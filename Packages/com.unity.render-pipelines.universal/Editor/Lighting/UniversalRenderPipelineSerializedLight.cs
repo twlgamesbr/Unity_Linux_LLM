@@ -6,8 +6,10 @@ namespace UnityEditor.Rendering.Universal
     {
         /// <summary>The base settings of the light</summary>
         public LightEditor.Settings settings { get; }
+
         /// <summary>The light serialized</summary>
         public SerializedObject serializedObject { get; }
+
         /// <summary>The additional light data serialized</summary>
         public SerializedObject serializedAdditionalDataObject { get; private set; }
 
@@ -18,11 +20,11 @@ namespace UnityEditor.Rendering.Universal
         public SerializedProperty intensity { get; }
 
         // URP Light Properties
-        public SerializedProperty useAdditionalDataProp { get; }                     // Does light use shadow bias settings defined in UniversalRP asset file?
-        public SerializedProperty additionalLightsShadowResolutionTierProp { get; }  // Index of the AdditionalLights ShadowResolution Tier
-        public SerializedProperty softShadowQualityProp { get; }                     // Per light soft shadow filtering quality.
-        public SerializedProperty lightCookieSizeProp { get; }                       // Multi dimensional light cookie size replacing `cookieSize` in legacy light.
-        public SerializedProperty lightCookieOffsetProp { get; }                     // Multi dimensional light cookie offset.
+        public SerializedProperty useAdditionalDataProp { get; } // Does light use shadow bias settings defined in UniversalRP asset file?
+        public SerializedProperty additionalLightsShadowResolutionTierProp { get; } // Index of the AdditionalLights ShadowResolution Tier
+        public SerializedProperty softShadowQualityProp { get; } // Per light soft shadow filtering quality.
+        public SerializedProperty lightCookieSizeProp { get; } // Multi dimensional light cookie size replacing `cookieSize` in legacy light.
+        public SerializedProperty lightCookieOffsetProp { get; } // Multi dimensional light cookie offset.
 
         // Light layers related
         public SerializedProperty renderingLayers { get; }
@@ -55,14 +57,17 @@ namespace UnityEditor.Rendering.Universal
 
             this.serializedObject = serializedObject;
 
-            lightsAdditionalData = CoreEditorUtils
-                .GetAdditionalData<UniversalAdditionalLightData>(serializedObject.targetObjects);
+            lightsAdditionalData = CoreEditorUtils.GetAdditionalData<UniversalAdditionalLightData>(
+                serializedObject.targetObjects
+            );
             serializedAdditionalDataObject = new SerializedObject(lightsAdditionalData);
 
             intensity = serializedObject.FindProperty("m_Intensity");
 
             useAdditionalDataProp = serializedAdditionalDataObject.FindProperty("m_UsePipelineSettings");
-            additionalLightsShadowResolutionTierProp = serializedAdditionalDataObject.FindProperty("m_AdditionalLightsShadowResolutionTier");
+            additionalLightsShadowResolutionTierProp = serializedAdditionalDataObject.FindProperty(
+                "m_AdditionalLightsShadowResolutionTier"
+            );
             softShadowQualityProp = serializedAdditionalDataObject.FindProperty("m_SoftShadowQuality");
             lightCookieSizeProp = serializedAdditionalDataObject.FindProperty("m_LightCookieSize");
             lightCookieOffsetProp = serializedAdditionalDataObject.FindProperty("m_LightCookieOffset");

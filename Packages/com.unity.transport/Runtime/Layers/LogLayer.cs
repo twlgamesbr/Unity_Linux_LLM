@@ -11,7 +11,7 @@ namespace Unity.Networking.Transport
     {
         private FixedString32Bytes m_DriverIdentifier;
 
-        public void Dispose() {}
+        public void Dispose() { }
 
         public int Initialize(ref NetworkSettings settings, ref ConnectionList connectionList, ref int packetPadding)
         {
@@ -24,20 +24,16 @@ namespace Unity.Networking.Transport
 
         public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dependency)
         {
-            return new LogJob
-            {
-                Label = $"[{m_DriverIdentifier}] Received",
-                Queue = arguments.ReceiveQueue,
-            }.Schedule(dependency);
+            return new LogJob { Label = $"[{m_DriverIdentifier}] Received", Queue = arguments.ReceiveQueue }.Schedule(
+                dependency
+            );
         }
 
         public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dependency)
         {
-            return new LogJob
-            {
-                Label = $"[{m_DriverIdentifier}] Sent",
-                Queue = arguments.SendQueue,
-            }.Schedule(dependency);
+            return new LogJob { Label = $"[{m_DriverIdentifier}] Sent", Queue = arguments.SendQueue }.Schedule(
+                dependency
+            );
         }
 
         [BurstCompile]
@@ -49,8 +45,9 @@ namespace Unity.Networking.Transport
             public void Execute()
             {
                 var count = Queue.Count;
-                if (count == 0) return;
-                
+                if (count == 0)
+                    return;
+
                 var buffer = new UnsafeText(4096, Allocator.Temp);
 
                 for (int i = 0; i < count; i++)
@@ -76,7 +73,13 @@ namespace Unity.Networking.Transport
                     }
 
                     var str = new FixedString4096Bytes(Label);
-                    str.Append(FixedString.Format(" {0} bytes [Endpoint: {1}]: ", packetProcessor.Length, packetProcessor.EndpointRef.ToFixedString512Bytes()));
+                    str.Append(
+                        FixedString.Format(
+                            " {0} bytes [Endpoint: {1}]: ",
+                            packetProcessor.Length,
+                            packetProcessor.EndpointRef.ToFixedString512Bytes()
+                        )
+                    );
                     if (AppendPayload(ref str, ref packetProcessor))
                     {
                         UnityEngine.Debug.Log(str);

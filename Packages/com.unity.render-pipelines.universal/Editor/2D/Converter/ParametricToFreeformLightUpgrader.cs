@@ -14,23 +14,24 @@ namespace UnityEditor.Rendering.Universal
     {
         public int type { get; set; }
 
-        public ParametricToFreeformLightUpgraderItem(string id) : base(id)
-        {
-        }
+        public ParametricToFreeformLightUpgraderItem(string id)
+            : base(id) { }
 
-        public ParametricToFreeformLightUpgraderItem(GlobalObjectId gid, string assetPath) : base(gid, assetPath)
-        {
-        }
+        public ParametricToFreeformLightUpgraderItem(GlobalObjectId gid, string assetPath)
+            : base(gid, assetPath) { }
 
-        public new Texture2D icon => EditorGUIUtility.ObjectContent(null, typeof(UnityEngine.Rendering.Universal.Light2D)).image as Texture2D;
+        public new Texture2D icon =>
+            EditorGUIUtility.ObjectContent(null, typeof(UnityEngine.Rendering.Universal.Light2D)).image as Texture2D;
     }
 
     [Serializable]
     [PipelineTools]
     [BatchModeConverterClassInfo("UpgradeURP2DAssets", "ParametricToFreeformLight")]
-    [ElementInfo(Name = "Parametric to Freeform Light Upgrade",
-             Order = 100,
-             Description = "This will upgrade all parametric lights to freeform lights.")]
+    [ElementInfo(
+        Name = "Parametric to Freeform Light Upgrade",
+        Order = 100,
+        Description = "This will upgrade all parametric lights to freeform lights."
+    )]
     internal sealed class ParametricToFreeformLightUpgrader : IRenderPipelineConverter
     {
         public bool isEnabled
@@ -60,13 +61,9 @@ namespace UnityEditor.Rendering.Universal
 
             var processedIds = new HashSet<string>();
 
-            SearchServiceUtils.RunQueuedSearch
-            (
+            SearchServiceUtils.RunQueuedSearch(
                 SearchServiceUtils.IndexingOptions.DeepSearch,
-                new List<(string, string)>()
-                {
-                    ("t:UnityEngine.Rendering.Universal.Light2D", "Light 2D"),
-                },
+                new List<(string, string)>() { ("t:UnityEngine.Rendering.Universal.Light2D", "Light 2D") },
                 (item, description) =>
                 {
                     // Direct conversion - works for both assets and scene objects
@@ -97,9 +94,8 @@ namespace UnityEditor.Rendering.Universal
                         info = isPrefab
                             ? $"Prefab: {AssetDatabase.GetAssetPath(unityObject)}"
                             : $"Scene: {go.scene.path}",
-                        type = type
+                        type = type,
                     };
-
 
                     returnList.Add(lightUpgraderItem);
                 },
@@ -139,12 +135,15 @@ namespace UnityEditor.Rendering.Universal
                 var min = new Vector3(float.MaxValue, float.MaxValue, 0);
                 var max = new Vector3(float.MinValue, float.MinValue, 0);
 
-
                 Vector3[] shapePath = new Vector3[sides];
                 for (var i = 0; i < sides; i++)
                 {
                     var endAngle = (i + 1) * radiansPerSide;
-                    var extrudeDir = new Vector3(Mathf.Cos(endAngle + angleOffset), Mathf.Sin(endAngle + angleOffset), 0);
+                    var extrudeDir = new Vector3(
+                        Mathf.Cos(endAngle + angleOffset),
+                        Mathf.Sin(endAngle + angleOffset),
+                        0
+                    );
                     var endPoint = radius * extrudeDir;
 
                     shapePath[i] = endPoint;

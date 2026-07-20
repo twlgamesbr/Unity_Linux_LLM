@@ -66,6 +66,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
 
         [SerializeField]
         public SceneSetup[] SceneSetup;
+
         [NonSerialized]
         public TestTaskBase[] Tasks;
 
@@ -82,10 +83,13 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
 
         [NonSerialized]
         public TestStartedEvent TestStartedEvent;
+
         [NonSerialized]
         public TestFinishedEvent TestFinishedEvent;
+
         [NonSerialized]
         public RunStartedEvent RunStartedEvent;
+
         [NonSerialized]
         public RunFinishedEvent RunFinishedEvent;
 
@@ -163,7 +167,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
                 return PlayerBuildOptionsWithProfile.options;
 #endif
 
-         return PlayerBuildOptions.options;
+            return PlayerBuildOptions.options;
         }
 
         [Serializable]

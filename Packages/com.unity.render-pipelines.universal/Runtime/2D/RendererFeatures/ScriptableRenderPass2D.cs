@@ -1,4 +1,3 @@
-
 using System;
 
 namespace UnityEngine.Rendering.Universal
@@ -64,6 +63,7 @@ namespace UnityEngine.Rendering.Universal
         /// You can target sorting layers when using this event.
         /// </summary>
         AfterRenderingSprites = 800,
+
         /// <summary>
         /// Executes a <c>ScriptableRenderPass2D</c> before rendering post-processing.
         /// </summary>
@@ -115,7 +115,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public int renderPassSortingLayerID { get; set; }
 
-        static internal int GetRenderPassEventRange(RenderPassEvent2D renderPassEvent2D)
+        internal static int GetRenderPassEventRange(RenderPassEvent2D renderPassEvent2D)
         {
             int numEvents = RenderPassEvents2DEnumValues.values.Length;
             int currentIndex = 0;
@@ -131,7 +131,9 @@ namespace UnityEngine.Rendering.Universal
 
             if (currentIndex >= numEvents)
             {
-                Debug.LogError("GetRenderPassEventRange: invalid renderPassEvent2D value cannot be found in the RenderPassEvent2D enumeration");
+                Debug.LogError(
+                    "GetRenderPassEventRange: invalid renderPassEvent2D value cannot be found in the RenderPassEvent2D enumeration"
+                );
                 return 0;
             }
 
@@ -143,15 +145,20 @@ namespace UnityEngine.Rendering.Universal
             return nextValue - (int)renderPassEvent2D;
         }
 
-        static internal bool IsSortingLayerEvent(RenderPassEvent2D renderPassEvent)
+        internal static bool IsSortingLayerEvent(RenderPassEvent2D renderPassEvent)
         {
-            return renderPassEvent >= RenderPassEvent2D.BeforeRenderingNormals && renderPassEvent <= RenderPassEvent2D.AfterRenderingSprites;
+            return renderPassEvent >= RenderPassEvent2D.BeforeRenderingNormals
+                && renderPassEvent <= RenderPassEvent2D.AfterRenderingSprites;
         }
     }
 
-    static internal class ScriptableRenderPass2DExtension
+    internal static class ScriptableRenderPass2DExtension
     {
-        static internal void GetInjectionPoint2D(this ScriptableRenderPass renderPass, out RenderPassEvent2D rpEvent, out int rpLayer)
+        internal static void GetInjectionPoint2D(
+            this ScriptableRenderPass renderPass,
+            out RenderPassEvent2D rpEvent,
+            out int rpLayer
+        )
         {
             ScriptableRenderPass2D renderPass2D = renderPass as ScriptableRenderPass2D;
 

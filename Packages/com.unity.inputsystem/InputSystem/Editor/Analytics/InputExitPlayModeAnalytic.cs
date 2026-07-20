@@ -6,8 +6,12 @@ using UnityEditor;
 namespace UnityEngine.InputSystem.Editor
 {
 #if UNITY_2023_2_OR_NEWER
-    [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-        maxNumberOfElements: kMaxNumberOfElements, vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey)]
+    [UnityEngine.Analytics.AnalyticInfo(
+        eventName: kEventName,
+        maxEventsPerHour: kMaxEventsPerHour,
+        maxNumberOfElements: kMaxNumberOfElements,
+        vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey
+    )]
 #endif // UNITY_2023_2_OR_NEWER
     internal class InputExitPlayModeAnalytic : UnityEngine.InputSystem.InputAnalytics.IInputAnalytic
     {
@@ -35,7 +39,7 @@ namespace UnityEngine.InputSystem.Editor
             ControlSchemeWithRequiredDevice = 9,
             ControlSchemeWithOptionalDevice = 10,
             ControlSchemeOrWithRequiredDevice = 11,
-            ControlSchemeOrWithOptionalDevice = 12
+            ControlSchemeOrWithOptionalDevice = 12,
         }
 
         private static readonly int[] m_Counters = new int[Enum.GetNames(typeof(Api)).Length];
@@ -59,10 +63,7 @@ namespace UnityEngine.InputSystem.Editor
         /// <remarks>
         /// May be used to temporarily suppress analytics to avoid false positives from internal usage.
         /// </remarks>
-        public static bool suppress
-        {
-            get; set;
-        }
+        public static bool suppress { get; set; }
 
         // Cache delegate
         private static readonly Action<PlayModeStateChange> PlayModeChanged = OnPlayModeStateChange;

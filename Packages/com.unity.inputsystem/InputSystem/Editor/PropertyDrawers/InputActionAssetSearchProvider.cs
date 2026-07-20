@@ -13,18 +13,28 @@ namespace UnityEngine.InputSystem.Editor
 
         internal static SearchProvider CreateInputActionAssetSearchProvider()
         {
-            return CreateInputActionAssetSearchProvider(k_AssetFolderSearchProviderId,
+            return CreateInputActionAssetSearchProvider(
+                k_AssetFolderSearchProviderId,
                 "Asset Input Action Assets",
-                (obj) => { return obj != null ? AssetDatabase.GetAssetPath(obj) : "Null"; },
-                () => LoadInputActionAssetsFromAssetDatabase(skipProjectWide: true));
+                (obj) =>
+                {
+                    return obj != null ? AssetDatabase.GetAssetPath(obj) : "Null";
+                },
+                () => LoadInputActionAssetsFromAssetDatabase(skipProjectWide: true)
+            );
         }
 
         internal static SearchProvider CreateInputActionAssetSearchProviderForProjectWideActions()
         {
-            return CreateInputActionAssetSearchProvider(k_ProjectWideActionsSearchProviderId,
+            return CreateInputActionAssetSearchProvider(
+                k_ProjectWideActionsSearchProviderId,
                 "Project-Wide Input Action Asset",
-                (obj) => { return obj != null ? AssetDatabase.GetAssetPath(obj) : "Null"; },
-                () => LoadInputActionReferencesFromAsset());
+                (obj) =>
+                {
+                    return obj != null ? AssetDatabase.GetAssetPath(obj) : "Null";
+                },
+                () => LoadInputActionReferencesFromAsset()
+            );
         }
 
         private static IEnumerable<Object> LoadInputActionReferencesFromAsset()
@@ -60,8 +70,12 @@ namespace UnityEngine.InputSystem.Editor
             return inputActionAssetList;
         }
 
-        private static SearchProvider CreateInputActionAssetSearchProvider(string id, string displayName,
-            Func<Object, string> createItemFetchDescription, Func<IEnumerable<Object>> fetchAssets)
+        private static SearchProvider CreateInputActionAssetSearchProvider(
+            string id,
+            string displayName,
+            Func<Object, string> createItemFetchDescription,
+            Func<IEnumerable<Object>> fetchAssets
+        )
         {
             // We assign description+label in FilteredSearch but also provide a fetchDescription+fetchLabel below.
             // This is needed to support all zoom-modes for an unknown reason.
@@ -73,8 +87,8 @@ namespace UnityEngine.InputSystem.Editor
             {
                 priority = 25,
                 fetchDescription = FetchLabel,
-                fetchItems = (context, items, provider) => FilteredSearch(context, provider, FetchLabel, createItemFetchDescription,
-                    fetchAssets),
+                fetchItems = (context, items, provider) =>
+                    FilteredSearch(context, provider, FetchLabel, createItemFetchDescription, fetchAssets),
                 fetchLabel = FetchLabel,
                 fetchPreview = (item, context, size, options) => inputActionAssetIcon,
                 fetchThumbnail = (item, context) => inputActionAssetIcon,
@@ -88,13 +102,18 @@ namespace UnityEngine.InputSystem.Editor
         }
 
         // Custom search function with label matching filtering.
-        private static IEnumerable<SearchItem> FilteredSearch(SearchContext context, SearchProvider provider,
-            Func<Object, string> fetchObjectLabel, Func<Object, string> createItemFetchDescription, Func<IEnumerable<Object>> fetchAssets)
+        private static IEnumerable<SearchItem> FilteredSearch(
+            SearchContext context,
+            SearchProvider provider,
+            Func<Object, string> fetchObjectLabel,
+            Func<Object, string> createItemFetchDescription,
+            Func<IEnumerable<Object>> fetchAssets
+        )
         {
             foreach (var asset in fetchAssets())
             {
                 var label = fetchObjectLabel(asset);
-                Texture2D thumbnail = null;   // filled in later
+                Texture2D thumbnail = null; // filled in later
 
                 if (!label.Contains(context.searchText, System.StringComparison.InvariantCultureIgnoreCase))
                     continue; // Ignore due to filtering
@@ -102,14 +121,20 @@ namespace UnityEngine.InputSystem.Editor
                 string itemId;
 
                 // 6.4 deprecated instance ids in favour of entity ids
-                #if UNITY_6000_4_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                 itemId = asset.GetEntityId().ToString();
-                #else
+#else
                 itemId = asset.GetInstanceID().ToString();
-                #endif
+#endif
 
-                yield return provider.CreateItem(context, itemId, label, createItemFetchDescription(asset),
-                    thumbnail, asset);
+                yield return provider.CreateItem(
+                    context,
+                    itemId,
+                    label,
+                    createItemFetchDescription(asset),
+                    thumbnail,
+                    asset
+                );
             }
         }
 
@@ -122,7 +147,7 @@ namespace UnityEngine.InputSystem.Editor
 
         private static string FetchLabel(SearchItem item, SearchContext context)
         {
-            return FetchLabel((item.data as Object) !);
+            return FetchLabel((item.data as Object)!);
         }
     }
 }

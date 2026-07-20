@@ -13,12 +13,12 @@ namespace UnityEditor.UI.Analytics
 
         public int callbackOrder { get; }
 
-        public void OnPreprocessBuild (BuildReport report)
+        public void OnPreprocessBuild(BuildReport report)
         {
             buildEvent = new UGUIBuildEvent();
         }
 
-        public void OnPostprocessBuild (BuildReport report)
+        public void OnPostprocessBuild(BuildReport report)
         {
             buildEvent.buildGuid = report.summary.guid.ToString();
             buildEvent.buildType = report.summary.buildType;
@@ -55,5 +55,4 @@ namespace UnityEditor.UI.Analytics
             }
         }
     }
-
 }

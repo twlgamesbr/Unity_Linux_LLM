@@ -10,6 +10,7 @@ namespace UnityEngine.UI
     public class LayoutRebuilder : ICanvasElement
     {
         private RectTransform m_ToRebuild;
+
         //There are a few of reasons we need to cache the Hash fromt he transform:
         //  - This is a ValueType (struct) and .Net calculates Hash from the Value Type fields.
         //  - The key of a Dictionary should have a constant Hash value.
@@ -18,7 +19,11 @@ namespace UnityEngine.UI
         // So this struct gets used as a key to a dictionary, so we need to guarantee a constant Hash value.
         private int m_CachedHashFromTransform;
 
-        static ObjectPool<LayoutRebuilder> s_Rebuilders = new ObjectPool<LayoutRebuilder>(() => new LayoutRebuilder(), null, x => x.Clear());
+        static ObjectPool<LayoutRebuilder> s_Rebuilders = new ObjectPool<LayoutRebuilder>(
+            () => new LayoutRebuilder(),
+            null,
+            x => x.Clear()
+        );
 
         private void Initialize(RectTransform controller)
         {
@@ -42,7 +47,10 @@ namespace UnityEngine.UI
             MarkLayoutForRebuild(driven);
         }
 
-        public Transform transform { get { return m_ToRebuild; }}
+        public Transform transform
+        {
+            get { return m_ToRebuild; }
+        }
 
         /// <summary>
         /// Has the native representation of this LayoutRebuilder been destroyed?
@@ -148,7 +156,7 @@ namespace UnityEngine.UI
             // If there are no controllers on this rect we can skip this entire sub-tree
             // We don't need to consider controllers on children deeper in the sub-tree either,
             // since they will be their own roots.
-            if (components.Count > 0  || rect.TryGetComponent(typeof(ILayoutGroup), out _))
+            if (components.Count > 0 || rect.TryGetComponent(typeof(ILayoutGroup), out _))
             {
                 // Layout calculations needs to executed bottom up with children being done before their parents,
                 // because the parent calculated sizes rely on the sizes of the children.
@@ -263,8 +271,7 @@ namespace UnityEngine.UI
             s_Rebuilders.Release(this);
         }
 
-        public void GraphicUpdateComplete()
-        {}
+        public void GraphicUpdateComplete() { }
 
         public override int GetHashCode()
         {

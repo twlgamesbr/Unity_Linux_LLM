@@ -12,7 +12,8 @@ namespace Unity.PlatformToolkit.PlayMode
         public PlayModeControlsAccountDataList(PlayModeControlsViewModel playModeControlsView)
         {
             var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                "Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsAccountDataList.uxml");
+                "Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsAccountDataList.uxml"
+            );
             uxml.CloneTree(this);
 
             // Note the binding is configured in UXML

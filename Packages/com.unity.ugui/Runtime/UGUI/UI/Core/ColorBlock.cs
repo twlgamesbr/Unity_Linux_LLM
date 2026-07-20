@@ -63,7 +63,11 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Color normalColor       { get { return m_NormalColor; } set { m_NormalColor = value; } }
+        public Color normalColor
+        {
+            get { return m_NormalColor; }
+            set { m_NormalColor = value; }
+        }
 
         /// <summary>
         /// The highlight color for this color block.
@@ -91,7 +95,11 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Color highlightedColor  { get { return m_HighlightedColor; } set { m_HighlightedColor = value; } }
+        public Color highlightedColor
+        {
+            get { return m_HighlightedColor; }
+            set { m_HighlightedColor = value; }
+        }
 
         /// <summary>
         /// The pressed color for this color block.
@@ -119,7 +127,11 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Color pressedColor      { get { return m_PressedColor; } set { m_PressedColor = value; } }
+        public Color pressedColor
+        {
+            get { return m_PressedColor; }
+            set { m_PressedColor = value; }
+        }
 
         /// <summary>
         /// The selected color for this color block.
@@ -147,7 +159,11 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Color selectedColor     { get { return m_SelectedColor; } set { m_SelectedColor = value; } }
+        public Color selectedColor
+        {
+            get { return m_SelectedColor; }
+            set { m_SelectedColor = value; }
+        }
 
         /// <summary>
         /// The disabled color for this color block.
@@ -175,17 +191,29 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Color disabledColor     { get { return m_DisabledColor; } set { m_DisabledColor = value; } }
+        public Color disabledColor
+        {
+            get { return m_DisabledColor; }
+            set { m_DisabledColor = value; }
+        }
 
         /// <summary>
         /// Multiplier applied to colors (allows brightening greater then base color).
         /// </summary>
-        public float colorMultiplier   { get { return m_ColorMultiplier; } set { m_ColorMultiplier = value; } }
+        public float colorMultiplier
+        {
+            get { return m_ColorMultiplier; }
+            set { m_ColorMultiplier = value; }
+        }
 
         /// <summary>
         /// How long a color transition between states should take.
         /// </summary>
-        public float fadeDuration      { get { return m_FadeDuration; } set { m_FadeDuration = value; } }
+        public float fadeDuration
+        {
+            get { return m_FadeDuration; }
+            set { m_FadeDuration = value; }
+        }
 
         /// <summary>
         /// Simple getter for a code generated default ColorBlock.
@@ -196,13 +224,13 @@ namespace UnityEngine.UI
         {
             defaultColorBlock = new ColorBlock
             {
-                m_NormalColor      = new Color32(255, 255, 255, 255),
+                m_NormalColor = new Color32(255, 255, 255, 255),
                 m_HighlightedColor = new Color32(245, 245, 245, 255),
-                m_PressedColor     = new Color32(200, 200, 200, 255),
-                m_SelectedColor    = new Color32(245, 245, 245, 255),
-                m_DisabledColor    = new Color32(200, 200, 200, 128),
-                colorMultiplier    = 1.0f,
-                fadeDuration       = 0.1f
+                m_PressedColor = new Color32(200, 200, 200, 255),
+                m_SelectedColor = new Color32(245, 245, 245, 255),
+                m_DisabledColor = new Color32(200, 200, 200, 128),
+                colorMultiplier = 1.0f,
+                fadeDuration = 0.1f,
             };
         }
 
@@ -216,21 +244,21 @@ namespace UnityEngine.UI
 
         public bool Equals(ColorBlock other)
         {
-            return normalColor == other.normalColor &&
-                highlightedColor == other.highlightedColor &&
-                pressedColor == other.pressedColor &&
-                selectedColor == other.selectedColor &&
-                disabledColor == other.disabledColor &&
-                colorMultiplier == other.colorMultiplier &&
-                fadeDuration == other.fadeDuration;
+            return normalColor == other.normalColor
+                && highlightedColor == other.highlightedColor
+                && pressedColor == other.pressedColor
+                && selectedColor == other.selectedColor
+                && disabledColor == other.disabledColor
+                && colorMultiplier == other.colorMultiplier
+                && fadeDuration == other.fadeDuration;
         }
 
-        public static bool operator==(ColorBlock point1, ColorBlock point2)
+        public static bool operator ==(ColorBlock point1, ColorBlock point2)
         {
             return point1.Equals(point2);
         }
 
-        public static bool operator!=(ColorBlock point1, ColorBlock point2)
+        public static bool operator !=(ColorBlock point1, ColorBlock point2)
         {
             return !point1.Equals(point2);
         }

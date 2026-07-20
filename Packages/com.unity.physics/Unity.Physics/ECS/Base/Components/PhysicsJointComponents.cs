@@ -75,63 +75,76 @@ namespace Unity.Physics
         /// Use this value to designate a <see cref="Constraint"/> configuration that does not map to a common type of joint, or to designate unknown configurations.
         /// </summary>
         Custom,
+
         /// <summary>
         /// A joint constraining the anchor point on body A to the target point on body B, about which the bodies can freely rotate.
         /// </summary>
         BallAndSocket,
+
         /// <summary>
         /// A joint constraining the position and orientation on body A to the target position and orientation on body B.
         /// </summary>
         Fixed,
+
         /// <summary>
         /// A joint constraining the anchor point on body A to the target point on body B, where each body can rotate freely about the vector where their axes align.
         /// The perpendicular axis of each body frame has no effect.
         /// </summary>
         Hinge,
+
         /// <summary>
         /// A joint constraining the anchor point on body A to the target point on body B within a specified linear distance range.
         /// </summary>
         LimitedDistance,
+
         /// <summary>
         /// A joint constraining the anchor point on body A to the target point on body B, where each body can rotate within a limited range about the vector where their axes align.
         /// The perpendicular axis of each body frame is used as a reference point for the range of motion.
         /// </summary>
         LimitedHinge,
+
         /// <summary>
         /// A joint constraining the anchor point on body A to the target point on body B, where the bodies' orientations are locked to one another and they can translate along the vector where the bodies' axes align.
         /// </summary>
         Prismatic,
+
         /// <summary>
         /// A joint constraining the orientation of body A to the orientation of body B, where the relative orientation of the bodies' axes may fall within a conical range of motion.
         /// The bodies' perpendicular axes may further rotate about their axes within a limited range of motion.
         /// This type is used in conjunction with <see cref="RagdollPerpendicularCone"/>.
         /// </summary>
         RagdollPrimaryCone,
+
         /// <summary>
         /// A joint constraining the anchor point on body A to the target point on body B, where the relative orientation of the bodies' perpendicular axes may fall within a range of motion between two cones aligned with the primary axis.
         /// This type is used in conjunction with <see cref="RagdollPrimaryCone"/>, where body B's axis for this joint corresponds with body A's primary axis in the primary cone.
         /// </summary>
         RagdollPerpendicularCone,
+
         /// <summary>
         /// A joint constraining the degrees of freedom of body A to a reference frame in the space of body B.
         /// </summary>
         LimitedDegreeOfFreedom,
+
         /// <summary>
         /// A motor that orients body A to a target rotation.
         /// </summary>
         RotationalMotor,
+
         /// <summary>
         /// A motor that drives a bodies angular velocity to a target angular velocity.
         /// </summary>
         AngularVelocityMotor,
+
         /// <summary>
         /// A motor that moves body A to a target position.
         /// </summary>
         PositionalMotor,
+
         /// <summary>
         /// A motor that drives a bodies' linear velocity to a target linear velocity.
         /// </summary>
-        LinearVelocityMotor
+        LinearVelocityMotor,
     }
 
     /// <summary>
@@ -146,7 +159,6 @@ namespace Unity.Physics
         /// <summary>   The number of constraints currently stored. </summary>
         public byte Length;
         internal const byte Capacity = 3;
-
 
         /// <summary>
         /// Set the sequence of <see cref="Constraint"/>s to this constraint block.
@@ -168,7 +180,10 @@ namespace Unity.Physics
                 {
                     ref var constraintsRef = ref this;
                     ref var listRef = ref constraints.ElementAt(0);
-                    fixed(void* constraintPtr = &constraintsRef, constraintListPtr = &listRef)
+                    fixed (
+                        void* constraintPtr = &constraintsRef,
+                            constraintListPtr = &listRef
+                    )
                     {
                         UnsafeUtility.MemCpy(constraintPtr, constraintListPtr, constraints.Length * sizeof(Constraint));
                     }
@@ -181,13 +196,13 @@ namespace Unity.Physics
         /// Returns a list representation of constraints in this block.
         /// </summary>
         /// <returns> The constraints. </returns>
-        internal  FixedList512Bytes<Constraint> GetConstraints()
+        internal FixedList512Bytes<Constraint> GetConstraints()
         {
             unsafe
             {
                 FixedList512Bytes<Constraint> temp = default;
                 ref var self = ref this;
-                fixed(void* ptr = &self)
+                fixed (void* ptr = &self)
                 {
                     temp.AddRange(ptr, Length);
                 }
@@ -281,7 +296,10 @@ namespace Unity.Physics
         }
 
         [CreateProperty]
-        [Obsolete("This property is only included to display data in the Entity Inspector. It should not be used.", true)]
+        [Obsolete(
+            "This property is only included to display data in the Entity Inspector. It should not be used.",
+            true
+        )]
         IEnumerable<Constraint> Constraints => GetConstraints().ToArray();
 
         /// <summary> Get number of <see cref="Constraint"/> atoms in this joint.</summary>
@@ -299,7 +317,7 @@ namespace Unity.Physics
             {
                 SafetyChecks.CheckIndexAndThrow(constraintIndex, GetConstraintCount());
                 ref var self = ref m_Constraints;
-                fixed(void* ptr = &self)
+                fixed (void* ptr = &self)
                 {
                     return ((Constraint*)ptr)[constraintIndex];
                 }
@@ -308,7 +326,7 @@ namespace Unity.Physics
             {
                 SafetyChecks.CheckIndexAndThrow(constraintIndex, GetConstraintCount());
                 ref var self = ref m_Constraints;
-                fixed(void* ptr = &self)
+                fixed (void* ptr = &self)
                 {
                     Constraint* constraintPtr = &(((Constraint*)ptr)[constraintIndex]);
                     *constraintPtr = value;
@@ -321,8 +339,7 @@ namespace Unity.Physics
         /// </summary>
         ///
         /// <returns>   The constraints. </returns>
-        public FixedList512Bytes<Constraint> GetConstraints()
-            => m_Constraints.GetConstraints();
+        public FixedList512Bytes<Constraint> GetConstraints() => m_Constraints.GetConstraints();
 
         /// <summary>
         /// Set the sequence of <see cref="Constraint"/>s to apply between the two bodies.
@@ -375,7 +392,10 @@ namespace Unity.Physics
         /// </summary>
         /// <param name="impulseEventLinearThreshold"> Impulse event threshold for all linear constraints. </param>
         /// <param name="impulseEventAngularThreshold"> Impulse event threshold for all angular constraints. </param>
-        public void SetImpulseEventThresholdAllConstraints(float3 impulseEventLinearThreshold, float3 impulseEventAngularThreshold)
+        public void SetImpulseEventThresholdAllConstraints(
+            float3 impulseEventLinearThreshold,
+            float3 impulseEventAngularThreshold
+        )
         {
             for (int i = 0; i < m_Constraints.Length; i++)
             {
@@ -412,11 +432,7 @@ namespace Unity.Physics
                 BodyAFromJoint = bodyAFromJoint,
                 BodyBFromJoint = bodyBFromJoint,
                 m_JointType = JointType.BallAndSocket,
-                m_Constraints = new ConstraintBlock3
-                {
-                    Length = 1,
-                    A = Constraint.BallAndSocket()
-                }
+                m_Constraints = new ConstraintBlock3 { Length = 1, A = Constraint.BallAndSocket() },
             };
         }
 
@@ -429,17 +445,17 @@ namespace Unity.Physics
         /// <returns>   The new fixed joint. </returns>
         public static PhysicsJoint CreateFixed(BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.Fixed,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 2,
-                A = Constraint.BallAndSocket(),
-                B = Constraint.FixedAngle()
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.Fixed,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 2,
+                    A = Constraint.BallAndSocket(),
+                    B = Constraint.FixedAngle(),
+                },
+            };
 
         /// <summary>   Create a <see cref="JointType.Hinge"/> joint. </summary>
         ///
@@ -451,17 +467,17 @@ namespace Unity.Physics
         /// <returns>   The new hinge joint. </returns>
         public static PhysicsJoint CreateHinge(BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.Hinge,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 2,
-                A = Constraint.Hinge(0),
-                B = Constraint.BallAndSocket()
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.Hinge,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 2,
+                    A = Constraint.Hinge(0),
+                    B = Constraint.BallAndSocket(),
+                },
+            };
 
         internal const int k_LimitedDistanceRangeIndex = 0;
 
@@ -472,7 +488,8 @@ namespace Unity.Physics
         /// <param name="distanceRange">    The minimum required distance and maximum possible distance between the two anchor points. </param>
         ///
         /// <returns>   The new limited distance joint. </returns>
-        public static PhysicsJoint CreateLimitedDistance(float3 anchorA, float3 anchorB, FloatRange distanceRange)  => CreateLimitedDistance(anchorA, anchorB, distanceRange, Constraint.DefaultMaxImpulse);
+        public static PhysicsJoint CreateLimitedDistance(float3 anchorA, float3 anchorB, FloatRange distanceRange) =>
+            CreateLimitedDistance(anchorA, anchorB, distanceRange, Constraint.DefaultMaxImpulse);
 
         /// <summary>   Create a <see cref="JointType.LimitedDistance"/> joint. </summary>
         ///
@@ -484,7 +501,14 @@ namespace Unity.Physics
         /// <param name="dampingRatio">     The damping ratio used to relax this joint. </param>
         ///
         /// <returns>   The new limited distance joint. </returns>
-        public static PhysicsJoint CreateLimitedDistance(float3 anchorA, float3 anchorB, FloatRange distanceRange, float3 impulseEventThreshold, float springFrequency = Constraint.DefaultSpringFrequency, float dampingRatio = Constraint.DefaultDampingRatio)
+        public static PhysicsJoint CreateLimitedDistance(
+            float3 anchorA,
+            float3 anchorB,
+            FloatRange distanceRange,
+            float3 impulseEventThreshold,
+            float springFrequency = Constraint.DefaultSpringFrequency,
+            float dampingRatio = Constraint.DefaultDampingRatio
+        )
         {
             var bodyAFromJoint = BodyFrame.Identity;
             bodyAFromJoint.Position = anchorA;
@@ -498,8 +522,13 @@ namespace Unity.Physics
                 m_Constraints = new ConstraintBlock3
                 {
                     Length = 1,
-                    A = Constraint.LimitedDistance(distanceRange.Sorted(), impulseEventThreshold, springFrequency, dampingRatio),
-                }
+                    A = Constraint.LimitedDistance(
+                        distanceRange.Sorted(),
+                        impulseEventThreshold,
+                        springFrequency,
+                        dampingRatio
+                    ),
+                },
             };
         }
 
@@ -516,21 +545,23 @@ namespace Unity.Physics
         ///
         /// <returns>   The new limited hinge joint. </returns>
         public static PhysicsJoint CreateLimitedHinge(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint, FloatRange angularRange
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
+            FloatRange angularRange
         ) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.LimitedHinge,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 3,
-                A = Constraint.Twist(0, angularRange.Sorted()),
-                B = Constraint.Hinge(0),
-                C = Constraint.BallAndSocket()
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.LimitedHinge,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 3,
+                    A = Constraint.Twist(0, angularRange.Sorted()),
+                    B = Constraint.Hinge(0),
+                    C = Constraint.BallAndSocket(),
+                },
+            };
 
         internal const int k_PrismaticDistanceOnAxisIndex = 1;
 
@@ -562,25 +593,26 @@ namespace Unity.Physics
         /// <param name="springDamping">The spring damping.</param>
         /// <returns>   The created joint. </returns>
         public static PhysicsJoint CreateRotationalMotor(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint,
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
             float target,
             float maxImpulseOfMotor = Constraint.DefaultMaxImpulse,
             float springFrequency = Constraint.DefaultSpringFrequency,
             float springDamping = Constraint.DefaultDampingRatio
         ) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.RotationalMotor,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 3,
-                A = Constraint.MotorTwist(target, math.abs(maxImpulseOfMotor), springFrequency, springDamping),
-                B = Constraint.Hinge(0),
-                C = Constraint.BallAndSocket()
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.RotationalMotor,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 3,
+                    A = Constraint.MotorTwist(target, math.abs(maxImpulseOfMotor), springFrequency, springDamping),
+                    B = Constraint.Hinge(0),
+                    C = Constraint.BallAndSocket(),
+                },
+            };
 
         /// <summary>
         /// Create a <see cref="JointType.RotationalMotor"/> joint. This is an angular motor that will drive towards
@@ -611,7 +643,8 @@ namespace Unity.Physics
         /// <param name="springDamping">The spring damping.</param>
         /// <returns>   The created joint. </returns>
         public static PhysicsJoint CreateRotationalMotor(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint,
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
             float target,
             FloatRange angleRange,
             float maxImpulseOfMotor,
@@ -619,18 +652,24 @@ namespace Unity.Physics
             float springDamping
         ) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.RotationalMotor,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 3,
-                A = Constraint.MotorTwist(target, angleRange, math.abs(maxImpulseOfMotor), springFrequency, springDamping),
-                B = Constraint.Hinge(0),
-                C = Constraint.BallAndSocket()
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.RotationalMotor,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 3,
+                    A = Constraint.MotorTwist(
+                        target,
+                        angleRange,
+                        math.abs(maxImpulseOfMotor),
+                        springFrequency,
+                        springDamping
+                    ),
+                    B = Constraint.Hinge(0),
+                    C = Constraint.BallAndSocket(),
+                },
+            };
 
         /// <summary>
         /// Create a <see cref="JointType.AngularVelocityMotor"/> joint. This is an angular motor that will spin around
@@ -660,25 +699,31 @@ namespace Unity.Physics
         /// <param name="springDamping">The spring damping.</param>
         /// <returns>   The created joint. </returns>
         public static PhysicsJoint CreateAngularVelocityMotor(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint,
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
             float targetVelocity,
             float maxImpulseOfMotor = Constraint.DefaultMaxImpulse,
             float springFrequency = Constraint.DefaultSpringFrequency,
             float springDamping = Constraint.DefaultDampingRatio
         ) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.AngularVelocityMotor,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 3,
-                A = Constraint.BallAndSocket(),
-                B = Constraint.Hinge(0),
-                C = Constraint.AngularVelocityMotor(targetVelocity, math.abs(maxImpulseOfMotor), springFrequency, springDamping)
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.AngularVelocityMotor,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 3,
+                    A = Constraint.BallAndSocket(),
+                    B = Constraint.Hinge(0),
+                    C = Constraint.AngularVelocityMotor(
+                        targetVelocity,
+                        math.abs(maxImpulseOfMotor),
+                        springFrequency,
+                        springDamping
+                    ),
+                },
+            };
 
         /// <summary>
         /// Create a <see cref="JointType.Prismatic"/> joint.
@@ -688,21 +733,23 @@ namespace Unity.Physics
         /// <param name="distanceOnAxis">The minimum required and maximum possible distance between the two anchor points along their aligned axes.</param>
         /// <returns>   The created joint. </returns>
         public static PhysicsJoint CreatePrismatic(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint, FloatRange distanceOnAxis
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
+            FloatRange distanceOnAxis
         ) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.Prismatic,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 3,
-                A = Constraint.FixedAngle(),
-                B = Constraint.Planar(0, distanceOnAxis.Sorted()),
-                C = Constraint.Cylindrical(0, float2.zero)
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.Prismatic,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 3,
+                    A = Constraint.FixedAngle(),
+                    B = Constraint.Planar(0, distanceOnAxis.Sorted()),
+                    C = Constraint.Cylindrical(0, float2.zero),
+                },
+            };
 
         /// <summary>
         /// Create a PositionMotor joint. This is a motorized prismatic joint that drives bodies toward the specified
@@ -733,25 +780,26 @@ namespace Unity.Physics
         /// <param name="springDamping">The spring damping.</param>
         /// <returns>   The created joint. </returns>
         public static PhysicsJoint CreatePositionMotor(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint,
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
             float target,
             float maxImpulseOfMotor = Constraint.DefaultMaxImpulse,
             float springFrequency = Constraint.DefaultSpringFrequency,
             float springDamping = Constraint.DefaultDampingRatio
         ) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.PositionalMotor,
-            m_Constraints = new ConstraintBlock3
             {
-                Length = 3,
-                A = Constraint.MotorPlanar(target, math.abs(maxImpulseOfMotor), springFrequency, springDamping),
-                B = Constraint.FixedAngle(),
-                C = Constraint.Cylindrical(0, float2.zero)
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.PositionalMotor,
+                m_Constraints = new ConstraintBlock3
+                {
+                    Length = 3,
+                    A = Constraint.MotorPlanar(target, math.abs(maxImpulseOfMotor), springFrequency, springDamping),
+                    B = Constraint.FixedAngle(),
+                    C = Constraint.Cylindrical(0, float2.zero),
+                },
+            };
 
         /// <summary>
         /// Create a <see cref="JointType.LinearVelocityMotor"/> joint. This is a motorized prismatic joint type that
@@ -783,24 +831,30 @@ namespace Unity.Physics
         /// <param name="springDamping">The spring damping.</param>
         /// <returns>   The created joint. </returns>
         public static PhysicsJoint CreateLinearVelocityMotor(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint,
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
             float target,
             float maxImpulseOfMotor = Constraint.DefaultMaxImpulse,
             float springFrequency = Constraint.DefaultSpringFrequency,
             float springDamping = Constraint.DefaultDampingRatio
         ) =>
             new PhysicsJoint
-        {
-            BodyAFromJoint = bodyAFromJoint,
-            BodyBFromJoint = bodyBFromJoint,
-            m_JointType = JointType.LinearVelocityMotor,
-            m_Constraints = new ConstraintBlock3()
             {
-                Length = 2,
-                A = Constraint.LinearVelocityMotor(target, math.abs(maxImpulseOfMotor), springFrequency, springDamping),
-                B = Constraint.FixedAngle()
-            }
-        };
+                BodyAFromJoint = bodyAFromJoint,
+                BodyBFromJoint = bodyBFromJoint,
+                m_JointType = JointType.LinearVelocityMotor,
+                m_Constraints = new ConstraintBlock3()
+                {
+                    Length = 2,
+                    A = Constraint.LinearVelocityMotor(
+                        target,
+                        math.abs(maxImpulseOfMotor),
+                        springFrequency,
+                        springDamping
+                    ),
+                    B = Constraint.FixedAngle(),
+                },
+            };
 
         internal const int k_RagdollPrimaryMaxConeIndex = 1;
         internal const int k_RagdollPrimaryTwistRangeIndex = 0;
@@ -832,9 +886,13 @@ namespace Unity.Physics
         /// <param name="perpendicularCone">   [out] The joint defining the conic sections about the
         /// perpendicular axis to subtract from the primary cone. </param>
         public static void CreateRagdoll(
-            BodyFrame bodyAFromJoint, BodyFrame bodyBFromJoint,
-            float maxConeAngle, FloatRange angularPlaneRange, FloatRange angularTwistRange,
-            out PhysicsJoint primaryConeAndTwist, out PhysicsJoint perpendicularCone
+            BodyFrame bodyAFromJoint,
+            BodyFrame bodyBFromJoint,
+            float maxConeAngle,
+            FloatRange angularPlaneRange,
+            FloatRange angularTwistRange,
+            out PhysicsJoint primaryConeAndTwist,
+            out PhysicsJoint perpendicularCone
         )
         {
             primaryConeAndTwist = new PhysicsJoint
@@ -845,9 +903,12 @@ namespace Unity.Physics
                 m_Constraints = new ConstraintBlock3
                 {
                     Length = 2,
-                    A = Constraint.Twist(0, math.clamp(angularTwistRange.Sorted(), new float2(-math.PI), new float2(math.PI))),
-                    B = Constraint.Cone(0, new FloatRange(0f, math.min(math.abs(maxConeAngle), math.PI)))
-                }
+                    A = Constraint.Twist(
+                        0,
+                        math.clamp(angularTwistRange.Sorted(), new float2(-math.PI), new float2(math.PI))
+                    ),
+                    B = Constraint.Cone(0, new FloatRange(0f, math.min(math.abs(maxConeAngle), math.PI))),
+                },
             };
 
             perpendicularCone = new PhysicsJoint
@@ -857,15 +918,22 @@ namespace Unity.Physics
                 {
                     Axis = bodyBFromJoint.PerpendicularAxis,
                     PerpendicularAxis = bodyBFromJoint.Axis,
-                    Position = bodyBFromJoint.Position
+                    Position = bodyBFromJoint.Position,
                 },
                 m_JointType = JointType.RagdollPerpendicularCone,
                 m_Constraints = new ConstraintBlock3
                 {
                     Length = 2,
-                    A = Constraint.Cone(0, math.clamp(angularPlaneRange.Sorted() + new float2(math.PI / 2), new float2(0f), new float2(math.PI))),
-                    B = Constraint.BallAndSocket()
-                }
+                    A = Constraint.Cone(
+                        0,
+                        math.clamp(
+                            angularPlaneRange.Sorted() + new float2(math.PI / 2),
+                            new float2(0f),
+                            new float2(math.PI)
+                        )
+                    ),
+                    B = Constraint.BallAndSocket(),
+                },
             };
         }
 
@@ -907,9 +975,9 @@ namespace Unity.Physics
                         Max = 0,
                         MaxImpulse = Constraint.DefaultMaxImpulse,
                         SpringFrequency = Constraint.DefaultSpringFrequency,
-                        DampingRatio = Constraint.DefaultDampingRatio
-                    }
-                }
+                        DampingRatio = Constraint.DefaultDampingRatio,
+                    },
+                },
             };
             return joint;
         }

@@ -20,9 +20,13 @@ namespace UnityEditor.EventSystems
 
             if (eventSystem.isOverridingUIToolkitEvents)
             {
-                EditorGUILayout.HelpBox(L10n.Tr(
-                    "This EventSystem will be used to drive UI Toolkit input.\nYou can use the Panel Input Configuration component " +
-                    "to configure how UI Toolkit will interact with this EventSystem."), MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    L10n.Tr(
+                        "This EventSystem will be used to drive UI Toolkit input.\nYou can use the Panel Input Configuration component "
+                            + "to configure how UI Toolkit will interact with this EventSystem."
+                    ),
+                    MessageType.Info
+                );
             }
 
             if (eventSystem.GetComponent<BaseInputModule>() != null)
@@ -53,7 +57,7 @@ namespace UnityEditor.EventSystems
                     {
                         richText = true,
                         alignment = TextAnchor.UpperLeft,
-                        fontStyle = FontStyle.Normal
+                        fontStyle = FontStyle.Normal,
                     };
                 }
 

@@ -43,6 +43,7 @@ namespace Unity.Entities.Content
         internal UnsafeHashMap<ContentArchiveId, ArchiveLocation> ArchiveLocations;
         internal UnsafeList<UnsafeList<ContentFileId>> FileDependencies;
         internal ManagedStringTable ManagedStrings;
+
         /// <summary>
         /// Initialize internal data storage.
         /// </summary>
@@ -51,13 +52,28 @@ namespace Unity.Entities.Content
         /// <param name="archiveCapacity">The initial capacity for archives.</param>
         /// <param name="dependencyCapacity">The initial capacity for file dependencies.</param>
         /// <param name="sceneCapacity">The initial capacity for scenes.</param>
-        public void Initialize(int objectCapacity = 0, int fileCapacity = 0, int archiveCapacity = 0, int dependencyCapacity = 0, int sceneCapacity = 0)
+        public void Initialize(
+            int objectCapacity = 0,
+            int fileCapacity = 0,
+            int archiveCapacity = 0,
+            int dependencyCapacity = 0,
+            int sceneCapacity = 0
+        )
         {
             ManagedStrings = new ManagedStringTable(objectCapacity + fileCapacity + archiveCapacity + sceneCapacity);
-            SceneLocations = new UnsafeHashMap<UntypedWeakReferenceId, SceneLocation>(sceneCapacity, Allocator.Persistent);
-            ObjectLocations = new UnsafeHashMap<UntypedWeakReferenceId, ObjectLocation>(objectCapacity, Allocator.Persistent);
+            SceneLocations = new UnsafeHashMap<UntypedWeakReferenceId, SceneLocation>(
+                sceneCapacity,
+                Allocator.Persistent
+            );
+            ObjectLocations = new UnsafeHashMap<UntypedWeakReferenceId, ObjectLocation>(
+                objectCapacity,
+                Allocator.Persistent
+            );
             FileLocations = new UnsafeHashMap<ContentFileId, FileLocation>(fileCapacity, Allocator.Persistent);
-            ArchiveLocations = new UnsafeHashMap<ContentArchiveId, ArchiveLocation>(archiveCapacity, Allocator.Persistent);
+            ArchiveLocations = new UnsafeHashMap<ContentArchiveId, ArchiveLocation>(
+                archiveCapacity,
+                Allocator.Persistent
+            );
             FileDependencies = new UnsafeList<UnsafeList<ContentFileId>>(dependencyCapacity, Allocator.Persistent);
         }
 
@@ -71,27 +87,32 @@ namespace Unity.Entities.Content
         /// </summary>
         /// <param name="alloc">Allocator to use for created NativeArray.</param>
         /// <returns>The set of archive ids.  The caller is responsible for disposing the returned array.</returns>
-        public NativeArray<ContentArchiveId> GetArchiveIds(AllocatorManager.AllocatorHandle alloc) => ArchiveLocations.GetKeyArray(alloc);
+        public NativeArray<ContentArchiveId> GetArchiveIds(AllocatorManager.AllocatorHandle alloc) =>
+            ArchiveLocations.GetKeyArray(alloc);
 
         /// <summary>
         /// Get the entire list of object ids.
         /// </summary>
         /// <param name="alloc">Allocator to use for created NativeArray.</param>
         /// <returns>The set of object ids.  The caller is responsible for disposing the returned array.</returns>
-        public NativeArray<UntypedWeakReferenceId> GetObjectIds(AllocatorManager.AllocatorHandle alloc) => ObjectLocations.GetKeyArray(alloc);
+        public NativeArray<UntypedWeakReferenceId> GetObjectIds(AllocatorManager.AllocatorHandle alloc) =>
+            ObjectLocations.GetKeyArray(alloc);
+
         /// <summary>
         /// Get the entire list of object ids.
         /// </summary>
         /// <param name="alloc">Allocator to use for created NativeArray.</param>
         /// <returns>The set of object ids.  The caller is responsible for disposing the returned array.</returns>
-        public NativeArray<UntypedWeakReferenceId> GetSceneIds(AllocatorManager.AllocatorHandle alloc) => SceneLocations.GetKeyArray(alloc);
+        public NativeArray<UntypedWeakReferenceId> GetSceneIds(AllocatorManager.AllocatorHandle alloc) =>
+            SceneLocations.GetKeyArray(alloc);
 
         /// <summary>
         /// Get the entire list of file ids.
         /// </summary>
         /// <param name="alloc">Allocator to use for created NativeArray.</param>
         /// <returns>The set of file ids.  The caller is responsible for disposing the returned array.</returns>
-        public NativeArray<ContentFileId> GetFileIds(AllocatorManager.AllocatorHandle alloc) => FileLocations.GetKeyArray(alloc);
+        public NativeArray<ContentFileId> GetFileIds(AllocatorManager.AllocatorHandle alloc) =>
+            FileLocations.GetKeyArray(alloc);
 
         /// <summary>
         /// The number of scenes.
@@ -121,9 +142,16 @@ namespace Unity.Entities.Content
         /// <param name="archivePathTransformFunc">Functor to transform archive paths.</param>
         /// <param name="mountedFileNameTransformFunc">Functor to transform filenames.</param>
         /// <returns> Returns true if the load was successful, false if it was unsuccessful. </returns>
-        public bool LoadCatalogData(string catalogPath, Func<string, string> archivePathTransformFunc, Func<string, string> mountedFileNameTransformFunc)
+        public bool LoadCatalogData(
+            string catalogPath,
+            Func<string, string> archivePathTransformFunc,
+            Func<string, string> mountedFileNameTransformFunc
+        )
         {
-            if (!string.IsNullOrEmpty(catalogPath) && BlobAssetReference<RuntimeContentCatalogData>.TryRead(catalogPath, 1, out var catalogData))
+            if (
+                !string.IsNullOrEmpty(catalogPath)
+                && BlobAssetReference<RuntimeContentCatalogData>.TryRead(catalogPath, 1, out var catalogData)
+            )
             {
                 LoadCatalogData(ref catalogData.Value, archivePathTransformFunc, mountedFileNameTransformFunc);
                 catalogData.Dispose();
@@ -138,7 +166,11 @@ namespace Unity.Entities.Content
         /// <param name="catalogData">The catalog data.</param>
         /// <param name="archivePathTransformFunc">Functor to transform archive paths.</param>
         /// <param name="mountedFileNameTransformFunc">Functor to transform filenames.</param>
-        public void LoadCatalogData(ref RuntimeContentCatalogData catalogData, Func<string, string> archivePathTransformFunc, Func<string, string> mountedFileNameTransformFunc)
+        public void LoadCatalogData(
+            ref RuntimeContentCatalogData catalogData,
+            Func<string, string> archivePathTransformFunc,
+            Func<string, string> mountedFileNameTransformFunc
+        )
         {
             int dependencyOffset = FileDependencies.Length;
             AddFileDependencies(ref catalogData, dependencyOffset);
@@ -173,7 +205,7 @@ namespace Unity.Entities.Content
             if (ObjectLocations.IsCreated)
                 ObjectLocations.Dispose();
 
-            if(SceneLocations.IsCreated)
+            if (SceneLocations.IsCreated)
                 SceneLocations.Dispose();
 
             if (FileLocations.IsCreated)
@@ -188,14 +220,17 @@ namespace Unity.Entities.Content
                     FileDependencies[i].Dispose();
                 FileDependencies.Dispose();
             }
-            if(ManagedStrings.IsCreated)
+            if (ManagedStrings.IsCreated)
                 ManagedStrings.Dispose();
         }
 
         internal void AddFileDependencies(ref RuntimeContentCatalogData catalogData, int dependencyOffset)
         {
             if (!FileDependencies.IsCreated)
-                FileDependencies = new UnsafeList<UnsafeList<ContentFileId>>(catalogData.Dependencies.Length, Allocator.Persistent);
+                FileDependencies = new UnsafeList<UnsafeList<ContentFileId>>(
+                    catalogData.Dependencies.Length,
+                    Allocator.Persistent
+                );
 
             FileDependencies.Resize(FileDependencies.Length + catalogData.Dependencies.Length);
 
@@ -212,42 +247,61 @@ namespace Unity.Entities.Content
             }
         }
 
-        internal void AddArchiveLocations(ref RuntimeContentCatalogData catalogData, Func<string, string> pathTransformFunc)
+        internal void AddArchiveLocations(
+            ref RuntimeContentCatalogData catalogData,
+            Func<string, string> pathTransformFunc
+        )
         {
             if (!ManagedStrings.IsCreated)
                 ManagedStrings = new ManagedStringTable(64);
 
             if (!ArchiveLocations.IsCreated)
-                ArchiveLocations = new UnsafeHashMap<ContentArchiveId, ArchiveLocation>(catalogData.Archives.Length, Allocator.Persistent);
+                ArchiveLocations = new UnsafeHashMap<ContentArchiveId, ArchiveLocation>(
+                    catalogData.Archives.Length,
+                    Allocator.Persistent
+                );
             else
                 ArchiveLocations.Capacity = ArchiveLocations.Count + catalogData.Archives.Length;
 
             for (int archiveIndex = 0; archiveIndex < catalogData.Archives.Length; archiveIndex++)
             {
                 var archiveId = catalogData.Archives[archiveIndex].ArchiveId;
-                ArchiveLocations.TryAdd(archiveId, new ArchiveLocation { PathIndex = ManagedStrings.Add(pathTransformFunc(archiveId.ToString())) });
+                ArchiveLocations.TryAdd(
+                    archiveId,
+                    new ArchiveLocation { PathIndex = ManagedStrings.Add(pathTransformFunc(archiveId.ToString())) }
+                );
             }
         }
 
-        internal void AddFileLocations(ref RuntimeContentCatalogData catalogData, int dependencyOffset, Func<string, string> mountedFileNameTransformFunc)
+        internal void AddFileLocations(
+            ref RuntimeContentCatalogData catalogData,
+            int dependencyOffset,
+            Func<string, string> mountedFileNameTransformFunc
+        )
         {
             if (!ManagedStrings.IsCreated)
                 ManagedStrings = new ManagedStringTable(64);
 
             if (!FileLocations.IsCreated)
-                FileLocations = new UnsafeHashMap<ContentFileId, FileLocation>(catalogData.Files.Length, Allocator.Persistent);
+                FileLocations = new UnsafeHashMap<ContentFileId, FileLocation>(
+                    catalogData.Files.Length,
+                    Allocator.Persistent
+                );
             else
                 FileLocations.Capacity = FileLocations.Count + catalogData.Files.Length;
 
             for (int fileIndex = 0; fileIndex < catalogData.Files.Length; fileIndex++)
             {
                 var file = catalogData.Files[fileIndex];
-                FileLocations.TryAdd(file.FileId, new FileLocation
-                {
-                    ArchiveId = catalogData.Archives[file.ArchiveIndex].ArchiveId,
-                    DependencyIndex = file.DependencyIndex + dependencyOffset,
-                    PathIndex = ManagedStrings.Add(mountedFileNameTransformFunc(file.FileId.ToString()))
-                });
+                FileLocations.TryAdd(
+                    file.FileId,
+                    new FileLocation
+                    {
+                        ArchiveId = catalogData.Archives[file.ArchiveIndex].ArchiveId,
+                        DependencyIndex = file.DependencyIndex + dependencyOffset,
+                        PathIndex = ManagedStrings.Add(mountedFileNameTransformFunc(file.FileId.ToString())),
+                    }
+                );
             }
         }
 
@@ -257,7 +311,10 @@ namespace Unity.Entities.Content
                 ManagedStrings = new ManagedStringTable(64);
 
             if (!SceneLocations.IsCreated)
-                SceneLocations = new UnsafeHashMap<UntypedWeakReferenceId, SceneLocation>(catalogData.Scenes.Length, Allocator.Persistent);
+                SceneLocations = new UnsafeHashMap<UntypedWeakReferenceId, SceneLocation>(
+                    catalogData.Scenes.Length,
+                    Allocator.Persistent
+                );
             else
                 SceneLocations.Capacity = SceneLocations.Count + catalogData.Scenes.Length;
 
@@ -265,14 +322,28 @@ namespace Unity.Entities.Content
             {
                 var sceneData = catalogData.Scenes[sceneIndex];
                 var fileId = catalogData.Files[sceneData.FileIndex].FileId;
-                SceneLocations.TryAdd(new UntypedWeakReferenceId { GlobalId = sceneData.SceneId.GlobalId, GenerationType = sceneData.SceneId.GenerationType }, new SceneLocation { FileId = fileId, PathIndex = ManagedStrings.Add(sceneData.SceneName.ToString())});
+                SceneLocations.TryAdd(
+                    new UntypedWeakReferenceId
+                    {
+                        GlobalId = sceneData.SceneId.GlobalId,
+                        GenerationType = sceneData.SceneId.GenerationType,
+                    },
+                    new SceneLocation
+                    {
+                        FileId = fileId,
+                        PathIndex = ManagedStrings.Add(sceneData.SceneName.ToString()),
+                    }
+                );
             }
         }
 
-        unsafe internal void AddObjectLocations(ref RuntimeContentCatalogData catalogData)
+        internal unsafe void AddObjectLocations(ref RuntimeContentCatalogData catalogData)
         {
             if (!ObjectLocations.IsCreated)
-                ObjectLocations = new UnsafeHashMap<UntypedWeakReferenceId, ObjectLocation>(catalogData.Objects.Length, Allocator.Persistent);
+                ObjectLocations = new UnsafeHashMap<UntypedWeakReferenceId, ObjectLocation>(
+                    catalogData.Objects.Length,
+                    Allocator.Persistent
+                );
             else
                 ObjectLocations.Capacity = ObjectLocations.Count + catalogData.Objects.Length;
 
@@ -283,12 +354,17 @@ namespace Unity.Entities.Content
             {
                 var objData = objPtr[objIndex];
                 ObjectLocations.TryAdd(
-                    new UntypedWeakReferenceId { GlobalId = objData.ObjectId.GlobalId, GenerationType = objData.ObjectId.GenerationType },
+                    new UntypedWeakReferenceId
+                    {
+                        GlobalId = objData.ObjectId.GlobalId,
+                        GenerationType = objData.ObjectId.GenerationType,
+                    },
                     new ObjectLocation
-                {
-                    FileId = filePtr[objData.FileIndex].FileId,
-                    LocalIdentifierInFile = objData.LocalIdentifierInFile
-                });
+                    {
+                        FileId = filePtr[objData.FileIndex].FileId,
+                        LocalIdentifierInFile = objData.LocalIdentifierInFile,
+                    }
+                );
             }
         }
 
@@ -299,7 +375,11 @@ namespace Unity.Entities.Content
         /// <param name="fileId">The ContentArchive file that this object is in.</param>
         /// <param name="localIdentifierInFile">The local id in the ContentArchive file.</param>
         /// <returns>True if the object information has been found, false otherwise.</returns>
-        public bool TryGetObjectLocation(UntypedWeakReferenceId objectId, out ContentFileId fileId, out long localIdentifierInFile)
+        public bool TryGetObjectLocation(
+            UntypedWeakReferenceId objectId,
+            out ContentFileId fileId,
+            out long localIdentifierInFile
+        )
         {
             if (ObjectLocations.TryGetValue(objectId, out var loc))
             {
@@ -312,7 +392,6 @@ namespace Unity.Entities.Content
             localIdentifierInFile = default;
             return false;
         }
-
 
         /// <summary>
         /// Retrieves location information about a scene.
@@ -329,7 +408,7 @@ namespace Unity.Entities.Content
                 sceneName = GetStringValue(loc.PathIndex);
                 return true;
             }
-             
+
             fileId = default;
             sceneName = default;
             return false;
@@ -343,9 +422,23 @@ namespace Unity.Entities.Content
         /// <param name="fileDependencies">The set of file dependencies for this file. These must be loaded before this file is loaded.</param>
         /// <param name="archiveId">The archive that this file is contained in.</param>
         /// <returns>True if the file information has been found, false otherwise.</returns>
-        public bool TryGetFileLocation(ContentFileId fileId, out string filePath, out UnsafeList<ContentFileId> fileDependencies, out ContentArchiveId archiveId, out int dependencyIndex)
+        public bool TryGetFileLocation(
+            ContentFileId fileId,
+            out string filePath,
+            out UnsafeList<ContentFileId> fileDependencies,
+            out ContentArchiveId archiveId,
+            out int dependencyIndex
+        )
         {
-            if (TryGetFileLocation(fileId, out int filePathIndex, out fileDependencies, out archiveId, out dependencyIndex))
+            if (
+                TryGetFileLocation(
+                    fileId,
+                    out int filePathIndex,
+                    out fileDependencies,
+                    out archiveId,
+                    out dependencyIndex
+                )
+            )
             {
                 filePath = GetStringValue(filePathIndex);
                 return true;
@@ -362,7 +455,13 @@ namespace Unity.Entities.Content
         /// <param name="fileDependencies">The set of file dependencies for this file. These must be loaded before this file is loaded.</param>
         /// <param name="archiveId">The archive that this file is contained in.</param>
         /// <returns>True if the file information has been found, false otherwise.</returns>
-        public bool TryGetFileLocation(ContentFileId fileId, out int filePathIndex, out UnsafeList<ContentFileId> fileDependencies, out ContentArchiveId archiveId, out int dependencyIndex)
+        public bool TryGetFileLocation(
+            ContentFileId fileId,
+            out int filePathIndex,
+            out UnsafeList<ContentFileId> fileDependencies,
+            out ContentArchiveId archiveId,
+            out int dependencyIndex
+        )
         {
             if (FileLocations.TryGetValue(fileId, out var loc))
             {
@@ -395,6 +494,7 @@ namespace Unity.Entities.Content
             archivePath = default;
             return false;
         }
+
         /// <summary>
         /// Get the loading information for an archive.
         /// </summary>
@@ -437,13 +537,23 @@ namespace Unity.Entities.Content
                     for (int i = 0; i < files.Length; i++)
                     {
                         var f = files[i];
-                        if (!TryGetFileLocation(f, out string filePath, out var deps, out var archiveId, out var dependencyIndex))
+                        if (
+                            !TryGetFileLocation(
+                                f,
+                                out string filePath,
+                                out var deps,
+                                out var archiveId,
+                                out var dependencyIndex
+                            )
+                        )
                         {
                             printFunc($"Unable to find location for file id {f}");
                         }
                         else
                         {
-                            printFunc($"Files[{i}] = {f}, ArchiveId = {archiveId}, path = {filePath}, dependencyIndex = {dependencyIndex}");
+                            printFunc(
+                                $"Files[{i}] = {f}, ArchiveId = {archiveId}, path = {filePath}, dependencyIndex = {dependencyIndex}"
+                            );
                         }
                     }
                 }
@@ -477,14 +587,12 @@ namespace Unity.Entities.Content
                 printFunc(e.ToString());
             }
         }
-
-
-
     }
 
     struct ManagedStringTable : IDisposable
     {
         GCHandle ValuesHandle;
+
         public ManagedStringTable(int capacity)
         {
             ValuesHandle = GCHandle.Alloc(new System.Collections.Generic.List<string>(capacity));
@@ -506,11 +614,7 @@ namespace Unity.Entities.Content
 
         public string this[int i]
         {
-            get
-            {
-                return (ValuesHandle.Target as System.Collections.Generic.List<string>)[i];
-            }
+            get { return (ValuesHandle.Target as System.Collections.Generic.List<string>)[i]; }
         }
     }
-
 }

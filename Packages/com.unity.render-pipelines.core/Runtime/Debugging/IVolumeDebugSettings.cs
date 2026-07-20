@@ -67,18 +67,21 @@ namespace UnityEngine.Rendering
     /// </summary>
 #pragma warning disable CS0618 // Type or member is obsolete
     [Obsolete("This is not longer supported Please use DebugDisplaySettingsVolume. #from(6000.2)")]
-
     public interface IVolumeDebugSettings2 : IVolumeDebugSettings
 #pragma warning restore CS0618 // Type or member is obsolete
     {
         /// <summary>
         /// Specifies the render pipeline
         /// </summary>
-        [Obsolete("This property is obsolete and kept only for not breaking user code. VolumeDebugSettings will use current pipeline when it needs to gather volume component types and paths. #from(2023.2)")]
+        [Obsolete(
+            "This property is obsolete and kept only for not breaking user code. VolumeDebugSettings will use current pipeline when it needs to gather volume component types and paths. #from(2023.2)"
+        )]
         Type targetRenderPipeline { get; }
 
         /// <summary>List of Volume component types and their path</summary>
-        [Obsolete("This property is obsolete and kept only for not breaking user code. VolumeDebugSettings will use current pipeline when it needs to gather volume component types and paths. #from(2023.2)")]
+        [Obsolete(
+            "This property is obsolete and kept only for not breaking user code. VolumeDebugSettings will use current pipeline when it needs to gather volume component types and paths. #from(2023.2)"
+        )]
         List<(string, Type)> volumeComponentsPathAndType { get; }
     }
 }

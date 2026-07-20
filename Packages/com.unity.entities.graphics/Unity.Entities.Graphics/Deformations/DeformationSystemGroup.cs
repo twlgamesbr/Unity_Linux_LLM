@@ -7,7 +7,11 @@ namespace Unity.Rendering
     /// Represents a system group that contains all systems that handle and execute mesh deformations such as skinning and blend shapes.
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
-    [UpdateInGroup(typeof(PresentationSystemGroup)), UpdateAfter(typeof(RegisterMaterialsAndMeshesSystem)), UpdateBefore(typeof(EntitiesGraphicsSystem))]
+    [
+        UpdateInGroup(typeof(PresentationSystemGroup)),
+        UpdateAfter(typeof(RegisterMaterialsAndMeshesSystem)),
+        UpdateBefore(typeof(EntitiesGraphicsSystem))
+    ]
     public sealed partial class DeformationsInPresentation : ComponentSystemGroup
     {
         /// <summary>
@@ -25,17 +29,24 @@ namespace Unity.Rendering
         }
     }
 
-
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     [UpdateInGroup(typeof(DeformationsInPresentation))]
     sealed partial class PushMeshDataSystem : SystemBase { }
 
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
-    [UpdateInGroup(typeof(DeformationsInPresentation)), UpdateAfter(typeof(PushMeshDataSystem)), UpdateBefore(typeof(SkinningDeformationSystem))]
+    [
+        UpdateInGroup(typeof(DeformationsInPresentation)),
+        UpdateAfter(typeof(PushMeshDataSystem)),
+        UpdateBefore(typeof(SkinningDeformationSystem))
+    ]
     sealed partial class PushSkinMatrixSystem : SystemBase { }
 
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
-    [UpdateInGroup(typeof(DeformationsInPresentation)), UpdateAfter(typeof(PushMeshDataSystem)), UpdateBefore(typeof(BlendShapeDeformationSystem))]
+    [
+        UpdateInGroup(typeof(DeformationsInPresentation)),
+        UpdateAfter(typeof(PushMeshDataSystem)),
+        UpdateBefore(typeof(BlendShapeDeformationSystem))
+    ]
     sealed partial class PushBlendWeightSystem : SystemBase { }
 
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]

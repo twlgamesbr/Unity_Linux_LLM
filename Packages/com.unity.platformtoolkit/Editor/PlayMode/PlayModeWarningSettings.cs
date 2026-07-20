@@ -34,47 +34,79 @@ namespace Unity.PlatformToolkit.PlayMode
             m_SerializedData = serializedData ?? throw new ArgumentNullException(nameof(serializedData));
         }
 
-        public bool StorageWarningsEnabled { get => m_SerializedData.StorageWarningsEnabled; set => m_SerializedData.StorageWarningsEnabled = value; }
+        public bool StorageWarningsEnabled
+        {
+            get => m_SerializedData.StorageWarningsEnabled;
+            set => m_SerializedData.StorageWarningsEnabled = value;
+        }
 
         public TimeSpan OpenFrequency
         {
-            get => FromMilliseconds(m_SerializedData.OpenFrequencyMs, PlayModeWarningTimeOptions.Frequency.Default.Milliseconds);
+            get =>
+                FromMilliseconds(
+                    m_SerializedData.OpenFrequencyMs,
+                    PlayModeWarningTimeOptions.Frequency.Default.Milliseconds
+                );
             set => m_SerializedData.OpenFrequencyMs = ToMilliseconds(value);
         }
 
         public TimeSpan WriteFrequency
         {
-            get => FromMilliseconds(m_SerializedData.WriteFrequencyMs, PlayModeWarningTimeOptions.Frequency.Default.Milliseconds);
+            get =>
+                FromMilliseconds(
+                    m_SerializedData.WriteFrequencyMs,
+                    PlayModeWarningTimeOptions.Frequency.Default.Milliseconds
+                );
             set => m_SerializedData.WriteFrequencyMs = ToMilliseconds(value);
         }
 
         public TimeSpan ReadFrequency
         {
-            get => FromMilliseconds(m_SerializedData.ReadFrequencyMs, PlayModeWarningTimeOptions.Frequency.Default.Milliseconds);
+            get =>
+                FromMilliseconds(
+                    m_SerializedData.ReadFrequencyMs,
+                    PlayModeWarningTimeOptions.Frequency.Default.Milliseconds
+                );
             set => m_SerializedData.ReadFrequencyMs = ToMilliseconds(value);
         }
 
         public TimeSpan EnumFrequency
         {
-            get => FromMilliseconds(m_SerializedData.EnumFrequencyMs, PlayModeWarningTimeOptions.Frequency.Default.Milliseconds);
+            get =>
+                FromMilliseconds(
+                    m_SerializedData.EnumFrequencyMs,
+                    PlayModeWarningTimeOptions.Frequency.Default.Milliseconds
+                );
             set => m_SerializedData.EnumFrequencyMs = ToMilliseconds(value);
         }
 
         public TimeSpan CommitFrequency
         {
-            get => FromMilliseconds(m_SerializedData.CommitFrequencyMs, PlayModeWarningTimeOptions.Frequency.Default.Milliseconds);
+            get =>
+                FromMilliseconds(
+                    m_SerializedData.CommitFrequencyMs,
+                    PlayModeWarningTimeOptions.Frequency.Default.Milliseconds
+                );
             set => m_SerializedData.CommitFrequencyMs = ToMilliseconds(value);
         }
 
         public TimeSpan DeleteFrequency
         {
-            get => FromMilliseconds(m_SerializedData.DeleteFrequencyMs, PlayModeWarningTimeOptions.Frequency.Default.Milliseconds);
+            get =>
+                FromMilliseconds(
+                    m_SerializedData.DeleteFrequencyMs,
+                    PlayModeWarningTimeOptions.Frequency.Default.Milliseconds
+                );
             set => m_SerializedData.DeleteFrequencyMs = ToMilliseconds(value);
         }
 
         public TimeSpan UndisposedSavesThreshold
         {
-            get => FromMilliseconds(m_SerializedData.UndisposedSavesMs, PlayModeWarningTimeOptions.UndisposedSaves.Default.Milliseconds);
+            get =>
+                FromMilliseconds(
+                    m_SerializedData.UndisposedSavesMs,
+                    PlayModeWarningTimeOptions.UndisposedSaves.Default.Milliseconds
+                );
             set => m_SerializedData.UndisposedSavesMs = ToMilliseconds(value);
         }
 
@@ -86,7 +118,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 return TimeSpan.FromMilliseconds(defaultMs);
 
             if (ms > k_MaxTimeValueMs)
-                throw new ArgumentOutOfRangeException($"Argument of {ms} milliseconds exceeds the maximum of {k_MaxTimeValueMs}");
+                throw new ArgumentOutOfRangeException(
+                    $"Argument of {ms} milliseconds exceeds the maximum of {k_MaxTimeValueMs}"
+                );
 
             return TimeSpan.FromMilliseconds(ms);
         }
@@ -99,7 +133,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 return PlayModeEnvironmentWarningData.k_InvalidMs;
 
             if (ms > k_MaxTimeValueMs)
-                throw new ArgumentOutOfRangeException($"Argument of timespan of {ms} milliseconds exceeds the maximum of {k_MaxTimeValueMs}");
+                throw new ArgumentOutOfRangeException(
+                    $"Argument of timespan of {ms} milliseconds exceeds the maximum of {k_MaxTimeValueMs}"
+                );
 
             return ms;
         }

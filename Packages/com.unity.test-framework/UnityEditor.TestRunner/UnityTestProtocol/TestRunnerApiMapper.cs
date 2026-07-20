@@ -10,7 +10,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
 {
     internal class TestRunnerApiMapper : ITestRunnerApiMapper
     {
-        internal IGuiHelper guiHelper =  new GuiHelper(new MonoCecilHelper(), new AssetsDatabaseHelper());
+        internal IGuiHelper guiHelper = new GuiHelper(new MonoCecilHelper(), new AssetsDatabaseHelper());
         private readonly string _projectRepoPath;
 
         public TestRunnerApiMapper(string projectRepoPath)
@@ -22,20 +22,14 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
         {
             var testsNames = testsToRun != null ? FlattenTestNames(testsToRun) : new List<string>();
 
-            var msg = new TestPlanMessage
-            {
-                tests = testsNames
-            };
+            var msg = new TestPlanMessage { tests = testsNames };
 
             return msg;
         }
 
         public TestStartedMessage MapTestToTestStartedMessage(ITestAdaptor test)
         {
-            return new TestStartedMessage
-            {
-                name = test.FullName
-            };
+            return new TestStartedMessage { name = test.FullName };
         }
 
         public TestFinishedMessage TestResultToTestFinishedMessage(ITestResultAdaptor result)
@@ -47,12 +41,14 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
                 var method = result.Test.Method.MethodInfo;
                 var type = result.Test.TypeInfo.Type;
                 var fileOpenInfo = guiHelper.GetFileOpenInfo(type, method);
-                filePathString = !string.IsNullOrEmpty(_projectRepoPath) ? Path.Combine(_projectRepoPath, fileOpenInfo.FilePath) : fileOpenInfo.FilePath;
+                filePathString = !string.IsNullOrEmpty(_projectRepoPath)
+                    ? Path.Combine(_projectRepoPath, fileOpenInfo.FilePath)
+                    : fileOpenInfo.FilePath;
                 lineNumber = fileOpenInfo.LineNumber;
             }
 
             var iteration = 0;
-            if(result is TestResultAdaptor)
+            if (result is TestResultAdaptor)
             {
                 var adaptor = ((TestResultAdaptor)result);
                 iteration = adaptor.RepeatIteration == 0 ? adaptor.RetryIteration : adaptor.RepeatIteration;
@@ -67,7 +63,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
                 stackTrace = result.StackTrace,
                 fileName = filePathString,
                 lineNumber = lineNumber,
-                iteration = iteration
+                iteration = iteration,
             };
         }
 
@@ -102,8 +98,10 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
                     state = TestState.Inconclusive;
                 }
 
-                if (result.ResultState.ToLowerInvariant().EndsWith("cancelled") ||
-                    result.ResultState.ToLowerInvariant().EndsWith("error"))
+                if (
+                    result.ResultState.ToLowerInvariant().EndsWith("cancelled")
+                    || result.ResultState.ToLowerInvariant().EndsWith("error")
+                )
                 {
                     state = TestState.Error;
                 }

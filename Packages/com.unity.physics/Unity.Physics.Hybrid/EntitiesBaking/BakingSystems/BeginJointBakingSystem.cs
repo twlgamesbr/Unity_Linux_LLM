@@ -9,8 +9,6 @@ namespace Unity.Physics.Authoring
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
     public partial struct BeginJointBakingSystem : ISystem
     {
-        public void OnUpdate(ref SystemState state)
-        {
-        }
+        public void OnUpdate(ref SystemState state) { }
     }
 }

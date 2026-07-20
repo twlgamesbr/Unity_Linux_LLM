@@ -17,6 +17,7 @@ namespace Unity.Netcode.Editor
     internal class SetInScenePlaced : IProcessSceneWithReport
     {
         public int callbackOrder => 0;
+
         public void OnProcessScene(Scene scene, BuildReport report)
         {
             foreach (var networkObject in FindObjects.FromSceneByType<NetworkObject>(scene, true))

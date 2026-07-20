@@ -39,6 +39,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             value = field.MeshShadingGradient.Gradient;
             m_ValueChangedCallback?.Invoke(MeshShadingGradient);
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<MeshShadingFillDropdown, UxmlTraits> { }
 #endif

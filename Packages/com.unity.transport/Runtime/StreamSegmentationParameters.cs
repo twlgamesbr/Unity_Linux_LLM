@@ -13,8 +13,7 @@ namespace Unity.Networking.Transport
 
     internal static class StreamSegmentationParameterExtensions
     {
-        public static ref NetworkSettings WithStreamSegmentationParameters(
-            ref this NetworkSettings    settings)
+        public static ref NetworkSettings WithStreamSegmentationParameters(ref this NetworkSettings settings)
         {
             var parameter = new StreamSegmentationParameter();
             settings.AddRawParameterStruct(ref parameter);

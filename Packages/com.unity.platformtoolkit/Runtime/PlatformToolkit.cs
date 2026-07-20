@@ -50,16 +50,13 @@ namespace Unity.PlatformToolkit
 #pragma warning restore CS4014
                 }
             }
-            remove
-            {
-                s_Initialized -= value;
-            }
+            remove { s_Initialized -= value; }
         }
 
         /// <summary>
         /// Most likely a temporary way to inject PT implementations. Users should never call this method, unless they are injecting their own custom PT implementations.
         /// </summary>
-        static internal void InjectImplementation(IPlatformToolkit implementation)
+        internal static void InjectImplementation(IPlatformToolkit implementation)
         {
             s_Instance = new NullToolkit();
             s_InitialisingInstance = implementation;
@@ -73,7 +70,7 @@ namespace Unity.PlatformToolkit
         /// Games should call Initialize as early as possible, for example during the initial loading screen.
         /// </summary>
         /// <returns>Task which returns when the toolkit is initialized.</returns>
-        public async static Task Initialize()
+        public static async Task Initialize()
         {
             using (var lck = s_Lock.Lock())
             {
@@ -86,7 +83,9 @@ namespace Unity.PlatformToolkit
             if (s_InitialisingInstance == null)
             {
 #if UNITY_EDITOR
-                throw new InvalidOperationException("No PlatformToolkit implementation available. Play Mode requires a Play Mode Controls Settings asset to be configured in Play Mode Controls.");
+                throw new InvalidOperationException(
+                    "No PlatformToolkit implementation available. Play Mode requires a Play Mode Controls Settings asset to be configured in Play Mode Controls."
+                );
 #else
                 throw new InvalidOperationException("No PlatformToolkit implementation available.");
 #endif
@@ -150,12 +149,14 @@ namespace Unity.PlatformToolkit
         /// <exception cref="InvalidOperationException">
         /// Thrown when platform does not support the local saving system.
         /// </exception>
-        ISavingSystem LocalSavingSystem => throw new InvalidOperationException("Local saving is not supported on this platform.");
+        ISavingSystem LocalSavingSystem =>
+            throw new InvalidOperationException("Local saving is not supported on this platform.");
     }
 
     internal class NullToolkit : IPlatformToolkit
     {
-        private const string k_UninitialisedError = "PlatformToolkit is not initialized. Call and await PlatformToolkit.Initialize() before using this API.";
+        private const string k_UninitialisedError =
+            "PlatformToolkit is not initialized. Call and await PlatformToolkit.Initialize() before using this API.";
 
         public Task Initialize() => throw new NotImplementedException();
 
@@ -177,15 +178,14 @@ namespace Unity.PlatformToolkit
         /// <summary>
         /// Construct a UserRefusalException with no message.
         /// </summary>
-        public UserRefusalException()
-        { }
+        public UserRefusalException() { }
 
         /// <summary>
         /// Construct a UserRefusalException with a message.
         /// </summary>
         /// <param name="message">The message to include with the exception.</param>
-        public UserRefusalException(string message) : base(message)
-        { }
+        public UserRefusalException(string message)
+            : base(message) { }
     }
 
     /// <summary>
@@ -196,15 +196,14 @@ namespace Unity.PlatformToolkit
         /// <summary>
         /// Construct an InvalidAccountException with no message.
         /// </summary>
-        public InvalidAccountException()
-        { }
+        public InvalidAccountException() { }
 
         /// <summary>
         /// Construct an InvalidAccountException with a message.
         /// </summary>
         /// <param name="message">The message to include with the exception.</param>
-        public InvalidAccountException(string message) : base(message)
-        { }
+        public InvalidAccountException(string message)
+            : base(message) { }
     }
 
     /// <summary>
@@ -217,15 +216,14 @@ namespace Unity.PlatformToolkit
         /// <summary>
         /// Construct an InvalidSystemException with no message.
         /// </summary>
-        public InvalidSystemException()
-        { }
+        public InvalidSystemException() { }
 
         /// <summary>
         /// Construct an InvalidSystemException with a message.
         /// </summary>
         /// <param name="message">The message to include with the exception.</param>
-        public InvalidSystemException(string message) : base(message)
-        { }
+        public InvalidSystemException(string message)
+            : base(message) { }
     }
 
     // exceptions derived from IOException
@@ -238,15 +236,14 @@ namespace Unity.PlatformToolkit
         /// <summary>
         /// Construct a NotEnoughSpaceException with no message.
         /// </summary>
-        public NotEnoughSpaceException()
-        { }
+        public NotEnoughSpaceException() { }
 
         /// <summary>
         /// Construct a NotEnoughSpaceException with a message.
         /// </summary>
         /// <param name="message">The message to include with the exception.</param>
-        public NotEnoughSpaceException(string message) : base(message)
-        { }
+        public NotEnoughSpaceException(string message)
+            : base(message) { }
     }
 
     /// <summary>
@@ -257,15 +254,14 @@ namespace Unity.PlatformToolkit
         /// <summary>
         /// Construct a SaveSystemLimitException with no message.
         /// </summary>
-        public SaveSystemLimitException()
-        { }
+        public SaveSystemLimitException() { }
 
         /// <summary>
         /// Construct a SaveSystemLimitException with a message.
         /// </summary>
         /// <param name="message">The message to include with the exception.</param>
-        public SaveSystemLimitException(string message) : base(message)
-        { }
+        public SaveSystemLimitException(string message)
+            : base(message) { }
     }
 
     /// <summary>
@@ -276,15 +272,14 @@ namespace Unity.PlatformToolkit
         /// <summary>
         /// Construct a CorruptedSaveException with no message.
         /// </summary>
-        public CorruptedSaveException()
-        { }
+        public CorruptedSaveException() { }
 
         /// <summary>
         /// Construct a CorruptedSaveException with a message.
         /// </summary>
         /// <param name="message">The message to include with the exception.</param>
-        public CorruptedSaveException(string message) : base(message)
-        { }
+        public CorruptedSaveException(string message)
+            : base(message) { }
     }
 
     /// <summary>
@@ -295,15 +290,14 @@ namespace Unity.PlatformToolkit
         /// <summary>
         /// Construct a TemporarilyUnavailableException with no message.
         /// </summary>
-        public TemporarilyUnavailableException()
-        { }
+        public TemporarilyUnavailableException() { }
 
         /// <summary>
         /// Construct a TemporarilyUnavailableException with a message.
         /// </summary>
         /// <param name="message">The message to include with the exception.</param>
-        public TemporarilyUnavailableException(string message) : base(message)
-        { }
+        public TemporarilyUnavailableException(string message)
+            : base(message) { }
     }
 
     #endregion

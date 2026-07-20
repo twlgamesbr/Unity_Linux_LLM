@@ -13,8 +13,12 @@ namespace Unity.Physics
     /// </summary>
     internal static class MeshUtilities
     {
-        internal static void AppendMeshPropertiesToNativeBuffers(UnityEngine.Mesh.MeshData meshData,
-            bool trianglesNeeded, out NativeArray<float3> vertices, out NativeArray<int3> triangles)
+        internal static void AppendMeshPropertiesToNativeBuffers(
+            UnityEngine.Mesh.MeshData meshData,
+            bool trianglesNeeded,
+            out NativeArray<float3> vertices,
+            out NativeArray<int3> triangles
+        )
         {
             vertices = new NativeArray<float3>(meshData.vertexCount, Allocator.Temp);
             var verticesV3 = vertices.Reinterpret<UnityEngine.Vector3>();
@@ -36,8 +40,9 @@ namespace Unity.Physics
                             var subMesh = meshData.GetSubMesh(sm);
                             for (int i = subMesh.indexStart, count = 0; count < subMesh.indexCount; i += 3, count += 3)
                             {
-                                triangles[trianglesIndex] =
-                                    ((int3) new uint3(indices16[i], indices16[i + 1], indices16[i + 2]));
+                                triangles[trianglesIndex] = (
+                                    (int3)new uint3(indices16[i], indices16[i + 1], indices16[i + 2])
+                                );
                                 ++trianglesIndex;
                             }
                         }
@@ -55,8 +60,9 @@ namespace Unity.Physics
                             var subMesh = meshData.GetSubMesh(sm);
                             for (int i = subMesh.indexStart, count = 0; count < subMesh.indexCount; i += 3, count += 3)
                             {
-                                triangles[trianglesIndex] =
-                                    ((int3) new uint3(indices32[i], indices32[i + 1], indices32[i + 2]));
+                                triangles[trianglesIndex] = (
+                                    (int3)new uint3(indices32[i], indices32[i + 1], indices32[i + 2])
+                                );
                                 ++trianglesIndex;
                             }
                         }
@@ -90,7 +96,7 @@ namespace Unity.Physics
             var appendMeshDataList = new List<AppendMeshData>();
             unsafe
             {
-                fixed(Collider* colliderPtr = &collider)
+                fixed (Collider* colliderPtr = &collider)
                 {
                     AppendCollider(ref appendMeshDataList, colliderPtr, RigidTransform.identity);
                 }
@@ -102,14 +108,13 @@ namespace Unity.Physics
             var i = 0;
             foreach (var data in appendMeshDataList)
             {
-                instances[i++] = new CombineInstance
-                {
-                    mesh = data.Mesh,
-                    transform = data.Transform
-                };
+                instances[i++] = new CombineInstance { mesh = data.Mesh, transform = data.Transform };
                 numVertices += mesh.vertexCount;
             }
-            mesh.indexFormat = numVertices > UInt16.MaxValue ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
+            mesh.indexFormat =
+                numVertices > UInt16.MaxValue
+                    ? UnityEngine.Rendering.IndexFormat.UInt32
+                    : UnityEngine.Rendering.IndexFormat.UInt16;
             mesh.CombineMeshes(instances.ToArray());
             mesh.RecalculateBounds();
             return mesh;
@@ -125,7 +130,12 @@ namespace Unity.Physics
             public float4x4 Transform => float4x4.TRS(Position, Orientation, Scale);
         }
 
-        static void AppendConvex(ref List<AppendMeshData> results, ref ConvexHull hull, RigidTransform worldFromCollider, float uniformScale = 1)
+        static void AppendConvex(
+            ref List<AppendMeshData> results,
+            ref ConvexHull hull,
+            RigidTransform worldFromCollider,
+            float uniformScale = 1
+        )
         {
             int totalNumVertices = 0;
             for (int f = 0; f < hull.NumFaces; f++)
@@ -182,16 +192,18 @@ namespace Unity.Physics
                 hideFlags = HideFlags.HideAndDontSave,
                 vertices = vertices,
                 normals = normals,
-                triangles = triangles
+                triangles = triangles,
             };
 
-            results.Add(new AppendMeshData
-            {
-                Mesh = mesh,
-                Scale = new float3(uniformScale),
-                Position = worldFromCollider.pos,
-                Orientation = worldFromCollider.rot
-            });
+            results.Add(
+                new AppendMeshData
+                {
+                    Mesh = mesh,
+                    Scale = new float3(uniformScale),
+                    Position = worldFromCollider.pos,
+                    Orientation = worldFromCollider.rot,
+                }
+            );
         }
 
         private static UnityEngine.Mesh _referenceSphere;
@@ -204,45 +216,81 @@ namespace Unity.Physics
             _referenceCylinder = Resources.GetBuiltinResource<UnityEngine.Mesh>("New-Cylinder.fbx");
         }
 
-        static unsafe void AppendSphere(ref List<AppendMeshData> results, SphereCollider* sphere, RigidTransform worldFromCollider, float uniformScale = 1)
+        static unsafe void AppendSphere(
+            ref List<AppendMeshData> results,
+            SphereCollider* sphere,
+            RigidTransform worldFromCollider,
+            float uniformScale = 1
+        )
         {
             float r = sphere->Radius * uniformScale;
-            results.Add(new AppendMeshData
-            {
-                Mesh = _referenceSphere,
-                Scale = new Vector3(r * 2.0f, r * 2.0f, r * 2.0f),
-                Position = math.transform(worldFromCollider, sphere->Center * uniformScale),
-                Orientation = worldFromCollider.rot,
-            });
+            results.Add(
+                new AppendMeshData
+                {
+                    Mesh = _referenceSphere,
+                    Scale = new Vector3(r * 2.0f, r * 2.0f, r * 2.0f),
+                    Position = math.transform(worldFromCollider, sphere->Center * uniformScale),
+                    Orientation = worldFromCollider.rot,
+                }
+            );
         }
 
-        static unsafe void AppendCapsule(ref List<AppendMeshData> results, CapsuleCollider* capsule, RigidTransform worldFromCollider, float uniformScale = 1)
+        static unsafe void AppendCapsule(
+            ref List<AppendMeshData> results,
+            CapsuleCollider* capsule,
+            RigidTransform worldFromCollider,
+            float uniformScale = 1
+        )
         {
             float r = capsule->Radius * uniformScale;
-            results.Add(new AppendMeshData
-            {
-                Mesh = _referenceSphere,
-                Scale = new Vector4(r * 2.0f, r * 2.0f, r * 2.0f),
-                Position = math.transform(worldFromCollider, capsule->Vertex0 * uniformScale),
-                Orientation = worldFromCollider.rot
-            });
-            results.Add(new AppendMeshData
-            {
-                Mesh = _referenceSphere,
-                Scale = new Vector4(r * 2.0f, r * 2.0f, r * 2.0f),
-                Position = math.transform(worldFromCollider, capsule->Vertex1 * uniformScale),
-                Orientation = worldFromCollider.rot
-            });
-            results.Add(new AppendMeshData
-            {
-                Mesh = _referenceCylinder,
-                Scale = new Vector4(r * 2.0f, math.length(capsule->Vertex1 - capsule->Vertex0) * 0.5f * uniformScale, r * 2.0f),
-                Position = math.transform(worldFromCollider, (capsule->Vertex0 + capsule->Vertex1) * 0.5f * uniformScale),
-                Orientation = math.mul(worldFromCollider.rot, Quaternion.FromToRotation(new float3(0, 1, 0), math.normalizesafe(capsule->Vertex1 - capsule->Vertex0)))
-            });
+            results.Add(
+                new AppendMeshData
+                {
+                    Mesh = _referenceSphere,
+                    Scale = new Vector4(r * 2.0f, r * 2.0f, r * 2.0f),
+                    Position = math.transform(worldFromCollider, capsule->Vertex0 * uniformScale),
+                    Orientation = worldFromCollider.rot,
+                }
+            );
+            results.Add(
+                new AppendMeshData
+                {
+                    Mesh = _referenceSphere,
+                    Scale = new Vector4(r * 2.0f, r * 2.0f, r * 2.0f),
+                    Position = math.transform(worldFromCollider, capsule->Vertex1 * uniformScale),
+                    Orientation = worldFromCollider.rot,
+                }
+            );
+            results.Add(
+                new AppendMeshData
+                {
+                    Mesh = _referenceCylinder,
+                    Scale = new Vector4(
+                        r * 2.0f,
+                        math.length(capsule->Vertex1 - capsule->Vertex0) * 0.5f * uniformScale,
+                        r * 2.0f
+                    ),
+                    Position = math.transform(
+                        worldFromCollider,
+                        (capsule->Vertex0 + capsule->Vertex1) * 0.5f * uniformScale
+                    ),
+                    Orientation = math.mul(
+                        worldFromCollider.rot,
+                        Quaternion.FromToRotation(
+                            new float3(0, 1, 0),
+                            math.normalizesafe(capsule->Vertex1 - capsule->Vertex0)
+                        )
+                    ),
+                }
+            );
         }
 
-        static unsafe void AppendMesh(ref List<AppendMeshData> results, MeshCollider* meshCollider, RigidTransform worldFromCollider, float uniformScale = 1)
+        static unsafe void AppendMesh(
+            ref List<AppendMeshData> results,
+            MeshCollider* meshCollider,
+            RigidTransform worldFromCollider,
+            float uniformScale = 1
+        )
         {
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
@@ -264,7 +312,8 @@ namespace Unity.Physics
                         section.Vertices[vertexIndices.A],
                         section.Vertices[vertexIndices.B],
                         section.Vertices[vertexIndices.C],
-                        section.Vertices[vertexIndices.D]);
+                        section.Vertices[vertexIndices.D]
+                    );
 
                     for (int triangleIndex = 0; triangleIndex < numTriangles; triangleIndex++)
                     {
@@ -290,42 +339,58 @@ namespace Unity.Physics
             var displayMesh = new UnityEngine.Mesh
             {
                 hideFlags = HideFlags.HideAndDontSave,
-                indexFormat = vertices.Count > UInt16.MaxValue
-                    ? UnityEngine.Rendering.IndexFormat.UInt32
-                    : UnityEngine.Rendering.IndexFormat.UInt16
+                indexFormat =
+                    vertices.Count > UInt16.MaxValue
+                        ? UnityEngine.Rendering.IndexFormat.UInt32
+                        : UnityEngine.Rendering.IndexFormat.UInt16,
             };
             displayMesh.SetVertices(vertices);
             displayMesh.SetNormals(normals);
             displayMesh.SetTriangles(triangles, 0);
 
-            results.Add(new AppendMeshData
-            {
-                Mesh = displayMesh,
-                Scale = new Vector3(uniformScale, uniformScale, uniformScale),
-                Position = worldFromCollider.pos,
-                Orientation = worldFromCollider.rot,
-            });
+            results.Add(
+                new AppendMeshData
+                {
+                    Mesh = displayMesh,
+                    Scale = new Vector3(uniformScale, uniformScale, uniformScale),
+                    Position = worldFromCollider.pos,
+                    Orientation = worldFromCollider.rot,
+                }
+            );
         }
 
-        static unsafe void AppendCompound(ref List<AppendMeshData> results, CompoundCollider* compoundCollider, RigidTransform worldFromCollider, float uniformScale = 1.0f)
+        static unsafe void AppendCompound(
+            ref List<AppendMeshData> results,
+            CompoundCollider* compoundCollider,
+            RigidTransform worldFromCollider,
+            float uniformScale = 1.0f
+        )
         {
             for (int i = 0; i < compoundCollider->Children.Length; i++)
             {
                 ref CompoundCollider.Child child = ref compoundCollider->Children[i];
                 ScaledMTransform mWorldFromCollider = new ScaledMTransform(worldFromCollider, uniformScale);
-                ScaledMTransform mWorldFromChild = ScaledMTransform.Mul(mWorldFromCollider, new MTransform(child.CompoundFromChild));
+                ScaledMTransform mWorldFromChild = ScaledMTransform.Mul(
+                    mWorldFromCollider,
+                    new MTransform(child.CompoundFromChild)
+                );
 
                 var worldFromChild = new RigidTransform
                 {
                     pos = mWorldFromChild.Translation,
-                    rot = new quaternion(mWorldFromChild.Rotation)
+                    rot = new quaternion(mWorldFromChild.Rotation),
                 };
 
                 AppendCollider(ref results, child.Collider, worldFromChild, uniformScale);
             }
         }
 
-        static unsafe void AppendTerrain(ref List<AppendMeshData> results, TerrainCollider* terrainCollider, RigidTransform worldFromCollider, float uniformScale = 1.0f)
+        static unsafe void AppendTerrain(
+            ref List<AppendMeshData> results,
+            TerrainCollider* terrainCollider,
+            RigidTransform worldFromCollider,
+            float uniformScale = 1.0f
+        )
         {
             ref var terrain = ref terrainCollider->Terrain;
 
@@ -376,24 +441,32 @@ namespace Unity.Physics
             var displayMesh = new UnityEngine.Mesh
             {
                 hideFlags = HideFlags.HideAndDontSave,
-                indexFormat = vertices.Count > UInt16.MaxValue
-                    ? UnityEngine.Rendering.IndexFormat.UInt32
-                    : UnityEngine.Rendering.IndexFormat.UInt16
+                indexFormat =
+                    vertices.Count > UInt16.MaxValue
+                        ? UnityEngine.Rendering.IndexFormat.UInt32
+                        : UnityEngine.Rendering.IndexFormat.UInt16,
             };
             displayMesh.SetVertices(vertices);
             displayMesh.SetNormals(normals);
             displayMesh.SetTriangles(triangles, 0);
 
-            results.Add(new AppendMeshData
-            {
-                Mesh = displayMesh,
-                Scale = new Vector3(uniformScale, uniformScale, uniformScale),
-                Position = worldFromCollider.pos,
-                Orientation = worldFromCollider.rot
-            });
+            results.Add(
+                new AppendMeshData
+                {
+                    Mesh = displayMesh,
+                    Scale = new Vector3(uniformScale, uniformScale, uniformScale),
+                    Position = worldFromCollider.pos,
+                    Orientation = worldFromCollider.rot,
+                }
+            );
         }
 
-        static unsafe void AppendCollider(ref List<AppendMeshData> results, Collider* collider, RigidTransform worldFromCollider, float uniformScale = 1.0f)
+        static unsafe void AppendCollider(
+            ref List<AppendMeshData> results,
+            Collider* collider,
+            RigidTransform worldFromCollider,
+            float uniformScale = 1.0f
+        )
         {
             switch (collider->Type)
             {
@@ -402,7 +475,12 @@ namespace Unity.Physics
                 case ColliderType.Quad:
                 case ColliderType.Cylinder:
                 case ColliderType.Convex:
-                    AppendConvex(ref results, ref ((ConvexCollider*)collider)->ConvexHull, worldFromCollider, uniformScale);
+                    AppendConvex(
+                        ref results,
+                        ref ((ConvexCollider*)collider)->ConvexHull,
+                        worldFromCollider,
+                        uniformScale
+                    );
                     break;
                 case ColliderType.Sphere:
                     AppendSphere(ref results, (SphereCollider*)collider, worldFromCollider, uniformScale);

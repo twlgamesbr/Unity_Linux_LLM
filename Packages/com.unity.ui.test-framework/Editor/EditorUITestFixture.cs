@@ -32,8 +32,8 @@ namespace UnityEditor.UIElements.TestFramework
 #pragma warning restore CS0618
         }
 
-
         EditorPanelSimulator panelSimulator;
+
         /// <summary>
         /// Instantiates a blank UI Toolkit panel that can be populated within the test class.
         /// </summary>
@@ -111,7 +111,6 @@ namespace UnityEditor.UIElements.TestFramework
 
             base.FixtureTearDown();
         }
-
 
         /// <summary>
         /// Tears down the test fixture.

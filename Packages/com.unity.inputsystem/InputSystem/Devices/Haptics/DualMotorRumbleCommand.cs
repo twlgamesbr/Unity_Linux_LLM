@@ -6,7 +6,10 @@ namespace UnityEngine.InputSystem.LowLevel
     [StructLayout(LayoutKind.Explicit, Size = kSize)]
     internal struct DualMotorRumbleCommand : IInputDeviceCommandInfo
     {
-        public static FourCC Type { get { return new FourCC('R', 'M', 'B', 'L'); } }
+        public static FourCC Type
+        {
+            get { return new FourCC('R', 'M', 'B', 'L'); }
+        }
 
         internal const int kSize = InputDeviceCommand.kBaseCommandSize + sizeof(float) * 2;
 
@@ -30,7 +33,7 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 baseCommand = new InputDeviceCommand(Type, kSize),
                 lowFrequencyMotorSpeed = lowFrequency,
-                highFrequencyMotorSpeed = highFrequency
+                highFrequencyMotorSpeed = highFrequency,
             };
         }
     }

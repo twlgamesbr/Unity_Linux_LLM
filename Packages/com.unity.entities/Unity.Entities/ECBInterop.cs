@@ -52,48 +52,59 @@ namespace Unity.Entities
         {
             if (processorType == (int)EntityCommandBuffer.ECBProcessorType.PlaybackProcessor)
             {
-                EntityCommandBuffer.ProcessManagedCommand((EntityCommandBuffer.PlaybackProcessor*) processor, header);
+                EntityCommandBuffer.ProcessManagedCommand((EntityCommandBuffer.PlaybackProcessor*)processor, header);
             }
             else if (processorType == (int)EntityCommandBuffer.ECBProcessorType.DebugViewProcessor)
             {
-                EntityCommandBuffer.ProcessManagedCommand((EntityCommandBuffer.DebugViewProcessor*) processor, header);
+                EntityCommandBuffer.ProcessManagedCommand((EntityCommandBuffer.DebugViewProcessor*)processor, header);
             }
-            else if (processorType == (int) EntityCommandBuffer.ECBProcessorType.PlaybackWithTraceProcessor)
+            else if (processorType == (int)EntityCommandBuffer.ECBProcessorType.PlaybackWithTraceProcessor)
             {
-                EntityCommandBuffer.ProcessManagedCommand((EntityCommandBuffer.PlaybackWithTraceProcessor*) processor, header);
+                EntityCommandBuffer.ProcessManagedCommand(
+                    (EntityCommandBuffer.PlaybackWithTraceProcessor*)processor,
+                    header
+                );
             }
-            else if (processorType == (int) EntityCommandBuffer.ECBProcessorType.PrePlaybackValidationProcessor)
+            else if (processorType == (int)EntityCommandBuffer.ECBProcessorType.PrePlaybackValidationProcessor)
             {
-                EntityCommandBuffer.ProcessManagedCommand((EntityCommandBuffer.PrePlaybackValidationProcessor*) processor, header);
+                EntityCommandBuffer.ProcessManagedCommand(
+                    (EntityCommandBuffer.PrePlaybackValidationProcessor*)processor,
+                    header
+                );
             }
         }
 
         [BurstMonoInteropMethod]
-        internal static unsafe void _ProcessChainChunk(void* walker, int processorType,
-            ECBChainPlaybackState* chainStates, int currentChain, int nextChain)
+        internal static unsafe void _ProcessChainChunk(
+            void* walker,
+            int processorType,
+            ECBChainPlaybackState* chainStates,
+            int currentChain,
+            int nextChain
+        )
         {
             if (processorType == (int)EntityCommandBuffer.ECBProcessorType.PlaybackProcessor)
             {
-                var playbackWalker = (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.PlaybackProcessor>*) walker;
+                var playbackWalker = (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.PlaybackProcessor>*)walker;
                 playbackWalker->ProcessChain(chainStates, currentChain, nextChain);
             }
             else if (processorType == (int)EntityCommandBuffer.ECBProcessorType.DebugViewProcessor)
             {
-                var debugViewWalker = (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.DebugViewProcessor>*) walker;
+                var debugViewWalker = (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.DebugViewProcessor>*)walker;
                 debugViewWalker->ProcessChain(chainStates, currentChain, nextChain);
             }
-            else if (processorType == (int) EntityCommandBuffer.ECBProcessorType.PlaybackWithTraceProcessor)
+            else if (processorType == (int)EntityCommandBuffer.ECBProcessorType.PlaybackWithTraceProcessor)
             {
-                var playbackWithTraceWalker = (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.PlaybackWithTraceProcessor>*) walker;
+                var playbackWithTraceWalker =
+                    (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.PlaybackWithTraceProcessor>*)walker;
                 playbackWithTraceWalker->ProcessChain(chainStates, currentChain, nextChain);
             }
-            else if (processorType == (int) EntityCommandBuffer.ECBProcessorType.PrePlaybackValidationProcessor)
+            else if (processorType == (int)EntityCommandBuffer.ECBProcessorType.PrePlaybackValidationProcessor)
             {
-                var prePlaybackValidationWalker = (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.PrePlaybackValidationProcessor>*) walker;
+                var prePlaybackValidationWalker =
+                    (EntityCommandBuffer.EcbWalker<EntityCommandBuffer.PrePlaybackValidationProcessor>*)walker;
                 prePlaybackValidationWalker->ProcessChain(chainStates, currentChain, nextChain);
             }
         }
-
-
     }
 }

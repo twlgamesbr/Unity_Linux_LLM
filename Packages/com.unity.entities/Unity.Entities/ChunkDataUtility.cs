@@ -74,7 +74,11 @@ namespace Unity.Entities
         }
 
         // When type arrays are pre-sorted, this can be used to search linearly for a match
-        public static int GetNextIndexInTypeArray(Archetype* archetype, TypeIndex typeIndex, int lastTypeIndexInTypeArray)
+        public static int GetNextIndexInTypeArray(
+            Archetype* archetype,
+            TypeIndex typeIndex,
+            int lastTypeIndexInTypeArray
+        )
         {
             Assert.IsTrue(lastTypeIndexInTypeArray >= 0 && lastTypeIndexInTypeArray < archetype->TypesCount);
 
@@ -118,7 +122,12 @@ namespace Unity.Entities
             typeLookupCache = -1;
         }
 
-        public static void SetSharedComponentDataIndex(Entity entity, Archetype* archetype, in SharedComponentValues sharedComponentValues, TypeIndex typeIndex)
+        public static void SetSharedComponentDataIndex(
+            Entity entity,
+            Archetype* archetype,
+            in SharedComponentValues sharedComponentValues,
+            TypeIndex typeIndex
+        )
         {
             var entityComponentStore = archetype->EntityComponentStore;
 
@@ -131,7 +140,12 @@ namespace Unity.Entities
             archetype->Chunks.SetChangeVersion(indexInTypeArray, chunk.ListIndex, globalSystemVersion);
         }
 
-        public static void SetSharedComponentDataIndex(ChunkIndex chunk, Archetype* archetype, in SharedComponentValues sharedComponentValues, TypeIndex typeIndex)
+        public static void SetSharedComponentDataIndex(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            in SharedComponentValues sharedComponentValues,
+            TypeIndex typeIndex
+        )
         {
             var entityComponentStore = archetype->EntityComponentStore;
             entityComponentStore->Move(chunk, archetype, sharedComponentValues);
@@ -142,7 +156,12 @@ namespace Unity.Entities
             archetype->Chunks.SetChangeVersion(indexInTypeArray, chunk.ListIndex, globalSystemVersion);
         }
 
-        public static void SetSharedComponentDataIndex(EntityBatchInChunk batch, Archetype* archetype, in SharedComponentValues sharedComponentValues, TypeIndex typeIndex)
+        public static void SetSharedComponentDataIndex(
+            EntityBatchInChunk batch,
+            Archetype* archetype,
+            in SharedComponentValues sharedComponentValues,
+            TypeIndex typeIndex
+        )
         {
             var entityComponentStore = archetype->EntityComponentStore;
             entityComponentStore->MoveAndSetChangeVersion(batch, archetype, sharedComponentValues, typeIndex);
@@ -150,7 +169,13 @@ namespace Unity.Entities
 
         // This variant returns an invalid pointer if the component is not present.
         // If you'd like a null pointer in this case instead, use GetOptionalComponentDataWithTypeRO()
-        public static byte* GetComponentDataWithTypeRO(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, TypeIndex typeIndex, ref LookupCache lookupCache)
+        public static byte* GetComponentDataWithTypeRO(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            TypeIndex typeIndex,
+            ref LookupCache lookupCache
+        )
         {
             if (Hint.Unlikely(lookupCache.Archetype != archetype))
                 lookupCache.Update(archetype, typeIndex);
@@ -160,7 +185,14 @@ namespace Unity.Entities
 
         // This variant returns an invalid pointer if the component is not present.
         // If you'd like a null pointer in this case instead, use GetOptionalComponentDataWithTypeRW()
-        public static byte* GetComponentDataWithTypeRW(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, TypeIndex typeIndex, uint globalSystemVersion, ref LookupCache lookupCache)
+        public static byte* GetComponentDataWithTypeRW(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            TypeIndex typeIndex,
+            uint globalSystemVersion,
+            ref LookupCache lookupCache
+        )
         {
             if (Hint.Unlikely(lookupCache.Archetype != archetype))
                 lookupCache.Update(archetype, typeIndex);
@@ -172,15 +204,30 @@ namespace Unity.Entities
 
         // This variant returns an invalid pointer if the component is not present.
         // If you'd like a null pointer in this case instead, use GetOptionalComponentDataWithTypeRW()
-        public static byte* GetComponentDataWithTypeRW(ChunkIndex chunk, int baseEntityIndex, uint globalSystemVersion, ref LookupCache lookupCache)
+        public static byte* GetComponentDataWithTypeRW(
+            ChunkIndex chunk,
+            int baseEntityIndex,
+            uint globalSystemVersion,
+            ref LookupCache lookupCache
+        )
         {
             // Write Component to Chunk. ChangeVersion:Yes OrderVersion:No
-            lookupCache.Archetype->Chunks.SetChangeVersion(lookupCache.IndexInArchetype, chunk.ListIndex, globalSystemVersion);
+            lookupCache.Archetype->Chunks.SetChangeVersion(
+                lookupCache.IndexInArchetype,
+                chunk.ListIndex,
+                globalSystemVersion
+            );
             return chunk.Buffer + (lookupCache.ComponentOffset + lookupCache.ComponentSizeOf * baseEntityIndex);
         }
 
         // This variant returns null if the component is not present.
-        public static byte* GetOptionalComponentDataWithTypeRO(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, TypeIndex typeIndex, ref LookupCache lookupCache)
+        public static byte* GetOptionalComponentDataWithTypeRO(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            TypeIndex typeIndex,
+            ref LookupCache lookupCache
+        )
         {
             if (Hint.Unlikely(lookupCache.Archetype != archetype))
                 lookupCache.Update(archetype, typeIndex);
@@ -191,7 +238,14 @@ namespace Unity.Entities
         }
 
         // This variant returns null if the component is not present.
-        public static byte* GetOptionalComponentDataWithTypeRW(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, TypeIndex typeIndex, uint globalSystemVersion, ref LookupCache lookupCache)
+        public static byte* GetOptionalComponentDataWithTypeRW(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            TypeIndex typeIndex,
+            uint globalSystemVersion,
+            ref LookupCache lookupCache
+        )
         {
             if (Hint.Unlikely(lookupCache.Archetype != archetype))
                 lookupCache.Update(archetype, typeIndex);
@@ -203,7 +257,12 @@ namespace Unity.Entities
             return chunk.Buffer + (lookupCache.ComponentOffset + lookupCache.ComponentSizeOf * baseEntityIndex);
         }
 
-        public static byte* GetComponentDataWithTypeRO(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, TypeIndex typeIndex)
+        public static byte* GetComponentDataWithTypeRO(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            TypeIndex typeIndex
+        )
         {
             var indexInTypeArray = GetIndexInTypeArray(archetype, typeIndex);
 
@@ -213,7 +272,13 @@ namespace Unity.Entities
             return chunk.Buffer + (offset + sizeOf * baseEntityIndex);
         }
 
-        public static byte* GetComponentDataWithTypeRW(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, TypeIndex typeIndex, uint globalSystemVersion)
+        public static byte* GetComponentDataWithTypeRW(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            TypeIndex typeIndex,
+            uint globalSystemVersion
+        )
         {
             var indexInTypeArray = GetIndexInTypeArray(archetype, typeIndex);
 
@@ -226,7 +291,12 @@ namespace Unity.Entities
             return chunk.Buffer + (offset + sizeOf * baseEntityIndex);
         }
 
-        public static byte* GetComponentDataRO(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, int indexInTypeArray)
+        public static byte* GetComponentDataRO(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            int indexInTypeArray
+        )
         {
             var offset = archetype->Offsets[indexInTypeArray];
             var sizeOf = archetype->SizeOfs[indexInTypeArray];
@@ -234,7 +304,13 @@ namespace Unity.Entities
             return chunk.Buffer + (offset + sizeOf * baseEntityIndex);
         }
 
-        public static byte* GetComponentDataRW(ChunkIndex chunk, Archetype* archetype, int baseEntityIndex, int indexInTypeArray, uint globalSystemVersion)
+        public static byte* GetComponentDataRW(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int baseEntityIndex,
+            int indexInTypeArray,
+            uint globalSystemVersion
+        )
         {
             var offset = archetype->Offsets[indexInTypeArray];
             var sizeOf = archetype->SizeOfs[indexInTypeArray];
@@ -252,7 +328,13 @@ namespace Unity.Entities
             return chunks.GetEnabledArrayForTypeInChunk(memoryOrderIndexInArchetype, chunk.ListIndex);
         }
 
-        public static UnsafeBitArray GetEnabledRefRW(ChunkIndex chunk, Archetype* archetype, int indexInTypeArray, uint globalSystemVersion, out int* ptrChunkDisabledCount)
+        public static UnsafeBitArray GetEnabledRefRW(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int indexInTypeArray,
+            uint globalSystemVersion,
+            out int* ptrChunkDisabledCount
+        )
         {
             var chunkListIndex = chunk.ListIndex;
             var chunks = archetype->Chunks;
@@ -260,11 +342,21 @@ namespace Unity.Entities
             chunks.SetChangeVersion(indexInTypeArray, chunkListIndex, globalSystemVersion);
 
             int memoryOrderIndexInArchetype = archetype->TypeIndexInArchetypeToMemoryOrderIndex[indexInTypeArray];
-            ptrChunkDisabledCount = chunks.GetPointerToChunkDisabledCountForType(memoryOrderIndexInArchetype, chunkListIndex);
+            ptrChunkDisabledCount = chunks.GetPointerToChunkDisabledCountForType(
+                memoryOrderIndexInArchetype,
+                chunkListIndex
+            );
             return chunks.GetEnabledArrayForTypeInChunk(memoryOrderIndexInArchetype, chunkListIndex);
         }
 
-        public static void Copy(EntityComponentStore* entityComponentStore, ChunkIndex srcChunk, int srcIndex, ChunkIndex dstChunk, int dstIndex, int count)
+        public static void Copy(
+            EntityComponentStore* entityComponentStore,
+            ChunkIndex srcChunk,
+            int srcIndex,
+            ChunkIndex dstChunk,
+            int dstIndex,
+            int count
+        )
         {
             var arch = entityComponentStore->GetArchetype(srcChunk);
 
@@ -303,7 +395,15 @@ namespace Unity.Entities
         }
 
         // Use this when cloning entities inside of a chunk to either the same chunk or a different chunk
-        public static void CloneEnabledBits(ChunkIndex srcChunk, Archetype* srcArch, int srcEntityIndexInChunk, ChunkIndex dstChunk, Archetype* dstArch, int dstEntityIndexInChunk, int entityCount)
+        public static void CloneEnabledBits(
+            ChunkIndex srcChunk,
+            Archetype* srcArch,
+            int srcEntityIndexInChunk,
+            ChunkIndex dstChunk,
+            Archetype* dstArch,
+            int dstEntityIndexInChunk,
+            int entityCount
+        )
         {
             int srcChunkIndexInArchetype = srcChunk.ListIndex;
             int dstChunkIndexInArchetype = dstChunk.ListIndex;
@@ -324,14 +424,28 @@ namespace Unity.Entities
                     continue;
                 dstTypeIndexInArchetype = result;
 
-                var srcBits = srcArch->Chunks.GetEnabledArrayForTypeInChunk(srcArch->TypeIndexInArchetypeToMemoryOrderIndex[srcTypeIndexInArchetype], srcChunkIndexInArchetype);
-                var dstBits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(dstArch->TypeIndexInArchetypeToMemoryOrderIndex[dstTypeIndexInArchetype], dstChunkIndexInArchetype);
+                var srcBits = srcArch->Chunks.GetEnabledArrayForTypeInChunk(
+                    srcArch->TypeIndexInArchetypeToMemoryOrderIndex[srcTypeIndexInArchetype],
+                    srcChunkIndexInArchetype
+                );
+                var dstBits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(
+                    dstArch->TypeIndexInArchetypeToMemoryOrderIndex[dstTypeIndexInArchetype],
+                    dstChunkIndexInArchetype
+                );
                 dstBits.Copy(dstEntityIndexInChunk, ref srcBits, srcEntityIndexInChunk, entityCount);
             }
         }
 
         // Use this when instantiating a single entity many times
-        public static void ReplicateEnabledBits(ChunkIndex srcChunk, Archetype* srcArch, int srcIndex, ChunkIndex dstChunk, Archetype* dstArch, int dstIndex, int count)
+        public static void ReplicateEnabledBits(
+            ChunkIndex srcChunk,
+            Archetype* srcArch,
+            int srcIndex,
+            ChunkIndex dstChunk,
+            Archetype* dstArch,
+            int dstIndex,
+            int count
+        )
         {
             var srcEnableableTypesCount = srcArch->EnableableTypesCount;
             int dstIndexInArchetype = 0;
@@ -342,23 +456,41 @@ namespace Unity.Entities
             for (var t = 0; t < srcEnableableTypesCount; t++)
             {
                 var srcIndexInArchetype = srcArch->EnableableTypeIndexInArchetype[t];
-                int srcMemoryOrderIndexInArchetype = srcArch->TypeIndexInArchetypeToMemoryOrderIndex[srcIndexInArchetype];
-                var srcBits = srcArch->Chunks.GetEnabledArrayForTypeInChunk(srcMemoryOrderIndexInArchetype, srcChunkListIndex);
+                int srcMemoryOrderIndexInArchetype = srcArch->TypeIndexInArchetypeToMemoryOrderIndex[
+                    srcIndexInArchetype
+                ];
+                var srcBits = srcArch->Chunks.GetEnabledArrayForTypeInChunk(
+                    srcMemoryOrderIndexInArchetype,
+                    srcChunkListIndex
+                );
                 var srcValue = srcBits.IsSet(srcIndex);
 
-                int result = GetNextIndexInTypeArray(dstArch, srcArch->Types[srcIndexInArchetype].TypeIndex, dstIndexInArchetype);
+                int result = GetNextIndexInTypeArray(
+                    dstArch,
+                    srcArch->Types[srcIndexInArchetype].TypeIndex,
+                    dstIndexInArchetype
+                );
                 if (result < 0)
                     continue;
                 dstIndexInArchetype = result;
 
-                int dstMemoryOrderIndexInArchetype = dstArch->TypeIndexInArchetypeToMemoryOrderIndex[dstIndexInArchetype];
-                var dstBits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(dstMemoryOrderIndexInArchetype, dstChunkListIndex);
+                int dstMemoryOrderIndexInArchetype = dstArch->TypeIndexInArchetypeToMemoryOrderIndex[
+                    dstIndexInArchetype
+                ];
+                var dstBits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(
+                    dstMemoryOrderIndexInArchetype,
+                    dstChunkListIndex
+                );
                 dstBits.SetBits(dstIndex, srcValue, count);
 
                 // If the src value is disabled, adjust the hierarchical data
                 if (!srcValue)
                 {
-                    dstArch->Chunks.AdjustChunkDisabledCountForType(dstMemoryOrderIndexInArchetype, dstChunkListIndex, count);
+                    dstArch->Chunks.AdjustChunkDisabledCountForType(
+                        dstMemoryOrderIndexInArchetype,
+                        dstChunkListIndex,
+                        count
+                    );
                 }
             }
         }
@@ -367,23 +499,41 @@ namespace Unity.Entities
         // SrcChunk and DstChunk are the same chunk which is currently being moved from srcArchetype to dstArchetype
         // Make sure the chunk is in both Archetypes' chunk lists when called
         // It is okay if srcArchetype and dstArchetype are the same, as long as srcChunkIndex and dstChunkIndex are different
-        public static void MoveEnabledBits(Archetype* srcArchetype, int srcChunkIndex, Archetype* dstArchetype, int dstChunkIndex, int srcEntityCount)
+        public static void MoveEnabledBits(
+            Archetype* srcArchetype,
+            int srcChunkIndex,
+            Archetype* dstArchetype,
+            int dstChunkIndex,
+            int srcEntityCount
+        )
         {
-            Assert.IsTrue(srcArchetype == dstArchetype || srcArchetype->Chunks[srcChunkIndex] == dstArchetype->Chunks[dstChunkIndex]);
+            Assert.IsTrue(
+                srcArchetype == dstArchetype
+                    || srcArchetype->Chunks[srcChunkIndex] == dstArchetype->Chunks[dstChunkIndex]
+            );
             var dstEnableableTypesCount = dstArchetype->EnableableTypesCount;
             var srcTypeIndexInArchetype = 0;
             for (var t = 0; t < dstEnableableTypesCount; t++)
             {
                 var dstTypeIndexInArchetype = dstArchetype->EnableableTypeIndexInArchetype[t];
-                int dstMemoryOrderIndexInArchetype = dstArchetype->TypeIndexInArchetypeToMemoryOrderIndex[dstTypeIndexInArchetype];
-                var dstBits = dstArchetype->Chunks.GetEnabledArrayForTypeInChunk(dstMemoryOrderIndexInArchetype, dstChunkIndex);
+                int dstMemoryOrderIndexInArchetype = dstArchetype->TypeIndexInArchetypeToMemoryOrderIndex[
+                    dstTypeIndexInArchetype
+                ];
+                var dstBits = dstArchetype->Chunks.GetEnabledArrayForTypeInChunk(
+                    dstMemoryOrderIndexInArchetype,
+                    dstChunkIndex
+                );
                 // Clear destination bits & bit count in preparation for new values.
                 // This is technically redundant, as the previous call to InitializeBitsForNewChunk() should already
                 // zero-initialize this data.
                 dstBits.Clear();
                 dstArchetype->Chunks.SetChunkDisabledCountForType(dstMemoryOrderIndexInArchetype, dstChunkIndex, 0);
 
-                int result = GetNextIndexInTypeArray(srcArchetype, dstArchetype->Types[dstTypeIndexInArchetype].TypeIndex, srcTypeIndexInArchetype);
+                int result = GetNextIndexInTypeArray(
+                    srcArchetype,
+                    dstArchetype->Types[dstTypeIndexInArchetype].TypeIndex,
+                    srcTypeIndexInArchetype
+                );
                 if (result < 0)
                 {
                     // If this type was not in srcArchetype, then it should default to enabled for all entities in the chunk.
@@ -394,13 +544,25 @@ namespace Unity.Entities
                 {
                     // If the type is in both srcArchetype and dstArchetype, copy its bits & count from srcChunk to dstChunk.
                     srcTypeIndexInArchetype = result;
-                    int srcMemoryOrderIndexInArchetype = srcArchetype->TypeIndexInArchetypeToMemoryOrderIndex[srcTypeIndexInArchetype];
-                    var srcBits = srcArchetype->Chunks.GetEnabledArrayForTypeInChunk(srcMemoryOrderIndexInArchetype, srcChunkIndex);
+                    int srcMemoryOrderIndexInArchetype = srcArchetype->TypeIndexInArchetypeToMemoryOrderIndex[
+                        srcTypeIndexInArchetype
+                    ];
+                    var srcBits = srcArchetype->Chunks.GetEnabledArrayForTypeInChunk(
+                        srcMemoryOrderIndexInArchetype,
+                        srcChunkIndex
+                    );
                     // Copy src bits to dst bits
                     dstBits.Copy(0, ref srcBits, 0, srcEntityCount);
                     // Copy enabled bit count to destination
-                    var srcDisabledCount = srcArchetype->Chunks.GetChunkDisabledCountForType(srcMemoryOrderIndexInArchetype, srcChunkIndex);
-                    dstArchetype->Chunks.SetChunkDisabledCountForType(dstMemoryOrderIndexInArchetype, dstChunkIndex, srcDisabledCount);
+                    var srcDisabledCount = srcArchetype->Chunks.GetChunkDisabledCountForType(
+                        srcMemoryOrderIndexInArchetype,
+                        srcChunkIndex
+                    );
+                    dstArchetype->Chunks.SetChunkDisabledCountForType(
+                        dstMemoryOrderIndexInArchetype,
+                        dstChunkIndex,
+                        srcDisabledCount
+                    );
                 }
             }
             // Clear the source bits and counts, because we're doing a full move.
@@ -430,7 +592,12 @@ namespace Unity.Entities
             archetype->Chunks.InitializeDisabledCountForChunk(chunkIndex);
         }
 
-        public static void RemoveFromEnabledBitsHierarchicalData(ChunkIndex chunk, Archetype* archetype, int startIndex, int count)
+        public static void RemoveFromEnabledBitsHierarchicalData(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int startIndex,
+            int count
+        )
         {
             var enableableTypesCount = archetype->EnableableTypesCount;
             var chunkListIndex = chunk.ListIndex;
@@ -442,11 +609,24 @@ namespace Unity.Entities
                 var bits = archetype->Chunks.GetEnabledArrayForTypeInChunk(memoryOrderIndexInArchetype, chunkListIndex);
 
                 var removedDisabledCount = count - bits.CountBits(startIndex, count);
-                archetype->Chunks.AdjustChunkDisabledCountForType(memoryOrderIndexInArchetype, chunkListIndex, -removedDisabledCount);
+                archetype->Chunks.AdjustChunkDisabledCountForType(
+                    memoryOrderIndexInArchetype,
+                    chunkListIndex,
+                    -removedDisabledCount
+                );
             }
         }
 
-        public static void CopyComponents(ChunkIndex srcChunk, Archetype* srcArch, int srcIndex, ChunkIndex dstChunk, Archetype* dstArch, int dstIndex, int count, uint dstGlobalSystemVersion)
+        public static void CopyComponents(
+            ChunkIndex srcChunk,
+            Archetype* srcArch,
+            int srcIndex,
+            ChunkIndex dstChunk,
+            Archetype* dstArch,
+            int dstIndex,
+            int count,
+            uint dstGlobalSystemVersion
+        )
         {
             var typesCount = srcArch->TypesCount;
 
@@ -486,7 +666,17 @@ namespace Unity.Entities
         }
 
         [BurstCompile]
-        public static void SwapComponents(Archetype* srcArch, ChunkIndex srcChunk, int srcIndex, Archetype* dstArch, ChunkIndex dstChunk, int dstIndex, int count, uint srcGlobalSystemVersion, uint dstGlobalSystemVersion)
+        public static void SwapComponents(
+            Archetype* srcArch,
+            ChunkIndex srcChunk,
+            int srcIndex,
+            Archetype* dstArch,
+            ChunkIndex dstChunk,
+            int dstIndex,
+            int count,
+            uint srcGlobalSystemVersion,
+            uint dstGlobalSystemVersion
+        )
         {
             var typesCount = srcArch->TypesCount;
 
@@ -569,7 +759,6 @@ namespace Unity.Entities
                 var bits = arch->Chunks.GetEnabledArrayForTypeInChunk(memoryOrderIndexInArchetype, dstChunk.ListIndex);
                 bits.SetBits(dstIndex, true, count);
             }
-
         }
 
         public static void InitializeBuffersInChunk(byte* p, int count, int stride, int bufferCapacity)
@@ -581,7 +770,15 @@ namespace Unity.Entities
             }
         }
 
-        public static void Convert(Archetype* srcArch, ChunkIndex srcChunk, int srcIndex, Archetype* dstArch, ChunkIndex dstChunk, int dstIndex, int count)
+        public static void Convert(
+            Archetype* srcArch,
+            ChunkIndex srcChunk,
+            int srcIndex,
+            Archetype* dstArch,
+            ChunkIndex dstChunk,
+            int dstIndex,
+            int count
+        )
         {
             Assert.AreNotEqual(srcChunk, dstChunk);
             var entityComponentStore = dstArch->EntityComponentStore;
@@ -636,7 +833,10 @@ namespace Unity.Entities
                     if (dstType.IsEnableable)
                     {
                         int dstMemoryOrderIndexInArchetype = dstArch->TypeIndexInArchetypeToMemoryOrderIndex[dstI];
-                        var bits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(dstMemoryOrderIndexInArchetype, dstChunk.ListIndex);
+                        var bits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(
+                            dstMemoryOrderIndexInArchetype,
+                            dstChunk.ListIndex
+                        );
                         bits.SetBits(dstIndex, true, count);
                     }
                     --dstI;
@@ -674,7 +874,10 @@ namespace Unity.Entities
                     if (dstType.IsEnableable)
                     {
                         int dstMemoryOrderIndexInArchetype = dstArch->TypeIndexInArchetypeToMemoryOrderIndex[dstI];
-                        var bits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(dstMemoryOrderIndexInArchetype, dstChunk.ListIndex);
+                        var bits = dstArch->Chunks.GetEnabledArrayForTypeInChunk(
+                            dstMemoryOrderIndexInArchetype,
+                            dstChunk.ListIndex
+                        );
                         bits.SetBits(dstIndex, true, count);
                     }
                     --dstTagI;
@@ -703,10 +906,11 @@ namespace Unity.Entities
                         if (managedComponentIndex == 0)
                             continue;
                         entityComponentStore->FreeManagedComponentIndex(managedComponentIndex);
-                        entityComponentStore->ManagedChangesTracker.AddToFreeManagedComponentCommand(managedComponentIndex);
+                        entityComponentStore->ManagedChangesTracker.AddToFreeManagedComponentCommand(
+                            managedComponentIndex
+                        );
                     }
-                }
-                while ((sourceTypesToDealloc[++iDealloc] >= srcArch->FirstManagedComponent));
+                } while ((sourceTypesToDealloc[++iDealloc] >= srcArch->FirstManagedComponent));
                 entityComponentStore->ManagedChangesTracker.EndDeallocateManagedComponentCommand(freeCommandHandle);
             }
 
@@ -765,13 +969,16 @@ namespace Unity.Entities
             UnsafeUtility.MemSet(chunkBuffer + lastStartOffset, value, bufferSize - lastStartOffset);
 
             // clear the chunk header padding zone
-            UnsafeUtility.MemSet(chunkBuffer - Chunk.kBufferOffset + Chunk.kSerializedHeaderSize, value, Chunk.kBufferOffset - Chunk.kSerializedHeaderSize);
+            UnsafeUtility.MemSet(
+                chunkBuffer - Chunk.kBufferOffset + Chunk.kSerializedHeaderSize,
+                value,
+                Chunk.kBufferOffset - Chunk.kSerializedHeaderSize
+            );
         }
 
         public static bool AreLayoutCompatible(Archetype* a, Archetype* b)
         {
-            if ((a == null) || (b == null) ||
-                (a->ChunkCapacity != b->ChunkCapacity))
+            if ((a == null) || (b == null) || (a->ChunkCapacity != b->ChunkCapacity))
                 return false;
 
             var typeCount = a->NonZeroSizedTypesCount;
@@ -838,7 +1045,8 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                     {
                         entityComponentStore->RemoveSharedComponentReference_Unmanaged(sharedComponentIndex);
-                    } else
+                    }
+                    else
                     {
                         entityComponentStore->ManagedChangesTracker.RemoveReference(sharedComponentIndex);
                     }
@@ -955,7 +1163,10 @@ namespace Unity.Entities
                 for (int i = 0; i < fillCount; i++)
                 {
                     var entity = fillEntities[i];
-                    entityComponentStore->SetEntityInChunk(entity, new EntityInChunk { Chunk = chunk, IndexInChunk = startIndex + i });
+                    entityComponentStore->SetEntityInChunk(
+                        entity,
+                        new EntityInChunk { Chunk = chunk, IndexInChunk = startIndex + i }
+                    );
                 }
             }
             else
@@ -968,7 +1179,10 @@ namespace Unity.Entities
             archetype->Chunks.SetOrderVersion(chunk.ListIndex, entityComponentStore->GlobalSystemVersion);
             entityComponentStore->IncrementComponentTypeOrderVersion(archetype);
             var sharedComponentValues = archetype->Chunks.GetSharedComponentValues(chunk.ListIndex);
-            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(archetype, sharedComponentValues);
+            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(
+                archetype,
+                sharedComponentValues
+            );
 
             int newChunkEntityCount = chunk.Count - count;
             SetChunkCount(archetype, chunk, newChunkEntityCount);
@@ -982,7 +1196,12 @@ namespace Unity.Entities
         /// Fix-up the chunk to refer to a different (but layout compatible) archetype.
         /// - Should only be called by Move(chunk)
         /// </summary>
-        public static void ChangeArchetypeInPlace(Archetype* srcArchetype, ChunkIndex srcChunk, Archetype* dstArchetype, int* dstSharedComponentValues)
+        public static void ChangeArchetypeInPlace(
+            Archetype* srcArchetype,
+            ChunkIndex srcChunk,
+            Archetype* dstArchetype,
+            int* dstSharedComponentValues
+        )
         {
             var entityComponentStore = dstArchetype->EntityComponentStore;
             AssertAreLayoutCompatible(srcArchetype, dstArchetype);
@@ -1001,7 +1220,7 @@ namespace Unity.Entities
                 int o = 0;
                 int n = 0;
 
-                for (; n < dstCount && o < srcCount;)
+                for (; n < dstCount && o < srcCount; )
                 {
                     var srcType = srcArchetype->Types[o + srcFirstShared].TypeIndex;
                     var dstType = dstArchetype->Types[n + dstFirstShared].TypeIndex;
@@ -1013,15 +1232,23 @@ namespace Unity.Entities
                         {
                             if (EntityComponentStore.IsUnmanagedSharedComponentIndex(srcSharedComponentDataIndex))
                             {
-                                entityComponentStore->RemoveSharedComponentReference_Unmanaged(srcSharedComponentDataIndex);
-                            } else
+                                entityComponentStore->RemoveSharedComponentReference_Unmanaged(
+                                    srcSharedComponentDataIndex
+                                );
+                            }
+                            else
                             {
-                                entityComponentStore->ManagedChangesTracker.RemoveReference(srcSharedComponentDataIndex);
+                                entityComponentStore->ManagedChangesTracker.RemoveReference(
+                                    srcSharedComponentDataIndex
+                                );
                             }
                             if (EntityComponentStore.IsUnmanagedSharedComponentIndex(dstSharedComponentDataIndex))
                             {
-                                entityComponentStore->AddSharedComponentReference_Unmanaged(dstSharedComponentDataIndex);
-                            } else
+                                entityComponentStore->AddSharedComponentReference_Unmanaged(
+                                    dstSharedComponentDataIndex
+                                );
+                            }
+                            else
                             {
                                 entityComponentStore->ManagedChangesTracker.AddReference(dstSharedComponentDataIndex);
                             }
@@ -1036,7 +1263,8 @@ namespace Unity.Entities
                         if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                         {
                             entityComponentStore->RemoveSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                        } else
+                        }
+                        else
                         {
                             entityComponentStore->ManagedChangesTracker.RemoveReference(sharedComponentDataIndex);
                         }
@@ -1048,7 +1276,8 @@ namespace Unity.Entities
                         if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                         {
                             entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                        } else
+                        }
+                        else
                         {
                             entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentDataIndex);
                         }
@@ -1062,7 +1291,8 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                     {
                         entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                    } else
+                    }
+                    else
                     {
                         entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentDataIndex);
                     }
@@ -1074,7 +1304,8 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                     {
                         entityComponentStore->RemoveSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                    } else
+                    }
+                    else
                     {
                         entityComponentStore->ManagedChangesTracker.RemoveReference(sharedComponentDataIndex);
                     }
@@ -1092,8 +1323,12 @@ namespace Unity.Entities
             if (Hint.Likely(dstArchetype != srcArchetype))
             {
                 //Change version is overriden below
-                dstArchetype->AddToChunkList(srcChunk, dstSharedComponentValues, 0,
-                    ref entityComponentStore->m_ChunkListChangesTracker);
+                dstArchetype->AddToChunkList(
+                    srcChunk,
+                    dstSharedComponentValues,
+                    0,
+                    ref entityComponentStore->m_ChunkListChangesTracker
+                );
                 int chunkIndexInDstArchetype = srcChunk.ListIndex;
 
                 // For unchanged components: Copy versions from src to dst archetype
@@ -1131,7 +1366,11 @@ namespace Unity.Entities
                 // We don't know which value changed at this point, so just copy them all.
                 for (int i = 0, sharedComponentCount = srcArchetype->NumSharedComponents; i < sharedComponentCount; ++i)
                 {
-                    srcArchetype->Chunks.SetSharedComponentValue(i, chunkIndexInSrcArchetype, dstSharedComponentValues[i]);
+                    srcArchetype->Chunks.SetSharedComponentValue(
+                        i,
+                        chunkIndexInSrcArchetype,
+                        dstSharedComponentValues[i]
+                    );
                 }
             }
 
@@ -1152,13 +1391,24 @@ namespace Unity.Entities
                 else
                 {
                     var metaChunk = entityComponentStore->GetChunk(srcChunk.MetaChunkEntity);
-                    var dstMetaSharedComponentValues = dstArchetype->Chunks.GetSharedComponentValues(metaChunk.ListIndex);
-                    entityComponentStore->Move(srcChunk.MetaChunkEntity, dstArchetype->MetaChunkArchetype, dstMetaSharedComponentValues);
+                    var dstMetaSharedComponentValues = dstArchetype->Chunks.GetSharedComponentValues(
+                        metaChunk.ListIndex
+                    );
+                    entityComponentStore->Move(
+                        srcChunk.MetaChunkEntity,
+                        dstArchetype->MetaChunkArchetype,
+                        dstMetaSharedComponentValues
+                    );
                 }
             }
         }
 
-        public static void MoveArchetype(Archetype* srcArchetype, ChunkIndex chunk, Archetype* dstArchetype, SharedComponentValues sharedComponentValues)
+        public static void MoveArchetype(
+            Archetype* srcArchetype,
+            ChunkIndex chunk,
+            Archetype* dstArchetype,
+            SharedComponentValues sharedComponentValues
+        )
         {
             var entityComponentStore = dstArchetype->EntityComponentStore;
             var globalSystemVersion = entityComponentStore->GlobalSystemVersion;
@@ -1171,7 +1421,12 @@ namespace Unity.Entities
 
             int chunkIndexInSrcArchetype = chunk.ListIndex;
 
-            dstArchetype->AddToChunkList(chunk, sharedComponentValues, globalSystemVersion, ref entityComponentStore->m_ChunkListChangesTracker);
+            dstArchetype->AddToChunkList(
+                chunk,
+                sharedComponentValues,
+                globalSystemVersion,
+                ref entityComponentStore->m_ChunkListChangesTracker
+            );
             var chunkIndexInDstArchetype = chunk.ListIndex;
 
             // Since we're not getting a clean chunk, we need to initialize the new bits here
@@ -1194,16 +1449,24 @@ namespace Unity.Entities
             dstArchetype->Chunks.SetOrderVersion(chunk.ListIndex, globalSystemVersion);
         }
 
-        public static void CloneChangeVersions(Archetype* srcArchetype, int chunkIndexInSrcArchetype, Archetype* dstArchetype, int chunkIndexInDstArchetype, bool dstValidExistingVersions = false)
+        public static void CloneChangeVersions(
+            Archetype* srcArchetype,
+            int chunkIndexInSrcArchetype,
+            Archetype* dstArchetype,
+            int chunkIndexInDstArchetype,
+            bool dstValidExistingVersions = false
+        )
         {
             var dstTypes = dstArchetype->Types;
             var srcTypes = srcArchetype->Types;
             var dstGlobalSystemVersion = dstArchetype->EntityComponentStore->GlobalSystemVersion;
             var srcGlobalSystemVersion = srcArchetype->EntityComponentStore->GlobalSystemVersion;
 
-            for (int isrcType = srcArchetype->TypesCount - 1, idstType = dstArchetype->TypesCount - 1;
-                 idstType >= 0;
-                 --idstType)
+            for (
+                int isrcType = srcArchetype->TypesCount - 1, idstType = dstArchetype->TypesCount - 1;
+                idstType >= 0;
+                --idstType
+            )
             {
                 var dstType = dstTypes[idstType];
                 while (srcTypes[isrcType] > dstType)
@@ -1237,7 +1500,13 @@ namespace Unity.Entities
             }
         }
 
-        public static void AllocateClone(Archetype* archetype, ChunkIndex chunk, Entity* entities, int count, Entity srcEntity)
+        public static void AllocateClone(
+            Archetype* archetype,
+            ChunkIndex chunk,
+            Entity* entities,
+            int count,
+            Entity srcEntity
+        )
         {
             var entityComponentStore = archetype->EntityComponentStore;
             var globalSystemVersion = entityComponentStore->GlobalSystemVersion;
@@ -1246,7 +1515,15 @@ namespace Unity.Entities
             int allocatedIndex;
             var allocatedCount = AllocateIntoChunk(archetype, chunk, count, out allocatedIndex);
             entityComponentStore->AllocateEntities(archetype, chunk, allocatedIndex, allocatedCount, entities);
-            ReplicateComponents(entityComponentStore->GetArchetype(src.Chunk), src.Chunk, src.IndexInChunk, archetype, chunk, allocatedIndex, allocatedCount);
+            ReplicateComponents(
+                entityComponentStore->GetArchetype(src.Chunk),
+                src.Chunk,
+                src.IndexInChunk,
+                archetype,
+                chunk,
+                allocatedIndex,
+                allocatedCount
+            );
 
             // Add Entities in Chunk. ChangeVersion:Yes OrderVersion:Yes
             var chunkListIndex = chunk.ListIndex;
@@ -1259,13 +1536,24 @@ namespace Unity.Entities
 #endif
 
             var sharedComponentValues = archetype->Chunks.GetSharedComponentValues(chunkListIndex);
-            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(archetype, sharedComponentValues);
+            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(
+                archetype,
+                sharedComponentValues
+            );
             entityComponentStore->IncrementComponentTypeOrderVersion(archetype);
         }
 
         public static void Deallocate(Archetype* archetype, ChunkIndex chunk)
         {
-            Deallocate(archetype, new EntityBatchInChunk { Chunk = chunk, StartIndex = 0, Count = chunk.Count });
+            Deallocate(
+                archetype,
+                new EntityBatchInChunk
+                {
+                    Chunk = chunk,
+                    StartIndex = 0,
+                    Count = chunk.Count,
+                }
+            );
         }
 
         public static void Deallocate(Archetype* archetype, in EntityBatchInChunk batch)
@@ -1278,7 +1566,10 @@ namespace Unity.Entities
 
             entityComponentStore->DeallocateDataEntitiesInChunk(chunk, archetype, startIndex, count);
             var sharedComponentValues = archetype->Chunks.GetSharedComponentValues(chunk.ListIndex);
-            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(archetype, sharedComponentValues);
+            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(
+                archetype,
+                sharedComponentValues
+            );
 
             // Remove Entities in Chunk. ChangeVersion:No OrderVersion:Yes
             archetype->Chunks.SetOrderVersion(chunk.ListIndex, globalSystemVersion);
@@ -1292,7 +1583,12 @@ namespace Unity.Entities
                 UpdateChunkDisabledEntityCounts(chunk, archetype);
         }
 
-        public static void Clone(Archetype* srcArchetype, in EntityBatchInChunk srcBatch, Archetype* dstArchetype, ChunkIndex dstChunk)
+        public static void Clone(
+            Archetype* srcArchetype,
+            in EntityBatchInChunk srcBatch,
+            Archetype* dstArchetype,
+            ChunkIndex dstChunk
+        )
         {
             var srcChunk = srcBatch.Chunk;
             var srcChunkIndex = srcBatch.StartIndex;
@@ -1313,10 +1609,19 @@ namespace Unity.Entities
             for (int i = 0; i < dstCount; i++)
             {
                 var entity = dstEntities[i];
-                entityComponentStore->SetEntityInChunk(entity, new EntityInChunk { Chunk = dstChunk, IndexInChunk = dstChunkIndex + i });
+                entityComponentStore->SetEntityInChunk(
+                    entity,
+                    new EntityInChunk { Chunk = dstChunk, IndexInChunk = dstChunkIndex + i }
+                );
             }
 
-            CloneChangeVersions(srcArchetype, srcChunk.ListIndex, dstArchetype, dstChunk.ListIndex, dstValidExistingVersions);
+            CloneChangeVersions(
+                srcArchetype,
+                srcChunk.ListIndex,
+                dstArchetype,
+                dstChunk.ListIndex,
+                dstValidExistingVersions
+            );
             CloneEnabledBits(srcChunk, srcArchetype, srcChunkIndex, dstChunk, dstArchetype, dstChunkIndex, dstCount);
             // Can't update these counts until the chunk count is up to date and padding bits are clear
             UpdateChunkDisabledEntityCounts(dstChunk, dstArchetype);
@@ -1324,24 +1629,35 @@ namespace Unity.Entities
             dstArchetype->Chunks.SetOrderVersion(dstChunk.ListIndex, globalSystemVersion);
             entityComponentStore->IncrementComponentTypeOrderVersion(dstArchetype);
             var dstSharedComponentValues = dstArchetype->Chunks.GetSharedComponentValues(dstChunk.ListIndex);
-            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(dstArchetype, dstSharedComponentValues);
+            entityComponentStore->ManagedChangesTracker.IncrementComponentOrderVersion(
+                dstArchetype,
+                dstSharedComponentValues
+            );
 
             // Cannot DestroyEntities unless CleanupComplete on the entity chunk.
             if (dstArchetype->CleanupComplete)
                 entityComponentStore->DestroyEntities(dstEntities, dstCount);
         }
 
-        static void ReplicateComponents(Archetype* srcArchetype, ChunkIndex srcChunk, int srcIndex, Archetype* dstArchetype, ChunkIndex dstChunk, int dstBaseIndex, int count)
+        static void ReplicateComponents(
+            Archetype* srcArchetype,
+            ChunkIndex srcChunk,
+            int srcIndex,
+            Archetype* dstArchetype,
+            ChunkIndex dstChunk,
+            int dstBaseIndex,
+            int count
+        )
         {
-            var srcBuffer           = srcChunk.Buffer;
-            var dstBuffer           = dstChunk.Buffer;
-            var srcOffsets          = srcArchetype->Offsets;
-            var srcSizeOfs          = srcArchetype->SizeOfs;
+            var srcBuffer = srcChunk.Buffer;
+            var dstBuffer = dstChunk.Buffer;
+            var srcOffsets = srcArchetype->Offsets;
+            var srcSizeOfs = srcArchetype->SizeOfs;
             var srcBufferCapacities = srcArchetype->BufferCapacities;
-            var srcTypes            = srcArchetype->Types;
-            var dstTypes            = dstArchetype->Types;
-            var dstOffsets          = dstArchetype->Offsets;
-            var dstTypeIndex        = 1;
+            var srcTypes = srcArchetype->Types;
+            var dstTypes = dstArchetype->Types;
+            var dstOffsets = dstArchetype->Offsets;
+            var dstTypeIndex = 1;
 
             var nativeComponentsEnd = srcArchetype->NativeComponentsEnd;
             for (var srcTypeIndex = 1; srcTypeIndex != nativeComponentsEnd; srcTypeIndex++)
@@ -1362,7 +1678,11 @@ namespace Unity.Entities
 
             dstTypeIndex = dstArchetype->FirstBufferComponent;
             var bufferComponentsEnd = srcArchetype->BufferComponentsEnd;
-            for (var srcTypeIndex = srcArchetype->FirstBufferComponent; srcTypeIndex != bufferComponentsEnd; srcTypeIndex++)
+            for (
+                var srcTypeIndex = srcArchetype->FirstBufferComponent;
+                srcTypeIndex != bufferComponentsEnd;
+                srcTypeIndex++
+            )
             {
                 var srcType = srcTypes[srcTypeIndex];
                 var dstType = dstTypes[dstTypeIndex];
@@ -1381,7 +1701,15 @@ namespace Unity.Entities
                     BufferHeader* srcHdr = (BufferHeader*)src;
                     BufferHeader* dstHdr = (BufferHeader*)dst;
                     BufferHeader.Initialize(dstHdr, srcBufferCapacity);
-                    BufferHeader.Assign(dstHdr, BufferHeader.GetElementPointer(srcHdr), srcHdr->Length, elementSize, alignment, false, 0);
+                    BufferHeader.Assign(
+                        dstHdr,
+                        BufferHeader.GetElementPointer(srcHdr),
+                        srcHdr->Length,
+                        elementSize,
+                        alignment,
+                        false,
+                        0
+                    );
 
                     dst += srcSizeOf;
                 }
@@ -1392,34 +1720,72 @@ namespace Unity.Entities
             // Copy enabled bits from source entity to the instantiated entities
             ReplicateEnabledBits(srcChunk, srcArchetype, srcIndex, dstChunk, dstArchetype, dstBaseIndex, count);
 
-
-            UnityEngine.Debug.Assert(sizeof(ulong)==UnsafeUtility.SizeOf<EntityId>(), "EntityId is not the same size as int, update this code to use ulong");
+            UnityEngine.Debug.Assert(
+                sizeof(ulong) == UnsafeUtility.SizeOf<EntityId>(),
+                "EntityId is not the same size as int, update this code to use ulong"
+            );
 
             // Replicate CompanionLinks
             EntityId* newCompanionLinkIds = null;
 
             if (srcArchetype->HasCompanionComponents && dstArchetype->HasCompanionComponents)
             {
-                var srcCompanionLinkIndex = GetIndexInTypeArray(srcArchetype, ManagedComponentStore.CompanionLinkTypeIndex);
-                var dstCompanionLinkIndex = GetIndexInTypeArray(dstArchetype, ManagedComponentStore.CompanionLinkTypeIndex);
-                var dstCompanionLinkTransformIndex = GetIndexInTypeArray(dstArchetype, ManagedComponentStore.CompanionLinkTransformTypeIndex);
+                var srcCompanionLinkIndex = GetIndexInTypeArray(
+                    srcArchetype,
+                    ManagedComponentStore.CompanionLinkTypeIndex
+                );
+                var dstCompanionLinkIndex = GetIndexInTypeArray(
+                    dstArchetype,
+                    ManagedComponentStore.CompanionLinkTypeIndex
+                );
+                var dstCompanionLinkTransformIndex = GetIndexInTypeArray(
+                    dstArchetype,
+                    ManagedComponentStore.CompanionLinkTransformTypeIndex
+                );
 
                 // It may just be a managed Unity reference but not an actual companion component
                 if (srcCompanionLinkIndex != -1 && dstCompanionLinkIndex != -1 && dstCompanionLinkTransformIndex != -1)
                 {
-                    var srcCompanionLinkPtr = (EntityId*)(srcBuffer + srcOffsets[srcCompanionLinkIndex] + sizeof(EntityId) * srcIndex);
-                    var dstCompanionLinkPtr = (EntityId*)(dstBuffer + dstOffsets[dstCompanionLinkIndex] + sizeof(EntityId) * dstBaseIndex);
-                    var dstCompanionLinkTransformPtr = (EntityId*)(dstBuffer + dstOffsets[dstCompanionLinkTransformIndex] + sizeof(EntityId) * dstBaseIndex);
+                    var srcCompanionLinkPtr = (EntityId*)(
+                        srcBuffer + srcOffsets[srcCompanionLinkIndex] + sizeof(EntityId) * srcIndex
+                    );
+                    var dstCompanionLinkPtr = (EntityId*)(
+                        dstBuffer + dstOffsets[dstCompanionLinkIndex] + sizeof(EntityId) * dstBaseIndex
+                    );
+                    var dstCompanionLinkTransformPtr = (EntityId*)(
+                        dstBuffer + dstOffsets[dstCompanionLinkTransformIndex] + sizeof(EntityId) * dstBaseIndex
+                    );
 
-                    var dstCompanionLinkArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<EntityId>(dstCompanionLinkPtr, count, Allocator.Invalid);
-                    var dstCompanionLinkTransformArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<EntityId>(dstCompanionLinkTransformPtr, count, Allocator.Invalid);
+                    var dstCompanionLinkArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<EntityId>(
+                        dstCompanionLinkPtr,
+                        count,
+                        Allocator.Invalid
+                    );
+                    var dstCompanionLinkTransformArray =
+                        NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<EntityId>(
+                            dstCompanionLinkTransformPtr,
+                            count,
+                            Allocator.Invalid
+                        );
 
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref dstCompanionLinkArray, AtomicSafetyHandle.GetTempMemoryHandle());
-                    NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref dstCompanionLinkTransformArray, AtomicSafetyHandle.GetTempMemoryHandle());
-    #endif
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+                    NativeArrayUnsafeUtility.SetAtomicSafetyHandle(
+                        ref dstCompanionLinkArray,
+                        AtomicSafetyHandle.GetTempMemoryHandle()
+                    );
+                    NativeArrayUnsafeUtility.SetAtomicSafetyHandle(
+                        ref dstCompanionLinkTransformArray,
+                        AtomicSafetyHandle.GetTempMemoryHandle()
+                    );
+#endif
                     var destScene = UnityEngine.GameObject.GetScene(srcCompanionLinkPtr[0]);
-                    UnityEngine.GameObject.InstantiateGameObjects(srcCompanionLinkPtr[0], count, dstCompanionLinkArray, dstCompanionLinkTransformArray, destScene);
+                    UnityEngine.GameObject.InstantiateGameObjects(
+                        srcCompanionLinkPtr[0],
+                        count,
+                        dstCompanionLinkArray,
+                        dstCompanionLinkTransformArray,
+                        destScene
+                    );
 
                     newCompanionLinkIds = dstCompanionLinkPtr;
                 }
@@ -1427,17 +1793,35 @@ namespace Unity.Entities
 
             if (dstArchetype->NumManagedComponents > 0)
             {
-                ReplicateManagedComponents(srcArchetype, srcChunk, srcIndex, dstArchetype, dstChunk, dstBaseIndex, count, newCompanionLinkIds);
+                ReplicateManagedComponents(
+                    srcArchetype,
+                    srcChunk,
+                    srcIndex,
+                    dstArchetype,
+                    dstChunk,
+                    dstBaseIndex,
+                    count,
+                    newCompanionLinkIds
+                );
             }
         }
 
-        static void ReplicateManagedComponents(Archetype* srcArchetype, ChunkIndex srcChunk, int srcIndex, Archetype* dstArchetype, ChunkIndex dstChunk, int dstBaseIndex, int count, EntityId* newCompanionLinkIds)
+        static void ReplicateManagedComponents(
+            Archetype* srcArchetype,
+            ChunkIndex srcChunk,
+            int srcIndex,
+            Archetype* dstArchetype,
+            ChunkIndex dstChunk,
+            int dstBaseIndex,
+            int count,
+            EntityId* newCompanionLinkIds
+        )
         {
             var entityComponentStore = dstArchetype->EntityComponentStore;
             var srcTypes = srcArchetype->Types;
             var dstTypes = dstArchetype->Types;
-            var srcOffsets          = srcArchetype->Offsets;
-            var dstOffsets          = dstArchetype->Offsets;
+            var srcOffsets = srcArchetype->Offsets;
+            var dstOffsets = dstArchetype->Offsets;
             int componentCount = dstArchetype->NumManagedComponents;
 
             int nonNullManagedComponents = 0;
@@ -1453,7 +1837,11 @@ namespace Unity.Entities
 
             bool hasCompanionComponents = dstArchetype->HasCompanionComponents;
 
-            for (var srcTypeIndex = srcArchetype->FirstManagedComponent; srcTypeIndex != managedComponentsEnd; srcTypeIndex++)
+            for (
+                var srcTypeIndex = srcArchetype->FirstManagedComponent;
+                srcTypeIndex != managedComponentsEnd;
+                srcTypeIndex++
+            )
             {
                 var srcType = srcTypes[srcTypeIndex];
                 var dstType = dstTypes[dstTypeIndex];
@@ -1469,7 +1857,11 @@ namespace Unity.Entities
                 }
                 else
                 {
-                    if (hasCompanionComponents && TypeManager.GetTypeInfo(srcType.TypeIndex).Category == TypeManager.TypeCategory.UnityEngineObject)
+                    if (
+                        hasCompanionComponents
+                        && TypeManager.GetTypeInfo(srcType.TypeIndex).Category
+                            == TypeManager.TypeCategory.UnityEngineObject
+                    )
                     {
                         //Hybrid component, put at end of array
                         var index = componentCount - nonNullCompanionComponents - 1;
@@ -1488,8 +1880,14 @@ namespace Unity.Entities
                 dstTypeIndex++;
             }
 
-            entityComponentStore->ReserveManagedComponentIndices(count * (nonNullManagedComponents + nonNullCompanionComponents));
-            entityComponentStore->ManagedChangesTracker.CloneManagedComponentBegin(componentIndices, nonNullManagedComponents, count);
+            entityComponentStore->ReserveManagedComponentIndices(
+                count * (nonNullManagedComponents + nonNullCompanionComponents)
+            );
+            entityComponentStore->ManagedChangesTracker.CloneManagedComponentBegin(
+                componentIndices,
+                nonNullManagedComponents,
+                count
+            );
             for (int c = 0; c < nonNullManagedComponents; ++c)
             {
                 var dst = (int*)(componentDstArrayStart[c]);
@@ -1499,11 +1897,24 @@ namespace Unity.Entities
 
             if (hasCompanionComponents)
             {
-                var companionLinkIndexInTypeArray = GetIndexInTypeArray(dstArchetype, ManagedComponentStore.CompanionReferenceTypeIndex);
-                var companionLinkIndices = (companionLinkIndexInTypeArray == -1) ? null : (int*)(dstBaseAddr + dstOffsets[companionLinkIndexInTypeArray]);
+                var companionLinkIndexInTypeArray = GetIndexInTypeArray(
+                    dstArchetype,
+                    ManagedComponentStore.CompanionReferenceTypeIndex
+                );
+                var companionLinkIndices =
+                    (companionLinkIndexInTypeArray == -1)
+                        ? null
+                        : (int*)(dstBaseAddr + dstOffsets[companionLinkIndexInTypeArray]);
 
                 var dstEntities = (Entity*)dstChunk.Buffer + dstBaseIndex;
-                entityComponentStore->ManagedChangesTracker.CloneCompanionComponentBegin(componentIndices + componentCount - nonNullCompanionComponents, nonNullCompanionComponents, dstEntities, count, companionLinkIndices, newCompanionLinkIds);
+                entityComponentStore->ManagedChangesTracker.CloneCompanionComponentBegin(
+                    componentIndices + componentCount - nonNullCompanionComponents,
+                    nonNullCompanionComponents,
+                    dstEntities,
+                    count,
+                    companionLinkIndices,
+                    newCompanionLinkIds
+                );
                 for (int c = componentCount - nonNullCompanionComponents; c < componentCount; ++c)
                 {
                     var dst = (int*)(componentDstArrayStart[c]);
@@ -1562,7 +1973,12 @@ namespace Unity.Entities
             }
         }
 
-        static bool ClearEntityReferences(EntityComponentStore* entityComponentStore, in TypeManager.TypeInfo typeInfo, byte* address, int elementCount)
+        static bool ClearEntityReferences(
+            EntityComponentStore* entityComponentStore,
+            in TypeManager.TypeInfo typeInfo,
+            byte* address,
+            int elementCount
+        )
         {
             var changed = false;
 
@@ -1589,20 +2005,36 @@ namespace Unity.Entities
 
         public static Entity GetEntityFromEntityInChunk(Archetype* archetype, EntityInChunk entityInChunk)
         {
-            var buffer = entityInChunk.Chunk.Buffer + archetype->Offsets[0] + entityInChunk.IndexInChunk * archetype->SizeOfs[0];
+            var buffer =
+                entityInChunk.Chunk.Buffer + archetype->Offsets[0] + entityInChunk.IndexInChunk * archetype->SizeOfs[0];
             return *(Entity*)buffer;
         }
 
-        public static void AddExistingChunk(Archetype* archetype, ChunkIndex chunk, int* sharedComponentIndices, byte* enabledBitsValuesForChunk, int* perComponentDisabledBitCount)
+        public static void AddExistingChunk(
+            Archetype* archetype,
+            ChunkIndex chunk,
+            int* sharedComponentIndices,
+            byte* enabledBitsValuesForChunk,
+            int* perComponentDisabledBitCount
+        )
         {
             var entityComponentStore = archetype->EntityComponentStore;
             var globalSystemVersion = entityComponentStore->GlobalSystemVersion;
-            archetype->AddToChunkList(chunk, sharedComponentIndices, globalSystemVersion, ref entityComponentStore->m_ChunkListChangesTracker);
+            archetype->AddToChunkList(
+                chunk,
+                sharedComponentIndices,
+                globalSystemVersion,
+                ref entityComponentStore->m_ChunkListChangesTracker
+            );
             archetype->EntityCount += chunk.Count;
 
             InitializeBitsForNewChunk(archetype, chunk.ListIndex);
             Assert.IsTrue(chunk.ListIndex >= 0 && chunk.ListIndex < archetype->Chunks.Count);
-            archetype->Chunks.SetEnabledBitsAndHierarchicalData(chunk.ListIndex, enabledBitsValuesForChunk, perComponentDisabledBitCount);
+            archetype->Chunks.SetEnabledBitsAndHierarchicalData(
+                chunk.ListIndex,
+                enabledBitsValuesForChunk,
+                perComponentDisabledBitCount
+            );
 
             for (var i = 0; i < archetype->NumSharedComponents; ++i)
             {
@@ -1610,7 +2042,8 @@ namespace Unity.Entities
                 if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                 {
                     entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentIndex);
-                } else
+                }
+                else
                 {
                     entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentIndex);
                 }
@@ -1622,7 +2055,11 @@ namespace Unity.Entities
             entityComponentStore->AddExistingEntitiesInChunk(chunk);
         }
 
-        public static void AddEmptyChunk(Archetype* archetype, ChunkIndex chunk, SharedComponentValues sharedComponentValues)
+        public static void AddEmptyChunk(
+            Archetype* archetype,
+            ChunkIndex chunk,
+            SharedComponentValues sharedComponentValues
+        )
         {
             var entityComponentStore = archetype->EntityComponentStore;
             var globalSystemVersion = entityComponentStore->GlobalSystemVersion;
@@ -1642,14 +2079,20 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                     {
                         entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentIndex);
-                    } else
+                    }
+                    else
                     {
                         entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentIndex);
                     }
                 }
             }
 
-            archetype->AddToChunkList(chunk, sharedComponentValues, globalSystemVersion, ref entityComponentStore->m_ChunkListChangesTracker);
+            archetype->AddToChunkList(
+                chunk,
+                sharedComponentValues,
+                globalSystemVersion,
+                ref entityComponentStore->m_ChunkListChangesTracker
+            );
 
             InitializeBitsForNewChunk(archetype, chunk.ListIndex);
 
@@ -1664,8 +2107,12 @@ namespace Unity.Entities
             }
             else
             {
-                Assert.IsTrue(archetype->FreeChunksBySharedComponents.TryGet(archetype->Chunks.GetSharedComponentValues(chunk.ListIndex),
-                    archetype->NumSharedComponents) != null);
+                Assert.IsTrue(
+                    archetype->FreeChunksBySharedComponents.TryGet(
+                        archetype->Chunks.GetSharedComponentValues(chunk.ListIndex),
+                        archetype->NumSharedComponents
+                    ) != null
+                );
             }
 
             chunk.Flags = 0;

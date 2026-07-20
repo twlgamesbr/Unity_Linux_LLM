@@ -36,10 +36,16 @@ namespace Unity.Physics
 
         // Build the Jacobian
         public void Build(
-            MTransform aFromConstraint, MTransform bFromConstraint,
-            MotionVelocity velocityA, MotionVelocity velocityB,
-            MotionData motionA, MotionData motionB,
-            Constraint constraint, float tau, float damping)
+            MTransform aFromConstraint,
+            MTransform bFromConstraint,
+            MotionVelocity velocityA,
+            MotionVelocity velocityB,
+            MotionData motionA,
+            MotionData motionB,
+            Constraint constraint,
+            float tau,
+            float damping
+        )
         {
             AnchorFrameInBodyA = aFromConstraint;
             AnchorFrameInBodyB = bFromConstraint;
@@ -65,15 +71,29 @@ namespace Unity.Physics
             InitialError = JacobianUtilities.CalculateError(initialAngle, MinAngle, MaxAngle);
         }
 
-        public void Solve(ref JacobianHeader jacHeader, ref MotionVelocity velocityA, ref MotionVelocity velocityB,
-            Solver.StepInput stepInput, ref NativeStream.Writer impulseEventsWriter)
+        public void Solve(
+            ref JacobianHeader jacHeader,
+            ref MotionVelocity velocityA,
+            ref MotionVelocity velocityB,
+            Solver.StepInput stepInput,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             // Predict the relative orientation at the end of the step
-            quaternion futureBFromA = JacobianUtilities.IntegrateOrientationBFromA(BFromA,
-                velocityA.AngularVelocity, velocityB.AngularVelocity, stepInput.Timestep);
+            quaternion futureBFromA = JacobianUtilities.IntegrateOrientationBFromA(
+                BFromA,
+                velocityA.AngularVelocity,
+                velocityB.AngularVelocity,
+                stepInput.Timestep
+            );
 
             // Find the future axis and angle of rotation between the free axes
-            float3 jacA0, jacA1, jacA2, jacB0, jacB1, jacB2;
+            float3 jacA0,
+                jacA1,
+                jacA2,
+                jacB0,
+                jacB1,
+                jacB2;
             quaternion jointOrientation;
             float3 effectiveMass; // first column of 3x3 effective mass matrix, don't need the others because only jac0 can have nonzero error
             float futureAngle;
@@ -93,7 +113,7 @@ namespace Unity.Physics
                 // jacA2: triple-axis perpendicular to BOTH jacA0 AND jacA1
                 //    None of these axes are axis-aligned (ie: to the x,y,z triple-axis)
                 jacA0 = math.select(jacA0 * invSinHalfAngle, new float3(1, 0, 0), invSinHalfAngle == 0.0f);
-                jacA0 = math.select(jacA0, -jacA0, jointOrientation.value.w < 0.0f);    // determines rotation direction
+                jacA0 = math.select(jacA0, -jacA0, jointOrientation.value.w < 0.0f); // determines rotation direction
                 Math.CalculatePerpendicularNormalized(jacA0, out jacA1, out jacA2);
 
                 //jacB are the same axes but from Body B's reference frame (ie: negative jacA)
@@ -119,14 +139,20 @@ namespace Unity.Physics
                 float3 invEffectiveMassDiag = new float3(
                     math.csum(jacA0 * jacA0 * velocityA.InverseInertia + jacB0 * jacB0 * velocityB.InverseInertia),
                     math.csum(jacA1 * jacA1 * velocityA.InverseInertia + jacB1 * jacB1 * velocityB.InverseInertia),
-                    math.csum(jacA2 * jacA2 * velocityA.InverseInertia + jacB2 * jacB2 * velocityB.InverseInertia));
+                    math.csum(jacA2 * jacA2 * velocityA.InverseInertia + jacB2 * jacB2 * velocityB.InverseInertia)
+                );
                 float3 invEffectiveMassOffDiag = new float3(
                     math.csum(jacA0 * jacA1 * velocityA.InverseInertia + jacB0 * jacB1 * velocityB.InverseInertia),
                     math.csum(jacA0 * jacA2 * velocityA.InverseInertia + jacB0 * jacB2 * velocityB.InverseInertia),
-                    math.csum(jacA1 * jacA2 * velocityA.InverseInertia + jacB1 * jacB2 * velocityB.InverseInertia));
+                    math.csum(jacA1 * jacA2 * velocityA.InverseInertia + jacB1 * jacB2 * velocityB.InverseInertia)
+                );
 
-                JacobianUtilities.InvertSymmetricMatrix(invEffectiveMassDiag, invEffectiveMassOffDiag,
-                    out float3 effectiveMassDiag, out float3 effectiveMassOffDiag);
+                JacobianUtilities.InvertSymmetricMatrix(
+                    invEffectiveMassDiag,
+                    invEffectiveMassOffDiag,
+                    out float3 effectiveMassDiag,
+                    out float3 effectiveMassOffDiag
+                );
 
                 effectiveMass = JacobianUtilities.BuildSymmetricMatrix(effectiveMassDiag, effectiveMassOffDiag).c0;
                 // effectiveMass is column0 of matrix: [diag.x, offdiag.x, offdiag.y]
@@ -137,31 +163,44 @@ namespace Unity.Physics
             float futureError = JacobianUtilities.CalculateError(futureAngle, MinAngle, MaxAngle);
             float solveError = JacobianUtilities.CalculateCorrection(futureError, InitialError, Tau, Damping);
             float solveVelocity = -solveError * Solver.CalculateInvTimestep(stepInput.Timestep);
-            float3 impulseA = solveVelocity * (jacA0 * effectiveMass.x + jacA1 * effectiveMass.y + jacA2 * effectiveMass.z);
-            float3 impulseB = solveVelocity * (jacB0 * effectiveMass.x + jacB1 * effectiveMass.y + jacB2 * effectiveMass.z);
+            float3 impulseA =
+                solveVelocity * (jacA0 * effectiveMass.x + jacA1 * effectiveMass.y + jacA2 * effectiveMass.z);
+            float3 impulseB =
+                solveVelocity * (jacB0 * effectiveMass.x + jacB1 * effectiveMass.y + jacB2 * effectiveMass.z);
             velocityA.ApplyAngularImpulse(impulseA);
             velocityB.ApplyAngularImpulse(impulseB);
 
             if ((jacHeader.Flags & JacobianFlags.EnableImpulseEvents) != 0)
             {
-                HandleImpulseEvent(ref jacHeader, solveVelocity * jointOrientation.value.xyz,
-                    stepInput.ExportEventsInThisIteration, ref impulseEventsWriter);
+                HandleImpulseEvent(
+                    ref jacHeader,
+                    solveVelocity * jointOrientation.value.xyz,
+                    stepInput.ExportEventsInThisIteration,
+                    ref impulseEventsWriter
+                );
             }
         }
 
-        private void HandleImpulseEvent(ref JacobianHeader jacHeader, float3 impulse, bool exportEvent, ref NativeStream.Writer impulseEventsWriter)
+        private void HandleImpulseEvent(
+            ref JacobianHeader jacHeader,
+            float3 impulse,
+            bool exportEvent,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             ref ImpulseEventSolverData impulseEventData = ref jacHeader.AccessImpulseEventSolverData();
             impulseEventData.AccumulatedImpulse += impulse;
             if (exportEvent && math.any(math.abs(impulseEventData.AccumulatedImpulse) > impulseEventData.MaxImpulse))
             {
-                impulseEventsWriter.Write(new ImpulseEventData
-                {
-                    Type = ConstraintType.Angular,
-                    Impulse = impulseEventData.AccumulatedImpulse,
-                    JointEntity = impulseEventData.JointEntity,
-                    BodyIndices = jacHeader.BodyPair
-                });
+                impulseEventsWriter.Write(
+                    new ImpulseEventData
+                    {
+                        Type = ConstraintType.Angular,
+                        Impulse = impulseEventData.AccumulatedImpulse,
+                        JointEntity = impulseEventData.JointEntity,
+                        BodyIndices = jacHeader.BodyPair,
+                    }
+                );
             }
         }
     }

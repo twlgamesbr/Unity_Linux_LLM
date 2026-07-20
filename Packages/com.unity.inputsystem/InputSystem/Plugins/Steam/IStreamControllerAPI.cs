@@ -18,26 +18,39 @@ namespace UnityEngine.InputSystem.Steam
 
         SteamHandle<InputAction> GetAnalogActionHandle(string actionName);
 
-        void ActivateActionSet(SteamHandle<SteamController> controllerHandle, SteamHandle<InputActionMap> actionSetHandle);
+        void ActivateActionSet(
+            SteamHandle<SteamController> controllerHandle,
+            SteamHandle<InputActionMap> actionSetHandle
+        );
 
         SteamHandle<InputActionMap> GetCurrentActionSet(SteamHandle<SteamController> controllerHandle);
 
-        void ActivateActionSetLayer(SteamHandle<SteamController> controllerHandle,
-            SteamHandle<InputActionMap> actionSetLayerHandle);
+        void ActivateActionSetLayer(
+            SteamHandle<SteamController> controllerHandle,
+            SteamHandle<InputActionMap> actionSetLayerHandle
+        );
 
-        void DeactivateActionSetLayer(SteamHandle<SteamController> controllerHandle,
-            SteamHandle<InputActionMap> actionSetLayerHandle);
+        void DeactivateActionSetLayer(
+            SteamHandle<SteamController> controllerHandle,
+            SteamHandle<InputActionMap> actionSetLayerHandle
+        );
 
         void DeactivateAllActionSetLayers(SteamHandle<SteamController> controllerHandle);
 
-        int GetActiveActionSetLayers(SteamHandle<SteamController> controllerHandle,
-            out SteamHandle<InputActionMap> handlesOut);
+        int GetActiveActionSetLayers(
+            SteamHandle<SteamController> controllerHandle,
+            out SteamHandle<InputActionMap> handlesOut
+        );
 
-        SteamAnalogActionData GetAnalogActionData(SteamHandle<SteamController> controllerHandle,
-            SteamHandle<InputAction> analogActionHandle);
+        SteamAnalogActionData GetAnalogActionData(
+            SteamHandle<SteamController> controllerHandle,
+            SteamHandle<InputAction> analogActionHandle
+        );
 
-        SteamDigitalActionData GetDigitalActionData(SteamHandle<SteamController> controllerHandle,
-            SteamHandle<InputAction> digitalActionHandle);
+        SteamDigitalActionData GetDigitalActionData(
+            SteamHandle<SteamController> controllerHandle,
+            SteamHandle<InputAction> digitalActionHandle
+        );
     }
 
     public struct SteamDigitalActionData

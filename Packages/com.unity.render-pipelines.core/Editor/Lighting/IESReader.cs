@@ -13,6 +13,7 @@ namespace UnityEditor.Rendering
     public class IESReader
     {
         string m_FileFormatVersion;
+
         /// <summary>
         /// Version of the IES File
         /// </summary>
@@ -22,6 +23,7 @@ namespace UnityEditor.Rendering
         }
 
         float m_TotalLumens;
+
         /// <summary>
         /// Total light intensity (in Lumens) stored on the file, usage of it is optional (through the prefab subasset inside the IESObject)
         /// </summary>
@@ -31,6 +33,7 @@ namespace UnityEditor.Rendering
         }
 
         float m_MaxCandelas;
+
         /// <summary>
         /// Maximum of Candela in the IES File
         /// </summary>
@@ -106,7 +109,11 @@ namespace UnityEditor.Rendering
 
                 string currentKeyword = string.Empty;
 
-                for (string keywordLine = (m_FileFormatVersion == "LM-63-1986") ? versionLine : iesReader.ReadLine(); true; keywordLine = iesReader.ReadLine())
+                for (
+                    string keywordLine = (m_FileFormatVersion == "LM-63-1986") ? versionLine : iesReader.ReadLine();
+                    true;
+                    keywordLine = iesReader.ReadLine()
+                )
                 {
                     if (keywordLine == null)
                     {
@@ -158,7 +165,6 @@ namespace UnityEditor.Rendering
                 var iesDataTokenEnumerator = iesDataTokens.GetEnumerator();
                 string iesDataToken;
 
-
                 if (iesDataTokens.Length == 1 && string.IsNullOrWhiteSpace(iesDataTokens[0]))
                 {
                     return "Premature end of file (missing IES data).";
@@ -171,7 +177,14 @@ namespace UnityEditor.Rendering
 
                 int lampCount;
                 iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                if (!int.TryParse(iesDataToken, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out lampCount))
+                if (
+                    !int.TryParse(
+                        iesDataToken,
+                        NumberStyles.AllowLeadingSign,
+                        CultureInfo.InvariantCulture,
+                        out lampCount
+                    )
+                )
                 {
                     return $"Invalid lamp count value: {iesDataToken}";
                 }
@@ -185,7 +198,14 @@ namespace UnityEditor.Rendering
 
                 float lumensPerLamp;
                 iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                if (!float.TryParse(iesDataToken, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out lumensPerLamp))
+                if (
+                    !float.TryParse(
+                        iesDataToken,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                        CultureInfo.InvariantCulture,
+                        out lumensPerLamp
+                    )
+                )
                 {
                     return $"Invalid lumens per lamp value: {iesDataToken}";
                 }
@@ -198,7 +218,14 @@ namespace UnityEditor.Rendering
 
                 float candelaMultiplier;
                 iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                if (!float.TryParse(iesDataToken, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out candelaMultiplier))
+                if (
+                    !float.TryParse(
+                        iesDataToken,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                        CultureInfo.InvariantCulture,
+                        out candelaMultiplier
+                    )
+                )
                 {
                     return $"Invalid candela multiplier value: {iesDataToken}";
                 }
@@ -211,7 +238,14 @@ namespace UnityEditor.Rendering
                 }
 
                 iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                if (!int.TryParse(iesDataToken, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out m_VerticalAngleCount))
+                if (
+                    !int.TryParse(
+                        iesDataToken,
+                        NumberStyles.AllowLeadingSign,
+                        CultureInfo.InvariantCulture,
+                        out m_VerticalAngleCount
+                    )
+                )
                 {
                     return $"Invalid vertical angle count value: {iesDataToken}";
                 }
@@ -226,7 +260,14 @@ namespace UnityEditor.Rendering
                 }
 
                 iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                if (!int.TryParse(iesDataToken, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out m_HorizontalAngleCount))
+                if (
+                    !int.TryParse(
+                        iesDataToken,
+                        NumberStyles.AllowLeadingSign,
+                        CultureInfo.InvariantCulture,
+                        out m_HorizontalAngleCount
+                    )
+                )
                 {
                     return $"Invalid horizontal angle count value: {iesDataToken}";
                 }
@@ -241,7 +282,14 @@ namespace UnityEditor.Rendering
                 }
 
                 iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                if (!int.TryParse(iesDataToken, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out m_PhotometricType))
+                if (
+                    !int.TryParse(
+                        iesDataToken,
+                        NumberStyles.AllowLeadingSign,
+                        CultureInfo.InvariantCulture,
+                        out m_PhotometricType
+                    )
+                )
                 {
                     return $"Invalid photometric type value: {iesDataToken}";
                 }
@@ -281,7 +329,14 @@ namespace UnityEditor.Rendering
 
                 float ballastFactor;
                 iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                if (!float.TryParse(iesDataToken, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out ballastFactor))
+                if (
+                    !float.TryParse(
+                        iesDataToken,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                        CultureInfo.InvariantCulture,
+                        out ballastFactor
+                    )
+                )
                 {
                     return $"Invalid ballast factor value: {iesDataToken}";
                 }
@@ -314,7 +369,14 @@ namespace UnityEditor.Rendering
 
                     float angle;
                     iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                    if (!float.TryParse(iesDataToken, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out angle))
+                    if (
+                        !float.TryParse(
+                            iesDataToken,
+                            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                            CultureInfo.InvariantCulture,
+                            out angle
+                        )
+                    )
                     {
                         return $"Invalid vertical angle value: {iesDataToken}";
                     }
@@ -347,7 +409,14 @@ namespace UnityEditor.Rendering
 
                     float angle;
                     iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                    if (!float.TryParse(iesDataToken, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out angle))
+                    if (
+                        !float.TryParse(
+                            iesDataToken,
+                            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                            CultureInfo.InvariantCulture,
+                            out angle
+                        )
+                    )
                     {
                         return $"Invalid horizontal angle value: {iesDataToken}";
                     }
@@ -383,7 +452,14 @@ namespace UnityEditor.Rendering
 
                         float value;
                         iesDataToken = iesDataTokenEnumerator.Current.ToString();
-                        if (!float.TryParse(iesDataToken, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out value))
+                        if (
+                            !float.TryParse(
+                                iesDataToken,
+                                NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                                CultureInfo.InvariantCulture,
+                                out value
+                            )
+                        )
                         {
                             return $"Invalid candela value: {iesDataToken}";
                         }
@@ -442,7 +518,10 @@ namespace UnityEditor.Rendering
 
         internal float ComputeTypeAorBHorizontalAnglePosition(float angle) // angle in range [-180..+180] degrees
         {
-            return ComputeAnglePosition(((m_FirstHorizontalAngle == 0f) ? Mathf.Abs(angle) : angle), m_HorizontalAngles);
+            return ComputeAnglePosition(
+                ((m_FirstHorizontalAngle == 0f) ? Mathf.Abs(angle) : angle),
+                m_HorizontalAngles
+            );
         }
 
         internal float ComputeTypeCHorizontalAnglePosition(float angle) // angle in range [0..360] degrees

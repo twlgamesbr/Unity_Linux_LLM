@@ -2,7 +2,12 @@ namespace Unity.Netcode
 {
     internal class NotAuthorityRpcTarget : NotServerRpcTarget
     {
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             var networkObject = behaviour.NetworkObject;
             if (m_NetworkManager.DistributedAuthorityMode)
@@ -70,8 +75,7 @@ namespace Unity.Netcode
             }
         }
 
-        internal NotAuthorityRpcTarget(NetworkManager manager) : base(manager)
-        {
-        }
+        internal NotAuthorityRpcTarget(NetworkManager manager)
+            : base(manager) { }
     }
 }

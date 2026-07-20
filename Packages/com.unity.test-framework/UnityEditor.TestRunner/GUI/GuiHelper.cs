@@ -18,7 +18,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             AssetsDatabaseHelper = assetsDatabaseHelper;
             GetCSFiles = (dirPath, fileExtension) =>
             {
-                return Directory.GetFiles(dirPath, $"*{fileExtension}", SearchOption.AllDirectories)
+                return Directory
+                    .GetFiles(dirPath, $"*{fileExtension}", SearchOption.AllDirectories)
                     .Select(Paths.UnifyDirectorySeparator);
             };
         }
@@ -35,14 +36,18 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
             if (string.IsNullOrEmpty(fileOpenInfo.FilePath))
             {
-                Debug.LogWarning("Failed to open test method source code in external editor. Inconsistent filename and yield return operator in target method.");
+                Debug.LogWarning(
+                    "Failed to open test method source code in external editor. Inconsistent filename and yield return operator in target method."
+                );
 
                 return;
             }
 
             if (fileOpenInfo.LineNumber == 1)
             {
-                Debug.LogWarning("Failed to get a line number for unity test method. So please find it in opened file in external editor.");
+                Debug.LogWarning(
+                    "Failed to get a line number for unity test method. So please find it in opened file in external editor."
+                );
             }
 
             if (!fileOpenInfo.FilePath.Contains("Assets"))
@@ -51,7 +56,10 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
             else
             {
-                AssetsDatabaseHelper.OpenAssetInItsDefaultExternalEditor(fileOpenInfo.FilePath, fileOpenInfo.LineNumber);
+                AssetsDatabaseHelper.OpenAssetInItsDefaultExternalEditor(
+                    fileOpenInfo.FilePath,
+                    fileOpenInfo.LineNumber
+                );
             }
         }
 
@@ -64,7 +72,10 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                 var allCsFiles = GetCSFiles(dirPath, FileExtension);
 
                 var fileName = allCsFiles.FirstOrDefault(x =>
-                    x.Split(Path.DirectorySeparatorChar).Last().Equals(string.Concat(GetTestFileName(type), FileExtension)));
+                    x.Split(Path.DirectorySeparatorChar)
+                        .Last()
+                        .Equals(string.Concat(GetTestFileName(type), FileExtension))
+                );
 
                 fileOpenInfo.FilePath = fileName ?? string.Empty;
             }
@@ -111,21 +122,25 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
             var regex = new Regex("in (?<path>.*):{1}(?<line>[0-9]+)");
 
-            var matchingLines = stacktrace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Where(x => regex.IsMatch(x)).ToList();
+            var matchingLines = stacktrace
+                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => regex.IsMatch(x))
+                .ToList();
             if (!matchingLines.Any())
                 return false;
 
             var fileOpenInfos = matchingLines
                 .Select(x => regex.Match(x))
-                .Select(x =>
-                    new FileOpenInfo
-                    {
-                        FilePath = x.Groups["path"].Value,
-                        LineNumber = int.Parse(x.Groups["line"].Value)
-                    }).ToList();
+                .Select(x => new FileOpenInfo
+                {
+                    FilePath = x.Groups["path"].Value,
+                    LineNumber = int.Parse(x.Groups["line"].Value),
+                })
+                .ToList();
 
-            var fileOpenInfo = fileOpenInfos
-                .FirstOrDefault(openInfo => !string.IsNullOrEmpty(openInfo.FilePath) && File.Exists(openInfo.FilePath));
+            var fileOpenInfo = fileOpenInfos.FirstOrDefault(openInfo =>
+                !string.IsNullOrEmpty(openInfo.FilePath) && File.Exists(openInfo.FilePath)
+            );
 
             if (fileOpenInfo == null)
             {

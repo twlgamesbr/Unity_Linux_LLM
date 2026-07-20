@@ -11,21 +11,15 @@ namespace UnityEditor.TestTools.TestRunner.Api.Analytics
             _runFinishedCallback = runFinishedCallback;
         }
 
-        public void RunStarted(ITestAdaptor testsToRun)
-        {
-        }
+        public void RunStarted(ITestAdaptor testsToRun) { }
 
         public void RunFinished(ITestResultAdaptor result)
         {
             _runFinishedCallback(result);
         }
 
-        public void TestStarted(ITestAdaptor test)
-        {
-        }
+        public void TestStarted(ITestAdaptor test) { }
 
-        public void TestFinished(ITestResultAdaptor result)
-        {
-        }
+        public void TestFinished(ITestResultAdaptor result) { }
     }
 }

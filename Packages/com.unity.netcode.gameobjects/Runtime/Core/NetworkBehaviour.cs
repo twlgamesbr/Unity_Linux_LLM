@@ -17,10 +17,8 @@ namespace Unity.Netcode
         /// Initializes a new instance of the RpcException class with a specified error message
         /// </summary>
         /// <param name="message">The message that describes the error</param>
-        public RpcException(string message) : base(message)
-        {
-
-        }
+        public RpcException(string message)
+            : base(message) { }
     }
 
     /// <summary>
@@ -37,15 +35,22 @@ namespace Unity.Netcode
 #pragma warning disable IDE1006 // disable naming rule violation check
 
         // RuntimeAccessModifiersILPP will make this `public`
-        internal delegate void RpcReceiveHandler(NetworkBehaviour behaviour, FastBufferReader reader, __RpcParams parameters);
+        internal delegate void RpcReceiveHandler(
+            NetworkBehaviour behaviour,
+            FastBufferReader reader,
+            __RpcParams parameters
+        );
 
         // RuntimeAccessModifiersILPP will make this `public`
-        internal static readonly Dictionary<Type, Dictionary<uint, RpcReceiveHandler>> __rpc_func_table = new Dictionary<Type, Dictionary<uint, RpcReceiveHandler>>();
-        internal static readonly Dictionary<Type, Dictionary<uint, RpcInvokePermission>> __rpc_permission_table = new Dictionary<Type, Dictionary<uint, RpcInvokePermission>>();
+        internal static readonly Dictionary<Type, Dictionary<uint, RpcReceiveHandler>> __rpc_func_table =
+            new Dictionary<Type, Dictionary<uint, RpcReceiveHandler>>();
+        internal static readonly Dictionary<Type, Dictionary<uint, RpcInvokePermission>> __rpc_permission_table =
+            new Dictionary<Type, Dictionary<uint, RpcInvokePermission>>();
 
 #if MULTIPLAYER_TOOLS && (DEBUG || UNITY_MP_TOOLS_NET_STATS_MONITOR_ENABLED_IN_RELEASE)
         // RuntimeAccessModifiersILPP will make this `public`
-        internal static readonly Dictionary<Type, Dictionary<uint, string>> __rpc_name_table = new Dictionary<Type, Dictionary<uint, string>>();
+        internal static readonly Dictionary<Type, Dictionary<uint, string>> __rpc_name_table =
+            new Dictionary<Type, Dictionary<uint, string>>();
 #endif
 
         // RuntimeAccessModifiersILPP will make this `protected`
@@ -61,6 +66,7 @@ namespace Unity.Netcode
             Server = 1,
             Client = 2,
         }
+
         // NetworkBehaviourILPP will override this in derived classes to return the name of the concrete type
         internal virtual string __getTypeName() => nameof(NetworkBehaviour);
 
@@ -71,10 +77,13 @@ namespace Unity.Netcode
 
         private const int k_RpcMessageDefaultSize = 1024; // 1k
         private const int k_RpcMessageMaximumSize = 1024 * 64; // 64k
-
 #pragma warning disable IDE1006 // disable naming rule violation check
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal FastBufferWriter __beginSendServerRpc(uint rpcMethodId, ServerRpcParams serverRpcParams, RpcDelivery rpcDelivery)
+        internal FastBufferWriter __beginSendServerRpc(
+            uint rpcMethodId,
+            ServerRpcParams serverRpcParams,
+            RpcDelivery rpcDelivery
+        )
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             if (m_NetworkObject == null && !IsSpawned)
@@ -87,7 +96,12 @@ namespace Unity.Netcode
 
 #pragma warning disable IDE1006 // disable naming rule violation check
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal void __endSendServerRpc(ref FastBufferWriter bufferWriter, uint rpcMethodId, ServerRpcParams serverRpcParams, RpcDelivery rpcDelivery)
+        internal void __endSendServerRpc(
+            ref FastBufferWriter bufferWriter,
+            uint rpcMethodId,
+            ServerRpcParams serverRpcParams,
+            RpcDelivery rpcDelivery
+        )
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             var serverRpcMessage = new ServerRpcMessage
@@ -98,7 +112,7 @@ namespace Unity.Netcode
                     NetworkBehaviourId = NetworkBehaviourId,
                     NetworkRpcMethodId = rpcMethodId,
                 },
-                WriteBuffer = bufferWriter
+                WriteBuffer = bufferWriter,
             };
 
             NetworkDelivery networkDelivery;
@@ -132,7 +146,7 @@ namespace Unity.Netcode
                     // RpcMessage doesn't access this stuff so it's just left empty.
                     Header = new NetworkMessageHeader(),
                     SerializedHeaderSize = 0,
-                    MessageSize = 0
+                    MessageSize = 0,
                 };
                 serverRpcMessage.ReadBuffer = tempBuffer;
                 serverRpcMessage.Handle(ref context);
@@ -140,7 +154,11 @@ namespace Unity.Netcode
             }
             else
             {
-                rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(ref serverRpcMessage, networkDelivery, NetworkManager.ServerClientId);
+                rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(
+                    ref serverRpcMessage,
+                    networkDelivery,
+                    NetworkManager.ServerClientId
+                );
             }
 
             bufferWriter.Dispose();
@@ -152,7 +170,11 @@ namespace Unity.Netcode
 
 #pragma warning disable IDE1006 // disable naming rule violation check
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal FastBufferWriter __beginSendClientRpc(uint rpcMethodId, ClientRpcParams clientRpcParams, RpcDelivery rpcDelivery)
+        internal FastBufferWriter __beginSendClientRpc(
+            uint rpcMethodId,
+            ClientRpcParams clientRpcParams,
+            RpcDelivery rpcDelivery
+        )
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             if (m_NetworkObject == null && !IsSpawned)
@@ -165,7 +187,12 @@ namespace Unity.Netcode
 
 #pragma warning disable IDE1006 // disable naming rule violation check
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal void __endSendClientRpc(ref FastBufferWriter bufferWriter, uint rpcMethodId, ClientRpcParams clientRpcParams, RpcDelivery rpcDelivery)
+        internal void __endSendClientRpc(
+            ref FastBufferWriter bufferWriter,
+            uint rpcMethodId,
+            ClientRpcParams clientRpcParams,
+            RpcDelivery rpcDelivery
+        )
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             var clientRpcMessage = new ClientRpcMessage
@@ -176,7 +203,7 @@ namespace Unity.Netcode
                     NetworkBehaviourId = NetworkBehaviourId,
                     NetworkRpcMethodId = rpcMethodId,
                 },
-                WriteBuffer = bufferWriter
+                WriteBuffer = bufferWriter,
             };
 
             NetworkDelivery networkDelivery;
@@ -210,12 +237,19 @@ namespace Unity.Netcode
                         continue;
                     }
                     // Check to make sure we are sending to only observers, if not log an error.
-                    if (m_NetworkManager.LogLevel >= LogLevel.Error && !m_NetworkObject.Observers.Contains(targetClientId))
+                    if (
+                        m_NetworkManager.LogLevel >= LogLevel.Error
+                        && !m_NetworkObject.Observers.Contains(targetClientId)
+                    )
                     {
                         NetworkLog.LogError(GenerateObserverErrorMessage(clientRpcParams, targetClientId));
                     }
                 }
-                rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(ref clientRpcMessage, networkDelivery, in clientRpcParams.Send.TargetClientIds);
+                rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(
+                    ref clientRpcMessage,
+                    networkDelivery,
+                    in clientRpcParams.Send.TargetClientIds
+                );
             }
             else if (clientRpcParams.Send.TargetClientIdsNativeArray != null)
             {
@@ -227,12 +261,19 @@ namespace Unity.Netcode
                         continue;
                     }
                     // Check to make sure we are sending to only observers, if not log an error.
-                    if (m_NetworkManager.LogLevel >= LogLevel.Error && !m_NetworkObject.Observers.Contains(targetClientId))
+                    if (
+                        m_NetworkManager.LogLevel >= LogLevel.Error
+                        && !m_NetworkObject.Observers.Contains(targetClientId)
+                    )
                     {
                         NetworkLog.LogError(GenerateObserverErrorMessage(clientRpcParams, targetClientId));
                     }
                 }
-                rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(ref clientRpcMessage, networkDelivery, clientRpcParams.Send.TargetClientIdsNativeArray.Value);
+                rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(
+                    ref clientRpcMessage,
+                    networkDelivery,
+                    clientRpcParams.Send.TargetClientIdsNativeArray.Value
+                );
             }
             else
             {
@@ -245,7 +286,11 @@ namespace Unity.Netcode
                         shouldInvokeLocally = true;
                         continue;
                     }
-                    rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(ref clientRpcMessage, networkDelivery, observerEnumerator.Current);
+                    rpcWriteSize = m_NetworkManager.ConnectionManager.SendMessage(
+                        ref clientRpcMessage,
+                        networkDelivery,
+                        observerEnumerator.Current
+                    );
                 }
             }
 
@@ -262,7 +307,7 @@ namespace Unity.Netcode
                     // RpcMessage doesn't access this stuff so it's just left empty.
                     Header = new NetworkMessageHeader(),
                     SerializedHeaderSize = 0,
-                    MessageSize = 0
+                    MessageSize = 0,
                 };
                 clientRpcMessage.ReadBuffer = tempBuffer;
                 clientRpcMessage.Handle(ref context);
@@ -285,7 +330,8 @@ namespace Unity.Netcode
                             m_NetworkObject,
                             rpcMethodName,
                             __getTypeName(),
-                            rpcWriteSize);
+                            rpcWriteSize
+                        );
                     }
                 }
                 else if (clientRpcParams.Send.TargetClientIdsNativeArray != null)
@@ -297,7 +343,8 @@ namespace Unity.Netcode
                             m_NetworkObject,
                             rpcMethodName,
                             __getTypeName(),
-                            rpcWriteSize);
+                            rpcWriteSize
+                        );
                     }
                 }
                 else
@@ -310,17 +357,23 @@ namespace Unity.Netcode
                             m_NetworkObject,
                             rpcMethodName,
                             __getTypeName(),
-                            rpcWriteSize);
+                            rpcWriteSize
+                        );
                     }
                 }
             }
 #endif
         }
 
-
 #pragma warning disable IDE1006 // disable naming rule violation check
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal FastBufferWriter __beginSendRpc(uint rpcMethodId, RpcParams rpcParams, RpcAttribute.RpcAttributeParams attributeParams, SendTo defaultTarget, RpcDelivery rpcDelivery)
+        internal FastBufferWriter __beginSendRpc(
+            uint rpcMethodId,
+            RpcParams rpcParams,
+            RpcAttribute.RpcAttributeParams attributeParams,
+            SendTo defaultTarget,
+            RpcDelivery rpcDelivery
+        )
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             if (!IsSpawned)
@@ -346,7 +399,14 @@ namespace Unity.Netcode
 
 #pragma warning disable IDE1006 // disable naming rule violation check
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal void __endSendRpc(ref FastBufferWriter bufferWriter, uint rpcMethodId, RpcParams rpcParams, RpcAttribute.RpcAttributeParams attributeParams, SendTo defaultTarget, RpcDelivery rpcDelivery)
+        internal void __endSendRpc(
+            ref FastBufferWriter bufferWriter,
+            uint rpcMethodId,
+            RpcParams rpcParams,
+            RpcAttribute.RpcAttributeParams attributeParams,
+            SendTo defaultTarget,
+            RpcDelivery rpcDelivery
+        )
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             var rpcMessage = new RpcMessage
@@ -358,7 +418,7 @@ namespace Unity.Netcode
                     NetworkRpcMethodId = rpcMethodId,
                 },
                 SenderClientId = m_NetworkManager.LocalClientId,
-                WriteBuffer = bufferWriter
+                WriteBuffer = bufferWriter,
             };
 
             NetworkDelivery networkDelivery;
@@ -391,7 +451,9 @@ namespace Unity.Netcode
                     SendTo.ClientsAndHost => RpcTarget.ClientsAndHost,
                     SendTo.Authority => RpcTarget.Authority,
                     SendTo.NotAuthority => RpcTarget.NotAuthority,
-                    SendTo.SpecifiedInParams => throw new RpcException("This method requires a runtime-specified send target."),
+                    SendTo.SpecifiedInParams => throw new RpcException(
+                        "This method requires a runtime-specified send target."
+                    ),
                     _ => throw new RpcException("This method requires a runtime-specified send target."),
                 };
             }
@@ -402,7 +464,9 @@ namespace Unity.Netcode
 
             if (rpcParams.Send.LocalDeferMode == LocalDeferMode.Default)
             {
-                rpcParams.Send.LocalDeferMode = attributeParams.DeferLocal ? LocalDeferMode.Defer : LocalDeferMode.SendImmediate;
+                rpcParams.Send.LocalDeferMode = attributeParams.DeferLocal
+                    ? LocalDeferMode.Defer
+                    : LocalDeferMode.SendImmediate;
             }
 
             rpcParams.Send.Target.Send(this, ref rpcMessage, networkDelivery, rpcParams);
@@ -412,7 +476,8 @@ namespace Unity.Netcode
 
 #pragma warning disable IDE1006 // disable naming rule violation check
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal static NativeList<T> __createNativeList<T>() where T : unmanaged
+        internal static NativeList<T> __createNativeList<T>()
+            where T : unmanaged
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             return new NativeList<T>(Allocator.Temp);
@@ -420,7 +485,10 @@ namespace Unity.Netcode
 
         internal string GenerateObserverErrorMessage(ClientRpcParams clientRpcParams, ulong targetClientId)
         {
-            var containerNameHoldingId = clientRpcParams.Send.TargetClientIds != null ? nameof(ClientRpcParams.Send.TargetClientIds) : nameof(ClientRpcParams.Send.TargetClientIdsNativeArray);
+            var containerNameHoldingId =
+                clientRpcParams.Send.TargetClientIds != null
+                    ? nameof(ClientRpcParams.Send.TargetClientIds)
+                    : nameof(ClientRpcParams.Send.TargetClientIdsNativeArray);
             return $"Sending ClientRpc to non-observer! {containerNameHoldingId} contains clientId {targetClientId} that is not an observer!";
         }
 
@@ -484,7 +552,6 @@ namespace Unity.Netcode
         /// </summary>
         public bool HasAuthority { get; internal set; }
 
-
         /// <summary>
         /// Gets whether the client is the distributed authority mode session owner.
         /// </summary>
@@ -499,7 +566,6 @@ namespace Unity.Netcode
         /// Gets whether executing as a client.
         /// </summary>
         public bool IsClient { get; private set; }
-
 
         /// <summary>
         /// Gets whether executing as a host (both server and client).
@@ -567,11 +633,17 @@ namespace Unity.Netcode
                 // or NetworkBehaviour.IsSpawned (i.e. to early exit if not spawned) which, in turn, could generate several Warning messages
                 // per spawned NetworkObject.  Checking for ShutdownInProgress prevents these unnecessary LogWarning messages.
                 // We must check IsSpawned, otherwise a warning will be logged under certain valid conditions (see OnDestroy)
-                if (IsSpawned && m_NetworkObject == null && (m_NetworkManager == null || !m_NetworkManager.ShutdownInProgress))
+                if (
+                    IsSpawned
+                    && m_NetworkObject == null
+                    && (m_NetworkManager == null || !m_NetworkManager.ShutdownInProgress)
+                )
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"Could not get {nameof(NetworkObject)} for the {nameof(NetworkBehaviour)}. Are you missing a {nameof(NetworkObject)} component?");
+                        NetworkLog.LogWarning(
+                            $"Could not get {nameof(NetworkObject)} for the {nameof(NetworkBehaviour)}. Are you missing a {nameof(NetworkObject)} component?"
+                        );
                     }
                 }
 
@@ -623,9 +695,7 @@ namespace Unity.Netcode
         /// This provides us with a way to track when something is in the middle
         /// of being destroyed or will be destroyed by something like SceneManager.
         /// </summary>
-        protected internal virtual void OnIsDestroying()
-        {
-        }
+        protected internal virtual void OnIsDestroying() { }
 
         /// <summary>
         /// Invoked by <see cref="NetworkObject.SetIsDestroying"/>.
@@ -943,10 +1013,7 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="previous">the previous owner</param>
         /// <param name="current">the current owner</param>
-        protected virtual void OnOwnershipChanged(ulong previous, ulong current)
-        {
-
-        }
+        protected virtual void OnOwnershipChanged(ulong previous, ulong current) { }
 
         internal void InternalOnOwnershipChanged(ulong previous, ulong current)
         {
@@ -994,9 +1061,16 @@ namespace Unity.Netcode
 
 #pragma warning disable IDE1006 // disable naming rule violation check
         // This is needed to add the RpcInvokePermission as even with an optional parameter, the change counts as a breaking change.
-        internal void __registerRpc(uint hash, RpcReceiveHandler handler, string rpcMethodName) => __registerRpc(hash, handler, rpcMethodName, RpcInvokePermission.Everyone);
+        internal void __registerRpc(uint hash, RpcReceiveHandler handler, string rpcMethodName) =>
+            __registerRpc(hash, handler, rpcMethodName, RpcInvokePermission.Everyone);
+
         // RuntimeAccessModifiersILPP will make this `protected`
-        internal void __registerRpc(uint hash, RpcReceiveHandler handler, string rpcMethodName, RpcInvokePermission permission)
+        internal void __registerRpc(
+            uint hash,
+            RpcReceiveHandler handler,
+            string rpcMethodName,
+            RpcInvokePermission permission
+        )
 #pragma warning restore IDE1006 // restore naming rule violation check
         {
             var rpcType = GetType();
@@ -1013,13 +1087,17 @@ namespace Unity.Netcode
         {
             if (m_NetworkManager == null)
             {
-                Debug.LogError($"[{nameof(ValidateRpcMessageMetrics)}][{type.Name}] {nameof(NetworkBehaviour)} is attempting to invoking an RPC before {nameof(NetworkManager)} has been initialized!");
+                Debug.LogError(
+                    $"[{nameof(ValidateRpcMessageMetrics)}][{type.Name}] {nameof(NetworkBehaviour)} is attempting to invoking an RPC before {nameof(NetworkManager)} has been initialized!"
+                );
                 return false;
             }
 
             if (!__rpc_name_table.ContainsKey(type))
             {
-                Debug.LogError($"[{nameof(ValidateRpcMessageMetrics)}][{type.Name}][{nameof(__rpc_name_table)}] RPC table initialization failure: Table does not contain an entry for {type.Name}!");
+                Debug.LogError(
+                    $"[{nameof(ValidateRpcMessageMetrics)}][{type.Name}][{nameof(__rpc_name_table)}] RPC table initialization failure: Table does not contain an entry for {type.Name}!"
+                );
                 return false;
             }
             return true;
@@ -1040,7 +1118,8 @@ namespace Unity.Netcode
                     m_NetworkObject,
                     rpcMethodName,
                     __getTypeName(),
-                    rpcWriteSize);
+                    rpcWriteSize
+                );
             }
         }
 
@@ -1059,7 +1138,8 @@ namespace Unity.Netcode
                     NetworkObject,
                     rpcMethodName,
                     __getTypeName(),
-                    length);
+                    length
+                );
             }
         }
 
@@ -1078,7 +1158,8 @@ namespace Unity.Netcode
                     NetworkObject,
                     rpcMethodName,
                     __getTypeName(),
-                    length);
+                    length
+                );
             }
         }
 #endif
@@ -1256,9 +1337,14 @@ namespace Unity.Netcode
                 // - If the target client ID is the owner and the owner is not the local NetworkManager instance
                 // - **Special** As long as ownership did not just change and we are sending the new owner any dirty/updated NetworkVariables
                 // Under these conditions we should not send to the client
-                if (shouldSend && networkManager.DAHost && networkVariable.WritePerm == NetworkVariableWritePermission.Owner &&
-                    networkObject.OwnerClientId == targetClientId && networkObject.OwnerClientId != networkManager.LocalClientId &&
-                    networkObject.PreviousOwnerId == networkObject.OwnerClientId)
+                if (
+                    shouldSend
+                    && networkManager.DAHost
+                    && networkVariable.WritePerm == NetworkVariableWritePermission.Owner
+                    && networkObject.OwnerClientId == targetClientId
+                    && networkObject.OwnerClientId != networkManager.LocalClientId
+                    && networkObject.PreviousOwnerId == networkObject.OwnerClientId
+                )
                 {
                     shouldSend = false;
                 }
@@ -1277,7 +1363,7 @@ namespace Unity.Netcode
                     // By sending the network delivery we can forward messages immediately as opposed to processing them
                     // at the end. While this will send updates to clients that cannot read, the handler will ignore anything
                     // sent to a client that does not have read permissions.
-                    NetworkDelivery = m_DeliveryTypesForNetworkVariableGroups[j]
+                    NetworkDelivery = m_DeliveryTypesForNetworkVariableGroups[j],
                 };
                 // TODO: Serialization is where the IsDirty flag gets changed.
                 // Messages don't get sent from the server to itself, so if we're host and sending to ourselves,
@@ -1286,7 +1372,11 @@ namespace Unity.Netcode
                 // so we don't have to do this serialization work if we're not going to use the result.
                 if (IsServer && targetClientId == NetworkManager.ServerClientId)
                 {
-                    var tmpWriter = new FastBufferWriter(messageManager.NonFragmentedMessageMaxSize, Allocator.Temp, messageManager.FragmentedMessageMaxSize);
+                    var tmpWriter = new FastBufferWriter(
+                        messageManager.NonFragmentedMessageMaxSize,
+                        Allocator.Temp,
+                        messageManager.FragmentedMessageMaxSize
+                    );
                     using (tmpWriter)
                     {
                         message.Serialize(tmpWriter, message.Version);
@@ -1294,7 +1384,11 @@ namespace Unity.Netcode
                 }
                 else
                 {
-                    connectionManager.SendMessage(ref message, m_DeliveryTypesForNetworkVariableGroups[j], targetClientId);
+                    connectionManager.SendMessage(
+                        ref message,
+                        m_DeliveryTypesForNetworkVariableGroups[j],
+                        targetClientId
+                    );
                 }
             }
         }
@@ -1448,7 +1542,9 @@ namespace Unity.Netcode
                         reader.ReadValueSafe(out expectedBytesToRead);
                         if (expectedBytesToRead == 0)
                         {
-                            Debug.LogError($"[{name}][NetworkObjectId: {NetworkObjectId}][NetworkBehaviourId: {NetworkBehaviourId}][{field.Name}] Expected non-zero size readable NetworkVariable! (Skipping)");
+                            Debug.LogError(
+                                $"[{name}][NetworkObjectId: {NetworkObjectId}][NetworkBehaviourId: {NetworkBehaviourId}][{field.Name}] Expected non-zero size readable NetworkVariable! (Skipping)"
+                            );
                             continue;
                         }
                         readStartPos = reader.Position;
@@ -1462,7 +1558,9 @@ namespace Unity.Netcode
                         reader.ReadValueSafe(out expectedBytesToRead);
                         if (expectedBytesToRead != 0)
                         {
-                            Debug.LogError($"[{name}][NetworkObjectId: {NetworkObjectId}][NetworkBehaviourId: {NetworkBehaviourId}][{field.Name}] Expected zero size for non-readable NetworkVariable when EnsureNetworkVariableLengthSafety is enabled! (Skipping)");
+                            Debug.LogError(
+                                $"[{name}][NetworkObjectId: {NetworkObjectId}][NetworkBehaviourId: {NetworkBehaviourId}][{field.Name}] Expected zero size for non-readable NetworkVariable when EnsureNetworkVariableLengthSafety is enabled! (Skipping)"
+                            );
                         }
                     }
                     continue;
@@ -1479,7 +1577,9 @@ namespace Unity.Netcode
                     {
                         if (networkManager.LogLevel <= LogLevel.Normal)
                         {
-                            NetworkLog.LogWarning($"[{name}][NetworkObjectId: {NetworkObjectId}][NetworkBehaviourId: {NetworkBehaviourId}][{field.Name}] NetworkVariable read {totalBytesRead} bytes but was expected to read {expectedBytesToRead} bytes during synchronization deserialization!");
+                            NetworkLog.LogWarning(
+                                $"[{name}][NetworkObjectId: {NetworkObjectId}][NetworkBehaviourId: {NetworkBehaviourId}][{field.Name}] NetworkVariable read {totalBytesRead} bytes but was expected to read {expectedBytesToRead} bytes during synchronization deserialization!"
+                            );
                         }
                         reader.Seek(readStartPos + expectedBytesToRead);
                     }
@@ -1514,20 +1614,15 @@ namespace Unity.Netcode
         /// Either BufferSerializerReader or BufferSerializerWriter, depending whether the serializer
         /// is in read mode or write mode.
         /// </typeparam>
-        protected virtual void OnSynchronize<T>(ref BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-
-        }
+        protected virtual void OnSynchronize<T>(ref BufferSerializer<T> serializer)
+            where T : IReaderWriter { }
 
         /// <summary>
         /// Called when network conditions require reanticipation of game state.
         /// Override this method to handle adjustments needed when network latency changes.
         /// </summary>
         /// <param name="lastRoundTripTime">The most recent round trip time measurement in seconds</param>
-        public virtual void OnReanticipate(double lastRoundTripTime)
-        {
-
-        }
+        public virtual void OnReanticipate(double lastRoundTripTime) { }
 
         /// <summary>
         /// The relative client identifier targeted for the serialization of this <see cref="NetworkBehaviour"/> instance.
@@ -1549,7 +1644,8 @@ namespace Unity.Netcode
         /// synchronize any remaining NetworkBehaviours.
         /// </remarks>
         /// <returns>true if it wrote synchronization data and false if it did not</returns>
-        internal bool Synchronize<T>(ref BufferSerializer<T> serializer, ulong targetClientId = 0) where T : IReaderWriter
+        internal bool Synchronize<T>(ref BufferSerializer<T> serializer, ulong targetClientId = 0)
+            where T : IReaderWriter
         {
             m_TargetIdBeingSynchronized = targetClientId;
             if (serializer.IsWriter)
@@ -1577,7 +1673,9 @@ namespace Unity.Netcode
                     threwException = true;
                     if (m_NetworkManager.LogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"{name} threw an exception during synchronization serialization, this {nameof(NetworkBehaviour)} is being skipped and will not be synchronized!");
+                        NetworkLog.LogWarning(
+                            $"{name} threw an exception during synchronization serialization, this {nameof(NetworkBehaviour)} is being skipped and will not be synchronized!"
+                        );
                         if (m_NetworkManager.LogLevel == LogLevel.Developer)
                         {
                             NetworkLog.LogError($"{ex.Message}\n {ex.StackTrace}");
@@ -1624,7 +1722,9 @@ namespace Unity.Netcode
                 {
                     if (m_NetworkManager.LogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"{name} threw an exception during synchronization deserialization, this {nameof(NetworkBehaviour)} is being skipped and will not be synchronized!");
+                        NetworkLog.LogWarning(
+                            $"{name} threw an exception during synchronization deserialization, this {nameof(NetworkBehaviour)} is being skipped and will not be synchronized!"
+                        );
                         if (m_NetworkManager.LogLevel == LogLevel.Developer)
                         {
                             NetworkLog.LogError($"{ex.Message}\n {ex.StackTrace}");
@@ -1638,7 +1738,9 @@ namespace Unity.Netcode
                 {
                     if (m_NetworkManager.LogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"{name} read {totalBytesRead} bytes but was expected to read {expectedBytesToRead} bytes during synchronization deserialization! This {nameof(NetworkBehaviour)}({GetType().Name})is being skipped and will not be synchronized!");
+                        NetworkLog.LogWarning(
+                            $"{name} read {totalBytesRead} bytes but was expected to read {expectedBytesToRead} bytes during synchronization deserialization! This {nameof(NetworkBehaviour)}({GetType().Name})is being skipped and will not be synchronized!"
+                        );
                     }
                     synchronizationError = true;
                 }
@@ -1661,10 +1763,7 @@ namespace Unity.Netcode
         /// Use to assure a helper component invokes script during destroy in the
         /// event that a derived class does not invoke base.OnDestroy.
         /// </summary>
-        internal virtual void InternalOnDestroy()
-        {
-
-        }
+        internal virtual void InternalOnDestroy() { }
 
         /// <summary>
         /// Invoked when the <see cref="GameObject"/> the <see cref="NetworkBehaviour"/> is attached to is destroyed.
@@ -1699,7 +1798,6 @@ namespace Unity.Netcode
             {
                 InitializeVariables();
             }
-
 
             foreach (var networkVar in NetworkVariableFields)
             {

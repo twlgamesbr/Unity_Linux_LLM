@@ -48,14 +48,12 @@ namespace Unity.Entities
             public int entries; // number of strings allocated so far
             public FixedString512Bytes kMaxEntriesMsg;
         }
-        internal static readonly SharedStatic<State> s_State = SharedStatic<State>.GetOrCreate<EntityNameStorage>();
 
+        internal static readonly SharedStatic<State> s_State = SharedStatic<State>.GetOrCreate<EntityNameStorage>();
 
         internal const int kMaxEntries = 16 << 10;
         internal const int kMaxChars = kMaxEntries * 64;
         internal const int kErrorExceedMaxEntryCapacity = -1;
-
-
 
         public const int kEntityNameMaxLengthBytes = FixedString64Bytes.utf8MaxLengthInBytes;
 
@@ -77,7 +75,8 @@ namespace Unity.Entities
             Clear();
             s_State.Data.initialized = 1;
             s_State.Data.hasLoggedError = 0;
-            s_State.Data.kMaxEntriesMsg = "Max unique Entity Name capacity exceeded. If you require more storage, edit EntityNameStorage.cs and change the value of kMaxEntries to pre-allocate more space.";
+            s_State.Data.kMaxEntriesMsg =
+                "Max unique Entity Name capacity exceeded. If you require more storage, edit EntityNameStorage.cs and change the value of kMaxEntries to pre-allocate more space.";
         }
 
         public static void Shutdown()
@@ -233,9 +232,9 @@ namespace Unity.Entities
         {
             int tryIndex = EntityNameStorage.GetOrCreateIndex(in value);
 
-            if(tryIndex >= 0)
+            if (tryIndex >= 0)
                 Index = tryIndex;
-            else if(EntityNameStorage.s_State.Data.hasLoggedError == 0)
+            else if (EntityNameStorage.s_State.Data.hasLoggedError == 0)
             {
                 UnityEngine.Debug.LogError(EntityNameStorage.s_State.Data.kMaxEntriesMsg);
                 EntityNameStorage.s_State.Data.hasLoggedError++;

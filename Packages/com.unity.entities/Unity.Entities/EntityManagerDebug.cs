@@ -77,10 +77,12 @@ namespace Unity.Entities
             /// Returns the same entities as <see cref="UniversalQuery"/>
             /// </summary>
             Default = 0,
+
             /// <summary>
             /// Includes any <see cref="Chunk.metaChunkEntity"/> in the query
             /// </summary>
             IncludeMeta = 1 << 0,
+
             /// <summary>
             /// Includes any System associated Entities in the query
             /// </summary>
@@ -98,8 +100,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <param name="allocator">The type of allocation for creating the NativeArray to hold the Entity objects.</param>
         /// <returns>An array of Entity objects referring to all the entities in the World.</returns>
-        public NativeArray<Entity> GetAllEntities(Allocator allocator = Allocator.Temp)
-            => GetAllEntities((AllocatorManager.AllocatorHandle) allocator, GetAllEntitiesOptions.Default);
+        public NativeArray<Entity> GetAllEntities(Allocator allocator = Allocator.Temp) =>
+            GetAllEntities((AllocatorManager.AllocatorHandle)allocator, GetAllEntitiesOptions.Default);
 
         /// <summary>
         /// Gets all the entities managed by this EntityManager.
@@ -112,8 +114,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <param name="allocator">The type of allocation for creating the NativeArray to hold the Entity objects.</param>
         /// <returns>An array of Entity objects referring to all the entities in the World.</returns>
-        public NativeArray<Entity> GetAllEntities(AllocatorManager.AllocatorHandle allocator)
-            => GetAllEntities(allocator, GetAllEntitiesOptions.Default);
+        public NativeArray<Entity> GetAllEntities(AllocatorManager.AllocatorHandle allocator) =>
+            GetAllEntities(allocator, GetAllEntitiesOptions.Default);
 
         /// <summary>
         /// Gets all the entities managed by this EntityManager.
@@ -127,7 +129,10 @@ namespace Unity.Entities
         /// <param name="allocator">The type of allocation for creating the NativeArray to hold the Entity objects.</param>
         /// <param name="options">Specifies whether entities from chunk components should be included.</param>
         /// <returns>An array of Entity objects referring to all the entities in the World.</returns>
-        public NativeArray<Entity> GetAllEntities(AllocatorManager.AllocatorHandle allocator, GetAllEntitiesOptions options)
+        public NativeArray<Entity> GetAllEntities(
+            AllocatorManager.AllocatorHandle allocator,
+            GetAllEntitiesOptions options
+        )
         {
             NativeArray<ArchetypeChunk> chunks = default;
             if ((options & GetAllEntitiesOptions.IncludeMeta) != 0)
@@ -184,7 +189,10 @@ namespace Unity.Entities
             /// <param name="value">The value to set for any unused chunk data</param>
             public void PoisonUnusedDataInAllChunks(EntityArchetype archetype, byte value)
             {
-                EntityComponentStore.AssertValidArchetype(m_Manager.GetCheckedEntityDataAccess()->EntityComponentStore, archetype);
+                EntityComponentStore.AssertValidArchetype(
+                    m_Manager.GetCheckedEntityDataAccess()->EntityComponentStore,
+                    archetype
+                );
 
                 for (var i = 0; i < archetype.Archetype->Chunks.Count; ++i)
                 {
@@ -200,7 +208,9 @@ namespace Unity.Entities
 
             internal void SetGlobalSystemVersion(uint version, in SystemHandle handle = default)
             {
-                m_Manager.GetCheckedEntityDataAccess()->EntityComponentStore->SetGlobalSystemVersion(version, in handle);
+                m_Manager
+                    .GetCheckedEntityDataAccess()
+                    ->EntityComponentStore->SetGlobalSystemVersion(version, in handle);
             }
 
             /// <summary>
@@ -279,7 +289,10 @@ namespace Unity.Entities
             public bool UseMemoryInitPattern
             {
                 get => m_Manager.GetCheckedEntityDataAccess()->EntityComponentStore->useMemoryInitPattern != 0;
-                set => m_Manager.GetCheckedEntityDataAccess()->EntityComponentStore->useMemoryInitPattern = value ? (byte)1 : (byte)0;
+                set =>
+                    m_Manager.GetCheckedEntityDataAccess()->EntityComponentStore->useMemoryInitPattern = value
+                        ? (byte)1
+                        : (byte)0;
             }
 
             /// <summary>
@@ -314,9 +327,12 @@ namespace Unity.Entities
             internal void SetIsInForEachDisallowStructuralChangeCounter(int counter)
             {
                 var access = m_Manager.GetCheckedEntityDataAccess();
-                access->DependencyManager->ForEachStructuralChange.SetIsInForEachDisallowStructuralChangeCounter(counter);
+                access->DependencyManager->ForEachStructuralChange.SetIsInForEachDisallowStructuralChangeCounter(
+                    counter
+                );
             }
 #endif
+
             /// <summary>
             /// Returns the name used for the profiler marker of the passed system. This is useful for inspecting profiling data using the ProfilerRecorder API.
             /// </summary>
@@ -338,7 +354,7 @@ namespace Unity.Entities
             public void LogEntityInfo(Entity entity) => Unity.Debug.Log(GetEntityInfo(entity));
 
 #if UNITY_EDITOR
-            internal string GetAllEntityInfo(bool includeComponentValues=false)
+            internal string GetAllEntityInfo(bool includeComponentValues = false)
             {
                 var str = new System.Text.StringBuilder();
                 using (var arr = m_Manager.UniversalQueryWithSystems.ToEntityArray(Allocator.Persistent))
@@ -367,7 +383,7 @@ namespace Unity.Entities
 #if ENTITY_STORE_V1
                     || entity.Index > entityComponentStore->EntitiesCapacity
 #endif
-                    )
+                )
                 {
                     return "Entity.Invalid";
                 }
@@ -422,7 +438,12 @@ namespace Unity.Entities
                     for (var i = 0; i < archetype->TypesCount; i++)
                     {
                         var componentType = archetype->Types[i].ToComponentType();
-                        if (componentType.IsBuffer || componentType.IsZeroSized || TypeManager.GetTypeInfo(componentType.TypeIndex).Category == TypeManager.TypeCategory.EntityData)
+                        if (
+                            componentType.IsBuffer
+                            || componentType.IsZeroSized
+                            || TypeManager.GetTypeInfo(componentType.TypeIndex).Category
+                                == TypeManager.TypeCategory.EntityData
+                        )
                             continue;
                         var comp = GetComponentBoxed(entity, componentType);
                         if (comp is UnityEngine.Object)
@@ -475,7 +496,10 @@ namespace Unity.Entities
                     throw new ArgumentException($"A component with type:{type} has not been added to the entity.");
 #endif
 
-                return new DebuggerDataAccess(access->EntityComponentStore).GetComponentBoxedUnchecked(entity, ComponentType.FromTypeIndex(typeIndex));
+                return new DebuggerDataAccess(access->EntityComponentStore).GetComponentBoxedUnchecked(
+                    entity,
+                    ComponentType.FromTypeIndex(typeIndex)
+                );
             }
 
 #if UNITY_EDITOR
@@ -486,7 +510,9 @@ namespace Unity.Entities
             public UnityEngine.Object GetAuthoringObjectForEntity(Entity entity)
             {
                 if (m_Manager.HasComponent<EntityGuid>(entity))
-                    return UnityEditor.EditorUtility.EntityIdToObject(m_Manager.GetComponentData<EntityGuid>(entity).OriginatingEntityId);
+                    return UnityEditor.EditorUtility.EntityIdToObject(
+                        m_Manager.GetComponentData<EntityGuid>(entity).OriginatingEntityId
+                    );
 
                 return null;
             }
@@ -495,12 +521,19 @@ namespace Unity.Entities
             struct BuildInstanceIDToEntityIndex : IJobChunk
             {
                 public UnsafeParallelMultiHashMap<EntityId, Entity>.ParallelWriter EntityLookup;
-                [ReadOnly]
-                public ComponentTypeHandle<EntityGuid>                GuidType;
-                [ReadOnly]
-                public EntityTypeHandle                               EntityType;
 
-                public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+                [ReadOnly]
+                public ComponentTypeHandle<EntityGuid> GuidType;
+
+                [ReadOnly]
+                public EntityTypeHandle EntityType;
+
+                public void Execute(
+                    in ArchetypeChunk chunk,
+                    int unfilteredChunkIndex,
+                    bool useEnabledMask,
+                    in v128 chunkEnabledMask
+                )
                 {
                     Assert.IsFalse(useEnabledMask);
                     var entities = chunk.GetNativeArray(EntityType);
@@ -526,6 +559,7 @@ namespace Unity.Entities
             {
                 GetEntitiesForAuthoringObject((UnityEngine.Object)component.gameObject, entities);
             }
+
             /// <summary>
             /// Lists all entities in this world that were converted from or are associated with the given object.
             /// </summary>
@@ -576,8 +610,10 @@ namespace Unity.Entities
                     {
                         EntityLookup = access->CachedEntityGUIDToEntityIndex.AsParallelWriter(),
                         GuidType = m_Manager.GetComponentTypeHandle<EntityGuid>(true),
-                        EntityType = m_Manager.GetEntityTypeHandle()
-                    }.ScheduleParallel(access->m_EntityGuidQuery, default).Complete();
+                        EntityType = m_Manager.GetEntityTypeHandle(),
+                    }
+                        .ScheduleParallel(access->m_EntityGuidQuery, default)
+                        .Complete();
                     access->m_CachedEntityGUIDToEntityIndexVersion = newVersion;
                 }
             }
@@ -615,15 +651,23 @@ namespace Unity.Entities
                 if (false == eda->EntityComponentStore->IsIntentionallyInconsistent)
                     eda->EntityComponentStore->CheckInternalConsistency(mcs.m_ManagedComponentData);
 
-                Assert.IsTrue(eda->AllSharedComponentReferencesAreFromChunks(eda->EntityComponentStore), "Not all shared component references originate from chunks");
+                Assert.IsTrue(
+                    eda->AllSharedComponentReferencesAreFromChunks(eda->EntityComponentStore),
+                    "Not all shared component references originate from chunks"
+                );
                 mcs.CheckInternalConsistency();
 
                 var chunkHeaderType = new ComponentType(typeof(ChunkHeader));
                 var chunkQuery = eda->EntityQueryManager->CreateEntityQuery(eda, &chunkHeaderType, 1);
 
-                int totalEntitiesFromQuery = eda->m_UniversalQueryWithSystems.CalculateEntityCount() + chunkQuery.CalculateEntityCount();
+                int totalEntitiesFromQuery =
+                    eda->m_UniversalQueryWithSystems.CalculateEntityCount() + chunkQuery.CalculateEntityCount();
                 int expectedEntities = eda->EntityComponentStore->CountEntities();
-                Assert.AreEqual(expectedEntities, totalEntitiesFromQuery, $"expected {expectedEntities} entities in EntityComponentStore, but queries match {totalEntitiesFromQuery}");
+                Assert.AreEqual(
+                    expectedEntities,
+                    totalEntitiesFromQuery,
+                    $"expected {expectedEntities} entities in EntityComponentStore, but queries match {totalEntitiesFromQuery}"
+                );
 
                 chunkQuery.Dispose();
 #endif

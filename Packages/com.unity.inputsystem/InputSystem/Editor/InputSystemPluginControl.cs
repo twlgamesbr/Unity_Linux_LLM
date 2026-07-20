@@ -40,7 +40,7 @@ namespace UnityEngine.InputSystem.Editor
             BuildTarget.QNX,
             BuildTarget.VisionOS,
             (BuildTarget)49,
-            BuildTarget.NoTarget
+            BuildTarget.NoTarget,
         };
 
         static bool BuildTargetNeedsPlugin()
@@ -84,7 +84,11 @@ namespace UnityEngine.InputSystem.Editor
             if (!BuildTargetNeedsPlugin())
                 return;
             if (!IsPluginInstalled())
-                Debug.LogError("Active Input Handling is set to InputSystem, but no Plugin for " + EditorUserBuildSettings.activeBuildTarget + " was found. Please install the missing InputSystem package extensions.");
+                Debug.LogError(
+                    "Active Input Handling is set to InputSystem, but no Plugin for "
+                        + EditorUserBuildSettings.activeBuildTarget
+                        + " was found. Please install the missing InputSystem package extensions."
+                );
         }
     }
 }

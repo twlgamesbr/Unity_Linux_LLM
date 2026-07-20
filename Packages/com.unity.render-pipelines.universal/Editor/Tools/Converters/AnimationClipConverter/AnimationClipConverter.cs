@@ -40,9 +40,11 @@ namespace UnityEditor.Rendering.Universal
     [URPHelpURL("features/rp-converter")]
     [PipelineConverter("Built-in", "Universal Render Pipeline (Universal Renderer)")]
     [BatchModeConverterClassInfo("BuiltInToURP", "AnimationClip")]
-    [ElementInfo(Name = "Animation Clip",
-                 Order = 110,
-                 Description = "Updates animation clips that reference material properties to work with URP shaders.\nEnsures material animations continue working after converting Materials from Built-in RP to URP.")]
+    [ElementInfo(
+        Name = "Animation Clip",
+        Order = 110,
+        Description = "Updates animation clips that reference material properties to work with URP shaders.\nEnsures material animations continue working after converting Materials from Built-in RP to URP."
+    )]
     internal sealed class AnimationClipConverter : IRenderPipelineConverter
     {
         [SerializeField]
@@ -65,7 +67,8 @@ namespace UnityEditor.Rendering.Universal
                     continue;
 
                 // Create a search query using the GlobalObjectId to find all assets referencing this clip
-                string formattedId = $"<$object:{GlobalObjectId.GetGlobalObjectIdSlow(animationClip)},UnityEngine.Object$>";
+                string formattedId =
+                    $"<$object:{GlobalObjectId.GetGlobalObjectIdSlow(animationClip)},UnityEngine.Object$>";
                 list.Add(($"p: ref={formattedId}", AssetDatabase.GetAssetPath(animationClip)));
             }
             return list;
@@ -95,14 +98,17 @@ namespace UnityEditor.Rendering.Universal
                 onScanFinish?.Invoke(results);
             }
 
-            using (UnityEngine.Pool.DictionaryPool<string, HashSet<AnimationClipConverterItem>>.Get(out var animatorUsingClip))
-            using (UnityEngine.Pool.HashSetPool<(string,string)>.Get(out var animatorReferences))
+            using (
+                UnityEngine.Pool.DictionaryPool<string, HashSet<AnimationClipConverterItem>>.Get(
+                    out var animatorUsingClip
+                )
+            )
+            using (UnityEngine.Pool.HashSetPool<(string, string)>.Get(out var animatorReferences))
             {
                 void OnAnimationClipDependenciesSearchFinish()
                 {
                     var query = new List<(string, string)>(animatorReferences);
-                    SearchServiceUtils.RunQueuedSearch
-                    (
+                    SearchServiceUtils.RunQueuedSearch(
                         SearchServiceUtils.IndexingOptions.DeepSearch,
                         query,
                         (item, path) =>
@@ -129,12 +135,11 @@ namespace UnityEditor.Rendering.Universal
                                 }
                             }
                         },
-                        OnSearchFinish  // Invoked when all queued searches complete
+                        OnSearchFinish // Invoked when all queued searches complete
                     );
                 }
 
-                SearchServiceUtils.RunQueuedSearch
-                (
+                SearchServiceUtils.RunQueuedSearch(
                     SearchServiceUtils.IndexingOptions.DeepSearch,
                     GetAnimationClipsSearchList(),
                     (searchItem, animationClipPath) =>
@@ -143,34 +148,40 @@ namespace UnityEditor.Rendering.Universal
                         // The queued search processes results grouped by animation clip. When we encounter
                         // a different animationClipPath than the current one, it indicates we've started
                         // processing dependencies for a new animation clip.
-                        // 
+                        //
                         // This batching approach efficiently groups all dependencies (prefabs, GameObjects, etc.)
                         // under their respective animation clips without requiring separate searches per clip.
 
                         // Create a new converter item when we encounter a different animation clip
-                        if (currentAnimationClipItem == null ||
-                            !currentAnimationClipItem.assetPath.Equals(animationClipPath))
+                        if (
+                            currentAnimationClipItem == null
+                            || !currentAnimationClipItem.assetPath.Equals(animationClipPath)
+                        )
                         {
                             currentAnimationClipItem = new AnimationClipConverterItem(
-                                GlobalObjectId.GetGlobalObjectIdSlow(AssetDatabase.LoadAssetAtPath<AnimationClip>(animationClipPath)),
-                                animationClipPath);
+                                GlobalObjectId.GetGlobalObjectIdSlow(
+                                    AssetDatabase.LoadAssetAtPath<AnimationClip>(animationClipPath)
+                                ),
+                                animationClipPath
+                            );
                             assets.Add(currentAnimationClipItem);
                         }
 
                         // Add the dependent asset (prefab, GameObject, etc.) to the current clip's dependency list
                         var assetItem = new RenderPipelineConverterAssetItem(searchItem.id);
-                        
+
                         // If the animation clip is being referenced by a controller, we need to enqueue where this controller is being used
                         // Handle everything at the end and fill clip dependencies, with controller dependencies.
                         if (assetItem.assetPath.EndsWith(".controller"))
                         {
                             var controller = assetItem.LoadObject();
-                            string formattedId = $"<$object:{GlobalObjectId.GetGlobalObjectIdSlow(controller)},UnityEngine.Object$>";
+                            string formattedId =
+                                $"<$object:{GlobalObjectId.GetGlobalObjectIdSlow(controller)},UnityEngine.Object$>";
                             animatorReferences.Add(($"ref={formattedId}", AssetDatabase.GetAssetPath(controller)));
 
                             if (!animatorUsingClip.TryGetValue(assetItem.assetPath, out var list))
                             {
-                                list = new ();
+                                list = new();
                                 animatorUsingClip[assetItem.assetPath] = list;
                             }
 
@@ -182,7 +193,7 @@ namespace UnityEditor.Rendering.Universal
                             currentAnimationClipItem.dependencies.Add(assetItem);
                         }
                     },
-                    OnAnimationClipDependenciesSearchFinish  // Queue animators
+                    OnAnimationClipDependenciesSearchFinish // Queue animators
                 );
             }
         }
@@ -199,7 +210,7 @@ namespace UnityEditor.Rendering.Universal
         /// </summary>
         public void BeforeConvert()
         {
-            m_UpgradePathsToNewShaders = new (BuiltInToURP3DMaterialUpgrader.FetchMaterialUpgraders());
+            m_UpgradePathsToNewShaders = new(BuiltInToURP3DMaterialUpgrader.FetchMaterialUpgraders());
         }
 
         /// <summary>
@@ -242,7 +253,11 @@ namespace UnityEditor.Rendering.Universal
         /// <param name="dependencies">List of assets that reference this clip (prefabs, GameObjects, etc.).</param>
         /// <param name="message">Output message builder for logging results and errors.</param>
         /// <returns>Status indicating success or failure of the conversion.</returns>
-        Status ConvertObject(AnimationClip clip, List<RenderPipelineConverterAssetItem> dependencies, StringBuilder message)
+        Status ConvertObject(
+            AnimationClip clip,
+            List<RenderPipelineConverterAssetItem> dependencies,
+            StringBuilder message
+        )
         {
             var status = Status.Success;
             try
@@ -262,7 +277,7 @@ namespace UnityEditor.Rendering.Universal
                     // Analyze how the clip is used across different GameObjects/prefabs to determine
                     // if it can be safely upgraded. A clip used with both upgraded and non-upgraded
                     // materials cannot be converted without breaking one of those use cases.
-                    // 
+                    //
                     // Dependencies include:
                     // - Prefabs that use this animation clip
                     // - GameObjects in scenes that use this clip
@@ -272,7 +287,7 @@ namespace UnityEditor.Rendering.Universal
                         if (d.LoadObject() is GameObject go)
                             GatherClipsUsageForGameObject(go, clipData, m_UpgradePathsToNewShaders, default);
                     }
-                    
+
                     // Track which clips were successfully upgraded and which could not be converted
                     var upgraded = new HashSet<(IAnimationClip Clip, ClipPath Path, ShaderPropertyUsage Usage)>();
                     var notUpgraded = new HashSet<(IAnimationClip Clip, ClipPath Path, ShaderPropertyUsage Usage)>();
@@ -294,7 +309,9 @@ namespace UnityEditor.Rendering.Universal
                             if (Usage.HasFlag(ShaderPropertyUsage.InvalidShader))
                             {
                                 message.Append("Unable to migrate Animation Clip");
-                                message.AppendLine("- There is not converter defined for the target shader, or the target shader must be upgraded before.");
+                                message.AppendLine(
+                                    "- There is not converter defined for the target shader, or the target shader must be upgraded before."
+                                );
                                 status = Status.Warning;
                                 setDirty = false;
                             }
@@ -315,13 +332,17 @@ namespace UnityEditor.Rendering.Universal
                             message.AppendLine("Unable to migrate Animation Clip:");
                             if (Usage.HasFlag(ShaderPropertyUsage.InvalidShader))
                             {
-                                message.AppendLine("- There is not converter defined for the target shader, or the target shader must be upgraded before.");
+                                message.AppendLine(
+                                    "- There is not converter defined for the target shader, or the target shader must be upgraded before."
+                                );
                                 status = Status.Warning;
                             }
 
                             if (Usage.HasFlag(ShaderPropertyUsage.MultipleUpgradePaths))
                             {
-                                message.Append("- The upgraders define multiple upgrade paths for one of the properties");
+                                message.Append(
+                                    "- The upgraders define multiple upgrade paths for one of the properties"
+                                );
                                 status = Status.Error;
                             }
                         }

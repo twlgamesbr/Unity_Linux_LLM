@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using UnityEngine;
 using UnityEditor.EditorTools;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
@@ -49,7 +49,10 @@ namespace UnityEditor
 
             if (camera == null)
             {
-                EditorGUILayout.HelpBox("Light Anchor: At least one camera must be tagged as MainCamera", MessageType.Error);
+                EditorGUILayout.HelpBox(
+                    "Light Anchor: At least one camera must be tagged as MainCamera",
+                    MessageType.Error
+                );
                 return;
             }
 
@@ -106,7 +109,10 @@ namespace UnityEditor
                     rollChanged = EditorGUI.EndChangeCheck();
                 }
                 EditorGUILayout.Space();
-                Rect angleRect = EditorGUILayout.GetControlRect(true, EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3, EditorGUIUtility.TrTextContent("")));
+                Rect angleRect = EditorGUILayout.GetControlRect(
+                    true,
+                    EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3, EditorGUIUtility.TrTextContent(""))
+                );
                 float[] angles = new float[3] { m_Yaw, m_Pitch, m_Roll };
                 EditorGUI.BeginChangeCheck();
                 EditorGUI.MultiFloatField(angleRect, LightAnchorStyles.angleSubContent, angles);
@@ -141,14 +147,20 @@ namespace UnityEditor
                 upChanged = EditorGUI.EndChangeCheck();
 
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_AnchorPositionOverrideProperty, LightAnchorStyles.anchorPositionOverrideProperty);
+                EditorGUILayout.PropertyField(
+                    m_AnchorPositionOverrideProperty,
+                    LightAnchorStyles.anchorPositionOverrideProperty
+                );
                 positionOverrideChanged = EditorGUI.EndChangeCheck();
 
                 if (m_AnchorPositionOverrideProperty.objectReferenceValue != null)
                 {
                     EditorGUI.indentLevel++;
                     EditorGUI.BeginChangeCheck();
-                    EditorGUILayout.PropertyField(m_AnchorPositionOffsetProperty, LightAnchorStyles.anchorPositionOffsetProperty);
+                    EditorGUILayout.PropertyField(
+                        m_AnchorPositionOffsetProperty,
+                        LightAnchorStyles.anchorPositionOffsetProperty
+                    );
                     positionOverrideChanged |= EditorGUI.EndChangeCheck();
                     EditorGUI.indentLevel--;
                 }
@@ -166,15 +178,22 @@ namespace UnityEditor
                         int elementIdx = 1;
                         EditorGUILayout.BeginHorizontal();
                         bool rectFound = false;
-                        void SingleThumbnail(GUIContent style, GUILayoutOption width, GUILayoutOption height,
-                            float yawValue, float pitchValue,
-                            float elemPerLine, bool doLayout,
-                            ref Rect rectangle, ref int elemIdx, ref bool rectangleFound,
+                        void SingleThumbnail(
+                            GUIContent style,
+                            GUILayoutOption width,
+                            GUILayoutOption height,
+                            float yawValue,
+                            float pitchValue,
+                            float elemPerLine,
+                            bool doLayout,
+                            ref Rect rectangle,
+                            ref int elemIdx,
+                            ref bool rectangleFound,
                             ref float yaw,
                             ref float pitch,
                             ref bool isYawChanged,
                             ref bool isPitchChanged
-                            )
+                        )
                         {
                             if (GUILayout.Button(style, width, height))
                             {
@@ -201,65 +220,159 @@ namespace UnityEditor
                             }
                         }
                         Rect rect = new Rect();
-                        SingleThumbnail(LightAnchorStyles.presetTextureRimLeft, presetButtonWidth, presetButtonHeight,
-                            135.0f, 0.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureKickLeft, presetButtonWidth, presetButtonHeight,
-                            100.0f, 10.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureBounceLeft, presetButtonWidth, presetButtonHeight,
-                            30.0f, -30.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureFillLeft, presetButtonWidth, presetButtonHeight,
-                            35.0f, 35.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureHair, presetButtonWidth, presetButtonHeight,
-                            0.0f, 100.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureFillRight, presetButtonWidth, presetButtonHeight,
-                            -35.0f, 35.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureBounceRight, presetButtonWidth, presetButtonHeight,
-                            -30.0f, -30.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureKickRight, presetButtonWidth, presetButtonHeight,
-                            -100.0f, 10.0f,
-                            elementPerLine, true,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
-                        SingleThumbnail(LightAnchorStyles.presetTextureRimRight, presetButtonWidth, presetButtonHeight,
-                            -135.0f, 0.0f,
-                            elementPerLine, false,
-                            ref rect, ref elementIdx, ref rectFound,
-                            ref m_Yaw, ref m_Pitch, ref yawChanged, ref pitchChanged
-                            );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureRimLeft,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            135.0f,
+                            0.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureKickLeft,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            100.0f,
+                            10.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureBounceLeft,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            30.0f,
+                            -30.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureFillLeft,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            35.0f,
+                            35.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureHair,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            0.0f,
+                            100.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureFillRight,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            -35.0f,
+                            35.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureBounceRight,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            -30.0f,
+                            -30.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureKickRight,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            -100.0f,
+                            10.0f,
+                            elementPerLine,
+                            true,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
+                        SingleThumbnail(
+                            LightAnchorStyles.presetTextureRimRight,
+                            presetButtonWidth,
+                            presetButtonHeight,
+                            -135.0f,
+                            0.0f,
+                            elementPerLine,
+                            false,
+                            ref rect,
+                            ref elementIdx,
+                            ref rectFound,
+                            ref m_Yaw,
+                            ref m_Pitch,
+                            ref yawChanged,
+                            ref pitchChanged
+                        );
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.EndHorizontal();
                         if (rectFound)
                         {
-                            Handles.DrawSolidRectangleWithOutline(rect, LightAnchorStyles.totalTransparentColor, LightAnchorStyles.hoverColor);
+                            Handles.DrawSolidRectangleWithOutline(
+                                rect,
+                                LightAnchorStyles.totalTransparentColor,
+                                LightAnchorStyles.hoverColor
+                            );
                         }
                     }
                     GUI.backgroundColor = cachedColor;
@@ -267,7 +380,10 @@ namespace UnityEditor
 
                 if (upChanged)
                 {
-                    Undo.RecordObjects(new UnityEngine.Object[] { target, manipulator.transform }, "Light Anchor Change");
+                    Undo.RecordObjects(
+                        new UnityEngine.Object[] { target, manipulator.transform },
+                        "Light Anchor Change"
+                    );
 
                     manipulator.frameSpace = (LightAnchor.UpDirection)m_FrameSpaceProperty.intValue;
                     manipulator.SynchronizeOnTransform(camera);
@@ -275,7 +391,10 @@ namespace UnityEditor
                 }
                 if (yawChanged || pitchChanged || rollChanged || distanceChanged || positionOverrideChanged)
                 {
-                    Undo.RecordObjects(new UnityEngine.Object[] { target, manipulator.transform }, "Light Anchor Change");
+                    Undo.RecordObjects(
+                        new UnityEngine.Object[] { target, manipulator.transform },
+                        "Light Anchor Change"
+                    );
 
                     if (yawChanged)
                         manipulator.yaw = m_Yaw;
@@ -293,12 +412,17 @@ namespace UnityEditor
                         {
                             // Check that the assigned transform is not child of the light anchor, otherwise it would cause problems when moving the light position
                             if (newTransform.IsChildOf(manipulator.transform))
-                                Debug.LogError($"Can't assign '{newTransform.name}' because it's a child of the Light Anchor component");
+                                Debug.LogError(
+                                    $"Can't assign '{newTransform.name}' because it's a child of the Light Anchor component"
+                                );
                             else
                             {
                                 manipulator.anchorPositionOverride = newTransform;
                                 manipulator.anchorPositionOffset = m_AnchorPositionOffsetProperty.vector3Value;
-                                float newDistance = Vector3.Distance(manipulator.transform.position, manipulator.anchorPosition);
+                                float newDistance = Vector3.Distance(
+                                    manipulator.transform.position,
+                                    manipulator.anchorPosition
+                                );
                                 // Orient the object to face the new override position
                                 manipulator.SynchronizeOnTransform(camera);
                                 // And adjust it's distance to avoid modifying it's position.
@@ -327,7 +451,8 @@ namespace UnityEditor
 
             // Get a reference to the GameView
             // TODO: This currently only works with a single Game View
-            var gameViews = Resources.FindObjectsOfTypeAll<EditorWindow>()
+            var gameViews = Resources
+                .FindObjectsOfTypeAll<EditorWindow>()
                 .Where(w => w.GetType().FullName == "UnityEditor.GameView")
                 .ToArray();
             var gameView = gameViews.First();
@@ -340,8 +465,7 @@ namespace UnityEditor
 
             // Determine if the editor tool is already active (this helps keep our state when swapping between
             // different light objects directly, or after an assembly reload)
-            var anchorTools = Resources.FindObjectsOfTypeAll<LightAnchorEditorTool>()
-                .ToArray();
+            var anchorTools = Resources.FindObjectsOfTypeAll<LightAnchorEditorTool>().ToArray();
             if (anchorTools.Length > 0)
             {
                 var anchorTool = anchorTools[0];
@@ -409,8 +533,11 @@ namespace UnityEditor
             var camToLight = manipulatorTransform.position - cameraTransform.position;
             var camLightForwardDot = Vector3.Dot(manipulatorTransform.forward, cameraTransform.forward);
             var camLightRightDot = Vector3.Dot(manipulatorTransform.right, cameraTransform.right);
-            var dirty = camToLight != m_CamToLight || Math.Abs(camLightForwardDot - m_CamLightForwardDot) > float.Epsilon
-                || Math.Abs(camLightRightDot - m_CamLightRightDot) > float.Epsilon || m_FrameSpace != manipulator.frameSpace;
+            var dirty =
+                camToLight != m_CamToLight
+                || Math.Abs(camLightForwardDot - m_CamLightForwardDot) > float.Epsilon
+                || Math.Abs(camLightRightDot - m_CamLightRightDot) > float.Epsilon
+                || m_FrameSpace != manipulator.frameSpace;
             m_CamToLight = camToLight;
             m_CamLightForwardDot = camLightForwardDot;
             m_CamLightRightDot = camLightRightDot;
@@ -440,7 +567,8 @@ namespace UnityEditor
 
             var newAngle = 0f;
             // reset on right click
-            var didReset = GUIUtility.hotControl == 0
+            var didReset =
+                GUIUtility.hotControl == 0
                 && Event.current.type == EventType.MouseDown
                 && Event.current.button == 1
                 && knobRect.Contains(Event.current.mousePosition);
@@ -454,9 +582,12 @@ namespace UnityEditor
             }
             else if (enabled)
             {
-                var srcPos = new Vector2(
-                    Mathf.Cos((angle + offset) * Mathf.Deg2Rad),
-                    Mathf.Sin((angle + offset) * Mathf.Deg2Rad)) * state.radius + state.position;
+                var srcPos =
+                    new Vector2(
+                        Mathf.Cos((angle + offset) * Mathf.Deg2Rad),
+                        Mathf.Sin((angle + offset) * Mathf.Deg2Rad)
+                    ) * state.radius
+                    + state.position;
 
                 var dstPos = Slider2DCircular(id, srcPos, 5f, Handles.CircleHandleCap);
                 dstPos -= state.position;
@@ -478,17 +609,26 @@ namespace UnityEditor
             return newAngle;
         }
 
-        static void DrawAngleWidget(Vector2 center, float radius, float angleDegrees, float offset, Color sectionColor, bool enabled)
+        static void DrawAngleWidget(
+            Vector2 center,
+            float radius,
+            float angleDegrees,
+            float offset,
+            Color sectionColor,
+            bool enabled
+        )
         {
-            Vector2 originPosition = center + new Vector2(
-                Mathf.Cos(offset * Mathf.Deg2Rad),
-                Mathf.Sin(offset * Mathf.Deg2Rad)) * radius;
+            Vector2 originPosition =
+                center + new Vector2(Mathf.Cos(offset * Mathf.Deg2Rad), Mathf.Sin(offset * Mathf.Deg2Rad)) * radius;
 
             Vector2 toOrigin = originPosition - center;
 
-            Vector2 handlePosition = center + new Vector2(
-                Mathf.Cos((angleDegrees + offset) * Mathf.Deg2Rad),
-                Mathf.Sin((angleDegrees + offset) * Mathf.Deg2Rad)) * radius;
+            Vector2 handlePosition =
+                center
+                + new Vector2(
+                    Mathf.Cos((angleDegrees + offset) * Mathf.Deg2Rad),
+                    Mathf.Sin((angleDegrees + offset) * Mathf.Deg2Rad)
+                ) * radius;
 
             Color backupColor = Handles.color;
             Handles.color = LightAnchorStyles.DiskBackgroundAngleColor();
@@ -496,7 +636,13 @@ namespace UnityEditor
             Handles.color = LightAnchorStyles.angleDiskBorderColor;
             Handles.DrawWireDisc(center, Vector3.forward, radius);
             Handles.color = sectionColor;
-            Handles.DrawSolidArc(center, Vector3.forward, Quaternion.AngleAxis(offset, Vector3.forward) * Vector3.right, angleDegrees, radius);
+            Handles.DrawSolidArc(
+                center,
+                Vector3.forward,
+                Quaternion.AngleAxis(offset, Vector3.forward) * Vector3.right,
+                angleDegrees,
+                radius
+            );
             Handles.color = LightAnchorStyles.WireDiskAngleColor();
             Handles.DrawLine(center + toOrigin * 0.75f, center + toOrigin * 0.9f);
             Handles.DrawLine(center, handlePosition);
@@ -506,16 +652,19 @@ namespace UnityEditor
 
         static Rect SliceRectVertical(Rect r, float min, float max)
         {
-            return Rect.MinMaxRect(
-                r.xMin, Mathf.Lerp(r.yMin, r.yMax, min),
-                r.xMax, Mathf.Lerp(r.yMin, r.yMax, max));
+            return Rect.MinMaxRect(r.xMin, Mathf.Lerp(r.yMin, r.yMax, min), r.xMax, Mathf.Lerp(r.yMin, r.yMax, max));
         }
 
         static Vector2 s_CurrentMousePosition;
         static Vector2 s_DragStartScreenPosition;
         static Vector2 s_DragScreenOffset;
 
-        static internal Vector2 Slider2DCircular(int id, Vector2 position, float size, Handles.CapFunction drawCapFunction)
+        internal static Vector2 Slider2DCircular(
+            int id,
+            Vector2 position,
+            float size,
+            Handles.CapFunction drawCapFunction
+        )
         {
             var type = Event.current.GetTypeForControl(id);
 
@@ -572,6 +721,7 @@ namespace UnityEditor
             return position;
         }
     }
+
     class AngleFieldState
     {
         public float radius;
@@ -580,44 +730,137 @@ namespace UnityEditor
 
     static class LightAnchorStyles
     {
-        static public float inspectorWidthPadding = 60f;
-        static public float presetButtonCount = 9f;
-        static public GUIStyle centeredLabel = GUI.skin.GetStyle("Label");
-        static public string k_IconFolder = @"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/";
-        static public GUIContent presetTextureRimLeft = EditorGUIUtility.TrTextContent("", "Rim Left", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetRim_Left", ".png", false));
-        static public GUIContent presetTextureKickLeft = EditorGUIUtility.TrTextContent("", "Kick Left", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetKick_Left", ".png", false));
-        static public GUIContent presetTextureBounceLeft = EditorGUIUtility.TrTextContent("", "Bounce Left", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetBounce_Left", ".png", false));
-        static public GUIContent presetTextureFillLeft = EditorGUIUtility.TrTextContent("", "Fill Left", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetFill_Left", ".png", false));
-        static public GUIContent presetTextureHair = EditorGUIUtility.TrTextContent("", "Hair", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetHair", ".png", false));
-        static public GUIContent presetTextureFillRight = EditorGUIUtility.TrTextContent("", "Fill Right", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetFill_Right", ".png", false));
-        static public GUIContent presetTextureBounceRight = EditorGUIUtility.TrTextContent("", "Bounce Right", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetBounce_Right", ".png", false));
-        static public GUIContent presetTextureKickRight = EditorGUIUtility.TrTextContent("", "Kick Right", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetKick_Right", ".png", false));
-        static public GUIContent presetTextureRimRight = EditorGUIUtility.TrTextContent("", "Rim Right", UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetRim_Right", ".png", false));
-        static public GUIContent distanceProperty = EditorGUIUtility.TrTextContent("Distance", "Controls how far 'back', the light is placed from its anchor");
-        static public GUIContent upDirectionProperty = EditorGUIUtility.TrTextContent("Up direction", "Specifies the space in which the up direction of the anchor is defined. Local is relative to the camera.");
-        static public GUIContent anchorPositionOverrideProperty = EditorGUIUtility.TrTextContent("Anchor Position Override", "Specifies the anchor position manually instead of relying on the angles, distance and transform position to compute the anchor position.");
-        static public GUIContent anchorPositionOffsetProperty = EditorGUIUtility.TrTextContent("Anchor Position Offset", "Specifies the anchor position offset relative to the anchor position override.");
-        static public GUIContent[] angleSubContent = new[]
+        public static float inspectorWidthPadding = 60f;
+        public static float presetButtonCount = 9f;
+        public static GUIStyle centeredLabel = GUI.skin.GetStyle("Label");
+        public static string k_IconFolder = @"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/";
+        public static GUIContent presetTextureRimLeft = EditorGUIUtility.TrTextContent(
+            "",
+            "Rim Left",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetRim_Left",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent presetTextureKickLeft = EditorGUIUtility.TrTextContent(
+            "",
+            "Kick Left",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetKick_Left",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent presetTextureBounceLeft = EditorGUIUtility.TrTextContent(
+            "",
+            "Bounce Left",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetBounce_Left",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent presetTextureFillLeft = EditorGUIUtility.TrTextContent(
+            "",
+            "Fill Left",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetFill_Left",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent presetTextureHair = EditorGUIUtility.TrTextContent(
+            "",
+            "Hair",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(LightAnchorStyles.k_IconFolder, "PresetHair", ".png", false)
+        );
+        public static GUIContent presetTextureFillRight = EditorGUIUtility.TrTextContent(
+            "",
+            "Fill Right",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetFill_Right",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent presetTextureBounceRight = EditorGUIUtility.TrTextContent(
+            "",
+            "Bounce Right",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetBounce_Right",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent presetTextureKickRight = EditorGUIUtility.TrTextContent(
+            "",
+            "Kick Right",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetKick_Right",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent presetTextureRimRight = EditorGUIUtility.TrTextContent(
+            "",
+            "Rim Right",
+            UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                LightAnchorStyles.k_IconFolder,
+                "PresetRim_Right",
+                ".png",
+                false
+            )
+        );
+        public static GUIContent distanceProperty = EditorGUIUtility.TrTextContent(
+            "Distance",
+            "Controls how far 'back', the light is placed from its anchor"
+        );
+        public static GUIContent upDirectionProperty = EditorGUIUtility.TrTextContent(
+            "Up direction",
+            "Specifies the space in which the up direction of the anchor is defined. Local is relative to the camera."
+        );
+        public static GUIContent anchorPositionOverrideProperty = EditorGUIUtility.TrTextContent(
+            "Anchor Position Override",
+            "Specifies the anchor position manually instead of relying on the angles, distance and transform position to compute the anchor position."
+        );
+        public static GUIContent anchorPositionOffsetProperty = EditorGUIUtility.TrTextContent(
+            "Anchor Position Offset",
+            "Specifies the anchor position offset relative to the anchor position override."
+        );
+        public static GUIContent[] angleSubContent = new[]
         {
             EditorGUIUtility.TrTextContent("Orbit"),
             EditorGUIUtility.TrTextContent("Elevation"),
-            EditorGUIUtility.TrTextContent("Roll")
+            EditorGUIUtility.TrTextContent("Roll"),
         };
-        static public Color totalTransparentColor = new Color(0, 0, 0, 0);
-        static public Color hoverColor = new Color(0.22745098039215686f, 0.4745098039215686f, 0.7333333333333333f, 1.0f);
+        public static Color totalTransparentColor = new Color(0, 0, 0, 0);
+        public static Color hoverColor = new Color(
+            0.22745098039215686f,
+            0.4745098039215686f,
+            0.7333333333333333f,
+            1.0f
+        );
 
-        static public Color darkBackgroundIconColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 128f / 255f);
-        static public Color lightBackgroundIconColor = new Color(1f, 1f, 1f);
+        public static Color darkBackgroundIconColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 128f / 255f);
+        public static Color lightBackgroundIconColor = new Color(1f, 1f, 1f);
 
-        static public Color angleDiskBorderColor = new Color(12f / 255f, 12f / 255f, 12f / 255f);
+        public static Color angleDiskBorderColor = new Color(12f / 255f, 12f / 255f, 12f / 255f);
 
-        static public Color darkDiskBackgroundAngleColor = new Color(42f / 255f, 42f / 255f, 42f / 255f);
-        static public Color lightDiskBackgroundAngleColor = new Color(229f / 255f, 229f / 255f, 229f / 255f);
+        public static Color darkDiskBackgroundAngleColor = new Color(42f / 255f, 42f / 255f, 42f / 255f);
+        public static Color lightDiskBackgroundAngleColor = new Color(229f / 255f, 229f / 255f, 229f / 255f);
 
-        static public Color darkWireDiskAngleColor = new Color(196f / 255f, 196f / 255f, 196f / 255f);
-        static public Color lightWireDiskAngleColor = new Color(97f / 255f, 97f / 255f, 97f / 255f);
+        public static Color darkWireDiskAngleColor = new Color(196f / 255f, 196f / 255f, 196f / 255f);
+        public static Color lightWireDiskAngleColor = new Color(97f / 255f, 97f / 255f, 97f / 255f);
 
-        static public Color BackgroundIconColor()
+        public static Color BackgroundIconColor()
         {
             if (EditorGUIUtility.isProSkin)
                 return darkBackgroundIconColor;
@@ -625,7 +868,7 @@ namespace UnityEditor
                 return lightBackgroundIconColor;
         }
 
-        static public Color DiskBackgroundAngleColor()
+        public static Color DiskBackgroundAngleColor()
         {
             if (EditorGUIUtility.isProSkin)
                 return darkDiskBackgroundAngleColor;
@@ -633,7 +876,7 @@ namespace UnityEditor
                 return lightDiskBackgroundAngleColor;
         }
 
-        static public Color WireDiskAngleColor()
+        public static Color WireDiskAngleColor()
         {
             if (EditorGUIUtility.isProSkin)
                 return darkWireDiskAngleColor;

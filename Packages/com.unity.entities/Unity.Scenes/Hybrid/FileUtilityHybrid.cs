@@ -1,9 +1,9 @@
+using UnityEngine.Scripting.APIUpdating;
 #if UNITY_ANDROID
 using UnityEngine.Networking;
 #else
 using System.IO;
 #endif
-using UnityEngine.Scripting.APIUpdating;
 
 namespace Unity.Scenes
 {
@@ -27,10 +27,10 @@ namespace Unity.Scenes
 #if UNITY_ANDROID
             var uwrFile = new UnityWebRequest(path);
             uwrFile.SendWebRequest();
-            while (!uwrFile.isDone) {}
+            while (!uwrFile.isDone) { }
 
-            return uwrFile.result != UnityWebRequest.Result.ConnectionError &&
-                   uwrFile.result != UnityWebRequest.Result.ProtocolError;
+            return uwrFile.result != UnityWebRequest.Result.ConnectionError
+                && uwrFile.result != UnityWebRequest.Result.ProtocolError;
 #else
             return File.Exists(path);
 #endif

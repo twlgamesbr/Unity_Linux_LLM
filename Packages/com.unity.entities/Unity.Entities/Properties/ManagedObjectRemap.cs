@@ -9,10 +9,7 @@ namespace Unity.Entities
         void Visit<TContainer>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value);
     }
 
-    unsafe class ManagedObjectRemap :
-        IPropertyBagVisitor,
-        IPropertyVisitor,
-        ITypedVisit<Entity>
+    unsafe class ManagedObjectRemap : IPropertyBagVisitor, IPropertyVisitor, ITypedVisit<Entity>
     {
         /// <summary>
         /// Set used to track already visited references, in order to avoid infinite recursion.
@@ -79,7 +76,12 @@ namespace Unity.Entities
         /// <param name="remapInfoCount">Length of the entity arrays.</param>
         /// <exception cref="ArgumentNullException">The given object was null.</exception>
         /// <exception cref="MissingPropertyBagException">The given object has no property bag associated with it.</exception>
-        public void RemapEntityReferencesForPrefab(ref object obj, Entity* remapSrc, Entity* remapDst, int remapInfoCount)
+        public void RemapEntityReferencesForPrefab(
+            ref object obj,
+            Entity* remapSrc,
+            Entity* remapDst,
+            int remapInfoCount
+        )
         {
             m_Info = null;
             m_PrefabSrc = remapSrc;
@@ -152,11 +154,16 @@ namespace Unity.Entities
         /// <param name="value">The entity value.</param>
         /// <typeparam name="TContainer">The container type.</typeparam>
         /// <returns>The status of the adapter visit.</returns>
-        void ITypedVisit<Entity>.Visit<TContainer>(Property<TContainer, Entity> property, ref TContainer container, ref Entity value)
+        void ITypedVisit<Entity>.Visit<TContainer>(
+            Property<TContainer, Entity> property,
+            ref TContainer container,
+            ref Entity value
+        )
         {
-            value = null != m_Info
-                ? EntityRemapUtility.RemapEntity(m_Info, value)
-                : EntityRemapUtility.RemapEntityForPrefab(m_PrefabSrc, m_PrefabDst, m_PrefabCount, value);
+            value =
+                null != m_Info
+                    ? EntityRemapUtility.RemapEntity(m_Info, value)
+                    : EntityRemapUtility.RemapEntityForPrefab(m_PrefabSrc, m_PrefabDst, m_PrefabCount, value);
         }
 
         public void ClearGCRefs()

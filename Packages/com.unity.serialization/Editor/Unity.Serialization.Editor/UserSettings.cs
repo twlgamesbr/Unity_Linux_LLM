@@ -14,7 +14,7 @@ namespace Unity.Serialization.Editor
         where T : class, new()
     {
         static readonly Dictionary<string, T> s_Cache = new Dictionary<string, T>();
- 
+
         static UserSettings()
         {
             EditorApplication.quitting += Save;
@@ -30,17 +30,17 @@ namespace Unity.Serialization.Editor
             s_Cache.Remove(key);
             EditorUserSettings.SetConfigValue(key, null);
         }
-        
+
         /// <summary>
-        /// Returns an instance of <see cref="T"/> for the provided key.  
+        /// Returns an instance of <see cref="T"/> for the provided key.
         /// </summary>
         /// <param name="key">The key to the data.</param>
         /// <returns>The <see cref="T"/> instance.</returns>
-        public static T GetOrCreate(string key) 
+        public static T GetOrCreate(string key)
         {
             if (s_Cache.TryGetValue(key, out var value))
                 return value;
-            
+
             var json = EditorUserSettings.GetConfigValue(key) ?? string.Empty;
             try
             {
@@ -48,7 +48,9 @@ namespace Unity.Serialization.Editor
             }
             catch (Exception exception)
             {
-                Debug.LogError($"UserSettings<{typeof(T).Name}>: Could not load at key `{key}`.\nException `{exception}`");
+                Debug.LogError(
+                    $"UserSettings<{typeof(T).Name}>: Could not load at key `{key}`.\nException `{exception}`"
+                );
                 value = new T();
             }
 

@@ -15,7 +15,7 @@ namespace Unity.Entities.Editor.Inspectors
                 name = Name,
                 label = DisplayName,
                 tooltip = Tooltip,
-                bindingPath = "."
+                bindingPath = ".",
             };
 
             InspectorUtility.AddRuntimeBar(m_Field);

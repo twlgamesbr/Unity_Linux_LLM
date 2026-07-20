@@ -6,7 +6,7 @@ namespace Unity.Entities.UI
 {
     class PaginationElement : VisualElement
     {
-        readonly List<int> m_PaginationSizes = new List<int> {5, 10, 20};
+        readonly List<int> m_PaginationSizes = new List<int> { 5, 10, 20 };
 
         readonly Button m_RangeButton;
         readonly IntegerField m_RangeInput;
@@ -66,19 +66,17 @@ namespace Unity.Entities.UI
                 m_PaginationSizes,
                 0,
                 FormatSelectedValueCallback,
-                FormatSelectedValueCallback);
+                FormatSelectedValueCallback
+            );
             m_SizeElement.RegisterValueChangedCallback(Callback);
 
             PaginationSize = m_PaginationSizes[0];
             paginationSize.Add(m_SizeElement);
 
-
-            m_PreviousButton =
-                this.Q<RepeatButton>(className: UssClasses.PaginationElement.PreviousPageButton);
+            m_PreviousButton = this.Q<RepeatButton>(className: UssClasses.PaginationElement.PreviousPageButton);
             m_PreviousButton.SetAction(NavigateToPreviousPage, 500, 100);
 
-            m_NextButton =
-                this.Q<RepeatButton>(className: UssClasses.PaginationElement.NextPageButton);
+            m_NextButton = this.Q<RepeatButton>(className: UssClasses.PaginationElement.NextPageButton);
             m_NextButton.SetAction(NavigateToNextPage, 500, 100);
 
             m_RangeButton = this.Q<Button>(className: UssClasses.PaginationElement.ElementsRange);
@@ -86,8 +84,7 @@ namespace Unity.Entities.UI
             m_RangeInputRoot = this.Q(className: UssClasses.PaginationElement.RangeInputRoot);
             m_RangeInputRoot.style.display = DisplayStyle.None;
 
-            m_RangeInput =
-                this.Q<IntegerField>(className: UssClasses.PaginationElement.RangeInput);
+            m_RangeInput = this.Q<IntegerField>(className: UssClasses.PaginationElement.RangeInput);
             m_RangeInput.isDelayed = true;
             m_RangeInput.RegisterValueChangedCallback(OnIndexSelected);
             m_RangeInput.Q(className: UssClasses.Unity.BaseFieldInput).RegisterCallback<FocusOutEvent>(Callback);

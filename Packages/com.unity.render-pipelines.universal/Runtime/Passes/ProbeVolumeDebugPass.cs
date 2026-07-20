@@ -35,16 +35,29 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="frameData"></param>
         /// <param name="depthPyramidBuffer"></param>
         /// <param name="normalBuffer"></param>
-        internal void Render(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle depthPyramidBuffer, in TextureHandle normalBuffer)
+        internal void Render(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle depthPyramidBuffer,
+            in TextureHandle normalBuffer
+        )
         {
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
 
             if (!ProbeReferenceVolume.instance.isInitialized)
                 return;
 
-            if (ProbeReferenceVolume.instance.GetProbeSamplingDebugResources(cameraData.camera, out var resultBuffer, out Vector2 coords))
+            if (
+                ProbeReferenceVolume.instance.GetProbeSamplingDebugResources(
+                    cameraData.camera,
+                    out var resultBuffer,
+                    out Vector2 coords
+                )
+            )
             {
-                using (var builder = renderGraph.AddComputePass<WriteApvData>(passName, out var passData, profilingSampler))
+                using (
+                    var builder = renderGraph.AddComputePass<WriteApvData>(passName, out var passData, profilingSampler)
+                )
                 {
                     passData.clickCoordinates = coords;
                     passData.computeShader = m_ComputeShader;
@@ -57,16 +70,37 @@ namespace UnityEngine.Rendering.Universal
                     builder.UseTexture(passData.depthBuffer, AccessFlags.Read);
                     builder.UseTexture(passData.normalBuffer, AccessFlags.Read);
 
-                    builder.SetRenderFunc(static (WriteApvData data, ComputeGraphContext ctx) =>
-                    {
-                        int kernel = data.computeShader.FindKernel("ComputePositionNormal");
+                    builder.SetRenderFunc(
+                        static (WriteApvData data, ComputeGraphContext ctx) =>
+                        {
+                            int kernel = data.computeShader.FindKernel("ComputePositionNormal");
 
-                        ctx.cmd.SetComputeTextureParam(data.computeShader, kernel, "_CameraDepthTexture", data.depthBuffer);
-                        ctx.cmd.SetComputeTextureParam(data.computeShader, kernel, "_NormalBufferTexture", data.normalBuffer);
-                        ctx.cmd.SetComputeVectorParam(data.computeShader, "_positionSS", new Vector4(data.clickCoordinates.x, data.clickCoordinates.y, 0.0f, 0.0f));
-                        ctx.cmd.SetComputeBufferParam(data.computeShader, kernel, "_ResultBuffer", data.resultBuffer);
-                        ctx.cmd.DispatchCompute(data.computeShader, kernel, 1, 1, 1);
-                    });
+                            ctx.cmd.SetComputeTextureParam(
+                                data.computeShader,
+                                kernel,
+                                "_CameraDepthTexture",
+                                data.depthBuffer
+                            );
+                            ctx.cmd.SetComputeTextureParam(
+                                data.computeShader,
+                                kernel,
+                                "_NormalBufferTexture",
+                                data.normalBuffer
+                            );
+                            ctx.cmd.SetComputeVectorParam(
+                                data.computeShader,
+                                "_positionSS",
+                                new Vector4(data.clickCoordinates.x, data.clickCoordinates.y, 0.0f, 0.0f)
+                            );
+                            ctx.cmd.SetComputeBufferParam(
+                                data.computeShader,
+                                kernel,
+                                "_ResultBuffer",
+                                data.resultBuffer
+                            );
+                            ctx.cmd.DispatchCompute(data.computeShader, kernel, 1, 1, 1);
+                        }
+                    );
                 }
             }
         }

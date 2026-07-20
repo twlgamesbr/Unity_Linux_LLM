@@ -10,6 +10,7 @@ namespace UnityEditor.Rendering.Universal
     {
         static readonly uint k_Version = 2;
         static readonly int k_Order = -980;
+
         public override uint GetVersion()
         {
             return k_Version;
@@ -20,21 +21,31 @@ namespace UnityEditor.Rendering.Universal
             return k_Order;
         }
 
-        public void OnPreprocessMaterialDescription(MaterialDescription description, Material material, AnimationClip[] clips)
+        public void OnPreprocessMaterialDescription(
+            MaterialDescription description,
+            Material material,
+            AnimationClip[] clips
+        )
         {
             var pipelineAsset = GraphicsSettings.currentRenderPipeline;
             if (!pipelineAsset || pipelineAsset.GetType() != typeof(UniversalRenderPipelineAsset))
                 return;
 
             var lowerCaseExtension = Path.GetExtension(assetPath).ToLower();
-            if (lowerCaseExtension != ".fbx" && lowerCaseExtension != ".obj" && lowerCaseExtension != ".blend" && lowerCaseExtension != ".mb" && lowerCaseExtension != ".ma" && lowerCaseExtension != ".max")
+            if (
+                lowerCaseExtension != ".fbx"
+                && lowerCaseExtension != ".obj"
+                && lowerCaseExtension != ".blend"
+                && lowerCaseExtension != ".mb"
+                && lowerCaseExtension != ".ma"
+                && lowerCaseExtension != ".max"
+            )
                 return;
 
             string path = AssetDatabase.GUIDToAssetPath(ShaderUtils.GetShaderGUID(ShaderPathID.Lit));
             var shader = AssetDatabase.LoadAssetAtPath<Shader>(path);
             if (shader == null)
                 return;
-
 
             material.shader = shader;
 
@@ -57,11 +68,16 @@ namespace UnityEditor.Rendering.Universal
                     opacity = vectorProperty.x == 1.0f ? 1.0f : 1.0f - vectorProperty.x;
                 }
             }
-            if (opacity < 1.0f || (opacity == 1.0f && description.TryGetProperty("TransparentColor", out textureProperty)))
+            if (
+                opacity < 1.0f
+                || (opacity == 1.0f && description.TryGetProperty("TransparentColor", out textureProperty))
+            )
             {
                 isTransparent = true;
             }
-            else if (description.HasAnimationCurve("TransparencyFactor") || description.HasAnimationCurve("TransparentColor"))
+            else if (
+                description.HasAnimationCurve("TransparencyFactor") || description.HasAnimationCurve("TransparentColor")
+            )
             {
                 isTransparent = true;
             }
@@ -107,7 +123,10 @@ namespace UnityEditor.Rendering.Universal
             {
                 Color diffuseColor = vectorProperty;
                 diffuseColor.a = opacity;
-                material.SetColor("_BaseColor", PlayerSettings.colorSpace == ColorSpace.Linear ? diffuseColor.gamma : diffuseColor);
+                material.SetColor(
+                    "_BaseColor",
+                    PlayerSettings.colorSpace == ColorSpace.Linear ? diffuseColor.gamma : diffuseColor
+                );
             }
 
             if (description.TryGetProperty("Bump", out textureProperty))
@@ -141,8 +160,10 @@ namespace UnityEditor.Rendering.Universal
                 }
             }
             else if (
-                description.TryGetProperty("EmissiveColor", out vectorProperty) && vectorProperty.magnitude > vectorProperty.w
-                || description.HasAnimationCurve("EmissiveColor.x"))
+                description.TryGetProperty("EmissiveColor", out vectorProperty)
+                    && vectorProperty.magnitude > vectorProperty.w
+                || description.HasAnimationCurve("EmissiveColor.x")
+            )
             {
                 if (description.TryGetProperty("EmissiveFactor", out floatProperty))
                     vectorProperty *= floatProperty;
@@ -164,7 +185,13 @@ namespace UnityEditor.Rendering.Universal
                 material.SetFloat("_Smoothness", 0.0f);
 
             if (PlayerSettings.colorSpace == ColorSpace.Linear)
-                RemapAndTransformColorCurves(description, clips, "DiffuseColor", "_BaseColor", ConvertFloatLinearToGamma);
+                RemapAndTransformColorCurves(
+                    description,
+                    clips,
+                    "DiffuseColor",
+                    "_BaseColor",
+                    ConvertFloatLinearToGamma
+                );
             else
                 RemapColorCurves(description, clips, "DiffuseColor", "_BaseColor");
 
@@ -197,14 +224,37 @@ namespace UnityEditor.Rendering.Universal
                 {
                     Vector4 diffuseColor;
                     description.TryGetProperty("DiffuseColor", out diffuseColor);
-                    clips[i].SetCurve("", typeof(Material), "_BaseColor.r", AnimationCurve.Constant(0.0f, 1.0f, diffuseColor.x));
-                    clips[i].SetCurve("", typeof(Material), "_BaseColor.g", AnimationCurve.Constant(0.0f, 1.0f, diffuseColor.y));
-                    clips[i].SetCurve("", typeof(Material), "_BaseColor.b", AnimationCurve.Constant(0.0f, 1.0f, diffuseColor.z));
+                    clips[i]
+                        .SetCurve(
+                            "",
+                            typeof(Material),
+                            "_BaseColor.r",
+                            AnimationCurve.Constant(0.0f, 1.0f, diffuseColor.x)
+                        );
+                    clips[i]
+                        .SetCurve(
+                            "",
+                            typeof(Material),
+                            "_BaseColor.g",
+                            AnimationCurve.Constant(0.0f, 1.0f, diffuseColor.y)
+                        );
+                    clips[i]
+                        .SetCurve(
+                            "",
+                            typeof(Material),
+                            "_BaseColor.b",
+                            AnimationCurve.Constant(0.0f, 1.0f, diffuseColor.z)
+                        );
                 }
             }
         }
 
-        static void RemapColorCurves(MaterialDescription description, AnimationClip[] clips, string originalPropertyName, string newPropertyName)
+        static void RemapColorCurves(
+            MaterialDescription description,
+            AnimationClip[] clips,
+            string originalPropertyName,
+            string newPropertyName
+        )
         {
             AnimationCurve curve;
             for (int i = 0; i < clips.Length; i++)
@@ -226,7 +276,13 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void RemapAndTransformColorCurves(MaterialDescription description, AnimationClip[] clips, string originalPropertyName, string newPropertyName, System.Func<float, float> converter)
+        static void RemapAndTransformColorCurves(
+            MaterialDescription description,
+            AnimationClip[] clips,
+            string originalPropertyName,
+            string newPropertyName,
+            System.Func<float, float> converter
+        )
         {
             AnimationCurve curve;
             for (int i = 0; i < clips.Length; i++)
@@ -271,7 +327,11 @@ namespace UnityEditor.Rendering.Universal
             curve.keys = keyframes;
         }
 
-        static void SetMaterialTextureProperty(string propertyName, Material material, TexturePropertyDescription textureProperty)
+        static void SetMaterialTextureProperty(
+            string propertyName,
+            Material material,
+            TexturePropertyDescription textureProperty
+        )
         {
             material.SetTexture(propertyName, textureProperty.texture);
             material.SetTextureOffset(propertyName, textureProperty.offset);

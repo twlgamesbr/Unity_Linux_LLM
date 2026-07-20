@@ -38,7 +38,11 @@ namespace Unity.PlatformToolkit
         /// <exception cref="InvalidOperationException">Save is already open.</exception>
         /// <exception cref="ArgumentException">The save name might contain invalid characters, is too long, is null or empty.</exception>
         /// <exception cref="IO.FileNotFoundException">Save with a given name doesn't exist in the <see cref="ISavingSystem"/>.</exception>
-        public static async Task<DataStore> Load(ISavingSystem savingSystem, string saveName, bool createIfNotFound = true)
+        public static async Task<DataStore> Load(
+            ISavingSystem savingSystem,
+            string saveName,
+            bool createIfNotFound = true
+        )
         {
             if (savingSystem is null)
                 throw new ArgumentNullException("Saving system is null");
@@ -75,9 +79,7 @@ namespace Unity.PlatformToolkit
         private SerializableDictionary<string, int> m_Ints = new();
         private SerializableDictionary<string, float> m_Floats = new();
 
-        private DataStore()
-        {
-        }
+        private DataStore() { }
 
         private DataStore(byte[] data)
         {
@@ -198,7 +200,7 @@ namespace Unity.PlatformToolkit
                 Version = 1,
                 Strings = m_Strings,
                 Ints = m_Ints,
-                Floats = m_Floats
+                Floats = m_Floats,
             };
 
             return Encoding.UTF8.GetBytes(JsonUtility.ToJson(saveData));
@@ -214,7 +216,7 @@ namespace Unity.PlatformToolkit
             if (saveData.Version != 1)
                 throw new InvalidOperationException("DataStore version mismatch");
 
-            m_Strings =  saveData.Strings;
+            m_Strings = saveData.Strings;
             m_Ints = saveData.Ints;
             m_Floats = saveData.Floats;
         }

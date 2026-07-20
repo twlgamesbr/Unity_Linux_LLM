@@ -1,8 +1,9 @@
+using UnityEngine.Rendering;
 #if ENABLE_IMAGECONVERSION_MODULE
 using System;
 using System.Reflection;
 #endif
-using UnityEngine.Rendering;
+
 
 namespace UnityEngine.PathTracing.Lightmapping
 {
@@ -13,11 +14,15 @@ namespace UnityEngine.PathTracing.Lightmapping
 #if ENABLE_IMAGECONVERSION_MODULE
             Type encoder = typeof(ImageConversion);
 
-            MethodInfo encodeMethod = encoder.GetMethod("EncodeToR2DInternal", BindingFlags.Static | BindingFlags.NonPublic);
+            MethodInfo encodeMethod = encoder.GetMethod(
+                "EncodeToR2DInternal",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
             if (encodeMethod == null)
                 return Array.Empty<byte>();
 
-            var encodeFunc = (Func<Texture2D, byte[]>)Delegate.CreateDelegate(typeof(Func<Texture2D, byte[]>), encodeMethod);
+            var encodeFunc =
+                (Func<Texture2D, byte[]>)Delegate.CreateDelegate(typeof(Func<Texture2D, byte[]>), encodeMethod);
 
             return encodeFunc(tex);
 #else
@@ -42,11 +47,29 @@ namespace UnityEngine.PathTracing.Lightmapping
             Debug.Assert(false, "GPU readback request not done.");
         }
 
-        internal static void WriteRenderTexture(CommandBuffer cmd, RenderTargetIdentifier renderTex, TextureFormat textureFormat, int width, int height, string path)
+        internal static void WriteRenderTexture(
+            CommandBuffer cmd,
+            RenderTargetIdentifier renderTex,
+            TextureFormat textureFormat,
+            int width,
+            int height,
+            string path
+        )
         {
-            Texture2D readableTex = new Texture2D(width, height, textureFormat, false) { name = "readableTex (WriteRenderTexture)", hideFlags = HideFlags.HideAndDontSave };
+            Texture2D readableTex = new Texture2D(width, height, textureFormat, false)
+            {
+                name = "readableTex (WriteRenderTexture)",
+                hideFlags = HideFlags.HideAndDontSave,
+            };
             cmd.CopyTexture(renderTex, readableTex);
-            cmd.RequestAsyncReadback(readableTex, 0, (AsyncGPUReadbackRequest request) => { ReadbackTexture(readableTex, request); });
+            cmd.RequestAsyncReadback(
+                readableTex,
+                0,
+                (AsyncGPUReadbackRequest request) =>
+                {
+                    ReadbackTexture(readableTex, request);
+                }
+            );
             cmd.WaitAllAsyncReadbackRequests();
             Graphics.ExecuteCommandBuffer(cmd);
             cmd.Clear();

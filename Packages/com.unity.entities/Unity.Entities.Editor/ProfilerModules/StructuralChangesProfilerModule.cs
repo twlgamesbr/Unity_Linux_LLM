@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Editor.Bridge;
+using Unity.Profiling.Editor;
 using UnityEditor;
 using UnityEditor.Profiling;
 using UnityEditorInternal;
 using UnityEngine.UIElements;
-using Unity.Editor.Bridge;
 using static Unity.Entities.EntitiesProfiler;
 using static Unity.Entities.StructuralChangesProfiler;
-
-using Unity.Profiling.Editor;
 
 namespace Unity.Entities.Editor
 {
@@ -24,8 +23,8 @@ namespace Unity.Entities.Editor
 
             public bool IsRecording => ProfilerWindowBridge.IsRecording(ProfilerWindow);
 
-            public StructuralChangesProfilerViewController(ProfilerWindow profilerWindow) :
-                base(profilerWindow)
+            public StructuralChangesProfilerViewController(ProfilerWindow profilerWindow)
+                : base(profilerWindow)
             {
                 m_View = new StructuralChangesProfilerModuleView();
                 m_View.SearchFinished = () => Update();
@@ -34,7 +33,11 @@ namespace Unity.Entities.Editor
 
             protected override VisualElement CreateView()
             {
-                Analytics.SendEditorEvent(Analytics.Window.Profiler, Analytics.EventType.ProfilerModuleCreate, Analytics.StructuralChangesProfilerModuleName);
+                Analytics.SendEditorEvent(
+                    Analytics.Window.Profiler,
+                    Analytics.EventType.ProfilerModuleCreate,
+                    Analytics.StructuralChangesProfilerModuleName
+                );
                 return m_View.Create();
             }
 
@@ -75,34 +78,53 @@ namespace Unity.Entities.Editor
             new ProfilerCounterDescriptor(k_SetSharedComponentCounterName, k_CategoryName),
         };
 
-        public StructuralChangesProfilerModule() :
-            base(ProfilerCounters, ProfilerModuleChartType.StackedTimeArea, new[] { k_CategoryName })
-        {
-        }
+        public StructuralChangesProfilerModule()
+            : base(ProfilerCounters, ProfilerModuleChartType.StackedTimeArea, new[] { k_CategoryName }) { }
 
-        public override ProfilerModuleViewController CreateDetailsViewController() => new StructuralChangesProfilerViewController(ProfilerWindow);
+        public override ProfilerModuleViewController CreateDetailsViewController() =>
+            new StructuralChangesProfilerViewController(ProfilerWindow);
     }
 
     partial class StructuralChangesProfilerModule
     {
-        static readonly string s_NoFrameDataAvailable = L10n.Tr("No frame data available. Select a frame from the charts above to see its details here.");
-        static readonly string s_DisplayingFrameDataDisabled = L10n.Tr("Displaying of frame data disabled while recording. To see the data, pause recording.");
+        static readonly string s_NoFrameDataAvailable = L10n.Tr(
+            "No frame data available. Select a frame from the charts above to see its details here."
+        );
+        static readonly string s_DisplayingFrameDataDisabled = L10n.Tr(
+            "Displaying of frame data disabled while recording. To see the data, pause recording."
+        );
 
-        static IEnumerable<TreeViewItemData<StructuralChangesProfilerTreeViewItemData>> GetTreeViewData(RawFrameDataView frame)
+        static IEnumerable<TreeViewItemData<StructuralChangesProfilerTreeViewItemData>> GetTreeViewData(
+            RawFrameDataView frame
+        )
         {
-            var worldsData = GetSessionMetaData<WorldData>(frame, EntitiesProfiler.Guid, (int)DataTag.WorldData).Distinct().ToDictionary(x => x.SequenceNumber, x => x);
-            var systemsData = GetSessionMetaData<SystemData>(frame, EntitiesProfiler.Guid, (int)DataTag.SystemData).Distinct().ToDictionary(x => x.System, x => x);
-            foreach (var structuralChangeData in GetFrameMetaData<StructuralChangeData>(frame, StructuralChangesProfiler.Guid, 0))
+            var worldsData = GetSessionMetaData<WorldData>(frame, EntitiesProfiler.Guid, (int)DataTag.WorldData)
+                .Distinct()
+                .ToDictionary(x => x.SequenceNumber, x => x);
+            var systemsData = GetSessionMetaData<SystemData>(frame, EntitiesProfiler.Guid, (int)DataTag.SystemData)
+                .Distinct()
+                .ToDictionary(x => x.System, x => x);
+            foreach (
+                var structuralChangeData in GetFrameMetaData<StructuralChangeData>(
+                    frame,
+                    StructuralChangesProfiler.Guid,
+                    0
+                )
+            )
             {
                 if (worldsData.TryGetValue(structuralChangeData.WorldSequenceNumber, out var worldData))
                 {
                     systemsData.TryGetValue(structuralChangeData.ExecutingSystem, out var systemData);
-                    yield return new TreeViewItemData<StructuralChangesProfilerTreeViewItemData>(0, new StructuralChangesProfilerTreeViewItemData(worldData, systemData, structuralChangeData));
+                    yield return new TreeViewItemData<StructuralChangesProfilerTreeViewItemData>(
+                        0,
+                        new StructuralChangesProfilerTreeViewItemData(worldData, systemData, structuralChangeData)
+                    );
                 }
             }
         }
 
-        static IEnumerable<T> GetSessionMetaData<T>(RawFrameDataView frame, Guid guid, int tag) where T : unmanaged
+        static IEnumerable<T> GetSessionMetaData<T>(RawFrameDataView frame, Guid guid, int tag)
+            where T : unmanaged
         {
             var metaDataCount = frame.GetSessionMetaDataCount(guid, tag);
             for (var metaDataIter = 0; metaDataIter < metaDataCount; ++metaDataIter)
@@ -113,7 +135,8 @@ namespace Unity.Entities.Editor
             }
         }
 
-        static IEnumerable<T> GetFrameMetaData<T>(RawFrameDataView frame, Guid guid, int tag) where T : unmanaged
+        static IEnumerable<T> GetFrameMetaData<T>(RawFrameDataView frame, Guid guid, int tag)
+            where T : unmanaged
         {
             var metaDataCount = frame.GetFrameMetaDataCount(guid, tag);
             for (var metaDataIter = 0; metaDataIter < metaDataCount; ++metaDataIter)

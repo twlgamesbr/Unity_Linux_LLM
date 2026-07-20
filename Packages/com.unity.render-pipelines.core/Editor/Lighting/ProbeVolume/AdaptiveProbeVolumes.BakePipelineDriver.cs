@@ -18,10 +18,22 @@ namespace UnityEngine.Rendering
                 Debug.Assert(UnityEditorInternal.InternalEditorUtility.CurrentThreadIsMainThread());
 
                 m_BakePipelineDriverType = Type.GetType("UnityEditor.LightBaking.BakePipelineDriver, UnityEditor");
-                Debug.Assert(m_BakePipelineDriverType != null, "Unexpected, could not find the type UnityEditor.LightBaking.BakePipelineDriver");
-                m_StageNameType = m_BakePipelineDriverType.GetNestedType("StageName", BindingFlags.NonPublic | BindingFlags.Public);
-                Debug.Assert(m_StageNameType is { IsEnum: true }, "Unexpected, could not find the nested enum StageName on BakePipelineDriver");
-                Debug.Assert(IsStageNameEnumConsistent(m_StageNameType), "Unexpected, StageName enum is not consistent with BakePipelineDriver.StageName enum");
+                Debug.Assert(
+                    m_BakePipelineDriverType != null,
+                    "Unexpected, could not find the type UnityEditor.LightBaking.BakePipelineDriver"
+                );
+                m_StageNameType = m_BakePipelineDriverType.GetNestedType(
+                    "StageName",
+                    BindingFlags.NonPublic | BindingFlags.Public
+                );
+                Debug.Assert(
+                    m_StageNameType is { IsEnum: true },
+                    "Unexpected, could not find the nested enum StageName on BakePipelineDriver"
+                );
+                Debug.Assert(
+                    IsStageNameEnumConsistent(m_StageNameType),
+                    "Unexpected, StageName enum is not consistent with BakePipelineDriver.StageName enum"
+                );
                 m_BakePipelineDriver = Activator.CreateInstance(m_BakePipelineDriverType, nonPublic: true);
                 Debug.Assert(m_BakePipelineDriver != null, "Unexpected, could not new up a BakePipelineDriver");
             }
@@ -44,30 +56,41 @@ namespace UnityEngine.Rendering
             internal void Step(ref float progress, ref StageName stage) =>
                 Update(true, true, true, out progress, out stage);
 
-            void SetEnableBakedLightmaps(bool enable) =>
-                InvokeMethod(new object[] { enable }, out _);
+            void SetEnableBakedLightmaps(bool enable) => InvokeMethod(new object[] { enable }, out _);
 
-            void SetEnablePatching(bool enable) =>
-                InvokeMethod(new object[] { enable }, out _);
+            void SetEnablePatching(bool enable) => InvokeMethod(new object[] { enable }, out _);
 
-            void Update(bool isOnDemandBakeInProgress, bool isOnDemandBakeAsync, bool shouldBeRunning,
-                out float progress, out StageName stage)
+            void Update(
+                bool isOnDemandBakeInProgress,
+                bool isOnDemandBakeAsync,
+                bool shouldBeRunning,
+                out float progress,
+                out StageName stage
+            )
             {
                 progress = -1.0f;
                 stage = StageName.Invalid;
-                object[] parameters = { isOnDemandBakeInProgress, isOnDemandBakeAsync, shouldBeRunning, progress,
-                    Enum.ToObject(m_StageNameType, (int)stage) };
+                object[] parameters =
+                {
+                    isOnDemandBakeInProgress,
+                    isOnDemandBakeAsync,
+                    shouldBeRunning,
+                    progress,
+                    Enum.ToObject(m_StageNameType, (int)stage),
+                };
                 InvokeMethod(parameters, out _);
                 progress = (float)parameters[3];
                 stage = (StageName)Convert.ToInt32(parameters[4]);
             }
 
-            public void Dispose() =>
-                InvokeMethod(new object[] { }, out _);
+            public void Dispose() => InvokeMethod(new object[] { }, out _);
 
             bool InvokeMethod(object[] parameters, out object result, [CallerMemberName] string methodName = "")
             {
-                MethodInfo methodInfo = m_BakePipelineDriverType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                MethodInfo methodInfo = m_BakePipelineDriverType.GetMethod(
+                    methodName,
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                );
                 bool gotMethod = methodInfo != null;
                 Debug.Assert(gotMethod, $"Unexpected, could not find {methodName} on BakePipelineDriver");
 
@@ -86,7 +109,7 @@ namespace UnityEngine.Rendering
                 Bake = 3,
                 PostProcess = 4,
                 AdditionalBake = 5,
-                Done = 6
+                Done = 6,
             }
 
             // If StageName is not kept in sync, this should return false

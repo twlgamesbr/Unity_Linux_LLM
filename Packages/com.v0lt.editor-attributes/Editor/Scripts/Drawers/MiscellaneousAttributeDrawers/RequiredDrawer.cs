@@ -1,11 +1,11 @@
 using System;
-using UnityEngine;
-using UnityEditor;
 using System.Reflection;
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
-using UnityEditor.SceneManagement;
 using EditorAttributes.Editor.Utility;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace EditorAttributes.Editor
@@ -16,13 +16,19 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The attached field must derive from <b>UnityEngine.Object</b>", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The attached field must derive from <b>UnityEngine.Object</b>",
+                    HelpBoxMessageType.Error
+                );
 
             var requiredAttribute = attribute as RequiredAttribute;
 
             VisualElement root = new();
             PropertyField propertyField = CreatePropertyField(property);
-            HelpBox helpBox = new($"The field <b>{property.displayName}</b> must be assigned", HelpBoxMessageType.Error);
+            HelpBox helpBox = new(
+                $"The field <b>{property.displayName}</b> must be assigned",
+                HelpBoxMessageType.Error
+            );
             Button fixButton = new(() => FixNullReference(property, requiredAttribute)) { text = "Fix" };
 
             if (CanApplyGlobalColor)
@@ -40,16 +46,20 @@ namespace EditorAttributes.Editor
             DoRequiredCheck();
             propertyField.RegisterCallback<SerializedPropertyChangeEvent>((changeEvent) => DoRequiredCheck());
 
-            void DoRequiredCheck() => helpBox.style.display = property.objectReferenceValue == null ? DisplayStyle.Flex : DisplayStyle.None;
+            void DoRequiredCheck() =>
+                helpBox.style.display = property.objectReferenceValue == null ? DisplayStyle.Flex : DisplayStyle.None;
 
             return root;
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.ObjectReference;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.ObjectReference;
 
         private void FixNullReference(SerializedProperty property, RequiredAttribute requiredAttribute)
         {
-            Type memberType = ReflectionUtils.GetMemberInfoType(ReflectionUtils.GetValidMemberInfo(property.name, property));
+            Type memberType = ReflectionUtils.GetMemberInfoType(
+                ReflectionUtils.GetValidMemberInfo(property.name, property)
+            );
 
             foreach (var target in property.serializedObject.targetObjects)
             {
@@ -105,7 +115,10 @@ namespace EditorAttributes.Editor
                         break;
 
                     case ReferenceFixMode.Custom:
-                        objectReference = ReflectionUtils.FindFunction(requiredAttribute.CustomFixFunctionName, target).Invoke(target, null) as Object;
+                        objectReference =
+                            ReflectionUtils
+                                .FindFunction(requiredAttribute.CustomFixFunctionName, target)
+                                .Invoke(target, null) as Object;
                         break;
                 }
 
@@ -113,7 +126,10 @@ namespace EditorAttributes.Editor
                 property.serializedObject.ApplyModifiedProperties();
 
                 if (property.objectReferenceValue == null)
-                    Debug.LogWarning($"Could not find a valid reference of the type <b>{memberType}</b> with <b>ReferenceFixMode.{requiredAttribute.FixMode}</b>", target);
+                    Debug.LogWarning(
+                        $"Could not find a valid reference of the type <b>{memberType}</b> with <b>ReferenceFixMode.{requiredAttribute.FixMode}</b>",
+                        target
+                    );
 
                 void GetSelf()
                 {
@@ -161,7 +177,11 @@ namespace EditorAttributes.Editor
             }
         }
 
-        private bool IsReferenceFixValid(SerializedProperty property, Type targetType, RequiredAttribute requiredAttribute)
+        private bool IsReferenceFixValid(
+            SerializedProperty property,
+            Type targetType,
+            RequiredAttribute requiredAttribute
+        )
         {
             bool isComponent = typeof(Component).IsAssignableFrom(targetType);
             bool isScriptableObject = typeof(ScriptableObject).IsAssignableFrom(targetType);
@@ -177,12 +197,18 @@ namespace EditorAttributes.Editor
                 case ReferenceFixMode.Scene:
                     if (isScriptableObject)
                     {
-                        Debug.LogError($"<b>{requiredAttribute.FixMode}</b> is not valid on <b>ScriptableObjects</b>", targetObject);
+                        Debug.LogError(
+                            $"<b>{requiredAttribute.FixMode}</b> is not valid on <b>ScriptableObjects</b>",
+                            targetObject
+                        );
                         return false;
                     }
                     else if (!isComponent)
                     {
-                        Debug.LogError($"<b>{requiredAttribute.FixMode}</b> is not valid on the type <b>{targetType}</b>", targetObject);
+                        Debug.LogError(
+                            $"<b>{requiredAttribute.FixMode}</b> is not valid on the type <b>{targetType}</b>",
+                            targetObject
+                        );
                         return false;
                     }
                     break;
@@ -210,7 +236,10 @@ namespace EditorAttributes.Editor
                     }
                     else if (!typeof(Object).IsAssignableFrom(functionInfo.ReturnType))
                     {
-                        Debug.LogError($"The function <b>{functionName}</b> needs to return a <b>Unity.Object</b>", targetObject);
+                        Debug.LogError(
+                            $"The function <b>{functionName}</b> needs to return a <b>Unity.Object</b>",
+                            targetObject
+                        );
                         return false;
                     }
                     break;

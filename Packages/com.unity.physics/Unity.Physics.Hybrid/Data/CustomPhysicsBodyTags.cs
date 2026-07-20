@@ -17,6 +17,7 @@ namespace Unity.Physics.Authoring
         /// Gets a <see cref="CustomPhysicsBodyTags"/> instance with all tags set to true.
         /// </summary>
         public static CustomPhysicsBodyTags Everything => new CustomPhysicsBodyTags { Value = unchecked((byte)~0) };
+
         /// <summary>
         /// Gets a <see cref="CustomPhysicsBodyTags"/> instance with all tags set to false.
         /// </summary>
@@ -24,18 +25,25 @@ namespace Unity.Physics.Authoring
 
         /// <summary> Tag 0 </summary>
         public bool Tag00;
+
         /// <summary> Tag 1 </summary>
         public bool Tag01;
+
         /// <summary> Tag 2 </summary>
         public bool Tag02;
+
         /// <summary> Tag 3 </summary>
         public bool Tag03;
+
         /// <summary> Tag 4 </summary>
         public bool Tag04;
+
         /// <summary> Tag 5 </summary>
         public bool Tag05;
+
         /// <summary> Tag 6 </summary>
         public bool Tag06;
+
         /// <summary> Tag 7 </summary>
         public bool Tag07;
 
@@ -46,15 +54,24 @@ namespace Unity.Physics.Authoring
                 SafetyChecks.CheckInRangeAndThrow(i, new int2(0, 7), nameof(i));
                 switch (i)
                 {
-                    case 0: return Tag00;
-                    case 1: return Tag01;
-                    case 2: return Tag02;
-                    case 3: return Tag03;
-                    case 4: return Tag04;
-                    case 5: return Tag05;
-                    case 6: return Tag06;
-                    case 7: return Tag07;
-                    default: return default;
+                    case 0:
+                        return Tag00;
+                    case 1:
+                        return Tag01;
+                    case 2:
+                        return Tag02;
+                    case 3:
+                        return Tag03;
+                    case 4:
+                        return Tag04;
+                    case 5:
+                        return Tag05;
+                    case 6:
+                        return Tag06;
+                    case 7:
+                        return Tag07;
+                    default:
+                        return default;
                 }
             }
             set
@@ -62,14 +79,30 @@ namespace Unity.Physics.Authoring
                 SafetyChecks.CheckInRangeAndThrow(i, new int2(0, 7), nameof(i));
                 switch (i)
                 {
-                    case 0: Tag00 = value; break;
-                    case 1: Tag01 = value; break;
-                    case 2: Tag02 = value; break;
-                    case 3: Tag03 = value; break;
-                    case 4: Tag04 = value; break;
-                    case 5: Tag05 = value; break;
-                    case 6: Tag06 = value; break;
-                    case 7: Tag07 = value; break;
+                    case 0:
+                        Tag00 = value;
+                        break;
+                    case 1:
+                        Tag01 = value;
+                        break;
+                    case 2:
+                        Tag02 = value;
+                        break;
+                    case 3:
+                        Tag03 = value;
+                        break;
+                    case 4:
+                        Tag04 = value;
+                        break;
+                    case 5:
+                        Tag05 = value;
+                        break;
+                    case 6:
+                        Tag06 = value;
+                        break;
+                    case 7:
+                        Tag07 = value;
+                        break;
                 }
             }
         }

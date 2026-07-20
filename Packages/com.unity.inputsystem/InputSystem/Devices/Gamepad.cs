@@ -81,22 +81,22 @@ namespace UnityEngine.InputSystem.LowLevel
         public static FourCC Format => new FourCC('G', 'P', 'A', 'D');
 
         // On Sony consoles, we use the platform defaults as the gamepad-wide short default names.
-        #if UNITY_PS4 || UNITY_PS5
+#if UNITY_PS4 || UNITY_PS5
         internal const string ButtonSouthShortDisplayName = "Cross";
         internal const string ButtonNorthShortDisplayName = "Triangle";
         internal const string ButtonWestShortDisplayName = "Square";
         internal const string ButtonEastShortDisplayName = "Circle";
-        #elif UNITY_SWITCH
+#elif UNITY_SWITCH
         internal const string ButtonSouthShortDisplayName = "B";
         internal const string ButtonNorthShortDisplayName = "X";
         internal const string ButtonWestShortDisplayName = "Y";
         internal const string ButtonEastShortDisplayName = "A";
-        #else
+#else
         internal const string ButtonSouthShortDisplayName = "A";
         internal const string ButtonNorthShortDisplayName = "Y";
         internal const string ButtonWestShortDisplayName = "X";
         internal const string ButtonEastShortDisplayName = "B";
-        #endif
+#endif
 
         /// <summary>
         /// Button bit mask.
@@ -113,18 +113,85 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <seealso cref="Gamepad.leftStickButton"/>
         /// <seealso cref="Gamepad.rightStickButton"/>
         ////REVIEW: do we want the name to correspond to what's actually on the device?
-        [InputControl(name = "dpad", layout = "Dpad", usage = "Hatswitch", displayName = "D-Pad", format = "BIT", sizeInBits = 4, bit = 0)]
-        [InputControl(name = "buttonSouth", layout = "Button", bit = (uint)GamepadButton.South, usages = new[] { "PrimaryAction", "Submit" }, aliases = new[] { "a", "cross" }, displayName = "Button South", shortDisplayName = ButtonSouthShortDisplayName)]
-        [InputControl(name = "buttonWest", layout = "Button", bit = (uint)GamepadButton.West, usage = "SecondaryAction", aliases = new[] { "x", "square" }, displayName = "Button West", shortDisplayName = ButtonWestShortDisplayName)]
-        [InputControl(name = "buttonNorth", layout = "Button", bit = (uint)GamepadButton.North, aliases = new[] { "y", "triangle" }, displayName = "Button North", shortDisplayName = ButtonNorthShortDisplayName)]
-        [InputControl(name = "buttonEast", layout = "Button", bit = (uint)GamepadButton.East, usages = new[] { "Back", "Cancel" }, aliases = new[] { "b", "circle" }, displayName = "Button East", shortDisplayName = ButtonEastShortDisplayName)]
+        [InputControl(
+            name = "dpad",
+            layout = "Dpad",
+            usage = "Hatswitch",
+            displayName = "D-Pad",
+            format = "BIT",
+            sizeInBits = 4,
+            bit = 0
+        )]
+        [InputControl(
+            name = "buttonSouth",
+            layout = "Button",
+            bit = (uint)GamepadButton.South,
+            usages = new[] { "PrimaryAction", "Submit" },
+            aliases = new[] { "a", "cross" },
+            displayName = "Button South",
+            shortDisplayName = ButtonSouthShortDisplayName
+        )]
+        [InputControl(
+            name = "buttonWest",
+            layout = "Button",
+            bit = (uint)GamepadButton.West,
+            usage = "SecondaryAction",
+            aliases = new[] { "x", "square" },
+            displayName = "Button West",
+            shortDisplayName = ButtonWestShortDisplayName
+        )]
+        [InputControl(
+            name = "buttonNorth",
+            layout = "Button",
+            bit = (uint)GamepadButton.North,
+            aliases = new[] { "y", "triangle" },
+            displayName = "Button North",
+            shortDisplayName = ButtonNorthShortDisplayName
+        )]
+        [InputControl(
+            name = "buttonEast",
+            layout = "Button",
+            bit = (uint)GamepadButton.East,
+            usages = new[] { "Back", "Cancel" },
+            aliases = new[] { "b", "circle" },
+            displayName = "Button East",
+            shortDisplayName = ButtonEastShortDisplayName
+        )]
         ////FIXME: 'Press' naming is inconsistent with 'Button' naming
-        [InputControl(name = "leftStickPress", layout = "Button", bit = (uint)GamepadButton.LeftStick, displayName = "Left Stick Press")]
-        [InputControl(name = "rightStickPress", layout = "Button", bit = (uint)GamepadButton.RightStick, displayName = "Right Stick Press")]
-        [InputControl(name = "leftShoulder", layout = "Button", bit = (uint)GamepadButton.LeftShoulder, displayName = "Left Shoulder", shortDisplayName = "LB")]
-        [InputControl(name = "rightShoulder", layout = "Button", bit = (uint)GamepadButton.RightShoulder, displayName = "Right Shoulder", shortDisplayName = "RB")]
+        [InputControl(
+            name = "leftStickPress",
+            layout = "Button",
+            bit = (uint)GamepadButton.LeftStick,
+            displayName = "Left Stick Press"
+        )]
+        [InputControl(
+            name = "rightStickPress",
+            layout = "Button",
+            bit = (uint)GamepadButton.RightStick,
+            displayName = "Right Stick Press"
+        )]
+        [InputControl(
+            name = "leftShoulder",
+            layout = "Button",
+            bit = (uint)GamepadButton.LeftShoulder,
+            displayName = "Left Shoulder",
+            shortDisplayName = "LB"
+        )]
+        [InputControl(
+            name = "rightShoulder",
+            layout = "Button",
+            bit = (uint)GamepadButton.RightShoulder,
+            displayName = "Right Shoulder",
+            shortDisplayName = "RB"
+        )]
         ////REVIEW: seems like these two should get less ambiguous names as well
-        [InputControl(name = "start", layout = "Button", bit = (uint)GamepadButton.Start, usage = "Menu", displayName = "Start")]
+        [InputControl(
+            name = "start",
+            layout = "Button",
+            bit = (uint)GamepadButton.Start,
+            usage = "Menu",
+            displayName = "Start"
+        )]
         [InputControl(name = "select", layout = "Button", bit = (uint)GamepadButton.Select, displayName = "Select")]
         [FieldOffset(0)]
         public uint buttons;
@@ -134,7 +201,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </summary>
         /// <remarks>Each axis of the 2D vector's range goes from -1 to 1. 0 represents the stick in its center position, and -1 or 1 represents the the stick pushed to its extent in each direction along the axis.</remarks>
         /// <seealso cref="Gamepad.leftStick"/>
-        [InputControl(layout = "Stick", usage = "Primary2DMotion", processors = "stickDeadzone", displayName = "Left Stick", shortDisplayName = "LS")]
+        [InputControl(
+            layout = "Stick",
+            usage = "Primary2DMotion",
+            processors = "stickDeadzone",
+            displayName = "Left Stick",
+            shortDisplayName = "LS"
+        )]
         [FieldOffset(4)]
         public Vector2 leftStick;
 
@@ -145,7 +218,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// 0 represents the stick in its center position.
         /// -1 or 1 represents the stick pushed to its extent in each direction along the axis.</remarks>
         /// <seealso cref="Gamepad.rightStick"/>
-        [InputControl(layout = "Stick", usage = "Secondary2DMotion", processors = "stickDeadzone", displayName = "Right Stick", shortDisplayName = "RS")]
+        [InputControl(
+            layout = "Stick",
+            usage = "Secondary2DMotion",
+            processors = "stickDeadzone",
+            displayName = "Right Stick",
+            shortDisplayName = "RS"
+        )]
         [FieldOffset(12)]
         public Vector2 rightStick;
 
@@ -158,7 +237,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// 0 represents the trigger in its neutral position.
         /// 1 represents the trigger in its fully pressed position.</remarks>
         /// <seealso cref="Gamepad.leftTrigger"/>
-        [InputControl(layout = "Button", format = "FLT", usage = "SecondaryTrigger", displayName = "Left Trigger", shortDisplayName = "LT")]
+        [InputControl(
+            layout = "Button",
+            format = "FLT",
+            usage = "SecondaryTrigger",
+            displayName = "Left Trigger",
+            shortDisplayName = "LT"
+        )]
         [FieldOffset(20)]
         public float leftTrigger;
 
@@ -169,7 +254,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// 0 represents the trigger in its neutral position.
         /// 1 represents the trigger in its fully pressed position.</remarks>
         /// <seealso cref="Gamepad.rightTrigger"/>
-        [InputControl(layout = "Button", format = "FLT", usage = "SecondaryTrigger", displayName = "Right Trigger", shortDisplayName = "RT")]
+        [InputControl(
+            layout = "Button",
+            format = "FLT",
+            usage = "SecondaryTrigger",
+            displayName = "Right Trigger",
+            shortDisplayName = "RT"
+        )]
         [FieldOffset(24)]
         public float rightTrigger;
 
@@ -285,7 +376,6 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </remarks>
         West = 7,
 
-
         /// <summary>
         /// The button pressed by pressing down the left stick on a gamepad.
         /// </summary>
@@ -336,6 +426,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Identical to <see cref="West"/>, which is the generic name of this button.
         /// </remarks>
         X = West,
+
         /// <summary>
         /// The Y button on an Xbox controller.
         /// </summary>
@@ -343,6 +434,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Identical to <see cref="North"/>, which is the generic name of this button.
         /// </remarks>
         Y = North,
+
         /// <summary>
         /// The A button on an Xbox controller.
         /// </summary>
@@ -350,6 +442,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Identical to <see cref="South"/>, which is the generic name of this button.
         /// </remarks>
         A = South,
+
         /// <summary>
         /// The B button on an Xbox controller.
         /// </summary>
@@ -365,6 +458,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Identical to <see cref="South"/>, which is the generic name of this button.
         /// </remarks>
         Cross = South,
+
         /// <summary>
         /// The square button on a PlayStation controller.
         /// </summary>
@@ -372,6 +466,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Identical to <see cref="West"/>, which is the generic name of this button.
         /// </remarks>
         Square = West,
+
         /// <summary>
         /// The triangle button on a PlayStation controller.
         /// </summary>
@@ -379,6 +474,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Identical to <see cref="North"/>, which is the generic name of this button.
         /// </remarks>
         Triangle = North,
+
         /// <summary>
         /// The circle button on a PlayStation controller.
         /// </summary>
@@ -587,22 +683,38 @@ namespace UnityEngine.InputSystem
             {
                 switch (button)
                 {
-                    case GamepadButton.North: return buttonNorth;
-                    case GamepadButton.South: return buttonSouth;
-                    case GamepadButton.East: return buttonEast;
-                    case GamepadButton.West: return buttonWest;
-                    case GamepadButton.Start: return startButton;
-                    case GamepadButton.Select: return selectButton;
-                    case GamepadButton.LeftShoulder: return leftShoulder;
-                    case GamepadButton.RightShoulder: return rightShoulder;
-                    case GamepadButton.LeftTrigger: return leftTrigger;
-                    case GamepadButton.RightTrigger: return rightTrigger;
-                    case GamepadButton.LeftStick: return leftStickButton;
-                    case GamepadButton.RightStick: return rightStickButton;
-                    case GamepadButton.DpadUp: return dpad.up;
-                    case GamepadButton.DpadDown: return dpad.down;
-                    case GamepadButton.DpadLeft: return dpad.left;
-                    case GamepadButton.DpadRight: return dpad.right;
+                    case GamepadButton.North:
+                        return buttonNorth;
+                    case GamepadButton.South:
+                        return buttonSouth;
+                    case GamepadButton.East:
+                        return buttonEast;
+                    case GamepadButton.West:
+                        return buttonWest;
+                    case GamepadButton.Start:
+                        return startButton;
+                    case GamepadButton.Select:
+                        return selectButton;
+                    case GamepadButton.LeftShoulder:
+                        return leftShoulder;
+                    case GamepadButton.RightShoulder:
+                        return rightShoulder;
+                    case GamepadButton.LeftTrigger:
+                        return leftTrigger;
+                    case GamepadButton.RightTrigger:
+                        return rightTrigger;
+                    case GamepadButton.LeftStick:
+                        return leftStickButton;
+                    case GamepadButton.RightStick:
+                        return rightStickButton;
+                    case GamepadButton.DpadUp:
+                        return dpad.up;
+                    case GamepadButton.DpadDown:
+                        return dpad.down;
+                    case GamepadButton.DpadLeft:
+                        return dpad.left;
+                    case GamepadButton.DpadRight:
+                        return dpad.right;
                     default:
                         throw new InvalidEnumArgumentException(nameof(button), (int)button, typeof(GamepadButton));
                 }
@@ -639,7 +751,7 @@ namespace UnityEngine.InputSystem
         ///
         /// Alternately, for querying a single gamepad, you can use <see cref="current"/> for example.
         /// </remarks>
-        public new static ReadOnlyArray<Gamepad> all => new ReadOnlyArray<Gamepad>(s_Gamepads, 0, s_GamepadCount);
+        public static new ReadOnlyArray<Gamepad> all => new ReadOnlyArray<Gamepad>(s_Gamepads, 0, s_GamepadCount);
 
         /// <inheritdoc />
         protected override void FinishSetup()
@@ -734,8 +846,10 @@ namespace UnityEngine.InputSystem
                 ArrayHelpers.EraseAtWithCapacity(s_Gamepads, ref s_GamepadCount, index);
             else
             {
-                Debug.Assert(false,
-                    $"Gamepad {this} seems to not have been added but is being removed (gamepad list: {string.Join(", ", all)})"); // Put in else to not allocate on normal path.
+                Debug.Assert(
+                    false,
+                    $"Gamepad {this} seems to not have been added but is being removed (gamepad list: {string.Join(", ", all)})"
+                ); // Put in else to not allocate on normal path.
             }
         }
 

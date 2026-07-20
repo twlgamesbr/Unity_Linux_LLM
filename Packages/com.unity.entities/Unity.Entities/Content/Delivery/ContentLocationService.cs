@@ -18,19 +18,23 @@ namespace Unity.Entities.Content
             /// The location resolving process has not begun.
             /// </summary>
             None,
+
             /// <summary>
             /// The location is currently resolving.
             /// </summary>
             Resolving,
+
             /// <summary>
             /// The location has been resolved and is ready.
             /// </summary>
             Complete,
+
             /// <summary>
             /// The location failed to resolve.
             /// </summary>
-            Failed
+            Failed,
         }
+
         /// <summary>
         /// The download service name.  Each service name must be unique.
         /// </summary>
@@ -55,6 +59,7 @@ namespace Unity.Entities.Content
             /// The current state.
             /// </summary>
             public ResolvingState State;
+
             /// <summary>
             /// The resolved location.  This is only valid when the State is Complete.
             /// </summary>
@@ -103,15 +108,20 @@ namespace Unity.Entities.Content
         /// <param name="idPtr">The pointer to the <seealso cref="RemoteContentId"/> array.</param>
         /// <param name="count">The number of ids.</param>
         /// <returns>True if the set is found. False, otherwise.</returns>
-        unsafe public abstract bool TryGetLocationSet(in FixedString512Bytes setName, out RemoteContentId* idPtr, out int count);
+        public abstract unsafe bool TryGetLocationSet(
+            in FixedString512Bytes setName,
+            out RemoteContentId* idPtr,
+            out int count
+        );
+
         /// <summary>
         /// Method called during the main process loop from the delivery service.
         /// </summary>
         public virtual void Process() { }
+
         ///<inheritdoc/>
         public virtual void Dispose() { }
     }
-
 
     internal struct RemoteContentCatalogData
     {
@@ -130,5 +140,4 @@ namespace Unity.Entities.Content
         public BlobArray<RemoteContentLocationData> RemoteContentLocations;
         public BlobArray<RemoteContentSetData> ContentSets;
     }
-
 }

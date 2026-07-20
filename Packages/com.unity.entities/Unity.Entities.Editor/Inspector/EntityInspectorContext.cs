@@ -10,10 +10,8 @@ namespace Unity.Entities.Editor
     {
         const string k_InvalidEntityName = "{ Invalid Entity }";
 
-        const WorldFlags k_ReadonlyFlags = WorldFlags.Conversion
-                                         | WorldFlags.Shadow
-                                         | WorldFlags.Staging
-                                         | WorldFlags.Streaming;
+        const WorldFlags k_ReadonlyFlags =
+            WorldFlags.Conversion | WorldFlags.Shadow | WorldFlags.Staging | WorldFlags.Streaming;
 
         internal World World { get; private set; }
         internal EntityContainer EntityContainer { get; private set; }
@@ -66,8 +64,10 @@ namespace Unity.Entities.Editor
             EntityManager.SetName(Entity, name);
         }
 
-        internal UnityEngine.Object GetSourceObject()
-            => this.TryGetComponentData(out EntityGuid guid) ? EditorUtility.EntityIdToObject(guid.OriginatingEntityId) : null;
+        internal UnityEngine.Object GetSourceObject() =>
+            this.TryGetComponentData(out EntityGuid guid)
+                ? EditorUtility.EntityIdToObject(guid.OriginatingEntityId)
+                : null;
 
         static bool IsWorldReadOnly(World world)
         {

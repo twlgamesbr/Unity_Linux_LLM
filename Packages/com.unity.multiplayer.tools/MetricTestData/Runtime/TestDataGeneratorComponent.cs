@@ -19,7 +19,8 @@ namespace Unity.Multiplayer.Tools.MetricTestData
 #endif
     class TestDataGeneratorComponent : MonoBehaviour
     {
-        [SerializeField] internal TestDataGeneratorType m_type;
+        [SerializeField]
+        internal TestDataGeneratorType m_type;
 
         TestDataDispatcher m_Dispatcher;
 

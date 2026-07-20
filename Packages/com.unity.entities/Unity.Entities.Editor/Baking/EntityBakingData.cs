@@ -10,9 +10,7 @@ namespace Unity.Entities.Editor
         public Entity[] AdditionalEntities;
         public EntityManager EntityManager;
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         public static bool operator ==(EntityBakingData lhs, EntityBakingData rhs)
         {
@@ -26,7 +24,9 @@ namespace Unity.Entities.Editor
 
         public bool Equals(EntityBakingData other)
         {
-            return PrimaryEntity.Equals(other.PrimaryEntity) && Equals(AdditionalEntities, other.AdditionalEntities) && Equals(EntityManager, other.EntityManager);
+            return PrimaryEntity.Equals(other.PrimaryEntity)
+                && Equals(AdditionalEntities, other.AdditionalEntities)
+                && Equals(EntityManager, other.EntityManager);
         }
 
         public override bool Equals(object obj)

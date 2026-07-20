@@ -71,7 +71,8 @@ namespace UnityEngine.Rendering
 
                 // Overwrite settings with data from profile
                 minBrickSize = ProbeVolumeBakingSet.GetMinBrickSize(bakingSet.minDistanceBetweenProbes);
-                cellSizeInMeters = ProbeVolumeBakingSet.GetCellSizeInBricks(bakingSet.simplificationLevels) * minBrickSize;
+                cellSizeInMeters =
+                    ProbeVolumeBakingSet.GetCellSizeInBricks(bakingSet.simplificationLevels) * minBrickSize;
                 probeOffset = bakingSet.probeOffset;
             }
 
@@ -80,7 +81,9 @@ namespace UnityEngine.Rendering
                 var subDivColors = probeRefVolume.subdivisionDebugColors;
 
                 if (_brickMeshGizmo == null)
-                    _brickMeshGizmo = new MeshGizmo((int)(Mathf.Pow(3, ProbeBrickIndex.kMaxSubdivisionLevels) * MeshGizmo.vertexCountPerCube));
+                    _brickMeshGizmo = new MeshGizmo(
+                        (int)(Mathf.Pow(3, ProbeBrickIndex.kMaxSubdivisionLevels) * MeshGizmo.vertexCountPerCube)
+                    );
                 _brickMeshGizmo.Clear();
 
                 if (debugDisplay.realtimeSubdivision)
@@ -99,7 +102,7 @@ namespace UnityEngine.Rendering
                     var cullCtx = new ProbeVolume.CellCullingContext
                     {
                         ActiveCamera = null,
-                        FrustumPlanes = stackalloc Plane[6]
+                        FrustumPlanes = stackalloc Plane[6],
                     };
                     ProbeVolume.PrepareCellCulling(ref cullCtx);
 
@@ -152,7 +155,7 @@ namespace UnityEngine.Rendering
                     var cullCtx = new ProbeVolume.CellCullingContext
                     {
                         ActiveCamera = null,
-                        FrustumPlanes = stackalloc Plane[6]
+                        FrustumPlanes = stackalloc Plane[6],
                     };
                     ProbeVolume.PrepareCellCulling(ref cullCtx);
 
@@ -164,7 +167,8 @@ namespace UnityEngine.Rendering
                         Color color;
                         if (debugDisplay.displayCellStreamingScore)
                         {
-                            float lerpFactor = (cell.streamingInfo.streamingScore - minStreamingScore) / streamingScoreRange;
+                            float lerpFactor =
+                                (cell.streamingInfo.streamingScore - minStreamingScore) / streamingScoreRange;
                             color = Color.Lerp(s_HighScoreColor, s_LowScoreColor, lerpFactor);
                         }
                         else
@@ -175,8 +179,14 @@ namespace UnityEngine.Rendering
                                 color = cell.loaded ? s_LoadedColor : s_UnloadedColor;
                         }
 
-                        var positionF = new Vector4(cell.desc.position.x, cell.desc.position.y, cell.desc.position.z, 0.0f);
-                        var center = (Vector4)probeOffset + positionF * cellSizeInMeters + cellSizeInMeters * 0.5f * Vector4.one;
+                        var positionF = new Vector4(
+                            cell.desc.position.x,
+                            cell.desc.position.y,
+                            cell.desc.position.z,
+                            0.0f
+                        );
+                        var center =
+                            (Vector4)probeOffset + positionF * cellSizeInMeters + cellSizeInMeters * 0.5f * Vector4.one;
                         DrawAndAddCell(_cellMeshGizmo, center, color, cellSizeInMeters);
                     }
                 }
@@ -195,14 +205,27 @@ namespace UnityEngine.Rendering
             meshGizmo.AddWireCube(center, Vector3.one * cellSizeInMeters, wireColor);
         }
 
-        static void DrawAndAddBrick(MeshGizmo meshGizmo, ProbeBrickIndex.Brick brick, float minBrickSize, Vector3 probeOffset, Color[] subDivColors)
+        static void DrawAndAddBrick(
+            MeshGizmo meshGizmo,
+            ProbeBrickIndex.Brick brick,
+            float minBrickSize,
+            Vector3 probeOffset,
+            Color[] subDivColors
+        )
         {
             if (brick.subdivisionLevel < 0)
                 return;
 
             float brickSize = minBrickSize * ProbeReferenceVolume.CellSize(brick.subdivisionLevel);
             Vector3 scaledSize = new Vector3(brickSize, brickSize, brickSize);
-            Vector3 scaledPos = probeOffset + new Vector3(brick.position.x * minBrickSize, brick.position.y * minBrickSize, brick.position.z * minBrickSize) + scaledSize / 2;
+            Vector3 scaledPos =
+                probeOffset
+                + new Vector3(
+                    brick.position.x * minBrickSize,
+                    brick.position.y * minBrickSize,
+                    brick.position.z * minBrickSize
+                )
+                + scaledSize / 2;
             meshGizmo.AddWireCube(scaledPos, scaledSize, subDivColors[brick.subdivisionLevel]);
         }
     }

@@ -9,7 +9,13 @@ namespace UnityEngine.InputSystem.LowLevel
     {
         public static FourCC kFormat => new FourCC('J', 'O', 'Y');
 
-        [InputControl(name = "trigger", displayName = "Trigger", layout = "Button", usages = new[] { "PrimaryTrigger", "PrimaryAction", "Submit" }, bit = (int)Button.Trigger)]
+        [InputControl(
+            name = "trigger",
+            displayName = "Trigger",
+            layout = "Button",
+            usages = new[] { "PrimaryTrigger", "PrimaryAction", "Submit" },
+            bit = (int)Button.Trigger
+        )]
         public int buttons;
 
         [InputControl(displayName = "Stick", layout = "Stick", usage = "Primary2DMotion", processors = "stickDeadzone")]
@@ -23,7 +29,7 @@ namespace UnityEngine.InputSystem.LowLevel
             HatSwitchLeft,
             HatSwitchRight,
 
-            Trigger
+            Trigger,
         }
 
         public FourCC format => kFormat;
@@ -120,7 +126,7 @@ namespace UnityEngine.InputSystem
         /// is invalidated.
         /// </remarks>
         /// <seealso cref="current"/>
-        public new static ReadOnlyArray<Joystick> all => new ReadOnlyArray<Joystick>(s_Joysticks, 0, s_JoystickCount);
+        public static new ReadOnlyArray<Joystick> all => new ReadOnlyArray<Joystick>(s_Joysticks, 0, s_JoystickCount);
 
         /// <summary>
         /// Called when the joystick has been created but before it is added
@@ -177,8 +183,10 @@ namespace UnityEngine.InputSystem
                 ArrayHelpers.EraseAtWithCapacity(s_Joysticks, ref s_JoystickCount, index);
             else
             {
-                Debug.Assert(false,
-                    $"Joystick {this} seems to not have been added but is being removed (joystick list: {string.Join(", ", all)})"); // Put in else to not allocate on normal path.
+                Debug.Assert(
+                    false,
+                    $"Joystick {this} seems to not have been added but is being removed (joystick list: {string.Join(", ", all)})"
+                ); // Put in else to not allocate on normal path.
             }
         }
 

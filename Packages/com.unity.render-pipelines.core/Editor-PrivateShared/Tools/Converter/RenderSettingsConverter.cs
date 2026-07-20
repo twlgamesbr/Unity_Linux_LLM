@@ -28,6 +28,7 @@ namespace UnityEditor.Rendering.Converter
                 return EditorGUIUtility.IconContent(iconAttribute.path)?.image as Texture2D;
             }
         }
+
         public void OnClicked()
         {
             SettingsService.OpenProjectSettings("Project/Quality");
@@ -39,31 +40,30 @@ namespace UnityEditor.Rendering.Converter
     {
         public void Scan(Action<List<IRenderPipelineConverterItem>> onScanFinish)
         {
-            List<IRenderPipelineConverterItem> renderPipelineConverterItems = new ();
-            QualitySettings.ForEach((index, name) =>
-            {
-                var item = new RenderSettingsConverterItem
+            List<IRenderPipelineConverterItem> renderPipelineConverterItems = new();
+            QualitySettings.ForEach(
+                (index, name) =>
                 {
-                    qualityLevelIndex = index,
-                    name = name
-                };
+                    var item = new RenderSettingsConverterItem { qualityLevelIndex = index, name = name };
 
-                if (QualitySettings.renderPipeline is not RenderPipelineAsset)
-                {
-                    item.isEnabled = true;
-                    item.info = $"Create a Render Pipeline Asset for Quality Level {index} ({name})";
+                    if (QualitySettings.renderPipeline is not RenderPipelineAsset)
+                    {
+                        item.isEnabled = true;
+                        item.info = $"Create a Render Pipeline Asset for Quality Level {index} ({name})";
+                    }
+                    else
+                    {
+                        item.info = "Quality Level already references a Render Pipeline Asset.";
+                        item.isEnabled = false;
+                        item.isDisabledMessage = item.info;
+                    }
+                    renderPipelineConverterItems.Add(item);
                 }
-                else
-                {
-                    item.info = "Quality Level already references a Render Pipeline Asset.";
-                    item.isEnabled = false;
-                    item.isDisabledMessage = item.info;
-                }
-                renderPipelineConverterItems.Add(item);
-            });
+            );
 
             onScanFinish?.Invoke(renderPipelineConverterItems);
         }
+
         public abstract bool isEnabled { get; }
 
         public abstract string isDisabledMessage { get; }
@@ -76,7 +76,8 @@ namespace UnityEditor.Rendering.Converter
             {
                 if (CreateRPAssetForQualityLevel(qualityLevelItem.qualityLevelIndex, out message))
                 {
-                    message = "Each Quality Level now has a new, unique RP asset, but all share identical settings. Modify each asset to restore your performance/quality tiers.";
+                    message =
+                        "Each Quality Level now has a new, unique RP asset, but all share identical settings. Modify each asset to restore your performance/quality tiers.";
                     return Status.Warning;
                 }
             }
@@ -126,7 +127,7 @@ namespace UnityEditor.Rendering.Converter
         }
 
         protected abstract RenderPipelineAsset CreateAsset(string name);
-        
+
         protected abstract void SetPipelineSettings(RenderPipelineAsset asset);
     }
 }

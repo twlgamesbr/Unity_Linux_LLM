@@ -18,82 +18,79 @@ namespace Unity.Editor.Legacy
             return s_Text;
         }
 
-        public static void Vector2Label(
-            string label,
-            Vector2 value,
-            params GUILayoutOption[] options)
+        public static void Vector2Label(string label, Vector2 value, params GUILayoutOption[] options)
         {
             Vector2Label(TempContent(label), value, new bool2(), options);
         }
 
-        public static void Vector2Label(
-            string label,
-            Vector2 value,
-            bool2 mixed,
-            params GUILayoutOption[] options)
+        public static void Vector2Label(string label, Vector2 value, bool2 mixed, params GUILayoutOption[] options)
         {
             Vector2Label(TempContent(label), value, mixed, options);
         }
 
-        static void Vector2Label(
-            GUIContent label,
-            Vector2 value,
-            bool2 mixed,
-            params GUILayoutOption[] options)
+        static void Vector2Label(GUIContent label, Vector2 value, bool2 mixed, params GUILayoutOption[] options)
         {
-            CustomEditorGUI.Vector2Label(EditorGUILayoutBridge.s_LastRect = EditorGUILayout.GetControlRect(true, EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector2, label), EditorStyles.numberField, options), label, value, mixed);
+            CustomEditorGUI.Vector2Label(
+                EditorGUILayoutBridge.s_LastRect = EditorGUILayout.GetControlRect(
+                    true,
+                    EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector2, label),
+                    EditorStyles.numberField,
+                    options
+                ),
+                label,
+                value,
+                mixed
+            );
         }
 
-        public static void Vector3Label(
-            string label,
-            Vector3 value,
-            params GUILayoutOption[] options)
+        public static void Vector3Label(string label, Vector3 value, params GUILayoutOption[] options)
         {
             Vector3Label(TempContent(label), value, new bool3(), options);
         }
 
-        public static void Vector3Label(
-            string label,
-            Vector3 value,
-            bool3 mixed,
-            params GUILayoutOption[] options)
+        public static void Vector3Label(string label, Vector3 value, bool3 mixed, params GUILayoutOption[] options)
         {
             Vector3Label(TempContent(label), value, mixed, options);
         }
 
-        static void Vector3Label(
-            GUIContent label,
-            Vector3 value,
-            bool3 mixed,
-            params GUILayoutOption[] options)
+        static void Vector3Label(GUIContent label, Vector3 value, bool3 mixed, params GUILayoutOption[] options)
         {
-            CustomEditorGUI.Vector3Label(EditorGUILayoutBridge.s_LastRect = EditorGUILayout.GetControlRect(true, EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3, label), EditorStyles.numberField, options), label, value, mixed);
+            CustomEditorGUI.Vector3Label(
+                EditorGUILayoutBridge.s_LastRect = EditorGUILayout.GetControlRect(
+                    true,
+                    EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3, label),
+                    EditorStyles.numberField,
+                    options
+                ),
+                label,
+                value,
+                mixed
+            );
         }
 
-        public static void Vector4Label(
-            string label,
-            Vector4 value,
-            params GUILayoutOption[] options)
+        public static void Vector4Label(string label, Vector4 value, params GUILayoutOption[] options)
         {
             Vector4Label(TempContent(label), value, new bool4(), options);
         }
 
-        public static void Vector4Label(
-            string label,
-            Vector4 value,
-            bool4 mixed,
-            params GUILayoutOption[] options)
+        public static void Vector4Label(string label, Vector4 value, bool4 mixed, params GUILayoutOption[] options)
         {
             Vector4Label(TempContent(label), value, mixed, options);
         }
 
-        public static void Vector4Label(
-            GUIContent label,
-            Vector4 value,
-            bool4 mixed,
-            params GUILayoutOption[] options)
+        public static void Vector4Label(GUIContent label, Vector4 value, bool4 mixed, params GUILayoutOption[] options)
         {
-            CustomEditorGUI.Vector4Label(EditorGUILayoutBridge.s_LastRect = EditorGUILayout.GetControlRect(true, EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector4, label), EditorStyles.numberField, options), label, value, mixed);
+            CustomEditorGUI.Vector4Label(
+                EditorGUILayoutBridge.s_LastRect = EditorGUILayout.GetControlRect(
+                    true,
+                    EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector4, label),
+                    EditorStyles.numberField,
+                    options
+                ),
+                label,
+                value,
+                mixed
+            );
         }
     }
 
@@ -109,7 +106,7 @@ namespace Unity.Editor.Legacy
             new GUIContent("X"),
             new GUIContent("Y"),
             new GUIContent("Z"),
-            new GUIContent("W")
+            new GUIContent("W"),
         };
 
         static readonly GUIContent s_TempContent1 = new GUIContent();
@@ -188,7 +185,12 @@ namespace Unity.Editor.Legacy
 
             if (EditorGUIUtility.wideMode)
             {
-                var labelPosition = new Rect(totalPosition.x + EditorGUIBridge.indent, totalPosition.y, EditorGUIUtility.labelWidth - EditorGUIBridge.indent, 18f);
+                var labelPosition = new Rect(
+                    totalPosition.x + EditorGUIBridge.indent,
+                    totalPosition.y,
+                    EditorGUIUtility.labelWidth - EditorGUIBridge.indent,
+                    18f
+                );
                 var rect = totalPosition;
                 rect.xMin += EditorGUIUtility.labelWidth + 2f;
                 if (columns == 2)
@@ -205,7 +207,12 @@ namespace Unity.Editor.Legacy
                 return rect;
             }
 
-            var labelPosition1 = new Rect(totalPosition.x + EditorGUIBridge.indent, totalPosition.y, totalPosition.width - EditorGUIBridge.indent, 18f);
+            var labelPosition1 = new Rect(
+                totalPosition.x + EditorGUIBridge.indent,
+                totalPosition.y,
+                totalPosition.width - EditorGUIBridge.indent,
+                18f
+            );
             EditorGUI.HandlePrefixLabel(totalPosition, labelPosition1, label, id);
 
             var rect1 = totalPosition;
@@ -228,14 +235,17 @@ namespace Unity.Editor.Legacy
             MultiFloatFieldAsLabel(position, s_VectorComponentsLabels, s_VectorComponents, s_IsMixed, 4);
         }
 
-        static void MultiFloatFieldAsLabel(Rect position, GUIContent[] subLabels, float[] values, bool[] mixed, int count)
+        static void MultiFloatFieldAsLabel(
+            Rect position,
+            GUIContent[] subLabels,
+            float[] values,
+            bool[] mixed,
+            int count
+        )
         {
             var length = count;
             var num = (position.width - (float)(length - 1) * 4f) / (float)length;
-            var position1 = new Rect(position)
-            {
-                width = num
-            };
+            var position1 = new Rect(position) { width = num };
             var labelWidth = EditorGUIUtility.labelWidth;
             var indentLevel = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
@@ -244,7 +254,13 @@ namespace Unity.Editor.Legacy
                 EditorGUIUtility.labelWidth = CalcPrefixLabelWidth(subLabels[index], (GUIStyle)null);
                 var richText = EditorStyles.label.richText;
                 EditorStyles.label.richText = true;
-                EditorGUI.LabelField(position1, subLabels[index], mixed[index] ? EditorGUIBridge.mixedValueContent : TempContent($"<b>{values[index]:0.##}</b>", null, string.Empty));
+                EditorGUI.LabelField(
+                    position1,
+                    subLabels[index],
+                    mixed[index]
+                        ? EditorGUIBridge.mixedValueContent
+                        : TempContent($"<b>{values[index]:0.##}</b>", null, string.Empty)
+                );
                 EditorStyles.label.richText = richText;
                 position1.x += num + 4f;
             }

@@ -5,7 +5,6 @@ using System.Reflection;
 using Unity.Entities.UI;
 using UnityEditor;
 using UnityEngine.UIElements;
-
 using SettingsProvider = UnityEditor.SettingsProvider;
 
 namespace Unity.Entities.Editor
@@ -25,10 +24,17 @@ namespace Unity.Entities.Editor
             }
         }
 
-        static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate("Preferences/preferences-window");
-        static readonly VisualElementTemplate s_SettingTemplate = PackageResources.LoadTemplate("Preferences/preferences-setting");
-        static readonly VisualElementTemplate s_ValueTemplate = PackageResources.LoadTemplate("Preferences/preferences-value");
-        static readonly Dictionary<string, List<SettingWrapper>> s_Settings = new Dictionary<string, List<SettingWrapper>>();
+        static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate(
+            "Preferences/preferences-window"
+        );
+        static readonly VisualElementTemplate s_SettingTemplate = PackageResources.LoadTemplate(
+            "Preferences/preferences-setting"
+        );
+        static readonly VisualElementTemplate s_ValueTemplate = PackageResources.LoadTemplate(
+            "Preferences/preferences-value"
+        );
+        static readonly Dictionary<string, List<SettingWrapper>> s_Settings =
+            new Dictionary<string, List<SettingWrapper>>();
         static readonly List<string> s_Keywords = new List<string>();
         static readonly string k_Prefix = $"{typeof(Settings<T>).FullName}: ";
 
@@ -59,7 +65,8 @@ namespace Unity.Entities.Editor
             if (typeof(T) == typeof(SettingsAttribute))
             {
                 UnityEngine.Debug.LogError(
-                    $"{k_Prefix} Constraint of type `{nameof(SettingsAttribute)}` is not allowed, you must use a derived type of type `{nameof(SettingsAttribute)}`.");
+                    $"{k_Prefix} Constraint of type `{nameof(SettingsAttribute)}` is not allowed, you must use a derived type of type `{nameof(SettingsAttribute)}`."
+                );
                 return;
             }
 
@@ -73,17 +80,21 @@ namespace Unity.Entities.Editor
                 if (!typeof(ISetting).IsAssignableFrom(type))
                 {
                     Debug.LogError(
-                        $"{k_Prefix} type `{type.FullName}` must implement `{typeof(ISetting)}` in order to be used as a setting.");
+                        $"{k_Prefix} type `{type.FullName}` must implement `{typeof(ISetting)}` in order to be used as a setting."
+                    );
                     continue;
                 }
 
                 var typedUserSettings = userSettingsType.MakeGenericType(type);
-                var getOrCreateMethod =
-                    typedUserSettings.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public);
+                var getOrCreateMethod = typedUserSettings.GetMethod(
+                    "GetOrCreate",
+                    BindingFlags.Static | BindingFlags.Public
+                );
                 if (null == getOrCreateMethod)
                 {
                     Debug.LogError(
-                        $"{k_Prefix} Could not find the `GetOrCreate` method on `{userSettingsType.FullName}` class.");
+                        $"{k_Prefix} Could not find the `GetOrCreate` method on `{userSettingsType.FullName}` class."
+                    );
                     continue;
                 }
 
@@ -97,7 +108,10 @@ namespace Unity.Entities.Editor
                         s_Keywords.Add(attribute.SectionName);
                     }
 
-                    var wrapper = new SettingWrapper(setting, type.GetCustomAttributes<InternalSettingAttribute>().Any());
+                    var wrapper = new SettingWrapper(
+                        setting,
+                        type.GetCustomAttributes<InternalSettingAttribute>().Any()
+                    );
                     list.Add(wrapper);
                     var keywords = wrapper.Setting.GetSearchKeywords();
                     if (keywords != null && keywords.Length > 0)
@@ -121,7 +135,8 @@ namespace Unity.Entities.Editor
 
         protected virtual string Title { get; }
 
-        protected Settings(string path, SettingsScope scope, IEnumerable<string> keywords = null) : base(PathForScope(scope) + path, scope, s_Keywords.Concat(keywords ?? Array.Empty<string>()))
+        protected Settings(string path, SettingsScope scope, IEnumerable<string> keywords = null)
+            : base(PathForScope(scope) + path, scope, s_Keywords.Concat(keywords ?? Array.Empty<string>()))
         {
             Title = path.Replace("/", " ");
         }
@@ -153,7 +168,9 @@ namespace Unity.Entities.Editor
                     property.SetAttributeFilter(AttributeFilter);
                     property.SetTarget(target);
                     property.OnChanged += (element, path) => target.OnSettingChanged(path);
-                    property.RegisterCallback<GeometryChangedEvent>(e => StylingUtility.AlignInspectorLabelWidth(property));
+                    property.RegisterCallback<GeometryChangedEvent>(e =>
+                        StylingUtility.AlignInspectorLabelWidth(property)
+                    );
                     content.Add(value);
                 }
                 settings.Add(setting);

@@ -1,22 +1,21 @@
 using System.Threading.Tasks;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Initialization
 {
     [DisallowMultipleComponent]
@@ -74,9 +73,7 @@ namespace NPCSystem.Initialization
 
         async Task LoadGameplaySceneAsync()
         {
-            if (
-                !_loadAdditiveGameplayScene || string.IsNullOrWhiteSpace(_additiveGameplaySceneName)
-            )
+            if (!_loadAdditiveGameplayScene || string.IsNullOrWhiteSpace(_additiveGameplaySceneName))
                 return;
 
             string sceneName = _additiveGameplaySceneName.Trim();
@@ -84,10 +81,7 @@ namespace NPCSystem.Initialization
             if (scene.IsValid() && scene.isLoaded)
                 return;
 
-            AsyncOperation operation = SceneManager.LoadSceneAsync(
-                sceneName,
-                LoadSceneMode.Additive
-            );
+            AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
             if (operation == null)
             {
                 _lastLoadStatus = $"Failed to start gameplay scene load: {sceneName}.";

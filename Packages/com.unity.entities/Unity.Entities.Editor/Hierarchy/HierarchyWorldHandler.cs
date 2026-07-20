@@ -12,8 +12,9 @@ namespace Unity.Entities.Editor
     internal class HierarchyWorldHandler : HierarchyNodeTypeHandler, IHierarchyEditorNodeTypeHandler
     {
         const string k_WorldUssClass = "hierarchy-item--world-node";
-        const string k_StyleSheetPath = "Packages/com.unity.entities/Editor Default Resources/uss/Hierarchy/hierarchy-entity-item.uss";
-        
+        const string k_StyleSheetPath =
+            "Packages/com.unity.entities/Editor Default Resources/uss/Hierarchy/hierarchy-entity-item.uss";
+
         // Set to a high number, so that World nodes are displayed after Scenes.
         const int k_DefaultHierarchySortIndex = int.MaxValue;
 
@@ -25,7 +26,7 @@ namespace Unity.Entities.Editor
 
         HierarchySubSceneRuntimeHandler m_SubSceneHandler;
         HierarchyEntityHandler m_EntityHandler;
-        
+
         public override string GetNodeTypeName() => nameof(World);
 
         protected override void Initialize()
@@ -68,10 +69,11 @@ namespace Unity.Entities.Editor
 
             base.Dispose(disposing);
         }
-        
+
         void OnUpdate() => UpdateRegisteredWorlds();
+
         internal void RegisterAllHierarchySystems() => UpdateRegisteredWorlds();
-        
+
         void UpdateRegisteredWorlds()
         {
             var filterMask = HierarchyEntitiesSettings.GetTypesOfWorldsShown();
@@ -79,11 +81,11 @@ namespace Unity.Entities.Editor
             {
                 if (m_WorldToNodeMap.ContainsKey(world))
                     continue;
-                if ((GetMainFlag(world) & filterMask) == 0) 
+                if ((GetMainFlag(world) & filterMask) == 0)
                     continue;
 
                 var systemGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-                
+
                 // Make sure TransformSystemGroup is created, since UpdateHierarchySystem is updating after it.
                 // Without creating the system group, we will see warnings when UpdateHierarchySystem cannot find the TransformSystemGroup.
                 if (world.GetExistingSystemManaged<TransformSystemGroup>() == null)
@@ -91,13 +93,13 @@ namespace Unity.Entities.Editor
                     var transformSystemGroup = world.CreateSystemManaged<TransformSystemGroup>();
                     systemGroup.AddSystemToUpdateList(transformSystemGroup);
                 }
-                
+
                 var hierarchySystem = world.GetOrCreateSystem<UpdateHierarchySystem>();
                 systemGroup.AddSystemToUpdateList(hierarchySystem);
                 hierarchySystem.Update(world.Unmanaged);
             }
         }
-        
+
         internal static WorldFlags GetMainFlag(World world)
         {
             if ((world.Flags & WorldFlags.Shadow) != 0)
@@ -122,7 +124,11 @@ namespace Unity.Entities.Editor
         [InitializeOnLoadMethod, UsedImplicitly]
         internal static void RegisterHierarchyHandlers()
         {
-            EditorApplication.delayCall += Unity.Hierarchy.Editor.HierarchyWindow.RegisterNodeTypeHandler<HierarchyWorldHandler>;
+            EditorApplication.delayCall += Unity
+                .Hierarchy
+                .Editor
+                .HierarchyWindow
+                .RegisterNodeTypeHandler<HierarchyWorldHandler>;
         }
 
         [UsedImplicitly]
@@ -221,7 +227,7 @@ namespace Unity.Entities.Editor
                 if (m_EntityHandler == null)
                     m_EntityHandler = Hierarchy.GetOrCreateNodeTypeHandler<HierarchyEntityHandler>();
                 m_EntityHandler.ClearMappings(world);
-                
+
                 if (m_SubSceneHandler == null)
                     m_SubSceneHandler = Hierarchy.GetOrCreateNodeTypeHandler<HierarchySubSceneRuntimeHandler>();
                 m_SubSceneHandler.ClearMappings(world);
@@ -233,32 +239,64 @@ namespace Unity.Entities.Editor
 
         #region IHierarchyEditorNodeTypeHandler
 
-        bool IHierarchyEditorNodeTypeHandler.CanSetName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnSetName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node, string name) => false;
+        bool IHierarchyEditorNodeTypeHandler.CanSetName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) =>
+            false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnSetName(
+            HierarchyView view,
+            in Unity.Hierarchy.HierarchyNode node,
+            string name
+        ) => false;
 
         string IHierarchyEditorNodeTypeHandler.GetDisplayName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node)
         {
             return m_NodeToWorldMap.TryGetValue(node, out var world) ? world.Name : Hierarchy.GetName(in node);
         }
 
-        bool IHierarchyEditorNodeTypeHandler. CanDoubleClick(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnDoubleClick(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanCut(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnCut(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanCopy(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnCopy(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanPaste(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnPaste(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanPasteAsChild(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnPasteAsChild(HierarchyView view, bool keepWorldPos) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanDuplicate(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnDuplicate(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanDelete(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnDelete(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler. AcceptParent(HierarchyView view, in Unity.Hierarchy.HierarchyNode parent) => false;
-        bool IHierarchyEditorNodeTypeHandler.AcceptChild(HierarchyView view, in Unity.Hierarchy.HierarchyNode child) => false;
+        bool IHierarchyEditorNodeTypeHandler.CanDoubleClick(
+            HierarchyView view,
+            in Unity.Hierarchy.HierarchyNode node
+        ) => false;
 
-        bool IHierarchyEditorNodeTypeHandler.CanStartDrag(HierarchyView view, ReadOnlySpan<Unity.Hierarchy.HierarchyNode> nodes)
+        bool IHierarchyEditorNodeTypeHandler.OnDoubleClick(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) =>
+            false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanCut(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnCut(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanCopy(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnCopy(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanPaste(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnPaste(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanPasteAsChild(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnPasteAsChild(HierarchyView view, bool keepWorldPos) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanDuplicate(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnDuplicate(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanDelete(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnDelete(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.AcceptParent(
+            HierarchyView view,
+            in Unity.Hierarchy.HierarchyNode parent
+        ) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.AcceptChild(HierarchyView view, in Unity.Hierarchy.HierarchyNode child) =>
+            false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanStartDrag(
+            HierarchyView view,
+            ReadOnlySpan<Unity.Hierarchy.HierarchyNode> nodes
+        )
         {
             bool canStartDrag = false;
             foreach (var node in nodes)
@@ -271,12 +309,28 @@ namespace Unity.Entities.Editor
         }
 
         void IHierarchyEditorNodeTypeHandler.OnStartDrag(in HierarchyViewDragAndDropSetupData data) { }
-        DragVisualMode IHierarchyEditorNodeTypeHandler.CanDrop(in HierarchyViewDragAndDropHandlingData data) => DragVisualMode.None;
+
+        DragVisualMode IHierarchyEditorNodeTypeHandler.CanDrop(in HierarchyViewDragAndDropHandlingData data) =>
+            DragVisualMode.None;
+
         bool IHierarchyEditorNodeTypeHandler.CanFindReferences(HierarchyView view) => false;
+
         bool IHierarchyEditorNodeTypeHandler.OnFindReferences(HierarchyView view) => false;
-        DragVisualMode IHierarchyEditorNodeTypeHandler.OnDrop(in HierarchyViewDragAndDropHandlingData data) => DragVisualMode.None;
-        void IHierarchyEditorNodeTypeHandler.GetTooltip(HierarchyViewItem item, bool isFiltering, StringBuilder tooltip) { }
-        void IHierarchyEditorNodeTypeHandler.PopulateContextMenu(HierarchyView view, HierarchyViewItem item, DropdownMenu menu) { }
+
+        DragVisualMode IHierarchyEditorNodeTypeHandler.OnDrop(in HierarchyViewDragAndDropHandlingData data) =>
+            DragVisualMode.None;
+
+        void IHierarchyEditorNodeTypeHandler.GetTooltip(
+            HierarchyViewItem item,
+            bool isFiltering,
+            StringBuilder tooltip
+        ) { }
+
+        void IHierarchyEditorNodeTypeHandler.PopulateContextMenu(
+            HierarchyView view,
+            HierarchyViewItem item,
+            DropdownMenu menu
+        ) { }
 
         #endregion
     }

@@ -13,7 +13,7 @@ namespace Unity.Entities.Editor
 
         public SystemDependenciesTab(SystemProxy systemProxy) => SystemProxy = systemProxy;
 
-        public void OnTabVisibilityChanged(bool isVisible) {}
+        public void OnTabVisibilityChanged(bool isVisible) { }
     }
 
     [UsedImplicitly]
@@ -46,7 +46,7 @@ namespace Unity.Entities.Editor
             var readSection = new FoldoutWithoutActionButton
             {
                 HeaderName = { text = L10n.Tr("Read Dependencies") },
-                MatchingCount = { text = readList.Count.ToString() }
+                MatchingCount = { text = readList.Count.ToString() },
             };
             readSection.Q<Toggle>().AddToClassList(UssClasses.FoldoutWithoutActionButton.ToggleNoBorder);
             sectionElement.Add(readSection);
@@ -54,7 +54,7 @@ namespace Unity.Entities.Editor
             var writeSection = new FoldoutWithoutActionButton
             {
                 HeaderName = { text = L10n.Tr("Write Dependencies") },
-                MatchingCount = { text = writeList.Count.ToString() }
+                MatchingCount = { text = writeList.Count.ToString() },
             };
             writeSection.Q<Toggle>().AddToClassList(UssClasses.FoldoutWithoutActionButton.ToggleNoBorder);
             sectionElement.Add(writeSection);

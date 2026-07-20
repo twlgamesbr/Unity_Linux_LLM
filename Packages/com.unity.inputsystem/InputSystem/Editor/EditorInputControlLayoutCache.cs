@@ -40,7 +40,10 @@ namespace UnityEngine.InputSystem.Editor
             get
             {
                 Refresh();
-                return s_Usages.Select(pair => new Tuple<string, IEnumerable<string>>(pair.Key, pair.Value.Select(x => x.ToString())));
+                return s_Usages.Select(pair => new Tuple<string, IEnumerable<string>>(
+                    pair.Key,
+                    pair.Value.Select(x => x.ToString())
+                ));
             }
         }
 
@@ -126,8 +129,10 @@ namespace UnityEngine.InputSystem.Editor
             // Grab type.
             var type = layout.type;
             Debug.Assert(type != null, "Layout should have associated type");
-            Debug.Assert(typeof(InputControl).IsAssignableFrom(type),
-                "Layout's associated type should be derived from InputControl");
+            Debug.Assert(
+                typeof(InputControl).IsAssignableFrom(type),
+                "Layout's associated type should be derived from InputControl"
+            );
 
             return layout.GetValueType();
         }
@@ -303,7 +308,7 @@ namespace UnityEngine.InputSystem.Editor
                 if (layout.m_BaseLayouts.length > 1)
                     throw new NotImplementedException();
 
-                for (var baseLayoutName = layout.baseLayouts.FirstOrDefault(); !baseLayoutName.IsEmpty();)
+                for (var baseLayoutName = layout.baseLayouts.FirstOrDefault(); !baseLayoutName.IsEmpty(); )
                 {
                     if (s_ProductLayouts.Contains(baseLayoutName))
                     {
@@ -337,13 +342,11 @@ namespace UnityEngine.InputSystem.Editor
             new Dictionary<InternedString, List<OptionalControl>>();
         private static readonly Dictionary<InternedString, InlinedArray<InputDeviceMatcher>> s_DeviceMatchers =
             new Dictionary<InternedString, InlinedArray<InputDeviceMatcher>>();
-        private static Dictionary<InternedString, Texture2D> s_Icons =
-            new Dictionary<InternedString, Texture2D>();
+        private static Dictionary<InternedString, Texture2D> s_Icons = new Dictionary<InternedString, Texture2D>();
 
         // We keep a map of the devices which a derived from a base device.
         private static readonly Dictionary<InternedString, HashSet<InternedString>> s_DeviceChildLayouts =
             new Dictionary<InternedString, HashSet<InternedString>>();
-
 
         // We keep a map of all unique usages we find in layouts and also
         // retain a list of the layouts they are used with.
@@ -364,7 +367,12 @@ namespace UnityEngine.InputSystem.Editor
                 //       controls present on the base.
                 // Only controls which belong to UI-facing layouts are included, as optional controls are used solely by
                 // the InputControlPickerDropdown UI
-                if (control.isFirstDefinedInThisLayout && !control.isModifyingExistingControl && !control.layout.IsEmpty() && !layout.hideInUI)
+                if (
+                    control.isFirstDefinedInThisLayout
+                    && !control.isModifyingExistingControl
+                    && !control.layout.IsEmpty()
+                    && !layout.hideInUI
+                )
                 {
                     foreach (var baseLayout in layout.baseLayouts)
                         AddOptionalControlRecursive(baseLayout, ref control);
@@ -411,7 +419,10 @@ namespace UnityEngine.InputSystem.Editor
             }
         }
 
-        private static void AddOptionalControlRecursive(InternedString layoutName, ref InputControlLayout.ControlItem controlItem)
+        private static void AddOptionalControlRecursive(
+            InternedString layoutName,
+            ref InputControlLayout.ControlItem controlItem
+        )
         {
             Debug.Assert(!controlItem.isModifyingExistingControl);
             Debug.Assert(!controlItem.layout.IsEmpty());
@@ -440,7 +451,7 @@ namespace UnityEngine.InputSystem.Editor
                 }
             }
             if (!alreadyPresent)
-                list.Add(new OptionalControl {name = controlItem.name, layout = controlItem.layout});
+                list.Add(new OptionalControl { name = controlItem.name, layout = controlItem.layout });
         }
 
         /// <summary>

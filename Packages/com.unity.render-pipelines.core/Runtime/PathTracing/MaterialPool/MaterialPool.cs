@@ -10,7 +10,11 @@ using UnityEngine.Rendering.UnifiedRayTracing;
 
 namespace UnityEngine.PathTracing.Core
 {
-    internal enum UVChannel : uint { UV0 = 0, UV1 = 1 };
+    internal enum UVChannel : uint
+    {
+        UV0 = 0,
+        UV1 = 1,
+    };
 
     internal class MaterialPool : IDisposable
     {
@@ -65,7 +69,14 @@ namespace UnityEngine.PathTracing.Core
             public UVChannel AlbedoAndEmissionUVChannel;
         };
 
-        private enum TextureType { Albedo, Emission, Transmission, LightCookie, LightCubemap };
+        private enum TextureType
+        {
+            Albedo,
+            Emission,
+            Transmission,
+            LightCookie,
+            LightCubemap,
+        };
 
         private class MaterialEntry
         {
@@ -75,9 +86,15 @@ namespace UnityEngine.PathTracing.Core
             }
 
             public readonly BlockAllocator.Allocation IndexInBuffer;
-            public TextureSlotAllocator.TextureLocation AlbedoTextureLocation = TextureSlotAllocator.TextureLocation.Invalid;
-            public TextureSlotAllocator.TextureLocation EmissionTextureLocation = TextureSlotAllocator.TextureLocation.Invalid;
-            public TextureSlotAllocator.TextureLocation TransmissionTextureLocation = TextureSlotAllocator.TextureLocation.Invalid;
+            public TextureSlotAllocator.TextureLocation AlbedoTextureLocation = TextureSlotAllocator
+                .TextureLocation
+                .Invalid;
+            public TextureSlotAllocator.TextureLocation EmissionTextureLocation = TextureSlotAllocator
+                .TextureLocation
+                .Invalid;
+            public TextureSlotAllocator.TextureLocation TransmissionTextureLocation = TextureSlotAllocator
+                .TextureLocation
+                .Invalid;
             public float3 EmissionColor = new(0, 0, 0);
             public UVChannel AlbedoAndEmissionUVChannel = 0;
             public bool DoubleSidedGI;
@@ -86,8 +103,8 @@ namespace UnityEngine.PathTracing.Core
         };
 
         private readonly Dictionary<UInt64, MaterialEntry> _materialMap = new();
-        private readonly Dictionary<ulong, BlockAllocator.Allocation> _lightCookies = new();  // this dictionary is used to keep track of which textures are inserted in the atlas and avoid duplication (important for LiveGI)
-        private readonly Dictionary<int, ulong> _cookieHandleToID = new();                    // this dictionary is used when deleting lights with cookies attached, so we can free-up the atlas slots
+        private readonly Dictionary<ulong, BlockAllocator.Allocation> _lightCookies = new(); // this dictionary is used to keep track of which textures are inserted in the atlas and avoid duplication (important for LiveGI)
+        private readonly Dictionary<int, ulong> _cookieHandleToID = new(); // this dictionary is used when deleting lights with cookies attached, so we can free-up the atlas slots
 
         public int MaterialCount => _materialMap.Count;
         private BlockAllocator _materialSlotAllocator;
@@ -121,15 +138,23 @@ namespace UnityEngine.PathTracing.Core
 
         private const int AtlasSize = 256;
 
-        public MaterialPool(ComputeShader setAlphaChannelShader, ComputeShader blitCubemapShader, ComputeShader blitGrayscaleCookieShader)
+        public MaterialPool(
+            ComputeShader setAlphaChannelShader,
+            ComputeShader blitCubemapShader,
+            ComputeShader blitGrayscaleCookieShader
+        )
         {
             _setAlphaChannelShader = setAlphaChannelShader;
             _setAlphaChannelKernel = _setAlphaChannelShader.FindKernel("SetAlphaChannel");
-            _setAlphaChannelShader.GetKernelThreadGroupSizes(_setAlphaChannelKernel,
-                out _alphaShaderThreadGroupSizes.x, out _alphaShaderThreadGroupSizes.y, out _alphaShaderThreadGroupSizes.z);
+            _setAlphaChannelShader.GetKernelThreadGroupSizes(
+                _setAlphaChannelKernel,
+                out _alphaShaderThreadGroupSizes.x,
+                out _alphaShaderThreadGroupSizes.y,
+                out _alphaShaderThreadGroupSizes.z
+            );
 
             _blitCubemapShader = blitCubemapShader;
-            _blitCubemapKernel  = _blitCubemapShader.FindKernel("BlitCubemap");
+            _blitCubemapKernel = _blitCubemapShader.FindKernel("BlitCubemap");
 
             _blitGrayscaleCookieShader = blitGrayscaleCookieShader;
             _blitGrayscaleCookieKernel = _blitGrayscaleCookieShader.FindKernel("BlitGrayScaleCookie");
@@ -138,9 +163,21 @@ namespace UnityEngine.PathTracing.Core
             const int initialMaxLightCubemapTextureCount = 3;
             const int initialMaxMaterialCount = 100;
 
-            _albedoTextureAllocator = new TextureSlotAllocator(AtlasSize, GetTextureFormat(TextureType.Albedo), FilterMode.Bilinear);
-            _emissionTextureAllocator = new TextureSlotAllocator(AtlasSize, GetTextureFormat(TextureType.Emission), FilterMode.Bilinear);
-            _transmissionTextureAllocator = new TextureSlotAllocator(AtlasSize, GetTextureFormat(TextureType.Transmission), FilterMode.Bilinear);
+            _albedoTextureAllocator = new TextureSlotAllocator(
+                AtlasSize,
+                GetTextureFormat(TextureType.Albedo),
+                FilterMode.Bilinear
+            );
+            _emissionTextureAllocator = new TextureSlotAllocator(
+                AtlasSize,
+                GetTextureFormat(TextureType.Emission),
+                FilterMode.Bilinear
+            );
+            _transmissionTextureAllocator = new TextureSlotAllocator(
+                AtlasSize,
+                GetTextureFormat(TextureType.Transmission),
+                FilterMode.Bilinear
+            );
 
             _materialSlotAllocator.Initialize(initialMaxMaterialCount);
             MaterialBuffer = new ComputeBuffer(initialMaxMaterialCount, Marshal.SizeOf<GpuMaterialEntry>());
@@ -179,7 +216,11 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-        public void AddMaterial(UInt64 materialHandle, in MaterialDescriptor material, UVChannel albedoAndEmissionUVChannel)
+        public void AddMaterial(
+            UInt64 materialHandle,
+            in MaterialDescriptor material,
+            UVChannel albedoAndEmissionUVChannel
+        )
         {
             MaterialEntry materialEntry;
             Debug.Assert(!_materialMap.ContainsKey(materialHandle), "Material was already added to the pool.");
@@ -187,7 +228,7 @@ namespace UnityEngine.PathTracing.Core
             var slotAllocation = _materialSlotAllocator.Allocate(1);
             if (!slotAllocation.valid)
             {
-                _materialSlotAllocator.Grow(_materialSlotAllocator.capacity+1);
+                _materialSlotAllocator.Grow(_materialSlotAllocator.capacity + 1);
                 RecreateGpuMaterialList();
                 slotAllocation = _materialSlotAllocator.Allocate(1);
                 Assert.IsTrue(slotAllocation.valid);
@@ -201,7 +242,11 @@ namespace UnityEngine.PathTracing.Core
             UpdateMaterialList(materialEntry);
         }
 
-        public void UpdateMaterial(UInt64 materialHandle, in MaterialDescriptor material, UVChannel albedoAndEmissionUVChannel)
+        public void UpdateMaterial(
+            UInt64 materialHandle,
+            in MaterialDescriptor material,
+            UVChannel albedoAndEmissionUVChannel
+        )
         {
             MaterialEntry materialEntry = _materialMap[materialHandle];
             UpdateMaterial(in material, albedoAndEmissionUVChannel, materialEntry);
@@ -264,7 +309,11 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-        private void UpdateMaterial(in MaterialDescriptor material, UVChannel albedoAndEmissionUVChannel, MaterialEntry materialEntry)
+        private void UpdateMaterial(
+            in MaterialDescriptor material,
+            UVChannel albedoAndEmissionUVChannel,
+            MaterialEntry materialEntry
+        )
         {
             AddOrUpdateTexture(in material, TextureType.Albedo, ref materialEntry.AlbedoTextureLocation);
 
@@ -295,7 +344,11 @@ namespace UnityEngine.PathTracing.Core
 
             if (material.TransmissionChannels == TransmissionChannels.RGB && material.Transmission != null)
             {
-                AddOrUpdateTexture(in material, TextureType.Transmission, ref materialEntry.TransmissionTextureLocation);
+                AddOrUpdateTexture(
+                    in material,
+                    TextureType.Transmission,
+                    ref materialEntry.TransmissionTextureLocation
+                );
             }
             else
             {
@@ -324,29 +377,42 @@ namespace UnityEngine.PathTracing.Core
                 // Values to be filled in immediately
                 EmissionColor = entry.EmissionColor,
                 AlbedoAndEmissionUVChannel = entry.AlbedoAndEmissionUVChannel,
-                Flags = (entry.IsTransmissive ? MaterialFlags.IsTransmissive : MaterialFlags.None) |
-                        (entry.DoubleSidedGI ? MaterialFlags.DoubleSidedGI : MaterialFlags.None) |
-                        (entry.PointSampleTransmission ? MaterialFlags.PointSampleTransmission : MaterialFlags.None),
+                Flags =
+                    (entry.IsTransmissive ? MaterialFlags.IsTransmissive : MaterialFlags.None)
+                    | (entry.DoubleSidedGI ? MaterialFlags.DoubleSidedGI : MaterialFlags.None)
+                    | (entry.PointSampleTransmission ? MaterialFlags.PointSampleTransmission : MaterialFlags.None),
             };
 
             if (entry.AlbedoTextureLocation.IsValid)
             {
                 gpuMat.AlbedoTextureIndex = entry.AlbedoTextureLocation.AtlasIndex;
-                _albedoTextureAllocator.GetScaleAndOffset(in entry.AlbedoTextureLocation, out var albedoScale, out var albedoOffset);
+                _albedoTextureAllocator.GetScaleAndOffset(
+                    in entry.AlbedoTextureLocation,
+                    out var albedoScale,
+                    out var albedoOffset
+                );
                 gpuMat.AlbedoScale = albedoScale;
                 gpuMat.AlbedoOffset = albedoOffset;
             }
             if (entry.EmissionTextureLocation.IsValid)
             {
                 gpuMat.EmissionTextureIndex = entry.EmissionTextureLocation.AtlasIndex;
-                _emissionTextureAllocator.GetScaleAndOffset(in entry.EmissionTextureLocation, out var emissionScale, out var emissionOffset);
+                _emissionTextureAllocator.GetScaleAndOffset(
+                    in entry.EmissionTextureLocation,
+                    out var emissionScale,
+                    out var emissionOffset
+                );
                 gpuMat.EmissionScale = emissionScale;
                 gpuMat.EmissionOffset = emissionOffset;
             }
             if (entry.TransmissionTextureLocation.IsValid)
             {
                 gpuMat.TransmissionTextureIndex = entry.TransmissionTextureLocation.AtlasIndex;
-                _transmissionTextureAllocator.GetScaleAndOffset(in entry.TransmissionTextureLocation, out var transmissionScale, out var transmissionOffset);
+                _transmissionTextureAllocator.GetScaleAndOffset(
+                    in entry.TransmissionTextureLocation,
+                    out var transmissionScale,
+                    out var transmissionOffset
+                );
                 gpuMat.TransmissionScale = transmissionScale;
                 gpuMat.TransmissionOffset = transmissionOffset;
             }
@@ -386,7 +452,12 @@ namespace UnityEngine.PathTracing.Core
                 if (slices > 1)
                 {
                     slotAllocation = _lightCubemapTexturesSlotAllocator.Allocate(1);
-                    ExpandCookieTextureArray(true, ref _lightCubemapTexturesSlotAllocator, ref LightCubemapTextures, ref slotAllocation);
+                    ExpandCookieTextureArray(
+                        true,
+                        ref _lightCubemapTexturesSlotAllocator,
+                        ref LightCubemapTextures,
+                        ref slotAllocation
+                    );
 
                     RenderTexture prevRT = RenderTexture.active;
                     BlitCubemapCookie(cookie, LightCubemapTextures, slotAllocation.block.offset);
@@ -395,7 +466,12 @@ namespace UnityEngine.PathTracing.Core
                 else
                 {
                     slotAllocation = _lightCookieTexturesSlotAllocator.Allocate(1);
-                    ExpandCookieTextureArray(false, ref _lightCookieTexturesSlotAllocator, ref LightCookieTextures, ref slotAllocation);
+                    ExpandCookieTextureArray(
+                        false,
+                        ref _lightCookieTexturesSlotAllocator,
+                        ref LightCookieTextures,
+                        ref slotAllocation
+                    );
 
                     RenderTexture prevRT = RenderTexture.active;
                     Blit2DCookie(cookie, LightCookieTextures, slotAllocation.block.offset);
@@ -435,7 +511,12 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-        private void ExpandCookieTextureArray(bool isCubemapCookie, ref BlockAllocator allocator, ref RenderTexture texture, ref BlockAllocator.Allocation textureAlloc)
+        private void ExpandCookieTextureArray(
+            bool isCubemapCookie,
+            ref BlockAllocator allocator,
+            ref RenderTexture texture,
+            ref BlockAllocator.Allocation textureAlloc
+        )
         {
             if (!textureAlloc.valid)
             {
@@ -445,7 +526,10 @@ namespace UnityEngine.PathTracing.Core
                     var oldCapacity = allocator.capacity;
                     allocator.Grow(allocator.capacity + 1);
 
-                    var newTexture = CreateTextureArray(allocator.capacity, isCubemapCookie ? TextureType.LightCubemap : TextureType.LightCookie);
+                    var newTexture = CreateTextureArray(
+                        allocator.capacity,
+                        isCubemapCookie ? TextureType.LightCubemap : TextureType.LightCookie
+                    );
 
                     using var cmd = new CommandBuffer();
                     for (int i = 0; i < oldCapacity; ++i)
@@ -479,8 +563,18 @@ namespace UnityEngine.PathTracing.Core
             {
                 cmd.SetComputeIntParam(_blitCubemapShader, Shader.PropertyToID("g_TextureSize"), dest.width);
                 cmd.SetComputeIntParam(_blitCubemapShader, Shader.PropertyToID("g_Face"), i);
-                cmd.SetComputeTextureParam(_blitCubemapShader, _blitCubemapKernel, Shader.PropertyToID("g_Source"), source);
-                cmd.SetComputeTextureParam(_blitCubemapShader, _blitCubemapKernel, Shader.PropertyToID("g_Destination"), tempRT);
+                cmd.SetComputeTextureParam(
+                    _blitCubemapShader,
+                    _blitCubemapKernel,
+                    Shader.PropertyToID("g_Source"),
+                    source
+                );
+                cmd.SetComputeTextureParam(
+                    _blitCubemapShader,
+                    _blitCubemapKernel,
+                    Shader.PropertyToID("g_Destination"),
+                    tempRT
+                );
                 int dispatchSize = GraphicsHelpers.DivUp(dest.width, 8);
                 cmd.DispatchCompute(_blitCubemapShader, _blitCubemapKernel, dispatchSize, dispatchSize, 1);
                 cmd.CopyTexture(tempRT, 0, dest, 6 * destIndex + i);
@@ -507,10 +601,26 @@ namespace UnityEngine.PathTracing.Core
                 using var cmd = new CommandBuffer();
                 cmd.SetComputeIntParam(_blitGrayscaleCookieShader, Shader.PropertyToID("g_TextureWidth"), dest.width);
                 cmd.SetComputeIntParam(_blitGrayscaleCookieShader, Shader.PropertyToID("g_TextureHeight"), dest.height);
-                cmd.SetComputeTextureParam(_blitGrayscaleCookieShader, _blitGrayscaleCookieKernel, Shader.PropertyToID("g_Source"), source);
-                cmd.SetComputeTextureParam(_blitGrayscaleCookieShader, _blitGrayscaleCookieKernel, Shader.PropertyToID("g_Destination"), tempRT);
+                cmd.SetComputeTextureParam(
+                    _blitGrayscaleCookieShader,
+                    _blitGrayscaleCookieKernel,
+                    Shader.PropertyToID("g_Source"),
+                    source
+                );
+                cmd.SetComputeTextureParam(
+                    _blitGrayscaleCookieShader,
+                    _blitGrayscaleCookieKernel,
+                    Shader.PropertyToID("g_Destination"),
+                    tempRT
+                );
 
-                cmd.DispatchCompute(_blitGrayscaleCookieShader, _blitGrayscaleCookieKernel, GraphicsHelpers.DivUp(dest.width, 8), GraphicsHelpers.DivUp(dest.height, 8), 1);
+                cmd.DispatchCompute(
+                    _blitGrayscaleCookieShader,
+                    _blitGrayscaleCookieKernel,
+                    GraphicsHelpers.DivUp(dest.width, 8),
+                    GraphicsHelpers.DivUp(dest.height, 8),
+                    1
+                );
                 cmd.CopyTexture(tempRT, 0, dest, destIndex);
 
                 Graphics.ExecuteCommandBuffer(cmd);
@@ -520,7 +630,11 @@ namespace UnityEngine.PathTracing.Core
         }
         #endregion
 
-        private void AddOrUpdateTexture(in MaterialDescriptor material, TextureType textureType, ref TextureSlotAllocator.TextureLocation location)
+        private void AddOrUpdateTexture(
+            in MaterialDescriptor material,
+            TextureType textureType,
+            ref TextureSlotAllocator.TextureLocation location
+        )
         {
             // Find appropriate allocator, scale, offset and texture
             var allocator = _transmissionTextureAllocator;
@@ -574,7 +688,10 @@ namespace UnityEngine.PathTracing.Core
             location = TextureSlotAllocator.TextureLocation.Invalid;
         }
 
-        private void FillAlbedoTextureAlphaWithOpacity(in MaterialDescriptor material, TextureSlotAllocator.TextureLocation location)
+        private void FillAlbedoTextureAlphaWithOpacity(
+            in MaterialDescriptor material,
+            TextureSlotAllocator.TextureLocation location
+        )
         {
             if (material.Transmission == null)
                 return;
@@ -590,13 +707,41 @@ namespace UnityEngine.PathTracing.Core
             cmd.SetComputeIntParam(_setAlphaChannelShader, Shader.PropertyToID("g_TargetOffsetX"), targetOffsetX);
             cmd.SetComputeIntParam(_setAlphaChannelShader, Shader.PropertyToID("g_TargetOffsetY"), targetOffsetY);
             cmd.SetComputeFloatParam(_setAlphaChannelShader, Shader.PropertyToID("g_Alpha"), material.Alpha);
-            cmd.SetComputeFloatParam(_setAlphaChannelShader, Shader.PropertyToID("g_AlphaCutoff"), material.AlphaCutoff);
-            cmd.SetComputeIntParam(_setAlphaChannelShader, Shader.PropertyToID("g_UseAlphaCutoff"), material.UseAlphaCutoff ? 1 : 0);
-            cmd.SetComputeTextureParam(_setAlphaChannelShader, _setAlphaChannelKernel, Shader.PropertyToID("g_AlbedoTextures"), AlbedoTextures);
-            cmd.SetComputeTextureParam(_setAlphaChannelShader, _setAlphaChannelKernel, Shader.PropertyToID("g_OpacityTexture"), material.Transmission);
-            cmd.SetComputeVectorParam(_setAlphaChannelShader, Shader.PropertyToID("g_OpacityTextureUVTransform"), new float4(material.TransmissionScale, material.TransmissionOffset));
+            cmd.SetComputeFloatParam(
+                _setAlphaChannelShader,
+                Shader.PropertyToID("g_AlphaCutoff"),
+                material.AlphaCutoff
+            );
+            cmd.SetComputeIntParam(
+                _setAlphaChannelShader,
+                Shader.PropertyToID("g_UseAlphaCutoff"),
+                material.UseAlphaCutoff ? 1 : 0
+            );
+            cmd.SetComputeTextureParam(
+                _setAlphaChannelShader,
+                _setAlphaChannelKernel,
+                Shader.PropertyToID("g_AlbedoTextures"),
+                AlbedoTextures
+            );
+            cmd.SetComputeTextureParam(
+                _setAlphaChannelShader,
+                _setAlphaChannelKernel,
+                Shader.PropertyToID("g_OpacityTexture"),
+                material.Transmission
+            );
+            cmd.SetComputeVectorParam(
+                _setAlphaChannelShader,
+                Shader.PropertyToID("g_OpacityTextureUVTransform"),
+                new float4(material.TransmissionScale, material.TransmissionOffset)
+            );
 
-            cmd.DispatchCompute(_setAlphaChannelShader, _setAlphaChannelKernel, GraphicsHelpers.DivUp(targetSize.x, _alphaShaderThreadGroupSizes.x), GraphicsHelpers.DivUp(targetSize.y, _alphaShaderThreadGroupSizes.y), 1);
+            cmd.DispatchCompute(
+                _setAlphaChannelShader,
+                _setAlphaChannelKernel,
+                GraphicsHelpers.DivUp(targetSize.x, _alphaShaderThreadGroupSizes.x),
+                GraphicsHelpers.DivUp(targetSize.y, _alphaShaderThreadGroupSizes.y),
+                1
+            );
             Graphics.ExecuteCommandBuffer(cmd);
         }
 
@@ -622,13 +767,19 @@ namespace UnityEngine.PathTracing.Core
             properties.SetVector(Shader.PropertyToID("unity_MetaFragmentControl"), fragmentControl);
             properties.SetFloat(Shader.PropertyToID("unity_OneOverOutputBoost"), 1.0f);
             properties.SetFloat(Shader.PropertyToID("unity_MaxOutputValue"), 0.97f); // only used by albedo pass
-            properties.SetInt(Shader.PropertyToID("unity_UseLinearSpace"), QualitySettings.activeColorSpace == ColorSpace.Linear ? 1 : 0);
+            properties.SetInt(
+                Shader.PropertyToID("unity_UseLinearSpace"),
+                QualitySettings.activeColorSpace == ColorSpace.Linear ? 1 : 0
+            );
             material.DisableKeyword("EDITOR_VISUALIZATION");
 
             using var cmd = new CommandBuffer();
             cmd.SetRenderTarget(targetTexture);
 
-            cmd.SetViewProjectionMatrices(Matrix4x4.identity, GL.GetGPUProjectionMatrix(Matrix4x4.Ortho(-1, 1, -1, 1, -50, 50), true));
+            cmd.SetViewProjectionMatrices(
+                Matrix4x4.identity,
+                GL.GetGPUProjectionMatrix(Matrix4x4.Ortho(-1, 1, -1, 1, -50, 50), true)
+            );
             cmd.SetViewport(new Rect(0, 0, targetTexture.width, targetTexture.height));
             cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 1));
 
@@ -686,15 +837,20 @@ namespace UnityEngine.PathTracing.Core
             return descriptor;
         }
 
-        static private GraphicsFormat GetTextureFormat(TextureType textureType)
+        private static GraphicsFormat GetTextureFormat(TextureType textureType)
         {
             switch (textureType)
             {
-                case TextureType.Albedo: return GraphicsFormat.R8G8B8A8_UNorm;
-                case TextureType.Emission: return GraphicsFormat.R16G16B16A16_SFloat; // TODO(Yvain) might want to use B10G11R11_UFloatPack32 for emissionthere
-                case TextureType.Transmission: return GraphicsFormat.R8G8B8A8_UNorm;
-                case TextureType.LightCookie: return GraphicsFormat.R16G16B16A16_SFloat;  // same as emission
-                case TextureType.LightCubemap: return GraphicsFormat.R16G16B16A16_SFloat; // same as emission
+                case TextureType.Albedo:
+                    return GraphicsFormat.R8G8B8A8_UNorm;
+                case TextureType.Emission:
+                    return GraphicsFormat.R16G16B16A16_SFloat; // TODO(Yvain) might want to use B10G11R11_UFloatPack32 for emissionthere
+                case TextureType.Transmission:
+                    return GraphicsFormat.R8G8B8A8_UNorm;
+                case TextureType.LightCookie:
+                    return GraphicsFormat.R16G16B16A16_SFloat; // same as emission
+                case TextureType.LightCubemap:
+                    return GraphicsFormat.R16G16B16A16_SFloat; // same as emission
             }
 
             return 0;
@@ -702,30 +858,41 @@ namespace UnityEngine.PathTracing.Core
 
         private static RenderTexture CreateTextureArray(int sliceCount, TextureType textureType)
         {
-            TextureDimension dimension = (textureType == TextureType.LightCubemap) ? TextureDimension.CubeArray: TextureDimension.Tex2DArray;
-            return CreateTexture(textureType, dimension, textureType == TextureType.LightCubemap ? sliceCount * 6 : sliceCount);
+            TextureDimension dimension =
+                (textureType == TextureType.LightCubemap) ? TextureDimension.CubeArray : TextureDimension.Tex2DArray;
+            return CreateTexture(
+                textureType,
+                dimension,
+                textureType == TextureType.LightCubemap ? sliceCount * 6 : sliceCount
+            );
         }
 
-        private static RenderTexture CreateTexture(TextureType textureType, TextureDimension dimension = TextureDimension.Tex2D, int sliceCount = 1)
+        private static RenderTexture CreateTexture(
+            TextureType textureType,
+            TextureDimension dimension = TextureDimension.Tex2D,
+            int sliceCount = 1
+        )
         {
             var format = GetTextureFormat(textureType);
 
-            var texture = new RenderTexture(new RenderTextureDescriptor(AtlasSize, AtlasSize)
-            {
-                dimension = dimension,
-                depthBufferBits = 0,
-                volumeDepth = sliceCount,
-                msaaSamples = 1,
-                vrUsage = VRTextureUsage.OneEye,
-                graphicsFormat = format,
-                enableRandomWrite = true,
-            })
+            var texture = new RenderTexture(
+                new RenderTextureDescriptor(AtlasSize, AtlasSize)
+                {
+                    dimension = dimension,
+                    depthBufferBits = 0,
+                    volumeDepth = sliceCount,
+                    msaaSamples = 1,
+                    vrUsage = VRTextureUsage.OneEye,
+                    graphicsFormat = format,
+                    enableRandomWrite = true,
+                }
+            )
             {
                 name = "CreateTexture (MaterialPool)",
                 hideFlags = HideFlags.DontSaveInEditor,
                 wrapMode = TextureWrapMode.Repeat,
                 wrapModeU = TextureWrapMode.Repeat,
-                wrapModeV = TextureWrapMode.Repeat
+                wrapModeV = TextureWrapMode.Repeat,
             };
             texture.Create();
 
@@ -742,38 +909,29 @@ namespace UnityEngine.PathTracing.Core
             NativeArray<GpuMaterialEntry>.Copy(oldMaterialList, _gpuMaterialList, oldMaterialList.Length);
             oldMaterialList.Dispose();
         }
+
         private static Mesh CreateQuadMesh()
         {
             Mesh mesh = new Mesh();
 
-            Vector3[] vertices = {
-                new(-1.0f, -1.0f, 0),
-                new(1.0f, -1.0f, 0),
-                new(-1.0f, 1.0f, 0),
-                new(1.0f, 1.0f, 0)
-            };
+            Vector3[] vertices = { new(-1.0f, -1.0f, 0), new(1.0f, -1.0f, 0), new(-1.0f, 1.0f, 0), new(1.0f, 1.0f, 0) };
             mesh.vertices = vertices;
 
-            Vector3[] normals = {
-                -Vector3.forward,
-                -Vector3.forward,
-                -Vector3.forward,
-                -Vector3.forward
-            };
+            Vector3[] normals = { -Vector3.forward, -Vector3.forward, -Vector3.forward, -Vector3.forward };
             mesh.normals = normals;
 
-            Vector2[] uv = {
-                new(0, 1),
-                new(1, 1),
-                new(0, 0),
-                new(1, 0)
-            };
+            Vector2[] uv = { new(0, 1), new(1, 1), new(0, 0), new(1, 0) };
             mesh.uv = uv;
             mesh.uv2 = uv;
 
-            int[] tris = {
-                0, 2, 1, // lower left triangle
-                2, 3, 1 // upper right triangle
+            int[] tris =
+            {
+                0,
+                2,
+                1, // lower left triangle
+                2,
+                3,
+                1, // upper right triangle
             };
             mesh.triangles = tris;
 

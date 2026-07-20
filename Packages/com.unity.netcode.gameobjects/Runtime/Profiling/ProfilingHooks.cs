@@ -9,7 +9,9 @@ namespace Unity.Netcode
         private Dictionary<Type, ProfilerMarker> m_HandlerProfilerMarkers = new Dictionary<Type, ProfilerMarker>();
         private Dictionary<Type, ProfilerMarker> m_SenderProfilerMarkers = new Dictionary<Type, ProfilerMarker>();
         private readonly ProfilerMarker m_SendBatch = new ProfilerMarker($"{nameof(NetworkMessageManager)}.SendBatch");
-        private readonly ProfilerMarker m_ReceiveBatch = new ProfilerMarker($"{nameof(NetworkMessageManager)}.ReceiveBatchBatch");
+        private readonly ProfilerMarker m_ReceiveBatch = new ProfilerMarker(
+            $"{nameof(NetworkMessageManager)}.ReceiveBatchBatch"
+        );
 
         private ProfilerMarker GetHandlerProfilerMarker(Type type)
         {
@@ -37,12 +39,14 @@ namespace Unity.Netcode
             return marker;
         }
 
-        public void OnBeforeSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery) where T : INetworkMessage
+        public void OnBeforeSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery)
+            where T : INetworkMessage
         {
             GetSenderProfilerMarker(typeof(T)).Begin();
         }
 
-        public void OnAfterSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery, int messageSizeBytes) where T : INetworkMessage
+        public void OnAfterSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery, int messageSizeBytes)
+            where T : INetworkMessage
         {
             GetSenderProfilerMarker(typeof(T)).End();
         }
@@ -82,17 +86,24 @@ namespace Unity.Netcode
             return true;
         }
 
-        public bool OnVerifyCanReceive(ulong senderId, Type messageType, FastBufferReader messageContent, ref NetworkContext context)
+        public bool OnVerifyCanReceive(
+            ulong senderId,
+            Type messageType,
+            FastBufferReader messageContent,
+            ref NetworkContext context
+        )
         {
             return true;
         }
 
-        public void OnBeforeHandleMessage<T>(ref T message, ref NetworkContext context) where T : INetworkMessage
+        public void OnBeforeHandleMessage<T>(ref T message, ref NetworkContext context)
+            where T : INetworkMessage
         {
             // nop
         }
 
-        public void OnAfterHandleMessage<T>(ref T message, ref NetworkContext context) where T : INetworkMessage
+        public void OnAfterHandleMessage<T>(ref T message, ref NetworkContext context)
+            where T : INetworkMessage
         {
             // nop
         }

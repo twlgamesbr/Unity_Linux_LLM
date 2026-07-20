@@ -12,6 +12,7 @@ namespace UnityEngine.Rendering
         /// Software dynamic resolution.
         /// </summary>
         Software,
+
         /// <summary>
         /// Hardware dynamic resolution.
         /// </summary>
@@ -26,29 +27,40 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Bilinear upscaling filter. Obsolete and not supported.
         /// </summary>
-        [Obsolete("Bilinear upscale filter is considered obsolete and is not supported anymore, please use CatmullRom for a very cheap, but blurry filter. #from(2022.1)")] Bilinear,
+        [Obsolete(
+            "Bilinear upscale filter is considered obsolete and is not supported anymore, please use CatmullRom for a very cheap, but blurry filter. #from(2022.1)"
+        )]
+        Bilinear,
+
         /// <summary>
         /// Bicubic Catmull-Rom upscaling filter.
         /// </summary>
         CatmullRom,
+
         /// <summary>
         /// Lanczos upscaling filter. Obsolete and not supported.
         /// </summary>
-        [Obsolete("Lanczos upscale filter is considered obsolete and is not supported anymore, please use Contrast Adaptive Sharpening for very sharp filter or FidelityFX Super Resolution 1.0. #from(2022.1)")] Lanczos,
+        [Obsolete(
+            "Lanczos upscale filter is considered obsolete and is not supported anymore, please use Contrast Adaptive Sharpening for very sharp filter or FidelityFX Super Resolution 1.0. #from(2022.1)"
+        )]
+        Lanczos,
+
         /// <summary>
         /// Contrast Adaptive Sharpening upscaling filter.
         /// </summary>
         ContrastAdaptiveSharpen,
+
         /// <summary>
         /// FidelityFX Super Resolution 1.0
         /// </summary>
         [InspectorName("FidelityFX Super Resolution 1.0")]
         EdgeAdaptiveScalingUpres,
+
         /// <summary>
         /// Temporal Upscaling.
         /// </summary>
         [InspectorName("TAA Upscale")]
-        TAAU
+        TAAU,
     }
 
     /// <summary>User-facing settings for advanced upscalers.</summary>
@@ -59,11 +71,13 @@ namespace UnityEngine.Rendering
         /// </summary>
         [InspectorName("Deep Learning Super Sampling (DLSS)")]
         DLSS = 0,
+
         /// <summary>
         /// AMD FidelityFX Super Resolution (FSR2).
         /// </summary>
         [InspectorName("FidelityFX Super Resolution 2.0 (FSR2)")]
         FSR2 = 1,
+
         /// <summary>
         /// Spatial-Temporal Post-Processing
         /// </summary>
@@ -81,43 +95,45 @@ namespace UnityEngine.Rendering
     {
         /// <summary>Default GlobalDynamicResolutionSettings</summary>
         /// <returns>A GlobalDynamicResolutionSettings instance initialized with default values.</returns>
-        public static GlobalDynamicResolutionSettings NewDefault() => new GlobalDynamicResolutionSettings()
-        {
-            useMipBias = false,
-            maxPercentage = 100.0f,
-            minPercentage = 100.0f,
-            // It fall-backs to software when not supported, so it makes sense to have it on by default.
-            dynResType = DynamicResolutionType.Hardware,
-            upsampleFilter = DynamicResUpscaleFilter.CatmullRom,
-            forcedPercentage = 100.0f,
-            lowResTransparencyMinimumThreshold = 0.0f,
-            lowResVolumetricCloudsMinimumThreshold = 50.0f,
-            rayTracingHalfResThreshold = 50.0f,
+        public static GlobalDynamicResolutionSettings NewDefault() =>
+            new GlobalDynamicResolutionSettings()
+            {
+                useMipBias = false,
+                maxPercentage = 100.0f,
+                minPercentage = 100.0f,
+                // It fall-backs to software when not supported, so it makes sense to have it on by default.
+                dynResType = DynamicResolutionType.Hardware,
+                upsampleFilter = DynamicResUpscaleFilter.CatmullRom,
+                forcedPercentage = 100.0f,
+                lowResTransparencyMinimumThreshold = 0.0f,
+                lowResVolumetricCloudsMinimumThreshold = 50.0f,
+                rayTracingHalfResThreshold = 50.0f,
 
 #if ENABLE_UPSCALER_FRAMEWORK
-            upscalerOptions = new List<UpscalerOptions>(),
+                upscalerOptions = new List<UpscalerOptions>(),
 #endif
 
-            DLSSUseOptimalSettings = true,
-            DLSSPerfQualitySetting = 0,
-            DLSSSharpness = 0.5f,
-            DLSSRenderPresetForQuality = 0,
-            DLSSRenderPresetForBalanced = 0,
-            DLSSRenderPresetForPerformance = 0,
-            DLSSRenderPresetForUltraPerformance = 0,
-            DLSSRenderPresetForDLAA = 0,
-            DLSSInjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.BeforePost,
-            FSR2InjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.BeforePost,
-            TAAUInjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.BeforePost,
-            defaultInjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.AfterPost,
-            advancedUpscalerNames = new List<string>() { AdvancedUpscalers.STP.ToString() },
+                DLSSUseOptimalSettings = true,
+                DLSSPerfQualitySetting = 0,
+                DLSSSharpness = 0.5f,
+                DLSSRenderPresetForQuality = 0,
+                DLSSRenderPresetForBalanced = 0,
+                DLSSRenderPresetForPerformance = 0,
+                DLSSRenderPresetForUltraPerformance = 0,
+                DLSSRenderPresetForDLAA = 0,
+                DLSSInjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.BeforePost,
+                FSR2InjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.BeforePost,
+                TAAUInjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.BeforePost,
+                defaultInjectionPoint = DynamicResolutionHandler.UpsamplerScheduleType.AfterPost,
+                advancedUpscalerNames = new List<string>() { AdvancedUpscalers.STP.ToString() },
 
-            fsrOverrideSharpness = false,
-            fsrSharpness = FSRUtils.kDefaultSharpnessLinear
-        };
+                fsrOverrideSharpness = false,
+                fsrSharpness = FSRUtils.kDefaultSharpnessLinear,
+            };
 
         /// <summary>Select whether the dynamic resolution is enabled or not.</summary>
         public bool enabled;
+
         /// <summary>Offsets the mip bias to recover mode detail. This only works if the camera is utilizing TAA.</summary>
         public bool useMipBias;
 
@@ -156,12 +172,16 @@ namespace UnityEngine.Rendering
 
         /// <summary> Specifies the DLSS Render Preset to use for the Quality performance quality setting.</summary>
         public uint DLSSRenderPresetForQuality;
+
         /// <summary> Specifies the DLSS Render Preset to use for the Balanced performance quality setting.</summary>
         public uint DLSSRenderPresetForBalanced;
+
         /// <summary> Specifies the DLSS Render Preset to use for the Performance performance quality setting.</summary>
         public uint DLSSRenderPresetForPerformance;
+
         /// <summary> Specifies the DLSS Render Preset to use for the UltraPerformance performance quality setting.</summary>
         public uint DLSSRenderPresetForUltraPerformance;
+
         /// <summary> Specifies the DLSS Render Preset to use for the DLAA performance quality setting.</summary>
         public uint DLSSRenderPresetForDLAA;
 
@@ -203,16 +223,19 @@ namespace UnityEngine.Rendering
 
         /// <summary>The maximum resolution percentage that dynamic resolution can reach.</summary>
         public float maxPercentage;
+
         /// <summary>The minimum resolution percentage that dynamic resolution can reach.</summary>
         public float minPercentage;
 
         /// <summary>The type of dynamic resolution method.</summary>
         public DynamicResolutionType dynResType;
+
         /// <summary>The default of upscaling filter used. It can be overridden via the API DynamicResolutionHandler.SetUpscaleFilter </summary>
         public DynamicResUpscaleFilter upsampleFilter;
 
         /// <summary>Select whether dynamic resolution system will force a specific resolution percentage.</summary>
         public bool forceResolution;
+
         /// <summary>The resolution percentage forced in case forceResolution is set to true.</summary>
         public float forcedPercentage;
 
@@ -229,7 +252,10 @@ namespace UnityEngine.Rendering
         public float lowResVolumetricCloudsMinimumThreshold;
 
         /// <summary>Obsolete, used only for data migration. Use the advancedUpscalersByPriority list instead to add the proper supported advanced upscaler by priority.</summary>
-        [Obsolete("Obsolete, used only for data migration. Use the advancedUpscalersByPriority list instead to add the proper supported advanced upscaler by priority. #from(2023.3)", true)]
+        [Obsolete(
+            "Obsolete, used only for data migration. Use the advancedUpscalersByPriority list instead to add the proper supported advanced upscaler by priority. #from(2023.3)",
+            true
+        )]
         public bool enableDLSS;
     }
 }

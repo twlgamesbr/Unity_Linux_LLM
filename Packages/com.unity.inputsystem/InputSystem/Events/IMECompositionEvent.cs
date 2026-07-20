@@ -10,7 +10,10 @@ namespace UnityEngine.InputSystem.LowLevel
     /// A specialized event that contains the current IME Composition string, if IME is enabled and active.
     /// This event contains the entire current string to date, and once a new composition is submitted will send a blank string event.
     /// </summary>
-    [StructLayout(LayoutKind.Explicit, Size = InputEvent.kBaseEventSize + sizeof(int) + (sizeof(char) * kIMECharBufferSize))]
+    [StructLayout(
+        LayoutKind.Explicit,
+        Size = InputEvent.kBaseEventSize + sizeof(int) + (sizeof(char) * kIMECharBufferSize)
+    )]
     public struct IMECompositionEvent : IInputEventTypeInfo
     {
         // These needs to match the native ImeCompositionStringInputEventData settings
@@ -28,7 +31,12 @@ namespace UnityEngine.InputSystem.LowLevel
         public static IMECompositionEvent Create(int deviceId, string compositionString, double time)
         {
             var inputEvent = new IMECompositionEvent();
-            inputEvent.baseEvent = new InputEvent(Type, InputEvent.kBaseEventSize + sizeof(int) + (sizeof(char) * kIMECharBufferSize), deviceId, time);
+            inputEvent.baseEvent = new InputEvent(
+                Type,
+                InputEvent.kBaseEventSize + sizeof(int) + (sizeof(char) * kIMECharBufferSize),
+                deviceId,
+                time
+            );
             inputEvent.compositionString = new IMECompositionString(compositionString);
             return inputEvent;
         }
@@ -42,7 +50,10 @@ namespace UnityEngine.InputSystem.LowLevel
     /// <see cref="ITextInputReceiver.OnIMECompositionChanged"/> method. It can easily be converted to a normal C# string using
     ///  <see cref="ToString"/>, but is exposed as the raw struct to avoid allocating memory by default.
     /// </remarks>
-    [StructLayout(LayoutKind.Explicit, Size = sizeof(int) + sizeof(char) * LowLevel.IMECompositionEvent.kIMECharBufferSize)]
+    [StructLayout(
+        LayoutKind.Explicit,
+        Size = sizeof(int) + sizeof(char) * LowLevel.IMECompositionEvent.kIMECharBufferSize
+    )]
     public unsafe struct IMECompositionString : IEnumerable<char>
     {
         internal struct Enumerator : IEnumerator<char>
@@ -67,7 +78,7 @@ namespace UnityEngine.InputSystem.LowLevel
                 if (m_CurrentIndex == size)
                     return false;
 
-                fixed(char* ptr = m_CompositionString.buffer)
+                fixed (char* ptr = m_CompositionString.buffer)
                 {
                     m_CurrentCharacter = *(ptr + m_CurrentIndex);
                 }
@@ -80,9 +91,7 @@ namespace UnityEngine.InputSystem.LowLevel
                 m_CurrentIndex = -1;
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public char Current => m_CurrentCharacter;
 
@@ -98,7 +107,7 @@ namespace UnityEngine.InputSystem.LowLevel
                 if (index >= Count || index < 0)
                     throw new ArgumentOutOfRangeException(nameof(index));
 
-                fixed(char* ptr = buffer)
+                fixed (char* ptr = buffer)
                 {
                     return *(ptr + index);
                 }
@@ -127,7 +136,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public override string ToString()
         {
-            fixed(char* ptr = buffer)
+            fixed (char* ptr = buffer)
             {
                 return new string(ptr, 0, size);
             }

@@ -12,13 +12,24 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
     [GenerateTestsForBurstCompatibility]
     internal unsafe partial struct Matrix : IDisposable
     {
-        public static Matrix Create(int numRows, int numCols, NativeArray<int> columnPtrs, NativeArray<int> rowIndices, NativeArray<float> values, Allocator alloc)
+        public static Matrix Create(
+            int numRows,
+            int numCols,
+            NativeArray<int> columnPtrs,
+            NativeArray<int> rowIndices,
+            NativeArray<float> values,
+            Allocator alloc
+        )
         {
             float* data = (float*)UnsafeUtility.Malloc(values.Length * UnsafeUtility.SizeOf<float>(), 16, alloc);
             UnsafeUtility.MemCpy(data, values.GetUnsafeReadOnlyPtr(), values.Length * UnsafeUtility.SizeOf<float>());
 
             int* idx = (int*)UnsafeUtility.Malloc(rowIndices.Length * UnsafeUtility.SizeOf<float>(), 16, alloc);
-            UnsafeUtility.MemCpy(idx, rowIndices.GetUnsafeReadOnlyPtr(), rowIndices.Length * UnsafeUtility.SizeOf<int>());
+            UnsafeUtility.MemCpy(
+                idx,
+                rowIndices.GetUnsafeReadOnlyPtr(),
+                rowIndices.Length * UnsafeUtility.SizeOf<int>()
+            );
 
             Vector* cols = (Vector*)UnsafeUtility.Malloc(numCols * UnsafeUtility.SizeOf<Vector>(), 16, alloc);
 

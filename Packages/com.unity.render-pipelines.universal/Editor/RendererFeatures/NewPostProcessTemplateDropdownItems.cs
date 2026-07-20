@@ -13,24 +13,38 @@ namespace UnityEditor.Rendering.Universal
         const string k_VolumeTemplatePath =
             "Packages/com.unity.render-pipelines.universal/Editor/RendererFeatures/NewPostProcessVolumeComponent.cs.txt";
 
-        static string PreprocessScriptTemplate(string content, string featureType = null, string volumeType = null, string displayName = null)
+        static string PreprocessScriptTemplate(
+            string content,
+            string featureType = null,
+            string volumeType = null,
+            string displayName = null
+        )
         {
-            if(featureType != null)
+            if (featureType != null)
                 content = content.Replace("#FEATURE_TYPE#", featureType);
 
-            if(volumeType != null)
+            if (volumeType != null)
                 content = content.Replace("#VOLUME_TYPE#", volumeType);
 
-            if(displayName != null)
+            if (displayName != null)
                 content = content.Replace("#DISPLAY_NAME#", displayName);
 
             return content;
         }
 
-        static Object CreateScriptAssetFromTemplate(string templatePath, string targetPath, string featureType = null, string volumeType = null, string displayName = null)
+        static Object CreateScriptAssetFromTemplate(
+            string templatePath,
+            string targetPath,
+            string featureType = null,
+            string volumeType = null,
+            string displayName = null
+        )
         {
             string content = File.ReadAllText(templatePath);
-            return ProjectWindowUtil.CreateScriptAssetWithContent(targetPath, PreprocessScriptTemplate(content, featureType, volumeType, displayName));
+            return ProjectWindowUtil.CreateScriptAssetWithContent(
+                targetPath,
+                PreprocessScriptTemplate(content, featureType, volumeType, displayName)
+            );
         }
 
         internal class CreateCombinedScriptTemplateAssetsAction : ProjectWindowCallback.AssetCreationEndAction
@@ -48,11 +62,20 @@ namespace UnityEditor.Rendering.Universal
                 {
                     AssetDatabase.StartAssetEditing();
 
-                    Object o = CreateScriptAssetFromTemplate(k_FeatureTemplatePath,
-                        Path.Combine(directoryPath, featureTypeName + ".cs"), featureTypeName, volumeTypeName, null);
-                    CreateScriptAssetFromTemplate(k_VolumeTemplatePath,
-                        Path.Combine(directoryPath, volumeTypeName + ".cs"), featureTypeName, volumeTypeName,
-                        enteredName);
+                    Object o = CreateScriptAssetFromTemplate(
+                        k_FeatureTemplatePath,
+                        Path.Combine(directoryPath, featureTypeName + ".cs"),
+                        featureTypeName,
+                        volumeTypeName,
+                        null
+                    );
+                    CreateScriptAssetFromTemplate(
+                        k_VolumeTemplatePath,
+                        Path.Combine(directoryPath, volumeTypeName + ".cs"),
+                        featureTypeName,
+                        volumeTypeName,
+                        enteredName
+                    );
                     ProjectWindowUtil.ShowCreatedAsset(o);
                 }
                 finally
@@ -62,13 +85,21 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        [MenuItem("Assets/Create/Scripting/URP Post-process Volume Scripts", priority = UnityEngine.Rendering.CoreUtils.Priorities.scriptingPriority + 1)]
+        [MenuItem(
+            "Assets/Create/Scripting/URP Post-process Volume Scripts",
+            priority = UnityEngine.Rendering.CoreUtils.Priorities.scriptingPriority + 1
+        )]
         static void MenuCreateCustomPostProcessVolumeRendererFeature()
         {
             Texture2D icon = EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D;
 
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None,
-                ScriptableObject.CreateInstance<CreateCombinedScriptTemplateAssetsAction>(), "NewPostProcessEffect.cs", icon, k_FeatureTemplatePath);
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
+                EntityId.None,
+                ScriptableObject.CreateInstance<CreateCombinedScriptTemplateAssetsAction>(),
+                "NewPostProcessEffect.cs",
+                icon,
+                k_FeatureTemplatePath
+            );
         }
     }
 }

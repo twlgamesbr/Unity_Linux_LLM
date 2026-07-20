@@ -8,7 +8,10 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
     {
         public void Start()
         {
-            PlayerConnection.instance.Register(PlayerConnectionMessageIds.quitPlayerMessageId, ProcessPlayerQuiteMessage);
+            PlayerConnection.instance.Register(
+                PlayerConnectionMessageIds.quitPlayerMessageId,
+                ProcessPlayerQuiteMessage
+            );
         }
 
         private void ProcessPlayerQuiteMessage(MessageEventArgs arg0)
@@ -26,20 +29,12 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
             Application.Quit();
         }
 
-        public void RunStarted(ITest testsToRun)
-        {
-        }
+        public void RunStarted(ITest testsToRun) { }
 
-        public void RunFinished(ITestResult testResults)
-        {
-        }
+        public void RunFinished(ITestResult testResults) { }
 
-        public void TestStarted(ITest test)
-        {
-        }
+        public void TestStarted(ITest test) { }
 
-        public void TestFinished(ITestResult result)
-        {
-        }
+        public void TestFinished(ITestResult result) { }
     }
 }

@@ -15,11 +15,7 @@ struct SharedComponentFilterInfo
 
 struct IfeType
 {
-    internal IReadOnlyCollection<ReturnedTupleElementDuringEnumeration> ReturnedTupleElementsDuringEnumeration
-    {
-        get;
-        set;
-    }
+    internal IReadOnlyCollection<ReturnedTupleElementDuringEnumeration> ReturnedTupleElementsDuringEnumeration { get; set; }
 
     public string TypeName { get; set; }
     public string FullyQualifiedTypeName { get; set; }
@@ -35,10 +31,11 @@ struct IfeType
 
         if (MustReturnEntityDuringIteration)
         {
-            var typeParameterFullNames = ReturnedTupleElementsDuringEnumeration.Select(f => f.TypeSymbolFullName).SeparateByCommaAndSpace();
+            var typeParameterFullNames = ReturnedTupleElementsDuringEnumeration
+                .Select(f => f.TypeSymbolFullName)
+                .SeparateByCommaAndSpace();
             queryReturnTypeFullName = $"Unity.Entities.QueryEnumerableWithEntity<{typeParameterFullNames}>";
-            return
-            (
+            return (
                 queryReturnTypeFullName,
                 $"new {queryReturnTypeFullName}({queryResultConstructorArgs.SeparateByComma()})"
             );
@@ -52,6 +49,9 @@ struct IfeType
             return (queryReturnTypeFullName, $"({queryResultConstructorArgs.SeparateByComma()})");
         }
 
-        return (ReturnedTupleElementsDuringEnumeration.Single().TypeSymbolFullName, queryResultConstructorArgs.Single());
+        return (
+            ReturnedTupleElementsDuringEnumeration.Single().TypeSymbolFullName,
+            queryResultConstructorArgs.Single()
+        );
     }
 }

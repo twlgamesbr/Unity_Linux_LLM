@@ -1,5 +1,5 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Scenes;
 using Unity.Scenes.Editor;
 using UnityEngine;
@@ -12,7 +12,10 @@ namespace UnityEditor.UI
         static class Styles
         {
             public static float subSceneEditingButtonWidth = 16f;
-            public static GUIContent subSceneEditingTooltip = EditorGUIUtility.TrTextContent(string.Empty, "Toggle whether the Sub Scene is open for editing.");
+            public static GUIContent subSceneEditingTooltip = EditorGUIUtility.TrTextContent(
+                string.Empty,
+                "Toggle whether the Sub Scene is open for editing."
+            );
         }
 
         internal static void HierarchyWindowItemOnGUI(EntityId entityId, Rect selectionRect)
@@ -59,7 +62,7 @@ namespace UnityEditor.UI
                             foreach (SubScene ss in subScenes)
                                 subSceneStack.Push(ss);
 
-                            while (subSceneStack.Count>0)
+                            while (subSceneStack.Count > 0)
                             {
                                 SubScene itr = subSceneStack.Pop();
                                 if (seenSubScene.Contains(itr) || !itr.EditingScene.isLoaded)
@@ -72,7 +75,9 @@ namespace UnityEditor.UI
                                 {
                                     foreach (GameObject ssGameObject in itr.EditingScene.GetRootGameObjects())
                                     {
-                                        foreach (SubScene childSubScene in ssGameObject.GetComponentsInChildren<SubScene>())
+                                        foreach (
+                                            SubScene childSubScene in ssGameObject.GetComponentsInChildren<SubScene>()
+                                        )
                                             subSceneStack.Push(childSubScene);
                                     }
                                 }

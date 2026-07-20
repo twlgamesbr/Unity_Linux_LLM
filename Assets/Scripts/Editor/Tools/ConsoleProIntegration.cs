@@ -57,7 +57,9 @@ namespace NPCSystem.Editor.Tools
             if (File.Exists(docsPath))
                 Application.OpenURL($"file://{Path.GetFullPath(docsPath)}");
             else
-                Debug.LogWarning("[ConsoleProIntegration] Documentation PDF not found. Check Console Pro installation.");
+                Debug.LogWarning(
+                    "[ConsoleProIntegration] Documentation PDF not found. Check Console Pro installation."
+                );
         }
 
         // ── Core ────────────────────────────────────────────────────────────
@@ -142,25 +144,32 @@ namespace NPCSystem.Editor.Tools
                 report.AppendLine($"⚠ '{DefineSymbol}' scripting define MISSING — run Reapply Scripting Define");
 
             // Check runtime helper
-            var debugScript = AssetDatabase.FindAssets("ConsoleProDebug")
+            var debugScript = AssetDatabase
+                .FindAssets("ConsoleProDebug")
                 .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
                 .FirstOrDefault(p => p.EndsWith(".cs"));
 
-            report.AppendLine(debugScript != null
-                ? "✅ ConsoleProDebug.cs found"
-                : "⚠ ConsoleProDebug.cs not found (runtime filtering won't work)");
+            report.AppendLine(
+                debugScript != null
+                    ? "✅ ConsoleProDebug.cs found"
+                    : "⚠ ConsoleProDebug.cs not found (runtime filtering won't work)"
+            );
 
             // Check version-specific DLL
 #if UNITY_6000_5_OR_NEWER
             var has6005Dll = dllPaths.Any(p => p.Contains("6000_5_Plus"));
-            report.AppendLine(has6005Dll
-                ? "✅ Unity 6000.5+ DLL available"
-                : "⚠ No Unity 6000.5+ specific DLL — ensure Console Pro is updated");
+            report.AppendLine(
+                has6005Dll
+                    ? "✅ Unity 6000.5+ DLL available"
+                    : "⚠ No Unity 6000.5+ specific DLL — ensure Console Pro is updated"
+            );
 #elif UNITY_6000_3_OR_NEWER
             var has6003Dll = dllPaths.Any(p => p.Contains("6000_3_Plus"));
-            report.AppendLine(has6003Dll
-                ? "✅ Unity 6000.3+ DLL available"
-                : "⚠ No Unity 6000.3+ specific DLL — ensure Console Pro is updated");
+            report.AppendLine(
+                has6003Dll
+                    ? "✅ Unity 6000.3+ DLL available"
+                    : "⚠ No Unity 6000.3+ specific DLL — ensure Console Pro is updated"
+            );
 #endif
 
             report.AppendLine("═════════════════════════════════════════");

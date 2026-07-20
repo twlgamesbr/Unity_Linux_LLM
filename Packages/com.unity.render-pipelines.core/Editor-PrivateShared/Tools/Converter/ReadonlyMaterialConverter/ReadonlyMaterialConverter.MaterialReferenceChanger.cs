@@ -123,7 +123,13 @@ namespace UnityEditor.Rendering.Converter
             return ok;
         }
 
-        private bool ReassignMaterialsFromInstaceIfOverriden(object obj, object prefabObj, MemberInfo member, bool isArray, StringBuilder errors)
+        private bool ReassignMaterialsFromInstaceIfOverriden(
+            object obj,
+            object prefabObj,
+            MemberInfo member,
+            bool isArray,
+            StringBuilder errors
+        )
         {
             if (!TryGetFromMemberInfoAccessors(obj, member, out var getter, out var setter))
             {
@@ -169,14 +175,23 @@ namespace UnityEditor.Rendering.Converter
             bool ok = true;
             foreach (var materialAccessor in entry.materialAccessors)
             {
-                bool reassignOk = (prefabObj != null) ?
-                    ReassignMaterialsFromInstaceIfOverriden(obj, prefabObj, materialAccessor.member, materialAccessor.isArray, errors):
-                    ReassignMaterialsFromInstance(obj, materialAccessor.member, materialAccessor.isArray);
+                bool reassignOk =
+                    (prefabObj != null)
+                        ? ReassignMaterialsFromInstaceIfOverriden(
+                            obj,
+                            prefabObj,
+                            materialAccessor.member,
+                            materialAccessor.isArray,
+                            errors
+                        )
+                        : ReassignMaterialsFromInstance(obj, materialAccessor.member, materialAccessor.isArray);
 
                 if (!reassignOk)
                 {
                     ok = false;
-                    errors.AppendLine($"Unable to change material on {entry.type} with property {materialAccessor.member.Name}");
+                    errors.AppendLine(
+                        $"Unable to change material on {entry.type} with property {materialAccessor.member.Name}"
+                    );
                 }
             }
             return ok;
@@ -195,7 +210,6 @@ namespace UnityEditor.Rendering.Converter
                 // Iterate over all components, and reassign materials
                 reassignOk = ReassignGameObjectMaterials(go, errors);
             }
-
             // Any other type, just get the mappings for that type and assing it through reflection
             else if (MaterialReferenceBuilder.TryGetReferenceInfoFromType(obj.GetType(), out var entry))
             {

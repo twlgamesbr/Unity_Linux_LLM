@@ -13,7 +13,7 @@ namespace UnityEditor.TestTools
         internal enum AssetPipelineBackend
         {
             V1,
-            V2
+            V2,
         }
 
         /// <summary>
@@ -21,7 +21,8 @@ namespace UnityEditor.TestTools
         /// </summary>
         internal class IgnoreInV1 : AssetPipelineIgnoreAttribute
         {
-            public IgnoreInV1(string ignoreReason) : base(AssetPipelineBackend.V1, ignoreReason) {}
+            public IgnoreInV1(string ignoreReason)
+                : base(AssetPipelineBackend.V1, ignoreReason) { }
         }
 
         /// <summary>
@@ -29,7 +30,8 @@ namespace UnityEditor.TestTools
         /// </summary>
         internal class IgnoreInV2 : AssetPipelineIgnoreAttribute
         {
-            public IgnoreInV2(string ignoreReason) : base(AssetPipelineBackend.V2, ignoreReason) {}
+            public IgnoreInV2(string ignoreReason)
+                : base(AssetPipelineBackend.V2, ignoreReason) { }
         }
 
         [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
@@ -54,7 +56,11 @@ namespace UnityEditor.TestTools
                 if (k_ActiveBackend == m_IgnoredBackend)
                 {
                     test.RunState = RunState.Ignored;
-                    var skipReason = string.Format("Not supported by asset pipeline {0} backend {1}", ActiveBackendName, m_IgnoreReason);
+                    var skipReason = string.Format(
+                        "Not supported by asset pipeline {0} backend {1}",
+                        ActiveBackendName,
+                        m_IgnoreReason
+                    );
                     test.Properties.Add(PropertyNames.SkipReason, skipReason);
                 }
             }

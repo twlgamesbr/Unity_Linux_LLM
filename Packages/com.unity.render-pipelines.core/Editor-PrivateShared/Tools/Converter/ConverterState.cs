@@ -13,7 +13,7 @@ namespace UnityEditor.Rendering.Converter
         Warnings = (1 << Status.Warning),
         Errors = (1 << Status.Error),
         Success = (1 << Status.Success),
-        All = Pending | Warnings | Errors | Success
+        All = Pending | Warnings | Errors | Success,
     }
 
     // Each converter uses the active bool
@@ -27,11 +27,13 @@ namespace UnityEditor.Rendering.Converter
         public bool isLoading; // to name
         public bool isInitialized;
         public List<ConverterItemState> items = new List<ConverterItemState>();
+
         [SerializeReference]
         public IRenderPipelineConverter converter;
 
         public DisplayFilter currentFilter = DisplayFilter.All;
-        public IList<TreeViewItemData<ConverterItemState>> filteredItems {get; private set; } = new List<TreeViewItemData<ConverterItemState>>();
+        public IList<TreeViewItemData<ConverterItemState>> filteredItems { get; private set; } =
+            new List<TreeViewItemData<ConverterItemState>>();
 
         private int CountItemWithFlag(Status status)
         {
@@ -45,6 +47,7 @@ namespace UnityEditor.Rendering.Converter
             }
             return count;
         }
+
         public int pending => CountItemWithFlag(Status.Pending);
         public int warnings => CountItemWithFlag(Status.Warning);
         public int errors => CountItemWithFlag(Status.Error);
@@ -75,7 +78,7 @@ namespace UnityEditor.Rendering.Converter
                 Status.Warning => IsVisible(DisplayFilter.Warnings),
                 Status.Error => IsVisible(DisplayFilter.Errors),
                 Status.Success => IsVisible(DisplayFilter.Success),
-                _ => false
+                _ => false,
             };
         }
 

@@ -132,9 +132,7 @@ namespace UnityEngine.InputSystem
         /// </code>
         /// </example>
         /// </remarks>
-        protected virtual void FinishSetup(ref InputBindingCompositeContext context)
-        {
-        }
+        protected virtual void FinishSetup(ref InputBindingCompositeContext context) { }
 
         // Avoid having to expose internal modifier.
         internal void CallFinishSetup(ref InputBindingCompositeContext context)
@@ -188,8 +186,10 @@ namespace UnityEngine.InputSystem
                 return null;
 
             ////TODO: allow it being properties instead of just fields
-            var field = compositeType.GetField(part,
-                BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public);
+            var field = compositeType.GetField(
+                part,
+                BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public
+            );
             if (field == null)
                 return null;
 
@@ -334,7 +334,8 @@ namespace UnityEngine.InputSystem
             if (bufferSize < valueSize)
                 throw new ArgumentException(
                     $"Expected buffer of at least {UnsafeUtility.SizeOf<TValue>()} bytes but got buffer of only {bufferSize} bytes instead",
-                    nameof(bufferSize));
+                    nameof(bufferSize)
+                );
 
             var value = ReadValue(ref context);
             var valuePtr = UnsafeUtility.AddressOf(ref value);

@@ -34,7 +34,15 @@ namespace UnityEditor.Rendering
         /// <param name="subHeader">Set to true to make this into a sub-header. This affects the style of the header. Set to false to make this use the standard style.</param>
         /// <param name="defaultExpandedState">The default state if the header is not present</param>
         /// <param name="documentationURL">[optional] Documentation page</param>
-        public MaterialHeaderScope(GUIContent title, uint bitExpanded, MaterialEditor materialEditor, bool spaceAtEnd = true, bool subHeader = false, uint defaultExpandedState = uint.MaxValue, string documentationURL = "")
+        public MaterialHeaderScope(
+            GUIContent title,
+            uint bitExpanded,
+            MaterialEditor materialEditor,
+            bool spaceAtEnd = true,
+            bool subHeader = false,
+            uint defaultExpandedState = uint.MaxValue,
+            string documentationURL = ""
+        )
         {
             if (title == null)
                 throw new ArgumentNullException(nameof(title));
@@ -66,15 +74,29 @@ namespace UnityEditor.Rendering
         /// <param name="materialEditor">The current material editor.</param>
         /// <param name="spaceAtEnd">Set this to true to make the block include space at the bottom of its UI. Set to false to not include any space.</param>
         /// <param name="subHeader">Set to true to make this into a sub-header. This affects the style of the header. Set to false to make this use the standard style.</param>
-        public MaterialHeaderScope(string title, uint bitExpanded, MaterialEditor materialEditor, bool spaceAtEnd = true, bool subHeader = false)
-            : this(EditorGUIUtility.TrTextContent(title, string.Empty), bitExpanded, materialEditor, spaceAtEnd, subHeader)
-        {
-        }
+        public MaterialHeaderScope(
+            string title,
+            uint bitExpanded,
+            MaterialEditor materialEditor,
+            bool spaceAtEnd = true,
+            bool subHeader = false
+        )
+            : this(
+                EditorGUIUtility.TrTextContent(title, string.Empty),
+                bitExpanded,
+                materialEditor,
+                spaceAtEnd,
+                subHeader
+            ) { }
 
         /// <summary>Disposes of the material scope header and cleans up any resources it used.</summary>
         void IDisposable.Dispose()
         {
-            if (expanded && spaceAtEnd && (Event.current.type == EventType.Repaint || Event.current.type == EventType.Layout))
+            if (
+                expanded
+                && spaceAtEnd
+                && (Event.current.type == EventType.Repaint || Event.current.type == EventType.Layout)
+            )
                 EditorGUILayout.Space();
 
             GUILayout.EndVertical();

@@ -27,9 +27,7 @@ namespace UnityEditor.PathTracing.Debugging
         }
 
         public BakeProfilingScope()
-            : this(IsFullBakeCaptureEnabled())
-        {
-        }
+            : this(IsFullBakeCaptureEnabled()) { }
 
         public void Dispose()
         {

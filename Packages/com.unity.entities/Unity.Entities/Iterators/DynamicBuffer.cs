@@ -22,7 +22,8 @@ namespace Unity.Entities
     [NativeContainer]
     [DebuggerDisplay("Length = {Length}, Capacity = {Capacity}, IsCreated = {IsCreated}")]
     [DebuggerTypeProxy(typeof(DynamicBufferDebugView<>))]
-    public unsafe struct DynamicBuffer<T> : IQueryTypeParameter, IEnumerable<T>, INativeList<T> where T : unmanaged
+    public unsafe struct DynamicBuffer<T> : IQueryTypeParameter, IEnumerable<T>, INativeList<T>
+        where T : unmanaged
     {
         [NativeDisableUnsafePtrRestriction]
         [NoAlias]
@@ -43,7 +44,15 @@ namespace Unity.Entities
 #endif
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal DynamicBuffer(BufferHeader* header, AtomicSafetyHandle safety, AtomicSafetyHandle arrayInvalidationSafety, bool isReadOnly, bool useMemoryInitPattern, byte memoryInitPattern, int internalCapacity)
+        internal DynamicBuffer(
+            BufferHeader* header,
+            AtomicSafetyHandle safety,
+            AtomicSafetyHandle arrayInvalidationSafety,
+            bool isReadOnly,
+            bool useMemoryInitPattern,
+            byte memoryInitPattern,
+            int internalCapacity
+        )
         {
             m_Buffer = header;
             m_Safety0 = safety;
@@ -57,14 +66,12 @@ namespace Unity.Entities
             CollectionHelper.InitNativeContainer<T>(m_Safety0);
             CollectionHelper.InitNativeContainer<T>(m_Safety1);
         }
-
 #else
         internal DynamicBuffer(BufferHeader* header, int internalCapacity)
         {
             m_Buffer = header;
             m_InternalCapacity = internalCapacity;
         }
-
 #endif
 
         /// <summary>
@@ -112,9 +119,27 @@ namespace Unity.Entities
 #endif
                 CheckWriteAccessAndInvalidateArrayAliases();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                BufferHeader.SetCapacity(m_Buffer, value, UnsafeUtility.SizeOf<T>(), UnsafeUtility.AlignOf<T>(), BufferHeader.TrashMode.RetainOldData, m_useMemoryInitPattern == 1, m_memoryInitPattern, m_InternalCapacity);
+                BufferHeader.SetCapacity(
+                    m_Buffer,
+                    value,
+                    UnsafeUtility.SizeOf<T>(),
+                    UnsafeUtility.AlignOf<T>(),
+                    BufferHeader.TrashMode.RetainOldData,
+                    m_useMemoryInitPattern == 1,
+                    m_memoryInitPattern,
+                    m_InternalCapacity
+                );
 #else
-                BufferHeader.SetCapacity(m_Buffer, value, UnsafeUtility.SizeOf<T>(), UnsafeUtility.AlignOf<T>(), BufferHeader.TrashMode.RetainOldData, false, 0, m_InternalCapacity);
+                BufferHeader.SetCapacity(
+                    m_Buffer,
+                    value,
+                    UnsafeUtility.SizeOf<T>(),
+                    UnsafeUtility.AlignOf<T>(),
+                    BufferHeader.TrashMode.RetainOldData,
+                    false,
+                    0,
+                    m_InternalCapacity
+                );
 #endif
             }
         }
@@ -130,17 +155,16 @@ namespace Unity.Entities
         /// </summary>
         public bool IsCreated
         {
-            get
-            {
-                return m_Buffer != null;
-            }
+            get { return m_Buffer != null; }
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         void CheckBounds(int index)
         {
             if ((uint)index >= (uint)Length)
-                throw new IndexOutOfRangeException($"Index {index} is out of range in DynamicBuffer of '{Length}' Length.");
+                throw new IndexOutOfRangeException(
+                    $"Index {index} is out of range in DynamicBuffer of '{Length}' Length."
+                );
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
@@ -260,9 +284,25 @@ namespace Unity.Entities
         {
             CheckWriteAccessAndInvalidateArrayAliases();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            BufferHeader.EnsureCapacity(m_Buffer, length, UnsafeUtility.SizeOf<T>(), UnsafeUtility.AlignOf<T>(), BufferHeader.TrashMode.RetainOldData, m_useMemoryInitPattern == 1, m_memoryInitPattern);
+            BufferHeader.EnsureCapacity(
+                m_Buffer,
+                length,
+                UnsafeUtility.SizeOf<T>(),
+                UnsafeUtility.AlignOf<T>(),
+                BufferHeader.TrashMode.RetainOldData,
+                m_useMemoryInitPattern == 1,
+                m_memoryInitPattern
+            );
 #else
-            BufferHeader.EnsureCapacity(m_Buffer, length, UnsafeUtility.SizeOf<T>(), UnsafeUtility.AlignOf<T>(), BufferHeader.TrashMode.RetainOldData, false, 0);
+            BufferHeader.EnsureCapacity(
+                m_Buffer,
+                length,
+                UnsafeUtility.SizeOf<T>(),
+                UnsafeUtility.AlignOf<T>(),
+                BufferHeader.TrashMode.RetainOldData,
+                false,
+                0
+            );
 #endif
         }
 
@@ -364,7 +404,11 @@ namespace Unity.Entities
             CheckBounds(index); //CheckBounds after ResizeUninitialized since index == length is allowed
             int elemSize = UnsafeUtility.SizeOf<T>();
             byte* basePtr = BufferHeader.GetElementPointer(m_Buffer);
-            UnsafeUtility.MemMove(basePtr + (index + 1) * elemSize, basePtr + index * elemSize, (long)elemSize * (length - index));
+            UnsafeUtility.MemMove(
+                basePtr + (index + 1) * elemSize,
+                basePtr + index * elemSize,
+                (long)elemSize * (length - index)
+            );
             this[index] = elem;
         }
 
@@ -385,7 +429,11 @@ namespace Unity.Entities
             ResizeUninitialized(oldLength + newElems.Length);
 
             byte* basePtr = BufferHeader.GetElementPointer(m_Buffer);
-            UnsafeUtility.MemCpy(basePtr + (long)oldLength * elemSize, newElems.GetUnsafeReadOnlyPtr<T>(), (long)elemSize * newElems.Length);
+            UnsafeUtility.MemCpy(
+                basePtr + (long)oldLength * elemSize,
+                newElems.GetUnsafeReadOnlyPtr<T>(),
+                (long)elemSize * newElems.Length
+            );
         }
 
         /// <summary>
@@ -408,7 +456,11 @@ namespace Unity.Entities
             int elemSize = UnsafeUtility.SizeOf<T>();
             byte* basePtr = BufferHeader.GetElementPointer(m_Buffer);
 
-            UnsafeUtility.MemMove(basePtr + index * elemSize, basePtr + (index + count) * elemSize, (long)elemSize * (Length - count - index));
+            UnsafeUtility.MemMove(
+                basePtr + index * elemSize,
+                basePtr + (index + count) * elemSize,
+                (long)elemSize * (Length - count - index)
+            );
 
             m_Buffer->Length -= count;
         }
@@ -496,10 +548,13 @@ namespace Unity.Entities
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        private static void AssertReinterpretSizesMatch<U>() where U : struct
+        private static void AssertReinterpretSizesMatch<U>()
+            where U : struct
         {
             if (UnsafeUtility.SizeOf<U>() != UnsafeUtility.SizeOf<T>())
-                throw new InvalidOperationException($"Types {typeof(U)} and {typeof(T)} are of different sizes; cannot reinterpret");
+                throw new InvalidOperationException(
+                    $"Types {typeof(U)} and {typeof(T)} are of different sizes; cannot reinterpret"
+                );
         }
 
         /// <summary>
@@ -514,13 +569,22 @@ namespace Unity.Entities
         /// <returns>A dynamic buffer of the reinterpreted type.</returns>
         /// <exception cref="InvalidOperationException">If the reinterpreted type is a different
         /// size than the original.</exception>
-        public DynamicBuffer<U> Reinterpret<U>() where U : unmanaged
+        public DynamicBuffer<U> Reinterpret<U>()
+            where U : unmanaged
         {
             AssertReinterpretSizesMatch<U>();
             // NOTE: We're forwarding the internal capacity along to this aliased, type-punned buffer.
             // That's OK, because if mutating operations happen they are all still the same size.
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            return new DynamicBuffer<U>(m_Buffer, m_Safety0, m_Safety1, m_IsReadOnly == 1, m_useMemoryInitPattern == 1, m_memoryInitPattern, m_InternalCapacity);
+            return new DynamicBuffer<U>(
+                m_Buffer,
+                m_Safety0,
+                m_Safety1,
+                m_IsReadOnly == 1,
+                m_useMemoryInitPattern == 1,
+                m_memoryInitPattern,
+                m_InternalCapacity
+            );
 #else
             return new DynamicBuffer<U>(m_Buffer, m_InternalCapacity);
 #endif
@@ -541,7 +605,11 @@ namespace Unity.Entities
         {
             CheckReadAccess();
 
-            var shadow = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(BufferHeader.GetElementPointer(m_Buffer), Length, Allocator.None);
+            var shadow = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                BufferHeader.GetElementPointer(m_Buffer),
+                Length,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var handle = m_Safety1;
             AtomicSafetyHandle.UseSecondaryVersion(ref handle);
@@ -564,8 +632,15 @@ namespace Unity.Entities
             return new NativeArray<T>.Enumerator(ref array);
         }
 
-        IEnumerator IEnumerable.GetEnumerator() { throw new NotImplementedException(); }
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() { throw new NotImplementedException(); }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Copies the buffer into a new native array.
@@ -623,8 +698,11 @@ namespace Unity.Entities
             v.CheckReadAccess();
             CheckWriteAccess();
 
-            UnsafeUtility.MemCpy(BufferHeader.GetElementPointer(m_Buffer),
-                BufferHeader.GetElementPointer(v.m_Buffer), Length * UnsafeUtility.SizeOf<T>());
+            UnsafeUtility.MemCpy(
+                BufferHeader.GetElementPointer(m_Buffer),
+                BufferHeader.GetElementPointer(v.m_Buffer),
+                Length * UnsafeUtility.SizeOf<T>()
+            );
         }
 
         /// <summary>
@@ -646,14 +724,20 @@ namespace Unity.Entities
             GCHandle gcHandle = GCHandle.Alloc((object)v, GCHandleType.Pinned);
             IntPtr num = gcHandle.AddrOfPinnedObject();
 
-            UnsafeUtility.MemCpy(BufferHeader.GetElementPointer(m_Buffer), (void*)num, Length * UnsafeUtility.SizeOf<T>());
+            UnsafeUtility.MemCpy(
+                BufferHeader.GetElementPointer(m_Buffer),
+                (void*)num,
+                Length * UnsafeUtility.SizeOf<T>()
+            );
             gcHandle.Free();
         }
     }
 
-    internal sealed class DynamicBufferDebugView<T>  where T : unmanaged
+    internal sealed class DynamicBufferDebugView<T>
+        where T : unmanaged
     {
         private DynamicBuffer<T> _buffer;
+
         public DynamicBufferDebugView(DynamicBuffer<T> source)
         {
             _buffer = source;

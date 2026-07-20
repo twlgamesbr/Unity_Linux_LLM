@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
-using Unity.Collections.LowLevel.Unsafe;
 
 // The types defined in this file should match the types defined in BakeInput.h.
 namespace UnityEditor.PathTracing.LightBakerBridge
@@ -31,7 +31,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         public void TransferBlittableArray<T>(ref T[] array)
             where T : unmanaged;
 
-        public void TransferDictionary<TKey, TValue>(ref Dictionary<TKey, TValue> dict, TransferFunction<TValue> valueTransfer)
+        public void TransferDictionary<TKey, TValue>(
+            ref Dictionary<TKey, TValue> dict,
+            TransferFunction<TValue> valueTransfer
+        )
             where TKey : unmanaged;
     }
 
@@ -40,14 +43,21 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         public static void Transfer<T>(this IBakeInputVisitor self, ref T result)
             where T : IBakeInputVisitable => result.Transfer(self);
 
-        public static void TransferArray<T>(this IBakeInputVisitor self, ref T[] array) where T : IBakeInputVisitable
-            => self.TransferArray(ref array, (IBakeInputVisitor visitor, ref T result) => visitor.Transfer(ref result));
+        public static void TransferArray<T>(this IBakeInputVisitor self, ref T[] array)
+            where T : IBakeInputVisitable =>
+            self.TransferArray(ref array, (IBakeInputVisitor visitor, ref T result) => visitor.Transfer(ref result));
 
-        public static void TransferBlittableDictionary<TKey, TValue>(this IBakeInputVisitor self, ref Dictionary<TKey, TValue> dict)
+        public static void TransferBlittableDictionary<TKey, TValue>(
+            this IBakeInputVisitor self,
+            ref Dictionary<TKey, TValue> dict
+        )
             where TKey : unmanaged
             where TValue : unmanaged
         {
-            self.TransferDictionary(ref dict, (IBakeInputVisitor visitor, ref TValue result) => visitor.TransferBlittable(ref result));
+            self.TransferDictionary(
+                ref dict,
+                (IBakeInputVisitor visitor, ref TValue result) => visitor.TransferBlittable(ref result)
+            );
         }
     }
 
@@ -120,7 +130,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
         }
 
-        public void TransferDictionary<TKey, TValue>(ref Dictionary<TKey, TValue> dict, TransferFunction<TValue> valueTransfer)
+        public void TransferDictionary<TKey, TValue>(
+            ref Dictionary<TKey, TValue> dict,
+            TransferFunction<TValue> valueTransfer
+        )
             where TKey : unmanaged
         {
             UInt64 length = 0;
@@ -177,9 +190,16 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         }
 
         public void TransferBlittableArray<T>(ref T[] array)
-            where T : unmanaged => TransferArray(ref array, (IBakeInputVisitor visitor, ref T result) => visitor.TransferBlittable(ref result));
+            where T : unmanaged =>
+            TransferArray(
+                ref array,
+                (IBakeInputVisitor visitor, ref T result) => visitor.TransferBlittable(ref result)
+            );
 
-        public void TransferDictionary<TKey, TValue>(ref Dictionary<TKey, TValue> dict, TransferFunction<TValue> valueTransfer)
+        public void TransferDictionary<TKey, TValue>(
+            ref Dictionary<TKey, TValue> dict,
+            TransferFunction<TValue> valueTransfer
+        )
             where TKey : unmanaged
         {
             UInt64 length = (UInt64)dict.Count;
@@ -206,7 +226,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
     {
         Opacity = 0,
         Transparency,
-        None
+        None,
     }
 
     internal enum TransmissionChannels
@@ -215,13 +235,13 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         Alpha,
         AlphaCutout,
         RGB,
-        None
+        None,
     }
 
     internal enum LightmapBakeMode
     {
         NonDirectional = 0,
-        CombinedDirectional
+        CombinedDirectional,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -273,7 +293,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         Normal = 1,
         TexCoord0 = 2,
         TexCoord1 = 3,
-        Count = 4
+        Count = 4,
     }
 
     [Flags]
@@ -285,7 +305,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         Normal = 1 << MeshShaderChannel.Normal,
         TexCoord0 = 1 << MeshShaderChannel.TexCoord0,
         TexCoord1 = 1 << MeshShaderChannel.TexCoord1,
-        MaskAll = (1 << MeshShaderChannel.Count) - 1
+        MaskAll = (1 << MeshShaderChannel.Count) - 1,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -499,7 +519,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         Rectangle,
         Disc,
         SpotPyramidShape,
-        SpotBoxShape
+        SpotBoxShape,
     }
 
     internal enum FalloffType : byte
@@ -508,20 +528,20 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         InverseSquaredNoRangeAttenuation,
         Linear,
         Legacy,
-        None
+        None,
     }
 
     internal enum AngularFalloffType : byte
     {
         LUT = 0,
-        AnalyticAndInnerAngle
+        AnalyticAndInnerAngle,
     }
 
     internal enum LightMode : byte
     {
         Realtime = 0,
         Mixed,
-        Baked
+        Baked,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -606,7 +626,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         LightProbeOcclusion = 1 << 4,
         EnvironmentOcclusion = 1 << 5,
         Depth = 1 << 6,
-        All = 0xFFFFFFFF
+        All = 0xFFFFFFFF,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -673,18 +693,18 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         Normal = 1 << 9,
         ChartIndex = 1 << 10,
         OverlapPixelIndex = 1 << 11,
-        All = 0xFFFFFFFF
+        All = 0xFFFFFFFF,
     }
 
     internal enum TilingMode : byte
-    {   // Assuming a 4k lightmap (16M texels), the tiling will yield the following chunk sizes:
-        None = 0,                 // 4k * 4k =    16M texels
-        Quarter = 1,              // 2k * 2k =     4M texels
-        Sixteenth = 2,            // 1k * 1k =     1M texels
-        Sixtyfourth = 3,          // 512 * 512 = 262k texels
+    { // Assuming a 4k lightmap (16M texels), the tiling will yield the following chunk sizes:
+        None = 0, // 4k * 4k =    16M texels
+        Quarter = 1, // 2k * 2k =     4M texels
+        Sixteenth = 2, // 1k * 1k =     1M texels
+        Sixtyfourth = 3, // 512 * 512 = 262k texels
         TwoHundredFiftySixth = 4, // 256 * 256 =  65k texels
         Max = TwoHundredFiftySixth,
-        Error = 5                 // Error. We don't want to go lower (GPU occupancy will start to be a problem for smaller atlas sizes).
+        Error = 5, // Error. We don't want to go lower (GPU occupancy will start to be a problem for smaller atlas sizes).
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -714,12 +734,24 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             // TODO: We need to change the naming of the entries in the enum see: https://jira.unity3d.com/browse/GFXFEAT-728
             switch (tilingMode)
             {
-                case TilingMode.None: bufferSize = 1048576; break;                     // UI: Highest Performance
-                case TilingMode.Quarter: bufferSize = 524288; break;                   // UI: High Performance
-                case TilingMode.Sixteenth: bufferSize = 262144; break;                 // UI: Automatic     (but it is not automatic)
-                case TilingMode.Sixtyfourth: bufferSize = 131072; break;               // UI: Low Memory Usage
-                case TilingMode.TwoHundredFiftySixth: bufferSize = 65536; break;       // UI: Lowest Memory Usage
-                default: Debug.Assert(false, "Unknown tiling mode."); break;
+                case TilingMode.None:
+                    bufferSize = 1048576;
+                    break; // UI: Highest Performance
+                case TilingMode.Quarter:
+                    bufferSize = 524288;
+                    break; // UI: High Performance
+                case TilingMode.Sixteenth:
+                    bufferSize = 262144;
+                    break; // UI: Automatic     (but it is not automatic)
+                case TilingMode.Sixtyfourth:
+                    bufferSize = 131072;
+                    break; // UI: Low Memory Usage
+                case TilingMode.TwoHundredFiftySixth:
+                    bufferSize = 65536;
+                    break; // UI: Lowest Memory Usage
+                default:
+                    Debug.Assert(false, "Unknown tiling mode.");
+                    break;
             }
             return math.max(bufferSize, kMinBufferSize);
         }
@@ -732,7 +764,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         {
             kSupersamplingDisabled = 1,
             kSupersamplingx2 = 2,
-            kSupersamplingx4 = 4
+            kSupersamplingx4 = 4,
         }
 
         public float backfaceTolerance;
@@ -753,18 +785,22 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         public ulong Index => _u64First;
 
         public override int GetHashCode() => HashCode.Combine(_u64First, _u64Second);
+
         public bool Equals(IndexHash128 other) => _u64First == other._u64First && _u64Second == other._u64Second;
+
         public override bool Equals(object obj) => obj is IndexHash128 other && Equals(other);
+
         public static bool operator ==(IndexHash128 a, IndexHash128 b) => a.Equals(b);
+
         public static bool operator !=(IndexHash128 a, IndexHash128 b) => !a.Equals(b);
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct PVRAtlasData : IBakeInputVisitable
     {
-        public IndexHash128 m_AtlasHash;      // The hash of this atlas.
-        public IndexHash128 m_SceneGUID;      // The scene identifier, used for multi-scene bakes.
-        public Int32 m_AtlasId;          // The atlasId.
+        public IndexHash128 m_AtlasHash; // The hash of this atlas.
+        public IndexHash128 m_SceneGUID; // The scene identifier, used for multi-scene bakes.
+        public Int32 m_AtlasId; // The atlasId.
         public ProgressiveBakeParametersStruct m_BakeParameters;
 
         public void Transfer(IBakeInputVisitor visitor)
@@ -811,9 +847,9 @@ namespace UnityEditor.PathTracing.LightBakerBridge
     [StructLayout(LayoutKind.Sequential)]
     internal struct AtlassedInstanceData : IBakeInputVisitable
     {
-        public int m_AtlasId;          // The 0-based atlas index of the atlas (used by the renderers to get the lightmap).
-        public int m_InstanceIndex;    // Instance index in atlas.
-        public float4 m_LightmapST;   // The atlas UV scale and translate.
+        public int m_AtlasId; // The 0-based atlas index of the atlas (used by the renderers to get the lightmap).
+        public int m_InstanceIndex; // Instance index in atlas.
+        public float4 m_LightmapST; // The atlas UV scale and translate.
         public Rect m_Viewport;
         public float m_Width;
         public float m_Height;
@@ -853,9 +889,17 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             visitor.TransferBlittableDictionary(ref m_AtlasHashToAtlasId);
             visitor.TransferBlittableDictionary(ref m_AtlasHashToGBufferHash);
             visitor.TransferBlittableArray(ref m_GBufferHashes);
-            visitor.TransferDictionary(ref m_AtlasHashToObjectIDHashes, (IBakeInputVisitor dictionaryVisitor, ref IndexHash128[] result) => dictionaryVisitor.TransferBlittableArray(ref result));
+            visitor.TransferDictionary(
+                ref m_AtlasHashToObjectIDHashes,
+                (IBakeInputVisitor dictionaryVisitor, ref IndexHash128[] result) =>
+                    dictionaryVisitor.TransferBlittableArray(ref result)
+            );
             visitor.TransferBlittableDictionary(ref m_AtlasHashToAtlasWeight);
-            visitor.TransferDictionary(ref m_GBufferHashToGBufferInstances, (IBakeInputVisitor dictionaryVisitor, ref GBufferInstances result) => dictionaryVisitor.Transfer(ref result));
+            visitor.TransferDictionary(
+                ref m_GBufferHashToGBufferInstances,
+                (IBakeInputVisitor dictionaryVisitor, ref GBufferInstances result) =>
+                    dictionaryVisitor.Transfer(ref result)
+            );
             visitor.TransferBlittableDictionary(ref m_InstanceAtlassingData);
             visitor.TransferBlittableArray(ref m_AtlasOffsets);
             visitor.TransferBlittable(ref m_EstimatedTexelCount);
@@ -880,15 +924,19 @@ namespace UnityEditor.PathTracing.LightBakerBridge
     {
         // Global settings
         public LightingSettings lightingSettings;
+
         // Mesh data
         public MeshData[] meshData;
         public TerrainData[] terrainData;
         public TerrainHoleData[] terrainHoleData;
         public HeightmapData[] heightMapData;
+
         // Material data
         public MaterialData[] materialData;
+
         // Instance data
         public InstanceData[] instanceData;
+
         // Texture data
         public UInt32[] instanceToTextureDataIndex; // Index into albedoData and emissiveData for each instance
         public Int32[] materialToTransmissionDataIndex; // Index into transmissionData and transmissionDataProperties for each material
@@ -896,9 +944,11 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         public TextureData[] emissiveData;
         public TextureData[] transmissionData; // Same size as transmissionDataProperties
         public TextureProperties[] transmissionDataProperties; // Same size as transmissionData
+
         // Cookie data
         public CookieData[] cookieData;
         public LightData[] lightData;
+
         // Environment data
         public EnvironmentData environmentData;
 
@@ -959,7 +1009,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
             UInt64 fileVersion = 0;
             visitor.TransferBlittable(ref fileVersion);
-            Debug.Assert(fileVersion == CurrentFileVersion, "Version number did not match the current implementation of BakeInput deserialization.");
+            Debug.Assert(
+                fileVersion == CurrentFileVersion,
+                "Version number did not match the current implementation of BakeInput deserialization."
+            );
             if (fileVersion != CurrentFileVersion)
                 return false;
 
@@ -974,7 +1027,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
             UInt64 fileVersion = 0;
             visitor.TransferBlittable(ref fileVersion);
-            Debug.Assert(fileVersion == CurrentFileVersion, "Version number did not match the current implementation of LightmapRequestData deserialization.");
+            Debug.Assert(
+                fileVersion == CurrentFileVersion,
+                "Version number did not match the current implementation of LightmapRequestData deserialization."
+            );
             if (fileVersion != CurrentFileVersion)
                 return false;
 
@@ -989,7 +1045,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
             UInt64 fileVersion = 0;
             visitor.TransferBlittable(ref fileVersion);
-            Debug.Assert(fileVersion == CurrentFileVersion, "Version number did not match the current implementation of LightProbeRequestData deserialization.");
+            Debug.Assert(
+                fileVersion == CurrentFileVersion,
+                "Version number did not match the current implementation of LightProbeRequestData deserialization."
+            );
             if (fileVersion != CurrentFileVersion)
                 return false;
 

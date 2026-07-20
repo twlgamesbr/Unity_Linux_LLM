@@ -22,9 +22,16 @@ namespace NPCSystem.Monitoring
     {
         static readonly HashSet<string> _interceptedPrefixes = new HashSet<string>
         {
-            "[NPC", "[TelemetryRouter]", "[TelemetryBootstrapper]", "[ConsoleSink]",
-            "[Supabase", "[WebGLDiagnostics]", "[Qdrant",
-            "[CreateGenericItems]", "[ConsoleProIntegration]", "[SettingsGuard]",
+            "[NPC",
+            "[TelemetryRouter]",
+            "[TelemetryBootstrapper]",
+            "[ConsoleSink]",
+            "[Supabase",
+            "[WebGLDiagnostics]",
+            "[Qdrant",
+            "[CreateGenericItems]",
+            "[ConsoleProIntegration]",
+            "[SettingsGuard]",
         };
 
         static readonly Regex _categoryPattern = new Regex(
@@ -70,7 +77,7 @@ namespace NPCSystem.Monitoring
             {
                 LogType.Error or LogType.Exception or LogType.Assert => "Error",
                 LogType.Warning => "Warning",
-                _ => "Info"
+                _ => "Info",
             };
 
             // Add #NPC# #category# temp filter tags — Console Pro auto-creates filter buttons
@@ -116,7 +123,7 @@ namespace NPCSystem.Monitoring
                     "telemetry" => "system",
                     "watch" => "system",
                     "consolesink" => "system",
-                    _ => "system"
+                    _ => "system",
                 };
             }
             return "system";
@@ -124,44 +131,56 @@ namespace NPCSystem.Monitoring
 
         static string InferNpcSubCategory(string logString)
         {
-            if (logString.Contains("rag", StringComparison.OrdinalIgnoreCase)
+            if (
+                logString.Contains("rag", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("retriev", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("qdrant", StringComparison.OrdinalIgnoreCase)
-                || logString.Contains("embed", StringComparison.OrdinalIgnoreCase))
+                || logString.Contains("embed", StringComparison.OrdinalIgnoreCase)
+            )
                 return "rag";
 
-            if (logString.Contains("llm", StringComparison.OrdinalIgnoreCase)
+            if (
+                logString.Contains("llm", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("localai", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("complet", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("chat", StringComparison.OrdinalIgnoreCase)
-                || logString.Contains("token", StringComparison.OrdinalIgnoreCase))
+                || logString.Contains("token", StringComparison.OrdinalIgnoreCase)
+            )
                 return "llm";
 
-            if (logString.Contains("auth", StringComparison.OrdinalIgnoreCase)
+            if (
+                logString.Contains("auth", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("login", StringComparison.OrdinalIgnoreCase)
-                || logString.Contains("supabase", StringComparison.OrdinalIgnoreCase))
+                || logString.Contains("supabase", StringComparison.OrdinalIgnoreCase)
+            )
                 return "auth";
 
-            if (logString.Contains("network", StringComparison.OrdinalIgnoreCase)
+            if (
+                logString.Contains("network", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("transport", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("websocket", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("rpc", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("netcode", StringComparison.OrdinalIgnoreCase)
-                || logString.Contains("ping", StringComparison.OrdinalIgnoreCase))
+                || logString.Contains("ping", StringComparison.OrdinalIgnoreCase)
+            )
                 return "network";
 
-            if (logString.Contains("item", StringComparison.OrdinalIgnoreCase)
+            if (
+                logString.Contains("item", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("trade", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("catalog", StringComparison.OrdinalIgnoreCase)
-                || logString.Contains("invent", StringComparison.OrdinalIgnoreCase))
+                || logString.Contains("invent", StringComparison.OrdinalIgnoreCase)
+            )
                 return "items";
 
-            if (logString.Contains("dialogue", StringComparison.OrdinalIgnoreCase)
+            if (
+                logString.Contains("dialogue", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("dialog", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("conversation", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("message", StringComparison.OrdinalIgnoreCase)
                 || logString.Contains("response", StringComparison.OrdinalIgnoreCase)
-                || logString.Contains("session", StringComparison.OrdinalIgnoreCase))
+                || logString.Contains("session", StringComparison.OrdinalIgnoreCase)
+            )
                 return "dialog";
 
             return "system";

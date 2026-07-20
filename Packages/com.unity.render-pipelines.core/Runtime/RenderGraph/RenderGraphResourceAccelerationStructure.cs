@@ -16,18 +16,25 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// Returns a null ray tracing acceleration structure handle
         /// </summary>
         /// <value>A null ray tracing acceleration structure handle.</value>
-        public static RayTracingAccelerationStructureHandle nullHandle { get { return s_NullHandle; } }
+        public static RayTracingAccelerationStructureHandle nullHandle
+        {
+            get { return s_NullHandle; }
+        }
 
         internal readonly ResourceHandle handle;
 
-        internal RayTracingAccelerationStructureHandle(int handle) { this.handle = new ResourceHandle(handle, RenderGraphResourceType.AccelerationStructure, false); }
+        internal RayTracingAccelerationStructureHandle(int handle)
+        {
+            this.handle = new ResourceHandle(handle, RenderGraphResourceType.AccelerationStructure, false);
+        }
 
         /// <summary>
         /// Cast to RayTracingAccelerationStructure
         /// </summary>
         /// <param name="handle">Input RayTracingAccelerationStructureHandle</param>
         /// <returns>Resource as a RayTracingAccelerationStructure.</returns>
-        public static implicit operator RayTracingAccelerationStructure(RayTracingAccelerationStructureHandle handle) => handle.IsValid() ? RenderGraphResourceRegistry.current.GetRayTracingAccelerationStructure(handle) : null;
+        public static implicit operator RayTracingAccelerationStructure(RayTracingAccelerationStructureHandle handle) =>
+            handle.IsValid() ? RenderGraphResourceRegistry.current.GetRayTracingAccelerationStructure(handle) : null;
 
         /// <summary>
         /// Return true if the handle is valid.
@@ -35,7 +42,6 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <returns>True if the handle is valid.</returns>
         public bool IsValid() => handle.IsValid();
     }
-
 
     /// <summary>
     /// Descriptor used to identify ray tracing acceleration structure resources
@@ -48,7 +54,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
     }
 
     [DebuggerDisplay("RayTracingAccelerationStructureResource ({desc.name})")]
-    class RayTracingAccelerationStructureResource : RenderGraphResource<RayTracingAccelerationStructureDesc, RayTracingAccelerationStructure>
+    class RayTracingAccelerationStructureResource
+        : RenderGraphResource<RayTracingAccelerationStructureDesc, RayTracingAccelerationStructure>
     {
         public override string GetName()
         {

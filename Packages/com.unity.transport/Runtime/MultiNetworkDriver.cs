@@ -102,7 +102,9 @@ namespace Unity.Networking.Transport
             {
                 var pipelines = this.GetDriverRef(id).PipelineCount;
                 if (pipelines != driver.PipelineCount)
-                    throw new ArgumentException($"Invalid driver (driver must have {pipelines} pipelines, but has {driver.PipelineCount}).");
+                    throw new ArgumentException(
+                        $"Invalid driver (driver must have {pipelines} pipelines, but has {driver.PipelineCount})."
+                    );
             }
         }
 
@@ -255,7 +257,9 @@ namespace Unity.Networking.Transport
                 // obtained from one of the methods provided by MultiNetworkDriver. Raise a specific
                 // exception for this case since the one from GetDriverRef won't be very useful.
                 if (connection.DriverId == 0)
-                    throw new ArgumentException("Invalid NetworkConnection (likely not obtained from MultiNetworkDriver).");
+                    throw new ArgumentException(
+                        "Invalid NetworkConnection (likely not obtained from MultiNetworkDriver)."
+                    );
             }
 
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
@@ -268,7 +272,9 @@ namespace Unity.Networking.Transport
                 // As for CheckConnection, we handle the default-valued ID specifically to raise an
                 // exception with a more useful error message than what we'd get with GetDriverRef.
                 if (pendingSendPtr->Connection.DriverId == 0)
-                    throw new ArgumentException("Invalid DataStreamWriter (likely not obtained from MultiNetworkDriver).");
+                    throw new ArgumentException(
+                        "Invalid DataStreamWriter (likely not obtained from MultiNetworkDriver)."
+                    );
             }
 
             /// <inheritdoc cref="MultiNetworkDriver.GetConnectionState"/>
@@ -285,7 +291,11 @@ namespace Unity.Networking.Transport
             }
 
             /// <inheritdoc cref="MultiNetworkDriver.PopEventForConnection(NetworkConnection, out DataStreamReader, out NetworkPipeline)"/>
-            public NetworkEvent.Type PopEventForConnection(NetworkConnection connection, out DataStreamReader reader, out NetworkPipeline pipe)
+            public NetworkEvent.Type PopEventForConnection(
+                NetworkConnection connection,
+                out DataStreamReader reader,
+                out NetworkPipeline pipe
+            )
             {
                 CheckConnection(connection);
                 return this.GetDriverRef(connection.DriverId).PopEventForConnection(connection, out reader, out pipe);
@@ -298,10 +308,16 @@ namespace Unity.Networking.Transport
             }
 
             /// <inheritdoc cref="MultiNetworkDriver.BeginSend(NetworkPipeline, NetworkConnection, out DataStreamWriter, int)"/>
-            public int BeginSend(NetworkPipeline pipe, NetworkConnection connection, out DataStreamWriter writer, int requiredPayloadSize = 0)
+            public int BeginSend(
+                NetworkPipeline pipe,
+                NetworkConnection connection,
+                out DataStreamWriter writer,
+                int requiredPayloadSize = 0
+            )
             {
                 CheckConnection(connection);
-                return this.GetDriverRef(connection.DriverId).BeginSend(pipe, connection, out writer, requiredPayloadSize);
+                return this.GetDriverRef(connection.DriverId)
+                    .BeginSend(pipe, connection, out writer, requiredPayloadSize);
             }
 
             /// <inheritdoc cref="MultiNetworkDriver.EndSend"/>
@@ -359,7 +375,8 @@ namespace Unity.Networking.Transport
         }
 
         /// <inheritdoc cref="NetworkDriver.RegisterPipelineStage"/>
-        public void RegisterPipelineStage<T>(T stage) where T : unmanaged, INetworkPipelineStage
+        public void RegisterPipelineStage<T>(T stage)
+            where T : unmanaged, INetworkPipelineStage
         {
             for (int id = 1; id <= DriverCount; id++)
             {
@@ -453,7 +470,12 @@ namespace Unity.Networking.Transport
         /// <param name="driverId">
         /// ID of the driver to connect, as obtained with <see cref="AddDriver"/>.
         /// </param>
-        public NetworkConnection Connect(int driverId, FixedString512Bytes address, ushort port, NativeArray<byte> payload)
+        public NetworkConnection Connect(
+            int driverId,
+            FixedString512Bytes address,
+            ushort port,
+            NativeArray<byte> payload
+        )
         {
             CheckDriverId(driverId);
 
@@ -517,7 +539,11 @@ namespace Unity.Networking.Transport
         }
 
         /// <inheritdoc cref="NetworkDriver.PopEvent(out NetworkConnection, out DataStreamReader, out NetworkPipeline)"/>
-        public NetworkEvent.Type PopEvent(out NetworkConnection connection, out DataStreamReader reader, out NetworkPipeline pipe)
+        public NetworkEvent.Type PopEvent(
+            out NetworkConnection connection,
+            out DataStreamReader reader,
+            out NetworkPipeline pipe
+        )
         {
             connection = default;
             reader = default;
@@ -549,7 +575,11 @@ namespace Unity.Networking.Transport
         /// <exception cref="ArgumentException">
         /// If <c>connection</c> was not obtained by a prior call to this <c>MultiNetworkDriver</c>.
         /// </exception>
-        public NetworkEvent.Type PopEventForConnection(NetworkConnection connection, out DataStreamReader reader, out NetworkPipeline pipe)
+        public NetworkEvent.Type PopEventForConnection(
+            NetworkConnection connection,
+            out DataStreamReader reader,
+            out NetworkPipeline pipe
+        )
         {
             CheckConnection(connection);
             return this.GetDriverRef(connection.DriverId).PopEventForConnection(connection, out reader, out pipe);
@@ -568,7 +598,12 @@ namespace Unity.Networking.Transport
         /// <exception cref="ArgumentException">
         /// If <c>connection</c> was not obtained by a prior call to this <c>MultiNetworkDriver</c>.
         /// </exception>
-        public int BeginSend(NetworkPipeline pipe, NetworkConnection connection, out DataStreamWriter writer, int requiredPayloadSize = 0)
+        public int BeginSend(
+            NetworkPipeline pipe,
+            NetworkConnection connection,
+            out DataStreamWriter writer,
+            int requiredPayloadSize = 0
+        )
         {
             CheckConnection(connection);
             return this.GetDriverRef(connection.DriverId).BeginSend(pipe, connection, out writer, requiredPayloadSize);
@@ -618,23 +653,34 @@ namespace Unity.Networking.Transport
         {
             switch (id)
             {
-                case 1: return ref multiDriver.Driver1;
-                case 2: return ref multiDriver.Driver2;
-                case 3: return ref multiDriver.Driver3;
-                case 4: return ref multiDriver.Driver4;
+                case 1:
+                    return ref multiDriver.Driver1;
+                case 2:
+                    return ref multiDriver.Driver2;
+                case 3:
+                    return ref multiDriver.Driver3;
+                case 4:
+                    return ref multiDriver.Driver4;
             }
 
             throw new ArgumentException($"Invalid driver ID {id}.");
         }
 
-        internal static ref NetworkDriver.Concurrent GetDriverRef(this ref MultiNetworkDriver.Concurrent multiDriver, int id)
+        internal static ref NetworkDriver.Concurrent GetDriverRef(
+            this ref MultiNetworkDriver.Concurrent multiDriver,
+            int id
+        )
         {
             switch (id)
             {
-                case 1: return ref multiDriver.Driver1;
-                case 2: return ref multiDriver.Driver2;
-                case 3: return ref multiDriver.Driver3;
-                case 4: return ref multiDriver.Driver4;
+                case 1:
+                    return ref multiDriver.Driver1;
+                case 2:
+                    return ref multiDriver.Driver2;
+                case 3:
+                    return ref multiDriver.Driver3;
+                case 4:
+                    return ref multiDriver.Driver4;
             }
 
             throw new ArgumentException($"Invalid driver ID {id}.");
@@ -644,15 +690,21 @@ namespace Unity.Networking.Transport
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
     internal struct DummyNetworkInterface : INetworkInterface
     {
-        public NetworkEndpoint LocalEndpoint { get => default; }
+        public NetworkEndpoint LocalEndpoint
+        {
+            get => default;
+        }
 
         public int Initialize(ref NetworkSettings settings, ref int packetPadding) => 0;
-        public void Dispose() {}
+
+        public void Dispose() { }
 
         public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dep) => dep;
+
         public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dep) => dep;
 
         public int Bind(NetworkEndpoint endpoint) => 0;
+
         public int Listen() => 0;
     }
 #endif

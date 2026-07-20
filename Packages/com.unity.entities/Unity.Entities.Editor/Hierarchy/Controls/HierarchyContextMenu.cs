@@ -24,7 +24,13 @@ namespace Unity.Entities.Editor
             m_Activators = new List<ManipulatorActivationFilter> { new() { button = MouseButton.RightMouse } };
             if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer)
             {
-                m_Activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse, modifiers = EventModifiers.Control });
+                m_Activators.Add(
+                    new ManipulatorActivationFilter
+                    {
+                        button = MouseButton.LeftMouse,
+                        modifiers = EventModifiers.Control,
+                    }
+                );
             }
         }
 
@@ -117,7 +123,9 @@ namespace Unity.Entities.Editor
         {
             evt.StopImmediatePropagation();
 
-            var currentNode = target is HierarchyListViewItem listViewItem ? listViewItem.Handle : HierarchyNodeHandle.Root;
+            var currentNode = target is HierarchyListViewItem listViewItem
+                ? listViewItem.Handle
+                : HierarchyNodeHandle.Root;
 
             if (currentNode.Kind is NodeKind.Scene)
             {
@@ -126,7 +134,7 @@ namespace Unity.Entities.Editor
                 // Let users add extra items.
                 SceneHierarchyHooksBridge.AddCustomSceneHeaderContextMenuItems(evt.menu, scene);
             }
-            else if(currentNode.Kind is NodeKind.GameObject)
+            else if (currentNode.Kind is NodeKind.GameObject)
             {
                 var gameObject = currentNode.ToGameObject();
                 BuildGameObjectContextMenu(evt.menu, gameObject, target);
@@ -154,12 +162,18 @@ namespace Unity.Entities.Editor
                 }
                 else
                 {
-                    evt.menu.AppendAction(L10n.Tr("Copy name"), _ => ClipboardUtilityBridge.SetString(m_Hierarchy.GetName(currentNode)));
+                    evt.menu.AppendAction(
+                        L10n.Tr("Copy name"),
+                        _ => ClipboardUtilityBridge.SetString(m_Hierarchy.GetName(currentNode))
+                    );
                 }
             }
             else if (currentNode.Kind is NodeKind.Entity)
             {
-                evt.menu.AppendAction(L10n.Tr("Copy name"), _ => ClipboardUtilityBridge.SetString(m_Hierarchy.GetName(currentNode)));
+                evt.menu.AppendAction(
+                    L10n.Tr("Copy name"),
+                    _ => ClipboardUtilityBridge.SetString(m_Hierarchy.GetName(currentNode))
+                );
             }
             else
             {
@@ -177,7 +191,10 @@ namespace Unity.Entities.Editor
 
             for (var i = 1; i < menuItems.Count; i++)
             {
-                if (menuItems[i] is DropdownMenuSeparator && (i == menuItems.Count - 1 || menuItems[i - 1] is DropdownMenuSeparator))
+                if (
+                    menuItems[i] is DropdownMenuSeparator
+                    && (i == menuItems.Count - 1 || menuItems[i - 1] is DropdownMenuSeparator)
+                )
                 {
                     evtMenu.RemoveItemAt(i);
                 }

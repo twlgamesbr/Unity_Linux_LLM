@@ -78,14 +78,18 @@ namespace UnityEngine.Rendering
         bool m_NeedUpdateComputeBuffer;
 
         internal Vector3Int GetGlobalIndirectionDimension() => m_EntriesCount;
+
         internal Vector3Int GetGlobalIndirectionMinEntry() => m_EntryMin;
 
-        int entrySizeInBricks => Mathf.Min((int)Mathf.Pow(ProbeBrickPool.kBrickCellCount, kEntryMaxSubdivLevel), m_CellSizeInMinBricks);
+        int entrySizeInBricks =>
+            Mathf.Min((int)Mathf.Pow(ProbeBrickPool.kBrickCellCount, kEntryMaxSubdivLevel), m_CellSizeInMinBricks);
         internal int entriesPerCellDimension => m_CellSizeInMinBricks / Mathf.Max(1, entrySizeInBricks);
 
         int GetFlatIndex(Vector3Int normalizedPos)
         {
-            return normalizedPos.z * (m_EntriesCount.x * m_EntriesCount.y) + normalizedPos.y * m_EntriesCount.x + normalizedPos.x;
+            return normalizedPos.z * (m_EntriesCount.x * m_EntriesCount.y)
+                + normalizedPos.y * m_EntriesCount.x
+                + normalizedPos.x;
         }
 
         internal ProbeGlobalIndirection(Vector3Int cellMin, Vector3Int cellMax, int cellSizeInMinBricks)
@@ -106,7 +110,6 @@ namespace UnityEngine.Rendering
             estimatedVMemCost = flatEntryCount * kUintPerEntry * sizeof(uint);
         }
 
-
         internal int GetFlatIdxForEntry(Vector3Int entryPosition)
         {
             Vector3Int normalizedPos = entryPosition - m_EntryMin;
@@ -120,7 +123,9 @@ namespace UnityEngine.Rendering
             Vector3Int firstEntryPosition = cellPosition * entriesPerCellDimension;
             int entriesPerCellDim = m_CellSizeInMinBricks / entrySizeInBricks;
 
-            int[] outListOfIndices = new int[entriesPerCellDimension * entriesPerCellDimension * entriesPerCellDimension];
+            int[] outListOfIndices = new int[
+                entriesPerCellDimension * entriesPerCellDimension * entriesPerCellDimension
+            ];
 
             int i = 0;
             for (int x = 0; x < entriesPerCellDim; ++x)
@@ -147,8 +152,12 @@ namespace UnityEngine.Rendering
                 int minSubdivCellSize = ProbeReferenceVolume.CellSize(entryUpdateInfo.minSubdivInCell);
                 IndexMetaData metaData = new IndexMetaData();
                 metaData.minSubdiv = entryUpdateInfo.minSubdivInCell;
-                metaData.minLocalIdx = entryUpdateInfo.hasOnlyBiggerBricks ? Vector3Int.zero : entryUpdateInfo.minValidBrickIndexForCellAtMaxRes / minSubdivCellSize;
-                metaData.maxLocalIdxPlusOne = entryUpdateInfo.hasOnlyBiggerBricks ? Vector3Int.one : entryUpdateInfo.maxValidBrickIndexForCellAtMaxResPlusOne / minSubdivCellSize;
+                metaData.minLocalIdx = entryUpdateInfo.hasOnlyBiggerBricks
+                    ? Vector3Int.zero
+                    : entryUpdateInfo.minValidBrickIndexForCellAtMaxRes / minSubdivCellSize;
+                metaData.maxLocalIdxPlusOne = entryUpdateInfo.hasOnlyBiggerBricks
+                    ? Vector3Int.one
+                    : entryUpdateInfo.maxValidBrickIndexForCellAtMaxResPlusOne / minSubdivCellSize;
                 metaData.firstChunkIndex = entryUpdateInfo.firstChunkIndex;
 
                 metaData.Pack(out uint[] packedVals);
@@ -173,7 +182,6 @@ namespace UnityEngine.Rendering
             }
             m_NeedUpdateComputeBuffer = true;
         }
-
 
         internal void PushComputeData()
         {

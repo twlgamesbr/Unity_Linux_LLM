@@ -32,6 +32,12 @@ namespace EditorAttributes
         /// <param name="displayNames">Change the display name for each button</param>
         /// <param name="buttonsHeight">The height of the selection buttons in pixels</param>
         /// <param name="showLabel">Show the label of the field</param>
-        public ValueButtonsAttribute(string collectionName, string[] displayNames, float buttonsHeight = 18f, bool showLabel = true) : this(collectionName, buttonsHeight, showLabel) => DisplayNames = displayNames;
+        public ValueButtonsAttribute(
+            string collectionName,
+            string[] displayNames,
+            float buttonsHeight = 18f,
+            bool showLabel = true
+        )
+            : this(collectionName, buttonsHeight, showLabel) => DisplayNames = displayNames;
     }
 }

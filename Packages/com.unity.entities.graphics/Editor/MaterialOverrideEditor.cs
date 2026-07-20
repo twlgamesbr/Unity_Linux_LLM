@@ -46,7 +46,12 @@ public class MaterialOverrideEditor : Editor
                     {
                         SerializedProperty colorProp = overrideProp.FindPropertyRelative("value");
 
-                        Color color = new Color(colorProp.vector4Value.x, colorProp.vector4Value.y, colorProp.vector4Value.z, colorProp.vector4Value.w);
+                        Color color = new Color(
+                            colorProp.vector4Value.x,
+                            colorProp.vector4Value.y,
+                            colorProp.vector4Value.z,
+                            colorProp.vector4Value.w
+                        );
                         Color newColor = EditorGUI.ColorField(fieldRect, new GUIContent(displayName), color);
                         Vector4 vec4 = new Vector4(newColor.r, newColor.g, newColor.b, newColor.a);
                         colorProp.vector4Value = vec4;
@@ -69,21 +74,31 @@ public class MaterialOverrideEditor : Editor
                     }
                     else
                     {
-                        Debug.Log("Property " + displayName + " is of unsupported type " + type + " for material override.");
+                        Debug.Log(
+                            "Property " + displayName + " is of unsupported type " + type + " for material override."
+                        );
                     }
                     if (EditorGUI.EndChangeCheck())
                     {
                         instanceProp.boolValue = true;
                     }
 
-
                     if (instanceProp.boolValue)
                     {
-                        if (fieldRect.Contains(Event.current.mousePosition) && Event.current.type == EventType.ContextClick)
+                        if (
+                            fieldRect.Contains(Event.current.mousePosition)
+                            && Event.current.type == EventType.ContextClick
+                        )
                         {
                             GenericMenu menu = new GenericMenu();
-                            menu.AddItem(new GUIContent("Apply to MaterialOverride '" + overrideComponent.overrideAsset.name + "'"),
-                                false, ApplyToOverrideAsset, i);
+                            menu.AddItem(
+                                new GUIContent(
+                                    "Apply to MaterialOverride '" + overrideComponent.overrideAsset.name + "'"
+                                ),
+                                false,
+                                ApplyToOverrideAsset,
+                                i
+                            );
                             menu.AddItem(new GUIContent("Revert"), false, RevertGameobjectOverride, i);
                             menu.ShowAsContext();
                             Event.current.Use();
@@ -112,7 +127,9 @@ public class MaterialOverrideEditor : Editor
         MaterialOverride overrideComponent = (target as MaterialOverride);
         SerializedObject assetSerializedObj = new SerializedObject(overrideComponent.overrideAsset);
         assetSerializedObj.Update();
-        SerializedProperty assetOverrideProp = assetSerializedObj.FindProperty("overrideList").GetArrayElementAtIndex(intIndex);
+        SerializedProperty assetOverrideProp = assetSerializedObj
+            .FindProperty("overrideList")
+            .GetArrayElementAtIndex(intIndex);
         assetOverrideProp.FindPropertyRelative("value").vector4Value = value.vector4Value;
         assetOverrideProp.FindPropertyRelative("instanceOverride").boolValue = false;
         assetSerializedObj.ApplyModifiedProperties();

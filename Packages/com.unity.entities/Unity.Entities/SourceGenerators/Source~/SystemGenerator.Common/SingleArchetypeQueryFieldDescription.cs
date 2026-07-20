@@ -7,19 +7,22 @@ using Unity.Entities.SourceGen.Common;
 
 namespace Unity.Entities.SourceGen.SystemGenerator.Common
 {
-    public readonly struct SingleArchetypeQueryFieldDescription : IEquatable<SingleArchetypeQueryFieldDescription>, IQueryFieldDescription
+    public readonly struct SingleArchetypeQueryFieldDescription
+        : IEquatable<SingleArchetypeQueryFieldDescription>,
+            IQueryFieldDescription
     {
         readonly Archetype _archetype;
         readonly IReadOnlyList<Query> _changeFilterTypes;
         readonly string _queryStorageFieldName;
 
-        public string GetFieldDeclaration(string generatedQueryFieldName, bool forcePublic = false)
-            => $"{(forcePublic ? "public " : "")}global::Unity.Entities.EntityQuery {generatedQueryFieldName};";
+        public string GetFieldDeclaration(string generatedQueryFieldName, bool forcePublic = false) =>
+            $"{(forcePublic ? "public " : "")}global::Unity.Entities.EntityQuery {generatedQueryFieldName};";
 
         public SingleArchetypeQueryFieldDescription(
             Archetype archetype,
             IReadOnlyList<Query> changeFilterTypes = null,
-            string queryStorageFieldName = null)
+            string queryStorageFieldName = null
+        )
         {
             _archetype = archetype;
             _changeFilterTypes = changeFilterTypes ?? Array.Empty<Query>();
@@ -29,8 +32,8 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
         public bool Equals(SingleArchetypeQueryFieldDescription other)
         {
             return _archetype.Equals(other._archetype)
-                   && _changeFilterTypes.SequenceEqual(other._changeFilterTypes)
-                   && _queryStorageFieldName == other._queryStorageFieldName;
+                && _changeFilterTypes.SequenceEqual(other._changeFilterTypes)
+                && _queryStorageFieldName == other._queryStorageFieldName;
         }
 
         public override bool Equals(object obj)
@@ -55,10 +58,20 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
                 return hash;
             }
         }
-        public static bool operator ==(SingleArchetypeQueryFieldDescription left, SingleArchetypeQueryFieldDescription right) => Equals(left, right);
-        public static bool operator !=(SingleArchetypeQueryFieldDescription left, SingleArchetypeQueryFieldDescription right) => !Equals(left, right);
 
-        static (HashSet<string> readOnlyTypeNames, HashSet<string> readWriteTypeNames) GetDistinctRequiredTypeNames(IEnumerable<Query> presentTypes)
+        public static bool operator ==(
+            SingleArchetypeQueryFieldDescription left,
+            SingleArchetypeQueryFieldDescription right
+        ) => Equals(left, right);
+
+        public static bool operator !=(
+            SingleArchetypeQueryFieldDescription left,
+            SingleArchetypeQueryFieldDescription right
+        ) => !Equals(left, right);
+
+        static (HashSet<string> readOnlyTypeNames, HashSet<string> readWriteTypeNames) GetDistinctRequiredTypeNames(
+            IEnumerable<Query> presentTypes
+        )
         {
             var readOnlyTypeNames = new HashSet<string>();
             var readWriteTypeNames = new HashSet<string>();
@@ -96,22 +109,28 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             // Explicitly Disabled types are removed from the requiredTypes list; we don't want to generate an explicit WithAll<T>() constraint for them.
             foreach (var comp in _archetype.Disabled)
             {
-                writer.WriteLine(comp.IsReadOnly
-                    ? $".WithDisabled<{comp.TypeSymbol.ToFullName()}>()"
-                    : $".WithDisabledRW<{comp.TypeSymbol.ToFullName()}>()");
-                var requiredTypesIndex =
-                    requiredTypes.FindIndex(q => SymbolEqualityComparer.Default.Equals(q.TypeSymbol, comp.TypeSymbol));
+                writer.WriteLine(
+                    comp.IsReadOnly
+                        ? $".WithDisabled<{comp.TypeSymbol.ToFullName()}>()"
+                        : $".WithDisabledRW<{comp.TypeSymbol.ToFullName()}>()"
+                );
+                var requiredTypesIndex = requiredTypes.FindIndex(q =>
+                    SymbolEqualityComparer.Default.Equals(q.TypeSymbol, comp.TypeSymbol)
+                );
                 if (requiredTypesIndex != -1)
                     requiredTypes.RemoveAtSwapBack(requiredTypesIndex);
             }
             // Explicitly Present types are removed from the requiredTypes list; we don't want to generate an explicit WithAll<T>() constraint for them.
             foreach (var comp in _archetype.Present)
             {
-                writer.WriteLine(comp.IsReadOnly
-                    ? $".WithPresent<{comp.TypeSymbol.ToFullName()}>()"
-                    : $".WithPresentRW<{comp.TypeSymbol.ToFullName()}>()");
-                var requiredTypesIndex =
-                    requiredTypes.FindIndex(q => SymbolEqualityComparer.Default.Equals(q.TypeSymbol, comp.TypeSymbol));
+                writer.WriteLine(
+                    comp.IsReadOnly
+                        ? $".WithPresent<{comp.TypeSymbol.ToFullName()}>()"
+                        : $".WithPresentRW<{comp.TypeSymbol.ToFullName()}>()"
+                );
+                var requiredTypesIndex = requiredTypes.FindIndex(q =>
+                    SymbolEqualityComparer.Default.Equals(q.TypeSymbol, comp.TypeSymbol)
+                );
                 if (requiredTypesIndex != -1)
                     requiredTypes.RemoveAtSwapBack(requiredTypesIndex);
             }
@@ -126,27 +145,30 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             foreach (var rw in distinctWithAllTypeNames.readWriteTypeNames)
                 writer.WriteLine($".WithAllRW<{rw}>()");
 
-
             foreach (var comp in _archetype.Any)
             {
-                writer.WriteLine(comp.IsReadOnly
-                    ? $".WithAny<{comp.TypeSymbol.ToFullName()}>()"
-                    : $".WithAnyRW<{comp.TypeSymbol.ToFullName()}>()");
+                writer.WriteLine(
+                    comp.IsReadOnly
+                        ? $".WithAny<{comp.TypeSymbol.ToFullName()}>()"
+                        : $".WithAnyRW<{comp.TypeSymbol.ToFullName()}>()"
+                );
             }
             foreach (var comp in _archetype.None)
             {
-                writer.WriteLine(comp.IsReadOnly
-                    ? $".WithNone<{comp.TypeSymbol.ToFullName()}>()"
-                    // We support specifying an enableable type as a `None` component *and* as an iterable query type in the same `SystemAPI.Query` invocation.
-                    // Users may write e.g. `SystemAPI.Query<EnabledRefRW<MyEnableableComponent>>().WithNone<MyEnableableComponent>()` in order to specifically iterate through
-                    // *disabled* `MyEnableableComponent`s. In that case, `MyEnableableComponent` is labelled a `None` component with read-write access, since `EnabledRefRW`
-                    // usages require read-write access. Since `.WithNoneRW` is not available as part of the `EntityQueryBuilder` public API, we can use `.WithDisabledRW` instead.
-                    : $".WithDisabledRW<{comp.TypeSymbol.ToFullName()}>()");
+                writer.WriteLine(
+                    comp.IsReadOnly
+                        ? $".WithNone<{comp.TypeSymbol.ToFullName()}>()"
+                        // We support specifying an enableable type as a `None` component *and* as an iterable query type in the same `SystemAPI.Query` invocation.
+                        // Users may write e.g. `SystemAPI.Query<EnabledRefRW<MyEnableableComponent>>().WithNone<MyEnableableComponent>()` in order to specifically iterate through
+                        // *disabled* `MyEnableableComponent`s. In that case, `MyEnableableComponent` is labelled a `None` component with read-write access, since `EnabledRefRW`
+                        // usages require read-write access. Since `.WithNoneRW` is not available as part of the `EntityQueryBuilder` public API, we can use `.WithDisabledRW` instead.
+                        : $".WithDisabledRW<{comp.TypeSymbol.ToFullName()}>()"
+                );
             }
             foreach (var comp in _archetype.Absent)
                 writer.WriteLine($".WithAbsent<{comp.TypeSymbol.ToFullName()}>()");
 
-            if(_archetype.Options != EntityQueryOptions.Default)
+            if (_archetype.Options != EntityQueryOptions.Default)
                 writer.WriteLine($".WithOptions({_archetype.Options.GetAsFlagStringSeperatedByOr()})");
 
             writer.WriteLine(".Build(ref state);");
@@ -156,7 +178,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
 
             if (_changeFilterTypes.Any())
             {
-                writer.WriteLine($@"{generatedQueryFieldName}.SetChangedVersionFilter(new ComponentType[{_changeFilterTypes.Count}]");
+                writer.WriteLine(
+                    $@"{generatedQueryFieldName}.SetChangedVersionFilter(new ComponentType[{_changeFilterTypes.Count}]"
+                );
                 writer.WriteLine("{");
                 writer.Indent++;
 

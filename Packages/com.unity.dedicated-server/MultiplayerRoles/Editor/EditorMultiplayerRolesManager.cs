@@ -1,15 +1,13 @@
-using UnityEngine;
+using System;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Profile;
-using System.Collections.Generic;
-using System;
 using UnityEditor.Multiplayer.Internal;
-using UnityEditor;
-
+using UnityEngine;
 using InternalManager = UnityEditor.Multiplayer.Internal.EditorMultiplayerManager;
 using InternalMultiplayerRoleFlags = UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags;
 using Object = UnityEngine.Object;
-
 
 namespace Unity.Multiplayer.Editor
 {
@@ -125,7 +123,9 @@ namespace Unity.Multiplayer.Editor
             // do nothing if component type has the restricted attribute
             if (component.GetType().GetCustomAttributes(typeof(MultiplayerRoleRestrictedAttribute), true).Length > 0)
             {
-                Debug.LogWarning($"Cannot set the multiplayer role for the component {component.GetType().Name} because it has the {nameof(MultiplayerRoleRestrictedAttribute)} attribute.");
+                Debug.LogWarning(
+                    $"Cannot set the multiplayer role for the component {component.GetType().Name} because it has the {nameof(MultiplayerRoleRestrictedAttribute)} attribute."
+                );
                 return;
             }
 
@@ -141,16 +141,18 @@ namespace Unity.Multiplayer.Editor
         /// For compatibility with build profiles use GetMultiplayerRoleForBuildProfile instead.
         /// </remarks>
         [Obsolete("Use GetMultiplayerRoleForBuildProfile or GetMultiplayerRoleForClassicTarget instead.", false)]
-        public static MultiplayerRoleFlags GetMultiplayerRoleForBuildTarget(NamedBuildTarget namedBuildTarget)
-            => throw new NotSupportedException("Use GetMultiplayerRoleForBuildProfile or GetMultiplayerRoleForClassicTarget instead.");
+        public static MultiplayerRoleFlags GetMultiplayerRoleForBuildTarget(NamedBuildTarget namedBuildTarget) =>
+            throw new NotSupportedException(
+                "Use GetMultiplayerRoleForBuildProfile or GetMultiplayerRoleForClassicTarget instead."
+            );
 
         /// <summary>
         /// Gets the multiplayer role that is going to be used for the provided build target.
         /// </summary>
         /// <param name="buildTarget">The build target to get the multiplayer role mask for.</param>
         /// <returns>Returns the multiplayer role mask for the provided build target.</returns>
-        public static MultiplayerRoleFlags GetMultiplayerRoleForClassicTarget(BuildTarget buildTarget)
-            => GetMultiplayerRoleForClassicTarget(buildTarget, StandaloneBuildSubtarget.Default);
+        public static MultiplayerRoleFlags GetMultiplayerRoleForClassicTarget(BuildTarget buildTarget) =>
+            GetMultiplayerRoleForClassicTarget(buildTarget, StandaloneBuildSubtarget.Default);
 
         /// <summary>
         /// Gets the multiplayer role that is going to be used for the provided build target and subtarget.
@@ -158,16 +160,20 @@ namespace Unity.Multiplayer.Editor
         /// <param name="buildTarget">The build target to get the multiplayer role mask for.</param>
         /// <param name="subtarget">The subtarget to get the multiplayer role mask for.</param>
         /// <returns>Returns the multiplayer role mask for the provided build target and subtarget.</returns>
-        public static MultiplayerRoleFlags GetMultiplayerRoleForClassicTarget(BuildTarget buildTarget, StandaloneBuildSubtarget subtarget)
-            => (MultiplayerRoleFlags)MultiplayerRolesSettings.instance.GetMultiplayerRoleForClassicTarget(buildTarget, subtarget);
+        public static MultiplayerRoleFlags GetMultiplayerRoleForClassicTarget(
+            BuildTarget buildTarget,
+            StandaloneBuildSubtarget subtarget
+        ) =>
+            (MultiplayerRoleFlags)
+                MultiplayerRolesSettings.instance.GetMultiplayerRoleForClassicTarget(buildTarget, subtarget);
 
         /// <summary>
         /// Gets the multiplayer role that is going to be used for the provided build profile.
         /// </summary>
         /// <param name="profile">The build profile to get the multiplayer role maks for.</param>
         /// <returns>Returns the multiplayer role mask for the provided build profile.</returns>
-        public static MultiplayerRoleFlags GetMultiplayerRoleForBuildProfile(BuildProfile profile)
-            => (MultiplayerRoleFlags)MultiplayerRolesSettings.instance.GetMultiplayerRoleForBuildProfile(profile);
+        public static MultiplayerRoleFlags GetMultiplayerRoleForBuildProfile(BuildProfile profile) =>
+            (MultiplayerRoleFlags)MultiplayerRolesSettings.instance.GetMultiplayerRoleForBuildProfile(profile);
 
         /// <summary>
         /// Gets the multiplayer role string that is going to be used for the provided build profile.
@@ -176,7 +182,9 @@ namespace Unity.Multiplayer.Editor
         /// <returns>Returns the multiplayer role string for the provided build profile.</returns>
         public static string GetMultiplayerRoleStringForBuildProfile(BuildProfile profile)
         {
-            return profile == null ? string.Empty : MultiplayerRolesSettings.instance.GetMultiplayerRoleForBuildProfile(profile).ToString();
+            return profile == null
+                ? string.Empty
+                : MultiplayerRolesSettings.instance.GetMultiplayerRoleForBuildProfile(profile).ToString();
         }
 
         /// <summary>
@@ -188,16 +196,21 @@ namespace Unity.Multiplayer.Editor
         /// For compatibility with build profiles use SetMultiplayerRoleForBuildProfile instead.
         /// </remarks>
         [Obsolete("Use SetMultiplayerRoleForBuildProfile or SetMultiplayerRoleForClassicTarget instead.", false)]
-        public static void SetMultiplayerRoleForBuildTarget(NamedBuildTarget namedBuildTarget, MultiplayerRoleFlags mask)
-            => throw new NotSupportedException("Use SetMultiplayerRoleForBuildProfile or SetMultiplayerRoleForClassicTarget instead.");
+        public static void SetMultiplayerRoleForBuildTarget(
+            NamedBuildTarget namedBuildTarget,
+            MultiplayerRoleFlags mask
+        ) =>
+            throw new NotSupportedException(
+                "Use SetMultiplayerRoleForBuildProfile or SetMultiplayerRoleForClassicTarget instead."
+            );
 
         /// <summary>
         /// Sets the multiplayer role that is going to be used for the provided build target.
         /// </summary>
         /// <param name="buildTarget">The build target to set the multiplayer role mask for.</param>
         /// <param name="mask">The multiplayer role mask to assing to the build target.</param>
-        public static void SetMultiplayerRoleForClassicTarget(BuildTarget buildTarget, MultiplayerRoleFlags mask)
-            => SetMultiplayerRoleForClassicTarget(buildTarget, StandaloneBuildSubtarget.Default, mask);
+        public static void SetMultiplayerRoleForClassicTarget(BuildTarget buildTarget, MultiplayerRoleFlags mask) =>
+            SetMultiplayerRoleForClassicTarget(buildTarget, StandaloneBuildSubtarget.Default, mask);
 
         /// <summary>
         /// Sets the multiplayer role that is going to be used for the provided build target and subtarget.
@@ -205,16 +218,27 @@ namespace Unity.Multiplayer.Editor
         /// <param name="buildTarget">The build target to set the multiplayer role mask for.</param>
         /// <param name="subtarget">The subtarget to set the multiplayer role mask for.</param>
         /// <param name="mask">The multiplayer role mask to assing to the build target and subtarget.</param>
-        public static void SetMultiplayerRoleForClassicTarget(BuildTarget buildTarget, StandaloneBuildSubtarget subtarget, MultiplayerRoleFlags mask)
-            => MultiplayerRolesSettings.instance.SetMultiplayerRoleForClassicTarget(buildTarget, subtarget, (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)mask);
+        public static void SetMultiplayerRoleForClassicTarget(
+            BuildTarget buildTarget,
+            StandaloneBuildSubtarget subtarget,
+            MultiplayerRoleFlags mask
+        ) =>
+            MultiplayerRolesSettings.instance.SetMultiplayerRoleForClassicTarget(
+                buildTarget,
+                subtarget,
+                (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)mask
+            );
 
         /// <summary>
         /// Sets the multiplayer role mask that is going to be used for the provided build profile.
         /// </summary>
         /// <param name="profile">The build profile to set the multiplayer role mask for.</param>
         /// <param name="mask">The multiplayer role mask to assing to the build profile.</param>
-        public static void SetMultiplayerRoleForBuildProfile(BuildProfile profile, MultiplayerRoleFlags mask)
-            => MultiplayerRolesSettings.instance.SetMultiplayerRoleForBuildProfile(profile, (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)mask);
+        public static void SetMultiplayerRoleForBuildProfile(BuildProfile profile, MultiplayerRoleFlags mask) =>
+            MultiplayerRolesSettings.instance.SetMultiplayerRoleForBuildProfile(
+                profile,
+                (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)mask
+            );
 
         internal static bool ShouldStrip(MultiplayerRoleFlags activeMask, GameObject gameObject)
         {
@@ -229,8 +253,8 @@ namespace Unity.Multiplayer.Editor
             if (!EnableMultiplayerRoles)
                 return false;
 
-            return (activeMask & GetMultiplayerRoleMaskForComponent(component)) == 0 ||
-                InternalManager.ShouldStripComponentType((InternalMultiplayerRoleFlags)activeMask, component);
+            return (activeMask & GetMultiplayerRoleMaskForComponent(component)) == 0
+                || InternalManager.ShouldStripComponentType((InternalMultiplayerRoleFlags)activeMask, component);
         }
 
         /// <summary>
@@ -275,31 +299,31 @@ namespace Unity.Multiplayer.Editor
             /// Gets the list of custom components that are automatically selected for the entire project.
             /// </summary>
             /// <returns>Returns a Dictionary where the key is the component Type and the value is the MultiplayerRoleFlags.</returns>
-            public static Dictionary<Type, MultiplayerRoleFlags> GetCustomComponents()
-                => ContentSelectionSettings.AutomaticSelection.GetCustomComponents();
+            public static Dictionary<Type, MultiplayerRoleFlags> GetCustomComponents() =>
+                ContentSelectionSettings.AutomaticSelection.GetCustomComponents();
 
             /// <summary>
             /// Sets the list of custom components that are automatically selected for the entire project.
             /// </summary>
             /// <param name="customComponents">A Dictionary where the key is the component Type and the value is the MultiplayerRoleFlags.</param>
-            public static void SetCustomComponents(Dictionary<Type, MultiplayerRoleFlags> customComponents)
-                => ContentSelectionSettings.AutomaticSelection.SetCustomComponents(customComponents);
+            public static void SetCustomComponents(Dictionary<Type, MultiplayerRoleFlags> customComponents) =>
+                ContentSelectionSettings.AutomaticSelection.SetCustomComponents(customComponents);
 
             /// <summary>
             /// Gets the multiplayer role mask for a component type.
             /// </summary>
             /// <param name="type">The component type.</param>
             /// <returns>Returns the multiplayer role mask of the component type.</returns>
-            public static MultiplayerRoleFlags GetMultiplayerRoleMaskForComponentType(Type type)
-                => ContentSelectionSettings.AutomaticSelection.GetMultiplayerRoleMaskForComponentType(type);
+            public static MultiplayerRoleFlags GetMultiplayerRoleMaskForComponentType(Type type) =>
+                ContentSelectionSettings.AutomaticSelection.GetMultiplayerRoleMaskForComponentType(type);
 
             /// <summary>
             /// Sets the multiplayer role mask for a component type.
             /// </summary>
             /// <param name="type">The component type.</param>
             /// <param name="mask">The multiplayer role mask to assing to the component type.</param>
-            public static void SetMultiplayerRoleMaskForComponentType(Type type, MultiplayerRoleFlags mask)
-                => ContentSelectionSettings.AutomaticSelection.SetMultiplayerRoleMaskForComponentType(type, mask);
+            public static void SetMultiplayerRoleMaskForComponentType(Type type, MultiplayerRoleFlags mask) =>
+                ContentSelectionSettings.AutomaticSelection.SetMultiplayerRoleMaskForComponentType(type, mask);
         }
     }
 }

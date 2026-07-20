@@ -32,11 +32,16 @@ namespace UnityEngine.Rendering
         /// <param name="path">The path where Unity generates the asset.</param>
         /// <param name="dataSource">Another `RenderPipelineGlobalSettings` that Unity uses as a data source.</param>
         /// <returns>Returns the asset created.</returns>
-        public static RenderPipelineGlobalSettings Create(Type renderPipelineGlobalSettingsType, string path, RenderPipelineGlobalSettings dataSource = null)
+        public static RenderPipelineGlobalSettings Create(
+            Type renderPipelineGlobalSettingsType,
+            string path,
+            RenderPipelineGlobalSettings dataSource = null
+        )
         {
             if (!typeof(RenderPipelineGlobalSettings).IsAssignableFrom(renderPipelineGlobalSettingsType))
                 throw new ArgumentException(
-                    $"{nameof(renderPipelineGlobalSettingsType)} must be a valid {typeof(RenderPipelineGlobalSettings)}");
+                    $"{nameof(renderPipelineGlobalSettingsType)} must be a valid {typeof(RenderPipelineGlobalSettings)}"
+                );
 
             // Sanitize the path
             if (string.IsNullOrEmpty(path))
@@ -48,7 +53,8 @@ namespace UnityEngine.Rendering
             CoreUtils.EnsureFolderTreeInAssetFilePath(path);
             path = AssetDatabase.GenerateUniqueAssetPath(path);
 
-            var assetCreated = ScriptableObject.CreateInstance(renderPipelineGlobalSettingsType) as RenderPipelineGlobalSettings;
+            var assetCreated =
+                ScriptableObject.CreateInstance(renderPipelineGlobalSettingsType) as RenderPipelineGlobalSettings;
             if (assetCreated != null)
             {
                 AssetDatabase.CreateAsset(assetCreated, path);
@@ -83,11 +89,17 @@ namespace UnityEngine.Rendering
         /// <typeparam name="TGlobalSetting">The type of global settings asset to check.</typeparam>
         /// <typeparam name="TRenderPipeline">The type of `RenderPipeline` that this asset belongs to.</typeparam>
         /// <returns>The asset that Unity found or created, or `null` if Unity can't find or create a valid asset.</returns>
-        public static bool TryEnsure<TGlobalSetting, TRenderPipeline>(ref TGlobalSetting instance, string defaultPath = "", bool canCreateNewAsset = true)
+        public static bool TryEnsure<TGlobalSetting, TRenderPipeline>(
+            ref TGlobalSetting instance,
+            string defaultPath = "",
+            bool canCreateNewAsset = true
+        )
             where TGlobalSetting : RenderPipelineGlobalSettings<TGlobalSetting, TRenderPipeline>
             where TRenderPipeline : RenderPipeline
         {
-            if (!TryEnsure<TGlobalSetting, TRenderPipeline>(ref instance, defaultPath, canCreateNewAsset, out var error))
+            if (
+                !TryEnsure<TGlobalSetting, TRenderPipeline>(ref instance, defaultPath, canCreateNewAsset, out var error)
+            )
             {
                 Debug.LogError(error.Message);
                 return false;
@@ -97,11 +109,17 @@ namespace UnityEngine.Rendering
         }
 
         // This method is exposed to Unit Tests
-        internal static bool TryEnsure<TGlobalSetting, TRenderPipeline>(ref TGlobalSetting instance, string defaultPath, bool canCreateNewAsset, out Exception error)
+        internal static bool TryEnsure<TGlobalSetting, TRenderPipeline>(
+            ref TGlobalSetting instance,
+            string defaultPath,
+            bool canCreateNewAsset,
+            out Exception error
+        )
             where TGlobalSetting : RenderPipelineGlobalSettings<TGlobalSetting, TRenderPipeline>
             where TRenderPipeline : RenderPipeline
         {
-            var globalSettingsName = typeof(TGlobalSetting).GetCustomAttribute<DisplayInfoAttribute>()?.name ?? typeof(TGlobalSetting).Name;
+            var globalSettingsName =
+                typeof(TGlobalSetting).GetCustomAttribute<DisplayInfoAttribute>()?.name ?? typeof(TGlobalSetting).Name;
 
             if (instance == null || instance.Equals(null))
             {
@@ -123,17 +141,21 @@ namespace UnityEngine.Rendering
                             instance = Create<TGlobalSetting>(defaultPath);
                             if (instance != null)
                             {
-                                Debug.LogWarning($"{globalSettingsName} has been created for you. If you want to modify it, go to Project Settings > Graphics > {globalSettingsName}");
+                                Debug.LogWarning(
+                                    $"{globalSettingsName} has been created for you. If you want to modify it, go to Project Settings > Graphics > {globalSettingsName}"
+                                );
                             }
                         }
                     }
                 }
             }
 
-            error = instance == null || instance.Equals(null)
-                ? new Exception(
-                    $"Unable to find or create a {globalSettingsName}. The configured Render Pipeline may not work correctly. Go to Project Settings > Graphics > {globalSettingsName} for additional help.")
-                : null;
+            error =
+                instance == null || instance.Equals(null)
+                    ? new Exception(
+                        $"Unable to find or create a {globalSettingsName}. The configured Render Pipeline may not work correctly. Go to Project Settings > Graphics > {globalSettingsName} for additional help."
+                    )
+                    : null;
 
             EditorGraphicsSettings.SetRenderPipelineGlobalSettingsAsset<TRenderPipeline>(instance);
 

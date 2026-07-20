@@ -26,8 +26,5 @@ namespace Unity.Entities
 
     // This exists only to be able to make generic instances of generic methods to test burst compatibility.
     [DisableAutoCreation]
-    partial struct BurstCompatibleSystem : ISystem
-    {
-
-    }
+    partial struct BurstCompatibleSystem : ISystem { }
 }

@@ -59,7 +59,7 @@ namespace UnityEngine.UI
             {
                 var fontData = new FontData
                 {
-                    m_FontSize  = 14,
+                    m_FontSize = 14,
                     m_LineSpacing = 1f,
                     m_FontStyle = FontStyle.Normal,
                     m_BestFit = false,
@@ -68,8 +68,8 @@ namespace UnityEngine.UI
                     m_Alignment = TextAnchor.UpperLeft,
                     m_HorizontalOverflow = HorizontalWrapMode.Wrap,
                     m_VerticalOverflow = VerticalWrapMode.Truncate,
-                    m_RichText  = true,
-                    m_AlignByGeometry = false
+                    m_RichText = true,
+                    m_AlignByGeometry = false,
                 };
                 return fontData;
             }
@@ -147,7 +147,7 @@ namespace UnityEngine.UI
         public bool alignByGeometry
         {
             get { return m_AlignByGeometry; }
-            set { m_AlignByGeometry = value;  }
+            set { m_AlignByGeometry = value; }
         }
 
         /// <summary>
@@ -186,8 +186,7 @@ namespace UnityEngine.UI
             set { m_LineSpacing = value; }
         }
 
-        void ISerializationCallbackReceiver.OnBeforeSerialize()
-        {}
+        void ISerializationCallbackReceiver.OnBeforeSerialize() { }
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {

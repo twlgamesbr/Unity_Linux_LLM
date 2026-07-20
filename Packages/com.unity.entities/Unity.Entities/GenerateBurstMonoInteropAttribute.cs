@@ -9,7 +9,7 @@ namespace Unity.Entities
     public sealed class GenerateBurstMonoInteropAttribute : Attribute
     {
         /// <summary>
-        /// Name of source file (without the .cs suffix) to generate interop code for. 
+        /// Name of source file (without the .cs suffix) to generate interop code for.
         /// </summary>
         /// <remarks> The interop file is placed beside this file in a `*.interop.gen.cs` file.
         /// </remarks>

@@ -1,12 +1,11 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine.Experimental.Rendering;
-using UnityEngine.PathTracing.Integration;
 using UnityEngine.PathTracing.Core;
+using UnityEngine.PathTracing.Integration;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.UnifiedRayTracing;
 using UnityEngine.Rendering.Sampling;
-
+using UnityEngine.Rendering.UnifiedRayTracing;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -42,16 +41,25 @@ namespace UnityEngine.PathTracing.Lightmapping
         Int32 LodContributorLevel;
 
         public override int GetHashCode() => HashCode.Combine(LodGroup, LodMask);
-        public override bool Equals(object obj) => obj is LodIdentifier other && other.LodGroup == LodGroup && other.LodMask == LodMask;
+
+        public override bool Equals(object obj) =>
+            obj is LodIdentifier other && other.LodGroup == LodGroup && other.LodMask == LodMask;
+
         public static readonly LodIdentifier Invalid = new LodIdentifier(-1, 0, -1);
+
         public bool IsValid() => LodGroup != -1;
+
         public bool IsContributor()
         {
             if (LodContributorLevel == -1)
                 return false;
             return (LodMask & (1 << LodContributorLevel)) != 0;
         }
-        public byte MinLodLevelMask() { return (byte)(LodMask & -LodMask); }
+
+        public byte MinLodLevelMask()
+        {
+            return (byte)(LodMask & -LodMask);
+        }
     }
 
     internal struct ContributorLodInfo
@@ -102,11 +110,23 @@ namespace UnityEngine.PathTracing.Lightmapping
         {
             var boundingSphere = new BoundingSphere();
             boundingSphere.position = LocalToWorldMatrix.MultiplyPoint(Mesh.bounds.center);
-            boundingSphere.radius = (LocalToWorldMatrix.MultiplyPoint(Mesh.bounds.extents) - boundingSphere.position).magnitude;
+            boundingSphere.radius = (
+                LocalToWorldMatrix.MultiplyPoint(Mesh.bounds.extents) - boundingSphere.position
+            ).magnitude;
             return boundingSphere;
         }
 
-        public void Build(Mesh mesh, Vector4 normalizedOccupiedST, Vector4 sourceLightmapST, Vector2Int texelSize, Vector2Int texelOffset, Matrix4x4 localToWorldMatrix, bool receiveShadows, LodIdentifier lodIdentifier, uint instanceIndex)
+        public void Build(
+            Mesh mesh,
+            Vector4 normalizedOccupiedST,
+            Vector4 sourceLightmapST,
+            Vector2Int texelSize,
+            Vector2Int texelOffset,
+            Matrix4x4 localToWorldMatrix,
+            bool receiveShadows,
+            LodIdentifier lodIdentifier,
+            uint instanceIndex
+        )
         {
             Mesh = mesh;
             NormalizedOccupiedST = normalizedOccupiedST;
@@ -136,7 +156,7 @@ namespace UnityEngine.PathTracing.Lightmapping
         Validity,
         DirectionalityDirect,
         DirectionalityIndirect,
-        ShadowMask
+        ShadowMask,
     }
 
     internal class LightmapIntegratorContext : IDisposable
@@ -192,25 +212,65 @@ namespace UnityEngine.PathTracing.Lightmapping
             CompactedGBufferLength?.Dispose();
         }
 
-        internal void Initialize(SamplingResources samplingResources, LightmapResourceLibrary lightmapResourceLib, bool countNEERayAsPathSegment)
+        internal void Initialize(
+            SamplingResources samplingResources,
+            LightmapResourceLibrary lightmapResourceLib,
+            bool countNEERayAsPathSegment
+        )
         {
             SamplingResources = samplingResources;
-            _emptyExposureTexture = RTHandles.Alloc(1, 1, enableRandomWrite: true, name: "Empty EV100 Exposure", colorFormat: GraphicsFormat.R8G8B8A8_UNorm);
+            _emptyExposureTexture = RTHandles.Alloc(
+                1,
+                1,
+                enableRandomWrite: true,
+                name: "Empty EV100 Exposure",
+                colorFormat: GraphicsFormat.R8G8B8A8_UNorm
+            );
 
             UVFallbackBufferBuilder = new UVFallbackBufferBuilder();
             UVFallbackBufferBuilder.Prepare(lightmapResourceLib.UVFallbackBufferGenerationMaterial);
             LightmapDirectIntegrator = new LightmapDirectIntegrator();
-            LightmapDirectIntegrator.Prepare(lightmapResourceLib.DirectAccumulationShader, lightmapResourceLib.NormalizationShader, lightmapResourceLib.ExpansionHelpers, SamplingResources, _emptyExposureTexture);
+            LightmapDirectIntegrator.Prepare(
+                lightmapResourceLib.DirectAccumulationShader,
+                lightmapResourceLib.NormalizationShader,
+                lightmapResourceLib.ExpansionHelpers,
+                SamplingResources,
+                _emptyExposureTexture
+            );
             LightmapIndirectIntegrator = new LightmapIndirectIntegrator(countNEERayAsPathSegment);
-            LightmapIndirectIntegrator.Prepare(lightmapResourceLib.IndirectAccumulationShader, lightmapResourceLib.NormalizationShader, lightmapResourceLib.ExpansionHelpers, SamplingResources, _emptyExposureTexture);
+            LightmapIndirectIntegrator.Prepare(
+                lightmapResourceLib.IndirectAccumulationShader,
+                lightmapResourceLib.NormalizationShader,
+                lightmapResourceLib.ExpansionHelpers,
+                SamplingResources,
+                _emptyExposureTexture
+            );
             LightmapAOIntegrator = new LightmapAOIntegrator();
-            LightmapAOIntegrator.Prepare(lightmapResourceLib.AOAccumulationShader, lightmapResourceLib.NormalizationShader, lightmapResourceLib.ExpansionHelpers, SamplingResources, _emptyExposureTexture);
+            LightmapAOIntegrator.Prepare(
+                lightmapResourceLib.AOAccumulationShader,
+                lightmapResourceLib.NormalizationShader,
+                lightmapResourceLib.ExpansionHelpers,
+                SamplingResources,
+                _emptyExposureTexture
+            );
             LightmapValidityIntegrator = new LightmapValidityIntegrator();
-            LightmapValidityIntegrator.Prepare(lightmapResourceLib.ValidityAccumulationShader, lightmapResourceLib.NormalizationShader, lightmapResourceLib.ExpansionHelpers, SamplingResources, _emptyExposureTexture);
+            LightmapValidityIntegrator.Prepare(
+                lightmapResourceLib.ValidityAccumulationShader,
+                lightmapResourceLib.NormalizationShader,
+                lightmapResourceLib.ExpansionHelpers,
+                SamplingResources,
+                _emptyExposureTexture
+            );
             LightmapOccupancyIntegrator = new LightmapOccupancyIntegrator();
             LightmapOccupancyIntegrator.Prepare(lightmapResourceLib.OccupancyShader);
-			LightmapShadowMaskIntegrator = new LightmapShadowMaskIntegrator();
-            LightmapShadowMaskIntegrator.Prepare(lightmapResourceLib.ShadowMaskAccumulationShader, lightmapResourceLib.NormalizationShader, lightmapResourceLib.ExpansionHelpers, SamplingResources, _emptyExposureTexture);
+            LightmapShadowMaskIntegrator = new LightmapShadowMaskIntegrator();
+            LightmapShadowMaskIntegrator.Prepare(
+                lightmapResourceLib.ShadowMaskAccumulationShader,
+                lightmapResourceLib.NormalizationShader,
+                lightmapResourceLib.ExpansionHelpers,
+                SamplingResources,
+                _emptyExposureTexture
+            );
             GBufferDebugShader = new GBufferDebug();
             GBufferDebugShader.Prepare(lightmapResourceLib.GBufferDebugShader, lightmapResourceLib.ExpansionHelpers);
             GBufferShader = lightmapResourceLib.GBufferShader;
@@ -225,10 +285,35 @@ namespace UnityEngine.PathTracing.Lightmapping
             ReductionKernel = ExpansionShaders.FindKernel("BinaryGroupSumLeft");
             CopyToLightmapKernel = ExpansionShaders.FindKernel("AdditivelyCopyCompactedTo2D");
 
-            ClearDispatchBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource | GraphicsBuffer.Target.CopyDestination, 3, sizeof(uint));
-            CopyDispatchBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource | GraphicsBuffer.Target.CopyDestination, 3, sizeof(uint));
-            ReduceDispatchBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource | GraphicsBuffer.Target.CopyDestination, 3, sizeof(uint));
-            CompactedGBufferLength = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, 1, sizeof(uint));
+            ClearDispatchBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.IndirectArguments
+                    | GraphicsBuffer.Target.Structured
+                    | GraphicsBuffer.Target.CopySource
+                    | GraphicsBuffer.Target.CopyDestination,
+                3,
+                sizeof(uint)
+            );
+            CopyDispatchBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.IndirectArguments
+                    | GraphicsBuffer.Target.Structured
+                    | GraphicsBuffer.Target.CopySource
+                    | GraphicsBuffer.Target.CopyDestination,
+                3,
+                sizeof(uint)
+            );
+            ReduceDispatchBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.IndirectArguments
+                    | GraphicsBuffer.Target.Structured
+                    | GraphicsBuffer.Target.CopySource
+                    | GraphicsBuffer.Target.CopyDestination,
+                3,
+                sizeof(uint)
+            );
+            CompactedGBufferLength = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource,
+                1,
+                sizeof(uint)
+            );
         }
     }
 
@@ -258,23 +343,47 @@ namespace UnityEngine.PathTracing.Lightmapping
         {
             const string packageFolder = "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/";
 
-            GBufferShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapGBufferIntegration.urtshader");
+            GBufferShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/LightmapGBufferIntegration.urtshader"
+            );
 
-            NormalizationShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/ResolveAccumulation.compute");
-            DirectAccumulationShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapDirectIntegration.urtshader");
-            AOAccumulationShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapAOIntegration.urtshader");
-            ValidityAccumulationShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapValidityIntegration.urtshader");
-            IndirectAccumulationShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapIndirectIntegration.urtshader");
-            ShadowMaskAccumulationShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapShadowMaskIntegration.urtshader");
+            NormalizationShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                packageFolder + "Shaders/ResolveAccumulation.compute"
+            );
+            DirectAccumulationShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/LightmapDirectIntegration.urtshader"
+            );
+            AOAccumulationShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/LightmapAOIntegration.urtshader"
+            );
+            ValidityAccumulationShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/LightmapValidityIntegration.urtshader"
+            );
+            IndirectAccumulationShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/LightmapIndirectIntegration.urtshader"
+            );
+            ShadowMaskAccumulationShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/LightmapShadowMaskIntegration.urtshader"
+            );
             GBufferDebugShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapGBufferDebug.urtshader");
 
-            NormalAccumulationShader = context.LoadRayTracingShader(packageFolder + "Shaders/LightmapNormalIntegration.urtshader");
+            NormalAccumulationShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/LightmapNormalIntegration.urtshader"
+            );
 
-            UVFallbackBufferGenerationMaterial = new Material(AssetDatabase.LoadAssetAtPath<Shader>(packageFolder + "Shaders/Lightmapping/UVFallbackBufferGeneration.shader"));
+            UVFallbackBufferGenerationMaterial = new Material(
+                AssetDatabase.LoadAssetAtPath<Shader>(
+                    packageFolder + "Shaders/Lightmapping/UVFallbackBufferGeneration.shader"
+                )
+            );
 
-            OccupancyShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/LightmapOccupancy.compute");
+            OccupancyShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                packageFolder + "Shaders/LightmapOccupancy.compute"
+            );
 
-            ExpansionHelpers = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/ExpansionHelpers.compute");
+            ExpansionHelpers = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                packageFolder + "Shaders/ExpansionHelpers.compute"
+            );
 
             ComputeHelpers = new LightmapIntegrationHelpers.ComputeHelpers();
             ComputeHelpers.Load();

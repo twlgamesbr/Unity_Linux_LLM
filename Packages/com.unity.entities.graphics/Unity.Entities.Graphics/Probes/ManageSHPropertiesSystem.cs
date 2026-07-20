@@ -6,17 +6,21 @@ using Unity.Entities;
 namespace Unity.Rendering
 {
     [RequireMatchingQueriesForUpdate]
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor
+    )]
     [UpdateInGroup(typeof(StructuralChangePresentationSystemGroup))]
     partial class ManageSHPropertiesSystem : SystemBase
     {
         // Match entities with CustomProbeTag, but without the SH component
         EntityQuery m_MissingSHQueryCustom;
+
         // Match entities with BlendProbeTag, but without the SH component
         EntityQuery m_MissingSHQueryBlend;
 
         // Matches entities with the SH component, but neither CustomProbeTag or BlendProbeTag
         EntityQuery m_MissingProbeTagQuery;
+
         // Matches entities with SH components and BlendProbeTag
         EntityQuery m_RemoveSHFromBlendProbeTagQuery;
 
@@ -25,47 +29,38 @@ namespace Unity.Rendering
         /// <inheritdoc/>
         protected override void OnCreate()
         {
-            m_SHComponentType = new[]
-            {
-                ComponentType.ReadOnly<BuiltinMaterialPropertyUnity_SHCoefficients>(),
-            };
+            m_SHComponentType = new[] { ComponentType.ReadOnly<BuiltinMaterialPropertyUnity_SHCoefficients>() };
 
-            m_MissingSHQueryCustom = GetEntityQuery(new EntityQueryDesc
-            {
-                Any = new[]
+            m_MissingSHQueryCustom = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadOnly<CustomProbeTag>()
-                },
-                None = m_SHComponentType,
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+                    Any = new[] { ComponentType.ReadOnly<CustomProbeTag>() },
+                    None = m_SHComponentType,
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_MissingSHQueryBlend = GetEntityQuery(new EntityQueryDesc
-            {
-                Any = new[]
+            m_MissingSHQueryBlend = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadOnly<BlendProbeTag>(),
-                },
-                None = m_SHComponentType,
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+                    Any = new[] { ComponentType.ReadOnly<BlendProbeTag>() },
+                    None = m_SHComponentType,
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_MissingProbeTagQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                Any = m_SHComponentType,
-                None = new[]
+            m_MissingProbeTagQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadOnly<BlendProbeTag>(),
-                    ComponentType.ReadOnly<CustomProbeTag>()
-                },
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+                    Any = m_SHComponentType,
+                    None = new[] { ComponentType.ReadOnly<BlendProbeTag>(), ComponentType.ReadOnly<CustomProbeTag>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_RemoveSHFromBlendProbeTagQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                Any = m_SHComponentType,
-                All = new []{ ComponentType.ReadOnly<BlendProbeTag>(), },
-            });
+            m_RemoveSHFromBlendProbeTagQuery = GetEntityQuery(
+                new EntityQueryDesc { Any = m_SHComponentType, All = new[] { ComponentType.ReadOnly<BlendProbeTag>() } }
+            );
         }
 
         /// <inheritdoc/>

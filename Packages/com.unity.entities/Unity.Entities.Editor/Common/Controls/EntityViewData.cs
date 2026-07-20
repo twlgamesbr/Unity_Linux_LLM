@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using Unity.Serialization;
 using UnityEditor;
 using UnityEngine;
@@ -21,26 +21,35 @@ namespace Unity.Entities.Editor
                 : EntityGuid.Null;
         }
 
-        [DontCreateProperty] public readonly World World;
-        [DontCreateProperty] public readonly Entity Entity;
-        [DontCreateProperty] public readonly EntityGuid EntityGuid;
+        [DontCreateProperty]
+        public readonly World World;
 
-        [CreateProperty, UsedImplicitly, DontSerialize] public string EntityName
+        [DontCreateProperty]
+        public readonly Entity Entity;
+
+        [DontCreateProperty]
+        public readonly EntityGuid EntityGuid;
+
+        [CreateProperty, UsedImplicitly, DontSerialize]
+        public string EntityName
         {
             get
             {
                 if (!World.IsCreated)
                     return k_InvalidEntity;
                 var name = World.EntityManager.GetName(Entity);
-                return string.IsNullOrEmpty(name)
-                    ? Entity.ToString()
-                    : name;
+                return string.IsNullOrEmpty(name) ? Entity.ToString() : name;
             }
         }
 
-        [CreateProperty, UsedImplicitly, DontSerialize] public EntityId EntityId => EntityGuid.OriginatingEntityId;
-        [CreateProperty, UsedImplicitly, DontSerialize] public int Index => Entity.Index;
-        [CreateProperty, UsedImplicitly, DontSerialize] public int ComponentCount => World.EntityManager.GetComponentCount(Entity);
+        [CreateProperty, UsedImplicitly, DontSerialize]
+        public EntityId EntityId => EntityGuid.OriginatingEntityId;
+
+        [CreateProperty, UsedImplicitly, DontSerialize]
+        public int Index => Entity.Index;
+
+        [CreateProperty, UsedImplicitly, DontSerialize]
+        public int ComponentCount => World.EntityManager.GetComponentCount(Entity);
 
         [UsedImplicitly]
         class Inspector : PropertyInspector<EntityViewData>
@@ -51,11 +60,14 @@ namespace Unity.Entities.Editor
                 Resources.Templates.ContentProvider.EntityInfo.AddStyles(root);
 
                 root.AddToClassList(UssClasses.Content.Query.EntityInfo.Container);
-                root.RegisterCallback<ClickEvent, Inspector>((evt, inspector) =>
-                {
-                    if (evt.clickCount >= 1)
-                        EntitySelectionProxy.SelectEntity(inspector.Target.World, inspector.Target.Entity);
-                }, this);
+                root.RegisterCallback<ClickEvent, Inspector>(
+                    (evt, inspector) =>
+                    {
+                        if (evt.clickCount >= 1)
+                            EntitySelectionProxy.SelectEntity(inspector.Target.World, inspector.Target.Entity);
+                    },
+                    this
+                );
 
                 var icon = new VisualElement();
                 icon.AddToClassList(UssClasses.Content.Query.EntityInfo.Icon);

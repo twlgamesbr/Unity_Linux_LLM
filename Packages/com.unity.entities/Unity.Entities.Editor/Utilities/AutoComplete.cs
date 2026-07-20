@@ -13,7 +13,9 @@ namespace Unity.Entities.Editor
         const int k_CompletionListItemHeight = 18;
         const int k_CompletionListMaxHeight = 150;
 
-        static readonly ProfilerMarker k_FetchCompletionResultsMarker = new ProfilerMarker($"{nameof(AutoComplete)}.FetchCompletionResults");
+        static readonly ProfilerMarker k_FetchCompletionResultsMarker = new ProfilerMarker(
+            $"{nameof(AutoComplete)}.FetchCompletionResults"
+        );
 
         readonly VisualElement m_Anchor;
         readonly IAutoCompleteBehavior m_Behavior;
@@ -38,7 +40,10 @@ namespace Unity.Entities.Editor
             m_Anchor = element;
             m_TextField = element as TextField ?? element.Q<TextField>();
             if (m_TextField == null)
-                throw new ArgumentNullException(nameof(element), $"{nameof(element)} needs to be or contain a {nameof(TextField)}");
+                throw new ArgumentNullException(
+                    nameof(element),
+                    $"{nameof(element)} needs to be or contain a {nameof(TextField)}"
+                );
             m_TextInput = m_TextField.Q(TextField.textInputUssName);
             m_Behavior = behavior;
 
@@ -46,9 +51,14 @@ namespace Unity.Entities.Editor
             m_CompletionContainer.AddToClassList(AutoCompleteContainerUssClass);
             m_CompletionContainer.Hide();
             m_CompletionContainer.style.position = Position.Absolute;
-            m_CompletionListView = new ListView(m_CompletionItems, k_CompletionListItemHeight, () => new Label(), (l, i) => ((Label)l).text = m_CompletionItems[i])
+            m_CompletionListView = new ListView(
+                m_CompletionItems,
+                k_CompletionListItemHeight,
+                () => new Label(),
+                (l, i) => ((Label)l).text = m_CompletionItems[i]
+            )
             {
-                style = { flexGrow = 1 }
+                style = { flexGrow = 1 },
             };
 
             m_CompletionContainer.Add(m_CompletionListView);
@@ -92,7 +102,10 @@ namespace Unity.Entities.Editor
         {
             if (!IsCompletionContainerVisible)
             {
-                if (evt.keyCode == KeyCode.Space && (evt.modifiers == EventModifiers.Command || evt.modifiers == EventModifiers.Control))
+                if (
+                    evt.keyCode == KeyCode.Space
+                    && (evt.modifiers == EventModifiers.Command || evt.modifiers == EventModifiers.Control)
+                )
                     BeginCompletion();
 
                 return;
@@ -106,12 +119,16 @@ namespace Unity.Entities.Editor
                     break;
                 case KeyCode.DownArrow:
                     CancelEvent(evt);
-                    m_CompletionListView.selectedIndex = (m_CompletionListView.selectedIndex + 1) % m_CompletionItems.Count;
+                    m_CompletionListView.selectedIndex =
+                        (m_CompletionListView.selectedIndex + 1) % m_CompletionItems.Count;
                     m_CompletionListView.ScrollToItem(m_CompletionListView.selectedIndex);
                     break;
                 case KeyCode.UpArrow:
                     CancelEvent(evt);
-                    m_CompletionListView.selectedIndex = m_CompletionListView.selectedIndex - 1 < 0 ? m_CompletionItems.Count - 1 : m_CompletionListView.selectedIndex - 1;
+                    m_CompletionListView.selectedIndex =
+                        m_CompletionListView.selectedIndex - 1 < 0
+                            ? m_CompletionItems.Count - 1
+                            : m_CompletionListView.selectedIndex - 1;
                     m_CompletionListView.ScrollToItem(m_CompletionListView.selectedIndex);
                     break;
                 case KeyCode.Return:
@@ -140,9 +157,11 @@ namespace Unity.Entities.Editor
 
         void OnFocusOut(FocusOutEvent evt)
         {
-            if (!IsCompletionContainerVisible
+            if (
+                !IsCompletionContainerVisible
                 || !(evt.relatedTarget is VisualElement ve)
-                || !m_CompletionContainer.Contains(ve) && !m_TextField.Contains(ve))
+                || !m_CompletionContainer.Contains(ve) && !m_TextField.Contains(ve)
+            )
             {
                 m_CompletionContainer.Hide();
             }
@@ -176,7 +195,10 @@ namespace Unity.Entities.Editor
                 m_CompletionItems.AddRange(m_Behavior.GetCompletionItems(m_TextField.value, pos));
             }
 
-            if (m_CompletionItems.Count == 0 || m_CompletionItems.Count == 1 && m_CompletionItems[0] == m_Behavior.GetToken(m_TextField.value, pos))
+            if (
+                m_CompletionItems.Count == 0
+                || m_CompletionItems.Count == 1 && m_CompletionItems[0] == m_Behavior.GetToken(m_TextField.value, pos)
+            )
             {
                 m_CompletionContainer.Hide();
                 return;
@@ -192,14 +214,20 @@ namespace Unity.Entities.Editor
         void SubmitCompletion(int selectedIndex)
         {
             m_IgnoreNextValueChanged = true;
-            var (newInput, newCaretPosition) = m_Behavior.OnCompletion(m_CompletionItems[selectedIndex], m_TextField.value, CaretPosition);
+            var (newInput, newCaretPosition) = m_Behavior.OnCompletion(
+                m_CompletionItems[selectedIndex],
+                m_TextField.value,
+                CaretPosition
+            );
             m_TextField.value = newInput;
-            m_TextField.schedule.Execute(() =>
-            {
-                m_TextField.Focus();
-                m_TextInput.Focus();
-                m_TextField.SelectRange(newCaretPosition, newCaretPosition);
-            }).StartingIn(0);
+            m_TextField
+                .schedule.Execute(() =>
+                {
+                    m_TextField.Focus();
+                    m_TextInput.Focus();
+                    m_TextField.SelectRange(newCaretPosition, newCaretPosition);
+                })
+                .StartingIn(0);
             m_CompletionContainer.Hide();
         }
 
@@ -210,7 +238,8 @@ namespace Unity.Entities.Editor
             m_CompletionContainer.style.left = worldBound.x;
             m_CompletionContainer.style.width = worldBound.width;
 
-            var maxHeightInCurrentContainer = m_Root.worldBound.height - worldBound.y - m_CompletionContainer.resolvedStyle.marginBottom;
+            var maxHeightInCurrentContainer =
+                m_Root.worldBound.height - worldBound.y - m_CompletionContainer.resolvedStyle.marginBottom;
 
             m_CompletionContainer.style.height = Math.Min(maxHeightInCurrentContainer, k_CompletionListMaxHeight);
         }
@@ -283,7 +312,9 @@ namespace Unity.Entities.Editor
         /// <param name="this">The <see cref="VisualElement"/> to attach the completion box to. This is expected to be or contain a <see cref="TextField"/></param>
         /// <param name="behavior">The instance of <see cref="AutoComplete.IAutoCompleteBehavior"/> to use to drive the completion behavior</param>
         /// <returns>The <see cref="AutoComplete"/> instance created, typically used to disable the completion behavior when needed or to operate on it by code</returns>
-        public static AutoComplete EnableAutoComplete(this VisualElement @this, AutoComplete.IAutoCompleteBehavior behavior)
-            => new AutoComplete(@this, behavior);
+        public static AutoComplete EnableAutoComplete(
+            this VisualElement @this,
+            AutoComplete.IAutoCompleteBehavior behavior
+        ) => new AutoComplete(@this, behavior);
     }
 }

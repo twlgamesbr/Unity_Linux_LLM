@@ -9,7 +9,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     internal static class UnsafeTextExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref UnsafeList<byte> AsUnsafeListOfBytes( this ref UnsafeText text )
+        public static ref UnsafeList<byte> AsUnsafeListOfBytes(this ref UnsafeText text)
         {
             return ref UnsafeUtility.As<UntypedUnsafeList, UnsafeList<byte>>(ref text.m_UntypedListData);
         }
@@ -61,7 +61,8 @@ namespace Unity.Collections.LowLevel.Unsafe
 
         internal static UnsafeText* Alloc(AllocatorManager.AllocatorHandle allocator)
         {
-            UnsafeText* data = (UnsafeText*)Memory.Unmanaged.Allocate(sizeof(UnsafeText), UnsafeUtility.AlignOf<UnsafeText>(), allocator);
+            UnsafeText* data = (UnsafeText*)
+                Memory.Unmanaged.Allocate(sizeof(UnsafeText), UnsafeUtility.AlignOf<UnsafeText>(), allocator);
             return data;
         }
 
@@ -186,7 +187,6 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             readonly get => this.AsUnsafeListOfBytesRO().Capacity - 1;
-
             set
             {
                 CheckCapacityInRange(value + 1, this.AsUnsafeListOfBytes().Length);
@@ -251,7 +251,9 @@ namespace Unity.Collections.LowLevel.Unsafe
                 throw new ArgumentOutOfRangeException($"Value {value} must be positive.");
 
             if ((uint)value < (uint)length)
-                throw new ArgumentOutOfRangeException($"Value {value} is out of range in NativeList of '{length}' Length.");
+                throw new ArgumentOutOfRangeException(
+                    $"Value {value} is out of range in NativeList of '{length}' Length."
+                );
         }
     }
 }

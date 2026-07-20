@@ -17,10 +17,7 @@ namespace Unity.Entities.Editor.Inspectors
 
         public override VisualElement Build()
         {
-            m_TextField = new TextField(DisplayName)
-            {
-                isDelayed = true
-            };
+            m_TextField = new TextField(DisplayName) { isDelayed = true };
 
             if (IsReadOnly)
             {
@@ -59,7 +56,7 @@ namespace Unity.Entities.Editor.Inspectors
         protected override string Value
         {
             get => Target.ToString();
-            set => Target = (FixedString32Bytes) value;
+            set => Target = (FixedString32Bytes)value;
         }
     }
 
@@ -71,7 +68,7 @@ namespace Unity.Entities.Editor.Inspectors
         protected override string Value
         {
             get => Target.ToString();
-            set => Target = (FixedString64Bytes) value;
+            set => Target = (FixedString64Bytes)value;
         }
     }
 
@@ -83,7 +80,7 @@ namespace Unity.Entities.Editor.Inspectors
         protected override string Value
         {
             get => Target.ToString();
-            set => Target = (FixedString128Bytes) value;
+            set => Target = (FixedString128Bytes)value;
         }
     }
 
@@ -95,7 +92,7 @@ namespace Unity.Entities.Editor.Inspectors
         protected override string Value
         {
             get => Target.ToString();
-            set => Target = (FixedString512Bytes) value;
+            set => Target = (FixedString512Bytes)value;
         }
     }
 
@@ -107,7 +104,7 @@ namespace Unity.Entities.Editor.Inspectors
         protected override string Value
         {
             get => Target.ToString();
-            set => Target = (FixedString4096Bytes) value;
+            set => Target = (FixedString4096Bytes)value;
         }
     }
 }

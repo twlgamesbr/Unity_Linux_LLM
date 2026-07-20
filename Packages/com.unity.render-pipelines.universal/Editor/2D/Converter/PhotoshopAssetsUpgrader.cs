@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using UnityEditor.Rendering.Converter;
 using UnityEngine.Categorization;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal
 {
     [Serializable]
     [PipelineTools]
-    [ElementInfo(Name = "Photoshop Assets Upgrader",
-             Order = 400,
-             Description = "This converter reimports the assets with extension .psd and .psb.")]
+    [ElementInfo(
+        Name = "Photoshop Assets Upgrader",
+        Order = 400,
+        Description = "This converter reimports the assets with extension .psd and .psb."
+    )]
     internal sealed class PhotoshopAssetsUpgrader : IRenderPipelineConverter
     {
         public bool isEnabled
@@ -39,20 +41,12 @@ namespace UnityEditor.Rendering.Universal
                 onScanFinish?.Invoke(returnList);
             }
 
-            SearchServiceUtils.RunQueuedSearch
-            (
+            SearchServiceUtils.RunQueuedSearch(
                 SearchServiceUtils.IndexingOptions.DeepSearch,
-                new List<(string, string)>()
-                {
-                    ("p: ext:psd", "PSD"),
-                    ("p: ext:psb", "PSB")
-                },
+                new List<(string, string)>() { ("p: ext:psd", "PSD"), ("p: ext:psb", "PSB") },
                 (item, description) =>
                 {
-                    var assetItem = new RenderPipelineConverterAssetItem(item.id)
-                    {
-                        info = description
-                    };
+                    var assetItem = new RenderPipelineConverterAssetItem(item.id) { info = description };
                     returnList.Add(assetItem);
                 },
                 OnSearchFinish
@@ -67,10 +61,11 @@ namespace UnityEditor.Rendering.Universal
 
             if (obj == null)
             {
-                message = $"Failed to load {assetItem.name} Global ID {assetItem.guid} Asset Path {assetItem.assetPath}";
+                message =
+                    $"Failed to load {assetItem.name} Global ID {assetItem.guid} Asset Path {assetItem.assetPath}";
                 return Status.Error;
             }
-            
+
             URP2DConverterUtility.UpgradePSB(assetItem.assetPath);
             message = string.Empty;
             return Status.Success;

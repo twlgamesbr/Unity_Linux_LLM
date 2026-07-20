@@ -17,8 +17,12 @@ namespace Unity.PlatformToolkit.PlayMode
         public PlayModeControls(VisualElement rootElement)
         {
             m_ControlsContainer = rootElement.Q("controls-container");
-            m_SystemControlsField = rootElement.Q<PlayModeControlsSystemControlsField>("play-mode-controls-system-controls");
-            m_AccountsField = rootElement.Q<PlayModeControlsAccountControlsField>("play-mode-controls-account-controls");
+            m_SystemControlsField = rootElement.Q<PlayModeControlsSystemControlsField>(
+                "play-mode-controls-system-controls"
+            );
+            m_AccountsField = rootElement.Q<PlayModeControlsAccountControlsField>(
+                "play-mode-controls-account-controls"
+            );
 #if INPUT_SYSTEM_AVAILABLE
             m_InputMappingField = rootElement.Q<PlayModeControlsInputMappingField>("play-mode-controls-input-mapping");
 #endif

@@ -10,6 +10,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
     class GraphLegend : VisualElement
     {
         List<LegendKey> m_LegendKeys = new List<LegendKey>();
+
         public GraphLegend()
         {
             AddToClassList(UssClassNames.k_GraphLegend);
@@ -37,9 +38,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             {
                 var legendKey = m_LegendKeys[i];
                 var stat = stats[i];
-                Color color = (variableColors != null && i < variableColors.Count)
-                    ? variableColors[i]
-                    : CategoricalColorPalette.GetColor(i);
+                Color color =
+                    (variableColors != null && i < variableColors.Count)
+                        ? variableColors[i]
+                        : CategoricalColorPalette.GetColor(i);
                 legendKey.Update(stat.ToString(), color);
 
                 if (i >= childrenCount)

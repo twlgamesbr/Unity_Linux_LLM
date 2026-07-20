@@ -16,14 +16,17 @@ namespace Unity.PlatformToolkit
 
         /// <summary>Get the <see cref="IPrimaryAccountSystem"/>.</summary>
         /// <exception cref="InvalidOperationException">Thrown if the primary account is not supported on the current platform. Use <see cref="ICapabilities.PrimaryAccount"/> to check if the primary account is supported.</exception>
-        IPrimaryAccountSystem Primary => throw new InvalidOperationException("Primary account is not supported on this platform.");
+        IPrimaryAccountSystem Primary =>
+            throw new InvalidOperationException("Primary account is not supported on this platform.");
 
         /// <summary>Get the <see cref="IAccountPickerSystem"/>.</summary>
         /// <exception cref="InvalidOperationException">Thrown if account picker is not supported on the current platform. Use <see cref="ICapabilities.AccountPicker"/> to check if account picker is supported.</exception>
-        IAccountPickerSystem Picker => throw new InvalidOperationException("Account picker is not supported on this platform.");
+        IAccountPickerSystem Picker =>
+            throw new InvalidOperationException("Account picker is not supported on this platform.");
 
         /// <summary>Get the <see cref="IInputOwnershipSystem"/>.</summary>
         /// <exception cref="InvalidOperationException">Thrown if account-input pairing is not supported on the current platform. Use <see cref="ICapabilities.InputOwnership"/> to check if account-input pairing is supported.</exception>
-        IInputOwnershipSystem InputOwnership => throw new InvalidOperationException("Account-input pairing is not supported on this platform.");
+        IInputOwnershipSystem InputOwnership =>
+            throw new InvalidOperationException("Account-input pairing is not supported on this platform.");
     }
 }

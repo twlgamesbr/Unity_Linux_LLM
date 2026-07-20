@@ -14,11 +14,20 @@ namespace UnityEngine.InputSystem.Editor
     [Serializable]
     internal class InputActionAssetManager : IDisposable
     {
-        [SerializeField] private InputActionAsset m_AssetObjectForEditing;
-        [SerializeField] private InputActionAsset m_ImportedAssetObject;
-        [SerializeField] private string m_AssetGUID;
-        [SerializeField] private string m_ImportedAssetJson;
-        [SerializeField] private bool m_IsDirty;
+        [SerializeField]
+        private InputActionAsset m_AssetObjectForEditing;
+
+        [SerializeField]
+        private InputActionAsset m_ImportedAssetObject;
+
+        [SerializeField]
+        private string m_AssetGUID;
+
+        [SerializeField]
+        private string m_ImportedAssetJson;
+
+        [SerializeField]
+        private bool m_IsDirty;
 
         private SerializedObject m_SerializedObject;
 
@@ -222,7 +231,9 @@ namespace UnityEngine.InputSystem.Editor
             if (EditorHelpers.WriteAsset(assetPath, assetJson))
                 return true;
 
-            Debug.LogError($"Unable save asset to \"{assetPath}\" since the asset-path could not be checked-out as editable in the underlying version-control system.");
+            Debug.LogError(
+                $"Unable save asset to \"{assetPath}\" since the asset-path could not be checked-out as editable in the underlying version-control system."
+            );
             return false;
         }
 

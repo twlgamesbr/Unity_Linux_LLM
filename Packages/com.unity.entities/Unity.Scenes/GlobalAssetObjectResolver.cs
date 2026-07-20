@@ -24,7 +24,7 @@ namespace Unity.Scenes
             {
                 AssetObjectManifest = manifest,
                 AssetBundle = assetBundle,
-                TargetHash = targetHash
+                TargetHash = targetHash,
             };
         }
 
@@ -52,19 +52,23 @@ namespace Unity.Scenes
 
             if (resolved.AssetBundle == null)
             {
-                Debug.LogError($"GlobalAssetObjectResolver Validate failed! => AssetBundle '{guid.ToString()}' not loadable");
+                Debug.LogError(
+                    $"GlobalAssetObjectResolver Validate failed! => AssetBundle '{guid.ToString()}' not loadable"
+                );
                 return;
             }
 
             if (resolved.AssetObjectManifest == null)
             {
                 if (!resolved.AssetBundle.isStreamedSceneAssetBundle)
-                    Debug.LogError($"GlobalAssetObjectResolver Validate failed! => ObjectManifest in '{guid.ToString()}' not loadable");
+                    Debug.LogError(
+                        $"GlobalAssetObjectResolver Validate failed! => ObjectManifest in '{guid.ToString()}' not loadable"
+                    );
                 return;
             }
 
-//@TODO: We currently have no way of stripping objects that are editor only,
-// so we can't perform these checks because some of these objects will in fact be null
+            //@TODO: We currently have no way of stripping objects that are editor only,
+            // so we can't perform these checks because some of these objects will in fact be null
 #if false
             for (int i = 0; i < resolved.AssetObjectManifest.Objects.Length; i++)
             {
@@ -100,7 +104,10 @@ namespace Unity.Scenes
             return EntityId.None;
         }
 
-        unsafe public void ResolveObjects(NativeArray<RuntimeGlobalObjectId> globalObjectIDs, NativeArray<EntityId> entityIds)
+        public unsafe void ResolveObjects(
+            NativeArray<RuntimeGlobalObjectId> globalObjectIDs,
+            NativeArray<EntityId> entityIds
+        )
         {
             var globalObjectIDsPtr = (RuntimeGlobalObjectId*)globalObjectIDs.GetUnsafePtr();
             for (int i = 0; i != globalObjectIDs.Length; i++)

@@ -8,13 +8,13 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 using ILPPInterface = Unity.CompilationPipeline.Common.ILPostProcessing.ILPostProcessor;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using ParameterAttributes = Mono.Cecil.ParameterAttributes;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Unity.Netcode.Editor.CodeGen
 {
@@ -27,8 +27,11 @@ namespace Unity.Netcode.Editor.CodeGen
 
         public override ILPPInterface GetInstance() => this;
 
-        public override bool WillProcess(ICompiledAssembly compiledAssembly) => compiledAssembly.Name == CodeGenHelpers.RuntimeAssemblyName ||
-            compiledAssembly.References.Any(filePath => Path.GetFileNameWithoutExtension(filePath) == CodeGenHelpers.RuntimeAssemblyName);
+        public override bool WillProcess(ICompiledAssembly compiledAssembly) =>
+            compiledAssembly.Name == CodeGenHelpers.RuntimeAssemblyName
+            || compiledAssembly.References.Any(filePath =>
+                Path.GetFileNameWithoutExtension(filePath) == CodeGenHelpers.RuntimeAssemblyName
+            );
 
         private readonly List<DiagnosticMessage> m_Diagnostics = new List<DiagnosticMessage>();
 
@@ -112,7 +115,8 @@ namespace Unity.Netcode.Editor.CodeGen
                     // process NetworkBehaviour types
                     try
                     {
-                        mainModule.GetTypes()
+                        mainModule
+                            .GetTypes()
                             .Where(t => t.IsSubclassOf(CodeGenHelpers.NetworkBehaviour_FullName))
                             .ToList()
                             .ForEach(b => ProcessNetworkBehaviour(b, compiledAssembly.Defines));
@@ -124,7 +128,9 @@ namespace Unity.Netcode.Editor.CodeGen
                             {
                                 if (attribute.AttributeType.Name == nameof(GenerateSerializationForTypeAttribute))
                                 {
-                                    var wrappedType = mainModule.ImportReference((TypeReference)attribute.ConstructorArguments[0].Value);
+                                    var wrappedType = mainModule.ImportReference(
+                                        (TypeReference)attribute.ConstructorArguments[0].Value
+                                    );
                                     AddWrappedType(wrappedType);
                                 }
                             }
@@ -135,7 +141,9 @@ namespace Unity.Netcode.Editor.CodeGen
                                 {
                                     if (attribute.AttributeType.Name == nameof(GenerateSerializationForTypeAttribute))
                                     {
-                                        var wrappedType = mainModule.ImportReference((TypeReference)attribute.ConstructorArguments[0].Value);
+                                        var wrappedType = mainModule.ImportReference(
+                                            (TypeReference)attribute.ConstructorArguments[0].Value
+                                        );
                                         AddWrappedType(wrappedType);
                                     }
                                 }
@@ -167,7 +175,7 @@ namespace Unity.Netcode.Editor.CodeGen
             {
                 SymbolWriterProvider = new PortablePdbWriterProvider(),
                 SymbolStream = pdb,
-                WriteSymbols = true
+                WriteSymbols = true,
             };
 
             assemblyDefinition.Write(pe, writerParameters);
@@ -203,13 +211,18 @@ namespace Unity.Netcode.Editor.CodeGen
 
         private void CreateNetworkVariableTypeInitializers(AssemblyDefinition assembly, string[] assemblyDefines)
         {
-            var typeDefinition = new TypeDefinition("__GEN", "NetworkVariableSerializationHelper", TypeAttributes.NotPublic | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, assembly.MainModule.TypeSystem.Object);
+            var typeDefinition = new TypeDefinition(
+                "__GEN",
+                "NetworkVariableSerializationHelper",
+                TypeAttributes.NotPublic | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit,
+                assembly.MainModule.TypeSystem.Object
+            );
 
             var staticCtorMethodDef = new MethodDefinition(
                 $"InitializeSerialization",
-                MethodAttributes.Assembly |
-                MethodAttributes.Static,
-                assembly.MainModule.TypeSystem.Void);
+                MethodAttributes.Assembly | MethodAttributes.Static,
+                assembly.MainModule.TypeSystem.Void
+            );
             staticCtorMethodDef.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             bool isEditor = assemblyDefines.Contains("UNITY_EDITOR");
             if (isEditor)
@@ -221,7 +234,6 @@ namespace Unity.Netcode.Editor.CodeGen
                 staticCtorMethodDef.CustomAttributes.Add(new CustomAttribute(m_RuntimeInitializeOnLoadAttribute_Ctor));
             }
             typeDefinition.Methods.Add(staticCtorMethodDef);
-
 
             var instructions = new List<Instruction>();
             var processor = staticCtorMethodDef.Body.GetILProcessor();
@@ -244,30 +256,47 @@ namespace Unity.Netcode.Editor.CodeGen
                 GenericInstanceMethod serializeMethod = null;
                 GenericInstanceMethod equalityMethod;
 
-
                 if (type.Resolve().FullName == "Unity.Collections.NativeArray`1")
                 {
                     var wrappedType = ((GenericInstanceType)type).GenericArguments[0];
-                    if (IsSpecialCaseType(wrappedType) || wrappedType.HasInterface(typeof(INetworkSerializeByMemcpy).FullName) || wrappedType.Resolve().IsEnum || IsMemcpyableType(wrappedType))
+                    if (
+                        IsSpecialCaseType(wrappedType)
+                        || wrappedType.HasInterface(typeof(INetworkSerializeByMemcpy).FullName)
+                        || wrappedType.Resolve().IsEnum
+                        || IsMemcpyableType(wrappedType)
+                    )
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyArray_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyArray_MethodRef
+                        );
                     }
                     else if (wrappedType.HasInterface(typeof(INetworkSerializable).FullName))
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableArray_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableArray_MethodRef
+                        );
                     }
-                    else if (wrappedType.HasInterface(CodeGenHelpers.IUTF8Bytes_FullName) && wrappedType.HasInterface(k_INativeListBool_FullName))
+                    else if (
+                        wrappedType.HasInterface(CodeGenHelpers.IUTF8Bytes_FullName)
+                        && wrappedType.HasInterface(k_INativeListBool_FullName)
+                    )
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_FixedStringArray_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_FixedStringArray_MethodRef
+                        );
                     }
 
                     if (wrappedType.HasInterface(typeof(IEquatable<>).FullName + "<" + wrappedType.FullName + ">"))
                     {
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableArray_MethodRef);
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableArray_MethodRef
+                        );
                     }
                     else
                     {
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsArray_MethodRef);
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsArray_MethodRef
+                        );
                     }
 
                     serializeMethod?.GenericArguments.Add(wrappedType);
@@ -276,18 +305,26 @@ namespace Unity.Netcode.Editor.CodeGen
                 else if (type.Resolve().FullName == "System.Collections.Generic.List`1")
                 {
                     var wrappedType = ((GenericInstanceType)type).GenericArguments[0];
-                    serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_List_MethodRef);
+                    serializeMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_List_MethodRef
+                    );
 
-                    equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_List_MethodRef);
+                    equalityMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_List_MethodRef
+                    );
                     serializeMethod.GenericArguments.Add(wrappedType);
                     equalityMethod.GenericArguments.Add(wrappedType);
                 }
                 else if (type.Resolve().FullName == "System.Collections.Generic.HashSet`1")
                 {
                     var wrappedType = ((GenericInstanceType)type).GenericArguments[0];
-                    serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_HashSet_MethodRef);
+                    serializeMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_HashSet_MethodRef
+                    );
 
-                    equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_HashSet_MethodRef);
+                    equalityMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_HashSet_MethodRef
+                    );
                     serializeMethod.GenericArguments.Add(wrappedType);
                     equalityMethod.GenericArguments.Add(wrappedType);
                 }
@@ -295,9 +332,13 @@ namespace Unity.Netcode.Editor.CodeGen
                 {
                     var wrappedKeyType = ((GenericInstanceType)type).GenericArguments[0];
                     var wrappedValType = ((GenericInstanceType)type).GenericArguments[1];
-                    serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_Dictionary_MethodRef);
+                    serializeMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_Dictionary_MethodRef
+                    );
 
-                    equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_Dictionary_MethodRef);
+                    equalityMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_Dictionary_MethodRef
+                    );
                     serializeMethod.GenericArguments.Add(wrappedKeyType);
                     serializeMethod.GenericArguments.Add(wrappedValType);
                     equalityMethod.GenericArguments.Add(wrappedKeyType);
@@ -307,26 +348,44 @@ namespace Unity.Netcode.Editor.CodeGen
                 else if (type.Resolve().FullName == "Unity.Collections.NativeList`1")
                 {
                     var wrappedType = ((GenericInstanceType)type).GenericArguments[0];
-                    if (IsSpecialCaseType(wrappedType) || wrappedType.HasInterface(typeof(INetworkSerializeByMemcpy).FullName) || wrappedType.Resolve().IsEnum || IsMemcpyableType(wrappedType))
+                    if (
+                        IsSpecialCaseType(wrappedType)
+                        || wrappedType.HasInterface(typeof(INetworkSerializeByMemcpy).FullName)
+                        || wrappedType.Resolve().IsEnum
+                        || IsMemcpyableType(wrappedType)
+                    )
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyList_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyList_MethodRef
+                        );
                     }
                     else if (wrappedType.HasInterface(typeof(INetworkSerializable).FullName))
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableList_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableList_MethodRef
+                        );
                     }
-                    else if (wrappedType.HasInterface(CodeGenHelpers.IUTF8Bytes_FullName) && wrappedType.HasInterface(k_INativeListBool_FullName))
+                    else if (
+                        wrappedType.HasInterface(CodeGenHelpers.IUTF8Bytes_FullName)
+                        && wrappedType.HasInterface(k_INativeListBool_FullName)
+                    )
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_FixedStringList_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_FixedStringList_MethodRef
+                        );
                     }
 
                     if (wrappedType.HasInterface(typeof(IEquatable<>).FullName + "<" + wrappedType.FullName + ">"))
                     {
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableList_MethodRef);
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableList_MethodRef
+                        );
                     }
                     else
                     {
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsList_MethodRef);
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsList_MethodRef
+                        );
                     }
 
                     serializeMethod?.GenericArguments.Add(wrappedType);
@@ -335,9 +394,13 @@ namespace Unity.Netcode.Editor.CodeGen
                 else if (type.Resolve().FullName == "Unity.Collections.NativeHashSet`1")
                 {
                     var wrappedType = ((GenericInstanceType)type).GenericArguments[0];
-                    serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_NativeHashSet_MethodRef);
+                    serializeMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_NativeHashSet_MethodRef
+                    );
 
-                    equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_NativeHashSet_MethodRef);
+                    equalityMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_NativeHashSet_MethodRef
+                    );
                     serializeMethod.GenericArguments.Add(wrappedType);
                     equalityMethod.GenericArguments.Add(wrappedType);
                 }
@@ -345,9 +408,13 @@ namespace Unity.Netcode.Editor.CodeGen
                 {
                     var wrappedKeyType = ((GenericInstanceType)type).GenericArguments[0];
                     var wrappedValType = ((GenericInstanceType)type).GenericArguments[1];
-                    serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_NativeHashMap_MethodRef);
+                    serializeMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_NativeHashMap_MethodRef
+                    );
 
-                    equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_NativeHashMap_MethodRef);
+                    equalityMethod = new GenericInstanceMethod(
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_NativeHashMap_MethodRef
+                    );
                     serializeMethod.GenericArguments.Add(wrappedKeyType);
                     serializeMethod.GenericArguments.Add(wrappedValType);
                     equalityMethod.GenericArguments.Add(wrappedKeyType);
@@ -356,26 +423,43 @@ namespace Unity.Netcode.Editor.CodeGen
 #endif
                 else if (type.IsValueType)
                 {
-                    if (type.HasInterface(typeof(INetworkSerializeByMemcpy).FullName) || type.Resolve().IsEnum || IsMemcpyableType(type))
+                    if (
+                        type.HasInterface(typeof(INetworkSerializeByMemcpy).FullName)
+                        || type.Resolve().IsEnum
+                        || IsMemcpyableType(type)
+                    )
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpy_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpy_MethodRef
+                        );
                     }
                     else if (type.HasInterface(typeof(INetworkSerializable).FullName))
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializable_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializable_MethodRef
+                        );
                     }
-                    else if (type.HasInterface(CodeGenHelpers.IUTF8Bytes_FullName) && type.HasInterface(k_INativeListBool_FullName))
+                    else if (
+                        type.HasInterface(CodeGenHelpers.IUTF8Bytes_FullName)
+                        && type.HasInterface(k_INativeListBool_FullName)
+                    )
                     {
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_FixedString_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_FixedString_MethodRef
+                        );
                     }
 
                     if (type.HasInterface(typeof(IEquatable<>).FullName + "<" + type.FullName + ">"))
                     {
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatable_MethodRef);
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatable_MethodRef
+                        );
                     }
                     else
                     {
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEquals_MethodRef);
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEquals_MethodRef
+                        );
                     }
 
                     serializeMethod?.GenericArguments.Add(type);
@@ -397,27 +481,42 @@ namespace Unity.Netcode.Editor.CodeGen
 
                         if (!hasEmptyConstructor)
                         {
-                            m_Diagnostics.AddError($"{type} cannot be used in a network variable - Managed {nameof(INetworkSerializable)} instances must meet the `new()` (default empty constructor) constraint.");
+                            m_Diagnostics.AddError(
+                                $"{type} cannot be used in a network variable - Managed {nameof(INetworkSerializable)} instances must meet the `new()` (default empty constructor) constraint."
+                            );
                             continue;
                         }
-                        serializeMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeSerializer_ManagedINetworkSerializable_MethodRef);
+                        serializeMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeSerializer_ManagedINetworkSerializable_MethodRef
+                        );
                     }
 
                     if (type.HasInterface(typeof(IEquatable<>).FullName + "<" + type.FullName + ">"))
                     {
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedIEquatable_MethodRef);
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedIEquatable_MethodRef
+                        );
                     }
                     else
                     {
                         foreach (var typeInterface in type.Resolve().Interfaces)
                         {
-                            if (typeInterface.InterfaceType.Name.Contains(typeof(IEquatable<>).Name) && typeInterface.InterfaceType.IsGenericInstance)
+                            if (
+                                typeInterface.InterfaceType.Name.Contains(typeof(IEquatable<>).Name)
+                                && typeInterface.InterfaceType.IsGenericInstance
+                            )
                             {
-                                m_Diagnostics.AddError($"{type}: A generic IEquatable '{typeInterface.InterfaceType.FullName}' is not supported.");
+                                m_Diagnostics.AddError(
+                                    $"{type}: A generic IEquatable '{typeInterface.InterfaceType.FullName}' is not supported."
+                                );
                             }
                         }
-                        m_Diagnostics.AddError($"{type}: Managed type in NetworkVariable must implement IEquatable<{type}>.");
-                        equalityMethod = new GenericInstanceMethod(m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedClassEquals_MethodRef);
+                        m_Diagnostics.AddError(
+                            $"{type}: Managed type in NetworkVariable must implement IEquatable<{type}>."
+                        );
+                        equalityMethod = new GenericInstanceMethod(
+                            m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedClassEquals_MethodRef
+                        );
                     }
 
                     serializeMethod?.GenericArguments.Add(type);
@@ -431,7 +530,9 @@ namespace Unity.Netcode.Editor.CodeGen
                 instructions.Add(processor.Create(OpCodes.Call, m_MainModule.ImportReference(equalityMethod)));
             }
 
-            instructions.ForEach(instruction => processor.Body.Instructions.Insert(processor.Body.Instructions.Count - 1, instruction));
+            instructions.ForEach(instruction =>
+                processor.Body.Instructions.Insert(processor.Body.Instructions.Count - 1, instruction)
+            );
 
             assembly.MainModule.Types.Add(typeDefinition);
         }
@@ -540,11 +641,13 @@ namespace Unity.Netcode.Editor.CodeGen
         private MethodReference m_NetworkBehaviour_createNativeList_MethodRef;
 
         private TypeReference m_FastBufferWriter_TypeRef;
-        private readonly Dictionary<string, MethodReference> m_FastBufferWriter_WriteValue_MethodRefs = new Dictionary<string, MethodReference>();
+        private readonly Dictionary<string, MethodReference> m_FastBufferWriter_WriteValue_MethodRefs =
+            new Dictionary<string, MethodReference>();
         private readonly List<MethodReference> m_FastBufferWriter_ExtensionMethodRefs = new List<MethodReference>();
 
         private TypeReference m_FastBufferReader_TypeRef;
-        private readonly Dictionary<string, MethodReference> m_FastBufferReader_ReadValue_MethodRefs = new Dictionary<string, MethodReference>();
+        private readonly Dictionary<string, MethodReference> m_FastBufferReader_ReadValue_MethodRefs =
+            new Dictionary<string, MethodReference>();
         private readonly List<MethodReference> m_FastBufferReader_ExtensionMethodRefs = new List<MethodReference>();
 
         private HashSet<TypeReference> m_WrappedNetworkVariableTypes = new HashSet<TypeReference>();
@@ -575,7 +678,7 @@ namespace Unity.Netcode.Editor.CodeGen
             typeof(Color),
             typeof(Color32),
             typeof(Ray),
-            typeof(Ray2D)
+            typeof(Ray2D),
         };
         internal static readonly Type[] SpecialCaseTypes = new[]
         {
@@ -645,14 +748,17 @@ namespace Unity.Netcode.Editor.CodeGen
                 }
             }
 
-
             bool isEditor = assemblyDefines.Contains("UNITY_EDITOR");
             if (isEditor)
             {
-                m_InitializeOnLoadAttribute_Ctor = moduleDefinition.ImportReference(typeof(InitializeOnLoadMethodAttribute).GetConstructor(new Type[] { }));
+                m_InitializeOnLoadAttribute_Ctor = moduleDefinition.ImportReference(
+                    typeof(InitializeOnLoadMethodAttribute).GetConstructor(new Type[] { })
+                );
             }
 
-            m_RuntimeInitializeOnLoadAttribute_Ctor = moduleDefinition.ImportReference(typeof(RuntimeInitializeOnLoadMethodAttribute).GetConstructor(new Type[] { }));
+            m_RuntimeInitializeOnLoadAttribute_Ctor = moduleDefinition.ImportReference(
+                typeof(RuntimeInitializeOnLoadMethodAttribute).GetConstructor(new Type[] { })
+            );
 
             TypeDefinition networkManagerTypeDef = null;
             TypeDefinition networkBehaviourTypeDef = null;
@@ -694,7 +800,10 @@ namespace Unity.Netcode.Editor.CodeGen
                     continue;
                 }
 
-                if (networkHandlerDelegateTypeDef == null && netcodeTypeDef.Name == nameof(NetworkBehaviour.RpcReceiveHandler))
+                if (
+                    networkHandlerDelegateTypeDef == null
+                    && netcodeTypeDef.Name == nameof(NetworkBehaviour.RpcReceiveHandler)
+                )
                 {
                     networkHandlerDelegateTypeDef = netcodeTypeDef;
                     continue;
@@ -742,7 +851,10 @@ namespace Unity.Netcode.Editor.CodeGen
                     continue;
                 }
 
-                if (networkVariableSerializationTypesTypeDef == null && netcodeTypeDef.Name == nameof(NetworkVariableSerializationTypedInitializers))
+                if (
+                    networkVariableSerializationTypesTypeDef == null
+                    && netcodeTypeDef.Name == nameof(NetworkVariableSerializationTypedInitializers)
+                )
                 {
                     networkVariableSerializationTypesTypeDef = netcodeTypeDef;
                     continue;
@@ -781,19 +893,27 @@ namespace Unity.Netcode.Editor.CodeGen
                 switch (propertyDef.Name)
                 {
                     case k_NetworkManager_LocalClientId:
-                        m_NetworkManager_getLocalClientId_MethodRef = moduleDefinition.ImportReference(propertyDef.GetMethod);
+                        m_NetworkManager_getLocalClientId_MethodRef = moduleDefinition.ImportReference(
+                            propertyDef.GetMethod
+                        );
                         break;
                     case k_NetworkManager_IsListening:
-                        m_NetworkManager_getIsListening_MethodRef = moduleDefinition.ImportReference(propertyDef.GetMethod);
+                        m_NetworkManager_getIsListening_MethodRef = moduleDefinition.ImportReference(
+                            propertyDef.GetMethod
+                        );
                         break;
                     case k_NetworkManager_IsHost:
                         m_NetworkManager_getIsHost_MethodRef = moduleDefinition.ImportReference(propertyDef.GetMethod);
                         break;
                     case k_NetworkManager_IsServer:
-                        m_NetworkManager_getIsServer_MethodRef = moduleDefinition.ImportReference(propertyDef.GetMethod);
+                        m_NetworkManager_getIsServer_MethodRef = moduleDefinition.ImportReference(
+                            propertyDef.GetMethod
+                        );
                         break;
                     case k_NetworkManager_IsClient:
-                        m_NetworkManager_getIsClient_MethodRef = moduleDefinition.ImportReference(propertyDef.GetMethod);
+                        m_NetworkManager_getIsClient_MethodRef = moduleDefinition.ImportReference(
+                            propertyDef.GetMethod
+                        );
                         break;
                 }
             }
@@ -816,10 +936,14 @@ namespace Unity.Netcode.Editor.CodeGen
                 switch (propertyDef.Name)
                 {
                     case k_NetworkBehaviour_NetworkManager:
-                        m_NetworkBehaviour_getNetworkManager_MethodRef = moduleDefinition.ImportReference(propertyDef.GetMethod);
+                        m_NetworkBehaviour_getNetworkManager_MethodRef = moduleDefinition.ImportReference(
+                            propertyDef.GetMethod
+                        );
                         break;
                     case k_NetworkBehaviour_OwnerClientId:
-                        m_NetworkBehaviour_getOwnerClientId_MethodRef = moduleDefinition.ImportReference(propertyDef.GetMethod);
+                        m_NetworkBehaviour_getOwnerClientId_MethodRef = moduleDefinition.ImportReference(
+                            propertyDef.GetMethod
+                        );
                         break;
                 }
             }
@@ -850,12 +974,13 @@ namespace Unity.Netcode.Editor.CodeGen
                         m_NetworkBehaviour_createNativeList_MethodRef = moduleDefinition.ImportReference(methodDef);
                         break;
                     case k_NetworkBehaviour___nameNetworkVariable:
-                        m_NetworkBehaviour___nameNetworkVariable_MethodRef = moduleDefinition.ImportReference(methodDef);
+                        m_NetworkBehaviour___nameNetworkVariable_MethodRef = moduleDefinition.ImportReference(
+                            methodDef
+                        );
                         break;
                     case k_NetworkBehaviour___registerRpc:
                         m_NetworkBehaviour___registerRpc_MethodRef = moduleDefinition.ImportReference(methodDef);
                         break;
-
                 }
             }
 
@@ -872,7 +997,6 @@ namespace Unity.Netcode.Editor.CodeGen
                 }
             }
 
-
             m_NetworkVariableBase_TypeRef = moduleDefinition.ImportReference(networkVariableBaseTypeDef);
             foreach (var methodDef in networkVariableBaseTypeDef.Methods)
             {
@@ -886,10 +1010,12 @@ namespace Unity.Netcode.Editor.CodeGen
 
             foreach (var ctor in networkHandlerDelegateTypeDef.Resolve().GetConstructors())
             {
-                if (ctor.HasParameters &&
-                    ctor.Parameters.Count == 2 &&
-                    ctor.Parameters[0].ParameterType.Name == nameof(System.Object) &&
-                    ctor.Parameters[1].ParameterType.Name == nameof(IntPtr))
+                if (
+                    ctor.HasParameters
+                    && ctor.Parameters.Count == 2
+                    && ctor.Parameters[0].ParameterType.Name == nameof(System.Object)
+                    && ctor.Parameters[1].ParameterType.Name == nameof(IntPtr)
+                )
                 {
                     m_NetworkHandlerDelegateCtor_MethodRef = moduleDefinition.ImportReference(ctor);
                     break;
@@ -924,7 +1050,8 @@ namespace Unity.Netcode.Editor.CodeGen
                             switch (recvFieldDef.Name)
                             {
                                 case k_ServerRpcReceiveParams_SenderClientId:
-                                    m_ServerRpcParams_Receive_SenderClientId_FieldRef = moduleDefinition.ImportReference(recvFieldDef);
+                                    m_ServerRpcParams_Receive_SenderClientId_FieldRef =
+                                        moduleDefinition.ImportReference(recvFieldDef);
                                     break;
                             }
                         }
@@ -944,7 +1071,8 @@ namespace Unity.Netcode.Editor.CodeGen
                             switch (recvFieldDef.Name)
                             {
                                 case k_RpcReceiveParams_SenderClientId:
-                                    m_UniversalRpcParams_Receive_SenderClientId_FieldRef = moduleDefinition.ImportReference(recvFieldDef);
+                                    m_UniversalRpcParams_Receive_SenderClientId_FieldRef =
+                                        moduleDefinition.ImportReference(recvFieldDef);
                                     break;
                             }
                         }
@@ -970,7 +1098,9 @@ namespace Unity.Netcode.Editor.CodeGen
                 }
             }
 
-            var extensionConstructor = moduleDefinition.ImportReference(typeof(ExtensionAttribute).GetConstructor(new Type[] { }));
+            var extensionConstructor = moduleDefinition.ImportReference(
+                typeof(ExtensionAttribute).GetConstructor(new Type[] { })
+            );
             foreach (var assembly in assemblies)
             {
                 foreach (var module in assembly.Modules)
@@ -1001,7 +1131,10 @@ namespace Unity.Netcode.Editor.CodeGen
 
                             foreach (var attr in method.CustomAttributes)
                             {
-                                if (attr.Constructor.DeclaringType.FullName == extensionConstructor.DeclaringType.FullName)
+                                if (
+                                    attr.Constructor.DeclaringType.FullName
+                                    == extensionConstructor.DeclaringType.FullName
+                                )
                                 {
                                     mayHaveExtensionAttr = true;
                                     break;
@@ -1023,9 +1156,14 @@ namespace Unity.Netcode.Editor.CodeGen
                             var firstParameterType = parameters[0].ParameterType;
 
                             // ReadValueSafe() and WriteValueSafe() can use both by-ref and non-by-ref type for the first parameter type
-                            var firstParameterElementType = firstParameterType is ByReferenceType byRefType ? byRefType.ElementType : firstParameterType;
+                            var firstParameterElementType = firstParameterType is ByReferenceType byRefType
+                                ? byRefType.ElementType
+                                : firstParameterType;
 
-                            if (firstParameterElementType.FullName != m_FastBufferWriter_TypeRef.FullName && firstParameterElementType.FullName != m_FastBufferReader_TypeRef.FullName)
+                            if (
+                                firstParameterElementType.FullName != m_FastBufferWriter_TypeRef.FullName
+                                && firstParameterElementType.FullName != m_FastBufferReader_TypeRef.FullName
+                            )
                             {
                                 continue;
                             }
@@ -1034,8 +1172,11 @@ namespace Unity.Netcode.Editor.CodeGen
 
                             foreach (var attr in method.CustomAttributes)
                             {
-                                if (attr.Constructor.DeclaringType.FullName == extensionConstructor.DeclaringType.FullName &&
-                                    attr.Constructor.Resolve() == extensionConstructor.Resolve())
+                                if (
+                                    attr.Constructor.DeclaringType.FullName
+                                        == extensionConstructor.DeclaringType.FullName
+                                    && attr.Constructor.Resolve() == extensionConstructor.Resolve()
+                                )
                                 {
                                     isExtension = true;
                                     break;
@@ -1047,11 +1188,19 @@ namespace Unity.Netcode.Editor.CodeGen
                                 continue;
                             }
 
-                            if (method.Name == k_WriteValueMethodName && firstParameterType.Resolve() == m_FastBufferWriter_TypeRef.MakeByReferenceType().Resolve())
+                            if (
+                                method.Name == k_WriteValueMethodName
+                                && firstParameterType.Resolve()
+                                    == m_FastBufferWriter_TypeRef.MakeByReferenceType().Resolve()
+                            )
                             {
                                 m_FastBufferWriter_ExtensionMethodRefs.Add(m_MainModule.ImportReference(method));
                             }
-                            else if (method.Name == k_ReadValueMethodName && firstParameterType.Resolve() == m_FastBufferReader_TypeRef.MakeByReferenceType().Resolve())
+                            else if (
+                                method.Name == k_ReadValueMethodName
+                                && firstParameterType.Resolve()
+                                    == m_FastBufferReader_TypeRef.MakeByReferenceType().Resolve()
+                            )
                             {
                                 m_FastBufferReader_ExtensionMethodRefs.Add(m_MainModule.ImportReference(method));
                             }
@@ -1072,25 +1221,40 @@ namespace Unity.Netcode.Editor.CodeGen
                     case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedByMemcpy):
                         m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpy_MethodRef = method;
                         break;
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedByMemcpyArray):
-                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyArray_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedByMemcpyArray
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyArray_MethodRef =
+                            method;
                         break;
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedByMemcpyList):
-                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyList_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedByMemcpyList
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedByMemcpyList_MethodRef =
+                            method;
                         break;
 #endif
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedINetworkSerializable):
-                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializable_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedINetworkSerializable
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializable_MethodRef =
+                            method;
                         break;
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedINetworkSerializableArray):
-                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableArray_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedINetworkSerializableArray
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableArray_MethodRef =
+                            method;
                         break;
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedINetworkSerializableList):
-                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableList_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeSerializer_UnmanagedINetworkSerializableList
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_UnmanagedINetworkSerializableList_MethodRef =
+                            method;
                         break;
                     case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_NativeHashSet):
                         m_NetworkVariableSerializationTypes_InitializeSerializer_NativeHashSet_MethodRef = method;
@@ -1108,8 +1272,11 @@ namespace Unity.Netcode.Editor.CodeGen
                     case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_Dictionary):
                         m_NetworkVariableSerializationTypes_InitializeSerializer_Dictionary_MethodRef = method;
                         break;
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_ManagedINetworkSerializable):
-                        m_NetworkVariableSerializationTypes_InitializeSerializer_ManagedINetworkSerializable_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeSerializer_ManagedINetworkSerializable
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeSerializer_ManagedINetworkSerializable_MethodRef =
+                            method;
                         break;
                     case nameof(NetworkVariableSerializationTypedInitializers.InitializeSerializer_FixedString):
                         m_NetworkVariableSerializationTypes_InitializeSerializer_FixedString_MethodRef = method;
@@ -1124,19 +1291,31 @@ namespace Unity.Netcode.Editor.CodeGen
                         break;
 #endif
 
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_ManagedIEquatable):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedIEquatable_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_ManagedIEquatable
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedIEquatable_MethodRef =
+                            method;
                         break;
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedIEquatable):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatable_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedIEquatable
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatable_MethodRef =
+                            method;
                         break;
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedIEquatableArray):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableArray_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedIEquatableArray
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableArray_MethodRef =
+                            method;
                         break;
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedIEquatableList):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableList_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedIEquatableList
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedIEquatableList_MethodRef =
+                            method;
                         break;
                     case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_NativeHashSet):
                         m_NetworkVariableSerializationTypes_InitializeEqualityChecker_NativeHashSet_MethodRef = method;
@@ -1154,19 +1333,31 @@ namespace Unity.Netcode.Editor.CodeGen
                     case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_Dictionary):
                         m_NetworkVariableSerializationTypes_InitializeEqualityChecker_Dictionary_MethodRef = method;
                         break;
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedValueEquals):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEquals_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedValueEquals
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEquals_MethodRef =
+                            method;
                         break;
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedValueEqualsArray):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsArray_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedValueEqualsArray
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsArray_MethodRef =
+                            method;
                         break;
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedValueEqualsList):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsList_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_UnmanagedValueEqualsList
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_UnmanagedValueEqualsList_MethodRef =
+                            method;
                         break;
 #endif
-                    case nameof(NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_ManagedClassEquals):
-                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedClassEquals_MethodRef = method;
+                    case nameof(
+                        NetworkVariableSerializationTypedInitializers.InitializeEqualityChecker_ManagedClassEquals
+                    ):
+                        m_NetworkVariableSerializationTypes_InitializeEqualityChecker_ManagedClassEquals_MethodRef =
+                            method;
                         break;
                 }
             }
@@ -1254,7 +1445,10 @@ namespace Unity.Netcode.Editor.CodeGen
             m_ExceptionCtorMethodReference = m_MainModule.ImportReference(exceptionCtor);
 
             var listType = typeof(List<NetworkVariableBase>);
-            var addMethod = listType.GetMethod(nameof(List<NetworkVariableBase>.Add), new[] { typeof(NetworkVariableBase) });
+            var addMethod = listType.GetMethod(
+                nameof(List<NetworkVariableBase>.Add),
+                new[] { typeof(NetworkVariableBase) }
+            );
             m_List_NetworkVariableBase_Add = moduleDefinition.ImportReference(addMethod);
 
             return true;
@@ -1263,7 +1457,11 @@ namespace Unity.Netcode.Editor.CodeGen
         // This gets all fields from this type as well as any parent types, up to (but not including) the base NetworkBehaviour class
         // Importantly... this also resolves any generics, so if the base class is Foo<T> and contains a field of NetworkVariable<T>,
         // and this class is Bar : Foo<int>, it will properly resolve NetworkVariable<T> to NetworkVariable<int>.
-        private void GetAllFieldsAndResolveGenerics(TypeDefinition type, ref List<TypeReference> fieldTypes, Dictionary<string, TypeReference> genericParameters = null)
+        private void GetAllFieldsAndResolveGenerics(
+            TypeDefinition type,
+            ref List<TypeReference> fieldTypes,
+            Dictionary<string, TypeReference> genericParameters = null
+        )
         {
             foreach (var field in type.Fields)
             {
@@ -1309,9 +1507,12 @@ namespace Unity.Netcode.Editor.CodeGen
             GetAllFieldsAndResolveGenerics(resolved, ref fieldTypes, genericParams);
         }
 
-        private void GetAllBaseTypesAndResolveGenerics(TypeDefinition type, ref List<TypeReference> baseTypes, Dictionary<string, TypeReference> genericParameters)
+        private void GetAllBaseTypesAndResolveGenerics(
+            TypeDefinition type,
+            ref List<TypeReference> baseTypes,
+            Dictionary<string, TypeReference> genericParameters
+        )
         {
-
             if (type == null || type.BaseType == null || type.BaseType.Name == "Object")
             {
                 return;
@@ -1332,7 +1533,9 @@ namespace Unity.Netcode.Editor.CodeGen
                     if (genericParameters != null && genericParameters.ContainsKey(argument.Name))
                     {
                         newGenericType.GenericArguments.Add(genericParameters[argument.Name]);
-                        genericParams[baseType.Resolve().GenericParameters[newGenericType.GenericArguments.Count - 1].Name] = genericParameters[argument.Name];
+                        genericParams[
+                            baseType.Resolve().GenericParameters[newGenericType.GenericArguments.Count - 1].Name
+                        ] = genericParameters[argument.Name];
                     }
                     else
                     {
@@ -1371,7 +1574,13 @@ namespace Unity.Netcode.Editor.CodeGen
                     return;
                 }
             }
-            var rpcHandlers = new List<(uint RpcMethodId, MethodDefinition RpcHandler, string RpcMethodName, CustomAttribute rpcAttribute)>();
+            var rpcHandlers =
+                new List<(
+                    uint RpcMethodId,
+                    MethodDefinition RpcHandler,
+                    string RpcMethodName,
+                    CustomAttribute rpcAttribute
+                )>();
 
             foreach (var methodDefinition in typeDefinition.Methods)
             {
@@ -1393,14 +1602,24 @@ namespace Unity.Netcode.Editor.CodeGen
                     {
                         if (attribute.AttributeType.Name == nameof(AsyncStateMachineAttribute))
                         {
-                            m_Diagnostics.AddError(methodDefinition, $"{methodDefinition.FullName}: RPCs cannot be 'async'");
+                            m_Diagnostics.AddError(
+                                methodDefinition,
+                                $"{methodDefinition.FullName}: RPCs cannot be 'async'"
+                            );
                         }
                     }
                 }
 
                 InjectWriteAndCallBlocks(methodDefinition, rpcAttribute, rpcMethodId);
 
-                rpcHandlers.Add((rpcMethodId, GenerateStaticHandler(methodDefinition, rpcAttribute, rpcMethodId), methodDefinition.Name, rpcAttribute));
+                rpcHandlers.Add(
+                    (
+                        rpcMethodId,
+                        GenerateStaticHandler(methodDefinition, rpcAttribute, rpcMethodId),
+                        methodDefinition.Name,
+                        rpcAttribute
+                    )
+                );
             }
 
             GenerateVariableInitialization(typeDefinition);
@@ -1416,13 +1635,18 @@ namespace Unity.Netcode.Editor.CodeGen
                     {
                         foreach (var attribute in type.Resolve().CustomAttributes)
                         {
-                            if (attribute.AttributeType.Name == nameof(GenerateSerializationForGenericParameterAttribute))
+                            if (
+                                attribute.AttributeType.Name
+                                == nameof(GenerateSerializationForGenericParameterAttribute)
+                            )
                             {
                                 var idx = (int)attribute.ConstructorArguments[0].Value;
                                 var genericInstanceType = (GenericInstanceType)type;
                                 if (idx < 0 || idx >= genericInstanceType.GenericArguments.Count)
                                 {
-                                    m_Diagnostics.AddError($"{type} has a {nameof(GenerateSerializationForGenericParameterAttribute)} referencing a parameter index outside the valid range (0-{genericInstanceType.GenericArguments.Count - 1}");
+                                    m_Diagnostics.AddError(
+                                        $"{type} has a {nameof(GenerateSerializationForGenericParameterAttribute)} referencing a parameter index outside the valid range (0-{genericInstanceType.GenericArguments.Count - 1}"
+                                    );
                                     continue;
                                 }
                                 var wrappedType = genericInstanceType.GenericArguments[idx];
@@ -1449,13 +1673,18 @@ namespace Unity.Netcode.Editor.CodeGen
                         {
                             foreach (var attribute in baseType.Resolve().CustomAttributes)
                             {
-                                if (attribute.AttributeType.Name == nameof(GenerateSerializationForGenericParameterAttribute))
+                                if (
+                                    attribute.AttributeType.Name
+                                    == nameof(GenerateSerializationForGenericParameterAttribute)
+                                )
                                 {
                                     var idx = (int)attribute.ConstructorArguments[0].Value;
                                     var genericInstanceType = (GenericInstanceType)baseType;
                                     if (idx < 0 || idx >= genericInstanceType.GenericArguments.Count)
                                     {
-                                        m_Diagnostics.AddError($"{baseType} has a {nameof(GenerateSerializationForGenericParameterAttribute)} referencing a parameter index outside the valid range (0-{genericInstanceType.GenericArguments.Count - 1}");
+                                        m_Diagnostics.AddError(
+                                            $"{baseType} has a {nameof(GenerateSerializationForGenericParameterAttribute)} referencing a parameter index outside the valid range (0-{genericInstanceType.GenericArguments.Count - 1}"
+                                        );
                                         continue;
                                     }
                                     var wrappedType = genericInstanceType.GenericArguments[idx];
@@ -1469,12 +1698,12 @@ namespace Unity.Netcode.Editor.CodeGen
 
             //if (rpcHandlers.Count > 0)
             {
-
                 // This always needs to generate even if it's empty.
                 var initializeRpcsMethodDef = new MethodDefinition(
-                        k_NetworkBehaviour___initializeRpcs,
-                        MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.HideBySig,
-                        typeDefinition.Module.TypeSystem.Void);
+                    k_NetworkBehaviour___initializeRpcs,
+                    MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.HideBySig,
+                    typeDefinition.Module.TypeSystem.Void
+                );
                 initializeRpcsMethodDef.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 
                 typeDefinition.Methods.Add(initializeRpcsMethodDef);
@@ -1503,8 +1732,12 @@ namespace Unity.Netcode.Editor.CodeGen
                         switch (attrField.Name)
                         {
                             case k_ServerRpcAttribute_RequireOwnership:
-                                var requireOwnership = attrField.Argument.Type == rpcHandler.Module.TypeSystem.Boolean && (bool)attrField.Argument.Value;
-                                invokePermission = requireOwnership ? RpcInvokePermission.Owner : RpcInvokePermission.Everyone;
+                                var requireOwnership =
+                                    attrField.Argument.Type == rpcHandler.Module.TypeSystem.Boolean
+                                    && (bool)attrField.Argument.Value;
+                                invokePermission = requireOwnership
+                                    ? RpcInvokePermission.Owner
+                                    : RpcInvokePermission.Everyone;
                                 break;
                             case k_RpcAttribute_InvokePermission:
                                 invokePermission = (RpcInvokePermission)attrField.Argument.Value;
@@ -1559,7 +1792,9 @@ namespace Unity.Netcode.Editor.CodeGen
                 if (typeDefinition.BaseType.Resolve().HasGenericParameters)
                 {
                     var baseTypeInstance = (GenericInstanceType)typeDefinition.BaseType;
-                    initializeRpcsBaseReference = initializeRpcsBaseReference.MakeGeneric(baseTypeInstance.GenericArguments.ToArray());
+                    initializeRpcsBaseReference = initializeRpcsBaseReference.MakeGeneric(
+                        baseTypeInstance.GenericArguments.ToArray()
+                    );
                 }
 
                 // base.__initializeRpcs();
@@ -1575,16 +1810,19 @@ namespace Unity.Netcode.Editor.CodeGen
             // override NetworkBehaviour.__getTypeName() method to return concrete type
             {
                 var networkBehaviour_TypeDef = m_NetworkBehaviour_TypeRef.Resolve();
-                var baseGetTypeNameMethod = networkBehaviour_TypeDef.Methods.First(p => p.Name.Equals(nameof(NetworkBehaviour.__getTypeName)));
+                var baseGetTypeNameMethod = networkBehaviour_TypeDef.Methods.First(p =>
+                    p.Name.Equals(nameof(NetworkBehaviour.__getTypeName))
+                );
 
                 var newGetTypeNameMethod = new MethodDefinition(
                     nameof(NetworkBehaviour.__getTypeName),
                     (baseGetTypeNameMethod.Attributes & ~MethodAttributes.NewSlot) | MethodAttributes.ReuseSlot,
-                    baseGetTypeNameMethod.ReturnType)
+                    baseGetTypeNameMethod.ReturnType
+                )
                 {
                     ImplAttributes = baseGetTypeNameMethod.ImplAttributes,
                     SemanticsAttributes = baseGetTypeNameMethod.SemanticsAttributes,
-                    IsFamilyOrAssembly = true
+                    IsFamilyOrAssembly = true,
                 };
 
                 var processor = newGetTypeNameMethod.Body.GetILProcessor();
@@ -1605,9 +1843,11 @@ namespace Unity.Netcode.Editor.CodeGen
             {
                 var customAttributeType_FullName = customAttribute.AttributeType.FullName;
 
-                if (customAttributeType_FullName == CodeGenHelpers.ServerRpcAttribute_FullName ||
-                    customAttributeType_FullName == CodeGenHelpers.ClientRpcAttribute_FullName ||
-                    customAttributeType_FullName == CodeGenHelpers.RpcAttribute_FullName)
+                if (
+                    customAttributeType_FullName == CodeGenHelpers.ServerRpcAttribute_FullName
+                    || customAttributeType_FullName == CodeGenHelpers.ClientRpcAttribute_FullName
+                    || customAttributeType_FullName == CodeGenHelpers.RpcAttribute_FullName
+                )
                 {
                     bool isValid = true;
 
@@ -1635,29 +1875,41 @@ namespace Unity.Netcode.Editor.CodeGen
                         isValid = false;
                     }
 
-                    if (customAttributeType_FullName == CodeGenHelpers.ServerRpcAttribute_FullName &&
-                        !methodDefinition.Name.EndsWith("ServerRpc", StringComparison.OrdinalIgnoreCase))
+                    if (
+                        customAttributeType_FullName == CodeGenHelpers.ServerRpcAttribute_FullName
+                        && !methodDefinition.Name.EndsWith("ServerRpc", StringComparison.OrdinalIgnoreCase)
+                    )
                     {
                         m_Diagnostics.AddError(methodDefinition, "ServerRpc method must end with 'ServerRpc' suffix!");
                         isValid = false;
                     }
 
-                    if (customAttributeType_FullName == CodeGenHelpers.ClientRpcAttribute_FullName &&
-                        !methodDefinition.Name.EndsWith("ClientRpc", StringComparison.OrdinalIgnoreCase))
+                    if (
+                        customAttributeType_FullName == CodeGenHelpers.ClientRpcAttribute_FullName
+                        && !methodDefinition.Name.EndsWith("ClientRpc", StringComparison.OrdinalIgnoreCase)
+                    )
                     {
                         m_Diagnostics.AddError(methodDefinition, "ClientRpc method must end with 'ClientRpc' suffix!");
                         isValid = false;
                     }
 
-                    if (customAttributeType_FullName == CodeGenHelpers.RpcAttribute_FullName &&
-                        !methodDefinition.Name.EndsWith("Rpc", StringComparison.OrdinalIgnoreCase))
+                    if (
+                        customAttributeType_FullName == CodeGenHelpers.RpcAttribute_FullName
+                        && !methodDefinition.Name.EndsWith("Rpc", StringComparison.OrdinalIgnoreCase)
+                    )
                     {
                         m_Diagnostics.AddError(methodDefinition, "Rpc method must end with 'Rpc' suffix!");
 
                         // Extra compiler information if a method was defined as a local function
-                        if (methodDefinition.Name.Contains("Rpc|", StringComparison.OrdinalIgnoreCase) && methodDefinition.Name.StartsWith("g__", StringComparison.OrdinalIgnoreCase))
+                        if (
+                            methodDefinition.Name.Contains("Rpc|", StringComparison.OrdinalIgnoreCase)
+                            && methodDefinition.Name.StartsWith("g__", StringComparison.OrdinalIgnoreCase)
+                        )
                         {
-                            m_Diagnostics.AddError(methodDefinition, $"{methodDefinition.Name} appears to be a local function. Local functions cannot be RPCs.");
+                            m_Diagnostics.AddError(
+                                methodDefinition,
+                                $"{methodDefinition.Name} appears to be a local function. Local functions cannot be RPCs."
+                            );
                         }
 
                         isValid = false;
@@ -1678,21 +1930,31 @@ namespace Unity.Netcode.Editor.CodeGen
             {
                 if (methodDefinition.Name.EndsWith("ServerRpc", StringComparison.OrdinalIgnoreCase))
                 {
-                    m_Diagnostics.AddError(methodDefinition, $"ServerRpc method {methodDefinition} must be marked with 'ServerRpc' attribute!");
+                    m_Diagnostics.AddError(
+                        methodDefinition,
+                        $"ServerRpc method {methodDefinition} must be marked with 'ServerRpc' attribute!"
+                    );
                 }
                 else if (methodDefinition.Name.EndsWith("ClientRpc", StringComparison.OrdinalIgnoreCase))
                 {
-                    m_Diagnostics.AddError(methodDefinition, $"ClientRpc method {methodDefinition} must be marked with 'ClientRpc' attribute!");
+                    m_Diagnostics.AddError(
+                        methodDefinition,
+                        $"ClientRpc method {methodDefinition} must be marked with 'ClientRpc' attribute!"
+                    );
                 }
                 else if (methodDefinition.Name.EndsWith("ExtRpc", StringComparison.OrdinalIgnoreCase))
                 {
-                    m_Diagnostics.AddError(methodDefinition, $"Ext Rpc method {methodDefinition} must be marked with 'ExtRpc' attribute!");
+                    m_Diagnostics.AddError(
+                        methodDefinition,
+                        $"Ext Rpc method {methodDefinition} must be marked with 'ExtRpc' attribute!"
+                    );
                 }
 
                 return null;
             }
 
-            bool hasInvokePermission = false, hasRequireOwnership = false;
+            bool hasInvokePermission = false,
+                hasRequireOwnership = false;
 
             foreach (var argument in rpcAttribute.Fields)
             {
@@ -1709,10 +1971,11 @@ namespace Unity.Netcode.Editor.CodeGen
 
             if (hasInvokePermission && hasRequireOwnership)
             {
-                m_Diagnostics.AddError($"{methodDefinition.Name} cannot declare both RequireOwnership and InvokePermission!");
+                m_Diagnostics.AddError(
+                    $"{methodDefinition.Name} cannot declare both RequireOwnership and InvokePermission!"
+                );
                 return null;
             }
-
 
             // Checks for IsSerializable are moved to later as the check is now done by dynamically seeing if any valid
             // serializer OR extension method exists for it.
@@ -1745,14 +2008,25 @@ namespace Unity.Netcode.Editor.CodeGen
 
                     if (!method.HasGenericParameters)
                     {
-                        if (!paramType.IsGenericInstance && (parameters[0].ParameterType.Resolve() == checkType ||
-                                (parameters[0].ParameterType.Resolve() == checkType.MakeByReferenceType().Resolve() && parameters[0].IsIn)))
+                        if (
+                            !paramType.IsGenericInstance
+                            && (
+                                parameters[0].ParameterType.Resolve() == checkType
+                                || (
+                                    parameters[0].ParameterType.Resolve() == checkType.MakeByReferenceType().Resolve()
+                                    && parameters[0].IsIn
+                                )
+                            )
+                        )
                         {
                             return method;
                         }
 
-                        if (parameters[0].ParameterType == paramType || parameters[0].ParameterType.FullName == paramType.FullName ||
-                            (parameters[0].ParameterType == paramType.MakeByReferenceType() && parameters[0].IsIn))
+                        if (
+                            parameters[0].ParameterType == paramType
+                            || parameters[0].ParameterType.FullName == paramType.FullName
+                            || (parameters[0].ParameterType == paramType.MakeByReferenceType() && parameters[0].IsIn)
+                        )
                         {
                             return method;
                         }
@@ -1766,11 +2040,15 @@ namespace Unity.Netcode.Editor.CodeGen
                         }
                         if (method.GenericParameters[0].HasConstraints)
                         {
-                            if (paramType.IsGenericInstance && (
+                            if (
+                                paramType.IsGenericInstance
+                                && (
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                                    paramType.Resolve().FullName == "Unity.Collections.NativeList`1" ||
+                                    paramType.Resolve().FullName == "Unity.Collections.NativeList`1"
+                                    ||
 #endif
-                                    paramType.Resolve().FullName == "Unity.Collections.NativeArray`1"))
+                                    paramType.Resolve().FullName == "Unity.Collections.NativeArray`1")
+                            )
                             {
                                 if (method.Parameters[0].ParameterType.Resolve() != paramType.Resolve())
                                 {
@@ -1790,18 +2068,29 @@ namespace Unity.Netcode.Editor.CodeGen
                                 var constraintTypeRef = constraint.ConstraintType;
 #endif
 
-                                var resolvedConstraintName = resolvedConstraint.FullNameWithGenericParameters(new[] { method.GenericParameters[0] }, new[] { checkType });
+                                var resolvedConstraintName = resolvedConstraint.FullNameWithGenericParameters(
+                                    new[] { method.GenericParameters[0] },
+                                    new[] { checkType }
+                                );
                                 if (constraintTypeRef.IsGenericInstance)
                                 {
                                     var genericConstraint = (GenericInstanceType)constraintTypeRef;
-                                    if (genericConstraint.HasGenericArguments && genericConstraint.GenericArguments[0].Resolve() != null)
+                                    if (
+                                        genericConstraint.HasGenericArguments
+                                        && genericConstraint.GenericArguments[0].Resolve() != null
+                                    )
                                     {
                                         resolvedConstraintName = constraintTypeRef.FullName;
                                     }
                                 }
-                                if ((resolvedConstraint.IsInterface && !checkType.HasInterface(resolvedConstraintName)) ||
-                                    (resolvedConstraint.IsClass && !checkType.Resolve().IsSubclassOf(resolvedConstraintName)) ||
-                                    (resolvedConstraint.Name == "ValueType" && !checkType.IsValueType))
+                                if (
+                                    (resolvedConstraint.IsInterface && !checkType.HasInterface(resolvedConstraintName))
+                                    || (
+                                        resolvedConstraint.IsClass
+                                        && !checkType.Resolve().IsSubclassOf(resolvedConstraintName)
+                                    )
+                                    || (resolvedConstraint.Name == "ValueType" && !checkType.IsValueType)
+                                )
                                 {
                                     meetsConstraints = false;
                                     break;
@@ -1812,11 +2101,15 @@ namespace Unity.Netcode.Editor.CodeGen
                             {
                                 var instanceMethod = new GenericInstanceMethod(method);
 
-                                if (paramType.IsGenericInstance && (
+                                if (
+                                    paramType.IsGenericInstance
+                                    && (
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                                        paramType.Resolve().FullName == "Unity.Collections.NativeList`1" ||
+                                        paramType.Resolve().FullName == "Unity.Collections.NativeList`1"
+                                        ||
 #endif
-                                        paramType.Resolve().FullName == "Unity.Collections.NativeArray`1"))
+                                        paramType.Resolve().FullName == "Unity.Collections.NativeArray`1")
+                                )
                                 {
                                     var wrappedType = ((GenericInstanceType)paramType).GenericArguments[0];
                                     instanceMethod.GenericArguments.Add(wrappedType);
@@ -1893,7 +2186,10 @@ namespace Unity.Netcode.Editor.CodeGen
                 return true;
             }
             var assemblyQualifiedName = paramType.FullName + ", " + paramType.Resolve().Module.Assembly.FullName;
-            var foundMethodRef = m_FastBufferWriter_WriteValue_MethodRefs.TryGetValue(assemblyQualifiedName, out methodRef);
+            var foundMethodRef = m_FastBufferWriter_WriteValue_MethodRefs.TryGetValue(
+                assemblyQualifiedName,
+                out methodRef
+            );
 
             if (!foundMethodRef)
             {
@@ -1903,8 +2199,10 @@ namespace Unity.Netcode.Editor.CodeGen
 
                     if (parameters[1].IsIn)
                     {
-                        if (((ByReferenceType)parameters[1].ParameterType).ElementType.FullName == paramType.FullName &&
-                            ((ByReferenceType)parameters[1].ParameterType).ElementType.IsArray == paramType.IsArray)
+                        if (
+                            ((ByReferenceType)parameters[1].ParameterType).ElementType.FullName == paramType.FullName
+                            && ((ByReferenceType)parameters[1].ParameterType).ElementType.IsArray == paramType.IsArray
+                        )
                         {
                             methodRef = method;
                             m_FastBufferWriter_WriteValue_MethodRefs[assemblyQualifiedName] = methodRef;
@@ -1913,8 +2211,10 @@ namespace Unity.Netcode.Editor.CodeGen
                     }
                     else
                     {
-                        if (parameters[1].ParameterType.FullName == paramType.FullName &&
-                            parameters[1].ParameterType.IsArray == paramType.IsArray)
+                        if (
+                            parameters[1].ParameterType.FullName == paramType.FullName
+                            && parameters[1].ParameterType.IsArray == paramType.IsArray
+                        )
                         {
                             methodRef = method;
                             m_FastBufferWriter_WriteValue_MethodRefs[assemblyQualifiedName] = methodRef;
@@ -1934,6 +2234,7 @@ namespace Unity.Netcode.Editor.CodeGen
 
             return foundMethodRef;
         }
+
         private MethodReference GetFastBufferReaderReadMethod(string name, TypeReference paramType)
         {
             foreach (var method in m_FastBufferReader_TypeRef.Resolve().Methods)
@@ -1968,7 +2269,13 @@ namespace Unity.Netcode.Editor.CodeGen
 
                     if (!method.HasGenericParameters)
                     {
-                        if (!paramType.IsGenericInstance && (methodParam.Resolve() == checkType.Resolve() || methodParam.Resolve() == checkType.MakeByReferenceType().Resolve()))
+                        if (
+                            !paramType.IsGenericInstance
+                            && (
+                                methodParam.Resolve() == checkType.Resolve()
+                                || methodParam.Resolve() == checkType.MakeByReferenceType().Resolve()
+                            )
+                        )
                         {
                             return method;
                         }
@@ -1985,25 +2292,27 @@ namespace Unity.Netcode.Editor.CodeGen
                         {
                             continue;
                         }
-                        if (paramType.IsGenericInstance && (
+                        if (
+                            paramType.IsGenericInstance
+                            && (
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                                paramType.Resolve().FullName == "Unity.Collections.NativeList`1" ||
+                                paramType.Resolve().FullName == "Unity.Collections.NativeList`1"
+                                ||
 #endif
-                                paramType.Resolve().FullName == "Unity.Collections.NativeArray`1"))
+                                paramType.Resolve().FullName == "Unity.Collections.NativeArray`1")
+                        )
                         {
                             if (method.Name == "OnSendGlobalCounterClientRpc")
                             {
                                 m_Diagnostics.AddWarning(
                                     $"{method}: {method.Parameters[0].ParameterType} | {paramType}"
-                                    );
+                                );
                             }
                             if (method.Parameters[0].ParameterType.Resolve() != paramType.Resolve())
                             {
                                 if (method.Name == "OnSendGlobalCounterClientRpc")
                                 {
-                                    m_Diagnostics.AddWarning(
-                                        $"{method}: Not suitable"
-                                    );
+                                    m_Diagnostics.AddWarning($"{method}: Not suitable");
                                 }
                                 continue;
                             }
@@ -2023,20 +2332,30 @@ namespace Unity.Netcode.Editor.CodeGen
                                 var constraintTypeRef = constraint.ConstraintType;
 #endif
 
-
-                                var resolvedConstraintName = resolvedConstraint.FullNameWithGenericParameters(new[] { method.GenericParameters[0] }, new[] { checkType });
+                                var resolvedConstraintName = resolvedConstraint.FullNameWithGenericParameters(
+                                    new[] { method.GenericParameters[0] },
+                                    new[] { checkType }
+                                );
                                 if (constraintTypeRef.IsGenericInstance)
                                 {
                                     var genericConstraint = (GenericInstanceType)constraintTypeRef;
-                                    if (genericConstraint.HasGenericArguments && genericConstraint.GenericArguments[0].Resolve() != null)
+                                    if (
+                                        genericConstraint.HasGenericArguments
+                                        && genericConstraint.GenericArguments[0].Resolve() != null
+                                    )
                                     {
                                         resolvedConstraintName = constraintTypeRef.FullName;
                                     }
                                 }
 
-                                if ((resolvedConstraint.IsInterface && !checkType.HasInterface(resolvedConstraintName)) ||
-                                    (resolvedConstraint.IsClass && !checkType.Resolve().IsSubclassOf(resolvedConstraintName)) ||
-                                    (resolvedConstraint.Name == "ValueType" && !checkType.IsValueType))
+                                if (
+                                    (resolvedConstraint.IsInterface && !checkType.HasInterface(resolvedConstraintName))
+                                    || (
+                                        resolvedConstraint.IsClass
+                                        && !checkType.Resolve().IsSubclassOf(resolvedConstraintName)
+                                    )
+                                    || (resolvedConstraint.Name == "ValueType" && !checkType.IsValueType)
+                                )
                                 {
                                     meetsConstraints = false;
                                     break;
@@ -2046,11 +2365,15 @@ namespace Unity.Netcode.Editor.CodeGen
                             if (meetsConstraints)
                             {
                                 var instanceMethod = new GenericInstanceMethod(method);
-                                if (paramType.IsGenericInstance && (
+                                if (
+                                    paramType.IsGenericInstance
+                                    && (
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-                                        paramType.Resolve().FullName == "Unity.Collections.NativeList`1" ||
+                                        paramType.Resolve().FullName == "Unity.Collections.NativeList`1"
+                                        ||
 #endif
-                                        paramType.Resolve().FullName == "Unity.Collections.NativeArray`1"))
+                                        paramType.Resolve().FullName == "Unity.Collections.NativeArray`1")
+                                )
                                 {
                                     var wrappedType = ((GenericInstanceType)paramType).GenericArguments[0];
                                     instanceMethod.GenericArguments.Add(wrappedType);
@@ -2128,15 +2451,20 @@ namespace Unity.Netcode.Editor.CodeGen
             }
             var assemblyQualifiedName = paramType.FullName + ", " + paramType.Resolve().Module.Assembly.FullName;
 
-            var foundMethodRef = m_FastBufferReader_ReadValue_MethodRefs.TryGetValue(assemblyQualifiedName, out methodRef);
+            var foundMethodRef = m_FastBufferReader_ReadValue_MethodRefs.TryGetValue(
+                assemblyQualifiedName,
+                out methodRef
+            );
             if (!foundMethodRef)
             {
                 foreach (var method in m_FastBufferReader_ExtensionMethodRefs)
                 {
                     var parameters = method.Resolve().Parameters;
-                    if (parameters[1].IsOut &&
-                        ((ByReferenceType)parameters[1].ParameterType).ElementType.FullName == paramType.FullName &&
-                        ((ByReferenceType)parameters[1].ParameterType).ElementType.IsArray == paramType.IsArray)
+                    if (
+                        parameters[1].IsOut
+                        && ((ByReferenceType)parameters[1].ParameterType).ElementType.FullName == paramType.FullName
+                        && ((ByReferenceType)parameters[1].ParameterType).ElementType.IsArray == paramType.IsArray
+                    )
                     {
                         methodRef = method;
                         m_FastBufferReader_ReadValue_MethodRefs[assemblyQualifiedName] = methodRef;
@@ -2171,7 +2499,11 @@ namespace Unity.Netcode.Editor.CodeGen
             return foundMethodRef;
         }
 
-        private void InjectWriteAndCallBlocks(MethodDefinition methodDefinition, CustomAttribute rpcAttribute, uint rpcMethodId)
+        private void InjectWriteAndCallBlocks(
+            MethodDefinition methodDefinition,
+            CustomAttribute rpcAttribute,
+            uint rpcMethodId
+        )
         {
             var typeSystem = methodDefinition.Module.TypeSystem;
             var instructions = new List<Instruction>();
@@ -2196,26 +2528,44 @@ namespace Unity.Netcode.Editor.CodeGen
                         rpcDelivery = (RpcDelivery)attrField.Argument.Value;
                         break;
                     case k_ServerRpcAttribute_RequireOwnership:
-                        requireOwnership = attrField.Argument.Type == typeSystem.Boolean && (bool)attrField.Argument.Value;
+                        requireOwnership =
+                            attrField.Argument.Type == typeSystem.Boolean && (bool)attrField.Argument.Value;
                         break;
                     case nameof(RpcAttribute.AllowTargetOverride):
-                        allowTargetOverride = attrField.Argument.Type == typeSystem.Boolean && (bool)attrField.Argument.Value;
+                        allowTargetOverride =
+                            attrField.Argument.Type == typeSystem.Boolean && (bool)attrField.Argument.Value;
                         break;
                 }
             }
 
             var paramCount = methodDefinition.Parameters.Count;
             var hasRpcParams =
-                paramCount > 0 &&
-                ((isServerRpc && methodDefinition.Parameters[paramCount - 1].ParameterType.FullName == CodeGenHelpers.ServerRpcParams_FullName) ||
-                 (isClientRpc && methodDefinition.Parameters[paramCount - 1].ParameterType.FullName == CodeGenHelpers.ClientRpcParams_FullName) ||
-                 (isGenericRpc && methodDefinition.Parameters[paramCount - 1].ParameterType.FullName == CodeGenHelpers.RpcParams_FullName));
+                paramCount > 0
+                && (
+                    (
+                        isServerRpc
+                        && methodDefinition.Parameters[paramCount - 1].ParameterType.FullName
+                            == CodeGenHelpers.ServerRpcParams_FullName
+                    )
+                    || (
+                        isClientRpc
+                        && methodDefinition.Parameters[paramCount - 1].ParameterType.FullName
+                            == CodeGenHelpers.ClientRpcParams_FullName
+                    )
+                    || (
+                        isGenericRpc
+                        && methodDefinition.Parameters[paramCount - 1].ParameterType.FullName
+                            == CodeGenHelpers.RpcParams_FullName
+                    )
+                );
 
             if (isGenericRpc && defaultTarget == SendTo.SpecifiedInParams)
             {
                 if (!hasRpcParams)
                 {
-                    m_Diagnostics.AddError($"{methodDefinition}: {nameof(SendTo)}.{nameof(SendTo.SpecifiedInParams)} cannot be used without a final parameter of type {CodeGenHelpers.RpcParams_FullName}.");
+                    m_Diagnostics.AddError(
+                        $"{methodDefinition}: {nameof(SendTo)}.{nameof(SendTo.SpecifiedInParams)} cannot be used without a final parameter of type {CodeGenHelpers.RpcParams_FullName}."
+                    );
                 }
 
                 foreach (var attrField in rpcAttribute.Fields)
@@ -2223,7 +2573,9 @@ namespace Unity.Netcode.Editor.CodeGen
                     switch (attrField.Name)
                     {
                         case nameof(RpcAttribute.AllowTargetOverride):
-                            m_Diagnostics.AddWarning($"{methodDefinition}: {nameof(RpcAttribute.AllowTargetOverride)} is ignored with {nameof(SendTo)}.{nameof(SendTo.SpecifiedInParams)}");
+                            m_Diagnostics.AddWarning(
+                                $"{methodDefinition}: {nameof(RpcAttribute.AllowTargetOverride)} is ignored with {nameof(SendTo)}.{nameof(SendTo.SpecifiedInParams)}"
+                            );
                             break;
                     }
                 }
@@ -2232,7 +2584,9 @@ namespace Unity.Netcode.Editor.CodeGen
             {
                 if (!hasRpcParams)
                 {
-                    m_Diagnostics.AddError($"{methodDefinition}: {nameof(RpcAttribute.AllowTargetOverride)} cannot be used without a final parameter of type {CodeGenHelpers.RpcParams_FullName}.");
+                    m_Diagnostics.AddError(
+                        $"{methodDefinition}: {nameof(RpcAttribute.AllowTargetOverride)} cannot be used without a final parameter of type {CodeGenHelpers.RpcParams_FullName}."
+                    );
                 }
             }
 
@@ -2247,7 +2601,13 @@ namespace Unity.Netcode.Editor.CodeGen
             // XXXRpcParams
             if (!hasRpcParams)
             {
-                methodDefinition.Body.Variables.Add(new VariableDefinition(isServerRpc ? m_ServerRpcParams_TypeRef : (isClientRpc ? m_ClientRpcParams_TypeRef : m_UniversalRpcParams_TypeRef)));
+                methodDefinition.Body.Variables.Add(
+                    new VariableDefinition(
+                        isServerRpc
+                            ? m_ServerRpcParams_TypeRef
+                            : (isClientRpc ? m_ClientRpcParams_TypeRef : m_UniversalRpcParams_TypeRef)
+                    )
+                );
             }
             int rpcParamsIdx = !hasRpcParams ? methodDefinition.Body.Variables.Count - 1 : -1;
 
@@ -2277,7 +2637,12 @@ namespace Unity.Netcode.Editor.CodeGen
 
                 // Debug.LogError(...);
                 instructions.Add(logNextInstr);
-                instructions.Add(processor.Create(OpCodes.Ldstr, "Rpc methods can only be invoked after starting the NetworkManager!"));
+                instructions.Add(
+                    processor.Create(
+                        OpCodes.Ldstr,
+                        "Rpc methods can only be invoked after starting the NetworkManager!"
+                    )
+                );
                 instructions.Add(processor.Create(OpCodes.Call, m_Debug_LogError_MethodRef));
 
                 instructions.Add(returnInstr);
@@ -2304,7 +2669,14 @@ namespace Unity.Netcode.Editor.CodeGen
                     // if (networkManager.IsClient || networkManager.IsHost) { ... } -> ServerRpc
                     // if (networkManager.IsServer || networkManager.IsHost) { ... } -> ClientRpc
                     instructions.Add(processor.Create(OpCodes.Ldloc, netManLocIdx));
-                    instructions.Add(processor.Create(OpCodes.Callvirt, isServerRpc ? m_NetworkManager_getIsClient_MethodRef : m_NetworkManager_getIsServer_MethodRef));
+                    instructions.Add(
+                        processor.Create(
+                            OpCodes.Callvirt,
+                            isServerRpc
+                                ? m_NetworkManager_getIsClient_MethodRef
+                                : m_NetworkManager_getIsServer_MethodRef
+                        )
+                    );
                     instructions.Add(processor.Create(OpCodes.Brtrue, beginInstr));
                     instructions.Add(processor.Create(OpCodes.Ldloc, netManLocIdx));
                     instructions.Add(processor.Create(OpCodes.Callvirt, m_NetworkManager_getIsHost_MethodRef));
@@ -2328,7 +2700,9 @@ namespace Unity.Netcode.Editor.CodeGen
                         instructions.Add(processor.Create(OpCodes.Ldarg_0));
                         instructions.Add(processor.Create(OpCodes.Call, m_NetworkBehaviour_getOwnerClientId_MethodRef));
                         instructions.Add(processor.Create(OpCodes.Ldloc, netManLocIdx));
-                        instructions.Add(processor.Create(OpCodes.Callvirt, m_NetworkManager_getLocalClientId_MethodRef));
+                        instructions.Add(
+                            processor.Create(OpCodes.Callvirt, m_NetworkManager_getLocalClientId_MethodRef)
+                        );
                         instructions.Add(processor.Create(OpCodes.Ceq));
                         instructions.Add(processor.Create(OpCodes.Ldc_I4, 0));
                         instructions.Add(processor.Create(OpCodes.Ceq));
@@ -2346,7 +2720,12 @@ namespace Unity.Netcode.Editor.CodeGen
                         instructions.Add(processor.Create(OpCodes.Brfalse, logNextInstr));
 
                         // Debug.LogError(...);
-                        instructions.Add(processor.Create(OpCodes.Ldstr, "Only the owner can invoke a ServerRpc that requires ownership!"));
+                        instructions.Add(
+                            processor.Create(
+                                OpCodes.Ldstr,
+                                "Only the owner can invoke a ServerRpc that requires ownership!"
+                            )
+                        );
                         instructions.Add(processor.Create(OpCodes.Call, m_Debug_LogError_MethodRef));
 
                         instructions.Add(logNextInstr);
@@ -2362,7 +2741,11 @@ namespace Unity.Netcode.Editor.CodeGen
                     instructions.Add(processor.Create(OpCodes.Ldc_I4, unchecked((int)rpcMethodId)));
 
                     // rpcParams
-                    instructions.Add(hasRpcParams ? processor.Create(OpCodes.Ldarg, paramCount) : processor.Create(OpCodes.Ldloc, rpcParamsIdx));
+                    instructions.Add(
+                        hasRpcParams
+                            ? processor.Create(OpCodes.Ldarg, paramCount)
+                            : processor.Create(OpCodes.Ldloc, rpcParamsIdx)
+                    );
 
                     // rpcDelivery
                     instructions.Add(processor.Create(OpCodes.Ldc_I4, (int)rpcDelivery));
@@ -2382,7 +2765,11 @@ namespace Unity.Netcode.Editor.CodeGen
                     instructions.Add(processor.Create(OpCodes.Ldc_I4, unchecked((int)rpcMethodId)));
 
                     // rpcParams
-                    instructions.Add(hasRpcParams ? processor.Create(OpCodes.Ldarg, paramCount) : processor.Create(OpCodes.Ldloc, rpcParamsIdx));
+                    instructions.Add(
+                        hasRpcParams
+                            ? processor.Create(OpCodes.Ldarg, paramCount)
+                            : processor.Create(OpCodes.Ldloc, rpcParamsIdx)
+                    );
 
                     // rpcDelivery
                     instructions.Add(processor.Create(OpCodes.Ldc_I4, (int)rpcDelivery));
@@ -2402,7 +2789,11 @@ namespace Unity.Netcode.Editor.CodeGen
                     instructions.Add(processor.Create(OpCodes.Ldc_I4, unchecked((int)rpcMethodId)));
 
                     // rpcParams
-                    instructions.Add(hasRpcParams ? processor.Create(OpCodes.Ldarg, paramCount) : processor.Create(OpCodes.Ldloc, rpcParamsIdx));
+                    instructions.Add(
+                        hasRpcParams
+                            ? processor.Create(OpCodes.Ldarg, paramCount)
+                            : processor.Create(OpCodes.Ldloc, rpcParamsIdx)
+                    );
 
                     // rpcAttributeParams
                     instructions.Add(processor.Create(OpCodes.Ldloca, rpcAttributeParamsIdx));
@@ -2427,8 +2818,14 @@ namespace Unity.Netcode.Editor.CodeGen
                                     {
                                         instructions.Add(processor.Create(OpCodes.Ldc_I4, (bool)value ? 1 : 0));
                                     }
-                                    else if (type == typeof(short) || type == typeof(int) || type == typeof(ushort)
-                                       || type == typeof(byte) || type == typeof(sbyte) || type == typeof(char))
+                                    else if (
+                                        type == typeof(short)
+                                        || type == typeof(int)
+                                        || type == typeof(ushort)
+                                        || type == typeof(byte)
+                                        || type == typeof(sbyte)
+                                        || type == typeof(char)
+                                    )
                                     {
                                         instructions.Add(processor.Create(OpCodes.Ldc_I4, (int)value));
                                     }
@@ -2439,7 +2836,6 @@ namespace Unity.Netcode.Editor.CodeGen
                                     else if (type == typeof(float))
                                     {
                                         instructions.Add(processor.Create(OpCodes.Ldc_R8, (float)value));
-
                                     }
                                     else if (type == typeof(double))
                                     {
@@ -2451,7 +2847,9 @@ namespace Unity.Netcode.Editor.CodeGen
                                     }
                                 }
 
-                                instructions.Add(processor.Create(OpCodes.Stfld, m_MainModule.ImportReference(attrField)));
+                                instructions.Add(
+                                    processor.Create(OpCodes.Stfld, m_MainModule.ImportReference(attrField))
+                                );
 
                                 break;
                             }
@@ -2459,7 +2857,9 @@ namespace Unity.Netcode.Editor.CodeGen
 
                         if (!found)
                         {
-                            m_Diagnostics.AddError($"{nameof(RpcAttribute)} contains field {field} which is not present in {nameof(RpcAttribute.RpcAttributeParams)}.");
+                            m_Diagnostics.AddError(
+                                $"{nameof(RpcAttribute)} contains field {field} which is not present in {nameof(RpcAttribute.RpcAttributeParams)}."
+                            );
                         }
                     }
 
@@ -2481,17 +2881,25 @@ namespace Unity.Netcode.Editor.CodeGen
                 {
                     var paramDef = methodDefinition.Parameters[paramIndex];
                     var paramType = paramDef.ParameterType;
-                    if (paramType.FullName == CodeGenHelpers.ClientRpcSendParams_FullName ||
-                        paramType.FullName == CodeGenHelpers.ClientRpcReceiveParams_FullName)
+                    if (
+                        paramType.FullName == CodeGenHelpers.ClientRpcSendParams_FullName
+                        || paramType.FullName == CodeGenHelpers.ClientRpcReceiveParams_FullName
+                    )
                     {
-                        m_Diagnostics.AddError($"Rpcs may not accept {paramType.FullName} as a parameter. Use {nameof(ClientRpcParams)} instead.");
+                        m_Diagnostics.AddError(
+                            $"Rpcs may not accept {paramType.FullName} as a parameter. Use {nameof(ClientRpcParams)} instead."
+                        );
                         continue;
                     }
 
-                    if (paramType.FullName == CodeGenHelpers.ServerRpcSendParams_FullName ||
-                        paramType.FullName == CodeGenHelpers.ServerRpcReceiveParams_FullName)
+                    if (
+                        paramType.FullName == CodeGenHelpers.ServerRpcSendParams_FullName
+                        || paramType.FullName == CodeGenHelpers.ServerRpcReceiveParams_FullName
+                    )
                     {
-                        m_Diagnostics.AddError($"Rpcs may not accept {paramType.FullName} as a parameter. Use {nameof(ServerRpcParams)} instead.");
+                        m_Diagnostics.AddError(
+                            $"Rpcs may not accept {paramType.FullName} as a parameter. Use {nameof(ServerRpcParams)} instead."
+                        );
                         continue;
                     }
                     // ServerRpcParams
@@ -2499,11 +2907,16 @@ namespace Unity.Netcode.Editor.CodeGen
                     {
                         if (paramIndex != paramCount - 1)
                         {
-                            m_Diagnostics.AddError(methodDefinition, $"{nameof(ServerRpcParams)} must be the last parameter in a ServerRpc.");
+                            m_Diagnostics.AddError(
+                                methodDefinition,
+                                $"{nameof(ServerRpcParams)} must be the last parameter in a ServerRpc."
+                            );
                         }
                         if (!isServerRpc)
                         {
-                            m_Diagnostics.AddError($"Only ServerRpcs may accept {nameof(ServerRpcParams)} as a parameter.");
+                            m_Diagnostics.AddError(
+                                $"Only ServerRpcs may accept {nameof(ServerRpcParams)} as a parameter."
+                            );
                         }
                         continue;
                     }
@@ -2512,11 +2925,16 @@ namespace Unity.Netcode.Editor.CodeGen
                     {
                         if (paramIndex != paramCount - 1)
                         {
-                            m_Diagnostics.AddError(methodDefinition, $"{nameof(ClientRpcParams)} must be the last parameter in a ClientRpc.");
+                            m_Diagnostics.AddError(
+                                methodDefinition,
+                                $"{nameof(ClientRpcParams)} must be the last parameter in a ClientRpc."
+                            );
                         }
                         if (!isClientRpc)
                         {
-                            m_Diagnostics.AddError($"Only clientRpcs may accept {nameof(ClientRpcParams)} as a parameter.");
+                            m_Diagnostics.AddError(
+                                $"Only clientRpcs may accept {nameof(ClientRpcParams)} as a parameter."
+                            );
                         }
                         continue;
                     }
@@ -2525,11 +2943,16 @@ namespace Unity.Netcode.Editor.CodeGen
                     {
                         if (paramIndex != paramCount - 1)
                         {
-                            m_Diagnostics.AddError(methodDefinition, $"{methodDefinition.Name} is invalid. {nameof(RpcParams)} must be the last parameter in a ClientRpc.");
+                            m_Diagnostics.AddError(
+                                methodDefinition,
+                                $"{methodDefinition.Name} is invalid. {nameof(RpcParams)} must be the last parameter in a ClientRpc."
+                            );
                         }
                         if (!isGenericRpc)
                         {
-                            m_Diagnostics.AddError($"{methodDefinition.Name} is invalid. Only Rpcs may accept {nameof(RpcParams)} as a parameter.");
+                            m_Diagnostics.AddError(
+                                $"{methodDefinition.Name} is invalid. Only Rpcs may accept {nameof(RpcParams)} as a parameter."
+                            );
                         }
                         continue;
                     }
@@ -2540,7 +2963,10 @@ namespace Unity.Netcode.Editor.CodeGen
                     {
                         if (!GetWriteMethodForParameter(typeSystem.Boolean, out var boolMethodRef))
                         {
-                            m_Diagnostics.AddError(methodDefinition, $"Couldn't find boolean serializer! Something's wrong!");
+                            m_Diagnostics.AddError(
+                                methodDefinition,
+                                $"Couldn't find boolean serializer! Something's wrong!"
+                            );
                             return;
                         }
 
@@ -2608,14 +3034,24 @@ namespace Unity.Netcode.Editor.CodeGen
                             instructions.Add(processor.Create(OpCodes.Ldarg, paramIndex + 1));
                         }
                         // Special handling for WriteValue() on arrays and strings since they have additional arguments.
-                        if (paramType.IsArray && ((!isExtensionMethod && methodRef.Parameters.Count == 3) ||
-                            (isExtensionMethod && methodRef.Parameters.Count == 4)))
+                        if (
+                            paramType.IsArray
+                            && (
+                                (!isExtensionMethod && methodRef.Parameters.Count == 3)
+                                || (isExtensionMethod && methodRef.Parameters.Count == 4)
+                            )
+                        )
                         {
                             instructions.Add(processor.Create(OpCodes.Ldc_I4_M1));
                             instructions.Add(processor.Create(OpCodes.Ldc_I4_0));
                         }
-                        else if (paramType == typeSystem.String && ((!isExtensionMethod && methodRef.Parameters.Count == 2) ||
-                            (isExtensionMethod && methodRef.Parameters.Count == 3)))
+                        else if (
+                            paramType == typeSystem.String
+                            && (
+                                (!isExtensionMethod && methodRef.Parameters.Count == 2)
+                                || (isExtensionMethod && methodRef.Parameters.Count == 3)
+                            )
+                        )
                         {
                             instructions.Add(processor.Create(OpCodes.Ldc_I4_0));
                         }
@@ -2650,7 +3086,10 @@ namespace Unity.Netcode.Editor.CodeGen
                     }
                     else
                     {
-                        m_Diagnostics.AddError(methodDefinition, $"{methodDefinition.Name} - Don't know how to serialize {paramType}. RPC parameter types must either implement {nameof(INetworkSerializeByMemcpy)} or {nameof(INetworkSerializable)}. If this type is external and you are sure its memory layout makes it serializable by memcpy, you can replace {paramType} with {typeof(ForceNetworkSerializeByMemcpy<>).Name}<{paramType}>, or you can create extension methods for {nameof(FastBufferReader)}.{nameof(FastBufferReader.ReadValueSafe)}(this {nameof(FastBufferReader)}, out {paramType}) and {nameof(FastBufferWriter)}.{nameof(FastBufferWriter.WriteValueSafe)}(this {nameof(FastBufferWriter)}, in {paramType}) to define serialization for this type.");
+                        m_Diagnostics.AddError(
+                            methodDefinition,
+                            $"{methodDefinition.Name} - Don't know how to serialize {paramType}. RPC parameter types must either implement {nameof(INetworkSerializeByMemcpy)} or {nameof(INetworkSerializable)}. If this type is external and you are sure its memory layout makes it serializable by memcpy, you can replace {paramType} with {typeof(ForceNetworkSerializeByMemcpy<>).Name}<{paramType}>, or you can create extension methods for {nameof(FastBufferReader)}.{nameof(FastBufferReader.ReadValueSafe)}(this {nameof(FastBufferReader)}, out {paramType}) and {nameof(FastBufferWriter)}.{nameof(FastBufferWriter.WriteValueSafe)}(this {nameof(FastBufferWriter)}, in {paramType}) to define serialization for this type."
+                        );
                         continue;
                     }
 
@@ -2775,7 +3214,14 @@ namespace Unity.Netcode.Editor.CodeGen
                     // if (networkManager.IsServer || networkManager.IsHost) -> ServerRpc
                     // if (networkManager.IsClient || networkManager.IsHost) -> ClientRpc
                     instructions.Add(processor.Create(OpCodes.Ldloc, netManLocIdx));
-                    instructions.Add(processor.Create(OpCodes.Callvirt, isServerRpc ? m_NetworkManager_getIsServer_MethodRef : m_NetworkManager_getIsClient_MethodRef));
+                    instructions.Add(
+                        processor.Create(
+                            OpCodes.Callvirt,
+                            isServerRpc
+                                ? m_NetworkManager_getIsServer_MethodRef
+                                : m_NetworkManager_getIsClient_MethodRef
+                        )
+                    );
                     instructions.Add(processor.Create(OpCodes.Brtrue, lastInstr));
                     instructions.Add(processor.Create(OpCodes.Ldloc, netManLocIdx));
                     instructions.Add(processor.Create(OpCodes.Callvirt, m_NetworkManager_getIsHost_MethodRef));
@@ -2809,7 +3255,6 @@ namespace Unity.Netcode.Editor.CodeGen
                     instructions.Add(processor.Create(OpCodes.Ldc_I4, (int)NetworkBehaviour.__RpcExecStage.Send));
                     instructions.Add(processor.Create(OpCodes.Stfld, m_NetworkBehaviour_rpc_exec_stage_FieldRef));
                 }
-
             }
 
             instructions.Reverse();
@@ -2830,7 +3275,8 @@ namespace Unity.Netcode.Editor.CodeGen
             var method = new MethodDefinition(
                 k_NetworkBehaviour___initializeVariables,
                 MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.HideBySig,
-                m_MainModule.TypeSystem.Void);
+                m_MainModule.TypeSystem.Void
+            );
 
             var processor = method.Body.GetILProcessor();
 
@@ -2856,7 +3302,11 @@ namespace Unity.Netcode.Editor.CodeGen
                     continue;
                 }
 
-                if (!field.FieldType.IsArray && !field.FieldType.Resolve().IsArray && field.FieldType.IsSubclassOf(m_NetworkVariableBase_TypeRef))
+                if (
+                    !field.FieldType.IsArray
+                    && !field.FieldType.Resolve().IsArray
+                    && field.FieldType.IsSubclassOf(m_NetworkVariableBase_TypeRef)
+                )
                 {
                     // if({variable} == null) {
                     processor.Emit(OpCodes.Ldarg_0);
@@ -2872,7 +3322,10 @@ namespace Unity.Netcode.Editor.CodeGen
 
                     // throw new Exception("...");
                     processor.Emit(OpCodes.Nop);
-                    processor.Emit(OpCodes.Ldstr, $"{type.Name}.{field.Name} cannot be null. All {nameof(NetworkVariableBase)} instances must be initialized.");
+                    processor.Emit(
+                        OpCodes.Ldstr,
+                        $"{type.Name}.{field.Name} cannot be null. All {nameof(NetworkVariableBase)} instances must be initialized."
+                    );
                     processor.Emit(OpCodes.Newobj, m_ExceptionCtorMethodReference);
                     processor.Emit(OpCodes.Throw);
 
@@ -2890,7 +3343,10 @@ namespace Unity.Netcode.Editor.CodeGen
                     processor.Emit(OpCodes.Ldarg_0);
                     processor.Emit(OpCodes.Ldarg_0);
                     processor.Emit(OpCodes.Ldfld, field);
-                    processor.Emit(OpCodes.Ldstr, field.Name.Replace("<", string.Empty).Replace(">k__BackingField", string.Empty));
+                    processor.Emit(
+                        OpCodes.Ldstr,
+                        field.Name.Replace("<", string.Empty).Replace(">k__BackingField", string.Empty)
+                    );
                     processor.Emit(OpCodes.Call, m_NetworkBehaviour___nameNetworkVariable_MethodRef);
 
                     // NetworkVariableFields.Add({variable});
@@ -2934,7 +3390,9 @@ namespace Unity.Netcode.Editor.CodeGen
             if (type.BaseType.Resolve().HasGenericParameters)
             {
                 var baseTypeInstance = (GenericInstanceType)type.BaseType;
-                initializeVariablesBaseReference = initializeVariablesBaseReference.MakeGeneric(baseTypeInstance.GenericArguments.ToArray());
+                initializeVariablesBaseReference = initializeVariablesBaseReference.MakeGeneric(
+                    baseTypeInstance.GenericArguments.ToArray()
+                );
             }
 
             // base.__initializeVariables();
@@ -2948,16 +3406,27 @@ namespace Unity.Netcode.Editor.CodeGen
             type.Methods.Add(method);
         }
 
-        private MethodDefinition GenerateStaticHandler(MethodDefinition methodDefinition, CustomAttribute rpcAttribute, uint rpcMethodId)
+        private MethodDefinition GenerateStaticHandler(
+            MethodDefinition methodDefinition,
+            CustomAttribute rpcAttribute,
+            uint rpcMethodId
+        )
         {
             var typeSystem = methodDefinition.Module.TypeSystem;
             var rpcHandler = new MethodDefinition(
                 $"__rpc_handler_{rpcMethodId}",
                 MethodAttributes.Private | MethodAttributes.Static | MethodAttributes.HideBySig,
-                methodDefinition.Module.TypeSystem.Void);
-            rpcHandler.Parameters.Add(new ParameterDefinition("target", ParameterAttributes.None, m_NetworkBehaviour_TypeRef));
-            rpcHandler.Parameters.Add(new ParameterDefinition("reader", ParameterAttributes.None, m_FastBufferReader_TypeRef));
-            rpcHandler.Parameters.Add(new ParameterDefinition("rpcParams", ParameterAttributes.None, m_RpcParams_TypeRef));
+                methodDefinition.Module.TypeSystem.Void
+            );
+            rpcHandler.Parameters.Add(
+                new ParameterDefinition("target", ParameterAttributes.None, m_NetworkBehaviour_TypeRef)
+            );
+            rpcHandler.Parameters.Add(
+                new ParameterDefinition("reader", ParameterAttributes.None, m_FastBufferReader_TypeRef)
+            );
+            rpcHandler.Parameters.Add(
+                new ParameterDefinition("rpcParams", ParameterAttributes.None, m_RpcParams_TypeRef)
+            );
 
             var processor = rpcHandler.Body.GetILProcessor();
 
@@ -2968,7 +3437,8 @@ namespace Unity.Netcode.Editor.CodeGen
                 switch (attrField.Name)
                 {
                     case k_ServerRpcAttribute_RequireOwnership:
-                        requireOwnership = attrField.Argument.Type == typeSystem.Boolean && (bool)attrField.Argument.Value;
+                        requireOwnership =
+                            attrField.Argument.Type == typeSystem.Boolean && (bool)attrField.Argument.Value;
                         break;
                 }
             }
@@ -3085,7 +3555,10 @@ namespace Unity.Netcode.Editor.CodeGen
                 {
                     if (!GetReadMethodForParameter(typeSystem.Boolean, out var boolMethodRef))
                     {
-                        m_Diagnostics.AddError(methodDefinition, $"Couldn't find boolean deserializer! Something's wrong!");
+                        m_Diagnostics.AddError(
+                            methodDefinition,
+                            $"Couldn't find boolean deserializer! Something's wrong!"
+                        );
                     }
 
                     // reader.ReadValueSafe(out bool isSet)
@@ -3190,7 +3663,10 @@ namespace Unity.Netcode.Editor.CodeGen
                 }
                 else
                 {
-                    m_Diagnostics.AddError(methodDefinition, $"{methodDefinition.Name} - Don't know how to deserialize {paramType}. RPC parameter types must either implement {nameof(INetworkSerializeByMemcpy)} or {nameof(INetworkSerializable)}. If this type is external and you are sure its memory layout makes it serializable by memcpy, you can replace {paramType} with {typeof(ForceNetworkSerializeByMemcpy<>).Name}<{paramType}>, or you can create extension methods for {nameof(FastBufferReader)}.{nameof(FastBufferReader.ReadValueSafe)}(this {nameof(FastBufferReader)}, out {paramType}) and {nameof(FastBufferWriter)}.{nameof(FastBufferWriter.WriteValueSafe)}(this {nameof(FastBufferWriter)}, in {paramType}) to define serialization for this type.");
+                    m_Diagnostics.AddError(
+                        methodDefinition,
+                        $"{methodDefinition.Name} - Don't know how to deserialize {paramType}. RPC parameter types must either implement {nameof(INetworkSerializeByMemcpy)} or {nameof(INetworkSerializable)}. If this type is external and you are sure its memory layout makes it serializable by memcpy, you can replace {paramType} with {typeof(ForceNetworkSerializeByMemcpy<>).Name}<{paramType}>, or you can create extension methods for {nameof(FastBufferReader)}.{nameof(FastBufferReader.ReadValueSafe)}(this {nameof(FastBufferReader)}, out {paramType}) and {nameof(FastBufferWriter)}.{nameof(FastBufferWriter.WriteValueSafe)}(this {nameof(FastBufferWriter)}, in {paramType}) to define serialization for this type."
+                    );
                     continue;
                 }
 
@@ -3217,7 +3693,10 @@ namespace Unity.Netcode.Editor.CodeGen
                 callMethod = callMethod.MakeGeneric(genericTypes.ToArray());
             }
             processor.Emit(OpCodes.Castclass, castType);
-            Enumerable.Range(0, paramCount).ToList().ForEach(paramIndex => processor.Emit(OpCodes.Ldloc, paramLocalMap[paramIndex]));
+            Enumerable
+                .Range(0, paramCount)
+                .ToList()
+                .ForEach(paramIndex => processor.Emit(OpCodes.Ldloc, paramLocalMap[paramIndex]));
             processor.Emit(OpCodes.Callvirt, callMethod);
 
             // NetworkBehaviour.__rpc_exec_stage = __RpcExecStage.None;

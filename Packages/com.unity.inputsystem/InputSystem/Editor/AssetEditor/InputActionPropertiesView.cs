@@ -19,14 +19,22 @@ namespace UnityEngine.InputSystem.Editor
         public static FourCC k_PropertiesChanged => new FourCC("PROP");
 
         public InputActionPropertiesView(SerializedProperty actionProperty, Action<FourCC> onChange = null)
-            : base("Action", actionProperty, onChange, actionProperty.FindPropertyRelative("m_ExpectedControlType").stringValue)
+            : base(
+                "Action",
+                actionProperty,
+                onChange,
+                actionProperty.FindPropertyRelative("m_ExpectedControlType").stringValue
+            )
         {
-            m_ExpectedControlTypeProperty = actionProperty.FindPropertyRelative(nameof(InputAction.m_ExpectedControlType));
+            m_ExpectedControlTypeProperty = actionProperty.FindPropertyRelative(
+                nameof(InputAction.m_ExpectedControlType)
+            );
             m_ActionTypeProperty = actionProperty.FindPropertyRelative(nameof(InputAction.m_Type));
             m_ActionFlagsProperty = actionProperty.FindPropertyRelative(nameof(InputAction.m_Flags));
 
             m_SelectedActionType = (InputActionType)m_ActionTypeProperty.intValue;
-            m_WantsInitialStateCheck = (m_ActionFlagsProperty.intValue & (int)InputAction.ActionFlags.WantsInitialStateCheck) != 0;
+            m_WantsInitialStateCheck =
+                (m_ActionFlagsProperty.intValue & (int)InputAction.ActionFlags.WantsInitialStateCheck) != 0;
 
             BuildControlTypeList();
             m_SelectedControlType = Array.IndexOf(m_ControlTypeList, m_ExpectedControlTypeProperty.stringValue);
@@ -34,14 +42,19 @@ namespace UnityEngine.InputSystem.Editor
                 m_SelectedControlType = 0;
 
             if (s_ControlTypeLabel == null)
-                s_ControlTypeLabel = EditorGUIUtility.TrTextContent("Control Type", m_ExpectedControlTypeProperty.GetTooltip());
+                s_ControlTypeLabel = EditorGUIUtility.TrTextContent(
+                    "Control Type",
+                    m_ExpectedControlTypeProperty.GetTooltip()
+                );
             if (s_ActionTypeLabel == null)
                 s_ActionTypeLabel = EditorGUIUtility.TrTextContent("Action Type", m_ActionTypeProperty.GetTooltip());
             if (s_WantsInitialStateCheckLabel == null)
-                s_WantsInitialStateCheckLabel = EditorGUIUtility.TrTextContent("Initial State Check",
+                s_WantsInitialStateCheckLabel = EditorGUIUtility.TrTextContent(
+                    "Initial State Check",
                     "Whether in the next input update after the action was enabled, the action should "
-                    + "immediately trigger if any of its bound controls are currently in a non-default state. "
-                    + "This check happens implicitly for Value actions but can be explicitly enabled for Button and Pass-Through actions.");
+                        + "immediately trigger if any of its bound controls are currently in a non-default state. "
+                        + "This check happens implicitly for Value actions but can be explicitly enabled for Button and Pass-Through actions."
+                );
         }
 
         protected override void DrawGeneralProperties()
@@ -50,10 +63,17 @@ namespace UnityEngine.InputSystem.Editor
 
             m_SelectedActionType = EditorGUILayout.EnumPopup(s_ActionTypeLabel, m_SelectedActionType);
             if ((InputActionType)m_SelectedActionType != InputActionType.Button)
-                m_SelectedControlType = EditorGUILayout.Popup(s_ControlTypeLabel, m_SelectedControlType, m_ControlTypeOptions);
+                m_SelectedControlType = EditorGUILayout.Popup(
+                    s_ControlTypeLabel,
+                    m_SelectedControlType,
+                    m_ControlTypeOptions
+                );
 
             if ((InputActionType)m_SelectedActionType != InputActionType.Value)
-                m_WantsInitialStateCheck = EditorGUILayout.Toggle(s_WantsInitialStateCheckLabel, m_WantsInitialStateCheck);
+                m_WantsInitialStateCheck = EditorGUILayout.Toggle(
+                    s_WantsInitialStateCheckLabel,
+                    m_WantsInitialStateCheck
+                );
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -89,14 +109,15 @@ namespace UnityEngine.InputSystem.Editor
 
                 // If the action type is InputActionType.Value, skip button controls.
                 var type = allLayouts.layoutTypes[layoutName];
-                if ((InputActionType)m_SelectedActionType == InputActionType.Value &&
-                    typeof(ButtonControl).IsAssignableFrom(type))
+                if (
+                    (InputActionType)m_SelectedActionType == InputActionType.Value
+                    && typeof(ButtonControl).IsAssignableFrom(type)
+                )
                     continue;
 
                 ////TODO: skip aliases
 
-                if (typeof(InputControl).IsAssignableFrom(type) &&
-                    !typeof(InputDevice).IsAssignableFrom(type))
+                if (typeof(InputControl).IsAssignableFrom(type) && !typeof(InputDevice).IsAssignableFrom(type))
                 {
                     types.Add(layoutName);
                 }
@@ -107,7 +128,8 @@ namespace UnityEngine.InputSystem.Editor
             types.Insert(0, "Any");
 
             m_ControlTypeList = types.ToArray();
-            m_ControlTypeOptions = m_ControlTypeList.Select(x => new GUIContent(ObjectNames.NicifyVariableName(x)))
+            m_ControlTypeOptions = m_ControlTypeList
+                .Select(x => new GUIContent(ObjectNames.NicifyVariableName(x)))
                 .ToArray();
         }
 

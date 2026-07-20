@@ -27,7 +27,9 @@ namespace UnityEngine.TestTools.TestRunner
 
             if (task.IsFaulted)
             {
-                ExceptionDispatchInfo.Capture(task.Exception.InnerExceptions.Count == 1 ? task.Exception.InnerException : task.Exception).Throw();
+                ExceptionDispatchInfo
+                    .Capture(task.Exception.InnerExceptions.Count == 1 ? task.Exception.InnerException : task.Exception)
+                    .Throw();
             }
         }
 
@@ -35,7 +37,10 @@ namespace UnityEngine.TestTools.TestRunner
         {
             try
             {
-                return m_TestMethod.Method.MethodInfo.Invoke(context.TestObject, m_TestMethod.parms != null ? m_TestMethod.parms.OriginalArguments : null) as Task;
+                return m_TestMethod.Method.MethodInfo.Invoke(
+                        context.TestObject,
+                        m_TestMethod.parms != null ? m_TestMethod.parms.OriginalArguments : null
+                    ) as Task;
             }
             catch (TargetInvocationException e)
             {

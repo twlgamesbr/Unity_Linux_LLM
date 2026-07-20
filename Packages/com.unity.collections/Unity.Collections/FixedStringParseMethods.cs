@@ -7,7 +7,7 @@ namespace Unity.Collections
     /// Provides methods for parsing numbers from FixedString*N*Bytes.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static partial class FixedStringMethods
+    public static unsafe partial class FixedStringMethods
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]

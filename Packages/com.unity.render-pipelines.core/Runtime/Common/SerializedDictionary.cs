@@ -1,6 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace UnityEngine.Rendering
 {
@@ -39,7 +39,7 @@ namespace UnityEngine.Rendering
     /// </example>
     [Serializable]
     [DebuggerDisplay("Count = {Count}")]
-    [DebuggerTypeProxy(typeof(SerializedDictionaryDebugView<, >))]
+    [DebuggerTypeProxy(typeof(SerializedDictionaryDebugView<,>))]
     public class SerializedDictionary<K, V> : SerializedDictionary<K, V, K, V>
     {
         /// <summary>
@@ -100,7 +100,6 @@ namespace UnityEngine.Rendering
         /// <param name="value">The value in <see cref="V"/></param>
         /// <returns>The value in <see cref="SV"/></returns>
         public abstract SV SerializeValue(V value);
-
 
         /// <summary>
         /// From <see cref="SK"/> to <see cref="K"/>

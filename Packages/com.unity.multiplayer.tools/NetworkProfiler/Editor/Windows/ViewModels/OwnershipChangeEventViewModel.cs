@@ -12,7 +12,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 $"{MetricType.OwnershipChange.GetDisplayNameString()}",
                 MetricType.OwnershipChange,
                 onSelectedCallback,
-                treeViewId)
-        { }
+                treeViewId
+            ) { }
     }
 }

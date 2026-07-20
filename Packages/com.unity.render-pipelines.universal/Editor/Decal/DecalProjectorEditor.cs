@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEditor.IMGUI.Controls;
+using UnityEditor.Rendering.Utilities;
+using UnityEditor.RenderPipelines.Core;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShortcutManagement;
 using UnityEditorInternal;
-using UnityEditor.EditorTools;
-using UnityEditor.Rendering.Utilities;
 using UnityEngine;
-using UnityEditor.RenderPipelines.Core;
 using UnityEngine.Rendering.Universal;
 using static UnityEditorInternal.EditMode;
 
@@ -20,11 +20,15 @@ namespace UnityEditor.Rendering.Universal
         const float k_Limit = 100000f;
         const float k_LimitInv = 1f / k_Limit;
 
-        static readonly GUIContent k_NewDecalMaterialButtonText = EditorGUIUtility.TrTextContent("New", "Creates a new Decal material.");
+        static readonly GUIContent k_NewDecalMaterialButtonText = EditorGUIUtility.TrTextContent(
+            "New",
+            "Creates a new Decal material."
+        );
         static readonly string k_NewDecalText = "URP Decal";
         static readonly string k_NewSGDecalText = "ShaderGraph Decal";
         static readonly string k_NewSGDecalFromTemplateText = "ShaderGraph Decal from Template";
-        static readonly string k_DefaultDecalShaderGraphTemplatePath = "Packages/com.unity.render-pipelines.universal/Shaders/Decal.shadergraph";
+        static readonly string k_DefaultDecalShaderGraphTemplatePath =
+            "Packages/com.unity.render-pipelines.universal/Shaders/Decal.shadergraph";
 
         static Color fullColor
         {
@@ -36,6 +40,7 @@ namespace UnityEditor.Rendering.Universal
             }
         }
         static Color s_LastColor;
+
         static void UpdateColorsInHandlesIfRequired()
         {
             Color c = DecalPreferences.decalGizmoColor;
@@ -111,8 +116,10 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static readonly BoxBoundsHandle s_AreaLightHandle =
-            new BoxBoundsHandle { axes = PrimitiveBoundsHandle.Axes.X | PrimitiveBoundsHandle.Axes.Y };
+        static readonly BoxBoundsHandle s_AreaLightHandle = new BoxBoundsHandle
+        {
+            axes = PrimitiveBoundsHandle.Axes.X | PrimitiveBoundsHandle.Axes.Y,
+        };
 
         const SceneViewEditMode k_EditShapeWithoutPreservingUV = (SceneViewEditMode)90;
         const SceneViewEditMode k_EditShapePreservingUV = (SceneViewEditMode)91;
@@ -194,8 +201,7 @@ namespace UnityEditor.Rendering.Universal
             s_Instances.Remove(this);
         }
 
-        private void OnDestroy() =>
-            DestroyImmediate(m_MaterialEditor);
+        private void OnDestroy() => DestroyImmediate(m_MaterialEditor);
 
         public bool HasFrameBounds()
         {
@@ -240,7 +246,12 @@ namespace UnityEditor.Rendering.Universal
         void DrawBoxTransformationHandles(DecalProjector decalProjector)
         {
             Vector3 scale = decalProjector.effectiveScale;
-            using (new Handles.DrawingScope(fullColor, Matrix4x4.TRS(decalProjector.transform.position, decalProjector.transform.rotation, scale)))
+            using (
+                new Handles.DrawingScope(
+                    fullColor,
+                    Matrix4x4.TRS(decalProjector.transform.position, decalProjector.transform.rotation, scale)
+                )
+            )
             {
                 Vector3 centerStart = decalProjector.pivot;
                 boxHandle.center = centerStart;
@@ -264,11 +275,13 @@ namespace UnityEditor.Rendering.Universal
                     decalProjector.size = new Vector3(
                         xChangeIsValid ? boxHandle.size.x : decalProjector.size.x,
                         yChangeIsValid ? boxHandle.size.y : decalProjector.size.y,
-                        zChangeIsValid ? boxHandle.size.z : decalProjector.size.z);
+                        zChangeIsValid ? boxHandle.size.z : decalProjector.size.z
+                    );
                     decalProjector.pivot = new Vector3(
                         xChangeIsValid ? boxHandle.center.x : decalProjector.pivot.x,
                         yChangeIsValid ? boxHandle.center.y : decalProjector.pivot.y,
-                        zChangeIsValid ? boxHandle.center.z : decalProjector.pivot.z);
+                        zChangeIsValid ? boxHandle.center.z : decalProjector.pivot.z
+                    );
 
                     Vector3 boundsSizeCurrentOS = boxHandle.size;
                     Vector3 boundsMinCurrentOS = boxHandle.size * -0.5f + boxHandle.center;
@@ -282,13 +295,23 @@ namespace UnityEditor.Rendering.Universal
                         Vector2 uvBias = decalProjector.uvBias;
                         if (xChangeIsValid)
                         {
-                            uvScale.x *= Mathf.Max(k_LimitInv, boundsSizeCurrentOS.x) / Mathf.Max(k_LimitInv, boundsSizePreviousOS.x);
-                            uvBias.x += (boundsMinCurrentOS.x - boundsMinPreviousOS.x) / Mathf.Max(k_LimitInv, boundsSizeCurrentOS.x) * uvScale.x;
+                            uvScale.x *=
+                                Mathf.Max(k_LimitInv, boundsSizeCurrentOS.x)
+                                / Mathf.Max(k_LimitInv, boundsSizePreviousOS.x);
+                            uvBias.x +=
+                                (boundsMinCurrentOS.x - boundsMinPreviousOS.x)
+                                / Mathf.Max(k_LimitInv, boundsSizeCurrentOS.x)
+                                * uvScale.x;
                         }
                         if (yChangeIsValid)
                         {
-                            uvScale.y *= Mathf.Max(k_LimitInv, boundsSizeCurrentOS.y) / Mathf.Max(k_LimitInv, boundsSizePreviousOS.y);
-                            uvBias.y += (boundsMinCurrentOS.y - boundsMinPreviousOS.y) / Mathf.Max(k_LimitInv, boundsSizeCurrentOS.y) * uvScale.y;
+                            uvScale.y *=
+                                Mathf.Max(k_LimitInv, boundsSizeCurrentOS.y)
+                                / Mathf.Max(k_LimitInv, boundsSizePreviousOS.y);
+                            uvBias.y +=
+                                (boundsMinCurrentOS.y - boundsMinPreviousOS.y)
+                                / Mathf.Max(k_LimitInv, boundsSizeCurrentOS.y)
+                                * uvScale.y;
                         }
                         decalProjector.uvScale = uvScale;
                         decalProjector.uvBias = uvBias;
@@ -308,19 +331,34 @@ namespace UnityEditor.Rendering.Universal
             Vector3 scaledPivot = Vector3.Scale(decalProjector.pivot, scale);
             Vector3 scaledSize = Vector3.Scale(decalProjector.size, scale);
 
-            using (new Handles.DrawingScope(fullColor, Matrix4x4.TRS(Vector3.zero, decalProjector.transform.rotation, Vector3.one)))
+            using (
+                new Handles.DrawingScope(
+                    fullColor,
+                    Matrix4x4.TRS(Vector3.zero, decalProjector.transform.rotation, Vector3.one)
+                )
+            )
             {
                 EditorGUI.BeginChangeCheck();
-                Vector3 newPosition = ProjectedTransform.DrawHandles(decalProjector.transform.position, .5f * scaledSize.z - scaledPivot.z, decalProjector.transform.rotation);
+                Vector3 newPosition = ProjectedTransform.DrawHandles(
+                    decalProjector.transform.position,
+                    .5f * scaledSize.z - scaledPivot.z,
+                    decalProjector.transform.rotation
+                );
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObjects(new UnityEngine.Object[] { decalProjector, decalProjector.transform }, "Decal Projector Change");
+                    Undo.RecordObjects(
+                        new UnityEngine.Object[] { decalProjector, decalProjector.transform },
+                        "Decal Projector Change"
+                    );
 
-                    scaledPivot += Quaternion.Inverse(decalProjector.transform.rotation) * (decalProjector.transform.position - newPosition);
+                    scaledPivot +=
+                        Quaternion.Inverse(decalProjector.transform.rotation)
+                        * (decalProjector.transform.position - newPosition);
                     decalProjector.pivot = new Vector3(
                         scale.x != 0f ? scaledPivot.x / scale.x : decalProjector.pivot.x,
                         scale.y != 0f ? scaledPivot.y / scale.y : decalProjector.pivot.y,
-                        scale.z != 0f ? scaledPivot.z / scale.z : decalProjector.pivot.z);
+                        scale.z != 0f ? scaledPivot.z / scale.z : decalProjector.pivot.z
+                    );
                     decalProjector.transform.position = newPosition;
 
                     ReinitSavedRatioSizePivotPosition();
@@ -334,7 +372,16 @@ namespace UnityEditor.Rendering.Universal
             Vector3 scaledPivot = Vector3.Scale(decalProjector.pivot, scale);
             Vector3 scaledSize = Vector3.Scale(decalProjector.size, scale);
 
-            using (new Handles.DrawingScope(Matrix4x4.TRS(decalProjector.transform.position + decalProjector.transform.rotation * (scaledPivot - .5f * scaledSize), decalProjector.transform.rotation, scale)))
+            using (
+                new Handles.DrawingScope(
+                    Matrix4x4.TRS(
+                        decalProjector.transform.position
+                            + decalProjector.transform.rotation * (scaledPivot - .5f * scaledSize),
+                        decalProjector.transform.rotation,
+                        scale
+                    )
+                )
+            )
             {
                 Vector2 uvScale = decalProjector.uvScale;
                 Vector2 uvBias = decalProjector.uvBias;
@@ -410,7 +457,12 @@ namespace UnityEditor.Rendering.Universal
             const float k_DotLength = 5f;
 
             // Draw them with scale applied to size and pivot instead of the matrix to keep the proportions of the arrow and lines.
-            using (new Handles.DrawingScope(fullColor, Matrix4x4.TRS(decalProjector.transform.position, decalProjector.transform.rotation, Vector3.one)))
+            using (
+                new Handles.DrawingScope(
+                    fullColor,
+                    Matrix4x4.TRS(decalProjector.transform.position, decalProjector.transform.rotation, Vector3.one)
+                )
+            )
             {
                 Vector3 scale = decalProjector.effectiveScale;
                 Vector3 scaledPivot = Vector3.Scale(decalProjector.pivot, scale);
@@ -418,7 +470,8 @@ namespace UnityEditor.Rendering.Universal
 
                 boxHandle.center = scaledPivot;
                 boxHandle.size = scaledSize;
-                bool isVolumeEditMode = editMode == k_EditShapePreservingUV || editMode == k_EditShapeWithoutPreservingUV;
+                bool isVolumeEditMode =
+                    editMode == k_EditShapePreservingUV || editMode == k_EditShapeWithoutPreservingUV;
                 bool isPivotEditMode = editMode == k_EditUVAndPivot;
                 if (lod > 0.5f)
                 {
@@ -443,13 +496,30 @@ namespace UnityEditor.Rendering.Universal
                     }
 
                     //draw UV and bolder edges
-                    using (new Handles.DrawingScope(Matrix4x4.TRS(decalProjector.transform.position + decalProjector.transform.rotation * new Vector3(scaledPivot.x, scaledPivot.y, scaledPivot.z - .5f * scaledSize.z), decalProjector.transform.rotation, Vector3.one)))
+                    using (
+                        new Handles.DrawingScope(
+                            Matrix4x4.TRS(
+                                decalProjector.transform.position
+                                    + decalProjector.transform.rotation
+                                        * new Vector3(scaledPivot.x, scaledPivot.y, scaledPivot.z - .5f * scaledSize.z),
+                                decalProjector.transform.rotation,
+                                Vector3.one
+                            )
+                        )
+                    )
                     {
                         Vector2 UVSize = new Vector2(
-                            (decalProjector.uvScale.x > k_Limit || decalProjector.uvScale.x < -k_Limit) ? 0f : scaledSize.x / decalProjector.uvScale.x,
-                            (decalProjector.uvScale.y > k_Limit || decalProjector.uvScale.y < -k_Limit) ? 0f : scaledSize.y / decalProjector.uvScale.y
+                            (decalProjector.uvScale.x > k_Limit || decalProjector.uvScale.x < -k_Limit)
+                                ? 0f
+                                : scaledSize.x / decalProjector.uvScale.x,
+                            (decalProjector.uvScale.y > k_Limit || decalProjector.uvScale.y < -k_Limit)
+                                ? 0f
+                                : scaledSize.y / decalProjector.uvScale.y
                         );
-                        Vector2 UVCenter = UVSize * .5f - new Vector2(decalProjector.uvBias.x * UVSize.x, decalProjector.uvBias.y * UVSize.y) - (Vector2)scaledSize * .5f;
+                        Vector2 UVCenter =
+                            UVSize * .5f
+                            - new Vector2(decalProjector.uvBias.x * UVSize.x, decalProjector.uvBias.y * UVSize.y)
+                            - (Vector2)scaledSize * .5f;
 
                         uvHandles.center = UVCenter;
                         uvHandles.size = UVSize;
@@ -554,7 +624,10 @@ namespace UnityEditor.Rendering.Universal
 
             bool isDecalSupported = DecalProjector.isSupported;
             if (!isDecalSupported)
-                EditorUtils.FeatureHelpBox("The current renderer has no Decal Renderer Feature added.", MessageType.Warning);
+                EditorUtils.FeatureHelpBox(
+                    "The current renderer has no Decal Renderer Feature added.",
+                    MessageType.Warning
+                );
 
             EditorGUI.BeginChangeCheck();
             {
@@ -565,12 +638,19 @@ namespace UnityEditor.Rendering.Universal
                 {
                     var decalProjector = target as DecalProjector;
 
-                    float combinedScale = decalProjector.transform.lossyScale.x * decalProjector.transform.lossyScale.y * decalProjector.transform.lossyScale.z;
-                    negativeScale |= combinedScale < 0 && decalProjector.scaleMode == DecalScaleMode.InheritFromHierarchy;
+                    float combinedScale =
+                        decalProjector.transform.lossyScale.x
+                        * decalProjector.transform.lossyScale.y
+                        * decalProjector.transform.lossyScale.z;
+                    negativeScale |=
+                        combinedScale < 0 && decalProjector.scaleMode == DecalScaleMode.InheritFromHierarchy;
                 }
                 if (negativeScale)
                 {
-                    EditorGUILayout.HelpBox("Does not work with negative odd scaling (When there are odd number of scale components)", MessageType.Warning);
+                    EditorGUILayout.HelpBox(
+                        "Does not work with negative odd scaling (When there are odd number of scale components)",
+                        MessageType.Warning
+                    );
                 }
 
                 var widthRect = EditorGUILayout.GetControlRect();
@@ -592,7 +672,11 @@ namespace UnityEditor.Rendering.Universal
                 var projectionRect = EditorGUILayout.GetControlRect();
                 EditorGUI.BeginProperty(projectionRect, k_ProjectionDepthContent, m_SizeValues[2]);
                 EditorGUI.BeginChangeCheck();
-                float newSizeZ = EditorGUI.FloatField(projectionRect, k_ProjectionDepthContent, m_SizeValues[2].floatValue);
+                float newSizeZ = EditorGUI.FloatField(
+                    projectionRect,
+                    k_ProjectionDepthContent,
+                    m_SizeValues[2].floatValue
+                );
                 if (EditorGUI.EndChangeCheck())
                     UpdateSize(2, Mathf.Max(0, newSizeZ));
                 EditorGUI.EndProperty();
@@ -621,11 +705,14 @@ namespace UnityEditor.Rendering.Universal
 
                 if (m_MaterialEditor && !isValidDecalMaterial)
                 {
-                    CoreEditorUtils.DrawFixMeBox("Decal only work with Decal Material. Use default material or create from decal shader graph sub target.", () =>
-                    {
-                        m_MaterialProperty.objectReferenceValue = DecalProjector.defaultMaterial;
-                        materialChanged = true;
-                    });
+                    CoreEditorUtils.DrawFixMeBox(
+                        "Decal only work with Decal Material. Use default material or create from decal shader graph sub target.",
+                        () =>
+                        {
+                            m_MaterialProperty.objectReferenceValue = DecalProjector.defaultMaterial;
+                            materialChanged = true;
+                        }
+                    );
                 }
 
                 EditorGUI.indentLevel++;
@@ -657,7 +744,13 @@ namespace UnityEditor.Rendering.Universal
                     float angleFadeMinValue = m_StartAngleFadeProperty.floatValue;
                     float angleFadeMaxValue = m_EndAngleFadeProperty.floatValue;
                     EditorGUI.BeginChangeCheck();
-                    EditorGUILayout.MinMaxSlider(k_AngleFadeContent, ref angleFadeMinValue, ref angleFadeMaxValue, 0.0f, 180.0f);
+                    EditorGUILayout.MinMaxSlider(
+                        k_AngleFadeContent,
+                        ref angleFadeMinValue,
+                        ref angleFadeMaxValue,
+                        0.0f,
+                        180.0f
+                    );
                     if (EditorGUI.EndChangeCheck())
                     {
                         m_StartAngleFadeProperty.floatValue = angleFadeMinValue;
@@ -667,7 +760,10 @@ namespace UnityEditor.Rendering.Universal
 
                 if (!angleFadeSupport && isValidDecalMaterial)
                 {
-                    EditorGUILayout.HelpBox($"Decal Angle Fade is not enabled in Shader. In ShaderGraph enable Angle Fade option.", MessageType.Info);
+                    EditorGUILayout.HelpBox(
+                        $"Decal Angle Fade is not enabled in Shader. In ShaderGraph enable Angle Fade option.",
+                        MessageType.Info
+                    );
                 }
 
                 EditorGUILayout.Space();
@@ -727,22 +823,32 @@ namespace UnityEditor.Rendering.Universal
             GenericMenu menu = new GenericMenu();
 
             menu.AddItem(new GUIContent(k_NewDecalText), false, () => CreateDefaultDecalMaterial(targets));
-            menu.AddItem(new GUIContent(k_NewSGDecalText), false, () => CreateDecalMaterialFromTemplate(targets, k_DefaultDecalShaderGraphTemplatePath));
-            menu.AddItem(new GUIContent(k_NewSGDecalFromTemplateText), false, () => CreateDecalMaterialFromTemplate(targets));
+            menu.AddItem(
+                new GUIContent(k_NewSGDecalText),
+                false,
+                () => CreateDecalMaterialFromTemplate(targets, k_DefaultDecalShaderGraphTemplatePath)
+            );
+            menu.AddItem(
+                new GUIContent(k_NewSGDecalFromTemplateText),
+                false,
+                () => CreateDecalMaterialFromTemplate(targets)
+            );
 
             menu.DropDown(newFieldRect);
         }
 
         static void CreateDecalMaterialFromTemplate(UnityEngine.Object[] decalProjectors, string templatePath = null)
         {
-            CreateShaderGraph.CreateGraphAndMaterialFromTemplate((material) =>
-            {
-                SetDecalMaterial(decalProjectors, material);
-            },
-            templatePath,
-            $"New {k_NewSGDecalText}",
-            null,
-            "shadergraph.material=decal");
+            CreateShaderGraph.CreateGraphAndMaterialFromTemplate(
+                (material) =>
+                {
+                    SetDecalMaterial(decalProjectors, material);
+                },
+                templatePath,
+                $"New {k_NewSGDecalText}",
+                null,
+                "shadergraph.material=decal"
+            );
         }
 
         static void CreateDefaultDecalMaterial(UnityEngine.Object[] decalProjectors)
@@ -771,7 +877,12 @@ namespace UnityEditor.Rendering.Universal
             Selection.objects = selection.ToArray();
         }
 
-        [Shortcut("URP/Decal: Handle changing size stretching UV", typeof(SceneView), KeyCode.Keypad1, ShortcutModifiers.Action)]
+        [Shortcut(
+            "URP/Decal: Handle changing size stretching UV",
+            typeof(SceneView),
+            KeyCode.Keypad1,
+            ShortcutModifiers.Action
+        )]
         static void EnterEditModeWithoutPreservingUV(ShortcutArguments args)
         {
             //If editor is not there, then the selected GameObject does not contains a DecalProjector
@@ -779,10 +890,19 @@ namespace UnityEditor.Rendering.Universal
             if (activeDecalProjector == null || activeDecalProjector.Equals(null))
                 return;
 
-            ChangeEditMode(k_EditShapeWithoutPreservingUV, GetBoundsGetter(activeDecalProjector)(), FindEditorFromSelection());
+            ChangeEditMode(
+                k_EditShapeWithoutPreservingUV,
+                GetBoundsGetter(activeDecalProjector)(),
+                FindEditorFromSelection()
+            );
         }
 
-        [Shortcut("URP/Decal: Handle changing size cropping UV", typeof(SceneView), KeyCode.Keypad2, ShortcutModifiers.Action)]
+        [Shortcut(
+            "URP/Decal: Handle changing size cropping UV",
+            typeof(SceneView),
+            KeyCode.Keypad2,
+            ShortcutModifiers.Action
+        )]
         static void EnterEditModePreservingUV(ShortcutArguments args)
         {
             //If editor is not there, then the selected GameObject does not contains a DecalProjector
@@ -793,7 +913,12 @@ namespace UnityEditor.Rendering.Universal
             ChangeEditMode(k_EditShapePreservingUV, GetBoundsGetter(activeDecalProjector)(), FindEditorFromSelection());
         }
 
-        [Shortcut("URP/Decal: Handle changing pivot position and UVs", typeof(SceneView), KeyCode.Keypad3, ShortcutModifiers.Action)]
+        [Shortcut(
+            "URP/Decal: Handle changing pivot position and UVs",
+            typeof(SceneView),
+            KeyCode.Keypad3,
+            ShortcutModifiers.Action
+        )]
         static void EnterEditModePivotPreservingUV(ShortcutArguments args)
         {
             //If editor is not there, then the selected GameObject does not contains a DecalProjector
@@ -804,7 +929,12 @@ namespace UnityEditor.Rendering.Universal
             ChangeEditMode(k_EditUVAndPivot, GetBoundsGetter(activeDecalProjector)(), FindEditorFromSelection());
         }
 
-        [Shortcut("URP/Decal: Handle swap between cropping and stretching UV", typeof(SceneView), KeyCode.Keypad4, ShortcutModifiers.Action)]
+        [Shortcut(
+            "URP/Decal: Handle swap between cropping and stretching UV",
+            typeof(SceneView),
+            KeyCode.Keypad4,
+            ShortcutModifiers.Action
+        )]
         static void SwappingEditUVMode(ShortcutArguments args)
         {
             //If editor is not there, then the selected GameObject does not contains a DecalProjector
@@ -845,7 +975,8 @@ namespace UnityEditor.Rendering.Universal
             private const EditMode.SceneViewEditMode Mode = DecalProjectorEditor.k_EditShapeWithoutPreservingUV;
             private const string IconName = "ScaleTool";
 
-            protected DecalProjectorModifyScaleTool() : base(Description, Mode, IconName) { }
+            protected DecalProjectorModifyScaleTool()
+                : base(Description, Mode, IconName) { }
         }
 
         [EditorTool(Description, typeof(DecalProjector), toolPriority = (int)Mode)]
@@ -855,7 +986,8 @@ namespace UnityEditor.Rendering.Universal
             private const EditMode.SceneViewEditMode Mode = DecalProjectorEditor.k_EditShapePreservingUV;
             private const string IconName = "RectTool";
 
-            protected DecalProjectorEditShapeTool() : base(Description, Mode, IconName) { }
+            protected DecalProjectorEditShapeTool()
+                : base(Description, Mode, IconName) { }
         }
 
         [EditorTool(Description, typeof(DecalProjector), toolPriority = (int)Mode)]
@@ -865,7 +997,8 @@ namespace UnityEditor.Rendering.Universal
             private const EditMode.SceneViewEditMode Mode = DecalProjectorEditor.k_EditUVAndPivot;
             private const string IconName = "MoveTool";
 
-            protected DecalProjectorEditTool() : base(Description, Mode, IconName) { }
+            protected DecalProjectorEditTool()
+                : base(Description, Mode, IconName) { }
         }
     }
 }

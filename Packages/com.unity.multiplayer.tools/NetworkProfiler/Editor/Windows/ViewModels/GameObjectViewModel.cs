@@ -5,15 +5,19 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 {
     internal class GameObjectViewModel : ViewModelBase
     {
-        public GameObjectViewModel(NetworkObjectIdentifier objectIdentifier, IRowData parent, Action onSelectedCallback = null)
+        public GameObjectViewModel(
+            NetworkObjectIdentifier objectIdentifier,
+            IRowData parent,
+            Action onSelectedCallback = null
+        )
             : base(
                 parent,
                 GetName(objectIdentifier),
                 string.Empty,
                 "gameobject",
                 onSelectedCallback,
-                objectIdentifier.TreeViewId)
-        { }
+                objectIdentifier.TreeViewId
+            ) { }
 
         static string GetName(NetworkObjectIdentifier objectIdentifier)
         {

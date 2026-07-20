@@ -8,7 +8,8 @@ namespace UnityEngine.Rendering
     /// Generic object pool.
     /// </summary>
     /// <typeparam name="T">Type of the object pool.</typeparam>
-    public class ObjectPool<T> where T : new()
+    public class ObjectPool<T>
+        where T : new()
     {
         readonly Stack<T> m_Stack = new Stack<T>();
         readonly UnityAction<T> m_ActionOnGet;
@@ -19,14 +20,22 @@ namespace UnityEngine.Rendering
         /// Number of objects in the pool.
         /// </summary>
         public int countAll { get; private set; }
+
         /// <summary>
         /// Number of active objects in the pool.
         /// </summary>
-        public int countActive { get { return countAll - countInactive; } }
+        public int countActive
+        {
+            get { return countAll - countInactive; }
+        }
+
         /// <summary>
         /// Number of inactive objects in the pool.
         /// </summary>
-        public int countInactive { get { return m_Stack.Count; } }
+        public int countInactive
+        {
+            get { return m_Stack.Count; }
+        }
 
         /// <summary>
         /// Constructor.
@@ -237,8 +246,10 @@ namespace UnityEngine.Rendering
     public static class DictionaryPool<TKey, TValue>
     {
         // Object pool to avoid allocations.
-        static readonly ObjectPool<Dictionary<TKey, TValue>> s_Pool
-            = new ObjectPool<Dictionary<TKey, TValue>>(null, l => l.Clear());
+        static readonly ObjectPool<Dictionary<TKey, TValue>> s_Pool = new ObjectPool<Dictionary<TKey, TValue>>(
+            null,
+            l => l.Clear()
+        );
 
         /// <summary>
         /// Get a new Dictionary
@@ -251,8 +262,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <param name="value">Output typed Dictionary.</param>
         /// <returns>A new Dictionary PooledObject.</returns>
-        public static ObjectPool<Dictionary<TKey, TValue>>.PooledObject Get(out Dictionary<TKey, TValue> value)
-            => s_Pool.Get(out value);
+        public static ObjectPool<Dictionary<TKey, TValue>>.PooledObject Get(out Dictionary<TKey, TValue> value) =>
+            s_Pool.Get(out value);
 
         /// <summary>
         /// Release an object to the pool.

@@ -34,5 +34,4 @@ namespace UnityEditor.Rendering.Converter
         /// </summary>
         void OnClicked();
     }
-
 }

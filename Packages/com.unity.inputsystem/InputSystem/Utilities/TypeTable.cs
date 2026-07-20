@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
 #if UNITY_EDITOR
 using System.ComponentModel;
 #endif
@@ -21,9 +20,9 @@ namespace UnityEngine.InputSystem.Utilities
 
         // In the editor, we want to keep track of when the same type gets registered multiple times
         // with different names so that we can keep the aliases out of the UI.
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public HashSet<InternedString> aliases;
-        #endif
+#endif
 
         // Strong coupling to Input Manager which is always the owner
         private InputManager m_Manager;
@@ -31,9 +30,9 @@ namespace UnityEngine.InputSystem.Utilities
         public void Initialize(InputManager manager)
         {
             table = new Dictionary<InternedString, Type>();
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             aliases = new HashSet<InternedString>();
-            #endif
+#endif
             m_Manager = manager;
         }
 
@@ -56,7 +55,7 @@ namespace UnityEngine.InputSystem.Utilities
 
             var internedName = new InternedString(name);
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             // First check if the name has already been added to the table
             // This allows safely calling this function multiple times with same name
             // and prevents adding an alias to itself
@@ -71,7 +70,7 @@ namespace UnityEngine.InputSystem.Utilities
                 if (table.ContainsValue(type))
                     aliases.Add(internedName);
             }
-            #endif
+#endif
 
             table[internedName] = type;
         }
@@ -104,7 +103,7 @@ namespace UnityEngine.InputSystem.Utilities
             return type;
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public bool ShouldHideInUI(string name)
         {
             // Always hide aliases.
@@ -117,6 +116,6 @@ namespace UnityEngine.InputSystem.Utilities
             return !(attribute?.Visible ?? true);
         }
 
-        #endif
+#endif
     }
 }

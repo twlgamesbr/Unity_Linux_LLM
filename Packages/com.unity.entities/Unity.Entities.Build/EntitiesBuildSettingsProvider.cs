@@ -9,14 +9,18 @@ namespace Unity.Entities.Build
             : base(path, scopes)
         {
             label = "Build";
-            keywords = GetSearchKeywordsFromSerializedObject(new SerializedObject(DotsGlobalSettings.Instance.GetClientSettingAsset().AsScriptableObject()));
+            keywords = GetSearchKeywordsFromSerializedObject(
+                new SerializedObject(DotsGlobalSettings.Instance.GetClientSettingAsset().AsScriptableObject())
+            );
         }
 
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
             var instance = DotsGlobalSettings.Instance;
 
-            StyleSheet stylesheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.unity.entities/Unity.Entities.Build/StyleSheets/dots-settings-window.uss");
+            StyleSheet stylesheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(
+                "Packages/com.unity.entities/Unity.Entities.Build/StyleSheets/dots-settings-window.uss"
+            );
             rootElement.styleSheets.Add(stylesheet);
             rootElement.AddToClassList("sb-settings-window");
 
@@ -54,4 +58,3 @@ namespace Unity.Entities.Build
         }
     }
 }
-

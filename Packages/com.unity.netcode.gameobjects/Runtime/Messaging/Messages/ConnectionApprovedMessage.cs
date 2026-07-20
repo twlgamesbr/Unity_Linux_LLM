@@ -11,7 +11,8 @@ namespace Unity.Netcode
         public bool ServerRedistribution;
         public ulong SessionStateToken;
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             if (serializer.IsWriter)
             {
@@ -64,10 +65,12 @@ namespace Unity.Netcode
 
         public ulong OwnerClientId;
         public int NetworkTick;
+
         // The cloud state service should set this if we are restoring a session
         public ServiceConfig ServiceConfig;
         public bool IsRestoredSession;
         public ulong CurrentSessionOwner;
+
         // Not serialized
         public bool IsDistributedAuthority;
 
@@ -156,7 +159,10 @@ namespace Unity.Netcode
                 // Serialize NetworkVariable data
                 foreach (var sobj in SpawnedObjectsList)
                 {
-                    if (sobj.SpawnWithObservers && (sobj.CheckObjectVisibility == null || sobj.CheckObjectVisibility(OwnerClientId)))
+                    if (
+                        sobj.SpawnWithObservers
+                        && (sobj.CheckObjectVisibility == null || sobj.CheckObjectVisibility(OwnerClientId))
+                    )
                     {
                         sobj.AddObserver(OwnerClientId);
                         // In distributed authority mode, we send the currently known observers of each NetworkObject to the client being synchronized.
@@ -196,12 +202,18 @@ namespace Unity.Netcode
             {
                 var messageVersion = new MessageVersionData();
                 messageVersion.Deserialize(reader);
-                networkManager.ConnectionManager.MessageManager.SetVersion(context.SenderId, messageVersion.Hash, messageVersion.Version);
+                networkManager.ConnectionManager.MessageManager.SetVersion(
+                    context.SenderId,
+                    messageVersion.Hash,
+                    messageVersion.Version
+                );
                 messageHashesInOrder[i] = messageVersion.Hash;
 
                 // Update the received version since this message will always be passed version 0, due to the map not
                 // being initialized until just now.
-                var messageType = networkManager.ConnectionManager.MessageManager.GetMessageForHash(messageVersion.Hash);
+                var messageType = networkManager.ConnectionManager.MessageManager.GetMessageForHash(
+                    messageVersion.Hash
+                );
                 if (messageType == typeof(ConnectionApprovedMessage))
                 {
                     receivedMessageVersion = messageVersion.Version;
@@ -247,20 +259,28 @@ namespace Unity.Netcode
         {
             var networkManager = (NetworkManager)context.SystemOwner;
 
-            if (networkManager.CMBServiceConnection && networkManager.LocalClient.IsSessionOwner && networkManager.NetworkConfig.EnableSceneManagement)
+            if (
+                networkManager.CMBServiceConnection
+                && networkManager.LocalClient.IsSessionOwner
+                && networkManager.NetworkConfig.EnableSceneManagement
+            )
             {
                 if (networkManager.LocalClientId != OwnerClientId)
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Developer)
                     {
-                        NetworkLog.LogInfo($"[Session Owner] Received connection approved for Client-{OwnerClientId}! Synchronizing...");
+                        NetworkLog.LogInfo(
+                            $"[Session Owner] Received connection approved for Client-{OwnerClientId}! Synchronizing..."
+                        );
                     }
 
                     networkManager.SceneManager.SynchronizeNetworkObjects(OwnerClientId);
                 }
                 else
                 {
-                    NetworkLog.LogWarning($"[Client-{OwnerClientId}] Receiving duplicate connection approved. Client is already connected!");
+                    NetworkLog.LogWarning(
+                        $"[Client-{OwnerClientId}] Receiving duplicate connection approved. Client is already connected!"
+                    );
                 }
                 ConnectedClientIds.Dispose();
                 return;
@@ -284,16 +304,24 @@ namespace Unity.Netcode
                     {
                         networkManager.SceneManager.InitializeScenesLoaded();
                     }
-                    if (networkManager.NetworkConfig.ConnectionApproval && networkManager.LogLevel <= LogLevel.Developer)
+                    if (
+                        networkManager.NetworkConfig.ConnectionApproval
+                        && networkManager.LogLevel <= LogLevel.Developer
+                    )
                     {
-                        NetworkLog.LogWarning($"{nameof(NetworkConfig.ConnectionApproval)} is enabled but is not supported when using a distributed authority topology. The {nameof(NetworkManager.ConnectionApprovalCallback)} will not be invoked.");
+                        NetworkLog.LogWarning(
+                            $"{nameof(NetworkConfig.ConnectionApproval)} is enabled but is not supported when using a distributed authority topology. The {nameof(NetworkManager.ConnectionApprovalCallback)} will not be invoked."
+                        );
                     }
                 }
             }
 
             var time = new NetworkTime(networkManager.NetworkTickSystem.TickRate, NetworkTick);
             networkManager.NetworkTimeSystem.Reset(time.Time, 0.15f); // Start with a constant RTT of 150 until we receive values from the transport.
-            networkManager.NetworkTickSystem.Reset(networkManager.NetworkTimeSystem.LocalTime, networkManager.NetworkTimeSystem.ServerTime);
+            networkManager.NetworkTickSystem.Reset(
+                networkManager.NetworkTimeSystem.LocalTime,
+                networkManager.NetworkTimeSystem.ServerTime
+            );
 
             networkManager.ConnectionManager.LocalClient.SetRole(false, true, networkManager);
             networkManager.ConnectionManager.LocalClient.IsApproved = true;
@@ -306,7 +334,10 @@ namespace Unity.Netcode
                 // DANGO-TODO: Revisit the entire connection sequence and determine why we would need to check both cases as we shouldn't have to =or= we could
                 // try removing this after the Rust server connection sequence stuff is resolved. (Might be only needed if scene management is disabled)
                 // If there is any disconnect between the connection sequence of Ids vs ConnectedClients, then add the client.
-                if (!networkManager.ConnectionManager.ConnectedClientIds.Contains(clientId) || !networkManager.ConnectionManager.ConnectedClients.ContainsKey(clientId))
+                if (
+                    !networkManager.ConnectionManager.ConnectedClientIds.Contains(clientId)
+                    || !networkManager.ConnectionManager.ConnectedClients.ContainsKey(clientId)
+                )
                 {
                     networkManager.ConnectionManager.AddClient(clientId);
                 }
@@ -354,7 +385,9 @@ namespace Unity.Netcode
 
                 if (NetworkLog.CurrentLogLevel <= LogLevel.Developer)
                 {
-                    NetworkLog.LogInfo($"[Client-{OwnerClientId}][Scene Management Disabled] Synchronization complete!");
+                    NetworkLog.LogInfo(
+                        $"[Client-{OwnerClientId}][Scene Management Disabled] Synchronization complete!"
+                    );
                 }
                 // When scene management is disabled we notify after everything is synchronized
                 networkManager.ConnectionManager.InvokeOnClientConnectedCallback(OwnerClientId);
@@ -364,7 +397,12 @@ namespace Unity.Netcode
             }
             else
             {
-                if (networkManager.DistributedAuthorityMode && networkManager.CMBServiceConnection && networkManager.LocalClient.IsSessionOwner && networkManager.NetworkConfig.EnableSceneManagement)
+                if (
+                    networkManager.DistributedAuthorityMode
+                    && networkManager.CMBServiceConnection
+                    && networkManager.LocalClient.IsSessionOwner
+                    && networkManager.NetworkConfig.EnableSceneManagement
+                )
                 {
                     // Mark the client being connected
                     networkManager.IsConnectedClient = networkManager.ConnectionManager.LocalClient.IsApproved;

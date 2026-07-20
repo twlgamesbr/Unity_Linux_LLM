@@ -18,11 +18,16 @@ namespace Unity.PlatformToolkit.PlayMode
         public IAccountPickerSystem AccountPickerSystem { get; }
         public ISavingSystem LocalSavingSystem { get; }
 
-        public PlayModePlatformToolkit(IPlayModeCapability playModeCapability, IEnvironment environment, IPlayModeUserManager userManager, PlayModeSaveData localSaveData)
+        public PlayModePlatformToolkit(
+            IPlayModeCapability playModeCapability,
+            IEnvironment environment,
+            IPlayModeUserManager userManager,
+            PlayModeSaveData localSaveData
+        )
         {
             var accountsSupported =
-                playModeCapability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported ||
-                playModeCapability.AdditionalAccountBehaviour != AdditionalAccountBehaviour.NotSupported;
+                playModeCapability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported
+                || playModeCapability.AdditionalAccountBehaviour != AdditionalAccountBehaviour.NotSupported;
 
             var primaryAccountSupported =
                 playModeCapability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported;
@@ -31,8 +36,14 @@ namespace Unity.PlatformToolkit.PlayMode
             {
                 AccountSupport = accountsSupported,
                 PrimaryAccount = primaryAccountSupported,
-                PrimaryAccountEstablishLimited = primaryAccountSupported && (!playModeCapability.AllowMultipleSignInAttempts || playModeCapability.AccountsCannotSignInOffline),
-                AdditionalAccountSystem = playModeCapability.AdditionalAccountBehaviour != AdditionalAccountBehaviour.NotSupported,
+                PrimaryAccountEstablishLimited =
+                    primaryAccountSupported
+                    && (
+                        !playModeCapability.AllowMultipleSignInAttempts
+                        || playModeCapability.AccountsCannotSignInOffline
+                    ),
+                AdditionalAccountSystem =
+                    playModeCapability.AdditionalAccountBehaviour != AdditionalAccountBehaviour.NotSupported,
                 AccountName = true,
                 AccountPicture = true,
                 AccountSavingSystem = accountsSupported,
@@ -54,7 +65,13 @@ namespace Unity.PlatformToolkit.PlayMode
         public async Task Initialize()
         {
             await m_Environment.WaitIfPaused();
-            AccountSystemManager = new PlayModeAccountSystemManager(m_Environment, m_UserManager, Capabilities, m_PlayModeCapability, m_Metrics);
+            AccountSystemManager = new PlayModeAccountSystemManager(
+                m_Environment,
+                m_UserManager,
+                Capabilities,
+                m_PlayModeCapability,
+                m_Metrics
+            );
 #if INPUT_SYSTEM_AVAILABLE
             AccountSystemManager.SetInputSystem(m_InputSystem);
 #endif // INPUT_SYSTEM_AVAILABLE

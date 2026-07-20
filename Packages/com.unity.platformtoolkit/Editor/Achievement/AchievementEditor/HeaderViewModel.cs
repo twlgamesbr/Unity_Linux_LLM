@@ -5,7 +5,8 @@ namespace Unity.PlatformToolkit.Editor
 {
     internal class HeaderViewModel
     {
-        [CreateProperty] public string HeaderText;
+        [CreateProperty]
+        public string HeaderText;
 
         [CreateProperty]
         public IReadOnlyList<string> Warnings { get; set; }

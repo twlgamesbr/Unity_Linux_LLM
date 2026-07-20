@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using UnityEngine.TextCore;
-using UnityEditor;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections.Generic;
 using TMPro.EditorUtilities;
 using TMPro.SpriteAssetUtilities;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.TextCore;
 
 namespace TMPro
 {
@@ -27,7 +27,10 @@ namespace TMPro
 
         TMP_SpriteAsset m_SpriteAsset;
 
-        static readonly GUIContent k_ConvertSpriteNameToUnicodeLabel = new GUIContent("Use filenames as Unicodes", "Should sprite filenames be converted and assigned as Unicode code points for each sprite? This conversion assumes the sprite filenames represent valid Unicode code points.");
+        static readonly GUIContent k_ConvertSpriteNameToUnicodeLabel = new GUIContent(
+            "Use filenames as Unicodes",
+            "Should sprite filenames be converted and assigned as Unicode code points for each sprite? This conversion assumes the sprite filenames represent valid Unicode code points."
+        );
         static bool k_SpriteNameIsUnicodeValue;
 
         /// <summary>
@@ -68,14 +71,21 @@ namespace TMPro
             EditorGUI.BeginChangeCheck();
 
             // Sprite Texture Selection
-            m_JsonFile = EditorGUILayout.ObjectField("Sprite Data Source", m_JsonFile, typeof(TextAsset), false) as TextAsset;
+            m_JsonFile =
+                EditorGUILayout.ObjectField("Sprite Data Source", m_JsonFile, typeof(TextAsset), false) as TextAsset;
 
-            m_SpriteDataFormat = (SpriteAssetImportFormats)EditorGUILayout.EnumPopup("Import Format", m_SpriteDataFormat);
+            m_SpriteDataFormat = (SpriteAssetImportFormats)
+                EditorGUILayout.EnumPopup("Import Format", m_SpriteDataFormat);
 
-            k_SpriteNameIsUnicodeValue = EditorGUILayout.Toggle(k_ConvertSpriteNameToUnicodeLabel, k_SpriteNameIsUnicodeValue);
+            k_SpriteNameIsUnicodeValue = EditorGUILayout.Toggle(
+                k_ConvertSpriteNameToUnicodeLabel,
+                k_SpriteNameIsUnicodeValue
+            );
 
             // Sprite Texture Selection
-            m_SpriteAtlas = EditorGUILayout.ObjectField("Sprite Texture Atlas", m_SpriteAtlas, typeof(Texture2D), false) as Texture2D;
+            m_SpriteAtlas =
+                EditorGUILayout.ObjectField("Sprite Texture Atlas", m_SpriteAtlas, typeof(Texture2D), false)
+                as Texture2D;
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -84,7 +94,8 @@ namespace TMPro
 
             GUILayout.Space(10);
 
-            GUI.enabled = m_JsonFile != null && m_SpriteAtlas != null && m_SpriteDataFormat != SpriteAssetImportFormats.None;
+            GUI.enabled =
+                m_JsonFile != null && m_SpriteAtlas != null && m_SpriteDataFormat != SpriteAssetImportFormats.None;
 
             // Create Sprite Asset
             if (GUILayout.Button("Create Sprite Asset"))
@@ -104,11 +115,16 @@ namespace TMPro
                             TexturePacker_JsonArray.SpriteDataObject jsonData = null;
                             try
                             {
-                                jsonData = JsonUtility.FromJson<TexturePacker_JsonArray.SpriteDataObject>(m_JsonFile.text);
+                                jsonData = JsonUtility.FromJson<TexturePacker_JsonArray.SpriteDataObject>(
+                                    m_JsonFile.text
+                                );
                             }
                             catch
                             {
-                                m_CreationFeedback = "The Sprite Data Source file [" + m_JsonFile.name + "] appears to be invalid or incorrectly formatted.";
+                                m_CreationFeedback =
+                                    "The Sprite Data Source file ["
+                                    + m_JsonFile.name
+                                    + "] appears to be invalid or incorrectly formatted.";
                             }
 
                             if (jsonData != null && jsonData.frames != null && jsonData.frames.Count > 0)
@@ -117,7 +133,10 @@ namespace TMPro
 
                                 // Update import results
                                 m_CreationFeedback = "<b>Import Results</b>\n--------------------\n";
-                                m_CreationFeedback += "<color=#C0ffff><b>" + spriteCount + "</b></color> Sprites were imported from file.";
+                                m_CreationFeedback +=
+                                    "<color=#C0ffff><b>"
+                                    + spriteCount
+                                    + "</b></color> Sprites were imported from file.";
 
                                 // Create new Sprite Asset
                                 m_SpriteAsset = CreateInstance<TMP_SpriteAsset>();
@@ -152,7 +171,12 @@ namespace TMPro
             GUI.enabled = m_JsonFile != null && m_SpriteAtlas && m_SpriteAsset != null;
             if (GUILayout.Button("Save Sprite Asset") && m_JsonFile != null)
             {
-                string filePath = EditorUtility.SaveFilePanel("Save Sprite Asset File", new FileInfo(AssetDatabase.GetAssetPath(m_JsonFile)).DirectoryName, m_JsonFile.name, "asset");
+                string filePath = EditorUtility.SaveFilePanel(
+                    "Save Sprite Asset File",
+                    new FileInfo(AssetDatabase.GetAssetPath(m_JsonFile)).DirectoryName,
+                    m_JsonFile.name,
+                    "asset"
+                );
 
                 if (filePath.Length == 0)
                     return;
@@ -168,7 +192,11 @@ namespace TMPro
         /// <param name="spriteDataObject"></param>
         /// <param name="spriteCharacterTable"></param>
         /// <param name="spriteGlyphTable"></param>
-        private static void PopulateSpriteTables(TexturePacker_JsonArray.SpriteDataObject spriteDataObject, List<TMP_SpriteCharacter> spriteCharacterTable, List<TMP_SpriteGlyph> spriteGlyphTable)
+        private static void PopulateSpriteTables(
+            TexturePacker_JsonArray.SpriteDataObject spriteDataObject,
+            List<TMP_SpriteCharacter> spriteCharacterTable,
+            List<TMP_SpriteGlyph> spriteGlyphTable
+        )
         {
             List<TexturePacker_JsonArray.Frame> importedSprites = spriteDataObject.frames;
 
@@ -181,8 +209,19 @@ namespace TMPro
                 TMP_SpriteGlyph spriteGlyph = new TMP_SpriteGlyph();
                 spriteGlyph.index = (uint)i;
 
-                spriteGlyph.metrics = new GlyphMetrics((int)spriteData.frame.w, (int)spriteData.frame.h, -spriteData.frame.w * spriteData.pivot.x, spriteData.frame.h * spriteData.pivot.y, (int)spriteData.frame.w);
-                spriteGlyph.glyphRect = new GlyphRect((int)spriteData.frame.x, (int)(atlasHeight - spriteData.frame.h - spriteData.frame.y), (int)spriteData.frame.w, (int)spriteData.frame.h);
+                spriteGlyph.metrics = new GlyphMetrics(
+                    (int)spriteData.frame.w,
+                    (int)spriteData.frame.h,
+                    -spriteData.frame.w * spriteData.pivot.x,
+                    spriteData.frame.h * spriteData.pivot.y,
+                    (int)spriteData.frame.w
+                );
+                spriteGlyph.glyphRect = new GlyphRect(
+                    (int)spriteData.frame.x,
+                    (int)(atlasHeight - spriteData.frame.h - spriteData.frame.y),
+                    (int)spriteData.frame.w,
+                    (int)spriteData.frame.h
+                );
                 spriteGlyph.scale = 1.0f;
 
                 spriteGlyphTable.Add(spriteGlyph);
@@ -223,7 +262,11 @@ namespace TMPro
 
             if (filePath.IndexOf(dataPath, System.StringComparison.InvariantCultureIgnoreCase) == -1)
             {
-                Debug.LogError("You're saving the font asset in a directory outside of this project folder. This is not supported. Please select a directory under \"" + dataPath + "\"");
+                Debug.LogError(
+                    "You're saving the font asset in a directory outside of this project folder. This is not supported. Please select a directory under \""
+                        + dataPath
+                        + "\""
+                );
                 return;
             }
 
@@ -269,7 +312,10 @@ namespace TMPro
 
             Vector2 currentWindowSize = editorWindow.minSize;
 
-            editorWindow.minSize = new Vector2(Mathf.Max(230, currentWindowSize.x), Mathf.Max(300, currentWindowSize.y));
+            editorWindow.minSize = new Vector2(
+                Mathf.Max(230, currentWindowSize.x),
+                Mathf.Max(300, currentWindowSize.y)
+            );
         }
     }
 }

@@ -6,6 +6,6 @@ namespace Unity.Rendering
     [MaterialProperty("unity_ProbeVolumeParams")]
     internal struct BuiltinMaterialPropertyUnity_ProbeVolumeParams : IComponentData
     {
-        public float4   Value;
+        public float4 Value;
     }
 }

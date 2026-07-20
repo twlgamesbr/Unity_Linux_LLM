@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using UnityEditor;
-using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace EditorAttributes.Editor
@@ -13,51 +13,67 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The attached field must derive from <b>UnityEngine.Object</b>", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The attached field must derive from <b>UnityEngine.Object</b>",
+                    HelpBoxMessageType.Error
+                );
 
             var typeFilterAttribute = attribute as TypeFilterAttribute;
 
             PropertyField propertyField = CreatePropertyField(property);
 
-            propertyField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var objectField = propertyField.Q<ObjectField>();
-
-                objectField.objectType = property.objectReferenceValue != null ? property.objectReferenceValue.GetType() : typeFilterAttribute.TypesToFilter.FirstOrDefault();
-
-                objectField.RegisterCallback<DragEnterEvent>(callback =>
+            propertyField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
                 {
-                    Object draggedObject = DragAndDrop.objectReferences.FirstOrDefault();
+                    var objectField = propertyField.Q<ObjectField>();
 
-                    if (draggedObject != null)
+                    objectField.objectType =
+                        property.objectReferenceValue != null
+                            ? property.objectReferenceValue.GetType()
+                            : typeFilterAttribute.TypesToFilter.FirstOrDefault();
+
+                    objectField.RegisterCallback<DragEnterEvent>(callback =>
                     {
-                        Type acceptedDraggedType = null;
+                        Object draggedObject = DragAndDrop.objectReferences.FirstOrDefault();
 
-                        // Check if the dragged object is compatible with any of the allowed types
-                        bool isValidType = typeFilterAttribute.TypesToFilter.Any(type =>
+                        if (draggedObject != null)
                         {
-                            var objectType = type;
+                            Type acceptedDraggedType = null;
 
-                            if (objectType.IsInstanceOfType(draggedObject))
+                            // Check if the dragged object is compatible with any of the allowed types
+                            bool isValidType = typeFilterAttribute.TypesToFilter.Any(type =>
                             {
-                                acceptedDraggedType = objectType;
-                                return true;
-                            }
+                                var objectType = type;
 
-                            return false;
-                        });
+                                if (objectType.IsInstanceOfType(draggedObject))
+                                {
+                                    acceptedDraggedType = objectType;
+                                    return true;
+                                }
 
-                        if (isValidType)
-                            objectField.objectType = acceptedDraggedType;
-                    }
-                });
+                                return false;
+                            });
 
-                objectField.TrackPropertyValue(property, (trackedProperty) => objectField.objectType = trackedProperty.objectReferenceValue != null ? trackedProperty.objectReferenceValue.GetType() : typeFilterAttribute.TypesToFilter.FirstOrDefault());
-            });
+                            if (isValidType)
+                                objectField.objectType = acceptedDraggedType;
+                        }
+                    });
+
+                    objectField.TrackPropertyValue(
+                        property,
+                        (trackedProperty) =>
+                            objectField.objectType =
+                                trackedProperty.objectReferenceValue != null
+                                    ? trackedProperty.objectReferenceValue.GetType()
+                                    : typeFilterAttribute.TypesToFilter.FirstOrDefault()
+                    );
+                }
+            );
 
             return propertyField;
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.ObjectReference;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.ObjectReference;
     }
 }

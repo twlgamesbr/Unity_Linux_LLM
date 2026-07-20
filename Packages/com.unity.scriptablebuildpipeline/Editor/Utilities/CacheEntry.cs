@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace UnityEditor.Build.Pipeline.Utilities
 {
-    interface ICachedData {}
+    interface ICachedData { }
 
     /// <summary>
     /// Stores asset information for the cache.
@@ -42,23 +42,28 @@ namespace UnityEditor.Build.Pipeline.Utilities
             /// Indicates that the entry is an asset.
             /// </summary>
             Asset,
+
             /// <summary>
             /// Indicates that the entry is a file.
             /// </summary>
             File,
+
             /// <summary>
             /// Indicates that the entry holds general data.
             /// </summary>
             Data,
+
             /// <summary>
             /// Indicates that the entry is a type.
             /// </summary>
-            ScriptType
+            ScriptType,
         }
 
         internal enum InclusionType
         {
-            None, Explicit, Implicit
+            None,
+            Explicit,
+            Implicit,
         }
 
         /// <summary>
@@ -115,13 +120,13 @@ namespace UnityEditor.Build.Pipeline.Utilities
         }
 
         /// <inheritdoc/>
-        public static bool operator==(CacheEntry x, CacheEntry y)
+        public static bool operator ==(CacheEntry x, CacheEntry y)
         {
             return x.Equals(y);
         }
 
         /// <inheritdoc/>
-        public static bool operator!=(CacheEntry x, CacheEntry y)
+        public static bool operator !=(CacheEntry x, CacheEntry y)
         {
             return !(x == y);
         }
@@ -165,7 +170,13 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <returns>Returns true if the entries are equivalent. Returns false otherwise.</returns>
         public bool Equals(CacheEntry other)
         {
-            return Hash.Equals(other.Hash) && Guid.Equals(other.Guid) && Version == other.Version && Type == other.Type && Inclusion == other.Inclusion && string.Equals(File, other.File) && string.Equals(ScriptType, other.ScriptType);
+            return Hash.Equals(other.Hash)
+                && Guid.Equals(other.Guid)
+                && Version == other.Version
+                && Type == other.Type
+                && Inclusion == other.Inclusion
+                && string.Equals(File, other.File)
+                && string.Equals(ScriptType, other.ScriptType);
         }
     }
 }

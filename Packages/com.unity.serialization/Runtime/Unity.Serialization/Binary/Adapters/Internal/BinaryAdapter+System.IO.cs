@@ -3,11 +3,12 @@ using Unity.Collections.LowLevel.Unsafe.NotBurstCompatible;
 
 namespace Unity.Serialization.Binary
 {
-    unsafe partial class BinaryAdapter :
-        IBinaryAdapter<DirectoryInfo>,
-        IBinaryAdapter<FileInfo>
+    unsafe partial class BinaryAdapter : IBinaryAdapter<DirectoryInfo>, IBinaryAdapter<FileInfo>
     {
-        void IBinaryAdapter<DirectoryInfo>.Serialize(in BinarySerializationContext<DirectoryInfo> context, DirectoryInfo value)
+        void IBinaryAdapter<DirectoryInfo>.Serialize(
+            in BinarySerializationContext<DirectoryInfo> context,
+            DirectoryInfo value
+        )
         {
             if (null == value)
                 context.Writer->AddNBC("null");

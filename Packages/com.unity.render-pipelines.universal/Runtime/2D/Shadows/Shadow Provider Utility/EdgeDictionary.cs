@@ -5,7 +5,9 @@ namespace UnityEngine.Rendering.Universal
 {
     internal struct EdgeDictionary : IEdgeStore
     {
-        static private Dictionary<ShadowEdge, int> m_EdgeDictionary = new Dictionary<ShadowEdge, int>(new EdgeComparer());  // This is done so we don't create garbage allocating and deallocating a dictionary object
+        private static Dictionary<ShadowEdge, int> m_EdgeDictionary = new Dictionary<ShadowEdge, int>(
+            new EdgeComparer()
+        ); // This is done so we don't create garbage allocating and deallocating a dictionary object
 
         private class EdgeComparer : IEqualityComparer<ShadowEdge>
         {
@@ -29,6 +31,7 @@ namespace UnityEngine.Rendering.Universal
                 return hashCode.GetHashCode();
             }
         }
+
         public NativeArray<ShadowEdge> GetOutsideEdges(NativeArray<Vector3> vertices, NativeArray<int> indices)
         {
             m_EdgeDictionary.Clear();

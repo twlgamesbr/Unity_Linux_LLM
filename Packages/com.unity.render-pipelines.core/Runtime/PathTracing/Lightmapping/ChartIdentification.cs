@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Unity.Jobs;
 using Unity.Collections;
+using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace UnityEngine.PathTracing.Lightmapping
@@ -51,7 +51,13 @@ namespace UnityEngine.PathTracing.Lightmapping
             }
         }
 
-        public static void UnionDuplicateVertices(ReadOnlySpan<float2> vertexUvs, ReadOnlySpan<float3> vertexPositions, ReadOnlySpan<float3> vertexNormals, Span<UInt32> vertexChartIds, bool respectNormals)
+        public static void UnionDuplicateVertices(
+            ReadOnlySpan<float2> vertexUvs,
+            ReadOnlySpan<float3> vertexPositions,
+            ReadOnlySpan<float3> vertexNormals,
+            Span<UInt32> vertexChartIds,
+            bool respectNormals
+        )
         {
             var map = new Dictionary<(float2, float3, float3), uint>();
             for (uint i = 0; i < vertexChartIds.Length; ++i)
@@ -59,7 +65,8 @@ namespace UnityEngine.PathTracing.Lightmapping
                 var tuple = (
                     vertexUvs[(int)i],
                     vertexPositions[(int)i],
-                    respectNormals ? vertexNormals[(int)i] : float3.zero);
+                    respectNormals ? vertexNormals[(int)i] : float3.zero
+                );
                 if (map.TryGetValue(tuple, out uint deduplicatedIndex))
                 {
                     Union(vertexChartIds, i, deduplicatedIndex);
@@ -161,17 +168,32 @@ namespace UnityEngine.PathTracing.Lightmapping
                 ChartIdentification.UnionTriangleEdges(InputVertexIndexBuffer, OutputVertexChartIndicesBuffer);
 
                 // Union duplicate verts taking normal into account
-                ChartIdentification.UnionDuplicateVertices(InputVertexUvBuffer, InputVertexPositionBuffer, InputVertexNormalBuffer, OutputVertexChartIndicesBuffer, respectNormals: true);
+                ChartIdentification.UnionDuplicateVertices(
+                    InputVertexUvBuffer,
+                    InputVertexPositionBuffer,
+                    InputVertexNormalBuffer,
+                    OutputVertexChartIndicesBuffer,
+                    respectNormals: true
+                );
                 ChartIdentification.FindRepresentatives(OutputVertexChartIndicesBuffer);
 
                 // Union duplicate verts NOT taking normal into account
                 OutputVertexChartIndicesBuffer.CopyTo(OutputVertexChartIndicesIgnoringNormalsBuffer);
-                ChartIdentification.UnionDuplicateVertices(InputVertexUvBuffer, InputVertexPositionBuffer, InputVertexNormalBuffer, OutputVertexChartIndicesIgnoringNormalsBuffer, respectNormals: false);
+                ChartIdentification.UnionDuplicateVertices(
+                    InputVertexUvBuffer,
+                    InputVertexPositionBuffer,
+                    InputVertexNormalBuffer,
+                    OutputVertexChartIndicesIgnoringNormalsBuffer,
+                    respectNormals: false
+                );
                 ChartIdentification.FindRepresentatives(OutputVertexChartIndicesIgnoringNormalsBuffer);
 
                 // Compact and output both mappings
                 ChartIdentification.Compact(OutputVertexChartIndicesBuffer, out uint outputChartCount);
-                ChartIdentification.Compact(OutputVertexChartIndicesIgnoringNormalsBuffer, out uint outputChartIgnoringNormalsCount);
+                ChartIdentification.Compact(
+                    OutputVertexChartIndicesIgnoringNormalsBuffer,
+                    out uint outputChartIgnoringNormalsCount
+                );
                 OutputChartCount[0] = outputChartCount;
                 OutputChartCount[1] = outputChartIgnoringNormalsCount;
             }
@@ -195,12 +217,29 @@ namespace UnityEngine.PathTracing.Lightmapping
                 if (uvBuffer == null || uvBuffer.Length == 0)
                     uvBuffer = mesh.uv;
 
-                var inputVertexIndices = new NativeArray<Int32>(mesh.triangles, Allocator.TempJob).Reinterpret<UInt32>(sizeof(Int32));
-                var inputVertexUvs = new NativeArray<Vector2>(uvBuffer, Allocator.TempJob).Reinterpret<float2>(sizeof(float) * 2);
-                var inputVertexPositions = new NativeArray<Vector3>(mesh.vertices, Allocator.TempJob).Reinterpret<float3>(sizeof(float) * 3);
-                var inputVertexNormals = new NativeArray<Vector3>(mesh.normals, Allocator.TempJob).Reinterpret<float3>(sizeof(float) * 3);
-                var outputChartIndices = new NativeArray<UInt32>(mesh.vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                var outputChartIndicesIgnoringNormals = new NativeArray<UInt32>(mesh.vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                var inputVertexIndices = new NativeArray<Int32>(mesh.triangles, Allocator.TempJob).Reinterpret<UInt32>(
+                    sizeof(Int32)
+                );
+                var inputVertexUvs = new NativeArray<Vector2>(uvBuffer, Allocator.TempJob).Reinterpret<float2>(
+                    sizeof(float) * 2
+                );
+                var inputVertexPositions = new NativeArray<Vector3>(
+                    mesh.vertices,
+                    Allocator.TempJob
+                ).Reinterpret<float3>(sizeof(float) * 3);
+                var inputVertexNormals = new NativeArray<Vector3>(mesh.normals, Allocator.TempJob).Reinterpret<float3>(
+                    sizeof(float) * 3
+                );
+                var outputChartIndices = new NativeArray<UInt32>(
+                    mesh.vertexCount,
+                    Allocator.TempJob,
+                    NativeArrayOptions.UninitializedMemory
+                );
+                var outputChartIndicesIgnoringNormals = new NativeArray<UInt32>(
+                    mesh.vertexCount,
+                    Allocator.TempJob,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 var outputChartCount = new NativeArray<UInt32>(2, Allocator.TempJob);
                 var job = new MeshChartIdentificationJob
                 {

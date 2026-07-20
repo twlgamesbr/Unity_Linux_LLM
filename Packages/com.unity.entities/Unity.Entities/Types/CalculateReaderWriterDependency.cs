@@ -18,7 +18,11 @@ namespace Unity.Entities
                 return AddWriterTypeIndex(type.TypeIndex, ref reading, ref writing);
         }
 
-        public static bool AddReaderTypeIndex(TypeIndex typeIndex, ref UnsafeList<TypeIndex> reading, ref UnsafeList<TypeIndex> writing)
+        public static bool AddReaderTypeIndex(
+            TypeIndex typeIndex,
+            ref UnsafeList<TypeIndex> reading,
+            ref UnsafeList<TypeIndex> writing
+        )
         {
             if (reading.Contains(typeIndex))
                 return false;
@@ -29,7 +33,11 @@ namespace Unity.Entities
             return true;
         }
 
-        public static bool AddWriterTypeIndex(TypeIndex typeIndex, ref UnsafeList<TypeIndex> reading, ref UnsafeList<TypeIndex> writing)
+        public static bool AddWriterTypeIndex(
+            TypeIndex typeIndex,
+            ref UnsafeList<TypeIndex> reading,
+            ref UnsafeList<TypeIndex> writing
+        )
         {
             if (writing.Contains(typeIndex))
                 return false;

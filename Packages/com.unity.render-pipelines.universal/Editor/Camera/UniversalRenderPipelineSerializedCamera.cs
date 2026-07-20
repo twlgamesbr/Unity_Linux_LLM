@@ -51,7 +51,10 @@ namespace UnityEditor.Rendering.Universal
                     throw new ArgumentOutOfRangeException($"{index} is out of bounds [0 - {numCameras}]");
 
                 // Return the camera on that index
-                return (cameras.GetArrayElementAtIndex(index).objectReferenceValue as Camera, cameraSerializedObjects[index]);
+                return (
+                    cameras.GetArrayElementAtIndex(index).objectReferenceValue as Camera,
+                    cameraSerializedObjects[index]
+                );
             }
         }
 
@@ -61,7 +64,10 @@ namespace UnityEditor.Rendering.Universal
 
         public UniversalAdditionalCameraData[] camerasAdditionalData { get; }
 
-        public UniversalRenderPipelineSerializedCamera(SerializedObject serializedObject, CameraEditor.Settings settings = null)
+        public UniversalRenderPipelineSerializedCamera(
+            SerializedObject serializedObject,
+            CameraEditor.Settings settings = null
+        )
         {
             this.serializedObject = serializedObject;
             projectionMatrixMode = serializedObject.FindProperty("m_projectionMatrixMode");
@@ -78,8 +84,9 @@ namespace UnityEditor.Rendering.Universal
                 baseCameraSettings = settings;
             }
 
-            camerasAdditionalData = CoreEditorUtils
-                .GetAdditionalData<UniversalAdditionalCameraData>(serializedObject.targetObjects);
+            camerasAdditionalData = CoreEditorUtils.GetAdditionalData<UniversalAdditionalCameraData>(
+                serializedObject.targetObjects
+            );
             serializedAdditionalDataObject = new SerializedObject(camerasAdditionalData);
 
             // Common properties
@@ -96,7 +103,9 @@ namespace UnityEditor.Rendering.Universal
             renderer = serializedAdditionalDataObject.FindProperty("m_RendererIndex");
             volumeLayerMask = serializedAdditionalDataObject.FindProperty("m_VolumeLayerMask");
             volumeTrigger = serializedAdditionalDataObject.FindProperty("m_VolumeTrigger");
-            volumeFrameworkUpdateMode = serializedAdditionalDataObject.FindProperty("m_VolumeFrameworkUpdateModeOption");
+            volumeFrameworkUpdateMode = serializedAdditionalDataObject.FindProperty(
+                "m_VolumeFrameworkUpdateModeOption"
+            );
             renderPostProcessing = serializedAdditionalDataObject.FindProperty("m_RenderPostProcessing");
             antialiasingQuality = serializedAdditionalDataObject.FindProperty("m_AntialiasingQuality");
             cameraType = serializedAdditionalDataObject.FindProperty("m_CameraType");
@@ -105,13 +114,17 @@ namespace UnityEditor.Rendering.Universal
             allowXRRendering = serializedAdditionalDataObject.FindProperty("m_AllowXRRendering");
 #endif
 
-            var taaSettings = serializedAdditionalDataObject.FindProperty(nameof(UniversalAdditionalCameraData.m_TaaSettings));
+            var taaSettings = serializedAdditionalDataObject.FindProperty(
+                nameof(UniversalAdditionalCameraData.m_TaaSettings)
+            );
             taaQuality = taaSettings.FindPropertyRelative(nameof(TemporalAA.Settings.m_Quality));
             taaFrameInfluence = taaSettings.FindPropertyRelative(nameof(TemporalAA.Settings.m_FrameInfluence));
             taaJitterScale = taaSettings.FindPropertyRelative(nameof(TemporalAA.Settings.m_JitterScale));
             taaMipBias = taaSettings.FindPropertyRelative(nameof(TemporalAA.Settings.m_MipBias));
             taaVarianceClampScale = taaSettings.FindPropertyRelative(nameof(TemporalAA.Settings.m_VarianceClampScale));
-            taaContrastAdaptiveSharpening = taaSettings.FindPropertyRelative(nameof(TemporalAA.Settings.m_ContrastAdaptiveSharpening));
+            taaContrastAdaptiveSharpening = taaSettings.FindPropertyRelative(
+                nameof(TemporalAA.Settings.m_ContrastAdaptiveSharpening)
+            );
 
             allowHDROutput = serializedAdditionalDataObject.FindProperty("m_AllowHDROutput");
         }

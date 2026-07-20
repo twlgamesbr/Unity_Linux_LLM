@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using UnityEngine;
 using UnityEditor;
-using System;
+using UnityEngine;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -15,21 +15,26 @@ namespace Unity.Web.Stripping.Editor
         /// Do nothing if a function of a stripped submodule is called.
         /// </summary>
         Ignore = 0,
+
         /// <summary>
         /// Log an error to the browser console if a function of a stripped submodule is called,
         /// but try to continue execution.
         /// </summary>
         LogError,
+
         /// <summary>
         /// Throw an exception if a function of a stripped submodule is called and halt execution.
         /// </summary>
-        ThrowException
+        ThrowException,
     }
 
     /// <summary>
     /// An asset for configuring submodule stripping settings.
     /// </summary>
-    [CreateAssetMenu(fileName = "SubmoduleStrippingSettings", menuName = RootMenuName + "/Submodule Stripping Settings")]
+    [CreateAssetMenu(
+        fileName = "SubmoduleStrippingSettings",
+        menuName = RootMenuName + "/Submodule Stripping Settings"
+    )]
     [HelpURL(PackageConstants.DocumentationUrl + "/manual/" + k_DocumentationPage + ".html")]
     public class SubmoduleStrippingSettings : ScriptableObject
     {
@@ -50,14 +55,18 @@ namespace Unity.Web.Stripping.Editor
         /// Run code optimization to reduce final build size and improve performance.
         /// Increases the stripping time significantly. Use on release builds.
         /// </summary>
-        [Tooltip("Run code optimization to reduce final build size and improve performance. Increases the stripping time significantly. Use on release builds.")]
+        [Tooltip(
+            "Run code optimization to reduce final build size and improve performance. Increases the stripping time significantly. Use on release builds."
+        )]
         public bool OptimizeCodeAfterStripping;
 
         /// <summary>
         /// Remove debug information after stripping.
         /// It is preferred to use <see cref="RemoveDebugInformation">RemoveDebugInformation</see> instead.
         /// </summary>
-        [Tooltip("Remove debug information after stripping. Debug symbols are required to identify functions during stripping, but they increase the size of WebAssembly files. Use on release builds if debug symbols are not required for other uses cases.")]
+        [Tooltip(
+            "Remove debug information after stripping. Debug symbols are required to identify functions during stripping, but they increase the size of WebAssembly files. Use on release builds if debug symbols are not required for other uses cases."
+        )]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool RemoveEmbeddedDebugSymbols;
 
@@ -67,15 +76,13 @@ namespace Unity.Web.Stripping.Editor
         /// but they increase the size of WebAssembly files.
         /// Use on release builds if debug symbols are not required for other use cases.
         /// </summary>
-        [Tooltip("Remove debug information after stripping. Debug symbols are required to identify functions during stripping, but they increase the size of WebAssembly files. Use on release builds if debug symbols are not required for other uses cases.")]
+        [Tooltip(
+            "Remove debug information after stripping. Debug symbols are required to identify functions during stripping, but they increase the size of WebAssembly files. Use on release builds if debug symbols are not required for other uses cases."
+        )]
         public bool RemoveDebugInformation
         {
             get => RemoveEmbeddedDebugSymbols;
-
-            set
-            {
-                RemoveEmbeddedDebugSymbols = value;
-            }
+            set { RemoveEmbeddedDebugSymbols = value; }
         }
 
         /// <summary>
@@ -85,12 +92,15 @@ namespace Unity.Web.Stripping.Editor
         /// - OptimizeCodeAfterStripping is enabled.
         /// - RemoveDebugInformation is enabled.
         /// </summary>
-        internal bool CanRunStripping => SubmodulesToStrip.Count > 0 || OptimizeCodeAfterStripping || RemoveDebugInformation;
+        internal bool CanRunStripping =>
+            SubmodulesToStrip.Count > 0 || OptimizeCodeAfterStripping || RemoveDebugInformation;
 
         /// <summary>
         /// The error handling behavior when a stripped submodule is used.
         /// </summary>
-        [Tooltip("The error handling behavior when a stripped submodule is used. The usage of a stripped submodule can be ignored, logged to the browser console, or thrown as an exception.")]
+        [Tooltip(
+            "The error handling behavior when a stripped submodule is used. The usage of a stripped submodule can be ignored, logged to the browser console, or thrown as an exception."
+        )]
         public MissingSubmoduleErrorHandlingType MissingSubmoduleErrorHandling;
 
         /// <summary>

@@ -21,8 +21,10 @@ namespace Unity.Physics.Systems
 
         /// <summary>   Query for dynamic bodies. </summary>
         public EntityQuery DynamicEntityGroup;
+
         /// <summary>   Query for bodies. </summary>
         public EntityQuery StaticEntityGroup;
+
         /// <summary>   Query for joints. </summary>
         public EntityQuery JointEntityGroup;
 
@@ -63,8 +65,12 @@ namespace Unity.Physics.Systems
                 PhysicsJointType = systemState.GetComponentTypeHandle<PhysicsJoint>(true);
                 SimulateType = systemState.GetComponentTypeHandle<Simulate>(true);
 
-                PhysicsTemporalCoherenceInfoTypeRW = systemState.GetComponentTypeHandle<PhysicsTemporalCoherenceInfo>(false);
-                PhysicsTemporalCoherenceInfoLookupRW = systemState.GetComponentLookup<PhysicsTemporalCoherenceInfo>(false);
+                PhysicsTemporalCoherenceInfoTypeRW = systemState.GetComponentTypeHandle<PhysicsTemporalCoherenceInfo>(
+                    false
+                );
+                PhysicsTemporalCoherenceInfoLookupRW = systemState.GetComponentLookup<PhysicsTemporalCoherenceInfo>(
+                    false
+                );
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !UNITY_PHYSICS_DISABLE_INTEGRITY_CHECKS
                 PhysicsWorldIndexType = systemState.GetSharedComponentTypeHandle<PhysicsWorldIndex>();
@@ -140,44 +146,58 @@ namespace Unity.Physics.Systems
             PhysicsWorld = new PhysicsWorld(0, 0, 0);
             HaveStaticBodiesChanged = new NativeReference<int>(Allocator.Persistent);
 
-            using (var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-                       .WithAll<PhysicsVelocity, LocalTransform, PhysicsWorldIndex>())
+            using (
+                var queryBuilder = new EntityQueryBuilder(Allocator.Temp).WithAll<
+                    PhysicsVelocity,
+                    LocalTransform,
+                    PhysicsWorldIndex
+                >()
+            )
             {
                 DynamicEntityGroup = state.GetEntityQuery(queryBuilder);
                 DynamicEntityGroup.SetSharedComponentFilter(worldIndex);
             }
 
-            using (var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-                       .WithAll<PhysicsCollider, PhysicsWorldIndex>()
-                       .WithAny<LocalToWorld, LocalTransform>()
-                       .WithNone<PhysicsVelocity>())
+            using (
+                var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+                    .WithAll<PhysicsCollider, PhysicsWorldIndex>()
+                    .WithAny<LocalToWorld, LocalTransform>()
+                    .WithNone<PhysicsVelocity>()
+            )
             {
                 StaticEntityGroup = state.GetEntityQuery(queryBuilder);
                 StaticEntityGroup.SetSharedComponentFilter(worldIndex);
             }
 
-            using (var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-                       .WithAll<PhysicsConstrainedBodyPair, PhysicsJoint, PhysicsWorldIndex>())
+            using (
+                var queryBuilder = new EntityQueryBuilder(Allocator.Temp).WithAll<
+                    PhysicsConstrainedBodyPair,
+                    PhysicsJoint,
+                    PhysicsWorldIndex
+                >()
+            )
             {
                 JointEntityGroup = state.GetEntityQuery(queryBuilder);
                 JointEntityGroup.SetSharedComponentFilter(worldIndex);
             }
 
-            using (var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-                       // neither static nor dynamic
-                       .WithAll<PhysicsTemporalCoherenceInfo>()
-                       .WithNone<PhysicsVelocity, PhysicsCollider>()
-                       .AddAdditionalQuery()
-                       // not in any world
-                       .WithAll<PhysicsTemporalCoherenceInfo>()
-                       .WithNone<PhysicsWorldIndex>()
-                       .AddAdditionalQuery()
-                       // without valid transform
-                       .WithAll<PhysicsTemporalCoherenceInfo>()
-                       .WithNone<LocalToWorld, LocalTransform>()
-                       .AddAdditionalQuery()
-                       // disabled
-                       .WithAll<PhysicsTemporalCoherenceInfo, Disabled>())
+            using (
+                var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+                    // neither static nor dynamic
+                    .WithAll<PhysicsTemporalCoherenceInfo>()
+                    .WithNone<PhysicsVelocity, PhysicsCollider>()
+                    .AddAdditionalQuery()
+                    // not in any world
+                    .WithAll<PhysicsTemporalCoherenceInfo>()
+                    .WithNone<PhysicsWorldIndex>()
+                    .AddAdditionalQuery()
+                    // without valid transform
+                    .WithAll<PhysicsTemporalCoherenceInfo>()
+                    .WithNone<LocalToWorld, LocalTransform>()
+                    .AddAdditionalQuery()
+                    // disabled
+                    .WithAll<PhysicsTemporalCoherenceInfo, Disabled>()
+            )
             {
                 InvalidatedTemporalCoherenceInfoGroup = state.GetEntityQuery(queryBuilder);
             }

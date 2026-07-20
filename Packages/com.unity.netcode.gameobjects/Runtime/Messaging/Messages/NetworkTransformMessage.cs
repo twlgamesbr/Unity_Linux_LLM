@@ -21,7 +21,10 @@ namespace Unity.Netcode
 
         private unsafe void CopyPayload(ref FastBufferWriter writer)
         {
-            writer.WriteBytesSafe(m_CurrentReader.GetUnsafePtrAtCurrentPosition(), m_CurrentReader.Length - m_CurrentReader.Position);
+            writer.WriteBytesSafe(
+                m_CurrentReader.GetUnsafePtrAtCurrentPosition(),
+                m_CurrentReader.Length - m_CurrentReader.Position
+            );
         }
 
         public void Serialize(FastBufferWriter writer, int targetVersion)
@@ -46,13 +49,21 @@ namespace Unity.Netcode
                 // Serialize the current local state.
                 writer.WriteNetworkSerializable(NetworkTransform.LocalAuthoritativeNetworkState);
 #if NGO_NETWORKTRANSFORMSTATE_LOGWRITESIZE
-                var networkTransformStateSize = writer.Position - position - networkObjectIdSize - networkBehaviourIdSize;
+                var networkTransformStateSize =
+                    writer.Position - position - networkObjectIdSize - networkBehaviourIdSize;
 #endif
                 BytesWritten = writer.Position - position;
 
 #if NGO_NETWORKTRANSFORMSTATE_LOGWRITESIZE
-                var parentInfo = writer.Position - position - networkObjectIdSize - networkBehaviourIdSize - networkTransformStateSize;
-                Debug.Log($"[NO-ID: {networkObjectIdSize}][NB-ID: {networkBehaviourIdSize}][NTState: {networkTransformStateSize}][PINFO: {parentInfo}][Total: {BytesWritten}]");
+                var parentInfo =
+                    writer.Position
+                    - position
+                    - networkObjectIdSize
+                    - networkBehaviourIdSize
+                    - networkTransformStateSize;
+                Debug.Log(
+                    $"[NO-ID: {networkObjectIdSize}][NB-ID: {networkBehaviourIdSize}][NTState: {networkTransformStateSize}][PINFO: {parentInfo}][Total: {BytesWritten}]"
+                );
 #endif
             }
         }
@@ -62,7 +73,9 @@ namespace Unity.Netcode
             var networkManager = context.SystemOwner as NetworkManager;
             if (networkManager == null)
             {
-                Debug.LogError($"[{nameof(NetworkTransformMessage)}] System owner context was not of type {nameof(NetworkManager)}!");
+                Debug.LogError(
+                    $"[{nameof(NetworkTransformMessage)}] System owner context was not of type {nameof(NetworkManager)}!"
+                );
                 return false;
             }
             if (networkManager.ShutdownInProgress)
@@ -72,12 +85,21 @@ namespace Unity.Netcode
             var currentPosition = reader.Position;
 
             ByteUnpacker.ReadValueBitPacked(reader, out ulong networkObjectId);
-            var isSpawnedLocally = networkManager.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out var networkObject);
+            var isSpawnedLocally = networkManager.SpawnManager.SpawnedObjects.TryGetValue(
+                networkObjectId,
+                out var networkObject
+            );
 
             // Only defer if the NetworkObject is not spawned yet and the local NetworkManager is not running as a DAHost.
             if (!isSpawnedLocally && !networkManager.DAHost)
             {
-                networkManager.DeferredMessageManager.DeferMessage(IDeferredNetworkMessageManager.TriggerType.OnSpawn, networkObjectId, reader, ref context, k_Name);
+                networkManager.DeferredMessageManager.DeferMessage(
+                    IDeferredNetworkMessageManager.TriggerType.OnSpawn,
+                    networkObjectId,
+                    reader,
+                    ref context,
+                    k_Name
+                );
                 return false;
             }
 
@@ -92,9 +114,14 @@ namespace Unity.Netcode
 
             if (isSpawnedLocally)
             {
-                if (!networkObject.ChildNetworkBehaviours.TryGetValue((ushort)networkBehaviourId, out var behaviour) || behaviour == null)
+                if (
+                    !networkObject.ChildNetworkBehaviours.TryGetValue((ushort)networkBehaviourId, out var behaviour)
+                    || behaviour == null
+                )
                 {
-                    Debug.LogError($"[{nameof(NetworkTransformMessage)}][Invalid] Targeted {nameof(NetworkTransform)}, {nameof(NetworkBehaviour.NetworkBehaviourId)} ({networkBehaviourId}), does not exist! Make sure you are not spawning {nameof(NetworkObject)}s with disabled {nameof(GameObject)}s that have {nameof(NetworkBehaviour)} components on them.");
+                    Debug.LogError(
+                        $"[{nameof(NetworkTransformMessage)}][Invalid] Targeted {nameof(NetworkTransform)}, {nameof(NetworkBehaviour.NetworkBehaviourId)} ({networkBehaviourId}), does not exist! Make sure you are not spawning {nameof(NetworkObject)}s with disabled {nameof(GameObject)}s that have {nameof(NetworkBehaviour)} components on them."
+                    );
                     return false;
                 }
 
@@ -102,7 +129,9 @@ namespace Unity.Netcode
                 var transform = behaviour as NetworkTransform;
                 if (transform == null)
                 {
-                    Debug.LogError($"[{nameof(NetworkTransformMessage)}][Invalid] Targeted {nameof(NetworkTransform)}, {nameof(NetworkBehaviour.NetworkBehaviourId)} ({networkBehaviourId}), does not exist on {networkObject.name}! Make sure you are not spawning {nameof(NetworkObject)}s with disabled {nameof(GameObject)}s that have {nameof(NetworkBehaviour)} components on them.");
+                    Debug.LogError(
+                        $"[{nameof(NetworkTransformMessage)}][Invalid] Targeted {nameof(NetworkTransform)}, {nameof(NetworkBehaviour.NetworkBehaviourId)} ({networkBehaviourId}), does not exist on {networkObject.name}! Make sure you are not spawning {nameof(NetworkObject)}s with disabled {nameof(GameObject)}s that have {nameof(NetworkBehaviour)} components on them."
+                    );
                     return false;
                 }
 
@@ -128,7 +157,9 @@ namespace Unity.Netcode
                 else
                 {
                     // Otherwise we can error out because we either shouldn't be receiving this message.
-                    Debug.LogError($"[{nameof(NetworkTransformMessage)}][Invalid] Target NetworkObject ({networkObjectId}) does not exist!");
+                    Debug.LogError(
+                        $"[{nameof(NetworkTransformMessage)}][Invalid] Target NetworkObject ({networkObjectId}) does not exist!"
+                    );
                     return false;
                 }
             }
@@ -153,7 +184,9 @@ namespace Unity.Netcode
                             // Sanity check, this should never happen.
                             if (count >= targetCount)
                             {
-                                Debug.LogError($"[{nameof(NetworkTransformMessage)}] Exceeded total number of observers!");
+                                Debug.LogError(
+                                    $"[{nameof(NetworkTransformMessage)}] Exceeded total number of observers!"
+                                );
                             }
                             count++;
                         }
@@ -180,12 +213,16 @@ namespace Unity.Netcode
                     // Depending upon whether it is spawned locally or not, get the deserialized state
                     var stateToUse = NetworkTransform != null ? NetworkTransform.InboundState : State;
                     // Determine the reliability used to send the message
-                    var networkDelivery = stateToUse.IsReliableStateUpdate() ? NetworkDelivery.ReliableSequenced : NetworkDelivery.UnreliableSequenced;
+                    var networkDelivery = stateToUse.IsReliableStateUpdate()
+                        ? NetworkDelivery.ReliableSequenced
+                        : NetworkDelivery.UnreliableSequenced;
 
                     // Forward the state update if there are any remote clients to foward it to
                     if (networkManager.ConnectionManager.ConnectedClientsList.Count > (networkManager.IsHost ? 2 : 1))
                     {
-                        var clientCount = networkManager.DistributedAuthorityMode ? targetCount : networkManager.ConnectionManager.ConnectedClientsList.Count;
+                        var clientCount = networkManager.DistributedAuthorityMode
+                            ? targetCount
+                            : networkManager.ConnectionManager.ConnectedClientsList.Count;
                         if (clientCount == 0)
                         {
                             return true;
@@ -202,9 +239,17 @@ namespace Unity.Netcode
 
                         for (int i = 0; i < clientCount; i++)
                         {
-                            var clientId = networkManager.DistributedAuthorityMode ? targetIds[i] : networkManager.ConnectionManager.ConnectedClientsList[i].ClientId;
-                            if (NetworkManager.ServerClientId == clientId || (!isServerAuthoritative && clientId == ownerClientId) ||
-                                (!networkManager.DistributedAuthorityMode && !networkObject.Observers.Contains(clientId)))
+                            var clientId = networkManager.DistributedAuthorityMode
+                                ? targetIds[i]
+                                : networkManager.ConnectionManager.ConnectedClientsList[i].ClientId;
+                            if (
+                                NetworkManager.ServerClientId == clientId
+                                || (!isServerAuthoritative && clientId == ownerClientId)
+                                || (
+                                    !networkManager.DistributedAuthorityMode
+                                    && !networkObject.Observers.Contains(clientId)
+                                )
+                            )
                             {
                                 continue;
                             }
@@ -231,7 +276,9 @@ namespace Unity.Netcode
 
             if (NetworkTransform == null)
             {
-                Debug.LogError($"[{nameof(NetworkTransformMessage)}][Dropped] Reciever {nameof(NetworkTransform)} was not set!");
+                Debug.LogError(
+                    $"[{nameof(NetworkTransformMessage)}][Dropped] Reciever {nameof(NetworkTransform)} was not set!"
+                );
                 return;
             }
 

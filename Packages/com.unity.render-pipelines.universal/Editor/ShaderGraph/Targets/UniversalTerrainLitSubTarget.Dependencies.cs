@@ -9,12 +9,18 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Template
         static class TerrainBaseMapGenTemplate
         {
-            public static readonly string kPassTemplate = "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainBaseMapGenPass.template";
+            public static readonly string kPassTemplate =
+                "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainBaseMapGenPass.template";
             public static readonly string[] kSharedTemplateDirectories;
+
             static TerrainBaseMapGenTemplate()
             {
                 kSharedTemplateDirectories = new string[UniversalTarget.kSharedTemplateDirectories.Length + 1];
-                Array.Copy(UniversalTarget.kSharedTemplateDirectories, kSharedTemplateDirectories, UniversalTarget.kSharedTemplateDirectories.Length);
+                Array.Copy(
+                    UniversalTarget.kSharedTemplateDirectories,
+                    kSharedTemplateDirectories,
+                    UniversalTarget.kSharedTemplateDirectories.Length
+                );
                 kSharedTemplateDirectories[^1] = "Packages/com.unity.render-pipelines.universal/Editor/Terrain/";
             }
         }
@@ -23,7 +29,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region SubShaders
         static class TerrainLitAddSubShaders
         {
-            public static SubShaderDescriptor LitComputeDotsSubShader(UniversalTarget target, string renderType, string renderQueue, bool blendModePreserveSpecular)
+            public static SubShaderDescriptor LitComputeDotsSubShader(
+                UniversalTarget target,
+                string renderType,
+                string renderQueue,
+                bool blendModePreserveSpecular
+            )
             {
                 SubShaderDescriptor result = new SubShaderDescriptor()
                 {
@@ -39,13 +50,20 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     shaderFallback = "",
                 };
 
-                result.passes.Add(TerrainLitAddPasses.Forward(target, blendModePreserveSpecular, TerrainCorePragmas.DOTSForward));
+                result.passes.Add(
+                    TerrainLitAddPasses.Forward(target, blendModePreserveSpecular, TerrainCorePragmas.DOTSForward)
+                );
                 result.passes.Add(TerrainLitAddPasses.GBuffer(target, blendModePreserveSpecular));
 
                 return result;
             }
 
-            public static SubShaderDescriptor LitGLESSubShader(UniversalTarget target, string renderType, string renderQueue, bool blendModePreserveSpecular)
+            public static SubShaderDescriptor LitGLESSubShader(
+                UniversalTarget target,
+                string renderType,
+                string renderQueue,
+                bool blendModePreserveSpecular
+            )
             {
                 SubShaderDescriptor result = new SubShaderDescriptor()
                 {
@@ -69,7 +87,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
         static class TerrainLitBaseMapGenSubShaders
         {
-            public static SubShaderDescriptor GenerateBaseMap(UniversalTarget target, string renderType, string renderQueue, bool blendModePreserveSpecular)
+            public static SubShaderDescriptor GenerateBaseMap(
+                UniversalTarget target,
+                string renderType,
+                string renderQueue,
+                bool blendModePreserveSpecular
+            )
             {
                 SubShaderDescriptor result = new SubShaderDescriptor()
                 {
@@ -93,7 +116,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Passes
         static class TerrainLitAddPasses
         {
-            public static PassDescriptor Forward(UniversalTarget target, bool blendModePreserveSpecular, PragmaCollection pragmas = null)
+            public static PassDescriptor Forward(
+                UniversalTarget target,
+                bool blendModePreserveSpecular,
+                PragmaCollection pragmas = null
+            )
             {
                 var result = TerrainLitPasses.Forward(target, blendModePreserveSpecular, pragmas);
                 result.renderStates = AdditionalLayersRenderState();
@@ -234,7 +261,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { Pragma.Fragment("frag") },
             };
 
-            public static readonly string kBaseMapPass = "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainBaseMapGenPass.hlsl";
+            public static readonly string kBaseMapPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainBaseMapGenPass.hlsl";
 
             public static readonly IncludeCollection BaseGenMainTexIncludes = new IncludeCollection
             {
@@ -243,7 +271,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainBaseGenPasses.kBaseMapPass, IncludeLocation.Postgraph },
@@ -256,7 +283,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainBaseGenPasses.kBaseMapPass, IncludeLocation.Postgraph },

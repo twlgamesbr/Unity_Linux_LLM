@@ -30,7 +30,9 @@ namespace UnityEngine.Rendering.Universal
             // Compact the light ranges for the current row.
             for (var itemIndex = 0; itemIndex < itemsPerTile; itemIndex++)
             {
-                var range = tileRanges[viewIndex * rangesPerItem * itemsPerTile + itemIndex * rangesPerItem + 1 + rowIndex];
+                var range = tileRanges[
+                    viewIndex * rangesPerItem * itemsPerTile + itemIndex * rangesPerItem + 1 + rowIndex
+                ];
                 if (!range.isEmpty)
                 {
                     itemIndices[compactCount] = (short)itemIndex;
@@ -39,7 +41,9 @@ namespace UnityEngine.Rendering.Universal
                 }
             }
 
-            var rowBaseMaskIndex = viewIndex * wordsPerTile * tileResolution.x * tileResolution.y + rowIndex * wordsPerTile * tileResolution.x;
+            var rowBaseMaskIndex =
+                viewIndex * wordsPerTile * tileResolution.x * tileResolution.y
+                + rowIndex * wordsPerTile * tileResolution.x;
             for (var tileIndex = 0; tileIndex < tileResolution.x; tileIndex++)
             {
                 var tileBaseIndex = rowBaseMaskIndex + tileIndex * wordsPerTile;

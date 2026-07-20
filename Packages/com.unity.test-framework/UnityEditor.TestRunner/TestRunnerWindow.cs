@@ -34,16 +34,22 @@ namespace UnityEditor.TestTools.TestRunner
 
         private readonly GUIContent m_GUIHorizontalSplit = EditorGUIUtility.TrTextContent("Horizontal layout");
         private readonly GUIContent m_GUIVerticalSplit = EditorGUIUtility.TrTextContent("Vertical layout");
-        private readonly GUIContent m_GUIDisablePlaymodeTestsRunner = EditorGUIUtility.TrTextContent("Disable playmode tests for all assemblies");
-        private readonly GUIContent m_GUIRunPlayModeTestAsEditModeTests = EditorGUIUtility.TrTextContent("Run playmode tests as editmode tests");
+        private readonly GUIContent m_GUIDisablePlaymodeTestsRunner = EditorGUIUtility.TrTextContent(
+            "Disable playmode tests for all assemblies"
+        );
+        private readonly GUIContent m_GUIRunPlayModeTestAsEditModeTests = EditorGUIUtility.TrTextContent(
+            "Run playmode tests as editmode tests"
+        );
 
         internal static TestRunnerWindow s_Instance;
         private bool m_IsBuilding;
+
         [NonSerialized]
         private bool m_Enabled;
 
         [NonSerialized]
         private double m_ScheduledRepaint;
+
         //internal TestFilterSettings filterSettings;
 
         [SerializeField]
@@ -55,11 +61,13 @@ namespace UnityEditor.TestTools.TestRunner
         {
             EditMode = 0,
             PlayMode,
-            Player
+            Player,
         }
+
         [SerializeField]
         private TestRunnerMenuLabels m_TestTypeToolbarIndex = TestRunnerMenuLabels.EditMode;
         internal TestListGUI m_SelectedTestTypes;
+
         [SerializeField]
         private TestListGUI[] m_TestListGUIs;
 
@@ -117,7 +125,10 @@ namespace UnityEditor.TestTools.TestRunner
         private void OnEnable()
         {
             s_Instance = this;
-            titleContent = new GUIContent(WindowTitle, "Test framework for running Edit mode and Play mode tests in Unity. Part of the com.unity.test-framework package.");
+            titleContent = new GUIContent(
+                WindowTitle,
+                "Test framework for running Edit mode and Play mode tests in Unity. Part of the com.unity.test-framework package."
+            );
             SelectTestListGUI(m_TestTypeToolbarIndex);
 
             m_testRunnerApi = CreateInstance<TestRunnerApi>();
@@ -164,19 +175,9 @@ namespace UnityEditor.TestTools.TestRunner
             {
                 m_TestListGUIs = new TestListGUI[]
                 {
-                    new TestListGUI()
-                    {
-                        m_TestMode = TestMode.EditMode,
-                    },
-                    new TestListGUI()
-                    {
-                        m_TestMode = TestMode.PlayMode,
-                    },
-                    new TestListGUI()
-                    {
-                        m_TestMode = TestMode.PlayMode,
-                        m_RunOnPlatform = true
-                    }
+                    new TestListGUI() { m_TestMode = TestMode.EditMode },
+                    new TestListGUI() { m_TestMode = TestMode.PlayMode },
+                    new TestListGUI() { m_TestMode = TestMode.PlayMode, m_RunOnPlatform = true },
                 };
             }
 
@@ -193,11 +194,14 @@ namespace UnityEditor.TestTools.TestRunner
         private void StartRetrieveTestList()
         {
             var listToInit = m_SelectedTestTypes;
-            m_testRunnerApi.RetrieveTestList(listToInit.m_TestMode, rootTest =>
-            {
-                listToInit.Init(this, rootTest);
-                listToInit.Reload();
-            });
+            m_testRunnerApi.RetrieveTestList(
+                listToInit.m_TestMode,
+                rootTest =>
+                {
+                    listToInit.Init(this, rootTest);
+                    listToInit.Reload();
+                }
+            );
         }
 
         internal void OnGUI()
@@ -220,7 +224,13 @@ namespace UnityEditor.TestTools.TestRunner
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             var selectedIndex = m_TestTypeToolbarIndex;
-            m_TestTypeToolbarIndex = (TestRunnerMenuLabels)GUILayout.Toolbar((int)m_TestTypeToolbarIndex, Enum.GetNames(typeof(TestRunnerMenuLabels)), "LargeButton", UnityEngine.GUI.ToolbarButtonSize.FitToContents);
+            m_TestTypeToolbarIndex = (TestRunnerMenuLabels)
+                GUILayout.Toolbar(
+                    (int)m_TestTypeToolbarIndex,
+                    Enum.GetNames(typeof(TestRunnerMenuLabels)),
+                    "LargeButton",
+                    UnityEngine.GUI.ToolbarButtonSize.FitToContents
+                );
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
@@ -278,16 +288,24 @@ namespace UnityEditor.TestTools.TestRunner
 
             if (EditorPrefs.GetBool("InternalMode", false))
             {
-                menu.AddItem(m_GUIRunPlayModeTestAsEditModeTests, PlayerSettings.runPlayModeTestAsEditModeTest, () =>
-                {
-                    PlayerSettings.runPlayModeTestAsEditModeTest = !PlayerSettings.runPlayModeTestAsEditModeTest;
-                });
+                menu.AddItem(
+                    m_GUIRunPlayModeTestAsEditModeTests,
+                    PlayerSettings.runPlayModeTestAsEditModeTest,
+                    () =>
+                    {
+                        PlayerSettings.runPlayModeTestAsEditModeTest = !PlayerSettings.runPlayModeTestAsEditModeTest;
+                    }
+                );
             }
 
             if (PlayerSettings.playModeTestRunnerEnabled)
             {
                 PlayerSettings.playModeTestRunnerEnabled = false;
-                EditorUtility.DisplayDialog(m_GUIDisablePlaymodeTestsRunner.text, "You need to restart the editor now", "Ok");
+                EditorUtility.DisplayDialog(
+                    m_GUIDisablePlaymodeTestsRunner.text,
+                    "You need to restart the editor now",
+                    "Ok"
+                );
             }
         }
 

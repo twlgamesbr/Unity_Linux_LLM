@@ -45,9 +45,13 @@ namespace Unity.Entities
         public void AssertValid()
         {
             if (Shared.Count < 0 || Shared.Count > SharedComponentData.Capacity)
-                throw new ArgumentOutOfRangeException($"Shared.Count {Shared.Count} is out of range [0..{SharedComponentData.Capacity}]");
+                throw new ArgumentOutOfRangeException(
+                    $"Shared.Count {Shared.Count} is out of range [0..{SharedComponentData.Capacity}]"
+                );
             if (Changed.Count < 0 || Changed.Count > ChangedFilter.Capacity)
-                throw new ArgumentOutOfRangeException($"Changed.Count {Changed.Count} is out of range [0..{ChangedFilter.Capacity}]");
+                throw new ArgumentOutOfRangeException(
+                    $"Changed.Count {Changed.Count} is out of range [0..{ChangedFilter.Capacity}]"
+                );
         }
     }
 }

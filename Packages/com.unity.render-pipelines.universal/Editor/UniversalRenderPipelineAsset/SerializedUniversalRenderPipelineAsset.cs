@@ -141,11 +141,19 @@ namespace UnityEditor.Rendering.Universal
             additionalLightsRenderingModeProp = serializedObject.FindProperty("m_AdditionalLightsRenderingMode");
             additionalLightsPerObjectLimitProp = serializedObject.FindProperty("m_AdditionalLightsPerObjectLimit");
             additionalLightShadowsSupportedProp = serializedObject.FindProperty("m_AdditionalLightShadowsSupported");
-            additionalLightShadowmapResolutionProp = serializedObject.FindProperty("m_AdditionalLightsShadowmapResolution");
+            additionalLightShadowmapResolutionProp = serializedObject.FindProperty(
+                "m_AdditionalLightsShadowmapResolution"
+            );
 
-            additionalLightsShadowResolutionTierLowProp = serializedObject.FindProperty("m_AdditionalLightsShadowResolutionTierLow");
-            additionalLightsShadowResolutionTierMediumProp = serializedObject.FindProperty("m_AdditionalLightsShadowResolutionTierMedium");
-            additionalLightsShadowResolutionTierHighProp = serializedObject.FindProperty("m_AdditionalLightsShadowResolutionTierHigh");
+            additionalLightsShadowResolutionTierLowProp = serializedObject.FindProperty(
+                "m_AdditionalLightsShadowResolutionTierLow"
+            );
+            additionalLightsShadowResolutionTierMediumProp = serializedObject.FindProperty(
+                "m_AdditionalLightsShadowResolutionTierMedium"
+            );
+            additionalLightsShadowResolutionTierHighProp = serializedObject.FindProperty(
+                "m_AdditionalLightsShadowResolutionTierHigh"
+            );
 
             additionalLightCookieResolutionProp = serializedObject.FindProperty("m_AdditionalLightsCookieResolution");
             additionalLightCookieFormatProp = serializedObject.FindProperty("m_AdditionalLightsCookieFormat");
@@ -188,13 +196,18 @@ namespace UnityEditor.Rendering.Universal
 
             gpuResidentDrawerMode = serializedObject.FindProperty("m_GPUResidentDrawerMode");
             smallMeshScreenPercentage = serializedObject.FindProperty("m_SmallMeshScreenPercentage");
-            gpuResidentDrawerEnableOcclusionCullingInCameras = serializedObject.FindProperty("m_GPUResidentDrawerEnableOcclusionCullingInCameras");
+            gpuResidentDrawerEnableOcclusionCullingInCameras = serializedObject.FindProperty(
+                "m_GPUResidentDrawerEnableOcclusionCullingInCameras"
+            );
 
 #if ENABLE_ADAPTIVE_PERFORMANCE
             useAdaptivePerformance = serializedObject.FindProperty("m_UseAdaptivePerformance");
 #endif
 #if ENABLE_UPSCALER_FRAMEWORK
-            bool referenceModified = UpscalerOptions.ValidateSerializedUpscalerOptionReferencesWithinRPAsset(asset, upscalerOptions);
+            bool referenceModified = UpscalerOptions.ValidateSerializedUpscalerOptionReferencesWithinRPAsset(
+                asset,
+                upscalerOptions
+            );
             if (referenceModified)
             {
                 serializedObject.ApplyModifiedProperties();

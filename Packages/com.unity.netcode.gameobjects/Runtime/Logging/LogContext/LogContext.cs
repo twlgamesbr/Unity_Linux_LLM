@@ -53,7 +53,6 @@ namespace Unity.Netcode.Logging
                 builder.AppendTag(m_CallingFunction);
             }
 
-
             // [SomeContext][SomeName:SomeValue]
             m_Other.AppendTo(builder);
 

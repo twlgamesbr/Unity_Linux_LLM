@@ -22,6 +22,7 @@ namespace Unity.Entities.Editor
             [InspectorName("Authoring Data")]
             [Tooltip("The Scene View window shows the authoring data.")]
             SceneViewShowsAuthoring,
+
             /// <summary>
             /// Display the result of the conversion in the scene view.
             /// </summary>
@@ -41,8 +42,13 @@ namespace Unity.Entities.Editor
         [CreateProperty, DontSerialize]
         public SceneViewPresentationMode SceneViewMode
         {
-            get => LiveConversionEditorSettings.LiveConversionSceneViewShowRuntime ? SceneViewPresentationMode.SceneViewShowsRuntime : SceneViewPresentationMode.SceneViewShowsAuthoring;
-            set => LiveConversionEditorSettings.LiveConversionSceneViewShowRuntime = value == SceneViewPresentationMode.SceneViewShowsRuntime;
+            get =>
+                LiveConversionEditorSettings.LiveConversionSceneViewShowRuntime
+                    ? SceneViewPresentationMode.SceneViewShowsRuntime
+                    : SceneViewPresentationMode.SceneViewShowsAuthoring;
+            set =>
+                LiveConversionEditorSettings.LiveConversionSceneViewShowRuntime =
+                    value == SceneViewPresentationMode.SceneViewShowsRuntime;
         }
 
         [CreateProperty, DontSerialize]
@@ -52,10 +58,7 @@ namespace Unity.Entities.Editor
             set => LiveConversionSettings.IsLiveBakingLoggingEnabled = value;
         }
 
-        public void OnSettingChanged(PropertyPath path)
-        {
-
-        }
+        public void OnSettingChanged(PropertyPath path) { }
 
         public string[] GetSearchKeywords()
         {
@@ -79,10 +82,7 @@ namespace Unity.Entities.Editor
                 var clearEntitiesCache = new Button(ClearEntitiesCacheWindow.OpenWindow)
                 {
                     text = "Clear Entity Cache",
-                    style =
-                    {
-                        alignSelf = Align.FlexStart
-                    }
+                    style = { alignSelf = Align.FlexStart },
                 };
 
                 root.Add(clearEntitiesCache);

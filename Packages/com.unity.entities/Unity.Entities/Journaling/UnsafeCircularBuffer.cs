@@ -13,17 +13,19 @@ namespace Unity.Entities.LowLevel.Unsafe
     /// An unmanaged, not resizable circular buffer.
     /// </summary>
     /// <typeparam name="T">The type of elements in the circular buffer.</typeparam>
-    [DebuggerDisplay("Count = {Count}, Capacity = {Capacity}, IsCreated = {IsCreated}, IsEmpty = {IsEmpty}, IsFull = {IsFull}")]
+    [DebuggerDisplay(
+        "Count = {Count}, Capacity = {Capacity}, IsCreated = {IsCreated}, IsEmpty = {IsEmpty}, IsFull = {IsFull}"
+    )]
     [DebuggerTypeProxy(typeof(UnsafeCircularBufferTDebugView<>))]
     [StructLayout(LayoutKind.Sequential)]
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-    internal unsafe struct UnsafeCircularBuffer<T> :
-        IDisposable,
-        IEnumerable<T>
+    internal unsafe struct UnsafeCircularBuffer<T> : IDisposable, IEnumerable<T>
         where T : unmanaged
     {
         AllocatorHandle m_Allocator;
-        [NativeDisableUnsafePtrRestriction] T* m_Ptr;
+
+        [NativeDisableUnsafePtrRestriction]
+        T* m_Ptr;
         int m_Front;
         int m_Back;
         int m_Capacity;
@@ -76,7 +78,11 @@ namespace Unity.Entities.LowLevel.Unsafe
         /// <param name="capacity">The total capacity.</param>
         /// <param name="allocator">The allocator.</param>
         /// <param name="options">Memory initialization options.</param>
-        public UnsafeCircularBuffer(int capacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory)
+        public UnsafeCircularBuffer(
+            int capacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.UninitializedMemory
+        )
         {
             m_Allocator = default;
             m_Ptr = null;
@@ -135,7 +141,11 @@ namespace Unity.Entities.LowLevel.Unsafe
         /// <param name="capacity">The total capacity.</param>
         /// <param name="allocator">The allocator.</param>
         /// <param name="options">Memory initialization options.</param>
-        public void Construct(int capacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory)
+        public void Construct(
+            int capacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.UninitializedMemory
+        )
         {
             ThrowIfAllocated();
 
@@ -540,7 +550,9 @@ namespace Unity.Entities.LowLevel.Unsafe
             }
 
             public void Dispose() { }
+
             public bool MoveNext() => ++m_Index < m_Buffer.m_Count;
+
             public void Reset() => m_Index = -1;
         }
 
@@ -591,7 +603,9 @@ namespace Unity.Entities.LowLevel.Unsafe
         void ThrowIfCapacityExceeded(int count)
         {
             if (count > m_Capacity)
-                throw new InvalidOperationException($"Count {count} exceeds capacity. Buffer capacity is {m_Capacity}.");
+                throw new InvalidOperationException(
+                    $"Count {count} exceeds capacity. Buffer capacity is {m_Capacity}."
+                );
         }
     }
 

@@ -21,12 +21,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             this.ownsData = ownsData;
         }
 
-        static public Vector Create(in MemoryManager heap, int size)
+        public static Vector Create(in MemoryManager heap, int size)
         {
             return new Vector(heap, heap.Allocate<float>(size), 1, size, true);
         }
 
-        static public Vector Create(in MemoryManager heap, float* data, int stride, int size)
+        public static Vector Create(in MemoryManager heap, float* data, int stride, int size)
         {
             return new Vector(heap, data, stride, size, false);
         }
@@ -54,10 +54,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
         public Vector this[int from, int to]
         {
-            get
-            {
-                return Subvector(from, to - from);
-            }
+            get { return Subvector(from, to - from); }
         }
 
         public float[] ToArray()
@@ -119,7 +116,8 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             }
         }
 
-        public T* ReinterpretCast<T>() where T : unmanaged
+        public T* ReinterpretCast<T>()
+            where T : unmanaged
         {
             return (T*)data;
         }
@@ -138,7 +136,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
         [NativeDisableUnsafePtrRestriction]
         [NoAlias]
-        private unsafe readonly float* data;
+        private readonly unsafe float* data;
         public readonly MemoryManager Heap;
         private readonly bool ownsData;
     }

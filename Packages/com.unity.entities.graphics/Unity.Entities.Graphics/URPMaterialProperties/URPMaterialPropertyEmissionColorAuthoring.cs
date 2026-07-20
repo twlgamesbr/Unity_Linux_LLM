@@ -14,7 +14,10 @@ namespace Unity.Rendering
     [UnityEngine.DisallowMultipleComponent]
     public class URPMaterialPropertyEmissionColorAuthoring : UnityEngine.MonoBehaviour
     {
-        [Unity.Entities.RegisterBinding(typeof(URPMaterialPropertyEmissionColor), nameof(URPMaterialPropertyEmissionColor.Value))]
+        [Unity.Entities.RegisterBinding(
+            typeof(URPMaterialPropertyEmissionColor),
+            nameof(URPMaterialPropertyEmissionColor.Value)
+        )]
         [ColorUsage(true, true)]
         public UnityEngine.Color color;
 
@@ -22,7 +25,8 @@ namespace Unity.Rendering
         {
             public override void Bake(URPMaterialPropertyEmissionColorAuthoring authoring)
             {
-                Unity.Rendering.URPMaterialPropertyEmissionColor component = default(Unity.Rendering.URPMaterialPropertyEmissionColor);
+                Unity.Rendering.URPMaterialPropertyEmissionColor component =
+                    default(Unity.Rendering.URPMaterialPropertyEmissionColor);
                 float4 colorValues;
                 colorValues.x = authoring.color.r;
                 colorValues.y = authoring.color.g;

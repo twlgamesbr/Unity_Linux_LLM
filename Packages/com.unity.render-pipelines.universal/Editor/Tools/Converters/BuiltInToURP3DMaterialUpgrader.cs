@@ -9,9 +9,11 @@ namespace UnityEditor.Rendering.Universal
     [Serializable]
     [PipelineConverter("Built-in", "Universal Render Pipeline (Universal Renderer)")]
     [BatchModeConverterClassInfo("BuiltInToURP", "Material")]
-    [ElementInfo(Name = "Material Shader Converter",
-                 Order = 100,
-                 Description = "This converter scans all materials that reference Built-in shaders and upgrades them to use Universal Render Pipeline (URP) shaders.")]
+    [ElementInfo(
+        Name = "Material Shader Converter",
+        Order = 100,
+        Description = "This converter scans all materials that reference Built-in shaders and upgrades them to use Universal Render Pipeline (URP) shaders."
+    )]
     internal sealed class BuiltInToURP3DMaterialUpgrader : RenderPipelineConverterMaterialUpgrader
     {
         internal static List<MaterialUpgrader> FetchMaterialUpgraders()
@@ -28,6 +30,6 @@ namespace UnityEditor.Rendering.Universal
             return builtInToURPUpgraders;
         }
 
-        protected override List<MaterialUpgrader> upgraders => FetchMaterialUpgraders();    
+        protected override List<MaterialUpgrader> upgraders => FetchMaterialUpgraders();
     }
 }

@@ -45,19 +45,39 @@ namespace UnityEngine.PathTracing.Lightmapping
             _lightmapResolution = (int)lightmapResolution;
 
             _shader = shader;
-            _triangleEdges = new NativeArray<float4>((int)maxEdgeCount,Allocator.Persistent);
+            _triangleEdges = new NativeArray<float4>((int)maxEdgeCount, Allocator.Persistent);
             _chartIndices = new NativeArray<uint>((int)maxEdgeCount, Allocator.Persistent);
-            _triangleEdgesBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _triangleEdges.Length, UnsafeUtility.SizeOf<float4>());
-            _chartIndicesBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _chartIndices.Length, sizeof(uint));
-            _perPixelChart = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _lightmapResolution*_lightmapResolution, sizeof(uint));
-            _overlapPixelsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _lightmapResolution*_lightmapResolution, sizeof(uint));
-            _overlapInstancesBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, (int)instanceCount, sizeof(uint));
+            _triangleEdgesBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                _triangleEdges.Length,
+                UnsafeUtility.SizeOf<float4>()
+            );
+            _chartIndicesBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                _chartIndices.Length,
+                sizeof(uint)
+            );
+            _perPixelChart = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                _lightmapResolution * _lightmapResolution,
+                sizeof(uint)
+            );
+            _overlapPixelsBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                _lightmapResolution * _lightmapResolution,
+                sizeof(uint)
+            );
+            _overlapInstancesBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                (int)instanceCount,
+                sizeof(uint)
+            );
 
             _overlapKernel = shader.FindKernel("MarkBilinearOverlaps");
             shader.GetKernelThreadGroupSizes(_overlapKernel, out _overlapKernelSize, out _, out _);
 
             // Initialize buffers
-            _overlapPixelsBuffer.SetData(new uint[_lightmapResolution*_lightmapResolution]);
+            _overlapPixelsBuffer.SetData(new uint[_lightmapResolution * _lightmapResolution]);
             _overlapInstancesBuffer.SetData(new uint[instanceCount]);
             var initPerPixelChart = new uint[_lightmapResolution * _lightmapResolution];
             Array.Fill(initPerPixelChart, uint.MaxValue);
@@ -70,7 +90,8 @@ namespace UnityEngine.PathTracing.Lightmapping
             NativeArray<UInt32> vertexToChartIndex,
             float4 occupiedST,
             uint instanceIndex,
-            uint chartIndexOffset)
+            uint chartIndexOffset
+        )
         {
             // Get the start and end pos of every edge, and the chart index for each edge.
             var indices = uvMesh.triangles;
@@ -111,7 +132,12 @@ namespace UnityEngine.PathTracing.Lightmapping
             cmd.SetComputeBufferParam(_shader, _overlapKernel, ShaderProperties.ChartIndices, _chartIndicesBuffer);
             cmd.SetComputeBufferParam(_shader, _overlapKernel, ShaderProperties.PerPixelChart, _perPixelChart);
             cmd.SetComputeBufferParam(_shader, _overlapKernel, ShaderProperties.OverlapPixels, _overlapPixelsBuffer);
-            cmd.SetComputeBufferParam(_shader, _overlapKernel, ShaderProperties.OverlapInstances, _overlapInstancesBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _overlapKernel,
+                ShaderProperties.OverlapInstances,
+                _overlapInstancesBuffer
+            );
             int dispatchSize = GraphicsHelpers.DivUp(edgeCount, _overlapKernelSize);
 
             uint tileCountOnEachDim = GraphicsHelpers.DivUp((uint)_lightmapResolution, tileSize);
@@ -129,7 +155,8 @@ namespace UnityEngine.PathTracing.Lightmapping
         public void CompactAndReadbackOverlaps(
             CommandBuffer cmd,
             out uint[] uniqueOverlapPixelIndices,
-            out ulong[] uniqueOverlapInstanceIndices)
+            out ulong[] uniqueOverlapInstanceIndices
+        )
         {
             // Make sure all kernels are finished
             GraphicsHelpers.Flush(cmd);
@@ -185,7 +212,8 @@ namespace UnityEngine.PathTracing.Lightmapping
         public static ComputeShader LoadShader()
         {
             return UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
-                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/Lightmapping/BilinearOverlaps.compute");
+                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/Lightmapping/BilinearOverlaps.compute"
+            );
         }
 #endif
     }

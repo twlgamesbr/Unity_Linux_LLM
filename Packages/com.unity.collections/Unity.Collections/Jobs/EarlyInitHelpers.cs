@@ -67,9 +67,10 @@ namespace Unity.Jobs
         /// <param name="ex">Exception type to throw</param>
         public static void JobReflectionDataCreationFailed(Exception ex)
         {
-            Debug.LogError($"Failed to create job reflection data. Please refer to callstack of exception for information on which job could not produce its reflection data.");
+            Debug.LogError(
+                $"Failed to create job reflection data. Please refer to callstack of exception for information on which job could not produce its reflection data."
+            );
             Debug.LogException(ex);
         }
     }
-
 }

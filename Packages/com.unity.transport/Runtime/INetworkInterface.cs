@@ -1,16 +1,15 @@
 using System;
 using Unity.Collections;
-using Unity.Jobs;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 
 namespace Unity.Networking.Transport
 {
     [Flags]
     internal enum SendHandleFlags
     {
-        AllocatedByDriver = 1 << 0
+        AllocatedByDriver = 1 << 0,
     }
-
 
     internal struct NetworkInterfaceSendHandle
     {

@@ -18,8 +18,9 @@ namespace Unity.Multiplayer.Tools.MetricTestData
             m_DataDefinition = dataDefinition;
             m_Random = random;
 
-            m_GameObjects = Enumerable.Range(0, nbGameObjects)
-                .Select(x => new NetworkObjectIdentifier(m_DataDefinition.GenerateGameObjectName(), (ulong) x))
+            m_GameObjects = Enumerable
+                .Range(0, nbGameObjects)
+                .Select(x => new NetworkObjectIdentifier(m_DataDefinition.GenerateGameObjectName(), (ulong)x))
                 .ToList();
         }
 
@@ -123,7 +124,6 @@ namespace Unity.Multiplayer.Tools.MetricTestData
                 yield return new SceneEventMetric(connection, $"{prefix}_SceneEventType", sceneName, byteCount);
             }
         }
-
 
         NetworkObjectIdentifier GetRandomGameObject() => m_GameObjects[m_Random.Next(0, m_GameObjects.Count)];
     }

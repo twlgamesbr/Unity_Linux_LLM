@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.PlayerLoop;
 using UnityEngine.LowLevel;
+using UnityEngine.PlayerLoop;
 
 namespace Unity.Entities
 {
@@ -12,13 +12,12 @@ namespace Unity.Entities
         Type SystemType { get; }
     }
 
-
     /// <summary>
     /// Apply to a system to specify an update ordering constraint with another system in the same <see cref="ComponentSystemGroup"/>.
     /// </summary>
     /// <remarks>Updating before or after a system constrains the scheduler ordering of these systems within a ComponentSystemGroup.
     /// Both the before and after systems must be a members of the same ComponentSystemGroup.</remarks>
-    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
     public class UpdateBeforeAttribute : Attribute, ISystemOrderAttribute
     {
         /// <summary>
@@ -46,7 +45,7 @@ namespace Unity.Entities
     /// </summary>
     /// <remarks>Updating before or after a system constrains the scheduler ordering of these systems within a ComponentSystemGroup.
     /// Both the before and after systems must be a members of the same ComponentSystemGroup.</remarks>
-    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
     public class UpdateAfterAttribute : Attribute, ISystemOrderAttribute
     {
         /// <summary>
@@ -139,7 +138,7 @@ namespace Unity.Entities
     ///
     /// An UpdateInGroup attribute with both OrderFirst=true and OrderLast=true is invalid, and will throw an exception.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class UpdateInGroupAttribute : Attribute
     {
         /// <summary>
@@ -147,6 +146,7 @@ namespace Unity.Entities
         /// which do not have OrderFirst=true.
         /// </summary>
         public bool OrderFirst = false;
+
         /// <summary>
         /// If true, the tagged system will be sorted later than all systems in the <see cref="ComponentSystemGroup"/>
         /// which do not have OrderLast=true.
@@ -188,7 +188,12 @@ namespace Unity.Entities
         /// <param name="playerLoop">The player loop.</param>
         /// <param name="playerLoopSystemType">The player loop system type.</param>
         /// <returns><see langword="true"/> if successfully appended to player loop, <see langword="false"/> otherwise.</returns>
-        internal static bool AppendToPlayerLoop(Type updateType, PlayerLoopSystem.UpdateFunction updateFunction, ref PlayerLoopSystem playerLoop, Type playerLoopSystemType)
+        internal static bool AppendToPlayerLoop(
+            Type updateType,
+            PlayerLoopSystem.UpdateFunction updateFunction,
+            ref PlayerLoopSystem playerLoop,
+            Type playerLoopSystemType
+        )
         {
             return AppendToPlayerLoopList(updateType, updateFunction, ref playerLoop, playerLoopSystemType);
         }
@@ -203,7 +208,11 @@ namespace Unity.Entities
         /// <param name="updateFunction">The update function.</param>
         /// <param name="playerLoopSystemType">The player loop system type to add to.</param>
         /// <returns><see langword="true"/> if successfully appended to player loop, <see langword="false"/> otherwise.</returns>
-        internal static bool AppendToCurrentPlayerLoop(Type updateType, PlayerLoopSystem.UpdateFunction updateFunction, Type playerLoopSystemType)
+        internal static bool AppendToCurrentPlayerLoop(
+            Type updateType,
+            PlayerLoopSystem.UpdateFunction updateFunction,
+            Type playerLoopSystemType
+        )
         {
             var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
             if (!AppendToPlayerLoop(updateType, updateFunction, ref playerLoop, playerLoopSystemType))
@@ -219,7 +228,10 @@ namespace Unity.Entities
         /// <param name="updateFunction">The update function.</param>
         /// <param name="playerLoop">The player loop.</param>
         /// <returns><see langword="true"/> if update function is part of player loop, <see langword="false"/> otherwise.</returns>
-        internal static bool IsInPlayerLoop(PlayerLoopSystem.UpdateFunction updateFunction, ref PlayerLoopSystem playerLoop)
+        internal static bool IsInPlayerLoop(
+            PlayerLoopSystem.UpdateFunction updateFunction,
+            ref PlayerLoopSystem playerLoop
+        )
         {
             return IsInPlayerLoopList(updateFunction, ref playerLoop);
         }
@@ -242,7 +254,10 @@ namespace Unity.Entities
         /// <param name="updateFunction">The update function.</param>
         /// <param name="playerLoop">The player loop.</param>
         /// <returns><see langword="true"/> if successfully removed from player loop, <see langword="false"/> otherwise.</returns>
-        internal static bool RemoveFromPlayerLoop(PlayerLoopSystem.UpdateFunction updateFunction, ref PlayerLoopSystem playerLoop)
+        internal static bool RemoveFromPlayerLoop(
+            PlayerLoopSystem.UpdateFunction updateFunction,
+            ref PlayerLoopSystem playerLoop
+        )
         {
             return RemoveFromPlayerLoopList(updateFunction, ref playerLoop);
         }
@@ -386,14 +401,23 @@ namespace Unity.Entities
         /// <param name="playerLoop">Existing player loop to modify (e.g. PlayerLoop.GetCurrentPlayerLoop())</param>
         /// <param name="playerLoopSystemType">The Type of the PlayerLoopSystem subsystem to which the ECS system should be appended.
         /// See the UnityEngine.PlayerLoop namespace for valid values.</param>
-        public static void AppendSystemToPlayerLoop(ComponentSystemBase system, ref PlayerLoopSystem playerLoop, Type playerLoopSystemType)
+        public static void AppendSystemToPlayerLoop(
+            ComponentSystemBase system,
+            ref PlayerLoopSystem playerLoop,
+            Type playerLoopSystemType
+        )
         {
             var wrapper = new DummyDelegateWrapper(system);
             if (!AppendToPlayerLoop(system.GetType(), wrapper.TriggerUpdate, ref playerLoop, playerLoopSystemType))
                 throw new ArgumentException($"Could not find PlayerLoopSystem with type={playerLoopSystemType}");
         }
 
-        static bool AppendToPlayerLoopList(Type updateType, PlayerLoopSystem.UpdateFunction updateFunction, ref PlayerLoopSystem playerLoop, Type playerLoopSystemType)
+        static bool AppendToPlayerLoopList(
+            Type updateType,
+            PlayerLoopSystem.UpdateFunction updateFunction,
+            ref PlayerLoopSystem playerLoop,
+            Type playerLoopSystemType
+        )
         {
             if (updateType == null || updateFunction == null || playerLoopSystemType == null)
                 return false;
@@ -407,7 +431,7 @@ namespace Unity.Entities
                 newSubsystemList[oldListLength] = new PlayerLoopSystem
                 {
                     type = updateType,
-                    updateDelegate = updateFunction
+                    updateDelegate = updateFunction,
                 };
                 playerLoop.subSystemList = newSubsystemList;
                 return true;
@@ -417,7 +441,14 @@ namespace Unity.Entities
             {
                 for (var i = 0; i < playerLoop.subSystemList.Length; ++i)
                 {
-                    if (AppendToPlayerLoopList(updateType, updateFunction, ref playerLoop.subSystemList[i], playerLoopSystemType))
+                    if (
+                        AppendToPlayerLoopList(
+                            updateType,
+                            updateFunction,
+                            ref playerLoop.subSystemList[i],
+                            playerLoopSystemType
+                        )
+                    )
                         return true;
                 }
             }
@@ -461,7 +492,10 @@ namespace Unity.Entities
             return false;
         }
 
-        static bool RemoveFromPlayerLoopList(RemoveFromPlayerLoopDelegate removeDelegate, ref PlayerLoopSystem playerLoop)
+        static bool RemoveFromPlayerLoopList(
+            RemoveFromPlayerLoopDelegate removeDelegate,
+            ref PlayerLoopSystem playerLoop
+        )
         {
             if (removeDelegate == null || playerLoop.subSystemList == null || playerLoop.subSystemList.Length == 0)
                 return false;
@@ -484,9 +518,15 @@ namespace Unity.Entities
             return result;
         }
 
-        static bool RemoveFromPlayerLoopList(PlayerLoopSystem.UpdateFunction updateFunction, ref PlayerLoopSystem playerLoop)
+        static bool RemoveFromPlayerLoopList(
+            PlayerLoopSystem.UpdateFunction updateFunction,
+            ref PlayerLoopSystem playerLoop
+        )
         {
-            return RemoveFromPlayerLoopList((ref PlayerLoopSystem pl) => pl.updateDelegate == updateFunction, ref playerLoop);
+            return RemoveFromPlayerLoopList(
+                (ref PlayerLoopSystem pl) => pl.updateDelegate == updateFunction,
+                ref playerLoop
+            );
         }
 
         static void RemoveWorldFromPlayerLoopList(World world, ref PlayerLoopSystem playerLoop)

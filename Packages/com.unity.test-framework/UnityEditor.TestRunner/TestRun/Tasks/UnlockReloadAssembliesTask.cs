@@ -6,6 +6,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
     internal class UnlockReloadAssembliesTask : TestTaskBase
     {
         internal Action UnlockReloadAssemblies = EditorApplication.UnlockReloadAssemblies;
+
         public UnlockReloadAssembliesTask()
         {
             RunOnError = ErrorRunMode.RunAlways;

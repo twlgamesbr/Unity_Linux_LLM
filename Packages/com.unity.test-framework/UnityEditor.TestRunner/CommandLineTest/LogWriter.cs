@@ -64,7 +64,14 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
 
         private StreamWriter CreateLogFile(string path)
         {
-            Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "Creating {0} device log: {1}", m_DeviceID, path);
+            Debug.LogFormat(
+                LogType.Log,
+                LogOption.NoStacktrace,
+                null,
+                "Creating {0} device log: {1}",
+                m_DeviceID,
+                path
+            );
             StreamWriter streamWriter = null;
             try
             {

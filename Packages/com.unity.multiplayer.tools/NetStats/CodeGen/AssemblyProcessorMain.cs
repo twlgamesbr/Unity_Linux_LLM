@@ -13,13 +13,13 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
         static readonly Type[] k_AssemblyProcessors =
         {
             typeof(EventPayloadRegistrationAssemblyProcessor),
-            typeof(MetricIdTypeRegistrationAssemblyProcessor)
+            typeof(MetricIdTypeRegistrationAssemblyProcessor),
         };
 
         public sealed override ILPostProcessor GetInstance() => this;
 
-        public sealed override bool WillProcess(ICompiledAssembly compiledAssembly)
-            => CodeGenHelpers.AssemblyDependsOnNetStats(compiledAssembly);
+        public sealed override bool WillProcess(ICompiledAssembly compiledAssembly) =>
+            CodeGenHelpers.AssemblyDependsOnNetStats(compiledAssembly);
 
         readonly List<DiagnosticMessage> m_Diagnostics = new List<DiagnosticMessage>();
 
@@ -36,14 +36,14 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
                 m_AssemblyName = assemblyName;
             }
 
-            public void LogError(string message)
-                => m_ProcessorMain.m_Diagnostics.AddError($"[{m_ProcessorName}] [{m_AssemblyName}] {message}");
+            public void LogError(string message) =>
+                m_ProcessorMain.m_Diagnostics.AddError($"[{m_ProcessorName}] [{m_AssemblyName}] {message}");
         }
 
         enum ProcessAssemblyResult
         {
             HasChangeOrError,
-            Skip
+            Skip,
         }
 
         public sealed override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
@@ -60,7 +60,10 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
             return OverwriteAssembly(assemblyDefinition);
         }
 
-        ProcessAssemblyResult ProcessAssembly(ICompiledAssembly compiledAssembly, out AssemblyDefinition assemblyDefinition)
+        ProcessAssemblyResult ProcessAssembly(
+            ICompiledAssembly compiledAssembly,
+            out AssemblyDefinition assemblyDefinition
+        )
         {
             if (!WillProcess(compiledAssembly))
             {
@@ -137,7 +140,7 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
             {
                 SymbolWriterProvider = new PortablePdbWriterProvider(),
                 SymbolStream = pdb,
-                WriteSymbols = true
+                WriteSymbols = true,
             };
 
             assemblyDefinition.Write(pe, writerParameters);

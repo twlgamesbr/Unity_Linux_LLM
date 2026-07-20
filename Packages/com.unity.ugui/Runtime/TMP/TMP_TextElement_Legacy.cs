@@ -1,9 +1,7 @@
 ﻿using System;
 
-
 namespace TMPro
 {
-
     /// <summary>
     /// Base class for all text elements like characters (glyphs) and sprites.
     /// </summary>

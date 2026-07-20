@@ -86,7 +86,7 @@ namespace UnityEngine.InputSystem.DualShock
         /// The last used/added DualShock controller.
         /// </summary>
         /// <value>Equivalent to <see cref="Gamepad.leftTrigger"/>.</value>
-        public new static DualShockGamepad current { get; private set; }
+        public static new DualShockGamepad current { get; private set; }
 
         /// <summary>
         /// If the controller is connected over HID, returns <see cref="HID.HID.HIDDeviceDescriptor"/> data parsed from <see cref="InputDeviceDescription.capabilities"/>.
@@ -129,8 +129,6 @@ namespace UnityEngine.InputSystem.DualShock
         }
 
         /// <inheritdoc />
-        public virtual void SetLightBarColor(Color color)
-        {
-        }
+        public virtual void SetLightBarColor(Color color) { }
     }
 }

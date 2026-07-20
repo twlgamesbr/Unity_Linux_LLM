@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Linq;
 
 namespace Unity.Multiplayer.Editor
 {
@@ -18,14 +18,15 @@ namespace Unity.Multiplayer.Editor
         public ReferenceTracker(MultiplayerRoleFlags activeMultiplayerRoleMask, GameObject[] gameObjects)
         {
             m_ComponentsCache = new List<Component>();
-            m_StrippedObjectsInstanceIds = new ();
-            m_ReferencesInstanceIds = new ();
-            m_ReferencePairs = new ();
+            m_StrippedObjectsInstanceIds = new();
+            m_ReferencesInstanceIds = new();
+            m_ReferencePairs = new();
             m_GameObjects = gameObjects;
             m_ActiveMultiplayerRoleMask = activeMultiplayerRoleMask;
         }
 
-        public ReferenceTracker(MultiplayerRoleFlags activeMultiplayerRoleMask, Scene scene) : this(activeMultiplayerRoleMask, scene.GetRootGameObjects()) { }
+        public ReferenceTracker(MultiplayerRoleFlags activeMultiplayerRoleMask, Scene scene)
+            : this(activeMultiplayerRoleMask, scene.GetRootGameObjects()) { }
 
         private void TrackStrippedObject(Object obj)
         {
@@ -54,7 +55,9 @@ namespace Unity.Multiplayer.Editor
         {
             transform.gameObject.GetComponents(m_ComponentsCache);
 
-            parentStripped = parentStripped || EditorMultiplayerRolesManager.ShouldStrip(m_ActiveMultiplayerRoleMask, transform.gameObject);
+            parentStripped =
+                parentStripped
+                || EditorMultiplayerRolesManager.ShouldStrip(m_ActiveMultiplayerRoleMask, transform.gameObject);
 
             if (parentStripped)
                 TrackStrippedObject(transform.gameObject);
@@ -89,7 +92,8 @@ namespace Unity.Multiplayer.Editor
             if (brokenReferences.Count() == 0)
                 return;
 
-            var message = $"The following objects are stripped for the current multiplayer role ({m_ActiveMultiplayerRoleMask}) but they are referenced by other objects in the scene. This could lead to null reference errors.\n";
+            var message =
+                $"The following objects are stripped for the current multiplayer role ({m_ActiveMultiplayerRoleMask}) but they are referenced by other objects in the scene. This could lead to null reference errors.\n";
 
             foreach (var referencePair in m_ReferencePairs)
             {
@@ -102,7 +106,8 @@ namespace Unity.Multiplayer.Editor
                     var reference = EditorUtility.EntityIdToObject((int)referencePair.Reference);
                     var referencer = EditorUtility.EntityIdToObject((int)referencePair.Referencer);
 #endif
-                    message += $"- {reference.name} ({reference.GetType().Name}) referenced by {referencer.name} ({referencer.GetType().Name})\n";
+                    message +=
+                        $"- {reference.name} ({reference.GetType().Name}) referenced by {referencer.name} ({referencer.GetType().Name})\n";
                 }
             }
 

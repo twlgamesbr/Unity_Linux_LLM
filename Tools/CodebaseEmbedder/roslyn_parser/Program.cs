@@ -28,9 +28,7 @@ internal static class Program
     {
         if (args.Length < 2)
         {
-            Console.Error.WriteLine(
-                "Usage: CodebaseRoslynParser <projectRoot> <file1.cs> [<file2.cs> ...]"
-            );
+            Console.Error.WriteLine("Usage: CodebaseRoslynParser <projectRoot> <file1.cs> [<file2.cs> ...]");
             return 1;
         }
 
@@ -56,15 +54,9 @@ internal static class Program
             var sourceText = await File.ReadAllTextAsync(file);
             var tree = CSharpSyntaxTree.ParseText(sourceText, options, path: file);
             var root = await tree.GetRootAsync();
-            var relativePath = Path.GetRelativePath(projectRoot, file)
-                .Replace(Path.DirectorySeparatorChar, '/');
+            var relativePath = Path.GetRelativePath(projectRoot, file).Replace(Path.DirectorySeparatorChar, '/');
             filePaths.Add(relativePath);
-            var (fileResults, fileSymbols) = AnalyzeFile(
-                projectRoot,
-                relativePath,
-                sourceText,
-                root
-            );
+            var (fileResults, fileSymbols) = AnalyzeFile(projectRoot, relativePath, sourceText, root);
             results.AddRange(fileResults);
             allSymbols.AddRange(fileSymbols);
         }
@@ -104,11 +96,7 @@ internal static class Program
         // Resolve unresolved call targets
         foreach (var obj in results)
         {
-            if (
-                obj is RelationRecord rel
-                && rel.RelationKind == "calls"
-                && !string.IsNullOrEmpty(rel.Target)
-            )
+            if (obj is RelationRecord rel && rel.RelationKind == "calls" && !string.IsNullOrEmpty(rel.Target))
             {
                 var targetName = rel.Target.Split('(')[0].Trim();
                 if (symbolLookup.TryGetValue(targetName, out var candidates))
@@ -140,20 +128,18 @@ internal static class Program
 
         var json = JsonSerializer.Serialize(
             results,
-            new JsonSerializerOptions
-            {
-                WriteIndented = false,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            }
+            new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
         );
         await Console.Out.WriteLineAsync(json);
         return 0;
     }
 
-    private static (
-        List<object> Records,
-        List<(string StableKey, string FQN, string Kind)> Symbols
-    ) AnalyzeFile(string projectRoot, string relPath, string text, SyntaxNode root)
+    private static (List<object> Records, List<(string StableKey, string FQN, string Kind)> Symbols) AnalyzeFile(
+        string projectRoot,
+        string relPath,
+        string text,
+        SyntaxNode root
+    )
     {
         var records = new List<object>();
         var symbols = new List<(string StableKey, string FQN, string Kind)>();
@@ -184,11 +170,7 @@ internal static class Program
             ["root_namespace"] = declaredNamespaces.FirstOrDefault() ?? string.Empty,
             ["declared_namespaces"] = declaredNamespaces,
             ["using_directives"] = usings,
-            ["type_names"] = typeDeclarations
-                .Select(t => t.Identifier.Text)
-                .Distinct()
-                .OrderBy(t => t)
-                .ToList(),
+            ["type_names"] = typeDeclarations.Select(t => t.Identifier.Text).Distinct().OrderBy(t => t).ToList(),
             ["member_names"] = typeDeclarations
                 .SelectMany(t =>
                     t.Members.OfType<BaseMethodDeclarationSyntax>()
@@ -239,9 +221,7 @@ internal static class Program
         );
         symbols.Add(($"file:{relPath}", relPath, "file"));
 
-        foreach (
-            var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>()
-        )
+        foreach (var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>())
         {
             var ns = namespaceDeclaration.Name.ToString();
             var types = namespaceDeclaration
@@ -255,10 +235,8 @@ internal static class Program
                 ["namespace"] = ns,
                 ["declared_type_names"] = types,
                 ["symbol_kind"] = "namespace",
-                ["line_start"] =
-                    namespaceDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
-                ["line_end"] =
-                    namespaceDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
+                ["line_start"] = namespaceDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
+                ["line_end"] = namespaceDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
             };
             records.Add(
                 new FileRecord
@@ -336,16 +314,11 @@ internal static class Program
         foreach (var typeDeclaration in typeDeclarations)
         {
             var ns =
-                typeDeclaration
-                    .Ancestors()
-                    .OfType<NamespaceDeclarationSyntax>()
-                    .FirstOrDefault()
-                    ?.Name.ToString()
+                typeDeclaration.Ancestors().OfType<NamespaceDeclarationSyntax>().FirstOrDefault()?.Name.ToString()
                 ?? string.Empty;
             var typeName = typeDeclaration.Identifier.Text;
             var baseTypes =
-                typeDeclaration.BaseList?.Types.Select(bt => bt.Type.ToString()).ToList()
-                ?? new List<string>();
+                typeDeclaration.BaseList?.Types.Select(bt => bt.Type.ToString()).ToList() ?? new List<string>();
             var interfaces =
                 typeDeclaration
                     .BaseList?.Types.Select(bt => bt.Type.ToString())
@@ -365,11 +338,7 @@ internal static class Program
             var summaryStart = trivia.IndexOf("<summary>", StringComparison.OrdinalIgnoreCase);
             if (summaryStart >= 0)
             {
-                var summaryEnd = trivia.IndexOf(
-                    "</summary>",
-                    summaryStart,
-                    StringComparison.OrdinalIgnoreCase
-                );
+                var summaryEnd = trivia.IndexOf("</summary>", summaryStart, StringComparison.OrdinalIgnoreCase);
                 if (summaryEnd >= 0)
                 {
                     summary = trivia[(summaryStart + 9)..summaryEnd].Trim();
@@ -383,8 +352,7 @@ internal static class Program
                 ["type_name"] = typeName,
                 ["fq_name"] = fqTypeName,
                 ["symbol_kind"] = typeDeclaration.Keyword.Text,
-                ["line_start"] =
-                    typeDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
+                ["line_start"] = typeDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
                 ["line_end"] = typeDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
                 ["attributes"] = typeDeclaration
                     .AttributeLists.SelectMany(a => a.Attributes)
@@ -412,9 +380,7 @@ internal static class Program
                 textParts.Add($"Methods: {string.Join(", ", methodNames)}");
             }
             textParts.Add($"Base types: {(baseTypes.Any() ? string.Join(", ", baseTypes) : "-")}");
-            textParts.Add(
-                $"Interfaces: {(interfaces.Any() ? string.Join(", ", interfaces) : "-")}"
-            );
+            textParts.Add($"Interfaces: {(interfaces.Any() ? string.Join(", ", interfaces) : "-")}");
 
             records.Add(
                 new FileRecord
@@ -488,12 +454,7 @@ internal static class Program
                     member,
                     memberName,
                     "method",
-                    member.Modifiers.ToString()
-                        + " "
-                        + member.ReturnType
-                        + " "
-                        + memberName
-                        + member.ParameterList,
+                    member.Modifiers.ToString() + " " + member.ReturnType + " " + memberName + member.ParameterList,
                     member.ReturnType.ToString(),
                     paramTypes
                 );
@@ -524,35 +485,16 @@ internal static class Program
             {
                 var propName = prop.Identifier.Text;
                 var hasGetter =
-                    prop.AccessorList?.Accessors.Any(a =>
-                        a.IsKind(SyntaxKind.GetAccessorDeclaration)
-                    )
-                    ?? false;
+                    prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.GetAccessorDeclaration)) ?? false;
                 var hasSetter =
-                    prop.AccessorList?.Accessors.Any(a =>
-                        a.IsKind(SyntaxKind.SetAccessorDeclaration)
-                    )
-                    ?? false;
+                    prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.SetAccessorDeclaration)) ?? false;
                 var hasInit =
-                    prop.AccessorList?.Accessors.Any(a =>
-                        a.IsKind(SyntaxKind.InitAccessorDeclaration)
-                    )
-                    ?? false;
+                    prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.InitAccessorDeclaration)) ?? false;
                 var isAutoProp =
-                    prop.AccessorList?.Accessors.All(a =>
-                        a.Body == null && a.ExpressionBody == null
-                    ) ?? false;
+                    prop.AccessorList?.Accessors.All(a => a.Body == null && a.ExpressionBody == null) ?? false;
                 var accessorSummary =
                     $"get:{(hasGetter ? "Y" : "N")} set:{(hasSetter ? "Y" : "N")} init:{(hasInit ? "Y" : "N")} auto:{(isAutoProp ? "Y" : "N")}";
-                var signature =
-                    prop.Modifiers
-                    + " "
-                    + prop.Type
-                    + " "
-                    + propName
-                    + " { "
-                    + accessorSummary
-                    + " }";
+                var signature = prop.Modifiers + " " + prop.Type + " " + propName + " { " + accessorSummary + " }";
 
                 var line = prop.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
                 var endLine = prop.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
@@ -566,10 +508,7 @@ internal static class Program
                     ["symbol_kind"] = "property",
                     ["signature"] = string.Join(
                         " ",
-                        signature.Split(
-                            new[] { ' ', '\t', '\r', '\n' },
-                            StringSplitOptions.RemoveEmptyEntries
-                        )
+                        signature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                     ),
                     ["return_type"] = propType,
                     ["line_start"] = line,
@@ -625,10 +564,7 @@ internal static class Program
                     ["symbol_kind"] = "event",
                     ["signature"] = string.Join(
                         " ",
-                        signature.Split(
-                            new[] { ' ', '\t', '\r', '\n' },
-                            StringSplitOptions.RemoveEmptyEntries
-                        )
+                        signature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                     ),
                     ["line_start"] = line,
                     ["line_end"] = endLine,
@@ -667,10 +603,8 @@ internal static class Program
                 var isSerialized =
                     field
                         .AttributeLists.SelectMany(a => a.Attributes)
-                        .Any(a =>
-                            a.Name.ToString()
-                                .EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase)
-                        ) || field.Modifiers.Any(SyntaxKind.PublicKeyword);
+                        .Any(a => a.Name.ToString().EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase))
+                    || field.Modifiers.Any(SyntaxKind.PublicKeyword);
                 foreach (var variable in field.Declaration.Variables)
                 {
                     var fieldName = variable.Identifier.Text;
@@ -728,9 +662,7 @@ internal static class Program
             }
 
             // --- CALL EXPRESSIONS ---
-            var callExpressions = typeDeclaration
-                .DescendantNodes()
-                .OfType<InvocationExpressionSyntax>();
+            var callExpressions = typeDeclaration.DescendantNodes().OfType<InvocationExpressionSyntax>();
             foreach (var call in callExpressions)
             {
                 var target = call.Expression.ToString();
@@ -761,11 +693,7 @@ internal static class Program
                         Source = fqTypeName,
                         Target = target,
                         Path = relPath,
-                        Payload = new Dictionary<string, object>
-                        {
-                            ["asmdef"] = string.Empty,
-                            ["line_start"] = line,
-                        },
+                        Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["line_start"] = line },
                     }
                 );
             }
@@ -792,9 +720,7 @@ internal static class Program
     {
         var line = member.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
         var endLine = member.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
-        var fq = string.IsNullOrEmpty(ns)
-            ? $"{typeName}.{memberName}"
-            : $"{ns}.{typeName}.{memberName}";
+        var fq = string.IsNullOrEmpty(ns) ? $"{typeName}.{memberName}" : $"{ns}.{typeName}.{memberName}";
 
         // Extract attributes
         var attributes = new List<string>();
@@ -815,10 +741,7 @@ internal static class Program
             ["symbol_kind"] = kind,
             ["signature"] = string.Join(
                 " ",
-                rawSignature.Split(
-                    new[] { ' ', '\t', '\r', '\n' },
-                    StringSplitOptions.RemoveEmptyEntries
-                )
+                rawSignature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
             ),
             ["line_start"] = line,
             ["line_end"] = endLine,
@@ -834,8 +757,7 @@ internal static class Program
             {
                 RecordType = "member",
                 StableKey = $"member:{fq}:{line}:{relPath}",
-                Text =
-                    $"{memberPayload["signature"]}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
+                Text = $"{memberPayload["signature"]}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
                 Payload = memberPayload,
             }
         );
@@ -848,11 +770,7 @@ internal static class Program
                 Source = fqTypeName,
                 Target = fq,
                 Path = relPath,
-                Payload = new Dictionary<string, object>
-                {
-                    ["asmdef"] = string.Empty,
-                    ["member_kind"] = kind,
-                },
+                Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = kind },
             }
         );
 
@@ -925,13 +843,7 @@ internal static class Program
         }
     }
 
-    private static void EmitTypeUses(
-        List<object> records,
-        string sourceFq,
-        string typeText,
-        string relPath,
-        string via
-    )
+    private static void EmitTypeUses(List<object> records, string sourceFq, string typeText, string relPath, string via)
     {
         foreach (var target in ExtractTypeNames(typeText).Distinct(StringComparer.Ordinal))
         {

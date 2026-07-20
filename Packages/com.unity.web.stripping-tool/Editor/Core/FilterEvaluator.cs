@@ -55,9 +55,11 @@ namespace Unity.Web.Stripping.Editor
             public RegexFilter(string filter, bool replaceKeywordsWithTypes)
             {
                 Filter = new Regex(
-                    "^" + Regex.Escape(
-                        replaceKeywordsWithTypes ? ReplaceKeywordsWithTypes(filter) : filter
-                        ).Replace("\\*", ".*?") + "$",
+                    "^"
+                        + Regex
+                            .Escape(replaceKeywordsWithTypes ? ReplaceKeywordsWithTypes(filter) : filter)
+                            .Replace("\\*", ".*?")
+                        + "$",
                     RegexOptions.Compiled
                 );
             }
@@ -151,34 +153,40 @@ namespace Unity.Web.Stripping.Editor
 
                 foreach (var assemblyFilter in AssemblyFilters)
                 {
-                    assemblyFilter.ForEachItemIn(methodMap.MethodsByAssembly, (assemblyName, methodDictionary) =>
-                    {
-                        if (MethodFilters.Count == 0)
+                    assemblyFilter.ForEachItemIn(
+                        methodMap.MethodsByAssembly,
+                        (assemblyName, methodDictionary) =>
                         {
-                            // Add all methods if no method filter is defined
-                            foreach (var methodList in methodDictionary.Values)
+                            if (MethodFilters.Count == 0)
                             {
-                                foreach (var method in methodList)
-                                {
-                                    functionNames.Add(method.NativeFunctionName);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // Search by method name within assembly
-                            foreach (var methodFilter in MethodFilters)
-                            {
-                                methodFilter.ForEachItemIn(methodDictionary, (methodName, methodList) =>
+                                // Add all methods if no method filter is defined
+                                foreach (var methodList in methodDictionary.Values)
                                 {
                                     foreach (var method in methodList)
                                     {
                                         functionNames.Add(method.NativeFunctionName);
                                     }
-                                });
+                                }
+                            }
+                            else
+                            {
+                                // Search by method name within assembly
+                                foreach (var methodFilter in MethodFilters)
+                                {
+                                    methodFilter.ForEachItemIn(
+                                        methodDictionary,
+                                        (methodName, methodList) =>
+                                        {
+                                            foreach (var method in methodList)
+                                            {
+                                                functionNames.Add(method.NativeFunctionName);
+                                            }
+                                        }
+                                    );
+                                }
                             }
                         }
-                    });
+                    );
                 }
 
                 return functionNames;
@@ -191,13 +199,16 @@ namespace Unity.Web.Stripping.Editor
                 // Apply method filter
                 foreach (var filter in MethodFilters)
                 {
-                    filter.ForEachItemIn(methodMap.Methods, (methodName, methodList) =>
-                    {
-                        foreach (var method in methodList)
+                    filter.ForEachItemIn(
+                        methodMap.Methods,
+                        (methodName, methodList) =>
                         {
-                            functionNames.Add(method.NativeFunctionName);
+                            foreach (var method in methodList)
+                            {
+                                functionNames.Add(method.NativeFunctionName);
+                            }
                         }
-                    });
+                    );
                 }
 
                 return functionNames;
@@ -212,7 +223,10 @@ namespace Unity.Web.Stripping.Editor
         /// </param>
         /// <param name="csharpSubmoduleDefinition">A C# submodule definition with filter rules.</param>
         /// <returns>A set of native function names for C# methods that match the filter rules.</returns>
-        public static HashSet<string> FindMethods(MethodMap methodMap, CSharpSubmoduleDefinition csharpSubmoduleDefinition)
+        public static HashSet<string> FindMethods(
+            MethodMap methodMap,
+            CSharpSubmoduleDefinition csharpSubmoduleDefinition
+        )
         {
             // Create list of functions to include
             var includeList = new HashSet<string>();
@@ -240,26 +254,29 @@ namespace Unity.Web.Stripping.Editor
 
         // The surrounding \b Regex ensures that the whole word is matched
         // and no replacement of type names within words can happen.
-        static ReadOnlyDictionary<string, Regex> DotNetTypeReplacements = new(new Dictionary<string, Regex> {
-            { "System.Void", new(@"\bvoid\b") },
-            { "System.Boolean", new(@"\bbool\b") },
-            { "System.SByte", new(@"\bsbyte\b") },
-            { "System.Byte", new(@"\bbyte\b") },
-            { "System.Char", new(@"\bchar\b") },
-            { "System.Decimal", new(@"\bdecimal\b") },
-            { "System.Double", new(@"\bdouble\b") },
-            { "System.Single", new(@"\bfloat\b") },
-            { "System.UIntPtr", new(@"\bnuint\b") },
-            { "System.IntPtr", new(@"\bnint\b") },
-            { "System.UInt32", new(@"\buint\b") },
-            { "System.Int32", new(@"\bint\b") },
-            { "System.UInt64", new(@"\bulong\b") },
-            { "System.Int64", new(@"\blong\b") },
-            { "System.UInt16", new(@"\bushort\b") },
-            { "System.Int16", new(@"\bshort\b") },
-            { "System.String", new(@"\bstring\b") },
-            { "System.Object", new(@"\bobject\b") }
-        });
+        static ReadOnlyDictionary<string, Regex> DotNetTypeReplacements = new(
+            new Dictionary<string, Regex>
+            {
+                { "System.Void", new(@"\bvoid\b") },
+                { "System.Boolean", new(@"\bbool\b") },
+                { "System.SByte", new(@"\bsbyte\b") },
+                { "System.Byte", new(@"\bbyte\b") },
+                { "System.Char", new(@"\bchar\b") },
+                { "System.Decimal", new(@"\bdecimal\b") },
+                { "System.Double", new(@"\bdouble\b") },
+                { "System.Single", new(@"\bfloat\b") },
+                { "System.UIntPtr", new(@"\bnuint\b") },
+                { "System.IntPtr", new(@"\bnint\b") },
+                { "System.UInt32", new(@"\buint\b") },
+                { "System.Int32", new(@"\bint\b") },
+                { "System.UInt64", new(@"\bulong\b") },
+                { "System.Int64", new(@"\blong\b") },
+                { "System.UInt16", new(@"\bushort\b") },
+                { "System.Int16", new(@"\bshort\b") },
+                { "System.String", new(@"\bstring\b") },
+                { "System.Object", new(@"\bobject\b") },
+            }
+        );
 
         /// <summary>
         /// Replace C# keywords, such as 'void', 'bool', and 'int', and so on, with the

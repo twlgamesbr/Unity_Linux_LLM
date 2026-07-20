@@ -62,14 +62,26 @@ namespace UnityEngine.Rendering.RadeonRays
             var bvhNodeCount = GetBvhNodeCount(instanceCount);
 
             accelStruct.Dispose();
-            accelStruct.instanceInfos = new GraphicsBuffer(TopLevelAccelStruct.instanceInfoTarget, (int)instanceCount, Marshal.SizeOf<InstanceInfo>());
-            accelStruct.topLevelBvh = new GraphicsBuffer(TopLevelAccelStruct.topLevelBvhTarget, (int)bvhNodeCount + 1, Marshal.SizeOf<BvhNode>()); // plus one for header
+            accelStruct.instanceInfos = new GraphicsBuffer(
+                TopLevelAccelStruct.instanceInfoTarget,
+                (int)instanceCount,
+                Marshal.SizeOf<InstanceInfo>()
+            );
+            accelStruct.topLevelBvh = new GraphicsBuffer(
+                TopLevelAccelStruct.topLevelBvhTarget,
+                (int)bvhNodeCount + 1,
+                Marshal.SizeOf<BvhNode>()
+            ); // plus one for header
         }
 
         public void CreateEmpty(ref TopLevelAccelStruct accelStruct)
         {
             accelStruct.Dispose();
-            accelStruct.topLevelBvh = new GraphicsBuffer(TopLevelAccelStruct.topLevelBvhTarget, 2, Marshal.SizeOf<BvhNode>());
+            accelStruct.topLevelBvh = new GraphicsBuffer(
+                TopLevelAccelStruct.topLevelBvhTarget,
+                2,
+                Marshal.SizeOf<BvhNode>()
+            );
             accelStruct.instanceInfos = accelStruct.topLevelBvh;
             accelStruct.bottomLevelBvhs = accelStruct.topLevelBvh;
             accelStruct.instanceCount = 0;
@@ -101,25 +113,53 @@ namespace UnityEngine.Rendering.RadeonRays
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_constants_vertex_stride, 0);
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_constants_triangle_count, (int)instanceCount);
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_bvh_offset, 0);
-            cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_internal_node_range_offset, (int)scratchLayout.InternalNodeRange);
+            cmd.SetComputeIntParam(
+                shaderBuildHlbvh,
+                SID.g_internal_node_range_offset,
+                (int)scratchLayout.InternalNodeRange
+            );
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_aabb_offset, (int)scratchLayout.Aabb);
 
             BindKernelArguments(cmd, kernelInit, scratch, scratchLayout, accelStruct, false);
             cmd.DispatchCompute(shaderBuildHlbvh, kernelInit, 1, 1, 1);
 
             BindKernelArguments(cmd, kernelCalculateAabb, scratch, scratchLayout, accelStruct, false);
-            cmd.DispatchCompute(shaderBuildHlbvh, kernelCalculateAabb, (int)Common.CeilDivide(instanceCount, kTrianglesPerGroup), 1, 1);
+            cmd.DispatchCompute(
+                shaderBuildHlbvh,
+                kernelCalculateAabb,
+                (int)Common.CeilDivide(instanceCount, kTrianglesPerGroup),
+                1,
+                1
+            );
 
             BindKernelArguments(cmd, kernelCalculateMortonCodes, scratch, scratchLayout, accelStruct, false);
-            cmd.DispatchCompute(shaderBuildHlbvh, kernelCalculateMortonCodes, (int)Common.CeilDivide(instanceCount, kTrianglesPerGroup), 1, 1);
+            cmd.DispatchCompute(
+                shaderBuildHlbvh,
+                kernelCalculateMortonCodes,
+                (int)Common.CeilDivide(instanceCount, kTrianglesPerGroup),
+                1,
+                1
+            );
 
-            radixSort.Execute(cmd, scratch,
-                scratchLayout.MortonCodes, scratchLayout.SortedMortonCodes,
-                scratchLayout.PrimitiveRefs, scratchLayout.SortedPrimitiveRefs,
-                scratchLayout.SortMemory, instanceCount);
+            radixSort.Execute(
+                cmd,
+                scratch,
+                scratchLayout.MortonCodes,
+                scratchLayout.SortedMortonCodes,
+                scratchLayout.PrimitiveRefs,
+                scratchLayout.SortedPrimitiveRefs,
+                scratchLayout.SortMemory,
+                instanceCount
+            );
 
             BindKernelArguments(cmd, kernelBuildTreeBottomUp, scratch, scratchLayout, accelStruct, true);
-            cmd.DispatchCompute(shaderBuildHlbvh, kernelBuildTreeBottomUp, (int)Common.CeilDivide(instanceCount, kTrianglesPerGroup), 1, 1);
+            cmd.DispatchCompute(
+                shaderBuildHlbvh,
+                kernelBuildTreeBottomUp,
+                (int)Common.CeilDivide(instanceCount, kTrianglesPerGroup),
+                1,
+                1
+            );
         }
 
         struct ScratchBufferLayout
@@ -163,7 +203,8 @@ namespace UnityEngine.Rendering.RadeonRays
             GraphicsBuffer scratch,
             ScratchBufferLayout scratchLayout,
             TopLevelAccelStruct accelStruct,
-            bool setSortedCodes)
+            bool setSortedCodes
+        )
         {
             cmd.SetComputeBufferParam(shaderBuildHlbvh, kernel, SID.g_scratch_buffer, scratch);
             cmd.SetComputeBufferParam(shaderBuildHlbvh, kernel, SID.g_bvh, accelStruct.topLevelBvh);
@@ -174,8 +215,16 @@ namespace UnityEngine.Rendering.RadeonRays
 
             if (setSortedCodes)
             {
-                cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_morton_codes_offset, (int)scratchLayout.SortedMortonCodes);
-                cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_primitive_refs_offset, (int)scratchLayout.SortedPrimitiveRefs);
+                cmd.SetComputeIntParam(
+                    shaderBuildHlbvh,
+                    SID.g_morton_codes_offset,
+                    (int)scratchLayout.SortedMortonCodes
+                );
+                cmd.SetComputeIntParam(
+                    shaderBuildHlbvh,
+                    SID.g_primitive_refs_offset,
+                    (int)scratchLayout.SortedPrimitiveRefs
+                );
             }
             else
             {

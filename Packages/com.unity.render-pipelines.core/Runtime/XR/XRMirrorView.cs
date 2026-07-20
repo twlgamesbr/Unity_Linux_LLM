@@ -1,7 +1,6 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine.Rendering;
-
 #if ENABLE_VR && ENABLE_XR_MODULE
 using UnityEngine.XR;
 #endif
@@ -25,7 +24,12 @@ namespace UnityEngine.Experimental.Rendering
         static readonly int k_ColorTransform = Shader.PropertyToID("_ColorTransform");
 
 #if ENABLE_VR && ENABLE_XR_MODULE
-        internal static void RenderMirrorView(CommandBuffer cmd, Camera camera, Material mat, XRDisplaySubsystem display)
+        internal static void RenderMirrorView(
+            CommandBuffer cmd,
+            Camera camera,
+            Material mat,
+            XRDisplaySubsystem display
+        )
         {
             // XRTODO : remove this check when the Quest plugin is fixed
             if (Application.platform == RuntimePlatform.Android && !XRGraphicsAutomatedTests.running)
@@ -39,7 +43,11 @@ namespace UnityEngine.Experimental.Rendering
             {
                 using (new ProfilingScope(cmd, k_MirrorViewProfilingSampler))
                 {
-                    cmd.SetRenderTarget(camera.targetTexture != null ? camera.targetTexture : new RenderTargetIdentifier(BuiltinRenderTextureType.CameraTarget));
+                    cmd.SetRenderTarget(
+                        camera.targetTexture != null
+                            ? camera.targetTexture
+                            : new RenderTargetIdentifier(BuiltinRenderTextureType.CameraTarget)
+                    );
 
                     if (blitDesc.nativeBlitAvailable)
                     {
@@ -51,11 +59,25 @@ namespace UnityEngine.Experimental.Rendering
                         {
                             blitDesc.GetBlitParameter(i, out var blitParam);
 
-                            Vector4 scaleBias = new Vector4(blitParam.srcRect.width, blitParam.srcRect.height, blitParam.srcRect.x, blitParam.srcRect.y);
-                            Vector4 scaleBiasRt = new Vector4(blitParam.destRect.width, blitParam.destRect.height, blitParam.destRect.x, blitParam.destRect.y);
+                            Vector4 scaleBias = new Vector4(
+                                blitParam.srcRect.width,
+                                blitParam.srcRect.height,
+                                blitParam.srcRect.x,
+                                blitParam.srcRect.y
+                            );
+                            Vector4 scaleBiasRt = new Vector4(
+                                blitParam.destRect.width,
+                                blitParam.destRect.height,
+                                blitParam.destRect.x,
+                                blitParam.destRect.y
+                            );
 
                             // Deal with y-flip
-                            if (camera.targetTexture != null || camera.cameraType == CameraType.SceneView || camera.cameraType == CameraType.Preview)
+                            if (
+                                camera.targetTexture != null
+                                || camera.cameraType == CameraType.SceneView
+                                || camera.cameraType == CameraType.Preview
+                            )
                             {
                                 scaleBias.y = -scaleBias.y;
                                 scaleBias.w += blitParam.srcRect.height;
@@ -66,17 +88,26 @@ namespace UnityEngine.Experimental.Rendering
                             // If we are writing to a HDR surface or reading from one we use the conversion shader to handle both
                             if (blitParam.srcHdrEncoded || mainDisplayHdrSettings.active)
                             {
-                                ColorGamut mainDisplayColorGamut = mainDisplayHdrSettings.active ? mainDisplayHdrSettings.displayColorGamut
+                                ColorGamut mainDisplayColorGamut = mainDisplayHdrSettings.active
+                                    ? mainDisplayHdrSettings.displayColorGamut
                                     : ColorGamut.sRGB;
-                                ColorGamut xrDisplayColorGamut = blitParam.srcHdrEncoded ? blitParam.srcHdrColorGamut
+                                ColorGamut xrDisplayColorGamut = blitParam.srcHdrEncoded
+                                    ? blitParam.srcHdrColorGamut
                                     : ColorGamut.sRGB;
 
-                                ColorPrimaries mainDisplayColorPrimaries = ColorGamutUtility.GetColorPrimaries(mainDisplayColorGamut);
-                                ColorPrimaries xrDisplayColorPrimaries = ColorGamutUtility.GetColorPrimaries(xrDisplayColorGamut);
+                                ColorPrimaries mainDisplayColorPrimaries = ColorGamutUtility.GetColorPrimaries(
+                                    mainDisplayColorGamut
+                                );
+                                ColorPrimaries xrDisplayColorPrimaries = ColorGamutUtility.GetColorPrimaries(
+                                    xrDisplayColorGamut
+                                );
 
                                 // Use the material? And use the passes?
                                 HDROutputUtils.ConfigureHDROutput(s_MirrorViewMaterialProperty, mainDisplayColorGamut);
-                                HDROutputUtils.ConfigureHDROutput(mat, HDROutputUtils.Operation.ColorConversion | HDROutputUtils.Operation.ColorEncoding);
+                                HDROutputUtils.ConfigureHDROutput(
+                                    mat,
+                                    HDROutputUtils.Operation.ColorConversion | HDROutputUtils.Operation.ColorEncoding
+                                );
                                 int sourceHdrEncoding;
                                 HDROutputUtils.GetColorEncodingForGamut(xrDisplayColorGamut, out sourceHdrEncoding);
                                 s_MirrorViewMaterialProperty.SetInteger(k_SourceHDREncoding, sourceHdrEncoding);
@@ -95,30 +126,48 @@ namespace UnityEngine.Experimental.Rendering
 
                                 // Quicker to go straight to a Matrix4x4 and multiply there? Or to store these as Matrix4x4 instead due to Unity missing a 3x3 type?
                                 float3x3 colorTransform = math.mul(sourceToRec2020, rec2020ToDest);
-                                Matrix4x4 m = new Matrix4x4((Vector4) new float4(colorTransform.c0, 0.0f),
-                                    (Vector4) new float4(colorTransform.c1, 0.0f), (Vector4) new float4(colorTransform.c2, 0.0f),
-                                    new Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+                                Matrix4x4 m = new Matrix4x4(
+                                    (Vector4)new float4(colorTransform.c0, 0.0f),
+                                    (Vector4)new float4(colorTransform.c1, 0.0f),
+                                    (Vector4)new float4(colorTransform.c2, 0.0f),
+                                    new Vector4(0.0f, 0.0f, 0.0f, 0.0f)
+                                );
                                 s_MirrorViewMaterialProperty.SetMatrix(k_ColorTransform, m);
 
-                                s_MirrorViewMaterialProperty.SetFloat(k_MaxNits, mainDisplayHdrSettings.active ? mainDisplayHdrSettings.maxToneMapLuminance : 160.0f);
-                                s_MirrorViewMaterialProperty.SetFloat(k_SourceMaxNits, blitParam.srcHdrEncoded ? blitParam.srcHdrMaxLuminance : 160.0f);
+                                s_MirrorViewMaterialProperty.SetFloat(
+                                    k_MaxNits,
+                                    mainDisplayHdrSettings.active ? mainDisplayHdrSettings.maxToneMapLuminance : 160.0f
+                                );
+                                s_MirrorViewMaterialProperty.SetFloat(
+                                    k_SourceMaxNits,
+                                    blitParam.srcHdrEncoded ? blitParam.srcHdrMaxLuminance : 160.0f
+                                );
                             }
 
                             // For 8888 formats we always gamma correct eye textures : use explicit sRGB read in shader only if the source is not using sRGB format.
-                            bool manualSRGBRead = !blitParam.srcTex.sRGB &&
-                                                  (blitParam.srcTex.graphicsFormat == GraphicsFormat.R8G8B8A8_UNorm ||
-                                                   blitParam.srcTex.graphicsFormat == GraphicsFormat.B8G8R8A8_UNorm);
+                            bool manualSRGBRead =
+                                !blitParam.srcTex.sRGB
+                                && (
+                                    blitParam.srcTex.graphicsFormat == GraphicsFormat.R8G8B8A8_UNorm
+                                    || blitParam.srcTex.graphicsFormat == GraphicsFormat.B8G8R8A8_UNorm
+                                );
                             s_MirrorViewMaterialProperty.SetFloat(k_SRGBRead, manualSRGBRead ? 1.0f : 0.0f);
 
                             // Perform explicit sRGB write in shader if color space is gamma
-                            s_MirrorViewMaterialProperty.SetFloat(k_SRGBWrite, (QualitySettings.activeColorSpace == ColorSpace.Linear) ? 0.0f : 1.0f);
+                            s_MirrorViewMaterialProperty.SetFloat(
+                                k_SRGBWrite,
+                                (QualitySettings.activeColorSpace == ColorSpace.Linear) ? 0.0f : 1.0f
+                            );
 
                             s_MirrorViewMaterialProperty.SetTexture(k_SourceTex, blitParam.srcTex);
                             s_MirrorViewMaterialProperty.SetVector(k_ScaleBias, scaleBias);
                             s_MirrorViewMaterialProperty.SetVector(k_ScaleBiasRt, scaleBiasRt);
                             s_MirrorViewMaterialProperty.SetFloat(k_SourceTexArraySlice, blitParam.srcTexArraySlice);
 
-                            if (XRSystem.foveatedRenderingCaps.HasFlag(FoveatedRenderingCaps.NonUniformRaster) && blitParam.foveatedRenderingInfo != IntPtr.Zero)
+                            if (
+                                XRSystem.foveatedRenderingCaps.HasFlag(FoveatedRenderingCaps.NonUniformRaster)
+                                && blitParam.foveatedRenderingInfo != IntPtr.Zero
+                            )
                             {
                                 cmd.ConfigureFoveatedRendering(blitParam.foveatedRenderingInfo);
                                 cmd.EnableShaderKeyword("_FOVEATED_RENDERING_NON_UNIFORM_RASTER");
@@ -127,7 +176,15 @@ namespace UnityEngine.Experimental.Rendering
                             if (blitParam.srcTex.dimension != TextureDimension.Tex2DArray)
                                 cmd.EnableShaderKeyword("DISABLE_TEXTURE2D_X_ARRAY");
 
-                            cmd.DrawProcedural(Matrix4x4.identity, mat, 0, MeshTopology.Quads, 4, 1, s_MirrorViewMaterialProperty);
+                            cmd.DrawProcedural(
+                                Matrix4x4.identity,
+                                mat,
+                                0,
+                                MeshTopology.Quads,
+                                4,
+                                1,
+                                s_MirrorViewMaterialProperty
+                            );
 
                             // Set back the XR texture for regular XR calls
                             if (blitParam.srcTex.dimension != TextureDimension.Tex2DArray && TextureXR.useTexArray)

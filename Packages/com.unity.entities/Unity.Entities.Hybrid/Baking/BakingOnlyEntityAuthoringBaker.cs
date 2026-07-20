@@ -5,7 +5,6 @@ namespace Unity.Entities.Hybrid.Baking
 {
     internal class BakingOnlyEntityAuthoringBaker : Baker<BakingOnlyEntityAuthoring>
     {
-
         [TemporaryBakingType]
         public struct BakingOnlyChildren : IBufferElementData
         {
@@ -23,7 +22,7 @@ namespace Unity.Entities.Hybrid.Baking
             {
                 // We don't need any transform components to make the child bake only
                 var child = GetEntity(childGameObject, TransformUsageFlags.Dynamic);
-                childrenBuffer.Add(new BakingOnlyChildren() {entity = child});
+                childrenBuffer.Add(new BakingOnlyChildren() { entity = child });
             }
         }
     }
@@ -33,8 +32,11 @@ namespace Unity.Entities.Hybrid.Baking
     {
         public EntityCommandBuffer.ParallelWriter ConcurrentCommands;
 
-        public void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex,
-            in DynamicBuffer<BakingOnlyEntityAuthoringBaker.BakingOnlyChildren> childrenBuffer)
+        public void Execute(
+            Entity entity,
+            [ChunkIndexInQuery] int chunkIndex,
+            in DynamicBuffer<BakingOnlyEntityAuthoringBaker.BakingOnlyChildren> childrenBuffer
+        )
         {
             foreach (var child in childrenBuffer)
             {
@@ -49,10 +51,7 @@ namespace Unity.Entities.Hybrid.Baking
         protected override void OnUpdate()
         {
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
-            var job = new AddBakingOnlyEntityJob
-            {
-                ConcurrentCommands = ecb.AsParallelWriter(),
-            };
+            var job = new AddBakingOnlyEntityJob { ConcurrentCommands = ecb.AsParallelWriter() };
             Dependency = job.ScheduleParallel(Dependency);
 
             CompleteDependency();

@@ -14,12 +14,12 @@ namespace Unity.Entities.Editor
         public static unsafe void Utf8ToLower(byte* ptr, int length)
         {
             var readIndex = 0;
-            
+
             while (readIndex < length)
             {
                 var writeIndex = readIndex;
                 Unicode.Utf8ToUcs(out var rune, ptr, ref readIndex, length);
-                        
+
                 var c = rune.value;
 
                 if (c >= 'A' && c <= 'Z')

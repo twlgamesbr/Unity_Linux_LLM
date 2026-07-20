@@ -11,9 +11,7 @@ namespace UnityEngine.TestTools
     internal class RepeatCommand : DelegatingTestCommand, IEnumerableTestMethodCommand
     {
         public RepeatCommand(TestCommand innerCommand)
-            : base(innerCommand)
-        {
-        }
+            : base(innerCommand) { }
 
         public override TestResult Execute(ITestExecutionContext context)
         {
@@ -28,7 +26,7 @@ namespace UnityEngine.TestTools
                 unityContext.RetryRepeatState = new EnumerableTestState();
             }
 
-            while(unityContext.RetryRepeatState.Repeat < unityContext.RepeatCount + 1)
+            while (unityContext.RetryRepeatState.Repeat < unityContext.RepeatCount + 1)
             {
                 if (innerCommand is IEnumerableTestMethodCommand)
                 {
@@ -55,8 +53,8 @@ namespace UnityEngine.TestTools
                 }
                 unityContext.RetryRepeatState.Repeat++;
             }
-           
-            SetIterationProperty(unityContext, unityContext.RetryRepeatState.Repeat-1);
+
+            SetIterationProperty(unityContext, unityContext.RetryRepeatState.Repeat - 1);
             unityContext.RetryRepeatState.Repeat = 0;
         }
 
@@ -65,7 +63,7 @@ namespace UnityEngine.TestTools
             unityContext.CurrentResult.StartTime = unityContext.StartTime;
             unityContext.CurrentResult.EndTime = DateTime.UtcNow;
             long tickCount = Stopwatch.GetTimestamp() - unityContext.StartTicks;
-            double seconds = (double) tickCount / Stopwatch.Frequency;
+            double seconds = (double)tickCount / Stopwatch.Frequency;
             unityContext.CurrentResult.Duration = seconds;
             SetIterationProperty(unityContext, unityContext.RetryRepeatState.Repeat);
             unityContext.Listener.TestFinished(unityContext.CurrentResult);

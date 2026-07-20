@@ -76,8 +76,8 @@ namespace UnityEngine.InputSystem.Utilities
             if (length != other.length)
                 return false;
 
-            return string.Compare(m_String, m_Index, other.ToString(), 0, length,
-                StringComparison.OrdinalIgnoreCase) == 0;
+            return string.Compare(m_String, m_Index, other.ToString(), 0, length, StringComparison.OrdinalIgnoreCase)
+                == 0;
         }
 
         public int CompareTo(Substring other)
@@ -94,8 +94,14 @@ namespace UnityEngine.InputSystem.Utilities
                 return 1;
             }
 
-            return string.Compare(left.m_String, left.m_Index, right.m_String, right.m_Index, left.m_Length,
-                comparison);
+            return string.Compare(
+                left.m_String,
+                left.m_Index,
+                right.m_String,
+                right.m_Index,
+                left.m_Length,
+                comparison
+            );
         }
 
         public bool StartsWith(string str)
@@ -135,32 +141,32 @@ namespace UnityEngine.InputSystem.Utilities
             return ToString().GetHashCode();
         }
 
-        public static bool operator==(Substring a, Substring b)
+        public static bool operator ==(Substring a, Substring b)
         {
             return a.Equals(b);
         }
 
-        public static bool operator!=(Substring a, Substring b)
+        public static bool operator !=(Substring a, Substring b)
         {
             return !a.Equals(b);
         }
 
-        public static bool operator==(Substring a, InternedString b)
+        public static bool operator ==(Substring a, InternedString b)
         {
             return a.Equals(b);
         }
 
-        public static bool operator!=(Substring a, InternedString b)
+        public static bool operator !=(Substring a, InternedString b)
         {
             return !a.Equals(b);
         }
 
-        public static bool operator==(InternedString a, Substring b)
+        public static bool operator ==(InternedString a, Substring b)
         {
             return b.Equals(a);
         }
 
-        public static bool operator!=(InternedString a, Substring b)
+        public static bool operator !=(InternedString a, Substring b)
         {
             return !b.Equals(a);
         }

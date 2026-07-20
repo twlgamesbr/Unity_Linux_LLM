@@ -82,11 +82,24 @@ namespace UnityEngine.Rendering.LiveGI
         public bool showRayHeatmap = false;
     }
 
-    internal enum PathTracingOutput { FullPathTracer, GIPreview };
+    internal enum PathTracingOutput
+    {
+        FullPathTracer,
+        GIPreview,
+    };
 
-    internal enum RayTracingBackend { Hardware = 0, Compute = 1 };
+    internal enum RayTracingBackend
+    {
+        Hardware = 0,
+        Compute = 1,
+    };
 
-    internal enum PathTermination { RusianRoulette = 0, NewUnbiased = 1, NewBiased = 2 };
+    internal enum PathTermination
+    {
+        RusianRoulette = 0,
+        NewUnbiased = 1,
+        NewBiased = 2,
+    };
 
     internal class PathTracingContext : IDisposable
     {
@@ -107,8 +120,7 @@ namespace UnityEngine.Rendering.LiveGI
 #if UNITY_EDITOR
             _samplingResources.Load((uint)SamplingResources.ResourceType.All);
 #endif
-            _emptyExposureTexture = RTHandles.Alloc(1, 1,
-                enableRandomWrite: true, name: "Empty EV100 Exposure");
+            _emptyExposureTexture = RTHandles.Alloc(1, 1, enableRandomWrite: true, name: "Empty EV100 Exposure");
         }
 
         public void Dispose()
@@ -132,24 +144,39 @@ namespace UnityEngine.Rendering.LiveGI
             CoreUtils.Destroy(_defaultMaterialDescriptor.Transmission);
         }
 
-        internal RayTracingBackend SelectRayTracingBackend(RayTracingBackend requestedBackend, RayTracingResources resources)
+        internal RayTracingBackend SelectRayTracingBackend(
+            RayTracingBackend requestedBackend,
+            RayTracingResources resources
+        )
         {
             if (!RayTracingContext.IsBackendSupported((UnifiedRayTracing.RayTracingBackend)requestedBackend))
             {
-                Debug.LogWarning("Hardware RayTracing not available. Falling back to Compute Shader based implementation.");
+                Debug.LogWarning(
+                    "Hardware RayTracing not available. Falling back to Compute Shader based implementation."
+                );
                 requestedBackend = RayTracingBackend.Compute;
             }
 
             // Early exit if the backend has not changed and the RT resources are already loaded
-            if (_world != null && _world.GetAccelerationStructure() != null && _rayTracingShader != null && _currentRayTracingBackend == requestedBackend)
+            if (
+                _world != null
+                && _world.GetAccelerationStructure() != null
+                && _rayTracingShader != null
+                && _currentRayTracingBackend == requestedBackend
+            )
                 return requestedBackend;
 
             _rayTracingContext?.Dispose();
 
-            _rayTracingContext = new RayTracingContext((UnifiedRayTracing.RayTracingBackend)requestedBackend, resources);
+            _rayTracingContext = new RayTracingContext(
+                (UnifiedRayTracing.RayTracingBackend)requestedBackend,
+                resources
+            );
             _currentRayTracingBackend = requestedBackend;
 #if UNITY_EDITOR
-            _rayTracingShader = _rayTracingContext.LoadRayTracingShader("Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/LiveGI.urtshader");
+            _rayTracingShader = _rayTracingContext.LoadRayTracingShader(
+                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/LiveGI.urtshader"
+            );
 #endif
             _world?.Dispose();
             _world = new World();
@@ -172,19 +199,48 @@ namespace UnityEngine.Rendering.LiveGI
             using (new ProfilingScope(cmd, new ProfilingSampler("LiveGI Update")))
             {
                 // TODO: enable this only for debugging
-                Unity.Collections.NativeLeakDetection.Mode = Unity.Collections.NativeLeakDetectionMode.EnabledWithStackTrace;
+                Unity.Collections.NativeLeakDetection.Mode = Unity
+                    .Collections
+                    .NativeLeakDetectionMode
+                    .EnabledWithStackTrace;
 
                 var changes = _sceneUpdatesTracker.GetChanges(_pathTracingOutput == PathTracingOutput.GIPreview);
                 _sceneChanged = changes.HasChanges();
 
-                UpdateMaterials(_world, _instanceIDToWorldMaterialHandles, _instanceIDToWorldMaterialDescriptors, changes.addedMaterials, changes.removedMaterials, changes.changedMaterials);
-                UpdateInstances(_world, _instanceIDToWorldInstanceHandles, _instanceIDToWorldMaterialHandles, changes.addedInstances, changes.changedInstances, changes.removedInstances, settings.renderedGameObjects, settings.enableEmissiveSampling, _defaultMaterial);
-                UpdateLights(_world, _instanceIDToWorldLightHandles, changes.addedLights, changes.removedLights, changes.changedLights, settings);
+                UpdateMaterials(
+                    _world,
+                    _instanceIDToWorldMaterialHandles,
+                    _instanceIDToWorldMaterialDescriptors,
+                    changes.addedMaterials,
+                    changes.removedMaterials,
+                    changes.changedMaterials
+                );
+                UpdateInstances(
+                    _world,
+                    _instanceIDToWorldInstanceHandles,
+                    _instanceIDToWorldMaterialHandles,
+                    changes.addedInstances,
+                    changes.changedInstances,
+                    changes.removedInstances,
+                    settings.renderedGameObjects,
+                    settings.enableEmissiveSampling,
+                    _defaultMaterial
+                );
+                UpdateLights(
+                    _world,
+                    _instanceIDToWorldLightHandles,
+                    changes.addedLights,
+                    changes.removedLights,
+                    changes.changedLights,
+                    settings
+                );
 
                 // Calculate scene bounds.
                 Bounds sceneBounds = new Bounds();
-                if (settings.lightPickingMethod == LightPickingMethod.Regir ||
-                    settings.lightPickingMethod == LightPickingMethod.LightGrid)
+                if (
+                    settings.lightPickingMethod == LightPickingMethod.Regir
+                    || settings.lightPickingMethod == LightPickingMethod.LightGrid
+                )
                 {
                     var sceneRenderers = Object.FindObjectsByType<Renderer>();
                     foreach (Renderer r in sceneRenderers)
@@ -193,7 +249,13 @@ namespace UnityEngine.Rendering.LiveGI
 
                 _world.SetEnvironmentMaterial(RenderSettings.skybox);
                 //_world.EnableEmissiveSampling = settings.enableEmissiveSampling;
-                _world.Build(sceneBounds, cmd, ref _buildScratchBuffer, _samplingResources, settings.enableEmissiveSampling);
+                _world.Build(
+                    sceneBounds,
+                    cmd,
+                    ref _buildScratchBuffer,
+                    _samplingResources,
+                    settings.enableEmissiveSampling
+                );
 
                 int newLightListHashCode = _world.LightListHashCode;
                 _sceneChanged |= (newLightListHashCode != _previousLightsHashCode);
@@ -201,17 +263,48 @@ namespace UnityEngine.Rendering.LiveGI
             }
         }
 
-        public void Render(CommandBuffer cmd, Vector2Int scaledSize, Vector4 viewFustum, Matrix4x4 cameraToWorldMatrix, Matrix4x4 worldToCameraMatrix, Matrix4x4 projectionMatrix, Matrix4x4 previousViewProjection, PathTracingSettings settings, RTHandle output, RTHandle normals, RTHandle motionVectors, RTHandle debugOutput, int frameIndex, bool preExpose = false)
+        public void Render(
+            CommandBuffer cmd,
+            Vector2Int scaledSize,
+            Vector4 viewFustum,
+            Matrix4x4 cameraToWorldMatrix,
+            Matrix4x4 worldToCameraMatrix,
+            Matrix4x4 projectionMatrix,
+            Matrix4x4 previousViewProjection,
+            PathTracingSettings settings,
+            RTHandle output,
+            RTHandle normals,
+            RTHandle motionVectors,
+            RTHandle debugOutput,
+            int frameIndex,
+            bool preExpose = false
+        )
         {
             using (new ProfilingScope(cmd, new ProfilingSampler("LiveGI Render")))
             {
-                Debug.Assert(_world.GetAccelerationStructure() != null, "Acceleration structure does not exist. Did you call Update()?");
+                Debug.Assert(
+                    _world.GetAccelerationStructure() != null,
+                    "Acceleration structure does not exist. Did you call Update()?"
+                );
 
                 // Path-tracer Input
-                Util.BindWorld(cmd, _rayTracingShader, _world, _pathTracingOutput == PathTracingOutput.GIPreview ? 32 : 1024);
+                Util.BindWorld(
+                    cmd,
+                    _rayTracingShader,
+                    _world,
+                    _pathTracingOutput == PathTracingOutput.GIPreview ? 32 : 1024
+                );
                 _rayTracingShader.SetVectorParam(cmd, Shader.PropertyToID("g_CameraFrustum"), viewFustum);
-                _rayTracingShader.SetMatrixParam(cmd, Shader.PropertyToID("g_CameraToWorldMatrix"), cameraToWorldMatrix);
-                _rayTracingShader.SetMatrixParam(cmd, Shader.PropertyToID("g_PreviousViewProjection"), previousViewProjection);
+                _rayTracingShader.SetMatrixParam(
+                    cmd,
+                    Shader.PropertyToID("g_CameraToWorldMatrix"),
+                    cameraToWorldMatrix
+                );
+                _rayTracingShader.SetMatrixParam(
+                    cmd,
+                    Shader.PropertyToID("g_PreviousViewProjection"),
+                    previousViewProjection
+                );
 
                 var viewProjection = projectionMatrix * worldToCameraMatrix;
                 _rayTracingShader.SetMatrixParam(cmd, Shader.PropertyToID("g_CameraViewProjection"), viewProjection);
@@ -220,26 +313,66 @@ namespace UnityEngine.Rendering.LiveGI
 
                 // For now the history rejection in the denoising is not compatible with stochastic jitter
                 _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_EnableSubPixelJittering"), 0);
-                _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_LightPickingMethod"), (int)settings.lightPickingMethod);
+                _rayTracingShader.SetIntParam(
+                    cmd,
+                    Shader.PropertyToID("g_LightPickingMethod"),
+                    (int)settings.lightPickingMethod
+                );
                 _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_BounceCount"), settings.bounceCount);
                 _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_SampleCount"), settings.sampleCount);
-                _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_LightEvaluations"), settings.lightEvaluations);
-                _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_PathtracerAsGiPreviewMode"), (_pathTracingOutput == PathTracingOutput.GIPreview) ? 1 : 0);
+                _rayTracingShader.SetIntParam(
+                    cmd,
+                    Shader.PropertyToID("g_LightEvaluations"),
+                    settings.lightEvaluations
+                );
+                _rayTracingShader.SetIntParam(
+                    cmd,
+                    Shader.PropertyToID("g_PathtracerAsGiPreviewMode"),
+                    (_pathTracingOutput == PathTracingOutput.GIPreview) ? 1 : 0
+                );
                 _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_CountNEERayAsPathSegment"), 1);
-                _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_RenderedInstances"), (int)settings.renderedGameObjects);
+                _rayTracingShader.SetIntParam(
+                    cmd,
+                    Shader.PropertyToID("g_RenderedInstances"),
+                    (int)settings.renderedGameObjects
+                );
                 _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_PreExpose"), preExpose ? 1 : 0);
-                _rayTracingShader.SetIntParam(cmd, Shader.PropertyToID("g_MaxIntensity"), settings.maxIntensity > 0 ? settings.maxIntensity : int.MaxValue);
+                _rayTracingShader.SetIntParam(
+                    cmd,
+                    Shader.PropertyToID("g_MaxIntensity"),
+                    settings.maxIntensity > 0 ? settings.maxIntensity : int.MaxValue
+                );
                 _rayTracingShader.SetFloatParam(cmd, Shader.PropertyToID("g_ExposureScale"), settings.exposureScale);
                 _rayTracingShader.SetFloatParam(cmd, Shader.PropertyToID("g_AlbedoBoost"), settings.albedoBoost);
-                _rayTracingShader.SetFloatParam(cmd, Shader.PropertyToID("g_IndirectScale"), settings.indirectIntensity);
-                _rayTracingShader.SetFloatParam(cmd, Shader.PropertyToID("g_EnvIntensityMultiplier"), settings.environmentIntensityMultiplier);
-                _rayTracingShader.SetFloatParam(cmd, Shader.PropertyToID("g_EnableDebug"), settings.showRayHeatmap ? 1 : 0);
-                _rayTracingShader.SetFloatParam(cmd, Shader.PropertyToID("g_PathTermination"), (int)settings.pathTermination);
+                _rayTracingShader.SetFloatParam(
+                    cmd,
+                    Shader.PropertyToID("g_IndirectScale"),
+                    settings.indirectIntensity
+                );
+                _rayTracingShader.SetFloatParam(
+                    cmd,
+                    Shader.PropertyToID("g_EnvIntensityMultiplier"),
+                    settings.environmentIntensityMultiplier
+                );
+                _rayTracingShader.SetFloatParam(
+                    cmd,
+                    Shader.PropertyToID("g_EnableDebug"),
+                    settings.showRayHeatmap ? 1 : 0
+                );
+                _rayTracingShader.SetFloatParam(
+                    cmd,
+                    Shader.PropertyToID("g_PathTermination"),
+                    (int)settings.pathTermination
+                );
 
                 // To avoid shader permutations, we always need to set an exposure texture, even if we don't read it
                 if (!preExpose)
                 {
-                    _rayTracingShader.SetTextureParam(cmd, Shader.PropertyToID("_ExposureTexture"), _emptyExposureTexture);
+                    _rayTracingShader.SetTextureParam(
+                        cmd,
+                        Shader.PropertyToID("_ExposureTexture"),
+                        _emptyExposureTexture
+                    );
                 }
 
                 SamplingResources.Bind(cmd, _samplingResources);
@@ -251,14 +384,30 @@ namespace UnityEngine.Rendering.LiveGI
                 _rayTracingShader.SetTextureParam(cmd, Shader.PropertyToID("g_DebugOutput"), debugOutput);
 
                 // Path-tracing
-                RayTracingHelper.ResizeScratchBufferForTrace(_rayTracingShader, (uint)scaledSize.x, (uint)scaledSize.y, 1, ref _traceScratchBuffer);
+                RayTracingHelper.ResizeScratchBufferForTrace(
+                    _rayTracingShader,
+                    (uint)scaledSize.x,
+                    (uint)scaledSize.y,
+                    1,
+                    ref _traceScratchBuffer
+                );
                 _rayTracingShader.Dispatch(cmd, _traceScratchBuffer, (uint)scaledSize.x, (uint)scaledSize.y, 1);
 
                 _world.NextFrame();
             }
         }
 
-        public void Denoise(CommandBuffer cmd, CommandBufferDenoiser denoiser, float nearClipPlane, float farClipPlane, Matrix4x4 viewProjection, PathTracingSettings settings, RTHandle color, RTHandle normals, RTHandle motionVectors)
+        public void Denoise(
+            CommandBuffer cmd,
+            CommandBufferDenoiser denoiser,
+            float nearClipPlane,
+            float farClipPlane,
+            Matrix4x4 viewProjection,
+            PathTracingSettings settings,
+            RTHandle color,
+            RTHandle normals,
+            RTHandle motionVectors
+        )
         {
             using (new ProfilingScope(cmd, new ProfilingSampler("LiveGI Denoise")))
             {
@@ -319,7 +468,12 @@ namespace UnityEngine.Rendering.LiveGI
         public static Vector4 GetCameraFrustum(Camera camera)
         {
             Vector3[] frustumCorners = new Vector3[4];
-            camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), 1.0f, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
+            camera.CalculateFrustumCorners(
+                new Rect(0, 0, 1, 1),
+                1.0f,
+                Camera.MonoOrStereoscopicEye.Mono,
+                frustumCorners
+            );
             float left = frustumCorners[0].x;
             float right = frustumCorners[2].x;
             float bottom = frustumCorners[0].y;
@@ -328,7 +482,14 @@ namespace UnityEngine.Rendering.LiveGI
             return new Vector4(left, right, bottom, top);
         }
 
-        internal static void UpdateMaterials(World world, Dictionary<EntityId, MaterialHandle> instanceIDToHandle, Dictionary<EntityId, MaterialPool.MaterialDescriptor> instanceIDToDescriptor, List<Material> addedMaterials, List<EntityId> removedMaterials, List<Material> changedMaterials)
+        internal static void UpdateMaterials(
+            World world,
+            Dictionary<EntityId, MaterialHandle> instanceIDToHandle,
+            Dictionary<EntityId, MaterialPool.MaterialDescriptor> instanceIDToDescriptor,
+            List<Material> addedMaterials,
+            List<EntityId> removedMaterials,
+            List<Material> changedMaterials
+        )
         {
             static void DeleteTemporaryTextures(ref MaterialPool.MaterialDescriptor desc)
             {
@@ -377,8 +538,15 @@ namespace UnityEngine.Rendering.LiveGI
             }
         }
 
-        private static void UpdateLights(World world, Dictionary<EntityId, LightHandle> instanceIDToHandle, List<Light> addedLights, List<EntityId> removedLights,
-            List<Light> changedLights, PathTracingSettings settings, MixedLightingMode mixedLightingMode = MixedLightingMode.IndirectOnly)
+        private static void UpdateLights(
+            World world,
+            Dictionary<EntityId, LightHandle> instanceIDToHandle,
+            List<Light> addedLights,
+            List<EntityId> removedLights,
+            List<Light> changedLights,
+            PathTracingSettings settings,
+            MixedLightingMode mixedLightingMode = MixedLightingMode.IndirectOnly
+        )
         {
             world.lightPickingMethod = settings.lightPickingMethod;
 
@@ -393,7 +561,15 @@ namespace UnityEngine.Rendering.LiveGI
             world.RemoveLights(handlesToRemove);
 
             // Add new lights
-            LightHandle[] addedHandles = world.AddLights(Util.ConvertUnityLightsToLightDescriptors(addedLights.ToArray(), settings.multiplyPunctualLightIntensityByPI), settings.respectLightLayers, settings.autoEstimateLUTRange, mixedLightingMode);
+            LightHandle[] addedHandles = world.AddLights(
+                Util.ConvertUnityLightsToLightDescriptors(
+                    addedLights.ToArray(),
+                    settings.multiplyPunctualLightIntensityByPI
+                ),
+                settings.respectLightLayers,
+                settings.autoEstimateLUTRange,
+                mixedLightingMode
+            );
             for (int i = 0; i < addedLights.Count; ++i)
                 instanceIDToHandle.Add(addedLights[i].GetEntityId(), addedHandles[i]);
 
@@ -401,7 +577,16 @@ namespace UnityEngine.Rendering.LiveGI
             LightHandle[] handlesToUpdate = new LightHandle[changedLights.Count];
             for (int i = 0; i < changedLights.Count; i++)
                 handlesToUpdate[i] = instanceIDToHandle[changedLights[i].GetEntityId()];
-            world.UpdateLights(handlesToUpdate, Util.ConvertUnityLightsToLightDescriptors(changedLights.ToArray(), settings.multiplyPunctualLightIntensityByPI), settings.respectLightLayers, settings.autoEstimateLUTRange, mixedLightingMode);
+            world.UpdateLights(
+                handlesToUpdate,
+                Util.ConvertUnityLightsToLightDescriptors(
+                    changedLights.ToArray(),
+                    settings.multiplyPunctualLightIntensityByPI
+                ),
+                settings.respectLightLayers,
+                settings.autoEstimateLUTRange,
+                mixedLightingMode
+            );
         }
 
         internal static void UpdateInstances(
@@ -413,7 +598,8 @@ namespace UnityEngine.Rendering.LiveGI
             List<EntityId> removedInstances,
             RenderedGameObjectsFilter renderedGameObjects,
             bool enableEmissiveSampling,
-            Material fallbackMaterial)
+            Material fallbackMaterial
+        )
         {
             foreach (var meshRendererInstanceID in removedInstances)
             {
@@ -432,7 +618,9 @@ namespace UnityEngine.Rendering.LiveGI
             {
                 if (meshRenderer.isPartOfStaticBatch)
                 {
-                    Debug.LogError("Static batching should be disabled when using the real time path tracer in play mode. You can disable it from the project settings.");
+                    Debug.LogError(
+                        "Static batching should be disabled when using the real time path tracer in play mode. You can disable it from the project settings."
+                    );
                     continue;
                 }
 
@@ -463,10 +651,14 @@ namespace UnityEngine.Rendering.LiveGI
 #else
                     bool hasLightmaps = true;
 #endif
-                    var mask = World.GetInstanceMask(meshRenderer.shadowCastingMode, Util.IsStatic(meshRenderer.gameObject), renderedGameObjects, hasLightmaps);
+                    var mask = World.GetInstanceMask(
+                        meshRenderer.shadowCastingMode,
+                        Util.IsStatic(meshRenderer.gameObject),
+                        renderedGameObjects,
+                        hasLightmaps
+                    );
                     masks[i] = visibility[i] ? mask : 0u;
                 }
-
 
                 InstanceHandle instance = world.AddInstance(
                     mesh,
@@ -477,7 +669,8 @@ namespace UnityEngine.Rendering.LiveGI
                     meshRenderer.bounds,
                     Util.IsStatic(meshRenderer.gameObject),
                     renderedGameObjects,
-                    enableEmissiveSampling);
+                    enableEmissiveSampling
+                );
                 var instanceID = meshRenderer.GetEntityId();
                 Debug.Assert(!instanceIDToInstanceHandle.ContainsKey(instanceID));
                 instanceIDToInstanceHandle.Add(instanceID, instance);
@@ -492,7 +685,9 @@ namespace UnityEngine.Rendering.LiveGI
 
                     if (!instanceIDToInstanceHandle.TryGetValue(renderer.GetEntityId(), out InstanceHandle instance))
                     {
-                        Debug.LogError($"Failed to update an instance with InstanceID {instanceUpdate.meshRenderer.GetEntityId()}");
+                        Debug.LogError(
+                            $"Failed to update an instance with InstanceID {instanceUpdate.meshRenderer.GetEntityId()}"
+                        );
                         continue;
                     }
 
@@ -502,7 +697,10 @@ namespace UnityEngine.Rendering.LiveGI
                     }
 
                     bool materialChanged = (instanceUpdate.changes & ModifiedProperties.Material) != 0;
-                    bool maskPropertiesChanged = (instanceUpdate.changes & ModifiedProperties.IsStatic) != 0 || (instanceUpdate.changes & ModifiedProperties.ShadowCasting) != 0 || (instanceUpdate.changes & ModifiedProperties.Layer) != 0;
+                    bool maskPropertiesChanged =
+                        (instanceUpdate.changes & ModifiedProperties.IsStatic) != 0
+                        || (instanceUpdate.changes & ModifiedProperties.ShadowCasting) != 0
+                        || (instanceUpdate.changes & ModifiedProperties.Layer) != 0;
                     if (materialChanged || enableEmissiveSampling || maskPropertiesChanged)
                     {
                         var materials = Util.GetMaterials(renderer);
@@ -522,7 +720,14 @@ namespace UnityEngine.Rendering.LiveGI
                         if (materialChanged)
                             world.UpdateInstanceMaterials(instance, materialHandles);
                         if (enableEmissiveSampling)
-                            world.UpdateInstanceEmission(instance, instanceUpdate.meshRenderer.GetComponent<MeshFilter>().sharedMesh, instanceUpdate.meshRenderer.bounds, materialHandles, Util.IsStatic(gameObject), renderedGameObjects);
+                            world.UpdateInstanceEmission(
+                                instance,
+                                instanceUpdate.meshRenderer.GetComponent<MeshFilter>().sharedMesh,
+                                instanceUpdate.meshRenderer.bounds,
+                                materialHandles,
+                                Util.IsStatic(gameObject),
+                                renderedGameObjects
+                            );
                         if (maskPropertiesChanged || materialChanged)
                         {
                             bool[] visibility = new bool[materials.Length];
@@ -536,7 +741,12 @@ namespace UnityEngine.Rendering.LiveGI
 #else
                                 bool hasLightmaps = true;
 #endif
-                                var mask = World.GetInstanceMask(renderer.shadowCastingMode, Util.IsStatic(renderer.gameObject), renderedGameObjects, hasLightmaps);
+                                var mask = World.GetInstanceMask(
+                                    renderer.shadowCastingMode,
+                                    Util.IsStatic(renderer.gameObject),
+                                    renderedGameObjects,
+                                    hasLightmaps
+                                );
                                 masks[i] = visibility[i] ? mask : 0u;
                             }
                             world.UpdateInstanceMask(instance, masks);
@@ -549,7 +759,7 @@ namespace UnityEngine.Rendering.LiveGI
                 }
             }
         }
-#endregion
+        #endregion
     }
 }
 #endif

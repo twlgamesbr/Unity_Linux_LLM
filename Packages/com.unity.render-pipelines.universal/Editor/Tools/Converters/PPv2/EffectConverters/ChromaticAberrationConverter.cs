@@ -12,8 +12,10 @@ namespace UnityEditor.Rendering.Universal
     {
         protected override Type OldSettingsType { get; } = typeof(BIRPRendering.ChromaticAberration);
 
-        protected override void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldSettings,
-            VolumeProfile targetProfile)
+        protected override void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldSettings,
+            VolumeProfile targetProfile
+        )
         {
             var oldChromaticAberration = oldSettings as BIRPRendering.ChromaticAberration;
 
@@ -22,8 +24,10 @@ namespace UnityEditor.Rendering.Universal
             newVolumeComponent.active = oldChromaticAberration.active;
 
             // TODO: Verify that these are 1:1 conversions for visual parity
-            oldChromaticAberration.intensity.Convert(newVolumeComponent.intensity,
-                enabledState: oldChromaticAberration.enabled);
+            oldChromaticAberration.intensity.Convert(
+                newVolumeComponent.intensity,
+                enabledState: oldChromaticAberration.enabled
+            );
 
             // TODO: No clear conversions for these?
             // oldChromaticAberration.spectralLut

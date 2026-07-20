@@ -31,8 +31,8 @@ namespace Unity.Entities.Editor
         {
             public EntityManager LiveEntityManager;
             public EntityManager ConvertedEntityManager;
-            public Entity        LiveEntity;
-            public Entity        ConvertedEntity;
+            public Entity LiveEntity;
+            public Entity ConvertedEntity;
 
             public unsafe bool HasChanged(TypeIndex typeIndex)
             {
@@ -98,14 +98,22 @@ namespace Unity.Entities.Editor
                 foreach (var authoringObject in authoringObjects)
                 {
                     var gameObject = ((Component)authoringObject).gameObject;
-                    var authoringComponent = (Component) authoringObject;
+                    var authoringComponent = (Component)authoringObject;
 
                     if (!BindingRegistry.s_AuthoringToRuntimeBinding.ContainsKey(authoringComponent.GetType()))
                         return false;
 
-                    if (GetDiffingContext(gameObject, Selection.activeObject as EntitySelectionProxy, out var diffingContext))
+                    if (
+                        GetDiffingContext(
+                            gameObject,
+                            Selection.activeObject as EntitySelectionProxy,
+                            out var diffingContext
+                        )
+                    )
                     {
-                        var runtimeDataBinding = BindingRegistry.s_AuthoringToRuntimeBinding[authoringComponent.GetType()];
+                        var runtimeDataBinding = BindingRegistry.s_AuthoringToRuntimeBinding[
+                            authoringComponent.GetType()
+                        ];
                         if (runtimeDataBinding.Count > 0)
                         {
                             var runtimeTypeTypeIndex = runtimeDataBinding[0].ComponentTypeIndex;
@@ -116,8 +124,10 @@ namespace Unity.Entities.Editor
                                 if (runtimeType != typeof(LocalTransform))
                                 {
                                     // Detect missing/failed conversion between the authoring and runtime type
-                                    Debug.LogError($"Can't update live properties on the authoring component {m_authoringType}." +
-                                                   $"Because the runtime component {runtimeType} is missing on the primary entity. It looks like conversion didn't run on {m_authoringType}.");
+                                    Debug.LogError(
+                                        $"Can't update live properties on the authoring component {m_authoringType}."
+                                            + $"Because the runtime component {runtimeType} is missing on the primary entity. It looks like conversion didn't run on {m_authoringType}."
+                                    );
                                     return false;
                                 }
                             }
@@ -149,7 +159,14 @@ namespace Unity.Entities.Editor
                 if (!BindingRegistry.s_AuthoringToRuntimeBinding.ContainsKey(m_authoringType))
                     return;
 
-                if (!EntitySelectionProxy.FindPrimaryEntity(gameObject, Selection.activeObject as EntitySelectionProxy, out var world, out var liveEntity))
+                if (
+                    !EntitySelectionProxy.FindPrimaryEntity(
+                        gameObject,
+                        Selection.activeObject as EntitySelectionProxy,
+                        out var world,
+                        out var liveEntity
+                    )
+                )
                     return;
 
                 var runtimeDataBinding = BindingRegistry.s_AuthoringToRuntimeBinding[m_authoringType];
@@ -162,19 +179,24 @@ namespace Unity.Entities.Editor
                     var runtimeTypeIndex = runtimeDataBinding[i].ComponentTypeIndex;
 
                     // For entities that do not have LocalTransform components, just skip them.
-                    if (runtimeTypeIndex == s_LocalTransformTypeIndex && !world.EntityManager.HasComponent<LocalTransform>(liveEntity))
+                    if (
+                        runtimeTypeIndex == s_LocalTransformTypeIndex
+                        && !world.EntityManager.HasComponent<LocalTransform>(liveEntity)
+                    )
                         continue;
 
                     var prop = serializedObject.FindProperty(binding.AuthoringFieldName);
                     if (prop == null)
                     {
-                        Debug.LogWarning($"Skipping the update of the property field: {binding.AuthoringFieldName}. " +
-                                         $"The serialized property to override can't be found on the component: {m_authoringType}. " +
-                                         $"The {BindingRegistry.s_AuthoringToRuntimeBinding} binding cache might be out of sync.");
+                        Debug.LogWarning(
+                            $"Skipping the update of the property field: {binding.AuthoringFieldName}. "
+                                + $"The serialized property to override can't be found on the component: {m_authoringType}. "
+                                + $"The {BindingRegistry.s_AuthoringToRuntimeBinding} binding cache might be out of sync."
+                        );
                         continue;
                     }
 
-                    var ptr = (byte*) world.EntityManager.GetComponentDataRawRO(liveEntity, runtimeTypeIndex);
+                    var ptr = (byte*)world.EntityManager.GetComponentDataRawRO(liveEntity, runtimeTypeIndex);
                     ptr += binding.FieldProperties.FieldOffset;
 
                     // TODO: Support more types
@@ -225,7 +247,12 @@ namespace Unity.Entities.Editor
                                 else
                                 {
                                     var quaternionValue = prop.quaternionValue;
-                                    f = new float4(quaternionValue.x, quaternionValue.y, quaternionValue.z, quaternionValue.w);
+                                    f = new float4(
+                                        quaternionValue.x,
+                                        quaternionValue.y,
+                                        quaternionValue.z,
+                                        quaternionValue.w
+                                    );
                                 }
                             }
                             break;
@@ -271,8 +298,10 @@ namespace Unity.Entities.Editor
                             }
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException($"Can't update the property {binding.AuthoringFieldName}." +
-                                                                  $"The serialize property type: {prop.propertyType} is not supported yet by the live properties override.");
+                            throw new ArgumentOutOfRangeException(
+                                $"Can't update the property {binding.AuthoringFieldName}."
+                                    + $"The serialize property type: {prop.propertyType} is not supported yet by the live properties override."
+                            );
                     }
                 }
             }

@@ -11,7 +11,7 @@ public enum Module
     Ife,
     IJobEntity,
     EntityQueryBulkOps,
-    EntitiesForEach
+    EntitiesForEach,
 }
 
 public readonly struct CandidateSyntax : ISystemCandidate
@@ -23,28 +23,31 @@ public readonly struct CandidateSyntax : ISystemCandidate
         Node = node;
     }
 
-    public string CandidateTypeName => Type switch
-    {
-        <= CandidateType.MaxSystemAPI => $"SystemAPI.{Type.ToString()}",
-        CandidateType.Ife => "SystemAPI.Query",
-        CandidateType.QueryBuilder => "SystemAPI.QueryBuilder",
-        CandidateType.EntityQueryBulkOps => "EntityQueryBulkOps",
-        CandidateType.IJobEntity => "IJobEntity",
-        CandidateType.EntitiesForEach => "Entities.ForEach",
-        _ => throw new ArgumentOutOfRangeException()
-    };
+    public string CandidateTypeName =>
+        Type switch
+        {
+            <= CandidateType.MaxSystemAPI => $"SystemAPI.{Type.ToString()}",
+            CandidateType.Ife => "SystemAPI.Query",
+            CandidateType.QueryBuilder => "SystemAPI.QueryBuilder",
+            CandidateType.EntityQueryBulkOps => "EntityQueryBulkOps",
+            CandidateType.IJobEntity => "IJobEntity",
+            CandidateType.EntitiesForEach => "Entities.ForEach",
+            _ => throw new ArgumentOutOfRangeException(),
+        };
 
     public SyntaxNode Node { get; }
     public readonly CandidateType Type;
     public readonly CandidateFlags Flags;
 
-    public static SimpleNameSyntax GetSimpleName(SyntaxNode newestNode) {
+    public static SimpleNameSyntax GetSimpleName(SyntaxNode newestNode)
+    {
         if (newestNode is not InvocationExpressionSyntax invocation)
             return newestNode as SimpleNameSyntax;
-        return invocation.Expression switch {
+        return invocation.Expression switch
+        {
             MemberAccessExpressionSyntax member => member.Name,
             SimpleNameSyntax sn => sn,
-            _ => null
+            _ => null,
         };
     }
 
@@ -57,7 +60,7 @@ public readonly struct CandidateSyntax : ISystemCandidate
             CandidateType.EntityQueryBulkOps => Module.EntityQueryBulkOps,
             CandidateType.IJobEntity => Module.IJobEntity,
             CandidateType.EntitiesForEach => Module.EntitiesForEach,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
 }
 
@@ -92,13 +95,14 @@ public enum CandidateType
     IJobEntity = 26,
     QueryBuilder = 27,
     EntityQueryBulkOps = 28,
-    EntitiesForEach = 29
+    EntitiesForEach = 29,
 }
 
 [Flags]
-public enum CandidateFlags {
+public enum CandidateFlags
+{
     None = 0,
     ReadOnly = 1,
     NoGenericGeneration = 2,
-    All = int.MaxValue
+    All = int.MaxValue,
 }

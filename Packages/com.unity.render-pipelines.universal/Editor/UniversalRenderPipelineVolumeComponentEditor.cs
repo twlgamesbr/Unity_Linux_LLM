@@ -88,9 +88,13 @@ namespace UnityEditor.Rendering.Universal
             if (m_FeatureAttribute == null)
                 return;
 
-            var rendererFeatures = (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urpAsset && urpAsset.scriptableRendererData != null)
-                ? urpAsset.scriptableRendererData.rendererFeatures
-                : null;
+            var rendererFeatures =
+                (
+                    GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urpAsset
+                    && urpAsset.scriptableRendererData != null
+                )
+                    ? urpAsset.scriptableRendererData.rendererFeatures
+                    : null;
 
             using (HashSetPool<Type>.Get(out var missingFeatureTypes))
             {
@@ -121,7 +125,8 @@ namespace UnityEditor.Rendering.Universal
                         {
                             Selection.activeObject = UniversalRenderPipeline.asset.scriptableRendererData;
                             GUIUtility.ExitGUI();
-                        });
+                        }
+                    );
                 }
             }
         }

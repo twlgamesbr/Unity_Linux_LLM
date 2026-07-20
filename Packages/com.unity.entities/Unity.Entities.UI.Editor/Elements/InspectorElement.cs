@@ -31,16 +31,12 @@ namespace Unity.Entities.UI
         ///   <para>Instantiates a <see cref="InspectorElement"/> using the data read from a UXML file.</para>
         /// </summary>
         [UsedImplicitly]
-        class InspectorElementFactory : UxmlFactory<InspectorElement, InspectorElementTraits>
-        {
-        }
+        class InspectorElementFactory : UxmlFactory<InspectorElement, InspectorElementTraits> { }
 
         /// <summary>
         ///   <para>Defines UxmlTraits for the <see cref="InspectorElement"/>.</para>
         /// </summary>
-        class InspectorElementTraits : UxmlTraits
-        {
-        }
+        class InspectorElementTraits : UxmlTraits { }
 #endif
     }
 }

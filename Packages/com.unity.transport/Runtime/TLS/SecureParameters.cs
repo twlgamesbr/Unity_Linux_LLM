@@ -9,8 +9,10 @@ namespace Unity.Networking.Transport.TLS
     {
         /// <summary>Client certificate is not requested (thus not verified).</summary>
         None = 0,
+
         /// <summary>Client certificate is requested, but not verified.</summary>
         Optional = 1,
+
         /// <summary>Client certificate is requested and verified.</summary>
         Required = 2,
     }
@@ -22,13 +24,17 @@ namespace Unity.Networking.Transport.TLS
     public struct SecureNetworkProtocolParameter : INetworkParameter
     {
         /// <summary>Root CA certificate (PEM format).</summary>
-        public FixedPEMString         CACertificate;
+        public FixedPEMString CACertificate;
+
         /// <summary>Server/client certificate (PEM format).</summary>
-        public FixedPEMString         Certificate;
+        public FixedPEMString Certificate;
+
         /// <summary>Server/client private key (PEM format).</summary>
-        public FixedPEMString         PrivateKey;
+        public FixedPEMString PrivateKey;
+
         /// <summary>Server/client certificate's common name.</summary>
-        public FixedString512Bytes    Hostname;
+        public FixedString512Bytes Hostname;
+
         /// <summary>Client authentication policy (server only, defaults to optional).</summary>
         public SecureClientAuthPolicy ClientAuthenticationPolicy;
 
@@ -44,16 +50,17 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Hostname of the server to connect to.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            ref FixedString512Bytes     serverName)
+            ref this NetworkSettings settings,
+            ref FixedString512Bytes serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = default,
-                Certificate                 = default,
-                PrivateKey                  = default,
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = default,
+                Certificate = default,
+                PrivateKey = default,
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -66,16 +73,17 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Hostname of the server to connect to.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            string                      serverName)
+            ref this NetworkSettings settings,
+            string serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = default,
-                Certificate                 = default,
-                PrivateKey                  = default,
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = default,
+                Certificate = default,
+                PrivateKey = default,
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -89,17 +97,18 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Common name (CN) in the server certificate.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            ref FixedString4096Bytes    caCertificate,
-            ref FixedString512Bytes     serverName)
+            ref this NetworkSettings settings,
+            ref FixedString4096Bytes caCertificate,
+            ref FixedString512Bytes serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = new FixedPEMString(ref caCertificate),
-                Certificate                 = default,
-                PrivateKey                  = default,
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = new FixedPEMString(ref caCertificate),
+                Certificate = default,
+                PrivateKey = default,
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -113,17 +122,18 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Common name (CN) in the server certificate.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            ref FixedPEMString          caCertificate,
-            ref FixedString512Bytes     serverName)
+            ref this NetworkSettings settings,
+            ref FixedPEMString caCertificate,
+            ref FixedString512Bytes serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = caCertificate,
-                Certificate                 = default,
-                PrivateKey                  = default,
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = caCertificate,
+                Certificate = default,
+                PrivateKey = default,
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -137,17 +147,18 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Common name (CN) in the server certificate.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            string                      caCertificate,
-            string                      serverName)
+            ref this NetworkSettings settings,
+            string caCertificate,
+            string serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = new FixedPEMString(caCertificate),
-                Certificate                 = default,
-                PrivateKey                  = default,
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = new FixedPEMString(caCertificate),
+                Certificate = default,
+                PrivateKey = default,
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -163,19 +174,20 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Common name (CN) in the server certificate.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            ref FixedString4096Bytes    certificate,
-            ref FixedString4096Bytes    privateKey,
-            ref FixedString4096Bytes    caCertificate,
-            ref FixedString512Bytes     serverName)
+            ref this NetworkSettings settings,
+            ref FixedString4096Bytes certificate,
+            ref FixedString4096Bytes privateKey,
+            ref FixedString4096Bytes caCertificate,
+            ref FixedString512Bytes serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = new FixedPEMString(ref caCertificate),
-                Certificate                 = new FixedPEMString(ref certificate),
-                PrivateKey                  = new FixedPEMString(ref privateKey),
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = new FixedPEMString(ref caCertificate),
+                Certificate = new FixedPEMString(ref certificate),
+                PrivateKey = new FixedPEMString(ref privateKey),
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -191,19 +203,20 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Common name (CN) in the server certificate.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            ref FixedPEMString          certificate,
-            ref FixedPEMString          privateKey,
-            ref FixedPEMString          caCertificate,
-            ref FixedString512Bytes     serverName)
+            ref this NetworkSettings settings,
+            ref FixedPEMString certificate,
+            ref FixedPEMString privateKey,
+            ref FixedPEMString caCertificate,
+            ref FixedString512Bytes serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = caCertificate,
-                Certificate                 = certificate,
-                PrivateKey                  = privateKey,
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = caCertificate,
+                Certificate = certificate,
+                PrivateKey = privateKey,
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -219,19 +232,20 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="serverName">Common name (CN) in the server certificate.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureClientParameters(
-            ref this NetworkSettings    settings,
-            string                      certificate,
-            string                      privateKey,
-            string                      caCertificate,
-            string                      serverName)
+            ref this NetworkSettings settings,
+            string certificate,
+            string privateKey,
+            string caCertificate,
+            string serverName
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = new FixedPEMString(caCertificate),
-                Certificate                 = new FixedPEMString(certificate),
-                PrivateKey                  = new FixedPEMString(privateKey),
-                Hostname                    = serverName,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = new FixedPEMString(caCertificate),
+                Certificate = new FixedPEMString(certificate),
+                PrivateKey = new FixedPEMString(privateKey),
+                Hostname = serverName,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -245,17 +259,18 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="privateKey">Server's private key (PEM format).</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureServerParameters(
-            ref this NetworkSettings    settings,
-            ref FixedString4096Bytes    certificate,
-            ref FixedString4096Bytes    privateKey)
+            ref this NetworkSettings settings,
+            ref FixedString4096Bytes certificate,
+            ref FixedString4096Bytes privateKey
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = default,
-                Certificate                 = new FixedPEMString(ref certificate),
-                PrivateKey                  = new FixedPEMString(ref privateKey),
-                Hostname                    = default,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = default,
+                Certificate = new FixedPEMString(ref certificate),
+                PrivateKey = new FixedPEMString(ref privateKey),
+                Hostname = default,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -269,17 +284,18 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="privateKey">Server's private key (PEM format).</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureServerParameters(
-            ref this NetworkSettings    settings,
-            ref FixedPEMString          certificate,
-            ref FixedPEMString          privateKey)
+            ref this NetworkSettings settings,
+            ref FixedPEMString certificate,
+            ref FixedPEMString privateKey
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = default,
-                Certificate                 = certificate,
-                PrivateKey                  = privateKey,
-                Hostname                    = default,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = default,
+                Certificate = certificate,
+                PrivateKey = privateKey,
+                Hostname = default,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -293,17 +309,18 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="privateKey">Server's private key (PEM format).</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureServerParameters(
-            ref this NetworkSettings    settings,
-            string                      certificate,
-            string                      privateKey)
+            ref this NetworkSettings settings,
+            string certificate,
+            string privateKey
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = default,
-                Certificate                 = new FixedPEMString(certificate),
-                PrivateKey                  = new FixedPEMString(privateKey),
-                Hostname                    = default,
-                ClientAuthenticationPolicy  = SecureClientAuthPolicy.None,
+                CACertificate = default,
+                Certificate = new FixedPEMString(certificate),
+                PrivateKey = new FixedPEMString(privateKey),
+                Hostname = default,
+                ClientAuthenticationPolicy = SecureClientAuthPolicy.None,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -320,20 +337,21 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="clientAuthenticationPolicy">Client authentication policy.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureServerParameters(
-            ref this NetworkSettings    settings,
-            ref FixedString4096Bytes    certificate,
-            ref FixedString4096Bytes    privateKey,
-            ref FixedString4096Bytes    caCertificate,
-            ref FixedString512Bytes     clientName,
-            SecureClientAuthPolicy      clientAuthenticationPolicy = SecureClientAuthPolicy.Required)
+            ref this NetworkSettings settings,
+            ref FixedString4096Bytes certificate,
+            ref FixedString4096Bytes privateKey,
+            ref FixedString4096Bytes caCertificate,
+            ref FixedString512Bytes clientName,
+            SecureClientAuthPolicy clientAuthenticationPolicy = SecureClientAuthPolicy.Required
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = new FixedPEMString(ref caCertificate),
-                Certificate                 = new FixedPEMString(ref certificate),
-                PrivateKey                  = new FixedPEMString(ref privateKey),
-                Hostname                    = clientName,
-                ClientAuthenticationPolicy  = clientAuthenticationPolicy,
+                CACertificate = new FixedPEMString(ref caCertificate),
+                Certificate = new FixedPEMString(ref certificate),
+                PrivateKey = new FixedPEMString(ref privateKey),
+                Hostname = clientName,
+                ClientAuthenticationPolicy = clientAuthenticationPolicy,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -350,20 +368,21 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="clientAuthenticationPolicy">Client authentication policy.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureServerParameters(
-            ref this NetworkSettings    settings,
-            ref FixedPEMString          certificate,
-            ref FixedPEMString          privateKey,
-            ref FixedPEMString          caCertificate,
-            ref FixedString512Bytes     clientName,
-            SecureClientAuthPolicy      clientAuthenticationPolicy = SecureClientAuthPolicy.Required)
+            ref this NetworkSettings settings,
+            ref FixedPEMString certificate,
+            ref FixedPEMString privateKey,
+            ref FixedPEMString caCertificate,
+            ref FixedString512Bytes clientName,
+            SecureClientAuthPolicy clientAuthenticationPolicy = SecureClientAuthPolicy.Required
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = caCertificate,
-                Certificate                 = certificate,
-                PrivateKey                  = privateKey,
-                Hostname                    = clientName,
-                ClientAuthenticationPolicy  = clientAuthenticationPolicy,
+                CACertificate = caCertificate,
+                Certificate = certificate,
+                PrivateKey = privateKey,
+                Hostname = clientName,
+                ClientAuthenticationPolicy = clientAuthenticationPolicy,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -380,20 +399,21 @@ namespace Unity.Networking.Transport.TLS
         /// <param name="clientAuthenticationPolicy">Client authentication policy.</param>
         /// <returns>Modified network settings.</returns>
         public static ref NetworkSettings WithSecureServerParameters(
-            ref this NetworkSettings    settings,
-            string                      certificate,
-            string                      privateKey,
-            string                      caCertificate,
-            string                      clientName,
-            SecureClientAuthPolicy      clientAuthenticationPolicy = SecureClientAuthPolicy.Required)
+            ref this NetworkSettings settings,
+            string certificate,
+            string privateKey,
+            string caCertificate,
+            string clientName,
+            SecureClientAuthPolicy clientAuthenticationPolicy = SecureClientAuthPolicy.Required
+        )
         {
             var parameter = new SecureNetworkProtocolParameter
             {
-                CACertificate               = new FixedPEMString(caCertificate),
-                Certificate                 = new FixedPEMString(certificate),
-                PrivateKey                  = new FixedPEMString(privateKey),
-                Hostname                    = clientName,
-                ClientAuthenticationPolicy  = clientAuthenticationPolicy,
+                CACertificate = new FixedPEMString(caCertificate),
+                Certificate = new FixedPEMString(certificate),
+                PrivateKey = new FixedPEMString(privateKey),
+                Hostname = clientName,
+                ClientAuthenticationPolicy = clientAuthenticationPolicy,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -408,7 +428,9 @@ namespace Unity.Networking.Transport.TLS
         {
             if (!settings.TryGet<SecureNetworkProtocolParameter>(out var parameters))
             {
-                throw new System.InvalidOperationException($"Can't extract Secure parameters: {nameof(SecureNetworkProtocolParameter)} must be provided to the {nameof(NetworkSettings)}");
+                throw new System.InvalidOperationException(
+                    $"Can't extract Secure parameters: {nameof(SecureNetworkProtocolParameter)} must be provided to the {nameof(NetworkSettings)}"
+                );
             }
 
             return parameters;

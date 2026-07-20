@@ -1,7 +1,7 @@
 using System;
-using UnityEngine.InputSystem.Utilities;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.InputSystem.Utilities;
 
 ////REVIEW: Can we change this into a setup where the buffering depth isn't fixed to 2 but rather
 ////        can be set on a per device basis?
@@ -168,10 +168,10 @@ namespace UnityEngine.InputSystem.LowLevel
             totalSize += sizePerBuffer * 2;
             totalSize += mappingTableSizePerBuffer;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             totalSize += sizePerBuffer * 2;
             totalSize += mappingTableSizePerBuffer;
-            #endif
+#endif
 
             // Plus 3 more buffers (one for default states, one for noise masks, and one for dontReset masks).
             totalSize += sizePerBuffer * 3;
@@ -182,14 +182,21 @@ namespace UnityEngine.InputSystem.LowLevel
 
             // Set up device to buffer mappings.
             var ptr = (byte*)m_AllBuffers;
-            m_PlayerStateBuffers =
-                SetUpDeviceToBufferMappings(deviceCount, ref ptr, sizePerBuffer,
-                    mappingTableSizePerBuffer);
+            m_PlayerStateBuffers = SetUpDeviceToBufferMappings(
+                deviceCount,
+                ref ptr,
+                sizePerBuffer,
+                mappingTableSizePerBuffer
+            );
 
-            #if UNITY_EDITOR
-            m_EditorStateBuffers =
-                SetUpDeviceToBufferMappings(deviceCount, ref ptr, sizePerBuffer, mappingTableSizePerBuffer);
-            #endif
+#if UNITY_EDITOR
+            m_EditorStateBuffers = SetUpDeviceToBufferMappings(
+                deviceCount,
+                ref ptr,
+                sizePerBuffer,
+                mappingTableSizePerBuffer
+            );
+#endif
 
             // Default state and noise filter buffers go last.
             defaultStateBuffer = ptr;
@@ -197,18 +204,19 @@ namespace UnityEngine.InputSystem.LowLevel
             resetMaskBuffer = ptr + sizePerBuffer * 2;
         }
 
-        private static DoubleBuffers SetUpDeviceToBufferMappings(int deviceCount, ref byte* bufferPtr, uint sizePerBuffer, uint mappingTableSizePerBuffer)
+        private static DoubleBuffers SetUpDeviceToBufferMappings(
+            int deviceCount,
+            ref byte* bufferPtr,
+            uint sizePerBuffer,
+            uint mappingTableSizePerBuffer
+        )
         {
             var front = bufferPtr;
             var back = bufferPtr + sizePerBuffer;
-            var mappings = (void**)(bufferPtr + sizePerBuffer * 2);  // Put mapping table at end.
+            var mappings = (void**)(bufferPtr + sizePerBuffer * 2); // Put mapping table at end.
             bufferPtr += sizePerBuffer * 2 + mappingTableSizePerBuffer;
 
-            var buffers = new DoubleBuffers
-            {
-                deviceToBufferMapping = mappings,
-                deviceCount = deviceCount
-            };
+            var buffers = new DoubleBuffers { deviceToBufferMapping = mappings, deviceCount = deviceCount };
 
             for (var i = 0; i < deviceCount; ++i)
             {
@@ -308,7 +316,12 @@ namespace UnityEngine.InputSystem.LowLevel
             }
         }
 
-        private static void MigrateDoubleBuffer(DoubleBuffers newBuffer, InputDevice[] devices, int deviceCount, DoubleBuffers oldBuffer)
+        private static void MigrateDoubleBuffer(
+            DoubleBuffers newBuffer,
+            InputDevice[] devices,
+            int deviceCount,
+            DoubleBuffers oldBuffer
+        )
         {
             // Nothing to migrate if we no longer keep a buffer of the corresponding type.
             if (!newBuffer.valid)
@@ -329,11 +342,13 @@ namespace UnityEngine.InputSystem.LowLevel
                 // NOTE: This also means that device indices of
                 if (device.m_StateBlock.byteOffset == InputStateBlock.InvalidOffset)
                 {
-                    #if DEVELOPMENT_BUILD || UNITY_EDITOR
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
                     for (var n = i + 1; n < deviceCount; ++n)
-                        Debug.Assert(devices[n].m_StateBlock.byteOffset == InputStateBlock.InvalidOffset,
-                            "New devices must be appended to the array; found an old device coming in the array after a newly added device");
-                    #endif
+                        Debug.Assert(
+                            devices[n].m_StateBlock.byteOffset == InputStateBlock.InvalidOffset,
+                            "New devices must be appended to the array; found an old device coming in the array after a newly added device"
+                        );
+#endif
                     break;
                 }
 
@@ -355,7 +370,12 @@ namespace UnityEngine.InputSystem.LowLevel
             }
         }
 
-        private static void MigrateSingleBuffer(void* newBuffer, InputDevice[] devices, int deviceCount, void* oldBuffer)
+        private static void MigrateSingleBuffer(
+            void* newBuffer,
+            InputDevice[] devices,
+            int deviceCount,
+            void* oldBuffer
+        )
         {
             // Migrate every device that has allocated state blocks.
             var newDeviceCount = deviceCount;

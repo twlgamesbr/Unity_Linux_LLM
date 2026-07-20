@@ -12,6 +12,7 @@ namespace Unity.PlatformToolkit.Editor
 
         [CreateProperty]
         public List<AttributeViewModel> AttributeViewModels;
+
         [CreateProperty]
         public bool ShowWarning;
 
@@ -43,7 +44,10 @@ namespace Unity.PlatformToolkit.Editor
         private void OnAttributeModified()
         {
             var duplicateNames = m_Settings.Attributes.GroupBy(a => a.Name).Where(g => g.Count() > 1).ToList();
-            if (!duplicateNames.Any() || (duplicateNames.Count() == 1 && string.IsNullOrEmpty(duplicateNames.First().Key)))
+            if (
+                !duplicateNames.Any()
+                || (duplicateNames.Count() == 1 && string.IsNullOrEmpty(duplicateNames.First().Key))
+            )
                 ShowWarning = false;
             else
                 ShowWarning = true;

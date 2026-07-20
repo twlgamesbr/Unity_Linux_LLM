@@ -1,22 +1,27 @@
 using System;
 using System.Threading;
-using UnityEngine.Assertions;
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Burst;
 using Unity.Mathematics;
+using UnityEngine.Assertions;
 
-[assembly: RegisterGenericJobType(typeof(UnityEngine.Rendering.FindNonRegisteredInstanceIDsJob<UnityEngine.Rendering.MeshInfo>))]
-[assembly: RegisterGenericJobType(typeof(UnityEngine.Rendering.FindNonRegisteredInstanceIDsJob<UnityEngine.Rendering.GPUDrivenMaterial>))]
+[assembly: RegisterGenericJobType(
+    typeof(UnityEngine.Rendering.FindNonRegisteredInstanceIDsJob<UnityEngine.Rendering.MeshInfo>)
+)]
+[assembly: RegisterGenericJobType(
+    typeof(UnityEngine.Rendering.FindNonRegisteredInstanceIDsJob<UnityEngine.Rendering.GPUDrivenMaterial>)
+)]
 
 namespace UnityEngine.Rendering
 {
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
     internal struct PrefixSumDrawInstancesJob : IJob
     {
-        [ReadOnly] public NativeParallelHashMap<RangeKey, int> rangeHash;
+        [ReadOnly]
+        public NativeParallelHashMap<RangeKey, int> rangeHash;
 
         public NativeList<DrawRange> drawRanges;
         public NativeList<DrawBatch> drawBatches;
@@ -74,14 +79,26 @@ namespace UnityEngine.Rendering
     {
         public const int k_IntsPerCacheLine = JobsUtility.CacheLineSize / sizeof(int);
 
-        [ReadOnly] public NativeParallelHashMap<DrawKey, int> batchHash;
-        [NativeDisableContainerSafetyRestriction, NoAlias] [ReadOnly] public NativeList<DrawInstance> drawInstances;
-        [NativeDisableContainerSafetyRestriction, NoAlias] [ReadOnly] public NativeList<DrawBatch> drawBatches;
+        [ReadOnly]
+        public NativeParallelHashMap<DrawKey, int> batchHash;
 
-        [NativeDisableContainerSafetyRestriction, NoAlias] [WriteOnly] public NativeArray<int> internalDrawIndex;
-        [NativeDisableContainerSafetyRestriction, NoAlias] [WriteOnly] public NativeArray<int> drawInstanceIndices;
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [ReadOnly]
+        public NativeList<DrawInstance> drawInstances;
 
-        private unsafe static int IncrementCounter(int* counter)
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [ReadOnly]
+        public NativeList<DrawBatch> drawBatches;
+
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [WriteOnly]
+        public NativeArray<int> internalDrawIndex;
+
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [WriteOnly]
+        public NativeArray<int> drawInstanceIndices;
+
+        private static unsafe int IncrementCounter(int* counter)
         {
             return Interlocked.Increment(ref UnsafeUtility.AsRef<int>(counter)) - 1;
         }
@@ -104,10 +121,15 @@ namespace UnityEngine.Rendering
     {
         public const int k_MaxBatchSize = 128;
 
-        [ReadOnly] public NativeArray<InstanceHandle> instancesSorted;
-        [NativeDisableContainerSafetyRestriction, NoAlias] [ReadOnly] public NativeList<DrawInstance> drawInstances;
+        [ReadOnly]
+        public NativeArray<InstanceHandle> instancesSorted;
 
-        [WriteOnly] public NativeList<int>.ParallelWriter outDrawInstanceIndicesWriter;
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [ReadOnly]
+        public NativeList<DrawInstance> drawInstances;
+
+        [WriteOnly]
+        public NativeList<int>.ParallelWriter outDrawInstanceIndicesWriter;
 
         public void Execute(int startIndex, int count)
         {
@@ -132,10 +154,15 @@ namespace UnityEngine.Rendering
     {
         public const int k_MaxBatchSize = 128;
 
-        [ReadOnly] public NativeArray<uint> materialsSorted;
-        [NativeDisableContainerSafetyRestriction, NoAlias] [ReadOnly] public NativeList<DrawInstance> drawInstances;
+        [ReadOnly]
+        public NativeArray<uint> materialsSorted;
 
-        [WriteOnly] public NativeList<int>.ParallelWriter outDrawInstanceIndicesWriter;
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [ReadOnly]
+        public NativeList<DrawInstance> drawInstances;
+
+        [WriteOnly]
+        public NativeList<int>.ParallelWriter outDrawInstanceIndicesWriter;
 
         public void Execute(int startIndex, int count)
         {
@@ -156,15 +183,22 @@ namespace UnityEngine.Rendering
     }
 
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-    internal struct FindNonRegisteredInstanceIDsJob<T> : IJobParallelFor where T : unmanaged
+    internal struct FindNonRegisteredInstanceIDsJob<T> : IJobParallelFor
+        where T : unmanaged
     {
         public const int MaxBatchSize = 128;
 
-        [ReadOnly] public NativeArray<JaggedJobRange> jobRanges;
-        [ReadOnly] public JaggedSpan<EntityId> jaggedInstanceIDs;
-        [ReadOnly] public NativeParallelHashMap<EntityId, T> hashMap;
+        [ReadOnly]
+        public NativeArray<JaggedJobRange> jobRanges;
 
-        [WriteOnly] public NativeParallelHashSet<EntityId>.ParallelWriter outInstanceIDWriter;
+        [ReadOnly]
+        public JaggedSpan<EntityId> jaggedInstanceIDs;
+
+        [ReadOnly]
+        public NativeParallelHashMap<EntityId, T> hashMap;
+
+        [WriteOnly]
+        public NativeParallelHashSet<EntityId>.ParallelWriter outInstanceIDWriter;
 
         public unsafe void Execute(int jobIndex)
         {
@@ -184,10 +218,14 @@ namespace UnityEngine.Rendering
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
     internal struct RegisterNewMaterialsJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<EntityId> instanceIDs;
-        [ReadOnly] public NativeArray<GPUDrivenMaterial> materials;
+        [ReadOnly]
+        public NativeArray<EntityId> instanceIDs;
 
-        [WriteOnly] public NativeParallelHashMap<EntityId, GPUDrivenMaterial>.ParallelWriter materialMap;
+        [ReadOnly]
+        public NativeArray<GPUDrivenMaterial> materials;
+
+        [WriteOnly]
+        public NativeParallelHashMap<EntityId, GPUDrivenMaterial>.ParallelWriter materialMap;
 
         public unsafe void Execute(int index)
         {
@@ -199,13 +237,23 @@ namespace UnityEngine.Rendering
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
     internal struct RegisterNewMeshesJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<EntityId> instanceIDs;
-        [ReadOnly] public NativeArray<BatchMeshID> batchMeshIDs;
-        [ReadOnly] public NativeArray<GPUDrivenMeshData> meshDatas;
-        [ReadOnly] public NativeArray<int> subMeshOffsets;
-        [ReadOnly] public NativeArray<GPUDrivenSubMesh> subMeshBuffer;
+        [ReadOnly]
+        public NativeArray<EntityId> instanceIDs;
 
-        [WriteOnly] public NativeParallelHashMap<EntityId, MeshInfo>.ParallelWriter meshMap;
+        [ReadOnly]
+        public NativeArray<BatchMeshID> batchMeshIDs;
+
+        [ReadOnly]
+        public NativeArray<GPUDrivenMeshData> meshDatas;
+
+        [ReadOnly]
+        public NativeArray<int> subMeshOffsets;
+
+        [ReadOnly]
+        public NativeArray<GPUDrivenSubMesh> subMeshBuffer;
+
+        [WriteOnly]
+        public NativeParallelHashMap<EntityId, MeshInfo>.ParallelWriter meshMap;
 
         public unsafe void Execute(int index)
         {

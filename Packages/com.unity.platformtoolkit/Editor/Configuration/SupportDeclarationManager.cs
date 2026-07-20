@@ -5,13 +5,15 @@ using UnityEditor;
 
 namespace Unity.PlatformToolkit.Editor
 {
-    static internal class SupportDeclarationManager
+    internal static class SupportDeclarationManager
     {
         private static readonly IPlatformToolkitSupportDeclaration[] s_SupportDeclarations;
         internal static IReadOnlyList<IPlatformToolkitSupportDeclaration> SupportDeclarations => s_SupportDeclarations;
 
-        private static readonly Dictionary<Type, IPlatformToolkitSupportDeclaration> s_DeclarationTypeToDeclaration = new();
-        private static readonly Dictionary<string, IPlatformToolkitSupportDeclaration> s_DeclarationKeyToDeclaration = new();
+        private static readonly Dictionary<Type, IPlatformToolkitSupportDeclaration> s_DeclarationTypeToDeclaration =
+            new();
+        private static readonly Dictionary<string, IPlatformToolkitSupportDeclaration> s_DeclarationKeyToDeclaration =
+            new();
         private static readonly Dictionary<Type, string> s_SettingsTypeToDeclarationKey = new();
 
         static SupportDeclarationManager()
@@ -28,27 +30,38 @@ namespace Unity.PlatformToolkit.Editor
                 s_DeclarationKeyToDeclaration.TryAdd(supportDeclaration.Key, supportDeclaration);
             }
 
-            s_SupportDeclarations = s_DeclarationKeyToDeclaration.Values.OrderBy(x =>
-            {
-                return (x.SortIndex != -1) ? x.SortIndex : int.MaxValue;
-            }).ToArray();
+            s_SupportDeclarations = s_DeclarationKeyToDeclaration
+                .Values.OrderBy(x =>
+                {
+                    return (x.SortIndex != -1) ? x.SortIndex : int.MaxValue;
+                })
+                .ToArray();
 
             foreach (var supportDeclaration in SupportDeclarations)
             {
                 s_DeclarationTypeToDeclaration.Add(supportDeclaration.GetType(), supportDeclaration);
                 if (supportDeclaration.SettingsProvider != null)
                 {
-                    s_SettingsTypeToDeclarationKey.TryAdd(supportDeclaration.SettingsProvider.SettingsType, supportDeclaration.Key);
+                    s_SettingsTypeToDeclarationKey.TryAdd(
+                        supportDeclaration.SettingsProvider.SettingsType,
+                        supportDeclaration.Key
+                    );
                 }
             }
         }
 
-        internal static bool TryGetSupportDeclaration(Type type, out IPlatformToolkitSupportDeclaration supportDeclaration)
+        internal static bool TryGetSupportDeclaration(
+            Type type,
+            out IPlatformToolkitSupportDeclaration supportDeclaration
+        )
         {
             return s_DeclarationTypeToDeclaration.TryGetValue(type, out supportDeclaration);
         }
 
-        internal static bool TryGetSupportDeclaration(string key, out IPlatformToolkitSupportDeclaration supportDeclaration)
+        internal static bool TryGetSupportDeclaration(
+            string key,
+            out IPlatformToolkitSupportDeclaration supportDeclaration
+        )
         {
             return s_DeclarationKeyToDeclaration.TryGetValue(key, out supportDeclaration);
         }

@@ -20,7 +20,6 @@ namespace Unity.PlatformToolkit.PlayMode
 
         internal event Action<string> OnWarningReported;
 
-
         /// <summary>
         /// Event types are used to bucket similar events together and only monitor them in isolation.
         /// This won't completely match up to some platform-specific frequency requirements as things opens, commits and deletes can be kinds of writes,
@@ -34,7 +33,7 @@ namespace Unity.PlatformToolkit.PlayMode
             Write,
             Enumerate,
             Commit,
-            Delete
+            Delete,
         }
 
         private readonly struct Event
@@ -71,9 +70,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
             public bool Equals(EventKey other)
             {
-                return Type == other.Type &&
-                    AccountId == other.AccountId &&
-                    string.Equals(Location, other.Location, StringComparison.Ordinal);
+                return Type == other.Type
+                    && AccountId == other.AccountId
+                    && string.Equals(Location, other.Location, StringComparison.Ordinal);
             }
 
             public override int GetHashCode()
@@ -97,7 +96,6 @@ namespace Unity.PlatformToolkit.PlayMode
             public readonly string Name;
         }
 
-
         private readonly struct StoredEvent
         {
             public StoredEvent(EventKey key, DateTime timeUtc)
@@ -112,7 +110,13 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private struct StoredHandleEvent
         {
-            public StoredHandleEvent(int accountId, string accountName, string location, object disposable, DateTime timeUtc)
+            public StoredHandleEvent(
+                int accountId,
+                string accountName,
+                string location,
+                object disposable,
+                DateTime timeUtc
+            )
             {
                 TimeUtc = timeUtc;
                 AccountId = accountId;
@@ -181,14 +185,11 @@ namespace Unity.PlatformToolkit.PlayMode
                 if ((m_HandleRecords.FindIndex(x => x.Disposable == disposable) != -1))
                     Debug.LogError("LogStorageOpenedDisposable called for a disposable that's already tracked.");
 
-                string accountName = accountId != -1 ?
-                    GetAccountName(accountId) :
-                    null;
+                string accountName = accountId != -1 ? GetAccountName(accountId) : null;
 
                 m_HandleRecords.Add(new StoredHandleEvent(accountId, accountName, location, disposable, GetUtcNow()));
             }
         }
-
 
         public void LogStorageDispose(object disposable)
         {
@@ -217,19 +218,32 @@ namespace Unity.PlatformToolkit.PlayMode
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void LogStorageOpenRead(int accountId, string location) => LogEvent(new Event(EventType.OpenRead, accountId, location));
+        public void LogStorageOpenRead(int accountId, string location) =>
+            LogEvent(new Event(EventType.OpenRead, accountId, location));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void LogStorageOpenWrite(int accountId, string location) => LogEvent(new Event(EventType.OpenWrite, accountId, location));
+        public void LogStorageOpenWrite(int accountId, string location) =>
+            LogEvent(new Event(EventType.OpenWrite, accountId, location));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void LogStorageRead(int accountId, string location) => LogEvent(new Event(EventType.Read, accountId, location));
+        public void LogStorageRead(int accountId, string location) =>
+            LogEvent(new Event(EventType.Read, accountId, location));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void LogStorageWrite(int accountId, string location) => LogEvent(new Event(EventType.Write, accountId, location));
+        public void LogStorageWrite(int accountId, string location) =>
+            LogEvent(new Event(EventType.Write, accountId, location));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void LogStorageEnumerate(int accountId, string location) => LogEvent(new Event(EventType.Enumerate, accountId, location));
+        public void LogStorageEnumerate(int accountId, string location) =>
+            LogEvent(new Event(EventType.Enumerate, accountId, location));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void LogStorageCommit(int accountId, string location) => LogEvent(new Event(EventType.Commit, accountId, location));
+        public void LogStorageCommit(int accountId, string location) =>
+            LogEvent(new Event(EventType.Commit, accountId, location));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void LogStorageDelete(int accountId, string location) => LogEvent(new Event(EventType.Delete, accountId, location));
+        public void LogStorageDelete(int accountId, string location) =>
+            LogEvent(new Event(EventType.Delete, accountId, location));
 
         private bool TryGetEventTypeIntervalTicks(EventType type, out long ticks)
         {
@@ -267,7 +281,6 @@ namespace Unity.PlatformToolkit.PlayMode
             return ticks > 0;
         }
 
-
         private void LogEvent(in Event evt)
         {
             var eventKey = new EventKey(evt.Type, evt.AccountId, evt.Location);
@@ -280,14 +293,21 @@ namespace Unity.PlatformToolkit.PlayMode
                     var timePassed = eventTimeUtc - lastEvent.TimeUtc;
                     var timePassedTicks = timePassed.Ticks;
 
-                    if (TryGetEventTypeIntervalTicks(evt.Type, out var thresholdTicks) &&
-                        timePassedTicks <= thresholdTicks)
+                    if (
+                        TryGetEventTypeIntervalTicks(evt.Type, out var thresholdTicks)
+                        && timePassedTicks <= thresholdTicks
+                    )
                     {
-                        var accountName = evt.AccountId != -1 ?
-                            GetAccountName(evt.AccountId) :
-                            null;
+                        var accountName = evt.AccountId != -1 ? GetAccountName(evt.AccountId) : null;
 
-                        ReportLimitReached(MakeEventReportString(evt.Location, accountName, evt.Type, (float)TimeSpan.FromTicks(thresholdTicks).TotalSeconds));
+                        ReportLimitReached(
+                            MakeEventReportString(
+                                evt.Location,
+                                accountName,
+                                evt.Type,
+                                (float)TimeSpan.FromTicks(thresholdTicks).TotalSeconds
+                            )
+                        );
                     }
                 }
 
@@ -326,7 +346,6 @@ namespace Unity.PlatformToolkit.PlayMode
             return $"[UNKNOWN]";
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ValidateLifetime(DateTime nowUtc, ref StoredHandleEvent handleEvent)
         {
@@ -336,10 +355,15 @@ namespace Unity.PlatformToolkit.PlayMode
             var timePassed = nowUtc - handleEvent.TimeUtc;
             var timePassedTicks = timePassed.Ticks;
 
-            if (TryGetUndisposedSaveIntervalTicks(out var thresholdTicks) &&
-                timePassedTicks >= thresholdTicks)
+            if (TryGetUndisposedSaveIntervalTicks(out var thresholdTicks) && timePassedTicks >= thresholdTicks)
             {
-                ReportLimitReached(MakeHandleReportString(handleEvent.Location, handleEvent.AccountName, (float)TimeSpan.FromTicks(thresholdTicks).TotalSeconds));
+                ReportLimitReached(
+                    MakeHandleReportString(
+                        handleEvent.Location,
+                        handleEvent.AccountName,
+                        (float)TimeSpan.FromTicks(thresholdTicks).TotalSeconds
+                    )
+                );
                 handleEvent.HasWarned = true;
             }
         }
@@ -354,18 +378,24 @@ namespace Unity.PlatformToolkit.PlayMode
             }
         }
 
-        private static string MakeEventReportString(string location, string accountName, EventType type, float thresholdSeconds)
+        private static string MakeEventReportString(
+            string location,
+            string accountName,
+            EventType type,
+            float thresholdSeconds
+        )
         {
             string locationStr = location != null ? $"at location '{location}' " : string.Empty;
             string accountStr = accountName != null ? $"for account '{accountName}' " : string.Empty;
 
-            string extraContext = type == EventType.Enumerate ?
-                "Note that Exists checks are often implemented as file enumerations, which may trigger this warning. " :
-                string.Empty;
+            string extraContext =
+                type == EventType.Enumerate
+                    ? "Note that Exists checks are often implemented as file enumerations, which may trigger this warning. "
+                    : string.Empty;
 
-            return $"Detected a repeated storage '{type}' event {accountStr}{locationStr}within a {thresholdSeconds} second period. " +
-                $"{extraContext}" +
-                "These warnings can be configured from the Play Mode Controls window.";
+            return $"Detected a repeated storage '{type}' event {accountStr}{locationStr}within a {thresholdSeconds} second period. "
+                + $"{extraContext}"
+                + "These warnings can be configured from the Play Mode Controls window.";
         }
 
         private static string MakeHandleReportString(string location, string accountName, double timePassedSeconds)
@@ -373,11 +403,10 @@ namespace Unity.PlatformToolkit.PlayMode
             string locationStr = location != null ? $"at location '{location}' " : string.Empty;
             string accountStr = accountName != null ? $"for account '{accountName}' " : string.Empty;
 
-            return $"Detected a storage handle {accountStr}{locationStr}has been held open for {timePassedSeconds:F2} seconds. " +
-                "Storage objects should be used and disposed within a reasonable timeframe to ensure changes aren't lost, Operating System handles aren't left open, and submission requirements on certain platforms are met. " +
-                "These warnings can be configured from the Play Mode Controls window.";
+            return $"Detected a storage handle {accountStr}{locationStr}has been held open for {timePassedSeconds:F2} seconds. "
+                + "Storage objects should be used and disposed within a reasonable timeframe to ensure changes aren't lost, Operating System handles aren't left open, and submission requirements on certain platforms are met. "
+                + "These warnings can be configured from the Play Mode Controls window.";
         }
-
 
         private void ReportLimitReached(string message)
         {

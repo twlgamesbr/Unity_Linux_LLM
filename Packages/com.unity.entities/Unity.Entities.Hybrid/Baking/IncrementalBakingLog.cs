@@ -14,17 +14,24 @@ namespace Unity.Entities.Baking
     [StructLayout(LayoutKind.Explicit)]
     struct BakerJournalingEntry
     {
-        [FieldOffset(0)] public int recordTypeInt;
-        [FieldOffset(4)] public EntityId intValue;
+        [FieldOffset(0)]
+        public int recordTypeInt;
+
+        [FieldOffset(4)]
+        public EntityId intValue;
+
 #if UNITY_EDITOR
-        [FieldOffset(4)] public GUID guidValue;
+        [FieldOffset(4)]
+        public GUID guidValue;
 #endif
-        [FieldOffset(4)] public ComponentBakeTrigger triggerValue;
+
+        [FieldOffset(4)]
+        public ComponentBakeTrigger triggerValue;
 
         public BakeRecordType RecordType
         {
-            get { return (BakeRecordType) recordTypeInt; }
-            set { recordTypeInt = (int)value;  }
+            get { return (BakeRecordType)recordTypeInt; }
+            set { recordTypeInt = (int)value; }
         }
     }
 
@@ -38,7 +45,11 @@ namespace Unity.Entities.Baking
 
         public bool Equals(ComponentBakeTrigger other)
         {
-            return AuthoringComponentId == other.AuthoringComponentId && BakeReason == other.BakeReason && ReasonId == other.ReasonId && ReasonGuid.Equals(other.ReasonGuid) && BakingUnityTypeIndex.Equals(other.BakingUnityTypeIndex);
+            return AuthoringComponentId == other.AuthoringComponentId
+                && BakeReason == other.BakeReason
+                && ReasonId == other.ReasonId
+                && ReasonGuid.Equals(other.ReasonGuid)
+                && BakingUnityTypeIndex.Equals(other.BakingUnityTypeIndex);
         }
 
         public override bool Equals(object obj)
@@ -48,7 +59,7 @@ namespace Unity.Entities.Baking
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(AuthoringComponentId, (int) BakeReason, ReasonId, ReasonGuid, BakingUnityTypeIndex);
+            return HashCode.Combine(AuthoringComponentId, (int)BakeReason, ReasonId, ReasonGuid, BakingUnityTypeIndex);
         }
     }
 
@@ -86,14 +97,17 @@ namespace Unity.Entities.Baking
         ChangedAssetsOnDisk,
 #endif
 
-        ComponentBakeTriggers
+        ComponentBakeTriggers,
     }
 
     internal static class IncrementalBakingLog
     {
         private static ulong lastJournalingRecordIndex;
 
-        internal sealed class SharedEnabled { internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedEnabled>(); }
+        internal sealed class SharedEnabled
+        {
+            internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedEnabled>();
+        }
 
         internal static ref bool Enabled => ref SharedEnabled.Ref.Data;
 
@@ -106,9 +120,9 @@ namespace Unity.Entities.Baking
 #endif
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             lastJournalingRecordIndex = EntitiesJournaling.RecordIndex;
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #endif
             if (!Enabled)
                 return;
@@ -178,7 +192,12 @@ namespace Unity.Entities.Baking
         }
 #endif
 
-        public static void RecordComponentBake(EntityId componentId, ComponentBakeReason reason, EntityId reasonId, TypeIndex unityTypeIndex)
+        public static void RecordComponentBake(
+            EntityId componentId,
+            ComponentBakeReason reason,
+            EntityId reasonId,
+            TypeIndex unityTypeIndex
+        )
         {
             if (!Enabled)
                 return;
@@ -191,14 +210,19 @@ namespace Unity.Entities.Baking
                 BakeReason = reason,
                 ReasonId = reasonId,
                 ReasonGuid = default,
-                BakingUnityTypeIndex = unityTypeIndex
+                BakingUnityTypeIndex = unityTypeIndex,
             };
 
             AddToJournaling(entry);
         }
 
 #if UNITY_EDITOR
-        public static void RecordComponentBake(EntityId componentId, ComponentBakeReason reason, GUID reasonGuid, TypeIndex unityTypeIndex)
+        public static void RecordComponentBake(
+            EntityId componentId,
+            ComponentBakeReason reason,
+            GUID reasonGuid,
+            TypeIndex unityTypeIndex
+        )
         {
             if (!Enabled)
                 return;
@@ -211,7 +235,7 @@ namespace Unity.Entities.Baking
                 BakeReason = reason,
                 ReasonId = EntityId.None,
                 ReasonGuid = reasonGuid,
-                BakingUnityTypeIndex = unityTypeIndex
+                BakingUnityTypeIndex = unityTypeIndex,
             };
             AddToJournaling(entry);
         }
@@ -240,7 +264,7 @@ namespace Unity.Entities.Baking
         private static void AddToJournaling(BakerJournalingEntry entry)
         {
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             unsafe
             {
                 int entrySize = UnsafeUtility.SizeOf<BakerJournalingEntry>();
@@ -251,9 +275,10 @@ namespace Unity.Entities.Baking
                     entities: default,
                     entityCount: default,
                     data: UnsafeUtility.AddressOf(ref entry),
-                    dataLength: entrySize);
+                    dataLength: entrySize
+                );
             }
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #endif
         }
 
@@ -349,11 +374,12 @@ namespace Unity.Entities.Baking
             JournalBakingInfo info = new JournalBakingInfo(Allocator.Persistent);
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             unsafe
             {
                 // We want only baking records with an index that's greater than lastJournalingRecordIndex
-                var records = EntitiesJournaling.GetRecords(EntitiesJournaling.Ordering.Ascending)
+                var records = EntitiesJournaling
+                    .GetRecords(EntitiesJournaling.Ordering.Ascending)
                     .WithRecordType(EntitiesJournaling.RecordType.BakingRecord)
                     .Where(r => r.Index > lastJournalingRecordIndex);
 
@@ -389,25 +415,30 @@ namespace Unity.Entities.Baking
                         case BakeRecordType.ChangedAssets:
                             info.ChangedAssets.Add(bakerEntry.intValue);
                             break;
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
                         case BakeRecordType.ChangedAssetsOnDisk:
                             info.ChangedAssetsOnDisk.Add(bakerEntry.guidValue);
                             break;
-    #endif
+#endif
                         case BakeRecordType.ComponentBakeTriggers:
-                        {
-                            if (!info.ComponentBakeTriggersCount.TryGetValue(bakerEntry.triggerValue, out var count))
                             {
-                                info.ComponentBakeTriggers.Add(bakerEntry.triggerValue.AuthoringComponentId, bakerEntry.triggerValue);
+                                if (
+                                    !info.ComponentBakeTriggersCount.TryGetValue(bakerEntry.triggerValue, out var count)
+                                )
+                                {
+                                    info.ComponentBakeTriggers.Add(
+                                        bakerEntry.triggerValue.AuthoringComponentId,
+                                        bakerEntry.triggerValue
+                                    );
+                                }
+                                info.ComponentBakeTriggersCount[bakerEntry.triggerValue] = count + 1;
                             }
-                            info.ComponentBakeTriggersCount[bakerEntry.triggerValue] = count + 1;
-                        }
 
-                        break;
+                            break;
                     }
                 }
             }
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #endif
             return info;
         }
@@ -477,7 +508,9 @@ namespace Unity.Entities.Baking
 
             // Write dependency triggers
             // -------------------------
-            using var authoringIds = NativeParallelHashMapExtensions.GetUniqueKeyArray(bakerRecords.ComponentBakeTriggers, Allocator.Temp).Item1;
+            using var authoringIds = NativeParallelHashMapExtensions
+                .GetUniqueKeyArray(bakerRecords.ComponentBakeTriggers, Allocator.Temp)
+                .Item1;
             if (authoringIds.Length > 0)
             {
                 sb.AppendLine($"Bake Reasons");
@@ -496,7 +529,8 @@ namespace Unity.Entities.Baking
                         {
                             sb.AppendLine($"Type: {component.GetType().Name}");
                             sb.AppendLine(
-                                $"GameObject: {component.gameObject.name} ({component.gameObject.GetEntityId()})");
+                                $"GameObject: {component.gameObject.name} ({component.gameObject.GetEntityId()})"
+                            );
                         }
                     }
                     else
@@ -514,13 +548,15 @@ namespace Unity.Entities.Baking
                             case ComponentBakeReason.NewComponent:
                             {
                                 sb.Append(
-                                    $"\tNew Component - {typeInfo.DebugTypeName} ({trigger.AuthoringComponentId})");
+                                    $"\tNew Component - {typeInfo.DebugTypeName} ({trigger.AuthoringComponentId})"
+                                );
                                 break;
                             }
                             case ComponentBakeReason.ComponentChanged:
                             {
                                 sb.Append(
-                                    $"\tComponent Changed - {typeInfo.DebugTypeName} ({trigger.AuthoringComponentId})");
+                                    $"\tComponent Changed - {typeInfo.DebugTypeName} ({trigger.AuthoringComponentId})"
+                                );
                                 break;
                             }
                             case ComponentBakeReason.GetComponentChanged:
@@ -531,7 +567,8 @@ namespace Unity.Entities.Baking
                             case ComponentBakeReason.GetComponentStructuralChange:
                             {
                                 sb.Append(
-                                    $"\tGetComponent({typeInfo.DebugTypeName}) Structural Change ({trigger.ReasonId})");
+                                    $"\tGetComponent({typeInfo.DebugTypeName}) Structural Change ({trigger.ReasonId})"
+                                );
                                 break;
                             }
                             case ComponentBakeReason.GetComponentsStructuralChange:
@@ -542,7 +579,8 @@ namespace Unity.Entities.Baking
                             case ComponentBakeReason.GetHierarchySingleStructuralChange:
                             {
                                 sb.Append(
-                                    $"\tHierarchy({typeInfo.DebugTypeName}) Structural Change ({trigger.ReasonId})");
+                                    $"\tHierarchy({typeInfo.DebugTypeName}) Structural Change ({trigger.ReasonId})"
+                                );
                                 break;
                             }
                             case ComponentBakeReason.GetHierarchyStructuralChange:
@@ -553,7 +591,8 @@ namespace Unity.Entities.Baking
                             case ComponentBakeReason.ObjectExistStructuralChange:
                             {
                                 sb.Append(
-                                    $"\tObjectExist({typeInfo.DebugTypeName}) Structural Change ({trigger.ReasonId})");
+                                    $"\tObjectExist({typeInfo.DebugTypeName}) Structural Change ({trigger.ReasonId})"
+                                );
                                 break;
                             }
                             case ComponentBakeReason.ReferenceChanged:
@@ -582,7 +621,7 @@ namespace Unity.Entities.Baking
 #endif
                             case ComponentBakeReason.ActiveChanged:
                             {
-                                var gameObject = (GameObject) Resources.EntityIdToObject(trigger.ReasonId);
+                                var gameObject = (GameObject)Resources.EntityIdToObject(trigger.ReasonId);
                                 if (gameObject != null)
                                 {
                                     sb.Append($"\tIsActive() Changed ({gameObject.name}, {trigger.ReasonId})");
@@ -596,16 +635,18 @@ namespace Unity.Entities.Baking
                             }
                             case ComponentBakeReason.UpdatePrefabInstance:
                             {
-                                var gameObject = (GameObject) Resources.EntityIdToObject(trigger.ReasonId);
+                                var gameObject = (GameObject)Resources.EntityIdToObject(trigger.ReasonId);
                                 if (gameObject != null)
                                 {
                                     sb.Append(
-                                        $"\tUpdatePrefabInstance ({gameObject.name}, {trigger.ReasonId}) - Caused when a prefab asset is instance in a SubScene and the original asset is modified, thus updating the non-overridden properties in the scene instance.");
+                                        $"\tUpdatePrefabInstance ({gameObject.name}, {trigger.ReasonId}) - Caused when a prefab asset is instance in a SubScene and the original asset is modified, thus updating the non-overridden properties in the scene instance."
+                                    );
                                 }
                                 else
                                 {
                                     sb.Append(
-                                        $"\tUpdatePrefabInstance ({trigger.ReasonId}) - Caused when a prefab asset is instance in a SubScene and the original asset is modified, thus updating the non-overridden properties in the scene instance.");
+                                        $"\tUpdatePrefabInstance ({trigger.ReasonId}) - Caused when a prefab asset is instance in a SubScene and the original asset is modified, thus updating the non-overridden properties in the scene instance."
+                                    );
                                 }
 
                                 break;
@@ -625,13 +666,17 @@ namespace Unity.Entities.Baking
 
         static void WriteComponent(StringBuilder sb, EntityId componentId)
         {
-            var component = (Component) Resources.EntityIdToObject(componentId);
+            var component = (Component)Resources.EntityIdToObject(componentId);
             sb.AppendLine($"Type: {component.GetType().Name}");
             sb.AppendLine($"EntityId: {componentId}");
             sb.AppendLine($"GameObject: {component.gameObject.name} ({component.gameObject.GetEntityId()})");
         }
 
-        static void WriteGameObject(ref GameObjectComponents gameObjectComponents, StringBuilder sb, EntityId gameObjectId)
+        static void WriteGameObject(
+            ref GameObjectComponents gameObjectComponents,
+            StringBuilder sb,
+            EntityId gameObjectId
+        )
         {
             var gameObject = (GameObject)Resources.EntityIdToObject(gameObjectId);
             sb.AppendLine($"Name: {gameObject.name}");
@@ -645,6 +690,5 @@ namespace Unity.Entities.Baking
                 sb.AppendLine($"\t{typeInfo.Type.Name} ({componentData.EntityId})");
             }
         }
-
     }
 }

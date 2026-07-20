@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Burst;
+using Unity.Collections.LowLevel.Unsafe;
 using static Unity.Collections.AllocatorManager;
 
 namespace Unity.Collections
@@ -10,7 +10,7 @@ namespace Unity.Collections
     /// Extension methods for NativeArray.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static class NativeArrayExtensions
+    public static unsafe class NativeArrayExtensions
     {
         /// <summary>
         /// Provides a Burst compatible id for NativeArray<typeparamref name="T"/> types. Used by the Job Safety System.
@@ -19,7 +19,9 @@ namespace Unity.Collections
         public struct NativeArrayStaticId<T>
             where T : unmanaged
         {
-            internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<NativeArray<T>>();
+            internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<
+                NativeArray<T>
+            >();
         }
 
         /// <summary>
@@ -30,8 +32,9 @@ namespace Unity.Collections
         /// <param name="container">The container to search.</param>
         /// <param name="value">The value to locate.</param>
         /// <returns>True if the value is present in this container.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(this NativeArray<T> container, U value) where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value) != -1;
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static bool Contains<T, U>(this NativeArray<T> container, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value) != -1;
 
         /// <summary>
         /// Finds the index of the first occurrence of a particular value in this container.
@@ -41,30 +44,9 @@ namespace Unity.Collections
         /// <param name="container">The container to search.</param>
         /// <param name="value">The value to locate.</param>
         /// <returns>The index of the first occurrence of the value in this container. Returns -1 if no occurrence is found.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static int IndexOf<T, U>(this NativeArray<T> container, U value) where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value);
-
-        /// <summary>
-        /// Returns true if a particular value is present in this container.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in this container.</typeparam>
-        /// <typeparam name="U">The value type.</typeparam>
-        /// <param name="container">The container to search.</param>
-        /// <param name="value">The value to locate.</param>
-        /// <returns>True if the value is present in this container.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(this NativeArray<T>.ReadOnly container, U value) where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value) != -1;
-
-        /// <summary>
-        /// Finds the index of the first occurrence of a particular value in this container.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in this container.</typeparam>
-        /// <typeparam name="U">The type of value to locate.</typeparam>
-        /// <param name="container">The container to search.</param>
-        /// <param name="value">The value to locate.</param>
-        /// <returns>The index of the first occurrence of the value in this container. Returns -1 if no occurrence is found.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static int IndexOf<T, U>(this NativeArray<T>.ReadOnly container, U value) where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value);
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static int IndexOf<T, U>(this NativeArray<T> container, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value);
 
         /// <summary>
         /// Returns true if a particular value is present in this container.
@@ -75,7 +57,8 @@ namespace Unity.Collections
         /// <param name="value">The value to locate.</param>
         /// <returns>True if the value is present in this container.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(this NativeList<T> container, U value) where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value) != -1;
+        public static bool Contains<T, U>(this NativeArray<T>.ReadOnly container, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value) != -1;
 
         /// <summary>
         /// Finds the index of the first occurrence of a particular value in this container.
@@ -86,7 +69,32 @@ namespace Unity.Collections
         /// <param name="value">The value to locate.</param>
         /// <returns>The index of the first occurrence of the value in this container. Returns -1 if no occurrence is found.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public static int IndexOf<T, U>(this NativeList<T> container, U value) where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value);
+        public static int IndexOf<T, U>(this NativeArray<T>.ReadOnly container, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value);
+
+        /// <summary>
+        /// Returns true if a particular value is present in this container.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in this container.</typeparam>
+        /// <typeparam name="U">The value type.</typeparam>
+        /// <param name="container">The container to search.</param>
+        /// <param name="value">The value to locate.</param>
+        /// <returns>True if the value is present in this container.</returns>
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static bool Contains<T, U>(this NativeList<T> container, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value) != -1;
+
+        /// <summary>
+        /// Finds the index of the first occurrence of a particular value in this container.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in this container.</typeparam>
+        /// <typeparam name="U">The type of value to locate.</typeparam>
+        /// <param name="container">The container to search.</param>
+        /// <param name="value">The value to locate.</param>
+        /// <returns>The index of the first occurrence of the value in this container. Returns -1 if no occurrence is found.</returns>
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static int IndexOf<T, U>(this NativeList<T> container, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(container.AsReadOnlySpan(), value);
 
         /// <summary>
         /// Returns true if a particular value is present in a buffer.
@@ -97,8 +105,9 @@ namespace Unity.Collections
         /// <param name="length">Number of elements in the buffer.</param>
         /// <param name="value">The value to locate.</param>
         /// <returns>True if the value is present in the buffer.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(T* ptr, int length, U value) where T : unmanaged, IEquatable<U> => IndexOf(ptr, length, value) != -1;
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static bool Contains<T, U>(T* ptr, int length, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(ptr, length, value) != -1;
 
         /// <summary>
         /// Finds the index of the first occurrence of a particular value in a buffer.
@@ -110,7 +119,8 @@ namespace Unity.Collections
         /// <param name="value">The value to locate.</param>
         /// <returns>The index of the first occurrence of the value in the buffer. Returns -1 if no occurrence is found.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public static int IndexOf<T, U>(T* ptr, int length, U value) where T : unmanaged, IEquatable<U> => IndexOf(new ReadOnlySpan<T>(ptr, length), value);
+        public static int IndexOf<T, U>(T* ptr, int length, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(new ReadOnlySpan<T>(ptr, length), value);
 
         /// <summary>
         /// Finds the index of the first occurrence of a particular value in a buffer.
@@ -149,7 +159,8 @@ namespace Unity.Collections
         /// <param name="value">The value to locate.</param>
         /// <returns>True if the value is present in this container.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(this ReadOnlySpan<T> roSpan, U value) where T : unmanaged, IEquatable<U> => IndexOf(roSpan, value) != -1;
+        public static bool Contains<T, U>(this ReadOnlySpan<T> roSpan, U value)
+            where T : unmanaged, IEquatable<U> => IndexOf(roSpan, value) != -1;
 
         /// <summary>
         /// Copies all elements of specified container to array.
@@ -208,7 +219,7 @@ namespace Unity.Collections
         /// <typeparam name="U">Type of elements in the reinterpreted array.</typeparam>
         /// <returns>The reinterpretation of this array into another kind of NativeArray.</returns>
         /// <exception cref="InvalidOperationException">Thrown if this array's capacity cannot be evenly divided by `sizeof(U)`.</exception>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
         public static NativeArray<U> Reinterpret<T, U>(this NativeArray<T> array)
             where U : unmanaged
             where T : unmanaged
@@ -239,7 +250,7 @@ namespace Unity.Collections
         /// <param name="container">The array to compare for equality.</param>
         /// <param name="other">The other array to compare for equality.</param>
         /// <returns>True if the arrays have equal length and content.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public static bool ArraysEqual<T>(this NativeArray<T> container, NativeArray<T> other)
             where T : unmanaged, IEquatable<T>
         {
@@ -268,15 +279,19 @@ namespace Unity.Collections
 
             if (uLen * uSize != byteLen)
             {
-                throw new InvalidOperationException($"Types {typeof(T)} (array length {array.Length}) and {typeof(U)} cannot be aliased due to size constraints. The size of the types and lengths involved must line up.");
+                throw new InvalidOperationException(
+                    $"Types {typeof(T)} (array length {array.Length}) and {typeof(U)} cannot be aliased due to size constraints. The size of the types and lengths involved must line up."
+                );
             }
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        internal static void Initialize<T>(ref this NativeArray<T> array,
-                                            int length,
-                                            AllocatorManager.AllocatorHandle allocator,
-                                            NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        internal static void Initialize<T>(
+            ref this NativeArray<T> array,
+            int length,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
             where T : unmanaged
         {
             AllocatorHandle handle = allocator;
@@ -294,16 +309,23 @@ namespace Unity.Collections
             array.m_MaxIndex = length - 1;
             array.m_Safety = CollectionHelper.CreateSafetyHandle(allocator);
 
-            CollectionHelper.SetStaticSafetyId<NativeArray<T>>(ref array.m_Safety, ref NativeArrayStaticId<T>.s_staticSafetyId.Data);
+            CollectionHelper.SetStaticSafetyId<NativeArray<T>>(
+                ref array.m_Safety,
+                ref NativeArrayStaticId<T>.s_staticSafetyId.Data
+            );
             handle.AddSafetyHandle(array.m_Safety);
 #endif
         }
 
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(AllocatorManager.AllocatorHandle) })]
-        internal static void Initialize<T, U>(ref this NativeArray<T> array,
-                                                int length,
-                                                ref U allocator,
-                                                NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(int), typeof(AllocatorManager.AllocatorHandle) }
+        )]
+        internal static void Initialize<T, U>(
+            ref this NativeArray<T> array,
+            int length,
+            ref U allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
             where T : unmanaged
             where U : unmanaged, AllocatorManager.IAllocator
         {
@@ -321,7 +343,10 @@ namespace Unity.Collections
             array.m_MaxIndex = length - 1;
             array.m_Safety = CollectionHelper.CreateSafetyHandle(allocator.ToAllocator);
 
-            CollectionHelper.SetStaticSafetyId<NativeArray<T>>(ref array.m_Safety, ref NativeArrayStaticId<T>.s_staticSafetyId.Data);
+            CollectionHelper.SetStaticSafetyId<NativeArray<T>>(
+                ref array.m_Safety,
+                ref NativeArrayStaticId<T>.s_staticSafetyId.Data
+            );
             allocator.Handle.AddSafetyHandle(array.m_Safety);
 #endif
         }

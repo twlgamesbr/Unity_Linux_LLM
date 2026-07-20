@@ -14,7 +14,8 @@ namespace Unity.Netcode
 #if UNITY_NETCODE_DEBUG_NO_PACKING
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValuePacked<T>(FastBufferReader reader, out T value) where T: unmanaged => reader.ReadValueSafe(out value);
+        public void ReadValuePacked<T>(FastBufferReader reader, out T value)
+            where T : unmanaged => reader.ReadValueSafe(out value);
 #else
         /// <summary>
         /// Read a packed enum value
@@ -24,7 +25,8 @@ namespace Unity.Netcode
         /// <typeparam name="TEnum">Type of enum to read</typeparam>
         /// <exception cref="InvalidOperationException">Throws InvalidOperationException if an enum somehow ends up not being the size of a byte, short, int, or long (which should be impossible)</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void ReadValuePacked<TEnum>(FastBufferReader reader, out TEnum value) where TEnum : unmanaged, Enum
+        public static unsafe void ReadValuePacked<TEnum>(FastBufferReader reader, out TEnum value)
+            where TEnum : unmanaged, Enum
         {
             switch (sizeof(TEnum))
             {
@@ -101,14 +103,14 @@ namespace Unity.Netcode
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ReadValuePacked(FastBufferReader reader, out bool value) => reader.ReadValueSafe(out value);
 
-
         /// <summary>
         /// Read an usigned short (Int16) as a varint from the stream.
         /// </summary>
         /// <param name="reader">The reader to read from</param>
         /// <param name="value">Value to read</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReadValuePacked(FastBufferReader reader, out short value) => ReadValueBitPacked(reader, out value);
+        public static void ReadValuePacked(FastBufferReader reader, out short value) =>
+            ReadValueBitPacked(reader, out value);
 
         /// <summary>
         /// Read an unsigned short (UInt16) as a varint from the stream.
@@ -116,7 +118,8 @@ namespace Unity.Netcode
         /// <param name="reader">The reader to read from</param>
         /// <param name="value">Value to read</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReadValuePacked(FastBufferReader reader, out ushort value) => ReadValueBitPacked(reader, out value);
+        public static void ReadValuePacked(FastBufferReader reader, out ushort value) =>
+            ReadValueBitPacked(reader, out value);
 
         /// <summary>
         /// Read a two-byte character as a varint from the stream.
@@ -136,7 +139,8 @@ namespace Unity.Netcode
         /// <param name="reader">The reader to read from</param>
         /// <param name="value">Value to read</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReadValuePacked(FastBufferReader reader, out int value) => ReadValueBitPacked(reader, out value);
+        public static void ReadValuePacked(FastBufferReader reader, out int value) =>
+            ReadValueBitPacked(reader, out value);
 
         /// <summary>
         /// Read an unsigned int (UInt32) from the stream.
@@ -144,7 +148,8 @@ namespace Unity.Netcode
         /// <param name="reader">The reader to read from</param>
         /// <param name="value">Value to read</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReadValuePacked(FastBufferReader reader, out uint value) => ReadValueBitPacked(reader, out value);
+        public static void ReadValuePacked(FastBufferReader reader, out uint value) =>
+            ReadValueBitPacked(reader, out value);
 
         /// <summary>
         /// Read an unsigned long (UInt64) from the stream.
@@ -152,7 +157,8 @@ namespace Unity.Netcode
         /// <param name="reader">The reader to read from</param>
         /// <param name="value">Value to read</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReadValuePacked(FastBufferReader reader, out ulong value) => ReadValueBitPacked(reader, out value);
+        public static void ReadValuePacked(FastBufferReader reader, out ulong value) =>
+            ReadValueBitPacked(reader, out value);
 
         /// <summary>
         /// Read a signed long (Int64) as a ZigZag encoded varint from the stream.
@@ -315,7 +321,8 @@ namespace Unity.Netcode
 #if UNITY_NETCODE_DEBUG_NO_PACKING
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueBitPacked<T>(FastBufferReader reader, T value) where T: unmanaged => reader.ReadValueSafe(out value);
+        public void ReadValueBitPacked<T>(FastBufferReader reader, T value)
+            where T : unmanaged => reader.ReadValueSafe(out value);
 #else
         /// <summary>
         /// Read a bit-packed 14-bit signed short from the stream.
@@ -536,14 +543,16 @@ namespace Unity.Netcode
 #endif
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe float ToSingle<T>(T value) where T : unmanaged
+        private static unsafe float ToSingle<T>(T value)
+            where T : unmanaged
         {
             float* asFloat = (float*)&value;
             return *asFloat;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe double ToDouble<T>(T value) where T : unmanaged
+        private static unsafe double ToDouble<T>(T value)
+            where T : unmanaged
         {
             double* asDouble = (double*)&value;
             return *asDouble;

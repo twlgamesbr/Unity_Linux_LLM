@@ -3,7 +3,7 @@
     static class Tooltips
     {
         public const string SearchBar =
-@"Search for a specific entry in the tree view. Additional Syntax:
+            @"Search for a specific entry in the tree view. Additional Syntax:
 
 Type:
   t:text (Filter by type column - ex. t:RPC)

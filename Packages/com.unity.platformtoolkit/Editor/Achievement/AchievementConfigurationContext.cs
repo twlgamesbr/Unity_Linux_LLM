@@ -11,9 +11,13 @@ namespace Unity.PlatformToolkit.Editor
         private readonly ObservableSerializableList<StoredAchievement> m_StoredAchievements;
         private readonly string m_PlatformToolkitId;
 
-        private Dictionary<StoredAchievement, ConfigurationAchievement> m_Achievements = new Dictionary<StoredAchievement, ConfigurationAchievement>();
+        private Dictionary<StoredAchievement, ConfigurationAchievement> m_Achievements =
+            new Dictionary<StoredAchievement, ConfigurationAchievement>();
 
-        public AchievementConfigurationContext(string platformToolkitId, ObservableSerializableList<StoredAchievement> achievements)
+        public AchievementConfigurationContext(
+            string platformToolkitId,
+            ObservableSerializableList<StoredAchievement> achievements
+        )
         {
             m_PlatformToolkitId = platformToolkitId;
             m_StoredAchievements = achievements;
@@ -26,7 +30,10 @@ namespace Unity.PlatformToolkit.Editor
             // When achievements are moved there might be some intermediary steps when achievements are repeated in the list. We don't want achievement
             // configurations to deal with this situation, so event is called only after all achievements have been moved. There should never be a situation
             // where the same achievement object is stored multiple times.
-            if (e.Action == NotifyCollectionChangedAction.Replace && m_StoredAchievements.Distinct().Count() != m_StoredAchievements.Count)
+            if (
+                e.Action == NotifyCollectionChangedAction.Replace
+                && m_StoredAchievements.Distinct().Count() != m_StoredAchievements.Count
+            )
             {
                 return;
             }

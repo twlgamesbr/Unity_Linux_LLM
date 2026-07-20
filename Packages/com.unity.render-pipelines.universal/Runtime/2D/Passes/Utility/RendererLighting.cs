@@ -1,5 +1,5 @@
-using UnityEngine.Experimental.Rendering;
 using Unity.Mathematics;
+using UnityEngine.Experimental.Rendering;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -17,7 +17,10 @@ namespace UnityEngine.Rendering.Universal
 
         private static readonly string[] k_UseBlendStyleKeywords =
         {
-            "USE_SHAPE_LIGHT_TYPE_0", "USE_SHAPE_LIGHT_TYPE_1", "USE_SHAPE_LIGHT_TYPE_2", "USE_SHAPE_LIGHT_TYPE_3"
+            "USE_SHAPE_LIGHT_TYPE_0",
+            "USE_SHAPE_LIGHT_TYPE_1",
+            "USE_SHAPE_LIGHT_TYPE_2",
+            "USE_SHAPE_LIGHT_TYPE_3",
         };
 
         private static readonly int[] k_BlendFactorsPropIDs =
@@ -25,7 +28,7 @@ namespace UnityEngine.Rendering.Universal
             Shader.PropertyToID("_ShapeLightBlendFactors0"),
             Shader.PropertyToID("_ShapeLightBlendFactors1"),
             Shader.PropertyToID("_ShapeLightBlendFactors2"),
-            Shader.PropertyToID("_ShapeLightBlendFactors3")
+            Shader.PropertyToID("_ShapeLightBlendFactors3"),
         };
 
         private static readonly int[] k_MaskFilterPropIDs =
@@ -33,7 +36,7 @@ namespace UnityEngine.Rendering.Universal
             Shader.PropertyToID("_ShapeLightMaskFilter0"),
             Shader.PropertyToID("_ShapeLightMaskFilter1"),
             Shader.PropertyToID("_ShapeLightMaskFilter2"),
-            Shader.PropertyToID("_ShapeLightMaskFilter3")
+            Shader.PropertyToID("_ShapeLightMaskFilter3"),
         };
 
         private static readonly int[] k_InvertedFilterPropIDs =
@@ -41,7 +44,7 @@ namespace UnityEngine.Rendering.Universal
             Shader.PropertyToID("_ShapeLightInvertedFilter0"),
             Shader.PropertyToID("_ShapeLightInvertedFilter1"),
             Shader.PropertyToID("_ShapeLightInvertedFilter2"),
-            Shader.PropertyToID("_ShapeLightInvertedFilter3")
+            Shader.PropertyToID("_ShapeLightInvertedFilter3"),
         };
 
         public static readonly string[] k_ShapeLightTextureIDs =
@@ -49,7 +52,7 @@ namespace UnityEngine.Rendering.Universal
             "_ShapeLightTexture0",
             "_ShapeLightTexture1",
             "_ShapeLightTexture2",
-            "_ShapeLightTexture3"
+            "_ShapeLightTexture3",
         };
 
         private static GraphicsFormat s_RenderTextureFormatToUse = GraphicsFormat.R8G8B8A8_UNorm;
@@ -110,7 +113,11 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        internal static void GetTransparencySortingMode(Renderer2DData rendererData, Camera camera, ref SortingSettings sortingSettings)
+        internal static void GetTransparencySortingMode(
+            Renderer2DData rendererData,
+            Camera camera,
+            ref SortingSettings sortingSettings
+        )
         {
             var mode = rendererData.transparencySortMode;
 
@@ -141,10 +148,17 @@ namespace UnityEngine.Rendering.Universal
 
         internal static bool CanCastVolumetricShadows(Light2D light, int endLayerValue)
         {
-            return light.volumeIntensity > 0 && light.volumetricEnabled && light.renderVolumetricShadows && light.GetTopMostLitLayer() == endLayerValue;
+            return light.volumeIntensity > 0
+                && light.volumetricEnabled
+                && light.renderVolumetricShadows
+                && light.GetTopMostLitLayer() == endLayerValue;
         }
 
-        internal static void SetLightShaderGlobals(IRasterCommandBuffer cmd, Light2DBlendStyle[] lightBlendStyles, int[] blendStyleIndices)
+        internal static void SetLightShaderGlobals(
+            IRasterCommandBuffer cmd,
+            Light2DBlendStyle[] lightBlendStyles,
+            int[] blendStyleIndices
+        )
         {
             for (var i = 0; i < blendStyleIndices.Length; i++)
             {
@@ -155,7 +169,10 @@ namespace UnityEngine.Rendering.Universal
                 var blendStyle = lightBlendStyles[blendStyleIndex];
                 cmd.SetGlobalVector(k_BlendFactorsPropIDs[blendStyleIndex], blendStyle.blendFactors);
                 cmd.SetGlobalVector(k_MaskFilterPropIDs[blendStyleIndex], blendStyle.maskTextureChannelFilter.mask);
-                cmd.SetGlobalVector(k_InvertedFilterPropIDs[blendStyleIndex], blendStyle.maskTextureChannelFilter.inverted);
+                cmd.SetGlobalVector(
+                    k_InvertedFilterPropIDs[blendStyleIndex],
+                    blendStyle.maskTextureChannelFilter.inverted
+                );
             }
         }
 
@@ -173,7 +190,11 @@ namespace UnityEngine.Rendering.Universal
         {
             var outerRadius = light.pointLightOuterRadius;
             var lightScale = Vector3.one;
-            var outerRadiusScale = new Vector3(lightScale.x * outerRadius, lightScale.y * outerRadius, lightScale.z * outerRadius);
+            var outerRadiusScale = new Vector3(
+                lightScale.x * outerRadius,
+                lightScale.y * outerRadius,
+                lightScale.z * outerRadius
+            );
 
             var transform = light.transform;
 
@@ -181,7 +202,14 @@ namespace UnityEngine.Rendering.Universal
             retMatrix = Matrix4x4.Inverse(scaledLightMat);
         }
 
-        internal static void SetPerLightShaderGlobals(IRasterCommandBuffer cmd, Light2D light, int slot, bool isVolumetric, bool hasShadows, bool batchingSupported)
+        internal static void SetPerLightShaderGlobals(
+            IRasterCommandBuffer cmd,
+            Light2D light,
+            int slot,
+            bool isVolumetric,
+            bool hasShadows,
+            bool batchingSupported
+        )
         {
             float intensity = light.intensity * light.color.a;
             Color color = intensity * light.color;
@@ -201,7 +229,9 @@ namespace UnityEngine.Rendering.Universal
                 perLight.LightType = (int)light.lightType;
                 perLight.ShadowIntensity = 1.0f;
                 if (hasShadows)
-                    perLight.ShadowIntensity = isVolumetric ? (1 - light.shadowVolumeIntensity) : (1 - light.shadowIntensity);
+                    perLight.ShadowIntensity = isVolumetric
+                        ? (1 - light.shadowVolumeIntensity)
+                        : (1 - light.shadowIntensity);
                 lightBatch.SetLight(slot, perLight);
             }
             else
@@ -212,14 +242,22 @@ namespace UnityEngine.Rendering.Universal
                 cmd.SetGlobalColor(k_L2DColor, color);
                 cmd.SetGlobalFloat(k_L2DVolumeOpacity, volumeIntensity);
                 cmd.SetGlobalInt(k_L2DLightType, (int)light.lightType);
-                cmd.SetGlobalFloat(k_L2DShadowIntensity, hasShadows ? (isVolumetric ? (1 - light.shadowVolumeIntensity) : (1 - light.shadowIntensity)) : 1);
+                cmd.SetGlobalFloat(
+                    k_L2DShadowIntensity,
+                    hasShadows ? (isVolumetric ? (1 - light.shadowVolumeIntensity) : (1 - light.shadowIntensity)) : 1
+                );
             }
 
             if (hasShadows)
                 ShadowRendering.SetGlobalShadowProp(cmd);
         }
 
-        internal static void SetPerPointLightShaderGlobals(IRasterCommandBuffer cmd, Light2D light, int slot, bool batchingSupported)
+        internal static void SetPerPointLightShaderGlobals(
+            IRasterCommandBuffer cmd,
+            Light2D light,
+            int slot,
+            bool batchingSupported
+        )
         {
             // This is used for the lookup texture
             GetScaledLightInvMatrix(light, out var lightInverseMatrix);
@@ -233,7 +271,12 @@ namespace UnityEngine.Rendering.Universal
             {
                 // Batched Params.
                 PerLight2D perLight = lightBatch.GetLight(slot);
-                perLight.InvMatrix = new float4x4(lightInverseMatrix.GetColumn(0), lightInverseMatrix.GetColumn(1), lightInverseMatrix.GetColumn(2), lightInverseMatrix.GetColumn(3));
+                perLight.InvMatrix = new float4x4(
+                    lightInverseMatrix.GetColumn(0),
+                    lightInverseMatrix.GetColumn(1),
+                    lightInverseMatrix.GetColumn(2),
+                    lightInverseMatrix.GetColumn(3)
+                );
                 perLight.InnerRadiusMult = innerRadiusMult;
                 perLight.InnerAngle = innerAngle;
                 perLight.OuterAngle = outerAngle;
@@ -251,7 +294,10 @@ namespace UnityEngine.Rendering.Universal
         internal static void SetCookieShaderProperties(Light2D light, MaterialPropertyBlock properties)
         {
             if (light.useCookieSprite && light.m_CookieSpriteTextureHandle.IsValid())
-                properties.SetTexture(light.lightType == Light2D.LightType.Sprite ? k_CookieTexID : k_PointLightCookieTexID, light.m_CookieSpriteTextureHandle);
+                properties.SetTexture(
+                    light.lightType == Light2D.LightType.Sprite ? k_CookieTexID : k_PointLightCookieTexID,
+                    light.m_CookieSpriteTextureHandle
+                );
         }
 
         private static void SetBlendModes(Material material, BlendMode src, BlendMode dst)
@@ -270,7 +316,10 @@ namespace UnityEngine.Rendering.Universal
             bitIndex++;
             var additiveBit = light.overlapOperation == Light2D.OverlapOperation.AlphaBlend ? 0u : 1u << bitIndex;
             bitIndex++;
-            var pointCookieBit = (isPoint && light.lightCookieSprite != null && light.lightCookieSprite.texture != null) ? 1u << bitIndex : 0u;
+            var pointCookieBit =
+                (isPoint && light.lightCookieSprite != null && light.lightCookieSprite.texture != null)
+                    ? 1u << bitIndex
+                    : 0u;
             bitIndex++;
             var fastQualityBit = (light.normalMapQuality == Light2D.NormalMapQuality.Fast) ? 1u << bitIndex : 0u;
             bitIndex++;
@@ -281,7 +330,12 @@ namespace UnityEngine.Rendering.Universal
             return fastQualityBit | pointCookieBit | additiveBit | shapeBit | volumeBit | useNormalMap | useShadowMap;
         }
 
-        private static Material CreateLightMaterial(Renderer2DData rendererData, Light2D light, bool isVolume, bool useShadows)
+        private static Material CreateLightMaterial(
+            Renderer2DData rendererData,
+            Light2D light,
+            bool isVolume,
+            bool useShadows
+        )
         {
             if (!GraphicsSettings.TryGetRenderPipelineSettings<Renderer2DResources>(out var resources))
                 return null;
@@ -325,7 +379,12 @@ namespace UnityEngine.Rendering.Universal
             return material;
         }
 
-        internal static Material GetLightMaterial(this Renderer2DData rendererData, Light2D light, bool isVolume, bool useShadows)
+        internal static Material GetLightMaterial(
+            this Renderer2DData rendererData,
+            Light2D light,
+            bool isVolume,
+            bool useShadows
+        )
         {
             var materialIndex = GetLightMaterialIndex(light, isVolume, useShadows);
 

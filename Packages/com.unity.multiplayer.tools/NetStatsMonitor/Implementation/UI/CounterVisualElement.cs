@@ -19,7 +19,6 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         int m_SampleCount;
         public SampleRate SampleRate { get; private set; }
 
-
         int m_SignificantDigits;
 
         float m_HighlightThresholdMin = float.MinValue;
@@ -49,7 +48,11 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     : NumericUtils.Base10ToBase1000(NumericUtils.ToBase10(value));
 
                 var digitsAboveDecimal = NumericUtils.GetDigitsAboveDecimal(mantissaExponent, m_DisplayAsPercentage);
-                var roundedValue = NumericUtils.RoundToSignificantDigits(mantissaExponent.Mantissa, m_SignificantDigits, digitsAboveDecimal);
+                var roundedValue = NumericUtils.RoundToSignificantDigits(
+                    mantissaExponent.Mantissa,
+                    m_SignificantDigits,
+                    digitsAboveDecimal
+                );
 
                 if (roundedValue == m_DisplayValue)
                 {
@@ -61,14 +64,14 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     ? NumericUtils.Base10ToPercentageNotation(
                         inputBase10: mantissaExponent,
                         significantDigits: m_SignificantDigits,
-                        units: m_Units)
+                        units: m_Units
+                    )
                     : NumericUtils.Base1000ToEngineeringNotation(
                         inputBase1000: mantissaExponent,
                         units: m_Units,
                         roundedValue: roundedValue,
-                        digitsBelowdecimal: NumericUtils.GetDigitsBelowDecimal(
-                            m_SignificantDigits,
-                            digitsAboveDecimal));
+                        digitsBelowdecimal: NumericUtils.GetDigitsBelowDecimal(m_SignificantDigits, digitsAboveDecimal)
+                    );
 
                 UpdateHighlightUssClasses();
             }
@@ -99,9 +102,11 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             m_SmoothingMethod = details.SmoothingMethod;
             m_AggregationMethod = details.AggregationMethod;
             m_DecayConstant = config.DecayConstant;
-            m_SampleCount = Math.Clamp(config.SampleCount,
+            m_SampleCount = Math.Clamp(
+                config.SampleCount,
                 ConfigurationLimits.k_CounterSampleMin,
-                ConfigurationLimits.k_CounterSampleMax);
+                ConfigurationLimits.k_CounterSampleMax
+            );
             SampleRate = config.SampleRate;
             m_SignificantDigits = Math.Max(details.SignificantDigits, 1);
 
@@ -114,8 +119,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         internal void UpdateDisplayData(MultiStatHistory history, double time)
         {
             var isLinearCombination =
-                m_AggregationMethod == AggregationMethod.Average ||
-                m_AggregationMethod == AggregationMethod.Sum;
+                m_AggregationMethod == AggregationMethod.Average || m_AggregationMethod == AggregationMethod.Sum;
 
             // Potential future work: MTT-1722
             // The current implementation of UpdateDisplayData is only correct for aggregations
@@ -136,55 +140,55 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             switch (m_SmoothingMethod)
             {
                 case SmoothingMethod.ExponentialMovingAverage:
+                {
+                    if (!hasDecayConstant)
                     {
-                        if (!hasDecayConstant)
+                        break;
+                    }
+                    var decayConstant = m_DecayConstant.Value;
+                    foreach (var stat in m_Stats)
+                    {
+                        if (!history.Data.TryGetValue(stat, out StatHistory statHistory))
                         {
-                            break;
+                            continue;
                         }
-                        var decayConstant = m_DecayConstant.Value;
-                        foreach (var stat in m_Stats)
+                        foreach (var cema in statHistory.ContinuousExponentialMovingAverages)
                         {
-                            if (!history.Data.TryGetValue(stat, out StatHistory statHistory))
+                            if (cema.DecayConstant == decayConstant)
                             {
-                                continue;
-                            }
-                            foreach (var cema in statHistory.ContinuousExponentialMovingAverages)
-                            {
-                                if (cema.DecayConstant == decayConstant)
+                                var metricKind = stat.MetricKind;
+                                switch (metricKind)
                                 {
-                                    var metricKind = stat.MetricKind;
-                                    switch (metricKind)
-                                    {
-                                        case MetricKind.Counter:
-                                            displayValue += cema.GetCounterValue(time);
-                                            break;
-                                        case MetricKind.Gauge:
-                                            displayValue += cema.GetGaugeValue();
-                                            break;
-                                        default:
-                                            throw new NotSupportedException($"Unhandled {nameof(MetricKind)} {metricKind}");
-                                    }
-                                    statsFoundCount++;
-                                    break;
+                                    case MetricKind.Counter:
+                                        displayValue += cema.GetCounterValue(time);
+                                        break;
+                                    case MetricKind.Gauge:
+                                        displayValue += cema.GetGaugeValue();
+                                        break;
+                                    default:
+                                        throw new NotSupportedException($"Unhandled {nameof(MetricKind)} {metricKind}");
                                 }
+                                statsFoundCount++;
+                                break;
                             }
                         }
-                        break;
                     }
+                    break;
+                }
                 case SmoothingMethod.SimpleMovingAverage:
+                {
+                    foreach (var stat in m_Stats)
                     {
-                        foreach (var stat in m_Stats)
+                        var statValue = history.GetSimpleMovingAverage(stat, SampleRate, m_SampleCount, time);
+                        if (!statValue.HasValue)
                         {
-                            var statValue = history.GetSimpleMovingAverage(stat, SampleRate, m_SampleCount, time);
-                            if (!statValue.HasValue)
-                            {
-                                continue;
-                            }
-                            displayValue += statValue.Value;
-                            statsFoundCount++;
+                            continue;
                         }
-                        break;
+                        displayValue += statValue.Value;
+                        statsFoundCount++;
                     }
+                    break;
+                }
             }
             if (m_AggregationMethod == AggregationMethod.Average && statsFoundCount > 0)
             {

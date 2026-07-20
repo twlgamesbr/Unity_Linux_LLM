@@ -26,7 +26,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public string ReadKeyName()
         {
-            fixed(QueryKeyNameCommand * thisPtr = &this)
+            fixed (QueryKeyNameCommand* thisPtr = &this)
             {
                 return StringHelpers.ReadStringFromBuffer(new IntPtr(thisPtr->nameBuffer), kMaxNameLength);
             }
@@ -39,7 +39,7 @@ namespace UnityEngine.InputSystem.LowLevel
             return new QueryKeyNameCommand
             {
                 baseCommand = new InputDeviceCommand(Type, kSize),
-                scanOrKeyCode = (int)key
+                scanOrKeyCode = (int)key,
             };
         }
     }

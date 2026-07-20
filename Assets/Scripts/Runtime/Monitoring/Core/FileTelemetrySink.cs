@@ -33,12 +33,9 @@ namespace NPCSystem.Monitoring
         /// <c>Application.persistentDataPath/Telemetry</c>.</param>
         public FileTelemetrySink(string sessionId = null, string basePath = null)
         {
-            _sessionId = string.IsNullOrWhiteSpace(sessionId)
-                ? Guid.NewGuid().ToString("N")
-                : sessionId;
+            _sessionId = string.IsNullOrWhiteSpace(sessionId) ? Guid.NewGuid().ToString("N") : sessionId;
 
-            _basePath = basePath
-                ?? Path.Combine(Application.persistentDataPath, "Telemetry");
+            _basePath = basePath ?? Path.Combine(Application.persistentDataPath, "Telemetry");
 
             Directory.CreateDirectory(_basePath);
         }
@@ -78,9 +75,7 @@ namespace NPCSystem.Monitoring
                     entry["tags"] = new Dictionary<string, object>(evt.Tags);
                 }
 
-                string json = UnityEngine.JsonUtility.ToJson(
-                    new TelemetryJsonWrapper { entry = entry }
-                );
+                string json = UnityEngine.JsonUtility.ToJson(new TelemetryJsonWrapper { entry = entry });
 
                 // JsonUtility wraps in an object — strip the wrapper to get raw JSON line
                 // {"entry":{...}} → {...}

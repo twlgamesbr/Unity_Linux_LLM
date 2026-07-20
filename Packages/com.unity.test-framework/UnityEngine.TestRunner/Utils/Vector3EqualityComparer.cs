@@ -15,9 +15,13 @@ namespace UnityEngine.TestTools.Utils
         /// <summary>
         /// A comparer instance with the default calculation error value equal to 0.0001f.
         ///</summary>
-        public static Vector3EqualityComparer Instance { get { return m_Instance; } }
+        public static Vector3EqualityComparer Instance
+        {
+            get { return m_Instance; }
+        }
 
-        private Vector3EqualityComparer() : this(k_DefaultError) {}
+        private Vector3EqualityComparer()
+            : this(k_DefaultError) { }
 
         /// <summary>
         /// A comparer instance with the default calculation error value equal to 0.0001f.
@@ -61,12 +65,11 @@ namespace UnityEngine.TestTools.Utils
         /// }
         /// </code>
         ///</example>
-
         public bool Equals(Vector3 expected, Vector3 actual)
         {
-            return Utils.AreFloatsEqual(expected.x, actual.x, AllowedError) &&
-                Utils.AreFloatsEqual(expected.y, actual.y, AllowedError) &&
-                Utils.AreFloatsEqual(expected.z, actual.z, AllowedError);
+            return Utils.AreFloatsEqual(expected.x, actual.x, AllowedError)
+                && Utils.AreFloatsEqual(expected.y, actual.y, AllowedError)
+                && Utils.AreFloatsEqual(expected.z, actual.z, AllowedError);
         }
 
         /// <summary>

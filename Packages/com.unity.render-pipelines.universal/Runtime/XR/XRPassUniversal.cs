@@ -18,7 +18,7 @@ namespace UnityEngine.Rendering.Universal
             return pass;
         }
 
-        override public void Release()
+        public override void Release()
         {
             GenericPool<XRPassUniversal>.Release(this);
         }

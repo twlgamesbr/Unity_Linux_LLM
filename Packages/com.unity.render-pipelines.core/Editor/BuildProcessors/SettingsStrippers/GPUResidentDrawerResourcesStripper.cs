@@ -6,6 +6,8 @@ namespace UnityEditor.Rendering
     {
         public bool active => true;
 
-        public bool CanRemoveSettings(GPUResidentDrawerResources settings) => !CoreBuildData.instance.pipelineSupportGPUResidentDrawer || !CoreBuildData.instance.playerNeedGPUResidentDrawer;
+        public bool CanRemoveSettings(GPUResidentDrawerResources settings) =>
+            !CoreBuildData.instance.pipelineSupportGPUResidentDrawer
+            || !CoreBuildData.instance.playerNeedGPUResidentDrawer;
     }
 }

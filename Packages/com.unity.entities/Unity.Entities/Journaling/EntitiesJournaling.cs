@@ -11,7 +11,10 @@ namespace Unity.Entities
     /// <summary>
     /// Entities journaling provides detailed information about past ECS events.
     /// </summary>
-    [Obsolete("Journaling is scheduled for removal in a future release. It is recommended to remove dependencies on this API.", false)]
+    [Obsolete(
+        "Journaling is scheduled for removal in a future release. It is recommended to remove dependencies on this API.",
+        false
+    )]
     public static unsafe partial class EntitiesJournaling
     {
         static Dictionary<ulong, WeakReference<World>> s_WorldWeakRefMap;
@@ -19,10 +22,27 @@ namespace Unity.Entities
         static Dictionary<SystemHandle, SystemTypeIndex> s_SystemTypeMap;
         static Dictionary<RecordView, object> s_RecordDataMap;
 
-        sealed class SharedInit { internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedInit>(); }
-        sealed class SharedEnabled { internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedEnabled>(); }
-        sealed class SharedEntityTypeIndex { internal static readonly SharedStatic<TypeIndex> Ref = SharedStatic<TypeIndex>.GetOrCreate<SharedEntityTypeIndex>(); }
-        sealed class SharedState { internal static readonly SharedStatic<JournalingState> Ref = SharedStatic<JournalingState>.GetOrCreate<SharedState>(); }
+        sealed class SharedInit
+        {
+            internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedInit>();
+        }
+
+        sealed class SharedEnabled
+        {
+            internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedEnabled>();
+        }
+
+        sealed class SharedEntityTypeIndex
+        {
+            internal static readonly SharedStatic<TypeIndex> Ref =
+                SharedStatic<TypeIndex>.GetOrCreate<SharedEntityTypeIndex>();
+        }
+
+        sealed class SharedState
+        {
+            internal static readonly SharedStatic<JournalingState> Ref =
+                SharedStatic<JournalingState>.GetOrCreate<SharedState>();
+        }
 
         static ref bool s_Initialized => ref SharedInit.Ref.Data;
         static ref bool s_Enabled => ref SharedEnabled.Ref.Data;
@@ -33,7 +53,7 @@ namespace Unity.Entities
         {
             StartRecording,
             StopRecording,
-            ClearResults
+            ClearResults,
         }
 
         public static event Action<JournalingOperationType> s_JournalingOperationExecuted;
@@ -70,7 +90,9 @@ namespace Unity.Entities
                 s_RecordDataMap.Clear();
                 s_State.ClearSystemVersionBuffers();
 
-                s_JournalingOperationExecuted?.Invoke(value ? JournalingOperationType.StartRecording : JournalingOperationType.StopRecording);
+                s_JournalingOperationExecuted?.Invoke(
+                    value ? JournalingOperationType.StartRecording : JournalingOperationType.StopRecording
+                );
             }
         }
 
@@ -102,7 +124,9 @@ namespace Unity.Entities
         /// <para>For this reason, it is not recommended to call this in a debugger watch window, otherwise a deadlock might occur.</para>
         /// </remarks>
         /// <returns>Array of record view.</returns>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         public static RecordViewArray GetRecords(Ordering ordering) => s_State.GetRecords(ordering, blocking: true);
 
         /// <summary>
@@ -112,7 +136,9 @@ namespace Unity.Entities
         /// Throws <see cref="InvalidOperationException"/> if records are currently locked for write.
         /// </remarks>
         /// <returns>Array of record view.</returns>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         public static RecordViewArray TryGetRecords(Ordering ordering) => s_State.GetRecords(ordering, blocking: false);
 
         /// <summary>
@@ -143,9 +169,22 @@ namespace Unity.Entities
             Internal_Shutdown();
         }
 
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void AddRecord(RecordType recordType, ulong worldSequenceNumber, in SystemHandle executingSystem, Entity* entities, int entityCount, in SystemHandle originSystem = default, TypeIndex* types = null, int typeCount = 0, void* data = null, int dataLength = 0)
+        internal static void AddRecord(
+            RecordType recordType,
+            ulong worldSequenceNumber,
+            in SystemHandle executingSystem,
+            Entity* entities,
+            int entityCount,
+            in SystemHandle originSystem = default,
+            TypeIndex* types = null,
+            int typeCount = 0,
+            void* data = null,
+            int dataLength = 0
+        )
         {
             if (!s_Initialized)
                 return;
@@ -164,12 +203,36 @@ namespace Unity.Entities
                 typeCount--;
             }
 
-            s_State.PushBack(recordType, worldSequenceNumber, in executingSystem, in originSystem, entities, entityCount, types, typeCount, data, dataLength);
+            s_State.PushBack(
+                recordType,
+                worldSequenceNumber,
+                in executingSystem,
+                in originSystem,
+                entities,
+                entityCount,
+                types,
+                typeCount,
+                data,
+                dataLength
+            );
         }
 
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void AddRecord(RecordType recordType, ulong worldSequenceNumber, in SystemHandle executingSystem, ArchetypeChunk* chunks, int chunkCount, in SystemHandle originSystem = default, TypeIndex* types = null, int typeCount = 0, void* data = null, int dataLength = 0)
+        internal static void AddRecord(
+            RecordType recordType,
+            ulong worldSequenceNumber,
+            in SystemHandle executingSystem,
+            ArchetypeChunk* chunks,
+            int chunkCount,
+            in SystemHandle originSystem = default,
+            TypeIndex* types = null,
+            int typeCount = 0,
+            void* data = null,
+            int dataLength = 0
+        )
         {
             if (!s_Initialized)
                 return;
@@ -188,12 +251,36 @@ namespace Unity.Entities
                 typeCount--;
             }
 
-            s_State.PushBack(recordType, worldSequenceNumber, in executingSystem, in originSystem, chunks, chunkCount, types, typeCount, data, dataLength);
+            s_State.PushBack(
+                recordType,
+                worldSequenceNumber,
+                in executingSystem,
+                in originSystem,
+                chunks,
+                chunkCount,
+                types,
+                typeCount,
+                data,
+                dataLength
+            );
         }
 
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void AddRecord(RecordType recordType, ulong worldSequenceNumber, in SystemHandle executingSystem, Archetype* archetype, ChunkIndex chunk, in SystemHandle originSystem = default, TypeIndex* types = null, int typeCount = 0, void* data = null, int dataLength = 0)
+        internal static void AddRecord(
+            RecordType recordType,
+            ulong worldSequenceNumber,
+            in SystemHandle executingSystem,
+            Archetype* archetype,
+            ChunkIndex chunk,
+            in SystemHandle originSystem = default,
+            TypeIndex* types = null,
+            int typeCount = 0,
+            void* data = null,
+            int dataLength = 0
+        )
         {
             if (!s_Initialized)
                 return;
@@ -210,12 +297,36 @@ namespace Unity.Entities
                 typeCount--;
             }
 
-            s_State.PushBack(recordType, worldSequenceNumber, in executingSystem, in originSystem, archetype, chunk, types, typeCount, data, dataLength);
+            s_State.PushBack(
+                recordType,
+                worldSequenceNumber,
+                in executingSystem,
+                in originSystem,
+                archetype,
+                chunk,
+                types,
+                typeCount,
+                data,
+                dataLength
+            );
         }
 
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void AddRecord(RecordType recordType, EntityComponentStore* entityComponentStore, uint globalSystemVersion, Entity* entities, int entityCount, in SystemHandle originSystem = default, TypeIndex* types = null, int typeCount = 0, void* data = null, int dataLength = 0)
+        internal static void AddRecord(
+            RecordType recordType,
+            EntityComponentStore* entityComponentStore,
+            uint globalSystemVersion,
+            Entity* entities,
+            int entityCount,
+            in SystemHandle originSystem = default,
+            TypeIndex* types = null,
+            int typeCount = 0,
+            void* data = null,
+            int dataLength = 0
+        )
         {
             if (!s_Initialized)
                 return;
@@ -234,12 +345,36 @@ namespace Unity.Entities
                 typeCount--;
             }
 
-            s_State.PushBack(recordType, entityComponentStore, globalSystemVersion, in originSystem, entities, entityCount, types, typeCount, data, dataLength);
+            s_State.PushBack(
+                recordType,
+                entityComponentStore,
+                globalSystemVersion,
+                in originSystem,
+                entities,
+                entityCount,
+                types,
+                typeCount,
+                data,
+                dataLength
+            );
         }
 
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void AddRecord(RecordType recordType, EntityComponentStore* entityComponentStore, uint globalSystemVersion, ArchetypeChunk* chunks, int chunkCount, in SystemHandle originSystem = default, TypeIndex* types = null, int typeCount = 0, void* data = null, int dataLength = 0)
+        internal static void AddRecord(
+            RecordType recordType,
+            EntityComponentStore* entityComponentStore,
+            uint globalSystemVersion,
+            ArchetypeChunk* chunks,
+            int chunkCount,
+            in SystemHandle originSystem = default,
+            TypeIndex* types = null,
+            int typeCount = 0,
+            void* data = null,
+            int dataLength = 0
+        )
         {
             if (!s_Initialized)
                 return;
@@ -258,12 +393,36 @@ namespace Unity.Entities
                 typeCount--;
             }
 
-            s_State.PushBack(recordType, entityComponentStore, globalSystemVersion, in originSystem, chunks, chunkCount, types, typeCount, data, dataLength);
+            s_State.PushBack(
+                recordType,
+                entityComponentStore,
+                globalSystemVersion,
+                in originSystem,
+                chunks,
+                chunkCount,
+                types,
+                typeCount,
+                data,
+                dataLength
+            );
         }
 
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void AddRecord(RecordType recordType, EntityComponentStore* entityComponentStore, uint globalSystemVersion, Archetype* archetype, ChunkIndex chunk, in SystemHandle originSystem = default, TypeIndex* types = null, int typeCount = 0, void* data = null, int dataLength = 0)
+        internal static void AddRecord(
+            RecordType recordType,
+            EntityComponentStore* entityComponentStore,
+            uint globalSystemVersion,
+            Archetype* archetype,
+            ChunkIndex chunk,
+            in SystemHandle originSystem = default,
+            TypeIndex* types = null,
+            int typeCount = 0,
+            void* data = null,
+            int dataLength = 0
+        )
         {
             if (!s_Initialized)
                 return;
@@ -280,10 +439,23 @@ namespace Unity.Entities
                 typeCount--;
             }
 
-            s_State.PushBack(recordType, entityComponentStore, globalSystemVersion, in originSystem, archetype, chunk, types, typeCount, data, dataLength);
+            s_State.PushBack(
+                recordType,
+                entityComponentStore,
+                globalSystemVersion,
+                in originSystem,
+                archetype,
+                chunk,
+                types,
+                typeCount,
+                data,
+                dataLength
+            );
         }
 
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void AddSystemVersionHandle(EntityComponentStore* store, uint version, in SystemHandle handle)
         {
@@ -389,7 +561,12 @@ namespace Unity.Entities
 
         static World GetWorld(ulong worldSeqNumber)
         {
-            return s_WorldWeakRefMap.TryGetValue(worldSeqNumber, out var worldWeakRef) && worldWeakRef.TryGetTarget(out var world) && world.IsCreated ? world : null;
+            return
+                s_WorldWeakRefMap.TryGetValue(worldSeqNumber, out var worldWeakRef)
+                && worldWeakRef.TryGetTarget(out var world)
+                && world.IsCreated
+                ? world
+                : null;
         }
 
         static string GetWorldName(ulong worldSeqNumber)
@@ -405,7 +582,9 @@ namespace Unity.Entities
 
         static string GetSystemName(SystemHandle handle)
         {
-            return s_SystemTypeMap.TryGetValue(handle, out var type) ? TypeManager.GetSystemName(type).ToString() : string.Empty;
+            return s_SystemTypeMap.TryGetValue(handle, out var type)
+                ? TypeManager.GetSystemName(type).ToString()
+                : string.Empty;
         }
 
         static Entity GetEntity(int index, int version, ulong worldSeqNumber)
@@ -429,14 +608,17 @@ namespace Unity.Entities
                 case RecordType.SetComponentData:
                 case RecordType.GetComponentDataRW:
                 case RecordType.SetSharedComponentData:
-                    return TryGetRecordDataAsComponentDataArrayBoxed(record, out var componentDataArray) ? componentDataArray : null;
+                    return TryGetRecordDataAsComponentDataArrayBoxed(record, out var componentDataArray)
+                        ? componentDataArray
+                        : null;
 
                 default:
                     return null;
             }
         }
 
-        static T* Allocate<T>(AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options) where T : unmanaged
+        static T* Allocate<T>(AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options)
+            where T : unmanaged
         {
             var ptr = AllocatorManager.Allocate<T>(allocator, 1);
             if (options == NativeArrayOptions.ClearMemory && ptr != null)

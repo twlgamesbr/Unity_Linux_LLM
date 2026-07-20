@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using UnityEngine.InputSystem.Haptics;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Profiling;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.Layouts;
-using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.DualShock;
 using UnityEngine.InputSystem.EnhancedTouch;
+using UnityEngine.InputSystem.Haptics;
 using UnityEngine.InputSystem.HID;
+using UnityEngine.InputSystem.Layouts;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Users;
-using UnityEngine.InputSystem.XInput;
 using UnityEngine.InputSystem.Utilities;
-using Unity.Profiling;
-
+using UnityEngine.InputSystem.XInput;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.InputSystem.Editor;
@@ -53,8 +52,11 @@ namespace UnityEngine.InputSystem
     /// be called on the main thread. However, select APIs like <see cref="QueueEvent"/> can be
     /// called from threads. Where this is the case, it is stated in the documentation.
     /// </remarks>
-
-    [SuppressMessage("Microsoft.Naming", "CA1724:TypeNamesShouldNotMatchNamespaces", Justification = "Options for namespaces are limited due to the legacy input class. Agreed on this as the least bad solution.")]
+    [SuppressMessage(
+        "Microsoft.Naming",
+        "CA1724:TypeNamesShouldNotMatchNamespaces",
+        Justification = "Options for namespaces are limited due to the legacy input class. Agreed on this as the least bad solution."
+    )]
 #if UNITY_EDITOR
     [InitializeOnLoad]
 #endif
@@ -62,7 +64,9 @@ namespace UnityEngine.InputSystem
     public static partial class InputSystem
     {
 #if UNITY_EDITOR
-        static readonly ProfilerMarker k_InputInitializeInEditorMarker = new ProfilerMarker("InputSystem.InitializeInEditor");
+        static readonly ProfilerMarker k_InputInitializeInEditorMarker = new ProfilerMarker(
+            "InputSystem.InitializeInEditor"
+        );
 #endif
         static readonly ProfilerMarker k_InputResetMarker = new ProfilerMarker("InputSystem.Reset");
 
@@ -438,8 +442,12 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="InputControlLayout.Builder"/>
         /// <seealso cref="InputSystem.onFindLayoutForDevice"/>
-        public static void RegisterLayoutBuilder(Func<InputControlLayout> buildMethod, string name,
-            string baseLayout = null, InputDeviceMatcher? matches = null)
+        public static void RegisterLayoutBuilder(
+            Func<InputControlLayout> buildMethod,
+            string name,
+            string baseLayout = null,
+            InputDeviceMatcher? matches = null
+        )
         {
             if (buildMethod == null)
                 throw new ArgumentNullException(nameof(buildMethod));
@@ -870,7 +878,13 @@ namespace UnityEngine.InputSystem
             var precompiledLayouts = s_Manager.m_Layouts.precompiledLayouts;
             foreach (var key in new List<InternedString>(precompiledLayouts.Keys)) // Need to keep key list stable while iterating; ToList() for some reason not available with .NET Standard 2.0 on Mono.
             {
-                if (StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(precompiledLayouts[key].metadata, name, ';'))
+                if (
+                    StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                        precompiledLayouts[key].metadata,
+                        name,
+                        ';'
+                    )
+                )
                     s_Manager.m_Layouts.precompiledLayouts.Remove(key);
             }
 
@@ -1080,8 +1094,7 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="FlushDisconnectedDevices"/>
         public static ReadOnlyArray<InputDevice> disconnectedDevices =>
-            new ReadOnlyArray<InputDevice>(s_Manager.m_DisconnectedDevices, 0,
-                s_Manager.m_DisconnectedDevicesCount);
+            new ReadOnlyArray<InputDevice>(s_Manager.m_DisconnectedDevices, 0, s_Manager.m_DisconnectedDevicesCount);
 
         /// <summary>
         /// Event that is signalled when the device setup in the system changes.
@@ -1440,7 +1453,8 @@ namespace UnityEngine.InputSystem
                 if (device != null)
                     RemoveDevice(device);
                 throw new InvalidOperationException(
-                    $"Layout registered for type '{typeof(TDevice).Name}' did not produce a device of that type; layout probably has been overridden");
+                    $"Layout registered for type '{typeof(TDevice).Name}' did not produce a device of that type; layout probably has been overridden"
+                );
             }
             return deviceOfType;
         }
@@ -1787,7 +1801,11 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputDevice.enabled"/>
         public static void DisableDevice(InputDevice device, bool keepSendingEvents = false)
         {
-            s_Manager.EnableOrDisableDevice(device, false, keepSendingEvents ? InputManager.DeviceDisableScope.InFrontendOnly : default);
+            s_Manager.EnableOrDisableDevice(
+                device,
+                false,
+                keepSendingEvents ? InputManager.DeviceDisableScope.InFrontendOnly : default
+            );
         }
 
         /// <summary>
@@ -2353,7 +2371,7 @@ namespace UnityEngine.InputSystem
             // and at the same time provide a springboard into IObservable.
             get => default;
             // ReSharper disable once ValueParameterNotUsed
-            set {}
+            set { }
         }
 
         /// <summary>
@@ -2446,8 +2464,7 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="ButtonControl.isPressed"/>
         /// <seealso cref="onEvent"/>
         public static IObservable<InputControl> onAnyButtonPress =>
-            onEvent
-                .Select(e => e.GetFirstButtonPressOrNull()).Where(c => c != null);
+            onEvent.Select(e => e.GetFirstButtonPressOrNull()).Where(c => c != null);
 
         /// <summary>
         /// Add an event to the internal event queue.
@@ -2549,6 +2566,7 @@ namespace UnityEngine.InputSystem
             public const int kMaxSize = 512;
             public fixed byte data[kMaxSize - 1]; // StateEvent already adds one.
         }
+
         /// <summary>
         /// Queue a <see cref="StateEvent"/> to update the input state of the given device.
         /// </summary>
@@ -2607,7 +2625,8 @@ namespace UnityEngine.InputSystem
             // Make sure device is actually in the system.
             if (device.m_DeviceIndex == InputDevice.kInvalidDeviceIndex)
                 throw new InvalidOperationException(
-                    $"Cannot queue state event for device '{device}' because device has not been added to system");
+                    $"Cannot queue state event for device '{device}' because device has not been added to system"
+                );
 
             ////REVIEW: does it make more sense to go off the 'stateBlock' on the device and let that determine size?
 
@@ -2615,7 +2634,8 @@ namespace UnityEngine.InputSystem
             if (stateSize > StateEventBuffer.kMaxSize)
                 throw new ArgumentException(
                     $"Size of '{typeof(TState).Name}' exceeds maximum supported state size of {StateEventBuffer.kMaxSize}",
-                    nameof(state));
+                    nameof(state)
+                );
             var eventSize = UnsafeUtility.SizeOf<StateEvent>() + stateSize - StateEvent.kStateDataSizeToSubtract;
 
             if (time < 0)
@@ -2624,11 +2644,10 @@ namespace UnityEngine.InputSystem
                 time += InputRuntime.s_CurrentTimeOffsetToRealtimeSinceStartup;
 
             StateEventBuffer eventBuffer;
-            eventBuffer.stateEvent =
-                new StateEvent
+            eventBuffer.stateEvent = new StateEvent
             {
                 baseEvent = new InputEvent(StateEvent.Type, (int)eventSize, device.deviceId, time),
-                stateFormat = state.format
+                stateFormat = state.format,
             };
 
             var ptr = eventBuffer.stateEvent.stateData;
@@ -2662,13 +2681,15 @@ namespace UnityEngine.InputSystem
 
             if (control.stateBlock.bitOffset != 0)
                 throw new InvalidOperationException(
-                    $"Cannot send delta state events against bitfield controls: {control}");
+                    $"Cannot send delta state events against bitfield controls: {control}"
+                );
 
             // Make sure device is actually in the system.
             var device = control.device;
             if (device.m_DeviceIndex == InputDevice.kInvalidDeviceIndex)
                 throw new InvalidOperationException(
-                    $"Cannot queue state event for control '{control}' on device '{device}' because device has not been added to system");
+                    $"Cannot queue state event for control '{control}' on device '{device}' because device has not been added to system"
+                );
 
             if (time < 0)
                 time = InputRuntime.s_Instance.currentTime;
@@ -2679,23 +2700,24 @@ namespace UnityEngine.InputSystem
             if (deltaSize > DeltaStateEventBuffer.kMaxSize)
                 throw new ArgumentException(
                     $"Size of state delta '{typeof(TDelta).Name}' exceeds maximum supported state size of {DeltaStateEventBuffer.kMaxSize}",
-                    nameof(delta));
+                    nameof(delta)
+                );
 
             ////TODO: recognize a matching C# representation of a state format and convert to what we expect for trivial cases
             if (deltaSize != control.stateBlock.alignedSizeInBytes)
                 throw new ArgumentException(
                     $"Size {deltaSize} of delta state of type {typeof(TDelta).Name} provided for control '{control}' does not match size {control.stateBlock.alignedSizeInBytes} of control",
-                    nameof(delta));
+                    nameof(delta)
+                );
 
             var eventSize = UnsafeUtility.SizeOf<DeltaStateEvent>() + deltaSize - 1;
 
             DeltaStateEventBuffer eventBuffer;
-            eventBuffer.stateEvent =
-                new DeltaStateEvent
+            eventBuffer.stateEvent = new DeltaStateEvent
             {
                 baseEvent = new InputEvent(DeltaStateEvent.Type, (int)eventSize, device.deviceId, time),
                 stateFormat = device.stateBlock.format,
-                stateOffset = control.m_StateBlock.byteOffset - device.m_StateBlock.byteOffset
+                stateOffset = control.m_StateBlock.byteOffset - device.m_StateBlock.byteOffset,
             };
 
             var ptr = eventBuffer.stateEvent.stateData;
@@ -2805,7 +2827,8 @@ namespace UnityEngine.InputSystem
         {
             if (updateType != InputUpdateType.None && (s_Manager.updateMask & updateType) == 0)
                 throw new InvalidOperationException(
-                    $"'{updateType}' updates are not enabled; InputSystem.settings.updateMode is set to '{settings.updateMode}'");
+                    $"'{updateType}' updates are not enabled; InputSystem.settings.updateMode is set to '{settings.updateMode}'"
+                );
             s_Manager.Update(updateType);
         }
 
@@ -2882,13 +2905,16 @@ namespace UnityEngine.InputSystem
                     return;
 
                 // In the editor, we keep track of the settings asset through EditorBuildSettings.
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(value)))
                 {
-                    EditorBuildSettings.AddConfigObject(InputSettingsProvider.kEditorBuildSettingsConfigKey,
-                        value, true);
+                    EditorBuildSettings.AddConfigObject(
+                        InputSettingsProvider.kEditorBuildSettingsConfigKey,
+                        value,
+                        true
+                    );
                 }
-                #endif
+#endif
 
                 s_Manager.settings = value;
             }
@@ -3069,7 +3095,9 @@ namespace UnityEngine.InputSystem
             {
                 // Prevent this property from being assigned in play-mode.
                 if (Application.isPlaying)
-                    throw new Exception($"Attempted to set property InputSystem.actions during Play-mode which is not supported. Assigning this property is only allowed in Edit-mode.");
+                    throw new Exception(
+                        $"Attempted to set property InputSystem.actions during Play-mode which is not supported. Assigning this property is only allowed in Edit-mode."
+                    );
 
                 // Note that we use reference equality to determine if object changed or not.
                 // This allows us to change the associated value even if changed or destroyed.
@@ -3081,7 +3109,9 @@ namespace UnityEngine.InputSystem
 #if UNITY_EDITOR
                 // Do not allow assigning non-persistent assets (pure in-memory objects)
                 if (valueIsNotNull && !EditorUtility.IsPersistent(value))
-                    throw new ArgumentException($"Assigning a non-persistent {nameof(InputActionAsset)} to this property is not allowed. The assigned asset need to be persisted on disc inside the /Assets folder.");
+                    throw new ArgumentException(
+                        $"Assigning a non-persistent {nameof(InputActionAsset)} to this property is not allowed. The assigned asset need to be persisted on disc inside the /Assets folder."
+                    );
 
                 // Track reference to enable including it in built Players, note that it will discard any non-persisted
                 // object reference
@@ -3109,7 +3139,6 @@ namespace UnityEngine.InputSystem
             add => s_Manager.onActionsChange += value;
             remove => s_Manager.onActionsChange -= value;
         }
-
 
         /// <summary>
         /// Event that is signalled when the state of enabled actions in the system changes or
@@ -3421,36 +3450,36 @@ namespace UnityEngine.InputSystem
         {
             Debug.Assert(s_Manager != null);
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             s_Remote = new InputRemoting(s_Manager);
             // NOTE: We use delayCall as our initial startup will run in editor initialization before
             //       PlayerConnection is itself ready. If we call Bind() directly here, we won't
             //       see any errors but the callbacks we register for will not trigger.
             EditorApplication.delayCall += SetUpRemotingInternal;
-            #else
+#else
             s_Remote = new InputRemoting(s_Manager);
             SetUpRemotingInternal();
-            #endif
+#endif
         }
 
         private static void SetUpRemotingInternal()
         {
             if (s_RemoteConnection == null)
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 s_RemoteConnection = RemoteInputPlayerConnection.instance;
                 s_RemoteConnection.Bind(EditorConnection.instance, false);
-                #else
+#else
                 s_RemoteConnection = ScriptableObject.CreateInstance<RemoteInputPlayerConnection>();
                 s_RemoteConnection.Bind(PlayerConnection.instance, PlayerConnection.instance.isConnected);
-                #endif
+#endif
             }
 
             s_Remote.Subscribe(s_RemoteConnection); // Feed messages from players into editor.
             s_RemoteConnection.Subscribe(s_Remote); // Feed messages from editor into players.
         }
 
-        #if !UNITY_EDITOR
+#if !UNITY_EDITOR
         private static bool ShouldEnableRemoting()
         {
 #if UNITY_INCLUDE_TESTS
@@ -3462,19 +3491,18 @@ namespace UnityEngine.InputSystem
                 return false; // Don't remote while running tests.
             return true;
         }
-
-        #endif
+#endif
 #endif // DEVELOPMENT_BUILD || UNITY_EDITOR
 
         // The rest here is internal stuff to manage singletons, survive domain reloads,
         // and to support the reset ability for tests.
         static InputSystem()
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             InitializeInEditor();
-            #else
+#else
             InitializeInPlayer();
-            #endif
+#endif
         }
 
         ////FIXME: Unity is not calling this method if it's inside an #if block that is not
@@ -3489,18 +3517,16 @@ namespace UnityEngine.InputSystem
             // IL2CPP has a bug that causes the class constructor to not be run when
             // the RuntimeInitializeOnLoadMethod is invoked. So we need an explicit check
             // here until that is fixed (case 1014293).
-            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
             if (s_Manager == null)
                 InitializeInPlayer();
-            #endif
+#endif
         }
 
         // Initialization is triggered by accessing InputSystem. Some parts (like InputActions)
         // do not rely on InputSystem and thus can be accessed without tapping InputSystem.
         // This method will explicitly make sure we trigger initialization.
-        internal static void EnsureInitialized()
-        {
-        }
+        internal static void EnsureInitialized() { }
 
 #if UNITY_EDITOR
         internal static InputSystemObject s_SystemObject;
@@ -3546,8 +3572,12 @@ namespace UnityEngine.InputSystem
                 s_SystemObject.hideFlags = HideFlags.HideAndDontSave;
 
                 // See if we have a remembered settings object.
-                if (EditorBuildSettings.TryGetConfigObject(InputSettingsProvider.kEditorBuildSettingsConfigKey,
-                    out InputSettings settingsAsset))
+                if (
+                    EditorBuildSettings.TryGetConfigObject(
+                        InputSettingsProvider.kEditorBuildSettingsConfigKey,
+                        out InputSettings settingsAsset
+                    )
+                )
                 {
                     if (s_Manager.m_Settings.hideFlags == HideFlags.HideAndDontSave)
                         ScriptableObject.DestroyImmediate(s_Manager.m_Settings);
@@ -3582,13 +3612,16 @@ namespace UnityEngine.InputSystem
 
         private static void ShowRestartWarning()
         {
-            if (!s_SystemObject.newInputBackendsCheckedAsEnabled &&
-                !EditorPlayerSettingHelpers.newSystemBackendsEnabled &&
-                !Application.isBatchMode)
+            if (
+                !s_SystemObject.newInputBackendsCheckedAsEnabled
+                && !EditorPlayerSettingHelpers.newSystemBackendsEnabled
+                && !Application.isBatchMode
+            )
             {
-                const string dialogText = "This project is using the new input system package but the native platform backends for the new input system are not enabled in the player settings. " +
-                    "This means that no input from native devices will come through." +
-                    "\n\nDo you want to enable the backends? Doing so will *RESTART* the editor.";
+                const string dialogText =
+                    "This project is using the new input system package but the native platform backends for the new input system are not enabled in the player settings. "
+                    + "This means that no input from native devices will come through."
+                    + "\n\nDo you want to enable the backends? Doing so will *RESTART* the editor.";
 
                 if (EditorUtility.DisplayDialog("Warning", dialogText, "Yes", "No"))
                 {
@@ -3723,7 +3756,9 @@ namespace UnityEngine.InputSystem
         private static void InitializeInPlayer(IInputRuntime runtime = null, InputSettings settings = null)
         {
             if (settings == null)
-                settings = Resources.FindObjectsOfTypeAll<InputSettings>().FirstOrDefault() ?? ScriptableObject.CreateInstance<InputSettings>();
+                settings =
+                    Resources.FindObjectsOfTypeAll<InputSettings>().FirstOrDefault()
+                    ?? ScriptableObject.CreateInstance<InputSettings>();
 
             // No domain reloads in the player so we don't need to look for existing
             // instances.
@@ -3743,7 +3778,6 @@ namespace UnityEngine.InputSystem
             // This is the point where we initialise project-wide actions for the Player
             EnableActions();
         }
-
 #endif // UNITY_EDITOR
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -3764,57 +3798,57 @@ namespace UnityEngine.InputSystem
         {
             UISupport.Initialize();
 
-            #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WSA || UNITY_ANDROID || UNITY_IOS || UNITY_TVOS || UNITY_VISIONOS
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WSA || UNITY_ANDROID || UNITY_IOS || UNITY_TVOS || UNITY_VISIONOS
             XInputSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_PS4 || UNITY_PS5 || UNITY_WSA || UNITY_ANDROID || UNITY_IOS || UNITY_TVOS || UNITY_VISIONOS
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_PS4 || UNITY_PS5 || UNITY_WSA || UNITY_ANDROID || UNITY_IOS || UNITY_TVOS || UNITY_VISIONOS
             DualShockSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WSA
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WSA
             HIDSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_ANDROID
+#if UNITY_EDITOR || UNITY_ANDROID
             Android.AndroidSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_IOS || UNITY_TVOS || UNITY_VISIONOS
+#if UNITY_EDITOR || UNITY_IOS || UNITY_TVOS || UNITY_VISIONOS
             iOS.iOSSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_STANDALONE_OSX
+#if UNITY_EDITOR || UNITY_STANDALONE_OSX
             OSX.OSXSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_WEBGL
+#if UNITY_EDITOR || UNITY_WEBGL
             WebGL.WebGLSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_WSA
+#if UNITY_EDITOR || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_WSA
             Switch.SwitchSupportHID.Initialize();
-            #endif
+#endif
 
-            #if UNITY_INPUT_SYSTEM_ENABLE_XR && (ENABLE_VR || UNITY_GAMECORE) && !UNITY_FORCE_INPUTSYSTEM_XR_OFF
+#if UNITY_INPUT_SYSTEM_ENABLE_XR && (ENABLE_VR || UNITY_GAMECORE) && !UNITY_FORCE_INPUTSYSTEM_XR_OFF
             XR.XRSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_STANDALONE_LINUX
+#if UNITY_EDITOR || UNITY_STANDALONE_LINUX
             Linux.LinuxSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_TVOS || UNITY_WSA || UNITY_VISIONOS
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_TVOS || UNITY_WSA || UNITY_VISIONOS
             OnScreen.OnScreenSupport.Initialize();
-            #endif
+#endif
 
-            #if (UNITY_EDITOR || UNITY_STANDALONE) && UNITY_ENABLE_STEAM_CONTROLLER_SUPPORT
+#if (UNITY_EDITOR || UNITY_STANDALONE) && UNITY_ENABLE_STEAM_CONTROLLER_SUPPORT
             Steam.SteamSupport.Initialize();
-            #endif
+#endif
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             UnityRemoteSupport.Initialize();
-            #endif
+#endif
         }
 
 #endif // UNITY_DISABLE_DEFAULT_INPUT_PLUGIN_INITIALIZATION
@@ -3851,11 +3885,9 @@ namespace UnityEngine.InputSystem
             var settings = ScriptableObject.CreateInstance<InputSettings>();
             settings.hideFlags = HideFlags.HideAndDontSave;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             s_Manager = new InputManager();
-            s_Manager.Initialize(
-                runtime: runtime ?? NativeInputRuntime.instance,
-                settings: settings);
+            s_Manager.Initialize(runtime: runtime ?? NativeInputRuntime.instance, settings: settings);
 
             s_Manager.m_Runtime.onPlayModeChanged = OnPlayModeChange;
             s_Manager.m_Runtime.onProjectChange = OnProjectChange;
@@ -3865,13 +3897,13 @@ namespace UnityEngine.InputSystem
             if (enableRemoting)
                 SetUpRemoting();
 
-            #if !UNITY_DISABLE_DEFAULT_INPUT_PLUGIN_INITIALIZATION
+#if !UNITY_DISABLE_DEFAULT_INPUT_PLUGIN_INITIALIZATION
             PerformDefaultPluginInitialization();
-            #endif
+#endif
 
-            #else
+#else
             InitializeInPlayer(runtime, settings);
-            #endif
+#endif
 
             Mouse.s_PlatformMouseDevice = null;
 
@@ -3900,11 +3932,11 @@ namespace UnityEngine.InputSystem
             s_Manager.Destroy();
             if (s_RemoteConnection != null)
                 Object.DestroyImmediate(s_RemoteConnection);
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             EditorInputControlLayoutCache.Clear();
             InputDeviceDebuggerWindow.s_OnToolbarGUIActions.Clear();
             InputEditorUserSettings.s_Settings = new InputEditorUserSettings.SerializedState();
-            #endif
+#endif
 
             s_Manager = null;
             s_RemoteConnection = null;
@@ -3920,19 +3952,38 @@ namespace UnityEngine.InputSystem
         [Serializable]
         internal struct State
         {
-            [NonSerialized] public InputManager manager;
-            [NonSerialized] public InputRemoting remote;
-            [SerializeField] public RemoteInputPlayerConnection remoteConnection;
-            [SerializeField] public InputManager.SerializedState managerState;
-            [SerializeField] public InputRemoting.SerializedState remotingState;
-            #if UNITY_EDITOR
-            [SerializeField] public InputEditorUserSettings.SerializedState userSettings;
-            [SerializeField] public string systemObject;
-            #endif
+            [NonSerialized]
+            public InputManager manager;
+
+            [NonSerialized]
+            public InputRemoting remote;
+
+            [SerializeField]
+            public RemoteInputPlayerConnection remoteConnection;
+
+            [SerializeField]
+            public InputManager.SerializedState managerState;
+
+            [SerializeField]
+            public InputRemoting.SerializedState remotingState;
+
+#if UNITY_EDITOR
+            [SerializeField]
+            public InputEditorUserSettings.SerializedState userSettings;
+
+            [SerializeField]
+            public string systemObject;
+#endif
+
             ////TODO: make these saved states capable of surviving domain reloads
-            [NonSerialized] public ISavedState inputActionState;
-            [NonSerialized] public ISavedState touchState;
-            [NonSerialized] public ISavedState inputUserState;
+            [NonSerialized]
+            public ISavedState inputActionState;
+
+            [NonSerialized]
+            public ISavedState touchState;
+
+            [NonSerialized]
+            public ISavedState inputUserState;
         }
 
         private static Stack<State> s_SavedStateStack;
@@ -3959,21 +4010,23 @@ namespace UnityEngine.InputSystem
             ////TODO: preserve InputUser state
             ////TODO: preserve EnhancedTouchSupport state
 
-            s_SavedStateStack.Push(new State
-            {
-                manager = s_Manager,
-                remote = s_Remote,
-                remoteConnection = s_RemoteConnection,
-                managerState = s_Manager.SaveState(),
-                remotingState = s_Remote?.SaveState() ?? new InputRemoting.SerializedState(),
-                #if UNITY_EDITOR
-                userSettings = InputEditorUserSettings.s_Settings,
-                systemObject = JsonUtility.ToJson(s_SystemObject),
-                #endif
-                inputActionState = InputActionState.SaveAndResetState(),
-                touchState = EnhancedTouch.Touch.SaveAndResetState(),
-                inputUserState = InputUser.SaveAndResetState()
-            });
+            s_SavedStateStack.Push(
+                new State
+                {
+                    manager = s_Manager,
+                    remote = s_Remote,
+                    remoteConnection = s_RemoteConnection,
+                    managerState = s_Manager.SaveState(),
+                    remotingState = s_Remote?.SaveState() ?? new InputRemoting.SerializedState(),
+#if UNITY_EDITOR
+                    userSettings = InputEditorUserSettings.s_Settings,
+                    systemObject = JsonUtility.ToJson(s_SystemObject),
+#endif
+                    inputActionState = InputActionState.SaveAndResetState(),
+                    touchState = EnhancedTouch.Touch.SaveAndResetState(),
+                    inputUserState = InputUser.SaveAndResetState(),
+                }
+            );
 
             Reset(enableRemoting, runtime ?? InputRuntime.s_Instance); // Keep current runtime.
         }
@@ -4010,10 +4063,10 @@ namespace UnityEngine.InputSystem
             s_Manager.InstallGlobals();
             s_Manager.ApplySettings();
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             InputEditorUserSettings.s_Settings = state.userSettings;
             JsonUtility.FromJsonOverwrite(state.systemObject, s_SystemObject);
-            #endif
+#endif
 
             // Get devices that keep global lists (like Gamepad) to re-initialize them
             // by pretending the devices have been added.

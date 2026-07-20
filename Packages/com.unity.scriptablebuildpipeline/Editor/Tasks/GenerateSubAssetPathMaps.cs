@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Injector;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEditor.Build.Pipeline.Utilities;
 using UnityEditor.Build.Pipeline.WriteTypes;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline.Tasks
 {
@@ -15,7 +15,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class GenerateSubAssetPathMaps : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext]
@@ -31,7 +34,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
             if (m_ExtendedAssetData == null || m_ExtendedAssetData.ExtendedData.IsNullOrEmpty())
                 return ReturnCode.SuccessNotRun;
 
-            Dictionary<string, IWriteOperation> fileToOperation = m_WriteData.WriteOperations.ToDictionary(x => x.Command.internalName, x => x);
+            Dictionary<string, IWriteOperation> fileToOperation = m_WriteData.WriteOperations.ToDictionary(
+                x => x.Command.internalName,
+                x => x
+            );
             foreach (var pair in m_ExtendedAssetData.ExtendedData)
             {
                 GUID asset = pair.Key;

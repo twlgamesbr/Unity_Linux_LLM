@@ -40,7 +40,7 @@ namespace UnityEngine.Rendering
         {
             Initial,
             Count,
-            Last = Count - 1
+            Last = Count - 1,
         }
 
         bool IRenderPipelineGraphicsSettings.isAvailableInPlayerBuild => true;
@@ -49,7 +49,11 @@ namespace UnityEngine.Rendering
         private Version m_version = Version.Last;
         int IRenderPipelineGraphicsSettings.version => (int)m_version;
 
-        [RecreatePipelineOnChange , SerializeField, Tooltip("Enable caching of render graph compilation from one frame to another.")]
+        [
+            RecreatePipelineOnChange,
+            SerializeField,
+            Tooltip("Enable caching of render graph compilation from one frame to another.")
+        ]
         private bool m_EnableCompilationCaching = true;
 
         /// <summary>Enable Compilation caching for render graph.</summary>
@@ -59,7 +63,13 @@ namespace UnityEngine.Rendering
             set => this.SetValueAndNotify(ref m_EnableCompilationCaching, value);
         }
 
-        [RecreatePipelineOnChange , SerializeField, Tooltip("Enable validity checks of render graph in Editor and Development mode. Always disabled in Release build.")]
+        [
+            RecreatePipelineOnChange,
+            SerializeField,
+            Tooltip(
+                "Enable validity checks of render graph in Editor and Development mode. Always disabled in Release build."
+            )
+        ]
         private bool m_EnableValidityChecks = true;
 
         /// <summary>Enable validity checks for render graph. Always disabled in Release mode.</summary>

@@ -7,9 +7,11 @@ namespace Unity.Entities.UI
     [Serializable]
     class SerializableContent
     {
-        [SerializeField, HideInInspector] string m_Data;
+        [SerializeField, HideInInspector]
+        string m_Data;
 
-        [NonSerialized] public ContentProvider Provider;
+        [NonSerialized]
+        public ContentProvider Provider;
 
         public string Name => Provider?.Name;
 
@@ -22,7 +24,7 @@ namespace Unity.Entities.UI
             {
                 foreach (var exception in events.Exceptions)
                 {
-                    Debug.LogException((Exception) exception.Payload);
+                    Debug.LogException((Exception)exception.Payload);
                 }
 
                 foreach (var warnings in events.Warnings)
@@ -39,9 +41,7 @@ namespace Unity.Entities.UI
 
         public void Save()
         {
-            m_Data = null != Provider
-                ? JsonSerialization.ToJson(Provider)
-                : string.Empty;
+            m_Data = null != Provider ? JsonSerialization.ToJson(Provider) : string.Empty;
         }
     }
 }

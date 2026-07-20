@@ -4,14 +4,15 @@ using System.Globalization;
 namespace Unity.Numerics.Linear.Dense.Primitives
 {
     [DebuggerTypeProxy(typeof(VectorDebugView))]
-    partial struct Vector {}
+    partial struct Vector { }
 
     [DebuggerTypeProxy(typeof(MatrixDebugView))]
-    partial struct Matrix {}
+    partial struct Matrix { }
 
     internal class VectorDebugView
     {
         private Vector vector;
+
         public VectorDebugView(Vector v)
         {
             vector = v;
@@ -20,10 +21,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public float[] Elements
         {
-            get
-            {
-                return vector.ToArray();
-            }
+            get { return vector.ToArray(); }
         }
 
         public string MaximaString
@@ -63,6 +61,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
     internal class MatrixDebugView
     {
         private Matrix matrix;
+
         public MatrixDebugView(Matrix m)
         {
             matrix = m;

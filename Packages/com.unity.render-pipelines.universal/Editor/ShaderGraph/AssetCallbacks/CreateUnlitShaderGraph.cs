@@ -6,7 +6,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
     static class CreateUnlitShaderGraph
     {
-        [MenuItem("Assets/Create/Shader Graph/URP/Unlit Shader Graph", priority = CoreUtils.Priorities.assetsCreateShaderMenuPriority + 1)]
+        [MenuItem(
+            "Assets/Create/Shader Graph/URP/Unlit Shader Graph",
+            priority = CoreUtils.Priorities.assetsCreateShaderMenuPriority + 1
+        )]
         public static void CreateUnlitGraph()
         {
             var target = (UniversalTarget)Activator.CreateInstance(typeof(UniversalTarget));

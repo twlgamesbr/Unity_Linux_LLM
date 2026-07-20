@@ -21,7 +21,10 @@ namespace Unity.Scenes.Editor
                 {
                     Scene scene;
                     if (Application.isPlaying)
-                        scene = EditorSceneManager.LoadSceneInPlayMode(subScene.EditableScenePath, new LoadSceneParameters(LoadSceneMode.Additive));
+                        scene = EditorSceneManager.LoadSceneInPlayMode(
+                            subScene.EditableScenePath,
+                            new LoadSceneParameters(LoadSceneMode.Additive)
+                        );
                     else
                         scene = EditorSceneManager.OpenScene(subScene.EditableScenePath, OpenSceneMode.Additive);
                     SubSceneInspectorUtility.SetSceneAsSubScene(scene);

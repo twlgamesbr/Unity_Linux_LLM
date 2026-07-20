@@ -2,7 +2,9 @@ using Unity.Entities;
 
 namespace Unity.Scenes.Editor
 {
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateBefore(typeof(SceneSystemGroup))]
     partial class LiveConversionEditorSystemGroup : ComponentSystemGroup

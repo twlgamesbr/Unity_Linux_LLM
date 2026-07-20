@@ -15,11 +15,11 @@ namespace Unity.Scenes
         public struct ResourcePacket : IDisposable
         {
             public NativeArray<RuntimeGlobalObjectId> GlobalObjectIds;
-            public UnsafeAppendBuffer                 ChangeSet;
+            public UnsafeAppendBuffer ChangeSet;
 
             public ResourcePacket(byte[] buffer)
             {
-                fixed(byte* ptr = buffer)
+                fixed (byte* ptr = buffer)
                 {
                     var bufferReader = new UnsafeAppendBuffer.Reader(ptr, buffer.Length);
 
@@ -39,7 +39,10 @@ namespace Unity.Scenes
             }
 
 #if UNITY_EDITOR
-            unsafe public static void SerializeResourcePacket(EntityChangeSet entityChangeSet, ref UnsafeAppendBuffer buffer)
+            unsafe public static void SerializeResourcePacket(
+                EntityChangeSet entityChangeSet,
+                ref UnsafeAppendBuffer buffer
+            )
             {
                 var changeSetBuffer = new UnsafeAppendBuffer(1024, 16, Allocator.TempJob);
                 Serialize(entityChangeSet, &changeSetBuffer, out var globalObjectIds);
@@ -54,7 +57,11 @@ namespace Unity.Scenes
 #endif
         }
 
-        public static EntityChangeSet Deserialize(UnsafeAppendBuffer.Reader* bufferReader, NativeArray<RuntimeGlobalObjectId> globalObjectIDs, GlobalAssetObjectResolver resolver)
+        public static EntityChangeSet Deserialize(
+            UnsafeAppendBuffer.Reader* bufferReader,
+            NativeArray<RuntimeGlobalObjectId> globalObjectIDs,
+            GlobalAssetObjectResolver resolver
+        )
         {
             bufferReader->ReadNext<ComponentTypeHash>(out var typeHashes, Allocator.Persistent);
 
@@ -65,7 +72,9 @@ namespace Unity.Scenes
                 if (typeIndex == TypeIndex.Null)
                 {
                     typeHashes.Dispose();
-                    throw new ArgumentException("The LiveConversion Patch Type Layout doesn't match the Data Layout of the Components. Please Rebuild the Player.");
+                    throw new ArgumentException(
+                        "The LiveConversion Patch Type Layout doesn't match the Data Layout of the Components. Please Rebuild the Player."
+                    );
                 }
             }
 
@@ -92,7 +101,11 @@ namespace Unity.Scenes
             var reader = new ManagedObjectBinaryReader(bufferReader, unityObjects);
 
             var addArchetypes = ReadFilteredArchetypes(bufferReader, Allocator.Persistent);
-            var (setSharedComponents, unmanagedSharedComponentData) = ReadSharedComponentDataChanges(bufferReader, reader, typeHashes);
+            var (setSharedComponents, unmanagedSharedComponentData) = ReadSharedComponentDataChanges(
+                bufferReader,
+                reader,
+                typeHashes
+            );
             var setManagedComponents = ReadManagedComponentDataChanges(bufferReader, reader, typeHashes);
 
             //if (!bufferReader->EndOfBuffer)
@@ -120,10 +133,15 @@ namespace Unity.Scenes
                 linkedEntityGroupRemovals,
                 createdBlobAssets,
                 destroyedBlobAssets,
-                blobAssetData);
+                blobAssetData
+            );
         }
 
-        static (PackedSharedComponentDataChange[], UnsafeAppendBuffer) ReadSharedComponentDataChanges(UnsafeAppendBuffer.Reader* buffer, ManagedObjectBinaryReader reader, NativeArray<ComponentTypeHash> typeHashes)
+        static (PackedSharedComponentDataChange[], UnsafeAppendBuffer) ReadSharedComponentDataChanges(
+            UnsafeAppendBuffer.Reader* buffer,
+            ManagedObjectBinaryReader reader,
+            NativeArray<ComponentTypeHash> typeHashes
+        )
         {
             buffer->ReadNext<PackedComponent>(out var packedComponents, Allocator.Temp);
             var setSharedComponentDataChanges = new PackedSharedComponentDataChange[packedComponents.Length];
@@ -148,7 +166,11 @@ namespace Unity.Scenes
             return (setSharedComponentDataChanges, unmanagedSharedComponentData);
         }
 
-        static PackedManagedComponentDataChange[] ReadManagedComponentDataChanges(UnsafeAppendBuffer.Reader* buffer, ManagedObjectBinaryReader reader, NativeArray<ComponentTypeHash> typeHashes)
+        static PackedManagedComponentDataChange[] ReadManagedComponentDataChanges(
+            UnsafeAppendBuffer.Reader* buffer,
+            ManagedObjectBinaryReader reader,
+            NativeArray<ComponentTypeHash> typeHashes
+        )
         {
             buffer->ReadNext<PackedComponent>(out var packedComponents, Allocator.Temp);
             var setManagedComponentDataChanges = new PackedManagedComponentDataChange[packedComponents.Length];
@@ -166,7 +188,10 @@ namespace Unity.Scenes
             return setManagedComponentDataChanges;
         }
 
-        static NativeArray<FilteredArchetype> ReadFilteredArchetypes(UnsafeAppendBuffer.Reader* buffer, Allocator allocator)
+        static NativeArray<FilteredArchetype> ReadFilteredArchetypes(
+            UnsafeAppendBuffer.Reader* buffer,
+            Allocator allocator
+        )
         {
             var filteredArchetypesLength = buffer->ReadNext<int>();
             var filteredArchetypes = new NativeArray<FilteredArchetype>(filteredArchetypesLength, allocator);
@@ -191,7 +216,7 @@ namespace Unity.Scenes
                 {
                     EntityCount = entityCount,
                     PackedEntityIndices = packedEntityIndices,
-                    TypeIndices = typeIndices
+                    TypeIndices = typeIndices,
                 };
             }
 
@@ -200,7 +225,11 @@ namespace Unity.Scenes
 
 #if UNITY_EDITOR
 
-        public static void Serialize(EntityChangeSet entityChangeSet, UnsafeAppendBuffer* buffer, out NativeArray<RuntimeGlobalObjectId> outAssets)
+        public static void Serialize(
+            EntityChangeSet entityChangeSet,
+            UnsafeAppendBuffer* buffer,
+            out NativeArray<RuntimeGlobalObjectId> outAssets
+        )
         {
             // @FIXME Workaround to solve an issue with hybrid components, LiveConversion player builds do NOT support hybrid components.
             //
@@ -210,10 +239,23 @@ namespace Unity.Scenes
             //
             // In order to avoid crashing the companion link system in the player build we strip this component during serialization.
             //
-            var companionLinkPackedTypeIndex = EntityChangeSet.GetCompanionLinkPackedTypeIndex(entityChangeSet.TypeHashes);
-            var addComponentsWithoutCompanionLinks = GetPackedComponentsWithoutCompanionLinks(entityChangeSet.AddComponents, companionLinkPackedTypeIndex, Allocator.Temp);
-            var removeComponentWithoutCompanionLinks = GetPackedComponentsWithoutCompanionLinks(entityChangeSet.RemoveComponents, companionLinkPackedTypeIndex, Allocator.Temp);
-            var setManagedComponentWithoutCompanionLinks = GetPackedManagedComponentChangesWithoutCompanionLinks(entityChangeSet.SetManagedComponents, companionLinkPackedTypeIndex);
+            var companionLinkPackedTypeIndex = EntityChangeSet.GetCompanionLinkPackedTypeIndex(
+                entityChangeSet.TypeHashes
+            );
+            var addComponentsWithoutCompanionLinks = GetPackedComponentsWithoutCompanionLinks(
+                entityChangeSet.AddComponents,
+                companionLinkPackedTypeIndex,
+                Allocator.Temp
+            );
+            var removeComponentWithoutCompanionLinks = GetPackedComponentsWithoutCompanionLinks(
+                entityChangeSet.RemoveComponents,
+                companionLinkPackedTypeIndex,
+                Allocator.Temp
+            );
+            var setManagedComponentWithoutCompanionLinks = GetPackedManagedComponentChangesWithoutCompanionLinks(
+                entityChangeSet.SetManagedComponents,
+                companionLinkPackedTypeIndex
+            );
 
             // Write EntityChangeSet
             buffer->Add(entityChangeSet.TypeHashes);
@@ -239,7 +281,12 @@ namespace Unity.Scenes
             var writer = new ManagedObjectBinaryWriter(buffer, unityObjectRefs);
 
             WriteFilteredArchetypes(buffer, entityChangeSet.AddArchetypes);
-            WriteSharedComponentDataChanges(buffer, writer, entityChangeSet.SetSharedComponents, entityChangeSet.UnmanagedSharedComponentData);
+            WriteSharedComponentDataChanges(
+                buffer,
+                writer,
+                entityChangeSet.SetSharedComponents,
+                entityChangeSet.UnmanagedSharedComponentData
+            );
             WriteManagedComponentDataChanges(buffer, writer, setManagedComponentWithoutCompanionLinks);
 
             var objectTable = unityObjectRefs.EntityIds.ToArrayNBC();
@@ -254,14 +301,18 @@ namespace Unity.Scenes
                 //@TODO: HACK (Object is a scene object)
                 if (globalObjectId.identifierType == 2)
                 {
-                    Debug.LogWarning($"{objectTable[i]} is part of a scene, LiveConversion can't transfer scene objects. (Note: LiveConvertSceneView currently triggers this)");
+                    Debug.LogWarning(
+                        $"{objectTable[i]} is part of a scene, LiveConversion can't transfer scene objects. (Note: LiveConvertSceneView currently triggers this)"
+                    );
                     globalObjectId = new GlobalObjectId();
                 }
 
                 if (globalObjectId.assetGUID == new UnityEngine.GUID())
                 {
                     //@TODO: How do we handle this
-                    Debug.LogWarning($"{objectTable[i]} has no valid GUID. LiveConversion currently does not support built-in assets.");
+                    Debug.LogWarning(
+                        $"{objectTable[i]} has no valid GUID. LiveConversion currently does not support built-in assets."
+                    );
                     globalObjectId = new GlobalObjectId();
                 }
 
@@ -292,7 +343,12 @@ namespace Unity.Scenes
             }
         }
 
-        static void WriteSharedComponentDataChanges(UnsafeAppendBuffer* buffer, ManagedObjectBinaryWriter writer, PackedSharedComponentDataChange[] changes, UnsafeAppendBuffer unmanagedSharedComponentData)
+        static void WriteSharedComponentDataChanges(
+            UnsafeAppendBuffer* buffer,
+            ManagedObjectBinaryWriter writer,
+            PackedSharedComponentDataChange[] changes,
+            UnsafeAppendBuffer unmanagedSharedComponentData
+        )
         {
             buffer->Add(changes.Length);
 
@@ -307,7 +363,11 @@ namespace Unity.Scenes
             buffer->Add(unmanagedSharedComponentData.Ptr, length);
         }
 
-        static void WriteManagedComponentDataChanges(UnsafeAppendBuffer* buffer, ManagedObjectBinaryWriter writer, PackedManagedComponentDataChange[] changes)
+        static void WriteManagedComponentDataChanges(
+            UnsafeAppendBuffer* buffer,
+            ManagedObjectBinaryWriter writer,
+            PackedManagedComponentDataChange[] changes
+        )
         {
             buffer->Add(changes.Length);
 
@@ -318,7 +378,11 @@ namespace Unity.Scenes
                 writer.WriteObject(changes[i].BoxedValue);
         }
 
-        static NativeList<PackedComponent> GetPackedComponentsWithoutCompanionLinks(NativeArray<PackedComponent> components, int companionLinkPackedTypeIndex, AllocatorManager.AllocatorHandle allocator)
+        static NativeList<PackedComponent> GetPackedComponentsWithoutCompanionLinks(
+            NativeArray<PackedComponent> components,
+            int companionLinkPackedTypeIndex,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             var list = new NativeList<PackedComponent>(components.Length, allocator);
 
@@ -333,7 +397,10 @@ namespace Unity.Scenes
             return list;
         }
 
-        static PackedManagedComponentDataChange[] GetPackedManagedComponentChangesWithoutCompanionLinks(PackedManagedComponentDataChange[] changes, int companionLinkPackedTypeIndex)
+        static PackedManagedComponentDataChange[] GetPackedManagedComponentChangesWithoutCompanionLinks(
+            PackedManagedComponentDataChange[] changes,
+            int companionLinkPackedTypeIndex
+        )
         {
             return companionLinkPackedTypeIndex == -1
                 ? changes

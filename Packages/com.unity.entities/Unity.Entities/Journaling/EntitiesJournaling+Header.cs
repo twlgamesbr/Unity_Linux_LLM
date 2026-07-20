@@ -21,7 +21,17 @@ namespace Unity.Entities
             public readonly int TypeCount;
             public readonly int DataLength;
 
-            public Header(ulong index, RecordType recordType, int frameIndex, ulong worldSeqNumber, in SystemHandle executingSystem, in SystemHandle originSystem, int entityCount, int typeCount, int dataLength)
+            public Header(
+                ulong index,
+                RecordType recordType,
+                int frameIndex,
+                ulong worldSeqNumber,
+                in SystemHandle executingSystem,
+                in SystemHandle originSystem,
+                int entityCount,
+                int typeCount,
+                int dataLength
+            )
             {
                 Index = index;
                 RecordType = recordType;

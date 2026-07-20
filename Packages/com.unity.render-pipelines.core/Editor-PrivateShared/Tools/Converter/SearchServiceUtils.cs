@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using UnityEditor.Search;
 
 namespace UnityEditor.Rendering
@@ -11,14 +11,15 @@ namespace UnityEditor.Rendering
         {
             None = 0,
             DeepSearch = 1 << 0,
-            PackageIndexing = 1 << 1
+            PackageIndexing = 1 << 1,
         }
 
         public static void RunQueuedSearch(
             IndexingOptions neededOptions,
             List<(string query, string description)> contextSearchQueriesAndIds,
             Action<SearchItem, string> onAssetGUIDFound,
-            Action onSearchsFinished)
+            Action onSearchsFinished
+        )
         {
             bool needsDeepSearch = (neededOptions & IndexingOptions.DeepSearch) != 0;
             bool needsPackageIndexing = (neededOptions & IndexingOptions.PackageIndexing) != 0;
@@ -31,14 +32,17 @@ namespace UnityEditor.Rendering
             {
                 if (index >= contextSearchQueriesAndIds.Count)
                 {
-                    if (isDeepSearchEnabled != Search.SearchService.IsDeepIndexingEnabled() ||
-                        isPackageIndexingEnabled != Search.SearchService.IsPackageIndexingEnabled())
+                    if (
+                        isDeepSearchEnabled != Search.SearchService.IsDeepIndexingEnabled()
+                        || isPackageIndexingEnabled != Search.SearchService.IsPackageIndexingEnabled()
+                    )
                     {
                         // Rollback the index settings, and call the callback to notify that the initialization is done
                         Search.SearchService.ChangeIndexingSettings(
                             deepIndexing: isDeepSearchEnabled,
                             packageIndexing: isPackageIndexingEnabled,
-                            () => onSearchsFinished?.Invoke());
+                            () => onSearchsFinished?.Invoke()
+                        );
                     }
                     else
                     {
@@ -47,22 +51,25 @@ namespace UnityEditor.Rendering
                     }
                     return;
                 }
-                
+
                 var id = contextSearchQueriesAndIds[index].description;
                 var query = contextSearchQueriesAndIds[index].query;
                 var context = Search.SearchService.CreateContext(query);
 
-                Search.SearchService.Request(context, (searchContext, searchItems) =>
-                {
-                    foreach (var item in searchItems)
+                Search.SearchService.Request(
+                    context,
+                    (searchContext, searchItems) =>
                     {
-                        onAssetGUIDFound.Invoke(item, id);
-                    }
+                        foreach (var item in searchItems)
+                        {
+                            onAssetGUIDFound.Invoke(item, id);
+                        }
 
-                    searchContext?.Dispose();
-                    index++;
-                    ProcessNextSearch();
-                });
+                        searchContext?.Dispose();
+                        index++;
+                        ProcessNextSearch();
+                    }
+                );
             }
 
             void OnSearchIndexReady()

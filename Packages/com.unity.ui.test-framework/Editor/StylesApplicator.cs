@@ -75,11 +75,15 @@ namespace UnityEditor.UIElements.TestFramework
         /// The fake path used internally to mimic a real asset location. By default, this is `Assets/test.uss`.
         /// </param>
         /// <param name="ignoreError">
-        /// A Boolean indicating whether to ignore errors encountered during processing. 
+        /// A Boolean indicating whether to ignore errors encountered during processing.
         /// Defaults to `false`.
         /// </param>
         /// <returns>A new `StyleSheet` instance generated from the provided content.</returns>
-        public static StyleSheet CreateStyleSheetFromString(string contents, string fakePath = "Assets/test.uss", bool ignoreError = false)
+        public static StyleSheet CreateStyleSheetFromString(
+            string contents,
+            string fakePath = "Assets/test.uss",
+            bool ignoreError = false
+        )
         {
             var sheet = ScriptableObject.CreateInstance<StyleSheet>();
             ImportFromString(sheet, contents, fakePath, ignoreError);
@@ -97,7 +101,12 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="ignoreError">
         /// Whether to ignore errors encountered during processing. Defaults to `false`.
         /// </param>
-        private static void ImportFromString(StyleSheet sheet, string contents, string fakePath = "Assets/test.uss", bool ignoreError = false)
+        private static void ImportFromString(
+            StyleSheet sheet,
+            string contents,
+            string fakePath = "Assets/test.uss",
+            bool ignoreError = false
+        )
         {
             sheet.hideFlags = HideFlags.HideAndDontSave | HideFlags.NotEditable;
 
@@ -115,7 +124,8 @@ namespace UnityEditor.UIElements.TestFramework
             private bool m_IgnoreErrors;
             private bool m_IgnoreWarnings;
 
-            public InMemoryStyleSheetImporter(string assetPath, bool ignoreErrors = false, bool ignoreWarnings = false) : base()
+            public InMemoryStyleSheetImporter(string assetPath, bool ignoreErrors = false, bool ignoreWarnings = false)
+                : base()
             {
                 m_AssetPath = assetPath;
                 m_StringBuilder = new StringBuilder();
@@ -163,6 +173,5 @@ namespace UnityEditor.UIElements.TestFramework
                 // all good
             }
         }
-
     }
 }

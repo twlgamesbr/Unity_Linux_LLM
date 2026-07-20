@@ -5,7 +5,5 @@ using UnityEngine.UIElements;
 namespace Unity.Entities.UI
 {
     [UsedImplicitly]
-    class Vector3PropertyPropertyInspector : BaseFieldPropertyInspector<Vector3Field, Vector3>
-    {
-    }
+    class Vector3PropertyPropertyInspector : BaseFieldPropertyInspector<Vector3Field, Vector3> { }
 }

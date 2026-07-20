@@ -77,7 +77,13 @@ namespace Unity.Physics
                 contactPoints[i] = EventData.Value.AccessContactPoint(i);
             }
 
-            return EventData.Value.CalculateDetails(ref physicsWorld, TimeStep, InputVelocityA, InputVelocityB, contactPoints);
+            return EventData.Value.CalculateDetails(
+                ref physicsWorld,
+                TimeStep,
+                InputVelocityA,
+                InputVelocityB,
+                contactPoints
+            );
         }
 
         /// <summary>   Extra details about a collision. </summary>
@@ -119,6 +125,7 @@ namespace Unity.Physics
     public struct CollisionEvents
     {
         readonly NativeStream m_EventDataStream;
+
         [ReadOnly]
         readonly NativeArray<Velocity> m_InputVelocities;
         readonly float m_TimeStep;
@@ -175,8 +182,13 @@ namespace Unity.Physics
                 AdvanceReader();
             }
 
-            internal Enumerator(NativeStream.Reader reader, NativeArray<Velocity> inputVelocities, float timeStep,
-                int forEachIndexBegin, int forEachIndexEnd)
+            internal Enumerator(
+                NativeStream.Reader reader,
+                NativeArray<Velocity> inputVelocities,
+                float timeStep,
+                int forEachIndexBegin,
+                int forEachIndexEnd
+            )
             {
                 m_Reader = reader;
                 m_CurrentWorkItem = forEachIndexBegin;
@@ -202,7 +214,9 @@ namespace Unity.Physics
 
                     unsafe
                     {
-                        m_Current = new CollisionEventDataRef((CollisionEventData*)(m_Reader.ReadUnsafePtr(currentSize)));
+                        m_Current = new CollisionEventDataRef(
+                            (CollisionEventData*)(m_Reader.ReadUnsafePtr(currentSize))
+                        );
                     }
 
                     AdvanceReader();
@@ -245,7 +259,7 @@ namespace Unity.Physics
                 EventData = new CollisionEventDataRef((CollisionEventData*)(UnsafeUtility.AddressOf(ref this))),
                 TimeStep = timeStep,
                 InputVelocityA = bodyIndexA < inputVelocities.Length ? inputVelocities[bodyIndexA] : Velocity.Zero,
-                InputVelocityB = bodyIndexB < inputVelocities.Length ? inputVelocities[bodyIndexB] : Velocity.Zero
+                InputVelocityB = bodyIndexB < inputVelocities.Length ? inputVelocities[bodyIndexB] : Velocity.Zero,
             };
         }
 
@@ -263,15 +277,24 @@ namespace Unity.Physics
 
         // Calculate extra details about the collision, by re-integrating the leaf colliders to the time of collision
         internal unsafe CollisionEvent.Details CalculateDetails(
-            ref PhysicsWorld physicsWorld, float timeStep, Velocity inputVelocityA, Velocity inputVelocityB, NativeArray<ContactPoint> narrowPhaseContactPoints)
+            ref PhysicsWorld physicsWorld,
+            float timeStep,
+            Velocity inputVelocityA,
+            Velocity inputVelocityB,
+            NativeArray<ContactPoint> narrowPhaseContactPoints
+        )
         {
             int bodyIndexA = BodyIndices.BodyIndexA;
             int bodyIndexB = BodyIndices.BodyIndexB;
             bool bodyAIsDynamic = bodyIndexA < physicsWorld.MotionVelocities.Length;
             bool bodyBIsDynamic = bodyIndexB < physicsWorld.MotionVelocities.Length;
 
-            MotionVelocity motionVelocityA = bodyAIsDynamic ? physicsWorld.MotionVelocities[bodyIndexA] : MotionVelocity.Zero;
-            MotionVelocity motionVelocityB = bodyBIsDynamic ? physicsWorld.MotionVelocities[bodyIndexB] : MotionVelocity.Zero;
+            MotionVelocity motionVelocityA = bodyAIsDynamic
+                ? physicsWorld.MotionVelocities[bodyIndexA]
+                : MotionVelocity.Zero;
+            MotionVelocity motionVelocityB = bodyBIsDynamic
+                ? physicsWorld.MotionVelocities[bodyIndexB]
+                : MotionVelocity.Zero;
             MotionData motionDataA = bodyAIsDynamic ? physicsWorld.MotionDatas[bodyIndexA] : MotionData.Zero;
             MotionData motionDataB = bodyBIsDynamic ? physicsWorld.MotionDatas[bodyIndexB] : MotionData.Zero;
 
@@ -288,10 +311,18 @@ namespace Unity.Physics
 
                     // Collect data for impulse estimation
                     {
-                        float3 pointVelA = GetPointVelocity(motionDataA.WorldFromMotion,
-                            motionVelocityA.LinearVelocity, motionVelocityA.AngularVelocity, cp.Position + Normal * cp.Distance);
-                        float3 pointVelB = GetPointVelocity(motionDataB.WorldFromMotion,
-                            motionVelocityB.LinearVelocity, motionVelocityB.AngularVelocity, cp.Position);
+                        float3 pointVelA = GetPointVelocity(
+                            motionDataA.WorldFromMotion,
+                            motionVelocityA.LinearVelocity,
+                            motionVelocityA.AngularVelocity,
+                            cp.Position + Normal * cp.Distance
+                        );
+                        float3 pointVelB = GetPointVelocity(
+                            motionDataB.WorldFromMotion,
+                            motionVelocityB.LinearVelocity,
+                            motionVelocityB.AngularVelocity,
+                            cp.Position
+                        );
                         float projRelVel = math.dot(pointVelB - pointVelA, Normal);
                         if (projRelVel > 0.0f)
                         {
@@ -302,10 +333,18 @@ namespace Unity.Physics
 
                     // Get minimum time of impact
                     {
-                        float3 pointVelA = GetPointVelocity(motionDataA.WorldFromMotion,
-                            inputVelocityA.Linear, inputVelocityA.Angular, cp.Position + Normal * cp.Distance);
-                        float3 pointVelB = GetPointVelocity(motionDataB.WorldFromMotion,
-                            inputVelocityB.Linear, inputVelocityB.Angular, cp.Position);
+                        float3 pointVelA = GetPointVelocity(
+                            motionDataA.WorldFromMotion,
+                            inputVelocityA.Linear,
+                            inputVelocityA.Angular,
+                            cp.Position + Normal * cp.Distance
+                        );
+                        float3 pointVelB = GetPointVelocity(
+                            motionDataB.WorldFromMotion,
+                            inputVelocityB.Linear,
+                            inputVelocityB.Angular,
+                            cp.Position
+                        );
                         float projRelVel = math.dot(pointVelB - pointVelA, Normal);
                         if (projRelVel > 0.0f)
                         {
@@ -337,8 +376,18 @@ namespace Unity.Physics
                     // Estimate new position
                     var cp = narrowPhaseContactPoints[i];
                     {
-                        float3 pointVelA = GetPointVelocity(motionDataA.WorldFromMotion, inputVelocityA.Linear, inputVelocityA.Angular, cp.Position + Normal * cp.Distance);
-                        float3 pointVelB = GetPointVelocity(motionDataB.WorldFromMotion, inputVelocityB.Linear, inputVelocityB.Angular, cp.Position);
+                        float3 pointVelA = GetPointVelocity(
+                            motionDataA.WorldFromMotion,
+                            inputVelocityA.Linear,
+                            inputVelocityA.Angular,
+                            cp.Position + Normal * cp.Distance
+                        );
+                        float3 pointVelB = GetPointVelocity(
+                            motionDataB.WorldFromMotion,
+                            inputVelocityB.Linear,
+                            inputVelocityB.Angular,
+                            cp.Position
+                        );
                         float3 relVel = pointVelB - pointVelA;
                         float projRelVel = math.dot(relVel, Normal);
 
@@ -376,14 +425,19 @@ namespace Unity.Physics
                 // to make sure at least one contact point is reported.
                 if (estimatedContactPointCount == 0)
                 {
-                    narrowPhaseContactPoints[estimatedContactPointCount++] = narrowPhaseContactPoints[closestContactIndex];
+                    narrowPhaseContactPoints[estimatedContactPointCount++] = narrowPhaseContactPoints[
+                        closestContactIndex
+                    ];
                 }
 
                 // Instantiate collision details and allocate memory
                 var details = new CollisionEvent.Details
                 {
-                    EstimatedContactPointPositions = new NativeArray<float3>(estimatedContactPointCount, Allocator.Temp),
-                    EstimatedImpulse = estimatedImpulse
+                    EstimatedContactPointPositions = new NativeArray<float3>(
+                        estimatedContactPointCount,
+                        Allocator.Temp
+                    ),
+                    EstimatedImpulse = estimatedImpulse,
                 };
 
                 // Fill the contact point positions array
@@ -396,7 +450,12 @@ namespace Unity.Physics
             }
         }
 
-        private static float3 GetPointVelocity(RigidTransform worldFromMotion, float3 linVel, float3 angVel, float3 point)
+        private static float3 GetPointVelocity(
+            RigidTransform worldFromMotion,
+            float3 linVel,
+            float3 angVel,
+            float3 point
+        )
         {
             float3 angularVelocity = math.rotate(worldFromMotion, angVel);
             float3 linearVelocity = math.cross(angularVelocity, point - worldFromMotion.pos);

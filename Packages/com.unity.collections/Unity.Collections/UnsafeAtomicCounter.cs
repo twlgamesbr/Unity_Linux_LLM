@@ -66,8 +66,7 @@ namespace Unity.Collections.LowLevel.Unsafe
                 oldVal = newVal;
                 newVal = newVal >= max ? max : math.min(max, newVal + value);
                 newVal = Interlocked.CompareExchange(ref UnsafeUtility.AsRef<int>(Counter), newVal, oldVal);
-            }
-            while (oldVal != newVal && oldVal != max);
+            } while (oldVal != newVal && oldVal != max);
 
             return oldVal;
         }
@@ -87,8 +86,7 @@ namespace Unity.Collections.LowLevel.Unsafe
                 oldVal = newVal;
                 newVal = newVal <= min ? min : math.max(min, newVal - value);
                 newVal = Interlocked.CompareExchange(ref UnsafeUtility.AsRef<int>(Counter), newVal, oldVal);
-            }
-            while (oldVal != newVal && oldVal != min);
+            } while (oldVal != newVal && oldVal != min);
 
             return oldVal;
         }
@@ -157,8 +155,7 @@ namespace Unity.Collections.LowLevel.Unsafe
                 oldVal = newVal;
                 newVal = newVal >= max ? max : math.min(max, newVal + value);
                 newVal = Interlocked.CompareExchange(ref UnsafeUtility.AsRef<long>(Counter), newVal, oldVal);
-            }
-            while (oldVal != newVal && oldVal != max);
+            } while (oldVal != newVal && oldVal != max);
 
             return oldVal;
         }
@@ -178,8 +175,7 @@ namespace Unity.Collections.LowLevel.Unsafe
                 oldVal = newVal;
                 newVal = newVal <= min ? min : math.max(min, newVal - value);
                 newVal = Interlocked.CompareExchange(ref UnsafeUtility.AsRef<long>(Counter), newVal, oldVal);
-            }
-            while (oldVal != newVal && oldVal != min);
+            } while (oldVal != newVal && oldVal != min);
 
             return oldVal;
         }

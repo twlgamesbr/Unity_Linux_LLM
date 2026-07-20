@@ -22,7 +22,10 @@ namespace UnityEditor.UI
             var graphic = (target as Mask).GetComponent<Graphic>();
 
             if (graphic && !graphic.IsActive())
-                EditorGUILayout.HelpBox("Masking disabled due to Graphic component being disabled.", MessageType.Warning);
+                EditorGUILayout.HelpBox(
+                    "Masking disabled due to Graphic component being disabled.",
+                    MessageType.Warning
+                );
 
             serializedObject.Update();
             EditorGUILayout.PropertyField(m_ShowMaskGraphic);

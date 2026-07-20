@@ -32,7 +32,12 @@ namespace Unity.Scenes
         /// <param name="writer">The serialization object.</param>
         /// <param name="objRefs">Contains the UnityEngine.Object references extracted during serialization.</param>
         /// <param name="entityRemapInfos">Entity remapping which is applied during serialization.</param>
-        public static void Serialize(EntityManager manager, BinaryWriter writer, out ReferencedUnityObjects objRefs, NativeArray<EntityRemapUtility.EntityRemapInfo> entityRemapInfos)
+        public static void Serialize(
+            EntityManager manager,
+            BinaryWriter writer,
+            out ReferencedUnityObjects objRefs,
+            NativeArray<EntityRemapUtility.EntityRemapInfo> entityRemapInfos
+        )
         {
             SerializeUtility.SerializeWorld(manager, writer, out var referencedObjects, entityRemapInfos);
             SerializeObjectReferences((UnityEngine.Object[])referencedObjects, out objRefs);
@@ -57,7 +62,10 @@ namespace Unity.Scenes
         /// </summary>
         /// <param name="referencedObjects">The array of UnityEngine.Object references.</param>
         /// <param name="objRefs">The ScriptableObject containing the serialized result.</param>
-        public static void SerializeObjectReferences(UnityEngine.Object[] referencedObjects, out ReferencedUnityObjects objRefs)
+        public static void SerializeObjectReferences(
+            UnityEngine.Object[] referencedObjects,
+            out ReferencedUnityObjects objRefs
+        )
         {
             objRefs = null;
 
@@ -87,7 +95,10 @@ namespace Unity.Scenes
         /// </summary>
         /// <param name="objRefs">The serialized UnityEngine.Object references.</param>
         /// <param name="objectReferences">The array of UnityEngine.Object references to be applied on the deserialized <see cref="World"/> object.</param>
-        public static void DeserializeObjectReferences(ReferencedUnityObjects objRefs, out UnityEngine.Object[] objectReferences)
+        public static void DeserializeObjectReferences(
+            ReferencedUnityObjects objRefs,
+            out UnityEngine.Object[] objectReferences
+        )
         {
             if (objRefs == null)
             {
@@ -110,13 +121,19 @@ namespace Unity.Scenes
 #if UNITY_EDITOR && !UNITY_DISABLE_MANAGED_COMPONENTS
             foreach (var companionIndex in objRefs.CompanionObjectIndices)
             {
-                var source = (UnityEngine.GameObject) objectReferences[companionIndex];
+                var source = (UnityEngine.GameObject)objectReferences[companionIndex];
                 CompanionGameObjectUtility.SetCompanionFlags(source);
             }
 #else
             var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-            NativeArray<EntityId> newGameObjects = new NativeArray<EntityId>(objRefs.CompanionObjectIndices.Length, Allocator.Temp);
-            NativeHashMap<EntityId, int> sourceInstanceIDToNewIndex = new NativeHashMap<EntityId, int>(objRefs.CompanionObjectIndices.Length, Allocator.Temp);
+            NativeArray<EntityId> newGameObjects = new NativeArray<EntityId>(
+                objRefs.CompanionObjectIndices.Length,
+                Allocator.Temp
+            );
+            NativeHashMap<EntityId, int> sourceInstanceIDToNewIndex = new NativeHashMap<EntityId, int>(
+                objRefs.CompanionObjectIndices.Length,
+                Allocator.Temp
+            );
             UnityEngine.GameObject[] newGameObjectsArray = new GameObject[objRefs.CompanionObjectIndices.Length];
 
             for (int i = 0; i < objRefs.CompanionObjectIndices.Length; i++)
@@ -138,8 +155,12 @@ namespace Unity.Scenes
             {
                 if (objectReferences[i] is UnityEngine.Component component)
                 {
-                    if (sourceInstanceIDToNewIndex.TryGetValue(component.gameObject.GetEntityId(),
-                            out var newGameObjectIndex))
+                    if (
+                        sourceInstanceIDToNewIndex.TryGetValue(
+                            component.gameObject.GetEntityId(),
+                            out var newGameObjectIndex
+                        )
+                    )
                     {
                         var newGameObject = newGameObjectsArray[newGameObjectIndex];
                         objectReferences[i] = newGameObject.GetComponent(component.GetType());

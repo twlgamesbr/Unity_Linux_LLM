@@ -20,7 +20,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         public float LineThickness
         {
             get => m_LineThickness;
-            set => m_LineThickness = Mathf.Clamp(value, ConfigurationLimits.k_GraphLineThicknessMin, ConfigurationLimits.k_GraphLineThicknessMax);
+            set =>
+                m_LineThickness = Mathf.Clamp(
+                    value,
+                    ConfigurationLimits.k_GraphLineThicknessMin,
+                    ConfigurationLimits.k_GraphLineThicknessMax
+                );
         }
 
         /// The line thickness for a line graph.

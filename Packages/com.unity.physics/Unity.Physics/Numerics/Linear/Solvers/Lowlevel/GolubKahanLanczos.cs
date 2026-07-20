@@ -245,9 +245,18 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         public struct Job : IJob
         {
             public MemoryManager heap;
-            [ReadOnly] public Matrix M;
-            [WriteOnly] public Vector diag, offDiag;
-            [WriteOnly] public Vector tauQ, tauP;
+
+            [ReadOnly]
+            public Matrix M;
+
+            [WriteOnly]
+            public Vector diag,
+                offDiag;
+
+            [WriteOnly]
+            public Vector tauQ,
+                tauP;
+
             public void Execute()
             {
                 tauQ = heap.Vector(M.MinDimension);

@@ -8,8 +8,12 @@ namespace UnityEngine.TestRunner.NUnitExtensions
 {
     internal static class TestResultExtensions
     {
-        public static void RecordPrefixedException(this TestResult testResult, string prefix, Exception ex, ResultState resultState = null)
-
+        public static void RecordPrefixedException(
+            this TestResult testResult,
+            string prefix,
+            Exception ex,
+            ResultState resultState = null
+        )
         {
             if (ex is NUnitException)
             {
@@ -18,9 +22,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions
 
             if (resultState == null)
             {
-                resultState = testResult.ResultState == ResultState.Cancelled
-                    ? ResultState.Cancelled
-                    : ResultState.Error;
+                resultState =
+                    testResult.ResultState == ResultState.Cancelled ? ResultState.Cancelled : ResultState.Error;
             }
 
             var exceptionMessage = ExceptionHelper.BuildMessage(ex);
@@ -51,14 +54,17 @@ namespace UnityEngine.TestRunner.NUnitExtensions
             testResult.SetResult(resultState, message, stackTrace);
         }
 
-        public static void RecordPrefixedError(this TestResult testResult, string prefix, string error, ResultState resultState = null)
-
+        public static void RecordPrefixedError(
+            this TestResult testResult,
+            string prefix,
+            string error,
+            ResultState resultState = null
+        )
         {
             if (resultState == null)
             {
-                resultState = testResult.ResultState == ResultState.Cancelled
-                    ? ResultState.Cancelled
-                    : ResultState.Error;
+                resultState =
+                    testResult.ResultState == ResultState.Cancelled ? ResultState.Cancelled : ResultState.Error;
             }
 
             if (testResult.Test.IsSuite)

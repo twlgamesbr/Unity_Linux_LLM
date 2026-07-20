@@ -6,11 +6,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Unity.Entities.SourceGen.Common;
-using Unity.Entities.SourceGen.SystemGenerator.SystemAPI.Query;
-using Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder;
-using Unity.Entities.SourceGen.SystemGenerator.SystemAPI;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
 using Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations;
+using Unity.Entities.SourceGen.SystemGenerator.SystemAPI;
+using Unity.Entities.SourceGen.SystemGenerator.SystemAPI.Query;
+using Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder;
 using JobEntityModule = Unity.Entities.SourceGen.JobEntityGenerator.JobEntityModule;
 
 namespace Unity.Entities.SourceGen.SystemGenerator;
@@ -22,12 +22,13 @@ public class SystemSyntaxReceiver : ISyntaxReceiver
     readonly Dictionary<SyntaxNode, CandidateSyntax> _markedNodes = new();
     readonly CancellationToken _cancellationToken;
 
-    internal Dictionary<TypeDeclarationSyntax, Dictionary<SyntaxNode, CandidateSyntax>> CandidateNodesGroupedBySystemType
-        => _markedNodes
+    internal Dictionary<
+        TypeDeclarationSyntax,
+        Dictionary<SyntaxNode, CandidateSyntax>
+    > CandidateNodesGroupedBySystemType =>
+        _markedNodes
             .GroupBy(n => n.Key.AncestorOfKind<TypeDeclarationSyntax>())
-            .ToDictionary(
-                group => group.Key,
-                group => group.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+            .ToDictionary(group => group.Key, group => group.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
 
     internal IReadOnlyCollection<ISystemModule> SystemModules { get; }
 
@@ -40,7 +41,7 @@ public class SystemSyntaxReceiver : ISyntaxReceiver
             new EntityQueryModule(),
             new IfeModule(),
             new SystemContextSystemModule(),
-            new SystemApiQueryBuilderModule()
+            new SystemApiQueryBuilderModule(),
         };
     }
 

@@ -1,7 +1,7 @@
-using UnityEngine.UIElements;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
-using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -19,17 +19,26 @@ namespace Unity.Web.Stripping.Editor
 
         void OnEnable()
         {
-            m_RunOptimizationPassProperty = serializedObject.FindProperty(nameof(SubmoduleStrippingSettings.OptimizeCodeAfterStripping));
-            m_RemoveEmbeddedDebugSymbolsProperty = serializedObject.FindProperty(nameof(SubmoduleStrippingSettings.RemoveEmbeddedDebugSymbols));
-            m_MissingSubmoduleErrorHandlingProperty = serializedObject.FindProperty(nameof(SubmoduleStrippingSettings.MissingSubmoduleErrorHandling));
-            m_SubmodulesToStripProperty = serializedObject.FindProperty(nameof(SubmoduleStrippingSettings.SubmodulesToStrip));
+            m_RunOptimizationPassProperty = serializedObject.FindProperty(
+                nameof(SubmoduleStrippingSettings.OptimizeCodeAfterStripping)
+            );
+            m_RemoveEmbeddedDebugSymbolsProperty = serializedObject.FindProperty(
+                nameof(SubmoduleStrippingSettings.RemoveEmbeddedDebugSymbols)
+            );
+            m_MissingSubmoduleErrorHandlingProperty = serializedObject.FindProperty(
+                nameof(SubmoduleStrippingSettings.MissingSubmoduleErrorHandling)
+            );
+            m_SubmodulesToStripProperty = serializedObject.FindProperty(
+                nameof(SubmoduleStrippingSettings.SubmodulesToStrip)
+            );
             // Snapshot the current on-disk state so DiscardChanges can restore it.
             // AssetDatabase.ImportAsset does not revert in-memory changes for already-loaded assets,
             // so we capture the serialized state here and restore it manually on discard.
             m_OriginalJson = EditorJsonUtility.ToJson(target);
 
             // Set custom message when changes are made
-            saveChangesMessage = $"The {ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings))} have unsaved changes. Save changes?";
+            saveChangesMessage =
+                $"The {ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings))} have unsaved changes. Save changes?";
 
             EditorApplication.update += OnEditorUpdate;
         }
@@ -89,8 +98,12 @@ namespace Unity.Web.Stripping.Editor
             submodulesToStripField.SetEnabled(false);
             visualElement.Add(submodulesToStripField);
             submodulesToStripField.Bind(serializedObject);
-            submodulesToStripField.RegisterCallback<GeometryChangedEvent>((evt) =>
-                InitSubmoduleList(evt.target as PropertyField, (target as SubmoduleStrippingSettings).SubmodulesToStrip)
+            submodulesToStripField.RegisterCallback<GeometryChangedEvent>(
+                (evt) =>
+                    InitSubmoduleList(
+                        evt.target as PropertyField,
+                        (target as SubmoduleStrippingSettings).SubmodulesToStrip
+                    )
             );
 
             var button = CreateSelectButton();
@@ -112,28 +125,31 @@ namespace Unity.Web.Stripping.Editor
             saveButton.clicked += SaveChanges;
             m_ButtonRow.Add(saveButton);
 
-            visualElement.TrackSerializedObjectValue(serializedObject, _ =>
-            {
-                // Suppress the callback triggered by DiscardChanges reverting values
-                if (m_IsDiscarding)
+            visualElement.TrackSerializedObjectValue(
+                serializedObject,
+                _ =>
                 {
-                    m_IsDiscarding = false;
-                    return;
-                }
+                    // Suppress the callback triggered by DiscardChanges reverting values
+                    if (m_IsDiscarding)
+                    {
+                        m_IsDiscarding = false;
+                        return;
+                    }
 
-                // If the asset is not dirty, the change was already saved externally (e.g. by SubmoduleStrippingWindow).
-                // Sync our snapshot to the current on-disk state and clear any pending unsaved-changes UI.
-                if (!EditorUtility.IsDirty(target))
-                {
-                    m_OriginalJson = EditorJsonUtility.ToJson(target);
-                    hasUnsavedChanges = false;
+                    // If the asset is not dirty, the change was already saved externally (e.g. by SubmoduleStrippingWindow).
+                    // Sync our snapshot to the current on-disk state and clear any pending unsaved-changes UI.
+                    if (!EditorUtility.IsDirty(target))
+                    {
+                        m_OriginalJson = EditorJsonUtility.ToJson(target);
+                        hasUnsavedChanges = false;
+                        UpdateButtonVisibility();
+                        return;
+                    }
+
+                    hasUnsavedChanges = true;
                     UpdateButtonVisibility();
-                    return;
                 }
-
-                hasUnsavedChanges = true;
-                UpdateButtonVisibility();
-            });
+            );
 
             return visualElement;
         }
@@ -169,7 +185,8 @@ namespace Unity.Web.Stripping.Editor
         {
             m_SelectionWindow = SubmoduleSelectionWindow.GetAsUtilityPopup();
             m_SelectionWindow.SelectedSubmodules = PropertyUtils.GetHashSetPropertyValue(m_SubmodulesToStripProperty);
-            m_SelectionWindow.SelectedSubmodulesChanged += (selectedSubmodules) => {
+            m_SelectionWindow.SelectedSubmodulesChanged += (selectedSubmodules) =>
+            {
                 serializedObject.Update();
                 PropertyUtils.SetHashSetPropertyValue(m_SubmodulesToStripProperty, selectedSubmodules);
                 serializedObject.ApplyModifiedProperties();

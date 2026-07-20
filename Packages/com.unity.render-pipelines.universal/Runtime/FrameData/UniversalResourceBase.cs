@@ -16,7 +16,7 @@ namespace UnityEngine.Rendering.Universal
             Camera,
 
             /// <summary>The backbuffer.</summary>
-            BackBuffer
+            BackBuffer,
         }
 
         internal bool isAccessible { get; set; }
@@ -82,7 +82,7 @@ namespace UnityEngine.Rendering.Universal
         protected TextureHandle[] CheckAndGetTextureHandle(ref TextureHandle[] handle)
         {
             if (!CheckAndWarnAboutAccessibility())
-                return new []{TextureHandle.nullHandle};
+                return new[] { TextureHandle.nullHandle };
 
             return handle;
         }

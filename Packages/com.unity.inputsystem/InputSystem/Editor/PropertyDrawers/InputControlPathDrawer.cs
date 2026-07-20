@@ -38,9 +38,12 @@ namespace UnityEngine.InputSystem.Editor
                 m_PickerState = new InputControlPickerState();
             if (m_Editor == null)
             {
-                m_Editor = new InputControlPathEditor(property, m_PickerState,
+                m_Editor = new InputControlPathEditor(
+                    property,
+                    m_PickerState,
                     () => property.serializedObject.ApplyModifiedProperties(),
-                    label: label);
+                    label: label
+                );
             }
 
             EditorGUI.BeginProperty(position, label, property);

@@ -129,6 +129,6 @@ namespace UnityEngine.InputSystem
         /// Note that interactions (refer to <see cref="IInputInteraction"/>) can alter how an action does or does not progress through
         /// the phases.
         /// </summary>
-        Canceled
+        Canceled,
     }
 }

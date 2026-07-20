@@ -10,16 +10,23 @@ public static class SystemApiContextErrors
 
     public static void SGSA0001(ISourceGeneratorDiagnosable systemDescription, CandidateSyntax candidate)
     {
-        systemDescription.LogError(nameof(SGSA0001), k_SystemAPIGenericAccess,
-            "SystemAPI usage with generic parameter not supported", candidate.Node.GetLocation());
+        systemDescription.LogError(
+            nameof(SGSA0001),
+            k_SystemAPIGenericAccess,
+            "SystemAPI usage with generic parameter not supported",
+            candidate.Node.GetLocation()
+        );
     }
 
     public static void SGSA0002(ISourceGeneratorDiagnosable systemDescription, CandidateSyntax candidate)
     {
         var dataLookupName = candidate.Type.ToString();
 
-        systemDescription.LogError(nameof(SGSA0002), k_SystemAPIComponentAccess,
+        systemDescription.LogError(
+            nameof(SGSA0002),
+            k_SystemAPIComponentAccess,
             $"{dataLookupName} usage with variable read permission not supported outside OnCreate of your system. To fix, instead call it inside OnCreate of your calling system",
-            candidate.Node.GetLocation());
+            candidate.Node.GetLocation()
+        );
     }
 }

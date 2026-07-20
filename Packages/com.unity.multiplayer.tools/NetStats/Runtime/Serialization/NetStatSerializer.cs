@@ -29,11 +29,7 @@ namespace Unity.Multiplayer.Tools.NetStats
             {
                 var metric = metricCollection.Metrics[i];
 
-                var header = new MetricHeader(
-                    metric.FactoryTypeName,
-                    metric.MetricContainerType,
-                    metric.Id
-                );
+                var header = new MetricHeader(metric.FactoryTypeName, metric.MetricContainerType, metric.Id);
 
                 writer.WriteValueSafe(header);
 
@@ -65,14 +61,14 @@ namespace Unity.Multiplayer.Tools.NetStats
                     }
                     else
                     {
-                        throw new InvalidOperationException($"Failed to construct metric from serialized data. Metric Header: {header}");
+                        throw new InvalidOperationException(
+                            $"Failed to construct metric from serialized data. Metric Header: {header}"
+                        );
                     }
                 }
             }
 
-            return new MetricCollection(
-                metrics,
-                connectionId);
+            return new MetricCollection(metrics, connectionId);
         }
     }
 }

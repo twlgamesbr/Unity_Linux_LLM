@@ -14,18 +14,33 @@ namespace Unity.Physics.Authoring
     ///
     /// A scriptable object used for assigning names to <see cref="CustomPhysicsBodyTags"/> and saving them.
     /// </summary>
-    [CreateAssetMenu(menuName = "Unity Physics/Custom Physics Body Tag Names", fileName = "Custom Physics Body Tag Names", order = 505)]
+    [CreateAssetMenu(
+        menuName = "Unity Physics/Custom Physics Body Tag Names",
+        fileName = "Custom Physics Body Tag Names",
+        order = 505
+    )]
     [HelpURL(HelpURLs.CustomPhysicsBodyTagNames)]
     public sealed class CustomPhysicsBodyTagNames : ScriptableObject, ITagNames
     {
-        CustomPhysicsBodyTagNames() {}
+        CustomPhysicsBodyTagNames() { }
 
         /// <summary>
         ///     The names corresponding to the eight tags in a <see cref="CustomPhysicsBodyTags"/> instance.
         /// </summary>
         public IReadOnlyList<string> TagNames => m_TagNames;
+
         [SerializeField]
-        string[] m_TagNames = { string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty };
+        string[] m_TagNames =
+        {
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+        };
 
         void OnValidate()
         {

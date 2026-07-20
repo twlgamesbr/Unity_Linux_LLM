@@ -1,9 +1,9 @@
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.Physics.Authoring
 {
@@ -23,7 +23,10 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (!SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay) || debugDisplay.DrawMassProperties == 0)
+            if (
+                !SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay)
+                || debugDisplay.DrawMassProperties == 0
+            )
                 return;
 
             if (!SystemAPI.TryGetSingleton(out DebugDraw draw))
@@ -35,7 +38,7 @@ namespace Unity.Physics.Authoring
             {
                 DebugDraw = draw,
                 MotionDatas = dynamicsWorld.MotionDatas,
-                MotionVelocities = dynamicsWorld.MotionVelocities
+                MotionVelocities = dynamicsWorld.MotionVelocities,
             }.Schedule(dynamicsWorld.MotionDatas.Length, 16, state.Dependency);
         }
 
@@ -44,9 +47,15 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         struct DisplayMassPropertiesJob : IJobParallelFor
         {
-            [ReadOnly][NativeDisableUnsafePtrRestriction] public DebugDraw DebugDraw;
-            [ReadOnly] public NativeArray<MotionData> MotionDatas;
-            [ReadOnly] public NativeArray<MotionVelocity> MotionVelocities;
+            [ReadOnly]
+            [NativeDisableUnsafePtrRestriction]
+            public DebugDraw DebugDraw;
+
+            [ReadOnly]
+            public NativeArray<MotionData> MotionDatas;
+
+            [ReadOnly]
+            public NativeArray<MotionVelocity> MotionVelocities;
 
             public void Execute(int m)
             {
@@ -83,7 +92,8 @@ namespace Unity.Physics.Authoring
                 var boxSize = new float3(
                     math.select(0, h, math.isfinite(h)),
                     math.select(0, w, math.isfinite(w)),
-                    math.select(0, d, math.isfinite(d)));
+                    math.select(0, d, math.isfinite(d))
+                );
                 DebugDraw.Box(boxSize, com, o, DebugDisplay.ColorIndex.Magenta);
             }
         }

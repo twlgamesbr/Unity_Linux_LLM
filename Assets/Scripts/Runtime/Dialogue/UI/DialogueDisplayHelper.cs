@@ -1,21 +1,20 @@
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Dialogue.UI
 {
     /// <summary>
@@ -49,7 +48,12 @@ namespace NPCSystem.Dialogue.UI
         /// Update NPC portrait raw images. Shows only the active profile's portrait,
         /// hides all others.
         /// </summary>
-        public static void UpdatePortrait(NPCProfile activeProfile, RawImage portrait1, RawImage portrait2, RawImage portrait3)
+        public static void UpdatePortrait(
+            NPCProfile activeProfile,
+            RawImage portrait1,
+            RawImage portrait2,
+            RawImage portrait3
+        )
         {
             // Hide all portraits
             if (portrait1 != null)
@@ -101,16 +105,23 @@ namespace NPCSystem.Dialogue.UI
         {
             string normalized = NormalizeError(error);
 
-            if (normalized.Contains("timeout", System.StringComparison.OrdinalIgnoreCase)
-                || normalized.Contains("timed out", System.StringComparison.OrdinalIgnoreCase))
+            if (
+                normalized.Contains("timeout", System.StringComparison.OrdinalIgnoreCase)
+                || normalized.Contains("timed out", System.StringComparison.OrdinalIgnoreCase)
+            )
                 return "The NPC is thinking... try again in a moment.";
 
-            if (normalized.Contains("connection", System.StringComparison.OrdinalIgnoreCase)
+            if (
+                normalized.Contains("connection", System.StringComparison.OrdinalIgnoreCase)
                 || normalized.Contains("network", System.StringComparison.OrdinalIgnoreCase)
-                || normalized.Contains("refused", System.StringComparison.OrdinalIgnoreCase))
+                || normalized.Contains("refused", System.StringComparison.OrdinalIgnoreCase)
+            )
                 return "Connection issue. Please check your network and try again.";
 
-            if (normalized.Contains("401") || normalized.Contains("unauthorized", System.StringComparison.OrdinalIgnoreCase))
+            if (
+                normalized.Contains("401")
+                || normalized.Contains("unauthorized", System.StringComparison.OrdinalIgnoreCase)
+            )
                 return "Session expired. Please log in again.";
 
             return $"Something went wrong: {normalized}";

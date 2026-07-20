@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,7 +8,12 @@ namespace UnityEngine.Rendering.Universal
 {
     internal class ShapeProviderUtility
     {
-        static public void CallOnBeforeRender(ShadowShape2DProvider shapeProvider, Component component, ShadowMesh2D shadowMesh, Bounds bounds)
+        public static void CallOnBeforeRender(
+            ShadowShape2DProvider shapeProvider,
+            Component component,
+            ShadowMesh2D shadowMesh,
+            Bounds bounds
+        )
         {
             if (component != null)
             {
@@ -22,7 +26,11 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        static public void PersistantDataCreated(ShadowShape2DProvider shapeProvider, Component component, ShadowMesh2D shadowMesh)
+        public static void PersistantDataCreated(
+            ShadowShape2DProvider shapeProvider,
+            Component component,
+            ShadowMesh2D shadowMesh
+        )
         {
             if (component != null)
             {
@@ -32,7 +40,11 @@ namespace UnityEngine.Rendering.Universal
         }
 
 #if UNITY_EDITOR
-        static public void TryGetDefaultShadowShapeProviderSource(GameObject go, out Component outSource, out ShadowShape2DProvider outProvider)
+        static public void TryGetDefaultShadowShapeProviderSource(
+            GameObject go,
+            out Component outSource,
+            out ShadowShape2DProvider outProvider
+        )
         {
             outSource = null;
             outProvider = null;

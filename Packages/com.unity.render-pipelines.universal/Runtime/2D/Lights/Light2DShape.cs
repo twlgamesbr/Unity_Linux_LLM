@@ -2,12 +2,23 @@ namespace UnityEngine.Rendering.Universal
 {
     public sealed partial class Light2D
     {
-        [SerializeField] int m_ShapeLightParametricSides = 5;
-        [SerializeField] float m_ShapeLightParametricAngleOffset = 0.0f;
-        [SerializeField] float m_ShapeLightParametricRadius = 1.0f;
-        [SerializeField] float m_ShapeLightFalloffSize = 0.50f;
-        [SerializeField] Vector2 m_ShapeLightFalloffOffset = Vector2.zero;
-        [SerializeField] Vector3[] m_ShapePath = null;
+        [SerializeField]
+        int m_ShapeLightParametricSides = 5;
+
+        [SerializeField]
+        float m_ShapeLightParametricAngleOffset = 0.0f;
+
+        [SerializeField]
+        float m_ShapeLightParametricRadius = 1.0f;
+
+        [SerializeField]
+        float m_ShapeLightFalloffSize = 0.50f;
+
+        [SerializeField]
+        Vector2 m_ShapeLightFalloffOffset = Vector2.zero;
+
+        [SerializeField]
+        Vector3[] m_ShapePath = null;
 
         float m_PreviousShapeLightFalloffSize = -1;
         int m_PreviousShapeLightParametricSides = -1;

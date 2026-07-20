@@ -136,7 +136,6 @@ namespace TMPro
         }
     }
 
-
     /// <summary>
     /// Structure used to track XML tags of various types.
     /// </summary>
@@ -154,7 +153,6 @@ namespace TMPro
 
         const int k_DefaultCapacity = 4;
 
-
         /// <summary>
         /// Constructor to create a new item stack.
         /// </summary>
@@ -169,7 +167,6 @@ namespace TMPro
             m_DefaultItem = default(T);
             m_Count = 0;
         }
-
 
         /// <summary>
         /// Constructor for a new item stack with the given capacity.
@@ -186,7 +183,6 @@ namespace TMPro
             m_Count = 0;
         }
 
-
         public TMP_TextProcessingStack(int capacity, int rolloverSize)
         {
             itemStack = new T[capacity];
@@ -198,7 +194,6 @@ namespace TMPro
             m_Count = 0;
         }
 
-
         /// <summary>
         ///
         /// </summary>
@@ -206,7 +201,6 @@ namespace TMPro
         {
             get { return m_Count; }
         }
-
 
         /// <summary>
         /// Returns the current item on the stack.
@@ -221,7 +215,6 @@ namespace TMPro
                 return itemStack[0];
             }
         }
-
 
         /// <summary>
         ///
@@ -238,7 +231,6 @@ namespace TMPro
             }
         }
 
-
         /// <summary>
         /// Set stack elements to default item.
         /// </summary>
@@ -250,7 +242,6 @@ namespace TMPro
                 stack[i].SetDefault(item);
         }
 
-
         /// <summary>
         /// Function to clear and reset stack to first item.
         /// </summary>
@@ -259,7 +250,6 @@ namespace TMPro
             index = 0;
             m_Count = 0;
         }
-
 
         /// <summary>
         /// Function to set the first item on the stack and reset index.
@@ -279,7 +269,6 @@ namespace TMPro
             m_Count = 1;
         }
 
-
         /// <summary>
         /// Function to add a new item to the stack.
         /// </summary>
@@ -292,7 +281,6 @@ namespace TMPro
                 index += 1;
             }
         }
-
 
         /// <summary>
         /// Function to retrieve an item from the stack.
@@ -308,7 +296,6 @@ namespace TMPro
                 m_Count = 0;
                 index = 1;
                 return itemStack[0];
-
             }
 
             return itemStack[index - 1];
@@ -337,7 +324,6 @@ namespace TMPro
                 index = (index + 1) % m_RolloverSize;
                 m_Count = m_Count < m_RolloverSize ? m_Count + 1 : m_RolloverSize;
             }
-
         }
 
         public T Pop()
@@ -373,7 +359,6 @@ namespace TMPro
             return itemStack[index - 1];
         }
 
-
         /// <summary>
         /// Function to retrieve the current item from the stack.
         /// </summary>
@@ -385,7 +370,6 @@ namespace TMPro
 
             return itemStack[0];
         }
-
 
         /// <summary>
         /// Function to retrieve the previous item without affecting the stack.

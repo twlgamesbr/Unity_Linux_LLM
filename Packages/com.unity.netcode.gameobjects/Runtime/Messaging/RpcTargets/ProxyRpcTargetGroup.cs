@@ -15,15 +15,29 @@ namespace Unity.Netcode
         public NativeList<ulong> TargetClientIds;
         internal HashSet<ulong> Ids = new HashSet<ulong>();
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             // If there are no targets then don't attempt to send anything.
             if (TargetClientIds.Length == 0 && Ids.Count == 0)
             {
                 return;
             }
-            var proxyMessage = new ProxyMessage { Delivery = delivery, TargetClientIds = TargetClientIds.AsArray(), WrappedMessage = message };
-            var size = behaviour.NetworkManager.MessageManager.SendMessage(ref proxyMessage, delivery, NetworkManager.ServerClientId);
+            var proxyMessage = new ProxyMessage
+            {
+                Delivery = delivery,
+                TargetClientIds = TargetClientIds.AsArray(),
+                WrappedMessage = message,
+            };
+            var size = behaviour.NetworkManager.MessageManager.SendMessage(
+                ref proxyMessage,
+                delivery,
+                NetworkManager.ServerClientId
+            );
 #if MULTIPLAYER_TOOLS && (DEBUG || UNITY_MP_TOOLS_NET_STATS_MONITOR_ENABLED_IN_RELEASE)
             foreach (var clientId in TargetClientIds)
             {
@@ -41,7 +55,8 @@ namespace Unity.Netcode
             }
         }
 
-        internal ProxyRpcTargetGroup(NetworkManager manager) : base(manager)
+        internal ProxyRpcTargetGroup(NetworkManager manager)
+            : base(manager)
         {
             TargetClientIds = new NativeList<ulong>(Allocator.Persistent);
             m_ServerRpcTarget = new ServerRpcTarget(manager);

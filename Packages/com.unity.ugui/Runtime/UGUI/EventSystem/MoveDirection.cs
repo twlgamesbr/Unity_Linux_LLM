@@ -564,6 +564,6 @@ namespace UnityEngine.EventSystems
         /// ]]>
         ///</code>
         /// </example>
-        None
+        None,
     }
 }

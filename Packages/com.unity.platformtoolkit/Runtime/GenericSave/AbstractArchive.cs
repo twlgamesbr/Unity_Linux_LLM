@@ -1,11 +1,11 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Unity.PlatformToolkit
 {
-    abstract internal class AbstractArchive : IGenericArchive
+    internal abstract class AbstractArchive : IGenericArchive
     {
         private bool m_OperationDataBuffering = true;
 
@@ -88,7 +88,6 @@ namespace Unity.PlatformToolkit
             {
                 await CommitDataToStorage(null, null);
             }
-
         }
 
         /// <summary>
@@ -107,7 +106,10 @@ namespace Unity.PlatformToolkit
         /// <param name="writtenFiles">Collection of all written files, their names and written data.</param>
         /// <param name="deletedFiles">Collection of deleted file names.</param>
         /// <returns>Task that represents the asynchronous commit operation.</returns>
-        protected abstract Task CommitDataToStorage(IReadOnlyCollection<(string name, byte[] data)> writtenFiles, IReadOnlyCollection<string> deletedFiles);
+        protected abstract Task CommitDataToStorage(
+            IReadOnlyCollection<(string name, byte[] data)> writtenFiles,
+            IReadOnlyCollection<string> deletedFiles
+        );
         protected abstract void RemoveDataFromStorage(string name);
 
         public ValueTask DisposeAsync()
@@ -125,12 +127,8 @@ namespace Unity.PlatformToolkit
             return new ValueTask();
         }
 
-        public virtual void DisposeInternal(bool explicitDispose)
-        {
-        }
+        public virtual void DisposeInternal(bool explicitDispose) { }
 
-        public virtual void NotifyExplicitDispose()
-        {
-        }
+        public virtual void NotifyExplicitDispose() { }
     }
 }

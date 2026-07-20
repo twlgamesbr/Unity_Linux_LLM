@@ -74,8 +74,9 @@ namespace Unity.Multiplayer.Tools.Common
             var max_ms = maxTicks * k_MilliSecondsPerTick;
 
             UnityEngine.Debug.Log(
-                $"{m_ScopeName} executed {sampleCount} times in {totalSeconds} seconds. " +
-                $"Average: {average_ms} ms, median: {median_ms} ms, min: {min_ms}, max: {max_ms}");
+                $"{m_ScopeName} executed {sampleCount} times in {totalSeconds} seconds. "
+                    + $"Average: {average_ms} ms, median: {median_ms} ms, min: {min_ms}, max: {max_ms}"
+            );
         }
 
         public void LogSamplesToFile(string filepath)

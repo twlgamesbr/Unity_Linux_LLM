@@ -28,7 +28,13 @@ namespace UnityEngine.InputSystem.Editor
             searchTree = Search(search);
         }
 
-        protected bool AddMatchItem(AdvancedDropdownItem e, string name, string[] searchWords, List<AdvancedDropdownItem> matchesStart, List<AdvancedDropdownItem> matchesWithin)
+        protected bool AddMatchItem(
+            AdvancedDropdownItem e,
+            string name,
+            string[] searchWords,
+            List<AdvancedDropdownItem> matchesStart,
+            List<AdvancedDropdownItem> matchesWithin
+        )
         {
             var didMatchAll = true;
             var didMatchStart = false;

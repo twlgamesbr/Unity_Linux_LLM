@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using Unity.Editor.Bridge;
 using UnityEditor.Search;
 using UnityEngine;
-using Unity.Editor.Bridge;
 using UnityEngine.UIElements;
-using System.Reflection;
 
 namespace Unity.Entities.Editor
 {
@@ -20,9 +20,7 @@ namespace Unity.Entities.Editor
     class QueryWorldBlock : QueryListBlock
     {
         public QueryWorldBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -30,7 +28,14 @@ namespace Unity.Entities.Editor
             foreach (var t in World.All)
             {
                 var name = t.Name.Contains(" ") ? $"\"{t.Name}\"" : t.Name;
-                yield return new SearchProposition(category, t.Name, replacement: name, help: $"Entity World: {t.Name}", type: GetType(), data: name);
+                yield return new SearchProposition(
+                    category,
+                    t.Name,
+                    replacement: name,
+                    help: $"Entity World: {t.Name}",
+                    type: GetType(),
+                    data: name
+                );
             }
         }
     }
@@ -39,9 +44,7 @@ namespace Unity.Entities.Editor
     class QueryComponentTypeBlock : QueryListBlock
     {
         public QueryComponentTypeBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -49,7 +52,14 @@ namespace Unity.Entities.Editor
             foreach (var cn in SearchUtils.componentNames)
             {
                 var name = cn.Contains(" ") ? $"\"{cn}\"" : cn;
-                yield return new SearchProposition(category, $"{id}{op}{cn}", replacement: name, help: $"Component type: {cn}", type: GetType(), data: name);
+                yield return new SearchProposition(
+                    category,
+                    $"{id}{op}{cn}",
+                    replacement: name,
+                    help: $"Component type: {cn}",
+                    type: GetType(),
+                    data: name
+                );
             }
         }
     }
@@ -58,18 +68,14 @@ namespace Unity.Entities.Editor
     class QueryAllComponentTypeBlock : QueryComponentTypeBlock
     {
         public QueryAllComponentTypeBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
     }
 
     [QueryListBlock("Component (None)", "None", "-c", "=")]
     class QueryNotAllComponentTypeBlock : QueryListBlock
     {
         public QueryNotAllComponentTypeBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -77,7 +83,14 @@ namespace Unity.Entities.Editor
             foreach (var cn in SearchUtils.componentNames)
             {
                 var name = cn.Contains(" ") ? $"\"{cn}\"" : cn;
-                yield return new SearchProposition(category, $"none={cn}", replacement: name, help: $"No Component of type: {cn}", type: GetType(), data: name);
+                yield return new SearchProposition(
+                    category,
+                    $"none={cn}",
+                    replacement: name,
+                    help: $"No Component of type: {cn}",
+                    type: GetType(),
+                    data: name
+                );
             }
         }
     }
@@ -86,18 +99,14 @@ namespace Unity.Entities.Editor
     class QueryNoComponentTypeBlock : QueryNotAllComponentTypeBlock
     {
         public QueryNoComponentTypeBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
     }
 
     [QueryListBlock("Component (Any)", "Any", "any", "=")]
     class QueryAnyComponentTypeBlock : QueryListBlock
     {
         public QueryAnyComponentTypeBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -105,7 +114,14 @@ namespace Unity.Entities.Editor
             foreach (var cn in SearchUtils.componentNames)
             {
                 var name = cn.Contains(" ") ? $"\"{cn}\"" : cn;
-                yield return new SearchProposition(category, $"any={cn}", replacement: name, help: $"Any Component of type: {cn}", type: GetType(), data: name);
+                yield return new SearchProposition(
+                    category,
+                    $"any={cn}",
+                    replacement: name,
+                    help: $"Any Component of type: {cn}",
+                    type: GetType(),
+                    data: name
+                );
             }
         }
     }
@@ -114,13 +130,16 @@ namespace Unity.Entities.Editor
     class QueryNodeKindBlock : QueryListBlock
     {
         public QueryNodeKindBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
-            return SearchUtils.GetEnumPropositions<NodeKind>(flags, this, "Kind:", new[] { NodeKind.Entity, NodeKind.GameObject, NodeKind.Scene, NodeKind.SubScene });
+            return SearchUtils.GetEnumPropositions<NodeKind>(
+                flags,
+                this,
+                "Kind:",
+                new[] { NodeKind.Entity, NodeKind.GameObject, NodeKind.Scene, NodeKind.SubScene }
+            );
         }
     }
 
@@ -128,9 +147,7 @@ namespace Unity.Entities.Editor
     class QueryPrefabTypeBlock : QueryListBlock
     {
         public QueryPrefabTypeBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -142,9 +159,7 @@ namespace Unity.Entities.Editor
     class QueryNamespaceBlock : QueryListBlock
     {
         public QueryNamespaceBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -152,18 +167,23 @@ namespace Unity.Entities.Editor
             foreach (var ns in SearchUtils.namespaces)
             {
                 var name = ns.Contains(" ") ? $"\"{ns}\"" : ns;
-                yield return new SearchProposition(category, $"{id}{op}{ns}", replacement: name, help: $"Namespace: {ns}", type: GetType(), data: name);
+                yield return new SearchProposition(
+                    category,
+                    $"{id}{op}{ns}",
+                    replacement: name,
+                    help: $"Namespace: {ns}",
+                    type: GetType(),
+                    data: name
+                );
             }
         }
     }
-    
+
     [QueryListBlock("Parent", "parent", "parent", "=")]
     class QueryParentBlock : QueryListBlock
     {
         public QueryParentBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -171,25 +191,37 @@ namespace Unity.Entities.Editor
             foreach (var cn in SearchUtils.systemGroups)
             {
                 var name = cn.Contains(" ") ? $"\"{cn}\"" : cn;
-                yield return new SearchProposition(category, $"{id}{op}{cn}", replacement: name, help: $"Parent type: {cn}", type: GetType(), data: name);
+                yield return new SearchProposition(
+                    category,
+                    $"{id}{op}{cn}",
+                    replacement: name,
+                    help: $"Parent type: {cn}",
+                    type: GetType(),
+                    data: name
+                );
             }
         }
-    }    
+    }
 
     [QueryListBlock("System Dependencies", "System Dependencies", "sd", "=")]
     class QuerySystemDependenciesBlock : QueryListBlock
     {
         public QuerySystemDependenciesBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
             var category = flags.HasFlag(SearchPropositionFlags.NoCategory) ? null : this.category;
             foreach (var sys in SystemSearchProvider.systems)
             {
-                yield return new SearchProposition(category, $"{id}{op}{sys.Name}", replacement: sys.Name, help: $"{category} {sys.Name}", type: GetType(), data: sys.Name);
+                yield return new SearchProposition(
+                    category,
+                    $"{id}{op}{sys.Name}",
+                    replacement: sys.Name,
+                    help: $"{category} {sys.Name}",
+                    type: GetType(),
+                    data: sys.Name
+                );
             }
         }
     }
@@ -198,36 +230,28 @@ namespace Unity.Entities.Editor
     class QuerySystemBlock : QuerySystemDependenciesBlock
     {
         public QuerySystemBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
     }
 
     [QueryListBlock("Origin System", "Origin System", "os", ":")]
     class QueryOriginSystemBlock : QuerySystemDependenciesBlock
     {
         public QueryOriginSystemBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
     }
 
     [QueryListBlock("Executing System", "Executing System", "es", ":")]
     class QueryExecutingSystemBlock : QuerySystemDependenciesBlock
     {
         public QueryExecutingSystemBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
     }
 
     [QueryListBlock("Category", "category", "category", ":")]
     class QueryComponentCategoryBlock : QueryListBlock
     {
         public QueryComponentCategoryBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
@@ -236,21 +260,19 @@ namespace Unity.Entities.Editor
     }
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618    
+#pragma warning disable 0618
     [QueryListBlock("Record Type", "rt", "rt", "=")]
     class QueryRecordTypeBlock : QueryListBlock
     {
         public QueryRecordTypeBlock(IQuerySource source, string id, string value, QueryListBlockAttribute attr)
-            : base(source, id, value, attr)
-        {
-        }
+            : base(source, id, value, attr) { }
 
         public override IEnumerable<SearchProposition> GetPropositions(SearchPropositionFlags flags)
         {
             return SearchUtils.GetEnumPropositions<EntitiesJournaling.RecordType>(flags, this, "Record Type:");
         }
     }
-#pragma warning restore 0618    
+#pragma warning restore 0618
 #endif
 
     class SharedComponentPropertyDesc
@@ -277,7 +299,8 @@ namespace Unity.Entities.Editor
         public Type propertyType => propertyField.FieldType;
         public string propertyName => useShortName ? shortPropertyName : fullPropertyName;
         public string propertyReplacement => useShortName ? shortPropertyReplacement : fullPropertyReplacement;
-        public string propertyQueryReplacement => useShortName ? shortPropertyQueryReplacement : fullPropertyQueryReplacement;
+        public string propertyQueryReplacement =>
+            useShortName ? shortPropertyQueryReplacement : fullPropertyQueryReplacement;
 
         public readonly string fullPropertyName;
         public readonly string shortPropertyName;
@@ -299,6 +322,7 @@ namespace Unity.Entities.Editor
         public Entities.TypeManager.TypeInfo info;
         public string typeName => info.Type.Name;
         public List<SharedComponentPropertyDesc> properties;
+
         public SharedComponentDesc(Entities.TypeManager.TypeInfo info)
         {
             this.info = info;
@@ -354,7 +378,9 @@ namespace Unity.Entities.Editor
                 if (s_SharedComponentDescs == null)
                 {
                     s_SharedComponentDescs = new Dictionary<string, SharedComponentDesc>();
-                    foreach (var type in TypeManager.AllTypes.Where(t => TypeManager.IsSharedComponentType(t.TypeIndex)))
+                    foreach (
+                        var type in TypeManager.AllTypes.Where(t => TypeManager.IsSharedComponentType(t.TypeIndex))
+                    )
                     {
                         s_SharedComponentDescs.Add(type.Type.FullName, new SharedComponentDesc(type));
                     }
@@ -415,10 +441,7 @@ namespace Unity.Entities.Editor
                     var tokens = strValue.Split('-');
                     if (tokens.Length == 2)
                     {
-                        typedValue = new Entity(){
-                            Index = int.Parse(tokens[0]),
-                            Version = int.Parse(tokens[1])
-                        };
+                        typedValue = new Entity() { Index = int.Parse(tokens[0]), Version = int.Parse(tokens[1]) };
                     }
                     else
                     {
@@ -521,7 +544,10 @@ namespace Unity.Entities.Editor
             {
                 if (s_ComponentNames == null)
                 {
-                    s_ComponentNames = TypeManager.AllTypes.Where(t => t.Type != null).Select(t => t.Type.Name).ToArray();
+                    s_ComponentNames = TypeManager
+                        .AllTypes.Where(t => t.Type != null)
+                        .Select(t => t.Type.Name)
+                        .ToArray();
                 }
                 return s_ComponentNames;
             }
@@ -568,7 +594,7 @@ namespace Unity.Entities.Editor
                         if (typeIndex.IsGroup)
                             systemGroupList.Add(TypeManager.GetSystemType(typeIndex).Name);
                     }
-                    
+
                     s_SystemGroups = new string[systemGroupList.Count];
                     for (var i = 0; i < systemGroupList.Count; i++)
                         s_SystemGroups[i] = systemGroupList[i];
@@ -634,23 +660,47 @@ namespace Unity.Entities.Editor
             return null;
         }
 
-        internal static IEnumerable<SearchProposition> GetEnumPropositions<TEnum>(SearchPropositionFlags flags, QueryListBlock b, string helpTemplate) where TEnum : System.Enum
+        internal static IEnumerable<SearchProposition> GetEnumPropositions<TEnum>(
+            SearchPropositionFlags flags,
+            QueryListBlock b,
+            string helpTemplate
+        )
+            where TEnum : System.Enum
         {
             return GetEnumPropositions(flags, b, helpTemplate, (TEnum[])Enum.GetValues(typeof(TEnum)));
         }
 
-        internal static IEnumerable<SearchProposition> GetEnumPropositions<TEnum>(SearchPropositionFlags flags, QueryListBlock b, string helpTemplate, IEnumerable<TEnum> values) where TEnum : System.Enum
+        internal static IEnumerable<SearchProposition> GetEnumPropositions<TEnum>(
+            SearchPropositionFlags flags,
+            QueryListBlock b,
+            string helpTemplate,
+            IEnumerable<TEnum> values
+        )
+            where TEnum : System.Enum
         {
             var category = flags.HasFlag(SearchPropositionFlags.NoCategory) ? null : b.category;
             foreach (var obj in values)
             {
                 var e = obj;
-                yield return new SearchProposition(category: category, label: e.ToString(), help: $"{helpTemplate} {e}",
-                        data: e, priority: 0, icon: null, type: b.GetType(), color: SearchBridge.GetBackgroundColor(b));
+                yield return new SearchProposition(
+                    category: category,
+                    label: e.ToString(),
+                    help: $"{helpTemplate} {e}",
+                    data: e,
+                    priority: 0,
+                    icon: null,
+                    type: b.GetType(),
+                    color: SearchBridge.GetBackgroundColor(b)
+                );
             }
         }
 
-        public static void GetQueryParts(IQueryNode n, List<IFilterNode> filters, List<IQueryNode> toggles, List<ISearchNode> searches)
+        public static void GetQueryParts(
+            IQueryNode n,
+            List<IFilterNode> filters,
+            List<IQueryNode> toggles,
+            List<ISearchNode> searches
+        )
         {
             if (n == null)
                 return;
@@ -790,7 +840,7 @@ namespace Unity.Entities.Editor
             string query = null;
             if (SharedComponents.TryGetValue(sharedComponent.GetType().FullName, out var compDesc))
             {
-                foreach(var prop in compDesc.properties)
+                foreach (var prop in compDesc.properties)
                 {
                     var value = prop.GetPropertyStringValue(sharedComponent);
                     if (value == null)
@@ -812,5 +862,4 @@ namespace Unity.Entities.Editor
             return query;
         }
     }
-
 }

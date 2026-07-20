@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEditor.Build.Pipeline.Utilities;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline
 {
@@ -45,7 +45,7 @@ namespace UnityEditor.Build.Pipeline
         /// <summary>
         /// Default constructor, creates an empty BuildContent.
         /// </summary>
-        public BuildContent() {}
+        public BuildContent() { }
 
         /// <summary>
         /// Default constructor, takes a set of Assets and converts them to the appropriate properties.
@@ -68,7 +68,9 @@ namespace UnityEditor.Build.Pipeline
                 else if (assetType == ValidationMethods.Status.Scene)
                     Scenes.Add(asset);
                 else
-                    throw new ArgumentException(string.Format("Asset '{0}' is not a valid Asset or Scene.", asset.ToString()));
+                    throw new ArgumentException(
+                        string.Format("Asset '{0}' is not a valid Asset or Scene.", asset.ToString())
+                    );
             }
         }
     }
@@ -101,7 +103,7 @@ namespace UnityEditor.Build.Pipeline
         /// <summary>
         /// Default constructor, creates an empty BundleBuildContent.
         /// </summary>
-        public BundleBuildContent() {}
+        public BundleBuildContent() { }
 
         /// <summary>
         /// Default constructor, takes a set of AssetBundleBuild and converts them to the appropriate properties.
@@ -133,16 +135,27 @@ namespace UnityEditor.Build.Pipeline
                     // Ensure the path is valid
                     ValidationMethods.Status status = ValidationMethods.ValidAsset(asset);
                     if (status == ValidationMethods.Status.Invalid)
-                        throw new ArgumentException(string.Format("Asset '{0}' is not a valid Asset or Scene.", assetPath));
+                        throw new ArgumentException(
+                            string.Format("Asset '{0}' is not a valid Asset or Scene.", assetPath)
+                        );
 
                     // Ensure we do not have a mixed bundle
                     if (bundleType == ValidationMethods.Status.Invalid)
                         bundleType = status;
                     else if (bundleType != status)
-                        throw new ArgumentException(string.Format("Asset Bundle '{0}' is invalid because it contains mixed Asset and Scene types.", bundleBuild.assetBundleName));
+                        throw new ArgumentException(
+                            string.Format(
+                                "Asset Bundle '{0}' is invalid because it contains mixed Asset and Scene types.",
+                                bundleBuild.assetBundleName
+                            )
+                        );
 
-                    string address = bundleBuild.addressableNames != null && i < bundleBuild.addressableNames.Length && !string.IsNullOrEmpty(bundleBuild.addressableNames[i]) ?
-                        bundleBuild.addressableNames[i] : AssetDatabase.GUIDToAssetPath(asset.ToString());
+                    string address =
+                        bundleBuild.addressableNames != null
+                        && i < bundleBuild.addressableNames.Length
+                        && !string.IsNullOrEmpty(bundleBuild.addressableNames[i])
+                            ? bundleBuild.addressableNames[i]
+                            : AssetDatabase.GUIDToAssetPath(asset.ToString());
 
                     // Add the guid to the bundle map
                     guids.Add(asset);

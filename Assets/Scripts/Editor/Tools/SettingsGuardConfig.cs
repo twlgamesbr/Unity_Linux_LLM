@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace NPCSystem.Editor.Tools
 {
@@ -19,7 +19,8 @@ namespace NPCSystem.Editor.Tools
         public List<PlatformCompatOverride> platformOverrides = new List<PlatformCompatOverride>();
 
         [Header("Editor Assemblies")]
-        public EditorAssembliesCompatibilityLevel requiredEditorAssembliesLevel = EditorAssembliesCompatibilityLevel.NET_Standard;
+        public EditorAssembliesCompatibilityLevel requiredEditorAssembliesLevel =
+            EditorAssembliesCompatibilityLevel.NET_Standard;
 
         [Header("Scripting Defines")]
         public List<PlatformDefines> scriptingDefines = new List<PlatformDefines>();
@@ -37,7 +38,7 @@ namespace NPCSystem.Editor.Tools
     [System.Serializable]
     public class PlatformCompatOverride
     {
-        public string platformName = "WebGL";         // Must match NamedBuildTarget field name
+        public string platformName = "WebGL"; // Must match NamedBuildTarget field name
         public ApiCompatibilityLevel requiredLevel = ApiCompatibilityLevel.NET_Standard;
     }
 

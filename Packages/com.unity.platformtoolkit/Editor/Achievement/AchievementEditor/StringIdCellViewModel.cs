@@ -21,7 +21,9 @@ namespace Unity.PlatformToolkit.Editor
                 var trimmedValue = value.Trim();
                 if (trimmedValue.Length > AchievementEditor.AchievementCharacterLimit)
                 {
-                    Debug.LogWarning($"Character limit exceeded in achievement ID. Limit: {AchievementEditor.AchievementCharacterLimit}.");
+                    Debug.LogWarning(
+                        $"Character limit exceeded in achievement ID. Limit: {AchievementEditor.AchievementCharacterLimit}."
+                    );
                     return;
                 }
                 Achievement.ImplementationData.ConfigurationData = trimmedValue;

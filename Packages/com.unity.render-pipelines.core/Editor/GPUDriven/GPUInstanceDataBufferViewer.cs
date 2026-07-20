@@ -7,7 +7,8 @@ namespace UnityEngine.Rendering
     //@ It could show layouts, archetypes, components and instance data.
     internal class GPUInstanceDataBufferViewer : EditorWindow
     {
-        [SerializeField] private Vector2 m_ScrollPos;
+        [SerializeField]
+        private Vector2 m_ScrollPos;
 
         public static void InitializeWindow()
         {
@@ -62,9 +63,16 @@ namespace UnityEngine.Rendering
                 var count = buffer.layout.instancesCount[archIndex];
                 for (int instanceIndex = 0; instanceIndex < count; ++instanceIndex)
                 {
-                    GPUInstanceIndex gpuIndex = buffer.InstanceGPUHandleToGPUIndex(InstanceGPUHandle.Create(archetype, instanceIndex));
-                    PackedMatrix objectToWorld = readback.LoadData<PackedMatrix>(defaultGPUComponents.objectToWorld, gpuIndex);
-                    EditorGUILayout.LabelField($"Instance {instanceIndex}; GPU Index: {gpuIndex.index}; ObjectToWorld {objectToWorld}");
+                    GPUInstanceIndex gpuIndex = buffer.InstanceGPUHandleToGPUIndex(
+                        InstanceGPUHandle.Create(archetype, instanceIndex)
+                    );
+                    PackedMatrix objectToWorld = readback.LoadData<PackedMatrix>(
+                        defaultGPUComponents.objectToWorld,
+                        gpuIndex
+                    );
+                    EditorGUILayout.LabelField(
+                        $"Instance {instanceIndex}; GPU Index: {gpuIndex.index}; ObjectToWorld {objectToWorld}"
+                    );
                     //@ Read and display more instance data here if needed...
                 }
             }

@@ -11,13 +11,16 @@ namespace Unity.Physics
     {
         [NoAlias]
         internal NativeArray<MotionData> m_MotionDatas;
+
         [NoAlias]
         internal NativeArray<MotionVelocity> m_MotionVelocities;
         internal int m_NumMotions; // number of motionDatas and motionVelocities currently in use
 
         [NoAlias]
         NativeList<Joint> m_Joints;
-        [NoAlias] internal NativeParallelHashMap<Entity, int> EntityJointIndexMap;
+
+        [NoAlias]
+        internal NativeParallelHashMap<Entity, int> EntityJointIndexMap;
 
         /// <summary>
         ///     <para> Enables direct solver.</para>
@@ -71,8 +74,16 @@ namespace Unity.Physics
         /// <param name="numJoints">    Number of joints. </param>
         public DynamicsWorld(int numMotions, int numJoints)
         {
-            m_MotionDatas = new NativeArray<MotionData>(numMotions, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-            m_MotionVelocities = new NativeArray<MotionVelocity>(numMotions, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_MotionDatas = new NativeArray<MotionData>(
+                numMotions,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
+            m_MotionVelocities = new NativeArray<MotionVelocity>(
+                numMotions,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_NumMotions = numMotions;
 
             m_Joints = new NativeList<Joint>(numJoints, Allocator.Persistent);
@@ -93,12 +104,20 @@ namespace Unity.Physics
             if (m_MotionDatas.Length < m_NumMotions)
             {
                 m_MotionDatas.Dispose();
-                m_MotionDatas = new NativeArray<MotionData>(m_NumMotions, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                m_MotionDatas = new NativeArray<MotionData>(
+                    m_NumMotions,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
             if (m_MotionVelocities.Length < m_NumMotions)
             {
                 m_MotionVelocities.Dispose();
-                m_MotionVelocities = new NativeArray<MotionVelocity>(m_NumMotions, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                m_MotionVelocities = new NativeArray<MotionVelocity>(
+                    m_NumMotions,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             if (EntityJointIndexMap.Capacity < numJoints)
@@ -148,12 +167,23 @@ namespace Unity.Physics
         {
             DynamicsWorld clone = new DynamicsWorld
             {
-                m_MotionDatas = new NativeArray<MotionData>(m_MotionDatas.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory),
-                m_MotionVelocities = new NativeArray<MotionVelocity>(m_MotionVelocities.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory),
+                m_MotionDatas = new NativeArray<MotionData>(
+                    m_MotionDatas.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                ),
+                m_MotionVelocities = new NativeArray<MotionVelocity>(
+                    m_MotionVelocities.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                ),
                 m_NumMotions = m_NumMotions,
                 m_Joints = new NativeList<Joint>(m_Joints.Length, Allocator.Persistent),
                 EntityJointIndexMap = new NativeParallelHashMap<Entity, int>(m_Joints.Length, Allocator.Persistent),
-                DirectSolverEnabledFlag = new NativeReference<bool>(DirectSolverEnabledFlag.Value, Allocator.Persistent)
+                DirectSolverEnabledFlag = new NativeReference<bool>(
+                    DirectSolverEnabledFlag.Value,
+                    Allocator.Persistent
+                ),
             };
             clone.m_MotionDatas.CopyFrom(m_MotionDatas);
             clone.m_MotionVelocities.CopyFrom(m_MotionVelocities);

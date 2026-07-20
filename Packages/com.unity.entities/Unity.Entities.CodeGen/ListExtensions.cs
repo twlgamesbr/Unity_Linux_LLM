@@ -26,6 +26,7 @@ namespace Unity.Entities.CodeGen
         }
 
         public static string SeparateBySpace(this IEnumerable<string> elements) => elements.SeparateBy(" ");
+
         public static string SeparateByComma(this IEnumerable<string> elements) => elements.SeparateBy(",");
     }
 }

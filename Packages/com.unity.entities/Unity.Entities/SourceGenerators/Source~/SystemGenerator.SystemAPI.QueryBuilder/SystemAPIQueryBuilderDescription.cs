@@ -46,8 +46,11 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                 return;
             }
 
-            if (systemDescription.SemanticModel.GetOperation(queryCandidate.BuildNode) is IInvocationOperation invocationOperation
-                && invocationOperation.TargetMethod.ToString() == "Unity.Entities.SystemAPIQueryBuilder.Build()")
+            if (
+                systemDescription.SemanticModel.GetOperation(queryCandidate.BuildNode)
+                    is IInvocationOperation invocationOperation
+                && invocationOperation.TargetMethod.ToString() == "Unity.Entities.SystemAPIQueryBuilder.Build()"
+            )
             {
                 SystemDescription = systemDescription;
                 queryCandidate.BuildNode.GetLocation();
@@ -55,7 +58,8 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                 var containingMethod = queryCandidate.BuildNode.AncestorOfKindOrDefault<MethodDeclarationSyntax>();
                 if (containingMethod != null)
                 {
-                    var methodSymbol = (IMethodSymbol)SystemDescription.SemanticModel.GetDeclaredSymbol(containingMethod);
+                    var methodSymbol = (IMethodSymbol)
+                        SystemDescription.SemanticModel.GetDeclaredSymbol(containingMethod);
                     IsBurstEnabled = methodSymbol.HasAttribute("Unity.Burst.BurstCompileAttribute");
 
                     var noneQueryTypes = new List<Query>();
@@ -66,7 +70,11 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                     var presentQueryTypes = new List<Query>();
                     var entityQueryOptions = new List<EntityQueryOptions>();
 
-                    foreach (var node in queryCandidate.SystemAPIQueryBuilderNode.Ancestors().OfType<InvocationExpressionSyntax>())
+                    foreach (
+                        var node in queryCandidate
+                            .SystemAPIQueryBuilderNode.Ancestors()
+                            .OfType<InvocationExpressionSyntax>()
+                    )
                     {
                         switch (node.Expression)
                         {
@@ -76,207 +84,242 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                                 switch (genericNameSyntax.Identifier.ValueText)
                                 {
                                     case "WithDisabled":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.Disabled,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.Disabled,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithDisabled<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithDisabled<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         disabledQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithDisabledRW":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.Disabled,
-                                                    IsReadOnly = false
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.Disabled,
+                                                IsReadOnly = false,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithDisabledRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithDisabledRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         disabledQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithPresent":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.Present,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.Present,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithPresent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithPresent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         presentQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithPresentRW":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.Present,
-                                                    IsReadOnly = false
-                                                }).ToArray();
-                                        _invocationsBeforeBuild.AppendLine($".WithPresentRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.Present,
+                                                IsReadOnly = false,
+                                            })
+                                            .ToArray();
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithPresentRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         presentQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAbsent":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.Absent,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.Absent,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAbsent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAbsent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         absentQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAbsentChunkComponent":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.Absent,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.Absent,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAbsentChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAbsentChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         absentQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAll":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.All,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.All,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAll<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAll<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         allQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAllRW":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.All,
-                                                    IsReadOnly = false
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.All,
+                                                IsReadOnly = false,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAllRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAllRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         allQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAllChunkComponent":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.All,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.All,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAllChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAllChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         allQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAllChunkComponentRW":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.All,
-                                                    IsReadOnly = false
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.All,
+                                                IsReadOnly = false,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAllChunkComponentRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAllChunkComponentRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         allQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAny":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.Any,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.Any,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAny<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAny<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         anyQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAnyChunkComponent":
-                                        typeArguments = genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                            new Query
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
                                             {
                                                 TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
                                                 Type = QueryType.Any,
-                                                IsReadOnly = true
-                                            }).ToArray();
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAnyChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAnyChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         anyQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAnyRW":
-                                         typeArguments = genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                            new Query
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
                                             {
                                                 TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
                                                 Type = QueryType.Any,
-                                                IsReadOnly = false
-                                            }).ToArray();
+                                                IsReadOnly = false,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAnyRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAnyRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         anyQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithAnyChunkComponentRW":
-                                        typeArguments = genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                            new Query
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
                                             {
                                                 TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
                                                 Type = QueryType.Any,
-                                                IsReadOnly = false
-                                            }).ToArray();
+                                                IsReadOnly = false,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithAnyChunkComponentRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithAnyChunkComponentRW<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         anyQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithNone":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.None,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.None,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithNone<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithNone<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         noneQueryTypes.AddRange(typeArguments);
                                         break;
                                     case "WithNoneChunkComponent":
-                                        typeArguments =
-                                            genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                                new Query
-                                                {
-                                                    TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                    Type = QueryType.None,
-                                                    IsReadOnly = true
-                                                }).ToArray();
+                                        typeArguments = genericNameSyntax
+                                            .TypeArgumentList.Arguments.Select(typeArg => new Query
+                                            {
+                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                                Type = QueryType.None,
+                                                IsReadOnly = true,
+                                            })
+                                            .ToArray();
 
-                                        _invocationsBeforeBuild.AppendLine($".WithNoneChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithNoneChunkComponent<{typeArguments.Select(t => t.TypeSymbol.ToFullName()).SeparateByCommaAndSpace()}>()"
+                                        );
                                         noneQueryTypes.AddRange(typeArguments);
                                         break;
                                 }
@@ -290,10 +333,14 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                                 {
                                     case "WithOptions":
                                         var argumentSyntax = node.ArgumentList.Arguments.Single();
-                                        var (options, argumentWithFullyQualifiedName) = GetEntityQueryOptionsArgument(argumentSyntax);
+                                        var (options, argumentWithFullyQualifiedName) = GetEntityQueryOptionsArgument(
+                                            argumentSyntax
+                                        );
                                         entityQueryOptions.Add(options);
 
-                                        _invocationsBeforeBuild.AppendLine($".WithOptions({argumentWithFullyQualifiedName})");
+                                        _invocationsBeforeBuild.AppendLine(
+                                            $".WithOptions({argumentWithFullyQualifiedName})"
+                                        );
                                         break;
                                     case "AddAdditionalQuery":
                                         _invocationsBeforeBuild.AppendLine(".AddAdditionalQuery()");
@@ -305,7 +352,17 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                                         }
                                         else
                                         {
-                                            archetype = new Archetype(allQueryTypes, anyQueryTypes, noneQueryTypes, disabledQueryTypes, absentQueryTypes, presentQueryTypes, entityQueryOptions.Any() ? entityQueryOptions.SingleOrDefault() : EntityQueryOptions.Default);
+                                            archetype = new Archetype(
+                                                allQueryTypes,
+                                                anyQueryTypes,
+                                                noneQueryTypes,
+                                                disabledQueryTypes,
+                                                absentQueryTypes,
+                                                presentQueryTypes,
+                                                entityQueryOptions.Any()
+                                                    ? entityQueryOptions.SingleOrDefault()
+                                                    : EntityQueryOptions.Default
+                                            );
                                             Archetypes.Add(archetype);
                                             QueryFinalizingLocations.Add(node.GetLocation());
                                         }
@@ -323,7 +380,17 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                                         }
                                         else
                                         {
-                                            archetype = new Archetype(allQueryTypes, anyQueryTypes, noneQueryTypes, disabledQueryTypes, absentQueryTypes, presentQueryTypes, entityQueryOptions.Any() ? entityQueryOptions.SingleOrDefault() : EntityQueryOptions.Default);
+                                            archetype = new Archetype(
+                                                allQueryTypes,
+                                                anyQueryTypes,
+                                                noneQueryTypes,
+                                                disabledQueryTypes,
+                                                absentQueryTypes,
+                                                presentQueryTypes,
+                                                entityQueryOptions.Any()
+                                                    ? entityQueryOptions.SingleOrDefault()
+                                                    : EntityQueryOptions.Default
+                                            );
                                             Archetypes.Add(archetype);
                                             QueryFinalizingLocations.Add(node.GetLocation());
                                         }
@@ -339,21 +406,32 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
                 Success = false;
         }
 
-        static (EntityQueryOptions Options, string ArgumentWithFullyQualifiedName) GetEntityQueryOptionsArgument(ArgumentSyntax argumentSyntax)
+        static (EntityQueryOptions Options, string ArgumentWithFullyQualifiedName) GetEntityQueryOptionsArgument(
+            ArgumentSyntax argumentSyntax
+        )
         {
             var options = EntityQueryOptions.Default;
             var argumentExpression = argumentSyntax.Expression;
 
             while (argumentExpression is BinaryExpressionSyntax binaryExpressionSyntax)
             {
-                if (SourceGenHelpers.TryParseQualifiedEnumValue(binaryExpressionSyntax.Right.ToString(),
-                        out EntityQueryOptions optionArg))
+                if (
+                    SourceGenHelpers.TryParseQualifiedEnumValue(
+                        binaryExpressionSyntax.Right.ToString(),
+                        out EntityQueryOptions optionArg
+                    )
+                )
                     options |= optionArg;
 
                 argumentExpression = binaryExpressionSyntax.Left;
             }
 
-            if (SourceGenHelpers.TryParseQualifiedEnumValue(argumentExpression.ToString(), out EntityQueryOptions option))
+            if (
+                SourceGenHelpers.TryParseQualifiedEnumValue(
+                    argumentExpression.ToString(),
+                    out EntityQueryOptions option
+                )
+            )
                 options |= option;
 
             return (options, options.GetAsFlagStringSeperatedByOr());

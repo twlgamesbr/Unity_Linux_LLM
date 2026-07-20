@@ -48,11 +48,15 @@ namespace UnityEngine.Experimental.Rendering
                     if (m_Pass.singlePassEnabled)
                     {
                         // Prefer multiview draw
-                        if (m_CombinedMesh != null && SystemInfo.supportsMultiview) 
+                        if (m_CombinedMesh != null && SystemInfo.supportsMultiview)
                         {
                             // For the multiview code path, keep the multiview state on to propagate geometries to all eye texture slices
                             cmd.EnableShaderKeyword("XR_OCCLUSION_MESH_COMBINED");
-                            Vector3 scale = new Vector3(occlusionMeshScale, yFlip? occlusionMeshScale : -occlusionMeshScale, 1.0f);
+                            Vector3 scale = new Vector3(
+                                occlusionMeshScale,
+                                yFlip ? occlusionMeshScale : -occlusionMeshScale,
+                                1.0f
+                            );
                             cmd.DrawMesh(m_CombinedMesh, Matrix4x4.Scale(scale), m_Material);
                             cmd.DisableShaderKeyword("XR_OCCLUSION_MESH_COMBINED");
                         }
@@ -61,13 +65,16 @@ namespace UnityEngine.Experimental.Rendering
                             m_Pass.StopSinglePass(cmd);
 
                             cmd.EnableShaderKeyword("XR_OCCLUSION_MESH_COMBINED");
-                            Vector3 scale = new Vector3(occlusionMeshScale, yFlip ? occlusionMeshScale : -occlusionMeshScale, 1.0f);
+                            Vector3 scale = new Vector3(
+                                occlusionMeshScale,
+                                yFlip ? occlusionMeshScale : -occlusionMeshScale,
+                                1.0f
+                            );
                             cmd.DrawMesh(m_CombinedMesh, Matrix4x4.Scale(scale), m_Material);
                             cmd.DisableShaderKeyword("XR_OCCLUSION_MESH_COMBINED");
 
                             m_Pass.StartSinglePass(cmd);
                         }
-
                     }
                     else
                     {
@@ -83,7 +90,11 @@ namespace UnityEngine.Experimental.Rendering
 
         internal void UpdateCombinedMesh()
         {
-            if (IsOcclusionMeshSupported() && m_Pass.singlePassEnabled && TryGetOcclusionMeshCombinedHashCode(out var hashCode))
+            if (
+                IsOcclusionMeshSupported()
+                && m_Pass.singlePassEnabled
+                && TryGetOcclusionMeshCombinedHashCode(out var hashCode)
+            )
             {
                 if (m_CombinedMesh == null || hashCode != m_CombinedMeshHashCode)
                 {

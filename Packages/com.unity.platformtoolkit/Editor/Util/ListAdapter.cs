@@ -28,7 +28,9 @@ namespace Unity.PlatformToolkit.Editor
 
         public void CopyTo(Array array, int index)
         {
-            throw new InvalidOperationException("CopyTo not supported. Sorry for disrespecting well established programming principles.");
+            throw new InvalidOperationException(
+                "CopyTo not supported. Sorry for disrespecting well established programming principles."
+            );
         }
 
         public int Count => m_List.Count;

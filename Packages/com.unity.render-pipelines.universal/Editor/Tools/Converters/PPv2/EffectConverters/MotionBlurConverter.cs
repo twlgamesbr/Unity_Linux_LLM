@@ -12,7 +12,10 @@ namespace UnityEditor.Rendering.Universal
     {
         protected override Type OldSettingsType { get; } = typeof(BIRPRendering.MotionBlur);
 
-        protected override void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldSettings, VolumeProfile targetProfile)
+        protected override void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldSettings,
+            VolumeProfile targetProfile
+        )
         {
             var oldMotionBlur = oldSettings as BIRPRendering.MotionBlur;
 

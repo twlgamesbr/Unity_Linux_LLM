@@ -1,7 +1,6 @@
 using System;
 using UnityEngine.Rendering;
 
-
 namespace UnityEngine.PathTracing.Core
 {
     internal struct EnvironmentCDF
@@ -18,8 +17,16 @@ namespace UnityEngine.PathTracing.Core
         {
             _environmentCDF.MarginalResolution = 64;
             _environmentCDF.ConditionalResolution = _environmentCDF.MarginalResolution * 2;
-            _environmentCDF.ConditionalBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _environmentCDF.ConditionalResolution * _environmentCDF.MarginalResolution, sizeof(float));
-            _environmentCDF.MarginalBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _environmentCDF.MarginalResolution, sizeof(float));
+            _environmentCDF.ConditionalBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                _environmentCDF.ConditionalResolution * _environmentCDF.MarginalResolution,
+                sizeof(float)
+            );
+            _environmentCDF.MarginalBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                _environmentCDF.MarginalResolution,
+                sizeof(float)
+            );
 
             _shader = shader;
             if (_shader)
@@ -35,11 +42,26 @@ namespace UnityEngine.PathTracing.Core
             cmd.SetComputeIntParam(_shader, "_MarginalResolution", _environmentCDF.MarginalResolution);
 
             cmd.SetComputeTextureParam(_shader, _computeConditionalKernel, "_EnvCubemap", cubemap);
-            cmd.SetComputeBufferParam(_shader, _computeConditionalKernel, "_ConditionalBuffer", _environmentCDF.ConditionalBuffer);
-            cmd.SetComputeBufferParam(_shader, _computeConditionalKernel, "_MarginalBuffer", _environmentCDF.MarginalBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _computeConditionalKernel,
+                "_ConditionalBuffer",
+                _environmentCDF.ConditionalBuffer
+            );
+            cmd.SetComputeBufferParam(
+                _shader,
+                _computeConditionalKernel,
+                "_MarginalBuffer",
+                _environmentCDF.MarginalBuffer
+            );
             cmd.DispatchCompute(_shader, _computeConditionalKernel, 1, _environmentCDF.MarginalResolution, 1);
 
-            cmd.SetComputeBufferParam(_shader, _computeMarginalKernel, "_MarginalBuffer", _environmentCDF.MarginalBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _computeMarginalKernel,
+                "_MarginalBuffer",
+                _environmentCDF.MarginalBuffer
+            );
             cmd.DispatchCompute(_shader, _computeMarginalKernel, 1, 1, 1);
         }
 

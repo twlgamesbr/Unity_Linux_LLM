@@ -84,7 +84,12 @@ namespace UnityEngine.InputSystem.Editor
                 var action = Selectors.GetSelectedAction(state)?.wrappedProperty;
                 var map = Selectors.GetSelectedActionMap(state)?.wrappedProperty;
                 var compositeType = InputBindingComposite.s_Composites.LookupTypeRegistration(compositeName);
-                var composite = InputActionSerializationHelpers.AddCompositeBinding(action, map, compositeName, compositeType);
+                var composite = InputActionSerializationHelpers.AddCompositeBinding(
+                    action,
+                    map,
+                    compositeName,
+                    compositeType
+                );
                 var index = new SerializedInputBinding(composite).indexOfBinding;
                 state.serializedObject.ApplyModifiedProperties();
                 state.m_Analytics?.RegisterBindingEdit();
@@ -105,8 +110,18 @@ namespace UnityEngine.InputSystem.Editor
                 if (state.selectedActionMapIndex == actionMapIndex)
                     return isCut ? SelectPrevActionMap(state).ClearCutElements() : SelectPrevActionMap(state);
                 if (isCut)
-                    return state.SelectActionMap(state.selectedActionMapIndex > actionMapIndex ? state.selectedActionMapIndex - 1 : state.selectedActionMapIndex).ClearCutElements();
-                return state.SelectActionMap(state.selectedActionMapIndex > actionMapIndex ? state.selectedActionMapIndex - 1 : state.selectedActionMapIndex);
+                    return state
+                        .SelectActionMap(
+                            state.selectedActionMapIndex > actionMapIndex
+                                ? state.selectedActionMapIndex - 1
+                                : state.selectedActionMapIndex
+                        )
+                        .ClearCutElements();
+                return state.SelectActionMap(
+                    state.selectedActionMapIndex > actionMapIndex
+                        ? state.selectedActionMapIndex - 1
+                        : state.selectedActionMapIndex
+                );
             };
         }
 
@@ -158,11 +173,15 @@ namespace UnityEngine.InputSystem.Editor
                     foreach (var pasteListener in pasteListeners)
                         pasteListener.OnPaste(state);
                 }
-                var lastPastedElement = CopyPasteHelper.PasteActionMapsFromClipboard(state.With(selectedActionMapIndex: newIndex >= -1 ? newIndex : state.selectedActionMapIndex));
+                var lastPastedElement = CopyPasteHelper.PasteActionMapsFromClipboard(
+                    state.With(selectedActionMapIndex: newIndex >= -1 ? newIndex : state.selectedActionMapIndex)
+                );
                 if (lastPastedElement != null)
                 {
                     state.serializedObject.ApplyModifiedProperties();
-                    return state.With(selectedActionMapIndex: lastPastedElement.GetIndexOfArrayElement()).ClearCutElements();
+                    return state
+                        .With(selectedActionMapIndex: lastPastedElement.GetIndexOfArrayElement())
+                        .ClearCutElements();
                 }
                 return state.ClearCutElements();
             };
@@ -187,10 +206,21 @@ namespace UnityEngine.InputSystem.Editor
                 CopyPasteHelper.Copy(state);
                 var action = Selectors.GetSelectedAction(state);
                 var actionMap = Selectors.GetActionMapForAction(state, action?.id);
-                var isCut = action.HasValue && state.IsActionCut(actionMap.GetIndexOfArrayElement(),
-                    action.Value.wrappedProperty.GetIndexOfArrayElement());
-                InputActionSerializationHelpers.DeleteActionAndBindings(actionMap, InputActionSerializationHelpers.GetId(action?.wrappedProperty));
-                var lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(state, true, actionMapIndex);
+                var isCut =
+                    action.HasValue
+                    && state.IsActionCut(
+                        actionMap.GetIndexOfArrayElement(),
+                        action.Value.wrappedProperty.GetIndexOfArrayElement()
+                    );
+                InputActionSerializationHelpers.DeleteActionAndBindings(
+                    actionMap,
+                    InputActionSerializationHelpers.GetId(action?.wrappedProperty)
+                );
+                var lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(
+                    state,
+                    true,
+                    actionMapIndex
+                );
                 if (lastPastedElement != null)
                     state.serializedObject.ApplyModifiedProperties();
                 EditorHelpers.SetSystemCopyBufferContents(string.Empty);
@@ -212,11 +242,19 @@ namespace UnityEngine.InputSystem.Editor
                     foreach (var pasteListener in pasteListeners)
                         pasteListener.OnPaste(state);
                 }
-                var lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(state.With(selectedActionIndex: newIndex >= 0 ? newIndex : state.selectedActionIndex), true);
+                var lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(
+                    state.With(selectedActionIndex: newIndex >= 0 ? newIndex : state.selectedActionIndex),
+                    true
+                );
                 if (lastPastedElement != null)
                 {
                     state.serializedObject.ApplyModifiedProperties();
-                    return state.With(selectedActionIndex: lastPastedElement.GetIndexOfArrayElement(), selectionType: SelectionType.Action).ClearCutElements();
+                    return state
+                        .With(
+                            selectedActionIndex: lastPastedElement.GetIndexOfArrayElement(),
+                            selectionType: SelectionType.Action
+                        )
+                        .ClearCutElements();
                 }
                 return state.ClearCutElements();
             };
@@ -247,12 +285,14 @@ namespace UnityEngine.InputSystem.Editor
                     if (actions.HasValue && actions.Value > 0)
                         lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(
                             state.With(selectedActionIndex: newIndex >= 0 ? newIndex : state.selectedActionIndex),
-                            typeOfCopiedData == typeof(InputBinding));
+                            typeOfCopiedData == typeof(InputBinding)
+                        );
                     else
                     {
-                        lastPastedElement =
-                            CopyPasteHelper.PasteActionsOrBindingsFromClipboard(
-                                state.With(selectedActionMapIndex: actionMap.GetIndexOfArrayElement()), addLast: true);
+                        lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(
+                            state.With(selectedActionMapIndex: actionMap.GetIndexOfArrayElement()),
+                            addLast: true
+                        );
                     }
                 }
                 else if (state.selectionType == SelectionType.Binding)
@@ -261,9 +301,16 @@ namespace UnityEngine.InputSystem.Editor
                     {
                         var bindings = Selectors.GetBindingsForAction(relatedAction.Value.name, state);
                         if (bindings.Count == 0) //add cutted binding into action instead if there are no bindings left for the action
-                            lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(state.With(selectedActionIndex: relatedAction.Value.wrappedProperty.GetIndexOfArrayElement(), selectionType: SelectionType.Action));
+                            lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(
+                                state.With(
+                                    selectedActionIndex: relatedAction.Value.wrappedProperty.GetIndexOfArrayElement(),
+                                    selectionType: SelectionType.Action
+                                )
+                            );
                         else
-                            lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(state.With(selectedBindingIndex: newIndex >= 0 ? newIndex : state.selectedBindingIndex));
+                            lastPastedElement = CopyPasteHelper.PasteActionsOrBindingsFromClipboard(
+                                state.With(selectedBindingIndex: newIndex >= 0 ? newIndex : state.selectedBindingIndex)
+                            );
 
                         if (lastPastedElement != null)
                             lastPastedElement.FindPropertyRelative("m_Action").stringValue = relatedAction.Value.name;
@@ -274,9 +321,13 @@ namespace UnityEngine.InputSystem.Editor
                 {
                     state.serializedObject.ApplyModifiedProperties();
                     if (typeOfCopiedData == typeof(InputAction))
-                        return state.With(selectedActionIndex: lastPastedElement.GetIndexOfArrayElement()).ClearCutElements();
+                        return state
+                            .With(selectedActionIndex: lastPastedElement.GetIndexOfArrayElement())
+                            .ClearCutElements();
                     if (typeOfCopiedData == typeof(InputBinding))
-                        return state.With(selectedBindingIndex: lastPastedElement.GetIndexOfArrayElement()).ClearCutElements();
+                        return state
+                            .With(selectedBindingIndex: lastPastedElement.GetIndexOfArrayElement())
+                            .ClearCutElements();
                 }
                 return state.ClearCutElements();
             };
@@ -289,7 +340,12 @@ namespace UnityEngine.InputSystem.Editor
                 var actionMapArray = state.serializedObject.FindProperty(nameof(InputActionAsset.m_ActionMaps));
                 var actionMap = Selectors.GetActionMapAtIndex(state, actionMapIndex)?.wrappedProperty;
                 var name = actionMap?.FindPropertyRelative(nameof(InputAction.m_Name)).stringValue;
-                var newMap = CopyPasteHelper.DuplicateElement(actionMapArray, actionMap, name, actionMap.GetIndexOfArrayElement() + 1);
+                var newMap = CopyPasteHelper.DuplicateElement(
+                    actionMapArray,
+                    actionMap,
+                    name,
+                    actionMap.GetIndexOfArrayElement() + 1
+                );
                 state.serializedObject.ApplyModifiedProperties();
                 state.m_Analytics?.RegisterActionMapEdit();
                 return state.SelectActionMap(newMap.FindPropertyRelative(nameof(InputAction.m_Name)).stringValue);
@@ -318,7 +374,12 @@ namespace UnityEngine.InputSystem.Editor
                 var actionName = binding?.FindPropertyRelative("m_Action").stringValue;
                 var actionMap = Selectors.GetActionMapAtIndex(state, state.selectedActionMapIndex)?.wrappedProperty;
                 var bindingsArray = actionMap?.FindPropertyRelative(nameof(InputActionMap.m_Bindings));
-                var newIndex = CopyPasteHelper.DuplicateBinding(bindingsArray, binding, actionName, binding.GetIndexOfArrayElement() + 1);
+                var newIndex = CopyPasteHelper.DuplicateBinding(
+                    bindingsArray,
+                    binding,
+                    actionName,
+                    binding.GetIndexOfArrayElement() + 1
+                );
                 state.serializedObject.ApplyModifiedProperties();
                 state.m_Analytics?.RegisterBindingEdit();
                 return state.SelectBinding(newIndex);
@@ -370,10 +431,16 @@ namespace UnityEngine.InputSystem.Editor
             return (in InputActionsEditorState state) =>
             {
                 var actionMap = Selectors.GetSelectedActionMap(state)?.wrappedProperty;
-                var compositeBindings = CopyPasteHelper.GetBindingsForComposite(actionMap?.FindPropertyRelative(nameof(InputActionMap.m_Bindings)), oldIndex);
+                var compositeBindings = CopyPasteHelper.GetBindingsForComposite(
+                    actionMap?.FindPropertyRelative(nameof(InputActionMap.m_Bindings)),
+                    oldIndex
+                );
                 //move the composite element
                 var newBindingIndex = MoveBindingOrComposite(state, oldIndex, actionIndex, childIndex);
-                var actionTo = Selectors.GetActionForIndex(actionMap, actionIndex).FindPropertyRelative(nameof(InputAction.m_Name)).stringValue;
+                var actionTo = Selectors
+                    .GetActionForIndex(actionMap, actionIndex)
+                    .FindPropertyRelative(nameof(InputAction.m_Name))
+                    .stringValue;
                 var toIndex = newBindingIndex;
                 foreach (var compositePart in compositeBindings)
                 {
@@ -384,7 +451,10 @@ namespace UnityEngine.InputSystem.Editor
                     // if added above the oldIndex, the index does not change
                     var to = oldIndex < newBindingIndex ? newBindingIndex : ++toIndex;
                     InputActionSerializationHelpers.MoveBinding(actionMap, from, to);
-                    Selectors.GetCompositeOrBindingInMap(actionMap, to).wrappedProperty.FindPropertyRelative("m_Action").stringValue = actionTo;
+                    Selectors
+                        .GetCompositeOrBindingInMap(actionMap, to)
+                        .wrappedProperty.FindPropertyRelative("m_Action")
+                        .stringValue = actionTo;
                 }
                 state.m_Analytics?.RegisterBindingEdit();
                 state.serializedObject.ApplyModifiedProperties();
@@ -392,20 +462,32 @@ namespace UnityEngine.InputSystem.Editor
             };
         }
 
-        private static int MoveBindingOrComposite(InputActionsEditorState state, int oldIndex, int actionIndex, int childIndex)
+        private static int MoveBindingOrComposite(
+            InputActionsEditorState state,
+            int oldIndex,
+            int actionIndex,
+            int childIndex
+        )
         {
             var actionMap = Selectors.GetSelectedActionMap(state)?.wrappedProperty;
             var bindingsForAction = Selectors.GetBindingsForAction(state, actionMap, actionIndex);
             var allBindings = actionMap?.FindPropertyRelative(nameof(InputActionMap.m_Bindings));
-            var actionTo = Selectors.GetActionForIndex(actionMap, actionIndex).FindPropertyRelative(nameof(InputAction.m_Name)).stringValue;
-            var actionFrom = Selectors.GetCompositeOrBindingInMap(actionMap, oldIndex).wrappedProperty.FindPropertyRelative("m_Action");
+            var actionTo = Selectors
+                .GetActionForIndex(actionMap, actionIndex)
+                .FindPropertyRelative(nameof(InputAction.m_Name))
+                .stringValue;
+            var actionFrom = Selectors
+                .GetCompositeOrBindingInMap(actionMap, oldIndex)
+                .wrappedProperty.FindPropertyRelative("m_Action");
             int newBindingIndex;
             if (bindingsForAction.Count == 0) //if there are no bindings for an action retrieve the first binding index of a binding before (iterate previous actions)
                 newBindingIndex = Selectors.GetBindingIndexBeforeAction(allBindings, actionIndex, allBindings);
             else
             {
                 var toSkip = GetNumberOfCompositePartItemsToSkip(bindingsForAction, childIndex, oldIndex); //skip composite parts if there are - avoid moving into a composite
-                newBindingIndex = bindingsForAction[0].GetIndexOfArrayElement() + Math.Clamp(childIndex + toSkip, 0, bindingsForAction.Count);
+                newBindingIndex =
+                    bindingsForAction[0].GetIndexOfArrayElement()
+                    + Math.Clamp(childIndex + toSkip, 0, bindingsForAction.Count);
                 newBindingIndex -= newBindingIndex > oldIndex && !actionTo.Equals(actionFrom.stringValue) ? 1 : 0; // reduce index by one in case the moved binding will be shifted underneath to another action
             }
 
@@ -415,7 +497,11 @@ namespace UnityEngine.InputSystem.Editor
             return newBindingIndex;
         }
 
-        private static int GetNumberOfCompositePartItemsToSkip(List<SerializedProperty> bindings, int childIndex, int oldIndex)
+        private static int GetNumberOfCompositePartItemsToSkip(
+            List<SerializedProperty> bindings,
+            int childIndex,
+            int oldIndex
+        )
         {
             var toSkip = 0;
             var normalBindings = 0;
@@ -425,8 +511,10 @@ namespace UnityEngine.InputSystem.Editor
                     continue;
                 if (normalBindings > childIndex)
                     break;
-                if (binding.FindPropertyRelative(nameof(InputBinding.m_Flags)).intValue ==
-                    (int)InputBinding.Flags.PartOfComposite)
+                if (
+                    binding.FindPropertyRelative(nameof(InputBinding.m_Flags)).intValue
+                    == (int)InputBinding.Flags.PartOfComposite
+                )
                     toSkip++;
                 else
                     normalBindings++;
@@ -439,9 +527,16 @@ namespace UnityEngine.InputSystem.Editor
             return (in InputActionsEditorState state) =>
             {
                 var actionMap = Selectors.GetSelectedActionMap(state)?.wrappedProperty;
-                var actionTo = actionMap?.FindPropertyRelative(nameof(InputActionMap.m_Bindings)).GetArrayElementAtIndex(compositeIndex).FindPropertyRelative("m_Action").stringValue;
+                var actionTo = actionMap
+                    ?.FindPropertyRelative(nameof(InputActionMap.m_Bindings))
+                    .GetArrayElementAtIndex(compositeIndex)
+                    .FindPropertyRelative("m_Action")
+                    .stringValue;
                 InputActionSerializationHelpers.MoveBinding(actionMap, oldIndex, newIndex);
-                Selectors.GetCompositeOrBindingInMap(actionMap, newIndex).wrappedProperty.FindPropertyRelative("m_Action").stringValue = actionTo;
+                Selectors
+                    .GetCompositeOrBindingInMap(actionMap, newIndex)
+                    .wrappedProperty.FindPropertyRelative("m_Action")
+                    .stringValue = actionTo;
                 state.m_Analytics?.RegisterBindingEdit();
                 state.serializedObject.ApplyModifiedProperties();
                 return state.SelectBinding(newIndex);
@@ -479,7 +574,9 @@ namespace UnityEngine.InputSystem.Editor
                 state.m_Analytics?.RegisterBindingEdit();
 
                 if (isCut)
-                    return state.With(selectedBindingIndex: -1, selectionType: SelectionType.Binding).ClearCutElements();
+                    return state
+                        .With(selectedBindingIndex: -1, selectionType: SelectionType.Binding)
+                        .ClearCutElements();
                 return state.With(selectedBindingIndex: -1, selectionType: SelectionType.Binding); // ActionsTreeView will dispatch a separate command to select the previous Binding
             };
         }
@@ -505,17 +602,24 @@ namespace UnityEngine.InputSystem.Editor
             };
         }
 
-        public static Command SetCompositeBindingType(SerializedInputBinding bindingProperty, IEnumerable<string> compositeTypes,
-            ParameterListView parameterListView, int selectedCompositeTypeIndex)
+        public static Command SetCompositeBindingType(
+            SerializedInputBinding bindingProperty,
+            IEnumerable<string> compositeTypes,
+            ParameterListView parameterListView,
+            int selectedCompositeTypeIndex
+        )
         {
             return (in InputActionsEditorState state) =>
             {
                 var nameAndParameters = new NameAndParameters
                 {
                     name = compositeTypes.ElementAt(selectedCompositeTypeIndex),
-                    parameters = parameterListView.GetParameters()
+                    parameters = parameterListView.GetParameters(),
                 };
-                InputActionSerializationHelpers.ChangeCompositeBindingType(bindingProperty.wrappedProperty, nameAndParameters);
+                InputActionSerializationHelpers.ChangeCompositeBindingType(
+                    bindingProperty.wrappedProperty,
+                    nameAndParameters
+                );
                 state.serializedObject.ApplyModifiedProperties();
                 state.m_Analytics?.RegisterBindingEdit(); // Questionable if action or binding edit?
                 return state;
@@ -567,7 +671,9 @@ namespace UnityEngine.InputSystem.Editor
 
                 // ISX-1650: "Any" (in index 0) should not be put into an InputAction.expectedControlType. It's expected to be null in this case.
                 var controlType = (controlTypeIndex == 0) ? string.Empty : controlTypes[controlTypeIndex];
-                inputAction.wrappedProperty.FindPropertyRelative(nameof(InputAction.m_ExpectedControlType)).stringValue = controlType;
+                inputAction
+                    .wrappedProperty.FindPropertyRelative(nameof(InputAction.m_ExpectedControlType))
+                    .stringValue = controlType;
                 state.serializedObject.ApplyModifiedProperties();
                 state.m_Analytics?.RegisterActionEdit();
                 return state;

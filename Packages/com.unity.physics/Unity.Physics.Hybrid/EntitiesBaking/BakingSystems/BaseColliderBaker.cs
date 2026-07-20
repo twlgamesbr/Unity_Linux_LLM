@@ -32,6 +32,7 @@ namespace Unity.Physics.Authoring
         public Entity ChildEntity;
         public RigidTransform BodyFromShape;
         public bool IsLeafEntityBody;
+
         // Collider reference which ensures that all colliders remain available during incremental baking of
         // compound colliders via the BuildCompoundColliderBakingSystem. They might otherwise be removed from
         // the BlobAssetStore since no reference is made to them anymore at the Entities
@@ -41,7 +42,8 @@ namespace Unity.Physics.Authoring
         public BlobAssetReference<Collider> BakedCollider;
     }
 
-    internal abstract class BaseColliderBaker<T> : BasePhysicsBaker<T> where T : Component
+    internal abstract class BaseColliderBaker<T> : BasePhysicsBaker<T>
+        where T : Component
     {
         /// <summary>
         /// Gets the collider bake matrix for the given collider authoring component world transform.
@@ -50,7 +52,11 @@ namespace Unity.Physics.Authoring
         /// <param name="bodyLocalToWorldMatrix">World transform of the body the resultant baked collider will be added to.</param>
         /// <param name="bodyUniformScale">Uniform scale which will be assigned to the baked rigid body.</param>
         /// <returns>Bake matrix, applied to the collider geometry during baking.</returns>
-        protected Matrix4x4 GetColliderBakeMatrix(Matrix4x4 localToWorldMatrix, Matrix4x4 bodyLocalToWorldMatrix, out float bodyUniformScale)
+        protected Matrix4x4 GetColliderBakeMatrix(
+            Matrix4x4 localToWorldMatrix,
+            Matrix4x4 bodyLocalToWorldMatrix,
+            out float bodyUniformScale
+        )
         {
             bodyUniformScale = 1f;
             var localToWorld = (float4x4)localToWorldMatrix;
@@ -104,16 +110,15 @@ namespace Unity.Physics.Authoring
             return float4x4.identity;
         }
 
-        protected GameObject FindFirstEnabledAncestor<TU>(GameObject shape, List<TU> buffer) where TU : Component
+        protected GameObject FindFirstEnabledAncestor<TU>(GameObject shape, List<TU> buffer)
+            where TU : Component
         {
             // include inactive in case the supplied shape GameObject is a prefab that has not been instantiated
             GetComponentsInParent(buffer);
             GameObject result = null;
             for (int i = 0, count = buffer.Count; i < count; ++i)
             {
-                if (
-                    (buffer[i] as UnityEngine.Collider)?.enabled ??
-                    (buffer[i] as MonoBehaviour)?.enabled ?? true)
+                if ((buffer[i] as UnityEngine.Collider)?.enabled ?? (buffer[i] as MonoBehaviour)?.enabled ?? true)
                 {
                     result = buffer[i].gameObject;
                     break;
@@ -123,17 +128,15 @@ namespace Unity.Physics.Authoring
             return result;
         }
 
-        protected GameObject FindTopmostEnabledAncestor<TU>(GameObject shape, List<TU> buffer) where TU : Component
+        protected GameObject FindTopmostEnabledAncestor<TU>(GameObject shape, List<TU> buffer)
+            where TU : Component
         {
             // include inactive in case the supplied shape GameObject is a prefab that has not been instantiated
             GetComponentsInParent(buffer);
             GameObject result = null;
             for (var i = buffer.Count - 1; i >= 0; --i)
             {
-                if (
-                    (buffer[i] as UnityEngine.Collider)?.enabled ??
-                    (buffer[i] as MonoBehaviour)?.enabled ?? true
-                )
+                if ((buffer[i] as UnityEngine.Collider)?.enabled ?? (buffer[i] as MonoBehaviour)?.enabled ?? true)
                 {
                     result = buffer[i].gameObject;
                     break;

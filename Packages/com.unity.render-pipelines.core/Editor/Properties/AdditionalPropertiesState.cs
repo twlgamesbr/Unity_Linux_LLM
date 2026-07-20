@@ -83,11 +83,7 @@ namespace UnityEditor.Rendering
         /// <param name="defaultValue">If key did not exist, it will be created with this value for initialization.</param>
         /// <param name="prefix">[Optional] Prefix scope of the key (Default is CoreRP)</param>
         /// <param name="stateId">[Optional] Postfix used to differentiate between different keys (Default is UI_AP_State)</param>
-        public AdditionalPropertiesState(
-            TState defaultValue,
-            string prefix = "CoreRP",
-            string stateId = "UI_AP_State"
-        )
+        public AdditionalPropertiesState(TState defaultValue, string prefix = "CoreRP", string stateId = "UI_AP_State")
         {
             string key = $"{prefix}:{typeof(TTarget).Name}:{typeof(TState).Name}:{stateId}";
             m_State = new EditorPrefBoolFlags<TState>(key);
@@ -147,10 +143,7 @@ namespace UnityEditor.Rendering
         /// <param name="index">The index of the flag to be removed.</param>
         public void RemoveFlagAtIndex(int index)
         {
-            m_State.rawValue = ExpandedStateList<TTarget>.RightShiftOnceFromIndexToMSB(
-                index,
-                m_State.rawValue
-            );
+            m_State.rawValue = ExpandedStateList<TTarget>.RightShiftOnceFromIndexToMSB(index, m_State.rawValue);
         }
     }
 }

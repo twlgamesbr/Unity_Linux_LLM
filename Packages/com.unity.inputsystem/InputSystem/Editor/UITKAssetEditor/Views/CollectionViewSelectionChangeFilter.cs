@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 
 using System;
-
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
@@ -38,14 +37,14 @@ namespace UnityEngine.InputSystem.Editor
             m_SelectedIndices = new List<int>();
 
             m_View = view;
-            #if UNITY_INPUT_SYSTEM_INPUT_ASSET_EDITOR_ALLOWS_DESELECTION
+#if UNITY_INPUT_SYSTEM_INPUT_ASSET_EDITOR_ALLOWS_DESELECTION
             m_View_.selectedIndicesChanged += OnSelectedIndicesChanged;
-            #else
+#else
             m_View.selectedIndicesChanged += FilterSelectedIndicesChanged;
-            #endif
+#endif
         }
 
-        #if !UNITY_INPUT_SYSTEM_INPUT_ASSET_EDITOR_ALLOWS_DESELECTION
+#if !UNITY_INPUT_SYSTEM_INPUT_ASSET_EDITOR_ALLOWS_DESELECTION
         private void FilterSelectedIndicesChanged(IEnumerable<int> selectedIndices)
         {
             // Convert IEnumerable to a list to allow for multiple-iteration
@@ -78,8 +77,7 @@ namespace UnityEngine.InputSystem.Editor
 
             OnSelectedIndicesChanged(this.m_SelectedIndices);
         }
-
-        #endif
+#endif
 
         private void OnSelectedIndicesChanged(IEnumerable<int> selectedIndices)
         {

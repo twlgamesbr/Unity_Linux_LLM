@@ -1,9 +1,9 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 using Unity.Entities.SourceGen.Common;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
@@ -24,10 +24,12 @@ namespace Unity.Entities.Analyzer
             });
         }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-            EntitiesDiagnostics.k_Ea0004Descriptor,
-            EntitiesDiagnostics.k_Ea0005Descriptor,
-            EntitiesDiagnostics.k_Ea0006Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+            ImmutableArray.Create(
+                EntitiesDiagnostics.k_Ea0004Descriptor,
+                EntitiesDiagnostics.k_Ea0005Descriptor,
+                EntitiesDiagnostics.k_Ea0006Descriptor
+            );
 
         static void AnalyzeInvocation(OperationAnalysisContext context)
         {
@@ -42,36 +44,58 @@ namespace Unity.Entities.Analyzer
             var propertyReferenceOperation = (IPropertyReferenceOperation)context.Operation;
 
             var containingType = propertyReferenceOperation.Property.ContainingType;
-            AnalyzeMember(context, containingType, propertyReferenceOperation,
-                propertyReferenceOperation.Property.Name);
+            AnalyzeMember(
+                context,
+                containingType,
+                propertyReferenceOperation,
+                propertyReferenceOperation.Property.Name
+            );
         }
 
-        static void AnalyzeMember(OperationAnalysisContext context, INamedTypeSymbol containingType,
-            IOperation targetOperation, string targetName)
+        static void AnalyzeMember(
+            OperationAnalysisContext context,
+            INamedTypeSymbol containingType,
+            IOperation targetOperation,
+            string targetName
+        )
         {
-            if (containingType is {IsStatic: true} && containingType.Is("global::Unity.Entities.SystemAPI"))
+            if (containingType is { IsStatic: true } && containingType.Is("global::Unity.Entities.SystemAPI"))
             {
                 var parentTypeDeclarationSyntax = targetOperation.Syntax.AncestorOfKind<TypeDeclarationSyntax>();
                 var invocationContainingType = ModelExtensions.GetDeclaredSymbol(
-                    targetOperation.SemanticModel, parentTypeDeclarationSyntax);
+                    targetOperation.SemanticModel,
+                    parentTypeDeclarationSyntax
+                );
 
-                if (invocationContainingType is INamedTypeSymbol namedContainingType &&
-                    !namedContainingType.TryGetSystemType().IsSystemType)
+                if (
+                    invocationContainingType is INamedTypeSymbol namedContainingType
+                    && !namedContainingType.TryGetSystemType().IsSystemType
+                )
                 {
                     // Emit diagnostic if we are in a non-system type
-                    EmitDiagnostic(EntitiesDiagnostics.k_Ea0004Descriptor, context,
-                        targetOperation.Syntax.GetLocation(), targetName);
+                    EmitDiagnostic(
+                        EntitiesDiagnostics.k_Ea0004Descriptor,
+                        context,
+                        targetOperation.Syntax.GetLocation(),
+                        targetName
+                    );
                 }
                 else
                 {
                     // Emit diagnostic if we are in a static method
                     var methodDeclarationSyntax =
                         targetOperation.Syntax.AncestorOfKindOrDefault<MethodDeclarationSyntax>();
-                    if (methodDeclarationSyntax != null &&
-                        methodDeclarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword)))
+                    if (
+                        methodDeclarationSyntax != null
+                        && methodDeclarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword))
+                    )
                     {
-                        EmitDiagnostic(EntitiesDiagnostics.k_Ea0006Descriptor, context,
-                            targetOperation.Syntax.GetLocation(), targetName);
+                        EmitDiagnostic(
+                            EntitiesDiagnostics.k_Ea0006Descriptor,
+                            context,
+                            targetOperation.Syntax.GetLocation(),
+                            targetName
+                        );
                     }
 
                     // Emit diagnostic if we are inside an Entities.ForEach (method invocations disallowed)
@@ -87,8 +111,12 @@ namespace Unity.Entities.Analyzer
                             {
                                 if (SystemAPIMethods.EFEAllowedAPIMethods.All(method => method[0] != targetName))
                                 {
-                                    EmitDiagnostic(EntitiesDiagnostics.k_Ea0005Descriptor, context,
-                                        targetOperation.Syntax.GetLocation(), targetName);
+                                    EmitDiagnostic(
+                                        EntitiesDiagnostics.k_Ea0005Descriptor,
+                                        context,
+                                        targetOperation.Syntax.GetLocation(),
+                                        targetName
+                                    );
                                 }
                             }
                         }
@@ -105,8 +133,10 @@ namespace Unity.Entities.Analyzer
                 {
                     var subString = lambdaInvocationString.Substring(entitiesStr.Length);
                     var charIdx = 0;
-                    while (charIdx < subString.Length &&
-                           (char.IsWhiteSpace(subString[charIdx]) || subString[charIdx] == '.'))
+                    while (
+                        charIdx < subString.Length
+                        && (char.IsWhiteSpace(subString[charIdx]) || subString[charIdx] == '.')
+                    )
                         charIdx++;
                     if (subString.Substring(charIdx).StartsWith("ForEach"))
                         return true;
@@ -115,7 +145,12 @@ namespace Unity.Entities.Analyzer
                 return false;
             }
 
-            static void EmitDiagnostic(DiagnosticDescriptor descriptor, OperationAnalysisContext context, Location location, string name)
+            static void EmitDiagnostic(
+                DiagnosticDescriptor descriptor,
+                OperationAnalysisContext context,
+                Location location,
+                string name
+            )
             {
                 context.ReportDiagnostic(Diagnostic.Create(descriptor, location, name));
             }

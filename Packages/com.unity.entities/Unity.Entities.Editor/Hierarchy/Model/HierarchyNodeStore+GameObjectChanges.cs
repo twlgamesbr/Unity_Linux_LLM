@@ -14,7 +14,11 @@ namespace Unity.Entities.Editor
 {
     partial struct HierarchyNodeStore
     {
-        public IntegrateGameObjectChangesEnumerator CreateIntegrateGameObjectChangesEnumerator(HierarchyGameObjectChanges changes, SubSceneMap subSceneMap, int batchSize)
+        public IntegrateGameObjectChangesEnumerator CreateIntegrateGameObjectChangesEnumerator(
+            HierarchyGameObjectChanges changes,
+            SubSceneMap subSceneMap,
+            int batchSize
+        )
         {
             return new IntegrateGameObjectChangesEnumerator(this, subSceneMap, changes, batchSize);
         }
@@ -26,7 +30,7 @@ namespace Unity.Entities.Editor
                 HandleUnloadedScenes,
                 HandleLoadedScenes,
                 IntegrateChanges,
-                Complete
+                Complete,
             }
 
             readonly HierarchyNodeStore m_Hierarchy;
@@ -41,7 +45,12 @@ namespace Unity.Entities.Editor
             int m_CurrentPosition;
             int m_BatchSize;
 
-            public IntegrateGameObjectChangesEnumerator(HierarchyNodeStore hierarchy, SubSceneMap subSceneMap, HierarchyGameObjectChanges changes, int batchSize)
+            public IntegrateGameObjectChangesEnumerator(
+                HierarchyNodeStore hierarchy,
+                SubSceneMap subSceneMap,
+                HierarchyGameObjectChanges changes,
+                int batchSize
+            )
             {
                 m_Hierarchy = hierarchy;
                 m_SubSceneMap = subSceneMap;
@@ -49,7 +58,10 @@ namespace Unity.Entities.Editor
                 m_TotalCount = changes.GameObjectChangeTrackerEvents.Length;
                 m_CurrentPosition = 0;
                 m_BatchSize = batchSize > 0 ? math.min(batchSize, m_TotalCount) : m_TotalCount;
-                m_Events = changes.GameObjectChangeTrackerEvents.Length > 0 ? m_Changes.GameObjectChangeTrackerEvents.AsArray() : default;
+                m_Events =
+                    changes.GameObjectChangeTrackerEvents.Length > 0
+                        ? m_Changes.GameObjectChangeTrackerEvents.AsArray()
+                        : default;
                 m_Step = default;
 
                 SetStep(Step.HandleUnloadedScenes);
@@ -132,7 +144,11 @@ namespace Unity.Entities.Editor
                 if (EditorApplication.isPlaying)
                 {
                     var dontDestroyOnLoadScene = EditorSceneManagerBridge.GetDontDestroyOnLoadScene();
-                    if (dontDestroyOnLoadScene.IsValid() && dontDestroyOnLoadScene.isLoaded && dontDestroyOnLoadScene.rootCount > 0)
+                    if (
+                        dontDestroyOnLoadScene.IsValid()
+                        && dontDestroyOnLoadScene.isLoaded
+                        && dontDestroyOnLoadScene.rootCount > 0
+                    )
                         m_Changes.LoadedScenes.Add(dontDestroyOnLoadScene);
                 }
 
@@ -146,7 +162,9 @@ namespace Unity.Entities.Editor
                     if (!scene.isLoaded)
                         continue;
 
-                    var node = scene.isSubScene ? m_SubSceneMap.GetSubSceneNodeHandleFromScene(scene) : HierarchyNodeHandle.FromScene(scene);
+                    var node = scene.isSubScene
+                        ? m_SubSceneMap.GetSubSceneNodeHandleFromScene(scene)
+                        : HierarchyNodeHandle.FromScene(scene);
 
                     if (!scene.isSubScene)
                     {
@@ -195,12 +213,11 @@ namespace Unity.Entities.Editor
                     }
 
                     if (!gameObject
-
-// Invalid scenes should be ignored by default, with the option to fail when encountered.
+                    // Invalid scenes should be ignored by default, with the option to fail when encountered.
 #if !DOTS_HIERARCHY_FAIL_ON_INVALID_SCENES
                         || !gameObject.scene.IsValid()
 #endif
-                       )
+                    )
                         continue;
                     var parent = GetParentNodeHandle(gameObject);
                     if (!m_Hierarchy.Exists(parent))
@@ -209,7 +226,10 @@ namespace Unity.Entities.Editor
                         for (var j = m_CurrentPosition; j < m_TotalCount; j++)
                         {
                             var evt = m_Events[j];
-                            if (evt.EntityId == parent.ToEntityId() && (evt.EventType & GameObjectChangeTrackerEventType.Destroyed) == 0)
+                            if (
+                                evt.EntityId == parent.ToEntityId()
+                                && (evt.EventType & GameObjectChangeTrackerEventType.Destroyed) == 0
+                            )
                             {
                                 // replace the current event with the one found
                                 m_Events[m_CurrentPosition] = evt;
@@ -249,11 +269,18 @@ namespace Unity.Entities.Editor
                         }
                     }
 
-                    if (((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedScene) != 0 || ((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedParent) != 0)))
+                    if (
+                        (
+                            (changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedScene) != 0
+                            || ((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedParent) != 0)
+                        )
+                    )
                     {
                         if (!m_Hierarchy.Exists(parent))
                         {
-                            Debug.Log($"[{changeTrackerEvent.EventType}]: Ignoring GameObject {gameObject.name} ({gameObject.GetEntityId()}), expected parent {parent} does not exist in the hierarchy");
+                            Debug.Log(
+                                $"[{changeTrackerEvent.EventType}]: Ignoring GameObject {gameObject.name} ({gameObject.GetEntityId()}), expected parent {parent} does not exist in the hierarchy"
+                            );
                         }
                         else
                         {
@@ -273,7 +300,10 @@ namespace Unity.Entities.Editor
                 }
             }
 
-            public void Reset() => throw new InvalidOperationException($"{nameof(IntegrateGameObjectChangesEnumerator)} can not be reset. Instead a new instance should be used with a new change set.");
+            public void Reset() =>
+                throw new InvalidOperationException(
+                    $"{nameof(IntegrateGameObjectChangesEnumerator)} can not be reset. Instead a new instance should be used with a new change set."
+                );
 
             public object Current => null;
 
@@ -283,10 +313,12 @@ namespace Unity.Entities.Editor
             {
                 if (!gameObject.transform.parent)
                 {
-// Invalid scenes should be ignored by default, with the option to fail when encountered.
+                    // Invalid scenes should be ignored by default, with the option to fail when encountered.
 #if DOTS_HIERARCHY_FAIL_ON_INVALID_SCENES
-                if (!gameObject.scene.IsValid())
-                    throw new System.InvalidOperationException($"GameObject {gameObject.name} ({gameObject.GetEntityId()}) is at root of a scene marked as not valid");
+                    if (!gameObject.scene.IsValid())
+                        throw new System.InvalidOperationException(
+                            $"GameObject {gameObject.name} ({gameObject.GetEntityId()}) is at root of a scene marked as not valid"
+                        );
 #endif
 
                     // No GO parent, parent must be a scene
@@ -359,7 +391,11 @@ namespace Unity.Entities.Editor
 
         HierarchyNodeHandle GetNodeHandle(GameObject gameObject, SubSceneMap subSceneMap)
         {
-            if (gameObject.TryGetComponent<SubScene>(out var subScene) && subScene.SceneGUID != default && subSceneMap.TryGetSubSceneNodeHandle(subScene, out var handle))
+            if (
+                gameObject.TryGetComponent<SubScene>(out var subScene)
+                && subScene.SceneGUID != default
+                && subSceneMap.TryGetSubSceneNodeHandle(subScene, out var handle)
+            )
                 return handle;
 
             return HierarchyNodeHandle.FromGameObject(gameObject);

@@ -24,7 +24,12 @@ namespace UnityEngine.PathTracing.Core
         public TextureQuadTree(int size)
         {
             _size = size;
-            var root = new TextureNode() { PosX = 0, PosY = 0, Size = _size };
+            var root = new TextureNode()
+            {
+                PosX = 0,
+                PosY = 0,
+                Size = _size,
+            };
             _leaves = new List<TextureNode>() { root };
         }
 
@@ -35,28 +40,28 @@ namespace UnityEngine.PathTracing.Core
                 PosX = node.PosX,
                 PosY = node.PosY,
                 Size = node.Size / 2,
-                Parent = node
+                Parent = node,
             };
             node.BottomLeft = new TextureNode()
             {
                 PosX = node.PosX,
                 PosY = node.PosY + node.Size / 2,
                 Size = node.Size / 2,
-                Parent = node
+                Parent = node,
             };
             node.TopRight = new TextureNode()
             {
                 PosX = node.PosX + node.Size / 2,
                 PosY = node.PosY,
                 Size = node.Size / 2,
-                Parent = node
+                Parent = node,
             };
             node.BottomRight = new TextureNode()
             {
                 PosX = node.PosX + node.Size / 2,
                 PosY = node.PosY + node.Size / 2,
                 Size = node.Size / 2,
-                Parent = node
+                Parent = node,
             };
         }
 
@@ -111,11 +116,10 @@ namespace UnityEngine.PathTracing.Core
         {
             bool ShouldCollapse(TextureNode node)
             {
-                return
-                    (node.TopLeft == null || _leaves.Contains(node.TopLeft)) &&
-                    (node.TopRight == null || _leaves.Contains(node.TopRight)) &&
-                    (node.BottomLeft == null || _leaves.Contains(node.BottomLeft)) &&
-                    (node.BottomRight == null || _leaves.Contains(node.BottomRight));
+                return (node.TopLeft == null || _leaves.Contains(node.TopLeft))
+                    && (node.TopRight == null || _leaves.Contains(node.TopRight))
+                    && (node.BottomLeft == null || _leaves.Contains(node.BottomLeft))
+                    && (node.BottomRight == null || _leaves.Contains(node.BottomRight));
             }
 
             // Add the node to the list of leaves

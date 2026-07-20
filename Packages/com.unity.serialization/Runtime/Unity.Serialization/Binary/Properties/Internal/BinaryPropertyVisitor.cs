@@ -9,7 +9,7 @@ namespace Unity.Serialization.Binary
         protected const byte k_TokenPolymorphic = 2;
         protected const byte k_TokenUnityEngineObjectReference = 3;
         protected const byte k_TokenSerializedReference = 4;
-        
+
         /// <summary>
         /// Scope used to lock the current visitor as being in use.
         /// </summary>
@@ -33,7 +33,7 @@ namespace Unity.Serialization.Binary
                 m_Visitor.IsLocked = false;
             }
         }
-        
+
         /// <summary>
         /// Returns true if the reader is currently in use.
         /// </summary>
@@ -43,7 +43,6 @@ namespace Unity.Serialization.Binary
         /// Creates a lock scope for the visitation.
         /// </summary>
         /// <returns>A disposable scope.</returns>
-        internal LockScope Lock()
-            => new LockScope(this);
+        internal LockScope Lock() => new LockScope(this);
     }
 }

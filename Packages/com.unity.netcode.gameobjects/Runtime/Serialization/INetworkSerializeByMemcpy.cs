@@ -1,4 +1,3 @@
-
 namespace Unity.Netcode
 {
     /// <summary>
@@ -9,7 +8,5 @@ namespace Unity.Netcode
     /// like `NativeList&lt;T&gt;`), it should be serialized via `INetworkSerializable` or via
     /// `FastBufferReader`/`FastBufferWriter` extension methods.
     /// </summary>
-    public interface INetworkSerializeByMemcpy
-    {
-    }
+    public interface INetworkSerializeByMemcpy { }
 }

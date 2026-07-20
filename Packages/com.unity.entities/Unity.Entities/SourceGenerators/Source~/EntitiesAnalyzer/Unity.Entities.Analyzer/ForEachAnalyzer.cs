@@ -1,6 +1,6 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.Operations;
 using Unity.Entities.SourceGen.Common;
 
@@ -16,12 +16,14 @@ namespace Unity.Entities.Analyzer
             context.RegisterOperationAction(Analyze, OperationKind.PropertyReference);
         }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-            EntitiesDiagnostics.k_Ea0011Descriptor,
-            EntitiesDiagnostics.k_Ea0012Descriptor,
-            EntitiesDiagnostics.k_Ea0013Descriptor,
-            EntitiesDiagnostics.k_Ea0014Descriptor,
-            EntitiesDiagnostics.k_Ea0015Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+            ImmutableArray.Create(
+                EntitiesDiagnostics.k_Ea0011Descriptor,
+                EntitiesDiagnostics.k_Ea0012Descriptor,
+                EntitiesDiagnostics.k_Ea0013Descriptor,
+                EntitiesDiagnostics.k_Ea0014Descriptor,
+                EntitiesDiagnostics.k_Ea0015Descriptor
+            );
 
         static void Analyze(OperationAnalysisContext context)
         {
@@ -33,7 +35,9 @@ namespace Unity.Entities.Analyzer
             var isEntities = propertyReferenceOperation.Property.Name == "Entities";
             if (!isEntities && !isJob)
                 return;
-            if (propertyReferenceOperation.Property.ContainingSymbol.ToFullName() != "global::Unity.Entities.SystemBase")
+            if (
+                propertyReferenceOperation.Property.ContainingSymbol.ToFullName() != "global::Unity.Entities.SystemBase"
+            )
                 return;
 
             var parent = propertyReferenceOperation.Parent;
@@ -78,13 +82,21 @@ namespace Unity.Entities.Analyzer
                 // We have a solitary "Entities" or "Job" statement.
                 if (isJob)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0015Descriptor,
-                        propertyReferenceOperation.Syntax.GetLocation()));
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            EntitiesDiagnostics.k_Ea0015Descriptor,
+                            propertyReferenceOperation.Syntax.GetLocation()
+                        )
+                    );
                 }
                 else
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0014Descriptor,
-                        propertyReferenceOperation.Syntax.GetLocation()));
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            EntitiesDiagnostics.k_Ea0014Descriptor,
+                            propertyReferenceOperation.Syntax.GetLocation()
+                        )
+                    );
                 }
                 return;
             }
@@ -94,8 +106,12 @@ namespace Unity.Entities.Analyzer
                 if (isEntities && countForEach == 0 && countTerminator == 0)
                 {
                     // We have an "Entities" statement, but no "ForEach()" or any terminating statement.
-                    context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0011Descriptor,
-                        invocationOperation.Syntax.GetLocation()));
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            EntitiesDiagnostics.k_Ea0011Descriptor,
+                            invocationOperation.Syntax.GetLocation()
+                        )
+                    );
                     return;
                 }
 
@@ -105,13 +121,21 @@ namespace Unity.Entities.Analyzer
                     // The chain is not terminated.
                     if (isJob)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0013Descriptor,
-                            invocationOperation.Syntax.GetLocation()));
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                EntitiesDiagnostics.k_Ea0013Descriptor,
+                                invocationOperation.Syntax.GetLocation()
+                            )
+                        );
                     }
                     else
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0012Descriptor,
-                            invocationOperation.Syntax.GetLocation()));
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                EntitiesDiagnostics.k_Ea0012Descriptor,
+                                invocationOperation.Syntax.GetLocation()
+                            )
+                        );
                     }
                 }
             }

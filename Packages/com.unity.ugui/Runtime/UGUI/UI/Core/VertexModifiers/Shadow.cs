@@ -21,8 +21,7 @@ namespace UnityEngine.UI
 
         private const float kMaxEffectDistance = 600f;
 
-        protected Shadow()
-        {}
+        protected Shadow() { }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -30,7 +29,6 @@ namespace UnityEngine.UI
             effectDistance = m_EffectDistance;
             base.OnValidate();
         }
-
 #endif
         /// <summary>
         /// Color for the effect

@@ -27,7 +27,19 @@ namespace Unity.Serialization.Json
         /// <returns>A json string.</returns>
         public static string ToJson<T>(T value, JsonSerializationParameters parameters = default)
         {
-            using (var writer = new JsonWriter(parameters.InitialCapacity, Allocator.Temp, new JsonWriterOptions {Minified = parameters.Minified, Simplified = parameters.Simplified, Indent = parameters.Indent, StringEscapeHandling = parameters.StringEscapeHandling}))
+            using (
+                var writer = new JsonWriter(
+                    parameters.InitialCapacity,
+                    Allocator.Temp,
+                    new JsonWriterOptions
+                    {
+                        Minified = parameters.Minified,
+                        Simplified = parameters.Simplified,
+                        Indent = parameters.Indent,
+                        StringEscapeHandling = parameters.StringEscapeHandling,
+                    }
+                )
+            )
             {
                 ToJson(writer, value, parameters);
                 return writer.ToString();
@@ -44,9 +56,10 @@ namespace Unity.Serialization.Json
         public static void ToJson<T>(JsonWriter writer, T value, JsonSerializationParameters parameters = default)
         {
             var container = new PropertyWrapper<T>(value);
-            
+
             var serializedReferences = default(SerializedReferences);
-            var state = parameters.State ?? (parameters.RequiresThreadSafety ? new JsonSerializationState() : GetSharedState());
+            var state =
+                parameters.State ?? (parameters.RequiresThreadSafety ? new JsonSerializationState() : GetSharedState());
 
             if (!parameters.DisableSerializedReferences)
             {
@@ -57,14 +70,14 @@ namespace Unity.Serialization.Json
             }
 
             var visitor = state.GetJsonPropertyWriter();
-            
+
             visitor.SetWriter(writer);
             visitor.SetSerializedType(parameters.SerializedType);
             visitor.SetDisableRootAdapters(parameters.DisableRootAdapters);
             visitor.SetGlobalAdapters(GetGlobalAdapters());
             visitor.SetUserDefinedAdapters(parameters.UserDefinedAdapters);
             visitor.SetGlobalMigrations(GetGlobalMigrations());
-            visitor.SetUserDefinedMigration(parameters.UserDefinedMigrations); 
+            visitor.SetUserDefinedMigration(parameters.UserDefinedMigrations);
             visitor.SetSerializedReferences(serializedReferences);
 
             using (visitor.Lock())

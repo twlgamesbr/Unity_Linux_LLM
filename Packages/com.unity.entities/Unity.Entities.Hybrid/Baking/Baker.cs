@@ -1,12 +1,13 @@
 using System;
-using Unity.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Entities.Baking;
+using Unity.Entities.Conversion;
+using UnityEngine;
 #if UNITY_EDITOR
 using Unity.Entities.Build;
 #endif
-using Unity.Entities.Baking;
-using UnityEngine;
-using Unity.Entities.Conversion;
+
 
 namespace Unity.Entities
 {
@@ -14,7 +15,7 @@ namespace Unity.Entities
     /// This type is used to identify identities that had any baking done on them before the BakingSystems ran
     /// </summary>
     [TemporaryBakingType]
-    public struct BakedEntity : IComponentData {}
+    public struct BakedEntity : IComponentData { }
 
     /// <summary>
     /// This class contains all the methods to bake a authoring component to an Entity.
@@ -30,21 +31,21 @@ namespace Unity.Entities
         /// </summary>
         internal struct BakerExecutionState
         {
-            internal Component                                AuthoringSource;
-            internal GameObject                               AuthoringObject;
-            internal EntityId                                 AuthoringId;
-            internal BakerState*                              BakerState;
-            internal BakerEntityUsage*                        Usage;
-            internal BakeDependencies.RecordedDependencies*   Dependencies;
-            internal BakerDebugState*                         DebugState;
-            internal BakedEntityData*                         BakedEntityData;
-            internal Entity                                   PrimaryEntity;
-            internal EntityCommandBuffer                      Ecb;
-            internal BakerDebugState.DebugState               DebugIndex;
-            internal BlobAssetStore                           BlobAssetStore;
-            internal World                                    World;
+            internal Component AuthoringSource;
+            internal GameObject AuthoringObject;
+            internal EntityId AuthoringId;
+            internal BakerState* BakerState;
+            internal BakerEntityUsage* Usage;
+            internal BakeDependencies.RecordedDependencies* Dependencies;
+            internal BakerDebugState* DebugState;
+            internal BakedEntityData* BakedEntityData;
+            internal Entity PrimaryEntity;
+            internal EntityCommandBuffer Ecb;
+            internal BakerDebugState.DebugState DebugIndex;
+            internal BlobAssetStore BlobAssetStore;
+            internal World World;
 #if UNITY_EDITOR
-            internal IEntitiesPlayerSettings                  DotsSettings;
+            internal IEntitiesPlayerSettings DotsSettings;
 #endif
 
             /// <summary>Exists to give context to error messages.</summary>
@@ -53,12 +54,15 @@ namespace Unity.Entities
                 if (!AuthoringObject)
                     return $"Baked in World '{World.Name}'."; // World at least gives some context. E.g. With incremental baking, it'll include scene name.
                 var scene = AuthoringObject.scene; // Scene can be null (i.e. Invalid) when the AuthoringObject is a prefab that is only referenced in a SubScene.
-                var sceneInfo = scene.IsValid() && !string.IsNullOrWhiteSpace(scene.path) ? $" in {(scene.isSubScene ? "SubScene" : "Scene")} '{scene.path}'" : "";
+                var sceneInfo =
+                    scene.IsValid() && !string.IsNullOrWhiteSpace(scene.path)
+                        ? $" in {(scene.isSubScene ? "SubScene" : "Scene")} '{scene.path}'"
+                        : "";
                 return $"GameObject '{AuthoringObject.name}'{sceneInfo}, baked in World '{World.Name}'.";
             }
         }
 
-        internal BakerExecutionState  _State;
+        internal BakerExecutionState _State;
 
         /// <summary>
         /// Get the GUID of the current scene
@@ -69,7 +73,7 @@ namespace Unity.Entities
             return _State.BakedEntityData->_SceneGUID;
         }
 
-#region GetComponent Methods
+        #region GetComponent Methods
 
         /// <summary>
         /// Retrieves the component of Type T in the GameObject
@@ -77,7 +81,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponent<T>() where T : Component
+        public T GetComponent<T>()
+            where T : Component
         {
             var gameObject = _State.AuthoringObject;
             return GetComponentInternal<T>(gameObject);
@@ -90,7 +95,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponent<T>(Component component) where T : Component
+        public T GetComponent<T>(Component component)
+            where T : Component
         {
             return GetComponentInternal<T>(component.gameObject);
         }
@@ -102,7 +108,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponent<T>(GameObject gameObject) where T : Component
+        public T GetComponent<T>(GameObject gameObject)
+            where T : Component
         {
             return GetComponentInternal<T>(gameObject);
         }
@@ -114,11 +121,17 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        private T GetComponentInternal<T>(GameObject gameObject) where T : Component
+        private T GetComponentInternal<T>(GameObject gameObject)
+            where T : Component
         {
             var hasComponent = gameObject.TryGetComponent<T>(out var returnedComponent);
 
-            _State.Dependencies->DependOnGetComponent(gameObject.GetEntityId(), TypeManager.GetTypeIndex<T>(), hasComponent ? returnedComponent.GetEntityId() : EntityId.None, BakeDependencies.GetComponentDependencyType.GetComponent);
+            _State.Dependencies->DependOnGetComponent(
+                gameObject.GetEntityId(),
+                TypeManager.GetTypeIndex<T>(),
+                hasComponent ? returnedComponent.GetEntityId() : EntityId.None,
+                BakeDependencies.GetComponentDependencyType.GetComponent
+            );
 
             // Transform component takes an implicit dependency on the entire parent hierarchy
             // since transform.position and friends returns a value calculated from all parents
@@ -135,7 +148,8 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponents<T>(List<T> components) where T : Component
+        public void GetComponents<T>(List<T> components)
+            where T : Component
         {
             var gameObject = _State.AuthoringObject;
             GetComponents<T>(gameObject, components);
@@ -148,7 +162,8 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponents<T>(Component component, List<T> components) where T : Component
+        public void GetComponents<T>(Component component, List<T> components)
+            where T : Component
         {
             GetComponents<T>(component.gameObject, components);
         }
@@ -160,11 +175,17 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponents<T>(GameObject gameObject, List<T> components) where T : Component
+        public void GetComponents<T>(GameObject gameObject, List<T> components)
+            where T : Component
         {
             gameObject.GetComponents<T>(components);
 
-            _State.Dependencies->DependOnGetComponents(gameObject.GetEntityId(), TypeManager.GetOrCreateTypeIndex(typeof(T)), components, BakeDependencies.GetComponentDependencyType.GetComponent);
+            _State.Dependencies->DependOnGetComponents(
+                gameObject.GetEntityId(),
+                TypeManager.GetOrCreateTypeIndex(typeof(T)),
+                components,
+                BakeDependencies.GetComponentDependencyType.GetComponent
+            );
 
             foreach (var component in components)
             {
@@ -182,7 +203,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponents<T>() where T : Component
+        public T[] GetComponents<T>()
+            where T : Component
         {
             var gameObject = _State.AuthoringObject;
             return GetComponents<T>(gameObject);
@@ -195,7 +217,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponents<T>(Component component) where T : Component
+        public T[] GetComponents<T>(Component component)
+            where T : Component
         {
             return GetComponents<T>(component.gameObject);
         }
@@ -207,11 +230,17 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponents<T>(GameObject gameObject) where T : Component
+        public T[] GetComponents<T>(GameObject gameObject)
+            where T : Component
         {
             var components = gameObject.GetComponents<T>();
 
-            _State.Dependencies->DependOnGetComponents(gameObject.GetEntityId(), TypeManager.GetTypeIndex<T>(), components, BakeDependencies.GetComponentDependencyType.GetComponent);
+            _State.Dependencies->DependOnGetComponents(
+                gameObject.GetEntityId(),
+                TypeManager.GetTypeIndex<T>(),
+                components,
+                BakeDependencies.GetComponentDependencyType.GetComponent
+            );
 
             foreach (var component in components)
             {
@@ -230,7 +259,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of Component to retrieve</typeparam>
         /// <returns>Returns a component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponentInParent<T>() where T : Component
+        public T GetComponentInParent<T>()
+            where T : Component
         {
             return GetComponentInParent<T>(_State.AuthoringObject);
         }
@@ -242,7 +272,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponentInParent<T>(Component component) where T : Component
+        public T GetComponentInParent<T>(Component component)
+            where T : Component
         {
             return GetComponentInParent<T>(component.gameObject);
         }
@@ -254,11 +285,17 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponentInParent<T>(GameObject gameObject) where T : Component
+        public T GetComponentInParent<T>(GameObject gameObject)
+            where T : Component
         {
             var component = gameObject.GetComponentInParent<T>(kDefaultIncludeInactive);
 
-            _State.Dependencies->DependOnGetComponent(gameObject.GetEntityId(), TypeManager.GetOrCreateTypeIndex(typeof(T)), component != null ? component.GetEntityId() : EntityId.None, BakeDependencies.GetComponentDependencyType.GetComponentInParent);
+            _State.Dependencies->DependOnGetComponent(
+                gameObject.GetEntityId(),
+                TypeManager.GetOrCreateTypeIndex(typeof(T)),
+                component != null ? component.GetEntityId() : EntityId.None,
+                BakeDependencies.GetComponentDependencyType.GetComponentInParent
+            );
 
             // Transform component takes an implicit dependency on the entire parent hierarchy
             // since transform.position and friends returns a value calculated from all parents
@@ -275,7 +312,8 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponentsInParent<T>(List<T> components) where T : Component
+        public void GetComponentsInParent<T>(List<T> components)
+            where T : Component
         {
             GetComponentsInParent<T>(_State.AuthoringObject, components);
         }
@@ -287,7 +325,8 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponentsInParent<T>(Component component, List<T> components) where T : Component
+        public void GetComponentsInParent<T>(Component component, List<T> components)
+            where T : Component
         {
             GetComponentsInParent<T>(component.gameObject, components);
         }
@@ -299,11 +338,17 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponentsInParent<T>(GameObject gameObject, List<T> components) where T : Component
+        public void GetComponentsInParent<T>(GameObject gameObject, List<T> components)
+            where T : Component
         {
             gameObject.GetComponentsInParent<T>(kDefaultIncludeInactive, components);
 
-            _State.Dependencies->DependOnGetComponents(gameObject.GetEntityId(), TypeManager.GetTypeIndex<T>(), components, BakeDependencies.GetComponentDependencyType.GetComponentInParent);
+            _State.Dependencies->DependOnGetComponents(
+                gameObject.GetEntityId(),
+                TypeManager.GetTypeIndex<T>(),
+                components,
+                BakeDependencies.GetComponentDependencyType.GetComponentInParent
+            );
 
             foreach (var component in components)
             {
@@ -321,7 +366,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponentsInParent<T>() where T : Component
+        public T[] GetComponentsInParent<T>()
+            where T : Component
         {
             return GetComponentsInParent<T>(_State.AuthoringObject);
         }
@@ -333,7 +379,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponentsInParent<T>(Component component) where T : Component
+        public T[] GetComponentsInParent<T>(Component component)
+            where T : Component
         {
             return GetComponentsInParent<T>(component.gameObject);
         }
@@ -345,10 +392,16 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of components to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponentsInParent<T>(GameObject gameObject) where T : Component
+        public T[] GetComponentsInParent<T>(GameObject gameObject)
+            where T : Component
         {
             var components = gameObject.GetComponentsInParent<T>(kDefaultIncludeInactive);
-            _State.Dependencies->DependOnGetComponents(gameObject.GetEntityId(), TypeManager.GetTypeIndex<T>(), components, BakeDependencies.GetComponentDependencyType.GetComponentInParent);
+            _State.Dependencies->DependOnGetComponents(
+                gameObject.GetEntityId(),
+                TypeManager.GetTypeIndex<T>(),
+                components,
+                BakeDependencies.GetComponentDependencyType.GetComponentInParent
+            );
 
             foreach (var component in components)
             {
@@ -367,7 +420,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponentInChildren<T>() where T : Component
+        public T GetComponentInChildren<T>()
+            where T : Component
         {
             var gameObject = _State.AuthoringObject;
             return GetComponentInChildren<T>(gameObject);
@@ -380,7 +434,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponentInChildren<T>(Component component) where T : Component
+        public T GetComponentInChildren<T>(Component component)
+            where T : Component
         {
             return GetComponentInChildren<T>(component.gameObject);
         }
@@ -392,11 +447,17 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The component if a component matching the type is found, null otherwise</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public T GetComponentInChildren<T>(GameObject gameObject) where T : Component
+        public T GetComponentInChildren<T>(GameObject gameObject)
+            where T : Component
         {
             var component = gameObject.GetComponentInChildren<T>(kDefaultIncludeInactive);
 
-            _State.Dependencies->DependOnGetComponent(gameObject.GetEntityId(), TypeManager.GetTypeIndex<T>(), component != null ? component.GetEntityId() : EntityId.None, BakeDependencies.GetComponentDependencyType.GetComponentInChildren);
+            _State.Dependencies->DependOnGetComponent(
+                gameObject.GetEntityId(),
+                TypeManager.GetTypeIndex<T>(),
+                component != null ? component.GetEntityId() : EntityId.None,
+                BakeDependencies.GetComponentDependencyType.GetComponentInChildren
+            );
 
             // Transform component takes an implicit dependency on the entire parent hierarchy
             // since transform.position and friends returns a value calculated from all parents
@@ -412,7 +473,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of component to retrieve</typeparam>
-        public void GetComponentsInChildren<T>(List<T> components) where T : Component
+        public void GetComponentsInChildren<T>(List<T> components)
+            where T : Component
         {
             GetComponentsInChildren<T>(_State.AuthoringObject, components);
         }
@@ -424,7 +486,8 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponentsInChildren<T>(Component refComponent, List<T> components) where T : Component
+        public void GetComponentsInChildren<T>(Component refComponent, List<T> components)
+            where T : Component
         {
             GetComponentsInChildren<T>(refComponent.gameObject, components);
         }
@@ -436,11 +499,17 @@ namespace Unity.Entities
         /// <param name="components">The components of Type T</param>
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <remarks>This will take a dependency on the components</remarks>
-        public void GetComponentsInChildren<T>(GameObject gameObject, List<T> components) where T : Component
+        public void GetComponentsInChildren<T>(GameObject gameObject, List<T> components)
+            where T : Component
         {
             gameObject.GetComponentsInChildren(kDefaultIncludeInactive, components);
 
-            _State.Dependencies->DependOnGetComponents(gameObject.GetEntityId(), TypeManager.GetTypeIndex<T>(), components, BakeDependencies.GetComponentDependencyType.GetComponentInChildren);
+            _State.Dependencies->DependOnGetComponents(
+                gameObject.GetEntityId(),
+                TypeManager.GetTypeIndex<T>(),
+                components,
+                BakeDependencies.GetComponentDependencyType.GetComponentInChildren
+            );
 
             foreach (var component in components)
             {
@@ -458,7 +527,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponentsInChildren<T>() where T : Component
+        public T[] GetComponentsInChildren<T>()
+            where T : Component
         {
             return GetComponentsInChildren<T>(_State.AuthoringObject);
         }
@@ -470,7 +540,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponentsInChildren<T>(Component component) where T : Component
+        public T[] GetComponentsInChildren<T>(Component component)
+            where T : Component
         {
             return GetComponentsInChildren<T>(component.gameObject);
         }
@@ -482,11 +553,17 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to retrieve</typeparam>
         /// <returns>The components of Type T</returns>
         /// <remarks>This will take a dependency on the components</remarks>
-        public T[] GetComponentsInChildren<T>(GameObject gameObject) where T : Component
+        public T[] GetComponentsInChildren<T>(GameObject gameObject)
+            where T : Component
         {
             var components = gameObject.GetComponentsInChildren<T>(kDefaultIncludeInactive);
 
-            _State.Dependencies->DependOnGetComponents(gameObject.GetEntityId(), TypeManager.GetTypeIndex<T>(), components, BakeDependencies.GetComponentDependencyType.GetComponentInChildren);
+            _State.Dependencies->DependOnGetComponents(
+                gameObject.GetEntityId(),
+                TypeManager.GetTypeIndex<T>(),
+                components,
+                BakeDependencies.GetComponentDependencyType.GetComponentInChildren
+            );
 
             foreach (var component in components)
             {
@@ -499,9 +576,9 @@ namespace Unity.Entities
             return components;
         }
 
-#endregion
+        #endregion
 
-#region Get Methods
+        #region Get Methods
 
         /// <summary>
         /// Returns the parent of the GameObject
@@ -539,7 +616,12 @@ namespace Unity.Entities
                 parent = parentTransform.gameObject;
             }
 
-            _State.Dependencies->DependOnGetHierarchySingle(gameObject.GetEntityId(), parent != null ? parent.GetEntityId() : EntityId.None, 0, BakeDependencies.GetHierarchySingleDependencyType.Parent);
+            _State.Dependencies->DependOnGetHierarchySingle(
+                gameObject.GetEntityId(),
+                parent != null ? parent.GetEntityId() : EntityId.None,
+                0,
+                BakeDependencies.GetHierarchySingleDependencyType.Parent
+            );
 
             return parent;
         }
@@ -615,7 +697,11 @@ namespace Unity.Entities
                 parentTransform = parentTransform.parent;
             }
 
-            _State.Dependencies->DependOnGetHierarchy(gameObject.GetEntityId(), parents, BakeDependencies.GetHierarchyDependencyType.Parent);
+            _State.Dependencies->DependOnGetHierarchy(
+                gameObject.GetEntityId(),
+                parents,
+                BakeDependencies.GetHierarchyDependencyType.Parent
+            );
         }
 
         /// <summary>
@@ -657,7 +743,12 @@ namespace Unity.Entities
                 child = childTransform.gameObject;
             }
 
-            _State.Dependencies->DependOnGetHierarchySingle(gameObject.GetEntityId(), child != null ? child.GetEntityId() : EntityId.None, 0, BakeDependencies.GetHierarchySingleDependencyType.Child);
+            _State.Dependencies->DependOnGetHierarchySingle(
+                gameObject.GetEntityId(),
+                child != null ? child.GetEntityId() : EntityId.None,
+                0,
+                BakeDependencies.GetHierarchySingleDependencyType.Child
+            );
 
             return child;
         }
@@ -717,7 +808,11 @@ namespace Unity.Entities
         /// <param name="gameObjects">The children of the GameObject</param>
         /// <param name="includeChildrenRecursively">Whether all children in the hierarchy should be added recursively</param>
         /// <remarks>This will take a dependency on the children</remarks>
-        public void GetChildren(Component refComponent, List<GameObject> gameObjects, bool includeChildrenRecursively = false)
+        public void GetChildren(
+            Component refComponent,
+            List<GameObject> gameObjects,
+            bool includeChildrenRecursively = false
+        )
         {
             GetChildren(refComponent.gameObject, gameObjects, includeChildrenRecursively);
         }
@@ -729,7 +824,11 @@ namespace Unity.Entities
         /// <param name="gameObjects">The children of the GameObject</param>
         /// <param name="includeChildrenRecursively">Whether all children in the hierarchy should be added recursively</param>
         /// <remarks>This will take a dependency on the children</remarks>
-        public void GetChildren(GameObject gameObject, List<GameObject> gameObjects, bool includeChildrenRecursively = false)
+        public void GetChildren(
+            GameObject gameObject,
+            List<GameObject> gameObjects,
+            bool includeChildrenRecursively = false
+        )
         {
             gameObjects.Clear();
 
@@ -740,7 +839,11 @@ namespace Unity.Entities
                 {
                     gameObjects.Add(child.gameObject);
                 }
-                _State.Dependencies->DependOnGetHierarchy(gameObject.GetEntityId(), gameObjects, BakeDependencies.GetHierarchyDependencyType.ImmediateChildren);
+                _State.Dependencies->DependOnGetHierarchy(
+                    gameObject.GetEntityId(),
+                    gameObjects,
+                    BakeDependencies.GetHierarchyDependencyType.ImmediateChildren
+                );
             }
             else
             {
@@ -750,7 +853,11 @@ namespace Unity.Entities
                 {
                     gameObjects.Add(transforms[index].gameObject);
                 }
-                _State.Dependencies->DependOnGetHierarchy(gameObject.GetEntityId(), gameObjects, BakeDependencies.GetHierarchyDependencyType.AllChildren);
+                _State.Dependencies->DependOnGetHierarchy(
+                    gameObject.GetEntityId(),
+                    gameObjects,
+                    BakeDependencies.GetHierarchyDependencyType.AllChildren
+                );
             }
         }
 
@@ -784,7 +891,12 @@ namespace Unity.Entities
         public int GetChildCount(GameObject gameObject)
         {
             var childCount = gameObject.transform.childCount;
-            _State.Dependencies->DependOnGetHierarchySingle(gameObject.GetEntityId(), childCount, 0, BakeDependencies.GetHierarchySingleDependencyType.ChildCount);
+            _State.Dependencies->DependOnGetHierarchySingle(
+                gameObject.GetEntityId(),
+                childCount,
+                0,
+                BakeDependencies.GetHierarchySingleDependencyType.ChildCount
+            );
             return childCount;
         }
 
@@ -901,7 +1013,9 @@ namespace Unity.Entities
         /// </summary>
         /// <returns>The requested Entity</returns>
         /// <remarks>Implicitly it access the entity with TransformUsageFlags.Dynamic as TransformUsageFlags.</remarks>
-        [Obsolete("Use the version of the function with the explicit TransformUsageFlag parameter (RemovedAfter Entities 1.0)")]
+        [Obsolete(
+            "Use the version of the function with the explicit TransformUsageFlag parameter (RemovedAfter Entities 1.0)"
+        )]
         public Entity GetEntity()
         {
             return GetEntity(TransformUsageFlags.Dynamic);
@@ -913,7 +1027,9 @@ namespace Unity.Entities
         /// <param name="authoring">The GameObject whose Entity is requested</param>
         /// <returns>The requested Entity if found, null otherwise</returns>
         /// <remarks>Implicitly it access the entity with TransformUsageFlags.Dynamic as TransformUsageFlags.</remarks>
-        [Obsolete("Use the version of the function with the explicit TransformUsageFlag parameter (RemovedAfter Entities 1.0)")]
+        [Obsolete(
+            "Use the version of the function with the explicit TransformUsageFlag parameter (RemovedAfter Entities 1.0)"
+        )]
         public Entity GetEntity(GameObject authoring)
         {
             return GetEntity(authoring, TransformUsageFlags.Dynamic);
@@ -925,7 +1041,9 @@ namespace Unity.Entities
         /// <param name="authoring">The Object whose Entity is requested</param>
         /// <returns>The requested Entity if found, null otherwise</returns>
         /// <remarks>Implicitly it access the entity with TransformUsageFlags.Dynamic as TransformUsageFlags.</remarks>
-        [Obsolete("Use the version of the function with the explicit TransformUsageFlag parameter (RemovedAfter Entities 1.0)")]
+        [Obsolete(
+            "Use the version of the function with the explicit TransformUsageFlag parameter (RemovedAfter Entities 1.0)"
+        )]
         public Entity GetEntity(Component authoring)
         {
             return GetEntity(authoring, TransformUsageFlags.Dynamic);
@@ -1005,9 +1123,9 @@ namespace Unity.Entities
             return _State.PrimaryEntity;
         }
 
-#endregion
+        #endregion
 
-#region Check State
+        #region Check State
 
         /// <summary>
         /// Checks if the GameObject is active
@@ -1053,8 +1171,10 @@ namespace Unity.Entities
         public bool IsActiveAndEnabled()
         {
             if (this is GameObjectBaker)
-                throw new InvalidOperationException("The IsActiveAndEnabled() method cannot be called from a GameObjectBaker." +
-                    $"If you need to depend on the GameObject active state, use IsActive() instead. {_State.ErrorContextString()}");
+                throw new InvalidOperationException(
+                    "The IsActiveAndEnabled() method cannot be called from a GameObjectBaker."
+                        + $"If you need to depend on the GameObject active state, use IsActive() instead. {_State.ErrorContextString()}"
+                );
 
             return IsActiveAndEnabled(_State.AuthoringSource);
         }
@@ -1140,7 +1260,7 @@ namespace Unity.Entities
         /// <returns>True if the NetCode package present and the authoring component is baked in the Client World</returns>
         public bool IsClient()
         {
-            return (_State.World.Flags&WorldFlags.GameClient) == WorldFlags.GameClient;
+            return (_State.World.Flags & WorldFlags.GameClient) == WorldFlags.GameClient;
         }
 
         /// <summary>
@@ -1149,12 +1269,12 @@ namespace Unity.Entities
         /// <returns>True if the NetCode package present and the authoring component is baked in the Server World</returns>
         public bool IsServer()
         {
-            return (_State.World.Flags&WorldFlags.GameServer) == WorldFlags.GameServer;
+            return (_State.World.Flags & WorldFlags.GameServer) == WorldFlags.GameServer;
         }
 
-#endregion
+        #endregion
 
-#region Declare Dependencies
+        #region Declare Dependencies
 
         /// <summary>
         /// This will take a dependency on Object of type T.
@@ -1162,7 +1282,8 @@ namespace Unity.Entities
         /// <param name="dependency">The Object to take a dependency on.</param>
         /// <typeparam name="T">The type of the object. Must be derived from UnityEngine.Object.</typeparam>
         /// <returns>The Object of type T if a dependency was taken, null otherwise.</returns>
-        public T DependsOn<T>(T dependency) where T : UnityEngine.Object
+        public T DependsOn<T>(T dependency)
+            where T : UnityEngine.Object
         {
             _State.Dependencies->DependResolveReference(_State.AuthoringSource.GetEntityId(), dependency);
 
@@ -1179,7 +1300,8 @@ namespace Unity.Entities
         /// This will take a dependency on the first component of type T in the GameObject or any of its parent. Works recursively.
         /// </summary>
         /// <typeparam name="T">The type of the component to take a dependency on</typeparam>
-        public void DependsOnComponentInParent<T>() where T : Component
+        public void DependsOnComponentInParent<T>()
+            where T : Component
         {
             GetComponentInParent<T>();
         }
@@ -1189,7 +1311,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="component">The Object to take the component dependency on</param>
         /// <typeparam name="T">The type of the component to take a dependency on</typeparam>
-        public void DependsOnComponentInParent<T>(Component component) where T : Component
+        public void DependsOnComponentInParent<T>(Component component)
+            where T : Component
         {
             GetComponentInParent<T>(component);
         }
@@ -1199,7 +1322,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="gameObject">The GameObject to take the component dependency on</param>
         /// <typeparam name="T">The type of the component to take a dependency on</typeparam>
-        public void DependsOnComponentInParent<T>(GameObject gameObject) where T : Component
+        public void DependsOnComponentInParent<T>(GameObject gameObject)
+            where T : Component
         {
             GetComponentInParent<T>(gameObject);
         }
@@ -1208,7 +1332,8 @@ namespace Unity.Entities
         /// This will take a dependency on the components of type T in the GameObject or any of its parent. Works recursively.
         /// </summary>
         /// <typeparam name="T">The type of the components to take a dependency on</typeparam>
-        public void DependsOnComponentsInParent<T>() where T : Component
+        public void DependsOnComponentsInParent<T>()
+            where T : Component
         {
             GetComponentsInParent<T>();
         }
@@ -1218,7 +1343,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="component">The Object to take the components' dependency on</param>
         /// <typeparam name="T">The type of the components to take a dependency on</typeparam>
-        public void DependsOnComponentsInParent<T>(Component component) where T : Component
+        public void DependsOnComponentsInParent<T>(Component component)
+            where T : Component
         {
             GetComponentsInParent<T>(component);
         }
@@ -1228,7 +1354,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="gameObject">The GameObject to take the components' dependency on</param>
         /// <typeparam name="T">The type of the components to take a dependency on</typeparam>
-        public void DependsOnComponentsInParent<T>(GameObject gameObject) where T : Component
+        public void DependsOnComponentsInParent<T>(GameObject gameObject)
+            where T : Component
         {
             GetComponentsInParent<T>(gameObject);
         }
@@ -1237,7 +1364,8 @@ namespace Unity.Entities
         /// This will take a dependency on the component of type T in the GameObject or any of its children. Works recursively.
         /// </summary>
         /// <typeparam name="T">The type of the component to take a dependency on</typeparam>
-        public void DependsOnComponentInChildren<T>() where T : Component
+        public void DependsOnComponentInChildren<T>()
+            where T : Component
         {
             GetComponentInChildren<T>();
         }
@@ -1247,7 +1375,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="component">The Object to take the component dependency on</param>
         /// <typeparam name="T">The type of the component to take a dependency on</typeparam>
-        public void DependsOnComponentInChildren<T>(Component component) where T : Component
+        public void DependsOnComponentInChildren<T>(Component component)
+            where T : Component
         {
             GetComponentInChildren<T>(component);
         }
@@ -1257,7 +1386,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="gameObject">The GameObject to take the component dependency on</param>
         /// <typeparam name="T">The type of the component to take a dependency on</typeparam>
-        public void DependsOnComponentInChildren<T>(GameObject gameObject) where T : Component
+        public void DependsOnComponentInChildren<T>(GameObject gameObject)
+            where T : Component
         {
             GetComponentInChildren<T>(gameObject);
         }
@@ -1266,7 +1396,8 @@ namespace Unity.Entities
         /// This will take a dependency on the components of type T in the GameObject or any of its children. Works recursively.
         /// </summary>
         /// <typeparam name="T">The type of the components to take a dependency on</typeparam>
-        public void DependsOnComponentsInChildren<T>() where T : Component
+        public void DependsOnComponentsInChildren<T>()
+            where T : Component
         {
             GetComponentsInChildren<T>();
         }
@@ -1276,7 +1407,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="gameObject">The GameObject to take the components' dependency on</param>
         /// <typeparam name="T">The type of the components to take a dependency on</typeparam>
-        public void DependsOnComponentsInChildren<T>(GameObject gameObject) where T : Component
+        public void DependsOnComponentsInChildren<T>(GameObject gameObject)
+            where T : Component
         {
             GetComponentsInChildren<T>(gameObject);
         }
@@ -1286,7 +1418,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="component">The Object to take the components' dependency on</param>
         /// <typeparam name="T">The type of the components to take a dependency on</typeparam>
-        public void DependsOnComponentsInChildren<T>(Component component) where T : Component
+        public void DependsOnComponentsInChildren<T>(Component component)
+            where T : Component
         {
             GetComponentsInChildren<T>(component);
         }
@@ -1301,7 +1434,7 @@ namespace Unity.Entities
 
         #endregion
 
-#region Debug Tracking and Validation
+        #region Debug Tracking and Validation
 
         /// <summary>
         /// Adds debug tracking for the Entity and Component pair, throws an Exception otherwise
@@ -1326,7 +1459,8 @@ namespace Unity.Entities
                 var previousBakerName = previousBaker.GetType().FullName;
                 var authoringComponentName = _State.AuthoringSource.GetType().FullName;
                 throw new InvalidOperationException(
-                    $"Baking error: Attempt to add duplicate component {TypeManager.GetTypeInfo(typeIndex).DebugTypeName} for Baker {bakerName} with authoring component {authoringComponentName}.  Previous component added by Baker {previousBakerName}. {_State.ErrorContextString()}");
+                    $"Baking error: Attempt to add duplicate component {TypeManager.GetTypeInfo(typeIndex).DebugTypeName} for Baker {bakerName} with authoring component {authoringComponentName}.  Previous component added by Baker {previousBakerName}. {_State.ErrorContextString()}"
+                );
             }
         }
 
@@ -1340,7 +1474,10 @@ namespace Unity.Entities
         {
             var entityComponentPair = new BakerDebugState.EntityComponentPair(entity, typeIndex);
 
-            var hasComponent = _State.DebugState->addedComponentsByEntity.TryGetValue(entityComponentPair, out var debugIndex);
+            var hasComponent = _State.DebugState->addedComponentsByEntity.TryGetValue(
+                entityComponentPair,
+                out var debugIndex
+            );
             if (hasComponent && debugIndex.Equals(_State.DebugIndex))
                 return;
             var bakerName = this.GetType().Name;
@@ -1351,11 +1488,15 @@ namespace Unity.Entities
                 var previousBakers = BakerDataUtility.GetBakers(debugIndex.TypeIndex);
                 var previousBaker = previousBakers[debugIndex.IndexInBakerArray].Baker;
                 var previousBakerName = previousBaker.GetType().Name;
-                throw new InvalidOperationException($"Baking error: Attempt to set component {TypeManager.GetTypeInfo(typeIndex).DebugTypeName} for Baker {bakerName} with authoring component {authoringComponentName} but the component was added by a different Baker {previousBakerName}. {_State.ErrorContextString()}");
+                throw new InvalidOperationException(
+                    $"Baking error: Attempt to set component {TypeManager.GetTypeInfo(typeIndex).DebugTypeName} for Baker {bakerName} with authoring component {authoringComponentName} but the component was added by a different Baker {previousBakerName}. {_State.ErrorContextString()}"
+                );
             }
             else
             {
-                throw new InvalidOperationException($"Baking error: Attempt to set component {TypeManager.GetTypeInfo(typeIndex).DebugTypeName} for Baker {bakerName} with authoring component {authoringComponentName} but the component hasn't been added by the baker yet. {_State.ErrorContextString()}");
+                throw new InvalidOperationException(
+                    $"Baking error: Attempt to set component {TypeManager.GetTypeInfo(typeIndex).DebugTypeName} for Baker {bakerName} with authoring component {authoringComponentName} but the component hasn't been added by the baker yet. {_State.ErrorContextString()}"
+                );
             }
         }
 
@@ -1387,7 +1528,7 @@ namespace Unity.Entities
         /// <param name="typeSet">The types of the Component to track</param>
         void AddDebugTrackingForComponent(Entity entity, in ComponentTypeSet typeSet)
         {
-            for (int i=0,n=typeSet.Length; i<n; ++i)
+            for (int i = 0, n = typeSet.Length; i < n; ++i)
                 AddDebugTrackingForComponent(entity, typeSet.GetComponentType(i));
         }
 
@@ -1416,7 +1557,7 @@ namespace Unity.Entities
         /// <param name="typeSet">The types of the Component to track</param>
         void AddTrackingForComponent(in ComponentTypeSet typeSet)
         {
-            for (int i=0,n=typeSet.Length; i<n; ++i)
+            for (int i = 0, n = typeSet.Length; i < n; ++i)
                 AddTrackingForComponent(typeSet.GetComponentType(i));
         }
 
@@ -1428,12 +1569,14 @@ namespace Unity.Entities
         void CheckValidAdditionalEntity(Entity entity)
         {
             if (!_State.BakerState->Entities.Contains(entity))
-                throw new InvalidOperationException($"Entity {entity} doesn't belong to the current authoring component. {_State.ErrorContextString()}");
+                throw new InvalidOperationException(
+                    $"Entity {entity} doesn't belong to the current authoring component. {_State.ErrorContextString()}"
+                );
         }
 
         #endregion
 
-#region Blob Assets
+        #region Blob Assets
 
         /// <summary>
         /// Adds a BlobAsset to the primary Entity
@@ -1442,7 +1585,8 @@ namespace Unity.Entities
         /// <param name="objectHash">The hash of the added BlobAsset</param>
         /// <typeparam name="T">The type of BlobAsset to add</typeparam>
         /// <remarks>This will take a dependency on the component</remarks>
-        public void AddBlobAsset<T>(ref BlobAssetReference<T> blobAssetReference, out Hash128 objectHash) where T : unmanaged
+        public void AddBlobAsset<T>(ref BlobAssetReference<T> blobAssetReference, out Hash128 objectHash)
+            where T : unmanaged
         {
             // TryAdd already prevents double entries
             _State.BlobAssetStore.TryAdd(ref blobAssetReference, out Hash128 tempObjectHash);
@@ -1456,7 +1600,8 @@ namespace Unity.Entities
         /// <param name="customHash">The hash that is used to add the BlobAsset to the Entity</param>
         /// <typeparam name="T">The type of BlobAsset to add</typeparam>
         /// <remarks>This will take a dependency on the component</remarks>
-        public void AddBlobAssetWithCustomHash<T>(ref BlobAssetReference<T> blobAssetReference, Hash128 customHash) where T : unmanaged
+        public void AddBlobAssetWithCustomHash<T>(ref BlobAssetReference<T> blobAssetReference, Hash128 customHash)
+            where T : unmanaged
         {
             if (!_State.BlobAssetStore.TryGet(customHash, out BlobAssetReference<T> existingBlobAssetReference))
             {
@@ -1476,7 +1621,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of BlobAsset to get</typeparam>
         /// <returns>True if the BlobAssetReference is found, otherwise False</returns>
         /// <remarks>This will take a dependency on the component</remarks>
-        public bool TryGetBlobAssetReference<T>(Hash128 hash, out BlobAssetReference<T> blobAssetReference) where T : unmanaged
+        public bool TryGetBlobAssetReference<T>(Hash128 hash, out BlobAssetReference<T> blobAssetReference)
+            where T : unmanaged
         {
             if (_State.BlobAssetStore.TryGet(hash, out blobAssetReference))
             {
@@ -1487,9 +1633,9 @@ namespace Unity.Entities
             return false;
         }
 
-#endregion
+        #endregion
 
-#region Add and Set Components on Entities
+        #region Add and Set Components on Entities
 
         /// <summary>
         /// Adds a component of type T to the primary Entity
@@ -1497,7 +1643,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to add</typeparam>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public void AddComponent<T>() where T : unmanaged, IComponentData
+        public void AddComponent<T>()
+            where T : unmanaged, IComponentData
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent<T>(entity);
@@ -1510,7 +1657,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to add</typeparam>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public void AddComponent<T>(in T component) where T : unmanaged, IComponentData
+        public void AddComponent<T>(in T component)
+            where T : unmanaged, IComponentData
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent<T>(entity, component);
@@ -1542,7 +1690,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to add the component to</param>
         /// <param name="component">The component to add</param>
         /// <typeparam name="T">The type of component to add</typeparam>
-        public void AddComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData
+        public void AddComponent<T>(Entity entity, in T component)
+            where T : unmanaged, IComponentData
         {
             if (_State.PrimaryEntity == entity)
             {
@@ -1562,7 +1711,8 @@ namespace Unity.Entities
         /// <param name="entities">The Entities to add the component to</param>
         /// <param name="component">The component to add</param>
         /// <typeparam name="T">The type of component to add</typeparam>
-        internal void AddComponent<T>(NativeArray<Entity> entities, in T component) where T : unmanaged, IComponentData
+        internal void AddComponent<T>(NativeArray<Entity> entities, in T component)
+            where T : unmanaged, IComponentData
         {
             // Currently doesn't work for the primary entity
             foreach (var entity in entities)
@@ -1624,7 +1774,11 @@ namespace Unity.Entities
         /// <param name="componentDataPtr">The pointer to the component data</param>
         internal void UnsafeAddComponent(Entity entity, TypeIndex typeIndex, int typeSize, void* componentDataPtr)
         {
-            var ctype = new ComponentType {AccessModeType = ComponentType.AccessMode.ReadWrite, TypeIndex = typeIndex};
+            var ctype = new ComponentType
+            {
+                AccessModeType = ComponentType.AccessMode.ReadWrite,
+                TypeIndex = typeIndex,
+            };
             if (_State.PrimaryEntity == entity)
             {
                 // Only track it for Primary Entity, additional entities can only be accessed by the baker that creates them
@@ -1691,7 +1845,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to add</typeparam>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public void AddComponentObject<T>(T component) where T : class
+        public void AddComponentObject<T>(T component)
+            where T : class
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponentObject<T>(entity, component);
@@ -1703,7 +1858,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to add the component to</param>
         /// <param name="component">The component to add</param>
         /// <typeparam name="T">The type of component to add</typeparam>
-        public void AddComponentObject<T>(Entity entity, T component) where T : class
+        public void AddComponentObject<T>(Entity entity, T component)
+            where T : class
         {
             if (_State.PrimaryEntity == entity)
             {
@@ -1725,7 +1881,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to add</typeparam>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public void AddSharedComponentManaged<T>(T component) where T : struct, ISharedComponentData
+        public void AddSharedComponentManaged<T>(T component)
+            where T : struct, ISharedComponentData
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AddSharedComponentManaged<T>(entity, component);
@@ -1737,7 +1894,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to add the component to</param>
         /// <param name="component">The component to add</param>
         /// <typeparam name="T">The type of component to add</typeparam>
-        public void AddSharedComponentManaged<T>(Entity entity, T component) where T : struct, ISharedComponentData
+        public void AddSharedComponentManaged<T>(Entity entity, T component)
+            where T : struct, ISharedComponentData
         {
             if (_State.PrimaryEntity == entity)
             {
@@ -1757,7 +1915,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to add</typeparam>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public void AddSharedComponent<T>(T component) where T : unmanaged, ISharedComponentData
+        public void AddSharedComponent<T>(T component)
+            where T : unmanaged, ISharedComponentData
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AddSharedComponent<T>(entity, component);
@@ -1769,7 +1928,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to add the component to</param>
         /// <param name="component">The component to add</param>
         /// <typeparam name="T">The type of component to add</typeparam>
-        public void AddSharedComponent<T>(Entity entity, T component) where T : unmanaged, ISharedComponentData
+        public void AddSharedComponent<T>(Entity entity, T component)
+            where T : unmanaged, ISharedComponentData
         {
             if (_State.PrimaryEntity == entity)
             {
@@ -1789,7 +1949,8 @@ namespace Unity.Entities
         /// <returns>The created DynamicBuffer</returns>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public DynamicBuffer<T> AddBuffer<T>() where T : unmanaged, IBufferElementData
+        public DynamicBuffer<T> AddBuffer<T>()
+            where T : unmanaged, IBufferElementData
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             return AddBuffer<T>(entity);
@@ -1801,7 +1962,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to add the buffer to</param>
         /// <typeparam name="T">The type of buffer to add</typeparam>
         /// <returns>The created DynamicBuffer</returns>
-        public DynamicBuffer<T> AddBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData
+        public DynamicBuffer<T> AddBuffer<T>(Entity entity)
+            where T : unmanaged, IBufferElementData
         {
             if (_State.PrimaryEntity == entity)
             {
@@ -1826,7 +1988,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the component to</param>
         /// <param name="component">The component to set</param>
         /// <typeparam name="T">The type of component to set</typeparam>
-        public void SetComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData
+        public void SetComponent<T>(Entity entity, in T component)
+            where T : unmanaged, IComponentData
         {
             if (_State.PrimaryEntity != entity)
                 CheckValidAdditionalEntity(entity);
@@ -1845,7 +2008,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the component to</param>
         /// <param name="enabled">True if the specified component should be enabled, or false if it should be disabled</param>
         /// <typeparam name="T">The type of component to set</typeparam>
-        public void SetComponentEnabled<T>(Entity entity, bool enabled) where T : struct, IEnableableComponent
+        public void SetComponentEnabled<T>(Entity entity, bool enabled)
+            where T : struct, IEnableableComponent
         {
             if (_State.PrimaryEntity != entity)
                 CheckValidAdditionalEntity(entity);
@@ -1862,20 +2026,26 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of component to set</typeparam>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public void SetComponentEnabled<T>(bool enabled) where T : struct, IEnableableComponent
+        public void SetComponentEnabled<T>(bool enabled)
+            where T : struct, IEnableableComponent
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             SetComponentEnabled<T>(entity, enabled);
         }
 
-         /// <summary>
-         /// Replaces the value of the component on the Entity.
-         /// </summary>
-         /// <param name="entity">The Entity to set the component to</param>
-         /// <param name="typeIndex">The index of the type of component to set</param>
-         /// <param name="typeSize">The size of the type of component to set</param>
-         /// <param name="componentDataPtr">The pointer to the component data</param>
-        internal unsafe void UnsafeSetComponent(Entity entity, TypeIndex typeIndex, int typeSize, void* componentDataPtr)
+        /// <summary>
+        /// Replaces the value of the component on the Entity.
+        /// </summary>
+        /// <param name="entity">The Entity to set the component to</param>
+        /// <param name="typeIndex">The index of the type of component to set</param>
+        /// <param name="typeSize">The size of the type of component to set</param>
+        /// <param name="componentDataPtr">The pointer to the component data</param>
+        internal unsafe void UnsafeSetComponent(
+            Entity entity,
+            TypeIndex typeIndex,
+            int typeSize,
+            void* componentDataPtr
+        )
         {
             if (_State.PrimaryEntity != entity)
                 CheckValidAdditionalEntity(entity);
@@ -1896,7 +2066,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the component to</param>
         /// <param name="component">The component to set</param>
         /// <typeparam name="T">The type of component to set</typeparam>
-        public void SetSharedComponentManaged<T>(Entity entity, in T component) where T : struct, ISharedComponentData
+        public void SetSharedComponentManaged<T>(Entity entity, in T component)
+            where T : struct, ISharedComponentData
         {
             if (_State.PrimaryEntity != entity)
                 CheckValidAdditionalEntity(entity);
@@ -1917,7 +2088,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the component to</param>
         /// <param name="component">The component to set</param>
         /// <typeparam name="T">The type of component to set</typeparam>
-        public void SetSharedComponent<T>(Entity entity, in T component) where T : unmanaged, ISharedComponentData
+        public void SetSharedComponent<T>(Entity entity, in T component)
+            where T : unmanaged, ISharedComponentData
         {
             if (_State.PrimaryEntity != entity)
                 CheckValidAdditionalEntity(entity);
@@ -1938,7 +2110,8 @@ namespace Unity.Entities
         /// <param name="entities">The Entities to set the component to</param>
         /// <param name="component">The component to set</param>
         /// <typeparam name="T">The type of component to set</typeparam>
-        internal void SetSharedComponent<T>(NativeArray<Entity> entities, in T component) where T : unmanaged, ISharedComponentData
+        internal void SetSharedComponent<T>(NativeArray<Entity> entities, in T component)
+            where T : unmanaged, ISharedComponentData
         {
             // Doesn't work for the primary entity
             foreach (var entity in entities)
@@ -1958,7 +2131,8 @@ namespace Unity.Entities
         /// <returns>The new DynamicBuffer</returns>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public DynamicBuffer<T> SetBuffer<T>() where T : unmanaged, IBufferElementData
+        public DynamicBuffer<T> SetBuffer<T>()
+            where T : unmanaged, IBufferElementData
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             return SetBuffer<T>(entity);
@@ -1975,7 +2149,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the buffer on</param>
         /// <typeparam name="T">The type of buffer to set</typeparam>
         /// <returns>The new DynamicBuffer</returns>
-        public DynamicBuffer<T> SetBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData
+        public DynamicBuffer<T> SetBuffer<T>(Entity entity)
+            where T : unmanaged, IBufferElementData
         {
             if (_State.PrimaryEntity != entity)
                 CheckValidAdditionalEntity(entity);
@@ -1994,7 +2169,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the buffer on</param>
         /// <typeparam name="T">The type of buffer to set</typeparam>
         /// <returns>The new DynamicBuffer</returns>
-        private DynamicBuffer<T> SetBufferInternal<T>(Entity entity) where T : unmanaged, IBufferElementData
+        private DynamicBuffer<T> SetBufferInternal<T>(Entity entity)
+            where T : unmanaged, IBufferElementData
         {
             if (_State.PrimaryEntity == entity)
                 CheckComponentHasBeenAddedByThisBaker(entity, TypeManager.GetTypeIndex<T>());
@@ -2009,7 +2185,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of buffer to append to</typeparam>
         /// <remarks>Implicitly it will access the primary entity with TransformUsageFlags.Dynamic.</remarks>
         [Obsolete("Use the version of the function with the explicit Entity parameter (RemovedAfter Entities 1.0)")]
-        public void AppendToBuffer<T>(T element) where T : unmanaged, IBufferElementData
+        public void AppendToBuffer<T>(T element)
+            where T : unmanaged, IBufferElementData
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AppendToBuffer<T>(entity, element);
@@ -2021,7 +2198,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the buffer on</param>
         /// <param name="element">The element of type T to append to the buffer</param>
         /// <typeparam name="T">The type of buffer to append to</typeparam>
-        public void AppendToBuffer<T>(Entity entity, T element) where T : unmanaged, IBufferElementData
+        public void AppendToBuffer<T>(Entity entity, T element)
+            where T : unmanaged, IBufferElementData
         {
             if (_State.PrimaryEntity != entity)
                 CheckValidAdditionalEntity(entity);
@@ -2035,7 +2213,8 @@ namespace Unity.Entities
         /// <param name="entity">The Entity to set the buffer on</param>
         /// <param name="element">The element of type T to append to the buffer</param>
         /// <typeparam name="T">The type of buffer to append to</typeparam>
-        private void AppendToBufferInternal<T>(Entity entity, T element) where T : unmanaged, IBufferElementData
+        private void AppendToBufferInternal<T>(Entity entity, T element)
+            where T : unmanaged, IBufferElementData
         {
             if (_State.PrimaryEntity == entity)
                 CheckComponentHasBeenAddedByThisBaker(entity, TypeManager.GetTypeIndex<T>());
@@ -2043,7 +2222,7 @@ namespace Unity.Entities
             _State.Ecb.AppendToBuffer(entity, element);
         }
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Creates an additional Entity tied to the primary entity.
@@ -2078,11 +2257,22 @@ namespace Unity.Entities
         ///
         /// Baking only additional entities are not exported in the runtime data.
         /// </remarks>
-        public Entity CreateAdditionalEntity(TransformUsageFlags transformUsageFlags, bool bakingOnlyEntity = false, string entityName = "")
+        public Entity CreateAdditionalEntity(
+            TransformUsageFlags transformUsageFlags,
+            bool bakingOnlyEntity = false,
+            string entityName = ""
+        )
         {
-            var entity = _State.BakedEntityData->CreateAdditionalEntity(_State.AuthoringObject, _State.AuthoringId, bakingOnlyEntity, entityName);
+            var entity = _State.BakedEntityData->CreateAdditionalEntity(
+                _State.AuthoringObject,
+                _State.AuthoringId,
+                bakingOnlyEntity,
+                entityName
+            );
             _State.BakerState->Entities.Add(entity);
-            _State.Usage->ReferencedEntityUsages.Add(new BakerEntityUsage.ReferencedEntityUsage(entity, transformUsageFlags));
+            _State.Usage->ReferencedEntityUsages.Add(
+                new BakerEntityUsage.ReferencedEntityUsage(entity, transformUsageFlags)
+            );
             return entity;
         }
 
@@ -2100,16 +2290,29 @@ namespace Unity.Entities
         ///
         /// Baking only additional entities are not exported in the runtime data.
         /// </remarks>
-        public void CreateAdditionalEntities(NativeArray<Entity> outputEntities, TransformUsageFlags transformUsageFlags, bool bakingOnlyEntity = false)
+        public void CreateAdditionalEntities(
+            NativeArray<Entity> outputEntities,
+            TransformUsageFlags transformUsageFlags,
+            bool bakingOnlyEntity = false
+        )
         {
             if (!outputEntities.IsCreated || outputEntities.Length == 0)
-                throw new ArgumentException($"{nameof(outputEntities)} is not valid or empty. {_State.ErrorContextString()}");
+                throw new ArgumentException(
+                    $"{nameof(outputEntities)} is not valid or empty. {_State.ErrorContextString()}"
+                );
 
-            _State.BakedEntityData->CreateAdditionalEntities(outputEntities, _State.AuthoringObject, _State.AuthoringId, bakingOnlyEntity);
+            _State.BakedEntityData->CreateAdditionalEntities(
+                outputEntities,
+                _State.AuthoringObject,
+                _State.AuthoringId,
+                bakingOnlyEntity
+            );
             foreach (var e in outputEntities)
             {
                 _State.BakerState->Entities.Add(e);
-                _State.Usage->ReferencedEntityUsages.Add(new BakerEntityUsage.ReferencedEntityUsage(e, transformUsageFlags));
+                _State.Usage->ReferencedEntityUsages.Add(
+                    new BakerEntityUsage.ReferencedEntityUsage(e, transformUsageFlags)
+                );
             }
         }
 
@@ -2245,7 +2448,7 @@ namespace Unity.Entities
                 state.Dependencies->DependOnParentTransformHierarchy(potentialTransform);
             }
 
-            Bake((TAuthoringType) state.AuthoringSource);
+            Bake((TAuthoringType)state.AuthoringSource);
             _State = default;
         }
 

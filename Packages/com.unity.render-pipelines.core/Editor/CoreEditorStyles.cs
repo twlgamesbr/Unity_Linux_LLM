@@ -21,14 +21,17 @@ namespace UnityEditor.Rendering
         #region Styles
 
         static System.Lazy<GUIStyle> m_SmallTickbox = new(() => new GUIStyle("ShurikenToggle"));
+
         /// <summary>Style for a small checkbox</summary>
         public static GUIStyle smallTickbox => m_SmallTickbox.Value;
 
         static System.Lazy<GUIStyle> m_SmallMixedTickbox = new(() => new GUIStyle("ShurikenToggleMixed"));
+
         /// <summary>Style for a small checkbox in mixed state</summary>
         public static GUIStyle smallMixedTickbox => m_SmallMixedTickbox.Value;
 
         static GUIStyle m_MiniLabelButton;
+
         /// <summary>Style for a minilabel button</summary>
         public static GUIStyle miniLabelButton
         {
@@ -42,14 +45,14 @@ namespace UnityEditor.Rendering
                         {
                             background = m_TransparentTexture,
                             scaledBackgrounds = null,
-                            textColor = EditorGUIUtility.isProSkin ? Color.grey : Color.darkGray
-                        }
+                            textColor = EditorGUIUtility.isProSkin ? Color.grey : Color.darkGray,
+                        },
                     };
                     var activeState = new GUIStyleState
                     {
                         background = m_TransparentTexture,
                         scaledBackgrounds = null,
-                        textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black
+                        textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black,
                     };
                     m_MiniLabelButton.active = activeState;
                     m_MiniLabelButton.onNormal = activeState;
@@ -62,24 +65,38 @@ namespace UnityEditor.Rendering
         }
 
         static System.Lazy<GUIStyle> m_ContextMenuStyle = new(() => new GUIStyle("IconButton"));
+
         /// <summary>Context Menu button style</summary>
         public static GUIStyle contextMenuStyle => m_ContextMenuStyle.Value;
 
-        static System.Lazy<GUIStyle> m_AdditionalPropertiesHighlightStyle = new(() => new GUIStyle { normal = { background = Texture2D.whiteTexture } });
+        static System.Lazy<GUIStyle> m_AdditionalPropertiesHighlightStyle = new(() =>
+            new GUIStyle { normal = { background = Texture2D.whiteTexture } }
+        );
+
         /// <summary>Style of a additional properties highlighted background.</summary>
         public static GUIStyle additionalPropertiesHighlightStyle => m_AdditionalPropertiesHighlightStyle.Value;
 
         /// <summary>Help icon style</summary>
-        public static GUIStyle iconHelpStyle => GUI.skin.FindStyle("IconButton") ?? EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).FindStyle("IconButton");
+        public static GUIStyle iconHelpStyle =>
+            GUI.skin.FindStyle("IconButton")
+            ?? EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).FindStyle("IconButton");
 
-        static System.Lazy<GUIStyle> m_SectionHeaderStyle = new(() => new GUIStyle(EditorStyles.largeLabel) { richText = true, fontSize = 18, fixedHeight = 42 });
+        static System.Lazy<GUIStyle> m_SectionHeaderStyle = new(() =>
+            new GUIStyle(EditorStyles.largeLabel)
+            {
+                richText = true,
+                fontSize = 18,
+                fixedHeight = 42,
+            }
+        );
+
         /// <summary>Style of Section Headers.</summary>
         public static GUIStyle sectionHeaderStyle => m_SectionHeaderStyle.Value;
 
         static System.Lazy<GUIStyle> m_SubSectionHeaderStyle = new(() => new GUIStyle(EditorStyles.boldLabel));
+
         /// <summary>Style of Sub-Section Headers.</summary>
         public static GUIStyle subSectionHeaderStyle => m_SubSectionHeaderStyle.Value;
-
 
         static System.Lazy<GUIStyle> m_HelpBox = new(() =>
         {
@@ -88,7 +105,7 @@ namespace UnityEditor.Rendering
                 imagePosition = ImagePosition.ImageLeft,
                 fontSize = 10,
                 wordWrap = true,
-                alignment = TextAnchor.MiddleLeft
+                alignment = TextAnchor.MiddleLeft,
             };
             style.normal.textColor = EditorStyles.helpBox.normal.textColor;
             return style;
@@ -103,31 +120,41 @@ namespace UnityEditor.Rendering
 
         /// <summary><see cref="Texture2D"/> 1x1 pixel with red color</summary>
         public static readonly Texture2D redTexture;
+
         /// <summary><see cref="Texture2D"/> 1x1 pixel with green color</summary>
         public static readonly Texture2D greenTexture;
+
         /// <summary><see cref="Texture2D"/> 1x1 pixel with blue color</summary>
         public static readonly Texture2D blueTexture;
 
         /// <summary> PaneOption icon for dark skin</summary>
         static readonly Texture2D paneOptionsIconDark;
+
         /// <summary> PaneOption icon for light skin</summary>
         static readonly Texture2D paneOptionsIconLight;
 
         /// <summary> PaneOption icon </summary>
-        public static Texture2D paneOptionsIcon => EditorGUIUtility.isProSkin ? paneOptionsIconDark : paneOptionsIconLight;
+        public static Texture2D paneOptionsIcon =>
+            EditorGUIUtility.isProSkin ? paneOptionsIconDark : paneOptionsIconLight;
 
         /// <summary> Warning icon </summary>
         public static readonly Texture2D iconWarn;
+
         /// <summary> Info icon </summary>
         public static readonly Texture2D iconInfo;
+
         /// <summary> Help icon </summary>
         public static readonly Texture2D iconHelp;
+
         /// <summary> Fail icon </summary>
         public static readonly Texture2D iconFail;
+
         /// <summary> Success icon </summary>
         public static readonly Texture2D iconSuccess;
+
         /// <summary> Complete icon </summary>
         public static readonly Texture2D iconComplete;
+
         /// <summary> Pending icon </summary>
         public static readonly Texture2D iconPending;
 
@@ -166,10 +193,12 @@ namespace UnityEditor.Rendering
         static readonly Color m_DarkThemeBackgroundHighlightColor;
 
         /// <summary>Regular background color.</summary>
-        public static Color backgroundColor => EditorGUIUtility.isProSkin ? m_DarkThemeBackgroundColor : m_LightThemeBackgroundColor;
+        public static Color backgroundColor =>
+            EditorGUIUtility.isProSkin ? m_DarkThemeBackgroundColor : m_LightThemeBackgroundColor;
 
         /// <summary>Hightlited background color.</summary>
-        public static Color backgroundHighlightColor => EditorGUIUtility.isProSkin ? m_DarkThemeBackgroundHighlightColor : m_LightThemeBackgroundHighlightColor;
+        public static Color backgroundHighlightColor =>
+            EditorGUIUtility.isProSkin ? m_DarkThemeBackgroundHighlightColor : m_LightThemeBackgroundHighlightColor;
 
         #endregion
 
@@ -195,7 +224,7 @@ namespace UnityEditor.Rendering
         {
             m_TransparentTexture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None)
             {
-                name = "transparent"
+                name = "transparent",
             };
             m_TransparentTexture.SetPixel(0, 0, Color.clear);
             m_TransparentTexture.Apply();

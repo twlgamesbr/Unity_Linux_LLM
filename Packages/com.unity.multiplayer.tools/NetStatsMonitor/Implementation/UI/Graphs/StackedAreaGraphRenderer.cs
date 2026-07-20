@@ -49,7 +49,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float renderBoundsXMax,
             float renderBoundsYMin,
             float renderBoundsYMax,
-            Vertex[] vertices)
+            Vertex[] vertices
+        )
         {
             ResizePointSumsIfNeeded(bufferParams);
 
@@ -66,16 +67,26 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             var graphPointsPerSample = 1 / graphSamplesPerPoint;
 
             m_BoundsTransformer ??= new GraphBoundsTransformer(
-                renderBoundsXMin, renderBoundsXMax, renderBoundsYMin, renderBoundsYMax,
-                yAxisMin, yAxisMax);
+                renderBoundsXMin,
+                renderBoundsXMax,
+                renderBoundsYMin,
+                renderBoundsYMax,
+                yAxisMin,
+                yAxisMax
+            );
 
             // X and Y axis transforms that must be applied to existing geometry
             // These transforms will be Identity if no transformation of the
             // existing geometry is required  along this axis
             var (xAxisTransform, yAxisTransform) = m_BoundsTransformer.ComputeTransformsForNewBounds(
-                renderBoundsXMin, renderBoundsXMax, renderBoundsYMin, renderBoundsYMax,
-                yAxisMin, yAxisMax,
-                pointsToAdvance);
+                renderBoundsXMin,
+                renderBoundsXMax,
+                renderBoundsYMin,
+                renderBoundsYMax,
+                yAxisMin,
+                yAxisMax,
+                pointsToAdvance
+            );
 
             if (pointsToAdvance <= 0)
             {
@@ -103,7 +114,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     xScale: xScale,
                     renderBoundsXMin: renderBoundsXMin,
                     pointsToCopy: pointsToCopy,
-                    pointsToAdvance: pointsToAdvance);
+                    pointsToAdvance: pointsToAdvance
+                );
 
                 ComputeNewGeometry(
                     vertices: vertices,
@@ -127,7 +139,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         void RescaleExistingGeometryIfNeeded(
             LinearTransform xAxisTransform,
             LinearTransform yAxisTransform,
-            Vertex[] vertices)
+            Vertex[] vertices
+        )
         {
             var xAxisChanged = !xAxisTransform.IsIdentity;
             var yAxisChanged = !yAxisTransform.IsIdentity;
@@ -193,7 +206,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float xScale,
             float renderBoundsXMin,
             int pointsToCopy,
-            int pointsToAdvance)
+            int pointsToAdvance
+        )
         {
             var yAxisChanged = !yAxisTransform.IsIdentity;
 
@@ -240,19 +254,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         void ComputeNewGeometry(
             Vertex[] vertices,
             int statVerticesBegin,
-
             float yAxisMax,
-
             float renderBoundsXMin,
             float renderBoundsYMin,
-
             int pointsPerStat,
-
             float xScale,
             float yScale,
-
             int pointsToCopy,
-            RingBuffer<float> pointValues)
+            RingBuffer<float> pointValues
+        )
         {
             for (var pointIndex = pointsToCopy; pointIndex < pointsPerStat; ++pointIndex)
             {

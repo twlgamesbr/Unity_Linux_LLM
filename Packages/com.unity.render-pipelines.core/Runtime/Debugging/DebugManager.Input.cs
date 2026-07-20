@@ -42,7 +42,8 @@ namespace UnityEngine.Rendering
         void RegisterDebugInputs()
         {
             var enableAction = m_DebugMenuEnableActions.AddAction(k_EnableDebug, type: InputActionType.Button);
-            enableAction.AddCompositeBinding("ButtonWithOneModifier")
+            enableAction
+                .AddCompositeBinding("ButtonWithOneModifier")
                 .With("Modifier", "<Gamepad>/rightStickPress")
                 .With("Button", "<Gamepad>/leftStickPress")
                 .With("Modifier", "<Keyboard>/leftCtrl")
@@ -65,34 +66,48 @@ namespace UnityEngine.Rendering
 
 #if ENABLE_RENDERING_DEBUGGER_UI
             var resetAction = m_DebugMenuActions.AddAction(k_ResetBtn, type: InputActionType.Button);
-            resetAction.AddCompositeBinding("ButtonWithOneModifier")
+            resetAction
+                .AddCompositeBinding("ButtonWithOneModifier")
                 .With("Modifier", "<Gamepad>/rightStickPress")
                 .With("Button", "<Gamepad>/b")
                 .With("Modifier", "<Keyboard>/leftAlt")
                 .With("Button", "<Keyboard>/backspace");
-            resetAction.performed += _ => { Reset(); };
+            resetAction.performed += _ =>
+            {
+                Reset();
+            };
 
             var next = m_DebugMenuActions.AddAction(k_DebugNextBtn, type: InputActionType.Button);
             next.AddBinding("<Keyboard>/pageDown");
             next.AddBinding("<Gamepad>/rightShoulder");
-            next.performed += _ => { m_RuntimeDebugWindow.SelectNextPanel(); };
+            next.performed += _ =>
+            {
+                m_RuntimeDebugWindow.SelectNextPanel();
+            };
 
             var previous = m_DebugMenuActions.AddAction(k_DebugPreviousBtn, type: InputActionType.Button);
             previous.AddBinding("<Keyboard>/pageUp");
             previous.AddBinding("<Gamepad>/leftShoulder");
-            previous.performed += _ => { m_RuntimeDebugWindow.SelectPreviousPanel(); };
+            previous.performed += _ =>
+            {
+                m_RuntimeDebugWindow.SelectPreviousPanel();
+            };
 
             var persistentAction = m_DebugMenuActions.AddAction(k_PersistentBtn, type: InputActionType.Button);
             persistentAction.AddBinding("<Keyboard>/rightShift");
             persistentAction.AddBinding("<Gamepad>/x");
-            persistentAction.performed += _ => { TogglePersistent(); };
+            persistentAction.performed += _ =>
+            {
+                TogglePersistent();
+            };
 
             m_MultiplierAction = m_DebugMenuActions.AddAction(k_MultiplierBtn, type: InputActionType.Value);
             m_MultiplierAction.AddBinding("<Keyboard>/leftShift");
             m_MultiplierAction.AddBinding("<Gamepad>/y");
 
             var moveHorizontalAction = m_DebugMenuActions.AddAction(k_DPadHorizontal);
-            moveHorizontalAction.AddCompositeBinding("1DAxis")
+            moveHorizontalAction
+                .AddCompositeBinding("1DAxis")
                 .With("Positive", "<Gamepad>/dpad/right")
                 .With("Negative", "<Gamepad>/dpad/left")
                 .With("Positive", "<Keyboard>/rightArrow")

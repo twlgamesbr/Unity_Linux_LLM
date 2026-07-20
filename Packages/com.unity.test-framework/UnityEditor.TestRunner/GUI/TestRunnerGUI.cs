@@ -21,7 +21,11 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
 
             var content = new GUIContent(text);
-            SelectionDropDown(contentProvider, content, GUILayout.Width(EditorStyles.toolbarDropDown.CalcSize(content).x));
+            SelectionDropDown(
+                contentProvider,
+                content,
+                GUILayout.Width(EditorStyles.toolbarDropDown.CalcSize(content).x)
+            );
         }
 
         internal static void CategorySelectionDropDown(ISelectionDropDownContentProvider contentProvider)
@@ -29,10 +33,18 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             SelectionDropDown(contentProvider, Style.CategoryButtonContent, GUILayout.Width(Style.CategoryButtonWidth));
         }
 
-        private static void SelectionDropDown(ISelectionDropDownContentProvider listContentProvider, GUIContent buttonContent,
-            params GUILayoutOption[] options)
+        private static void SelectionDropDown(
+            ISelectionDropDownContentProvider listContentProvider,
+            GUIContent buttonContent,
+            params GUILayoutOption[] options
+        )
         {
-            var rect = EditorGUILayout.GetControlRect(false, EditorGUI.kSingleLineHeight, Styles.DropdownButton, options);
+            var rect = EditorGUILayout.GetControlRect(
+                false,
+                EditorGUI.kSingleLineHeight,
+                Styles.DropdownButton,
+                options
+            );
             if (!EditorGUI.DropdownButton(rect, buttonContent, FocusType.Passive, Styles.DropdownButton))
             {
                 return;

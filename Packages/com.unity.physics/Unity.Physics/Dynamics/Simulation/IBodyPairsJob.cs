@@ -22,14 +22,11 @@ namespace Unity.Physics
         void Execute(ref ModifiableBodyPair pair);
     }
 
-
     /// <summary>
     /// Interface for jobs that iterate through the list of potentially overlapping body pairs
     /// produced by the broad phase.
     /// </summary>
-    public interface IBodyPairsJob : IBodyPairsJobBase
-    {
-    }
+    public interface IBodyPairsJob : IBodyPairsJobBase { }
 
     /// <summary>   A modifiable body pair. </summary>
     public struct ModifiableBodyPair
@@ -76,7 +73,12 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle Schedule<T>(this T job, SimulationSingleton simulationSingleton, ref PhysicsWorld world, JobHandle inputDeps)
+        public static JobHandle Schedule<T>(
+            this T job,
+            SimulationSingleton simulationSingleton,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IBodyPairsJobBase
         {
             // Should work only for UnityPhysics
@@ -100,7 +102,13 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleParallel<T>(this T job, int innerLoopBatchCount, SimulationSingleton simulationSingleton, ref PhysicsWorld world, JobHandle inputDeps)
+        public static JobHandle ScheduleParallel<T>(
+            this T job,
+            int innerLoopBatchCount,
+            SimulationSingleton simulationSingleton,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IBodyPairsJob
         {
             // Should work only for UnityPhysics
@@ -109,13 +117,27 @@ namespace Unity.Physics
                 return inputDeps;
             }
 
-            return ScheduleParallelUnityPhysicsBodyPairsJob(job, innerLoopBatchCount, simulationSingleton.AsSimulation(), ref world, inputDeps);
+            return ScheduleParallelUnityPhysicsBodyPairsJob(
+                job,
+                innerLoopBatchCount,
+                simulationSingleton.AsSimulation(),
+                ref world,
+                inputDeps
+            );
         }
 
-        static unsafe JobHandle ScheduleUnityPhysicsBodyPairsJob<T>(T job, Simulation simulation, ref PhysicsWorld world, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleUnityPhysicsBodyPairsJob<T>(
+            T job,
+            Simulation simulation,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IBodyPairsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.PostCreateBodyPairs);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateBodyPairs
+            );
 
             if (simulation.StepContext.PhasedDispatchPairs.IsCreated)
             {
@@ -124,13 +146,18 @@ namespace Unity.Physics
                     UserJobData = job,
                     PhasedDispatchPairs = simulation.StepContext.PhasedDispatchPairs.AsDeferredJobArray(),
                     Bodies = world.Bodies,
-                    IsParallel = false
+                    IsParallel = false,
                 };
 
                 var jobReflectionData = BodyPairsJobProcess<T>.jobReflectionData.Data;
                 BodyPairsJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-                var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Single);
+                var parameters = new JobsUtility.JobScheduleParameters(
+                    UnsafeUtility.AddressOf(ref data),
+                    jobReflectionData,
+                    inputDeps,
+                    ScheduleMode.Single
+                );
                 return JobsUtility.Schedule(ref parameters);
             }
             // else:
@@ -138,10 +165,19 @@ namespace Unity.Physics
             return inputDeps;
         }
 
-        static unsafe JobHandle ScheduleParallelUnityPhysicsBodyPairsJob<T>(this T job, int innerLoopBatchCount, Simulation simulation, ref PhysicsWorld world, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleParallelUnityPhysicsBodyPairsJob<T>(
+            this T job,
+            int innerLoopBatchCount,
+            Simulation simulation,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IBodyPairsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.PostCreateBodyPairs);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateBodyPairs
+            );
 
             if (simulation.StepContext.PhasedDispatchPairs.IsCreated)
             {
@@ -150,45 +186,76 @@ namespace Unity.Physics
                     UserJobData = job,
                     PhasedDispatchPairs = simulation.StepContext.PhasedDispatchPairs.AsDeferredJobArray(),
                     Bodies = world.Bodies,
-                    IsParallel = true
+                    IsParallel = true,
                 };
 
                 var jobReflectionData = BodyPairsJobProcess<T>.jobReflectionData.Data;
                 BodyPairsJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-                var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Parallel);
+                var parameters = new JobsUtility.JobScheduleParameters(
+                    UnsafeUtility.AddressOf(ref data),
+                    jobReflectionData,
+                    inputDeps,
+                    ScheduleMode.Parallel
+                );
                 var listDataPtr = simulation.StepContext.PhasedDispatchPairs.GetUnsafeList();
-                return JobsUtility.ScheduleParallelForDeferArraySize(ref parameters, innerLoopBatchCount, listDataPtr, null);
+                return JobsUtility.ScheduleParallelForDeferArraySize(
+                    ref parameters,
+                    innerLoopBatchCount,
+                    listDataPtr,
+                    null
+                );
             }
 
             return inputDeps;
         }
 
-        internal struct BodyPairsJobData<T> where T : struct
+        internal struct BodyPairsJobData<T>
+            where T : struct
         {
             public T UserJobData;
             public NativeArray<DispatchPairSequencer.DispatchPair> PhasedDispatchPairs;
+
             //Need to disable aliasing restriction in case T has a NativeArray of PhysicsWorld.Bodies:
-            [ReadOnly][NativeDisableContainerSafetyRestriction] public NativeArray<RigidBody> Bodies;
+            [ReadOnly]
+            [NativeDisableContainerSafetyRestriction]
+            public NativeArray<RigidBody> Bodies;
             public bool IsParallel;
         }
 
-        internal struct BodyPairsJobProcess<T> where T : struct, IBodyPairsJobBase
+        internal struct BodyPairsJobProcess<T>
+            where T : struct, IBodyPairsJobBase
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<BodyPairsJobProcess<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                BodyPairsJobProcess<T>
+            >();
 
             [Preserve]
             internal static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(BodyPairsJobData<T>), typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(BodyPairsJobData<T>),
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
-            public delegate void ExecuteJobFunction(ref BodyPairsJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref BodyPairsJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
-            public unsafe static void Execute(ref BodyPairsJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static unsafe void Execute(
+                ref BodyPairsJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
@@ -201,7 +268,12 @@ namespace Unity.Physics
                             break;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData), startIndex, endIndex - startIndex);
+                        JobsUtility.PatchBufferMinMaxRanges(
+                            bufferRangePatchData,
+                            UnsafeUtility.AddressOf(ref jobData),
+                            startIndex,
+                            endIndex - startIndex
+                        );
 #endif
                     }
 
@@ -217,16 +289,16 @@ namespace Unity.Physics
 
                         var pair = new ModifiableBodyPair
                         {
-                            BodyIndexPair =
-                                new BodyIndexPair
-                                {
-                                    BodyIndexA = dispatchPair.BodyIndexA, BodyIndexB = dispatchPair.BodyIndexB
-                                },
+                            BodyIndexPair = new BodyIndexPair
+                            {
+                                BodyIndexA = dispatchPair.BodyIndexA,
+                                BodyIndexB = dispatchPair.BodyIndexB,
+                            },
                             EntityPair = new EntityPair
                             {
                                 EntityA = jobData.Bodies[dispatchPair.BodyIndexA].Entity,
-                                EntityB = jobData.Bodies[dispatchPair.BodyIndexB].Entity
-                            }
+                                EntityB = jobData.Bodies[dispatchPair.BodyIndexB].Entity,
+                            },
                         };
 
                         jobData.UserJobData.Execute(ref pair);
@@ -247,7 +319,9 @@ namespace Unity.Physics
             internal static void CheckReflectionDataCorrect(IntPtr reflectionData)
             {
                 if (reflectionData == IntPtr.Zero)
-                    SafetyChecks.ThrowInvalidOperationException("Reflection data was not set up by an Initialize() call");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Reflection data was not set up by an Initialize() call"
+                    );
             }
         }
 

@@ -38,7 +38,8 @@ namespace UnityEngine.Rendering.Universal
             return index >= start && index <= end;
         }
 
-        public static InclusiveRange Merge(InclusiveRange a, InclusiveRange b) => new(Math.Min(a.start, b.start), Math.Max(a.end, b.end));
+        public static InclusiveRange Merge(InclusiveRange a, InclusiveRange b) =>
+            new(Math.Min(a.start, b.start), Math.Max(a.end, b.end));
 
         public static InclusiveRange empty => new InclusiveRange(short.MaxValue, short.MinValue);
 

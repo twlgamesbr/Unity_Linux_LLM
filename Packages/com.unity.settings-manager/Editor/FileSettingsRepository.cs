@@ -24,6 +24,7 @@ namespace UnityEditor.SettingsManagement
 
         bool m_Initialized;
         string m_Path;
+
         [SerializeField]
         SettingsDictionary m_Dictionary = new SettingsDictionary();
         Hash128 m_JsonHash;
@@ -118,7 +119,8 @@ namespace UnityEditor.SettingsManagement
                 if (string.IsNullOrEmpty(directory))
                 {
                     Debug.LogError(
-                        $"Settings file {name} is saved to an invalid path: {path}. Settings will not be saved.");
+                        $"Settings file {name} is saved to an invalid path: {path}. Settings will not be saved."
+                    );
                     return;
                 }
 
@@ -128,9 +130,7 @@ namespace UnityEditor.SettingsManagement
             string json = EditorJsonUtility.ToJson(this, k_PrettyPrintJson);
 
             // While unlikely, a hash collision is possible. Always test the actual saved contents before early exit.
-            if (m_JsonHash == Hash128.Compute(json)
-                && TryLoadSavedJson(out string existing)
-                && existing.Equals(json))
+            if (m_JsonHash == Hash128.Compute(json) && TryLoadSavedJson(out string existing) && existing.Equals(json))
                 return;
 
 #if UNITY_2019_3_OR_NEWER

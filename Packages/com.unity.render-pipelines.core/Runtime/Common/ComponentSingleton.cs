@@ -11,6 +11,7 @@ namespace UnityEngine.Rendering
         where TType : Component
     {
         static TType s_Instance = null;
+
         /// <summary>
         /// Instance of the required component type.
         /// </summary>
@@ -20,7 +21,10 @@ namespace UnityEngine.Rendering
             {
                 if (s_Instance == null)
                 {
-                    GameObject go = new GameObject("Default " + typeof(TType).Name) { hideFlags = HideFlags.HideAndDontSave };
+                    GameObject go = new GameObject("Default " + typeof(TType).Name)
+                    {
+                        hideFlags = HideFlags.HideAndDontSave,
+                    };
 
 #if !UNITY_EDITOR
                     GameObject.DontDestroyOnLoad(go);

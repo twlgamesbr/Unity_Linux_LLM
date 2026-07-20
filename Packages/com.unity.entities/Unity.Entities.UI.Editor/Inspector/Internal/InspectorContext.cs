@@ -30,7 +30,8 @@ namespace Unity.Entities.UI
             PropertyPath propertyPath,
             IProperty property,
             IEnumerable<Attribute> attributes = null
-        ){
+        )
+        {
             Root = root;
             PropertyPath = propertyPath;
             BasePath = PropertyPath;
@@ -38,10 +39,10 @@ namespace Unity.Entities.UI
                 BasePath = PropertyPath.Pop(PropertyPath);
 
             Name = property.Name;
-            Part = PropertyPath.Length> 0 ? PropertyPath[PropertyPath.Length - 1] : default;
+            Part = PropertyPath.Length > 0 ? PropertyPath[PropertyPath.Length - 1] : default;
             var attributeList = new List<Attribute>(attributes ?? property.GetAttributes());
             Attributes = attributeList;
-            Tooltip =  property.GetAttribute<TooltipAttribute>()?.tooltip;
+            Tooltip = property.GetAttribute<TooltipAttribute>()?.tooltip;
             DisplayName = GuiFactory.GetDisplayName(property);
             IsDelayed = property.HasAttribute<DelayedAttribute>();
             IsReadOnly = property.IsReadOnly;

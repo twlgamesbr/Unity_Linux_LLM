@@ -3,8 +3,11 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_AORemapMax"           )]
-    public struct HDRPMaterialPropertyAORemapMax : IComponentData { public float  Value; }
+    [MaterialProperty("_AORemapMax")]
+    public struct HDRPMaterialPropertyAORemapMax : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyAORemapMaxAuthoring : UnityEngine.MonoBehaviour

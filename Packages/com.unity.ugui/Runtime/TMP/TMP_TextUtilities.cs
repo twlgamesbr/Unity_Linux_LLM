@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 
-
 namespace TMPro
 {
-    public enum CaretPosition { None, Left, Right }
+    public enum CaretPosition
+    {
+        None,
+        Left,
+        Right,
+    }
 
     /// <summary>
     /// Structure which contains the character index and position of caret relative to the character.
@@ -23,7 +27,6 @@ namespace TMPro
     public static class TMP_TextUtilities
     {
         private static Vector3[] m_rectWorldCorners = new Vector3[4];
-
 
         // TEXT INPUT COMPONENT RELATED FUNCTIONS
 
@@ -59,7 +62,6 @@ namespace TMPro
         //        return new CaretInfo(index, CaretPosition.Right);
         //}
 
-
         /// <summary>
         /// Function returning the index of the character whose origin is closest to the cursor.
         /// </summary>
@@ -88,9 +90,7 @@ namespace TMPro
                 return index;
             else
                 return index + 1;
-
         }
-
 
         /// <summary>
         /// Function returning the index of the character whose origin is closest to the cursor.
@@ -129,7 +129,6 @@ namespace TMPro
         //    }
         //}
 
-
         /// <summary>
         /// Function returning the index of the character whose origin is closest to the cursor.
         /// </summary>
@@ -138,7 +137,12 @@ namespace TMPro
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <param name="cursor">The position of the cursor insertion position relative to the position.</param>
         /// <returns></returns>
-        public static int GetCursorIndexFromPosition(TMP_Text textComponent, Vector3 position, Camera camera, out CaretPosition cursor)
+        public static int GetCursorIndexFromPosition(
+            TMP_Text textComponent,
+            Vector3 position,
+            Camera camera,
+            out CaretPosition cursor
+        )
         {
             int line = FindNearestLine(textComponent, position, camera);
 
@@ -182,7 +186,6 @@ namespace TMPro
                 return index;
             }
         }
-
 
         /// <summary>
         /// Function returning the line nearest to the position.
@@ -229,7 +232,6 @@ namespace TMPro
             return closest;
         }
 
-
         /// <summary>
         /// Function returning the nearest character to position on a given line.
         /// </summary>
@@ -238,7 +240,13 @@ namespace TMPro
         /// <param name="line"></param>
         /// <param name="camera"></param>
         /// <returns></returns>
-        public static int FindNearestCharacterOnLine(TMP_Text text, Vector3 position, int line, Camera camera, bool visibleOnly)
+        public static int FindNearestCharacterOnLine(
+            TMP_Text text,
+            Vector3 position,
+            int line,
+            Camera camera,
+            bool visibleOnly
+        )
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -293,7 +301,6 @@ namespace TMPro
             return closest;
         }
 
-
         /// <summary>
         /// Function used to determine if the position intersects with the RectTransform.
         /// </summary>
@@ -308,14 +315,21 @@ namespace TMPro
 
             rectTransform.GetWorldCorners(m_rectWorldCorners);
 
-            if (PointIntersectRectangle(position, m_rectWorldCorners[0], m_rectWorldCorners[1], m_rectWorldCorners[2], m_rectWorldCorners[3]))
+            if (
+                PointIntersectRectangle(
+                    position,
+                    m_rectWorldCorners[0],
+                    m_rectWorldCorners[1],
+                    m_rectWorldCorners[2],
+                    m_rectWorldCorners[3]
+                )
+            )
             {
                 return true;
             }
 
             return false;
         }
-
 
         // CHARACTER HANDLING
 
@@ -354,7 +368,6 @@ namespace TMPro
             return -1;
         }
 
-
         /// <summary>
         /// Function returning the index of the character at the given position (if any).
         /// </summary>
@@ -390,7 +403,6 @@ namespace TMPro
 
         //    return -1;
         //}
-
 
         /// <summary>
         /// Function to find the nearest character to position.
@@ -445,7 +457,6 @@ namespace TMPro
 
             return closest;
         }
-
 
         /// <summary>
         /// Function to find the nearest character to position.
@@ -503,7 +514,6 @@ namespace TMPro
         //    return closest;
         //}
 
-
         /// <summary>
         /// Function to find the nearest character to position.
         /// </summary>
@@ -559,7 +569,6 @@ namespace TMPro
 
         //    return closest;
         //}
-
 
         // WORD HANDLING
         /// <summary>
@@ -680,12 +689,10 @@ namespace TMPro
                 }
 
                 //Debug.Log("Word at Index: " + i + " is located at (" + bl + ", " + tl + ", " + tr + ", " + br + ").");
-
             }
 
             return -1;
         }
-
 
         /// <summary>
         /// Function returning the index of the word at the given position (if any).
@@ -813,7 +820,6 @@ namespace TMPro
         //    return -1;
         //}
 
-
         /// <summary>
         /// Function returning the index of the word at the given position (if any).
         /// </summary>
@@ -938,7 +944,6 @@ namespace TMPro
         //    return -1;
         //}
 
-
         /// <summary>
         /// Function returning the index of the word at the given position (if any).
         /// </summary>
@@ -980,8 +985,12 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0)
+                        );
+                        tl = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0)
+                        );
 
                         //Debug.Log("Start Word Region at [" + currentCharInfo.character + "]");
 
@@ -990,8 +999,12 @@ namespace TMPro
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(
+                                new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                            );
+                            tr = rectTransform.TransformPoint(
+                                new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                            );
 
                             // Check for Intersection
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1020,8 +1033,12 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                        );
+                        tr = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                        );
 
                         // Check for Intersection
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1048,8 +1065,12 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                        );
+                        tr = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                        );
 
                         // Check for Intersection
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1195,7 +1216,6 @@ namespace TMPro
         //    return closest;
         //}
 
-
         /// <summary>
         /// Function returning the index of the word at the given position (if any).
         /// </summary>
@@ -1313,7 +1333,6 @@ namespace TMPro
 
         //}
 
-
         /// <summary>
         /// Function returning the line intersecting the position.
         /// </summary>
@@ -1348,7 +1367,6 @@ namespace TMPro
             return closest;
         }
 
-
         /// <summary>
         /// Function returning the index of the Link at the given position (if any).
         /// </summary>
@@ -1382,15 +1400,22 @@ namespace TMPro
                     int currentLine = currentCharInfo.lineNumber;
 
                     // Check if Link characters are on the current page
-                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay)
+                    if (
+                        text.overflowMode == TextOverflowModes.Page
+                        && currentCharInfo.pageNumber + 1 != text.pageToDisplay
+                    )
                         continue;
 
                     if (isBeginRegion == false)
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0)
+                        );
+                        tl = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0)
+                        );
 
                         //Debug.Log("Start Word Region at [" + currentCharInfo.character + "]");
 
@@ -1399,8 +1424,12 @@ namespace TMPro
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(
+                                new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                            );
+                            tr = rectTransform.TransformPoint(
+                                new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                            );
 
                             // Check for Intersection
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1415,8 +1444,12 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                        );
+                        tr = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                        );
 
                         // Check for Intersection
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1429,8 +1462,12 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                        );
+                        tr = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                        );
 
                         // Check for Intersection
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1441,7 +1478,6 @@ namespace TMPro
                 }
 
                 //Debug.Log("Word at Index: " + i + " is located at (" + bl + ", " + tl + ", " + tr + ", " + br + ").");
-
             }
 
             return -1;
@@ -1544,7 +1580,6 @@ namespace TMPro
         //    return -1;
         //}
 
-
         /// <summary>
         /// Function returning the index of the Link at the given position (if any).
         /// </summary>
@@ -1642,7 +1677,6 @@ namespace TMPro
         //    return -1;
         //}
 
-
         /// <summary>
         /// Function returning the index of the word at the given position (if any).
         /// </summary>
@@ -1679,7 +1713,10 @@ namespace TMPro
                     int currentLine = currentCharInfo.lineNumber;
 
                     // Check if Link characters are on the current page
-                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay)
+                    if (
+                        text.overflowMode == TextOverflowModes.Page
+                        && currentCharInfo.pageNumber + 1 != text.pageToDisplay
+                    )
                         continue;
 
                     if (isBeginRegion == false)
@@ -1688,16 +1725,24 @@ namespace TMPro
 
                         //Debug.Log("Start Word Region at [" + currentCharInfo.character + "]");
 
-                        bl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0)
+                        );
+                        tl = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0)
+                        );
 
                         // If Link is one character
                         if (linkInfo.linkTextLength == 1)
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(
+                                new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                            );
+                            tr = rectTransform.TransformPoint(
+                                new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                            );
 
                             // Check for Intersection
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1718,7 +1763,6 @@ namespace TMPro
                                 distanceSqr = d;
                                 closest = i;
                             }
-
                         }
                     }
 
@@ -1727,8 +1771,12 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                        );
+                        tr = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                        );
 
                         // Check for Intersection
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1749,15 +1797,18 @@ namespace TMPro
                             distanceSqr = d;
                             closest = i;
                         }
-
                     }
                     // If Link is split on more than one line.
                     else if (isBeginRegion && currentLine != text.textInfo.characterInfo[characterIndex + 1].lineNumber)
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0)
+                        );
+                        tr = rectTransform.TransformPoint(
+                            new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0)
+                        );
 
                         // Check for Intersection
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -1782,12 +1833,10 @@ namespace TMPro
                 }
 
                 //Debug.Log("Word at Index: " + i + " is located at (" + bl + ", " + tl + ", " + tr + ", " + br + ").");
-
             }
 
             return closest;
         }
-
 
         /// <summary>
         /// Function returning the index of the word at the given position (if any).
@@ -1901,7 +1950,6 @@ namespace TMPro
         //    return closest;
         //}
 
-
         /// <summary>
         /// Function returning the index of the word at the given position (if any).
         /// </summary>
@@ -2013,8 +2061,6 @@ namespace TMPro
         //    return closest;
         //}
 
-
-
         /// <summary>
         /// Function to check if a Point is contained within a Rectangle.
         /// </summary>
@@ -2042,7 +2088,6 @@ namespace TMPro
             return 0 <= abamDot && abamDot <= Vector3.Dot(ab, ab) && 0 <= bcbmDot && bcbmDot <= Vector3.Dot(bc, bc);
         }
 
-
         /// <summary>
         /// Method to convert ScreenPoint to WorldPoint aligned with Rectangle
         /// </summary>
@@ -2051,7 +2096,12 @@ namespace TMPro
         /// <param name="cam"></param>
         /// <param name="worldPoint"></param>
         /// <returns></returns>
-        public static bool ScreenPointToWorldPointInRectangle(Transform transform, Vector2 screenPoint, Camera cam, out Vector3 worldPoint)
+        public static bool ScreenPointToWorldPointInRectangle(
+            Transform transform,
+            Vector2 screenPoint,
+            Camera cam,
+            out Vector3 worldPoint
+        )
         {
             worldPoint = (Vector3)Vector2.zero;
             Ray ray = RectTransformUtility.ScreenPointToRay(cam, screenPoint);
@@ -2065,7 +2115,6 @@ namespace TMPro
             return true;
         }
 
-
         private struct LineSegment
         {
             public Vector3 Point1;
@@ -2078,7 +2127,6 @@ namespace TMPro
             }
         }
 
-
         /// <summary>
         /// Function returning the point of intersection between a line and a plane.
         /// </summary>
@@ -2087,7 +2135,12 @@ namespace TMPro
         /// <param name="normal"></param>
         /// <param name="intersectingPoint"></param>
         /// <returns></returns>
-        private static bool IntersectLinePlane(LineSegment line, Vector3 point, Vector3 normal, out Vector3 intersectingPoint)
+        private static bool IntersectLinePlane(
+            LineSegment line,
+            Vector3 point,
+            Vector3 normal,
+            out Vector3 intersectingPoint
+        )
         {
             intersectingPoint = Vector3.zero;
             Vector3 u = line.Point2 - line.Point1;
@@ -2096,7 +2149,7 @@ namespace TMPro
             float D = Vector3.Dot(normal, u);
             float N = -Vector3.Dot(normal, w);
 
-            if (Mathf.Abs(D) < Mathf.Epsilon)   // if line is parallel & co-planar to plane
+            if (Mathf.Abs(D) < Mathf.Epsilon) // if line is parallel & co-planar to plane
             {
                 if (N == 0)
                     return true;
@@ -2113,7 +2166,6 @@ namespace TMPro
 
             return true;
         }
-
 
         /// <summary>
         /// Function returning the Square Distance from a Point to a Line.
@@ -2134,24 +2186,23 @@ namespace TMPro
             Vector3 n = b - a;
             Vector3 pa = a - point;
 
-            float c = Vector3.Dot( n, pa );
+            float c = Vector3.Dot(n, pa);
 
             // Closest point is a
-            if ( c > 0.0f )
-                return Vector3.Dot( pa, pa );
+            if (c > 0.0f)
+                return Vector3.Dot(pa, pa);
 
             Vector3 bp = point - b;
 
             // Closest point is b
-            if (Vector3.Dot( n, bp ) > 0.0f )
-                return Vector3.Dot( bp, bp );
+            if (Vector3.Dot(n, bp) > 0.0f)
+                return Vector3.Dot(bp, bp);
 
             // Closest point is between a and b
-            Vector3 e = pa - n * (c / Vector3.Dot( n, n ));
+            Vector3 e = pa - n * (c / Vector3.Dot(n, n));
 
-            return Vector3.Dot( e, e );
+            return Vector3.Dot(e, e);
         }
-
 
         /// <summary>
         /// Function returning the Square Distance from a Point to a Line and Direction.
@@ -2187,17 +2238,17 @@ namespace TMPro
         //    return Vector3.Dot(e, e);
         //}
 
-
         /// <summary>
         /// Table used to convert character to lowercase.
         /// </summary>
-        const string k_lookupStringL = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[-]^_`abcdefghijklmnopqrstuvwxyz{|}~-";
+        const string k_lookupStringL =
+            "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[-]^_`abcdefghijklmnopqrstuvwxyz{|}~-";
 
         /// <summary>
         /// Table used to convert character to uppercase.
         /// </summary>
-        const string k_lookupStringU = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
-
+        const string k_lookupStringU =
+            "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
 
         /// <summary>
         /// Get lowercase version of this ASCII character.
@@ -2293,7 +2344,6 @@ namespace TMPro
             return hashCode;
         }
 
-
         /// <summary>
         /// Function to convert Hex to Int
         /// </summary>
@@ -2303,32 +2353,53 @@ namespace TMPro
         {
             switch (hex)
             {
-                case '0': return 0;
-                case '1': return 1;
-                case '2': return 2;
-                case '3': return 3;
-                case '4': return 4;
-                case '5': return 5;
-                case '6': return 6;
-                case '7': return 7;
-                case '8': return 8;
-                case '9': return 9;
-                case 'A': return 10;
-                case 'B': return 11;
-                case 'C': return 12;
-                case 'D': return 13;
-                case 'E': return 14;
-                case 'F': return 15;
-                case 'a': return 10;
-                case 'b': return 11;
-                case 'c': return 12;
-                case 'd': return 13;
-                case 'e': return 14;
-                case 'f': return 15;
+                case '0':
+                    return 0;
+                case '1':
+                    return 1;
+                case '2':
+                    return 2;
+                case '3':
+                    return 3;
+                case '4':
+                    return 4;
+                case '5':
+                    return 5;
+                case '6':
+                    return 6;
+                case '7':
+                    return 7;
+                case '8':
+                    return 8;
+                case '9':
+                    return 9;
+                case 'A':
+                    return 10;
+                case 'B':
+                    return 11;
+                case 'C':
+                    return 12;
+                case 'D':
+                    return 13;
+                case 'E':
+                    return 14;
+                case 'F':
+                    return 15;
+                case 'a':
+                    return 10;
+                case 'b':
+                    return 11;
+                case 'c':
+                    return 12;
+                case 'd':
+                    return 13;
+                case 'e':
+                    return 14;
+                case 'f':
+                    return 15;
             }
             return 15;
         }
-
 
         /// <summary>
         /// Function to convert a properly formatted string which contains an hex value to its decimal value.

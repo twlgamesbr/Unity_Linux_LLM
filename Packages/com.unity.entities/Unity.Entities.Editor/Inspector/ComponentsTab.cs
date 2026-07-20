@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine.UIElements;
 using UnityEngine.Pool;
+using UnityEngine.UIElements;
 
 namespace Unity.Entities.Editor
 {
@@ -17,10 +17,15 @@ namespace Unity.Entities.Editor
         ComponentsTabInspector m_Inspector;
 
         public string TabName { get; } = L10n.Tr("Components");
+
         public void OnTabVisibilityChanged(bool isVisible)
         {
             if (isVisible)
-                Analytics.SendEditorEvent(Analytics.Window.Inspector, Analytics.EventType.InspectorTabFocus, Analytics.ComponentsTabName);
+                Analytics.SendEditorEvent(
+                    Analytics.Window.Inspector,
+                    Analytics.EventType.InspectorTabFocus,
+                    Analytics.ComponentsTabName
+                );
             m_IsVisible = isVisible;
         }
 
@@ -28,8 +33,9 @@ namespace Unity.Entities.Editor
         {
             m_Context = entityInspectorContext;
         }
-        
+
         internal void ClearSearch() => m_Inspector?.ClearSearch();
+
         internal void ApplySearch(string searchText) => m_Inspector?.ApplySearch(searchText);
 
         [UsedImplicitly]
@@ -55,7 +61,8 @@ namespace Unity.Entities.Editor
                 m_SearchField = InspectorUtility.CreateSearchField(
                     UssClasses.Inspector.ComponentsTab.SearchField,
                     ApplySearch,
-                    ClearSearch);
+                    ClearSearch
+                );
 
                 var searchContainer = m_Root.Q(className: "search-field-container");
                 searchContainer.Add(m_SearchField);
@@ -65,10 +72,13 @@ namespace Unity.Entities.Editor
                 m_Root.Add(m_TagsRoot);
                 m_Root.Add(m_ComponentsRoot);
 
-                m_Root.RegisterCallback<GeometryChangedEvent, VisualElement>((_, elem) =>
-                {
-                    StylingUtility.AlignInspectorLabelWidth(elem);
-                }, m_Root);
+                m_Root.RegisterCallback<GeometryChangedEvent, VisualElement>(
+                    (_, elem) =>
+                    {
+                        StylingUtility.AlignInspectorLabelWidth(elem);
+                    },
+                    m_Root
+                );
 
                 m_InspectorBuilderVisitor = new EntityInspectorBuilderVisitor(Target.m_Context);
                 m_CurrentComponentStructure = new EntityInspectorComponentStructure();
@@ -95,8 +105,9 @@ namespace Unity.Entities.Editor
 
                 foreach (var element in list)
                 {
-                    var isMatch = element.DisplayName != null &&
-                                  element.DisplayName.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0;
+                    var isMatch =
+                        element.DisplayName != null
+                        && element.DisplayName.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0;
                     element.SetVisibility(isMatch);
                 }
             }
@@ -147,8 +158,10 @@ namespace Unity.Entities.Editor
                 }
                 else
                 {
-                    UpdateUI(!m_CurrentComponentStructure.Tags.SequenceEqual(m_LastComponentStructure.Tags),
-                             !m_CurrentComponentStructure.Components.SequenceEqual(m_LastComponentStructure.Components));
+                    UpdateUI(
+                        !m_CurrentComponentStructure.Tags.SequenceEqual(m_LastComponentStructure.Tags),
+                        !m_CurrentComponentStructure.Components.SequenceEqual(m_LastComponentStructure.Components)
+                    );
                 }
 
                 m_LastComponentStructure.CopyFrom(m_CurrentComponentStructure);
@@ -164,21 +177,25 @@ namespace Unity.Entities.Editor
                 // update tags
                 if (updateTags)
                 {
-                    InspectorUtility.Synchronize(m_LastComponentStructure.Tags,
+                    InspectorUtility.Synchronize(
+                        m_LastComponentStructure.Tags,
                         m_CurrentComponentStructure.Tags,
-                                EntityInspectorComponentsComparer.Instance,
-                                m_TagsRoot,
-                                Factory);
+                        EntityInspectorComponentsComparer.Instance,
+                        m_TagsRoot,
+                        Factory
+                    );
                 }
 
                 // update regular components
                 if (updateComponents)
                 {
-                    InspectorUtility.Synchronize(m_LastComponentStructure.Components,
+                    InspectorUtility.Synchronize(
+                        m_LastComponentStructure.Components,
                         m_CurrentComponentStructure.Components,
-                                EntityInspectorComponentsComparer.Instance,
-                                m_ComponentsRoot,
-                                Factory);
+                        EntityInspectorComponentsComparer.Instance,
+                        m_ComponentsRoot,
+                        Factory
+                    );
                 }
 
                 VisualElement Factory(IComponentProperty property)
@@ -187,7 +204,6 @@ namespace Unity.Entities.Editor
                     return m_InspectorBuilderVisitor.Result;
                 }
             }
-
         }
     }
 }

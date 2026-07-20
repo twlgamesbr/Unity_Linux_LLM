@@ -13,7 +13,10 @@ namespace UnityEditor.Rendering.Universal
 #if PPV2_EXISTS
         protected override Type OldSettingsType { get; } = typeof(BIRPRendering.Bloom);
 
-        protected override void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldSettings, VolumeProfile targetProfile)
+        protected override void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldSettings,
+            VolumeProfile targetProfile
+        )
         {
             var oldBloom = oldSettings as BIRPRendering.Bloom;
 

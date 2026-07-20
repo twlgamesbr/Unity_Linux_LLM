@@ -74,7 +74,7 @@ internal enum PrimaryAccountBehaviour
     /// <summary>
     /// The primary account can be signed in or out at any time and it can be changed.
     /// </summary>
-    OptionalAndMutable = 3
+    OptionalAndMutable = 3,
 }
 
 /// <summary>
@@ -98,5 +98,5 @@ internal enum AdditionalAccountBehaviour
     /// however, they can be signed out afterwards (after sign-in) from the system environment.
     /// All additional account will be automatically signed out when the application is closed.
     /// </summary>
-    SignInOnGameRequestAndSignOutAnytime = 2
+    SignInOnGameRequestAndSignOutAnytime = 2,
 }

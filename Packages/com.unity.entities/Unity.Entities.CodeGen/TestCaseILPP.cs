@@ -11,7 +11,6 @@ namespace Unity.Entities.CodeGen
     /// cases. It is compatible with NUnit, although it only implements a subset of the NUnit functionality.
     ///
     /// </remarks>
-
     class TestCaseILPP : EntitiesILPostProcessor
     {
         MethodDefinition m_TestRunner;
@@ -31,10 +30,10 @@ namespace Unity.Entities.CodeGen
         enum TestStatus
         {
             Okay,
-            Ignored,            // [Ignored] in the code, equivalent to skipped.
-            Limitation,         // Limitation of test suite.
-            NotSupported,       // Test uses unsupported, not cross-platform feature.
-            PartiallySupported  // Test case can be run, but not all the asserts in the test case are executed.
+            Ignored, // [Ignored] in the code, equivalent to skipped.
+            Limitation, // Limitation of test suite.
+            NotSupported, // Test uses unsupported, not cross-platform feature.
+            PartiallySupported, // Test case can be run, but not all the asserts in the test case are executed.
         }
 
         protected override bool PostProcessImpl(TypeDefinition[] componentSystemTypes)
@@ -45,7 +44,9 @@ namespace Unity.Entities.CodeGen
 
             m_windows = Defines.FirstOrDefault(define => define == "UNITY_WINDOWS") != null;
 
-            m_WriteLine = AssemblyDefinition.MainModule.ImportReference(typeof(Console).GetMethod("WriteLine", new[] {typeof(string)}));
+            m_WriteLine = AssemblyDefinition.MainModule.ImportReference(
+                typeof(Console).GetMethod("WriteLine", new[] { typeof(string) })
+            );
 
             // Initially set up the caller.
             m_TestRunner.Body.Instructions.Clear();
@@ -62,7 +63,9 @@ namespace Unity.Entities.CodeGen
             }
             catch
             {
-                Console.WriteLine($"Failed to find required fields (testsRan, testsIgnored, etc.) of NUnitFrameWork.Assert in the runtime package.");
+                Console.WriteLine(
+                    $"Failed to find required fields (testsRan, testsIgnored, etc.) of NUnitFrameWork.Assert in the runtime package."
+                );
             }
 
             foreach (var t in AssemblyDefinition.MainModule.Types)
@@ -85,7 +88,9 @@ namespace Unity.Entities.CodeGen
 
         MethodDefinition FindCallerMethod()
         {
-            TypeDefinition runner = AssemblyDefinition.MainModule.Types.FirstOrDefault(t => t.FullName == "NUnit.Framework.UnitTestRunner");
+            TypeDefinition runner = AssemblyDefinition.MainModule.Types.FirstOrDefault(t =>
+                t.FullName == "NUnit.Framework.UnitTestRunner"
+            );
             MethodDefinition caller = runner?.Methods.First(m => m.Name == "Run");
             return caller;
         }
@@ -100,8 +105,11 @@ namespace Unity.Entities.CodeGen
 
             // Actually need to search a hierarchy; the attribute we want may be a parent.
             // But do the quick check first, since it usually works.
-            if (attributes.FirstOrDefault(ca =>
-                ca.AttributeType.FullName == attributeName || ca.AttributeType.FullName == fullAttrName) != null)
+            if (
+                attributes.FirstOrDefault(ca =>
+                    ca.AttributeType.FullName == attributeName || ca.AttributeType.FullName == fullAttrName
+                ) != null
+            )
             {
                 return true;
             }
@@ -176,7 +184,13 @@ namespace Unity.Entities.CodeGen
         // Walks the code to look for [NotSupported]/[PartiallySupported] method calls.
         // Recursive, but some of the Asserts are "buried deep" and hard to find,
         // so the use of Ignore may still be required.
-        bool HasTaggedCodeRecursive(MethodReference method, out string msg, HashSet<string> visited, int recDepth, string attr)
+        bool HasTaggedCodeRecursive(
+            MethodReference method,
+            out string msg,
+            HashSet<string> visited,
+            int recDepth,
+            string attr
+        )
         {
             msg = "";
 
@@ -266,9 +280,9 @@ namespace Unity.Entities.CodeGen
                     // Since there is no command line interface yet [Explicit] is the same as [Ignore]
                     // [WindowsOnly] is tied to the dotnet build. Also effectively [Ignore]
 
-                    string[] ignoreList = new[] { "ExplicitAttribute"};
+                    string[] ignoreList = new[] { "ExplicitAttribute" };
                     if (m_windows)
-                        ignoreList = ignoreList.Concat(new [] {"WindowsOnlyAttribute"}).ToArray();
+                        ignoreList = ignoreList.Concat(new[] { "WindowsOnlyAttribute" }).ToArray();
 
                     if (ignoreList.Contains(type.Name))
                     {
@@ -335,9 +349,14 @@ namespace Unity.Entities.CodeGen
         // See DeconstructParameters.
         // Given a List<List<object>>, convert that to IL code that is all the parameter combinations
         // for a given test method: basically, it is a List of LDC_I4 in every possible combination.
-        void ParametersToILRecursive(int depth, List<List<object>> paramList,
-            List<List<Instruction>> instructions, List<Instruction> instructionStack,
-            List<string> logs, List<string> logStack)
+        void ParametersToILRecursive(
+            int depth,
+            List<List<object>> paramList,
+            List<List<Instruction>> instructions,
+            List<Instruction> instructionStack,
+            List<string> logs,
+            List<string> logStack
+        )
         {
             if (depth == paramList.Count)
             {
@@ -345,7 +364,7 @@ namespace Unity.Entities.CodeGen
 
                 StringBuilder builder = new StringBuilder();
                 builder.Append("(");
-                for(int i=0; i<logStack.Count; ++i)
+                for (int i = 0; i < logStack.Count; ++i)
                 {
                     if (i > 0)
                         builder.Append(", ");
@@ -362,9 +381,9 @@ namespace Unity.Entities.CodeGen
             {
                 object obj;
                 if (p is CustomAttributeArgument)
-                    obj = ((CustomAttributeArgument)p).Value;    // almost everything is wrapped in a CustomAttributeArgument
+                    obj = ((CustomAttributeArgument)p).Value; // almost everything is wrapped in a CustomAttributeArgument
                 else
-                    obj = p;                                     // but Bool sometimes isn't; so fall back to this.
+                    obj = p; // but Bool sometimes isn't; so fall back to this.
 
                 switch (obj)
                 {
@@ -396,7 +415,9 @@ namespace Unity.Entities.CodeGen
 
                     default:
                         // The name of the test case is prepended in the log.
-                        throw new ArgumentException($"The portable test runner is missing support for {obj.GetType()} [Values] attribute.");
+                        throw new ArgumentException(
+                            $"The portable test runner is missing support for {obj.GetType()} [Values] attribute."
+                        );
                 }
 
                 logStack.Add(obj.ToString());
@@ -431,9 +452,14 @@ namespace Unity.Entities.CodeGen
             return status == TestStatus.Okay || status == TestStatus.PartiallySupported;
         }
 
-        void EmitTestCalls(TypeDefinition clss, List<MethodDefinition> tests,
-            List<MethodDefinition> setup, List<MethodDefinition> teardown,
-            List<MethodDefinition> oneTimeSetup, List<MethodDefinition> oneTimeTeardown)
+        void EmitTestCalls(
+            TypeDefinition clss,
+            List<MethodDefinition> tests,
+            List<MethodDefinition> setup,
+            List<MethodDefinition> teardown,
+            List<MethodDefinition> oneTimeSetup,
+            List<MethodDefinition> oneTimeTeardown
+        )
         {
             var ctor = clss.Methods.FirstOrDefault(m => m.Name == ".ctor" && m.Parameters.Count == 0);
             if (ctor == null)
@@ -450,7 +476,10 @@ namespace Unity.Entities.CodeGen
             foreach (var oneTimeSetupCall in oneTimeSetup)
             {
                 il.Emit(OpCodes.Ldloc, classLocal);
-                il.Emit(oneTimeSetupCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(oneTimeSetupCall));
+                il.Emit(
+                    oneTimeSetupCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
+                    AssemblyDefinition.MainModule.ImportReference(oneTimeSetupCall)
+                );
             }
 
             foreach (var testMethod in tests)
@@ -547,7 +576,10 @@ namespace Unity.Entities.CodeGen
                         foreach (var setupCall in setup)
                         {
                             il.Emit(OpCodes.Ldloc, classLocal);
-                            il.Emit(setupCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(setupCall));
+                            il.Emit(
+                                setupCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
+                                AssemblyDefinition.MainModule.ImportReference(setupCall)
+                            );
                         }
 
                         if (!testMethod.IsStatic)
@@ -559,7 +591,10 @@ namespace Unity.Entities.CodeGen
                         foreach (var teardownCall in teardown)
                         {
                             il.Emit(OpCodes.Ldloc, classLocal);
-                            il.Emit(teardownCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(teardownCall));
+                            il.Emit(
+                                teardownCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
+                                AssemblyDefinition.MainModule.ImportReference(teardownCall)
+                            );
                         }
 
                         EmitIncStaticFld(il, m_TestsRanFld);
@@ -570,10 +605,12 @@ namespace Unity.Entities.CodeGen
             foreach (var oneTimeTeardownCall in oneTimeTeardown)
             {
                 il.Emit(OpCodes.Ldloc, classLocal);
-                il.Emit(oneTimeTeardownCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(oneTimeTeardownCall));
+                il.Emit(
+                    oneTimeTeardownCall.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
+                    AssemblyDefinition.MainModule.ImportReference(oneTimeTeardownCall)
+                );
             }
         }
-
 
         /// <summary>
         /// NUnit uses [SetUp] and [TearDown] attributes to denote methods that should run before and after methods with a [Test] attribute.
@@ -605,7 +642,8 @@ namespace Unity.Entities.CodeGen
                     if (method.HasParameters || method.IsStatic)
                         continue;
 
-                    string attr = (oneTime ? "NUnit.Framework.OneTime" : "NUnit.Framework.") + (setup ? "SetUp" : "TearDown");
+                    string attr =
+                        (oneTime ? "NUnit.Framework.OneTime" : "NUnit.Framework.") + (setup ? "SetUp" : "TearDown");
                     if (HasCustomAttribute(method, attr))
                     {
                         list.Add(method);

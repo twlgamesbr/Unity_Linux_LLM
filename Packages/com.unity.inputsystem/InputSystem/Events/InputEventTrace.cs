@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine.InputSystem.Utilities;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.InputSystem.Layouts;
 using Unity.Profiling;
+using UnityEngine.InputSystem.Layouts;
+using UnityEngine.InputSystem.Utilities;
 
 namespace UnityEngine.InputSystem.LowLevel
 {
@@ -156,8 +156,13 @@ namespace UnityEngine.InputSystem.LowLevel
             remove => m_EventListeners.RemoveCallback(value);
         }
 
-        public InputEventTrace(InputDevice device, long bufferSizeInBytes = kDefaultBufferSize, bool growBuffer = false,
-                               long maxBufferSizeInBytes = -1, long growIncrementSizeInBytes = -1)
+        public InputEventTrace(
+            InputDevice device,
+            long bufferSizeInBytes = kDefaultBufferSize,
+            bool growBuffer = false,
+            long maxBufferSizeInBytes = -1,
+            long growIncrementSizeInBytes = -1
+        )
             : this(bufferSizeInBytes, growBuffer, maxBufferSizeInBytes, growIncrementSizeInBytes)
         {
             if (device == null)
@@ -175,7 +180,12 @@ namespace UnityEngine.InputSystem.LowLevel
         /// size of <paramref name="maxBufferSizeInBytes"/>. This is off by default.</param>
         /// <param name="maxBufferSizeInBytes">If <paramref name="growBuffer"/> is true, this is the maximum size that the buffer should
         /// be grown to. If the maximum size is reached, old events are being overwritten.</param>
-        public InputEventTrace(long bufferSizeInBytes = kDefaultBufferSize, bool growBuffer = false, long maxBufferSizeInBytes = -1, long growIncrementSizeInBytes = -1)
+        public InputEventTrace(
+            long bufferSizeInBytes = kDefaultBufferSize,
+            bool growBuffer = false,
+            long maxBufferSizeInBytes = -1,
+            long growIncrementSizeInBytes = -1
+        )
         {
             m_EventBufferSize = (uint)bufferSizeInBytes;
 
@@ -250,7 +260,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
                 var sizeInBytes = eventPtr.sizeInBytes;
                 var buffer = new byte[sizeInBytes];
-                fixed(byte* bufferPtr = buffer)
+                fixed (byte* bufferPtr = buffer)
                 {
                     UnsafeUtility.MemCpy(bufferPtr, eventPtr.data, sizeInBytes);
                     writer.Write(buffer);
@@ -325,7 +335,9 @@ namespace UnityEngine.InputSystem.LowLevel
             if (reader.ReadInt32() != kFileFormat)
                 throw new IOException($"Stream does not appear to be an InputEventTrace (no '{kFileFormat}' code)");
             if (reader.ReadInt32() > kFileVersion)
-                throw new IOException($"Stream is an InputEventTrace but a newer version (expected version {kFileVersion} or below)");
+                throw new IOException(
+                    $"Stream is an InputEventTrace but a newer version (expected version {kFileVersion} or below)"
+                );
             reader.ReadInt32(); // Flags; ignored for now.
             reader.ReadInt32(); // Platform; for now we're not doing anything with it.
             var eventCount = reader.ReadUInt64();
@@ -343,7 +355,8 @@ namespace UnityEngine.InputSystem.LowLevel
                 }
                 else
                 {
-                    buffer = (byte*)UnsafeUtility.Malloc((long)totalEventSizeInBytes, InputEvent.kAlignment, Allocator.Persistent);
+                    buffer = (byte*)
+                        UnsafeUtility.Malloc((long)totalEventSizeInBytes, InputEvent.kAlignment, Allocator.Persistent);
                     m_EventBufferSize = (long)totalEventSizeInBytes;
                 }
                 try
@@ -371,8 +384,8 @@ namespace UnityEngine.InputSystem.LowLevel
                         ////TODO: find way to directly read from stream into a byte* pointer
                         var remainingSize = (int)eventSizeInBytes - sizeof(int) - sizeof(short) - sizeof(short);
                         var tempBuffer = reader.ReadBytes(remainingSize);
-                        fixed(byte* tempBufferPtr = tempBuffer)
-                        UnsafeUtility.MemCpy(tailPtr, tempBufferPtr, remainingSize);
+                        fixed (byte* tempBufferPtr = tempBuffer)
+                            UnsafeUtility.MemCpy(tailPtr, tempBufferPtr, remainingSize);
 
                         tailPtr += remainingSize.AlignToMultipleOf(InputEvent.kAlignment);
                         totalEventSize += eventSizeInBytes.AlignToMultipleOf(InputEvent.kAlignment);
@@ -392,7 +405,7 @@ namespace UnityEngine.InputSystem.LowLevel
                             layout = reader.ReadString(),
                             stateFormat = reader.ReadInt32(),
                             stateSizeInBytes = reader.ReadInt32(),
-                            m_FullLayoutJson = reader.ReadString()
+                            m_FullLayoutJson = reader.ReadString(),
                         };
                     }
 
@@ -502,7 +515,8 @@ namespace UnityEngine.InputSystem.LowLevel
                 newMaxBufferSize = newBufferSize;
 
             // Allocate.
-            var newEventBuffer = (byte*)UnsafeUtility.Malloc(newBufferSize, InputEvent.kAlignment, Allocator.Persistent);
+            var newEventBuffer = (byte*)
+                UnsafeUtility.Malloc(newBufferSize, InputEvent.kAlignment, Allocator.Persistent);
             if (newEventBuffer == default)
                 return false;
 
@@ -546,9 +560,7 @@ namespace UnityEngine.InputSystem.LowLevel
                 else
                 {
                     // Simple case of just having to copy everything between head and tail.
-                    UnsafeUtility.MemCpy(newEventBuffer,
-                        m_EventBufferHead,
-                        m_EventSizeInBytes);
+                    UnsafeUtility.MemCpy(newEventBuffer, m_EventBufferHead, m_EventSizeInBytes);
                 }
             }
 
@@ -669,8 +681,7 @@ namespace UnityEngine.InputSystem.LowLevel
             // around to the beginning. In this scenario there must be an event
             // at the beginning of the buffer; tail won't position itself at
             // m_EventBuffer.
-            if (endOfBuffer - nextEvent < InputEvent.kBaseEventSize ||
-                ((InputEvent*)nextEvent)->sizeInBytes == 0)
+            if (endOfBuffer - nextEvent < InputEvent.kBaseEventSize || ((InputEvent*)nextEvent)->sizeInBytes == 0)
             {
                 nextEvent = m_EventBuffer;
                 if (nextEvent == current.ToPointer())
@@ -709,30 +720,59 @@ namespace UnityEngine.InputSystem.LowLevel
         // We want to make sure that it's not possible to iterate with an enumerable over
         // a trace that is being changed so we bump this counter every time we modify the
         // buffer and check in the enumerator that the counts match.
-        [NonSerialized] private int m_ChangeCounter;
-        [NonSerialized] private bool m_Enabled;
-        [NonSerialized] private Func<InputEventPtr, InputDevice, bool> m_OnFilterEvent;
+        [NonSerialized]
+        private int m_ChangeCounter;
 
-        [SerializeField] private int m_DeviceId = InputDevice.InvalidDeviceId;
-        [NonSerialized] private CallbackArray<Action<InputEventPtr>> m_EventListeners;
+        [NonSerialized]
+        private bool m_Enabled;
+
+        [NonSerialized]
+        private Func<InputEventPtr, InputDevice, bool> m_OnFilterEvent;
+
+        [SerializeField]
+        private int m_DeviceId = InputDevice.InvalidDeviceId;
+
+        [NonSerialized]
+        private CallbackArray<Action<InputEventPtr>> m_EventListeners;
 
         // Buffer for storing event trace. Allocated in native so that we can survive a
         // domain reload without losing event traces.
         // NOTE: Ideally this would simply use InputEventBuffer but we can't serialize that one because
         //       of the NativeArray it has inside. Also, due to the wrap-around nature, storage of
         //       events in the buffer may not be linear.
-        [SerializeField] private long m_EventBufferSize;
-        [SerializeField] private long m_MaxEventBufferSize;
-        [SerializeField] private long m_GrowIncrementSize;
-        [SerializeField] private long m_EventCount;
-        [SerializeField] private long m_EventSizeInBytes;
+        [SerializeField]
+        private long m_EventBufferSize;
+
+        [SerializeField]
+        private long m_MaxEventBufferSize;
+
+        [SerializeField]
+        private long m_GrowIncrementSize;
+
+        [SerializeField]
+        private long m_EventCount;
+
+        [SerializeField]
+        private long m_EventSizeInBytes;
+
         // These are ulongs for the sake of Unity serialization which can't handle pointers or IntPtrs.
-        [SerializeField] private ulong m_EventBufferStorage;
-        [SerializeField] private ulong m_EventBufferHeadStorage;
-        [SerializeField] private ulong m_EventBufferTailStorage;
-        [SerializeField] private bool m_HasWrapped;
-        [SerializeField] private bool m_RecordFrameMarkers;
-        [SerializeField] private DeviceInfo[] m_DeviceInfos;
+        [SerializeField]
+        private ulong m_EventBufferStorage;
+
+        [SerializeField]
+        private ulong m_EventBufferHeadStorage;
+
+        [SerializeField]
+        private ulong m_EventBufferTailStorage;
+
+        [SerializeField]
+        private bool m_HasWrapped;
+
+        [SerializeField]
+        private bool m_RecordFrameMarkers;
+
+        [SerializeField]
+        private DeviceInfo[] m_DeviceInfos;
 
         private byte* m_EventBuffer
         {
@@ -781,7 +821,7 @@ namespace UnityEngine.InputSystem.LowLevel
                 {
                     type = FrameMarkerEvent,
                     internalTime = InputRuntime.s_Instance.currentTime,
-                    sizeInBytes = (uint)UnsafeUtility.SizeOf<InputEvent>()
+                    sizeInBytes = (uint)UnsafeUtility.SizeOf<InputEvent>(),
                 };
 
                 OnInputEvent(new InputEventPtr((InputEvent*)UnsafeUtility.AddressOf(ref frameMarkerEvent)), null);
@@ -795,7 +835,11 @@ namespace UnityEngine.InputSystem.LowLevel
                 return;
 
             // Ignore if the event isn't for our device (except if it's a frame marker).
-            if (m_DeviceId != InputDevice.InvalidDeviceId && inputEvent.deviceId != m_DeviceId && inputEvent.type != FrameMarkerEvent)
+            if (
+                m_DeviceId != InputDevice.InvalidDeviceId
+                && inputEvent.deviceId != m_DeviceId
+                && inputEvent.type != FrameMarkerEvent
+            )
                 return;
 
             // Give callback a chance to filter event.
@@ -877,8 +921,7 @@ namespace UnityEngine.InputSystem.LowLevel
             if (newTailOvertakesHead)
             {
                 var newHead = m_EventBufferHead;
-                var endOfBufferMinusOneEvent =
-                    m_EventBuffer + m_EventBufferSize - InputEvent.kBaseEventSize;
+                var endOfBufferMinusOneEvent = m_EventBuffer + m_EventBufferSize - InputEvent.kBaseEventSize;
 
                 while (newHead < newTail)
                 {
@@ -917,25 +960,31 @@ namespace UnityEngine.InputSystem.LowLevel
                             break;
                         }
                 if (!haveRecord)
-                    ArrayHelpers.Append(ref m_DeviceInfos, new DeviceInfo
-                    {
-                        m_DeviceId = device.deviceId,
-                        m_Layout = device.layout,
-                        m_StateFormat = device.stateBlock.format,
-                        m_StateSizeInBytes = (int)device.stateBlock.alignedSizeInBytes,
+                    ArrayHelpers.Append(
+                        ref m_DeviceInfos,
+                        new DeviceInfo
+                        {
+                            m_DeviceId = device.deviceId,
+                            m_Layout = device.layout,
+                            m_StateFormat = device.stateBlock.format,
+                            m_StateSizeInBytes = (int)device.stateBlock.alignedSizeInBytes,
 
-                        // If it's a generated layout, store the full layout JSON in the device info. We do this so that
-                        // when saving traces for this kind of input, we can recreate the device.
-                        m_FullLayoutJson = InputControlLayout.s_Layouts.IsGeneratedLayout(device.m_Layout)
-                            ? InputSystem.LoadLayout(device.layout).ToJson()
-                            : null
-                    });
+                            // If it's a generated layout, store the full layout JSON in the device info. We do this so that
+                            // when saving traces for this kind of input, we can recreate the device.
+                            m_FullLayoutJson = InputControlLayout.s_Layouts.IsGeneratedLayout(device.m_Layout)
+                                ? InputSystem.LoadLayout(device.layout).ToJson()
+                                : null,
+                        }
+                    );
             }
 
             // Notify listeners.
             if (m_EventListeners.length > 0)
-                DelegateHelpers.InvokeCallbacksSafe(ref m_EventListeners, new InputEventPtr((InputEvent*)buffer),
-                    "InputEventTrace.onEvent");
+                DelegateHelpers.InvokeCallbacksSafe(
+                    ref m_EventListeners,
+                    new InputEventPtr((InputEvent*)buffer),
+                    "InputEventTrace.onEvent"
+                );
 
             k_InputEvenTraceMarker.End();
         }
@@ -1389,7 +1438,8 @@ namespace UnityEngine.InputSystem.LowLevel
                 // Shift time on event.
                 var originalTimestamp = eventPtr.internalTime;
                 if (m_AllEventsByTime != null)
-                    eventPtr.internalTime = m_StartTimeAsPerRuntime + (eventPtr.internalTime - m_StartTimeAsPerFirstEvent);
+                    eventPtr.internalTime =
+                        m_StartTimeAsPerRuntime + (eventPtr.internalTime - m_StartTimeAsPerFirstEvent);
                 else
                     eventPtr.internalTime = InputRuntime.s_Instance.currentTime;
 
@@ -1436,8 +1486,12 @@ namespace UnityEngine.InputSystem.LowLevel
                         m_StartTimeAsPerFirstEvent = m_AllEventsByTime[0].internalTime;
                         m_StartTimeAsPerRuntime = InputRuntime.s_Instance.currentTime;
                     }
-                    else if (m_AllEventsByTimeIndex < m_AllEventsByTime.Count - 1 &&
-                             m_AllEventsByTime[m_AllEventsByTimeIndex + 1].internalTime > m_StartTimeAsPerFirstEvent + (InputRuntime.s_Instance.currentTime - m_StartTimeAsPerRuntime))
+                    else if (
+                        m_AllEventsByTimeIndex < m_AllEventsByTime.Count - 1
+                        && m_AllEventsByTime[m_AllEventsByTimeIndex + 1].internalTime
+                            > m_StartTimeAsPerFirstEvent
+                                + (InputRuntime.s_Instance.currentTime - m_StartTimeAsPerRuntime)
+                    )
                     {
                         // We're queuing by original time and the next event isn't up yet,
                         // so early out.
@@ -1460,8 +1514,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
                         ++position;
                         eventPtr = m_Enumerator.Current;
-                    }
-                    while (skipFrameEvents && eventPtr.type == FrameMarkerEvent);
+                    } while (skipFrameEvents && eventPtr.type == FrameMarkerEvent);
                 }
 
                 return true;
@@ -1562,11 +1615,20 @@ namespace UnityEngine.InputSystem.LowLevel
                 set => m_StateSizeInBytes = value;
             }
 
-            [SerializeField] internal int m_DeviceId;
-            [SerializeField] internal string m_Layout;
-            [SerializeField] internal FourCC m_StateFormat;
-            [SerializeField] internal int m_StateSizeInBytes;
-            [SerializeField] internal string m_FullLayoutJson;
+            [SerializeField]
+            internal int m_DeviceId;
+
+            [SerializeField]
+            internal string m_Layout;
+
+            [SerializeField]
+            internal FourCC m_StateFormat;
+
+            [SerializeField]
+            internal int m_StateSizeInBytes;
+
+            [SerializeField]
+            internal string m_FullLayoutJson;
         }
     }
 }

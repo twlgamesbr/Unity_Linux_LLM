@@ -18,7 +18,7 @@ namespace Unity.Multiplayer.Tools
         }
 
         internal static INetworkObjectProvider NetworkObjectProvider => s_Parameters.NetworkObjectProvider;
-        
+
 #if UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void ResetStaticsOnLoad()

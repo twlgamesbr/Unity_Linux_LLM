@@ -36,7 +36,11 @@ namespace UnityEditor.Build.Pipeline
         /// <param name="content">Set of content and explicit asset bundle layout to build.</param>
         /// <param name="result">Results from building the content and explicit asset bundle layout.</param>
         /// <returns>Return code with status information about success or failure causes.</returns>
-        public static ReturnCode BuildAssetBundles(IBundleBuildParameters parameters, IBundleBuildContent content, out IBundleBuildResults result)
+        public static ReturnCode BuildAssetBundles(
+            IBundleBuildParameters parameters,
+            IBundleBuildContent content,
+            out IBundleBuildResults result
+        )
         {
             BuildContext buildContext = new BuildContext();
             return BuildAssetBundles(buildContext, parameters, content, out result);
@@ -51,7 +55,12 @@ namespace UnityEditor.Build.Pipeline
         /// <param name="content">Set of content and explicit asset bundle layout to build.</param>
         /// <param name="result">Results from building the content and explicit asset bundle layout.</param>
         /// <returns>Return code with status information about success or failure causes.</returns>
-        public static ReturnCode BuildAssetBundles(BuildContext buildContext, IBundleBuildParameters parameters, IBundleBuildContent content, out IBundleBuildResults result)
+        public static ReturnCode BuildAssetBundles(
+            BuildContext buildContext,
+            IBundleBuildParameters parameters,
+            IBundleBuildContent content,
+            out IBundleBuildResults result
+        )
         {
             var taskList = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleCompatible);
             return BuildAssetBundles(buildContext, parameters, content, out result, taskList);
@@ -66,12 +75,20 @@ namespace UnityEditor.Build.Pipeline
         /// <param name="taskList">Custom task list for building asset bundles.</param>
         /// <param name="contextObjects">Additional context objects to make available to the build.</param>
         /// <returns>Return code with status information about success or failure causes.</returns>
-        public static ReturnCode BuildContentDirectories(BuildContext buildContext, IBuildParameters parameters, out IBuildResults result, IList<IBuildTask> taskList, params IContextObject[] contextObjects)
+        public static ReturnCode BuildContentDirectories(
+            BuildContext buildContext,
+            IBuildParameters parameters,
+            out IBuildResults result,
+            IList<IBuildTask> taskList,
+            params IContextObject[] contextObjects
+        )
         {
             if (BuildPipeline.isBuildingPlayer)
             {
                 result = null;
-                BuildLogger.LogException(new InvalidOperationException("Cannot build asset bundles while a build is in progress"));
+                BuildLogger.LogException(
+                    new InvalidOperationException("Cannot build asset bundles while a build is in progress")
+                );
                 return ReturnCode.Exception;
             }
 
@@ -87,7 +104,11 @@ namespace UnityEditor.Build.Pipeline
             if (!CanBuildPlayer(contentBuildSettings.target, contentBuildSettings.group))
             {
                 result = null;
-                BuildLogger.LogException(new InvalidOperationException("Unable to build with the current configuration, please check the Build Settings."));
+                BuildLogger.LogException(
+                    new InvalidOperationException(
+                        "Unable to build with the current configuration, please check the Build Settings."
+                    )
+                );
                 return ReturnCode.Exception;
             }
 
@@ -155,7 +176,10 @@ namespace UnityEditor.Build.Pipeline
                     {
                         string buildLogPath = parameters.GetOutputFilePathForIdentifier("buildlogtep.json");
                         Directory.CreateDirectory(Path.GetDirectoryName(buildLogPath));
-                        File.WriteAllText(parameters.GetOutputFilePathForIdentifier("buildlogtep.json"), buildLog.FormatForTraceEventProfiler());
+                        File.WriteAllText(
+                            parameters.GetOutputFilePathForIdentifier("buildlogtep.json"),
+                            buildLog.FormatForTraceEventProfiler()
+                        );
                     }
                 }
             }
@@ -175,7 +199,13 @@ namespace UnityEditor.Build.Pipeline
         /// <param name="taskList">Custom task list for building asset bundles.</param>
         /// <param name="contextObjects">Additional context objects to make available to the build.</param>
         /// <returns>Return code with status information about success or failure causes.</returns>
-        public static ReturnCode BuildAssetBundles(IBundleBuildParameters parameters, IBundleBuildContent content, out IBundleBuildResults result, IList<IBuildTask> taskList, params IContextObject[] contextObjects)
+        public static ReturnCode BuildAssetBundles(
+            IBundleBuildParameters parameters,
+            IBundleBuildContent content,
+            out IBundleBuildResults result,
+            IList<IBuildTask> taskList,
+            params IContextObject[] contextObjects
+        )
         {
             BuildContext buildContext = new BuildContext(contextObjects);
             return BuildAssetBundles(buildContext, parameters, content, out result, taskList, contextObjects);
@@ -192,12 +222,21 @@ namespace UnityEditor.Build.Pipeline
         /// <param name="taskList">Custom task list for building asset bundles.</param>
         /// <param name="contextObjects">Additional context objects to make available to the build.</param>
         /// <returns>Return code with status information about success or failure causes.</returns>
-        public static ReturnCode BuildAssetBundles(BuildContext buildContext, IBundleBuildParameters parameters, IBundleBuildContent content, out IBundleBuildResults result, IList<IBuildTask> taskList, params IContextObject[] contextObjects)
+        public static ReturnCode BuildAssetBundles(
+            BuildContext buildContext,
+            IBundleBuildParameters parameters,
+            IBundleBuildContent content,
+            out IBundleBuildResults result,
+            IList<IBuildTask> taskList,
+            params IContextObject[] contextObjects
+        )
         {
             if (BuildPipeline.isBuildingPlayer)
             {
                 result = null;
-                BuildLogger.LogException(new InvalidOperationException("Cannot build asset bundles while a build is in progress"));
+                BuildLogger.LogException(
+                    new InvalidOperationException("Cannot build asset bundles while a build is in progress")
+                );
                 return ReturnCode.Exception;
             }
 
@@ -227,13 +266,21 @@ namespace UnityEditor.Build.Pipeline
                     if (!content.Addresses.TryGetValue(guid, out var address))
                     {
                         result = null;
-                        BuildLogger.LogException(new InvalidOperationException($"Unable to find internal id for guid {guid} in bundle {b.Key}."));
+                        BuildLogger.LogException(
+                            new InvalidOperationException(
+                                $"Unable to find internal id for guid {guid} in bundle {b.Key}."
+                            )
+                        );
                         return ReturnCode.Exception;
                     }
                     if (!uniqueAddresses.Add(address))
                     {
                         result = null;
-                        BuildLogger.LogException(new InvalidOperationException($"Duplicate internal id '{address}' for guid {guid} found in bundle {b.Key}. Each internal id within a bundle must be unique."));
+                        BuildLogger.LogException(
+                            new InvalidOperationException(
+                                $"Duplicate internal id '{address}' for guid {guid} found in bundle {b.Key}. Each internal id within a bundle must be unique."
+                            )
+                        );
                         return ReturnCode.Exception;
                     }
                 }
@@ -243,7 +290,11 @@ namespace UnityEditor.Build.Pipeline
             if (!CanBuildPlayer(contentBuildSettings.target, contentBuildSettings.group))
             {
                 result = null;
-                BuildLogger.LogException(new InvalidOperationException("Unable to build with the current configuration, please check the Build Settings."));
+                BuildLogger.LogException(
+                    new InvalidOperationException(
+                        "Unable to build with the current configuration, please check the Build Settings."
+                    )
+                );
                 return ReturnCode.Exception;
             }
 
@@ -295,7 +346,11 @@ namespace UnityEditor.Build.Pipeline
                         buildContext.SetContextObjectIfNull(buildCache);
                         // If IDeterministicIdentifiers was passed in with contextObjects, don't add the default
                         if (!buildContext.ContainsContextObject(typeof(IDeterministicIdentifiers)))
-                            buildContext.SetContextObjectIfNull(parameters.ContiguousBundles ? new PrefabPackedIdentifiers() : (IDeterministicIdentifiers)new Unity5PackedIdentifiers());
+                            buildContext.SetContextObjectIfNull(
+                                parameters.ContiguousBundles
+                                    ? new PrefabPackedIdentifiers()
+                                    : (IDeterministicIdentifiers)new Unity5PackedIdentifiers()
+                            );
                         buildContext.SetContextObjectIfNull(new BuildDependencyData());
                         buildContext.SetContextObjectIfNull(new ObjectDependencyData());
                         buildContext.SetContextObjectIfNull(new BundleWriteData());
@@ -324,7 +379,10 @@ namespace UnityEditor.Build.Pipeline
                     {
                         string buildLogPath = parameters.GetOutputFilePathForIdentifier("buildlogtep.json");
                         Directory.CreateDirectory(Path.GetDirectoryName(buildLogPath));
-                        File.WriteAllText(parameters.GetOutputFilePathForIdentifier("buildlogtep.json"), buildLog.FormatForTraceEventProfiler());
+                        File.WriteAllText(
+                            parameters.GetOutputFilePathForIdentifier("buildlogtep.json"),
+                            buildLog.FormatForTraceEventProfiler()
+                        );
                     }
                 }
             }
@@ -355,17 +413,23 @@ namespace UnityEditor.Build.Pipeline
             return ModuleManager.GetBuildWindowExtension(module);
         }
 
-        internal static bool CanBuildPlayer(BuildTarget target, BuildTargetGroup targetGroup, IBuildWindowExtension buildWindowExtension)
+        internal static bool CanBuildPlayer(
+            BuildTarget target,
+            BuildTargetGroup targetGroup,
+            IBuildWindowExtension buildWindowExtension
+        )
         {
             // we expect this to mainly happen within yamato when no build target modules are installed
             if (!BuildPipeline.IsBuildTargetSupported(targetGroup, target))
             {
-                BuildLogger.LogWarning("The currently selected build target is not supported. If the build fails please check the Build Settings.");
+                BuildLogger.LogWarning(
+                    "The currently selected build target is not supported. If the build fails please check the Build Settings."
+                );
                 return true;
             }
 
             return buildWindowExtension != null ? buildWindowExtension.EnabledBuildButton() : false;
         }
 #endif
-        }
+    }
 }

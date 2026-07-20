@@ -74,7 +74,9 @@ namespace Unity.Netcode.Transports.UTP
 
             if (unityTransportComponent == null)
             {
-                Debug.LogError($"You need to select the UnityTransport protocol, in the NetworkManager, in order for the SecretsLoaderHelper component to be useful.");
+                Debug.LogError(
+                    $"You need to select the UnityTransport protocol, in the NetworkManager, in order for the SecretsLoaderHelper component to be useful."
+                );
                 return;
             }
 
@@ -104,7 +106,9 @@ namespace Unity.Netcode.Transports.UTP
             set => m_ClientCAFilePath = value;
         }
 
-        [Tooltip("Client CA Override. Only useful for development with self-signed certificates. Certificate content, for platforms that lack file access (WebGL)")]
+        [Tooltip(
+            "Client CA Override. Only useful for development with self-signed certificates. Certificate content, for platforms that lack file access (WebGL)"
+        )]
         [SerializeField]
         private string m_ClientCAOverride = "";
 
@@ -183,7 +187,11 @@ namespace Unity.Netcode.Transports.UTP
 
             var reader = new StreamReader(path);
             string fileContent = reader.ReadToEnd();
-            Debug.Log((fileContent.Length > 1) ? ("Successfully loaded " + fileContent.Length + " byte(s) from " + label) : ("Could not read " + label + " file"));
+            Debug.Log(
+                (fileContent.Length > 1)
+                    ? ("Successfully loaded " + fileContent.Length + " byte(s) from " + label)
+                    : ("Could not read " + label + " file")
+            );
             return fileContent;
         }
     }

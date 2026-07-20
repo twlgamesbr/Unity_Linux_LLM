@@ -35,8 +35,7 @@ namespace UnityEngine.InputSystem
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
             if (asset.FindActionMap(name) != null)
-                throw new InvalidOperationException(
-                    $"An action map called '{name}' already exists in the asset");
+                throw new InvalidOperationException($"An action map called '{name}' already exists in the asset");
 
             var map = new InputActionMap(name);
             map.GenerateId();
@@ -64,11 +63,11 @@ namespace UnityEngine.InputSystem
                 throw new InvalidOperationException("Maps added to an input action asset must be named");
             if (map.asset != null)
                 throw new InvalidOperationException(
-                    $"Cannot add map '{map}' to asset '{asset}' as it has already been added to asset '{map.asset}'");
+                    $"Cannot add map '{map}' to asset '{asset}' as it has already been added to asset '{map.asset}'"
+                );
             ////REVIEW: some of the rules here seem stupid; just replace?
             if (asset.FindActionMap(map.name) != null)
-                throw new InvalidOperationException(
-                    $"An action map called '{map.name}' already exists in the asset");
+                throw new InvalidOperationException($"An action map called '{map.name}' already exists in the asset");
 
             map.OnWantToChangeSetup();
             asset.OnWantToChangeSetup();
@@ -167,8 +166,16 @@ namespace UnityEngine.InputSystem
         /// <exception cref="InvalidOperationException"><paramref name="map"/> is enabled (see <see cref="InputActionMap.enabled"/>)
         /// or is part of an <see cref="InputActionAsset"/> that has <see cref="InputActionMap"/>s that are <see cref="InputActionMap.enabled"/>
         /// -or- <paramref name="map"/> already contains an action called <paramref name="name"/> (case-insensitive).</exception>
-        public static InputAction AddAction(this InputActionMap map, string name, InputActionType type = default, string binding = null,
-            string interactions = null, string processors = null, string groups = null, string expectedControlLayout = null)
+        public static InputAction AddAction(
+            this InputActionMap map,
+            string name,
+            InputActionType type = default,
+            string binding = null,
+            string interactions = null,
+            string processors = null,
+            string groups = null,
+            string expectedControlLayout = null
+        )
         {
             if (map == null)
                 throw new ArgumentNullException(nameof(map));
@@ -177,13 +184,11 @@ namespace UnityEngine.InputSystem
             map.OnWantToChangeSetup();
             if (map.FindAction(name) != null)
                 throw new InvalidOperationException(
-                    $"Cannot add action with duplicate name '{name}' to set '{map.name}'");
+                    $"Cannot add action with duplicate name '{name}' to set '{map.name}'"
+                );
 
             // Append action to array.
-            var action = new InputAction(name, type)
-            {
-                expectedControlType = expectedControlLayout
-            };
+            var action = new InputAction(name, type) { expectedControlType = expectedControlLayout };
             action.GenerateId();
             ArrayHelpers.Append(ref map.m_Actions, action);
             action.m_ActionMap = map;
@@ -199,7 +204,8 @@ namespace UnityEngine.InputSystem
                 if (!string.IsNullOrEmpty(groups))
                     throw new ArgumentException(
                         $"No binding path was specified for action '{action}' but groups was specified ('{groups}'); cannot apply groups without binding",
-                        nameof(groups));
+                        nameof(groups)
+                    );
 
                 // If no binding has been supplied but there are interactions and processors, they go on the action itself.
                 action.m_Interactions = interactions;
@@ -235,7 +241,9 @@ namespace UnityEngine.InputSystem
             var actionMap = action.actionMap;
             if (actionMap == null)
                 throw new ArgumentException(
-                    $"Action '{action}' does not belong to an action map; nowhere to remove from", nameof(action));
+                    $"Action '{action}' does not belong to an action map; nowhere to remove from",
+                    nameof(action)
+                );
             actionMap.OnWantToChangeSetup();
 
             var bindingsForAction = action.bindings.ToArray();
@@ -248,7 +256,8 @@ namespace UnityEngine.InputSystem
             action.m_SingletonActionBindings = bindingsForAction;
 
             // Remove bindings to action from map.
-            var newActionMapBindingCount = actionMap.m_Bindings != null ? actionMap.m_Bindings.Length - bindingsForAction.Length : 0;
+            var newActionMapBindingCount =
+                actionMap.m_Bindings != null ? actionMap.m_Bindings.Length - bindingsForAction.Length : 0;
             if (newActionMapBindingCount == 0)
             {
                 actionMap.m_Bindings = null;
@@ -302,16 +311,24 @@ namespace UnityEngine.InputSystem
         /// <param name="groups">Optional list of binding groups that should be assigned to the binding. See
         /// <see cref="InputBinding.groups"/> for details.</param>
         /// <returns>Fluent-style syntax to further configure the binding.</returns>
-        public static BindingSyntax AddBinding(this InputAction action, string path, string interactions = null,
-            string processors = null, string groups = null)
+        public static BindingSyntax AddBinding(
+            this InputAction action,
+            string path,
+            string interactions = null,
+            string processors = null,
+            string groups = null
+        )
         {
-            return AddBinding(action, new InputBinding
-            {
-                path = path,
-                interactions = interactions,
-                processors = processors,
-                groups = groups
-            });
+            return AddBinding(
+                action,
+                new InputBinding
+                {
+                    path = path,
+                    interactions = interactions,
+                    processors = processors,
+                    groups = groups,
+                }
+            );
         }
 
         /// <summary>
@@ -323,13 +340,12 @@ namespace UnityEngine.InputSystem
         /// Be extremely careful in enabling/disabling tracking before internal calls since those may otherwise
         /// be incorrectly registered.
         /// </remarks>
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         private static void RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api api)
         {
             UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Register(api);
         }
-
-        #endif
+#endif
 
         /// <summary>
         /// Add a binding that references the given <paramref name="control"/> and triggers
@@ -374,9 +390,9 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         public static BindingSyntax AddBinding(this InputAction action, InputBinding binding = default)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.AddBinding);
-            #endif
+#endif
 
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -415,13 +431,20 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="InputBinding"/>
         /// <seealso cref="InputActionMap.bindings"/>
-        public static BindingSyntax AddBinding(this InputActionMap actionMap, string path,
-            string interactions = null, string groups = null, string action = null, string processors = null)
+        public static BindingSyntax AddBinding(
+            this InputActionMap actionMap,
+            string path,
+            string interactions = null,
+            string groups = null,
+            string action = null,
+            string processors = null
+        )
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path), "Binding path cannot be null");
 
-            return AddBinding(actionMap,
+            return AddBinding(
+                actionMap,
                 new InputBinding
                 {
                     path = path,
@@ -429,7 +452,8 @@ namespace UnityEngine.InputSystem
                     groups = groups,
                     action = action,
                     processors = processors,
-                });
+                }
+            );
         }
 
         /// <summary>
@@ -448,18 +472,24 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="path"/> is <c>null</c>.</exception>
         /// <seealso cref="InputBinding"/>
         /// <seealso cref="InputActionMap.bindings"/>
-        public static BindingSyntax AddBinding(this InputActionMap actionMap, string path, InputAction action,
-            string interactions = null, string groups = null)
+        public static BindingSyntax AddBinding(
+            this InputActionMap actionMap,
+            string path,
+            InputAction action,
+            string interactions = null,
+            string groups = null
+        )
         {
             if (action != null && action.actionMap != actionMap)
                 throw new ArgumentException(
-                    $"Action '{action}' is not part of action map '{actionMap}'", nameof(action));
+                    $"Action '{action}' is not part of action map '{actionMap}'",
+                    nameof(action)
+                );
 
             if (action == null)
                 return AddBinding(actionMap, path: path, interactions: interactions, groups: groups);
 
-            return AddBinding(actionMap, path: path, interactions: interactions, groups: groups,
-                action: action.id);
+            return AddBinding(actionMap, path: path, interactions: interactions, groups: groups, action: action.id);
         }
 
         /// <summary>
@@ -486,13 +516,23 @@ namespace UnityEngine.InputSystem
         /// </code>
         /// </example>
         /// </remarks>
-        public static BindingSyntax AddBinding(this InputActionMap actionMap, string path, Guid action,
-            string interactions = null, string groups = null)
+        public static BindingSyntax AddBinding(
+            this InputActionMap actionMap,
+            string path,
+            Guid action,
+            string interactions = null,
+            string groups = null
+        )
         {
             if (action == Guid.Empty)
                 return AddBinding(actionMap, path: path, interactions: interactions, groups: groups);
-            return AddBinding(actionMap, path: path, interactions: interactions, groups: groups,
-                action: action.ToString());
+            return AddBinding(
+                actionMap,
+                path: path,
+                interactions: interactions,
+                groups: groups,
+                action: action.ToString()
+            );
         }
 
         /// <summary>
@@ -507,9 +547,9 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputActionMap.bindings"/>
         public static BindingSyntax AddBinding(this InputActionMap actionMap, InputBinding binding)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.AddBinding);
-            #endif
+#endif
 
             if (actionMap == null)
                 throw new ArgumentNullException(nameof(actionMap));
@@ -531,12 +571,16 @@ namespace UnityEngine.InputSystem
         /// <returns>A write accessor to the newly added composite binding.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="action"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="composite"/> is <c>null</c> or empty.</exception>
-        public static CompositeSyntax AddCompositeBinding(this InputAction action, string composite,
-            string interactions = null, string processors = null)
+        public static CompositeSyntax AddCompositeBinding(
+            this InputAction action,
+            string composite,
+            string interactions = null,
+            string processors = null
+        )
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.AddCompositeBinding);
-            #endif
+#endif
 
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -552,7 +596,7 @@ namespace UnityEngine.InputSystem
                 interactions = interactions,
                 processors = processors,
                 isComposite = true,
-                action = action.name
+                action = action.name,
             };
 
             var bindingIndex = AddBindingInternal(actionMap, binding);
@@ -617,9 +661,9 @@ namespace UnityEngine.InputSystem
         /// of <paramref name="action"/>).</exception>
         public static BindingSyntax ChangeBinding(this InputAction action, int index)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ChangeBinding);
-            #endif
+#endif
 
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -679,9 +723,9 @@ namespace UnityEngine.InputSystem
         /// of <paramref name="actionMap"/>).</exception>
         public static BindingSyntax ChangeBinding(this InputActionMap actionMap, int index)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ChangeBinding);
-            #endif
+#endif
 
             if (actionMap == null)
                 throw new ArgumentNullException(nameof(actionMap));
@@ -718,7 +762,7 @@ namespace UnityEngine.InputSystem
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            return action.ChangeBinding(new InputBinding {m_Id = id});
+            return action.ChangeBinding(new InputBinding { m_Id = id });
         }
 
         /// <summary>
@@ -748,7 +792,7 @@ namespace UnityEngine.InputSystem
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            return action.ChangeBinding(new InputBinding {id = id});
+            return action.ChangeBinding(new InputBinding { id = id });
         }
 
         /// <summary>
@@ -779,7 +823,7 @@ namespace UnityEngine.InputSystem
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            return action.ChangeBinding(new InputBinding {groups = group});
+            return action.ChangeBinding(new InputBinding { groups = group });
         }
 
         /// <summary>
@@ -810,7 +854,7 @@ namespace UnityEngine.InputSystem
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            return action.ChangeBinding(new InputBinding {path = path});
+            return action.ChangeBinding(new InputBinding { path = path });
         }
 
         /// <summary>
@@ -881,9 +925,9 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputBindingComposite"/>
         public static BindingSyntax ChangeCompositeBinding(this InputAction action, string compositeName)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ChangeCompositeBinding);
-            #endif
+#endif
 
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -901,9 +945,13 @@ namespace UnityEngine.InputSystem
                     continue;
 
                 ////REVIEW: should this do a registration lookup to deal with aliases?
-                if (compositeName.Equals(binding.name, StringComparison.InvariantCultureIgnoreCase)
-                    || compositeName.Equals(NameAndParameters.ParseName(binding.path),
-                        StringComparison.InvariantCultureIgnoreCase))
+                if (
+                    compositeName.Equals(binding.name, StringComparison.InvariantCultureIgnoreCase)
+                    || compositeName.Equals(
+                        NameAndParameters.ParseName(binding.path),
+                        StringComparison.InvariantCultureIgnoreCase
+                    )
+                )
                     return new BindingSyntax(actionMap, i, action);
             }
 
@@ -926,9 +974,9 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         public static void Rename(this InputAction action, string newName)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.Rename);
-            #endif
+#endif
 
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -942,7 +990,8 @@ namespace UnityEngine.InputSystem
             var actionMap = action.actionMap;
             if (actionMap?.FindAction(newName) != null)
                 throw new InvalidOperationException(
-                    $"Cannot rename '{action}' to '{newName}' in map '{actionMap}' as the map already contains an action with that name");
+                    $"Cannot rename '{action}' to '{newName}' in map '{actionMap}' as the map already contains an action with that name"
+                );
 
             var oldName = action.m_Name;
             action.m_Name = newName;
@@ -972,17 +1021,21 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         public static void AddControlScheme(this InputActionAsset asset, InputControlScheme controlScheme)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.AddControlScheme);
-            #endif
+#endif
 
             if (asset == null)
                 throw new ArgumentNullException(nameof(asset));
             if (string.IsNullOrEmpty(controlScheme.name))
-                throw new ArgumentException("Cannot add control scheme without name to asset " + asset.name, nameof(controlScheme));
+                throw new ArgumentException(
+                    "Cannot add control scheme without name to asset " + asset.name,
+                    nameof(controlScheme)
+                );
             if (asset.FindControlScheme(controlScheme.name) != null)
                 throw new InvalidOperationException(
-                    $"Asset '{asset.name}' already contains a control scheme called '{controlScheme.name}'");
+                    $"Asset '{asset.name}' already contains a control scheme called '{controlScheme.name}'"
+                );
 
             ArrayHelpers.Append(ref asset.m_ControlSchemes, controlScheme);
 
@@ -1044,9 +1097,9 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         public static void RemoveControlScheme(this InputActionAsset asset, string name)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.RemoveControlScheme);
-            #endif
+#endif
 
             if (asset == null)
                 throw new ArgumentNullException(nameof(asset));
@@ -1068,18 +1121,20 @@ namespace UnityEngine.InputSystem
         /// <returns><paramref name="scheme"/></returns>
         public static InputControlScheme WithBindingGroup(this InputControlScheme scheme, string bindingGroup)
         {
-            #if UNITY_EDITOR
-            RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeWithBindingGroup);
-            #endif
+#if UNITY_EDITOR
+            RegisterApiUsage(
+                UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeWithBindingGroup
+            );
+#endif
 
             return new ControlSchemeSyntax(scheme).WithBindingGroup(bindingGroup).Done();
         }
 
         public static InputControlScheme WithDevice(this InputControlScheme scheme, string controlPath, bool required)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeWithDevice);
-            #endif
+#endif
 
             if (required)
                 return new ControlSchemeSyntax(scheme).WithRequiredDevice(controlPath).Done();
@@ -1088,36 +1143,44 @@ namespace UnityEngine.InputSystem
 
         public static InputControlScheme WithRequiredDevice(this InputControlScheme scheme, string controlPath)
         {
-            #if UNITY_EDITOR
-            RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeWithRequiredDevice);
-            #endif
+#if UNITY_EDITOR
+            RegisterApiUsage(
+                UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeWithRequiredDevice
+            );
+#endif
 
             return new ControlSchemeSyntax(scheme).WithRequiredDevice(controlPath).Done();
         }
 
         public static InputControlScheme WithOptionalDevice(this InputControlScheme scheme, string controlPath)
         {
-            #if UNITY_EDITOR
-            RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeWithOptionalDevice);
-            #endif
+#if UNITY_EDITOR
+            RegisterApiUsage(
+                UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeWithOptionalDevice
+            );
+#endif
 
             return new ControlSchemeSyntax(scheme).WithOptionalDevice(controlPath).Done();
         }
 
         public static InputControlScheme OrWithRequiredDevice(this InputControlScheme scheme, string controlPath)
         {
-            #if UNITY_EDITOR
-            RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeOrWithRequiredDevice);
-            #endif
+#if UNITY_EDITOR
+            RegisterApiUsage(
+                UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeOrWithRequiredDevice
+            );
+#endif
 
             return new ControlSchemeSyntax(scheme).OrWithRequiredDevice(controlPath).Done();
         }
 
         public static InputControlScheme OrWithOptionalDevice(this InputControlScheme scheme, string controlPath)
         {
-            #if UNITY_EDITOR
-            RegisterApiUsage(UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeOrWithOptionalDevice);
-            #endif
+#if UNITY_EDITOR
+            RegisterApiUsage(
+                UnityEngine.InputSystem.Editor.InputExitPlayModeAnalytic.Api.ControlSchemeOrWithOptionalDevice
+            );
+#endif
 
             return new ControlSchemeSyntax(scheme).OrWithOptionalDevice(controlPath).Done();
         }
@@ -1151,7 +1214,10 @@ namespace UnityEngine.InputSystem
             /// <summary>
             /// True if the if binding accessor is valid.
             /// </summary>
-            public bool valid => m_ActionMap != null && m_BindingIndexInMap >= 0 && m_BindingIndexInMap < m_ActionMap.m_Bindings.LengthSafe();
+            public bool valid =>
+                m_ActionMap != null
+                && m_BindingIndexInMap >= 0
+                && m_BindingIndexInMap < m_ActionMap.m_Bindings.LengthSafe();
 
             /// <summary>
             /// Index of the binding that the accessor refers to.
@@ -1242,7 +1308,9 @@ namespace UnityEngine.InputSystem
                     throw new ArgumentException("Group name cannot be null or empty", nameof(group));
                 if (group.IndexOf(InputBinding.Separator) != -1)
                     throw new ArgumentException(
-                        $"Group name cannot contain separator character '{InputBinding.Separator}'", nameof(group));
+                        $"Group name cannot contain separator character '{InputBinding.Separator}'",
+                        nameof(group)
+                    );
 
                 return WithGroups(group);
             }
@@ -1287,7 +1355,9 @@ namespace UnityEngine.InputSystem
                     throw new ArgumentException("Interaction cannot be null or empty", nameof(interaction));
                 if (interaction.IndexOf(InputBinding.Separator) != -1)
                     throw new ArgumentException(
-                        $"Interaction string cannot contain separator character '{InputBinding.Separator}'", nameof(interaction));
+                        $"Interaction string cannot contain separator character '{InputBinding.Separator}'",
+                        nameof(interaction)
+                    );
 
                 return WithInteractions(interaction);
             }
@@ -1332,7 +1402,9 @@ namespace UnityEngine.InputSystem
 
                 var interactionName = InputInteraction.s_Interactions.FindNameForType(typeof(TInteraction));
                 if (interactionName.IsEmpty())
-                    throw new NotSupportedException($"Type '{typeof(TInteraction)}' has not been registered as a interaction");
+                    throw new NotSupportedException(
+                        $"Type '{typeof(TInteraction)}' has not been registered as a interaction"
+                    );
 
                 return WithInteraction(interactionName);
             }
@@ -1353,7 +1425,9 @@ namespace UnityEngine.InputSystem
                     throw new ArgumentException("Processor cannot be null or empty", nameof(processor));
                 if (processor.IndexOf(InputBinding.Separator) != -1)
                     throw new ArgumentException(
-                        $"Processor string cannot contain separator character '{InputBinding.Separator}'", nameof(processor));
+                        $"Processor string cannot contain separator character '{InputBinding.Separator}'",
+                        nameof(processor)
+                    );
 
                 return WithProcessors(processor);
             }
@@ -1397,7 +1471,9 @@ namespace UnityEngine.InputSystem
 
                 var processorName = InputProcessor.s_Processors.FindNameForType(typeof(TProcessor));
                 if (processorName.IsEmpty())
-                    throw new NotSupportedException($"Type '{typeof(TProcessor)}' has not been registered as a processor");
+                    throw new NotSupportedException(
+                        $"Type '{typeof(TProcessor)}' has not been registered as a processor"
+                    );
 
                 return WithProcessor(processorName);
             }
@@ -1418,7 +1494,9 @@ namespace UnityEngine.InputSystem
                     throw new ArgumentNullException(nameof(action));
                 if (action.isSingletonAction)
                     throw new ArgumentException(
-                        $"Cannot change the action a binding triggers on singleton action '{action}'", nameof(action));
+                        $"Cannot change the action a binding triggers on singleton action '{action}'",
+                        nameof(action)
+                    );
                 m_ActionMap.m_Bindings[m_BindingIndexInMap].action = action.name;
                 m_ActionMap.OnBindingModified();
                 return this;
@@ -1660,7 +1738,10 @@ namespace UnityEngine.InputSystem
                 // If it's a composite, also erase part bindings.
                 if (isComposite)
                 {
-                    while (m_BindingIndexInMap < m_ActionMap.m_Bindings.LengthSafe() && m_ActionMap.m_Bindings[m_BindingIndexInMap].isPartOfComposite)
+                    while (
+                        m_BindingIndexInMap < m_ActionMap.m_Bindings.LengthSafe()
+                        && m_ActionMap.m_Bindings[m_BindingIndexInMap].isPartOfComposite
+                    )
                     {
                         ArrayHelpers.EraseAt(ref m_ActionMap.m_Bindings, m_BindingIndexInMap);
                     }
@@ -1693,9 +1774,17 @@ namespace UnityEngine.InputSystem
                 if (!binding.isPartOfComposite && !binding.isComposite)
                     throw new InvalidOperationException("Binding accessor must point to composite or part binding");
 
-                AddBindingInternal(m_ActionMap,
-                    new InputBinding { path = path, isPartOfComposite = true, name = partName, action = m_Action?.name },
-                    m_BindingIndexInMap + 1);
+                AddBindingInternal(
+                    m_ActionMap,
+                    new InputBinding
+                    {
+                        path = path,
+                        isPartOfComposite = true,
+                        name = partName,
+                        action = m_Action?.name,
+                    },
+                    m_BindingIndexInMap + 1
+                );
 
                 return new BindingSyntax(m_ActionMap, m_BindingIndexInMap + 1, m_Action);
             }
@@ -1774,10 +1863,12 @@ namespace UnityEngine.InputSystem
                 {
                     int bindingIndex;
                     if (m_Action != null)
-                        bindingIndex = m_Action.AddBinding(path: binding, groups: groups, processors: processors)
+                        bindingIndex = m_Action
+                            .AddBinding(path: binding, groups: groups, processors: processors)
                             .m_BindingIndexInMap;
                     else
-                        bindingIndex = m_ActionMap.AddBinding(path: binding, groups: groups, processors: processors)
+                        bindingIndex = m_ActionMap
+                            .AddBinding(path: binding, groups: groups, processors: processors)
                             .m_BindingIndexInMap;
 
                     m_ActionMap.m_Bindings[bindingIndex].name = name;
@@ -1936,9 +2027,10 @@ namespace UnityEngine.InputSystem
             /// <returns>The same control scheme syntax for further configuration.</returns>
             public ControlSchemeSyntax OrWithOptionalDevice(string controlPath)
             {
-                AddDeviceEntry(controlPath,
-                    InputControlScheme.DeviceRequirement.Flags.Optional |
-                    InputControlScheme.DeviceRequirement.Flags.Or);
+                AddDeviceEntry(
+                    controlPath,
+                    InputControlScheme.DeviceRequirement.Flags.Optional | InputControlScheme.DeviceRequirement.Flags.Or
+                );
                 return this;
             }
 
@@ -1968,12 +2060,10 @@ namespace UnityEngine.InputSystem
                     throw new ArgumentNullException(nameof(controlPath));
 
                 var scheme = m_Asset != null ? m_Asset.m_ControlSchemes[m_ControlSchemeIndex] : m_ControlScheme;
-                ArrayHelpers.Append(ref scheme.m_DeviceRequirements,
-                    new InputControlScheme.DeviceRequirement
-                    {
-                        m_ControlPath = controlPath,
-                        m_Flags = flags,
-                    });
+                ArrayHelpers.Append(
+                    ref scheme.m_DeviceRequirements,
+                    new InputControlScheme.DeviceRequirement { m_ControlPath = controlPath, m_Flags = flags }
+                );
 
                 if (m_Asset == null)
                     m_ControlScheme = scheme;

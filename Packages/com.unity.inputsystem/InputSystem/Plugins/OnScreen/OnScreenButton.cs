@@ -1,7 +1,6 @@
 #if PACKAGE_DOCS_GENERATION || UNITY_INPUT_SYSTEM_ENABLE_UI
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.Layouts;
-
 #if UNITY_EDITOR
 using UnityEngine.InputSystem.Editor;
 #endif

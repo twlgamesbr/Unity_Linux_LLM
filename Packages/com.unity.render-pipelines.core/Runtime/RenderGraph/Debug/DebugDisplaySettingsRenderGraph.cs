@@ -5,8 +5,16 @@ namespace UnityEngine.Rendering
     /// <summary>
     /// Render Graph-related Rendering Debugger settings.
     /// </summary>
-    [PipelineHelpURL("UniversalRenderPipelineAsset", pageName: "features/rendering-debugger-reference", pageHash: "render-graph")]
-    [PipelineHelpURL("HDRenderPipelineAsset", pageName: "rendering-debugger-window-reference", pageHash: "render-graph")]
+    [PipelineHelpURL(
+        "UniversalRenderPipelineAsset",
+        pageName: "features/rendering-debugger-reference",
+        pageHash: "render-graph"
+    )]
+    [PipelineHelpURL(
+        "HDRenderPipelineAsset",
+        pageName: "rendering-debugger-window-reference",
+        pageHash: "render-graph"
+    )]
     class DebugDisplaySettingsRenderGraph : IDebugDisplaySettingsData
     {
         public DebugDisplaySettingsRenderGraph()
@@ -26,7 +34,7 @@ namespace UnityEngine.Rendering
                 var foldout = new DebugUI.Foldout()
                 {
                     displayName = "Render Graph",
-                    documentationUrl = documentationUrl
+                    documentationUrl = documentationUrl,
                 };
                 AddWidget(foldout);
 
@@ -41,12 +49,13 @@ namespace UnityEngine.Rendering
 
                 if (!usingRenderGraph)
                 {
-                    foldout.children.Add(new DebugUI.MessageBox()
-                    {
-                        displayName =
-                            "Warning: The current render pipeline does not have Render Graphs Registered",
-                        style = DebugUI.MessageBox.Style.Warning
-                    });
+                    foldout.children.Add(
+                        new DebugUI.MessageBox()
+                        {
+                            displayName = "Warning: The current render pipeline does not have Render Graphs Registered",
+                            style = DebugUI.MessageBox.Style.Warning,
+                        }
+                    );
                 }
             }
         }

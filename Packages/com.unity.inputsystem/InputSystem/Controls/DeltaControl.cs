@@ -20,7 +20,12 @@ namespace UnityEngine.InputSystem.Controls
         /// <remarks>
         /// The control is marked as <see cref="InputControl.synthetic"/>.
         /// </remarks>
-        [InputControl(useStateFrom = "y", parameters = "clamp=1,clampMin=0,clampMax=3.402823E+38", synthetic = true, displayName = "Up")]
+        [InputControl(
+            useStateFrom = "y",
+            parameters = "clamp=1,clampMin=0,clampMax=3.402823E+38",
+            synthetic = true,
+            displayName = "Up"
+        )]
         [Preserve]
         public AxisControl up { get; set; }
 
@@ -31,7 +36,12 @@ namespace UnityEngine.InputSystem.Controls
         /// <remarks>
         /// The control is marked as <see cref="InputControl.synthetic"/>.
         /// </remarks>
-        [InputControl(useStateFrom = "y", parameters = "clamp=1,clampMin=-3.402823E+38,clampMax=0,invert", synthetic = true, displayName = "Down")]
+        [InputControl(
+            useStateFrom = "y",
+            parameters = "clamp=1,clampMin=-3.402823E+38,clampMax=0,invert",
+            synthetic = true,
+            displayName = "Down"
+        )]
         [Preserve]
         public AxisControl down { get; set; }
 
@@ -42,7 +52,12 @@ namespace UnityEngine.InputSystem.Controls
         /// <remarks>
         /// The control is marked as <see cref="InputControl.synthetic"/>.
         /// </remarks>
-        [InputControl(useStateFrom = "x", parameters = "clamp=1,clampMin=-3.402823E+38,clampMax=0,invert", synthetic = true, displayName = "Left")]
+        [InputControl(
+            useStateFrom = "x",
+            parameters = "clamp=1,clampMin=-3.402823E+38,clampMax=0,invert",
+            synthetic = true,
+            displayName = "Left"
+        )]
         [Preserve]
         public AxisControl left { get; set; }
 
@@ -53,7 +68,12 @@ namespace UnityEngine.InputSystem.Controls
         /// <remarks>
         /// The control is marked as <see cref="InputControl.synthetic"/>.
         /// </remarks>
-        [InputControl(useStateFrom = "x", parameters = "clamp=1,clampMin=0,clampMax=3.402823E+38", synthetic = true, displayName = "Right")]
+        [InputControl(
+            useStateFrom = "x",
+            parameters = "clamp=1,clampMin=0,clampMax=3.402823E+38",
+            synthetic = true,
+            displayName = "Right"
+        )]
         [Preserve]
         public AxisControl right { get; set; }
 

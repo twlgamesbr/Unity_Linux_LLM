@@ -10,7 +10,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public PlayModeAchievementSystem(IEnvironment environment, PlayModeAccountAchievementData achievementData)
         {
-            m_NotificationManager = environment.NotificationManager ?? throw new ArgumentNullException(nameof(environment.NotificationManager));
+            m_NotificationManager =
+                environment.NotificationManager
+                ?? throw new ArgumentNullException(nameof(environment.NotificationManager));
             // Make sure the achievement data has updated names.
             achievementData.UpdateAchievementList();
             m_AchievementData = achievementData;

@@ -12,7 +12,12 @@ namespace UnityEngine.InputSystem
         private InlinedArray<StateChangeMonitorTimeout> m_StateChangeMonitorTimeouts;
 
         ////TODO: support combining monitors for bitfields
-        public void AddStateChangeMonitor(InputControl control, IInputStateChangeMonitor monitor, long monitorIndex, uint groupIndex)
+        public void AddStateChangeMonitor(
+            InputControl control,
+            IInputStateChangeMonitor monitor,
+            long monitorIndex,
+            uint groupIndex
+        )
         {
             if (m_DevicesCount <= 0)
                 return;
@@ -75,12 +80,20 @@ namespace UnityEngine.InputSystem
 
             // Remove pending timeouts on the monitor.
             for (var i = 0; i < m_StateChangeMonitorTimeouts.length; ++i)
-                if (m_StateChangeMonitorTimeouts[i].monitor == monitor &&
-                    m_StateChangeMonitorTimeouts[i].monitorIndex == monitorIndex)
+                if (
+                    m_StateChangeMonitorTimeouts[i].monitor == monitor
+                    && m_StateChangeMonitorTimeouts[i].monitorIndex == monitorIndex
+                )
                     m_StateChangeMonitorTimeouts[i] = default;
         }
 
-        public void AddStateChangeMonitorTimeout(InputControl control, IInputStateChangeMonitor monitor, double time, long monitorIndex, int timerIndex)
+        public void AddStateChangeMonitorTimeout(
+            InputControl control,
+            IInputStateChangeMonitor monitor,
+            double time,
+            long monitorIndex,
+            int timerIndex
+        )
         {
             m_StateChangeMonitorTimeouts.Append(
                 new StateChangeMonitorTimeout
@@ -90,7 +103,8 @@ namespace UnityEngine.InputSystem
                     monitor = monitor,
                     monitorIndex = monitorIndex,
                     timerIndex = timerIndex,
-                });
+                }
+            );
         }
 
         public void RemoveStateChangeMonitorTimeout(IInputStateChangeMonitor monitor, long monitorIndex, int timerIndex)
@@ -99,9 +113,11 @@ namespace UnityEngine.InputSystem
             for (var i = 0; i < timeoutCount; ++i)
             {
                 ////REVIEW: can we avoid the repeated array lookups without copying the struct out?
-                if (ReferenceEquals(m_StateChangeMonitorTimeouts[i].monitor, monitor)
+                if (
+                    ReferenceEquals(m_StateChangeMonitorTimeouts[i].monitor, monitor)
                     && m_StateChangeMonitorTimeouts[i].monitorIndex == monitorIndex
-                    && m_StateChangeMonitorTimeouts[i].timerIndex == timerIndex)
+                    && m_StateChangeMonitorTimeouts[i].timerIndex == timerIndex
+                )
                 {
                     m_StateChangeMonitorTimeouts[i] = default;
                     break;
@@ -111,8 +127,11 @@ namespace UnityEngine.InputSystem
 
         private void SortStateChangeMonitorsIfNecessary(int deviceIndex)
         {
-            if (m_StateChangeMonitors != null && deviceIndex < m_StateChangeMonitors.Length &&
-                m_StateChangeMonitors[deviceIndex].needToUpdateOrderingOfMonitors)
+            if (
+                m_StateChangeMonitors != null
+                && deviceIndex < m_StateChangeMonitors.Length
+                && m_StateChangeMonitors[deviceIndex].needToUpdateOrderingOfMonitors
+            )
                 m_StateChangeMonitors[deviceIndex].SortMonitorsByIndex();
         }
 
@@ -184,16 +203,30 @@ namespace UnityEngine.InputSystem
 
                 // Record listener.
                 var listenerCount = signalled.length;
-                ArrayHelpers.AppendWithCapacity(ref listeners, ref listenerCount,
+                ArrayHelpers.AppendWithCapacity(
+                    ref listeners,
+                    ref listenerCount,
                     new StateChangeMonitorListener
-                    { monitor = monitor, monitorIndex = monitorIndex, groupIndex = groupIndex, control = control });
+                    {
+                        monitor = monitor,
+                        monitorIndex = monitorIndex,
+                        groupIndex = groupIndex,
+                        control = control,
+                    }
+                );
 
                 // Record memory region.
                 ref var controlStateBlock = ref control.m_StateBlock;
                 var memoryRegionCount = signalled.length;
-                ArrayHelpers.AppendWithCapacity(ref memoryRegions, ref memoryRegionCount,
-                    new MemoryHelpers.BitRegion(controlStateBlock.byteOffset - control.device.stateBlock.byteOffset,
-                        controlStateBlock.bitOffset, controlStateBlock.sizeInBits));
+                ArrayHelpers.AppendWithCapacity(
+                    ref memoryRegions,
+                    ref memoryRegionCount,
+                    new MemoryHelpers.BitRegion(
+                        controlStateBlock.byteOffset - control.device.stateBlock.byteOffset,
+                        controlStateBlock.bitOffset,
+                        controlStateBlock.sizeInBits
+                    )
+                );
 
                 signalled.SetLength(signalled.length + 1);
 
@@ -266,8 +299,12 @@ namespace UnityEngine.InputSystem
                     {
                         // Sort by complexities only to keep the sort stable
                         // i.e. don't reverse the order of controls which have the same complexity
-                        var firstComplexity = InputActionState.GetComplexityFromMonitorIndex(listeners[j - 1].monitorIndex);
-                        var secondComplexity = InputActionState.GetComplexityFromMonitorIndex(listeners[j].monitorIndex);
+                        var firstComplexity = InputActionState.GetComplexityFromMonitorIndex(
+                            listeners[j - 1].monitorIndex
+                        );
+                        var secondComplexity = InputActionState.GetComplexityFromMonitorIndex(
+                            listeners[j].monitorIndex
+                        );
                         if (firstComplexity >= secondComplexity)
                             break;
 
@@ -286,7 +323,13 @@ namespace UnityEngine.InputSystem
         // NOTE: 'newState' can be a subset of the full state stored at 'oldState'. In this case,
         //       'newStateOffsetInBytes' must give the offset into the full state and 'newStateSizeInBytes' must
         //       give the size of memory slice to be updated.
-        private unsafe bool ProcessStateChangeMonitors(int deviceIndex, void* newStateFromEvent, void* oldStateOfDevice, uint newStateSizeInBytes, uint newStateOffsetInBytes)
+        private unsafe bool ProcessStateChangeMonitors(
+            int deviceIndex,
+            void* newStateFromEvent,
+            void* oldStateOfDevice,
+            uint newStateSizeInBytes,
+            uint newStateOffsetInBytes
+        )
         {
             if (m_StateChangeMonitors == null)
                 return false;
@@ -332,7 +375,14 @@ namespace UnityEngine.InputSystem
                 }
 
                 var overlap = newEventMemoryRegion.Overlap(memoryRegion);
-                if (overlap.isEmpty || MemoryHelpers.Compare(oldStateOfDevice, (byte*)newStateFromEvent - newStateOffsetInBytes, overlap))
+                if (
+                    overlap.isEmpty
+                    || MemoryHelpers.Compare(
+                        oldStateOfDevice,
+                        (byte*)newStateFromEvent - newStateOffsetInBytes,
+                        overlap
+                    )
+                )
                     continue;
 
                 signals.SetBit(i);
@@ -357,7 +407,10 @@ namespace UnityEngine.InputSystem
             }
             if (m_StateChangeMonitors.Length <= deviceIndex)
             {
-                Debug.Assert(false, $"deviceIndex {deviceIndex} passed to FireStateChangeNotifications is out of bounds (current length {m_StateChangeMonitors.Length}).");
+                Debug.Assert(
+                    false,
+                    $"deviceIndex {deviceIndex} passed to FireStateChangeNotifications is out of bounds (current length {m_StateChangeMonitors.Length})."
+                );
                 return;
             }
 
@@ -368,7 +421,10 @@ namespace UnityEngine.InputSystem
             ref var signals = ref m_StateChangeMonitors[deviceIndex].signalled;
             if (signals.AnyBitIsSet() && m_StateChangeMonitors[deviceIndex].listeners == null)
             {
-                Debug.Assert(false, $"A state change for device {deviceIndex} has been set, but list of listeners is null.");
+                Debug.Assert(
+                    false,
+                    $"A state change for device {deviceIndex} has been set, but list of listeners is null."
+                );
                 return;
             }
 
@@ -392,13 +448,13 @@ namespace UnityEngine.InputSystem
                 var listener = listeners[i];
                 try
                 {
-                    listener.monitor.NotifyControlStateChanged(listener.control, time, eventPtr,
-                        listener.monitorIndex);
+                    listener.monitor.NotifyControlStateChanged(listener.control, time, eventPtr, listener.monitorIndex);
                 }
                 catch (Exception exception)
                 {
                     Debug.LogError(
-                        $"Exception '{exception.GetType().Name}' thrown from state change monitor '{listener.monitor.GetType().Name}' on '{listener.control}'");
+                        $"Exception '{exception.GetType().Name}' thrown from state change monitor '{listener.monitor.GetType().Name}' on '{listener.control}'"
+                    );
                     Debug.LogException(exception);
                 }
 
@@ -454,8 +510,12 @@ namespace UnityEngine.InputSystem
                 if (timerExpirationTime <= currentTime)
                 {
                     var timeout = m_StateChangeMonitorTimeouts[i];
-                    timeout.monitor.NotifyTimerExpired(timeout.control,
-                        currentTime, timeout.monitorIndex, timeout.timerIndex);
+                    timeout.monitor.NotifyTimerExpired(
+                        timeout.control,
+                        currentTime,
+                        timeout.monitorIndex,
+                        timeout.timerIndex
+                    );
 
                     // Compaction will get rid of the entry.
                 }

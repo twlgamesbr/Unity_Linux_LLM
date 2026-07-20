@@ -5,7 +5,8 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.Entities.DebugProxies
 {
-    readonly unsafe struct BlobAssetReferenceProxy<T> where T : unmanaged
+    readonly unsafe struct BlobAssetReferenceProxy<T>
+        where T : unmanaged
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly object m_Root;
@@ -27,6 +28,7 @@ namespace Unity.Entities.DebugProxies
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Key;
+
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public object Value;
 
@@ -34,10 +36,12 @@ namespace Unity.Entities.DebugProxies
         public string TypeName => Value.GetType().Name;
     }
 
-    struct BlobStructProxy<T> where T : struct
+    struct BlobStructProxy<T>
+        where T : struct
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private BlobStruct<T> m_Struct;
+
         public BlobStructProxy(BlobStruct<T> struc)
         {
             m_Struct = struc;
@@ -47,10 +51,12 @@ namespace Unity.Entities.DebugProxies
         public BlobMember[] Entries => m_Struct.Members;
     }
 
-    struct BlobPtrProxy<T> where T : struct
+    struct BlobPtrProxy<T>
+        where T : struct
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private BlobPtrDebug<T> m_Ptr;
+
         public BlobPtrProxy(BlobPtrDebug<T> ptr)
         {
             m_Ptr = ptr;
@@ -60,16 +66,20 @@ namespace Unity.Entities.DebugProxies
     }
 
     [DebuggerDisplay("{Description,nq}")]
-    unsafe struct BlobArrayDebug<T> where T : struct
+    unsafe struct BlobArrayDebug<T>
+        where T : struct
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly void* m_BasePtr;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private object[] m_Entries;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Description => "BlobArray<" + typeof(T).Name + "> (" + Length + ')';
+
         public override string ToString() => Description;
+
         public int Length => UnsafeUtility.AsRef<BlobArray<T>>(m_BasePtr).Length;
 
         public BlobArrayDebug(IntPtr basePtr)
@@ -84,7 +94,7 @@ namespace Unity.Entities.DebugProxies
                 return;
             ref var blobArr = ref UnsafeUtility.AsRef<BlobArray<T>>(m_BasePtr);
             int offset = blobArr.m_OffsetPtr;
-            byte* arrBasePtr = (byte*) m_BasePtr + offset;
+            byte* arrBasePtr = (byte*)m_BasePtr + offset;
             // we might know the concrete type, but if T might need to be wrapped, so object[] it is
             var arr = new object[blobArr.Length];
             int length = blobArr.Length;
@@ -112,14 +122,17 @@ namespace Unity.Entities.DebugProxies
 
     [DebuggerTypeProxy(typeof(BlobStructProxy<>))]
     [DebuggerDisplay("{Description,nq}")]
-    unsafe struct BlobStruct<T> where T : struct
+    unsafe struct BlobStruct<T>
+        where T : struct
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly void* m_BasePtr;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private BlobMember[] m_Members;
 
         public string Description => UnsafeUtility.AsRef<T>(m_BasePtr).ToString();
+
         public override string ToString() => Description;
 
         public BlobStruct(IntPtr basePtr)
@@ -137,11 +150,11 @@ namespace Unity.Entities.DebugProxies
             m_Members = new BlobMember[fields.Length];
             for (int i = 0; i < m_Members.Length; i++)
             {
-                var offset = (byte*) m_BasePtr + UnsafeUtility.GetFieldOffset(fields[i]);
+                var offset = (byte*)m_BasePtr + UnsafeUtility.GetFieldOffset(fields[i]);
                 m_Members[i] = new BlobMember
                 {
                     Key = fields[i].Name,
-                    Value = BlobProxy.UnpackValue(offset, fields[i].FieldType)
+                    Value = BlobProxy.UnpackValue(offset, fields[i].FieldType),
                 };
             }
         }
@@ -158,14 +171,17 @@ namespace Unity.Entities.DebugProxies
 
     [DebuggerTypeProxy(typeof(BlobPtrProxy<>))]
     [DebuggerDisplay("{Description,nq}")]
-    unsafe struct BlobPtrDebug<T> where T : struct
+    unsafe struct BlobPtrDebug<T>
+        where T : struct
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly void* m_BasePtr;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private object m_Value;
 
         public string Description => "BlobPtr<" + typeof(T).Name + '>';
+
         public override string ToString() => Description;
 
         public BlobPtrDebug(IntPtr basePtr)
@@ -178,7 +194,7 @@ namespace Unity.Entities.DebugProxies
         {
             if (m_Value != null)
                 return;
-            var referencedOffset = (byte*) m_BasePtr + UnsafeUtility.AsRef<BlobPtr<T>>(m_BasePtr).m_OffsetPtr;
+            var referencedOffset = (byte*)m_BasePtr + UnsafeUtility.AsRef<BlobPtr<T>>(m_BasePtr).m_OffsetPtr;
             m_Value = BlobProxy.UnpackValue(referencedOffset, typeof(T));
         }
 
@@ -194,7 +210,8 @@ namespace Unity.Entities.DebugProxies
 
     static class BlobProxy
     {
-        static unsafe object GetPrimitive<T>(IntPtr basePtr) where T : unmanaged
+        static unsafe object GetPrimitive<T>(IntPtr basePtr)
+            where T : unmanaged
         {
             return *(T*)basePtr.ToPointer();
         }
@@ -231,7 +248,9 @@ namespace Unity.Entities.DebugProxies
                 return Activator.CreateInstance(structType, new IntPtr(basePtr));
             }
 
-            var makePrimitive = typeof(BlobProxy).GetMethod("GetPrimitive", BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(type);
+            var makePrimitive = typeof(BlobProxy)
+                .GetMethod("GetPrimitive", BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(type);
             return makePrimitive.Invoke(null, new object[] { new IntPtr(basePtr) });
         }
     }

@@ -40,15 +40,28 @@ namespace UnityEngine.Rendering.Universal
         ref Header header => ref UnsafeUtility.AsRef<Header>(m_Data);
 
         (int, int) m_ActiveFreeMaskCounts;
-        NativeArray<int> freeMaskCounts => GetNativeArray<int>(m_ActiveFreeMaskCounts.Item1, m_ActiveFreeMaskCounts.Item2);
+        NativeArray<int> freeMaskCounts =>
+            GetNativeArray<int>(m_ActiveFreeMaskCounts.Item1, m_ActiveFreeMaskCounts.Item2);
 
         (int, int) m_FreeMasksStorage;
-        NativeArray<ulong> freeMasksStorage => GetNativeArray<ulong>(m_FreeMasksStorage.Item1, m_FreeMasksStorage.Item2);
-        NativeArray<ulong> FreeMasks(int level) => freeMasksStorage.GetSubArray(LevelOffset64(level, header.branchingOrder), LevelLength64(level, header.branchingOrder));
+        NativeArray<ulong> freeMasksStorage =>
+            GetNativeArray<ulong>(m_FreeMasksStorage.Item1, m_FreeMasksStorage.Item2);
+
+        NativeArray<ulong> FreeMasks(int level) =>
+            freeMasksStorage.GetSubArray(
+                LevelOffset64(level, header.branchingOrder),
+                LevelLength64(level, header.branchingOrder)
+            );
 
         (int, int) m_FreeMaskIndicesStorage;
-        NativeArray<int> freeMaskIndicesStorage => GetNativeArray<int>(m_FreeMaskIndicesStorage.Item1, m_FreeMaskIndicesStorage.Item2);
-        NativeArray<int> FreeMaskIndices(int level) => freeMaskIndicesStorage.GetSubArray(LevelOffset64(level, header.branchingOrder), LevelLength64(level, header.branchingOrder));
+        NativeArray<int> freeMaskIndicesStorage =>
+            GetNativeArray<int>(m_FreeMaskIndicesStorage.Item1, m_FreeMaskIndicesStorage.Item2);
+
+        NativeArray<int> FreeMaskIndices(int level) =>
+            freeMaskIndicesStorage.GetSubArray(
+                LevelOffset64(level, header.branchingOrder),
+                LevelLength64(level, header.branchingOrder)
+            );
 
         Allocator m_Allocator;
 
@@ -77,11 +90,7 @@ namespace UnityEngine.Rendering.Universal
             m_SafetyHandle = AtomicSafetyHandle.Create();
 #endif
 
-            header = new Header
-            {
-                branchingOrder = branchingOrder,
-                levelCount = levelCount
-            };
+            header = new Header { branchingOrder = branchingOrder, levelCount = levelCount };
 
             // Initialize level-0 to have 1/1 block available.
             var freeMasks0 = FreeMasks(0);
@@ -172,7 +181,9 @@ namespace UnityEngine.Rendering.Universal
                 var indices = FreeMaskIndices(level);
                 var counts = freeMaskCounts;
 
-                var superBlockMask = ((1ul << Pow2(header.branchingOrder)) - 1) << ((bitIndex >> header.branchingOrder) * Pow2(header.branchingOrder));
+                var superBlockMask =
+                    ((1ul << Pow2(header.branchingOrder)) - 1)
+                    << ((bitIndex >> header.branchingOrder) * Pow2(header.branchingOrder));
                 // Check if the whole super-block (i.e. making up one block of the next level) is free.
                 // If it is, we let the loop continue upwards.
                 if (level == 0 || (~freeMask & superBlockMask) != 0)
@@ -215,9 +226,14 @@ namespace UnityEngine.Rendering.Universal
             m_Allocator = default;
         }
 
-        NativeArray<T> GetNativeArray<T>(int offset, int length) where T : struct
+        NativeArray<T> GetNativeArray<T>(int offset, int length)
+            where T : struct
         {
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(PtrAdd(m_Data, offset), length, m_Allocator);
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                PtrAdd(m_Data, offset),
+                length,
+                m_Allocator
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, m_SafetyHandle);
 #endif
@@ -225,14 +241,21 @@ namespace UnityEngine.Rendering.Universal
         }
 
         // sum x^i for i=0..(n-1) = (x ^ n - 1) / (x - 1) where n is order and n is 2^branchingOrder
-        static int LevelOffset(int level, int branchingOrder) => (Pow2(branchingOrder) * (Pow2(branchingOrder * (level - 1) + branchingOrder) - 1)) / (Pow2(branchingOrder) - 1);
+        static int LevelOffset(int level, int branchingOrder) =>
+            (Pow2(branchingOrder) * (Pow2(branchingOrder * (level - 1) + branchingOrder) - 1))
+            / (Pow2(branchingOrder) - 1);
+
         static int LevelLength(int level, int branchingOrder) => Pow2N(branchingOrder, level + 1);
 
         // These are for when orders of length <= 64 only take up 1 item, e.g. ulong bitmasks.
-        static int LevelOffset64(int level, int branchingOrder) => math.min(level, 6/branchingOrder) + LevelOffset(math.max(0, level - 6/branchingOrder), branchingOrder);
-        static int LevelLength64(int level, int branchingOrder) => Pow2N(branchingOrder, math.max(0, level - 6/branchingOrder + 1));
+        static int LevelOffset64(int level, int branchingOrder) =>
+            math.min(level, 6 / branchingOrder) + LevelOffset(math.max(0, level - 6 / branchingOrder), branchingOrder);
 
-        static (int, int) AllocateRange<T>(int length, ref int dataSize) where T : struct
+        static int LevelLength64(int level, int branchingOrder) =>
+            Pow2N(branchingOrder, math.max(0, level - 6 / branchingOrder + 1));
+
+        static (int, int) AllocateRange<T>(int length, ref int dataSize)
+            where T : struct
         {
             dataSize = AlignForward(dataSize, UnsafeUtility.AlignOf<T>());
             var range = (dataSize, length);
@@ -248,7 +271,7 @@ namespace UnityEngine.Rendering.Universal
             return offset;
         }
 
-        static void* PtrAdd(void* ptr, int bytes) => (void*) ((IntPtr) ptr + bytes);
+        static void* PtrAdd(void* ptr, int bytes) => (void*)((IntPtr)ptr + bytes);
 
         static int Pow2(int n) => 1 << n;
 

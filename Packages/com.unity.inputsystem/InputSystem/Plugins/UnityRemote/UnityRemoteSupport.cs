@@ -84,22 +84,35 @@ namespace UnityEngine.InputSystem
                     var phase = TouchPhase.None;
                     switch (touchMessage->phase)
                     {
-                        case (int)UnityEngine.TouchPhase.Began: phase = TouchPhase.Began; break;
-                        case (int)UnityEngine.TouchPhase.Canceled: phase = TouchPhase.Canceled; break;
-                        case (int)UnityEngine.TouchPhase.Ended: phase = TouchPhase.Ended; break;
-                        case (int)UnityEngine.TouchPhase.Moved: phase = TouchPhase.Moved; break;
-                            // Ignore stationary.
+                        case (int)UnityEngine.TouchPhase.Began:
+                            phase = TouchPhase.Began;
+                            break;
+                        case (int)UnityEngine.TouchPhase.Canceled:
+                            phase = TouchPhase.Canceled;
+                            break;
+                        case (int)UnityEngine.TouchPhase.Ended:
+                            phase = TouchPhase.Ended;
+                            break;
+                        case (int)UnityEngine.TouchPhase.Moved:
+                            phase = TouchPhase.Moved;
+                            break;
+                        // Ignore stationary.
                     }
                     if (phase == default)
                         break;
-                    InputSystem.QueueStateEvent(s_State.touchscreen, new TouchState
-                    {
-                        touchId = touchMessage->id + 1,
-                        phase = phase,
-                        position = MapRemoteTouchCoordinatesToLocal(new Vector2(touchMessage->positionX, touchMessage->positionY)),
-                        radius = new Vector2(touchMessage->radius, touchMessage->radius),
-                        pressure = touchMessage->pressure
-                    });
+                    InputSystem.QueueStateEvent(
+                        s_State.touchscreen,
+                        new TouchState
+                        {
+                            touchId = touchMessage->id + 1,
+                            phase = phase,
+                            position = MapRemoteTouchCoordinatesToLocal(
+                                new Vector2(touchMessage->positionX, touchMessage->positionY)
+                            ),
+                            radius = new Vector2(touchMessage->radius, touchMessage->radius),
+                            pressure = touchMessage->pressure,
+                        }
+                    );
                     break;
 
                 case (byte)MessageType.GyroSettings:
@@ -137,35 +150,60 @@ namespace UnityEngine.InputSystem
                     var gyroInputMessage = (GyroInputMessage*)messageData;
                     if (s_State.attitude != null && s_State.attitude.enabled)
                     {
-                        InputSystem.QueueStateEvent(s_State.attitude, new AttitudeState
-                        {
-                            attitude = new Quaternion(gyroInputMessage->attitudeX, gyroInputMessage->attitudeY, gyroInputMessage->attitudeZ,
-                                gyroInputMessage->attitudeW)
-                        });
+                        InputSystem.QueueStateEvent(
+                            s_State.attitude,
+                            new AttitudeState
+                            {
+                                attitude = new Quaternion(
+                                    gyroInputMessage->attitudeX,
+                                    gyroInputMessage->attitudeY,
+                                    gyroInputMessage->attitudeZ,
+                                    gyroInputMessage->attitudeW
+                                ),
+                            }
+                        );
                     }
                     if (s_State.gyroscope != null && s_State.gyroscope.enabled)
                     {
-                        InputSystem.QueueStateEvent(s_State.gyroscope, new GyroscopeState
-                        {
-                            angularVelocity = new Vector3(gyroInputMessage->rotationRateX, gyroInputMessage->rotationRateY,
-                                gyroInputMessage->rotationRateZ)
-                        });
+                        InputSystem.QueueStateEvent(
+                            s_State.gyroscope,
+                            new GyroscopeState
+                            {
+                                angularVelocity = new Vector3(
+                                    gyroInputMessage->rotationRateX,
+                                    gyroInputMessage->rotationRateY,
+                                    gyroInputMessage->rotationRateZ
+                                ),
+                            }
+                        );
                     }
                     if (s_State.gravity != null && s_State.gravity.enabled)
                     {
-                        InputSystem.QueueStateEvent(s_State.gravity, new GravityState
-                        {
-                            gravity = new Vector3(gyroInputMessage->gravityX, gyroInputMessage->gravityY,
-                                gyroInputMessage->gravityZ)
-                        });
+                        InputSystem.QueueStateEvent(
+                            s_State.gravity,
+                            new GravityState
+                            {
+                                gravity = new Vector3(
+                                    gyroInputMessage->gravityX,
+                                    gyroInputMessage->gravityY,
+                                    gyroInputMessage->gravityZ
+                                ),
+                            }
+                        );
                     }
                     if (s_State.linearAcceleration != null && s_State.linearAcceleration.enabled)
                     {
-                        InputSystem.QueueStateEvent(s_State.linearAcceleration, new LinearAccelerationState
-                        {
-                            acceleration = new Vector3(gyroInputMessage->userAccelerationX, gyroInputMessage->userAccelerationY,
-                                gyroInputMessage->userAccelerationZ)
-                        });
+                        InputSystem.QueueStateEvent(
+                            s_State.linearAcceleration,
+                            new LinearAccelerationState
+                            {
+                                acceleration = new Vector3(
+                                    gyroInputMessage->userAccelerationX,
+                                    gyroInputMessage->userAccelerationY,
+                                    gyroInputMessage->userAccelerationZ
+                                ),
+                            }
+                        );
                     }
                     break;
 
@@ -173,11 +211,17 @@ namespace UnityEngine.InputSystem
                     if (s_State.accelerometer == null)
                         break;
                     var accelerometerMessage = (AccelerometerInputMessage*)messageData;
-                    InputSystem.QueueStateEvent(s_State.accelerometer, new AccelerometerState
-                    {
-                        acceleration = new Vector3(accelerometerMessage->accelerationX, accelerometerMessage->accelerationY,
-                            accelerometerMessage->accelerationZ)
-                    });
+                    InputSystem.QueueStateEvent(
+                        s_State.accelerometer,
+                        new AccelerometerState
+                        {
+                            acceleration = new Vector3(
+                                accelerometerMessage->accelerationX,
+                                accelerometerMessage->accelerationY,
+                                accelerometerMessage->accelerationZ
+                            ),
+                        }
+                    );
                     break;
             }
 
@@ -224,8 +268,12 @@ namespace UnityEngine.InputSystem
                 case InputDeviceChange.Disabled:
                     // If it's any of our devices that make up the remote gyro,
                     // send a message to the remote.
-                    if (device == s_State.attitude || device == s_State.gravity || device == s_State.gyroscope ||
-                        device == s_State.linearAcceleration)
+                    if (
+                        device == s_State.attitude
+                        || device == s_State.gravity
+                        || device == s_State.gyroscope
+                        || device == s_State.linearAcceleration
+                    )
                     {
                         SyncGyroEnabledInRemote();
                     }
@@ -235,8 +283,12 @@ namespace UnityEngine.InputSystem
 
         private static unsafe long? OnDeviceCommand(InputDevice device, InputDeviceCommand* command)
         {
-            if (device != s_State.attitude && device != s_State.gyroscope && device != s_State.gravity &&
-                device != s_State.linearAcceleration)
+            if (
+                device != s_State.attitude
+                && device != s_State.gyroscope
+                && device != s_State.gravity
+                && device != s_State.linearAcceleration
+            )
                 return null;
 
             if (command->type == SetSamplingFrequencyCommand.Type)
@@ -257,8 +309,11 @@ namespace UnityEngine.InputSystem
 
         private static void SyncGyroEnabledInRemote()
         {
-            var enabled = (s_State.attitude?.enabled ?? false) || (s_State.gravity?.enabled ?? false) ||
-                (s_State.gyroscope?.enabled ?? false) || (s_State.linearAcceleration?.enabled ?? false);
+            var enabled =
+                (s_State.attitude?.enabled ?? false)
+                || (s_State.gravity?.enabled ?? false)
+                || (s_State.gyroscope?.enabled ?? false)
+                || (s_State.linearAcceleration?.enabled ?? false);
             if (enabled != s_State.gyroEnabled)
             {
                 s_State.gyroEnabled = enabled;
@@ -269,7 +324,7 @@ namespace UnityEngine.InputSystem
         // This is taken from HandleOptionsMessage() in GenericRemote.cpp.
         private static Vector2 DetermineScreenSize(int dimension1, int dimension2)
         {
-            const float kMaxPixels = 640 * 480;  // limit the resolution to VGA
+            const float kMaxPixels = 640 * 480; // limit the resolution to VGA
             float screenPixels = dimension1 * dimension2;
             var divider = (int)Mathf.Ceil(Mathf.Sqrt(screenPixels / kMaxPixels));
 
@@ -281,7 +336,10 @@ namespace UnityEngine.InputSystem
 
             // GetConfigValue is private. Reflect around it.
             var getConfigValueMethod = typeof(EditorSettings).GetMethod("GetConfigValue");
-            if (getConfigValueMethod != null && "Normal".Equals(getConfigValueMethod.Invoke(null, new[] { "UnityRemoteResolution" })))
+            if (
+                getConfigValueMethod != null
+                && "Normal".Equals(getConfigValueMethod.Invoke(null, new[] { "UnityRemoteResolution" }))
+            )
             {
                 hdim1 = dimension1;
                 hdim2 = dimension2;
@@ -300,7 +358,8 @@ namespace UnityEngine.InputSystem
 
             return new Vector2(
                 position.x / screenSizeRemote.x * screenSizeLocal.x,
-                position.y = position.y / screenSizeRemote.y * screenSizeLocal.y);
+                position.y = position.y / screenSizeRemote.y * screenSizeLocal.y
+            );
         }
 
         // See Editor/Src/RemoteInput/GenericRemote.cpp
@@ -346,17 +405,27 @@ namespace UnityEngine.InputSystem
             // Unfortunately, the header has an odd 5 byte length and everything
             // coming after it is misaligned. Reason is that native reads is as a stream
             // and wants to pack tightly.
-            [FieldOffset(0)] public byte type;
-            [FieldOffset(1)] public int length;
+            [FieldOffset(0)]
+            public byte type;
+
+            [FieldOffset(1)]
+            public int length;
         }
 
         [StructLayout(LayoutKind.Explicit)]
         internal unsafe struct HelloMessage : IUnityRemoteMessage
         {
-            [FieldOffset(0)] public MessageHeader header;
-            [FieldOffset(5)] public uint protocolIdLength;
-            [FieldOffset(9)] public fixed char protocolId[11];
-            [FieldOffset(20)] public int protocolVersion;
+            [FieldOffset(0)]
+            public MessageHeader header;
+
+            [FieldOffset(5)]
+            public uint protocolIdLength;
+
+            [FieldOffset(9)]
+            public fixed char protocolId[11];
+
+            [FieldOffset(20)]
+            public int protocolVersion;
 
             public byte staticType => (byte)MessageType.Hello;
 
@@ -383,9 +452,14 @@ namespace UnityEngine.InputSystem
         [StructLayout(LayoutKind.Explicit)]
         internal struct OptionsMessage : IUnityRemoteMessage
         {
-            [FieldOffset(0)] public MessageHeader header;
-            [FieldOffset(5)] public int dimension1;
-            [FieldOffset(9)] public int dimension2;
+            [FieldOffset(0)]
+            public MessageHeader header;
+
+            [FieldOffset(5)]
+            public int dimension1;
+
+            [FieldOffset(9)]
+            public int dimension2;
 
             public byte staticType => (byte)MessageType.Options;
         }
@@ -393,7 +467,8 @@ namespace UnityEngine.InputSystem
         [StructLayout(LayoutKind.Explicit)]
         internal struct GoodbyeMessage : IUnityRemoteMessage
         {
-            [FieldOffset(0)] public MessageHeader header;
+            [FieldOffset(0)]
+            public MessageHeader header;
 
             public byte staticType => (byte)MessageType.Goodbye;
         }
@@ -401,20 +476,47 @@ namespace UnityEngine.InputSystem
         [StructLayout(LayoutKind.Explicit)]
         internal struct TouchInputMessage : IUnityRemoteMessage
         {
-            [FieldOffset(0)] public MessageHeader header;
-            [FieldOffset(5)] public float positionX;
-            [FieldOffset(9)] public float positionY;
-            [FieldOffset(13)] public ulong frame;
-            [FieldOffset(21)] public int id;
-            [FieldOffset(25)] public int phase;
-            [FieldOffset(29)] public int tapCount;
-            [FieldOffset(33)] public float radius;
-            [FieldOffset(37)] public float radiusVariance;
-            [FieldOffset(41)] public int type;
-            [FieldOffset(45)] public float pressure;
-            [FieldOffset(49)] public float maximumPossiblePressure;
-            [FieldOffset(53)] public float azimuthAngle;
-            [FieldOffset(57)] public float altitudeAngle;
+            [FieldOffset(0)]
+            public MessageHeader header;
+
+            [FieldOffset(5)]
+            public float positionX;
+
+            [FieldOffset(9)]
+            public float positionY;
+
+            [FieldOffset(13)]
+            public ulong frame;
+
+            [FieldOffset(21)]
+            public int id;
+
+            [FieldOffset(25)]
+            public int phase;
+
+            [FieldOffset(29)]
+            public int tapCount;
+
+            [FieldOffset(33)]
+            public float radius;
+
+            [FieldOffset(37)]
+            public float radiusVariance;
+
+            [FieldOffset(41)]
+            public int type;
+
+            [FieldOffset(45)]
+            public float pressure;
+
+            [FieldOffset(49)]
+            public float maximumPossiblePressure;
+
+            [FieldOffset(53)]
+            public float azimuthAngle;
+
+            [FieldOffset(57)]
+            public float altitudeAngle;
 
             public byte staticType => (byte)MessageType.TouchInput;
         }
@@ -422,9 +524,14 @@ namespace UnityEngine.InputSystem
         [StructLayout(LayoutKind.Explicit)]
         internal struct GyroSettingsMessage : IUnityRemoteMessage
         {
-            [FieldOffset(0)] public MessageHeader header;
-            [FieldOffset(5)] public int enabled;
-            [FieldOffset(9)] public float receivedGyroUpdateInternal;
+            [FieldOffset(0)]
+            public MessageHeader header;
+
+            [FieldOffset(5)]
+            public int enabled;
+
+            [FieldOffset(9)]
+            public float receivedGyroUpdateInternal;
 
             public byte staticType => (byte)MessageType.GyroSettings;
         }
@@ -432,23 +539,56 @@ namespace UnityEngine.InputSystem
         [StructLayout(LayoutKind.Explicit)]
         internal struct GyroInputMessage : IUnityRemoteMessage
         {
-            [FieldOffset(0)] public MessageHeader header;
-            [FieldOffset(5)] public float rotationRateX;
-            [FieldOffset(9)] public float rotationRateY;
-            [FieldOffset(13)] public float rotationRateZ;
-            [FieldOffset(17)] public float rotationRateUnbiasedX;
-            [FieldOffset(21)] public float rotationRateUnbiasedY;
-            [FieldOffset(25)] public float rotationRateUnbiasedZ;
-            [FieldOffset(29)] public float gravityX;
-            [FieldOffset(33)] public float gravityY;
-            [FieldOffset(37)] public float gravityZ;
-            [FieldOffset(41)] public float userAccelerationX;
-            [FieldOffset(45)] public float userAccelerationY;
-            [FieldOffset(49)] public float userAccelerationZ;
-            [FieldOffset(53)] public float attitudeX;
-            [FieldOffset(57)] public float attitudeY;
-            [FieldOffset(61)] public float attitudeZ;
-            [FieldOffset(65)] public float attitudeW;
+            [FieldOffset(0)]
+            public MessageHeader header;
+
+            [FieldOffset(5)]
+            public float rotationRateX;
+
+            [FieldOffset(9)]
+            public float rotationRateY;
+
+            [FieldOffset(13)]
+            public float rotationRateZ;
+
+            [FieldOffset(17)]
+            public float rotationRateUnbiasedX;
+
+            [FieldOffset(21)]
+            public float rotationRateUnbiasedY;
+
+            [FieldOffset(25)]
+            public float rotationRateUnbiasedZ;
+
+            [FieldOffset(29)]
+            public float gravityX;
+
+            [FieldOffset(33)]
+            public float gravityY;
+
+            [FieldOffset(37)]
+            public float gravityZ;
+
+            [FieldOffset(41)]
+            public float userAccelerationX;
+
+            [FieldOffset(45)]
+            public float userAccelerationY;
+
+            [FieldOffset(49)]
+            public float userAccelerationZ;
+
+            [FieldOffset(53)]
+            public float attitudeX;
+
+            [FieldOffset(57)]
+            public float attitudeY;
+
+            [FieldOffset(61)]
+            public float attitudeZ;
+
+            [FieldOffset(65)]
+            public float attitudeW;
 
             public byte staticType => (byte)MessageType.GyroInput;
         }
@@ -456,11 +596,20 @@ namespace UnityEngine.InputSystem
         [StructLayout(LayoutKind.Explicit)]
         internal struct AccelerometerInputMessage : IUnityRemoteMessage
         {
-            [FieldOffset(0)] public MessageHeader header;
-            [FieldOffset(5)] public float accelerationX;
-            [FieldOffset(9)] public float accelerationY;
-            [FieldOffset(13)] public float accelerationZ;
-            [FieldOffset(17)] public float deltaTime;
+            [FieldOffset(0)]
+            public MessageHeader header;
+
+            [FieldOffset(5)]
+            public float accelerationX;
+
+            [FieldOffset(9)]
+            public float accelerationY;
+
+            [FieldOffset(13)]
+            public float accelerationZ;
+
+            [FieldOffset(17)]
+            public float deltaTime;
 
             public byte staticType => (byte)MessageType.AccelerometerInput;
         }

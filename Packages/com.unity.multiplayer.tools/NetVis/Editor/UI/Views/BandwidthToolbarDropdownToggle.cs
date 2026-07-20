@@ -15,9 +15,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             : base(
                 name: "Network Visualization Bandwidth",
                 tooltip: "Visualize Networked Objects Bandwidth using colored categories.",
-                icon: NetVisIcon.Bandwidth)
-        {
-        }
+                icon: NetVisIcon.Bandwidth
+            ) { }
 
         protected override void OnMetricChanged(NetVisMetric metric)
         {
@@ -26,15 +25,14 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
 
         protected override void OnStateChange(ChangeEvent<bool> stateChange)
         {
-            ConfigurationWithEvents.Metric = stateChange.newValue
-                ? NetVisMetric.Bandwidth
-                : NetVisMetric.None;
+            ConfigurationWithEvents.Metric = stateChange.newValue ? NetVisMetric.Bandwidth : NetVisMetric.None;
         }
 
         protected override void ShowOverlayPopUp()
         {
             PopupWindow.Show(worldBound, new NetVisPopupWindowContent<BandwidthConfigurationView>(320));
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<BandwidthToolbarDropdownToggle, UxmlTraits> { }
 #endif

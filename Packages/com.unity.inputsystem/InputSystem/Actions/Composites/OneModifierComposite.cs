@@ -56,7 +56,8 @@ namespace UnityEngine.InputSystem.Composites
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         // ReSharper disable once UnassignedField.Global
-        [InputControl(layout = "Button")] public int modifier;
+        [InputControl(layout = "Button")]
+        public int modifier;
 
         /// <summary>
         /// Binding for the control that is gated by the modifier. The composite will assume the value
@@ -70,7 +71,8 @@ namespace UnityEngine.InputSystem.Composites
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         // ReSharper disable once UnassignedField.Global
-        [InputControl] public int binding;
+        [InputControl]
+        public int binding;
 
         /// <summary>
         /// Type of values read from controls bound to <see cref="binding"/>.
@@ -103,7 +105,9 @@ namespace UnityEngine.InputSystem.Composites
         ///
         /// To don't depends on the setting please consider using <see cref="modifiersOrder"/> instead.
         /// </remarks>
-        [Tooltip("Obsolete please use modifiers Order. If enabled, this will override the Input Consumption setting, allowing the modifier keys to be pressed after the button and the composite will still trigger.")]
+        [Tooltip(
+            "Obsolete please use modifiers Order. If enabled, this will override the Input Consumption setting, allowing the modifier keys to be pressed after the button and the composite will still trigger."
+        )]
         [Obsolete("Use ModifiersOrder.Unordered with 'modifiersOrder' instead")]
         public bool overrideModifiersNeedToBePressedFirst;
 
@@ -136,7 +140,7 @@ namespace UnityEngine.InputSystem.Composites
             /// <see cref="modifier"/> can be pressed after <see cref="binding"/>
             /// and the composite will still trigger. The only requirement is for all of them to concurrently be in pressed state.
             /// </summary>
-            Unordered = 2
+            Unordered = 2,
         }
 
         /// <summary>
@@ -160,7 +164,9 @@ namespace UnityEngine.InputSystem.Composites
         /// is bound to, any press sequence is acceptable. For the example binding to <c>Ctrl+B</c>, it would mean that pressing <c>B</c> and
         /// only then pressing <c>Ctrl</c> will still trigger the binding.
         /// </remarks>
-        [Tooltip("By default it follows the Input Consumption setting to determine if the modifers keys need to be pressed first.")]
+        [Tooltip(
+            "By default it follows the Input Consumption setting to determine if the modifers keys need to be pressed first."
+        )]
         public ModifiersOrder modifiersOrder = ModifiersOrder.Default;
 
         private int m_ValueSizeInBytes;
@@ -202,7 +208,13 @@ namespace UnityEngine.InputSystem.Composites
         /// <inheritdoc/>
         protected override void FinishSetup(ref InputBindingCompositeContext context)
         {
-            DetermineValueTypeAndSize(ref context, binding, out m_ValueType, out m_ValueSizeInBytes, out m_BindingIsButton);
+            DetermineValueTypeAndSize(
+                ref context,
+                binding,
+                out m_ValueType,
+                out m_ValueSizeInBytes,
+                out m_BindingIsButton
+            );
 
             if (modifiersOrder == ModifiersOrder.Default)
             {
@@ -213,7 +225,9 @@ namespace UnityEngine.InputSystem.Composites
 #pragma warning restore CS0618
                     modifiersOrder = ModifiersOrder.Unordered;
                 else
-                    modifiersOrder = InputSystem.settings.shortcutKeysConsumeInput ? ModifiersOrder.Ordered : ModifiersOrder.Unordered;
+                    modifiersOrder = InputSystem.settings.shortcutKeysConsumeInput
+                        ? ModifiersOrder.Ordered
+                        : ModifiersOrder.Unordered;
             }
         }
 
@@ -224,7 +238,13 @@ namespace UnityEngine.InputSystem.Composites
             return null;
         }
 
-        internal static void DetermineValueTypeAndSize(ref InputBindingCompositeContext context, int part, out Type valueType, out int valueSizeInBytes, out bool isButton)
+        internal static void DetermineValueTypeAndSize(
+            ref InputBindingCompositeContext context,
+            int part,
+            out Type valueType,
+            out int valueSizeInBytes,
+            out bool isButton
+        )
         {
             valueSizeInBytes = 0;
             isButton = true;

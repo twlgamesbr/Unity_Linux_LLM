@@ -10,7 +10,8 @@ namespace UnityEngine.Rendering
     /// </summary>
     /// <typeparam name="TGlobalRenderPipelineSettings"><see cref="RenderPipelineGlobalSettings"/></typeparam>
     /// <typeparam name="TRenderPipeline"><see cref="RenderPipeline"/></typeparam>
-    public abstract class RenderPipelineGlobalSettings<TGlobalRenderPipelineSettings, TRenderPipeline> : RenderPipelineGlobalSettings
+    public abstract class RenderPipelineGlobalSettings<TGlobalRenderPipelineSettings, TRenderPipeline>
+        : RenderPipelineGlobalSettings
         where TRenderPipeline : RenderPipeline
         where TGlobalRenderPipelineSettings : RenderPipelineGlobalSettings
     {
@@ -19,10 +20,13 @@ namespace UnityEngine.Rendering
         /// </summary>
 #if UNITY_EDITOR
         public static TGlobalRenderPipelineSettings instance =>
-            EditorGraphicsSettings.GetRenderPipelineGlobalSettingsAsset<TRenderPipeline>() as TGlobalRenderPipelineSettings;
+            EditorGraphicsSettings.GetRenderPipelineGlobalSettingsAsset<TRenderPipeline>()
+            as TGlobalRenderPipelineSettings;
 #else
         public static TGlobalRenderPipelineSettings instance => s_Instance.Value;
-        private static Lazy<TGlobalRenderPipelineSettings> s_Instance = new (() => GraphicsSettings.GetSettingsForRenderPipeline<TRenderPipeline>() as TGlobalRenderPipelineSettings);
+        private static Lazy<TGlobalRenderPipelineSettings> s_Instance = new(() =>
+            GraphicsSettings.GetSettingsForRenderPipeline<TRenderPipeline>() as TGlobalRenderPipelineSettings
+        );
 #endif
 
         /// <summary>

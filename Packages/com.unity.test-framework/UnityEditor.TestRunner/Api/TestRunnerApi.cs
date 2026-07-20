@@ -47,11 +47,12 @@ namespace UnityEditor.TestTools.TestRunner.Api
             get { return testJobDataHolder ?? (testJobDataHolder = TestJobDataHolder.instance); }
         }
 
-        internal Func<ExecutionSettings,string> ScheduleJob = executionSettings =>
+        internal Func<ExecutionSettings, string> ScheduleJob = executionSettings =>
         {
             var runner = new TestJobRunner();
             return runner.RunJob(new TestJobData(executionSettings));
         };
+
         /// <summary>
         /// Starts a test run with a given set of executionSettings.
         /// </summary>
@@ -64,14 +65,20 @@ namespace UnityEditor.TestTools.TestRunner.Api
                 throw new ArgumentNullException(nameof(executionSettings));
             }
 
-            if ((executionSettings.filters == null || executionSettings.filters.Length == 0) && executionSettings.filter != null)
+            if (
+                (executionSettings.filters == null || executionSettings.filters.Length == 0)
+                && executionSettings.filter != null
+            )
             {
                 // Map filter (singular) to filters (plural), for backwards compatibility.
                 executionSettings.filters = new[] { executionSettings.filter };
             }
 
-            if (executionSettings.targetPlatform == null && executionSettings.filters != null &&
-                executionSettings.filters.Length > 0)
+            if (
+                executionSettings.targetPlatform == null
+                && executionSettings.filters != null
+                && executionSettings.filters.Length > 0
+            )
             {
                 executionSettings.targetPlatform = executionSettings.filters[0].targetPlatform;
             }
@@ -96,7 +103,8 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// <param name="priority">
         /// Sets the order in which the callbacks are invoked, starting with the highest value first.
         /// </param>
-        public void RegisterCallbacks<T>(T testCallbacks, int priority = 0) where T : ICallbacks
+        public void RegisterCallbacks<T>(T testCallbacks, int priority = 0)
+            where T : ICallbacks
         {
             RegisterTestCallback(testCallbacks, priority);
         }
@@ -111,7 +119,8 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// <param name="priority">
         /// Sets the order in which the callbacks are invoked, starting with the highest value first.
         /// </param>
-        public static void RegisterTestCallback<T>(T testCallbacks, int priority = 0) where T : ICallbacks
+        public static void RegisterTestCallback<T>(T testCallbacks, int priority = 0)
+            where T : ICallbacks
         {
             if (testCallbacks == null)
             {
@@ -128,7 +137,8 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// Generic representing a type of callback.
         /// </typeparam>
         /// <param name="testCallbacks">The test callbacks to unregister.</param>
-        public void UnregisterCallbacks<T>(T testCallbacks) where T : ICallbacks
+        public void UnregisterCallbacks<T>(T testCallbacks)
+            where T : ICallbacks
         {
             UnregisterTestCallback(testCallbacks);
         }
@@ -140,7 +150,8 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// Generic representing a type of callback.
         /// </typeparam>
         /// <param name="testCallbacks">The test callbacks to unregister.</param>
-        public static void UnregisterTestCallback<T>(T testCallbacks) where T : ICallbacks
+        public static void UnregisterTestCallback<T>(T testCallbacks)
+            where T : ICallbacks
         {
             if (testCallbacks == null)
             {
@@ -160,6 +171,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
             var firstFilter = executionSettings.filters?.FirstOrDefault() ?? executionSettings.filter;
             RetrieveTestList(firstFilter.testMode, callback);
         }
+
         /// <summary>
         /// Retrieve the full test tree as ITestAdaptor for a given test mode. This is obsolete. Use TestRunnerApi.RetrieveTestTree instead.
         /// </summary>
@@ -173,16 +185,31 @@ namespace UnityEditor.TestTools.TestRunner.Api
             }
 
             var platform = ParseTestMode(testMode);
-            var testAssemblyProvider = new EditorLoadedTestAssemblyProvider(new EditorCompilationInterfaceProxy(), new EditorAssembliesProxy());
+            var testAssemblyProvider = new EditorLoadedTestAssemblyProvider(
+                new EditorCompilationInterfaceProxy(),
+                new EditorAssembliesProxy()
+            );
             var testAdaptorFactory = new TestAdaptorFactory();
-            var testListCache = new TestListCache(testAdaptorFactory, new RemoteTestResultDataFactory(), TestListCacheData.instance);
+            var testListCache = new TestListCache(
+                testAdaptorFactory,
+                new RemoteTestResultDataFactory(),
+                TestListCacheData.instance
+            );
             var testListProvider = new TestListProvider(testAssemblyProvider, new UnityTestAssemblyBuilder(null, 0));
-            var cachedTestListProvider = new CachingTestListProvider(testListProvider, testListCache, testAdaptorFactory);
+            var cachedTestListProvider = new CachingTestListProvider(
+                testListProvider,
+                testListCache,
+                testAdaptorFactory
+            );
 
-            var job = new TestListJob(cachedTestListProvider, platform, testRoot =>
-            {
-                callback(testRoot);
-            });
+            var job = new TestListJob(
+                cachedTestListProvider,
+                platform,
+                testRoot =>
+                {
+                    callback(testRoot);
+                }
+            );
             job.Start();
         }
 
@@ -226,11 +253,12 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         private static TestPlatform ParseTestMode(TestMode testMode)
         {
-            return (((testMode & TestMode.EditMode) == TestMode.EditMode) ? TestPlatform.EditMode : 0) | (((testMode & TestMode.PlayMode) == TestMode.PlayMode) ? TestPlatform.PlayMode : 0);
+            return (((testMode & TestMode.EditMode) == TestMode.EditMode) ? TestPlatform.EditMode : 0)
+                | (((testMode & TestMode.PlayMode) == TestMode.PlayMode) ? TestPlatform.PlayMode : 0);
         }
 
-        internal class RunProgressChangedEvent : UnityEvent<TestRunProgress> {}
-        internal static RunProgressChangedEvent runProgressChanged = new RunProgressChangedEvent();
+        internal class RunProgressChangedEvent : UnityEvent<TestRunProgress> { }
 
+        internal static RunProgressChangedEvent runProgressChanged = new RunProgressChangedEvent();
     }
 }

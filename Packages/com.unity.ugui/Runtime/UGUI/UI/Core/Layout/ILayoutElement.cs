@@ -72,7 +72,6 @@ namespace UnityEngine.UI
         ///]]>
         ///</code>
         ///</example>
-
         float flexibleWidth { get; }
 
         /// <summary>
@@ -162,9 +161,7 @@ namespace UnityEngine.UI
     /// <remarks>
     /// ILayoutGroup derives from ILayoutController and requires the same members to be implemented.
     /// </remarks>
-    public interface ILayoutGroup : ILayoutController
-    {
-    }
+    public interface ILayoutGroup : ILayoutController { }
 
     /// <summary>
     /// ILayoutSelfController is an ILayoutController that should drive its own RectTransform.
@@ -242,9 +239,7 @@ namespace UnityEngine.UI
     /// ]]>
     ///</code>
     /// </example>
-    public interface ILayoutSelfController : ILayoutController
-    {
-    }
+    public interface ILayoutSelfController : ILayoutController { }
 
     /// <summary>
     /// A RectTransform will be ignored by the layout system if it has a component which implements ILayoutIgnorer.

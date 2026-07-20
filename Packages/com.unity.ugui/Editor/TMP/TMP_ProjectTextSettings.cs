@@ -3,7 +3,6 @@ using UnityEditor;
 
 namespace TMPro
 {
-
     public static class TMP_ProjectTextSettings
     {
         // Open Project Text Settings
@@ -23,7 +22,6 @@ namespace TMPro
             else
                 TMPro_EventManager.RESOURCE_LOAD_EVENT.Add(ON_RESOURCES_LOADED);
         }
-
 
         // Event received when TMP resources have been loaded.
         static void ON_RESOURCES_LOADED()

@@ -58,7 +58,9 @@ namespace FlyingWormConsole3.LiteNetLib
                 //Socket isn't running but should be. Try to start again.
                 if (!_netManager.Start(_ipv4, _ipv6, _port, _manualMode))
                 {
-                    NetDebug.WriteError($"[S] Cannot restore connection. Ipv4 {_ipv4}, Ipv6 {_ipv6}, Port {_port}, ManualMode {_manualMode}");
+                    NetDebug.WriteError(
+                        $"[S] Cannot restore connection. Ipv4 {_ipv4}, Ipv6 {_ipv6}, Port {_port}, ManualMode {_manualMode}"
+                    );
                 }
             }
         }

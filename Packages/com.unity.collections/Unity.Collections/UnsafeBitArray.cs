@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Unity.Jobs;
 using Unity.Mathematics;
-using System.Runtime.InteropServices;
 
 namespace Unity.Collections.LowLevel.Unsafe
 {
@@ -16,8 +16,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     [DebuggerTypeProxy(typeof(UnsafeBitArrayDebugView))]
     [GenerateTestsForBurstCompatibility]
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct UnsafeBitArray
-        : INativeDisposable
+    public unsafe struct UnsafeBitArray : INativeDisposable
     {
         /// <summary>
         /// Pointer to the data.
@@ -50,7 +49,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="ptr">An existing buffer.</param>
         /// <param name="allocator">The allocator that was used to allocate the bytes. Needed to dispose this array.</param>
         /// <param name="sizeInBytes">The number of bytes. The length will be `sizeInBytes * 8`.</param>
-        public unsafe UnsafeBitArray(void* ptr, int sizeInBytes, AllocatorManager.AllocatorHandle allocator = new AllocatorManager.AllocatorHandle())
+        public unsafe UnsafeBitArray(
+            void* ptr,
+            int sizeInBytes,
+            AllocatorManager.AllocatorHandle allocator = new AllocatorManager.AllocatorHandle()
+        )
         {
             CheckSizeMultipleOf8(sizeInBytes);
             Ptr = (ulong*)ptr;
@@ -65,7 +68,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="numBits">Number of bits.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public UnsafeBitArray(int numBits, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public UnsafeBitArray(
+            int numBits,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
         {
             CollectionHelper.CheckAllocator(allocator);
             Allocator = allocator;
@@ -79,7 +86,8 @@ namespace Unity.Collections.LowLevel.Unsafe
 
         internal static UnsafeBitArray* Alloc(AllocatorManager.AllocatorHandle allocator)
         {
-            UnsafeBitArray* data = (UnsafeBitArray*)Memory.Unmanaged.Allocate(sizeof(UnsafeBitArray), UnsafeUtility.AlignOf<UnsafeBitArray>(), allocator);
+            UnsafeBitArray* data = (UnsafeBitArray*)
+                Memory.Unmanaged.Allocate(sizeof(UnsafeBitArray), UnsafeUtility.AlignOf<UnsafeBitArray>(), allocator);
             return data;
         }
 
@@ -112,7 +120,7 @@ namespace Unity.Collections.LowLevel.Unsafe
 
         void Realloc(int capacityInBits)
         {
-            int newCapacity = (int)math.min(Bitwise.AlignUp((long)capacityInBits, 64), int.MaxValue-63);
+            int newCapacity = (int)math.min(Bitwise.AlignUp((long)capacityInBits, 64), int.MaxValue - 63);
             int sizeInBytes = newCapacity / 8;
 
             ulong* newPointer = null;
@@ -167,7 +175,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="capacityInBits">The new capacity.</param>
         public void SetCapacity(int capacityInBits)
         {
-            CollectionHelper.CheckCapacityInRange(capacityInBits, int.MaxValue-63, Length);
+            CollectionHelper.CheckCapacityInRange(capacityInBits, int.MaxValue - 63, Length);
 
             if (Capacity == capacityInBits)
             {
@@ -386,7 +394,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             return Bitwise.IsSet(Ptr, pos);
         }
 
-        internal void CopyUlong(int dstPos, ref UnsafeBitArray srcBitArray, int srcPos, int numBits) => SetBits(dstPos, srcBitArray.GetBits(srcPos, numBits), numBits);
+        internal void CopyUlong(int dstPos, ref UnsafeBitArray srcBitArray, int srcPos, int numBits) =>
+            SetBits(dstPos, srcBitArray.GetBits(srcPos, numBits), numBits);
 
         /// <summary>
         /// Copies a range of bits from this array to another range in this array.
@@ -466,7 +475,11 @@ namespace Unity.Collections.LowLevel.Unsafe
                 {
                     unsafe
                     {
-                        UnsafeUtility.MemMove((byte*)Ptr + dstPosInBytes, (byte*)srcBitArray.Ptr + srcPosInBytes, numBytes);
+                        UnsafeUtility.MemMove(
+                            (byte*)Ptr + dstPosInBytes,
+                            (byte*)srcBitArray.Ptr + srcPosInBytes,
+                            numBytes
+                        );
                     }
                 }
 
@@ -474,7 +487,12 @@ namespace Unity.Collections.LowLevel.Unsafe
 
                 if (numPostBits > 0)
                 {
-                    CopyUlong((dstPosInBytes + numBytes) * 8, ref srcBitArray, (srcPosInBytes + numBytes) * 8, numPostBits);
+                    CopyUlong(
+                        (dstPosInBytes + numBytes) * 8,
+                        ref srcBitArray,
+                        (srcPosInBytes + numBytes) * 8,
+                        numPostBits
+                    );
                 }
             }
             else // unaligned copy
@@ -744,11 +762,11 @@ namespace Unity.Collections.LowLevel.Unsafe
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
             readonly void CheckArgs(int pos, int numBits)
             {
-                if (pos < 0
-                    || pos >= Length
-                    || numBits < 1)
+                if (pos < 0 || pos >= Length || numBits < 1)
                 {
-                    throw new ArgumentException($"BitArray invalid arguments: pos {pos} (must be 0-{Length - 1}), numBits {numBits} (must be greater than 0).");
+                    throw new ArgumentException(
+                        $"BitArray invalid arguments: pos {pos} (must be 0-{Length - 1}), numBits {numBits} (must be greater than 0)."
+                    );
                 }
             }
 
@@ -767,7 +785,9 @@ namespace Unity.Collections.LowLevel.Unsafe
 
                 if (numBits < 1 || count < numBits)
                 {
-                    throw new ArgumentException($"BitArray invalid argument: numBits {numBits} (must be greater than 0).");
+                    throw new ArgumentException(
+                        $"BitArray invalid argument: numBits {numBits} (must be greater than 0)."
+                    );
                 }
             }
 
@@ -783,7 +803,9 @@ namespace Unity.Collections.LowLevel.Unsafe
 
                 if (pos + numBits > Length)
                 {
-                    throw new ArgumentException($"BitArray invalid arguments: Out of bounds pos {pos}, numBits {numBits}, Length {Length}.");
+                    throw new ArgumentException(
+                        $"BitArray invalid arguments: Out of bounds pos {pos}, numBits {numBits}, Length {Length}."
+                    );
                 }
             }
         }
@@ -793,18 +815,20 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             if ((sizeInBytes & 7) != 0)
             {
-                throw new ArgumentException($"BitArray invalid arguments: sizeInBytes {sizeInBytes} (must be multiple of 8-bytes, sizeInBytes: {sizeInBytes}).");
+                throw new ArgumentException(
+                    $"BitArray invalid arguments: sizeInBytes {sizeInBytes} (must be multiple of 8-bytes, sizeInBytes: {sizeInBytes})."
+                );
             }
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         void CheckArgs(int pos, int numBits)
         {
-            if (pos < 0
-                || pos >= Length
-                || numBits < 1)
+            if (pos < 0 || pos >= Length || numBits < 1)
             {
-                throw new ArgumentException($"BitArray invalid arguments: pos {pos} (must be 0-{Length - 1}), numBits {numBits} (must be greater than 0).");
+                throw new ArgumentException(
+                    $"BitArray invalid arguments: pos {pos} (must be 0-{Length - 1}), numBits {numBits} (must be greater than 0)."
+                );
             }
         }
 
@@ -839,21 +863,33 @@ namespace Unity.Collections.LowLevel.Unsafe
 
             if (pos + numBits > Length)
             {
-                throw new ArgumentException($"BitArray invalid arguments: Out of bounds pos {pos}, numBits {numBits}, Length {Length}.");
+                throw new ArgumentException(
+                    $"BitArray invalid arguments: Out of bounds pos {pos}, numBits {numBits}, Length {Length}."
+                );
             }
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        static void CheckArgsCopy(ref UnsafeBitArray dstBitArray, int dstPos, ref UnsafeBitArray srcBitArray, int srcPos, int numBits)
+        static void CheckArgsCopy(
+            ref UnsafeBitArray dstBitArray,
+            int dstPos,
+            ref UnsafeBitArray srcBitArray,
+            int srcPos,
+            int numBits
+        )
         {
             if (srcPos + numBits > srcBitArray.Length)
             {
-                throw new ArgumentException($"BitArray invalid arguments: Out of bounds - source position {srcPos}, numBits {numBits}, source bit array Length {srcBitArray.Length}.");
+                throw new ArgumentException(
+                    $"BitArray invalid arguments: Out of bounds - source position {srcPos}, numBits {numBits}, source bit array Length {srcBitArray.Length}."
+                );
             }
 
             if (dstPos + numBits > dstBitArray.Length)
             {
-                throw new ArgumentException($"BitArray invalid arguments: Out of bounds - destination position {dstPos}, numBits {numBits}, destination bit array Length {dstBitArray.Length}.");
+                throw new ArgumentException(
+                    $"BitArray invalid arguments: Out of bounds - destination position {dstPos}, numBits {numBits}, destination bit array Length {dstBitArray.Length}."
+                );
             }
         }
     }

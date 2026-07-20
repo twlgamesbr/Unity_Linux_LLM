@@ -43,11 +43,29 @@ namespace UnityEditor.Rendering.Universal
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Toggle(currentChannel == 0, EditorGUIUtility.TrTextContent("Red", "Red output channel."), EditorStyles.miniButtonLeft))
+                    if (
+                        GUILayout.Toggle(
+                            currentChannel == 0,
+                            EditorGUIUtility.TrTextContent("Red", "Red output channel."),
+                            EditorStyles.miniButtonLeft
+                        )
+                    )
                         currentChannel = 0;
-                    if (GUILayout.Toggle(currentChannel == 1, EditorGUIUtility.TrTextContent("Green", "Green output channel."), EditorStyles.miniButtonMid))
+                    if (
+                        GUILayout.Toggle(
+                            currentChannel == 1,
+                            EditorGUIUtility.TrTextContent("Green", "Green output channel."),
+                            EditorStyles.miniButtonMid
+                        )
+                    )
                         currentChannel = 1;
-                    if (GUILayout.Toggle(currentChannel == 2, EditorGUIUtility.TrTextContent("Blue", "Blue output channel."), EditorStyles.miniButtonRight))
+                    if (
+                        GUILayout.Toggle(
+                            currentChannel == 2,
+                            EditorGUIUtility.TrTextContent("Blue", "Blue output channel."),
+                            EditorStyles.miniButtonRight
+                        )
+                    )
                         currentChannel = 2;
                 }
             }

@@ -15,7 +15,7 @@ namespace Unity.Entities
             /// <summary>
             /// This chunk exists in both worlds, change version comparisons can be done.
             /// </summary>
-            Cloned
+            Cloned,
         }
 
         internal readonly struct ArchetypeChunkChanges : IDisposable
@@ -92,9 +92,14 @@ namespace Unity.Entities
         [BurstCompile]
         struct BuildChunkSequenceNumberMap : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [WriteOnly] public NativeParallelHashMap<ulong, ArchetypeChunk>.ParallelWriter ChunksBySequenceNumber;
-            public void Execute(int index) => ChunksBySequenceNumber.TryAdd(Chunks[index].m_Chunk.SequenceNumber, Chunks[index]);
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [WriteOnly]
+            public NativeParallelHashMap<ulong, ArchetypeChunk>.ParallelWriter ChunksBySequenceNumber;
+
+            public void Execute(int index) =>
+                ChunksBySequenceNumber.TryAdd(Chunks[index].m_Chunk.SequenceNumber, Chunks[index]);
         }
 
         /// <summary>
@@ -105,15 +110,32 @@ namespace Unity.Entities
         [BurstCompile]
         struct GatherArchetypeChunkChanges : IJob
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> SrcChunks;
-            [ReadOnly] public NativeList<ArchetypeChunk> DstChunks;
-            [ReadOnly] public NativeParallelHashMap<ulong, ArchetypeChunk> SrcChunksBySequenceNumber;
-            [WriteOnly] public NativeList<ArchetypeChunk> CreatedChunks;
-            [WriteOnly] public NativeList<ArchetypeChunkChangeFlags> CreatedChunkFlags;
-            [WriteOnly] public NativeList<int> CreatedChunkEntityCounts;
-            [WriteOnly] public NativeList<ArchetypeChunk> DestroyedChunks;
-            [WriteOnly] public NativeList<ArchetypeChunkChangeFlags> DestroyedChunkFlags;
-            [WriteOnly] public NativeList<int> DestroyedChunkEntityCounts;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> SrcChunks;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> DstChunks;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ArchetypeChunk> SrcChunksBySequenceNumber;
+
+            [WriteOnly]
+            public NativeList<ArchetypeChunk> CreatedChunks;
+
+            [WriteOnly]
+            public NativeList<ArchetypeChunkChangeFlags> CreatedChunkFlags;
+
+            [WriteOnly]
+            public NativeList<int> CreatedChunkEntityCounts;
+
+            [WriteOnly]
+            public NativeList<ArchetypeChunk> DestroyedChunks;
+
+            [WriteOnly]
+            public NativeList<ArchetypeChunkChangeFlags> DestroyedChunkFlags;
+
+            [WriteOnly]
+            public NativeList<int> DestroyedChunkEntityCounts;
 
             public void Execute()
             {
@@ -142,7 +164,14 @@ namespace Unity.Entities
                     }
                     else
                     {
-                        if (ChunksAreDifferent(srcChunk.Archetype.Archetype, srcChunk.m_Chunk, dstChunk.Archetype.Archetype, dstChunk.m_Chunk))
+                        if (
+                            ChunksAreDifferent(
+                                srcChunk.Archetype.Archetype,
+                                srcChunk.m_Chunk,
+                                dstChunk.Archetype.Archetype,
+                                dstChunk.m_Chunk
+                            )
+                        )
                         {
                             // The chunk exists in both worlds, but it has been changed in some way.
                             // Treat this chunk as being destroyed and re-created.
@@ -182,7 +211,12 @@ namespace Unity.Entities
                 DestroyedChunkEntityCounts.Add(destroyedChunkEntityCount);
             }
 
-            static bool ChunksAreDifferent(Archetype* srcArchetype, ChunkIndex srcChunk, Archetype* dstArchetype, ChunkIndex dstChunk)
+            static bool ChunksAreDifferent(
+                Archetype* srcArchetype,
+                ChunkIndex srcChunk,
+                Archetype* dstArchetype,
+                ChunkIndex dstChunk
+            )
             {
 #if !ENTITY_STORE_V1
                 // With entity store V2, since entities are remapped between the source and shadow worlds, any reference
@@ -231,17 +265,21 @@ namespace Unity.Entities
             int maxSrcChunkCount,
             AllocatorManager.AllocatorHandle allocator,
             out JobHandle jobHandle,
-            JobHandle dependsOn = default)
+            JobHandle dependsOn = default
+        )
         {
             var archetypeChunkChanges = new ArchetypeChunkChanges(allocator);
             // srcChunks and dstChunks are being written by a job, so accessing any of their members would be a race condition.
             // All we can do is pass them to dependent jobs to consume their contents.
-            var srcChunksBySequenceNumber = new NativeParallelHashMap<ulong, ArchetypeChunk>(maxSrcChunkCount, Allocator.TempJob);
+            var srcChunksBySequenceNumber = new NativeParallelHashMap<ulong, ArchetypeChunk>(
+                maxSrcChunkCount,
+                Allocator.TempJob
+            );
 
             var buildChunkSequenceNumberMap = new BuildChunkSequenceNumberMap
             {
                 Chunks = srcChunks,
-                ChunksBySequenceNumber = srcChunksBySequenceNumber.AsParallelWriter()
+                ChunksBySequenceNumber = srcChunksBySequenceNumber.AsParallelWriter(),
             }.Schedule(srcChunks, 64, dependsOn);
 
             var gatherArchetypeChunkChanges = new GatherArchetypeChunkChanges

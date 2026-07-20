@@ -14,6 +14,7 @@ namespace UnityEditor.Rendering
             // TODO Deprecate this key in U7: Advanced properties were formerly called additional properties
             internal const string showAllAdditionalProperties = "General.ShowAllAdditionalProperties";
             internal const string advancedPropertiesMigrated = "General.LocalAdditionalPropertiesMigratedToGlobal";
+
             //END TODO
 
             internal const string showAdvancedProperties = "General.ShowAdvancedProperties";
@@ -23,16 +24,21 @@ namespace UnityEditor.Rendering
         static AdvancedProperties()
         {
             // Migrate from the previous global state
-            UpdateShowAdvancedProperties(Keys.showAllAdditionalProperties,
-                EditorPrefs.HasKey(Keys.showAllAdditionalProperties) &&
-                EditorPrefs.GetBool(Keys.showAllAdditionalProperties));
+            UpdateShowAdvancedProperties(
+                Keys.showAllAdditionalProperties,
+                EditorPrefs.HasKey(Keys.showAllAdditionalProperties)
+                    && EditorPrefs.GetBool(Keys.showAllAdditionalProperties)
+            );
         }
 
         internal static void UpdateShowAdvancedProperties(string key, bool previousState)
         {
             if (previousState)
             {
-                if (!EditorPrefs.HasKey(Keys.advancedPropertiesMigrated) || !EditorPrefs.GetBool(Keys.advancedPropertiesMigrated))
+                if (
+                    !EditorPrefs.HasKey(Keys.advancedPropertiesMigrated)
+                    || !EditorPrefs.GetBool(Keys.advancedPropertiesMigrated)
+                )
                 {
                     // Before we were storing a global state and a per editor state.
                     // So if the user had at least 1 editor with show additional, we need to show advanced properties everywhere.
@@ -44,6 +50,7 @@ namespace UnityEditor.Rendering
             if (EditorPrefs.HasKey(key))
                 EditorPrefs.DeleteKey(key);
         }
+
         // END TODO
 
         /// <summary>
@@ -80,9 +87,17 @@ namespace UnityEditor.Rendering
         /// <param name="menu">The menu where to add the Advanced Properties entry.</param>
         /// <param name="hasMoreOptions">If the option is checked</param>
         /// <param name="toggleMoreOptions">The toggle action</param>
-        public static void AddAdvancedPropertiesBoolMenuItem(this GenericMenu menu, Func<bool> hasMoreOptions, Action toggleMoreOptions)
+        public static void AddAdvancedPropertiesBoolMenuItem(
+            this GenericMenu menu,
+            Func<bool> hasMoreOptions,
+            Action toggleMoreOptions
+        )
         {
-            menu.AddItem(EditorGUIUtility.TrTextContent("Show All Advanced Properties"), hasMoreOptions.Invoke(), () => toggleMoreOptions.Invoke());
+            menu.AddItem(
+                EditorGUIUtility.TrTextContent("Show All Advanced Properties"),
+                hasMoreOptions.Invoke(),
+                () => toggleMoreOptions.Invoke()
+            );
         }
 
         /// <summary>
@@ -91,15 +106,14 @@ namespace UnityEditor.Rendering
         /// <param name="menu">The menu where to add the Advanced Properties entry.</param>
         public static void AddAdvancedPropertiesBoolMenuItem(this GenericMenu menu)
         {
-            AddAdvancedPropertiesBoolMenuItem(menu,
+            AddAdvancedPropertiesBoolMenuItem(
+                menu,
                 () => AdvancedProperties.enabled,
-                () => AdvancedProperties.enabled = !AdvancedProperties.enabled);
+                () => AdvancedProperties.enabled = !AdvancedProperties.enabled
+            );
         }
 
-        internal static AnimFloat s_AnimFloat = new(0)
-        {
-            speed = 0.2f
-        };
+        internal static AnimFloat s_AnimFloat = new(0) { speed = 0.2f };
 
         internal static void ResetHighlight()
         {

@@ -32,55 +32,66 @@ namespace Unity.Entities.Content
             /// Content update process has not started.
             /// </summary>
             None,
+
             /// <summary>
             /// Downloading uncached catalog info - this happens each time the application is started to check for updated catalogs.
             /// </summary>
             DownloadingCatalogInfo,
+
             /// <summary>
             /// Downloading remote catalogs.  This consists of any remote catalogs contained in the catalog info file.
             /// </summary>
             DownloadingCatalogs,
+
             /// <summary>
             /// Downloading local catalogs.  During the publish process, all .bin files are added to this content set.
             /// </summary>
             DownloadingLocalCatalogs,
+
             /// <summary>
             /// Downloading initial content sets.  This can be used to specify an initial set of content to download before initialization completes.
             /// </summary>
             DownloadingContentSet,
+
             /// <summary>
             /// The content update failed and there is no data in the cache.
             /// </summary>
             NoContentAvailable,
+
             /// <summary>
-            /// Content is ready.  It may be local, updated from remote, or from the cache.  
+            /// Content is ready.  It may be local, updated from remote, or from the cache.
             /// </summary>
             ContentReady,
+
             /// <summary>
             /// The content will be loaded from the streaming assets folder and no attempt to update will be made.
             /// </summary>
             UsingContentFromStreamingAssets,
+
             /// <summary>
             /// The content has successfully been updated from the remote content server.
             /// </summary>
             ContentUpdatedFromRemote,
+
             /// <summary>
             /// The content update failed, content will be loaded from the local cache if possible.
             /// </summary>
-            UsingContentFromCache
+            UsingContentFromCache,
         }
 
         /// <summary>
         /// Functor used to remap content into the local cache.  The first parameter is the original path, usually relative to the StreamingAssets folder.
         /// The boolean parameter indicates if the remapped path should be checked before using it.  The return value should be the remapped path and it should exist on device
-        /// if the bool parameter is true.  If the bool parameter is false, this can return a remapped path that does not exist yet.  
+        /// if the bool parameter is true.  If the bool parameter is false, this can return a remapped path that does not exist yet.
         /// </summary>
         public static Func<string, bool, string> PathRemapFuncWithFileCheck;
 
         /// <summary>
-        /// Functor used to remap content to cached path.  
+        /// Functor used to remap content to cached path.
         /// </summary>
-        [Obsolete("Use PathRemapFuncWithFileCheck instead as it allows for checking the local device for files before remapping.")]
+        [Obsolete(
+            "Use PathRemapFuncWithFileCheck instead as it allows for checking the local device for files before remapping."
+        )]
         public static Func<string, string> PathRemapFunc => s => PathRemapFuncWithFileCheck(s, false);
 
         /// <summary>
@@ -93,7 +104,6 @@ namespace Unity.Entities.Content
         static ContentUpdateContext contentUpdateContext;
         static ContentDeliveryService contentDeliveryService;
 
-
         /// <summary>
         /// Gets the delivery service used to download remote content.  This can be used to initiate the download of additional files or content sets.
         /// If initialization fails to download remote content, this will be null;
@@ -102,7 +112,6 @@ namespace Unity.Entities.Content
         {
             get { return contentDeliveryService; }
         }
-
 
         /// <summary>
         /// Release resources from the content delivery initialization process and delivery service.
@@ -115,7 +124,6 @@ namespace Unity.Entities.Content
             contentUpdateState = ContentUpdateState.None;
             contentDeliveryService?.Dispose();
         }
-
 
         /// <summary>
         /// Register for content update state changes.
@@ -142,14 +150,18 @@ namespace Unity.Entities.Content
                 LogFunc?.Invoke($"Invalid uri used for remoteUrlRoot: '{remoteUrlRoot}'.");
                 return false;
             }
-            if(uri.Scheme == Uri.UriSchemeHttps ||
-                uri.Scheme == Uri.UriSchemeHttp ||
-                uri.Scheme == Uri.UriSchemeFile ||
-                uri.Scheme == Uri.UriSchemeFtp)
+            if (
+                uri.Scheme == Uri.UriSchemeHttps
+                || uri.Scheme == Uri.UriSchemeHttp
+                || uri.Scheme == Uri.UriSchemeFile
+                || uri.Scheme == Uri.UriSchemeFtp
+            )
             {
                 return true;
             }
-            LogFunc?.Invoke($"Uri scheme {uri.Scheme} is not supported with specified remoteUrlRoot: '{remoteUrlRoot}'.");
+            LogFunc?.Invoke(
+                $"Uri scheme {uri.Scheme} is not supported with specified remoteUrlRoot: '{remoteUrlRoot}'."
+            );
             return false;
         }
 
@@ -160,13 +172,20 @@ namespace Unity.Entities.Content
         /// <param name="cachePath">The full local path of the content cache.  This must be a directory that the application has read and write access to.</param>
         /// <param name="initialContentSet">The initial set of content to download.  The content sets are given names during the publish process and by default everything is added to the "all" set.</param>
         /// <param name="updateStateFunc">Callback action that will get called whenever the content update state changes.</param>
-        public static void Initialize(string remoteUrlRoot, string cachePath, string initialContentSet, Action<ContentUpdateState> updateStateFunc)
+        public static void Initialize(
+            string remoteUrlRoot,
+            string cachePath,
+            string initialContentSet,
+            Action<ContentUpdateState> updateStateFunc
+        )
         {
-            LogFunc?.Invoke($"ContentDeliveryGlobalState.Initialize({remoteUrlRoot}, {cachePath}, {initialContentSet})");
+            LogFunc?.Invoke(
+                $"ContentDeliveryGlobalState.Initialize({remoteUrlRoot}, {cachePath}, {initialContentSet})"
+            );
             if (!IsValidURLRoot(remoteUrlRoot))
             {
                 contentUpdateState = ContentUpdateState.UsingContentFromStreamingAssets;
-                PathRemapFuncWithFileCheck = (p,d) => $"{Application.streamingAssetsPath}/{p}";
+                PathRemapFuncWithFileCheck = (p, d) => $"{Application.streamingAssetsPath}/{p}";
             }
             else
             {
@@ -175,7 +194,7 @@ namespace Unity.Entities.Content
                 {
                     remoteUrlRoot = remoteUrlRoot,
                     cachePath = cachePath,
-                    initialContentSet = initialContentSet
+                    initialContentSet = initialContentSet,
                 };
 
                 contentDeliveryService = new ContentDeliveryService();
@@ -211,7 +230,7 @@ namespace Unity.Entities.Content
                 {
                     contentDeliveryService.Dispose();
                     contentDeliveryService = null;
-                    PathRemapFuncWithFileCheck = (p,d) => $"{Application.streamingAssetsPath}/{p}";
+                    PathRemapFuncWithFileCheck = (p, d) => $"{Application.streamingAssetsPath}/{p}";
                 }
             }
 
@@ -228,20 +247,20 @@ namespace Unity.Entities.Content
             }
         }
 
-        internal static string CreateCatalogLocationPath(string streamingAssetsPath) => Path.Combine(streamingAssetsPath, $"{kCatalogLocations}.bin");
+        internal static string CreateCatalogLocationPath(string streamingAssetsPath) =>
+            Path.Combine(streamingAssetsPath, $"{kCatalogLocations}.bin");
 
-        internal unsafe static bool FileExists(string path)
+        internal static unsafe bool FileExists(string path)
         {
 #if UNITY_EDITOR
             return System.IO.File.Exists(path);
 #else
-                IO.LowLevel.Unsafe.FileInfoResult result;
-                var readHandle = IO.LowLevel.Unsafe.AsyncReadManager.GetFileInfo(path, &result);
-                readHandle.JobHandle.Complete();
-                return result.FileState == IO.LowLevel.Unsafe.FileState.Exists;
+            IO.LowLevel.Unsafe.FileInfoResult result;
+            var readHandle = IO.LowLevel.Unsafe.AsyncReadManager.GetFileInfo(path, &result);
+            readHandle.JobHandle.Complete();
+            return result.FileState == IO.LowLevel.Unsafe.FileState.Exists;
 #endif
         }
-
 
         internal class ContentUpdateContext
         {
@@ -255,7 +274,12 @@ namespace Unity.Entities.Content
                 if (currentUpdateState == ContentUpdateState.None)
                 {
                     LogFunc?.Invoke($"Downloading remote catalog info from {remoteUrlRoot}{kCatalogLocations}.bin");
-                    currentRemoteId = contentDeliveryService.DeliverContent($"{remoteUrlRoot}{kCatalogLocations}.bin", default, 0, 0);
+                    currentRemoteId = contentDeliveryService.DeliverContent(
+                        $"{remoteUrlRoot}{kCatalogLocations}.bin",
+                        default,
+                        0,
+                        0
+                    );
                     currentUpdateState = ContentUpdateState.DownloadingCatalogInfo;
                 }
 
@@ -264,11 +288,18 @@ namespace Unity.Entities.Content
                     var status = contentDeliveryService.GetDeliveryStatus(currentRemoteId);
                     if (status.State == ContentDeliveryService.DeliveryState.ContentDownloaded)
                     {
-                        LogFunc?.Invoke($"Remote catalog info loaded, creating location service from {status.DownloadStatus.LocalPath}");
+                        LogFunc?.Invoke(
+                            $"Remote catalog info loaded, creating location service from {status.DownloadStatus.LocalPath}"
+                        );
                         var catalogInfoPath = Path.Combine(cachePath, $"{kCatalogLocations}.bin");
                         File.Copy(status.DownloadStatus.LocalPath.ToString(), catalogInfoPath, true);
                         File.Delete(status.DownloadStatus.LocalPath.ToString());
-                        var catLocSvc = new DefaultContentLocationService(kCatalogLocations, 1, catalogInfoPath, p => $"{remoteUrlRoot}{p}");
+                        var catLocSvc = new DefaultContentLocationService(
+                            kCatalogLocations,
+                            1,
+                            catalogInfoPath,
+                            p => $"{remoteUrlRoot}{p}"
+                        );
                         contentDeliveryService.AddLocationService(catLocSvc);
                         LogFunc?.Invoke($"Downloading content set '{kCatalogLocations}'");
                         currentRemoteId = contentDeliveryService.DeliverContent(kCatalogLocations);
@@ -280,14 +311,23 @@ namespace Unity.Entities.Content
                         var catalogInfoPath = Path.Combine(cachePath, $"{kCatalogLocations}.bin");
                         if (File.Exists(catalogInfoPath))
                         {
-                            LogFunc?.Invoke($"Cached catalog info file found at '{catalogInfoPath}', attempting to use cached content.");
-                            var catLocSvc = new DefaultContentLocationService(kCatalogLocations, 1, catalogInfoPath, p => $"{remoteUrlRoot}{p}");
+                            LogFunc?.Invoke(
+                                $"Cached catalog info file found at '{catalogInfoPath}', attempting to use cached content."
+                            );
+                            var catLocSvc = new DefaultContentLocationService(
+                                kCatalogLocations,
+                                1,
+                                catalogInfoPath,
+                                p => $"{remoteUrlRoot}{p}"
+                            );
                             contentDeliveryService.AddLocationService(catLocSvc);
                             LogFunc?.Invoke($"Downloading content set '{kCatalogLocations}'");
                             currentRemoteId = contentDeliveryService.DeliverContent(kCatalogLocations);
                             if (!currentRemoteId.IsValid)
                             {
-                                LogFunc?.Invoke($"Unable to resolve content for remote catalogs, name = '{kCatalogLocations}'");
+                                LogFunc?.Invoke(
+                                    $"Unable to resolve content for remote catalogs, name = '{kCatalogLocations}'"
+                                );
                                 currentUpdateState = AttemptToSetContentPathsToStreamingAssets();
                             }
                             else
@@ -309,11 +349,20 @@ namespace Unity.Entities.Content
                     {
                         var deliveryStatus = new NativeList<ContentDeliveryService.DeliveryStatus>(3, Allocator.Temp);
                         contentDeliveryService.GetDeliveryStatus(currentRemoteId, ref deliveryStatus);
-                        LogFunc?.Invoke($"Content set '{kCatalogLocations}' loaded, found {deliveryStatus.Length} catalog locations.");
+                        LogFunc?.Invoke(
+                            $"Content set '{kCatalogLocations}' loaded, found {deliveryStatus.Length} catalog locations."
+                        );
                         for (int i = 0; i < deliveryStatus.Length; i++)
                         {
-                            LogFunc?.Invoke($"Loading catalog '{deliveryStatus[i].ContentId.Name}' from path '{deliveryStatus[i].DownloadStatus.LocalPath}'");
-                            var locSvc = new DefaultContentLocationService(deliveryStatus[i].ContentId.Name.ToString(), 2 + (deliveryStatus.Length - i), deliveryStatus[i].DownloadStatus.LocalPath.ToString(), p => $"{remoteUrlRoot}{p}");
+                            LogFunc?.Invoke(
+                                $"Loading catalog '{deliveryStatus[i].ContentId.Name}' from path '{deliveryStatus[i].DownloadStatus.LocalPath}'"
+                            );
+                            var locSvc = new DefaultContentLocationService(
+                                deliveryStatus[i].ContentId.Name.ToString(),
+                                2 + (deliveryStatus.Length - i),
+                                deliveryStatus[i].DownloadStatus.LocalPath.ToString(),
+                                p => $"{remoteUrlRoot}{p}"
+                            );
                             contentDeliveryService.AddLocationService(locSvc);
                         }
                         deliveryStatus.Dispose();
@@ -326,12 +375,20 @@ namespace Unity.Entities.Content
                         }
                         else
                         {
-                            LogFunc?.Invoke($"Failed to resolve local catalog content set with name '{kLocalCatalogsContentSet}'");
-                            currentUpdateState = DownloadInitialContentSet(contentDeliveryService, ref currentRemoteId, initialContentSet);
+                            LogFunc?.Invoke(
+                                $"Failed to resolve local catalog content set with name '{kLocalCatalogsContentSet}'"
+                            );
+                            currentUpdateState = DownloadInitialContentSet(
+                                contentDeliveryService,
+                                ref currentRemoteId,
+                                initialContentSet
+                            );
                         }
                     }
-                    else if (status.State == ContentDeliveryService.DeliveryState.Failed ||
-                             status.State == ContentDeliveryService.DeliveryState.None)
+                    else if (
+                        status.State == ContentDeliveryService.DeliveryState.Failed
+                        || status.State == ContentDeliveryService.DeliveryState.None
+                    )
                     {
                         currentUpdateState = AttemptToSetContentPathsToStreamingAssets();
                     }
@@ -343,7 +400,11 @@ namespace Unity.Entities.Content
                     if (status.State >= ContentDeliveryService.DeliveryState.ContentDownloaded)
                     {
                         LogFunc?.Invoke($"Successfully downloaded local catalogs.");
-                        currentUpdateState = DownloadInitialContentSet(contentDeliveryService, ref currentRemoteId, initialContentSet);
+                        currentUpdateState = DownloadInitialContentSet(
+                            contentDeliveryService,
+                            ref currentRemoteId,
+                            initialContentSet
+                        );
                     }
                     else if (status.State == ContentDeliveryService.DeliveryState.Failed)
                     {
@@ -359,13 +420,17 @@ namespace Unity.Entities.Content
                     {
                         var deliveryStatus = new NativeList<ContentDeliveryService.DeliveryStatus>(128, Allocator.Temp);
                         contentDeliveryService.GetDeliveryStatus(currentRemoteId, ref deliveryStatus);
-                        LogFunc?.Invoke($"Content set '{initialContentSet}' loaded, found {deliveryStatus.Length} content locations.");
+                        LogFunc?.Invoke(
+                            $"Content set '{initialContentSet}' loaded, found {deliveryStatus.Length} content locations."
+                        );
                         deliveryStatus.Dispose();
                         currentRemoteId = default;
                         currentUpdateState = ContentUpdateState.ContentUpdatedFromRemote;
                     }
-                    else if (status.State == ContentDeliveryService.DeliveryState.Failed ||
-                        status.State == ContentDeliveryService.DeliveryState.None)
+                    else if (
+                        status.State == ContentDeliveryService.DeliveryState.Failed
+                        || status.State == ContentDeliveryService.DeliveryState.None
+                    )
                     {
                         currentUpdateState = AttemptToSetContentPathsToStreamingAssets();
                     }
@@ -373,7 +438,11 @@ namespace Unity.Entities.Content
                 return (currentUpdateState >= ContentUpdateState.NoContentAvailable);
             }
 
-            private static ContentUpdateState DownloadInitialContentSet(ContentDeliveryService contentDeliveryService, ref RemoteContentId remoteId, string contentSet)
+            private static ContentUpdateState DownloadInitialContentSet(
+                ContentDeliveryService contentDeliveryService,
+                ref RemoteContentId remoteId,
+                string contentSet
+            )
             {
                 if (!string.IsNullOrEmpty(contentSet))
                 {
@@ -395,19 +464,26 @@ namespace Unity.Entities.Content
 
             internal ContentUpdateState AttemptToSetContentPathsToStreamingAssets()
             {
-                var catalogPathInStreamingAssets = $"{Application.streamingAssetsPath}/{RuntimeContentManager.RelativeCatalogPath}";
+                var catalogPathInStreamingAssets =
+                    $"{Application.streamingAssetsPath}/{RuntimeContentManager.RelativeCatalogPath}";
                 if (FileExists(catalogPathInStreamingAssets))
                 {
-                    LogFunc?.Invoke($"No connection, but catalog found at {catalogPathInStreamingAssets}.  Attempting to use streaming assets for content.");
+                    LogFunc?.Invoke(
+                        $"No connection, but catalog found at {catalogPathInStreamingAssets}.  Attempting to use streaming assets for content."
+                    );
                     return ContentUpdateState.UsingContentFromStreamingAssets;
                 }
                 var remoteCatalogPathInStreamingAssets = CreateCatalogLocationPath(Application.streamingAssetsPath);
                 if (!FileExists(remoteCatalogPathInStreamingAssets))
                 {
-                    LogFunc?.Invoke($"No connection, no catalog found at {catalogPathInStreamingAssets}, but no remote catalog at {remoteCatalogPathInStreamingAssets}.  Attempting to use streaming assets for content.");
+                    LogFunc?.Invoke(
+                        $"No connection, no catalog found at {catalogPathInStreamingAssets}, but no remote catalog at {remoteCatalogPathInStreamingAssets}.  Attempting to use streaming assets for content."
+                    );
                     return ContentUpdateState.UsingContentFromStreamingAssets;
                 }
-                LogFunc?.Invoke($"No connection, no cached data, no catalog found at {catalogPathInStreamingAssets}. Remote catalog found at {remoteCatalogPathInStreamingAssets}.  Content is not available.");
+                LogFunc?.Invoke(
+                    $"No connection, no cached data, no catalog found at {catalogPathInStreamingAssets}. Remote catalog found at {remoteCatalogPathInStreamingAssets}.  Content is not available."
+                );
                 return ContentUpdateState.NoContentAvailable;
             }
         }

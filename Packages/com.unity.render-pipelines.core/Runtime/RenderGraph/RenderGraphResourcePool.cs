@@ -18,7 +18,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
     /// Encapsulates a pooled resource along with its frame and execution tracking metadata.
     /// This allows the pool to track when resources were released for proper reuse and purging decisions.
     /// </summary>
-    readonly struct PooledResourceEntry<Type> where Type : class
+    readonly struct PooledResourceEntry<Type>
+        where Type : class
     {
         public readonly Type resource;
         public readonly int frameIndex;
@@ -32,11 +33,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
         }
     }
 
-    abstract class RenderGraphResourcePool<Type> : IRenderGraphResourcePool where Type : class
+    abstract class RenderGraphResourcePool<Type> : IRenderGraphResourcePool
+        where Type : class
     {
         // Dictionary tracks resources by hash and stores resources with same hash in a List (list instead of a stack because we need to be able to remove stale allocations, potentially in the middle of the stack).
         // The list needs to be sorted otherwise you could get inconsistent resource usage from one frame to another.
-        protected Dictionary<int, SortedList<ulong, PooledResourceEntry<Type>>> m_ResourcePool = new Dictionary<int, SortedList<ulong, PooledResourceEntry<Type>>>();
+        protected Dictionary<int, SortedList<ulong, PooledResourceEntry<Type>>> m_ResourcePool =
+            new Dictionary<int, SortedList<ulong, PooledResourceEntry<Type>>>();
 
         // This list allows us to determine if all resources were correctly released in the frame when validity checks are enabled.
         // This is useful to warn in case of user error or avoid leaks when a render graph execution error occurs for example.
@@ -58,12 +61,18 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 m_ResourcePool.Add(hash, list);
             }
 
-            list.Add(GetSortIndex(resource), new PooledResourceEntry<Type>(resource, currentFrameIndex, currentExecutionCount));
+            list.Add(
+                GetSortIndex(resource),
+                new PooledResourceEntry<Type>(resource, currentFrameIndex, currentExecutionCount)
+            );
         }
 
         public bool TryGetResource(int hashCode, out Type resource, int currentFrameIndex, int currentExecutionCount)
         {
-            if (m_ResourcePool.TryGetValue(hashCode, out SortedList<ulong, PooledResourceEntry<Type>> list) && list.Count > 0)
+            if (
+                m_ResourcePool.TryGetValue(hashCode, out SortedList<ulong, PooledResourceEntry<Type>> list)
+                && list.Count > 0
+            )
             {
                 // When "intra frame memory aliasing" mode is disabled, skip resources that were released in the current execution.
                 // They will only be available for reuse in the next execution.
@@ -143,7 +152,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 {
                     string logMessage = "";
                     if (!onException)
-                        logMessage = $"RenderGraph: Not all resources of type {GetResourceTypeName()} were released. This can be caused by a resources being allocated but never read by any pass.";
+                        logMessage =
+                            $"RenderGraph: Not all resources of type {GetResourceTypeName()} were released. This can be caused by a resources being allocated but never read by any pass.";
 
                     foreach (var value in m_FrameAllocatedResources)
                     {

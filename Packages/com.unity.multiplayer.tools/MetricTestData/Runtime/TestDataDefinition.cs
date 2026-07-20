@@ -61,7 +61,6 @@ namespace Unity.Multiplayer.Tools.MetricTestData
             return m_Random.Next(1, 999);
         }
 
-
         public string GenerateSceneName()
         {
             return $"{Capitalize(GetRandomValue(Adjectives.Values))}{Capitalize(GetRandomValue(Adjectives.Values))}Scene";
@@ -69,16 +68,12 @@ namespace Unity.Multiplayer.Tools.MetricTestData
 
         string GetRandomValue(IReadOnlyList<string> collection)
         {
-            return !collection.Any()
-                ? string.Empty
-                : collection[m_Random.Next(0, collection.Count)];
+            return !collection.Any() ? string.Empty : collection[m_Random.Next(0, collection.Count)];
         }
 
         static string Capitalize(string input)
         {
-            return string.IsNullOrEmpty(input)
-                ? string.Empty
-                : $"{char.ToUpper(input[0])}{input.Substring(1)}";
+            return string.IsNullOrEmpty(input) ? string.Empty : $"{char.ToUpper(input[0])}{input.Substring(1)}";
         }
     }
 }

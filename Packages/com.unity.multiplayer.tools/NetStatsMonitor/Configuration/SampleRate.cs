@@ -15,6 +15,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// Graph points and Simple Moving Average counter samples correspond to data collected within a single frame.
         /// </summary>
         PerFrame,
+
         /// <summary>
         /// Graph points and Simple Moving Average counter samples correspond to data collected over a full second.
         /// </summary>

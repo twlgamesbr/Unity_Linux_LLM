@@ -239,12 +239,12 @@ namespace UnityEngine.InputSystem.LowLevel
             return unchecked((int)(long)m_EventPtr);
         }
 
-        public static bool operator==(InputEventPtr left, InputEventPtr right)
+        public static bool operator ==(InputEventPtr left, InputEventPtr right)
         {
             return left.m_EventPtr == right.m_EventPtr;
         }
 
-        public static bool operator!=(InputEventPtr left, InputEventPtr right)
+        public static bool operator !=(InputEventPtr left, InputEventPtr right)
         {
             return left.m_EventPtr != right.m_EventPtr;
         }

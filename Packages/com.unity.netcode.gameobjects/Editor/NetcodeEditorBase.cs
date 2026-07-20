@@ -15,7 +15,8 @@ namespace Unity.Netcode.Editor
     /// </remarks>
     /// <typeparam name="TT">The base <see cref="MonoBehaviour"/> derived component type</typeparam>
     [CanEditMultipleObjects]
-    public partial class NetcodeEditorBase<TT> : UnityEditor.Editor where TT : MonoBehaviour
+    public partial class NetcodeEditorBase<TT> : UnityEditor.Editor
+        where TT : MonoBehaviour
     {
         private const int k_IndentOffset = 15;
         private int m_IndentOffset = 0;
@@ -23,9 +24,7 @@ namespace Unity.Netcode.Editor
         private float m_OriginalLabelWidth;
 
         /// <inheritdoc cref="UnityEditor.Editor.OnEnable"/>
-        public virtual void OnEnable()
-        {
-        }
+        public virtual void OnEnable() { }
 
         /// <summary>
         /// Draws a <see cref="SerializedProperty"/> with the option to provide the font style to use.
@@ -93,16 +92,27 @@ namespace Unity.Netcode.Editor
         /// <param name="displayProperties">The <see cref="Action"/> to invoke that will draw the type <typeparamref name="T"/> properties.</param>
         /// <param name="expanded">The <typeparamref name="T"/> current expanded property value</param>
         /// <param name="setExpandedProperty">The <see cref="Action{bool}"/> invoked to apply the updated <paramref name="expanded"/> value.</param>
-        protected void DrawFoldOutGroup<T>(Type type, Action displayProperties, bool expanded, Action<bool> setExpandedProperty)
+        protected void DrawFoldOutGroup<T>(
+            Type type,
+            Action displayProperties,
+            bool expanded,
+            Action<bool> setExpandedProperty
+        )
         {
             var baseClass = target as TT;
             EditorGUI.BeginChangeCheck();
             serializedObject.Update();
             var currentClass = typeof(T);
 
-            if (type.IsSubclassOf(currentClass) || (!type.IsSubclassOf(currentClass) && currentClass.IsSubclassOf(typeof(TT))))
+            if (
+                type.IsSubclassOf(currentClass)
+                || (!type.IsSubclassOf(currentClass) && currentClass.IsSubclassOf(typeof(TT)))
+            )
             {
-                var expandedValue = EditorGUILayout.BeginFoldoutHeaderGroup(expanded, $"{currentClass.Name} Properties");
+                var expandedValue = EditorGUILayout.BeginFoldoutHeaderGroup(
+                    expanded,
+                    $"{currentClass.Name} Properties"
+                );
 
                 if (expandedValue)
                 {

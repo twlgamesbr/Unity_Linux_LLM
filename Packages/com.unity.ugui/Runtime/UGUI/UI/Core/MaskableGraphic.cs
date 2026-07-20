@@ -35,7 +35,7 @@ namespace UnityEngine.UI
         protected bool m_IncludeForMasking = false;
 
         [Serializable]
-        public class CullStateChangedEvent : UnityEvent<bool> {}
+        public class CullStateChangedEvent : UnityEvent<bool> { }
 
         // Event delegates triggered on click.
         [SerializeField]
@@ -68,7 +68,6 @@ namespace UnityEngine.UI
                 SetMaterialDirty();
             }
         }
-
 
         /// <summary>
         /// Is this graphic the graphic on the same object as a Mask that is enabled.
@@ -121,7 +120,15 @@ namespace UnityEngine.UI
             // it adds some coupling between components though :(
             if (m_StencilValue > 0 && !isMaskingGraphic)
             {
-                var maskMat = StencilMaterial.Add(toUse, (1 << m_StencilValue) - 1, StencilOp.Keep, CompareFunction.Equal, ColorWriteMask.All, (1 << m_StencilValue) - 1, 0);
+                var maskMat = StencilMaterial.Add(
+                    toUse,
+                    (1 << m_StencilValue) - 1,
+                    StencilOp.Keep,
+                    CompareFunction.Equal,
+                    ColorWriteMask.All,
+                    (1 << m_StencilValue) - 1,
+                    0
+                );
                 StencilMaterial.Remove(m_MaskMaterial);
                 m_MaskMaterial = maskMat;
                 toUse = m_MaskMaterial;
@@ -201,7 +208,6 @@ namespace UnityEngine.UI
             UpdateClipParent();
             SetMaterialDirty();
         }
-
 #endif
 
         protected override void OnTransformParentChanged()
@@ -218,7 +224,7 @@ namespace UnityEngine.UI
 
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete("Not used anymore.", true)]
-        public virtual void ParentMaskStateChanged() {}
+        public virtual void ParentMaskStateChanged() { }
 
         protected override void OnCanvasHierarchyChanged()
         {

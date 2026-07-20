@@ -1,11 +1,11 @@
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.Rendering.Universal;
-using ShaderPathID = UnityEngine.Rendering.Universal.ShaderPathID;
-using UnityEditor.ShaderGraph;
 using UnityEditor.Rendering.Universal.ShaderGraph;
 using UnityEditor.Rendering.Universal.ShaderGUI;
+using UnityEditor.ShaderGraph;
+using UnityEngine;
 using UnityEngine.Rendering;
+using ShaderPathID = UnityEngine.Rendering.Universal.ShaderPathID;
 
 namespace Unity.Rendering.Universal
 {
@@ -33,14 +33,14 @@ namespace Unity.Rendering.Universal
             ComplexLit = ShaderPathID.ComplexLit,
 
             // ShaderGraph IDs start at 1000, correspond to subtargets
-            SG_Unlit = 1000,        // UniversalUnlitSubTarget
-            SG_Lit,                 // UniversalLitSubTarget
-            SG_Decal,               // UniversalDecalSubTarget
-            SG_SpriteUnlit,         // UniversalSpriteUnlitSubTarget
-            SG_SpriteLit,           // UniversalSpriteLitSubTarget
-            SG_TerrainLit,          // UniversalTerrainLitSubTarget
-            SG_SpriteCustomLit,      // UniversalSpriteCustomLitSubTarget
-            SG_SixWaySmokeLit       // UniversalSixWaySubTarget
+            SG_Unlit = 1000, // UniversalUnlitSubTarget
+            SG_Lit, // UniversalLitSubTarget
+            SG_Decal, // UniversalDecalSubTarget
+            SG_SpriteUnlit, // UniversalSpriteUnlitSubTarget
+            SG_SpriteLit, // UniversalSpriteLitSubTarget
+            SG_TerrainLit, // UniversalTerrainLitSubTarget
+            SG_SpriteCustomLit, // UniversalSpriteCustomLitSubTarget
+            SG_SixWaySmokeLit, // UniversalSixWaySubTarget
         }
 
         internal static bool IsShaderGraph(this ShaderID id)
@@ -70,7 +70,7 @@ namespace Unity.Rendering.Universal
             // Currently only these ShaderIDs have a pass with a { "LightMode" = "MotionVectors" } tag in URP
             // (this is a more efficient check than looping over all sub-shaders and their passes and checking the
             // "LightMode" tag value with FindPassTagValue)
-            switch(id)
+            switch (id)
             {
                 case ShaderID.Lit:
                 case ShaderID.Unlit:
@@ -124,12 +124,16 @@ namespace Unity.Rendering.Universal
             CreatedNewMaterial,
             ChangedAssignedShader,
             ModifiedShader,
-            ModifiedMaterial
+            ModifiedMaterial,
         }
 
         //Helper used by VFX, allow retrieval of ShaderID on another object than material.shader
         //In case of ShaderGraph integration, the material.shader is actually pointing to VisualEffectAsset
-        internal static void UpdateMaterial(Material material, MaterialUpdateType updateType, UnityEngine.Object assetWithURPMetaData)
+        internal static void UpdateMaterial(
+            Material material,
+            MaterialUpdateType updateType,
+            UnityEngine.Object assetWithURPMetaData
+        )
         {
             var currentShaderId = ShaderUtils.ShaderID.Unknown;
             if (assetWithURPMetaData != null)
@@ -149,7 +153,11 @@ namespace Unity.Rendering.Universal
 
         // this is used to update a material's keywords, applying any shader-associated logic to update dependent properties and keywords
         // this is also invoked when a material is created, modified, or the material's shader is modified or reassigned
-        internal static void UpdateMaterial(Material material, MaterialUpdateType updateType, ShaderID shaderID = ShaderID.Unknown)
+        internal static void UpdateMaterial(
+            Material material,
+            MaterialUpdateType updateType,
+            ShaderID shaderID = ShaderID.Unknown
+        )
         {
             // if unknown, look it up from the material's shader
             // NOTE: this will only work for asset-based shaders..
@@ -168,10 +176,18 @@ namespace Unity.Rendering.Universal
                     UnlitShader.SetMaterialKeywords(material);
                     break;
                 case ShaderID.ParticlesLit:
-                    ParticlesLitShader.SetMaterialKeywords(material, LitGUI.SetMaterialKeywords, ParticleGUI.SetMaterialKeywords);
+                    ParticlesLitShader.SetMaterialKeywords(
+                        material,
+                        LitGUI.SetMaterialKeywords,
+                        ParticleGUI.SetMaterialKeywords
+                    );
                     break;
                 case ShaderID.ParticlesSimpleLit:
-                    ParticlesSimpleLitShader.SetMaterialKeywords(material, SimpleLitGUI.SetMaterialKeywords, ParticleGUI.SetMaterialKeywords);
+                    ParticlesSimpleLitShader.SetMaterialKeywords(
+                        material,
+                        SimpleLitGUI.SetMaterialKeywords,
+                        ParticleGUI.SetMaterialKeywords
+                    );
                     break;
                 case ShaderID.ParticlesUnlit:
                     ParticlesUnlitShader.SetMaterialKeywords(material, null, ParticleGUI.SetMaterialKeywords);

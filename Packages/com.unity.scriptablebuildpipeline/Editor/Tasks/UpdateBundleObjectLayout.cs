@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Injector;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEditor.Build.Pipeline.Utilities;
 using UnityEditor.Build.Utilities;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline.Tasks
 {
@@ -17,7 +17,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class UpdateBundleObjectLayout : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In, true)]
@@ -52,22 +55,48 @@ namespace UnityEditor.Build.Pipeline.Tasks
             {
                 var task = Task.Run(() =>
                 {
-                    using (m_Log.ScopedStep(LogLevel.Info, "Populate Assets Map", $"Count={m_DependencyData.AssetInfo.Count}"))
+                    using (
+                        m_Log.ScopedStep(
+                            LogLevel.Info,
+                            "Populate Assets Map",
+                            $"Count={m_DependencyData.AssetInfo.Count}"
+                        )
+                    )
                     {
                         foreach (KeyValuePair<GUID, AssetLoadInfo> dependencyPair in m_DependencyData.AssetInfo)
                         {
-                            PopulateReferencesMap(dependencyPair.Key, dependencyPair.Value.includedObjects, ObjectToAssetReferences);
-                            PopulateReferencesMap(dependencyPair.Key, dependencyPair.Value.referencedObjects, ObjectToAssetReferences);
+                            PopulateReferencesMap(
+                                dependencyPair.Key,
+                                dependencyPair.Value.includedObjects,
+                                ObjectToAssetReferences
+                            );
+                            PopulateReferencesMap(
+                                dependencyPair.Key,
+                                dependencyPair.Value.referencedObjects,
+                                ObjectToAssetReferences
+                            );
                         }
                     }
-                    using (m_Log.ScopedStep(LogLevel.Info, "Populate Scenes Map", $"Count={m_DependencyData.SceneInfo.Count}"))
+                    using (
+                        m_Log.ScopedStep(
+                            LogLevel.Info,
+                            "Populate Scenes Map",
+                            $"Count={m_DependencyData.SceneInfo.Count}"
+                        )
+                    )
                     {
                         foreach (KeyValuePair<GUID, SceneDependencyInfo> dependencyPair in m_DependencyData.SceneInfo)
-                            PopulateReferencesMap(dependencyPair.Key, dependencyPair.Value.referencedObjects, ObjectToAssetReferences);
+                            PopulateReferencesMap(
+                                dependencyPair.Key,
+                                dependencyPair.Value.referencedObjects,
+                                ObjectToAssetReferences
+                            );
                     }
                 });
 
-                using (m_Log.ScopedStep(LogLevel.Info, "Populate Files Map", $"Count={m_WriteData.FileToObjects.Count}"))
+                using (
+                    m_Log.ScopedStep(LogLevel.Info, "Populate Files Map", $"Count={m_WriteData.FileToObjects.Count}")
+                )
                 {
                     foreach (KeyValuePair<string, List<ObjectIdentifier>> filePair in m_WriteData.FileToObjects)
                         PopulateReferencesMap(filePair.Key, filePair.Value, ObjectToFiles);
@@ -81,11 +110,18 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 {
                     IEnumerable<ObjectIdentifier> objectIDs = group.Select(s => s.Key);
                     string bundleName = group.Key;
-                    string internalName = string.Format(CommonStrings.AssetBundleNameFormat, m_PackingMethod.GenerateInternalFileName(bundleName));
+                    string internalName = string.Format(
+                        CommonStrings.AssetBundleNameFormat,
+                        m_PackingMethod.GenerateInternalFileName(bundleName)
+                    );
 
                     foreach (var objectID in objectIDs)
                     {
-                        UpdateAssetToFilesMap(internalName, ObjectToAssetReferences[objectID], m_WriteData.AssetToFiles);
+                        UpdateAssetToFilesMap(
+                            internalName,
+                            ObjectToAssetReferences[objectID],
+                            m_WriteData.AssetToFiles
+                        );
                         if (ObjectToFiles.ContainsKey(objectID))
                             RemoveObjectIDFromFiles(objectID, ObjectToFiles[objectID], m_WriteData.FileToObjects);
                     }
@@ -100,7 +136,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return ReturnCode.Success;
         }
 
-        internal static void PopulateReferencesMap<T>(T key, IList<ObjectIdentifier> objects, Dictionary<ObjectIdentifier, List<T>> map)
+        internal static void PopulateReferencesMap<T>(
+            T key,
+            IList<ObjectIdentifier> objects,
+            Dictionary<ObjectIdentifier, List<T>> map
+        )
         {
             foreach (var obj in objects)
             {
@@ -109,7 +149,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
             }
         }
 
-        internal static void UpdateAssetToFilesMap(string file, List<GUID> assetsToUpdate, Dictionary<GUID, List<string>> AssetToFiles)
+        internal static void UpdateAssetToFilesMap(
+            string file,
+            List<GUID> assetsToUpdate,
+            Dictionary<GUID, List<string>> AssetToFiles
+        )
         {
             foreach (var asset in assetsToUpdate)
             {
@@ -119,13 +163,22 @@ namespace UnityEditor.Build.Pipeline.Tasks
             }
         }
 
-        internal static void RemoveObjectIDFromFiles(ObjectIdentifier objectID, List<string> files, Dictionary<string, List<ObjectIdentifier>> FileToObjects)
+        internal static void RemoveObjectIDFromFiles(
+            ObjectIdentifier objectID,
+            List<string> files,
+            Dictionary<string, List<ObjectIdentifier>> FileToObjects
+        )
         {
             foreach (var file in files)
                 FileToObjects[file].Remove(objectID);
         }
 
-        internal static void UpdateFileToBundleMap(string bundleName, string file, Dictionary<string, string> FileToBundle, Dictionary<string, List<GUID>> BundleLayout)
+        internal static void UpdateFileToBundleMap(
+            string bundleName,
+            string file,
+            Dictionary<string, string> FileToBundle,
+            Dictionary<string, List<GUID>> BundleLayout
+        )
         {
             if (!FileToBundle.ContainsKey(file))
             {
@@ -136,7 +189,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
             }
         }
 
-        internal static void UpdateFileToObjectMap(string file, IEnumerable<ObjectIdentifier> newObjectIDs, Dictionary<string, List<ObjectIdentifier>> FileToObjects)
+        internal static void UpdateFileToObjectMap(
+            string file,
+            IEnumerable<ObjectIdentifier> newObjectIDs,
+            Dictionary<string, List<ObjectIdentifier>> FileToObjects
+        )
         {
             // This is called after remove, thus we can just AddRange as we already know these objects are not in any file
             FileToObjects.GetOrAdd(file, out var objectIDs);

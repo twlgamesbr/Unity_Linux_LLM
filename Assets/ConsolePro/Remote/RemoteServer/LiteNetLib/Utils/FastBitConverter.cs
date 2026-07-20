@@ -9,7 +9,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 #if (LITENETLIB_UNSAFE || NETCOREAPP3_1 || NET5_0 || NETCOREAPP3_0_OR_GREATER) && !BIGENDIAN
 #if LITENETLIB_UNSAFE
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void GetBytes<T>(byte[] bytes, int startIndex, T value) where T : unmanaged
+        public static unsafe void GetBytes<T>(byte[] bytes, int startIndex, T value)
+            where T : unmanaged
         {
             int size = sizeof(T);
             if (bytes.Length < startIndex + size)
@@ -80,7 +81,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             buffer[offset + 3] = (byte)(data >> 32);
             buffer[offset + 2] = (byte)(data >> 40);
             buffer[offset + 1] = (byte)(data >> 48);
-            buffer[offset    ] = (byte)(data >> 56);
+            buffer[offset] = (byte)(data >> 56);
 #else
             buffer[offset] = (byte)(data);
             buffer[offset + 1] = (byte)(data >> 8);
@@ -100,7 +101,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             buffer[offset + 3] = (byte)(data);
             buffer[offset + 2] = (byte)(data >> 8);
             buffer[offset + 1] = (byte)(data >> 16);
-            buffer[offset    ] = (byte)(data >> 24);
+            buffer[offset] = (byte)(data >> 24);
 #else
             buffer[offset] = (byte)(data);
             buffer[offset + 1] = (byte)(data >> 8);
@@ -114,7 +115,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
         {
 #if BIGENDIAN
             buffer[offset + 1] = (byte)(data);
-            buffer[offset    ] = (byte)(data >> 8);
+            buffer[offset] = (byte)(data >> 8);
 #else
             buffer[offset] = (byte)(data);
             buffer[offset + 1] = (byte)(data >> 8);

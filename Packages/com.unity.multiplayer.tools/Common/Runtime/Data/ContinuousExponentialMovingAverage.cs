@@ -51,13 +51,18 @@ namespace Unity.Multiplayer.Tools.Common
         /// </summary>
         public static float GetDecayConstantForHalfLife(float halfLife) => halfLife > 0 ? k_ln2F / halfLife : -1f;
 
-        public ContinuousExponentialMovingAverage(double decayConstant, double value = 0d, double time = k_DefaultInitialTime)
+        public ContinuousExponentialMovingAverage(
+            double decayConstant,
+            double value = 0d,
+            double time = k_DefaultInitialTime
+        )
         {
             if (decayConstant < 0)
             {
                 throw new ArgumentException(
                     $"ContinuousExponentialMovingAverage decay constant {decayConstant} should be >= 0; "
-                    + "otherwise it will grow exponentially over time.");
+                        + "otherwise it will grow exponentially over time."
+                );
             }
             DecayConstant = decayConstant;
             LastValue = value;

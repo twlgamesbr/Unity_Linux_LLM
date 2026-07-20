@@ -5,7 +5,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine.Profiling;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -17,7 +16,11 @@ namespace Unity.Entities
         static bool s_Initialized;
         static ulong s_LastWorldSequenceNumber;
 
-        sealed class SharedStaticData { internal static readonly SharedStatic<StaticData> Ref = SharedStatic<StaticData>.GetOrCreate<SharedStaticData>(); }
+        sealed class SharedStaticData
+        {
+            internal static readonly SharedStatic<StaticData> Ref =
+                SharedStatic<StaticData>.GetOrCreate<SharedStaticData>();
+        }
 
         public static Guid Guid => s_Data.Guid;
 
@@ -77,7 +80,8 @@ namespace Unity.Entities
         [ExcludeFromBurstCompatTesting("Takes managed World")]
         public static void OnWorldCreated(World world) => s_Data.AddWorld(world);
 
-        public static void OnSystemCreated(SystemTypeIndex systemType, in SystemHandle systemHandle) => s_Data.AddSystem(systemType, in systemHandle);
+        public static void OnSystemCreated(SystemTypeIndex systemType, in SystemHandle systemHandle) =>
+            s_Data.AddSystem(systemType, in systemHandle);
 
         [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_PROFILER")]
         public static unsafe void ArchetypeAdded(Archetype* archetype) => s_Data.AddArchetype(archetype);
@@ -89,7 +93,7 @@ namespace Unity.Entities
                 // Iterate forward to keep creation order in our events.
                 foreach (var world in World.All)
                 {
-                    if(world.SequenceNumber >= s_LastWorldSequenceNumber)
+                    if (world.SequenceNumber >= s_LastWorldSequenceNumber)
                         OnWorldCreated(world);
                 }
                 s_LastWorldSequenceNumber = World.NextSequenceNumber;
@@ -100,7 +104,8 @@ namespace Unity.Entities
             s_Data.Flush();
         }
 
-        internal static unsafe void FlushSessionMetaData<T>(in Guid guid, int tag, ref UnsafeList<T> list) where T : unmanaged
+        internal static unsafe void FlushSessionMetaData<T>(in Guid guid, int tag, ref UnsafeList<T> list)
+            where T : unmanaged
         {
             if (!Profiler.enabled || list.IsEmpty)
                 return;
@@ -109,7 +114,8 @@ namespace Unity.Entities
             list.Clear();
         }
 
-        internal static unsafe void FlushFrameMetaData<T>(in Guid guid, int tag, ref UnsafeList<T> list) where T : unmanaged
+        internal static unsafe void FlushFrameMetaData<T>(in Guid guid, int tag, ref UnsafeList<T> list)
+            where T : unmanaged
         {
             if (!Profiler.enabled || list.IsEmpty)
                 return;
@@ -118,9 +124,14 @@ namespace Unity.Entities
             list.Clear();
         }
 
-        static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list) where T : unmanaged
+        static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list)
+            where T : unmanaged
         {
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list.Ptr, list.Length, Allocator.None);
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                list.Ptr,
+                list.Length,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, AtomicSafetyHandle.GetTempMemoryHandle());
 #endif

@@ -8,7 +8,11 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         const string ServerName = "Server";
         const string ClientNamePrefix = "Client";
 
-        public ConnectionViewModel(ConnectionInfo connectionInfo, ConnectionInfo localConnection, Action onSelectedCallback = null)
+        public ConnectionViewModel(
+            ConnectionInfo connectionInfo,
+            ConnectionInfo localConnection,
+            Action onSelectedCallback = null
+        )
             : base(
                 parent: null,
                 name: GetName(connectionInfo),
@@ -18,14 +22,11 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 id: connectionInfo.Id,
                 connectionInfo,
                 localConnection
-            )
-        { }
+            ) { }
 
         static string GetName(ConnectionInfo connectionInfo)
         {
-            return connectionInfo.Id == 0
-                ? ServerName
-                : $"{ClientNamePrefix} {connectionInfo.Id}";
+            return connectionInfo.Id == 0 ? ServerName : $"{ClientNamePrefix} {connectionInfo.Id}";
         }
     }
 }

@@ -19,9 +19,11 @@ namespace UnityEditor.TestTools.TestRunner
         IEnumerable<Type> Search(ITest tests, ITestFilter filter, RuntimePlatform testTargetPlatform);
     }
 
-    internal abstract class AttributeFinderBase<T1, T2> : AttributeFinderBase where T2 : Attribute
+    internal abstract class AttributeFinderBase<T1, T2> : AttributeFinderBase
+        where T2 : Attribute
     {
         private readonly Func<T2, Type> m_TypeSelector;
+
         protected AttributeFinderBase(Func<T2, Type> typeSelector)
         {
             m_TypeSelector = typeSelector;
@@ -46,10 +48,18 @@ namespace UnityEditor.TestTools.TestRunner
 #else
             var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
-            allAssemblies = allAssemblies.Where(x => x.GetReferencedAssemblies().Any(z => z.Name == "UnityEditor.TestRunner")).ToArray();
-            var attributesFromAssemblies = allAssemblies.SelectMany(assembly => assembly.GetCustomAttributes(typeof(T2), true).OfType<T2>());
-            var attributesFromMethods = tests.SelectMany(t => t.Method.GetCustomAttributes<T2>(true).Select(attribute => attribute));
-            var attributesFromTypes = tests.SelectMany(t => t.Method.TypeInfo.GetCustomAttributes<T2>(true).Select(attribute => attribute));
+            allAssemblies = allAssemblies
+                .Where(x => x.GetReferencedAssemblies().Any(z => z.Name == "UnityEditor.TestRunner"))
+                .ToArray();
+            var attributesFromAssemblies = allAssemblies.SelectMany(assembly =>
+                assembly.GetCustomAttributes(typeof(T2), true).OfType<T2>()
+            );
+            var attributesFromMethods = tests.SelectMany(t =>
+                t.Method.GetCustomAttributes<T2>(true).Select(attribute => attribute)
+            );
+            var attributesFromTypes = tests.SelectMany(t =>
+                t.Method.TypeInfo.GetCustomAttributes<T2>(true).Select(attribute => attribute)
+            );
 
             var result = new List<T2>();
             result.AddRange(attributesFromAssemblies);
@@ -59,9 +69,15 @@ namespace UnityEditor.TestTools.TestRunner
             return result.Select(m_TypeSelector).Where(type => type != null);
         }
 
-        private static IEnumerable<Type> GetTypesFromInterface(IEnumerable<ITest> selectedTests, RuntimePlatform testTargetPlatform)
+        private static IEnumerable<Type> GetTypesFromInterface(
+            IEnumerable<ITest> selectedTests,
+            RuntimePlatform testTargetPlatform
+        )
         {
-            var typesWithInterfaces = selectedTests.Where(t => typeof(T1).IsAssignableFrom(t.Method.TypeInfo.Type) && TestFiltering.IsTestEnabledOnPlatform(t, testTargetPlatform));
+            var typesWithInterfaces = selectedTests.Where(t =>
+                typeof(T1).IsAssignableFrom(t.Method.TypeInfo.Type)
+                && TestFiltering.IsTestEnabledOnPlatform(t, testTargetPlatform)
+            );
             return typesWithInterfaces.Select(t => t.Method.TypeInfo.Type);
         }
     }

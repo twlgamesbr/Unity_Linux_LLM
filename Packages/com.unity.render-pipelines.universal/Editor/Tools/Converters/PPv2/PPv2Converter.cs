@@ -22,10 +22,11 @@ namespace UnityEditor.Rendering.Universal
     [Serializable]
     [PipelineConverter("Built-in", "Universal Render Pipeline (Universal Renderer)")]
     [BatchModeConverterClassInfo("BuiltInToURP", "PPv2")]
-    [ElementInfo(Name = "Post-Processing Stack v2",
-                 Order = int.MaxValue,
-                 Description = "This converter creates Universal Render Pipeline (URP) assets and corresponding Renderer assets, configuring their settings to match the equivalent settings from the Built-in Render Pipeline.")]
-
+    [ElementInfo(
+        Name = "Post-Processing Stack v2",
+        Order = int.MaxValue,
+        Description = "This converter creates Universal Render Pipeline (URP) assets and corresponding Renderer assets, configuring their settings to match the equivalent settings from the Built-in Render Pipeline."
+    )]
     internal class PPv2Converter : AssetsConverter
     {
         public override bool isEnabled => s_PostProcessTypesToSearch?.Count() > 0;
@@ -35,15 +36,16 @@ namespace UnityEditor.Rendering.Universal
 
         private List<Object> postConversionDestroyables = null;
 
-        protected override List<(string query, string description)> contextSearchQueriesAndIds
-            => s_PostProcessTypesToSearch;
+        protected override List<(string query, string description)> contextSearchQueriesAndIds =>
+            s_PostProcessTypesToSearch;
 
         static List<(string, string)> s_PostProcessTypesToSearch = new()
         {
             ("p: t:PostProcessVolume", "Contains Post Process Volume Component"),
             ("p: t:PostProcessLayer", "Contains Post Process Layer Component"),
-            ("p: t:PostProcessProfile", "Contains Instance of Post Process Profile")
+            ("p: t:PostProcessProfile", "Contains Instance of Post Process Profile"),
         };
+
         public override void BeforeConvert()
         {
             // Converters should already be set to null on domain reload,
@@ -87,9 +89,11 @@ namespace UnityEditor.Rendering.Universal
             //       though it shouldn't ever actually occur.
             var succeeded = true;
 
-            if (effectConverters == null ||
-                effectConverters.Count() == 0 ||
-                effectConverters.Any(converter => converter == null))
+            if (
+                effectConverters == null
+                || effectConverters.Count() == 0
+                || effectConverters.Any(converter => converter == null)
+            )
             {
                 effectConverters = GetAllBIRPConverters();
             }
@@ -137,10 +141,13 @@ namespace UnityEditor.Rendering.Universal
             postConversionDestroyables.Clear();
         }
 
-#region Conversion_Entry_Points
+        #region Conversion_Entry_Points
 
-        private void ConvertVolume(BIRPRendering.PostProcessVolume oldVolume, ref bool succeeded,
-            StringBuilder errorString)
+        private void ConvertVolume(
+            BIRPRendering.PostProcessVolume oldVolume,
+            ref bool succeeded,
+            StringBuilder errorString
+        )
         {
             if (!succeeded)
             {
@@ -157,8 +164,7 @@ namespace UnityEditor.Rendering.Universal
                 return;
             }
 
-            if (PrefabUtility.IsPartOfPrefabInstance(oldVolume) &&
-                !PrefabUtility.IsAddedComponentOverride(oldVolume))
+            if (PrefabUtility.IsPartOfPrefabInstance(oldVolume) && !PrefabUtility.IsAddedComponentOverride(oldVolume))
             {
                 // This is a property override on an instance of the component,
                 // so override the component instance with the modifications.
@@ -171,8 +177,11 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        private void ConvertLayer(BIRPRendering.PostProcessLayer oldLayer, ref bool succeeded,
-            StringBuilder errorString)
+        private void ConvertLayer(
+            BIRPRendering.PostProcessLayer oldLayer,
+            ref bool succeeded,
+            StringBuilder errorString
+        )
         {
             if (!succeeded)
             {
@@ -189,8 +198,7 @@ namespace UnityEditor.Rendering.Universal
                 return;
             }
 
-            if (PrefabUtility.IsPartOfPrefabInstance(oldLayer) &&
-                !PrefabUtility.IsAddedComponentOverride(oldLayer))
+            if (PrefabUtility.IsPartOfPrefabInstance(oldLayer) && !PrefabUtility.IsAddedComponentOverride(oldLayer))
             {
                 // This is a property override on an instance of the component,
                 // so override the component instance with the modifications.
@@ -203,8 +211,11 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        private void ConvertProfile(BIRPRendering.PostProcessProfile oldProfile, ref bool succeeded,
-            StringBuilder errorString)
+        private void ConvertProfile(
+            BIRPRendering.PostProcessProfile oldProfile,
+            ref bool succeeded,
+            StringBuilder errorString
+        )
         {
             if (!succeeded)
             {
@@ -214,7 +225,8 @@ namespace UnityEditor.Rendering.Universal
             if (!oldProfile)
             {
                 errorString.AppendLine(
-                    "PPv2 PostProcessProfile failed to be converted because the original asset reference was lost during conversion.");
+                    "PPv2 PostProcessProfile failed to be converted because the original asset reference was lost during conversion."
+                );
                 return;
             }
 
@@ -226,12 +238,13 @@ namespace UnityEditor.Rendering.Universal
             // - Alternatively, leave deletion of Profiles entirely to the user. (I think this is preferred)
         }
 
-#endregion Conversion_Entry_Points
+        #endregion Conversion_Entry_Points
 
         private bool ConvertVolumeComponent(BIRPRendering.PostProcessVolume oldVolume, StringBuilder errorString)
         {
             // Don't convert if it appears to already have been converted.
-            if (oldVolume.GetComponent<Volume>()) return true;
+            if (oldVolume.GetComponent<Volume>())
+                return true;
 
             var gameObject = oldVolume.gameObject;
             var newVolume = gameObject.AddComponent<Volume>();
@@ -280,7 +293,8 @@ namespace UnityEditor.Rendering.Universal
                 if (!newVolumeInstance)
                 {
                     errorString.AppendLine(
-                        "PPv2 PostProcessVolume failed to be converted because the instance object did not inherit the converted Prefab source.");
+                        "PPv2 PostProcessVolume failed to be converted because the instance object did not inherit the converted Prefab source."
+                    );
                     return false;
                 }
             }
@@ -293,22 +307,36 @@ namespace UnityEditor.Rendering.Universal
                 {
                     if (oldModification.propertyPath.EndsWith("priority", StringComparison.InvariantCultureIgnoreCase))
                         newVolumeInstance.priority = oldVolume.priority;
-                    else if (oldModification.propertyPath.EndsWith("weight",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    else if (
+                        oldModification.propertyPath.EndsWith("weight", StringComparison.InvariantCultureIgnoreCase)
+                    )
                         newVolumeInstance.weight = oldVolume.weight;
-                    else if (oldModification.propertyPath.EndsWith("blendDistance",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    else if (
+                        oldModification.propertyPath.EndsWith(
+                            "blendDistance",
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
                         newVolumeInstance.blendDistance = oldVolume.blendDistance;
-                    else if (oldModification.propertyPath.EndsWith("isGlobal",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    else if (
+                        oldModification.propertyPath.EndsWith("isGlobal", StringComparison.InvariantCultureIgnoreCase)
+                    )
                         newVolumeInstance.isGlobal = oldVolume.isGlobal;
-                    else if (oldModification.propertyPath.EndsWith("enabled",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    else if (
+                        oldModification.propertyPath.EndsWith("enabled", StringComparison.InvariantCultureIgnoreCase)
+                    )
                         newVolumeInstance.enabled = oldVolume.enabled;
-                    else if (oldModification.propertyPath.EndsWith("sharedProfile",
-                        StringComparison.InvariantCultureIgnoreCase))
-                        newVolumeInstance.sharedProfile =
-                            ConvertVolumeProfileAsset(oldVolume.sharedProfile, errorString, ref success);
+                    else if (
+                        oldModification.propertyPath.EndsWith(
+                            "sharedProfile",
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
+                        newVolumeInstance.sharedProfile = ConvertVolumeProfileAsset(
+                            oldVolume.sharedProfile,
+                            errorString,
+                            ref success
+                        );
 
                     EditorUtility.SetDirty(newVolumeInstance);
                 }
@@ -326,7 +354,8 @@ namespace UnityEditor.Rendering.Universal
             if (!siblingCamera)
             {
                 errorString.AppendLine(
-                    "PPv2 PostProcessLayer failed to be converted because the instance object was missing a required sibling Camera component.");
+                    "PPv2 PostProcessLayer failed to be converted because the instance object was missing a required sibling Camera component."
+                );
                 return false;
             }
 
@@ -337,8 +366,8 @@ namespace UnityEditor.Rendering.Universal
             siblingCamera.volumeTrigger = oldLayer.volumeTrigger;
             siblingCamera.stopNaN = oldLayer.stopNaNPropagation;
 
-            siblingCamera.antialiasingQuality =
-                (URPRendering.AntialiasingQuality)oldLayer.subpixelMorphologicalAntialiasing.quality;
+            siblingCamera.antialiasingQuality = (URPRendering.AntialiasingQuality)
+                oldLayer.subpixelMorphologicalAntialiasing.quality;
 
             switch (oldLayer.antialiasingMode)
             {
@@ -378,7 +407,8 @@ namespace UnityEditor.Rendering.Universal
             if (!siblingCamera)
             {
                 errorString.AppendLine(
-                    "PPv2 PostProcessLayer failed to be converted because the instance object was missing a required sibling Camera component.");
+                    "PPv2 PostProcessLayer failed to be converted because the instance object was missing a required sibling Camera component."
+                );
                 return false;
             }
 
@@ -387,21 +417,38 @@ namespace UnityEditor.Rendering.Universal
             {
                 if (oldModification.target is BIRPRendering.PostProcessLayer)
                 {
-                    if (oldModification.propertyPath.EndsWith("volumeLayer",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    if (
+                        oldModification.propertyPath.EndsWith(
+                            "volumeLayer",
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
                         siblingCamera.volumeLayerMask = oldLayer.volumeLayer;
-                    else if (oldModification.propertyPath.EndsWith("volumeTrigger",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    else if (
+                        oldModification.propertyPath.EndsWith(
+                            "volumeTrigger",
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
                         siblingCamera.volumeTrigger = oldLayer.volumeTrigger;
-                    else if (oldModification.propertyPath.EndsWith("stopNaNPropagation",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    else if (
+                        oldModification.propertyPath.EndsWith(
+                            "stopNaNPropagation",
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
                         siblingCamera.stopNaN = oldLayer.stopNaNPropagation;
-                    else if (oldModification.propertyPath.EndsWith("quality",
-                        StringComparison.InvariantCultureIgnoreCase))
-                        siblingCamera.antialiasingQuality =
-                            (URPRendering.AntialiasingQuality)oldLayer.subpixelMorphologicalAntialiasing.quality;
-                    else if (oldModification.propertyPath.EndsWith("antialiasingMode",
-                        StringComparison.InvariantCultureIgnoreCase))
+                    else if (
+                        oldModification.propertyPath.EndsWith("quality", StringComparison.InvariantCultureIgnoreCase)
+                    )
+                        siblingCamera.antialiasingQuality = (URPRendering.AntialiasingQuality)
+                            oldLayer.subpixelMorphologicalAntialiasing.quality;
+                    else if (
+                        oldModification.propertyPath.EndsWith(
+                            "antialiasingMode",
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
                     {
                         switch (oldLayer.antialiasingMode)
                         {
@@ -412,8 +459,9 @@ namespace UnityEditor.Rendering.Universal
                                 siblingCamera.antialiasing = URPRendering.AntialiasingMode.FastApproximateAntialiasing;
                                 break;
                             case BIRPRendering.PostProcessLayer.Antialiasing.SubpixelMorphologicalAntialiasing:
-                                siblingCamera.antialiasing =
-                                    URPRendering.AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+                                siblingCamera.antialiasing = URPRendering
+                                    .AntialiasingMode
+                                    .SubpixelMorphologicalAntiAliasing;
                                 break;
                             default:
                                 // Default to the the most performant mode, since "None" is an explicit option.
@@ -429,11 +477,15 @@ namespace UnityEditor.Rendering.Universal
             return true;
         }
 
-        private VolumeProfile ConvertVolumeProfileAsset(BIRPRendering.PostProcessProfile oldProfile,
-            StringBuilder errorString, ref bool success)
+        private VolumeProfile ConvertVolumeProfileAsset(
+            BIRPRendering.PostProcessProfile oldProfile,
+            StringBuilder errorString,
+            ref bool success
+        )
         {
             // Don't convert if it appears to already have been converted.
-            if (!oldProfile) return null;
+            if (!oldProfile)
+                return null;
 
             var oldPath = AssetDatabase.GetAssetPath(oldProfile);
             var oldDirectory = Path.GetDirectoryName(oldPath);
@@ -454,7 +506,8 @@ namespace UnityEditor.Rendering.Universal
                 errorString.AppendLine($"PPv2 PostProcessLayer failed to be converted with exception:\n{e}");
                 success = false;
 
-                if (!newProfile) return null;
+                if (!newProfile)
+                    return null;
             }
 
             foreach (var oldSettings in oldProfile.settings)
@@ -477,9 +530,7 @@ namespace UnityEditor.Rendering.Universal
             var assembly = Assembly.GetAssembly(baseType);
             var derivedTypes = assembly
                 .GetTypes()
-                .Where(t =>
-                    t.BaseType != null &&
-                    t.BaseType == baseType)
+                .Where(t => t.BaseType != null && t.BaseType == baseType)
                 .Select(t => ScriptableObject.CreateInstance(t) as PostProcessEffectSettingsConverter);
 
             return derivedTypes;

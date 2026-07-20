@@ -41,14 +41,18 @@ namespace Unity.Mathematics
         /// <param name="points">An array into which the random points are stored</param>
         /// <param name="inputDeps">A JobHandle to wait for, before the jobs scheduled by this function</param>
         /// <returns>A JobHandle of the job that was created to generate random points inside a sphere</returns>
-        public static JobHandle RandomPointsInSphere(float3 center, float radius, NativeArray<float3> points,
-            JobHandle inputDeps)
+        public static JobHandle RandomPointsInSphere(
+            float3 center,
+            float radius,
+            NativeArray<float3> points,
+            JobHandle inputDeps
+        )
         {
             var pointsInSphereJob = new PointsInSphere
             {
                 Radius = radius,
                 Center = center,
-                Points = points
+                Points = points,
             };
             var pointsInSphereJobHandle = pointsInSphereJob.Schedule(inputDeps);
             return pointsInSphereJobHandle;

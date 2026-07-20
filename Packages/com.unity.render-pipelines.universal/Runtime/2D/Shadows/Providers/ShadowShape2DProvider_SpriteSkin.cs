@@ -10,12 +10,16 @@ namespace UnityEngine.Rendering.Universal
         const float k_InitialTrim = 0.05f;
 
         ShadowShape2D m_PersistantShapeData;
-        int           m_LastDeformedVertexHash;
+        int m_LastDeformedVertexHash;
 
         void TryToSetPersistantShapeData(SpriteSkin spriteSkin, ShadowShape2D persistantShadowShape, bool force)
         {
             if (spriteSkin != null)
-                persistantShadowShape.SetShape(spriteSkin.outlineVertices, spriteSkin.outlineIndices, ShadowShape2D.OutlineTopology.Lines);
+                persistantShadowShape.SetShape(
+                    spriteSkin.outlineVertices,
+                    spriteSkin.outlineIndices,
+                    ShadowShape2D.OutlineTopology.Lines
+                );
         }
 
         void UpdatePersistantShapeData(SpriteRenderer spriteRenderer)
@@ -31,8 +35,15 @@ namespace UnityEngine.Rendering.Universal
         //============================================================================================================
         //                                                  Public
         //============================================================================================================
-        public override int MenuPriority() { return 10; }  // give higher than default menu priority
-        public override bool IsRequiredComponentData(Component sourceComponent) { return sourceComponent is SpriteSkin; }
+        public override int MenuPriority()
+        {
+            return 10;
+        } // give higher than default menu priority
+
+        public override bool IsRequiredComponentData(Component sourceComponent)
+        {
+            return sourceComponent is SpriteSkin;
+        }
 
 #if USING_2DANIMATION_13_0_1_OR_ABOVE
         public override void Enabled(Component sourceComponent, ShadowShape2D persistantShadowShape)
@@ -51,6 +62,7 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 #endif
+
         public override void OnInitialized(Component sourceComponent, ShadowShape2D persistantShadowShape)
         {
             SpriteSkin spriteSkin = (SpriteSkin)sourceComponent;
@@ -63,7 +75,11 @@ namespace UnityEngine.Rendering.Universal
             TryToSetPersistantShapeData(spriteSkin, persistantShadowShape, true);
         }
 
-        public override void OnBeforeRender(Component sourceComponent, Bounds worldCullingBounds, ShadowShape2D persistantShadowShape)
+        public override void OnBeforeRender(
+            Component sourceComponent,
+            Bounds worldCullingBounds,
+            ShadowShape2D persistantShadowShape
+        )
         {
             SpriteSkin spriteSkin = (SpriteSkin)sourceComponent;
             if (spriteSkin != null && spriteSkin.vertexDeformationHash != m_LastDeformedVertexHash)

@@ -3,8 +3,11 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_AlphaCutoff"          )]
-    public struct HDRPMaterialPropertyAlphaCutoff : IComponentData { public float  Value; }
+    [MaterialProperty("_AlphaCutoff")]
+    public struct HDRPMaterialPropertyAlphaCutoff : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyAlphaCutoffAuthoring : UnityEngine.MonoBehaviour

@@ -30,6 +30,7 @@ namespace EditorAttributes
         /// <param name="groupName">The name of the group</param>
         /// <param name="drawInBox">Draw the fields in the group in a nice box</param>
         /// <param name="fieldsToGroup">The name of the fields to group</param>
-        public ToggleGroupAttribute(string groupName, bool drawInBox, params string[] fieldsToGroup) : this(groupName, fieldsToGroup) => DrawInBox = drawInBox;
+        public ToggleGroupAttribute(string groupName, bool drawInBox, params string[] fieldsToGroup)
+            : this(groupName, fieldsToGroup) => DrawInBox = drawInBox;
     }
 }

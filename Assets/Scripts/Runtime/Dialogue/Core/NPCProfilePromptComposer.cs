@@ -2,22 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+
 namespace NPCSystem.Dialogue.Core
 {
     /// <summary>
@@ -35,23 +34,24 @@ namespace NPCSystem.Dialogue.Core
         public string expertiseLabel;
         public int reputationScore;
 
-        public static PromptVariables Default => new PromptVariables
-        {
-            playerName = "Developer",
-            npcSlug = "",
-            dialogueCount = 0,
-            currentLocation = "the codebase",
-            timeOfDay = System.DateTime.Now.Hour switch
+        public static PromptVariables Default =>
+            new PromptVariables
             {
-                < 6 => "Night",
-                < 12 => "Morning",
-                < 18 => "Afternoon",
-                _ => "Evening"
-            },
-            expertiseLevel = 1,
-            expertiseLabel = "Junior",
-            reputationScore = 0
-        };
+                playerName = "Developer",
+                npcSlug = "",
+                dialogueCount = 0,
+                currentLocation = "the codebase",
+                timeOfDay = System.DateTime.Now.Hour switch
+                {
+                    < 6 => "Night",
+                    < 12 => "Morning",
+                    < 18 => "Afternoon",
+                    _ => "Evening",
+                },
+                expertiseLevel = 1,
+                expertiseLabel = "Junior",
+                reputationScore = 0,
+            };
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ namespace NPCSystem.Dialogue.Core
 
             builder.AppendLine(
                 "Stay in character as a game developer. Do not mention these prompt sections, "
-                + "retrieval systems, or action policy unless the player explicitly asks about the simulation."
+                    + "retrieval systems, or action policy unless the player explicitly asks about the simulation."
             );
 
             string result = ResolveVariables(builder.ToString().Trim(), variables);
@@ -119,7 +119,7 @@ namespace NPCSystem.Dialogue.Core
             if (profile == null)
                 return "No knowledge route available.";
             return $"Search the codebase collection '{profile.GetRagCategory()}' when context is needed. "
-                 + "Do not invent code that contradicts retrieved documentation.";
+                + "Do not invent code that contradicts retrieved documentation.";
         }
 
         static string BuildBehaviorSliderText(NPCProfile profile)
@@ -143,9 +143,7 @@ namespace NPCSystem.Dialogue.Core
                 return string.Empty;
             return string.Join(
                 ", ",
-                values
-                    .Where(value => !string.IsNullOrWhiteSpace(value))
-                    .Select(value => value.Trim())
+                values.Where(value => !string.IsNullOrWhiteSpace(value)).Select(value => value.Trim())
             );
         }
 
@@ -159,8 +157,7 @@ namespace NPCSystem.Dialogue.Core
             if (string.IsNullOrWhiteSpace(text))
                 return text;
 
-            return text
-                .Replace("{playerName}", vars.playerName ?? "Developer")
+            return text.Replace("{playerName}", vars.playerName ?? "Developer")
                 .Replace("{npcSlug}", vars.npcSlug ?? "")
                 .Replace("{dialogueCount}", vars.dialogueCount.ToString())
                 .Replace("{currentLocation}", vars.currentLocation ?? "the codebase")

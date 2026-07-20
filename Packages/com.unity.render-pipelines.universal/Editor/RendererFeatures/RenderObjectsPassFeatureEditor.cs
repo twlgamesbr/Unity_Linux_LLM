@@ -1,9 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace UnityEditor.Rendering.Universal
 {
@@ -28,35 +28,84 @@ namespace UnityEditor.Experimental.Rendering.Universal
     {
         internal class Styles
         {
-            public static float defaultLineSpace = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-            public static GUIContent callback = new GUIContent("Event", "Choose at which point this render pass is executed in the frame.");
+            public static float defaultLineSpace =
+                EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            public static GUIContent callback = new GUIContent(
+                "Event",
+                "Choose at which point this render pass is executed in the frame."
+            );
 
             //Headers
-            public static GUIContent filtersHeader = new GUIContent("Filters", "Settings that control which objects should be rendered.");
-            public static GUIContent renderHeader = new GUIContent("Overrides", "Different parts of the rendering that you can choose to override.");
+            public static GUIContent filtersHeader = new GUIContent(
+                "Filters",
+                "Settings that control which objects should be rendered."
+            );
+            public static GUIContent renderHeader = new GUIContent(
+                "Overrides",
+                "Different parts of the rendering that you can choose to override."
+            );
 
             //Filters
-            public static GUIContent renderQueueFilter = new GUIContent("Queue", "Only render objects in the selected render queue range.");
-            public static GUIContent layerMask = new GUIContent("Layer Mask", "Only render objects in a layer that match the given layer mask.");
-            public static GUIContent shaderPassFilter = new GUIContent("LightMode Tags", "Controls which shader passes to render by filtering by LightMode tag.");
+            public static GUIContent renderQueueFilter = new GUIContent(
+                "Queue",
+                "Only render objects in the selected render queue range."
+            );
+            public static GUIContent layerMask = new GUIContent(
+                "Layer Mask",
+                "Only render objects in a layer that match the given layer mask."
+            );
+            public static GUIContent shaderPassFilter = new GUIContent(
+                "LightMode Tags",
+                "Controls which shader passes to render by filtering by LightMode tag."
+            );
 
             //Render Options
-            public static GUIContent overrideMaterial = new GUIContent("Material", "Choose an override material, every renderer will be rendered with this material.");
-            public static GUIContent overrideMaterialPass = new GUIContent("Pass Index", "The pass index for the override material to use.");
-            public static GUIContent overrideShader = new GUIContent("Shader", "Choose an override shader, every renderer will be renderered with this shader and it's current material properties");
-            public static GUIContent overrideShaderPass = new GUIContent("Pass Index", "The pass index for the override shader to use.");
-            public static GUIContent overrideMode = new GUIContent("Override Mode", "Choose the material override mode. Material: override the material and all properties. Shader: override the shader and maintain current properties.");
+            public static GUIContent overrideMaterial = new GUIContent(
+                "Material",
+                "Choose an override material, every renderer will be rendered with this material."
+            );
+            public static GUIContent overrideMaterialPass = new GUIContent(
+                "Pass Index",
+                "The pass index for the override material to use."
+            );
+            public static GUIContent overrideShader = new GUIContent(
+                "Shader",
+                "Choose an override shader, every renderer will be renderered with this shader and it's current material properties"
+            );
+            public static GUIContent overrideShaderPass = new GUIContent(
+                "Pass Index",
+                "The pass index for the override shader to use."
+            );
+            public static GUIContent overrideMode = new GUIContent(
+                "Override Mode",
+                "Choose the material override mode. Material: override the material and all properties. Shader: override the shader and maintain current properties."
+            );
 
             //Depth Settings
-            public static GUIContent overrideDepth = new GUIContent("Depth", "Select this option to specify how this Renderer Feature affects or uses the values in the Depth buffer.");
+            public static GUIContent overrideDepth = new GUIContent(
+                "Depth",
+                "Select this option to specify how this Renderer Feature affects or uses the values in the Depth buffer."
+            );
             public static GUIContent writeDepth = new GUIContent("Write Depth", "Choose to write depth to the screen.");
             public static GUIContent depthState = new GUIContent("Depth Test", "Choose a new depth test function.");
 
             //Camera Settings
-            public static GUIContent overrideCamera = new GUIContent("Camera", "Override camera matrices. Toggling this setting will make camera use perspective projection.");
-            public static GUIContent cameraFOV = new GUIContent("Field Of View", "The camera's view angle measured in degrees along vertical axis.");
-            public static GUIContent positionOffset = new GUIContent("Position Offset", "Position offset to apply to the original camera's position.");
-            public static GUIContent restoreCamera = new GUIContent("Restore", "Restore to the original camera matrices after the execution of the render passes added by this feature.");
+            public static GUIContent overrideCamera = new GUIContent(
+                "Camera",
+                "Override camera matrices. Toggling this setting will make camera use perspective projection."
+            );
+            public static GUIContent cameraFOV = new GUIContent(
+                "Field Of View",
+                "The camera's view angle measured in degrees along vertical axis."
+            );
+            public static GUIContent positionOffset = new GUIContent(
+                "Position Offset",
+                "Position offset to apply to the original camera's position."
+            );
+            public static GUIContent restoreCamera = new GUIContent(
+                "Restore",
+                "Restore to the original camera matrices after the execution of the render passes added by this feature."
+            );
         }
 
         //Headers and layout
@@ -70,23 +119,28 @@ namespace UnityEditor.Experimental.Rendering.Universal
         // Serialized Properties
         private SerializedProperty m_Callback;
         private SerializedProperty m_PassTag;
+
         //Filter props
         private SerializedProperty m_FilterSettings;
         private SerializedProperty m_RenderQueue;
         private SerializedProperty m_LayerMask;
         private SerializedProperty m_ShaderPasses;
+
         //Render props
         private SerializedProperty m_OverrideMaterial;
         private SerializedProperty m_OverrideMaterialPass;
         private SerializedProperty m_OverrideShader;
         private SerializedProperty m_OverrideShaderPass;
         private SerializedProperty m_OverrideMode;
+
         //Depth props
         private SerializedProperty m_OverrideDepth;
         private SerializedProperty m_WriteDepth;
         private SerializedProperty m_DepthState;
+
         //Stencil props
         private SerializedProperty m_StencilSettings;
+
         //Caemra props
         private SerializedProperty m_CameraSettings;
         private SerializedProperty m_OverrideCamera;
@@ -98,18 +152,25 @@ namespace UnityEditor.Experimental.Rendering.Universal
 
         static bool FilterRenderPassEvent(int evt) =>
             // Return all events higher or equal than before rendering prepasses
-            evt >= (int)RenderPassEvent.BeforeRenderingPrePasses &&
+            evt >= (int)RenderPassEvent.BeforeRenderingPrePasses
+            &&
             // filter obsolete events
-            typeof(RenderPassEvent).GetField(Enum.GetName(typeof(RenderPassEvent), evt))?.GetCustomAttribute(typeof(ObsoleteAttribute)) == null;
+            typeof(RenderPassEvent)
+                .GetField(Enum.GetName(typeof(RenderPassEvent), evt))
+                ?.GetCustomAttribute(typeof(ObsoleteAttribute)) == null;
 
         // Return all render pass event names that match filterRenderPassEvent
-        private GUIContent[] m_EventOptionNames = Enum.GetValues(typeof(RenderPassEvent)).Cast<int>()
+        private GUIContent[] m_EventOptionNames = Enum.GetValues(typeof(RenderPassEvent))
+            .Cast<int>()
             .Where(FilterRenderPassEvent)
-            .Select(x => new GUIContent(Enum.GetName(typeof(RenderPassEvent), x))).ToArray();
+            .Select(x => new GUIContent(Enum.GetName(typeof(RenderPassEvent), x)))
+            .ToArray();
 
         // Return all render pass event options that match filterRenderPassEvent
-        private int[] m_EventOptionValues = Enum.GetValues(typeof(RenderPassEvent)).Cast<int>()
-            .Where(FilterRenderPassEvent).ToArray();
+        private int[] m_EventOptionValues = Enum.GetValues(typeof(RenderPassEvent))
+            .Cast<int>()
+            .Where(FilterRenderPassEvent)
+            .ToArray();
 
         private void Init(SerializedProperty property)
         {
@@ -117,7 +178,6 @@ namespace UnityEditor.Experimental.Rendering.Universal
             var key = $"{this.ToString().Split('.').Last()}.{property.serializedObject.targetObject.name}";
             m_FiltersFoldout = new HeaderBool($"{key}.FiltersFoldout", true);
             m_RenderFoldout = new HeaderBool($"{key}.RenderFoldout");
-
 
             m_Callback = property.FindPropertyRelative("Event");
             m_PassTag = property.FindPropertyRelative("passTag");
@@ -173,7 +233,13 @@ namespace UnityEditor.Experimental.Rendering.Universal
 
             //Forward Callbacks
             EditorGUI.BeginChangeCheck();
-            int selectedValue = EditorGUI.IntPopup(rect, Styles.callback, m_Callback.intValue, m_EventOptionNames, m_EventOptionValues);
+            int selectedValue = EditorGUI.IntPopup(
+                rect,
+                Styles.callback,
+                m_Callback.intValue,
+                m_EventOptionNames,
+                m_EventOptionValues
+            );
             if (EditorGUI.EndChangeCheck())
                 m_Callback.intValue = selectedValue;
             rect.y += Styles.defaultLineSpace;
@@ -297,7 +363,11 @@ namespace UnityEditor.Experimental.Rendering.Universal
                 //Offset vector
                 var offset = m_CameraOffset.vector4Value;
                 EditorGUI.BeginChangeCheck();
-                var newOffset = EditorGUI.Vector3Field(rect, Styles.positionOffset, new Vector3(offset.x, offset.y, offset.z));
+                var newOffset = EditorGUI.Vector3Field(
+                    rect,
+                    Styles.positionOffset,
+                    new Vector3(offset.x, offset.y, offset.z)
+                );
                 if (EditorGUI.EndChangeCheck())
                     m_CameraOffset.vector4Value = new Vector4(newOffset.x, newOffset.y, newOffset.z, 0f);
                 rect.y += Styles.defaultLineSpace;

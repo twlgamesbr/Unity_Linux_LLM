@@ -62,11 +62,13 @@ namespace Unity.Physics.Systems
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
-            state.Dependency = new ColliderBlobCleanupJob
-            {
-                ECB = ecb.AsParallelWriter()
-            }.ScheduleParallel(m_ColliderBlobCleanupOnUpdateQuery, state.Dependency);
+            var ecb = SystemAPI
+                .GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>()
+                .CreateCommandBuffer(state.WorldUnmanaged);
+            state.Dependency = new ColliderBlobCleanupJob { ECB = ecb.AsParallelWriter() }.ScheduleParallel(
+                m_ColliderBlobCleanupOnUpdateQuery,
+                state.Dependency
+            );
         }
     }
 }

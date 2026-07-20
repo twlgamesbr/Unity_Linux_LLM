@@ -10,9 +10,11 @@ namespace UnityEditor.Rendering.Universal
     [Serializable]
     [PipelineConverter("Built-in", "Universal Render Pipeline (2D Renderer)")]
     [BatchModeConverterClassInfo("BuiltInToURP2D", "RenderSettings2D")]
-    [ElementInfo(Name = "Rendering Settings",
-                 Order = int.MinValue,
-                 Description = "This converter creates Universal Render Pipeline (URP) assets and corresponding Renderer assets, configuring their settings to match the equivalent settings from the Built-in Render Pipeline.")]
+    [ElementInfo(
+        Name = "Rendering Settings",
+        Order = int.MinValue,
+        Description = "This converter creates Universal Render Pipeline (URP) assets and corresponding Renderer assets, configuring their settings to match the equivalent settings from the Built-in Render Pipeline."
+    )]
     class BuiltInToURP2DRenderSettingsConverter : RenderSettingsConverter
     {
         public override bool isEnabled => true;
@@ -28,7 +30,9 @@ namespace UnityEditor.Rendering.Universal
             try
             {
                 CoreUtils.EnsureFolderTreeInAssetFilePath(path);
-                var asset = ScriptableObject.CreateInstance(typeof(UniversalRenderPipelineAsset)) as UniversalRenderPipelineAsset;
+                var asset =
+                    ScriptableObject.CreateInstance(typeof(UniversalRenderPipelineAsset))
+                    as UniversalRenderPipelineAsset;
                 AssetDatabase.CreateAsset(asset, path);
                 AssetDatabase.SaveAssetIfDirty(asset);
                 return asset;
@@ -48,8 +52,10 @@ namespace UnityEditor.Rendering.Universal
 
             CoreUtils.EnsureFolderTreeInAssetFilePath(path);
 
-            var asset = Renderer2DMenus.CreateRendererAsset(path, RendererType._2DRenderer, relativePath: false) as Renderer2DData;
-            
+            var asset =
+                Renderer2DMenus.CreateRendererAsset(path, RendererType._2DRenderer, relativePath: false)
+                as Renderer2DData;
+
             EditorUtility.SetDirty(asset);
             AssetDatabase.SaveAssetIfDirty(asset);
 
@@ -59,7 +65,6 @@ namespace UnityEditor.Rendering.Universal
         void GetRenderers(out ScriptableRendererData[] renderers, out int defaultIndex)
         {
             defaultIndex = 0;
-
 
             using (ListPool<ScriptableRendererData>.Get(out var tmp))
             {

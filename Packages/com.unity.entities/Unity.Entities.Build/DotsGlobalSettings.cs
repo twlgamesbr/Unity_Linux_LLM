@@ -144,7 +144,8 @@ namespace Unity.Entities.Build
                 return default;
             }
 
-            return settingsAsset.GUID;        }
+            return settingsAsset.GUID;
+        }
 
         /// <summary>
         /// Return the PlayerType of the asset (Client or Server).
@@ -174,9 +175,15 @@ namespace Unity.Entities.Build
             {
                 UnityEngine.Object.DestroyImmediate(settings.AsScriptableObject());
                 var settingsType = settings.GetType();
-                var instanceField = settingsType.BaseType.GetField("s_Instance", BindingFlags.Static | BindingFlags.NonPublic);
+                var instanceField = settingsType.BaseType.GetField(
+                    "s_Instance",
+                    BindingFlags.Static | BindingFlags.NonPublic
+                );
                 instanceField.SetValue(null, null);
-                var loadMethod = settingsType.BaseType.GetMethod("CreateAndLoad", BindingFlags.Static | BindingFlags.NonPublic);
+                var loadMethod = settingsType.BaseType.GetMethod(
+                    "CreateAndLoad",
+                    BindingFlags.Static | BindingFlags.NonPublic
+                );
                 loadMethod.Invoke(null, null);
             }
         }
@@ -196,16 +203,18 @@ namespace Unity.Entities.Build
             /// The player instance is a client.
             /// </summary>
             Client,
+
             /// <summary>
             /// The player instance is a server.
             /// </summary>
-            Server
+            Server,
         }
 
         /// <summary>
         /// The client player settings provider.
         /// </summary>
         public DotsPlayerSettingsProvider ClientProvider { get; private set; }
+
         /// <summary>
         /// The server player settings provider.
         /// </summary>
@@ -223,17 +232,18 @@ namespace Unity.Entities.Build
             //When switching from dedicated server to other standalone platform, the standaloneBuildSubtarget
             //is not reset. At the moment this is the safest and suggest check to verify we are building for the
             //dedicated server platform.
-            #if UNITY_SERVER
+#if UNITY_SERVER
             return PlayerType.Server;
-            #else
+#else
             return PlayerType.Client;
-            #endif
+#endif
         }
 
         /// <summary>
         /// The <see cref="DotsGlobalSettings"/> instance.
         /// </summary>
-        public static DotsGlobalSettings Instance {
+        public static DotsGlobalSettings Instance
+        {
             get
             {
                 if (s_Instance == null)
@@ -256,7 +266,7 @@ namespace Unity.Entities.Build
             {
                 foreach (var type in types)
                 {
-                    var instance = (DotsPlayerSettingsProvider) Activator.CreateInstance(type);
+                    var instance = (DotsPlayerSettingsProvider)Activator.CreateInstance(type);
                     if (instance.GetPlayerType() == PlayerType.Client)
                     {
                         if (ClientProvider == null)
@@ -278,7 +288,7 @@ namespace Unity.Entities.Build
             {
                 foreach (var type in types)
                 {
-                    var instance = (DotsPlayerSettingsProvider) Activator.CreateInstance(type);
+                    var instance = (DotsPlayerSettingsProvider)Activator.CreateInstance(type);
                     if (instance.GetPlayerType() == PlayerType.Server)
                     {
                         if (ServerProvider == null)

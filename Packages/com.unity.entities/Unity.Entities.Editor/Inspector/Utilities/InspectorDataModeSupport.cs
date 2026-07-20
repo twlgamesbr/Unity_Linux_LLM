@@ -12,13 +12,15 @@ namespace Unity.Entities.Editor
 {
     static class InspectorDataModeSupport
     {
-        static readonly DataMode[] k_EditorDataModes =  { DataMode.Runtime };
+        static readonly DataMode[] k_EditorDataModes = { DataMode.Runtime };
         static readonly DataMode[] k_RuntimeDataModes = { DataMode.Runtime };
 
         static readonly ProfilerMarker k_GetEditorMarker = new("GetEditor");
         static readonly ProfilerMarker k_SelectionCompareMarker = new("Compare Selection");
         static readonly ProfilerMarker k_SelectEditorMarker = new("Select Editor");
-        static readonly string k_MixedDataModeWarningMessage = L10n.Tr("Enter Play mode to see live values in Mixed DataMode.");
+        static readonly string k_MixedDataModeWarningMessage = L10n.Tr(
+            "Enter Play mode to see live values in Mixed DataMode."
+        );
 
         static int s_LastSelectionCount = 0;
         static int s_LastSelectionHash = 0;
@@ -40,7 +42,10 @@ namespace Unity.Entities.Editor
             if (selectedGameObject == null)
                 return;
 
-            if (EditorApplication.isPlaying || InspectorWindowBridge.GetInspectorWindowDataMode(editor) != DataMode.Mixed)
+            if (
+                EditorApplication.isPlaying
+                || InspectorWindowBridge.GetInspectorWindowDataMode(editor) != DataMode.Mixed
+            )
                 return;
 
             EditorGUILayout.HelpBox(k_MixedDataModeWarningMessage, MessageType.Info);
@@ -48,15 +53,21 @@ namespace Unity.Entities.Editor
 
         static void OnPlayModeStateChanged(PlayModeStateChange stateChange)
         {
-            if (stateChange is PlayModeStateChange.ExitingPlayMode &&
-                (Selection.activeObject is EntitySelectionProxy || Selection.activeContext is EntitySelectionProxy))
+            if (
+                stateChange is PlayModeStateChange.ExitingPlayMode
+                && (Selection.activeObject is EntitySelectionProxy || Selection.activeContext is EntitySelectionProxy)
+            )
                 Selection.activeObject = null;
 
             if (stateChange is not (PlayModeStateChange.EnteredEditMode or PlayModeStateChange.EnteredPlayMode))
                 return;
         }
 
-        static void OnDeclareDataModeSupport(UnityObject activeSelection, UnityObject activeContext, HashSet<DataMode> supportedModes)
+        static void OnDeclareDataModeSupport(
+            UnityObject activeSelection,
+            UnityObject activeContext,
+            HashSet<DataMode> supportedModes
+        )
         {
             // Only claim DOTS inspector support for direct entity selections, not GameObjects
             if (activeSelection is EntitySelectionProxy || activeContext is EntitySelectionProxy)
@@ -72,7 +83,7 @@ namespace Unity.Entities.Editor
             }
         }
 
-        [RootEditor(supportsAddComponent : false), UsedImplicitly]
+        [RootEditor(supportsAddComponent: false), UsedImplicitly]
         public static Type GetEditor(UnityObject[] targets, UnityObject context, DataMode inspectorDataMode)
         {
             using var getEditorScope = k_GetEditorMarker.Auto();
@@ -94,8 +105,13 @@ namespace Unity.Entities.Editor
 
                 // If last editor is unsupported game object editor, we want to reevaluate inspector content
                 // even if selection and data mode stay the same.
-                if (s_LastSelectedEditorType != typeof(UnsupportedGameObjectEditor) && filteredTargetsList.Count == s_LastSelectionCount && selectionHash == s_LastSelectionHash &&
-                    contextHash == s_LastActiveContext && inspectorDataMode == s_LastInspectorDataMode)
+                if (
+                    s_LastSelectedEditorType != typeof(UnsupportedGameObjectEditor)
+                    && filteredTargetsList.Count == s_LastSelectionCount
+                    && selectionHash == s_LastSelectionHash
+                    && contextHash == s_LastActiveContext
+                    && inspectorDataMode == s_LastInspectorDataMode
+                )
                 {
                     return s_LastSelectedEditorType;
                 }
@@ -143,14 +159,13 @@ namespace Unity.Entities.Editor
                         // it means we have no backing GameObject, nothing more
                         // is required to provide an inspector. If the proxy was
                         // invalid, however, we can't handle that so we bail.
-                        return proxy.Exists
-                            ? typeof(EntityEditor)
-                            : null;
+                        return proxy.Exists ? typeof(EntityEditor) : null;
                     }
                     case GameObject go:
                     {
                         // GameObjects outside of SubScenes cannot save PlayMode changes
-                        hasAtLeastOneNonSavableGameObjectTarget = hasAtLeastOneNonSavableGameObjectTarget || !go.scene.isSubScene;
+                        hasAtLeastOneNonSavableGameObjectTarget =
+                            hasAtLeastOneNonSavableGameObjectTarget || !go.scene.isSubScene;
 
                         // The authoring of GameObjects that are part of prefabs at runtime is not currently supported
                         hasAtLeastOnePrefabTarget = hasAtLeastOnePrefabTarget || PrefabUtility.IsPartOfPrefabAsset(go);
@@ -162,36 +177,32 @@ namespace Unity.Entities.Editor
             return inspectorDataMode switch
             {
                 // Trying to author a GameObject which can't be saved during PlayMode.
-                DataMode.Authoring
-                    when EditorApplication.isPlaying &&
-                         hasAtLeastOneNonSavableGameObjectTarget
-                    => context is EntitySelectionProxy { Exists: true }
+                DataMode.Authoring when EditorApplication.isPlaying && hasAtLeastOneNonSavableGameObjectTarget =>
+                    context is EntitySelectionProxy { Exists: true }
                         ? typeof(UnsupportedEntityEditor)
                         : typeof(UnsupportedGameObjectEditor),
 
                 // Trying to author a GameObject that is part of a prefab asset in PlayMode.
                 // This is poorly supported at the moment and the UX around it is very confusing,
                 // so we're disabling the possibility for the moment.
-                DataMode.Authoring
-                    when EditorApplication.isPlaying &&
-                         hasAtLeastOnePrefabTarget
-                    => typeof(UnsupportedPrefabEntityEditor),
+                DataMode.Authoring when EditorApplication.isPlaying && hasAtLeastOnePrefabTarget =>
+                    typeof(UnsupportedPrefabEntityEditor),
 
                 // Inspecting the Runtime representation of a GameObject that is converted/baked into an Entity.
-                DataMode.Runtime
-                    when context is EntitySelectionProxy { Exists: true }
-                    => typeof(EntityEditor),
+                DataMode.Runtime when context is EntitySelectionProxy { Exists: true } => typeof(EntityEditor),
+
+                DataMode.Runtime when context is EntitySelectionProxy { Exists: false } => typeof(InvalidEntityEditor),
 
                 DataMode.Runtime
-                    when context is EntitySelectionProxy { Exists: false }
-                    => typeof(InvalidEntityEditor),
-
-                DataMode.Runtime
-                    when context is null && (Selection.activeGameObject != null && Selection.activeGameObject.scene != default && Selection.activeGameObject.scene.isSubScene)
-                    => null, // Show default GameObject inspector
+                    when context is null
+                        && (
+                            Selection.activeGameObject != null
+                            && Selection.activeGameObject.scene != default
+                            && Selection.activeGameObject.scene.isSubScene
+                        ) => null, // Show default GameObject inspector
 
                 // Anything else: show the default inspector.
-                _ => null
+                _ => null,
             };
         }
 

@@ -20,6 +20,7 @@ namespace Unity.Netcode.Components
         /// of the collidingBody parameter if the contact event occurred with a collider that is not registered with the <see cref="RigidbodyContactEventManager"/>.
         /// </summary>
         public bool ProvideNonRigidBodyContactEvents;
+
         /// <summary>
         /// When set to true, the <see cref="RigidbodyContactEventManager"/> will prioritize invoking <see cref="IContactEventHandler.ContactEvent(ulong, Vector3, Rigidbody, Vector3, bool, Vector3)"/> <br />
         /// if it is the 2nd colliding body in the contact pair being processed. With distributed authority, setting this value to true when a <see cref="NetworkObject"/> is owned by the local client <br />
@@ -50,7 +51,14 @@ namespace Unity.Netcode.Components
         /// <param name="contactPoint">The world space location of the contact event.</param>
         /// <param name="hasCollisionStay">Will be set if this is a collision stay contact event (i.e. it is not the first contact event and continually has contact)</param>
         /// <param name="averagedCollisionStayNormal">The average normal of the collision stay contact over time.</param>
-        public void ContactEvent(ulong eventId, Vector3 averagedCollisionNormal, Rigidbody collidingBody, Vector3 contactPoint, bool hasCollisionStay = false, Vector3 averagedCollisionStayNormal = default);
+        public void ContactEvent(
+            ulong eventId,
+            Vector3 averagedCollisionNormal,
+            Rigidbody collidingBody,
+            Vector3 contactPoint,
+            bool hasCollisionStay = false,
+            Vector3 averagedCollisionStayNormal = default
+        );
     }
 
     /// <summary>
@@ -98,15 +106,20 @@ namespace Unity.Netcode.Components
         private JobHandle m_JobHandle;
 #if UNITY_6000_2_OR_NEWER
         private readonly Dictionary<EntityId, Rigidbody> m_RigidbodyMapping = new Dictionary<EntityId, Rigidbody>();
-        private readonly Dictionary<EntityId, IContactEventHandler> m_HandlerMapping = new Dictionary<EntityId, IContactEventHandler>();
-        private readonly Dictionary<EntityId, ContactEventHandlerInfo> m_HandlerInfo = new Dictionary<EntityId, ContactEventHandlerInfo>();
+        private readonly Dictionary<EntityId, IContactEventHandler> m_HandlerMapping =
+            new Dictionary<EntityId, IContactEventHandler>();
+        private readonly Dictionary<EntityId, ContactEventHandlerInfo> m_HandlerInfo =
+            new Dictionary<EntityId, ContactEventHandlerInfo>();
 #else
         private readonly Dictionary<int, Rigidbody> m_RigidbodyMapping = new Dictionary<int, Rigidbody>();
-        private readonly Dictionary<int, IContactEventHandler> m_HandlerMapping = new Dictionary<int, IContactEventHandler>();
-        private readonly Dictionary<int, ContactEventHandlerInfo> m_HandlerInfo = new Dictionary<int, ContactEventHandlerInfo>();
+        private readonly Dictionary<int, IContactEventHandler> m_HandlerMapping =
+            new Dictionary<int, IContactEventHandler>();
+        private readonly Dictionary<int, ContactEventHandlerInfo> m_HandlerInfo =
+            new Dictionary<int, ContactEventHandlerInfo>();
 #endif
 
         private ContextualLogger m_Log;
+
         private void OnEnable()
         {
             m_Log = new ContextualLogger(this);
@@ -114,8 +127,22 @@ namespace Unity.Netcode.Components
             Physics.ContactEvent += Physics_ContactEvent;
             if (Instance != null && Instance != this)
             {
-                m_Log.Error(new Context(LogLevel.Error, $"Found more than one instance of {nameof(RigidbodyContactEventManager)}").AddTag("Invalid").AddTag("Multiple Instances").AddInfo("Instance 1", Instance.name).AddInfo("Instance 2", name));
-                m_Log.Error(new Context(LogLevel.Error, $"Disabling instance: ").AddTag("Disable").AddTag("Additional Instance").AddInfo("Instance", name));
+                m_Log.Error(
+                    new Context(
+                        LogLevel.Error,
+                        $"Found more than one instance of {nameof(RigidbodyContactEventManager)}"
+                    )
+                        .AddTag("Invalid")
+                        .AddTag("Multiple Instances")
+                        .AddInfo("Instance 1", Instance.name)
+                        .AddInfo("Instance 2", name)
+                );
+                m_Log.Error(
+                    new Context(LogLevel.Error, $"Disabling instance: ")
+                        .AddTag("Disable")
+                        .AddTag("Additional Instance")
+                        .AddInfo("Instance", name)
+                );
                 gameObject.SetActive(false);
                 return;
             }
@@ -274,18 +301,37 @@ namespace Unity.Netcode.Components
                     otherRigidbody = null;
                 }
 
-                if (preferredContactHandler == null || (preferredContactHandler != null && otherContactHandler == null && !preferredContactHandlerNonRigidbody))
+                if (
+                    preferredContactHandler == null
+                    || (
+                        preferredContactHandler != null
+                        && otherContactHandler == null
+                        && !preferredContactHandlerNonRigidbody
+                    )
+                )
                 {
                     continue;
                 }
 
                 if (m_ResultsArray[i].HasCollisionStay)
                 {
-                    preferredContactHandler.ContactEvent(m_EventId, m_ResultsArray[i].AverageNormal, otherRigidbody, m_ResultsArray[i].ContactPoint, m_ResultsArray[i].HasCollisionStay, m_ResultsArray[i].AverageCollisionStayNormal);
+                    preferredContactHandler.ContactEvent(
+                        m_EventId,
+                        m_ResultsArray[i].AverageNormal,
+                        otherRigidbody,
+                        m_ResultsArray[i].ContactPoint,
+                        m_ResultsArray[i].HasCollisionStay,
+                        m_ResultsArray[i].AverageCollisionStayNormal
+                    );
                 }
                 else
                 {
-                    preferredContactHandler.ContactEvent(m_EventId, m_ResultsArray[i].AverageNormal, otherRigidbody, m_ResultsArray[i].ContactPoint);
+                    preferredContactHandler.ContactEvent(
+                        m_EventId,
+                        m_ResultsArray[i].AverageNormal,
+                        otherRigidbody,
+                        m_ResultsArray[i].ContactPoint
+                    );
                 }
             }
         }
@@ -315,6 +361,7 @@ namespace Unity.Netcode.Components
         }
 
         private ulong m_EventId;
+
         private void Physics_ContactEvent(PhysicsScene scene, NativeArray<ContactPairHeader>.ReadOnly pairHeaders)
         {
             m_EventId++;
@@ -326,11 +373,7 @@ namespace Unity.Netcode.Components
                 m_ResultsArray = new NativeArray<JobResultStruct>(Mathf.NextPowerOfTwo(n), Allocator.Persistent);
             }
             m_Count = n;
-            var job = new GetCollisionsJob()
-            {
-                PairedHeaders = pairHeaders,
-                ResultsArray = m_ResultsArray
-            };
+            var job = new GetCollisionsJob() { PairedHeaders = pairHeaders, ResultsArray = m_ResultsArray };
             m_JobHandle = job.Schedule(n, 256);
         }
 
@@ -403,7 +446,7 @@ namespace Unity.Netcode.Components
                     AverageNormal = averageNormal,
                     HasCollisionStay = collisionStaycount != 0,
                     AverageCollisionStayNormal = averageCollisionStay,
-                    ContactPoint = averagePoint
+                    ContactPoint = averagePoint,
                 };
 
                 ResultsArray[index] = result;

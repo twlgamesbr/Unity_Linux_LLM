@@ -26,19 +26,23 @@ namespace UnityEngine.InputSystem.Controls
 
             if (!stateBlock.format.IsIntegerFormat())
                 throw new NotSupportedException(
-                    $"Non-integer format '{stateBlock.format}' is not supported for TouchButtonControl '{this}'");
+                    $"Non-integer format '{stateBlock.format}' is not supported for TouchButtonControl '{this}'"
+                );
         }
 
         /// <inheritdoc />
         public override unsafe float ReadUnprocessedValueFromState(void* statePtr)
         {
             var valuePtr = (byte*)statePtr + (int)m_StateBlock.byteOffset;
-            var uintValue = MemoryHelpers.ReadMultipleBitsAsUInt(valuePtr, m_StateBlock.bitOffset, m_StateBlock.sizeInBits);
+            var uintValue = MemoryHelpers.ReadMultipleBitsAsUInt(
+                valuePtr,
+                m_StateBlock.bitOffset,
+                m_StateBlock.sizeInBits
+            );
             var phaseValue = (TouchPhase)uintValue;
 
             var value = 0.0f;
-            if (phaseValue == TouchPhase.Began || phaseValue == TouchPhase.Stationary ||
-                phaseValue == TouchPhase.Moved)
+            if (phaseValue == TouchPhase.Began || phaseValue == TouchPhase.Stationary || phaseValue == TouchPhase.Moved)
                 value = 1;
 
             return Preprocess(value);

@@ -53,16 +53,16 @@ namespace Unity.Entities
 
         internal bool HasAnyChanges()
         {
-            return DeletedEntityIds.Length > 0 ||
-                !ChangedEntityIds.IsEmpty ||
-                !BakeHierarchyEntityIds.IsEmpty ||
-                !ForceBakeHierarchyEntityIds.IsEmpty ||
-                ComponentChanges.Count > 0 ||
-                !ParentChangeEntityIds.IsEmpty ||
-                ChangedAssets.Length > 0 ||
-                DeletedAssets.Length > 0 ||
-                ParentWithChildrenOrderChangedEntityIds.Length > 0 ||
-                LightBakingChanged;
+            return DeletedEntityIds.Length > 0
+                || !ChangedEntityIds.IsEmpty
+                || !BakeHierarchyEntityIds.IsEmpty
+                || !ForceBakeHierarchyEntityIds.IsEmpty
+                || ComponentChanges.Count > 0
+                || !ParentChangeEntityIds.IsEmpty
+                || ChangedAssets.Length > 0
+                || DeletedAssets.Length > 0
+                || ParentWithChildrenOrderChangedEntityIds.Length > 0
+                || LightBakingChanged;
         }
 
         internal void FillBatch(ref IncrementalBakingBatch batch)
@@ -123,12 +123,14 @@ namespace Unity.Entities
         }
 
         public void MarkComponentChanged(Component c) => ComponentChanges.Add(c);
+
         public void MarkBakeHierarchy(EntityId entityId) => BakeHierarchyEntityIds.Add(entityId);
+
         public void MarkForceBakeHierarchy(EntityId entityId) => ForceBakeHierarchyEntityIds.Add(entityId);
+
         public void MarkChanged(EntityId entityId) => ChangedEntityIds.Add(entityId);
 
-        public void MarkChildrenOrderChange(EntityId entityId) =>
-            ParentWithChildrenOrderChangedEntityIds.Add(entityId);
+        public void MarkChildrenOrderChange(EntityId entityId) => ParentWithChildrenOrderChangedEntityIds.Add(entityId);
 
         public void MarkLightBakingChanged() => LightBakingChanged = true;
     }
@@ -213,6 +215,7 @@ namespace Unity.Entities
             if (RecreateInstanceIds.IsCreated)
                 RecreateInstanceIds.Dispose();
         }
+
 #if UNITY_EDITOR
         internal string FormatSummary()
         {

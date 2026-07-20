@@ -1,7 +1,6 @@
 using System;
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,7 +12,8 @@ namespace UnityEngine.PathTracing.Core
     [Categorization.CategoryInfo(Name = "R: Path Tracing Core World", Order = 1000), HideInInspector]
     sealed class WorldRenderPipelineResources : IRenderPipelineResources
     {
-        [SerializeField, HideInInspector] int _version = 3;
+        [SerializeField, HideInInspector]
+        int _version = 3;
 
         public int version
         {
@@ -29,7 +29,11 @@ namespace UnityEngine.PathTracing.Core
         [SerializeField, ResourcePath("Runtime/PathTracing/Shaders/SetAlphaChannel.compute")]
         ComputeShader _setAlphaChannelShader;
 
-        [SerializeField, ResourcePath("Runtime/PathTracing/Environment/EnvironmentImportanceSamplingBuild.compute"), FormerlySerializedAs("_pathTracingSkySamplingDataShader")]
+        [
+            SerializeField,
+            ResourcePath("Runtime/PathTracing/Environment/EnvironmentImportanceSamplingBuild.compute"),
+            FormerlySerializedAs("_pathTracingSkySamplingDataShader")
+        ]
         ComputeShader _environmentImportanceSamplingBuild;
 
         [SerializeField, ResourcePath("Runtime/PathTracing/Meshes/SkyBoxMesh.mesh")]
@@ -40,7 +44,6 @@ namespace UnityEngine.PathTracing.Core
 
         [SerializeField, ResourcePath("Runtime/PathTracing/Shaders/BuildLightGrid.compute")]
         ComputeShader _buildLightGridShader;
-
 
         public ComputeShader BlitCubemap
         {
@@ -63,7 +66,12 @@ namespace UnityEngine.PathTracing.Core
         public ComputeShader EnvironmentImportanceSamplingBuild
         {
             get => _environmentImportanceSamplingBuild;
-            set => this.SetValueAndNotify(ref _environmentImportanceSamplingBuild, value, nameof(_environmentImportanceSamplingBuild));
+            set =>
+                this.SetValueAndNotify(
+                    ref _environmentImportanceSamplingBuild,
+                    value,
+                    nameof(_environmentImportanceSamplingBuild)
+                );
         }
 
         public Mesh SkyBoxMesh
@@ -101,12 +109,20 @@ namespace UnityEngine.PathTracing.Core
             const string packageFolder = "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/";
 
             BlitCubemap = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/BlitCubemap.compute");
-            BlitGrayScaleCookie = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/BlitCookie.compute");
-            SetAlphaChannelShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/SetAlphaChannel.compute");
-            EnvironmentImportanceSamplingBuild = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Environment/EnvironmentImportanceSamplingBuild.compute");
+            BlitGrayScaleCookie = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                packageFolder + "Shaders/BlitCookie.compute"
+            );
+            SetAlphaChannelShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                packageFolder + "Shaders/SetAlphaChannel.compute"
+            );
+            EnvironmentImportanceSamplingBuild = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                packageFolder + "Environment/EnvironmentImportanceSamplingBuild.compute"
+            );
             SkyBoxMesh = AssetDatabase.LoadAssetAtPath<Mesh>(packageFolder + "Meshes/SkyboxMesh.mesh");
             SixFaceSkyBoxMesh = AssetDatabase.LoadAssetAtPath<Mesh>(packageFolder + "Meshes/6FaceSkyboxMesh.mesh");
-            BuildLightGridShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/BuildLightGrid.compute");
+            BuildLightGridShader = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                packageFolder + "Shaders/BuildLightGrid.compute"
+            );
         }
 #endif
 

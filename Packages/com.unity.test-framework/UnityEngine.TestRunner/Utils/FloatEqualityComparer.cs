@@ -10,13 +10,18 @@ namespace UnityEngine.TestTools.Utils
         private const float k_DefaultError = 0.0001f;
         private readonly float AllowedError;
 
-        private static readonly  FloatEqualityComparer m_Instance = new FloatEqualityComparer();
+        private static readonly FloatEqualityComparer m_Instance = new FloatEqualityComparer();
+
         /// <summary>
         ///A singleton instance of the comparer with a default error value set to 0.0001f.
         /// </summary>
-        public static FloatEqualityComparer Instance { get { return m_Instance; } }
+        public static FloatEqualityComparer Instance
+        {
+            get { return m_Instance; }
+        }
 
-        private FloatEqualityComparer() : this(k_DefaultError) {}
+        private FloatEqualityComparer()
+            : this(k_DefaultError) { }
 
         /// <summary>
         /// Initializes an instance of a FloatEqualityComparer with a custom error value instead of the default 0.0001f.

@@ -7,7 +7,8 @@ namespace UnityEngine.Rendering.Universal
     [Serializable]
     internal class Provider2DSource : SelectionSource
     {
-        [SerializeReference] public Provider2D m_Provider;
+        [SerializeReference]
+        public Provider2D m_Provider;
 
         public virtual void Initialize(Provider2D provider, Component component, int providerType)
         {
@@ -18,7 +19,11 @@ namespace UnityEngine.Rendering.Universal
             m_Provider = provider;
         }
 
-        public override void DrawUI(SerializedProperty property, SerializedObject serializedObject, UnityEngine.Object[] targets)
+        public override void DrawUI(
+            SerializedProperty property,
+            SerializedObject serializedObject,
+            UnityEngine.Object[] targets
+        )
         {
             SerializedProperty source = property.FindPropertyRelative("m_SelectedSource");
             SerializedProperty provideProperty = source.FindPropertyRelative("m_Provider");

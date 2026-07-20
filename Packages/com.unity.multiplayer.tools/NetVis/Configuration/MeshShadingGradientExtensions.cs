@@ -21,15 +21,13 @@ namespace Unity.Multiplayer.Tools.NetVis.Configuration
                 MeshShadingGradientPreset.Plasma => MatplotlibColorMaps.GetPlasma(percentage),
                 MeshShadingGradientPreset.Magma => MatplotlibColorMaps.GetMagma(percentage),
                 MeshShadingGradientPreset.Inferno => MatplotlibColorMaps.GetInferno(percentage),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
         }
 
         public static Gradient ToGradient(this MeshShadingGradient meshShadingFill)
         {
-            return meshShadingFill.UseGradient
-                ? meshShadingFill.Gradient
-                : meshShadingFill.Preset.ToGradient();
+            return meshShadingFill.UseGradient ? meshShadingFill.Gradient : meshShadingFill.Preset.ToGradient();
         }
 
         public static Gradient ToGradient(this MeshShadingGradientPreset preset)
@@ -40,14 +38,12 @@ namespace Unity.Multiplayer.Tools.NetVis.Configuration
                 MeshShadingGradientPreset.Plasma => MatplotlibColorMaps.GeneratePlasma(8),
                 MeshShadingGradientPreset.Magma => MatplotlibColorMaps.GenerateMagma(8),
                 MeshShadingGradientPreset.Inferno => MatplotlibColorMaps.GenerateInferno(8),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
 
             return new()
             {
-                colorKeys = colors
-                    .Select((color, index) => new GradientColorKey(color, index / 8f))
-                    .ToArray()
+                colorKeys = colors.Select((color, index) => new GradientColorKey(color, index / 8f)).ToArray(),
             };
         }
     }

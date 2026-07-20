@@ -12,17 +12,17 @@ namespace Unity.Rendering
         /// <summary>
         /// Scene ID.
         /// </summary>
-        public Hash128          SceneGUID;
+        public Hash128 SceneGUID;
 
         /// <summary>
         /// Section ID.
         /// </summary>
-        public int              SectionIndex;
+        public int SectionIndex;
 
         /// <summary>
         /// Streaming LOD flags.
         /// </summary>
-        public int              HasStreamedLOD;
+        public int HasStreamedLOD;
 
         /// <summary>
         /// Determines whether two object instances are equal.

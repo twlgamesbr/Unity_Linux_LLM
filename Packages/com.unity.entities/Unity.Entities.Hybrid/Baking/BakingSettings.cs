@@ -10,11 +10,11 @@ namespace Unity.Entities
 {
     internal class BakingSettings
     {
-        public Hash128                  SceneGUID;
-        public BakingUtility.BakingFlags          BakingFlags;
+        public Hash128 SceneGUID;
+        public BakingUtility.BakingFlags BakingFlags;
         public WorldSystemFilterFlags FilterFlags = WorldSystemFilterFlags.BakingSystem;
-        public List<Type>               ExtraSystems = new List<Type>();
-        public List<Type>               Systems;
+        public List<Type> ExtraSystems = new List<Type>();
+        public List<Type> Systems;
 #if UNITY_EDITOR
         public IEntitiesPlayerSettings DotsSettings;
         public AssetImportContext AssetImportContext;
@@ -34,11 +34,11 @@ namespace Unity.Entities
             }
         }
 #endif
-        internal byte                     NamespaceID; // this must be internal
+        internal byte NamespaceID; // this must be internal
 
         public BlobAssetStore BlobAssetStore { get; protected internal set; }
 
-        public BakingSettings() {}
+        public BakingSettings() { }
 
         public BakingSettings(BakingUtility.BakingFlags bakingFlags, BlobAssetStore blobAssetStore)
         {

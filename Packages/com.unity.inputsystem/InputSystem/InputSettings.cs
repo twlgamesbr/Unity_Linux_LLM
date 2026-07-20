@@ -730,37 +730,80 @@ namespace UnityEngine.InputSystem
             OnChange();
         }
 
-        [Tooltip("Determine which type of devices are used by the application. By default, this is empty meaning that all devices recognized "
-            + "by Unity will be used. Restricting the set of supported devices will make only those devices appear in the input system.")]
-        [SerializeField] private string[] m_SupportedDevices;
-        [Tooltip("Determine when Unity processes events. By default, accumulated input events are flushed out before each fixed update and "
-            + "before each dynamic update. This setting can be used to restrict event processing to only where the application needs it.")]
-        [SerializeField] private UpdateMode m_UpdateMode = UpdateMode.ProcessEventsInDynamicUpdate;
-        [SerializeField] private ScrollDeltaBehavior m_ScrollDeltaBehavior = ScrollDeltaBehavior.UniformAcrossAllPlatforms;
-        [SerializeField] private int m_MaxEventBytesPerUpdate = 5 * 1024 * 1024;
-        [SerializeField] private int m_MaxQueuedEventsPerUpdate = 1000;
+        [Tooltip(
+            "Determine which type of devices are used by the application. By default, this is empty meaning that all devices recognized "
+                + "by Unity will be used. Restricting the set of supported devices will make only those devices appear in the input system."
+        )]
+        [SerializeField]
+        private string[] m_SupportedDevices;
 
-        [SerializeField] private bool m_CompensateForScreenOrientation = true;
-        [SerializeField] private BackgroundBehavior m_BackgroundBehavior = BackgroundBehavior.ResetAndDisableNonBackgroundDevices;
-        [SerializeField] private EditorInputBehaviorInPlayMode m_EditorInputBehaviorInPlayMode;
-        [SerializeField] private InputActionPropertyDrawerMode m_InputActionPropertyDrawerMode = InputActionPropertyDrawerMode.Compact;
-        [SerializeField] private float m_DefaultDeadzoneMin = 0.125f;
-        [SerializeField] private float m_DefaultDeadzoneMax = 0.925f;
+        [Tooltip(
+            "Determine when Unity processes events. By default, accumulated input events are flushed out before each fixed update and "
+                + "before each dynamic update. This setting can be used to restrict event processing to only where the application needs it."
+        )]
+        [SerializeField]
+        private UpdateMode m_UpdateMode = UpdateMode.ProcessEventsInDynamicUpdate;
+
+        [SerializeField]
+        private ScrollDeltaBehavior m_ScrollDeltaBehavior = ScrollDeltaBehavior.UniformAcrossAllPlatforms;
+
+        [SerializeField]
+        private int m_MaxEventBytesPerUpdate = 5 * 1024 * 1024;
+
+        [SerializeField]
+        private int m_MaxQueuedEventsPerUpdate = 1000;
+
+        [SerializeField]
+        private bool m_CompensateForScreenOrientation = true;
+
+        [SerializeField]
+        private BackgroundBehavior m_BackgroundBehavior = BackgroundBehavior.ResetAndDisableNonBackgroundDevices;
+
+        [SerializeField]
+        private EditorInputBehaviorInPlayMode m_EditorInputBehaviorInPlayMode;
+
+        [SerializeField]
+        private InputActionPropertyDrawerMode m_InputActionPropertyDrawerMode = InputActionPropertyDrawerMode.Compact;
+
+        [SerializeField]
+        private float m_DefaultDeadzoneMin = 0.125f;
+
+        [SerializeField]
+        private float m_DefaultDeadzoneMax = 0.925f;
+
         // A setting of 0.5 seems to roughly be what games generally use on the gamepad triggers.
         // Having a higher value here also obsoletes the need for custom press points on stick buttons
         // (the up/down/left/right ones).
         [Min(ButtonControl.kMinButtonPressPoint)]
-        [SerializeField] private float m_DefaultButtonPressPoint = 0.5f;
-        [SerializeField] private float m_ButtonReleaseThreshold = 0.75f;
-        [SerializeField] private float m_DefaultTapTime = 0.2f;
-        [SerializeField] private float m_DefaultSlowTapTime = 0.5f;
-        [SerializeField] private float m_DefaultHoldTime = 0.4f;
-        [SerializeField] private float m_TapRadius = 5;
-        [SerializeField] private float m_MultiTapDelayTime = 0.75f;
-        [SerializeField] private bool m_DisableRedundantEventsMerging = false;
-        [SerializeField] private bool m_ShortcutKeysConsumeInputs = false; // This is the shortcut support from v1.4. Temporarily moved here as an opt-in feature, while it's issues are investigated.
+        [SerializeField]
+        private float m_DefaultButtonPressPoint = 0.5f;
 
-        [NonSerialized] internal HashSet<string> m_FeatureFlags;
+        [SerializeField]
+        private float m_ButtonReleaseThreshold = 0.75f;
+
+        [SerializeField]
+        private float m_DefaultTapTime = 0.2f;
+
+        [SerializeField]
+        private float m_DefaultSlowTapTime = 0.5f;
+
+        [SerializeField]
+        private float m_DefaultHoldTime = 0.4f;
+
+        [SerializeField]
+        private float m_TapRadius = 5;
+
+        [SerializeField]
+        private float m_MultiTapDelayTime = 0.75f;
+
+        [SerializeField]
+        private bool m_DisableRedundantEventsMerging = false;
+
+        [SerializeField]
+        private bool m_ShortcutKeysConsumeInputs = false; // This is the shortcut support from v1.4. Temporarily moved here as an opt-in feature, while it's issues are investigated.
+
+        [NonSerialized]
+        internal HashSet<string> m_FeatureFlags;
 
         internal bool IsFeatureEnabled(string featureName)
         {
@@ -849,7 +892,7 @@ namespace UnityEngine.InputSystem
             /// The range will typically be [-120, 120] on Windows and [-1, 1] on MacOS and Linux.
             /// Other platforms may have different ranges.
             /// </remarks>
-            KeepPlatformSpecificInputRange = 1
+            KeepPlatformSpecificInputRange = 1,
         }
 
         /// <summary>
@@ -966,7 +1009,8 @@ namespace UnityEngine.InputSystem
         /// * support inspector view which only work in IMGUI for now.
         /// * prevent the UI to be rendered in IMGUI and UI Toolkit in the Input Actions Editor window.
         /// </summary>
-        public bool useIMGUIEditorForAssets => UnityEditor.EditorGUI.indentLevel > 0 || IsFeatureEnabled(InputFeatureNames.kUseIMGUIEditorForAssets);
+        public bool useIMGUIEditorForAssets =>
+            UnityEditor.EditorGUI.indentLevel > 0 || IsFeatureEnabled(InputFeatureNames.kUseIMGUIEditorForAssets);
 #endif
 
         private static bool CompareFloats(float a, float b)
@@ -1013,33 +1057,33 @@ namespace UnityEngine.InputSystem
             if (ReferenceEquals(a, b))
                 return true;
 
-            return (a.updateMode == b.updateMode) &&
-                (a.compensateForScreenOrientation == b.compensateForScreenOrientation) &&
+            return (a.updateMode == b.updateMode)
+                && (a.compensateForScreenOrientation == b.compensateForScreenOrientation)
+                &&
                 // Ignoring filterNoiseOnCurrent since deprecated
-                CompareFloats(a.defaultDeadzoneMin, b.defaultDeadzoneMin) &&
-                CompareFloats(a.defaultDeadzoneMax, b.defaultDeadzoneMax) &&
-                CompareFloats(a.defaultButtonPressPoint, b.defaultButtonPressPoint) &&
-                CompareFloats(a.buttonReleaseThreshold, b.buttonReleaseThreshold) &&
-                CompareFloats(a.defaultTapTime, b.defaultTapTime) &&
-                CompareFloats(a.defaultSlowTapTime, b.defaultSlowTapTime) &&
-                CompareFloats(a.defaultHoldTime, b.defaultHoldTime) &&
-                CompareFloats(a.tapRadius, b.tapRadius) &&
-                CompareFloats(a.multiTapDelayTime, b.multiTapDelayTime) &&
-                a.backgroundBehavior == b.backgroundBehavior &&
-                a.editorInputBehaviorInPlayMode == b.editorInputBehaviorInPlayMode &&
-                a.inputActionPropertyDrawerMode == b.inputActionPropertyDrawerMode &&
-                a.maxEventBytesPerUpdate == b.maxEventBytesPerUpdate &&
-                a.maxQueuedEventsPerUpdate == b.maxQueuedEventsPerUpdate &&
-                CompareSets(a.supportedDevices, b.supportedDevices) &&
-                a.disableRedundantEventsMerging == b.disableRedundantEventsMerging &&
-                a.shortcutKeysConsumeInput == b.shortcutKeysConsumeInput &&
-
-                CompareFeatureFlag(a, b, InputFeatureNames.kUseOptimizedControls) &&
-                CompareFeatureFlag(a, b, InputFeatureNames.kUseReadValueCaching) &&
-                CompareFeatureFlag(a, b, InputFeatureNames.kParanoidReadValueCachingChecks) &&
-                CompareFeatureFlag(a, b, InputFeatureNames.kDisableUnityRemoteSupport) &&
-                CompareFeatureFlag(a, b, InputFeatureNames.kRunPlayerUpdatesInEditMode) &&
-                CompareFeatureFlag(a, b, InputFeatureNames.kUseIMGUIEditorForAssets);
+                CompareFloats(a.defaultDeadzoneMin, b.defaultDeadzoneMin)
+                && CompareFloats(a.defaultDeadzoneMax, b.defaultDeadzoneMax)
+                && CompareFloats(a.defaultButtonPressPoint, b.defaultButtonPressPoint)
+                && CompareFloats(a.buttonReleaseThreshold, b.buttonReleaseThreshold)
+                && CompareFloats(a.defaultTapTime, b.defaultTapTime)
+                && CompareFloats(a.defaultSlowTapTime, b.defaultSlowTapTime)
+                && CompareFloats(a.defaultHoldTime, b.defaultHoldTime)
+                && CompareFloats(a.tapRadius, b.tapRadius)
+                && CompareFloats(a.multiTapDelayTime, b.multiTapDelayTime)
+                && a.backgroundBehavior == b.backgroundBehavior
+                && a.editorInputBehaviorInPlayMode == b.editorInputBehaviorInPlayMode
+                && a.inputActionPropertyDrawerMode == b.inputActionPropertyDrawerMode
+                && a.maxEventBytesPerUpdate == b.maxEventBytesPerUpdate
+                && a.maxQueuedEventsPerUpdate == b.maxQueuedEventsPerUpdate
+                && CompareSets(a.supportedDevices, b.supportedDevices)
+                && a.disableRedundantEventsMerging == b.disableRedundantEventsMerging
+                && a.shortcutKeysConsumeInput == b.shortcutKeysConsumeInput
+                && CompareFeatureFlag(a, b, InputFeatureNames.kUseOptimizedControls)
+                && CompareFeatureFlag(a, b, InputFeatureNames.kUseReadValueCaching)
+                && CompareFeatureFlag(a, b, InputFeatureNames.kParanoidReadValueCachingChecks)
+                && CompareFeatureFlag(a, b, InputFeatureNames.kDisableUnityRemoteSupport)
+                && CompareFeatureFlag(a, b, InputFeatureNames.kRunPlayerUpdatesInEditMode)
+                && CompareFeatureFlag(a, b, InputFeatureNames.kUseIMGUIEditorForAssets);
         }
     }
 }

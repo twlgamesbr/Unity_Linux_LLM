@@ -31,7 +31,7 @@ namespace UnityEngine.InputSystem.iOS.LowLevel
         /// <summary>
         /// Access was allowed by the user.
         /// </summary>
-        Authorized
+        Authorized,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -80,7 +80,11 @@ namespace UnityEngine.InputSystem.iOS.LowLevel
         }
 
         [DllImport("__Internal")]
-        private static extern int _iOSStepCounterEnable(int deviceId, ref iOSStepCounterCallbacks callbacks, int sizeOfCallbacks);
+        private static extern int _iOSStepCounterEnable(
+            int deviceId,
+            ref iOSStepCounterCallbacks callbacks,
+            int sizeOfCallbacks
+        );
 
         [DllImport("__Internal")]
         private static extern int _iOSStepCounterDisable(int deviceId);
@@ -98,12 +102,13 @@ namespace UnityEngine.InputSystem.iOS.LowLevel
         private static void OnDataReceived(int deviceId, int numberOfSteps)
         {
             var stepCounter = (iOSStepCounter)InputSystem.GetDeviceById(deviceId);
-            InputSystem.QueueStateEvent(stepCounter, new iOSStepCounterState {stepCounter = numberOfSteps});
+            InputSystem.QueueStateEvent(stepCounter, new iOSStepCounterState { stepCounter = numberOfSteps });
         }
 
 #if UNITY_EDITOR
         private bool m_Enabled = false;
 #endif
+
         protected override unsafe long ExecuteCommand(InputDeviceCommand* commandPtr)
         {
             var t = commandPtr->type;

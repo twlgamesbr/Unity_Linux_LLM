@@ -15,7 +15,7 @@ namespace Unity.Entities.LowLevel
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Acquire()
         {
-            for (;;)
+            for (; ; )
             {
                 // Optimistically assume the lock is free on the first try.
                 if (Interlocked.CompareExchange(ref m_Lock, 1, 0) == 0)
@@ -41,8 +41,7 @@ namespace Unity.Entities.LowLevel
         public bool TryAcquire()
         {
             // First do a memory load (read) to check if lock is free in order to prevent unnecessary cache misses.
-            return Volatile.Read(ref m_Lock) == 0 &&
-                Interlocked.CompareExchange(ref m_Lock, 1, 0) == 0;
+            return Volatile.Read(ref m_Lock) == 0 && Interlocked.CompareExchange(ref m_Lock, 1, 0) == 0;
         }
 
         /// <summary>

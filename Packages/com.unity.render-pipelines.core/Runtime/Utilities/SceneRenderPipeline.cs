@@ -1,9 +1,10 @@
+using System;
+using UnityEngine.Analytics;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-using System;
-using UnityEngine.Analytics;
+
 
 namespace UnityEngine.Rendering
 {
@@ -17,7 +18,8 @@ namespace UnityEngine.Rendering
     public class SceneRenderPipeline : MonoBehaviour
     {
 #if UNITY_EDITOR
-        [SerializeField] bool firstTimeCreated = true;
+        [SerializeField]
+        bool firstTimeCreated = true;
 
         /// <summary>
         /// Scriptable Render Pipeline Asset to setup on scene load.
@@ -41,17 +43,17 @@ namespace UnityEngine.Rendering
             GraphicsSettings.defaultRenderPipeline = renderPipelineAsset;
         }
 
-
-        [AnalyticInfo(eventName: "sceneRenderPipelineAssignment", vendorKey: "unity.srp", maxEventsPerHour: 10, maxNumberOfElements: 1000)]
+        [AnalyticInfo(
+            eventName: "sceneRenderPipelineAssignment",
+            vendorKey: "unity.srp",
+            maxEventsPerHour: 10,
+            maxNumberOfElements: 1000
+        )]
         class SceneRenderPipelineAnalytic : IAnalytic
         {
-
             public SceneRenderPipelineAnalytic(string guid)
             {
-                m_Data = new Data
-                {
-                    scene_guid = guid
-                };
+                m_Data = new Data { scene_guid = guid };
             }
 
             [System.Diagnostics.DebuggerDisplay("{scene_guid}")]
@@ -69,15 +71,16 @@ namespace UnityEngine.Rendering
                 return true;
             }
 
-            static public void SendAnalytic(SceneRenderPipeline sender)
+            public static void SendAnalytic(SceneRenderPipeline sender)
             {
-                SceneRenderPipelineAnalytic analytic = new SceneRenderPipelineAnalytic(sender.gameObject.scene.GetGUID());
+                SceneRenderPipelineAnalytic analytic = new SceneRenderPipelineAnalytic(
+                    sender.gameObject.scene.GetGUID()
+                );
                 EditorAnalytics.SendAnalytic(analytic);
             }
 
             Data m_Data;
         }
-
 
 #endif
     }

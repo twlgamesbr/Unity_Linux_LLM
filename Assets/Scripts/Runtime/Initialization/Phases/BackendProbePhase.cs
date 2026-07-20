@@ -37,7 +37,7 @@ namespace NPCSystem.Initialization
                 ["authReachable"] = snapshot.auth.reachable,
                 ["localAiReachable"] = snapshot.localAi.reachable,
                 ["authStatus"] = snapshot.auth.status,
-                ["localAiStatus"] = snapshot.localAi.status
+                ["localAiStatus"] = snapshot.localAi.status,
             };
 
             if (snapshot.auth.reachable && snapshot.localAi.reachable)
@@ -48,7 +48,8 @@ namespace NPCSystem.Initialization
                     NPCFlowLogLevel.Info,
                     "Required multiplayer dialogue backends are reachable.",
                     source: nameof(BackendProbePhase),
-                    data: data);
+                    data: data
+                );
             }
             else
             {
@@ -58,7 +59,8 @@ namespace NPCSystem.Initialization
                     NPCFlowLogLevel.Warning,
                     "One or more required multiplayer dialogue backends are unreachable.",
                     source: nameof(BackendProbePhase),
-                    data: data);
+                    data: data
+                );
             }
         }
 
@@ -69,13 +71,10 @@ namespace NPCSystem.Initialization
                 NPCFlowStatus.Error,
                 NPCFlowLogLevel.Error,
                 $"Required reference {refName} is not assigned. "
-                + "Wire it in the Inspector — FindAnyObjectByType is not used.",
+                    + "Wire it in the Inspector — FindAnyObjectByType is not used.",
                 source: nameof(BackendProbePhase),
-                data: new Dictionary<string, object>
-                {
-                    ["correlationId"] = ctx.CorrelationId,
-                    ["missingRef"] = refName
-                });
+                data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId, ["missingRef"] = refName }
+            );
         }
     }
 }

@@ -23,19 +23,24 @@ namespace UnityEditor.Rendering
 
         /// <summary>SerializedObject representing the settings object</summary>
         protected SerializedObject m_SettingsSerializedObject;
+
         /// <summary>SerializedProperty representing the Default Volume Profile</summary>
         protected SerializedProperty m_VolumeProfileSerializedProperty;
+
         /// <summary>Foldout state</summary>
         protected EditorPrefBool m_DefaultVolumeProfileFoldoutExpanded;
+
         /// <summary>VisualElement containing the DefaultVolumeProfileEditor</summary>
         protected VisualElement m_EditorContainer;
+
         /// <summary>Default Volume Profile label width</summary>
         protected const int k_DefaultVolumeLabelWidth = 260;
+
         /// <summary>Info box message</summary>
         protected abstract GUIContent volumeInfoBoxLabel { get; }
 
         /// <summary>Label and tooltip used for the Default Volume Profile asset field.</summary>
-        protected abstract GUIContent defaultVolumeProfileAssetLabel { get;  }
+        protected abstract GUIContent defaultVolumeProfileAssetLabel { get; }
 
         /// <summary>
         /// CreatePropertyGUI implementation.
@@ -52,7 +57,10 @@ namespace UnityEditor.Rendering
 
             m_SettingsSerializedObject = property.serializedObject;
             m_VolumeProfileSerializedProperty = property.FindPropertyRelative("m_VolumeProfile");
-            m_DefaultVolumeProfileFoldoutExpanded = new EditorPrefBool($"{GetType()}.DefaultVolumeProfileFoldoutExpanded", true);
+            m_DefaultVolumeProfileFoldoutExpanded = new EditorPrefBool(
+                $"{GetType()}.DefaultVolumeProfileFoldoutExpanded",
+                true
+            );
 
             m_EditorContainer = new VisualElement();
             if (!RenderPipelineManager.pipelineSwitchCompleted)
@@ -121,11 +129,18 @@ namespace UnityEditor.Rendering
         /// <param name="previousValue">Previous volume profile</param>
         /// <param name="defaultVolumeProfileSettings">Optionally provided default volume profile to extract default values</param>
         /// <typeparam name="TRenderPipeline">Render Pipeline type</typeparam>
-        void ShowGlobalDefaultVolumeDialog<TRenderPipeline>(ObjectField field, Object newValue,
-            Object previousValue, IDefaultVolumeProfileSettings defaultVolumeProfileSettings = null)
+        void ShowGlobalDefaultVolumeDialog<TRenderPipeline>(
+            ObjectField field,
+            Object newValue,
+            Object previousValue,
+            IDefaultVolumeProfileSettings defaultVolumeProfileSettings = null
+        )
             where TRenderPipeline : RenderPipeline
         {
-            bool confirmed = VolumeProfileUtils.UpdateGlobalDefaultVolumeProfileWithConfirmation<TRenderPipeline>(newValue as VolumeProfile, defaultVolumeProfileSettings?.volumeProfile);
+            bool confirmed = VolumeProfileUtils.UpdateGlobalDefaultVolumeProfileWithConfirmation<TRenderPipeline>(
+                newValue as VolumeProfile,
+                defaultVolumeProfileSettings?.volumeProfile
+            );
             if (confirmed)
             {
                 UpdateDefaultVolumeSerializedPropertyAndRecreate(field, newValue);
@@ -162,8 +177,10 @@ namespace UnityEditor.Rendering
         /// <typeparam name="TRenderPipeline">Render Pipeline type for Default Volume</typeparam>
         /// <typeparam name="TDefaultVolumeSettings">Default Volume settings container type</typeparam>
         /// <returns>New Object Field</returns>
-        protected VisualElement DrawDefaultVolumeObjectField<TRenderPipeline, TDefaultVolumeSettings>(TDefaultVolumeSettings defaultVolumeProfileSettings = null)
-            where TRenderPipeline: RenderPipeline
+        protected VisualElement DrawDefaultVolumeObjectField<TRenderPipeline, TDefaultVolumeSettings>(
+            TDefaultVolumeSettings defaultVolumeProfileSettings = null
+        )
+            where TRenderPipeline : RenderPipeline
             where TDefaultVolumeSettings : class, IDefaultVolumeProfileSettings
         {
             VisualElement profileLine = new();
@@ -176,10 +193,7 @@ namespace UnityEditor.Rendering
                 tooltip = defaultVolumeProfileAssetLabel.tooltip,
                 objectType = typeof(VolumeProfile),
                 value = m_VolumeProfileSerializedProperty.objectReferenceValue as VolumeProfile,
-                style =
-                {
-                    flexShrink = 1,
-                }
+                style = { flexShrink = 1 },
             };
             m_ObjectField.AddToClassList("unity-base-field__aligned"); //Align with other BaseField<T>
             m_ObjectField.Q<Label>().RegisterCallback<ClickEvent>(evt => toggle.value ^= true);
@@ -190,7 +204,9 @@ namespace UnityEditor.Rendering
                 m_DefaultVolumeProfileFoldoutExpanded.value = evt.newValue;
             });
             toggle.SetValueWithoutNotify(m_DefaultVolumeProfileFoldoutExpanded.value);
-            m_EditorContainer.style.display = m_DefaultVolumeProfileFoldoutExpanded.value ? DisplayStyle.Flex : DisplayStyle.None;
+            m_EditorContainer.style.display = m_DefaultVolumeProfileFoldoutExpanded.value
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
 
             profileLine.style.flexDirection = FlexDirection.Row;
             m_ObjectField.style.flexGrow = 1;
@@ -203,7 +219,9 @@ namespace UnityEditor.Rendering
                 if (RenderPipelineManager.currentPipeline is not TRenderPipeline)
                 {
                     m_ObjectField.SetValueWithoutNotify(evt.previousValue);
-                    Debug.Log($"Cannot change Default Volume Profile when {typeof(TRenderPipeline).Name} is not active. Rolling back to previous value.");
+                    Debug.Log(
+                        $"Cannot change Default Volume Profile when {typeof(TRenderPipeline).Name} is not active. Rolling back to previous value."
+                    );
                     return;
                 }
 
@@ -214,16 +232,24 @@ namespace UnityEditor.Rendering
                     return;
                 }
 
-
                 if (evt.previousValue != null)
                 {
                     var newValue = evt.newValue;
                     var oldValue = evt.previousValue;
-                    EditorApplication.delayCall += () => ShowGlobalDefaultVolumeDialog<TRenderPipeline>(m_ObjectField, newValue, oldValue, defaultVolumeProfileSettings);
+                    EditorApplication.delayCall += () =>
+                        ShowGlobalDefaultVolumeDialog<TRenderPipeline>(
+                            m_ObjectField,
+                            newValue,
+                            oldValue,
+                            defaultVolumeProfileSettings
+                        );
                     return;
                 }
 
-                VolumeProfileUtils.UpdateGlobalDefaultVolumeProfile<TRenderPipeline>(evt.newValue as VolumeProfile, defaultVolumeProfileSettings?.volumeProfile);
+                VolumeProfileUtils.UpdateGlobalDefaultVolumeProfile<TRenderPipeline>(
+                    evt.newValue as VolumeProfile,
+                    defaultVolumeProfileSettings?.volumeProfile
+                );
                 UpdateDefaultVolumeSerializedPropertyAndRecreate(m_ObjectField, evt.newValue);
             });
 
@@ -233,7 +259,9 @@ namespace UnityEditor.Rendering
                     HandleRenderPipelineChange<TRenderPipeline>();
                 RenderPipelineManager.activeRenderPipelineTypeChanged += HandleRenderPipelineChange<TRenderPipeline>;
             });
-            m_ObjectField.RegisterCallback<DetachFromPanelEvent>(evt => RenderPipelineManager.activeRenderPipelineTypeChanged -= HandleRenderPipelineChange<TRenderPipeline>);
+            m_ObjectField.RegisterCallback<DetachFromPanelEvent>(evt =>
+                RenderPipelineManager.activeRenderPipelineTypeChanged -= HandleRenderPipelineChange<TRenderPipeline>
+            );
 
             profileLine.Add(toggle);
             profileLine.Add(m_ObjectField);
@@ -242,12 +270,10 @@ namespace UnityEditor.Rendering
         }
 
         void HandleRenderPipelineChange<TRenderPipeline>()
-            where TRenderPipeline: RenderPipeline
+            where TRenderPipeline : RenderPipeline
         {
             m_ObjectField.enabledSelf = RenderPipelineManager.currentPipeline is TRenderPipeline;
         }
-
-
 
         /// <summary>
         /// Implementation of the Default Volume Profile asset field.
@@ -260,7 +286,8 @@ namespace UnityEditor.Rendering
         /// </summary>
         /// <typeparam name="TSetting">Default Volume Profile Settings type</typeparam>
         /// <typeparam name="TRenderPipeline">Render Pipeline type</typeparam>
-        public abstract class DefaultVolumeProfileSettingsContextMenu2<TSetting, TRenderPipeline> : IRenderPipelineGraphicsSettingsContextMenu2<TSetting>
+        public abstract class DefaultVolumeProfileSettingsContextMenu2<TSetting, TRenderPipeline>
+            : IRenderPipelineGraphicsSettingsContextMenu2<TSetting>
             where TSetting : class, IDefaultVolumeProfileSettings
             where TRenderPipeline : RenderPipeline
         {
@@ -269,10 +296,15 @@ namespace UnityEditor.Rendering
             /// </summary>
             protected abstract string defaultVolumeProfilePath { get; }
 
-            void IRenderPipelineGraphicsSettingsContextMenu2<TSetting>.PopulateContextMenu(TSetting setting, SerializedProperty _, ref GenericMenu menu)
+            void IRenderPipelineGraphicsSettingsContextMenu2<TSetting>.PopulateContextMenu(
+                TSetting setting,
+                SerializedProperty _,
+                ref GenericMenu menu
+            )
             {
                 bool canCreateNewAsset = RenderPipelineManager.currentPipeline is TRenderPipeline;
-                VolumeProfileUtils.AddVolumeProfileContextMenuItems(ref menu,
+                VolumeProfileUtils.AddVolumeProfileContextMenuItems(
+                    ref menu,
                     setting.volumeProfile,
                     s_DefaultVolumeProfileEditor == null ? null : s_DefaultVolumeProfileEditor.allEditors,
                     overrideStateOnReset: true,
@@ -284,17 +316,26 @@ namespace UnityEditor.Rendering
 
                         VolumeProfile initialAsset = null;
 
-                        var initialAssetSettings = EditorGraphicsSettings.GetRenderPipelineSettingsFromInterface<IDefaultVolumeProfileAsset>();
+                        var initialAssetSettings =
+                            EditorGraphicsSettings.GetRenderPipelineSettingsFromInterface<IDefaultVolumeProfileAsset>();
                         if (initialAssetSettings.Length > 0)
                         {
                             if (initialAssetSettings.Length > 1)
-                                throw new InvalidOperationException("Found multiple settings implementing IDefaultVolumeProfileAsset, expected only one");
+                                throw new InvalidOperationException(
+                                    "Found multiple settings implementing IDefaultVolumeProfileAsset, expected only one"
+                                );
                             initialAsset = initialAssetSettings[0].defaultVolumeProfile;
                         }
-                        VolumeProfileUtils.UpdateGlobalDefaultVolumeProfile<TRenderPipeline>(createdProfile, initialAsset);
+                        VolumeProfileUtils.UpdateGlobalDefaultVolumeProfile<TRenderPipeline>(
+                            createdProfile,
+                            initialAsset
+                        );
                     },
-                    onComponentEditorsExpandedCollapsed: s_DefaultVolumeProfileEditor == null ? null : s_DefaultVolumeProfileEditor.RebuildListViews,
-                    canCreateNewAsset);
+                    onComponentEditorsExpandedCollapsed: s_DefaultVolumeProfileEditor == null
+                        ? null
+                        : s_DefaultVolumeProfileEditor.RebuildListViews,
+                    canCreateNewAsset
+                );
             }
         }
     }

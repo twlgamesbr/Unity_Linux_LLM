@@ -1,13 +1,14 @@
+using System.Threading;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Scripting;
-using System.Threading;
 #if !UNITY_NETCODE_GAMEOBJECTS_2_1_0_ABOVE
 using System.Threading.Tasks;
 using Unity.Multiplayer.Tools.Common;
 #endif
 
 [assembly: AlwaysLinkAssembly]
+
 namespace Unity.Multiplayer.Tools.Adapters.Ngo1
 {
     static class Ngo1AdapterInitializer
@@ -15,7 +16,7 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
         static bool s_Initialized;
         static Ngo1Adapter s_Instance;
         static CancellationTokenSource s_InitializeAdapterCts;
-        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         internal static void InitializeAdapter()
         {
@@ -54,7 +55,6 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
             }
             else
                 s_Instance.ReplaceNetworkManager(networkManager);
-
         }
 
         private static void OnDestroying(NetworkManager _)
@@ -67,11 +67,11 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
             }
         }
 #else
-        
+
         static async Task InitializeAdapterAsync(CancellationToken ct)
         {
             var networkManager = await GetNetworkManagerAsync(ct);
-            if(ct.IsCancellationRequested)
+            if (ct.IsCancellationRequested)
                 return;
             s_Instance = new Ngo1Adapter(networkManager);
             NetworkAdapters.AddAdapter(s_Instance);

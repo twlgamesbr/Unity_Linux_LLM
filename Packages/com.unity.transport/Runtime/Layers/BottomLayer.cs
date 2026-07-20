@@ -10,7 +10,8 @@ namespace Unity.Networking.Transport
     /// </summary>
     internal struct BottomLayer : INetworkLayer
     {
-        public int Initialize(ref NetworkSettings settings, ref ConnectionList connectionList, ref int packetPadding) => 0;
+        public int Initialize(ref NetworkSettings settings, ref ConnectionList connectionList, ref int packetPadding) =>
+            0;
 
         public void Dispose() { }
 
@@ -18,10 +19,7 @@ namespace Unity.Networking.Transport
 
         public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dependency)
         {
-            return new ClearJob
-            {
-                SendQueue = arguments.SendQueue,
-            }.Schedule(dependency);
+            return new ClearJob { SendQueue = arguments.SendQueue }.Schedule(dependency);
         }
 
         [BurstCompile]

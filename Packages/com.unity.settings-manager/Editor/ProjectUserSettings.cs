@@ -17,9 +17,8 @@ namespace UnityEditor.SettingsManagement
         /// </summary>
         /// <param name="package">The name of the package to store the serialized data under.</param>
         /// <param name="name">The base filename to use for the serialized data location (defaults to "Settings").</param>
-        public ProjectUserSettings(string package, string name = "Settings") : base(GetUserSettingsPath(package, name))
-        {
-        }
+        public ProjectUserSettings(string package, string name = "Settings")
+            : base(GetUserSettingsPath(package, name)) { }
 
         /// <summary>
         /// Builds and returns a path for a settings file relative to the calling assembly's package directory.

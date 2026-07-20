@@ -18,12 +18,12 @@ namespace Unity.Collections
     {
         [NativeDisableContainerSafetyRestriction]
         [NoAlias]
-        private void* m_Elements;    // storage for all elements (allocated and free)
-        private readonly int m_capacity;      // number of elements
-        private int m_FirstFreeIndex;         // the index of the first free element (or -1 if none free)
+        private void* m_Elements; // storage for all elements (allocated and free)
+        private readonly int m_capacity; // number of elements
+        private int m_FirstFreeIndex; // the index of the first free element (or -1 if none free)
 
-        public int Capacity => m_capacity;     // the maximum number of elements that can be allocated
-        public int PeakCount { get; private set; }  // the maximum number of elements allocated so far
+        public int Capacity => m_capacity; // the maximum number of elements that can be allocated
+        public int PeakCount { get; private set; } // the maximum number of elements allocated so far
         public bool CanAllocate => m_FirstFreeIndex >= 0 || PeakCount < Capacity;
 
         public ElementPoolBase(void* userBuffer, int capacity)
@@ -35,7 +35,8 @@ namespace Unity.Collections
         }
 
         // Add an element to the pool
-        public int Allocate<T>(T element) where T : unmanaged, IPoolElement
+        public int Allocate<T>(T element)
+            where T : unmanaged, IPoolElement
         {
             T* elements = ((T*)m_Elements);
 
@@ -55,7 +56,8 @@ namespace Unity.Collections
         }
 
         // Remove an element from the pool
-        public void Release<T>(int index) where T : unmanaged, IPoolElement
+        public void Release<T>(int index)
+            where T : unmanaged, IPoolElement
         {
             T* elementsTyped = (T*)m_Elements;
             elementsTyped[index].MarkFree(m_FirstFreeIndex);
@@ -69,13 +71,15 @@ namespace Unity.Collections
             m_FirstFreeIndex = -1;
         }
 
-        public bool IsAllocated<T>(int index) where T : unmanaged, IPoolElement
+        public bool IsAllocated<T>(int index)
+            where T : unmanaged, IPoolElement
         {
             T element = ((T*)m_Elements)[index];
             return element.IsAllocated;
         }
 
-        public T Get<T>(int index) where T : unmanaged, IPoolElement
+        public T Get<T>(int index)
+            where T : unmanaged, IPoolElement
         {
             Assert.IsTrue(index < Capacity);
             T element = ((T*)m_Elements)[index];
@@ -83,13 +87,15 @@ namespace Unity.Collections
             return element;
         }
 
-        public void Set<T>(int index, T value) where T : unmanaged, IPoolElement
+        public void Set<T>(int index, T value)
+            where T : unmanaged, IPoolElement
         {
             Assert.IsTrue(index < Capacity);
             ((T*)m_Elements)[index] = value;
         }
 
-        public void CopyFrom<T>(ElementPoolBase other) where T : unmanaged, IPoolElement
+        public void CopyFrom<T>(ElementPoolBase other)
+            where T : unmanaged, IPoolElement
         {
             Assert.IsTrue(other.PeakCount <= Capacity);
             PeakCount = other.PeakCount;
@@ -97,7 +103,8 @@ namespace Unity.Collections
             UnsafeUtility.MemCpy(m_Elements, other.m_Elements, PeakCount * UnsafeUtility.SizeOf<T>());
         }
 
-        public void CopyFrom<T>(void* buffer, int length) where T : unmanaged, IPoolElement
+        public void CopyFrom<T>(void* buffer, int length)
+            where T : unmanaged, IPoolElement
         {
             Assert.IsTrue(length <= Capacity);
             PeakCount = length;
@@ -108,7 +115,8 @@ namespace Unity.Collections
         // Compacts the pool so that all of the allocated elements are contiguous, and resets PeakCount to the current allocated count.
         // remap may be null or an array of size at least PeakCount, if not null and the return value is true then Compact() sets remap[oldIndex] = newIndex for all allocated elements.
         // Returns true if compact occurred, false if the pool was already compact.
-        public bool Compact<T>(int* remap) where T : unmanaged, IPoolElement
+        public bool Compact<T>(int* remap)
+            where T : unmanaged, IPoolElement
         {
             if (m_FirstFreeIndex == -1)
             {
@@ -132,32 +140,44 @@ namespace Unity.Collections
 
         #region Enumerables
 
-        public IndexEnumerable<T> GetIndices<T>() where T : unmanaged, IPoolElement
+        public IndexEnumerable<T> GetIndices<T>()
+            where T : unmanaged, IPoolElement
         {
-            NativeArray<T> slice = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(m_Elements, PeakCount, Allocator.None);
+            NativeArray<T> slice = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                m_Elements,
+                PeakCount,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref slice, AtomicSafetyHandle.GetTempUnsafePtrSliceHandle());
 #endif
             return new IndexEnumerable<T> { Slice = slice };
         }
 
-        public ElementEnumerable<T> GetElements<T>() where T : unmanaged, IPoolElement
+        public ElementEnumerable<T> GetElements<T>()
+            where T : unmanaged, IPoolElement
         {
-            NativeArray<T> slice = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(m_Elements, PeakCount, Allocator.None);
+            NativeArray<T> slice = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                m_Elements,
+                PeakCount,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref slice, AtomicSafetyHandle.GetTempUnsafePtrSliceHandle());
 #endif
             return new ElementEnumerable<T> { Slice = slice };
         }
 
-        public struct IndexEnumerable<T> where T : unmanaged, IPoolElement
+        public struct IndexEnumerable<T>
+            where T : unmanaged, IPoolElement
         {
             internal NativeArray<T> Slice;
 
             public IndexEnumerator<T> GetEnumerator() => new IndexEnumerator<T>(ref Slice);
         }
 
-        public struct ElementEnumerable<T> where T : unmanaged, IPoolElement
+        public struct ElementEnumerable<T>
+            where T : unmanaged, IPoolElement
         {
             internal NativeArray<T> Slice;
 
@@ -165,7 +185,8 @@ namespace Unity.Collections
         }
 
         // An enumerator for iterating over the indices
-        public struct IndexEnumerator<T> where T : unmanaged, IPoolElement
+        public struct IndexEnumerator<T>
+            where T : unmanaged, IPoolElement
         {
             internal NativeArray<T> Slice;
             internal int Index;
@@ -195,7 +216,8 @@ namespace Unity.Collections
         }
 
         // An enumerator for iterating over the allocated elements
-        public struct ElementEnumerator<T> where T : unmanaged, IPoolElement
+        public struct ElementEnumerator<T>
+            where T : unmanaged, IPoolElement
         {
             internal NativeArray<T> Slice;
             internal IndexEnumerator<T> IndexEnumerator;
@@ -215,22 +237,32 @@ namespace Unity.Collections
     }
 
     // A fixed capacity array acting as a pool of allocated/free structs referenced by indices
-    unsafe struct ElementPool<T> where T : unmanaged, IPoolElement
+    unsafe struct ElementPool<T>
+        where T : unmanaged, IPoolElement
     {
         public ElementPoolBase* ElementPoolBase;
 
-        public int Capacity => ElementPoolBase->Capacity;     // the maximum number of elements that can be allocated
-        public int PeakCount => ElementPoolBase->PeakCount;  // the maximum number of elements allocated so far
+        public int Capacity => ElementPoolBase->Capacity; // the maximum number of elements that can be allocated
+        public int PeakCount => ElementPoolBase->PeakCount; // the maximum number of elements allocated so far
         public bool CanAllocate => ElementPoolBase->CanAllocate;
 
         // Add an element to the pool
-        public int Allocate(T element) { return ElementPoolBase->Allocate<T>(element); }
+        public int Allocate(T element)
+        {
+            return ElementPoolBase->Allocate<T>(element);
+        }
 
         // Remove an element from the pool
-        public void Release(int index) { ElementPoolBase->Release<T>(index); }
+        public void Release(int index)
+        {
+            ElementPoolBase->Release<T>(index);
+        }
 
         // Empty the pool
-        public void Clear() { ElementPoolBase->Clear(); }
+        public void Clear()
+        {
+            ElementPoolBase->Clear();
+        }
 
         public bool IsAllocated(int index)
         {
@@ -244,13 +276,25 @@ namespace Unity.Collections
             set { ElementPoolBase->Set<T>(index, value); }
         }
 
-        public void Set(int index, T value) { ElementPoolBase->Set<T>(index, value); }
+        public void Set(int index, T value)
+        {
+            ElementPoolBase->Set<T>(index, value);
+        }
 
-        public void CopyFrom(ElementPool<T> other) { ElementPoolBase->CopyFrom<T>(*other.ElementPoolBase); }
+        public void CopyFrom(ElementPool<T> other)
+        {
+            ElementPoolBase->CopyFrom<T>(*other.ElementPoolBase);
+        }
 
-        public void CopyFrom(void* buffer, int length) { ElementPoolBase->CopyFrom<T>(buffer, length); }
+        public void CopyFrom(void* buffer, int length)
+        {
+            ElementPoolBase->CopyFrom<T>(buffer, length);
+        }
 
-        public bool Compact(int* remap) { return ElementPoolBase->Compact<T>(remap); }
+        public bool Compact(int* remap)
+        {
+            return ElementPoolBase->Compact<T>(remap);
+        }
 
         public ElementPoolBase.IndexEnumerable<T> Indices => ElementPoolBase->GetIndices<T>();
         public ElementPoolBase.ElementEnumerable<T> Elements => ElementPoolBase->GetElements<T>();

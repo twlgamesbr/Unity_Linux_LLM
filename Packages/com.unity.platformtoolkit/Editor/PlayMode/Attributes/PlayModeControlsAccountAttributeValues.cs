@@ -15,13 +15,18 @@ namespace Unity.PlatformToolkit.PlayMode
         private int m_UserIndex;
 
         [SerializeField]
-        private List<PlayModeControlsAccountAttributeValue> m_AttributeValues = new ();
+        private List<PlayModeControlsAccountAttributeValue> m_AttributeValues = new();
+
         [CreateProperty]
         public IReadOnlyList<PlayModeControlsAccountAttributeValue> AttributeValues => m_AttributeValues;
 
         private ObservableSerializableList<PlayModeControlsAttributeDefinition> m_SubscribedAttributeDefinitions;
 
-        public void Init(ScriptableObjectDataChangePersistor persistor, ObservableSerializableList<PlayModeControlsAttributeDefinition> attributeDefinitions, int userIndex)
+        public void Init(
+            ScriptableObjectDataChangePersistor persistor,
+            ObservableSerializableList<PlayModeControlsAttributeDefinition> attributeDefinitions,
+            int userIndex
+        )
         {
             m_Persistor = persistor;
             m_UserIndex = userIndex;
@@ -31,7 +36,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
             foreach (var definition in attributeDefinitions)
             {
-                var attributeValue = m_AttributeValues.FirstOrDefault(av => av.AttributeDefinitionGuid == definition.Guid);
+                var attributeValue = m_AttributeValues.FirstOrDefault(av =>
+                    av.AttributeDefinitionGuid == definition.Guid
+                );
                 if (attributeValue != null)
                     attributeValue.Init(m_Persistor, definition, m_UserIndex);
                 else
@@ -75,7 +82,9 @@ namespace Unity.PlatformToolkit.PlayMode
                     break;
                 case NotifyCollectionChangedAction.Replace:
                     var oldAttributeDefinition = e.OldItems[0] as PlayModeControlsAttributeDefinition;
-                    var attributeValue = m_AttributeValues.First(av => av.AttributeDefinition == oldAttributeDefinition);
+                    var attributeValue = m_AttributeValues.First(av =>
+                        av.AttributeDefinition == oldAttributeDefinition
+                    );
                     m_AttributeValues.Remove(attributeValue);
                     AddAttributeValue(e.NewItems[0] as PlayModeControlsAttributeDefinition, e.NewStartingIndex);
                     break;
@@ -101,7 +110,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private void RemoveAttributeValue(PlayModeControlsAttributeDefinition attributeDefinition)
         {
-            var attributeValue = m_AttributeValues.FirstOrDefault(av => av.AttributeDefinition.Guid == attributeDefinition.Guid);
+            var attributeValue = m_AttributeValues.FirstOrDefault(av =>
+                av.AttributeDefinition.Guid == attributeDefinition.Guid
+            );
             if (attributeValue == null)
                 return;
             m_AttributeValues.Remove(attributeValue);

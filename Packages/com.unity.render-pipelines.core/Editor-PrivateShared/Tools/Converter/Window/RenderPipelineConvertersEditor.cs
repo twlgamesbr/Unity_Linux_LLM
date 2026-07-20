@@ -41,11 +41,17 @@ namespace UnityEditor.Rendering.Converter
     [EditorWindowTitle(title = "Render Pipeline Converters")]
     internal class RenderPipelineConvertersEditor : EditorWindow, IHasCustomMenu
     {
-        const string k_Uxml = "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConvertersEditor.uxml";
-        const string k_Uss = "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConvertersEditor.uss";
+        const string k_Uxml =
+            "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConvertersEditor.uxml";
+        const string k_Uss =
+            "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConvertersEditor.uss";
 
-        static Lazy<VisualTreeAsset> s_VisualTreeAsset = new Lazy<VisualTreeAsset>(() => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_Uxml));
-        static Lazy<StyleSheet> s_StyleSheet = new Lazy<StyleSheet>(() => AssetDatabase.LoadAssetAtPath<StyleSheet>(k_Uss));
+        static Lazy<VisualTreeAsset> s_VisualTreeAsset = new Lazy<VisualTreeAsset>(() =>
+            AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_Uxml)
+        );
+        static Lazy<StyleSheet> s_StyleSheet = new Lazy<StyleSheet>(() =>
+            AssetDatabase.LoadAssetAtPath<StyleSheet>(k_Uss)
+        );
 
         ScrollView m_ScrollView;
         Button m_ConvertButton;
@@ -54,9 +60,9 @@ namespace UnityEditor.Rendering.Converter
         DropdownField m_SourcePipelineDropDown;
         DropdownField m_DestinationPipelineDropDown;
 
-        List<Node<ConverterInfo>> m_CoreConvertersList = new ();
+        List<Node<ConverterInfo>> m_CoreConvertersList = new();
         Node<ConverterInfo> currentContainer { get; set; }
-        Dictionary<Node<ConverterInfo>, RenderPipelineConverterVisualElement> m_ConvertersVisualElements = new ();
+        Dictionary<Node<ConverterInfo>, RenderPipelineConverterVisualElement> m_ConvertersVisualElements = new();
 
         internal static List<Node<ConverterInfo>> CategorizeConverters()
         {
@@ -104,11 +110,15 @@ namespace UnityEditor.Rendering.Converter
             var parentViewField = editorWindowType.GetField("m_Parent", BindingFlags.Instance | BindingFlags.NonPublic);
             var parentViewValue = parentViewField.GetValue(wnd);
             // window should not be saved to layout
-            var containerWindowProperty =
-                hostViewType.GetProperty("window", BindingFlags.Instance | BindingFlags.Public);
+            var containerWindowProperty = hostViewType.GetProperty(
+                "window",
+                BindingFlags.Instance | BindingFlags.Public
+            );
             var parentContainerWindowValue = containerWindowProperty.GetValue(parentViewValue);
-            var dontSaveToLayoutField =
-                containerWindowType.GetField("m_DontSaveToLayout", BindingFlags.Instance | BindingFlags.NonPublic);
+            var dontSaveToLayoutField = containerWindowType.GetField(
+                "m_DontSaveToLayout",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
             dontSaveToLayoutField.SetValue(parentContainerWindowValue, true);
         }
 
@@ -224,15 +234,19 @@ namespace UnityEditor.Rendering.Converter
                 HideUnhideConverters();
             };
 
-            m_SourcePipelineDropDown.RegisterCallback<ChangeEvent<string>>((evt) =>
-            {
-                HideUnhideConverters();
-            });
+            m_SourcePipelineDropDown.RegisterCallback<ChangeEvent<string>>(
+                (evt) =>
+                {
+                    HideUnhideConverters();
+                }
+            );
 
-            m_DestinationPipelineDropDown.RegisterCallback<ChangeEvent<string>>((evt) =>
-            {
-                HideUnhideConverters();
-            });
+            m_DestinationPipelineDropDown.RegisterCallback<ChangeEvent<string>>(
+                (evt) =>
+                {
+                    HideUnhideConverters();
+                }
+            );
 
             HideUnhideConverters();
             EnableOrDisableScanButton();
@@ -246,8 +260,7 @@ namespace UnityEditor.Rendering.Converter
             foreach (var kvp in m_ConvertersVisualElements)
             {
                 var ve = kvp.Value;
-                if (ve.isSelectedAndEnabled &&
-                    !ve.state.isInitialized)
+                if (ve.isSelectedAndEnabled && !ve.state.isInitialized)
                 {
                     return true;
                 }
@@ -260,10 +273,12 @@ namespace UnityEditor.Rendering.Converter
             foreach (var kvp in m_ConvertersVisualElements)
             {
                 var ve = kvp.Value;
-                if (ve.isSelectedAndEnabled &&
-                    ve.state.isInitialized &&
-                    ve.state.selectedItemsCount > 0 &&
-                    ve.state.pending > 0)
+                if (
+                    ve.isSelectedAndEnabled
+                    && ve.state.isInitialized
+                    && ve.state.selectedItemsCount > 0
+                    && ve.state.pending > 0
+                )
                 {
                     return true;
                 }
@@ -287,21 +302,25 @@ namespace UnityEditor.Rendering.Converter
                 throw new NullReferenceException("Current Container must not be null");
 
             bool pipelineConverterSelected = currentContainer.name == "Pipeline Converter";
-            m_PipelineToolsVisualElements.style.display = pipelineConverterSelected ? DisplayStyle.Flex : DisplayStyle.None;
+            m_PipelineToolsVisualElements.style.display = pipelineConverterSelected
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
 
             m_ScrollView.Clear();
             foreach (var child in currentContainer.children)
             {
                 if (m_ConvertersVisualElements.TryGetValue(child, out var ve))
                 {
-                    bool isVisible = !pipelineConverterSelected || (
-                        m_SourcePipelineDropDown.text == child.data.sourcePipeline &&
-                        m_DestinationPipelineDropDown.text == child.data.destinationPipeline
-                    );
+                    bool isVisible =
+                        !pipelineConverterSelected
+                        || (
+                            m_SourcePipelineDropDown.text == child.data.sourcePipeline
+                            && m_DestinationPipelineDropDown.text == child.data.destinationPipeline
+                        );
 
                     if (isVisible)
                         m_ScrollView.Add(ve);
-                }  
+                }
             }
         }
 
@@ -317,10 +336,12 @@ namespace UnityEditor.Rendering.Converter
                         continue;
 
                     var data = kvp.Key.data;
-                    bool isVisible = !pipelineConverterSelected || (
-                       m_SourcePipelineDropDown.text == data.sourcePipeline &&
-                       m_DestinationPipelineDropDown.text == data.destinationPipeline
-                    );
+                    bool isVisible =
+                        !pipelineConverterSelected
+                        || (
+                            m_SourcePipelineDropDown.text == data.sourcePipeline
+                            && m_DestinationPipelineDropDown.text == data.destinationPipeline
+                        );
 
                     if (!isVisible)
                         continue;
@@ -369,8 +390,14 @@ namespace UnityEditor.Rendering.Converter
                 var current = convertersToInitialize[iConverterIndex];
                 var converter = current.converter;
 
-                if (!m_WindowAlive || EditorUtility.DisplayCancelableProgressBar("Initializing converters",
-                    $"({iConverterIndex} of {count}) {current.displayName}", (float)iConverterIndex / (float)count))
+                if (
+                    !m_WindowAlive
+                    || EditorUtility.DisplayCancelableProgressBar(
+                        "Initializing converters",
+                        $"({iConverterIndex} of {count}) {current.displayName}",
+                        (float)iConverterIndex / (float)count
+                    )
+                )
                 {
                     InitializationFinish();
                     return;
@@ -387,9 +414,11 @@ namespace UnityEditor.Rendering.Converter
                 {
                     current.Scan(OnConverterScanFinished);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    Debug.LogError($"An exception occurred while initializing converter {current.displayName}. See console for more details.");
+                    Debug.LogError(
+                        $"An exception occurred while initializing converter {current.displayName}. See console for more details."
+                    );
                     Debug.LogException(ex);
                     InitializationFinish();
                 }
@@ -415,9 +444,14 @@ namespace UnityEditor.Rendering.Converter
             Scene currentScene = SceneManager.GetActiveScene();
             if (currentScene.isDirty)
             {
-                if (EditorUtility.DisplayDialog("Scene is not saved.",
-                    "Current scene is not saved. Please save the scene before continuing.", "Save and Continue",
-                    "Cancel"))
+                if (
+                    EditorUtility.DisplayDialog(
+                        "Scene is not saved.",
+                        "Current scene is not saved. Please save the scene before continuing.",
+                        "Save and Continue",
+                        "Cancel"
+                    )
+                )
                 {
                     EditorSceneManager.SaveScene(currentScene);
                 }
@@ -450,7 +484,7 @@ namespace UnityEditor.Rendering.Converter
 
             StringBuilder sb = new StringBuilder("=== Render Pipeline Converters Report ===\n");
 
-            List<RenderPipelineConverterVisualElement> convertersToPerformConversion = new ();
+            List<RenderPipelineConverterVisualElement> convertersToPerformConversion = new();
 
             // Getting all the active converters to use in the cancelable progressbar
             foreach (var converterVE in selectedConverters)
@@ -461,7 +495,7 @@ namespace UnityEditor.Rendering.Converter
                 }
             }
 
-            List<AnalyticContextInfo> contextInfo = new ();
+            List<AnalyticContextInfo> contextInfo = new();
 
             int converterCount = 1;
             int activeConvertersCount = convertersToPerformConversion.Count;
@@ -469,22 +503,23 @@ namespace UnityEditor.Rendering.Converter
             {
                 try
                 {
-                    activeConverter.Convert($"({converterCount} of {activeConvertersCount}) {activeConverter.displayName}", sb);
+                    activeConverter.Convert(
+                        $"({converterCount} of {activeConvertersCount}) {activeConverter.displayName}",
+                        sb
+                    );
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"An exception occurred while executing converter {activeConverter.displayName}. See console for more details.");
+                    Debug.LogError(
+                        $"An exception occurred while executing converter {activeConverter.displayName}. See console for more details."
+                    );
                     Debug.LogException(ex);
                 }
 
                 converterCount++;
 
                 // Add this converter to the analytics
-                contextInfo.Add(new()
-                {
-                    converter_id = activeConverter.displayName,
-                    items_count = 0
-                });
+                contextInfo.Add(new() { converter_id = activeConverter.displayName, items_count = 0 });
 
                 EditorUtility.ClearProgressBar();
             }
@@ -499,15 +534,17 @@ namespace UnityEditor.Rendering.Converter
 
             RefreshUI();
 
-            GraphicsToolUsageAnalytic.ActionPerformed<RenderPipelineConvertersEditor>(nameof(Convert), contextInfo.ToNestedColumn());
+            GraphicsToolUsageAnalytic.ActionPerformed<RenderPipelineConvertersEditor>(
+                nameof(Convert),
+                contextInfo.ToNestedColumn()
+            );
 
             Debug.Log(sb);
         }
 
         public void AddItemsToMenu(GenericMenu menu)
         {
-            menu.AddItem
-            (
+            menu.AddItem(
                 EditorGUIUtility.TrTextContent("Reset"),
                 false,
                 () =>
@@ -519,12 +556,19 @@ namespace UnityEditor.Rendering.Converter
             );
         }
 
-        internal static string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Rendering)}.{nameof(RenderPipelineConvertersEditor)}.{nameof(ShowIrreversibleChangesDialog)}";
+        internal static string k_DialogKey =
+            $"{nameof(UnityEditor)}.{nameof(Rendering)}.{nameof(RenderPipelineConvertersEditor)}.{nameof(ShowIrreversibleChangesDialog)}";
+
         private bool ShowIrreversibleChangesDialog()
         {
-            return EditorUtility.DisplayDialog("Confirm Project Conversion",
-                    "This action will modify project assets and cannot be easily undone. It is strongly recommended to have a backup or use version control before continuing.",
-                    "Proceed", "Cancel", DialogOptOutDecisionType.ForThisMachine, k_DialogKey);
+            return EditorUtility.DisplayDialog(
+                "Confirm Project Conversion",
+                "This action will modify project assets and cannot be easily undone. It is strongly recommended to have a backup or use version control before continuing.",
+                "Proceed",
+                "Cancel",
+                DialogOptOutDecisionType.ForThisMachine,
+                k_DialogKey
+            );
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Unity.Networking.Transport.Utilities
     /// tracks the acknowledgements based on the last acknowledged packet which is entirely implicit
     /// (this structure does not track the last acknowledged sequence number). Packets preceding
     /// this last acknowledged packet are identified by their distance to it.
-    /// 
+    ///
     /// For example, if the last acknowledged packet is sequence number 100, then distance 0 is
     /// packet 100, distance 1 is packet 99, distance 2 is packet 98, etc. Thus calling Ack(1)
     /// will mark packet 99 as acknowledged, and IsAcked(2) will return true if packet 98 has been
@@ -167,7 +167,9 @@ namespace Unity.Networking.Transport.Utilities
         }
 
         public override bool Equals(object obj) => obj == null ? false : Equals((ReliableAckMask)obj);
+
         public static bool operator ==(ReliableAckMask left, ReliableAckMask right) => left.Equals(right);
+
         public static bool operator !=(ReliableAckMask left, ReliableAckMask right) => !left.Equals(right);
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]

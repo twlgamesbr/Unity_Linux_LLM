@@ -78,26 +78,54 @@ namespace Unity.Entities.Editor
         {
             public static readonly string Entity = L10n.Tr("Entity");
             public static readonly string Entities = L10n.Tr("Entities");
-            public static readonly string LiveConversionDisabled = L10n.Tr("Live Conversion is disabled. Enable it in the DOTS file menu to see entity baking preview.");
-            public static readonly string PreviewForUnbakedGameObjects = L10n.Tr("Entity baking can only be previewed for GameObjects baked by a SubScene.");
-            public static readonly string MultiSelectionWarning = L10n.Tr("Components that are only on some of the baked entities are not shown.");
+            public static readonly string LiveConversionDisabled = L10n.Tr(
+                "Live Conversion is disabled. Enable it in the DOTS file menu to see entity baking preview."
+            );
+            public static readonly string PreviewForUnbakedGameObjects = L10n.Tr(
+                "Entity baking can only be previewed for GameObjects baked by a SubScene."
+            );
+            public static readonly string MultiSelectionWarning = L10n.Tr(
+                "Components that are only on some of the baked entities are not shown."
+            );
             public static readonly string WillBeBakedAtRuntime = L10n.Tr("This game object will be baked at runtime.");
-            public static readonly string PrimaryEntityDestroyed = L10n.Tr("The primary entity has been destroyed during baking.");
-            public static readonly string OneOrMorePrimaryEntitiesDestroyed = L10n.Tr("One or more primary entities have been destroyed during baking.");
-            public static readonly string TooManyAdditionalEntities = L10n.Tr("Too many additional entities to display.");
-            public static readonly string TooManyGameObjectsToPreview = L10n.Tr($"For performance reasons, baking preview is disabled when inspecting more than {k_MaxPreviewableGameObjectsCount} GameObjects.");
+            public static readonly string PrimaryEntityDestroyed = L10n.Tr(
+                "The primary entity has been destroyed during baking."
+            );
+            public static readonly string OneOrMorePrimaryEntitiesDestroyed = L10n.Tr(
+                "One or more primary entities have been destroyed during baking."
+            );
+            public static readonly string TooManyAdditionalEntities = L10n.Tr(
+                "Too many additional entities to display."
+            );
+            public static readonly string TooManyGameObjectsToPreview = L10n.Tr(
+                $"For performance reasons, baking preview is disabled when inspecting more than {k_MaxPreviewableGameObjectsCount} GameObjects."
+            );
         }
 
         static class Styles
         {
-            public static readonly GUIStyle EntityConversionWarningMessage = EditorStyleUSSBridge.FromUSS(".EntityConversionWarningMessage");
-            public static readonly GUIStyle EntityConversionCommonComponentMessage = EditorStyleUSSBridge.FromUSS(".EntityConversionCommonComponentMessage");
-            public static readonly GUIStyle EntityConversionComponentTag = EditorStyleUSSBridge.FromUSS(".EntityConversionComponentTag");
+            public static readonly GUIStyle EntityConversionWarningMessage = EditorStyleUSSBridge.FromUSS(
+                ".EntityConversionWarningMessage"
+            );
+            public static readonly GUIStyle EntityConversionCommonComponentMessage = EditorStyleUSSBridge.FromUSS(
+                ".EntityConversionCommonComponentMessage"
+            );
+            public static readonly GUIStyle EntityConversionComponentTag = EditorStyleUSSBridge.FromUSS(
+                ".EntityConversionComponentTag"
+            );
             public static readonly GUIStyle AdditionalEntityTag = EditorStyleUSSBridge.FromUSS(".AdditionalEntityTag");
-            public static readonly GUIStyle SelectedAdditionalEntityTag = EditorStyleUSSBridge.FromUSS(".SelectedAdditionalEntityTag");
-            public static readonly GUIStyle AdditionalEntityIconTag = EditorStyleUSSBridge.FromUSS(".AdditionalEntityIconTag");
-            public static readonly GUIStyle EntityConversionComponentArea = EditorStyleUSSBridge.FromUSS(".EntityConversionComponentArea");
-            public static readonly GUIStyle AdditionalEntityToggle = EditorStyleUSSBridge.FromUSS(".AdditionalEntityToggle");
+            public static readonly GUIStyle SelectedAdditionalEntityTag = EditorStyleUSSBridge.FromUSS(
+                ".SelectedAdditionalEntityTag"
+            );
+            public static readonly GUIStyle AdditionalEntityIconTag = EditorStyleUSSBridge.FromUSS(
+                ".AdditionalEntityIconTag"
+            );
+            public static readonly GUIStyle EntityConversionComponentArea = EditorStyleUSSBridge.FromUSS(
+                ".EntityConversionComponentArea"
+            );
+            public static readonly GUIStyle AdditionalEntityToggle = EditorStyleUSSBridge.FromUSS(
+                ".AdditionalEntityToggle"
+            );
         }
 
         /// <summary>
@@ -185,7 +213,10 @@ namespace Unity.Entities.Editor
                 return null;
             }
 
-            state.SelectedWorldIndex = state.SelectedWorldIndex >= 0 && state.SelectedWorldIndex < Worlds.FilteredWorlds.Count ? state.SelectedWorldIndex : 0;
+            state.SelectedWorldIndex =
+                state.SelectedWorldIndex >= 0 && state.SelectedWorldIndex < Worlds.FilteredWorlds.Count
+                    ? state.SelectedWorldIndex
+                    : 0;
             return Worlds.FilteredWorlds[state.SelectedWorldIndex];
         }
 
@@ -204,7 +235,8 @@ namespace Unity.Entities.Editor
             m_State = SessionState<State>.GetOrCreate($"{nameof(EntityBakingPreview)}.{nameof(State)}.{entityId}");
             m_SharedState = SessionState<SharedState>.GetOrCreate(k_SharedStateKey);
             m_RuntimeComponentsDrawer = new RuntimeComponentsDrawer();
-            m_RuntimeComponentsDrawer.OnDeselectComponent += typeIndex => m_State.SelectedComponentTypes.Remove(typeIndex);
+            m_RuntimeComponentsDrawer.OnDeselectComponent += typeIndex =>
+                m_State.SelectedComponentTypes.Remove(typeIndex);
             m_ChangeTracker = new GameObjectBakingChangeTracker();
             m_Targets = new Object[] { mainTarget };
             m_LastSelectedComponentIdx = -1;
@@ -233,7 +265,11 @@ namespace Unity.Entities.Editor
         /// </summary>
         public override void OnPreviewSettings()
         {
-            m_SharedState.SelectedWorldIndex = EditorGUILayout.Popup(GUIContent.none, m_SharedState.SelectedWorldIndex, Worlds.FilteredWorldNames);
+            m_SharedState.SelectedWorldIndex = EditorGUILayout.Popup(
+                GUIContent.none,
+                m_SharedState.SelectedWorldIndex,
+                Worlds.FilteredWorldNames
+            );
         }
 
         /// <summary>
@@ -260,29 +296,44 @@ namespace Unity.Entities.Editor
             {
                 if (m_GameObjectTargets.Count > k_MaxPreviewableGameObjectsCount)
                 {
-                    GUILayout.Label(EditorGUIUtilityBridge.TempContent(Strings.TooManyGameObjectsToPreview), Styles.EntityConversionWarningMessage);
+                    GUILayout.Label(
+                        EditorGUIUtilityBridge.TempContent(Strings.TooManyGameObjectsToPreview),
+                        Styles.EntityConversionWarningMessage
+                    );
                     return;
                 }
 
                 if (!LiveConversionConfigHelper.LiveConversionEnabledInEditMode)
                 {
-                    GUILayout.Label(EditorGUIUtilityBridge.TempContent(Strings.LiveConversionDisabled), Styles.EntityConversionWarningMessage);
+                    GUILayout.Label(
+                        EditorGUIUtilityBridge.TempContent(Strings.LiveConversionDisabled),
+                        Styles.EntityConversionWarningMessage
+                    );
                     return;
                 }
 
                 if (firstLayout)
-                    EntityBakingEditorUtility.GetBakingData(m_GameObjectTargets, GetCurrentlySelectedWorld(), m_CachedBakingData);
+                    EntityBakingEditorUtility.GetBakingData(
+                        m_GameObjectTargets,
+                        GetCurrentlySelectedWorld(),
+                        m_CachedBakingData
+                    );
 
                 if (m_GameObjectTargets.Count != m_CachedBakingData.Count)
                 {
-
-                    GUILayout.Label(EditorGUIUtilityBridge.TempContent(Strings.PreviewForUnbakedGameObjects), Styles.EntityConversionWarningMessage);
+                    GUILayout.Label(
+                        EditorGUIUtilityBridge.TempContent(Strings.PreviewForUnbakedGameObjects),
+                        Styles.EntityConversionWarningMessage
+                    );
                     return;
                 }
 
                 if (!ValidateGameObjectBakingData(m_CachedBakingData, out var errorMessage))
                 {
-                    GUILayout.Label(EditorGUIUtilityBridge.TempContent(errorMessage), Styles.EntityConversionWarningMessage);
+                    GUILayout.Label(
+                        EditorGUIUtilityBridge.TempContent(errorMessage),
+                        Styles.EntityConversionWarningMessage
+                    );
                     return;
                 }
 
@@ -300,13 +351,14 @@ namespace Unity.Entities.Editor
 
                 if (hasAdditionalEntities)
                 {
-                    m_State.ShowAdditionalEntities = EditorGUILayout.Foldout(m_State.ShowAdditionalEntities,
-                        EditorGUIUtilityBridge.TempContent($"{entityName} + {additionalEntitiesCount} {(additionalEntitiesCount > 1 ? Strings.Entities : Strings.Entity)}", EditorIcons.Entity),
-                        new GUIStyle(EditorStyles.foldout)
-                        {
-                            fixedWidth = 650.0f,
-                            fontStyle = FontStyle.Bold
-                        });
+                    m_State.ShowAdditionalEntities = EditorGUILayout.Foldout(
+                        m_State.ShowAdditionalEntities,
+                        EditorGUIUtilityBridge.TempContent(
+                            $"{entityName} + {additionalEntitiesCount} {(additionalEntitiesCount > 1 ? Strings.Entities : Strings.Entity)}",
+                            EditorIcons.Entity
+                        ),
+                        new GUIStyle(EditorStyles.foldout) { fixedWidth = 650.0f, fontStyle = FontStyle.Bold }
+                    );
 
                     GUILayout.Space(4);
 
@@ -314,16 +366,26 @@ namespace Unity.Entities.Editor
                     {
                         if (additionalEntitiesCount > k_MaxAdditionalEntitiesDisplay)
                         {
-                            var labelRect = GUILayoutUtility.GetRect(EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+                            var labelRect = GUILayoutUtility.GetRect(
+                                EditorGUIUtility.labelWidth,
+                                EditorGUIUtility.singleLineHeight
+                            );
                             labelRect.xMin += (EditorGUI.indentLevel + 1) * 15; // 15 = EditorGUI.kIndentPerLevel (private const)
                             GUI.Label(labelRect, EditorGUIUtilityBridge.TempContent(Strings.TooManyAdditionalEntities));
                         }
                         else
                         {
-                            using var scroll = new EditorGUILayout.ScrollViewScope(m_ScrollHeaderPosition, GUILayout.ExpandWidth(true), GUILayout.Height(56));
+                            using var scroll = new EditorGUILayout.ScrollViewScope(
+                                m_ScrollHeaderPosition,
+                                GUILayout.ExpandWidth(true),
+                                GUILayout.Height(56)
+                            );
                             m_ScrollHeaderPosition = scroll.scrollPosition;
 
-                            var additionalEntityLabel = GUILayoutUtility.GetRect(0, EditorGUIUtility.singleLineHeight + 3f);
+                            var additionalEntityLabel = GUILayoutUtility.GetRect(
+                                0,
+                                EditorGUIUtility.singleLineHeight + 3f
+                            );
                             additionalEntityLabel.height -= 3.0f;
                             additionalEntityLabel.x = 4.0f;
 
@@ -331,7 +393,14 @@ namespace Unity.Entities.Editor
                             {
                                 var entity = primary.AdditionalEntities[i];
 
-                                if (ShowAdditionalEntityToggle(ref additionalEntityLabel, i == m_State.AdditionalEntityIndex, primary.EntityManager, entity))
+                                if (
+                                    ShowAdditionalEntityToggle(
+                                        ref additionalEntityLabel,
+                                        i == m_State.AdditionalEntityIndex,
+                                        primary.EntityManager,
+                                        entity
+                                    )
+                                )
                                 {
                                     m_State.AdditionalEntityIndex = i;
                                 }
@@ -347,7 +416,10 @@ namespace Unity.Entities.Editor
                 }
                 else
                 {
-                    EditorGUILayout.LabelField(EditorGUIUtilityBridge.TempContent(entityName, EditorIcons.Entity), EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField(
+                        EditorGUIUtilityBridge.TempContent(entityName, EditorIcons.Entity),
+                        EditorStyles.boldLabel
+                    );
                     GUILayout.Space(4);
                 }
 
@@ -379,7 +451,11 @@ namespace Unity.Entities.Editor
                     m_RuntimeComponentsDrawer.SetTargets(m_InspectorTargets);
                     m_RuntimeComponentsDrawer.SetComponentTypes(m_State.SelectedComponentTypes);
 
-                    if (m_State.SelectedComponentTypes.Count > 0 && m_CommonComponentTypes.Count(type => m_State.SelectedComponentTypes.Contains(type.TypeIndex)) > 0)
+                    if (
+                        m_State.SelectedComponentTypes.Count > 0
+                        && m_CommonComponentTypes.Count(type => m_State.SelectedComponentTypes.Contains(type.TypeIndex))
+                            > 0
+                    )
                     {
                         using (new WideModeScope(338))
                         {
@@ -391,13 +467,22 @@ namespace Unity.Entities.Editor
 
                     if (!isSingleSelection)
                     {
-                        GUILayout.Label(EditorGUIUtilityBridge.TempContent(Strings.MultiSelectionWarning), Styles.EntityConversionCommonComponentMessage);
+                        GUILayout.Label(
+                            EditorGUIUtilityBridge.TempContent(Strings.MultiSelectionWarning),
+                            Styles.EntityConversionCommonComponentMessage
+                        );
                     }
                 }
             }
         }
 
-        void HandleComponentSelection(List<ComponentType> componentTypes, ComponentType componentType, int indexInOrderedComponentList, bool isSelected, bool isSelectedInUi)
+        void HandleComponentSelection(
+            List<ComponentType> componentTypes,
+            ComponentType componentType,
+            int indexInOrderedComponentList,
+            bool isSelected,
+            bool isSelectedInUi
+        )
         {
             var isMultiSelectionEnabled = EditorGUI.actionKey;
             var isWideSelectionEnabled = Event.current.shift;
@@ -425,7 +510,11 @@ namespace Unity.Entities.Editor
                 if (!isMultiSelectionEnabled)
                     m_State.SelectedComponentTypes.Clear();
 
-                if (isWideSelectionEnabled && m_LastSelectedComponentIdx != -1 && m_LastSelectedComponentIdx != indexInOrderedComponentList)
+                if (
+                    isWideSelectionEnabled
+                    && m_LastSelectedComponentIdx != -1
+                    && m_LastSelectedComponentIdx != indexInOrderedComponentList
+                )
                 {
                     SelectRange(componentTypes, m_LastSelectedComponentIdx, indexInOrderedComponentList);
                 }
@@ -460,7 +549,14 @@ namespace Unity.Entities.Editor
                 return;
             }
 
-            if (isSelected && m_ChangeTracker.DidChange(GetCurrentlySelectedWorld(), m_GameObjectTargets, m_State.SelectedComponentTypes))
+            if (
+                isSelected
+                && m_ChangeTracker.DidChange(
+                    GetCurrentlySelectedWorld(),
+                    m_GameObjectTargets,
+                    m_State.SelectedComponentTypes
+                )
+            )
                 inspector.Repaint();
         }
 
@@ -479,9 +575,10 @@ namespace Unity.Entities.Editor
 
                 if (!entityManager.SafeExists(primaryEntity))
                 {
-                    message = bakingDataEntries.Count == 0
-                        ? Strings.PrimaryEntityDestroyed
-                        : Strings.OneOrMorePrimaryEntitiesDestroyed;
+                    message =
+                        bakingDataEntries.Count == 0
+                            ? Strings.PrimaryEntityDestroyed
+                            : Strings.OneOrMorePrimaryEntitiesDestroyed;
 
                     return false;
                 }
@@ -497,7 +594,11 @@ namespace Unity.Entities.Editor
         /// <param name="bakingDataEntries">The set of currently selected objects.</param>
         /// <param name="state">The current <see cref="EntityBakingPreview"/> state.</param>
         /// <param name="result">The <see cref="EntityContainer"/> instances which should be inspected.</param>
-        static void GetInspectorTargets(IReadOnlyList<EntityBakingData> bakingDataEntries, State state, List<EntityContainer> result)
+        static void GetInspectorTargets(
+            IReadOnlyList<EntityBakingData> bakingDataEntries,
+            State state,
+            List<EntityContainer> result
+        )
         {
             result.Clear();
             var root = bakingDataEntries[0];
@@ -505,7 +606,9 @@ namespace Unity.Entities.Editor
             // @TODO (UX) Figure out how we want to show additional entities during multi-selection.
             if (bakingDataEntries.Count == 1 && state.ShowAdditionalEntities && state.AdditionalEntityIndex != -1)
             {
-                result.Add(new EntityContainer(root.EntityManager, root.AdditionalEntities[state.AdditionalEntityIndex]));
+                result.Add(
+                    new EntityContainer(root.EntityManager, root.AdditionalEntities[state.AdditionalEntityIndex])
+                );
                 return;
             }
 
@@ -556,7 +659,12 @@ namespace Unity.Entities.Editor
             }
         }
 
-        static bool ShowAdditionalEntityToggle(ref Rect labelRect, bool isSelected, EntityManager entityManager, Entity entity)
+        static bool ShowAdditionalEntityToggle(
+            ref Rect labelRect,
+            bool isSelected,
+            EntityManager entityManager,
+            Entity entity
+        )
         {
             const int kIconWidth = 20;
             var name = entityManager.GetName(entity);
@@ -628,7 +736,11 @@ namespace Unity.Entities.Editor
             ArchetypeChunk m_LastChunk;
             uint m_LastGlobalSystemVersion;
 
-            public bool DidChange(World world, IEnumerable<GameObject> targets, IEnumerable<TypeIndex> selectedComponentTypes)
+            public bool DidChange(
+                World world,
+                IEnumerable<GameObject> targets,
+                IEnumerable<TypeIndex> selectedComponentTypes
+            )
             {
                 if (null == world)
                     return false;
@@ -638,7 +750,11 @@ namespace Unity.Entities.Editor
                 return result;
             }
 
-            unsafe bool DidChangeInternal(World world, IEnumerable<GameObject> targets, IEnumerable<TypeIndex> selectedComponentTypes)
+            unsafe bool DidChangeInternal(
+                World world,
+                IEnumerable<GameObject> targets,
+                IEnumerable<TypeIndex> selectedComponentTypes
+            )
             {
                 if (world != m_LastWorld)
                 {
@@ -656,7 +772,6 @@ namespace Unity.Entities.Editor
 
                     m_LastChunk = world.EntityManager.GetChunk(m_LastBakingData.PrimaryEntity);
                     return true;
-
                 }
 
                 var chunk = world.EntityManager.GetChunk(m_LastBakingData.PrimaryEntity);
@@ -674,7 +789,10 @@ namespace Unity.Entities.Editor
                     var typeIndexInArchetype = ChunkDataUtility.GetIndexInTypeArray(archetype, typeIndex);
                     if (typeIndexInArchetype == -1)
                         continue;
-                    var typeChangeVersion = archetype->Chunks.GetChangeVersion(typeIndexInArchetype, m_LastChunk.m_Chunk.ListIndex);
+                    var typeChangeVersion = archetype->Chunks.GetChangeVersion(
+                        typeIndexInArchetype,
+                        m_LastChunk.m_Chunk.ListIndex
+                    );
 
                     if (ChangeVersionUtility.DidChange(typeChangeVersion, m_LastGlobalSystemVersion))
                     {

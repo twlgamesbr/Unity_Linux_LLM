@@ -20,7 +20,8 @@ namespace FlyingWormConsole3.LiteNetLib
                 [In] int len,
                 [In] SocketFlags socketFlags,
                 [Out] byte[] socketAddress,
-                [In, Out] ref int socketAddressSize);
+                [In, Out] ref int socketAddressSize
+            );
 
             [DllImport(LibName, SetLastError = true)]
             internal static extern int sendto(
@@ -29,7 +30,8 @@ namespace FlyingWormConsole3.LiteNetLib
                 [In] int len,
                 [In] SocketFlags socketFlags,
                 [In] byte[] socketAddress,
-                [In] int socketAddressSize);
+                [In] int socketAddressSize
+            );
         }
 
         static unsafe class UnixSock
@@ -43,7 +45,8 @@ namespace FlyingWormConsole3.LiteNetLib
                 [In] int len,
                 [In] SocketFlags socketFlags,
                 [Out] byte[] socketAddress,
-                [In, Out] ref int socketAddressSize);
+                [In, Out] ref int socketAddressSize
+            );
 
             [DllImport(LibName, SetLastError = true)]
             internal static extern int sendto(
@@ -52,7 +55,8 @@ namespace FlyingWormConsole3.LiteNetLib
                 [In] int len,
                 [In] SocketFlags socketFlags,
                 [In] byte[] socketAddress,
-                [In] int socketAddressSize);
+                [In] int socketAddressSize
+            );
         }
 
         public static readonly bool IsSupported = false;
@@ -65,48 +69,48 @@ namespace FlyingWormConsole3.LiteNetLib
 
         private static readonly Dictionary<int, SocketError> NativeErrorToSocketError = new Dictionary<int, SocketError>
         {
-            { 13, SocketError.AccessDenied },               //EACCES
-            { 98, SocketError.AddressAlreadyInUse },        //EADDRINUSE
-            { 99, SocketError.AddressNotAvailable },        //EADDRNOTAVAIL
-            { 97, SocketError.AddressFamilyNotSupported },  //EAFNOSUPPORT
-            { 11, SocketError.WouldBlock },                 //EAGAIN
-            { 114, SocketError.AlreadyInProgress },         //EALREADY
-            { 9, SocketError.OperationAborted },            //EBADF
-            { 125, SocketError.OperationAborted },          //ECANCELED
-            { 103, SocketError.ConnectionAborted },         //ECONNABORTED
-            { 111, SocketError.ConnectionRefused },         //ECONNREFUSED
-            { 104, SocketError.ConnectionReset },           //ECONNRESET
+            { 13, SocketError.AccessDenied }, //EACCES
+            { 98, SocketError.AddressAlreadyInUse }, //EADDRINUSE
+            { 99, SocketError.AddressNotAvailable }, //EADDRNOTAVAIL
+            { 97, SocketError.AddressFamilyNotSupported }, //EAFNOSUPPORT
+            { 11, SocketError.WouldBlock }, //EAGAIN
+            { 114, SocketError.AlreadyInProgress }, //EALREADY
+            { 9, SocketError.OperationAborted }, //EBADF
+            { 125, SocketError.OperationAborted }, //ECANCELED
+            { 103, SocketError.ConnectionAborted }, //ECONNABORTED
+            { 111, SocketError.ConnectionRefused }, //ECONNREFUSED
+            { 104, SocketError.ConnectionReset }, //ECONNRESET
             { 89, SocketError.DestinationAddressRequired }, //EDESTADDRREQ
-            { 14, SocketError.Fault },                      //EFAULT
-            { 112, SocketError.HostDown },                  //EHOSTDOWN
-            { 6, SocketError.HostNotFound },                //ENXIO
-            { 113, SocketError.HostUnreachable },           //EHOSTUNREACH
-            { 115, SocketError.InProgress },                //EINPROGRESS
-            { 4, SocketError.Interrupted },                 //EINTR
-            { 22, SocketError.InvalidArgument },            //EINVAL
-            { 106, SocketError.IsConnected },               //EISCONN
-            { 24, SocketError.TooManyOpenSockets },         //EMFILE
-            { 90, SocketError.MessageSize },                //EMSGSIZE
-            { 100, SocketError.NetworkDown },               //ENETDOWN
-            { 102, SocketError.NetworkReset },              //ENETRESET
-            { 101, SocketError.NetworkUnreachable },        //ENETUNREACH
-            { 23, SocketError.TooManyOpenSockets },         //ENFILE
-            { 105, SocketError.NoBufferSpaceAvailable },    //ENOBUFS
-            { 61, SocketError.NoData },                     //ENODATA
-            { 2, SocketError.AddressNotAvailable },         //ENOENT
-            { 92, SocketError.ProtocolOption },             //ENOPROTOOPT
-            { 107, SocketError.NotConnected },              //ENOTCONN
-            { 88, SocketError.NotSocket },                  //ENOTSOCK
-            { 3440, SocketError.OperationNotSupported },    //ENOTSUP
-            { 1, SocketError.AccessDenied },                //EPERM
-            { 32, SocketError.Shutdown },                   //EPIPE
+            { 14, SocketError.Fault }, //EFAULT
+            { 112, SocketError.HostDown }, //EHOSTDOWN
+            { 6, SocketError.HostNotFound }, //ENXIO
+            { 113, SocketError.HostUnreachable }, //EHOSTUNREACH
+            { 115, SocketError.InProgress }, //EINPROGRESS
+            { 4, SocketError.Interrupted }, //EINTR
+            { 22, SocketError.InvalidArgument }, //EINVAL
+            { 106, SocketError.IsConnected }, //EISCONN
+            { 24, SocketError.TooManyOpenSockets }, //EMFILE
+            { 90, SocketError.MessageSize }, //EMSGSIZE
+            { 100, SocketError.NetworkDown }, //ENETDOWN
+            { 102, SocketError.NetworkReset }, //ENETRESET
+            { 101, SocketError.NetworkUnreachable }, //ENETUNREACH
+            { 23, SocketError.TooManyOpenSockets }, //ENFILE
+            { 105, SocketError.NoBufferSpaceAvailable }, //ENOBUFS
+            { 61, SocketError.NoData }, //ENODATA
+            { 2, SocketError.AddressNotAvailable }, //ENOENT
+            { 92, SocketError.ProtocolOption }, //ENOPROTOOPT
+            { 107, SocketError.NotConnected }, //ENOTCONN
+            { 88, SocketError.NotSocket }, //ENOTSOCK
+            { 3440, SocketError.OperationNotSupported }, //ENOTSUP
+            { 1, SocketError.AccessDenied }, //EPERM
+            { 32, SocketError.Shutdown }, //EPIPE
             { 96, SocketError.ProtocolFamilyNotSupported }, //EPFNOSUPPORT
-            { 93, SocketError.ProtocolNotSupported },       //EPROTONOSUPPORT
-            { 91, SocketError.ProtocolType },               //EPROTOTYPE
-            { 94, SocketError.SocketNotSupported },         //ESOCKTNOSUPPORT
-            { 108, SocketError.Disconnecting },             //ESHUTDOWN
-            { 110, SocketError.TimedOut },                  //ETIMEDOUT
-            { 0, SocketError.Success }
+            { 93, SocketError.ProtocolNotSupported }, //EPROTONOSUPPORT
+            { 91, SocketError.ProtocolType }, //EPROTOTYPE
+            { 94, SocketError.SocketNotSupported }, //ESOCKTNOSUPPORT
+            { 108, SocketError.Disconnecting }, //ESHUTDOWN
+            { 110, SocketError.TimedOut }, //ETIMEDOUT
+            { 0, SocketError.Success },
         };
 
         static NativeSocket()
@@ -128,7 +132,8 @@ namespace FlyingWormConsole3.LiteNetLib
             byte[] pinnedBuffer,
             int len,
             byte[] socketAddress,
-            ref int socketAddressSize)
+            ref int socketAddressSize
+        )
         {
             return UnixMode
                 ? UnixSock.recvfrom(socketHandle, pinnedBuffer, len, 0, socketAddress, ref socketAddressSize)
@@ -141,7 +146,8 @@ namespace FlyingWormConsole3.LiteNetLib
             byte* pinnedBuffer,
             int len,
             byte[] socketAddress,
-            int socketAddressSize)
+            int socketAddressSize
+        )
         {
             return UnixMode
                 ? UnixSock.sendto(socketHandle, pinnedBuffer, len, 0, socketAddress, socketAddressSize)
@@ -152,9 +158,7 @@ namespace FlyingWormConsole3.LiteNetLib
         {
             int error = Marshal.GetLastWin32Error();
             if (UnixMode)
-                return NativeErrorToSocketError.TryGetValue(error, out var err)
-                    ? err
-                    : SocketError.SocketError;
+                return NativeErrorToSocketError.TryGetValue(error, out var err) ? err : SocketError.SocketError;
             return (SocketError)error;
         }
 

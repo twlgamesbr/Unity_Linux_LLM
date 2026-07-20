@@ -38,7 +38,9 @@ namespace NPCSystem.Monitoring
 #else
         // No-ops on non-WebGL platforms (server, editor, standalone)
         private static void DDGrantTrackingConsent() { }
+
         private static void DDRevokeTrackingConsent() { }
+
         private static int DDGetTrackingConsent() => 0;
 #endif
 
@@ -49,8 +51,10 @@ namespace NPCSystem.Monitoring
         {
             /// <summary>No data collected. Default state until user grants consent.</summary>
             Pending = 0,
+
             /// <summary>User has granted consent. RUM data is collected and sent.</summary>
             Granted = 1,
+
             /// <summary>User has revoked consent. No data collected.</summary>
             NotGranted = 2,
         }
@@ -67,13 +71,15 @@ namespace NPCSystem.Monitoring
         public static void Grant()
         {
             DDGrantTrackingConsent();
-            NPCFlowLogger.FindOrCreate().Log(
-                NPCFlowStage.ConfigurationValidation,
-                NPCFlowStatus.Success,
-                NPCFlowLogLevel.Info,
-                "Datadog RUM tracking consent granted by user.",
-                source: nameof(DatadogConsent)
-            );
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "Datadog RUM tracking consent granted by user.",
+                    source: nameof(DatadogConsent)
+                );
         }
 
         /// <summary>
@@ -83,13 +89,15 @@ namespace NPCSystem.Monitoring
         public static void Revoke()
         {
             DDRevokeTrackingConsent();
-            NPCFlowLogger.FindOrCreate().Log(
-                NPCFlowStage.ConfigurationValidation,
-                NPCFlowStatus.Success,
-                NPCFlowLogLevel.Info,
-                "Datadog RUM tracking consent revoked by user.",
-                source: nameof(DatadogConsent)
-            );
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "Datadog RUM tracking consent revoked by user.",
+                    source: nameof(DatadogConsent)
+                );
         }
     }
 }

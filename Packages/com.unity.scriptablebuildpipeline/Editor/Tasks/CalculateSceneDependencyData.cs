@@ -15,7 +15,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class CalculateSceneDependencyData : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 7; } }
+        public int Version
+        {
+            get { return 7; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -70,7 +73,14 @@ namespace UnityEditor.Build.Pipeline.Tasks
 #endif
         }
 
-        CachedInfo GetCachedInfo(GUID scene, IEnumerable<ObjectIdentifier> references, SceneDependencyInfo sceneInfo, BuildUsageTagSet usageTags, IEnumerable<CacheEntry> prefabEntries, Hash128 prefabDependency)
+        CachedInfo GetCachedInfo(
+            GUID scene,
+            IEnumerable<ObjectIdentifier> references,
+            SceneDependencyInfo sceneInfo,
+            BuildUsageTagSet usageTags,
+            IEnumerable<CacheEntry> prefabEntries,
+            Hash128 prefabDependency
+        )
         {
             var info = new CachedInfo();
             info.Asset = GetCacheEntry(scene);
@@ -148,14 +158,31 @@ namespace UnityEditor.Build.Pipeline.Tasks
 #if NONRECURSIVE_DEPENDENCY_DATA
                                     if (m_Parameters.NonRecursiveDependencies)
                                     {
-                                        var sceneInfoNew = ContentBuildInterface.CalculatePlayerDependenciesForScene(scenePath, settings, usageTags, m_DependencyData.DependencyUsageCache, DependencyType.ValidReferences);
+                                        var sceneInfoNew = ContentBuildInterface.CalculatePlayerDependenciesForScene(
+                                            scenePath,
+                                            settings,
+                                            usageTags,
+                                            m_DependencyData.DependencyUsageCache,
+                                            DependencyType.ValidReferences
+                                        );
                                         filteredReferencesNew = sceneInfoNew.referencedObjects.ToArray();
-                                        filteredReferencesNew = ExtensionMethods.FilterReferencedObjectIDs(scene, filteredReferencesNew, m_Parameters.Target, m_Parameters.ScriptInfo, new HashSet<GUID>(m_Content.Assets));
+                                        filteredReferencesNew = ExtensionMethods.FilterReferencedObjectIDs(
+                                            scene,
+                                            filteredReferencesNew,
+                                            m_Parameters.Target,
+                                            m_Parameters.ScriptInfo,
+                                            new HashSet<GUID>(m_Content.Assets)
+                                        );
                                     }
                                     else
 #endif
                                     {
-                                        var sceneInfoNew = ContentBuildInterface.CalculatePlayerDependenciesForScene(scenePath, settings, usageTags, m_DependencyData.DependencyUsageCache);
+                                        var sceneInfoNew = ContentBuildInterface.CalculatePlayerDependenciesForScene(
+                                            scenePath,
+                                            settings,
+                                            usageTags,
+                                            m_DependencyData.DependencyUsageCache
+                                        );
                                         filteredReferencesNew = sceneInfoNew.referencedObjects.ToArray();
                                     }
 
@@ -168,7 +195,6 @@ namespace UnityEditor.Build.Pipeline.Tasks
                                     break;
                                 }
                             }
-
                         }
 
                         if (useCachedScene)
@@ -189,16 +215,38 @@ namespace UnityEditor.Build.Pipeline.Tasks
 #if NONRECURSIVE_DEPENDENCY_DATA
                         if (m_Parameters.NonRecursiveDependencies)
                         {
-                            sceneInfo = ContentBuildInterface.CalculatePlayerDependenciesForScene(scenePath, settings, usageTags, m_DependencyData.DependencyUsageCache, DependencyType.ValidReferences);
+                            sceneInfo = ContentBuildInterface.CalculatePlayerDependenciesForScene(
+                                scenePath,
+                                settings,
+                                usageTags,
+                                m_DependencyData.DependencyUsageCache,
+                                DependencyType.ValidReferences
+                            );
                             ObjectIdentifier[] filteredReferences = sceneInfo.referencedObjects.ToArray();
-                            filteredReferences = ExtensionMethods.FilterReferencedObjectIDs(scene, filteredReferences, m_Parameters.Target, m_Parameters.ScriptInfo, new HashSet<GUID>(m_Content.Assets));
-                            ContentBuildInterface.CalculateBuildUsageTags(filteredReferences, filteredReferences, sceneInfo.globalUsage, usageTags);
+                            filteredReferences = ExtensionMethods.FilterReferencedObjectIDs(
+                                scene,
+                                filteredReferences,
+                                m_Parameters.Target,
+                                m_Parameters.ScriptInfo,
+                                new HashSet<GUID>(m_Content.Assets)
+                            );
+                            ContentBuildInterface.CalculateBuildUsageTags(
+                                filteredReferences,
+                                filteredReferences,
+                                sceneInfo.globalUsage,
+                                usageTags
+                            );
                             sceneInfo.SetReferencedObjects(filteredReferences);
                         }
                         else
 #endif
                         {
-                            sceneInfo = ContentBuildInterface.CalculatePlayerDependenciesForScene(scenePath, settings, usageTags, m_DependencyData.DependencyUsageCache);
+                            sceneInfo = ContentBuildInterface.CalculatePlayerDependenciesForScene(
+                                scenePath,
+                                settings,
+                                usageTags,
+                                m_DependencyData.DependencyUsageCache
+                            );
                         }
                         if (uncachedInfo != null)
                         {
@@ -211,7 +259,14 @@ namespace UnityEditor.Build.Pipeline.Tasks
                                     prefabEntries.Add(GetCacheEntry(assetPath));
                             }
                             prefabDependency = HashingMethods.Calculate(prefabEntries).ToHash128();
-                            var cacheInfo = GetCachedInfo(scene, sceneInfo.referencedObjects, sceneInfo, usageTags, prefabEntries, prefabDependency);
+                            var cacheInfo = GetCachedInfo(
+                                scene,
+                                sceneInfo.referencedObjects,
+                                sceneInfo,
+                                usageTags,
+                                prefabEntries,
+                                prefabDependency
+                            );
                             uncachedInfo.Add(cacheInfo);
                             info.Add(cacheInfo);
                         }
@@ -227,7 +282,8 @@ namespace UnityEditor.Build.Pipeline.Tasks
             {
                 foreach (CachedInfo sceneFileInfo in info)
                 {
-                    Dictionary<ObjectIdentifier, System.Type[]> objectTypes = new Dictionary<ObjectIdentifier, System.Type[]>();
+                    Dictionary<ObjectIdentifier, System.Type[]> objectTypes =
+                        new Dictionary<ObjectIdentifier, System.Type[]>();
                     List<ObjectTypes> types = sceneFileInfo.Data[3] as List<ObjectTypes>;
 
                     foreach (var objectType in types)
@@ -242,10 +298,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
                         Hash = sceneFileInfo.Asset.Hash,
                         IncludedObjects = new List<ObjectIdentifier>(),
                         ReferencedObjects = null,
-                        ObjectTypes = objectTypes
+                        ObjectTypes = objectTypes,
                     };
 
-                    if(!m_Results.AssetResults.ContainsKey(resultData.Guid))
+                    if (!m_Results.AssetResults.ContainsKey(resultData.Guid))
                         m_Results.AssetResults.Add(resultData.Guid, resultData);
                 }
             }
@@ -253,7 +309,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return ReturnCode.Success;
         }
 
-        void SetOutputInformation(GUID asset, SceneDependencyInfo sceneInfo, BuildUsageTagSet usageTags, Hash128 prefabDependency)
+        void SetOutputInformation(
+            GUID asset,
+            SceneDependencyInfo sceneInfo,
+            BuildUsageTagSet usageTags,
+            Hash128 prefabDependency
+        )
         {
             // Add generated scene information to BuildDependencyData
             m_DependencyData.SceneInfo.Add(asset, sceneInfo);

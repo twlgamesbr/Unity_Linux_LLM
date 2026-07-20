@@ -29,9 +29,7 @@ namespace NPCSystem.Monitoring.Datadog
 
         public DatadogTelemetrySink(string metricPrefix = "npc")
         {
-            _metricPrefix = string.IsNullOrWhiteSpace(metricPrefix)
-                ? "npc"
-                : metricPrefix.Trim().TrimEnd('.');
+            _metricPrefix = string.IsNullOrWhiteSpace(metricPrefix) ? "npc" : metricPrefix.Trim().TrimEnd('.');
         }
 
         public void Emit(in TelemetryEvent evt)
@@ -41,9 +39,7 @@ namespace NPCSystem.Monitoring.Datadog
             if (evt.Status == "start")
                 return;
 
-            string metricName = $"{_metricPrefix}.{evt.Category}.{evt.Source}"
-                .ToLowerInvariant()
-                .Replace(' ', '_');
+            string metricName = $"{_metricPrefix}.{evt.Category}.{evt.Source}".ToLowerInvariant().Replace(' ', '_');
 
             var tags = new List<string> { $"category:{evt.Category}", $"source:{evt.Source}" };
 
@@ -52,12 +48,7 @@ namespace NPCSystem.Monitoring.Datadog
 
             if (evt.DurationMs > 0)
                 // Timed event → histogram
-                DatadogMetricsService.Timer(
-                    metricName,
-                    (double)evt.DurationMs,
-                    1.0,
-                    tags.ToArray()
-                );
+                DatadogMetricsService.Timer(metricName, (double)evt.DurationMs, 1.0, tags.ToArray());
             else
                 // Point event → counter
                 DatadogMetricsService.Increment(metricName, 1.0, 1.0, tags.ToArray());

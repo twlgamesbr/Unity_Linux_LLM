@@ -45,9 +45,9 @@ namespace UnityEngine.InputSystem
     /// </remarks>
     /// <typeparam name="TControl">Type of <see cref="InputControl"/> to store in the list.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
-    #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     [DebuggerTypeProxy(typeof(InputControlListDebugView<>))]
-    #endif
+#endif
     public unsafe struct InputControlList<TControl> : IList<TControl>, IReadOnlyList<TControl>, IDisposable
         where TControl : InputControl
     {
@@ -122,7 +122,9 @@ namespace UnityEngine.InputSystem
             {
                 if (index < 0 || index >= m_Count)
                     throw new ArgumentOutOfRangeException(
-                        nameof(index), $"Index {index} is out of range in list with {m_Count} entries");
+                        nameof(index),
+                        $"Index {index} is out of range in list with {m_Count} entries"
+                    );
 
                 return FromIndex(m_Indices[index]);
             }
@@ -130,7 +132,9 @@ namespace UnityEngine.InputSystem
             {
                 if (index < 0 || index >= m_Count)
                     throw new ArgumentOutOfRangeException(
-                        nameof(index), $"Index {index} is out of range in list with {m_Count} entries");
+                        nameof(index),
+                        $"Index {index} is out of range in list with {m_Count} entries"
+                    );
 
                 m_Indices[index] = ToIndex(value);
             }
@@ -216,7 +220,11 @@ namespace UnityEngine.InputSystem
 
             // Initialize newly added entries (if any) such that they produce NULL entries.
             if (size > Count)
-                UnsafeUtility.MemSet((byte*)m_Indices.GetUnsafePtr() + Count * sizeof(ulong), Byte.MaxValue, size - Count);
+                UnsafeUtility.MemSet(
+                    (byte*)m_Indices.GetUnsafePtr() + Count * sizeof(ulong),
+                    Byte.MaxValue,
+                    size - Count
+                );
 
             m_Count = size;
         }
@@ -266,15 +274,22 @@ namespace UnityEngine.InputSystem
             if (count == 0)
                 return;
             if (sourceIndex + count > list.Count)
-                throw new ArgumentOutOfRangeException(nameof(count),
-                    $"Count of {count} elements starting at index {sourceIndex} exceeds length of list of {list.Count}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(count),
+                    $"Count of {count} elements starting at index {sourceIndex} exceeds length of list of {list.Count}"
+                );
 
             // Make space in the list.
             if (Capacity < m_Count + count)
                 Capacity = Math.Max(m_Count + count, 10);
             if (destinationIndex < Count)
-                NativeArray<ulong>.Copy(m_Indices, destinationIndex, m_Indices, destinationIndex + count,
-                    Count - destinationIndex);
+                NativeArray<ulong>.Copy(
+                    m_Indices,
+                    destinationIndex,
+                    m_Indices,
+                    destinationIndex + count,
+                    Count - destinationIndex
+                );
 
             // Add elements.
             for (var i = 0; i < count; ++i)
@@ -312,8 +327,13 @@ namespace UnityEngine.InputSystem
             if (Capacity < m_Count + count)
                 Capacity = Math.Max(m_Count + count, 10);
             if (destinationIndex < Count)
-                NativeArray<ulong>.Copy(m_Indices, destinationIndex, m_Indices, destinationIndex + count,
-                    Count - destinationIndex);
+                NativeArray<ulong>.Copy(
+                    m_Indices,
+                    destinationIndex,
+                    m_Indices,
+                    destinationIndex + count,
+                    Count - destinationIndex
+                );
 
             // Add elements.
             foreach (var element in list)
@@ -360,7 +380,9 @@ namespace UnityEngine.InputSystem
         {
             if (index < 0 || index >= m_Count)
                 throw new ArgumentOutOfRangeException(
-                    nameof(index), $"Index {index} is out of range in list with {m_Count} elements");
+                    nameof(index),
+                    $"Index {index} is out of range in list with {m_Count} elements"
+                );
 
             ArrayHelpers.EraseAtWithCapacity(m_Indices, ref m_Count, index);
         }
@@ -440,8 +462,8 @@ namespace UnityEngine.InputSystem
 
             // Simple insertion sort.
             for (var i = 1; i < count; ++i)
-                for (var j = i; j > 0 && comparer.Compare(this[j - 1], this[j]) < 0; --j)
-                    SwapElements(j, j - 1);
+            for (var j = i; j > 0 && comparer.Compare(this[j - 1], this[j]) < 0; --j)
+                SwapElements(j, j - 1);
         }
 
         /// <summary>
@@ -591,13 +613,11 @@ namespace UnityEngine.InputSystem
 
             object IEnumerator.Current => Current;
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
     }
 
-    #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     internal struct InputControlListDebugView<TControl>
         where TControl : InputControl
     {
@@ -610,5 +630,5 @@ namespace UnityEngine.InputSystem
 
         public TControl[] controls => m_Controls;
     }
-    #endif
+#endif
 }

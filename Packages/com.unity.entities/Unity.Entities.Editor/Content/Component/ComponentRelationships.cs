@@ -77,7 +77,9 @@ namespace Unity.Entities.Editor
                     if (world == null || !world.IsCreated)
                         continue;
 
-                    var worldSectionView = new ComponentRelationshipWorldView(new ComponentRelationshipWorldViewData(world, Target.ComponentType));
+                    var worldSectionView = new ComponentRelationshipWorldView(
+                        new ComponentRelationshipWorldViewData(world, Target.ComponentType)
+                    );
                     m_WorldSections.Add(worldSectionView);
                     m_Root.Add(worldSectionView);
                 }

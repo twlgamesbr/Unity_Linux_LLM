@@ -39,7 +39,11 @@ namespace UnityEditor.Rendering.Converter
             }
         }
 
-        public RenderPipelineConverterMaterialUpgraderItem(string shaderPath, string materialPath, List<string> variantsPaths)
+        public RenderPipelineConverterMaterialUpgraderItem(
+            string shaderPath,
+            string materialPath,
+            List<string> variantsPaths
+        )
         {
             if (string.IsNullOrEmpty(materialPath))
                 throw new ArgumentException(nameof(materialPath));
@@ -119,13 +123,17 @@ namespace UnityEditor.Rendering.Converter
                             variantsPaths.Add(AssetDatabase.GetAssetPath(variant));
                         }
 
-                        assets.Add(new RenderPipelineConverterMaterialUpgraderItem(kvp.Key,
-                            AssetDatabase.GetAssetPath(parent),
-                            variantsPaths));
+                        assets.Add(
+                            new RenderPipelineConverterMaterialUpgraderItem(
+                                kvp.Key,
+                                AssetDatabase.GetAssetPath(parent),
+                                variantsPaths
+                            )
+                        );
                     }
                 }
                 onScanFinish?.Invoke(assets);
-            } 
+            }
         }
 
         public Status Convert(IRenderPipelineConverterItem item, out string message)

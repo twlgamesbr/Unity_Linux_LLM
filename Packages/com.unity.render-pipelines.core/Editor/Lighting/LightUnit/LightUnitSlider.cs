@@ -29,8 +29,10 @@ namespace UnityEditor.Rendering
         {
             /// <summary> A <see cref="GUIStyle"/> with "IconButton" </summary>
             public static GUIStyle k_IconButton = new GUIStyle("IconButton");
+
             /// <summary> A <see cref="GUIStyle"/> with "ColorPickerSliderBackground" </summary>
             public static GUIStyle k_TemperatureBorder = new GUIStyle("ColorPickerSliderBackground");
+
             /// <summary> A <see cref="GUIStyle"/> with "ColorPickerHorizThumb" </summary>
             public static GUIStyle k_TemperatureThumb = new GUIStyle("ColorPickerHorizThumb");
         }
@@ -106,8 +108,10 @@ namespace UnityEditor.Rendering
                 }
             }
 
-            var cautionValue = value < m_Descriptor.sliderRange.x ? m_Descriptor.sliderRange.x : m_Descriptor.sliderRange.y;
-            var cautionTooltip = value < m_Descriptor.sliderRange.x ? m_Descriptor.belowRangeTooltip : m_Descriptor.aboveRangeTooltip;
+            var cautionValue =
+                value < m_Descriptor.sliderRange.x ? m_Descriptor.sliderRange.x : m_Descriptor.sliderRange.y;
+            var cautionTooltip =
+                value < m_Descriptor.sliderRange.x ? m_Descriptor.belowRangeTooltip : m_Descriptor.aboveRangeTooltip;
             return LightUnitSliderUIRange.CautionRange(cautionTooltip, cautionValue);
         }
 
@@ -121,13 +125,14 @@ namespace UnityEditor.Rendering
             iconRect.width = EditorGUIUtility.singleLineHeight;
         }
 
-        void ClampValue(ref float value, Vector2 range) =>
-            value = Mathf.Clamp(value, range.x, range.y);
+        void ClampValue(ref float value, Vector2 range) => value = Mathf.Clamp(value, range.x, range.y);
 
-        internal float ClampValue(float value) => Mathf.Clamp(value, m_Descriptor.sliderRange.x, m_Descriptor.sliderRange.y);
+        internal float ClampValue(float value) =>
+            Mathf.Clamp(value, m_Descriptor.sliderRange.x, m_Descriptor.sliderRange.y);
 
         private static Color k_DarkThemeColor = new Color32(153, 153, 153, 255);
         private static Color k_LiteThemeColor = new Color32(97, 97, 97, 255);
+
         static Color GetMarkerColor() => EditorGUIUtility.isProSkin ? k_DarkThemeColor : k_LiteThemeColor;
 
         void DoSliderMarker(Rect rect, float position, float value, string tooltip)
@@ -206,7 +211,11 @@ namespace UnityEditor.Rendering
                 // Indicate a checkmark if the value is within this preset range.
                 var isInPreset = CurrentRange(floatValue).value == preset.value;
 
-                menu.AddItem(EditorGUIUtility.TrTextContent(preset.content.tooltip), isInPreset, () => SetValueToPreset(value, preset));
+                menu.AddItem(
+                    EditorGUIUtility.TrTextContent(preset.content.tooltip),
+                    isInPreset,
+                    () => SetValueToPreset(value, preset)
+                );
             }
 
             menu.DropDown(new Rect(pos, Vector2.zero));
@@ -283,7 +292,8 @@ namespace UnityEditor.Rendering
         }
 
         // Remaps value in the domain { Min0, Max0 } to { Min1, Max1 } (by default, normalizes it to (0, 1).
-        static float Remap(float v, float x0, float y0, float x1 = 0f, float y1 = 1f) => x1 + (v - x0) * (y1 - x1) / (y0 - x0);
+        static float Remap(float v, float x0, float y0, float x1 = 0f, float y1 = 1f) =>
+            x1 + (v - x0) * (y1 - x1) / (y0 - x0);
 
         /// <summary>
         /// Maps a light unit value onto the slider. Keeps in sync placement of markers and tooltips with the slider power.

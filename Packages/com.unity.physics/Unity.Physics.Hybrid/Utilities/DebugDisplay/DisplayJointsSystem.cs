@@ -17,11 +17,22 @@ namespace Unity.Physics.Authoring
         const float k_Scale = 0.5f;
 
         DebugDraw DebugDraw;
-        [ReadOnly] NativeArray<PhysicsJoint> Joints;
-        [ReadOnly] NativeArray<float4x4> WorldFromJointsA;
-        [ReadOnly] NativeArray<float4x4> WorldFromJointsB;
 
-        public static void ScheduleJob(in DebugDraw debugDraw, in EntityQuery jointsQuery, in EntityQuery bodyPairQuery, ref SystemState state)
+        [ReadOnly]
+        NativeArray<PhysicsJoint> Joints;
+
+        [ReadOnly]
+        NativeArray<float4x4> WorldFromJointsA;
+
+        [ReadOnly]
+        NativeArray<float4x4> WorldFromJointsB;
+
+        public static void ScheduleJob(
+            in DebugDraw debugDraw,
+            in EntityQuery jointsQuery,
+            in EntityQuery bodyPairQuery,
+            ref SystemState state
+        )
         {
             var joints = jointsQuery.ToComponentDataArray<PhysicsJoint>(Allocator.TempJob);
             var bodyPairs = bodyPairQuery.ToComponentDataArray<PhysicsConstrainedBodyPair>(Allocator.TempJob);
@@ -32,12 +43,14 @@ namespace Unity.Physics.Authoring
             for (int i = 0; i < joints.Length; ++i)
             {
                 var bodyPair = bodyPairs[i];
-                var localToWorldA = bodyPair.EntityA != Entity.Null && state.EntityManager.HasComponent<LocalToWorld>(bodyPair.EntityA)
-                    ? state.EntityManager.GetComponentData<LocalToWorld>(bodyPair.EntityA).Value
-                    : float4x4.identity;
-                var localToWorldB = bodyPair.EntityB != Entity.Null && state.EntityManager.HasComponent<LocalToWorld>(bodyPair.EntityB)
-                    ? state.EntityManager.GetComponentData<LocalToWorld>(bodyPair.EntityB).Value
-                    : float4x4.identity;
+                var localToWorldA =
+                    bodyPair.EntityA != Entity.Null && state.EntityManager.HasComponent<LocalToWorld>(bodyPair.EntityA)
+                        ? state.EntityManager.GetComponentData<LocalToWorld>(bodyPair.EntityA).Value
+                        : float4x4.identity;
+                var localToWorldB =
+                    bodyPair.EntityB != Entity.Null && state.EntityManager.HasComponent<LocalToWorld>(bodyPair.EntityB)
+                        ? state.EntityManager.GetComponentData<LocalToWorld>(bodyPair.EntityB).Value
+                        : float4x4.identity;
 
                 var inverseScaleA = math.inverse(float4x4.Scale(localToWorldA.DecomposeScale()));
                 var inverseScaleB = math.inverse(float4x4.Scale(localToWorldB.DecomposeScale()));
@@ -46,8 +59,16 @@ namespace Unity.Physics.Authoring
                 var localToWorldBNoScale = math.mul(localToWorldB, inverseScaleB);
 
                 var joint = joints[i];
-                float3x3 rotationA = new float3x3(joint.BodyAFromJoint.Axis, joint.BodyAFromJoint.PerpendicularAxis, math.cross(joint.BodyAFromJoint.Axis, joint.BodyAFromJoint.PerpendicularAxis));
-                float3x3 rotationB = new float3x3(joint.BodyBFromJoint.Axis, joint.BodyBFromJoint.PerpendicularAxis, math.cross(joint.BodyBFromJoint.Axis, joint.BodyBFromJoint.PerpendicularAxis));
+                float3x3 rotationA = new float3x3(
+                    joint.BodyAFromJoint.Axis,
+                    joint.BodyAFromJoint.PerpendicularAxis,
+                    math.cross(joint.BodyAFromJoint.Axis, joint.BodyAFromJoint.PerpendicularAxis)
+                );
+                float3x3 rotationB = new float3x3(
+                    joint.BodyBFromJoint.Axis,
+                    joint.BodyBFromJoint.PerpendicularAxis,
+                    math.cross(joint.BodyBFromJoint.Axis, joint.BodyBFromJoint.PerpendicularAxis)
+                );
                 var AFromJoint = new float4x4(rotationA, joint.BodyAFromJoint.Position);
                 var BFromJoint = new float4x4(rotationB, joint.BodyBFromJoint.Position);
 
@@ -60,7 +81,7 @@ namespace Unity.Physics.Authoring
                 DebugDraw = debugDraw,
                 Joints = joints,
                 WorldFromJointsA = worldFromJointA.AsArray(),
-                WorldFromJointsB = worldFromJointB.AsArray()
+                WorldFromJointsB = worldFromJointB.AsArray(),
             }.Schedule(joints.Length, 16, state.Dependency);
 
             state.Dependency.Complete();
@@ -86,8 +107,16 @@ namespace Unity.Physics.Authoring
             float3 pivotA = new float3(worldFromJointA.c3.xyz);
             float3 pivotB = new float3(worldFromJointB.c3.xyz);
 
-            float3x3 rotationA = new float3x3(worldFromJointA.c0.xyz, worldFromJointA.c1.xyz, math.cross(worldFromJointA.c0.xyz, worldFromJointA.c1.xyz));
-            float3x3 rotationB = new float3x3(worldFromJointB.c0.xyz, worldFromJointB.c1.xyz, math.cross(worldFromJointB.c0.xyz, worldFromJointB.c1.xyz));
+            float3x3 rotationA = new float3x3(
+                worldFromJointA.c0.xyz,
+                worldFromJointA.c1.xyz,
+                math.cross(worldFromJointA.c0.xyz, worldFromJointA.c1.xyz)
+            );
+            float3x3 rotationB = new float3x3(
+                worldFromJointB.c0.xyz,
+                worldFromJointB.c1.xyz,
+                math.cross(worldFromJointB.c0.xyz, worldFromJointB.c1.xyz)
+            );
 
             var constraints = joint.GetConstraints();
             {
@@ -121,15 +150,21 @@ namespace Unity.Physics.Authoring
                                     rangeOrigin = pivotB + direction * dot;
                                     rangeDirection = diff - direction * dot;
                                     rangeDistance = math.length(rangeDirection);
-                                    rangeDirection = math.select(rangeDirection / rangeDistance, float3.zero,
-                                        rangeDistance < 1e-5);
+                                    rangeDirection = math.select(
+                                        rangeDirection / rangeDistance,
+                                        float3.zero,
+                                        rangeDistance < 1e-5
+                                    );
                                     break;
                                 case 3:
                                     DebugDraw.Point(pivotB, k_Scale, colorB);
                                     rangeOrigin = pivotB;
                                     rangeDistance = math.length(diff);
-                                    rangeDirection = math.select(diff / rangeDistance, float3.zero,
-                                        rangeDistance < 1e-5);
+                                    rangeDirection = math.select(
+                                        diff / rangeDistance,
+                                        float3.zero,
+                                        rangeDistance < 1e-5
+                                    );
                                     break;
                                 default:
                                     SafetyChecks.ThrowNotImplementedException();
@@ -173,25 +208,31 @@ namespace Unity.Physics.Authoring
                                     // Get the limited axis and perpendicular in joint space
                                     int constrainedAxis = constraint.ConstrainedAxis1D;
                                     float3 axisInWorld = rotationA[constrainedAxis];
-                                    float3 perpendicularInWorld =
-                                        rotationA[(constrainedAxis + 1) % 3] * k_Scale;
+                                    float3 perpendicularInWorld = rotationA[(constrainedAxis + 1) % 3] * k_Scale;
 
                                     // Draw the angle of A
                                     DebugDraw.Line(pivotA, pivotA + perpendicularInWorld, colorA);
 
                                     // Calculate the relative angle
                                     float angle;
+
                                     {
-                                        float3x3 jointBFromA = math.mul(math.inverse(rotationA),
-                                            rotationA);
+                                        float3x3 jointBFromA = math.mul(math.inverse(rotationA), rotationA);
                                         angle = CalculateTwistAngle(new quaternion(jointBFromA), constrainedAxis);
                                     }
 
                                     // Draw the range in B
                                     float3 axis = rotationA[constraint.ConstrainedAxis1D];
-                                    DebugDraw.Arc(pivotB, axis,
-                                        math.mul(quaternion.AxisAngle(axis, constraint.Min - angle),
-                                            perpendicularInWorld), constraint.Max - constraint.Min, colorB);
+                                    DebugDraw.Arc(
+                                        pivotB,
+                                        axis,
+                                        math.mul(
+                                            quaternion.AxisAngle(axis, constraint.Min - angle),
+                                            perpendicularInWorld
+                                        ),
+                                        constraint.Max - constraint.Min,
+                                        colorB
+                                    );
 
                                     break;
                                 case 2:
@@ -257,6 +298,7 @@ namespace Unity.Physics.Authoring
     {
         private EntityQuery JointsQuery;
         private EntityQuery BodyPairQuery;
+
         public void OnCreate(ref SystemState state)
         {
             JointsQuery = state.GetEntityQuery(ComponentType.ReadOnly<PhysicsJoint>());
@@ -287,6 +329,7 @@ namespace Unity.Physics.Authoring
     {
         private EntityQuery JointsQuery;
         private EntityQuery BodyPairQuery;
+
         public void OnCreate(ref SystemState state)
         {
             JointsQuery = state.GetEntityQuery(ComponentType.ReadOnly<PhysicsJoint>());

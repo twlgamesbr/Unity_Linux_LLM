@@ -6,15 +6,15 @@ namespace NPCSystem.Monitoring
     /// </summary>
     public enum NPCFlowCategory
     {
-        Infrastructure,     // Bootstrap, config validation, connectivity
-        Auth,               // Login, register, session restore
-        Dialogue,           // Turn processing, message flow
-        LLM,                // LocalAI HTTP requests, retries, streaming
-        RAG,                // Embedding, Qdrant search, local RAG
-        Network,            // NGO transport, RPC, multiplayer
-        Memory,             // History load/save, Cognee
-        UI,                 // Input actions, UI state, player interaction
-        Monitoring,         // Datadog trace/metric lifecycle
-        EditorWorkflow,     // Editor-only operations
+        Infrastructure, // Bootstrap, config validation, connectivity
+        Auth, // Login, register, session restore
+        Dialogue, // Turn processing, message flow
+        LLM, // LocalAI HTTP requests, retries, streaming
+        RAG, // Embedding, Qdrant search, local RAG
+        Network, // NGO transport, RPC, multiplayer
+        Memory, // History load/save, Cognee
+        UI, // Input actions, UI state, player interaction
+        Monitoring, // Datadog trace/metric lifecycle
+        EditorWorkflow, // Editor-only operations
     }
 }

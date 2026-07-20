@@ -243,10 +243,12 @@ namespace UnityEngine.InputSystem.UI
                 set => m_ClickedOnSameGameObject = value;
             }
 
-            public bool wasPressedThisFrame => m_FramePressState == PointerEventData.FramePressState.Pressed ||
-            m_FramePressState == PointerEventData.FramePressState.PressedAndReleased;
-            public bool wasReleasedThisFrame => m_FramePressState == PointerEventData.FramePressState.Released ||
-            m_FramePressState == PointerEventData.FramePressState.PressedAndReleased;
+            public bool wasPressedThisFrame =>
+                m_FramePressState == PointerEventData.FramePressState.Pressed
+                || m_FramePressState == PointerEventData.FramePressState.PressedAndReleased;
+            public bool wasReleasedThisFrame =>
+                m_FramePressState == PointerEventData.FramePressState.Released
+                || m_FramePressState == PointerEventData.FramePressState.PressedAndReleased;
 
             private RaycastResult m_PressRaycast;
             private GameObject m_PressObject;

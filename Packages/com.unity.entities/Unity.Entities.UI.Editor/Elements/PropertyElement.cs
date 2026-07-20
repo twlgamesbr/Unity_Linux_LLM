@@ -24,22 +24,18 @@ namespace Unity.Entities.UI
             element.SetTarget(value);
             return element;
         }
-        
+
 #if !UNITY_2023_3_OR_NEWER
         /// <summary>
         ///   <para>Instantiates a <see cref="PropertyElement"/> using the data read from a UXML file.</para>
         /// </summary>
         [UsedImplicitly]
-        class PropertyElementFactory : UxmlFactory<PropertyElement, PropertyElementTraits>
-        {
-        }
+        class PropertyElementFactory : UxmlFactory<PropertyElement, PropertyElementTraits> { }
 
         /// <summary>
         ///   <para>Defines UxmlTraits for the <see cref="PropertyElement"/>.</para>
         /// </summary>
-        class PropertyElementTraits : UxmlTraits
-        {
-        }
+        class PropertyElementTraits : UxmlTraits { }
 #endif
     }
 }

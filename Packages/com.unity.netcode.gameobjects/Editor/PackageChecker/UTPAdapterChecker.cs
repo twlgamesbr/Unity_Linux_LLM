@@ -36,14 +36,18 @@ namespace Unity.Netcode.Editor.PackageChecker
             {
                 if (s_ListRequest.Result.Any(p => p.name == k_UTPAdapterPackageName))
                 {
-                    Debug.Log($"({nameof(UTPAdapterChecker)}) Found UTP Adapter package, it is no longer needed, `UnityTransport` is now directly integrated into the SDK therefore removing it from the project.");
+                    Debug.Log(
+                        $"({nameof(UTPAdapterChecker)}) Found UTP Adapter package, it is no longer needed, `UnityTransport` is now directly integrated into the SDK therefore removing it from the project."
+                    );
                     Client.Remove(k_UTPAdapterPackageName);
                 }
             }
             else
             {
                 var error = s_ListRequest.Error;
-                Debug.LogError($"({nameof(UTPAdapterChecker)}) Cannot check the list of packages -> error #{error.errorCode}: {error.message}");
+                Debug.LogError(
+                    $"({nameof(UTPAdapterChecker)}) Cannot check the list of packages -> error #{error.errorCode}: {error.message}"
+                );
             }
 
             s_ListRequest = null;

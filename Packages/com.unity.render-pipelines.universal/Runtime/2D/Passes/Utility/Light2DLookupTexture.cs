@@ -60,7 +60,6 @@ namespace UnityEngine.Rendering.Universal
             if (s_FalloffLookupTexture == null)
                 s_FalloffLookupTexture = CreateFalloffLookupTexture();
             return s_FalloffLookupTexture;
-
         }
 
         private static Texture2D CreatePointLightLookupTexture()

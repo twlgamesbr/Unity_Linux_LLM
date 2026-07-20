@@ -2,26 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
+using NPCSystem.Network.Core;
 using Unity.Multiplayer;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Monitoring.Datadog;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Auth
 {
     /// <summary>
@@ -108,17 +107,14 @@ namespace NPCSystem.Auth
         [SerializeField]
         string _hostAddress = "127.0.0.1";
 
-        [Tooltip(
-            "Host port to connect to when _startAsHost is false. 0 = use bootstrap's configured port."
-        )]
+        [Tooltip("Host port to connect to when _startAsHost is false. 0 = use bootstrap's configured port.")]
         [FormerlySerializedAs("HostPort")]
         [SerializeField]
         ushort _hostPort = 0;
 
         [Header("Events")]
         [SerializeField]
-        UnityEngine.Events.UnityEvent<string> _onHostStarted =
-            new UnityEngine.Events.UnityEvent<string>();
+        UnityEngine.Events.UnityEvent<string> _onHostStarted = new UnityEngine.Events.UnityEvent<string>();
 
         string _authenticatedPlayerName = "";
         NPCFlowLogger _logger;
@@ -129,10 +125,13 @@ namespace NPCSystem.Auth
         // ── Connection reliability tracking ──
         [SerializeField, ReadOnly]
         string _authFlowId;
+
         [SerializeField, ReadOnly]
         bool _authConnected;
+
         [SerializeField, ReadOnly]
         bool _authFallbackAttempted;
+
         [Tooltip("How long to wait for client connection before attempting fallback (ms). Default: 15000")]
         [SerializeField]
         int _connectionTimeoutMs = 15000;
@@ -191,19 +190,13 @@ namespace NPCSystem.Auth
                 _authController = GetComponent<AuthUIController>();
 
             if (_authController == null)
-                _authController = FindAnyObjectByType<AuthUIController>(
-                    FindObjectsInactive.Include
-                );
+                _authController = FindAnyObjectByType<AuthUIController>(FindObjectsInactive.Include);
 #endif
             if (_networkBootstrap == null)
-                _networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
-                    FindObjectsInactive.Include
-                );
+                _networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(FindObjectsInactive.Include);
 
             if (_gameplayLoadController == null)
-                _gameplayLoadController = FindAnyObjectByType<WebGLGameplayLoadController>(
-                    FindObjectsInactive.Include
-                );
+                _gameplayLoadController = FindAnyObjectByType<WebGLGameplayLoadController>(FindObjectsInactive.Include);
         }
 
 #if !UNITY_SERVER
@@ -225,8 +218,7 @@ namespace NPCSystem.Auth
                         ["expectedComponent"] = nameof(AuthUIController),
                     }
                 );
-                lastBridgeStatus =
-                    "Missing Auth Controller reference; auth success cannot start networking.";
+                lastBridgeStatus = "Missing Auth Controller reference; auth success cannot start networking.";
                 return;
             }
 
@@ -242,8 +234,7 @@ namespace NPCSystem.Auth
                 data: new Dictionary<string, object>
                 {
                     ["_authController"] = _authController.name,
-                    ["_networkBootstrap"] =
-                        _networkBootstrap != null ? _networkBootstrap.name : "<missing>",
+                    ["_networkBootstrap"] = _networkBootstrap != null ? _networkBootstrap.name : "<missing>",
                 }
             );
         }
@@ -278,10 +269,7 @@ namespace NPCSystem.Auth
                     }
                 );
                 lastBridgeStatus = $"Auth handler crashed: {ex.Message}";
-                DatadogMetricsService.Increment(
-                    "auth.handler.crash",
-                    tags: new[] { $"flow_id:{_authFlowId ?? "?"}" }
-                );
+                DatadogMetricsService.Increment("auth.handler.crash", tags: new[] { $"flow_id:{_authFlowId ?? "?"}" });
             }
         }
 
@@ -301,10 +289,7 @@ namespace NPCSystem.Auth
             );
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (
-                string.IsNullOrWhiteSpace(_hostAddress)
-                || NPCNetworkUtils.IsLocalHost(_hostAddress)
-            )
+            if (string.IsNullOrWhiteSpace(_hostAddress) || NPCNetworkUtils.IsLocalHost(_hostAddress))
             {
                 try
                 {
@@ -345,8 +330,7 @@ namespace NPCSystem.Auth
                     ["fallbackEnabled"] = resolvedMode == ResolvedNetworkStartupMode.Client,
                 }
             );
-            lastBridgeStatus =
-                $"[{_authFlowId}] Auth ok for {_authenticatedPlayerName}; mode={resolvedMode}";
+            lastBridgeStatus = $"[{_authFlowId}] Auth ok for {_authenticatedPlayerName}; mode={resolvedMode}";
 
             await PrepareGameplayAsync();
 
@@ -382,9 +366,7 @@ namespace NPCSystem.Auth
             }
 
 #if !UNITY_SERVER
-            var uiController = FindAnyObjectByType<NPCDialogueUIController>(
-                FindObjectsInactive.Include
-            );
+            var uiController = FindAnyObjectByType<NPCDialogueUIController>(FindObjectsInactive.Include);
             if (uiController != null)
             {
                 GameObject gameplayCanvas = uiController.GetGameplayCanvas();
@@ -428,9 +410,7 @@ namespace NPCSystem.Auth
 
             if (NPCPlayModeInstanceResolver.TryGetPlayerIndex(out int playerIndex))
             {
-                return playerIndex <= 1
-                    ? ResolvedNetworkStartupMode.Host
-                    : ResolvedNetworkStartupMode.Client;
+                return playerIndex <= 1 ? ResolvedNetworkStartupMode.Host : ResolvedNetworkStartupMode.Client;
             }
 
             if (_autoDetectStartupMode)
@@ -441,18 +421,13 @@ namespace NPCSystem.Auth
                     return ResolvedNetworkStartupMode.Client;
                 }
 
-                if (
-                    roleMask == MultiplayerRoleFlags.Server
-                    || roleMask == MultiplayerRoleFlags.ClientAndServer
-                )
+                if (roleMask == MultiplayerRoleFlags.Server || roleMask == MultiplayerRoleFlags.ClientAndServer)
                 {
                     return ResolvedNetworkStartupMode.Host;
                 }
             }
 
-            return _startAsHost
-                ? ResolvedNetworkStartupMode.Host
-                : ResolvedNetworkStartupMode.Client;
+            return _startAsHost ? ResolvedNetworkStartupMode.Host : ResolvedNetworkStartupMode.Client;
         }
 
         public static bool TryGetCommandLineStartupMode(out ResolvedNetworkStartupMode mode)
@@ -522,7 +497,8 @@ namespace NPCSystem.Auth
         void RegisterAuthCallbacks()
         {
             NetworkManager nm = GetNetworkManager();
-            if (nm == null) return;
+            if (nm == null)
+                return;
             // Unregister first to avoid double-subscription from retry paths
             nm.OnClientConnectedCallback -= OnAuthClientConnected;
             nm.OnClientDisconnectCallback -= OnAuthClientDisconnected;
@@ -533,7 +509,8 @@ namespace NPCSystem.Auth
         void UnregisterAuthCallbacks()
         {
             NetworkManager nm = GetNetworkManager();
-            if (nm == null) return;
+            if (nm == null)
+                return;
             nm.OnClientConnectedCallback -= OnAuthClientConnected;
             nm.OnClientDisconnectCallback -= OnAuthClientDisconnected;
         }
@@ -605,7 +582,8 @@ namespace NPCSystem.Auth
         /// </summary>
         async Task TryFallbackToHostAsync()
         {
-            if (_authFallbackAttempted) return;
+            if (_authFallbackAttempted)
+                return;
             _authFallbackAttempted = true;
 
             string flowId = _authFlowId ?? Guid.NewGuid().ToString("N")[..8];
@@ -625,10 +603,7 @@ namespace NPCSystem.Auth
                 }
             );
 
-            DatadogMetricsService.Increment(
-                "auth.fallback.to_host",
-                tags: new[] { $"flow_id:{flowId}" }
-            );
+            DatadogMetricsService.Increment("auth.fallback.to_host", tags: new[] { $"flow_id:{flowId}" });
             lastBridgeStatus = $"[{flowId}] Client failed; falling back to Host";
 
             UnregisterAuthCallbacks();
@@ -764,8 +739,7 @@ namespace NPCSystem.Auth
                 "Player object did not spawn within timeout (host). Name set via OnNetworkSpawn.",
                 source: nameof(AuthNetworkBridge)
             );
-            lastBridgeStatus =
-                "Host player object spawn timed out; fallback to OnNetworkSpawn registration.";
+            lastBridgeStatus = "Host player object spawn timed out; fallback to OnNetworkSpawn registration.";
         }
 
         // ── Client mode ───────────────────────────────────────────
@@ -813,9 +787,7 @@ namespace NPCSystem.Auth
             }
 
             // Override bootstrap's connect address if specified, then delegate to bootstrap
-            _networkBootstrap.TransportConfig.ConnectAddress = string.IsNullOrWhiteSpace(
-                _hostAddress
-            )
+            _networkBootstrap.TransportConfig.ConnectAddress = string.IsNullOrWhiteSpace(_hostAddress)
                 ? "127.0.0.1"
                 : _hostAddress.Trim();
             if (_hostPort > 0)
@@ -867,9 +839,7 @@ namespace NPCSystem.Auth
                 return;
 
             GameObject playerObj =
-                netManager.LocalClient.PlayerObject != null
-                    ? netManager.LocalClient.PlayerObject.gameObject
-                    : null;
+                netManager.LocalClient.PlayerObject != null ? netManager.LocalClient.PlayerObject.gameObject : null;
             if (playerObj == null)
             {
                 _logger?.Log(
@@ -899,8 +869,7 @@ namespace NPCSystem.Auth
                         ["playerObjectName"] = playerObj.name,
                     }
                 );
-                lastBridgeStatus =
-                    $"Player name {_authenticatedPlayerName} set on {playerObj.name}.";
+                lastBridgeStatus = $"Player name {_authenticatedPlayerName} set on {playerObj.name}.";
             }
             else
             {

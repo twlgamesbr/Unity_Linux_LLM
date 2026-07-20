@@ -11,13 +11,16 @@ namespace UnityEngine.Rendering.RenderGraphModule
     /// <summary>
     /// Sets the read and write access for the depth buffer.
     /// </summary>
-    [Flags][MovedFrom(true, "UnityEngine.Experimental.Rendering.RenderGraphModule", "UnityEngine.Rendering.RenderGraphModule")]
+    [Flags]
+    [MovedFrom(true, "UnityEngine.Experimental.Rendering.RenderGraphModule", "UnityEngine.Rendering.RenderGraphModule")]
     public enum DepthAccess
     {
         ///<summary>Read Access.</summary>
         Read = 1 << 0,
+
         ///<summary>Write Access.</summary>
         Write = 1 << 1,
+
         ///<summary>Read and Write Access.</summary>
         ReadWrite = Read | Write,
     }
@@ -25,7 +28,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
     /// <summary>
     /// Express the operations the rendergraph pass will do on a resource.
     /// </summary>
-    [Flags][MovedFrom(true, "UnityEngine.Experimental.Rendering.RenderGraphModule", "UnityEngine.Rendering.RenderGraphModule")]
+    [Flags]
+    [MovedFrom(true, "UnityEngine.Experimental.Rendering.RenderGraphModule", "UnityEngine.Rendering.RenderGraphModule")]
     public enum AccessFlags
     {
         ///<summary>The pass does not access the resource at all. Calling Use* functions with none has no effect.</summary>
@@ -44,7 +48,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         WriteAll = Write | Discard,
 
         ///<summary> Shortcut for Read | Write</summary>
-        ReadWrite = Read | Write
+        ReadWrite = Read | Write,
     }
 
     /// <summary>
@@ -55,10 +59,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         ///<summary>Default state with no extended features enabled.</summary>
         None = 0,
+
         ///<summary>On Meta XR, this flag can be set for the pass that performs the most 3D rendering to achieve better performance.</summary>
         TileProperties = 1 << 0,
+
         ///<summary>On XR, this flag can be set for passes that are compatible with Multiview Render Regions</summary>
         MultiviewRenderRegionsCompatible = 1 << 1,
+
         ///<summary>On Meta XR, this flag can be set to use MSAA shader resolve in the last subpass of a render pass. </summary>
         MultisampledShaderResolve = 1 << 2,
     }
@@ -89,7 +96,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <summary>
         /// Utility flag to check if the graph is active.
         /// </summary>
-        Active = RecordingGraph | RecordingPass | Executing
+        Active = RecordingGraph | RecordingPass | Executing,
     }
 
     /// <summary>
@@ -99,8 +106,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         /// <summary>RenderTextures are always treated as bottom left orientation.</summary>
         BottomLeft,
+
         /// <summary>RenderTextures may inherit the backbuffer attachment orientation if they are only used via attachment reads.</summary>
-        PropagateAttachmentOrientation
+        PropagateAttachmentOrientation,
     }
 
     /// <summary>
@@ -162,12 +170,18 @@ namespace UnityEngine.Rendering.RenderGraphModule
         public RasterCommandBuffer cmd;
 
         ///<summary>Render Graph default resources.</summary>
-        public RenderGraphDefaultResources defaultResources { get => wrappedContext.defaultResources; }
+        public RenderGraphDefaultResources defaultResources
+        {
+            get => wrappedContext.defaultResources;
+        }
 
         ///<summary>Render Graph pool used for temporary data.</summary>
-        public RenderGraphObjectPool renderGraphPool { get => wrappedContext.renderGraphPool; }
+        public RenderGraphObjectPool renderGraphPool
+        {
+            get => wrappedContext.renderGraphPool;
+        }
 
-        static internal RasterCommandBuffer rastercmd = new RasterCommandBuffer(null, null, false);
+        internal static RasterCommandBuffer rastercmd = new RasterCommandBuffer(null, null, false);
 
         /// <inheritdoc />
         public void FromInternalContext(InternalRenderGraphContext context)
@@ -205,12 +219,18 @@ namespace UnityEngine.Rendering.RenderGraphModule
         public ComputeCommandBuffer cmd;
 
         ///<summary>Render Graph default resources.</summary>
-        public RenderGraphDefaultResources defaultResources { get => wrappedContext.defaultResources; }
+        public RenderGraphDefaultResources defaultResources
+        {
+            get => wrappedContext.defaultResources;
+        }
 
         ///<summary>Render Graph pool used for temporary data.</summary>
-        public RenderGraphObjectPool renderGraphPool { get => wrappedContext.renderGraphPool; }
+        public RenderGraphObjectPool renderGraphPool
+        {
+            get => wrappedContext.renderGraphPool;
+        }
 
-        static internal ComputeCommandBuffer computecmd = new ComputeCommandBuffer(null, null, false);
+        internal static ComputeCommandBuffer computecmd = new ComputeCommandBuffer(null, null, false);
 
         /// <inheritdoc />
         public void FromInternalContext(InternalRenderGraphContext context)
@@ -248,12 +268,19 @@ namespace UnityEngine.Rendering.RenderGraphModule
         public UnsafeCommandBuffer cmd;
 
         ///<summary>Render Graph default resources.</summary>
-        public RenderGraphDefaultResources defaultResources { get => wrappedContext.defaultResources; }
+        public RenderGraphDefaultResources defaultResources
+        {
+            get => wrappedContext.defaultResources;
+        }
 
         ///<summary>Render Graph pool used for temporary data.</summary>
-        public RenderGraphObjectPool renderGraphPool { get => wrappedContext.renderGraphPool; }
+        public RenderGraphObjectPool renderGraphPool
+        {
+            get => wrappedContext.renderGraphPool;
+        }
 
         internal static UnsafeCommandBuffer unsCmd = new UnsafeCommandBuffer(null, null, false);
+
         /// <inheritdoc />
         public void FromInternalContext(InternalRenderGraphContext context)
         {
@@ -284,25 +311,37 @@ namespace UnityEngine.Rendering.RenderGraphModule
     public struct RenderGraphParameters
     {
         ///<summary>Identifier for this render graph execution.</summary>
-        [Obsolete("Not used anymore. The debugging tools use the name of the object identified by executionId. #from(6000.3)")]
+        [Obsolete(
+            "Not used anymore. The debugging tools use the name of the object identified by executionId. #from(6000.3)"
+        )]
         public string executionName;
+
         ///<summary>Identifier for this render graph execution (i.e. EntityId of the Camera rendering). Used for debugging tools.</summary>
         public EntityId executionId;
+
         ///<summary>Whether the execution should generate debug data and be visible in Render Graph Viewer.</summary>
         public bool generateDebugData;
+
         ///<summary>Index of the current frame being rendered.</summary>
         public int currentFrameIndex;
+
         ///<summary> Controls whether to enable Renderer List culling or not.</summary>
-        [Obsolete("Not supported anymore. Syncing with culling system brings performance regressions in most cases. #from(6000.5)")]
+        [Obsolete(
+            "Not supported anymore. Syncing with culling system brings performance regressions in most cases. #from(6000.5)"
+        )]
         public bool rendererListCulling;
+
         ///<summary>Scriptable Render Context used by the render pipeline.</summary>
         public ScriptableRenderContext scriptableRenderContext;
+
         ///<summary>Command Buffer used to execute graphic commands.</summary>
         public CommandBuffer commandBuffer;
+
         ///<summary>When running tests indicate the context is intentionally invalid and all calls on it should just do nothing.
         ///This allows you to run tests that rely on code execution the way to the pass render functions
         ///This also changes some behaviours with exception handling and error logging so the test framework can act on exceptions to validate behaviour better.</summary>
         internal bool invalidContextForTesting;
+
         ///<summary>The strategy that the rendergraph should use to determine the texture uv origin if Unknown of RenderTextures when rendering.</summary>
         public RenderTextureUVOriginStrategy renderTextureUVOriginStrategy;
     }
@@ -315,7 +354,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
     /// <param name="data">Render Pass specific data.</param>
     /// <param name="renderGraphContext">Global Render Graph context.</param>
     [MovedFrom(true, "UnityEngine.Experimental.Rendering.RenderGraphModule", "UnityEngine.Rendering.RenderGraphModule")]
-    public delegate void BaseRenderFunc<PassData, ContextType>(PassData data, ContextType renderGraphContext) where PassData : class, new();
+    public delegate void BaseRenderFunc<PassData, ContextType>(PassData data, ContextType renderGraphContext)
+        where PassData : class, new();
 
     /// <summary>
     /// This class is the main entry point of the Render Graph system.
@@ -353,11 +393,14 @@ namespace UnityEngine.Rendering.RenderGraphModule
         [Obsolete("RenderGraph always enables native render pass support. #from(6000.5)")]
         public bool nativeRenderPassesEnabled { get; set; } = true;
 
-        internal/*for tests*/ RenderGraphResourceRegistry m_Resources;
-        internal/*for tests*/ RenderGraphObjectPool m_RenderGraphPool = new RenderGraphObjectPool();
+        internal /*for tests*/
+        RenderGraphResourceRegistry m_Resources;
+        internal /*for tests*/
+        RenderGraphObjectPool m_RenderGraphPool = new RenderGraphObjectPool();
         RenderGraphBuilders m_builderInstance = new RenderGraphBuilders();
         RenderGraphValidationLayer m_ValidationLayer = null;
-        internal/*for tests*/ List<RenderGraphPass> m_RenderPasses = new List<RenderGraphPass>(64);
+        internal /*for tests*/
+        List<RenderGraphPass> m_RenderPasses = new List<RenderGraphPass>(64);
         List<RendererListHandle> m_RendererLists = new List<RendererListHandle>(32);
         RenderGraphDebugParams m_DebugParameters = new RenderGraphDebugParams();
         RenderGraphDefaultResources m_DefaultResources = new RenderGraphDefaultResources();
@@ -372,7 +415,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
         int m_CurrentFrameIndex;
         bool m_ExecutionExceptionWasRaised;
         bool m_EnableCompilationCaching;
-        internal/*for tests*/ static bool? s_EnableCompilationCachingForTests;
+        internal /*for tests*/
+        static bool? s_EnableCompilationCachingForTests;
         RenderGraphState m_RenderGraphState;
         RenderTextureUVOriginStrategy m_renderTextureUVOriginStrategy;
 
@@ -380,7 +424,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         // When a RenderGraph is created, an entry is added to this dictionary. When that RenderGraph renders something,
         // and a debug session is active, an entry is added to the list of executions for that RenderGraph using the executionId
         // as the key. So when you render multiple times with the same executionId, only one DebugExecutionItem is created.
-        static Dictionary<RenderGraph, List<DebugExecutionItem>> s_RegisteredExecutions = new ();
+        static Dictionary<RenderGraph, List<DebugExecutionItem>> s_RegisteredExecutions = new();
 
         #region Public Interface
         /// <summary>Name of the Render Graph.</summary>
@@ -419,10 +463,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </summary>
         public RenderGraphDefaultResources defaultResources
         {
-            get
-            {
-                return m_DefaultResources;
-            }
+            get { return m_DefaultResources; }
         }
 
         /// <summary>
@@ -432,7 +473,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         public RenderGraph(string name = "RenderGraph")
         {
             this.name = name;
-            if (GraphicsSettings.TryGetRenderPipelineSettings<RenderGraphGlobalSettings>(out var renderGraphGlobalSettings))
+            if (
+                GraphicsSettings.TryGetRenderPipelineSettings<RenderGraphGlobalSettings>(
+                    out var renderGraphGlobalSettings
+                )
+            )
             {
                 m_EnableCompilationCaching = renderGraphGlobalSettings.enableCompilationCaching;
                 enableValidityChecks = renderGraphGlobalSettings.enableValidityChecks;
@@ -540,7 +585,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
             return new List<RenderGraph>(s_RegisteredExecutions.Keys);
         }
 
-        internal static Dictionary<RenderGraph, List<DebugExecutionItem>> GetRegisteredExecutions() => s_RegisteredExecutions;
+        internal static Dictionary<RenderGraph, List<DebugExecutionItem>> GetRegisteredExecutions() =>
+            s_RegisteredExecutions;
 
         /// <summary>
         /// End frame processing. Purge resources that have been used since last frame and resets internal states.
@@ -622,7 +668,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="info">The properties of the passed in RTHandle.</param>
         /// <param name="importParams">Info describing the clear behavior of imported textures. Clearing textures using importParams may be more efficient than manually clearing the texture using `cmd.Clear` on some hardware.</param>
         /// <returns>A new TextureHandle that represents the imported texture in the context of this rendergraph.</returns>
-        public TextureHandle ImportTexture(RTHandle rt, RenderTargetInfo info, ImportResourceParams importParams = new ImportResourceParams())
+        public TextureHandle ImportTexture(
+            RTHandle rt,
+            RenderTargetInfo info,
+            ImportResourceParams importParams = new ImportResourceParams()
+        )
         {
             CheckNotUsedWhenExecuting();
 
@@ -656,7 +706,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="info">The properties of the passed in RTHandle.</param>
         /// <param name="importParams">Info describing the clear behavior of imported textures. Clearing textures using importParams may be more efficient than manually clearing the texture using `cmd.Clear` on some hardware.</param>
         /// <returns>A new TextureHandle that represents the imported texture in the context of this rendergraph.</returns>
-        public TextureHandle ImportBackbuffer(RenderTargetIdentifier rt, RenderTargetInfo info, ImportResourceParams importParams = new ImportResourceParams())
+        public TextureHandle ImportBackbuffer(
+            RenderTargetIdentifier rt,
+            RenderTargetInfo info,
+            ImportResourceParams importParams = new ImportResourceParams()
+        )
         {
             CheckNotUsedWhenExecuting();
 
@@ -880,11 +934,20 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="projectionMatrix">The projection matrix used during XR rendering of the skybox.</param>
         /// <param name="viewMatrix">The view matrix used during XR rendering of the skybox.</param>
         /// <returns>A new RendererListHandle.</returns>
-        public RendererListHandle CreateSkyboxRendererList(in Camera camera, Matrix4x4 projectionMatrix, Matrix4x4 viewMatrix)
+        public RendererListHandle CreateSkyboxRendererList(
+            in Camera camera,
+            Matrix4x4 projectionMatrix,
+            Matrix4x4 viewMatrix
+        )
         {
             CheckNotUsedWhenExecuting();
 
-            return m_Resources.CreateSkyboxRendererList(m_RenderGraphContext.renderContext, camera, projectionMatrix, viewMatrix);
+            return m_Resources.CreateSkyboxRendererList(
+                m_RenderGraphContext.renderContext,
+                camera,
+                projectionMatrix,
+                viewMatrix
+            );
         }
 
         /// <summary>
@@ -899,11 +962,24 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="projectionMatrixR">The right eye projection matrix used during Legacy single pass XR rendering of the skybox.</param>
         /// <param name="viewMatrixR">The right eye view matrix used during Legacy single pass XR rendering of the skybox.</param>
         /// <returns>A new RendererListHandle.</returns>
-        public RendererListHandle CreateSkyboxRendererList(in Camera camera, Matrix4x4 projectionMatrixL, Matrix4x4 viewMatrixL, Matrix4x4 projectionMatrixR, Matrix4x4 viewMatrixR)
+        public RendererListHandle CreateSkyboxRendererList(
+            in Camera camera,
+            Matrix4x4 projectionMatrixL,
+            Matrix4x4 viewMatrixL,
+            Matrix4x4 projectionMatrixR,
+            Matrix4x4 viewMatrixR
+        )
         {
             CheckNotUsedWhenExecuting();
 
-            return m_Resources.CreateSkyboxRendererList(m_RenderGraphContext.renderContext, camera, projectionMatrixL, viewMatrixL, projectionMatrixR, viewMatrixR);
+            return m_Resources.CreateSkyboxRendererList(
+                m_RenderGraphContext.renderContext,
+                camera,
+                projectionMatrixL,
+                viewMatrixL,
+                projectionMatrixR,
+                viewMatrixR
+            );
         }
 
         /// <summary>
@@ -967,9 +1043,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// This API cannot be called during the Render Graph execution, please call it outside of SetRenderFunc().
         /// </remarks>
         /// <param name="accelStruct">External RayTracingAccelerationStructure that needs to be imported.</param>
-		/// <param name="name">Optional name for identifying the RayTracingAccelerationStructure in the Render Graph.</param>
+        /// <param name="name">Optional name for identifying the RayTracingAccelerationStructure in the Render Graph.</param>
         /// <returns>A new RayTracingAccelerationStructureHandle.</returns>
-        public RayTracingAccelerationStructureHandle ImportRayTracingAccelerationStructure(in RayTracingAccelerationStructure accelStruct, string name = null)
+        public RayTracingAccelerationStructureHandle ImportRayTracingAccelerationStructure(
+            in RayTracingAccelerationStructure accelStruct,
+            string name = null
+        )
         {
             CheckNotUsedWhenExecuting();
 
@@ -980,42 +1059,62 @@ namespace UnityEngine.Rendering.RenderGraphModule
         void CheckNotUsedWhenExecuting()
         {
             if (enableValidityChecks && m_RenderGraphState == RenderGraphState.Executing)
-                throw new InvalidOperationException(RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.Executing));
+                throw new InvalidOperationException(
+                    RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.Executing)
+                );
         }
 
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         void CheckNotUsedWhenRecordingGraph()
         {
             if (enableValidityChecks && m_RenderGraphState == RenderGraphState.RecordingGraph)
-                throw new InvalidOperationException(RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.RecordingGraph));
+                throw new InvalidOperationException(
+                    RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.RecordingGraph)
+                );
         }
 
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         void CheckNotUsedWhenRecordPassOrExecute()
         {
-            if (enableValidityChecks && (m_RenderGraphState == RenderGraphState.RecordingPass || m_RenderGraphState == RenderGraphState.Executing))
-                throw new InvalidOperationException(RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.RecordingPass | RenderGraphState.Executing));
+            if (
+                enableValidityChecks
+                && (
+                    m_RenderGraphState == RenderGraphState.RecordingPass
+                    || m_RenderGraphState == RenderGraphState.Executing
+                )
+            )
+                throw new InvalidOperationException(
+                    RenderGraphExceptionMessages.GetExceptionMessage(
+                        RenderGraphState.RecordingPass | RenderGraphState.Executing
+                    )
+                );
         }
 
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         void CheckNotUsedWhenRecordingPass()
         {
             if (enableValidityChecks && m_RenderGraphState == RenderGraphState.RecordingPass)
-                throw new InvalidOperationException(RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.RecordingPass));
+                throw new InvalidOperationException(
+                    RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.RecordingPass)
+                );
         }
 
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         void CheckNotUsedWhenActive()
         {
             if (enableValidityChecks && (m_RenderGraphState & RenderGraphState.Active) != RenderGraphState.Idle)
-                throw new InvalidOperationException(RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.Active));
+                throw new InvalidOperationException(
+                    RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.Active)
+                );
         }
 
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         void CheckNotUsedWhenIdle()
         {
             if (enableValidityChecks && m_RenderGraphState == RenderGraphState.Idle)
-                throw new InvalidOperationException(RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.Active));
+                throw new InvalidOperationException(
+                    RenderGraphExceptionMessages.GetExceptionMessage(RenderGraphState.Active)
+                );
         }
 
         /// <summary>
@@ -1030,10 +1129,15 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a IRasterRenderGraphBuilder used to setup the new Rasterization Render Pass.</returns>
-        public IRasterRenderGraphBuilder AddRasterRenderPass<PassData>(string passName, out PassData passData
+        public IRasterRenderGraphBuilder AddRasterRenderPass<PassData>(
+            string passName,
+            out PassData passData
 #if !CORE_PACKAGE_DOCTOOLS
-            , [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             return AddRasterRenderPass(passName, out passData, GetDefaultProfilingSampler(passName), file, line);
@@ -1049,10 +1153,16 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a IRasterRenderGraphBuilder used to setup the new Rasterization Render Pass.</returns>
-        public IRasterRenderGraphBuilder AddRasterRenderPass<PassData>(string passName, out PassData passData, ProfilingSampler sampler
+        public IRasterRenderGraphBuilder AddRasterRenderPass<PassData>(
+            string passName,
+            out PassData passData,
+            ProfilingSampler sampler
 #if !CORE_PACKAGE_DOCTOOLS
-            ,[CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             CheckNotUsedWhenRecordingPass();
@@ -1060,7 +1170,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
             m_RenderGraphState = RenderGraphState.RecordingPass;
 
             var renderPass = m_RenderGraphPool.Get<RasterRenderGraphPass<PassData>>();
-            renderPass.Initialize(m_RenderPasses.Count, m_RenderGraphPool.Get<PassData>(), passName, RenderGraphPassType.Raster, sampler);
+            renderPass.Initialize(
+                m_RenderPasses.Count,
+                m_RenderGraphPool.Get<PassData>(),
+                passName,
+                RenderGraphPassType.Raster,
+                sampler
+            );
 
             AddPassDebugMetadata(renderPass, file, line);
 
@@ -1085,10 +1201,15 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a IRasterRenderGraphBuilder used to setup the new Rasterization Render Pass.</returns>
-        public IComputeRenderGraphBuilder AddComputePass<PassData>(string passName, out PassData passData
+        public IComputeRenderGraphBuilder AddComputePass<PassData>(
+            string passName,
+            out PassData passData
 #if !CORE_PACKAGE_DOCTOOLS
-        , [CallerFilePath] string file = "",
-        [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             return AddComputePass(passName, out passData, GetDefaultProfilingSampler(passName), file, line);
@@ -1104,10 +1225,16 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a IComputeRenderGraphBuilder used to setup the new Compute Render Pass.</returns>
-        public IComputeRenderGraphBuilder AddComputePass<PassData>(string passName, out PassData passData, ProfilingSampler sampler
+        public IComputeRenderGraphBuilder AddComputePass<PassData>(
+            string passName,
+            out PassData passData,
+            ProfilingSampler sampler
 #if !CORE_PACKAGE_DOCTOOLS
-            ,[CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             CheckNotUsedWhenRecordingPass();
@@ -1115,7 +1242,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
             m_RenderGraphState = RenderGraphState.RecordingPass;
 
             var renderPass = m_RenderGraphPool.Get<ComputeRenderGraphPass<PassData>>();
-            renderPass.Initialize(m_RenderPasses.Count, m_RenderGraphPool.Get<PassData>(), passName, RenderGraphPassType.Compute, sampler);
+            renderPass.Initialize(
+                m_RenderPasses.Count,
+                m_RenderGraphPool.Get<PassData>(),
+                passName,
+                RenderGraphPassType.Compute,
+                sampler
+            );
 
             AddPassDebugMetadata(renderPass, file, line);
 
@@ -1146,10 +1279,15 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a IUnsafeRenderGraphBuilder used to setup the new Unsafe Render Pass.</returns>
-        public IUnsafeRenderGraphBuilder AddUnsafePass<PassData>(string passName, out PassData passData
+        public IUnsafeRenderGraphBuilder AddUnsafePass<PassData>(
+            string passName,
+            out PassData passData
 #if !CORE_PACKAGE_DOCTOOLS
-            , [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             return AddUnsafePass(passName, out passData, GetDefaultProfilingSampler(passName), file, line);
@@ -1171,10 +1309,16 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a IUnsafeRenderGraphBuilder used to setup the new unsafe Render Pass.</returns>
-        public IUnsafeRenderGraphBuilder AddUnsafePass<PassData>(string passName, out PassData passData, ProfilingSampler sampler
+        public IUnsafeRenderGraphBuilder AddUnsafePass<PassData>(
+            string passName,
+            out PassData passData,
+            ProfilingSampler sampler
 #if !CORE_PACKAGE_DOCTOOLS
-            , [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             CheckNotUsedWhenRecordingPass();
@@ -1182,7 +1326,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
             m_RenderGraphState = RenderGraphState.RecordingPass;
 
             var renderPass = m_RenderGraphPool.Get<UnsafeRenderGraphPass<PassData>>();
-            renderPass.Initialize(m_RenderPasses.Count, m_RenderGraphPool.Get<PassData>(), passName, RenderGraphPassType.Unsafe, sampler);
+            renderPass.Initialize(
+                m_RenderPasses.Count,
+                m_RenderGraphPool.Get<PassData>(),
+                passName,
+                RenderGraphPassType.Unsafe,
+                sampler
+            );
             renderPass.AllowGlobalState(true);
 
             AddPassDebugMetadata(renderPass, file, line);
@@ -1224,7 +1374,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
             // Ignore preview cameras and render requests for debug data generation. They would cause the same camera to
             // be rendered twice with different render graphs, confusing users and causing the RG Viewer to constantly update.
-            m_CurrentExecutionCanGenerateDebugData = parameters.generateDebugData && parameters.executionId != EntityId.None;
+            m_CurrentExecutionCanGenerateDebugData =
+                parameters.generateDebugData && parameters.executionId != EntityId.None;
 
             m_renderTextureUVOriginStrategy = parameters.renderTextureUVOriginStrategy;
             m_ValidationLayer = null;
@@ -1310,8 +1461,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
             m_RenderGraphState = RenderGraphState.Executing;
 
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
-                if (m_RenderGraphContext.cmd == null)
-                    throw new InvalidOperationException("RenderGraph.BeginRecording was not called before executing the render graph.");
+            if (m_RenderGraphContext.cmd == null)
+                throw new InvalidOperationException(
+                    "RenderGraph.BeginRecording was not called before executing the render graph."
+                );
 
             ClearCacheIfNewActiveDebugSession();
 #endif
@@ -1349,22 +1502,34 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="sampler">Sampler used for profiling.</param>
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
-        public void BeginProfilingSampler(ProfilingSampler sampler,
+        public void BeginProfilingSampler(
+            ProfilingSampler sampler,
             [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0)
+            [CallerLineNumber] int line = 0
+        )
         {
             if (sampler == null)
                 return;
 
-            using (var builder = AddUnsafePass<ProfilingScopePassData>(k_BeginProfilingSamplerPassName, out var passData, (ProfilingSampler)null, file, line))
+            using (
+                var builder = AddUnsafePass<ProfilingScopePassData>(
+                    k_BeginProfilingSamplerPassName,
+                    out var passData,
+                    (ProfilingSampler)null,
+                    file,
+                    line
+                )
+            )
             {
                 passData.sampler = sampler;
                 builder.AllowPassCulling(false);
                 builder.GenerateDebugData(false);
-                builder.SetRenderFunc(static (ProfilingScopePassData data, UnsafeGraphContext ctx) =>
-                {
-                    data.sampler.Begin(CommandBufferHelpers.GetNativeCommandBuffer(ctx.cmd));
-                });
+                builder.SetRenderFunc(
+                    static (ProfilingScopePassData data, UnsafeGraphContext ctx) =>
+                    {
+                        data.sampler.Begin(CommandBufferHelpers.GetNativeCommandBuffer(ctx.cmd));
+                    }
+                );
             }
         }
 
@@ -1374,26 +1539,38 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="sampler">Sampler used for profiling.</param>
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
-        public void EndProfilingSampler(ProfilingSampler sampler,
+        public void EndProfilingSampler(
+            ProfilingSampler sampler,
             [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0)
+            [CallerLineNumber] int line = 0
+        )
         {
             if (sampler == null)
                 return;
 
-            using (var builder = AddUnsafePass<ProfilingScopePassData>(k_EndProfilingSamplerPassName, out var passData, (ProfilingSampler)null, file, line))
+            using (
+                var builder = AddUnsafePass<ProfilingScopePassData>(
+                    k_EndProfilingSamplerPassName,
+                    out var passData,
+                    (ProfilingSampler)null,
+                    file,
+                    line
+                )
+            )
             {
                 passData.sampler = sampler;
                 builder.AllowPassCulling(false);
                 builder.GenerateDebugData(false);
-                builder.SetRenderFunc(static (ProfilingScopePassData data, UnsafeGraphContext ctx) =>
-                {
-                    data.sampler.End(CommandBufferHelpers.GetNativeCommandBuffer(ctx.cmd));
-                });
+                builder.SetRenderFunc(
+                    static (ProfilingScopePassData data, UnsafeGraphContext ctx) =>
+                    {
+                        data.sampler.End(CommandBufferHelpers.GetNativeCommandBuffer(ctx.cmd));
+                    }
+                );
             }
         }
 
-#endregion
+        #endregion
 
         #region Internal Interface
 
@@ -1428,7 +1605,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         internal delegate void OnGraphRegisteredDelegate(string graphName);
         internal static event OnGraphRegisteredDelegate onGraphRegistered;
         internal static event OnGraphRegisteredDelegate onGraphUnregistered;
-        internal delegate void OnExecutionRegisteredDelegate(string graphName, EntityId executionId, string executionName);
+        internal delegate void OnExecutionRegisteredDelegate(
+            string graphName,
+            EntityId executionId,
+            string executionName
+        );
         internal static event OnExecutionRegisteredDelegate onExecutionRegistered;
         #endregion
 
@@ -1547,7 +1728,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         void GenerateDebugData(int graphHash)
         {
-            if (!RenderGraphDebugSession.hasActiveDebugSession || !m_CurrentExecutionCanGenerateDebugData || m_ExecutionExceptionWasRaised)
+            if (
+                !RenderGraphDebugSession.hasActiveDebugSession
+                || !m_CurrentExecutionCanGenerateDebugData
+                || m_ExecutionExceptionWasRaised
+            )
                 return;
 
             var registeredExecutions = s_RegisteredExecutions[this];

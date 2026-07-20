@@ -17,19 +17,19 @@ namespace Unity.Networking.Transport
             // change to it should be discussed and properly synchronized with them first.
 
             /// <summary>Internal value. Do not use.</summary>
-            Default                       = 0,
+            Default = 0,
 
             /// <summary>Indicates the connection timed out due to inactivity.</summary>
-            Timeout                       = 1,
+            Timeout = 1,
 
             /// <summary>
             /// Indicates the connection failed to be established because the server could not be
             /// reached (see <see cref="NetworkConfigParameter.maxConnectAttempts"/>).
             /// </summary>
-            MaxConnectionAttempts         = 2,
+            MaxConnectionAttempts = 2,
 
             /// <summary>Indicates the connection was manually closed by the remote peer.</summary>
-            ClosedByRemote                = 3,
+            ClosedByRemote = 3,
 
             // Values 4 and 5 are already used by Netcode for Entites for bad protocol version and
             // invalid RPC, respectively. So we want new values to start at 6.
@@ -38,7 +38,7 @@ namespace Unity.Networking.Transport
             /// Indicates the connection failed to be established because the remote peer could not
             /// be authenticated. This can only occur if using DTLS or TLS (with WebSockets).
             /// </summary>
-            AuthenticationFailure         = 6,
+            AuthenticationFailure = 6,
 
             /// <summary>
             /// Indicates the connection failed because of a low-level protocol error (unexpected
@@ -46,7 +46,7 @@ namespace Unity.Networking.Transport
             /// is both unexpected and that can't be recovered from. As such it should not be
             /// returned under normal operating circumstances.
             /// </summary>
-            ProtocolError                 = 7,
+            ProtocolError = 7,
 
             // Slot available for value 8.
 
@@ -54,7 +54,7 @@ namespace Unity.Networking.Transport
             /// When connecting using a hostname instead of an IP, this indicates the host
             /// could not be found.
             /// </summary>
-            HostNotFound                  = 9,
+            HostNotFound = 9,
         }
 
         /// <summary>
@@ -63,36 +63,36 @@ namespace Unity.Networking.Transport
         public enum StatusCode
         {
             /// <summary>Operation completed successfully.</summary>
-            Success                       =  0,
+            Success = 0,
 
             /// <summary>Connection is invalid.</summary>
-            NetworkIdMismatch             = -1,
+            NetworkIdMismatch = -1,
 
             /// <summary>
             /// Connection is invalid. This is usually caused by an attempt to use a connection
             /// that has been already closed.
             /// </summary>
-            NetworkVersionMismatch        = -2,
+            NetworkVersionMismatch = -2,
 
             /// <summary>
             /// State of the connection is invalid for the operation requested. This is usually
             /// caused by an attempt to send on a connecting/closed connection.
             /// </summary>
-            NetworkStateMismatch          = -3,
+            NetworkStateMismatch = -3,
 
             /// <summary>Packet is too large for the supported capacity.</summary>
-            NetworkPacketOverflow         = -4,
+            NetworkPacketOverflow = -4,
 
             /// <summary>Packet couldn't be sent because the send queue is full.</summary>
-            NetworkSendQueueFull          = -5,
+            NetworkSendQueueFull = -5,
 
             // Slot available for value -6.
 
             /// <summary>Attempted to process the same connection in different jobs.</summary>
-            NetworkDriverParallelForErr   = -7,
+            NetworkDriverParallelForErr = -7,
 
             /// <summary>The <see cref="DataStreamWriter"/> is invalid.</summary>
-            NetworkSendHandleInvalid      = -8,
+            NetworkSendHandleInvalid = -8,
 
             // Slot available for value -9.
 
@@ -100,10 +100,10 @@ namespace Unity.Networking.Transport
             /// A message couldn't be received because the receive queue is full. This can only be
             /// returned through <see cref="NetworkDriver.ReceiveErrorCode"/>.
             /// </summary>
-            NetworkReceiveQueueFull       = -10,
+            NetworkReceiveQueueFull = -10,
 
             /// <summary>There was an error from the underlying low-level socket.</summary>
-            NetworkSocketError            = -11,
+            NetworkSocketError = -11,
         }
     }
 
@@ -191,7 +191,11 @@ namespace Unity.Networking.Transport
         /// <returns>
         /// Type of the popped event. <see cref="NetworkEvent.Type.Empty"/> if nothing to pop.
         /// </returns>
-        public NetworkEvent.Type PopEvent(NetworkDriver driver, out DataStreamReader stream, out NetworkPipeline pipeline)
+        public NetworkEvent.Type PopEvent(
+            NetworkDriver driver,
+            out DataStreamReader stream,
+            out NetworkPipeline pipeline
+        )
         {
             return driver.PopEventForConnection(this, out stream, out pipeline);
         }
@@ -225,13 +229,13 @@ namespace Unity.Networking.Transport
         }
 
         /// <inheritdoc/>
-        public static bool operator==(NetworkConnection lhs, NetworkConnection rhs)
+        public static bool operator ==(NetworkConnection lhs, NetworkConnection rhs)
         {
             return lhs.m_ConnectionId == rhs.m_ConnectionId;
         }
 
         /// <inheritdoc/>
-        public static bool operator!=(NetworkConnection lhs, NetworkConnection rhs)
+        public static bool operator !=(NetworkConnection lhs, NetworkConnection rhs)
         {
             return lhs.m_ConnectionId != rhs.m_ConnectionId;
         }

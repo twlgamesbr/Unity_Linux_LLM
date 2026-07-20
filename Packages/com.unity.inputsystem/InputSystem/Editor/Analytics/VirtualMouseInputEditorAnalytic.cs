@@ -8,8 +8,12 @@ namespace UnityEngine.InputSystem.Editor
     /// Analytics record for tracking engagement with Input Action Asset editor(s).
     /// </summary>
 #if UNITY_2023_2_OR_NEWER
-    [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-        maxNumberOfElements: kMaxNumberOfElements, vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey)]
+    [UnityEngine.Analytics.AnalyticInfo(
+        eventName: kEventName,
+        maxEventsPerHour: kMaxEventsPerHour,
+        maxNumberOfElements: kMaxNumberOfElements,
+        vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey
+    )]
 #endif // UNITY_2023_2_OR_NEWER
     internal class VirtualMouseInputEditorAnalytic : UnityEngine.InputSystem.InputAnalytics.IInputAnalytic
     {
@@ -38,7 +42,7 @@ namespace UnityEngine.InputSystem.Editor
             public enum CursorMode
             {
                 SoftwareCursor = 0,
-                HardwareCursorIfAvailable = 1
+                HardwareCursorIfAvailable = 1,
             }
 
             private static CursorMode ToCursorMode(VirtualMouseInput.CursorMode value)

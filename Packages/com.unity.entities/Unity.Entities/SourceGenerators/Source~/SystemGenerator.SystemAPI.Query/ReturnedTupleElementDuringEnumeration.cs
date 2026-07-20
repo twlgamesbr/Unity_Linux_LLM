@@ -11,7 +11,8 @@ readonly struct ReturnedTupleElementDuringEnumeration
         string typeSymbolFullName,
         string typeArgumentFullName,
         string elementName,
-        QueryType type)
+        QueryType type
+    )
     {
         TypeSymbolFullName = typeSymbolFullName;
         TypeArgumentFullName = typeArgumentFullName;

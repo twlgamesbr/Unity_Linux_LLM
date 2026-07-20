@@ -15,11 +15,20 @@ namespace Unity.Entities.Editor
             [BurstCompile]
             struct GetArchetypesDataJob : IJobParallelFor
             {
-                [ReadOnly] public ulong WorldSequenceNumber;
-                [ReadOnly] public NativeArray<EntityArchetype> Archetypes;
-                [WriteOnly] public NativeArray<ArchetypeData> ArchetypesData;
-                [WriteOnly] public NativeArray<ArchetypeMemoryData> ArchetypesMemoryData;
-                [WriteOnly] public NativeArray<ulong> ArchetypesStableHash;
+                [ReadOnly]
+                public ulong WorldSequenceNumber;
+
+                [ReadOnly]
+                public NativeArray<EntityArchetype> Archetypes;
+
+                [WriteOnly]
+                public NativeArray<ArchetypeData> ArchetypesData;
+
+                [WriteOnly]
+                public NativeArray<ArchetypeMemoryData> ArchetypesMemoryData;
+
+                [WriteOnly]
+                public NativeArray<ulong> ArchetypesStableHash;
 
                 public void Execute(int index)
                 {
@@ -74,7 +83,7 @@ namespace Unity.Entities.Editor
                     Archetypes = m_Archetypes.AsArray(),
                     ArchetypesData = m_ArchetypesData.AsArray(),
                     ArchetypesMemoryData = m_ArchetypesMemoryData.AsArray(),
-                    ArchetypesStableHash = m_ArchetypesStableHash.AsArray()
+                    ArchetypesStableHash = m_ArchetypesStableHash.AsArray(),
                 }.Run(m_Archetypes.Length);
 
                 // Populate component data for each archetype
@@ -87,8 +96,12 @@ namespace Unity.Entities.Editor
                     {
                         var typeIndex = archetype->Types[componentIndex].TypeIndex;
                         var stableTypeHash = TypeManager.GetTypeInfo(typeIndex).StableTypeHash;
-                        var flags = TypeManager.IsChunkComponent(typeIndex) ? ComponentTypeFlags.ChunkComponent : ComponentTypeFlags.None;
-                        m_ArchetypeComponentsData.Add(new ArchetypeComponentData(archetypeStableHash, stableTypeHash, flags, componentIndex));
+                        var flags = TypeManager.IsChunkComponent(typeIndex)
+                            ? ComponentTypeFlags.ChunkComponent
+                            : ComponentTypeFlags.None;
+                        m_ArchetypeComponentsData.Add(
+                            new ArchetypeComponentData(archetypeStableHash, stableTypeHash, flags, componentIndex)
+                        );
                     }
                 }
             }
@@ -153,14 +166,15 @@ namespace Unity.Entities.Editor
                 m_ArchetypesStableHash.AddRange(m_Recorder.ArchetypesStableHash);
             }
         }
-        
+
         internal static unsafe bool MemCmp<T>(NativeArray<T> lhs, NativeArray<T> rhs)
             where T : unmanaged
         {
             if (lhs.Length != rhs.Length)
                 return false;
 
-            return UnsafeUtility.MemCmp(lhs.GetUnsafeReadOnlyPtr(), rhs.GetUnsafeReadOnlyPtr(), sizeof(T) * lhs.Length) == 0;
-        }        
+            return UnsafeUtility.MemCmp(lhs.GetUnsafeReadOnlyPtr(), rhs.GetUnsafeReadOnlyPtr(), sizeof(T) * lhs.Length)
+                == 0;
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace UnityEngine.InputSystem.LowLevel
             return new QueryCanRunInBackground
             {
                 baseCommand = new InputDeviceCommand(Type, kSize),
-                canRunInBackground = false
+                canRunInBackground = false,
             };
         }
     }

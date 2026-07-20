@@ -10,15 +10,17 @@ namespace UnityEngine.UI
     /// Keep in mind though that this will create an extra draw call with each RawImage present, so it's
     /// best to use it only for backgrounds or temporary visible graphics.
     /// </remarks>
-
     [RequireComponent(typeof(CanvasRenderer))]
     [AddComponentMenu("UI (Canvas)/Raw Image", 12)]
     [UGUIHelpURL("RawImage")]
     public class RawImage : MaskableGraphic
     {
         [FormerlySerializedAs("m_Tex")]
-        [SerializeField] Texture m_Texture;
-        [SerializeField] Rect m_UVRect = new Rect(0f, 0f, 1f, 1f);
+        [SerializeField]
+        Texture m_Texture;
+
+        [SerializeField]
+        Rect m_UVRect = new Rect(0f, 0f, 1f, 1f);
 
         protected RawImage()
         {
@@ -86,10 +88,7 @@ namespace UnityEngine.UI
         /// </example>
         public Texture texture
         {
-            get
-            {
-                return m_Texture;
-            }
+            get { return m_Texture; }
             set
             {
                 if (m_Texture == value)
@@ -106,10 +105,7 @@ namespace UnityEngine.UI
         /// </summary>
         public Rect uvRect
         {
-            get
-            {
-                return m_UVRect;
-            }
+            get { return m_UVRect; }
             set
             {
                 if (m_UVRect == value)

@@ -26,9 +26,13 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
         public override long Length => Null.Length;
 
-        public override long Position { get => Null.Position; set => Null.Position = value; }
+        public override long Position
+        {
+            get => Null.Position;
+            set => Null.Position = value;
+        }
 
-        public override void Flush() {}
+        public override void Flush() { }
 
         public override int Read(byte[] buffer, int offset, int count) => Null.Read(buffer, offset, count);
 

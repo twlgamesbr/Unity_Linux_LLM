@@ -32,7 +32,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
             string androidMinimumSdkVersion = "",
             bool graphicsJobs = false,
             bool mtRendering = false
-            )
+        )
         {
             ScriptingBackend = scriptingBackend;
             GpuSkinning = gpuSkinning;

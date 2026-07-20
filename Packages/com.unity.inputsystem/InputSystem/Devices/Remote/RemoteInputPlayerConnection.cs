@@ -16,7 +16,8 @@ namespace UnityEngine.InputSystem
     //       be a ScriptableObject as it will register every listeners as a persistent
     //       one.
     [Serializable]
-    internal class RemoteInputPlayerConnection :
+    internal class RemoteInputPlayerConnection
+        :
 #if UNITY_EDITOR
         // In the editor, we need to make sure that we get the same instance after domain reloads.
         // Otherwise, callbacks we have registered before the reload will no longer be valid, because
@@ -27,7 +28,8 @@ namespace UnityEngine.InputSystem
 #else
         ScriptableObject,
 #endif
-        IObserver<InputRemoting.Message>, IObservable<InputRemoting.Message>
+            IObserver<InputRemoting.Message>,
+            IObservable<InputRemoting.Message>
     {
         public static readonly Guid kNewDeviceMsg = new Guid("fcd9651ded40425995dfa6aeb78f1f1c");
         public static readonly Guid kNewLayoutMsg = new Guid("fccfec2b7369466d88502a9dd38505f4");
@@ -74,13 +76,15 @@ namespace UnityEngine.InputSystem
             if (observer == null)
                 throw new System.ArgumentNullException(nameof(observer));
 
-            var subscriber = new Subscriber {owner = this, observer = observer};
+            var subscriber = new Subscriber { owner = this, observer = observer };
             ArrayHelpers.Append(ref m_Subscribers, subscriber);
 
             if (m_ConnectedIds != null)
             {
                 foreach (var id in m_ConnectedIds)
-                    observer.OnNext(new InputRemoting.Message { type = InputRemoting.MessageType.Connect, participantId = id });
+                    observer.OnNext(
+                        new InputRemoting.Message { type = InputRemoting.MessageType.Connect, participantId = id }
+                    );
             }
 
             return subscriber;
@@ -95,7 +99,7 @@ namespace UnityEngine.InputSystem
 
             ArrayHelpers.Append(ref m_ConnectedIds, id);
 
-            SendToSubscribers(InputRemoting.MessageType.Connect, new MessageEventArgs {playerId = id});
+            SendToSubscribers(InputRemoting.MessageType.Connect, new MessageEventArgs { playerId = id });
         }
 
         private void OnDisconnected(int id)
@@ -105,7 +109,7 @@ namespace UnityEngine.InputSystem
 
             ArrayHelpers.Erase(ref m_ConnectedIds, id);
 
-            SendToSubscribers(InputRemoting.MessageType.Disconnect, new MessageEventArgs {playerId = id});
+            SendToSubscribers(InputRemoting.MessageType.Disconnect, new MessageEventArgs { playerId = id });
         }
 
         private void OnNewDevice(MessageEventArgs args)
@@ -152,7 +156,7 @@ namespace UnityEngine.InputSystem
             {
                 participantId = args.playerId,
                 type = type,
-                data = args.data
+                data = args.data,
             };
 
             for (var i = 0; i < m_Subscribers.Length; ++i)
@@ -187,17 +191,18 @@ namespace UnityEngine.InputSystem
             }
         }
 
-        void IObserver<InputRemoting.Message>.OnError(Exception error)
-        {
-        }
+        void IObserver<InputRemoting.Message>.OnError(Exception error) { }
 
-        void IObserver<InputRemoting.Message>.OnCompleted()
-        {
-        }
+        void IObserver<InputRemoting.Message>.OnCompleted() { }
 
-        [SerializeField] private IEditorPlayerConnection m_Connection;
-        [NonSerialized] private Subscriber[] m_Subscribers;
-        [SerializeField] private int[] m_ConnectedIds;
+        [SerializeField]
+        private IEditorPlayerConnection m_Connection;
+
+        [NonSerialized]
+        private Subscriber[] m_Subscribers;
+
+        [SerializeField]
+        private int[] m_ConnectedIds;
 
         private class Subscriber : IDisposable
         {

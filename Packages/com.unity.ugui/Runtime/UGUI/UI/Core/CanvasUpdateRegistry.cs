@@ -13,26 +13,31 @@ namespace UnityEngine.UI
         /// Called before layout.
         /// </summary>
         Prelayout = 0,
+
         /// <summary>
         /// Called for layout.
         /// </summary>
         Layout = 1,
+
         /// <summary>
         /// Called after layout.
         /// </summary>
         PostLayout = 2,
+
         /// <summary>
         /// Called before rendering.
         /// </summary>
         PreRender = 3,
+
         /// <summary>
         /// Called late, before render.
         /// </summary>
         LatePreRender = 4,
+
         /// <summary>
         /// Max enum value. Always last.
         /// </summary>
-        MaxUpdateValue = 5
+        MaxUpdateValue = 5,
     }
 
     /// <summary>
@@ -79,7 +84,14 @@ namespace UnityEngine.UI
         private bool m_PerformingGraphicUpdate;
 
         // This list matches the CanvasUpdate enum above. Keep in sync
-        private string[] m_CanvasUpdateProfilerStrings = new string[] { "CanvasUpdate.Prelayout", "CanvasUpdate.Layout", "CanvasUpdate.PostLayout", "CanvasUpdate.PreRender", "CanvasUpdate.LatePreRender" };
+        private string[] m_CanvasUpdateProfilerStrings = new string[]
+        {
+            "CanvasUpdate.Prelayout",
+            "CanvasUpdate.Layout",
+            "CanvasUpdate.PostLayout",
+            "CanvasUpdate.PreRender",
+            "CanvasUpdate.LatePreRender",
+        };
         private const string m_CullingUpdateProfilerString = "ClipperRegistry.Cull";
 
         private readonly IndexedSet<ICanvasElement> m_LayoutRebuildQueue = new IndexedSet<ICanvasElement>();
@@ -158,6 +170,7 @@ namespace UnityEngine.UI
         }
 
         private static readonly Comparison<ICanvasElement> s_SortLayoutFunction = SortLayoutList;
+
         private void PerformUpdate()
         {
             UISystemProfilerApi.BeginSample(UISystemProfilerApi.SampleType.Layout);
@@ -317,7 +330,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingGraphicUpdate)
             {
-                Debug.LogError(string.Format("Trying to add {0} for graphic rebuild while we are already inside a graphic rebuild loop. This is not supported.", element));
+                Debug.LogError(
+                    string.Format(
+                        "Trying to add {0} for graphic rebuild while we are already inside a graphic rebuild loop. This is not supported.",
+                        element
+                    )
+                );
                 return false;
             }
 
@@ -348,7 +366,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingLayoutUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(
+                    string.Format(
+                        "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                        element
+                    )
+                );
                 return;
             }
 
@@ -360,7 +383,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingGraphicUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(
+                    string.Format(
+                        "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                        element
+                    )
+                );
                 return;
             }
             element.GraphicUpdateComplete();
@@ -371,7 +399,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingLayoutUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(
+                    string.Format(
+                        "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                        element
+                    )
+                );
                 return;
             }
 
@@ -383,7 +416,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingGraphicUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(
+                    string.Format(
+                        "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                        element
+                    )
+                );
                 return;
             }
             element.GraphicUpdateComplete();

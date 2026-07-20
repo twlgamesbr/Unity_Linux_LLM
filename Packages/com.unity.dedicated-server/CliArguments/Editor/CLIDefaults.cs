@@ -10,13 +10,34 @@ namespace Unity.DedicatedServer
     {
         class SettingsContent
         {
-            public static readonly GUIContent listenPort = EditorGUIUtility.TrTextContent("Port", "Port server listens on");
-            public static readonly GUIContent targetFramerate = EditorGUIUtility.TrTextContent("Target Framerate", "rate server ticks");
-            public static readonly GUIContent logLevel = EditorGUIUtility.TrTextContent("Log level", "minimum log level");
-            public static readonly GUIContent logPath = EditorGUIUtility.TrTextContent("Log path", "directory for log files");
-            public static readonly GUIContent queryPort = EditorGUIUtility.TrTextContent("Query port", "Port for server status queries");
-            public static readonly GUIContent queryType = EditorGUIUtility.TrTextContent("Query type", "protocol for server status queries");
-            public static readonly GUIContent argumentErrorPolicy = EditorGUIUtility.TrTextContent("Argument error policy", "how arguement errors are to be handled");
+            public static readonly GUIContent listenPort = EditorGUIUtility.TrTextContent(
+                "Port",
+                "Port server listens on"
+            );
+            public static readonly GUIContent targetFramerate = EditorGUIUtility.TrTextContent(
+                "Target Framerate",
+                "rate server ticks"
+            );
+            public static readonly GUIContent logLevel = EditorGUIUtility.TrTextContent(
+                "Log level",
+                "minimum log level"
+            );
+            public static readonly GUIContent logPath = EditorGUIUtility.TrTextContent(
+                "Log path",
+                "directory for log files"
+            );
+            public static readonly GUIContent queryPort = EditorGUIUtility.TrTextContent(
+                "Query port",
+                "Port for server status queries"
+            );
+            public static readonly GUIContent queryType = EditorGUIUtility.TrTextContent(
+                "Query type",
+                "protocol for server status queries"
+            );
+            public static readonly GUIContent argumentErrorPolicy = EditorGUIUtility.TrTextContent(
+                "Argument error policy",
+                "how arguement errors are to be handled"
+            );
         }
 
         class CLIDefault
@@ -32,13 +53,14 @@ namespace Unity.DedicatedServer
                 content = Content;
             }
 
-            public virtual void DisplayProperty()
-            {
-            }
+            public virtual void DisplayProperty() { }
 
             public string GetDefaultValue()
             {
-                var defValue = EditorUserBuildSettings.GetPlatformSettings(NamedBuildTarget.Server.TargetName, $"arg-default-{name}");
+                var defValue = EditorUserBuildSettings.GetPlatformSettings(
+                    NamedBuildTarget.Server.TargetName,
+                    $"arg-default-{name}"
+                );
                 if (string.IsNullOrEmpty(defValue))
                 {
                     defValue = defaultValue;
@@ -49,16 +71,18 @@ namespace Unity.DedicatedServer
 
             protected void SetDefaultValue(string defValue)
             {
-                EditorUserBuildSettings.SetPlatformSettings(NamedBuildTarget.Server.TargetName, $"arg-default-{name}", defValue);
+                EditorUserBuildSettings.SetPlatformSettings(
+                    NamedBuildTarget.Server.TargetName,
+                    $"arg-default-{name}",
+                    defValue
+                );
             }
         };
 
         class CLIDefaultInt : CLIDefault
         {
             public CLIDefaultInt(string Name, int DefaultValue, GUIContent Content)
-                : base(Name, $"{DefaultValue}", Content)
-            {
-            }
+                : base(Name, $"{DefaultValue}", Content) { }
 
             public override void DisplayProperty()
             {
@@ -73,9 +97,7 @@ namespace Unity.DedicatedServer
         class CLIDefaultString : CLIDefault
         {
             public CLIDefaultString(string Name, string DefaultValue, GUIContent Content)
-                : base(Name, DefaultValue, Content)
-            {
-            }
+                : base(Name, DefaultValue, Content) { }
 
             public override void DisplayProperty()
             {
@@ -86,7 +108,8 @@ namespace Unity.DedicatedServer
             }
         }
 
-        class CLIDefaultEnum<T> : CLIDefault where T : Enum
+        class CLIDefaultEnum<T> : CLIDefault
+            where T : Enum
         {
             public string[] enumValues;
 
@@ -108,17 +131,23 @@ namespace Unity.DedicatedServer
 
         static CLIDefault[] Defaults =
         {
-            new CLIDefaultInt("port",       7777,     SettingsContent.listenPort),
-            new CLIDefaultInt("framerate",  30,       SettingsContent.targetFramerate),
-            new CLIDefaultString("logpath",    "logs",   SettingsContent.logPath),
+            new CLIDefaultInt("port", 7777, SettingsContent.listenPort),
+            new CLIDefaultInt("framerate", 30, SettingsContent.targetFramerate),
+            new CLIDefaultString("logpath", "logs", SettingsContent.logPath),
 #if UNITY_LOGGING_PACKAGE_PRESENT
-            new CLIDefaultEnum<Unity.Logging.LogLevel>
-                ("loglevel",   Unity.Logging.LogLevel.Debug,  SettingsContent.logLevel),
+            new CLIDefaultEnum<Unity.Logging.LogLevel>(
+                "loglevel",
+                Unity.Logging.LogLevel.Debug,
+                SettingsContent.logLevel
+            ),
 #endif
-            new CLIDefaultInt("queryport",  20000,    SettingsContent.queryPort),
-            new CLIDefaultString("querytype",  "SQP",    SettingsContent.queryType),
-            new CLIDefaultEnum<UnityEngine.DedicatedServer.Arguments.ArgumentErrorPolicy>
-                ("argument-error-policy",  UnityEngine.DedicatedServer.Arguments.ArgumentErrorPolicy.Warn,  SettingsContent.argumentErrorPolicy),
+            new CLIDefaultInt("queryport", 20000, SettingsContent.queryPort),
+            new CLIDefaultString("querytype", "SQP", SettingsContent.queryType),
+            new CLIDefaultEnum<UnityEngine.DedicatedServer.Arguments.ArgumentErrorPolicy>(
+                "argument-error-policy",
+                UnityEngine.DedicatedServer.Arguments.ArgumentErrorPolicy.Warn,
+                SettingsContent.argumentErrorPolicy
+            ),
         };
 
         public static void OnGUI()

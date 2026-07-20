@@ -69,7 +69,10 @@ namespace UnityEditor.Rendering.Converter
         public RenderPipelineConverterAssetItem(string id)
         {
             if (!UnityEditor.GlobalObjectId.TryParse(id, out var gid))
-                throw new ArgumentException(nameof(id), $"Unable to perform GlobalObjectId.TryParse with the given id {id}");
+                throw new ArgumentException(
+                    nameof(id),
+                    $"Unable to perform GlobalObjectId.TryParse with the given id {id}"
+                );
 
             m_AssetPath = AssetDatabase.GUIDToAssetPath(gid.assetGUID);
             m_GlobalObjectId = gid.ToString();
@@ -101,8 +104,7 @@ namespace UnityEditor.Rendering.Converter
                 // If the object was not loaded, it is probably part of an unopened scene or prefab;
                 // if so, then the solution is to first load the scene here.
                 var objIsInSceneOrPrefab = globalId.identifierType == 2; // 2 is IdentifierType.kSceneObject
-                if (!obj &&
-                    objIsInSceneOrPrefab)
+                if (!obj && objIsInSceneOrPrefab)
                 {
                     // Open the Containing Scene Asset or Prefab in the Hierarchy so the Object can be manipulated
                     var mainAssetPath = AssetDatabase.GUIDToAssetPath(globalId.assetGUID);

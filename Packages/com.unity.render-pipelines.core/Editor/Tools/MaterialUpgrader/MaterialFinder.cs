@@ -13,7 +13,11 @@ namespace UnityEditor.Rendering
 
             foreach (var material in allMaterials)
             {
-                if (AssetDatabase.GetAssetPath(material).StartsWith("Packages", System.StringComparison.InvariantCultureIgnoreCase))
+                if (
+                    AssetDatabase
+                        .GetAssetPath(material)
+                        .StartsWith("Packages", System.StringComparison.InvariantCultureIgnoreCase)
+                )
                     continue;
 
                 var shader = material.shader;

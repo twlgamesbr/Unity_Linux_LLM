@@ -1,9 +1,9 @@
 using System;
-using UnityEditor;
 using System.Reflection;
-using UnityEngine.UIElements;
 using EditorAttributes.Editor.Utility;
+using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -15,7 +15,9 @@ namespace EditorAttributes.Editor
             var hideInChildrenAttribute = attribute as HideInChildrenAttribute;
 
             PropertyField propertyField = CreatePropertyField(property);
-            propertyField.style.display = IsPropertyInherited(property, hideInChildrenAttribute) ? DisplayStyle.None : DisplayStyle.Flex;
+            propertyField.style.display = IsPropertyInherited(property, hideInChildrenAttribute)
+                ? DisplayStyle.None
+                : DisplayStyle.Flex;
 
             return propertyField;
         }

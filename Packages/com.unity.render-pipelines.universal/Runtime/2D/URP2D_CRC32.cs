@@ -61,8 +61,15 @@ namespace UnityEngine.Rendering.Universal
                 uint step3 = data[i + 2] ^ ((crc >> 16) & 0xFF);
                 uint step4 = data[i + 3] ^ (crc >> 24);
 
-                crc = t7[step1] ^ t6[step2] ^ t5[step3] ^ t4[step4] ^
-                      t3[data[i + 4]] ^ t2[data[i + 5]] ^ t1[data[i + 6]] ^ t0[data[i + 7]];
+                crc =
+                    t7[step1]
+                    ^ t6[step2]
+                    ^ t5[step3]
+                    ^ t4[step4]
+                    ^ t3[data[i + 4]]
+                    ^ t2[data[i + 5]]
+                    ^ t1[data[i + 6]]
+                    ^ t0[data[i + 7]];
                 i += 8;
             }
 
@@ -82,6 +89,5 @@ namespace UnityEngine.Rendering.Universal
             // Use the most efficient way to get bytes without huge allocations
             return Compute(Encoding.UTF8.GetBytes(input));
         }
-
     }
 }

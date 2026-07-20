@@ -9,13 +9,20 @@ namespace UnityEngine.Rendering
     [Serializable]
     public class SerializableEnum
     {
-        [SerializeField] private string m_EnumValueAsString;
-        [SerializeField] private string m_EnumTypeAsString;
+        [SerializeField]
+        private string m_EnumValueAsString;
+
+        [SerializeField]
+        private string m_EnumTypeAsString;
 
         /// <summary> Value as enum </summary>
         public Enum value
         {
-            get => !string.IsNullOrEmpty(m_EnumTypeAsString) && Enum.TryParse(Type.GetType(m_EnumTypeAsString), m_EnumValueAsString, out object result) ? (Enum)result : default;
+            get =>
+                !string.IsNullOrEmpty(m_EnumTypeAsString)
+                && Enum.TryParse(Type.GetType(m_EnumTypeAsString), m_EnumValueAsString, out object result)
+                    ? (Enum)result
+                    : default;
             set => m_EnumValueAsString = value.ToString();
         }
 

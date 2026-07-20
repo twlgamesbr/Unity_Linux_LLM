@@ -42,7 +42,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             Assert.IsTrue(threadIndex < BlockCount && threadIndex >= 0);
 
-            UnsafeStreamBlock* block = (UnsafeStreamBlock*)Memory.Unmanaged.Array.Resize(null, 0, AllocationSize, Allocator, 1, 16);
+            UnsafeStreamBlock* block = (UnsafeStreamBlock*)
+                Memory.Unmanaged.Array.Resize(null, 0, AllocationSize, Allocator, 1, 16);
             block->Next = null;
 
             if (oldBlock == null)
@@ -89,8 +90,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     /// that the code reading from a particular buffer knows what to expect to read from it.
     /// </remarks>
     [GenerateTestsForBurstCompatibility]
-    public unsafe struct UnsafeStream
-        : INativeDisposable
+    public unsafe struct UnsafeStream : INativeDisposable
     {
         [NativeDisableUnsafePtrRestriction]
         internal AllocatorManager.Block m_BlockData;
@@ -121,11 +121,20 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>The handle of the new job.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public static JobHandle ScheduleConstruct<T>(out UnsafeStream stream, NativeList<T> bufferCount, JobHandle dependency, AllocatorManager.AllocatorHandle allocator)
+        public static JobHandle ScheduleConstruct<T>(
+            out UnsafeStream stream,
+            NativeList<T> bufferCount,
+            JobHandle dependency,
+            AllocatorManager.AllocatorHandle allocator
+        )
             where T : unmanaged
         {
             AllocateBlock(out stream, allocator);
-            var jobData = new ConstructJobList { List = (UntypedUnsafeList*)bufferCount.GetUnsafeList(), Container = stream };
+            var jobData = new ConstructJobList
+            {
+                List = (UntypedUnsafeList*)bufferCount.GetUnsafeList(),
+                Container = stream,
+            };
             return jobData.Schedule(dependency);
         }
 
@@ -141,7 +150,12 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="dependency">A job handle. The new job will depend upon this handle.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>The handle of the new job.</returns>
-        public static JobHandle ScheduleConstruct(out UnsafeStream stream, NativeArray<int> bufferCount, JobHandle dependency, AllocatorManager.AllocatorHandle allocator)
+        public static JobHandle ScheduleConstruct(
+            out UnsafeStream stream,
+            NativeArray<int> bufferCount,
+            JobHandle dependency,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             AllocateBlock(out stream, allocator);
             var jobData = new ConstructJob { Length = bufferCount, Container = stream };
@@ -161,7 +175,7 @@ namespace Unity.Collections.LowLevel.Unsafe
             int allocationSize = sizeof(UnsafeStreamBlockData) + sizeof(UnsafeStreamBlock*) * blockCount;
 
             AllocatorManager.Block blk = AllocatorManager.AllocateBlock(ref allocator, allocationSize, 16, 1);
-            UnsafeUtility.MemClear( (void*)blk.Range.Pointer, blk.AllocatedBytes);
+            UnsafeUtility.MemClear((void*)blk.Range.Pointer, blk.AllocatedBytes);
 
             stream.m_BlockData = blk;
 
@@ -177,7 +191,12 @@ namespace Unity.Collections.LowLevel.Unsafe
         internal void AllocateForEach(int forEachCount)
         {
             var blockData = (UnsafeStreamBlockData*)m_BlockData.Range.Pointer;
-            blockData->Ranges = AllocatorManager.AllocateBlock(ref m_BlockData.Range.Allocator, sizeof(UnsafeStreamRange), 16, forEachCount);
+            blockData->Ranges = AllocatorManager.AllocateBlock(
+                ref m_BlockData.Range.Allocator,
+                sizeof(UnsafeStreamRange),
+                16,
+                forEachCount
+            );
             blockData->RangeCount = forEachCount;
             UnsafeUtility.MemClear((void*)blockData->Ranges.Range.Pointer, blockData->Ranges.AllocatedBytes);
         }
@@ -273,9 +292,14 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>A new NativeArray copy of this stream's data.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public NativeArray<T> ToNativeArray<T>(AllocatorManager.AllocatorHandle allocator) where T : unmanaged
+        public NativeArray<T> ToNativeArray<T>(AllocatorManager.AllocatorHandle allocator)
+            where T : unmanaged
         {
-            var array = CollectionHelper.CreateNativeArray<T>(Count(), allocator, NativeArrayOptions.UninitializedMemory);
+            var array = CollectionHelper.CreateNativeArray<T>(
+                Count(),
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
             var reader = AsReader();
 
             int offset = 0;
@@ -294,7 +318,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             return array;
         }
 
-        internal readonly void* GetForEachCountPtr() => UnsafeUtility.AddressOf(ref ((UnsafeStreamBlockData*)m_BlockData.Range.Pointer)->RangeCount);
+        internal readonly void* GetForEachCountPtr() =>
+            UnsafeUtility.AddressOf(ref ((UnsafeStreamBlockData*)m_BlockData.Range.Pointer)->RangeCount);
 
         void Deallocate()
         {
@@ -497,7 +522,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <typeparam name="T">The type of value to write.</typeparam>
             /// <param name="value">The value to write.</param>
             [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-            public void Write<T>(T value) where T : unmanaged
+            public void Write<T>(T value)
+                where T : unmanaged
             {
                 ref T dst = ref Allocate<T>();
                 dst = value;
@@ -511,7 +537,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <typeparam name="T">The type of value to allocate space for.</typeparam>
             /// <returns>A reference to the allocation.</returns>
             [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-            public ref T Allocate<T>() where T : unmanaged
+            public ref T Allocate<T>()
+                where T : unmanaged
             {
                 int size = sizeof(T);
                 return ref UnsafeUtility.AsRef<T>(Allocate(size));
@@ -610,13 +637,14 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <remarks> Setting a state obtained from a different reader leads to undefined behavior. </remarks>
             public ReaderState State
             {
-                get => new()
+                get =>
+                    new()
                     {
                         m_CurrentBlock = m_CurrentBlock,
                         m_CurrentPtr = m_CurrentPtr,
                         m_CurrentBlockEnd = m_CurrentBlockEnd,
                         m_RemainingItemCount = m_RemainingItemCount,
-                        m_LastBlockSize = m_LastBlockSize
+                        m_LastBlockSize = m_LastBlockSize,
                     };
                 set
                 {
@@ -627,7 +655,6 @@ namespace Unity.Collections.LowLevel.Unsafe
                     m_LastBlockSize = value.m_LastBlockSize;
                 }
             }
-
 
             /// <summary>
             /// Readies this reader to read a particular buffer of the stream.
@@ -656,9 +683,7 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// Does nothing.
             /// </summary>
             /// <remarks>Included only for consistency with <see cref="NativeStream"/>.</remarks>
-            public void EndForEachIndex()
-            {
-            }
+            public void EndForEachIndex() { }
 
             /// <summary>
             /// The number of buffers in the stream of this reader.
@@ -706,7 +731,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <typeparam name="T">The type of value to read.</typeparam>
             /// <returns>A reference to the next value from the buffer.</returns>
             [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-            public ref T Read<T>() where T : unmanaged
+            public ref T Read<T>()
+                where T : unmanaged
             {
                 int size = sizeof(T);
                 return ref UnsafeUtility.AsRef<T>(ReadUnsafePtr(size));
@@ -718,7 +744,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <typeparam name="T">The type of value to read.</typeparam>
             /// <returns>A reference to the next value from the buffer.</returns>
             [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-            public ref T Peek<T>() where T : unmanaged
+            public ref T Peek<T>()
+                where T : unmanaged
             {
                 int size = sizeof(T);
 

@@ -9,7 +9,17 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
     {
         public PlayerSystemInfo() { }
 
-        public PlayerSystemInfo(string operatingSystem, string deviceModel, string deviceName, string processorType, int processorCount, string graphicsDeviceName, int systemMemorySize, string xrModel = "", string xrDevice = "")
+        public PlayerSystemInfo(
+            string operatingSystem,
+            string deviceModel,
+            string deviceName,
+            string processorType,
+            int processorCount,
+            string graphicsDeviceName,
+            int systemMemorySize,
+            string xrModel = "",
+            string xrDevice = ""
+        )
         {
             OperatingSystem = operatingSystem;
             DeviceModel = deviceModel;

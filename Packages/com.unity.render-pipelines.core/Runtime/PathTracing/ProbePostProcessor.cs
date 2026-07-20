@@ -32,86 +32,229 @@ namespace UnityEngine.PathTracing.PostProcessing
             Debug.Assert(_windowSphericalHarmonicsL2Kernel != -1);
         }
 
-        public void ConvolveRadianceToIrradiance(CommandBuffer cmd, GraphicsBuffer inRadianceBuffer, GraphicsBuffer outIrradianceBuffer, uint inputOffset, uint outputOffset, uint probeCount)
+        public void ConvolveRadianceToIrradiance(
+            CommandBuffer cmd,
+            GraphicsBuffer inRadianceBuffer,
+            GraphicsBuffer outIrradianceBuffer,
+            uint inputOffset,
+            uint outputOffset,
+            uint probeCount
+        )
         {
             Debug.Assert(_computeShader != null);
             Debug.Assert(inRadianceBuffer.count == outIrradianceBuffer.count);
             Debug.Assert(inRadianceBuffer.stride == sizeof(float));
 
-            cmd.SetComputeBufferParam(_computeShader, _convolveRadianceToIrradianceKernel, Shader.PropertyToID("g_PrimaryInputShl2"), inRadianceBuffer);
-            cmd.SetComputeBufferParam(_computeShader, _convolveRadianceToIrradianceKernel, Shader.PropertyToID("g_OutputShl2"), outIrradianceBuffer);
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _convolveRadianceToIrradianceKernel,
+                Shader.PropertyToID("g_PrimaryInputShl2"),
+                inRadianceBuffer
+            );
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _convolveRadianceToIrradianceKernel,
+                Shader.PropertyToID("g_OutputShl2"),
+                outIrradianceBuffer
+            );
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_PrimaryInputOffset"), (int)inputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_OutputOffset"), (int)outputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_ProbeCount"), (int)probeCount);
 
-            _computeShader.GetKernelThreadGroupSizes(_convolveRadianceToIrradianceKernel, out uint threadGroupsX, out uint _, out uint _);
-            cmd.DispatchCompute(_computeShader, _convolveRadianceToIrradianceKernel, Mathf.CeilToInt(probeCount / (float)threadGroupsX), 1, 1);
+            _computeShader.GetKernelThreadGroupSizes(
+                _convolveRadianceToIrradianceKernel,
+                out uint threadGroupsX,
+                out uint _,
+                out uint _
+            );
+            cmd.DispatchCompute(
+                _computeShader,
+                _convolveRadianceToIrradianceKernel,
+                Mathf.CeilToInt(probeCount / (float)threadGroupsX),
+                1,
+                1
+            );
         }
 
-        public void ConvertToUnityFormat(CommandBuffer cmd, GraphicsBuffer inIrradianceBuffer, GraphicsBuffer outIrradianceBuffer, uint inputOffset, uint outputOffset, uint probeCount)
+        public void ConvertToUnityFormat(
+            CommandBuffer cmd,
+            GraphicsBuffer inIrradianceBuffer,
+            GraphicsBuffer outIrradianceBuffer,
+            uint inputOffset,
+            uint outputOffset,
+            uint probeCount
+        )
         {
             Debug.Assert(_computeShader != null);
             Debug.Assert(inIrradianceBuffer.count == outIrradianceBuffer.count);
             Debug.Assert(inIrradianceBuffer.stride == sizeof(float));
 
-            cmd.SetComputeBufferParam(_computeShader, _convertToUnityFormatKernel, Shader.PropertyToID("g_PrimaryInputShl2"), inIrradianceBuffer);
-            cmd.SetComputeBufferParam(_computeShader, _convertToUnityFormatKernel, Shader.PropertyToID("g_OutputShl2"), outIrradianceBuffer);
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _convertToUnityFormatKernel,
+                Shader.PropertyToID("g_PrimaryInputShl2"),
+                inIrradianceBuffer
+            );
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _convertToUnityFormatKernel,
+                Shader.PropertyToID("g_OutputShl2"),
+                outIrradianceBuffer
+            );
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_PrimaryInputOffset"), (int)inputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_OutputOffset"), (int)outputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_ProbeCount"), (int)probeCount);
 
             _computeShader.GetKernelThreadGroupSizes(_convertToUnityFormatKernel, out uint threadGroupsX, out _, out _);
-            cmd.DispatchCompute(_computeShader, _convertToUnityFormatKernel, Mathf.CeilToInt(probeCount / (float)threadGroupsX), 1, 1);
+            cmd.DispatchCompute(
+                _computeShader,
+                _convertToUnityFormatKernel,
+                Mathf.CeilToInt(probeCount / (float)threadGroupsX),
+                1,
+                1
+            );
         }
 
-        internal void AddSphericalHarmonicsL2(CommandBuffer cmd, GraphicsBuffer inA, GraphicsBuffer inB, GraphicsBuffer outSum, uint inputOffsetA, uint inputOffsetB, uint outputOffset, uint probeCount)
+        internal void AddSphericalHarmonicsL2(
+            CommandBuffer cmd,
+            GraphicsBuffer inA,
+            GraphicsBuffer inB,
+            GraphicsBuffer outSum,
+            uint inputOffsetA,
+            uint inputOffsetB,
+            uint outputOffset,
+            uint probeCount
+        )
         {
             Debug.Assert(_computeShader != null);
             Debug.Assert(inA.count == inB.count);
             Debug.Assert(inA.count == outSum.count);
             Debug.Assert(inA.stride == sizeof(float));
 
-            cmd.SetComputeBufferParam(_computeShader, _addSphericalHarmonicsL2Kernel, Shader.PropertyToID("g_PrimaryInputShl2"), inA);
-            cmd.SetComputeBufferParam(_computeShader, _addSphericalHarmonicsL2Kernel, Shader.PropertyToID("g_SecondaryInputShl2"), inB);
-            cmd.SetComputeBufferParam(_computeShader, _addSphericalHarmonicsL2Kernel, Shader.PropertyToID("g_OutputShl2"), outSum);
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _addSphericalHarmonicsL2Kernel,
+                Shader.PropertyToID("g_PrimaryInputShl2"),
+                inA
+            );
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _addSphericalHarmonicsL2Kernel,
+                Shader.PropertyToID("g_SecondaryInputShl2"),
+                inB
+            );
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _addSphericalHarmonicsL2Kernel,
+                Shader.PropertyToID("g_OutputShl2"),
+                outSum
+            );
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_PrimaryInputOffset"), (int)inputOffsetA);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_SecondaryInputOffset"), (int)inputOffsetB);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_OutputOffset"), (int)outputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_ProbeCount"), (int)probeCount);
 
-            _computeShader.GetKernelThreadGroupSizes(_addSphericalHarmonicsL2Kernel, out uint threadGroupsX, out _, out _);
-            cmd.DispatchCompute(_computeShader, _addSphericalHarmonicsL2Kernel, Mathf.CeilToInt(probeCount / (float)threadGroupsX), 1, 1);
+            _computeShader.GetKernelThreadGroupSizes(
+                _addSphericalHarmonicsL2Kernel,
+                out uint threadGroupsX,
+                out _,
+                out _
+            );
+            cmd.DispatchCompute(
+                _computeShader,
+                _addSphericalHarmonicsL2Kernel,
+                Mathf.CeilToInt(probeCount / (float)threadGroupsX),
+                1,
+                1
+            );
         }
 
-        internal void ScaleSphericalHarmonicsL2(CommandBuffer cmd, GraphicsBuffer input, GraphicsBuffer outScaled, uint inputOffset, uint outputOffset, uint probeCount, float scale)
+        internal void ScaleSphericalHarmonicsL2(
+            CommandBuffer cmd,
+            GraphicsBuffer input,
+            GraphicsBuffer outScaled,
+            uint inputOffset,
+            uint outputOffset,
+            uint probeCount,
+            float scale
+        )
         {
             Debug.Assert(_computeShader != null);
             Debug.Assert(input.stride == sizeof(float));
 
-            cmd.SetComputeBufferParam(_computeShader, _scaleSphericalHarmonicsL2Kernel, Shader.PropertyToID("g_PrimaryInputShl2"), input);
-            cmd.SetComputeBufferParam(_computeShader, _scaleSphericalHarmonicsL2Kernel, Shader.PropertyToID("g_OutputShl2"), outScaled);
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _scaleSphericalHarmonicsL2Kernel,
+                Shader.PropertyToID("g_PrimaryInputShl2"),
+                input
+            );
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _scaleSphericalHarmonicsL2Kernel,
+                Shader.PropertyToID("g_OutputShl2"),
+                outScaled
+            );
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_PrimaryInputOffset"), (int)inputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_OutputOffset"), (int)outputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_ProbeCount"), (int)probeCount);
             cmd.SetComputeFloatParam(_computeShader, Shader.PropertyToID("g_Scale"), scale);
 
-            _computeShader.GetKernelThreadGroupSizes(_scaleSphericalHarmonicsL2Kernel, out uint threadGroupsX, out _, out _);
-            cmd.DispatchCompute(_computeShader, _scaleSphericalHarmonicsL2Kernel, Mathf.CeilToInt(probeCount / (float)threadGroupsX), 1, 1);
+            _computeShader.GetKernelThreadGroupSizes(
+                _scaleSphericalHarmonicsL2Kernel,
+                out uint threadGroupsX,
+                out _,
+                out _
+            );
+            cmd.DispatchCompute(
+                _computeShader,
+                _scaleSphericalHarmonicsL2Kernel,
+                Mathf.CeilToInt(probeCount / (float)threadGroupsX),
+                1,
+                1
+            );
         }
 
-        internal void WindowSphericalHarmonicsL2(CommandBuffer cmd, GraphicsBuffer input, GraphicsBuffer outWindowed, uint inputOffset, uint outputOffset, uint probeCount)
+        internal void WindowSphericalHarmonicsL2(
+            CommandBuffer cmd,
+            GraphicsBuffer input,
+            GraphicsBuffer outWindowed,
+            uint inputOffset,
+            uint outputOffset,
+            uint probeCount
+        )
         {
             Debug.Assert(_computeShader != null);
             Debug.Assert(input.stride == sizeof(float));
 
-            cmd.SetComputeBufferParam(_computeShader, _windowSphericalHarmonicsL2Kernel, Shader.PropertyToID("g_PrimaryInputShl2"), input);
-            cmd.SetComputeBufferParam(_computeShader, _windowSphericalHarmonicsL2Kernel, Shader.PropertyToID("g_OutputShl2"), outWindowed);
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _windowSphericalHarmonicsL2Kernel,
+                Shader.PropertyToID("g_PrimaryInputShl2"),
+                input
+            );
+            cmd.SetComputeBufferParam(
+                _computeShader,
+                _windowSphericalHarmonicsL2Kernel,
+                Shader.PropertyToID("g_OutputShl2"),
+                outWindowed
+            );
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_PrimaryInputOffset"), (int)inputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_OutputOffset"), (int)outputOffset);
             cmd.SetComputeIntParam(_computeShader, Shader.PropertyToID("g_ProbeCount"), (int)probeCount);
 
-            _computeShader.GetKernelThreadGroupSizes(_windowSphericalHarmonicsL2Kernel, out uint threadGroupsX, out _, out _);
-            cmd.DispatchCompute(_computeShader, _windowSphericalHarmonicsL2Kernel, Mathf.CeilToInt(probeCount / (float)threadGroupsX), 1, 1);
+            _computeShader.GetKernelThreadGroupSizes(
+                _windowSphericalHarmonicsL2Kernel,
+                out uint threadGroupsX,
+                out _,
+                out _
+            );
+            cmd.DispatchCompute(
+                _computeShader,
+                _windowSphericalHarmonicsL2Kernel,
+                Mathf.CeilToInt(probeCount / (float)threadGroupsX),
+                1,
+                1
+            );
         }
     }
 }

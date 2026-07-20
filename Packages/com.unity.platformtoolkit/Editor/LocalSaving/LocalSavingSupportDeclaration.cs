@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Unity.PlatformToolkit.Editor;
 using UnityEditor;
-
 #if UNITY_6000_4_OR_NEWER
 using GUID = UnityEngine.GUID;
 #endif
@@ -15,7 +14,7 @@ namespace Unity.PlatformToolkit.LocalSaving.Editor
             BuildTarget.StandaloneWindows,
             BuildTarget.StandaloneWindows64,
             BuildTarget.StandaloneOSX,
-            BuildTarget.StandaloneLinux64
+            BuildTarget.StandaloneLinux64,
         };
 
         public string DisplayName => "Local Saving";
@@ -30,7 +29,10 @@ namespace Unity.PlatformToolkit.LocalSaving.Editor
         };
         public IReadOnlyCollection<GUID> SupportedBuildProfileGuids => k_SupportedBuildProfileGuids;
 
-        public IPlatformToolkitBuilder CreateBuilder(IAchievementConfigurationContext achievementContext, ISettingsConfigurationContext settingsContext)
+        public IPlatformToolkitBuilder CreateBuilder(
+            IAchievementConfigurationContext achievementContext,
+            ISettingsConfigurationContext settingsContext
+        )
         {
             return new LocalSavingBuilder();
         }

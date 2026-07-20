@@ -1,5 +1,5 @@
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -32,14 +32,15 @@ namespace UnityEngine.Rendering.Universal
             internal Vector4 paniniParams;
             internal bool isPaniniGeneric;
         }
+
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            if(!m_IsValid)
+            if (!m_IsValid)
                 return;
 
             var paniniProjection = volumeStack.GetComponent<PaniniProjection>();
 
-            if(!paniniProjection.IsActive())
+            if (!paniniProjection.IsActive())
                 return;
 
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
@@ -48,7 +49,13 @@ namespace UnityEngine.Rendering.Universal
 
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
             var sourceTexture = resourceData.cameraColor;
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, sourceTexture, k_TargetName, true, FilterMode.Bilinear);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                sourceTexture,
+                k_TargetName,
+                true,
+                FilterMode.Bilinear
+            );
 
             Camera camera = cameraData.camera;
 
@@ -65,7 +72,13 @@ namespace UnityEngine.Rendering.Universal
             float paniniD = distance;
             float paniniS = Mathf.Lerp(1f, Mathf.Clamp01(scaleF), paniniProjection.cropToFit.value);
 
-            using (var builder = renderGraph.AddRasterRenderPass<PaniniProjectionPassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PaniniProjectionPassData>(
+                    passName,
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 builder.AllowGlobalStateModification(true);
                 builder.SetRenderAttachment(destinationTexture, 0, AccessFlags.Write);
@@ -75,17 +88,28 @@ namespace UnityEngine.Rendering.Universal
                 passData.paniniParams = new Vector4(viewExtents.x, viewExtents.y, paniniD, paniniS);
                 passData.isPaniniGeneric = 1f - Mathf.Abs(paniniD) > float.Epsilon;
 
-                builder.SetRenderFunc(static (PaniniProjectionPassData data, RasterGraphContext context) =>
-                {
-                    var cmd = context.cmd;
-                    RTHandle sourceTextureHdl = data.sourceTexture;
+                builder.SetRenderFunc(
+                    static (PaniniProjectionPassData data, RasterGraphContext context) =>
+                    {
+                        var cmd = context.cmd;
+                        RTHandle sourceTextureHdl = data.sourceTexture;
 
-                    data.material.SetVector(ShaderConstants._Params, data.paniniParams);
-                    data.material.EnableKeyword(data.isPaniniGeneric ? ShaderKeywordStrings.PaniniGeneric : ShaderKeywordStrings.PaniniUnitDistance);
+                        data.material.SetVector(ShaderConstants._Params, data.paniniParams);
+                        data.material.EnableKeyword(
+                            data.isPaniniGeneric
+                                ? ShaderKeywordStrings.PaniniGeneric
+                                : ShaderKeywordStrings.PaniniUnitDistance
+                        );
 
-                    Vector2 viewportScale = sourceTextureHdl.useScaling ? new Vector2(sourceTextureHdl.rtHandleProperties.rtHandleScale.x, sourceTextureHdl.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, data.material, 0);
-                });
+                        Vector2 viewportScale = sourceTextureHdl.useScaling
+                            ? new Vector2(
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.x,
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.y
+                            )
+                            : Vector2.one;
+                        Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, data.material, 0);
+                    }
+                );
             }
 
             resourceData.cameraColor = destinationTexture;

@@ -7,19 +7,21 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine.Profiling;
 using Unity.Profiling;
-
+using UnityEngine.Profiling;
 
 namespace UnityEngine.Rendering
 {
-    class TProfilingSampler<TEnum> : ProfilingSampler where TEnum : Enum
+    class TProfilingSampler<TEnum> : ProfilingSampler
+        where TEnum : Enum
     {
 #if USE_UNSAFE
         internal static TProfilingSampler<TEnum>[] samples;
 #else
-        internal static Dictionary<TEnum, TProfilingSampler<TEnum>> samples = new Dictionary<TEnum, TProfilingSampler<TEnum>>();
+        internal static Dictionary<TEnum, TProfilingSampler<TEnum>> samples =
+            new Dictionary<TEnum, TProfilingSampler<TEnum>>();
 #endif
+
         static TProfilingSampler()
         {
             var names = Enum.GetNames(typeof(TEnum));
@@ -42,9 +44,7 @@ namespace UnityEngine.Rendering
         }
 
         public TProfilingSampler(string name)
-            : base(name)
-        {
-        }
+            : base(name) { }
     }
 
     /// <summary>
@@ -141,10 +141,14 @@ namespace UnityEngine.Rendering
             inlineSampler?.End();
         }
 
-        internal bool IsValid() { return (sampler != null && inlineSampler != null); }
+        internal bool IsValid()
+        {
+            return (sampler != null && inlineSampler != null);
+        }
 
         internal CustomSampler sampler { get; private set; }
         internal CustomSampler inlineSampler { get; private set; }
+
         /// <summary>
         /// Name of the Profiling Sampler
         /// </summary>
@@ -174,22 +178,28 @@ namespace UnityEngine.Rendering
         /// GPU Elapsed time in milliseconds.
         /// </summary>
         public float gpuElapsedTime => m_Recorder.enabled ? m_Recorder.gpuElapsedNanoseconds / 1000000.0f : 0.0f;
+
         /// <summary>
         /// Number of times the Profiling Sampler has hit on the GPU
         /// </summary>
         public int gpuSampleCount => m_Recorder.enabled ? m_Recorder.gpuSampleBlockCount : 0;
+
         /// <summary>
         /// CPU Elapsed time in milliseconds (Command Buffer execution).
         /// </summary>
         public float cpuElapsedTime => m_Recorder.enabled ? m_Recorder.elapsedNanoseconds / 1000000.0f : 0.0f;
+
         /// <summary>
         /// Number of times the Profiling Sampler has hit on the CPU in the command buffer.
         /// </summary>
         public int cpuSampleCount => m_Recorder.enabled ? m_Recorder.sampleBlockCount : 0;
+
         /// <summary>
         /// CPU Elapsed time in milliseconds (Direct execution).
         /// </summary>
-        public float inlineCpuElapsedTime => m_InlineRecorder.enabled ? m_InlineRecorder.elapsedNanoseconds / 1000000.0f : 0.0f;
+        public float inlineCpuElapsedTime =>
+            m_InlineRecorder.enabled ? m_InlineRecorder.elapsedNanoseconds / 1000000.0f : 0.0f;
+
         /// <summary>
         /// Number of times the Profiling Sampler has hit on the CPU.
         /// </summary>
@@ -231,9 +241,9 @@ namespace UnityEngine.Rendering
     [IgnoredByDeepProfiler]
     public struct ProfilingScope : IDisposable
     {
-        CommandBuffer       m_Cmd;
-        bool                m_Disposed;
-        ProfilingSampler    m_Sampler;
+        CommandBuffer m_Cmd;
+        bool m_Disposed;
+        ProfilingSampler m_Sampler;
 
         /// <summary>
         /// Profiling Scope constructor
@@ -322,37 +332,28 @@ namespace UnityEngine.Rendering
         /// Profiling Scope constructor
         /// </summary>
         /// <param name="sampler">Profiling Sampler to be used for this scope.</param>
-        public ProfilingScope(ProfilingSampler sampler)
-        {
-        }
+        public ProfilingScope(ProfilingSampler sampler) { }
 
         /// <summary>
         /// Profiling Scope constructor
         /// </summary>
         /// <param name="cmd">Command buffer used to add markers and compute execution timings.</param>
         /// <param name="sampler">Profiling Sampler to be used for this scope.</param>
-        public ProfilingScope(CommandBuffer cmd, ProfilingSampler sampler)
-        {
-        }
+        public ProfilingScope(CommandBuffer cmd, ProfilingSampler sampler) { }
 
         /// <summary>
         /// Profiling Scope constructor
         /// </summary>
         /// <param name="cmd">Command buffer used to add markers and compute execution timings.</param>
         /// <param name="sampler">Profiling Sampler to be used for this scope.</param>
-        public ProfilingScope(BaseCommandBuffer cmd, ProfilingSampler sampler)
-        {
-        }
+        public ProfilingScope(BaseCommandBuffer cmd, ProfilingSampler sampler) { }
 
         /// <summary>
         ///  Dispose pattern implementation
         /// </summary>
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 #endif
-
 
     /// <summary>
     /// Profiling Sampler class.
@@ -391,9 +392,8 @@ namespace UnityEngine.Rendering
         /// <param name="cmd">Command Buffer.</param>
         /// <param name="format">Formating of the profiling sample.</param>
         /// <param name="arg">Parameters for formating the name.</param>
-        public ProfilingSample(CommandBuffer cmd, string format, object arg) : this(cmd, string.Format(format, arg))
-        {
-        }
+        public ProfilingSample(CommandBuffer cmd, string format, object arg)
+            : this(cmd, string.Format(format, arg)) { }
 
         // Shortcut to string.Format() with variable amount of arguments - for performance critical
         // code you should pre-build & cache the marker name instead of using this
@@ -403,9 +403,8 @@ namespace UnityEngine.Rendering
         /// <param name="cmd">Command Buffer.</param>
         /// <param name="format">Formating of the profiling sample.</param>
         /// <param name="args">Parameters for formating the name.</param>
-        public ProfilingSample(CommandBuffer cmd, string format, params object[] args) : this(cmd, string.Format(format, args))
-        {
-        }
+        public ProfilingSample(CommandBuffer cmd, string format, params object[] args)
+            : this(cmd, string.Format(format, args)) { }
 
         /// <summary>
         ///  Dispose pattern implementation

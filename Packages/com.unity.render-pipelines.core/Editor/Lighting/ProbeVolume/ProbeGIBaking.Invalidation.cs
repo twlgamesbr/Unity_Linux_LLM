@@ -39,7 +39,16 @@ namespace UnityEngine.Rendering
             return outputLayer;
         }
 
-        static void StoreScratchData(int x, int y, int z, int dataWidth, int dataHeight, float value, byte layer, int probeIndex)
+        static void StoreScratchData(
+            int x,
+            int y,
+            int z,
+            int dataWidth,
+            int dataHeight,
+            float value,
+            byte layer,
+            int probeIndex
+        )
         {
             int index = x + dataWidth * (y + dataHeight * z);
             s_ValidityLayer_locData[index] = (value, layer);
@@ -88,7 +97,11 @@ namespace UnityEngine.Rendering
             int brickChunksCount = (bricks.Length + chunkSize - 1) / chunkSize;
             int validityLayerCount = cell.layerValidity != null ? cell.validityNeighbourMask.GetLength(0) : 1;
 
-            var probeHasEmptySpaceInGrid = new NativeArray<bool>(cell.probePositions.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var probeHasEmptySpaceInGrid = new NativeArray<bool>(
+                cell.probePositions.Length,
+                Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             int shidx = 0;
             for (int chunkIndex = 0; chunkIndex < brickChunksCount; ++chunkIndex)
@@ -96,7 +109,9 @@ namespace UnityEngine.Rendering
                 Vector3Int locSize = ProbeBrickPool.ProbeCountToDataLocSize(ProbeBrickPool.GetChunkSizeInProbeCount());
                 int size = locSize.x * locSize.y * locSize.z;
                 int count = ProbeBrickPool.GetChunkSizeInProbeCount();
-                int bx = 0, by = 0, bz = 0;
+                int bx = 0,
+                    by = 0,
+                    bz = 0;
 
                 s_ValidityLayer_locData.Resize(size);
                 s_ProbeIndices.Resize(size);
@@ -122,19 +137,40 @@ namespace UnityEngine.Rendering
                                 else
                                 {
                                     byte layer = validityLayerCount > 1 ? cell.layerValidity[shidx] : (byte)0xFF;
-                                    StoreScratchData(ix, iy, iz, locSize.x, locSize.y, cell.validity[shidx], layer, shidx);
+                                    StoreScratchData(
+                                        ix,
+                                        iy,
+                                        iz,
+                                        locSize.x,
+                                        locSize.y,
+                                        cell.validity[shidx],
+                                        layer,
+                                        shidx
+                                    );
 
                                     // Check if we need to do some extra check on this probe.
                                     bool hasFreeNeighbourhood = false;
                                     Bounds invalidatingTouchupBound;
-                                    if (m_BakingBatch.forceInvalidatedProbesAndTouchupVols.TryGetValue(cell.probePositions[shidx], out invalidatingTouchupBound))
+                                    if (
+                                        m_BakingBatch.forceInvalidatedProbesAndTouchupVols.TryGetValue(
+                                            cell.probePositions[shidx],
+                                            out invalidatingTouchupBound
+                                        )
+                                    )
                                     {
                                         int actualBrickIdx = brickIdx / ProbeBrickPool.kBrickProbeCountTotal;
-                                        float brickSize = ProbeReferenceVolume.CellSize(cell.bricks[actualBrickIdx].subdivisionLevel);
+                                        float brickSize = ProbeReferenceVolume.CellSize(
+                                            cell.bricks[actualBrickIdx].subdivisionLevel
+                                        );
                                         Vector3 position = cell.probePositions[shidx];
                                         probesToRestore.Add(new Vector3Int(ix, iy, iz));
-                                        var searchDistance = (brickSize * m_ProfileInfo.minBrickSize) / ProbeBrickPool.kBrickCellCount;
-                                        hasFreeNeighbourhood = NeighbourhoodIsEmptySpace(position, searchDistance, invalidatingTouchupBound);
+                                        var searchDistance =
+                                            (brickSize * m_ProfileInfo.minBrickSize) / ProbeBrickPool.kBrickCellCount;
+                                        hasFreeNeighbourhood = NeighbourhoodIsEmptySpace(
+                                            position,
+                                            searchDistance,
+                                            invalidatingTouchupBound
+                                        );
                                     }
                                     probeHasEmptySpaceInGrid[shidx] = hasFreeNeighbourhood;
                                 }
@@ -173,9 +209,11 @@ namespace UnityEngine.Rendering
                                 for (int o = 0; o < 8; ++o)
                                 {
                                     Vector3Int off = GetSampleOffset(o);
-                                    Vector3Int samplePos = new Vector3Int(Mathf.Clamp(x + off.x, 0, locSize.x - 1),
-                                                                          Mathf.Clamp(y + off.y, 0, locSize.y - 1),
-                                                                          Mathf.Clamp(z + off.z, 0, ProbeBrickPool.kBrickProbeCountPerDim - 1));
+                                    Vector3Int samplePos = new Vector3Int(
+                                        Mathf.Clamp(x + off.x, 0, locSize.x - 1),
+                                        Mathf.Clamp(y + off.y, 0, locSize.y - 1),
+                                        Mathf.Clamp(z + off.z, 0, ProbeBrickPool.kBrickProbeCountPerDim - 1)
+                                    );
 
                                     if (probesToRestore.Contains(samplePos))
                                     {
@@ -185,7 +223,13 @@ namespace UnityEngine.Rendering
                                         }
                                     }
 
-                                    (validities[o], layers[o]) = ReadValidity(samplePos.x, samplePos.y, samplePos.z, locSize.x, locSize.y);
+                                    (validities[o], layers[o]) = ReadValidity(
+                                        samplePos.x,
+                                        samplePos.y,
+                                        samplePos.z,
+                                        locSize.x,
+                                        locSize.y
+                                    );
                                 }
 
                                 // Keeping for safety but i think this is useless

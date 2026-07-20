@@ -6,17 +6,24 @@ namespace Unity.Editor.Bridge
 {
     static class MenuUtilsBridge
     {
-
         internal enum ContextMenuOrigin
         {
             GameObject,
             Scene,
             Subscene,
             Toolbar,
-            None
+            None,
         }
 
-        internal static void AddCreateGameObjectItemsToMenu(GenericMenu menu, UnityEngine.Object[] context, bool includeCreateEmptyChild, bool useCreateEmptyParentMenuItem, bool includeGameObjectInPath, SceneHandle targetSceneHandle, ContextMenuOrigin origin)
+        internal static void AddCreateGameObjectItemsToMenu(
+            GenericMenu menu,
+            UnityEngine.Object[] context,
+            bool includeCreateEmptyChild,
+            bool useCreateEmptyParentMenuItem,
+            bool includeGameObjectInPath,
+            SceneHandle targetSceneHandle,
+            ContextMenuOrigin origin
+        )
         {
             ScriptingMenuItem[] menus = Menu.GetMenuItems("GameObject", true, false);
             int previousMenuItemPosition = -1;
@@ -32,7 +39,11 @@ namespace Unity.Editor.Bridge
                 if (!useCreateEmptyParentMenuItem && path.ToLower() == "GameObject/Create Empty Parent".ToLower())
                 {
                     if (GOCreationCommands.ValidateCreateEmptyParent())
-                        menu.AddItem(EditorGUIUtility.TrTextContent("Create Empty Parent"), false, GOCreationCommands.CreateEmptyParent);
+                        menu.AddItem(
+                            EditorGUIUtility.TrTextContent("Create Empty Parent"),
+                            false,
+                            GOCreationCommands.CreateEmptyParent
+                        );
                     continue;
                 }
 
@@ -46,7 +57,8 @@ namespace Unity.Editor.Bridge
                 if (!includeGameObjectInPath)
                     menupath = path.Substring(11);
 
-                MenuUtils.ExtractOnlyEnabledMenuItem(menuItem,
+                MenuUtils.ExtractOnlyEnabledMenuItem(
+                    menuItem,
                     menu,
                     menupath,
                     tempContext,
@@ -54,7 +66,8 @@ namespace Unity.Editor.Bridge
                     BeforeCreateGameObjectMenuItemWasExecuted,
                     AfterCreateGameObjectMenuItemWasExecuted,
                     (MenuUtils.ContextMenuOrigin)origin,
-                    previousMenuItemPosition);
+                    previousMenuItemPosition
+                );
 
                 previousMenuItemPosition = menuItem.priority;
             }
@@ -62,7 +75,12 @@ namespace Unity.Editor.Bridge
             MenuUtils.RemoveInvalidMenuItems(menu);
         }
 
-        static void BeforeCreateGameObjectMenuItemWasExecuted(string menuPath, UnityEngine.Object[] contextObjects, MenuUtils.ContextMenuOrigin origin, ulong userData)
+        static void BeforeCreateGameObjectMenuItemWasExecuted(
+            string menuPath,
+            UnityEngine.Object[] contextObjects,
+            MenuUtils.ContextMenuOrigin origin,
+            ulong userData
+        )
         {
             SceneHandle sceneHandle = SceneHandle.FromRawData(userData);
             if (origin == MenuUtils.ContextMenuOrigin.Scene || origin == MenuUtils.ContextMenuOrigin.Subscene)
@@ -70,7 +88,12 @@ namespace Unity.Editor.Bridge
             EditorSceneManager.SetTargetSceneForNewGameObjects(sceneHandle);
         }
 
-        static void AfterCreateGameObjectMenuItemWasExecuted(string menuPath, UnityEngine.Object[] contextObjects, MenuUtils.ContextMenuOrigin origin, ulong userData)
+        static void AfterCreateGameObjectMenuItemWasExecuted(
+            string menuPath,
+            UnityEngine.Object[] contextObjects,
+            MenuUtils.ContextMenuOrigin origin,
+            ulong userData
+        )
         {
             EditorSceneManager.SetTargetSceneForNewGameObjects(default(UnityEngine.SceneManagement.SceneHandle));
             GOCreationCommands.forcePlaceObjectsAtWorldOrigin = false;

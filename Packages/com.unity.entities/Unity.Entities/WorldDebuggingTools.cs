@@ -6,8 +6,11 @@ namespace Unity.Entities
 {
     internal static class WorldDebuggingTools
     {
-        internal static unsafe void MatchEntityInEntityQueries(World world, Entity entity,
-            List<Tuple<ComponentSystemBase, List<EntityQuery>>> matchList)
+        internal static unsafe void MatchEntityInEntityQueries(
+            World world,
+            Entity entity,
+            List<Tuple<ComponentSystemBase, List<EntityQuery>>> matchList
+        )
         {
             foreach (var system in world.Systems)
             {
@@ -24,8 +27,7 @@ namespace Unity.Entities
                 }
 
                 if (queryList.Count > 0)
-                    matchList.Add(
-                        new Tuple<ComponentSystemBase, List<EntityQuery>>(system, queryList));
+                    matchList.Add(new Tuple<ComponentSystemBase, List<EntityQuery>>(system, queryList));
             }
         }
     }

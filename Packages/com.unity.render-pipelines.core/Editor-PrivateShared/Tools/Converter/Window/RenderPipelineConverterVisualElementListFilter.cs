@@ -6,11 +6,17 @@ namespace UnityEditor.Rendering.Converter
     [UxmlElement]
     partial class RenderPipelineConverterVisualElementListFilter : VisualElement
     {
-        const string k_Uxml = "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElementListFilter.uxml";
-        const string k_Uss = "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElementListFilter.uss";
+        const string k_Uxml =
+            "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElementListFilter.uxml";
+        const string k_Uss =
+            "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElementListFilter.uss";
 
-        static Lazy<VisualTreeAsset> s_VisualTreeAsset = new Lazy<VisualTreeAsset>(() => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_Uxml));
-        static Lazy<StyleSheet> s_StyleSheet = new Lazy<StyleSheet>(() => AssetDatabase.LoadAssetAtPath<StyleSheet>(k_Uss));
+        static Lazy<VisualTreeAsset> s_VisualTreeAsset = new Lazy<VisualTreeAsset>(() =>
+            AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_Uxml)
+        );
+        static Lazy<StyleSheet> s_StyleSheet = new Lazy<StyleSheet>(() =>
+            AssetDatabase.LoadAssetAtPath<StyleSheet>(k_Uss)
+        );
 
         Button m_Pending;
         Button m_Warning;

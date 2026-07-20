@@ -16,7 +16,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public PlayModeControlsAccountAchievementsList()
         {
-            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsAccountAchievementsList.uxml");
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsAccountAchievementsList.uxml"
+            );
             uxml.CloneTree(this);
         }
 
@@ -32,7 +34,8 @@ namespace Unity.PlatformToolkit.PlayMode
                 field.dataSource = s_DefaultAchievementData;
                 return field;
             };
-            achievementsList.bindItem = (achievementField, index) => achievementField.dataSource = achievementData.Achievements[index];
+            achievementsList.bindItem = (achievementField, index) =>
+                achievementField.dataSource = achievementData.Achievements[index];
             achievementsList.dataSource = achievementData;
 
             var resetButton = this.Q<Button>("reset-all-button");

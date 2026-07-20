@@ -57,16 +57,16 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
+using Unity.Entities.Graphics;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Profiling;
-using Unity.Entities.Graphics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
-
+using AABB = Unity.Mathematics.AABB;
 #if URP_10_0_0_OR_NEWER && UNITY_EDITOR
 using System.Reflection;
 using UnityEngine.Rendering.Universal;
@@ -75,7 +75,6 @@ using UnityEngine.Rendering.Universal;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using AABB = Unity.Mathematics.AABB;
 
 namespace Unity.Rendering
 {
@@ -91,7 +90,7 @@ namespace Unity.Rendering
     internal struct EntitiesGraphicsTuningConstants
     {
         public const int kMaxInstancesPerDrawCommand = 4096;
-        public const int kMaxInstancesPerDrawRange   = 4096;
+        public const int kMaxInstancesPerDrawRange = 4096;
         public const int kMaxDrawCommandsPerDrawRange = 512;
     }
 
@@ -122,8 +121,11 @@ namespace Unity.Rendering
         {
             return new BatchCreateInfo
             {
-                GraphicsArchetypeIndex =
-                    GraphicsArchetypes.GetGraphicsArchetypeIndex(chunk.Archetype, TypeIndexToMaterialProperty, ref failureProperty),
+                GraphicsArchetypeIndex = GraphicsArchetypes.GetGraphicsArchetypeIndex(
+                    chunk.Archetype,
+                    TypeIndexToMaterialProperty,
+                    ref failureProperty
+                ),
                 Chunk = chunk,
             };
         }
@@ -206,15 +208,27 @@ namespace Unity.Rendering
     [BurstCompile]
     internal struct BoundsCheckMaterialMeshIndexJob : IJobChunk
     {
-        [ReadOnly] public SharedComponentTypeHandle<RenderMeshArray> RenderMeshArrayHandle;
-        [ReadOnly] public NativeParallelHashMap<int, BRGRenderMeshArray> BRGRenderMeshArrays;
-        [ReadOnly] public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfoHandle;
+        [ReadOnly]
+        public SharedComponentTypeHandle<RenderMeshArray> RenderMeshArrayHandle;
+
+        [ReadOnly]
+        public NativeParallelHashMap<int, BRGRenderMeshArray> BRGRenderMeshArrays;
+
+        [ReadOnly]
+        public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfoHandle;
         public EntityTypeHandle EntityHandle;
         public NativeList<Entity>.ParallelWriter EntitiesWithOutOfBoundsMMI;
 
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMaskIn)
+        public void Execute(
+            in ArchetypeChunk chunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMaskIn
+        )
         {
-            var chunkEnabledMask = useEnabledMask ? chunkEnabledMaskIn : EntitiesGraphicsUtils.ComputeBitmask(chunk.Count);
+            var chunkEnabledMask = useEnabledMask
+                ? chunkEnabledMaskIn
+                : EntitiesGraphicsUtils.ComputeBitmask(chunk.Count);
 
             var sharedComponentIndex = chunk.GetSharedComponentIndex(RenderMeshArrayHandle);
             var materialMeshInfos = chunk.GetNativeArray(ref MaterialMeshInfoHandle);
@@ -250,15 +264,19 @@ namespace Unity.Rendering
                     else
                     {
                         if (materialMeshInfo.Material < 0)
-                            outOfBounds = outOfBounds || MaterialMeshInfo.StaticIndexToArrayIndex(materialMeshInfo.Material) >= materials.Length;
+                            outOfBounds =
+                                outOfBounds
+                                || MaterialMeshInfo.StaticIndexToArrayIndex(materialMeshInfo.Material)
+                                    >= materials.Length;
 
                         if (materialMeshInfo.Mesh < 0)
-                            outOfBounds = outOfBounds || MaterialMeshInfo.StaticIndexToArrayIndex(materialMeshInfo.Mesh) >= meshes.Length;
+                            outOfBounds =
+                                outOfBounds
+                                || MaterialMeshInfo.StaticIndexToArrayIndex(materialMeshInfo.Mesh) >= meshes.Length;
                     }
 
                     if (outOfBounds)
                         EntitiesWithOutOfBoundsMMI.AddNoResize(entities[entityIndex]);
-
                 }
             }
         }
@@ -267,7 +285,8 @@ namespace Unity.Rendering
     [BurstCompile]
     internal struct InitializeUnreferencedIndicesScatterJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<int> ExistingBatchIndices;
+        [ReadOnly]
+        public NativeArray<int> ExistingBatchIndices;
         public NativeArray<long> UnreferencedBatchIndices;
 
         public unsafe void Execute(int index)
@@ -357,14 +376,13 @@ namespace Unity.Rendering
             m_RendererSystem = World.GetExistingSystemManaged<EntitiesGraphicsSystem>();
 
 #if ENABLE_MATERIALMESHINFO_BOUNDS_CHECKING
-            m_ChangedMaterialMeshQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[]
+            m_ChangedMaterialMeshQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadWrite<MaterialMeshInfo>()
-                },
-                Options = EntityQueryOptions.IncludeDisabledEntities,
-            });
+                    All = new[] { ComponentType.ReadWrite<MaterialMeshInfo>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities,
+                }
+            );
             m_ChangedMaterialMeshQuery.SetChangedVersionFilter(ComponentType.ReadWrite<MaterialMeshInfo>());
 #endif
         }
@@ -412,7 +430,11 @@ namespace Unity.Rendering
             }
         }
 
-        private void GetFilteredRenderMeshArrays(out List<RenderMeshArray> renderArrays, out List<int> sharedIndices, out List<int> sharedVersions)
+        private void GetFilteredRenderMeshArrays(
+            out List<RenderMeshArray> renderArrays,
+            out List<int> sharedIndices,
+            out List<int> sharedVersions
+        )
         {
             m_RenderMeshArrays.Clear();
             m_SharedComponentIndices.Clear();
@@ -422,7 +444,11 @@ namespace Unity.Rendering
             sharedIndices = m_SharedComponentIndices;
             sharedVersions = m_SharedComponentVersions;
 
-            EntityManager.GetAllUniqueSharedComponentsManaged<RenderMeshArray>(renderArrays, sharedIndices, sharedVersions);
+            EntityManager.GetAllUniqueSharedComponentsManaged<RenderMeshArray>(
+                renderArrays,
+                sharedIndices,
+                sharedVersions
+            );
             //Debug.Log($"BRG update: Found {renderArrays.Count} unique RenderMeshArray components:");
 
             // Discard null RenderMeshArray components
@@ -493,7 +519,8 @@ namespace Unity.Rendering
                 var sharedVersion = sharedVersions[ri];
                 var materialCount = renderArray.MaterialReferences.Length;
                 var meshCount = renderArray.MeshReferences.Length;
-                var matMeshIndexCount = renderArray.MaterialMeshIndices != null ? renderArray.MaterialMeshIndices.Length : 0;
+                var matMeshIndexCount =
+                    renderArray.MaterialMeshIndices != null ? renderArray.MaterialMeshIndices.Length : 0;
                 uint4 hash128 = renderArray.GetHash128();
 
                 bool update = false;
@@ -502,14 +529,15 @@ namespace Unity.Rendering
                 {
                     // Version change means that the shared component was deleted and another one was created with the same index
                     // It's also possible that the contents changed and the version number did not, so we also compare the 128-bit hash
-                    if ((brgRenderArray.Version != sharedVersion) ||
-                        math.any(brgRenderArray.Hash128 != hash128))
+                    if ((brgRenderArray.Version != sharedVersion) || math.any(brgRenderArray.Hash128 != hash128))
                     {
                         brgArraysToDispose.Add(brgRenderArray);
                         update = true;
 
 #if DEBUG_LOG_BRG_MATERIAL_MESH
-                        Debug.Log($"BRG Material Mesh : RenderMeshArray version change | SharedIndex ({sharedIndex}) | SharedVersion ({brgRenderArray.Version}) -> ({sharedVersion})");
+                        Debug.Log(
+                            $"BRG Material Mesh : RenderMeshArray version change | SharedIndex ({sharedIndex}) | SharedVersion ({brgRenderArray.Version}) -> ({sharedVersion})"
+                        );
 #endif
                     }
                 }
@@ -527,9 +555,15 @@ namespace Unity.Rendering
                 {
                     brgRenderArray.Version = sharedVersion;
                     brgRenderArray.Hash128 = hash128;
-                    brgRenderArray.UniqueMaterials = new UnsafeList<BatchMaterialID>(materialCount, Allocator.Persistent);
+                    brgRenderArray.UniqueMaterials = new UnsafeList<BatchMaterialID>(
+                        materialCount,
+                        Allocator.Persistent
+                    );
                     brgRenderArray.UniqueMeshes = new UnsafeList<BatchMeshID>(meshCount, Allocator.Persistent);
-                    brgRenderArray.MaterialMeshSubMeshes = new UnsafeList<BatchMaterialMeshSubMesh>(matMeshIndexCount, Allocator.Persistent);
+                    brgRenderArray.MaterialMeshSubMeshes = new UnsafeList<BatchMaterialMeshSubMesh>(
+                        matMeshIndexCount,
+                        Allocator.Persistent
+                    );
 
                     for (int i = 0; i < materialCount; ++i)
                     {
@@ -537,7 +571,9 @@ namespace Unity.Rendering
                         var id = m_RendererSystem.RegisterMaterial(material);
                         if (id == BatchMaterialID.Null)
                         {
-                            Debug.LogWarning($"Registering material {(material ? material.Value.ToString() : "null")} at index {i} inside a RenderMeshArray failed.");
+                            Debug.LogWarning(
+                                $"Registering material {(material ? material.Value.ToString() : "null")} at index {i} inside a RenderMeshArray failed."
+                            );
                         }
 
                         brgRenderArray.UniqueMaterials.Add(id);
@@ -548,7 +584,9 @@ namespace Unity.Rendering
                         var mesh = renderArray.MeshReferences[i];
                         var id = m_RendererSystem.RegisterMesh(mesh);
                         if (id == BatchMeshID.Null)
-                            Debug.LogWarning($"Registering mesh {(mesh ? mesh.Value.ToString() : "null")} at index {i} inside a RenderMeshArray failed.");
+                            Debug.LogWarning(
+                                $"Registering mesh {(mesh ? mesh.Value.ToString() : "null")} at index {i} inside a RenderMeshArray failed."
+                            );
 
                         brgRenderArray.UniqueMeshes.Add(id);
                     }
@@ -565,12 +603,14 @@ namespace Unity.Rendering
                         if (matMeshIndex.MeshIndex != -1)
                             meshID = brgRenderArray.UniqueMeshes[matMeshIndex.MeshIndex];
 
-                        brgRenderArray.MaterialMeshSubMeshes.Add(new BatchMaterialMeshSubMesh
-                        {
-                            Material = materialID,
-                            Mesh = meshID,
-                            SubMeshIndex = matMeshIndex.SubMeshIndex,
-                        });
+                        brgRenderArray.MaterialMeshSubMeshes.Add(
+                            new BatchMaterialMeshSubMesh
+                            {
+                                Material = materialID,
+                                Mesh = meshID,
+                                SubMeshIndex = matMeshIndex.SubMeshIndex,
+                            }
+                        );
                     }
 
                     m_BRGRenderMeshArrays[sharedIndex] = brgRenderArray;
@@ -590,7 +630,8 @@ namespace Unity.Rendering
             // Fire jobs to remap offline->runtime indices
             m_EntitiesWithOutOfBoundsMMI = new NativeList<Entity>(
                 m_ChangedMaterialMeshQuery.CalculateEntityCountWithoutFiltering(),
-                WorldUpdateAllocator);
+                WorldUpdateAllocator
+            );
             m_BoundsCheckHandle = new BoundsCheckMaterialMeshIndexJob
             {
                 RenderMeshArrayHandle = GetSharedComponentTypeHandle<RenderMeshArray>(),
@@ -598,8 +639,7 @@ namespace Unity.Rendering
                 EntityHandle = GetEntityTypeHandle(),
                 BRGRenderMeshArrays = m_BRGRenderMeshArrays,
                 EntitiesWithOutOfBoundsMMI = m_EntitiesWithOutOfBoundsMMI.AsParallelWriter(),
-            }
-            .ScheduleParallel(m_ChangedMaterialMeshQuery, inputDeps);
+            }.ScheduleParallel(m_ChangedMaterialMeshQuery, inputDeps);
 
             return m_BoundsCheckHandle;
 #else
@@ -624,9 +664,7 @@ namespace Unity.Rendering
 #if UNITY_EDITOR
                 authoring = EntityManager.Debug.GetAuthoringObjectForEntity(e);
 #endif
-                string entityDebugString = authoring is null
-                    ? e.ToString()
-                    : authoring.ToString();
+                string entityDebugString = authoring is null ? e.ToString() : authoring.ToString();
 
                 int numMeshes = rma.MeshReferences?.Length ?? 0;
                 int numMaterials = rma.MaterialReferences?.Length ?? 0;
@@ -640,7 +678,8 @@ namespace Unity.Rendering
                     {
                         Debug.LogError(
                             $"Entity \"{entityDebugString}\" has an invalid out of bounds MaterialMeshSubmeshes range, and will not render correctly at runtime: {matMeshIndexRange}. Number of MaterialMeshIndex in RenderMeshArray: {numMatMeshIndex}.",
-                            authoring);
+                            authoring
+                        );
                     }
                 }
                 else
@@ -677,7 +716,8 @@ namespace Unity.Rendering
                         else
                         {
                             Material material = rma.GetMaterial(mmi);
-                            materialMsg = $"MaterialID: {mmi.Material} (array index: {mmi.MaterialArrayIndex}, \"{material}\")";
+                            materialMsg =
+                                $"MaterialID: {mmi.Material} (array index: {mmi.MaterialArrayIndex}, \"{material}\")";
                         }
                     }
                     else
@@ -688,7 +728,8 @@ namespace Unity.Rendering
 
                     Debug.LogError(
                         $"Entity \"{entityDebugString}\" has an invalid out of bounds index to a Mesh or Material, and will not render correctly at runtime. {meshMsg}. Number of Meshes in RenderMeshArray: {numMeshes}. {materialMsg}. Number of Materials in RenderMeshArray: {numMaterials}.",
-                        authoring);
+                        authoring
+                    );
                 }
             }
 #endif
@@ -725,7 +766,11 @@ namespace Unity.Rendering
 
                     using var instanceIDs = registeredAssets.ToNativeArray(Allocator.Temp);
 #if (UNITY_2022_3 && UNITY_2022_3_43F1_OR_NEWER) || (UNITY_6000 && UNITY_6000_0_16F1_OR_NEWER)
-                    UnityObjectRefUtility.MarkInstanceIDsAsRootForEntitiesAssetGC((IntPtr)instanceIDs.GetUnsafePtr(), instanceIDs.Length, state);
+                    UnityObjectRefUtility.MarkInstanceIDsAsRootForEntitiesAssetGC(
+                        (IntPtr)instanceIDs.GetUnsafePtr(),
+                        instanceIDs.Length,
+                        state
+                    );
 #endif
                 }
             }
@@ -755,9 +800,11 @@ namespace Unity.Rendering
                 var apis = PlayerSettings.GetGraphicsAPIs(activeTarget);
                 if (apis != null && Array.IndexOf(apis, GraphicsDeviceType.OpenGLES3) >= 0)
                 {
-                    Debug.LogWarning("Support for OpenGL ES for Entities Graphics is deprecated, and will be removed in a future version of Entities Graphics. Update Graphics APIs in the Player Settings. " +
-                        "This warning can be suppressed by adding the scripting define DISABLE_ENTITIES_GRAPHICS_GLES_WARNING. " +
-                        "For more details, see: <a href=\"https://docs.unity3d.com/Documentation/Manual/custom-scripting-symbols.html#player-settings\">Custom symbols for a platform</a>.");
+                    Debug.LogWarning(
+                        "Support for OpenGL ES for Entities Graphics is deprecated, and will be removed in a future version of Entities Graphics. Update Graphics APIs in the Player Settings. "
+                            + "This warning can be suppressed by adding the scripting define DISABLE_ENTITIES_GRAPHICS_GLES_WARNING. "
+                            + "For more details, see: <a href=\"https://docs.unity3d.com/Documentation/Manual/custom-scripting-symbols.html#player-settings\">Custom symbols for a platform</a>."
+                    );
                 }
             }
         }
@@ -883,19 +930,19 @@ namespace Unity.Rendering
             {
                 ref var s = ref m_PerThreadStats[i];
 
-                result.ChunkTotal                   += s.ChunkTotal;
-                result.ChunkCountAnyLod             += s.ChunkCountAnyLod;
+                result.ChunkTotal += s.ChunkTotal;
+                result.ChunkCountAnyLod += s.ChunkCountAnyLod;
                 result.ChunkCountInstancesProcessed += s.ChunkCountInstancesProcessed;
-                result.ChunkCountFullyIn            += s.ChunkCountFullyIn;
-                result.InstanceTests                += s.InstanceTests;
-                result.LodTotal                     += s.LodTotal;
-                result.LodNoRequirements            += s.LodNoRequirements;
-                result.LodChanged                   += s.LodChanged;
-                result.LodChunksTested              += s.LodChunksTested;
+                result.ChunkCountFullyIn += s.ChunkCountFullyIn;
+                result.InstanceTests += s.InstanceTests;
+                result.LodTotal += s.LodTotal;
+                result.LodNoRequirements += s.LodNoRequirements;
+                result.LodChanged += s.LodChanged;
+                result.LodChunksTested += s.LodChunksTested;
 
-                result.RenderedInstanceCount        += s.RenderedEntityCount;
-                result.DrawCommandCount             += s.DrawCommandCount;
-                result.DrawRangeCount               += s.DrawRangeCount;
+                result.RenderedInstanceCount += s.RenderedEntityCount;
+                result.DrawCommandCount += s.DrawCommandCount;
+                result.DrawRangeCount += s.DrawRangeCount;
             }
 
             result.CameraMoveDistance = m_CamMoveDistance;
@@ -920,20 +967,35 @@ namespace Unity.Rendering
             if (pipelineAsset is UniversalRenderPipelineAsset)
             {
                 UniversalRenderPipelineAsset settings = pipelineAsset as UniversalRenderPipelineAsset;
-                var rendererDataListField = typeof(UniversalRenderPipelineAsset).GetField("m_RendererDataList", BindingFlags.NonPublic | BindingFlags.Instance);
-                var defaultRendererIndexField = typeof(UniversalRenderPipelineAsset).GetField("m_DefaultRendererIndex", BindingFlags.NonPublic | BindingFlags.Instance);
+                var rendererDataListField = typeof(UniversalRenderPipelineAsset).GetField(
+                    "m_RendererDataList",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
+                var defaultRendererIndexField = typeof(UniversalRenderPipelineAsset).GetField(
+                    "m_DefaultRendererIndex",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
                 if (rendererDataListField != null && defaultRendererIndexField != null)
                 {
-                    ScriptableRendererData[] rendererDatas = rendererDataListField.GetValue(settings) as ScriptableRendererData[];
+                    ScriptableRendererData[] rendererDatas =
+                        rendererDataListField.GetValue(settings) as ScriptableRendererData[];
                     int defaultRendererDataIndex = (int)defaultRendererIndexField.GetValue(settings);
-                    UniversalRendererData universalRendererData = rendererDatas[defaultRendererDataIndex] as UniversalRendererData;
-                    var renderingModeField = typeof(UniversalRendererData).GetField("m_RenderingMode", BindingFlags.NonPublic | BindingFlags.Instance);
+                    UniversalRendererData universalRendererData =
+                        rendererDatas[defaultRendererDataIndex] as UniversalRendererData;
+                    var renderingModeField = typeof(UniversalRendererData).GetField(
+                        "m_RenderingMode",
+                        BindingFlags.NonPublic | BindingFlags.Instance
+                    );
                     if (renderingModeField != null && universalRendererData != null)
                     {
                         RenderingMode renderingMode = (RenderingMode)renderingModeField.GetValue(universalRendererData);
                         if (renderingMode != RenderingMode.ForwardPlus)
                         {
-                            Debug.LogWarning("Entities.Graphics should be used with URP Forward+. Change Rendering Path on " + universalRendererData.name + " for best compatibility.");
+                            Debug.LogWarning(
+                                "Entities.Graphics should be used with URP Forward+. Change Rendering Path on "
+                                    + universalRendererData.name
+                                    + " for best compatibility."
+                            );
                         }
                     }
                 }
@@ -952,7 +1014,8 @@ namespace Unity.Rendering
         NativeParallelHashMap<int, MaterialPropertyType> m_TypeIndexToMaterialProperty;
         private PresentationSystemGroup m_presentationSystemGroup;
 
-        static Dictionary<Type, NamedPropertyMapping> s_TypeToPropertyMappings = new Dictionary<Type, NamedPropertyMapping>();
+        static Dictionary<Type, NamedPropertyMapping> s_TypeToPropertyMappings =
+            new Dictionary<Type, NamedPropertyMapping>();
 
 #if DEBUG_PROPERTY_NAMES
         internal static Dictionary<int, string> s_NameIDToName = new Dictionary<int, string>();
@@ -988,10 +1051,11 @@ namespace Unity.Rendering
             if (!EntitiesGraphicsEnabled)
             {
                 Enabled = false;
-                Debug.Log("No SRP present, no compute shader support, or running with -nographics. Entities Graphics package disabled");
+                Debug.Log(
+                    "No SRP present, no compute shader support, or running with -nographics. Entities Graphics package disabled"
+                );
                 return;
             }
-
 
 #if URP_10_0_0_OR_NEWER && UNITY_EDITOR
             ValidateUsingURPForwardPlus();
@@ -1014,40 +1078,54 @@ namespace Unity.Rendering
                 ComponentType.ChunkComponentReadOnly<EntitiesGraphicsChunkInfo>()
             );
 
-            m_EntitiesGraphicsRenderedQuery = GetEntityQuery(EntitiesGraphicsUtils.GetEntitiesGraphicsRenderedQueryDesc());
-            m_EntitiesGraphicsRenderedQueryRO = GetEntityQuery(EntitiesGraphicsUtils.GetEntitiesGraphicsRenderedQueryDescReadOnly());
+            m_EntitiesGraphicsRenderedQuery = GetEntityQuery(
+                EntitiesGraphicsUtils.GetEntitiesGraphicsRenderedQueryDesc()
+            );
+            m_EntitiesGraphicsRenderedQueryRO = GetEntityQuery(
+                EntitiesGraphicsUtils.GetEntitiesGraphicsRenderedQueryDescReadOnly()
+            );
 
-            m_LodSelectGroup = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[]
+            m_LodSelectGroup = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadWrite<EntitiesGraphicsChunkInfo>(),
-                    ComponentType.ReadOnly<ChunkHeader>()
-                },
-            });
+                    All = new[]
+                    {
+                        ComponentType.ReadWrite<EntitiesGraphicsChunkInfo>(),
+                        ComponentType.ReadOnly<ChunkHeader>(),
+                    },
+                }
+            );
 
-            m_ChangedTransformQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[]
+            m_ChangedTransformQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadOnly<LocalToWorld>(),
-                    ComponentType.ChunkComponent<EntitiesGraphicsChunkInfo>(),
-                },
-            });
+                    All = new[]
+                    {
+                        ComponentType.ReadOnly<LocalToWorld>(),
+                        ComponentType.ChunkComponent<EntitiesGraphicsChunkInfo>(),
+                    },
+                }
+            );
             m_ChangedTransformQuery.AddChangedVersionFilter(ComponentType.ReadOnly<LocalToWorld>());
             m_ChangedTransformQuery.AddOrderVersionFilter();
 
             m_BatchRendererGroup = new BatchRendererGroup(this.OnPerformCulling, IntPtr.Zero);
             // Hybrid Renderer supports all view types
-            m_BatchRendererGroup.SetEnabledViewTypes(new BatchCullingViewType[]
-            {
-                BatchCullingViewType.Camera,
-                BatchCullingViewType.Light,
-                BatchCullingViewType.Picking,
-                BatchCullingViewType.SelectionOutline
-            });
+            m_BatchRendererGroup.SetEnabledViewTypes(
+                new BatchCullingViewType[]
+                {
+                    BatchCullingViewType.Camera,
+                    BatchCullingViewType.Light,
+                    BatchCullingViewType.Picking,
+                    BatchCullingViewType.SelectionOutline,
+                }
+            );
             m_ThreadedBatchContext = m_BatchRendererGroup.GetThreadedBatchContext();
-            m_ForceLowLOD = NewNativeListResized<byte>(kInitialMaxBatchCount, Allocator.Persistent, NativeArrayOptions.ClearMemory);
+            m_ForceLowLOD = NewNativeListResized<byte>(
+                kInitialMaxBatchCount,
+                Allocator.Persistent,
+                NativeArrayOptions.ClearMemory
+            );
 
             m_ResetLod = true;
 
@@ -1065,13 +1143,15 @@ namespace Unity.Rendering
             m_SharedZeroAllocation = m_GPUPersistentAllocator.Allocate((ulong)sizeof(float4x4));
             Assert.IsTrue(!m_SharedZeroAllocation.Empty, "Allocation of constant-zero data failed");
             // Make sure the global zero is actually zero.
-            m_ValueBlits.Add(new ValueBlitDescriptor
-            {
-                Value = float4x4.zero,
-                DestinationOffset = (uint)m_SharedZeroAllocation.begin,
-                ValueSizeBytes = (uint)sizeof(float4x4),
-                Count = 1,
-            });
+            m_ValueBlits.Add(
+                new ValueBlitDescriptor
+                {
+                    Value = float4x4.zero,
+                    DestinationOffset = (uint)m_SharedZeroAllocation.begin,
+                    ValueSizeBytes = (uint)sizeof(float4x4),
+                    Count = 1,
+                }
+            );
             Assert.IsTrue(m_SharedZeroAllocation.begin == 0, "Global zero allocation should have zero address");
 
             ResetIds();
@@ -1084,7 +1164,8 @@ namespace Unity.Rendering
                         ComponentType.ReadWrite<EntitiesGraphicsChunkInfo>(),
                         ComponentType.ReadOnly<ChunkHeader>(),
                     },
-                });
+                }
+            );
 
 #if UNITY_EDITOR
 #if UNITY_2022_2_14F1_OR_NEWER
@@ -1093,13 +1174,23 @@ namespace Unity.Rendering
             int maxThreadCount = JobsUtility.MaxJobThreadCount;
 #endif
 
-            m_PerThreadStats = (EntitiesGraphicsPerThreadStats*)Memory.Unmanaged.Allocate(maxThreadCount * sizeof(EntitiesGraphicsPerThreadStats),
-                64, Allocator.Persistent);
+            m_PerThreadStats = (EntitiesGraphicsPerThreadStats*)
+                Memory.Unmanaged.Allocate(
+                    maxThreadCount * sizeof(EntitiesGraphicsPerThreadStats),
+                    64,
+                    Allocator.Persistent
+                );
 #endif
 
             // Collect all components with [MaterialProperty] attribute
-            m_NameIDToMaterialProperties = new NativeParallelMultiHashMap<int, MaterialPropertyType>(256, Allocator.Persistent);
-            m_TypeIndexToMaterialProperty = new NativeParallelHashMap<int, MaterialPropertyType>(256, Allocator.Persistent);
+            m_NameIDToMaterialProperties = new NativeParallelMultiHashMap<int, MaterialPropertyType>(
+                256,
+                Allocator.Persistent
+            );
+            m_TypeIndexToMaterialProperty = new NativeParallelHashMap<int, MaterialPropertyType>(
+                256,
+                Allocator.Persistent
+            );
 
             m_GraphicsArchetypes = new EntitiesGraphicsArchetypes(256);
 
@@ -1141,7 +1232,8 @@ namespace Unity.Rendering
                 GraphicsBuffer.Target.Raw,
                 GraphicsBuffer.UsageFlags.None,
                 (int)m_PersistentInstanceDataSize / 4,
-                4);
+                4
+            );
 
             m_GPUPersistentInstanceBufferHandle = m_GPUPersistentInstanceData.bufferHandle;
 
@@ -1188,9 +1280,7 @@ namespace Unity.Rendering
         /// <summary>
         /// The maximum GPU buffer size (in bytes) that a batch can access.
         /// </summary>
-        public static int MaxBytesPerBatch => UseConstantBuffers
-            ? MaxBytesPerCBuffer
-            : kMaxBytesPerBatchRawBuffer;
+        public static int MaxBytesPerBatch => UseConstantBuffers ? MaxBytesPerCBuffer : kMaxBytesPerBatchRawBuffer;
 
         /// <summary>
         /// Registers a material property type with the given name.
@@ -1213,8 +1303,10 @@ namespace Unity.Rendering
             if (s_TypeToPropertyMappings.ContainsKey(type))
             {
                 string prevPropertyName = s_TypeToPropertyMappings[type].Name;
-                Assert.IsTrue(propertyName.Equals(prevPropertyName),
-                    $"Attempted to register type {type.Name} with multiple different property names. Registered with \"{propertyName}\", previously registered with \"{prevPropertyName}\".");
+                Assert.IsTrue(
+                    propertyName.Equals(prevPropertyName),
+                    $"Attempted to register type {type.Name} with multiple different property names. Registered with \"{propertyName}\", previously registered with \"{prevPropertyName}\"."
+                );
             }
             else
             {
@@ -1252,14 +1344,13 @@ namespace Unity.Rendering
                 int typeIndex = TypeManager.GetTypeIndex(type);
                 int nameID = Shader.PropertyToID(propertyName);
 
-                var materialPropertyType =
-                    new MaterialPropertyType
-                    {
-                        TypeIndex = typeIndex,
-                        NameID = nameID,
-                        SizeBytesCPU = sizeBytesCPU,
-                        SizeBytesGPU = sizeBytesGPU,
-                    };
+                var materialPropertyType = new MaterialPropertyType
+                {
+                    TypeIndex = typeIndex,
+                    NameID = nameID,
+                    SizeBytesCPU = sizeBytesCPU,
+                    SizeBytesGPU = sizeBytesGPU,
+                };
 
                 m_TypeIndexToMaterialProperty.Add(typeIndex, materialPropertyType);
                 m_NameIDToMaterialProperties.Add(nameID, materialPropertyType);
@@ -1270,14 +1361,15 @@ namespace Unity.Rendering
 #endif
 
 #if DEBUG_LOG_MATERIAL_PROPERTY_TYPES
-                Debug.Log($"Type \"{type.Name}\" ({sizeBytesCPU} bytes) overrides material property \"{propertyName}\" (nameID: {nameID}, typeIndex: {typeIndex})");
+                Debug.Log(
+                    $"Type \"{type.Name}\" ({sizeBytesCPU} bytes) overrides material property \"{propertyName}\" (nameID: {nameID}, typeIndex: {typeIndex})"
+                );
 #endif
 
                 // We cache all IComponentData types that we know are capable of overriding properties
                 m_ComponentTypeCache.UseType(typeIndex);
             }
         }
-
 
         /// <summary>
         /// Prune sparse uploader gpu buffer pool.
@@ -1322,7 +1414,8 @@ namespace Unity.Rendering
                 ? $"UBO mode (UBO max size: {MaxBytesPerCBuffer}, alignment: {BatchAllocationAlignment}, globals: {m_GlobalWindowSize})"
                 : "SSBO mode";
             Debug.Log(
-                $"Entities Graphics active, MaterialProperty component type count {m_ComponentTypeCache.UsedTypeCount} / {ComponentTypeCache.BurstCompatibleTypeArray.kMaxTypes}, {mode}");
+                $"Entities Graphics active, MaterialProperty component type count {m_ComponentTypeCache.UsedTypeCount} / {ComponentTypeCache.BurstCompatibleTypeArray.kMaxTypes}, {mode}"
+            );
 #endif
         }
 
@@ -1352,7 +1445,7 @@ namespace Unity.Rendering
         {
             return new BatchFilterSettings
             {
-                layer = (byte) filterSettings.Layer,
+                layer = (byte)filterSettings.Layer,
                 renderingLayerMask = filterSettings.RenderingLayerMask,
                 motionMode = filterSettings.MotionMode,
                 shadowCastingMode = filterSettings.ShadowCastingMode,
@@ -1432,8 +1525,7 @@ namespace Unity.Rendering
             if (currentCapacity >= neededCapacity)
                 return;
 
-            Assert.IsTrue(kMaxBatchGrowFactor >= 1f,
-                "Grow factor should always be greater or equal to 1");
+            Assert.IsTrue(kMaxBatchGrowFactor >= 1f, "Grow factor should always be greater or equal to 1");
 
             var newCapacity = (int)(kMaxBatchGrowFactor * neededCapacity);
 
@@ -1513,14 +1605,20 @@ namespace Unity.Rendering
             m_ResetLod = true;
         }
 
-        private void RewindThreadLocalAllocator()
-            => RewindThreadLocalAllocator(
+        private void RewindThreadLocalAllocator() =>
+            RewindThreadLocalAllocator(
                 ref m_CullingJobReleaseDependency,
                 ref m_ReleaseDependency,
                 ref m_ThreadLocalAllocators,
-                ref m_NumberOfCullingPassesAccumulatedWithoutAllocatorRewind);
+                ref m_NumberOfCullingPassesAccumulatedWithoutAllocatorRewind
+            );
 
-        private static void RewindThreadLocalAllocator(ref JobHandle cullingJobReleaseDependency, ref JobHandle releaseDependency, ref ThreadLocalAllocator allocator, ref int numberOfCullingPassesAccumulatedWithoutAllocatorRewind)
+        private static void RewindThreadLocalAllocator(
+            ref JobHandle cullingJobReleaseDependency,
+            ref JobHandle releaseDependency,
+            ref ThreadLocalAllocator allocator,
+            ref int numberOfCullingPassesAccumulatedWithoutAllocatorRewind
+        )
         {
             cullingJobReleaseDependency.Complete();
             cullingJobReleaseDependency = default;
@@ -1531,7 +1629,10 @@ namespace Unity.Rendering
         }
 
         // This function does only return a meaningful IncludeExcludeListFilter object when called from a BRG culling callback.
-        static IncludeExcludeListFilter GetPickingIncludeExcludeListFilterForCurrentCullingCallback(EntityManager entityManager, in BatchCullingContext cullingContext)
+        static IncludeExcludeListFilter GetPickingIncludeExcludeListFilterForCurrentCullingCallback(
+            EntityManager entityManager,
+            in BatchCullingContext cullingContext
+        )
         {
 #if ENABLE_PICKING && !DISABLE_INCLUDE_EXCLUDE_LIST_FILTERING
             PickingIncludeExcludeEntityIdList includeExcludeList = default;
@@ -1571,7 +1672,8 @@ namespace Unity.Rendering
                 entityManager,
                 includeEntityIndices,
                 excludeEntityIndices,
-                Allocator.TempJob);
+                Allocator.TempJob
+            );
 
             includeExcludeList.Dispose();
             emptyArray.Dispose();
@@ -1606,12 +1708,12 @@ namespace Unity.Rendering
             ref float prevLodDistanceScale,
             ref NativeList<byte> forceLowLOD,
             ref IncludeExcludeListFilter includeExcludeListFilter
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             ,
             ref EntitiesGraphicsPerThreadStats* perThreadStats,
             ref float camMoveDistance
-            #endif
-            )
+#endif
+        )
         {
             var chunkCount = entitiesGraphicsRenderedQueryRO.CalculateChunkCountWithoutFiltering();
 
@@ -1624,7 +1726,12 @@ namespace Unity.Rendering
             //if we have accumulated too many culling passes without rewinding the allocator in system update, force the rewind here. Otherwise when system update doesn't tick but culling does, we might run out of memory
             if (numberOfCullingPassesAccumulatedWithoutAllocatorRewind == kMaxCullingPassesWithoutAllocatorRewind)
             {
-                RewindThreadLocalAllocator(ref cullingJobReleaseDependency, ref releaseDependency, ref threadLocalAllocators, ref numberOfCullingPassesAccumulatedWithoutAllocatorRewind);
+                RewindThreadLocalAllocator(
+                    ref cullingJobReleaseDependency,
+                    ref releaseDependency,
+                    ref threadLocalAllocators,
+                    ref numberOfCullingPassesAccumulatedWithoutAllocatorRewind
+                );
             }
             ++numberOfCullingPassesAccumulatedWithoutAllocatorRewind;
 
@@ -1637,8 +1744,10 @@ namespace Unity.Rendering
             {
                 // Depend on all component ata we access + previous jobs since we are writing to a single
                 // m_ChunkInstanceLodEnableds array.
-                var lodJobDependency = JobHandle.CombineDependencies(cullingJobDependency,
-                    cullingJobDependencyGroup.GetDependency());
+                var lodJobDependency = JobHandle.CombineDependencies(
+                    cullingJobDependency,
+                    cullingJobDependencyGroup.GetDependency()
+                );
 
                 float cameraMoveDistance = math.length(prevCameraPos - lodParams.cameraPos);
                 var lodDistanceScaleChanged = lodParams.distanceScale != prevLodDistanceScale;
@@ -1658,8 +1767,9 @@ namespace Unity.Rendering
                     LODReferencePoints = systemState->GetComponentTypeHandle<LODWorldReferencePoint>(true),
                     EntitiesGraphicsChunkInfo = systemState->GetComponentTypeHandle<EntitiesGraphicsChunkInfo>(),
                     ChunkHeader = systemState->GetComponentTypeHandle<ChunkHeader>(),
-                    CameraMoveDistanceFixed16 =
-                        Fixed16CamDistance.FromFloatCeil(cameraMoveDistance * lodParams.distanceScale),
+                    CameraMoveDistanceFixed16 = Fixed16CamDistance.FromFloatCeil(
+                        cameraMoveDistance * lodParams.distanceScale
+                    ),
                     DistanceScale = lodParams.distanceScale,
                     DistanceScaleChanged = lodDistanceScaleChanged,
                     MaximumLODLevelMask = 1 << QualitySettings.maximumLODLevel,
@@ -1668,7 +1778,10 @@ namespace Unity.Rendering
 #endif
                 };
 
-                cullingDependency = LODDependency = selectLodEnabledJob.ScheduleParallel(lodSelectGroup, lodJobDependency);
+                cullingDependency = LODDependency = selectLodEnabledJob.ScheduleParallel(
+                    lodSelectGroup,
+                    lodJobDependency
+                );
 
                 prevLODParams = lodParams;
                 prevLodDistanceScale = lodParams.distanceScale;
@@ -1689,18 +1802,25 @@ namespace Unity.Rendering
                 cullingDependency = JobHandle.CombineDependencies(
                     LODDependency,
                     cullingJobDependency,
-                    cullingJobDependencyGroup.GetDependency());
+                    cullingJobDependencyGroup.GetDependency()
+                );
             }
 
             var visibilityItems = new IndirectList<ChunkVisibilityItem>(
                 chunkCount,
-                threadLocalAllocators.GeneralAllocator);
+                threadLocalAllocators.GeneralAllocator
+            );
 
-            bool cullLightmapShadowCasters = (cullingContext->cullingFlags & BatchCullingFlags.CullLightmappedShadowCasters) != 0;
+            bool cullLightmapShadowCasters =
+                (cullingContext->cullingFlags & BatchCullingFlags.CullLightmappedShadowCasters) != 0;
 
             var frustumCullingJob = new FrustumCullingJob
             {
-                Splits = CullingSplits.Create(cullingContext, QualitySettings.shadowProjection, threadLocalAllocators.GeneralAllocator->Handle),
+                Splits = CullingSplits.Create(
+                    cullingContext,
+                    QualitySettings.shadowProjection,
+                    threadLocalAllocators.GeneralAllocator->Handle
+                ),
                 CullingViewType = cullingContext->viewType,
                 EntitiesGraphicsChunkInfo = systemState->GetComponentTypeHandle<EntitiesGraphicsChunkInfo>(true),
                 ChunkWorldRenderBounds = systemState->GetComponentTypeHandle<ChunkWorldRenderBounds>(true),
@@ -1716,8 +1836,13 @@ namespace Unity.Rendering
 #endif
             };
 
-            var frustumCullingJobHandle = frustumCullingJob.ScheduleParallel(entitiesGraphicsRenderedQueryRO, cullingDependency);
-            var disposeFrustumCullingHandle = frustumCullingJob.IncludeExcludeListFilter.Dispose(frustumCullingJobHandle);
+            var frustumCullingJobHandle = frustumCullingJob.ScheduleParallel(
+                entitiesGraphicsRenderedQueryRO,
+                cullingDependency
+            );
+            var disposeFrustumCullingHandle = frustumCullingJob.IncludeExcludeListFilter.Dispose(
+                frustumCullingJobHandle
+            );
 
             cullingJobDependency = JobHandle.CombineDependencies(frustumCullingJobHandle, cullingJobDependency);
             cullingJobDependencyGroup.AddDependency(frustumCullingJobHandle);
@@ -1727,10 +1852,15 @@ namespace Unity.Rendering
             var chunkDrawCommandOutput = new ChunkDrawCommandOutput(
                 binCountEstimate,
                 threadLocalAllocators,
-                cullingOutput);
+                cullingOutput
+            );
 
             float screenRelativeMetric = LODRenderingUtils.CalculateScreenRelativeMetricNoBias(cullingCtxLodParams);
-            float meshLodConstant = LODRenderingUtils.CalculateMeshLodConstant(cullingCtxLodParams, screenRelativeMetric, QualitySettings.meshLodThreshold);
+            float meshLodConstant = LODRenderingUtils.CalculateMeshLodConstant(
+                cullingCtxLodParams,
+                screenRelativeMetric,
+                QualitySettings.meshLodThreshold
+            );
 
             var meshLodSelectionContext = new MeshLodSelectionContext
             {
@@ -1767,10 +1897,7 @@ namespace Unity.Rendering
                 ProfilerEmitChunk = new ProfilerMarker("EmitChunk"),
             };
 
-            var allocateWorkItemsJob = new AllocateWorkItemsJob
-            {
-                DrawCommandOutput = chunkDrawCommandOutput,
-            };
+            var allocateWorkItemsJob = new AllocateWorkItemsJob { DrawCommandOutput = chunkDrawCommandOutput };
 
             var collectWorkItemsJob = new CollectWorkItemsJob
             {
@@ -1779,25 +1906,13 @@ namespace Unity.Rendering
                 ProfileWrite = new ProfilerMarker("Write"),
             };
 
-            var flushWorkItemsJob = new FlushWorkItemsJob
-            {
-                DrawCommandOutput = chunkDrawCommandOutput,
-            };
+            var flushWorkItemsJob = new FlushWorkItemsJob { DrawCommandOutput = chunkDrawCommandOutput };
 
-            var allocateInstancesJob = new AllocateInstancesJob
-            {
-                DrawCommandOutput = chunkDrawCommandOutput,
-            };
+            var allocateInstancesJob = new AllocateInstancesJob { DrawCommandOutput = chunkDrawCommandOutput };
 
-            var allocateDrawCommandsJob = new AllocateDrawCommandsJob
-            {
-                DrawCommandOutput = chunkDrawCommandOutput
-            };
+            var allocateDrawCommandsJob = new AllocateDrawCommandsJob { DrawCommandOutput = chunkDrawCommandOutput };
 
-            var expandInstancesJob = new ExpandVisibleInstancesJob
-            {
-                DrawCommandOutput = chunkDrawCommandOutput,
-            };
+            var expandInstancesJob = new ExpandVisibleInstancesJob { DrawCommandOutput = chunkDrawCommandOutput };
 
             var generateDrawCommandsJob = new GenerateDrawCommandsJob
             {
@@ -1817,52 +1932,68 @@ namespace Unity.Rendering
 #endif
             };
 
-            var emitDrawCommandsDependency = emitDrawCommandsJob.ScheduleWithIndirectList(visibilityItems, 1, cullingJobDependency);
+            var emitDrawCommandsDependency = emitDrawCommandsJob.ScheduleWithIndirectList(
+                visibilityItems,
+                1,
+                cullingJobDependency
+            );
 
-            var collectGlobalBinsDependency =
-                chunkDrawCommandOutput.BinCollector.ScheduleFinalize(emitDrawCommandsDependency);
+            var collectGlobalBinsDependency = chunkDrawCommandOutput.BinCollector.ScheduleFinalize(
+                emitDrawCommandsDependency
+            );
             var sortBinsDependency = DrawBinSort.ScheduleBinSort(
                 threadLocalAllocators.GeneralAllocator,
                 chunkDrawCommandOutput.SortedBins,
                 chunkDrawCommandOutput.UnsortedBins,
-                collectGlobalBinsDependency);
+                collectGlobalBinsDependency
+            );
 
             var allocateWorkItemsDependency = allocateWorkItemsJob.Schedule(collectGlobalBinsDependency);
             var collectWorkItemsDependency = collectWorkItemsJob.ScheduleWithIndirectList(
-                chunkDrawCommandOutput.UnsortedBins, 1, allocateWorkItemsDependency);
+                chunkDrawCommandOutput.UnsortedBins,
+                1,
+                allocateWorkItemsDependency
+            );
 
-            var flushWorkItemsDependency =
-                flushWorkItemsJob.Schedule(ChunkDrawCommandOutput.NumThreads, 1, collectWorkItemsDependency);
+            var flushWorkItemsDependency = flushWorkItemsJob.Schedule(
+                ChunkDrawCommandOutput.NumThreads,
+                1,
+                collectWorkItemsDependency
+            );
 
             var allocateInstancesDependency = allocateInstancesJob.Schedule(flushWorkItemsDependency);
 
             var allocateDrawCommandsDependency = allocateDrawCommandsJob.Schedule(
-                JobHandle.CombineDependencies(sortBinsDependency, flushWorkItemsDependency));
+                JobHandle.CombineDependencies(sortBinsDependency, flushWorkItemsDependency)
+            );
 
             var allocationsDependency = JobHandle.CombineDependencies(
                 allocateInstancesDependency,
-                allocateDrawCommandsDependency);
+                allocateDrawCommandsDependency
+            );
 
             var expandInstancesDependency = expandInstancesJob.ScheduleWithIndirectList(
                 chunkDrawCommandOutput.WorkItems,
                 1,
-                allocateInstancesDependency);
+                allocateInstancesDependency
+            );
             var generateDrawCommandsDependency = generateDrawCommandsJob.ScheduleWithIndirectList(
                 chunkDrawCommandOutput.SortedBins,
                 1,
-                allocationsDependency);
+                allocationsDependency
+            );
             var generateDrawRangesDependency = generateDrawRangesJob.Schedule(allocateDrawCommandsDependency);
 
             var expansionDependency = JobHandle.CombineDependencies(
                 expandInstancesDependency,
                 generateDrawCommandsDependency,
-                generateDrawRangesDependency);
+                generateDrawRangesDependency
+            );
 
 #if DEBUG_VALIDATE_DRAW_COMMAND_SORT
-            expansionDependency = new DebugValidateSortJob
-            {
-                DrawCommandOutput = chunkDrawCommandOutput,
-            }.Schedule(expansionDependency);
+            expansionDependency = new DebugValidateSortJob { DrawCommandOutput = chunkDrawCommandOutput }.Schedule(
+                expansionDependency
+            );
 #endif
 
 #if DEBUG_LOG_DRAW_COMMANDS || DEBUG_LOG_DRAW_COMMANDS_VERBOSE
@@ -1872,15 +2003,21 @@ namespace Unity.Rendering
             cullingJobReleaseDependency = JobHandle.CombineDependencies(
                 cullingJobReleaseDependency,
                 disposeFrustumCullingHandle,
-                chunkDrawCommandOutput.Dispose(expansionDependency));
+                chunkDrawCommandOutput.Dispose(expansionDependency)
+            );
 
             cullingJobDependency = JobHandle.CombineDependencies(emitDrawCommandsDependency, cullingJobDependency);
             cullingJobDependency = JobHandle.CombineDependencies(expansionDependency, cullingJobDependency);
             cullingJobDependencyGroup.AddDependency(expansionDependency);
-            result =  cullingJobDependency;
+            result = cullingJobDependency;
         }
 
-        private JobHandle OnPerformCulling(BatchRendererGroup rendererGroup, BatchCullingContext cullingContext, BatchCullingOutput cullingOutput, IntPtr userContext)
+        private JobHandle OnPerformCulling(
+            BatchRendererGroup rendererGroup,
+            BatchCullingContext cullingContext,
+            BatchCullingOutput cullingOutput,
+            IntPtr userContext
+        )
         {
             Profiler.BeginSample("OnPerformCulling");
             if (!m_presentationSystemGroup.Enabled)
@@ -1897,7 +2034,8 @@ namespace Unity.Rendering
                 return m_CullingJobDependency;
             }
 
-            IncludeExcludeListFilter includeExcludeListFilter = GetPickingIncludeExcludeListFilterForCurrentCullingCallback(EntityManager, cullingContext);
+            IncludeExcludeListFilter includeExcludeListFilter =
+                GetPickingIncludeExcludeListFilterForCurrentCullingCallback(EntityManager, cullingContext);
 
             // If inclusive filtering is enabled and we know there are no included entities,
             // we can skip all the work because we know that the result will be nothing.
@@ -1937,12 +2075,12 @@ namespace Unity.Rendering
                 ref m_PrevLodDistanceScale,
                 ref m_ForceLowLOD,
                 ref includeExcludeListFilter
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 ,
                 ref m_PerThreadStats,
                 ref m_CamMoveDistance
-                #endif
-                );
+#endif
+            );
 
             Profiler.EndSample();
             return result;
@@ -1954,7 +2092,9 @@ namespace Unity.Rendering
 
             var drawCommands = cullingOutput.drawCommands[0];
 
-            Debug.Log($"Draw Command summary: visibleInstanceCount: {drawCommands.visibleInstanceCount} drawCommandCount: {drawCommands.drawCommandCount} drawRangeCount: {drawCommands.drawRangeCount}");
+            Debug.Log(
+                $"Draw Command summary: visibleInstanceCount: {drawCommands.visibleInstanceCount} drawCommandCount: {drawCommands.drawCommandCount} drawRangeCount: {drawCommands.drawRangeCount}"
+            );
 
 #if DEBUG_LOG_DRAW_COMMANDS_VERBOSE
             bool verbose = true;
@@ -1974,17 +2114,21 @@ namespace Unity.Rendering
                         SubMeshIndex = cmd.submeshIndex,
                         Flags = cmd.flags,
                     };
-                    Debug.Log($"Draw Command #{i}: {settings} visibleOffset: {cmd.visibleOffset} visibleCount: {cmd.visibleCount}");
+                    Debug.Log(
+                        $"Draw Command #{i}: {settings} visibleOffset: {cmd.visibleOffset} visibleCount: {cmd.visibleCount}"
+                    );
                     StringBuilder sb = new StringBuilder((int)cmd.visibleCount * 30);
                     bool hasSortingPosition = settings.HasSortingPosition;
                     for (int j = 0; j < cmd.visibleCount; ++j)
                     {
                         sb.Append(drawCommands.visibleInstances[cmd.visibleOffset + j]);
                         if (hasSortingPosition)
-                            sb.AppendFormat(" ({0:F3} {1:F3} {2:F3})",
+                            sb.AppendFormat(
+                                " ({0:F3} {1:F3} {2:F3})",
                                 drawCommands.instanceSortingPositions[cmd.sortingPosition + 0],
                                 drawCommands.instanceSortingPositions[cmd.sortingPosition + 1],
-                                drawCommands.instanceSortingPositions[cmd.sortingPosition + 2]);
+                                drawCommands.instanceSortingPositions[cmd.sortingPosition + 2]
+                            );
                         sb.Append(", ");
                     }
                     Debug.Log($"Draw Command #{i} instances: [{sb}]");
@@ -2001,18 +2145,18 @@ namespace Unity.Rendering
             int maxThreadCount = JobsUtility.MaxJobThreadCount;
 #endif
 
-
             var threadLocalAABBs = new NativeArray<ThreadLocalAABB>(
                 maxThreadCount,
                 Allocator.TempJob,
-                NativeArrayOptions.UninitializedMemory);
-            var zeroAABBJob = new ZeroThreadLocalAABBJob
-            {
-                ThreadLocalAABBs = threadLocalAABBs,
-            }.Schedule(threadLocalAABBs.Length, 16);
+                NativeArrayOptions.UninitializedMemory
+            );
+            var zeroAABBJob = new ZeroThreadLocalAABBJob { ThreadLocalAABBs = threadLocalAABBs }.Schedule(
+                threadLocalAABBs.Length,
+                16
+            );
             ThreadLocalAABB.AssertCacheLineSize();
 
-            var entitiesGraphicsRenderedChunkType= GetComponentTypeHandle<EntitiesGraphicsChunkInfo>(false);
+            var entitiesGraphicsRenderedChunkType = GetComponentTypeHandle<EntitiesGraphicsChunkInfo>(false);
             var entitiesGraphicsRenderedChunkTypeRO = GetComponentTypeHandle<EntitiesGraphicsChunkInfo>(true);
             var chunkHeadersRO = GetComponentTypeHandle<ChunkHeader>(true);
             var chunkWorldRenderBoundsRO = GetComponentTypeHandle<ChunkWorldRenderBounds>(true);
@@ -2028,23 +2172,24 @@ namespace Unity.Rendering
             var numNewChunksArray = new NativeArray<int>(1, Allocator.TempJob);
             int totalChunksWithNormalQuery = m_EntitiesGraphicsRenderedQuery.CalculateChunkCountWithoutFiltering();
             // One meta-entity = one chunk of normal entities, so use CalculateEntityCount
-            int totalChunksWithMetaEntityQuery = m_MetaEntitiesForHybridRenderableChunksQuery.CalculateEntityCountWithoutFiltering();
+            int totalChunksWithMetaEntityQuery =
+                m_MetaEntitiesForHybridRenderableChunksQuery.CalculateEntityCountWithoutFiltering();
             // For some reason, the counts returned by these queries may not always match in edge cases.
             // Use the larger of the two counts to ensure we never run out of space.
             int totalChunks = math.max(totalChunksWithNormalQuery, totalChunksWithMetaEntityQuery);
             var newChunks = new NativeArray<ArchetypeChunk>(
                 totalChunks,
                 Allocator.TempJob,
-                NativeArrayOptions.UninitializedMemory);
+                NativeArrayOptions.UninitializedMemory
+            );
 
             var classifyNewChunksJob = new ClassifyNewChunksJob
-                {
-                    EntitiesGraphicsChunkInfo = entitiesGraphicsRenderedChunkTypeRO,
-                    ChunkHeader = chunkHeadersRO,
-                    NumNewChunks = numNewChunksArray,
-                    NewChunks = newChunks
-                }
-                .ScheduleParallel(m_MetaEntitiesForHybridRenderableChunksQuery, inputDependencies);
+            {
+                EntitiesGraphicsChunkInfo = entitiesGraphicsRenderedChunkTypeRO,
+                ChunkHeader = chunkHeadersRO,
+                NumNewChunks = numNewChunksArray,
+                NewChunks = newChunks,
+            }.ScheduleParallel(m_MetaEntitiesForHybridRenderableChunksQuery, inputDependencies);
 
             JobHandle entitiesGraphicsCompleted = new JobHandle();
 
@@ -2052,7 +2197,8 @@ namespace Unity.Rendering
             var unreferencedBatchIndices = new NativeArray<long>(
                 (BatchIndexRange + kNumBitsPerLong) / kNumBitsPerLong,
                 Allocator.TempJob,
-                NativeArrayOptions.ClearMemory);
+                NativeArrayOptions.ClearMemory
+            );
 
             JobHandle initializedUnreferenced = default;
             var existingKeys = m_ExistingBatchIndices.ToNativeArray(Allocator.TempJob);
@@ -2076,11 +2222,13 @@ namespace Unity.Rendering
             var gpuUploadOperations = new NativeArray<GpuUploadOperation>(
                 conservativeMaximumGpuUploads,
                 Allocator.TempJob,
-                NativeArrayOptions.UninitializedMemory);
+                NativeArrayOptions.UninitializedMemory
+            );
             var numGpuUploadOperationsArray = new NativeArray<int>(
                 1,
                 Allocator.TempJob,
-                NativeArrayOptions.ClearMemory);
+                NativeArrayOptions.ClearMemory
+            );
 
             uint lastSystemVersion = LastSystemVersion;
 
@@ -2115,7 +2263,6 @@ namespace Unity.Rendering
 
                 ThreadLocalAABBs = threadLocalAABBs,
                 ThreadIndex = 0, // set by the job system
-
 #if PROFILE_BURST_JOB_INTERNALS
                 ProfileAddUpload = new ProfilerMarker("AddUpload"),
 #endif
@@ -2136,7 +2283,9 @@ namespace Unity.Rendering
             JobHandle updateOldDependencies = inputDependencies;
 
             // We need to wait for the job to complete here so we can process the new chunks
-            updateOldJob.ScheduleParallel(m_MetaEntitiesForHybridRenderableChunksQuery, updateOldDependencies).Complete();
+            updateOldJob
+                .ScheduleParallel(m_MetaEntitiesForHybridRenderableChunksQuery, updateOldDependencies)
+                .Complete();
 
             // Garbage collect deleted batches before adding new ones to minimize peak memory use.
             Profiler.BeginSample("GarbageCollectUnreferencedBatches");
@@ -2159,13 +2308,17 @@ namespace Unity.Rendering
 
 #if DEBUG_LOG_INVALID_CHUNKS
                 if (numValidNewChunks != numNewChunks)
-                    Debug.Log($"Tried to add {numNewChunks} new chunks, but only {numValidNewChunks} were valid, {numNewChunks - numValidNewChunks} were invalid");
+                    Debug.Log(
+                        $"Tried to add {numNewChunks} new chunks, but only {numValidNewChunks} were valid, {numNewChunks - numValidNewChunks} were invalid"
+                    );
 #endif
 
                 entitiesGraphicsCompleted = updateNewChunksJob.Schedule(numValidNewChunks, kNumNewChunksPerThread);
             }
 
-            disposeJobHandles[numDisposeJobHandles++] = entitiesGraphicsChunkUpdater.ComponentTypes.Dispose(entitiesGraphicsCompleted);
+            disposeJobHandles[numDisposeJobHandles++] = entitiesGraphicsChunkUpdater.ComponentTypes.Dispose(
+                entitiesGraphicsCompleted
+            );
             disposeJobHandles[numDisposeJobHandles++] = newChunks.Dispose(entitiesGraphicsCompleted);
             disposeJobHandles[numDisposeJobHandles++] = numNewChunksArray.Dispose(entitiesGraphicsCompleted);
 
@@ -2183,11 +2336,18 @@ namespace Unity.Rendering
             entitiesGraphicsCompleted.Complete();
 
             int numGpuUploadOperations = numGpuUploadOperationsArray[0];
-            Assert.IsTrue(numGpuUploadOperations <= gpuUploadOperations.Length, "Maximum GPU upload operation count exceeded");
+            Assert.IsTrue(
+                numGpuUploadOperations <= gpuUploadOperations.Length,
+                "Maximum GPU upload operation count exceeded"
+            );
 
             ComputeUploadSizeRequirements(
-                numGpuUploadOperations, gpuUploadOperations,
-                out int numOperations, out int totalUploadBytes, out int biggestUploadBytes);
+                numGpuUploadOperations,
+                gpuUploadOperations,
+                out int numOperations,
+                out int totalUploadBytes,
+                out int biggestUploadBytes
+            );
 
 #if DEBUG_LOG_UPLOADS
             if (numOperations > 0)
@@ -2213,7 +2373,9 @@ namespace Unity.Rendering
 
 #if DEBUG_LOG_CHUNK_CHANGES
             if (numNewChunks > 0 || numRemoved > 0)
-                Debug.Log($"Chunks changed, new chunks: {numNewChunks}, removed batches: {numRemoved}, batch count: {m_ExistingBatchBatchIndices.Count()}, chunk count: {m_MetaEntitiesForHybridRenderableChunks.CalculateEntityCount()}");
+                Debug.Log(
+                    $"Chunks changed, new chunks: {numNewChunks}, removed batches: {numRemoved}, batch count: {m_ExistingBatchBatchIndices.Count()}, chunk count: {m_MetaEntitiesForHybridRenderableChunks.CalculateEntityCount()}"
+                );
 #endif
 
             Profiler.BeginSample("UpdateGlobalAABB");
@@ -2225,12 +2387,12 @@ namespace Unity.Rendering
             uploadsExecuted.Complete();
 
             // Also add a dependency to the dispose jobs to ensure they will always be waited on
-            m_ReleaseDependency = JobHandle.CombineDependencies(
-                    disposeJobHandles.Slice(0, numDisposeJobHandles));
+            m_ReleaseDependency = JobHandle.CombineDependencies(disposeJobHandles.Slice(0, numDisposeJobHandles));
             JobHandle outputDeps = JobHandle.CombineDependencies(
                 uploadsExecuted,
                 drawCommandFlagsUpdated,
-                m_ReleaseDependency);
+                m_ReleaseDependency
+            );
 
             return outputDeps;
         }
@@ -2246,15 +2408,19 @@ namespace Unity.Rendering
             Debug.Log($"Global AABB min: {aabb.Min} max: {aabb.Max}");
 #endif
 
-            var centerExtentsAABB = (AABB) aabb;
+            var centerExtentsAABB = (AABB)aabb;
             m_BatchRendererGroup.SetGlobalBounds(new Bounds(centerExtentsAABB.Center, centerExtentsAABB.Extents));
 
             threadLocalAABBs.Dispose();
         }
 
         private void ComputeUploadSizeRequirements(
-            int numGpuUploadOperations, NativeArray<GpuUploadOperation> gpuUploadOperations,
-            out int numOperations, out int totalUploadBytes, out int biggestUploadBytes)
+            int numGpuUploadOperations,
+            NativeArray<GpuUploadOperation> gpuUploadOperations,
+            out int numOperations,
+            out int totalUploadBytes,
+            out int biggestUploadBytes
+        )
         {
             numOperations = numGpuUploadOperations + m_ValueBlits.Length;
             totalUploadBytes = 0;
@@ -2333,7 +2499,7 @@ namespace Unity.Rendering
                 m_ChunkMetadataAllocator.Release(metadataAllocation);
             }
 
-            m_ThreadedBatchContext.RemoveBatch(new BatchID { value = (uint) batchIndex });
+            m_ThreadedBatchContext.RemoveBatch(new BatchID { value = (uint)batchIndex });
         }
 
         static int NumInstancesInChunk(ArchetypeChunk chunk) => chunk.Capacity;
@@ -2376,10 +2542,18 @@ namespace Unity.Rendering
             };
 
             var sortedNewChunks = new NativeArray<BatchCreateInfo>(newChunks.Length, Allocator.Temp);
-            CreateBatchCreateInfo(ref batchCreateInfoFactory, ref newChunks, ref sortedNewChunks, out var failureProperty);
+            CreateBatchCreateInfo(
+                ref batchCreateInfoFactory,
+                ref newChunks,
+                ref sortedNewChunks,
+                out var failureProperty
+            );
             if (failureProperty.TypeIndex >= 0)
             {
-                Assert.IsTrue(false, $"TypeIndex mismatch between key and stored property, Type: {failureProperty.TypeName} ({failureProperty.TypeIndex:x8}), Property: {failureProperty.PropertyName} ({failureProperty.NameID:x8})");
+                Assert.IsTrue(
+                    false,
+                    $"TypeIndex mismatch between key and stored property, Type: {failureProperty.TypeName} ({failureProperty.TypeIndex:x8}), Property: {failureProperty.PropertyName} ({failureProperty.NameID:x8})"
+                );
             }
 
             int batchBegin = 0;
@@ -2414,7 +2588,8 @@ namespace Unity.Rendering
                     bool valid = AddNewBatch(
                         batchCreationTypeHandles,
                         sortedNewChunks.GetSubArray(batchBegin, numChunks),
-                        numInstances);
+                        numInstances
+                    );
 
                     // As soon as we encounter an invalid chunk, we know that all the rest are invalid
                     // too.
@@ -2454,15 +2629,15 @@ namespace Unity.Rendering
             return new MetadataValue
             {
                 NameID = nameID,
-                Value = (uint) gpuAddress
-                        | (isOverridden ? kPerInstanceDataBit : 0),
+                Value = (uint)gpuAddress | (isOverridden ? kPerInstanceDataBit : 0),
             };
         }
 
         private bool AddNewBatch(
             BatchCreationTypeHandles typeHandles,
             NativeArray<BatchCreateInfo> batchChunks,
-            int numInstances)
+            int numInstances
+        )
         {
             var graphicsArchetype = m_GraphicsArchetypes.GetGraphicsArchetype(batchChunks[0].GraphicsArchetypeIndex);
 
@@ -2494,14 +2669,23 @@ namespace Unity.Rendering
             batchInfo.ChunkMetadataAllocation = m_ChunkMetadataAllocator.Allocate((ulong)batchTotalChunkMetadata);
             if (batchInfo.ChunkMetadataAllocation.Empty)
             {
-                Assert.IsTrue(false, $"Out of memory in the Entities Graphics chunk metadata buffer. Attempted to allocate {batchTotalChunkMetadata} elements, buffer size: {m_ChunkMetadataAllocator.Size}, free size left: {m_ChunkMetadataAllocator.FreeSpace}.");
+                Assert.IsTrue(
+                    false,
+                    $"Out of memory in the Entities Graphics chunk metadata buffer. Attempted to allocate {batchTotalChunkMetadata} elements, buffer size: {m_ChunkMetadataAllocator.Size}, free size left: {m_ChunkMetadataAllocator.FreeSpace}."
+                );
                 return false;
             }
 
-            batchInfo.GPUMemoryAllocation = m_GPUPersistentAllocator.Allocate((ulong)batchSizeBytes, BatchAllocationAlignment);
+            batchInfo.GPUMemoryAllocation = m_GPUPersistentAllocator.Allocate(
+                (ulong)batchSizeBytes,
+                BatchAllocationAlignment
+            );
             if (batchInfo.GPUMemoryAllocation.Empty)
             {
-                Assert.IsTrue(false, $"Out of memory in the Entities Graphics GPU instance data buffer. Attempted to allocate {batchSizeBytes}, buffer size: {m_GPUPersistentAllocator.Size}, free size left: {m_GPUPersistentAllocator.FreeSpace}.");
+                Assert.IsTrue(
+                    false,
+                    $"Out of memory in the Entities Graphics GPU instance data buffer. Attempted to allocate {batchSizeBytes}, buffer size: {m_GPUPersistentAllocator.Size}, free size left: {m_GPUPersistentAllocator.FreeSpace}."
+                );
                 return false;
             }
 
@@ -2510,12 +2694,8 @@ namespace Unity.Rendering
 
             // Metadata offset depends on whether a raw buffer or cbuffer is used.
             // Raw buffers index from start of buffer, cbuffers index from start of allocation.
-            uint bindOffset = UseConstantBuffers
-                ? (uint)allocationBegin
-                : 0;
-            uint bindWindowSize = UseConstantBuffers
-                ? (uint)MaxBytesPerBatch
-                : 0;
+            uint bindOffset = UseConstantBuffers ? (uint)allocationBegin : 0;
+            uint bindWindowSize = UseConstantBuffers ? (uint)MaxBytesPerBatch : 0;
 
             // Compute where each individual property SoA stream starts
             var overrideStreamBegin = new NativeArray<int>(overrides.Length, Allocator.Temp);
@@ -2534,18 +2714,26 @@ namespace Unity.Rendering
                 ++metadataIndex;
 
 #if DEBUG_LOG_PROPERTY_ALLOCATIONS
-                Debug.Log($"Property Allocation: Property: {NameIDFormatted(overrides[i].NameID)} Type: {TypeIndexFormatted(overrides[i].TypeIndex)} Metadata: {overrideMetadata[i].Value:x8} Allocation: {overrideStreamBegin[i]}");
+                Debug.Log(
+                    $"Property Allocation: Property: {NameIDFormatted(overrides[i].NameID)} Type: {TypeIndexFormatted(overrides[i].TypeIndex)} Metadata: {overrideMetadata[i].Value:x8} Allocation: {overrideStreamBegin[i]}"
+                );
 #endif
             }
 
-            var batchID = m_ThreadedBatchContext.AddBatch(overrideMetadata, m_GPUPersistentInstanceBufferHandle,
-                bindOffset, bindWindowSize);
+            var batchID = m_ThreadedBatchContext.AddBatch(
+                overrideMetadata,
+                m_GPUPersistentInstanceBufferHandle,
+                bindOffset,
+                bindWindowSize
+            );
             int batchIndex = (int)batchID.value;
 
 #if DEBUG_LOG_BATCH_CREATION
-            Debug.Log($"Created new batch, ID: {batchIndex}, chunks: {batchChunks.Length}, properties: {numProperties}, instances: {numInstances}, size: {batchSizeBytes}, buffer {m_GPUPersistentInstanceBufferHandle.value} (size {m_GPUPersistentInstanceData.count * m_GPUPersistentInstanceData.stride} bytes)");
+            Debug.Log(
+                $"Created new batch, ID: {batchIndex}, chunks: {batchChunks.Length}, properties: {numProperties}, instances: {numInstances}, size: {batchSizeBytes}, buffer {m_GPUPersistentInstanceBufferHandle.value} (size {m_GPUPersistentInstanceData.count * m_GPUPersistentInstanceData.stride} bytes)"
+            );
 #endif
-            Assert.IsTrue(batchIndex!=0, "Failed to add new BatchRendererGroup batch.");
+            Assert.IsTrue(batchIndex != 0, "Failed to add new BatchRendererGroup batch.");
 
             AddBatchIndex(batchIndex);
             m_BatchInfos[batchIndex] = batchInfo;
@@ -2561,7 +2749,7 @@ namespace Unity.Rendering
                 TypeHandles = typeHandles,
                 ChunkMetadataBegin = (int)batchInfo.ChunkMetadataAllocation.begin,
                 ChunkOffsetInBatch = 0,
-                OverrideStreamBegin = overrideStreamBegin
+                OverrideStreamBegin = overrideStreamBegin,
             };
             SetBatchChunkData(ref args, ref overrides);
 
@@ -2584,7 +2772,10 @@ namespace Unity.Rendering
         }
 
         [BurstCompile]
-        static void SetBatchChunkData(ref SetBatchChunkDataArgs args, ref UnsafeList<ArchetypePropertyOverride> overrides)
+        static void SetBatchChunkData(
+            ref SetBatchChunkDataArgs args,
+            ref UnsafeList<ArchetypePropertyOverride> overrides
+        )
         {
             var batchChunks = args.BatchChunks;
             int numProperties = args.NumProperties;
@@ -2633,8 +2824,7 @@ namespace Unity.Rendering
 
         static byte ComputeCullingFlags(ArchetypeChunk chunk, BatchCreationTypeHandles typeHandles)
         {
-            bool hasLodData = chunk.Has(ref typeHandles.RootLODRange) &&
-                              chunk.Has(ref typeHandles.LODRange);
+            bool hasLodData = chunk.Has(ref typeHandles.RootLODRange) && chunk.Has(ref typeHandles.LODRange);
 
             // TODO: Do we need non-per-instance culling anymore? It seems to always be added
             // for converted objects, and doesn't seem to be removed ever, so the only way to
@@ -2656,7 +2846,7 @@ namespace Unity.Rendering
             UploadBlitJob uploadJob = new UploadBlitJob()
             {
                 BlitList = m_ValueBlits,
-                ThreadedSparseUploader = m_ThreadedGPUUploader
+                ThreadedSparseUploader = m_ThreadedGPUUploader,
             };
 
             JobHandle handle = uploadJob.Schedule(m_ValueBlits.Length, 1);
@@ -2690,7 +2880,6 @@ namespace Unity.Rendering
             m_CullingJobDependencyGroup.AddDependency(job);
         }
 
-
         private void StartUpdate(int numOperations, int totalUploadBytes, int biggestUploadBytes)
         {
             var persistentBytes = m_GPUPersistentAllocator.OnePastHighestUsedAddress;
@@ -2706,34 +2895,39 @@ namespace Unity.Rendering
                     m_PersistentInstanceDataSize = kGPUBufferSizeMax; // Some backends fails at loading 1024 MiB, but 1023 is fine... This should ideally be a device cap.
                 }
 
-                if(persistentBytes > kGPUBufferSizeMax)
-                    Debug.LogError("Entities Graphics: Current loaded scenes need more than 1GiB of persistent GPU memory. This is more than some GPU backends can allocate. Try to reduce amount of loaded data.");
+                if (persistentBytes > kGPUBufferSizeMax)
+                    Debug.LogError(
+                        "Entities Graphics: Current loaded scenes need more than 1GiB of persistent GPU memory. This is more than some GPU backends can allocate. Try to reduce amount of loaded data."
+                    );
 
                 var newBuffer = new GraphicsBuffer(
                     GraphicsBuffer.Target.Raw,
                     GraphicsBuffer.UsageFlags.None,
                     (int)m_PersistentInstanceDataSize / 4,
-                    4);
+                    4
+                );
                 m_GPUUploader.ReplaceBuffer(newBuffer, true);
 
                 m_GPUPersistentInstanceBufferHandle = newBuffer.bufferHandle;
 
                 UpdateBatchBufferHandles();
 
-                if(m_GPUPersistentInstanceData != null)
+                if (m_GPUPersistentInstanceData != null)
                     m_GPUPersistentInstanceData.Dispose();
                 m_GPUPersistentInstanceData = newBuffer;
             }
 
-            m_ThreadedGPUUploader =
-                m_GPUUploader.Begin(totalUploadBytes, biggestUploadBytes, numOperations);
+            m_ThreadedGPUUploader = m_GPUUploader.Begin(totalUploadBytes, biggestUploadBytes, numOperations);
         }
 
         private void UpdateBatchBufferHandles()
         {
             foreach (var b in m_ExistingBatchIndices)
             {
-                m_BatchRendererGroup.SetBatchBuffer(new BatchID { value = (uint)b }, m_GPUPersistentInstanceBufferHandle);
+                m_BatchRendererGroup.SetBatchBuffer(
+                    new BatchID { value = (uint)b },
+                    m_GPUPersistentInstanceBufferHandle
+                );
             }
         }
 
@@ -2755,7 +2949,9 @@ namespace Unity.Rendering
 #if DEBUG_LOG_MEMORY_USAGE
             if (m_GPUPersistentAllocator.UsedSpace != PrevUsedSpace)
             {
-                Debug.Log($"GPU memory: {m_GPUPersistentAllocator.UsedSpace / 1024.0 / 1024.0:F4} / {m_GPUPersistentAllocator.Size / 1024.0 / 1024.0:F4}");
+                Debug.Log(
+                    $"GPU memory: {m_GPUPersistentAllocator.UsedSpace / 1024.0 / 1024.0:F4} / {m_GPUPersistentAllocator.Size / 1024.0 / 1024.0:F4}"
+                );
                 PrevUsedSpace = m_GPUPersistentAllocator.UsedSpace;
             }
 #endif
@@ -2765,7 +2961,12 @@ namespace Unity.Rendering
 #endif
         }
 
-        internal static NativeList<T> NewNativeListResized<T>(int length, Allocator allocator, NativeArrayOptions resizeOptions = NativeArrayOptions.ClearMemory) where T : unmanaged
+        internal static NativeList<T> NewNativeListResized<T>(
+            int length,
+            Allocator allocator,
+            NativeArrayOptions resizeOptions = NativeArrayOptions.ClearMemory
+        )
+            where T : unmanaged
         {
             var list = new NativeList<T>(length, allocator);
             list.Resize(length, resizeOptions);
@@ -2901,4 +3102,3 @@ namespace Unity.Rendering
         }
     }
 }
-

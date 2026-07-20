@@ -53,7 +53,12 @@ namespace Unity.Physics.Extensions
         /// <param name="point">            The point. </param>
         ///
         /// <returns>   The effective mass. </returns>
-        public static float GetEffectiveMass(this in PhysicsWorld world, int rigidBodyIndex, float3 impulse, float3 point)
+        public static float GetEffectiveMass(
+            this in PhysicsWorld world,
+            int rigidBodyIndex,
+            float3 impulse,
+            float3 point
+        )
         {
             if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
                 return 0;
@@ -72,7 +77,12 @@ namespace Unity.Physics.Extensions
         ///
         /// <returns>   The effective mass implementation. </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static float GetEffectiveMassImpl(float3 centerOfMass, float3 inverseInertia, float3 impulse, float3 point)
+        internal static float GetEffectiveMassImpl(
+            float3 centerOfMass,
+            float3 inverseInertia,
+            float3 impulse,
+            float3 point
+        )
         {
             float3 pointDir = math.normalizesafe(point - centerOfMass);
             float3 impulseDir = math.normalizesafe(impulse);
@@ -189,7 +199,12 @@ namespace Unity.Physics.Extensions
         ///
         /// <returns>   The linear velocity implementation. </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static float3 GetLinearVelocityImpl(RigidTransform worldFromMotion, float3 angularVelocity, float3 linearVelocity, float3 point)
+        internal static float3 GetLinearVelocityImpl(
+            RigidTransform worldFromMotion,
+            float3 angularVelocity,
+            float3 linearVelocity,
+            float3 point
+        )
         {
             angularVelocity = math.rotate(worldFromMotion, angularVelocity);
             return linearVelocity + math.cross(angularVelocity, point - worldFromMotion.pos);
@@ -246,7 +261,10 @@ namespace Unity.Physics.Extensions
 
             MotionData md = world.MotionDatas[rigidBodyIndex];
             float3 angularImpulseWorldSpace = math.cross(point - md.WorldFromMotion.pos, linearImpulse);
-            float3 angularImpulseMotionSpace = math.rotate(math.inverse(md.WorldFromMotion.rot), angularImpulseWorldSpace);
+            float3 angularImpulseMotionSpace = math.rotate(
+                math.inverse(md.WorldFromMotion.rot),
+                angularImpulseWorldSpace
+            );
 
             Unity.Collections.NativeArray<MotionVelocity> motionVelocities = world.MotionVelocities;
             MotionVelocity mv = motionVelocities[rigidBodyIndex];
@@ -302,8 +320,13 @@ namespace Unity.Physics.Extensions
         /// <param name="requiredLinearVelocity">   [out] The required linear velocity. </param>
         /// <param name="requiredAngularVelocity">  [out] The required angular velocity. </param>
         public static void CalculateVelocityToTarget(
-            this PhysicsWorld world, int rigidBodyIndex, RigidTransform targetTransform, float timestep,
-            out float3 requiredLinearVelocity, out float3 requiredAngularVelocity)
+            this PhysicsWorld world,
+            int rigidBodyIndex,
+            RigidTransform targetTransform,
+            float timestep,
+            out float3 requiredLinearVelocity,
+            out float3 requiredAngularVelocity
+        )
         {
             if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
             {
@@ -315,8 +338,13 @@ namespace Unity.Physics.Extensions
             MotionData md = world.MotionDatas[rigidBodyIndex];
             RigidTransform worldFromBody = math.mul(md.WorldFromMotion, math.inverse(md.BodyFromMotion));
             CalculateVelocityToTargetImpl(
-                worldFromBody, math.inverse(md.WorldFromMotion.rot), md.BodyFromMotion.pos, targetTransform, timestep,
-                out requiredLinearVelocity, out requiredAngularVelocity
+                worldFromBody,
+                math.inverse(md.WorldFromMotion.rot),
+                md.BodyFromMotion.pos,
+                targetTransform,
+                timestep,
+                out requiredLinearVelocity,
+                out requiredAngularVelocity
             );
         }
 
@@ -331,14 +359,20 @@ namespace Unity.Physics.Extensions
         /// <param name="requiredAngularVelocity">  [out] The required angular velocity. </param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void CalculateVelocityToTargetImpl(
-            RigidTransform worldFromBody, quaternion motionFromWorld, float3 centerOfMass,
-            RigidTransform targetTransform, in float stepFrequency,
-            out float3 requiredLinearVelocity, out float3 requiredAngularVelocity
+            RigidTransform worldFromBody,
+            quaternion motionFromWorld,
+            float3 centerOfMass,
+            RigidTransform targetTransform,
+            in float stepFrequency,
+            out float3 requiredLinearVelocity,
+            out float3 requiredAngularVelocity
         )
         {
             var com = new float4(centerOfMass, 1f);
-            requiredLinearVelocity = (math.mul(targetTransform, com) - math.mul(worldFromBody, com)).xyz * stepFrequency;
-            var angularVelocity = math.mul(targetTransform.rot, math.inverse(worldFromBody.rot)).ToEulerAngles() * stepFrequency;
+            requiredLinearVelocity =
+                (math.mul(targetTransform, com) - math.mul(worldFromBody, com)).xyz * stepFrequency;
+            var angularVelocity =
+                math.mul(targetTransform.rot, math.inverse(worldFromBody.rot)).ToEulerAngles() * stepFrequency;
             requiredAngularVelocity = math.rotate(motionFromWorld, angularVelocity);
         }
     }

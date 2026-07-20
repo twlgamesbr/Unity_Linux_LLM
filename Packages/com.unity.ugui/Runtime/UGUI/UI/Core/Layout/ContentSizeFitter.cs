@@ -23,41 +23,52 @@ namespace UnityEngine.UI
             /// Don't perform any resizing.
             /// </summary>
             Unconstrained,
+
             /// <summary>
             /// Resize to the minimum size of the content.
             /// </summary>
             MinSize,
+
             /// <summary>
             /// Resize to the preferred size of the content.
             /// </summary>
-            PreferredSize
+            PreferredSize,
         }
 
-        [SerializeField] protected FitMode m_HorizontalFit = FitMode.Unconstrained;
+        [SerializeField]
+        protected FitMode m_HorizontalFit = FitMode.Unconstrained;
 
         /// <summary>
         /// The fit mode to use to determine the width.
         /// </summary>
-        public FitMode horizontalFit { get { return m_HorizontalFit; } set
+        public FitMode horizontalFit
+        {
+            get { return m_HorizontalFit; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_HorizontalFit, value))
                     SetDirty();
             }
         }
 
-        [SerializeField] protected FitMode m_VerticalFit = FitMode.Unconstrained;
+        [SerializeField]
+        protected FitMode m_VerticalFit = FitMode.Unconstrained;
 
         /// <summary>
         /// The fit mode to use to determine the height.
         /// </summary>
-        public FitMode verticalFit { get { return m_VerticalFit; } set
+        public FitMode verticalFit
+        {
+            get { return m_VerticalFit; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_VerticalFit, value))
                     SetDirty();
             }
         }
 
-        [System.NonSerialized] private RectTransform m_Rect;
+        [System.NonSerialized]
+        private RectTransform m_Rect;
         private RectTransform rectTransform
         {
             get
@@ -69,12 +80,11 @@ namespace UnityEngine.UI
         }
 
         // field is never assigned warning
-        #pragma warning disable 649
+#pragma warning disable 649
         private DrivenRectTransformTracker m_Tracker;
-        #pragma warning restore 649
+#pragma warning restore 649
 
-        protected ContentSizeFitter()
-        {}
+        protected ContentSizeFitter() { }
 
         protected override void OnEnable()
         {
@@ -104,13 +114,23 @@ namespace UnityEngine.UI
                 return;
             }
 
-            m_Tracker.Add(this, rectTransform, (axis == 0 ? DrivenTransformProperties.SizeDeltaX : DrivenTransformProperties.SizeDeltaY));
+            m_Tracker.Add(
+                this,
+                rectTransform,
+                (axis == 0 ? DrivenTransformProperties.SizeDeltaX : DrivenTransformProperties.SizeDeltaY)
+            );
 
             // Set size to min or preferred size
             if (fitting == FitMode.MinSize)
-                rectTransform.SetSizeWithCurrentAnchors((RectTransform.Axis)axis, LayoutUtility.GetMinSize(m_Rect, axis));
+                rectTransform.SetSizeWithCurrentAnchors(
+                    (RectTransform.Axis)axis,
+                    LayoutUtility.GetMinSize(m_Rect, axis)
+                );
             else
-                rectTransform.SetSizeWithCurrentAnchors((RectTransform.Axis)axis, LayoutUtility.GetPreferredSize(m_Rect, axis));
+                rectTransform.SetSizeWithCurrentAnchors(
+                    (RectTransform.Axis)axis,
+                    LayoutUtility.GetPreferredSize(m_Rect, axis)
+                );
         }
 
         /// <summary>
@@ -138,12 +158,12 @@ namespace UnityEngine.UI
             LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
         }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             SetDirty();
         }
 
-    #endif
+#endif
     }
 }

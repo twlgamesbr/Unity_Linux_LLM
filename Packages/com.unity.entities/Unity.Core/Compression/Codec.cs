@@ -7,7 +7,7 @@ namespace Unity.Core.Compression
     internal enum Codec : int
     {
         None = 0,
-        LZ4
+        LZ4,
     }
 
     /// <summary>
@@ -21,13 +21,16 @@ namespace Unity.Core.Compression
         /// <param name="codec"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        static public unsafe int CompressUpperBound(Codec codec, int size)
+        public static unsafe int CompressUpperBound(Codec codec, int size)
         {
             switch (codec)
             {
-                case Codec.None: return size;
-                case Codec.LZ4:  return CompressBoundLZ4(size);
-                default: throw new ArgumentException($"Invalid codec '{codec}' specified");
+                case Codec.None:
+                    return size;
+                case Codec.LZ4:
+                    return CompressBoundLZ4(size);
+                default:
+                    throw new ArgumentException($"Invalid codec '{codec}' specified");
             }
         }
 
@@ -40,9 +43,15 @@ namespace Unity.Core.Compression
         /// <param name="dst"></param>
         /// <param name="allocator"></param>
         /// <returns></returns>
-        static public unsafe int Compress(Codec codec, in byte* src, int srcSize, out byte* dst, Allocator allocator = Allocator.Temp)
+        public static unsafe int Compress(
+            Codec codec,
+            in byte* src,
+            int srcSize,
+            out byte* dst,
+            Allocator allocator = Allocator.Temp
+        )
         {
-            return Compress(codec, src, srcSize, out dst, (AllocatorManager.AllocatorHandle) allocator);
+            return Compress(codec, src, srcSize, out dst, (AllocatorManager.AllocatorHandle)allocator);
         }
 
         /// <summary>
@@ -54,7 +63,13 @@ namespace Unity.Core.Compression
         /// <param name="dst"></param>
         /// <param name="allocator"></param>
         /// <returns></returns>
-        static public unsafe int Compress(Codec codec, in byte* src, int srcSize, out byte* dst, AllocatorManager.AllocatorHandle allocator)
+        public static unsafe int Compress(
+            Codec codec,
+            in byte* src,
+            int srcSize,
+            out byte* dst,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             int boundedSize = CompressUpperBound(codec, srcSize);
             dst = (byte*)Memory.Unmanaged.Allocate(boundedSize, 16, allocator);
@@ -62,10 +77,13 @@ namespace Unity.Core.Compression
             int compressedSize = 0;
             switch (codec)
             {
-                case Codec.LZ4: compressedSize = CompressLZ4(src, dst, srcSize, boundedSize); break;
+                case Codec.LZ4:
+                    compressedSize = CompressLZ4(src, dst, srcSize, boundedSize);
+                    break;
 
                 case Codec.None: // Surely this is an error/unintentional
-                default: throw new ArgumentException($"Invalid codec '{codec}' specified");
+                default:
+                    throw new ArgumentException($"Invalid codec '{codec}' specified");
             }
 
             if (compressedSize < 0)
@@ -88,22 +106,33 @@ namespace Unity.Core.Compression
         /// <param name="decompressedData"></param>
         /// <param name="decompressedSize"></param>
         /// <returns></returns>
-        static public unsafe bool Decompress(Codec codec, in byte* compressedData, int compressedSize, byte* decompressedData, int decompressedSize)
+        public static unsafe bool Decompress(
+            Codec codec,
+            in byte* compressedData,
+            int compressedSize,
+            byte* decompressedData,
+            int decompressedSize
+        )
         {
             switch (codec)
             {
-                case Codec.LZ4: return DecompressLZ4(compressedData, decompressedData, compressedSize, decompressedSize) > 0;
+                case Codec.LZ4:
+                    return DecompressLZ4(compressedData, decompressedData, compressedSize, decompressedSize) > 0;
 
                 case Codec.None: // Surely this is an error/unintentional
-                default: throw new ArgumentException($"Invalid codec '{codec}' specified");
+                default:
+                    throw new ArgumentException($"Invalid codec '{codec}' specified");
             }
         }
 
         const string DllName = "liblz4";
+
         [DllImport(DllName, EntryPoint = "LZ4_compressBound")]
         static extern unsafe int CompressBoundLZ4(int srcSize);
+
         [DllImport(DllName, EntryPoint = "LZ4_compress_default")]
         static extern unsafe int CompressLZ4(byte* src, byte* dst, int srcSize, int dstCapacity);
+
         [DllImport(DllName, EntryPoint = "LZ4_decompress_safe")]
         static extern unsafe int DecompressLZ4(byte* src, byte* dst, int compressedSize, int dstCapacity);
     }

@@ -15,22 +15,31 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         /// <summary>Default black 2D texture.</summary>
         public TextureHandle blackTexture { get; private set; }
+
         /// <summary>Default white 2D texture.</summary>
         public TextureHandle whiteTexture { get; private set; }
+
         /// <summary>Default clear color XR 2D texture.</summary>
         public TextureHandle clearTextureXR { get; private set; }
+
         /// <summary>Default magenta XR 2D texture.</summary>
         public TextureHandle magentaTextureXR { get; private set; }
+
         /// <summary>Default black XR 2D texture.</summary>
         public TextureHandle blackTextureXR { get; private set; }
+
         /// <summary>Default black XR 2D Array texture.</summary>
         public TextureHandle blackTextureArrayXR { get; private set; }
+
         /// <summary>Default black (UInt) XR 2D texture.</summary>
         public TextureHandle blackUIntTextureXR { get; private set; }
+
         /// <summary>Default black XR 3D texture.</summary>
         public TextureHandle blackTexture3DXR { get; private set; }
+
         /// <summary>Default white XR 2D texture.</summary>
         public TextureHandle whiteTextureXR { get; private set; }
+
         /// <summary>Default 1x1 shadow texture.</summary>
         public TextureHandle defaultShadowTexture { get; private set; }
 
@@ -49,7 +58,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
             if (m_ShadowTexture2D == null)
             {
-                m_ShadowTexture2D = RTHandles.Alloc(1, 1, CoreUtils.GetDefaultDepthOnlyFormat(), isShadowMap: true, name: "DefaultShadowTexture");
+                m_ShadowTexture2D = RTHandles.Alloc(
+                    1,
+                    1,
+                    CoreUtils.GetDefaultDepthOnlyFormat(),
+                    isShadowMap: true,
+                    name: "DefaultShadowTexture"
+                );
 
                 // Fill the shadow texture with the default (far-plane) depth value for the current platform.
                 CommandBuffer cmd = CommandBufferPool.Get();

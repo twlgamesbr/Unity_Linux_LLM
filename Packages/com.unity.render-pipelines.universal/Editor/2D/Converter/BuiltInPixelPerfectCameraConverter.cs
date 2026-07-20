@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEditor.Rendering.Converter;
 using UnityEngine;
 using UnityEngine.Categorization;
-
 #if PIXEL_PERFECT_2D_EXISTS
 using U2DPackage = UnityEngine.U2D;
 #endif
@@ -13,25 +12,25 @@ namespace UnityEditor.Rendering.Universal
     [Serializable]
     internal class PixelPerfectCameraConverterItem : RenderPipelineConverterAssetItem
     {
-        public PixelPerfectCameraConverterItem(string id) : base(id)
-        {
-        }
+        public PixelPerfectCameraConverterItem(string id)
+            : base(id) { }
 
-        public PixelPerfectCameraConverterItem(GlobalObjectId gid, string assetPath) : base(gid, assetPath)
-        {
-        }
+        public PixelPerfectCameraConverterItem(GlobalObjectId gid, string assetPath)
+            : base(gid, assetPath) { }
 
-        public new Texture2D icon => EditorGUIUtility.ObjectContent(null, typeof(UnityEngine.Camera)).image as Texture2D;
+        public new Texture2D icon =>
+            EditorGUIUtility.ObjectContent(null, typeof(UnityEngine.Camera)).image as Texture2D;
     }
 
     [Serializable]
     [PipelineConverter("Built-in", "Universal Render Pipeline (2D Renderer)")]
-    [ElementInfo(Name = "Pixel Perfect Camera Converter",
-             Order = 1000,
-             Description = "This will upgrade all 2D Pixel Perfect Camera (com.unity.2d.pixelperfect) to the Universal Render Pipeline version.")]
+    [ElementInfo(
+        Name = "Pixel Perfect Camera Converter",
+        Order = 1000,
+        Description = "This will upgrade all 2D Pixel Perfect Camera (com.unity.2d.pixelperfect) to the Universal Render Pipeline version."
+    )]
     internal class BuiltInPixelPerfectCameraConverter : IRenderPipelineConverter
     {
-
 #if PIXEL_PERFECT_2D_EXISTS
         public bool isEnabled => true;
         public string isDisabledMessage { get; }
@@ -90,10 +89,10 @@ namespace UnityEditor.Rendering.Universal
             if (cam != null)
                 UpgradePixelPerfectCamera(cam);
         }
-
 #else
         public bool isEnabled => false;
-        public string isDisabledMessage => "Pixel Perfect package is not installed. Please install the Pixel Perfect package to enable this converter.";
+        public string isDisabledMessage =>
+            "Pixel Perfect package is not installed. Please install the Pixel Perfect package to enable this converter.";
 #endif
 
         public void Scan(Action<List<IRenderPipelineConverterItem>> onScanFinish)
@@ -107,10 +106,12 @@ namespace UnityEditor.Rendering.Universal
 
             var processedIds = new HashSet<string>();
 
-            SearchServiceUtils.RunQueuedSearch
-            (
+            SearchServiceUtils.RunQueuedSearch(
                 SearchServiceUtils.IndexingOptions.DeepSearch,
-                new List<(string query, string description)> { ("t:UnityEngine.U2D.PixelPerfectCamera", "Game Objects Referencing a U2D Pixel Perfect Camera") },
+                new List<(string query, string description)>
+                {
+                    ("t:UnityEngine.U2D.PixelPerfectCamera", "Game Objects Referencing a U2D Pixel Perfect Camera"),
+                },
                 (item, description) =>
                 {
                     // Direct conversion - works for both assets and scene objects
@@ -158,8 +159,10 @@ namespace UnityEditor.Rendering.Universal
 #if PIXEL_PERFECT_2D_EXISTS
             if (item is PixelPerfectCameraConverterItem ppCameraItem)
             {
-                if (ppCameraItem.type == 1) URP2DConverterUtility.UpgradePrefab(ppCameraItem.info, UpgradeGameObject);
-                else URP2DConverterUtility.UpgradeScene(ppCameraItem.info, UpgradeGameObject);
+                if (ppCameraItem.type == 1)
+                    URP2DConverterUtility.UpgradePrefab(ppCameraItem.info, UpgradeGameObject);
+                else
+                    URP2DConverterUtility.UpgradeScene(ppCameraItem.info, UpgradeGameObject);
 
                 return Status.Success;
             }

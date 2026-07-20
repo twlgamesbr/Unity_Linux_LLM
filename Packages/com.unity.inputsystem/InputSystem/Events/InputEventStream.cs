@@ -21,19 +21,21 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </summary>
         public int numEventsRetainedInBuffer => m_NumEventsRetainedInBuffer;
 
-        public InputEvent* currentEventPtr => m_RemainingNativeEventCount > 0
-        ? m_CurrentNativeEventReadPtr
-        : (m_RemainingAppendEventCount > 0 ? m_CurrentAppendEventReadPtr : null);
+        public InputEvent* currentEventPtr =>
+            m_RemainingNativeEventCount > 0
+                ? m_CurrentNativeEventReadPtr
+                : (m_RemainingAppendEventCount > 0 ? m_CurrentAppendEventReadPtr : null);
 
         public uint numBytesRetainedInBuffer =>
-            (uint)((byte*)m_CurrentNativeEventWritePtr -
-                (byte*)NativeArrayUnsafeUtility
-                    .GetUnsafeBufferPointerWithoutChecks(m_NativeBuffer.data));
+            (uint)(
+                (byte*)m_CurrentNativeEventWritePtr
+                - (byte*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_NativeBuffer.data)
+            );
 
         public InputEventStream(ref InputEventBuffer eventBuffer, int maxAppendedEvents)
         {
-            m_CurrentNativeEventWritePtr = m_CurrentNativeEventReadPtr =
-                (InputEvent*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(eventBuffer.data);
+            m_CurrentNativeEventWritePtr = m_CurrentNativeEventReadPtr = (InputEvent*)
+                NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(eventBuffer.data);
 
             m_NativeBuffer = eventBuffer;
             m_RemainingNativeEventCount = m_NativeBuffer.eventCount;
@@ -55,8 +57,12 @@ namespace UnityEngine.InputSystem.LowLevel
                 var bufferPtr = NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_NativeBuffer.data);
                 Debug.Assert((byte*)m_CurrentNativeEventWritePtr > (byte*)bufferPtr);
                 var newBufferSize = (byte*)m_CurrentNativeEventWritePtr - (byte*)bufferPtr;
-                m_NativeBuffer = new InputEventBuffer((InputEvent*)bufferPtr, m_NumEventsRetainedInBuffer, (int)newBufferSize,
-                    (int)m_NativeBuffer.capacityInBytes);
+                m_NativeBuffer = new InputEventBuffer(
+                    (InputEvent*)bufferPtr,
+                    m_NumEventsRetainedInBuffer,
+                    (int)newBufferSize,
+                    (int)m_NativeBuffer.capacityInBytes
+                );
             }
             else
             {
@@ -87,9 +93,11 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             if (m_AppendBuffer.eventCount >= m_MaxAppendedEvents)
             {
-                Debug.LogError($"Maximum number of queued events exceeded. Set the '{nameof(InputSettings.maxQueuedEventsPerUpdate)}' " +
-                    $"setting to a higher value if you need to queue more events than this. " +
-                    $"Current limit is '{m_MaxAppendedEvents}'.");
+                Debug.LogError(
+                    $"Maximum number of queued events exceeded. Set the '{nameof(InputSettings.maxQueuedEventsPerUpdate)}' "
+                        + $"setting to a higher value if you need to queue more events than this. "
+                        + $"Current limit is '{m_MaxAppendedEvents}'."
+                );
                 return;
             }
 
@@ -100,8 +108,8 @@ namespace UnityEngine.InputSystem.LowLevel
 
             if (!wasAlreadyCreated)
             {
-                m_CurrentAppendEventWritePtr = m_CurrentAppendEventReadPtr =
-                    (InputEvent*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_AppendBuffer.data);
+                m_CurrentAppendEventWritePtr = m_CurrentAppendEventReadPtr = (InputEvent*)
+                    NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_AppendBuffer.data);
             }
             else
             {
@@ -124,14 +132,24 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             if (m_RemainingNativeEventCount > 0)
             {
-                m_NativeBuffer.AdvanceToNextEvent(ref m_CurrentNativeEventReadPtr, ref m_CurrentNativeEventWritePtr,
-                    ref m_NumEventsRetainedInBuffer, ref m_RemainingNativeEventCount, leaveEventInBuffer);
+                m_NativeBuffer.AdvanceToNextEvent(
+                    ref m_CurrentNativeEventReadPtr,
+                    ref m_CurrentNativeEventWritePtr,
+                    ref m_NumEventsRetainedInBuffer,
+                    ref m_RemainingNativeEventCount,
+                    leaveEventInBuffer
+                );
             }
             else if (m_RemainingAppendEventCount > 0)
             {
                 var numEventRetained = 0;
-                m_AppendBuffer.AdvanceToNextEvent(ref m_CurrentAppendEventReadPtr, ref m_CurrentAppendEventWritePtr,
-                    ref numEventRetained, ref m_RemainingAppendEventCount, false);
+                m_AppendBuffer.AdvanceToNextEvent(
+                    ref m_CurrentAppendEventReadPtr,
+                    ref m_CurrentAppendEventWritePtr,
+                    ref numEventRetained,
+                    ref m_RemainingAppendEventCount,
+                    false
+                );
             }
 
             return currentEventPtr;

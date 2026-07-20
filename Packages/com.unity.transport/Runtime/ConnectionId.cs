@@ -17,12 +17,12 @@ namespace Unity.Networking.Transport
             Version = version;
         }
 
-        public static bool operator==(ConnectionId lhs, ConnectionId rhs)
+        public static bool operator ==(ConnectionId lhs, ConnectionId rhs)
         {
             return lhs.Id == rhs.Id && lhs.Version == rhs.Version;
         }
 
-        public static bool operator!=(ConnectionId lhs, ConnectionId rhs)
+        public static bool operator !=(ConnectionId lhs, ConnectionId rhs)
         {
             return lhs.Id != rhs.Id || lhs.Version != rhs.Version;
         }

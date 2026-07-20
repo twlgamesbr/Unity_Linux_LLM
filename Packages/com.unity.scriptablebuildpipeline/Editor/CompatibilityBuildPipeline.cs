@@ -32,11 +32,20 @@ namespace UnityEditor.Build.Pipeline
         /// <param name="assetBundleOptions">AssetBundle building options.</param>
         /// <param name="targetPlatform">Chosen target build platform.</param>
         /// <returns>CompatibilityAssetBundleManifest object exposing information about the generated asset bundles.</returns>
-        public static CompatibilityAssetBundleManifest BuildAssetBundles(string outputPath, BuildAssetBundleOptions assetBundleOptions, BuildTarget targetPlatform)
+        public static CompatibilityAssetBundleManifest BuildAssetBundles(
+            string outputPath,
+            BuildAssetBundleOptions assetBundleOptions,
+            BuildTarget targetPlatform
+        )
         {
             // Retrieve the AssetBundle definitions as defined through the Inspector and saved in the AssetDatabase
             var buildInput = ContentBuildInterface.GenerateAssetBundleBuilds();
-            return BuildAssetBundles_Internal(outputPath, new BundleBuildContent(buildInput), assetBundleOptions, targetPlatform);
+            return BuildAssetBundles_Internal(
+                outputPath,
+                new BundleBuildContent(buildInput),
+                assetBundleOptions,
+                targetPlatform
+            );
         }
 
         /// <summary>
@@ -53,12 +62,27 @@ namespace UnityEditor.Build.Pipeline
         /// <param name="assetBundleOptions">AssetBundle building options.</param>
         /// <param name="targetPlatform">Chosen target build platform.</param>
         /// <returns>CompatibilityAssetBundleManifest object exposing information about the generated asset bundles.</returns>
-        public static CompatibilityAssetBundleManifest BuildAssetBundles(string outputPath, AssetBundleBuild[] builds, BuildAssetBundleOptions assetBundleOptions, BuildTarget targetPlatform)
+        public static CompatibilityAssetBundleManifest BuildAssetBundles(
+            string outputPath,
+            AssetBundleBuild[] builds,
+            BuildAssetBundleOptions assetBundleOptions,
+            BuildTarget targetPlatform
+        )
         {
-            return BuildAssetBundles_Internal(outputPath, new BundleBuildContent(builds), assetBundleOptions, targetPlatform);
+            return BuildAssetBundles_Internal(
+                outputPath,
+                new BundleBuildContent(builds),
+                assetBundleOptions,
+                targetPlatform
+            );
         }
 
-        internal static CompatibilityAssetBundleManifest BuildAssetBundles_Internal(string outputPath, IBundleBuildContent content, BuildAssetBundleOptions options, BuildTarget targetPlatform)
+        internal static CompatibilityAssetBundleManifest BuildAssetBundles_Internal(
+            string outputPath,
+            IBundleBuildContent content,
+            BuildAssetBundleOptions options,
+            BuildTarget targetPlatform
+        )
         {
             var group = BuildPipeline.GetBuildTargetGroup(targetPlatform);
             var parameters = new BundleBuildParameters(targetPlatform, group, outputPath);
@@ -99,7 +123,10 @@ namespace UnityEditor.Build.Pipeline
 
             var manifest = ScriptableObject.CreateInstance<CompatibilityAssetBundleManifest>();
             manifest.SetResults(results.BundleInfos);
-            File.WriteAllText(parameters.GetOutputFilePathForIdentifier(Path.GetFileName(outputPath) + ".manifest"), manifest.ToString());
+            File.WriteAllText(
+                parameters.GetOutputFilePathForIdentifier(Path.GetFileName(outputPath) + ".manifest"),
+                manifest.ToString()
+            );
             return manifest;
         }
     }

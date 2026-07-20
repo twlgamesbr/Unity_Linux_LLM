@@ -14,7 +14,7 @@ namespace UnityEngine.Rendering.Universal
         private static readonly string[] m_TaaAccumulationNames = new[]
         {
             "TaaAccumulationTex0",
-            "TaaAccumulationTex1"
+            "TaaAccumulationTex1",
         };
 
         private RenderTextureDescriptor m_Descriptor;

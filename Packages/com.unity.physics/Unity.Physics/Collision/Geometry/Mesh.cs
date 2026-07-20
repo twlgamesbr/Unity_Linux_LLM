@@ -15,16 +15,19 @@ namespace Unity.Physics
         // A set of vertex indices into the section's vertex buffer
         public struct PrimitiveVertexIndices
         {
-            public byte A, B, C, D;
+            public byte A,
+                B,
+                C,
+                D;
         }
 
         // Flags describing how the primitive vertices are used
         [Flags]
         public enum PrimitiveFlags : byte
         {
-            IsTriangle = 1 << 0,        // the primitive stores a single triangle
-            IsTrianglePair = 1 << 1,    // the primitive stores a pair of triangles
-            IsQuad = 1 << 2             // the primitive stores a pair of coplanar triangles, which can be represented as a single quad
+            IsTriangle = 1 << 0, // the primitive stores a single triangle
+            IsTrianglePair = 1 << 1, // the primitive stores a pair of triangles
+            IsQuad = 1 << 2, // the primitive stores a pair of coplanar triangles, which can be represented as a single quad
         }
 
         // A section of the mesh, containing up to 256 vertices.
@@ -33,22 +36,27 @@ namespace Unity.Physics
             public const int MaxNumVertices = 1 << 8;
 
             internal BlobArray PrimitiveFlagsBlob;
-            public BlobArray.Accessor<PrimitiveFlags> PrimitiveFlags => new BlobArray.Accessor<PrimitiveFlags>(ref PrimitiveFlagsBlob);
+            public BlobArray.Accessor<PrimitiveFlags> PrimitiveFlags =>
+                new BlobArray.Accessor<PrimitiveFlags>(ref PrimitiveFlagsBlob);
 
             internal BlobArray PrimitiveVertexIndicesBlob;
-            public BlobArray.Accessor<PrimitiveVertexIndices> PrimitiveVertexIndices => new BlobArray.Accessor<PrimitiveVertexIndices>(ref PrimitiveVertexIndicesBlob);
+            public BlobArray.Accessor<PrimitiveVertexIndices> PrimitiveVertexIndices =>
+                new BlobArray.Accessor<PrimitiveVertexIndices>(ref PrimitiveVertexIndicesBlob);
 
             internal BlobArray VerticesBlob;
             public BlobArray.Accessor<float3> Vertices => new BlobArray.Accessor<float3>(ref VerticesBlob);
 
             internal BlobArray PrimitiveFilterIndicesBlob;
-            public BlobArray.Accessor<short> PrimitiveFilterIndices => new BlobArray.Accessor<short>(ref PrimitiveFilterIndicesBlob);
+            public BlobArray.Accessor<short> PrimitiveFilterIndices =>
+                new BlobArray.Accessor<short>(ref PrimitiveFilterIndicesBlob);
 
             internal BlobArray FiltersBlob;
-            public BlobArray.Accessor<CollisionFilter> Filters => new BlobArray.Accessor<CollisionFilter>(ref FiltersBlob);
+            public BlobArray.Accessor<CollisionFilter> Filters =>
+                new BlobArray.Accessor<CollisionFilter>(ref FiltersBlob);
 
             internal BlobArray PrimitiveMaterialIndicesBlob;
-            public BlobArray.Accessor<short> PrimitiveMaterialIndices => new BlobArray.Accessor<short>(ref PrimitiveMaterialIndicesBlob);
+            public BlobArray.Accessor<short> PrimitiveMaterialIndices =>
+                new BlobArray.Accessor<short>(ref PrimitiveMaterialIndicesBlob);
 
             internal BlobArray MaterialsBlob;
             public BlobArray.Accessor<Material> Materials => new BlobArray.Accessor<Material>(ref MaterialsBlob);
@@ -60,13 +68,14 @@ namespace Unity.Physics
 
         // The bounding volume hierarchy
         private BlobArray m_BvhNodesBlob;
-        public unsafe BoundingVolumeHierarchy BoundingVolumeHierarchy => new BoundingVolumeHierarchy(BvhNodesPtr, m_BvhNodesBlob.Length, nodeFilters: null);
+        public unsafe BoundingVolumeHierarchy BoundingVolumeHierarchy =>
+            new BoundingVolumeHierarchy(BvhNodesPtr, m_BvhNodesBlob.Length, nodeFilters: null);
 
         private unsafe BoundingVolumeHierarchy.Node* BvhNodesPtr
         {
             get
             {
-                fixed(BlobArray* blob = &m_BvhNodesBlob)
+                fixed (BlobArray* blob = &m_BvhNodesBlob)
                 {
                     return (BoundingVolumeHierarchy.Node*)((byte*)&(blob->Offset) + blob->Offset);
                 }
@@ -175,7 +184,8 @@ namespace Unity.Physics
         public static bool IsPrimitiveFlagSet(PrimitiveFlags flags, PrimitiveFlags testFlag) => (flags & testFlag) != 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetNumPolygonsInPrimitive(PrimitiveFlags primitiveFlags) => primitiveFlags == PrimitiveFlags.IsTrianglePair ? 2 : 1;
+        public static int GetNumPolygonsInPrimitive(PrimitiveFlags primitiveFlags) =>
+            primitiveFlags == PrimitiveFlags.IsTrianglePair ? 2 : 1;
 
         // Get the flags of a primitive
         internal PrimitiveFlags GetPrimitiveFlags(int primitiveKey)
@@ -187,7 +197,12 @@ namespace Unity.Physics
         }
 
         // Get the vertices, flags and collision filter of a primitive
-        internal void GetPrimitive(int primitiveKey, out float3x4 vertices, out PrimitiveFlags flags, out CollisionFilter filter)
+        internal void GetPrimitive(
+            int primitiveKey,
+            out float3x4 vertices,
+            out PrimitiveFlags flags,
+            out CollisionFilter filter
+        )
         {
             int sectionIndex = primitiveKey >> 8;
             int sectionPrimitiveIndex = primitiveKey & 0xFF;
@@ -200,7 +215,8 @@ namespace Unity.Physics
                 section.Vertices[vertexIndices.A],
                 section.Vertices[vertexIndices.B],
                 section.Vertices[vertexIndices.C],
-                section.Vertices[vertexIndices.D]);
+                section.Vertices[vertexIndices.D]
+            );
 
             flags = section.PrimitiveFlags[sectionPrimitiveIndex];
 
@@ -209,7 +225,13 @@ namespace Unity.Physics
         }
 
         // Get the vertices, flags, collision filter and material of a primitive
-        internal void GetPrimitive(int primitiveKey, out float3x4 vertices, out PrimitiveFlags flags, out CollisionFilter filter, out Material material)
+        internal void GetPrimitive(
+            int primitiveKey,
+            out float3x4 vertices,
+            out PrimitiveFlags flags,
+            out CollisionFilter filter,
+            out Material material
+        )
         {
             int sectionIndex = primitiveKey >> 8;
             int sectionPrimitiveIndex = primitiveKey & 0xFF;
@@ -222,7 +244,8 @@ namespace Unity.Physics
                 section.Vertices[vertexIndices.A],
                 section.Vertices[vertexIndices.B],
                 section.Vertices[vertexIndices.C],
-                section.Vertices[vertexIndices.D]);
+                section.Vertices[vertexIndices.D]
+            );
 
             flags = section.PrimitiveFlags[sectionPrimitiveIndex];
 
@@ -258,7 +281,8 @@ namespace Unity.Physics
                 section.Vertices[vertexIndices.A],
                 section.Vertices[vertexIndices.B],
                 section.Vertices[vertexIndices.C],
-                section.Vertices[vertexIndices.D]);
+                section.Vertices[vertexIndices.D]
+            );
 
             PrimitiveFlags flags = section.PrimitiveFlags[sectionPrimitiveIndex];
             if (IsPrimitiveFlagSet(flags, PrimitiveFlags.IsQuad))
@@ -292,7 +316,8 @@ namespace Unity.Physics
                 section.Vertices[vertexIndices.A],
                 section.Vertices[vertexIndices.B],
                 section.Vertices[vertexIndices.C],
-                section.Vertices[vertexIndices.D]);
+                section.Vertices[vertexIndices.D]
+            );
 
             PrimitiveFlags flags = section.PrimitiveFlags[0];
             if (IsPrimitiveFlagSet(flags, PrimitiveFlags.IsQuad))
@@ -313,7 +338,11 @@ namespace Unity.Physics
             return true;
         }
 
-        internal bool GetNextPolygon(uint previousMeshKey, [NoAlias] out uint meshKey, [NoAlias] ref PolygonCollider polygon)
+        internal bool GetNextPolygon(
+            uint previousMeshKey,
+            [NoAlias] out uint meshKey,
+            [NoAlias] ref PolygonCollider polygon
+        )
         {
             int primitiveKey = (int)previousMeshKey >> 1;
             int polygonIndex = (int)previousMeshKey & 1;
@@ -325,7 +354,10 @@ namespace Unity.Physics
             {
                 ref Section section = ref Sections[sectionIndex];
 
-                if (polygonIndex == 0 && IsPrimitiveFlagSet(section.PrimitiveFlags[sectionPrimitiveIndex], PrimitiveFlags.IsTrianglePair))
+                if (
+                    polygonIndex == 0
+                    && IsPrimitiveFlagSet(section.PrimitiveFlags[sectionPrimitiveIndex], PrimitiveFlags.IsTrianglePair)
+                )
                 {
                     // Move to next triangle
                     polygonIndex = 1;
@@ -361,7 +393,8 @@ namespace Unity.Physics
                     section.Vertices[vertexIndices.A],
                     section.Vertices[vertexIndices.B],
                     section.Vertices[vertexIndices.C],
-                    section.Vertices[vertexIndices.D]);
+                    section.Vertices[vertexIndices.D]
+                );
 
                 PrimitiveFlags flags = section.PrimitiveFlags[sectionPrimitiveIndex];
                 if (IsPrimitiveFlagSet(flags, PrimitiveFlags.IsQuad))
@@ -411,7 +444,13 @@ namespace Unity.Physics
         }
 
         // Initialize the data. Assumes the appropriate memory has already been allocated.
-        internal unsafe void Init(BoundingVolumeHierarchy.Node* nodes, int nodeCount, MeshBuilder.TempSection tempSections, CollisionFilter filter, Material material)
+        internal unsafe void Init(
+            BoundingVolumeHierarchy.Node* nodes,
+            int nodeCount,
+            MeshBuilder.TempSection tempSections,
+            CollisionFilter filter,
+            Material material
+        )
         {
             byte* end = (byte*)UnsafeUtility.AddressOf(ref this) + sizeof(Mesh);
             end = (byte*)Math.NextMultipleOf16((ulong)end);
@@ -442,9 +481,15 @@ namespace Unity.Physics
                 section->PrimitiveFlagsBlob.Length = range.PrimitivesFlagsLength;
                 end += Math.NextMultipleOf(section->PrimitiveFlagsBlob.Length * sizeof(PrimitiveFlags), 4);
 
-                section->PrimitiveVertexIndicesBlob.Offset = UnsafeEx.CalculateOffset(end, ref section->PrimitiveVertexIndicesBlob);
+                section->PrimitiveVertexIndicesBlob.Offset = UnsafeEx.CalculateOffset(
+                    end,
+                    ref section->PrimitiveVertexIndicesBlob
+                );
                 section->PrimitiveVertexIndicesBlob.Length = range.PrimitivesLength;
-                end += Math.NextMultipleOf(section->PrimitiveVertexIndicesBlob.Length * sizeof(PrimitiveVertexIndices), 4);
+                end += Math.NextMultipleOf(
+                    section->PrimitiveVertexIndicesBlob.Length * sizeof(PrimitiveVertexIndices),
+                    4
+                );
 
                 section->VerticesBlob.Offset = UnsafeEx.CalculateOffset(end, ref section->VerticesBlob);
                 section->VerticesBlob.Length = range.VerticesLength;
@@ -452,7 +497,9 @@ namespace Unity.Physics
 
                 for (int i = 0; i < range.PrimitivesFlagsLength; i++)
                 {
-                    Sections[sectionIndex].PrimitiveFlags[i] = tempSections.PrimitivesFlags[range.PrimitivesFlagsMin + i];
+                    Sections[sectionIndex].PrimitiveFlags[i] = tempSections.PrimitivesFlags[
+                        range.PrimitivesFlagsMin + i
+                    ];
                     Sections[sectionIndex].PrimitiveVertexIndices[i] = tempSections.Primitives[range.PrimitivesMin + i];
                 }
 
@@ -463,7 +510,10 @@ namespace Unity.Physics
 
                 // Filters
 
-                section->PrimitiveFilterIndicesBlob.Offset = UnsafeEx.CalculateOffset(end, ref section->PrimitiveFilterIndicesBlob);
+                section->PrimitiveFilterIndicesBlob.Offset = UnsafeEx.CalculateOffset(
+                    end,
+                    ref section->PrimitiveFilterIndicesBlob
+                );
                 section->PrimitiveFilterIndicesBlob.Length = range.PrimitivesLength;
                 end += Math.NextMultipleOf(section->PrimitiveFilterIndicesBlob.Length * sizeof(short), 4);
 
@@ -479,7 +529,10 @@ namespace Unity.Physics
 
                 // Materials
 
-                section->PrimitiveMaterialIndicesBlob.Offset = UnsafeEx.CalculateOffset(end, ref section->PrimitiveMaterialIndicesBlob);
+                section->PrimitiveMaterialIndicesBlob.Offset = UnsafeEx.CalculateOffset(
+                    end,
+                    ref section->PrimitiveMaterialIndicesBlob
+                );
                 section->PrimitiveMaterialIndicesBlob.Length = range.PrimitivesLength;
                 end += Math.NextMultipleOf(section->PrimitiveMaterialIndicesBlob.Length * sizeof(short), 4);
 
@@ -498,8 +551,11 @@ namespace Unity.Physics
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             // validation check to ensure that the memory allocated matches the memory accessed
-            SafetyChecks.CheckMemorySizeAndThrow(begin, end,
-                (ulong)CalculateMeshDataSize(nodeCount, tempSections.Ranges));
+            SafetyChecks.CheckMemorySizeAndThrow(
+                begin,
+                end,
+                (ulong)CalculateMeshDataSize(nodeCount, tempSections.Ranges)
+            );
 #endif
         }
 

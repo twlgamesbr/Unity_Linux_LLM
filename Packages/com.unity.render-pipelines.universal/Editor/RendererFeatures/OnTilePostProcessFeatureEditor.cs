@@ -11,13 +11,15 @@ namespace UnityEditor.Rendering.Universal
 
         static class Styles
         {
-            public static readonly string k_NoSettingsHelpBox = L10n.Tr("Only pixel local post-processing effects are supported. For example color adjustments, vignette or film grain. There are currently no available settings.");
-            public static readonly string k_TileOnlyModeOffWarning = L10n.Tr("Tile-Only Mode is not enabled on this Renderer. This feature will fallback to texture sampling mode. This uses more GPU bandwidth and can reduce performance.");
+            public static readonly string k_NoSettingsHelpBox = L10n.Tr(
+                "Only pixel local post-processing effects are supported. For example color adjustments, vignette or film grain. There are currently no available settings."
+            );
+            public static readonly string k_TileOnlyModeOffWarning = L10n.Tr(
+                "Tile-Only Mode is not enabled on this Renderer. This feature will fallback to texture sampling mode. This uses more GPU bandwidth and can reduce performance."
+            );
         }
 
-        private void OnEnable()
-        {
-        }
+        private void OnEnable() { }
 
         /// <summary>
         /// The renderer data that owns the feature when the inspector is drawn.

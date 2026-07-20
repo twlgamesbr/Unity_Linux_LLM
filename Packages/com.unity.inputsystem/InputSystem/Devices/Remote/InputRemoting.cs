@@ -170,20 +170,16 @@ namespace UnityEngine.InputSystem
             }
         }
 
-        void IObserver<Message>.OnError(Exception error)
-        {
-        }
+        void IObserver<Message>.OnError(Exception error) { }
 
-        void IObserver<Message>.OnCompleted()
-        {
-        }
+        void IObserver<Message>.OnCompleted() { }
 
         public IDisposable Subscribe(IObserver<Message> observer)
         {
             if (observer == null)
                 throw new ArgumentNullException(nameof(observer));
 
-            var subscriber = new Subscriber {owner = this, observer = observer};
+            var subscriber = new Subscriber { owner = this, observer = observer };
             ArrayHelpers.Append(ref m_Subscribers, subscriber);
 
             return subscriber;
@@ -324,10 +320,7 @@ namespace UnityEngine.InputSystem
             }
 
             // Create new.
-            var sender = new RemoteSender
-            {
-                senderId = senderId,
-            };
+            var sender = new RemoteSender { senderId = senderId };
             return ArrayHelpers.Append(ref m_Senders, sender);
         }
 
@@ -370,7 +363,7 @@ namespace UnityEngine.InputSystem
         private enum Flags
         {
             Sending = 1 << 0,
-            StartSendingOnConnect = 1 << 1
+            StartSendingOnConnect = 1 << 1,
         }
 
         // Data we keep about a unique sender that we receive input data
@@ -397,6 +390,7 @@ namespace UnityEngine.InputSystem
         {
             public InputRemoting owner;
             public IObserver<Message> observer;
+
             public void Dispose()
             {
                 ArrayHelpers.Erase(ref owner.m_Subscribers, this);
@@ -481,15 +475,20 @@ namespace UnityEngine.InputSystem
                     layout = sender.m_LocalManager.TryLoadControlLayout(new InternedString(layoutName));
                     if (layout == null)
                     {
-                        Debug.Log(string.Format(
-                            "Could not find layout '{0}' meant to be sent through remote connection; this should not happen",
-                            layoutName));
+                        Debug.Log(
+                            string.Format(
+                                "Could not find layout '{0}' meant to be sent through remote connection; this should not happen",
+                                layoutName
+                            )
+                        );
                         return null;
                     }
                 }
                 catch (Exception exception)
                 {
-                    Debug.Log($"Could not load layout '{layoutName}'; not sending to remote listeners (exception: {exception})");
+                    Debug.Log(
+                        $"Could not load layout '{layoutName}'; not sending to remote listeners (exception: {exception})"
+                    );
                     return null;
                 }
 
@@ -497,14 +496,10 @@ namespace UnityEngine.InputSystem
                 {
                     name = layoutName,
                     layoutJson = layout.ToJson(),
-                    isOverride = layout.isOverride
+                    isOverride = layout.isOverride,
                 };
 
-                return new Message
-                {
-                    type = MessageType.NewLayout,
-                    data = SerializeData(data)
-                };
+                return new Message { type = MessageType.NewLayout, data = SerializeData(data) };
             }
 
             public static void Process(InputRemoting receiver, Message msg)
@@ -541,14 +536,10 @@ namespace UnityEngine.InputSystem
                     layout = device.layout,
                     deviceId = device.deviceId,
                     description = device.description,
-                    usages = device.usages.Select(x => x.ToString()).ToArray()
+                    usages = device.usages.Select(x => x.ToString()).ToArray(),
                 };
 
-                return new Message
-                {
-                    type = MessageType.NewDevice,
-                    data = SerializeData(data)
-                };
+                return new Message { type = MessageType.NewDevice, data = SerializeData(data) };
             }
 
             public static void Process(InputRemoting receiver, Message msg)
@@ -563,10 +554,15 @@ namespace UnityEngine.InputSystem
                     foreach (var entry in devices)
                         if (entry.remoteId == data.deviceId)
                         {
-                            Debug.LogError(string.Format(
-                                "Already received device with id {0} (layout '{1}', description '{3}) from remote {2}",
-                                data.deviceId,
-                                data.layout, msg.participantId, data.description));
+                            Debug.LogError(
+                                string.Format(
+                                    "Already received device with id {0} (layout '{1}', description '{3}) from remote {2}",
+                                    data.deviceId,
+                                    data.layout,
+                                    msg.participantId,
+                                    data.description
+                                )
+                            );
                             return;
                         }
                 }
@@ -583,7 +579,8 @@ namespace UnityEngine.InputSystem
                 catch (Exception exception)
                 {
                     Debug.LogError(
-                        $"Could not create remote device '{data.description}' with layout '{data.layout}' locally (exception: {exception})");
+                        $"Could not create remote device '{data.description}' with layout '{data.layout}' locally (exception: {exception})"
+                    );
                     return;
                 }
                 ////FIXME: Setting this here like so means none of this is visible during onDeviceChange
@@ -630,24 +627,20 @@ namespace UnityEngine.InputSystem
                 // but unfortunately we need a byte[] and can't just pass the 'events' IntPtr
                 // directly.
                 var data = new byte[totalSize];
-                fixed(byte* dataPtr = data)
+                fixed (byte* dataPtr = data)
                 {
                     UnsafeUtility.MemCpy(dataPtr, events, totalSize);
                 }
 
                 // Done.
-                return new Message
-                {
-                    type = MessageType.NewEvents,
-                    data = data
-                };
+                return new Message { type = MessageType.NewEvents, data = data };
             }
 
             public static unsafe void Process(InputRemoting receiver, Message msg)
             {
                 var manager = receiver.m_LocalManager;
 
-                fixed(byte* dataPtr = msg.data)
+                fixed (byte* dataPtr = msg.data)
                 {
                     var dataEndPtr = new IntPtr(dataPtr + msg.data.Length);
                     var eventCount = 0;
@@ -689,14 +682,10 @@ namespace UnityEngine.InputSystem
                 var data = new Data
                 {
                     deviceId = device.deviceId,
-                    usages = device.usages.Select(x => x.ToString()).ToArray()
+                    usages = device.usages.Select(x => x.ToString()).ToArray(),
                 };
 
-                return new Message
-                {
-                    type = MessageType.ChangeUsages,
-                    data = SerializeData(data)
-                };
+                return new Message { type = MessageType.ChangeUsages, data = SerializeData(data) };
             }
 
             public static void Process(InputRemoting receiver, Message msg)
@@ -727,11 +716,7 @@ namespace UnityEngine.InputSystem
         {
             public static Message Create(InputDevice device)
             {
-                return new Message
-                {
-                    type = MessageType.RemoveDevice,
-                    data = BitConverter.GetBytes(device.deviceId)
-                };
+                return new Message { type = MessageType.RemoveDevice, data = BitConverter.GetBytes(device.deviceId) };
             }
 
             public static void Process(InputRemoting receiver, Message msg)
@@ -768,16 +753,13 @@ namespace UnityEngine.InputSystem
 
             // We can't take these across domain reloads but we want to take them across
             // InputSystem.Save/Restore.
-            [NonSerialized] public Subscriber[] subscribers;
+            [NonSerialized]
+            public Subscriber[] subscribers;
         }
 
         internal SerializedState SaveState()
         {
-            return new SerializedState
-            {
-                senders = m_Senders,
-                subscribers = m_Subscribers
-            };
+            return new SerializedState { senders = m_Senders, subscribers = m_Subscribers };
         }
 
         internal void RestoreState(SerializedState state, InputManager manager)

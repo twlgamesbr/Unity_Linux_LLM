@@ -1,7 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using CellStreamingScratchBuffer = UnityEngine.Rendering.ProbeReferenceVolume.CellStreamingScratchBuffer;
 using CellStreamingScratchBufferLayout = UnityEngine.Rendering.ProbeReferenceVolume.CellStreamingScratchBufferLayout;
 
@@ -10,8 +9,7 @@ namespace UnityEngine.Rendering
     class ProbeVolumeScratchBufferPool
     {
         [DebuggerDisplay("ChunkCount = {chunkCount} ElementCount = {pool.Count}")]
-        class ScratchBufferPool
-            : IComparable<ScratchBufferPool>
+        class ScratchBufferPool : IComparable<ScratchBufferPool>
         {
             public int chunkCount = -1;
             public Stack<CellStreamingScratchBuffer> pool = new Stack<CellStreamingScratchBuffer>();
@@ -21,10 +19,7 @@ namespace UnityEngine.Rendering
                 this.chunkCount = chunkCount;
             }
 
-            private ScratchBufferPool()
-            {
-
-            }
+            private ScratchBufferPool() { }
 
             public int CompareTo(ScratchBufferPool other)
             {
@@ -39,6 +34,7 @@ namespace UnityEngine.Rendering
 
         // Size in bytes of a full SH chunk (L0+L1+L2+ValidityMask+Occlusion)
         public int chunkSize { get; private set; }
+
         // Maximum number of chunks that should allocated in total. This is a hint, size may differ a bit to ensure at least one scratch buffer for each required size.
         public int maxChunkCount { get; private set; }
         public int allocatedMemory => chunkSize * m_CurrentlyAllocatedChunkCount;
@@ -53,10 +49,13 @@ namespace UnityEngine.Rendering
         int m_SkyShadingDirectionSize;
 
         int m_CurrentlyAllocatedChunkCount = 0;
+
         // List and not a Dictionary because we need the list sorted.
         List<ScratchBufferPool> m_Pools = new List<ScratchBufferPool>();
+
         // We store layouts separately because we might use a bigger buffer than required but we still want the layout to match the exact chunk count.
-        Dictionary<int, CellStreamingScratchBufferLayout> m_Layouts = new Dictionary<int, CellStreamingScratchBufferLayout>();
+        Dictionary<int, CellStreamingScratchBufferLayout> m_Layouts =
+            new Dictionary<int, CellStreamingScratchBufferLayout>();
 
         public ProbeVolumeScratchBufferPool(ProbeVolumeBakingSet bakingSet, ProbeVolumeSHBands shBands)
         {
@@ -129,24 +128,28 @@ namespace UnityEngine.Rendering
                 bufferLayout._L2ProbeSize = 4; // 4xbyte
 
                 int destChunksSize = chunkCount * sizeof(uint) * 4; // 1 Chunk == Vector4Int
-                                                                    // First destination chunks at offset 0 (no explicit member for this).
-                                                                    // Then, shared data destination chunks. Can be different from SH data destination in case of blending
-                                                                    // (one pool for blending and one other pool for shared data and blending destination).
+                // First destination chunks at offset 0 (no explicit member for this).
+                // Then, shared data destination chunks. Can be different from SH data destination in case of blending
+                // (one pool for blending and one other pool for shared data and blending destination).
                 bufferLayout._SharedDestChunksOffset = destChunksSize;
                 bufferLayout._L0L1rxOffset = bufferLayout._SharedDestChunksOffset + destChunksSize;
                 bufferLayout._L1GryOffset = bufferLayout._L0L1rxOffset + m_L0Size * chunkCount;
                 bufferLayout._L1BrzOffset = bufferLayout._L1GryOffset + m_L1Size * chunkCount;
                 bufferLayout._ValidityOffset = bufferLayout._L1BrzOffset + m_L1Size * chunkCount;
                 bufferLayout._ProbeOcclusionOffset = bufferLayout._ValidityOffset + m_ValiditySize * chunkCount;
-                bufferLayout._SkyOcclusionOffset = bufferLayout._ProbeOcclusionOffset + m_ProbeOcclusionSize * chunkCount;
-                bufferLayout._SkyShadingDirectionOffset = bufferLayout._SkyOcclusionOffset + m_SkyOcclusionSize * chunkCount;
-                bufferLayout._L2_0Offset = bufferLayout._SkyShadingDirectionOffset + m_SkyShadingDirectionSize * chunkCount;
+                bufferLayout._SkyOcclusionOffset =
+                    bufferLayout._ProbeOcclusionOffset + m_ProbeOcclusionSize * chunkCount;
+                bufferLayout._SkyShadingDirectionOffset =
+                    bufferLayout._SkyOcclusionOffset + m_SkyOcclusionSize * chunkCount;
+                bufferLayout._L2_0Offset =
+                    bufferLayout._SkyShadingDirectionOffset + m_SkyShadingDirectionSize * chunkCount;
                 bufferLayout._L2_1Offset = bufferLayout._L2_0Offset + m_L2Size * chunkCount;
                 bufferLayout._L2_2Offset = bufferLayout._L2_1Offset + m_L2Size * chunkCount;
                 bufferLayout._L2_3Offset = bufferLayout._L2_2Offset + m_L2Size * chunkCount;
 
                 bufferLayout._ProbeCountInChunkLine = ProbeBrickPool.kChunkProbeCountPerDim;
-                bufferLayout._ProbeCountInChunkSlice = ProbeBrickPool.kChunkProbeCountPerDim * ProbeBrickPool.kBrickProbeCountPerDim;
+                bufferLayout._ProbeCountInChunkSlice =
+                    ProbeBrickPool.kChunkProbeCountPerDim * ProbeBrickPool.kBrickProbeCountPerDim;
 
                 m_Layouts.Add(chunkCount, bufferLayout);
                 return bufferLayout;
@@ -165,7 +168,12 @@ namespace UnityEngine.Rendering
         static int s_ChunkCount;
 
         // Will return a the smallest GraphicsBuffer with at least enough space for chunkCount chunks.
-        public bool AllocateScratchBuffer(int chunkCount, out CellStreamingScratchBuffer scratchBuffer, out CellStreamingScratchBufferLayout layout, bool allocateGraphicsBuffers)
+        public bool AllocateScratchBuffer(
+            int chunkCount,
+            out CellStreamingScratchBuffer scratchBuffer,
+            out CellStreamingScratchBufferLayout layout,
+            bool allocateGraphicsBuffers
+        )
         {
             s_ChunkCount = chunkCount;
             int index = m_Pools.FindIndex(0, (o) => o.chunkCount == s_ChunkCount);
@@ -233,7 +241,7 @@ namespace UnityEngine.Rendering
         {
             if (scratchBuffer.chunkSize != chunkSize)
             {
-                scratchBuffer.Dispose();                
+                scratchBuffer.Dispose();
                 return;
             }
 
@@ -247,7 +255,7 @@ namespace UnityEngine.Rendering
         {
             foreach (var pool in m_Pools)
             {
-                while(pool.pool.Count > 0)
+                while (pool.pool.Count > 0)
                 {
                     var scratchBuffer = pool.pool.Pop();
                     scratchBuffer.Dispose();

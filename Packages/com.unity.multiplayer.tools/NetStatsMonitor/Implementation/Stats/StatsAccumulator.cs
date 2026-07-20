@@ -98,16 +98,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 return (statRequirements.SampleCounts[sampleRate] > 0)
                     || (statRequirements.DecayConstants.Count > 0 && sampleRate == SampleRate.PerFrame);
             }
-            var unrequiredSums = m_Sums.Keys
-                .Where(key => !Required(key))
-                .ToList();
+            var unrequiredSums = m_Sums.Keys.Where(key => !Required(key)).ToList();
             foreach (var key in unrequiredSums)
             {
                 m_Sums.Remove(key);
             }
-            var unrequiredGauges = m_GaugeCounts.Keys
-                .Where(key => !Required(key))
-                .ToList();
+            var unrequiredGauges = m_GaugeCounts.Keys.Where(key => !Required(key)).ToList();
             foreach (var key in unrequiredGauges)
             {
                 m_GaugeCounts.Remove(key);
@@ -122,8 +118,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 {
                     m_Sums.Add(metricId, 0f);
                 }
-                if (metricId.MetricKind == MetricKind.Gauge &&
-                    !m_GaugeCounts.ContainsKey(metricId))
+                if (metricId.MetricKind == MetricKind.Gauge && !m_GaugeCounts.ContainsKey(metricId))
                 {
                     m_GaugeCounts.Add(metricId, 0);
                 }

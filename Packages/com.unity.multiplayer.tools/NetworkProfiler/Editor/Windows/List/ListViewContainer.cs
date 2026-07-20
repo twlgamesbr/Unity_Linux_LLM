@@ -29,33 +29,25 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
         internal void NameSort(bool isAscending)
         {
-            var sort = isAscending
-                ? SortDirection.NameAscending
-                : SortDirection.NameDescending;
+            var sort = isAscending ? SortDirection.NameAscending : SortDirection.NameDescending;
             SortShowResults(sort);
         }
 
         internal void TypeSort(bool isAscending)
         {
-            var sort = isAscending
-                ? SortDirection.TypeAscending
-                : SortDirection.TypeDescending;
+            var sort = isAscending ? SortDirection.TypeAscending : SortDirection.TypeDescending;
             SortShowResults(sort);
         }
 
         internal void BytesSentSort(bool isAscending)
         {
-            var sort = isAscending
-                ? SortDirection.BytesSentAscending
-                : SortDirection.BytesSentDescending;
+            var sort = isAscending ? SortDirection.BytesSentAscending : SortDirection.BytesSentDescending;
             SortShowResults(sort);
         }
 
         internal void BytesReceivedSort(bool isAscending)
         {
-            var sort = isAscending
-                ? SortDirection.BytesReceivedAscending
-                : SortDirection.BytesReceivedDescending;
+            var sort = isAscending ? SortDirection.BytesReceivedAscending : SortDirection.BytesReceivedDescending;
             SortShowResults(sort);
         }
 

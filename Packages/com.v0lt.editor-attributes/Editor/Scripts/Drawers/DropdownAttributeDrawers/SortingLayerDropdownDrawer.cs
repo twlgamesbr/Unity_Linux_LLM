@@ -1,9 +1,9 @@
 using System;
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -13,25 +13,37 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The SortingLayerDropdown Attribute can only be attached to int fields", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The SortingLayerDropdown Attribute can only be attached to int fields",
+                    HelpBoxMessageType.Error
+                );
 
             MaskField maskField = new(property.displayName, GetSortingLayerNames(), property.intValue)
             {
                 showMixedValue = property.hasMultipleDifferentValues,
-                tooltip = property.tooltip
+                tooltip = property.tooltip,
             };
 
             maskField.AddToClassList(BaseField<Void>.alignedFieldUssClassName);
             AddPropertyContextMenu(maskField, property);
 
-            maskField.RegisterValueChangedCallback((callback) =>
-            {
-                property.intValue = maskField.value;
-                property.serializedObject.ApplyModifiedProperties();
-            });
+            maskField.RegisterValueChangedCallback(
+                (callback) =>
+                {
+                    property.intValue = maskField.value;
+                    property.serializedObject.ApplyModifiedProperties();
+                }
+            );
 
-            maskField.TrackPropertyValue(property, (trackedProperty) => maskField.SetValueWithoutNotify(trackedProperty.intValue));
-            maskField.RegisterCallbackOnce<GeometryChangedEvent>((callback) => maskField.Q(className: MaskField.inputUssClassName).style.backgroundColor = EditorExtension.GLOBAL_COLOR / 2f);
+            maskField.TrackPropertyValue(
+                property,
+                (trackedProperty) => maskField.SetValueWithoutNotify(trackedProperty.intValue)
+            );
+            maskField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                    maskField.Q(className: MaskField.inputUssClassName).style.backgroundColor =
+                        EditorExtension.GLOBAL_COLOR / 2f
+            );
 
             return maskField;
         }
@@ -51,7 +63,8 @@ namespace EditorAttributes.Editor
             }
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.Integer;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.Integer;
 
         private List<string> GetSortingLayerNames()
         {

@@ -47,7 +47,10 @@ namespace Unity.Rendering
             public override void Bake(MaterialColor authoring)
             {
                 Color linearCol = authoring.color.linear;
-                var data = new Unity.Rendering.MaterialColor { Value = new float4(linearCol.r, linearCol.g, linearCol.b, linearCol.a) };
+                var data = new Unity.Rendering.MaterialColor
+                {
+                    Value = new float4(linearCol.r, linearCol.g, linearCol.b, linearCol.a),
+                };
                 var entity = GetEntity(TransformUsageFlags.Renderable);
                 AddComponent(entity, data);
             }

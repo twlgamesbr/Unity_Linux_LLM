@@ -23,7 +23,8 @@ public partial class JobEntityModule
             string jobArg,
             string queryToUse,
             string? userDefinedDependency,
-            ExpressionSyntax systemStateExpression)
+            ExpressionSyntax systemStateExpression
+        )
         {
             _schedulingMethodName = schedulingMethodName;
             _scheduleMode = scheduleMode;
@@ -49,7 +50,9 @@ public partial class JobEntityModule
             string systemStateArg = $"ref {_systemStateExpression}";
             string hasUserDefinedQueryArg = _hasUserDefinedQuery ? "true" : "false";
 
-            stringBuilder.Append($"{_schedulingMethodName}({jobArg}, {queryArg}, {dependencyArg}, {systemStateArg}, {hasUserDefinedQueryArg})");
+            stringBuilder.Append(
+                $"{_schedulingMethodName}({jobArg}, {queryArg}, {dependencyArg}, {systemStateArg}, {hasUserDefinedQueryArg})"
+            );
             return stringBuilder.ToString();
         }
     }

@@ -11,7 +11,8 @@ namespace Unity.PlatformToolkit.Editor
         private SupportDeclarationTargetsManager m_SupportDeclarationTargetsTargetsManager;
         private IPlatformToolkitSupportDeclaration m_Declaration;
 
-        public IReadOnlyList<BuildTarget> SupportedBuildTargets => m_Declaration.SupportedPlatforms.OrderBy(p=> p.ToString()).ToList();
+        public IReadOnlyList<BuildTarget> SupportedBuildTargets =>
+            m_Declaration.SupportedPlatforms.OrderBy(p => p.ToString()).ToList();
 
         [CreateProperty]
         public string Name => m_Declaration.DisplayName;
@@ -23,16 +24,21 @@ namespace Unity.PlatformToolkit.Editor
             set => UpdateTargetPlatform(value);
         }
 
-        public SupportDeclarationTarget(IPlatformToolkitSupportDeclaration declaration, SupportDeclarationTargetsManager supportDeclarationTargetsManager)
+        public SupportDeclarationTarget(
+            IPlatformToolkitSupportDeclaration declaration,
+            SupportDeclarationTargetsManager supportDeclarationTargetsManager
+        )
         {
-            m_SupportDeclarationTargetsTargetsManager =  supportDeclarationTargetsManager;
+            m_SupportDeclarationTargetsTargetsManager = supportDeclarationTargetsManager;
             m_Declaration = declaration;
         }
 
         private ToggleButtonGroupState GetToggleButtonGroupState()
         {
             var selectedPlatforms = m_SupportDeclarationTargetsTargetsManager.GetTargetedPlatforms(m_Declaration.Key);
-            var options = SupportedBuildTargets.Select(supportedBuildTarget => selectedPlatforms.Contains(supportedBuildTarget)).ToList();
+            var options = SupportedBuildTargets
+                .Select(supportedBuildTarget => selectedPlatforms.Contains(supportedBuildTarget))
+                .ToList();
             return ToggleButtonGroupState.CreateFromOptions(options);
         }
 

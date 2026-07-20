@@ -1,8 +1,8 @@
 using System;
-using Unity.Jobs.LowLevel.Unsafe;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Burst;
+using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 
 namespace Unity.Jobs
@@ -23,9 +23,18 @@ namespace Unity.Jobs
         /// <param name="innerloopBatchCount"></param>
         /// <param name="dependsOn"></param>
         /// <returns></returns>
-        [Obsolete("The signature for 'ScheduleAppend' has changed. 'innerloopBatchCount' is no longer part of this API.", false)]
-        public static unsafe JobHandle ScheduleAppend<T>(this T jobData, NativeList<int> indices, int arrayLength, int innerloopBatchCount, JobHandle dependsOn = new JobHandle()) where T : struct, IJobFilter
-            => jobData.ScheduleAppend(indices, arrayLength, dependsOn);
+        [Obsolete(
+            "The signature for 'ScheduleAppend' has changed. 'innerloopBatchCount' is no longer part of this API.",
+            false
+        )]
+        public static unsafe JobHandle ScheduleAppend<T>(
+            this T jobData,
+            NativeList<int> indices,
+            int arrayLength,
+            int innerloopBatchCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobFilter => jobData.ScheduleAppend(indices, arrayLength, dependsOn);
 
         /// <summary>
         /// **Obsolete.**
@@ -36,9 +45,16 @@ namespace Unity.Jobs
         /// <param name="innerloopBatchCount"></param>
         /// <param name="dependsOn"></param>
         /// <returns></returns>
-        [Obsolete("The signature for 'ScheduleFilter' has changed. 'innerloopBatchCount' is no longer part of this API.")]
-        public static unsafe JobHandle ScheduleFilter<T>(this T jobData, NativeList<int> indices, int innerloopBatchCount, JobHandle dependsOn = new JobHandle()) where T : struct, IJobFilter
-            => jobData.ScheduleFilter(indices, dependsOn);
+        [Obsolete(
+            "The signature for 'ScheduleFilter' has changed. 'innerloopBatchCount' is no longer part of this API."
+        )]
+        public static unsafe JobHandle ScheduleFilter<T>(
+            this T jobData,
+            NativeList<int> indices,
+            int innerloopBatchCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobFilter => jobData.ScheduleFilter(indices, dependsOn);
     }
 
     /// <summary>
@@ -48,13 +64,12 @@ namespace Unity.Jobs
     public interface IJobParallelForFilter
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
         bool Execute(int index);
     }
-
 
     /// <summary>
     /// Filters a list of indices.
@@ -82,7 +97,8 @@ namespace Unity.Jobs
     /// </summary>
     public static class IJobFilterExtensions
     {
-        internal struct JobFilterProducer<T> where T : struct, IJobFilter
+        internal struct JobFilterProducer<T>
+            where T : struct, IJobFilter
         {
             public struct JobWrapper
             {
@@ -92,16 +108,28 @@ namespace Unity.Jobs
                 public T JobData;
             }
 
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<JobFilterProducer<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                JobFilterProducer<T>
+            >();
 
             [BurstDiscard]
             internal static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(JobWrapper), typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(JobWrapper),
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
-            public delegate void ExecuteJobFunction(ref JobWrapper jobWrapper, IntPtr additionalPtr, IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref JobWrapper jobWrapper,
+                IntPtr additionalPtr,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
             /// <summary>
             /// Job Producer method invoked by the Job System when running an IJobFilter Job.
@@ -111,7 +139,13 @@ namespace Unity.Jobs
             /// <param name="bufferRangePatchData">Buffer data JobRanges</param>
             /// <param name="ranges">unused</param>
             /// <param name="jobIndex">unused</param>
-            public static void Execute(ref JobWrapper jobWrapper, IntPtr additionalPtr, IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static void Execute(
+                ref JobWrapper jobWrapper,
+                IntPtr additionalPtr,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 if (jobWrapper.appendCount == -1)
                     ExecuteFilter(ref jobWrapper, bufferRangePatchData);
@@ -122,14 +156,21 @@ namespace Unity.Jobs
             public static unsafe void ExecuteAppend(ref JobWrapper jobWrapper, System.IntPtr bufferRangePatchData)
             {
                 int oldLength = jobWrapper.outputIndices.Length;
-                jobWrapper.outputIndices.Capacity = math.max(jobWrapper.appendCount + oldLength, jobWrapper.outputIndices.Capacity);
+                jobWrapper.outputIndices.Capacity = math.max(
+                    jobWrapper.appendCount + oldLength,
+                    jobWrapper.outputIndices.Capacity
+                );
 
                 int* outputPtr = (int*)jobWrapper.outputIndices.GetUnsafePtr();
                 int outputIndex = oldLength;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobWrapper),
-                    0, jobWrapper.appendCount);
+                JobsUtility.PatchBufferMinMaxRanges(
+                    bufferRangePatchData,
+                    UnsafeUtility.AddressOf(ref jobWrapper),
+                    0,
+                    jobWrapper.appendCount
+                );
 #endif
                 for (int i = 0; i != jobWrapper.appendCount; i++)
                 {
@@ -154,7 +195,12 @@ namespace Unity.Jobs
                     int inputIndex = outputPtr[i];
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobWrapper), inputIndex, 1);
+                    JobsUtility.PatchBufferMinMaxRanges(
+                        bufferRangePatchData,
+                        UnsafeUtility.AddressOf(ref jobWrapper),
+                        inputIndex,
+                        1
+                    );
 #endif
 
                     if (jobWrapper.JobData.Execute(inputIndex))
@@ -174,7 +220,7 @@ namespace Unity.Jobs
         /// <typeparam name="T">Job type</typeparam>
         /// <remarks>
         /// When the Collections package is included in the project, Unity generates code to call EarlyJobInit at startup. This allows Burst compiled code to schedule jobs because the reflection part of initialization, which is not compatible with burst compiler constraints, has already happened in EarlyJobInit.
-        /// 
+        ///
         /// __Note__: While the Jobs package code generator handles this automatically for all closed job types, you must register those with generic arguments (like IJobFilter&amp;lt;MyJobType&amp;lt;T&amp;gt;&amp;gt;) manually for each specialization with [[Unity.Jobs.RegisterGenericJobTypeAttribute]].
         /// </remarks>
         public static void EarlyJobInit<T>()
@@ -201,7 +247,12 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleAppend<T>(this T jobData, NativeList<int> indices, int arrayLength, JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle ScheduleAppend<T>(
+            this T jobData,
+            NativeList<int> indices,
+            int arrayLength,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobFilter
         {
             return jobData.ScheduleAppendByRef(indices, arrayLength, dependsOn);
@@ -216,7 +267,11 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleFilter<T>(this T jobData, NativeList<int> indices, JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle ScheduleFilter<T>(
+            this T jobData,
+            NativeList<int> indices,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobFilter
         {
             return jobData.ScheduleFilterByRef(indices, dependsOn);
@@ -257,17 +312,27 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleAppendByRef<T>(ref this T jobData, NativeList<int> indices, int arrayLength, JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle ScheduleAppendByRef<T>(
+            ref this T jobData,
+            NativeList<int> indices,
+            int arrayLength,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobFilter
         {
             JobFilterProducer<T>.JobWrapper jobWrapper = new JobFilterProducer<T>.JobWrapper()
             {
                 JobData = jobData,
                 outputIndices = indices,
-                appendCount = arrayLength
+                appendCount = arrayLength,
             };
 
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobWrapper), GetReflectionData<T>(), dependsOn, ScheduleMode.Single);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobWrapper),
+                GetReflectionData<T>(),
+                dependsOn,
+                ScheduleMode.Single
+            );
             return JobsUtility.Schedule(ref scheduleParams);
         }
 
@@ -281,17 +346,26 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleFilterByRef<T>(ref this T jobData, NativeList<int> indices, JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle ScheduleFilterByRef<T>(
+            ref this T jobData,
+            NativeList<int> indices,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobFilter
         {
             JobFilterProducer<T>.JobWrapper jobWrapper = new JobFilterProducer<T>.JobWrapper()
             {
                 JobData = jobData,
                 outputIndices = indices,
-                appendCount = -1
+                appendCount = -1,
             };
 
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobWrapper), GetReflectionData<T>(), dependsOn, ScheduleMode.Single);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobWrapper),
+                GetReflectionData<T>(),
+                dependsOn,
+                ScheduleMode.Single
+            );
             return JobsUtility.Schedule(ref scheduleParams);
         }
 
@@ -309,10 +383,15 @@ namespace Unity.Jobs
             {
                 JobData = jobData,
                 outputIndices = indices,
-                appendCount = arrayLength
+                appendCount = arrayLength,
             };
 
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobWrapper), GetReflectionData<T>(), new JobHandle(), ScheduleMode.Run);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobWrapper),
+                GetReflectionData<T>(),
+                new JobHandle(),
+                ScheduleMode.Run
+            );
             JobsUtility.Schedule(ref scheduleParams);
         }
 
@@ -330,10 +409,15 @@ namespace Unity.Jobs
             {
                 JobData = jobData,
                 outputIndices = indices,
-                appendCount = -1
+                appendCount = -1,
             };
 
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobWrapper), GetReflectionData<T>(), new JobHandle(), ScheduleMode.Run);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobWrapper),
+                GetReflectionData<T>(),
+                new JobHandle(),
+                ScheduleMode.Run
+            );
             JobsUtility.Schedule(ref scheduleParams);
         }
     }

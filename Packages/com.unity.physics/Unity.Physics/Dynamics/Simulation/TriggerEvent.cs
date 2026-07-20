@@ -148,10 +148,7 @@ namespace Unity.Physics
 
         internal TriggerEvent CreateTriggerEvent()
         {
-            return new TriggerEvent
-            {
-                EventData = this
-            };
+            return new TriggerEvent { EventData = this };
         }
     }
 }

@@ -12,7 +12,9 @@ namespace Unity.Entities.Editor
     /// </summary>
     class HierarchyFilter : IDisposable
     {
-        static readonly ProfilerMarker k_PreProcessTokensMarker = new ProfilerMarker($"{nameof(HierarchyFilter)}.{nameof(PreProcessTokens)}");
+        static readonly ProfilerMarker k_PreProcessTokensMarker = new ProfilerMarker(
+            $"{nameof(HierarchyFilter)}.{nameof(PreProcessTokens)}"
+        );
 
         /// <summary>
         /// The search backend for the hierarchy.
@@ -62,12 +64,31 @@ namespace Unity.Entities.Editor
         static readonly string k_ComponentTypeNotFoundTitle = L10n.Tr("Type not found");
         static readonly string k_ComponentTypeNotFoundContent = L10n.Tr("\"{0}\" is not a component type");
 
-        internal HierarchyFilter(HierarchySearch hierarchySearch, string searchString, ICollection<string> tokens, Allocator allocator)
-            : this(hierarchySearch, HierarchyQueryBuilder.BuildQuery(searchString), tokens, -1, NodeKind.None, allocator, true)
-        {
-        }
+        internal HierarchyFilter(
+            HierarchySearch hierarchySearch,
+            string searchString,
+            ICollection<string> tokens,
+            Allocator allocator
+        )
+            : this(
+                hierarchySearch,
+                HierarchyQueryBuilder.BuildQuery(searchString),
+                tokens,
+                -1,
+                NodeKind.None,
+                allocator,
+                true
+            ) { }
 
-        internal HierarchyFilter(HierarchySearch hierarchySearch, HierarchyQueryBuilder.Result result, ICollection<string> tokens, int entityIndex, NodeKind nodeKind, Allocator allocator, bool parseTokensForFilter)
+        internal HierarchyFilter(
+            HierarchySearch hierarchySearch,
+            HierarchyQueryBuilder.Result result,
+            ICollection<string> tokens,
+            int entityIndex,
+            NodeKind nodeKind,
+            Allocator allocator,
+            bool parseTokensForFilter
+        )
         {
             m_HierarchySearch = hierarchySearch;
             m_QueryResult = result;
@@ -104,7 +125,12 @@ namespace Unity.Entities.Editor
             m_Tokens.Dispose();
         }
 
-        void PreProcessTokens(IEnumerable<string> inputTokens, NativeList<FixedString64Bytes> processedTokens, ref int targetIndex, ref NodeKind kind)
+        void PreProcessTokens(
+            IEnumerable<string> inputTokens,
+            NativeList<FixedString64Bytes> processedTokens,
+            ref int targetIndex,
+            ref NodeKind kind
+        )
         {
             using var marker = k_PreProcessTokensMarker.Auto();
 
@@ -117,7 +143,9 @@ namespace Unity.Entities.Editor
                 // Component
                 if (token.StartsWith(Constants.ComponentSearch.TokenOp, StringComparison.OrdinalIgnoreCase))
                     continue;
-                else if (token.StartsWith(Constants.Hierarchy.EntityIndexTokenOpEqual, StringComparison.OrdinalIgnoreCase))
+                else if (
+                    token.StartsWith(Constants.Hierarchy.EntityIndexTokenOpEqual, StringComparison.OrdinalIgnoreCase)
+                )
                 {
                     var startIndex = Constants.Hierarchy.EntityIndexTokenOpEqual.Length;
                     var length = token.Length - startIndex;
@@ -138,18 +166,24 @@ namespace Unity.Entities.Editor
                         continue;
 
                     var value = token.Substring(startIndex, token.Length - startIndex).ToLowerInvariant();
-                    foreach(var k in Enum.GetValues(typeof(NodeKind)))
+                    foreach (var k in Enum.GetValues(typeof(NodeKind)))
                     {
                         if (k.ToString().ToLowerInvariant() == value)
                             kind = (NodeKind)k;
                         continue;
                     }
                 }
-                else if (token.StartsWith("\"", StringComparison.Ordinal) && token.EndsWith("\"", StringComparison.Ordinal))
+                else if (
+                    token.StartsWith("\"", StringComparison.Ordinal) && token.EndsWith("\"", StringComparison.Ordinal)
+                )
                 {
                     // Discard single quote or empty double quotes
                     if (token.Length > 2)
-                        processedTokens.Add(token.Substring(1, Math.Min(token.Length - 2, FixedString64Bytes.UTF8MaxLengthInBytes)).ToLowerInvariant());
+                        processedTokens.Add(
+                            token
+                                .Substring(1, Math.Min(token.Length - 2, FixedString64Bytes.UTF8MaxLengthInBytes))
+                                .ToLowerInvariant()
+                        );
                 }
                 else
                 {
@@ -165,7 +199,10 @@ namespace Unity.Entities.Editor
 
         static FixedString64Bytes ProcessToken(string token)
         {
-            var truncatedToken = token.Length > FixedString64Bytes.UTF8MaxLengthInBytes ? token.Substring(0, FixedString64Bytes.UTF8MaxLengthInBytes) : token;
+            var truncatedToken =
+                token.Length > FixedString64Bytes.UTF8MaxLengthInBytes
+                    ? token.Substring(0, FixedString64Bytes.UTF8MaxLengthInBytes)
+                    : token;
 
             // Use the fixed string to-lower variant to be compatible with filtering.
             return FixedStringUtility.ToLower(truncatedToken);
@@ -220,7 +257,13 @@ namespace Unity.Entities.Editor
             mask.SetBits(0, true, mask.Length);
 
             m_HierarchySearch.ApplyEntityIndexFilter(nodes, m_EntityIndex, mask);
-            m_HierarchySearch.ApplyEntityQueryFilter(nodes, m_QueryResult.EntityQueryDesc, EntityQueryModifiers, mask, allocator);
+            m_HierarchySearch.ApplyEntityQueryFilter(
+                nodes,
+                m_QueryResult.EntityQueryDesc,
+                EntityQueryModifiers,
+                mask,
+                allocator
+            );
 
             m_HierarchySearch.ApplyNameFilter(nodes, m_Tokens, mask);
             m_HierarchySearch.ApplyIncludeSubSceneFilter(nodes, mask);

@@ -1,19 +1,18 @@
 using System;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+
 namespace NPCSystem.Network.Core
 {
     /// <summary>
@@ -29,7 +28,7 @@ namespace NPCSystem.Network.Core
         public static bool IsLocalHost(string host)
         {
             return string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(host, "127.0.0.1", StringComparison.Ordinal);
+                || string.Equals(host, "127.0.0.1", StringComparison.Ordinal);
         }
     }
 }

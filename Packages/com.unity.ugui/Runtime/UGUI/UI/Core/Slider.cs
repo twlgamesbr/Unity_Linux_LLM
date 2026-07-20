@@ -1,7 +1,6 @@
 using System;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -52,7 +51,7 @@ namespace UnityEngine.UI
         /// <summary>
         /// Event type used by the UI.Slider.
         /// </summary>
-        public class SliderEvent : UnityEvent<float> {}
+        public class SliderEvent : UnityEvent<float> { }
 
         [SerializeField]
         private RectTransform m_FillRect;
@@ -83,12 +82,16 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public RectTransform fillRect { get { return m_FillRect; } set
+        public RectTransform fillRect
+        {
+            get { return m_FillRect; }
+            set
             {
                 if (SetPropertyUtility.SetClass(ref m_FillRect, value))
                 {
                     UpdateCachedReferences();
-                    UpdateVisuals(); }
+                    UpdateVisuals();
+                }
             }
         }
 
@@ -122,17 +125,20 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public RectTransform handleRect { get { return m_HandleRect; } set
+        public RectTransform handleRect
+        {
+            get { return m_HandleRect; }
+            set
             {
                 if (SetPropertyUtility.SetClass(ref m_HandleRect, value))
                 {
                     UpdateCachedReferences();
-                    UpdateVisuals(); }
+                    UpdateVisuals();
+                }
             }
         }
 
         [Space]
-
         [SerializeField]
         private Direction m_Direction = Direction.LeftToRight;
 
@@ -162,7 +168,10 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Direction direction { get { return m_Direction; } set
+        public Direction direction
+        {
+            get { return m_Direction; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_Direction, value))
                     UpdateVisuals();
@@ -195,12 +204,16 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public float minValue { get { return m_MinValue; } set
+        public float minValue
+        {
+            get { return m_MinValue; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_MinValue, value))
                 {
                     Set(m_Value);
-                    UpdateVisuals(); }
+                    UpdateVisuals();
+                }
             }
         }
 
@@ -230,12 +243,16 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public float maxValue { get { return m_MaxValue; } set
+        public float maxValue
+        {
+            get { return m_MaxValue; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_MaxValue, value))
                 {
                     Set(m_Value);
-                    UpdateVisuals(); }
+                    UpdateVisuals();
+                }
             }
         }
 
@@ -265,12 +282,16 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public bool wholeNumbers { get { return m_WholeNumbers; } set
+        public bool wholeNumbers
+        {
+            get { return m_WholeNumbers; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_WholeNumbers, value))
                 {
                     Set(m_Value);
-                    UpdateVisuals(); }
+                    UpdateVisuals();
+                }
             }
         }
 
@@ -303,14 +324,8 @@ namespace UnityEngine.UI
         /// </example>
         public virtual float value
         {
-            get
-            {
-                return wholeNumbers ? Mathf.Round(m_Value) : m_Value;
-            }
-            set
-            {
-                Set(value);
-            }
+            get { return wholeNumbers ? Mathf.Round(m_Value) : m_Value; }
+            set { Set(value); }
         }
 
         /// <summary>
@@ -354,14 +369,10 @@ namespace UnityEngine.UI
                     return 0;
                 return Mathf.InverseLerp(minValue, maxValue, value);
             }
-            set
-            {
-                this.value = Mathf.Lerp(minValue, maxValue, value);
-            }
+            set { this.value = Mathf.Lerp(minValue, maxValue, value); }
         }
 
         [Space]
-
         [SerializeField]
         private SliderEvent m_OnValueChanged = new SliderEvent();
 
@@ -394,7 +405,11 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public SliderEvent onValueChanged { get { return m_OnValueChanged; } set { m_OnValueChanged = value; } }
+        public SliderEvent onValueChanged
+        {
+            get { return m_OnValueChanged; }
+            set { m_OnValueChanged = value; }
+        }
 
         // Private fields
 
@@ -408,18 +423,20 @@ namespace UnityEngine.UI
         private Vector2 m_Offset = Vector2.zero;
 
         // field is never assigned warning
-        #pragma warning disable 649
+#pragma warning disable 649
         private DrivenRectTransformTracker m_Tracker;
-        #pragma warning restore 649
+#pragma warning restore 649
 
         // This "delayed" mechanism is required for case 1037681.
         private bool m_DelayedUpdateVisuals = false;
 
         // Size of each step.
-        float stepSize { get { return wholeNumbers ? 1 : (maxValue - minValue) * 0.1f; } }
+        float stepSize
+        {
+            get { return wholeNumbers ? 1 : (maxValue - minValue) * 0.1f; }
+        }
 
-        protected Slider()
-        {}
+        protected Slider() { }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -443,7 +460,6 @@ namespace UnityEngine.UI
             if (!UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this) && !Application.isPlaying)
                 CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
         }
-
 #endif // if UNITY_EDITOR
 
         public virtual void Rebuild(CanvasUpdate executing)
@@ -457,14 +473,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// See ICanvasElement.LayoutComplete
         /// </summary>
-        public virtual void LayoutComplete()
-        {}
+        public virtual void LayoutComplete() { }
 
         /// <summary>
         /// See ICanvasElement.GraphicUpdateComplete
         /// </summary>
-        public virtual void GraphicUpdateComplete()
-        {}
+        public virtual void GraphicUpdateComplete() { }
 
         protected override void OnEnable()
         {
@@ -513,10 +527,14 @@ namespace UnityEngine.UI
                 if (m_FillImage != null && m_FillImage.type == Image.Type.Filled)
                     oldNormalizedValue = m_FillImage.fillAmount;
                 else
-                    oldNormalizedValue = (reverseValue ? 1 - m_FillRect.anchorMin[(int)axis] : m_FillRect.anchorMax[(int)axis]);
+                    oldNormalizedValue = (
+                        reverseValue ? 1 - m_FillRect.anchorMin[(int)axis] : m_FillRect.anchorMax[(int)axis]
+                    );
             }
             else if (m_HandleContainerRect != null)
-                oldNormalizedValue = (reverseValue ? 1 - m_HandleRect.anchorMin[(int)axis] : m_HandleRect.anchorMin[(int)axis]);
+                oldNormalizedValue = (
+                    reverseValue ? 1 - m_HandleRect.anchorMin[(int)axis] : m_HandleRect.anchorMin[(int)axis]
+                );
 
             UpdateVisuals();
 
@@ -615,11 +633,22 @@ namespace UnityEngine.UI
         enum Axis
         {
             Horizontal = 0,
-            Vertical = 1
+            Vertical = 1,
         }
 
-        Axis axis { get { return (m_Direction == Direction.LeftToRight || m_Direction == Direction.RightToLeft) ? Axis.Horizontal : Axis.Vertical; } }
-        bool reverseValue { get { return m_Direction == Direction.RightToLeft || m_Direction == Direction.TopToBottom; } }
+        Axis axis
+        {
+            get
+            {
+                return (m_Direction == Direction.LeftToRight || m_Direction == Direction.RightToLeft)
+                    ? Axis.Horizontal
+                    : Axis.Vertical;
+            }
+        }
+        bool reverseValue
+        {
+            get { return m_Direction == Direction.RightToLeft || m_Direction == Direction.TopToBottom; }
+        }
 
         // Force-update the slider. Useful if you've changed the properties and want it to update visually.
         private void UpdateVisuals()
@@ -697,10 +726,24 @@ namespace UnityEngine.UI
             base.OnPointerDown(eventData);
 
             m_Offset = Vector2.zero;
-            if (m_HandleContainerRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_HandleRect, eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera))
+            if (
+                m_HandleContainerRect != null
+                && RectTransformUtility.RectangleContainsScreenPoint(
+                    m_HandleRect,
+                    eventData.pointerPressRaycast.screenPosition,
+                    eventData.enterEventCamera
+                )
+            )
             {
                 Vector2 localMousePos;
-                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HandleRect, eventData.pointerPressRaycast.screenPosition, eventData.pressEventCamera, out localMousePos))
+                if (
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        m_HandleRect,
+                        eventData.pointerPressRaycast.screenPosition,
+                        eventData.pressEventCamera,
+                        out localMousePos
+                    )
+                )
                     m_Offset = localMousePos;
             }
             else

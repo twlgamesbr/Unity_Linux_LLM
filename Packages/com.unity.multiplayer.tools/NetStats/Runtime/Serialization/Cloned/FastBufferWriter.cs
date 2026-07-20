@@ -60,7 +60,6 @@ namespace Unity.Multiplayer.Tools.NetStats
             get => Handle->Position > Handle->Length ? Handle->Position : Handle->Length;
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal unsafe void CommitBitwiseWrites(int amount)
         {
@@ -78,7 +77,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="maxSize">Maximum size the buffer can grow to. If less than size, buffer cannot grow.</param>
         public unsafe FastBufferWriter(int size, Allocator allocator, int maxSize = -1)
         {
-            Handle = (WriterHandle*)UnsafeUtility.Malloc(sizeof(WriterHandle) + size, UnsafeUtility.AlignOf<WriterHandle>(), allocator);
+            Handle = (WriterHandle*)
+                UnsafeUtility.Malloc(sizeof(WriterHandle) + size, UnsafeUtility.AlignOf<WriterHandle>(), allocator);
 #if UNITY_ENABLE_CHECKS || UNITY_EDITOR
             UnsafeUtility.MemSet(Handle, 0, sizeof(WriterHandle) + size);
 #endif
@@ -217,7 +217,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             if (Handle->Position + bytes > Handle->Capacity)
@@ -258,13 +259,15 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <returns>True if the write is allowed, false otherwise</returns>
         /// <exception cref="InvalidOperationException">If called while in a bitwise context</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe bool TryBeginWriteValue<T>(in T value) where T : unmanaged
+        public unsafe bool TryBeginWriteValue<T>(in T value)
+            where T : unmanaged
         {
 #if UNITY_ENABLE_CHECKS || UNITY_EDITOR
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             int len = sizeof(T);
@@ -304,7 +307,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             if (Handle->Position + bytes > Handle->Capacity)
@@ -386,7 +390,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// </summary>
         /// <param name="value">The value to write</param>
         /// <typeparam name="T"></typeparam>
-        public void WriteNetworkSerializable<T>(in T value) where T : INetworkSerializable
+        public void WriteNetworkSerializable<T>(in T value)
+            where T : INetworkSerializable
         {
             var bufferSerializer = new BufferSerializer<BufferSerializerWriter>(new BufferSerializerWriter(this));
             value.NetworkSerialize(bufferSerializer);
@@ -399,7 +404,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="count"></param>
         /// <param name="offset"></param>
         /// <typeparam name="T"></typeparam>
-        public void WriteNetworkSerializable<T>(INetworkSerializable[] array, int count = -1, int offset = 0) where T : INetworkSerializable
+        public void WriteNetworkSerializable<T>(INetworkSerializable[] array, int count = -1, int offset = 0)
+            where T : INetworkSerializable
         {
             int sizeInTs = count != -1 ? count : array.Length - offset;
             WriteValueSafe(sizeInTs);
@@ -448,7 +454,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -486,7 +493,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int GetWriteSize<T>(T[] array, int count = -1, int offset = 0) where T : unmanaged
+        public static unsafe int GetWriteSize<T>(T[] array, int count = -1, int offset = 0)
+            where T : unmanaged
         {
             int sizeInTs = count != -1 ? count : array.Length - offset;
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -500,7 +508,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="count">The amount of elements to write</param>
         /// <param name="offset">Where in the array to start</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void WriteValue<T>(T[] array, int count = -1, int offset = 0) where T : unmanaged
+        public unsafe void WriteValue<T>(T[] array, int count = -1, int offset = 0)
+            where T : unmanaged
         {
             int sizeInTs = count != -1 ? count : array.Length - offset;
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -522,13 +531,15 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="count">The amount of elements to write</param>
         /// <param name="offset">Where in the array to start</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void WriteValueSafe<T>(T[] array, int count = -1, int offset = 0) where T : unmanaged
+        public unsafe void WriteValueSafe<T>(T[] array, int count = -1, int offset = 0)
+            where T : unmanaged
         {
 #if UNITY_ENABLE_CHECKS || UNITY_EDITOR
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -557,13 +568,15 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="OverflowException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void WritePartialValue<T>(T value, int bytesToWrite, int offsetBytes = 0) where T : unmanaged
+        public unsafe void WritePartialValue<T>(T value, int bytesToWrite, int offsetBytes = 0)
+            where T : unmanaged
         {
 #if UNITY_ENABLE_CHECKS || UNITY_EDITOR
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + bytesToWrite > Handle->AllowedWriteMark)
             {
@@ -589,7 +602,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + 1 > Handle->AllowedWriteMark)
             {
@@ -613,7 +627,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -637,7 +652,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + size > Handle->AllowedWriteMark)
             {
@@ -664,7 +680,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -740,7 +757,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int GetWriteSize<T>(in T value) where T : unmanaged
+        public static unsafe int GetWriteSize<T>(in T value)
+            where T : unmanaged
         {
             return sizeof(T);
         }
@@ -750,7 +768,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static unsafe int GetWriteSize<T>() where T : unmanaged
+        public static unsafe int GetWriteSize<T>()
+            where T : unmanaged
         {
             return sizeof(T);
         }
@@ -762,7 +781,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="value">The value to copy</param>
         /// <typeparam name="T">Any unmanaged type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void WriteValue<T>(in T value) where T : unmanaged
+        public unsafe void WriteValue<T>(in T value)
+            where T : unmanaged
         {
             int len = sizeof(T);
 
@@ -770,7 +790,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + len > Handle->AllowedWriteMark)
             {
@@ -795,7 +816,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="value">The value to copy</param>
         /// <typeparam name="T">Any unmanaged type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void WriteValueSafe<T>(in T value) where T : unmanaged
+        public unsafe void WriteValueSafe<T>(in T value)
+            where T : unmanaged
         {
             int len = sizeof(T);
 
@@ -803,7 +825,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferWriter in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferWriter in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 

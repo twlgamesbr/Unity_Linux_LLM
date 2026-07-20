@@ -7,6 +7,7 @@ namespace UnityEngine.TestRunner.TestProtocol
     internal class MessageForRetryRepeat
     {
         public string type;
+
         // Milliseconds since unix epoch
         public ulong time;
         public int version;

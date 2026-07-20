@@ -30,7 +30,13 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                     yield break;
                 }
 
-                runner.Resume(testJobData.executionSettings.BuildNUnitFilter(), testJobData.testTree, testJobData.TestStartedEvent, testJobData.TestFinishedEvent, testJobData.Context);
+                runner.Resume(
+                    testJobData.executionSettings.BuildNUnitFilter(),
+                    testJobData.testTree,
+                    testJobData.TestStartedEvent,
+                    testJobData.TestFinishedEvent,
+                    testJobData.Context
+                );
                 yield break;
             }
 
@@ -39,8 +45,17 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             testJobData.editModeRunner = editModeRunner;
 
             editModeRunner.UnityTestAssemblyRunnerFactory = new UnityTestAssemblyRunnerFactory();
-            editModeRunner.Init(testJobData.executionSettings.BuildNUnitFilter(), testJobData.executionSettings.runSynchronously, testJobData.testTree, testJobData.TestStartedEvent,
-                testJobData.TestFinishedEvent, testJobData.Context, testJobData.executionSettings.orderedTestNames, testJobData.executionSettings.randomOrderSeed, testJobData.executionSettings.featureFlags.disableNestedEnumeratorBugfix);
+            editModeRunner.Init(
+                testJobData.executionSettings.BuildNUnitFilter(),
+                testJobData.executionSettings.runSynchronously,
+                testJobData.testTree,
+                testJobData.TestStartedEvent,
+                testJobData.TestFinishedEvent,
+                testJobData.Context,
+                testJobData.executionSettings.orderedTestNames,
+                testJobData.executionSettings.randomOrderSeed,
+                testJobData.executionSettings.featureFlags.disableNestedEnumeratorBugfix
+            );
 
             while (testJobData.editModeRunner != null && !testJobData.editModeRunner.RunFinished)
             {

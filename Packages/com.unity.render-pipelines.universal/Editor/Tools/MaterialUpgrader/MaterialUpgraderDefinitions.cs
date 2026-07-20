@@ -5,11 +5,10 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 [assembly: InternalsVisibleTo("MaterialPostprocessor")]
+
 namespace UnityEditor.Rendering.Universal
 {
-    internal interface IBuiltInToURPMaterialUpgrader
-    {
-    }
+    internal interface IBuiltInToURPMaterialUpgrader { }
 
     internal sealed class MaterialUpgradeUtils
     {
@@ -155,8 +154,8 @@ namespace UnityEditor.Rendering.Universal
         {
             Opaque,
             Cutout,
-            Fade,   // Old school alpha-blending mode, fresnel does not affect amount of transparency
-            Transparent // Physically plausible transparency mode, implemented as alpha pre-multiply
+            Fade, // Old school alpha-blending mode, fresnel does not affect amount of transparency
+            Transparent, // Physically plausible transparency mode, implemented as alpha pre-multiply
         }
 
         /// <summary>
@@ -222,9 +221,15 @@ namespace UnityEditor.Rendering.Universal
             var baseOffset = material.GetTextureOffset("_BaseMap");
             var detailScale = material.GetTextureScale("_DetailAlbedoMap");
             var detailOffset = material.GetTextureOffset("_DetailAlbedoMap");
-            var scale = new Vector2(baseScale.x == 0 ? 0 : detailScale.x / baseScale.x, baseScale.y == 0 ? 0 : detailScale.y / baseScale.y);
+            var scale = new Vector2(
+                baseScale.x == 0 ? 0 : detailScale.x / baseScale.x,
+                baseScale.y == 0 ? 0 : detailScale.y / baseScale.y
+            );
             material.SetTextureScale("_DetailAlbedoMap", scale);
-            material.SetTextureOffset("_DetailAlbedoMap", new Vector2((detailOffset.x - baseOffset.x * scale.x), (detailOffset.y - baseOffset.y * scale.y)));
+            material.SetTextureOffset(
+                "_DetailAlbedoMap",
+                new Vector2((detailOffset.x - baseOffset.x * scale.x), (detailOffset.y - baseOffset.y * scale.y))
+            );
         }
 
         // Converts from legacy RenderingMode to new SurfaceType and BlendMode
@@ -321,7 +326,8 @@ namespace UnityEditor.Rendering.Universal
             // or is enabled and may be modified at runtime. This state depends on the values of the current flag and emissive color.
             // The fixup routine makes sure that the material is in the correct state if/when changes are made to the mode or color.
             MaterialEditor.FixupEmissiveFlag(material);
-            bool shouldEmissionBeEnabled = (material.globalIlluminationFlags & MaterialGlobalIlluminationFlags.AnyEmissive) != 0;
+            bool shouldEmissionBeEnabled =
+                (material.globalIlluminationFlags & MaterialGlobalIlluminationFlags.AnyEmissive) != 0;
             CoreUtils.SetKeyword(material, "_EMISSION", shouldEmissionBeEnabled);
             MaterialUpgradeUtils.DisableKeywords(material);
         }
@@ -341,7 +347,11 @@ namespace UnityEditor.Rendering.Universal
                 bool hasGlossMap = material.GetTexture("_SpecGlossMap");
                 CoreUtils.SetKeyword(material, "_SPECGLOSSMAP", hasGlossMap);
                 CoreUtils.SetKeyword(material, "_SPECULAR_COLOR", !hasGlossMap);
-                CoreUtils.SetKeyword(material, "_GLOSSINESS_FROM_BASE_ALPHA", glossSource == SmoothnessSource.BaseAlpha);
+                CoreUtils.SetKeyword(
+                    material,
+                    "_GLOSSINESS_FROM_BASE_ALPHA",
+                    glossSource == SmoothnessSource.BaseAlpha
+                );
             }
         }
     }
@@ -357,23 +367,35 @@ namespace UnityEditor.Rendering.Universal
         /// <param name="oldShaderName">The name of the old shader.</param>
         public TerrainUpgrader(string oldShaderName)
         {
-            RenameShader(oldShaderName, ShaderUtils.GetShaderPath(ShaderPathID.TerrainLit), MaterialUpgradeUtils.DisableKeywords);
+            RenameShader(
+                oldShaderName,
+                ShaderUtils.GetShaderPath(ShaderPathID.TerrainLit),
+                MaterialUpgradeUtils.DisableKeywords
+            );
         }
-
     }
 
     internal class SpeedTreeUpgrader : MaterialUpgrader, IBuiltInToURPMaterialUpgrader
     {
         internal SpeedTreeUpgrader(string oldShaderName)
         {
-            RenameShader(oldShaderName, ShaderUtils.GetShaderPath(ShaderPathID.SpeedTree7), MaterialUpgradeUtils.DisableKeywords);
+            RenameShader(
+                oldShaderName,
+                ShaderUtils.GetShaderPath(ShaderPathID.SpeedTree7),
+                MaterialUpgradeUtils.DisableKeywords
+            );
         }
     }
+
     internal class SpeedTreeBillboardUpgrader : MaterialUpgrader, IBuiltInToURPMaterialUpgrader
     {
         internal SpeedTreeBillboardUpgrader(string oldShaderName)
         {
-            RenameShader(oldShaderName, ShaderUtils.GetShaderPath(ShaderPathID.SpeedTree7Billboard), MaterialUpgradeUtils.DisableKeywords);
+            RenameShader(
+                oldShaderName,
+                ShaderUtils.GetShaderPath(ShaderPathID.SpeedTree7Billboard),
+                MaterialUpgradeUtils.DisableKeywords
+            );
         }
     }
 
@@ -400,8 +422,11 @@ namespace UnityEditor.Rendering.Universal
             }
             else
             {
-                RenameShader(oldShaderName, ShaderUtils.GetShaderPath(ShaderPathID.ParticlesLit),
-                    UpdateStandardSurface);
+                RenameShader(
+                    oldShaderName,
+                    ShaderUtils.GetShaderPath(ShaderPathID.ParticlesLit),
+                    UpdateStandardSurface
+                );
                 RenameFloat("_Glossiness", "_Smoothness");
             }
 
@@ -482,8 +507,8 @@ namespace UnityEditor.Rendering.Universal
         {
             Opaque,
             Cutout,
-            Fade,   // Old school alpha-blending mode, fresnel does not affect amount of transparency
-            Transparent // Physically plausible transparency mode, implemented as alpha pre-multiply
+            Fade, // Old school alpha-blending mode, fresnel does not affect amount of transparency
+            Transparent, // Physically plausible transparency mode, implemented as alpha pre-multiply
         }
 
         /// <summary>
@@ -492,7 +517,11 @@ namespace UnityEditor.Rendering.Universal
         /// <param name="oldShaderName">The name of the old shader.</param>
         public AutodeskInteractiveUpgrader(string oldShaderName)
         {
-            RenameShader(oldShaderName, "Universal Render Pipeline/Autodesk Interactive/AutodeskInteractive", MaterialUpgradeUtils.DisableKeywords);
+            RenameShader(
+                oldShaderName,
+                "Universal Render Pipeline/Autodesk Interactive/AutodeskInteractive",
+                MaterialUpgradeUtils.DisableKeywords
+            );
         }
 
         private bool TryGetShaderUpgrade(Material material, out Shader shader)
@@ -526,6 +555,7 @@ namespace UnityEditor.Rendering.Universal
             }
             return true;
         }
+
         /// <inheritdoc/>
         public override void Upgrade(Material material, UpgradeFlags flags)
         {
@@ -534,7 +564,9 @@ namespace UnityEditor.Rendering.Universal
 
             if (!TryGetShaderUpgrade(material, out var shader))
             {
-                Debug.LogError($"Unable to find destination shader {NewShaderPath} when trying to upgrade {material.name}");
+                Debug.LogError(
+                    $"Unable to find destination shader {NewShaderPath} when trying to upgrade {material.name}"
+                );
                 return;
             }
 
@@ -560,6 +592,7 @@ namespace UnityEditor.Rendering.Universal
 
             Finalizer?.Invoke(material);
         }
+
         /// <inheritdoc/>
         public override void Convert(Material srcMaterial, Material dstMaterial)
         {

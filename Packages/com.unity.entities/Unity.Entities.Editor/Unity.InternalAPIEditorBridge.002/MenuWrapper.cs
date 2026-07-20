@@ -31,9 +31,21 @@ namespace Unity.Editor.Bridge
                         menu.AppendSeparator(menuItem.content.text);
                 }
                 else if (menuItem.userData != null)
-                    menu.AppendAction(menuItem.content.text, a => menuItem.func2(a.userData), _ => menuItem.func2 == null ? DropdownMenuAction.Status.Disabled : DropdownMenuAction.Status.Normal, menuItem.userData);
+                    menu.AppendAction(
+                        menuItem.content.text,
+                        a => menuItem.func2(a.userData),
+                        _ =>
+                            menuItem.func2 == null
+                                ? DropdownMenuAction.Status.Disabled
+                                : DropdownMenuAction.Status.Normal,
+                        menuItem.userData
+                    );
                 else
-                    menu.AppendAction(menuItem.content.text, a => menuItem.func(), menuItem.func == null ? DropdownMenuAction.Status.Disabled : DropdownMenuAction.Status.Normal);
+                    menu.AppendAction(
+                        menuItem.content.text,
+                        a => menuItem.func(),
+                        menuItem.func == null ? DropdownMenuAction.Status.Disabled : DropdownMenuAction.Status.Normal
+                    );
             }
 
             m_GenericMenu.menuItems.Clear();

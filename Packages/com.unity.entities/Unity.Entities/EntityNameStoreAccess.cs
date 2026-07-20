@@ -17,6 +17,7 @@ internal unsafe struct EntityNameStoreAccess : IDisposable
     [NativeDisableUnsafePtrRestriction]
     private EntityComponentStore* m_EntityComponentStore;
     private UnsafeHashSet<Entity> m_EntitiesNameSet;
+
     [NativeDisableUnsafePtrRestriction]
     private EntityNameStoreAccessData* m_Data;
 

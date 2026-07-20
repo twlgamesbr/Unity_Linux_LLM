@@ -8,12 +8,8 @@ namespace UnityEditor.TestTools.TestRunner
 
         public string buildOnlyLocationPath { set; get; }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
-        void ITestRunSettings.Apply()
-        {
-        }
+        void ITestRunSettings.Apply() { }
     }
 }

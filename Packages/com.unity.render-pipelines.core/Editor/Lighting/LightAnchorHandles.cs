@@ -11,6 +11,7 @@ namespace UnityEditor
         /// The light position
         /// </summary>
         public Vector3 lightPosition { get; set; }
+
         /// <summary>
         /// The anchor position
         /// </summary>

@@ -7,14 +7,16 @@ namespace Unity.Multiplayer.Tools.NetStats
 {
     class EventMetricFactory : IMetricFactory
     {
-        public static bool TryGetFactoryTypeName(Type type, out FixedString128Bytes typeName) => k_TypeNames.TryGetValue(type, out typeName);
+        public static bool TryGetFactoryTypeName(Type type, out FixedString128Bytes typeName) =>
+            k_TypeNames.TryGetValue(type, out typeName);
 
         interface IEventMetricFactory
         {
             IMetric Construct(MetricId id);
         }
 
-        class EventMetricFactoryImpl<T> : IEventMetricFactory where T : unmanaged
+        class EventMetricFactoryImpl<T> : IEventMetricFactory
+            where T : unmanaged
         {
             public IMetric Construct(MetricId id)
             {
@@ -22,7 +24,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             }
         }
 
-        static readonly Dictionary<FixedString128Bytes, IEventMetricFactory> k_FactoriesByName = new Dictionary<FixedString128Bytes, IEventMetricFactory>();
+        static readonly Dictionary<FixedString128Bytes, IEventMetricFactory> k_FactoriesByName =
+            new Dictionary<FixedString128Bytes, IEventMetricFactory>();
         static readonly Dictionary<Type, FixedString128Bytes> k_TypeNames = new Dictionary<Type, FixedString128Bytes>();
 
         static EventMetricFactory()
@@ -30,7 +33,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             TypeRegistration.RunIfNeeded();
         }
 
-        internal static void RegisterType<T>() where T : unmanaged
+        internal static void RegisterType<T>()
+            where T : unmanaged
         {
             if (k_TypeNames.ContainsKey(typeof(T)))
             {

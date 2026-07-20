@@ -16,13 +16,15 @@ namespace UnityEditor.UIElements.TestFramework
     /// use <see cref="UITestFixture"/> instead.
     /// </remarks>
     /// <typeparam name="EditorWindowType">The type of `EditorWindow` to create with this test fixture.</typeparam>
-    public abstract class EditorWindowUITestFixture<EditorWindowType> : CommonUITestFixture where EditorWindowType : EditorWindow
+    public abstract class EditorWindowUITestFixture<EditorWindowType> : CommonUITestFixture
+        where EditorWindowType : EditorWindow
     {
         EditorWindowPanelSimulator editorWindowPanelSimulator;
 
         // Backing field serializable to allow the window to survive domain reloads
         // for tests that are Enter/Exit playmode without "fast enter playmode".
-        [SerializeField] EditorWindowType m_Window;
+        [SerializeField]
+        EditorWindowType m_Window;
 
         /// <summary>
         /// `EditorWindow` created by the test fixture. Null if no window is created.
@@ -65,10 +67,10 @@ namespace UnityEditor.UIElements.TestFramework
         [System.Obsolete("IMGUI is not fully supported.")]
         internal bool needsImprovedIMGUISupport
         {
-            #pragma warning disable CS0618 // IMGUI is not fully supported
+#pragma warning disable CS0618 // IMGUI is not fully supported
             get => editorWindowPanelSimulator.needsImprovedIMGUISupport;
             set => editorWindowPanelSimulator.needsImprovedIMGUISupport = value;
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         private bool m_PanelSizeSet = false;
@@ -116,9 +118,9 @@ namespace UnityEditor.UIElements.TestFramework
         [System.Obsolete("IMGUI is not fully supported.")]
         internal void ExecuteWithinIMGUIContext(System.Action command)
         {
-            #pragma warning disable CS0618 // IMGUI is not fully supported
+#pragma warning disable CS0618 // IMGUI is not fully supported
             editorWindowPanelSimulator.ExecuteWithinIMGUIContext(command);
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         /// <summary>

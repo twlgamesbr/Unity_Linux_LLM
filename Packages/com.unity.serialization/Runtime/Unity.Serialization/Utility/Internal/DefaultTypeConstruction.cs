@@ -13,47 +13,54 @@ namespace Unity.Serialization
         /// </summary>
         /// <returns>The <see cref="System.Type"/> which was serialized.</returns>
         Type GetSerializedType();
-        
+
         /// <summary>
-        /// Returns the array length. 
+        /// Returns the array length.
         /// </summary>
         /// <returns></returns>
         int GetArrayLength();
-        
+
         object GetDefaultObject();
     }
-    
+
     static class DefaultTypeConstruction
     {
         internal static void Construct<TValue>(ref TValue value, ISerializedTypeProvider provider)
         {
             if (TypeTraits<TValue>.IsValueType)
             {
-                if (!(TypeTraits<TValue>.IsNullable && TypeTraits.IsContainer(Nullable.GetUnderlyingType(typeof(TValue)))))
+                if (
+                    !(
+                        TypeTraits<TValue>.IsNullable
+                        && TypeTraits.IsContainer(Nullable.GetUnderlyingType(typeof(TValue)))
+                    )
+                )
                 {
                     return;
                 }
             }
-            
+
             var serializedType = provider.GetSerializedType();
 
-            if (null != serializedType) 
+            if (null != serializedType)
             {
                 if (!typeof(TValue).IsAssignableFrom(serializedType))
                 {
-                    throw new ArgumentException($"Type mismatch. DeclaredType=[{typeof(TValue)}] SerializedType=[{serializedType}]");
+                    throw new ArgumentException(
+                        $"Type mismatch. DeclaredType=[{typeof(TValue)}] SerializedType=[{serializedType}]"
+                    );
                 }
 
                 ConstructFromSerializedType(ref value, serializedType, provider);
                 return;
             }
-            
+
             if (TypeTraits<TValue>.IsObject && null == value)
             {
-                value = (TValue) provider.GetDefaultObject();
+                value = (TValue)provider.GetDefaultObject();
                 return;
             }
-            
+
             if (TypeTraits<TValue>.IsAbstractOrInterface)
             {
                 throw new ArgumentException();
@@ -70,7 +77,7 @@ namespace Unity.Serialization
                 value = TypeUtility.InstantiateArray<TValue>(type, count);
                 return;
             }
-            
+
             if (null != value && value.GetType() == type)
             {
                 return;
@@ -84,7 +91,7 @@ namespace Unity.Serialization
             if (typeof(TValue).IsArray)
             {
                 var count = provider.GetArrayLength();
-                
+
                 if (null == value || (value as Array)?.Length != count)
                 {
                     value = TypeUtility.InstantiateArray<TValue>(count);

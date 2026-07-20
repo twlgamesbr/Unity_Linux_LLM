@@ -28,7 +28,7 @@ namespace Unity.DebugDisplay
             m_Buffer[index] = new Instance
             {
                 m_Begin = new float4(begin.x, begin.y, begin.z, colorIndex.value),
-                m_End = new float4(end.x, end.y, end.z, colorIndex.value)
+                m_End = new float4(end.x, end.y, end.z, colorIndex.value),
             };
         }
 
@@ -38,7 +38,7 @@ namespace Unity.DebugDisplay
 
         internal void ClearLine(int index)
         {
-            m_Buffer[index] = new Instance {};
+            m_Buffer[index] = new Instance { };
         }
 
         internal NativeArray<Instance> AsArray()

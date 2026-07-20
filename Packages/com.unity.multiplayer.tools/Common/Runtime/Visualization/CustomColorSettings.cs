@@ -10,7 +10,10 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
     /// It is a synchronized scriptable singleton saved to the project settings at the path specified by the FilePath attribute,
     /// and it is automatically updated whenever the file is changed by an MPPM instance, therefore always reflecting the latest Colors set by the user everywhere.
     /// </summary>
-    [FilePath("ProjectSettings/Packages/com.unity.multiplayer.tools/CustomColorSettings.asset", FilePathAttribute.Location.ProjectFolder)]
+    [FilePath(
+        "ProjectSettings/Packages/com.unity.multiplayer.tools/CustomColorSettings.asset",
+        FilePathAttribute.Location.ProjectFolder
+    )]
     class CustomColorSettings : SyncedSingleton<CustomColorSettings>
     {
         // Nested class to handle saving settings when assets are saved
@@ -24,7 +27,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
         }
 
         [SerializeField]
-        SerializedDictionary<int, Color> colors = new ();
+        SerializedDictionary<int, Color> colors = new();
 
         /// <summary>
         /// Method to set a custom Color for a specific ID, automatically serialized to disk and synchronized between MPPM instances.
@@ -37,7 +40,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             EditorUtility.SetDirty(instance);
             instance.SaveIfDirty();
         }
-        
+
         /// <summary>
         /// Sets multiple custom colors at once.
         /// </summary>
@@ -71,7 +74,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
         {
             return instance.colors[colorID];
         }
-        
+
         /// <summary>
         /// Retrieves all currently defined custom colors.
         /// </summary>
@@ -80,7 +83,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
         {
             return new Dictionary<int, Color>(instance.colors);
         }
-        
+
         /// <summary>
         /// Removes the custom Color associated with the given Color ID and synchronizes the changes across instances.
         /// </summary>

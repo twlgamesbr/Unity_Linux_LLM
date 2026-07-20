@@ -20,7 +20,16 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
         private Func<bool> m_ScriptCompilationFailedCheck;
         private Func<bool> m_IsRunActive;
 
-        public Executer(ITestRunnerApi testRunnerApi, ISettingsBuilder settingsBuilder, Action<string, object[]> logErrorFormat, Action<Exception> logException, Action<string> logMessage, Action<int> exitEditorApplication, Func<bool> scriptCompilationFailedCheck, Func<bool> isRunActive)
+        public Executer(
+            ITestRunnerApi testRunnerApi,
+            ISettingsBuilder settingsBuilder,
+            Action<string, object[]> logErrorFormat,
+            Action<Exception> logException,
+            Action<string> logMessage,
+            Action<int> exitEditorApplication,
+            Func<bool> scriptCompilationFailedCheck,
+            Func<bool> isRunActive
+        )
         {
             m_TestRunnerApi = testRunnerApi;
             m_SettingsBuilder = settingsBuilder;
@@ -93,7 +102,7 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             Ok = 0,
             Failed = 2,
             RunError = 3,
-            PlatformNotFoundReturnCode = 4
+            PlatformNotFoundReturnCode = 4,
         }
 
         public void SetUpCallbacks(ExecutionSettings executionSettings)
@@ -114,7 +123,9 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
         {
             if (m_ScriptCompilationFailedCheck())
             {
-                var handling = s_ExceptionHandlingMapping.First(h => h.m_ExceptionType == SetupException.ExceptionType.ScriptCompilationFailed);
+                var handling = s_ExceptionHandlingMapping.First(h =>
+                    h.m_ExceptionType == SetupException.ExceptionType.ScriptCompilationFailed
+                );
                 m_LogErrorFormat(handling.m_Message, new object[0]);
                 ExitApplication(handling.m_ReturnCode, handling.m_Message);
             }
@@ -122,7 +133,13 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
 
         private void HandleSetupException(SetupException exception)
         {
-            ExceptionHandling handling = s_ExceptionHandlingMapping.FirstOrDefault(h => h.m_ExceptionType == exception.Type) ?? new ExceptionHandling(exception.Type, "Unknown command line test run error. " + exception.Type, ReturnCodes.RunError);
+            ExceptionHandling handling =
+                s_ExceptionHandlingMapping.FirstOrDefault(h => h.m_ExceptionType == exception.Type)
+                ?? new ExceptionHandling(
+                    exception.Type,
+                    "Unknown command line test run error. " + exception.Type,
+                    ReturnCodes.RunError
+                );
             m_LogErrorFormat(handling.m_Message, exception.Details);
             ExitApplication(handling.m_ReturnCode, handling.m_Message);
         }
@@ -132,6 +149,7 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             internal SetupException.ExceptionType m_ExceptionType;
             internal string m_Message;
             internal ReturnCodes m_ReturnCode;
+
             public ExceptionHandling(SetupException.ExceptionType exceptionType, string message, ReturnCodes returnCode)
             {
                 m_ExceptionType = exceptionType;
@@ -140,29 +158,49 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             }
         }
 
-        private static ExceptionHandling[] s_ExceptionHandlingMapping = {
-            new ExceptionHandling(SetupException.ExceptionType.ScriptCompilationFailed, "Scripts had compilation errors.", ReturnCodes.RunError),
-            new ExceptionHandling(SetupException.ExceptionType.PlatformNotFound, "Test platform not found ({0}).", ReturnCodes.PlatformNotFoundReturnCode),
-            new ExceptionHandling(SetupException.ExceptionType.TestSettingsFileNotFound, "Test settings file not found at {0}.", ReturnCodes.RunError),
-            new ExceptionHandling(SetupException.ExceptionType.OrderedTestListFileNotFound, "Ordered test list file not found at {0}.", ReturnCodes.RunError)
+        private static ExceptionHandling[] s_ExceptionHandlingMapping =
+        {
+            new ExceptionHandling(
+                SetupException.ExceptionType.ScriptCompilationFailed,
+                "Scripts had compilation errors.",
+                ReturnCodes.RunError
+            ),
+            new ExceptionHandling(
+                SetupException.ExceptionType.PlatformNotFound,
+                "Test platform not found ({0}).",
+                ReturnCodes.PlatformNotFoundReturnCode
+            ),
+            new ExceptionHandling(
+                SetupException.ExceptionType.TestSettingsFileNotFound,
+                "Test settings file not found at {0}.",
+                ReturnCodes.RunError
+            ),
+            new ExceptionHandling(
+                SetupException.ExceptionType.OrderedTestListFileNotFound,
+                "Ordered test list file not found at {0}.",
+                ReturnCodes.RunError
+            ),
         };
 
         private static IDictionary<TestRunState, string> s_StateMessages = new Dictionary<TestRunState, string>()
         {
-            {TestRunState.NoCallbacksReceived, "No callbacks received."},
-            {TestRunState.OneOrMoreTestsExecutedWithNoFailures, "Run completed."},
-            {TestRunState.OneOrMoreTestsExecutedWithOneOrMoreFailed, "One or more tests failed."},
-            {TestRunState.CompletedJobWithoutAnyTestsExecuted, "No tests were executed."},
-            {TestRunState.RunError, null}
+            { TestRunState.NoCallbacksReceived, "No callbacks received." },
+            { TestRunState.OneOrMoreTestsExecutedWithNoFailures, "Run completed." },
+            { TestRunState.OneOrMoreTestsExecutedWithOneOrMoreFailed, "One or more tests failed." },
+            { TestRunState.CompletedJobWithoutAnyTestsExecuted, "No tests were executed." },
+            { TestRunState.RunError, null },
         };
 
-        private static IDictionary<TestRunState, ReturnCodes> s_StateReturnCodes = new Dictionary<TestRunState, ReturnCodes>()
+        private static IDictionary<TestRunState, ReturnCodes> s_StateReturnCodes = new Dictionary<
+            TestRunState,
+            ReturnCodes
+        >()
         {
-            {TestRunState.NoCallbacksReceived, ReturnCodes.RunError},
-            {TestRunState.OneOrMoreTestsExecutedWithNoFailures, ReturnCodes.Ok},
-            {TestRunState.OneOrMoreTestsExecutedWithOneOrMoreFailed, ReturnCodes.Failed},
-            {TestRunState.CompletedJobWithoutAnyTestsExecuted, ReturnCodes.Ok},
-            {TestRunState.RunError, ReturnCodes.RunError}
+            { TestRunState.NoCallbacksReceived, ReturnCodes.RunError },
+            { TestRunState.OneOrMoreTestsExecutedWithNoFailures, ReturnCodes.Ok },
+            { TestRunState.OneOrMoreTestsExecutedWithOneOrMoreFailed, ReturnCodes.Failed },
+            { TestRunState.CompletedJobWithoutAnyTestsExecuted, ReturnCodes.Ok },
+            { TestRunState.RunError, ReturnCodes.RunError },
         };
     }
 }

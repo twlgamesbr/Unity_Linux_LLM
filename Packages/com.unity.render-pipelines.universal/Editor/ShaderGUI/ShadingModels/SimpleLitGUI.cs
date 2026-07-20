@@ -21,7 +21,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// <summary>
             /// Use this when not using specular.
             /// </summary>
-            NoSpecular
+            NoSpecular,
         }
 
         /// <summary>
@@ -48,8 +48,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// <summary>
             /// The text and tooltip for the specular map GUI.
             /// </summary>
-            public static GUIContent specularMapText =
-                EditorGUIUtility.TrTextContent("Specular Map", "Designates a Specular Map and specular color determining the apperance of reflections on this Material's surface.");
+            public static GUIContent specularMapText = EditorGUIUtility.TrTextContent(
+                "Specular Map",
+                "Designates a Specular Map and specular color determining the apperance of reflections on this Material's surface."
+            );
         }
 
         /// <summary>
@@ -126,9 +128,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             SpecularSource specularSource = (SpecularSource)properties.specHighlights.floatValue;
             EditorGUI.BeginChangeCheck();
             EditorGUI.showMixedValue = properties.specHighlights.hasMixedValue;
-            bool enabled = EditorGUILayout.Toggle(LitGUI.Styles.highlightsText, specularSource == SpecularSource.SpecularTextureAndColor);
+            bool enabled = EditorGUILayout.Toggle(
+                LitGUI.Styles.highlightsText,
+                specularSource == SpecularSource.SpecularTextureAndColor
+            );
             if (EditorGUI.EndChangeCheck())
-                properties.specHighlights.floatValue = enabled ? (float)SpecularSource.SpecularTextureAndColor : (float)SpecularSource.NoSpecular;
+                properties.specHighlights.floatValue = enabled
+                    ? (float)SpecularSource.SpecularTextureAndColor
+                    : (float)SpecularSource.NoSpecular;
             EditorGUI.showMixedValue = false;
         }
 
@@ -138,12 +145,28 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
         /// <param name="properties"></param>
         /// <param name="materialEditor"></param>
         /// <param name="material">The material to use.</param>
-        public static void DoSpecularArea(SimpleLitProperties properties, MaterialEditor materialEditor, Material material)
+        public static void DoSpecularArea(
+            SimpleLitProperties properties,
+            MaterialEditor materialEditor,
+            Material material
+        )
         {
             SpecularSource specSource = (SpecularSource)properties.specHighlights.floatValue;
             EditorGUI.BeginDisabledGroup(specSource == SpecularSource.NoSpecular);
-            BaseShaderGUI.TextureColorProps(materialEditor, Styles.specularMapText, properties.specGlossMap, properties.specColor, true);
-            LitGUI.DoSmoothness(materialEditor, material, properties.smoothness, properties.smoothnessMapChannel, LitGUI.Styles.specularSmoothnessChannelNames);
+            BaseShaderGUI.TextureColorProps(
+                materialEditor,
+                Styles.specularMapText,
+                properties.specGlossMap,
+                properties.specColor,
+                true
+            );
+            LitGUI.DoSmoothness(
+                materialEditor,
+                material,
+                properties.smoothness,
+                properties.smoothnessMapChannel,
+                LitGUI.Styles.specularSmoothnessChannelNames
+            );
             EditorGUI.EndDisabledGroup();
         }
 
@@ -158,8 +181,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
 
         private static void UpdateMaterialSpecularSource(Material material)
         {
-            var opaque = ((BaseShaderGUI.SurfaceType)material.GetFloat("_Surface") ==
-                BaseShaderGUI.SurfaceType.Opaque);
+            var opaque = ((BaseShaderGUI.SurfaceType)material.GetFloat("_Surface") == BaseShaderGUI.SurfaceType.Opaque);
             SpecularSource specSource = (SpecularSource)material.GetFloat("_SpecularHighlights");
             if (specSource == SpecularSource.NoSpecular)
             {
@@ -174,7 +196,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
                 CoreUtils.SetKeyword(material, "_SPECGLOSSMAP", hasMap);
                 CoreUtils.SetKeyword(material, "_SPECULAR_COLOR", !hasMap);
                 if (opaque)
-                    CoreUtils.SetKeyword(material, "_GLOSSINESS_FROM_BASE_ALPHA", smoothnessSource == SmoothnessMapChannel.AlbedoAlpha);
+                    CoreUtils.SetKeyword(
+                        material,
+                        "_GLOSSINESS_FROM_BASE_ALPHA",
+                        smoothnessSource == SmoothnessMapChannel.AlbedoAlpha
+                    );
                 else
                     CoreUtils.SetKeyword(material, "_GLOSSINESS_FROM_BASE_ALPHA", false);
 

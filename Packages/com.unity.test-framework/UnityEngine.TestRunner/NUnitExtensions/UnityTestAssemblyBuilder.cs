@@ -19,22 +19,21 @@ namespace UnityEngine.TestTools.NUnitExtensions
 
         public UnityTestAssemblyBuilder(string[] orderedTestNames, int randomSeed)
         {
-            m_TestSuiteModifiers = (orderedTestNames != null && orderedTestNames.Length > 0) || randomSeed != 0
-                ? new ITestSuiteModifier[] {new OrderedTestSuiteModifier(orderedTestNames, randomSeed)}
-                : new ITestSuiteModifier[0];
+            m_TestSuiteModifiers =
+                (orderedTestNames != null && orderedTestNames.Length > 0) || randomSeed != 0
+                    ? new ITestSuiteModifier[] { new OrderedTestSuiteModifier(orderedTestNames, randomSeed) }
+                    : new ITestSuiteModifier[0];
             m_ProductName = Application.productName;
         }
 
         public ITest Build(Assembly[] assemblies, TestPlatform[] testPlatforms, IDictionary<string, object> options)
         {
             var test = BuildAsync(assemblies, testPlatforms, options);
-            while (test.MoveNext())
-            {
-            }
+            while (test.MoveNext()) { }
 
             return test.Current;
         }
-        
+
         struct PlatformAssembly : IEquatable<PlatformAssembly>
         {
             public System.Reflection.Assembly Assembly;
@@ -54,14 +53,19 @@ namespace UnityEngine.TestTools.NUnitExtensions
             {
                 unchecked
                 {
-                    return ((Assembly != null ? Assembly.GetHashCode() : 0) * 397) ^ (int) Platform;
+                    return ((Assembly != null ? Assembly.GetHashCode() : 0) * 397) ^ (int)Platform;
                 }
             }
         }
 
-        private static Dictionary<PlatformAssembly, TestSuite> CachedAssemblies = new Dictionary<PlatformAssembly, TestSuite>();
+        private static Dictionary<PlatformAssembly, TestSuite> CachedAssemblies =
+            new Dictionary<PlatformAssembly, TestSuite>();
 
-        public IEnumerator<ITest> BuildAsync(Assembly[] assemblies, TestPlatform[] testPlatforms, IDictionary<string, object> options)
+        public IEnumerator<ITest> BuildAsync(
+            Assembly[] assemblies,
+            TestPlatform[] testPlatforms,
+            IDictionary<string, object> options
+        )
         {
             var productName = string.Join("_", m_ProductName.Split(Path.GetInvalidFileNameChars()));
             var suite = new TestSuite(productName);
@@ -73,7 +77,7 @@ namespace UnityEngine.TestTools.NUnitExtensions
 
                 using (new ProfilerMarker(nameof(UnityTestAssemblyBuilder) + "." + assembly.GetName().Name).Auto())
                 {
-                    var key = new PlatformAssembly {Assembly = assembly, Platform = platform};
+                    var key = new PlatformAssembly { Assembly = assembly, Platform = platform };
                     if (!CachedAssemblies.TryGetValue(key, out var assemblySuite))
                     {
                         assemblySuite = Build(assembly, GetNUnitTestBuilderSettings(platform)) as TestSuite;

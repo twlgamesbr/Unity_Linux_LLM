@@ -24,7 +24,7 @@ namespace Unity.Netcode.Editor.Configuration
                 label = "Netcode for GameObjects",
                 keywords = new[] { "netcode", "editor" },
                 guiHandler = OnGuiHandler,
-                deactivateHandler = OnDeactivate
+                deactivateHandler = OnDeactivate,
             };
 
             return provider;
@@ -78,7 +78,6 @@ namespace Unity.Netcode.Editor.Configuration
             }
         }
 
-
         internal static NetcodeSettingsLabel NetworkObjectsSectionLabel;
         internal static NetcodeSettingsToggle AutoAddNetworkObjectToggle;
         internal static NetcodeSettingsToggle CheckForNetworkObjectToggle;
@@ -101,12 +100,20 @@ namespace Unity.Netcode.Editor.Configuration
 
             if (AutoAddNetworkObjectToggle == null)
             {
-                AutoAddNetworkObjectToggle = new NetcodeSettingsToggle("Auto-Add NetworkObject Component", "When enabled, NetworkObject components are automatically added to GameObjects when NetworkBehaviour components are added first.", 20);
+                AutoAddNetworkObjectToggle = new NetcodeSettingsToggle(
+                    "Auto-Add NetworkObject Component",
+                    "When enabled, NetworkObject components are automatically added to GameObjects when NetworkBehaviour components are added first.",
+                    20
+                );
             }
 
             if (CheckForNetworkObjectToggle == null)
             {
-                CheckForNetworkObjectToggle = new NetcodeSettingsToggle("Check for NetworkObject Component", "When disabled, the automatic check on NetworkBehaviours for an associated NetworkObject component will not be performed and Auto-Add NetworkObject Component will be disabled.", 20);
+                CheckForNetworkObjectToggle = new NetcodeSettingsToggle(
+                    "Check for NetworkObject Component",
+                    "When disabled, the automatic check on NetworkBehaviours for an associated NetworkObject component will not be performed and Auto-Add NetworkObject Component will be disabled.",
+                    20
+                );
             }
 
             if (MultiplayerToolsLabel == null)
@@ -116,7 +123,11 @@ namespace Unity.Netcode.Editor.Configuration
 
             if (MultiplayerToolTipStatusToggle == null)
             {
-                MultiplayerToolTipStatusToggle = new NetcodeSettingsToggle("Multiplayer Tools Install Reminder", "When enabled, the NetworkManager will display the notification to install the multiplayer tools package.", 20);
+                MultiplayerToolTipStatusToggle = new NetcodeSettingsToggle(
+                    "Multiplayer Tools Install Reminder",
+                    "When enabled, the NetworkManager will display the notification to install the multiplayer tools package.",
+                    20
+                );
             }
         }
 
@@ -127,7 +138,8 @@ namespace Unity.Netcode.Editor.Configuration
 
             var autoAddNetworkObjectSetting = NetcodeForGameObjectsEditorSettings.GetAutoAddNetworkObjectSetting();
             var checkForNetworkObjectSetting = NetcodeForGameObjectsEditorSettings.GetCheckForNetworkObjectSetting();
-            var multiplayerToolsTipStatus = NetcodeForGameObjectsEditorSettings.GetNetcodeInstallMultiplayerToolTips() == 0;
+            var multiplayerToolsTipStatus =
+                NetcodeForGameObjectsEditorSettings.GetNetcodeInstallMultiplayerToolTips() == 0;
 
             var settings = NetcodeForGameObjectsProjectSettings.instance;
             var generateDefaultPrefabs = settings.GenerateDefaultNetworkPrefabs;
@@ -136,14 +148,20 @@ namespace Unity.Netcode.Editor.Configuration
             EditorGUI.BeginChangeCheck();
 
             GUILayout.BeginVertical("Box");
-            s_ShowEditorSettingFields = EditorGUILayout.BeginFoldoutHeaderGroup(s_ShowEditorSettingFields, "Editor Settings");
+            s_ShowEditorSettingFields = EditorGUILayout.BeginFoldoutHeaderGroup(
+                s_ShowEditorSettingFields,
+                "Editor Settings"
+            );
 
             if (s_ShowEditorSettingFields)
             {
                 GUILayout.BeginVertical("Box");
                 NetworkObjectsSectionLabel.DrawLabel();
 
-                autoAddNetworkObjectSetting = AutoAddNetworkObjectToggle.DrawToggle(autoAddNetworkObjectSetting, checkForNetworkObjectSetting);
+                autoAddNetworkObjectSetting = AutoAddNetworkObjectToggle.DrawToggle(
+                    autoAddNetworkObjectSetting,
+                    checkForNetworkObjectSetting
+                );
                 checkForNetworkObjectSetting = CheckForNetworkObjectToggle.DrawToggle(checkForNetworkObjectSetting);
                 if (autoAddNetworkObjectSetting && !checkForNetworkObjectSetting)
                 {
@@ -160,7 +178,10 @@ namespace Unity.Netcode.Editor.Configuration
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical("Box");
-            s_ShowProjectSettingFields = EditorGUILayout.BeginFoldoutHeaderGroup(s_ShowProjectSettingFields, "Project Settings");
+            s_ShowProjectSettingFields = EditorGUILayout.BeginFoldoutHeaderGroup(
+                s_ShowProjectSettingFields,
+                "Project Settings"
+            );
             if (s_ShowProjectSettingFields)
             {
                 GUILayout.BeginVertical("Box");
@@ -179,18 +200,22 @@ namespace Unity.Netcode.Editor.Configuration
                 generateDefaultPrefabs = EditorGUILayout.Toggle(
                     new GUIContent(
                         generateNetworkPrefabsString,
-                        "When enabled, a default NetworkPrefabsList object will be added to your project and kept up " +
-                        "to date with all NetworkObject prefabs."),
+                        "When enabled, a default NetworkPrefabsList object will be added to your project and kept up "
+                            + "to date with all NetworkObject prefabs."
+                    ),
                     generateDefaultPrefabs,
-                    GUILayout.Width(s_MaxLabelWidth + 20));
+                    GUILayout.Width(s_MaxLabelWidth + 20)
+                );
 
                 GUI.SetNextControlName("Location");
                 networkPrefabsPath = EditorGUILayout.TextField(
                     new GUIContent(
                         networkPrefabsLocationString,
-                        "The path to the asset the default NetworkPrefabList object should be stored in."),
+                        "The path to the asset the default NetworkPrefabList object should be stored in."
+                    ),
                     networkPrefabsPath,
-                    GUILayout.Width(s_MaxLabelWidth + 270));
+                    GUILayout.Width(s_MaxLabelWidth + 270)
+                );
                 GUILayout.EndVertical();
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
@@ -199,7 +224,9 @@ namespace Unity.Netcode.Editor.Configuration
             {
                 NetcodeForGameObjectsEditorSettings.SetAutoAddNetworkObjectSetting(autoAddNetworkObjectSetting);
                 NetcodeForGameObjectsEditorSettings.SetCheckForNetworkObjectSetting(checkForNetworkObjectSetting);
-                NetcodeForGameObjectsEditorSettings.SetNetcodeInstallMultiplayerToolTips(multiplayerToolsTipStatus ? 0 : 1);
+                NetcodeForGameObjectsEditorSettings.SetNetcodeInstallMultiplayerToolTips(
+                    multiplayerToolsTipStatus ? 0 : 1
+                );
                 settings.GenerateDefaultNetworkPrefabs = generateDefaultPrefabs;
                 settings.TempNetworkPrefabsPath = networkPrefabsPath;
                 settings.SaveSettings();
@@ -257,5 +284,4 @@ namespace Unity.Netcode.Editor.Configuration
             m_LayoutWidth = GUILayout.Width(m_LabelSize + offset);
         }
     }
-
 }

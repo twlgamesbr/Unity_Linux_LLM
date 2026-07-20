@@ -190,8 +190,11 @@ namespace UnityEngine.InputSystem
         {
             if (m_TriggerState.phase == InputActionPhase.Waiting)
                 m_TriggerState.startTime = time;
-            m_State.ChangePhaseOfInteraction(InputActionPhase.Performed, ref m_TriggerState,
-                phaseAfterPerformed: InputActionPhase.Started);
+            m_State.ChangePhaseOfInteraction(
+                InputActionPhase.Performed,
+                ref m_TriggerState,
+                phaseAfterPerformed: InputActionPhase.Started
+            );
         }
 
         /// <summary>
@@ -204,8 +207,11 @@ namespace UnityEngine.InputSystem
         {
             if (m_TriggerState.phase == InputActionPhase.Waiting)
                 m_TriggerState.startTime = time;
-            m_State.ChangePhaseOfInteraction(InputActionPhase.Performed, ref m_TriggerState,
-                phaseAfterPerformed: InputActionPhase.Performed);
+            m_State.ChangePhaseOfInteraction(
+                InputActionPhase.Performed,
+                ref m_TriggerState,
+                phaseAfterPerformed: InputActionPhase.Performed
+            );
         }
 
         /// <summary>
@@ -364,7 +370,7 @@ namespace UnityEngine.InputSystem
         [Flags]
         internal enum Flags
         {
-            TimerHasExpired = 1 << 1
+            TimerHasExpired = 1 << 1,
         }
     }
 }

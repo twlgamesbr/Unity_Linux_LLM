@@ -8,9 +8,9 @@ namespace UnityEngine.UIElements.TestFramework
     [Obsolete("NavigationFocusOverrideTestComponent will be deprecated.")]
     internal class NavigationFocusOverrideTestComponent : UITestComponent
     {
-        #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
         private NavigationFocusControllerOverride m_NavigationFocusControllerOverride;
-        #pragma warning restore CS0618
+#pragma warning restore CS0618
 
         /// <summary>
         /// Overrides the focus controller of the panel.
@@ -18,9 +18,9 @@ namespace UnityEngine.UIElements.TestFramework
         protected override void BeforeTest()
         {
             base.BeforeTest();
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             m_NavigationFocusControllerOverride = new NavigationFocusControllerOverride(fixture.panel);
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         /// <summary>
@@ -41,9 +41,9 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="panel">The panel whose focus controller you want to override.</param>
         public void ForceResetPanel(IPanel panel)
         {
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             m_NavigationFocusControllerOverride = new NavigationFocusControllerOverride(panel);
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         [System.Obsolete("For Internal Use Only.")]

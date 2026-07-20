@@ -31,7 +31,11 @@ namespace UnityEngine.InputSystem.Steam.Editor
         /// <param name="vdf"></param>
         /// <param name="namespaceAndClassName"></param>
         /// <returns></returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "TODO: Refactor later.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Performance",
+            "CA1809:AvoidExcessiveLocals",
+            Justification = "TODO: Refactor later."
+        )]
         public static string GenerateInputDeviceFromSteamIGA(string vdf, string namespaceAndClassName)
         {
             if (string.IsNullOrEmpty(vdf))
@@ -41,7 +45,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
 
             // Parse VDF.
             var parsedVdf = ParseVDF(vdf);
-            var actions = (Dictionary<string, object>)((Dictionary<string, object>)parsedVdf["In Game Actions"])["actions"];
+            var actions =
+                (Dictionary<string, object>)((Dictionary<string, object>)parsedVdf["In Game Actions"])["actions"];
 
             // Determine class and namespace name.
             var namespaceName = "";
@@ -120,7 +125,9 @@ namespace UnityEngine.InputSystem.Steam.Editor
             // RuntimeInitializeOnLoadMethod.
             // NOTE: Not relying on static ctor here. See il2cpp bug 1014293.
             builder.Append('\n');
-            builder.Append("    [RuntimeInitializeOnLoadMethod(loadType: RuntimeInitializeLoadType.BeforeSceneLoad)]\n");
+            builder.Append(
+                "    [RuntimeInitializeOnLoadMethod(loadType: RuntimeInitializeLoadType.BeforeSceneLoad)]\n"
+            );
             builder.Append("    private static void RuntimeInitializeOnLoad()\n");
             builder.Append("    {\n");
             builder.Append("        InputSystem.RegisterLayout<");
@@ -139,10 +146,13 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in stickPadGyros)
                 {
                     var entryProperties = (Dictionary<string, object>)entry.Value;
-                    var isStick = entryProperties.ContainsKey("input_mode") && (string)entryProperties["input_mode"] == "joystick_move";
+                    var isStick =
+                        entryProperties.ContainsKey("input_mode")
+                        && (string)entryProperties["input_mode"] == "joystick_move";
                     builder.Append("    [InputControl]\n");
                     builder.Append(
-                        $"    public {(isStick ? "StickControl" : "Vector2Control")} {CSharpCodeHelpers.MakeIdentifier(entry.Key)} {{ get; protected set; }}\n");
+                        $"    public {(isStick ? "StickControl" : "Vector2Control")} {CSharpCodeHelpers.MakeIdentifier(entry.Key)} {{ get; protected set; }}\n"
+                    );
                 }
 
                 // Buttons.
@@ -151,7 +161,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 {
                     builder.Append("    [InputControl]\n");
                     builder.Append(
-                        $"    public ButtonControl {CSharpCodeHelpers.MakeIdentifier(entry.Key)} {{ get; protected set; }}\n");
+                        $"    public ButtonControl {CSharpCodeHelpers.MakeIdentifier(entry.Key)} {{ get; protected set; }}\n"
+                    );
                 }
 
                 // AnalogTriggers.
@@ -160,7 +171,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 {
                     builder.Append("    [InputControl]\n");
                     builder.Append(
-                        $"    public AxisControl {CSharpCodeHelpers.MakeIdentifier(entry.Key)} {{ get; protected set; }}\n");
+                        $"    public AxisControl {CSharpCodeHelpers.MakeIdentifier(entry.Key)} {{ get; protected set; }}\n"
+                    );
                 }
             }
 
@@ -178,9 +190,12 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in stickPadGyros)
                 {
                     var entryProperties = (Dictionary<string, object>)entry.Value;
-                    var isStick = entryProperties.ContainsKey("input_mode") && (string)entryProperties["input_mode"] == "joystick_move";
+                    var isStick =
+                        entryProperties.ContainsKey("input_mode")
+                        && (string)entryProperties["input_mode"] == "joystick_move";
                     builder.Append(
-                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)} = GetChildControl<{(isStick ? "StickControl" : "Vector2Control")}>(\"{entry.Key}\");\n");
+                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)} = GetChildControl<{(isStick ? "StickControl" : "Vector2Control")}>(\"{entry.Key}\");\n"
+                    );
                 }
 
                 // Buttons.
@@ -188,7 +203,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in buttons)
                 {
                     builder.Append(
-                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)} = GetChildControl<ButtonControl>(\"{entry.Key}\");\n");
+                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)} = GetChildControl<ButtonControl>(\"{entry.Key}\");\n"
+                    );
                 }
 
                 // AnalogTriggers.
@@ -196,7 +212,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in analogTriggers)
                 {
                     builder.Append(
-                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)} = GetChildControl<AxisControl>(\"{entry.Key}\");\n");
+                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)} = GetChildControl<AxisControl>(\"{entry.Key}\");\n"
+                    );
                 }
             }
             builder.Append("    }\n");
@@ -211,14 +228,16 @@ namespace UnityEngine.InputSystem.Steam.Editor
 
                 // Set handle.
                 builder.Append(
-                    $"        {CSharpCodeHelpers.MakeIdentifier(setEntry.Key)}SetHandle = api.GetActionSetHandle(\"{setEntry.Key}\");\n");
+                    $"        {CSharpCodeHelpers.MakeIdentifier(setEntry.Key)}SetHandle = api.GetActionSetHandle(\"{setEntry.Key}\");\n"
+                );
 
                 // StickPadGyros.
                 var stickPadGyros = (Dictionary<string, object>)setEntryProperties["StickPadGyro"];
                 foreach (var entry in stickPadGyros)
                 {
                     builder.Append(
-                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle = api.GetAnalogActionHandle(\"{entry.Key}\");\n");
+                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle = api.GetAnalogActionHandle(\"{entry.Key}\");\n"
+                    );
                 }
 
                 // Buttons.
@@ -226,7 +245,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in buttons)
                 {
                     builder.Append(
-                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle = api.GetDigitalActionHandle(\"{entry.Key}\");\n");
+                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle = api.GetDigitalActionHandle(\"{entry.Key}\");\n"
+                    );
                 }
 
                 // AnalogTriggers.
@@ -234,7 +254,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in analogTriggers)
                 {
                     builder.Append(
-                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle = api.GetAnalogActionHandle(\"{entry.Key}\");\n");
+                        $"        {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle = api.GetAnalogActionHandle(\"{entry.Key}\");\n"
+                    );
                 }
             }
             builder.Append("    }\n");
@@ -247,14 +268,16 @@ namespace UnityEngine.InputSystem.Steam.Editor
 
                 // Set handle.
                 builder.Append(
-                    $"    public SteamHandle<InputActionMap> {CSharpCodeHelpers.MakeIdentifier(setEntry.Key)}SetHandle {{ get; private set; }}\n");
+                    $"    public SteamHandle<InputActionMap> {CSharpCodeHelpers.MakeIdentifier(setEntry.Key)}SetHandle {{ get; private set; }}\n"
+                );
 
                 // StickPadGyros.
                 var stickPadGyros = (Dictionary<string, object>)setEntryProperties["StickPadGyro"];
                 foreach (var entry in stickPadGyros)
                 {
                     builder.Append(
-                        $"    public SteamHandle<InputAction> {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle {{ get; private set; }}\n");
+                        $"    public SteamHandle<InputAction> {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle {{ get; private set; }}\n"
+                    );
                 }
 
                 // Buttons.
@@ -262,7 +285,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in buttons)
                 {
                     builder.Append(
-                        $"    public SteamHandle<InputAction> {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle {{ get; private set; }}\n");
+                        $"    public SteamHandle<InputAction> {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle {{ get; private set; }}\n"
+                    );
                 }
 
                 // AnalogTriggers.
@@ -270,7 +294,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in analogTriggers)
                 {
                     builder.Append(
-                        $"    public SteamHandle<InputAction> {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle {{ get; private set; }}\n");
+                        $"    public SteamHandle<InputAction> {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle {{ get; private set; }}\n"
+                    );
                 }
             }
 
@@ -286,10 +311,13 @@ namespace UnityEngine.InputSystem.Steam.Editor
             builder.Append("                {\n");
             foreach (var setEntry in actions)
             {
-                builder.Append(string.Format(
-                    "                    new SteamActionSetInfo {{ name = \"{0}\", handle = {1}SetHandle }},\n",
-                    setEntry.Key,
-                    CSharpCodeHelpers.MakeIdentifier(setEntry.Key)));
+                builder.Append(
+                    string.Format(
+                        "                    new SteamActionSetInfo {{ name = \"{0}\", handle = {1}SetHandle }},\n",
+                        setEntry.Key,
+                        CSharpCodeHelpers.MakeIdentifier(setEntry.Key)
+                    )
+                );
             }
             builder.Append("                };\n");
             builder.Append("            return new ReadOnlyArray<SteamActionSetInfo>(m_ActionSets);\n");
@@ -310,8 +338,12 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 var stickPadGyros = (Dictionary<string, object>)setEntryProperties["StickPadGyro"];
                 foreach (var entry in stickPadGyros)
                 {
-                    builder.Append(string.Format("        state.{0} = api.GetAnalogActionData(steamControllerHandle, {0}Handle).position;\n",
-                        CSharpCodeHelpers.MakeIdentifier(entry.Key)));
+                    builder.Append(
+                        string.Format(
+                            "        state.{0} = api.GetAnalogActionData(steamControllerHandle, {0}Handle).position;\n",
+                            CSharpCodeHelpers.MakeIdentifier(entry.Key)
+                        )
+                    );
                 }
 
                 // Buttons.
@@ -319,7 +351,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in buttons)
                 {
                     builder.Append(
-                        $"        if (api.GetDigitalActionData(steamControllerHandle, {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle).pressed)\n");
+                        $"        if (api.GetDigitalActionData(steamControllerHandle, {CSharpCodeHelpers.MakeIdentifier(entry.Key)}Handle).pressed)\n"
+                    );
                     builder.Append($"            state.buttons[{currentButtonBit / 8}] |= {currentButtonBit % 8};\n");
                     ++currentButtonBit;
                 }
@@ -328,8 +361,12 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 var analogTriggers = (Dictionary<string, object>)setEntryProperties["AnalogTrigger"];
                 foreach (var entry in analogTriggers)
                 {
-                    builder.Append(string.Format("        state.{0} = api.GetAnalogActionData(steamControllerHandle, {0}Handle).position.x;\n",
-                        CSharpCodeHelpers.MakeIdentifier(entry.Key)));
+                    builder.Append(
+                        string.Format(
+                            "        state.{0} = api.GetAnalogActionData(steamControllerHandle, {0}Handle).position.x;\n",
+                            CSharpCodeHelpers.MakeIdentifier(entry.Key)
+                        )
+                    );
                 }
             }
             builder.Append("        InputSystem.QueueStateEvent(this, state);\n");
@@ -351,7 +388,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
             ////TODO: handle class names that are shorter than 4 characters
             ////TODO: uppercase characters
             builder.Append(
-                $"            return new FourCC('{className[0]}', '{className[1]}', '{className[2]}', '{className[3]}');\n");
+                $"            return new FourCC('{className[0]}', '{className[1]}', '{className[2]}', '{className[3]}');\n"
+            );
             builder.Append("        }\n");
             builder.Append("    }\n");
             builder.Append("\n");
@@ -368,7 +406,8 @@ namespace UnityEngine.InputSystem.Steam.Editor
                     foreach (var entry in buttons)
                     {
                         builder.Append(
-                            $"    [InputControl(name = \"{entry.Key}\", layout = \"Button\", bit = {totalButtonCount})]\n");
+                            $"    [InputControl(name = \"{entry.Key}\", layout = \"Button\", bit = {totalButtonCount})]\n"
+                        );
                         ++totalButtonCount;
                     }
                 }
@@ -389,10 +428,13 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 foreach (var entry in stickPadGyros)
                 {
                     var entryProperties = (Dictionary<string, object>)entry.Value;
-                    var isStick = entryProperties.ContainsKey("input_mode") && (string)entryProperties["input_mode"] == "joystick_move";
+                    var isStick =
+                        entryProperties.ContainsKey("input_mode")
+                        && (string)entryProperties["input_mode"] == "joystick_move";
 
                     builder.Append(
-                        $"    [InputControl(name = \"{entry.Key}\", layout = \"{(isStick ? "Stick" : "Vector2")}\")]\n");
+                        $"    [InputControl(name = \"{entry.Key}\", layout = \"{(isStick ? "Stick" : "Vector2")}\")]\n"
+                    );
                     builder.Append($"    public Vector2 {CSharpCodeHelpers.MakeIdentifier(entry.Key)};\n");
                 }
 
@@ -426,7 +468,10 @@ namespace UnityEngine.InputSystem.Steam.Editor
             return ConvertInputActionsToSteamIGA(asset.actionMaps, locale: locale);
         }
 
-        public static string ConvertInputActionsToSteamIGA(IEnumerable<InputActionMap> actionMaps, string locale = "english")
+        public static string ConvertInputActionsToSteamIGA(
+            IEnumerable<InputActionMap> actionMaps,
+            string locale = "english"
+        )
         {
             if (actionMaps == null)
                 throw new ArgumentNullException("actionMaps");
@@ -507,7 +552,11 @@ namespace UnityEngine.InputSystem.Steam.Editor
             return builder.ToString();
         }
 
-        private static void ConvertInputActionToVDF(InputAction action, StringBuilder builder, Dictionary<string, string> localizationStrings)
+        private static void ConvertInputActionToVDF(
+            InputAction action,
+            StringBuilder builder,
+            Dictionary<string, string> localizationStrings
+        )
         {
             builder.Append("\t\t\t\t\"");
             builder.Append(action.name);
@@ -557,13 +606,18 @@ namespace UnityEngine.InputSystem.Steam.Editor
             // Make sure we have an expected control layout.
             var expectedControlLayout = action.expectedControlType;
             if (string.IsNullOrEmpty(expectedControlLayout))
-                throw new ArgumentException($"Cannot determine Steam input type for action '{action}' that has no associated expected control layout",
-                    nameof(action));
+                throw new ArgumentException(
+                    $"Cannot determine Steam input type for action '{action}' that has no associated expected control layout",
+                    nameof(action)
+                );
 
             // Try to fetch the layout.
             var layout = EditorInputControlLayoutCache.TryGetLayout(expectedControlLayout);
             if (layout == null)
-                throw new ArgumentException($"Cannot determine Steam input type for action '{action}'; cannot find layout '{expectedControlLayout}'", nameof(action));
+                throw new ArgumentException(
+                    $"Cannot determine Steam input type for action '{action}'; cannot find layout '{expectedControlLayout}'",
+                    nameof(action)
+                );
 
             // Map our supported control types.
             var controlType = layout.type;
@@ -575,7 +629,10 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 return "StickPadGyro";
 
             // Everything else throws.
-            throw new ArgumentException($"Cannot determine Steam input type for action '{action}'; layout '{expectedControlLayout}' with control type '{ controlType.Name}' has no known representation in the Steam controller API", nameof(action));
+            throw new ArgumentException(
+                $"Cannot determine Steam input type for action '{action}'; layout '{expectedControlLayout}' with control type '{controlType.Name}' has no known representation in the Steam controller API",
+                nameof(action)
+            );
         }
 
         public static Dictionary<string, object> ParseVDF(string vdf)
@@ -603,7 +660,9 @@ namespace UnityEngine.InputSystem.Steam.Editor
                 ParseKeyValuePair(result);
                 SkipWhitespace();
                 if (position < length)
-                    throw new InvalidOperationException($"Parse error at {position} in '{vdf}'; not expecting any more input");
+                    throw new InvalidOperationException(
+                        $"Parse error at {position} in '{vdf}'; not expecting any more input"
+                    );
                 return result;
             }
 
@@ -706,7 +765,12 @@ namespace UnityEngine.InputSystem.Steam.Editor
             }
 
             // Ask for save location.
-            var fileName = EditorUtility.SaveFilePanel("Export Steam In-Game Actions File", directory, defaultVDFName, "vdf");
+            var fileName = EditorUtility.SaveFilePanel(
+                "Export Steam In-Game Actions File",
+                directory,
+                defaultVDFName,
+                "vdf"
+            );
             if (!string.IsNullOrEmpty(fileName))
             {
                 var text = ConvertInputActionsToSteamIGA(selectedAsset);
@@ -746,7 +810,12 @@ namespace UnityEngine.InputSystem.Steam.Editor
             var defaultDirectory = Path.GetDirectoryName(assetPath);
 
             // Ask for save location.
-            var fileName = EditorUtility.SaveFilePanel("Generate C# Input Device Class", defaultDirectory, defaultFileName, "cs");
+            var fileName = EditorUtility.SaveFilePanel(
+                "Generate C# Input Device Class",
+                defaultDirectory,
+                defaultFileName,
+                "cs"
+            );
             if (string.IsNullOrEmpty(fileName))
                 return;
 

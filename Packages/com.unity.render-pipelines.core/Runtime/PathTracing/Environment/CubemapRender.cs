@@ -2,7 +2,6 @@ using System;
 using Unity.Mathematics;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,7 +13,7 @@ namespace UnityEngine.PathTracing.Core
         internal enum Mode
         {
             Material,
-            Color
+            Color,
         }
 
         private Material _material;
@@ -28,12 +27,12 @@ namespace UnityEngine.PathTracing.Core
         private static readonly int[] _cubeFaceToSkyboxPass = { 2, 3, 4, 5, 0, 1 };
         private static readonly Matrix4x4[] _cubemapFaceBases = new Matrix4x4[6]
         {
-            new(new float4(0, 0, -1, 0), new float4(0, 1, 0, 0),  new float4(-1, 0, 0, 0), new float4(0, 0, 0, 1)),
-            new(new float4(0, 0, 1, 0),  new float4(0, 1, 0, 0),  new float4(1, 0, 0, 0),  new float4(0, 0, 0, 1)),
-            new(new float4(1, 0, 0, 0),  new float4(0, 0, -1, 0), new float4(0, -1, 0, 0), new float4(0, 0, 0, 1)),
-            new(new float4(1, 0, 0, 0),  new float4(0, 0, 1, 0),  new float4(0, 1, 0, 0),  new float4(0, 0, 0, 1)),
-            new(new float4(1, 0, 0, 0),  new float4(0, 1, 0, 0),  new float4(0, 0, -1, 0), new float4(0, 0, 0, 1)),
-            new(new float4(-1, 0, 0, 0), new float4(0, 1, 0, 0),  new float4(0, 0, 1, 0),  new float4(0, 0, 0, 1)),
+            new(new float4(0, 0, -1, 0), new float4(0, 1, 0, 0), new float4(-1, 0, 0, 0), new float4(0, 0, 0, 1)),
+            new(new float4(0, 0, 1, 0), new float4(0, 1, 0, 0), new float4(1, 0, 0, 0), new float4(0, 0, 0, 1)),
+            new(new float4(1, 0, 0, 0), new float4(0, 0, -1, 0), new float4(0, -1, 0, 0), new float4(0, 0, 0, 1)),
+            new(new float4(1, 0, 0, 0), new float4(0, 0, 1, 0), new float4(0, 1, 0, 0), new float4(0, 0, 0, 1)),
+            new(new float4(1, 0, 0, 0), new float4(0, 1, 0, 0), new float4(0, 0, -1, 0), new float4(0, 0, 0, 1)),
+            new(new float4(-1, 0, 0, 0), new float4(0, 1, 0, 0), new float4(0, 0, 1, 0), new float4(0, 0, 0, 1)),
         };
 
         public int Hash => _hash;
@@ -69,7 +68,9 @@ namespace UnityEngine.PathTracing.Core
 
         Color LightColorInRenderingSpace(Light light)
         {
-            Color cct = light.useColorTemperature ? Mathf.CorrelatedColorTemperatureToRGB(light.colorTemperature) : new Color(1, 1, 1, 1);
+            Color cct = light.useColorTemperature
+                ? Mathf.CorrelatedColorTemperatureToRGB(light.colorTemperature)
+                : new Color(1, 1, 1, 1);
             Color filter = light.color.linear;
             return cct * filter * light.intensity;
         }
@@ -130,7 +131,7 @@ namespace UnityEngine.PathTracing.Core
 
             for (int faceIndex = 0; faceIndex < 6; ++faceIndex)
             {
-                cmd.SetRenderTarget(new RenderTargetIdentifier(_cubemap, 0, (CubemapFace) faceIndex));
+                cmd.SetRenderTarget(new RenderTargetIdentifier(_cubemap, 0, (CubemapFace)faceIndex));
                 cmd.SetViewport(new Rect(0, 0, 1, 1));
                 cmd.ClearRenderTarget(false, true, _color);
             }
@@ -149,7 +150,10 @@ namespace UnityEngine.PathTracing.Core
             if (sun != null)
             {
                 properties.SetVector(Shader.PropertyToID("_LightColor0"), LightColorInRenderingSpace(sun));
-                properties.SetVector(Shader.PropertyToID("_WorldSpaceLightPos0"), -sun.GetComponent<Transform>().forward);
+                properties.SetVector(
+                    Shader.PropertyToID("_WorldSpaceLightPos0"),
+                    -sun.GetComponent<Transform>().forward
+                );
             }
             else
             {
@@ -165,7 +169,7 @@ namespace UnityEngine.PathTracing.Core
                     proj.SetColumn(1, -proj.GetColumn(1)); // flip Y axis
 
                 cmd.SetViewProjectionMatrices(viewMatrix, proj);
-                cmd.SetRenderTarget(new RenderTargetIdentifier(_cubemap, 0, (CubemapFace) faceIndex));
+                cmd.SetRenderTarget(new RenderTargetIdentifier(_cubemap, 0, (CubemapFace)faceIndex));
                 cmd.SetViewport(new Rect(0, 0, _cubemap.width, _cubemap.height));
                 cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 1));
 
@@ -201,17 +205,20 @@ namespace UnityEngine.PathTracing.Core
 
         private void CreateCubemap(int width)
         {
-            var texture = new RenderTexture(new RenderTextureDescriptor(){
-                dimension = TextureDimension.Cube,
-                width = width,
-                height = width,
-                depthBufferBits = 0,
-                volumeDepth = 1,
-                msaaSamples = 1,
-                vrUsage = VRTextureUsage.OneEye,
-                graphicsFormat = GraphicsFormat.R16G16B16A16_SFloat,
-                enableRandomWrite = true
-            });
+            var texture = new RenderTexture(
+                new RenderTextureDescriptor()
+                {
+                    dimension = TextureDimension.Cube,
+                    width = width,
+                    height = width,
+                    depthBufferBits = 0,
+                    volumeDepth = 1,
+                    msaaSamples = 1,
+                    vrUsage = VRTextureUsage.OneEye,
+                    graphicsFormat = GraphicsFormat.R16G16B16A16_SFloat,
+                    enableRandomWrite = true,
+                }
+            );
             texture.Create();
             texture.name = "EnvironmentCubemap";
             _cubemap = texture;
@@ -219,8 +226,8 @@ namespace UnityEngine.PathTracing.Core
 
         private static bool IsOpenGLGfxDevice()
         {
-            return SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3 ||
-                SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore;
+            return SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3
+                || SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore;
         }
     }
 }

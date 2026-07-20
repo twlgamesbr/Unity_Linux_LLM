@@ -20,7 +20,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Position of the pointer in screen space.
         /// </summary>
 #if UNITY_EDITOR
-        [InputControl(layout = "Vector2", displayName = "Position", usage = "Point", processors = "AutoWindowSpace", dontReset = true)]
+        [InputControl(
+            layout = "Vector2",
+            displayName = "Position",
+            usage = "Point",
+            processors = "AutoWindowSpace",
+            dontReset = true
+        )]
 #else
         [InputControl(layout = "Vector2", displayName = "Position", usage = "Point", dontReset = true)]
 #endif
@@ -234,7 +240,11 @@ namespace UnityEngine.InputSystem
             OnStateEvent(eventPtr);
         }
 
-        bool IInputStateCallbackReceiver.GetStateOffsetForEvent(InputControl control, InputEventPtr eventPtr, ref uint offset)
+        bool IInputStateCallbackReceiver.GetStateOffsetForEvent(
+            InputControl control,
+            InputEventPtr eventPtr,
+            ref uint offset
+        )
         {
             return false;
         }

@@ -15,13 +15,22 @@ namespace Unity.Entities.UI
 
         static BindingUtilities()
         {
-            BaseBinderMethod = typeof(BindingUtilities)
-                .GetMethod(nameof(SetCallbacks), BindingFlags.Static | BindingFlags.NonPublic);
+            BaseBinderMethod = typeof(BindingUtilities).GetMethod(
+                nameof(SetCallbacks),
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
             if (null == BaseBinderMethod)
-                throw new InvalidOperationException($"Could not find private static method `{nameof(SetCallbacks)}<,>` in the {nameof(BindingUtilities)} class.");
+                throw new InvalidOperationException(
+                    $"Could not find private static method `{nameof(SetCallbacks)}<,>` in the {nameof(BindingUtilities)} class."
+                );
         }
 
-        public static void Bind<TValue>(VisualElement element, ref TValue value, PropertyPath path, BindingContextElement root)
+        public static void Bind<TValue>(
+            VisualElement element,
+            ref TValue value,
+            PropertyPath path,
+            BindingContextElement root
+        )
         {
             switch (element)
             {
@@ -41,7 +50,12 @@ namespace Unity.Entities.UI
             }
         }
 
-        static void TrySetCallbacksThroughReflection<TValue>(VisualElement element, ref TValue value, PropertyPath path, BindingContextElement root)
+        static void TrySetCallbacksThroughReflection<TValue>(
+            VisualElement element,
+            ref TValue value,
+            PropertyPath path,
+            BindingContextElement root
+        )
         {
             var type = element.GetType();
             var baseFieldType = GetBaseFieldType(type);
@@ -56,10 +70,15 @@ namespace Unity.Entities.UI
                 s_RegistrationMethods[key] = method = BaseBinderMethod.MakeGenericMethod(fieldType, typeof(TValue));
             }
 
-            method.Invoke(null, new object[] {value, element, path, root});
+            method.Invoke(null, new object[] { value, element, path, root });
         }
 
-        static void SetCallbacks<TFieldType, TValue>(ref TValue value, BaseField<TFieldType> field, PropertyPath path, BindingContextElement root)
+        static void SetCallbacks<TFieldType, TValue>(
+            ref TValue value,
+            BaseField<TFieldType> field,
+            PropertyPath path,
+            BindingContextElement root
+        )
         {
             GuiFactory.SetCallbacks(ref value, path, root, field);
         }

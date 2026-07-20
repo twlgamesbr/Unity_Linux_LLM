@@ -10,11 +10,10 @@ namespace Unity.Entities.Editor
 {
     static class InspectorUtility
     {
-        public static InspectorSettings Settings => UserSettings<InspectorSettings>.GetOrCreate(Constants.Settings.Inspector);
+        public static InspectorSettings Settings =>
+            UserSettings<InspectorSettings>.GetOrCreate(Constants.Settings.Inspector);
 
-        static InspectorUtility()
-        {
-        }
+        static InspectorUtility() { }
 
         public static void CreateComponentHeader(VisualElement parent, ComponentPropertyType type, string displayName)
         {
@@ -51,7 +50,7 @@ namespace Unity.Entities.Editor
             categoryLabel.binding = new BooleanVisibilityPreferenceBinding
             {
                 Target = categoryLabel,
-                PreferencePath = new PropertyPath(nameof(InspectorSettings.DisplayComponentType))
+                PreferencePath = new PropertyPath(nameof(InspectorSettings.DisplayComponentType)),
             };
             categoryLabel.binding.Update();
         }
@@ -60,15 +59,22 @@ namespace Unity.Entities.Editor
         {
             switch (type)
             {
-                case ComponentPropertyType.Component: return "(Component)";
-                case ComponentPropertyType.Tag: return "(Tag)";
-                case ComponentPropertyType.SharedComponent: return "(Shared)";
-                case ComponentPropertyType.ChunkComponent: return "(Chunk)";
-                case ComponentPropertyType.CompanionComponent: return "(Companion)";
-                case ComponentPropertyType.Buffer: return "(Buffer)";
+                case ComponentPropertyType.Component:
+                    return "(Component)";
+                case ComponentPropertyType.Tag:
+                    return "(Tag)";
+                case ComponentPropertyType.SharedComponent:
+                    return "(Shared)";
+                case ComponentPropertyType.ChunkComponent:
+                    return "(Chunk)";
+                case ComponentPropertyType.CompanionComponent:
+                    return "(Companion)";
+                case ComponentPropertyType.Buffer:
+                    return "(Buffer)";
                 case ComponentPropertyType.None:
                 case ComponentPropertyType.All:
-                default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
@@ -76,25 +82,28 @@ namespace Unity.Entities.Editor
         {
             switch (type)
             {
-                case ComponentPropertyType.Component: return UssClasses.Inspector.ComponentTypes.Component;
-                case ComponentPropertyType.Tag: return UssClasses.Inspector.ComponentTypes.Tag;
-                case ComponentPropertyType.SharedComponent: return UssClasses.Inspector.ComponentTypes.SharedComponent;
-                case ComponentPropertyType.ChunkComponent: return UssClasses.Inspector.ComponentTypes.ChunkComponent;
-                case ComponentPropertyType.CompanionComponent: return UssClasses.Inspector.ComponentTypes.ManagedComponent;
-                case ComponentPropertyType.Buffer: return UssClasses.Inspector.ComponentTypes.BufferComponent;
+                case ComponentPropertyType.Component:
+                    return UssClasses.Inspector.ComponentTypes.Component;
+                case ComponentPropertyType.Tag:
+                    return UssClasses.Inspector.ComponentTypes.Tag;
+                case ComponentPropertyType.SharedComponent:
+                    return UssClasses.Inspector.ComponentTypes.SharedComponent;
+                case ComponentPropertyType.ChunkComponent:
+                    return UssClasses.Inspector.ComponentTypes.ChunkComponent;
+                case ComponentPropertyType.CompanionComponent:
+                    return UssClasses.Inspector.ComponentTypes.ManagedComponent;
+                case ComponentPropertyType.Buffer:
+                    return UssClasses.Inspector.ComponentTypes.BufferComponent;
                 case ComponentPropertyType.None:
                 case ComponentPropertyType.All:
-                default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
         public static ToolbarMenu CreateDropdownSettings(string ussClass)
         {
-            var dropdownSettings = new ToolbarMenu
-            {
-                name = "dropdownSettings",
-                variant = ToolbarMenu.Variant.Popup
-            };
+            var dropdownSettings = new ToolbarMenu { name = "dropdownSettings", variant = ToolbarMenu.Variant.Popup };
 
             Resources.Templates.DotsEditorCommon.AddStyles(dropdownSettings);
             dropdownSettings.AddToClassList(UssClasses.DotsEditorCommon.CommonResources);
@@ -108,14 +117,21 @@ namespace Unity.Entities.Editor
 
         public static void SetUnityBaseFieldInputsEnabled(VisualElement root, bool enabled)
         {
-            root.Query(className: UssClasses.DotsEditorCommon.UnityBaseField).ForEach(e =>
-            {
-                if (e is {parent: not Toggle} && e.parent?.parent is not Foldout)
-                    e.SetEnabled(enabled);
-            });
+            root.Query(className: UssClasses.DotsEditorCommon.UnityBaseField)
+                .ForEach(e =>
+                {
+                    if (e is { parent: not Toggle } && e.parent?.parent is not Foldout)
+                        e.SetEnabled(enabled);
+                });
         }
 
-        public static void Synchronize<T>(List<T> existingOrder, List<T> targetOrder, IComparer<T> comparer, VisualElement root, Func<T, VisualElement> Factory)
+        public static void Synchronize<T>(
+            List<T> existingOrder,
+            List<T> targetOrder,
+            IComparer<T> comparer,
+            VisualElement root,
+            Func<T, VisualElement> Factory
+        )
         {
             // optimizations for simple cases
             if (targetOrder.Count == 0)
@@ -134,7 +150,7 @@ namespace Unity.Entities.Editor
                 return;
             }
 
-            for (int x = 0, y = 0; x < existingOrder.Count || y < targetOrder.Count;)
+            for (int x = 0, y = 0; x < existingOrder.Count || y < targetOrder.Count; )
             {
                 // If the target list is exhausted,
                 // delete the current element from the subject list
@@ -143,7 +159,6 @@ namespace Unity.Entities.Editor
                     existingOrder.RemoveAt(x);
                     root.RemoveAt(x);
                 }
-
                 // if the subject list is exhausted,
                 // insert the current element from the target list
                 else if (x >= existingOrder.Count)
@@ -151,7 +166,6 @@ namespace Unity.Entities.Editor
                     existingOrder.Insert(y, targetOrder[y]);
                     root.Insert(y, Factory(targetOrder[y]));
                 }
-
                 // if the current subject element precedes the current target element,
                 // delete the current subject element.
                 else
@@ -231,7 +245,8 @@ namespace Unity.Entities.Editor
         public static ToolbarSearchField CreateSearchField(
             string cssClass,
             Action<string> onSearchChanged,
-            Action onSearchCleared)
+            Action onSearchCleared
+        )
         {
             var searchField = new ToolbarSearchField();
             searchField.AddToClassList(cssClass);

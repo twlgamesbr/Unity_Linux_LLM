@@ -1,10 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unity.Entities.SourceGen.SystemGenerator;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -15,7 +13,8 @@ public class EntityQueryErrorTests
     [Ignore("Entities.* bulk operations are gone")]
     public async Task DC0062_EntityQueryInvalidMethod()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             public partial class MySystem : SystemBase

@@ -6,12 +6,18 @@ namespace Unity.Editor.Bridge
 {
     static class ListViewBridge
     {
-        internal static void SetDragAndDropController(MultiColumnListView listView, ICollectionDragAndDropController controller)
+        internal static void SetDragAndDropController(
+            MultiColumnListView listView,
+            ICollectionDragAndDropController controller
+        )
         {
             listView.dragger.dragAndDropController = new CollectionDragAndDropControllerProxy(controller);
         }
 
-        internal static int VirtualizationControllerGetItemIndexFromMousePosition(MultiColumnListView listView, Vector2 position)
+        internal static int VirtualizationControllerGetItemIndexFromMousePosition(
+            MultiColumnListView listView,
+            Vector2 position
+        )
         {
             return listView.virtualizationController.GetIndexFromPosition(position);
         }
@@ -25,10 +31,12 @@ namespace Unity.Editor.Bridge
                 m_Controller = controller;
             }
 
-            public bool CanStartDrag(IEnumerable<int> itemIndices)
-                => m_Controller.CanStartDrag(itemIndices);
+            public bool CanStartDrag(IEnumerable<int> itemIndices) => m_Controller.CanStartDrag(itemIndices);
 
-            public UnityEngine.UIElements.StartDragArgs SetupDragAndDrop(IEnumerable<int> itemIndices, bool skipText = false)
+            public UnityEngine.UIElements.StartDragArgs SetupDragAndDrop(
+                IEnumerable<int> itemIndices,
+                bool skipText = false
+            )
             {
                 var args = m_Controller.SetupDragAndDrop(itemIndices, skipText);
                 return args.ToStartDragArgs();
@@ -36,18 +44,23 @@ namespace Unity.Editor.Bridge
 
             public UnityEngine.UIElements.DragVisualMode HandleDragAndDrop(IListDragAndDropArgs args)
             {
-                return (UnityEngine.UIElements.DragVisualMode)m_Controller.HandleDragAndDrop(args.target,
-                                                                                             args.insertAtIndex,
-                                                                                             (DragAndDropPosition)args.dragAndDropPosition,
-                                                                                             args.dragAndDropData != null ? new DragAndDropData(args.dragAndDropData) : default);
+                return (UnityEngine.UIElements.DragVisualMode)
+                    m_Controller.HandleDragAndDrop(
+                        args.target,
+                        args.insertAtIndex,
+                        (DragAndDropPosition)args.dragAndDropPosition,
+                        args.dragAndDropData != null ? new DragAndDropData(args.dragAndDropData) : default
+                    );
             }
 
             public void OnDrop(IListDragAndDropArgs args)
             {
-                m_Controller.OnDrop(args.target,
-                                    args.insertAtIndex,
-                                    (DragAndDropPosition)args.dragAndDropPosition,
-                                    args.dragAndDropData != null ? new DragAndDropData(args.dragAndDropData) : default);
+                m_Controller.OnDrop(
+                    args.target,
+                    args.insertAtIndex,
+                    (DragAndDropPosition)args.dragAndDropPosition,
+                    args.dragAndDropData != null ? new DragAndDropData(args.dragAndDropData) : default
+                );
             }
 
             public bool enableReordering { get; set; } = true;
@@ -58,7 +71,12 @@ namespace Unity.Editor.Bridge
     {
         bool CanStartDrag(IEnumerable<int> itemIndices);
         StartDragArgs SetupDragAndDrop(IEnumerable<int> itemIndices, bool skipText);
-        DragVisualMode HandleDragAndDrop(object target, int insertAtIndex, DragAndDropPosition position, DragAndDropData data);
+        DragVisualMode HandleDragAndDrop(
+            object target,
+            int insertAtIndex,
+            DragAndDropPosition position,
+            DragAndDropData data
+        );
         void OnDrop(object target, int insertAtIndex, DragAndDropPosition position, DragAndDropData data);
     }
 
@@ -67,24 +85,24 @@ namespace Unity.Editor.Bridge
         None,
         Copy,
         Move,
-        Rejected
+        Rejected,
     }
 
     enum DragAndDropPosition
     {
         OverItem,
         BetweenItems,
-        OutsideItems
+        OutsideItems,
     }
 
     readonly struct DragAndDropData
     {
         readonly IDragAndDropData m_Data;
 
-        internal DragAndDropData(IDragAndDropData data)
-            => m_Data = data;
+        internal DragAndDropData(IDragAndDropData data) => m_Data = data;
 
         public object GetGenericData(string key) => m_Data.GetGenericData(key);
+
         public object userData => m_Data.userData;
         public IEnumerable<Object> unityObjectReferences => m_Data.unityObjectReferences;
     }

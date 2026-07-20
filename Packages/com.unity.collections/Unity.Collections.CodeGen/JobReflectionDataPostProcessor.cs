@@ -14,7 +14,8 @@ namespace Unity.Jobs.CodeGen
     internal partial class JobsILPostProcessor : ILPostProcessor
     {
         private static readonly string ProducerAttributeName = typeof(JobProducerTypeAttribute).FullName;
-        private static readonly string RegisterGenericJobTypeAttributeName = typeof(RegisterGenericJobTypeAttribute).FullName;
+        private static readonly string RegisterGenericJobTypeAttributeName =
+            typeof(RegisterGenericJobTypeAttribute).FullName;
 
         public static MethodReference AttributeConstructorReferenceFor(Type attributeType, ModuleDefinition module)
         {
@@ -44,7 +45,6 @@ namespace Unity.Jobs.CodeGen
                 }
 
                 result = gt;
-
             }
             else
             {
@@ -76,18 +76,29 @@ namespace Unity.Jobs.CodeGen
             bool anythingChanged = false;
 
             var asmDef = AssemblyDefinition;
-            var funcDef = new MethodDefinition("CreateJobReflectionData",
+            var funcDef = new MethodDefinition(
+                "CreateJobReflectionData",
                 MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
-                asmDef.MainModule.ImportReference(typeof(void)));
+                asmDef.MainModule.ImportReference(typeof(void))
+            );
 
             // This must use a stable hash code function (do not using string.GetHashCode)
             var autoClassName = $"__JobReflectionRegistrationOutput__{StableHash_FNV1A64(asmDef.FullName)}";
 
             funcDef.Body.InitLocals = false;
 
-            var classDef = new TypeDefinition("", autoClassName, TypeAttributes.Class, asmDef.MainModule.ImportReference(typeof(object)));
+            var classDef = new TypeDefinition(
+                "",
+                autoClassName,
+                TypeAttributes.Class,
+                asmDef.MainModule.ImportReference(typeof(object))
+            );
             classDef.IsBeforeFieldInit = false;
-            classDef.CustomAttributes.Add(new CustomAttribute(AttributeConstructorReferenceFor(typeof(DOTSCompilerGeneratedAttribute), asmDef.MainModule)));
+            classDef.CustomAttributes.Add(
+                new CustomAttribute(
+                    AttributeConstructorReferenceFor(typeof(DOTSCompilerGeneratedAttribute), asmDef.MainModule)
+                )
+            );
             classDef.Methods.Add(funcDef);
 
             var body = funcDef.Body;
@@ -137,7 +148,7 @@ namespace Unity.Jobs.CodeGen
 
             // Now that we have generated all reflection info
             // finish wrapping the ops in a try catch now
-            var lastWorkOp = processor.Body.Instructions[processor.Body.Instructions.Count-1];
+            var lastWorkOp = processor.Body.Instructions[processor.Body.Instructions.Count - 1];
             processor.Append(handler);
 
             var earlyInitHelpersDef = asmDef.MainModule.ImportReference(typeof(EarlyInitHelpers)).Resolve();
@@ -172,23 +183,40 @@ namespace Unity.Jobs.CodeGen
 
             if (anythingChanged)
             {
-                var ctorFuncDef = new MethodDefinition("EarlyInit", MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig, asmDef.MainModule.ImportReference(typeof(void)));
+                var ctorFuncDef = new MethodDefinition(
+                    "EarlyInit",
+                    MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
+                    asmDef.MainModule.ImportReference(typeof(void))
+                );
 
                 if (!Defines.Contains("UNITY_EDITOR"))
                 {
                     // Needs to run automatically in the player, but we need to
                     // exclude this attribute when building for the editor, or
                     // it will re-run the registration for every enter play mode.
-                    var loadTypeEnumType = asmDef.MainModule.ImportReference(typeof(UnityEngine.RuntimeInitializeLoadType));
-                    var attributeCtor = asmDef.MainModule.ImportReference(typeof(UnityEngine.RuntimeInitializeOnLoadMethodAttribute).GetConstructor(new[] { typeof(UnityEngine.RuntimeInitializeLoadType) }));
+                    var loadTypeEnumType = asmDef.MainModule.ImportReference(
+                        typeof(UnityEngine.RuntimeInitializeLoadType)
+                    );
+                    var attributeCtor = asmDef.MainModule.ImportReference(
+                        typeof(UnityEngine.RuntimeInitializeOnLoadMethodAttribute).GetConstructor(
+                            new[] { typeof(UnityEngine.RuntimeInitializeLoadType) }
+                        )
+                    );
                     var attribute = new CustomAttribute(attributeCtor);
-                    attribute.ConstructorArguments.Add(new CustomAttributeArgument(loadTypeEnumType, UnityEngine.RuntimeInitializeLoadType.AfterAssembliesLoaded));
+                    attribute.ConstructorArguments.Add(
+                        new CustomAttributeArgument(
+                            loadTypeEnumType,
+                            UnityEngine.RuntimeInitializeLoadType.AfterAssembliesLoaded
+                        )
+                    );
                     ctorFuncDef.CustomAttributes.Add(attribute);
                 }
                 else
                 {
                     // Needs to run automatically in the editor.
-                    var attributeCtor2 = asmDef.MainModule.ImportReference(typeof(UnityEditor.InitializeOnLoadMethodAttribute).GetConstructor(Type.EmptyTypes));
+                    var attributeCtor2 = asmDef.MainModule.ImportReference(
+                        typeof(UnityEditor.InitializeOnLoadMethodAttribute).GetConstructor(Type.EmptyTypes)
+                    );
                     ctorFuncDef.CustomAttributes.Add(new CustomAttribute(attributeCtor2));
                 }
 
@@ -207,7 +235,13 @@ namespace Unity.Jobs.CodeGen
             return anythingChanged;
         }
 
-        private bool VisitJobStructInterfaces(TypeReference jobTypeRef, TypeDefinition jobType, TypeDefinition currentType, ILProcessor processor, MethodBody body)
+        private bool VisitJobStructInterfaces(
+            TypeReference jobTypeRef,
+            TypeDefinition jobType,
+            TypeDefinition currentType,
+            ILProcessor processor,
+            MethodBody body
+        )
         {
             bool didAnything = false;
 
@@ -257,7 +291,12 @@ namespace Unity.Jobs.CodeGen
             return VisitJobStructInterfaces(t, rt, rt, processor, body);
         }
 
-        private bool GenerateCalls(TypeReference producerRef, TypeReference jobStructType, MethodBody body, ILProcessor processor)
+        private bool GenerateCalls(
+            TypeReference producerRef,
+            TypeReference jobStructType,
+            MethodBody body,
+            ILProcessor processor
+        )
         {
             try
             {
@@ -268,7 +307,12 @@ namespace Unity.Jobs.CodeGen
                     methodToCall = null;
                     foreach (var method in carrierType.GetMethods())
                     {
-                        if(method.IsStatic && method.IsPublic && method.Parameters.Count == 0 && method.Name == "EarlyJobInit")
+                        if (
+                            method.IsStatic
+                            && method.IsPublic
+                            && method.Parameters.Count == 0
+                            && method.Name == "EarlyJobInit"
+                        )
                         {
                             methodToCall = method;
                             break;
@@ -286,7 +330,9 @@ namespace Unity.Jobs.CodeGen
                     return false;
 
                 var asm = AssemblyDefinition.MainModule;
-                var mref = asm.ImportReference(asm.ImportReference(methodToCall).MakeGenericInstanceMethod(jobStructType));
+                var mref = asm.ImportReference(
+                    asm.ImportReference(methodToCall).MakeGenericInstanceMethod(jobStructType)
+                );
                 processor.Append(Instruction.Create(OpCodes.Call, mref));
 
                 return true;
@@ -299,7 +345,11 @@ namespace Unity.Jobs.CodeGen
             return false;
         }
 
-        private static void CollectGenericTypeInstances(AssemblyDefinition assembly, List<TypeReference> types, HashSet<string> visited)
+        private static void CollectGenericTypeInstances(
+            AssemblyDefinition assembly,
+            List<TypeReference> types,
+            HashSet<string> visited
+        )
         {
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // WARNING: THIS CODE HAS TO BE MAINTAINED IN SYNC WITH BurstReflection.cs in Unity.Burst package
@@ -322,7 +372,8 @@ namespace Unity.Jobs.CodeGen
                         {
                             CollectGenericTypeInstances(type, types, visited);
                         }
-                    } else if (token == null)
+                    }
+                    else if (token == null)
                         break;
                 }
 
@@ -364,7 +415,11 @@ namespace Unity.Jobs.CodeGen
             }
         }
 
-        private static void CollectGenericTypeInstances(TypeReference type, List<TypeReference> types, HashSet<string> visited)
+        private static void CollectGenericTypeInstances(
+            TypeReference type,
+            List<TypeReference> types,
+            HashSet<string> visited
+        )
         {
             if (type.IsPrimitive)
                 return;
@@ -392,4 +447,3 @@ namespace Unity.Jobs.CodeGen
         }
     }
 }
-

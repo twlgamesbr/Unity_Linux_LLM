@@ -54,30 +54,42 @@ namespace UnityEngine.InputSystem.Editor
 
         private void DoNotificationSectionUI()
         {
-            var notificationBehaviorProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_NotificationBehavior));
+            var notificationBehaviorProperty = serializedObject.FindProperty(
+                nameof(PlayerInputManager.m_NotificationBehavior)
+            );
             EditorGUILayout.PropertyField(notificationBehaviorProperty);
             switch ((PlayerNotifications)notificationBehaviorProperty.intValue)
             {
                 case PlayerNotifications.SendMessages:
                     if (m_SendMessagesHelpText == null)
                         m_SendMessagesHelpText = EditorGUIUtility.TrTextContent(
-                            $"Will SendMessage() to GameObject: " + string.Join(",", PlayerInputManager.messages));
+                            $"Will SendMessage() to GameObject: " + string.Join(",", PlayerInputManager.messages)
+                        );
                     EditorGUILayout.HelpBox(m_SendMessagesHelpText);
                     break;
 
                 case PlayerNotifications.BroadcastMessages:
                     if (m_BroadcastMessagesHelpText == null)
                         m_BroadcastMessagesHelpText = EditorGUIUtility.TrTextContent(
-                            $"Will BroadcastMessage() to GameObject: " + string.Join(",", PlayerInputManager.messages));
+                            $"Will BroadcastMessage() to GameObject: " + string.Join(",", PlayerInputManager.messages)
+                        );
                     EditorGUILayout.HelpBox(m_BroadcastMessagesHelpText);
                     break;
 
                 case PlayerNotifications.InvokeUnityEvents:
-                    m_EventsExpanded = EditorGUILayout.Foldout(m_EventsExpanded, m_EventsLabel, toggleOnLabelClick: true);
+                    m_EventsExpanded = EditorGUILayout.Foldout(
+                        m_EventsExpanded,
+                        m_EventsLabel,
+                        toggleOnLabelClick: true
+                    );
                     if (m_EventsExpanded)
                     {
-                        var playerJoinedEventProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_PlayerJoinedEvent));
-                        var playerLeftEventProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_PlayerLeftEvent));
+                        var playerJoinedEventProperty = serializedObject.FindProperty(
+                            nameof(PlayerInputManager.m_PlayerJoinedEvent)
+                        );
+                        var playerLeftEventProperty = serializedObject.FindProperty(
+                            nameof(PlayerInputManager.m_PlayerLeftEvent)
+                        );
 
                         EditorGUILayout.PropertyField(playerJoinedEventProperty);
                         EditorGUILayout.PropertyField(playerLeftEventProperty);
@@ -98,8 +110,10 @@ namespace UnityEngine.InputSystem.Editor
                 ++EditorGUI.indentLevel;
 
                 // Join action.
-                if ((PlayerJoinBehavior)joinBehaviorProperty.intValue ==
-                    PlayerJoinBehavior.JoinPlayersWhenJoinActionIsTriggered)
+                if (
+                    (PlayerJoinBehavior)joinBehaviorProperty.intValue
+                    == PlayerJoinBehavior.JoinPlayersWhenJoinActionIsTriggered
+                )
                 {
                     var joinActionProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_JoinAction));
                     EditorGUILayout.PropertyField(joinActionProperty);
@@ -117,13 +131,19 @@ namespace UnityEngine.InputSystem.Editor
             // Enabled-by-default.
             var allowJoiningProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_AllowJoining));
             if (m_AllowingJoiningLabel == null)
-                m_AllowingJoiningLabel = new GUIContent("Joining Enabled By Default", allowJoiningProperty.GetTooltip());
+                m_AllowingJoiningLabel = new GUIContent(
+                    "Joining Enabled By Default",
+                    allowJoiningProperty.GetTooltip()
+                );
             EditorGUILayout.PropertyField(allowJoiningProperty, m_AllowingJoiningLabel);
 
             // Max player count.
             var maxPlayerCountProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_MaxPlayerCount));
             if (m_EnableMaxPlayerCountLabel == null)
-                m_EnableMaxPlayerCountLabel = EditorGUIUtility.TrTextContent("Limit Number of Players", maxPlayerCountProperty.GetTooltip());
+                m_EnableMaxPlayerCountLabel = EditorGUIUtility.TrTextContent(
+                    "Limit Number of Players",
+                    maxPlayerCountProperty.GetTooltip()
+                );
             if (maxPlayerCountProperty.intValue > 0)
                 m_MaxPlayerCountEnabled = true;
             m_MaxPlayerCountEnabled = EditorGUILayout.Toggle(m_EnableMaxPlayerCountLabel, m_MaxPlayerCountEnabled);
@@ -139,8 +159,10 @@ namespace UnityEngine.InputSystem.Editor
                 maxPlayerCountProperty.intValue = -1;
         }
 
-        private static void ValidatePlayerPrefab(SerializedProperty joinBehaviorProperty,
-            SerializedProperty playerPrefabProperty)
+        private static void ValidatePlayerPrefab(
+            SerializedProperty joinBehaviorProperty,
+            SerializedProperty playerPrefabProperty
+        )
         {
             if ((PlayerJoinBehavior)joinBehaviorProperty.intValue != PlayerJoinBehavior.JoinPlayersWhenButtonIsPressed)
                 return;
@@ -148,8 +170,9 @@ namespace UnityEngine.InputSystem.Editor
             if (playerPrefabProperty.objectReferenceValue == null)
                 return;
 
-            var playerInput = ((GameObject)playerPrefabProperty.objectReferenceValue)
-                .GetComponentInChildren<PlayerInput>();
+            var playerInput = (
+                (GameObject)playerPrefabProperty.objectReferenceValue
+            ).GetComponentInChildren<PlayerInput>();
 
             if (playerInput == null)
             {
@@ -164,9 +187,11 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             if (playerInput.actions.controlSchemes.Any(c => c.deviceRequirements.Count > 0) == false)
-                EditorGUILayout.HelpBox("Join Players When Button Is Pressed behavior will not work when the Input Action Asset " +
-                    "assigned to the PlayerInput component has no required devices in any control scheme.",
-                    MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "Join Players When Button Is Pressed behavior will not work when the Input Action Asset "
+                        + "assigned to the PlayerInput component has no required devices in any control scheme.",
+                    MessageType.Info
+                );
         }
 
         private void DoSplitScreenSectionUI()
@@ -184,28 +209,41 @@ namespace UnityEngine.InputSystem.Editor
             ++EditorGUI.indentLevel;
 
             // Maintain-aspect-ratio toggle.
-            var maintainAspectRatioProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_MaintainAspectRatioInSplitScreen));
+            var maintainAspectRatioProperty = serializedObject.FindProperty(
+                nameof(PlayerInputManager.m_MaintainAspectRatioInSplitScreen)
+            );
             if (m_MaintainAspectRatioLabel == null)
-                m_MaintainAspectRatioLabel =
-                    new GUIContent("Maintain Aspect Ratio", maintainAspectRatioProperty.GetTooltip());
+                m_MaintainAspectRatioLabel = new GUIContent(
+                    "Maintain Aspect Ratio",
+                    maintainAspectRatioProperty.GetTooltip()
+                );
             EditorGUILayout.PropertyField(maintainAspectRatioProperty, m_MaintainAspectRatioLabel);
 
             // Fixed-number toggle.
-            var fixedNumberProperty = serializedObject.FindProperty(nameof(PlayerInputManager.m_FixedNumberOfSplitScreens));
+            var fixedNumberProperty = serializedObject.FindProperty(
+                nameof(PlayerInputManager.m_FixedNumberOfSplitScreens)
+            );
             if (m_EnableFixedNumberOfSplitScreensLabel == null)
-                m_EnableFixedNumberOfSplitScreensLabel = EditorGUIUtility.TrTextContent("Set Fixed Number", fixedNumberProperty.GetTooltip());
+                m_EnableFixedNumberOfSplitScreensLabel = EditorGUIUtility.TrTextContent(
+                    "Set Fixed Number",
+                    fixedNumberProperty.GetTooltip()
+                );
             if (fixedNumberProperty.intValue > 0)
                 m_FixedNumberOfSplitScreensEnabled = true;
-            m_FixedNumberOfSplitScreensEnabled = EditorGUILayout.Toggle(m_EnableFixedNumberOfSplitScreensLabel,
-                m_FixedNumberOfSplitScreensEnabled);
+            m_FixedNumberOfSplitScreensEnabled = EditorGUILayout.Toggle(
+                m_EnableFixedNumberOfSplitScreensLabel,
+                m_FixedNumberOfSplitScreensEnabled
+            );
             if (m_FixedNumberOfSplitScreensEnabled)
             {
                 ++EditorGUI.indentLevel;
                 if (fixedNumberProperty.intValue < 0)
                     fixedNumberProperty.intValue = 4;
                 if (m_FixedNumberOfSplitScreensLabel == null)
-                    m_FixedNumberOfSplitScreensLabel = EditorGUIUtility.TrTextContent("Number of Screens",
-                        fixedNumberProperty.tooltip);
+                    m_FixedNumberOfSplitScreensLabel = EditorGUIUtility.TrTextContent(
+                        "Number of Screens",
+                        fixedNumberProperty.tooltip
+                    );
                 EditorGUILayout.PropertyField(fixedNumberProperty, m_FixedNumberOfSplitScreensLabel);
                 --EditorGUI.indentLevel;
             }
@@ -247,23 +285,53 @@ namespace UnityEngine.InputSystem.Editor
             EditorGUI.EndDisabledGroup();
         }
 
-        [SerializeField] private bool m_EventsExpanded;
-        [SerializeField] private bool m_MaxPlayerCountEnabled;
-        [SerializeField] private bool m_FixedNumberOfSplitScreensEnabled;
+        [SerializeField]
+        private bool m_EventsExpanded;
 
-        [NonSerialized] private readonly GUIContent m_JoiningGroupLabel = EditorGUIUtility.TrTextContent("Joining");
-        [NonSerialized] private readonly GUIContent m_SplitScreenGroupLabel = EditorGUIUtility.TrTextContent("Split-Screen");
-        [NonSerialized] private readonly GUIContent m_EventsLabel = EditorGUIUtility.TrTextContent("Events");
-        [NonSerialized] private readonly GUIContent m_DebugLabel = EditorGUIUtility.TrTextContent("Debug");
-        [NonSerialized] private GUIContent m_SendMessagesHelpText;
-        [NonSerialized] private GUIContent m_BroadcastMessagesHelpText;
-        [NonSerialized] private GUIContent m_AllowingJoiningLabel;
-        [NonSerialized] private GUIContent m_SplitScreenLabel;
-        [NonSerialized] private GUIContent m_MaintainAspectRatioLabel;
-        [NonSerialized] private GUIContent m_SplitScreenAreaLabel;
-        [NonSerialized] private GUIContent m_FixedNumberOfSplitScreensLabel;
-        [NonSerialized] private GUIContent m_EnableMaxPlayerCountLabel;
-        [NonSerialized] private GUIContent m_EnableFixedNumberOfSplitScreensLabel;
+        [SerializeField]
+        private bool m_MaxPlayerCountEnabled;
+
+        [SerializeField]
+        private bool m_FixedNumberOfSplitScreensEnabled;
+
+        [NonSerialized]
+        private readonly GUIContent m_JoiningGroupLabel = EditorGUIUtility.TrTextContent("Joining");
+
+        [NonSerialized]
+        private readonly GUIContent m_SplitScreenGroupLabel = EditorGUIUtility.TrTextContent("Split-Screen");
+
+        [NonSerialized]
+        private readonly GUIContent m_EventsLabel = EditorGUIUtility.TrTextContent("Events");
+
+        [NonSerialized]
+        private readonly GUIContent m_DebugLabel = EditorGUIUtility.TrTextContent("Debug");
+
+        [NonSerialized]
+        private GUIContent m_SendMessagesHelpText;
+
+        [NonSerialized]
+        private GUIContent m_BroadcastMessagesHelpText;
+
+        [NonSerialized]
+        private GUIContent m_AllowingJoiningLabel;
+
+        [NonSerialized]
+        private GUIContent m_SplitScreenLabel;
+
+        [NonSerialized]
+        private GUIContent m_MaintainAspectRatioLabel;
+
+        [NonSerialized]
+        private GUIContent m_SplitScreenAreaLabel;
+
+        [NonSerialized]
+        private GUIContent m_FixedNumberOfSplitScreensLabel;
+
+        [NonSerialized]
+        private GUIContent m_EnableMaxPlayerCountLabel;
+
+        [NonSerialized]
+        private GUIContent m_EnableFixedNumberOfSplitScreensLabel;
     }
 }
 #endif // UNITY_EDITOR

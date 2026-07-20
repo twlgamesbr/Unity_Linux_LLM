@@ -58,7 +58,6 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             "amaranth pink",
             "light turquoise",
             "azalea",
-
             "madison",
             "christalle",
             "tory blue",
@@ -75,7 +74,6 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             "violet",
             "electric blue",
             "pale mauve",
-
             "british racing green",
             "rosewood",
             "san felix",
@@ -99,54 +97,54 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
         /// </summary>
         public static readonly Color[] k_ColorPalette_OriginalOrder =
         {
-            new(  0 / 255f,  61 / 255f,  48 / 255f), // sherwood green
-            new( 90 / 255f,  10 / 255f,  51 / 255f), // mulberry
-            new(  0 / 255f,  87 / 255f,  69 / 255f), // deep opal
-            new(129 / 255f,  13 / 255f,  73 / 255f), // french plum
-            new(  0 / 255f, 115 / 255f,  92 / 255f), // robin hood
-            new(171 / 255f,  13 / 255f,  97 / 255f), // jazberry jam
-            new(  0 / 255f, 145 / 255f, 117 / 255f), // elf green
-            new(216 / 255f,  13 / 255f, 123 / 255f), // magenta
-            new(  0 / 255f, 175 / 255f, 142 / 255f), // jeepers creepers
-            new(255 / 255f,  46 / 255f, 149 / 255f), // persian rose
-            new(  0 / 255f, 203 / 255f, 167 / 255f), // aquamarine
+            new(0 / 255f, 61 / 255f, 48 / 255f), // sherwood green
+            new(90 / 255f, 10 / 255f, 51 / 255f), // mulberry
+            new(0 / 255f, 87 / 255f, 69 / 255f), // deep opal
+            new(129 / 255f, 13 / 255f, 73 / 255f), // french plum
+            new(0 / 255f, 115 / 255f, 92 / 255f), // robin hood
+            new(171 / 255f, 13 / 255f, 97 / 255f), // jazberry jam
+            new(0 / 255f, 145 / 255f, 117 / 255f), // elf green
+            new(216 / 255f, 13 / 255f, 123 / 255f), // magenta
+            new(0 / 255f, 175 / 255f, 142 / 255f), // jeepers creepers
+            new(255 / 255f, 46 / 255f, 149 / 255f), // persian rose
+            new(0 / 255f, 203 / 255f, 167 / 255f), // aquamarine
             new(255 / 255f, 120 / 255f, 173 / 255f), // barbie pink
-            new(  0 / 255f, 235 / 255f, 193 / 255f), // vivid opal
+            new(0 / 255f, 235 / 255f, 193 / 255f), // vivid opal
             new(255 / 255f, 172 / 255f, 198 / 255f), // amaranth pink
             new(134 / 255f, 255 / 255f, 222 / 255f), // light turquoise
             new(255 / 255f, 215 / 255f, 225 / 255f), // azalea
-            new(  0 / 255f,  48 / 255f, 111 / 255f), // madison
-            new( 70 / 255f,  11 / 255f, 112 / 255f), // christalle
-            new(  0 / 255f,  72 / 255f, 158 / 255f), // tory blue
-            new(107 / 255f,   6 / 255f, 159 / 255f), // purple heart
-            new(  0 / 255f,  95 / 255f, 204 / 255f), // royal blue
-            new(142 / 255f,   6 / 255f, 205 / 255f), // french violet
-            new(  0 / 255f, 121 / 255f, 250 / 255f), // azure
-            new(180 / 255f,  10 / 255f, 252 / 255f), // electric purple
-            new(  0 / 255f, 159 / 255f, 250 / 255f), // bleu de france
-            new(237 / 255f,  13 / 255f, 253 / 255f), // psychedelic purple
-            new(  0 / 255f, 194 / 255f, 249 / 255f), // capri
+            new(0 / 255f, 48 / 255f, 111 / 255f), // madison
+            new(70 / 255f, 11 / 255f, 112 / 255f), // christalle
+            new(0 / 255f, 72 / 255f, 158 / 255f), // tory blue
+            new(107 / 255f, 6 / 255f, 159 / 255f), // purple heart
+            new(0 / 255f, 95 / 255f, 204 / 255f), // royal blue
+            new(142 / 255f, 6 / 255f, 205 / 255f), // french violet
+            new(0 / 255f, 121 / 255f, 250 / 255f), // azure
+            new(180 / 255f, 10 / 255f, 252 / 255f), // electric purple
+            new(0 / 255f, 159 / 255f, 250 / 255f), // bleu de france
+            new(237 / 255f, 13 / 255f, 253 / 255f), // psychedelic purple
+            new(0 / 255f, 194 / 255f, 249 / 255f), // capri
             new(255 / 255f, 102 / 255f, 253 / 255f), // fuchsia
-            new(  0 / 255f, 229 / 255f, 248 / 255f), // aqua blue
+            new(0 / 255f, 229 / 255f, 248 / 255f), // aqua blue
             new(255 / 255f, 163 / 255f, 252 / 255f), // violet
             new(124 / 255f, 255 / 255f, 250 / 255f), // electric blue
             new(255 / 255f, 213 / 255f, 253 / 255f), // pale mauve
-            new(  0 / 255f,  64 / 255f,   2 / 255f), // british racing green
-            new( 95 / 255f,   9 / 255f,  20 / 255f), // rosewood
-            new(  0 / 255f,  90 / 255f,   1 / 255f), // san felix
-            new(134 / 255f,   8 / 255f,  28 / 255f), // hot chile
-            new(  0 / 255f, 119 / 255f,   2 / 255f), // bilbao
-            new(178 / 255f,   7 / 255f,  37 / 255f), // alabama crimson
-            new(  0 / 255f, 149 / 255f,   3 / 255f), // india green
-            new(222 / 255f,  13 / 255f,  46 / 255f), // amaranth red
-            new(  0 / 255f, 180 / 255f,   8 / 255f), // kelly green
-            new(255 / 255f,  66 / 255f,  53 / 255f), // carmine
-            new(  0 / 255f, 211 / 255f,   2 / 255f), // vivid harlequin
-            new(255 / 255f, 135 / 255f,  53 / 255f), // burning orange
-            new(  0 / 255f, 244 / 255f,   7 / 255f), // radioactive green
-            new(255 / 255f, 185 / 255f,  53 / 255f), // frenzee
-            new(175 / 255f, 255 / 255f,  42 / 255f), // lime
-            new(255 / 255f, 226 / 255f,  57 / 255f), // gargoyle gas
+            new(0 / 255f, 64 / 255f, 2 / 255f), // british racing green
+            new(95 / 255f, 9 / 255f, 20 / 255f), // rosewood
+            new(0 / 255f, 90 / 255f, 1 / 255f), // san felix
+            new(134 / 255f, 8 / 255f, 28 / 255f), // hot chile
+            new(0 / 255f, 119 / 255f, 2 / 255f), // bilbao
+            new(178 / 255f, 7 / 255f, 37 / 255f), // alabama crimson
+            new(0 / 255f, 149 / 255f, 3 / 255f), // india green
+            new(222 / 255f, 13 / 255f, 46 / 255f), // amaranth red
+            new(0 / 255f, 180 / 255f, 8 / 255f), // kelly green
+            new(255 / 255f, 66 / 255f, 53 / 255f), // carmine
+            new(0 / 255f, 211 / 255f, 2 / 255f), // vivid harlequin
+            new(255 / 255f, 135 / 255f, 53 / 255f), // burning orange
+            new(0 / 255f, 244 / 255f, 7 / 255f), // radioactive green
+            new(255 / 255f, 185 / 255f, 53 / 255f), // frenzee
+            new(175 / 255f, 255 / 255f, 42 / 255f), // lime
+            new(255 / 255f, 226 / 255f, 57 / 255f), // gargoyle gas
         };
 
         public static int ColorCount => k_ColorPalette_OriginalOrder.Length;
@@ -163,6 +161,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             /// </summary>
             ZigZag,
         }
+
         static readonly string[] k_ColorOrderNames = EnumUtil.GetNames<ColorOrder>();
 
         static int GetColorIndex(ColorOrder order, int index)
@@ -171,7 +170,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             {
                 ColorOrder.Original => index,
                 ColorOrder.ZigZag => ZigZagOrdering(index),
-                _ => throw new ArgumentOutOfRangeException(nameof(order), order, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(order), order, null),
             };
         }
 
@@ -192,9 +191,9 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             var next = -i;
 
             var lightness =
-                ((next & 0b001) != 0 ? 0b100 : 0) |
-                ((next & 0b010) != 0 ? 0b010 : 0) |
-                ((next & 0b100) != 0 ? 0b001 : 0);
+                ((next & 0b001) != 0 ? 0b100 : 0)
+                | ((next & 0b010) != 0 ? 0b010 : 0)
+                | ((next & 0b100) != 0 ? 0b001 : 0);
 
             var indexInOriginalOrder = series * 16 + lightness * 2 + redOrGreen;
 
@@ -237,7 +236,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
                 ColorVisionType.Deuteranopia => "Affecting green cones",
                 ColorVisionType.Protanopia => "Affecting red cones",
                 ColorVisionType.Monochromacy => "Total color blindness",
-                _ => throw new ArgumentOutOfRangeException(nameof(visionType), visionType, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(visionType), visionType, null),
             };
         }
 
@@ -249,7 +248,7 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
                 ColorVisionType.Deuteranopia => DeuteranopiaColorTransform(inputColor),
                 ColorVisionType.Protanopia => ProtanopiaColorTransform(inputColor),
                 ColorVisionType.Monochromacy => MonochromacyColorTransform(inputColor),
-                _ => throw new ArgumentOutOfRangeException(nameof(visionType), visionType, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(visionType), visionType, null),
             };
         }
 
@@ -265,7 +264,8 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             return new Color(
                 0.33066007f * c.r + 0.66933993f * c.g + 0f * c.b,
                 0.33066007f * c.r + 0.66933993f * c.g + 0f * c.b,
-               -0.02785538f * c.r + 0.02785538f * c.g + 1f * c.b);
+                -0.02785538f * c.r + 0.02785538f * c.g + 1f * c.b
+            );
         }
 
         /// <summary>
@@ -280,7 +280,8 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             return new Color(
                 0.170556992f * c.r + 0.829443014f * c.g + 0f * c.b,
                 0.170556991f * c.r + 0.829443008f * c.g + 0f * c.b,
-               -0.004517144f * c.r + 0.004517144f * c.g + 1f * c.b);
+                -0.004517144f * c.r + 0.004517144f * c.g + 1f * c.b
+            );
         }
 
         /// <summary>
@@ -295,7 +296,8 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             return new Color(
                 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b,
                 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b,
-                0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b);
+                0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b
+            );
         }
 
         ColorOrder m_Order = ColorOrder.ZigZag;
@@ -313,14 +315,16 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             root.Add(windowTitle);
 
             var windowDescription = new Label(
-                "Window for visualizing the color palette used in the Multiplayer Tools package as it would appear " +
-                "with various kinds of color blindness.");
+                "Window for visualizing the color palette used in the Multiplayer Tools package as it would appear "
+                    + "with various kinds of color blindness."
+            );
             root.Add(windowDescription);
 
             var colorOrderDropdown = new DropdownField(
                 label: "Color Order",
                 choices: k_ColorOrderNames.ToList(),
-                defaultIndex: (int)m_Order);
+                defaultIndex: (int)m_Order
+            );
             root.Add(colorOrderDropdown);
             colorOrderDropdown.style.alignSelf = Align.FlexStart;
             colorOrderDropdown.RegisterCallback<ChangeEvent<string>>(evt =>
@@ -350,9 +354,11 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
             var colorColumns = new VisualElement();
             colorColumns.style.flexDirection = FlexDirection.Row;
 
-            for (var visionType = ColorVisionType.Normal;
-                 (int)visionType < (int)ColorVisionType.Count;
-                 visionType = (ColorVisionType)((int)visionType + 1))
+            for (
+                var visionType = ColorVisionType.Normal;
+                (int)visionType < (int)ColorVisionType.Count;
+                visionType = (ColorVisionType)((int)visionType + 1)
+            )
             {
                 var column = new VisualElement();
                 column.style.flexDirection = FlexDirection.Column;
@@ -401,11 +407,15 @@ namespace Unity.Multiplayer.Tools.Common.Visualization
 
                 if (existingEntries.Contains(index))
                 {
-                    Debug.LogWarning($"Color order {order} contains duplicate entries for color {name} corresponding to index {index}");
+                    Debug.LogWarning(
+                        $"Color order {order} contains duplicate entries for color {name} corresponding to index {index}"
+                    );
                 }
                 existingEntries.Add(index);
 
-                colors.AppendLine($"new({Round(color.r),3} / 255f, {Round(color.g),3} / 255f, {Round(color.b),3} / 255f), // {name}");
+                colors.AppendLine(
+                    $"new({Round(color.r), 3} / 255f, {Round(color.g), 3} / 255f, {Round(color.b), 3} / 255f), // {name}"
+                );
             }
             Debug.Log(colors.ToString());
         }

@@ -21,7 +21,9 @@ namespace Unity.PlatformToolkit.PlayMode
         {
             // We need to do GetFullPath because we get the path like so: somePath/Folder/, this will make it somePath\Folder\ required for the split
             fullPath = Path.GetFullPath(fullPath);
-            var saveName = Path.GetFileNameWithoutExtension(fullPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).Last());
+            var saveName = Path.GetFileNameWithoutExtension(
+                fullPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).Last()
+            );
             SaveNameValidator.CheckSaveName(saveName);
 
             var data = await File.ReadAllBytesAsync(fullPath);

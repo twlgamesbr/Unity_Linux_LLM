@@ -29,24 +29,35 @@ public partial class JobEntityModule : ISystemModule
     internal readonly struct JobEntityCandidate : ISystemCandidate
     {
         public MemberAccessExpressionSyntax MemberAccessExpressionSyntax { get; }
+
         public JobEntityCandidate(MemberAccessExpressionSyntax node) => MemberAccessExpressionSyntax = node;
+
         public string CandidateTypeName => "IJobEntity";
         public SyntaxNode Node => MemberAccessExpressionSyntax;
-        public InvocationExpressionSyntax Invocation => (MemberAccessExpressionSyntax.Parent as InvocationExpressionSyntax)!;
+        public InvocationExpressionSyntax Invocation =>
+            (MemberAccessExpressionSyntax.Parent as InvocationExpressionSyntax)!;
     }
 
     public void OnReceiveSyntaxNode(SyntaxNode node, Dictionary<SyntaxNode, CandidateSyntax> candidateOwnership)
     {
-        if (node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccessExpressionSyntax }
+        if (
+            node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccessExpressionSyntax }
             && memberAccessExpressionSyntax.Kind() == SyntaxKind.SimpleMemberAccessExpression
-            && memberAccessExpressionSyntax.Expression is IdentifierNameSyntax or ObjectCreationExpressionSyntax or InvocationExpressionSyntax)
+            && memberAccessExpressionSyntax.Expression
+                is IdentifierNameSyntax
+                    or ObjectCreationExpressionSyntax
+                    or InvocationExpressionSyntax
+        )
         {
             var schedulingMethodName = memberAccessExpressionSyntax.Name.Identifier.ValueText;
 
             if (ScheduleModes.Contains(schedulingMethodName))
             {
                 var containingType = node.AncestorOfKind<TypeDeclarationSyntax>();
-                _jobEntityInvocationCandidates.Add(containingType, new JobEntityCandidate(memberAccessExpressionSyntax));
+                _jobEntityInvocationCandidates.Add(
+                    containingType,
+                    new JobEntityCandidate(memberAccessExpressionSyntax)
+                );
             }
         }
     }
@@ -62,11 +73,15 @@ public partial class JobEntityModule : ISystemModule
                 validCandidates[candidate.Invocation] = knownJobEntityInfo;
                 systemDescription.CandidateNodes.Add(
                     key: candidate.Invocation,
-                    value: new CandidateSyntax(CandidateType.IJobEntity, CandidateFlags.None, candidate.Invocation));
+                    value: new CandidateSyntax(CandidateType.IJobEntity, CandidateFlags.None, candidate.Invocation)
+                );
             }
 
         if (validCandidates.Count > 0)
-            systemDescription.SyntaxWalkers.Add(Module.IJobEntity, new IjeSchedulingSyntaxWalker(ref systemDescription, validCandidates));
+            systemDescription.SyntaxWalkers.Add(
+                Module.IJobEntity,
+                new IjeSchedulingSyntaxWalker(ref systemDescription, validCandidates)
+            );
 
         return validCandidates.Count > 0;
     }

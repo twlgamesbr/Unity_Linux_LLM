@@ -14,11 +14,13 @@ namespace Unity.Netcode
 
         /// <inheritdoc cref="Exception(string)"/>
         /// <param name="message">The message that describes the invalid parent operation</param>
-        public InvalidParentException(string message) : base(message) { }
+        public InvalidParentException(string message)
+            : base(message) { }
 
         /// <inheritdoc cref="Exception(string, Exception)"/>
         /// <param name="message">The message that describes the invalid parent operation</param>
         /// <param name="innerException">The exception that caused the current exception</param>
-        public InvalidParentException(string message, Exception innerException) : base(message, innerException) { }
+        public InvalidParentException(string message, Exception innerException)
+            : base(message, innerException) { }
     }
 }

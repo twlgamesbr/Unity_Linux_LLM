@@ -32,14 +32,18 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
             public string Name { get; set; }
             public LogLevel Level { get; set; }
-            public List<LogStep> Children { get
+            public List<LogStep> Children
+            {
+                get
                 {
                     if (m_Children == null)
                         m_Children = new List<LogStep>();
                     return m_Children;
                 }
             }
-            public List<LogEntry> Entries { get
+            public List<LogEntry> Entries
+            {
+                get
                 {
                     if (m_Entries == null)
                         m_Entries = new List<LogEntry>();
@@ -51,8 +55,14 @@ namespace UnityEditor.Build.Pipeline.Utilities
             public double StartTime { get; set; }
             internal bool isThreaded;
 
-            public bool HasChildren { get { return Children != null && Children.Count > 0; } }
-            public bool HasEntries { get { return Entries != null && Entries.Count > 0; } }
+            public bool HasChildren
+            {
+                get { return Children != null && Children.Count > 0; }
+            }
+            public bool HasEntries
+            {
+                get { return Entries != null && Entries.Count > 0; }
+            }
 
             internal void Complete(double time)
             {
@@ -61,10 +71,13 @@ namespace UnityEditor.Build.Pipeline.Utilities
         }
 
         LogStep m_Root;
+
         [NonSerialized]
         Stack<LogStep> m_Stack;
+
         [NonSerialized]
         ThreadLocal<BuildLog> m_ThreadedLogs;
+
         [NonSerialized]
         Stopwatch m_WallTimer;
 
@@ -193,13 +206,25 @@ namespace UnityEditor.Build.Pipeline.Utilities
             }
         }
 
-        internal LogStep Root { get { return m_Root; } }
+        internal LogStep Root
+        {
+            get { return m_Root; }
+        }
 
         /// <inheritdoc />
         public void AddEntry(LogLevel level, string msg)
         {
             BuildLog log = GetThreadSafeLog();
-            log.m_Stack.Peek().Entries.Add(new LogEntry() { Level = level, Message = msg, Time = log.GetWallTime(), ThreadId = Thread.CurrentThread.ManagedThreadId });
+            log.m_Stack.Peek()
+                .Entries.Add(
+                    new LogEntry()
+                    {
+                        Level = level,
+                        Message = msg,
+                        Time = log.GetWallTime(),
+                        ThreadId = Thread.CurrentThread.ManagedThreadId,
+                    }
+                );
         }
 
         /// <summary>
@@ -252,7 +277,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 AppendLineIndented(builder, indentCount, $"[{node.Name}] {node.DurationMS * 1000}us");
             foreach (var msg in node.Entries)
             {
-                string line = (msg.Level == LogLevel.Warning || msg.Level == LogLevel.Error) ? $"{msg.Level}: {msg.Message}" : msg.Message;
+                string line =
+                    (msg.Level == LogLevel.Warning || msg.Level == LogLevel.Error)
+                        ? $"{msg.Level}: {msg.Message}"
+                        : msg.Message;
                 AppendLineIndented(builder, indentCount + 1, line);
             }
             foreach (var child in node.Children)
@@ -285,7 +313,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 builder.Append(", \"args\": {");
                 for (int i = 0; i < node.Entries.Count; i++)
                 {
-                    string line = (node.Entries[i].Level == LogLevel.Warning || node.Entries[i].Level == LogLevel.Error) ? $"{node.Entries[i].Level}: {node.Entries[i].Message}" : node.Entries[i].Message;
+                    string line =
+                        (node.Entries[i].Level == LogLevel.Warning || node.Entries[i].Level == LogLevel.Error)
+                            ? $"{node.Entries[i].Level}: {node.Entries[i].Message}"
+                            : node.Entries[i].Message;
                     builder.Append($"\"{i}\":\"{CleanJSONText(line)}\"");
                     if (i < (node.Entries.Count - 1))
                         builder.Append(", ");
@@ -295,16 +326,20 @@ namespace UnityEditor.Build.Pipeline.Utilities
             }
 
             if (includeSelf)
-                yield return "{" + $"\"name\": \"{CleanJSONText(node.Name)}\", \"ph\": \"X\", \"dur\": {node.DurationMS * 1000}, \"tid\": {node.ThreadId}, \"ts\": {us}, \"pid\": 1" + argText + "}";
+                yield return "{"
+                    + $"\"name\": \"{CleanJSONText(node.Name)}\", \"ph\": \"X\", \"dur\": {node.DurationMS * 1000}, \"tid\": {node.ThreadId}, \"ts\": {us}, \"pid\": 1"
+                    + argText
+                    + "}";
 
             foreach (var child in node.Children)
-                foreach (var r in IterateTEPLines(true, child))
-                    yield return r;
+            foreach (var r in IterateTEPLines(true, child))
+                yield return r;
         }
 
         class CultureScope : IDisposable
         {
             CultureInfo m_Prev;
+
             public CultureScope()
             {
                 m_Prev = Thread.CurrentThread.CurrentCulture;

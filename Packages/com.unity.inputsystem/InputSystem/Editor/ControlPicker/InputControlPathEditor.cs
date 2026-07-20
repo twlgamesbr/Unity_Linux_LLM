@@ -26,7 +26,12 @@ namespace UnityEngine.InputSystem.Editor
         /// <param name="onModified">Delegate that is called when the path has been modified.</param>
         /// <param name="label">Optional label to display instead of display name of <paramref name="pathProperty"/>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="pathProperty"/> is <c>null</c>.</exception>
-        public InputControlPathEditor(SerializedProperty pathProperty, InputControlPickerState pickerState, Action onModified, GUIContent label = null)
+        public InputControlPathEditor(
+            SerializedProperty pathProperty,
+            InputControlPickerState pickerState,
+            Action onModified,
+            GUIContent label = null
+        )
         {
             if (pathProperty == null)
                 throw new ArgumentNullException(nameof(pathProperty));
@@ -89,7 +94,12 @@ namespace UnityEngine.InputSystem.Editor
             EditorGUILayout.EndHorizontal();
         }
 
-        public void OnGUI(Rect rect, GUIContent label = null, SerializedProperty property = null, Action modifiedCallback = null)
+        public void OnGUI(
+            Rect rect,
+            GUIContent label = null,
+            SerializedProperty property = null,
+            Action modifiedCallback = null
+        )
         {
             var pathLabel = label ?? m_PathLabel;
             var serializedProperty = property ?? pathProperty;
@@ -155,8 +165,12 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             // Button to toggle between text edit mode.
-            m_PickerState.manualPathEditMode = GUI.Toggle(editButtonRect, m_PickerState.manualPathEditMode, "T",
-                EditorStyles.miniButton);
+            m_PickerState.manualPathEditMode = GUI.Toggle(
+                editButtonRect,
+                m_PickerState.manualPathEditMode,
+                "T",
+                EditorStyles.miniButton
+            );
         }
 
         private void ShowDropdown(Rect rect, SerializedProperty serializedProperty, Action modifiedCallback)
@@ -173,7 +187,8 @@ namespace UnityEngine.InputSystem.Editor
                         serializedProperty.stringValue = path;
                         m_PickerState.manualPathEditMode = false;
                         modifiedCallback();
-                    });
+                    }
+                );
             }
 
             m_PickerDropdown.SetPickedCallback(path =>
@@ -220,4 +235,4 @@ namespace UnityEngine.InputSystem.Editor
         internal static bool IsShowingDropdown { get; private set; }
     }
 }
- #endif // UNITY_EDITOR
+#endif // UNITY_EDITOR

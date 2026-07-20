@@ -18,8 +18,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// The value is clamped to the range [8, 512].
         /// </remarks>
         [field: SerializeField]
-        [field: Tooltip("The number of samples that are maintained for the purpose of graphing. " +
-                        "The value is clamped to the range [8, 512].")]
+        [field: Tooltip(
+            "The number of samples that are maintained for the purpose of graphing. "
+                + "The value is clamped to the range [8, 512]."
+        )]
         [field: Range(ConfigurationLimits.k_GraphSampleMin, ConfigurationLimits.k_GraphSampleMax)]
         int m_SampleCount = ConfigurationLimits.k_GraphSampleDefault;
 
@@ -32,10 +34,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         public int SampleCount
         {
             get => m_SampleCount;
-            set => m_SampleCount = Mathf.Clamp(
-                value,
-                ConfigurationLimits.k_GraphSampleMin,
-                ConfigurationLimits.k_GraphSampleMax);
+            set =>
+                m_SampleCount = Mathf.Clamp(
+                    value,
+                    ConfigurationLimits.k_GraphSampleMin,
+                    ConfigurationLimits.k_GraphSampleMax
+                );
         }
 
         /// <summary>
@@ -49,11 +53,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// </remarks>
         [field: SerializeField]
         [Tooltip(
-            "The sample rate of the graph. " +
-            "If the sample rate is Per Second " +
-            "then each point in the graph corresponds to data collected over a full second, whereas " +
-            "if the sample rate is Per Frame " +
-            "then each point in the graph corresponds to data collected within a single frame.")]
+            "The sample rate of the graph. "
+                + "If the sample rate is Per Second "
+                + "then each point in the graph corresponds to data collected over a full second, whereas "
+                + "if the sample rate is Per Frame "
+                + "then each point in the graph corresponds to data collected within a single frame."
+        )]
         public SampleRate SampleRate { get; set; } = SampleRate.PerSecond;
 
         /// <summary>
@@ -79,7 +84,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
 
         internal int ComputeHashCode()
         {
-            var hash = HashCode.Combine(SampleCount, (int)SampleRate, (int)XAxisType, LineGraphConfiguration.ComputeHashCode());
+            var hash = HashCode.Combine(
+                SampleCount,
+                (int)SampleRate,
+                (int)XAxisType,
+                LineGraphConfiguration.ComputeHashCode()
+            );
             if (VariableColors != null)
             {
                 foreach (var color in VariableColors)

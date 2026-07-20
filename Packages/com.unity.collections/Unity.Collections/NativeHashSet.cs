@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using Unity.Burst;
-using System.Runtime.CompilerServices;
 
 namespace Unity.Collections
 {
@@ -21,9 +21,7 @@ namespace Unity.Collections
     [NativeContainer]
     [DebuggerTypeProxy(typeof(NativeHashSetDebuggerTypeProxy<>))]
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-    public unsafe struct NativeHashSet<T>
-        : INativeDisposable
-        , IEnumerable<T> // Used by collection initializers.
+    public unsafe struct NativeHashSet<T> : INativeDisposable, IEnumerable<T> // Used by collection initializers.
         where T : unmanaged, IEquatable<T>
     {
         [NativeDisableUnsafePtrRestriction]
@@ -100,7 +98,6 @@ namespace Unity.Collections
                 CheckRead();
                 return m_Data->Capacity;
             }
-
             set
             {
                 CheckWrite();
@@ -166,10 +163,20 @@ namespace Unity.Collections
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            var jobHandle = new NativeHashMapDisposeJob { Data = new NativeHashMapDispose { m_HashMapData = (UnsafeHashMap<int, int>*)m_Data, m_Safety = m_Safety } }.Schedule(inputDeps);
+            var jobHandle = new NativeHashMapDisposeJob
+            {
+                Data = new NativeHashMapDispose
+                {
+                    m_HashMapData = (UnsafeHashMap<int, int>*)m_Data,
+                    m_Safety = m_Safety,
+                },
+            }.Schedule(inputDeps);
             AtomicSafetyHandle.Release(m_Safety);
 #else
-            var jobHandle = new NativeHashMapDisposeJob { Data = new NativeHashMapDispose { m_HashMapData = (UnsafeHashMap<int, int>*)m_Data } }.Schedule(inputDeps);
+            var jobHandle = new NativeHashMapDisposeJob
+            {
+                Data = new NativeHashMapDispose { m_HashMapData = (UnsafeHashMap<int, int>*)m_Data },
+            }.Schedule(inputDeps);
 #endif
             m_Data = null;
 
@@ -266,13 +273,11 @@ namespace Unity.Collections
             var ash = m_Safety;
             AtomicSafetyHandle.UseSecondaryVersion(ref ash);
 #endif
-            return new Enumerator
-            {
+            return new Enumerator {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 m_Safety = ash,
 #endif
-                m_Enumerator = new HashMapHelper<T>.Enumerator(m_Data),
-            };
+                m_Enumerator = new HashMapHelper<T>.Enumerator(m_Data) };
         }
 
         /// <summary>
@@ -379,8 +384,7 @@ namespace Unity.Collections
         [NativeContainer]
         [NativeContainerIsReadOnly]
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public struct ReadOnly
-            : IEnumerable<T>
+        public struct ReadOnly : IEnumerable<T>
         {
             [NativeDisableUnsafePtrRestriction]
             internal HashMapHelper<T>* m_Data;
@@ -489,13 +493,11 @@ namespace Unity.Collections
                 var ash = m_Safety;
                 AtomicSafetyHandle.UseSecondaryVersion(ref ash);
 #endif
-                return new Enumerator
-                {
+                return new Enumerator {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                     m_Safety = ash,
 #endif
-                    m_Enumerator = new HashMapHelper<T>.Enumerator(m_Data),
-                };
+                    m_Enumerator = new HashMapHelper<T>.Enumerator(m_Data) };
             }
 
             /// <summary>
@@ -547,7 +549,7 @@ namespace Unity.Collections
         }
     }
 
-    sealed internal unsafe class NativeHashSetDebuggerTypeProxy<T>
+    internal sealed unsafe class NativeHashSetDebuggerTypeProxy<T>
         where T : unmanaged, IEquatable<T>
     {
         HashMapHelper<T>* Data;

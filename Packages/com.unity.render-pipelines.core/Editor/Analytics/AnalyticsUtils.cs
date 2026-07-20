@@ -19,7 +19,7 @@ namespace UnityEditor.Rendering
 
         internal static void SendData(IAnalytic analytic)
         {
-             EditorAnalytics.SendAnalytic(analytic);
+            EditorAnalytics.SendAnalytic(analytic);
         }
 
         /// <summary>
@@ -164,7 +164,13 @@ namespace UnityEditor.Rendering
             return diff;
         }
 
-        private static void AddDiff(object current, object defaults, FieldInfo field, Type fieldType, Dictionary<string, string> diff)
+        private static void AddDiff(
+            object current,
+            object defaults,
+            FieldInfo field,
+            Type fieldType,
+            Dictionary<string, string> diff
+        )
         {
             try
             {
@@ -178,7 +184,13 @@ namespace UnityEditor.Rendering
             }
         }
 
-        private static void AddIfDifferent(FieldInfo field, Type fieldType, Dictionary<string, string> diff, object valueCurrent, object valueDefault)
+        private static void AddIfDifferent(
+            FieldInfo field,
+            Type fieldType,
+            Dictionary<string, string> diff,
+            object valueCurrent,
+            object valueDefault
+        )
         {
             if (!AreValuesEqual(fieldType, valueCurrent, valueDefault))
             {
@@ -199,7 +211,8 @@ namespace UnityEditor.Rendering
 
         static bool IsFieldIgnored(Type fieldType)
         {
-            return fieldType.GetCustomAttribute<ObsoleteAttribute>() != null || typeof(ScriptableObject).IsAssignableFrom(fieldType);
+            return fieldType.GetCustomAttribute<ObsoleteAttribute>() != null
+                || typeof(ScriptableObject).IsAssignableFrom(fieldType);
         }
 
         internal static bool AreValuesEqual(Type fieldType, object valueCurrent, object valueDefault)
@@ -306,7 +319,10 @@ namespace UnityEditor.Rendering
         /// <param name="compareAndSimplifyWithDefault">If a comparison against the default value must be done.</param>
         /// <returns>The nested columns in form of {key.nestedKey : value} </returns>
         /// <exception cref="ArgumentNullException">Throws an exception if current parameter is null.</exception>
-        public static string[] ToNestedColumn<T>([DisallowNull] this T current, bool compareAndSimplifyWithDefault = false)
+        public static string[] ToNestedColumn<T>(
+            [DisallowNull] this T current,
+            bool compareAndSimplifyWithDefault = false
+        )
             where T : new()
         {
             if (current == null)
@@ -344,7 +360,6 @@ namespace UnityEditor.Rendering
             return ToStringArray(diff);
         }
 
-
         /// <summary>
         /// Obtains the Serialized fields and values in form of nested columns for BigQuery
         /// https://cloud.google.com/bigquery/docs/nested-repeated
@@ -355,15 +370,21 @@ namespace UnityEditor.Rendering
         /// <param name="compareAndSimplifyWithDefault">If a comparison against the default value must be done.</param>
         /// <returns>The nested columns in form of {key.nestedKey : value} </returns>
         /// <exception cref="ArgumentNullException">Throws an exception if the current parameter is null.</exception>
-        public static string[] ToNestedColumnWithDefault<T>([DisallowNull] this T current, [DisallowNull] T defaultObject, bool compareAndSimplifyWithDefault = false)
+        public static string[] ToNestedColumnWithDefault<T>(
+            [DisallowNull] this T current,
+            [DisallowNull] T defaultObject,
+            bool compareAndSimplifyWithDefault = false
+        )
         {
             if (current == null)
                 throw new ArgumentNullException(nameof(current));
 
             var type = current.GetType();
 
-            Dictionary<string, string> diff = (compareAndSimplifyWithDefault) ?
-                GetDiffAsDictionary(type, current, defaultObject) : DumpValues(type, current);
+            Dictionary<string, string> diff =
+                (compareAndSimplifyWithDefault)
+                    ? GetDiffAsDictionary(type, current, defaultObject)
+                    : DumpValues(type, current);
 
             return ToStringArray(diff);
         }

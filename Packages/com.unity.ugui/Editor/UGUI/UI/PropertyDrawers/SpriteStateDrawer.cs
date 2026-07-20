@@ -1,6 +1,6 @@
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace UnityEditor.UI
@@ -51,7 +51,7 @@ namespace UnityEditor.UI
                 property.FindPropertyRelative(kHighlightedSprite),
                 property.FindPropertyRelative(kPressedSprite),
                 property.FindPropertyRelative(kSelectedSprite),
-                property.FindPropertyRelative(kDisabledSprite)
+                property.FindPropertyRelative(kDisabledSprite),
             };
 
             foreach (var prop in properties)

@@ -14,10 +14,7 @@ namespace Unity.Multiplayer.Tools.NetVis
     /// </remarks>
     class JsonColorConverter : JsonConverter<Color>
     {
-        public override void WriteJson(
-            JsonWriter writer,
-            Color value,
-            JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Color value, JsonSerializer serializer)
         {
             writer.WriteStartArray();
             writer.WriteValue(value.r);
@@ -32,7 +29,8 @@ namespace Unity.Multiplayer.Tools.NetVis
             Type objectType,
             Color existingValue,
             bool hasExistingValue,
-            JsonSerializer serializer)
+            JsonSerializer serializer
+        )
         {
             if (reader.TokenType != JsonToken.StartArray)
             {
@@ -52,9 +50,7 @@ namespace Unity.Multiplayer.Tools.NetVis
 
         static float ReadFloat(JsonReader reader)
         {
-            var value = reader.TokenType == JsonToken.Float
-                ? Convert.ToSingle(reader.Value)
-                : default;
+            var value = reader.TokenType == JsonToken.Float ? Convert.ToSingle(reader.Value) : default;
             reader.Read();
             return value;
         }

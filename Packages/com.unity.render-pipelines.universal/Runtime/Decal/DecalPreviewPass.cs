@@ -35,7 +35,13 @@ namespace UnityEngine.Rendering.Universal
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Decal Preview Pass", out var passData, m_ProfilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(
+                    "Decal Preview Pass",
+                    out var passData,
+                    m_ProfilingSampler
+                )
+            )
             {
                 UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
                 UniversalRenderingData renderingData = frameData.Get<UniversalRenderingData>();
@@ -48,15 +54,23 @@ namespace UnityEngine.Rendering.Universal
                 builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.Read);
 
                 SortingCriteria sortingCriteria = cameraData.defaultOpaqueSortFlags;
-                DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(m_ShaderTagIdList, renderingData, cameraData, lightData, sortingCriteria);
+                DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(
+                    m_ShaderTagIdList,
+                    renderingData,
+                    cameraData,
+                    lightData,
+                    sortingCriteria
+                );
                 var param = new RendererListParams(renderingData.cullResults, drawingSettings, m_FilteringSettings);
                 passData.rendererList = renderGraph.CreateRendererList(param);
                 builder.UseRendererList(passData.rendererList);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext rgContext) =>
-                {
-                    ExecutePass(rgContext.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext rgContext) =>
+                    {
+                        ExecutePass(rgContext.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
     }

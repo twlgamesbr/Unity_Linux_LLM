@@ -10,9 +10,18 @@ namespace UnityEditor.Rendering.Universal
     {
         private static class Styles
         {
-            public static readonly GUIContent shadowsLabel = EditorGUIUtility.TrTextContent("Shadows", "Use this to control and apply a hue to the shadows.");
-            public static readonly GUIContent midtonesLabel = EditorGUIUtility.TrTextContent("Midtones", "Use this to control and apply a hue to the shadows.");
-            public static readonly GUIContent highlightsLabel = EditorGUIUtility.TrTextContent("Highlights", "Use this to control and apply a hue to the shadows.");
+            public static readonly GUIContent shadowsLabel = EditorGUIUtility.TrTextContent(
+                "Shadows",
+                "Use this to control and apply a hue to the shadows."
+            );
+            public static readonly GUIContent midtonesLabel = EditorGUIUtility.TrTextContent(
+                "Midtones",
+                "Use this to control and apply a hue to the shadows."
+            );
+            public static readonly GUIContent highlightsLabel = EditorGUIUtility.TrTextContent(
+                "Highlights",
+                "Use this to control and apply a hue to the shadows."
+            );
         }
 
         SerializedDataParameter m_Shadows;
@@ -53,11 +62,26 @@ namespace UnityEditor.Rendering.Universal
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                m_TrackballUIDrawer.OnGUI(m_Shadows.value, enableOverrides ? m_Shadows.overrideState : null, Styles.shadowsLabel, GetWheelValue);
+                m_TrackballUIDrawer.OnGUI(
+                    m_Shadows.value,
+                    enableOverrides ? m_Shadows.overrideState : null,
+                    Styles.shadowsLabel,
+                    GetWheelValue
+                );
                 GUILayout.Space(4f);
-                m_TrackballUIDrawer.OnGUI(m_Midtones.value, enableOverrides ? m_Midtones.overrideState : null, Styles.midtonesLabel, GetWheelValue);
+                m_TrackballUIDrawer.OnGUI(
+                    m_Midtones.value,
+                    enableOverrides ? m_Midtones.overrideState : null,
+                    Styles.midtonesLabel,
+                    GetWheelValue
+                );
                 GUILayout.Space(4f);
-                m_TrackballUIDrawer.OnGUI(m_Highlights.value, enableOverrides ? m_Highlights.overrideState : null, Styles.highlightsLabel, GetWheelValue);
+                m_TrackballUIDrawer.OnGUI(
+                    m_Highlights.value,
+                    enableOverrides ? m_Highlights.overrideState : null,
+                    Styles.highlightsLabel,
+                    GetWheelValue
+                );
             }
             EditorGUILayout.Space();
 
@@ -68,10 +92,18 @@ namespace UnityEditor.Rendering.Universal
             if (Event.current.type == EventType.Repaint)
             {
                 float alpha = GUI.enabled ? 1f : 0.4f;
-                var limits = new Vector4(m_ShadowsStart.value.floatValue, m_ShadowsEnd.value.floatValue, m_HighlightsStart.value.floatValue, m_HighlightsEnd.value.floatValue);
+                var limits = new Vector4(
+                    m_ShadowsStart.value.floatValue,
+                    m_ShadowsEnd.value.floatValue,
+                    m_HighlightsStart.value.floatValue,
+                    m_HighlightsEnd.value.floatValue
+                );
 
                 s_Material.SetVector("_ShaHiLimits", limits);
-                s_Material.SetVector("_Variants", new Vector4(alpha, Mathf.Max(m_HighlightsEnd.value.floatValue, 1f), 0f, 0f));
+                s_Material.SetVector(
+                    "_Variants",
+                    new Vector4(alpha, Mathf.Max(m_HighlightsEnd.value.floatValue, 1f), 0f, 0f)
+                );
 
                 CheckCurveRT((int)m_CurveRect.width, (int)m_CurveRect.height);
 
@@ -90,14 +122,25 @@ namespace UnityEditor.Rendering.Universal
             m_ShadowsEnd.value.floatValue = Mathf.Max(m_ShadowsStart.value.floatValue, m_ShadowsEnd.value.floatValue);
 
             PropertyField(m_HighlightsStart, EditorGUIUtility.TrTextContent("Start"));
-            m_HighlightsStart.value.floatValue = Mathf.Min(m_HighlightsStart.value.floatValue, m_HighlightsEnd.value.floatValue);
+            m_HighlightsStart.value.floatValue = Mathf.Min(
+                m_HighlightsStart.value.floatValue,
+                m_HighlightsEnd.value.floatValue
+            );
             PropertyField(m_HighlightsEnd, EditorGUIUtility.TrTextContent("End"));
-            m_HighlightsEnd.value.floatValue = Mathf.Max(m_HighlightsStart.value.floatValue, m_HighlightsEnd.value.floatValue);
+            m_HighlightsEnd.value.floatValue = Mathf.Max(
+                m_HighlightsStart.value.floatValue,
+                m_HighlightsEnd.value.floatValue
+            );
         }
 
         void CheckCurveRT(int width, int height)
         {
-            if (m_CurveTex == null || !m_CurveTex.IsCreated() || m_CurveTex.width != width || m_CurveTex.height != height)
+            if (
+                m_CurveTex == null
+                || !m_CurveTex.IsCreated()
+                || m_CurveTex.width != width
+                || m_CurveTex.height != height
+            )
             {
                 CoreUtils.Destroy(m_CurveTex);
                 m_CurveTex = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32);
@@ -108,11 +151,7 @@ namespace UnityEditor.Rendering.Universal
         static Vector3 GetWheelValue(Vector4 v)
         {
             float w = v.w * (Mathf.Sign(v.w) < 0f ? 1f : 4f);
-            return new Vector3(
-                Mathf.Max(v.x + w, 0f),
-                Mathf.Max(v.y + w, 0f),
-                Mathf.Max(v.z + w, 0f)
-            );
+            return new Vector3(Mathf.Max(v.x + w, 0f), Mathf.Max(v.y + w, 0f), Mathf.Max(v.z + w, 0f));
         }
 
         bool CheckMaterialAndShader()

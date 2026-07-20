@@ -24,13 +24,17 @@ namespace Unity.Networking.Transport.Relay
             if (length > k_Length)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"Provided byte array length is invalid, must be less or equal to {k_Length} but got {length}.");
+                throw new ArgumentException(
+                    $"Provided byte array length is invalid, must be less or equal to {k_Length} but got {length}."
+                );
 #else
-                Debug.LogError($"Provided byte array length is invalid, must be less or equal to {k_Length} but got {length}.");
+                Debug.LogError(
+                    $"Provided byte array length is invalid, must be less or equal to {k_Length} but got {length}."
+                );
                 return default;
 #endif
             }
-            
+
             var connectionData = new RelayConnectionData();
             UnsafeUtility.MemCpy(connectionData.Value, dataPtr, length);
             return connectionData;
@@ -41,7 +45,7 @@ namespace Unity.Networking.Transport.Relay
         /// <returns>New connection data.</returns>
         public static RelayConnectionData FromByteArray(byte[] data)
         {
-            fixed(byte* ptr = data)
+            fixed (byte* ptr = data)
             {
                 return RelayConnectionData.FromBytePointer(ptr, data.Length);
             }

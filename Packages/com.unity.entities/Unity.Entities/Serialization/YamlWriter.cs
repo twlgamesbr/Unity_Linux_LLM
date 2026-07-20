@@ -261,7 +261,8 @@ namespace Unity.Entities.Serialization
 
         public class Collection : Scope
         {
-            public Collection(YamlWriter owner, string collectionName) : base(owner, true)
+            public Collection(YamlWriter owner, string collectionName)
+                : base(owner, true)
             {
                 m_Owner.WriteLine($"{collectionName}:");
                 m_Owner.IncrementIndent();

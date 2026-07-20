@@ -39,8 +39,9 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
                 NeedsResetToImmediateValue = true;
             }
 
-            m_DecayConstant =
-                ContinuousExponentialMovingAverage.GetDecayConstantForHalfLife(settings.SmoothingHalfLife);
+            m_DecayConstant = ContinuousExponentialMovingAverage.GetDecayConstantForHalfLife(
+                settings.SmoothingHalfLife
+            );
         }
 
         public float this[ObjectId objectId] => m_SmoothedBandwidth.TryGetValue(objectId, out var value) ? value : 0f;
@@ -98,6 +99,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
 
         HashSet<ObjectId> m_ActiveObjectIds;
         List<ObjectId> m_UnusedObjectIds;
+
         void ClearUnusedBandwidthEntries(IGetObjectIds getObjectIds)
         {
             m_ActiveObjectIds ??= new();

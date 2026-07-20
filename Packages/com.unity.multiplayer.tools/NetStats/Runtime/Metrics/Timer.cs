@@ -7,9 +7,7 @@ namespace Unity.Multiplayer.Tools.NetStats
     class Timer : Metric<TimeSpan>
     {
         public Timer(MetricId metricId, TimeSpan defaultValue = default)
-            : base(metricId, defaultValue)
-        {
-        }
+            : base(metricId, defaultValue) { }
 
         public void Set(TimeSpan value)
         {

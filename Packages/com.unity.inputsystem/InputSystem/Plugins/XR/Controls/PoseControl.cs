@@ -43,7 +43,14 @@ namespace UnityEngine.InputSystem.XR
         /// <param name="rotation">Value to use for <see cref="rotation"/></param>
         /// <param name="velocity">Value to use for <see cref="velocity"/></param>
         /// <param name="angularVelocity">Value to use for <see cref="angularVelocity"/></param>
-        public PoseState(bool isTracked, TrackingState trackingState, Vector3 position, Quaternion rotation, Vector3 velocity, Vector3 angularVelocity)
+        public PoseState(
+            bool isTracked,
+            TrackingState trackingState,
+            Vector3 position,
+            Quaternion rotation,
+            Vector3 velocity,
+            Vector3 angularVelocity
+        )
         {
             this.isTracked = isTracked;
             this.trackingState = trackingState;
@@ -59,7 +66,14 @@ namespace UnityEngine.InputSystem.XR
         /// <remarks>
         /// Fully tracked means that the pose is accurate and not using any simulated or extrapolated positions, and the system tracking this pose is able to confidently track this object.
         /// </remarks>
-        [FieldOffset(0), InputControl(displayName = "Is Tracked", layout = "Button", sizeInBits = 8 /* needed to ensure optimization kicks-in */)]
+        [
+            FieldOffset(0),
+            InputControl(
+                displayName = "Is Tracked",
+                layout = "Button",
+                sizeInBits = 8 /* needed to ensure optimization kicks-in */
+            )
+        ]
         public bool isTracked;
 
         /// <summary>
@@ -249,19 +263,19 @@ namespace UnityEngine.InputSystem.XR
         protected override FourCC CalculateOptimizedControlDataType()
         {
             if (
-                m_StateBlock.sizeInBits == PoseState.kSizeInBytes * 8 &&
-                m_StateBlock.bitOffset == 0 &&
-                isTracked.optimizedControlDataType == InputStateBlock.kFormatByte &&
-                trackingState.optimizedControlDataType == InputStateBlock.kFormatInt &&
-                position.optimizedControlDataType == InputStateBlock.kFormatVector3 &&
-                rotation.optimizedControlDataType == InputStateBlock.kFormatQuaternion &&
-                velocity.optimizedControlDataType == InputStateBlock.kFormatVector3 &&
-                angularVelocity.optimizedControlDataType == InputStateBlock.kFormatVector3 &&
-                trackingState.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 4 &&
-                position.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 8 &&
-                rotation.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 20 &&
-                velocity.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 36 &&
-                angularVelocity.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 48
+                m_StateBlock.sizeInBits == PoseState.kSizeInBytes * 8
+                && m_StateBlock.bitOffset == 0
+                && isTracked.optimizedControlDataType == InputStateBlock.kFormatByte
+                && trackingState.optimizedControlDataType == InputStateBlock.kFormatInt
+                && position.optimizedControlDataType == InputStateBlock.kFormatVector3
+                && rotation.optimizedControlDataType == InputStateBlock.kFormatQuaternion
+                && velocity.optimizedControlDataType == InputStateBlock.kFormatVector3
+                && angularVelocity.optimizedControlDataType == InputStateBlock.kFormatVector3
+                && trackingState.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 4
+                && position.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 8
+                && rotation.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 20
+                && velocity.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 36
+                && angularVelocity.m_StateBlock.byteOffset == isTracked.m_StateBlock.byteOffset + 48
             )
                 return InputStateBlock.kFormatPose;
 

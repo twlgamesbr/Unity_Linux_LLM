@@ -1,10 +1,10 @@
 using System;
 using System.Diagnostics;
-using Unity.Collections.LowLevel.Unsafe;
+using System.Runtime.CompilerServices;
 using Unity.Burst;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using UnityEngine.Assertions;
-using System.Runtime.CompilerServices;
 
 namespace Unity.Collections
 {
@@ -68,11 +68,20 @@ namespace Unity.Collections
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>The handle of the new job.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public static JobHandle ScheduleConstruct<T>(out NativeStream stream, NativeList<T> bufferCount, JobHandle dependency, AllocatorManager.AllocatorHandle allocator)
+        public static JobHandle ScheduleConstruct<T>(
+            out NativeStream stream,
+            NativeList<T> bufferCount,
+            JobHandle dependency,
+            AllocatorManager.AllocatorHandle allocator
+        )
             where T : unmanaged
         {
             AllocateBlock(out stream, allocator);
-            var jobData = new ConstructJobList { List = (UntypedUnsafeList*)bufferCount.GetUnsafeList(), Container = stream };
+            var jobData = new ConstructJobList
+            {
+                List = (UntypedUnsafeList*)bufferCount.GetUnsafeList(),
+                Container = stream,
+            };
             return jobData.Schedule(dependency);
         }
 
@@ -90,7 +99,12 @@ namespace Unity.Collections
         /// <param name="dependency">A job handle. The new job will depend upon this handle.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>The handle of the new job.</returns>
-        public static JobHandle ScheduleConstruct(out NativeStream stream, NativeArray<int> bufferCount, JobHandle dependency, AllocatorManager.AllocatorHandle allocator)
+        public static JobHandle ScheduleConstruct(
+            out NativeStream stream,
+            NativeArray<int> bufferCount,
+            JobHandle dependency,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             AllocateBlock(out stream, allocator);
             var jobData = new ConstructJobArray { ForEachCountArray = bufferCount, Container = stream };
@@ -111,7 +125,12 @@ namespace Unity.Collections
         /// <param name="dependency">A job handle. The new job will depend upon this handle.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>The handle of the new job.</returns>
-        public static JobHandle ScheduleConstruct(out NativeStream stream, NativeReference<int> bufferCount, JobHandle dependency, AllocatorManager.AllocatorHandle allocator)
+        public static JobHandle ScheduleConstruct(
+            out NativeStream stream,
+            NativeReference<int> bufferCount,
+            JobHandle dependency,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             AllocateBlock(out stream, allocator);
             var jobData = new ConstructJob { ForEachCount = bufferCount, Container = stream };
@@ -191,8 +210,9 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of values in the array.</typeparam>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>A new NativeArray copy of this stream's data.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public NativeArray<T> ToNativeArray<T>(AllocatorManager.AllocatorHandle allocator) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public NativeArray<T> ToNativeArray<T>(AllocatorManager.AllocatorHandle allocator)
+            where T : unmanaged
         {
             CheckRead();
             return m_Stream.ToNativeArray<T>(allocator);
@@ -239,10 +259,16 @@ namespace Unity.Collections
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            var jobHandle = new NativeStreamDisposeJob { Data = new NativeStreamDispose { m_StreamData = m_Stream, m_Safety = m_Safety } }.Schedule(inputDeps);
+            var jobHandle = new NativeStreamDisposeJob
+            {
+                Data = new NativeStreamDispose { m_StreamData = m_Stream, m_Safety = m_Safety },
+            }.Schedule(inputDeps);
             AtomicSafetyHandle.Release(m_Safety);
 #else
-            var jobHandle = new NativeStreamDisposeJob { Data = new NativeStreamDispose { m_StreamData = m_Stream } }.Schedule(inputDeps);
+            var jobHandle = new NativeStreamDisposeJob
+            {
+                Data = new NativeStreamDispose { m_StreamData = m_Stream },
+            }.Schedule(inputDeps);
 #endif
             m_Stream = default;
 
@@ -313,7 +339,11 @@ namespace Unity.Collections
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             stream.m_Safety = CollectionHelper.CreateSafetyHandle(allocator);
 
-            CollectionHelper.SetStaticSafetyId(ref stream.m_Safety, ref s_staticSafetyId.Data, "Unity.Collections.NativeStream");
+            CollectionHelper.SetStaticSafetyId(
+                ref stream.m_Safety,
+                ref s_staticSafetyId.Data,
+                "Unity.Collections.NativeStream"
+            );
 #endif
         }
 
@@ -365,7 +395,11 @@ namespace Unity.Collections
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 m_Safety = stream.m_Safety;
-                CollectionHelper.SetStaticSafetyId(ref m_Safety, ref s_staticSafetyId.Data, "Unity.Collections.NativeStream.Writer");
+                CollectionHelper.SetStaticSafetyId(
+                    ref m_Safety,
+                    ref s_staticSafetyId.Data,
+                    "Unity.Collections.NativeStream.Writer"
+                );
                 m_Length = int.MaxValue;
                 m_MinIndex = int.MinValue;
                 m_MaxIndex = int.MinValue;
@@ -441,8 +475,9 @@ namespace Unity.Collections
             /// <param name="value">The value to write.</param>
             /// <exception cref="ArgumentException">Thrown if BeginForEachIndex was not called.</exception>
             /// <exception cref="ArgumentException">Thrown when the NativeStream.Writer instance has been passed by value instead of by reference.</exception>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public void Write<T>(T value) where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public void Write<T>(T value)
+                where T : unmanaged
             {
                 ref T dst = ref Allocate<T>();
                 dst = value;
@@ -458,8 +493,9 @@ namespace Unity.Collections
             /// <returns>A reference to the allocation.</returns>
             /// <exception cref="ArgumentException">Thrown if BeginForEachIndex was not called.</exception>
             /// <exception cref="ArgumentException">Thrown when the NativeStream.Writer instance has been passed by value instead of by reference.</exception>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public ref T Allocate<T>() where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public ref T Allocate<T>()
+                where T : unmanaged
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 if (UnsafeUtility.IsNativeContainerType<T>())
@@ -513,7 +549,9 @@ namespace Unity.Collections
 
                     if (foreachIndex < m_MinIndex || foreachIndex > m_MaxIndex)
                     {
-                        throw new ArgumentException($"Index {foreachIndex} is out of restricted IJobParallelFor range [{m_MinIndex}...{m_MaxIndex}] in NativeStream.");
+                        throw new ArgumentException(
+                            $"Index {foreachIndex} is out of restricted IJobParallelFor range [{m_MinIndex}...{m_MaxIndex}] in NativeStream."
+                        );
                     }
                 }
 #endif
@@ -527,7 +565,9 @@ namespace Unity.Collections
 
                 if (0 != ranges[foreachIndex].ElementCount)
                 {
-                    throw new ArgumentException($"BeginForEachIndex can only be called once for the same index ({foreachIndex}).");
+                    throw new ArgumentException(
+                        $"BeginForEachIndex can only be called once for the same index ({foreachIndex})."
+                    );
                 }
 #endif
             }
@@ -541,7 +581,9 @@ namespace Unity.Collections
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 if (m_Writer.m_ForeachIndex == int.MinValue)
                 {
-                    throw new System.ArgumentException("EndForEachIndex must always be called balanced by a BeginForEachIndex or AppendForEachIndex call");
+                    throw new System.ArgumentException(
+                        "EndForEachIndex must always be called balanced by a BeginForEachIndex or AppendForEachIndex call"
+                    );
                 }
 #endif
             }
@@ -553,10 +595,11 @@ namespace Unity.Collections
                 AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
 #endif
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-                if (m_PassByRefCheck != UnsafeUtility.AddressOf(ref this)
-                ||  m_Writer.m_ForeachIndex == int.MinValue)
+                if (m_PassByRefCheck != UnsafeUtility.AddressOf(ref this) || m_Writer.m_ForeachIndex == int.MinValue)
                 {
-                    throw new ArgumentException("BeginForEachIndex has not been called on NativeStream.Writer, or NativeStream.Writer is not passed by reference.");
+                    throw new ArgumentException(
+                        "BeginForEachIndex has not been called on NativeStream.Writer, or NativeStream.Writer is not passed by reference."
+                    );
                 }
 
                 if (size > UnsafeStreamBlockData.AllocationSize - sizeof(void*))
@@ -596,7 +639,11 @@ namespace Unity.Collections
 #endif
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 m_Safety = stream.m_Safety;
-                CollectionHelper.SetStaticSafetyId(ref m_Safety, ref s_staticSafetyId.Data, "Unity.Collections.NativeStream.Reader");
+                CollectionHelper.SetStaticSafetyId(
+                    ref m_Safety,
+                    ref s_staticSafetyId.Data,
+                    "Unity.Collections.NativeStream.Reader"
+                );
 #endif
             }
 
@@ -703,7 +750,8 @@ namespace Unity.Collections
                     }
                     else
                     {
-                        m_Reader.m_CurrentBlockEnd = (byte*)m_Reader.m_CurrentBlock + UnsafeStreamBlockData.AllocationSize;
+                        m_Reader.m_CurrentBlockEnd =
+                            (byte*)m_Reader.m_CurrentBlock + UnsafeStreamBlockData.AllocationSize;
                     }
 #else
                     m_Reader.m_CurrentBlockEnd = (byte*)m_Reader.m_CurrentBlock + UnsafeStreamBlockData.AllocationSize;
@@ -722,8 +770,9 @@ namespace Unity.Collections
             /// <typeparam name="T">The type of value to read.</typeparam>
             /// <returns>A reference to the next value from the buffer.</returns>
             /// <exception cref="ArgumentException">Thrown if the reader would advance past the end of the buffer.</exception>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public ref T Read<T>() where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public ref T Read<T>()
+                where T : unmanaged
             {
                 int size = sizeof(T);
                 return ref UnsafeUtility.AsRef<T>(ReadUnsafePtr(size));
@@ -735,8 +784,9 @@ namespace Unity.Collections
             /// <typeparam name="T">The type of value to read.</typeparam>
             /// <returns>A reference to the next value from the buffer.</returns>
             /// <exception cref="ArgumentException">Thrown if the read would go past the end of the buffer.</exception>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public ref T Peek<T>() where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public ref T Peek<T>()
+                where T : unmanaged
             {
                 int size = sizeof(T);
                 CheckReadSize(size);
@@ -800,7 +850,10 @@ namespace Unity.Collections
 
                 if ((uint)forEachIndex >= (uint)blockData->RangeCount)
                 {
-                    throw new System.ArgumentOutOfRangeException(nameof(forEachIndex), $"foreachIndex: {forEachIndex} must be between 0 and ForEachCount: {blockData->RangeCount}");
+                    throw new System.ArgumentOutOfRangeException(
+                        nameof(forEachIndex),
+                        $"foreachIndex: {forEachIndex} must be between 0 and ForEachCount: {blockData->RangeCount}"
+                    );
                 }
 #endif
             }
@@ -810,12 +863,16 @@ namespace Unity.Collections
             {
                 if (m_Reader.m_RemainingItemCount != 0)
                 {
-                    throw new System.ArgumentException("Not all elements (Count) have been read. If this is intentional, simply skip calling EndForEachIndex();");
+                    throw new System.ArgumentException(
+                        "Not all elements (Count) have been read. If this is intentional, simply skip calling EndForEachIndex();"
+                    );
                 }
 
                 if (m_Reader.m_CurrentBlockEnd != m_Reader.m_CurrentPtr)
                 {
-                    throw new System.ArgumentException("Not all data (Data Size) has been read. If this is intentional, simply skip calling EndForEachIndex();");
+                    throw new System.ArgumentException(
+                        "Not all data (Data Size) has been read. If this is intentional, simply skip calling EndForEachIndex();"
+                    );
                 }
             }
         }

@@ -9,7 +9,8 @@ namespace Unity.Networking.Transport
     /// the last valid connection version. Disconnected connections return the defaultDataValue.
     /// </summary>
     /// <typeparam name="T">Type of the data to store per connection.</typeparam>
-    internal struct ConnectionDataMap<T> : IDisposable where T : unmanaged
+    internal struct ConnectionDataMap<T> : IDisposable
+        where T : unmanaged
     {
         private struct ConnectionSlot
         {
@@ -65,7 +66,7 @@ namespace Unity.Networking.Transport
                     return;
 #endif
                 }
-                
+
                 slot.Version = connection.Version;
                 slot.Value = value;
             }
@@ -81,11 +82,7 @@ namespace Unity.Networking.Transport
             if (index < 0 || index >= m_List.Length)
                 return default;
 
-            return new ConnectionId
-            {
-                Id = index,
-                Version = m_List[index].Version,
-            };
+            return new ConnectionId { Id = index, Version = m_List[index].Version };
         }
 
         internal T DataAt(int index)
@@ -98,8 +95,7 @@ namespace Unity.Networking.Transport
 
         public override bool Equals(object obj)
         {
-            return obj is ConnectionDataMap<T> map &&
-                this == map;
+            return obj is ConnectionDataMap<T> map && this == map;
         }
 
         public override unsafe int GetHashCode()
@@ -107,12 +103,12 @@ namespace Unity.Networking.Transport
             return ((int)m_List.GetUnsafeList()).GetHashCode();
         }
 
-        public static unsafe bool operator==(ConnectionDataMap<T> a, ConnectionDataMap<T> b)
+        public static unsafe bool operator ==(ConnectionDataMap<T> a, ConnectionDataMap<T> b)
         {
             return a.m_List.GetUnsafeList() == b.m_List.GetUnsafeList();
         }
 
-        public static unsafe bool operator!=(ConnectionDataMap<T> a, ConnectionDataMap<T> b)
+        public static unsafe bool operator !=(ConnectionDataMap<T> a, ConnectionDataMap<T> b)
         {
             return !(a == b);
         }

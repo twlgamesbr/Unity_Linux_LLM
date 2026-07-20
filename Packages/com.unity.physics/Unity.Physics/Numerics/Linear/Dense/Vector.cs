@@ -8,7 +8,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
     /// </summary>
     [BurstCompile]
     [GenerateTestsForBurstCompatibility]
-    internal unsafe readonly partial struct Vector
+    internal readonly unsafe partial struct Vector
     {
         // Index of the element with the greatest value
         public int MaxIndex()

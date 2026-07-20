@@ -101,9 +101,7 @@ namespace UnityEngine.InputSystem.Utilities
         /// <seealso cref="SubscribeTo(InputAction)"/>
         /// <seealso cref="SubscribeTo(InputActionMap)"/>
         /// <seealso cref="SubscribeToAll"/>
-        public InputActionTrace()
-        {
-        }
+        public InputActionTrace() { }
 
         /// <summary>
         /// Constructs a new <c>InputActionTrace</c> that records <paramref name="action"/>.
@@ -300,8 +298,8 @@ namespace UnityEngine.InputSystem.Utilities
 
             // Allocate event.
             var valueSizeInBytes = context.valueSizeInBytes;
-            var eventPtr =
-                (ActionEvent*)m_EventBuffer.AllocateEvent(ActionEvent.GetEventSizeWithValueSize(valueSizeInBytes));
+            var eventPtr = (ActionEvent*)
+                m_EventBuffer.AllocateEvent(ActionEvent.GetEventSizeWithValueSize(valueSizeInBytes));
 
             // Initialize event.
             ref var triggerState = ref context.m_State.actionStates[context.m_ActionIndex];
@@ -592,13 +590,18 @@ namespace UnityEngine.InputSystem.Utilities
 
                     var valueType = composite.valueType;
                     if (valueType == null)
-                        throw new InvalidOperationException($"Cannot read value from Composite '{composite}' which does not have a valueType set");
+                        throw new InvalidOperationException(
+                            $"Cannot read value from Composite '{composite}' which does not have a valueType set"
+                        );
 
                     return Marshal.PtrToStructure(new IntPtr(valuePtr), valueType);
                 }
 
                 // Expecting action to only trigger from part bindings or bindings outside of composites.
-                Debug.Assert(!m_State.bindingStates[bindingIndex].isComposite, "Action should not have triggered directly from a composite binding");
+                Debug.Assert(
+                    !m_State.bindingStates[bindingIndex].isComposite,
+                    "Action should not have triggered directly from a composite binding"
+                );
 
                 // Read value through InputControl.
                 var valueSizeInBytes = m_Ptr->valueSizeInBytes;
@@ -622,7 +625,8 @@ namespace UnityEngine.InputSystem.Utilities
                 if (bufferSize < valueSizeInBytes)
                     throw new ArgumentException(
                         $"Expected buffer of at least {valueSizeInBytes} bytes but got buffer of just {bufferSize} bytes instead",
-                        nameof(bufferSize));
+                        nameof(bufferSize)
+                    );
 
                 UnsafeUtility.MemCpy(buffer, m_Ptr->valueData, valueSizeInBytes);
             }
@@ -641,7 +645,8 @@ namespace UnityEngine.InputSystem.Utilities
                 ////REVIEW: do we want more checking than this?
                 if (UnsafeUtility.SizeOf<TValue>() != valueSizeInBytes)
                     throw new InvalidOperationException(
-                        $"Cannot read a value of type '{typeof(TValue).Name}' with size {UnsafeUtility.SizeOf<TValue>()} from event on action '{action}' with value size {valueSizeInBytes}");
+                        $"Cannot read a value of type '{typeof(TValue).Name}' with size {UnsafeUtility.SizeOf<TValue>()} from event on action '{action}' with value size {valueSizeInBytes}"
+                    );
 
                 var result = new TValue();
                 var resultPtr = UnsafeUtility.AddressOf(ref result);
@@ -705,20 +710,14 @@ namespace UnityEngine.InputSystem.Utilities
                 m_CurrentIndex = 0;
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public ActionEventPtr Current
             {
                 get
                 {
                     var state = m_Trace.m_ActionMapStates[m_CurrentEvent->stateIndex];
-                    return new ActionEventPtr
-                    {
-                        m_State = state,
-                        m_Ptr = m_CurrentEvent,
-                    };
+                    return new ActionEventPtr { m_State = state, m_Ptr = m_CurrentEvent };
                 }
             }
 

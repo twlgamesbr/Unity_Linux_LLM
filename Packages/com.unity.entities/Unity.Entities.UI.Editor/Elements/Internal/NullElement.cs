@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using Unity.Properties;
 using UnityEngine.UIElements;
 
-
 namespace Unity.Entities.UI
 {
     class NullElement<T> : BindableElement, IBinding
     {
-        abstract class Null{}
+        abstract class Null { }
 
         readonly BindingContextElement m_Root;
         readonly PropertyPath m_Path;
@@ -16,7 +15,7 @@ namespace Unity.Entities.UI
 
         public NullElement(BindingContextElement root, IProperty property, PropertyPath path)
         {
-            m_PotentialTypes = new List<Type> {typeof(Null)};
+            m_PotentialTypes = new List<Type> { typeof(Null) };
             binding = this;
             m_Root = root;
             m_Path = path;
@@ -57,7 +56,8 @@ namespace Unity.Entities.UI
                 m_PotentialTypes,
                 typeof(Null),
                 GetTypeName,
-                GetTypeName);
+                GetTypeName
+            );
             typeSelector.RegisterValueChangedCallback(OnCreateItem);
             if (property.IsReadOnly)
             {
@@ -77,9 +77,7 @@ namespace Unity.Entities.UI
             return TypeUtility.GetTypeDisplayName(type);
         }
 
-        void IBinding.PreUpdate()
-        {
-        }
+        void IBinding.PreUpdate() { }
 
         void IBinding.Update()
         {
@@ -95,15 +93,10 @@ namespace Unity.Entities.UI
 
                 ReloadWithInstance(value);
             }
-            catch (Exception )
-            {
-
-            }
+            catch (Exception) { }
         }
 
-        void IBinding.Release()
-        {
-        }
+        void IBinding.Release() { }
 
         void OnCreateItem(ChangeEvent<Type> evt)
         {
@@ -113,9 +106,7 @@ namespace Unity.Entities.UI
                 return;
             }
 
-            var instance = type == typeof(T)
-                ? TypeUtility.Instantiate<T>()
-                : TypeUtility.Instantiate<T>(type);
+            var instance = type == typeof(T) ? TypeUtility.Instantiate<T>() : TypeUtility.Instantiate<T>(type);
 
             ReloadWithInstance(instance);
         }

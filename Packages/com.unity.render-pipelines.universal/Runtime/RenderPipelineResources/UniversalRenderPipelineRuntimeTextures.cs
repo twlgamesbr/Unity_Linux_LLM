@@ -15,7 +15,7 @@ namespace UnityEngine.Rendering.Universal
     /// <code>
     /// using UnityEngine.Rendering;
     /// using UnityEngine.Rendering.Universal;
-    /// 
+    ///
     /// public static class URPUniversalRendererRuntimeTexturesHelper
     /// {
     ///     public static Texture blueNoise
@@ -36,7 +36,9 @@ namespace UnityEngine.Rendering.Universal
     [Categorization.CategoryInfo(Name = "R: Runtime Textures", Order = 1000), HideInInspector]
     public class UniversalRenderPipelineRuntimeTextures : IRenderPipelineResources
     {
-        [SerializeField][HideInInspector] private int m_Version = 1;
+        [SerializeField]
+        [HideInInspector]
+        private int m_Version = 1;
 
         /// <summary>
         /// Current version of the resource container. Used only for upgrading a project.
@@ -95,7 +97,13 @@ namespace UnityEngine.Rendering.Universal
             {
                 if (!m_StencilDitherTex)
                 {
-                    m_StencilDitherTex = new Texture2D(width: 2, height: 2, textureFormat: TextureFormat.Alpha8, mipChain: false, linear: true);
+                    m_StencilDitherTex = new Texture2D(
+                        width: 2,
+                        height: 2,
+                        textureFormat: TextureFormat.Alpha8,
+                        mipChain: false,
+                        linear: true
+                    );
 
                     // keep in sync with StencilDitherMaskSeed.shader
                     m_StencilDitherTex.SetPixel(0, 0, Color.red * 0.25f);
@@ -107,7 +115,5 @@ namespace UnityEngine.Rendering.Universal
                 return m_StencilDitherTex;
             }
         }
-
-
     }
 }

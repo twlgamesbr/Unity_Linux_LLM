@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NPCSystem.Dialogue.Core;
 using NPCSystem.Monitoring;
+using NPCSystem.Network.Bridges;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.Serialization;
-
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Network.Bridges;
 
 namespace NPCSystem.Initialization
 {
@@ -21,7 +20,7 @@ namespace NPCSystem.Initialization
         BackendReadiness,
         NetworkBridge,
         Validation,
-        Spawning
+        Spawning,
     }
 
     /// <summary>
@@ -49,7 +48,7 @@ namespace NPCSystem.Initialization
             NPCSceneInitializationPhase.BackendReadiness,
             NPCSceneInitializationPhase.NetworkBridge,
             NPCSceneInitializationPhase.Validation,
-            NPCSceneInitializationPhase.Spawning
+            NPCSceneInitializationPhase.Spawning,
         };
 
         // ── Public accessors (used by tests) ──
@@ -63,7 +62,9 @@ namespace NPCSystem.Initialization
         public InitializationState State => _context?.State ?? InitializationState.NotStarted;
         public NPCSceneInitializationPhase? CurrentPhase => _context?.CurrentPhase;
         public string CorrelationId => _context?.CorrelationId;
+
         public bool IsPhaseCompleted(NPCSceneInitializationPhase phase) => _context?.IsPhaseCompleted(phase) ?? false;
+
         public string GetStatusSummary() => _context?.GetStatusSummary() ?? "Pipeline not initialized.";
 
         /// <summary>True when Phases 1-2 ran and 3-8 are pending ContinueInitializationAsync().</summary>
@@ -125,8 +126,8 @@ namespace NPCSystem.Initialization
         bool _initialized;
 
         // Phase registry
-        readonly Dictionary<NPCSceneInitializationPhase, ISceneInitializationPhase> _phaseHandlers
-            = new Dictionary<NPCSceneInitializationPhase, ISceneInitializationPhase>();
+        readonly Dictionary<NPCSceneInitializationPhase, ISceneInitializationPhase> _phaseHandlers =
+            new Dictionary<NPCSceneInitializationPhase, ISceneInitializationPhase>();
 
         // ── Unity Lifecycle ──
 
@@ -143,7 +144,8 @@ namespace NPCSystem.Initialization
 
         async void Start()
         {
-            if (!_initializeOnStart) return;
+            if (!_initializeOnStart)
+                return;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             // WebGL: run Phases 1-2 immediately (logger + ref validation),
@@ -168,7 +170,8 @@ namespace NPCSystem.Initialization
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (_context == null || !_context.IsDeferred)
                 throw new InvalidOperationException(
-                    "ContinueInitializationAsync() is only valid on WebGL after Start() deferred the pipeline.");
+                    "ContinueInitializationAsync() is only valid on WebGL after Start() deferred the pipeline."
+                );
 
             _context.IsDeferred = false;
             await RunPhasesAsync(2, OrderedPhases.Length);
@@ -192,10 +195,7 @@ namespace NPCSystem.Initialization
             _context.SetState(InitializationState.Running);
             _pipelineCts = new CancellationTokenSource();
 
-            InitTelemetry.PipelineStarted(
-                _context.CorrelationId,
-                _context.IsDeferred,
-                OrderedPhases.Length);
+            InitTelemetry.PipelineStarted(_context.CorrelationId, _context.IsDeferred, OrderedPhases.Length);
 
             try
             {
@@ -215,7 +215,8 @@ namespace NPCSystem.Initialization
                     _context.CorrelationId,
                     _context.Elapsed,
                     completed: _context.Results.Count,
-                    skipped: 0);
+                    skipped: 0
+                );
             }
             catch (OperationCanceledException)
             {
@@ -226,7 +227,8 @@ namespace NPCSystem.Initialization
                     _context.CorrelationId,
                     _context.CurrentPhase ?? NPCSceneInitializationPhase.Logger,
                     new TimeoutException("Pipeline timed out."),
-                    _context.Elapsed);
+                    _context.Elapsed
+                );
             }
             catch (Exception ex)
             {
@@ -237,7 +239,8 @@ namespace NPCSystem.Initialization
                     _context.CorrelationId,
                     _context.CurrentPhase ?? NPCSceneInitializationPhase.Logger,
                     ex,
-                    _context.Elapsed);
+                    _context.Elapsed
+                );
             }
             finally
             {
@@ -298,7 +301,9 @@ namespace NPCSystem.Initialization
             try
             {
                 // Apply per-phase timeout
-                using var phaseCts = CancellationTokenSource.CreateLinkedTokenSource(_pipelineCts?.Token ?? CancellationToken.None);
+                using var phaseCts = CancellationTokenSource.CreateLinkedTokenSource(
+                    _pipelineCts?.Token ?? CancellationToken.None
+                );
                 var config = _config?.GetConfig(phase);
                 if (config != null && config.TimeoutSeconds > 0)
                     phaseCts.CancelAfter(TimeSpan.FromSeconds(config.TimeoutSeconds));
@@ -314,8 +319,7 @@ namespace NPCSystem.Initialization
             catch (OperationCanceledException) when (_pipelineCts?.IsCancellationRequested == true)
             {
                 sw.Stop();
-                var result = PhaseResult.Failed(phase, sw.Elapsed,
-                    new TimeoutException($"Phase {phase} timed out."));
+                var result = PhaseResult.Failed(phase, sw.Elapsed, new TimeoutException($"Phase {phase} timed out."));
                 _context.RecordPhaseResult(result);
                 throw; // Re-throw to abort pipeline
             }
@@ -368,7 +372,7 @@ namespace NPCSystem.Initialization
                 NetworkBridge = _networkBridge,
                 SmokeValidator = _smokeValidator,
                 Config = _config,
-                IsDeferred = false
+                IsDeferred = false,
             };
         }
 
@@ -378,17 +382,26 @@ namespace NPCSystem.Initialization
         {
             var missing = new List<string>();
 
-            if (_flowLogger == null) missing.Add("_flowLogger (NPCFlowLogger)");
-            if (_networkBootstrap == null) missing.Add("_networkBootstrap (NPCNetworkBootstrap)");
-            if (_dialogueManager == null) missing.Add("_dialogueManager (NPCDialogueManager)");
-            if (_backendReadiness == null) missing.Add("_backendReadiness (NPCBackendReadinessService)");
-            if (_networkBridge == null) missing.Add("_networkBridge (NPCDialogueNetworkBridge)");
-            if (_smokeValidator == null) missing.Add("_smokeValidator (NPCDialogueSmokeValidator)");
+            if (_flowLogger == null)
+                missing.Add("_flowLogger (NPCFlowLogger)");
+            if (_networkBootstrap == null)
+                missing.Add("_networkBootstrap (NPCNetworkBootstrap)");
+            if (_dialogueManager == null)
+                missing.Add("_dialogueManager (NPCDialogueManager)");
+            if (_backendReadiness == null)
+                missing.Add("_backendReadiness (NPCBackendReadinessService)");
+            if (_networkBridge == null)
+                missing.Add("_networkBridge (NPCDialogueNetworkBridge)");
+            if (_smokeValidator == null)
+                missing.Add("_smokeValidator (NPCDialogueSmokeValidator)");
 
-            if (missing.Count == 0) return;
+            if (missing.Count == 0)
+                return;
 
-            string msg = "Scene initialization controller is missing serialized references: "
-                + string.Join(", ", missing) + ". "
+            string msg =
+                "Scene initialization controller is missing serialized references: "
+                + string.Join(", ", missing)
+                + ". "
                 + "Drag the required components into the Inspector slots. "
                 + "FindAnyObjectByType is not used — all dependencies must be wired in the scene.";
 
@@ -399,7 +412,8 @@ namespace NPCSystem.Initialization
                     NPCFlowStatus.Warning,
                     NPCFlowLogLevel.Warning,
                     msg,
-                    source: nameof(NPCSceneInitializationController));
+                    source: nameof(NPCSceneInitializationController)
+                );
             }
             else
             {

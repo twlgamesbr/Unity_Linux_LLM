@@ -22,15 +22,29 @@ namespace UnityEngine.InputSystem.LowLevel
         public static FourCC Type => new FourCC('A', 'C', 'T', 'N');
 
         ////REVIEW: should we decouple this from InputEvent? we get deviceId which we don't really have a use for
-        [FieldOffset(0)] public InputEvent baseEvent;
+        [FieldOffset(0)]
+        public InputEvent baseEvent;
 
-        [FieldOffset(InputEvent.kBaseEventSize + 0)] private ushort m_ControlIndex;
-        [FieldOffset(InputEvent.kBaseEventSize + 2)] private ushort m_BindingIndex;
-        [FieldOffset(InputEvent.kBaseEventSize + 4)] private ushort m_InteractionIndex;
-        [FieldOffset(InputEvent.kBaseEventSize + 6)] private byte m_StateIndex;
-        [FieldOffset(InputEvent.kBaseEventSize + 7)] private byte m_Phase;
-        [FieldOffset(InputEvent.kBaseEventSize + 8)] private double m_StartTime;
-        [FieldOffset(InputEvent.kBaseEventSize + 16)] public fixed byte m_ValueData[1]; // Variable-sized.
+        [FieldOffset(InputEvent.kBaseEventSize + 0)]
+        private ushort m_ControlIndex;
+
+        [FieldOffset(InputEvent.kBaseEventSize + 2)]
+        private ushort m_BindingIndex;
+
+        [FieldOffset(InputEvent.kBaseEventSize + 4)]
+        private ushort m_InteractionIndex;
+
+        [FieldOffset(InputEvent.kBaseEventSize + 6)]
+        private byte m_StateIndex;
+
+        [FieldOffset(InputEvent.kBaseEventSize + 7)]
+        private byte m_Phase;
+
+        [FieldOffset(InputEvent.kBaseEventSize + 8)]
+        private double m_StartTime;
+
+        [FieldOffset(InputEvent.kBaseEventSize + 16)]
+        public fixed byte m_ValueData[1]; // Variable-sized.
 
         public double startTime
         {
@@ -48,7 +62,7 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(byte* data = m_ValueData)
+                fixed (byte* data = m_ValueData)
                 {
                     return data;
                 }
@@ -117,7 +131,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public InputEventPtr ToEventPtr()
         {
-            fixed(ActionEvent* ptr = &this)
+            fixed (ActionEvent* ptr = &this)
             {
                 return new InputEventPtr((InputEvent*)ptr);
             }

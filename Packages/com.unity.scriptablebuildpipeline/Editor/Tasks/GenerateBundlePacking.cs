@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Injector;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEditor.Build.Pipeline.Utilities;
 using UnityEditor.Build.Utilities;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline.Tasks
 {
@@ -16,7 +16,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class GenerateBundlePacking : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -38,7 +41,9 @@ namespace UnityEditor.Build.Pipeline.Tasks
         static bool ValidAssetBundle(List<GUID> assets, HashSet<GUID> customAssets)
         {
             // Custom Valid Asset Bundle function that tests if every asset is known by the asset database, is an asset (not a scene), or is a user driven custom asset
-            return assets.All(x => ValidationMethods.ValidAsset(x) == ValidationMethods.Status.Asset || customAssets.Contains(x));
+            return assets.All(x =>
+                ValidationMethods.ValidAsset(x) == ValidationMethods.Status.Asset || customAssets.Contains(x)
+            );
         }
 
         /// <inheritdoc />
@@ -77,12 +82,20 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return ReturnCode.Success;
         }
 
-        void PackAssetBundle(string bundleName, List<GUID> includedAssets, Dictionary<GUID, List<GUID>> assetToReferences)
+        void PackAssetBundle(
+            string bundleName,
+            List<GUID> includedAssets,
+            Dictionary<GUID, List<GUID>> assetToReferences
+        )
         {
-            var internalName = string.Format(CommonStrings.AssetBundleNameFormat, m_PackingMethod.GenerateInternalFileName(bundleName));
+            var internalName = string.Format(
+                CommonStrings.AssetBundleNameFormat,
+                m_PackingMethod.GenerateInternalFileName(bundleName)
+            );
 
             var allObjects = new HashSet<ObjectIdentifier>();
-            Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets = new Dictionary<GUID, HashSet<ObjectIdentifier>>();
+            Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets =
+                new Dictionary<GUID, HashSet<ObjectIdentifier>>();
             foreach (var asset in includedAssets)
             {
                 AssetLoadInfo assetInfo = m_DependencyData.AssetInfo[asset];
@@ -90,7 +103,14 @@ namespace UnityEditor.Build.Pipeline.Tasks
 
                 var references = new List<ObjectIdentifier>();
                 references.AddRange(assetInfo.referencedObjects);
-                assetToReferences[asset] = FilterReferencesForAsset(m_DependencyData, asset, references, null, null, assetObjectIdentifierHashSets);
+                assetToReferences[asset] = FilterReferencesForAsset(
+                    m_DependencyData,
+                    asset,
+                    references,
+                    null,
+                    null,
+                    assetObjectIdentifierHashSets
+                );
 
                 allObjects.UnionWith(references);
                 m_WriteData.AssetToFiles[asset] = new List<string> { internalName };
@@ -100,7 +120,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
             m_WriteData.FileToObjects.Add(internalName, allObjects.ToList());
         }
 
-        void PackSceneBundle(string bundleName, List<GUID> includedScenes, Dictionary<GUID, List<GUID>> assetToReferences)
+        void PackSceneBundle(
+            string bundleName,
+            List<GUID> includedScenes,
+            Dictionary<GUID, List<GUID>> assetToReferences
+        )
         {
             if (includedScenes.IsNullOrEmpty())
                 return;
@@ -109,7 +133,8 @@ namespace UnityEditor.Build.Pipeline.Tasks
             HashSet<ObjectIdentifier> previousSceneObjects = new HashSet<ObjectIdentifier>();
             HashSet<GUID> previousSceneAssets = new HashSet<GUID>();
             List<string> sceneInternalNames = new List<string>();
-            Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets = new Dictionary<GUID, HashSet<ObjectIdentifier>>();
+            Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets =
+                new Dictionary<GUID, HashSet<ObjectIdentifier>>();
             foreach (var scene in includedScenes)
             {
                 var scenePath = AssetDatabase.GUIDToAssetPath(scene.ToString());
@@ -122,7 +147,14 @@ namespace UnityEditor.Build.Pipeline.Tasks
 
                 var references = new List<ObjectIdentifier>();
                 references.AddRange(sceneInfo.referencedObjects);
-                assetToReferences[scene] = FilterReferencesForAsset(m_DependencyData, scene, references, previousSceneObjects, previousSceneAssets, assetObjectIdentifierHashSets);
+                assetToReferences[scene] = FilterReferencesForAsset(
+                    m_DependencyData,
+                    scene,
+                    references,
+                    previousSceneObjects,
+                    previousSceneAssets,
+                    assetObjectIdentifierHashSets
+                );
                 previousSceneObjects.UnionWith(references);
                 previousSceneAssets.UnionWith(assetToReferences[scene]);
 
@@ -137,10 +169,16 @@ namespace UnityEditor.Build.Pipeline.Tasks
             }
         }
 
-        static HashSet<ObjectIdentifier> GetRefObjectIdLookup(AssetLoadInfo referencedAsset, Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets)
+        static HashSet<ObjectIdentifier> GetRefObjectIdLookup(
+            AssetLoadInfo referencedAsset,
+            Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets
+        )
         {
             HashSet<ObjectIdentifier> refObjectIdLookup;
-            if ((assetObjectIdentifierHashSets == null) || (!assetObjectIdentifierHashSets.TryGetValue(referencedAsset.asset, out refObjectIdLookup)))
+            if (
+                (assetObjectIdentifierHashSets == null)
+                || (!assetObjectIdentifierHashSets.TryGetValue(referencedAsset.asset, out refObjectIdLookup))
+            )
             {
                 refObjectIdLookup = new HashSet<ObjectIdentifier>(referencedAsset.referencedObjects);
                 assetObjectIdentifierHashSets?.Add(referencedAsset.asset, refObjectIdLookup);
@@ -148,7 +186,14 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return refObjectIdLookup;
         }
 
-        internal static List<GUID> FilterReferencesForAsset(IDependencyData dependencyData, GUID asset, List<ObjectIdentifier> references, HashSet<ObjectIdentifier> previousSceneObjects = null, HashSet<GUID> previousSceneReferences = null, Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets = null)
+        internal static List<GUID> FilterReferencesForAsset(
+            IDependencyData dependencyData,
+            GUID asset,
+            List<ObjectIdentifier> references,
+            HashSet<ObjectIdentifier> previousSceneObjects = null,
+            HashSet<GUID> previousSceneReferences = null,
+            Dictionary<GUID, HashSet<ObjectIdentifier>> assetObjectIdentifierHashSets = null
+        )
         {
             var referencedAssets = new HashSet<AssetLoadInfo>();
             var referencedAssetsGuids = new List<GUID>(referencedAssets.Count);
@@ -156,7 +201,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
             // Remove Default Resources and Includes for Assets assigned to Bundles
             foreach (ObjectIdentifier reference in references)
             {
-                if (reference.filePath.Equals(CommonStrings.UnityDefaultResourcePath, StringComparison.OrdinalIgnoreCase))
+                if (
+                    reference.filePath.Equals(
+                        CommonStrings.UnityDefaultResourcePath,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
                     continue;
                 if (dependencyData.AssetInfo.TryGetValue(reference.guid, out AssetLoadInfo referenceInfo))
                 {
@@ -190,7 +240,9 @@ namespace UnityEditor.Build.Pipeline.Tasks
                     }
                     if (!exists)
                     {
-                        references.RemoveAll(GetRefObjectIdLookup(referencedAsset, assetObjectIdentifierHashSets).Contains);
+                        references.RemoveAll(
+                            GetRefObjectIdLookup(referencedAsset, assetObjectIdentifierHashSets).Contains
+                        );
                     }
                 }
             }

@@ -9,7 +9,6 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeView = UnityEditor.IMGUI.Controls.TreeView<int>;
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
@@ -69,7 +68,10 @@ namespace UnityEngine.InputSystem.Editor
         /// <summary>
         /// Build an action tree that shows only the bindings for the given action.
         /// </summary>
-        public static TreeViewItem BuildWithJustBindingsFromAction(SerializedProperty actionProperty, SerializedProperty actionMapProperty = null)
+        public static TreeViewItem BuildWithJustBindingsFromAction(
+            SerializedProperty actionProperty,
+            SerializedProperty actionMapProperty = null
+        )
         {
             Debug.Assert(actionProperty != null, "Action property cannot be null");
             var root = new ActionTreeItem(actionMapProperty, actionProperty);
@@ -182,10 +184,12 @@ namespace UnityEngine.InputSystem.Editor
             // When filtering by binding group, we tag bindings that are not in any binding group as "{GLOBAL}".
             // This helps when having a specific control scheme selected, to also see the bindings that are active
             // in that control scheme by virtue of not being associated with *any* specific control scheme.
-            if (item is BindingTreeItem bindingItem &&
-                !(item is CompositeBindingTreeItem) &&
-                string.IsNullOrEmpty(bindingItem.groups) &&
-                m_ItemFilterCriteria.Any(x => x.type == FilterCriterion.Type.ByBindingGroup))
+            if (
+                item is BindingTreeItem bindingItem
+                && !(item is CompositeBindingTreeItem)
+                && string.IsNullOrEmpty(bindingItem.groups)
+                && m_ItemFilterCriteria.Any(x => x.type == FilterCriterion.Type.ByBindingGroup)
+            )
             {
                 item.displayName += " {GLOBAL}";
             }
@@ -284,7 +288,10 @@ namespace UnityEngine.InputSystem.Editor
         {
             var item = FindItemFor(element);
             if (item == null)
-                throw new ArgumentException($"Cannot find item for property path '{element.propertyPath}'", nameof(element));
+                throw new ArgumentException(
+                    $"Cannot find item for property path '{element.propertyPath}'",
+                    nameof(element)
+                );
 
             SelectItem(item, additive);
         }
@@ -451,7 +458,9 @@ namespace UnityEngine.InputSystem.Editor
             DragAndDrop.PrepareStartDrag();
             DragAndDrop.SetGenericData("itemIDs", args.draggedItemIDs.ToArray());
             DragAndDrop.SetGenericData("tree", this);
-            DragAndDrop.StartDrag(string.Join(",", args.draggedItemIDs.Select(id => FindItem(id, rootItem).displayName)));
+            DragAndDrop.StartDrag(
+                string.Join(",", args.draggedItemIDs.Select(id => FindItem(id, rootItem).displayName))
+            );
         }
 
         protected override DragAndDropVisualMode HandleDragAndDrop(DragAndDropArgs args)
@@ -466,8 +475,11 @@ namespace UnityEngine.InputSystem.Editor
             // Reject the drag if the parent item does not accept the drop.
             if (args.parentItem is ActionTreeItemBase parentItem)
             {
-                if (itemIds.Any(id =>
-                    !parentItem.AcceptsDrop((ActionTreeItemBase)sourceTree.FindItem(id, sourceTree.rootItem))))
+                if (
+                    itemIds.Any(id =>
+                        !parentItem.AcceptsDrop((ActionTreeItemBase)sourceTree.FindItem(id, sourceTree.rootItem))
+                    )
+                )
                     return DragAndDropVisualMode.Rejected;
             }
             else
@@ -522,9 +534,14 @@ namespace UnityEngine.InputSystem.Editor
                     // With drag&drop, preserve binding groups.
                     bindingGroupForNewBindings = null;
 
-                    PasteItems(copyBuffer.ToString(),
-                        new[] { new InsertLocation { item = target, childIndex = childIndex } },
-                        assignNewIDs: assignNewIDs);
+                    PasteItems(
+                        copyBuffer.ToString(),
+                        new[]
+                        {
+                            new InsertLocation { item = target, childIndex = childIndex },
+                        },
+                        assignNewIDs: assignNewIDs
+                    );
                 }
                 finally
                 {
@@ -724,7 +741,9 @@ namespace UnityEngine.InputSystem.Editor
             if (!copyBufferString.StartsWith(k_CopyPasteMarker))
                 return;
 
-            var locations = GetSelectedItemsWithChildrenFilteredOut().Select(x => new InsertLocation { item = x }).ToList();
+            var locations = GetSelectedItemsWithChildrenFilteredOut()
+                .Select(x => new InsertLocation { item = x })
+                .ToList();
             if (locations.Count == 0)
                 locations.Add(new InsertLocation { item = rootItem });
 
@@ -738,14 +757,22 @@ namespace UnityEngine.InputSystem.Editor
             public int? childIndex;
         }
 
-        public void PasteItems(string copyBufferString, IEnumerable<InsertLocation> locations, bool assignNewIDs = true, bool selectNewItems = true)
+        public void PasteItems(
+            string copyBufferString,
+            IEnumerable<InsertLocation> locations,
+            bool assignNewIDs = true,
+            bool selectNewItems = true
+        )
         {
             var newItemPropertyPaths = new List<string>();
 
             // Split buffer into transmissions and then into transmission blocks. Each transmission is an item subtree
             // meant to be pasted as a whole and each transmission block is a single chunk of serialized data.
-            foreach (var transmission in copyBufferString.Substring(k_CopyPasteMarker.Length)
-                     .Split(new[] { k_EndOfTransmission }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (
+                var transmission in copyBufferString
+                    .Substring(k_CopyPasteMarker.Length)
+                    .Split(new[] { k_EndOfTransmission }, StringSplitOptions.RemoveEmptyEntries)
+            )
             {
                 foreach (var location in locations)
                     PasteBlocks(transmission, location, assignNewIDs, newItemPropertyPaths);
@@ -768,14 +795,19 @@ namespace UnityEngine.InputSystem.Editor
         private const string k_ActionTag = k_StartOfHeading + "ActionTreeItem" + k_StartOfText;
         private const string k_BindingTag = k_StartOfHeading + "BindingTreeItem" + k_StartOfText;
         private const string k_CompositeBindingTag = k_StartOfHeading + "CompositeBindingTreeItem" + k_StartOfText;
-        private const string k_PartOfCompositeBindingTag = k_StartOfHeading + "PartOfCompositeBindingTreeItem" + k_StartOfText;
+        private const string k_PartOfCompositeBindingTag =
+            k_StartOfHeading + "PartOfCompositeBindingTreeItem" + k_StartOfText;
 
-        private void PasteBlocks(string transmission, InsertLocation location, bool assignNewIDs, List<string> newItemPropertyPaths)
+        private void PasteBlocks(
+            string transmission,
+            InsertLocation location,
+            bool assignNewIDs,
+            List<string> newItemPropertyPaths
+        )
         {
             Debug.Assert(location.item != null, "Should have drop target");
 
-            var blocks = transmission.Split(new[] { k_EndOfTransmissionBlock },
-                StringSplitOptions.RemoveEmptyEntries);
+            var blocks = transmission.Split(new[] { k_EndOfTransmissionBlock }, StringSplitOptions.RemoveEmptyEntries);
             if (blocks.Length < 1)
                 return;
 
@@ -783,11 +815,16 @@ namespace UnityEngine.InputSystem.Editor
             {
                 switch (tagName)
                 {
-                    case k_ActionMapTag: return typeof(ActionMapTreeItem);
-                    case k_ActionTag: return typeof(ActionTreeItem);
-                    case k_BindingTag: return typeof(BindingTreeItem);
-                    case k_CompositeBindingTag: return typeof(CompositeBindingTreeItem);
-                    case k_PartOfCompositeBindingTag: return typeof(PartOfCompositeBindingTreeItem);
+                    case k_ActionMapTag:
+                        return typeof(ActionMapTreeItem);
+                    case k_ActionTag:
+                        return typeof(ActionTreeItem);
+                    case k_BindingTag:
+                        return typeof(BindingTreeItem);
+                    case k_CompositeBindingTag:
+                        return typeof(CompositeBindingTreeItem);
+                    case k_PartOfCompositeBindingTag:
+                        return typeof(PartOfCompositeBindingTreeItem);
                     default:
                         throw new Exception($"Unrecognized copy block tag '{tagName}'");
                 }
@@ -802,7 +839,10 @@ namespace UnityEngine.InputSystem.Editor
             if (location.item is ActionTreeItemBase dropTarget)
             {
                 // Specific case - Composite parts cannot be dropped into Bindings
-                if (tag == k_PartOfCompositeBindingTag && location.item is not(CompositeBindingTreeItem or PartOfCompositeBindingTreeItem))
+                if (
+                    tag == k_PartOfCompositeBindingTag
+                    && location.item is not (CompositeBindingTreeItem or PartOfCompositeBindingTreeItem)
+                )
                     return;
 
                 if (!dropTarget.GetDropLocation(itemType, location.childIndex, ref array, ref arrayIndex))
@@ -853,10 +893,14 @@ namespace UnityEngine.InputSystem.Editor
                 {
                     SplitTagAndData(blocks[i], out var blockTag, out var blockData);
 
-                    PasteBlock(blockTag, blockData, bindingArray,
+                    PasteBlock(
+                        blockTag,
+                        blockData,
+                        bindingArray,
                         tag == k_CompositeBindingTag ? arrayIndex + i : -1,
                         assignNewIDs,
-                        actionForNewBindings);
+                        actionForNewBindings
+                    );
                 }
             }
         }
@@ -865,8 +909,10 @@ namespace UnityEngine.InputSystem.Editor
         {
             var indexOfStartOfTextChar = block.IndexOf(k_StartOfText);
             if (indexOfStartOfTextChar == -1)
-                throw new ArgumentException($"Incorrect copy data format: Expecting '{k_StartOfText}' in '{block}'",
-                    nameof(block));
+                throw new ArgumentException(
+                    $"Incorrect copy data format: Expecting '{k_StartOfText}' in '{block}'",
+                    nameof(block)
+                );
 
             tag = block.Substring(0, indexOfStartOfTextChar + 1);
             data = block.Substring(indexOfStartOfTextChar + 1);
@@ -888,8 +934,14 @@ namespace UnityEngine.InputSystem.Editor
             return elementProperty;
         }
 
-        private SerializedProperty PasteBlock(string tag, string data, SerializedProperty array, int arrayIndex,
-            bool assignNewIDs, string actionForNewBindings = null)
+        private SerializedProperty PasteBlock(
+            string tag,
+            string data,
+            SerializedProperty array,
+            int arrayIndex,
+            bool assignNewIDs,
+            string actionForNewBindings = null
+        )
         {
             // Add an element to the array. Then read the serialized properties stored in the copy data
             // back into the element.
@@ -915,8 +967,7 @@ namespace UnityEngine.InputSystem.Editor
                 // group with it.
                 if (!string.IsNullOrEmpty(bindingGroupForNewBindings) && tag != k_CompositeBindingTag)
                 {
-                    InputActionSerializationHelpers.ChangeBinding(property,
-                        groups: bindingGroupForNewBindings);
+                    InputActionSerializationHelpers.ChangeBinding(property, groups: bindingGroupForNewBindings);
                 }
 
                 onBindingAdded?.Invoke(property);
@@ -929,7 +980,13 @@ namespace UnityEngine.InputSystem.Editor
 
         #region Context Menus
 
-        public void BuildContextMenuFor(Type itemType, GenericMenu menu, bool multiSelect, ActionTreeItem actionItem = null, bool noSelection = false)
+        public void BuildContextMenuFor(
+            Type itemType,
+            GenericMenu menu,
+            bool multiSelect,
+            ActionTreeItem actionItem = null,
+            bool noSelection = false
+        )
         {
             var canRename = false;
             if (itemType == typeof(ActionMapTreeItem))
@@ -959,11 +1016,15 @@ namespace UnityEngine.InputSystem.Editor
             }
             else
             {
-                menu.AddItem(s_CutLabel, false, () =>
-                {
-                    CopySelectedItemsToClipboard();
-                    DeleteDataOfSelectedItems();
-                });
+                menu.AddItem(
+                    s_CutLabel,
+                    false,
+                    () =>
+                    {
+                        CopySelectedItemsToClipboard();
+                        DeleteDataOfSelectedItems();
+                    }
+                );
                 menu.AddItem(s_CopyLabel, false, CopySelectedItemsToClipboard);
             }
             if (HavePastableClipboardData())
@@ -997,19 +1058,25 @@ namespace UnityEngine.InputSystem.Editor
         public void BuildMenuToAddBindings(GenericMenu menu, ActionTreeItem actionItem = null)
         {
             // Add entry to add "normal" bindings.
-            menu.AddItem(s_AddBindingLabel, false,
+            menu.AddItem(
+                s_AddBindingLabel,
+                false,
                 () =>
                 {
                     if (actionItem != null)
                         AddNewBinding(actionItem.property, actionItem.actionMapProperty);
                     else
                         AddNewBinding();
-                });
+                }
+            );
 
             // Add one entry for each registered type of composite binding.
             var expectedControlLayout = new InternedString(actionItem?.expectedControlLayout);
-            foreach (var compositeName in InputBindingComposite.s_Composites.internedNames.Where(x =>
-                !InputBindingComposite.s_Composites.aliases.Contains(x)).OrderBy(x => x))
+            foreach (
+                var compositeName in InputBindingComposite
+                    .s_Composites.internedNames.Where(x => !InputBindingComposite.s_Composites.aliases.Contains(x))
+                    .OrderBy(x => x)
+            )
             {
                 // Skip composites we should hide from the UI.
                 var compositeType = InputBindingComposite.s_Composites.LookupTypeRegistration(compositeName);
@@ -1023,21 +1090,29 @@ namespace UnityEngine.InputSystem.Editor
                 if (!expectedControlLayout.IsEmpty())
                 {
                     var valueType = InputBindingComposite.GetValueType(compositeName);
-                    if (valueType != null &&
-                        !InputControlLayout.s_Layouts.ValueTypeIsAssignableFrom(expectedControlLayout, valueType))
+                    if (
+                        valueType != null
+                        && !InputControlLayout.s_Layouts.ValueTypeIsAssignableFrom(expectedControlLayout, valueType)
+                    )
                         continue;
                 }
 
                 var displayName = compositeType.GetCustomAttribute<DisplayNameAttribute>();
-                var niceName = displayName != null ? displayName.DisplayName.Replace('/', '\\') : ObjectNames.NicifyVariableName(compositeName) + " Composite";
-                menu.AddItem(new GUIContent($"Add {niceName}"), false,
+                var niceName =
+                    displayName != null
+                        ? displayName.DisplayName.Replace('/', '\\')
+                        : ObjectNames.NicifyVariableName(compositeName) + " Composite";
+                menu.AddItem(
+                    new GUIContent($"Add {niceName}"),
+                    false,
                     () =>
                     {
                         if (actionItem != null)
                             AddNewComposite(actionItem.property, actionItem.actionMapProperty, compositeName);
                         else
                             AddNewComposite(compositeName);
-                    });
+                    }
+                );
             }
         }
 
@@ -1103,7 +1178,11 @@ namespace UnityEngine.InputSystem.Editor
         {
             var actionMapProperty = InputActionSerializationHelpers.AddActionMap(serializedObject);
             var actionProperty = InputActionSerializationHelpers.AddAction(actionMapProperty);
-            InputActionSerializationHelpers.AddBinding(actionProperty, actionMapProperty, groups: bindingGroupForNewBindings);
+            InputActionSerializationHelpers.AddBinding(
+                actionProperty,
+                actionMapProperty,
+                groups: bindingGroupForNewBindings
+            );
             OnNewItemAdded(actionMapProperty);
         }
 
@@ -1123,7 +1202,11 @@ namespace UnityEngine.InputSystem.Editor
             else
             {
                 var actionProperty = InputActionSerializationHelpers.AddAction(actionMapProperty);
-                InputActionSerializationHelpers.AddBinding(actionProperty, actionMapProperty, groups: bindingGroupForNewBindings);
+                InputActionSerializationHelpers.AddBinding(
+                    actionProperty,
+                    actionMapProperty,
+                    groups: bindingGroupForNewBindings
+                );
                 OnNewItemAdded(actionProperty);
             }
         }
@@ -1136,8 +1219,11 @@ namespace UnityEngine.InputSystem.Editor
 
         public void AddNewBinding(SerializedProperty actionProperty, SerializedProperty actionMapProperty)
         {
-            var bindingProperty = InputActionSerializationHelpers.AddBinding(actionProperty, actionMapProperty,
-                groups: bindingGroupForNewBindings);
+            var bindingProperty = InputActionSerializationHelpers.AddBinding(
+                actionProperty,
+                actionMapProperty,
+                groups: bindingGroupForNewBindings
+            );
             onBindingAdded?.Invoke(bindingProperty);
             OnNewItemAdded(bindingProperty);
         }
@@ -1148,14 +1234,25 @@ namespace UnityEngine.InputSystem.Editor
                 AddNewComposite(actionItem.property, actionItem.actionMapProperty, compositeType);
         }
 
-        public void AddNewComposite(SerializedProperty actionProperty, SerializedProperty actionMapProperty, string compositeName)
+        public void AddNewComposite(
+            SerializedProperty actionProperty,
+            SerializedProperty actionMapProperty,
+            string compositeName
+        )
         {
             var compositeType = InputBindingComposite.s_Composites.LookupTypeRegistration(compositeName);
             if (compositeType == null)
-                throw new ArgumentException($"Cannot find composite registration for {compositeName}",
-                    nameof(compositeName));
-            var compositeProperty = InputActionSerializationHelpers.AddCompositeBinding(actionProperty,
-                actionMapProperty, compositeName, compositeType, groups: bindingGroupForNewBindings);
+                throw new ArgumentException(
+                    $"Cannot find composite registration for {compositeName}",
+                    nameof(compositeName)
+                );
+            var compositeProperty = InputActionSerializationHelpers.AddCompositeBinding(
+                actionProperty,
+                actionMapProperty,
+                compositeName,
+                compositeType,
+                groups: bindingGroupForNewBindings
+            );
             onBindingAdded?.Invoke(compositeProperty);
             OnNewItemAdded(compositeProperty);
         }
@@ -1298,7 +1395,11 @@ namespace UnityEngine.InputSystem.Editor
             // When drawing input actions in the input actions editor, we don't want to offset the foldout
             // icon any further than the position that's passed in to this function, so take advantage of
             // the fact that indentLevel is always zero in that editor.
-            position.x = EditorGUI.IndentedRect(position).x * Mathf.Clamp01(indentLevel) + kColorTagWidth + 2 + indent * kColorTagWidth;
+            position.x =
+                EditorGUI.IndentedRect(position).x * Mathf.Clamp01(indentLevel)
+                + kColorTagWidth
+                + 2
+                + indent * kColorTagWidth;
 
             position.width = kFoldoutWidth;
 
@@ -1360,7 +1461,8 @@ namespace UnityEngine.InputSystem.Editor
             if (item is ActionTreeItem actionItem)
             {
                 var buttonRect = args.rowRect;
-                buttonRect.x = buttonRect.width - (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+                buttonRect.x =
+                    buttonRect.width - (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
                 buttonRect.width = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 if (GUI.Button(buttonRect, s_PlusBindingIcon, GUIStyle.none))
                 {
@@ -1423,7 +1525,8 @@ namespace UnityEngine.InputSystem.Editor
 
         public void UpdateSerializedObjectDirtyCount()
         {
-            m_SerializedObjectDirtyCount = serializedObject != null ? EditorUtility.GetDirtyCount(serializedObject.targetObject) : 0;
+            m_SerializedObjectDirtyCount =
+                serializedObject != null ? EditorUtility.GetDirtyCount(serializedObject.targetObject) : 0;
         }
 
         private bool ReloadIfSerializedObjectHasBeenChanged()
@@ -1509,11 +1612,26 @@ namespace UnityEngine.InputSystem.Editor
         private static readonly GUIContent s_AddBindingLabel = EditorGUIUtility.TrTextContent("Add Binding");
         private static readonly GUIContent s_AddActionLabel = EditorGUIUtility.TrTextContent("Add Action");
         private static readonly GUIContent s_AddActionMapLabel = EditorGUIUtility.TrTextContent("Add Action Map");
-        private static readonly GUIContent s_PlusBindingIcon = EditorGUIUtility.TrIconContent("Toolbar Plus More", "Add Binding");
-        private static readonly GUIContent s_PlusActionIcon = EditorGUIUtility.TrIconContent("Toolbar Plus", "Add Action");
-        private static readonly GUIContent s_PlusActionMapIcon = EditorGUIUtility.TrIconContent("Toolbar Plus", "Add Action Map");
-        private static readonly GUIContent s_DeleteSectionIcon = EditorGUIUtility.TrIconContent("Toolbar Minus", "Delete Selection");
-        private static readonly GUIContent s_ActionPropertiesIcon = EditorGUIUtility.TrIconContent("Settings", "Action Properties");
+        private static readonly GUIContent s_PlusBindingIcon = EditorGUIUtility.TrIconContent(
+            "Toolbar Plus More",
+            "Add Binding"
+        );
+        private static readonly GUIContent s_PlusActionIcon = EditorGUIUtility.TrIconContent(
+            "Toolbar Plus",
+            "Add Action"
+        );
+        private static readonly GUIContent s_PlusActionMapIcon = EditorGUIUtility.TrIconContent(
+            "Toolbar Plus",
+            "Add Action Map"
+        );
+        private static readonly GUIContent s_DeleteSectionIcon = EditorGUIUtility.TrIconContent(
+            "Toolbar Minus",
+            "Delete Selection"
+        );
+        private static readonly GUIContent s_ActionPropertiesIcon = EditorGUIUtility.TrIconContent(
+            "Settings",
+            "Action Properties"
+        );
 
         private static readonly GUIContent s_CutLabel = EditorGUIUtility.TrTextContent("Cut");
         private static readonly GUIContent s_CopyLabel = EditorGUIUtility.TrTextContent("Copy");
@@ -1524,7 +1642,8 @@ namespace UnityEngine.InputSystem.Editor
         private static readonly GUIContent s_ExpandAllLabel = EditorGUIUtility.TrTextContent("Expand All");
         private static readonly GUIContent s_CollapseAllLabel = EditorGUIUtility.TrTextContent("Collapse All");
 
-        public static string SharedResourcesPath = "Packages/com.unity.inputsystem/InputSystem/Editor/AssetEditor/PackageResources/";
+        public static string SharedResourcesPath =
+            "Packages/com.unity.inputsystem/InputSystem/Editor/AssetEditor/PackageResources/";
         public static string ResourcesPath
         {
             get
@@ -1568,7 +1687,10 @@ namespace UnityEngine.InputSystem.Editor
                         // NOTE: Composite items have names (and part bindings in a way, too) but we don't filter on them.
                         if (item is ActionMapTreeItem || item is ActionTreeItem)
                         {
-                            var matchesSelf = item.displayName.Contains(text, StringComparison.InvariantCultureIgnoreCase);
+                            var matchesSelf = item.displayName.Contains(
+                                text,
+                                StringComparison.InvariantCultureIgnoreCase
+                            );
 
                             // Name filters behave recursively. I.e. if any item in the subtree is matched by the name filter,
                             // the item is included.
@@ -1610,8 +1732,12 @@ namespace UnityEngine.InputSystem.Editor
                                 return CheckChildrenFor(Match.Success, item) ? Match.Success : Match.Failure;
 
                             var deviceLayout = InputControlPath.TryGetDeviceLayout(bindingItem.path);
-                            return string.Equals(deviceLayout, text, StringComparison.InvariantCultureIgnoreCase)
-                                || InputControlLayout.s_Layouts.IsBasedOn(new InternedString(deviceLayout), new InternedString(text))
+                            return
+                                string.Equals(deviceLayout, text, StringComparison.InvariantCultureIgnoreCase)
+                                || InputControlLayout.s_Layouts.IsBasedOn(
+                                    new InternedString(deviceLayout),
+                                    new InternedString(text)
+                                )
                                 ? Match.Success
                                 : Match.Failure;
                         }
@@ -1690,14 +1816,21 @@ namespace UnityEngine.InputSystem.Editor
         public static class Styles
         {
             public static readonly GUIStyle text = new GUIStyle("Label").WithAlignment(TextAnchor.MiddleLeft);
-            public static readonly GUIStyle selectedText = new GUIStyle("Label").WithAlignment(TextAnchor.MiddleLeft).WithNormalTextColor(Color.white);
-            public static readonly GUIStyle backgroundWithoutBorder = new GUIStyle("Label")
-                .WithNormalBackground(AssetDatabase.LoadAssetAtPath<Texture2D>(ResourcesPath + "actionTreeBackgroundWithoutBorder.png"));
+            public static readonly GUIStyle selectedText = new GUIStyle("Label")
+                .WithAlignment(TextAnchor.MiddleLeft)
+                .WithNormalTextColor(Color.white);
+            public static readonly GUIStyle backgroundWithoutBorder = new GUIStyle("Label").WithNormalBackground(
+                AssetDatabase.LoadAssetAtPath<Texture2D>(ResourcesPath + "actionTreeBackgroundWithoutBorder.png")
+            );
             public static readonly GUIStyle border = new GUIStyle("Label")
-                .WithNormalBackground(AssetDatabase.LoadAssetAtPath<Texture2D>(ResourcesPath + "actionTreeBackground.png"))
+                .WithNormalBackground(
+                    AssetDatabase.LoadAssetAtPath<Texture2D>(ResourcesPath + "actionTreeBackground.png")
+                )
                 .WithBorder(new RectOffset(0, 0, 0, 1));
             public static readonly GUIStyle backgroundWithBorder = new GUIStyle("Label")
-                .WithNormalBackground(AssetDatabase.LoadAssetAtPath<Texture2D>(ResourcesPath + "actionTreeBackground.png"))
+                .WithNormalBackground(
+                    AssetDatabase.LoadAssetAtPath<Texture2D>(ResourcesPath + "actionTreeBackground.png")
+                )
                 .WithBorder(new RectOffset(3, 3, 3, 3))
                 .WithMargin(new RectOffset(4, 4, 4, 4));
             public static readonly GUIStyle columnHeaderLabel = new GUIStyle(EditorStyles.toolbar)
@@ -1707,9 +1840,7 @@ namespace UnityEngine.InputSystem.Editor
         }
 
         // Just so that we can tell apart TreeViews containing only maps.
-        internal class ActionMapListItem : TreeViewItem
-        {
-        }
+        internal class ActionMapListItem : TreeViewItem { }
     }
 }
 #endif // UNITY_EDITOR

@@ -1,5 +1,4 @@
 using System;
-
 using System.Linq;
 using UnityEngine.LowLevel;
 
@@ -18,9 +17,11 @@ namespace Unity.Entities
         public static event Action PostFrameUpdate;
 
         internal static void InvokePreFrameUpdate() => PreFrameUpdate?.Invoke();
+
         internal static void InvokePostFrameUpdate() => PostFrameUpdate?.Invoke();
 
         sealed class UpdatePreFrame { }
+
         sealed class UpdatePostFrame { }
 
         internal static void RegisterFrameUpdateToCurrentPlayerLoop()
@@ -29,19 +30,16 @@ namespace Unity.Entities
             var playerLoopSystems = playerLoop.subSystemList.ToList();
             if (!playerLoopSystems.Any(s => s.type == typeof(UpdatePreFrame)))
             {
-                playerLoopSystems.Insert(0, new PlayerLoopSystem
-                {
-                    type = typeof(UpdatePreFrame),
-                    updateDelegate = InvokePreFrameUpdate
-                });
+                playerLoopSystems.Insert(
+                    0,
+                    new PlayerLoopSystem { type = typeof(UpdatePreFrame), updateDelegate = InvokePreFrameUpdate }
+                );
             }
             if (!playerLoopSystems.Any(s => s.type == typeof(UpdatePostFrame)))
             {
-                playerLoopSystems.Add(new PlayerLoopSystem
-                {
-                    type = typeof(UpdatePostFrame),
-                    updateDelegate = InvokePostFrameUpdate
-                });
+                playerLoopSystems.Add(
+                    new PlayerLoopSystem { type = typeof(UpdatePostFrame), updateDelegate = InvokePostFrameUpdate }
+                );
             }
             playerLoop.subSystemList = playerLoopSystems.ToArray();
             PlayerLoop.SetPlayerLoop(playerLoop);

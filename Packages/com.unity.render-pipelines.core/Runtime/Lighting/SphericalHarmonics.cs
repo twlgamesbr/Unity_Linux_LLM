@@ -12,10 +12,12 @@ namespace UnityEngine.Rendering
         /// Red channel of each of the three L1 SH coefficient.
         /// </summary>
         public Vector4 shAr;
+
         /// <summary>
         /// Green channel of each of the three L1 SH coefficient.
         /// </summary>
         public Vector4 shAg;
+
         /// <summary>
         /// Blue channel of each of the three L1 SH coefficient.
         /// </summary>
@@ -28,7 +30,7 @@ namespace UnityEngine.Rendering
         {
             shAr = Vector4.zero,
             shAg = Vector4.zero,
-            shAb = Vector4.zero
+            shAb = Vector4.zero,
         };
 
         // These operators are implemented so that SphericalHarmonicsL1 matches API of SphericalHarmonicsL2.
@@ -39,12 +41,13 @@ namespace UnityEngine.Rendering
         /// <param name="lhs">First SphericalHarmonicsL1.</param>
         /// <param name="rhs">Second SphericalHarmonicsL1.</param>
         /// <returns>The resulting SphericalHarmonicsL1.</returns>
-        public static SphericalHarmonicsL1 operator +(SphericalHarmonicsL1 lhs, SphericalHarmonicsL1 rhs) => new SphericalHarmonicsL1()
-        {
-            shAr = lhs.shAr + rhs.shAr,
-            shAg = lhs.shAg + rhs.shAg,
-            shAb = lhs.shAb + rhs.shAb
-        };
+        public static SphericalHarmonicsL1 operator +(SphericalHarmonicsL1 lhs, SphericalHarmonicsL1 rhs) =>
+            new SphericalHarmonicsL1()
+            {
+                shAr = lhs.shAr + rhs.shAr,
+                shAg = lhs.shAg + rhs.shAg,
+                shAb = lhs.shAb + rhs.shAb,
+            };
 
         /// <summary>
         /// Subtract two SphericalHarmonicsL1.
@@ -52,12 +55,13 @@ namespace UnityEngine.Rendering
         /// <param name="lhs">First SphericalHarmonicsL1.</param>
         /// <param name="rhs">Second SphericalHarmonicsL1.</param>
         /// <returns>The resulting SphericalHarmonicsL1.</returns>
-        public static SphericalHarmonicsL1 operator -(SphericalHarmonicsL1 lhs, SphericalHarmonicsL1 rhs) => new SphericalHarmonicsL1()
-        {
-            shAr = lhs.shAr - rhs.shAr,
-            shAg = lhs.shAg - rhs.shAg,
-            shAb = lhs.shAb - rhs.shAb
-        };
+        public static SphericalHarmonicsL1 operator -(SphericalHarmonicsL1 lhs, SphericalHarmonicsL1 rhs) =>
+            new SphericalHarmonicsL1()
+            {
+                shAr = lhs.shAr - rhs.shAr,
+                shAg = lhs.shAg - rhs.shAg,
+                shAb = lhs.shAb - rhs.shAb,
+            };
 
         /// <summary>
         /// Multiply two SphericalHarmonicsL1.
@@ -65,12 +69,13 @@ namespace UnityEngine.Rendering
         /// <param name="lhs">First SphericalHarmonicsL1.</param>
         /// <param name="rhs">Second SphericalHarmonicsL1.</param>
         /// <returns>The resulting SphericalHarmonicsL1.</returns>
-        public static SphericalHarmonicsL1 operator *(SphericalHarmonicsL1 lhs, float rhs) => new SphericalHarmonicsL1()
-        {
-            shAr = lhs.shAr * rhs,
-            shAg = lhs.shAg * rhs,
-            shAb = lhs.shAb * rhs
-        };
+        public static SphericalHarmonicsL1 operator *(SphericalHarmonicsL1 lhs, float rhs) =>
+            new SphericalHarmonicsL1()
+            {
+                shAr = lhs.shAr * rhs,
+                shAg = lhs.shAg * rhs,
+                shAb = lhs.shAb * rhs,
+            };
 
         /// <summary>
         /// Divide two SphericalHarmonicsL1.
@@ -78,12 +83,13 @@ namespace UnityEngine.Rendering
         /// <param name="lhs">First SphericalHarmonicsL1.</param>
         /// <param name="rhs">Second SphericalHarmonicsL1.</param>
         /// <returns>The resulting SphericalHarmonicsL1.</returns>
-        public static SphericalHarmonicsL1 operator /(SphericalHarmonicsL1 lhs, float rhs) => new SphericalHarmonicsL1()
-        {
-            shAr = lhs.shAr / rhs,
-            shAg = lhs.shAg / rhs,
-            shAb = lhs.shAb / rhs
-        };
+        public static SphericalHarmonicsL1 operator /(SphericalHarmonicsL1 lhs, float rhs) =>
+            new SphericalHarmonicsL1()
+            {
+                shAr = lhs.shAr / rhs,
+                shAg = lhs.shAg / rhs,
+                shAb = lhs.shAb / rhs,
+            };
 
         /// <summary>
         /// Compare two SphericalHarmonicsL1.
@@ -93,9 +99,7 @@ namespace UnityEngine.Rendering
         /// <returns>Whether the SphericalHarmonicsL1 match.</returns>
         public static bool operator ==(SphericalHarmonicsL1 lhs, SphericalHarmonicsL1 rhs)
         {
-            return lhs.shAr == rhs.shAr
-                && lhs.shAg == rhs.shAg
-                && lhs.shAb == rhs.shAb;
+            return lhs.shAr == rhs.shAr && lhs.shAg == rhs.shAg && lhs.shAb == rhs.shAb;
         }
 
         /// <summary>
@@ -145,17 +149,11 @@ namespace UnityEngine.Rendering
         /// <param name ="L1_B">The blue channel of all coefficient for the L1 band.</param>
         public static void GetL1(SphericalHarmonicsL2 sh, out Vector3 L1_R, out Vector3 L1_G, out Vector3 L1_B)
         {
-            L1_R = new Vector3(sh[0, 1],
-                sh[0, 2],
-                sh[0, 3]);
+            L1_R = new Vector3(sh[0, 1], sh[0, 2], sh[0, 3]);
 
-            L1_G = new Vector3(sh[1, 1],
-                sh[1, 2],
-                sh[1, 3]);
+            L1_G = new Vector3(sh[1, 1], sh[1, 2], sh[1, 3]);
 
-            L1_B = new Vector3(sh[2, 1],
-                sh[2, 2],
-                sh[2, 3]);
+            L1_B = new Vector3(sh[2, 1], sh[2, 2], sh[2, 3]);
         }
 
         /// <summary>
@@ -167,27 +165,24 @@ namespace UnityEngine.Rendering
         /// <param name ="L2_2">The third coefficient for the L2 band.</param>
         /// <param name ="L2_3">The fourth coefficient for the L2 band.</param>
         /// <param name ="L2_4">The fifth coefficient for the L2 band.</param>
-        public static void GetL2(SphericalHarmonicsL2 sh, out Vector3 L2_0, out Vector3 L2_1, out Vector3 L2_2, out Vector3 L2_3, out Vector3 L2_4)
+        public static void GetL2(
+            SphericalHarmonicsL2 sh,
+            out Vector3 L2_0,
+            out Vector3 L2_1,
+            out Vector3 L2_2,
+            out Vector3 L2_3,
+            out Vector3 L2_4
+        )
         {
-            L2_0 = new Vector3(sh[0, 4],
-                sh[1, 4],
-                sh[2, 4]);
+            L2_0 = new Vector3(sh[0, 4], sh[1, 4], sh[2, 4]);
 
-            L2_1 = new Vector3(sh[0, 5],
-                sh[1, 5],
-                sh[2, 5]);
+            L2_1 = new Vector3(sh[0, 5], sh[1, 5], sh[2, 5]);
 
-            L2_2 = new Vector3(sh[0, 6],
-                sh[1, 6],
-                sh[2, 6]);
+            L2_2 = new Vector3(sh[0, 6], sh[1, 6], sh[2, 6]);
 
-            L2_3 = new Vector3(sh[0, 7],
-                sh[1, 7],
-                sh[2, 7]);
+            L2_3 = new Vector3(sh[0, 7], sh[1, 7], sh[2, 7]);
 
-            L2_4 = new Vector3(sh[0, 8],
-                sh[1, 8],
-                sh[2, 8]);
+            L2_4 = new Vector3(sh[0, 8], sh[1, 8], sh[2, 8]);
         }
 
         /// <summary>

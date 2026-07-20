@@ -11,8 +11,10 @@ namespace UnityEditor.Rendering.Universal
     {
         protected override Type OldSettingsType { get; } = typeof(BIRPRendering.Vignette);
 
-        protected override void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldSettings,
-            VolumeProfile targetProfile)
+        protected override void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldSettings,
+            VolumeProfile targetProfile
+        )
         {
             var oldVignette = oldSettings as BIRPRendering.Vignette;
 

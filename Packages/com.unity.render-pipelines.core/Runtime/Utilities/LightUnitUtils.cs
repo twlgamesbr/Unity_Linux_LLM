@@ -55,16 +55,15 @@ namespace UnityEngine.Rendering
         /// <returns>True if light unit is supported.</returns>
         public static bool IsLightUnitSupported(LightType lightType, LightUnit lightUnit)
         {
-            const int punctualUnits = 1 << (int)LightUnit.Lumen |
-                                      1 << (int)LightUnit.Candela |
-                                      1 << (int)LightUnit.Lux |
-                                      1 << (int)LightUnit.Ev100;
+            const int punctualUnits =
+                1 << (int)LightUnit.Lumen
+                | 1 << (int)LightUnit.Candela
+                | 1 << (int)LightUnit.Lux
+                | 1 << (int)LightUnit.Ev100;
 
             const int directionalUnits = 1 << (int)LightUnit.Lux;
 
-            const int areaUnits = 1 << (int)LightUnit.Lumen |
-                                  1 << (int)LightUnit.Nits |
-                                  1 << (int)LightUnit.Ev100;
+            const int areaUnits = 1 << (int)LightUnit.Lumen | 1 << (int)LightUnit.Nits | 1 << (int)LightUnit.Ev100;
 
             int lightUnitFlag = 1 << (int)lightUnit;
 
@@ -138,9 +137,11 @@ namespace UnityEngine.Rendering
             return lightType switch
             {
                 LightType.Spot => spotReflector ? GetSolidAngleFromSpotLight(spotAngle) : SphereSolidAngle,
-                LightType.Pyramid => spotReflector ? GetSolidAngleFromPyramidLight(spotAngle, aspectRatio) : SphereSolidAngle,
+                LightType.Pyramid => spotReflector
+                    ? GetSolidAngleFromPyramidLight(spotAngle, aspectRatio)
+                    : SphereSolidAngle,
                 LightType.Point => GetSolidAngleFromPointLight(),
-                _ => throw new ArgumentException("Solid angle is undefined for lights of type " + lightType)
+                _ => throw new ArgumentException("Solid angle is undefined for lights of type " + lightType),
             };
         }
 
@@ -312,13 +313,21 @@ namespace UnityEngine.Rendering
             return NitsToEv100(candela);
         }
 
-        internal static float ConvertIntensityInternal(float intensity, LightUnit fromUnit, LightUnit toUnit,
-            LightType lightType, float area, float luxAtDistance, float solidAngle)
+        internal static float ConvertIntensityInternal(
+            float intensity,
+            LightUnit fromUnit,
+            LightUnit toUnit,
+            LightType lightType,
+            float area,
+            float luxAtDistance,
+            float solidAngle
+        )
         {
             if (!IsLightUnitSupported(lightType, fromUnit) || !IsLightUnitSupported(lightType, toUnit))
             {
-                throw new ArgumentException("Converting " + fromUnit + " to " + toUnit
-                                            + " is undefined for lights of type " + lightType);
+                throw new ArgumentException(
+                    "Converting " + fromUnit + " to " + toUnit + " is undefined for lights of type " + lightType
+                );
             }
 
             if (fromUnit == toUnit)
@@ -356,15 +365,16 @@ namespace UnityEngine.Rendering
                             // Lumen => Candela/Nits => Ev100
                             float candelaNits = lightType switch
                             {
-                                LightType.Point or LightType.Spot or LightType.Pyramid =>
-                                    LumenToCandela(intensity, solidAngle),
+                                LightType.Point or LightType.Spot or LightType.Pyramid => LumenToCandela(
+                                    intensity,
+                                    solidAngle
+                                ),
 
-                                LightType.Rectangle or LightType.Disc or LightType.Tube =>
-                                    LumenToNits(intensity, area),
+                                LightType.Rectangle or LightType.Disc or LightType.Tube => LumenToNits(intensity, area),
 
-                                _ =>
-                                    throw new ArgumentException("Converting from Lumen to Ev100 is undefined for light type "
-                                                                 + lightType)
+                                _ => throw new ArgumentException(
+                                    "Converting from Lumen to Ev100 is undefined for light type " + lightType
+                                ),
                             };
                             return NitsToEv100(candelaNits);
                         }
@@ -459,15 +469,19 @@ namespace UnityEngine.Rendering
                             float candelaOrNits = Ev100ToNits(intensity);
                             return lightType switch
                             {
-                                LightType.Point or LightType.Spot or LightType.Pyramid =>
-                                    CandelaToLumen(candelaOrNits, solidAngle),
+                                LightType.Point or LightType.Spot or LightType.Pyramid => CandelaToLumen(
+                                    candelaOrNits,
+                                    solidAngle
+                                ),
 
-                                LightType.Rectangle or LightType.Disc or LightType.Tube =>
-                                    NitsToLumen(candelaOrNits, area),
+                                LightType.Rectangle or LightType.Disc or LightType.Tube => NitsToLumen(
+                                    candelaOrNits,
+                                    area
+                                ),
 
-                                _ =>
-                                    throw new ArgumentException("Converting from Lumen to Ev100 is undefined for light type "
-                                                                + lightType)
+                                _ => throw new ArgumentException(
+                                    "Converting from Lumen to Ev100 is undefined for light type " + lightType
+                                ),
                             };
                         }
 
@@ -510,14 +524,18 @@ namespace UnityEngine.Rendering
                 LightType.Rectangle => GetAreaFromRectangleLight(light.areaSize),
                 LightType.Disc => GetAreaFromDiscLight(light.areaSize.x), // Disc radius is stored in areaSize.x
                 LightType.Tube => GetAreaFromTubeLight(light.areaSize.x), // Tube length is stored in areaSize.x
-                _ => 0.0f
+                _ => 0.0f,
             };
             float luxAtDistance = light.luxAtDistance;
             float solidAngle = lightType switch
             {
-                LightType.Spot or LightType.Pyramid or LightType.Point => GetSolidAngle(lightType, light.enableSpotReflector,
-                    light.spotAngle, light.areaSize.x), // Pyramid aspect ratio is store in areaSize.x
-                _ => 0.0f
+                LightType.Spot or LightType.Pyramid or LightType.Point => GetSolidAngle(
+                    lightType,
+                    light.enableSpotReflector,
+                    light.spotAngle,
+                    light.areaSize.x
+                ), // Pyramid aspect ratio is store in areaSize.x
+                _ => 0.0f,
             };
 
             return ConvertIntensityInternal(intensity, fromUnit, toUnit, lightType, area, luxAtDistance, solidAngle);

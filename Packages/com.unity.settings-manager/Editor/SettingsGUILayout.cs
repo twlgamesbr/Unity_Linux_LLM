@@ -25,24 +25,18 @@ namespace UnityEditor.SettingsManagement
             {
                 normal = new GUIStyleState()
                 {
-                    background = AssetDatabase.LoadAssetAtPath<Texture2D>(k_SettingsGearIcon)
+                    background = AssetDatabase.LoadAssetAtPath<Texture2D>(k_SettingsGearIcon),
                 },
                 fixedWidth = 14,
                 fixedHeight = 14,
                 padding = new RectOffset(0, 0, 0, 0),
                 margin = new RectOffset(4, 4, 4, 4),
-                imagePosition = ImagePosition.ImageOnly
+                imagePosition = ImagePosition.ImageOnly,
             };
 
-            s_SettingsArea = new GUIStyle()
-            {
-                margin = new RectOffset(6, 6, 0, 0)
-            };
+            s_SettingsArea = new GUIStyle() { margin = new RectOffset(6, 6, 0, 0) };
 
-            s_IndentedSettingBlock = new GUIStyle()
-            {
-                padding = new RectOffset(16, 0, 0, 0)
-            };
+            s_IndentedSettingBlock = new GUIStyle() { padding = new RectOffset(16, 0, 0, 0) };
         }
 
         public static GUIStyle settingsGizmo
@@ -138,7 +132,9 @@ namespace UnityEditor.SettingsManagement
 
             var split = searchContext.Split(' ');
 
-            return split.Any(x => !string.IsNullOrEmpty(x) && label.IndexOf(x, StringComparison.InvariantCultureIgnoreCase) > -1);
+            return split.Any(x =>
+                !string.IsNullOrEmpty(x) && label.IndexOf(x, StringComparison.InvariantCultureIgnoreCase) > -1
+            );
         }
 
         internal static bool DebugModeFilter(IUserSetting pref)
@@ -336,7 +332,13 @@ namespace UnityEditor.SettingsManagement
         /// <param name="max">The value at the right end of the slider.</param>
         /// <param name="searchContext">A string representing the current search query. Empty or null strings match any value.</param>
         /// <returns>The value set by the user.</returns>
-        public static float SettingsSlider(GUIContent label, UserSetting<float> value, float min, float max, string searchContext)
+        public static float SettingsSlider(
+            GUIContent label,
+            UserSetting<float> value,
+            float min,
+            float max,
+            string searchContext
+        )
         {
             if (!DebugModeFilter(value) || !MatchSearchGroups(searchContext, label.text))
                 return value;
@@ -354,7 +356,13 @@ namespace UnityEditor.SettingsManagement
         /// <param name="max">The value at the right end of the slider.</param>
         /// <param name="searchContext">A string representing the current search query. Empty or null strings match any value.</param>
         /// <returns>The value set by the user.</returns>
-        public static float SettingsSlider(string label, UserSetting<float> value, float min, float max, string searchContext)
+        public static float SettingsSlider(
+            string label,
+            UserSetting<float> value,
+            float min,
+            float max,
+            string searchContext
+        )
         {
             if (!DebugModeFilter(value) || !MatchSearchGroups(searchContext, label))
                 return value;
@@ -372,7 +380,13 @@ namespace UnityEditor.SettingsManagement
         /// <param name="max">The value at the right end of the slider.</param>
         /// <param name="searchContext">A string representing the current search query. Empty or null strings match any value.</param>
         /// <returns>The value set by the user.</returns>
-        public static int SettingsSlider(GUIContent label, UserSetting<int> value, int min, int max, string searchContext)
+        public static int SettingsSlider(
+            GUIContent label,
+            UserSetting<int> value,
+            int min,
+            int max,
+            string searchContext
+        )
         {
             if (!DebugModeFilter(value) || !MatchSearchGroups(searchContext, label.text))
                 return value;
@@ -576,10 +590,14 @@ namespace UnityEditor.SettingsManagement
             if (evt.type == EventType.ContextClick && rect.Contains(evt.mousePosition))
             {
                 var menu = new GenericMenu();
-                menu.AddItem(new GUIContent("Reset [" + pref.scope + "] " + pref.key), false, () =>
+                menu.AddItem(
+                    new GUIContent("Reset [" + pref.scope + "] " + pref.key),
+                    false,
+                    () =>
                     {
                         pref.Reset(true);
-                    });
+                    }
+                );
                 menu.ShowAsContext();
             }
         }

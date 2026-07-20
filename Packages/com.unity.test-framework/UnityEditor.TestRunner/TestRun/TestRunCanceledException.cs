@@ -2,7 +2,5 @@ using System;
 
 namespace UnityEditor.TestTools.TestRunner.TestRun
 {
-    internal class TestRunCanceledException : Exception
-    {
-    }
+    internal class TestRunCanceledException : Exception { }
 }

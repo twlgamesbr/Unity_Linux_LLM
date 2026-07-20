@@ -55,8 +55,7 @@ namespace Unity.Core
                 {
                     acc = processStripe32(ref pInput, ref acc1, ref acc2, ref acc3, ref acc4);
                     remainingLen -= stripeLength;
-                }
-                while (remainingLen >= stripeLength);
+                } while (remainingLen >= stripeLength);
             }
             else
             {
@@ -86,7 +85,7 @@ namespace Unity.Core
             int readBytes = stream.Read(buffer, 0, readBufferSize);
             int len = readBytes;
 
-            fixed(byte* inputPtr = buffer)
+            fixed (byte* inputPtr = buffer)
             {
                 byte* pInput = inputPtr;
                 if (readBytes >= stripeLength)
@@ -103,8 +102,7 @@ namespace Unity.Core
                         {
                             acc = processStripe32(ref pInput, ref acc1, ref acc2, ref acc3, ref acc4);
                             readBytes -= stripeLength;
-                        }
-                        while (readBytes >= stripeLength);
+                        } while (readBytes >= stripeLength);
 
                         // read more if the alignment is still intact
                         if (readBytes == 0)
@@ -113,8 +111,7 @@ namespace Unity.Core
                             pInput = inputPtr;
                             len += readBytes;
                         }
-                    }
-                    while (readBytes >= stripeLength);
+                    } while (readBytes >= stripeLength);
                 }
                 else
                 {
@@ -156,8 +153,7 @@ namespace Unity.Core
                 {
                     acc = processStripe64(ref pInput, ref acc1, ref acc2, ref acc3, ref acc4);
                     remainingLen -= stripeLength;
-                }
-                while (remainingLen >= stripeLength);
+                } while (remainingLen >= stripeLength);
             }
             else
             {
@@ -166,7 +162,6 @@ namespace Unity.Core
 
             acc += (ulong)len;
             acc = processRemaining64(pInput, acc, remainingLen);
-
 
             return avalanche64(acc);
         }
@@ -188,7 +183,7 @@ namespace Unity.Core
             int readBytes = stream.Read(buffer, 0, readBufferSize);
             ulong len = (ulong)readBytes;
 
-            fixed(byte* inputPtr = buffer)
+            fixed (byte* inputPtr = buffer)
             {
                 byte* pInput = inputPtr;
                 if (readBytes >= stripeLength)
@@ -203,15 +198,9 @@ namespace Unity.Core
                     {
                         do
                         {
-                            acc = processStripe64(
-                                ref pInput,
-                                ref acc1,
-                                ref acc2,
-                                ref acc3,
-                                ref acc4);
+                            acc = processStripe64(ref pInput, ref acc1, ref acc2, ref acc3, ref acc4);
                             readBytes -= stripeLength;
-                        }
-                        while (readBytes >= stripeLength);
+                        } while (readBytes >= stripeLength);
 
                         // read more if the alignment is intact
                         if (readBytes == 0)
@@ -220,8 +209,7 @@ namespace Unity.Core
                             pInput = inputPtr;
                             len += (ulong)readBytes;
                         }
-                    }
-                    while (readBytes >= stripeLength);
+                    } while (readBytes >= stripeLength);
                 }
                 else
                 {
@@ -247,14 +235,16 @@ namespace Unity.Core
             ref ulong acc1,
             ref ulong acc2,
             ref ulong acc3,
-            ref ulong acc4)
+            ref ulong acc4
+        )
         {
             processLane64(ref acc1, ref pInput);
             processLane64(ref acc2, ref pInput);
             processLane64(ref acc3, ref pInput);
             processLane64(ref acc4, ref pInput);
 
-            ulong acc = Bits.RotateLeft(acc1, 1)
+            ulong acc =
+                Bits.RotateLeft(acc1, 1)
                 + Bits.RotateLeft(acc2, 7)
                 + Bits.RotateLeft(acc3, 12)
                 + Bits.RotateLeft(acc4, 18);
@@ -275,10 +265,7 @@ namespace Unity.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe ulong processRemaining64(
-            byte* pInput,
-            ulong acc,
-            int remainingLen)
+        private static unsafe ulong processRemaining64(byte* pInput, ulong acc, int remainingLen)
         {
             for (ulong lane; remainingLen >= 8; remainingLen -= 8, pInput += 8)
             {
@@ -347,7 +334,8 @@ namespace Unity.Core
             ref uint acc1,
             ref uint acc2,
             ref uint acc3,
-            ref uint acc4)
+            ref uint acc4
+        )
         {
             processLane32(ref pInput, ref acc1);
             processLane32(ref pInput, ref acc2);
@@ -369,10 +357,7 @@ namespace Unity.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe uint processRemaining32(
-            byte* pInput,
-            uint acc,
-            int remainingLen)
+        private static unsafe uint processRemaining32(byte* pInput, uint acc, int remainingLen)
         {
             for (uint lane; remainingLen >= 4; remainingLen -= 4, pInput += 4)
             {
@@ -526,14 +511,14 @@ namespace Unity.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal static uint SwapBytes32(uint num)
             {
-                return (Bits.RotateLeft(num, 8) & 0x00FF00FFu)
-                    | (Bits.RotateRight(num, 8) & 0xFF00FF00u);
+                return (Bits.RotateLeft(num, 8) & 0x00FF00FFu) | (Bits.RotateRight(num, 8) & 0xFF00FF00u);
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal static ulong SwapBytes64(ulong num)
             {
-                num = (Bits.RotateLeft(num, 48) & 0xFFFF0000FFFF0000ul)
+                num =
+                    (Bits.RotateLeft(num, 48) & 0xFFFF0000FFFF0000ul)
                     | (Bits.RotateLeft(num, 16) & 0x0000FFFF0000FFFFul);
                 return (Bits.RotateLeft(num, 8) & 0xFF00FF00FF00FF00ul)
                     | (Bits.RotateRight(num, 8) & 0x00FF00FF00FF00FFul);
@@ -548,7 +533,7 @@ namespace Unity.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static unsafe int ToInt32(byte[] value, int startIndex)
             {
-                fixed(byte* pbyte = &value[startIndex])
+                fixed (byte* pbyte = &value[startIndex])
                 {
                     if ((startIndex & 3) == 0)
                     {

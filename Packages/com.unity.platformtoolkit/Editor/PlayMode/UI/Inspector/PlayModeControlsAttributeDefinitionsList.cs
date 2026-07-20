@@ -9,14 +9,16 @@ namespace Unity.PlatformToolkit.PlayMode
         public PlayModeControlsAttributeDefinitionsList(PlayModeControlsViewModel viewModel)
         {
             var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAttributeDefinitionsList.uxml");
+                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAttributeDefinitionsList.uxml"
+            );
             uxml.CloneTree(this);
 
             var attributeDefinitions = this.Q<MultiColumnListView>("attribute-definitions");
 
             // This is a workaround for a UI Toolkit bug where you cannot set the MultiColumnListView's template cell to a custom C# UXML element
             var typeCellUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAttributeDefinitionValueTypePopupField.uxml");
+                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAttributeDefinitionValueTypePopupField.uxml"
+            );
             var typeColumn = attributeDefinitions.columns.First(c => c.name == "Type");
             typeColumn.makeCell = () => typeCellUxml.Instantiate();
 

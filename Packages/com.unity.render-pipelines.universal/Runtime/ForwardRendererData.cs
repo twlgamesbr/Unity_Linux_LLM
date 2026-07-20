@@ -8,11 +8,15 @@ namespace UnityEngine.Rendering.Universal
     /// Deprecated, kept for backward compatibility with existing ForwardRendererData asset files.
     /// Use UniversalRendererData instead.
     /// </summary>
-    [System.Obsolete("ForwardRendererData has been deprecated #from(2021.2) #breakingFrom(2021.2) (UnityUpgradable) -> UniversalRendererData", true)]
+    [System.Obsolete(
+        "ForwardRendererData has been deprecated #from(2021.2) #breakingFrom(2021.2) (UnityUpgradable) -> UniversalRendererData",
+        true
+    )]
     [Serializable, ReloadGroup, ExcludeFromPreset]
     public class ForwardRendererData : ScriptableRendererData
     {
-        private const string k_ErrorMessage = "ForwardRendererData has been deprecated. Use UniversalRendererData instead";
+        private const string k_ErrorMessage =
+            "ForwardRendererData has been deprecated. Use UniversalRendererData instead";
 
         /// <summary>
         /// Class containing shader resources used in URP.
@@ -35,7 +39,10 @@ namespace UnityEngine.Rendering.Universal
             /// <summary>
             /// Screen space shadows shader.
             /// </summary>
-            [Obsolete("Obsolete, this feature will be supported by new 'ScreenSpaceShadows' renderer feature. #from(2021.1) #breakingFrom(2023.1)", true)]
+            [Obsolete(
+                "Obsolete, this feature will be supported by new 'ScreenSpaceShadows' renderer feature. #from(2021.1) #breakingFrom(2023.1)",
+                true
+            )]
             public Shader screenSpaceShadowPS;
 
             /// <summary>
@@ -108,20 +115,39 @@ namespace UnityEngine.Rendering.Universal
         public XRSystemData xrSystemData;
 #endif
 
-        [SerializeField] LayerMask m_OpaqueLayerMask;
-        [SerializeField] LayerMask m_TransparentLayerMask;
-        [SerializeField] StencilStateData m_DefaultStencilState; // This default state is compatible with deferred renderer.
-        [SerializeField] bool m_ShadowTransparentReceive;
-        [SerializeField] RenderingMode m_RenderingMode;
-        [SerializeField] DepthPrimingMode m_DepthPrimingMode; // Default disabled because there are some outstanding issues with Text Mesh rendering.
-        [SerializeField] bool m_AccurateGbufferNormals;
-        [SerializeField] bool m_ClusteredRendering;
-        [SerializeField] TileSize m_TileSize;
+        [SerializeField]
+        LayerMask m_OpaqueLayerMask;
+
+        [SerializeField]
+        LayerMask m_TransparentLayerMask;
+
+        [SerializeField]
+        StencilStateData m_DefaultStencilState; // This default state is compatible with deferred renderer.
+
+        [SerializeField]
+        bool m_ShadowTransparentReceive;
+
+        [SerializeField]
+        RenderingMode m_RenderingMode;
+
+        [SerializeField]
+        DepthPrimingMode m_DepthPrimingMode; // Default disabled because there are some outstanding issues with Text Mesh rendering.
+
+        [SerializeField]
+        bool m_AccurateGbufferNormals;
+
+        [SerializeField]
+        bool m_ClusteredRendering;
+
+        [SerializeField]
+        TileSize m_TileSize;
 
         /// <inheritdoc/>
         protected override ScriptableRenderer Create()
         {
-            Debug.LogWarning($"Forward Renderer Data has been deprecated, {name} will be upgraded to a {nameof(UniversalRendererData)}.");
+            Debug.LogWarning(
+                $"Forward Renderer Data has been deprecated, {name} will be upgraded to a {nameof(UniversalRendererData)}."
+            );
             return null;
         }
 

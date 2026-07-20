@@ -7,5 +7,5 @@ namespace Unity.Physics
         public BlobAssetReference<Collider> Value;
     }
 
-    internal struct EnsureUniqueColliderBlobTag : IComponentData {}
+    internal struct EnsureUniqueColliderBlobTag : IComponentData { }
 }

@@ -43,7 +43,12 @@ namespace Unity.PlatformToolkit
 
         ValueTaskSourceStatus IValueTaskSource.GetStatus(short token) => m_Source.GetStatus(token);
 
-        void IValueTaskSource.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags)
+        void IValueTaskSource.OnCompleted(
+            Action<object> continuation,
+            object state,
+            short token,
+            ValueTaskSourceOnCompletedFlags flags
+        )
         {
             m_Source.OnCompleted(continuation, state, token, flags);
         }

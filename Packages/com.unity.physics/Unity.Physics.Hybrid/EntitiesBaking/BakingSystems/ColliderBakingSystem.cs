@@ -20,16 +20,19 @@ namespace Unity.Physics.Authoring
         public static readonly List<UnityEngine.Collider> s_CollidersBuffer = new List<UnityEngine.Collider>(16);
     }
 
-    abstract class ColliderBaker<T> : BaseColliderBaker<T> where T : UnityEngine.Collider
+    abstract class ColliderBaker<T> : BaseColliderBaker<T>
+        where T : UnityEngine.Collider
     {
         static List<UnityEngine.Collider> colliderComponents = new List<UnityEngine.Collider>();
 
-        static readonly IReadOnlyDictionary<UnityPhysicsMaterialCombine, Material.CombinePolicy> k_MaterialCombineLookup =
-            new Dictionary<UnityPhysicsMaterialCombine, Material.CombinePolicy>
+        static readonly IReadOnlyDictionary<
+            UnityPhysicsMaterialCombine,
+            Material.CombinePolicy
+        > k_MaterialCombineLookup = new Dictionary<UnityPhysicsMaterialCombine, Material.CombinePolicy>
         {
             { UnityPhysicsMaterialCombine.Average, Material.CombinePolicy.ArithmeticMean },
             { UnityPhysicsMaterialCombine.Maximum, Material.CombinePolicy.Maximum },
-            { UnityPhysicsMaterialCombine.Minimum, Material.CombinePolicy.Minimum }
+            { UnityPhysicsMaterialCombine.Minimum, Material.CombinePolicy.Minimum },
         };
 
         static UnityPhysicsMaterial DefaultMaterial
@@ -84,19 +87,25 @@ namespace Unity.Physics.Authoring
                 );
 
             var detailedStaticMeshCollision = collider.gameObject.GetComponent<DetailedStaticMeshCollisionAuthoring>();
-            material.EnableDetailedStaticMeshCollision = detailedStaticMeshCollision != null && detailedStaticMeshCollision.isActiveAndEnabled;
+            material.EnableDetailedStaticMeshCollision =
+                detailedStaticMeshCollision != null && detailedStaticMeshCollision.isActiveAndEnabled;
 
             return material;
         }
 
-        internal ShapeComputationDataBaking GenerateComputationDataGeneric(UnityEngine.Collider shape, GameObject body, ColliderInstanceBaking colliderInstance, uint forceUniqueID)
+        internal ShapeComputationDataBaking GenerateComputationDataGeneric(
+            UnityEngine.Collider shape,
+            GameObject body,
+            ColliderInstanceBaking colliderInstance,
+            uint forceUniqueID
+        )
         {
             return new ShapeComputationDataBaking
             {
                 Instance = colliderInstance,
                 Material = ProduceMaterial(shape),
                 CollisionFilter = ProduceCollisionFilter(shape, body),
-                ForceUniqueIdentifier = forceUniqueID
+                ForceUniqueIdentifier = forceUniqueID,
             };
         }
 
@@ -106,7 +115,7 @@ namespace Unity.Physics.Authoring
             var layer = GetLayer(collider);
 
             // create filter and assign layer of this collider
-            var filter = new CollisionFilter {BelongsTo = 1u << layer};
+            var filter = new CollisionFilter { BelongsTo = 1u << layer };
 
             uint includeMask = 0u;
             // incorporate global layer collision matrix
@@ -161,7 +170,14 @@ namespace Unity.Physics.Authoring
             return FindTopmostEnabledAncestor(shape, FindAncestorBuffer.s_CollidersBuffer);
         }
 
-        protected abstract ShapeComputationDataBaking GenerateComputationData(T shapeData, GameObject body, Transform bodyTransform, ColliderInstanceBaking colliderInstance, Entity colliderEntity, uint forceUniqueID);
+        protected abstract ShapeComputationDataBaking GenerateComputationData(
+            T shapeData,
+            GameObject body,
+            Transform bodyTransform,
+            ColliderInstanceBaking colliderInstance,
+            Entity colliderEntity,
+            uint forceUniqueID
+        );
 
         ShapeComputationDataBaking GetInputDataFromAuthoringComponent(T shape, Entity colliderEntity)
         {
@@ -175,8 +191,15 @@ namespace Unity.Physics.Authoring
             // prepare the static root
             if (isStaticBody)
             {
-                var staticRootMarker = CreateAdditionalEntity(TransformUsageFlags.Dynamic, true, "StaticRootBakeMarker");
-                AddComponent(staticRootMarker, new BakeStaticRoot() { Body = bodyEntity, ConvertedBodyEntityId = body.transform.GetEntityId() });
+                var staticRootMarker = CreateAdditionalEntity(
+                    TransformUsageFlags.Dynamic,
+                    true,
+                    "StaticRootBakeMarker"
+                );
+                AddComponent(
+                    staticRootMarker,
+                    new BakeStaticRoot() { Body = bodyEntity, ConvertedBodyEntityId = body.transform.GetEntityId() }
+                );
             }
 
             // Track dependencies to the transforms
@@ -232,12 +255,15 @@ namespace Unity.Physics.Authoring
                     // Rigid Body bakes always add the PhysicsWorldIndex component
                     AddSharedComponent(entity, new PhysicsWorldIndex());
 
-                    AddComponent(entity, new PhysicsCompoundData()
-                    {
-                        AssociateBlobToBody = false,
-                        ConvertedBodyEntityId = shapeEntityID,
-                        Hash = default,
-                    });
+                    AddComponent(
+                        entity,
+                        new PhysicsCompoundData()
+                        {
+                            AssociateBlobToBody = false,
+                            ConvertedBodyEntityId = shapeEntityID,
+                            Hash = default,
+                        }
+                    );
 
                     AddComponent<PhysicsRootBaked>(entity);
                     AddComponent<PhysicsCollider>(entity);
@@ -272,14 +298,21 @@ namespace Unity.Physics.Authoring
                 AddComponent(colliderEntity, shapeBakingData);
 
                 // The data will be filled in by the BaseShapeBakingSystem, but we add it here so it gets reverted from the entity if the collider component is deleted
-                AddComponent(colliderEntity, new PhysicsColliderBakedData()
-                {
-                    BodyEntity = shapeBakingData.ShapeComputationalData.Instance.BodyEntity,
-                    BodyFromShape = shapeBakingData.ShapeComputationalData.Instance.BodyFromShape,
-                    ChildEntity = shapeBakingData.ShapeComputationalData.Instance.ChildEntity,
-                    // It is a leaf if the Shape Entity equals Body Entity
-                    IsLeafEntityBody = (shapeBakingData.ShapeComputationalData.Instance.ShapeEntity.Equals(shapeBakingData.ShapeComputationalData.Instance.BodyEntity))
-                });
+                AddComponent(
+                    colliderEntity,
+                    new PhysicsColliderBakedData()
+                    {
+                        BodyEntity = shapeBakingData.ShapeComputationalData.Instance.BodyEntity,
+                        BodyFromShape = shapeBakingData.ShapeComputationalData.Instance.BodyFromShape,
+                        ChildEntity = shapeBakingData.ShapeComputationalData.Instance.ChildEntity,
+                        // It is a leaf if the Shape Entity equals Body Entity
+                        IsLeafEntityBody = (
+                            shapeBakingData.ShapeComputationalData.Instance.ShapeEntity.Equals(
+                                shapeBakingData.ShapeComputationalData.Instance.BodyEntity
+                            )
+                        ),
+                    }
+                );
             }
 
             Profiler.EndSample();
@@ -288,13 +321,24 @@ namespace Unity.Physics.Authoring
 
     class BoxBaker : ColliderBaker<UnityEngine.BoxCollider>
     {
-        protected override ShapeComputationDataBaking GenerateComputationData(UnityEngine.BoxCollider shape, GameObject body, Transform bodyTransform, ColliderInstanceBaking colliderInstance, Entity colliderEntity, uint forceUniqueID)
+        protected override ShapeComputationDataBaking GenerateComputationData(
+            UnityEngine.BoxCollider shape,
+            GameObject body,
+            Transform bodyTransform,
+            ColliderInstanceBaking colliderInstance,
+            Entity colliderEntity,
+            uint forceUniqueID
+        )
         {
             var res = GenerateComputationDataGeneric(shape, body, colliderInstance, forceUniqueID);
             res.ShapeType = ShapeType.Box;
 
             var shapeLocalToWorld = shape.transform.localToWorldMatrix;
-            var bakeToShape = GetColliderBakeMatrix(shapeLocalToWorld, bodyTransform.localToWorldMatrix, out float bodyUniformScale);
+            var bakeToShape = GetColliderBakeMatrix(
+                shapeLocalToWorld,
+                bodyTransform.localToWorldMatrix,
+                out float bodyUniformScale
+            );
 
             var center = math.transform(bakeToShape, shape.center);
 
@@ -309,16 +353,15 @@ namespace Unity.Physics.Authoring
             }
 #endif
 
-            var geometry = new BoxGeometry
-            {
-                Center = center,
-                Orientation = orientation
-            };
+            var geometry = new BoxGeometry { Center = center, Orientation = orientation };
 
             geometry.Size = math.abs((float3)shape.size * (float3)bakeToShape.lossyScale);
 
             // Note: set bevel radius to a reasonable value, ensuring it can not collapse to a quad, while considering the uniform scale of the baked rigid body which will be applied to the collider at runtime.
-            geometry.BevelRadius = math.min(ConvexHullGenerationParameters.Default.BevelRadius / bodyUniformScale, math.cmin(geometry.Size) * 0.1f);
+            geometry.BevelRadius = math.min(
+                ConvexHullGenerationParameters.Default.BevelRadius / bodyUniformScale,
+                math.cmin(geometry.Size) * 0.1f
+            );
 
             res.BoxProperties = geometry;
 
@@ -328,13 +371,24 @@ namespace Unity.Physics.Authoring
 
     class SphereBaker : ColliderBaker<UnityEngine.SphereCollider>
     {
-        protected override ShapeComputationDataBaking GenerateComputationData(UnityEngine.SphereCollider shape, GameObject body, Transform bodyTransform, ColliderInstanceBaking colliderInstance, Entity colliderEntity, uint forceUniqueID)
+        protected override ShapeComputationDataBaking GenerateComputationData(
+            UnityEngine.SphereCollider shape,
+            GameObject body,
+            Transform bodyTransform,
+            ColliderInstanceBaking colliderInstance,
+            Entity colliderEntity,
+            uint forceUniqueID
+        )
         {
             var res = GenerateComputationDataGeneric(shape, body, colliderInstance, forceUniqueID);
             res.ShapeType = ShapeType.Sphere;
 
             var shapeLocalToWorld = shape.transform.localToWorldMatrix;
-            var bakeToShape = GetColliderBakeMatrix(shapeLocalToWorld, bodyTransform.localToWorldMatrix, out float bodyUniformScale);
+            var bakeToShape = GetColliderBakeMatrix(
+                shapeLocalToWorld,
+                bodyTransform.localToWorldMatrix,
+                out float bodyUniformScale
+            );
 
             var center = math.transform(bakeToShape, shape.center);
             var radius = shape.radius * math.cmax(math.abs(bakeToShape.lossyScale));
@@ -347,13 +401,24 @@ namespace Unity.Physics.Authoring
 
     class CapsuleBaker : ColliderBaker<UnityEngine.CapsuleCollider>
     {
-        protected override ShapeComputationDataBaking GenerateComputationData(UnityEngine.CapsuleCollider shape, GameObject body, Transform bodyTransform, ColliderInstanceBaking colliderInstance, Entity colliderEntity, uint forceUniqueID)
+        protected override ShapeComputationDataBaking GenerateComputationData(
+            UnityEngine.CapsuleCollider shape,
+            GameObject body,
+            Transform bodyTransform,
+            ColliderInstanceBaking colliderInstance,
+            Entity colliderEntity,
+            uint forceUniqueID
+        )
         {
             var res = GenerateComputationDataGeneric(shape, body, colliderInstance, forceUniqueID);
 
             res.ShapeType = ShapeType.Capsule;
 
-            var bakeToShape = GetColliderBakeMatrix(shape.transform.localToWorldMatrix, bodyTransform.localToWorldMatrix, out float bodyUniformScale);
+            var bakeToShape = GetColliderBakeMatrix(
+                shape.transform.localToWorldMatrix,
+                bodyTransform.localToWorldMatrix,
+                out float bodyUniformScale
+            );
             var lossyScale = math.abs(bakeToShape.lossyScale);
 
             // the capsule axis corresponds to the local axis specified by the direction index.
@@ -378,7 +443,12 @@ namespace Unity.Physics.Authoring
             var v0 = center + vertexOffset;
             var v1 = center - vertexOffset;
 
-            res.CapsuleProperties = new CapsuleGeometry { Vertex0 = v0, Vertex1 = v1, Radius = radius };
+            res.CapsuleProperties = new CapsuleGeometry
+            {
+                Vertex0 = v0,
+                Vertex1 = v1,
+                Radius = radius,
+            };
 
             return res;
         }
@@ -386,7 +456,14 @@ namespace Unity.Physics.Authoring
 
     class MeshBaker : ColliderBaker<UnityEngine.MeshCollider>
     {
-        protected override ShapeComputationDataBaking GenerateComputationData(UnityEngine.MeshCollider shape, GameObject body, Transform bodyTransform, ColliderInstanceBaking colliderInstance, Entity colliderEntity, uint forceUniqueID)
+        protected override ShapeComputationDataBaking GenerateComputationData(
+            UnityEngine.MeshCollider shape,
+            GameObject body,
+            Transform bodyTransform,
+            ColliderInstanceBaking colliderInstance,
+            Entity colliderEntity,
+            uint forceUniqueID
+        )
         {
             UnityEngine.Mesh mesh = shape.sharedMesh;
             if (mesh == null)
@@ -427,9 +504,13 @@ namespace Unity.Physics.Authoring
             {
                 Convex = shape.convex,
                 Mesh = mesh,
-                BakeFromShape = GetColliderBakeMatrix(shape.transform.localToWorldMatrix, bodyTransform.localToWorldMatrix, out float bodyUniformScale),
+                BakeFromShape = GetColliderBakeMatrix(
+                    shape.transform.localToWorldMatrix,
+                    bodyTransform.localToWorldMatrix,
+                    out float bodyUniformScale
+                ),
                 MeshBounds = mesh.bounds,
-                ChildToShape = float4x4.identity
+                ChildToShape = float4x4.identity,
             };
             AddComponent(colliderEntity, meshBakingData);
 

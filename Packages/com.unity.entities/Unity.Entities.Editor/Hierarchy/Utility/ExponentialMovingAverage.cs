@@ -12,7 +12,7 @@
                 current = next;
                 return;
             }
-            
+
             var alpha = 2.0f / (n + 1);
             var delta = next - current;
             current += alpha * delta;

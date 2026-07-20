@@ -44,9 +44,7 @@ namespace UnityEngine.Rendering
         // Flag indicating that default state has changed, therefore all properties in the stack must be reset in the next update.
         internal bool requiresResetForAllProperties = true;
 
-        internal VolumeStack()
-        {
-        }
+        internal VolumeStack() { }
 
         internal void Clear()
         {

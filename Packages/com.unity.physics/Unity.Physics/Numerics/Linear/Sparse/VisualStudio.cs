@@ -9,7 +9,7 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
         [BurstDiscard]
         internal unsafe (int, float)[] ToArray()
         {
-            var arr = new(int, float)[NonZeroElements];
+            var arr = new (int, float)[NonZeroElements];
             for (int i = 0; i < NonZeroElements; i++)
             {
                 arr[i] = (indices[i], values[i]);
@@ -29,11 +29,12 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
     }
 
     [DebuggerTypeProxy(typeof(MatrixDebugView))]
-    partial struct Matrix {}
+    partial struct Matrix { }
 
     internal class VectorDebugView
     {
         private Vector vector;
+
         public VectorDebugView(Vector v)
         {
             vector = v;
@@ -42,25 +43,20 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public (int, float)[] Elements
         {
-            get
-            {
-                return vector.ToArray();
-            }
+            get { return vector.ToArray(); }
         }
 
         //[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public float[] ElementsUncompressed
         {
-            get
-            {
-                return vector.ToUncompressedArray();
-            }
+            get { return vector.ToUncompressedArray(); }
         }
     }
 
     internal class MatrixDebugView
     {
         private Matrix matrix;
+
         public MatrixDebugView(Matrix m)
         {
             matrix = m;

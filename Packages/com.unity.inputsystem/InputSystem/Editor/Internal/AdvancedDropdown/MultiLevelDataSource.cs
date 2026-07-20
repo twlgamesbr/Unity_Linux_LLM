@@ -18,9 +18,7 @@ namespace UnityEngine.InputSystem.Editor
             set { m_Label = value; }
         }
 
-        internal MultiLevelDataSource()
-        {
-        }
+        internal MultiLevelDataSource() { }
 
         public MultiLevelDataSource(string[] displayOptions)
         {
@@ -69,7 +67,9 @@ namespace UnityEngine.InputSystem.Editor
         class MultiLevelItem : AdvancedDropdownItem
         {
             internal string stringId;
-            public MultiLevelItem(string path, string menuPath) : base(path)
+
+            public MultiLevelItem(string path, string menuPath)
+                : base(path)
             {
                 stringId = menuPath;
                 id = menuPath.GetHashCode();

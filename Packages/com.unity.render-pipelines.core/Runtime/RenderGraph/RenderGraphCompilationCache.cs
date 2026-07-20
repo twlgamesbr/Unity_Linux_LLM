@@ -25,7 +25,8 @@ class RenderGraphCompilationCache
             return 0;
     }
 
-    static DynamicArray<HashEntry<CompilerContextData>>.SortComparer s_NativeEntryComparer = HashEntryComparer<CompilerContextData>;
+    static DynamicArray<HashEntry<CompilerContextData>>.SortComparer s_NativeEntryComparer =
+        HashEntryComparer<CompilerContextData>;
 
     const int k_CachedGraphCount = 20;
 
@@ -40,7 +41,14 @@ class RenderGraphCompilationCache
     // Avoid GC in lambda.
     static int s_Hash;
 
-    bool GetCompilationCache(int hash, int frameIndex, out CompilerContextData outGraph, DynamicArray<HashEntry<CompilerContextData>> hashEntries, Stack<CompilerContextData> pool, DynamicArray<HashEntry<CompilerContextData>>.SortComparer comparer)
+    bool GetCompilationCache(
+        int hash,
+        int frameIndex,
+        out CompilerContextData outGraph,
+        DynamicArray<HashEntry<CompilerContextData>> hashEntries,
+        Stack<CompilerContextData> pool,
+        DynamicArray<HashEntry<CompilerContextData>>.SortComparer comparer
+    )
     {
         s_Hash = hash;
         int index = hashEntries.FindIndex(value => value.hash == s_Hash);
@@ -59,7 +67,7 @@ class RenderGraphCompilationCache
                 {
                     hash = hash,
                     lastFrameUsed = frameIndex,
-                    compiledGraph = pool.Pop()
+                    compiledGraph = pool.Pop(),
                 };
                 hashEntries.Add(newEntry);
                 outGraph = newEntry.compiledGraph;
@@ -82,7 +90,14 @@ class RenderGraphCompilationCache
 
     public bool GetCompilationCache(int hash, int frameIndex, out CompilerContextData outGraph)
     {
-        return GetCompilationCache(hash, frameIndex, out outGraph, m_NativeHashEntries, m_NativeCompiledGraphPool, s_NativeEntryComparer);
+        return GetCompilationCache(
+            hash,
+            frameIndex,
+            out outGraph,
+            m_NativeHashEntries,
+            m_NativeCompiledGraphPool,
+            s_NativeEntryComparer
+        );
     }
 
     public void Clear()

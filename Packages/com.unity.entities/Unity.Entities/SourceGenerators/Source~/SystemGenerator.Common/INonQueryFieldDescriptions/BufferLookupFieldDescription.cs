@@ -20,6 +20,7 @@ public readonly struct BufferLookupFieldDescription : IEquatable<BufferLookupFie
         w.Write($"Unity.Entities.BufferLookup<{TypeSymbol.ToFullName()}> {GeneratedFieldName};");
         w.WriteLine();
     }
+
     public string GetMemberAssignment() =>
         $@"{GeneratedFieldName} = state.GetBufferLookup<{TypeSymbol.ToFullName()}>({(IsReadOnly ? "true" : "false")});";
 
@@ -38,8 +39,8 @@ public readonly struct BufferLookupFieldDescription : IEquatable<BufferLookupFie
     {
         unchecked
         {
-            return ((TypeSymbol != null ?
-                SymbolEqualityComparer.Default.GetHashCode(TypeSymbol) : 0) * 397) ^ IsReadOnly.GetHashCode();
+            return ((TypeSymbol != null ? SymbolEqualityComparer.Default.GetHashCode(TypeSymbol) : 0) * 397)
+                ^ IsReadOnly.GetHashCode();
         }
     }
 }

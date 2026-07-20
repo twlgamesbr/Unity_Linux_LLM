@@ -11,7 +11,15 @@ namespace Unity.PlatformToolkit
         private PlatformToolkitMetrics m_Metrics;
         private int m_AccountId;
 
-        public PlayModeSolidZipFileArchive(Stream stream, string name, bool writable, PlayModeSaveDataInfo info, PlatformToolkitMetrics metrics, int accountId) : base(stream, name, writable)
+        public PlayModeSolidZipFileArchive(
+            Stream stream,
+            string name,
+            bool writable,
+            PlayModeSaveDataInfo info,
+            PlatformToolkitMetrics metrics,
+            int accountId
+        )
+            : base(stream, name, writable)
         {
             m_playModeBoundInfo = info;
             m_playModeBoundInfo.Name = name;

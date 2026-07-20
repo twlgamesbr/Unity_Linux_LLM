@@ -758,8 +758,14 @@ namespace UnityEngine.InputSystem
         /// </code>
         /// </example>
         /// </remarks>
-        public InputAction(string name = null, InputActionType type = default, string binding = null,
-                           string interactions = null, string processors = null, string expectedControlType = null)
+        public InputAction(
+            string name = null,
+            InputActionType type = default,
+            string binding = null,
+            string interactions = null,
+            string processors = null,
+            string expectedControlType = null
+        )
         {
             m_Name = name;
             m_Type = type;
@@ -1133,7 +1139,11 @@ namespace UnityEngine.InputSystem
         public void Reset()
         {
             var state = GetOrCreateActionMap().m_State;
-            state?.ResetActionState(m_ActionIndexInState, toPhase: enabled ? InputActionPhase.Waiting : InputActionPhase.Disabled, hardReset: true);
+            state?.ResetActionState(
+                m_ActionIndexInState,
+                toPhase: enabled ? InputActionPhase.Waiting : InputActionPhase.Disabled,
+                hardReset: true
+            );
         }
 
         /// <summary>
@@ -1744,8 +1754,14 @@ namespace UnityEngine.InputSystem
 
                     if (interactionState.totalTimeoutCompletionTimeRemaining > 0)
                     {
-                        return (interactionState.totalTimeoutCompletionDone + timerCompletion * interactionState.timerDuration)  /
-                            (interactionState.totalTimeoutCompletionDone + interactionState.totalTimeoutCompletionTimeRemaining);
+                        return (
+                                interactionState.totalTimeoutCompletionDone
+                                + timerCompletion * interactionState.timerDuration
+                            )
+                            / (
+                                interactionState.totalTimeoutCompletionDone
+                                + interactionState.totalTimeoutCompletionTimeRemaining
+                            );
                     }
                     else
                     {
@@ -1760,42 +1776,73 @@ namespace UnityEngine.InputSystem
         }
 
         ////REVIEW: it would be best if these were InternedStrings; however, for serialization, it has to be strings
-        [Tooltip("Human readable name of the action. Must be unique within its action map (case is ignored). Can be changed "
-            + "without breaking references to the action.")]
-        [SerializeField] internal string m_Name;
-        [Tooltip("Determines how the action triggers.\n"
-            + "\n"
-            + "A Value action will start and perform when a control moves from its default value and then "
-            + "perform on every value change. It will cancel when controls go back to default value. Also, when enabled, a Value "
-            + "action will respond right away to a control's current value.\n"
-            + "\n"
-            + "A Button action will start when a button is pressed and perform when the press threshold (see 'Default Button Press Point' in settings) "
-            + "is reached. It will cancel when the button is going below the release threshold (see 'Button Release Threshold' in settings). Also, "
-            + "if a button is already pressed when the action is enabled, the button has to be released first.\n"
-            + "\n"
-            + "A Pass-Through action will not explicitly start and will never cancel. Instead, for every value change on any bound control, "
-            + "the action will perform.")]
-        [SerializeField] internal InputActionType m_Type;
+        [Tooltip(
+            "Human readable name of the action. Must be unique within its action map (case is ignored). Can be changed "
+                + "without breaking references to the action."
+        )]
+        [SerializeField]
+        internal string m_Name;
+
+        [Tooltip(
+            "Determines how the action triggers.\n"
+                + "\n"
+                + "A Value action will start and perform when a control moves from its default value and then "
+                + "perform on every value change. It will cancel when controls go back to default value. Also, when enabled, a Value "
+                + "action will respond right away to a control's current value.\n"
+                + "\n"
+                + "A Button action will start when a button is pressed and perform when the press threshold (see 'Default Button Press Point' in settings) "
+                + "is reached. It will cancel when the button is going below the release threshold (see 'Button Release Threshold' in settings). Also, "
+                + "if a button is already pressed when the action is enabled, the button has to be released first.\n"
+                + "\n"
+                + "A Pass-Through action will not explicitly start and will never cancel. Instead, for every value change on any bound control, "
+                + "the action will perform."
+        )]
+        [SerializeField]
+        internal InputActionType m_Type;
+
         [FormerlySerializedAs("m_ExpectedControlLayout")]
-        [Tooltip("The type of control expected by the action (e.g. \"Digital\" for buttons, \"Vector2\" for sticks). This will limit the controls shown "
-            + "when setting up bindings in the UI and will also limit which controls can be bound interactively to the action.")]
-        [SerializeField] internal string m_ExpectedControlType;
-        [Tooltip("Unique ID of the action (GUID). Used to reference the action from bindings such that actions can be renamed "
-            + "without breaking references.")]
-        [SerializeField] internal string m_Id; // Can't serialize System.Guid and Unity's GUID is editor only.
-        [SerializeField] internal string m_Processors;
-        [SerializeField] internal string m_Interactions;
+        [Tooltip(
+            "The type of control expected by the action (e.g. \"Digital\" for buttons, \"Vector2\" for sticks). This will limit the controls shown "
+                + "when setting up bindings in the UI and will also limit which controls can be bound interactively to the action."
+        )]
+        [SerializeField]
+        internal string m_ExpectedControlType;
+
+        [Tooltip(
+            "Unique ID of the action (GUID). Used to reference the action from bindings such that actions can be renamed "
+                + "without breaking references."
+        )]
+        [SerializeField]
+        internal string m_Id; // Can't serialize System.Guid and Unity's GUID is editor only.
+
+        [SerializeField]
+        internal string m_Processors;
+
+        [SerializeField]
+        internal string m_Interactions;
 
         // For singleton actions, we serialize the bindings directly as part of the action.
         // For any other type of action, this is null.
-        [SerializeField] internal InputBinding[] m_SingletonActionBindings;
-        [SerializeField] internal ActionFlags m_Flags;
+        [SerializeField]
+        internal InputBinding[] m_SingletonActionBindings;
 
-        [NonSerialized] internal InputBinding? m_BindingMask;
-        [NonSerialized] internal int m_BindingsStartIndex;
-        [NonSerialized] internal int m_BindingsCount;
-        [NonSerialized] internal int m_ControlStartIndex;
-        [NonSerialized] internal int m_ControlCount;
+        [SerializeField]
+        internal ActionFlags m_Flags;
+
+        [NonSerialized]
+        internal InputBinding? m_BindingMask;
+
+        [NonSerialized]
+        internal int m_BindingsStartIndex;
+
+        [NonSerialized]
+        internal int m_BindingsCount;
+
+        [NonSerialized]
+        internal int m_ControlStartIndex;
+
+        [NonSerialized]
+        internal int m_ControlCount;
 
         /// <summary>
         /// Index of the action in the <see cref="InputActionState"/> associated with the
@@ -1805,7 +1852,8 @@ namespace UnityEngine.InputSystem
         /// This is not necessarily the same as the index of the action in its map.
         /// </remarks>
         /// <seealso cref="actionMap"/>
-        [NonSerialized] internal int m_ActionIndexInState = InputActionState.kInvalidIndex;
+        [NonSerialized]
+        internal int m_ActionIndexInState = InputActionState.kInvalidIndex;
 
         /// <summary>
         /// The action map that owns the action.
@@ -1813,12 +1861,18 @@ namespace UnityEngine.InputSystem
         /// <remarks>
         /// This is not serialized. The action map will restore this back references after deserialization.
         /// </remarks>
-        [NonSerialized] internal InputActionMap m_ActionMap;
+        [NonSerialized]
+        internal InputActionMap m_ActionMap;
 
         // Listeners. No array allocations if only a single listener.
-        [NonSerialized] internal CallbackArray<Action<CallbackContext>> m_OnStarted;
-        [NonSerialized] internal CallbackArray<Action<CallbackContext>> m_OnCanceled;
-        [NonSerialized] internal CallbackArray<Action<CallbackContext>> m_OnPerformed;
+        [NonSerialized]
+        internal CallbackArray<Action<CallbackContext>> m_OnStarted;
+
+        [NonSerialized]
+        internal CallbackArray<Action<CallbackContext>> m_OnCanceled;
+
+        [NonSerialized]
+        internal CallbackArray<Action<CallbackContext>> m_OnPerformed;
 
         /// <summary>
         /// Whether the action is a loose action created in code (e.g. as a property on a component).
@@ -1873,7 +1927,7 @@ namespace UnityEngine.InputSystem
             {
                 m_Actions = new[] { this },
                 m_SingletonAction = this,
-                m_Bindings = m_SingletonActionBindings
+                m_Bindings = m_SingletonActionBindings,
             };
         }
 
@@ -1949,8 +2003,10 @@ namespace UnityEngine.InputSystem
                     return i;
             }
 
-            throw new ArgumentOutOfRangeException(nameof(indexOfBindingOnAction),
-                $"Binding index {indexOfBindingOnAction} is out of range for action '{this}' with {currentBindingIndexOnAction + 1} bindings");
+            throw new ArgumentOutOfRangeException(
+                nameof(indexOfBindingOnAction),
+                $"Binding index {indexOfBindingOnAction} is out of range for action '{this}' with {currentBindingIndexOnAction + 1} bindings"
+            );
         }
 
         internal int BindingIndexOnMapToBindingIndexOnAction(int indexOfBindingOnMap)
@@ -1964,8 +2020,10 @@ namespace UnityEngine.InputSystem
             {
                 ref var binding = ref bindingsInMap[i];
 
-                if (string.Compare(binding.action, actionName, StringComparison.InvariantCultureIgnoreCase) == 0 ||
-                    binding.action == m_Id)
+                if (
+                    string.Compare(binding.action, actionName, StringComparison.InvariantCultureIgnoreCase) == 0
+                    || binding.action == m_Id
+                )
                     ++bindingIndexOnAction;
             }
 
@@ -2358,7 +2416,9 @@ namespace UnityEngine.InputSystem
                     var valueSize = valueSizeInBytes;
                     if (bufferSize < valueSize)
                         throw new ArgumentException(
-                            $"Expected buffer of at least {valueSize} bytes but got buffer of only {bufferSize} bytes", nameof(bufferSize));
+                            $"Expected buffer of at least {valueSize} bytes but got buffer of only {bufferSize} bytes",
+                            nameof(bufferSize)
+                        );
                     UnsafeUtility.MemClear(buffer, valueSizeInBytes);
                 }
             }
@@ -2417,9 +2477,9 @@ namespace UnityEngine.InputSystem
                 var value = default(TValue);
                 if (m_State != null)
                 {
-                    value = phase.IsInProgress() ?
-                        m_State.ReadValue<TValue>(bindingIndex, controlIndex) :
-                        m_State.ApplyProcessors(bindingIndex, value);
+                    value = phase.IsInProgress()
+                        ? m_State.ReadValue<TValue>(bindingIndex, controlIndex)
+                        : m_State.ApplyProcessors(bindingIndex, value);
                 }
 
                 return value;

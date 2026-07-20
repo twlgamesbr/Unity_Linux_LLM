@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
+using Unity.Editor.Bridge;
+using Unity.Profiling.Editor;
 using UnityEditor;
 using UnityEditor.Profiling;
 using UnityEditorInternal;
 using UnityEngine.UIElements;
-using Unity.Editor.Bridge;
-using Unity.Collections;
 using static Unity.Entities.EntitiesProfiler;
 using static Unity.Entities.MemoryProfiler;
-
-using Unity.Profiling.Editor;
 
 namespace Unity.Entities.Editor
 {
@@ -25,8 +24,8 @@ namespace Unity.Entities.Editor
 
             public bool IsRecording => ProfilerWindowBridge.IsRecording(ProfilerWindow);
 
-            public MemoryProfilerViewController(ProfilerWindow profilerWindow) :
-                base(profilerWindow)
+            public MemoryProfilerViewController(ProfilerWindow profilerWindow)
+                : base(profilerWindow)
             {
                 m_View = new MemoryProfilerModuleView();
                 m_View.SearchFinished = () => Update();
@@ -35,7 +34,11 @@ namespace Unity.Entities.Editor
 
             protected override VisualElement CreateView()
             {
-                Analytics.SendEditorEvent(Analytics.Window.Profiler, Analytics.EventType.ProfilerModuleCreate, Analytics.MemoryProfilerModuleName);
+                Analytics.SendEditorEvent(
+                    Analytics.Window.Profiler,
+                    Analytics.EventType.ProfilerModuleCreate,
+                    Analytics.MemoryProfilerModuleName
+                );
                 return m_View.Create();
             }
 
@@ -70,45 +73,69 @@ namespace Unity.Entities.Editor
         static ProfilerCounterDescriptor[] ProfilerCounters = new[]
         {
             new ProfilerCounterDescriptor(k_AllocatedMemoryCounterName, k_CategoryName),
-            new ProfilerCounterDescriptor(k_UnusedMemoryCounterName, k_CategoryName)
+            new ProfilerCounterDescriptor(k_UnusedMemoryCounterName, k_CategoryName),
         };
 
-        public MemoryProfilerModule() :
-            base(ProfilerCounters, ProfilerModuleChartType.Line, new[] { k_CategoryName })
-        {
-        }
+        public MemoryProfilerModule()
+            : base(ProfilerCounters, ProfilerModuleChartType.Line, new[] { k_CategoryName }) { }
 
-        public override ProfilerModuleViewController CreateDetailsViewController() => new MemoryProfilerViewController(ProfilerWindow);
+        public override ProfilerModuleViewController CreateDetailsViewController() =>
+            new MemoryProfilerViewController(ProfilerWindow);
     }
 
     partial class MemoryProfilerModule
     {
-        static readonly string s_NoFrameDataAvailable = L10n.Tr("No frame data available. Select a frame from the charts above to see its details here.");
-        static readonly string s_DisplayingFrameDataDisabled = L10n.Tr("Displaying of frame data disabled while recording. To see the data, pause recording.");
+        static readonly string s_NoFrameDataAvailable = L10n.Tr(
+            "No frame data available. Select a frame from the charts above to see its details here."
+        );
+        static readonly string s_DisplayingFrameDataDisabled = L10n.Tr(
+            "Displaying of frame data disabled while recording. To see the data, pause recording."
+        );
 
         static IEnumerable<MemoryProfilerTreeViewItemData> GetTreeViewData(RawFrameDataView frame)
         {
-            var worldsData = GetSessionMetaData<WorldData>(frame, EntitiesProfiler.Guid, (int)DataTag.WorldData).Distinct().ToDictionary(x => x.SequenceNumber, x => x);
-            var archetypesData = GetSessionMetaData<ArchetypeData>(frame, EntitiesProfiler.Guid, (int)DataTag.ArchetypeData).Distinct().ToDictionary(x => x.StableHash, x => x);
+            var worldsData = GetSessionMetaData<WorldData>(frame, EntitiesProfiler.Guid, (int)DataTag.WorldData)
+                .Distinct()
+                .ToDictionary(x => x.SequenceNumber, x => x);
+            var archetypesData = GetSessionMetaData<ArchetypeData>(
+                    frame,
+                    EntitiesProfiler.Guid,
+                    (int)DataTag.ArchetypeData
+                )
+                .Distinct()
+                .ToDictionary(x => x.StableHash, x => x);
 
-            var componentsTemp = GetSessionMetaData<ArchetypeComponentData>(frame, EntitiesProfiler.Guid, (int)DataTag.ArchetypeComponentData).ToList();
+            var componentsTemp = GetSessionMetaData<ArchetypeComponentData>(
+                    frame,
+                    EntitiesProfiler.Guid,
+                    (int)DataTag.ArchetypeComponentData
+                )
+                .ToList();
             var archetypeComponentsData = new NativeArray<ArchetypeComponentData>(componentsTemp.Count, Allocator.Temp);
             for (var i = 0; i < componentsTemp.Count; ++i)
                 archetypeComponentsData[i] = componentsTemp[i];
 
             foreach (var archetypeMemoryData in GetFrameMetaData<ArchetypeMemoryData>(frame, MemoryProfiler.Guid, 0))
             {
-                if (worldsData.TryGetValue(archetypeMemoryData.WorldSequenceNumber, out var worldData) &&
-                    archetypesData.TryGetValue(archetypeMemoryData.StableHash, out var archetypeData))
+                if (
+                    worldsData.TryGetValue(archetypeMemoryData.WorldSequenceNumber, out var worldData)
+                    && archetypesData.TryGetValue(archetypeMemoryData.StableHash, out var archetypeData)
+                )
                 {
-                    yield return new MemoryProfilerTreeViewItemData(worldData.Name, archetypeData, archetypeMemoryData, archetypeComponentsData);
+                    yield return new MemoryProfilerTreeViewItemData(
+                        worldData.Name,
+                        archetypeData,
+                        archetypeMemoryData,
+                        archetypeComponentsData
+                    );
                 }
             }
 
             archetypeComponentsData.Dispose();
         }
 
-        static IEnumerable<T> GetSessionMetaData<T>(RawFrameDataView frame, Guid guid, int tag) where T : unmanaged
+        static IEnumerable<T> GetSessionMetaData<T>(RawFrameDataView frame, Guid guid, int tag)
+            where T : unmanaged
         {
             var metaDataCount = frame.GetSessionMetaDataCount(guid, tag);
             for (var metaDataIter = 0; metaDataIter < metaDataCount; ++metaDataIter)
@@ -119,7 +146,8 @@ namespace Unity.Entities.Editor
             }
         }
 
-        static IEnumerable<T> GetFrameMetaData<T>(RawFrameDataView frame, Guid guid, int tag) where T : unmanaged
+        static IEnumerable<T> GetFrameMetaData<T>(RawFrameDataView frame, Guid guid, int tag)
+            where T : unmanaged
         {
             var metaDataCount = frame.GetFrameMetaDataCount(guid, tag);
             for (var metaDataIter = 0; metaDataIter < metaDataCount; ++metaDataIter)

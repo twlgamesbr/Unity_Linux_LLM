@@ -24,8 +24,10 @@ namespace Unity.Jobs.CodeGen
         /// <param name="method"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public static MethodReference MakeGenericInstanceMethod(this MethodReference method,
-            params TypeReference[] types)
+        public static MethodReference MakeGenericInstanceMethod(
+            this MethodReference method,
+            params TypeReference[] types
+        )
         {
             var result = new GenericInstanceMethod(method);
             foreach (var type in types)

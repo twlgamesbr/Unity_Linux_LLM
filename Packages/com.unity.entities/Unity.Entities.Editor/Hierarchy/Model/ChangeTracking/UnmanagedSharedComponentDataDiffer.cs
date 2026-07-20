@@ -83,7 +83,8 @@ namespace Unity.Entities.Editor
             {
                 m_TypeIndex = typeIndex;
                 m_Allocator = allocator;
-                Ptr = (Data*) Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
+                Ptr = (Data*)
+                    Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
                 UnsafeUtility.MemClear(Ptr, UnsafeUtility.SizeOf<Data>());
             }
 
@@ -106,14 +107,22 @@ namespace Unity.Entities.Editor
             {
                 var addedComponentEntities = Ptr->AddedComponentEntities;
                 entities.ResizeUninitialized(addedComponentEntities.Length);
-                UnsafeUtility.MemCpy(entities.GetUnsafePtr(), addedComponentEntities.Ptr, addedComponentEntities.Length * UnsafeUtility.SizeOf<Entity>());
+                UnsafeUtility.MemCpy(
+                    entities.GetUnsafePtr(),
+                    addedComponentEntities.Ptr,
+                    addedComponentEntities.Length * UnsafeUtility.SizeOf<Entity>()
+                );
             }
 
             public void GetRemovedComponentEntities(NativeList<Entity> entities)
             {
                 var removedComponentEntities = Ptr->RemovedComponentEntities;
                 entities.ResizeUninitialized(removedComponentEntities.Length);
-                UnsafeUtility.MemCpy(entities.GetUnsafePtr(), removedComponentEntities.Ptr, removedComponentEntities.Length * UnsafeUtility.SizeOf<Entity>());
+                UnsafeUtility.MemCpy(
+                    entities.GetUnsafePtr(),
+                    removedComponentEntities.Ptr,
+                    removedComponentEntities.Length * UnsafeUtility.SizeOf<Entity>()
+                );
             }
 
             public Entity GetAddedComponentEntity(int index)
@@ -126,48 +135,67 @@ namespace Unity.Entities.Editor
                 return Ptr->RemovedComponentEntities[index];
             }
 
-            public void GetAddedComponentData<T>(NativeList<T> components) where T : unmanaged, ISharedComponentData
+            public void GetAddedComponentData<T>(NativeList<T> components)
+                where T : unmanaged, ISharedComponentData
             {
                 var addedComponentIndices = Ptr->AddedComponentIndices;
                 components.ResizeUninitialized(addedComponentIndices.Length);
 
                 for (var i = 0; i < addedComponentIndices.Length; i++)
                 {
-                    UnsafeUtility.CopyPtrToStructure<T>(Ptr->SharedComponentData.Ptr + addedComponentIndices[i] * UnsafeUtility.SizeOf<T>(), out var value);
+                    UnsafeUtility.CopyPtrToStructure<T>(
+                        Ptr->SharedComponentData.Ptr + addedComponentIndices[i] * UnsafeUtility.SizeOf<T>(),
+                        out var value
+                    );
                     components[i] = value;
                 }
             }
 
-            public void GetRemovedComponentData<T>(NativeList<T> components) where T : unmanaged, ISharedComponentData
+            public void GetRemovedComponentData<T>(NativeList<T> components)
+                where T : unmanaged, ISharedComponentData
             {
                 var removedComponentIndices = Ptr->RemovedComponentIndices;
                 components.ResizeUninitialized(removedComponentIndices.Length);
 
                 for (var i = 0; i < removedComponentIndices.Length; i++)
                 {
-                    UnsafeUtility.CopyPtrToStructure<T>(Ptr->SharedComponentData.Ptr + removedComponentIndices[i] * UnsafeUtility.SizeOf<T>(), out var value);
+                    UnsafeUtility.CopyPtrToStructure<T>(
+                        Ptr->SharedComponentData.Ptr + removedComponentIndices[i] * UnsafeUtility.SizeOf<T>(),
+                        out var value
+                    );
                     components[i] = value;
                 }
             }
 
-            public T GetAddedComponentData<T>(int index) where T : struct, ISharedComponentData
+            public T GetAddedComponentData<T>(int index)
+                where T : struct, ISharedComponentData
             {
                 EnsureIsExpectedComponent<T>();
-                UnsafeUtility.CopyPtrToStructure<T>(Ptr->SharedComponentData.Ptr + Ptr->AddedComponentIndices[index] * UnsafeUtility.SizeOf<T>(), out var value);
+                UnsafeUtility.CopyPtrToStructure<T>(
+                    Ptr->SharedComponentData.Ptr + Ptr->AddedComponentIndices[index] * UnsafeUtility.SizeOf<T>(),
+                    out var value
+                );
                 return value;
             }
 
-            public T GetRemovedComponentData<T>(int index) where T : struct, ISharedComponentData
+            public T GetRemovedComponentData<T>(int index)
+                where T : struct, ISharedComponentData
             {
                 EnsureIsExpectedComponent<T>();
-                UnsafeUtility.CopyPtrToStructure<T>(Ptr->SharedComponentData.Ptr + Ptr->RemovedComponentIndices[index] * UnsafeUtility.SizeOf<T>(), out var value);
+                UnsafeUtility.CopyPtrToStructure<T>(
+                    Ptr->SharedComponentData.Ptr + Ptr->RemovedComponentIndices[index] * UnsafeUtility.SizeOf<T>(),
+                    out var value
+                );
                 return value;
             }
 
-            void EnsureIsExpectedComponent<T>() where T : struct
+            void EnsureIsExpectedComponent<T>()
+                where T : struct
             {
                 if (TypeManager.GetTypeIndex<T>() != m_TypeIndex)
-                    throw new InvalidOperationException($"Unable to retrieve data for component type {typeof(T)} (type index {TypeManager.GetTypeIndex<T>()}), this container only holds data for the type with type index {m_TypeIndex}.");
+                    throw new InvalidOperationException(
+                        $"Unable to retrieve data for component type {typeof(T)} (type index {TypeManager.GetTypeIndex<T>()}), this container only holds data for the type with type index {m_TypeIndex}."
+                    );
             }
         }
 
@@ -219,7 +247,8 @@ namespace Unity.Entities.Editor
             public ChunkShadow(Allocator allocator)
             {
                 m_Allocator = allocator;
-                Ptr = (Data*) Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
+                Ptr = (Data*)
+                    Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
                 UnsafeUtility.MemClear(Ptr, UnsafeUtility.SizeOf<Data>());
             }
 
@@ -314,7 +343,10 @@ namespace Unity.Entities.Editor
         public UnmanagedSharedComponentDataDiffer(ComponentType componentType)
         {
             if (!CanWatch(componentType))
-                throw new ArgumentException($"{nameof(UnmanagedSharedComponentDataDiffer)} only supports unmanaged {nameof(ISharedComponentData)} components.", nameof(componentType));
+                throw new ArgumentException(
+                    $"{nameof(UnmanagedSharedComponentDataDiffer)} only supports unmanaged {nameof(ISharedComponentData)} components.",
+                    nameof(componentType)
+                );
 
             var typeInfo = TypeManager.GetTypeInfo(componentType.TypeIndex);
 
@@ -338,7 +370,8 @@ namespace Unity.Entities.Editor
                 throw new InvalidOperationException($"{nameof(TypeManager)} has not been initialized properly");
 
             var typeInfo = TypeManager.GetTypeInfo(componentType.TypeIndex);
-            return typeInfo.Category == TypeManager.TypeCategory.ISharedComponentData && UnsafeUtility.IsUnmanaged(componentType.GetManagedType());
+            return typeInfo.Category == TypeManager.TypeCategory.ISharedComponentData
+                && UnsafeUtility.IsUnmanaged(componentType.GetManagedType());
         }
 
         public void Dispose()
@@ -372,7 +405,12 @@ namespace Unity.Entities.Editor
             return changes;
         }
 
-        public unsafe ChangeSet GatherComponentChangesAsync(EntityManager entityManager, EntityQuery query, Allocator allocator, out JobHandle jobHandle)
+        public unsafe ChangeSet GatherComponentChangesAsync(
+            EntityManager entityManager,
+            EntityQuery query,
+            Allocator allocator,
+            out JobHandle jobHandle
+        )
         {
             var access = entityManager.GetCheckedEntityDataAccessExclusive();
             var chunks = query.ToArchetypeChunkListAsync(Allocator.TempJob, out var chunksJobHandle);
@@ -396,7 +434,10 @@ namespace Unity.Entities.Editor
             }.Schedule(chunksJobHandle);
 
             m_ChunkSequenceNumbers.Capacity = math.max(m_ChunkSequenceNumbers.Capacity, maxChunkCount);
-            m_ChunkShadowBySequenceNumber.Capacity = math.max(m_ChunkShadowBySequenceNumber.Capacity, maxChunkCount * 2);
+            m_ChunkShadowBySequenceNumber.Capacity = math.max(
+                m_ChunkShadowBySequenceNumber.Capacity,
+                maxChunkCount * 2
+            );
             m_RemovedChunks.Capacity = math.max(m_RemovedChunks.Capacity, maxChunkCount);
 
             var changes = new ChangeSet(m_TypeIndex, allocator);
@@ -409,14 +450,14 @@ namespace Unity.Entities.Editor
                 TypeIndex = m_TypeIndex,
                 Chunks = chunks,
                 ShadowChunksBySequenceNumber = m_ChunkShadowBySequenceNumber,
-                GatheredChangesByChunk = m_ChangesByChunk.GetUnsafeList()->Ptr
+                GatheredChangesByChunk = m_ChangesByChunk.GetUnsafeList()->Ptr,
             }.Schedule(chunks, 1, resizeAndClearJobHandle);
 
             var gatherExistingChunksJobHandle = new GatherExistingChunks
             {
                 TypeIndex = m_TypeIndex,
                 Chunks = chunks,
-                ChunkSequenceNumbers = m_ChunkSequenceNumbers.AsParallelWriter()
+                ChunkSequenceNumbers = m_ChunkSequenceNumbers.AsParallelWriter(),
             }.Schedule(chunks, 1, chunksJobHandle);
 
             var gatherRemovedChunksJobHandle = new GatherRemovedChunks
@@ -424,13 +465,13 @@ namespace Unity.Entities.Editor
                 ChunkShadowBySequenceNumberKeys = m_ChunkShadowBySequenceNumberKeys,
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
                 ChunkSequenceNumbers = m_ChunkSequenceNumbers,
-                RemovedChunks = m_RemovedChunks.AsParallelWriter()
+                RemovedChunks = m_RemovedChunks.AsParallelWriter(),
             }.Schedule(m_ChunkShadowBySequenceNumberKeys, 1, gatherExistingChunksJobHandle);
 
             var gatherRemovedEntitiesJobHandle = new GatherRemovedEntitiesJob
             {
                 RemoveChunks = m_RemovedChunks.AsDeferredJobArray(),
-                RemovedEntities = m_RemovedEntities
+                RemovedEntities = m_RemovedEntities,
             }.Schedule(gatherRemovedChunksJobHandle);
 
             var allocateNewShadowChunksJobHandle = new AllocateChunkShadowsJob
@@ -438,7 +479,7 @@ namespace Unity.Entities.Editor
                 TypeIndex = m_TypeIndex,
                 Chunks = chunks,
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
-                AllocatedChunkShadowsByChunk = m_AllocatedChunkShadowByChunk.GetUnsafeList()
+                AllocatedChunkShadowsByChunk = m_AllocatedChunkShadowByChunk.GetUnsafeList(),
             }.Schedule(chunks, 1, resizeAndClearJobHandle);
 
             var buildChangeSetJobHandle = new BuildChangeSetJob
@@ -452,8 +493,14 @@ namespace Unity.Entities.Editor
                 RemovedEntities = m_RemovedEntities.AsDeferredJobArray(),
                 ShadowChunkSharedComponentData = m_ChunkShadowSharedComponentData.GetUnsafeList(),
                 SharedComponentDataByType = access->EntityComponentStore->m_UnmanagedSharedComponentsByType,
-                Result = changes
-            }.Schedule(JobHandle.CombineDependencies(gatherEntityChangesJobHandle, gatherRemovedEntitiesJobHandle, allocateNewShadowChunksJobHandle));
+                Result = changes,
+            }.Schedule(
+                JobHandle.CombineDependencies(
+                    gatherEntityChangesJobHandle,
+                    gatherRemovedEntitiesJobHandle,
+                    allocateNewShadowChunksJobHandle
+                )
+            );
 
             var updateShadowChunksJobHandle = new UpdateShadowChunksJob
             {
@@ -462,8 +509,16 @@ namespace Unity.Entities.Editor
                 TypeIndex = m_TypeIndex,
                 ChangesByChunk = m_ChangesByChunk.AsDeferredJobArray(),
                 AllocatedChunkShadowsByChunk = m_AllocatedChunkShadowByChunk.AsDeferredJobArray(),
-                ShadowChunksBySequenceNumber = m_ChunkShadowBySequenceNumber.AsParallelWriter()
-            }.Schedule(chunks, 1, JobHandle.CombineDependencies(gatherEntityChangesJobHandle, gatherRemovedEntitiesJobHandle, allocateNewShadowChunksJobHandle));
+                ShadowChunksBySequenceNumber = m_ChunkShadowBySequenceNumber.AsParallelWriter(),
+            }.Schedule(
+                chunks,
+                1,
+                JobHandle.CombineDependencies(
+                    gatherEntityChangesJobHandle,
+                    gatherRemovedEntitiesJobHandle,
+                    allocateNewShadowChunksJobHandle
+                )
+            );
 
             var removeShadowChunksJobHande = new RemoveChunkShadowsJob
             {
@@ -471,7 +526,7 @@ namespace Unity.Entities.Editor
                 RemovedChunks = m_RemovedChunks.AsDeferredJobArray(),
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
                 ChunkShadowBySequenceNumberKeys = m_ChunkShadowBySequenceNumberKeys,
-                ChunkShadowBySequenceNumberKeysFreeList = m_ChunkShadowBySequenceNumberKeysFreeList
+                ChunkShadowBySequenceNumberKeysFreeList = m_ChunkShadowBySequenceNumberKeysFreeList,
             }.Schedule(JobHandle.CombineDependencies(buildChangeSetJobHandle, updateShadowChunksJobHandle));
 
             var copySharedComponentsJobHandle = new CopyStateToShadowSharedComponentDataJob
@@ -479,17 +534,23 @@ namespace Unity.Entities.Editor
                 TypeIndex = m_TypeIndex,
                 ComponentSize = m_ComponentSize,
                 SharedComponentDataByType = access->EntityComponentStore->m_UnmanagedSharedComponentsByType,
-                ShadowChunkSharedComponentData = m_ChunkShadowSharedComponentData.GetUnsafeList()
+                ShadowChunkSharedComponentData = m_ChunkShadowSharedComponentData.GetUnsafeList(),
             }.Schedule(buildChangeSetJobHandle);
 
-            var disposeChunksJobHandle = chunks.Dispose(JobHandle.CombineDependencies(copySharedComponentsJobHandle, removeShadowChunksJobHande));
+            var disposeChunksJobHandle = chunks.Dispose(
+                JobHandle.CombineDependencies(copySharedComponentsJobHandle, removeShadowChunksJobHande)
+            );
 
             var disposeGatheredChangesJobHandle = new DisposeGatheredChangesJob
             {
-                GatheredChanges = m_ChangesByChunk
+                GatheredChanges = m_ChangesByChunk,
             }.Schedule(m_ChangesByChunk, 1, buildChangeSetJobHandle);
 
-            jobHandle = JobHandle.CombineDependencies(gatherRemovedChunksJobHandle, disposeChunksJobHandle, disposeGatheredChangesJobHandle);
+            jobHandle = JobHandle.CombineDependencies(
+                gatherRemovedChunksJobHandle,
+                disposeChunksJobHandle,
+                disposeGatheredChangesJobHandle
+            );
 
             return changes;
         }
@@ -499,8 +560,11 @@ namespace Unity.Entities.Editor
         {
             public TypeIndex TypeIndex;
 
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [WriteOnly] public NativeParallelHashSet<ulong>.ParallelWriter ChunkSequenceNumbers;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [WriteOnly]
+            public NativeParallelHashSet<ulong>.ParallelWriter ChunkSequenceNumbers;
 
             public void Execute(int index)
             {
@@ -517,10 +581,17 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         struct GatherRemovedChunks : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
-            [ReadOnly] public NativeParallelHashSet<ulong> ChunkSequenceNumbers;
-            [WriteOnly] public NativeList<ChunkShadow>.ParallelWriter RemovedChunks;
+            [ReadOnly]
+            public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
+
+            [ReadOnly]
+            public NativeParallelHashSet<ulong> ChunkSequenceNumbers;
+
+            [WriteOnly]
+            public NativeList<ChunkShadow>.ParallelWriter RemovedChunks;
 
             public void Execute(int index)
             {
@@ -535,8 +606,11 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct GatherRemovedEntitiesJob : IJob
         {
-            [ReadOnly] public NativeArray<ChunkShadow> RemoveChunks;
-            [WriteOnly] public NativeList<Entity> RemovedEntities;
+            [ReadOnly]
+            public NativeArray<ChunkShadow> RemoveChunks;
+
+            [WriteOnly]
+            public NativeList<Entity> RemovedEntities;
 
             public void Execute()
             {
@@ -548,9 +622,11 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct ResizeAndClearChunkListsJob : IJob
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
             public NativeList<ChunkShadow> AllocatedChunkShadowByChunk;
             public NativeList<ChunkChanges> GatheredChanges;
+
             public void Execute()
             {
                 AllocatedChunkShadowByChunk.Resize(Chunks.Length, NativeArrayOptions.UninitializedMemory);
@@ -568,9 +644,14 @@ namespace Unity.Entities.Editor
         {
             public TypeIndex TypeIndex;
 
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ShadowChunksBySequenceNumber;
-            [NativeDisableUnsafePtrRestriction] public ChunkChanges* GatheredChangesByChunk;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ShadowChunksBySequenceNumber;
+
+            [NativeDisableUnsafePtrRestriction]
+            public ChunkChanges* GatheredChangesByChunk;
 
             public void Execute(int index)
             {
@@ -638,9 +719,15 @@ namespace Unity.Entities.Editor
         unsafe struct AllocateChunkShadowsJob : IJobParallelForDefer
         {
             public TypeIndex TypeIndex;
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
-            [NativeDisableUnsafePtrRestriction] public UnsafeList<ChunkShadow>* AllocatedChunkShadowsByChunk;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeList<ChunkShadow>* AllocatedChunkShadowsByChunk;
 
             public void Execute(int index)
             {
@@ -657,7 +744,9 @@ namespace Unity.Entities.Editor
                 var sharedComponentValueArray = archetype->Chunks.GetSharedComponentValues(chunk.ListIndex);
                 var sharedComponentOffset = indexInTypeArray - archetype->FirstSharedComponent;
                 var sharedComponentDataIndex = sharedComponentValueArray[sharedComponentOffset];
-                var elementIndex = EntityComponentStore.GetElementIndexFromSharedComponentIndex(sharedComponentDataIndex);
+                var elementIndex = EntityComponentStore.GetElementIndexFromSharedComponentIndex(
+                    sharedComponentDataIndex
+                );
 
                 var entityDataPtr = chunk.Buffer + archetype->Offsets[0];
                 var chunkCount = chunk.Count;
@@ -667,7 +756,8 @@ namespace Unity.Entities.Editor
                 shadow.Ptr->Count = chunkCount;
                 shadow.Ptr->Version = archetype->Chunks.GetChangeVersion(0, chunk.ListIndex);
                 shadow.Ptr->SharedComponentElementIndex = elementIndex;
-                shadow.Ptr->Entities = (Entity*)Memory.Unmanaged.Allocate(sizeof(Entity) * archetype->ChunkCapacity, 4, Allocator.Persistent);
+                shadow.Ptr->Entities = (Entity*)
+                    Memory.Unmanaged.Allocate(sizeof(Entity) * archetype->ChunkCapacity, 4, Allocator.Persistent);
 
                 UnsafeUtility.MemCpy(shadow.Ptr->Entities, entityDataPtr, chunkCount * sizeof(Entity));
                 AllocatedChunkShadowsByChunk->ElementAt(index) = shadow;
@@ -681,23 +771,31 @@ namespace Unity.Entities.Editor
             public int ComponentSize;
             public Allocator Allocator;
 
-            [NativeDisableUnsafePtrRestriction] public EntityComponentStore* ECS;
+            [NativeDisableUnsafePtrRestriction]
+            public EntityComponentStore* ECS;
 
             /// <summary>
             /// The set of changes gathered for this cycle.
             /// </summary>
-            [ReadOnly] public NativeArray<ChunkChanges> GatheredChangesByChunk;
-            [ReadOnly] public NativeArray<ChunkShadow> RemovedChunks;
-            [ReadOnly] public NativeArray<Entity> RemovedEntities;
+            [ReadOnly]
+            public NativeArray<ChunkChanges> GatheredChangesByChunk;
 
-            [NativeDisableUnsafePtrRestriction] public UnsafeList<byte>* ShadowChunkSharedComponentData;
+            [ReadOnly]
+            public NativeArray<ChunkShadow> RemovedChunks;
+
+            [ReadOnly]
+            public NativeArray<Entity> RemovedEntities;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeList<byte>* ShadowChunkSharedComponentData;
 
             /// <summary>
             /// The set of existing shared component data.
             /// </summary>
             public UnsafeList<ComponentTypeList> SharedComponentDataByType;
 
-            [NativeDisableUnsafePtrRestriction] public ChangeSet Result;
+            [NativeDisableUnsafePtrRestriction]
+            public ChangeSet Result;
 
             public void Execute()
             {
@@ -746,7 +844,11 @@ namespace Unity.Entities.Editor
                 if (RemovedEntities.Length > 0)
                 {
                     // We have already baked out a linear list of all entities that are removed via chunk destruction. We can simply copy this to the output.
-                    UnsafeUtility.MemCpy(removedComponentEntities.Ptr, RemovedEntities.GetUnsafeReadOnlyPtr(), RemovedEntities.Length * sizeof(Entity));
+                    UnsafeUtility.MemCpy(
+                        removedComponentEntities.Ptr,
+                        RemovedEntities.GetUnsafeReadOnlyPtr(),
+                        RemovedEntities.Length * sizeof(Entity)
+                    );
                 }
 
                 // We now need to add mappings so that each removed entity references it's previous shared component value.
@@ -757,13 +859,23 @@ namespace Unity.Entities.Editor
 
                     // Fetch the last known shared component value for this chunk.
                     var shadowSharedComponentValueIndex = removedChunk.Ptr->SharedComponentElementIndex;
-                    var shadowSharedComponentValuePtr = ShadowChunkSharedComponentData->Ptr + shadowSharedComponentValueIndex * ComponentSize;
+                    var shadowSharedComponentValuePtr =
+                        ShadowChunkSharedComponentData->Ptr + shadowSharedComponentValueIndex * ComponentSize;
 
                     // Add an entry to the sharedComponentDataBuffer for this chunk.
-                    UnsafeUtility.MemCpy(sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize, shadowSharedComponentValuePtr, ComponentSize);
+                    UnsafeUtility.MemCpy(
+                        sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize,
+                        shadowSharedComponentValuePtr,
+                        ComponentSize
+                    );
 
                     // Add an index to this shared component buffer PER entity. NOTE. This __could__ be optimized by using some sort of chunk based data structure. But this is a simpler implementation.
-                    UnsafeUtility.MemCpyReplicate(removedComponentIndices.Ptr + removedEntityCurrentCount, &sharedComponentDataBufferIndex, sizeof(int), removedChunk.Ptr->Count);
+                    UnsafeUtility.MemCpyReplicate(
+                        removedComponentIndices.Ptr + removedEntityCurrentCount,
+                        &sharedComponentDataBufferIndex,
+                        sizeof(int),
+                        removedChunk.Ptr->Count
+                    );
 
                     removedEntityCurrentCount += removedChunk.Ptr->Count;
                     sharedComponentDataBufferIndex++;
@@ -783,19 +895,36 @@ namespace Unity.Entities.Editor
 
                     if (shadowSharedComponentValueIndex != 0)
                     {
-                        var shadowSharedComponentValuePtr = ShadowChunkSharedComponentData->Ptr + shadowSharedComponentValueIndex * ComponentSize;
+                        var shadowSharedComponentValuePtr =
+                            ShadowChunkSharedComponentData->Ptr + shadowSharedComponentValueIndex * ComponentSize;
 
                         // Add an entry to the sharedComponentDataBuffer for this chunk.
-                        UnsafeUtility.MemCpy(sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize, shadowSharedComponentValuePtr, ComponentSize);
+                        UnsafeUtility.MemCpy(
+                            sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize,
+                            shadowSharedComponentValuePtr,
+                            ComponentSize
+                        );
                     }
                     else
                     {
-                        UnsafeUtility.MemClear(sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize, ComponentSize);
+                        UnsafeUtility.MemClear(
+                            sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize,
+                            ComponentSize
+                        );
                     }
 
                     // Add the entity and lookup to the output buffer.
-                    UnsafeUtility.MemCpy(removedComponentEntities.Ptr + removedEntityCurrentCount, changesForChunk.RemovedEntities.Ptr, changesForChunk.RemovedEntities.Length * sizeof(Entity));
-                    UnsafeUtility.MemCpyReplicate(removedComponentIndices.Ptr + removedEntityCurrentCount, &sharedComponentDataBufferIndex, sizeof(int), changesForChunk.RemovedEntities.Length);
+                    UnsafeUtility.MemCpy(
+                        removedComponentEntities.Ptr + removedEntityCurrentCount,
+                        changesForChunk.RemovedEntities.Ptr,
+                        changesForChunk.RemovedEntities.Length * sizeof(Entity)
+                    );
+                    UnsafeUtility.MemCpyReplicate(
+                        removedComponentIndices.Ptr + removedEntityCurrentCount,
+                        &sharedComponentDataBufferIndex,
+                        sizeof(int),
+                        changesForChunk.RemovedEntities.Length
+                    );
 
                     removedEntityCurrentCount += changesForChunk.RemovedEntities.Length;
                     sharedComponentDataBufferIndex++;
@@ -812,27 +941,48 @@ namespace Unity.Entities.Editor
                     // Fetch the current shared component value for this chunk.
                     var archetype = ECS->GetArchetype(changesForChunk.Chunk);
                     var indexInTypeArray = ChunkDataUtility.GetIndexInTypeArray(archetype, TypeIndex);
-                    var sharedComponentValueArray = archetype->Chunks.GetSharedComponentValues(changesForChunk.Chunk.ListIndex);
+                    var sharedComponentValueArray = archetype->Chunks.GetSharedComponentValues(
+                        changesForChunk.Chunk.ListIndex
+                    );
                     var sharedComponentOffset = indexInTypeArray - archetype->FirstSharedComponent;
                     var sharedComponentDataIndex = sharedComponentValueArray[sharedComponentOffset];
-                    var elementIndex = EntityComponentStore.GetElementIndexFromSharedComponentIndex(sharedComponentDataIndex);
+                    var elementIndex = EntityComponentStore.GetElementIndexFromSharedComponentIndex(
+                        sharedComponentDataIndex
+                    );
 
                     if (elementIndex != 0)
                     {
                         // Fetch the current shared component value for this chunk.
-                        var sharedComponentValuePtr = (byte*) SharedComponentDataByType[TypeIndex.Index].Ptr + elementIndex * ComponentSize;
+                        var sharedComponentValuePtr =
+                            (byte*)SharedComponentDataByType[TypeIndex.Index].Ptr + elementIndex * ComponentSize;
 
                         // Add an entry to the sharedComponentDataBuffer for this chunk.
-                        UnsafeUtility.MemCpy(sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize, sharedComponentValuePtr, ComponentSize);
+                        UnsafeUtility.MemCpy(
+                            sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize,
+                            sharedComponentValuePtr,
+                            ComponentSize
+                        );
                     }
                     else
                     {
-                        UnsafeUtility.MemClear(sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize, ComponentSize);
+                        UnsafeUtility.MemClear(
+                            sharedComponentData.Ptr + sharedComponentDataBufferIndex * ComponentSize,
+                            ComponentSize
+                        );
                     }
 
                     // Add the entity and lookup to the output buffer.
-                    UnsafeUtility.MemCpy(addedComponentEntities.Ptr + addedEntityCurrentCount, changesForChunk.AddedEntities.Ptr, changesForChunk.AddedEntities.Length * sizeof(Entity));
-                    UnsafeUtility.MemCpyReplicate(addedComponentIndices.Ptr + addedEntityCurrentCount, &sharedComponentDataBufferIndex, sizeof(int), changesForChunk.AddedEntities.Length);
+                    UnsafeUtility.MemCpy(
+                        addedComponentEntities.Ptr + addedEntityCurrentCount,
+                        changesForChunk.AddedEntities.Ptr,
+                        changesForChunk.AddedEntities.Length * sizeof(Entity)
+                    );
+                    UnsafeUtility.MemCpyReplicate(
+                        addedComponentIndices.Ptr + addedEntityCurrentCount,
+                        &sharedComponentDataBufferIndex,
+                        sizeof(int),
+                        changesForChunk.AddedEntities.Length
+                    );
 
                     addedEntityCurrentCount += changesForChunk.AddedEntities.Length;
                     sharedComponentDataBufferIndex++;
@@ -850,11 +1000,21 @@ namespace Unity.Entities.Editor
         unsafe struct UpdateShadowChunksJob : IJobParallelForDefer
         {
             public TypeIndex TypeIndex;
-            [NativeDisableUnsafePtrRestriction] public EntityComponentStore* ECS;
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks; // not used, but required to be here for IJobParallelForDefer
-            [ReadOnly] public NativeArray<ChunkChanges> ChangesByChunk;
-            [ReadOnly] public NativeArray<ChunkShadow> AllocatedChunkShadowsByChunk;
-            [WriteOnly] public NativeParallelHashMap<ulong, ChunkShadow>.ParallelWriter ShadowChunksBySequenceNumber;
+
+            [NativeDisableUnsafePtrRestriction]
+            public EntityComponentStore* ECS;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks; // not used, but required to be here for IJobParallelForDefer
+
+            [ReadOnly]
+            public NativeArray<ChunkChanges> ChangesByChunk;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> AllocatedChunkShadowsByChunk;
+
+            [WriteOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow>.ParallelWriter ShadowChunksBySequenceNumber;
 
             public void Execute(int index)
             {
@@ -880,7 +1040,9 @@ namespace Unity.Entities.Editor
                     var sharedComponentValueArray = archetype->Chunks.GetSharedComponentValues(listIndex);
                     var sharedComponentOffset = indexInTypeArray - archetype->FirstSharedComponent;
                     var sharedComponentDataIndex = sharedComponentValueArray[sharedComponentOffset];
-                    var sharedComponentElementIndex = EntityComponentStore.GetElementIndexFromSharedComponentIndex(sharedComponentDataIndex);
+                    var sharedComponentElementIndex = EntityComponentStore.GetElementIndexFromSharedComponentIndex(
+                        sharedComponentDataIndex
+                    );
                     var entities = chunk.Buffer + archetype->Offsets[0];
 
                     changes.Shadow.Ptr->SharedComponentElementIndex = sharedComponentElementIndex;
@@ -895,15 +1057,18 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct RemoveChunkShadowsJob : IJob
         {
-            [ReadOnly] public NativeArray<ChunkShadow> AllocatedChunkShadowByChunk;
-            [ReadOnly] public NativeArray<ChunkShadow> RemovedChunks;
+            [ReadOnly]
+            public NativeArray<ChunkShadow> AllocatedChunkShadowByChunk;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> RemovedChunks;
             public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
             public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
             public NativeList<int> ChunkShadowBySequenceNumberKeysFreeList;
 
             public void Execute()
             {
-                for (var i=0; i<AllocatedChunkShadowByChunk.Length; i++)
+                for (var i = 0; i < AllocatedChunkShadowByChunk.Length; i++)
                 {
                     var shadow = AllocatedChunkShadowByChunk[i];
 
@@ -947,7 +1112,8 @@ namespace Unity.Entities.Editor
             /// <summary>
             /// The shadow copy of all shared component data.
             /// </summary>
-            [NativeDisableUnsafePtrRestriction] public UnsafeList<byte>* ShadowChunkSharedComponentData;
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeList<byte>* ShadowChunkSharedComponentData;
 
             public void Execute()
             {
@@ -963,7 +1129,11 @@ namespace Unity.Entities.Editor
                     {
                         // For now we just do a brute force copy each frame. This should be optimized to only update changed things but will likely need some deeper investigation.
                         ShadowChunkSharedComponentData->Resize(sharedComponentData->Length * ComponentSize);
-                        UnsafeUtility.MemCpy(ShadowChunkSharedComponentData->Ptr, sharedComponentData->Ptr, sharedComponentData->Length * ComponentSize);
+                        UnsafeUtility.MemCpy(
+                            ShadowChunkSharedComponentData->Ptr,
+                            sharedComponentData->Ptr,
+                            sharedComponentData->Length * ComponentSize
+                        );
                     }
                 }
             }
@@ -972,7 +1142,8 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct DisposeGatheredChangesJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ChunkChanges> GatheredChanges;
+            [ReadOnly]
+            public NativeList<ChunkChanges> GatheredChanges;
 
             public void Execute(int index)
             {

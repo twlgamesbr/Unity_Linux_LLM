@@ -9,7 +9,8 @@ namespace UnityEngine.InputSystem.Editor
 {
     internal class InputActionDebuggerWindow : EditorWindow
     {
-        [NonSerialized] private InputAction m_Action = null;
+        [NonSerialized]
+        private InputAction m_Action = null;
 
         public static void CreateOrShowExisting(InputAction action)
         {
@@ -38,9 +39,7 @@ namespace UnityEngine.InputSystem.Editor
             window.AddToList();
         }
 
-        public void OnGUI()
-        {
-        }
+        public void OnGUI() { }
 
         private static List<InputActionDebuggerWindow> s_OpenDebuggerWindows;
 

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VerifyCS = Unity.Entities.Analyzer.Test.CSharpCodeFixVerifier<
     Unity.Entities.Analyzer.SystemAPIAnalyzer,
-    Unity.Entities.Analyzer.EntitiesCodeFixProvider>;
+    Unity.Entities.Analyzer.EntitiesCodeFixProvider
+>;
 
 namespace Unity.Entities.Analyzer
 {
@@ -18,7 +18,8 @@ namespace Unity.Entities.Analyzer
         [DataRow("Time", @"var time = {|#0:Time|}.DeltaTime")]
         public async Task SystemAPIUseInNonSystemType_Error(string memberName, string apiMethodInvocation)
         {
-            var test = @$"
+            var test =
+                @$"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 using static Unity.Entities.SystemAPI;
@@ -42,7 +43,8 @@ namespace Unity.Entities.Analyzer
         [DataRow("Time", @"var time = {|#0:Time|}.DeltaTime")]
         public async Task SystemAPIUseInStaticMethod_Error(string memberName, string apiMethodInvocation)
         {
-            var test = @$"
+            var test =
+                @$"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 using static Unity.Entities.SystemAPI;

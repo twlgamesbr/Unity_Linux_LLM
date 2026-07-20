@@ -98,8 +98,7 @@ namespace UnityEngine.InputSystem.Utilities
         /// <returns>String representation of the FourCC.</returns>
         public override string ToString()
         {
-            return
-                $"{(char) (m_Code >> 24)}{(char) ((m_Code & 0xff0000) >> 16)}{(char) ((m_Code & 0xff00) >> 8)}{(char) (m_Code & 0xff)}";
+            return $"{(char)(m_Code >> 24)}{(char)((m_Code & 0xff0000) >> 16)}{(char)((m_Code & 0xff00) >> 8)}{(char)(m_Code & 0xff)}";
         }
 
         /// <summary>
@@ -144,7 +143,7 @@ namespace UnityEngine.InputSystem.Utilities
         /// <returns>True if the two FourCCs are equal, i.e. have the same exact
         /// character codes.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator==(FourCC left, FourCC right)
+        public static bool operator ==(FourCC left, FourCC right)
         {
             return left.m_Code == right.m_Code;
         }
@@ -157,7 +156,7 @@ namespace UnityEngine.InputSystem.Utilities
         /// <returns>True if the two FourCCs are not equal, i.e. do not have the same exact
         /// character codes.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator!=(FourCC left, FourCC right)
+        public static bool operator !=(FourCC left, FourCC right)
         {
             return left.m_Code != right.m_Code;
         }

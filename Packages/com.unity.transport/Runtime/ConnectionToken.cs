@@ -8,15 +8,19 @@ namespace Unity.Networking.Transport
     internal unsafe struct ConnectionToken : IEquatable<ConnectionToken>, IComparable<ConnectionToken>
     {
         public const int k_Length = 8;
-        [FieldOffset(0)] public fixed byte Value[k_Length];
-        [FieldOffset(0)] private long m_ValueLongWorkaround;
 
-        public static bool operator==(ConnectionToken lhs, ConnectionToken rhs)
+        [FieldOffset(0)]
+        public fixed byte Value[k_Length];
+
+        [FieldOffset(0)]
+        private long m_ValueLongWorkaround;
+
+        public static bool operator ==(ConnectionToken lhs, ConnectionToken rhs)
         {
             return lhs.Compare(rhs) == 0;
         }
 
-        public static bool operator!=(ConnectionToken lhs, ConnectionToken rhs)
+        public static bool operator !=(ConnectionToken lhs, ConnectionToken rhs)
         {
             return lhs.Compare(rhs) != 0;
         }
@@ -38,29 +42,29 @@ namespace Unity.Networking.Transport
 
         public override int GetHashCode()
         {
-            fixed(byte* p = Value)
-            unchecked
-            {
-                var result = 0;
-
-                for (int i = 0; i < k_Length; i++)
+            fixed (byte* p = Value)
+                unchecked
                 {
-                    result = (result * 31) ^ (int)p[i];
-                }
+                    var result = 0;
 
-                return result;
-            }
+                    for (int i = 0; i < k_Length; i++)
+                    {
+                        result = (result * 31) ^ (int)p[i];
+                    }
+
+                    return result;
+                }
         }
 
         public override string ToString()
         {
-            fixed(byte* p = Value)
-            return $"0x{*(long*)p:x16}";
+            fixed (byte* p = Value)
+                return $"0x{*(long*)p:x16}";
         }
 
         int Compare(ConnectionToken other)
         {
-            fixed(void* p = Value)
+            fixed (void* p = Value)
             {
                 return UnsafeUtility.MemCmp(p, other.Value, k_Length);
             }

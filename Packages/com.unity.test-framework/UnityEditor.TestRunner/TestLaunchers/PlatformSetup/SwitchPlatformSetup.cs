@@ -22,20 +22,12 @@ namespace UnityEditor.TestTools.TestRunner
             //EditorUserBuildSettings.allowDebugging = true; // managed debugger can be attached
         }
 
-        public void PostBuildAction()
-        {
-        }
+        public void PostBuildAction() { }
 
-        public void PostSuccessfulBuildAction()
-        {
-        }
+        public void PostSuccessfulBuildAction() { }
 
-        public void PostSuccessfulLaunchAction()
-        {
-        }
+        public void PostSuccessfulLaunchAction() { }
 
-        public void CleanUp()
-        {
-        }
+        public void CleanUp() { }
     }
 }

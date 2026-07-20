@@ -13,7 +13,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
         public void WriteValueToRendererInstanceIdsInDictionary<TValue>(
             GameObject gameObject,
             TValue value,
-            Dictionary<int, TValue> dictionary)
+            Dictionary<int, TValue> dictionary
+        )
         {
             gameObject.GetComponentsInChildren(m_RenderersPin);
             foreach (var renderer in m_RenderersPin)

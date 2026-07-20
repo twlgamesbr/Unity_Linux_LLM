@@ -12,10 +12,12 @@ namespace UnityEngine.Rendering
     {
         /// <summary>Low Material Quality.</summary>
         Low = 1 << 0,
+
         /// <summary>Medium Material Quality.</summary>
         Medium = 1 << 1,
+
         /// <summary>High Material Quality.</summary>
-        High = 1 << 2
+        High = 1 << 2,
     }
 
     /// <summary>
@@ -72,7 +74,10 @@ namespace UnityEngine.Rendering
         /// <param name="availableLevels">Available MaterialQuality bitfield.</param>
         /// <param name="requestedLevel">Input MaterialQuality level.</param>
         /// <returns>The closest available quality level.</returns>
-        public static MaterialQuality GetClosestQuality(this MaterialQuality availableLevels, MaterialQuality requestedLevel)
+        public static MaterialQuality GetClosestQuality(
+            this MaterialQuality availableLevels,
+            MaterialQuality requestedLevel
+        )
         {
             // Special fallback when there are no available quality levels. Needs to match in the shader stripping code
             if (availableLevels == 0)

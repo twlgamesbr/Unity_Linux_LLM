@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.UIElements;
-using System.Collections.Generic;
 
 namespace EditorAttributes.Editor
 {
@@ -42,7 +42,10 @@ namespace EditorAttributes.Editor
 
             foreach (var field in tabGroupAttribute.FieldsToGroup)
             {
-                SerializedProperty fieldProperty = FindNestedProperty(property, GetSerializedPropertyName(field, property));
+                SerializedProperty fieldProperty = FindNestedProperty(
+                    property,
+                    GetSerializedPropertyName(field, property)
+                );
 
                 stringList.Add(fieldProperty == null ? field : fieldProperty.displayName);
             }

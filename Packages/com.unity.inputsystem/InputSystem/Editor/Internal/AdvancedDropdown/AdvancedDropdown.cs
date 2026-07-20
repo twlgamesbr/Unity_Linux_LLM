@@ -42,8 +42,10 @@ namespace UnityEngine.InputSystem.Editor
             m_WindowInstance.state = m_State;
             m_WindowInstance.dataSource = m_DataSource;
             m_WindowInstance.gui = m_Gui;
-            m_WindowInstance.windowClosed +=
-                w => { ItemSelected(w.GetSelectedItem()); };
+            m_WindowInstance.windowClosed += w =>
+            {
+                ItemSelected(w.GetSelectedItem());
+            };
             m_WindowInstance.windowDestroyed += OnDestroy;
             m_WindowInstance.Init(rect);
         }
@@ -60,19 +62,17 @@ namespace UnityEngine.InputSystem.Editor
 
         protected abstract AdvancedDropdownItem BuildRoot();
 
-        protected virtual AdvancedDropdownItem BuildCustomSearch(string searchString,
-            IEnumerable<AdvancedDropdownItem> elements)
+        protected virtual AdvancedDropdownItem BuildCustomSearch(
+            string searchString,
+            IEnumerable<AdvancedDropdownItem> elements
+        )
         {
             return null;
         }
 
-        protected virtual void ItemSelected(AdvancedDropdownItem item)
-        {
-        }
+        protected virtual void ItemSelected(AdvancedDropdownItem item) { }
 
-        protected virtual void OnDestroy()
-        {
-        }
+        protected virtual void OnDestroy() { }
     }
 }
 #endif

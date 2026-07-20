@@ -9,7 +9,8 @@ namespace Unity.Entities
         [BurstCompile]
         struct ClearMissingReferencesJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
 
             public void Execute(int index)
             {
@@ -19,12 +20,14 @@ namespace Unity.Entities
             }
         }
 
-        static void ClearMissingReferences(EntityManager entityManager, NativeList<ArchetypeChunk> chunks, out JobHandle jobHandle, JobHandle dependsOn)
+        static void ClearMissingReferences(
+            EntityManager entityManager,
+            NativeList<ArchetypeChunk> chunks,
+            out JobHandle jobHandle,
+            JobHandle dependsOn
+        )
         {
-            jobHandle = new ClearMissingReferencesJob
-            {
-                Chunks = chunks,
-            }.Schedule(chunks, 64, dependsOn);
+            jobHandle = new ClearMissingReferencesJob { Chunks = chunks }.Schedule(chunks, 64, dependsOn);
         }
     }
 }

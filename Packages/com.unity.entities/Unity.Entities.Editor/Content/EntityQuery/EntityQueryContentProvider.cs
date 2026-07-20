@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using Unity.Serialization;
 using Unity.Serialization.Json;
 using UnityEditor;
@@ -14,35 +14,55 @@ namespace Unity.Entities.Editor
     enum EntityQueryContentTab
     {
         Components,
-        Entities
+        Entities,
     }
 
     class EntityQueryContentProvider : ContentProvider
     {
         // Unity.Entities.World is not serializable by default, so we use the world's name to find it again. This is
         // clearly not enough to guarantee that we can survive domain reload, but it should cover most cases.
-        [CreateProperty, HideInInspector] string m_WorldName;
-        [CreateProperty, HideInInspector] EntityQueryOptions m_Options;
-        [CreateProperty, HideInInspector] string[] m_NoneComponentTypes;
-        [CreateProperty, HideInInspector] string[] m_AnyComponentTypes;
-        [CreateProperty, HideInInspector] string[] m_AllComponentTypes;
-        [CreateProperty, HideInInspector] string[] m_DisabledComponentTypes;
-        [CreateProperty, HideInInspector] string[] m_AbsentComponentTypes;
+        [CreateProperty, HideInInspector]
+        string m_WorldName;
 
-        bool Any => m_AllComponentTypes != null ||
-                    m_AnyComponentTypes != null ||
-                    m_NoneComponentTypes != null ||
-                    m_DisabledComponentTypes != null ||
-                    m_AbsentComponentTypes != null;
+        [CreateProperty, HideInInspector]
+        EntityQueryOptions m_Options;
+
+        [CreateProperty, HideInInspector]
+        string[] m_NoneComponentTypes;
+
+        [CreateProperty, HideInInspector]
+        string[] m_AnyComponentTypes;
+
+        [CreateProperty, HideInInspector]
+        string[] m_AllComponentTypes;
+
+        [CreateProperty, HideInInspector]
+        string[] m_DisabledComponentTypes;
+
+        [CreateProperty, HideInInspector]
+        string[] m_AbsentComponentTypes;
+
+        bool Any =>
+            m_AllComponentTypes != null
+            || m_AnyComponentTypes != null
+            || m_NoneComponentTypes != null
+            || m_DisabledComponentTypes != null
+            || m_AbsentComponentTypes != null;
 
         public override string Name { get; } = L10n.Tr("Query");
 
         World m_World;
         EntityQuery m_Query;
         SystemProxy m_SystemProxy;
-        [SerializeField] string m_SystemTypeName;
-        [SerializeField] int m_QueryOrder;
-        [SerializeField] EntityQueryContentTab m_Tab;
+
+        [SerializeField]
+        string m_SystemTypeName;
+
+        [SerializeField]
+        int m_QueryOrder;
+
+        [SerializeField]
+        EntityQueryContentTab m_Tab;
 
         [CreateProperty, DontSerialize]
         public int EntityCount => IsValid ? Query.CalculateEntityCount() : 0;
@@ -245,8 +265,9 @@ namespace Unity.Entities.Editor
                 m_Query = m_World.EntityManager.CreateEntityQuery(desc);
             }
 
-            return m_World != null && m_World.IsCreated && m_World.EntityManager.IsQueryValid(m_Query) ?
-                ContentStatus.ContentReady : ContentStatus.ContentNotReady;
+            return m_World != null && m_World.IsCreated && m_World.EntityManager.IsQueryValid(m_Query)
+                ? ContentStatus.ContentReady
+                : ContentStatus.ContentNotReady;
         }
 
         public override object GetContent() => this;
@@ -269,15 +290,15 @@ namespace Unity.Entities.Editor
                     return false;
                 }
 
-                value = JsonSerialization.ToJson(new ComponentTypeContainer
-                {
-                    Type = $"{type}, {type.Assembly.GetName().Name}",
-                    AccessMode = componentType.AccessModeType,
-                    IsChunkComponent = componentType.IsChunkComponent
-                }, new JsonSerializationParameters
-                {
-                    Minified = true
-                });
+                value = JsonSerialization.ToJson(
+                    new ComponentTypeContainer
+                    {
+                        Type = $"{type}, {type.Assembly.GetName().Name}",
+                        AccessMode = componentType.AccessModeType,
+                        IsChunkComponent = componentType.IsChunkComponent,
+                    },
+                    new JsonSerializationParameters { Minified = true }
+                );
                 return true;
             }
 
@@ -295,18 +316,14 @@ namespace Unity.Entities.Editor
                             var valueTemp = new ComponentType
                             {
                                 TypeIndex = typeIndex,
-                                AccessModeType = container.AccessMode
+                                AccessModeType = container.AccessMode,
                             };
 
                             value = ComponentType.ChunkComponent(valueTemp.GetManagedType());
                         }
                         else
                         {
-                            value = new ComponentType
-                            {
-                                TypeIndex = typeIndex,
-                                AccessModeType = container.AccessMode
-                            };
+                            value = new ComponentType { TypeIndex = typeIndex, AccessModeType = container.AccessMode };
                         }
 
                         return true;
@@ -317,14 +334,19 @@ namespace Unity.Entities.Editor
                 return false;
             }
 
-            void IJsonAdapter<ComponentType>.Serialize(in JsonSerializationContext<ComponentType> context, ComponentType value)
+            void IJsonAdapter<ComponentType>.Serialize(
+                in JsonSerializationContext<ComponentType> context,
+                ComponentType value
+            )
             {
                 context.Writer.WriteValue(TrySerialize(value, out var json) ? json : null);
             }
 
             ComponentType IJsonAdapter<ComponentType>.Deserialize(in JsonDeserializationContext<ComponentType> context)
             {
-                return TryDeserialize(context.SerializedValue.AsStringView().ToString(), out var componentType) ? componentType : default;
+                return TryDeserialize(context.SerializedValue.AsStringView().ToString(), out var componentType)
+                    ? componentType
+                    : default;
             }
         }
     }
@@ -338,7 +360,13 @@ namespace Unity.Entities.Editor
             Resources.AddCommonVariables(element);
             Resources.Templates.ContentProvider.EntityQuery.AddStyles(element);
 
-            var content = new EntityQueryContent(Target.World, Target.Query, Target.SystemProxy, Target.QueryOrder, Target.Tab);
+            var content = new EntityQueryContent(
+                Target.World,
+                Target.Query,
+                Target.SystemProxy,
+                Target.QueryOrder,
+                Target.Tab
+            );
             element.SetTarget(new EntityQueryDisplay(content));
             return element;
         }

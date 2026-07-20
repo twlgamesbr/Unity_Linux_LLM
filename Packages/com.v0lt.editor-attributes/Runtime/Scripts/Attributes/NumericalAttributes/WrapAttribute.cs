@@ -24,7 +24,8 @@ namespace EditorAttributes
         /// </summary>
         /// <param name="minValue">The min value before it wraps arround</param>
         /// <param name="maxValue">The max value before it wraps arround</param>
-        public WrapAttribute(float minValue, float maxValue) : this(minValue, maxValue, minValue, maxValue) { }
+        public WrapAttribute(float minValue, float maxValue)
+            : this(minValue, maxValue, minValue, maxValue) { }
 
         /// <summary>
         /// Attribute to wrap over a numeric value after it surpases it's limits
@@ -33,7 +34,8 @@ namespace EditorAttributes
         /// <param name="maxValueX">The max value on X before it wraps arround</param>
         /// <param name="minValueY">The min value on Y before it wraps arround</param>
         /// <param name="maxValueY">The max value on Y before it wraps arround</param>
-        public WrapAttribute(float minValueX, float maxValueX, float minValueY, float maxValueY) : this(minValueX, maxValueX, minValueY, maxValueY, minValueX, maxValueX) { }
+        public WrapAttribute(float minValueX, float maxValueX, float minValueY, float maxValueY)
+            : this(minValueX, maxValueX, minValueY, maxValueY, minValueX, maxValueX) { }
 
         /// <summary>
         /// Attribute to wrap over a numeric value after it surpases it's limits
@@ -44,7 +46,15 @@ namespace EditorAttributes
         /// <param name="maxValueY">The max value on Y before it wraps arround</param>
         /// <param name="minValueZ">The min value on Z before it wraps arround</param>
         /// <param name="maxValueZ">The max value on Z before it wraps arround</param>
-        public WrapAttribute(float minValueX, float maxValueX, float minValueY, float maxValueY, float minValueZ, float maxValueZ) : this(minValueX, maxValueX, minValueY, maxValueY, minValueZ, maxValueZ, minValueX, maxValueX) { }
+        public WrapAttribute(
+            float minValueX,
+            float maxValueX,
+            float minValueY,
+            float maxValueY,
+            float minValueZ,
+            float maxValueZ
+        )
+            : this(minValueX, maxValueX, minValueY, maxValueY, minValueZ, maxValueZ, minValueX, maxValueX) { }
 
         /// <summary>
         /// Attribute to wrap over a numeric value after it surpases it's limits
@@ -57,7 +67,16 @@ namespace EditorAttributes
         /// <param name="maxValueZ">The max value on Z before it wraps arround</param>
         /// <param name="minValueW">The min value on W before it wraps arround</param>
         /// <param name="maxValueW">The max value on W before it wraps arround</param>
-        public WrapAttribute(float minValueX, float maxValueX, float minValueY, float maxValueY, float minValueZ, float maxValueZ, float minValueW, float maxValueW)
+        public WrapAttribute(
+            float minValueX,
+            float maxValueX,
+            float minValueY,
+            float maxValueY,
+            float minValueZ,
+            float maxValueZ,
+            float minValueW,
+            float maxValueW
+        )
         {
             MinValueX = minValueX;
             MaxValueX = maxValueX;

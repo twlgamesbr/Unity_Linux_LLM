@@ -59,7 +59,7 @@ namespace UnityEngine.Rendering.Universal
             Foliage,
 
             /// <summary> Use this for custom. </summary>
-            Custom
+            Custom,
         }
 
         struct AlbedoDebugValidationPresetData
@@ -77,7 +77,7 @@ namespace UnityEngine.Rendering.Universal
                 name = "Default Luminance",
                 color = new Color(127f / 255f, 127f / 255f, 127f / 255f),
                 minLuminance = 0.01f,
-                maxLuminance = 0.90f
+                maxLuminance = 0.90f,
             },
             // colors taken from http://www.babelcolor.com/index_htm_files/ColorChecker_RGB_and_spectra.xls
             new AlbedoDebugValidationPresetData()
@@ -85,99 +85,98 @@ namespace UnityEngine.Rendering.Universal
                 name = "Black Acrylic Paint",
                 color = new Color(56f / 255f, 56f / 255f, 56f / 255f),
                 minLuminance = 0.03f,
-                maxLuminance = 0.07f
+                maxLuminance = 0.07f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Dark Soil",
                 color = new Color(85f / 255f, 61f / 255f, 49f / 255f),
                 minLuminance = 0.05f,
-                maxLuminance = 0.14f
+                maxLuminance = 0.14f,
             },
-
             new AlbedoDebugValidationPresetData()
             {
                 name = "Worn Asphalt",
                 color = new Color(91f / 255f, 91f / 255f, 91f / 255f),
                 minLuminance = 0.10f,
-                maxLuminance = 0.15f
+                maxLuminance = 0.15f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Dry Clay Soil",
                 color = new Color(137f / 255f, 120f / 255f, 102f / 255f),
                 minLuminance = 0.15f,
-                maxLuminance = 0.35f
+                maxLuminance = 0.35f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Green Grass",
                 color = new Color(123f / 255f, 131f / 255f, 74f / 255f),
                 minLuminance = 0.16f,
-                maxLuminance = 0.26f
+                maxLuminance = 0.26f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Old Concrete",
                 color = new Color(135f / 255f, 136f / 255f, 131f / 255f),
                 minLuminance = 0.17f,
-                maxLuminance = 0.30f
+                maxLuminance = 0.30f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Red Clay Tile",
                 color = new Color(197f / 255f, 125f / 255f, 100f / 255f),
                 minLuminance = 0.23f,
-                maxLuminance = 0.33f
+                maxLuminance = 0.33f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Dry Sand",
                 color = new Color(177f / 255f, 167f / 255f, 132f / 255f),
                 minLuminance = 0.20f,
-                maxLuminance = 0.45f
+                maxLuminance = 0.45f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "New Concrete",
                 color = new Color(185f / 255f, 182f / 255f, 175f / 255f),
                 minLuminance = 0.32f,
-                maxLuminance = 0.55f
+                maxLuminance = 0.55f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "White Acrylic Paint",
                 color = new Color(227f / 255f, 227f / 255f, 227f / 255f),
                 minLuminance = 0.75f,
-                maxLuminance = 0.85f
+                maxLuminance = 0.85f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Fresh Snow",
                 color = new Color(243f / 255f, 243f / 255f, 243f / 255f),
                 minLuminance = 0.85f,
-                maxLuminance = 0.95f
+                maxLuminance = 0.95f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Blue Sky",
                 color = new Color(93f / 255f, 123f / 255f, 157f / 255f),
                 minLuminance = new Color(93f / 255f, 123f / 255f, 157f / 255f).linear.maxColorComponent - 0.05f,
-                maxLuminance = new Color(93f / 255f, 123f / 255f, 157f / 255f).linear.maxColorComponent + 0.05f
+                maxLuminance = new Color(93f / 255f, 123f / 255f, 157f / 255f).linear.maxColorComponent + 0.05f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Foliage",
                 color = new Color(91f / 255f, 108f / 255f, 65f / 255f),
                 minLuminance = new Color(91f / 255f, 108f / 255f, 65f / 255f).linear.maxColorComponent - 0.05f,
-                maxLuminance = new Color(91f / 255f, 108f / 255f, 65f / 255f).linear.maxColorComponent + 0.05f
+                maxLuminance = new Color(91f / 255f, 108f / 255f, 65f / 255f).linear.maxColorComponent + 0.05f,
             },
             new AlbedoDebugValidationPresetData()
             {
                 name = "Custom",
                 color = new Color(127f / 255f, 127f / 255f, 127f / 255f),
                 minLuminance = 0.01f,
-                maxLuminance = 0.90f
+                maxLuminance = 0.90f,
             },
         };
 
@@ -218,7 +217,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public float albedoHueTolerance
         {
-            get => m_AlbedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance ? 1.0f : m_AlbedoHueTolerance;
+            get =>
+                m_AlbedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance ? 1.0f : m_AlbedoHueTolerance;
             set => m_AlbedoHueTolerance = value;
         }
 
@@ -229,7 +229,10 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public float albedoSaturationTolerance
         {
-            get => m_AlbedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance ? 1.0f : m_AlbedoSaturationTolerance;
+            get =>
+                m_AlbedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance
+                    ? 1.0f
+                    : m_AlbedoSaturationTolerance;
             set => m_AlbedoSaturationTolerance = value;
         }
 
@@ -348,72 +351,136 @@ namespace UnityEngine.Rendering.Universal
             public const string MetallicSettingsContainerName = "Metallic Settings";
             public const string RenderingLayerMasksSettingsContainerName = "Rendering Layer Masks Settings";
 
-            public static readonly NameAndTooltip MaterialOverride = new() { name = "Material Override", tooltip = "Use the drop-down to select a Material property to visualize on every GameObject on screen." };
-            public static readonly NameAndTooltip VertexAttribute = new() { name = "Vertex Attribute", tooltip = "Use the drop-down to select a 3D GameObject attribute, like Texture Coordinates or Vertex Color, to visualize on screen." };
-            public static readonly NameAndTooltip MaterialValidationMode = new() { name = "Material Validation Mode", tooltip = "Debug and validate material properties." };
-            public static readonly NameAndTooltip RenderingLayersSelectedLight = new() { name = "Filter Rendering Layers by Light", tooltip = "Highlight Renderers affected by Selected Light" };
-            public static readonly NameAndTooltip SelectedLightShadowLayerMask = new() { name = "Use Light's Shadow Layer Mask", tooltip = "Highlight Renderers that cast shadows for the Selected Light" };
-            public static readonly NameAndTooltip FilterRenderingLayerMask = new() { name = "Filter Layers", tooltip = "Use the dropdown to filter Rendering Layers that you want to visualize" };
-            public static readonly NameAndTooltip ValidationPreset = new() { name = "Validation Preset", tooltip = "Validate using a list of preset surfaces and inputs based on real-world surfaces." };
-            public static readonly NameAndTooltip AlbedoCustomColor = new() { name = "Target Color", tooltip = "Custom target color for albedo validation." };
-            public static readonly NameAndTooltip AlbedoMinLuminance = new() { name = "Min Luminance", tooltip = "Any values set below this field are invalid and appear red on screen." };
-            public static readonly NameAndTooltip AlbedoMaxLuminance = new() { name = "Max Luminance", tooltip = "Any values set above this field are invalid and appear blue on screen." };
-            public static readonly NameAndTooltip AlbedoHueTolerance = new() { name = "Hue Tolerance", tooltip = "Validate a material based on a specific hue." };
-            public static readonly NameAndTooltip AlbedoSaturationTolerance = new() { name = "Saturation Tolerance", tooltip = "Validate a material based on a specific Saturation." };
-            public static readonly NameAndTooltip MetallicMinValue = new() { name = "Min Value", tooltip = "Any values set below this field are invalid and appear red on screen." };
-            public static readonly NameAndTooltip MetallicMaxValue = new() { name = "Max Value", tooltip = "Any values set above this field are invalid and appear blue on screen." };
+            public static readonly NameAndTooltip MaterialOverride = new()
+            {
+                name = "Material Override",
+                tooltip = "Use the drop-down to select a Material property to visualize on every GameObject on screen.",
+            };
+            public static readonly NameAndTooltip VertexAttribute = new()
+            {
+                name = "Vertex Attribute",
+                tooltip =
+                    "Use the drop-down to select a 3D GameObject attribute, like Texture Coordinates or Vertex Color, to visualize on screen.",
+            };
+            public static readonly NameAndTooltip MaterialValidationMode = new()
+            {
+                name = "Material Validation Mode",
+                tooltip = "Debug and validate material properties.",
+            };
+            public static readonly NameAndTooltip RenderingLayersSelectedLight = new()
+            {
+                name = "Filter Rendering Layers by Light",
+                tooltip = "Highlight Renderers affected by Selected Light",
+            };
+            public static readonly NameAndTooltip SelectedLightShadowLayerMask = new()
+            {
+                name = "Use Light's Shadow Layer Mask",
+                tooltip = "Highlight Renderers that cast shadows for the Selected Light",
+            };
+            public static readonly NameAndTooltip FilterRenderingLayerMask = new()
+            {
+                name = "Filter Layers",
+                tooltip = "Use the dropdown to filter Rendering Layers that you want to visualize",
+            };
+            public static readonly NameAndTooltip ValidationPreset = new()
+            {
+                name = "Validation Preset",
+                tooltip = "Validate using a list of preset surfaces and inputs based on real-world surfaces.",
+            };
+            public static readonly NameAndTooltip AlbedoCustomColor = new()
+            {
+                name = "Target Color",
+                tooltip = "Custom target color for albedo validation.",
+            };
+            public static readonly NameAndTooltip AlbedoMinLuminance = new()
+            {
+                name = "Min Luminance",
+                tooltip = "Any values set below this field are invalid and appear red on screen.",
+            };
+            public static readonly NameAndTooltip AlbedoMaxLuminance = new()
+            {
+                name = "Max Luminance",
+                tooltip = "Any values set above this field are invalid and appear blue on screen.",
+            };
+            public static readonly NameAndTooltip AlbedoHueTolerance = new()
+            {
+                name = "Hue Tolerance",
+                tooltip = "Validate a material based on a specific hue.",
+            };
+            public static readonly NameAndTooltip AlbedoSaturationTolerance = new()
+            {
+                name = "Saturation Tolerance",
+                tooltip = "Validate a material based on a specific Saturation.",
+            };
+            public static readonly NameAndTooltip MetallicMinValue = new()
+            {
+                name = "Min Value",
+                tooltip = "Any values set below this field are invalid and appear red on screen.",
+            };
+            public static readonly NameAndTooltip MetallicMaxValue = new()
+            {
+                name = "Max Value",
+                tooltip = "Any values set above this field are invalid and appear blue on screen.",
+            };
         }
 
         internal static class WidgetFactory
         {
-            internal static DebugUI.Widget CreateMaterialOverride(DebugDisplaySettingsMaterial data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.MaterialOverride,
-                autoEnum = typeof(DebugMaterialMode),
-                getter = () => (int)data.materialDebugMode,
-                setter = (value) => data.materialDebugMode = (DebugMaterialMode)value,
-                getIndex = () => (int)data.materialDebugMode,
-                setIndex = (value) => data.materialDebugMode = (DebugMaterialMode)value
-            };
+            internal static DebugUI.Widget CreateMaterialOverride(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.MaterialOverride,
+                    autoEnum = typeof(DebugMaterialMode),
+                    getter = () => (int)data.materialDebugMode,
+                    setter = (value) => data.materialDebugMode = (DebugMaterialMode)value,
+                    getIndex = () => (int)data.materialDebugMode,
+                    setIndex = (value) => data.materialDebugMode = (DebugMaterialMode)value,
+                };
 
-            internal static DebugUI.Widget CreateVertexAttribute(DebugDisplaySettingsMaterial data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.VertexAttribute,
-                autoEnum = typeof(DebugVertexAttributeMode),
-                getter = () => (int)data.vertexAttributeDebugMode,
-                setter = (value) => data.vertexAttributeDebugMode = (DebugVertexAttributeMode)value,
-                getIndex = () => (int)data.vertexAttributeDebugMode,
-                setIndex = (value) => data.vertexAttributeDebugMode = (DebugVertexAttributeMode)value
-            };
+            internal static DebugUI.Widget CreateVertexAttribute(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.VertexAttribute,
+                    autoEnum = typeof(DebugVertexAttributeMode),
+                    getter = () => (int)data.vertexAttributeDebugMode,
+                    setter = (value) => data.vertexAttributeDebugMode = (DebugVertexAttributeMode)value,
+                    getIndex = () => (int)data.vertexAttributeDebugMode,
+                    setIndex = (value) => data.vertexAttributeDebugMode = (DebugVertexAttributeMode)value,
+                };
 
-            internal static DebugUI.Widget CreateMaterialValidationMode(DebugDisplaySettingsMaterial data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.MaterialValidationMode,
-                autoEnum = typeof(DebugMaterialValidationMode),
-                getter = () => (int)data.materialValidationMode,
-                setter = (value) => data.materialValidationMode = (DebugMaterialValidationMode)value,
-                getIndex = () => (int)data.materialValidationMode,
-                setIndex = (value) => data.materialValidationMode = (DebugMaterialValidationMode)value
-            };
+            internal static DebugUI.Widget CreateMaterialValidationMode(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.MaterialValidationMode,
+                    autoEnum = typeof(DebugMaterialValidationMode),
+                    getter = () => (int)data.materialValidationMode,
+                    setter = (value) => data.materialValidationMode = (DebugMaterialValidationMode)value,
+                    getIndex = () => (int)data.materialValidationMode,
+                    setIndex = (value) => data.materialValidationMode = (DebugMaterialValidationMode)value,
+                };
 
-            internal static DebugUI.Widget CreateRenderingLayersSelectedLight (DebugDisplaySettingsMaterial data) => new DebugUI.BoolField
-            {
-                nameAndTooltip = Strings.RenderingLayersSelectedLight,
-                getter = () => (bool)data.renderingLayersSelectedLight,
-                setter = (value) => data.renderingLayersSelectedLight = value,
-                flags = DebugUI.Flags.EditorOnly,
-            };
+            internal static DebugUI.Widget CreateRenderingLayersSelectedLight(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.BoolField
+                {
+                    nameAndTooltip = Strings.RenderingLayersSelectedLight,
+                    getter = () => (bool)data.renderingLayersSelectedLight,
+                    setter = (value) => data.renderingLayersSelectedLight = value,
+                    flags = DebugUI.Flags.EditorOnly,
+                };
 
-            internal static DebugUI.Widget CreateSelectedLightShadowLayerMask(DebugDisplaySettingsMaterial data) => new DebugUI.BoolField
-            {
-                nameAndTooltip = Strings.SelectedLightShadowLayerMask,
-                getter = () => (bool)data.selectedLightShadowLayerMask,
-                setter = value => data.selectedLightShadowLayerMask = value,
-                flags = DebugUI.Flags.EditorOnly,
-                isHiddenCallback = () => !data.renderingLayersSelectedLight
-            };
+            internal static DebugUI.Widget CreateSelectedLightShadowLayerMask(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.BoolField
+                {
+                    nameAndTooltip = Strings.SelectedLightShadowLayerMask,
+                    getter = () => (bool)data.selectedLightShadowLayerMask,
+                    setter = value => data.selectedLightShadowLayerMask = value,
+                    flags = DebugUI.Flags.EditorOnly,
+                    isHiddenCallback = () => !data.renderingLayersSelectedLight,
+                };
 
-            internal static DebugUI.RenderingLayerField CreateFilterRenderingLayerMasks(DebugDisplaySettingsMaterial data)
+            internal static DebugUI.RenderingLayerField CreateFilterRenderingLayerMasks(
+                DebugDisplaySettingsMaterial data
+            )
             {
                 var renderingLayersField = new DebugUI.RenderingLayerField()
                 {
@@ -422,79 +489,89 @@ namespace UnityEngine.Rendering.Universal
                     setter = value => data.renderingLayerMask = value,
                     getRenderingLayerColor = index => data.debugRenderingLayersColors[index],
                     setRenderingLayerColor = (value, index) => data.debugRenderingLayersColors[index] = value,
-                    isHiddenCallback = () => data.renderingLayersSelectedLight
+                    isHiddenCallback = () => data.renderingLayersSelectedLight,
                 };
 
                 return renderingLayersField;
             }
 
-            internal static DebugUI.Widget CreateAlbedoPreset(DebugDisplaySettingsMaterial data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.ValidationPreset,
-                autoEnum = typeof(AlbedoDebugValidationPreset),
-                getter = () => (int)data.albedoValidationPreset,
-                setter = (value) => data.albedoValidationPreset = (AlbedoDebugValidationPreset)value,
-                getIndex = () => (int)data.albedoValidationPreset,
-                setIndex = (value) => data.albedoValidationPreset = (AlbedoDebugValidationPreset)value
-            };
+            internal static DebugUI.Widget CreateAlbedoPreset(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.ValidationPreset,
+                    autoEnum = typeof(AlbedoDebugValidationPreset),
+                    getter = () => (int)data.albedoValidationPreset,
+                    setter = (value) => data.albedoValidationPreset = (AlbedoDebugValidationPreset)value,
+                    getIndex = () => (int)data.albedoValidationPreset,
+                    setIndex = (value) => data.albedoValidationPreset = (AlbedoDebugValidationPreset)value,
+                };
 
-            internal static DebugUI.Widget CreateAlbedoCustomColor(DebugDisplaySettingsMaterial data) => new DebugUI.ColorField()
-            {
-                nameAndTooltip = Strings.AlbedoCustomColor,
-                getter = () => data.albedoCompareColor,
-                setter = (value) => data.albedoCompareColor = value,
-                isHiddenCallback = () => data.albedoValidationPreset != AlbedoDebugValidationPreset.Custom
-            };
+            internal static DebugUI.Widget CreateAlbedoCustomColor(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.ColorField()
+                {
+                    nameAndTooltip = Strings.AlbedoCustomColor,
+                    getter = () => data.albedoCompareColor,
+                    setter = (value) => data.albedoCompareColor = value,
+                    isHiddenCallback = () => data.albedoValidationPreset != AlbedoDebugValidationPreset.Custom,
+                };
 
-            internal static DebugUI.Widget CreateAlbedoMinLuminance(DebugDisplaySettingsMaterial data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.AlbedoMinLuminance,
-                getter = () => data.albedoMinLuminance,
-                setter = (value) => data.albedoMinLuminance = value,
-                incStep = 0.01f
-            };
+            internal static DebugUI.Widget CreateAlbedoMinLuminance(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.AlbedoMinLuminance,
+                    getter = () => data.albedoMinLuminance,
+                    setter = (value) => data.albedoMinLuminance = value,
+                    incStep = 0.01f,
+                };
 
-            internal static DebugUI.Widget CreateAlbedoMaxLuminance(DebugDisplaySettingsMaterial data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.AlbedoMaxLuminance,
-                getter = () => data.albedoMaxLuminance,
-                setter = (value) => data.albedoMaxLuminance = value,
-                incStep = 0.01f
-            };
+            internal static DebugUI.Widget CreateAlbedoMaxLuminance(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.AlbedoMaxLuminance,
+                    getter = () => data.albedoMaxLuminance,
+                    setter = (value) => data.albedoMaxLuminance = value,
+                    incStep = 0.01f,
+                };
 
-            internal static DebugUI.Widget CreateAlbedoHueTolerance(DebugDisplaySettingsMaterial data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.AlbedoHueTolerance,
-                getter = () => data.albedoHueTolerance,
-                setter = (value) => data.albedoHueTolerance = value,
-                incStep = 0.01f,
-                isHiddenCallback = () => data.albedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance
-            };
+            internal static DebugUI.Widget CreateAlbedoHueTolerance(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.AlbedoHueTolerance,
+                    getter = () => data.albedoHueTolerance,
+                    setter = (value) => data.albedoHueTolerance = value,
+                    incStep = 0.01f,
+                    isHiddenCallback = () =>
+                        data.albedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance,
+                };
 
-            internal static DebugUI.Widget CreateAlbedoSaturationTolerance(DebugDisplaySettingsMaterial data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.AlbedoSaturationTolerance,
-                getter = () => data.albedoSaturationTolerance,
-                setter = (value) => data.albedoSaturationTolerance = value,
-                incStep = 0.01f,
-                isHiddenCallback = () => data.albedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance
-            };
+            internal static DebugUI.Widget CreateAlbedoSaturationTolerance(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.AlbedoSaturationTolerance,
+                    getter = () => data.albedoSaturationTolerance,
+                    setter = (value) => data.albedoSaturationTolerance = value,
+                    incStep = 0.01f,
+                    isHiddenCallback = () =>
+                        data.albedoValidationPreset == AlbedoDebugValidationPreset.DefaultLuminance,
+                };
 
-            internal static DebugUI.Widget CreateMetallicMinValue(DebugDisplaySettingsMaterial data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.MetallicMinValue,
-                getter = () => data.metallicMinValue,
-                setter = (value) => data.metallicMinValue = value,
-                incStep = 0.01f
-            };
+            internal static DebugUI.Widget CreateMetallicMinValue(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.MetallicMinValue,
+                    getter = () => data.metallicMinValue,
+                    setter = (value) => data.metallicMinValue = value,
+                    incStep = 0.01f,
+                };
 
-            internal static DebugUI.Widget CreateMetallicMaxValue(DebugDisplaySettingsMaterial data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.MetallicMaxValue,
-                getter = () => data.metallicMaxValue,
-                setter = (value) => data.metallicMaxValue = value,
-                incStep = 0.01f
-            };
+            internal static DebugUI.Widget CreateMetallicMaxValue(DebugDisplaySettingsMaterial data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.MetallicMaxValue,
+                    getter = () => data.metallicMaxValue,
+                    setter = (value) => data.metallicMaxValue = value,
+                    incStep = 0.01f,
+                };
         }
 
         [DisplayInfo(name = "Material", order = 2)]
@@ -505,60 +582,67 @@ namespace UnityEngine.Rendering.Universal
                 : base(data)
             {
                 AddWidget(new DebugUI.RuntimeDebugShadersMessageBox());
-                AddWidget(new DebugUI.Foldout
-                {
-                    displayName = "Material Filters",
-                    opened = true,
-                    children =
+                AddWidget(
+                    new DebugUI.Foldout
                     {
-                        WidgetFactory.CreateMaterialOverride(data),
-                        new DebugUI.Container()
+                        displayName = "Material Filters",
+                        opened = true,
+                        children =
                         {
-                            displayName = Strings.RenderingLayerMasksSettingsContainerName,
-                            isHiddenCallback = () => data.materialDebugMode != DebugMaterialMode.RenderingLayerMasks,
-                            children =
+                            WidgetFactory.CreateMaterialOverride(data),
+                            new DebugUI.Container()
                             {
-                                WidgetFactory.CreateRenderingLayersSelectedLight(data),
-                                WidgetFactory.CreateSelectedLightShadowLayerMask(data),
-                                WidgetFactory.CreateFilterRenderingLayerMasks(data),
-                            }
+                                displayName = Strings.RenderingLayerMasksSettingsContainerName,
+                                isHiddenCallback = () =>
+                                    data.materialDebugMode != DebugMaterialMode.RenderingLayerMasks,
+                                children =
+                                {
+                                    WidgetFactory.CreateRenderingLayersSelectedLight(data),
+                                    WidgetFactory.CreateSelectedLightShadowLayerMask(data),
+                                    WidgetFactory.CreateFilterRenderingLayerMasks(data),
+                                },
+                            },
+                            WidgetFactory.CreateVertexAttribute(data),
                         },
-                        WidgetFactory.CreateVertexAttribute(data)
                     }
-                });
-                AddWidget(new DebugUI.Foldout
-                {
-                    displayName = "Material Validation",
-                    opened = true,
-                    children =
+                );
+                AddWidget(
+                    new DebugUI.Foldout
                     {
-                        WidgetFactory.CreateMaterialValidationMode(data),
-                        new DebugUI.Container()
+                        displayName = "Material Validation",
+                        opened = true,
+                        children =
                         {
-                            displayName = Strings.AlbedoSettingsContainerName,
-                            isHiddenCallback = () => data.materialValidationMode != DebugMaterialValidationMode.Albedo,
-                            children =
+                            WidgetFactory.CreateMaterialValidationMode(data),
+                            new DebugUI.Container()
                             {
-                                WidgetFactory.CreateAlbedoPreset(data),
-                                WidgetFactory.CreateAlbedoCustomColor(data),
-                                WidgetFactory.CreateAlbedoMinLuminance(data),
-                                WidgetFactory.CreateAlbedoMaxLuminance(data),
-                                WidgetFactory.CreateAlbedoHueTolerance(data),
-                                WidgetFactory.CreateAlbedoSaturationTolerance(data)
-                            }
+                                displayName = Strings.AlbedoSettingsContainerName,
+                                isHiddenCallback = () =>
+                                    data.materialValidationMode != DebugMaterialValidationMode.Albedo,
+                                children =
+                                {
+                                    WidgetFactory.CreateAlbedoPreset(data),
+                                    WidgetFactory.CreateAlbedoCustomColor(data),
+                                    WidgetFactory.CreateAlbedoMinLuminance(data),
+                                    WidgetFactory.CreateAlbedoMaxLuminance(data),
+                                    WidgetFactory.CreateAlbedoHueTolerance(data),
+                                    WidgetFactory.CreateAlbedoSaturationTolerance(data),
+                                },
+                            },
+                            new DebugUI.Container()
+                            {
+                                displayName = Strings.MetallicSettingsContainerName,
+                                isHiddenCallback = () =>
+                                    data.materialValidationMode != DebugMaterialValidationMode.Metallic,
+                                children =
+                                {
+                                    WidgetFactory.CreateMetallicMinValue(data),
+                                    WidgetFactory.CreateMetallicMaxValue(data),
+                                },
+                            },
                         },
-                        new DebugUI.Container()
-                        {
-                            displayName = Strings.MetallicSettingsContainerName,
-                            isHiddenCallback = () => data.materialValidationMode != DebugMaterialValidationMode.Metallic,
-                            children =
-                            {
-                                WidgetFactory.CreateMetallicMinValue(data),
-                                WidgetFactory.CreateMetallicMaxValue(data)
-                            }
-                        }
                     }
-                });
+                );
             }
         }
 
@@ -566,9 +650,9 @@ namespace UnityEngine.Rendering.Universal
 
         /// <inheritdoc/>
         public bool AreAnySettingsActive =>
-            (materialDebugMode != DebugMaterialMode.None) ||
-            (vertexAttributeDebugMode != DebugVertexAttributeMode.None) ||
-            (materialValidationMode != DebugMaterialValidationMode.None);
+            (materialDebugMode != DebugMaterialMode.None)
+            || (vertexAttributeDebugMode != DebugVertexAttributeMode.None)
+            || (materialValidationMode != DebugMaterialValidationMode.None);
 
         /// <inheritdoc/>
         public bool IsPostProcessingAllowed => !AreAnySettingsActive;

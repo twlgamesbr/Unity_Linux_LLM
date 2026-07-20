@@ -70,7 +70,11 @@ namespace Unity.PlatformToolkit.PlayMode
 
             // Iterate source achievements and reorder and update serialized elements as needed.
             // Reordering is done to keep consistency across visual views.
-            for (int storedAchievementIndex = 0; storedAchievementIndex < storedAchievements.Count; ++storedAchievementIndex)
+            for (
+                int storedAchievementIndex = 0;
+                storedAchievementIndex < storedAchievements.Count;
+                ++storedAchievementIndex
+            )
             {
                 var storedAchievement = storedAchievements[storedAchievementIndex];
 
@@ -81,7 +85,10 @@ namespace Unity.PlatformToolkit.PlayMode
                 while (searchStartIndex == 0 || (indexOfExisting != -1 && copiedEntryFlags[indexOfExisting]))
                 {
                     // Find the next un-copied entry in the pre-sorted list
-                    indexOfExisting = m_Achievements.FindIndex(searchStartIndex, a => String.Equals(storedAchievement.Id, a.Name));
+                    indexOfExisting = m_Achievements.FindIndex(
+                        searchStartIndex,
+                        a => String.Equals(storedAchievement.Id, a.Name)
+                    );
                     searchStartIndex = (indexOfExisting != -1) ? indexOfExisting + 1 : m_Achievements.Count + 1;
                 }
 
@@ -89,7 +96,10 @@ namespace Unity.PlatformToolkit.PlayMode
                 {
                     // Add a new achievement since it was never found in the existing list.
                     dirty = true;
-                    updatedAchievements[storedAchievementIndex] = new PlayModeAchievementData(storedAchievement) { Persistor = m_Persistor };
+                    updatedAchievements[storedAchievementIndex] = new PlayModeAchievementData(storedAchievement)
+                    {
+                        Persistor = m_Persistor,
+                    };
                 }
                 else
                 {

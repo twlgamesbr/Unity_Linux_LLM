@@ -8,8 +8,11 @@ namespace Unity.Entities.Editor
         static readonly string[] s_BytesToStringSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 
         public static string CountToString(int value) => value.ToString("N0", CultureInfo.InvariantCulture);
+
         public static string CountToString(uint value) => value.ToString("N0", CultureInfo.InvariantCulture);
+
         public static string CountToString(long value) => value.ToString("N0", CultureInfo.InvariantCulture);
+
         public static string CountToString(ulong value) => value.ToString("N0", CultureInfo.InvariantCulture);
 
         public static string BytesToString(ulong value)

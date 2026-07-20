@@ -15,14 +15,19 @@ namespace Unity.Entities
         /// <summary>
         /// Array of <see cref="RecordView"/>.
         /// </summary>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [DebuggerDisplay("Length = {Length}")]
         [DebuggerTypeProxy(typeof(RecordViewArrayDebugView))]
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct RecordViewArray : IEnumerable<RecordView>
         {
-            [NativeDisableUnsafePtrRestriction] readonly Record* m_RecordsPtr;
-            [NativeDisableUnsafePtrRestriction] readonly byte* m_BufferPtr;
+            [NativeDisableUnsafePtrRestriction]
+            readonly Record* m_RecordsPtr;
+
+            [NativeDisableUnsafePtrRestriction]
+            readonly byte* m_BufferPtr;
             readonly ulong m_RecordIndex;
             readonly int m_RecordsLength;
             readonly int m_BufferLength;
@@ -117,7 +122,9 @@ namespace Unity.Entities
             /// <summary>
             /// Enumerator that can iterate through the <see cref="RecordViewArray"/>.
             /// </summary>
-            [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+            [GenerateTestsForBurstCompatibility(
+                RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+            )]
             public struct Enumerator : IEnumerator<RecordView>
             {
                 readonly RecordViewArray m_RecordViewArray;
@@ -135,11 +142,18 @@ namespace Unity.Entities
                 }
 
                 public void Dispose() { }
+
                 public bool MoveNext() => ++m_Index < m_RecordViewArray.m_RecordsLength;
+
                 public void Reset() => m_Index = -1;
             }
 
-            internal RecordViewArray(ulong recordIndex, in UnsafeCircularBuffer<Record> records, in UnsafeCircularBuffer<byte> buffer, Ordering ordering)
+            internal RecordViewArray(
+                ulong recordIndex,
+                in UnsafeCircularBuffer<Record> records,
+                in UnsafeCircularBuffer<byte> buffer,
+                Ordering ordering
+            )
             {
                 ThrowIfFrontIndexIsNotZero(in records);
                 ThrowIfFrontIndexIsNotZero(in buffer);
@@ -168,7 +182,8 @@ namespace Unity.Entities
             }
 
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-            static void ThrowIfFrontIndexIsNotZero<T>(in UnsafeCircularBuffer<T> buffer) where T : unmanaged
+            static void ThrowIfFrontIndexIsNotZero<T>(in UnsafeCircularBuffer<T> buffer)
+                where T : unmanaged
             {
                 if (buffer.FrontIndex != 0)
                     throw new InvalidOperationException("Buffer front index is not zero.");

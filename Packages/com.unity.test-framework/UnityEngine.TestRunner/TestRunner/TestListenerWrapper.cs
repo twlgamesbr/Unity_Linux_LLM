@@ -23,8 +23,6 @@ namespace UnityEngine.TestTools.TestRunner
             m_TestFinishedEvent.Invoke(result);
         }
 
-        public void TestOutput(TestOutput output)
-        {
-        }
+        public void TestOutput(TestOutput output) { }
     }
 }

@@ -32,11 +32,12 @@ namespace Unity.Rendering
                 if (material == null)
                     continue;
 
-                var supportsSkinning = material.HasProperty(s_SkinMatrixIndexProperty)
+                var supportsSkinning =
+                    material.HasProperty(s_SkinMatrixIndexProperty)
 #if ENABLE_DOTS_DEFORMATION_MOTION_VECTORS
-                                       || material.HasProperty(s_DOTSDeformedProperty)
+                    || material.HasProperty(s_DOTSDeformedProperty)
 #endif
-                                       || material.HasProperty(s_ComputeMeshIndexProperty);
+                    || material.HasProperty(s_ComputeMeshIndexProperty);
                 if (!supportsSkinning)
                 {
                     string errorMsg = "";
@@ -49,10 +50,18 @@ namespace Unity.Rendering
             }
 
             // Takes a dependency on the transform
-            var root = authoring.rootBone ? GetComponent<Transform>(authoring.rootBone) : GetComponent<Transform>(authoring);
+            var root = authoring.rootBone
+                ? GetComponent<Transform>(authoring.rootBone)
+                : GetComponent<Transform>(authoring);
 
             var mesh = authoring.sharedMesh;
-            MeshRendererBakingUtility.ConvertToMultipleEntities(this, authoring, mesh, root, out var additionalEntities);
+            MeshRendererBakingUtility.ConvertToMultipleEntities(
+                this,
+                authoring,
+                mesh,
+                root,
+                out var additionalEntities
+            );
             UnityEngine.Debug.Assert(additionalEntities.IsCreated);
 
             var hasSkinning = mesh == null ? false : mesh.boneWeights.Length > 0 && mesh.bindposeCount > 0;
@@ -60,14 +69,14 @@ namespace Unity.Rendering
             var deformedEntity = GetEntity(TransformUsageFlags.Dynamic);
             foreach (var entity in additionalEntities)
             {
-               AddTransformUsageFlags(entity, TransformUsageFlags.Dynamic);
-               // Add relevant deformation tags to converted render entities and link them to the DeformedEntity.
-               AddComponent(entity, new DeformedMeshIndex());
-               AddComponent(entity, new DeformedEntity {Value = deformedEntity});
+                AddTransformUsageFlags(entity, TransformUsageFlags.Dynamic);
+                // Add relevant deformation tags to converted render entities and link them to the DeformedEntity.
+                AddComponent(entity, new DeformedMeshIndex());
+                AddComponent(entity, new DeformedEntity { Value = deformedEntity });
 
-               // Add SkinnedMeshRendererBakingData on the additional entities to allow RenderMeshPostProcessSystem to process on SkinnedMeshRenderer as well
-               AddComponent(entity, new SkinnedMeshRendererBakingData {SkinnedMeshRenderer = authoring});
-               SetComponent(entity, new RenderBounds { Value = authoring.localBounds.ToAABB() });
+                // Add SkinnedMeshRendererBakingData on the additional entities to allow RenderMeshPostProcessSystem to process on SkinnedMeshRenderer as well
+                AddComponent(entity, new SkinnedMeshRendererBakingData { SkinnedMeshRenderer = authoring });
+                SetComponent(entity, new RenderBounds { Value = authoring.localBounds.ToAABB() });
             }
 
             additionalEntities.Dispose();
@@ -80,7 +89,7 @@ namespace Unity.Rendering
 
                 for (int i = 0; i < weights.Length; ++i)
                 {
-                    weights[i] = new BlendShapeWeight {Value = authoring.GetBlendShapeWeight(i)};
+                    weights[i] = new BlendShapeWeight { Value = authoring.GetBlendShapeWeight(i) };
                 }
             }
 
@@ -102,15 +111,22 @@ namespace Unity.Rendering
                     // If the transform changes the skin matrices need to be updated.
                     DependsOn(bones[i]);
 
-                    Assert.IsTrue(i < authoring.sharedMesh.bindposeCount, $"No corresponding bindpose found for the bone ({bones[i].name}) at index {i}.");
+                    Assert.IsTrue(
+                        i < authoring.sharedMesh.bindposeCount,
+                        $"No corresponding bindpose found for the bone ({bones[i].name}) at index {i}."
+                    );
 
                     var bindPose = bindposes[i];
                     var boneMatRootSpace = math.mul(rootMatrixInv, bones[i].localToWorldMatrix);
                     var skinMatRootSpace = math.mul(boneMatRootSpace, bindPose);
                     skinMatrices[i] = new SkinMatrix
                     {
-                        Value = new float3x4(skinMatRootSpace.c0.xyz, skinMatRootSpace.c1.xyz, skinMatRootSpace.c2.xyz,
-                            skinMatRootSpace.c3.xyz)
+                        Value = new float3x4(
+                            skinMatRootSpace.c0.xyz,
+                            skinMatRootSpace.c1.xyz,
+                            skinMatRootSpace.c2.xyz,
+                            skinMatRootSpace.c3.xyz
+                        ),
                     };
                 }
             }

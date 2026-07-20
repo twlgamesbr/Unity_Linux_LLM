@@ -89,9 +89,7 @@ namespace UnityEditor.SettingsManagement
         /// Saves all settings to their serialized state.
         /// </summary>
         /// <seealso cref="ISettingsRepository.Save"/>
-        public void Save()
-        {
-        }
+        public void Save() { }
 
         /// <summary>
         /// Sets a value for a settings entry with a matching key and type `T`.

@@ -9,8 +9,12 @@ namespace Unity.Entities
     /// RefRW stores a reference (with write access) to native memory
     /// </summary>
     /// <typeparam name="T">The type of object referenced.</typeparam>
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData) }, RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS")]
-    public readonly struct RefRW<T> : IQueryTypeParameter where T : struct, IComponentData
+    [GenerateTestsForBurstCompatibility(
+        GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData) },
+        RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS"
+    )]
+    public readonly struct RefRW<T> : IQueryTypeParameter
+        where T : struct, IComponentData
     {
         /// <summary>
         /// Convert into a read-only version RefRO of this RefRW
@@ -24,7 +28,7 @@ namespace Unity.Entities
             => new RefRO<T>(refRW._Data);
 #endif
 
-        readonly private unsafe byte*      _Data;
+        readonly private unsafe byte* _Data;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         readonly AtomicSafetyHandle _Safety;
 #endif
@@ -66,7 +70,7 @@ namespace Unity.Entities
         /// <param name="index">The index of the array.</param>
         public unsafe RefRW(NativeArray<T> componentDataNativeArray, int index)
         {
-            _Data = (byte*) NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(componentDataNativeArray);
+            _Data = (byte*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(componentDataNativeArray);
             _Data += UnsafeUtility.SizeOf<T>() * index;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             _Safety = NativeArrayUnsafeUtility.GetAtomicSafetyHandle(componentDataNativeArray);
@@ -98,6 +102,7 @@ namespace Unity.Entities
             _Data = (byte*)ptr;
         }
 #endif
+
         /// <summary>
         /// Checks if the component exists on this entity.
         /// </summary>

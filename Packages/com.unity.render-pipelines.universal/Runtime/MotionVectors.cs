@@ -161,7 +161,7 @@ namespace UnityEngine.Rendering.Universal
             m_previousPreviousWorldSpaceCameraPos = Vector3.zero;
         }
 
-        static private int GetXRMultiPassId(XRPass xr)
+        private static int GetXRMultiPassId(XRPass xr)
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             return xr.enabled ? xr.multipassId : 0;
@@ -283,7 +283,10 @@ namespace UnityEngine.Rendering.Universal
             else
 #endif
             {
-                cmd.SetGlobalMatrix(ShaderPropertyId.previousViewProjectionNoJitter, previousViewProjectionStereo[passID]);
+                cmd.SetGlobalMatrix(
+                    ShaderPropertyId.previousViewProjectionNoJitter,
+                    previousViewProjectionStereo[passID]
+                );
                 cmd.SetGlobalMatrix(ShaderPropertyId.viewProjectionNoJitter, viewProjectionStereo[passID]);
             }
         }

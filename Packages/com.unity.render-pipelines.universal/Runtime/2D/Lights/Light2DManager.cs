@@ -10,9 +10,9 @@ namespace UnityEngine.Rendering.Universal
     {
         private static SortingLayer[] s_SortingLayers;
 
-        static List<Light2D> s_Lights = new List<Light2D>();    // Scene/Game/Prefab view
+        static List<Light2D> s_Lights = new List<Light2D>(); // Scene/Game/Prefab view
 #if UNITY_EDITOR
-        static Dictionary<SceneHandle, List<Light2D>> s_LightsEditorOnly = new Dictionary<SceneHandle, List<Light2D>>();    // Preview view
+        static Dictionary<SceneHandle, List<Light2D>> s_LightsEditorOnly = new Dictionary<SceneHandle, List<Light2D>>(); // Preview view
 #endif
 
         // GetLights return different list depending on the context of the GameObject requesting (Camera or Light2D)
@@ -76,7 +76,7 @@ namespace UnityEngine.Rendering.Universal
             handle = obj.scene.handle;
             var isPreview = EditorSceneManager.IsPreviewSceneObject(obj);
 
-            // Prefab scene 
+            // Prefab scene
             var prefabStage = PrefabStageUtility.GetPrefabStage(obj);
             if (prefabStage != null && isPreview)
             {
@@ -140,7 +140,12 @@ namespace UnityEngine.Rendering.Universal
             {
                 // should this really trigger at runtime?
                 if (ContainsDuplicateGlobalLight(sortingLayer, light))
-                    Debug.LogError("More than one global light on layer " + SortingLayer.IDToName(sortingLayer) + " for light blend style index " + light.blendStyleIndex);
+                    Debug.LogError(
+                        "More than one global light on layer "
+                            + SortingLayer.IDToName(sortingLayer)
+                            + " for light blend style index "
+                            + light.blendStyleIndex
+                    );
             }
         }
 
@@ -152,15 +157,18 @@ namespace UnityEngine.Rendering.Universal
             // This should be rewritten to search only global lights
             foreach (var light in GetOrCreateLights(cam.gameObject))
             {
-                if (light.lightType != Light2D.LightType.Global ||
-                    light.blendStyleIndex != blendStyleIndex ||
-                    !light.IsLitLayer(sortingLayerIndex))
+                if (
+                    light.lightType != Light2D.LightType.Global
+                    || light.blendStyleIndex != blendStyleIndex
+                    || !light.IsLitLayer(sortingLayerIndex)
+                )
                     continue;
 
                 var inCurrentPrefabStage = true;
 #if UNITY_EDITOR
                 // If we found the first global light in our prefab stage
-                inCurrentPrefabStage = PrefabStageUtility.GetCurrentPrefabStage()?.IsPartOfPrefabContents(light.gameObject) ?? true;
+                inCurrentPrefabStage =
+                    PrefabStageUtility.GetCurrentPrefabStage()?.IsPartOfPrefabContents(light.gameObject) ?? true;
 #endif
 
                 if (inCurrentPrefabStage)
@@ -188,13 +196,18 @@ namespace UnityEngine.Rendering.Universal
             // This should be rewritten to search only global lights
             foreach (var light in GetOrCreateLights(inLight.gameObject))
             {
-                if (light.lightType == Light2D.LightType.Global &&
-                    light.blendStyleIndex == inLight.blendStyleIndex &&
-                    light.IsLitLayer(sortingLayerIndex))
+                if (
+                    light.lightType == Light2D.LightType.Global
+                    && light.blendStyleIndex == inLight.blendStyleIndex
+                    && light.IsLitLayer(sortingLayerIndex)
+                )
                 {
 #if UNITY_EDITOR
                     // If we found the first global light in our prefab stage
-                    if (PrefabStageUtility.GetPrefabStage(light.gameObject) == PrefabStageUtility.GetCurrentPrefabStage())
+                    if (
+                        PrefabStageUtility.GetPrefabStage(light.gameObject)
+                        == PrefabStageUtility.GetCurrentPrefabStage()
+                    )
 #endif
                     {
                         if (globalLightCount > 0)
@@ -220,7 +233,7 @@ namespace UnityEngine.Rendering.Universal
         internal static void OnSortingLayerChanged()
         {
             // Update sorting layers that were added or removed or changed order
-             s_SortingLayers = SortingLayer.layers;
+            s_SortingLayers = SortingLayer.layers;
         }
 #endif
     }

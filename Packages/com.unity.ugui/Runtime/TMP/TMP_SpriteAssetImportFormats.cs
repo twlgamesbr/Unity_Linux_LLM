@@ -1,10 +1,13 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace TMPro.SpriteAssetUtilities
 {
-    public enum SpriteAssetImportFormats { None = 0, TexturePackerJsonArray = 0x1 };
+    public enum SpriteAssetImportFormats
+    {
+        None = 0,
+        TexturePackerJsonArray = 0x1,
+    };
 
     public class TexturePacker_JsonArray
     {
@@ -18,7 +21,15 @@ namespace TMPro.SpriteAssetUtilities
 
             public override string ToString()
             {
-                string s = "x: " + x.ToString("f2") + " y: " + y.ToString("f2") + " h: " + h.ToString("f2") + " w: " + w.ToString("f2");
+                string s =
+                    "x: "
+                    + x.ToString("f2")
+                    + " y: "
+                    + y.ToString("f2")
+                    + " h: "
+                    + h.ToString("f2")
+                    + " w: "
+                    + w.ToString("f2");
                 return s;
             }
         }

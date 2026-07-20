@@ -24,14 +24,20 @@ namespace UnityEngine.Rendering.Universal
             /// The ID for the additional shadows buffer ID.
             /// This has been deprecated. Shadow slice matrix is now passed to the GPU using an entry in buffer m_AdditionalLightsWorldToShadow_SSBO.
             /// </summary>
-            [Obsolete("AdditionalLightsShadowCasterPass.m_AdditionalShadowsBufferId was deprecated. Shadow slice matrix is now passed to the GPU using an entry in buffer m_AdditionalLightsWorldToShadow_SSBO #from(2021.1) #breakingFrom(2023.1)", true)]
+            [Obsolete(
+                "AdditionalLightsShadowCasterPass.m_AdditionalShadowsBufferId was deprecated. Shadow slice matrix is now passed to the GPU using an entry in buffer m_AdditionalLightsWorldToShadow_SSBO #from(2021.1) #breakingFrom(2023.1)",
+                true
+            )]
             public static int m_AdditionalShadowsBufferId;
 
             /// <summary>
             /// The ID for the additional shadows buffer ID.
             /// This has been deprecated. hadow slice index is now passed to the GPU using last member of an entry in buffer m_AdditionalShadowParams_SSBO.
             /// </summary>
-            [Obsolete("AdditionalLightsShadowCasterPass.m_AdditionalShadowsIndicesId was deprecated. Shadow slice index is now passed to the GPU using last member of an entry in buffer m_AdditionalShadowParams_SSBO #from(2021.1) #breakingFrom(2023.1)", true)]
+            [Obsolete(
+                "AdditionalLightsShadowCasterPass.m_AdditionalShadowsIndicesId was deprecated. Shadow slice index is now passed to the GPU using last member of an entry in buffer m_AdditionalShadowParams_SSBO #from(2021.1) #breakingFrom(2023.1)",
+                true
+            )]
             public static int m_AdditionalShadowsIndicesId;
         }
     }
@@ -46,10 +52,12 @@ namespace UnityEngine.Rendering.Universal
         /// No cascades used for the shadows
         /// </summary>
         NoCascades,
+
         /// <summary>
         /// Two cascades used for the shadows
         /// </summary>
         TwoCascades,
+
         /// <summary>
         /// Four cascades used for the shadows
         /// </summary>
@@ -60,7 +68,10 @@ namespace UnityEngine.Rendering.Universal
     /// Specifies the logging level for shader variants.
     /// This is obsolete, UnityEngine.Rendering.ShaderVariantLogLevel instead.
     /// </summary>
-    [Obsolete("This is obsolete, UnityEngine.Rendering.ShaderVariantLogLevel instead. #from(2022.2) #breakingFrom(2023.1)", true)]
+    [Obsolete(
+        "This is obsolete, UnityEngine.Rendering.ShaderVariantLogLevel instead. #from(2022.2) #breakingFrom(2023.1)",
+        true
+    )]
     public enum ShaderVariantLogLevel
     {
         /// <summary>Disable all log for shader variants.</summary>
@@ -72,33 +83,41 @@ namespace UnityEngine.Rendering.Universal
 
         /// <summary>Logs all shader variants.</summary>
         [InspectorName("All Shaders")]
-        AllShaders
+        AllShaders,
     }
 
     public partial class UniversalRenderPipelineAsset
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         [Obsolete("Editor resources are stored directly into GraphicsSettings. #from(2023.3)")]
         public static readonly string editorResourcesGUID = "a3d8d823eedde654bb4c11a1cfaf1abb";
-        #endif
+#endif
 
-        [SerializeField] int m_ShaderVariantLogLevel;
+        [SerializeField]
+        int m_ShaderVariantLogLevel;
 
 #pragma warning disable 618 // Obsolete warning
         /// <summary>
         /// Previously returned the shader variant log level for this Render Pipeline Asset but is now deprecated.
         /// </summary>
-        [Obsolete("Use GraphicsSettings.GetRenderPipelineSettings<ShaderStrippingSetting>().shaderVariantLogLevel instead. #from(2022.2)")]
+        [Obsolete(
+            "Use GraphicsSettings.GetRenderPipelineSettings<ShaderStrippingSetting>().shaderVariantLogLevel instead. #from(2022.2)"
+        )]
         public ShaderVariantLogLevel shaderVariantLogLevel
         {
-            get => (ShaderVariantLogLevel)GraphicsSettings.GetRenderPipelineSettings<ShaderStrippingSetting>().shaderVariantLogLevel;
-            set => GraphicsSettings.GetRenderPipelineSettings<ShaderStrippingSetting>().shaderVariantLogLevel = (Rendering.ShaderVariantLogLevel)value;
+            get =>
+                (ShaderVariantLogLevel)
+                    GraphicsSettings.GetRenderPipelineSettings<ShaderStrippingSetting>().shaderVariantLogLevel;
+            set =>
+                GraphicsSettings.GetRenderPipelineSettings<ShaderStrippingSetting>().shaderVariantLogLevel =
+                    (Rendering.ShaderVariantLogLevel)value;
         }
 #pragma warning restore 618 // Obsolete warning
 
 #pragma warning disable 618 // Obsolete warning
         [Obsolete("This is obsolete, please use shadowCascadeCount instead. #from(2021.1)")]
-        [SerializeField] ShadowCascadesOption m_ShadowCascades = ShadowCascadesOption.NoCascades;
+        [SerializeField]
+        ShadowCascadesOption m_ShadowCascades = ShadowCascadesOption.NoCascades;
 
         /// <summary>
         /// Previously used insted of shadowCascadeCount. Please use that instead.
@@ -110,10 +129,16 @@ namespace UnityEngine.Rendering.Universal
             {
                 switch (shadowCascadeCount)
                 {
-                    case 1: return ShadowCascadesOption.NoCascades;
-                    case 2: return ShadowCascadesOption.TwoCascades;
-                    case 4: return ShadowCascadesOption.FourCascades;
-                    default: throw new InvalidOperationException("Cascade count is not compatible with obsolete API, please use shadowCascadeCount instead.");
+                    case 1:
+                        return ShadowCascadesOption.NoCascades;
+                    case 2:
+                        return ShadowCascadesOption.TwoCascades;
+                    case 4:
+                        return ShadowCascadesOption.FourCascades;
+                    default:
+                        throw new InvalidOperationException(
+                            "Cascade count is not compatible with obsolete API, please use shadowCascadeCount instead."
+                        );
                 }
                 ;
             }
@@ -131,7 +156,9 @@ namespace UnityEngine.Rendering.Universal
                         shadowCascadeCount = 4;
                         break;
                     default:
-                        throw new InvalidOperationException("Cascade count is not compatible with obsolete API, please use shadowCascadeCount instead.");
+                        throw new InvalidOperationException(
+                            "Cascade count is not compatible with obsolete API, please use shadowCascadeCount instead."
+                        );
                 }
             }
         }
@@ -189,7 +216,7 @@ namespace UnityEngine.Rendering.Universal
                 return m_Textures;
             }
         }
-        
+
         /// <summary>
         /// Controls when URP renders via an intermediate texture.
         /// </summary>
@@ -197,14 +224,11 @@ namespace UnityEngine.Rendering.Universal
         public IntermediateTextureMode intermediateTextureMode
         {
             get => default;
-            set {}
+            set { }
         }
     }
 
-    public abstract partial class ScriptableRenderer
-    {
-
-    }
+    public abstract partial class ScriptableRenderer { }
 
     public abstract partial class ScriptableRendererData
     {
@@ -304,7 +328,9 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Specifies whether the renderer should use Native Render Pass.
         /// </summary>
-        [Obsolete("Native Render Pass is automatically enabled through Render Graph, useNativeRenderPass is not considered anymore. #from(6000.5)")]
+        [Obsolete(
+            "Native Render Pass is automatically enabled through Render Graph, useNativeRenderPass is not considered anymore. #from(6000.5)"
+        )]
         public bool useNativeRenderPass
         {
             get => true;
@@ -382,7 +408,9 @@ namespace UnityEngine.Rendering.Universal
         /// Class containing shader resources used in URP.
         /// </summary>
         [Serializable, ReloadGroup]
-        [Obsolete("UniversalRenderPipelineEditorResources.ShaderResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorShaders>(). #from(2023.3)")]
+        [Obsolete(
+            "UniversalRenderPipelineEditorResources.ShaderResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorShaders>(). #from(2023.3)"
+        )]
         public sealed class ShaderResources
         {
             /// <summary>
@@ -438,7 +466,9 @@ namespace UnityEngine.Rendering.Universal
         /// Class containing material resources used in URP.
         /// </summary>
         [Serializable, ReloadGroup]
-        [Obsolete("UniversalRenderPipelineEditorResources.MaterialResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorMaterials>(). #from(2023.3)")]
+        [Obsolete(
+            "UniversalRenderPipelineEditorResources.MaterialResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorMaterials>(). #from(2023.3)"
+        )]
         public sealed class MaterialResources
         {
             /// <summary>
@@ -472,13 +502,17 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Shader resources used in URP.
         /// </summary>
-        [Obsolete("UniversalRenderPipelineEditorResources.ShaderResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorShaders>(). #from(2023.3)")]
+        [Obsolete(
+            "UniversalRenderPipelineEditorResources.ShaderResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorShaders>(). #from(2023.3)"
+        )]
         public ShaderResources shaders;
 
         /// <summary>
         /// Material resources used in URP.
         /// </summary>
-        [Obsolete("UniversalRenderPipelineEditorResources.MaterialResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorMaterials>(). #from(2023.3)")]
+        [Obsolete(
+            "UniversalRenderPipelineEditorResources.MaterialResources is obsolete GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorMaterials>(). #from(2023.3)"
+        )]
         public MaterialResources materials;
     }
 
@@ -528,7 +562,10 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Screen Space Shadows shader.
         /// </summary>
-        [Obsolete("Obsolete, this feature will be supported by new 'ScreenSpaceShadows' renderer feature. #from(2023.3) #breakingFrom(2023.3)", true)]
+        [Obsolete(
+            "Obsolete, this feature will be supported by new 'ScreenSpaceShadows' renderer feature. #from(2023.3) #breakingFrom(2023.3)",
+            true
+        )]
         public Shader screenSpaceShadowPS = null;
 
         /// <summary>
@@ -603,25 +640,46 @@ namespace UnityEngine.Rendering.Universal
         [Obsolete("Moved to UniversalRenderPipelineRuntimeShaders on GraphicsSettings. #from(2023.3)")]
         public Shader dataDrivenLensFlare;
     }
-  
+
     partial class UniversalRenderPipelineGlobalSettings
     {
 #pragma warning disable 0414
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal ShaderStrippingSetting m_ShaderStrippingSetting = new();
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal URPShaderStrippingSetting m_URPShaderStrippingSetting = new();
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal Rendering.ShaderVariantLogLevel m_ShaderVariantLogLevel = Rendering.ShaderVariantLogLevel.Disabled;
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal bool m_ExportShaderVariants = true;
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal bool m_StripDebugVariants = true;
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal bool m_StripUnusedPostProcessingVariants = false;
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal bool m_StripUnusedVariants = true;
-        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")] internal bool m_StripScreenCoordOverrideVariants = true;
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal ShaderStrippingSetting m_ShaderStrippingSetting = new();
+
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal URPShaderStrippingSetting m_URPShaderStrippingSetting = new();
+
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal Rendering.ShaderVariantLogLevel m_ShaderVariantLogLevel = Rendering.ShaderVariantLogLevel.Disabled;
+
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal bool m_ExportShaderVariants = true;
+
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal bool m_StripDebugVariants = true;
+
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal bool m_StripUnusedPostProcessingVariants = false;
+
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal bool m_StripUnusedVariants = true;
+
+        [SerializeField, Obsolete("Keep for migration. #from(2023.2)")]
+        internal bool m_StripScreenCoordOverrideVariants = true;
 #pragma warning restore 0414
 
         /// <summary>
         /// If this property is true, Unity strips the LOD variants if the LOD cross-fade feature (UniversalRenderingPipelineAsset.enableLODCrossFade) is disabled.
         /// </summary>
-        [Obsolete("No longer used as Shader Prefiltering automatically strips out unused LOD Crossfade variants. Please use the LOD Crossfade setting in the URP Asset to disable the feature if not used. #from(2023.1)")]
-        public bool stripUnusedLODCrossFadeVariants { get => false; set { } }
+        [Obsolete(
+            "No longer used as Shader Prefiltering automatically strips out unused LOD Crossfade variants. Please use the LOD Crossfade setting in the URP Asset to disable the feature if not used. #from(2023.1)"
+        )]
+        public bool stripUnusedLODCrossFadeVariants
+        {
+            get => false;
+            set { }
+        }
 
         /// <summary>
         /// Controls whether debug display shaders for Rendering Debugger are available in Player builds.

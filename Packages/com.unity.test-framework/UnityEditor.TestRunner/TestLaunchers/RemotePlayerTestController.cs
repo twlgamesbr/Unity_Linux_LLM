@@ -27,8 +27,9 @@ namespace UnityEditor.TestRunner.TestLaunchers
             TestStarted,
             TestFinished,
             RunStarted,
-            RunFinished
+            RunFinished,
         }
+
         [Serializable]
         private struct Message
         {
@@ -74,10 +75,22 @@ namespace UnityEditor.TestRunner.TestLaunchers
             // minutes to react to all messages we receive because we only do 1ms of processing, then render all of the
             // editor etc. -- Instead, we use that 1ms time-window to enqueue messages and then react to them later
             // during the frame. This reduces the waiting time from minutes to seconds.
-            EditorConnection.instance.Register(PlayerConnectionMessageIds.testStartedMessageId, args => EnqueueMessage(new Message(args, MessageType.TestStarted)));
-            EditorConnection.instance.Register(PlayerConnectionMessageIds.testFinishedMessageId, args => EnqueueMessage(new Message(args, MessageType.TestFinished)));
-            EditorConnection.instance.Register(PlayerConnectionMessageIds.runStartedMessageId, args => EnqueueMessage(new Message(args, MessageType.RunStarted)));
-            EditorConnection.instance.Register(PlayerConnectionMessageIds.runFinishedMessageId, args => EnqueueMessage(new Message(args, MessageType.RunFinished)));
+            EditorConnection.instance.Register(
+                PlayerConnectionMessageIds.testStartedMessageId,
+                args => EnqueueMessage(new Message(args, MessageType.TestStarted))
+            );
+            EditorConnection.instance.Register(
+                PlayerConnectionMessageIds.testFinishedMessageId,
+                args => EnqueueMessage(new Message(args, MessageType.TestFinished))
+            );
+            EditorConnection.instance.Register(
+                PlayerConnectionMessageIds.runStartedMessageId,
+                args => EnqueueMessage(new Message(args, MessageType.RunStarted))
+            );
+            EditorConnection.instance.Register(
+                PlayerConnectionMessageIds.runFinishedMessageId,
+                args => EnqueueMessage(new Message(args, MessageType.RunFinished))
+            );
         }
 
         private void FlushMessageQueue()
@@ -133,7 +146,11 @@ namespace UnityEditor.TestRunner.TestLaunchers
         private void RunFinished(MessageEventArgs messageEventArgs)
         {
             m_TimeoutCallback?.Clear();
-            EditorConnection.instance.Send(PlayerConnectionMessageIds.quitPlayerMessageId, null, messageEventArgs.playerId);
+            EditorConnection.instance.Send(
+                PlayerConnectionMessageIds.quitPlayerMessageId,
+                null,
+                messageEventArgs.playerId
+            );
             EditorConnection.instance.DisconnectAll();
 
             CallbacksDelegator.instance.RunFinishedRemotely(messageEventArgs.data);
@@ -147,7 +164,9 @@ namespace UnityEditor.TestRunner.TestLaunchers
 
         private void TimeoutCallback()
         {
-            CallbacksDelegator.instance.RunFailed($"Test execution timed out. No activity received from the player in {m_HearbeatTimeOut} seconds.");
+            CallbacksDelegator.instance.RunFailed(
+                $"Test execution timed out. No activity received from the player in {m_HearbeatTimeOut} seconds."
+            );
         }
 
         public void PostSuccessfulBuildAction()

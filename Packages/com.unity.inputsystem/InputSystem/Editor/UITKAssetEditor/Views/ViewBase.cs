@@ -40,8 +40,9 @@ namespace UnityEngine.InputSystem.Editor
             if (m_ViewStateSelector == null)
             {
                 Debug.LogWarning(
-                    $"View '{GetType().Name}' has no selector and will not render. Create a selector for the " +
-                    $"view using the CreateSelector method.");
+                    $"View '{GetType().Name}' has no selector and will not render. Create a selector for the "
+                        + $"view using the CreateSelector method."
+                );
                 return;
             }
 
@@ -59,13 +60,15 @@ namespace UnityEngine.InputSystem.Editor
             allowUICommandExecution = true;
         }
 
-        public TView CreateChildView<TView>(TView view) where TView : IView
+        public TView CreateChildView<TView>(TView view)
+            where TView : IView
         {
             m_ChildViews.Add(view);
             return view;
         }
 
-        public void DestroyChildView<TView>(TView view) where TView : IView
+        public void DestroyChildView<TView>(TView view)
+            where TView : IView
         {
             if (view == null)
                 return;
@@ -85,9 +88,7 @@ namespace UnityEngine.InputSystem.Editor
         /// Called when a parent view is destroying this view to give it an opportunity to clean up any
         /// resources or event handlers.
         /// </summary>
-        public virtual void DestroyView()
-        {
-        }
+        public virtual void DestroyView() { }
 
         protected void CreateSelector(Func<InputActionsEditorState, TViewState> selector)
         {
@@ -96,7 +97,8 @@ namespace UnityEngine.InputSystem.Editor
 
         protected void CreateSelector<T1>(
             Func<InputActionsEditorState, T1> func1,
-            Func<T1, InputActionsEditorState, TViewState> selector)
+            Func<T1, InputActionsEditorState, TViewState> selector
+        )
         {
             m_ViewStateSelector = new ViewStateSelector<T1, TViewState>(func1, selector);
         }
@@ -104,7 +106,8 @@ namespace UnityEngine.InputSystem.Editor
         protected void CreateSelector<T1, T2>(
             Func<InputActionsEditorState, T1> func1,
             Func<InputActionsEditorState, T2> func2,
-            Func<T1, T2, InputActionsEditorState, TViewState> selector)
+            Func<T1, T2, InputActionsEditorState, TViewState> selector
+        )
         {
             m_ViewStateSelector = new ViewStateSelector<T1, T2, TViewState>(func1, func2, selector);
         }
@@ -113,7 +116,8 @@ namespace UnityEngine.InputSystem.Editor
             Func<InputActionsEditorState, T1> func1,
             Func<InputActionsEditorState, T2> func2,
             Func<InputActionsEditorState, T3> func3,
-            Func<T1, T2, T3, InputActionsEditorState, TViewState> selector)
+            Func<T1, T2, T3, InputActionsEditorState, TViewState> selector
+        )
         {
             m_ViewStateSelector = new ViewStateSelector<T1, T2, T3, TViewState>(func1, func2, func3, selector);
         }
@@ -156,8 +160,10 @@ namespace UnityEngine.InputSystem.Editor
 
         private T1 m_PreviousT1;
 
-        public ViewStateSelector(Func<InputActionsEditorState, T1> func1,
-                                 Func<T1, InputActionsEditorState, TReturn> selector)
+        public ViewStateSelector(
+            Func<InputActionsEditorState, T1> func1,
+            Func<T1, InputActionsEditorState, TReturn> selector
+        )
         {
             m_Func1 = func1;
             m_Selector = selector;
@@ -196,9 +202,11 @@ namespace UnityEngine.InputSystem.Editor
         private T1 m_PreviousT1;
         private T2 m_PreviousT2;
 
-        public ViewStateSelector(Func<InputActionsEditorState, T1> func1,
-                                 Func<InputActionsEditorState, T2> func2,
-                                 Func<T1, T2, InputActionsEditorState, TReturn> selector)
+        public ViewStateSelector(
+            Func<InputActionsEditorState, T1> func1,
+            Func<InputActionsEditorState, T2> func2,
+            Func<T1, T2, InputActionsEditorState, TReturn> selector
+        )
         {
             m_Func1 = func1;
             m_Func2 = func2;
@@ -213,12 +221,18 @@ namespace UnityEngine.InputSystem.Editor
             var valueOneHasChanged = false;
             var valueTwoHasChanged = false;
 
-            if (valueOne is IViewStateCollection collection && !collection.SequenceEqual((IViewStateCollection)m_PreviousT1) ||
-                !valueOne.Equals(m_PreviousT1))
+            if (
+                valueOne is IViewStateCollection collection
+                    && !collection.SequenceEqual((IViewStateCollection)m_PreviousT1)
+                || !valueOne.Equals(m_PreviousT1)
+            )
                 valueOneHasChanged = true;
 
-            if (valueTwo is IViewStateCollection collection2 && !collection2.SequenceEqual((IViewStateCollection)m_PreviousT2) ||
-                !valueTwo.Equals(m_PreviousT2))
+            if (
+                valueTwo is IViewStateCollection collection2
+                    && !collection2.SequenceEqual((IViewStateCollection)m_PreviousT2)
+                || !valueTwo.Equals(m_PreviousT2)
+            )
                 valueTwoHasChanged = true;
 
             if (!valueOneHasChanged && !valueTwoHasChanged)
@@ -246,10 +260,12 @@ namespace UnityEngine.InputSystem.Editor
         private T2 m_PreviousT2;
         private T3 m_PreviousT3;
 
-        public ViewStateSelector(Func<InputActionsEditorState, T1> func1,
-                                 Func<InputActionsEditorState, T2> func2,
-                                 Func<InputActionsEditorState, T3> func3,
-                                 Func<T1, T2, T3, InputActionsEditorState, TReturn> selector)
+        public ViewStateSelector(
+            Func<InputActionsEditorState, T1> func1,
+            Func<InputActionsEditorState, T2> func2,
+            Func<InputActionsEditorState, T3> func3,
+            Func<T1, T2, T3, InputActionsEditorState, TReturn> selector
+        )
         {
             m_Func1 = func1;
             m_Func2 = func2;
@@ -267,16 +283,25 @@ namespace UnityEngine.InputSystem.Editor
             var valueTwoHasChanged = false;
             var valueThreeHasChanged = false;
 
-            if (valueOne is IViewStateCollection collection && !collection.SequenceEqual((IViewStateCollection)m_PreviousT1) ||
-                !valueOne.Equals(m_PreviousT1))
+            if (
+                valueOne is IViewStateCollection collection
+                    && !collection.SequenceEqual((IViewStateCollection)m_PreviousT1)
+                || !valueOne.Equals(m_PreviousT1)
+            )
                 valueOneHasChanged = true;
 
-            if (valueTwo is IViewStateCollection collection2 && !collection2.SequenceEqual((IViewStateCollection)m_PreviousT2) ||
-                !valueTwo.Equals(m_PreviousT2))
+            if (
+                valueTwo is IViewStateCollection collection2
+                    && !collection2.SequenceEqual((IViewStateCollection)m_PreviousT2)
+                || !valueTwo.Equals(m_PreviousT2)
+            )
                 valueTwoHasChanged = true;
 
-            if (valueThree is IViewStateCollection collection3 && !collection3.SequenceEqual((IViewStateCollection)m_PreviousT3) ||
-                !valueThree.Equals(m_PreviousT3))
+            if (
+                valueThree is IViewStateCollection collection3
+                    && !collection3.SequenceEqual((IViewStateCollection)m_PreviousT3)
+                || !valueThree.Equals(m_PreviousT3)
+            )
                 valueThreeHasChanged = true;
 
             if (!valueOneHasChanged && !valueTwoHasChanged && !valueThreeHasChanged)

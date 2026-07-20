@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Interfaces;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline
 {
@@ -15,8 +15,10 @@ namespace UnityEditor.Build.Pipeline
     {
         /// <inheritdoc />
         public Dictionary<GUID, List<string>> AssetToFiles { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, List<ObjectIdentifier>> FileToObjects { get; private set; }
+
         /// <inheritdoc />
         public List<IWriteOperation> WriteOperations { get; private set; }
 
@@ -40,14 +42,19 @@ namespace UnityEditor.Build.Pipeline
     {
         /// <inheritdoc />
         public Dictionary<GUID, List<string>> AssetToFiles { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, List<ObjectIdentifier>> FileToObjects { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, string> FileToBundle { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, BuildUsageTagSet> FileToUsageSet { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, BuildReferenceMap> FileToReferenceMap { get; private set; }
+
         /// <inheritdoc />
         public List<IWriteOperation> WriteOperations { get; private set; }
 

@@ -15,6 +15,7 @@ namespace Unity.Netcode.Components
     public class NetworkRigidbody2D : NetworkRigidbodyBase
     {
         public Rigidbody2D Rigidbody2D => m_InternalRigidbody2D;
+
         protected virtual void Awake()
         {
             Initialize(RigidbodyTypes.Rigidbody2D);

@@ -8,7 +8,5 @@ namespace Unity.Rendering
     /// <remarks>
     /// The LightProbeUpdateSystem uses this to manage light probes.
     /// </remarks>
-    public struct BlendProbeTag : IComponentData
-    {
-    }
+    public struct BlendProbeTag : IComponentData { }
 }

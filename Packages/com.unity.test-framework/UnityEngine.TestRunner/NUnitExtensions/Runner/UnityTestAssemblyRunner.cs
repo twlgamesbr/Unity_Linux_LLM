@@ -60,7 +60,11 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             get { return TopLevelWorkItem != null && TopLevelWorkItem.State == WorkItemState.Complete; }
         }
 
-        public UnityTestAssemblyRunner(UnityTestAssemblyBuilder builder, WorkItemFactory factory, UnityTestExecutionContext context)
+        public UnityTestAssemblyRunner(
+            UnityTestAssemblyBuilder builder,
+            WorkItemFactory factory,
+            UnityTestExecutionContext context
+        )
         {
             unityBuilder = builder;
             m_Factory = factory;
@@ -79,7 +83,11 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             if (settings.ContainsKey(FrameworkPackageSettings.RandomSeed))
                 Randomizer.InitialSeed = (int)settings[FrameworkPackageSettings.RandomSeed];
 
-            var tree = unityBuilder.Build(assemblies, Enumerable.Repeat(testPlatform, assemblies.Length).ToArray(), settings);
+            var tree = unityBuilder.Build(
+                assemblies,
+                Enumerable.Repeat(testPlatform, assemblies.Length).ToArray(),
+                settings
+            );
 
             return LoadedTest = tree;
         }

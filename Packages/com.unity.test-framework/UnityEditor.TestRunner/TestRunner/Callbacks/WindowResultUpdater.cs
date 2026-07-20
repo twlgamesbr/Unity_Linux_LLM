@@ -15,11 +15,9 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
 
             cachedResults.Clear();
+        }
 
-        }
-        public void RunStarted(ITestAdaptor testsToRun)
-        {
-        }
+        public void RunStarted(ITestAdaptor testsToRun) { }
 
         public void RunFinished(ITestResultAdaptor testResults)
         {
@@ -30,9 +28,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
         }
 
-        public void TestStarted(ITestAdaptor testName)
-        {
-        }
+        public void TestStarted(ITestAdaptor testName) { }
 
         public void TestFinished(ITestResultAdaptor test)
         {

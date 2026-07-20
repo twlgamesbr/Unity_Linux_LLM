@@ -8,7 +8,7 @@ namespace Unity.PlatformToolkit
     /// Utility for multicasting 3rd party delegates. Invokes all delegates, even when some of them throw exceptions.
     /// Exceptions are logged. Delegates are invoked on the main thread.
     /// </summary>
-    static internal class SafeInvoker
+    internal static class SafeInvoker
     {
         public static void Invoke(Action eventToInvoke)
         {
@@ -71,7 +71,12 @@ namespace Unity.PlatformToolkit
             }
         }
 
-        public static void Invoke<TArg0, TArg1, TArg2>(Action<TArg0, TArg1, TArg2> eventToInvoke, TArg0 arg0, TArg1 arg1, TArg2 arg2)
+        public static void Invoke<TArg0, TArg1, TArg2>(
+            Action<TArg0, TArg1, TArg2> eventToInvoke,
+            TArg0 arg0,
+            TArg1 arg1,
+            TArg2 arg2
+        )
         {
             if (eventToInvoke == null)
                 return;
@@ -91,25 +96,34 @@ namespace Unity.PlatformToolkit
             }
         }
 
-        public async static Task InvokeOnMainThread(Action eventToInvoke)
+        public static async Task InvokeOnMainThread(Action eventToInvoke)
         {
             await Awaitable.MainThreadAsync();
             Invoke(eventToInvoke);
         }
 
-        public async static Task InvokeOnMainThread<TArg0>(Action<TArg0> eventToInvoke, TArg0 arg0)
+        public static async Task InvokeOnMainThread<TArg0>(Action<TArg0> eventToInvoke, TArg0 arg0)
         {
             await Awaitable.MainThreadAsync();
             Invoke(eventToInvoke, arg0);
         }
 
-        public async static Task InvokeOnMainThread<TArg0, TArg1>(Action<TArg0, TArg1> eventToInvoke, TArg0 arg0, TArg1 arg1)
+        public static async Task InvokeOnMainThread<TArg0, TArg1>(
+            Action<TArg0, TArg1> eventToInvoke,
+            TArg0 arg0,
+            TArg1 arg1
+        )
         {
             await Awaitable.MainThreadAsync();
             Invoke(eventToInvoke, arg0, arg1);
         }
 
-        public async static Task InvokeOnMainThread<TArg0, TArg1, TArg2>(Action<TArg0, TArg1, TArg2> eventToInvoke, TArg0 arg0, TArg1 arg1, TArg2 arg2)
+        public static async Task InvokeOnMainThread<TArg0, TArg1, TArg2>(
+            Action<TArg0, TArg1, TArg2> eventToInvoke,
+            TArg0 arg0,
+            TArg1 arg1,
+            TArg2 arg2
+        )
         {
             await Awaitable.MainThreadAsync();
             Invoke(eventToInvoke, arg0, arg1, arg2);

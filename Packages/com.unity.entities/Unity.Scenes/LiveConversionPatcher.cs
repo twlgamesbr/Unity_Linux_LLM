@@ -12,9 +12,7 @@ namespace Unity.Scenes
     /// <summary>
     /// Tag component for disabling live conversion of scene entities.
     /// </summary>
-    public struct DisableLiveConversion : IComponentData
-    {
-    }
+    public struct DisableLiveConversion : IComponentData { }
 
     /// <summary>
     /// Options for how the conversion system runs and makes the results available in the Editor.
@@ -25,14 +23,17 @@ namespace Unity.Scenes
         /// Disable live conversion. The conversion system doesn't run when the authoring data is changed.
         /// </summary>
         Disabled = 0,
+
         /// <summary>
         /// Run the conversion when building the player.
         /// </summary>
         LiveConvertStandalonePlayer,
+
         /// <summary>
         /// Enable live conversion is enabled and display the authoring data in the scene view.
         /// </summary>
         SceneViewShowsAuthoring,
+
         /// <summary>
         /// Enable the live conversion and display the result of the conversion in the scene view.
         /// </summary>
@@ -41,18 +42,18 @@ namespace Unity.Scenes
 
     struct LiveConversionChangeSet : IDisposable
     {
-        public Hash128         SceneGUID;
+        public Hash128 SceneGUID;
         public EntityChangeSet Changes;
-        public string          SceneName;
-        public bool            UnloadAllPreviousEntities;
-        public int             FramesToRetainBlobAssets;
+        public string SceneName;
+        public bool UnloadAllPreviousEntities;
+        public int FramesToRetainBlobAssets;
 
         public void Dispose()
         {
             Changes.Dispose();
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public byte[] Serialize()
         {
             var buffer = new UnsafeAppendBuffer(1024, 16, Allocator.Persistent);
@@ -68,10 +69,12 @@ namespace Unity.Scenes
             buffer.Dispose();
             return outputArray;
         }
+#endif
 
-        #endif
-
-        unsafe public static LiveConversionChangeSet Deserialize(EntityChangeSetSerialization.ResourcePacket resource, GlobalAssetObjectResolver resolver)
+        unsafe public static LiveConversionChangeSet Deserialize(
+            EntityChangeSetSerialization.ResourcePacket resource,
+            GlobalAssetObjectResolver resolver
+        )
         {
             var reader = resource.ChangeSet.AsReader();
 
@@ -85,7 +88,6 @@ namespace Unity.Scenes
             return changeSet;
         }
     }
-
 
     class LiveConversionPatcher
     {
@@ -104,10 +106,10 @@ namespace Unity.Scenes
             }
         }
 
-
         private World _DstWorld;
         EntityQuery _AddedScenesQuery;
         private EntityQuery _RemovedScenesQuery;
+
         public LiveConversionPatcher(World destinationWorld)
         {
             _DstWorld = destinationWorld;
@@ -116,7 +118,7 @@ namespace Unity.Scenes
                 .WithAllRW<SceneTag>()
                 .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
                 .Build(_DstWorld.EntityManager);
-            _AddedScenesQuery.SetSharedComponentFilter(new SceneTag { SceneEntity = Entity.Null});
+            _AddedScenesQuery.SetSharedComponentFilter(new SceneTag { SceneEntity = Entity.Null });
 
             _RemovedScenesQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<LiveConvertedSceneCleanup>()
@@ -133,10 +135,13 @@ namespace Unity.Scenes
         struct RemoveLiveConversionSceneState : IJobChunk
         {
             public Hash128 DeleteGuid;
-            public  EntityCommandBuffer Commands;
+            public EntityCommandBuffer Commands;
 
-            [ReadOnly] public ComponentTypeHandle<LiveConvertedSceneCleanup> LiveConvertedSceneStateHandle;
-            [ReadOnly] public EntityTypeHandle EntitiesHandle;
+            [ReadOnly]
+            public ComponentTypeHandle<LiveConvertedSceneCleanup> LiveConvertedSceneStateHandle;
+
+            [ReadOnly]
+            public EntityTypeHandle EntitiesHandle;
 
             public void Execute(Entity entity, in LiveConvertedSceneCleanup scene)
             {
@@ -144,7 +149,12 @@ namespace Unity.Scenes
                     Commands.RemoveComponent<LiveConvertedSceneCleanup>(entity);
             }
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
                 var entities = chunk.GetNativeArray(EntitiesHandle);
@@ -177,8 +187,9 @@ namespace Unity.Scenes
             {
                 DeleteGuid = sceneGUID,
                 Commands = new EntityCommandBuffer(Allocator.TempJob),
-                LiveConvertedSceneStateHandle = _DstWorld.EntityManager.GetComponentTypeHandle<LiveConvertedSceneCleanup>(true),
-                EntitiesHandle = _DstWorld.EntityManager.GetEntityTypeHandle()
+                LiveConvertedSceneStateHandle =
+                    _DstWorld.EntityManager.GetComponentTypeHandle<LiveConvertedSceneCleanup>(true),
+                EntitiesHandle = _DstWorld.EntityManager.GetEntityTypeHandle(),
             };
             job.Run(_RemovedScenesQuery);
 
@@ -198,7 +209,9 @@ namespace Unity.Scenes
             //@TODO: Check if the scene or section is requested to be loaded
             if (sceneEntity == Entity.Null)
             {
-                Debug.LogWarning($"'{changeSet.SceneName}' (Scene GUID {changeSet.SceneGUID}) was ignored in live conversion since it is not loaded.");
+                Debug.LogWarning(
+                    $"'{changeSet.SceneName}' (Scene GUID {changeSet.SceneGUID}) was ignored in live conversion since it is not loaded."
+                );
                 return;
             }
 
@@ -213,22 +226,39 @@ namespace Unity.Scenes
 
                 // Create section
                 sectionEntity = dstEntities.CreateEntity();
-                dstEntities.AddComponentData(sectionEntity, new SceneSectionStreamingSystem.StreamingState { Status = SceneSectionStreamingSystem.StreamingStatus.Loaded});
+                dstEntities.AddComponentData(
+                    sectionEntity,
+                    new SceneSectionStreamingSystem.StreamingState
+                    {
+                        Status = SceneSectionStreamingSystem.StreamingStatus.Loaded,
+                    }
+                );
                 dstEntities.AddComponentData(sectionEntity, new IsSectionLoaded());
                 dstEntities.AddComponentData(sectionEntity, new DisableSceneResolveAndLoad());
-                dstEntities.AddComponentData(sectionEntity, new SceneEntityReference {SceneEntity = sceneEntity});
+                dstEntities.AddComponentData(sectionEntity, new SceneEntityReference { SceneEntity = sceneEntity });
 
                 // Configure scene
                 dstEntities.AddComponentData(sceneEntity, new DisableSceneResolveAndLoad());
-                dstEntities.AddComponentData(sceneEntity, new LiveConvertedSceneCleanup { Scene = changeSet.SceneGUID });
+                dstEntities.AddComponentData(
+                    sceneEntity,
+                    new LiveConvertedSceneCleanup { Scene = changeSet.SceneGUID }
+                );
 
-                dstEntities.AddBuffer<ResolvedSectionEntity>(sceneEntity).Add(new ResolvedSectionEntity { SectionEntity = sectionEntity});
+                dstEntities
+                    .AddBuffer<ResolvedSectionEntity>(sceneEntity)
+                    .Add(new ResolvedSectionEntity { SectionEntity = sectionEntity });
 
 #if UNITY_EDITOR
                 var sceneNameFs64 = new FixedString64Bytes();
-                FixedStringMethods.CopyFromTruncated(ref sceneNameFs64, "SceneSection (Live converted): " + changeSet.SceneName);
+                FixedStringMethods.CopyFromTruncated(
+                    ref sceneNameFs64,
+                    "SceneSection (Live converted): " + changeSet.SceneName
+                );
                 dstEntities.SetName(sectionEntity, sceneNameFs64);
-                FixedStringMethods.CopyFromTruncated(ref sceneNameFs64, "Scene (Live converted): " + changeSet.SceneName);
+                FixedStringMethods.CopyFromTruncated(
+                    ref sceneNameFs64,
+                    "Scene (Live converted): " + changeSet.SceneName
+                );
                 dstEntities.SetName(sceneEntity, sceneNameFs64);
 #endif
             }
@@ -255,7 +285,7 @@ namespace Unity.Scenes
 
             if (sectionEntity != Entity.Null)
             {
-                dstEntities.SetSharedComponentManaged(_AddedScenesQuery, new SceneTag {SceneEntity = sectionEntity});
+                dstEntities.SetSharedComponentManaged(_AddedScenesQuery, new SceneTag { SceneEntity = sectionEntity });
             }
 
             EditorUpdateUtility.EditModeQueuePlayerLoopUpdate();

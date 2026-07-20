@@ -40,7 +40,12 @@ namespace UnityEditor.TestRunner.TestLaunchers
 
                 // Create a dictionary for the test names and their file paths
                 var testFilePaths = new Dictionary<string, FileReference>();
-                RecursivelyPopulateFileReferences(runnerLoadedTest, testFilePaths, repositoryPath, new GuiHelper(new MonoCecilHelper(), new AssetsDatabaseHelper()));
+                RecursivelyPopulateFileReferences(
+                    runnerLoadedTest,
+                    testFilePaths,
+                    repositoryPath,
+                    new GuiHelper(new MonoCecilHelper(), new AssetsDatabaseHelper())
+                );
                 SaveToJsonFile(testFilePaths, metaFileDestinationPath);
             }
             catch (Exception e)
@@ -51,7 +56,10 @@ namespace UnityEditor.TestRunner.TestLaunchers
 
         // This function serializes dictionary to json file, all the logic would not be necessary if Unity was able to serialize Dictionaries, or if we could use Newtonsoft.Json.
         // This function could be changed later on, or we can use different data structure than Dictionary.
-        private static void SaveToJsonFile(Dictionary<string, FileReference> testFilePaths, string metaFileDestinationPath)
+        private static void SaveToJsonFile(
+            Dictionary<string, FileReference> testFilePaths,
+            string metaFileDestinationPath
+        )
         {
             using (var fileStream = File.CreateText(Path.Combine(metaFileDestinationPath, "TestFileReferences.json")))
             {
@@ -60,7 +68,9 @@ namespace UnityEditor.TestRunner.TestLaunchers
                 foreach (var testFilePath in testFilePaths)
                 {
                     fileStream.WriteLine($"   \"{JavaScriptStringEncode(testFilePath.Key)}\": {{");
-                    fileStream.WriteLine($"      \"filePath\": \"{JavaScriptStringEncode(testFilePath.Value.FilePath)}\",");
+                    fileStream.WriteLine(
+                        $"      \"filePath\": \"{JavaScriptStringEncode(testFilePath.Value.FilePath)}\","
+                    );
                     fileStream.WriteLine($"      \"lineNumber\": {testFilePath.Value.LineNumber}");
                     // check if it is the last element in the dictionary
                     if (testFilePath.Key != testFilePaths.Keys.Last())
@@ -91,7 +101,12 @@ namespace UnityEditor.TestRunner.TestLaunchers
                 : playerBuildOptions.GetCurrentLocationPath();
         }
 
-        private static void RecursivelyPopulateFileReferences(ITest test, Dictionary<string, FileReference> testFilePaths, string repositoryPath, IGuiHelper guiHelper)
+        private static void RecursivelyPopulateFileReferences(
+            ITest test,
+            Dictionary<string, FileReference> testFilePaths,
+            string repositoryPath,
+            IGuiHelper guiHelper
+        )
         {
             if (test.HasChildren)
             {
@@ -118,11 +133,7 @@ namespace UnityEditor.TestRunner.TestLaunchers
             var fileOpenInfo = guiHelper.GetFileOpenInfo(type, methodInfo);
             var filePathString = Path.Combine(repositoryPath, fileOpenInfo.FilePath);
             var lineNumber = fileOpenInfo.LineNumber;
-            var fileReference = new FileReference
-            {
-                FilePath = filePathString,
-                LineNumber = lineNumber
-            };
+            var fileReference = new FileReference { FilePath = filePathString, LineNumber = lineNumber };
             // Cannot be simplified with .TryAdd because Unity 2020.3 and below does not have it.
             if (!testFilePaths.ContainsKey(test.FullName))
             {
@@ -157,7 +168,7 @@ namespace UnityEditor.TestRunner.TestLaunchers
 
             return string.Empty;
         }
-        
+
         // Below implementation is copy-paste from HttpUtility.JavaScriptStringEncode
         private static string JavaScriptStringEncode(string value)
         {
@@ -191,7 +202,8 @@ namespace UnityEditor.TestRunner.TestLaunchers
                     count = 0;
                 }
 
-                switch (c) {
+                switch (c)
+                {
                     case '\r':
                         b.Append("\\r");
                         break;
@@ -239,20 +251,22 @@ namespace UnityEditor.TestRunner.TestLaunchers
             return b.ToString();
         }
 
-        private static bool CharRequiresJavaScriptEncoding(char c) {
+        private static bool CharRequiresJavaScriptEncoding(char c)
+        {
             return c < 0x20 // control chars always have to be encoded
-                   || c == '\"' // chars which must be encoded per JSON spec
-                   || c == '\\'
-                   || c == '\'' // HTML-sensitive chars encoded for safety
-                   || c == '<'
-                   || c == '>'
-                   || c == '&'
-                   || c == '\u0085' // newline chars (see Unicode 6.2, Table 5-1 [http://www.unicode.org/versions/Unicode6.2.0/ch05.pdf]) have to be encoded (DevDiv #663531)
-                   || c == '\u2028'
-                   || c == '\u2029';
+                || c == '\"' // chars which must be encoded per JSON spec
+                || c == '\\'
+                || c == '\'' // HTML-sensitive chars encoded for safety
+                || c == '<'
+                || c == '>'
+                || c == '&'
+                || c == '\u0085' // newline chars (see Unicode 6.2, Table 5-1 [http://www.unicode.org/versions/Unicode6.2.0/ch05.pdf]) have to be encoded (DevDiv #663531)
+                || c == '\u2028'
+                || c == '\u2029';
         }
-        
-        private static void AppendCharAsUnicodeJavaScript(StringBuilder builder, char c) {
+
+        private static void AppendCharAsUnicodeJavaScript(StringBuilder builder, char c)
+        {
             builder.Append("\\u");
             builder.Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
         }

@@ -13,11 +13,13 @@ namespace UnityEngine.TestTools
     {
         private int repeatCount;
 
-        public EnumerableRepeatedTestCommand(RepeatAttribute.RepeatedTestCommand commandToReplace) : base(commandToReplace.GetInnerCommand())
+        public EnumerableRepeatedTestCommand(RepeatAttribute.RepeatedTestCommand commandToReplace)
+            : base(commandToReplace.GetInnerCommand())
         {
-            repeatCount = (int)typeof(RepeatAttribute.RepeatedTestCommand)
-                .GetField("repeatCount", BindingFlags.NonPublic | BindingFlags.Instance)
-                .GetValue(commandToReplace);
+            repeatCount = (int)
+                typeof(RepeatAttribute.RepeatedTestCommand)
+                    .GetField("repeatCount", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(commandToReplace);
         }
 
         public override TestResult Execute(ITestExecutionContext context)

@@ -6,9 +6,9 @@ namespace UnityEngine.Rendering
     /// A graphics settings container for settings related to additional <see cref="RenderPipelineAsset"/> inclusion at build time.
     /// </summary>
     /// <remarks>
-    /// These settings are not editable through the editor's UI but can be changed through the API for advanced usage. 
-    /// Changing this through the API is only allowed in the Editor. In the Player, this raises an error. 
-    /// 
+    /// These settings are not editable through the editor's UI but can be changed through the API for advanced usage.
+    /// Changing this through the API is only allowed in the Editor. In the Player, this raises an error.
+    ///
     /// By default, only RPAsset, in Quality Settings, is embedded in the build. This allows you to add assets.
     /// Add any render pipeline assets you use in your project either through this or directly in Quality Settings. They contain data listing what resources need to be embedded in the build.
     /// It is highly recommended not to change it unless you know what you are doing. Otherwise, this may lead to unexpected changes in your Player.
@@ -18,7 +18,7 @@ namespace UnityEngine.Rendering
     /// <para> Here is an example of how to determine what label to use to embed additional assets. </para>
     /// <code>
     /// using UnityEngine.Rendering;
-    /// 
+    ///
     /// public static class RPAssetIncludedHelper
     /// {
     ///     public static string label
@@ -46,8 +46,9 @@ namespace UnityEngine.Rendering
             Initial,
 
             Count,
-            Last = Count - 1
+            Last = Count - 1,
         }
+
         [SerializeField, HideInInspector]
         private Version m_version = Version.Last;
         int IRenderPipelineGraphicsSettings.version => (int)m_version;
@@ -61,20 +62,20 @@ namespace UnityEngine.Rendering
             get => m_IncludeReferencedInScenes;
             set => this.SetValueAndNotify(ref m_IncludeReferencedInScenes, value, nameof(m_IncludeReferencedInScenes));
         }
-        
+
         [SerializeField]
         private bool m_IncludeAssetsByLabel;
-        
+
         /// <summary> Additionaly include RPAsset that have a specific label. </summary>
         public bool includeAssetsByLabel
         {
             get => m_IncludeAssetsByLabel;
             set => this.SetValueAndNotify(ref m_IncludeAssetsByLabel, value, nameof(m_IncludeAssetsByLabel));
         }
-        
+
         [SerializeField]
         private string m_LabelToInclude;
-        
+
         /// <summary> Label to use when including RPAsset by label. </summary>
         public string labelToInclude
         {

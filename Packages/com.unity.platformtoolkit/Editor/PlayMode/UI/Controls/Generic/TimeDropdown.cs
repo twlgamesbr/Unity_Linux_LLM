@@ -50,11 +50,7 @@ namespace Unity.PlatformToolkit.PlayMode
         public static TimeOption ConvertTimeSpanToValue(TimeSpan span)
         {
             int milliseconds = (int)span.TotalMilliseconds;
-            return new TimeOption
-            {
-                Milliseconds = milliseconds,
-                FormattingSuffix = string.Empty
-            };
+            return new TimeOption { Milliseconds = milliseconds, FormattingSuffix = string.Empty };
         }
     }
 
@@ -127,7 +123,8 @@ namespace Unity.PlatformToolkit.PlayMode
             }
         }
 
-        public TimeDropdown() : base()
+        public TimeDropdown()
+            : base()
         {
             formatSelectedValueCallback = FormatSelectedItem;
             formatListItemCallback = FormatItem;

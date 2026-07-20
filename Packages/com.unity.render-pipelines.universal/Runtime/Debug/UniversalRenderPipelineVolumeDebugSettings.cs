@@ -34,7 +34,12 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                if (selectedCamera != null && selectedCamera.TryGetComponent<UniversalAdditionalCameraData>(out var selectedAdditionalCameraData))
+                if (
+                    selectedCamera != null
+                    && selectedCamera.TryGetComponent<UniversalAdditionalCameraData>(
+                        out var selectedAdditionalCameraData
+                    )
+                )
                     return selectedAdditionalCameraData.volumeLayerMask;
 
                 return 1; // "Default"
@@ -42,6 +47,7 @@ namespace UnityEngine.Rendering.Universal
         }
 
         /// <summary>Selected camera volume position.</summary>
-        public override Vector3 selectedCameraPosition => selectedCamera != null ? selectedCamera.transform.position : Vector3.zero;
+        public override Vector3 selectedCameraPosition =>
+            selectedCamera != null ? selectedCamera.transform.position : Vector3.zero;
     }
 }

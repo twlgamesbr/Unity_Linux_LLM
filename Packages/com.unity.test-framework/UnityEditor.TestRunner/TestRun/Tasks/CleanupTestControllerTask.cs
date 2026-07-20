@@ -16,7 +16,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             {
                 yield break;
             }
-            
+
             testJobData.PlaymodeTestsController.Cleanup();
         }
     }

@@ -22,7 +22,10 @@ namespace UnityEditor.Rendering
             return GraphicsSettings.isScriptableRenderPipelineEnabled;
         }
 
-        [MenuItem("Edit/Rendering/Materials/Convert All Built-In Materials to Current SRP", priority = CoreUtils.Priorities.editMenuPriority + 1)]
+        [MenuItem(
+            "Edit/Rendering/Materials/Convert All Built-In Materials to Current SRP",
+            priority = CoreUtils.Priorities.editMenuPriority + 1
+        )]
         internal static void UpgradeMaterialsProject()
         {
             MaterialUpgrader.UpgradeProjectFolder(GetCurrentSRPUpgraders(), "Upgrade to SRP Material");
@@ -43,7 +46,10 @@ namespace UnityEditor.Rendering
             return true;
         }
 
-        [MenuItem("Edit/Rendering/Materials/Convert Selected Built-In Materials to Current SRP", priority = CoreUtils.Priorities.editMenuPriority + 2)]
+        [MenuItem(
+            "Edit/Rendering/Materials/Convert Selected Built-In Materials to Current SRP",
+            priority = CoreUtils.Priorities.editMenuPriority + 2
+        )]
         internal static void UpgradeMaterialsSelection()
         {
             MaterialUpgrader.UpgradeSelection(GetCurrentSRPUpgraders(), "Upgrade to SRP Material");

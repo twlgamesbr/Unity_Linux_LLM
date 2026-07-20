@@ -4,7 +4,8 @@ using UnityEngine.UIElements;
 
 namespace Unity.Entities.UI
 {
-    abstract class MinMaxAttributeInspectorBaseField<TValue> : BaseFieldAttributeInspector<MinMaxSlider, Vector2, TValue, MinMaxAttribute>
+    abstract class MinMaxAttributeInspectorBaseField<TValue>
+        : BaseFieldAttributeInspector<MinMaxSlider, Vector2, TValue, MinMaxAttribute>
     {
         public override VisualElement Build()
         {
@@ -16,12 +17,8 @@ namespace Unity.Entities.UI
     }
 
     [UsedImplicitly]
-    class MinMaxFieldAttributeInspector : MinMaxAttributeInspectorBaseField<Vector2>
-    {
-    }
+    class MinMaxFieldAttributeInspector : MinMaxAttributeInspectorBaseField<Vector2> { }
 
     [UsedImplicitly]
-    class MinMaxFieldIntAttributeInspector : MinMaxAttributeInspectorBaseField<Vector2Int>
-    {
-    }
+    class MinMaxFieldIntAttributeInspector : MinMaxAttributeInspectorBaseField<Vector2Int> { }
 }

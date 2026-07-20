@@ -10,8 +10,10 @@ namespace Unity.Entities.Editor
     {
 #if !UNITY_2023_3_OR_NEWER
         class FoldoutFieldFactory : UxmlFactory<FoldoutField, FoldoutFieldTraits> { }
+
         class FoldoutFieldTraits : UxmlTraits { }
 #endif
+
         const string s_UssClassName = "foldout-field";
         const string s_IconOpenClassName = s_UssClassName + "__icon-open";
         const string s_IconClosedClassName = s_UssClassName + "__icon-closed";
@@ -67,11 +69,13 @@ namespace Unity.Entities.Editor
             var foldout = template.Clone(this);
             var toggle = foldout.Q("toggle");
 
-            toggle.RegisterCallback<ClickEvent>((e) =>
-            {
-                open = !open;
-                e.StopPropagation();
-            });
+            toggle.RegisterCallback<ClickEvent>(
+                (e) =>
+                {
+                    open = !open;
+                    e.StopPropagation();
+                }
+            );
 
             m_Icon = toggle.Q<Image>("icon");
             m_Label = toggle.Q<Label>("label");

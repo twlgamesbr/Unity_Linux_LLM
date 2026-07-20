@@ -28,7 +28,13 @@ namespace UnityEditor.Build.Pipeline
         /// <summary>
         /// Func delegate for the callback after writing content has occurred.
         /// </summary>
-        public Func<IBuildParameters, IDependencyData, IWriteData, IBuildResults, ReturnCode> PostWritingCallback { get; set; }
+        public Func<
+            IBuildParameters,
+            IDependencyData,
+            IWriteData,
+            IBuildResults,
+            ReturnCode
+        > PostWritingCallback { get; set; }
 
         /// <inheritdoc />
         public ReturnCode PostScripts(IBuildParameters parameters, IBuildResults results)
@@ -47,7 +53,11 @@ namespace UnityEditor.Build.Pipeline
         }
 
         /// <inheritdoc />
-        public ReturnCode PostPacking(IBuildParameters buildParameters, IDependencyData dependencyData, IWriteData writeData)
+        public ReturnCode PostPacking(
+            IBuildParameters buildParameters,
+            IDependencyData dependencyData,
+            IWriteData writeData
+        )
         {
             if (PostPackingCallback != null)
                 return PostPackingCallback(buildParameters, dependencyData, writeData);
@@ -55,7 +65,12 @@ namespace UnityEditor.Build.Pipeline
         }
 
         /// <inheritdoc />
-        public ReturnCode PostWriting(IBuildParameters parameters, IDependencyData dependencyData, IWriteData writeData, IBuildResults results)
+        public ReturnCode PostWriting(
+            IBuildParameters parameters,
+            IDependencyData dependencyData,
+            IWriteData writeData,
+            IBuildResults results
+        )
         {
             if (PostWritingCallback != null)
                 return PostWritingCallback(parameters, dependencyData, writeData, results);

@@ -13,7 +13,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
     {
         const string UXML = "Packages/com.unity.multiplayer.tools/NetworkSimulator/Editor/UI/NetworkTypeView.uxml";
 
-        const string CustomTooltipText = "Changes to the parameters in the inspector will be reflected in the Custom Connection Type asset.";
+        const string CustomTooltipText =
+            "Changes to the parameters in the inspector will be reflected in the Custom Connection Type asset.";
         const string BuiltInTooltipText = "Built-in connection types cannot be edited.";
 
         const int k_MaxDelay = 5_000;
@@ -43,7 +44,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
             m_NetworkSimulator = networkSimulator;
             m_SerializedObject = serializedObject;
             m_ConfigurationObject = m_SerializedObject.FindProperty(nameof(Runtime.NetworkSimulator.m_PresetAsset));
-            m_ConfigurationReference = m_SerializedObject.FindProperty(nameof(Runtime.NetworkSimulator.m_PresetReference));
+            m_ConfigurationReference = m_SerializedObject.FindProperty(
+                nameof(Runtime.NetworkSimulator.m_PresetReference)
+            );
             m_SerializedObject.Update();
 
             if (m_NetworkSimulator.ConnectionPreset == null)

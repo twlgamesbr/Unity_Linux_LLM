@@ -1,9 +1,9 @@
 using System;
 using Unity.Collections;
-using UnityEngine.Profiling;
-using UnityEngine.Assertions;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnityEngine.Assertions;
+using UnityEngine.Profiling;
 
 namespace UnityEngine.Rendering
 {
@@ -59,21 +59,39 @@ namespace UnityEngine.Rendering
             var visibleTreeRenderers = new NativeList<EntityId>(Allocator.TempJob);
             var visibleTreeInstances = new NativeList<InstanceHandle>(Allocator.TempJob);
 
-            m_InstanceDataSystem.GetVisibleTreeInstances(compactedVisibilityMasks, m_ProcessedThisFrameTreeBits, visibleTreeRenderers, visibleTreeInstances,
-                becomeVisibleOnly, out var becomeVisibleTreeInstancesCount);
+            m_InstanceDataSystem.GetVisibleTreeInstances(
+                compactedVisibilityMasks,
+                m_ProcessedThisFrameTreeBits,
+                visibleTreeRenderers,
+                visibleTreeInstances,
+                becomeVisibleOnly,
+                out var becomeVisibleTreeInstancesCount
+            );
 
             if (visibleTreeRenderers.Length > 0)
             {
                 Profiler.BeginSample("SpeedTreeGPUWindDataUpdater.UpdateSpeedTreeWindAndUploadWindParamsToGPU");
 
                 // Become visible trees is a subset of visible trees.
-                var becomeVisibleTreeRendererIDs = visibleTreeRenderers.AsArray().GetSubArray(0, becomeVisibleTreeInstancesCount);
-                var becomeVisibleTreeInstances = visibleTreeInstances.AsArray().GetSubArray(0, becomeVisibleTreeInstancesCount);
+                var becomeVisibleTreeRendererIDs = visibleTreeRenderers
+                    .AsArray()
+                    .GetSubArray(0, becomeVisibleTreeInstancesCount);
+                var becomeVisibleTreeInstances = visibleTreeInstances
+                    .AsArray()
+                    .GetSubArray(0, becomeVisibleTreeInstancesCount);
 
                 if (becomeVisibleTreeRendererIDs.Length > 0)
-                    UpdateSpeedTreeWindAndUploadWindParamsToGPU(becomeVisibleTreeRendererIDs, becomeVisibleTreeInstances, history: true);
+                    UpdateSpeedTreeWindAndUploadWindParamsToGPU(
+                        becomeVisibleTreeRendererIDs,
+                        becomeVisibleTreeInstances,
+                        history: true
+                    );
 
-                UpdateSpeedTreeWindAndUploadWindParamsToGPU(visibleTreeRenderers.AsArray(), visibleTreeInstances.AsArray(), history: false);
+                UpdateSpeedTreeWindAndUploadWindParamsToGPU(
+                    visibleTreeRenderers.AsArray(),
+                    visibleTreeInstances.AsArray(),
+                    history: false
+                );
 
                 Profiler.EndSample();
             }
@@ -84,7 +102,11 @@ namespace UnityEngine.Rendering
             Profiler.EndSample();
         }
 
-        private unsafe void UpdateSpeedTreeWindAndUploadWindParamsToGPU(NativeArray<EntityId> treeRenderers, NativeArray<InstanceHandle> treeInstances, bool history)
+        private unsafe void UpdateSpeedTreeWindAndUploadWindParamsToGPU(
+            NativeArray<EntityId> treeRenderers,
+            NativeArray<InstanceHandle> treeInstances,
+            bool history
+        )
         {
             if (treeRenderers.Length == 0)
                 return;
@@ -93,14 +115,22 @@ namespace UnityEngine.Rendering
 
             Assert.AreEqual(treeRenderers.Length, treeInstances.Length);
             Assert.AreEqual(defaultGPUComponents.speedTreeWind.Length, (int)SpeedTreeWindParamIndex.MaxWindParamsCount);
-            
-            var gpuIndices = new NativeArray<GPUInstanceIndex>(treeInstances.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+
+            var gpuIndices = new NativeArray<GPUInstanceIndex>(
+                treeInstances.Length,
+                Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_InstanceDataSystem.QueryInstanceGPUIndices(treeInstances, gpuIndices);
 
             if (!history)
                 m_InstanceDataSystem.UpdateInstanceWindDataHistory(gpuIndices);
 
-            GPUInstanceUploadData uploadData = m_InstanceDataSystem.CreateInstanceUploadData(defaultGPUComponents.speedTreeWind, treeInstances.Length, Allocator.TempJob);
+            GPUInstanceUploadData uploadData = m_InstanceDataSystem.CreateInstanceUploadData(
+                defaultGPUComponents.speedTreeWind,
+                treeInstances.Length,
+                Allocator.TempJob
+            );
 
             EnsureUploadBufferUintCount(uploadData.uploadDataUIntSize);
 
@@ -109,12 +139,14 @@ namespace UnityEngine.Rendering
             var windParams = new SpeedTreeWindParamsBufferIterator();
             windParams.bufferPtr = (IntPtr)writeBuffer.GetUnsafePtr();
             for (int i = 0; i < (int)SpeedTreeWindParamIndex.MaxWindParamsCount; ++i)
-                windParams.uintParamOffsets[i] = uploadData.PrepareComponentWrite<Vector4>(defaultGPUComponents.speedTreeWind[i]);
+                windParams.uintParamOffsets[i] = uploadData.PrepareComponentWrite<Vector4>(
+                    defaultGPUComponents.speedTreeWind[i]
+                );
             windParams.uintStride = UnsafeUtility.SizeOf<Vector4>() / UnsafeUtility.SizeOf<uint>();
             windParams.elementOffset = 0;
             windParams.elementsCount = treeInstances.Length;
             SpeedTreeWindManager.UpdateWindAndWriteBufferWindParams(treeRenderers, windParams, history);
-            
+
             m_GPUUploadBuffer.SetData(writeBuffer);
 
             m_InstanceDataSystem.UploadDataToGPU(gpuIndices, m_GPUUploadBuffer, uploadData);

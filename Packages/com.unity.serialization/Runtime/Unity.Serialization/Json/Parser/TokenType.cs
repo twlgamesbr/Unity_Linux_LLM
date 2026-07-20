@@ -34,10 +34,10 @@
         /// Holds a reference to characters that represent any value that does not fit into the above categories.
         /// </summary>
         Primitive,
-        
+
         /// <summary>
         /// The token holds a reference to all characters of a comment block.
         /// </summary>
-        Comment
+        Comment,
     }
 }

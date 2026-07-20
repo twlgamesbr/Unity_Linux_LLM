@@ -10,8 +10,12 @@ namespace UnityEngine.InputSystem.Editor
     /// Analytics for tracking Player Input component user engagement in the editor.
     /// </summary>
 #if UNITY_2023_2_OR_NEWER
-    [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-        maxNumberOfElements: kMaxNumberOfElements, vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey)]
+    [UnityEngine.Analytics.AnalyticInfo(
+        eventName: kEventName,
+        maxEventsPerHour: kMaxEventsPerHour,
+        maxNumberOfElements: kMaxNumberOfElements,
+        vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey
+    )]
 #endif // UNITY_2023_2_OR_NEWER
     internal class InputBuildAnalytic : UnityEngine.InputSystem.InputAnalytics.IInputAnalytic
     {
@@ -78,7 +82,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 ResetAndDisableNonBackgroundDevices = 0,
                 ResetAndDisableAllDevices = 1,
-                IgnoreFocus = 2
+                IgnoreFocus = 2,
             }
 
             [Serializable]
@@ -86,7 +90,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 PointersAndKeyboardsRespectGameViewFocus = 0,
                 AllDevicesRespectGameViewFocus = 1,
-                AllDeviceInputAlwaysGoesToGameView = 2
+                AllDeviceInputAlwaysGoesToGameView = 2,
             }
 
             [Serializable]
@@ -94,7 +98,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 Compact = 0,
                 MultilineEffective = 1,
-                MultilineBoth = 2
+                MultilineBoth = 2,
             }
 
             public InputBuildAnalyticData(BuildReport report, InputSettings settings, InputSettings defaultSettings)
@@ -135,16 +139,16 @@ namespace UnityEngine.InputSystem.Editor
                 switch (settings.editorInputBehaviorInPlayMode)
                 {
                     case InputSettings.EditorInputBehaviorInPlayMode.PointersAndKeyboardsRespectGameViewFocus:
-                        editor_input_behavior_in_playmode = EditorInputBehaviorInPlayMode
-                            .PointersAndKeyboardsRespectGameViewFocus;
+                        editor_input_behavior_in_playmode =
+                            EditorInputBehaviorInPlayMode.PointersAndKeyboardsRespectGameViewFocus;
                         break;
                     case InputSettings.EditorInputBehaviorInPlayMode.AllDevicesRespectGameViewFocus:
-                        editor_input_behavior_in_playmode = EditorInputBehaviorInPlayMode
-                            .AllDevicesRespectGameViewFocus;
+                        editor_input_behavior_in_playmode =
+                            EditorInputBehaviorInPlayMode.AllDevicesRespectGameViewFocus;
                         break;
                     case InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView:
-                        editor_input_behavior_in_playmode = EditorInputBehaviorInPlayMode
-                            .AllDeviceInputAlwaysGoesToGameView;
+                        editor_input_behavior_in_playmode =
+                            EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
                         break;
                     default:
                         throw new Exception("Unsupported editor background behavior");
@@ -190,16 +194,20 @@ namespace UnityEngine.InputSystem.Editor
 
                 feature_optimized_controls_enabled = settings.IsFeatureEnabled(InputFeatureNames.kUseOptimizedControls);
                 feature_read_value_caching_enabled = settings.IsFeatureEnabled(InputFeatureNames.kUseReadValueCaching);
-                feature_paranoid_read_value_caching_checks_enabled =
-                    settings.IsFeatureEnabled(InputFeatureNames.kParanoidReadValueCachingChecks);
+                feature_paranoid_read_value_caching_checks_enabled = settings.IsFeatureEnabled(
+                    InputFeatureNames.kParanoidReadValueCachingChecks
+                );
 
-                feature_use_imgui_editor_for_assets =
-                    settings.IsFeatureEnabled(InputFeatureNames.kUseIMGUIEditorForAssets);
+                feature_use_imgui_editor_for_assets = settings.IsFeatureEnabled(
+                    InputFeatureNames.kUseIMGUIEditorForAssets
+                );
 
-                feature_disable_unity_remote_support =
-                    settings.IsFeatureEnabled(InputFeatureNames.kDisableUnityRemoteSupport);
-                feature_run_player_updates_in_editmode =
-                    settings.IsFeatureEnabled(InputFeatureNames.kRunPlayerUpdatesInEditMode);
+                feature_disable_unity_remote_support = settings.IsFeatureEnabled(
+                    InputFeatureNames.kDisableUnityRemoteSupport
+                );
+                feature_run_player_updates_in_editmode = settings.IsFeatureEnabled(
+                    InputFeatureNames.kRunPlayerUpdatesInEditMode
+                );
 
                 has_default_settings = InputSettings.AreEqual(settings, defaultSettings);
 

@@ -49,7 +49,8 @@ namespace Unity.Entities.Editor
             {
                 m_TypeIndex = typeIndex;
                 m_Allocator = allocator;
-                Ptr = (Data*) Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
+                Ptr = (Data*)
+                    Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
                 UnsafeUtility.MemClear(Ptr, UnsafeUtility.SizeOf<Data>());
             }
 
@@ -72,7 +73,11 @@ namespace Unity.Entities.Editor
                     return;
                 var addedComponents = Ptr->AddedComponents;
                 entities.ResizeUninitialized(addedComponents.Length);
-                UnsafeUtility.MemCpy(entities.GetUnsafePtr(), addedComponents.Ptr, addedComponents.Length * UnsafeUtility.SizeOf<Entity>());
+                UnsafeUtility.MemCpy(
+                    entities.GetUnsafePtr(),
+                    addedComponents.Ptr,
+                    addedComponents.Length * UnsafeUtility.SizeOf<Entity>()
+                );
             }
 
             public void GetRemovedComponentEntities(NativeList<Entity> entities)
@@ -81,10 +86,15 @@ namespace Unity.Entities.Editor
                     return;
                 var removedComponents = Ptr->RemovedComponents;
                 entities.ResizeUninitialized(removedComponents.Length);
-                UnsafeUtility.MemCpy(entities.GetUnsafePtr(), removedComponents.Ptr, removedComponents.Length * UnsafeUtility.SizeOf<Entity>());
+                UnsafeUtility.MemCpy(
+                    entities.GetUnsafePtr(),
+                    removedComponents.Ptr,
+                    removedComponents.Length * UnsafeUtility.SizeOf<Entity>()
+                );
             }
 
-            public void GetAddedComponentData<T>(NativeList<T> components) where T : unmanaged
+            public void GetAddedComponentData<T>(NativeList<T> components)
+                where T : unmanaged
             {
                 EnsureIsExpectedComponent<T>();
 
@@ -92,10 +102,15 @@ namespace Unity.Entities.Editor
                     return;
                 var addedComponents = Ptr->AddedComponents;
                 components.ResizeUninitialized(addedComponents.Length);
-                UnsafeUtility.MemCpy(components.GetUnsafePtr(), Ptr->Buffer.Ptr, addedComponents.Length * UnsafeUtility.SizeOf<T>());
+                UnsafeUtility.MemCpy(
+                    components.GetUnsafePtr(),
+                    Ptr->Buffer.Ptr,
+                    addedComponents.Length * UnsafeUtility.SizeOf<T>()
+                );
             }
 
-            public void GetRemovedComponentData<T>(NativeList<T> components) where T : unmanaged
+            public void GetRemovedComponentData<T>(NativeList<T> components)
+                where T : unmanaged
             {
                 EnsureIsExpectedComponent<T>();
 
@@ -104,10 +119,17 @@ namespace Unity.Entities.Editor
 
                 var removedComponents = Ptr->RemovedComponents;
                 components.ResizeUninitialized(removedComponents.Length);
-                UnsafeUtility.MemCpy(components.GetUnsafePtr(), (byte*)Ptr->Buffer.Ptr + Ptr->AddedComponents.Length * UnsafeUtility.SizeOf<T>(), removedComponents.Length * UnsafeUtility.SizeOf<T>());
+                UnsafeUtility.MemCpy(
+                    components.GetUnsafePtr(),
+                    (byte*)Ptr->Buffer.Ptr + Ptr->AddedComponents.Length * UnsafeUtility.SizeOf<T>(),
+                    removedComponents.Length * UnsafeUtility.SizeOf<T>()
+                );
             }
 
-            public (NativeArray<Entity> entities, NativeArray<T> componentData) GetAddedComponents<T>(Allocator allocator) where T : unmanaged
+            public (NativeArray<Entity> entities, NativeArray<T> componentData) GetAddedComponents<T>(
+                Allocator allocator
+            )
+                where T : unmanaged
             {
                 EnsureIsExpectedComponent<T>();
 
@@ -117,13 +139,22 @@ namespace Unity.Entities.Editor
                 var addedComponents = Ptr->AddedComponents;
                 var entities = CollectionHelper.CreateNativeArray<Entity>(addedComponents.Length, allocator);
                 var components = CollectionHelper.CreateNativeArray<T>(addedComponents.Length, allocator);
-                UnsafeUtility.MemCpy(entities.GetUnsafePtr(), addedComponents.Ptr, addedComponents.Length * UnsafeUtility.SizeOf<Entity>());
-                UnsafeUtility.MemCpy(components.GetUnsafePtr(), Ptr->Buffer.Ptr, addedComponents.Length * UnsafeUtility.SizeOf<T>());
+                UnsafeUtility.MemCpy(
+                    entities.GetUnsafePtr(),
+                    addedComponents.Ptr,
+                    addedComponents.Length * UnsafeUtility.SizeOf<Entity>()
+                );
+                UnsafeUtility.MemCpy(
+                    components.GetUnsafePtr(),
+                    Ptr->Buffer.Ptr,
+                    addedComponents.Length * UnsafeUtility.SizeOf<T>()
+                );
 
                 return (entities, components);
             }
 
-            public NativeArray<Entity> GetEntitiesWithRemovedComponents<T>(Allocator allocator) where T : struct
+            public NativeArray<Entity> GetEntitiesWithRemovedComponents<T>(Allocator allocator)
+                where T : struct
             {
                 EnsureIsExpectedComponent<T>();
 
@@ -132,12 +163,19 @@ namespace Unity.Entities.Editor
 
                 var removedComponents = Ptr->RemovedComponents;
                 var entities = CollectionHelper.CreateNativeArray<Entity>(removedComponents.Length, allocator);
-                UnsafeUtility.MemCpy(entities.GetUnsafePtr(), removedComponents.Ptr, removedComponents.Length * UnsafeUtility.SizeOf<Entity>());
+                UnsafeUtility.MemCpy(
+                    entities.GetUnsafePtr(),
+                    removedComponents.Ptr,
+                    removedComponents.Length * UnsafeUtility.SizeOf<Entity>()
+                );
 
                 return entities;
             }
 
-            public (NativeArray<Entity> entities, NativeArray<T> componentData) GetRemovedComponents<T>(Allocator allocator) where T : unmanaged
+            public (NativeArray<Entity> entities, NativeArray<T> componentData) GetRemovedComponents<T>(
+                Allocator allocator
+            )
+                where T : unmanaged
             {
                 EnsureIsExpectedComponent<T>();
 
@@ -147,16 +185,27 @@ namespace Unity.Entities.Editor
                 var removedComponents = Ptr->RemovedComponents;
                 var entities = CollectionHelper.CreateNativeArray<Entity>(removedComponents.Length, allocator);
                 var components = CollectionHelper.CreateNativeArray<T>(removedComponents.Length, allocator);
-                UnsafeUtility.MemCpy(entities.GetUnsafePtr(), removedComponents.Ptr, removedComponents.Length * UnsafeUtility.SizeOf<Entity>());
-                UnsafeUtility.MemCpy(components.GetUnsafePtr(), (byte*)Ptr->Buffer.Ptr + Ptr->AddedComponents.Length * UnsafeUtility.SizeOf<T>(), removedComponents.Length * UnsafeUtility.SizeOf<T>());
+                UnsafeUtility.MemCpy(
+                    entities.GetUnsafePtr(),
+                    removedComponents.Ptr,
+                    removedComponents.Length * UnsafeUtility.SizeOf<Entity>()
+                );
+                UnsafeUtility.MemCpy(
+                    components.GetUnsafePtr(),
+                    (byte*)Ptr->Buffer.Ptr + Ptr->AddedComponents.Length * UnsafeUtility.SizeOf<T>(),
+                    removedComponents.Length * UnsafeUtility.SizeOf<T>()
+                );
 
                 return (entities, components);
             }
 
-            void EnsureIsExpectedComponent<T>() where T : struct
+            void EnsureIsExpectedComponent<T>()
+                where T : struct
             {
                 if (TypeManager.GetTypeIndex<T>() != m_TypeIndex)
-                    throw new InvalidOperationException($"Unable to retrieve data for component type {typeof(T)} (type index {TypeManager.GetTypeIndex<T>()}), this container only holds data for the type with type index {m_TypeIndex}.");
+                    throw new InvalidOperationException(
+                        $"Unable to retrieve data for component type {typeof(T)} (type index {TypeManager.GetTypeIndex<T>()}), this container only holds data for the type with type index {m_TypeIndex}."
+                    );
             }
         }
 
@@ -213,7 +262,8 @@ namespace Unity.Entities.Editor
             public ChunkShadow(Allocator allocator)
             {
                 m_Allocator = allocator;
-                Ptr = (Data*) Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
+                Ptr = (Data*)
+                    Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
                 UnsafeUtility.MemClear(Ptr, UnsafeUtility.SizeOf<Data>());
             }
 
@@ -319,7 +369,8 @@ namespace Unity.Entities.Editor
                 throw new InvalidOperationException($"{nameof(TypeManager)} has not been initialized properly");
 
             var typeInfo = TypeManager.GetTypeInfo(componentType.TypeIndex);
-            return typeInfo.Category == TypeManager.TypeCategory.ComponentData && UnsafeUtility.IsUnmanaged(componentType.GetManagedType());
+            return typeInfo.Category == TypeManager.TypeCategory.ComponentData
+                && UnsafeUtility.IsUnmanaged(componentType.GetManagedType());
         }
 
         /// <summary>
@@ -330,7 +381,10 @@ namespace Unity.Entities.Editor
         public ComponentDataDiffer(EntityComponentStore* ecs, ComponentType componentType)
         {
             if (!CanWatch(componentType))
-                throw new ArgumentException($"{nameof(ComponentDataDiffer)} only supports unmanaged {nameof(IComponentData)} components.", nameof(componentType));
+                throw new ArgumentException(
+                    $"{nameof(ComponentDataDiffer)} only supports unmanaged {nameof(IComponentData)} components.",
+                    nameof(componentType)
+                );
 
             var typeInfo = TypeManager.GetTypeInfo(componentType.TypeIndex);
 
@@ -379,7 +433,11 @@ namespace Unity.Entities.Editor
             return changes;
         }
 
-        public unsafe ChangeSet GatherComponentChangesAsync(EntityQuery query, Allocator allocator, out JobHandle jobHandle)
+        public unsafe ChangeSet GatherComponentChangesAsync(
+            EntityQuery query,
+            Allocator allocator,
+            out JobHandle jobHandle
+        )
         {
             var chunks = query.ToArchetypeChunkListAsync(Allocator.TempJob, out var chunksJobHandle);
 
@@ -403,7 +461,10 @@ namespace Unity.Entities.Editor
             }.Schedule(chunksJobHandle);
 
             m_ChunkSequenceNumbers.Capacity = math.max(m_ChunkSequenceNumbers.Capacity, maxChunkCount);
-            m_ChunkShadowBySequenceNumber.Capacity = math.max(m_ChunkShadowBySequenceNumber.Capacity, maxChunkCount * 2);
+            m_ChunkShadowBySequenceNumber.Capacity = math.max(
+                m_ChunkShadowBySequenceNumber.Capacity,
+                maxChunkCount * 2
+            );
             m_RemovedChunks.Capacity = math.max(m_RemovedChunks.Capacity, m_ChunkShadowBySequenceNumberKeys.Length);
 
             var changes = new ChangeSet(m_TypeIndex, allocator);
@@ -414,14 +475,14 @@ namespace Unity.Entities.Editor
                 ComponentSize = m_ComponentSize,
                 Chunks = chunks,
                 ShadowChunksBySequenceNumber = m_ChunkShadowBySequenceNumber,
-                GatheredChanges = m_ChangesByChunk.GetUnsafeList()->Ptr
+                GatheredChanges = m_ChangesByChunk.GetUnsafeList()->Ptr,
             }.Schedule(chunks, 1, resizeAndClearJobHandle);
 
             var gatherExistingChunksJobHandle = new GatherExistingChunks
             {
                 TypeIndex = m_TypeIndex,
                 Chunks = chunks,
-                ChunkSequenceNumbers = m_ChunkSequenceNumbers.AsParallelWriter()
+                ChunkSequenceNumbers = m_ChunkSequenceNumbers.AsParallelWriter(),
             }.Schedule(chunks, 1, chunksJobHandle);
 
             var gatherRemovedChunksJobHandle = new GatherRemovedChunks
@@ -429,7 +490,7 @@ namespace Unity.Entities.Editor
                 ChunkShadowBySequenceNumberKeys = m_ChunkShadowBySequenceNumberKeys,
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
                 ChunkSequenceNumbers = m_ChunkSequenceNumbers,
-                RemovedChunks = m_RemovedChunks.AsParallelWriter()
+                RemovedChunks = m_RemovedChunks.AsParallelWriter(),
             }.Schedule(m_ChunkShadowBySequenceNumberKeys.Length, 1, gatherExistingChunksJobHandle);
 
             var gatherRemovedEntitiesAndComponentsJobHandle = new GatherRemovedEntitiesAndComponentsJob
@@ -437,7 +498,7 @@ namespace Unity.Entities.Editor
                 ComponentSize = m_ComponentSize,
                 RemoveChunks = m_RemovedChunks.AsDeferredJobArray(),
                 RemovedEntities = m_RemovedEntities,
-                RemovedComponents = m_RemovedComponents
+                RemovedComponents = m_RemovedComponents,
             }.Schedule(gatherRemovedChunksJobHandle);
 
             var allocateChunkShadowsJobHandle = new AllocateChunkShadowsJob
@@ -446,7 +507,7 @@ namespace Unity.Entities.Editor
                 ComponentSize = m_ComponentSize,
                 Chunks = chunks,
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
-                AllocatedChunkShadowByChunk = m_AllocatedChunkShadowByChunk.GetUnsafeList()
+                AllocatedChunkShadowByChunk = m_AllocatedChunkShadowByChunk.GetUnsafeList(),
             }.Schedule(chunks, 1, resizeAndClearJobHandle);
 
             var buildChangeSetJobHandle = new BuildChangeSetJob
@@ -456,8 +517,14 @@ namespace Unity.Entities.Editor
                 GatheredChangesByChunk = m_ChangesByChunk.AsDeferredJobArray(),
                 RemovedEntities = m_RemovedEntities.AsDeferredJobArray(),
                 RemovedComponents = m_RemovedComponents.AsDeferredJobArray(),
-                Result = changes
-            }.Schedule(JobHandle.CombineDependencies(gatherEntityAndComponentChangesJobHandle, gatherRemovedEntitiesAndComponentsJobHandle, allocateChunkShadowsJobHandle));
+                Result = changes,
+            }.Schedule(
+                JobHandle.CombineDependencies(
+                    gatherEntityAndComponentChangesJobHandle,
+                    gatherRemovedEntitiesAndComponentsJobHandle,
+                    allocateChunkShadowsJobHandle
+                )
+            );
 
             var updateShadowChunksJobHandle = new UpdateShadowChunksJob
             {
@@ -467,8 +534,16 @@ namespace Unity.Entities.Editor
                 ComponentSize = m_ComponentSize,
                 GatheredChangesByChunk = m_ChangesByChunk.AsDeferredJobArray(),
                 AllocatedChunkShadowsByChunk = m_AllocatedChunkShadowByChunk.AsDeferredJobArray(),
-                ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber.AsParallelWriter()
-            }.Schedule(chunks, 1, JobHandle.CombineDependencies(gatherEntityAndComponentChangesJobHandle, gatherRemovedEntitiesAndComponentsJobHandle, allocateChunkShadowsJobHandle));
+                ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber.AsParallelWriter(),
+            }.Schedule(
+                chunks,
+                1,
+                JobHandle.CombineDependencies(
+                    gatherEntityAndComponentChangesJobHandle,
+                    gatherRemovedEntitiesAndComponentsJobHandle,
+                    allocateChunkShadowsJobHandle
+                )
+            );
 
             var removeChunkShadowsJobHandle = new RemoveChunkShadowsJob
             {
@@ -477,17 +552,23 @@ namespace Unity.Entities.Editor
                 RemovedChunks = m_RemovedChunks.AsDeferredJobArray(),
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
                 ChunkShadowBySequenceNumberKeys = m_ChunkShadowBySequenceNumberKeys,
-                ChunkShadowBySequenceNumberKeysFreeList = m_ChunkShadowBySequenceNumberKeysFreeList
+                ChunkShadowBySequenceNumberKeysFreeList = m_ChunkShadowBySequenceNumberKeysFreeList,
             }.Schedule(updateShadowChunksJobHandle);
 
-            var disposeChunksJobHandle = chunks.Dispose(JobHandle.CombineDependencies(buildChangeSetJobHandle, removeChunkShadowsJobHandle));
+            var disposeChunksJobHandle = chunks.Dispose(
+                JobHandle.CombineDependencies(buildChangeSetJobHandle, removeChunkShadowsJobHandle)
+            );
 
             var disposeGatheredChangesJobHandle = new DisposeGatheredChangesJob
             {
                 GatheredChanges = m_ChangesByChunk,
             }.Schedule(m_ChangesByChunk, 1, buildChangeSetJobHandle);
 
-            jobHandle = JobHandle.CombineDependencies(gatherRemovedChunksJobHandle, disposeChunksJobHandle, disposeGatheredChangesJobHandle);
+            jobHandle = JobHandle.CombineDependencies(
+                gatherRemovedChunksJobHandle,
+                disposeChunksJobHandle,
+                disposeGatheredChangesJobHandle
+            );
 
             return changes;
         }
@@ -495,9 +576,11 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct ResizeAndClearChunkListsJob : IJob
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
             public NativeList<ChunkShadow> AllocatedChunkShadowByChunk;
             public NativeList<ChunkChanges> GatheredChanges;
+
             public void Execute()
             {
                 AllocatedChunkShadowByChunk.Resize(Chunks.Length, NativeArrayOptions.UninitializedMemory);
@@ -513,9 +596,14 @@ namespace Unity.Entities.Editor
             public TypeIndex TypeIndex;
             public int ComponentSize;
 
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ShadowChunksBySequenceNumber;
-            [NativeDisableUnsafePtrRestriction] public ChunkChanges* GatheredChanges;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ShadowChunksBySequenceNumber;
+
+            [NativeDisableUnsafePtrRestriction]
+            public ChunkChanges* GatheredChanges;
 
             public void Execute(int index)
             {
@@ -530,8 +618,10 @@ namespace Unity.Entities.Editor
                 {
                     var componentVersion = archetype->Chunks.GetChangeVersion(indexInTypeArray, chunk.ListIndex);
                     var entityVersion = archetype->Chunks.GetChangeVersion(0, chunk.ListIndex);
-                    if (!ChangeVersionUtility.DidChange(componentVersion, shadow.Ptr->ComponentVersion) &&
-                        !ChangeVersionUtility.DidChange(entityVersion, shadow.Ptr->EntityVersion))
+                    if (
+                        !ChangeVersionUtility.DidChange(componentVersion, shadow.Ptr->ComponentVersion)
+                        && !ChangeVersionUtility.DidChange(entityVersion, shadow.Ptr->EntityVersion)
+                    )
                         return;
 
                     var changesForChunk = GatheredChanges + index;
@@ -562,7 +652,10 @@ namespace Unity.Entities.Editor
                         var entity = *(Entity*)(entityDataPtr + sizeof(Entity) * i);
                         var previousEntity = *(Entity*)(shadow.Ptr->Entities + sizeof(Entity) * i);
 
-                        if (entity != previousEntity || UnsafeUtility.MemCmp(currentComponentData, previousComponentData, ComponentSize) != 0)
+                        if (
+                            entity != previousEntity
+                            || UnsafeUtility.MemCmp(currentComponentData, previousComponentData, ComponentSize) != 0
+                        )
                         {
                             OnRemovedComponent(changesForChunk, previousEntity, previousComponentData, ComponentSize);
                             OnNewComponent(changesForChunk, entity, currentComponentData, ComponentSize);
@@ -602,13 +695,23 @@ namespace Unity.Entities.Editor
                 }
             }
 
-            static void OnNewComponent(ChunkChanges* changesForChunk, Entity entity, byte* currentComponentData, int componentSize)
+            static void OnNewComponent(
+                ChunkChanges* changesForChunk,
+                Entity entity,
+                byte* currentComponentData,
+                int componentSize
+            )
             {
                 changesForChunk->AddedEntities.Add(entity);
                 changesForChunk->AddedComponentData.AddRange(currentComponentData, componentSize);
             }
 
-            static void OnRemovedComponent(ChunkChanges* changesForChunk, Entity entity, byte* previousComponentData, int componentSize)
+            static void OnRemovedComponent(
+                ChunkChanges* changesForChunk,
+                Entity entity,
+                byte* previousComponentData,
+                int componentSize
+            )
             {
                 changesForChunk->RemovedEntities.Add(entity);
                 changesForChunk->RemovedComponentData.AddRange(previousComponentData, componentSize);
@@ -620,8 +723,11 @@ namespace Unity.Entities.Editor
         {
             public TypeIndex TypeIndex;
 
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [WriteOnly] public NativeParallelHashSet<ulong>.ParallelWriter ChunkSequenceNumbers;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [WriteOnly]
+            public NativeParallelHashSet<ulong>.ParallelWriter ChunkSequenceNumbers;
 
             public void Execute(int index)
             {
@@ -638,10 +744,17 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         struct GatherRemovedChunks : IJobParallelFor
         {
-            [ReadOnly] public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
-            [ReadOnly] public NativeParallelHashSet<ulong> ChunkSequenceNumbers;
-            [WriteOnly] public NativeList<ChunkShadow>.ParallelWriter RemovedChunks;
+            [ReadOnly]
+            public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
+
+            [ReadOnly]
+            public NativeParallelHashSet<ulong> ChunkSequenceNumbers;
+
+            [WriteOnly]
+            public NativeList<ChunkShadow>.ParallelWriter RemovedChunks;
 
             public void Execute(int index)
             {
@@ -657,16 +770,25 @@ namespace Unity.Entities.Editor
         unsafe struct GatherRemovedEntitiesAndComponentsJob : IJob
         {
             public int ComponentSize;
-            [ReadOnly] public NativeArray<ChunkShadow> RemoveChunks;
-            [WriteOnly] public NativeList<Entity> RemovedEntities;
-            [WriteOnly] public NativeList<byte> RemovedComponents;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> RemoveChunks;
+
+            [WriteOnly]
+            public NativeList<Entity> RemovedEntities;
+
+            [WriteOnly]
+            public NativeList<byte> RemovedComponents;
 
             public void Execute()
             {
                 for (var i = 0; i < RemoveChunks.Length; i++)
                 {
                     RemovedEntities.AddRange(RemoveChunks[i].Ptr->Entities, RemoveChunks[i].Ptr->Count);
-                    RemovedComponents.AddRange(RemoveChunks[i].Ptr->Components, RemoveChunks[i].Ptr->Count * ComponentSize);
+                    RemovedComponents.AddRange(
+                        RemoveChunks[i].Ptr->Components,
+                        RemoveChunks[i].Ptr->Count * ComponentSize
+                    );
                 }
             }
         }
@@ -676,9 +798,15 @@ namespace Unity.Entities.Editor
         {
             public TypeIndex TypeIndex;
             public int ComponentSize;
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
-            [NativeDisableUnsafePtrRestriction] public UnsafeList<ChunkShadow>* AllocatedChunkShadowByChunk;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeList<ChunkShadow>* AllocatedChunkShadowByChunk;
 
             public void Execute(int index)
             {
@@ -702,8 +830,10 @@ namespace Unity.Entities.Editor
                 shadow.Ptr->Count = chunkCount;
                 shadow.Ptr->ComponentVersion = archetype->Chunks.GetChangeVersion(indexInTypeArray, chunk.ListIndex);
                 shadow.Ptr->EntityVersion = archetype->Chunks.GetChangeVersion(0, chunk.ListIndex);
-                shadow.Ptr->Entities = (byte*)Memory.Unmanaged.Allocate(sizeof(Entity) * capacity, 4, Allocator.Persistent);
-                shadow.Ptr->Components = (byte*)Memory.Unmanaged.Allocate(ComponentSize * capacity, 4, Allocator.Persistent);
+                shadow.Ptr->Entities = (byte*)
+                    Memory.Unmanaged.Allocate(sizeof(Entity) * capacity, 4, Allocator.Persistent);
+                shadow.Ptr->Components = (byte*)
+                    Memory.Unmanaged.Allocate(ComponentSize * capacity, 4, Allocator.Persistent);
                 shadow.Ptr->SequenceNumber = sequenceNumber;
 
                 UnsafeUtility.MemCpy(shadow.Ptr->Entities, entityDataPtr, chunkCount * sizeof(Entity));
@@ -719,12 +849,17 @@ namespace Unity.Entities.Editor
             public int ComponentSize;
             public Allocator Allocator;
 
-            [ReadOnly] public NativeArray<ChunkChanges> GatheredChangesByChunk;
+            [ReadOnly]
+            public NativeArray<ChunkChanges> GatheredChangesByChunk;
 
-            [ReadOnly] public NativeArray<Entity> RemovedEntities;
-            [ReadOnly] public NativeArray<byte> RemovedComponents;
+            [ReadOnly]
+            public NativeArray<Entity> RemovedEntities;
 
-            [NativeDisableUnsafePtrRestriction] public ChangeSet Result;
+            [ReadOnly]
+            public NativeArray<byte> RemovedComponents;
+
+            [NativeDisableUnsafePtrRestriction]
+            public ChangeSet Result;
 
             public void Execute()
             {
@@ -753,8 +888,14 @@ namespace Unity.Entities.Editor
 
                     if (changesForChunk.AddedComponentData.IsCreated)
                     {
-                        buffer.AddRangeNoResize(changesForChunk.AddedComponentData.Ptr, changesForChunk.AddedComponentData.Length);
-                        addedComponents.AddRangeNoResize(changesForChunk.AddedEntities.Ptr, changesForChunk.AddedEntities.Length);
+                        buffer.AddRangeNoResize(
+                            changesForChunk.AddedComponentData.Ptr,
+                            changesForChunk.AddedComponentData.Length
+                        );
+                        addedComponents.AddRangeNoResize(
+                            changesForChunk.AddedEntities.Ptr,
+                            changesForChunk.AddedEntities.Length
+                        );
                     }
 
                     if (changesForChunk.RemovedComponentData.IsCreated)
@@ -764,8 +905,14 @@ namespace Unity.Entities.Editor
                 for (var i = 0; i < chunksWithRemovedData.Length; i++)
                 {
                     var changesForChunk = GatheredChangesByChunk[chunksWithRemovedData[i]];
-                    buffer.AddRangeNoResize(changesForChunk.RemovedComponentData.Ptr, changesForChunk.RemovedComponentData.Length);
-                    removedComponents.AddRangeNoResize(changesForChunk.RemovedEntities.Ptr, changesForChunk.RemovedEntities.Length);
+                    buffer.AddRangeNoResize(
+                        changesForChunk.RemovedComponentData.Ptr,
+                        changesForChunk.RemovedComponentData.Length
+                    );
+                    removedComponents.AddRangeNoResize(
+                        changesForChunk.RemovedEntities.Ptr,
+                        changesForChunk.RemovedEntities.Length
+                    );
                 }
 
                 chunksWithRemovedData.Dispose();
@@ -785,11 +932,21 @@ namespace Unity.Entities.Editor
             public TypeIndex TypeIndex;
             public int ComponentSize;
 
-            [NativeDisableUnsafePtrRestriction][ReadOnly] public EntityComponentStore* EntityComponentStore;
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks; // not used, but required to be here for IJobParallelForDefer
-            [ReadOnly] public NativeArray<ChunkChanges> GatheredChangesByChunk;
-            [ReadOnly] public NativeArray<ChunkShadow> AllocatedChunkShadowsByChunk;
-            [WriteOnly] public NativeParallelHashMap<ulong, ChunkShadow>.ParallelWriter ChunkShadowBySequenceNumber;
+            [NativeDisableUnsafePtrRestriction]
+            [ReadOnly]
+            public EntityComponentStore* EntityComponentStore;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks; // not used, but required to be here for IJobParallelForDefer
+
+            [ReadOnly]
+            public NativeArray<ChunkChanges> GatheredChangesByChunk;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> AllocatedChunkShadowsByChunk;
+
+            [WriteOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow>.ParallelWriter ChunkShadowBySequenceNumber;
 
             public void Execute(int index)
             {
@@ -816,7 +973,10 @@ namespace Unity.Entities.Editor
 
                     changes.Shadow.Ptr->Count = changes.Chunk.Count;
                     changes.Shadow.Ptr->EntityVersion = archetype->Chunks.GetChangeVersion(0, listIndex);
-                    changes.Shadow.Ptr->ComponentVersion = archetype->Chunks.GetChangeVersion(indexInTypeArray, listIndex);
+                    changes.Shadow.Ptr->ComponentVersion = archetype->Chunks.GetChangeVersion(
+                        indexInTypeArray,
+                        listIndex
+                    );
 
                     var entityCount = chunk.Count;
 
@@ -829,9 +989,14 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct RemoveChunkShadowsJob : IJob
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeArray<ChunkShadow> AllocatedChunkShadowByChunk;
-            [ReadOnly] public NativeArray<ChunkShadow> RemovedChunks;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> AllocatedChunkShadowByChunk;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> RemovedChunks;
             public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
             public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
             public NativeList<int> ChunkShadowBySequenceNumberKeysFreeList;
@@ -840,7 +1005,7 @@ namespace Unity.Entities.Editor
             {
                 // AllocatedChunkShadowByChunk is conservatively sized; only the first Chunks.Length elements are valid.
                 int chunkCount = Chunks.Length;
-                for (var i=0; i<chunkCount; i++)
+                for (var i = 0; i < chunkCount; i++)
                 {
                     var shadow = AllocatedChunkShadowByChunk[i];
 
@@ -873,7 +1038,8 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct DisposeGatheredChangesJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ChunkChanges> GatheredChanges;
+            [ReadOnly]
+            public NativeList<ChunkChanges> GatheredChanges;
 
             public void Execute(int index)
             {

@@ -69,6 +69,5 @@ namespace Unity.PlatformToolkit.Editor
         {
             InvokeAchievementsChanged();
         }
-
     }
 }

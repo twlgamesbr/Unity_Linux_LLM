@@ -12,9 +12,11 @@ namespace UnityEditor.Rendering.Universal
     [URPHelpURL("features/rp-converter")]
     [PipelineConverter("Built-in", "Universal Render Pipeline (Universal Renderer)")]
     [BatchModeConverterClassInfo("BuiltInToURP", "RenderSettings")]
-    [ElementInfo(Name = "Rendering Settings",
-                 Order = int.MinValue,
-                 Description = "This converter creates Universal Render Pipeline (URP) assets and corresponding Renderer assets, configuring their settings to match the equivalent settings from the Built-in Render Pipeline.")]
+    [ElementInfo(
+        Name = "Rendering Settings",
+        Order = int.MinValue,
+        Description = "This converter creates Universal Render Pipeline (URP) assets and corresponding Renderer assets, configuring their settings to match the equivalent settings from the Built-in Render Pipeline."
+    )]
     class BuiltInToURP3DRenderSettingsConverter : RenderSettingsConverter
     {
         public override bool isEnabled => true;
@@ -30,7 +32,9 @@ namespace UnityEditor.Rendering.Universal
             try
             {
                 CoreUtils.EnsureFolderTreeInAssetFilePath(path);
-                var asset = ScriptableObject.CreateInstance(typeof(UniversalRenderPipelineAsset)) as UniversalRenderPipelineAsset;
+                var asset =
+                    ScriptableObject.CreateInstance(typeof(UniversalRenderPipelineAsset))
+                    as UniversalRenderPipelineAsset;
                 AssetDatabase.CreateAsset(asset, path);
                 AssetDatabase.SaveAssetIfDirty(asset);
                 return asset;
@@ -44,14 +48,21 @@ namespace UnityEditor.Rendering.Universal
 
         UniversalRendererData CreateUniversalRendererDataAsset(RenderingPath renderingPath, RenderingMode renderingMode)
         {
-            string path = $"Assets/{UniversalProjectSettings.projectSettingsFolderPath}/Default_{renderingMode}_Renderer.asset";
+            string path =
+                $"Assets/{UniversalProjectSettings.projectSettingsFolderPath}/Default_{renderingMode}_Renderer.asset";
             if (AssetDatabase.AssetPathExists(path))
                 return AssetDatabase.LoadAssetAtPath<UniversalRendererData>(path);
 
             CoreUtils.EnsureFolderTreeInAssetFilePath(path);
 
-            var asset = UniversalRenderPipelineAsset.CreateRendererAsset(path, RendererType.UniversalRenderer, relativePath: false) as UniversalRendererData;
-            asset.renderingMode = renderingPath == RenderingPath.Forward ? RenderingMode.Forward : RenderingMode.Deferred;
+            var asset =
+                UniversalRenderPipelineAsset.CreateRendererAsset(
+                    path,
+                    RendererType.UniversalRenderer,
+                    relativePath: false
+                ) as UniversalRendererData;
+            asset.renderingMode =
+                renderingPath == RenderingPath.Forward ? RenderingMode.Forward : RenderingMode.Deferred;
 
             EditorUtility.SetDirty(asset);
             AssetDatabase.SaveAssetIfDirty(asset);
@@ -95,11 +106,11 @@ namespace UnityEditor.Rendering.Universal
             var targetGrp = BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget);
             var tier = EditorGraphicsSettings.GetTierSettings(targetGrp, GraphicsTier.Tier3);
 
-            var pixelLightCount  = QualitySettings.pixelLightCount;
-            var shadows          = QualitySettings.shadows;
+            var pixelLightCount = QualitySettings.pixelLightCount;
+            var shadows = QualitySettings.shadows;
             var shadowResolution = QualitySettings.shadowResolution;
-            var shadowDistance   = QualitySettings.shadowDistance;
-            
+            var shadowDistance = QualitySettings.shadowDistance;
+
             var reflectionProbeBlending = tier.reflectionProbeBlending;
             var reflectionProbeBoxProjection = tier.reflectionProbeBoxProjection;
             bool cascadeShadows = tier.cascadedShadowMaps;
@@ -119,21 +130,19 @@ namespace UnityEditor.Rendering.Universal
             urpAsset.msaaSampleCount = msaa == 0 ? 1 : msaa;
 
             // Main Light
-            urpAsset.mainLightRenderingMode = pixelLightCount == 0
-                ? LightRenderingMode.Disabled
-                : LightRenderingMode.PerPixel;
+            urpAsset.mainLightRenderingMode =
+                pixelLightCount == 0 ? LightRenderingMode.Disabled : LightRenderingMode.PerPixel;
             urpAsset.supportsMainLightShadows = shadows != ShadowQuality.Disable;
-            urpAsset.mainLightShadowmapResolution =
-                GetEquivalentMainlightShadowResolution((int)shadowResolution);
+            urpAsset.mainLightShadowmapResolution = GetEquivalentMainlightShadowResolution((int)shadowResolution);
 
             // Additional Lights
-            urpAsset.additionalLightsRenderingMode = pixelLightCount == 0
-                ? LightRenderingMode.PerVertex
-                : LightRenderingMode.PerPixel;
+            urpAsset.additionalLightsRenderingMode =
+                pixelLightCount == 0 ? LightRenderingMode.PerVertex : LightRenderingMode.PerPixel;
             urpAsset.maxAdditionalLightsCount = pixelLightCount != 0 ? Mathf.Max(0, pixelLightCount) : 4;
             urpAsset.supportsAdditionalLightShadows = shadows != ShadowQuality.Disable;
-            urpAsset.additionalLightsShadowmapResolution =
-                GetEquivalentAdditionalLightAtlasShadowResolution((int)shadowResolution);
+            urpAsset.additionalLightsShadowmapResolution = GetEquivalentAdditionalLightAtlasShadowResolution(
+                (int)shadowResolution
+            );
 
             // Reflection Probes
             urpAsset.reflectionProbeBlending = reflectionProbeBlending;

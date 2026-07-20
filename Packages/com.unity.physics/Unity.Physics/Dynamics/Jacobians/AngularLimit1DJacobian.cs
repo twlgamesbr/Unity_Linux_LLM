@@ -41,10 +41,16 @@ namespace Unity.Physics
 
         // Build the Jacobian
         public void Build(
-            MTransform aFromConstraint, MTransform bFromConstraint,
-            MotionVelocity velocityA, MotionVelocity velocityB,
-            MotionData motionA, MotionData motionB,
-            Constraint constraint, float tau, float damping)
+            MTransform aFromConstraint,
+            MTransform bFromConstraint,
+            MotionVelocity velocityA,
+            MotionVelocity velocityB,
+            MotionData motionA,
+            MotionData motionB,
+            Constraint constraint,
+            float tau,
+            float damping
+        )
         {
             // Copy the constraint into the jacobian
             AxisIndex = constraint.ConstrainedAxis1D;
@@ -71,18 +77,30 @@ namespace Unity.Physics
         }
 
         // Solve the Jacobian
-        public void Solve(ref JacobianHeader jacHeader, ref MotionVelocity velocityA, ref MotionVelocity velocityB,
-            Solver.StepInput stepInput, ref NativeStream.Writer impulseEventsWriter)
+        public void Solve(
+            ref JacobianHeader jacHeader,
+            ref MotionVelocity velocityA,
+            ref MotionVelocity velocityB,
+            Solver.StepInput stepInput,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             // Predict the relative orientation at the end of the step
-            quaternion futureMotionBFromA = JacobianUtilities.IntegrateOrientationBFromA(MotionBFromA, velocityA.AngularVelocity, velocityB.AngularVelocity, stepInput.Timestep);
+            quaternion futureMotionBFromA = JacobianUtilities.IntegrateOrientationBFromA(
+                MotionBFromA,
+                velocityA.AngularVelocity,
+                velocityB.AngularVelocity,
+                stepInput.Timestep
+            );
 
             // Calculate the effective mass
             float3 axisInMotionB = math.mul(futureMotionBFromA, -AxisInMotionA);
             float effectiveMass;
             {
-                float invEffectiveMass = math.csum(AxisInMotionA * AxisInMotionA * velocityA.InverseInertia +
-                    axisInMotionB * axisInMotionB * velocityB.InverseInertia);
+                float invEffectiveMass = math.csum(
+                    AxisInMotionA * AxisInMotionA * velocityA.InverseInertia
+                        + axisInMotionB * axisInMotionB * velocityB.InverseInertia
+                );
                 effectiveMass = math.select(1.0f / invEffectiveMass, 0.0f, invEffectiveMass == 0.0f);
             }
 
@@ -95,8 +113,12 @@ namespace Unity.Physics
 
             if ((jacHeader.Flags & JacobianFlags.EnableImpulseEvents) != 0)
             {
-                HandleImpulseEvent(ref jacHeader, impulse, stepInput.ExportEventsInThisIteration,
-                    ref impulseEventsWriter);
+                HandleImpulseEvent(
+                    ref jacHeader,
+                    impulse,
+                    stepInput.ExportEventsInThisIteration,
+                    ref impulseEventsWriter
+                );
             }
         }
 
@@ -144,20 +166,27 @@ namespace Unity.Physics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void HandleImpulseEvent(ref JacobianHeader jacHeader, float impulse, bool exportEvent, ref NativeStream.Writer impulseEventsWriter)
+        private void HandleImpulseEvent(
+            ref JacobianHeader jacHeader,
+            float impulse,
+            bool exportEvent,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             ref ImpulseEventSolverData impulseEventData = ref jacHeader.AccessImpulseEventSolverData();
             impulseEventData.AccumulatedImpulse[AxisIndex] += impulse;
 
             if (exportEvent && math.any(math.abs(impulseEventData.AccumulatedImpulse) > impulseEventData.MaxImpulse))
             {
-                impulseEventsWriter.Write(new ImpulseEventData
-                {
-                    Type = ConstraintType.Angular,
-                    Impulse = impulseEventData.AccumulatedImpulse,
-                    JointEntity = impulseEventData.JointEntity,
-                    BodyIndices = jacHeader.BodyPair
-                });
+                impulseEventsWriter.Write(
+                    new ImpulseEventData
+                    {
+                        Type = ConstraintType.Angular,
+                        Impulse = impulseEventData.AccumulatedImpulse,
+                        JointEntity = impulseEventData.JointEntity,
+                        BodyIndices = jacHeader.BodyPair,
+                    }
+                );
             }
         }
     }

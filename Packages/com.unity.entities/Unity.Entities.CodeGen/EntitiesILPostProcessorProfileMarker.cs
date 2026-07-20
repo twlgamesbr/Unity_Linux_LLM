@@ -13,7 +13,8 @@ namespace Unity.Entities.CodeGen
         readonly Stopwatch m_Stopwatch;
         readonly string m_AssemblyName;
         readonly string m_SectionName;
-        readonly List<EntitiesILPostProcessorProfileMarker> m_ChildMarkers = new List<EntitiesILPostProcessorProfileMarker>();
+        readonly List<EntitiesILPostProcessorProfileMarker> m_ChildMarkers =
+            new List<EntitiesILPostProcessorProfileMarker>();
         bool m_IsChild;
 
         public EntitiesILPostProcessorProfileMarker(string assemblyName, string sectionName = "")
@@ -41,7 +42,8 @@ namespace Unity.Entities.CodeGen
             if (s_OmitZeroMSTimings && m_Stopwatch.ElapsedMilliseconds == 0)
                 return;
             var discrepancyText = !m_IsChild ? $"(~{m_Stopwatch.ElapsedMilliseconds - GetTotalChildTime()}ms)" : "";
-            var logText = $"  - EILPP : {m_AssemblyName} : {m_SectionName}: {m_Stopwatch.ElapsedMilliseconds}ms {discrepancyText}";
+            var logText =
+                $"  - EILPP : {m_AssemblyName} : {m_SectionName}: {m_Stopwatch.ElapsedMilliseconds}ms {discrepancyText}";
             if (m_IsChild)
                 logText = "  " + logText;
             LogText(logText);

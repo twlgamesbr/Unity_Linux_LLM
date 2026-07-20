@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using System.IO;
-using System;
-
+using UnityEngine;
 
 namespace TMPro
 {
@@ -19,9 +18,9 @@ namespace TMPro
 
                 if (settings == null || TMP_Settings.enableEmojiSupport == false)
                     return;
-                
+
                 string file = "";
-                
+
                 switch (PlayerSettings.xcodeProjectType)
                 {
                     case XcodeProjectType.ObjectiveC:
@@ -35,14 +34,16 @@ namespace TMPro
                         file = Path.Combine(pathToBuiltProject, "UnityFramework/Features/Keyboard/Keyboard.mm");
                         break;
                     default:
-                        throw new Exception("Unsupported iOS Xcode project type. Will not be able to modify Keyboard.mm to disable emoji filtering.");
+                        throw new Exception(
+                            "Unsupported iOS Xcode project type. Will not be able to modify Keyboard.mm to disable emoji filtering."
+                        );
                 }
 
                 if (!File.Exists(file))
                 {
                     throw new Exception("Could not enable emojis support. Failed to locate Keyboard.mm file.");
                 }
-                
+
                 string content = File.ReadAllText(file);
                 content = content.Replace("FILTER_EMOJIS_IOS_KEYBOARD 1", "FILTER_EMOJIS_IOS_KEYBOARD 0");
                 File.WriteAllText(file, content);

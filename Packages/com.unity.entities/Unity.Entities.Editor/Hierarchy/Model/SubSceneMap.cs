@@ -22,9 +22,16 @@ namespace Unity.Entities.Editor
         Dictionary<Hash128, HierarchyNodeHandle> m_SubScenes = new();
         Dictionary<Entity, HierarchyNodeHandle> m_EntityScenes = new();
 
-        public void IntegrateChanges(World world, HierarchyNodeStore nodeStore, HierarchyNameStore nameStore, SubSceneChangeTracker.SubSceneMapChanges changes)
+        public void IntegrateChanges(
+            World world,
+            HierarchyNodeStore nodeStore,
+            HierarchyNameStore nameStore,
+            SubSceneChangeTracker.SubSceneMapChanges changes
+        )
         {
-            using var tracker = EditorPerformanceTrackerBridge.CreateEditorPerformanceTracker($"{nameof(SubSceneMap)}.{nameof(IntegrateChanges)}");
+            using var tracker = EditorPerformanceTrackerBridge.CreateEditorPerformanceTracker(
+                $"{nameof(SubSceneMap)}.{nameof(IntegrateChanges)}"
+            );
             using var handlesToRemovePoolHandle = HashSetPool<HierarchyNodeHandle>.Get(out var handlesToRemove);
 
             foreach (var sceneTag in changes.RemovedSceneTags)
@@ -34,14 +41,25 @@ namespace Unity.Entities.Editor
 
             foreach (var sceneTag in changes.CreatedSceneTags)
             {
-                if (!world.EntityManager.Exists(sceneTag.SceneEntity) || !world.EntityManager.HasComponent<SceneEntityReference>(sceneTag.SceneEntity))
+                if (
+                    !world.EntityManager.Exists(sceneTag.SceneEntity)
+                    || !world.EntityManager.HasComponent<SceneEntityReference>(sceneTag.SceneEntity)
+                )
                     continue;
 
-                var sceneEntityReference = world.EntityManager.GetComponentData<SceneEntityReference>(sceneTag.SceneEntity).SceneEntity;
-                if (!world.EntityManager.Exists(sceneEntityReference) || !world.EntityManager.HasComponent<SceneReference>(sceneEntityReference))
+                var sceneEntityReference = world
+                    .EntityManager.GetComponentData<SceneEntityReference>(sceneTag.SceneEntity)
+                    .SceneEntity;
+                if (
+                    !world.EntityManager.Exists(sceneEntityReference)
+                    || !world.EntityManager.HasComponent<SceneReference>(sceneEntityReference)
+                )
                     continue;
 
-                m_SceneTagToSceneReference[sceneTag] = (sceneEntityReference, world.EntityManager.GetComponentData<SceneReference>(sceneEntityReference));
+                m_SceneTagToSceneReference[sceneTag] = (
+                    sceneEntityReference,
+                    world.EntityManager.GetComponentData<SceneReference>(sceneEntityReference)
+                );
             }
 
             var allSubScenes = (List<SubScene>)SubScene.AllSubScenes;
@@ -80,13 +98,18 @@ namespace Unity.Entities.Editor
                         continue;
                     handle = HierarchyNodeHandle.FromSubScene(s_SubSceneCounter++);
                     nodeStore.AddNode(handle);
-                    nameStore.SetName(handle,  $"Entity Scene {sceneReference.SceneGUID}"); // todo find entity scene name?
+                    nameStore.SetName(handle, $"Entity Scene {sceneReference.SceneGUID}"); // todo find entity scene name?
                 }
 
                 m_EntityScenes.Add(entity, handle);
             }
 
-            foreach (var (entity, _ /*sceneReference*/) in changes.RemovedEntityScenes)
+            foreach (
+                var (
+                    entity,
+                    _ /*sceneReference*/
+                ) in changes.RemovedEntityScenes
+            )
             {
                 var isSubScene = m_EntityToSubScene.TryGetValue(entity, out var subScene);
                 if (isSubScene)
@@ -134,7 +157,10 @@ namespace Unity.Entities.Editor
             }
 
             // swap by deconstruction 🤯
-            (m_PreviousSceneGuidToSubScene, m_SceneGuidToSubScene) = (m_SceneGuidToSubScene, m_PreviousSceneGuidToSubScene);
+            (m_PreviousSceneGuidToSubScene, m_SceneGuidToSubScene) = (
+                m_SceneGuidToSubScene,
+                m_PreviousSceneGuidToSubScene
+            );
             m_SceneGuidToSubScene.Clear();
 
             // Remove unused handles
@@ -174,11 +200,12 @@ namespace Unity.Entities.Editor
             return handle;
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
-        public NativeParallelHashMap<HierarchyNodeHandle, bool /*IsLoaded*/> GetSubSceneStateMap()
+        public NativeParallelHashMap<
+            HierarchyNodeHandle,
+            bool /*IsLoaded*/
+        > GetSubSceneStateMap()
         {
             // Map of SubScene/EntityScene node to state being loaded or not
 
@@ -222,14 +249,23 @@ namespace Unity.Entities.Editor
             }
 
             var unitySceneIsLoaded = subScene.IsLoaded;
-            var entitySceneIsLoaded = entityScene != Entity.Null && SceneSystem.IsSceneLoaded(world.Unmanaged, entityScene);
+            var entitySceneIsLoaded =
+                entityScene != Entity.Null && SceneSystem.IsSceneLoaded(world.Unmanaged, entityScene);
 
-            return (unitySceneIsLoaded, entitySceneIsLoaded, liveConversionEnabled: LiveConversionEditorSettings.LiveConversionEnabled) switch
+            return (
+                unitySceneIsLoaded,
+                entitySceneIsLoaded,
+                liveConversionEnabled: LiveConversionEditorSettings.LiveConversionEnabled
+            ) switch
             {
-                (unitySceneIsLoaded: true,  entitySceneIsLoaded: _,     liveConversionEnabled: true)  => SubSceneLoadedState.LiveConverted,
-                (unitySceneIsLoaded: true,  entitySceneIsLoaded: _,     liveConversionEnabled: false) => SubSceneLoadedState.Opened,
-                (unitySceneIsLoaded: false, entitySceneIsLoaded: true,  liveConversionEnabled: _)     => SubSceneLoadedState.Closed,
-                (unitySceneIsLoaded: false, entitySceneIsLoaded: false, liveConversionEnabled: _)     => SubSceneLoadedState.NotLoaded,
+                (unitySceneIsLoaded: true, entitySceneIsLoaded: _, liveConversionEnabled: true) =>
+                    SubSceneLoadedState.LiveConverted,
+                (unitySceneIsLoaded: true, entitySceneIsLoaded: _, liveConversionEnabled: false) =>
+                    SubSceneLoadedState.Opened,
+                (unitySceneIsLoaded: false, entitySceneIsLoaded: true, liveConversionEnabled: _) =>
+                    SubSceneLoadedState.Closed,
+                (unitySceneIsLoaded: false, entitySceneIsLoaded: false, liveConversionEnabled: _) =>
+                    SubSceneLoadedState.NotLoaded,
             };
         }
 
@@ -306,6 +342,6 @@ namespace Unity.Entities.Editor
         Closed,
         NotLoaded,
         LiveConverted,
-        Opened
+        Opened,
     }
 }

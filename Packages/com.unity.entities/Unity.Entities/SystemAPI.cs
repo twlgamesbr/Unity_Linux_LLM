@@ -26,7 +26,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <returns>An instance of `SystemAPIQueryBuilder`, which can be used to fluently construct queries.</returns>
         /// <exception cref="Internal.InternalCompilerInterface.ThrowCodeGenException">Exception indicating that this method has been called outside of a valid context.</exception>
-        public static SystemAPIQueryBuilder QueryBuilder() =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static SystemAPIQueryBuilder QueryBuilder() =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
         #endregion
 
         #region Query
@@ -40,8 +41,7 @@ namespace Unity.Entities
         /// <exception cref="Internal.InternalCompilerInterface.ThrowCodeGenException">Exception indicating that this method has been called outside of a valid context.</exception>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static QueryEnumerable<T1> Query<T1>()
-            where T1 : IQueryTypeParameter
-            =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T1 : IQueryTypeParameter => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Get Enumerable for iterating through Component types from inside a system
@@ -53,8 +53,7 @@ namespace Unity.Entities
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static QueryEnumerable<T1, T2> Query<T1, T2>()
             where T1 : IQueryTypeParameter
-            where T2 : IQueryTypeParameter
-            =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T2 : IQueryTypeParameter => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Get Enumerable for iterating through Component types from inside a system
@@ -68,8 +67,7 @@ namespace Unity.Entities
         public static QueryEnumerable<T1, T2, T3> Query<T1, T2, T3>()
             where T1 : IQueryTypeParameter
             where T2 : IQueryTypeParameter
-            where T3 : IQueryTypeParameter
-            =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T3 : IQueryTypeParameter => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Get Enumerable for iterating through Component types from inside a system
@@ -85,8 +83,7 @@ namespace Unity.Entities
             where T1 : IQueryTypeParameter
             where T2 : IQueryTypeParameter
             where T3 : IQueryTypeParameter
-            where T4 : IQueryTypeParameter
-            =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T4 : IQueryTypeParameter => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Get Enumerable for iterating through Component types from inside a system
@@ -104,8 +101,7 @@ namespace Unity.Entities
             where T2 : IQueryTypeParameter
             where T3 : IQueryTypeParameter
             where T4 : IQueryTypeParameter
-            where T5 : IQueryTypeParameter
-            =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T5 : IQueryTypeParameter => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Get Enumerable for iterating through Component types from inside a system
@@ -125,8 +121,7 @@ namespace Unity.Entities
             where T3 : IQueryTypeParameter
             where T4 : IQueryTypeParameter
             where T5 : IQueryTypeParameter
-            where T6 : IQueryTypeParameter
-            =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T6 : IQueryTypeParameter => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Get Enumerable for iterating through Component types from inside a system
@@ -148,8 +143,7 @@ namespace Unity.Entities
             where T4 : IQueryTypeParameter
             where T5 : IQueryTypeParameter
             where T6 : IQueryTypeParameter
-            where T7 : IQueryTypeParameter
-            =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T7 : IQueryTypeParameter => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
         #endregion
 
         #region Time
@@ -159,7 +153,7 @@ namespace Unity.Entities
         /// The current Time data for calling system's world.
         /// </summary>
         /// <remarks> Not working in IJobEntity, and Utility methods</remarks>
-        public static ref readonly TimeData Time =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static ref readonly TimeData Time => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
         #endregion
 
         #region ComponentData
@@ -177,7 +171,7 @@ namespace Unity.Entities
         /// </remarks>
         /// <remarks> Not working in IJobEntity, and Utility methods</remarks>
         public static ComponentLookup<T> GetComponentLookup<T>(bool isReadOnly = false)
-            where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Look up the value of a component for an entity.
@@ -200,7 +194,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static T GetComponent<T>(Entity entity)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets a reference to a component for an entity, for read-only access.
@@ -223,7 +218,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static RefRO<T> GetComponentRO<T>(Entity entity) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static RefRO<T> GetComponentRO<T>(Entity entity)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets a reference to a component for an entity, for read/write access.
@@ -246,7 +242,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static RefRW<T> GetComponentRW<T>(Entity entity) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static RefRW<T> GetComponentRW<T>(Entity entity)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Try to look up the value of a component for an entity.
@@ -263,7 +260,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-        public static bool TryGetComponent<T>(Entity entity, out T result) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool TryGetComponent<T>(Entity entity, out T result)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Sets the value of a component of an entity.
@@ -286,7 +284,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static void SetComponent<T>(Entity entity, T component) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static void SetComponent<T>(Entity entity, T component)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks whether an entity has a specific type of component.
@@ -310,7 +309,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <returns>True, if the specified entity has the component.</returns>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static bool HasComponent<T>(Entity entity) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool HasComponent<T>(Entity entity)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks whether the <see cref="IComponentData"/> of type T is enabled on the specified <see cref="Entity"/>.
@@ -323,7 +323,9 @@ namespace Unity.Entities
         /// <returns>True if the specified component is enabled, or false if it is disabled.</returns>
         /// <seealso cref="SetComponentEnabled{T}(Entity, bool)"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-        public static bool IsComponentEnabled<T>(Entity entity) where T : unmanaged, IComponentData, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool IsComponentEnabled<T>(Entity entity)
+            where T : unmanaged, IComponentData, IEnableableComponent =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Enable or disable the <see cref="IComponentData"/> of type T on the specified <see cref="Entity"/>. This operation
@@ -337,7 +339,9 @@ namespace Unity.Entities
         /// /// <typeparam name="T">An unmanaged IComponentData type</typeparam>
         /// <seealso cref="IsComponentEnabled{T}(Entity)"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-        public static void SetComponentEnabled<T>(Entity entity, bool value) where T : unmanaged, IComponentData, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static void SetComponentEnabled<T>(Entity entity, bool value)
+            where T : unmanaged, IComponentData, IEnableableComponent =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the value of a component for an entity associated with a system.
@@ -352,7 +356,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static T GetComponent<T>(SystemHandle systemHandle) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static T GetComponent<T>(SystemHandle systemHandle)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets a reference to a component for an entity associated with a system, for read/write access.
@@ -368,7 +373,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static RefRW<T> GetComponentRW<T>(SystemHandle systemHandle) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static RefRW<T> GetComponentRW<T>(SystemHandle systemHandle)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Sets the value of a component of an entity associated with a system.
@@ -384,7 +390,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static void SetComponent<T>(SystemHandle systemHandle, T component) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static void SetComponent<T>(SystemHandle systemHandle, T component)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks whether an entity associated with a system has a specific type of component.
@@ -401,7 +408,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <returns>True, if the specified system owned entity has the component.</returns>
         /// <remarks> Not working in IJobEntity, and Utility methods </remarks>
-        public static bool HasComponent<T>(SystemHandle systemHandle) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool HasComponent<T>(SystemHandle systemHandle)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks whether the <see cref="IComponentData"/> of type T is enabled on the specified system using a <see cref="SystemHandle"/>.
@@ -414,7 +422,9 @@ namespace Unity.Entities
         /// <returns>True if the specified component is enabled, or false if it is disabled.</returns>
         /// <seealso cref="SetComponentEnabled{T}(SystemHandle, bool)"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-        public static bool IsComponentEnabled<T>(SystemHandle systemHandle) where T : unmanaged, IComponentData, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool IsComponentEnabled<T>(SystemHandle systemHandle)
+            where T : unmanaged, IComponentData, IEnableableComponent =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Enable or disable the <see cref="IComponentData"/> of type T on the specified system using a <see cref="SystemHandle"/>. This operation
@@ -428,7 +438,9 @@ namespace Unity.Entities
         /// /// <typeparam name="T">An unmanaged IComponentData type</typeparam>
         /// <seealso cref="IsComponentEnabled{T}(Entity)"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-        public static void SetComponentEnabled<T>(SystemHandle systemHandle, bool value) where T : unmanaged, IComponentData, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static void SetComponentEnabled<T>(SystemHandle systemHandle, bool value)
+            where T : unmanaged, IComponentData, IEnableableComponent =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         #endregion
 
@@ -448,7 +460,7 @@ namespace Unity.Entities
         /// <seealso cref="ComponentLookup{T}"/>
         /// <remarks> Not working in IJobEntity, and Utility methods</remarks>
         public static BufferLookup<T> GetBufferLookup<T>(bool isReadOnly = false)
-            where T : unmanaged, IBufferElementData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IBufferElementData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the dynamic buffer of an entity.
@@ -461,7 +473,8 @@ namespace Unity.Entities
         /// <returns>The DynamicBuffer object for accessing the buffer contents.</returns>
         /// <exception cref="ArgumentException">Thrown if T is an unsupported type.</exception>
         /// <remarks> Not working in IJobEntity, and Utility methods</remarks>
-        public static DynamicBuffer<T> GetBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static DynamicBuffer<T> GetBuffer<T>(Entity entity)
+            where T : unmanaged, IBufferElementData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks whether an entity has a dynamic buffer of a specific IBufferElementData type.
@@ -485,7 +498,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <returns>True, if the specified entity has the component.</returns>
         /// <remarks> Not working in IJobEntity, and Utility methods</remarks>
-        public static bool HasBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool HasBuffer<T>(Entity entity)
+            where T : unmanaged, IBufferElementData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks whether the <see cref="IBufferElementData"/> of type T is enabled on the specified <see cref="Entity"/>.
@@ -498,7 +512,9 @@ namespace Unity.Entities
         /// <returns>True if the specified component is enabled, or false if it is disabled.</returns>
         /// <seealso cref="SetBufferEnabled{T}(Entity, bool)"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-        public static bool IsBufferEnabled<T>(Entity entity) where T : unmanaged, IBufferElementData, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool IsBufferEnabled<T>(Entity entity)
+            where T : unmanaged, IBufferElementData, IEnableableComponent =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Enable or disable the <see cref="IBufferElementData"/> of type T on the specified <see cref="Entity"/>. This operation
@@ -512,7 +528,9 @@ namespace Unity.Entities
         /// /// <typeparam name="T">An unmanaged IComponentData type</typeparam>
         /// <seealso cref="IsBufferEnabled{T}(Entity)"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-        public static void SetBufferEnabled<T>(Entity entity, bool value) where T : unmanaged, IBufferElementData, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static void SetBufferEnabled<T>(Entity entity, bool value)
+            where T : unmanaged, IBufferElementData, IEnableableComponent =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
         #endregion
 
         #region StorageInfo
@@ -525,7 +543,8 @@ namespace Unity.Entities
         /// indexed by <see cref="Entity"/>.</returns>
         /// <seealso cref="EntityStorageInfoLookup"/>
         /// <remarks> Not working in IJobEntity, and Utility methods</remarks>
-        public static EntityStorageInfoLookup GetEntityStorageInfoLookup() =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static EntityStorageInfoLookup GetEntityStorageInfoLookup() =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks if the entity exists inside this system's EntityManager.
@@ -539,7 +558,7 @@ namespace Unity.Entities
         /// <returns>True if the given entity exists or the entity has a Cleanup Component that is yet to be destroyed</returns>
         /// <seealso cref="EntityManager.Exists"/>
         /// <remarks> Not working in IJobEntity, and Utility methods</remarks>
-        public static bool Exists(Entity entity) =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool Exists(Entity entity) => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
         #endregion
 
         #region Singleton
@@ -556,7 +575,7 @@ namespace Unity.Entities
         /// <seealso cref="EntityQuery.GetSingletonRW{T}"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static T GetSingleton<T>()
-            where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the value of a singleton component, and returns whether or not a singleton component of the specified type exists in the <see cref="World"/>.
@@ -567,7 +586,7 @@ namespace Unity.Entities
         /// <returns>True, if exactly one <see cref="Entity"/> exists in the <see cref="World"/> with the provided component type.</returns>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static bool TryGetSingleton<T>(out T value)
-            where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets a reference to the singleton component, for read/write access.
@@ -584,7 +603,8 @@ namespace Unity.Entities
         /// <seealso cref="EntityQuery.GetSingleton{T}"/>
         /// <seealso cref="EntityQuery.GetSingletonRW{T}"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static RefRW<T> GetSingletonRW<T>() where T : unmanaged, IComponentData =>   throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static RefRW<T> GetSingletonRW<T>()
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the value of a singleton component, and returns whether or not a singleton component of the specified type exists in the <see cref="World"/>.
@@ -595,7 +615,7 @@ namespace Unity.Entities
         /// <returns>True, if exactly one <see cref="Entity"/> exists in the <see cref="World"/> with the provided component type.</returns>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static bool TryGetSingletonRW<T>(out RefRW<T> value)
-            where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Sets the value of a singleton component.
@@ -606,7 +626,7 @@ namespace Unity.Entities
         /// <seealso cref="EntityQuery.SetSingleton{T}"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static void SetSingleton<T>(T value)
-            where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the Entity instance for a singleton.
@@ -616,7 +636,8 @@ namespace Unity.Entities
         /// <returns>The entity associated with the specified singleton component.</returns>
         /// <seealso cref="EntityQuery.GetSingletonEntity"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static Entity GetSingletonEntity<T>() where T : unmanaged =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static Entity GetSingletonEntity<T>()
+            where T : unmanaged => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the singleton Entity, and returns whether or not a singleton <see cref="Entity"/> of the specified type exists in the <see cref="World"/>.
@@ -627,7 +648,8 @@ namespace Unity.Entities
         ///  If a singleton of the specified types does not exist in the current <see cref="World"/>, this is set to Entity.Null</param>
         /// <returns>True, if exactly one <see cref="Entity"/> exists in the <see cref="World"/> with the provided component type.</returns>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static bool TryGetSingletonEntity<T>(out Entity value) where T : unmanaged =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool TryGetSingletonEntity<T>(out Entity value)
+            where T : unmanaged => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the value of a singleton buffer component.
@@ -640,7 +662,7 @@ namespace Unity.Entities
         /// <seealso cref="EntityQuery.GetSingleton{T}"/>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static DynamicBuffer<T> GetSingletonBuffer<T>(bool isReadOnly = false)
-            where T : unmanaged, IBufferElementData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IBufferElementData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the value of a singleton buffer component, and returns whether or not a singleton buffer component of the specified type exists in the <see cref="World"/>.
@@ -652,7 +674,7 @@ namespace Unity.Entities
         /// <returns>True, if exactly one <see cref="Entity"/> exists in the <see cref="World"/> with the provided component type.</returns>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
         public static bool TryGetSingletonBuffer<T>(out DynamicBuffer<T> value, bool isReadOnly = false)
-            where T : unmanaged, IBufferElementData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            where T : unmanaged, IBufferElementData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Checks whether a singleton component of the specified type exists.
@@ -661,7 +683,8 @@ namespace Unity.Entities
         /// This component type must not implement <see cref="IEnableableComponent"/></typeparam>
         /// <returns>True, if a singleton of the specified type exists in the current <see cref="World"/>.</returns>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static bool HasSingleton<T>() where T : unmanaged =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static bool HasSingleton<T>()
+            where T : unmanaged => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
         #endregion
 
         #region Handles
@@ -673,7 +696,8 @@ namespace Unity.Entities
         /// <returns>An object representing the type information required to safely access Entity instances stored in a
         /// chunk.</returns>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static EntityTypeHandle GetEntityTypeHandle() =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static EntityTypeHandle GetEntityTypeHandle() =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the run-time type information required to access an array of component data in a chunk.
@@ -686,7 +710,8 @@ namespace Unity.Entities
         /// <remarks>Pass an <see cref="ComponentTypeHandle{T}"/> instance to a job that has access to chunk data,
         /// such as an <see cref="IJobChunk"/> job, to access that type of component inside the job.</remarks>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false) where T : unmanaged, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false)
+            where T : unmanaged, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the run-time type information required to access an array of buffer components in a chunk.
@@ -699,7 +724,8 @@ namespace Unity.Entities
         /// <remarks>Pass a BufferTypeHandle instance to a job that has access to chunk data, such as an
         /// <see cref="IJobChunk"/> job, to access that type of buffer component inside the job.</remarks>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static BufferTypeHandle<T> GetBufferTypeHandle<T>(bool isReadOnly = false) where T : unmanaged, IBufferElementData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static BufferTypeHandle<T> GetBufferTypeHandle<T>(bool isReadOnly = false)
+            where T : unmanaged, IBufferElementData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
         /// <summary>
         /// Gets the run-time type information required to access a shared component data in a chunk.
@@ -708,7 +734,9 @@ namespace Unity.Entities
         /// <returns>An object representing the type information required to safely access shared component data stored in a
         /// chunk.</returns>
         /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-        public static SharedComponentTypeHandle<T> GetSharedComponentTypeHandle<T>() where T : unmanaged, ISharedComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+        public static SharedComponentTypeHandle<T> GetSharedComponentTypeHandle<T>()
+            where T : unmanaged, ISharedComponentData =>
+            throw Internal.InternalCompilerInterface.ThrowCodeGenException();
         #endregion
 
 #if !UNITY_DISABLE_MANAGED_COMPONENTS
@@ -725,7 +753,8 @@ namespace Unity.Entities
             /// ScriptableObjects, MonoBehaviour and UnityEngine.Transform
             /// </summary>
             /// <typeparam name="T">Any ScriptableObject, MonoBehaviour or UnityEngine.Object like UnityEngine.Transform.</typeparam>
-            public struct UnityEngineComponent<T> : IQueryTypeParameter where T : UnityEngine.Object
+            public struct UnityEngineComponent<T> : IQueryTypeParameter
+                where T : UnityEngine.Object
             {
                 /// <summary>
                 /// Gets you back the contained value
@@ -765,7 +794,8 @@ namespace Unity.Entities
             /// </remarks>
             /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static T GetComponent<T>(Entity entity) where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static T GetComponent<T>(Entity entity)
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Try to look up the value of a component for an entity.
@@ -780,7 +810,8 @@ namespace Unity.Entities
             /// </remarks>
             /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static bool TryGetComponent<T>(Entity entity, out T result) where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static bool TryGetComponent<T>(Entity entity, out T result)
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Checks whether an entity has a specific type of component.
@@ -804,7 +835,8 @@ namespace Unity.Entities
             /// </remarks>
             /// <returns>True, if the specified entity has the component.</returns>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static bool HasComponent<T>(Entity entity) where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static bool HasComponent<T>(Entity entity)
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Checks whether the <see cref="IComponentData"/> of type T is enabled on the specified <see cref="Entity"/>.
@@ -817,7 +849,9 @@ namespace Unity.Entities
             /// <returns>True if the specified component is enabled, or false if it is disabled.</returns>
             /// <seealso cref="SetComponentEnabled{T}(Entity, bool)"/>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static bool IsComponentEnabled<T>(Entity entity) where T : class, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static bool IsComponentEnabled<T>(Entity entity)
+                where T : class, IEnableableComponent =>
+                throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Enable or disable the <see cref="IComponentData"/> of type T on the specified <see cref="Entity"/>. This operation
@@ -831,7 +865,9 @@ namespace Unity.Entities
             /// /// <typeparam name="T">An unmanaged IComponentData type</typeparam>
             /// <seealso cref="IsComponentEnabled{T}(Entity)"/>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static void SetComponentEnabled<T>(Entity entity, bool value) where T : class, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static void SetComponentEnabled<T>(Entity entity, bool value)
+                where T : class, IEnableableComponent =>
+                throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Gets the value of a component for an entity associated with a system.
@@ -846,7 +882,8 @@ namespace Unity.Entities
             /// </remarks>
             /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static T GetComponent<T>(SystemHandle systemHandle) where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static T GetComponent<T>(SystemHandle systemHandle)
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Checks whether an entity associated with a system has a specific type of component.
@@ -863,7 +900,8 @@ namespace Unity.Entities
             /// </remarks>
             /// <returns>True, if the specified system owned entity has the component.</returns>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static bool HasComponent<T>(SystemHandle systemHandle) where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static bool HasComponent<T>(SystemHandle systemHandle)
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Checks whether the <see cref="IComponentData"/> of type T is enabled on the specified system using a <see cref="SystemHandle"/>.
@@ -876,7 +914,9 @@ namespace Unity.Entities
             /// <returns>True if the specified component is enabled, or false if it is disabled.</returns>
             /// <seealso cref="SetComponentEnabled{T}(SystemHandle, bool)"/>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static bool IsComponentEnabled<T>(SystemHandle systemHandle) where T : class, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static bool IsComponentEnabled<T>(SystemHandle systemHandle)
+                where T : class, IEnableableComponent =>
+                throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Enable or disable the <see cref="IComponentData"/> of type T on the specified system using a <see cref="SystemHandle"/>. This operation
@@ -890,7 +930,9 @@ namespace Unity.Entities
             /// /// <typeparam name="T">An unmanaged IComponentData type</typeparam>
             /// <seealso cref="IsComponentEnabled{T}(Entity)"/>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods </remarks>
-            public static void SetComponentEnabled<T>(SystemHandle systemHandle, bool value) where T : class, IEnableableComponent =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static void SetComponentEnabled<T>(SystemHandle systemHandle, bool value)
+                where T : class, IEnableableComponent =>
+                throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             #endregion
 
@@ -908,7 +950,7 @@ namespace Unity.Entities
             /// <seealso cref="EntityQuery.GetSingletonRW{T}"/>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
             public static T GetSingleton<T>()
-                where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Gets the value of a singleton component, and returns whether or not a singleton component of the specified type exists in the <see cref="World"/>.
@@ -919,7 +961,7 @@ namespace Unity.Entities
             /// <returns>True, if exactly one <see cref="Entity"/> exists in the <see cref="World"/> with the provided component type.</returns>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
             public static bool TryGetSingleton<T>(out T value)
-                where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Gets the Entity instance for a singleton.
@@ -929,7 +971,8 @@ namespace Unity.Entities
             /// <returns>The entity associated with the specified singleton component.</returns>
             /// <seealso cref="EntityQuery.GetSingletonEntity"/>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-            public static Entity GetSingletonEntity<T>() where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static Entity GetSingletonEntity<T>()
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Gets the singleton Entity, and returns whether or not a singleton <see cref="Entity"/> of the specified type exists in the <see cref="World"/>.
@@ -940,7 +983,8 @@ namespace Unity.Entities
             ///  If a singleton of the specified types does not exist in the current <see cref="World"/>, this is set to Entity.Null</param>
             /// <returns>True, if exactly one <see cref="Entity"/> exists in the <see cref="World"/> with the provided component type.</returns>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-            public static bool TryGetSingletonEntity<T>(out Entity value) where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static bool TryGetSingletonEntity<T>(out Entity value)
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Checks whether a singleton component of the specified type exists.
@@ -949,7 +993,8 @@ namespace Unity.Entities
             /// This component type must not implement <see cref="IEnableableComponent"/></typeparam>
             /// <returns>True, if a singleton of the specified type exists in the current <see cref="World"/>.</returns>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-            public static bool HasSingleton<T>() where T : class =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static bool HasSingleton<T>()
+                where T : class => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
             #endregion
 
             #region Handles
@@ -966,7 +1011,8 @@ namespace Unity.Entities
             /// <remarks>Pass an <see cref="ComponentTypeHandle{T}"/> instance to a job that has access to chunk data,
             /// such as an <see cref="IJobChunk"/> job, to access that type of component inside the job.</remarks>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-            public static ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false) where T : class, IComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false)
+                where T : class, IComponentData => throw Internal.InternalCompilerInterface.ThrowCodeGenException();
 
             /// <summary>
             /// Gets the run-time type information required to access a shared component data in a chunk.
@@ -975,7 +1021,9 @@ namespace Unity.Entities
             /// <returns>An object representing the type information required to safely access shared component data stored in a
             /// chunk.</returns>
             /// <remarks> Not working in Entities.ForEach, IJobEntity, and Utility methods</remarks>
-            public static SharedComponentTypeHandle<T> GetSharedComponentTypeHandle<T>() where T : struct, ISharedComponentData =>  throw Internal.InternalCompilerInterface.ThrowCodeGenException();
+            public static SharedComponentTypeHandle<T> GetSharedComponentTypeHandle<T>()
+                where T : struct, ISharedComponentData =>
+                throw Internal.InternalCompilerInterface.ThrowCodeGenException();
             #endregion
         }
 #endif

@@ -1,6 +1,5 @@
 ﻿namespace TMPro
 {
-
     /// <summary>
     /// Structure which contains information about the individual lines of text.
     /// </summary>

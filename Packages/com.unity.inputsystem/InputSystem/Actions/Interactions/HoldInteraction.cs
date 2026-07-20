@@ -50,7 +50,8 @@ namespace UnityEngine.InputSystem.Interactions
         public float pressPoint;
 
         private float durationOrDefault => duration > 0.0 ? duration : InputSystem.settings.defaultHoldTime;
-        private float pressPointOrDefault => pressPoint > 0.0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
+        private float pressPointOrDefault =>
+            pressPoint > 0.0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
 
         private double m_TimePressed;
 
@@ -103,7 +104,7 @@ namespace UnityEngine.InputSystem.Interactions
         }
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     /// <summary>
     /// UI that is displayed when editing <see cref="HoldInteraction"/> in the editor.
     /// </summary>
@@ -111,14 +112,22 @@ namespace UnityEngine.InputSystem.Interactions
     {
         protected override void OnEnable()
         {
-            m_PressPointSetting.Initialize("Press Point",
+            m_PressPointSetting.Initialize(
+                "Press Point",
                 "Float value that an axis control has to cross for it to be considered pressed.",
                 "Default Button Press Point",
-                () => target.pressPoint, v => target.pressPoint = v, () => ButtonControl.s_GlobalDefaultButtonPressPoint);
-            m_DurationSetting.Initialize("Hold Time",
+                () => target.pressPoint,
+                v => target.pressPoint = v,
+                () => ButtonControl.s_GlobalDefaultButtonPressPoint
+            );
+            m_DurationSetting.Initialize(
+                "Hold Time",
                 "Time (in seconds) that a control has to be held in order for it to register as a hold.",
                 "Default Hold Time",
-                () => target.duration, x => target.duration = x, () => InputSystem.settings.defaultHoldTime);
+                () => target.duration,
+                x => target.duration = x,
+                () => InputSystem.settings.defaultHoldTime
+            );
         }
 
         public override void OnGUI()
@@ -139,5 +148,5 @@ namespace UnityEngine.InputSystem.Interactions
         private CustomOrDefaultSetting m_PressPointSetting;
         private CustomOrDefaultSetting m_DurationSetting;
     }
-    #endif
+#endif
 }

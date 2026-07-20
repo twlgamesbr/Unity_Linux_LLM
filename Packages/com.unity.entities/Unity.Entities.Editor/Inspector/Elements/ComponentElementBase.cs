@@ -10,9 +10,11 @@ namespace Unity.Entities.Editor
     internal abstract class ComponentElementBase : BindableElement
     {
         public ComponentPropertyType Type { get; }
-        [CreateProperty] public string Path { get; private set; }
+
+        [CreateProperty]
+        public string Path { get; private set; }
         public string DisplayName { get; }
-        
+
         protected int TypeIndex { get; private set; }
         protected EntityInspectorContext Context { get; }
         protected EntityContainer Container { get; }
@@ -33,15 +35,26 @@ namespace Unity.Entities.Editor
             InspectorUtility.CreateComponentHeader(this, property.Type, DisplayName);
 
             var foldout = this.Q<Foldout>(className: UssClasses.Inspector.Component.Header);
-            foldout.Q<Toggle>().AddManipulator(new ContextualMenuManipulator(evt => { OnPopulateMenu(evt.menu); }));
+            foldout
+                .Q<Toggle>()
+                .AddManipulator(
+                    new ContextualMenuManipulator(evt =>
+                    {
+                        OnPopulateMenu(evt.menu);
+                    })
+                );
 
             if (!Context.IsReadOnly)
             {
                 if (Type == ComponentPropertyType.ChunkComponent)
-                    foldout.contentContainer.Add(new HelpBox("Chunk component data is shared between multiple entities", HelpBoxMessageType.Info));
+                    foldout.contentContainer.Add(
+                        new HelpBox("Chunk component data is shared between multiple entities", HelpBoxMessageType.Info)
+                    );
 
                 if (Type == ComponentPropertyType.SharedComponent)
-                    foldout.contentContainer.Add(new HelpBox("Changing shared values will move entities between chunks", HelpBoxMessageType.Info));
+                    foldout.contentContainer.Add(
+                        new HelpBox("Changing shared values will move entities between chunks", HelpBoxMessageType.Info)
+                    );
             }
 
             var content = new PropertyElement();
@@ -62,7 +75,11 @@ namespace Unity.Entities.Editor
             if (container.IsReadOnly)
             {
                 SetReadonly(foldout);
-                foldout.RegisterCallback<ClickEvent, EntityInspectorContext>(OnClicked, Context, TrickleDown.TrickleDown);
+                foldout.RegisterCallback<ClickEvent, EntityInspectorContext>(
+                    OnClicked,
+                    Context,
+                    TrickleDown.TrickleDown
+                );
             }
 
             return content;

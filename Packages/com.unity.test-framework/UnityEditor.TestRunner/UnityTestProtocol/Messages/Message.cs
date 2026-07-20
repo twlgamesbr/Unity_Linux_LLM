@@ -7,6 +7,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
     internal abstract class Message
     {
         public string type;
+
         // Milliseconds since unix epoch
         public ulong time;
         public int version;

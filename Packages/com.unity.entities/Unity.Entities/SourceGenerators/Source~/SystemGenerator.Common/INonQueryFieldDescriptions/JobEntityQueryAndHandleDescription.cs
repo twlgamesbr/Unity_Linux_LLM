@@ -5,11 +5,13 @@ using Unity.Entities.SourceGen.Common;
 
 namespace Unity.Entities.SourceGen.SystemGenerator.Common;
 
-public readonly struct JobEntityQueryAndHandleDescription : IEquatable<JobEntityQueryAndHandleDescription>, IMemberDescription
+public readonly struct JobEntityQueryAndHandleDescription
+    : IEquatable<JobEntityQueryAndHandleDescription>,
+        IMemberDescription
 {
     ITypeSymbol TypeSymbol { get; }
     bool AssignDefaultQuery { get; }
-    public string GeneratedFieldName{ get; }
+    public string GeneratedFieldName { get; }
 
     public void AppendMemberDeclaration(IndentedTextWriter w, bool forcePublic = false)
     {
@@ -26,18 +28,20 @@ public readonly struct JobEntityQueryAndHandleDescription : IEquatable<JobEntity
         TypeSymbol = typeSymbol;
         AssignDefaultQuery = assignDefaultQuery;
 
-        GeneratedFieldName = $"__{TypeSymbol.ToValidIdentifier()}_{(AssignDefaultQuery ? "With" : "Without")}DefaultQuery_JobEntityTypeHandle";
+        GeneratedFieldName =
+            $"__{TypeSymbol.ToValidIdentifier()}_{(AssignDefaultQuery ? "With" : "Without")}DefaultQuery_JobEntityTypeHandle";
     }
 
     public bool Equals(JobEntityQueryAndHandleDescription other) =>
-        SymbolEqualityComparer.Default.Equals(TypeSymbol, other.TypeSymbol) && AssignDefaultQuery == other.AssignDefaultQuery;
+        SymbolEqualityComparer.Default.Equals(TypeSymbol, other.TypeSymbol)
+        && AssignDefaultQuery == other.AssignDefaultQuery;
 
     public override int GetHashCode()
     {
         unchecked
         {
-            return ((TypeSymbol != null ?
-                SymbolEqualityComparer.Default.GetHashCode(TypeSymbol) : 0) * 397) ^ AssignDefaultQuery.GetHashCode();
+            return ((TypeSymbol != null ? SymbolEqualityComparer.Default.GetHashCode(TypeSymbol) : 0) * 397)
+                ^ AssignDefaultQuery.GetHashCode();
         }
     }
 }

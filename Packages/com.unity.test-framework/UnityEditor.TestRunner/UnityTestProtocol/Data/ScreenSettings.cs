@@ -16,10 +16,10 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
         }
 
         public ScreenSettings() { }
+
         public int ScreenWidth;
         public int ScreenHeight;
         public int ScreenRefreshRate;
         public bool Fullscreen;
-
     }
 }

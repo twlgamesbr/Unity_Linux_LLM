@@ -14,7 +14,7 @@ namespace Unity.Entities.UI
         public static InspectorContentParameters Default = new InspectorContentParameters
         {
             ApplyInspectorStyling = true,
-            UseDefaultMargins = true
+            UseDefaultMargins = true,
         };
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Unity.Entities.UI
         public static InspectorContentParameters NoStyling = new InspectorContentParameters
         {
             ApplyInspectorStyling = false,
-            UseDefaultMargins = false
+            UseDefaultMargins = false,
         };
 
         /// <summary>

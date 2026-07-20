@@ -5,7 +5,9 @@ namespace UnityEngine.Rendering.Universal
 {
     internal class DecalDrawFowardEmissiveSystem : DecalDrawSystem
     {
-        public DecalDrawFowardEmissiveSystem(DecalEntityManager entityManager) : base("DecalDrawFowardEmissiveSystem.Execute", entityManager) { }
+        public DecalDrawFowardEmissiveSystem(DecalEntityManager entityManager)
+            : base("DecalDrawFowardEmissiveSystem.Execute", entityManager) { }
+
         protected override int GetPassIndex(DecalCachedChunk decalCachedChunk) => decalCachedChunk.passIndexEmissive;
     }
 
@@ -41,10 +43,20 @@ namespace UnityEngine.Rendering.Universal
             passData.drawSystem = m_DrawSystem;
         }
 
-        private RendererListParams InitRendererListParams(UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+        private RendererListParams InitRendererListParams(
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData
+        )
         {
             SortingCriteria sortingCriteria = cameraData.defaultOpaqueSortFlags;
-            DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(m_ShaderTagIdList, renderingData, cameraData, lightData, sortingCriteria);
+            DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(
+                m_ShaderTagIdList,
+                renderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
             return new RendererListParams(renderingData.cullResults, drawingSettings, m_FilteringSettings);
         }
 
@@ -56,7 +68,9 @@ namespace UnityEngine.Rendering.Universal
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
                 UniversalRenderingData renderingData = frameData.Get<UniversalRenderingData>();
@@ -72,10 +86,12 @@ namespace UnityEngine.Rendering.Universal
                 builder.SetRenderAttachment(resourceData.activeColorTexture, 0, AccessFlags.Write);
                 builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.Read);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext rgContext) =>
-                {
-                    ExecutePass(rgContext.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext rgContext) =>
+                    {
+                        ExecutePass(rgContext.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
     }

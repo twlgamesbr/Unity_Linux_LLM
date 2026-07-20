@@ -21,10 +21,17 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             m_Shader = shader;
             m_KernelIndex = m_Shader.FindKernel(dispatchFuncName);
             m_ComputeIndirectDispatchDimsKernelIndex = m_Shader.FindKernel("ComputeIndirectDispatchDims");
-            Debug.Assert(m_Shader.IsSupported(m_KernelIndex), $"Invalid compute shader [{shader.name}], please check that your shader code is compiling.");
+            Debug.Assert(
+                m_Shader.IsSupported(m_KernelIndex),
+                $"Invalid compute shader [{shader.name}], please check that your shader code is compiling."
+            );
 
-            m_Shader.GetKernelThreadGroupSizes(m_KernelIndex,
-                out m_ThreadGroupSizes.x, out m_ThreadGroupSizes.y, out m_ThreadGroupSizes.z);
+            m_Shader.GetKernelThreadGroupSizes(
+                m_KernelIndex,
+                out m_ThreadGroupSizes.x,
+                out m_ThreadGroupSizes.y,
+                out m_ThreadGroupSizes.z
+            );
             m_DispatchBuffer = dispatchBuffer;
         }
 
@@ -115,9 +122,16 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             var requiredScratchSize = GetTraceScratchBufferRequiredSizeInBytes(width, height, depth);
             if (requiredScratchSize > 0)
             {
-                Utils.CheckArg(scratchBuffer != null && ((ulong)(scratchBuffer.count * scratchBuffer.stride) >= requiredScratchSize), "scratchBuffer size is too small");
+                Utils.CheckArg(
+                    scratchBuffer != null
+                        && ((ulong)(scratchBuffer.count * scratchBuffer.stride) >= requiredScratchSize),
+                    "scratchBuffer size is too small"
+                );
                 Utils.CheckArg(scratchBuffer.stride == 4, "scratchBuffer stride must be 4");
-                Utils.CheckArg(scratchBuffer.target == RayTracingHelper.ScratchBufferTarget, "scratchBuffer.target must have Target.Structured set");
+                Utils.CheckArg(
+                    scratchBuffer.target == RayTracingHelper.ScratchBufferTarget,
+                    "scratchBuffer.target must have Target.Structured set"
+                );
             }
 
             cmd.SetComputeBufferParam(m_Shader, m_KernelIndex, SID._UnifiedRT_Stack, scratchBuffer);
@@ -133,8 +147,12 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         public void Dispatch(CommandBuffer cmd, GraphicsBuffer scratchBuffer, GraphicsBuffer argsBuffer)
         {
             Utils.CheckArgIsNotNull(cmd, nameof(cmd));
-            GraphicsBuffer.Target requiredFlags = GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured;
-            Utils.CheckArg((argsBuffer.target & requiredFlags) == requiredFlags, "argsBuffer.target must have both Target.IndirectArguments and Target.Structured set");
+            GraphicsBuffer.Target requiredFlags =
+                GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured;
+            Utils.CheckArg(
+                (argsBuffer.target & requiredFlags) == requiredFlags,
+                "argsBuffer.target must have both Target.IndirectArguments and Target.Structured set"
+            );
 
             SetIndirectDispatchDimensions(cmd, argsBuffer);
             DispatchIndirect(cmd, scratchBuffer, argsBuffer);
@@ -142,8 +160,18 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         internal void SetIndirectDispatchDimensions(CommandBuffer cmd, GraphicsBuffer argsBuffer)
         {
-            cmd.SetComputeBufferParam(m_Shader, m_ComputeIndirectDispatchDimsKernelIndex, SID._UnifiedRT_DispatchDims, argsBuffer);
-            cmd.SetComputeBufferParam(m_Shader, m_ComputeIndirectDispatchDimsKernelIndex, SID._UnifiedRT_DispatchDimsInWorkgroups, m_DispatchBuffer);
+            cmd.SetComputeBufferParam(
+                m_Shader,
+                m_ComputeIndirectDispatchDimsKernelIndex,
+                SID._UnifiedRT_DispatchDims,
+                argsBuffer
+            );
+            cmd.SetComputeBufferParam(
+                m_Shader,
+                m_ComputeIndirectDispatchDimsKernelIndex,
+                SID._UnifiedRT_DispatchDimsInWorkgroups,
+                m_DispatchBuffer
+            );
             cmd.DispatchCompute(m_Shader, m_ComputeIndirectDispatchDimsKernelIndex, 1, 1, 1);
         }
 
@@ -161,5 +189,3 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
     }
 }
-
-

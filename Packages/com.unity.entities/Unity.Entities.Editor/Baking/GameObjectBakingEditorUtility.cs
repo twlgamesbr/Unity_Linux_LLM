@@ -35,7 +35,6 @@ namespace Unity.Entities.Editor
         public static bool IsBaked(this GameObjectBakingResultStatus status) =>
             status == GameObjectBakingResultStatus.BakedBySubScene;
 
-        public static bool IsBaked(GameObject gameObject) =>
-            GetGameObjectBakingResultStatus(gameObject).IsBaked();
+        public static bool IsBaked(GameObject gameObject) => GetGameObjectBakingResultStatus(gameObject).IsBaked();
     }
 }

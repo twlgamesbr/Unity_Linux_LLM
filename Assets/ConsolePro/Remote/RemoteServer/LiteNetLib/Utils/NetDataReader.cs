@@ -86,10 +86,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             _dataSize = maxSize;
         }
 
-        public NetDataReader()
-        {
-
-        }
+        public NetDataReader() { }
 
         public NetDataReader(NetDataWriter writer)
         {
@@ -108,13 +105,15 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 
         #region GetMethods
 
-        public void Get<T>(out T result) where T : struct, INetSerializable
+        public void Get<T>(out T result)
+            where T : struct, INetSerializable
         {
             result = default(T);
             result.Deserialize(this);
         }
 
-        public void Get<T>(out T result, Func<T> constructor) where T : class, INetSerializable
+        public void Get<T>(out T result, Func<T> constructor)
+            where T : class, INetSerializable
         {
             result = constructor();
             result.Deserialize(this);
@@ -194,7 +193,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
         {
             result = GetString(maxLength);
         }
-        
+
         public void Get(out Guid result)
         {
             result = GetGuid();
@@ -230,7 +229,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             return result;
         }
 
-        public T[] GetArray<T>() where T : INetSerializable, new()
+        public T[] GetArray<T>()
+            where T : INetSerializable, new()
         {
             ushort length = BitConverter.ToUInt16(_data, _position);
             _position += 2;
@@ -243,8 +243,9 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             }
             return result;
         }
-        
-        public T[] GetArray<T>(Func<T> constructor) where T : class, INetSerializable
+
+        public T[] GetArray<T>(Func<T> constructor)
+            where T : class, INetSerializable
         {
             ushort length = BitConverter.ToUInt16(_data, _position);
             _position += 2;
@@ -253,7 +254,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
                 Get(out result[i], constructor);
             return result;
         }
-        
+
         public bool[] GetBoolArray()
         {
             return GetArray<bool>(1);
@@ -400,11 +401,12 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             ushort size = GetUShort();
             if (size == 0)
                 return string.Empty;
-            
+
             int actualSize = size - 1;
-            string result = maxLength > 0 && NetDataWriter.uTF8Encoding.Value.GetCharCount(_data, _position, actualSize) > maxLength ?
-                string.Empty :
-                NetDataWriter.uTF8Encoding.Value.GetString(_data, _position, actualSize);
+            string result =
+                maxLength > 0 && NetDataWriter.uTF8Encoding.Value.GetCharCount(_data, _position, actualSize) > maxLength
+                    ? string.Empty
+                    : NetDataWriter.uTF8Encoding.Value.GetString(_data, _position, actualSize);
             _position += actualSize;
             return result;
         }
@@ -414,7 +416,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             ushort size = GetUShort();
             if (size == 0)
                 return string.Empty;
-            
+
             int actualSize = size - 1;
             string result = NetDataWriter.uTF8Encoding.Value.GetString(_data, _position, actualSize);
             _position += actualSize;
@@ -430,11 +432,11 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             _position += size;
             return result;
         }
-        
+
         public Guid GetGuid()
         {
 #if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
-            var result =  new Guid(_data.AsSpan(_position, 16));
+            var result = new Guid(_data.AsSpan(_position, 16));
             _position += 16;
             return result;
 #else
@@ -456,14 +458,16 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             return segment;
         }
 
-        public T Get<T>() where T : struct, INetSerializable
+        public T Get<T>()
+            where T : struct, INetSerializable
         {
             var obj = default(T);
             obj.Deserialize(this);
             return obj;
         }
 
-        public T Get<T>(Func<T> constructor) where T : class, INetSerializable
+        public T Get<T>(Func<T> constructor)
+            where T : class, INetSerializable
         {
             var obj = constructor();
             obj.Deserialize(this);
@@ -476,7 +480,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
         {
             return new ReadOnlySpan<byte>(_data, _position, _dataSize - _position);
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlyMemory<byte> GetRemainingBytesMemory()
         {
@@ -585,11 +589,14 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             ushort size = PeekUShort();
             if (size == 0)
                 return string.Empty;
-            
+
             int actualSize = size - 1;
-            return (maxLength > 0 && NetDataWriter.uTF8Encoding.Value.GetCharCount(_data, _position + 2, actualSize) > maxLength) ?
-                string.Empty :
-                NetDataWriter.uTF8Encoding.Value.GetString(_data, _position + 2, actualSize);
+            return (
+                maxLength > 0
+                && NetDataWriter.uTF8Encoding.Value.GetCharCount(_data, _position + 2, actualSize) > maxLength
+            )
+                ? string.Empty
+                : NetDataWriter.uTF8Encoding.Value.GetString(_data, _position + 2, actualSize);
         }
 
         public string PeekString()

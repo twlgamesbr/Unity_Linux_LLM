@@ -9,6 +9,7 @@ namespace Unity.Entities.Editor
     {
 #if !UNITY_2023_3_OR_NEWER
         class TabContentFactory : UxmlFactory<TabContent, TabContentTraits> { }
+
         class TabContentTraits : UxmlTraits { }
 #endif
 
@@ -43,8 +44,7 @@ namespace Unity.Entities.Editor
             UnregisterCallback<GeometryChangedEvent>(OnGeometryChangeEvent);
         }
 
-        public void SetValueWithoutNotify(string newValue)
-            => m_TabName = newValue;
+        public void SetValueWithoutNotify(string newValue) => m_TabName = newValue;
 
         string INotifyValueChanged<string>.value
         {

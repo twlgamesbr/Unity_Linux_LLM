@@ -1,13 +1,13 @@
 //#define USE_INDEX_NATIVE_ARRAY
 using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using UnityEngine.Profiling;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Chunk = UnityEngine.Rendering.ProbeBrickPool.BrickChunkAlloc;
+using UnityEngine.Profiling;
 using CellIndexInfo = UnityEngine.Rendering.ProbeReferenceVolume.CellIndexInfo;
+using Chunk = UnityEngine.Rendering.ProbeBrickPool.BrickChunkAlloc;
 
 namespace UnityEngine.Rendering
 {
@@ -19,7 +19,6 @@ namespace UnityEngine.Rendering
 
         internal const int kFailChunkIndex = -1;
         internal const int kEmptyIndex = -2; // This is a tag value used to say that we have a valid entry but with no data.
-
 
         BitArray m_IndexChunks;
         BitArray m_IndexChunksCopyForChecks;
@@ -39,15 +38,15 @@ namespace UnityEngine.Rendering
         internal int estimatedVMemCost { get; private set; }
 
         internal ComputeBuffer GetDebugFragmentationBuffer() => m_DebugFragmentationBuffer;
+
         internal float fragmentationRate { get; private set; }
 
         [DebuggerDisplay("Brick [{position}, {subdivisionLevel}]")]
         [Serializable]
-
         public struct Brick : IEquatable<Brick>
         {
-            public Vector3Int position;   // refspace index, indices are brick coordinates at max resolution
-            public int subdivisionLevel;              // size as factor covered elementary cells
+            public Vector3Int position; // refspace index, indices are brick coordinates at max resolution
+            public int subdivisionLevel; // size as factor covered elementary cells
 
             internal Brick(Vector3Int position, int subdivisionLevel)
             {
@@ -73,7 +72,7 @@ namespace UnityEngine.Rendering
             }
         }
 
-        Vector3Int m_CenterRS;   // the anchor in ref space, around which the index is defined. [IMPORTANT NOTE! For now we always have it at 0, so is not passed to the shader, but is kept here until development is active in case we find it useful]
+        Vector3Int m_CenterRS; // the anchor in ref space, around which the index is defined. [IMPORTANT NOTE! For now we always have it at 0, so is not passed to the shader, but is kept here until development is active in case we find it useful]
 
         int SizeOfPhysicalIndexFromBudget(ProbeVolumeTextureMemoryBudget memoryBudget)
         {
@@ -99,13 +98,20 @@ namespace UnityEngine.Rendering
 
             m_NeedUpdateIndexComputeBuffer = false;
 
-            m_ChunksCount = Mathf.Max(1, Mathf.CeilToInt((float)SizeOfPhysicalIndexFromBudget(memoryBudget) / kIndexChunkSize));
+            m_ChunksCount = Mathf.Max(
+                1,
+                Mathf.CeilToInt((float)SizeOfPhysicalIndexFromBudget(memoryBudget) / kIndexChunkSize)
+            );
             m_AvailableChunkCount = m_ChunksCount;
             m_IndexChunks = new BitArray(m_ChunksCount);
             m_IndexChunksCopyForChecks = new BitArray(m_ChunksCount);
 
             int physicalBufferSize = m_ChunksCount * kIndexChunkSize;
-            m_PhysicalIndexBufferData = new NativeArray<int>(physicalBufferSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_PhysicalIndexBufferData = new NativeArray<int>(
+                physicalBufferSize,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_PhysicalIndexBuffer = new ComputeBuffer(physicalBufferSize, sizeof(int), ComputeBufferType.Structured);
 
             estimatedVMemCost = physicalBufferSize * sizeof(int);
@@ -219,6 +225,7 @@ namespace UnityEngine.Rendering
             public int firstChunkIndex;
             public int numberOfChunks;
             public int minSubdivInCell;
+
             // IMPORTANT, These values should be at max resolution, independent of minSubdivInCell. This means that
             // The map to the lower possible resolution is done after.  However they are still in local space.
             public Vector3Int minValidBrickIndexForCellAtMaxRes;
@@ -280,7 +287,8 @@ namespace UnityEngine.Rendering
                 {
                     if (!m_IndexChunksCopyForChecks[i])
                     {
-                        int firstSlot = i, lastSlot = i + numberOfChunksForEntry;
+                        int firstSlot = i,
+                            lastSlot = i + numberOfChunksForEntry;
                         while (i + 1 < lastSlot)
                         {
                             if (m_IndexChunksCopyForChecks[++i])
@@ -303,7 +311,11 @@ namespace UnityEngine.Rendering
                 }
 
                 // Sucessful allocation - We need to markup the copy.
-                for (int i = entriesInfo[entry].firstChunkIndex; i < (entriesInfo[entry].firstChunkIndex + numberOfChunksForEntry); ++i)
+                for (
+                    int i = entriesInfo[entry].firstChunkIndex;
+                    i < (entriesInfo[entry].firstChunkIndex + numberOfChunksForEntry);
+                    ++i
+                )
                 {
                     Debug.Assert(!m_IndexChunksCopyForChecks[i]);
                     m_IndexChunksCopyForChecks[i] = true;
@@ -345,11 +357,19 @@ namespace UnityEngine.Rendering
             return true;
         }
 
-        static internal bool BrickOverlapEntry(Vector3Int brickMin, Vector3Int brickMax, Vector3Int entryMin, Vector3Int entryMax)
+        internal static bool BrickOverlapEntry(
+            Vector3Int brickMin,
+            Vector3Int brickMax,
+            Vector3Int entryMin,
+            Vector3Int entryMax
+        )
         {
-            return brickMax.x > entryMin.x && entryMax.x > brickMin.x &&
-                   brickMax.y > entryMin.y && entryMax.y > brickMin.y &&
-                   brickMax.z > entryMin.z && entryMax.z > brickMin.z;
+            return brickMax.x > entryMin.x
+                && entryMax.x > brickMin.x
+                && brickMax.y > entryMin.y
+                && entryMax.y > brickMin.y
+                && brickMax.z > entryMin.z
+                && entryMax.z > brickMin.z;
         }
 
         static int LocationToIndex(int x, int y, int z, Vector3Int sizeOfValid)
@@ -357,7 +377,14 @@ namespace UnityEngine.Rendering
             return z * (sizeOfValid.x * sizeOfValid.y) + x * sizeOfValid.y + y;
         }
 
-        void MarkBrickInPhysicalBuffer(in IndirectionEntryUpdateInfo entry, Vector3Int brickMin, Vector3Int brickMax, int brickSubdivLevel, int entrySubdivLevel, int idx)
+        void MarkBrickInPhysicalBuffer(
+            in IndirectionEntryUpdateInfo entry,
+            Vector3Int brickMin,
+            Vector3Int brickMax,
+            int brickSubdivLevel,
+            int entrySubdivLevel,
+            int idx
+        )
         {
             m_NeedUpdateIndexComputeBuffer = true;
 
@@ -401,9 +428,16 @@ namespace UnityEngine.Rendering
                     brickMax /= minBrickSize;
 
                     // Verify we are actually in local space now.
-                    int maxCellSizeInOutputRes = ProbeReferenceVolume.CellSize(entrySubdivLevel - entry.minSubdivInCell);
+                    int maxCellSizeInOutputRes = ProbeReferenceVolume.CellSize(
+                        entrySubdivLevel - entry.minSubdivInCell
+                    );
                     Debug.Assert(brickMin.x >= 0 && brickMin.y >= 0 && brickMin.z >= 0, "Brick is out of bounds");
-                    Debug.Assert(brickMax.x <= maxCellSizeInOutputRes && brickMax.y <= maxCellSizeInOutputRes && brickMax.z <= maxCellSizeInOutputRes, "Brick out of bounds");
+                    Debug.Assert(
+                        brickMax.x <= maxCellSizeInOutputRes
+                            && brickMax.y <= maxCellSizeInOutputRes
+                            && brickMax.z <= maxCellSizeInOutputRes,
+                        "Brick out of bounds"
+                    );
 
                     // Then perform the rescale of the local indices for min and max.
                     brickMin -= entryMinIndex;
@@ -432,7 +466,14 @@ namespace UnityEngine.Rendering
             }
         }
 
-        public void AddBricks(CellIndexInfo cellInfo, NativeArray<Brick> bricks, List<Chunk> allocations, int allocationSize, int poolWidth, int poolHeight)
+        public void AddBricks(
+            CellIndexInfo cellInfo,
+            NativeArray<Brick> bricks,
+            List<Chunk> allocations,
+            int allocationSize,
+            int poolWidth,
+            int poolHeight
+        )
         {
             Debug.Assert(bricks.Length <= ushort.MaxValue, "Cannot add more than 65K bricks per RegId.");
 
@@ -468,10 +509,21 @@ namespace UnityEngine.Rendering
                     foreach (var entry in cellInfo.updateInfo.entriesInfo)
                     {
                         // We might have the brick completely out of the entry. In those case, we must skip.
-                        var minEntryPosition = entry.entryPositionInBricksAtMaxRes + entry.minValidBrickIndexForCellAtMaxRes;
-                        var maxEntryPosition = entry.entryPositionInBricksAtMaxRes + entry.maxValidBrickIndexForCellAtMaxResPlusOne - Vector3Int.one;
+                        var minEntryPosition =
+                            entry.entryPositionInBricksAtMaxRes + entry.minValidBrickIndexForCellAtMaxRes;
+                        var maxEntryPosition =
+                            entry.entryPositionInBricksAtMaxRes
+                            + entry.maxValidBrickIndexForCellAtMaxResPlusOne
+                            - Vector3Int.one;
                         if (BrickOverlapEntry(brickMin, brickMax, minEntryPosition, maxEntryPosition))
-                            MarkBrickInPhysicalBuffer(entry, brickMin, brickMax, brick.subdivisionLevel, entrySubdivLevel, idx);
+                            MarkBrickInPhysicalBuffer(
+                                entry,
+                                brickMin,
+                                brickMax,
+                                brick.subdivisionLevel,
+                                entrySubdivLevel,
+                                idx
+                            );
                     }
                 }
             }

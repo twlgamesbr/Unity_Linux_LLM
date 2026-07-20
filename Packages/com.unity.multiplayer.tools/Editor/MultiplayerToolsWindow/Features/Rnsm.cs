@@ -9,7 +9,8 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
     class Rnsm : IMultiplayerToolsFeature
     {
         public string Name => "Runtime Network Stats Monitor";
-        public string ToolTip => "The Runtime Network Stats Monitor enables you to monitor the bandwidth usage of your game at runtime.";
+        public string ToolTip =>
+            "The Runtime Network Stats Monitor enables you to monitor the bandwidth usage of your game at runtime.";
         public string ButtonText => "Add to Scene";
         public string DocumentationUrl => Doc.RuntimeNetStatsMonitor;
 
@@ -27,7 +28,9 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
         }
 #else
         public bool IsAvailable => false;
-        public string AvailabilityMessage => "Runtime Network Stats Monitor is only available with Netcode for GameObjects 1.1+";
+        public string AvailabilityMessage =>
+            "Runtime Network Stats Monitor is only available with Netcode for GameObjects 1.1+";
+
         public void Open() => throw new NotImplementedException();
 #endif
     }

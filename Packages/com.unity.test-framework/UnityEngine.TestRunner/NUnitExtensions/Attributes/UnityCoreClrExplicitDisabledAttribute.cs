@@ -34,10 +34,15 @@ namespace UnityEngine.TestTools
     /// ]]>
     /// </code>
     /// </example>
-
-    [Obsolete("Internal use only. This attribute is only intended for use during the implementation of CoreCLR support in Unity.")]
+    [Obsolete(
+        "Internal use only. This attribute is only intended for use during the implementation of CoreCLR support in Unity."
+    )]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Assembly, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(
+        AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Assembly,
+        AllowMultiple = false,
+        Inherited = true
+    )]
     public class UnityCoreClrExplicitDisabledAttribute : NUnitAttribute, IApplyToTest
     {
         private readonly string JiraTicket = "";
@@ -47,17 +52,22 @@ namespace UnityEngine.TestTools
         public UnityCoreClrExplicitDisabledAttribute(string jiraTicket)
         {
             if (string.IsNullOrEmpty(jiraTicket) || !jiraTicket.Contains("jira", StringComparison.OrdinalIgnoreCase))
-                throw new ArgumentException("No jira issue referenced. Must reference a jira issue.", nameof(jiraTicket));
+                throw new ArgumentException(
+                    "No jira issue referenced. Must reference a jira issue.",
+                    nameof(jiraTicket)
+                );
             JiraTicket = jiraTicket;
             Reason = $"{Reason}\nSee {JiraTicket} for more details.";
         }
 
-        public UnityCoreClrExplicitDisabledAttribute(string jiraTicket, string reason) : this(jiraTicket)
+        public UnityCoreClrExplicitDisabledAttribute(string jiraTicket, string reason)
+            : this(jiraTicket)
         {
             Reason = $"{reason}\nSee {JiraTicket} for more details.";
         }
 
-        public UnityCoreClrExplicitDisabledAttribute(string jiraTicket, string reason, string category) : this(jiraTicket, reason)
+        public UnityCoreClrExplicitDisabledAttribute(string jiraTicket, string reason, string category)
+            : this(jiraTicket, reason)
         {
             Category = category;
         }

@@ -20,31 +20,36 @@ namespace Unity.Rendering
 
         private readonly EntityQueryDesc m_ProbeGridQueryDesc = new()
         {
-            All = new []
-            {
-                ComponentType.ReadWrite<BuiltinMaterialPropertyUnity_SHCoefficients>(),
-                ComponentType.ReadOnly<WorldRenderBounds>(),
-                ComponentType.ReadOnly<BlendProbeTag>()
-            },
-            None = new []
-            {
-                ComponentType.ReadOnly<OverrideLightProbeAnchorComponent>()
-            }
-        };
-
-        private readonly EntityQueryDesc m_ProbeGridAnchorQueryDesc = new()
-        {
-            All = new []
+            All = new[]
             {
                 ComponentType.ReadWrite<BuiltinMaterialPropertyUnity_SHCoefficients>(),
                 ComponentType.ReadOnly<WorldRenderBounds>(),
                 ComponentType.ReadOnly<BlendProbeTag>(),
-                ComponentType.ReadOnly<OverrideLightProbeAnchorComponent>()
-            }
+            },
+            None = new[] { ComponentType.ReadOnly<OverrideLightProbeAnchorComponent>() },
         };
 
-        private readonly ComponentType[] gridQueryFilter = {ComponentType.ReadOnly<WorldRenderBounds>(), ComponentType.ReadWrite<BlendProbeTag>()};
-        private readonly ComponentType[] gridQueryAnchorFilter = { ComponentType.ReadOnly<OverrideLightProbeAnchorComponent>(), ComponentType.ReadWrite<BlendProbeTag>() };
+        private readonly EntityQueryDesc m_ProbeGridAnchorQueryDesc = new()
+        {
+            All = new[]
+            {
+                ComponentType.ReadWrite<BuiltinMaterialPropertyUnity_SHCoefficients>(),
+                ComponentType.ReadOnly<WorldRenderBounds>(),
+                ComponentType.ReadOnly<BlendProbeTag>(),
+                ComponentType.ReadOnly<OverrideLightProbeAnchorComponent>(),
+            },
+        };
+
+        private readonly ComponentType[] gridQueryFilter =
+        {
+            ComponentType.ReadOnly<WorldRenderBounds>(),
+            ComponentType.ReadWrite<BlendProbeTag>(),
+        };
+        private readonly ComponentType[] gridQueryAnchorFilter =
+        {
+            ComponentType.ReadOnly<OverrideLightProbeAnchorComponent>(),
+            ComponentType.ReadWrite<BlendProbeTag>(),
+        };
 
         private ComponentType[] gridQueryFilterForAmbient = { ComponentType.ReadWrite<BlendProbeTag>() };
 
@@ -80,7 +85,8 @@ namespace Unity.Rendering
             EntityQuery query,
             ComponentType[] queryFilter,
             SphericalHarmonicsL2 ambientProbe,
-            SphericalHarmonicsL2 lastProbe)
+            SphericalHarmonicsL2 lastProbe
+        )
         {
             Profiler.BeginSample("UpdateEntitiesFromAmbientProbe");
             var updateAll = ambientProbe != lastProbe;
@@ -107,6 +113,7 @@ namespace Unity.Rendering
         private List<Vector3> m_Positions = new List<Vector3>(512);
         private List<SphericalHarmonicsL2> m_LightProbes = new List<SphericalHarmonicsL2>(512);
         private List<Vector4> m_OcclusionProbes = new List<Vector4>(512);
+
         private void UpdateEntitiesFromGrid()
         {
             Profiler.BeginSample("UpdateEntitiesFromGrid");
@@ -138,11 +145,11 @@ namespace Unity.Rendering
                 for (var i = 0; i < m_Positions.Count; ++i)
                 {
                     var shCoefficients = new SHCoefficients(m_LightProbes[i], m_OcclusionProbes[i]);
-                    chunkSH[i] = new BuiltinMaterialPropertyUnity_SHCoefficients() {Value = shCoefficients};
+                    chunkSH[i] = new BuiltinMaterialPropertyUnity_SHCoefficients() { Value = shCoefficients };
                 }
             }
 
-            var gridChunks  = m_ProbeGridQuery.ToArchetypeChunkArray(Allocator.Temp);
+            var gridChunks = m_ProbeGridQuery.ToArchetypeChunkArray(Allocator.Temp);
 
             if (gridChunks.Length == 0 && gridAnchorChunks.Length == 0)
             {
@@ -170,7 +177,7 @@ namespace Unity.Rendering
                 for (var i = 0; i < m_Positions.Count; ++i)
                 {
                     var shCoefficients = new SHCoefficients(m_LightProbes[i], m_OcclusionProbes[i]);
-                    chunkSH[i] = new BuiltinMaterialPropertyUnity_SHCoefficients() {Value = shCoefficients};
+                    chunkSH[i] = new BuiltinMaterialPropertyUnity_SHCoefficients() { Value = shCoefficients };
                 }
             }
 
@@ -183,7 +190,12 @@ namespace Unity.Rendering
             public SHCoefficients Coefficients;
             public ComponentTypeHandle<BuiltinMaterialPropertyUnity_SHCoefficients> SHType;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 // This job is not written to support queries with enableable component types.
                 Assert.IsFalse(useEnabledMask);
@@ -192,7 +204,7 @@ namespace Unity.Rendering
 
                 for (var i = 0; i < chunkSH.Length; i++)
                 {
-                    chunkSH[i] = new BuiltinMaterialPropertyUnity_SHCoefficients {Value = Coefficients};
+                    chunkSH[i] = new BuiltinMaterialPropertyUnity_SHCoefficients { Value = Coefficients };
                 }
             }
         }

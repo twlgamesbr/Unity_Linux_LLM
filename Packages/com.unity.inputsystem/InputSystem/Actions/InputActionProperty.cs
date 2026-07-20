@@ -26,7 +26,10 @@ namespace UnityEngine.InputSystem
     /// <seealso cref="InputAction"/>
     /// <seealso cref="InputActionReference"/>
     [Serializable]
-    public struct InputActionProperty : IEquatable<InputActionProperty>, IEquatable<InputAction>, IEquatable<InputActionReference>
+    public struct InputActionProperty
+        : IEquatable<InputActionProperty>,
+            IEquatable<InputAction>,
+            IEquatable<InputActionReference>
     {
         /// <summary>
         /// The effective action held on to by the property.
@@ -38,7 +41,12 @@ namespace UnityEngine.InputSystem
         /// has been manually initialized with a <c>null</c> <see cref="InputAction"/> using
         /// <see cref="InputActionProperty(InputAction)"/>.
         /// </remarks>
-        public InputAction action => m_UseReference ? m_Reference != null ? m_Reference.action : null : m_Action;
+        public InputAction action =>
+            m_UseReference
+                ? m_Reference != null
+                    ? m_Reference.action
+                    : null
+                : m_Action;
 
         /// <summary>
         /// If the property is set to use a reference to the action, this property returns
@@ -96,9 +104,9 @@ namespace UnityEngine.InputSystem
         /// <returns>True if both properties refer to the same action.</returns>
         public bool Equals(InputActionProperty other)
         {
-            return m_Reference == other.m_Reference &&
-                m_UseReference == other.m_UseReference &&
-                m_Action == other.m_Action;
+            return m_Reference == other.m_Reference
+                && m_UseReference == other.m_UseReference
+                && m_Action == other.m_Action;
         }
 
         /// <summary>
@@ -152,7 +160,7 @@ namespace UnityEngine.InputSystem
         /// <param name="right">The second property.</param>
         /// <returns>True if the two action properties are equivalent.</returns>
         /// <seealso cref="Equals(InputActionProperty)"/>
-        public static bool operator==(InputActionProperty left, InputActionProperty right)
+        public static bool operator ==(InputActionProperty left, InputActionProperty right)
         {
             return left.Equals(right);
         }
@@ -164,13 +172,18 @@ namespace UnityEngine.InputSystem
         /// <param name="right">The second property.</param>
         /// <returns>True if the two action properties are not equivalent.</returns>
         /// <seealso cref="Equals(InputActionProperty)"/>
-        public static bool operator!=(InputActionProperty left, InputActionProperty right)
+        public static bool operator !=(InputActionProperty left, InputActionProperty right)
         {
             return !left.Equals(right);
         }
 
-        [SerializeField] private bool m_UseReference;
-        [SerializeField] private InputAction m_Action;
-        [SerializeField] private InputActionReference m_Reference;
+        [SerializeField]
+        private bool m_UseReference;
+
+        [SerializeField]
+        private InputAction m_Action;
+
+        [SerializeField]
+        private InputActionReference m_Reference;
     }
 }

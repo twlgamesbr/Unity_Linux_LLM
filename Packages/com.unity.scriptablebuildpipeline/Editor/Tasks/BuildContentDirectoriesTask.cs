@@ -25,7 +25,9 @@ namespace UnityEditor.Build.Pipeline.Tasks
             var parameters = m_Parameters.GetContentDirectoryParameters();
             var report = BuildPipeline.BuildContentDirectory(parameters);
             m_BuildReportContext = new BuildReportContext(report);
-            return report.summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded ? ReturnCode.Success : ReturnCode.Error;
+            return report.summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded
+                ? ReturnCode.Success
+                : ReturnCode.Error;
         }
     }
 }

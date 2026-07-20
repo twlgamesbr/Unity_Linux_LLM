@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -15,10 +14,12 @@ namespace UnityEngine.Rendering
     public class RenderPipelineGraphicsSettingsContainer : ISerializationCallbackReceiver
     {
 #if UNITY_EDITOR
-        [SerializeField] private RenderPipelineGraphicsSettingsCollection m_SettingsList = new();
+        [SerializeField]
+        private RenderPipelineGraphicsSettingsCollection m_SettingsList = new();
 #endif
 
-        [SerializeField, HideInInspector] private RenderPipelineGraphicsSettingsCollection m_RuntimeSettings = new();
+        [SerializeField, HideInInspector]
+        private RenderPipelineGraphicsSettingsCollection m_RuntimeSettings = new();
 
         /// <summary>
         /// Returns one list for editor and another for runtime
@@ -40,7 +41,10 @@ namespace UnityEngine.Rendering
 #if UNITY_EDITOR
             m_RuntimeSettings.settingsList.Clear();
             if (BuildPipeline.isBuildingPlayer) // Same behaviour as transfer.IsSerializingForGameRelease
-                RenderPipelineGraphicsSettingsStripper.PerformStripping(m_SettingsList.settingsList, m_RuntimeSettings.settingsList);
+                RenderPipelineGraphicsSettingsStripper.PerformStripping(
+                    m_SettingsList.settingsList,
+                    m_RuntimeSettings.settingsList
+                );
 #endif
         }
 

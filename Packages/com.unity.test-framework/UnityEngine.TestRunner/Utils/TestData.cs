@@ -24,9 +24,7 @@ namespace UnityEngine.TestTools
             var testList = TestList ?? Enumerable.Empty<ITest>();
             var testNames = testList.Select(t => t?.FullName ?? "null").ToList();
 
-            var testListString = testNames.Count == 0
-                ? "(empty)"
-                : string.Join("\n\t\t- ", testNames);
+            var testListString = testNames.Count == 0 ? "(empty)" : string.Join("\n\t\t- ", testNames);
 
             return $"TestData:\n\tTestMode: {TestMode}\n\tTestPlatform: {TestPlatform}\n\tTestList ({testNames.Count}):{(testNames.Count == 0 ? " (empty)" : $"\n\t\t- {testListString}")}";
         }

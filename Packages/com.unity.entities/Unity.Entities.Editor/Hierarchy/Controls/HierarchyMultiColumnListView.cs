@@ -29,10 +29,7 @@ namespace Unity.Entities.Editor
             fixedItemHeight = 16;
 
             // The name column acts as the primary column. This drives the expand and collapse toggle.
-            m_NameColumn = new HierarchyNameColumn(model, contextMenu)
-            {
-                OnMakeCell = e => OnMakeItem?.Invoke(e)
-            };
+            m_NameColumn = new HierarchyNameColumn(model, contextMenu) { OnMakeCell = e => OnMakeItem?.Invoke(e) };
 
             columns.Add(m_NameColumn);
 
@@ -57,7 +54,8 @@ namespace Unity.Entities.Editor
             return m_NameColumn.GetItem(handle);
         }
 
-        protected override CollectionViewController CreateViewController() => new HierarchyMultiColumnListViewController(m_Model, columns, sortColumnDescriptions, m_SortedColumns);
+        protected override CollectionViewController CreateViewController() =>
+            new HierarchyMultiColumnListViewController(m_Model, columns, sortColumnDescriptions, m_SortedColumns);
     }
 
     class HierarchyNameColumn : Column
@@ -164,9 +162,7 @@ namespace Unity.Entities.Editor
             return new VisualElement();
         }
 
-        void DestroyHeader(VisualElement element)
-        {
-        }
+        void DestroyHeader(VisualElement element) { }
 
         VisualElement MakeCell()
         {
@@ -184,7 +180,7 @@ namespace Unity.Entities.Editor
 
         void BindCell(VisualElement element, int index)
         {
-            if (m_Model.World is {IsCreated: false})
+            if (m_Model.World is { IsCreated: false })
                 return;
 
             if (element is not HierarchyListViewItem item)
@@ -222,7 +218,6 @@ namespace Unity.Entities.Editor
             if (null != m_Decorators)
                 foreach (var decorator in m_Decorators)
                     decorator.OnDestroyItem(item);
-
 
             m_Items.Remove(item);
             item.UnregisterEventListeners();

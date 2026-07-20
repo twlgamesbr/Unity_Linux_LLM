@@ -15,19 +15,20 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
     {
         internal ITestJobDataHolder testJobDataHolder = TestJobDataHolder.instance;
 
-        internal Action<EditorApplication.CallbackFunction> SubscribeCallback =
-            callback => EditorApplication.update += callback;
+        internal Action<EditorApplication.CallbackFunction> SubscribeCallback = callback =>
+            EditorApplication.update += callback;
 
         // ReSharper disable once DelegateSubtraction
-        internal Action<EditorApplication.CallbackFunction> UnsubscribeCallback =
-            callback => EditorApplication.update -= callback;
+        internal Action<EditorApplication.CallbackFunction> UnsubscribeCallback = callback =>
+            EditorApplication.update -= callback;
 
         internal TestCommandPcHelper PcHelper = new EditModePcHelper();
         internal Func<ExecutionSettings, IEnumerable<TestTaskBase>> GetTasks = TaskList.GetTaskList;
         internal Action<Exception> LogException = Debug.LogException;
         internal Action<string> LogError = Debug.LogError;
         internal Action<string> ReportRunFailed = CallbacksDelegator.instance.RunFailed;
-        internal Func<TestRunnerApi.RunProgressChangedEvent> RunProgressChanged = () => TestRunnerApi.runProgressChanged;
+        internal Func<TestRunnerApi.RunProgressChangedEvent> RunProgressChanged = () =>
+            TestRunnerApi.runProgressChanged;
 
         private TestJobData m_JobData;
         private IEnumerator m_Enumerator;
@@ -42,8 +43,10 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
 
             if (data.taskInfoStack == null)
             {
-                throw new ArgumentException($"{nameof(data.taskInfoStack)} on {nameof(TestJobData)} is null.",
-                    nameof(data));
+                throw new ArgumentException(
+                    $"{nameof(data.taskInfoStack)} on {nameof(TestJobData)} is null.",
+                    nameof(data)
+                );
             }
 
             if (IsRunningJob())
@@ -70,12 +73,14 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
                 var taskInfoBeforeResuming = m_JobData.taskInfoStack.Peek();
                 if (taskInfoBeforeResuming.taskMode != TaskMode.Resume)
                 {
-                    m_JobData.taskInfoStack.Push(new TaskInfo
-                    {
-                        taskMode = TaskMode.Resume,
-                        index = 0,
-                        stopBeforeIndex = taskInfoBeforeResuming.index + (taskInfoBeforeResuming.pc > 0 ? 1 : 0)
-                    });
+                    m_JobData.taskInfoStack.Push(
+                        new TaskInfo
+                        {
+                            taskMode = TaskMode.Resume,
+                            index = 0,
+                            stopBeforeIndex = taskInfoBeforeResuming.index + (taskInfoBeforeResuming.pc > 0 ? 1 : 0),
+                        }
+                    );
                 }
                 else
                 {
@@ -138,7 +143,8 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
                     var taskInfo = m_JobData.taskInfoStack.Peek();
                     var taskName = taskInfo != null ? m_JobData.Tasks[taskInfo.index].GetType().Name : "null";
                     Debug.LogError(
-                        $"Too many instant steps in test execution mode: {taskInfo?.taskMode}. Current task {taskName}.");
+                        $"Too many instant steps in test execution mode: {taskInfo?.taskMode}. Current task {taskName}."
+                    );
                     StopRun();
                     return;
                 }
@@ -161,8 +167,10 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
 
                     if (m_Enumerator == null)
                     {
-                        if (taskInfo.index >= m_JobData.Tasks.Length || (taskInfo.stopBeforeIndex > 0 &&
-                                                                         taskInfo.index >= taskInfo.stopBeforeIndex))
+                        if (
+                            taskInfo.index >= m_JobData.Tasks.Length
+                            || (taskInfo.stopBeforeIndex > 0 && taskInfo.index >= taskInfo.stopBeforeIndex)
+                        )
                         {
                             m_JobData.taskInfoStack.Pop();
                             return;
@@ -242,19 +250,18 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
 
         public bool CancelRun()
         {
-            if (m_JobData == null || m_JobData.taskInfoStack.Count == 0 ||
-                m_JobData.taskInfoStack.Peek().taskMode == TaskMode.Canceled)
+            if (
+                m_JobData == null
+                || m_JobData.taskInfoStack.Count == 0
+                || m_JobData.taskInfoStack.Peek().taskMode == TaskMode.Canceled
+            )
             {
                 return false;
             }
 
             var lastIndex = m_JobData.taskInfoStack.Last().index;
             m_JobData.taskInfoStack.Clear();
-            m_JobData.taskInfoStack.Push(new TaskInfo
-            {
-                index = lastIndex,
-                taskMode = TaskMode.Canceled
-            });
+            m_JobData.taskInfoStack.Push(new TaskInfo { index = lastIndex, taskMode = TaskMode.Canceled });
             m_Enumerator = null;
             return true;
         }
@@ -311,15 +318,18 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
 
         private void ReportRunProgress(bool runHasFinished)
         {
-            RunProgressChanged().Invoke(new TestRunProgress
-            {
-                CurrentStageName = m_JobData.runProgress.stageName ?? "",
-                CurrentStepName = m_JobData.runProgress.stepName ?? "",
-                Progress = m_JobData.runProgress.progress,
-                ExecutionSettings = m_JobData.executionSettings,
-                RunGuid = m_JobData.guid ?? "",
-                HasFinished = runHasFinished,
-            });
+            RunProgressChanged()
+                .Invoke(
+                    new TestRunProgress
+                    {
+                        CurrentStageName = m_JobData.runProgress.stageName ?? "",
+                        CurrentStepName = m_JobData.runProgress.stepName ?? "",
+                        Progress = m_JobData.runProgress.progress,
+                        ExecutionSettings = m_JobData.executionSettings,
+                        RunGuid = m_JobData.guid ?? "",
+                        HasFinished = runHasFinished,
+                    }
+                );
         }
 
         private void MarkJobAsError()

@@ -1,7 +1,7 @@
-using UnityEngine;
 using UnityEditor;
-using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -17,29 +17,35 @@ namespace EditorAttributes.Editor
 
             Label prefixLabel = new()
             {
-                style = {
+                style =
+                {
                     fontSize = 12,
                     maxWidth = 200f,
                     marginRight = prefixAttribute.Offset,
                     unityTextAlign = TextAnchor.MiddleRight,
                     alignSelf = Align.FlexEnd,
-                    overflow = Overflow.Hidden
-                }
+                    overflow = Overflow.Hidden,
+                },
             };
 
             prefixLabel.style.color = CanApplyGlobalColor ? EditorExtension.GLOBAL_COLOR : Color.gray;
 
-            propertyField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var field = propertyField.Q<Label>();
-                field.Add(prefixLabel);
-            });
+            propertyField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    var field = propertyField.Q<Label>();
+                    field.Add(prefixLabel);
+                }
+            );
 
-            UpdateVisualElement(prefixLabel, () =>
-            {
-                prefixLabel.text = GetDynamicString(prefixAttribute.Prefix, property, prefixAttribute, errorBox);
-                DisplayErrorBox(propertyField, errorBox);
-            });
+            UpdateVisualElement(
+                prefixLabel,
+                () =>
+                {
+                    prefixLabel.text = GetDynamicString(prefixAttribute.Prefix, property, prefixAttribute, errorBox);
+                    DisplayErrorBox(propertyField, errorBox);
+                }
+            );
 
             return propertyField;
         }

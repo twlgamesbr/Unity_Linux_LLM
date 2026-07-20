@@ -6,7 +6,9 @@ namespace Unity.Editor.Bridge
     {
         public static void NavigateBack()
         {
-            StageNavigationManager.instance.NavigateBack(StageNavigationManager.Analytics.ChangeType.NavigateBackViaHierarchyHeaderLeftArrow);
+            StageNavigationManager.instance.NavigateBack(
+                StageNavigationManager.Analytics.ChangeType.NavigateBackViaHierarchyHeaderLeftArrow
+            );
         }
     }
 }

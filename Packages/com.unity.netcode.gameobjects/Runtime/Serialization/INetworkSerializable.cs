@@ -13,6 +13,7 @@ namespace Unity.Netcode
         /// Either BufferSerializerReader or BufferSerializerWriter, depending whether the serializer
         /// is in read mode or write mode.
         /// </typeparam>
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter;
     }
 }

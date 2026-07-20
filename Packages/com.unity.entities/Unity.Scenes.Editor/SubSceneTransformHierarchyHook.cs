@@ -14,8 +14,10 @@ namespace Unity.Scenes.Editor
         {
             SceneHierarchyHooks.provideSubScenes = ProvideSubScenes;
             SceneHierarchyHooks.provideSubSceneName = ProvideSubSceneName;
-            SceneHierarchyHooks.addItemsToGameObjectContextMenu += SubSceneContextMenu.AddExtraGameObjectContextMenuItems;
-            SceneHierarchyHooks.addItemsToSceneHeaderContextMenu += SubSceneContextMenu.AddExtraSceneHeaderContextMenuItems;
+            SceneHierarchyHooks.addItemsToGameObjectContextMenu +=
+                SubSceneContextMenu.AddExtraGameObjectContextMenuItems;
+            SceneHierarchyHooks.addItemsToSceneHeaderContextMenu +=
+                SubSceneContextMenu.AddExtraSceneHeaderContextMenuItems;
             SceneHierarchyHooks.addItemsToCreateMenu += SubSceneContextMenu.AddExtraItemsToCreateDropdown;
             EditorApplication.hierarchyWindowItemByEntityIdOnGUI += HierarchyOverlay.HierarchyWindowItemOnGUI;
         }
@@ -42,7 +44,8 @@ namespace Unity.Scenes.Editor
             foreach (var subScene in SubScene.AllSubScenes)
             {
                 var isSubSceneInMainStage = subScene.IsInMainStage();
-                var duplicateSceneAsset = subScene.SceneAsset != null && isSubSceneInMainStage && !sceneAssets.Add(subScene.SceneAsset);
+                var duplicateSceneAsset =
+                    subScene.SceneAsset != null && isSubSceneInMainStage && !sceneAssets.Add(subScene.SceneAsset);
                 var transform = subScene.transform;
                 if (duplicateSceneAsset)
                 {

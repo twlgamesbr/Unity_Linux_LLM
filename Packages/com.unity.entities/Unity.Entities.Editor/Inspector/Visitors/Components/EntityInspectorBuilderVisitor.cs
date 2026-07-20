@@ -29,8 +29,10 @@ namespace Unity.Entities.Editor
                 }
                 case ComponentPropertyType.Buffer:
                 {
-                    if (PropertyBag.TryGetPropertyBagForValue(ref value, out var valuePropertyBag)
-                        && valuePropertyBag is IListPropertyAccept<TValue> accept)
+                    if (
+                        PropertyBag.TryGetPropertyBagForValue(ref value, out var valuePropertyBag)
+                        && valuePropertyBag is IListPropertyAccept<TValue> accept
+                    )
                     {
                         // Revisit as a list
                         accept.Accept(this, property, ref container, ref value);
@@ -46,7 +48,11 @@ namespace Unity.Entities.Editor
             }
         }
 
-        void IListPropertyVisitor.Visit<TContainer, TList, TElement>(Property<TContainer, TList> property, ref TContainer container, ref TList list)
+        void IListPropertyVisitor.Visit<TContainer, TList, TElement>(
+            Property<TContainer, TList> property,
+            ref TContainer container,
+            ref TList list
+        )
         {
             if (property is not IComponentProperty { Type: ComponentPropertyType.Buffer } componentProperty)
                 return;

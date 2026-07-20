@@ -1,17 +1,20 @@
 using System;
-using UnityEngine;
-using UnityEditor;
 using System.IO;
+using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 internal static class URP2DConverterUtility
 {
-
     private static class Styles
     {
-        public static readonly GUIContent failedToInstallPackageTitle = EditorGUIUtility.TrTextContent("Installation Failed");
-        public static readonly GUIContent failedToInstallPackageContent = EditorGUIUtility.TrTextContent("Failed to install {0} package.\nErrorCode: {1}\nMessage: {2}");
+        public static readonly GUIContent failedToInstallPackageTitle = EditorGUIUtility.TrTextContent(
+            "Installation Failed"
+        );
+        public static readonly GUIContent failedToInstallPackageContent = EditorGUIUtility.TrTextContent(
+            "Failed to install {0} package.\nErrorCode: {1}\nMessage: {2}"
+        );
         public static readonly GUIContent okText = EditorGUIUtility.TrTextContent("OK");
     }
 
@@ -23,7 +26,12 @@ internal static class URP2DConverterUtility
 
         if (addRequest.Status == UnityEditor.PackageManager.StatusCode.Failure)
         {
-            var message = System.String.Format(Styles.failedToInstallPackageContent.text, package, addRequest.Error.errorCode, addRequest.Error.message);
+            var message = System.String.Format(
+                Styles.failedToInstallPackageContent.text,
+                package,
+                addRequest.Error.errorCode,
+                addRequest.Error.message
+            );
             EditorUtility.DisplayDialog(Styles.failedToInstallPackageTitle.text, message, Styles.okText.text);
         }
         UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
@@ -41,7 +49,6 @@ internal static class URP2DConverterUtility
         return path.EndsWith(".psb") || path.EndsWith(".psd");
     }
 
-
     public static bool IsMaterialPath(string path, string[] ids)
     {
         if (string.IsNullOrEmpty(path))
@@ -54,7 +61,6 @@ internal static class URP2DConverterUtility
         {
             return URP2DConverterUtility.DoesFileContainString(path, ids);
         }
-            
 
         return false;
     }
@@ -67,7 +73,10 @@ internal static class URP2DConverterUtility
         if (path.StartsWith("Packages"))
             return false;
 
-        if (path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase))
+        if (
+            path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase)
+            || path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase)
+        )
             return URP2DConverterUtility.DoesFileContainString(path, ids);
 
         return false;

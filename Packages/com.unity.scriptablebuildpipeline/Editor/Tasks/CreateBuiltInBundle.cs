@@ -15,8 +15,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class CreateBuiltInBundle : IBuildTask
     {
         static readonly GUID k_BuiltInGuid = new GUID(CommonStrings.UnityBuiltInExtraGuid);
+
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -29,7 +33,7 @@ namespace UnityEditor.Build.Pipeline.Tasks
         /// <summary>
         /// Stores the name for the built-in bundle.
         /// </summary>
-        public string BuiltInBundleName {get; set; }
+        public string BuiltInBundleName { get; set; }
 
         /// <summary>
         /// Create the built-in bundle.

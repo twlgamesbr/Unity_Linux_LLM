@@ -18,7 +18,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
     {
         public BLASPositionsPool(ComputeShader copyPositionsShader, ComputeShader copyShader)
         {
-            m_VerticesBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, intialVertexCount * VertexSizeInDwords, 4);
+            m_VerticesBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                intialVertexCount * VertexSizeInDwords,
+                4
+            );
             m_VerticesAllocator = new BlockAllocator();
             m_VerticesAllocator.Initialize(intialVertexCount);
 
@@ -35,12 +39,19 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         public const int VertexSizeInDwords = 3;
 
-        public GraphicsBuffer VertexBuffer { get { return m_VerticesBuffer; } }
+        public GraphicsBuffer VertexBuffer
+        {
+            get { return m_VerticesBuffer; }
+        }
 
         public void Clear()
         {
             m_VerticesBuffer.Dispose();
-            m_VerticesBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, intialVertexCount * VertexSizeInDwords, 4);
+            m_VerticesBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                intialVertexCount * VertexSizeInDwords,
+                4
+            );
             m_VerticesAllocator.Dispose();
             m_VerticesAllocator = new BlockAllocator();
             m_VerticesAllocator.Initialize(intialVertexCount);
@@ -62,15 +73,44 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             {
                 int oldCapacity = m_VerticesAllocator.capacity;
                 // Capping capacity to 2,147,483,647 vertices because m_VerticesAllocator is using NativeList which has int max capacity
-                int maxCapacity = (int)math.min((long)Int32.MaxValue, GraphicsHelpers.MaxGraphicsBufferSizeInBytes / (long)UnsafeUtility.SizeOf<float3>());
+                int maxCapacity = (int)
+                    math.min(
+                        (long)Int32.MaxValue,
+                        GraphicsHelpers.MaxGraphicsBufferSizeInBytes / (long)UnsafeUtility.SizeOf<float3>()
+                    );
 
-                if (!m_VerticesAllocator.GetExpectedGrowthToFitAllocation((int)info.vertexCount, maxCapacity, out int newCapacity))
-                    throw new UnifiedRayTracingException($"VerticesAllocator can't grow to {maxCapacity } elements", UnifiedRayTracingError.GraphicsBufferAllocationFailed);
+                if (
+                    !m_VerticesAllocator.GetExpectedGrowthToFitAllocation(
+                        (int)info.vertexCount,
+                        maxCapacity,
+                        out int newCapacity
+                    )
+                )
+                    throw new UnifiedRayTracingException(
+                        $"VerticesAllocator can't grow to {maxCapacity} elements",
+                        UnifiedRayTracingError.GraphicsBufferAllocationFailed
+                    );
 
-                if (!GraphicsHelpers.ReallocateBuffer(m_CopyShader, oldCapacity, newCapacity, UnsafeUtility.SizeOf<float3>(), ref m_VerticesBuffer))
-                    throw new UnifiedRayTracingException($"Failed to allocate buffer of size: {newCapacity * UnsafeUtility.SizeOf<float3>()} bytes", UnifiedRayTracingError.GraphicsBufferAllocationFailed);
+                if (
+                    !GraphicsHelpers.ReallocateBuffer(
+                        m_CopyShader,
+                        oldCapacity,
+                        newCapacity,
+                        UnsafeUtility.SizeOf<float3>(),
+                        ref m_VerticesBuffer
+                    )
+                )
+                    throw new UnifiedRayTracingException(
+                        $"Failed to allocate buffer of size: {newCapacity * UnsafeUtility.SizeOf<float3>()} bytes",
+                        UnifiedRayTracingError.GraphicsBufferAllocationFailed
+                    );
 
-                verticesAllocation = m_VerticesAllocator.GrowAndAllocate((int)info.vertexCount, maxCapacity, out oldCapacity, out newCapacity);
+                verticesAllocation = m_VerticesAllocator.GrowAndAllocate(
+                    (int)info.vertexCount,
+                    maxCapacity,
+                    out oldCapacity,
+                    out newCapacity
+                );
                 Debug.Assert(verticesAllocation.valid);
             }
 
@@ -79,10 +119,25 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             cmd.SetComputeIntParam(m_CopyPositionsShader, "_InputPosBufferOffset", info.verticesStartOffset);
             cmd.SetComputeIntParam(m_CopyPositionsShader, "_InputBaseVertex", info.baseVertex);
             cmd.SetComputeIntParam(m_CopyPositionsShader, "_InputPosBufferStride", (int)info.vertexStride);
-            cmd.SetComputeIntParam(m_CopyPositionsShader, "_OutputPosBufferOffset", verticesAllocation.block.offset * VertexSizeInDwords);
+            cmd.SetComputeIntParam(
+                m_CopyPositionsShader,
+                "_OutputPosBufferOffset",
+                verticesAllocation.block.offset * VertexSizeInDwords
+            );
             cmd.SetComputeBufferParam(m_CopyPositionsShader, m_CopyVerticesKernel, "_InputPosBuffer", info.vertices);
-            cmd.SetComputeBufferParam(m_CopyPositionsShader, m_CopyVerticesKernel, "_OutputPosBuffer", m_VerticesBuffer);
-            cmd.DispatchCompute(m_CopyPositionsShader, m_CopyVerticesKernel, (int)Common.CeilDivide(info.vertexCount, kItemsPerWorkgroup), 1, 1);
+            cmd.SetComputeBufferParam(
+                m_CopyPositionsShader,
+                m_CopyVerticesKernel,
+                "_OutputPosBuffer",
+                m_VerticesBuffer
+            );
+            cmd.DispatchCompute(
+                m_CopyPositionsShader,
+                m_CopyVerticesKernel,
+                (int)Common.CeilDivide(info.vertexCount, kItemsPerWorkgroup),
+                1,
+                1
+            );
 
             Graphics.ExecuteCommandBuffer(cmd);
         }
@@ -95,5 +150,3 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
     }
 }
-
-

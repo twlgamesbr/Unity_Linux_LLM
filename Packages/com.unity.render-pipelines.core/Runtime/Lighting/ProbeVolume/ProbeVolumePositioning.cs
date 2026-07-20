@@ -47,7 +47,9 @@ namespace UnityEngine.Rendering
             point -= obb.corner;
             point = new Vector3(Vector3.Dot(point, obb.X), Vector3.Dot(point, obb.Y), Vector3.Dot(point, obb.Z));
 
-            return (0.0f < point.x && point.x < lenX2) && (0.0f < point.y && point.y < lenY2) && (0.0f < point.z && point.z < lenZ2);
+            return (0.0f < point.x && point.x < lenX2)
+                && (0.0f < point.y && point.y < lenY2)
+                && (0.0f < point.z && point.z < lenZ2);
         }
 
         // Test between a OBB and an AABB. The AABB of the OBB is requested to avoid recalculating it
@@ -58,7 +60,8 @@ namespace UnityEngine.Rendering
                 return false;
 
             // Perform complex OBB test
-            Vector3 boundsMin = b.min, boundsMax = b.max;
+            Vector3 boundsMin = b.min,
+                boundsMax = b.max;
             m_AABBCorners[0] = new Vector3(boundsMin.x, boundsMin.y, boundsMin.z);
             m_AABBCorners[1] = new Vector3(boundsMax.x, boundsMin.y, boundsMin.z);
             m_AABBCorners[2] = new Vector3(boundsMax.x, boundsMax.y, boundsMin.z);

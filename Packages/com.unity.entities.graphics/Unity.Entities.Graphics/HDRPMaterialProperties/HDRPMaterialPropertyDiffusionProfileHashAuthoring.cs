@@ -3,13 +3,19 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_DiffusionProfileHash" )]
-    public struct HDRPMaterialPropertyDiffusionProfileHash : IComponentData { public float  Value; }
+    [MaterialProperty("_DiffusionProfileHash")]
+    public struct HDRPMaterialPropertyDiffusionProfileHash : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyDiffusionProfileHashAuthoring : UnityEngine.MonoBehaviour
     {
-        [RegisterBinding(typeof(HDRPMaterialPropertyDiffusionProfileHash), nameof(HDRPMaterialPropertyDiffusionProfileHash.Value))]
+        [RegisterBinding(
+            typeof(HDRPMaterialPropertyDiffusionProfileHash),
+            nameof(HDRPMaterialPropertyDiffusionProfileHash.Value)
+        )]
         public float Value;
 
         class HDRPMaterialPropertyDiffusionProfileHashBaker : Baker<HDRPMaterialPropertyDiffusionProfileHashAuthoring>

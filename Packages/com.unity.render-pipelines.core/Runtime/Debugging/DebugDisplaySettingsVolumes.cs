@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -53,7 +52,8 @@ namespace UnityEngine.Rendering
         }
 
         /// <summary>List of Volume component types.</summary>
-        public List<(string, Type)> volumeComponentsPathAndType => VolumeManager.instance.GetVolumeComponentsForDisplay(GraphicsSettings.currentRenderPipelineAssetType);
+        public List<(string, Type)> volumeComponentsPathAndType =>
+            VolumeManager.instance.GetVolumeComponentsForDisplay(GraphicsSettings.currentRenderPipelineAssetType);
 
         private Camera m_SelectedCamera;
 
@@ -79,15 +79,18 @@ namespace UnityEngine.Rendering
 
         VolumeComponent m_VolumeInterpolatedResults;
         private bool m_StoreStackInterpolatedValues;
-        private ObservableList<Volume> m_InfluenceVolumes = new ();
-        private List<(Volume volume, float weight)> m_VolumesWeights = new ();
+        private ObservableList<Volume> m_InfluenceVolumes = new();
+        private List<(Volume volume, float weight)> m_VolumesWeights = new();
 
         private void ClearInterpolationData()
         {
             m_VolumesWeights.Clear();
         }
 
-        static bool AreVolumesChanged(ObservableList<Volume> influenceVolumes, List<(Volume volume, float weight)> volumesWeights)
+        static bool AreVolumesChanged(
+            ObservableList<Volume> influenceVolumes,
+            List<(Volume volume, float weight)> volumesWeights
+        )
         {
             // First, check if the lists have the same number of elements
             if (influenceVolumes.Count != volumesWeights.Count)
@@ -174,7 +177,6 @@ namespace UnityEngine.Rendering
             return m_InfluenceVolumes;
         }
 
-
         void IDebugDisplaySettingsData.Reset()
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -217,7 +219,8 @@ namespace UnityEngine.Rendering
             get
             {
                 if (m_VolumeInterpolatedResults == null)
-                    m_VolumeInterpolatedResults = ScriptableObject.CreateInstance(selectedComponentType) as VolumeComponent;
+                    m_VolumeInterpolatedResults =
+                        ScriptableObject.CreateInstance(selectedComponentType) as VolumeComponent;
 
                 return m_VolumeInterpolatedResults;
             }
@@ -240,7 +243,11 @@ namespace UnityEngine.Rendering
                 return Strings.none + $" ({propertyType.Name})";
 
             var toString = propertyType.GetMethod("ToString", Type.EmptyTypes);
-            if ((toString == null) || (toString.DeclaringType == typeof(object)) || (toString.DeclaringType == typeof(Object)))
+            if (
+                (toString == null)
+                || (toString.DeclaringType == typeof(object))
+                || (toString.DeclaringType == typeof(Object))
+            )
             {
                 // Check if the parameter has a name
                 var nameProp = property.PropertyType.GetProperty("name");
@@ -261,7 +268,8 @@ namespace UnityEngine.Rendering
 
         static class Strings
         {
-            public static readonly string cameraNeedsRendering = "Values might not be fully updated if the camera you are inspecting is not rendered.";
+            public static readonly string cameraNeedsRendering =
+                "Values might not be fully updated if the camera you are inspecting is not rendered.";
             public static readonly string none = "None";
             public static readonly string parameter = "Parameter";
             public static readonly string component = "Component";
@@ -270,11 +278,14 @@ namespace UnityEngine.Rendering
             public static readonly string gameObject = "GameObject";
             public static readonly string priority = "Priority";
             public static readonly string resultValue = "Result";
-            public static readonly string resultValueTooltip = "The interpolated result value of the parameter. This value is used to render the camera.";
+            public static readonly string resultValueTooltip =
+                "The interpolated result value of the parameter. This value is used to render the camera.";
             public static readonly string globalDefaultValue = "Graphics Settings";
-            public static readonly string globalDefaultValueTooltip = "Default value for this parameter, defined by the Default Volume Profile in Global Settings.";
+            public static readonly string globalDefaultValueTooltip =
+                "Default value for this parameter, defined by the Default Volume Profile in Global Settings.";
             public static readonly string qualityLevelValue = "Quality Settings";
-            public static readonly string qualityLevelValueTooltip = "Override value for this parameter, defined by the Volume Profile in the current SRP Asset.";
+            public static readonly string qualityLevelValueTooltip =
+                "Override value for this parameter, defined by the Volume Profile in the current SRP Asset.";
             public static readonly string global = "Global";
             public static readonly string local = "Local";
             public static readonly string volumeProfile = "Volume Profile";
@@ -294,9 +305,11 @@ namespace UnityEngine.Rendering
             DebugManager.instance.RequestEditorWindowPanel(k_PanelTitle);
 
             // Try to select the given volume component in the component selector drop down
-            if (volumeComponent != null &&
-                VolumeManager.instance.TryGetVolumePathAndType(volumeComponent.GetType(), out var result) &&
-                panel.TryFindChild<DebugUI.EnumField>(Strings.component, out var componentSelector))
+            if (
+                volumeComponent != null
+                && VolumeManager.instance.TryGetVolumePathAndType(volumeComponent.GetType(), out var result)
+                && panel.TryFindChild<DebugUI.EnumField>(Strings.component, out var componentSelector)
+            )
             {
                 int selectedIndex = -1;
                 for (int i = 0; i < componentSelector.enumNames.Length; ++i)
@@ -320,7 +333,10 @@ namespace UnityEngine.Rendering
 
         internal static class WidgetFactory
         {
-            public static DebugUI.EnumField CreateComponentSelector(SettingsPanel panel, Action<DebugUI.Field<int>, int> refresh)
+            public static DebugUI.EnumField CreateComponentSelector(
+                SettingsPanel panel,
+                Action<DebugUI.Field<int>, int> refresh
+            )
             {
                 int componentIndex = 0;
                 var componentNames = new List<GUIContent>() { Styles.none };
@@ -341,29 +357,37 @@ namespace UnityEngine.Rendering
                     enumNames = componentNames.ToArray(),
                     enumValues = componentValues.ToArray(),
                     getIndex = () => panel.data.volumeComponentEnumIndex,
-                    setIndex = value => { panel.data.volumeComponentEnumIndex = value; },
-                    onValueChanged = refresh
+                    setIndex = value =>
+                    {
+                        panel.data.volumeComponentEnumIndex = value;
+                    },
+                    onValueChanged = refresh,
                 };
             }
 
-            public static DebugUI.CameraSelector CreateCameraSelector(SettingsPanel panel, Action<DebugUI.Field<Object>, Object> refresh)
+            public static DebugUI.CameraSelector CreateCameraSelector(
+                SettingsPanel panel,
+                Action<DebugUI.Field<Object>, Object> refresh
+            )
             {
                 return new DebugUI.CameraSelector()
                 {
                     getter = () => panel.data.selectedCamera,
                     setter = value => panel.data.selectedCamera = value as Camera,
-                    onValueChanged = refresh
+                    onValueChanged = refresh,
                 };
             }
 
-            internal static DebugUI.Widget CreateVolumeParameterWidget(string name, bool isResultParameter, VolumeParameter param)
+            internal static DebugUI.Widget CreateVolumeParameterWidget(
+                string name,
+                bool isResultParameter,
+                VolumeParameter param
+            )
             {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (param != null)
                 {
-                    Func<bool> isHiddenCallback = isResultParameter ?
-                            () => false :
-                            () => !param.overrideState;
+                    Func<bool> isHiddenCallback = isResultParameter ? () => false : () => !param.overrideState;
                     var parameterType = param.GetType();
                     if (parameterType == typeof(ColorParameter))
                     {
@@ -376,10 +400,13 @@ namespace UnityEngine.Rendering
                             showPicker = false,
                             getter = () => p.value,
                             setter = value => p.value = value,
-                            isHiddenCallback = isHiddenCallback
+                            isHiddenCallback = isHiddenCallback,
                         };
                     }
-                    else if (parameterType.BaseType.IsGenericType && parameterType.BaseType.GetGenericArguments().Length > 0)
+                    else if (
+                        parameterType.BaseType.IsGenericType
+                        && parameterType.BaseType.GetGenericArguments().Length > 0
+                    )
                     {
                         // Get the generic type argument, e.g., <Texture> in VolumeParameter<Texture>
                         var genericArgument = parameterType.BaseType.GetGenericArguments()[0];
@@ -398,9 +425,8 @@ namespace UnityEngine.Rendering
 
                                     var value = property.GetValue(param);
                                     return value as Object;
-
                                 },
-                                isHiddenCallback = isHiddenCallback
+                                isHiddenCallback = isHiddenCallback,
                             };
                         }
                     }
@@ -416,7 +442,7 @@ namespace UnityEngine.Rendering
                             type = parameterType,
                             // Result column reads a pool-rented buffer whose tail is null-padded; hide it.
                             trimTrailingNulls = isResultParameter,
-                            isHiddenCallback = isHiddenCallback
+                            isHiddenCallback = isHiddenCallback,
                         };
                     }
 
@@ -424,11 +450,11 @@ namespace UnityEngine.Rendering
                     {
                         displayName = name,
                         getter = () => ExtractResult(param),
-                        isHiddenCallback = isHiddenCallback
+                        isHiddenCallback = isHiddenCallback,
                     };
                 }
-    #endif
-                return new DebugUI.Value() { displayName = name, getter = () => Strings.parameterNotCalculated, };
+#endif
+                return new DebugUI.Value() { displayName = name, getter = () => Strings.parameterNotCalculated };
             }
 
             static DebugUI.Value s_EmptyDebugUIValue = new DebugUI.Value { getter = () => string.Empty };
@@ -470,7 +496,7 @@ namespace UnityEngine.Rendering
                         name = Strings.resultValue,
                         tooltip = Strings.resultValueTooltip,
                     },
-                    volumeComponent = data.resultVolumeComponent
+                    volumeComponent = data.resultVolumeComponent,
                 };
 
                 chain.Add(result);
@@ -494,7 +520,7 @@ namespace UnityEngine.Rendering
                             },
                             volumeProfile = profile,
                             volumeComponent = overrideComponent,
-                            volume = volume
+                            volume = volume,
                         };
                         chain.Add(overrideVolume);
                     }
@@ -526,7 +552,10 @@ namespace UnityEngine.Rendering
                 // Add Quality Settings
                 if (VolumeManager.instance.qualityDefaultProfile != null)
                 {
-                    var qualitySettingsComponent = GetSelectedVolumeComponent(VolumeManager.instance.qualityDefaultProfile, selectedType);
+                    var qualitySettingsComponent = GetSelectedVolumeComponent(
+                        VolumeManager.instance.qualityDefaultProfile,
+                        selectedType
+                    );
                     if (qualitySettingsComponent != null)
                     {
                         var overrideVolume = new VolumeParameterChain()
@@ -546,7 +575,10 @@ namespace UnityEngine.Rendering
                 // Add Graphics Settings
                 if (VolumeManager.instance.globalDefaultProfile != null)
                 {
-                    var graphicsSettingsComponent = GetSelectedVolumeComponent(VolumeManager.instance.globalDefaultProfile, selectedType);
+                    var graphicsSettingsComponent = GetSelectedVolumeComponent(
+                        VolumeManager.instance.globalDefaultProfile,
+                        selectedType
+                    );
                     if (graphicsSettingsComponent != null)
                     {
                         var overrideVolume = new VolumeParameterChain()
@@ -572,7 +604,8 @@ namespace UnityEngine.Rendering
                 Func<bool> hiddenCallback = () =>
                 {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    VolumeManager.instance.renderingDebuggerAttached = data.selectedComponent > 0 && data.selectedCamera != null;
+                    VolumeManager.instance.renderingDebuggerAttached =
+                        data.selectedComponent > 0 && data.selectedCamera != null;
                     return !VolumeManager.instance.renderingDebuggerAttached;
 #else
                     return true;
@@ -596,7 +629,11 @@ namespace UnityEngine.Rendering
                 return table;
             }
 
-            private static void GenerateTableColumns(DebugUI.Table table, DebugDisplaySettingsVolume data, List<VolumeParameterChain> resolutionChain)
+            private static void GenerateTableColumns(
+                DebugUI.Table table,
+                DebugDisplaySettingsVolume data,
+                List<VolumeParameterChain> resolutionChain
+            )
             {
                 for (int i = 0; i < resolutionChain.Count; ++i)
                 {
@@ -605,41 +642,51 @@ namespace UnityEngine.Rendering
 
                     if (chain.volume != null)
                     {
-                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(new DebugUI.Value()
-                        {
-                            nameAndTooltip = chain.nameAndTooltip,
-                            getter = () =>
+                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(
+                            new DebugUI.Value()
                             {
-                                var scope = chain.volume.isGlobal ? Strings.global : Strings.local;
-                                var weight = data.GetVolumeWeight(chain.volume);
-                                if (chain.volumeComponent.active)
-                                    return $"{scope} ({(weight * 100f):F2}%)";
-                                else
-                                    return $"{scope} (disabled)";
-                            },
-                            refreshRate = 0.2f
-                        });
-                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(new DebugUI.ObjectField() { displayName = string.Empty, getter = () => chain.volume });
-                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(new DebugUI.Value()
-                        {
-                            nameAndTooltip = chain.nameAndTooltip,
-                            getter = () => chain.volume.priority
-                        });
+                                nameAndTooltip = chain.nameAndTooltip,
+                                getter = () =>
+                                {
+                                    var scope = chain.volume.isGlobal ? Strings.global : Strings.local;
+                                    var weight = data.GetVolumeWeight(chain.volume);
+                                    if (chain.volumeComponent.active)
+                                        return $"{scope} ({(weight * 100f):F2}%)";
+                                    else
+                                        return $"{scope} (disabled)";
+                                },
+                                refreshRate = 0.2f,
+                            }
+                        );
+                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(
+                            new DebugUI.ObjectField() { displayName = string.Empty, getter = () => chain.volume }
+                        );
+                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(
+                            new DebugUI.Value()
+                            {
+                                nameAndTooltip = chain.nameAndTooltip,
+                                getter = () => chain.volume.priority,
+                            }
+                        );
                     }
                     else
                     {
-                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(new DebugUI.Value()
-                        {
-                            nameAndTooltip = chain.nameAndTooltip,
-                            getter = () => string.Empty
-                        });
+                        ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(
+                            new DebugUI.Value() { nameAndTooltip = chain.nameAndTooltip, getter = () => string.Empty }
+                        );
                         ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(s_EmptyDebugUIValue);
                         ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(s_EmptyDebugUIValue);
                     }
 
-                    ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(chain.volumeProfile != null ?
-                        new DebugUI.ObjectField() { displayName = string.Empty, getter = () => chain.volumeProfile } :
-                        s_EmptyDebugUIValue);
+                    ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(
+                        chain.volumeProfile != null
+                            ? new DebugUI.ObjectField()
+                            {
+                                displayName = string.Empty,
+                                getter = () => chain.volumeProfile,
+                            }
+                            : s_EmptyDebugUIValue
+                    );
 
                     ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(s_EmptyDebugUIValue);
 
@@ -648,7 +695,8 @@ namespace UnityEngine.Rendering
                     {
                         var parameter = chain.volumeComponent.parameterList[j];
                         ((DebugUI.Table.Row)table.children[++iRowIndex]).children.Add(
-                            CreateVolumeParameterWidget(chain.nameAndTooltip.name, isResultParameter, parameter));
+                            CreateVolumeParameterWidget(chain.nameAndTooltip.name, isResultParameter, parameter)
+                        );
                     }
                 }
             }
@@ -666,7 +714,7 @@ namespace UnityEngine.Rendering
                 {
                     var parameter = results.parameterList[i];
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    string displayName = VolumeDebugData.GetVolumeParameterDebugId(parameter);// In the development player, just the debug id
+                    string displayName = VolumeDebugData.GetVolumeParameterDebugId(parameter); // In the development player, just the debug id
 #else
                     string displayName = i.ToString(); // Everywhere else, just a dummy id ( TODO: The Volume panel code should be stripped completely in nom-development builds )
 #endif
@@ -702,12 +750,14 @@ namespace UnityEngine.Rendering
                 AddWidget(componentSelector);
 
                 Func<bool> hiddenCallback = () => data.selectedCamera == null || data.selectedComponent <= 0;
-                AddWidget(new DebugUI.MessageBox()
-                {
-                    displayName = Strings.cameraNeedsRendering,
-                    style = DebugUI.MessageBox.Style.Warning,
-                    isHiddenCallback = hiddenCallback,
-                });
+                AddWidget(
+                    new DebugUI.MessageBox()
+                    {
+                        displayName = Strings.cameraNeedsRendering,
+                        style = DebugUI.MessageBox.Style.Warning,
+                        isHiddenCallback = hiddenCallback,
+                    }
+                );
                 m_VolumeTable = WidgetFactory.CreateVolumeTable(data);
                 AddWidget(m_VolumeTable);
                 data.GetVolumesList().ItemAdded += OnVolumeInfluenceChanged;
@@ -720,6 +770,7 @@ namespace UnityEngine.Rendering
             }
 
             DebugUI.Table m_VolumeTable = null;
+
             void Refresh()
             {
                 var panel = DebugManager.instance.GetPanel(PanelName);

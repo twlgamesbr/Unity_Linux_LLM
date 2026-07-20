@@ -43,9 +43,13 @@ namespace UnityEngine.Rendering
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             // Check user managed RTHandle wrapper is actually a wrapper around RTid
             if (rtWrapper.m_RT != null)
-                throw new ArgumentException($"Input wrapper must be a wrapper around RenderTargetIdentifier. Passed in wrapper contains valid RenderTexture {rtWrapper.m_RT.name} and cannot be used as wrapper.");
+                throw new ArgumentException(
+                    $"Input wrapper must be a wrapper around RenderTargetIdentifier. Passed in wrapper contains valid RenderTexture {rtWrapper.m_RT.name} and cannot be used as wrapper."
+                );
             if (rtWrapper.m_ExternalTexture != null)
-                throw new ArgumentException($"Input wrapper must be a wrapper around RenderTargetIdentifier. Passed in wrapper contains valid Texture {rtWrapper.m_ExternalTexture.name} and cannot be used as wrapper.");
+                throw new ArgumentException(
+                    $"Input wrapper must be a wrapper around RenderTargetIdentifier. Passed in wrapper contains valid Texture {rtWrapper.m_ExternalTexture.name} and cannot be used as wrapper."
+                );
 #endif
             rtWrapper.SetTexture(rtId);
         }
@@ -101,35 +105,59 @@ namespace UnityEngine.Rendering
         /// Returns true if the RTHandle uses automatic scaling.
         /// </summary>
         public bool useScaling { get; internal set; }
+
         /// <summary>
         /// Reference size of the RTHandle System associated with the RTHandle
         /// </summary>
         public Vector2Int referenceSize { get; internal set; }
+
         /// <summary>
         /// Current properties of the RTHandle System. If a custom property has been set through SetCustomHandleProperties method, it will be used that one instead.
         /// </summary>
-        public RTHandleProperties rtHandleProperties { get { return m_UseCustomHandleScales ? m_CustomHandleProperties : m_Owner.rtHandleProperties; } }
+        public RTHandleProperties rtHandleProperties
+        {
+            get { return m_UseCustomHandleScales ? m_CustomHandleProperties : m_Owner.rtHandleProperties; }
+        }
+
         /// <summary>
         /// RenderTexture associated with the RTHandle
         /// </summary>
-        public RenderTexture rt { get { return m_RT; } }
+        public RenderTexture rt
+        {
+            get { return m_RT; }
+        }
+
         /// <summary>
         /// Texture associated with the RTHandle when constructed from an external Texture or RenderTexture
         /// </summary>
-        public Texture externalTexture { get { return m_ExternalTexture; } }
+        public Texture externalTexture
+        {
+            get { return m_ExternalTexture; }
+        }
+
         /// <summary>
         /// RenderTargetIdentifier associated with the RTHandle
         /// </summary>
-        public RenderTargetIdentifier nameID { get { return m_NameID; } }
+        public RenderTargetIdentifier nameID
+        {
+            get { return m_NameID; }
+        }
+
         /// <summary>
         /// Name of the RTHandle
         /// </summary>
-        public string name { get { return m_Name; } }
+        public string name
+        {
+            get { return m_Name; }
+        }
 
         /// <summary>
         /// Returns true is MSAA is enabled, false otherwise.
         /// </summary>
-        public bool isMSAAEnabled { get { return m_EnableMSAA; } }
+        public bool isMSAAEnabled
+        {
+            get { return m_EnableMSAA; }
+        }
 
         // Keep constructor private
         internal RTHandle(RTHandleSystem owner)
@@ -173,7 +201,10 @@ namespace UnityEngine.Rendering
             if (handle == null)
                 return null;
 
-            Debug.Assert(handle.rt != null, "RTHandle was created using a regular Texture and is used as a RenderTexture");
+            Debug.Assert(
+                handle.rt != null,
+                "RTHandle was created using a regular Texture and is used as a RenderTexture"
+            );
             return handle.rt;
         }
 
@@ -294,8 +325,8 @@ namespace UnityEngine.Rendering
         /// <param name="residencyFraction">How much of the render target is to be switched into fast memory (between 0 and 1).</param>
         /// <param name="flags">Flag to determine what parts of the render target is spilled if not fully resident in fast memory.</param>
         /// <param name="copyContents">Whether the content of render target are copied or not when switching to fast memory.</param>
-
-        public void SwitchToFastMemory(CommandBuffer cmd,
+        public void SwitchToFastMemory(
+            CommandBuffer cmd,
             float residencyFraction = 1.0f,
             FastMemoryFlags flags = FastMemoryFlags.SpillTop,
             bool copyContents = false
@@ -311,7 +342,8 @@ namespace UnityEngine.Rendering
         /// <param name="cmd">Command buffer used for rendering.</param>
         /// <param name="residencyFraction">How much of the render target is to be switched into fast memory (between 0 and 1).</param>
         /// <param name="flags">Flag to determine what parts of the render target is spilled if not fully resident in fast memory.</param>
-        public void CopyToFastMemory(CommandBuffer cmd,
+        public void CopyToFastMemory(
+            CommandBuffer cmd,
             float residencyFraction = 1.0f,
             FastMemoryFlags flags = FastMemoryFlags.SpillTop
         )

@@ -61,17 +61,18 @@ namespace Unity.Physics
             WorldFromLocalTransform.Scale = 1.0f;
         }
 
-        public static QueryContext DefaultContext => new QueryContext
-        {
-            RigidBodyIndex = -1,
-            ColliderKey = ColliderKey.Empty,
-            Entity = Entity.Null,
-            NumColliderKeyBits = 0,
-            WorldFromLocalTransform = ScaledMTransform.Identity,
-            InvTargetScale = 1.0f,
-            IsInitialized = true,
-            IsFlipped = false
-        };
+        public static QueryContext DefaultContext =>
+            new QueryContext
+            {
+                RigidBodyIndex = -1,
+                ColliderKey = ColliderKey.Empty,
+                Entity = Entity.Null,
+                NumColliderKeyBits = 0,
+                WorldFromLocalTransform = ScaledMTransform.Identity,
+                InvTargetScale = 1.0f,
+                IsInitialized = true,
+                IsFlipped = false,
+            };
 
         public ColliderKey SetSubKey(uint childSubKeyNumOfBits, uint childSubKey)
         {
@@ -94,7 +95,8 @@ namespace Unity.Physics
     /// <summary>   Interface for collecting hits during a collision query. </summary>
     ///
     /// <typeparam name="T">    Generic type parameter. </typeparam>
-    public interface ICollector<T> where T : struct, IQueryResult
+    public interface ICollector<T>
+        where T : struct, IQueryResult
     {
         /// <summary>   Whether to exit the query as soon as any hit has been accepted. </summary>
         ///
@@ -127,7 +129,8 @@ namespace Unity.Physics
     /// <summary>   A collector which exits the query as soon as any hit is detected. </summary>
     ///
     /// <typeparam name="T">    Generic type parameter. </typeparam>
-    public struct AnyHitCollector<T> : ICollector<T> where T : struct, IQueryResult
+    public struct AnyHitCollector<T> : ICollector<T>
+        where T : struct, IQueryResult
     {
         /// <summary>   Gets a value indicating whether the early out on first hit. </summary>
         ///
@@ -171,7 +174,8 @@ namespace Unity.Physics
     /// <summary>   A collector which stores only the closest hit. </summary>
     ///
     /// <typeparam name="T">    Generic type parameter. </typeparam>
-    public struct ClosestHitCollector<T> : ICollector<T> where T : struct, IQueryResult
+    public struct ClosestHitCollector<T> : ICollector<T>
+        where T : struct, IQueryResult
     {
         /// <summary>   Gets a value indicating whether the early out on first hit. </summary>
         ///
@@ -227,7 +231,8 @@ namespace Unity.Physics
     /// <summary>   A collector which stores every hit. </summary>
     ///
     /// <typeparam name="T">    Generic type parameter. </typeparam>
-    public struct AllHitsCollector<T> : ICollector<T> where T : unmanaged, IQueryResult
+    public struct AllHitsCollector<T> : ICollector<T>
+        where T : unmanaged, IQueryResult
     {
         /// <summary>   Gets a value indicating whether the early out on first hit. </summary>
         ///
@@ -337,7 +342,12 @@ namespace Unity.Physics
         // This must be a void ptr, since C# doesn't allow generic type pointers
         private void* m_CollectorPtr;
 
-        public FlippedColliderCastQueryCollector(ref C collector, float3 castDirectionWS, ColliderKey targetColliderKey, Material targetMaterial)
+        public FlippedColliderCastQueryCollector(
+            ref C collector,
+            float3 castDirectionWS,
+            ColliderKey targetColliderKey,
+            Material targetMaterial
+        )
         {
             m_TargetColliderKey = targetColliderKey;
             m_TargetMaterial = targetMaterial;
@@ -383,7 +393,11 @@ namespace Unity.Physics
         // This must be a void ptr, since C# doesn't allow generic type pointers
         private void* m_CollectorPtr;
 
-        public FlippedColliderDistanceQueryCollector(ref C collector, ColliderKey targetColliderKey, Material targetMaterial)
+        public FlippedColliderDistanceQueryCollector(
+            ref C collector,
+            ColliderKey targetColliderKey,
+            Material targetMaterial
+        )
         {
             m_TargetColliderKey = targetColliderKey;
             m_TargetMaterial = targetMaterial;

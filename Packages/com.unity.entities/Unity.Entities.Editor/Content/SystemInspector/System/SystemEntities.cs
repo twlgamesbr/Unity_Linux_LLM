@@ -44,12 +44,13 @@ namespace Unity.Entities.Editor
 
                 for (var i = 0; i < m_LastEntityQueries.Length; i++)
                 {
-                    m_EntitiesFromQueries.Add(new QueryWithEntitiesViewData(m_World, m_LastEntityQueries[i], m_SystemProxy, i + 1));
+                    m_EntitiesFromQueries.Add(
+                        new QueryWithEntitiesViewData(m_World, m_LastEntityQueries[i], m_SystemProxy, i + 1)
+                    );
                 }
 
                 return m_EntitiesFromQueries;
             }
         }
-
     }
 }

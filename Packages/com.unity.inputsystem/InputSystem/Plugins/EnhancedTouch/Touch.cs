@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
 
 ////TODO: recorded times are baked *external* times; reset touch when coming out of play mode
@@ -151,7 +151,8 @@ namespace UnityEngine.InputSystem.EnhancedTouch
         /// Whether the touch is currently in progress, i.e. whether <see cref="phase"/> is either
         /// <see cref="TouchPhase.Moved"/>, <see cref="TouchPhase.Stationary"/>, or <see cref="TouchPhase.Began"/>.
         /// </summary>
-        public bool inProgress => phase == TouchPhase.Moved || phase == TouchPhase.Stationary || phase == TouchPhase.Began;
+        public bool inProgress =>
+            phase == TouchPhase.Moved || phase == TouchPhase.Stationary || phase == TouchPhase.Began;
 
         /// <summary>
         /// Whether the touch has ended this frame, i.e. whether <see cref="phase"/> is either
@@ -448,7 +449,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                 EnhancedTouchSupport.CheckEnabled();
                 // We lazily construct the array of active touches.
                 s_GlobalState.playerState.UpdateActiveTouches();
-                return new ReadOnlyArray<Touch>(s_GlobalState.playerState.activeTouches, 0, s_GlobalState.playerState.activeTouchCount);
+                return new ReadOnlyArray<Touch>(
+                    s_GlobalState.playerState.activeTouches,
+                    0,
+                    s_GlobalState.playerState.activeTouchCount
+                );
             }
         }
 
@@ -470,7 +475,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             get
             {
                 EnhancedTouchSupport.CheckEnabled();
-                return new ReadOnlyArray<Finger>(s_GlobalState.playerState.fingers, 0, s_GlobalState.playerState.totalFingerCount);
+                return new ReadOnlyArray<Finger>(
+                    s_GlobalState.playerState.fingers,
+                    0,
+                    s_GlobalState.playerState.totalFingerCount
+                );
             }
         }
 
@@ -488,7 +497,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                 EnhancedTouchSupport.CheckEnabled();
                 // We lazily construct the array of active fingers.
                 s_GlobalState.playerState.UpdateActiveFingers();
-                return new ReadOnlyArray<Finger>(s_GlobalState.playerState.activeFingers, 0, s_GlobalState.playerState.activeFingerCount);
+                return new ReadOnlyArray<Finger>(
+                    s_GlobalState.playerState.activeFingers,
+                    0,
+                    s_GlobalState.playerState.activeFingerCount
+                );
             }
         }
 
@@ -680,8 +693,16 @@ namespace UnityEngine.InputSystem.EnhancedTouch
         internal static void BeginUpdate()
         {
 #if UNITY_EDITOR
-            if ((InputState.currentUpdateType == InputUpdateType.Editor && s_GlobalState.playerState.updateMask != InputUpdateType.Editor) ||
-                (InputState.currentUpdateType != InputUpdateType.Editor && s_GlobalState.playerState.updateMask == InputUpdateType.Editor))
+            if (
+                (
+                    InputState.currentUpdateType == InputUpdateType.Editor
+                    && s_GlobalState.playerState.updateMask != InputUpdateType.Editor
+                )
+                || (
+                    InputState.currentUpdateType != InputUpdateType.Editor
+                    && s_GlobalState.playerState.updateMask == InputUpdateType.Editor
+                )
+            )
             {
                 // Either swap in editor state and retain currently active player state in s_EditorState
                 // or swap player state back in.
@@ -716,7 +737,7 @@ namespace UnityEngine.InputSystem.EnhancedTouch
         }
 
         private static GlobalState CreateGlobalState()
-        {   // Convenient method since parameterized construction is default
+        { // Convenient method since parameterized construction is default
             return new GlobalState { historyLengthPerFinger = 64 };
         }
 
@@ -728,7 +749,9 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             var savedState = new SavedStructState<GlobalState>(
                 ref s_GlobalState,
                 (ref GlobalState state) => s_GlobalState = state,
-                () => { /* currently nothing to dispose */ });
+                () => { /* currently nothing to dispose */
+                }
+            );
 
             // Reset global state
             s_GlobalState = CreateGlobalState();
@@ -742,8 +765,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
         //
         // NOTE: Finger instances are per state. This means that you will actually see different Finger instances for
         //       the same finger in two different update types.
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-            Justification = "Managed internally")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Usage",
+            "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+            Justification = "Managed internally"
+        )]
         internal struct FingerAndTouchState
         {
             public InputUpdateType updateMask;
@@ -828,7 +854,7 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                 {
                     activeTouchState = new InputStateHistory<TouchState>
                     {
-                        extraMemoryPerRecord = UnsafeUtility.SizeOf<ExtraDataPerTouchState>()
+                        extraMemoryPerRecord = UnsafeUtility.SizeOf<ExtraDataPerTouchState>(),
                     };
                 }
                 else
@@ -889,7 +915,9 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                             }
                             else
                             {
-                                touchRecordHeader = (InputStateHistory.RecordHeader*)((byte*)touchRecordHeader - touchRecordSize);
+                                touchRecordHeader = (InputStateHistory.RecordHeader*)(
+                                    (byte*)touchRecordHeader - touchRecordSize
+                                );
                             }
                         }
 
@@ -925,8 +953,12 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                             // An exception are touches that both began *and* ended in the previous frame.
                             // For these, we surface the Began in the previous update and the Ended in the
                             // current frame.
-                            if (!(touchState->beganInSameFrame && touchState->updateStepCount == currentUpdateStepCount - 1) &&
-                                !wasUpdatedThisFrame)
+                            if (
+                                !(
+                                    touchState->beganInSameFrame
+                                    && touchState->updateStepCount == currentUpdateStepCount - 1
+                                ) && !wasUpdatedThisFrame
+                            )
                                 break;
                         }
 
@@ -937,21 +969,39 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                         var touchExtraState = (ExtraDataPerTouchState*)((byte*)touchRecordHeader + extraMemoryOffset);
                         var newRecordHeader = activeTouchState.AllocateRecord(out var newRecordIndex);
                         var newRecordState = (TouchState*)newRecordHeader->statePtrWithControlIndex;
-                        var newRecordExtraState = (ExtraDataPerTouchState*)((byte*)newRecordHeader + activeTouchState.bytesPerRecord - UnsafeUtility.SizeOf<ExtraDataPerTouchState>());
+                        var newRecordExtraState = (ExtraDataPerTouchState*)(
+                            (byte*)newRecordHeader
+                            + activeTouchState.bytesPerRecord
+                            - UnsafeUtility.SizeOf<ExtraDataPerTouchState>()
+                        );
                         newRecordHeader->time = touchRecordHeader->time;
-                        newRecordHeader->controlIndex = ArrayHelpers.AppendWithCapacity(ref activeTouchState.m_Controls,
-                            ref activeTouchState.m_ControlCount, finger.m_StateHistory.controls[0]);
+                        newRecordHeader->controlIndex = ArrayHelpers.AppendWithCapacity(
+                            ref activeTouchState.m_Controls,
+                            ref activeTouchState.m_ControlCount,
+                            finger.m_StateHistory.controls[0]
+                        );
 
                         UnsafeUtility.MemCpy(newRecordState, touchState, UnsafeUtility.SizeOf<TouchState>());
-                        UnsafeUtility.MemCpy(newRecordExtraState, touchExtraState, UnsafeUtility.SizeOf<ExtraDataPerTouchState>());
+                        UnsafeUtility.MemCpy(
+                            newRecordExtraState,
+                            touchExtraState,
+                            UnsafeUtility.SizeOf<ExtraDataPerTouchState>()
+                        );
 
                         // If the touch hasn't moved this frame, mark it stationary.
                         // EXCEPT: If we are looked at a Moved touch that also began in the same frame and that
                         //         frame is the one immediately preceding us. In that case, we want to surface the Moved
                         //         as if it happened this frame.
                         var phase = touchState->phase;
-                        if ((phase == TouchPhase.Moved || phase == TouchPhase.Began) &&
-                            !wasUpdatedThisFrame && !(phase == TouchPhase.Moved && touchState->beganInSameFrame && touchState->updateStepCount == currentUpdateStepCount - 1))
+                        if (
+                            (phase == TouchPhase.Moved || phase == TouchPhase.Began)
+                            && !wasUpdatedThisFrame
+                            && !(
+                                phase == TouchPhase.Moved
+                                && touchState->beganInSameFrame
+                                && touchState->updateStepCount == currentUpdateStepCount - 1
+                            )
+                        )
                         {
                             newRecordState->phase = TouchPhase.Stationary;
                             newRecordState->delta = default;
@@ -967,7 +1017,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                             newRecordState->delta = newRecordExtraState->accumulatedDelta;
                         }
 
-                        var newRecord = new InputStateHistory<TouchState>.Record(activeTouchState, newRecordIndex, newRecordHeader);
+                        var newRecord = new InputStateHistory<TouchState>.Record(
+                            activeTouchState,
+                            newRecordIndex,
+                            newRecordHeader
+                        );
                         var newTouch = new Touch(finger, newRecord);
 
                         ArrayHelpers.InsertAtWithCapacity(ref activeTouches, ref activeTouchCount, insertAt, newTouch);

@@ -13,7 +13,7 @@ namespace Unity.Entities
         /// Utiliy methods for <see cref="RecordViewArray"/>.
         /// </summary>
         [BurstCompile]
-        public unsafe static class RecordViewArrayUtility
+        public static unsafe class RecordViewArrayUtility
         {
             /// <summary>
             /// Convert <see cref="RecordType.GetComponentDataRW"/> records to <see cref="RecordType.SetComponentData"/> records, when possible.
@@ -22,13 +22,17 @@ namespace Unity.Entities
             [BurstCompile]
             public static void ConvertGetRWsToSets(in RecordViewArray records)
             {
-                var worldDataStore = new NativeList<NativeList<NativeHashMap<ComponentTypeView, IntPtr>>>(0, Allocator.Temp);
+                var worldDataStore = new NativeList<NativeList<NativeHashMap<ComponentTypeView, IntPtr>>>(
+                    0,
+                    Allocator.Temp
+                );
 
                 // Process every record in descending order
                 for (
                     int recordIter = records.Ordering == Ordering.Ascending ? records.Length - 1 : 0;
                     recordIter >= 0 && recordIter < records.Length;
-                    recordIter = records.Ordering == Ordering.Ascending ? recordIter - 1 : recordIter + 1)
+                    recordIter = records.Ordering == Ordering.Ascending ? recordIter - 1 : recordIter + 1
+                )
                 {
                     var record = records[recordIter];
 
@@ -51,7 +55,10 @@ namespace Unity.Entities
                         var entityDataStore = worldDataStore[worldIndex];
                         if (!entityDataStore.IsCreated)
                         {
-                            entityDataStore = new NativeList<NativeHashMap<ComponentTypeView, IntPtr>>(0, Allocator.Temp);
+                            entityDataStore = new NativeList<NativeHashMap<ComponentTypeView, IntPtr>>(
+                                0,
+                                Allocator.Temp
+                            );
                             worldDataStore[worldIndex] = entityDataStore;
                         }
 
@@ -79,7 +86,11 @@ namespace Unity.Entities
                             if (!componentDataStore.TryGetValue(component, out var componentData))
                             {
                                 // This component was never seen before, add it to component data store
-                                var componentDataPtr = AllocatorManager.Allocate(Allocator.Temp, typeInfo.TypeSize, typeInfo.AlignmentInBytes);
+                                var componentDataPtr = AllocatorManager.Allocate(
+                                    Allocator.Temp,
+                                    typeInfo.TypeSize,
+                                    typeInfo.AlignmentInBytes
+                                );
                                 if (componentDataPtr != null)
                                 {
                                     UnsafeUtility.MemCpy(componentDataPtr, dataPtr, typeInfo.TypeSize);
@@ -102,7 +113,17 @@ namespace Unity.Entities
                     // If any component data was changed, mark the record as converted
                     if (hasChanges)
                     {
-                        var header = new Header(record.Index, RecordType.SetComponentData, record.FrameIndex, record.World.SequenceNumber, record.ExecutingSystem.Handle, record.OriginSystem.Handle, record.Entities.Length, record.ComponentTypes.Length, record.DataLength);
+                        var header = new Header(
+                            record.Index,
+                            RecordType.SetComponentData,
+                            record.FrameIndex,
+                            record.World.SequenceNumber,
+                            record.ExecutingSystem.Handle,
+                            record.OriginSystem.Handle,
+                            record.Entities.Length,
+                            record.ComponentTypes.Length,
+                            record.DataLength
+                        );
                         UnsafeUtility.MemCpy(record.Ptr, &header, UnsafeUtility.SizeOf<Header>());
                     }
                 }

@@ -7,7 +7,7 @@ namespace Unity.Entities.UI
 {
     class CustomInspectorElement : VisualElement, IBindable, IBinding
     {
-        internal class DefaultInspectorElement : VisualElement{}
+        internal class DefaultInspectorElement : VisualElement { }
 
         PropertyPath m_BasePath;
         readonly BindingContextElement m_Root;
@@ -103,13 +103,18 @@ namespace Unity.Entities.UI
                 foreach (var child in content.Children())
                     RegisterBindings(child);
 
-            for(var i = 0; i < popRelativePartCount; ++i)
+            for (var i = 0; i < popRelativePartCount; ++i)
             {
                 m_RelativePath = PropertyPath.Pop(m_RelativePath);
             }
         }
 
-        static void RegisterBindings(IInspector inspector, PropertyPath pathToValue, VisualElement toBind, BindingContextElement root)
+        static void RegisterBindings(
+            IInspector inspector,
+            PropertyPath pathToValue,
+            VisualElement toBind,
+            BindingContextElement root
+        )
         {
             var fullPath = PropertyPath.Combine(inspector.PropertyPath, pathToValue);
             root.RegisterBindings(fullPath, toBind);

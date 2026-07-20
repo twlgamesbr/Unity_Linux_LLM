@@ -43,7 +43,8 @@ namespace NPCSystem.Initialization
 
             if (missing.Count > 0)
             {
-                string msg = "Scene initialization controller is missing serialized references: "
+                string msg =
+                    "Scene initialization controller is missing serialized references: "
                     + string.Join(", ", missing)
                     + ". FindAnyObjectByType is not used — all dependencies must be wired in the scene.";
 
@@ -57,8 +58,9 @@ namespace NPCSystem.Initialization
                     {
                         ["correlationId"] = ctx.CorrelationId,
                         ["missingRefs"] = string.Join(";", missing),
-                        ["missingCount"] = missing.Count
-                    });
+                        ["missingCount"] = missing.Count,
+                    }
+                );
             }
             else
             {
@@ -68,10 +70,8 @@ namespace NPCSystem.Initialization
                     NPCFlowLogLevel.Debug,
                     "All serialized references validated successfully.",
                     source: nameof(ReferenceValidationPhase),
-                    data: new Dictionary<string, object>
-                    {
-                        ["correlationId"] = ctx.CorrelationId
-                    });
+                    data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId }
+                );
             }
 
             return Task.CompletedTask;

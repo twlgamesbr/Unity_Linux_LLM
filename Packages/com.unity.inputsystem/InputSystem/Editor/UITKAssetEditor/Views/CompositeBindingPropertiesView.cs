@@ -13,9 +13,10 @@ namespace UnityEngine.InputSystem.Editor
         private readonly DropdownField m_CompositeTypeField;
         private EventCallback<ChangeEvent<string>> m_CompositeTypeFieldChangedHandler;
 
-        private const string UxmlName = InputActionsEditorConstants.PackagePath +
-            InputActionsEditorConstants.ResourcesPath +
-            InputActionsEditorConstants.CompositeBindingPropertiesViewUxml;
+        private const string UxmlName =
+            InputActionsEditorConstants.PackagePath
+            + InputActionsEditorConstants.ResourcesPath
+            + InputActionsEditorConstants.CompositeBindingPropertiesViewUxml;
 
         public CompositeBindingPropertiesView(VisualElement root, StateContainer stateContainer)
             : base(root, stateContainer)
@@ -26,8 +27,11 @@ namespace UnityEngine.InputSystem.Editor
 
             m_CompositeTypeField = container.Q<DropdownField>("composite-type-dropdown");
 
-            CreateSelector(Selectors.GetSelectedBinding,
-                (binding, state) => binding == null ? null : Selectors.GetCompositeBindingViewState(state, binding.Value));
+            CreateSelector(
+                Selectors.GetSelectedBinding,
+                (binding, state) =>
+                    binding == null ? null : Selectors.GetCompositeBindingViewState(state, binding.Value)
+            );
         }
 
         public override void RedrawUI(ViewState viewState)
@@ -41,7 +45,13 @@ namespace UnityEngine.InputSystem.Editor
 
             viewState.parameterListView.onChange = () =>
             {
-                Dispatch(Commands.UpdatePathNameAndValues(viewState.parameterListView.GetParameters(), viewState.selectedBindingPath), UIRebuildMode.None);
+                Dispatch(
+                    Commands.UpdatePathNameAndValues(
+                        viewState.parameterListView.GetParameters(),
+                        viewState.selectedBindingPath
+                    ),
+                    UIRebuildMode.None
+                );
             };
             viewState.parameterListView.OnDrawVisualElements(rootElement);
         }
@@ -58,7 +68,9 @@ namespace UnityEngine.InputSystem.Editor
                     viewState.selectedBinding,
                     viewState.compositeTypes,
                     viewState.parameterListView,
-                    m_CompositeTypeField.index));
+                    m_CompositeTypeField.index
+                )
+            );
         }
 
         internal class ViewState
@@ -74,8 +86,10 @@ namespace UnityEngine.InputSystem.Editor
 
     internal static partial class Selectors
     {
-        public static CompositeBindingPropertiesView.ViewState GetCompositeBindingViewState(in InputActionsEditorState state,
-            SerializedInputBinding binding)
+        public static CompositeBindingPropertiesView.ViewState GetCompositeBindingViewState(
+            in InputActionsEditorState state,
+            SerializedInputBinding binding
+        )
         {
             var inputAction = GetSelectedAction(state);
             var compositeNameAndParameters = NameAndParameters.Parse(binding.path);
@@ -88,8 +102,11 @@ namespace UnityEngine.InputSystem.Editor
 
             var compositeTypes = GetCompositeTypes(binding.path, inputAction?.expectedControlType).ToList();
             var compositeNames = compositeTypes.Select(ObjectNames.NicifyVariableName).ToList();
-            var selectedCompositeName = compositeNames[compositeTypes.FindIndex(str =>
-                InputBindingComposite.s_Composites.LookupTypeRegistration(str) == compositeType)];
+            var selectedCompositeName = compositeNames[
+                compositeTypes.FindIndex(str =>
+                    InputBindingComposite.s_Composites.LookupTypeRegistration(str) == compositeType
+                )
+            ];
 
             return new CompositeBindingPropertiesView.ViewState
             {
@@ -98,7 +115,7 @@ namespace UnityEngine.InputSystem.Editor
                 compositeTypes = compositeTypes,
                 compositeNames = compositeNames,
                 parameterListView = parameterListView,
-                selectedCompositeName = selectedCompositeName
+                selectedCompositeName = selectedCompositeName,
             };
         }
     }

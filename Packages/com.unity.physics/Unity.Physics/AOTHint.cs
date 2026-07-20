@@ -2,7 +2,7 @@ using System;
 
 namespace Unity.Physics
 {
-    class PreserveAttribute : Attribute {}
+    class PreserveAttribute : Attribute { }
 
     [Obsolete("Do not access this type. It is only included to hint AOT compilation. (DoNotRemove)", true)]
     static unsafe class AOTHint
@@ -10,12 +10,30 @@ namespace Unity.Physics
         [Preserve]
         static void HintAllImplementations()
         {
-            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<Broadphase.BvhLeafProcessor, Broadphase.RigidBodyOverlapsCollector>();
-            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<Broadphase.BvhLeafProcessor, ManifoldQueries.ConvexCompositeOverlapCollector>();
-            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<OverlapQueries.CompoundLeafProcessor, Broadphase.RigidBodyOverlapsCollector>();
-            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<OverlapQueries.CompoundLeafProcessor, ManifoldQueries.ConvexCompositeOverlapCollector>();
-            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<OverlapQueries.MeshLeafProcessor, Broadphase.RigidBodyOverlapsCollector>();
-            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<OverlapQueries.MeshLeafProcessor, ManifoldQueries.ConvexCompositeOverlapCollector>();
+            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<
+                Broadphase.BvhLeafProcessor,
+                Broadphase.RigidBodyOverlapsCollector
+            >();
+            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<
+                Broadphase.BvhLeafProcessor,
+                ManifoldQueries.ConvexCompositeOverlapCollector
+            >();
+            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<
+                OverlapQueries.CompoundLeafProcessor,
+                Broadphase.RigidBodyOverlapsCollector
+            >();
+            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<
+                OverlapQueries.CompoundLeafProcessor,
+                ManifoldQueries.ConvexCompositeOverlapCollector
+            >();
+            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<
+                OverlapQueries.MeshLeafProcessor,
+                Broadphase.RigidBodyOverlapsCollector
+            >();
+            AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<
+                OverlapQueries.MeshLeafProcessor,
+                ManifoldQueries.ConvexCompositeOverlapCollector
+            >();
 
             ColliderCastLeafProcessor_ColliderCastHitCollectors<Broadphase.BvhLeafProcessor>();
             ColliderCastLeafProcessor_ColliderCastHitCollectors<ColliderCastQueries.ColliderCompoundLeafProcessor<ColliderCastQueries.DefaultCompoundDispatcher>>();
@@ -40,7 +58,10 @@ namespace Unity.Physics
             RaycastLeafProcessor_RaycastHitCollectors<Broadphase.BvhLeafProcessor>();
         }
 
-        static void AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<TProcessor, TCollector>()
+        static void AabbOverlapLeafProcessor_BoundingVolumeHierarchy_OverlapQueries_OverlapCollectors<
+            TProcessor,
+            TCollector
+        >()
             where TProcessor : struct, BoundingVolumeHierarchy.IAabbOverlapLeafProcessor
             where TCollector : struct, IOverlapCollector
         {

@@ -12,10 +12,11 @@ namespace UnityEngine.Rendering
         /// Exact Packing
         /// </summary>
         Exact,
+
         /// <summary>
         /// Aggressive Packing
         /// </summary>
-        Aggressive
+        Aggressive,
     };
 
     /// <summary>
@@ -27,18 +28,21 @@ namespace UnityEngine.Rendering
         /// No Packing
         /// </summary>
         NoPacking = 0,
+
         /// <summary>
         /// R11G11B10 Packing
         /// </summary>
         R11G11B10,
+
         /// <summary>
         /// Packed Float
         /// </summary>
         PackedFloat,
+
         /// <summary>
         /// Packed UInt
         /// </summary>
-        PackedUint
+        PackedUint,
     }
 
     /// <summary>
@@ -50,14 +54,16 @@ namespace UnityEngine.Rendering
         /// Half Precision
         /// </summary>
         Half,
+
         /// <summary>
         /// Real Precision
         /// </summary>
         Real,
+
         /// <summary>
         /// Default Precision
         /// </summary>
-        Default
+        Default,
     }
 
     /// <summary>
@@ -70,38 +76,47 @@ namespace UnityEngine.Rendering
         /// Packing rules for the struct.
         /// </summary>
         public PackingRules packingRules;
+
         /// <summary>
         /// Structure contains packed fields.
         /// </summary>
         public bool containsPackedFields;
+
         /// <summary>
         /// Structure needs generated accessors.
         /// </summary>
         public bool needAccessors;
+
         /// <summary>
         /// Structure needs generated setters.
         /// </summary>
         public bool needSetters;
+
         /// <summary>
         /// Structure needs generated debug defines and functions.
         /// </summary>
         public bool needParamDebug;
+
         /// <summary>
         /// Start value of generated defines.
         /// </summary>
         public int paramDefinesStart;
+
         /// <summary>
         /// Generate structure declaration or not.
         /// </summary>
         public bool omitStructDeclaration;
+
         /// <summary>
         /// Generate constant buffer declaration or not.
         /// </summary>
         public bool generateCBuffer;
+
         /// <summary>
         /// If specified, when generating a constant buffer, use this explicit register.
         /// </summary>
         public int constantRegister;
+
         /// <summary>
         /// Path of the generated file
         /// </summary>
@@ -120,9 +135,18 @@ namespace UnityEngine.Rendering
         /// <param name="generateCBuffer">Generate a constant buffer.</param>
         /// <param name="constantRegister">When generating a constant buffer, specify the optional constant register.</param>
         /// <param name="sourcePath">Location of the source file defining the C# type. (Automatically filled by compiler)</param>
-        public GenerateHLSL(PackingRules rules = PackingRules.Exact, bool needAccessors = true, bool needSetters = false, bool needParamDebug = false, int paramDefinesStart = 1,
-                            bool omitStructDeclaration = false, bool containsPackedFields = false, bool generateCBuffer = false, int constantRegister = -1,
-                            [CallerFilePath] string sourcePath = null)
+        public GenerateHLSL(
+            PackingRules rules = PackingRules.Exact,
+            bool needAccessors = true,
+            bool needSetters = false,
+            bool needParamDebug = false,
+            int paramDefinesStart = 1,
+            bool omitStructDeclaration = false,
+            bool containsPackedFields = false,
+            bool generateCBuffer = false,
+            int constantRegister = -1,
+            [CallerFilePath] string sourcePath = null
+        )
         {
             this.sourcePath = sourcePath;
             packingRules = rules;
@@ -147,22 +171,27 @@ namespace UnityEngine.Rendering
         /// Display names overrides for the field.
         /// </summary>
         public string[] displayNames;
+
         /// <summary>
         /// True if the field is a direction.
         /// </summary>
         public bool isDirection;
+
         /// <summary>
         /// True if the field is an sRGB value.
         /// </summary>
         public bool sRGBDisplay;
+
         /// <summary>
         /// Field precision.
         /// </summary>
         public FieldPrecision precision;
+
         /// <summary>
         /// Field is a normalized vector.
         /// </summary>
         public bool checkIsNormalized;
+
         /// <summary>
         /// If not empty, add a preprocessor #if / #endif with the string provided around the generated hlsl code
         /// </summary>
@@ -177,7 +206,14 @@ namespace UnityEngine.Rendering
         /// <param name="precision">Field precision.</param>
         /// <param name="checkIsNormalized">Field checkIsNormalized.</param>
         /// <param name="preprocessor">Field preprocessor.</param>
-        public SurfaceDataAttributes(string displayName = "", bool isDirection = false, bool sRGBDisplay = false, FieldPrecision precision = FieldPrecision.Default, bool checkIsNormalized = false, string preprocessor = "")
+        public SurfaceDataAttributes(
+            string displayName = "",
+            bool isDirection = false,
+            bool sRGBDisplay = false,
+            FieldPrecision precision = FieldPrecision.Default,
+            bool checkIsNormalized = false,
+            string preprocessor = ""
+        )
         {
             displayNames = new string[1];
             displayNames[0] = displayName;
@@ -199,7 +235,14 @@ namespace UnityEngine.Rendering
         /// <param name="precision">Field precision.</param>
         /// <param name="checkIsNormalized">Field checkIsNormalized.</param>
         /// <param name="preprocessor">Field preprocessor.</param>
-        public SurfaceDataAttributes(string[] displayNames, bool isDirection = false, bool sRGBDisplay = false, FieldPrecision precision = FieldPrecision.Default, bool checkIsNormalized = false, string preprocessor = "")
+        public SurfaceDataAttributes(
+            string[] displayNames,
+            bool isDirection = false,
+            bool sRGBDisplay = false,
+            FieldPrecision precision = FieldPrecision.Default,
+            bool checkIsNormalized = false,
+            string preprocessor = ""
+        )
         {
             this.displayNames = displayNames;
             this.isDirection = isDirection;
@@ -220,6 +263,7 @@ namespace UnityEngine.Rendering
         /// Size of the array.
         /// </summary>
         public int arraySize;
+
         /// <summary>
         /// Type of the array elements.
         /// </summary>
@@ -247,34 +291,42 @@ namespace UnityEngine.Rendering
         /// Display names.
         /// </summary>
         public string[] displayNames;
+
         /// <summary>
         /// Minimum and Maximum value.
         /// </summary>
         public float[] range;
+
         /// <summary>
         /// Packing scheme.
         /// </summary>
         public FieldPacking packingScheme;
+
         /// <summary>
         /// Offset in source.
         /// </summary>
         public int offsetInSource;
+
         /// <summary>
         /// Size in bits.
         /// </summary>
         public int sizeInBits;
+
         /// <summary>
         /// True if the field is a direction.
         /// </summary>
         public bool isDirection;
+
         /// <summary>
         /// True if the field is an sRGB value.
         /// </summary>
         public bool sRGBDisplay;
+
         /// <summary>
         /// True if the field is an sRGB value.
         /// </summary>
         public bool checkIsNormalized;
+
         /// <summary>
         /// If not empty, add a preprocessor #if / #endif with the string provided around the generated hlsl code
         /// </summary>
@@ -293,7 +345,18 @@ namespace UnityEngine.Rendering
         /// <param name="sRGBDisplay">Field is an sRGB value.</param>
         /// <param name="checkIsNormalized">Field checkIsNormalized.</param>
         /// <param name="preprocessor">Field preprocessor.</param>
-        public PackingAttribute(string[] displayNames, FieldPacking packingScheme = FieldPacking.NoPacking, int bitSize = 32, int offsetInSource = 0, float minValue = 0.0f, float maxValue = 1.0f, bool isDirection = false, bool sRGBDisplay = false, bool checkIsNormalized = false, string preprocessor = "")
+        public PackingAttribute(
+            string[] displayNames,
+            FieldPacking packingScheme = FieldPacking.NoPacking,
+            int bitSize = 32,
+            int offsetInSource = 0,
+            float minValue = 0.0f,
+            float maxValue = 1.0f,
+            bool isDirection = false,
+            bool sRGBDisplay = false,
+            bool checkIsNormalized = false,
+            string preprocessor = ""
+        )
         {
             this.displayNames = displayNames;
             this.packingScheme = packingScheme;
@@ -319,7 +382,18 @@ namespace UnityEngine.Rendering
         /// <param name="sRGBDisplay">Field is an sRGB value.</param>
         /// <param name="checkIsNormalized">Field checkIsNormalized.</param>
         /// <param name="preprocessor">Field preprocessor.</param>
-        public PackingAttribute(string displayName = "", FieldPacking packingScheme = FieldPacking.NoPacking, int bitSize = 0, int offsetInSource = 0, float minValue = 0.0f, float maxValue = 1.0f, bool isDirection = false, bool sRGBDisplay = false, bool checkIsNormalized = false, string preprocessor = "")
+        public PackingAttribute(
+            string displayName = "",
+            FieldPacking packingScheme = FieldPacking.NoPacking,
+            int bitSize = 0,
+            int offsetInSource = 0,
+            float minValue = 0.0f,
+            float maxValue = 1.0f,
+            bool isDirection = false,
+            bool sRGBDisplay = false,
+            bool checkIsNormalized = false,
+            string preprocessor = ""
+        )
         {
             displayNames = new string[1];
             displayNames[0] = displayName;
@@ -337,7 +411,5 @@ namespace UnityEngine.Rendering
     /// <summary>
     /// This type needs to be used when generating unsigned integer arrays for constant buffers.
     /// </summary>
-    public struct ShaderGenUInt4
-    {
-    }
+    public struct ShaderGenUInt4 { }
 }

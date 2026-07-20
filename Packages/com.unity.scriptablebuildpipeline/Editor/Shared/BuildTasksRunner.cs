@@ -59,7 +59,12 @@ namespace UnityEditor.Build.Pipeline
                     }
                     catch (Exception e)
                     {
-                        BuildLogger.LogError("Build Task {0} failed with exception:\n{1}\n{2}", task.GetType().Name, e.Message, e.StackTrace);
+                        BuildLogger.LogError(
+                            "Build Task {0} failed with exception:\n{1}\n{2}",
+                            task.GetType().Name,
+                            e.Message,
+                            e.StackTrace
+                        );
                         return ReturnCode.Exception;
                     }
                 }

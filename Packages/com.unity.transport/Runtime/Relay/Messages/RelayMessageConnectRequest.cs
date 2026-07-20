@@ -5,7 +5,8 @@ namespace Unity.Networking.Transport.Relay
     [StructLayout(LayoutKind.Sequential)]
     internal struct RelayMessageConnectRequest
     {
-        public const int k_Length = RelayMessageHeader.k_Length + RelayAllocationId.k_Length + 1 + RelayConnectionData.k_Length; // Header + AllocationId + ToConnectionDataLength + ToConnectionData;
+        public const int k_Length =
+            RelayMessageHeader.k_Length + RelayAllocationId.k_Length + 1 + RelayConnectionData.k_Length; // Header + AllocationId + ToConnectionDataLength + ToConnectionData;
 
         public RelayMessageHeader Header;
 
@@ -13,7 +14,10 @@ namespace Unity.Networking.Transport.Relay
         public byte ToConnectionDataLength;
         public RelayConnectionData ToConnectionData;
 
-        public static RelayMessageConnectRequest Create(RelayAllocationId allocationId, RelayConnectionData toConnectionData)
+        public static RelayMessageConnectRequest Create(
+            RelayAllocationId allocationId,
+            RelayConnectionData toConnectionData
+        )
         {
             return new RelayMessageConnectRequest
             {
@@ -24,7 +28,11 @@ namespace Unity.Networking.Transport.Relay
             };
         }
 
-        public static void Write(ref PacketProcessor packetProcessor, ref RelayAllocationId allocationId, ref RelayConnectionData toConnectionData)
+        public static void Write(
+            ref PacketProcessor packetProcessor,
+            ref RelayAllocationId allocationId,
+            ref RelayConnectionData toConnectionData
+        )
         {
             RelayMessageHeader.Write(ref packetProcessor, RelayMessageType.ConnectRequest);
             packetProcessor.AppendToPayload<RelayAllocationId>(allocationId);

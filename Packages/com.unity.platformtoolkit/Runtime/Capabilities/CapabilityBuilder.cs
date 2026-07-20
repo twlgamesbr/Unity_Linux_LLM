@@ -23,8 +23,7 @@ namespace Unity.PlatformToolkit
 
         public ICapabilities ToCapabilities()
         {
-            return new GenericCapabilities
-            (
+            return new GenericCapabilities(
                 accounts: AccountSupport,
                 primaryAccount: PrimaryAccount,
                 accountPicker: AdditionalAccountSystem,
@@ -39,8 +38,7 @@ namespace Unity.PlatformToolkit
 
         private class GenericCapabilities : ICapabilities
         {
-            public GenericCapabilities
-            (
+            public GenericCapabilities(
                 bool accounts,
                 bool primaryAccount,
                 bool accountPicker,

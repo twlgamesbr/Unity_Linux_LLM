@@ -9,6 +9,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// Aggregation using the sum of multiple stats.
         /// </summary>
         Sum,
+
         /// <summary>
         /// Aggregation using the average of multiple stats.
         /// </summary>

@@ -29,9 +29,7 @@ namespace UnityEngine.InputSystem.Utilities
                 m_Remaining = observable.m_Count;
             }
 
-            public void OnCompleted()
-            {
-            }
+            public void OnCompleted() { }
 
             public void OnError(Exception error)
             {

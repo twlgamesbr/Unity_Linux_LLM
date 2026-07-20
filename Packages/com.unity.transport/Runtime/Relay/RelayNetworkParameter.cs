@@ -44,7 +44,9 @@ namespace Unity.Networking.Transport.Relay
         {
             if (!settings.TryGet<RelayNetworkParameter>(out var parameters))
             {
-                throw new System.InvalidOperationException($"Can't extract Relay parameters: {nameof(RelayNetworkParameter)} must be provided to the {nameof(NetworkSettings)}");
+                throw new System.InvalidOperationException(
+                    $"Can't extract Relay parameters: {nameof(RelayNetworkParameter)} must be provided to the {nameof(NetworkSettings)}"
+                );
             }
 
             return parameters;
@@ -86,7 +88,9 @@ namespace Unity.Networking.Transport.Relay
             if (RelayConnectionTimeMS < 0)
             {
                 valid = false;
-                Debug.LogError($"RelayConnectionTimeMS value ({RelayConnectionTimeMS}) must be greater than or equal to 0");
+                Debug.LogError(
+                    $"RelayConnectionTimeMS value ({RelayConnectionTimeMS}) must be greater than or equal to 0"
+                );
             }
 
             return valid;

@@ -38,7 +38,7 @@ namespace UnityEditor.TestRunner.CommandLineParser
                 return null;
             }
 
-            return value.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            return value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

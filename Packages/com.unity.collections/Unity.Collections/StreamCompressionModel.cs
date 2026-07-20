@@ -30,23 +30,86 @@ namespace Unity.Collections
     [GenerateTestsForBurstCompatibility]
     public unsafe struct StreamCompressionModel
     {
-        internal static readonly byte[] k_BucketSizes =
-        {
-            0, 0, 1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 21, 24, 27, 32
-        };
+        internal static readonly byte[] k_BucketSizes = { 0, 0, 1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 21, 24, 27, 32 };
 
         internal static readonly uint[] k_BucketOffsets =
         {
-            0, 1, 2, 4, 8, 16, 32, 96, 352, 1376, 5472, 38240, 300384, 2397536, 19174752, 153392480
+            0,
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            96,
+            352,
+            1376,
+            5472,
+            38240,
+            300384,
+            2397536,
+            19174752,
+            153392480,
         };
         internal static readonly int[] k_FirstBucketCandidate =
         {
             // 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 19 20 21 22 23 24 25 26 27 28 29 30 31 32
-            15, 15, 15, 15, 14, 14, 14, 13, 13, 13, 12, 12, 12, 11, 11, 11, 10, 10, 10, 9, 9, 8, 8, 7, 7, 6, 5, 4, 3, 2, 1, 1, 0
+            15,
+            15,
+            15,
+            15,
+            14,
+            14,
+            14,
+            13,
+            13,
+            13,
+            12,
+            12,
+            12,
+            11,
+            11,
+            11,
+            10,
+            10,
+            10,
+            9,
+            9,
+            8,
+            8,
+            7,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            1,
+            0,
         };
-        internal static readonly byte[] k_DefaultModelData = { 16, // 16 symbols
-                                                               2, 3, 3, 3,   4, 4, 4, 5,     5, 5, 6, 6,     6, 6, 6, 6,
-                                                               0, 0 }; // no contexts
+        internal static readonly byte[] k_DefaultModelData =
+        {
+            16, // 16 symbols
+            2,
+            3,
+            3,
+            3,
+            4,
+            4,
+            4,
+            5,
+            5,
+            5,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            0,
+            0,
+        }; // no contexts
         internal const int k_AlphabetSize = 16;
         internal const int k_MaxHuffmanSymbolLength = 6;
         internal const int k_MaxContexts = 1;
@@ -54,14 +117,16 @@ namespace Unity.Collections
 
         static class SharedStaticCompressionModel
         {
-            internal static readonly SharedStatic<StreamCompressionModel> Default = SharedStatic<StreamCompressionModel>.GetOrCreate<StreamCompressionModel>();
+            internal static readonly SharedStatic<StreamCompressionModel> Default =
+                SharedStatic<StreamCompressionModel>.GetOrCreate<StreamCompressionModel>();
         }
 
         /// <summary>
         /// A shared singleton instance of <see cref="StreamCompressionModel"/>, this instance is initialized using
         /// hardcoded bucket parameters and model.
         /// </summary>
-        public static StreamCompressionModel Default {
+        public static StreamCompressionModel Default
+        {
             get
             {
                 if (SharedStaticCompressionModel.Default.Data.m_Initialized == 1)
@@ -136,19 +201,37 @@ namespace Unity.Collections
                     tmpSymbolLengths[i] = symbolLengths[numContexts * context + i];
 
                 GenerateHuffmanCodes(symbolCodes, 0, tmpSymbolLengths, 0, k_AlphabetSize, k_MaxHuffmanSymbolLength);
-                GenerateHuffmanDecodeTable(tmpSymbolDecodeTable, 0, tmpSymbolLengths, symbolCodes, k_AlphabetSize, k_MaxHuffmanSymbolLength);
+                GenerateHuffmanDecodeTable(
+                    tmpSymbolDecodeTable,
+                    0,
+                    tmpSymbolLengths,
+                    symbolCodes,
+                    k_AlphabetSize,
+                    k_MaxHuffmanSymbolLength
+                );
                 for (int i = 0; i < k_AlphabetSize; i++)
                 {
-                    SharedStaticCompressionModel.Default.Data.encodeTable[context * k_AlphabetSize + i] = (ushort)((symbolCodes[i] << 8) | symbolLengths[numContexts * context + i]);
+                    SharedStaticCompressionModel.Default.Data.encodeTable[context * k_AlphabetSize + i] = (ushort)(
+                        (symbolCodes[i] << 8) | symbolLengths[numContexts * context + i]
+                    );
                 }
                 for (int i = 0; i < (1 << k_MaxHuffmanSymbolLength); i++)
                 {
-                    SharedStaticCompressionModel.Default.Data.decodeTable[context * (1 << k_MaxHuffmanSymbolLength) + i] = tmpSymbolDecodeTable[i];
+                    SharedStaticCompressionModel.Default.Data.decodeTable[
+                        context * (1 << k_MaxHuffmanSymbolLength) + i
+                    ] = tmpSymbolDecodeTable[i];
                 }
             }
         }
 
-        static void GenerateHuffmanCodes(NativeArray<byte> symbolCodes, int symbolCodesOffset, NativeArray<byte> symbolLengths, int symbolLengthsOffset, int alphabetSize, int maxCodeLength)
+        static void GenerateHuffmanCodes(
+            NativeArray<byte> symbolCodes,
+            int symbolCodesOffset,
+            NativeArray<byte> symbolLengths,
+            int symbolLengthsOffset,
+            int alphabetSize,
+            int maxCodeLength
+        )
         {
             CheckAlphabetAndMaxCodeLength(alphabetSize, maxCodeLength);
 
@@ -188,7 +271,14 @@ namespace Unity.Collections
         }
 
         // decode table entries: (symbol << 8) | length
-        static void GenerateHuffmanDecodeTable(NativeArray<ushort> decodeTable, int decodeTableOffset, NativeArray<byte> symbolLengths, NativeArray<byte> symbolCodes, int alphabetSize, int maxCodeLength)
+        static void GenerateHuffmanDecodeTable(
+            NativeArray<ushort> decodeTable,
+            int decodeTableOffset,
+            NativeArray<byte> symbolLengths,
+            NativeArray<byte> symbolCodes,
+            int alphabetSize,
+            int maxCodeLength
+        )
         {
             CheckAlphabetAndMaxCodeLength(alphabetSize, maxCodeLength);
 
@@ -205,8 +295,7 @@ namespace Unity.Collections
                     {
                         decodeTable[(int)(decodeTableOffset + code)] = (ushort)(symbol << 8 | length);
                         code += step;
-                    }
-                    while (code < maxCode);
+                    } while (code < maxCode);
                 }
             }
         }
@@ -216,15 +305,18 @@ namespace Unity.Collections
         /// (code &lt;&lt; 8) | length
         /// </summary>
         internal fixed ushort encodeTable[k_MaxContexts * k_AlphabetSize];
+
         /// <summary>
         /// Bucket n starts at bucketOffsets[n] and ends at bucketOffsets[n] + (1 &lt;&lt; bucketSizes[n]).
         /// (symbol &lt;&lt; 8) | length
         /// </summary>
         internal fixed ushort decodeTable[k_MaxContexts * (1 << k_MaxHuffmanSymbolLength)];
+
         /// <summary>
         /// Specifies the sizes of the buckets in bits, so a bucket of n bits has 2^n values.
         /// </summary>
         internal fixed byte bucketSizes[k_AlphabetSize];
+
         /// <summary>
         /// Specifies the starting positions of the bucket.
         /// </summary>
@@ -235,7 +327,7 @@ namespace Unity.Collections
         /// </summary>
         /// <param name="value">A 4-byte unsigned integer value to find a bucket for.</param>
         /// <returns>The bucket index where to put the value.</returns>
-        readonly public int CalculateBucket(uint value)
+        public readonly int CalculateBucket(uint value)
         {
             int bucketIndex = k_FirstBucketCandidate[math.lzcnt(value)];
             if (bucketIndex + 1 < k_AlphabetSize && value >= bucketOffsets[bucketIndex + 1])
@@ -262,7 +354,9 @@ namespace Unity.Collections
         {
             if (alphabetSize != k_AlphabetSize)
             {
-                throw new InvalidOperationException("The alphabet size of compression models must be " + k_AlphabetSize);
+                throw new InvalidOperationException(
+                    "The alphabet size of compression models must be " + k_AlphabetSize
+                );
             }
         }
 
@@ -277,7 +371,9 @@ namespace Unity.Collections
         static void CheckAlphabetAndMaxCodeLength(int alphabetSize, int maxCodeLength)
         {
             if (alphabetSize > 256 || maxCodeLength > 8)
-                throw new InvalidOperationException("Can only generate huffman codes up to alphabet size 256 and maximum code length 8");
+                throw new InvalidOperationException(
+                    "Can only generate huffman codes up to alphabet size 256 and maximum code length 8"
+                );
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]

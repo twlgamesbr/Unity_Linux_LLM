@@ -138,32 +138,31 @@ namespace UnityEngine.EventSystems
     /// ]]>
     ///</code>
     /// </example>
-    public class EventTrigger :
-        MonoBehaviour,
-        IPointerEnterHandler,
-        IPointerExitHandler,
-        IPointerDownHandler,
-        IPointerUpHandler,
-        IPointerClickHandler,
-        IInitializePotentialDragHandler,
-        IBeginDragHandler,
-        IDragHandler,
-        IEndDragHandler,
-        IDropHandler,
-        IScrollHandler,
-        IUpdateSelectedHandler,
-        ISelectHandler,
-        IDeselectHandler,
-        IMoveHandler,
-        ISubmitHandler,
-        ICancelHandler
+    public class EventTrigger
+        : MonoBehaviour,
+            IPointerEnterHandler,
+            IPointerExitHandler,
+            IPointerDownHandler,
+            IPointerUpHandler,
+            IPointerClickHandler,
+            IInitializePotentialDragHandler,
+            IBeginDragHandler,
+            IDragHandler,
+            IEndDragHandler,
+            IDropHandler,
+            IScrollHandler,
+            IUpdateSelectedHandler,
+            ISelectHandler,
+            IDeselectHandler,
+            IMoveHandler,
+            ISubmitHandler,
+            ICancelHandler
     {
         [Serializable]
         /// <summary>
         /// UnityEvent class for Triggers.
         /// </summary>
-        public class TriggerEvent : UnityEvent<BaseEventData>
-        {}
+        public class TriggerEvent : UnityEvent<BaseEventData> { }
 
         [Serializable]
         /// <summary>
@@ -191,10 +190,13 @@ namespace UnityEngine.EventSystems
 
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete("Please use triggers instead (UnityUpgradable) -> triggers", true)]
-        public List<Entry> delegates { get { return triggers; } set { triggers = value; } }
+        public List<Entry> delegates
+        {
+            get { return triggers; }
+            set { triggers = value; }
+        }
 
-        protected EventTrigger()
-        {}
+        protected EventTrigger() { }
 
         /// <summary>
         /// All the functions registered in this EventTrigger

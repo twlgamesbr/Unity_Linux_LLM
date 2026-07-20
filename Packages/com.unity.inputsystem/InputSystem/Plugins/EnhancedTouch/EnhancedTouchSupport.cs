@@ -90,9 +90,9 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             InputSystem.onBeforeUpdate += Touch.BeginUpdate;
             InputSystem.onSettingsChange += OnSettingsChange;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             AssemblyReloadEvents.beforeAssemblyReload += OnBeforeDomainReload;
-            #endif
+#endif
 
             SetUpState();
         }
@@ -115,9 +115,9 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             InputSystem.onBeforeUpdate -= Touch.BeginUpdate;
             InputSystem.onSettingsChange -= OnSettingsChange;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeDomainReload;
-            #endif
+#endif
 
             TearDownState();
         }
@@ -127,19 +127,20 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             Touch.s_GlobalState.touchscreens = default;
             Touch.s_GlobalState.playerState.Destroy();
             Touch.s_GlobalState.playerState = default;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             Touch.s_GlobalState.editorState.Destroy();
             Touch.s_GlobalState.editorState = default;
-            #endif
+#endif
             s_Enabled = 0;
         }
 
         private static void SetUpState()
         {
-            Touch.s_GlobalState.playerState.updateMask = InputUpdateType.Dynamic | InputUpdateType.Manual | InputUpdateType.Fixed;
-            #if UNITY_EDITOR
+            Touch.s_GlobalState.playerState.updateMask =
+                InputUpdateType.Dynamic | InputUpdateType.Manual | InputUpdateType.Fixed;
+#if UNITY_EDITOR
             Touch.s_GlobalState.editorState.updateMask = InputUpdateType.Editor;
-            #endif
+#endif
 
             s_UpdateMode = InputSystem.settings.updateMode;
 
@@ -153,14 +154,14 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                 OnDeviceChange(device, InputDeviceChange.Removed);
 
             Touch.s_GlobalState.playerState.Destroy();
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             Touch.s_GlobalState.editorState.Destroy();
-            #endif
+#endif
 
             Touch.s_GlobalState.playerState = default;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             Touch.s_GlobalState.editorState = default;
-            #endif
+#endif
         }
 
         private static void OnDeviceChange(InputDevice device, InputDeviceChange change)
@@ -192,22 +193,23 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             SetUpState();
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         private static void OnBeforeDomainReload()
         {
             // We need to release NativeArrays we're holding before losing track of them during domain reloads.
             Touch.s_GlobalState.playerState.Destroy();
             Touch.s_GlobalState.editorState.Destroy();
         }
-
-        #endif
+#endif
 
         [Conditional("DEVELOPMENT_BUILD")]
         [Conditional("UNITY_EDITOR")]
         internal static void CheckEnabled()
         {
             if (!enabled)
-                throw new InvalidOperationException("EnhancedTouch API is not enabled; call EnhancedTouchSupport.Enable()");
+                throw new InvalidOperationException(
+                    "EnhancedTouch API is not enabled; call EnhancedTouchSupport.Enable()"
+                );
         }
     }
 }

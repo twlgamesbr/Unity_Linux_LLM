@@ -11,7 +11,8 @@ namespace UnityEngine.UIElements.TestFramework
         /// Creates a `RuntimePanelSimulator` with
         /// a null `PanelSettings`.
         /// </summary>
-        public RuntimePanelSimulator() : this(null) { }
+        public RuntimePanelSimulator()
+            : this(null) { }
 
         /// <summary>
         /// The distance used for the picking algorithm for pointer interactions in world space.
@@ -45,15 +46,15 @@ namespace UnityEngine.UIElements.TestFramework
         /// </summary>
         /// <param name="panelSettings">The `PanelSettings` object to set for the created panel.</param>
         public RuntimePanelSimulator(PanelSettings panelSettings)
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             : base()
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         {
             if (panelSettings != null)
             {
-                #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                 AssignPanel(panelSettings);
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
             }
         }
 
@@ -62,26 +63,26 @@ namespace UnityEngine.UIElements.TestFramework
         {
             if (panelSettingsAsset == null)
             {
-                #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                 SetPanel(null);
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
             }
             else
             {
-                #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                 SetPanel(panelSettingsAsset.panel);
                 SetRootVisualElement(panelSettingsAsset.panel.visualTree);
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
             }
         }
 
         /// <inheritdoc cref="PanelSimulator.FrameUpdate(double)"/>
         public override void FrameUpdate(double time)
         {
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             EnsureFrameUpdateCalledDuringTest();
             DoFrameUpdate(time);
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         /// <summary>
@@ -112,7 +113,10 @@ namespace UnityEngine.UIElements.TestFramework
             // change the ray to world space, then move back, and then change it back to panel space.
             var panelComponent = element.FindRootPanelComponent();
             if (panelComponent == null)
-                throw new ArgumentException("Element in world-space panel needs to come from a UIDocument or a PanelRenderer component.", nameof(element));
+                throw new ArgumentException(
+                    "Element in world-space panel needs to come from a UIDocument or a PanelRenderer component.",
+                    nameof(element)
+                );
             var transform = panelComponent.gameObject.transform;
             var worldRay = transform.localToWorldMatrix.TransformRay(panelRay);
             worldRay.origin -= worldRay.direction * pickingDistance;

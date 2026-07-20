@@ -1,14 +1,17 @@
 using UnityEngine;
 
-
 namespace TMPro
 {
-    public enum Compute_DistanceTransform_EventTypes { Processing, Completed };
-
+    public enum Compute_DistanceTransform_EventTypes
+    {
+        Processing,
+        Completed,
+    };
 
     public static class TMPro_EventManager
     {
-        public static readonly FastAction<object, Compute_DT_EventArgs> COMPUTE_DT_EVENT = new FastAction<object, Compute_DT_EventArgs>();
+        public static readonly FastAction<object, Compute_DT_EventArgs> COMPUTE_DT_EVENT =
+            new FastAction<object, Compute_DT_EventArgs>();
 
         // Event & Delegate used to notify TextMesh Pro objects that Material properties have been changed.
         public static readonly FastAction<bool, Material> MATERIAL_PROPERTY_EVENT = new FastAction<bool, Material>();
@@ -19,7 +22,8 @@ namespace TMPro
 
         public static readonly FastAction<bool, Object> TEXTMESHPRO_PROPERTY_EVENT = new FastAction<bool, Object>();
 
-        public static readonly FastAction<GameObject, Material, Material> DRAG_AND_DROP_MATERIAL_EVENT = new FastAction<GameObject, Material, Material>();
+        public static readonly FastAction<GameObject, Material, Material> DRAG_AND_DROP_MATERIAL_EVENT =
+            new FastAction<GameObject, Material, Material>();
 
         public static readonly FastAction<bool> TEXT_STYLE_PROPERTY_EVENT = new FastAction<bool>();
 
@@ -29,7 +33,8 @@ namespace TMPro
 
         public static readonly FastAction RESOURCE_LOAD_EVENT = new FastAction();
 
-        public static readonly FastAction<bool, Object> TEXTMESHPRO_UGUI_PROPERTY_EVENT = new FastAction<bool, Object>();
+        public static readonly FastAction<bool, Object> TEXTMESHPRO_UGUI_PROPERTY_EVENT =
+            new FastAction<bool, Object>();
 
         public static readonly FastAction<Object> TEXT_CHANGED_EVENT = new FastAction<Object>();
 
@@ -55,7 +60,11 @@ namespace TMPro
             TEXTMESHPRO_PROPERTY_EVENT.Call(isChanged, obj);
         }
 
-        public static void ON_DRAG_AND_DROP_MATERIAL_CHANGED(GameObject sender, Material currentMaterial, Material newMaterial)
+        public static void ON_DRAG_AND_DROP_MATERIAL_CHANGED(
+            GameObject sender,
+            Material currentMaterial,
+            Material newMaterial
+        )
         {
             DRAG_AND_DROP_MATERIAL_EVENT.Call(sender, currentMaterial, newMaterial);
         }
@@ -69,7 +78,6 @@ namespace TMPro
         {
             COLOR_GRADIENT_PROPERTY_EVENT.Call(obj);
         }
-
 
         public static void ON_TEXT_CHANGED(Object obj)
         {
@@ -108,13 +116,11 @@ namespace TMPro
         }
     }
 
-
     public class Compute_DT_EventArgs
     {
         public Compute_DistanceTransform_EventTypes EventType;
         public float ProgressPercentage;
         public Color[] Colors;
-
 
         public Compute_DT_EventArgs(Compute_DistanceTransform_EventTypes type, float progress)
         {
@@ -127,7 +133,5 @@ namespace TMPro
             EventType = type;
             Colors = colors;
         }
-
     }
-
 }

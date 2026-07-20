@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 
 namespace Unity.PlatformToolkit.Editor
 {
-    static internal class PlatformToolkitEditorRunner
+    internal static class PlatformToolkitEditorRunner
     {
         static PlayModeControlsSettings s_CachedSettings;
         static PlayModePlatformToolkit s_RegisteredUpdateInstance;
@@ -26,14 +26,18 @@ namespace Unity.PlatformToolkit.Editor
                     newRuntime.Capability,
                     newRuntime.Environment,
                     newRuntime.UserManager,
-                    settings.LocalSaveData);
+                    settings.LocalSaveData
+                );
 #if INPUT_SYSTEM_AVAILABLE
                 toolkit.SetInputSystem(newRuntime.PlayModeInputSystem);
 #endif // INPUT_SYSTEM_AVAILABLE;
                 PlatformToolkit.InjectImplementation(toolkit);
 
                 // PlayModeStateChanged will unregister this.
-                Assert.IsNull(s_RegisteredUpdateInstance, "An EditorApplication.update event was not unregistered correctly.");
+                Assert.IsNull(
+                    s_RegisteredUpdateInstance,
+                    "An EditorApplication.update event was not unregistered correctly."
+                );
                 s_RegisteredUpdateInstance = toolkit;
                 EditorApplication.update += Update;
             }

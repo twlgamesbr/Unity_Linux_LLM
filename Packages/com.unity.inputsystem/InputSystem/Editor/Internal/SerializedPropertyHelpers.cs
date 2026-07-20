@@ -16,13 +16,21 @@ namespace UnityEngine.InputSystem.Editor
         // Show a PropertyField with a greyed-out default text if the field is empty and not being edited.
         // This is meant to communicate the fact that filling these properties is optional and that Unity will
         // use reasonable defaults if left empty.
-        public static void PropertyFieldWithDefaultText(this SerializedProperty prop, GUIContent label, string defaultText)
+        public static void PropertyFieldWithDefaultText(
+            this SerializedProperty prop,
+            GUIContent label,
+            string defaultText
+        )
         {
             GUI.SetNextControlName(label.text);
             var rt = GUILayoutUtility.GetRect(label, GUI.skin.textField);
 
             EditorGUI.PropertyField(rt, prop, label);
-            if (string.IsNullOrEmpty(prop.stringValue) && GUI.GetNameOfFocusedControl() != label.text && Event.current.type == EventType.Repaint)
+            if (
+                string.IsNullOrEmpty(prop.stringValue)
+                && GUI.GetNameOfFocusedControl() != label.text
+                && Event.current.type == EventType.Repaint
+            )
             {
                 using (new EditorGUI.DisabledScope(true))
                 {
@@ -59,9 +67,15 @@ namespace UnityEngine.InputSystem.Editor
             if (propertyPath[propertyPath.Length - 1] != ']')
                 return -1;
             var lastIndexOfLeftBracket = propertyPath.LastIndexOf('[');
-            if (int.TryParse(
-                propertyPath.Substring(lastIndexOfLeftBracket + 1, propertyPath.Length - lastIndexOfLeftBracket - 2),
-                out var index))
+            if (
+                int.TryParse(
+                    propertyPath.Substring(
+                        lastIndexOfLeftBracket + 1,
+                        propertyPath.Length - lastIndexOfLeftBracket - 2
+                    ),
+                    out var index
+                )
+            )
                 return index;
             return -1;
         }
@@ -72,8 +86,10 @@ namespace UnityEngine.InputSystem.Editor
 
             var fieldType = property.GetFieldType();
             if (fieldType == null)
-                throw new ArgumentException($"Cannot determine managed field type of {property.propertyPath}",
-                    nameof(property));
+                throw new ArgumentException(
+                    $"Cannot determine managed field type of {property.propertyPath}",
+                    nameof(property)
+                );
 
             return fieldType.GetElementType();
         }
@@ -152,12 +168,21 @@ namespace UnityEngine.InputSystem.Editor
             return buffer.ToString();
         }
 
-        public static void CopyToJson(this SerializedProperty property, StringBuilder buffer, bool ignoreObjectReferences = false)
+        public static void CopyToJson(
+            this SerializedProperty property,
+            StringBuilder buffer,
+            bool ignoreObjectReferences = false
+        )
         {
             CopyToJson(property, buffer, noPropertyName: true, ignoreObjectReferences: ignoreObjectReferences);
         }
 
-        private static void CopyToJson(this SerializedProperty property, StringBuilder buffer, bool noPropertyName, bool ignoreObjectReferences)
+        private static void CopyToJson(
+            this SerializedProperty property,
+            StringBuilder buffer,
+            bool noPropertyName,
+            bool ignoreObjectReferences
+        )
         {
             var propertyType = property.propertyType;
             if (ignoreObjectReferences && propertyType == SerializedPropertyType.ObjectReference)
@@ -276,7 +301,10 @@ namespace UnityEngine.InputSystem.Editor
 
                     var childProperty = property.FindPropertyRelative(propertyName.ToString());
                     if (childProperty == null)
-                        throw new ArgumentException($"Cannot find property '{propertyName}' in {property}", nameof(property));
+                        throw new ArgumentException(
+                            $"Cannot find property '{propertyName}' in {property}",
+                            nameof(property)
+                        );
 
                     RestoreFromJson(childProperty, ref parser);
                     parser.ParseToken(',');
@@ -317,7 +345,8 @@ namespace UnityEngine.InputSystem.Editor
 
                     default:
                         throw new NotImplementedException(
-                            $"Restoring property value of type {property.propertyType} (property: {property})");
+                            $"Restoring property value of type {property.propertyType} (property: {property})"
+                        );
                 }
             }
         }
@@ -367,8 +396,10 @@ namespace UnityEngine.InputSystem.Editor
                     }
                 }
 
-                result = currentSerializableType.GetField(component,
-                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+                result = currentSerializableType.GetField(
+                    component,
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy
+                );
                 if (result == null)
                     return null;
                 currentSerializableType = result.FieldType;

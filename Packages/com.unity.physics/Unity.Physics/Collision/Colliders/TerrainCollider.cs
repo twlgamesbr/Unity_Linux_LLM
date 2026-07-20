@@ -15,6 +15,7 @@ namespace Unity.Physics
     public struct TerrainCollider : ICompositeCollider
     {
         internal ColliderHeader m_Header;
+
         /// <summary>   The material. </summary>
         public Material Material;
 
@@ -45,7 +46,7 @@ namespace Unity.Physics
             VertexSamples,
 
             /// <summary>   In this mode the collision behaves exactly as if it were a MeshCollider. </summary>
-            Triangles
+            Triangles,
         }
 
         /// <summary>   Create a terrain collider from a grid of heights. </summary>
@@ -56,8 +57,12 @@ namespace Unity.Physics
         /// <param name="collisionMethod">  The collision method. </param>
         ///
         /// <returns>   A BlobAssetReference&lt;Collider&gt; </returns>
-        public static BlobAssetReference<Collider> Create(NativeArray<float> heights, int2 size, float3 scale, CollisionMethod collisionMethod) =>
-            Create(heights, size, scale, collisionMethod, CollisionFilter.Default, Material.Default);
+        public static BlobAssetReference<Collider> Create(
+            NativeArray<float> heights,
+            int2 size,
+            float3 scale,
+            CollisionMethod collisionMethod
+        ) => Create(heights, size, scale, collisionMethod, CollisionFilter.Default, Material.Default);
 
         /// <summary>   Create a terrain collider from a grid of heights. </summary>
         ///
@@ -71,8 +76,22 @@ namespace Unity.Physics
         ///                                     When set to true, it is flipped and goes from vertex (i, j) (bottom-left corner) to (i+1, j+1) (top-right corner). </param>
         ///
         /// <returns>   A BlobAssetReference&lt;Collider&gt; </returns>
-        public static BlobAssetReference<Collider> Create(NativeArray<float> heights, int2 size, float3 scale, CollisionMethod collisionMethod, bool flipInnerCellEdges) =>
-            Create(heights, size, scale, collisionMethod, CollisionFilter.Default, Material.Default, flipInnerCellEdges);
+        public static BlobAssetReference<Collider> Create(
+            NativeArray<float> heights,
+            int2 size,
+            float3 scale,
+            CollisionMethod collisionMethod,
+            bool flipInnerCellEdges
+        ) =>
+            Create(
+                heights,
+                size,
+                scale,
+                collisionMethod,
+                CollisionFilter.Default,
+                Material.Default,
+                flipInnerCellEdges
+            );
 
         /// <summary>   Creates a new BlobAssetReference&lt;Collider&gt; </summary>
         ///
@@ -83,8 +102,13 @@ namespace Unity.Physics
         /// <param name="filter">           Specifies the filter. </param>
         ///
         /// <returns>   A BlobAssetReference&lt;Collider&gt; </returns>
-        public static BlobAssetReference<Collider> Create(NativeArray<float> heights, int2 size, float3 scale, CollisionMethod collisionMethod, CollisionFilter filter) =>
-            Create(heights, size, scale, collisionMethod, filter, Material.Default, flipInnerCellEdges: false);
+        public static BlobAssetReference<Collider> Create(
+            NativeArray<float> heights,
+            int2 size,
+            float3 scale,
+            CollisionMethod collisionMethod,
+            CollisionFilter filter
+        ) => Create(heights, size, scale, collisionMethod, filter, Material.Default, flipInnerCellEdges: false);
 
         /// <summary>   Creates a new BlobAssetReference&lt;Collider&gt; </summary>
         ///
@@ -96,8 +120,14 @@ namespace Unity.Physics
         /// <param name="material">             The material. </param>
         ///
         /// <returns>   A BlobAssetReference&lt;Collider&gt; </returns>
-        public static BlobAssetReference<Collider> Create(NativeArray<float> heights, int2 size, float3 scale, CollisionMethod collisionMethod, CollisionFilter filter, Material material) =>
-            Create(heights, size, scale, collisionMethod, filter, material, flipInnerCellEdges: false);
+        public static BlobAssetReference<Collider> Create(
+            NativeArray<float> heights,
+            int2 size,
+            float3 scale,
+            CollisionMethod collisionMethod,
+            CollisionFilter filter,
+            Material material
+        ) => Create(heights, size, scale, collisionMethod, filter, material, flipInnerCellEdges: false);
 
         /// <summary>   Creates a new BlobAssetReference&lt;Collider&gt; </summary>
         ///
@@ -113,7 +143,15 @@ namespace Unity.Physics
         ///                                     When set to true, it is flipped and goes from vertex (i, j) (bottom-left corner) to (i+1, j+1) (top-right corner). </param>
         ///
         /// <returns>   A BlobAssetReference&lt;Collider&gt; </returns>
-        public static BlobAssetReference<Collider> Create(NativeArray<float> heights, int2 size, float3 scale, CollisionMethod collisionMethod, CollisionFilter filter, Material material, bool flipInnerCellEdges)
+        public static BlobAssetReference<Collider> Create(
+            NativeArray<float> heights,
+            int2 size,
+            float3 scale,
+            CollisionMethod collisionMethod,
+            CollisionFilter filter,
+            Material material,
+            bool flipInnerCellEdges
+        )
         {
             unsafe
             {
@@ -128,7 +166,8 @@ namespace Unity.Physics
 
                 // Initialize the collider
                 collider->m_Header.Type = ColliderType.Terrain;
-                collider->m_Header.CollisionType = (collisionMethod == CollisionMethod.Triangles) ? CollisionType.Composite : CollisionType.Terrain;
+                collider->m_Header.CollisionType =
+                    (collisionMethod == CollisionMethod.Triangles) ? CollisionType.Composite : CollisionType.Terrain;
                 collider->m_Header.Version = 1;
                 collider->m_Header.Magic = 0xff;
                 collider->m_Header.ForceUniqueBlobID = ~ColliderConstants.k_SharedBlobID;
@@ -206,10 +245,11 @@ namespace Unity.Physics
                         InertiaTensor = new float3(
                             (size.y * size.y + size.z * size.z) / 12.0f,
                             (size.x * size.x + size.z * size.z) / 12.0f,
-                            (size.x * size.x + size.y * size.y) / 12.0f)
+                            (size.x * size.x + size.y * size.y) / 12.0f
+                        ),
                     },
                     Volume = 0,
-                    AngularExpansionFactor = math.length(Terrain.Aabb.Extents) * 0.5f
+                    AngularExpansionFactor = math.length(Terrain.Aabb.Extents) * 0.5f,
                 };
             }
         }
@@ -225,7 +265,10 @@ namespace Unity.Physics
         {
             if (key.PopSubKey(NumColliderKeyBits, out uint subKey))
             {
-                var index = new int2(((int)subKey >> 1) & ((1 << (int)Terrain.NumXBits) - 1), (int)subKey >> ((int)Terrain.NumXBits + 1));
+                var index = new int2(
+                    ((int)subKey >> 1) & ((1 << (int)Terrain.NumXBits) - 1),
+                    (int)subKey >> ((int)Terrain.NumXBits + 1)
+                );
                 int triangle = (int)subKey & 1;
                 child = Terrain.GetTriangle(index, triangle, GetCollisionFilter(), Material);
                 return true;
@@ -252,7 +295,8 @@ namespace Unity.Physics
         ///
         /// <typeparam name="T">    Generic type parameter. </typeparam>
         /// <param name="collector">    [in,out] The collector. </param>
-        public void GetLeaves<T>([NoAlias] ref T collector) where T : struct, ILeafColliderCollector
+        public void GetLeaves<T>([NoAlias] ref T collector)
+            where T : struct, ILeafColliderCollector
         {
             for (int x = 0; x < Terrain.Size.x - 1; x++)
             {
@@ -301,7 +345,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastRay(RaycastInput input, out RaycastHit closestHit) => QueryWrappers.RayCast(in this, input, out closestHit);
+        public bool CastRay(RaycastInput input, out RaycastHit closestHit) =>
+            QueryWrappers.RayCast(in this, input, out closestHit);
 
         /// <summary>   Cast ray. </summary>
         ///
@@ -309,7 +354,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastRay(RaycastInput input, ref NativeList<RaycastHit> allHits) => QueryWrappers.RayCast(in this, input, ref allHits);
+        public bool CastRay(RaycastInput input, ref NativeList<RaycastHit> allHits) =>
+            QueryWrappers.RayCast(in this, input, ref allHits);
 
         /// <summary>   Cast ray. </summary>
         ///
@@ -318,11 +364,12 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastRay<T>(RaycastInput input, ref T collector) where T : struct, ICollector<RaycastHit>
+        public bool CastRay<T>(RaycastInput input, ref T collector)
+            where T : struct, ICollector<RaycastHit>
         {
             unsafe
             {
-                fixed(TerrainCollider* target = &this)
+                fixed (TerrainCollider* target = &this)
                 {
                     return RaycastQueries.RayCollider(input, (Collider*)target, ref collector);
                 }
@@ -348,7 +395,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastCollider(ColliderCastInput input, out ColliderCastHit closestHit) => QueryWrappers.ColliderCast(in this, input, out closestHit);
+        public bool CastCollider(ColliderCastInput input, out ColliderCastHit closestHit) =>
+            QueryWrappers.ColliderCast(in this, input, out closestHit);
 
         /// <summary>   Cast collider. </summary>
         ///
@@ -356,7 +404,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastCollider(ColliderCastInput input, ref NativeList<ColliderCastHit> allHits) => QueryWrappers.ColliderCast(in this, input, ref allHits);
+        public bool CastCollider(ColliderCastInput input, ref NativeList<ColliderCastHit> allHits) =>
+            QueryWrappers.ColliderCast(in this, input, ref allHits);
 
         /// <summary>   Cast collider. </summary>
         ///
@@ -365,11 +414,12 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastCollider<T>(ColliderCastInput input, ref T collector) where T : struct, ICollector<ColliderCastHit>
+        public bool CastCollider<T>(ColliderCastInput input, ref T collector)
+            where T : struct, ICollector<ColliderCastHit>
         {
             unsafe
             {
-                fixed(TerrainCollider* target = &this)
+                fixed (TerrainCollider* target = &this)
                 {
                     return ColliderCastQueries.ColliderCollider(input, (Collider*)target, ref collector);
                 }
@@ -389,7 +439,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(PointDistanceInput input, out DistanceHit closestHit) => QueryWrappers.CalculateDistance(in this, input, out closestHit);
+        public bool CalculateDistance(PointDistanceInput input, out DistanceHit closestHit) =>
+            QueryWrappers.CalculateDistance(in this, input, out closestHit);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -397,7 +448,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(PointDistanceInput input, ref NativeList<DistanceHit> allHits) => QueryWrappers.CalculateDistance(in this, input, ref allHits);
+        public bool CalculateDistance(PointDistanceInput input, ref NativeList<DistanceHit> allHits) =>
+            QueryWrappers.CalculateDistance(in this, input, ref allHits);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -406,11 +458,12 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance<T>(PointDistanceInput input, ref T collector) where T : struct, ICollector<DistanceHit>
+        public bool CalculateDistance<T>(PointDistanceInput input, ref T collector)
+            where T : struct, ICollector<DistanceHit>
         {
             unsafe
             {
-                fixed(TerrainCollider* target = &this)
+                fixed (TerrainCollider* target = &this)
                 {
                     return DistanceQueries.PointCollider(input, (Collider*)target, ref collector);
                 }
@@ -430,7 +483,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(ColliderDistanceInput input, out DistanceHit closestHit) => QueryWrappers.CalculateDistance(in this, input, out closestHit);
+        public bool CalculateDistance(ColliderDistanceInput input, out DistanceHit closestHit) =>
+            QueryWrappers.CalculateDistance(in this, input, out closestHit);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -438,7 +492,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(ColliderDistanceInput input, ref NativeList<DistanceHit> allHits) => QueryWrappers.CalculateDistance(in this, input, ref allHits);
+        public bool CalculateDistance(ColliderDistanceInput input, ref NativeList<DistanceHit> allHits) =>
+            QueryWrappers.CalculateDistance(in this, input, ref allHits);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -447,11 +502,12 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance<T>(ColliderDistanceInput input, ref T collector) where T : struct, ICollector<DistanceHit>
+        public bool CalculateDistance<T>(ColliderDistanceInput input, ref T collector)
+            where T : struct, ICollector<DistanceHit>
         {
             unsafe
             {
-                fixed(TerrainCollider* target = &this)
+                fixed (TerrainCollider* target = &this)
                 {
                     return DistanceQueries.ColliderCollider(input, (Collider*)target, ref collector);
                 }
@@ -468,8 +524,12 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CheckSphere(float3 position, float radius, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CheckSphere(in this, position, radius, filter, queryInteraction);
+        public bool CheckSphere(
+            float3 position,
+            float radius,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.CheckSphere(in this, position, radius, filter, queryInteraction);
 
         /// <summary>   Overlap sphere. </summary>
         ///
@@ -480,8 +540,13 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapSphere(float3 position, float radius, ref NativeList<DistanceHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.OverlapSphere(in this, position, radius, ref outHits, filter, queryInteraction);
+        public bool OverlapSphere(
+            float3 position,
+            float radius,
+            ref NativeList<DistanceHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.OverlapSphere(in this, position, radius, ref outHits, filter, queryInteraction);
 
         /// <summary>   Overlap sphere custom. </summary>
         ///
@@ -493,8 +558,15 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapSphereCustom<T>(float3 position, float radius, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<DistanceHit>
-            => QueryWrappers.OverlapSphereCustom(in this, position, radius, ref collector, filter, queryInteraction);
+        public bool OverlapSphereCustom<T>(
+            float3 position,
+            float radius,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<DistanceHit> =>
+            QueryWrappers.OverlapSphereCustom(in this, position, radius, ref collector, filter, queryInteraction);
 
         /// <summary>   Check capsule. </summary>
         ///
@@ -505,8 +577,13 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CheckCapsule(float3 point1, float3 point2, float radius, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CheckCapsule(in this, point1, point2, radius, filter, queryInteraction);
+        public bool CheckCapsule(
+            float3 point1,
+            float3 point2,
+            float radius,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.CheckCapsule(in this, point1, point2, radius, filter, queryInteraction);
 
         /// <summary>   Overlap capsule. </summary>
         ///
@@ -518,8 +595,14 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapCapsule(float3 point1, float3 point2, float radius, ref NativeList<DistanceHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.OverlapCapsule(in this, point1, point2, radius, ref outHits, filter, queryInteraction);
+        public bool OverlapCapsule(
+            float3 point1,
+            float3 point2,
+            float radius,
+            ref NativeList<DistanceHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.OverlapCapsule(in this, point1, point2, radius, ref outHits, filter, queryInteraction);
 
         /// <summary>   Overlap capsule custom. </summary>
         ///
@@ -532,8 +615,24 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapCapsuleCustom<T>(float3 point1, float3 point2, float radius, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<DistanceHit>
-            => QueryWrappers.OverlapCapsuleCustom(in this, point1, point2, radius, ref collector, filter, queryInteraction);
+        public bool OverlapCapsuleCustom<T>(
+            float3 point1,
+            float3 point2,
+            float radius,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<DistanceHit> =>
+            QueryWrappers.OverlapCapsuleCustom(
+                in this,
+                point1,
+                point2,
+                radius,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Check box. </summary>
         ///
@@ -544,8 +643,13 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CheckBox(float3 center, quaternion orientation, float3 halfExtents, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CheckBox(in this, center, orientation, halfExtents, filter, queryInteraction);
+        public bool CheckBox(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.CheckBox(in this, center, orientation, halfExtents, filter, queryInteraction);
 
         /// <summary>   Overlap box. </summary>
         ///
@@ -557,8 +661,14 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapBox(float3 center, quaternion orientation, float3 halfExtents, ref NativeList<DistanceHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.OverlapBox(in this, center, orientation, halfExtents, ref outHits, filter, queryInteraction);
+        public bool OverlapBox(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            ref NativeList<DistanceHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.OverlapBox(in this, center, orientation, halfExtents, ref outHits, filter, queryInteraction);
 
         /// <summary>   Overlap box custom. </summary>
         ///
@@ -571,8 +681,24 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapBoxCustom<T>(float3 center, quaternion orientation, float3 halfExtents, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<DistanceHit>
-            => QueryWrappers.OverlapBoxCustom(in this, center, orientation, halfExtents, ref collector, filter, queryInteraction);
+        public bool OverlapBoxCustom<T>(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<DistanceHit> =>
+            QueryWrappers.OverlapBoxCustom(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Sphere cast. </summary>
         ///
@@ -584,8 +710,14 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCast(float3 origin, float radius, float3 direction, float maxDistance, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.SphereCast(in this, origin, radius, direction, maxDistance, filter, queryInteraction);
+        public bool SphereCast(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.SphereCast(in this, origin, radius, direction, maxDistance, filter, queryInteraction);
 
         /// <summary>   Sphere cast. </summary>
         ///
@@ -598,8 +730,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCast(float3 origin, float radius, float3 direction, float maxDistance, out ColliderCastHit hitInfo, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.SphereCast(in this, origin, radius, direction, maxDistance, out hitInfo, filter, queryInteraction);
+        public bool SphereCast(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            out ColliderCastHit hitInfo,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.SphereCast(
+                in this,
+                origin,
+                radius,
+                direction,
+                maxDistance,
+                out hitInfo,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Sphere cast all. </summary>
         ///
@@ -612,8 +761,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCastAll(float3 origin, float radius, float3 direction, float maxDistance, ref NativeList<ColliderCastHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.SphereCastAll(in this, origin, radius, direction, maxDistance, ref outHits, filter, queryInteraction);
+        public bool SphereCastAll(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref NativeList<ColliderCastHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.SphereCastAll(
+                in this,
+                origin,
+                radius,
+                direction,
+                maxDistance,
+                ref outHits,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Sphere cast custom. </summary>
         ///
@@ -627,8 +793,26 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCastCustom<T>(float3 origin, float radius, float3 direction, float maxDistance, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<ColliderCastHit>
-            => QueryWrappers.SphereCastCustom(in this, origin, radius, direction, maxDistance, ref collector, filter, queryInteraction);
+        public bool SphereCastCustom<T>(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<ColliderCastHit> =>
+            QueryWrappers.SphereCastCustom(
+                in this,
+                origin,
+                radius,
+                direction,
+                maxDistance,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast. </summary>
         ///
@@ -641,8 +825,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCast(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.BoxCast(in this, center, orientation, halfExtents, direction, maxDistance, filter, queryInteraction);
+        public bool BoxCast(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.BoxCast(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast. </summary>
         ///
@@ -656,8 +857,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCast(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, out ColliderCastHit hitInfo, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.BoxCast(in this, center, orientation, halfExtents, direction, maxDistance, out hitInfo, filter, queryInteraction);
+        public bool BoxCast(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            out ColliderCastHit hitInfo,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.BoxCast(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                out hitInfo,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast all. </summary>
         ///
@@ -671,8 +891,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCastAll(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, ref NativeList<ColliderCastHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.BoxCastAll(in this, center, orientation, halfExtents, direction, maxDistance, ref outHits, filter, queryInteraction);
+        public bool BoxCastAll(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            ref NativeList<ColliderCastHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.BoxCastAll(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                ref outHits,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast custom. </summary>
         ///
@@ -687,8 +926,28 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCastCustom<T>(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<ColliderCastHit>
-            => QueryWrappers.BoxCastCustom(in this, center, orientation, halfExtents, direction, maxDistance, ref collector, filter, queryInteraction);
+        public bool BoxCastCustom<T>(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<ColliderCastHit> =>
+            QueryWrappers.BoxCastCustom(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast. </summary>
         ///
@@ -701,8 +960,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCast(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CapsuleCast(in this, point1, point2, radius, direction, maxDistance, filter, queryInteraction);
+        public bool CapsuleCast(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.CapsuleCast(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast. </summary>
         ///
@@ -716,8 +992,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCast(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, out ColliderCastHit hitInfo, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CapsuleCast(in this, point1, point2, radius, direction, maxDistance, out hitInfo, filter, queryInteraction);
+        public bool CapsuleCast(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            out ColliderCastHit hitInfo,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.CapsuleCast(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                out hitInfo,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast all. </summary>
         ///
@@ -731,8 +1026,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCastAll(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, ref NativeList<ColliderCastHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CapsuleCastAll(in this, point1, point2, radius, direction, maxDistance, ref outHits, filter, queryInteraction);
+        public bool CapsuleCastAll(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref NativeList<ColliderCastHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.CapsuleCastAll(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                ref outHits,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast custom. </summary>
         ///
@@ -747,8 +1061,28 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCastCustom<T>(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<ColliderCastHit>
-            => QueryWrappers.CapsuleCastCustom(in this, point1, point2, radius, direction, maxDistance, ref collector, filter, queryInteraction);
+        public bool CapsuleCastCustom<T>(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<ColliderCastHit> =>
+            QueryWrappers.CapsuleCastCustom(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         #endregion
 
@@ -799,8 +1133,8 @@ namespace Unity.Physics
         // Descriptor for one level of the quadtree
         public struct Level
         {
-            public int Base;    // Index of the first node
-            public int Pitch;   // Number of nodes per row
+            public int Base; // Index of the first node
+            public int Pitch; // Number of nodes per row
             public float Scale; // Size of a child of a node in this level
         }
 
@@ -850,8 +1184,12 @@ namespace Unity.Physics
         // Calculate the number of quadtree nodes and levels required for the given heightfield size
         static internal void CalculateTreeInfo(
             int2 heightfieldSize,
-            out int numNodes, out int numLevels,
-            out int heightsSize, out int levelsSize, out int nodesSize)
+            out int numNodes,
+            out int numLevels,
+            out int heightsSize,
+            out int levelsSize,
+            out int nodesSize
+        )
         {
             numNodes = 0;
             numLevels = 0;
@@ -880,10 +1218,16 @@ namespace Unity.Physics
         }
 
         // Calculate the amount of extra memory needed to store the terrain data for the given heightfield size
-        static internal int CalculateDataSize(int2 heightfieldSize)
+        internal static int CalculateDataSize(int2 heightfieldSize)
         {
-            CalculateTreeInfo(heightfieldSize, out int numNodes, out int numLevels,
-                out int heightsSize, out int levelsSize, out int nodesSize);
+            CalculateTreeInfo(
+                heightfieldSize,
+                out int numNodes,
+                out int numLevels,
+                out int heightsSize,
+                out int levelsSize,
+                out int nodesSize
+            );
             return heightsSize + levelsSize + nodesSize + 64; // + 64 to allow for aligning the nodes to 64 bytes
         }
 
@@ -892,8 +1236,14 @@ namespace Unity.Physics
         internal unsafe void Init(int2 size, float3 scale, float* heights, bool flipInnerCellEdges = false)
         {
             int numSamples = size.x * size.y;
-            CalculateTreeInfo(size, out int numNodes, out int numLevels,
-                out int heightsSize, out int levelsSize, out int nodesSize);
+            CalculateTreeInfo(
+                size,
+                out int numNodes,
+                out int numLevels,
+                out int heightsSize,
+                out int levelsSize,
+                out int nodesSize
+            );
 
             // Calculate the quantization scale for the heights
             float quantizationFactor;
@@ -969,7 +1319,6 @@ namespace Unity.Physics
                         levelSize = (levelSize / 2 + 1) & ~1;
                     }
                     level -= levelSize.x * levelSize.y; // pointer to the beginning of the current level's nodes
-
 #if DEVELOPMENT_BUILD
                     SafetyChecks.Check4ByteAlignmentAndThrow(levelData, nameof(levelData));
 #endif
@@ -983,7 +1332,7 @@ namespace Unity.Physics
                     // Build the level's nodes
                     int2 index = int2.zero;
                     Node* node = level;
-                    int4 di = new int4(1, -1, 1, 1);    // swizzling pattern, order in 2x2 blocks
+                    int4 di = new int4(1, -1, 1, 1); // swizzling pattern, order in 2x2 blocks
                     int4 dj = new int4(0, 1, 0, -1);
                     while (node != lastLevel)
                     {
@@ -1026,12 +1375,20 @@ namespace Unity.Physics
                                         {
                                             int2 sampleIndex = childIndex + new int2(i, j);
                                             short height0 = quantizedHeights[sampleIndex.y * size.x + sampleIndex.x];
-                                            short height1 = quantizedHeights[sampleIndex.y * size.x + sampleIndex.x + 1];
-                                            short height2 = quantizedHeights[(sampleIndex.y + 1) * size.x + sampleIndex.x];
-                                            short height3 = quantizedHeights[(sampleIndex.y + 1) * size.x + sampleIndex.x + 1];
+                                            short height1 = quantizedHeights[
+                                                sampleIndex.y * size.x + sampleIndex.x + 1
+                                            ];
+                                            short height2 = quantizedHeights[
+                                                (sampleIndex.y + 1) * size.x + sampleIndex.x
+                                            ];
+                                            short height3 = quantizedHeights[
+                                                (sampleIndex.y + 1) * size.x + sampleIndex.x + 1
+                                            ];
 
-                                            node->Min[leafIndex] = (short)math.min(math.min(height0, height1), math.min(height2, height3));
-                                            node->Max[leafIndex] = (short)math.max(math.max(height0, height1), math.max(height2, height3));
+                                            node->Min[leafIndex] = (short)
+                                                math.min(math.min(height0, height1), math.min(height2, height3));
+                                            node->Max[leafIndex] = (short)
+                                                math.max(math.max(height0, height1), math.max(height2, height3));
                                         }
                                         leafIndex++;
                                     }
@@ -1044,8 +1401,12 @@ namespace Unity.Physics
                             if (childIndex.x < lastSize.x && childIndex.y < lastSize.y)
                             {
                                 Node* lastNode = lastLevel + index.y * lastSize.x * 2 + index.x * 4;
-                                int4x4 minT = math.transpose(new int4x4(lastNode[0].Min4, lastNode[1].Min4, lastNode[2].Min4, lastNode[3].Min4));
-                                int4x4 maxT = math.transpose(new int4x4(lastNode[0].Max4, lastNode[1].Max4, lastNode[2].Max4, lastNode[3].Max4));
+                                int4x4 minT = math.transpose(
+                                    new int4x4(lastNode[0].Min4, lastNode[1].Min4, lastNode[2].Min4, lastNode[3].Min4)
+                                );
+                                int4x4 maxT = math.transpose(
+                                    new int4x4(lastNode[0].Max4, lastNode[1].Max4, lastNode[2].Max4, lastNode[3].Max4)
+                                );
                                 node->Min4 = math.min(math.min(minT.c0, minT.c1), math.min(minT.c2, minT.c3));
                                 node->Max4 = math.max(math.max(maxT.c0, maxT.c1), math.max(maxT.c2, maxT.c3));
                             }
@@ -1068,15 +1429,14 @@ namespace Unity.Physics
                             index = new int2(0, index.y + 2);
                         }
                     }
-                }
-                while (math.any(levelSize > 1));
+                } while (math.any(levelSize > 1));
             }
 
             // Use min and max height of the whole heightfield to build the AABB
             Aabb = new Aabb
             {
                 Min = new float3(0, math.cmin(root->Min4), 0) * Scale,
-                Max = new float3(size.x - 1, math.cmax(root->Max4), size.y - 1) * Scale
+                Max = new float3(size.x - 1, math.cmax(root->Max4), size.y - 1) * Scale,
             };
 
             // Set the flag that determines the orientation of the inner diagonal edge of each terrain cell during triangulation.
@@ -1113,7 +1473,14 @@ namespace Unity.Physics
 
             // Get heights of the corners of the cell
             int baseIndex = index.y * Size.x + index.x;
-            float4 heights = Scale.y * new float4(Heights[baseIndex], Heights[baseIndex + 1], Heights[baseIndex + Size.x], Heights[baseIndex + Size.x + 1]);
+            float4 heights =
+                Scale.y
+                * new float4(
+                    Heights[baseIndex],
+                    Heights[baseIndex + 1],
+                    Heights[baseIndex + Size.x],
+                    Heights[baseIndex + Size.x + 1]
+                );
 
             // Get the height within the cell
             bool triangle0 = fraction0.x < fraction1.y; // Select the triangle within the cell
@@ -1143,7 +1510,9 @@ namespace Unity.Physics
         // Returns a triangle in a ChildCollider
         public ChildCollider GetTriangle(int2 index, int triangle, CollisionFilter filter, Material material)
         {
-            int2 index0, index1, index2;
+            int2 index0,
+                index1,
+                index2;
 
             if (m_FlipInnerCellEdge)
             {
@@ -1164,7 +1533,9 @@ namespace Unity.Physics
                 new float3(index0.x, GetHeight(index0), index0.y) * Scale,
                 new float3(index1.x, GetHeight(index1), index1.y) * Scale,
                 new float3(index2.x, GetHeight(index2), index2.y) * Scale,
-                filter, material);
+                filter,
+                material
+            );
         }
 
         // Helper for traversing the quad tree in query implementations
@@ -1195,7 +1566,7 @@ namespace Unity.Physics
                 Bounds = new FourTransposedAabbs();
 
                 // Initialize the stack with a single node
-                fixed(int* stack = m_Stack)
+                fixed (int* stack = m_Stack)
                 {
                     m_Top = stack;
 
@@ -1243,7 +1614,7 @@ namespace Unity.Physics
             // Otherwise returns false.
             public bool Pop()
             {
-                fixed(int* stack = m_Stack)
+                fixed (int* stack = m_Stack)
                 {
                     if (m_Top == stack)
                     {
@@ -1257,7 +1628,8 @@ namespace Unity.Physics
 
                 // Get the node
                 Level level = m_Terrain->Levels[m_LevelIndex];
-                int levelOffset = (m_Index.y & ~1) * level.Pitch + ((m_Index.y & 1) << 1) + ((m_Index.x & ~1) << 1) + (m_Index.x & 1); // swizzled, see comment on Nodes
+                int levelOffset =
+                    (m_Index.y & ~1) * level.Pitch + ((m_Index.y & 1) << 1) + ((m_Index.x & ~1) << 1) + (m_Index.x & 1); // swizzled, see comment on Nodes
                 Node node = m_Terrain->Nodes[level.Base + levelOffset];
 
                 // Calculate the AABBs of the node's children
@@ -1271,7 +1643,7 @@ namespace Unity.Physics
                     Lz = boundsZ.xxyy,
                     Hz = boundsZ.yyzz,
                     Ly = node.Min4,
-                    Hy = node.Max4
+                    Hy = node.Max4,
                 };
 
                 return true;
@@ -1285,7 +1657,14 @@ namespace Unity.Physics
 
             // Returns the coordinates and vertices of one child of the current node, specified by childIndex.
             // Should only be called if the current node is a leaf.
-            public void GetQuad(int childIndex, out int2 quadIndex, out float3 a, out float3 b, out float3 c, out float3 d)
+            public void GetQuad(
+                int childIndex,
+                out int2 quadIndex,
+                out float3 a,
+                out float3 b,
+                out float3 c,
+                out float3 d
+            )
             {
                 quadIndex = GetQuadIndex(childIndex);
                 int height0 = m_Terrain->GetHeight(quadIndex);

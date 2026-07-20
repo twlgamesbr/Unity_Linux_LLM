@@ -24,12 +24,19 @@ namespace Unity.Entities.Editor
             if (data.Entity != default)
                 Update(data);
             this.Q<VisualElement>(className: UssClasses.EntityView.GoTo)
-                .RegisterCallback<MouseDownEvent, EntityView>((_, @this) =>
-                {
-                    Analytics.SendEditorEvent(Analytics.Window.Inspector, Analytics.EventType.RelationshipGoTo, Analytics.GoToEntityDestination);
-                    EntitySelectionProxy.SelectEntity(@this.m_Data.World, @this.m_Data.Entity);
-                    FrameInHierarchy(@this.m_Data.Entity);
-                }, this);
+                .RegisterCallback<MouseDownEvent, EntityView>(
+                    (_, @this) =>
+                    {
+                        Analytics.SendEditorEvent(
+                            Analytics.Window.Inspector,
+                            Analytics.EventType.RelationshipGoTo,
+                            Analytics.GoToEntityDestination
+                        );
+                        EntitySelectionProxy.SelectEntity(@this.m_Data.World, @this.m_Data.Entity);
+                        FrameInHierarchy(@this.m_Data.Entity);
+                    },
+                    this
+                );
         }
 
         static void FrameInHierarchy(Entity entity)

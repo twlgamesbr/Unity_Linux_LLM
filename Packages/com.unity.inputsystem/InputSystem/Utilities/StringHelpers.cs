@@ -99,10 +99,14 @@ namespace UnityEngine.InputSystem.Utilities
 
             switch (str)
             {
-                case "Mouse": return "Mice";
-                case "mouse": return "mice";
-                case "Axis": return "Axes";
-                case "axis": return "axes";
+                case "Mouse":
+                    return "Mice";
+                case "mouse":
+                    return "mice";
+                case "Axis":
+                    return "Axes";
+                case "axis":
+                    return "axes";
             }
 
             return str + 's';
@@ -317,8 +321,11 @@ namespace UnityEngine.InputSystem.Utilities
             return result.ToString();
         }
 
-        public static string MakeUniqueName<TExisting>(string baseName, IEnumerable<TExisting> existingSet,
-            Func<TExisting, string> getNameFunc)
+        public static string MakeUniqueName<TExisting>(
+            string baseName,
+            IEnumerable<TExisting> existingSet,
+            Func<TExisting, string> getNameFunc
+        )
         {
             if (getNameFunc == null)
                 throw new ArgumentNullException(nameof(getNameFunc));
@@ -364,8 +371,11 @@ namespace UnityEngine.InputSystem.Utilities
         }
 
         ////REVIEW: should we allow whitespace and skip automatically?
-        public static bool CharacterSeparatedListsHaveAtLeastOneCommonElement(string firstList, string secondList,
-            char separator)
+        public static bool CharacterSeparatedListsHaveAtLeastOneCommonElement(
+            string firstList,
+            string secondList,
+            char separator
+        )
         {
             if (firstList == null)
                 throw new ArgumentNullException(nameof(firstList));
@@ -471,14 +481,22 @@ namespace UnityEngine.InputSystem.Utilities
             return WriteStringToBuffer(text, buffer, bufferSizeInCharacters, ref offset);
         }
 
-        public static unsafe bool WriteStringToBuffer(string text, IntPtr buffer, int bufferSizeInCharacters, ref uint offset)
+        public static unsafe bool WriteStringToBuffer(
+            string text,
+            IntPtr buffer,
+            int bufferSizeInCharacters,
+            ref uint offset
+        )
         {
             if (buffer == IntPtr.Zero)
                 throw new ArgumentNullException("buffer");
 
             var length = string.IsNullOrEmpty(text) ? 0 : text.Length;
             if (length > ushort.MaxValue)
-                throw new ArgumentException(string.Format("String exceeds max size of {0} characters", ushort.MaxValue), "text");
+                throw new ArgumentException(
+                    string.Format("String exceeds max size of {0} characters", ushort.MaxValue),
+                    "text"
+                );
 
             var endOffset = offset + sizeof(char) * length + sizeof(int);
             if (endOffset > bufferSizeInCharacters)

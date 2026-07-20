@@ -115,7 +115,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions
 
             return 0;
         }
-        
+
         public static int GetRepeatIteration(this ITest test)
         {
             if (test.Properties.ContainsKey("repeatIteration"))
@@ -199,6 +199,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions
         {
             return childIndex != -1 ? GetIndexedTestCaseName(testFullName, childIndex) : testFullName;
         }
+
         private static string GetIndexedTestCaseName(string fullName, int index)
         {
             var generatedTestSuffix = " GeneratedTestCase" + index;

@@ -30,10 +30,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
         int m_Index;
 
         [SerializeField]
-        List<Configuration> m_Configurations = new(new[]
-        {
-            new Configuration { ConnectionPreset = NetworkSimulatorPresets.None }
-        });
+        List<Configuration> m_Configurations = new(
+            new[] { new Configuration { ConnectionPreset = NetworkSimulatorPresets.None } }
+        );
 
         /// <summary>
         /// The list of configuration used to define <see cref="PresetConfiguration.ConnectionPreset"/> and the <see cref="Configuration.ChangeIntervalMilliseconds"/>.
@@ -53,7 +52,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
 
                 if (m_Index >= m_Configurations.Count)
                 {
-                    Debug.LogWarning($"Skipping scenario item #{m_Index} as {nameof(ConnectionsCycle)}.{nameof(Configurations)} doesn't have enough elements.");
+                    Debug.LogWarning(
+                        $"Skipping scenario item #{m_Index} as {nameof(ConnectionsCycle)}.{nameof(Configurations)} doesn't have enough elements."
+                    );
                     await Task.Yield();
                     Iterate();
                     continue;
@@ -66,7 +67,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
 
                 if (config.ChangeIntervalMilliseconds <= 0)
                 {
-                    Debug.LogWarning($"Skipping scenario item #{m_Index}. {nameof(ConnectionsCycle)}.{nameof(Configurations)}[{m_Index}].{config.ChangeIntervalMilliseconds} must be greater than 0.");
+                    Debug.LogWarning(
+                        $"Skipping scenario item #{m_Index}. {nameof(ConnectionsCycle)}.{nameof(Configurations)}[{m_Index}].{config.ChangeIntervalMilliseconds} must be greater than 0."
+                    );
                     await Task.Yield();
                     Iterate();
                     continue;
@@ -77,6 +80,7 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
                 Iterate();
             }
         }
+
         void Iterate() => m_Index = ++m_Index >= m_Configurations.Count ? 0 : m_Index;
     }
 }

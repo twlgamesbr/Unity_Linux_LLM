@@ -2,7 +2,7 @@ using System;
 
 namespace Unity.Entities
 {
-    internal struct ComponentTypeInArchetype: IEquatable<ComponentTypeInArchetype>
+    internal struct ComponentTypeInArchetype : IEquatable<ComponentTypeInArchetype>
     {
         public readonly TypeIndex TypeIndex;
 
@@ -29,12 +29,12 @@ namespace Unity.Entities
             TypeIndex = typeIndex;
         }
 
-        public static bool operator==(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
+        public static bool operator ==(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
         {
             return lhs.TypeIndex == rhs.TypeIndex;
         }
 
-        public static bool operator!=(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
+        public static bool operator !=(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
         {
             return lhs.TypeIndex != rhs.TypeIndex;
         }
@@ -55,28 +55,32 @@ namespace Unity.Entities
         //12. Chunk Dynamic buffer components (IBufferElementData)
         //13. Chunk cleanup dynamic buffer components (ICleanupBufferElementData)
 
-        public static bool operator<(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
+        public static bool operator <(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
         {
             return lhs.TypeIndex < rhs.TypeIndex;
         }
 
-        public static bool operator>(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
+        public static bool operator >(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
         {
             return lhs.TypeIndex > rhs.TypeIndex;
         }
 
-        public static bool operator<=(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
+        public static bool operator <=(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
         {
             return !(lhs > rhs);
         }
 
-        public static bool operator>=(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
+        public static bool operator >=(ComponentTypeInArchetype lhs, ComponentTypeInArchetype rhs)
         {
             return !(lhs < rhs);
         }
 
-        public static unsafe bool CompareArray(ComponentTypeInArchetype* type1, int typeCount1,
-            ComponentTypeInArchetype* type2, int typeCount2)
+        public static unsafe bool CompareArray(
+            ComponentTypeInArchetype* type1,
+            int typeCount1,
+            ComponentTypeInArchetype* type2,
+            int typeCount2
+        )
         {
             if (typeCount1 != typeCount2)
                 return false;
@@ -99,7 +103,6 @@ namespace Unity.Entities
         {
             return ToComponentType().ToString();
         }
-
 #endif
         public override bool Equals(object obj)
         {

@@ -10,16 +10,19 @@ namespace UnityEngine.TestTools.Utils
         private const float k_DefaultError = 0.01f;
         private readonly float AllowedError;
 
-
         private static readonly ColorEqualityComparer m_Instance = new ColorEqualityComparer();
+
         /// <summary>
         ///A singleton instance of the comparer with a default error value set to 0.01f.
         /// </summary>
-        public static ColorEqualityComparer Instance { get { return m_Instance; } }
-
-        private ColorEqualityComparer() : this(k_DefaultError)
+        public static ColorEqualityComparer Instance
         {
+            get { return m_Instance; }
         }
+
+        private ColorEqualityComparer()
+            : this(k_DefaultError) { }
+
         /// <summary>
         /// Creates an instance of the comparer with a custom error value.
         /// </summary>
@@ -61,10 +64,10 @@ namespace UnityEngine.TestTools.Utils
         /// </example>
         public bool Equals(Color expected, Color actual)
         {
-            return Utils.AreFloatsEqualAbsoluteError(expected.r, actual.r, AllowedError) &&
-                Utils.AreFloatsEqualAbsoluteError(expected.g, actual.g, AllowedError) &&
-                Utils.AreFloatsEqualAbsoluteError(expected.b, actual.b, AllowedError) &&
-                Utils.AreFloatsEqualAbsoluteError(expected.a, actual.a, AllowedError);
+            return Utils.AreFloatsEqualAbsoluteError(expected.r, actual.r, AllowedError)
+                && Utils.AreFloatsEqualAbsoluteError(expected.g, actual.g, AllowedError)
+                && Utils.AreFloatsEqualAbsoluteError(expected.b, actual.b, AllowedError)
+                && Utils.AreFloatsEqualAbsoluteError(expected.a, actual.a, AllowedError);
         }
 
         /// <summary>

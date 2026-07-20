@@ -1,44 +1,50 @@
 using Unity.Collections;
-using Unity.Mathematics;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
 
 namespace UnityEngine.Rendering.Universal
 {
     internal class LightBuffer
     {
-        static readonly internal int kMax = 2048 * 8;
-        static readonly internal int kCount = 1;
-        static readonly internal int kLightMod = 64;
-        static readonly internal int kBatchMax = 256;
+        internal static readonly int kMax = 2048 * 8;
+        internal static readonly int kCount = 1;
+        internal static readonly int kLightMod = 64;
+        internal static readonly int kBatchMax = 256;
 
         private GraphicsBuffer m_GraphicsBuffer;
-        private NativeArray<int> m_Markers = new NativeArray<int>(kBatchMax, Allocator.Persistent, NativeArrayOptions.ClearMemory);
-        private NativeArray<PerLight2D> m_NativeBuffer = new NativeArray<PerLight2D>(kMax, Allocator.Persistent, NativeArrayOptions.ClearMemory);
+        private NativeArray<int> m_Markers = new NativeArray<int>(
+            kBatchMax,
+            Allocator.Persistent,
+            NativeArrayOptions.ClearMemory
+        );
+        private NativeArray<PerLight2D> m_NativeBuffer = new NativeArray<PerLight2D>(
+            kMax,
+            Allocator.Persistent,
+            NativeArrayOptions.ClearMemory
+        );
 
         internal GraphicsBuffer graphicsBuffer
         {
             get
             {
                 if (null == m_GraphicsBuffer)
-                    m_GraphicsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, kMax, UnsafeUtility.SizeOf<PerLight2D>());
+                    m_GraphicsBuffer = new GraphicsBuffer(
+                        GraphicsBuffer.Target.Structured,
+                        kMax,
+                        UnsafeUtility.SizeOf<PerLight2D>()
+                    );
                 return m_GraphicsBuffer;
             }
         }
 
         internal NativeArray<int> lightMarkers
         {
-            get
-            {
-                return m_Markers;
-            }
+            get { return m_Markers; }
         }
 
         internal NativeArray<PerLight2D> nativeBuffer
         {
-            get
-            {
-                return m_NativeBuffer;
-            }
+            get { return m_NativeBuffer; }
         }
 
         internal void Release()
@@ -55,23 +61,26 @@ namespace UnityEngine.Rendering.Universal
             }
             unsafe
             {
-                UnsafeUtility.MemClear(m_NativeBuffer.GetUnsafePtr(), UnsafeUtility.SizeOf<PerLight2D>() * LightBuffer.kMax);
+                UnsafeUtility.MemClear(
+                    m_NativeBuffer.GetUnsafePtr(),
+                    UnsafeUtility.SizeOf<PerLight2D>() * LightBuffer.kMax
+                );
             }
         }
-
     }
 
     // The idea is to avoid CPU cost when rendering meshes with the same shader (Consider this a light-weight SRP batcher). To identify the Mesh instance ID in the Light Buffer we utilize a Slot Index
     // identified from the Blue Channel of the Vertex Colors (Solely used for this purpose). This can batch a maximum of kLightMod meshes in best-case scenario. Simple but no optizations have been added yet
     internal class LightBatch
     {
-
         static readonly ProfilingSampler profilingDrawBatched = new ProfilingSampler("Light2D Batcher");
         static readonly int k_BufferOffset = Shader.PropertyToID("_BatchBufferOffset");
         static int sBatchIndexCounter = 0; // For LightMesh asset conditioning to facilitate batching.
 
         private static int batchLightMod => LightBuffer.kLightMod;
-        private static float batchRunningIndex => (sBatchIndexCounter++) % LightBuffer.kLightMod / (float)LightBuffer.kLightMod;
+        private static float batchRunningIndex =>
+            (sBatchIndexCounter++) % LightBuffer.kLightMod / (float)LightBuffer.kLightMod;
+
         // Should be in Sync with USE_STRUCTURED_BUFFER_FOR_LIGHT2D_DATA
         public static bool isBatchingSupported => false;
 
@@ -119,6 +128,7 @@ namespace UnityEngine.Rendering.Universal
         }
 
         internal PerLight2D GetLight(int index) => nativeBuffer[index];
+
         internal static int batchSlotIndex => (int)(batchRunningIndex * LightBuffer.kLightMod);
 #if UNITY_EDITOR
         static bool kRegisterCallback = false;
@@ -146,7 +156,9 @@ namespace UnityEngine.Rendering.Universal
             {
                 int _hashCode = (int)2166136261;
                 _hashCode = _hashCode * 16777619 ^ material.GetHashCode();
-                _hashCode = _hashCode * 16777619 ^ (light.lightCookieSprite == null ? 0 : light.lightCookieSprite.GetHashCode());
+                _hashCode =
+                    _hashCode * 16777619
+                    ^ (light.lightCookieSprite == null ? 0 : light.lightCookieSprite.GetHashCode());
                 return _hashCode;
             }
         }
@@ -176,7 +188,12 @@ namespace UnityEngine.Rendering.Universal
         void SetBuffer()
         {
             Validate();
-            graphicsBuffer.SetData(nativeBuffer, lightCount, lightCount, math.min(LightBuffer.kBatchMax, LightBuffer.kMax - lightCount));
+            graphicsBuffer.SetData(
+                nativeBuffer,
+                lightCount,
+                lightCount,
+                math.min(LightBuffer.kBatchMax, LightBuffer.kMax - lightCount)
+            );
         }
 
         internal int SlotIndex(int x)
@@ -219,7 +236,15 @@ namespace UnityEngine.Rendering.Universal
             return true;
         }
 
-        internal bool AddBatch(Light2D light, Material material, Matrix4x4 mat, Mesh mesh, int subset, int lightHash, int index)
+        internal bool AddBatch(
+            Light2D light,
+            Material material,
+            Matrix4x4 mat,
+            Mesh mesh,
+            int subset,
+            int lightHash,
+            int index
+        )
         {
             Debug.Assert(lightHash == hashCode);
             cachedLight = light;

@@ -3,18 +3,26 @@ using System;
 namespace Unity.Collections
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [Obsolete("Use GenerateTestsForBurstCompatibility (UnityUpgradable) -> GenerateTestsForBurstCompatibilityAttribute", true)]
-    public class BurstCompatibleAttribute : Attribute
-    {
-    }
+    [Obsolete(
+        "Use GenerateTestsForBurstCompatibility (UnityUpgradable) -> GenerateTestsForBurstCompatibilityAttribute",
+        true
+    )]
+    public class BurstCompatibleAttribute : Attribute { }
 
     /// <summary>
     /// Documents and enforces (via generated tests) that the tagged method or property has to stay burst compatible.
     /// </summary>
     /// <remarks>This attribute cannot be used with private methods or properties.</remarks>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Constructor, AllowMultiple = true)]
+    [AttributeUsage(
+        AttributeTargets.Class
+            | AttributeTargets.Struct
+            | AttributeTargets.Method
+            | AttributeTargets.Property
+            | AttributeTargets.Constructor,
+        AllowMultiple = true
+    )]
     public class GenerateTestsForBurstCompatibilityAttribute : Attribute
     {
         /// <summary>
@@ -35,7 +43,7 @@ namespace Unity.Collections
             /// <summary>
             /// Player and editor.
             /// </summary>
-            PlayerAndEditor
+            PlayerAndEditor,
         }
 
         /// <summary>
@@ -93,7 +101,7 @@ namespace Unity.Collections
         /// Reason for excluding a method from being included in generated Burst compilation tests
         /// </summary>
         public string Reason { get; set; }
-        
+
         /// <summary>
         /// Create this attribute with the reason to exclude from burst compatibility testing.
         /// </summary>

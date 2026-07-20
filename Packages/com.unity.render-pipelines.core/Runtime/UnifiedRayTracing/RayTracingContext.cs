@@ -1,5 +1,4 @@
 using System;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -19,7 +18,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// <summary>
         /// Software implementation of ray tracing that requires the GPU to support compute shaders.
         /// </summary>
-        Compute = 1
+        Compute = 1,
     }
 
     /// <summary>
@@ -64,9 +63,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// </summary>
         /// <param name="resources">The resources (provides the various shaders the context needs to operate).</param>
         /// <exception cref="System.InvalidOperationException">Thrown when no supported backend is available.</exception>
-        public RayTracingContext(RayTracingResources resources) : this(IsBackendSupported(RayTracingBackend.Hardware) ? RayTracingBackend.Hardware : RayTracingBackend.Compute, resources)
-        {
-        }
+        public RayTracingContext(RayTracingResources resources)
+            : this(
+                IsBackendSupported(RayTracingBackend.Hardware) ? RayTracingBackend.Hardware : RayTracingBackend.Compute,
+                resources
+            ) { }
 
         /// <summary>
         /// Disposes the RaytracingContext.
@@ -78,8 +79,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         {
             if (m_AccelStructCounter.value != 0)
             {
-                Debug.LogError("Memory Leak. Please call .Dispose() on all the IAccelerationStructure resources "+
-                               "that have been created with this context before calling RayTracingContext.Dispose()");
+                Debug.LogError(
+                    "Memory Leak. Please call .Dispose() on all the IAccelerationStructure resources "
+                        + "that have been created with this context before calling RayTracingContext.Dispose()"
+                );
             }
             m_DispatchBuffer?.Release();
         }
@@ -94,7 +97,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// </summary>
         /// <param name="backend">The backend.</param>
         /// <returns>Whether the specified bakend is supported.</returns>
-        static public bool IsBackendSupported(RayTracingBackend backend)
+        public static bool IsBackendSupported(RayTracingBackend backend)
         {
             if (backend == RayTracingBackend.Hardware)
                 return SystemInfo.supportsRayTracing;
@@ -149,6 +152,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return CreateRayTracingShader(asset);
         }
 #endif
+
         /// <summary>
         /// Creates a IRayTracingAccelStruct.
         /// </summary>
@@ -214,7 +218,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// <summary>
         /// Minimize the amount of temporary memory Unity uses when building the acceleration structure, and minimize the size of the result.
         /// </summary>
-        MinimizeMemory = 1 << 2
+        MinimizeMemory = 1 << 2,
     }
 
     /// <summary>
@@ -226,6 +230,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// Option for the quality of the built <see cref="IRayTracingAccelStruct"/>.
         /// </summary>
         public BuildFlags buildFlags = 0;
+
 #if UNITY_EDITOR
         /// <summary>
         /// Enables building the acceleration structure on the CPU instead of the GPU.
@@ -242,8 +247,15 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
     {
         public ulong value = 0;
 
-        public void Inc() { value++; }
-        public void Dec() { value--; }
+        public void Inc()
+        {
+            value++;
+        }
+
+        public void Dec()
+        {
+            value--;
+        }
     }
 
     /// <summary>
@@ -263,9 +275,15 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// Creates an indirect args buffer suitable for <see cref="IRayTracingShader.Dispatch"/>.
         /// </summary>
         /// <returns>The scratch buffer.</returns>
-        static public GraphicsBuffer CreateDispatchIndirectBuffer()
+        public static GraphicsBuffer CreateDispatchIndirectBuffer()
         {
-            return new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, 3, sizeof(uint));
+            return new GraphicsBuffer(
+                GraphicsBuffer.Target.IndirectArguments
+                    | GraphicsBuffer.Target.Structured
+                    | GraphicsBuffer.Target.CopySource,
+                3,
+                sizeof(uint)
+            );
         }
 
         /// <summary>
@@ -277,14 +295,21 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// <param name="dispatchHeight">Number of threads in the Y dimension that will be passed to <see cref="IRayTracingShader.Dispatch"/>.</param>
         /// <param name="dispatchDepth">Number of threads in the Z dimension that will be passed to <see cref="IRayTracingShader.Dispatch"/>.</param>
         /// <returns>The scratch buffer.</returns>
-        static public GraphicsBuffer CreateScratchBufferForBuildAndDispatch(
+        public static GraphicsBuffer CreateScratchBufferForBuildAndDispatch(
             IRayTracingAccelStruct accelStruct,
-            IRayTracingShader shader, uint dispatchWidth, uint dispatchHeight, uint dispatchDepth)
+            IRayTracingShader shader,
+            uint dispatchWidth,
+            uint dispatchHeight,
+            uint dispatchDepth
+        )
         {
             Utils.CheckArgIsNotNull(accelStruct, nameof(accelStruct));
             Utils.CheckArgIsNotNull(shader, nameof(shader));
 
-            var sizeInBytes = System.Math.Max(accelStruct.GetBuildScratchBufferRequiredSizeInBytes(), shader.GetTraceScratchBufferRequiredSizeInBytes(dispatchWidth, dispatchHeight, dispatchDepth));
+            var sizeInBytes = System.Math.Max(
+                accelStruct.GetBuildScratchBufferRequiredSizeInBytes(),
+                shader.GetTraceScratchBufferRequiredSizeInBytes(dispatchWidth, dispatchHeight, dispatchDepth)
+            );
             if (sizeInBytes == 0)
                 return null;
 
@@ -296,8 +321,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// </summary>
         /// <param name="accelStruct">The acceleration structure that will be passed to <see cref="IRayTracingAccelStruct.Build"/>.</param>
         /// <returns>The scratch buffer.</returns>
-        static public GraphicsBuffer CreateScratchBufferForBuild(
-            IRayTracingAccelStruct accelStruct)
+        public static GraphicsBuffer CreateScratchBufferForBuild(IRayTracingAccelStruct accelStruct)
         {
             Utils.CheckArgIsNotNull(accelStruct, nameof(accelStruct));
 
@@ -316,11 +340,20 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// <param name="dispatchHeight">Number of threads in the Y dimension that will be passed to <see cref="IRayTracingShader.Dispatch"/>.</param>
         /// <param name="dispatchDepth">Number of threads in the Z dimension that will be passed to <see cref="IRayTracingShader.Dispatch"/>.</param>
         /// <returns>The scratch buffer.</returns>
-        static public GraphicsBuffer CreateScratchBufferForTrace(IRayTracingShader shader, uint dispatchWidth, uint dispatchHeight, uint dispatchDepth)
+        public static GraphicsBuffer CreateScratchBufferForTrace(
+            IRayTracingShader shader,
+            uint dispatchWidth,
+            uint dispatchHeight,
+            uint dispatchDepth
+        )
         {
             Utils.CheckArgIsNotNull(shader, nameof(shader));
 
-            var sizeInBytes = shader.GetTraceScratchBufferRequiredSizeInBytes(dispatchWidth, dispatchHeight, dispatchDepth);
+            var sizeInBytes = shader.GetTraceScratchBufferRequiredSizeInBytes(
+                dispatchWidth,
+                dispatchHeight,
+                dispatchDepth
+            );
             if (sizeInBytes == 0)
                 return null;
 
@@ -332,7 +365,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// </summary>
         /// <remarks>
         /// Unity resizes the buffer by disposing of the `GraphicsBuffer` and instantiating a new one with the proper size.
-        /// **Important:** If you reference the current <paramref name="scratchBuffer"/> in a command buffer, you must 
+        /// **Important:** If you reference the current <paramref name="scratchBuffer"/> in a command buffer, you must
         /// only call this method after you submit the command buffer. See <see cref="Graphics.ExecuteCommandBuffer"/> or <see cref="ScriptableRenderContext.ExecuteCommandBuffer"/>.
         /// </remarks>
         /// <param name="shader">The shader that will be passed to <see cref="IRayTracingShader.Dispatch"/>.</param>
@@ -340,19 +373,31 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// <param name="dispatchHeight">Number of threads in the Y dimension that will be passed to <see cref="IRayTracingShader.Dispatch"/>.</param>
         /// <param name="dispatchDepth">Number of threads in the Z dimension that will be passed to <see cref="IRayTracingShader.Dispatch"/>.</param>
         /// <param name="scratchBuffer">The scratch buffer.</param>
-        static public void ResizeScratchBufferForTrace(
-            IRayTracingShader shader, uint dispatchWidth, uint dispatchHeight, uint dispatchDepth, ref GraphicsBuffer scratchBuffer)
+        public static void ResizeScratchBufferForTrace(
+            IRayTracingShader shader,
+            uint dispatchWidth,
+            uint dispatchHeight,
+            uint dispatchDepth,
+            ref GraphicsBuffer scratchBuffer
+        )
         {
             Utils.CheckArgIsNotNull(shader, nameof(shader));
 
-            var sizeInBytes = shader.GetTraceScratchBufferRequiredSizeInBytes(dispatchWidth, dispatchHeight, dispatchDepth);
+            var sizeInBytes = shader.GetTraceScratchBufferRequiredSizeInBytes(
+                dispatchWidth,
+                dispatchHeight,
+                dispatchDepth
+            );
             if (sizeInBytes == 0)
                 return;
 
             if (scratchBuffer != null)
-                Utils.CheckArg(scratchBuffer.target == ScratchBufferTarget, "scratchBuffer.target must have Target.Structured set");
+                Utils.CheckArg(
+                    scratchBuffer.target == ScratchBufferTarget,
+                    "scratchBuffer.target must have Target.Structured set"
+                );
 
-            if (scratchBuffer == null || (ulong)(scratchBuffer.count*scratchBuffer.stride) < sizeInBytes)
+            if (scratchBuffer == null || (ulong)(scratchBuffer.count * scratchBuffer.stride) < sizeInBytes)
             {
                 scratchBuffer?.Dispose();
                 scratchBuffer = new GraphicsBuffer(ScratchBufferTarget, (int)(sizeInBytes / 4), 4);
@@ -364,13 +409,15 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// </summary>
         /// <remarks>
         /// Unity resizes the buffer by disposing of the `GraphicsBuffer` and instantiating a new one with the proper size.
-        /// **Important:** If you reference the current <paramref name="scratchBuffer"/> in a command buffer, you must 
+        /// **Important:** If you reference the current <paramref name="scratchBuffer"/> in a command buffer, you must
         /// only call this method after you submit the command buffer. See <see cref="Graphics.ExecuteCommandBuffer"/> or <see cref="ScriptableRenderContext.ExecuteCommandBuffer"/>.
         /// </remarks>
         /// <param name="accelStruct">The acceleration structure that will be passed to <see cref="IRayTracingAccelStruct.Build"/>.</param>
         /// <param name="scratchBuffer">The scratch buffer.</param>
-        static public void ResizeScratchBufferForBuild(
-            IRayTracingAccelStruct accelStruct, ref GraphicsBuffer scratchBuffer)
+        public static void ResizeScratchBufferForBuild(
+            IRayTracingAccelStruct accelStruct,
+            ref GraphicsBuffer scratchBuffer
+        )
         {
             Utils.CheckArgIsNotNull(accelStruct, nameof(accelStruct));
 
@@ -379,7 +426,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 return;
 
             if (scratchBuffer != null)
-                Utils.CheckArg(scratchBuffer.target == ScratchBufferTarget, "scratchBuffer.target must have Target.Structured set");
+                Utils.CheckArg(
+                    scratchBuffer.target == ScratchBufferTarget,
+                    "scratchBuffer.target must have Target.Structured set"
+                );
 
             if (scratchBuffer == null || (ulong)(scratchBuffer.count * scratchBuffer.stride) < sizeInBytes)
             {
@@ -388,5 +438,4 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             }
         }
     }
-
 }

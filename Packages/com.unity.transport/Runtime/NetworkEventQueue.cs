@@ -43,14 +43,23 @@ namespace Unity.Networking.Transport
             /// obtained along with the event. That single byte will represent a value from the
             /// <see cref="Error.DisconnectReason"/> enum.
             /// </summary>
-            Disconnect
+            Disconnect,
         }
 
-        [FieldOffset(0)] internal Type type;
-        [FieldOffset(2)] internal short pipelineId;
-        [FieldOffset(4)] internal int connectionId;
-        [FieldOffset(8)] internal int offset;
-        [FieldOffset(12)] internal int size;
+        [FieldOffset(0)]
+        internal Type type;
+
+        [FieldOffset(2)]
+        internal short pipelineId;
+
+        [FieldOffset(4)]
+        internal int connectionId;
+
+        [FieldOffset(8)]
+        internal int offset;
+
+        [FieldOffset(12)]
+        internal int size;
     }
 
     internal struct NetworkEventQueue : IDisposable
@@ -59,6 +68,7 @@ namespace Unity.Networking.Transport
         {
             get { return m_ConnectionEventQ.Length / (m_ConnectionEventHeadTail.Length / 2); }
         }
+
         public NetworkEventQueue(int queueSizePerConnection)
         {
             m_MasterEventQ = new NativeQueue<SubQueueItem>(Allocator.Persistent);
@@ -111,7 +121,12 @@ namespace Unity.Networking.Transport
             return PopEventForConnection(connectionId, out offset, out size, out var _);
         }
 
-        public NetworkEvent.Type PopEventForConnection(int connectionId, out int offset, out int size, out int pipelineId)
+        public NetworkEvent.Type PopEventForConnection(
+            int connectionId,
+            out int offset,
+            out int size,
+            out int pipelineId
+        )
         {
             offset = 0;
             size = 0;
@@ -170,7 +185,11 @@ namespace Unity.Networking.Transport
                 m_ConnectionEventQ.ResizeUninitialized(maxConnections * curMaxEvents);
                 for (int con = maxConnections - 1; con >= 0; --con)
                 {
-                    for (int i = m_ConnectionEventHeadTail[con * 2 + 1] - 1; i >= m_ConnectionEventHeadTail[con * 2]; --i)
+                    for (
+                        int i = m_ConnectionEventHeadTail[con * 2 + 1] - 1;
+                        i >= m_ConnectionEventHeadTail[con * 2];
+                        --i
+                    )
                     {
                         m_ConnectionEventQ[con * curMaxEvents + i] = m_ConnectionEventQ[con * oldMax + i];
                     }
@@ -180,7 +199,7 @@ namespace Unity.Networking.Transport
             m_ConnectionEventQ[ev.connectionId * curMaxEvents + idx] = ev;
             m_ConnectionEventHeadTail[ev.connectionId * 2 + 1] = idx + 1;
 
-            m_MasterEventQ.Enqueue(new SubQueueItem {connection = ev.connectionId, idx = idx});
+            m_MasterEventQ.Enqueue(new SubQueueItem { connection = ev.connectionId, idx = idx });
         }
 
         internal void Clear()
@@ -216,10 +235,12 @@ namespace Unity.Networking.Transport
             [NativeContainerIsAtomicWriteOnly]
             internal unsafe struct ConcurrentConnectionQueue
             {
-                [NativeDisableUnsafePtrRestriction] private UnsafeList<int>* m_ConnectionEventHeadTail;
+                [NativeDisableUnsafePtrRestriction]
+                private UnsafeList<int>* m_ConnectionEventHeadTail;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 private AtomicSafetyHandle m_Safety;
 #endif
+
                 public ConcurrentConnectionQueue(NativeList<int> queue)
                 {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -247,14 +268,20 @@ namespace Unity.Networking.Transport
                         idx = ((int*)m_ConnectionEventHeadTail->Ptr)[connectionId * 2];
                         if (idx >= ((int*)m_ConnectionEventHeadTail->Ptr)[connectionId * 2 + 1])
                             return -1;
-                        if (Interlocked.CompareExchange(ref ((int*)m_ConnectionEventHeadTail->Ptr)[connectionId * 2], idx + 1,
-                            idx) != idx)
+                        if (
+                            Interlocked.CompareExchange(
+                                ref ((int*)m_ConnectionEventHeadTail->Ptr)[connectionId * 2],
+                                idx + 1,
+                                idx
+                            ) != idx
+                        )
                             idx = -1;
                     }
 
                     return idx;
                 }
             }
+
             private int MaxEvents
             {
                 get { return m_ConnectionEventQ.Length / (m_ConnectionEventHeadTail.Length / 2); }
@@ -265,7 +292,12 @@ namespace Unity.Networking.Transport
                 return PopEventForConnection(connectionId, out offset, out size, out var _);
             }
 
-            public NetworkEvent.Type PopEventForConnection(int connectionId, out int offset, out int size, out int pipelineId)
+            public NetworkEvent.Type PopEventForConnection(
+                int connectionId,
+                out int offset,
+                out int size,
+                out int pipelineId
+            )
             {
                 offset = 0;
                 size = 0;
@@ -286,7 +318,8 @@ namespace Unity.Networking.Transport
                 return ev.type;
             }
 
-            [ReadOnly] internal NativeList<NetworkEvent> m_ConnectionEventQ;
+            [ReadOnly]
+            internal NativeList<NetworkEvent> m_ConnectionEventQ;
             internal ConcurrentConnectionQueue m_ConnectionEventHeadTail;
         }
     }

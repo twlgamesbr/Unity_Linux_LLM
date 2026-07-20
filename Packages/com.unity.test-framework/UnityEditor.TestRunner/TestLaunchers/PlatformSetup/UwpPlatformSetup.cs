@@ -11,8 +11,12 @@ namespace UnityEditor.TestTools.TestRunner
 
         public void Setup()
         {
-            m_InternetClientServer = PlayerSettings.WSA.GetCapability(PlayerSettings.WSACapability.InternetClientServer);
-            m_PrivateNetworkClientServer = PlayerSettings.WSA.GetCapability(PlayerSettings.WSACapability.PrivateNetworkClientServer);
+            m_InternetClientServer = PlayerSettings.WSA.GetCapability(
+                PlayerSettings.WSACapability.InternetClientServer
+            );
+            m_PrivateNetworkClientServer = PlayerSettings.WSA.GetCapability(
+                PlayerSettings.WSACapability.PrivateNetworkClientServer
+            );
             PlayerSettings.WSA.SetCapability(PlayerSettings.WSACapability.InternetClientServer, true);
             PlayerSettings.WSA.SetCapability(PlayerSettings.WSACapability.PrivateNetworkClientServer, true);
 
@@ -30,33 +34,36 @@ namespace UnityEditor.TestTools.TestRunner
 #endif
 
                 EditorUserBuildSettings.wsaArchitecture = "x64";
-                EditorUserBuildSettings.SetPlatformSettings(BuildPipeline.GetBuildTargetName(BuildTarget.WSAPlayer), k_SettingsBuildConfiguration, WSABuildType.Debug.ToString());
+                EditorUserBuildSettings.SetPlatformSettings(
+                    BuildPipeline.GetBuildTargetName(BuildTarget.WSAPlayer),
+                    k_SettingsBuildConfiguration,
+                    WSABuildType.Debug.ToString()
+                );
                 EditorUserBuildSettings.wsaUWPBuildType = WSAUWPBuildType.ExecutableOnly;
 #if UNITY_2021_2_OR_NEWER
-                PlayerSettings.SetIl2CppCompilerConfiguration(NamedBuildTarget.WindowsStoreApps, Il2CppCompilerConfiguration.Debug);
+                PlayerSettings.SetIl2CppCompilerConfiguration(
+                    NamedBuildTarget.WindowsStoreApps,
+                    Il2CppCompilerConfiguration.Debug
+                );
 #else
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.WSA, Il2CppCompilerConfiguration.Debug);
 #endif
-
             }
         }
 
-        public void PostBuildAction()
-        {
-        }
+        public void PostBuildAction() { }
 
-        public void PostSuccessfulBuildAction()
-        {
-        }
+        public void PostSuccessfulBuildAction() { }
 
-        public void PostSuccessfulLaunchAction()
-        {
-        }
+        public void PostSuccessfulLaunchAction() { }
 
         public void CleanUp()
         {
             PlayerSettings.WSA.SetCapability(PlayerSettings.WSACapability.InternetClientServer, m_InternetClientServer);
-            PlayerSettings.WSA.SetCapability(PlayerSettings.WSACapability.PrivateNetworkClientServer, m_PrivateNetworkClientServer);
+            PlayerSettings.WSA.SetCapability(
+                PlayerSettings.WSACapability.PrivateNetworkClientServer,
+                m_PrivateNetworkClientServer
+            );
         }
     }
 }

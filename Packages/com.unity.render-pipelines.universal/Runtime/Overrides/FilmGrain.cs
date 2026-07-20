@@ -61,7 +61,7 @@ namespace UnityEngine.Rendering.Universal
         /// Custom grain preset.
         /// </summary>
         /// <seealso cref="FilmGrain.texture"/>
-        Custom
+        Custom,
     }
 
     /// <summary>
@@ -180,7 +180,9 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Controls the noisiness response curve based on scene luminance. Higher values mean less noise in light areas.
         /// </summary>
-        [Tooltip("Controls the noisiness response curve based on scene luminance. Higher values mean less noise in light areas.")]
+        [Tooltip(
+            "Controls the noisiness response curve based on scene luminance. Higher values mean less noise in light areas."
+        )]
         public ClampedFloatParameter response = new ClampedFloatParameter(0.8f, 0f, 1f);
 
         /// <summary>
@@ -193,7 +195,8 @@ namespace UnityEngine.Rendering.Universal
         /// Tells if the post process needs to be rendered or not.
         /// </summary>
         /// <returns><c>true</c> if the effect should be rendered, <c>false</c> otherwise.</returns>
-        public bool IsActive() => intensity.value > 0f && (type.value != FilmGrainLookup.Custom || texture.value != null);
+        public bool IsActive() =>
+            intensity.value > 0f && (type.value != FilmGrainLookup.Custom || texture.value != null);
 
         /// <summary>
         /// Tells if the post process can run the effect on-tile or if it needs a full pass.
@@ -214,6 +217,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <param name="value">The initial value to store in the parameter.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public FilmGrainLookupParameter(FilmGrainLookup value, bool overrideState = false) : base(value, overrideState) { }
+        public FilmGrainLookupParameter(FilmGrainLookup value, bool overrideState = false)
+            : base(value, overrideState) { }
     }
 }

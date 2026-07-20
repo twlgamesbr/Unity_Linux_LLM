@@ -7,14 +7,10 @@ namespace Unity.Multiplayer.Tools.NetStats
 {
     sealed class MetricDispatcherBuilder
     {
-        readonly IDictionary<MetricId, IMetric<long>> m_Counters
-            = new Dictionary<MetricId, IMetric<long>>();
-        readonly IDictionary<MetricId, IMetric<double>> m_Gauges
-            = new Dictionary<MetricId, IMetric<double>>();
-        readonly IDictionary<MetricId, IMetric<TimeSpan>> m_Timers
-            = new Dictionary<MetricId, IMetric<TimeSpan>>();
-        readonly IDictionary<MetricId, IEventMetric> m_PayloadEvents
-            = new Dictionary<MetricId, IEventMetric>();
+        readonly IDictionary<MetricId, IMetric<long>> m_Counters = new Dictionary<MetricId, IMetric<long>>();
+        readonly IDictionary<MetricId, IMetric<double>> m_Gauges = new Dictionary<MetricId, IMetric<double>>();
+        readonly IDictionary<MetricId, IMetric<TimeSpan>> m_Timers = new Dictionary<MetricId, IMetric<TimeSpan>>();
+        readonly IDictionary<MetricId, IEventMetric> m_PayloadEvents = new Dictionary<MetricId, IEventMetric>();
 
         readonly List<IResettable> m_Resettables = new List<IResettable>();
 
@@ -70,9 +66,11 @@ namespace Unity.Multiplayer.Tools.NetStats
                     new ReadOnlyDictionary<MetricId, IMetric<long>>(m_Counters),
                     new ReadOnlyDictionary<MetricId, IMetric<double>>(m_Gauges),
                     new ReadOnlyDictionary<MetricId, IMetric<TimeSpan>>(m_Timers),
-                    new ReadOnlyDictionary<MetricId, IEventMetric>(m_PayloadEvents)),
+                    new ReadOnlyDictionary<MetricId, IEventMetric>(m_PayloadEvents)
+                ),
                 m_Resettables,
-                m_PayloadEvents.Values.ToList());
+                m_PayloadEvents.Values.ToList()
+            );
         }
     }
 }

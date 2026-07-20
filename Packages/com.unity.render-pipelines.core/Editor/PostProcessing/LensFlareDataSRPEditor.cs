@@ -29,79 +29,230 @@ namespace UnityEditor.Rendering
                 ? new Color32(65, 65, 65, 255)
                 : new Color32(200, 200, 200, 255);
 
-            public static readonly GUIContent mainHeader = EditorGUIUtility.TrTextContent("Elements", "List of elements in the Lens Flare.");
-            public static readonly GUIContent elementHeader = EditorGUIUtility.TrTextContent("Lens Flare Element", "Elements in the Lens Flare.");
+            public static readonly GUIContent mainHeader = EditorGUIUtility.TrTextContent(
+                "Elements",
+                "List of elements in the Lens Flare."
+            );
+            public static readonly GUIContent elementHeader = EditorGUIUtility.TrTextContent(
+                "Lens Flare Element",
+                "Elements in the Lens Flare."
+            );
 
             // Cathegory headers
-            static public readonly string typeCathegory = L10n.Tr("Type");
-            static public readonly string noiseCathegory = L10n.Tr("Noise");
-            static public readonly string colorCathegory = L10n.Tr("Color");
-            static public readonly string cutoffCathegory = L10n.Tr("Cutoff");
-            static public readonly string transformCathegory = L10n.Tr("Transform");
-            static public readonly string axisTransformCathegory = L10n.Tr("Axis Transform");
-            static public readonly string radialDistortionCathegory = L10n.Tr("Radial Distortion");
-            static public readonly string multipleElementsCathegory = L10n.Tr("Multiple Elements");
+            public static readonly string typeCathegory = L10n.Tr("Type");
+            public static readonly string noiseCathegory = L10n.Tr("Noise");
+            public static readonly string colorCathegory = L10n.Tr("Color");
+            public static readonly string cutoffCathegory = L10n.Tr("Cutoff");
+            public static readonly string transformCathegory = L10n.Tr("Transform");
+            public static readonly string axisTransformCathegory = L10n.Tr("Axis Transform");
+            public static readonly string radialDistortionCathegory = L10n.Tr("Radial Distortion");
+            public static readonly string multipleElementsCathegory = L10n.Tr("Multiple Elements");
 
             // Type
-            static public readonly GUIContent type = EditorGUIUtility.TrTextContent("Type", "Specifies the type of this lens flare element.");
-            static public readonly GUIContent flareTexture = EditorGUIUtility.TrTextContent("Flare Texture", "Specifies the Texture this element uses.");
-            static public readonly GUIContent preserveAspectRatio = EditorGUIUtility.TrTextContent("Use Aspect Ratio", "When enabled, uses original aspect ratio of the width and height of the element's Flare Texture (or 1 for shape).");
-            static public readonly GUIContent gradient = EditorGUIUtility.TrTextContent("Gradient", "Controls the offset of the Procedural Flare gradient relative to its starting point. A higher value means the gradient starts further from the center of the shape.");
-            static public readonly GUIContent fallOff = EditorGUIUtility.TrTextContent("Falloff", "Controls the smoothness of the gradient. A higher value creates a sharper gradient.");
-            static public readonly GUIContent sideCount = EditorGUIUtility.TrTextContent("Side Count", "Specifies the number of sides of the lens flare polygon.");
-            static public readonly GUIContent sdfRoundness = EditorGUIUtility.TrTextContent("Roundness", "Specifies the roundness of the polygon flare. A value of 0 creates a sharp polygon, a value of 1 creates a circle.");
-            static public readonly GUIContent inverseSDF = EditorGUIUtility.TrTextContent("Invert", "When enabled, will invert the gradient direction.");
-            static public readonly GUIContent shapeCutOffSpeed = EditorGUIUtility.TrTextContent("Cutoff Speed", "Sets the speed at which the radius occludes the element.\nA value of zero (with a large radius) does not occlude anything. The higher this value, the faster the element is occluded on the side of the screen.\nThe effect of this value is more noticeable with multiple elements.");
-            static public readonly GUIContent shapeCutOffRadius = EditorGUIUtility.TrTextContent("Cutoff Radius", "Sets the normalized radius of the lens shape used to occlude the lens flare element.\nA radius of one is equivalent to the scale of the element.");
-            static public readonly GUIContent lensFlareDataSRP = EditorGUIUtility.TrTextContent("Asset", "Lens Flare Data SRP asset as an element.");
+            public static readonly GUIContent type = EditorGUIUtility.TrTextContent(
+                "Type",
+                "Specifies the type of this lens flare element."
+            );
+            public static readonly GUIContent flareTexture = EditorGUIUtility.TrTextContent(
+                "Flare Texture",
+                "Specifies the Texture this element uses."
+            );
+            public static readonly GUIContent preserveAspectRatio = EditorGUIUtility.TrTextContent(
+                "Use Aspect Ratio",
+                "When enabled, uses original aspect ratio of the width and height of the element's Flare Texture (or 1 for shape)."
+            );
+            public static readonly GUIContent gradient = EditorGUIUtility.TrTextContent(
+                "Gradient",
+                "Controls the offset of the Procedural Flare gradient relative to its starting point. A higher value means the gradient starts further from the center of the shape."
+            );
+            public static readonly GUIContent fallOff = EditorGUIUtility.TrTextContent(
+                "Falloff",
+                "Controls the smoothness of the gradient. A higher value creates a sharper gradient."
+            );
+            public static readonly GUIContent sideCount = EditorGUIUtility.TrTextContent(
+                "Side Count",
+                "Specifies the number of sides of the lens flare polygon."
+            );
+            public static readonly GUIContent sdfRoundness = EditorGUIUtility.TrTextContent(
+                "Roundness",
+                "Specifies the roundness of the polygon flare. A value of 0 creates a sharp polygon, a value of 1 creates a circle."
+            );
+            public static readonly GUIContent inverseSDF = EditorGUIUtility.TrTextContent(
+                "Invert",
+                "When enabled, will invert the gradient direction."
+            );
+            public static readonly GUIContent shapeCutOffSpeed = EditorGUIUtility.TrTextContent(
+                "Cutoff Speed",
+                "Sets the speed at which the radius occludes the element.\nA value of zero (with a large radius) does not occlude anything. The higher this value, the faster the element is occluded on the side of the screen.\nThe effect of this value is more noticeable with multiple elements."
+            );
+            public static readonly GUIContent shapeCutOffRadius = EditorGUIUtility.TrTextContent(
+                "Cutoff Radius",
+                "Sets the normalized radius of the lens shape used to occlude the lens flare element.\nA radius of one is equivalent to the scale of the element."
+            );
+            public static readonly GUIContent lensFlareDataSRP = EditorGUIUtility.TrTextContent(
+                "Asset",
+                "Lens Flare Data SRP asset as an element."
+            );
+
             // Type::Ring:
-            static public readonly GUIContent noiseAmplitude = EditorGUIUtility.TrTextContent("Amplitude", "Amplitude of the sampling of the noise.");
-            static public readonly GUIContent noiseFrequency = EditorGUIUtility.TrTextContent("Repeat", "Frequency of the sampling for the noise.");
-            static public readonly GUIContent noiseSpeed = EditorGUIUtility.TrTextContent("Speed", "Scale the speed of the animation.");
-            static public readonly GUIContent ringThickness = EditorGUIUtility.TrTextContent("Ring Thickness", "Ring Thickness.");
+            public static readonly GUIContent noiseAmplitude = EditorGUIUtility.TrTextContent(
+                "Amplitude",
+                "Amplitude of the sampling of the noise."
+            );
+            public static readonly GUIContent noiseFrequency = EditorGUIUtility.TrTextContent(
+                "Repeat",
+                "Frequency of the sampling for the noise."
+            );
+            public static readonly GUIContent noiseSpeed = EditorGUIUtility.TrTextContent(
+                "Speed",
+                "Scale the speed of the animation."
+            );
+            public static readonly GUIContent ringThickness = EditorGUIUtility.TrTextContent(
+                "Ring Thickness",
+                "Ring Thickness."
+            );
 
             // Color
-            static public readonly GUIContent tintColorType = EditorGUIUtility.TrTextContent("Color Type", "Specify how to colorize the flare.");
-            static public readonly GUIContent tint = EditorGUIUtility.TrTextContent("Tint", "Specifies the tint of the element. If the element type is set to Image, the Flare Texture is multiplied by this color.");
-            static public readonly GUIContent tintRadial = EditorGUIUtility.TrTextContent("Tint Radial", "Specifies the radial gradient tint of the element. If the element type is set to Image, the Flare Texture is multiplied by this color.");
-            static public readonly GUIContent tintAngular = EditorGUIUtility.TrTextContent("Tint Angular", "Specifies the angular gradient tint of the element. If the element type is set to Image, the Flare Texture is multiplied by this color.");
-            static public readonly GUIContent modulateByLightColor = EditorGUIUtility.TrTextContent("Modulate By Light Color", "When enabled,changes the color of the elements based on the light color, if this asset is attached to a light.");
-            static public readonly GUIContent intensity = EditorGUIUtility.TrTextContent("Intensity", "Sets the intensity of the element.");
-            static public readonly GUIContent blendMode = EditorGUIUtility.TrTextContent("Blend Mode", "Specifies the blend mode this element uses.");
+            public static readonly GUIContent tintColorType = EditorGUIUtility.TrTextContent(
+                "Color Type",
+                "Specify how to colorize the flare."
+            );
+            public static readonly GUIContent tint = EditorGUIUtility.TrTextContent(
+                "Tint",
+                "Specifies the tint of the element. If the element type is set to Image, the Flare Texture is multiplied by this color."
+            );
+            public static readonly GUIContent tintRadial = EditorGUIUtility.TrTextContent(
+                "Tint Radial",
+                "Specifies the radial gradient tint of the element. If the element type is set to Image, the Flare Texture is multiplied by this color."
+            );
+            public static readonly GUIContent tintAngular = EditorGUIUtility.TrTextContent(
+                "Tint Angular",
+                "Specifies the angular gradient tint of the element. If the element type is set to Image, the Flare Texture is multiplied by this color."
+            );
+            public static readonly GUIContent modulateByLightColor = EditorGUIUtility.TrTextContent(
+                "Modulate By Light Color",
+                "When enabled,changes the color of the elements based on the light color, if this asset is attached to a light."
+            );
+            public static readonly GUIContent intensity = EditorGUIUtility.TrTextContent(
+                "Intensity",
+                "Sets the intensity of the element."
+            );
+            public static readonly GUIContent blendMode = EditorGUIUtility.TrTextContent(
+                "Blend Mode",
+                "Specifies the blend mode this element uses."
+            );
 
             // Transform
-            static public readonly GUIContent positionOffset = EditorGUIUtility.TrTextContent("Position Offset", "Sets the offset of this element in screen space relative to its source.");
-            static public readonly GUIContent autoRotate = EditorGUIUtility.TrTextContent("Auto Rotate", "When enabled, automatically rotates the element between its position and the center of the screen. Requires the Starting Position property to have a value greater than 0.");
-            static public readonly GUIContent rotation = EditorGUIUtility.TrTextContent("Rotation", "Sets the local rotation of the elements.");
-            static public readonly GUIContent sizeXY = EditorGUIUtility.TrTextContent("Scale", "Sets the stretch of each dimension in relative to the scale. You can use this with Radial Distortion.");
-            static public readonly GUIContent uniformScale = EditorGUIUtility.TrTextContent("Uniform Scale", "Sets the scale of this element.");
+            public static readonly GUIContent positionOffset = EditorGUIUtility.TrTextContent(
+                "Position Offset",
+                "Sets the offset of this element in screen space relative to its source."
+            );
+            public static readonly GUIContent autoRotate = EditorGUIUtility.TrTextContent(
+                "Auto Rotate",
+                "When enabled, automatically rotates the element between its position and the center of the screen. Requires the Starting Position property to have a value greater than 0."
+            );
+            public static readonly GUIContent rotation = EditorGUIUtility.TrTextContent(
+                "Rotation",
+                "Sets the local rotation of the elements."
+            );
+            public static readonly GUIContent sizeXY = EditorGUIUtility.TrTextContent(
+                "Scale",
+                "Sets the stretch of each dimension in relative to the scale. You can use this with Radial Distortion."
+            );
+            public static readonly GUIContent uniformScale = EditorGUIUtility.TrTextContent(
+                "Uniform Scale",
+                "Sets the scale of this element."
+            );
 
             // Axis Transform
-            static public readonly GUIContent position = EditorGUIUtility.TrTextContent("Starting Position", "Sets the starting position of this element in screen space relative to its source.");
-            static public readonly GUIContent angularOffset = EditorGUIUtility.TrTextContent("Angular Offset", "Sets the angular offset of this element in degrees relative to its current position.");
-            static public readonly GUIContent translationScale = EditorGUIUtility.TrTextContent("Translation Scale", "Controls the direction and speed the element appears to move. For example, values of (1,0) make the lens flare move horizontally.");
+            public static readonly GUIContent position = EditorGUIUtility.TrTextContent(
+                "Starting Position",
+                "Sets the starting position of this element in screen space relative to its source."
+            );
+            public static readonly GUIContent angularOffset = EditorGUIUtility.TrTextContent(
+                "Angular Offset",
+                "Sets the angular offset of this element in degrees relative to its current position."
+            );
+            public static readonly GUIContent translationScale = EditorGUIUtility.TrTextContent(
+                "Translation Scale",
+                "Controls the direction and speed the element appears to move. For example, values of (1,0) make the lens flare move horizontally."
+            );
 
             // Radial Distortion
-            static public readonly GUIContent enableDistortion = EditorGUIUtility.TrTextContent("Enable", "When enabled, distorts the element relative to its distance from the flare position in screen space.");
-            static public readonly GUIContent targetSizeDistortion = EditorGUIUtility.TrTextContent("Radial Edge Size", "Sets the target size of the edge of the screen. Values of (1, 1) match the actual screen size.");
-            static public readonly GUIContent distortionCurve = EditorGUIUtility.TrTextContent("Radial Edge Curve", "Controls the amount of distortion between the position of the lens flare and the edge of the screen.");
-            static public readonly GUIContent distortionRelativeToCenter = EditorGUIUtility.TrTextContent("Relative To Center", "When enabled, the amount of radial distortion changes between the center of the screen and the edge of the screen.");
+            public static readonly GUIContent enableDistortion = EditorGUIUtility.TrTextContent(
+                "Enable",
+                "When enabled, distorts the element relative to its distance from the flare position in screen space."
+            );
+            public static readonly GUIContent targetSizeDistortion = EditorGUIUtility.TrTextContent(
+                "Radial Edge Size",
+                "Sets the target size of the edge of the screen. Values of (1, 1) match the actual screen size."
+            );
+            public static readonly GUIContent distortionCurve = EditorGUIUtility.TrTextContent(
+                "Radial Edge Curve",
+                "Controls the amount of distortion between the position of the lens flare and the edge of the screen."
+            );
+            public static readonly GUIContent distortionRelativeToCenter = EditorGUIUtility.TrTextContent(
+                "Relative To Center",
+                "When enabled, the amount of radial distortion changes between the center of the screen and the edge of the screen."
+            );
 
             // Multiple Elements
-            static public readonly GUIContent allowMultipleElement = EditorGUIUtility.TrTextContent("Enable", "When enabled, allows multiple lens flare elements.");
-            static public readonly GUIContent count = EditorGUIUtility.TrTextContent("Count", "Sets the number of elements.");
-            static public readonly GUIContent distribution = EditorGUIUtility.TrTextContent("Distribution", "Controls how multiple lens flare elements are distributed.");
-            static public readonly GUIContent lengthSpread = EditorGUIUtility.TrTextContent("Length Spread", "Sets the length lens flare elements are spread across in screen space.");
-            static public readonly GUIContent seed = EditorGUIUtility.TrTextContent("Seed", "Sets the seed value used to define randomness.");
-            static public readonly GUIContent intensityVariation = EditorGUIUtility.TrTextContent("Intensity Variation", "Controls the offset of the intensities. A value of 0 means no variations, a value of 1 means variations between 0 and 1.");
-            static public readonly GUIContent colorGradient = EditorGUIUtility.TrTextContent("Colors", "Specifies the gradient applied across all the elements.");
-            static public readonly GUIContent positionVariation = EditorGUIUtility.TrTextContent("Position Variation", "Sets the offset applied to the current position of the element.");
-            static public readonly GUIContent rotationVariation = EditorGUIUtility.TrTextContent("Rotation Variation", "Sets the offset applied to the current element rotation.");
-            static public readonly GUIContent scaleVariation = EditorGUIUtility.TrTextContent("Scale Variation", "Sets the offset applied to the current scale of the element.");
-            static public readonly GUIContent positionCurve = EditorGUIUtility.TrTextContent("Position Variation", "Defines how the multiple elements are placed along the spread using a curve.");
-            static public readonly GUIContent scaleCurve = EditorGUIUtility.TrTextContent("Scale", "Defines how the multiple elements are scaled along the spread.");
-            static public readonly GUIContent uniformAngleCurve = EditorGUIUtility.TrTextContent("Rotation", "The uniform angle of rotation (in degrees) applied to each element distributed along the curve.");
-            static public readonly GUIContent uniformAngle = EditorGUIUtility.TrTextContent("Rotation", "The angle of rotation (in degrees) applied to each element incrementally.");
+            public static readonly GUIContent allowMultipleElement = EditorGUIUtility.TrTextContent(
+                "Enable",
+                "When enabled, allows multiple lens flare elements."
+            );
+            public static readonly GUIContent count = EditorGUIUtility.TrTextContent(
+                "Count",
+                "Sets the number of elements."
+            );
+            public static readonly GUIContent distribution = EditorGUIUtility.TrTextContent(
+                "Distribution",
+                "Controls how multiple lens flare elements are distributed."
+            );
+            public static readonly GUIContent lengthSpread = EditorGUIUtility.TrTextContent(
+                "Length Spread",
+                "Sets the length lens flare elements are spread across in screen space."
+            );
+            public static readonly GUIContent seed = EditorGUIUtility.TrTextContent(
+                "Seed",
+                "Sets the seed value used to define randomness."
+            );
+            public static readonly GUIContent intensityVariation = EditorGUIUtility.TrTextContent(
+                "Intensity Variation",
+                "Controls the offset of the intensities. A value of 0 means no variations, a value of 1 means variations between 0 and 1."
+            );
+            public static readonly GUIContent colorGradient = EditorGUIUtility.TrTextContent(
+                "Colors",
+                "Specifies the gradient applied across all the elements."
+            );
+            public static readonly GUIContent positionVariation = EditorGUIUtility.TrTextContent(
+                "Position Variation",
+                "Sets the offset applied to the current position of the element."
+            );
+            public static readonly GUIContent rotationVariation = EditorGUIUtility.TrTextContent(
+                "Rotation Variation",
+                "Sets the offset applied to the current element rotation."
+            );
+            public static readonly GUIContent scaleVariation = EditorGUIUtility.TrTextContent(
+                "Scale Variation",
+                "Sets the offset applied to the current scale of the element."
+            );
+            public static readonly GUIContent positionCurve = EditorGUIUtility.TrTextContent(
+                "Position Variation",
+                "Defines how the multiple elements are placed along the spread using a curve."
+            );
+            public static readonly GUIContent scaleCurve = EditorGUIUtility.TrTextContent(
+                "Scale",
+                "Defines how the multiple elements are scaled along the spread."
+            );
+            public static readonly GUIContent uniformAngleCurve = EditorGUIUtility.TrTextContent(
+                "Rotation",
+                "The uniform angle of rotation (in degrees) applied to each element distributed along the curve."
+            );
+            public static readonly GUIContent uniformAngle = EditorGUIUtility.TrTextContent(
+                "Rotation",
+                "The angle of rotation (in degrees) applied to each element incrementally."
+            );
 
             static GUIStyle m_BlueFocusedBoldLabel;
             public static GUIStyle blueFocusedBoldLabel
@@ -124,12 +275,27 @@ namespace UnityEditor.Rendering
 
         static LensFlareDataSRPEditor()
         {
-            MethodInfo FillPropertyContextMenuInfo = typeof(EditorGUI).GetMethod("FillPropertyContextMenu", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] {typeof(SerializedProperty), typeof(SerializedProperty), typeof(GenericMenu)}, null);
+            MethodInfo FillPropertyContextMenuInfo = typeof(EditorGUI).GetMethod(
+                "FillPropertyContextMenu",
+                BindingFlags.Static | BindingFlags.NonPublic,
+                null,
+                new Type[] { typeof(SerializedProperty), typeof(SerializedProperty), typeof(GenericMenu) },
+                null
+            );
             var propertyParam = Expression.Parameter(typeof(SerializedProperty), "property");
             var FillPropertyContextMenuBlock = Expression.Block(
-                Expression.Call(null, FillPropertyContextMenuInfo, propertyParam, Expression.Constant(null, typeof(SerializedProperty)), Expression.Constant(null, typeof(GenericMenu)))
+                Expression.Call(
+                    null,
+                    FillPropertyContextMenuInfo,
+                    propertyParam,
+                    Expression.Constant(null, typeof(SerializedProperty)),
+                    Expression.Constant(null, typeof(GenericMenu))
+                )
             );
-            var FillPropertyContextMenuLambda = Expression.Lambda<Func<SerializedProperty, GenericMenu>>(FillPropertyContextMenuBlock, propertyParam);
+            var FillPropertyContextMenuLambda = Expression.Lambda<Func<SerializedProperty, GenericMenu>>(
+                FillPropertyContextMenuBlock,
+                propertyParam
+            );
             FillPropertyContextMenu = FillPropertyContextMenuLambda.Compile();
         }
 
@@ -138,13 +304,19 @@ namespace UnityEditor.Rendering
         SerializedProperty m_Elements;
         ReorderableList m_List;
         Rect? m_ReservedListSizeRect;
+
         // cf. LensFlareCommon.hlsl
         static readonly int k_FlarePreviewData = Shader.PropertyToID("_FlarePreviewData");
 
         class TextureCacheElement
         {
             public int hash = 0;
-            public Texture2D computedTexture = new Texture2D(Styles.thumbnailSizeWidth, Styles.thumbnailSizeHeight, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SRGB, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
+            public Texture2D computedTexture = new Texture2D(
+                Styles.thumbnailSizeWidth,
+                Styles.thumbnailSizeHeight,
+                UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SRGB,
+                UnityEngine.Experimental.Rendering.TextureCreationFlags.None
+            );
         }
 
         RTHandle m_PreviewTexture;
@@ -169,7 +341,11 @@ namespace UnityEditor.Rendering
 
             if (m_PreviewTexture == null)
             {
-                m_PreviewTexture = RTHandles.Alloc(Styles.thumbnailSizeWidth, Styles.thumbnailSizeHeight, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SRGB);
+                m_PreviewTexture = RTHandles.Alloc(
+                    Styles.thumbnailSizeWidth,
+                    Styles.thumbnailSizeHeight,
+                    UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SRGB
+                );
             }
             if (m_PreviewTextureCache == null)
             {
@@ -304,13 +480,18 @@ namespace UnityEditor.Rendering
                     SerializedProperty distribution = element.FindPropertyRelative("distribution");
                     SerializedProperty enableRadialDistortion = element.FindPropertyRelative("enableRadialDistortion");
 
-                    int multipleElementsLines = GetMultipleElementsCathegoryLines(type, allowMultipleElement, distribution);
+                    int multipleElementsLines = GetMultipleElementsCathegoryLines(
+                        type,
+                        allowMultipleElement,
+                        distribution
+                    );
 
                     if (multipleElementsLines == 0)
                         titleLine = 6;
                     else
                         titleLine = 7;
-                    line = GetTypeCathegoryLines(type)
+                    line =
+                        GetTypeCathegoryLines(type)
                         + GetCutoffCathegoryLines()
                         + GetColorCathegoryLines()
                         + GetTransformCathegoryLines()
@@ -328,20 +509,22 @@ namespace UnityEditor.Rendering
             {
                 if (GetEnum<SRPLensFlareType>(type) != SRPLensFlareType.LensFlareDataSRP)
                 {
-                    line = 3;   //Type, Tint, Intensity
+                    line = 3; //Type, Tint, Intensity
                     if (allowMultipleElement.boolValue)
-                        line += 1;  //Count
+                        line += 1; //Count
                 }
                 else
                 {
-                    line = 3;   //Type, LensFlareDataSRP
+                    line = 3; //Type, LensFlareDataSRP
                 }
             }
             line = Math.Max(line, 4);
 
             return (line + titleLine) * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing)
                 + (Mathf.Max(titleLine - 1, 0)) * (Styles.cathegorySpacing)
-                + Styles.footerSeparatorHeight + Styles.headerHeight + EditorGUIUtility.standardVerticalSpacing;
+                + Styles.footerSeparatorHeight
+                + Styles.headerHeight
+                + EditorGUIUtility.standardVerticalSpacing;
         }
 
         int GetTypeCathegoryLines(SerializedProperty type)
@@ -351,58 +534,58 @@ namespace UnityEditor.Rendering
             {
                 case SRPLensFlareType.Circle:
                     line += 3;
-                    break;  //Gradient, Falloff, Invert
+                    break; //Gradient, Falloff, Invert
                 case SRPLensFlareType.Image:
                     line += 2;
-                    break;  //Flare Texture, Use Aspect Ratio
+                    break; //Flare Texture, Use Aspect Ratio
                 case SRPLensFlareType.Polygon:
                     line += 5;
-                    break;  //Gradient, Falloff, Invert, Side count, Roundness
+                    break; //Gradient, Falloff, Invert, Side count, Roundness
                 case SRPLensFlareType.Ring:
                     line += 8 + 2;
-                    break;  //Gradient, Falloff, Invert, [Noise], Amplitude, Frequency, Speed, Ring Thickness
+                    break; //Gradient, Falloff, Invert, [Noise], Amplitude, Frequency, Speed, Ring Thickness
                 case SRPLensFlareType.LensFlareDataSRP:
                     line += 2;
-                    break;  //Asset
+                    break; //Asset
             }
             return line;
         }
 
-        int GetColorCathegoryLines()
-            => 5; //tintColorType, Tint/TintGradient, Modulate by Light Color, Intensity, Blend Mode
+        int GetColorCathegoryLines() => 5; //tintColorType, Tint/TintGradient, Modulate by Light Color, Intensity, Blend Mode
 
-        int GetTransformCathegoryLines()
-            => 5; //Position Offset, Auto Rotate, Rotation, Scale, Uniform Scale
+        int GetTransformCathegoryLines() => 5; //Position Offset, Auto Rotate, Rotation, Scale, Uniform Scale
 
-        int GetAxisTransformCathegoryLines()
-            => 3; //Starting Position, Angular Offset, Translation Scale
-        int GetCutoffCathegoryLines()
-            => 2; //Speed, Size
+        int GetAxisTransformCathegoryLines() => 3; //Starting Position, Angular Offset, Translation Scale
 
-        int GetRadialDistortionCathegoryLines(SerializedProperty enabled)
-            => enabled.boolValue ? 4 : 1; //[Enable], Radial Edge Size, Radial Edge Curve, Relative to Center
+        int GetCutoffCathegoryLines() => 2; //Speed, Size
 
-        int GetMultipleElementsCathegoryLines(SerializedProperty type, SerializedProperty enabled, SerializedProperty distribution)
+        int GetRadialDistortionCathegoryLines(SerializedProperty enabled) => enabled.boolValue ? 4 : 1; //[Enable], Radial Edge Size, Radial Edge Curve, Relative to Center
+
+        int GetMultipleElementsCathegoryLines(
+            SerializedProperty type,
+            SerializedProperty enabled,
+            SerializedProperty distribution
+        )
         {
             SRPLensFlareType eType = GetEnum<SRPLensFlareType>(type);
             if (eType == SRPLensFlareType.Ring || eType == SRPLensFlareType.LensFlareDataSRP)
                 return 0;
 
             if (!enabled.boolValue)
-                return 1;   //[Enable]
+                return 1; //[Enable]
 
-            int line = 5;   //[Enable], Count, Distribution, Length Spread, Colors
+            int line = 5; //[Enable], Count, Distribution, Length Spread, Colors
             switch (GetEnum<SRPLensFlareDistribution>(distribution))
             {
                 case SRPLensFlareDistribution.Uniform:
                     line += 1;
-                    break;  //UniformAngle
+                    break; //UniformAngle
                 case SRPLensFlareDistribution.Curve:
                     line += 3;
-                    break;  //Position Variation, Rotation, Scale
+                    break; //Position Variation, Rotation, Scale
                 case SRPLensFlareDistribution.Random:
                     line += 5;
-                    break;  //Seed, Intensity Variation, Position Variation, Rotation Variation, Scale Variation
+                    break; //Seed, Intensity Variation, Position Variation, Rotation Variation, Scale Variation
             }
             return line;
         }
@@ -410,12 +593,13 @@ namespace UnityEditor.Rendering
         #endregion
 
         #region Draw element
-        void DrawElementBackground(Rect rect, int index, bool isActive, bool isFocused)
-            => EditorGUI.DrawRect(rect, Styles.elementBackgroundColor);
+        void DrawElementBackground(Rect rect, int index, bool isActive, bool isFocused) =>
+            EditorGUI.DrawRect(rect, Styles.elementBackgroundColor);
 
         static Gradient SafeGradientValue(SerializedProperty sp)
         {
-            BindingFlags instanceAnyPrivacyBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            BindingFlags instanceAnyPrivacyBindingFlags =
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
             PropertyInfo propertyInfo = typeof(SerializedProperty).GetProperty(
                 "gradientValue",
@@ -434,7 +618,12 @@ namespace UnityEditor.Rendering
             return gradientValue;
         }
 
-        void ComputeThumbnail(ref Texture2D computedTexture, SerializedProperty element, SRPLensFlareType type, int index)
+        void ComputeThumbnail(
+            ref Texture2D computedTexture,
+            SerializedProperty element,
+            SRPLensFlareType type,
+            int index
+        )
         {
             LensFlareDataSRP lsSRP = target as LensFlareDataSRP;
             LensFlareDataElementSRP elementLocal = lsSRP.elements[index].Clone();
@@ -460,8 +649,15 @@ namespace UnityEditor.Rendering
 
             Vector2 center;
             float scale;
-            if ((allowMultipleElementProp.boolValue && lengthSpreadProp.floatValue != 0.0f && countProp.intValue > 1 && type != SRPLensFlareType.Ring) ||
-                type == SRPLensFlareType.LensFlareDataSRP)
+            if (
+                (
+                    allowMultipleElementProp.boolValue
+                    && lengthSpreadProp.floatValue != 0.0f
+                    && countProp.intValue > 1
+                    && type != SRPLensFlareType.Ring
+                )
+                || type == SRPLensFlareType.LensFlareDataSRP
+            )
             {
                 center = new Vector2(0.5f, -0.5f);
                 scale = 1.0f;
@@ -469,21 +665,35 @@ namespace UnityEditor.Rendering
             else
             {
                 center = Vector2.zero;
-                scale = 10.0f / uniformScaleProp.floatValue / Mathf.Max(sizeXYProp.vector2Value.x, sizeXYProp.vector2Value.y);
+                scale =
+                    10.0f
+                    / uniformScaleProp.floatValue
+                    / Mathf.Max(sizeXYProp.vector2Value.x, sizeXYProp.vector2Value.y);
             }
-            cmd.SetGlobalVector(k_FlarePreviewData, new Vector4(Styles.thumbnailSizeWidth, Styles.thumbnailSizeHeight, 1f, 0f));
-            cmd.SetGlobalVector(LensFlareCommonSRP._FlareData1, new Vector4(0.0f, 0.0f, 0.0f, ((float)Styles.thumbnailSizeHeight) / ((float)Styles.thumbnailSizeWidth)));
+            cmd.SetGlobalVector(
+                k_FlarePreviewData,
+                new Vector4(Styles.thumbnailSizeWidth, Styles.thumbnailSizeHeight, 1f, 0f)
+            );
+            cmd.SetGlobalVector(
+                LensFlareCommonSRP._FlareData1,
+                new Vector4(0.0f, 0.0f, 0.0f, ((float)Styles.thumbnailSizeHeight) / ((float)Styles.thumbnailSizeWidth))
+            );
             Vector3 unused = new();
             LensFlareCommonSRP.ProcessLensFlareSRPElementsSingle(
                 elementLocal,
                 cmd,
                 Color.white,
                 null,
-                1.0f, scale,
-                localMat, center,
+                1.0f,
+                scale,
+                localMat,
+                center,
                 false,
                 new Vector2(aspect, 1),
-                unused, false, 0);
+                unused,
+                false,
+                0
+            );
 
             Graphics.ExecuteCommandBuffer(cmd);
             cmd.CopyTexture(m_PreviewTexture.rt, computedTexture);
@@ -667,7 +877,12 @@ namespace UnityEditor.Rendering
             EditorGUIUtility.wideMode = oldWideMode;
         }
 
-        bool DrawElementHeader(Rect headerRect, SerializedProperty isFoldOpened, bool selectedInList, SerializedProperty element)
+        bool DrawElementHeader(
+            Rect headerRect,
+            SerializedProperty isFoldOpened,
+            bool selectedInList,
+            SerializedProperty element
+        )
         {
             Rect visibilityRect = headerRect;
             visibilityRect.xMin += 16;
@@ -694,7 +909,14 @@ namespace UnityEditor.Rendering
 
             // Title
             if (Event.current.type == EventType.Repaint)
-                Styles.blueFocusedBoldLabel.Draw(labelRect, Styles.elementHeader, hasKeyboardFocus: selectedInList, isActive: false, on: false, isHover: false);
+                Styles.blueFocusedBoldLabel.Draw(
+                    labelRect,
+                    Styles.elementHeader,
+                    hasKeyboardFocus: selectedInList,
+                    isActive: false,
+                    on: false,
+                    isHover: false
+                );
 
             // Collapsable behaviour
             bool previousState = isFoldOpened.boolValue;
@@ -722,7 +944,12 @@ namespace UnityEditor.Rendering
 
             SerializedProperty visible = element.FindPropertyRelative("visible");
             EditorGUI.BeginChangeCheck();
-            bool newVisibility = GUI.Toggle(visibilityRect, visible.boolValue, GUIContent.none, CoreEditorStyles.smallTickbox);
+            bool newVisibility = GUI.Toggle(
+                visibilityRect,
+                visible.boolValue,
+                GUIContent.none,
+                CoreEditorStyles.smallTickbox
+            );
             if (EditorGUI.EndChangeCheck())
                 visible.boolValue = newVisibility;
 
@@ -744,14 +971,17 @@ namespace UnityEditor.Rendering
             DrawThumbnailProcedural(thumbnailRect, element, GetEnum<SRPLensFlareType>(type), index);
 
             bool allowMultipleElementValue;
-            if (GetEnum<SRPLensFlareType>(type) == SRPLensFlareType.LensFlareDataSRP ||
-                GetEnum<SRPLensFlareType>(type) == SRPLensFlareType.Ring)
+            if (
+                GetEnum<SRPLensFlareType>(type) == SRPLensFlareType.LensFlareDataSRP
+                || GetEnum<SRPLensFlareType>(type) == SRPLensFlareType.Ring
+            )
                 allowMultipleElementValue = false;
             else
                 allowMultipleElementValue = allowMultipleElement.boolValue;
             IEnumerator<Rect> fieldRect = ReserveFields(summaryRect, allowMultipleElementValue ? 4 : 3);
             float oldLabelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth -= thumbnailRect.width + Styles.horiwontalSpaceBetweenThumbnailAndInspector + Styles.shrinkingLabel;
+            EditorGUIUtility.labelWidth -=
+                thumbnailRect.width + Styles.horiwontalSpaceBetweenThumbnailAndInspector + Styles.shrinkingLabel;
 
             fieldRect.MoveNext();
             EditorGUI.PropertyField(fieldRect.Current, type, Styles.type);
@@ -760,7 +990,11 @@ namespace UnityEditor.Rendering
             {
                 SerializedProperty lensFlareDataSRP = element.FindPropertyRelative("lensFlareDataSRP");
                 fieldRect.MoveNext();
-                DrawLensFlareDataSRPFieldWithCycleDetection(fieldRect.Current, lensFlareDataSRP, Styles.lensFlareDataSRP);
+                DrawLensFlareDataSRPFieldWithCycleDetection(
+                    fieldRect.Current,
+                    lensFlareDataSRP,
+                    Styles.lensFlareDataSRP
+                );
                 EditorGUIUtility.labelWidth = oldLabelWidth;
                 return;
             }
@@ -773,16 +1007,31 @@ namespace UnityEditor.Rendering
                 EditorGUI.BeginChangeCheck();
                 Gradient newGradient;
                 if (tintColorType.enumValueIndex == (int)SRPLensFlareColorType.RadialGradient)
-                    newGradient = EditorGUI.GradientField(fieldRect.Current, Styles.tintRadial, tintGradientGradient.gradientValue);
+                    newGradient = EditorGUI.GradientField(
+                        fieldRect.Current,
+                        Styles.tintRadial,
+                        tintGradientGradient.gradientValue
+                    );
                 else // (tintColorType.enumValueIndex == (int)SRPLensFlareColorType.AngularGradient)
-                    newGradient = EditorGUI.GradientField(fieldRect.Current, Styles.tintAngular, tintGradientGradient.gradientValue);
+                    newGradient = EditorGUI.GradientField(
+                        fieldRect.Current,
+                        Styles.tintAngular,
+                        tintGradientGradient.gradientValue
+                    );
                 if (EditorGUI.EndChangeCheck())
                 {
                     element.serializedObject.ApplyModifiedProperties();
                     foreach (var target in targets)
                     {
                         LensFlareDataSRP lsSRP = target as LensFlareDataSRP;
-                        lsSRP.elements[index].tintGradient.SetKeys(newGradient.colorKeys, newGradient.alphaKeys, newGradient.mode, newGradient.colorSpace);
+                        lsSRP
+                            .elements[index]
+                            .tintGradient.SetKeys(
+                                newGradient.colorKeys,
+                                newGradient.alphaKeys,
+                                newGradient.mode,
+                                newGradient.colorSpace
+                            );
                         lsSRP.elements[index].tintGradient.SetDirty();
                     }
                 }
@@ -838,89 +1087,100 @@ namespace UnityEditor.Rendering
             switch (flareType)
             {
                 case SRPLensFlareType.Image:
-                {
-                    SerializedProperty flareTexture = element.FindPropertyRelative("lensFlareTexture");
-                    SerializedProperty preserveAspectRatio = element.FindPropertyRelative("preserveAspectRatio");
+                    {
+                        SerializedProperty flareTexture = element.FindPropertyRelative("lensFlareTexture");
+                        SerializedProperty preserveAspectRatio = element.FindPropertyRelative("preserveAspectRatio");
 
-                    // display it with texture icon
-                    fieldRect.MoveNext();
-                    EditorGUI.BeginChangeCheck();
-                    Texture newTexture = EditorGUI.ObjectField(fieldRect.Current, Styles.flareTexture, flareTexture.objectReferenceValue, typeof(Texture), false) as Texture;
-                    if (EditorGUI.EndChangeCheck())
-                        flareTexture.objectReferenceValue = newTexture;
+                        // display it with texture icon
+                        fieldRect.MoveNext();
+                        EditorGUI.BeginChangeCheck();
+                        Texture newTexture =
+                            EditorGUI.ObjectField(
+                                fieldRect.Current,
+                                Styles.flareTexture,
+                                flareTexture.objectReferenceValue,
+                                typeof(Texture),
+                                false
+                            ) as Texture;
+                        if (EditorGUI.EndChangeCheck())
+                            flareTexture.objectReferenceValue = newTexture;
 
-                    fieldRect.MoveNext();
-                    EditorGUI.PropertyField(fieldRect.Current, preserveAspectRatio, Styles.preserveAspectRatio);
-                }
-                break;
+                        fieldRect.MoveNext();
+                        EditorGUI.PropertyField(fieldRect.Current, preserveAspectRatio, Styles.preserveAspectRatio);
+                    }
+                    break;
 
                 case SRPLensFlareType.Circle:
                 case SRPLensFlareType.Polygon:
                 case SRPLensFlareType.Ring:
-                {
-                    SerializedProperty gradient = element.FindPropertyRelative("m_EdgeOffset");
-                    SerializedProperty fallOff = element.FindPropertyRelative("m_FallOff");
-                    SerializedProperty inverseSDF = element.FindPropertyRelative("inverseSDF");
-
-                    fieldRect.MoveNext();
-                    EditorGUI.PropertyField(fieldRect.Current, gradient, Styles.gradient);
-
-                    fieldRect.MoveNext();
-                    EditorGUI.PropertyField(fieldRect.Current, fallOff, Styles.fallOff);
-
-                    fieldRect.MoveNext();
-                    EditorGUI.PropertyField(fieldRect.Current, inverseSDF, Styles.inverseSDF);
-
-                    if (flareType == SRPLensFlareType.Polygon)
                     {
-                        SerializedProperty sideCount = element.FindPropertyRelative("m_SideCount");
-                        SerializedProperty sdfRoundness = element.FindPropertyRelative("m_SdfRoundness");
+                        SerializedProperty gradient = element.FindPropertyRelative("m_EdgeOffset");
+                        SerializedProperty fallOff = element.FindPropertyRelative("m_FallOff");
+                        SerializedProperty inverseSDF = element.FindPropertyRelative("inverseSDF");
 
                         fieldRect.MoveNext();
-                        EditorGUI.PropertyField(fieldRect.Current, sideCount, Styles.sideCount);
+                        EditorGUI.PropertyField(fieldRect.Current, gradient, Styles.gradient);
 
                         fieldRect.MoveNext();
-                        EditorGUI.PropertyField(fieldRect.Current, sdfRoundness, Styles.sdfRoundness);
-                    }
-
-                    if (flareType == SRPLensFlareType.Ring)
-                    {
-                        fieldRect.MoveNext();
-                        EditorGUI.LabelField(fieldRect.Current, Styles.noiseCathegory, EditorStyles.boldLabel);
-
-                        SerializedProperty noiseAmplitude = element.FindPropertyRelative("noiseAmplitude");
-                        SerializedProperty noiseFrequency = element.FindPropertyRelative("noiseFrequency");
-                        SerializedProperty noiseSpeed = element.FindPropertyRelative("noiseSpeed");
-
-                        EditorGUI.indentLevel++;
-                        fieldRect.MoveNext();
-                        EditorGUI.PropertyField(fieldRect.Current, noiseAmplitude, Styles.noiseAmplitude);
+                        EditorGUI.PropertyField(fieldRect.Current, fallOff, Styles.fallOff);
 
                         fieldRect.MoveNext();
-                        EditorGUI.PropertyField(fieldRect.Current, noiseFrequency, Styles.noiseFrequency);
+                        EditorGUI.PropertyField(fieldRect.Current, inverseSDF, Styles.inverseSDF);
 
-                        fieldRect.MoveNext();
-                        EditorGUI.PropertyField(fieldRect.Current, noiseSpeed, Styles.noiseSpeed);
+                        if (flareType == SRPLensFlareType.Polygon)
+                        {
+                            SerializedProperty sideCount = element.FindPropertyRelative("m_SideCount");
+                            SerializedProperty sdfRoundness = element.FindPropertyRelative("m_SdfRoundness");
 
-                        EditorGUI.indentLevel--;
+                            fieldRect.MoveNext();
+                            EditorGUI.PropertyField(fieldRect.Current, sideCount, Styles.sideCount);
+
+                            fieldRect.MoveNext();
+                            EditorGUI.PropertyField(fieldRect.Current, sdfRoundness, Styles.sdfRoundness);
+                        }
 
                         if (flareType == SRPLensFlareType.Ring)
                         {
-                            SerializedProperty ringThickness = element.FindPropertyRelative("ringThickness");
                             fieldRect.MoveNext();
-                            EditorGUI.PropertyField(fieldRect.Current, ringThickness, Styles.ringThickness);
+                            EditorGUI.LabelField(fieldRect.Current, Styles.noiseCathegory, EditorStyles.boldLabel);
+
+                            SerializedProperty noiseAmplitude = element.FindPropertyRelative("noiseAmplitude");
+                            SerializedProperty noiseFrequency = element.FindPropertyRelative("noiseFrequency");
+                            SerializedProperty noiseSpeed = element.FindPropertyRelative("noiseSpeed");
+
+                            EditorGUI.indentLevel++;
+                            fieldRect.MoveNext();
+                            EditorGUI.PropertyField(fieldRect.Current, noiseAmplitude, Styles.noiseAmplitude);
+
+                            fieldRect.MoveNext();
+                            EditorGUI.PropertyField(fieldRect.Current, noiseFrequency, Styles.noiseFrequency);
+
+                            fieldRect.MoveNext();
+                            EditorGUI.PropertyField(fieldRect.Current, noiseSpeed, Styles.noiseSpeed);
+
+                            EditorGUI.indentLevel--;
+
+                            if (flareType == SRPLensFlareType.Ring)
+                            {
+                                SerializedProperty ringThickness = element.FindPropertyRelative("ringThickness");
+                                fieldRect.MoveNext();
+                                EditorGUI.PropertyField(fieldRect.Current, ringThickness, Styles.ringThickness);
+                            }
                         }
                     }
-                }
-                break;
+                    break;
 
                 case SRPLensFlareType.LensFlareDataSRP:
                     {
                         SerializedProperty lensFlareDataSRP = element.FindPropertyRelative("lensFlareDataSRP");
                         fieldRect.MoveNext();
-                        DrawLensFlareDataSRPFieldWithCycleDetection(fieldRect.Current, lensFlareDataSRP, Styles.lensFlareDataSRP);
+                        DrawLensFlareDataSRPFieldWithCycleDetection(
+                            fieldRect.Current,
+                            lensFlareDataSRP,
+                            Styles.lensFlareDataSRP
+                        );
                     }
-                break;
+                    break;
             }
 
             // update remaining
@@ -980,16 +1240,31 @@ namespace UnityEditor.Rendering
                 EditorGUI.BeginChangeCheck();
                 Gradient newGradient;
                 if (tintColorType.enumValueIndex == (int)SRPLensFlareColorType.RadialGradient)
-                    newGradient = EditorGUI.GradientField(fieldRect.Current, Styles.tintRadial, tintGradientGradient.gradientValue);
+                    newGradient = EditorGUI.GradientField(
+                        fieldRect.Current,
+                        Styles.tintRadial,
+                        tintGradientGradient.gradientValue
+                    );
                 else // (tintColorType.enumValueIndex == (int)SRPLensFlareColorType.AngularGradient)
-                    newGradient = EditorGUI.GradientField(fieldRect.Current, Styles.tintAngular, tintGradientGradient.gradientValue);
+                    newGradient = EditorGUI.GradientField(
+                        fieldRect.Current,
+                        Styles.tintAngular,
+                        tintGradientGradient.gradientValue
+                    );
                 if (EditorGUI.EndChangeCheck())
                 {
                     element.serializedObject.ApplyModifiedProperties();
                     foreach (var target in targets)
                     {
                         LensFlareDataSRP lsSRP = target as LensFlareDataSRP;
-                        lsSRP.elements[index].tintGradient.SetKeys(newGradient.colorKeys, newGradient.alphaKeys, newGradient.mode, newGradient.colorSpace);
+                        lsSRP
+                            .elements[index]
+                            .tintGradient.SetKeys(
+                                newGradient.colorKeys,
+                                newGradient.alphaKeys,
+                                newGradient.mode,
+                                newGradient.colorSpace
+                            );
                         lsSRP.elements[index].tintGradient.SetDirty();
                     }
                 }
@@ -1072,7 +1347,10 @@ namespace UnityEditor.Rendering
         {
             SerializedProperty enableDistortion = element.FindPropertyRelative("enableRadialDistortion");
 
-            IEnumerator<Rect> fieldRect = ReserveCathegory(remainingRect, GetRadialDistortionCathegoryLines(enableDistortion));
+            IEnumerator<Rect> fieldRect = ReserveCathegory(
+                remainingRect,
+                GetRadialDistortionCathegoryLines(enableDistortion)
+            );
 
             fieldRect.MoveNext();
             EditorGUI.LabelField(fieldRect.Current, Styles.radialDistortionCathegory, EditorStyles.boldLabel);
@@ -1084,7 +1362,9 @@ namespace UnityEditor.Rendering
             {
                 SerializedProperty targetSizeDistortion = element.FindPropertyRelative("targetSizeDistortion");
                 SerializedProperty distortionCurve = element.FindPropertyRelative("distortionCurve");
-                SerializedProperty distortionRelativeToCenter = element.FindPropertyRelative("distortionRelativeToCenter");
+                SerializedProperty distortionRelativeToCenter = element.FindPropertyRelative(
+                    "distortionRelativeToCenter"
+                );
 
                 fieldRect.MoveNext();
                 EditorGUI.PropertyField(fieldRect.Current, targetSizeDistortion, Styles.targetSizeDistortion);
@@ -1093,7 +1373,11 @@ namespace UnityEditor.Rendering
                 EditorGUI.PropertyField(fieldRect.Current, distortionCurve, Styles.distortionCurve);
 
                 fieldRect.MoveNext();
-                EditorGUI.PropertyField(fieldRect.Current, distortionRelativeToCenter, Styles.distortionRelativeToCenter);
+                EditorGUI.PropertyField(
+                    fieldRect.Current,
+                    distortionRelativeToCenter,
+                    Styles.distortionRelativeToCenter
+                );
             }
 
             // update remaining
@@ -1107,7 +1391,10 @@ namespace UnityEditor.Rendering
             SerializedProperty distribution = element.FindPropertyRelative("distribution"); //needed for lines computation
             SerializedProperty type = element.FindPropertyRelative("flareType");
 
-            IEnumerator<Rect> fieldRect = ReserveCathegory(remainingRect, GetMultipleElementsCathegoryLines(type, allowMultipleElement, distribution));
+            IEnumerator<Rect> fieldRect = ReserveCathegory(
+                remainingRect,
+                GetMultipleElementsCathegoryLines(type, allowMultipleElement, distribution)
+            );
 
             fieldRect.MoveNext();
             EditorGUI.LabelField(fieldRect.Current, Styles.multipleElementsCathegory, EditorStyles.boldLabel);
@@ -1193,7 +1480,7 @@ namespace UnityEditor.Rendering
             remainingRect = fieldRect.Current;
         }
 
-#endregion
+        #endregion
 
         #region Utility
         IEnumerator<Rect> ReserveFields(Rect rect, int fields)
@@ -1232,7 +1519,11 @@ namespace UnityEditor.Rendering
         Rect OffsetForThumbnail(ref Rect remainingRect)
         {
             Rect thumbnailRect = remainingRect;
-            thumbnailRect.yMin += ((4.0f * EditorGUIUtility.singleLineHeight + 3.0f * EditorGUIUtility.standardVerticalSpacing) - (float)Styles.thumbnailSizeHeight) / 2.0f;
+            thumbnailRect.yMin +=
+                (
+                    (4.0f * EditorGUIUtility.singleLineHeight + 3.0f * EditorGUIUtility.standardVerticalSpacing)
+                    - (float)Styles.thumbnailSizeHeight
+                ) / 2.0f;
             thumbnailRect.width = Styles.thumbnailSizeWidth;
             thumbnailRect.height = Styles.thumbnailSizeHeight;
 
@@ -1242,18 +1533,27 @@ namespace UnityEditor.Rendering
 
         // enumValueIndex is not the underling int but the index in enum names.
         // if enum don't start at 0, or skip a value, comparing int with enumValueIndex will fail.
-        T GetEnum<T>(SerializedProperty property)
-            => (T)(object)property.intValue;
+        T GetEnum<T>(SerializedProperty property) => (T)(object)property.intValue;
 
-        void SetEnum<T>(SerializedProperty property, T value)
-            => property.intValue = (int)(object)value;
+        void SetEnum<T>(SerializedProperty property, T value) => property.intValue = (int)(object)value;
 
-        void DrawLensFlareDataSRPFieldWithCycleDetection(Rect rect, SerializedProperty lensFlareDataSRPProperty, GUIContent label)
+        void DrawLensFlareDataSRPFieldWithCycleDetection(
+            Rect rect,
+            SerializedProperty lensFlareDataSRPProperty,
+            GUIContent label
+        )
         {
             LensFlareDataSRP currentAsset = target as LensFlareDataSRP;
 
             EditorGUI.BeginChangeCheck();
-            LensFlareDataSRP newValue = EditorGUI.ObjectField(rect, label, lensFlareDataSRPProperty.objectReferenceValue, typeof(LensFlareDataSRP), false) as LensFlareDataSRP;
+            LensFlareDataSRP newValue =
+                EditorGUI.ObjectField(
+                    rect,
+                    label,
+                    lensFlareDataSRPProperty.objectReferenceValue,
+                    typeof(LensFlareDataSRP),
+                    false
+                ) as LensFlareDataSRP;
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -1282,9 +1582,15 @@ namespace UnityEditor.Rendering
 
                             foreach (var element in asset.elements)
                             {
-                                if (element.flareType == SRPLensFlareType.LensFlareDataSRP && element.lensFlareDataSRP != null)
+                                if (
+                                    element.flareType == SRPLensFlareType.LensFlareDataSRP
+                                    && element.lensFlareDataSRP != null
+                                )
                                 {
-                                    if (element.lensFlareDataSRP == targetAsset || CheckCycle(element.lensFlareDataSRP, targetAsset))
+                                    if (
+                                        element.lensFlareDataSRP == targetAsset
+                                        || CheckCycle(element.lensFlareDataSRP, targetAsset)
+                                    )
                                         return true;
                                 }
                             }
@@ -1299,7 +1605,9 @@ namespace UnityEditor.Rendering
                 {
                     // Cycle detected - set to null and show a warning
                     lensFlareDataSRPProperty.objectReferenceValue = null;
-                    Debug.LogWarning($"Cannot assign lens flare asset '{newValue.name}' because it would create a cyclic dependency. Setting to null to prevent infinite loop.");
+                    Debug.LogWarning(
+                        $"Cannot assign lens flare asset '{newValue.name}' because it would create a cyclic dependency. Setting to null to prevent infinite loop."
+                    );
                 }
                 else
                 {

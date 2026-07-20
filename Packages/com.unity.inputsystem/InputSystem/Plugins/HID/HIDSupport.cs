@@ -98,7 +98,12 @@ namespace UnityEngine.InputSystem.HID
                 for (var i = 0; i < InputSystem.devices.Count; ++i)
                 {
                     var device = InputSystem.devices[i];
-                    if (device is HID hid && !s_SupportedHIDUsages.Contains(new HIDPageUsage(hid.hidDescriptor.usagePage, hid.hidDescriptor.usage)))
+                    if (
+                        device is HID hid
+                        && !s_SupportedHIDUsages.Contains(
+                            new HIDPageUsage(hid.hidDescriptor.usagePage, hid.hidDescriptor.usage)
+                        )
+                    )
                     {
                         // Remove the entire generated layout. This will also remove all devices based on it.
                         InputSystem.RemoveLayout(device.layout);
@@ -130,9 +135,8 @@ namespace UnityEngine.InputSystem.HID
 
             // Add toolbar button to any devices using the "HID" interface. Opens
             // a windows to browse the HID descriptor of the device.
-            #if UNITY_EDITOR
-            InputDeviceDebuggerWindow.onToolbarGUI +=
-                device =>
+#if UNITY_EDITOR
+            InputDeviceDebuggerWindow.onToolbarGUI += device =>
             {
                 if (device.description.interfaceName == HID.kHIDInterface)
                 {
@@ -142,11 +146,11 @@ namespace UnityEngine.InputSystem.HID
                     }
                 }
             };
-            #endif
+#endif
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         private static readonly GUIContent s_HIDDescriptor = new GUIContent("HID Descriptor");
-        #endif
+#endif
     }
 }

@@ -128,7 +128,10 @@ namespace UnityEditor.Rendering
         /// <param name="obj">The <see cref="SerializedObject"/> being searched.</param>
         /// <param name="expr">A lambda expression pointing to the field within the source class.</param>
         /// <returns>The corresponding <see cref="SerializedProperty"/>, or null if not found.</returns>
-        public static SerializedProperty Find<TSource, TValue>(this SerializedObject obj, Expression<Func<TSource, TValue>> expr)
+        public static SerializedProperty Find<TSource, TValue>(
+            this SerializedObject obj,
+            Expression<Func<TSource, TValue>> expr
+        )
         {
             var path = CoreEditorUtils.FindProperty(expr);
             return obj.FindProperty(path);
@@ -142,7 +145,10 @@ namespace UnityEditor.Rendering
         /// <param name="obj">The instance of <see cref="SerializedProperty"/> to begin the search from.</param>
         /// <param name="expr">>A lambda expression pointing to the field within the source class.</param>
         /// <returns>The relative <see cref="SerializedProperty"/> if found; otherwise, null.</returns>
-        public static SerializedProperty Find<TSource, TValue>(this SerializedProperty obj, Expression<Func<TSource, TValue>> expr)
+        public static SerializedProperty Find<TSource, TValue>(
+            this SerializedProperty obj,
+            Expression<Func<TSource, TValue>> expr
+        )
         {
             var path = CoreEditorUtils.FindProperty(expr);
             return obj.FindPropertyRelative(path);

@@ -25,22 +25,30 @@ namespace UnityEditor.Rendering
         {
             /// <summary> Wireframe </summary>
             Wireframe = 1,
+
             /// <summary> Solid </summary>
             Solid = 2,
+
             /// <summary> Solid with Wireframe </summary>
-            Everything = Wireframe | Solid
+            Everything = Wireframe | Solid,
         }
 
         class Styles
         {
-            public static readonly GUIContent volumeGizmosVisibilityLabel = EditorGUIUtility.TrTextContent("Gizmo Visibility", "Specifies how Gizmos for Volumes are being rendered");
+            public static readonly GUIContent volumeGizmosVisibilityLabel = EditorGUIUtility.TrTextContent(
+                "Gizmo Visibility",
+                "Specifies how Gizmos for Volumes are being rendered"
+            );
         }
 
         static VolumeGizmoVisibility s_VolumeGizmosVisibilityOption = VolumeGizmoVisibility.Solid;
 
         static VolumesPreferences()
         {
-            GetColorPrefVolumeGizmoColor = RuntimeSRPPreferences.RegisterPreferenceColor("Scene/Volume Gizmo", s_VolumeGizmoColorDefault);
+            GetColorPrefVolumeGizmoColor = RuntimeSRPPreferences.RegisterPreferenceColor(
+                "Scene/Volume Gizmo",
+                s_VolumeGizmoColorDefault
+            );
             if (EditorPrefs.HasKey(Keys.volumeGizmosVisibility))
                 s_VolumeGizmosVisibilityOption = (VolumeGizmoVisibility)EditorPrefs.GetInt(Keys.volumeGizmosVisibility);
         }
@@ -61,12 +69,14 @@ namespace UnityEditor.Rendering
         /// <summary>
         /// Returns if the Volume Gizmos should render the wireframe edges
         /// </summary>
-        public static bool drawWireFrame => (volumeGizmosVisibilityOption & VolumeGizmoVisibility.Wireframe) == VolumeGizmoVisibility.Wireframe;
+        public static bool drawWireFrame =>
+            (volumeGizmosVisibilityOption & VolumeGizmoVisibility.Wireframe) == VolumeGizmoVisibility.Wireframe;
 
         /// <summary>
         /// Returns if the Volume Gizmos should render the solid faces
         /// </summary>
-        public static bool drawSolid => (volumeGizmosVisibilityOption & VolumeGizmoVisibility.Solid) == VolumeGizmoVisibility.Solid;
+        public static bool drawSolid =>
+            (volumeGizmosVisibilityOption & VolumeGizmoVisibility.Solid) == VolumeGizmoVisibility.Solid;
 
         static Color s_VolumeGizmoColorDefault = new Color(0.2f, 0.8f, 0.1f, 0.125f);
         private static Func<Color> GetColorPrefVolumeGizmoColor;
@@ -77,6 +87,7 @@ namespace UnityEditor.Rendering
         public static Color volumeGizmoColor => GetColorPrefVolumeGizmoColor();
 
         static List<string> s_SearchKeywords = new() { "Gizmo", "Wireframe", "Visibility" };
+
         /// <summary>
         /// The list of keywords for user search
         /// </summary>

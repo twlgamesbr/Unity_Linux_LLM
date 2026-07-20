@@ -42,13 +42,7 @@ namespace NPCSystem.EditorUX
         [SerializeField, HideProperty]
         bool useQdrantDiagnostics = true;
 
-        [FoldoutGroup(
-            "LocalAI Settings",
-            true,
-            nameof(localAiHost),
-            nameof(localAiPort),
-            nameof(localAiModel)
-        )]
+        [FoldoutGroup("LocalAI Settings", true, nameof(localAiHost), nameof(localAiPort), nameof(localAiModel))]
         [SerializeField]
         private Void localAiGroup;
 
@@ -97,9 +91,7 @@ namespace NPCSystem.EditorUX
         {
             if (DialogueManager == null)
             {
-                DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
-                    FindObjectsInactive.Include
-                );
+                DialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
             }
 
             if (QdrantRag == null)
@@ -122,11 +114,7 @@ namespace NPCSystem.EditorUX
                     : "LocalAI settings are incomplete. Check host, port, and model.";
         }
 
-        [Button(
-            nameof(useQdrantDiagnostics),
-            ConditionResult.ShowHide,
-            buttonLabel: "Validate Qdrant Settings"
-        )]
+        [Button(nameof(useQdrantDiagnostics), ConditionResult.ShowHide, buttonLabel: "Validate Qdrant Settings")]
         void ValidateQdrantSettings()
         {
             if (!useQdrantDiagnostics)
@@ -137,17 +125,13 @@ namespace NPCSystem.EditorUX
 
             if (QdrantRag == null)
             {
-                lastValidationStatus =
-                    "Qdrant diagnostics enabled but no QdrantRAGService is assigned.";
+                lastValidationStatus = "Qdrant diagnostics enabled but no QdrantRAGService is assigned.";
                 return;
             }
 
             bool hasUrl =
                 !string.IsNullOrWhiteSpace(QdrantRag.QdrantUrl)
-                && (
-                    QdrantRag.QdrantUrl.StartsWith("http://")
-                    || QdrantRag.QdrantUrl.StartsWith("https://")
-                );
+                && (QdrantRag.QdrantUrl.StartsWith("http://") || QdrantRag.QdrantUrl.StartsWith("https://"));
             bool hasCollection = !string.IsNullOrWhiteSpace(QdrantRag.CollectionName);
             lastValidationStatus =
                 hasUrl && hasCollection

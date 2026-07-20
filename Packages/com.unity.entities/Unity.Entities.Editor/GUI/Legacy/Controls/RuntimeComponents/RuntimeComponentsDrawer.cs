@@ -17,7 +17,9 @@ namespace Unity.Editor.Legacy
         struct PathScope : IDisposable
         {
             readonly RuntimeComponentsDrawer m_Drawer;
+
             public PathScope(RuntimeComponentsDrawer context) => m_Drawer = context;
+
             public void Dispose() => m_Drawer.m_Path = PropertyPath.Pop(m_Drawer.m_Path);
         }
 
@@ -112,7 +114,11 @@ namespace Unity.Editor.Legacy
         /// <summary>
         /// Invoked by the <see cref="PropertyVisitor"/> base class when encountering ANY property value not consumed by an adapter.
         /// </summary>
-        protected override void VisitProperty<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value)
+        protected override void VisitProperty<TContainer, TValue>(
+            Property<TContainer, TValue> property,
+            ref TContainer container,
+            ref TValue value
+        )
         {
             if (!BeginProperty(property, value))
                 return;
@@ -122,7 +128,11 @@ namespace Unity.Editor.Legacy
             EndProperty(property);
         }
 
-        protected override void VisitCollection<TContainer, TCollection, TElement>(Property<TContainer, TCollection> property, ref TContainer container, ref TCollection value)
+        protected override void VisitCollection<TContainer, TCollection, TElement>(
+            Property<TContainer, TCollection> property,
+            ref TContainer container,
+            ref TCollection value
+        )
         {
             if (!BeginProperty(property, value))
                 return;
@@ -168,7 +178,6 @@ namespace Unity.Editor.Legacy
 
                 if (properties is IIndexedProperties<TCollection> indexed)
                 {
-
                     for (var index = start; index < end && index < count; index++)
                     {
                         if (indexed.TryGetProperty(ref value, index, out var p))
@@ -189,7 +198,11 @@ namespace Unity.Editor.Legacy
             EndProperty(property);
         }
 
-        protected override void VisitSet<TContainer, TSet, TElement>(Property<TContainer, TSet> property, ref TContainer container, ref TSet value)
+        protected override void VisitSet<TContainer, TSet, TElement>(
+            Property<TContainer, TSet> property,
+            ref TContainer container,
+            ref TSet value
+        )
         {
             if (!BeginProperty(property, value))
                 return;
@@ -209,7 +222,11 @@ namespace Unity.Editor.Legacy
             EndProperty(property);
         }
 
-        protected override void VisitDictionary<TContainer, TDictionary, TKey, TValue>(Property<TContainer, TDictionary> property, ref TContainer container, ref TDictionary value)
+        protected override void VisitDictionary<TContainer, TDictionary, TKey, TValue>(
+            Property<TContainer, TDictionary> property,
+            ref TContainer container,
+            ref TDictionary value
+        )
         {
             if (!BeginProperty(property, value))
                 return;
@@ -238,13 +255,7 @@ namespace Unity.Editor.Legacy
                 if (!m_SelectedComponentTypes.Contains(typeIndex))
                     return false;
 
-                var style = new GUIStyle("HelpBox")
-                {
-                    normal =
-                    {
-                        background = EditorIcons.RoundedCorners
-                    }
-                };
+                var style = new GUIStyle("HelpBox") { normal = { background = EditorIcons.RoundedCorners } };
 
                 GUI.color = EditorGUIUtility.isProSkin
                     ? new Color32(0x22, 0x22, 0x22, 0xFF)
@@ -257,7 +268,7 @@ namespace Unity.Editor.Legacy
                 var content = new GUIContent
                 {
                     text = " " + TypeManager.GetType(typeIndex).Name + " " + GetComponentCategory(typeIndex),
-                    image = EditorIcons.RuntimeComponent
+                    image = EditorIcons.RuntimeComponent,
                 };
 
                 using (new EditorGUILayout.HorizontalScope())
@@ -280,7 +291,10 @@ namespace Unity.Editor.Legacy
 
                 if (IsMixedType<TValue>(value))
                 {
-                    EditorGUILayout.LabelField(new GUIContent(GetDisplayName(property)), Bridge.EditorGUIBridge.mixedValueContent);
+                    EditorGUILayout.LabelField(
+                        new GUIContent(GetDisplayName(property)),
+                        Bridge.EditorGUIBridge.mixedValueContent
+                    );
                     m_Path = PropertyPath.Pop(m_Path);
                     return false;
                 }
@@ -347,7 +361,10 @@ namespace Unity.Editor.Legacy
         /// </remarks>
         static void LabelField<TValue>(IProperty property, TValue value, bool isMixed)
         {
-            LabelField(GetLabelContent(GetDisplayName(property)), isMixed ? Bridge.EditorGUIBridge.mixedValueContent : GetValueContent(value));
+            LabelField(
+                GetLabelContent(GetDisplayName(property)),
+                isMixed ? Bridge.EditorGUIBridge.mixedValueContent : GetValueContent(value)
+            );
         }
 
         /// <summary>
@@ -358,7 +375,10 @@ namespace Unity.Editor.Legacy
         /// </remarks>
         static void LabelField<TValue>(string name, TValue value, bool isMixed)
         {
-            LabelField(GetLabelContent(name), isMixed ? Bridge.EditorGUIBridge.mixedValueContent : GetValueContent(value));
+            LabelField(
+                GetLabelContent(name),
+                isMixed ? Bridge.EditorGUIBridge.mixedValueContent : GetValueContent(value)
+            );
         }
 
         /// <summary>
@@ -465,13 +485,16 @@ namespace Unity.Editor.Legacy
             return false;
         }
 
-        bool IsMixedSize<TCollection, TElement>(TCollection value) where TCollection : ICollection<TElement>
+        bool IsMixedSize<TCollection, TElement>(TCollection value)
+            where TCollection : ICollection<TElement>
         {
             for (var index = 1; index < m_Targets.Count; index++)
             {
                 var target = m_Targets[index];
 
-                if (!PropertyContainer.TryGetValue<EntityContainer, TCollection>(ref target, m_Path, out var otherValue))
+                if (
+                    !PropertyContainer.TryGetValue<EntityContainer, TCollection>(ref target, m_Path, out var otherValue)
+                )
                 {
                     return true;
                 }
@@ -500,7 +523,8 @@ namespace Unity.Editor.Legacy
             return false;
         }
 
-        int GetMinCount<TCollection, TElement>(TCollection value) where TCollection : ICollection<TElement>
+        int GetMinCount<TCollection, TElement>(TCollection value)
+            where TCollection : ICollection<TElement>
         {
             var min = value.Count;
 
@@ -508,7 +532,9 @@ namespace Unity.Editor.Legacy
             {
                 var target = m_Targets[index];
 
-                if (!PropertyContainer.TryGetValue<EntityContainer, TCollection>(ref target, m_Path, out var otherValue))
+                if (
+                    !PropertyContainer.TryGetValue<EntityContainer, TCollection>(ref target, m_Path, out var otherValue)
+                )
                 {
                     continue;
                 }

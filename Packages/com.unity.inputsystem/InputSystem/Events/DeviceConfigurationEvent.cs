@@ -24,7 +24,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public unsafe InputEventPtr ToEventPtr()
         {
-            fixed(DeviceConfigurationEvent * ptr = &this)
+            fixed (DeviceConfigurationEvent* ptr = &this)
             {
                 return new InputEventPtr((InputEvent*)ptr);
             }

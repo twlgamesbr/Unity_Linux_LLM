@@ -19,12 +19,18 @@ namespace UnityEngine.Rendering
         public static AABB AABBTransform(float4x4 transform, AABB localBounds)
         {
             AABB transformed;
-            transformed.extents = AABBRotateExtents(localBounds.extents, transform.c0.xyz, transform.c1.xyz, transform.c2.xyz);
+            transformed.extents = AABBRotateExtents(
+                localBounds.extents,
+                transform.c0.xyz,
+                transform.c1.xyz,
+                transform.c2.xyz
+            );
             transformed.center = math.transform(transform, localBounds.center);
             return transformed;
         }
 
-        private unsafe static int AtomicAddLengthNoResize<T>(in NativeList<T> list, int count) where T : unmanaged
+        private static unsafe int AtomicAddLengthNoResize<T>(in NativeList<T> list, int count)
+            where T : unmanaged
         {
             UnsafeList<T>* unsafeList = list.GetUnsafeList();
             var newLength = Interlocked.Add(ref unsafeList->m_length, count);
@@ -35,12 +41,22 @@ namespace UnityEngine.Rendering
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
         private unsafe struct QueryRendererInstancesJob : IJobParallelFor
         {
-            [ReadOnly] public NativeArray<JaggedJobRange> jobRanges;
-            [ReadOnly] public NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap;
-            [NativeDisableContainerSafetyRestriction, NoAlias][ReadOnly] public JaggedSpan<EntityId> jaggedRenderers;
+            [ReadOnly]
+            public NativeArray<JaggedJobRange> jobRanges;
 
-            [NativeDisableContainerSafetyRestriction, NoAlias][WriteOnly] public NativeArray<InstanceHandle> instances;
-            [NativeDisableUnsafePtrRestriction] public UnsafeAtomicCounter32 atomicNonFoundInstancesCount;
+            [ReadOnly]
+            public NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap;
+
+            [NativeDisableContainerSafetyRestriction, NoAlias]
+            [ReadOnly]
+            public JaggedSpan<EntityId> jaggedRenderers;
+
+            [NativeDisableContainerSafetyRestriction, NoAlias]
+            [WriteOnly]
+            public NativeArray<InstanceHandle> instances;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeAtomicCounter32 atomicNonFoundInstancesCount;
 
             public void Execute(int jobIndex)
             {
@@ -74,10 +90,15 @@ namespace UnityEngine.Rendering
         {
             public const int MaxBatchSize = 64;
 
-            [ReadOnly] public RenderWorld renderWorld;
-            [ReadOnly] public NativeArray<EntityId> sortedMeshes;
+            [ReadOnly]
+            public RenderWorld renderWorld;
 
-            [NativeDisableParallelForRestriction][WriteOnly] public NativeList<InstanceHandle> instances;
+            [ReadOnly]
+            public NativeArray<EntityId> sortedMeshes;
+
+            [NativeDisableParallelForRestriction]
+            [WriteOnly]
+            public NativeList<InstanceHandle> instances;
 
             public void Execute(int startIndex, int count)
             {
@@ -120,13 +141,26 @@ namespace UnityEngine.Rendering
         {
             public const int k_CalculatedProbesPerBatch = 8;
 
-            [ReadOnly] public int probesCount;
-            [ReadOnly] public LightProbesQuery lightProbesQuery;
+            [ReadOnly]
+            public int probesCount;
 
-            [NativeDisableParallelForRestriction][ReadOnly] public NativeArray<Vector3> queryPostitions;
-            [NativeDisableParallelForRestriction] public NativeArray<int> compactTetrahedronCache;
-            [NativeDisableParallelForRestriction][WriteOnly] public NativeArray<SphericalHarmonicsL2> probesSphericalHarmonics;
-            [NativeDisableParallelForRestriction][WriteOnly] public NativeArray<Vector4> probesOcclusion;
+            [ReadOnly]
+            public LightProbesQuery lightProbesQuery;
+
+            [NativeDisableParallelForRestriction]
+            [ReadOnly]
+            public NativeArray<Vector3> queryPostitions;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<int> compactTetrahedronCache;
+
+            [NativeDisableParallelForRestriction]
+            [WriteOnly]
+            public NativeArray<SphericalHarmonicsL2> probesSphericalHarmonics;
+
+            [NativeDisableParallelForRestriction]
+            [WriteOnly]
+            public NativeArray<Vector4> probesOcclusion;
 
             public void Execute(int index)
             {
@@ -138,17 +172,27 @@ namespace UnityEngine.Rendering
                 var queryPostitionsSubArray = queryPostitions.GetSubArray(startIndex, count);
                 var probesSphericalHarmonicsSubArray = probesSphericalHarmonics.GetSubArray(startIndex, count);
                 var probesOcclusionSubArray = probesOcclusion.GetSubArray(startIndex, count);
-                lightProbesQuery.CalculateInterpolatedLightAndOcclusionProbes(queryPostitionsSubArray, compactTetrahedronCacheSubArray, probesSphericalHarmonicsSubArray, probesOcclusionSubArray);
+                lightProbesQuery.CalculateInterpolatedLightAndOcclusionProbes(
+                    queryPostitionsSubArray,
+                    compactTetrahedronCacheSubArray,
+                    probesSphericalHarmonicsSubArray,
+                    probesOcclusionSubArray
+                );
             }
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
         private struct ScatterTetrahedronCacheIndicesJob : IJobParallelFor
         {
-            [ReadOnly] public NativeArray<InstanceHandle> probeInstances;
-            [ReadOnly] public NativeArray<int> compactTetrahedronCache;
+            [ReadOnly]
+            public NativeArray<InstanceHandle> probeInstances;
 
-            [NativeDisableContainerSafetyRestriction, NoAlias][NativeDisableParallelForRestriction] public RenderWorld renderWorld;
+            [ReadOnly]
+            public NativeArray<int> compactTetrahedronCache;
+
+            [NativeDisableContainerSafetyRestriction, NoAlias]
+            [NativeDisableParallelForRestriction]
+            public RenderWorld renderWorld;
 
             public void Execute(int index)
             {
@@ -163,18 +207,38 @@ namespace UnityEngine.Rendering
         {
             public const int MaxBatchSize = 64;
 
-            [ReadOnly] public NativeArray<JaggedJobRange> jobRanges;
-            [ReadOnly] public NativeArray<InstanceHandle> instances;
-            [ReadOnly] public JaggedSpan<float4x4> jaggedLocalToWorldMatrices;
-            [ReadOnly] public JaggedSpan<float4x4> jaggedPrevLocalToWorldMatrices;
-            [ReadOnly] public bool initialize;
-            [ReadOnly] public bool enableBoundingSpheres;
+            [ReadOnly]
+            public NativeArray<JaggedJobRange> jobRanges;
 
-            [NativeDisableUnsafePtrRestriction] public UnsafeAtomicCounter32 atomicTransformQueueCount;
-            [NativeDisableParallelForRestriction] public RenderWorld renderWorld;
-            [NativeDisableParallelForRestriction] public NativeArray<InstanceHandle> transformUpdateInstanceQueue;
-            [NativeDisableParallelForRestriction] public NativeArray<TransformUpdatePacket> transformUpdateDataQueue;
-            [NativeDisableParallelForRestriction] public NativeArray<float4> boundingSpheresDataQueue;
+            [ReadOnly]
+            public NativeArray<InstanceHandle> instances;
+
+            [ReadOnly]
+            public JaggedSpan<float4x4> jaggedLocalToWorldMatrices;
+
+            [ReadOnly]
+            public JaggedSpan<float4x4> jaggedPrevLocalToWorldMatrices;
+
+            [ReadOnly]
+            public bool initialize;
+
+            [ReadOnly]
+            public bool enableBoundingSpheres;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeAtomicCounter32 atomicTransformQueueCount;
+
+            [NativeDisableParallelForRestriction]
+            public RenderWorld renderWorld;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<InstanceHandle> transformUpdateInstanceQueue;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<TransformUpdatePacket> transformUpdateDataQueue;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<float4> boundingSpheresDataQueue;
 
             public void Execute(int jobIndex)
             {
@@ -235,7 +299,9 @@ namespace UnityEngine.Rendering
                         if (initialize)
                         {
                             PackedMatrix l2wPacked = PackedMatrix.FromFloat4x4(l2w);
-                            PackedMatrix l2wPrevPacked = PackedMatrix.FromFloat4x4(prevLocalToWorldMatrices.ElementAt(localIndex));
+                            PackedMatrix l2wPrevPacked = PackedMatrix.FromFloat4x4(
+                                prevLocalToWorldMatrices.ElementAt(localIndex)
+                            );
 
                             transformUpdateDataQueue[writeIndex * 2] = new TransformUpdatePacket()
                             {
@@ -263,7 +329,12 @@ namespace UnityEngine.Rendering
                         }
 
                         if (enableBoundingSpheres)
-                            boundingSpheresDataQueue[writeIndex] = new float4(worldAABB.center.x, worldAABB.center.y, worldAABB.center.z, math.distance(worldAABB.max, worldAABB.min) * 0.5f);
+                            boundingSpheresDataQueue[writeIndex] = new float4(
+                                worldAABB.center.x,
+                                worldAABB.center.y,
+                                worldAABB.center.z,
+                                math.distance(worldAABB.max, worldAABB.min) * 0.5f
+                            );
 
                         writeIndex += 1;
                         validBits &= ~(1ul << validBitIndex);
@@ -278,13 +349,25 @@ namespace UnityEngine.Rendering
         {
             public const int MaxBatchSize = 64;
 
-            [ReadOnly] [NativeDisableContainerSafetyRestriction, NoAlias] public NativeArray<InstanceHandle> instances;
-            [ReadOnly] [NativeDisableContainerSafetyRestriction, NoAlias] public RenderWorld renderWorld;
+            [ReadOnly]
+            [NativeDisableContainerSafetyRestriction, NoAlias]
+            public NativeArray<InstanceHandle> instances;
 
-            [NativeDisableUnsafePtrRestriction] public UnsafeAtomicCounter32 atomicProbesQueueCount;
-            [NativeDisableParallelForRestriction] public NativeArray<InstanceHandle> probeInstanceQueue;
-            [NativeDisableParallelForRestriction] public NativeArray<int> compactTetrahedronCache;
-            [NativeDisableParallelForRestriction] public NativeArray<Vector3> probeQueryPosition;
+            [ReadOnly]
+            [NativeDisableContainerSafetyRestriction, NoAlias]
+            public RenderWorld renderWorld;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeAtomicCounter32 atomicProbesQueueCount;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<InstanceHandle> probeInstanceQueue;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<int> compactTetrahedronCache;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<Vector3> probeQueryPosition;
 
             public void Execute(int startIndex, int count)
             {
@@ -300,7 +383,8 @@ namespace UnityEngine.Rendering
                     int instanceIndex = renderWorld.HandleToIndex(instance);
                     InternalMeshRendererSettings rendererSettings = renderWorld.rendererSettings[instanceIndex];
                     int lightmapIndex = renderWorld.lightmapIndices[instanceIndex];
-                    bool hasLightProbes = !LightmapUtils.UsesLightmaps(lightmapIndex)
+                    bool hasLightProbes =
+                        !LightmapUtils.UsesLightmaps(lightmapIndex)
                         && rendererSettings.LightProbeUsage == LightProbeUsage.BlendProbes;
 
                     if (!hasLightProbes)
@@ -337,11 +421,18 @@ namespace UnityEngine.Rendering
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
         private struct MotionUpdateJob : IJobParallelFor
         {
-            [ReadOnly] public int queueWriteBase;
+            [ReadOnly]
+            public int queueWriteBase;
 
-            [NativeDisableParallelForRestriction] public RenderWorld renderWorld;
-            [NativeDisableUnsafePtrRestriction] public UnsafeAtomicCounter32 atomicUpdateQueueCount;
-            [NativeDisableParallelForRestriction][WriteOnly] public NativeArray<InstanceHandle> transformUpdateInstanceQueue;
+            [NativeDisableParallelForRestriction]
+            public RenderWorld renderWorld;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeAtomicCounter32 atomicUpdateQueueCount;
+
+            [NativeDisableParallelForRestriction]
+            [WriteOnly]
+            public NativeArray<InstanceHandle> transformUpdateInstanceQueue;
 
             public void Execute(int chunk_index)
             {
@@ -382,30 +473,57 @@ namespace UnityEngine.Rendering
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
         private unsafe struct UpdateRendererInstancesJob : IJobParallelFor
         {
-            [ReadOnly] public NativeArray<JaggedJobRange> jobRanges;
-            [ReadOnly] public MeshRendererUpdateBatch updateBatch;
-            [ReadOnly] public NativeArray<InstanceHandle> instances;
-            [ReadOnly] public NativeParallelHashMap<EntityId, GPUInstanceIndex> lodGroupDataMap;
+            [ReadOnly]
+            public NativeArray<JaggedJobRange> jobRanges;
 
-            [NativeDisableParallelForRestriction][NativeDisableContainerSafetyRestriction] public RenderWorld renderWorld;
+            [ReadOnly]
+            public MeshRendererUpdateBatch updateBatch;
+
+            [ReadOnly]
+            public NativeArray<InstanceHandle> instances;
+
+            [ReadOnly]
+            public NativeParallelHashMap<EntityId, GPUInstanceIndex> lodGroupDataMap;
+
+            [NativeDisableParallelForRestriction]
+            [NativeDisableContainerSafetyRestriction]
+            public RenderWorld renderWorld;
 
             public void Execute(int jobIndex)
             {
                 JaggedJobRange jobRange = jobRanges[jobIndex];
                 NativeArray<EntityId> rendererSection = updateBatch.instanceIDs[jobRange.sectionIndex];
                 NativeArray<EntityId> meshSection = updateBatch.GetMeshSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<ushort> subMeshStartIndexSection = updateBatch.GetSubMeshStartIndexSectionOrDefault(jobRange.sectionIndex);
+                NativeArray<ushort> subMeshStartIndexSection = updateBatch.GetSubMeshStartIndexSectionOrDefault(
+                    jobRange.sectionIndex
+                );
                 NativeArray<EntityId> materialSection = updateBatch.GetMaterialSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<RangeInt> subMaterialRangeSection = updateBatch.GetSubMaterialRangeSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<float4x4> localToWorldSection = updateBatch.GetLocalToWorldSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<AABB> localBoundsSection = updateBatch.GetLocalBoundsSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<InternalMeshRendererSettings> rendererSettingsSection = updateBatch.GetRendererSettingsSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<int> rendererPrioritySection = updateBatch.GetRendererPrioritySectionOrDefault(jobRange.sectionIndex);
-                NativeArray<short> lightmapIndexSection = updateBatch.GetLightmapIndexSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<EntityId> parentLODGroupSection = updateBatch.GetParentLODGroupIDSectionOrDefault(jobRange.sectionIndex);
+                NativeArray<RangeInt> subMaterialRangeSection = updateBatch.GetSubMaterialRangeSectionOrDefault(
+                    jobRange.sectionIndex
+                );
+                NativeArray<float4x4> localToWorldSection = updateBatch.GetLocalToWorldSectionOrDefault(
+                    jobRange.sectionIndex
+                );
+                NativeArray<AABB> localBoundsSection = updateBatch.GetLocalBoundsSectionOrDefault(
+                    jobRange.sectionIndex
+                );
+                NativeArray<InternalMeshRendererSettings> rendererSettingsSection =
+                    updateBatch.GetRendererSettingsSectionOrDefault(jobRange.sectionIndex);
+                NativeArray<int> rendererPrioritySection = updateBatch.GetRendererPrioritySectionOrDefault(
+                    jobRange.sectionIndex
+                );
+                NativeArray<short> lightmapIndexSection = updateBatch.GetLightmapIndexSectionOrDefault(
+                    jobRange.sectionIndex
+                );
+                NativeArray<EntityId> parentLODGroupSection = updateBatch.GetParentLODGroupIDSectionOrDefault(
+                    jobRange.sectionIndex
+                );
                 NativeArray<byte> lodMaskSection = updateBatch.GetLODMaskSectionOrDefault(jobRange.sectionIndex);
-                NativeArray<InternalMeshLodRendererSettings> meshLodSettingsSection = updateBatch.GetMeshLodSettingsSectionOrDefault(jobRange.sectionIndex);
-                UnsafeBitArray renderingEnabledSection = updateBatch.GetRenderingEnabledSectionOrDefault(jobRange.sectionIndex);
+                NativeArray<InternalMeshLodRendererSettings> meshLodSettingsSection =
+                    updateBatch.GetMeshLodSettingsSectionOrDefault(jobRange.sectionIndex);
+                UnsafeBitArray renderingEnabledSection = updateBatch.GetRenderingEnabledSectionOrDefault(
+                    jobRange.sectionIndex
+                );
 
                 NativeArray<ulong> sceneCullingMaskSection = default;
                 ulong sharedSceneCullingMask = 0;
@@ -422,7 +540,8 @@ namespace UnityEngine.Rendering
                 }
 
                 MeshRendererUpdateType updateType = updateBatch.updateType;
-                bool hasOnlyKnowInstances = updateType == MeshRendererUpdateType.NoStructuralChanges
+                bool hasOnlyKnowInstances =
+                    updateType == MeshRendererUpdateType.NoStructuralChanges
                     || updateType == MeshRendererUpdateType.RecreateOnlyKnownInstances;
 
                 int treeCountDelta = 0;
@@ -457,8 +576,10 @@ namespace UnityEngine.Rendering
                     if (updateBatch.HasAnyComponent(MeshRendererComponentMask.Material))
                     {
                         var subMaterialRange = subMaterialRangeSection[localIndex];
-                        var subMaterialIDs = new EmbeddedArray32<EntityId>(materialSection.GetSubArray(subMaterialRange.start, subMaterialRange.length),
-                            Allocator.Persistent);
+                        var subMaterialIDs = new EmbeddedArray32<EntityId>(
+                            materialSection.GetSubArray(subMaterialRange.start, subMaterialRange.length),
+                            Allocator.Persistent
+                        );
 
                         renderWorld.materialIDArrays.ElementAtRW(instanceIndex).Dispose();
                         renderWorld.materialIDArrays.ElementAtRW(instanceIndex) = subMaterialIDs;
@@ -493,13 +614,17 @@ namespace UnityEngine.Rendering
                         renderWorld.lodMasks.ElementAtRW(instanceIndex) = lodMaskSection[localIndex];
 
                     if (updateBatch.HasAnyComponent(MeshRendererComponentMask.MeshLodSettings))
-                        renderWorld.meshLodRendererSettings.ElementAtRW(instanceIndex) = meshLodSettingsSection[localIndex];
+                        renderWorld.meshLodRendererSettings.ElementAtRW(instanceIndex) = meshLodSettingsSection[
+                            localIndex
+                        ];
 
                     if (updateBatch.HasAnyComponent(MeshRendererComponentMask.Mesh))
                         renderWorld.meshIDs.ElementAtRW(instanceIndex) = meshSection[localIndex];
 
                     if (updateBatch.HasAnyComponent(MeshRendererComponentMask.SubMeshStartIndex))
-                        renderWorld.subMeshStartIndices.ElementAtRW(instanceIndex) = subMeshStartIndexSection[localIndex];
+                        renderWorld.subMeshStartIndices.ElementAtRW(instanceIndex) = subMeshStartIndexSection[
+                            localIndex
+                        ];
 
                     if (updateBatch.HasAnyComponent(MeshRendererComponentMask.RendererSettings))
                     {
@@ -529,9 +654,9 @@ namespace UnityEngine.Rendering
                         renderWorld.renderingEnabled.Set(instanceIndex, renderingEnabledSection.IsSet(localIndex));
 #if UNITY_EDITOR
                     if (updateBatch.HasAnyComponent(MeshRendererComponentMask.SceneCullingMask))
-                        renderWorld.sceneCullingMasks.ElementAtRW(instanceIndex) = updateBatch.useSharedSceneCullingMask ?
-                            sharedSceneCullingMask :
-                            sceneCullingMaskSection[localIndex];
+                        renderWorld.sceneCullingMasks.ElementAtRW(instanceIndex) = updateBatch.useSharedSceneCullingMask
+                            ? sharedSceneCullingMask
+                            : sceneCullingMaskSection[localIndex];
 #endif
                 }
 
@@ -545,16 +670,29 @@ namespace UnityEngine.Rendering
         {
             public const int MaxBatchSize = 64;
 
-            [ReadOnly] public RenderWorld renderWorld;
-            [ReadOnly][NativeDisableContainerSafetyRestriction, NoAlias] public ParallelBitArray compactedVisibilityMasks;
-            [ReadOnly] public bool becomeVisible;
+            [ReadOnly]
+            public RenderWorld renderWorld;
 
-            [NativeDisableParallelForRestriction] public ParallelBitArray processedBits;
+            [ReadOnly]
+            [NativeDisableContainerSafetyRestriction, NoAlias]
+            public ParallelBitArray compactedVisibilityMasks;
 
-            [NativeDisableParallelForRestriction][WriteOnly] public NativeArray<EntityId> renderers;
-            [NativeDisableParallelForRestriction][WriteOnly] public NativeArray<InstanceHandle> instances;
+            [ReadOnly]
+            public bool becomeVisible;
 
-            [NativeDisableUnsafePtrRestriction] public UnsafeAtomicCounter32 atomicTreeInstancesCount;
+            [NativeDisableParallelForRestriction]
+            public ParallelBitArray processedBits;
+
+            [NativeDisableParallelForRestriction]
+            [WriteOnly]
+            public NativeArray<EntityId> renderers;
+
+            [NativeDisableParallelForRestriction]
+            [WriteOnly]
+            public NativeArray<InstanceHandle> instances;
+
+            [NativeDisableUnsafePtrRestriction]
+            public UnsafeAtomicCounter32 atomicTreeInstancesCount;
 
             public void Execute(int startIndex, int count)
             {
@@ -626,9 +764,12 @@ namespace UnityEngine.Rendering
         {
             public const int MaxBatchSize = 64;
 
-            [ReadOnly] public ParallelBitArray compactedVisibilityMasks;
+            [ReadOnly]
+            public ParallelBitArray compactedVisibilityMasks;
 
-            [NativeDisableContainerSafetyRestriction, NoAlias][NativeDisableParallelForRestriction] public RenderWorld renderWorld;
+            [NativeDisableContainerSafetyRestriction, NoAlias]
+            [NativeDisableParallelForRestriction]
+            public RenderWorld renderWorld;
 
             public void Execute(int startIndex, int count)
             {
@@ -648,6 +789,5 @@ namespace UnityEngine.Rendering
                 renderWorld.visibleInPreviousFrameBits.SetChunk(startIndex / 64, visibleBits);
             }
         }
-
     }
 }

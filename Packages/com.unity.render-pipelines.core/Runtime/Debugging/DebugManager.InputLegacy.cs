@@ -20,13 +20,13 @@ namespace UnityEngine.Rendering
         MoveHorizontal,
         Multiplier,
         ResetAll,
-        DebugActionCount
+        DebugActionCount,
     }
 
     enum DebugActionRepeatMode
     {
         Never,
-        Delay
+        Delay,
     }
 
     public sealed partial class DebugManager
@@ -220,15 +220,76 @@ namespace UnityEngine.Rendering
 #pragma warning disable CS0618 // Type or member is obsolete
             var inputEntries = new List<InputManagerEntry>
             {
-                new InputManagerEntry { name = k_EnableDebugBtn1,  kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "left ctrl",   altBtnPositive = "joystick button 8" },
-                new InputManagerEntry { name = k_EnableDebugBtn2,  kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "backspace",   altBtnPositive = "joystick button 9" },
-                new InputManagerEntry { name = k_ResetBtn,         kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "left alt",    altBtnPositive = "joystick button 1" },
-                new InputManagerEntry { name = k_DebugNextBtn,     kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "page down",   altBtnPositive = "joystick button 5" },
-                new InputManagerEntry { name = k_DebugPreviousBtn, kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "page up",     altBtnPositive = "joystick button 4" },
-                new InputManagerEntry { name = k_PersistentBtn,    kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "right shift", altBtnPositive = "joystick button 2" },
-                new InputManagerEntry { name = k_MultiplierBtn,    kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "left shift",  altBtnPositive = "joystick button 3" },
-                new InputManagerEntry { name = k_DPadHorizontal,   kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "right",       btnNegative = "left", gravity = 1000f, deadZone = 0.001f, sensitivity = 1000f },
-                new InputManagerEntry { name = k_DPadHorizontal,   kind = InputManagerEntry.Kind.Axis, axis = InputManagerEntry.Axis.Sixth,   btnPositive = "right", btnNegative = "left", gravity = 1000f, deadZone = 0.001f, sensitivity = 1000f },
+                new InputManagerEntry
+                {
+                    name = k_EnableDebugBtn1,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "left ctrl",
+                    altBtnPositive = "joystick button 8",
+                },
+                new InputManagerEntry
+                {
+                    name = k_EnableDebugBtn2,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "backspace",
+                    altBtnPositive = "joystick button 9",
+                },
+                new InputManagerEntry
+                {
+                    name = k_ResetBtn,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "left alt",
+                    altBtnPositive = "joystick button 1",
+                },
+                new InputManagerEntry
+                {
+                    name = k_DebugNextBtn,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "page down",
+                    altBtnPositive = "joystick button 5",
+                },
+                new InputManagerEntry
+                {
+                    name = k_DebugPreviousBtn,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "page up",
+                    altBtnPositive = "joystick button 4",
+                },
+                new InputManagerEntry
+                {
+                    name = k_PersistentBtn,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "right shift",
+                    altBtnPositive = "joystick button 2",
+                },
+                new InputManagerEntry
+                {
+                    name = k_MultiplierBtn,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "left shift",
+                    altBtnPositive = "joystick button 3",
+                },
+                new InputManagerEntry
+                {
+                    name = k_DPadHorizontal,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "right",
+                    btnNegative = "left",
+                    gravity = 1000f,
+                    deadZone = 0.001f,
+                    sensitivity = 1000f,
+                },
+                new InputManagerEntry
+                {
+                    name = k_DPadHorizontal,
+                    kind = InputManagerEntry.Kind.Axis,
+                    axis = InputManagerEntry.Axis.Sixth,
+                    btnPositive = "right",
+                    btnNegative = "left",
+                    gravity = 1000f,
+                    deadZone = 0.001f,
+                    sensitivity = 1000f,
+                },
             };
 
             InputRegistering.RegisterInputs(inputEntries);
@@ -253,7 +314,7 @@ namespace UnityEngine.Rendering
         {
             Button,
             Axis,
-            Key
+            Key,
         }
 
         DebugActionKeyType m_Type;
@@ -276,6 +337,7 @@ namespace UnityEngine.Rendering
             for (int i = 0; i < m_TriggerPressedUp.Length; ++i)
                 m_TriggerPressedUp[i] = false;
         }
+
         public void TriggerWithButton(string[] buttons, float state)
         {
             m_Type = DebugActionKeyType.Button;

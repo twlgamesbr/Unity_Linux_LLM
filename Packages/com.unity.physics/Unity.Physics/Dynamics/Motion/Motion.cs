@@ -51,10 +51,10 @@ namespace Unity.Physics
             MassDistribution = new MassDistribution
             {
                 Transform = RigidTransform.identity,
-                InertiaTensor = new float3(2.0f / 5.0f)
+                InertiaTensor = new float3(2.0f / 5.0f),
             },
             Volume = (4.0f / 3.0f) * math.PI,
-            AngularExpansionFactor = 0.0f
+            AngularExpansionFactor = 0.0f,
         };
 
         /// <summary>
@@ -90,10 +90,15 @@ namespace Unity.Physics
                 MassDistribution = new MassDistribution
                 {
                     Transform = RigidTransform.identity,
-                    InertiaTensor = new float3(size.y * size.y + size.z * size.z, size.x * size.x + size.z * size.z, size.x * size.x + size.y * size.y) / 12.0f
+                    InertiaTensor =
+                        new float3(
+                            size.y * size.y + size.z * size.z,
+                            size.x * size.x + size.z * size.z,
+                            size.x * size.x + size.y * size.y
+                        ) / 12.0f,
                 },
                 Volume = size.x * size.y * size.z,
-                AngularExpansionFactor = 0.0f
+                AngularExpansionFactor = 0.0f,
             };
         }
 
@@ -110,10 +115,10 @@ namespace Unity.Physics
                 MassDistribution = new MassDistribution
                 {
                     Transform = RigidTransform.identity,
-                    InertiaTensor = new float3(2.0f / 5.0f * radius2)
+                    InertiaTensor = new float3(2.0f / 5.0f * radius2),
                 },
                 Volume = (4.0f / 3.0f) * math.PI * radius * radius2,
-                AngularExpansionFactor = 0.0f
+                AngularExpansionFactor = 0.0f,
             };
         }
     }
@@ -131,6 +136,7 @@ namespace Unity.Physics
 
         /// <summary>   Linear damping applied to the motion during each simulation step. </summary>
         public float LinearDamping;
+
         /// <summary>   Angular damping applied to the motion during each simulation step. </summary>
         public float AngularDamping;
 
@@ -140,7 +146,7 @@ namespace Unity.Physics
             WorldFromMotion = RigidTransform.identity,
             BodyFromMotion = RigidTransform.identity,
             LinearDamping = 0.0f,
-            AngularDamping = 0.0f
+            AngularDamping = 0.0f,
         };
     }
 
@@ -149,12 +155,16 @@ namespace Unity.Physics
     {
         /// <summary>  Linear velocity in  World space. </summary>
         public float3 LinearVelocity;
+
         /// <summary>  Angular velocity in Motion space. </summary>
         public float3 AngularVelocity;
+
         /// <summary>   The inverse inertia. </summary>
         public float3 InverseInertia;
+
         /// <summary>   The inverse mass. </summary>
         public float InverseMass;
+
         /// <summary>   The angular expansion factor. </summary>
         public float AngularExpansionFactor;
 
@@ -184,7 +194,7 @@ namespace Unity.Physics
             InverseInertia = new float3(0),
             InverseMass = 0.0f,
             AngularExpansionFactor = 0.0f,
-            GravityFactor = 0.0f
+            GravityFactor = 0.0f,
         };
 
         /// <summary>   Apply a linear impulse (in world space) </summary>
@@ -207,55 +217,55 @@ namespace Unity.Physics
 
         // Calculate the distances by which to expand collision tolerances based on the speed of the object.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal MotionExpansion CalculateExpansion(float timeStep) => new MotionExpansion
-        {
-            Linear = LinearVelocity * timeStep,
-            // math.length(AngularVelocity) * timeStep is conservative approximation of sin((math.length(AngularVelocity) * timeStep)
-            Uniform = math.min(math.length(AngularVelocity) * timeStep * AngularExpansionFactor, AngularExpansionFactor)
-        };
+        internal MotionExpansion CalculateExpansion(float timeStep) =>
+            new MotionExpansion
+            {
+                Linear = LinearVelocity * timeStep,
+                // math.length(AngularVelocity) * timeStep is conservative approximation of sin((math.length(AngularVelocity) * timeStep)
+                Uniform = math.min(
+                    math.length(AngularVelocity) * timeStep * AngularExpansionFactor,
+                    AngularExpansionFactor
+                ),
+            };
     }
 
     // Provides an upper bound on change in a body's extents in any direction during a step.
     // Used to determine how far away from the body to look for collisions.
     struct MotionExpansion
     {
-        public float3 Linear;   // how far to look ahead of the object
-        public float Uniform;   // how far to look around the object
+        public float3 Linear; // how far to look ahead of the object
+        public float Uniform; // how far to look around the object
 
         public float MaxDistance => math.length(Linear) + Uniform;
 
-        public static readonly MotionExpansion Zero = new MotionExpansion
-        {
-            Linear = new float3(0),
-            Uniform = 0.0f
-        };
+        public static readonly MotionExpansion Zero = new MotionExpansion { Linear = new float3(0), Uniform = 0.0f };
 
         // Expand an AABB
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Aabb ExpandAabb(Aabb aabb) => new Aabb
-        {
-            Max = math.max(aabb.Max, aabb.Max + Linear) + Uniform,
-            Min = math.min(aabb.Min, aabb.Min + Linear) - Uniform
-        };
+        public Aabb ExpandAabb(Aabb aabb) =>
+            new Aabb
+            {
+                Max = math.max(aabb.Max, aabb.Max + Linear) + Uniform,
+                Min = math.min(aabb.Min, aabb.Min + Linear) - Uniform,
+            };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator MotionExpansion(float4 motionExpansion) => new MotionExpansion { Linear = motionExpansion.xyz, Uniform = motionExpansion.w };
+        public static implicit operator MotionExpansion(float4 motionExpansion) =>
+            new MotionExpansion { Linear = motionExpansion.xyz, Uniform = motionExpansion.w };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator float4(MotionExpansion motionExpansion) => new float4(motionExpansion.Linear, motionExpansion.Uniform);
+        public static implicit operator float4(MotionExpansion motionExpansion) =>
+            new float4(motionExpansion.Linear, motionExpansion.Uniform);
     }
 
     internal struct Velocity
     {
         /// <summary>   World space linear velocity. </summary>
         public float3 Linear;
+
         /// <summary>   Motion space angular velocity. </summary>
         public float3 Angular;
 
-        public static readonly Velocity Zero = new Velocity
-        {
-            Linear = new float3(0),
-            Angular = new float3(0)
-        };
+        public static readonly Velocity Zero = new Velocity { Linear = new float3(0), Angular = new float3(0) };
     }
 }

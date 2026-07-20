@@ -11,10 +11,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor
             element.style.display = includeInLayout ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        public static void Bind<TValue>(
-            this BaseField<TValue> element,
-            TValue value,
-            Action<TValue> onValueChanged)
+        public static void Bind<TValue>(this BaseField<TValue> element, TValue value, Action<TValue> onValueChanged)
         {
             element.value = value;
 

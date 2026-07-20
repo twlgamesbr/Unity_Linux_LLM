@@ -68,13 +68,13 @@ namespace Unity.PlatformToolkit.Editor
             if (!string.IsNullOrEmpty(cellData) && cellData.Contains(','))
             {
                 needsQuotesAroundCell = false;
-                cellData =  @"""" + cellData + @"""";
+                cellData = @"""" + cellData + @"""";
             }
 
             // When any of the above is used, we always need to add quotes around the cell
             if (needsQuotesAroundCell)
             {
-                cellData =  @"""" + cellData + @"""";
+                cellData = @"""" + cellData + @"""";
             }
 
             return cellData.Trim();

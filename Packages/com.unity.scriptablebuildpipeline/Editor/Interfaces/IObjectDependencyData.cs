@@ -4,6 +4,7 @@ using UnityEditor.Build.Content;
 
 //TODO: Remove this when we make this interface public
 [assembly: InternalsVisibleTo("Unity.Addressables.Editor", AllInternalsVisible = true)]
+
 namespace UnityEditor.Build.Pipeline.Interfaces
 {
     /// <summary>

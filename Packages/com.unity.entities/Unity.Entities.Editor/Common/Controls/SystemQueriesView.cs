@@ -14,16 +14,23 @@ namespace Unity.Entities.Editor
             MatchingCount.Hide();
             ActionButton.AddToClassList(UssClasses.SystemQueriesView.GoTo);
 
-            ActionButton.RegisterCallback<MouseDownEvent, SystemQueriesView>((evt, @this) =>
-            {
-                evt.StopPropagation();
+            ActionButton.RegisterCallback<MouseDownEvent, SystemQueriesView>(
+                (evt, @this) =>
+                {
+                    evt.StopPropagation();
 #if !UNITY_2023_2_OR_NEWER
-                evt.PreventDefault();
+                    evt.PreventDefault();
 #endif
-                Analytics.SendEditorEvent(Analytics.Window.Inspector, Analytics.EventType.RelationshipGoTo, Analytics.GoToSystemDestination);
-                SystemScheduleWindow.HighlightSystem(@this.Data.SystemProxy);
-                ContentUtilities.ShowSystemInspectorContent(@this.Data.SystemProxy);
-            }, this);
+                    Analytics.SendEditorEvent(
+                        Analytics.Window.Inspector,
+                        Analytics.EventType.RelationshipGoTo,
+                        Analytics.GoToSystemDestination
+                    );
+                    SystemScheduleWindow.HighlightSystem(@this.Data.SystemProxy);
+                    ContentUtilities.ShowSystemInspectorContent(@this.Data.SystemProxy);
+                },
+                this
+            );
 
             Update(data);
         }
@@ -62,13 +69,14 @@ namespace Unity.Entities.Editor
             }
         }
 
-        internal static string GetClassForKind(SystemQueriesViewData.SystemKind kind) => kind switch
-        {
-            SystemQueriesViewData.SystemKind.Unmanaged => "unmanaged-system",
-            SystemQueriesViewData.SystemKind.CommandBufferBegin => "begin-command-buffer",
-            SystemQueriesViewData.SystemKind.CommandBufferEnd => "end-command-buffer",
-            _ => string.Empty
-        };
+        internal static string GetClassForKind(SystemQueriesViewData.SystemKind kind) =>
+            kind switch
+            {
+                SystemQueriesViewData.SystemKind.Unmanaged => "unmanaged-system",
+                SystemQueriesViewData.SystemKind.CommandBufferBegin => "begin-command-buffer",
+                SystemQueriesViewData.SystemKind.CommandBufferEnd => "end-command-buffer",
+                _ => string.Empty,
+            };
 
         void UpdateIcon(SystemQueriesViewData.SystemKind previousKind, SystemQueriesViewData.SystemKind newKind)
         {

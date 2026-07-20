@@ -28,14 +28,16 @@ namespace UnityEngine.TestTools.Utils
                     m_TestCoroutine = ExMethod(WrapEnumeratorForChecks(testEnumerator));
                     m_Controller.StartCoroutine(m_TestCoroutine);
                 }
-                if (m_Context.ExecutionStatus == TestExecutionStatus.StopRequested || m_Context.ExecutionStatus == TestExecutionStatus.AbortRequested)
+                if (
+                    m_Context.ExecutionStatus == TestExecutionStatus.StopRequested
+                    || m_Context.ExecutionStatus == TestExecutionStatus.AbortRequested
+                )
                 {
                     StopAllRunningCoroutines();
                     yield break;
                 }
                 yield return null;
-            }
-            while (m_Running);
+            } while (m_Running);
         }
 
         private void StopAllRunningCoroutines()

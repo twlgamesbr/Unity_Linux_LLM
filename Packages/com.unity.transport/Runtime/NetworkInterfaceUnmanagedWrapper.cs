@@ -11,7 +11,8 @@ namespace Unity.Networking.Transport
     /// not create one manually.
     /// </summary>
     /// <typeparam name="T">Type of the network interface to wrap.</typeparam>
-    public unsafe struct NetworkInterfaceUnmanagedWrapper<T> : INetworkInterface where T : INetworkInterface
+    public unsafe struct NetworkInterfaceUnmanagedWrapper<T> : INetworkInterface
+        where T : INetworkInterface
     {
         private static ManagedCallWrapper s_LocalEndpoint_FPtr;
         private static ManagedCallWrapper s_Bind_FPtr;
@@ -50,9 +51,13 @@ namespace Unity.Networking.Transport
             public ManagedReference<T> InterfaceReference;
             public NetworkEndpoint Return;
         }
+
         private static void LocalEndpointWrapper(void* argumentsPtr, int argumentsSize)
         {
-            ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<LocalEndpoint_Arguments>(argumentsPtr, argumentsSize);
+            ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<LocalEndpoint_Arguments>(
+                argumentsPtr,
+                argumentsSize
+            );
             arguments.Return = arguments.InterfaceReference.Element.LocalEndpoint;
         }
 
@@ -61,10 +66,7 @@ namespace Unity.Networking.Transport
         {
             get
             {
-                var arguments = new LocalEndpoint_Arguments
-                {
-                    InterfaceReference = m_NetworkInterfaceReference,
-                };
+                var arguments = new LocalEndpoint_Arguments { InterfaceReference = m_NetworkInterfaceReference };
 
                 s_LocalEndpoint_FPtr.Invoke(ref arguments);
 
@@ -72,13 +74,13 @@ namespace Unity.Networking.Transport
             }
         }
 
-
         private struct Bind_Arguments
         {
             public ManagedReference<T> InterfaceReference;
             public NetworkEndpoint Endpoint;
             public int Return;
         }
+
         private static void BindWrapper(void* argumentsPtr, int argumentsSize)
         {
             ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<Bind_Arguments>(argumentsPtr, argumentsSize);
@@ -103,6 +105,7 @@ namespace Unity.Networking.Transport
         {
             public ManagedReference<T> InterfaceReference;
         }
+
         private static void DisposeWrapper(void* argumentsPtr, int argumentsSize)
         {
             ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<Dispose_Arguments>(argumentsPtr, argumentsSize);
@@ -112,10 +115,7 @@ namespace Unity.Networking.Transport
         /// <inheritdoc/>
         public void Dispose()
         {
-            var arguments = new Dispose_Arguments
-            {
-                InterfaceReference = m_NetworkInterfaceReference,
-            };
+            var arguments = new Dispose_Arguments { InterfaceReference = m_NetworkInterfaceReference };
             s_Dispose_FPtr.Invoke(ref arguments);
             m_NetworkInterfaceReference.Dispose();
         }
@@ -127,15 +127,21 @@ namespace Unity.Networking.Transport
             public int PacketPadding;
             public int Return;
         }
+
         private static void InitializeWrapper(void* argumentsPtr, int argumentsSize)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (argumentsSize != UnsafeUtility.SizeOf<Initialize_Arguments>())
-                throw new InvalidOperationException($"The requested argument type size does not match the provided one");
+                throw new InvalidOperationException(
+                    $"The requested argument type size does not match the provided one"
+                );
 #endif
             // workaround for NetworkSettings being managed
             var arguments = UnsafeUtility.ReadArrayElement<Initialize_Arguments>(argumentsPtr, 0);
-            arguments.Return = arguments.InterfaceReference.Element.Initialize(ref arguments.NetworkSettings, ref arguments.PacketPadding);
+            arguments.Return = arguments.InterfaceReference.Element.Initialize(
+                ref arguments.NetworkSettings,
+                ref arguments.PacketPadding
+            );
             UnsafeUtility.WriteArrayElement(argumentsPtr, 0, arguments);
         }
 
@@ -166,6 +172,7 @@ namespace Unity.Networking.Transport
             public ManagedReference<T> InterfaceReference;
             public int Return;
         }
+
         private static void ListenWrapper(void* argumentsPtr, int argumentsSize)
         {
             ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<Listen_Arguments>(argumentsPtr, argumentsSize);
@@ -175,10 +182,7 @@ namespace Unity.Networking.Transport
         /// <inheritdoc/>
         public int Listen()
         {
-            var arguments = new Listen_Arguments
-            {
-                InterfaceReference = m_NetworkInterfaceReference,
-            };
+            var arguments = new Listen_Arguments { InterfaceReference = m_NetworkInterfaceReference };
             s_Listen_FPtr.Invoke(ref arguments);
             return arguments.Return;
         }
@@ -190,15 +194,21 @@ namespace Unity.Networking.Transport
             public JobHandle Dependency;
             public JobHandle Return;
         }
+
         private static void ScheduleReceiveWrapper(void* argumentsPtr, int argumentsSize)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (argumentsSize != UnsafeUtility.SizeOf<ScheduleReceive_Arguments>())
-                throw new InvalidOperationException($"The requested argument type size does not match the provided one");
+                throw new InvalidOperationException(
+                    $"The requested argument type size does not match the provided one"
+                );
 #endif
             // workaround for NetworkPacketReceiver being managed
             var arguments = UnsafeUtility.ReadArrayElement<ScheduleReceive_Arguments>(argumentsPtr, 0);
-            arguments.Return = arguments.InterfaceReference.Element.ScheduleReceive(ref arguments.Arguments, arguments.Dependency);
+            arguments.Return = arguments.InterfaceReference.Element.ScheduleReceive(
+                ref arguments.Arguments,
+                arguments.Dependency
+            );
             UnsafeUtility.WriteArrayElement(argumentsPtr, 0, arguments);
         }
 
@@ -226,15 +236,21 @@ namespace Unity.Networking.Transport
             public JobHandle Dependency;
             public JobHandle Return;
         }
+
         private static void ScheduleSendWrapper(void* argumentsPtr, int argumentsSize)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (argumentsSize != UnsafeUtility.SizeOf<ScheduleSend_Arguments>())
-                throw new InvalidOperationException($"The requested argument type size does not match the provided one");
+                throw new InvalidOperationException(
+                    $"The requested argument type size does not match the provided one"
+                );
 #endif
             // workaround for NetworkPacketReceiver being managed
             var arguments = UnsafeUtility.ReadArrayElement<ScheduleSend_Arguments>(argumentsPtr, 0);
-            arguments.Return = arguments.InterfaceReference.Element.ScheduleSend(ref arguments.Arguments, arguments.Dependency);
+            arguments.Return = arguments.InterfaceReference.Element.ScheduleSend(
+                ref arguments.Arguments,
+                arguments.Dependency
+            );
             UnsafeUtility.WriteArrayElement(argumentsPtr, 0, arguments);
         }
 
@@ -271,17 +287,22 @@ namespace Unity.Networking.Transport
         /// <exception cref="InvalidOperationException">
         /// If the type network interface is already an unmanaged type.
         /// </exception>
-        public static NetworkInterfaceUnmanagedWrapper<T> WrapToUnmanaged<T>(this T networkInterface) where T : INetworkInterface
+        public static NetworkInterfaceUnmanagedWrapper<T> WrapToUnmanaged<T>(this T networkInterface)
+            where T : INetworkInterface
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (networkInterface == null)
                 throw new ArgumentNullException(nameof(networkInterface));
 
             if (!typeof(T).IsValueType)
-                throw new InvalidOperationException($"Non struct NetworkInterfaces ({typeof(T)}) are not supported yet due to a bug on windows (#1412477).");
+                throw new InvalidOperationException(
+                    $"Non struct NetworkInterfaces ({typeof(T)}) are not supported yet due to a bug on windows (#1412477)."
+                );
 
             if (UnsafeUtility.IsUnmanaged<T>())
-                throw new InvalidOperationException($"The network interface type {typeof(T).Name} is already an unmanaged type.");
+                throw new InvalidOperationException(
+                    $"The network interface type {typeof(T).Name} is already an unmanaged type."
+                );
 #endif
             return new NetworkInterfaceUnmanagedWrapper<T>(ref networkInterface);
         }

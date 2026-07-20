@@ -1,13 +1,12 @@
 using System.Threading;
 using Unity.Assertions;
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Profiling;
-using Unity.Burst.Intrinsics;
-
 using BatchMeshID = UnityEngine.Rendering.BatchMeshID;
 using VertexAttribute = UnityEngine.Rendering.VertexAttribute;
 using VertexAttributeFormat = UnityEngine.Rendering.VertexAttributeFormat;
@@ -68,7 +67,9 @@ namespace Unity.Rendering
 #endif
             {
                 Enabled = false;
-                UnityEngine.Debug.Log("No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.");
+                UnityEngine.Debug.Log(
+                    "No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled."
+                );
                 return;
             }
 
@@ -90,21 +91,23 @@ namespace Unity.Rendering
             m_RendererSystem = World.GetOrCreateSystemManaged<EntitiesGraphicsSystem>();
 
             // Queries
-            m_LayoutDeformedMeshesQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[]
+            m_LayoutDeformedMeshesQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadOnly<DeformedEntity>(),
-                    ComponentType.ReadOnly<MaterialMeshInfo>(),
-                    ComponentType.ReadWrite<DeformedMeshIndex>(),
-                },
-                Any = new[]
-                {
-                    ComponentType.ReadWrite<BlendWeightBufferIndex>(),
-                    ComponentType.ReadWrite<SkinMatrixBufferIndex>(),
-                },
-                Options = EntityQueryOptions.IgnoreComponentEnabledState
-            });
+                    All = new[]
+                    {
+                        ComponentType.ReadOnly<DeformedEntity>(),
+                        ComponentType.ReadOnly<MaterialMeshInfo>(),
+                        ComponentType.ReadWrite<DeformedMeshIndex>(),
+                    },
+                    Any = new[]
+                    {
+                        ComponentType.ReadWrite<BlendWeightBufferIndex>(),
+                        ComponentType.ReadWrite<SkinMatrixBufferIndex>(),
+                    },
+                    Options = EntityQueryOptions.IgnoreComponentEnabledState,
+                }
+            );
         }
 
         protected override void OnDestroy()
@@ -155,7 +158,9 @@ namespace Unity.Rendering
             // There need to be at least 3 vertex attributes
             if (mesh.vertexAttributeCount < 3)
             {
-                UnityEngine.Debug.LogWarning($"Unsupported vertex layout for deformations in mesh ({mesh.name}). Expecting Position, Normal and Tangent attributes but only found {mesh.vertexAttributeCount} attributes. The mesh deformations for this mesh will be disabled and rendered as a regular mesh.");
+                UnityEngine.Debug.LogWarning(
+                    $"Unsupported vertex layout for deformations in mesh ({mesh.name}). Expecting Position, Normal and Tangent attributes but only found {mesh.vertexAttributeCount} attributes. The mesh deformations for this mesh will be disabled and rendered as a regular mesh."
+                );
                 return false;
             }
 
@@ -164,30 +169,46 @@ namespace Unity.Rendering
             var tangent = mesh.GetVertexAttribute(2);
 
             // The attributes are Position, Normal & Tangent.
-            if (position.attribute != VertexAttribute.Position || normal.attribute != VertexAttribute.Normal || tangent.attribute != VertexAttribute.Tangent)
+            if (
+                position.attribute != VertexAttribute.Position
+                || normal.attribute != VertexAttribute.Normal
+                || tangent.attribute != VertexAttribute.Tangent
+            )
             {
-                UnityEngine.Debug.LogWarning($"Unsupported vertex layout for deformations in mesh ({mesh.name}). Expecting Position, Normal and Tangent attributes but found {position.attribute}, {normal.attribute} and {tangent.attribute}. The mesh deformations for this mesh will be disabled and rendered as a regular mesh.");
+                UnityEngine.Debug.LogWarning(
+                    $"Unsupported vertex layout for deformations in mesh ({mesh.name}). Expecting Position, Normal and Tangent attributes but found {position.attribute}, {normal.attribute} and {tangent.attribute}. The mesh deformations for this mesh will be disabled and rendered as a regular mesh."
+                );
                 return false;
             }
 
             // The format for these attributes is float32.
-            if (position.format != VertexAttributeFormat.Float32 || normal.format != VertexAttributeFormat.Float32 || tangent.format != VertexAttributeFormat.Float32)
+            if (
+                position.format != VertexAttributeFormat.Float32
+                || normal.format != VertexAttributeFormat.Float32
+                || tangent.format != VertexAttributeFormat.Float32
+            )
             {
-                UnityEngine.Debug.LogWarning($"Unsupported vertex layout for deformations in mesh ({mesh.name}). The Position, Normal and Tangent attributes need to use Float32 format. The mesh deformations for this mesh will be disabled and rendered as a regular mesh.");
+                UnityEngine.Debug.LogWarning(
+                    $"Unsupported vertex layout for deformations in mesh ({mesh.name}). The Position, Normal and Tangent attributes need to use Float32 format. The mesh deformations for this mesh will be disabled and rendered as a regular mesh."
+                );
                 return false;
             }
 
             // The dimension needs to be 3 for position and normal and 4 for tangent.
             if (position.dimension != 3 || normal.dimension != 3 || tangent.dimension != 4)
             {
-                UnityEngine.Debug.LogWarning($"Unsupported vertex layout for deformations in mesh ({mesh.name}). Expecting dimensions 3, 3 and 4 for Position, Normal and Tangent respectively but got {position.dimension}, {normal.dimension} and {tangent.dimension}. The mesh deformations for this mesh will be disabled and rendered as a regular mesh.");
+                UnityEngine.Debug.LogWarning(
+                    $"Unsupported vertex layout for deformations in mesh ({mesh.name}). Expecting dimensions 3, 3 and 4 for Position, Normal and Tangent respectively but got {position.dimension}, {normal.dimension} and {tangent.dimension}. The mesh deformations for this mesh will be disabled and rendered as a regular mesh."
+                );
                 return false;
             }
 
             // All three attributes need to be in stream 0
             if (position.stream != 0 || normal.stream != 0 || tangent.stream != 0)
             {
-                UnityEngine.Debug.LogWarning($"Unsupported vertex layout for deformations in mesh ({mesh.name}). The Position, Normal and Tangent attributes need to be present in stream 0. The mesh deformations for this mesh will be disabled and rendered as a regular mesh.");
+                UnityEngine.Debug.LogWarning(
+                    $"Unsupported vertex layout for deformations in mesh ({mesh.name}). The Position, Normal and Tangent attributes need to be present in stream 0. The mesh deformations for this mesh will be disabled and rendered as a regular mesh."
+                );
                 return false;
             }
 
@@ -197,7 +218,9 @@ namespace Unity.Rendering
                 var attribute = mesh.GetVertexAttribute(i);
                 if (attribute.stream == 0)
                 {
-                    UnityEngine.Debug.LogWarning($"Unsupported vertex layout for deformations in mesh ({mesh.name}). The vertex attribute {attribute.attribute} should not be present in stream 0. The mesh deformations for this mesh will be disabled and rendered as a regular mesh.");
+                    UnityEngine.Debug.LogWarning(
+                        $"Unsupported vertex layout for deformations in mesh ({mesh.name}). The vertex attribute {attribute.attribute} should not be present in stream 0. The mesh deformations for this mesh will be disabled and rendered as a regular mesh."
+                    );
                     return false;
                 }
             }
@@ -205,7 +228,12 @@ namespace Unity.Rendering
             return true;
         }
 
-        private SharedMeshData AddSharedMeshData(in BatchMeshID meshID, UnityEngine.Mesh mesh, NativeList<BatchMeshID> meshIDs, NativeList<SharedMeshData> meshData)
+        private SharedMeshData AddSharedMeshData(
+            in BatchMeshID meshID,
+            UnityEngine.Mesh mesh,
+            NativeList<BatchMeshID> meshIDs,
+            NativeList<SharedMeshData> meshData
+        )
         {
             Assert.IsFalse(meshID == BatchMeshID.Null);
             Assert.IsNotNull(mesh);
@@ -275,8 +303,12 @@ namespace Unity.Rendering
 
             using (var disabledComponentsEcb = new EntityCommandBuffer(Allocator.Temp))
             {
-                foreach (var (tracked, e) in SystemAPI.Query<RefRO<SharedMeshTracker>>()
-                             .WithAll<Disabled, DeformedEntity>().WithEntityAccess())
+                foreach (
+                    var (tracked, e) in SystemAPI
+                        .Query<RefRO<SharedMeshTracker>>()
+                        .WithAll<Disabled, DeformedEntity>()
+                        .WithEntityAccess()
+                )
                 {
                     disabledComponentsEcb.RemoveComponent<SharedMeshTracker>(e);
                     disabledComponentsEcb.RemoveComponent<DeformedMeshIndex>(e);
@@ -292,9 +324,13 @@ namespace Unity.Rendering
 
             using (var removeComponentsEcb = new EntityCommandBuffer(Allocator.Temp))
             {
-                foreach (var (tracked, e) in SystemAPI.Query<RefRO<SharedMeshTracker>>()
-                             .WithOptions(EntityQueryOptions.IncludeDisabledEntities)
-                             .WithNone<DeformedEntity>().WithEntityAccess())
+                foreach (
+                    var (tracked, e) in SystemAPI
+                        .Query<RefRO<SharedMeshTracker>>()
+                        .WithOptions(EntityQueryOptions.IncludeDisabledEntities)
+                        .WithNone<DeformedEntity>()
+                        .WithEntityAccess()
+                )
                 {
                     removeComponentsEcb.RemoveComponent<SharedMeshTracker>(e);
                     removeComponentsEcb.RemoveComponent<DeformedMeshIndex>(e);
@@ -308,28 +344,37 @@ namespace Unity.Rendering
                 removeComponentsEcb.Playback(EntityManager);
             }
 
-            var brgRenderMeshArrays = World.GetExistingSystemManaged<RegisterMaterialsAndMeshesSystem>()?.BRGRenderMeshArrays ?? new NativeParallelHashMap<int, BRGRenderMeshArray>();
+            var brgRenderMeshArrays =
+                World.GetExistingSystemManaged<RegisterMaterialsAndMeshesSystem>()?.BRGRenderMeshArrays
+                ?? new NativeParallelHashMap<int, BRGRenderMeshArray>();
             var renderMeshArrayHandle = GetSharedComponentTypeHandle<RenderMeshArray>();
 
             using (var addComponentsEcb = new EntityCommandBuffer(Allocator.Temp))
             {
-                foreach (var (materialMeshInfo, e) in SystemAPI.Query<RefRO<MaterialMeshInfo>>()
-                             .WithAll<DeformedEntity>().WithNone<SharedMeshTracker>().WithEntityAccess())
+                foreach (
+                    var (materialMeshInfo, e) in SystemAPI
+                        .Query<RefRO<MaterialMeshInfo>>()
+                        .WithAll<DeformedEntity>()
+                        .WithNone<SharedMeshTracker>()
+                        .WithEntityAccess()
+                )
                 {
                     // If the chunk has a RenderMeshArray, get access to the corresponding registered
                     // Material and Mesh IDs
                     BRGRenderMeshArray brgRenderMeshArray = default;
                     if (!brgRenderMeshArrays.IsEmpty)
                     {
-                        int renderMeshArrayIndex = EntityManager.GetChunk(e).GetSharedComponentIndex(renderMeshArrayHandle);
+                        int renderMeshArrayIndex = EntityManager
+                            .GetChunk(e)
+                            .GetSharedComponentIndex(renderMeshArrayHandle);
                         bool hasRenderMeshArray = renderMeshArrayIndex >= 0;
                         if (hasRenderMeshArray)
                             brgRenderMeshArrays.TryGetValue(renderMeshArrayIndex, out brgRenderMeshArray);
                     }
 
                     BatchMeshID meshID = materialMeshInfo.ValueRO.IsRuntimeMesh
-                            ? materialMeshInfo.ValueRO.MeshID
-                            : brgRenderMeshArray.GetMeshID(materialMeshInfo.ValueRO);
+                        ? materialMeshInfo.ValueRO.MeshID
+                        : brgRenderMeshArray.GetMeshID(materialMeshInfo.ValueRO);
 
                     if (meshID == BatchMeshID.Null)
                         continue;
@@ -379,8 +424,9 @@ namespace Unity.Rendering
                     RmvMeshes = rmvMeshes,
                     AddMeshes = addMeshes,
                     MeshIDs = meshIDs,
-                    MeshData = meshData
-                }.Run();            }
+                    MeshData = meshData,
+                }.Run();
+            }
 
             rmvMeshes.Dispose();
             addMeshes.Dispose();
@@ -402,9 +448,11 @@ namespace Unity.Rendering
                 AddMeshes.Sort();
 
                 // Single pass O(n) in reverse. Both arrays are guaranteed to be sorted.
-                for (int i = MeshData.Length - 1, j = RmvMeshes.Length - 1, k = AddMeshes.Length - 1;
-                     i >= 0 && (j >= 0 || k >= 0);
-                     i--)
+                for (
+                    int i = MeshData.Length - 1, j = RmvMeshes.Length - 1, k = AddMeshes.Length - 1;
+                    i >= 0 && (j >= 0 || k >= 0);
+                    i--
+                )
                 {
                     var hash = MeshData[i].StateHash();
 
@@ -471,6 +519,7 @@ namespace Unity.Rendering
         {
             [ReadOnly]
             public NativeList<SharedMeshData> SharedMeshes;
+
             [ReadOnly]
             public NativeList<BatchMeshID> Meshes;
             public NativeArray<int> Count;
@@ -492,18 +541,21 @@ namespace Unity.Rendering
         {
             [ReadOnly]
             public NativeList<SharedMeshData> SharedMeshes;
+
             [ReadOnly]
             public NativeList<BatchMeshID> Meshes;
 
             public NativeReference<int> VertexCountRef;
             public NativeReference<int> ShapeWeightCountRef;
             public NativeReference<int> SkinMatrixCountRef;
-            public NativeParallelHashMap<BatchMeshID,MeshDeformationBatch> Batches;
+            public NativeParallelHashMap<BatchMeshID, MeshDeformationBatch> Batches;
             public NativeArray<int> Count;
 
             public void Execute()
             {
-                int vertexCount, shapeWeightCount, skinMatrixCount;
+                int vertexCount,
+                    shapeWeightCount,
+                    skinMatrixCount;
                 vertexCount = shapeWeightCount = skinMatrixCount = k_DeformBufferStartIndex;
 
                 for (int i = 0; i < Meshes.Length; i++)
@@ -555,7 +607,7 @@ namespace Unity.Rendering
             {
                 SharedMeshes = sharedMeshes,
                 Meshes = meshes,
-                Count = count
+                Count = count,
             }.Schedule(Dependency);
 
             k_CollectActiveMeshes.End();
@@ -575,12 +627,14 @@ namespace Unity.Rendering
                 Batches = batches,
                 SharedMeshes = sharedMeshes,
                 Meshes = meshes,
-                Count = count
+                Count = count,
             }.Schedule(Dependency);
 
             m_BatchConstructionHandle = Dependency;
 
-            var brgRenderMeshArrays = World.GetExistingSystemManaged<RegisterMaterialsAndMeshesSystem>()?.BRGRenderMeshArrays ?? new NativeParallelHashMap<int, BRGRenderMeshArray>();
+            var brgRenderMeshArrays =
+                World.GetExistingSystemManaged<RegisterMaterialsAndMeshesSystem>()?.BRGRenderMeshArrays
+                ?? new NativeParallelHashMap<int, BRGRenderMeshArray>();
             var renderMeshArrayHandle = GetSharedComponentTypeHandle<RenderMeshArray>();
 
             Dependency = new LayoutDeformedMeshJob
@@ -621,20 +675,38 @@ namespace Unity.Rendering
             public ComponentTypeHandle<BlendWeightBufferIndex> BlendWeightBufferIndexHandle;
             public ComponentTypeHandle<SkinMatrixBufferIndex> SkinMatrixBufferIndexHandle;
 
-            [ReadOnly] public SharedComponentTypeHandle<RenderMeshArray> RenderMeshArrayHandle;
-            [ReadOnly] public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfoHandle;
+            [ReadOnly]
+            public SharedComponentTypeHandle<RenderMeshArray> RenderMeshArrayHandle;
 
-            [NativeDisableContainerSafetyRestriction] public NativeArray<int> MeshCounts;
+            [ReadOnly]
+            public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfoHandle;
 
-            [ReadOnly] public NativeParallelHashMap<BatchMeshID, MeshDeformationBatch> BatchData;
-            [ReadOnly] public NativeParallelHashMap<int, BRGRenderMeshArray> BRGRenderMeshArrays;
-            [ReadOnly] public NativeArray<SharedMeshData> SharedMeshData;
-            [ReadOnly] public NativeArray<BatchMeshID> MeshIDs;
+            [NativeDisableContainerSafetyRestriction]
+            public NativeArray<int> MeshCounts;
+
+            [ReadOnly]
+            public NativeParallelHashMap<BatchMeshID, MeshDeformationBatch> BatchData;
+
+            [ReadOnly]
+            public NativeParallelHashMap<int, BRGRenderMeshArray> BRGRenderMeshArrays;
+
+            [ReadOnly]
+            public NativeArray<SharedMeshData> SharedMeshData;
+
+            [ReadOnly]
+            public NativeArray<BatchMeshID> MeshIDs;
+
 #if ENABLE_DOTS_DEFORMATION_MOTION_VECTORS
-            [ReadOnly] public int DeformedMeshBufferIndex;
+            [ReadOnly]
+            public int DeformedMeshBufferIndex;
 #endif
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 enabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 enabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
 
@@ -671,16 +743,19 @@ namespace Unity.Rendering
 
                     unsafe
                     {
-                        var instanceIndex =
-                            Interlocked.Decrement(
-                                ref UnsafeUtility.ArrayElementAsRef<int>(MeshCounts.GetUnsafePtr(), meshIndex));
+                        var instanceIndex = Interlocked.Decrement(
+                            ref UnsafeUtility.ArrayElementAsRef<int>(MeshCounts.GetUnsafePtr(), meshIndex)
+                        );
 
-                        uint deformedMeshIndex =
-                            (uint)(batchRange.MeshVertexIndex + instanceIndex * meshData.VertexCount);
+                        uint deformedMeshIndex = (uint)(
+                            batchRange.MeshVertexIndex + instanceIndex * meshData.VertexCount
+                        );
 
 #if ENABLE_DOTS_DEFORMATION_MOTION_VECTORS
-                        ref var component =
- ref UnsafeUtility.ArrayElementAsRef<DeformedMeshIndex>(meshIndices.GetUnsafePtr(), i);
+                        ref var component = ref UnsafeUtility.ArrayElementAsRef<DeformedMeshIndex>(
+                            meshIndices.GetUnsafePtr(),
+                            i
+                        );
                         // Set index into deformed mesh buffer for the current frame
                         component.Value[DeformedMeshBufferIndex] = deformedMeshIndex;
                         // Set current frame buffer index (0 or 1)
@@ -693,14 +768,18 @@ namespace Unity.Rendering
                         {
                             Assert.IsTrue(blendWeightIndices.IsCreated);
                             blendWeightIndices[i] = new BlendWeightBufferIndex
-                                { Value = batchRange.BlendShapeIndex + instanceIndex * meshData.BlendShapeCount };
+                            {
+                                Value = batchRange.BlendShapeIndex + instanceIndex * meshData.BlendShapeCount,
+                            };
                         }
 
                         if (meshData.HasSkinning)
                         {
                             Assert.IsTrue(skinMatrixIndices.IsCreated);
                             skinMatrixIndices[i] = new SkinMatrixBufferIndex
-                                { Value = batchRange.SkinMatrixIndex + instanceIndex * meshData.BoneCount };
+                            {
+                                Value = batchRange.SkinMatrixIndex + instanceIndex * meshData.BoneCount,
+                            };
                         }
                     }
                 }

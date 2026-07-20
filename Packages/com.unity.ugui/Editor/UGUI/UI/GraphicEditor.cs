@@ -9,7 +9,6 @@ namespace UnityEditor.UI
     /// Editor class used to edit UI Graphics.
     /// Extend this class to write your own graphic editor.
     /// </summary>
-
     [CustomEditor(typeof(MaskableGraphic), false)]
     [CanEditMultipleObjects]
     public class GraphicEditor : Editor
@@ -29,7 +28,7 @@ namespace UnityEditor.UI
         GUIContent m_RightContent;
         GUIContent m_TopContent;
         GUIContent m_BottomContent;
-        static private bool m_ShowPadding = false;
+        private static bool m_ShowPadding = false;
 
         protected virtual void OnDisable()
         {
@@ -40,7 +39,10 @@ namespace UnityEditor.UI
 
         protected virtual void OnEnable()
         {
-            m_CorrectButtonContent = EditorGUIUtility.TrTextContent("Set Native Size", "Sets the size to match the content.");
+            m_CorrectButtonContent = EditorGUIUtility.TrTextContent(
+                "Set Native Size",
+                "Sets the size to match the content."
+            );
             m_PaddingContent = EditorGUIUtility.TrTextContent("Raycast Padding");
             m_LeftContent = EditorGUIUtility.TrTextContent("Left");
             m_RightContent = EditorGUIUtility.TrTextContent("Right");

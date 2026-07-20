@@ -5,7 +5,8 @@ using UnityEngine;
 
 namespace Unity.Rendering
 {
-    internal class ComputeBufferWrapper<DataType> where DataType : struct
+    internal class ComputeBufferWrapper<DataType>
+        where DataType : struct
     {
         ComputeBuffer m_Buffer;
         ComputeShader m_Shader;
@@ -20,7 +21,8 @@ namespace Unity.Rendering
             m_Buffer = new ComputeBuffer(size, UnsafeUtility.SizeOf<DataType>(), ComputeBufferType.Default);
         }
 
-        public ComputeBufferWrapper(int namePropertyId, int size, ComputeShader shader) : this(namePropertyId, size)
+        public ComputeBufferWrapper(int namePropertyId, int size, ComputeShader shader)
+            : this(namePropertyId, size)
         {
             Assert.IsTrue(shader != null);
             m_Shader = shader;
@@ -33,7 +35,12 @@ namespace Unity.Rendering
             m_Buffer = new ComputeBuffer(newSize, UnsafeUtility.SizeOf<DataType>(), ComputeBufferType.Default);
         }
 
-        public void SetData(NativeArray<DataType> data, int nativeBufferStartIndex, int computeBufferStartIndex, int count)
+        public void SetData(
+            NativeArray<DataType> data,
+            int nativeBufferStartIndex,
+            int computeBufferStartIndex,
+            int count
+        )
         {
             m_Buffer.SetData(data, nativeBufferStartIndex, computeBufferStartIndex, count);
         }
@@ -61,7 +68,8 @@ namespace Unity.Rendering
         }
     }
 
-    internal class ComputeDoubleBufferWrapper<DataType> where DataType : struct
+    internal class ComputeDoubleBufferWrapper<DataType>
+        where DataType : struct
     {
         ComputeBufferWrapper<DataType>[] m_Buffers = new ComputeBufferWrapper<DataType>[2];
         readonly int m_PrimaryBufferPropertyID;

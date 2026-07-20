@@ -22,7 +22,8 @@ namespace UnityEditor.Build.Pipeline
         {
             byte[] assetHash;
             byte[] objectHash;
-            bool extraArtifact = HashingMethods.IsVirtualArtifactsExtraPath(objectID.filePath)
+            bool extraArtifact =
+                HashingMethods.IsVirtualArtifactsExtraPath(objectID.filePath)
                 || HashingMethods.IsUdsDataPath(objectID.filePath);
             int hashSeed = ScriptableBuildPipeline.fileIDHashSeed;
             if (extraArtifact && hashSeed != 0)
@@ -50,7 +51,11 @@ namespace UnityEditor.Build.Pipeline
 
             int headerSize = ScriptableBuildPipeline.prefabPackedHeaderSize;
             if (headerSize == 0)
-                throw new ArgumentOutOfRangeException(nameof(headerSize), headerSize, "Prefab packed header size must be non-zero; zero breaks serialization index masking (64-bit shift / low mask).");
+                throw new ArgumentOutOfRangeException(
+                    nameof(headerSize),
+                    headerSize,
+                    "Prefab packed header size must be non-zero; zero breaks serialization index masking (64-bit shift / low mask)."
+                );
 
             ulong assetVal = BitConverter.ToUInt64(assetHash, 0);
             ulong objectVal = BitConverter.ToUInt64(objectHash, 0);

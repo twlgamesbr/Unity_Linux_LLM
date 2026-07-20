@@ -21,8 +21,11 @@ namespace Unity.Entities
         [BurstCompile]
         struct BuildEntityGuidToEntity : IJob
         {
-            [ReadOnly] public NativeArray<EntityInChunkWithGuid> SortedEntitiesWithGuid;
-            [WriteOnly] public NativeList<DuplicateEntityGuid> Duplicates;
+            [ReadOnly]
+            public NativeArray<EntityInChunkWithGuid> SortedEntitiesWithGuid;
+
+            [WriteOnly]
+            public NativeList<DuplicateEntityGuid> Duplicates;
 
             public void Execute()
             {
@@ -60,14 +63,15 @@ namespace Unity.Entities
             NativeArray<EntityInChunkWithGuid> sortedEntitiesWithGuid,
             AllocatorManager.AllocatorHandle allocator,
             out JobHandle jobHandle,
-            JobHandle dependsOn = default)
+            JobHandle dependsOn = default
+        )
         {
             var duplicates = new NativeList<DuplicateEntityGuid>(1, allocator);
 
             jobHandle = new BuildEntityGuidToEntity
             {
                 SortedEntitiesWithGuid = sortedEntitiesWithGuid,
-                Duplicates = duplicates
+                Duplicates = duplicates,
             }.Schedule(dependsOn);
 
             return duplicates;

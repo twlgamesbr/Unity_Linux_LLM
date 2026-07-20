@@ -21,6 +21,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
         const double k_MinCollectionInterval_PerFrame = 5e-3;
         const double k_MinCollectionInterval_PerSecond = 1;
+
         static double MinCollectionInterval(SampleRate rate)
         {
             switch (rate)
@@ -82,10 +83,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
         static RnsmComponentImplementation()
         {
-            k_DefaultPanelSettings =
-                Resources.Load<PanelSettings>(StringConstants.k_ResourcePrefixRnsmDefault + "PanelSettings");
-            k_DefaultStyleSheet =
-                Resources.Load<StyleSheet>(StringConstants.k_ResourcePrefixRnsmDefault + "StyleSheet");
+            k_DefaultPanelSettings = Resources.Load<PanelSettings>(
+                StringConstants.k_ResourcePrefixRnsmDefault + "PanelSettings"
+            );
+            k_DefaultStyleSheet = Resources.Load<StyleSheet>(
+                StringConstants.k_ResourcePrefixRnsmDefault + "StyleSheet"
+            );
         }
 
         internal void UpdateUiVisibility(bool enabled, bool visible)
@@ -99,11 +102,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         }
 
         UnsubscribeFromAllAdapters m_UnsubscribeFromAllAdapters;
+
         void SubscribeToAllAdapters()
         {
-            m_UnsubscribeFromAllAdapters = NetworkAdapters.SubscribeToAll(
-                SubscribeToAdapter,
-                UnsubscribeFromAdapter);
+            m_UnsubscribeFromAllAdapters = NetworkAdapters.SubscribeToAll(SubscribeToAdapter, UnsubscribeFromAdapter);
         }
 
         void SubscribeToAdapter(INetworkAdapter adapter)
@@ -149,7 +151,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             PositionConfiguration position,
             StyleSheet styleSheet,
             PanelSettings panelSettingsOverride,
-            double maxRefreshRate)
+            double maxRefreshRate
+        )
         {
             SetupUiDoc();
             if (configuration != null)
@@ -203,7 +206,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             NetStatsMonitorConfiguration configuration,
             PositionConfiguration positionConfiguration,
             StyleSheet customStyleSheet,
-            PanelSettings panelSettingsOverride)
+            PanelSettings panelSettingsOverride
+        )
         {
             Analytic(customStyleSheet, panelSettingsOverride, positionConfiguration);
             if (customStyleSheet != m_CustomStyleSheet)
@@ -219,22 +223,28 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 m_CustomStyleSheet = customStyleSheet;
             }
 
-            UiDoc.panelSettings = panelSettingsOverride != null
-                ? panelSettingsOverride
-                : k_DefaultPanelSettings;
+            UiDoc.panelSettings = panelSettingsOverride != null ? panelSettingsOverride : k_DefaultPanelSettings;
 
             RnsmVisualElement.ApplyPosition(positionConfiguration);
 
             ApplyConfigurationChangesIfHashHasChanged(configuration);
         }
 
-        private void Analytic(StyleSheet customStyleSheet, PanelSettings panelSettingsOverride, PositionConfiguration positionConfiguration)
+        private void Analytic(
+            StyleSheet customStyleSheet,
+            PanelSettings panelSettingsOverride,
+            PositionConfiguration positionConfiguration
+        )
         {
 #if UNITY_EDITOR && UNITY_2023_2_OR_NEWER
             var isUsingCustomStyleSheet = customStyleSheet != null;
             var isUsingPanelSettingsOverride = panelSettingsOverride != null;
             var isUsingPositionOverride = positionConfiguration?.OverridePosition ?? false;
-            var configUpdated = new ConfigUpdatedAnalytic(isUsingCustomStyleSheet, isUsingPanelSettingsOverride, isUsingPositionOverride);
+            var configUpdated = new ConfigUpdatedAnalytic(
+                isUsingCustomStyleSheet,
+                isUsingPanelSettingsOverride,
+                isUsingPositionOverride
+            );
             if (!configUpdated.Equals(m_PreviousConfig))
             {
                 m_PreviousConfig = configUpdated;
@@ -252,7 +262,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 RnsmVisualElement.UpdateConfiguration(configuration);
 
                 // Can't use ?. syntax, as this bypasses internal Unity lifetime check. Ternary is equivalent.
-                int? newHistoryRequirementsHash = configuration != null ? configuration.GetHistoryRequirementsHash() : null;
+                int? newHistoryRequirementsHash =
+                    configuration != null ? configuration.GetHistoryRequirementsHash() : null;
 
                 if (newHistoryRequirementsHash != m_PreviousHistoryRequirementsHash)
                 {
@@ -268,7 +279,6 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
                 m_PreviousConfigurationHash = newConfigurationHash;
             }
-
         }
 
         void CollectStatsIfEnoughTimeHasElapsed(SampleRate rate, double time)

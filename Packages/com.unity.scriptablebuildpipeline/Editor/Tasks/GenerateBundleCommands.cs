@@ -18,7 +18,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class GenerateBundleCommands : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -43,7 +46,9 @@ namespace UnityEditor.Build.Pipeline.Tasks
         static bool ValidAssetBundle(List<GUID> assets, HashSet<GUID> customAssets)
         {
             // Custom Valid Asset Bundle function that tests if every asset is known by the asset database, is an asset (not a scene), or is a user driven custom asset
-            return assets.All(x => ValidationMethods.ValidAsset(x) == ValidationMethods.Status.Asset || customAssets.Contains(x));
+            return assets.All(x =>
+                ValidationMethods.ValidAsset(x) == ValidationMethods.Status.Asset || customAssets.Contains(x)
+            );
         }
 
         /// <inheritdoc />
@@ -62,13 +67,22 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 if (ValidAssetBundle(bundlePair.Value, customAssets))
                 {
                     // Use generated internalName here as we could have an empty asset bundle used for raw object storage (See CreateStandardShadersBundle)
-                    var internalName = string.Format(CommonStrings.AssetBundleNameFormat, m_PackingMethod.GenerateInternalFileName(bundlePair.Key));
+                    var internalName = string.Format(
+                        CommonStrings.AssetBundleNameFormat,
+                        m_PackingMethod.GenerateInternalFileName(bundlePair.Key)
+                    );
                     CreateAssetBundleCommand(bundlePair.Key, internalName, bundlePair.Value);
                 }
                 else if (ValidationMethods.ValidSceneBundle(bundlePair.Value))
                 {
                     var firstScene = bundlePair.Value[0];
-                    CreateSceneBundleCommand(bundlePair.Key, assetToMainFile[firstScene], firstScene, bundlePair.Value, assetToMainFile);
+                    CreateSceneBundleCommand(
+                        bundlePair.Key,
+                        assetToMainFile[firstScene],
+                        firstScene,
+                        bundlePair.Value,
+                        assetToMainFile
+                    );
                     for (int i = 1; i < bundlePair.Value.Count; ++i)
                     {
                         var additionalScene = bundlePair.Value[i];
@@ -80,7 +94,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return ReturnCode.Success;
         }
 
-        internal static WriteCommand CreateWriteCommand(string internalName, List<ObjectIdentifier> objects, IDeterministicIdentifiers packingMethod, out Hash128 renderpipelineHash)
+        internal static WriteCommand CreateWriteCommand(
+            string internalName,
+            List<ObjectIdentifier> objects,
+            IDeterministicIdentifiers packingMethod,
+            out Hash128 renderpipelineHash
+        )
         {
             var command = new WriteCommand();
             command.internalName = internalName;
@@ -100,14 +119,21 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 var serializationInfo = new SerializationInfo
                 {
                     serializationObject = obj,
-                    serializationIndex = packingMethod.SerializationIndexFromObjectIdentifier(obj)
+                    serializationIndex = packingMethod.SerializationIndexFromObjectIdentifier(obj),
                 };
 
                 if (consumedIds.TryGetValue(serializationInfo.serializationIndex, out var priorObject))
                 {
-                    string msg = string.Format(@"File '{0}' contains a file identifier collision between {1} ({2}) and {3} ({4}) at id {5}. Objects will be missing from the bundle!
+                    string msg = string.Format(
+                        @"File '{0}' contains a file identifier collision between {1} ({2}) and {3} ({4}) at id {5}. Objects will be missing from the bundle!
 You can work around this issue by changing the 'FileID Generator Seed' found in the Scriptable Build Pipeline Preferences window.",
-                        internalName, obj, BuildCacheUtility.GetMainTypeForObject(obj), priorObject, BuildCacheUtility.GetMainTypeForObject(priorObject), serializationInfo.serializationIndex);
+                        internalName,
+                        obj,
+                        BuildCacheUtility.GetMainTypeForObject(obj),
+                        priorObject,
+                        BuildCacheUtility.GetMainTypeForObject(priorObject),
+                        serializationInfo.serializationIndex
+                    );
                     throw new BuildFailedException(msg);
                 }
                 consumedIds.Add(serializationInfo.serializationIndex, obj);
@@ -156,12 +182,16 @@ You can work around this issue by changing the 'FileID Generator Seed' found in 
 
         void CreateAssetBundleCommand(string bundleName, string internalName, List<GUID> assets)
         {
-            var command = CreateWriteCommand(internalName, m_WriteData.FileToObjects[internalName], m_PackingMethod, out Hash128 renderPipelineHash);
+            var command = CreateWriteCommand(
+                internalName,
+                m_WriteData.FileToObjects[internalName],
+                m_PackingMethod,
+                out Hash128 renderPipelineHash
+            );
             var usageSet = new BuildUsageTagSet();
             var referenceMap = new BuildReferenceMap();
             var dependencyHashes = new List<Hash128>();
             var bundleAssets = new List<AssetLoadInfo>();
-
 
             referenceMap.AddMappings(command.internalName, command.serializeObjects.ToArray());
             foreach (var asset in assets)
@@ -180,16 +210,16 @@ You can work around this issue by changing the 'FileID Generator Seed' found in 
 
             bundleAssets.Sort(AssetLoadInfoCompare);
 
-
             var operation = new AssetBundleWriteOperation();
             operation.Command = command;
             operation.UsageSet = usageSet;
             operation.ReferenceMap = referenceMap;
-            operation.DependencyHash = !dependencyHashes.IsNullOrEmpty() ? HashingMethods.Calculate(dependencyHashes).ToHash128() : new Hash128();
+            operation.DependencyHash = !dependencyHashes.IsNullOrEmpty()
+                ? HashingMethods.Calculate(dependencyHashes).ToHash128()
+                : new Hash128();
             operation.Info = new AssetBundleInfo();
             operation.Info.bundleName = bundleName;
             operation.Info.bundleAssets = bundleAssets;
-
 
             m_WriteData.WriteOperations.Add(operation);
             m_WriteData.FileToUsageSet.Add(command.internalName, usageSet);
@@ -227,7 +257,6 @@ You can work around this issue by changing the 'FileID Generator Seed' found in 
                 sortedObjects.Add(new SortObject { sortIndex = GetSortIndex(types[i]), objectId = objects[i] });
             return sortedObjects.OrderBy(x => x.sortIndex).Select(x => x.objectId).ToList();
         }
-
 #endif
 
         List<ObjectIdentifier> GetFileObjectsForScene(string internalName)
@@ -247,17 +276,27 @@ You can work around this issue by changing the 'FileID Generator Seed' found in 
             return fileObjects;
         }
 
-        void CreateSceneBundleCommand(string bundleName, string internalName, GUID scene, List<GUID> bundledScenes, Dictionary<GUID, string> assetToMainFile)
+        void CreateSceneBundleCommand(
+            string bundleName,
+            string internalName,
+            GUID scene,
+            List<GUID> bundledScenes,
+            Dictionary<GUID, string> assetToMainFile
+        )
         {
             var fileObjects = GetFileObjectsForScene(internalName);
-            var command = CreateWriteCommand(internalName, fileObjects, new LinearPackedIdentifiers(3), out Hash128 renderpipelineHash); // Start at 3: PreloadData = 1, AssetBundle = 2
+            var command = CreateWriteCommand(
+                internalName,
+                fileObjects,
+                new LinearPackedIdentifiers(3),
+                out Hash128 renderpipelineHash
+            ); // Start at 3: PreloadData = 1, AssetBundle = 2
             var usageSet = new BuildUsageTagSet();
             var referenceMap = new BuildReferenceMap();
             var preloadObjects = new List<ObjectIdentifier>();
             var bundleScenes = new List<SceneLoadInfo>();
             var dependencyInfo = m_DependencyData.SceneInfo[scene];
             var fileObjectSet = new HashSet<ObjectIdentifier>(fileObjects);
-
 
             usageSet.UnionWith(m_DependencyData.SceneUsage[scene]);
             referenceMap.AddMappings(command.internalName, command.serializeObjects.ToArray());
@@ -276,19 +315,19 @@ You can work around this issue by changing the 'FileID Generator Seed' found in 
                 bundleScenes.Add(loadInfo);
             }
 
-
             var operation = new SceneBundleWriteOperation();
             operation.Command = command;
             operation.UsageSet = usageSet;
             operation.ReferenceMap = referenceMap;
-            operation.DependencyHash = m_DependencyData.DependencyHash.TryGetValue(scene, out var hash) ? hash : new Hash128();
+            operation.DependencyHash = m_DependencyData.DependencyHash.TryGetValue(scene, out var hash)
+                ? hash
+                : new Hash128();
             operation.Scene = dependencyInfo.scene;
             operation.PreloadInfo = new PreloadInfo();
             operation.PreloadInfo.preloadObjects = preloadObjects;
             operation.Info = new SceneBundleInfo();
             operation.Info.bundleName = bundleName;
             operation.Info.bundleScenes = bundleScenes;
-
 
             m_WriteData.WriteOperations.Add(operation);
             m_WriteData.FileToUsageSet.Add(command.internalName, usageSet);
@@ -298,13 +337,17 @@ You can work around this issue by changing the 'FileID Generator Seed' found in 
         void CreateSceneDataCommand(string internalName, GUID scene)
         {
             var fileObjects = GetFileObjectsForScene(internalName);
-            var command = CreateWriteCommand(internalName, fileObjects, new LinearPackedIdentifiers(2), out Hash128 renderpipelineHash); // Start at 3: PreloadData = 1
+            var command = CreateWriteCommand(
+                internalName,
+                fileObjects,
+                new LinearPackedIdentifiers(2),
+                out Hash128 renderpipelineHash
+            ); // Start at 3: PreloadData = 1
             var usageSet = new BuildUsageTagSet();
             var referenceMap = new BuildReferenceMap();
             var preloadObjects = new List<ObjectIdentifier>();
             var dependencyInfo = m_DependencyData.SceneInfo[scene];
             var fileObjectSet = new HashSet<ObjectIdentifier>(fileObjects);
-
 
             usageSet.UnionWith(m_DependencyData.SceneUsage[scene]);
             referenceMap.AddMappings(command.internalName, command.serializeObjects.ToArray());
@@ -315,16 +358,16 @@ You can work around this issue by changing the 'FileID Generator Seed' found in 
                 preloadObjects.Add(referencedObject);
             }
 
-
             var operation = new SceneDataWriteOperation();
             operation.Command = command;
             operation.UsageSet = usageSet;
             operation.ReferenceMap = referenceMap;
-            operation.DependencyHash = m_DependencyData.DependencyHash.TryGetValue(scene, out var hash) ? hash : new Hash128();
+            operation.DependencyHash = m_DependencyData.DependencyHash.TryGetValue(scene, out var hash)
+                ? hash
+                : new Hash128();
             operation.Scene = dependencyInfo.scene;
             operation.PreloadInfo = new PreloadInfo();
             operation.PreloadInfo.preloadObjects = preloadObjects;
-
 
             m_WriteData.FileToReferenceMap.Add(command.internalName, referenceMap);
             m_WriteData.FileToUsageSet.Add(command.internalName, usageSet);

@@ -1,5 +1,5 @@
-using Unity.Collections;
 using Unity.Burst;
+using Unity.Collections;
 using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering
@@ -8,12 +8,14 @@ namespace UnityEngine.Rendering
     internal static class LODGroupDataSystemBurst
     {
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static int GetOrAllocateLODGroupDataInstances(in JaggedSpan<EntityId> jaggedLODGroups,
+        public static int GetOrAllocateLODGroupDataInstances(
+            in JaggedSpan<EntityId> jaggedLODGroups,
             ref NativeList<LODGroupData> lodGroupsData,
             ref NativeList<LODGroupCullingData> lodGroupCullingData,
             ref NativeParallelHashMap<EntityId, GPUInstanceIndex> lodGroupDataHash,
             ref NativeList<GPUInstanceIndex> freeLODGroupDataHandles,
-            ref NativeArray<GPUInstanceIndex> lodGroupInstances)
+            ref NativeArray<GPUInstanceIndex> lodGroupInstances
+        )
         {
             int freeHandlesCount = freeLODGroupDataHandles.Length;
             int lodDataLength = lodGroupsData.Length;
@@ -55,10 +57,12 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static int FreeLODGroupData(in NativeArray<EntityId> destroyedLODGroups,
+        public static int FreeLODGroupData(
+            in NativeArray<EntityId> destroyedLODGroups,
             ref NativeList<LODGroupData> lodGroupsData,
             ref NativeParallelHashMap<EntityId, GPUInstanceIndex> lodGroupDataHash,
-            ref NativeList<GPUInstanceIndex> freeLODGroupDataHandles)
+            ref NativeList<GPUInstanceIndex> freeLODGroupDataHandles
+        )
         {
             int removedRendererCount = 0;
 

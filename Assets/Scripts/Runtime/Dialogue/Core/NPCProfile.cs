@@ -1,23 +1,22 @@
 using System;
 using System.Linq;
 using EditorAttributes;
-using UnityEngine.Serialization;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+using UnityEngine.Serialization;
+
 namespace NPCSystem.Dialogue.Core
 {
     [CreateAssetMenu(fileName = "NPCProfile", menuName = "NPC Dialogue/NPC Profile")]
@@ -34,17 +33,29 @@ namespace NPCSystem.Dialogue.Core
         [FormerlySerializedAs("npcSlug")]
         [SerializeField]
         string _npcSlug = "npc";
-        public string NpcSlug { get => _npcSlug; set => _npcSlug = value; }
+        public string NpcSlug
+        {
+            get => _npcSlug;
+            set => _npcSlug = value;
+        }
 
         [FormerlySerializedAs("displayName")]
         [SerializeField]
         string _displayName = "NPC";
-        public string DisplayName { get => _displayName; set => _displayName = value; }
+        public string DisplayName
+        {
+            get => _displayName;
+            set => _displayName = value;
+        }
 
         [FormerlySerializedAs("portraitTexture")]
         [SerializeField]
         Texture2D _portraitTexture;
-        public Texture2D PortraitTexture { get => _portraitTexture; set => _portraitTexture = value; }
+        public Texture2D PortraitTexture
+        {
+            get => _portraitTexture;
+            set => _portraitTexture = value;
+        }
 
         [Title("Personality")]
         [Header("Personality")]
@@ -52,42 +63,70 @@ namespace NPCSystem.Dialogue.Core
         [SerializeField]
         [TextArea(4, 12)]
         string _systemPrompt = "You are a helpful in-game NPC.";
-        public string SystemPrompt { get => _systemPrompt; set => _systemPrompt = value; }
+        public string SystemPrompt
+        {
+            get => _systemPrompt;
+            set => _systemPrompt = value;
+        }
 
         [Header("Behavior")]
         [FormerlySerializedAs("personalityBrief")]
         [SerializeField]
         [TextArea(2, 5)]
         string _personalityBrief = "";
-        public string PersonalityBrief { get => _personalityBrief; set => _personalityBrief = value; }
+        public string PersonalityBrief
+        {
+            get => _personalityBrief;
+            set => _personalityBrief = value;
+        }
 
         [FormerlySerializedAs("speakingStyle")]
         [SerializeField]
         [TextArea(2, 5)]
         string _speakingStyle = "";
-        public string SpeakingStyle { get => _speakingStyle; set => _speakingStyle = value; }
+        public string SpeakingStyle
+        {
+            get => _speakingStyle;
+            set => _speakingStyle = value;
+        }
 
         [FormerlySerializedAs("boundaries")]
         [SerializeField]
         [TextArea(2, 5)]
         string _boundaries = "";
-        public string Boundaries { get => _boundaries; set => _boundaries = value; }
+        public string Boundaries
+        {
+            get => _boundaries;
+            set => _boundaries = value;
+        }
 
         [FormerlySerializedAs("helpfulness")]
         [SerializeField]
         [Range(0f, 1f)]
         float _helpfulness = 0.7f;
-        public float Helpfulness { get => _helpfulness; set => _helpfulness = value; }
+        public float Helpfulness
+        {
+            get => _helpfulness;
+            set => _helpfulness = value;
+        }
 
         [FormerlySerializedAs("preferredActionFunctions")]
         [SerializeField]
         string[] _preferredActionFunctions = new string[0];
-        public string[] PreferredActionFunctions { get => _preferredActionFunctions; set => _preferredActionFunctions = value; }
+        public string[] PreferredActionFunctions
+        {
+            get => _preferredActionFunctions;
+            set => _preferredActionFunctions = value;
+        }
 
         [FormerlySerializedAs("forbiddenActionFunctions")]
         [SerializeField]
         string[] _forbiddenActionFunctions = new string[0];
-        public string[] ForbiddenActionFunctions { get => _forbiddenActionFunctions; set => _forbiddenActionFunctions = value; }
+        public string[] ForbiddenActionFunctions
+        {
+            get => _forbiddenActionFunctions;
+            set => _forbiddenActionFunctions = value;
+        }
 
         [Title("Sampling")]
         [Header("Sampling")]
@@ -95,37 +134,61 @@ namespace NPCSystem.Dialogue.Core
         [SerializeField]
         [Range(0f, 2f)]
         float _temperature = 0.7f;
-        public float Temperature { get => _temperature; set => _temperature = value; }
+        public float Temperature
+        {
+            get => _temperature;
+            set => _temperature = value;
+        }
 
         [FormerlySerializedAs("topP")]
         [SerializeField]
         [Range(0f, 1f)]
         float _topP = 0.9f;
-        public float TopP { get => _topP; set => _topP = value; }
+        public float TopP
+        {
+            get => _topP;
+            set => _topP = value;
+        }
 
         [FormerlySerializedAs("minP")]
         [SerializeField]
         [Range(0f, 1f)]
         float _minP = 0.05f;
-        public float MinP { get => _minP; set => _minP = value; }
+        public float MinP
+        {
+            get => _minP;
+            set => _minP = value;
+        }
 
         [FormerlySerializedAs("topK")]
         [SerializeField]
         [Range(0, 100)]
         int _topK = 40;
-        public int TopK { get => _topK; set => _topK = value; }
+        public int TopK
+        {
+            get => _topK;
+            set => _topK = value;
+        }
 
         [FormerlySerializedAs("repeatPenalty")]
         [SerializeField]
         [Range(0f, 2f)]
         float _repeatPenalty = 1.1f;
-        public float RepeatPenalty { get => _repeatPenalty; set => _repeatPenalty = value; }
+        public float RepeatPenalty
+        {
+            get => _repeatPenalty;
+            set => _repeatPenalty = value;
+        }
 
         [FormerlySerializedAs("maxTokens")]
         [SerializeField]
         [Suffix("tokens")]
         int _maxTokens = 150;
-        public int MaxTokens { get => _maxTokens; set => _maxTokens = value; }
+        public int MaxTokens
+        {
+            get => _maxTokens;
+            set => _maxTokens = value;
+        }
 
         [Title("Knowledge")]
         [Header("Knowledge")]
@@ -133,17 +196,29 @@ namespace NPCSystem.Dialogue.Core
         [SerializeField]
         [Tooltip("Qdrant vector database for NPC knowledge retrieval")]
         KnowledgeSource _knowledgeSource = KnowledgeSource.Qdrant;
-        public KnowledgeSource KnowledgeSource { get => _knowledgeSource; set => _knowledgeSource = value; }
+        public KnowledgeSource KnowledgeSource
+        {
+            get => _knowledgeSource;
+            set => _knowledgeSource = value;
+        }
 
         [FormerlySerializedAs("ragCategory")]
         [SerializeField]
         string _ragCategory = "";
-        public string RagCategory { get => _ragCategory; set => _ragCategory = value; }
+        public string RagCategory
+        {
+            get => _ragCategory;
+            set => _ragCategory = value;
+        }
 
         [FormerlySerializedAs("ragResults")]
         [SerializeField]
         int _ragResults = 3;
-        public int RagResults { get => _ragResults; set => _ragResults = value; }
+        public int RagResults
+        {
+            get => _ragResults;
+            set => _ragResults = value;
+        }
 
         [FormerlySerializedAs("knowledgeSourcePath")]
         [SerializeField]
@@ -151,14 +226,22 @@ namespace NPCSystem.Dialogue.Core
         [FilePath(true, "md")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
         string _knowledgeSourcePath = "";
-        public string KnowledgeSourcePath { get => _knowledgeSourcePath; set => _knowledgeSourcePath = value; }
+        public string KnowledgeSourcePath
+        {
+            get => _knowledgeSourcePath;
+            set => _knowledgeSourcePath = value;
+        }
 
         [Title("Trading")]
         [Header("Trading")]
         [FormerlySerializedAs("inventoryItems")]
         [SerializeField]
         NPCItemDefinition[] _inventoryItems = new NPCItemDefinition[0];
-        public NPCItemDefinition[] InventoryItems { get => _inventoryItems; set => _inventoryItems = value; }
+        public NPCItemDefinition[] InventoryItems
+        {
+            get => _inventoryItems;
+            set => _inventoryItems = value;
+        }
 
         [Title("LoRA")]
         [Header("LoRA")]
@@ -168,13 +251,21 @@ namespace NPCSystem.Dialogue.Core
         [FilePath(true, "gguf")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
         string _loraAdapterPath = "";
-        public string LoraAdapterPath { get => _loraAdapterPath; set => _loraAdapterPath = value; }
+        public string LoraAdapterPath
+        {
+            get => _loraAdapterPath;
+            set => _loraAdapterPath = value;
+        }
 
         [FormerlySerializedAs("loraWeight")]
         [SerializeField]
         [Range(0f, 1f)]
         float _loraWeight = 0.8f;
-        public float LoraWeight { get => _loraWeight; set => _loraWeight = value; }
+        public float LoraWeight
+        {
+            get => _loraWeight;
+            set => _loraWeight = value;
+        }
 
         [Title("History")]
         [Header("History")]
@@ -183,7 +274,11 @@ namespace NPCSystem.Dialogue.Core
         [Tooltip("Path relative to Application.persistentDataPath, e.g. NPCDialogue/butler.json")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
         string _historySaveFile = "";
-        public string HistorySaveFile { get => _historySaveFile; set => _historySaveFile = value; }
+        public string HistorySaveFile
+        {
+            get => _historySaveFile;
+            set => _historySaveFile = value;
+        }
 
         [SerializeField, ReadOnly]
         string inspectorPreview = "Not validated yet.";
@@ -296,32 +391,17 @@ namespace NPCSystem.Dialogue.Core
                 if (profile == null)
                     continue;
 
-                if (
-                    string.Equals(
-                        profile.GetNpcSlug(),
-                        key,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                if (string.Equals(profile.GetNpcSlug(), key, StringComparison.OrdinalIgnoreCase))
                     return profile;
             }
 
             // Fall back to display name / asset name
-            return profiles.FirstOrDefault(
-                profile =>
-                    profile != null
-                    && (
-                        string.Equals(
-                            profile.GetDisplayName(),
-                            key,
-                            StringComparison.OrdinalIgnoreCase
-                        )
-                        || string.Equals(
-                            profile.name,
-                            key,
-                            StringComparison.OrdinalIgnoreCase
-                        )
-                    )
+            return profiles.FirstOrDefault(profile =>
+                profile != null
+                && (
+                    string.Equals(profile.GetDisplayName(), key, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(profile.name, key, StringComparison.OrdinalIgnoreCase)
+                )
             );
         }
     }
@@ -332,6 +412,6 @@ namespace NPCSystem.Dialogue.Core
     /// </summary>
     public enum KnowledgeSource
     {
-        Qdrant
+        Qdrant,
     }
 }

@@ -9,7 +9,7 @@ namespace Unity.Physics.Authoring
     /// An empty component that is used to indicate if the root of a compound collider has been baked
     /// </summary>
     [TemporaryBakingType]
-    public struct PhysicsRootBaked : IComponentData {}
+    public struct PhysicsRootBaked : IComponentData { }
 
     /// <summary>
     /// Component that specifies data relating to compound colliders and blobs. Note that all colliders will have this
@@ -35,7 +35,8 @@ namespace Unity.Physics.Authoring
         public bool RegisterBlob;
     }
 
-    internal abstract class BasePhysicsBaker<T> : Baker<T> where T : Component
+    internal abstract class BasePhysicsBaker<T> : Baker<T>
+        where T : Component
     {
         bool HasNonIdentityScale(Transform bodyTransform)
         {
@@ -50,8 +51,8 @@ namespace Unity.Physics.Authoring
         protected void PostProcessTransform(Transform bodyTransform, BodyMotionType motionType = BodyMotionType.Static)
         {
             Transform transformParent = bodyTransform.parent;
-            bool haveParentEntity    = transformParent != null;
-            bool haveBakedTransform  = IsStatic();
+            bool haveParentEntity = transformParent != null;
+            bool haveBakedTransform = IsStatic();
             float4x4 localToWorld = bodyTransform.localToWorldMatrix;
             bool hasShear = localToWorld.HasShear();
             bool hasNonIdentityScale = HasNonIdentityScale(bodyTransform);
@@ -59,7 +60,13 @@ namespace Unity.Physics.Authoring
             // the TransformBakingSystem assumes a scale despite in certain cases there not being any (e.g., exactly two axes flipped,
             // leading to a pure rotation and no scale).
             bool hasNegativeLossyScale = math.cmin(bodyTransform.lossyScale) < 0;
-            bool unparent = motionType != BodyMotionType.Static || hasShear || hasNonIdentityScale || !haveParentEntity || haveBakedTransform || hasNegativeLossyScale;
+            bool unparent =
+                motionType != BodyMotionType.Static
+                || hasShear
+                || hasNonIdentityScale
+                || !haveParentEntity
+                || haveBakedTransform
+                || hasNegativeLossyScale;
 
             if (unparent)
             {
@@ -69,10 +76,7 @@ namespace Unity.Physics.Authoring
                 var entity = GetEntity(TransformUsageFlags.ManualOverride);
 
                 var rigidBodyTransform = Math.DecomposeRigidBodyTransform(localToWorld);
-                var compositeScale = math.mul(
-                    math.inverse(new float4x4(rigidBodyTransform)),
-                    localToWorld
-                );
+                var compositeScale = math.mul(math.inverse(new float4x4(rigidBodyTransform)), localToWorld);
 
                 AddComponent(entity, new LocalToWorld { Value = localToWorld });
 
@@ -86,8 +90,11 @@ namespace Unity.Physics.Authoring
                     uniformScale = math.abs(bodyTransform.lossyScale[0]);
                 }
 
-                LocalTransform transform = LocalTransform.FromPositionRotationScale(rigidBodyTransform.pos,
-                    rigidBodyTransform.rot, uniformScale);
+                LocalTransform transform = LocalTransform.FromPositionRotationScale(
+                    rigidBodyTransform.pos,
+                    rigidBodyTransform.rot,
+                    uniformScale
+                );
                 AddComponent(entity, transform);
             }
         }

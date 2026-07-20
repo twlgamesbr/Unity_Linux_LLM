@@ -6,7 +6,7 @@ namespace Unity.Collections
     /// <summary>
     /// Provides extension methods for sets.
     /// </summary>
-    public unsafe static class HashSetExtensions
+    public static unsafe class HashSetExtensions
     {
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
@@ -63,6 +63,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -118,6 +119,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -173,6 +175,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -228,6 +231,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -283,6 +287,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -338,6 +343,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -393,6 +399,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -448,6 +455,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -503,6 +511,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -524,7 +533,10 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of values.</typeparam>
         /// <param name="container">The set to remove values from.</param>
         /// <param name="other">The collection to compare with.</param>
-        public static void IntersectWith<T>(this ref NativeHashSet<T> container, NativeParallelHashSet<T>.ReadOnly other)
+        public static void IntersectWith<T>(
+            this ref NativeHashSet<T> container,
+            NativeParallelHashSet<T>.ReadOnly other
+        )
             where T : unmanaged, IEquatable<T>
         {
             var result = new UnsafeList<T>(container.Count, Allocator.Temp);
@@ -558,6 +570,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -613,6 +626,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -668,6 +682,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -723,6 +738,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -778,6 +794,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -833,6 +850,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -888,6 +906,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -943,6 +962,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -998,6 +1018,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -1019,7 +1040,10 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of values.</typeparam>
         /// <param name="container">The set to remove values from.</param>
         /// <param name="other">The collection to compare with.</param>
-        public static void IntersectWith<T>(this ref NativeParallelHashSet<T> container, NativeHashSet<T>.ReadOnly other)
+        public static void IntersectWith<T>(
+            this ref NativeParallelHashSet<T> container,
+            NativeHashSet<T>.ReadOnly other
+        )
             where T : unmanaged, IEquatable<T>
         {
             var result = new UnsafeList<T>(container.Count(), Allocator.Temp);
@@ -1053,6 +1077,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
@@ -1108,13 +1133,17 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>
         /// <typeparam name="T">The type of values.</typeparam>
         /// <param name="container">The set to remove values from.</param>
         /// <param name="other">The collection to compare with.</param>
-        public static void ExceptWith<T>(this ref NativeParallelHashSet<T> container, NativeParallelHashSet<T>.ReadOnly other)
+        public static void ExceptWith<T>(
+            this ref NativeParallelHashSet<T> container,
+            NativeParallelHashSet<T>.ReadOnly other
+        )
             where T : unmanaged, IEquatable<T>
         {
             foreach (var item in other)
@@ -1129,7 +1158,10 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of values.</typeparam>
         /// <param name="container">The set to remove values from.</param>
         /// <param name="other">The collection to compare with.</param>
-        public static void IntersectWith<T>(this ref NativeParallelHashSet<T> container, NativeParallelHashSet<T>.ReadOnly other)
+        public static void IntersectWith<T>(
+            this ref NativeParallelHashSet<T> container,
+            NativeParallelHashSet<T>.ReadOnly other
+        )
             where T : unmanaged, IEquatable<T>
         {
             var result = new UnsafeList<T>(container.Count(), Allocator.Temp);
@@ -1155,7 +1187,10 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of values.</typeparam>
         /// <param name="container">The set to add values to.</param>
         /// <param name="other">The collection to copy values from.</param>
-        public static void UnionWith<T>(this ref NativeParallelHashSet<T> container, NativeParallelHashSet<T>.ReadOnly other)
+        public static void UnionWith<T>(
+            this ref NativeParallelHashSet<T> container,
+            NativeParallelHashSet<T>.ReadOnly other
+        )
             where T : unmanaged, IEquatable<T>
         {
             foreach (var item in other)
@@ -1163,6 +1198,7 @@ namespace Unity.Collections
                 container.TryAdd(item);
             }
         }
+
         /// <summary>
         /// Removes the values from this set which are also present in another collection.
         /// </summary>

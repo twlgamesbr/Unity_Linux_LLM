@@ -24,7 +24,11 @@ namespace UnityEngine.InputSystem.LowLevel
         ////REVIEW: is this too heavy to allocate on the stack?
         internal const int kSize = InputDeviceCommand.kBaseCommandSize + 8 + kMaxNameLength * 2 + kMaxIdLength * 2;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames", Justification = "`Result` matches other command result names")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Naming",
+            "CA1714:FlagsEnumsShouldHavePluralNames",
+            Justification = "`Result` matches other command result names"
+        )]
         [Flags]
         public enum Result : long
         {
@@ -87,8 +91,8 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(byte* idBufferPtr = idBuffer)
-                return StringHelpers.ReadStringFromBuffer(new IntPtr(idBufferPtr), kMaxIdLength);
+                fixed (byte* idBufferPtr = idBuffer)
+                    return StringHelpers.ReadStringFromBuffer(new IntPtr(idBufferPtr), kMaxIdLength);
             }
             set
             {
@@ -96,9 +100,12 @@ namespace UnityEngine.InputSystem.LowLevel
                     throw new ArgumentNullException(nameof(value));
                 var length = value.Length;
                 if (length > kMaxIdLength)
-                    throw new ArgumentException($"ID '{value}' exceeds maximum supported length of {kMaxIdLength} characters", nameof(value));
+                    throw new ArgumentException(
+                        $"ID '{value}' exceeds maximum supported length of {kMaxIdLength} characters",
+                        nameof(value)
+                    );
 
-                fixed(byte* idBufferPtr = idBuffer)
+                fixed (byte* idBufferPtr = idBuffer)
                 {
                     StringHelpers.WriteStringToBuffer(value, new IntPtr(idBufferPtr), kMaxIdLength);
                 }
@@ -112,8 +119,8 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(byte* nameBufferPtr = nameBuffer)
-                return StringHelpers.ReadStringFromBuffer(new IntPtr(nameBufferPtr), kMaxNameLength);
+                fixed (byte* nameBufferPtr = nameBuffer)
+                    return StringHelpers.ReadStringFromBuffer(new IntPtr(nameBufferPtr), kMaxNameLength);
             }
             set
             {
@@ -121,9 +128,12 @@ namespace UnityEngine.InputSystem.LowLevel
                     throw new ArgumentNullException("value");
                 var length = value.Length;
                 if (length > kMaxNameLength)
-                    throw new ArgumentException($"Name '{value}' exceeds maximum supported length of {kMaxNameLength} characters", nameof(value));
+                    throw new ArgumentException(
+                        $"Name '{value}' exceeds maximum supported length of {kMaxNameLength} characters",
+                        nameof(value)
+                    );
 
-                fixed(byte* nameBufferPtr = nameBuffer)
+                fixed (byte* nameBufferPtr = nameBuffer)
                 {
                     StringHelpers.WriteStringToBuffer(value, new IntPtr(nameBufferPtr), kMaxNameLength);
                 }
@@ -134,10 +144,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static QueryPairedUserAccountCommand Create()
         {
-            return new QueryPairedUserAccountCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize),
-            };
+            return new QueryPairedUserAccountCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

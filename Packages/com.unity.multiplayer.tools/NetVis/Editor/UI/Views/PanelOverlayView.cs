@@ -12,18 +12,36 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
     class PanelOverlayView : InjectedVisualElement<PanelOverlayView>
     {
         const string k_SettingsPanelOpenKey = "NetVis.SettingsPanelOpen";
-        
-        [UxmlQuery] BandwidthConfigurationView BandwidthConfigurationView;
-        [UxmlQuery] OwnershipConfigurationView OwnershipConfigurationView;
-        [UxmlQuery] CommonSettingsView CommonSettingsView;
-        [UxmlQuery] ToolbarToggle BandwidthToggle;
-        [UxmlQuery] VisualElement BandwidthIcon;
-        [UxmlQuery] ToolbarToggle OwnershipToggle;
-        [UxmlQuery] VisualElement OwnershipIcon;
-        [UxmlQuery] ToolbarToggle SettingsToggle;
-        [UxmlQuery] VisualElement SettingsIcon;
 
-        [Inject] NetVisConfigurationWithEvents Configuration;
+        [UxmlQuery]
+        BandwidthConfigurationView BandwidthConfigurationView;
+
+        [UxmlQuery]
+        OwnershipConfigurationView OwnershipConfigurationView;
+
+        [UxmlQuery]
+        CommonSettingsView CommonSettingsView;
+
+        [UxmlQuery]
+        ToolbarToggle BandwidthToggle;
+
+        [UxmlQuery]
+        VisualElement BandwidthIcon;
+
+        [UxmlQuery]
+        ToolbarToggle OwnershipToggle;
+
+        [UxmlQuery]
+        VisualElement OwnershipIcon;
+
+        [UxmlQuery]
+        ToolbarToggle SettingsToggle;
+
+        [UxmlQuery]
+        VisualElement SettingsIcon;
+
+        [Inject]
+        NetVisConfigurationWithEvents Configuration;
 
         protected override void Initialized()
         {
@@ -51,14 +69,16 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
                 value =>
                 {
                     Configuration.Metric = value ? NetVisMetric.Bandwidth : NetVisMetric.None;
-                });
+                }
+            );
 
             OwnershipToggle.Bind(
                 Configuration.Metric == NetVisMetric.Ownership,
                 value =>
                 {
                     Configuration.Metric = value ? NetVisMetric.Ownership : NetVisMetric.None;
-                });
+                }
+            );
         }
 
         void OnAttach(AttachToPanelEvent _)
@@ -86,6 +106,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             BandwidthConfigurationView.SetInclude(metric == NetVisMetric.Bandwidth);
             OwnershipConfigurationView.SetInclude(metric == NetVisMetric.Ownership);
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<PanelOverlayView, UxmlTraits> { }
 #endif

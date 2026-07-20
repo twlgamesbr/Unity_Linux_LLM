@@ -16,14 +16,16 @@ namespace Unity.Netcode
         /// Constructs a SpawnStateException with a message
         /// </summary>
         /// <param name="message">The exception message</param>
-        public SpawnStateException(string message) : base(message) { }
+        public SpawnStateException(string message)
+            : base(message) { }
 
         /// <summary>
         /// Constructs a SpawnStateException with a message and a inner exception
         /// </summary>
         /// <param name="message">The exception message</param>
         /// <param name="inner">The inner exception</param>
-        public SpawnStateException(string message, Exception inner) : base(message, inner) { }
+        public SpawnStateException(string message, Exception inner)
+            : base(message, inner) { }
     }
 
     /// <summary>
@@ -35,6 +37,7 @@ namespace Unity.Netcode
         /// Constructs an InvalidChannelException with a message
         /// </summary>
         /// <param name="message">the message</param>
-        public InvalidChannelException(string message) : base(message) { }
+        public InvalidChannelException(string message)
+            : base(message) { }
     }
 }

@@ -1,8 +1,8 @@
 using System;
-using System.IO;
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -26,7 +26,9 @@ namespace Unity.Web.Stripping.Editor
                 var playerSettings = build.GetWebPlayerSettings();
                 if (playerSettings == null)
                 {
-                    Debug.LogError($"Could not read WebPlayerSettings JSON from {build.OutputPath}. This file is required for stripping. Rebuild to generate the file.");
+                    Debug.LogError(
+                        $"Could not read WebPlayerSettings JSON from {build.OutputPath}. This file is required for stripping. Rebuild to generate the file."
+                    );
                     return false;
                 }
 
@@ -39,8 +41,12 @@ namespace Unity.Web.Stripping.Editor
 
                 if (effectivePlayerSettings.HasIncompatibleEmscriptenArg)
                 {
-                    var incompatibleArgs = WebPlayerSettings.FindIncompatibleEmscriptenArgs(effectivePlayerSettings.emscriptenArgs);
-                    Debug.LogError($"Build has the incompatible Emscripten argument '{string.Join(' ', incompatibleArgs)}'.  Can't add submodule profiling to the build.");
+                    var incompatibleArgs = WebPlayerSettings.FindIncompatibleEmscriptenArgs(
+                        effectivePlayerSettings.emscriptenArgs
+                    );
+                    Debug.LogError(
+                        $"Build has the incompatible Emscripten argument '{string.Join(' ', incompatibleArgs)}'.  Can't add submodule profiling to the build."
+                    );
                     return false;
                 }
 
@@ -52,13 +58,20 @@ namespace Unity.Web.Stripping.Editor
 
                 if (build.HasStrippingInfo)
                 {
-                    Debug.LogError($"Build '{build.WasmFilePath}' is already stripped and can't be instrumented for profiling.");
+                    Debug.LogError(
+                        $"Build '{build.WasmFilePath}' is already stripped and can't be instrumented for profiling."
+                    );
                     return false;
                 }
 
-                if (!string.IsNullOrEmpty(build.EmscriptenVersion) && build.EmscriptenVersion != BuildToolsLocator.EmscriptenVersion)
+                if (
+                    !string.IsNullOrEmpty(build.EmscriptenVersion)
+                    && build.EmscriptenVersion != BuildToolsLocator.EmscriptenVersion
+                )
                 {
-                    Debug.LogError($"Build was created with a different Emscripten version than available in the Unity Editor: '{build.EmscriptenVersion}'. The editor uses '{BuildToolsLocator.EmscriptenVersion}'. Please rebuild the project or open the project with a different editor version.");
+                    Debug.LogError(
+                        $"Build was created with a different Emscripten version than available in the Unity Editor: '{build.EmscriptenVersion}'. The editor uses '{BuildToolsLocator.EmscriptenVersion}'. Please rebuild the project or open the project with a different editor version."
+                    );
                     return false;
                 }
 
@@ -75,7 +88,10 @@ namespace Unity.Web.Stripping.Editor
                 var originalFrameworkFile = BackUpBuildFile(build, build.FrameworkFilePath);
                 build.FrameworkBackupFilePath = originalFrameworkFile;
 
-                var submoduleDefinitionFiles = BuildToolsLocator.GetSubmoduleDefinitionFilePaths(playerSettings.threadsSupport, playerSettings.wasm2023);
+                var submoduleDefinitionFiles = BuildToolsLocator.GetSubmoduleDefinitionFilePaths(
+                    playerSettings.threadsSupport,
+                    playerSettings.wasm2023
+                );
                 var submoduleProfiler = new SubmoduleProfiler()
                 {
                     SubmoduleDefinitionFiles = submoduleDefinitionFiles,
@@ -87,7 +103,9 @@ namespace Unity.Web.Stripping.Editor
                     SevenZipPath = BuildToolsLocator.SevenZipPath,
                     EnableEmscripten4Features = emscriptenVersion.StartsWith("4."),
                     LogFunctionCode = TemplateAssetsHelper.GetFunctionCode("SubmoduleProfilingOverlay.wasmimport"),
-                    MinifiedLogFunctionCode = TemplateAssetsHelper.GetFunctionCode("MinifiedSubmoduleProfilingOverlay.wasmimport")
+                    MinifiedLogFunctionCode = TemplateAssetsHelper.GetFunctionCode(
+                        "MinifiedSubmoduleProfilingOverlay.wasmimport"
+                    ),
                 };
 
                 submoduleProfiler.InstrumentBuild(
@@ -185,7 +203,8 @@ namespace Unity.Web.Stripping.Editor
         internal static bool StripBuild(
             WebBuildReport build,
             SubmoduleStrippingSettings settings,
-            string additionalSubmoduleDefinitionFile)
+            string additionalSubmoduleDefinitionFile
+        )
         {
             if (build == null)
             {
@@ -208,7 +227,9 @@ namespace Unity.Web.Stripping.Editor
             var playerSettings = build.GetWebPlayerSettings();
             if (playerSettings == null)
             {
-                Debug.LogError($"Could not read WebPlayerSettings JSON from {build.OutputPath}. This file is required for stripping. Rebuild to generate the file.");
+                Debug.LogError(
+                    $"Could not read WebPlayerSettings JSON from {build.OutputPath}. This file is required for stripping. Rebuild to generate the file."
+                );
                 return false;
             }
 
@@ -221,14 +242,23 @@ namespace Unity.Web.Stripping.Editor
 
             if (effectivePlayerSettings.HasIncompatibleEmscriptenArg)
             {
-                var incompatibleArgs = WebPlayerSettings.FindIncompatibleEmscriptenArgs(effectivePlayerSettings.emscriptenArgs);
-                Debug.LogError($"Build has the incompatible Emscripten argument '{string.Join(' ', incompatibleArgs)}'. Can't strip submodules.");
+                var incompatibleArgs = WebPlayerSettings.FindIncompatibleEmscriptenArgs(
+                    effectivePlayerSettings.emscriptenArgs
+                );
+                Debug.LogError(
+                    $"Build has the incompatible Emscripten argument '{string.Join(' ', incompatibleArgs)}'. Can't strip submodules."
+                );
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(build.EmscriptenVersion) && build.EmscriptenVersion != BuildToolsLocator.EmscriptenVersion)
+            if (
+                !string.IsNullOrEmpty(build.EmscriptenVersion)
+                && build.EmscriptenVersion != BuildToolsLocator.EmscriptenVersion
+            )
             {
-                Debug.LogError($"Build was created with a different Emscripten version than available in the Unity Editor: '{build.EmscriptenVersion}'. The editor uses '{BuildToolsLocator.EmscriptenVersion}'. Please rebuild the project or open the project with a different editor version.");
+                Debug.LogError(
+                    $"Build was created with a different Emscripten version than available in the Unity Editor: '{build.EmscriptenVersion}'. The editor uses '{BuildToolsLocator.EmscriptenVersion}'. Please rebuild the project or open the project with a different editor version."
+                );
                 return false;
             }
 
@@ -247,10 +277,14 @@ namespace Unity.Web.Stripping.Editor
             }
 
             // Warn user if build was created without enableSubmoduleStrippingCompatibility
-            if (PlayerSettingsHelper.IsSubmoduleStrippingCompatibilityAvailable
-                && !playerSettings.enableSubmoduleStrippingCompatibility)
+            if (
+                PlayerSettingsHelper.IsSubmoduleStrippingCompatibilityAvailable
+                && !playerSettings.enableSubmoduleStrippingCompatibility
+            )
             {
-                Debug.LogWarning("Submodule stripping works best with \"Enable Submodule Stripping Compatibility\". Rebuild with the setting enabled for best results.");
+                Debug.LogWarning(
+                    "Submodule stripping works best with \"Enable Submodule Stripping Compatibility\". Rebuild with the setting enabled for best results."
+                );
             }
 
             // Replace the original file, make a back-up of it.
@@ -285,15 +319,26 @@ namespace Unity.Web.Stripping.Editor
                 {
                     {
                         "THROW_ON_EXECUTION",
-                        (settings.MissingSubmoduleErrorHandling == MissingSubmoduleErrorHandlingType.ThrowException).ToString().ToLower()
-                    }
+                        (settings.MissingSubmoduleErrorHandling == MissingSubmoduleErrorHandlingType.ThrowException)
+                            .ToString()
+                            .ToLower()
+                    },
                 };
 
-                logFunctionCode = TemplateAssetsHelper.GetFunctionCode("SubmoduleErrorHandler.wasmimport", replacements);
-                minifiedLogFunctionCode = TemplateAssetsHelper.GetFunctionCode("MinifiedSubmoduleErrorHandler.wasmimport", replacements);
+                logFunctionCode = TemplateAssetsHelper.GetFunctionCode(
+                    "SubmoduleErrorHandler.wasmimport",
+                    replacements
+                );
+                minifiedLogFunctionCode = TemplateAssetsHelper.GetFunctionCode(
+                    "MinifiedSubmoduleErrorHandler.wasmimport",
+                    replacements
+                );
             }
 
-            var submoduleDefinitionFiles = BuildToolsLocator.GetSubmoduleDefinitionFilePaths(playerSettings.threadsSupport, playerSettings.wasm2023);
+            var submoduleDefinitionFiles = BuildToolsLocator.GetSubmoduleDefinitionFilePaths(
+                playerSettings.threadsSupport,
+                playerSettings.wasm2023
+            );
             // Also use user-supplied submodule definition file if present
             if (!string.IsNullOrEmpty(additionalSubmoduleDefinitionFile))
             {
@@ -331,7 +376,9 @@ namespace Unity.Web.Stripping.Editor
                 MethodMapFile = build.MethodMapFilePath,
                 UnityVersion = Application.unityVersion,
                 ProductVersion = PackageConstants.VerboseVersion,
-                MissingSubmoduleErrorHandling = ObjectNames.NicifyVariableName(settings.MissingSubmoduleErrorHandling.ToString())
+                MissingSubmoduleErrorHandling = ObjectNames.NicifyVariableName(
+                    settings.MissingSubmoduleErrorHandling.ToString()
+                ),
             };
 
             if (!string.IsNullOrEmpty(build.SymbolFilePath))
@@ -343,13 +390,25 @@ namespace Unity.Web.Stripping.Editor
             submoduleStripper.OnProgress += DefaultProgressCallback;
             try
             {
-                submoduleStripper.StripSubmodules(originalWasmFile, outputWasmFile, originalFrameworkFile, outputFrameworkFile);
+                submoduleStripper.StripSubmodules(
+                    originalWasmFile,
+                    outputWasmFile,
+                    originalFrameworkFile,
+                    outputFrameworkFile
+                );
 
                 // stripping_info.json is always written next the the output wasm, move the info to our backup folder
-                var strippingInfoPath = Path.Combine(Path.GetDirectoryName(outputWasmFile), SubmoduleStripper.StrippingInfoFileName);
+                var strippingInfoPath = Path.Combine(
+                    Path.GetDirectoryName(outputWasmFile),
+                    SubmoduleStripper.StrippingInfoFileName
+                );
                 if (File.Exists(strippingInfoPath))
                 {
-                    var strippingInfoBakPath = Utils.GetBackupFileName(backupDirectory, SubmoduleStripper.StrippingInfoFileName, null);
+                    var strippingInfoBakPath = Utils.GetBackupFileName(
+                        backupDirectory,
+                        SubmoduleStripper.StrippingInfoFileName,
+                        null
+                    );
                     if (File.Exists(strippingInfoBakPath))
                         File.Delete(strippingInfoBakPath);
                     File.Move(strippingInfoPath, strippingInfoBakPath);

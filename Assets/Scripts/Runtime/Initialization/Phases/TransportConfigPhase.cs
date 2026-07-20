@@ -39,10 +39,8 @@ namespace NPCSystem.Initialization
                 NPCFlowLogLevel.Info,
                 "Network transport configuration applied.",
                 source: nameof(TransportConfigPhase),
-                data: new Dictionary<string, object>
-                {
-                    ["correlationId"] = ctx.CorrelationId
-                });
+                data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId }
+            );
 
             return Task.CompletedTask;
         }
@@ -54,13 +52,10 @@ namespace NPCSystem.Initialization
                 NPCFlowStatus.Error,
                 NPCFlowLogLevel.Error,
                 $"Required reference {refName} is not assigned. "
-                + "Wire it in the Inspector — FindAnyObjectByType is not used.",
+                    + "Wire it in the Inspector — FindAnyObjectByType is not used.",
                 source: nameof(TransportConfigPhase),
-                data: new Dictionary<string, object>
-                {
-                    ["correlationId"] = ctx.CorrelationId,
-                    ["missingRef"] = refName
-                });
+                data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId, ["missingRef"] = refName }
+            );
         }
     }
 }

@@ -13,7 +13,8 @@ namespace Unity.Entities
         /// <param name="query">The query whose entities should have their <typeparamref name="T"/> values gathered.</param>
         /// <typeparam name="T">The managed component type to gather</typeparam>
         /// <returns>A managed array of <typeparamref name="T"/> values for all entities that match the query.</returns>
-        public unsafe static T[] ToComponentArray<T>(this EntityQuery query) where T: class
+        public static unsafe T[] ToComponentArray<T>(this EntityQuery query)
+            where T : class
         {
             var entities = query.ToEntityArray(Allocator.Temp);
             int entityCount = entities.Length;

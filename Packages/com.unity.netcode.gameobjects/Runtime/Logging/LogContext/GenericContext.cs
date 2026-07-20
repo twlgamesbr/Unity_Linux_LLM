@@ -87,5 +87,4 @@ namespace Unity.Netcode.Logging
             }
         }
     }
-
 }

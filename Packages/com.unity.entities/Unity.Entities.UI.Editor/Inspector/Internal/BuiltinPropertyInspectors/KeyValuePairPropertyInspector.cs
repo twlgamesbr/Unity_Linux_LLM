@@ -19,6 +19,7 @@ namespace Unity.Entities.UI
             {
                 Key = key;
             }
+
             public readonly TKey Key;
         }
 
@@ -28,6 +29,7 @@ namespace Unity.Entities.UI
             {
                 Value = value;
             }
+
             public TValue Value;
         }
 

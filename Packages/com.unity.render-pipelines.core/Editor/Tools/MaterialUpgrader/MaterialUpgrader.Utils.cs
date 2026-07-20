@@ -12,7 +12,8 @@ namespace UnityEditor.Rendering
     /// </summary>
     public partial class MaterialUpgrader
     {
-internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Rendering)}.{nameof(MaterialUpgrader)}.ConfirmMaterialConversion";
+        internal static readonly string k_DialogKey =
+            $"{nameof(UnityEditor)}.{nameof(Rendering)}.{nameof(MaterialUpgrader)}.ConfirmMaterialConversion";
 
         #region Internal API
         /// <summary>
@@ -107,9 +108,13 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
                 if (obj is not MaterialUpgradeEntry other)
                     return false;
 
-                return Equals(MaterialInfo, other.MaterialInfo) &&
-                       AvailableForUpgrade == other.AvailableForUpgrade &&
-                       string.Equals(NotAvailableForUpgradeReason, other.NotAvailableForUpgradeReason, StringComparison.OrdinalIgnoreCase);
+                return Equals(MaterialInfo, other.MaterialInfo)
+                    && AvailableForUpgrade == other.AvailableForUpgrade
+                    && string.Equals(
+                        NotAvailableForUpgradeReason,
+                        other.NotAvailableForUpgradeReason,
+                        StringComparison.OrdinalIgnoreCase
+                    );
             }
 
             /// <summary>
@@ -159,9 +164,14 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
 
             return GetUpgrader(upgraders, material) != null;
         }
+
         /// Extracts shader paths from a list of upgraders into two sets:
         /// one for shaders to upgrade (old) and one for shaders already upgraded (new).
-        internal static void GetUpgraderShaderPaths(List<MaterialUpgrader> upgraders, out HashSet<string> oldShaders, out HashSet<string> newShaders)
+        internal static void GetUpgraderShaderPaths(
+            List<MaterialUpgrader> upgraders,
+            out HashSet<string> oldShaders,
+            out HashSet<string> newShaders
+        )
         {
             oldShaders = new HashSet<string>();
             newShaders = new HashSet<string>();
@@ -199,7 +209,7 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
                 ShaderName = material.shader.name,
                 IsVariant = material.isVariant,
                 BaseMaterialName = baseMaterial.name,
-                BaseMaterial = baseMaterial
+                BaseMaterial = baseMaterial,
             };
         }
 
@@ -217,7 +227,11 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
             return materialsInfo;
         }
 
-        internal static IEnumerable<MaterialUpgradeEntry> FetchUpgradeOptions(HashSet<string> upgradersAvailable, HashSet<string> shaderNamesToIgnore, List<MaterialInfo> materialInfo)
+        internal static IEnumerable<MaterialUpgradeEntry> FetchUpgradeOptions(
+            HashSet<string> upgradersAvailable,
+            HashSet<string> shaderNamesToIgnore,
+            List<MaterialInfo> materialInfo
+        )
         {
             foreach (var material in materialInfo)
             {
@@ -233,7 +247,7 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
                 {
                     MaterialInfo = material,
                     AvailableForUpgrade = isUpgradable,
-                    NotAvailableForUpgradeReason = reason
+                    NotAvailableForUpgradeReason = reason,
                 };
             }
         }
@@ -259,7 +273,10 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         /// An enumerable of <see cref="MaterialUpgradeEntry"/> representing each material and whether it can be upgraded.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="upgraders"/> is null.</exception>
-        internal static IEnumerable<MaterialUpgradeEntry> FetchUpgradeOptions(List<MaterialUpgrader> upgraders, List<Material> materials = null)
+        internal static IEnumerable<MaterialUpgradeEntry> FetchUpgradeOptions(
+            List<MaterialUpgrader> upgraders,
+            List<Material> materials = null
+        )
         {
             if (upgraders == null)
                 throw new ArgumentNullException(nameof(upgraders));
@@ -295,7 +312,8 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
             HashSet<string> shaderNamesToIgnore,
             string progressBarName,
             bool showProgressBar = true,
-            UpgradeFlags flags = UpgradeFlags.None)
+            UpgradeFlags flags = UpgradeFlags.None
+        )
         {
             s_UpgradeLog.Clear();
 
@@ -309,7 +327,13 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
 
                     if (showProgressBar)
                     {
-                        if (EditorUtility.DisplayCancelableProgressBar(progressBarName, $"({materialIndex} of {materialUpgrades.Count}) {entry.MaterialInfo.Name}", (float)materialIndex / (float)materialUpgrades.Count))
+                        if (
+                            EditorUtility.DisplayCancelableProgressBar(
+                                progressBarName,
+                                $"({materialIndex} of {materialUpgrades.Count}) {entry.MaterialInfo.Name}",
+                                (float)materialIndex / (float)materialUpgrades.Count
+                            )
+                        )
                         {
                             s_UpgradeLog.AppendLine("Process cancelled by user.");
                             break;
@@ -318,11 +342,15 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
 
                     if (!entry.AvailableForUpgrade || shaderNamesToIgnore.Contains(entry.MaterialInfo.ShaderName))
                     {
-                        s_UpgradeLog.AppendLine($"Skipping material: {entry.MaterialInfo.Name} - {entry.NotAvailableForUpgradeReason}");
+                        s_UpgradeLog.AppendLine(
+                            $"Skipping material: {entry.MaterialInfo.Name} - {entry.NotAvailableForUpgradeReason}"
+                        );
                     }
                     else
                     {
-                        s_UpgradeLog.AppendLine($"Upgrading material: {entry.MaterialInfo.Name} using shader: {entry.MaterialInfo.ShaderName}");
+                        s_UpgradeLog.AppendLine(
+                            $"Upgrading material: {entry.MaterialInfo.Name} using shader: {entry.MaterialInfo.ShaderName}"
+                        );
                         Upgrade(entry.MaterialInfo.Material, upgraders, flags);
                     }
                 }
@@ -336,7 +364,13 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
             return s_UpgradeLog.ToString();
         }
 
-        static void PerformUpgrade(List<MaterialUpgradeEntry> materialUpgrades, List<MaterialUpgrader> upgraders, HashSet<string> shaderNamesToIgnore, string progressBarName, UpgradeFlags flags = UpgradeFlags.None)
+        static void PerformUpgrade(
+            List<MaterialUpgradeEntry> materialUpgrades,
+            List<MaterialUpgrader> upgraders,
+            HashSet<string> shaderNamesToIgnore,
+            string progressBarName,
+            UpgradeFlags flags = UpgradeFlags.None
+        )
         {
             if (materialUpgrades == null || materialUpgrades.Count == 0)
             {
@@ -347,19 +381,34 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
             bool CanPerformUpgrade()
             {
                 const string title = "Confirm Material Conversion";
-                const string message = "This action will modify materials and cannot be easily undone. It is strongly recommended to have a backup or use version control before continuing.";
+                const string message =
+                    "This action will modify materials and cannot be easily undone. It is strongly recommended to have a backup or use version control before continuing.";
                 const string proceed = "Proceed";
                 const string cancel = "Cancel";
 
                 if (Application.isBatchMode)
                     return true;
 
-                return EditorUtility.DisplayDialog(title, message, proceed, cancel, DialogOptOutDecisionType.ForThisMachine, k_DialogKey);
+                return EditorUtility.DisplayDialog(
+                    title,
+                    message,
+                    proceed,
+                    cancel,
+                    DialogOptOutDecisionType.ForThisMachine,
+                    k_DialogKey
+                );
             }
 
             if (CanPerformUpgrade())
             {
-                string upgradeLog = PerformUpgradeInternal(materialUpgrades, upgraders, shaderNamesToIgnore, progressBarName, true, flags);
+                string upgradeLog = PerformUpgradeInternal(
+                    materialUpgrades,
+                    upgraders,
+                    shaderNamesToIgnore,
+                    progressBarName,
+                    true,
+                    flags
+                );
                 Debug.Log(upgradeLog);
             }
         }
@@ -389,7 +438,11 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         /// <param name="upgraders">List of upgraders.</param>
         /// <param name="progressBarName">Name of the progress bar.</param>
         /// <param name="flags">Material Upgrader flags.</param>
-        public static void UpgradeProjectFolder(List<MaterialUpgrader> upgraders, string progressBarName, UpgradeFlags flags = UpgradeFlags.None)
+        public static void UpgradeProjectFolder(
+            List<MaterialUpgrader> upgraders,
+            string progressBarName,
+            UpgradeFlags flags = UpgradeFlags.None
+        )
         {
             HashSet<string> shaderNamesToIgnore = new HashSet<string>();
             UpgradeProjectFolder(upgraders, shaderNamesToIgnore, progressBarName, flags);
@@ -403,7 +456,10 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         public static List<MaterialUpgrader> FetchAllUpgradersForPipeline(Type renderPipelineAssetType)
         {
             if (!typeof(RenderPipelineAsset).IsAssignableFrom(renderPipelineAssetType))
-                throw new ArgumentException($"Type '{renderPipelineAssetType.FullName}' must inherit from RenderPipelineAsset.", nameof(renderPipelineAssetType));
+                throw new ArgumentException(
+                    $"Type '{renderPipelineAssetType.FullName}' must inherit from RenderPipelineAsset.",
+                    nameof(renderPipelineAssetType)
+                );
 
             return MaterialUpgraderRegistry.instance.GetMaterialUpgradersForPipeline(renderPipelineAssetType);
         }
@@ -416,7 +472,7 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         public static List<Material> FetchAllUpgradableMaterialsForPipeline(Type renderPipelineAssetType)
         {
             var upgraders = FetchAllUpgradersForPipeline(renderPipelineAssetType);
-            
+
             if (upgraders == null || upgraders.Count == 0)
             {
                 Debug.LogWarning($"No material upgraders found for pipeline: {renderPipelineAssetType.Name}");
@@ -481,7 +537,12 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         /// <param name="flags">Material upgrader flags.</param>
         /// <param name="message">Error message to be outputted when no material upgraders are suitable for given material if the flags <see cref="UpgradeFlags.LogMessageWhenNoUpgraderFound"/> is used.</param>
         /// <returns>Returns true if the upgrader was found for the passed in material.</returns>
-        public static bool Upgrade(Material material, List<MaterialUpgrader> upgraders, UpgradeFlags flags, ref string message)
+        public static bool Upgrade(
+            Material material,
+            List<MaterialUpgrader> upgraders,
+            UpgradeFlags flags,
+            ref string message
+        )
         {
             if (material == null)
                 return false;
@@ -510,7 +571,12 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         /// <param name="shaderNamesToIgnore">Set of shader names to ignore.</param>
         /// <param name="progressBarName">Name of the progress bar.</param>
         /// <param name="flags">Material Upgrader flags.</param>
-        public static void UpgradeProjectFolder(List<MaterialUpgrader> upgraders, HashSet<string> shaderNamesToIgnore, string progressBarName, UpgradeFlags flags = UpgradeFlags.None)
+        public static void UpgradeProjectFolder(
+            List<MaterialUpgrader> upgraders,
+            HashSet<string> shaderNamesToIgnore,
+            string progressBarName,
+            UpgradeFlags flags = UpgradeFlags.None
+        )
         {
             using (ListPool<MaterialUpgradeEntry>.Get(out var tmp))
             {
@@ -525,7 +591,11 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         /// <param name="upgraders">List of upgraders.</param>
         /// <param name="progressBarName">Name of the progress bar.</param>
         /// <param name="flags">Material Upgrader flags.</param>
-        public static void UpgradeSelection(List<MaterialUpgrader> upgraders, string progressBarName, UpgradeFlags flags = UpgradeFlags.None)
+        public static void UpgradeSelection(
+            List<MaterialUpgrader> upgraders,
+            string progressBarName,
+            UpgradeFlags flags = UpgradeFlags.None
+        )
         {
             HashSet<string> shaderNamesToIgnore = new HashSet<string>();
             UpgradeSelection(upgraders, shaderNamesToIgnore, progressBarName, flags);
@@ -538,7 +608,12 @@ internal static readonly string k_DialogKey = $"{nameof(UnityEditor)}.{nameof(Re
         /// <param name="shaderNamesToIgnore">Set of shader names to ignore.</param>
         /// <param name="progressBarName">Name of the progress bar.</param>
         /// <param name="flags">Material Upgrader flags.</param>
-        public static void UpgradeSelection(List<MaterialUpgrader> upgraders, HashSet<string> shaderNamesToIgnore, string progressBarName, UpgradeFlags flags = UpgradeFlags.None)
+        public static void UpgradeSelection(
+            List<MaterialUpgrader> upgraders,
+            HashSet<string> shaderNamesToIgnore,
+            string progressBarName,
+            UpgradeFlags flags = UpgradeFlags.None
+        )
         {
             using (ListPool<MaterialUpgradeEntry>.Get(out var tmp))
             {

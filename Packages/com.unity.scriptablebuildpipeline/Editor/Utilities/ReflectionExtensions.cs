@@ -18,18 +18,36 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
         static ReflectionExtensions()
         {
-            WriteResult_SerializedObjects = typeof(WriteResult).GetField("m_SerializedObjects", BindingFlags.NonPublic | BindingFlags.Instance);
-            WriteResult_ResourceFiles = typeof(WriteResult).GetField("m_ResourceFiles", BindingFlags.NonPublic | BindingFlags.Instance);
-            SceneDependencyInfo_Scene =  typeof(SceneDependencyInfo).GetField("m_Scene", BindingFlags.Instance | BindingFlags.NonPublic);
-            SceneDependencyInfo_ProcessedScene = typeof(SceneDependencyInfo).GetField("m_ProcessedScene", BindingFlags.Instance | BindingFlags.NonPublic);
-            SceneDependencyInfo_ReferencedObjects = typeof(SceneDependencyInfo).GetField("m_ReferencedObjects", BindingFlags.Instance | BindingFlags.NonPublic);
+            WriteResult_SerializedObjects = typeof(WriteResult).GetField(
+                "m_SerializedObjects",
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+            WriteResult_ResourceFiles = typeof(WriteResult).GetField(
+                "m_ResourceFiles",
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+            SceneDependencyInfo_Scene = typeof(SceneDependencyInfo).GetField(
+                "m_Scene",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            SceneDependencyInfo_ProcessedScene = typeof(SceneDependencyInfo).GetField(
+                "m_ProcessedScene",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            SceneDependencyInfo_ReferencedObjects = typeof(SceneDependencyInfo).GetField(
+                "m_ReferencedObjects",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
             BuildUsageTagSet_SupportsFilterToSubset = typeof(BuildUsageTagSet).GetMethod("FilterToSubset") != null;
-            foreach (MethodInfo info in typeof(ContentBuildInterface).GetMethods().Where(x => x.Name == "ArchiveAndCompress"))
+            foreach (
+                MethodInfo info in typeof(ContentBuildInterface).GetMethods().Where(x => x.Name == "ArchiveAndCompress")
+            )
             {
                 foreach (var attr in info.CustomAttributes)
                 {
-                    ContentBuildInterface_SupportsMultiThreadedArchiving = attr.AttributeType.Name == "ThreadSafeAttribute";
+                    ContentBuildInterface_SupportsMultiThreadedArchiving =
+                        attr.AttributeType.Name == "ThreadSafeAttribute";
                     if (ContentBuildInterface_SupportsMultiThreadedArchiving)
                         break;
                 }
@@ -61,7 +79,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
             dependencyInfo = (SceneDependencyInfo)boxed;
         }
 
-        public static void SetReferencedObjects(this ref SceneDependencyInfo dependencyInfo, ObjectIdentifier[] references)
+        public static void SetReferencedObjects(
+            this ref SceneDependencyInfo dependencyInfo,
+            ObjectIdentifier[] references
+        )
         {
             object boxed = dependencyInfo;
             SceneDependencyInfo_ReferencedObjects.SetValue(boxed, references);

@@ -23,10 +23,28 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         private static class Strings
         {
-            public static readonly NameAndTooltip ClearRenderTargetsAtCreation = new() { name = "Clear Render Targets At Creation", tooltip = "Enable to clear all render textures before any rendergraph passes to check if some clears are missing." };
-            public static readonly NameAndTooltip ClearRenderTargetsAtFree = new() { name = "Clear Render Targets When Freed", tooltip = "Enable to clear all render textures when textures are freed by the graph to detect use after free of textures." };
-            public static readonly NameAndTooltip DisablePassCulling = new() { name = "Disable Pass Culling", tooltip = "Enable to temporarily disable culling to assess if a pass is culled." };
-            public static readonly NameAndTooltip DisablePassMerging = new() { name = "Disable Pass Merging", tooltip = "Enable to temporarily disable pass merging to diagnose issues or analyze performance." };
+            public static readonly NameAndTooltip ClearRenderTargetsAtCreation = new()
+            {
+                name = "Clear Render Targets At Creation",
+                tooltip =
+                    "Enable to clear all render textures before any rendergraph passes to check if some clears are missing.",
+            };
+            public static readonly NameAndTooltip ClearRenderTargetsAtFree = new()
+            {
+                name = "Clear Render Targets When Freed",
+                tooltip =
+                    "Enable to clear all render textures when textures are freed by the graph to detect use after free of textures.",
+            };
+            public static readonly NameAndTooltip DisablePassCulling = new()
+            {
+                name = "Disable Pass Culling",
+                tooltip = "Enable to temporarily disable culling to assess if a pass is culled.",
+            };
+            public static readonly NameAndTooltip DisablePassMerging = new()
+            {
+                name = "Disable Pass Merging",
+                tooltip = "Enable to temporarily disable pass merging to diagnose issues or analyze performance.",
+            };
         }
 
         internal List<DebugUI.Widget> GetWidgetList(string name)
@@ -42,13 +60,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
                         {
                             nameAndTooltip = Strings.ClearRenderTargetsAtCreation,
                             getter = () => clearRenderTargetsAtCreation,
-                            setter = value => clearRenderTargetsAtCreation = value
+                            setter = value => clearRenderTargetsAtCreation = value,
                         },
                         new DebugUI.BoolField
                         {
                             nameAndTooltip = Strings.ClearRenderTargetsAtFree,
                             getter = () => clearRenderTargetsAtRelease,
-                            setter = value => clearRenderTargetsAtRelease = value
+                            setter = value => clearRenderTargetsAtRelease = value,
                         },
                         // We cannot expose this option as it will change the active render target and the debug menu won't know where to render itself anymore.
                         //    list.Add(new DebugUI.BoolField { displayName = "Clear Render Targets at release", getter = () => clearRenderTargetsAtRelease, setter = value => clearRenderTargetsAtRelease = value });
@@ -56,16 +74,16 @@ namespace UnityEngine.Rendering.RenderGraphModule
                         {
                             nameAndTooltip = Strings.DisablePassCulling,
                             getter = () => disablePassCulling,
-                            setter = value => disablePassCulling = value
+                            setter = value => disablePassCulling = value,
                         },
                         new DebugUI.BoolField
                         {
                             nameAndTooltip = Strings.DisablePassMerging,
                             getter = () => disablePassMerging,
                             setter = value => disablePassMerging = value,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             return list;
@@ -75,9 +93,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             var list = GetWidgetList(name);
             m_DebugItems = list.ToArray();
-            m_DebugPanel = debugPanel != null ? debugPanel : DebugManager.instance.GetPanel(name.Length == 0 ? "Rendering" : name, true);
+            m_DebugPanel =
+                debugPanel != null
+                    ? debugPanel
+                    : DebugManager.instance.GetPanel(name.Length == 0 ? "Rendering" : name, true);
 
-            var foldout = new DebugUI.Foldout() { displayName = name, };
+            var foldout = new DebugUI.Foldout() { displayName = name };
             foldout.children.Add(m_DebugItems);
             m_DebugPanel.children.Add(foldout);
         }
@@ -85,7 +106,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         public void UnRegisterDebug(string name)
         {
             //DebugManager.instance.RemovePanel(name.Length == 0 ? "Render Graph" : name);
-            if ( m_DebugPanel != null )
+            if (m_DebugPanel != null)
                 m_DebugPanel.children.Remove(m_DebugItems);
             m_DebugPanel = null;
             m_DebugItems = null;
@@ -95,10 +116,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             get
             {
-                return clearRenderTargetsAtCreation ||
-                       clearRenderTargetsAtRelease ||
-                       disablePassCulling ||
-                       disablePassMerging;
+                return clearRenderTargetsAtCreation
+                    || clearRenderTargetsAtRelease
+                    || disablePassCulling
+                    || disablePassMerging;
             }
         }
     }

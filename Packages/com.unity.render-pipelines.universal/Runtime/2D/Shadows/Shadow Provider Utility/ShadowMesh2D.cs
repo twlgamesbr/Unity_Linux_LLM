@@ -16,27 +16,44 @@ namespace UnityEngine.Rendering.Universal
             Clipping,
         }
 
-        [NonSerialized]  Mesh               m_Mesh;
-        [NonSerialized]  bool               m_IsDirty;
-        [SerializeField] ShadowMeshVertex[] m_Vertices;
-        [SerializeField] int[]              m_Indices;
+        [NonSerialized]
+        Mesh m_Mesh;
 
-        NativeArray<ShadowMeshVertex>       m_NativeVertices;
-        NativeArray<int>                    m_NativeIndices;
+        [NonSerialized]
+        bool m_IsDirty;
 
+        [SerializeField]
+        ShadowMeshVertex[] m_Vertices;
 
-        [SerializeField] Bounds m_LocalBounds;
-        [SerializeField] EdgeProcessing m_EdgeProcessing = EdgeProcessing.Clipping;
-        [SerializeField] float m_TrimEdge = k_TrimEdgeUninitialized;
-        [SerializeField] bool  m_FlipX;
-        [SerializeField] bool  m_FlipY;
-        [SerializeField] float m_InitialTrim = 0;
+        [SerializeField]
+        int[] m_Indices;
 
-        public  Mesh mesh
+        NativeArray<ShadowMeshVertex> m_NativeVertices;
+        NativeArray<int> m_NativeIndices;
+
+        [SerializeField]
+        Bounds m_LocalBounds;
+
+        [SerializeField]
+        EdgeProcessing m_EdgeProcessing = EdgeProcessing.Clipping;
+
+        [SerializeField]
+        float m_TrimEdge = k_TrimEdgeUninitialized;
+
+        [SerializeField]
+        bool m_FlipX;
+
+        [SerializeField]
+        bool m_FlipY;
+
+        [SerializeField]
+        float m_InitialTrim = 0;
+
+        public Mesh mesh
         {
             get
             {
-                if(m_Mesh == null || m_Mesh.vertexCount == 0 || m_IsDirty)
+                if (m_Mesh == null || m_Mesh.vertexCount == 0 || m_IsDirty)
                     GenerateShadowMesh(ref m_Mesh, m_NativeVertices, m_NativeIndices);
 
                 return m_Mesh;
@@ -49,12 +66,23 @@ namespace UnityEngine.Rendering.Universal
             m_Indices = null;
         }
 
-        public  BoundingSphere boundingSphere { get => m_BoundingSphere; }
-        internal BoundingSphere m_BoundingSphere;   // update to world space
-        public EdgeProcessing edgeProcessing { get { return m_EdgeProcessing; } set { m_EdgeProcessing = value; } }
-        public float trimEdge { get { return m_TrimEdge; } set { m_TrimEdge = value; } }
+        public BoundingSphere boundingSphere
+        {
+            get => m_BoundingSphere;
+        }
+        internal BoundingSphere m_BoundingSphere; // update to world space
+        public EdgeProcessing edgeProcessing
+        {
+            get { return m_EdgeProcessing; }
+            set { m_EdgeProcessing = value; }
+        }
+        public float trimEdge
+        {
+            get { return m_TrimEdge; }
+            set { m_TrimEdge = value; }
+        }
 
-        static internal void DuplicateShadowMesh(Mesh source, out Mesh dest)
+        internal static void DuplicateShadowMesh(Mesh source, out Mesh dest)
         {
             // This is not gc tested as this generates garbage
             dest = new Mesh();
@@ -71,7 +99,7 @@ namespace UnityEngine.Rendering.Universal
 
         internal void OnBeforeSerialize()
         {
-            if(m_NativeVertices.IsCreated)
+            if (m_NativeVertices.IsCreated)
                 m_Vertices = m_NativeVertices.ToArray();
 
             if (m_NativeIndices.IsCreated)
@@ -80,11 +108,11 @@ namespace UnityEngine.Rendering.Universal
 
         internal void OnAfterDeserialize()
         {
-            if(m_NativeVertices.IsCreated)
+            if (m_NativeVertices.IsCreated)
                 m_NativeVertices.Dispose();
             m_NativeVertices = new NativeArray<ShadowMeshVertex>(m_Vertices, Allocator.Persistent);
 
-            if(m_NativeIndices.IsCreated)
+            if (m_NativeIndices.IsCreated)
                 m_NativeIndices.Dispose();
             m_NativeIndices = new NativeArray<int>(m_Indices, Allocator.Persistent);
         }
@@ -97,11 +125,19 @@ namespace UnityEngine.Rendering.Universal
             m_LocalBounds = source.m_LocalBounds;
             m_EdgeProcessing = source.edgeProcessing;
             m_Vertices.CopyTo(source.m_Vertices, 0);
-            m_Indices.CopyTo(source.m_Indices,0);
+            m_Indices.CopyTo(source.m_Indices, 0);
             GenerateShadowMesh(ref m_Mesh, m_NativeVertices, m_NativeIndices);
         }
 
-        internal void AddCircle(Vector3 center, float r, NativeArray<Vector3> generatedVertices, NativeArray<int> generatedIndices, bool reverseWindingOrder, ref int vertexWritePos, ref int indexWritePos)
+        internal void AddCircle(
+            Vector3 center,
+            float r,
+            NativeArray<Vector3> generatedVertices,
+            NativeArray<int> generatedIndices,
+            bool reverseWindingOrder,
+            ref int vertexWritePos,
+            ref int indexWritePos
+        )
         {
             float direction = reverseWindingOrder ? 1 : -1;
 
@@ -120,7 +156,16 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        internal void AddCapsuleCap(Vector3 center, float r, Vector3 otherCenter, NativeArray<Vector3> generatedVertices, NativeArray<int> generatedIndices, bool reverseWindingOrder, ref int vertexWritePos, ref int indexWritePos)
+        internal void AddCapsuleCap(
+            Vector3 center,
+            float r,
+            Vector3 otherCenter,
+            NativeArray<Vector3> generatedVertices,
+            NativeArray<int> generatedIndices,
+            bool reverseWindingOrder,
+            ref int vertexWritePos,
+            ref int indexWritePos
+        )
         {
             float startAngle;
             float endAngle;
@@ -159,10 +204,24 @@ namespace UnityEngine.Rendering.Universal
                 generatedVertices[vertexWritePos++] = new Vector3(x, y, 0);
             }
             angle = deltaAngle + startAngle;
-            generatedVertices[vertexWritePos++] = new Vector3(r * Mathf.Cos(angle) + center.x, r * Mathf.Sin(angle) + center.y, 0);
+            generatedVertices[vertexWritePos++] = new Vector3(
+                r * Mathf.Cos(angle) + center.x,
+                r * Mathf.Sin(angle) + center.y,
+                0
+            );
         }
 
-        internal void AddCapsule(Vector3 pt0, Vector3 pt1, float r0, float r1, NativeArray<Vector3> generatedVertices, NativeArray<int> generatedIndices, bool reverseWindingOrder, ref int vertexWritePos, ref int indexWritePos)
+        internal void AddCapsule(
+            Vector3 pt0,
+            Vector3 pt1,
+            float r0,
+            float r1,
+            NativeArray<Vector3> generatedVertices,
+            NativeArray<int> generatedIndices,
+            bool reverseWindingOrder,
+            ref int vertexWritePos,
+            ref int indexWritePos
+        )
         {
             // Add Straight Segments
             Vector3 delta = (pt1 - pt0).normalized;
@@ -179,15 +238,41 @@ namespace UnityEngine.Rendering.Universal
             int circle0Start = vertexWritePos;
 
             // Add circles
-            AddCapsuleCap(pt0, r0, pt1, generatedVertices, generatedIndices, reverseWindingOrder, ref vertexWritePos, ref indexWritePos);
+            AddCapsuleCap(
+                pt0,
+                r0,
+                pt1,
+                generatedVertices,
+                generatedIndices,
+                reverseWindingOrder,
+                ref vertexWritePos,
+                ref indexWritePos
+            );
             generatedIndices[indexWritePos++] = vertexWritePos - 1;
             generatedIndices[indexWritePos++] = vertexWritePos;
-            AddCapsuleCap(pt1, r1, pt0, generatedVertices, generatedIndices, reverseWindingOrder, ref vertexWritePos, ref indexWritePos);
+            AddCapsuleCap(
+                pt1,
+                r1,
+                pt0,
+                generatedVertices,
+                generatedIndices,
+                reverseWindingOrder,
+                ref vertexWritePos,
+                ref indexWritePos
+            );
             generatedIndices[indexWritePos++] = vertexWritePos - 1;
             generatedIndices[indexWritePos++] = circle0Start;
         }
 
-        internal int AddShape(NativeArray<Vector3> vertices, NativeArray<int> indices, int indicesProcessed, NativeArray<Vector3> generatedVertices, NativeArray<int> generatedIndices, ref int vertexWritePos, ref int indexWritePos)
+        internal int AddShape(
+            NativeArray<Vector3> vertices,
+            NativeArray<int> indices,
+            int indicesProcessed,
+            NativeArray<Vector3> generatedVertices,
+            NativeArray<int> generatedIndices,
+            ref int vertexWritePos,
+            ref int indexWritePos
+        )
         {
             int indexToProcess = indicesProcessed;
             int prevIndex = indices[indexToProcess];
@@ -197,7 +282,7 @@ namespace UnityEngine.Rendering.Universal
             generatedVertices[vertexWritePos++] = vertices[prevIndex];
 
             bool continueProcessing = true;
-            while (indexToProcess < indices.Length  && continueProcessing)
+            while (indexToProcess < indices.Length && continueProcessing)
             {
                 int index0 = indices[indexToProcess++];
                 int index1 = indices[indexToProcess++];
@@ -222,7 +307,15 @@ namespace UnityEngine.Rendering.Universal
             return indexToProcess;
         }
 
-        public override void SetShape(NativeArray<Vector3> vertices, NativeArray<int> indices, NativeArray<float> radii, Matrix4x4 transform, ShadowShape2D.WindingOrder windingOrder = ShadowShape2D.WindingOrder.Clockwise, bool allowTriming = true, bool createInteriorGeometry = false)
+        public override void SetShape(
+            NativeArray<Vector3> vertices,
+            NativeArray<int> indices,
+            NativeArray<float> radii,
+            Matrix4x4 transform,
+            ShadowShape2D.WindingOrder windingOrder = ShadowShape2D.WindingOrder.Clockwise,
+            bool allowTriming = true,
+            bool createInteriorGeometry = false
+        )
         {
             if (m_TrimEdge == k_TrimEdgeUninitialized)
                 m_TrimEdge = m_InitialTrim;
@@ -234,7 +327,6 @@ namespace UnityEngine.Rendering.Universal
             }
 
             bool reverseWindingOrder = windingOrder == ShadowShape2D.WindingOrder.CounterClockwise;
-
 
             int circleCount = 0;
             int capsuleCount = 0;
@@ -253,12 +345,12 @@ namespace UnityEngine.Rendering.Universal
             }
 
             int capsuleStraightSegments = capsuleCount * 2;
-            int capsuleCapSegments = capsuleCount * k_CapsuleCapSegments;  // This can be refined later
+            int capsuleCapSegments = capsuleCount * k_CapsuleCapSegments; // This can be refined later
             int circleSegments = circleCount * 2 * k_CapsuleCapSegments;
 
             int lineCount = (indices.Length >> 1) - (capsuleCount + circleCount);
             int indexCount = 2 * (lineCount + capsuleStraightSegments + (2 * capsuleCapSegments) + circleSegments);
-            int vertexCount = indexCount;  // Keep this simple for now
+            int vertexCount = indexCount; // Keep this simple for now
 
             NativeArray<Vector3> generatedVertices = new NativeArray<Vector3>(vertexCount, Allocator.Temp);
             NativeArray<int> generatedIndices = new NativeArray<int>(indexCount, Allocator.Temp);
@@ -280,16 +372,42 @@ namespace UnityEngine.Rendering.Universal
                     Vector3 pt1 = vertices[v1];
 
                     if (vertices[v0].x == vertices[v1].x && vertices[v0].y == vertices[v1].y)
-                        AddCircle(pt0, r0, generatedVertices, generatedIndices, reverseWindingOrder, ref vertexWritePos, ref indexWritePos);
+                        AddCircle(
+                            pt0,
+                            r0,
+                            generatedVertices,
+                            generatedIndices,
+                            reverseWindingOrder,
+                            ref vertexWritePos,
+                            ref indexWritePos
+                        );
                     else
-                        AddCapsule(pt0, pt1, r0, r1, generatedVertices, generatedIndices, reverseWindingOrder, ref vertexWritePos, ref indexWritePos);
+                        AddCapsule(
+                            pt0,
+                            pt1,
+                            r0,
+                            r1,
+                            generatedVertices,
+                            generatedIndices,
+                            reverseWindingOrder,
+                            ref vertexWritePos,
+                            ref indexWritePos
+                        );
 
                     indicesProcessed += 2;
                 }
                 else
                 {
                     // Will add edges or polygons
-                    indicesProcessed = AddShape(vertices, indices, indicesProcessed, generatedVertices, generatedIndices, ref vertexWritePos, ref indexWritePos);
+                    indicesProcessed = AddShape(
+                        vertices,
+                        indices,
+                        indicesProcessed,
+                        generatedVertices,
+                        generatedIndices,
+                        ref vertexWritePos,
+                        ref indexWritePos
+                    );
                 }
             }
 
@@ -300,7 +418,12 @@ namespace UnityEngine.Rendering.Universal
             NativeArray<int> calculatedStartingEdges;
             NativeArray<bool> calculatedIsClosedArray;
 
-            ShadowUtility.CalculateEdgesFromLines(ref generatedIndices, out calculatedEdges, out calculatedStartingEdges, out calculatedIsClosedArray);
+            ShadowUtility.CalculateEdgesFromLines(
+                ref generatedIndices,
+                out calculatedEdges,
+                out calculatedStartingEdges,
+                out calculatedIsClosedArray
+            );
 
             if (reverseWindingOrder)
                 ShadowUtility.ReverseWindingOrder(ref calculatedStartingEdges, ref calculatedEdges);
@@ -311,11 +434,30 @@ namespace UnityEngine.Rendering.Universal
                 NativeArray<ShadowEdge> clippedEdges;
                 NativeArray<int> clippedStartingIndices;
 
-                ShadowUtility.ClipEdges(ref generatedVertices, ref calculatedEdges, ref calculatedStartingEdges, ref calculatedIsClosedArray, trimEdge, out clippedVertices, out clippedEdges, out clippedStartingIndices);
+                ShadowUtility.ClipEdges(
+                    ref generatedVertices,
+                    ref calculatedEdges,
+                    ref calculatedStartingEdges,
+                    ref calculatedIsClosedArray,
+                    trimEdge,
+                    out clippedVertices,
+                    out clippedEdges,
+                    out clippedStartingIndices
+                );
 
                 if (clippedStartingIndices.Length > 0)
                 {
-                    m_LocalBounds = ShadowUtility.GenerateShadowGeometry(ref m_NativeVertices, ref m_NativeIndices, clippedVertices, clippedEdges, clippedStartingIndices, calculatedIsClosedArray, true, createInteriorGeometry, ShadowShape2D.OutlineTopology.Lines);
+                    m_LocalBounds = ShadowUtility.GenerateShadowGeometry(
+                        ref m_NativeVertices,
+                        ref m_NativeIndices,
+                        clippedVertices,
+                        clippedEdges,
+                        clippedStartingIndices,
+                        calculatedIsClosedArray,
+                        true,
+                        createInteriorGeometry,
+                        ShadowShape2D.OutlineTopology.Lines
+                    );
                     m_IsDirty = true;
                 }
                 else
@@ -330,7 +472,17 @@ namespace UnityEngine.Rendering.Universal
             }
             else
             {
-                m_LocalBounds = ShadowUtility.GenerateShadowGeometry(ref m_NativeVertices, ref m_NativeIndices, generatedVertices, calculatedEdges, calculatedStartingEdges, calculatedIsClosedArray, true, createInteriorGeometry, ShadowShape2D.OutlineTopology.Lines);
+                m_LocalBounds = ShadowUtility.GenerateShadowGeometry(
+                    ref m_NativeVertices,
+                    ref m_NativeIndices,
+                    generatedVertices,
+                    calculatedEdges,
+                    calculatedStartingEdges,
+                    calculatedIsClosedArray,
+                    true,
+                    createInteriorGeometry,
+                    ShadowShape2D.OutlineTopology.Lines
+                );
                 m_IsDirty = true;
             }
 
@@ -339,9 +491,7 @@ namespace UnityEngine.Rendering.Universal
             calculatedEdges.Dispose();
             calculatedIsClosedArray.Dispose();
             calculatedStartingEdges.Dispose();
-
         }
-
 
         bool AreDegenerateVertices(NativeArray<Vector3> vertices)
         {
@@ -350,7 +500,7 @@ namespace UnityEngine.Rendering.Universal
 
             // This should is a trade off between perfomance and accuracy. This may need to be refined later if we find cases where this is not good enough.
             int prevIndex = vertices.Length - 1;
-            for (int i=0;i< vertices.Length; i++)
+            for (int i = 0; i < vertices.Length; i++)
             {
                 if (vertices[prevIndex].x != vertices[i].x || vertices[prevIndex].y != vertices[i].y)
                     return false;
@@ -361,7 +511,14 @@ namespace UnityEngine.Rendering.Universal
             return true;
         }
 
-        public override void SetShape(NativeArray<Vector3> vertices, NativeArray<int> indices, ShadowShape2D.OutlineTopology outlineTopology, ShadowShape2D.WindingOrder windingOrder = ShadowShape2D.WindingOrder.Clockwise, bool allowTrimming = true,  bool createInteriorGeometry = false)
+        public override void SetShape(
+            NativeArray<Vector3> vertices,
+            NativeArray<int> indices,
+            ShadowShape2D.OutlineTopology outlineTopology,
+            ShadowShape2D.WindingOrder windingOrder = ShadowShape2D.WindingOrder.Clockwise,
+            bool allowTrimming = true,
+            bool createInteriorGeometry = false
+        )
         {
             if (AreDegenerateVertices(vertices) || indices == null || indices.Length == 0)
             {
@@ -372,7 +529,6 @@ namespace UnityEngine.Rendering.Universal
             if (m_TrimEdge == k_TrimEdgeUninitialized)
                 m_TrimEdge = m_InitialTrim;
 
-
             bool disposeVertices = false;
             NativeArray<ShadowEdge> edges;
             NativeArray<int> shapeStartingIndices;
@@ -381,14 +537,27 @@ namespace UnityEngine.Rendering.Universal
             if (outlineTopology == ShadowShape2D.OutlineTopology.Triangles)
             {
                 NativeArray<Vector3> newVertices;
-                ShadowUtility.CalculateEdgesFromTriangles(ref vertices, ref indices, true, out newVertices, out edges, out shapeStartingIndices, out shapeIsClosedArray);
+                ShadowUtility.CalculateEdgesFromTriangles(
+                    ref vertices,
+                    ref indices,
+                    true,
+                    out newVertices,
+                    out edges,
+                    out shapeStartingIndices,
+                    out shapeIsClosedArray
+                );
 
                 disposeVertices = true;
                 vertices = newVertices;
             }
             else // if (outlineTopology == ShadowShape2D.OutlineTopology.Lines)
             {
-                ShadowUtility.CalculateEdgesFromLines(ref indices, out edges, out shapeStartingIndices, out shapeIsClosedArray);
+                ShadowUtility.CalculateEdgesFromLines(
+                    ref indices,
+                    out edges,
+                    out shapeStartingIndices,
+                    out shapeIsClosedArray
+                );
             }
 
             if (windingOrder == ShadowShape2D.WindingOrder.CounterClockwise)
@@ -401,9 +570,28 @@ namespace UnityEngine.Rendering.Universal
                 NativeArray<ShadowEdge> clippedEdges;
                 NativeArray<int> clippedStartingIndices;
 
-                ShadowUtility.ClipEdges(ref vertices, ref edges, ref shapeStartingIndices, ref shapeIsClosedArray, trimEdge, out clippedVertices, out clippedEdges, out clippedStartingIndices);
+                ShadowUtility.ClipEdges(
+                    ref vertices,
+                    ref edges,
+                    ref shapeStartingIndices,
+                    ref shapeIsClosedArray,
+                    trimEdge,
+                    out clippedVertices,
+                    out clippedEdges,
+                    out clippedStartingIndices
+                );
 
-                m_LocalBounds = ShadowUtility.GenerateShadowGeometry(ref m_NativeVertices, ref m_NativeIndices, clippedVertices, clippedEdges, clippedStartingIndices, shapeIsClosedArray, allowTrimming, createInteriorGeometry, outlineTopology);
+                m_LocalBounds = ShadowUtility.GenerateShadowGeometry(
+                    ref m_NativeVertices,
+                    ref m_NativeIndices,
+                    clippedVertices,
+                    clippedEdges,
+                    clippedStartingIndices,
+                    shapeIsClosedArray,
+                    allowTrimming,
+                    createInteriorGeometry,
+                    outlineTopology
+                );
                 m_IsDirty = true;
 
                 clippedVertices.Dispose();
@@ -412,7 +600,17 @@ namespace UnityEngine.Rendering.Universal
             }
             else
             {
-                m_LocalBounds = ShadowUtility.GenerateShadowGeometry(ref m_NativeVertices, ref m_NativeIndices, vertices, edges, shapeStartingIndices, shapeIsClosedArray, allowTrimming, createInteriorGeometry, outlineTopology);
+                m_LocalBounds = ShadowUtility.GenerateShadowGeometry(
+                    ref m_NativeVertices,
+                    ref m_NativeIndices,
+                    vertices,
+                    edges,
+                    shapeStartingIndices,
+                    shapeIsClosedArray,
+                    allowTrimming,
+                    createInteriorGeometry,
+                    outlineTopology
+                );
                 m_IsDirty = true;
             }
 
@@ -421,7 +619,7 @@ namespace UnityEngine.Rendering.Universal
 
             ShadowUtility.GenerateShadowMesh(ref m_Mesh, m_NativeVertices, m_NativeIndices);
 
-            if(disposeVertices)
+            if (disposeVertices)
                 vertices.Dispose();
 
             edges.Dispose();
@@ -444,7 +642,6 @@ namespace UnityEngine.Rendering.Universal
         {
             flipX = m_FlipX;
             flipY = m_FlipY;
-
         }
 
         public override void SetDefaultTrim(float trim)
@@ -464,10 +661,10 @@ namespace UnityEngine.Rendering.Universal
 
         ~ShadowMesh2D()
         {
-            if(m_NativeIndices.IsCreated)
+            if (m_NativeIndices.IsCreated)
                 m_NativeIndices.Dispose();
 
-            if(m_NativeVertices.IsCreated)
+            if (m_NativeVertices.IsCreated)
                 m_NativeVertices.Dispose();
         }
     }

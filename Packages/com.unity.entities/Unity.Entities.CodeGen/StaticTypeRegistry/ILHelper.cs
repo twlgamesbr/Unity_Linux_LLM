@@ -9,7 +9,12 @@ namespace Unity.Entities.CodeGen
     {
         // Annoyingly cecil's il.Emit API doesn't allow generic operand values so we have a variety of
         // helper functions that all do similar things with only the input list type varying
-        public static void StoreStringArrayInField(ILProcessor il, List<string> values, FieldReference fieldRef, bool isStaticField)
+        public static void StoreStringArrayInField(
+            ILProcessor il,
+            List<string> values,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
             var stringTypeRef = il.Body.Method.Module.ImportReference(typeof(string));
 
@@ -24,7 +29,12 @@ namespace Unity.Entities.CodeGen
             StoreTopOfStackToField(il, fieldRef, isStaticField);
         }
 
-        public static void StoreBoolArrayInField(ILProcessor il, List<bool> values, FieldReference fieldRef, bool isStaticField)
+        public static void StoreBoolArrayInField(
+            ILProcessor il,
+            List<bool> values,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
             var boolTypeDef = il.Body.Method.Module.ImportReference(typeof(bool));
 
@@ -39,7 +49,12 @@ namespace Unity.Entities.CodeGen
             StoreTopOfStackToField(il, fieldRef, isStaticField);
         }
 
-        public static void StoreIntArrayInField(ILProcessor il, List<int> values, FieldReference fieldRef, bool isStaticField)
+        public static void StoreIntArrayInField(
+            ILProcessor il,
+            List<int> values,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
             var boolTypeDef = il.Body.Method.Module.ImportReference(typeof(int));
 
@@ -64,8 +79,8 @@ namespace Unity.Entities.CodeGen
 
         public static void PushNewArray(ILProcessor il, TypeReference elementTypeRef, int arraySize)
         {
-            EmitLoadConstant(il, arraySize);                    // Push Array Size
-            il.Emit(OpCodes.Newarr, elementTypeRef);    // Push array reference to top of stack
+            EmitLoadConstant(il, arraySize); // Push Array Size
+            il.Emit(OpCodes.Newarr, elementTypeRef); // Push array reference to top of stack
         }
 
         /// <summary>
@@ -73,7 +88,7 @@ namespace Unity.Entities.CodeGen
         /// </summary>
         public static void PushNewArrayElement(ILProcessor il, int elementIndex)
         {
-            il.Emit(OpCodes.Dup);       // Duplicate top of stack (the array)
+            il.Emit(OpCodes.Dup); // Duplicate top of stack (the array)
             EmitLoadConstant(il, elementIndex); // Push array index onto the stack
         }
 
@@ -84,27 +99,38 @@ namespace Unity.Entities.CodeGen
                 switch (val)
                 {
                     case -1:
-                        il.Emit(OpCodes.Ldc_I4_M1); break;
+                        il.Emit(OpCodes.Ldc_I4_M1);
+                        break;
                     case 0:
-                        il.Emit(OpCodes.Ldc_I4_0); break;
+                        il.Emit(OpCodes.Ldc_I4_0);
+                        break;
                     case 1:
-                        il.Emit(OpCodes.Ldc_I4_1); break;
+                        il.Emit(OpCodes.Ldc_I4_1);
+                        break;
                     case 2:
-                        il.Emit(OpCodes.Ldc_I4_2); break;
+                        il.Emit(OpCodes.Ldc_I4_2);
+                        break;
                     case 3:
-                        il.Emit(OpCodes.Ldc_I4_3); break;
+                        il.Emit(OpCodes.Ldc_I4_3);
+                        break;
                     case 4:
-                        il.Emit(OpCodes.Ldc_I4_4); break;
+                        il.Emit(OpCodes.Ldc_I4_4);
+                        break;
                     case 5:
-                        il.Emit(OpCodes.Ldc_I4_5); break;
+                        il.Emit(OpCodes.Ldc_I4_5);
+                        break;
                     case 6:
-                        il.Emit(OpCodes.Ldc_I4_6); break;
+                        il.Emit(OpCodes.Ldc_I4_6);
+                        break;
                     case 7:
-                        il.Emit(OpCodes.Ldc_I4_7); break;
+                        il.Emit(OpCodes.Ldc_I4_7);
+                        break;
                     case 8:
-                        il.Emit(OpCodes.Ldc_I4_8); break;
+                        il.Emit(OpCodes.Ldc_I4_8);
+                        break;
                     default:
-                        il.Emit(OpCodes.Ldc_I4_S, (sbyte)val); break;
+                        il.Emit(OpCodes.Ldc_I4_S, (sbyte)val);
+                        break;
                 }
             }
             else

@@ -2,14 +2,15 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Unity.Scenes.Hybrid.Tests.Editmode.Content")]
 [assembly: InternalsVisibleTo("Unity.Environment.Editor")]
+
 namespace Unity.Scenes.Editor
 {
     internal class SubSceneContextMenu
@@ -19,15 +20,22 @@ namespace Unity.Scenes.Editor
         internal enum NewSubSceneMode
         {
             EmptyScene,
-            MoveSelectionToScene
+            MoveSelectionToScene,
         }
 
         internal struct NewSubSceneArgs
         {
-            public NewSubSceneArgs(GameObject target, Scene parentScene, NewSubSceneMode mode, string defaultFilename = null)
+            public NewSubSceneArgs(
+                GameObject target,
+                Scene parentScene,
+                NewSubSceneMode mode,
+                string defaultFilename = null
+            )
             {
                 if (target == null && !parentScene.isLoaded)
-                    throw new ArgumentException("Missing info for new Sub Scene: Neither GameObject target nor parent scene is valid");
+                    throw new ArgumentException(
+                        "Missing info for new Sub Scene: Neither GameObject target nor parent scene is valid"
+                    );
                 this.target = target;
                 this.parentScene = target != null ? target.scene : parentScene;
                 newSubSceneMode = mode;
@@ -40,14 +48,24 @@ namespace Unity.Scenes.Editor
             public string defaultFilename;
         }
 
-        internal static SubScene CreateNewSubSceneAtPath(string path, NewSubSceneArgs args, InteractionMode interactionMode)
+        internal static SubScene CreateNewSubSceneAtPath(
+            string path,
+            NewSubSceneArgs args,
+            InteractionMode interactionMode
+        )
         {
             GameObject targetGameObject;
             Scene parentScene;
             GameObject[] topLevelGameObjects;
             CheckInputArguments(args, out parentScene, out targetGameObject, out topLevelGameObjects);
 
-            return CreateSubSceneAtPathAndMoveObjectsInside(parentScene, targetGameObject?.transform, topLevelGameObjects, path, interactionMode);
+            return CreateSubSceneAtPathAndMoveObjectsInside(
+                parentScene,
+                targetGameObject?.transform,
+                topLevelGameObjects,
+                path,
+                interactionMode
+            );
         }
 
         internal static SubScene CreateNewSubScene(string name, NewSubSceneArgs args, InteractionMode interactionMode)
@@ -57,15 +75,28 @@ namespace Unity.Scenes.Editor
             GameObject[] topLevelGameObjects;
             CheckInputArguments(args, out parentScene, out targetGameObject, out topLevelGameObjects);
 
-            return CreateSubSceneAndMoveObjectsInside(parentScene, targetGameObject?.transform, topLevelGameObjects, name, interactionMode);
+            return CreateSubSceneAndMoveObjectsInside(
+                parentScene,
+                targetGameObject?.transform,
+                topLevelGameObjects,
+                name,
+                interactionMode
+            );
         }
 
-        static void CheckInputArguments(NewSubSceneArgs args, out Scene parentScene, out GameObject targetGameObject, out GameObject[] topLevelGameObjects)
+        static void CheckInputArguments(
+            NewSubSceneArgs args,
+            out Scene parentScene,
+            out GameObject targetGameObject,
+            out GameObject[] topLevelGameObjects
+        )
         {
             targetGameObject = args.target;
             parentScene = targetGameObject != null ? targetGameObject.scene : args.parentScene;
             if (!parentScene.isLoaded && args.target == null)
-                throw new InvalidOperationException("Creating a Sub Scene needs a target GameObject or a valid parent Scene");
+                throw new InvalidOperationException(
+                    "Creating a Sub Scene needs a target GameObject or a valid parent Scene"
+                );
 
             switch (args.newSubSceneMode)
             {
@@ -82,9 +113,17 @@ namespace Unity.Scenes.Editor
             }
         }
 
-        internal static SubScene CreateSubSceneAndAddSelection(GameObject gameObject, InteractionMode interactionMode = InteractionMode.AutomatedAction)
+        internal static SubScene CreateSubSceneAndAddSelection(
+            GameObject gameObject,
+            InteractionMode interactionMode = InteractionMode.AutomatedAction
+        )
         {
-            var args = new NewSubSceneArgs(gameObject, default(Scene), NewSubSceneMode.MoveSelectionToScene, "New Sub Scene");
+            var args = new NewSubSceneArgs(
+                gameObject,
+                default(Scene),
+                NewSubSceneMode.MoveSelectionToScene,
+                "New Sub Scene"
+            );
 
             return CreateNewSubScene(gameObject.name, args, interactionMode);
         }
@@ -99,13 +138,23 @@ namespace Unity.Scenes.Editor
             var parentScene = target != null ? target.scene : GetLastRootScene();
             var validForEmptyScene = validTarget || !string.IsNullOrEmpty(parentScene.path);
             if (!EditorApplication.isPlaying && validForEmptyScene)
-                menu.AddItem(newEmptySubScene, false, OnMenuItemForNewSubScene, new NewSubSceneArgs(target, parentScene, NewSubSceneMode.EmptyScene, k_DefaultFilename));
+                menu.AddItem(
+                    newEmptySubScene,
+                    false,
+                    OnMenuItemForNewSubScene,
+                    new NewSubSceneArgs(target, parentScene, NewSubSceneMode.EmptyScene, k_DefaultFilename)
+                );
             else
                 menu.AddDisabledItem(newEmptySubScene);
 
             var addSubSceneContent = EditorGUIUtility.TrTextContent("New Sub Scene/From Selection...");
             if (!EditorApplication.isPlaying && validTarget)
-                menu.AddItem(addSubSceneContent, false, OnMenuItemForNewSubScene, new NewSubSceneArgs(target, default(Scene), NewSubSceneMode.MoveSelectionToScene, k_DefaultFilename));
+                menu.AddItem(
+                    addSubSceneContent,
+                    false,
+                    OnMenuItemForNewSubScene,
+                    new NewSubSceneArgs(target, default(Scene), NewSubSceneMode.MoveSelectionToScene, k_DefaultFilename)
+                );
             else
                 menu.AddDisabledItem(addSubSceneContent);
         }
@@ -126,7 +175,12 @@ namespace Unity.Scenes.Editor
             var newEmptySubScene = EditorGUIUtility.TrTextContent("New Empty Sub Scene...");
             var validTarget = target.isLoaded && !string.IsNullOrEmpty(target.path);
             if (!EditorApplication.isPlaying && validTarget)
-                menu.AddItem(newEmptySubScene, false, OnMenuItemForNewSubScene, new NewSubSceneArgs(null, target,  NewSubSceneMode.EmptyScene, k_DefaultFilename));
+                menu.AddItem(
+                    newEmptySubScene,
+                    false,
+                    OnMenuItemForNewSubScene,
+                    new NewSubSceneArgs(null, target, NewSubSceneMode.EmptyScene, k_DefaultFilename)
+                );
             else
                 menu.AddDisabledItem(newEmptySubScene);
         }
@@ -200,7 +254,9 @@ namespace Unity.Scenes.Editor
             var parentScene = args.parentScene.isLoaded ? args.parentScene : args.target.scene;
             var parentSceneName = Path.GetFileNameWithoutExtension(parentScene.path);
             var startFolder = Path.Combine(Path.GetDirectoryName(parentScene.path), parentSceneName);
-            var startPath = GetActualPathName(Path.Combine(startFolder, args.defaultFilename ?? k_DefaultFilename + ".unity"));
+            var startPath = GetActualPathName(
+                Path.Combine(startFolder, args.defaultFilename ?? k_DefaultFilename + ".unity")
+            );
             if (Directory.Exists(startFolder))
                 startPath = AssetDatabase.GenerateUniqueAssetPath(startPath);
 
@@ -209,19 +265,37 @@ namespace Unity.Scenes.Editor
                 Directory.CreateDirectory(startFolder);
 
             string savePath = string.Empty;
-            while(true)
+            while (true)
             {
-                savePath = EditorUtility.SaveFilePanelInProject("Create new Sub Scene", Path.GetFileNameWithoutExtension(startPath), "unity", "", startFolder);
+                savePath = EditorUtility.SaveFilePanelInProject(
+                    "Create new Sub Scene",
+                    Path.GetFileNameWithoutExtension(startPath),
+                    "unity",
+                    "",
+                    startFolder
+                );
                 if (string.IsNullOrEmpty(savePath))
                     break;
 
                 if (SubScene.AllSubScenes.Any(x => x.EditableScenePath == savePath))
                 {
-                    EditorUtility.DisplayDialog(L10n.Tr("Sub Scene Found"), L10n.Tr("Cannot overwrite a Sub Scene that is already part of the Hierarchy. Select another file path"), L10n.Tr("Ok"));
+                    EditorUtility.DisplayDialog(
+                        L10n.Tr("Sub Scene Found"),
+                        L10n.Tr(
+                            "Cannot overwrite a Sub Scene that is already part of the Hierarchy. Select another file path"
+                        ),
+                        L10n.Tr("Ok")
+                    );
                 }
                 else if (SceneManager.GetSceneByPath(savePath).IsValid())
                 {
-                    EditorUtility.DisplayDialog(L10n.Tr("Scene Already Open"), L10n.Tr("Cannot overwrite a Scene that is already open in the Hierarchy. Select another file path"), L10n.Tr("Ok"));
+                    EditorUtility.DisplayDialog(
+                        L10n.Tr("Scene Already Open"),
+                        L10n.Tr(
+                            "Cannot overwrite a Scene that is already open in the Hierarchy. Select another file path"
+                        ),
+                        L10n.Tr("Ok")
+                    );
                 }
                 else
                 {
@@ -248,7 +322,10 @@ namespace Unity.Scenes.Editor
         {
             newSubSceneName = newSubSceneName.Trim();
             var srcPath = parentScene.path;
-            var dstDirectory = Path.Combine(Path.GetDirectoryName(srcPath), Path.GetFileNameWithoutExtension(parentScene.path));
+            var dstDirectory = Path.Combine(
+                Path.GetDirectoryName(srcPath),
+                Path.GetFileNameWithoutExtension(parentScene.path)
+            );
             var dstPath = GetActualPathName(Path.Combine(dstDirectory, newSubSceneName + ".unity"));
             return dstPath;
         }
@@ -276,14 +353,17 @@ namespace Unity.Scenes.Editor
         {
             if (string.IsNullOrEmpty(fileName) || fileName.Trim() == string.Empty)
             {
-                throw new ArgumentException("The provided name for the Sub Scene is empty. This is not allowed since the name is used when creating the Scene asset file.");
+                throw new ArgumentException(
+                    "The provided name for the Sub Scene is empty. This is not allowed since the name is used when creating the Scene asset file."
+                );
             }
 
             var invalidIndex = fileName.IndexOfAny(GetInvalidFileNameChars());
             if (invalidIndex >= 0)
             {
                 char invalidChar = fileName[invalidIndex];
-                var errorMessage = $"The name '{fileName}' contains the invalid character: '{invalidChar}'. This is not allowed since the name is used when creating the Scene asset file.";
+                var errorMessage =
+                    $"The name '{fileName}' contains the invalid character: '{invalidChar}'. This is not allowed since the name is used when creating the Scene asset file.";
                 throw new ArgumentException(errorMessage);
             }
         }
@@ -293,14 +373,16 @@ namespace Unity.Scenes.Editor
             if (File.Exists(destinationPath))
             {
                 var fileName = Path.GetFileNameWithoutExtension(destinationPath);
-                var errorMessage = $"A Scene already exists at '{destinationPath}'.\n\nRename '{fileName}' to prevent overwriting the existing Scene file.";
+                var errorMessage =
+                    $"A Scene already exists at '{destinationPath}'.\n\nRename '{fileName}' to prevent overwriting the existing Scene file.";
                 throw new ArgumentException(errorMessage);
             }
 
             if (SceneManager.GetSceneByPath(destinationPath).IsValid())
             {
                 var fileName = Path.GetFileNameWithoutExtension(destinationPath);
-                var errorMessage = $"A Scene with path '{destinationPath}' already exists in the SceneManager.\n\nRename '{fileName}' to prevent overwriting the existing Scene.";
+                var errorMessage =
+                    $"A Scene with path '{destinationPath}' already exists in the SceneManager.\n\nRename '{fileName}' to prevent overwriting the existing Scene.";
                 throw new ArgumentException(errorMessage);
             }
         }
@@ -310,30 +392,45 @@ namespace Unity.Scenes.Editor
             if (gameObjectsMovedToSubScene == null)
                 throw new ArgumentNullException("gameObjectsMovedToSubScene");
 
-            if (gameObjectsMovedToSubScene.Any(x => PrefabUtility.IsPartOfAnyPrefab(x) && !PrefabUtility.IsOutermostPrefabInstanceRoot(x)))
+            if (
+                gameObjectsMovedToSubScene.Any(x =>
+                    PrefabUtility.IsPartOfAnyPrefab(x) && !PrefabUtility.IsOutermostPrefabInstanceRoot(x)
+                )
+            )
             {
-                throw new ArgumentException("Cannot create a Sub Scene from a part of a Prefab instance. Select the outermost Prefab root.");
+                throw new ArgumentException(
+                    "Cannot create a Sub Scene from a part of a Prefab instance. Select the outermost Prefab root."
+                );
             }
         }
 
         static string GetActualPathName(string path)
         {
             //@TODO: GetActualPathName is expected to become public in 2020.1
-            var getActualPathName = typeof(FileUtil).GetMethod("GetActualPathName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var getActualPathName = typeof(FileUtil).GetMethod(
+                "GetActualPathName",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static
+            );
             return (string)getActualPathName?.Invoke(null, new object[] { path });
         }
 
         static char[] GetInvalidFileNameChars()
         {
             // Unity uses its own list of invalid file name chars (to ensure valid asset file names across OS'es)
-            var getInvalidFileNameCharsMethod = typeof(EditorUtility).GetMethod("GetInvalidFilenameChars", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var getInvalidFileNameCharsMethod = typeof(EditorUtility).GetMethod(
+                "GetInvalidFilenameChars",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static
+            );
             var result = (string)getInvalidFileNameCharsMethod.Invoke(null, null);
             return result.ToCharArray();
         }
 
         static bool CreateSceneFile(string scenePath)
         {
-            var createSceneAssetMethod = typeof(EditorSceneManager).GetMethod("CreateSceneAsset", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var createSceneAssetMethod = typeof(EditorSceneManager).GetMethod(
+                "CreateSceneAsset",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static
+            );
             var addDefaultGameObjects = false;
             return (bool)createSceneAssetMethod.Invoke(null, new object[] { scenePath, addDefaultGameObjects });
         }
@@ -353,14 +450,32 @@ namespace Unity.Scenes.Editor
             return default;
         }
 
-        static SubScene CreateSubSceneAndMoveObjectsInside(Scene parentScene, Transform targetTransform, GameObject[] topLevelObjects, string name, InteractionMode interactionMode)
+        static SubScene CreateSubSceneAndMoveObjectsInside(
+            Scene parentScene,
+            Transform targetTransform,
+            GameObject[] topLevelObjects,
+            string name,
+            InteractionMode interactionMode
+        )
         {
             ThrowIfInvalidSubSceneFileName(name);
             var dstPath = GetSubSceneFilePathUnderParentSceneFilePath(parentScene, name);
-            return CreateSubSceneAtPathAndMoveObjectsInside(parentScene, targetTransform, topLevelObjects, dstPath, interactionMode);
+            return CreateSubSceneAtPathAndMoveObjectsInside(
+                parentScene,
+                targetTransform,
+                topLevelObjects,
+                dstPath,
+                interactionMode
+            );
         }
 
-        static SubScene CreateSubSceneAtPathAndMoveObjectsInside(Scene parentScene, Transform targetTransform, GameObject[] topLevelObjects, string dstPath, InteractionMode interactionMode)
+        static SubScene CreateSubSceneAtPathAndMoveObjectsInside(
+            Scene parentScene,
+            Transform targetTransform,
+            GameObject[] topLevelObjects,
+            string dstPath,
+            InteractionMode interactionMode
+        )
         {
             ThrowIfFileExists(dstPath);
             ThrowIfAnyGameObjectsCannotBeMovedToSubScene(topLevelObjects);

@@ -66,7 +66,7 @@ namespace Unity.Networking.Transport
                     var packetProcessor = Queue[i];
                     if (packetProcessor.Length == 0)
                         continue;
-                    
+
                     var packetSize = packetProcessor.Length + ctx.OSHeaderOverhead;
 #if UNITY_WEBGL && !UNITY_EDITOR
                     // WebSocket header needs 2 extra bytes if the payload is larger than 125 bytes

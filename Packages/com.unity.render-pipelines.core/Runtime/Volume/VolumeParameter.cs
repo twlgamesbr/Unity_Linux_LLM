@@ -33,6 +33,7 @@ namespace UnityEngine.Rendering
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         internal int fieldHash { get; set; }
 #endif
+
         /// <summary>
         /// A beautified string for debugger output. This is set on a <c>DebuggerDisplay</c> on every
         /// parameter types.
@@ -95,16 +96,12 @@ namespace UnityEngine.Rendering
         /// <see cref="VolumeComponent"/>, thus allowing access to previously
         /// inaccessible fields and properties.
         /// </remarks>
-        protected internal virtual void OnEnable()
-        {
-        }
+        protected internal virtual void OnEnable() { }
 
         /// <summary>
         /// Unity calls this method when the parent <see cref="VolumeComponent"/> goes out of scope.
         /// </summary>
-        protected internal virtual void OnDisable()
-        {
-        }
+        protected internal virtual void OnDisable() { }
 
         /// <summary>
         /// Checks if a given type is an <see cref="ObjectParameter{T}"/>.
@@ -117,8 +114,7 @@ namespace UnityEngine.Rendering
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ObjectParameter<>))
                 return true;
 
-            return type.BaseType != null
-                && IsObjectParameter(type.BaseType);
+            return type.BaseType != null && IsObjectParameter(type.BaseType);
         }
 
         /// <summary>
@@ -130,7 +126,6 @@ namespace UnityEngine.Rendering
         /// Clones the current instance of the <see cref="VolumeParameter"/>
         /// </summary>
         /// <returns>A new created instance with the same values as the current instance of <see cref="VolumeParameter"/></returns>
-
         public abstract object Clone();
     }
 
@@ -190,9 +185,7 @@ namespace UnityEngine.Rendering
         /// Creates a new <see cref="VolumeParameter{T}"/> instance.
         /// </summary>
         public VolumeParameter()
-            : this(default, false)
-        {
-        }
+            : this(default, false) { }
 
         /// <summary>
         /// Creates a new <see cref="VolumeParameter{T}"/> instance.
@@ -278,7 +271,8 @@ namespace UnityEngine.Rendering
         /// <param name="lhs">The first value in a <see cref="VolumeParameter"/>.</param>
         /// <param name="rhs">The second value.</param>
         /// <returns><c>true</c> if both values are equal, <c>false</c> otherwise.</returns>
-        public static bool operator ==(VolumeParameter<T> lhs, T rhs) => !ReferenceEquals(lhs, null) && !ReferenceEquals(lhs.value, null) && lhs.value.Equals(rhs);
+        public static bool operator ==(VolumeParameter<T> lhs, T rhs) =>
+            !ReferenceEquals(lhs, null) && !ReferenceEquals(lhs.value, null) && lhs.value.Equals(rhs);
 
         /// <summary>
         /// Compares the value store in a parameter with another value of the same type.
@@ -357,9 +351,7 @@ namespace UnityEngine.Rendering
         /// <param name="value">The initial value to store in the parameter</param>
         /// <param name="overrideState">The initial override state for the parameter</param>
         public BoolParameter(bool value, bool overrideState = false)
-            : base(value, overrideState)
-        {
-        }
+            : base(value, overrideState) { }
 
         /// <summary>
         /// Creates a new <see cref="BoolParameter"/> instance.
@@ -380,8 +372,9 @@ namespace UnityEngine.Rendering
         {
             /// <summary> Display boolean parameter as checkbox. </summary>
             Checkbox,
+
             /// <summary> Display boolean parameter as enum popup with Disabled/Enabled options. </summary>
-            EnumPopup
+            EnumPopup,
         }
 
         /// <summary>
@@ -1361,7 +1354,13 @@ namespace UnityEngine.Rendering
         /// <param name="showAlpha">Specifies whether you can edit the alpha channel in the Inspector or not.</param>
         /// <param name="showEyeDropper">Specifies whether the eye dropper is visible in the editor or not.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public NoInterpColorParameter(Color value, bool hdr, bool showAlpha, bool showEyeDropper, bool overrideState = false)
+        public NoInterpColorParameter(
+            Color value,
+            bool hdr,
+            bool showAlpha,
+            bool showEyeDropper,
+            bool overrideState = false
+        )
             : base(value, overrideState)
         {
             this.hdr = hdr;
@@ -1546,7 +1545,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1578,7 +1576,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1610,7 +1607,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1642,7 +1638,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1676,7 +1671,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1708,7 +1702,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1732,6 +1725,7 @@ namespace UnityEngine.Rendering
         /// <param name="overrideState">The initial override state for the parameter.</param>
         public CubemapParameter(Texture value, bool overrideState = false)
             : base(value, overrideState) { }
+
         // TODO: Cubemap interpolation
 
         /// <summary>
@@ -1741,7 +1735,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1773,7 +1766,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = base.GetHashCode();
-
             unchecked
             {
                 if (value != null)
@@ -1822,7 +1814,8 @@ namespace UnityEngine.Rendering
                 }
 
                 // Automatically grab all fields of type VolumeParameter contained in this instance
-                parameters = m_Value.GetType()
+                parameters = m_Value
+                    .GetType()
                     .GetFields(BindingFlags.Public | BindingFlags.Instance)
                     .Where(t => t.FieldType.IsSubclassOf(typeof(VolumeParameter)))
                     .OrderBy(t => t.MetadataToken) // Guaranteed order
@@ -1909,14 +1902,14 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <returns>A hash code for the animationCurve.</returns>
         public override int GetHashCode()
-         {
-             unchecked
-             {
+        {
+            unchecked
+            {
                 var hash = overrideState.GetHashCode();
 
                 return hash * 23 + value.GetHashCode();
-             }
-         }
+            }
+        }
     }
 
     /// <summary>

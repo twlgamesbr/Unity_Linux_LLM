@@ -21,7 +21,12 @@ namespace UnityEngine.Rendering
         /// <returns>True if succeed, false otherwise</returns>
         [CollectionAccess(CollectionAccessType.ModifyExistingContent)]
         [MustUseReturnValue]
-        public static bool TrySwap<TValue>([DisallowNull] this IList<TValue> list, int from, int to, [NotNullWhen(false)] out Exception error)
+        public static bool TrySwap<TValue>(
+            [DisallowNull] this IList<TValue> list,
+            int from,
+            int to,
+            [NotNullWhen(false)] out Exception error
+        )
         {
             error = null;
             if (list == null)

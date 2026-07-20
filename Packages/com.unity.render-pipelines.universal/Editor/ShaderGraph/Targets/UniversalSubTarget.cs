@@ -1,7 +1,7 @@
-using UnityEngine;
 using UnityEditor.ShaderGraph;
-using static Unity.Rendering.Universal.ShaderUtils;
 using UnityEditor.ShaderGraph.Internal;
+using UnityEngine;
+using static Unity.Rendering.Universal.ShaderUtils;
 #if HAS_VFX_GRAPH
 using UnityEditor.VFX;
 #endif
@@ -10,10 +10,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
     abstract class UniversalSubTarget : SubTarget<UniversalTarget>, IHasMetadata
 #if HAS_VFX_GRAPH
-        , IRequireVFXContext
+            , IRequireVFXContext
 #endif
     {
-        static readonly GUID kSourceCodeGuid = new GUID("92228d45c1ff66740bfa9e6d97f7e280");  // UniversalSubTarget.cs
+        static readonly GUID kSourceCodeGuid = new GUID("92228d45c1ff66740bfa9e6d97f7e280"); // UniversalSubTarget.cs
 
         public override void Setup(ref TargetSetupContext context)
         {
@@ -26,6 +26,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         // VFX Properties
         VFXContext m_ContextVFX = null;
         VFXTaskCompiledData m_TaskDataVFX;
+
         protected bool TargetsVFX() => m_ContextVFX != null;
 
         public void ConfigureContextData(VFXContext context, VFXTaskCompiledData data)
@@ -53,6 +54,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         }
 
         public virtual string identifier => GetType().Name;
+
         public virtual ScriptableObject GetMetadataObject(GraphDataReadOnly graphData)
         {
             var urpMetadata = ScriptableObject.CreateInstance<UniversalMetadata>();
@@ -64,22 +66,25 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 urpMetadata.allowMaterialOverride = target.allowMaterialOverride;
                 urpMetadata.surfaceType = target.surfaceType;
                 urpMetadata.castShadows = target.castShadows;
-                urpMetadata.hasVertexModificationInMotionVector = target.additionalMotionVectorMode != AdditionalMotionVectorMode.None || graphData.AnyVertexAnimationActive();
+                urpMetadata.hasVertexModificationInMotionVector =
+                    target.additionalMotionVectorMode != AdditionalMotionVectorMode.None
+                    || graphData.AnyVertexAnimationActive();
             }
             else
             {
                 //Ignore unsupported settings in SpriteUnlit/SpriteLit
                 urpMetadata.allowMaterialOverride = false;
-                urpMetadata.surfaceType = SurfaceType.Transparent; 
+                urpMetadata.surfaceType = SurfaceType.Transparent;
                 urpMetadata.castShadows = false;
                 urpMetadata.hasVertexModificationInMotionVector = false;
             }
-            
+
             urpMetadata.isVFXCompatible = target.SupportsVFX();
             return urpMetadata;
         }
 
         private int lastMaterialNeedsUpdateHash = 0;
+
         protected virtual int ComputeMaterialNeedsUpdateHash() => 0;
 
         public override object saveContext
@@ -98,31 +103,45 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
     internal static class SubShaderUtils
     {
-        internal static void AddFloatProperty(this PropertyCollector collector, string referenceName, float defaultValue, HLSLDeclaration declarationType = HLSLDeclaration.DoNotDeclare)
+        internal static void AddFloatProperty(
+            this PropertyCollector collector,
+            string referenceName,
+            float defaultValue,
+            HLSLDeclaration declarationType = HLSLDeclaration.DoNotDeclare
+        )
         {
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                floatType = FloatType.Default,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = declarationType,
-                value = defaultValue,
-                displayName = referenceName,
-                overrideReferenceName = referenceName,
-            });
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    floatType = FloatType.Default,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = declarationType,
+                    value = defaultValue,
+                    displayName = referenceName,
+                    overrideReferenceName = referenceName,
+                }
+            );
         }
 
-        internal static void AddToggleProperty(this PropertyCollector collector, string referenceName, bool defaultValue, HLSLDeclaration declarationType = HLSLDeclaration.DoNotDeclare)
+        internal static void AddToggleProperty(
+            this PropertyCollector collector,
+            string referenceName,
+            bool defaultValue,
+            HLSLDeclaration declarationType = HLSLDeclaration.DoNotDeclare
+        )
         {
-            collector.AddShaderProperty(new BooleanShaderProperty
-            {
-                value = defaultValue,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = declarationType,
-                displayName = referenceName,
-                overrideReferenceName = referenceName,
-            });
+            collector.AddShaderProperty(
+                new BooleanShaderProperty
+                {
+                    value = defaultValue,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = declarationType,
+                    displayName = referenceName,
+                    overrideReferenceName = referenceName,
+                }
+            );
         }
 
         // Overloads to do inline PassDescriptor modifications

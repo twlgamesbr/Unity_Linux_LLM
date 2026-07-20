@@ -2,19 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using Unity.Burst;
+using Unity.Cecil.Awesome;
 using Unity.CompilationPipeline.Common.Diagnostics;
+using UnityEngine.Scripting;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using ParameterAttributes = Mono.Cecil.ParameterAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
-using Unity.Cecil.Awesome;
-using UnityEngine.Scripting;
-using System.Reflection;
-using Unity.Burst;
 using TypeReferenceEqualityComparer = Unity.Cecil.Awesome.Comparers.TypeReferenceEqualityComparer;
-
 
 namespace Unity.Entities.CodeGen
 {
@@ -34,13 +33,13 @@ namespace Unity.Entities.CodeGen
         {
             var irefCountedType = AssemblyDefinition.MainModule.ImportReference(typeof(IRefCounted));
             var iequatableType = AssemblyDefinition.MainModule.ImportReference(typeof(IEquatable<>));
-            var isharedcomponentdataType =
-                AssemblyDefinition.MainModule.ImportReference(typeof(ISharedComponentData));
+            var isharedcomponentdataType = AssemblyDefinition.MainModule.ImportReference(typeof(ISharedComponentData));
 
             var preserveAttrCtor = AssemblyDefinition.MainModule.ImportReference(
-                typeof(PreserveAttribute).GetConstructors(BindingFlags.Public |
-                                                          BindingFlags.NonPublic |
-                                                          BindingFlags.Instance)[0]);
+                typeof(PreserveAttribute).GetConstructors(
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                )[0]
+            );
 
             var modified = false;
             var memos = new List<TypeMemo>();
@@ -48,8 +47,7 @@ namespace Unity.Entities.CodeGen
             var mod = AssemblyDefinition.MainModule;
             var intPtrRef = mod.ImportReference(typeof(IntPtr));
             var voidstarRef = mod.ImportReference(typeof(void*));
-            mod.ImportReference(intPtrRef.Resolve()
-                .Methods.FirstOrDefault(x => x.Name == nameof(IntPtr.ToPointer)));
+            mod.ImportReference(intPtrRef.Resolve().Methods.FirstOrDefault(x => x.Name == nameof(IntPtr.ToPointer)));
 
             foreach (var type in AssemblyDefinition.MainModule.GetAllTypes())
             {
@@ -71,7 +69,7 @@ namespace Unity.Entities.CodeGen
                 {
                     foreach (var m in type.Methods)
                     {
-                        if (m.Name is "OnCreate" or "OnDestroy" or "OnUpdate" or "OnStartRunning" or "OnStopRunning") 
+                        if (m.Name is "OnCreate" or "OnDestroy" or "OnUpdate" or "OnStartRunning" or "OnStopRunning")
                         {
                             m.CustomAttributes.Add(new CustomAttribute(preserveAttrCtor));
                         }
@@ -80,7 +78,11 @@ namespace Unity.Entities.CodeGen
                     modified = PreserveDefaultCtor(type, preserveAttrCtor);
                 }
 
-                if (!type.IsValueType() && !type.IsInterface && type.TypeImplements(mod.ImportReference(typeof(IComponentData))))
+                if (
+                    !type.IsValueType()
+                    && !type.IsInterface
+                    && type.TypeImplements(mod.ImportReference(typeof(IComponentData)))
+                )
                 {
                     try
                     {
@@ -88,35 +90,42 @@ namespace Unity.Entities.CodeGen
                     }
                     catch
                     {
-                        _diagnosticMessages.Add(new DiagnosticMessage()
-                        {
-                            Column = 0, 
-                            DiagnosticType = DiagnosticType.Error, 
-                            File = null, 
-                            Line = 0,
-                            MessageData =
-                                $"Class IComponentData type {type.FullName} has no default constructor, but one is required when implementing class-based IComponentData."
-                        });
+                        _diagnosticMessages.Add(
+                            new DiagnosticMessage()
+                            {
+                                Column = 0,
+                                DiagnosticType = DiagnosticType.Error,
+                                File = null,
+                                Line = 0,
+                                MessageData =
+                                    $"Class IComponentData type {type.FullName} has no default constructor, but one is required when implementing class-based IComponentData.",
+                            }
+                        );
                     }
                 }
 
                 if (hasISD)
                 {
                     var memo = new TypeMemo
-                        {m_Type = type, m_Wrappers = null, m_BurstCompileBits = 0};
+                    {
+                        m_Type = type,
+                        m_Wrappers = null,
+                        m_BurstCompileBits = 0,
+                    };
                     IEnumerable<string> methodNames = new List<string>();
 
                     var numwrappers = 0;
                     if (hasIRC)
                     {
-                        methodNames =
-                            methodNames.Concat(new[] {nameof(IRefCounted.Retain), nameof(IRefCounted.Release)});
+                        methodNames = methodNames.Concat(
+                            new[] { nameof(IRefCounted.Retain), nameof(IRefCounted.Release) }
+                        );
                         numwrappers += 2;
                     }
 
                     if (hasIEQ)
                     {
-                        methodNames = methodNames.Concat(new[] {"Equals", "GetHashCode"});
+                        methodNames = methodNames.Concat(new[] { "Equals", "GetHashCode" });
                         numwrappers += 2;
                     }
 
@@ -137,7 +146,7 @@ namespace Unity.Entities.CodeGen
                                 if (isEquals)
                                 {
                                     /*
-                                     Irritatingly, if you do this: 
+                                     Irritatingly, if you do this:
     public struct SceneTag : ISharedComponentData, IEquatable<SceneTag>
     {
         public Entity  SceneEntity;
@@ -153,18 +162,25 @@ namespace Unity.Entities.CodeGen
 
                                     then Name will not be Equals, so you can't just check Name either.
 
-                                    So you have to check both. 
+                                    So you have to check both.
                                      */
-                                    if (x.Name == name &&
-                                        x.Parameters.Count == 1 &&
-                                        x.Parameters[0].ParameterType.Name == type.Name)
+                                    if (
+                                        x.Name == name
+                                        && x.Parameters.Count == 1
+                                        && x.Parameters[0].ParameterType.Name == type.Name
+                                    )
                                         return true;
                                     foreach (var y in x.Overrides)
                                     {
-                                        if (TypeReferenceEqualityComparer.AreEqual(
-                                                AssemblyDefinition.MainModule.ImportReference(y.DeclaringType.Resolve()),
-                                                iequatableType) &&
-                                            y.Name == "Equals")
+                                        if (
+                                            TypeReferenceEqualityComparer.AreEqual(
+                                                AssemblyDefinition.MainModule.ImportReference(
+                                                    y.DeclaringType.Resolve()
+                                                ),
+                                                iequatableType
+                                            )
+                                            && y.Name == "Equals"
+                                        )
                                             return true;
                                     }
                                     return false;
@@ -180,18 +196,19 @@ namespace Unity.Entities.CodeGen
                             //gethashcode is optional
                             if (name == "GetHashCode")
                                 continue;
-                            
-                            _diagnosticMessages.Add(new DiagnosticMessage()
-                            {
-                                Column = 0, 
-                                DiagnosticType = DiagnosticType.Error, 
-                                File = null, 
-                                Line = 0,
-                                MessageData =
-                                    $"Signature mismatch in ilpp on type {type} method {name} exception {e.Message}. Seeing this error indicates a bug in Entities. Please submit a bug with About->Report a bug... Thanks!"
 
-                            });
-                            
+                            _diagnosticMessages.Add(
+                                new DiagnosticMessage()
+                                {
+                                    Column = 0,
+                                    DiagnosticType = DiagnosticType.Error,
+                                    File = null,
+                                    Line = 0,
+                                    MessageData =
+                                        $"Signature mismatch in ilpp on type {type} method {name} exception {e.Message}. Seeing this error indicates a bug in Entities. Please submit a bug with About->Report a bug... Thanks!",
+                                }
+                            );
+
                             int j = 0;
                             foreach (var m in type.Methods.Where(x => x.Name == name))
                             {
@@ -204,13 +221,19 @@ namespace Unity.Entities.CodeGen
                             throw e;
                         }
 
-                        var methodDef = new MethodDefinition(GeneratedPrefix + name,
+                        var methodDef = new MethodDefinition(
+                            GeneratedPrefix + name,
                             MethodAttributes.Static | MethodAttributes.Public,
-                            mod.ImportReference(targetMethod.ReturnType));
+                            mod.ImportReference(targetMethod.ReturnType)
+                        );
 
-                        methodDef.Parameters.Add(new ParameterDefinition("self",
-                            ParameterAttributes.None,
-                            (name == "Equals" || name == "GetHashCode") ? voidstarRef : intPtrRef));
+                        methodDef.Parameters.Add(
+                            new ParameterDefinition(
+                                "self",
+                                ParameterAttributes.None,
+                                (name == "Equals" || name == "GetHashCode") ? voidstarRef : intPtrRef
+                            )
+                        );
 
                         foreach (var p in targetMethod.Parameters)
                         {
@@ -219,34 +242,41 @@ namespace Unity.Entities.CodeGen
 
                         // Transfer any BurstCompile attribute from target function to the forwarding wrapper
                         var burstAttribute = targetMethod.CustomAttributes.FirstOrDefault(x =>
-                            x.Constructor.DeclaringType.Name == nameof(BurstCompileAttribute));
+                            x.Constructor.DeclaringType.Name == nameof(BurstCompileAttribute)
+                        );
                         if (burstAttribute != null)
                         {
-                            methodDef.CustomAttributes.Add(new CustomAttribute(burstAttribute.Constructor,
-                                burstAttribute.GetBlob()));
+                            methodDef.CustomAttributes.Add(
+                                new CustomAttribute(burstAttribute.Constructor, burstAttribute.GetBlob())
+                            );
                             memo.m_BurstCompileBits |= 1 << i;
                         }
 
                         // Adding MonoPInvokeCallbackAttribute needed for IL2CPP to work when burst is disabled
                         var monoPInvokeCallbackAttributeConstructors =
-                            typeof(MonoPInvokeCallbackAttribute).GetConstructors(BindingFlags.Public |
-                                BindingFlags.NonPublic |
-                                BindingFlags.Instance);
-                        var monoPInvokeCallbackAttribute =
-                            new CustomAttribute(mod.ImportReference(monoPInvokeCallbackAttributeConstructors[0]));
-                        monoPInvokeCallbackAttribute.ConstructorArguments.Add(new CustomAttributeArgument(mod.ImportReference(typeof(Type)), mod.ImportReference(typeof(SystemBaseDelegates.Function))));
+                            typeof(MonoPInvokeCallbackAttribute).GetConstructors(
+                                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                            );
+                        var monoPInvokeCallbackAttribute = new CustomAttribute(
+                            mod.ImportReference(monoPInvokeCallbackAttributeConstructors[0])
+                        );
+                        monoPInvokeCallbackAttribute.ConstructorArguments.Add(
+                            new CustomAttributeArgument(
+                                mod.ImportReference(typeof(Type)),
+                                mod.ImportReference(typeof(SystemBaseDelegates.Function))
+                            )
+                        );
                         methodDef.CustomAttributes.Add(monoPInvokeCallbackAttribute);
 
                         methodDef.CustomAttributes.Add(new CustomAttribute(preserveAttrCtor));
 
                         var processor = methodDef.Body.GetILProcessor();
 
-                        processor.Emit(OpCodes.Ldarg_S, (byte) 0);
+                        processor.Emit(OpCodes.Ldarg_S, (byte)0);
                         for (int j = 1; j < methodDef.Parameters.Count; j++)
                         {
-                            processor.Emit(OpCodes.Ldarg_S, (byte) j);
+                            processor.Emit(OpCodes.Ldarg_S, (byte)j);
                             processor.Emit(OpCodes.Ldobj, type);
-
                         }
 
                         processor.Emit(OpCodes.Call, targetMethod);
@@ -308,19 +338,23 @@ namespace Unity.Entities.CodeGen
         private void AddRegistrationCode(List<TypeMemo> memos)
         {
             var autoClassName =
-                $"__SharedComponentPostProcessorOutput__{(uint) AssemblyDefinition.FullName.GetHashCode()}";
+                $"__SharedComponentPostProcessorOutput__{(uint)AssemblyDefinition.FullName.GetHashCode()}";
             var mod = AssemblyDefinition.MainModule;
 
-            var classDef = new TypeDefinition("",
+            var classDef = new TypeDefinition(
+                "",
                 autoClassName,
                 TypeAttributes.Class,
-                AssemblyDefinition.MainModule.ImportReference(typeof(object)));
+                AssemblyDefinition.MainModule.ImportReference(typeof(object))
+            );
             classDef.IsBeforeFieldInit = false;
             mod.Types.Add(classDef);
 
-            var funcDef = new MethodDefinition("RegisterSharedComponentFunctions",
+            var funcDef = new MethodDefinition(
+                "RegisterSharedComponentFunctions",
                 MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
-                AssemblyDefinition.MainModule.ImportReference(typeof(void)));
+                AssemblyDefinition.MainModule.ImportReference(typeof(void))
+            );
             funcDef.Body.InitLocals = true;
 
             classDef.Methods.Add(funcDef);
@@ -329,50 +363,57 @@ namespace Unity.Entities.CodeGen
 
             var typeManagerType = mod.ImportReference(typeof(TypeManager)).Resolve();
             var iRefCountedType = mod.ImportReference(typeof(IRefCounted)).Resolve();
-            var addRetainMethod =
-                mod.ImportReference(typeManagerType.Methods.FirstOrDefault((x) =>
-                    x.Name == nameof(TypeManager.SetIRefCounted_RetainFn)));
-            var addReleaseMethod =
-                mod.ImportReference(typeManagerType.Methods.FirstOrDefault((x) =>
-                    x.Name == nameof(TypeManager.SetIRefCounted_ReleaseFn)));
-            var addEqualsMethod =
-                mod.ImportReference(typeManagerType.Methods.FirstOrDefault((x) =>
-                    x.Name == nameof(TypeManager.SetIEquatable_EqualsFn)));
-            var addGetHashCodeMethod =
-                mod.ImportReference(typeManagerType.Methods.FirstOrDefault((x) =>
-                    x.Name == nameof(TypeManager.SetIEquatable_GetHashCodeFn)));
+            var addRetainMethod = mod.ImportReference(
+                typeManagerType.Methods.FirstOrDefault((x) => x.Name == nameof(TypeManager.SetIRefCounted_RetainFn))
+            );
+            var addReleaseMethod = mod.ImportReference(
+                typeManagerType.Methods.FirstOrDefault((x) => x.Name == nameof(TypeManager.SetIRefCounted_ReleaseFn))
+            );
+            var addEqualsMethod = mod.ImportReference(
+                typeManagerType.Methods.FirstOrDefault((x) => x.Name == nameof(TypeManager.SetIEquatable_EqualsFn))
+            );
+            var addGetHashCodeMethod = mod.ImportReference(
+                typeManagerType.Methods.FirstOrDefault((x) => x.Name == nameof(TypeManager.SetIEquatable_GetHashCodeFn))
+            );
 
             var intType = mod.ImportReference(typeof(int)).Resolve();
 
-            var genericGetTypeIndex =
-                mod.ImportReference(typeManagerType.Methods.FirstOrDefault((x) =>
-                    x.Name == nameof(TypeManager.GetTypeIndex) && x.Parameters.Count == 0));
+            var genericGetTypeIndex = mod.ImportReference(
+                typeManagerType.Methods.FirstOrDefault(
+                    (x) => x.Name == nameof(TypeManager.GetTypeIndex) && x.Parameters.Count == 0
+                )
+            );
 
-            var ircDelegateCtor = mod.ImportReference(iRefCountedType.NestedTypes
-                .FirstOrDefault((x) => x.Name == nameof(IRefCounted.RefCountDelegate))
-                .GetConstructors()
-                .FirstOrDefault((x) => x.Parameters.Count == 2));
+            var ircDelegateCtor = mod.ImportReference(
+                iRefCountedType
+                    .NestedTypes.FirstOrDefault((x) => x.Name == nameof(IRefCounted.RefCountDelegate))
+                    .GetConstructors()
+                    .FirstOrDefault((x) => x.Parameters.Count == 2)
+            );
 
             var equalsDelegateCtor = mod.ImportReference(
                 mod.ImportReference(typeof(FastEquality.TypeInfo.CompareEqualDelegate))
-                .Resolve()
-                .GetConstructors()
-                .FirstOrDefault(x => x.Parameters.Count == 2));
+                    .Resolve()
+                    .GetConstructors()
+                    .FirstOrDefault(x => x.Parameters.Count == 2)
+            );
 
             var ghcDelegateCtor = mod.ImportReference(
                 mod.ImportReference(typeof(FastEquality.TypeInfo.GetHashCodeDelegate))
-                .Resolve()
-                .GetConstructors()
-                .FirstOrDefault(x => x.Parameters.Count == 2));
-
+                    .Resolve()
+                    .GetConstructors()
+                    .FirstOrDefault(x => x.Parameters.Count == 2)
+            );
 
             foreach (var memo in memos)
             {
                 var typeIndexLocal = new VariableDefinition(intType);
                 funcDef.Body.Variables.Add(typeIndexLocal);
 
-                processor.Emit(OpCodes.Call,
-                    mod.ImportReference(genericGetTypeIndex.MakeGenericInstanceMethod(memo.m_Type)));
+                processor.Emit(
+                    OpCodes.Call,
+                    mod.ImportReference(genericGetTypeIndex.MakeGenericInstanceMethod(memo.m_Type))
+                );
                 processor.Emit(OpCodes.Stloc, typeIndexLocal);
 
                 for (int i = 0; i < memo.m_Wrappers.Length; i++)

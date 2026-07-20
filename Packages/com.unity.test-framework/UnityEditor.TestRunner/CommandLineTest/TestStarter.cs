@@ -69,8 +69,20 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
         {
             var shouldRunTests = false;
             var optionSet = new CommandLineOptionSet(
-                new CommandLineOption("runTests", () => { shouldRunTests = true; }),
-                new CommandLineOption("runEditorTests", () => { shouldRunTests = true; })
+                new CommandLineOption(
+                    "runTests",
+                    () =>
+                    {
+                        shouldRunTests = true;
+                    }
+                ),
+                new CommandLineOption(
+                    "runEditorTests",
+                    () =>
+                    {
+                        shouldRunTests = true;
+                    }
+                )
             );
             optionSet.Parse(GetCommandLineArgs());
             return shouldRunTests;
@@ -84,9 +96,26 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
                 if (m_Executer == null)
                 {
                     Func<bool> compilationCheck = () => EditorUtility.scriptCompilationFailed;
-                    Action<string> actionLogger = msg => { Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, msg); };
-                    var apiSettingsBuilder = new SettingsBuilder(new TestSettingsDeserializer(() => new TestSettings()), actionLogger, Debug.LogWarning, compilationCheck);
-                    m_Executer = new Executer(ScriptableObject.CreateInstance<TestRunnerApi>(), apiSettingsBuilder, Debug.LogErrorFormat, Debug.LogException, Debug.Log, EditorApplication.Exit, compilationCheck, TestRunnerApi.IsRunActive);
+                    Action<string> actionLogger = msg =>
+                    {
+                        Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, msg);
+                    };
+                    var apiSettingsBuilder = new SettingsBuilder(
+                        new TestSettingsDeserializer(() => new TestSettings()),
+                        actionLogger,
+                        Debug.LogWarning,
+                        compilationCheck
+                    );
+                    m_Executer = new Executer(
+                        ScriptableObject.CreateInstance<TestRunnerApi>(),
+                        apiSettingsBuilder,
+                        Debug.LogErrorFormat,
+                        Debug.LogException,
+                        Debug.Log,
+                        EditorApplication.Exit,
+                        compilationCheck,
+                        TestRunnerApi.IsRunActive
+                    );
                 }
 
                 return m_Executer;

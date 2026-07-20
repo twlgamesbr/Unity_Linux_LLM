@@ -1,12 +1,11 @@
 using UnityEngine;
-
 #if USING_2DANIMATION
 using UnityEngine.U2D.Animation;
 #endif
 
 internal static class ShadowShapeProvider2DUtility
 {
-    static public float GetTrimEdgeFromBounds(Bounds bounds, float trimMultipler)
+    public static float GetTrimEdgeFromBounds(Bounds bounds, float trimMultipler)
     {
         Vector3 size = bounds.size;
 
@@ -20,13 +19,12 @@ internal static class ShadowShapeProvider2DUtility
         return trimEdge;
     }
 
-    static public bool IsUsingGpuDeformation()
+    public static bool IsUsingGpuDeformation()
     {
-        #if USING_2DANIMATION
-            return SpriteSkinUtility.IsUsingGpuDeformation();
-        #else
-            return false;
-        #endif
+#if USING_2DANIMATION
+        return SpriteSkinUtility.IsUsingGpuDeformation();
+#else
+        return false;
+#endif
     }
-
 }

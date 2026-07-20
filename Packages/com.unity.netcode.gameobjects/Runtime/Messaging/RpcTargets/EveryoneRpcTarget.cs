@@ -15,7 +15,12 @@ namespace Unity.Netcode
             m_AuthorityRpcTarget.Dispose();
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             if (NetworkManager.IsDistributedAuthority)
             {
@@ -29,7 +34,8 @@ namespace Unity.Netcode
             }
         }
 
-        internal EveryoneRpcTarget(NetworkManager manager) : base(manager)
+        internal EveryoneRpcTarget(NetworkManager manager)
+            : base(manager)
         {
             m_NotServerRpcTarget = new NotServerRpcTarget(manager);
             m_ServerRpcTarget = new ServerRpcTarget(manager);

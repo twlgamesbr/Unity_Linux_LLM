@@ -37,7 +37,9 @@ namespace Unity.Rendering
 #endif
             {
                 Enabled = false;
-                UnityEngine.Debug.Log("No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.");
+                UnityEngine.Debug.Log(
+                    "No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled."
+                );
                 return;
             }
 
@@ -55,9 +57,7 @@ namespace Unity.Rendering
             m_KernelDense4 = m_ComputeShader.FindKernel("SkinningDense4ComputeKernel");
             m_KernelSparse = m_ComputeShader.FindKernel("SkinningSparseComputeKernel");
 
-            m_SkinMatrixQuery = GetEntityQuery(
-                ComponentType.ReadWrite<SkinMatrix>()
-            );
+            m_SkinMatrixQuery = GetEntityQuery(ComponentType.ReadWrite<SkinMatrix>());
         }
 
         protected override void OnUpdate()
@@ -71,7 +71,9 @@ namespace Unity.Rendering
             // This guarantees that the data has been written to GPU
             // Assuming that PushSkinMatrixSystem has executed before this system.
             m_SkinMatrixQuery.CompleteDependency();
-            m_PushMeshDataSystem.SkinningBufferManager.UnlockSkinMatrixBufferForWrite(m_PushMeshDataSystem.SkinMatrixCount);
+            m_PushMeshDataSystem.SkinningBufferManager.UnlockSkinMatrixBufferForWrite(
+                m_PushMeshDataSystem.SkinMatrixCount
+            );
 
             k_FinalizePushSkinMatrix.End();
             k_SkinningDeformationMarker.Begin();

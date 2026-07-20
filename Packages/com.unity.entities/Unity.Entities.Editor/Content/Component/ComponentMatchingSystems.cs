@@ -73,7 +73,13 @@ namespace Unity.Entities.Editor
 
                 if (entityQueriesList.Count > 0)
                 {
-                    systems.Add(new SystemQueriesViewData(system, RelationshipsTab.GetSystemKind(system), queryViewDataList.ToArray()));
+                    systems.Add(
+                        new SystemQueriesViewData(
+                            system,
+                            RelationshipsTab.GetSystemKind(system),
+                            queryViewDataList.ToArray()
+                        )
+                    );
                 }
             }
         }

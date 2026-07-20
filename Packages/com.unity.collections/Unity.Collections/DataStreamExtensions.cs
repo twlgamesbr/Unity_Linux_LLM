@@ -30,7 +30,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <returns>Whether the write was successful</returns>
         public static unsafe bool WriteBytesUnsafe(this ref DataStreamWriter writer, byte* data, int bytes)
         {
-            var dataArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(data, bytes, Allocator.None);
+            var dataArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                data,
+                bytes,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref dataArray, AtomicSafetyHandle.GetTempMemoryHandle());
 #endif
@@ -46,13 +50,16 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="length">Number of bytes to read.</param>
         public static unsafe void ReadBytesUnsafe(this ref DataStreamReader reader, byte* data, int length)
         {
-            var dataArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(data, length, Allocator.None);
+            var dataArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                data,
+                length,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref dataArray, AtomicSafetyHandle.GetTempMemoryHandle());
 #endif
             reader.ReadBytes(dataArray);
         }
-
 
         /// <summary>
         /// Reads a 2-byte length value from the current stream, reads the specified number of bytes
@@ -64,7 +71,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <returns>The number of bytes written to the data buffer.</returns>
         public static unsafe ushort ReadFixedStringUnsafe(this ref DataStreamReader reader, byte* data, int maxLength)
         {
-            var dataArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(data, maxLength, Allocator.Temp);
+            var dataArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                data,
+                maxLength,
+                Allocator.Temp
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref dataArray, AtomicSafetyHandle.GetTempMemoryHandle());
 #endif
@@ -83,10 +94,25 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="baseLength">The length of the previous value.</param>
         /// <param name="model"><see cref="StreamCompressionModel"/> model for writing value in a packed manner.</param>
         /// <returns>Whether the write was successful</returns>
-        public static unsafe ushort ReadPackedFixedStringDeltaUnsafe(this ref DataStreamReader reader, byte* data, int maxLength, byte* baseData, ushort baseLength, StreamCompressionModel model)
+        public static unsafe ushort ReadPackedFixedStringDeltaUnsafe(
+            this ref DataStreamReader reader,
+            byte* data,
+            int maxLength,
+            byte* baseData,
+            ushort baseLength,
+            StreamCompressionModel model
+        )
         {
-            var current = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(data, maxLength, Allocator.Temp);
-            var baseline = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(baseData, baseLength, Allocator.Temp);
+            var current = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                data,
+                maxLength,
+                Allocator.Temp
+            );
+            var baseline = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                baseData,
+                baseLength,
+                Allocator.Temp
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandle = AtomicSafetyHandle.GetTempMemoryHandle();
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref current, safetyHandle);

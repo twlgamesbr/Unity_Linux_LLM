@@ -31,7 +31,5 @@ namespace UnityEngine.TestTools
     /// </code>
     /// </example>
     [AttributeUsage(AttributeTargets.Method)]
-    public class UnityTearDownAttribute : NUnitAttribute
-    {
-    }
+    public class UnityTearDownAttribute : NUnitAttribute { }
 }

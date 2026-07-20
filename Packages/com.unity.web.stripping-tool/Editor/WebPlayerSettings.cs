@@ -1,6 +1,6 @@
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEditor;
@@ -25,15 +25,13 @@ namespace Unity.Web.Stripping.Editor
         {
             "wasmArithmeticExceptions",
             "analyzeBuildSize",
-            "enableWebGPU" // simply removed in 6.1a without becoming deprecated first
+            "enableWebGPU", // simply removed in 6.1a without becoming deprecated first
         };
 
         /// <summary>
         /// Constructs with default-initialized values.
         /// </summary>
-        public WebPlayerSettings()
-        {
-        }
+        public WebPlayerSettings() { }
 
         /// <summary>
         /// Constructs a new `WebPlayerSettings` with values read from current Player settings.
@@ -154,80 +152,99 @@ namespace Unity.Web.Stripping.Editor
         /// Refer to [`PlayerSettings.WebGL.closeOnQuit`](xref:UnityEditor.PlayerSettings.WebGL.closeOnQuit).
         /// </summary>
         public bool closeOnQuit;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.compressionFormat`](xref:UnityEditor.PlayerSettings.WebGL.compressionFormat).
         /// </summary>
         public WebGLCompressionFormat compressionFormat;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.dataCaching`](xref:UnityEditor.PlayerSettings.WebGL.dataCaching).
         /// </summary>
         public bool dataCaching;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.debugSymbolMode`](xref:UnityEditor.PlayerSettings.WebGL.debugSymbolMode).
         /// </summary>
         public WebGLDebugSymbolMode debugSymbolMode;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.decompressionFallback`](xref:UnityEditor.PlayerSettings.WebGL.decompressionFallback).
         /// </summary>
         public bool decompressionFallback;
+
         /// <summary>
         /// For internal use only, hidden from the documentation.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public string emscriptenArgs;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.exceptionSupport`](xref:UnityEditor.PlayerSettings.WebGL.exceptionSupport).
         /// </summary>
         public WebGLExceptionSupport exceptionSupport;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.geometricMemoryGrowthStep`](xref:UnityEditor.PlayerSettings.WebGL.geometricMemoryGrowthStep).
         /// </summary>
         public float geometricMemoryGrowthStep;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.initialMemorySize`](xref:UnityEditor.PlayerSettings.WebGL.initialMemorySize).
         /// </summary>
         public int initialMemorySize;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.linearMemoryGrowthStep`](xref:UnityEditor.PlayerSettings.WebGL.linearMemoryGrowthStep).
         /// </summary>
         public int linearMemoryGrowthStep;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.linkerTarget`](xref:UnityEditor.PlayerSettings.WebGL.linkerTarget).
         /// </summary>
         public WebGLLinkerTarget linkerTarget;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.maximumMemorySize`](xref:UnityEditor.PlayerSettings.WebGL.maximumMemorySize).
         /// </summary>
         public int maximumMemorySize;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.memorySize`](xref:UnityEditor.PlayerSettings.WebGL.memorySize).
         /// </summary>
         public int memorySize;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.memoryGeometricGrowthCap`](xref:UnityEditor.PlayerSettings.WebGL.memoryGeometricGrowthCap).
         /// </summary>
         public int memoryGeometricGrowthCap;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.memoryGrowthMode`](xref:UnityEditor.PlayerSettings.WebGL.memoryGrowthMode).
         /// </summary>
         public WebGLMemoryGrowthMode memoryGrowthMode;
+
         /// <summary>
         /// For internal use only, hidden from the documentation.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public string modulesDirectory;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.nameFilesAsHashes`](xref:UnityEditor.PlayerSettings.WebGL.nameFilesAsHashes).
         /// </summary>
         public bool nameFilesAsHashes;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.powerPreference`](xref:UnityEditor.PlayerSettings.WebGL.powerPreference).
         /// </summary>
         public WebGLPowerPreference powerPreference;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.showDiagnostics`](xref:UnityEditor.PlayerSettings.WebGL.showDiagnostics).
         /// </summary>
         public bool showDiagnostics;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.template`](xref:UnityEditor.PlayerSettings.WebGL.template).
         /// </summary>
@@ -247,30 +264,37 @@ namespace Unity.Web.Stripping.Editor
         /// Refer to [`PlayerSettings.WebGL.threadsSupport`](xref:UnityEditor.PlayerSettings.WebGL.threadsSupport).
         /// </summary>
         public bool threadsSupport;
+
         /// <summary>
         /// Refer to [Embedded resources in Web](xref:webgl-embeddedresources).
         /// </summary>
         public bool useEmbeddedResources;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.wasm2023`](xref:UnityEditor.PlayerSettings.WebGL.wasm2023).
         /// </summary>
         public bool wasm2023;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.webAssemblyBigInt`](xref:UnityEditor.PlayerSettings.WebGL.webAssemblyBigInt).
         /// </summary>
         public bool webAssemblyBigInt;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.webAssemblyTable`](xref:UnityEditor.PlayerSettings.WebGL.webAssemblyTable).
         /// </summary>
         public bool webAssemblyTable;
+
         /// <summary>
         /// Refer to [`PlayerSettings.WebGL.enableSubmoduleStrippingCompatibility`](xref:UnityEditor.PlayerSettings.WebGL.enableSubmoduleStrippingCompatibility).
         /// </summary>
         public bool enableSubmoduleStrippingCompatibility;
+
         /// <summary>
         /// Refer to [`ManagedStrippingLevel`](xref:UnityEditor.ManagedStrippingLevel).
         /// </summary>
         public ManagedStrippingLevel managedStrippingLevel;
+
         /// <summary>
         /// Refer to [`PlayerSettings.stripEngineCode`](xref:UnityEditor.PlayerSettings.stripEngineCode).
         /// </summary>
@@ -285,6 +309,7 @@ namespace Unity.Web.Stripping.Editor
         /// Refer to [`Il2CppCodeGeneration`](xref:UnityEditor.Build.Il2CppCodeGeneration).
         /// </summary>
         public Il2CppCodeGeneration il2CppCodeGeneration;
+
         /// <summary>
         /// Refer to [`Il2CppCompilerConfiguration`](xref:UnityEditor.Il2CppCompilerConfiguration).
         /// </summary>
@@ -311,8 +336,10 @@ namespace Unity.Web.Stripping.Editor
         internal WebGLDebugSymbolMode DebugSymbolMode =>
             BuildSettings?.development == true ? WebGLDebugSymbolMode.Embedded : debugSymbolMode;
         internal bool MultithreadingEnabled => threadsSupport;
+
         // Native multithreading means that all other wasm features are enabled also even if not explicitly set
         internal bool Wasm2023Enabled => MultithreadingEnabled || wasm2023;
+
         // Wasm2023 means that all other wasm features are enabled
         internal bool WasmTableEnabled => Wasm2023Enabled || webAssemblyTable;
         internal bool WasmBigIntEnabled => Wasm2023Enabled || webAssemblyBigInt;
@@ -327,22 +354,27 @@ namespace Unity.Web.Stripping.Editor
         /// Check whether Player settings contain additional Emscripten args that
         /// are incompatible with submodule profiling and stripping.
         /// </summary>
-        internal bool HasIncompatibleEmscriptenArg => FindIncompatibleEmscriptenArgs(emscriptenArgs).Any() && debugSymbolMode == WebGLDebugSymbolMode.External;
+        internal bool HasIncompatibleEmscriptenArg =>
+            FindIncompatibleEmscriptenArgs(emscriptenArgs).Any() && debugSymbolMode == WebGLDebugSymbolMode.External;
 
         internal static ManagedStrippingLevel GetManagedStrippingLevel() =>
             PlayerSettings.GetManagedStrippingLevel(NamedBuildTarget.WebGL);
+
         internal static void SetManagedStrippingLevel(ManagedStrippingLevel l) =>
             PlayerSettings.SetManagedStrippingLevel(NamedBuildTarget.WebGL, l);
 
         internal static Il2CppCodeGeneration GetIl2CppCodeGeneration() =>
             PlayerSettings.GetIl2CppCodeGeneration(NamedBuildTarget.WebGL);
+
         internal static void SetIl2CppCodeGeneration(Il2CppCodeGeneration l) =>
             PlayerSettings.SetIl2CppCodeGeneration(NamedBuildTarget.WebGL, l);
 
         internal static Il2CppCompilerConfiguration GetIl2CppCompilerConfiguration() =>
             PlayerSettings.GetIl2CppCompilerConfiguration(NamedBuildTarget.WebGL);
+
         internal static void SetIl2CppCompilerConfiguration(Il2CppCompilerConfiguration l) =>
             PlayerSettings.SetIl2CppCompilerConfiguration(NamedBuildTarget.WebGL, l);
+
         internal static IEnumerable<string> FindIncompatibleEmscriptenArgs(string emscriptenArgs) =>
             string.IsNullOrEmpty(emscriptenArgs)
                 ? new string[0]

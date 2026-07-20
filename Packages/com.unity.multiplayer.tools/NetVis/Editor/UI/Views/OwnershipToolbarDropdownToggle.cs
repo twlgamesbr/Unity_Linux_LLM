@@ -15,9 +15,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             : base(
                 name: "Network Visualization Ownership",
                 tooltip: "Visualize Networked Objects Ownership using colored categories.",
-                icon: NetVisIcon.Ownership)
-        {
-        }
+                icon: NetVisIcon.Ownership
+            ) { }
 
         protected override void OnMetricChanged(NetVisMetric metric)
         {
@@ -26,15 +25,14 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
 
         protected override void OnStateChange(ChangeEvent<bool> stateChange)
         {
-            ConfigurationWithEvents.Metric = stateChange.newValue
-                ? NetVisMetric.Ownership
-                : NetVisMetric.None;
+            ConfigurationWithEvents.Metric = stateChange.newValue ? NetVisMetric.Ownership : NetVisMetric.None;
         }
 
         protected override void ShowOverlayPopUp()
         {
             PopupWindow.Show(worldBound, new NetVisPopupWindowContent<OwnershipConfigurationView>(400));
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<OwnershipToolbarDropdownToggle, UxmlTraits> { }
 #endif

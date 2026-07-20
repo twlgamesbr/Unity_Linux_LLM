@@ -29,8 +29,8 @@ namespace Unity.Editor.Bridge
             }
         }
 
-        public static void PublishEvents(NativeArray<GameObjectChangeTrackerEvent> events)
-            => GameObjectChangeTracker.PublishEvents(events.Reinterpret<UnityEditor.GameObjectChangeTrackerEvent>());
+        public static void PublishEvents(NativeArray<GameObjectChangeTrackerEvent> events) =>
+            GameObjectChangeTracker.PublishEvents(events.Reinterpret<UnityEditor.GameObjectChangeTrackerEvent>());
 
         static void OnInternalGameObjectsChanged(in NativeArray<UnityEditor.GameObjectChangeTrackerEvent> events)
         {
@@ -50,8 +50,8 @@ namespace Unity.Editor.Bridge
             EventType = eventType;
         }
 
-        public override string ToString()
-            => $"GameObjectChangeTrackerEvent(InstanceId: {EntityId}, EventType: {EventType})";
+        public override string ToString() =>
+            $"GameObjectChangeTrackerEvent(InstanceId: {EntityId}, EventType: {EventType})";
     }
 
     [Flags]

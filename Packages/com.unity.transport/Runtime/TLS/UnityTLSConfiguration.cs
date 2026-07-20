@@ -20,7 +20,8 @@ namespace Unity.Networking.Transport.TLS
         private NativeReference<UnityTLSCallbacks.CallbackContext> m_Callbacks;
 
         public Binding.unitytls_client_config* ConfigPtr => (Binding.unitytls_client_config*)m_Config.GetUnsafePtr();
-        public UnityTLSCallbacks.CallbackContext* CallbackContextPtr => (UnityTLSCallbacks.CallbackContext*)m_Callbacks.GetUnsafePtr();
+        public UnityTLSCallbacks.CallbackContext* CallbackContextPtr =>
+            (UnityTLSCallbacks.CallbackContext*)m_Callbacks.GetUnsafePtr();
 
         // We need to store pointers into SecureNetworkProtocolParameter or RelayNetworkParameter
         // inside the UnityTLS configuration, so store them in native containers so that they'll
@@ -30,7 +31,10 @@ namespace Unity.Networking.Transport.TLS
 
         public bool IsCreated => m_Config.IsCreated;
 
-        private static void InitializeFromSecureParameters(Binding.unitytls_client_config* config, ref SecureNetworkProtocolParameter parameters)
+        private static void InitializeFromSecureParameters(
+            Binding.unitytls_client_config* config,
+            ref SecureNetworkProtocolParameter parameters
+        )
         {
             config->clientAuth = (uint)parameters.ClientAuthenticationPolicy;
 
@@ -42,7 +46,7 @@ namespace Unity.Networking.Transport.TLS
                 config->caPEM = new Binding.unitytls_dataRef()
                 {
                     dataPtr = parameters.CACertificate.GetUnsafePtr(),
-                    dataLen = new UIntPtr((uint)parameters.CACertificate.Length)
+                    dataLen = new UIntPtr((uint)parameters.CACertificate.Length),
                 };
             }
 
@@ -51,18 +55,21 @@ namespace Unity.Networking.Transport.TLS
                 config->serverPEM = new Binding.unitytls_dataRef()
                 {
                     dataPtr = parameters.Certificate.GetUnsafePtr(),
-                    dataLen = new UIntPtr((uint)parameters.Certificate.Length)
+                    dataLen = new UIntPtr((uint)parameters.Certificate.Length),
                 };
 
                 config->privateKeyPEM = new Binding.unitytls_dataRef()
                 {
                     dataPtr = parameters.PrivateKey.GetUnsafePtr(),
-                    dataLen = new UIntPtr((uint)parameters.PrivateKey.Length)
+                    dataLen = new UIntPtr((uint)parameters.PrivateKey.Length),
                 };
             }
         }
 
-        private static void InitializeFromRelayParameters(Binding.unitytls_client_config* config, ref RelayNetworkParameter parameters)
+        private static void InitializeFromRelayParameters(
+            Binding.unitytls_client_config* config,
+            ref RelayNetworkParameter parameters
+        )
         {
             config->hostname = (byte*)parameters.ServerData.HostString.GetUnsafePtr();
 
@@ -75,7 +82,7 @@ namespace Unity.Networking.Transport.TLS
                     config->psk = new Binding.unitytls_dataRef()
                     {
                         dataPtr = hmacPtr,
-                        dataLen = new UIntPtr(RelayHMACKey.k_Length)
+                        dataLen = new UIntPtr(RelayHMACKey.k_Length),
                     };
                 }
 
@@ -84,7 +91,7 @@ namespace Unity.Networking.Transport.TLS
                     config->pskIdentity = new Binding.unitytls_dataRef()
                     {
                         dataPtr = allocPtr,
-                        dataLen = new UIntPtr(RelayAllocationId.k_Length)
+                        dataLen = new UIntPtr(RelayAllocationId.k_Length),
                     };
                 }
             }
@@ -130,7 +137,10 @@ namespace Unity.Networking.Transport.TLS
                 var paramsPtr = (SecureNetworkProtocolParameter*)m_SecureParameters.GetUnsafePtr();
                 *paramsPtr = secureParams;
 
-                InitializeFromSecureParameters(ConfigPtr, ref UnsafeUtility.AsRef<SecureNetworkProtocolParameter>(paramsPtr));
+                InitializeFromSecureParameters(
+                    ConfigPtr,
+                    ref UnsafeUtility.AsRef<SecureNetworkProtocolParameter>(paramsPtr)
+                );
             }
         }
 

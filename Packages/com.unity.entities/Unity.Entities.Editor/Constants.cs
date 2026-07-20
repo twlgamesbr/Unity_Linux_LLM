@@ -5,7 +5,8 @@ namespace Unity.Entities.Editor
 {
     static class Constants
     {
-        public const string EditorDefaultResourcesPath = "Packages/" + Resources.PackageId + "/Editor Default Resources/";
+        public const string EditorDefaultResourcesPath =
+            "Packages/" + Resources.PackageId + "/Editor Default Resources/";
 
         public static readonly Vector2 MinWindowSize = new Vector2(200, 200); // Matches SceneHierarchy's min size
 

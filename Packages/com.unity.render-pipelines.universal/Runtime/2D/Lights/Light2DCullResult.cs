@@ -15,11 +15,26 @@ namespace UnityEngine.Rendering.Universal
         public uint blendStylesUsed;
         public uint blendStylesWithLights;
 
-        public bool useLights { get { return totalLights > 0; } }
-        public bool useShadows { get { return totalShadows > 0; } }
-        public bool useVolumetricLights { get { return totalVolumetricUsage > 0; } }
-        public bool useVolumetricShadowLights { get { return totalVolumetricShadowUsage > 0; } }
-        public bool useNormalMap { get { return totalNormalMapUsage > 0; } }
+        public bool useLights
+        {
+            get { return totalLights > 0; }
+        }
+        public bool useShadows
+        {
+            get { return totalShadows > 0; }
+        }
+        public bool useVolumetricLights
+        {
+            get { return totalVolumetricUsage > 0; }
+        }
+        public bool useVolumetricShadowLights
+        {
+            get { return totalVolumetricShadowUsage > 0; }
+        }
+        public bool useNormalMap
+        {
+            get { return totalNormalMapUsage > 0; }
+        }
     }
 
     internal interface ILight2DCullResult
@@ -140,7 +155,9 @@ namespace UnityEngine.Rendering.Universal
                         continue;
 
 #if UNITY_EDITOR
-                    if (!UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera(light.gameObject, camera))
+                    if (
+                        !UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera(light.gameObject, camera)
+                    )
                         continue;
 #endif
 

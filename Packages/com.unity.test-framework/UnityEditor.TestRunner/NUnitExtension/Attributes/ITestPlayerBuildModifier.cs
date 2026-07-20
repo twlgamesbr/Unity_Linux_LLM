@@ -21,7 +21,10 @@ namespace UnityEditor.TestTools
         /// <param name="playerOptions">The unmodified BuildPlayerWithProfileOptions, does not specify a build profile.</param>
         /// <returns>The modified BuildPlayerWithProfileOptions. If a build profile is given, then <see cref="BuildPlayerWithProfileOptions"> is
         /// used to build the player.</returns>
-        BuildPlayerWithProfileOptions ModifyOptions(BuildPlayerWithProfileOptions playerOptions) { return playerOptions; }
+        BuildPlayerWithProfileOptions ModifyOptions(BuildPlayerWithProfileOptions playerOptions)
+        {
+            return playerOptions;
+        }
 #endif
     }
 }

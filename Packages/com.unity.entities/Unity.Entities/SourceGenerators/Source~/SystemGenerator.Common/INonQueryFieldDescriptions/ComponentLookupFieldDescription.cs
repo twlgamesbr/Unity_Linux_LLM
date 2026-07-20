@@ -9,7 +9,7 @@ public readonly struct ComponentLookupFieldDescription : IEquatable<ComponentLoo
 {
     ITypeSymbol TypeSymbol { get; }
     bool IsReadOnly { get; }
-    public string GeneratedFieldName{ get; }
+    public string GeneratedFieldName { get; }
 
     public void AppendMemberDeclaration(IndentedTextWriter w, bool forcePublic = false)
     {
@@ -39,8 +39,8 @@ public readonly struct ComponentLookupFieldDescription : IEquatable<ComponentLoo
     {
         unchecked
         {
-            return ((TypeSymbol != null ?
-                SymbolEqualityComparer.Default.GetHashCode(TypeSymbol) : 0) * 397) ^ IsReadOnly.GetHashCode();
+            return ((TypeSymbol != null ? SymbolEqualityComparer.Default.GetHashCode(TypeSymbol) : 0) * 397)
+                ^ IsReadOnly.GetHashCode();
         }
     }
 }

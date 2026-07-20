@@ -19,9 +19,7 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
         /// <see cref="PresetConfiguration"/>
         /// </summary>
         [Serializable]
-        public sealed class Configuration : PresetConfiguration
-        {
-        }
+        public sealed class Configuration : PresetConfiguration { }
 
         /// <summary>
         /// Time in milliseconds to activate the next <see cref="PresetConfiguration.ConnectionPreset"/>.
@@ -30,10 +28,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
         public int ChangeIntervalMilliseconds = 5_000;
 
         [SerializeField]
-        List<Configuration> m_Configurations = new(new[]
-        {
-            new Configuration { ConnectionPreset = NetworkSimulatorPresets.None }
-        });
+        List<Configuration> m_Configurations = new(
+            new[] { new Configuration { ConnectionPreset = NetworkSimulatorPresets.None } }
+        );
 
         /// <summary>
         /// Defines the available <see cref="PresetConfiguration.ConnectionPreset"/> list.
@@ -55,7 +52,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
 
                 if (index >= m_Configurations.Count)
                 {
-                    Debug.LogWarning($"Skipping scenario item #{index} as {nameof(RandomConnectionsSwap)}.{nameof(Configurations)} doesn't have enough elements.");
+                    Debug.LogWarning(
+                        $"Skipping scenario item #{index} as {nameof(RandomConnectionsSwap)}.{nameof(Configurations)} doesn't have enough elements."
+                    );
                     await Task.Yield();
                     continue;
                 }
@@ -65,7 +64,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios
 
                 if (ChangeIntervalMilliseconds <= 0)
                 {
-                    Debug.LogWarning($"Skipping scenario item #{index}. {nameof(RandomConnectionsSwap)}.{ChangeIntervalMilliseconds} parameter must be greater than 0.");
+                    Debug.LogWarning(
+                        $"Skipping scenario item #{index}. {nameof(RandomConnectionsSwap)}.{ChangeIntervalMilliseconds} parameter must be greater than 0."
+                    );
                     await Task.Yield();
                     continue;
                 }

@@ -146,9 +146,7 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
         /// <summary>
         /// Disposes the scenario.
         /// </summary>
-        public virtual void Dispose()
-        {
-        }
+        public virtual void Dispose() { }
 
         /// <summary>
         /// Implement to define custom behaviour to be called when the scenario is paused.

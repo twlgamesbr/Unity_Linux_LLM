@@ -8,7 +8,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
     /// A generic type content provider to be used with the <see cref="SelectionDropDown" /> control.
     /// </summary>
     /// <typeparam name="T">The type of values represented by content elements.</typeparam>
-    internal class GenericItemContentProvider<T> : ISelectionDropDownContentProvider where T : IEquatable<T>
+    internal class GenericItemContentProvider<T> : ISelectionDropDownContentProvider
+        where T : IEquatable<T>
     {
         private readonly ISelectableItem<T>[] m_Items;
         private readonly Action<T> m_ValueChangedCallback;
@@ -23,7 +24,12 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
         /// <param name="valueChangedCallback"></param>
         /// <exception cref="ArgumentNullException">Thrown if any of the provided arguments is null, except for the separator indices.</exception>
         /// <exception cref="ArgumentException">Thrown if the set of items is empty or does not contain the initial selection value.</exception>
-        public GenericItemContentProvider(T initialValue, ISelectableItem<T>[] items, int[] separatorIndices, Action<T> valueChangedCallback)
+        public GenericItemContentProvider(
+            T initialValue,
+            ISelectableItem<T>[] items,
+            int[] separatorIndices,
+            Action<T> valueChangedCallback
+        )
         {
             if (initialValue == null)
             {
@@ -37,7 +43,10 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
 
             if (valueChangedCallback == null)
             {
-                throw new ArgumentNullException(nameof(valueChangedCallback), "The value change callback must not be null.");
+                throw new ArgumentNullException(
+                    nameof(valueChangedCallback),
+                    "The value change callback must not be null."
+                );
             }
 
             if (items.Length == 0)

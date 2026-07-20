@@ -27,7 +27,6 @@ namespace UnityEngine.Rendering.Universal
 
     internal static class LightUtility
     {
-
         public static int ProviderToHash(Provider2D provider, Component component)
         {
             if (provider != null && component != null)
@@ -69,7 +68,6 @@ namespace UnityEngine.Rendering.Universal
             return changed;
         }
 
-
         public static bool CheckForChange(float a, ref float b)
         {
             var changed = a != b;
@@ -90,7 +88,7 @@ namespace UnityEngine.Rendering.Universal
             PivotCurve,
             PivotIntersect,
             PivotSkip,
-            PivotClip
+            PivotClip,
         };
 
         [Serializable]
@@ -209,7 +207,7 @@ namespace UnityEngine.Rendering.Universal
             }
 
             // Insert Skipped Points.
-            for (int i = 1; i < path.Count - 1;)
+            for (int i = 1; i < path.Count - 1; )
             {
                 var prev = path[i - 1];
                 var curr = path[i];
@@ -267,8 +265,13 @@ namespace UnityEngine.Rendering.Universal
             return output;
         }
 
-        static void TransferToMesh(NativeArray<LightMeshVertex> vertices, int vertexCount, NativeArray<ushort> indices,
-            int indexCount, Light2D light)
+        static void TransferToMesh(
+            NativeArray<LightMeshVertex> vertices,
+            int vertexCount,
+            NativeArray<ushort> indices,
+            int indexCount,
+            Light2D light
+        )
         {
             var mesh = light.lightMesh;
             mesh.SetVertexBufferParams(vertexCount, LightMeshVertex.VertexLayout);
@@ -281,7 +284,12 @@ namespace UnityEngine.Rendering.Universal
             NativeArray<ushort>.Copy(indices, light.indices, indexCount);
         }
 
-        public static Bounds GenerateShapeMesh(Light2D light, Vector3[] shapePath, float falloffDistance, float batchColor)
+        public static Bounds GenerateShapeMesh(
+            Light2D light,
+            Vector3[] shapePath,
+            float falloffDistance,
+            float batchColor
+        )
         {
             const float kClipperScale = 10000.0f;
 
@@ -319,7 +327,18 @@ namespace UnityEngine.Rendering.Universal
 
 #if USING_2DCOMMON
             int tessOutEdgeCount = 0;
-            U2D.Common.UTess.ModuleHandle.Tessellate(Allocator.Temp, tessInVertices, tessInEdges, ref tessOutVertices, out tessOutVertexCount, ref tessOutIndices, out tessOutIndexCount, ref tessOutEdges, out tessOutEdgeCount, false);
+            U2D.Common.UTess.ModuleHandle.Tessellate(
+                Allocator.Temp,
+                tessInVertices,
+                tessInEdges,
+                ref tessOutVertices,
+                out tessOutVertexCount,
+                ref tessOutIndices,
+                out tessOutIndexCount,
+                ref tessOutEdges,
+                out tessOutEdgeCount,
+                false
+            );
 #endif
 
             // Create falloff geometry with random noise to account for collinear points
@@ -367,7 +386,7 @@ namespace UnityEngine.Rendering.Universal
                     outVertices[i] = new LightMeshVertex()
                     {
                         position = new float3(tessOutVertices[i].x, tessOutVertices[i].y, 0),
-                        color = meshInteriorColor
+                        color = meshInteriorColor,
                     };
                 }
 
@@ -381,7 +400,7 @@ namespace UnityEngine.Rendering.Universal
                     outVertices[vcount++] = new LightMeshVertex()
                     {
                         position = new float3(shapePath[i].x, shapePath[i].y, 0),
-                        color = meshInteriorColor
+                        color = meshInteriorColor,
                     };
                     innerIndices[i] = (ushort)(vcount - 1);
                 }
@@ -400,7 +419,7 @@ namespace UnityEngine.Rendering.Universal
                     outVertices[vcount++] = new LightMeshVertex()
                     {
                         position = new float3(currPoint.x, currPoint.y, 0),
-                        color = (interiorStartPoint > i) ? meshExteriorColor : meshInteriorColor
+                        color = (interiorStartPoint > i) ? meshExteriorColor : meshInteriorColor,
                     };
 
                     if (prevIndex != currIndex)
@@ -431,8 +450,20 @@ namespace UnityEngine.Rendering.Universal
                         var kTolerance = 0.001f;
                         var connectingPoint = innerIndices[lastPointIndex];
                         // End point detection is tricky and depends on convexity of shape. Simple test is to just check the vertices and detect.
-                        var testA = MathF.Abs(outVertices[connectingPoint].position.x - outVertices[outIndices[icount - 1]].position.x) > kTolerance || MathF.Abs(outVertices[connectingPoint].position.y - outVertices[outIndices[icount - 1]].position.y) > kTolerance;
-                        var testB = MathF.Abs(outVertices[connectingPoint].position.x - outVertices[outIndices[icount - 2]].position.x) > kTolerance || MathF.Abs(outVertices[connectingPoint].position.y - outVertices[outIndices[icount - 2]].position.y) > kTolerance;
+                        var testA =
+                            MathF.Abs(
+                                outVertices[connectingPoint].position.x - outVertices[outIndices[icount - 1]].position.x
+                            ) > kTolerance
+                            || MathF.Abs(
+                                outVertices[connectingPoint].position.y - outVertices[outIndices[icount - 1]].position.y
+                            ) > kTolerance;
+                        var testB =
+                            MathF.Abs(
+                                outVertices[connectingPoint].position.x - outVertices[outIndices[icount - 2]].position.x
+                            ) > kTolerance
+                            || MathF.Abs(
+                                outVertices[connectingPoint].position.y - outVertices[outIndices[icount - 2]].position.y
+                            ) > kTolerance;
                         if (!testA || !testB)
                             connectingPoint = (ushort)(interiorStartPoint + inputPointCount + tessOutVertexCount - 1);
                         outIndices[icount++] = connectingPoint;
@@ -448,7 +479,14 @@ namespace UnityEngine.Rendering.Universal
             return light.lightMesh.GetSubMesh(0).bounds;
         }
 
-        public static Bounds GenerateParametricMesh(Light2D light, float radius, float falloffDistance, float angle, int sides, float batchColor)
+        public static Bounds GenerateParametricMesh(
+            Light2D light,
+            float radius,
+            float falloffDistance,
+            float angle,
+            int sides,
+            float batchColor
+        )
         {
             var angleOffset = Mathf.PI / 2.0f + Mathf.Deg2Rad * angle;
             if (sides < 3)
@@ -471,11 +509,7 @@ namespace UnityEngine.Rendering.Universal
 
             // Only Alpha value in Color channel is ever used. May remove it or keep it for batching params in the future.
             var color = new Color(0, 0, batchColor, 1.0f);
-            vertices[centerIndex] = new LightMeshVertex
-            {
-                position = float3.zero,
-                color = color
-            };
+            vertices[centerIndex] = new LightMeshVertex { position = float3.zero, color = color };
 
             var radiansPerSide = 2 * Mathf.PI / sides;
             var min = new float3(float.MaxValue, float.MaxValue, 0);
@@ -491,13 +525,9 @@ namespace UnityEngine.Rendering.Universal
                 vertices[vertexIndex] = new LightMeshVertex
                 {
                     position = endPoint,
-                    color = new Color(extrudeDir.x, extrudeDir.y, batchColor, 0)
+                    color = new Color(extrudeDir.x, extrudeDir.y, batchColor, 0),
                 };
-                vertices[vertexIndex + 1] = new LightMeshVertex
-                {
-                    position = endPoint,
-                    color = color
-                };
+                vertices[vertexIndex + 1] = new LightMeshVertex { position = endPoint, color = color };
 
                 // Triangle 1 (Tip)
                 var triangleIndex = 9 * i;
@@ -528,11 +558,7 @@ namespace UnityEngine.Rendering.Universal
             light.indices = new ushort[indexCount];
             NativeArray<ushort>.Copy(triangles, light.indices, indexCount);
 
-            return new Bounds
-            {
-                min = min,
-                max = max
-            };
+            return new Bounds { min = min, max = max };
         }
 
         public static Bounds GenerateSpriteMesh(Light2D light, Sprite sprite, float batchColor)
@@ -563,7 +589,7 @@ namespace UnityEngine.Rendering.Universal
                 {
                     position = new Vector3(srcVertices[i].x, srcVertices[i].y, 0),
                     color = color,
-                    uv = srcUVs[i]
+                    uv = srcUVs[i],
                 };
             }
             mesh.SetVertexBufferParams(vertices.Length, LightMeshVertex.VertexLayout);

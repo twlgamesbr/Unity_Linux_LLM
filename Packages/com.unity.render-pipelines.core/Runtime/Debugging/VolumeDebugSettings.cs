@@ -31,12 +31,12 @@ namespace UnityEngine.Rendering
             get
             {
                 var count = cameras.Count();
-                return count > 0 ? Math.Clamp(m_SelectedCameraIndex, 0, count-1) : -1;
+                return count > 0 ? Math.Clamp(m_SelectedCameraIndex, 0, count - 1) : -1;
             }
             set
             {
                 var count = cameras.Count();
-                m_SelectedCameraIndex = Math.Clamp(value, 0, count-1);
+                m_SelectedCameraIndex = Math.Clamp(value, 0, count - 1);
             }
         }
 
@@ -107,12 +107,15 @@ namespace UnityEngine.Rendering
         }
 
         /// <summary>List of Volume component types.</summary>
-        public List<(string, Type)> volumeComponentsPathAndType => VolumeManager.instance.GetVolumeComponentsForDisplay(GraphicsSettings.currentRenderPipelineAssetType);
+        public List<(string, Type)> volumeComponentsPathAndType =>
+            VolumeManager.instance.GetVolumeComponentsForDisplay(GraphicsSettings.currentRenderPipelineAssetType);
 
         /// <summary>
         /// Specifies the render pipeline for this volume settings
         /// </summary>
-        [Obsolete("This property is obsolete and kept only for not breaking user code. VolumeDebugSettings will use current pipeline when it needs to gather volume component types and paths. #from(2023.2)")]
+        [Obsolete(
+            "This property is obsolete and kept only for not breaking user code. VolumeDebugSettings will use current pipeline when it needs to gather volume component types and paths. #from(2023.2)"
+        )]
         public virtual Type targetRenderPipeline { get; }
 
         internal VolumeParameter GetParameter(VolumeComponent component, FieldInfo field)
@@ -138,6 +141,7 @@ namespace UnityEngine.Rendering
         }
 
         float[] weights = null;
+
         float ComputeWeight(Volume volume, Vector3 triggerPos)
         {
             if (volume == null)
@@ -189,12 +193,15 @@ namespace UnityEngine.Rendering
         /// <returns>An array of volumes sorted by influence.</returns>
         public Volume[] GetVolumes()
         {
-            return VolumeManager.instance.GetVolumes(selectedCameraLayerMask)
+            return VolumeManager
+                .instance.GetVolumes(selectedCameraLayerMask)
                 .Where(v => v.sharedProfile != null)
-                .Reverse().ToArray();
+                .Reverse()
+                .ToArray();
         }
 
         VolumeParameter[,] savedStates = null;
+
         VolumeParameter[,] GetStates()
         {
             var fields = selectedComponentType

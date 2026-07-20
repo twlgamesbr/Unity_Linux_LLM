@@ -23,7 +23,8 @@ namespace Unity.PlatformToolkit
 
         public bool HasAttribute<T>(string attributeName)
         {
-            return m_AttributeNameToGetter.TryGetValue(attributeName, out var attributeGetter) && attributeGetter is Func<TAccount, Task<T>>;
+            return m_AttributeNameToGetter.TryGetValue(attributeName, out var attributeGetter)
+                && attributeGetter is Func<TAccount, Task<T>>;
         }
 
         public Task<T> GetAttribute<T>(TAccount account, string attributeName)
@@ -34,13 +35,17 @@ namespace Unity.PlatformToolkit
             if (attributeGetter is Func<TAccount, Task<T>> getter)
                 return getter(account);
 
-            throw new InvalidOperationException($"Attribute {attributeName} type mismatch. Attribute with name {attributeName} ");
+            throw new InvalidOperationException(
+                $"Attribute {attributeName} type mismatch. Attribute with name {attributeName} "
+            );
         }
 
-        public void RegisterAttributeGetter<TAttribute>(string attributeId,  Func<TAccount, Task<TAttribute>> getter)
+        public void RegisterAttributeGetter<TAttribute>(string attributeId, Func<TAccount, Task<TAttribute>> getter)
         {
             if (!m_AttributeIdToGetter.TryAdd(attributeId, getter))
-                throw new ArgumentException($"Attribute {attributeId} is already registered, multiple registrations are not allowed.");
+                throw new ArgumentException(
+                    $"Attribute {attributeId} is already registered, multiple registrations are not allowed."
+                );
         }
 
         public void FinalizeRegistration()
@@ -52,7 +57,10 @@ namespace Unity.PlatformToolkit
                     throw new InvalidOperationException($"Attribute {attributeId} has no registered getter.");
                 }
 
-                if (m_AttributeIdToNames.TryGetValue(attributeId, out var attributeNames) && attributeNames is { Count: > 0 })
+                if (
+                    m_AttributeIdToNames.TryGetValue(attributeId, out var attributeNames)
+                    && attributeNames is { Count: > 0 }
+                )
                 {
                     foreach (var attributeName in attributeNames)
                     {

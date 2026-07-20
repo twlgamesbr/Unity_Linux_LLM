@@ -28,7 +28,10 @@ namespace UnityEditor.AddressableAssets.Build.DataBuilders
         /// <summary>
         /// The build report being generated.
         /// </summary>
-        public BuildReport Report { get { return m_Report; } }
+        public BuildReport Report
+        {
+            get { return m_Report; }
+        }
 
         /// <summary>
         /// Constructor for BuildReportContext

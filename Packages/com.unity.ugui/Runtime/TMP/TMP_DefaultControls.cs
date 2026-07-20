@@ -1,14 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-
 namespace TMPro
 {
-
     public static class TMP_DefaultControls
     {
         public struct Resources
@@ -28,25 +25,26 @@ namespace TMPro
         private static Vector2 s_TextElementSize = new Vector2(100f, 100f);
         private static Vector2 s_ThickElementSize = new Vector2(kWidth, kThickHeight);
         private static Vector2 s_ThinElementSize = new Vector2(kWidth, kThinHeight);
+
         //private static Vector2 s_ImageElementSize = new Vector2(100f, 100f);
         private static Color s_DefaultSelectableColor = new Color(1f, 1f, 1f, 1f);
+
         //private static Color s_PanelColor = new Color(1f, 1f, 1f, 0.392f);
         private static Color s_TextColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
-
 
         private static GameObject CreateUIElementRoot(string name, Vector2 size)
         {
             GameObject root;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             root = ObjectFactory.CreateGameObject(name, typeof(RectTransform));
             var rt = root.GetComponent<RectTransform>();
             rt.sizeDelta = size;
-            #else
+#else
             root = new GameObject(name);
             RectTransform rectTransform = root.AddComponent<RectTransform>();
             rectTransform.sizeDelta = size;
-            #endif
+#endif
 
             return root;
         }
@@ -54,12 +52,12 @@ namespace TMPro
         static GameObject CreateUIObject(string name, GameObject parent)
         {
             GameObject go;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             go = ObjectFactory.CreateGameObject(name, typeof(RectTransform));
-            #else
+#else
             go = new GameObject(name);
             go.AddComponent<RectTransform>();
-            #endif
+#endif
             SetParentAndAlign(go, parent);
             return go;
         }
@@ -177,12 +175,12 @@ namespace TMPro
         {
             GameObject go = null;
 
-            #if UNITY_EDITOR
-                go = ObjectFactory.CreateGameObject("Text (TMP)", typeof(TextMeshProUGUI));
-            #else
-                go = CreateUIElementRoot("Text (TMP)", s_TextElementSize);
-                go.AddComponent<TextMeshProUGUI>();
-            #endif
+#if UNITY_EDITOR
+            go = ObjectFactory.CreateGameObject("Text (TMP)", typeof(TextMeshProUGUI));
+#else
+            go = CreateUIElementRoot("Text (TMP)", s_TextElementSize);
+            go.AddComponent<TextMeshProUGUI>();
+#endif
 
             return go;
         }
@@ -212,7 +210,6 @@ namespace TMPro
             textAreaRectTransform.sizeDelta = Vector2.zero;
             textAreaRectTransform.offsetMin = new Vector2(10, 6);
             textAreaRectTransform.offsetMax = new Vector2(-10, -7);
-
 
             TextMeshProUGUI text = AddComponent<TextMeshProUGUI>(childText);
             text.text = "";
@@ -349,9 +346,9 @@ namespace TMPro
 
             // Setting default Item list.
             itemLabelText.text = "Option A";
-            dropdown.options.Add(new TMP_Dropdown.OptionData {text = "Option A" });
-            dropdown.options.Add(new TMP_Dropdown.OptionData {text = "Option B" });
-            dropdown.options.Add(new TMP_Dropdown.OptionData {text = "Option C" });
+            dropdown.options.Add(new TMP_Dropdown.OptionData { text = "Option A" });
+            dropdown.options.Add(new TMP_Dropdown.OptionData { text = "Option B" });
+            dropdown.options.Add(new TMP_Dropdown.OptionData { text = "Option C" });
             dropdown.RefreshShownValue();
 
             // Set up RectTransforms.
@@ -415,7 +412,8 @@ namespace TMPro
             return root;
         }
 
-        private static T AddComponent<T>(GameObject go) where T : Component
+        private static T AddComponent<T>(GameObject go)
+            where T : Component
         {
 #if UNITY_EDITOR
             return ObjectFactory.AddComponent<T>(go);

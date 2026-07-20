@@ -4,7 +4,6 @@ using System.Threading;
 using Unity.Baselib.LowLevel;
 using Unity.Burst;
 using Unity.Collections;
-
 using Random = Unity.Mathematics.Random;
 
 namespace Unity.Networking.Transport.Utilities
@@ -14,7 +13,8 @@ namespace Unity.Networking.Transport.Utilities
     /// Each bucket has its own first and last item and each bucket can have
     /// items pushed and popped individually.
     /// </summary>
-    internal struct NativeMultiQueue<T> : IDisposable where T : unmanaged
+    internal struct NativeMultiQueue<T> : IDisposable
+        where T : unmanaged
     {
         private NativeList<T> m_Queue;
         private NativeList<int> m_QueueHeadTail;
@@ -171,8 +171,8 @@ namespace Unity.Networking.Transport.Utilities
         internal static bool GreaterThan16(ushort lhs, ushort rhs)
         {
             const uint max_sequence_divide_2 = 0x7FFF;
-            return lhs > rhs && lhs - rhs <= (ushort)max_sequence_divide_2 ||
-                lhs < rhs && rhs - lhs > (ushort)max_sequence_divide_2;
+            return lhs > rhs && lhs - rhs <= (ushort)max_sequence_divide_2
+                || lhs < rhs && rhs - lhs > (ushort)max_sequence_divide_2;
         }
 
         internal static bool LessThan16(ushort lhs, ushort rhs)
@@ -195,7 +195,8 @@ namespace Unity.Networking.Transport.Utilities
         /// </summary>
         /// <param name="list">List that should be resized if sizeToFit >= its size</param>
         /// <param name="sizeToFit">Requested size that should fit into list</param>
-        internal static void ResizeUninitializedTillPowerOf2<T>(this NativeList<T> list, int sizeToFit) where T : unmanaged
+        internal static void ResizeUninitializedTillPowerOf2<T>(this NativeList<T> list, int sizeToFit)
+            where T : unmanaged
         {
             var n = list.Capacity;
 
@@ -218,7 +219,8 @@ namespace Unity.Networking.Transport.Utilities
     internal static class RandomHelpers
     {
         private static readonly SharedStatic<long> s_SharedSeed = SharedStatic<long>.GetOrCreate<SharedRandomKey>(16);
-        private class SharedRandomKey {}
+
+        private class SharedRandomKey { }
 
         static RandomHelpers()
         {
@@ -243,7 +245,7 @@ namespace Unity.Networking.Transport.Utilities
             return (ushort)GetRandomGenerator().NextUInt(1, ushort.MaxValue - 1);
         }
 
-        internal unsafe static ConnectionToken GetRandomConnectionToken()
+        internal static unsafe ConnectionToken GetRandomConnectionToken()
         {
             var token = new ConnectionToken();
             var random = GetRandomGenerator();

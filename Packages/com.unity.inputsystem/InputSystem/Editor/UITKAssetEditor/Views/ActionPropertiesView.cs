@@ -18,16 +18,18 @@ namespace UnityEngine.InputSystem.Editor
             m_ParentFoldout = foldout;
 
             // TODO: Consider IEquatable<T> and how to compare selector data
-            CreateSelector(Selectors.GetSelectedAction,
+            CreateSelector(
+                Selectors.GetSelectedAction,
                 (inputAction, _) =>
                 {
                     if (!inputAction.HasValue)
                         return (null, new List<string>());
                     return (inputAction.Value, Selectors.BuildControlTypeList(inputAction.Value.type).ToList());
-                });
+                }
+            );
         }
 
-        public override void RedrawUI((SerializedInputAction ? , List<string>) viewState)
+        public override void RedrawUI((SerializedInputAction?, List<string>) viewState)
         {
             if (!viewState.Item1.HasValue)
                 return;
@@ -37,10 +39,7 @@ namespace UnityEngine.InputSystem.Editor
 
             rootElement.Clear();
 
-            var actionType = new EnumField("Action Type", inputAction.type)
-            {
-                tooltip = inputAction.actionTypeTooltip
-            };
+            var actionType = new EnumField("Action Type", inputAction.type) { tooltip = inputAction.actionTypeTooltip };
 
             // Tighten up the gap between the label and dropdown so the latter is more readable when the parent pane is at min width.
             var actionLabel = actionType.Q<Label>();
@@ -92,7 +91,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 var initialStateCheck = new Toggle("Initial State Check")
                 {
-                    tooltip = InputActionsEditorConstants.InitialStateCheckTooltip
+                    tooltip = InputActionsEditorConstants.InitialStateCheckTooltip,
                 };
                 initialStateCheck.SetValueWithoutNotify(inputAction.initialStateCheck);
                 initialStateCheck.RegisterValueChangedCallback(evt =>

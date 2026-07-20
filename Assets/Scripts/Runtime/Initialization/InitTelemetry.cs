@@ -23,11 +23,7 @@ namespace NPCSystem.Initialization
         // ── Phase Events ──────────────────────────────────────────────
 
         /// <summary>Emitted before a phase begins execution.</summary>
-        public static void PhaseStarted(
-            string correlationId,
-            NPCSceneInitializationPhase phase,
-            int index,
-            int total)
+        public static void PhaseStarted(string correlationId, NPCSceneInitializationPhase phase, int index, int total)
         {
             TelemetryRouter.Point(
                 correlationId,
@@ -40,8 +36,9 @@ namespace NPCSystem.Initialization
                     ["correlationId"] = correlationId,
                     ["phase"] = phase.ToString(),
                     ["phaseIndex"] = index,
-                    ["totalPhases"] = total
-                });
+                    ["totalPhases"] = total,
+                }
+            );
         }
 
         /// <summary>Emitted after a phase completes successfully.</summary>
@@ -49,12 +46,13 @@ namespace NPCSystem.Initialization
             string correlationId,
             NPCSceneInitializationPhase phase,
             TimeSpan duration,
-            Dictionary<string, object> data = null)
+            Dictionary<string, object> data = null
+        )
         {
             var tags = new Dictionary<string, object>
             {
                 ["correlationId"] = correlationId,
-                ["phase"] = phase.ToString()
+                ["phase"] = phase.ToString(),
             };
 
             if (data != null)
@@ -70,12 +68,14 @@ namespace NPCSystem.Initialization
                 "success",
                 (long)duration.TotalMilliseconds,
                 $"Phase {phase} completed in {duration.TotalMilliseconds:F0}ms.",
-                tags);
+                tags
+            );
 
             DatadogMetricsService.Timer(
                 "init.phase.duration",
                 duration.TotalMilliseconds,
-                tags: new[] { $"phase:{phase.ToString().ToLowerInvariant()}" });
+                tags: new[] { $"phase:{phase.ToString().ToLowerInvariant()}" }
+            );
         }
 
         /// <summary>Emitted when a phase fails with an exception.</summary>
@@ -83,7 +83,8 @@ namespace NPCSystem.Initialization
             string correlationId,
             NPCSceneInitializationPhase phase,
             Exception ex,
-            TimeSpan duration)
+            TimeSpan duration
+        )
         {
             TelemetryRouter.Timed(
                 correlationId,
@@ -97,23 +98,18 @@ namespace NPCSystem.Initialization
                     ["correlationId"] = correlationId,
                     ["phase"] = phase.ToString(),
                     ["exception"] = ex.GetType().Name,
-                    ["exceptionMessage"] = ex.Message
-                });
+                    ["exceptionMessage"] = ex.Message,
+                }
+            );
 
             DatadogMetricsService.Increment(
                 "init.phase.failed",
-                tags: new[]
-                {
-                    $"phase:{phase.ToString().ToLowerInvariant()}",
-                    $"error:{ex.GetType().Name}"
-                });
+                tags: new[] { $"phase:{phase.ToString().ToLowerInvariant()}", $"error:{ex.GetType().Name}" }
+            );
         }
 
         /// <summary>Emitted when a phase is skipped (disabled or dependency failed).</summary>
-        public static void PhaseSkipped(
-            string correlationId,
-            NPCSceneInitializationPhase phase,
-            string reason)
+        public static void PhaseSkipped(string correlationId, NPCSceneInitializationPhase phase, string reason)
         {
             TelemetryRouter.Point(
                 correlationId,
@@ -125,21 +121,20 @@ namespace NPCSystem.Initialization
                 {
                     ["correlationId"] = correlationId,
                     ["phase"] = phase.ToString(),
-                    ["reason"] = reason
-                });
+                    ["reason"] = reason,
+                }
+            );
 
             DatadogMetricsService.Increment(
                 "init.phase.skipped",
-                tags: new[] { $"phase:{phase.ToString().ToLowerInvariant()}" });
+                tags: new[] { $"phase:{phase.ToString().ToLowerInvariant()}" }
+            );
         }
 
         // ── Pipeline Events ───────────────────────────────────────────
 
         /// <summary>Emitted once before the first phase runs.</summary>
-        public static void PipelineStarted(
-            string correlationId,
-            bool isWebGL,
-            int phaseCount)
+        public static void PipelineStarted(string correlationId, bool isWebGL, int phaseCount)
         {
             TelemetryRouter.Point(
                 correlationId,
@@ -151,18 +146,15 @@ namespace NPCSystem.Initialization
                 {
                     ["correlationId"] = correlationId,
                     ["isWebGL"] = isWebGL,
-                    ["phaseCount"] = phaseCount
-                });
+                    ["phaseCount"] = phaseCount,
+                }
+            );
 
             DatadogMetricsService.Increment("init.pipeline.started");
         }
 
         /// <summary>Emitted after the last phase completes.</summary>
-        public static void PipelineCompleted(
-            string correlationId,
-            TimeSpan totalDuration,
-            int completed,
-            int skipped)
+        public static void PipelineCompleted(string correlationId, TimeSpan totalDuration, int completed, int skipped)
         {
             TelemetryRouter.Timed(
                 correlationId,
@@ -175,8 +167,9 @@ namespace NPCSystem.Initialization
                 {
                     ["correlationId"] = correlationId,
                     ["phasesCompleted"] = completed,
-                    ["phasesSkipped"] = skipped
-                });
+                    ["phasesSkipped"] = skipped,
+                }
+            );
 
             DatadogMetricsService.Timer("init.pipeline.duration", totalDuration.TotalMilliseconds);
             DatadogMetricsService.Gauge("init.pipeline.phases_completed", completed);
@@ -191,7 +184,8 @@ namespace NPCSystem.Initialization
             string correlationId,
             NPCSceneInitializationPhase failedPhase,
             Exception ex,
-            TimeSpan totalDuration)
+            TimeSpan totalDuration
+        )
         {
             TelemetryRouter.Timed(
                 correlationId,
@@ -205,16 +199,14 @@ namespace NPCSystem.Initialization
                     ["correlationId"] = correlationId,
                     ["failedPhase"] = failedPhase.ToString(),
                     ["exception"] = ex.GetType().Name,
-                    ["exceptionMessage"] = ex.Message
-                });
+                    ["exceptionMessage"] = ex.Message,
+                }
+            );
 
             DatadogMetricsService.Increment(
                 "init.pipeline.failed",
-                tags: new[]
-                {
-                    $"phase:{failedPhase.ToString().ToLowerInvariant()}",
-                    $"error:{ex.GetType().Name}"
-                });
+                tags: new[] { $"phase:{failedPhase.ToString().ToLowerInvariant()}", $"error:{ex.GetType().Name}" }
+            );
         }
     }
 }

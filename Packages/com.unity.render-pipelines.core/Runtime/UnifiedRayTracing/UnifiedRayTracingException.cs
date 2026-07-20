@@ -1,4 +1,3 @@
-
 using System;
 
 namespace UnityEngine.Rendering.UnifiedRayTracing
@@ -10,8 +9,9 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
     {
         /// <summary>Unknown error.</summary>
         Unknown,
+
         /// <summary>Graphics Buffer allocation failed. It happens usually when the GPU runs out of memory. You can try to reduce your mesh data or your number of instances.</summary>
-        GraphicsBufferAllocationFailed
+        GraphicsBufferAllocationFailed,
     }
 
     /// <summary>
@@ -35,7 +35,4 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// </summary>
         public UnifiedRayTracingError errorCode { get; private set; }
     }
-
 }
-
-

@@ -8,7 +8,8 @@ namespace UnityEngine.Rendering.Universal
 
         public VolumeStack volumeStack
         {
-            get{
+            get
+            {
                 if (m_VolumeStackOverride == null)
                 {
                     return VolumeManager.instance.stack;

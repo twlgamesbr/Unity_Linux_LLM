@@ -9,44 +9,44 @@ using System.IO;
 
 namespace Microsoft.Unity.VisualStudio.Editor
 {
-	internal static class Discovery
-	{
-		public static IEnumerable<IVisualStudioInstallation> GetVisualStudioInstallations()
-		{
+    internal static class Discovery
+    {
+        public static IEnumerable<IVisualStudioInstallation> GetVisualStudioInstallations()
+        {
 #if UNITY_EDITOR_WIN
-			foreach (var installation in VisualStudioForWindowsInstallation.GetVisualStudioInstallations())
-				yield return installation;
+            foreach (var installation in VisualStudioForWindowsInstallation.GetVisualStudioInstallations())
+                yield return installation;
 #endif
 
-			foreach (var installation in VisualStudioCodeInstallation.GetVisualStudioInstallations())
-				yield return installation;
-		}
+            foreach (var installation in VisualStudioCodeInstallation.GetVisualStudioInstallations())
+                yield return installation;
+        }
 
-		public static bool TryDiscoverInstallation(string editorPath, out IVisualStudioInstallation installation)
-		{
-			try
-			{
+        public static bool TryDiscoverInstallation(string editorPath, out IVisualStudioInstallation installation)
+        {
+            try
+            {
 #if UNITY_EDITOR_WIN
-				if (VisualStudioForWindowsInstallation.TryDiscoverInstallation(editorPath, out installation))
-					return true;
+                if (VisualStudioForWindowsInstallation.TryDiscoverInstallation(editorPath, out installation))
+                    return true;
 #endif
-				if (VisualStudioCodeInstallation.TryDiscoverInstallation(editorPath, out installation))
-					return true;
-			}
-			catch (IOException)
-			{
-				installation = null;
-			}
+                if (VisualStudioCodeInstallation.TryDiscoverInstallation(editorPath, out installation))
+                    return true;
+            }
+            catch (IOException)
+            {
+                installation = null;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public static void Initialize()
-		{
+        public static void Initialize()
+        {
 #if UNITY_EDITOR_WIN
-			VisualStudioForWindowsInstallation.Initialize();
+            VisualStudioForWindowsInstallation.Initialize();
 #endif
-			VisualStudioCodeInstallation.Initialize();
-		}
-	}
+            VisualStudioCodeInstallation.Initialize();
+        }
+    }
 }

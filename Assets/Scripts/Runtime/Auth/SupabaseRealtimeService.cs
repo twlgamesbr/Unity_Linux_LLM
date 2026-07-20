@@ -4,6 +4,19 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Postgrest.Exceptions;
 using Supabase.Realtime;
 using Supabase.Realtime.Interfaces;
@@ -11,20 +24,6 @@ using Supabase.Realtime.Models;
 using Supabase.Realtime.PostgresChanges;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Auth
 {
     /// <summary>
@@ -55,21 +54,32 @@ namespace NPCSystem.Auth
         [SerializeField]
         EditorAttributes.Void behaviourGroup;
 
-        [SerializeField, HideProperty, Tooltip(
-            "When true (default), falls back to REST polling when realtime WebSocket "
-            + "is unavailable (WebGL builds). When false, WebGL will simply skip realtime."
-        )]
+        [
+            SerializeField,
+            HideProperty,
+            Tooltip(
+                "When true (default), falls back to REST polling when realtime WebSocket "
+                    + "is unavailable (WebGL builds). When false, WebGL will simply skip realtime."
+            )
+        ]
         bool _enablePollingFallback = true;
 
-        [SerializeField, HideProperty, Suffix("s"), Tooltip(
-            "Polling interval when WebSocket is unavailable (WebGL only)."
-        )]
+        [
+            SerializeField,
+            HideProperty,
+            Suffix("s"),
+            Tooltip("Polling interval when WebSocket is unavailable (WebGL only).")
+        ]
         float _pollingIntervalSeconds = 3f;
 
-        [SerializeField, HideProperty, Tooltip(
-            "When true, automatically subscribes to room dialogue channels "
-            + "when the player joins a multiplayer room (via room_memberships)."
-        )]
+        [
+            SerializeField,
+            HideProperty,
+            Tooltip(
+                "When true, automatically subscribes to room dialogue channels "
+                    + "when the player joins a multiplayer room (via room_memberships)."
+            )
+        ]
         bool _autoSubscribeRooms = true;
 
         [FoldoutGroup("Debug", true, nameof(_lastConnectionState), nameof(_lastError))]
@@ -205,9 +215,7 @@ namespace NPCSystem.Auth
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning(
-                        $"[{nameof(SupabaseRealtimeService)}] Channel cleanup: {ex.Message}"
-                    );
+                    Debug.LogWarning($"[{nameof(SupabaseRealtimeService)}] Channel cleanup: {ex.Message}");
                 }
                 _turnChannel = null;
             }
@@ -220,9 +228,7 @@ namespace NPCSystem.Auth
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning(
-                        $"[{nameof(SupabaseRealtimeService)}] Room channel cleanup: {ex.Message}"
-                    );
+                    Debug.LogWarning($"[{nameof(SupabaseRealtimeService)}] Room channel cleanup: {ex.Message}");
                 }
                 _roomChannel = null;
             }
@@ -236,9 +242,7 @@ namespace NPCSystem.Auth
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning(
-                        $"[{nameof(SupabaseRealtimeService)}] Disconnect warning: {ex.Message}"
-                    );
+                    Debug.LogWarning($"[{nameof(SupabaseRealtimeService)}] Disconnect warning: {ex.Message}");
                 }
                 _realtime = null;
             }
@@ -294,10 +298,7 @@ namespace NPCSystem.Auth
                     NPCFlowLogLevel.Warning,
                     $"Realtime WebSocket connect failed: {ex.Message}",
                     source: nameof(SupabaseRealtimeService),
-                    data: new Dictionary<string, object>
-                    {
-                        ["exceptionType"] = ex.GetType().Name,
-                    }
+                    data: new Dictionary<string, object> { ["exceptionType"] = ex.GetType().Name }
                 );
 
                 if (_enablePollingFallback)
@@ -313,12 +314,7 @@ namespace NPCSystem.Auth
             try
             {
                 // Create a channel for the dialogue_turns table
-                _turnChannel = _realtime.Channel(
-                    "realtime",
-                    "public",
-                    "dialogue_turns",
-                    null, null, null
-                );
+                _turnChannel = _realtime.Channel("realtime", "public", "dialogue_turns", null, null, null);
 
                 // Register postgres_changes on this channel
                 var options = new PostgresChangesOptions(
@@ -387,9 +383,7 @@ namespace NPCSystem.Auth
             }
             catch (Exception ex)
             {
-                Debug.LogWarning(
-                    $"[{nameof(SupabaseRealtimeService)}] Failed to parse turn: {ex.Message}"
-                );
+                Debug.LogWarning($"[{nameof(SupabaseRealtimeService)}] Failed to parse turn: {ex.Message}");
             }
         }
 
@@ -479,9 +473,7 @@ namespace NPCSystem.Auth
             }
             catch (Exception ex)
             {
-                Debug.LogWarning(
-                    $"[{nameof(SupabaseRealtimeService)}] Poll fetch failed: {ex.Message}"
-                );
+                Debug.LogWarning($"[{nameof(SupabaseRealtimeService)}] Poll fetch failed: {ex.Message}");
                 return new List<DialogueTurnRecord>();
             }
         }
@@ -527,7 +519,9 @@ namespace NPCSystem.Auth
                 {
                     _realtime.Remove(_roomChannel);
                 }
-                catch { /* ignore */ }
+                catch
+                { /* ignore */
+                }
                 _roomChannel = null;
                 _roomBroadcast = null;
             }
@@ -535,10 +529,7 @@ namespace NPCSystem.Auth
             try
             {
                 string channelName = $"room:{roomCode}";
-                _roomChannel = _realtime.Channel(
-                    channelName,
-                    null, null, null, null, null
-                );
+                _roomChannel = _realtime.Channel(channelName, null, null, null, null, null);
 
                 // Register for broadcast events
                 _roomBroadcast = _roomChannel.Register<RoomDialoguePayload>(false, false);
@@ -552,11 +543,7 @@ namespace NPCSystem.Auth
                     NPCFlowLogLevel.Debug,
                     $"Joined room broadcast channel: {channelName}",
                     source: nameof(SupabaseRealtimeService),
-                    data: new Dictionary<string, object>
-                    {
-                        ["roomCode"] = roomCode,
-                        ["channelName"] = channelName,
-                    }
+                    data: new Dictionary<string, object> { ["roomCode"] = roomCode, ["channelName"] = channelName }
                 );
             }
             catch (Exception ex)
@@ -590,9 +577,7 @@ namespace NPCSystem.Auth
             }
             catch (Exception ex)
             {
-                Debug.LogWarning(
-                    $"[{nameof(SupabaseRealtimeService)}] Room unsubscribe: {ex.Message}"
-                );
+                Debug.LogWarning($"[{nameof(SupabaseRealtimeService)}] Room unsubscribe: {ex.Message}");
             }
             _roomChannel = null;
 
@@ -610,14 +595,13 @@ namespace NPCSystem.Auth
             // Route broadcast events to main thread
             if (_mainThreadContext != null && broadcast is RoomDialoguePayload payload)
             {
-                _mainThreadContext.Post(_ =>
-                {
-                    OnRoomDialogueReceived?.Invoke(
-                        payload.NpcSlug,
-                        payload.DialogueMessage,
-                        payload.PlayerName
-                    );
-                }, null);
+                _mainThreadContext.Post(
+                    _ =>
+                    {
+                        OnRoomDialogueReceived?.Invoke(payload.NpcSlug, payload.DialogueMessage, payload.PlayerName);
+                    },
+                    null
+                );
             }
         }
 
@@ -644,14 +628,17 @@ namespace NPCSystem.Auth
 
         // ── Socket State Handling ───────────────────────────────────
 
-        void OnSocketStateChanged(
-            IRealtimeClient<RealtimeSocket, RealtimeChannel> sender,
-            Constants.SocketState state
-        )
+        void OnSocketStateChanged(IRealtimeClient<RealtimeSocket, RealtimeChannel> sender, Constants.SocketState state)
         {
             if (_mainThreadContext != null)
             {
-                _mainThreadContext.Post(_ => { SetConnectionState(state); }, null);
+                _mainThreadContext.Post(
+                    _ =>
+                    {
+                        SetConnectionState(state);
+                    },
+                    null
+                );
             }
         }
 
@@ -685,9 +672,7 @@ namespace NPCSystem.Auth
         void ValidateSettings()
         {
             bool hasAuth = _authService != null;
-            _lastConnectionState = hasAuth
-                ? "Settings valid. Connect after auth."
-                : "Missing Auth Service reference.";
+            _lastConnectionState = hasAuth ? "Settings valid. Connect after auth." : "Missing Auth Service reference.";
             _lastError = string.Empty;
 
             _logger?.Log(
@@ -703,9 +688,7 @@ namespace NPCSystem.Auth
         {
             _authService = GetComponent<PlayerAuthService>();
             if (_authService == null)
-                _authService = FindAnyObjectByType<PlayerAuthService>(
-                    FindObjectsInactive.Include
-                );
+                _authService = FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
         }
 
         void OnValidate()
@@ -714,9 +697,7 @@ namespace NPCSystem.Auth
             {
                 _authService = GetComponent<PlayerAuthService>();
                 if (_authService == null)
-                    _authService = FindAnyObjectByType<PlayerAuthService>(
-                        FindObjectsInactive.Include
-                    );
+                    _authService = FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
             }
         }
     }

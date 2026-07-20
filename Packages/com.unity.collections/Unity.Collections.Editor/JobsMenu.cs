@@ -10,7 +10,7 @@ class JobsMenu
         var provider = new SettingsProvider("Preferences/Jobs", SettingsScope.User)
         {
             label = "Jobs",
-            keywords = new[]{"Jobs"},
+            keywords = new[] { "Jobs" },
             guiHandler = (searchContext) =>
             {
                 var originalWidth = EditorGUIUtility.labelWidth;
@@ -31,7 +31,10 @@ class JobsMenu
                 }
 
                 bool oldUseJobsDebugger = JobsUtility.JobDebuggerEnabled;
-                var newUseJobsDebugger = EditorGUILayout.Toggle(new GUIContent("Enable Jobs Debugger"), JobsUtility.JobDebuggerEnabled);
+                var newUseJobsDebugger = EditorGUILayout.Toggle(
+                    new GUIContent("Enable Jobs Debugger"),
+                    JobsUtility.JobDebuggerEnabled
+                );
                 if (newUseJobsDebugger != oldUseJobsDebugger)
                 {
                     madeChange = true;
@@ -39,7 +42,8 @@ class JobsMenu
                 }
 
                 var oldLeakDetectionMode = NativeLeakDetection.Mode;
-                var newLeakDetectionMode = (NativeLeakDetectionMode) EditorGUILayout.EnumPopup(new GUIContent("Leak Detection Level"), oldLeakDetectionMode);
+                var newLeakDetectionMode = (NativeLeakDetectionMode)
+                    EditorGUILayout.EnumPopup(new GUIContent("Leak Detection Level"), oldLeakDetectionMode);
                 if (newLeakDetectionMode != oldLeakDetectionMode)
                 {
                     madeChange = true;
@@ -47,14 +51,20 @@ class JobsMenu
                 }
 
                 if (madeChange)
-                    Telemetry.LogMenuPreferences(new Telemetry.MenuPreferencesEvent { useJobsThreads = newUseJobsDebugger, enableJobsDebugger = newUseJobsDebugger, nativeLeakDetectionMode = newLeakDetectionMode });
+                    Telemetry.LogMenuPreferences(
+                        new Telemetry.MenuPreferencesEvent
+                        {
+                            useJobsThreads = newUseJobsDebugger,
+                            enableJobsDebugger = newUseJobsDebugger,
+                            nativeLeakDetectionMode = newLeakDetectionMode,
+                        }
+                    );
 
                 GUILayout.EndVertical();
                 EditorGUILayout.EndVertical();
 
                 EditorGUIUtility.labelWidth = originalWidth;
-            }
-
+            },
         };
 
         return provider;
@@ -84,7 +94,7 @@ class JobsMenu
 
     static void SetLeakDetection(NativeLeakDetectionMode value)
     {
-        switch(value)
+        switch (value)
         {
             case NativeLeakDetectionMode.Disabled:
             {
@@ -92,7 +102,9 @@ class JobsMenu
                 // while disabled. So to avoid spurious leak warnings, just forgive the leaks every time someone disables
                 // leak checking through the menu.
                 UnsafeUtility.ForgiveLeaks();
-                Debug.LogWarning("Leak detection has been disabled. Leak warnings will not be generated, and all leaks up to now are forgotten.");
+                Debug.LogWarning(
+                    "Leak detection has been disabled. Leak warnings will not be generated, and all leaks up to now are forgotten."
+                );
                 break;
             }
             case NativeLeakDetectionMode.Enabled:
@@ -102,7 +114,9 @@ class JobsMenu
             }
             case NativeLeakDetectionMode.EnabledWithStackTrace:
             {
-                Debug.Log("Leak detection with stack traces has been enabled. Leak warnings will be generated upon exiting play mode.");
+                Debug.Log(
+                    "Leak detection with stack traces has been enabled. Leak warnings will be generated upon exiting play mode."
+                );
                 break;
             }
             default:

@@ -1,8 +1,6 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpIncrementalGeneratorVerifier<
-        Unity.Entities.SourceGen.JobEntityGenerator.JobEntityGenerator>;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpIncrementalGeneratorVerifier<Unity.Entities.SourceGen.JobEntityGenerator.JobEntityGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -12,7 +10,8 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task JobWithIdenticallyNamedComponentsInDifferentNamespaces()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             namespace NamespaceA
@@ -47,7 +46,8 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task JobWithEnableableBufferElement()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             public partial struct JobWithEnableableBufferElement : IJobEntity
@@ -60,7 +60,8 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task NO_SGICE_BUT_HAS_CSHARP_COMPILE_ERRORS()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             using static Unity.Entities.SystemAPI;
@@ -75,46 +76,50 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task InnerNamespaceUsing()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             namespace SomeNameSpace {
                 public partial struct SomeJob : IJobEntity {
                     public void Execute() {}
                 }
             }";
-            await VerifyCS.VerifySourceGeneratorAsync(source);
+        await VerifyCS.VerifySourceGeneratorAsync(source);
     }
 
     [TestMethod]
     public async Task JobInStruct()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial struct SomeOuter {
                 public partial struct SomeJob : IJobEntity {
                     public void Execute() {}
                 }
             }";
-            await VerifyCS.VerifySourceGeneratorAsync(source);
+        await VerifyCS.VerifySourceGeneratorAsync(source);
     }
 
     [TestMethod]
     public async Task JobInClass()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial class SomeOuter {
                 public partial struct SomeJob : IJobEntity {
                     public void Execute() {}
                 }
             }";
-            await VerifyCS.VerifySourceGeneratorAsync(source);
+        await VerifyCS.VerifySourceGeneratorAsync(source);
     }
 
     [TestMethod]
     public async Task RefWrapperParamsWorkWithTagComponents()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -129,7 +134,8 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task TwoJobs()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial struct SomeOuter {
                 public partial struct SomeJobA : IJobEntity {
@@ -139,13 +145,14 @@ public class JobEntityNoErrorTests
                     public void Execute() {}
                 }
             }";
-            await VerifyCS.VerifySourceGeneratorAsync(source);
+        await VerifyCS.VerifySourceGeneratorAsync(source);
     }
 
     [TestMethod]
     public async Task ParameterTypesWithValidAccessibility()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             struct NonPublicComponent : IComponentData
@@ -174,7 +181,8 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task UsingInPreProccessorStatements()
     {
-        const string source = @"
+        const string source =
+            @"
                 namespace SomeNamespace {
                     using Unity.Entities;
                     using Unity.Entities.Tests;
@@ -193,7 +201,8 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task PreProcessorStatementInMiddleOfUsings()
     {
-        const string source = @"
+        const string source =
+            @"
                 using Unity.Entities;
                 #if !UNITY_EDITOR
                 using Unity.Mathematics;
@@ -212,7 +221,8 @@ public class JobEntityNoErrorTests
     [TestMethod]
     public async Task SystemInnerNamespaceUsing()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             namespace SomeNameSpace {
@@ -222,13 +232,14 @@ public class JobEntityNoErrorTests
                     }
                 }
             }";
-            await VerifyCS.VerifySourceGeneratorAsync(source);
+        await VerifyCS.VerifySourceGeneratorAsync(source);
     }
 
     [TestMethod]
     public async Task SystemInStruct()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             public partial struct SomeOuter {
@@ -238,13 +249,14 @@ public class JobEntityNoErrorTests
                     }
                 }
             }";
-            await VerifyCS.VerifySourceGeneratorAsync(source);
+        await VerifyCS.VerifySourceGeneratorAsync(source);
     }
 
     [TestMethod]
     public async Task SystemInClass()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             public partial class SomeOuter {
@@ -254,7 +266,7 @@ public class JobEntityNoErrorTests
                     }
                 }
             }";
-            await VerifyCS.VerifySourceGeneratorAsync(source);
+        await VerifyCS.VerifySourceGeneratorAsync(source);
     }
 
     #endregion

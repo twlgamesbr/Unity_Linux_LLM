@@ -187,7 +187,9 @@ namespace UnityEngine.VFX.Utility
         /// <returns>String containing the binder information.</returns>
         public override string ToString()
         {
-            return string.Format($"URP Camera : '{(AdditionalData == null ? "null" : AdditionalData.gameObject.name)}' -> {CameraProperty}");
+            return string.Format(
+                $"URP Camera : '{(AdditionalData == null ? "null" : AdditionalData.gameObject.name)}' -> {CameraProperty}"
+            );
         }
     }
 }

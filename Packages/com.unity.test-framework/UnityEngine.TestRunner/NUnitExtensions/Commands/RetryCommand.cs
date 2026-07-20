@@ -8,12 +8,10 @@ using UnityEngine.TestRunner.NUnitExtensions.Runner;
 
 namespace UnityEngine.TestTools
 {
-    internal class RetryCommand  : DelegatingTestCommand, IEnumerableTestMethodCommand
+    internal class RetryCommand : DelegatingTestCommand, IEnumerableTestMethodCommand
     {
         public RetryCommand(TestCommand innerCommand)
-            : base(innerCommand)
-        {
-        }
+            : base(innerCommand) { }
 
         public override TestResult Execute(ITestExecutionContext context)
         {
@@ -28,7 +26,7 @@ namespace UnityEngine.TestTools
                 unityContext.RetryRepeatState = new EnumerableTestState();
             }
 
-            while(unityContext.RetryRepeatState.Retry < unityContext.RetryCount + 1)
+            while (unityContext.RetryRepeatState.Retry < unityContext.RetryCount + 1)
             {
                 if (innerCommand is IEnumerableTestMethodCommand)
                 {
@@ -43,7 +41,10 @@ namespace UnityEngine.TestTools
                     context.CurrentResult = innerCommand.Execute(context);
                 }
 
-                if (context.CurrentResult.ResultState != ResultState.Failure || context.CurrentResult.ResultState == ResultState.Error)
+                if (
+                    context.CurrentResult.ResultState != ResultState.Failure
+                    || context.CurrentResult.ResultState == ResultState.Error
+                )
                 {
                     unityContext.RetryRepeatState.Retry++;
                     break;
@@ -55,7 +56,7 @@ namespace UnityEngine.TestTools
                 }
                 unityContext.RetryRepeatState.Retry++;
             }
-            
+
             SetIterationProperty(unityContext, unityContext.RetryRepeatState.Retry - 1);
             unityContext.RetryRepeatState.Retry = 0;
         }
@@ -65,7 +66,7 @@ namespace UnityEngine.TestTools
             unityContext.CurrentResult.StartTime = unityContext.StartTime;
             unityContext.CurrentResult.EndTime = DateTime.UtcNow;
             long tickCount = Stopwatch.GetTimestamp() - unityContext.StartTicks;
-            double seconds = (double) tickCount / Stopwatch.Frequency;
+            double seconds = (double)tickCount / Stopwatch.Frequency;
             unityContext.CurrentResult.Duration = seconds;
             SetIterationProperty(unityContext, unityContext.RetryRepeatState.Retry);
             unityContext.Listener.TestFinished(unityContext.CurrentResult);

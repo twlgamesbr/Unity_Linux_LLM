@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace UnityEngine.Rendering
 {
@@ -92,8 +92,11 @@ namespace UnityEngine.Rendering
             Graphics.ExecuteCommandBuffer(cmd);
         }
 
-        public void RenderWireframe(Matrix4x4 trs, CompareFunction depthTest = CompareFunction.LessEqual, string gizmoName = null)
-            => DrawMesh(trs, wireMaterial, MeshTopology.Lines, depthTest, gizmoName);
+        public void RenderWireframe(
+            Matrix4x4 trs,
+            CompareFunction depthTest = CompareFunction.LessEqual,
+            string gizmoName = null
+        ) => DrawMesh(trs, wireMaterial, MeshTopology.Lines, depthTest, gizmoName);
 
         public void Dispose()
         {

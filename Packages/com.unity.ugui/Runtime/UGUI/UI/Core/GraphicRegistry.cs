@@ -10,8 +10,10 @@ namespace UnityEngine.UI
     {
         private static GraphicRegistry s_Instance;
 
-        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_Graphics = new Dictionary<Canvas, IndexedSet<Graphic>>();
-        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_RaycastableGraphics = new Dictionary<Canvas, IndexedSet<Graphic>>();
+        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_Graphics =
+            new Dictionary<Canvas, IndexedSet<Graphic>>();
+        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_RaycastableGraphics =
+            new Dictionary<Canvas, IndexedSet<Graphic>>();
 
         protected GraphicRegistry()
         {

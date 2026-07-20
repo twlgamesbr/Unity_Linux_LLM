@@ -10,8 +10,8 @@ namespace Unity.Entities.Analyzer
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SystemStateByRefAnalyzer : DiagnosticAnalyzer
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-            EntitiesDiagnostics.k_Ea0016Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+            ImmutableArray.Create(EntitiesDiagnostics.k_Ea0016Descriptor);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -24,9 +24,18 @@ namespace Unity.Entities.Analyzer
         {
             var parameterSymbol = (IParameterSymbol)context.Symbol;
             var typeSymbol = parameterSymbol.Type;
-            if (parameterSymbol.RefKind != RefKind.Ref && typeSymbol.Is("global::Unity.Entities.SystemState") && parameterSymbol.DeclaringSyntaxReferences.Length > 0)
+            if (
+                parameterSymbol.RefKind != RefKind.Ref
+                && typeSymbol.Is("global::Unity.Entities.SystemState")
+                && parameterSymbol.DeclaringSyntaxReferences.Length > 0
+            )
             {
-                context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0016Descriptor, parameterSymbol.DeclaringSyntaxReferences[0].GetSyntax().GetLocation()));
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        EntitiesDiagnostics.k_Ea0016Descriptor,
+                        parameterSymbol.DeclaringSyntaxReferences[0].GetSyntax().GetLocation()
+                    )
+                );
             }
         }
     }

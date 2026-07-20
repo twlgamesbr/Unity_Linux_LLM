@@ -82,7 +82,8 @@ namespace UnityEditor.Rendering
         /// <param name="parameter">The parameter for which to calculate the height.</param>
         /// <returns>The required height in pixels. The default implementation returns
         /// <c>EditorGUI.GetPropertyHeight(parameter.value)</c>.</returns>
-        public virtual float GetElementHeight(SerializedDataParameter parameter) => EditorGUI.GetPropertyHeight(parameter.value);
+        public virtual float GetElementHeight(SerializedDataParameter parameter) =>
+            EditorGUI.GetPropertyHeight(parameter.value);
 
         /// <summary>
         /// Draws the parameter in the editor. If the input parameter is invalid you should return

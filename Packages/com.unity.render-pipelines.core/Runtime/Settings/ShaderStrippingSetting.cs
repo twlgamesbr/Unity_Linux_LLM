@@ -32,7 +32,7 @@ namespace UnityEngine.Rendering
     /// <para> Here is an example of how to check if your project strips variant shaders when building a Player using URP. </para>
     /// <code>
     /// using UnityEngine.Rendering;
-    /// 
+    ///
     /// public static class ShaderStrippingHelper
     /// {
     ///     public static bool exportLog
@@ -60,7 +60,8 @@ namespace UnityEngine.Rendering
             Initial = 0,
         }
 
-        [SerializeField] [HideInInspector]
+        [SerializeField]
+        [HideInInspector]
         private Version m_Version = Version.Initial;
 
         /// <summary>Current version of the settings container. Used only for project upgrades.</summary>
@@ -75,11 +76,15 @@ namespace UnityEngine.Rendering
         private bool m_ExportShaderVariants = true;
 
         [SerializeField]
-        [Tooltip("Controls the level of logging of shader variant information outputted during the build process. Information appears in the Unity Console when the build finishes.")]
+        [Tooltip(
+            "Controls the level of logging of shader variant information outputted during the build process. Information appears in the Unity Console when the build finishes."
+        )]
         private ShaderVariantLogLevel m_ShaderVariantLogLevel = ShaderVariantLogLevel.Disabled;
 
         [SerializeField]
-        [Tooltip("When enabled, all debug display shader variants are removed when you build for the Unity Player. This decreases build time, but prevents the use of most Rendering Debugger features in Player builds.")]
+        [Tooltip(
+            "When enabled, all debug display shader variants are removed when you build for the Unity Player. This decreases build time, but prevents the use of most Rendering Debugger features in Player builds."
+        )]
         private bool m_StripRuntimeDebugShaders = true;
         #endregion
 

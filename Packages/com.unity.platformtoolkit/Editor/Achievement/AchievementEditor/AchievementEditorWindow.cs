@@ -1,8 +1,8 @@
-using System.IO;
 using System.Collections.Specialized;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEditor;
 
 namespace Unity.PlatformToolkit.Editor
 {
@@ -11,6 +11,7 @@ namespace Unity.PlatformToolkit.Editor
         private AchievementEditor m_AchievementEditor;
         private MultiColumnListView m_MultiColumnListView;
         private const int k_ColumnWidth = 250;
+
         [MenuItem("Window/Platform Toolkit/Achievement Editor", priority = Editor.MenuPriority.AchievementEditor)]
         private static void CreateWindow()
         {
@@ -29,12 +30,20 @@ namespace Unity.PlatformToolkit.Editor
 
         private void CreateGUI()
         {
-            m_AchievementEditor = new AchievementEditor(PlatformToolkitSettings.instance.StoredAchievements, SupportDeclarationManager.SupportDeclarations);
+            m_AchievementEditor = new AchievementEditor(
+                PlatformToolkitSettings.instance.StoredAchievements,
+                SupportDeclarationManager.SupportDeclarations
+            );
             m_AchievementEditor.Achievements.CollectionChanged += AchievementsOnCollectionChanged;
-            var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditor.uxml");
+            var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditor.uxml"
+            );
             visualTreeAsset.CloneTree(rootVisualElement);
             m_MultiColumnListView = rootVisualElement.Q<MultiColumnListView>("achievement-list");
-            var listAdapter = new ListAdapter<StoredAchievement>(m_AchievementEditor.Achievements, () => new StoredAchievement());
+            var listAdapter = new ListAdapter<StoredAchievement>(
+                m_AchievementEditor.Achievements,
+                () => new StoredAchievement()
+            );
             m_MultiColumnListView.itemsSource = listAdapter;
             m_MultiColumnListView.columns.Add(CreateCommonAchievementColumn());
 
@@ -42,13 +51,18 @@ namespace Unity.PlatformToolkit.Editor
             {
                 var column = new Column
                 {
-                    stretchable = true, minWidth = k_ColumnWidth, name = configurationAndContext.configuration.PlatformName,
+                    stretchable = true,
+                    minWidth = k_ColumnWidth,
+                    name = configurationAndContext.configuration.PlatformName,
                 };
                 column.makeHeader += configurationAndContext.configuration.EditorProvider.MakeHeader;
                 column.makeCell += configurationAndContext.configuration.EditorProvider.MakeCell;
                 column.bindCell += (cell, i) =>
                 {
-                    configurationAndContext.configuration.EditorProvider.BindCell(cell, configurationAndContext.context.Achievements[i]);
+                    configurationAndContext.configuration.EditorProvider.BindCell(
+                        cell,
+                        configurationAndContext.context.Achievements[i]
+                    );
                 };
                 column.unbindCell += (cell, _) =>
                 {
@@ -84,7 +98,12 @@ namespace Unity.PlatformToolkit.Editor
 
         private void Export()
         {
-            var path = EditorUtility.SaveFilePanel("Select folder/file to export file to", Application.dataPath, "PT-Achievements","csv");
+            var path = EditorUtility.SaveFilePanel(
+                "Select folder/file to export file to",
+                Application.dataPath,
+                "PT-Achievements",
+                "csv"
+            );
             if (string.IsNullOrEmpty(path))
                 return;
             var data = m_AchievementEditor.Export();
@@ -107,7 +126,7 @@ namespace Unity.PlatformToolkit.Editor
                 {
                     m_AchievementEditor.CommonConfiguration.UnbindCell(cell);
                 },
-                minWidth = k_ColumnWidth
+                minWidth = k_ColumnWidth,
             };
             return commonColumn;
         }

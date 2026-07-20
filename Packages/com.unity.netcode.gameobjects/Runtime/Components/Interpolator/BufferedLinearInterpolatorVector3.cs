@@ -14,6 +14,7 @@ namespace Unity.Netcode
         /// Use <see cref="Vector3.Lerp"/> when <see cref="false"/>
         /// </summary>
         public bool IsSlerp;
+
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected override Vector3 InterpolateUnclamped(Vector3 start, Vector3 end, float time)
@@ -44,12 +45,15 @@ namespace Unity.Netcode
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected internal override Vector3 OnConvertTransformSpace(Transform transform, Vector3 position, bool inLocalSpace)
+        protected internal override Vector3 OnConvertTransformSpace(
+            Transform transform,
+            Vector3 position,
+            bool inLocalSpace
+        )
         {
             if (inLocalSpace)
             {
                 return transform.InverseTransformPoint(position);
-
             }
             else
             {
@@ -61,14 +65,21 @@ namespace Unity.Netcode
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private protected override bool IsApproximately(Vector3 first, Vector3 second, float precision = 1E-06F)
         {
-            return Math.Round(Mathf.Abs(first.x - second.x), 2) <= precision &&
-                Math.Round(Mathf.Abs(first.y - second.y), 2) <= precision &&
-                Math.Round(Mathf.Abs(first.z - second.z), 2) <= precision;
+            return Math.Round(Mathf.Abs(first.x - second.x), 2) <= precision
+                && Math.Round(Mathf.Abs(first.y - second.y), 2) <= precision
+                && Math.Round(Mathf.Abs(first.z - second.z), 2) <= precision;
         }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private protected override Vector3 SmoothDamp(Vector3 current, Vector3 target, ref Vector3 rateOfChange, float duration, float deltaTime, float maxSpeed)
+        private protected override Vector3 SmoothDamp(
+            Vector3 current,
+            Vector3 target,
+            ref Vector3 rateOfChange,
+            float duration,
+            float deltaTime,
+            float maxSpeed
+        )
         {
             return Vector3.SmoothDamp(current, target, ref rateOfChange, duration, maxSpeed, deltaTime);
         }

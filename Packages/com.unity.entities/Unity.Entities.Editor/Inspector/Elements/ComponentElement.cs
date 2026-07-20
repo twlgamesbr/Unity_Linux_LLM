@@ -10,7 +10,8 @@ namespace Unity.Entities.Editor
         readonly PropertyElement m_Content;
         readonly Toggle m_Enabled;
 
-        public ComponentElement(IComponentProperty property, EntityInspectorContext context, ref TComponent value) : base(property, context)
+        public ComponentElement(IComponentProperty property, EntityInspectorContext context, ref TComponent value)
+            : base(property, context)
         {
             binding = this;
             m_Content = CreateContent(property, ref value);
@@ -18,10 +19,12 @@ namespace Unity.Entities.Editor
 
             if (TypeManager.IsEnableable(TypeIndex))
             {
-                m_Enabled.RegisterValueChangedCallback((e) =>
-                {
-                    Context.EntityManager.SetComponentEnabled(Context.Entity, typeof(TComponent), e.newValue);
-                });
+                m_Enabled.RegisterValueChangedCallback(
+                    (e) =>
+                    {
+                        Context.EntityManager.SetComponentEnabled(Context.Entity, typeof(TComponent), e.newValue);
+                    }
+                );
             }
         }
 
@@ -44,19 +47,25 @@ namespace Unity.Entities.Editor
             menu.AddCopyValue(value);
 
             var query = SearchUtils.CreateComponentQuery(value);
-            menu.AppendAction("Open in Hierarchy...", (a) =>
-            {
-                HierarchyWindow.OpenWindow(query);
-            }, DropdownMenuAction.AlwaysEnabled);
-            menu.AppendAction("Open in Search Window...", (a) =>
-            {
-                HierarchySearchProvider.OpenProvider(query);
-            }, DropdownMenuAction.AlwaysEnabled);
+            menu.AppendAction(
+                "Open in Hierarchy...",
+                (a) =>
+                {
+                    HierarchyWindow.OpenWindow(query);
+                },
+                DropdownMenuAction.AlwaysEnabled
+            );
+            menu.AppendAction(
+                "Open in Search Window...",
+                (a) =>
+                {
+                    HierarchySearchProvider.OpenProvider(query);
+                },
+                DropdownMenuAction.AlwaysEnabled
+            );
         }
 
-        void IBinding.PreUpdate()
-        {
-        }
+        void IBinding.PreUpdate() { }
 
         void IBinding.Update()
         {
@@ -66,10 +75,15 @@ namespace Unity.Entities.Editor
                 return;
             }
 
-            if (TypeManager.IsEnableable(TypeIndex) && Context.EntityManager.HasComponent(Context.Entity, typeof(TComponent)))
+            if (
+                TypeManager.IsEnableable(TypeIndex)
+                && Context.EntityManager.HasComponent(Context.Entity, typeof(TComponent))
+            )
             {
                 m_Enabled.visible = true;
-                m_Enabled.SetValueWithoutNotify(Context.EntityManager.IsComponentEnabled(Context.Entity, typeof(TComponent)));
+                m_Enabled.SetValueWithoutNotify(
+                    Context.EntityManager.IsComponentEnabled(Context.Entity, typeof(TComponent))
+                );
             }
             else
             {
@@ -82,8 +96,6 @@ namespace Unity.Entities.Editor
                 m_Content.SetTarget(component);
         }
 
-        void IBinding.Release()
-        {
-        }
+        void IBinding.Release() { }
     }
 }

@@ -11,12 +11,18 @@ namespace UnityEngine.TestTools.Utils
         private readonly float AllowedError;
 
         private static readonly Vector4EqualityComparer m_Instance = new Vector4EqualityComparer();
+
         /// <summary>
         /// A comparer instance with the default calculation error value set to 0.0001f.
         /// </summary>
-        public static Vector4EqualityComparer Instance { get { return m_Instance; } }
+        public static Vector4EqualityComparer Instance
+        {
+            get { return m_Instance; }
+        }
 
-        private Vector4EqualityComparer() : this(k_DefaultError) {}
+        private Vector4EqualityComparer()
+            : this(k_DefaultError) { }
+
         /// <summary>
         /// Initializes an instance of Vector4Equality comparer with custom allowed calculation error.
         /// </summary>
@@ -58,10 +64,10 @@ namespace UnityEngine.TestTools.Utils
         /// </example>
         public bool Equals(Vector4 expected, Vector4 actual)
         {
-            return Utils.AreFloatsEqual(expected.x, actual.x, AllowedError) &&
-                Utils.AreFloatsEqual(expected.y, actual.y, AllowedError) &&
-                Utils.AreFloatsEqual(expected.z, actual.z, AllowedError) &&
-                Utils.AreFloatsEqual(expected.w, actual.w, AllowedError);
+            return Utils.AreFloatsEqual(expected.x, actual.x, AllowedError)
+                && Utils.AreFloatsEqual(expected.y, actual.y, AllowedError)
+                && Utils.AreFloatsEqual(expected.z, actual.z, AllowedError)
+                && Utils.AreFloatsEqual(expected.w, actual.w, AllowedError);
         }
 
         /// <summary>

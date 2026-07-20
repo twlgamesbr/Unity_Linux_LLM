@@ -54,15 +54,26 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Maximum allocated width of the Buffered RTHandle System
         /// </summary>
-        public int maxWidth { get { return m_RTHandleSystem.GetMaxWidth(); } }
+        public int maxWidth
+        {
+            get { return m_RTHandleSystem.GetMaxWidth(); }
+        }
+
         /// <summary>
         /// Maximum allocated height of the Buffered RTHandle System
         /// </summary>
-        public int maxHeight { get { return m_RTHandleSystem.GetMaxHeight(); } }
+        public int maxHeight
+        {
+            get { return m_RTHandleSystem.GetMaxHeight(); }
+        }
+
         /// <summary>
         /// Current properties of the Buffered RTHandle System
         /// </summary>
-        public RTHandleProperties rtHandleProperties { get { return m_RTHandleSystem.rtHandleProperties; } }
+        public RTHandleProperties rtHandleProperties
+        {
+            get { return m_RTHandleSystem.rtHandleProperties; }
+        }
 
         /// <summary>
         /// Return the frame RT or null.
@@ -84,14 +95,18 @@ namespace UnityEngine.Rendering
         /// Clears all the previously created history buffers
         /// </summary>
         /// <param name="cmd">Defines the command buffer used for clearing.</param>
-
         public void ClearBuffers(CommandBuffer cmd)
         {
             foreach (var rtHandle in m_RTHandles)
             {
                 for (int i = 0; i < rtHandle.Value.Length; ++i)
                 {
-                    CoreUtils.SetRenderTarget(cmd, rtHandle.Value[i], clearFlag: ClearFlag.Color, clearColor: Color.black);
+                    CoreUtils.SetRenderTarget(
+                        cmd,
+                        rtHandle.Value[i],
+                        clearFlag: ClearFlag.Color,
+                        clearColor: Color.black
+                    );
                 }
             }
         }
@@ -102,11 +117,7 @@ namespace UnityEngine.Rendering
         /// <param name="bufferId">The buffer to allocate.</param>
         /// <param name="allocator">The functor to use for allocation.</param>
         /// <param name="bufferCount">The number of RT handles for this buffer.</param>
-        public void AllocBuffer(
-            int bufferId,
-            Func<RTHandleSystem, int, RTHandle> allocator,
-            int bufferCount
-        )
+        public void AllocBuffer(int bufferId, Func<RTHandleSystem, int, RTHandle> allocator, int bufferCount)
         {
             // This function should only be used when there is a non-zero number of buffers to allocate.
             // If the caller provides a value of zero, they're likely doing something unintentional in the calling code.
@@ -139,14 +150,17 @@ namespace UnityEngine.Rendering
         /// <param name="mipMapBias">Bias applied to mipmaps during filtering.</param>
         /// <param name="name">Name of the RTHandle.</param>
         // NOTE: API is similar to RTHandles.Alloc.
-        public void AllocBuffer(int bufferId, int bufferCount,
+        public void AllocBuffer(
+            int bufferId,
+            int bufferCount,
             ref RenderTextureDescriptor descriptor,
             FilterMode filterMode = FilterMode.Point,
             TextureWrapMode wrapMode = TextureWrapMode.Repeat,
             bool isShadowMap = false,
             int anisoLevel = 1,
             float mipMapBias = 0,
-            string name = "")
+            string name = ""
+        )
         {
             // This function should only be used when there is a non-zero number of buffers to allocate.
             // If the caller provides a value of zero, they're likely doing something unintentional in the calling code.
@@ -155,8 +169,14 @@ namespace UnityEngine.Rendering
             var buffer = new RTHandle[bufferCount];
             m_RTHandles.Add(bufferId, buffer);
 
-            RTHandleAllocInfo allocInfo = RTHandles.GetRTHandleAllocInfo(descriptor, filterMode,
-                wrapMode, anisoLevel, mipMapBias, name);
+            RTHandleAllocInfo allocInfo = RTHandles.GetRTHandleAllocInfo(
+                descriptor,
+                filterMode,
+                wrapMode,
+                anisoLevel,
+                mipMapBias,
+                name
+            );
             allocInfo.isShadowMap = isShadowMap;
 
             // First is autoresized

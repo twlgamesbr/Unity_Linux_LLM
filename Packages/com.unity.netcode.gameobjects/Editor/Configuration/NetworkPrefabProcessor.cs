@@ -14,10 +14,7 @@ namespace Unity.Netcode.Editor.Configuration
         /// </summary>
         public static string DefaultNetworkPrefabsPath
         {
-            get
-            {
-                return NetcodeForGameObjectsProjectSettings.instance.NetworkPrefabsPath;
-            }
+            get { return NetcodeForGameObjectsProjectSettings.instance.NetworkPrefabsPath; }
             internal set
             {
                 NetcodeForGameObjectsProjectSettings.instance.NetworkPrefabsPath = value;
@@ -28,7 +25,12 @@ namespace Unity.Netcode.Editor.Configuration
         private static NetworkPrefabsList s_PrefabsList;
         private static Dictionary<string, NetworkPrefab> s_PrefabsListPath = new Dictionary<string, NetworkPrefab>();
 
-        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        private static void OnPostprocessAllAssets(
+            string[] importedAssets,
+            string[] deletedAssets,
+            string[] movedAssets,
+            string[] movedFromAssetPaths
+        )
         {
             var settings = NetcodeForGameObjectsProjectSettings.instance;
             if (!settings.GenerateDefaultNetworkPrefabs)

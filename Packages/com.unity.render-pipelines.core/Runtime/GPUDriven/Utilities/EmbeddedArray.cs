@@ -5,7 +5,8 @@ using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering
 {
-    internal unsafe struct EmbeddedArray32<T> : IDisposable where T : unmanaged
+    internal unsafe struct EmbeddedArray32<T> : IDisposable
+        where T : unmanaged
     {
         FixedList32Bytes<T> m_FixedArray;
         UnsafeList<T> m_List;
@@ -67,7 +68,8 @@ namespace UnityEngine.Rendering
         }
     }
 
-    internal unsafe struct EmbeddedArray64<T> : IDisposable where T : unmanaged
+    internal unsafe struct EmbeddedArray64<T> : IDisposable
+        where T : unmanaged
     {
         FixedList64Bytes<T> m_FixedArray;
         UnsafeList<T> m_List;

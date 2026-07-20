@@ -1,30 +1,29 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Items
 {
     /// <summary>
     /// Server-authoritative service that processes NPC dialogue item-trade
     /// actions. Triggered by parsing <c>[give_item:id=xxx]</c> or
     /// <c>[trade_item:id=xxx,require=yyy]</c> tags in LLM responses.
-    /// 
+    ///
     /// Requires an ItemCatalog assigned at edit time.
     /// </summary>
     [RequireComponent(typeof(NetworkObject))]
@@ -114,7 +113,9 @@ namespace NPCSystem.Items
             bool added = inventory.ServerTryAddItem(itemId);
             if (added)
             {
-                NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(FindObjectsInactive.Include);
+                NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(
+                    FindObjectsInactive.Include
+                );
                 sessionManager?.AddInventoryItem(playerClientId, itemId);
 
                 LogInfo($"Gave item '{itemId}' to player {playerClientId}.");
@@ -142,7 +143,9 @@ namespace NPCSystem.Items
             bool removed = inventory.ServerTryRemoveItem(itemId);
             if (removed)
             {
-                NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(FindObjectsInactive.Include);
+                NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(
+                    FindObjectsInactive.Include
+                );
                 sessionManager?.RemoveInventoryItem(playerClientId, itemId);
 
                 LogInfo($"Removed item '{itemId}' from player {playerClientId}.");
@@ -217,7 +220,10 @@ namespace NPCSystem.Items
 
         NPCPlayerInventory FindPlayerInventory(ulong clientId)
         {
-            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None
+            );
             foreach (var avatar in avatars)
             {
                 if (avatar != null && avatar.IsSpawned && avatar.OwnerClientId == clientId)
@@ -231,12 +237,24 @@ namespace NPCSystem.Items
         void LogInfo(string msg)
         {
             if (_verboseLogging)
-                Logger?.Log(NPCFlowStage.ResponseComplete, NPCFlowStatus.Success, NPCFlowLogLevel.Info, msg, source: nameof(ItemTradeService));
+                Logger?.Log(
+                    NPCFlowStage.ResponseComplete,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    msg,
+                    source: nameof(ItemTradeService)
+                );
         }
 
         void LogWarning(string msg)
         {
-            Logger?.Log(NPCFlowStage.ResponseComplete, NPCFlowStatus.Fallback, NPCFlowLogLevel.Warning, msg, source: nameof(ItemTradeService));
+            Logger?.Log(
+                NPCFlowStage.ResponseComplete,
+                NPCFlowStatus.Fallback,
+                NPCFlowLogLevel.Warning,
+                msg,
+                source: nameof(ItemTradeService)
+            );
         }
     }
 }

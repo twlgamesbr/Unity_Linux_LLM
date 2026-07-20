@@ -43,10 +43,16 @@ namespace Unity.Physics
 
         // Build the Jacobian
         public void Build(
-            MTransform aFromConstraint, MTransform bFromConstraint,
-            MotionVelocity velocityA, MotionVelocity velocityB,
-            MotionData motionA, MotionData motionB,
-            Constraint constraint, float tau, float damping)
+            MTransform aFromConstraint,
+            MTransform bFromConstraint,
+            MotionVelocity velocityA,
+            MotionVelocity velocityB,
+            MotionData motionA,
+            MotionData motionB,
+            Constraint constraint,
+            float tau,
+            float damping
+        )
         {
             // Copy the constraint data
             FreeIndex = constraint.FreeAxis2D;
@@ -86,12 +92,21 @@ namespace Unity.Physics
         }
 
         // Solve the Jacobian
-        public void Solve(ref JacobianHeader jacHeader, ref MotionVelocity velocityA, ref MotionVelocity velocityB,
-            Solver.StepInput stepInput, ref NativeStream.Writer impulseEventsWriter)
+        public void Solve(
+            ref JacobianHeader jacHeader,
+            ref MotionVelocity velocityA,
+            ref MotionVelocity velocityB,
+            Solver.StepInput stepInput,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             // Predict the relative orientation at the end of the step
             quaternion futureBFromA = JacobianUtilities.IntegrateOrientationBFromA(
-                BFromA, velocityA.AngularVelocity, velocityB.AngularVelocity, stepInput.Timestep);
+                BFromA,
+                velocityA.AngularVelocity,
+                velocityB.AngularVelocity,
+                stepInput.Timestep
+            );
 
             // Calculate the jacobian axis and angle
             float3 axisAinB = math.mul(futureBFromA, AxisAinA);
@@ -114,9 +129,15 @@ namespace Unity.Physics
             float2 effectiveMass; // First column of the 2x2 matrix, we don't need the second column because the second component of error is zero
             {
                 // Calculate the inverse effective mass matrix, then invert it
-                float invEffMassDiag0 = math.csum(jacA0 * jacA0 * velocityA.InverseInertia + jacB0 * jacB0 * velocityB.InverseInertia);
-                float invEffMassDiag1 = math.csum(jacA1 * jacA1 * velocityA.InverseInertia + jacB1 * jacB1 * velocityB.InverseInertia);
-                float invEffMassOffDiag = math.csum(jacA0 * jacA1 * velocityA.InverseInertia + jacB0 * jacB1 * velocityB.InverseInertia);
+                float invEffMassDiag0 = math.csum(
+                    jacA0 * jacA0 * velocityA.InverseInertia + jacB0 * jacB0 * velocityB.InverseInertia
+                );
+                float invEffMassDiag1 = math.csum(
+                    jacA1 * jacA1 * velocityA.InverseInertia + jacB1 * jacB1 * velocityB.InverseInertia
+                );
+                float invEffMassOffDiag = math.csum(
+                    jacA0 * jacA1 * velocityA.InverseInertia + jacB0 * jacB1 * velocityB.InverseInertia
+                );
                 float det = invEffMassDiag0 * invEffMassDiag1 - invEffMassOffDiag * invEffMassOffDiag;
                 float invDet = math.select(jacLengthSq / det, 0.0f, det == 0.0f); // scale by jacLengthSq because the jacs were not normalized
                 effectiveMass = invDet * new float2(invEffMassDiag1, -invEffMassOffDiag);
@@ -138,11 +159,21 @@ namespace Unity.Physics
 
             if ((jacHeader.Flags & JacobianFlags.EnableImpulseEvents) != 0)
             {
-                HandleImpulseEvent(ref jacHeader, impulse, stepInput.ExportEventsInThisIteration, ref impulseEventsWriter);
+                HandleImpulseEvent(
+                    ref jacHeader,
+                    impulse,
+                    stepInput.ExportEventsInThisIteration,
+                    ref impulseEventsWriter
+                );
             }
         }
 
-        private void HandleImpulseEvent(ref JacobianHeader jacHeader, float2 impulse, bool exportEvent, ref NativeStream.Writer impulseEventsWriter)
+        private void HandleImpulseEvent(
+            ref JacobianHeader jacHeader,
+            float2 impulse,
+            bool exportEvent,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             ref ImpulseEventSolverData impulseEventData = ref jacHeader.AccessImpulseEventSolverData();
             impulseEventData.AccumulatedImpulse[ConstraintIndexX] += impulse.x;
@@ -150,13 +181,15 @@ namespace Unity.Physics
 
             if (exportEvent && math.any(math.abs(impulseEventData.AccumulatedImpulse) > impulseEventData.MaxImpulse))
             {
-                impulseEventsWriter.Write(new ImpulseEventData
-                {
-                    Type = ConstraintType.Angular,
-                    Impulse = impulseEventData.AccumulatedImpulse,
-                    JointEntity = impulseEventData.JointEntity,
-                    BodyIndices = jacHeader.BodyPair
-                });
+                impulseEventsWriter.Write(
+                    new ImpulseEventData
+                    {
+                        Type = ConstraintType.Angular,
+                        Impulse = impulseEventData.AccumulatedImpulse,
+                        JointEntity = impulseEventData.JointEntity,
+                        BodyIndices = jacHeader.BodyPair,
+                    }
+                );
             }
         }
     }

@@ -19,9 +19,7 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
             m_ResultRenderer.ShowResults();
         }
 
-        public void TestFinished(ITestResult result)
-        {
-        }
+        public void TestFinished(ITestResult result) { }
 
 #if !DISABLE_TESTFRAMEWORK_GUI
         public void OnGUI()
@@ -30,14 +28,13 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
                 m_ResultRenderer.Draw();
         }
 #endif
+
         public void RunStarted(ITest testsToRun)
         {
             Application.logMessageReceived += LogRecieved;
         }
 
-        public void TestStarted(ITest test)
-        {
-        }
+        public void TestStarted(ITest test) { }
 
         private void LogRecieved(string message, string stacktrace, LogType type)
         {

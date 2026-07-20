@@ -2,9 +2,7 @@ using Unity.Properties;
 
 namespace Unity.Entities.UI
 {
-    interface IInspectorVisit
-    {
-    }
+    interface IInspectorVisit { }
 
     interface IInspectorVisit<TValue> : IInspectorVisit
     {
@@ -12,7 +10,8 @@ namespace Unity.Entities.UI
             InspectorVisitor.InspectorContext inspectorContext,
             IProperty<TContainer> property,
             ref TValue value,
-            PropertyPath path);
+            PropertyPath path
+        );
     }
 
     interface IInspectorContravariantVisit<in TValue> : IInspectorVisit
@@ -21,23 +20,22 @@ namespace Unity.Entities.UI
             InspectorVisitor.InspectorContext inspectorContext,
             IProperty<TContainer> property,
             TValue value,
-            PropertyPath path);
+            PropertyPath path
+        );
     }
 
     interface IInspectorPrimitiveVisit
-        : IInspectorVisit<sbyte>
-            , IInspectorVisit<short>
-            , IInspectorVisit<int>
-            , IInspectorVisit<long>
-            , IInspectorVisit<byte>
-            , IInspectorVisit<ushort>
-            , IInspectorVisit<uint>
-            , IInspectorVisit<ulong>
-            , IInspectorVisit<float>
-            , IInspectorVisit<double>
-            , IInspectorVisit<bool>
-            , IInspectorVisit<char>
-            , IInspectorVisit<string>
-    {
-    }
+        : IInspectorVisit<sbyte>,
+            IInspectorVisit<short>,
+            IInspectorVisit<int>,
+            IInspectorVisit<long>,
+            IInspectorVisit<byte>,
+            IInspectorVisit<ushort>,
+            IInspectorVisit<uint>,
+            IInspectorVisit<ulong>,
+            IInspectorVisit<float>,
+            IInspectorVisit<double>,
+            IInspectorVisit<bool>,
+            IInspectorVisit<char>,
+            IInspectorVisit<string> { }
 }

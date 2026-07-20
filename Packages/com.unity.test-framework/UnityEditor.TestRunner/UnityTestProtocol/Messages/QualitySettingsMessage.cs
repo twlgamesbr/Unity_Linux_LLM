@@ -6,6 +6,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
     internal class QualitySettingsMessage : Message
     {
         public QualitySettings QualitySettings;
+
         public QualitySettingsMessage()
         {
             type = "QualitySettings";

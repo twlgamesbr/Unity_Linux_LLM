@@ -13,9 +13,11 @@ namespace UnityEngine.Rendering.Universal
             lightType.intValue = m_SourceType;
         }
 
-        public override void DrawUI(SerializedProperty property, SerializedObject serializedObject, UnityEngine.Object[] targets)
-        {
-        }
+        public override void DrawUI(
+            SerializedProperty property,
+            SerializedObject serializedObject,
+            UnityEngine.Object[] targets
+        ) { }
 
         public override int GetHashCode()
         {
@@ -29,7 +31,6 @@ namespace UnityEngine.Rendering.Universal
             m_MenuPriority = priority;
             m_HashCode = (int)Light2D.LightType.Global;
         }
-
     }
 }
 #endif

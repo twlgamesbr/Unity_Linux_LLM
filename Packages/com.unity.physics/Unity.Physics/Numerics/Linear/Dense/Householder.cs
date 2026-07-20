@@ -126,11 +126,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                     var work = v.Heap.Vector(lastC);
                     var subC = C.Submatrix(0, 0, lastV, lastC);
                     var subv = v.Subvector(0, lastV);
-                    work.ScaleAndAddProduct(
-                        subC,
-                        Op.Transpose,
-                        subv,
-                        1.0f, 0.0f);
+                    work.ScaleAndAddProduct(subC, Op.Transpose, subv, 1.0f, 0.0f);
                     subC.AddOuterProduct(subv, work, -tau);
                     subC.Dispose();
                     work.Dispose();
@@ -144,11 +140,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                     var work = v.Heap.Vector(lastC);
                     var subC = C.Submatrix(0, 0, lastC, lastV);
                     var subv = v.Subvector(0, lastV);
-                    work.ScaleAndAddProduct(
-                        subC,
-                        Op.None,
-                        subv,
-                        1.0f, 0.0f);
+                    work.ScaleAndAddProduct(subC, Op.None, subv, 1.0f, 0.0f);
                     subC.AddOuterProduct(work, subv, -tau);
                     subC.Dispose();
                     work.Dispose();

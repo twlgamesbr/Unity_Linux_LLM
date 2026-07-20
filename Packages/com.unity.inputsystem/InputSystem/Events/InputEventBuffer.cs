@@ -103,16 +103,21 @@ namespace UnityEngine.InputSystem.LowLevel
             if (eventPtr == null && eventCount != 0)
                 throw new ArgumentException("eventPtr is NULL but eventCount is != 0", nameof(eventCount));
             if (capacityInBytes != 0 && capacityInBytes < sizeInBytes)
-                throw new ArgumentException($"capacity({capacityInBytes}) cannot be smaller than size({sizeInBytes})",
-                    nameof(capacityInBytes));
+                throw new ArgumentException(
+                    $"capacity({capacityInBytes}) cannot be smaller than size({sizeInBytes})",
+                    nameof(capacityInBytes)
+                );
 
             if (eventPtr != null)
             {
                 if (capacityInBytes < 0)
                     capacityInBytes = sizeInBytes;
 
-                m_Buffer = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(eventPtr,
-                    capacityInBytes > 0 ? capacityInBytes : 0, Allocator.None);
+                m_Buffer = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                    eventPtr,
+                    capacityInBytes > 0 ? capacityInBytes : 0,
+                    Allocator.None
+                );
                 m_SizeInBytes = sizeInBytes >= 0 ? sizeInBytes : BufferSizeUnknown;
                 m_EventCount = eventCount;
                 m_WeOwnTheBuffer = false;
@@ -134,7 +139,12 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <exception cref="ArgumentException"><paramref name="buffer"/> has no memory allocated but <paramref name="eventCount"/> is not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeInBytes"/> is greater than the total length allocated for
         /// <paramref name="buffer"/>.</exception>
-        public InputEventBuffer(NativeArray<byte> buffer, int eventCount, int sizeInBytes = -1, bool transferNativeArrayOwnership = false)
+        public InputEventBuffer(
+            NativeArray<byte> buffer,
+            int eventCount,
+            int sizeInBytes = -1,
+            bool transferNativeArrayOwnership = false
+        )
         {
             if (eventCount > 0 && !buffer.IsCreated)
                 throw new ArgumentException("buffer has no data but eventCount is > 0", nameof(eventCount));
@@ -161,7 +171,11 @@ namespace UnityEngine.InputSystem.LowLevel
         /// If the buffer's current capacity (see <see cref="capacityInBytes"/>) is smaller than <see cref="InputEvent.sizeInBytes"/>
         /// of the given event, the buffer will be reallocated.
         /// </remarks>
-        public void AppendEvent(InputEvent* eventPtr, int capacityIncrementInBytes = 2048, Allocator allocator = Allocator.Persistent)
+        public void AppendEvent(
+            InputEvent* eventPtr,
+            int capacityIncrementInBytes = 2048,
+            Allocator allocator = Allocator.Persistent
+        )
         {
             if (eventPtr == null)
                 throw new ArgumentNullException(nameof(eventPtr));
@@ -192,12 +206,17 @@ namespace UnityEngine.InputSystem.LowLevel
         ///
         /// The event will be appended to the buffer after the last event currently in the buffer (if any).
         /// </remarks>
-        public InputEvent* AllocateEvent(int sizeInBytes, int capacityIncrementInBytes = 2048, Allocator allocator = Allocator.Persistent)
+        public InputEvent* AllocateEvent(
+            int sizeInBytes,
+            int capacityIncrementInBytes = 2048,
+            Allocator allocator = Allocator.Persistent
+        )
         {
             if (sizeInBytes < InputEvent.kBaseEventSize)
                 throw new ArgumentException(
                     $"sizeInBytes must be >= sizeof(InputEvent) == {InputEvent.kBaseEventSize} (was {sizeInBytes})",
-                    nameof(sizeInBytes));
+                    nameof(sizeInBytes)
+                );
 
             var alignedSizeInBytes = sizeInBytes.AlignToMultipleOf(InputEvent.kAlignment);
 
@@ -211,14 +230,15 @@ namespace UnityEngine.InputSystem.LowLevel
                 var newCapacity = necessaryCapacity.AlignToMultipleOf(capacityIncrementInBytes);
                 if (newCapacity > int.MaxValue)
                     throw new NotImplementedException("NativeArray long support");
-                var newBuffer =
-                    new NativeArray<byte>((int)newCapacity, allocator, NativeArrayOptions.ClearMemory);
+                var newBuffer = new NativeArray<byte>((int)newCapacity, allocator, NativeArrayOptions.ClearMemory);
 
                 if (m_Buffer.IsCreated)
                 {
-                    UnsafeUtility.MemCpy(newBuffer.GetUnsafePtr(),
+                    UnsafeUtility.MemCpy(
+                        newBuffer.GetUnsafePtr(),
                         NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_Buffer),
-                        this.sizeInBytes);
+                        this.sizeInBytes
+                    );
 
                     if (m_WeOwnTheBuffer)
                         m_Buffer.Dispose();
@@ -228,7 +248,9 @@ namespace UnityEngine.InputSystem.LowLevel
                 m_WeOwnTheBuffer = true;
             }
 
-            var eventPtr = (InputEvent*)((byte*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_Buffer) + m_SizeInBytes);
+            var eventPtr = (InputEvent*)(
+                (byte*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_Buffer) + m_SizeInBytes
+            );
             eventPtr->sizeInBytes = (uint)sizeInBytes;
             m_SizeInBytes += alignedSizeInBytes;
             ++m_EventCount;
@@ -286,9 +308,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// This method MUST ONLY BE CALLED if the current event has been fully processed. If the at <paramref name="currentWritePos"/>
         /// is smaller than the current event, then this method will OVERWRITE parts or all of the current event.
         /// </remarks>
-        internal void AdvanceToNextEvent(ref InputEvent* currentReadPos,
-            ref InputEvent* currentWritePos, ref int numEventsRetainedInBuffer,
-            ref int numRemainingEvents, bool leaveEventInBuffer)
+        internal void AdvanceToNextEvent(
+            ref InputEvent* currentReadPos,
+            ref InputEvent* currentWritePos,
+            ref int numEventsRetainedInBuffer,
+            ref int numRemainingEvents,
+            bool leaveEventInBuffer
+        )
         {
             Debug.Assert(currentReadPos >= currentWritePos, "Current write position is beyond read position");
 
@@ -298,11 +324,11 @@ namespace UnityEngine.InputSystem.LowLevel
             if (numRemainingEvents > 1)
             {
                 // Don't perform safety check in non-debug builds.
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 newReadPos = InputEvent.GetNextInMemoryChecked(currentReadPos, ref this);
-                #else
+#else
                 newReadPos = InputEvent.GetNextInMemory(currentReadPos);
-                #endif
+#endif
             }
 
             // If the current event should be left in the buffer, advance write position.
@@ -412,9 +438,7 @@ namespace UnityEngine.InputSystem.LowLevel
                 m_CurrentIndex = 0;
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public InputEventPtr Current => m_CurrentEvent;
 

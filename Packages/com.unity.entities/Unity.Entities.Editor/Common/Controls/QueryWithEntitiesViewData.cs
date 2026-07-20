@@ -15,7 +15,12 @@ namespace Unity.Entities.Editor
 
         int m_LastVersion;
 
-        public QueryWithEntitiesViewData(World world, EntityQuery query, SystemProxy systemProxy = default, int queryOrder = 0)
+        public QueryWithEntitiesViewData(
+            World world,
+            EntityQuery query,
+            SystemProxy systemProxy = default,
+            int queryOrder = 0
+        )
         {
             World = world;
             SystemProxy = systemProxy;

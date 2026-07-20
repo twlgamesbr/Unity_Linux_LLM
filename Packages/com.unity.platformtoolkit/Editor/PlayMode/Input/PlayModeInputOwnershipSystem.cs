@@ -16,18 +16,23 @@ namespace Unity.PlatformToolkit.PlayMode
         private PlayModeInputSystem m_InputSystem;
         private PlayModeAccountSystemManager m_AccountSystemManager;
 
-        public PlayModeInputOwnershipSystem(PlayModeInputSystem inputSystem, PlayModeAccountSystemManager accountSystemManager)
+        public PlayModeInputOwnershipSystem(
+            PlayModeInputSystem inputSystem,
+            PlayModeAccountSystemManager accountSystemManager
+        )
         {
             m_InputSystem = inputSystem;
             m_AccountSystemManager = accountSystemManager;
             m_InputSystem.PairingChangedEvent += MarkPairingChanged;
-            RegisterInputDeviceConverter<InputDevice>((inputDevice) =>
-            {
-                var playModeInputDevice = new PlayModeInputDevice();
-                playModeInputDevice.Id = inputDevice.deviceId.ToString();
-                playModeInputDevice.IdType = "deviceId";
-                return playModeInputDevice;
-            });
+            RegisterInputDeviceConverter<InputDevice>(
+                (inputDevice) =>
+                {
+                    var playModeInputDevice = new PlayModeInputDevice();
+                    playModeInputDevice.Id = inputDevice.deviceId.ToString();
+                    playModeInputDevice.IdType = "deviceId";
+                    return playModeInputDevice;
+                }
+            );
         }
 
         public override IAccount GetOwner(IInputDevice inputDevice)

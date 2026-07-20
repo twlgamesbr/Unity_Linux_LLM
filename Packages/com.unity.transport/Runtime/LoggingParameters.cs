@@ -34,7 +34,10 @@ namespace Unity.Networking.Transport.Logging
         /// <param name="settings">Settings to modify.</param>
         /// <param name="driverName">Label to use for this driver in the logs.</param>
         /// <returns>Settings structure with modified values.</returns>
-        public static ref NetworkSettings WithLoggingParameters(ref this NetworkSettings settings, FixedString32Bytes driverName)
+        public static ref NetworkSettings WithLoggingParameters(
+            ref this NetworkSettings settings,
+            FixedString32Bytes driverName
+        )
         {
             var parameter = new LoggingParameter { DriverName = driverName };
             settings.AddRawParameterStruct(ref parameter);

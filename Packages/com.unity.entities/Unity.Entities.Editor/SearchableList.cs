@@ -10,7 +10,8 @@ namespace Unity.Entities.Editor
     /// <summary>
     /// Provides basic searchable list handling.
     /// </summary>
-    class SearchableList<TList, TItem> where TList : BaseListView
+    class SearchableList<TList, TItem>
+        where TList : BaseListView
     {
         readonly TList m_List;
         readonly SearchElement m_SearchElement;
@@ -47,7 +48,8 @@ namespace Unity.Entities.Editor
             TList list,
             SearchElement search,
             Func<IEnumerable<TItem>> getSourceItems,
-            Func<TItem, IEnumerable<string>> getSearchData)
+            Func<TItem, IEnumerable<string>> getSearchData
+        )
         {
             m_List = list;
             m_SearchElement = search;
@@ -209,7 +211,10 @@ namespace Unity.Entities.Editor
         {
             m_SearchElement
                 .GetQueryEngine<TItem>()
-                .AddOperatorHandler<IEnumerable<T>, T>(op, (lhs, rhs, options) => lhs.Any(element => handler(element, rhs, options)));
+                .AddOperatorHandler<IEnumerable<T>, T>(
+                    op,
+                    (lhs, rhs, options) => lhs.Any(element => handler(element, rhs, options))
+                );
         }
     }
 }

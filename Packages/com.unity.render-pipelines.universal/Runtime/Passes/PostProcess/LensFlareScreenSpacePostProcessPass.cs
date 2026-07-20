@@ -1,6 +1,6 @@
 using System;
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -72,7 +72,8 @@ namespace UnityEngine.Rendering.Universal
             // TODO: Check src/dst handle equality in the future.
             // Kawase blur does not use the mip pyramid.
             // It is safe to pass the same texture to both input/output.
-            bool useDestinationAsSource = m_FlareSourceBloomMipIndex == 0 || bloom.filter.value == BloomFilterMode.Kawase;
+            bool useDestinationAsSource =
+                m_FlareSourceBloomMipIndex == 0 || bloom.filter.value == BloomFilterMode.Kawase;
 
             var resourceData = frameData.Get<UniversalResourceData>();
             var cameraData = frameData.Get<UniversalCameraData>();
@@ -82,20 +83,49 @@ namespace UnityEngine.Rendering.Universal
             // Flare is blended to the destination. Typically, the bloom (mip0) texture. Bloom can be at different resolution compared to the main color source.
             var destinationTexture = resourceData.bloom;
 
-            var downsample = (int) lensFlareScreenSpace.resolution.value;
+            var downsample = (int)lensFlareScreenSpace.resolution.value;
 
-            int flareRenderWidth = Math.Max( m_ColorBufferWidth / downsample, 1);
-            int flareRenderHeight = Math.Max( m_ColorBufferHeight / downsample, 1);
+            int flareRenderWidth = Math.Max(m_ColorBufferWidth / downsample, 1);
+            int flareRenderHeight = Math.Max(m_ColorBufferHeight / downsample, 1);
 
             var streakDesc = renderGraph.GetTextureDesc(resourceData.cameraColor);
-            var streakTextureDesc = PostProcessUtils.GetCompatibleDescriptor(streakDesc, flareRenderWidth, flareRenderHeight, streakDesc.colorFormat);
-            var streakTmpTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, streakTextureDesc, "_StreakTmpTexture", true, FilterMode.Bilinear);
-            var streakTmpTexture2 = PostProcessUtils.CreateCompatibleTexture(renderGraph, streakTextureDesc, "_StreakTmpTexture2", true, FilterMode.Bilinear);
+            var streakTextureDesc = PostProcessUtils.GetCompatibleDescriptor(
+                streakDesc,
+                flareRenderWidth,
+                flareRenderHeight,
+                streakDesc.colorFormat
+            );
+            var streakTmpTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                streakTextureDesc,
+                "_StreakTmpTexture",
+                true,
+                FilterMode.Bilinear
+            );
+            var streakTmpTexture2 = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                streakTextureDesc,
+                "_StreakTmpTexture2",
+                true,
+                FilterMode.Bilinear
+            );
 
             // NOTE: Result texture is the result of the flares/streaks only. Not the final output which is "bloom + flares".
-            var resultTmpTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, streakTextureDesc, "_LensFlareScreenSpace", true, FilterMode.Bilinear);
+            var resultTmpTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                streakTextureDesc,
+                "_LensFlareScreenSpace",
+                true,
+                FilterMode.Bilinear
+            );
 
-            using (var builder = renderGraph.AddUnsafePass<LensFlareScreenSpacePassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddUnsafePass<LensFlareScreenSpacePassData>(
+                    passName,
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 // Use WriteTexture here because DoLensFlareScreenSpaceCommon will call SetRenderTarget internally.
                 // TODO RENDERGRAPH: convert SRP core lensflare to be rendergraph friendly
@@ -107,7 +137,7 @@ namespace UnityEngine.Rendering.Universal
                 builder.UseTexture(sourceTexture, AccessFlags.ReadWrite);
                 passData.flareDestinationBloomTexture = destinationTexture;
                 // Input/Output can be the same texture. There's a temp texture in between. Avoid RG double write error.
-                if(!useDestinationAsSource)
+                if (!useDestinationAsSource)
                     builder.UseTexture(destinationTexture, AccessFlags.ReadWrite);
                 passData.actualColorWidth = m_ColorBufferWidth;
                 passData.actualColorHeight = m_ColorBufferHeight;
@@ -118,57 +148,65 @@ namespace UnityEngine.Rendering.Universal
                 passData.flareResultTmp = resultTmpTexture;
                 builder.UseTexture(resultTmpTexture, AccessFlags.ReadWrite);
 
-                builder.SetRenderFunc(static (LensFlareScreenSpacePassData data, UnsafeGraphContext context) =>
-                {
-                    var cmd = context.cmd;
-                    var camera = data.camera;
-                    var lensFlareScreenSpace = data.lensFlareScreenSpace;
+                builder.SetRenderFunc(
+                    static (LensFlareScreenSpacePassData data, UnsafeGraphContext context) =>
+                    {
+                        var cmd = context.cmd;
+                        var camera = data.camera;
+                        var lensFlareScreenSpace = data.lensFlareScreenSpace;
 
-                    LensFlareCommonSRP.DoLensFlareScreenSpaceCommon(
-                        data.material,
-                        camera,
-                        (float)data.actualColorWidth,
-                        (float)data.actualColorHeight,
-                        data.lensFlareScreenSpace.tintColor.value,
-                        data.flareDestinationBloomTexture,
-                        data.flareSourceBloomMipTexture,
-                        null, // We don't have any spectral LUT in URP
-                        data.streakTmpTexture,
-                        data.streakTmpTexture2,
-                        new Vector4(
-                            lensFlareScreenSpace.intensity.value,
-                            lensFlareScreenSpace.firstFlareIntensity.value,
-                            lensFlareScreenSpace.secondaryFlareIntensity.value,
-                            lensFlareScreenSpace.warpedFlareIntensity.value),
-                        new Vector4(
-                            lensFlareScreenSpace.vignetteEffect.value,
-                            lensFlareScreenSpace.startingPosition.value,
-                            lensFlareScreenSpace.scale.value,
-                            0), // Free slot, not used
-                        new Vector4(
-                            lensFlareScreenSpace.samples.value,
-                            lensFlareScreenSpace.sampleDimmer.value,
-                            lensFlareScreenSpace.chromaticAbberationIntensity.value,
-                            0), // No need to pass a chromatic aberration sample count, hardcoded at 3 in shader
-                        new Vector4(
-                            lensFlareScreenSpace.streaksIntensity.value,
-                            lensFlareScreenSpace.streaksLength.value,
-                            lensFlareScreenSpace.streaksOrientation.value,
-                            lensFlareScreenSpace.streaksThreshold.value),
-                        new Vector4(
-                            data.downsample,
-                            lensFlareScreenSpace.warpedFlareScale.value.x,
-                            lensFlareScreenSpace.warpedFlareScale.value.y,
-                            0), // Free slot, not used
-                        cmd,
-                        data.flareResultTmp,
-                        false);
-                });
+                        LensFlareCommonSRP.DoLensFlareScreenSpaceCommon(
+                            data.material,
+                            camera,
+                            (float)data.actualColorWidth,
+                            (float)data.actualColorHeight,
+                            data.lensFlareScreenSpace.tintColor.value,
+                            data.flareDestinationBloomTexture,
+                            data.flareSourceBloomMipTexture,
+                            null, // We don't have any spectral LUT in URP
+                            data.streakTmpTexture,
+                            data.streakTmpTexture2,
+                            new Vector4(
+                                lensFlareScreenSpace.intensity.value,
+                                lensFlareScreenSpace.firstFlareIntensity.value,
+                                lensFlareScreenSpace.secondaryFlareIntensity.value,
+                                lensFlareScreenSpace.warpedFlareIntensity.value
+                            ),
+                            new Vector4(
+                                lensFlareScreenSpace.vignetteEffect.value,
+                                lensFlareScreenSpace.startingPosition.value,
+                                lensFlareScreenSpace.scale.value,
+                                0
+                            ), // Free slot, not used
+                            new Vector4(
+                                lensFlareScreenSpace.samples.value,
+                                lensFlareScreenSpace.sampleDimmer.value,
+                                lensFlareScreenSpace.chromaticAbberationIntensity.value,
+                                0
+                            ), // No need to pass a chromatic aberration sample count, hardcoded at 3 in shader
+                            new Vector4(
+                                lensFlareScreenSpace.streaksIntensity.value,
+                                lensFlareScreenSpace.streaksLength.value,
+                                lensFlareScreenSpace.streaksOrientation.value,
+                                lensFlareScreenSpace.streaksThreshold.value
+                            ),
+                            new Vector4(
+                                data.downsample,
+                                lensFlareScreenSpace.warpedFlareScale.value.x,
+                                lensFlareScreenSpace.warpedFlareScale.value.y,
+                                0
+                            ), // Free slot, not used
+                            cmd,
+                            data.flareResultTmp,
+                            false
+                        );
+                    }
+                );
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static internal bool IsActive(VolumeStack volumeStack, ContextContainer frameData)
+        internal static bool IsActive(VolumeStack volumeStack, ContextContainer frameData)
         {
             var lensFlareScreenSpace = volumeStack.GetComponent<ScreenSpaceLensFlare>();
             if (!lensFlareScreenSpace.IsActive())

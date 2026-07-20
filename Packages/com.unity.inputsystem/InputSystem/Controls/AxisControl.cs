@@ -310,23 +310,24 @@ namespace UnityEngine.InputSystem.Controls
 
         protected override FourCC CalculateOptimizedControlDataType()
         {
-            var noProcessingNeeded =
-                clamp == Clamp.None &&
-                invert == false &&
-                normalize == false &&
-                scale == false;
+            var noProcessingNeeded = clamp == Clamp.None && invert == false && normalize == false && scale == false;
 
-            if (noProcessingNeeded &&
-                m_StateBlock.format == InputStateBlock.FormatFloat &&
-                m_StateBlock.sizeInBits == 32 &&
-                m_StateBlock.bitOffset == 0)
+            if (
+                noProcessingNeeded
+                && m_StateBlock.format == InputStateBlock.FormatFloat
+                && m_StateBlock.sizeInBits == 32
+                && m_StateBlock.bitOffset == 0
+            )
                 return InputStateBlock.FormatFloat;
-            if (noProcessingNeeded &&
-                m_StateBlock.format == InputStateBlock.FormatBit &&
+            if (
+                noProcessingNeeded
+                && m_StateBlock.format == InputStateBlock.FormatBit
+                &&
                 // has to be 8, otherwise we might be mapping to a state which only represents first bit in the byte, while other bits might map to some other controls
                 // like in the mouse where LMB/RMB map to the same byte, just LMB maps to first bit and RMB maps to second bit
-                m_StateBlock.sizeInBits == 8 &&
-                m_StateBlock.bitOffset == 0)
+                m_StateBlock.sizeInBits == 8
+                && m_StateBlock.bitOffset == 0
+            )
                 return InputStateBlock.FormatByte;
             return InputStateBlock.FormatInvalid;
         }

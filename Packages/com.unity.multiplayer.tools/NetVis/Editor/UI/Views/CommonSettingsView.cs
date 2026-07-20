@@ -12,26 +12,37 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
     [LoadUxmlView(NetVisEditorPaths.k_UxmlRoot)]
     partial class CommonSettingsView : InjectedVisualElement<CommonSettingsView>
     {
-        [UxmlQuery] Toggle Outline;
-        [UxmlQuery] SliderInt Saturation;
+        [UxmlQuery]
+        Toggle Outline;
 
-        [Inject] NetVisConfigurationWithEvents Configuration;
+        [UxmlQuery]
+        SliderInt Saturation;
+
+        [Inject]
+        NetVisConfigurationWithEvents Configuration;
         NetVisCommonSettings CommonSettings => Configuration.Configuration.Settings.Common;
 
         public CommonSettingsView()
         {
-            Outline.Bind(CommonSettings.Outline, value =>
-            {
-                CommonSettings.Outline = value;
-                Configuration.NotifySettingsChanged();
-            });
+            Outline.Bind(
+                CommonSettings.Outline,
+                value =>
+                {
+                    CommonSettings.Outline = value;
+                    Configuration.NotifySettingsChanged();
+                }
+            );
 
-            Saturation.Bind(Mathf.RoundToInt(CommonSettings.SceneSaturation * 100f), value =>
-            {
-                CommonSettings.SceneSaturation = value / 100f;
-                Configuration.NotifySettingsChanged();
-            });
+            Saturation.Bind(
+                Mathf.RoundToInt(CommonSettings.SceneSaturation * 100f),
+                value =>
+                {
+                    CommonSettings.SceneSaturation = value / 100f;
+                    Configuration.NotifySettingsChanged();
+                }
+            );
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlTraits : VisualElement.UxmlTraits { }
 

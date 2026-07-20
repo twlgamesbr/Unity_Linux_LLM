@@ -16,7 +16,9 @@ namespace Unity.Scenes.Editor
             get
             {
                 if (EditorApplication.isPlaying || LiveConversionEnabled)
-                    return LiveConversionSceneViewShowRuntime ? LiveConversionMode.SceneViewShowsRuntime : LiveConversionMode.SceneViewShowsAuthoring;
+                    return LiveConversionSceneViewShowRuntime
+                        ? LiveConversionMode.SceneViewShowsRuntime
+                        : LiveConversionMode.SceneViewShowsAuthoring;
                 else
                     return LiveConversionMode.Disabled;
             }
@@ -57,6 +59,6 @@ namespace Unity.Scenes.Editor
             }
         }
 
-        internal static event Action LiveConversionModeChanged = delegate {};
+        internal static event Action LiveConversionModeChanged = delegate { };
     }
 }

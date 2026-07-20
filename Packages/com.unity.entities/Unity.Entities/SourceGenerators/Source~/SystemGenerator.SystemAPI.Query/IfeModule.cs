@@ -19,17 +19,18 @@ public class IfeModule : ISystemModule
         {
             if (_candidatesGroupedByContainingSystemTypes == null)
             {
-                _candidatesGroupedByContainingSystemTypes =
-                    _queryCandidates
-                        .GroupBy(c => c.ContainingTypeNode)
-                        .ToDictionary(group => group.Key, group => group.ToArray());
+                _candidatesGroupedByContainingSystemTypes = _queryCandidates
+                    .GroupBy(c => c.ContainingTypeNode)
+                    .ToDictionary(group => group.Key, group => group.ToArray());
             }
             return _candidatesGroupedByContainingSystemTypes;
         }
     }
 
-    public IEnumerable<(SyntaxNode SyntaxNode, TypeDeclarationSyntax SystemType)> Candidates
-        => _queryCandidates.Select(candidate => (SyntaxNode: candidate.FullInvocationChainSyntaxNode, ContainingType: candidate.ContainingTypeNode));
+    public IEnumerable<(SyntaxNode SyntaxNode, TypeDeclarationSyntax SystemType)> Candidates =>
+        _queryCandidates.Select(candidate =>
+            (SyntaxNode: candidate.FullInvocationChainSyntaxNode, ContainingType: candidate.ContainingTypeNode)
+        );
 
     public bool RequiresReferenceToBurst { get; private set; }
 
@@ -45,12 +46,24 @@ public class IfeModule : ISystemModule
                     {
                         case GenericNameSyntax { Identifier: { ValueText: "Query" } } genericNameSyntax:
                         {
-                            var fullInvocationChainSyntaxNode = invocationExpressionSyntax.Ancestors().OfType<InvocationExpressionSyntax>().LastOrDefault() ?? invocationExpressionSyntax;
+                            var fullInvocationChainSyntaxNode =
+                                invocationExpressionSyntax
+                                    .Ancestors()
+                                    .OfType<InvocationExpressionSyntax>()
+                                    .LastOrDefault()
+                                ?? invocationExpressionSyntax;
 
-                            var candidate = QueryCandidate.From(fullInvocationChainSyntaxNode, genericNameSyntax.TypeArgumentList.Arguments);
+                            var candidate = QueryCandidate.From(
+                                fullInvocationChainSyntaxNode,
+                                genericNameSyntax.TypeArgumentList.Arguments
+                            );
                             _queryCandidates.Add(candidate);
 
-                            var candidateSyntax = new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, fullInvocationChainSyntaxNode);
+                            var candidateSyntax = new CandidateSyntax(
+                                CandidateType.Ife,
+                                CandidateFlags.None,
+                                fullInvocationChainSyntaxNode
+                            );
                             candidateOwnership[fullInvocationChainSyntaxNode] = candidateSyntax;
                             break;
                         }
@@ -59,12 +72,21 @@ public class IfeModule : ISystemModule
                 }
                 case GenericNameSyntax { Identifier: { ValueText: "Query" } } genericNameSyntax:
                 {
-                    var fullInvocationChainSyntaxNode = invocationExpressionSyntax.Ancestors().OfType<InvocationExpressionSyntax>().LastOrDefault() ?? invocationExpressionSyntax;
+                    var fullInvocationChainSyntaxNode =
+                        invocationExpressionSyntax.Ancestors().OfType<InvocationExpressionSyntax>().LastOrDefault()
+                        ?? invocationExpressionSyntax;
 
-                    var candidate = QueryCandidate.From(fullInvocationChainSyntaxNode, genericNameSyntax.TypeArgumentList.Arguments);
+                    var candidate = QueryCandidate.From(
+                        fullInvocationChainSyntaxNode,
+                        genericNameSyntax.TypeArgumentList.Arguments
+                    );
                     _queryCandidates.Add(candidate);
 
-                    var candidateSyntax = new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, fullInvocationChainSyntaxNode);
+                    var candidateSyntax = new CandidateSyntax(
+                        CandidateType.Ife,
+                        CandidateFlags.None,
+                        fullInvocationChainSyntaxNode
+                    );
                     candidateOwnership[fullInvocationChainSyntaxNode] = candidateSyntax;
                     break;
                 }
@@ -77,33 +99,103 @@ public class IfeModule : ISystemModule
         var idiomaticCSharpForEachDescriptions = new List<IfeDescription>();
         foreach (var queryCandidate in CandidatesGroupedByContainingSystemTypes[systemDescription.SystemTypeSyntax])
         {
-            var description = new IfeDescription(systemDescription, queryCandidate, idiomaticCSharpForEachDescriptions.Count);
+            var description = new IfeDescription(
+                systemDescription,
+                queryCandidate,
+                idiomaticCSharpForEachDescriptions.Count
+            );
 
-            description.Success &=
-                VerifyQueryTypeCorrectness(description.SystemDescription, description.Location, description.AllQueryTypes, invokedMethodName: "WithAll");
-            description.Success &=
-                VerifyQueryTypeCorrectness(description.SystemDescription, description.Location, description.NoneQueryTypes, invokedMethodName: "WithNone");
-            description.Success &=
-                VerifyQueryTypeCorrectness(description.SystemDescription, description.Location, description.AnyQueryTypes, invokedMethodName: "WithAny");
+            description.Success &= VerifyQueryTypeCorrectness(
+                description.SystemDescription,
+                description.Location,
+                description.AllQueryTypes,
+                invokedMethodName: "WithAll"
+            );
+            description.Success &= VerifyQueryTypeCorrectness(
+                description.SystemDescription,
+                description.Location,
+                description.NoneQueryTypes,
+                invokedMethodName: "WithNone"
+            );
+            description.Success &= VerifyQueryTypeCorrectness(
+                description.SystemDescription,
+                description.Location,
+                description.AnyQueryTypes,
+                invokedMethodName: "WithAny"
+            );
 
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.AbsentQueryTypes, description.PresentQueryTypes, "WithAbsent", "WithPresent");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.NoneQueryTypes, description.PresentQueryTypes, "WithNone", "WithPresent");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.AnyQueryTypes, description.PresentQueryTypes, "WithAny", "WithPresent");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.AbsentQueryTypes, description.DisabledQueryTypes, "WithAbsent", "WithDisabled");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.AbsentQueryTypes, description.AllQueryTypes, "WithAbsent", "WithAll");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.AbsentQueryTypes, description.AnyQueryTypes, "WithAbsent", "WithAny");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.NoneQueryTypes, description.AllQueryTypes, "WithNone", "WithAll");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.NoneQueryTypes, description.AnyQueryTypes, "WithNone", "WithAny");
-            description.Success &=
-                VerifyNoMutuallyExclusiveQueries(description.SystemDescription, description.Location, description.AnyQueryTypes, description.AllQueryTypes, "WithAny", "WithAll");
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.AbsentQueryTypes,
+                description.PresentQueryTypes,
+                "WithAbsent",
+                "WithPresent"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.NoneQueryTypes,
+                description.PresentQueryTypes,
+                "WithNone",
+                "WithPresent"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.AnyQueryTypes,
+                description.PresentQueryTypes,
+                "WithAny",
+                "WithPresent"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.AbsentQueryTypes,
+                description.DisabledQueryTypes,
+                "WithAbsent",
+                "WithDisabled"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.AbsentQueryTypes,
+                description.AllQueryTypes,
+                "WithAbsent",
+                "WithAll"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.AbsentQueryTypes,
+                description.AnyQueryTypes,
+                "WithAbsent",
+                "WithAny"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.NoneQueryTypes,
+                description.AllQueryTypes,
+                "WithNone",
+                "WithAll"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.NoneQueryTypes,
+                description.AnyQueryTypes,
+                "WithNone",
+                "WithAny"
+            );
+            description.Success &= VerifyNoMutuallyExclusiveQueries(
+                description.SystemDescription,
+                description.Location,
+                description.AnyQueryTypes,
+                description.AllQueryTypes,
+                "WithAny",
+                "WithAll"
+            );
 
             if (!description.Success) // if !description.Success, TypeSymbolsForEntityQueryCreation might not be right, thus causing an exception
                 continue;
@@ -115,7 +207,8 @@ public class IfeModule : ISystemModule
                 description.IterableNonEnableableTypes,
                 "WithAbsent",
                 "Main query type in SystemAPI.Query",
-                compareTypeSymbolsOnly: true);
+                compareTypeSymbolsOnly: true
+            );
 
             description.Success &= VerifyNoMutuallyExclusiveQueries(
                 description.SystemDescription,
@@ -124,7 +217,8 @@ public class IfeModule : ISystemModule
                 description.IterableNonEnableableTypes,
                 "WithDisabled",
                 "Main query type in SystemAPI.Query",
-                compareTypeSymbolsOnly: true);
+                compareTypeSymbolsOnly: true
+            );
 
             description.Success &= VerifyNoMutuallyExclusiveQueries(
                 description.SystemDescription,
@@ -133,7 +227,8 @@ public class IfeModule : ISystemModule
                 description.IterableNonEnableableTypes,
                 "WithNone",
                 "Main query type in SystemAPI.Query",
-                compareTypeSymbolsOnly: true);
+                compareTypeSymbolsOnly: true
+            );
 
             description.Success &= VerifyNoMutuallyExclusiveQueries(
                 description.SystemDescription,
@@ -142,7 +237,8 @@ public class IfeModule : ISystemModule
                 description.IterableNonEnableableTypes,
                 "WithAny",
                 "Main query type in SystemAPI.Query",
-                compareTypeSymbolsOnly: true);
+                compareTypeSymbolsOnly: true
+            );
 
             if (description.Success)
             {
@@ -156,34 +252,41 @@ public class IfeModule : ISystemModule
         var candidateNodesToReplacementCode = new Dictionary<SyntaxNode, string>();
         foreach (var description in idiomaticCSharpForEachDescriptions)
         {
-            var ifeStructWriter =
-                new IfeStructWriter
-                {
-                    IfeType = description.IfeType,
-                    SharedComponentFilterInfos = description.SharedComponentFilterInfos
-                };
+            var ifeStructWriter = new IfeStructWriter
+            {
+                IfeType = description.IfeType,
+                SharedComponentFilterInfos = description.SharedComponentFilterInfos,
+            };
 
             systemDescription.NewMiscellaneousMembers.Add(ifeStructWriter);
 
             var ifeTypeHandleFieldName =
-                systemDescription.QueriesAndHandles.GetOrCreateSourceGeneratedIfeTypeHandleField(description.IfeType.FullyQualifiedTypeName);
+                systemDescription.QueriesAndHandles.GetOrCreateSourceGeneratedIfeTypeHandleField(
+                    description.IfeType.FullyQualifiedTypeName
+                );
 
-            var entityQueryFieldName =
-                systemDescription.QueriesAndHandles.GetOrCreateQueryField(
-                    new SingleArchetypeQueryFieldDescription(
-                        new Archetype(
-                            description.GetDistinctAllQueryTypes(),
-                            description.AnyQueryTypes,
-                            description.NoneQueryTypes,
-                            description.DisabledQueryTypes,
-                            description.AbsentQueryTypes,
-                            description.PresentQueryTypes,
-                            description.GetEntityQueryOptionsArgument()),
-                        description.ChangeFilterQueryTypes));
+            var entityQueryFieldName = systemDescription.QueriesAndHandles.GetOrCreateQueryField(
+                new SingleArchetypeQueryFieldDescription(
+                    new Archetype(
+                        description.GetDistinctAllQueryTypes(),
+                        description.AnyQueryTypes,
+                        description.NoneQueryTypes,
+                        description.DisabledQueryTypes,
+                        description.AbsentQueryTypes,
+                        description.PresentQueryTypes,
+                        description.GetEntityQueryOptionsArgument()
+                    ),
+                    description.ChangeFilterQueryTypes
+                )
+            );
 
             description.CandidateNodesToReplacementCode.Add(
                 key: description.QueryCandidate.FullInvocationChainSyntaxNode,
-                value: description.CreateQueryInvocationNodeReplacementCode(entityQueryFieldName, ifeTypeHandleFieldName));
+                value: description.CreateQueryInvocationNodeReplacementCode(
+                    entityQueryFieldName,
+                    ifeTypeHandleFieldName
+                )
+            );
 
             foreach (var candidateSyntax in description.AdditionalCandidates)
                 systemDescription.CandidateNodes.Add(candidateSyntax.Node, candidateSyntax);

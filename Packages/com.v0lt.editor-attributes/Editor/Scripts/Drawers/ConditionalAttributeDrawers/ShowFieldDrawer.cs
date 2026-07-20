@@ -1,8 +1,8 @@
-using UnityEditor;
 using System.Reflection;
+using EditorAttributes.Editor.Utility;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
@@ -17,11 +17,21 @@ namespace EditorAttributes.Editor
             HelpBox errorBox = new();
             PropertyField propertyField = CreatePropertyField(property);
 
-            UpdateVisualElement(propertyField, () =>
-            {
-                propertyField.style.display = GetConditionValue(conditionalProperty, showAttribute, property, errorBox) ? DisplayStyle.Flex : DisplayStyle.None;
-                DisplayErrorBox(propertyField, errorBox);
-            });
+            UpdateVisualElement(
+                propertyField,
+                () =>
+                {
+                    propertyField.style.display = GetConditionValue(
+                        conditionalProperty,
+                        showAttribute,
+                        property,
+                        errorBox
+                    )
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None;
+                    DisplayErrorBox(propertyField, errorBox);
+                }
+            );
 
             return propertyField;
         }

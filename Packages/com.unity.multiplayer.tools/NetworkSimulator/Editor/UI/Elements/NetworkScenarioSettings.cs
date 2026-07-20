@@ -12,6 +12,7 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<NetworkScenarioSettings, UxmlTraits> { }
 #endif
+
         readonly IMGUIContainer m_ScenarioSettings;
 
         Runtime.NetworkSimulator m_NetworkSimulator;

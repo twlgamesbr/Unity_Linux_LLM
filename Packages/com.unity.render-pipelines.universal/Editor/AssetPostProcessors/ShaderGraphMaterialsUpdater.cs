@@ -38,7 +38,8 @@ namespace UnityEditor.Rendering.Universal
                         EditorUtility.DisplayProgressBar(
                             "Checking material dependencies...",
                             $"{i} / {length} materials.",
-                            i / (float)(length - 1));
+                            i / (float)(length - 1)
+                        );
                     }
 
                     // Reset keywords

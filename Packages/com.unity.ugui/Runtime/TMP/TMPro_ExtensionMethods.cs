@@ -1,11 +1,10 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace TMPro
 {
     public static class TMPro_ExtensionMethods
     {
-
         /// <summary>
         /// Converts a string of 4 ascii characters to an int.
         /// </summary>
@@ -18,7 +17,6 @@ namespace TMPro
 
             return s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3];
         }
-
 
         public static int[] ToIntArray(this string text)
         {
@@ -87,8 +85,8 @@ namespace TMPro
             return new string(chars);
         }
 
-
-        public static int FindInstanceID <T> (this List<T> list, T target) where T : Object
+        public static int FindInstanceID<T>(this List<T> list, T target)
+            where T : Object
         {
             EntityId targetID = target.GetEntityId();
 
@@ -100,30 +98,27 @@ namespace TMPro
             return -1;
         }
 
-
         public static bool Compare(this Color32 a, Color32 b)
         {
             return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
         }
 
-		public static bool CompareRGB(this Color32 a, Color32 b)
-		{
-			return a.r == b.r && a.g == b.g && a.b == b.b;
-		}
+        public static bool CompareRGB(this Color32 a, Color32 b)
+        {
+            return a.r == b.r && a.g == b.g && a.b == b.b;
+        }
 
-		public static bool Compare(this Color a, Color b)
+        public static bool Compare(this Color a, Color b)
         {
             return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
         }
 
+        public static bool CompareRGB(this Color a, Color b)
+        {
+            return a.r == b.r && a.g == b.g && a.b == b.b;
+        }
 
-		public static bool CompareRGB(this Color a, Color b)
-		{
-			return a.r == b.r && a.g == b.g && a.b == b.b;
-		}
-
-
-        public static Color32 Multiply (this Color32 c1, Color32 c2)
+        public static Color32 Multiply(this Color32 c1, Color32 c2)
         {
             byte r = (byte)((c1.r / 255f) * (c2.r / 255f) * 255);
             byte g = (byte)((c1.g / 255f) * (c2.g / 255f) * 255);
@@ -133,8 +128,7 @@ namespace TMPro
             return new Color32(r, g, b, a);
         }
 
-
-        public static Color32 Tint (this Color32 c1, Color32 c2)
+        public static Color32 Tint(this Color32 c1, Color32 c2)
         {
             byte r = (byte)((c1.r / 255f) * (c2.r / 255f) * 255);
             byte g = (byte)((c1.g / 255f) * (c2.g / 255f) * 255);
@@ -181,7 +175,6 @@ namespace TMPro
 
             return new Color(c1.r, c1.g, c1.b, a);
         }
-
 
         public static bool Compare(this Vector3 v1, Vector3 v2, int accuracy)
         {
@@ -264,7 +257,6 @@ namespace TMPro
         //            sourceIndex = 0;
         //    }
         //}
-
     }
 
     public static class TMP_Math

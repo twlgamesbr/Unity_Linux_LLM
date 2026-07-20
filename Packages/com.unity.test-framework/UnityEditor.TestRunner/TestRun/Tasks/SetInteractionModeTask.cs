@@ -6,12 +6,14 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
     {
         private const string ApplicationIdleTimeKey = "ApplicationIdleTime";
         private const string InteractionModeKey = "InteractionMode";
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             SetInteractionModeToNoThrottling(testJobData);
             EditorApplication.UpdateInteractionModeSettings();
             yield break;
         }
+
         private void SetInteractionModeToNoThrottling(TestJobData testJobData)
         {
             testJobData.UserApplicationIdleTime = EditorPrefs.GetInt(ApplicationIdleTimeKey);

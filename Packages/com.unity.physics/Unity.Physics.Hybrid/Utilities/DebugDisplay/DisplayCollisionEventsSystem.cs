@@ -23,7 +23,10 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (!SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay) || debugDisplay.DrawCollisionEvents == 0)
+            if (
+                !SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay)
+                || debugDisplay.DrawCollisionEvents == 0
+            )
                 return;
 
             if (!SystemAPI.TryGetSingleton(out DebugDraw draw))
@@ -32,7 +35,7 @@ namespace Unity.Physics.Authoring
             state.Dependency = new DisplayCollisionEventsJob
             {
                 Draw = draw,
-                World = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld
+                World = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld,
             }.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
         }
 
@@ -40,8 +43,12 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         struct DisplayCollisionEventsJob : ICollisionEventsJob
         {
-            [ReadOnly][NativeDisableUnsafePtrRestriction] public DebugDraw Draw;
-            [ReadOnly] public PhysicsWorld World;
+            [ReadOnly]
+            [NativeDisableUnsafePtrRestriction]
+            public DebugDraw Draw;
+
+            [ReadOnly]
+            public PhysicsWorld World;
 
             public void Execute(CollisionEvent collisionEvent)
             {

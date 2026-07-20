@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace Unity.Netcode
 {
-
     /// <summary>
     /// A NetworkClient
     /// </summary>
@@ -62,7 +61,8 @@ namespace Unity.Netcode
         /// <summary>
         /// The NetworkObject's owned by this client instance
         /// </summary>
-        public NetworkObject[] OwnedObjects => IsConnected ? SpawnManager.GetClientOwnedObjects(ClientId) : new NetworkObject[] { };
+        public NetworkObject[] OwnedObjects =>
+            IsConnected ? SpawnManager.GetClientOwnedObjects(ClientId) : new NetworkObject[] { };
 
         internal NetworkSpawnManager SpawnManager { get; private set; }
 
@@ -85,13 +85,17 @@ namespace Unity.Netcode
                     // DANGO-TODO: We might allow a dedicated mock CMB server, but for now do not allow this
                     if (!IsClient && IsServer)
                     {
-                        Debug.LogError("You cannot start NetworkManager as a server when operating in distributed authority mode!");
+                        Debug.LogError(
+                            "You cannot start NetworkManager as a server when operating in distributed authority mode!"
+                        );
                         return false;
                     }
 
                     if (DAHost && networkManager.CMBServiceConnection)
                     {
-                        Debug.LogError("You cannot start a host when connecting to a distributed authority CMB Service!");
+                        Debug.LogError(
+                            "You cannot start a host when connecting to a distributed authority CMB Service!"
+                        );
                         return false;
                     }
                 }

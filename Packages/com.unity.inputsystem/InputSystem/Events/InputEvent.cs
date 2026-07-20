@@ -259,7 +259,8 @@ namespace UnityEngine.InputSystem.LowLevel
 
             if (!buffer.Contains(nextPtr))
                 throw new InvalidOperationException(
-                    $"Event '{new InputEventPtr(currentPtr)}' is last event in given buffer with size {buffer.sizeInBytes}");
+                    $"Event '{new InputEventPtr(currentPtr)}' is last event in given buffer with size {buffer.sizeInBytes}"
+                );
 
             return nextPtr;
         }

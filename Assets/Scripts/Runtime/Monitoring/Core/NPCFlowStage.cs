@@ -43,8 +43,10 @@ namespace NPCSystem.Monitoring
         // ── Animation & Input ──────────────────────────────────────
         /// <summary>Animator snapshot submitted from owner client to server (20 Hz).</summary>
         AnimationSync,
+
         /// <summary>Server-side velocity fallback activated when owner RPC is late.</summary>
         AnimationFallback,
+
         /// <summary>Player input system switched between Gameplay and UI dialogue mode.</summary>
         InputModeSwitch,
 

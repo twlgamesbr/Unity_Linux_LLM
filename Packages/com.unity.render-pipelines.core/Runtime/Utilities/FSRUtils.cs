@@ -31,7 +31,12 @@ namespace UnityEngine.Rendering
         /// <param name="inputViewportSizeInPixels">This the rendered image resolution being upscaled</param>
         /// <param name="inputImageSizeInPixels">This is the resolution of the resource containing the input image (useful for dynamic resolution)</param>
         /// <param name="outputImageSizeInPixels">This is the display resolution which the input image gets upscaled to</param>
-        public static void SetEasuConstants(CommandBuffer cmd, Vector2 inputViewportSizeInPixels, Vector2 inputImageSizeInPixels, Vector2 outputImageSizeInPixels)
+        public static void SetEasuConstants(
+            CommandBuffer cmd,
+            Vector2 inputViewportSizeInPixels,
+            Vector2 inputImageSizeInPixels,
+            Vector2 outputImageSizeInPixels
+        )
         {
             Vector4 constants0;
             Vector4 constants1;
@@ -94,10 +99,19 @@ namespace UnityEngine.Rendering
         /// <param name="inputViewportSizeInPixels">This the rendered image resolution being upscaled</param>
         /// <param name="inputImageSizeInPixels">This is the resolution of the resource containing the input image (useful for dynamic resolution)</param>
         /// <param name="outputImageSizeInPixels">This is the display resolution which the input image gets upscaled to</param>
-        public static void SetEasuConstants(BaseCommandBuffer cmd, Vector2 inputViewportSizeInPixels,
-            Vector2 inputImageSizeInPixels, Vector2 outputImageSizeInPixels)
+        public static void SetEasuConstants(
+            BaseCommandBuffer cmd,
+            Vector2 inputViewportSizeInPixels,
+            Vector2 inputImageSizeInPixels,
+            Vector2 outputImageSizeInPixels
+        )
         {
-            SetEasuConstants(cmd.m_WrappedCommandBuffer, inputViewportSizeInPixels, inputImageSizeInPixels, outputImageSizeInPixels);
+            SetEasuConstants(
+                cmd.m_WrappedCommandBuffer,
+                inputViewportSizeInPixels,
+                inputImageSizeInPixels,
+                outputImageSizeInPixels
+            );
         }
 
         /// <summary>
@@ -184,7 +198,10 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <param name="cmd">RasterCommandBuffer to modify</param>
         /// <param name="sharpnessLinear">The level of intensity of the sharpening filter where 0.0 is the least sharp and 1.0 is the most sharp</param>
-        public static void SetRcasConstantsLinear(RasterCommandBuffer cmd, float sharpnessLinear = kDefaultSharpnessLinear)
+        public static void SetRcasConstantsLinear(
+            RasterCommandBuffer cmd,
+            float sharpnessLinear = kDefaultSharpnessLinear
+        )
         {
             SetRcasConstantsLinear(cmd.m_WrappedCommandBuffer, sharpnessLinear);
         }

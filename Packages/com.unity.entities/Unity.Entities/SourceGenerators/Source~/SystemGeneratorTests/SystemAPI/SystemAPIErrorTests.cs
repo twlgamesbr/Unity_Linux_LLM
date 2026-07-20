@@ -1,11 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unity.Entities.SourceGen.JobEntityGenerator;
 using Unity.Entities.SourceGen.SystemGenerator;
 using Unity.Entities.SourceGen.SystemGenerator.SystemAPI;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -15,7 +13,8 @@ public class SystemAPIErrorTests
     [TestMethod]
     public async Task NO_SGICE_BUT_HAS_CSHARP_COMPILE_ERRORS()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             using static Unity.Entities.SystemAPI;
@@ -32,15 +31,17 @@ public class SystemAPIErrorTests
             }";
         var expectedA = VerifyCS.CompilerError("CS7036").WithLocation(0);
         var expectedB = VerifyCS.CompilerError("CS1503").WithLocation(1);
-        var expectedC = Test.CSharpSourceGeneratorVerifier<SystemGenerator>
-            .CompilerError(nameof(JobEntityGeneratorErrors.SGJE0024)).WithLocation(2);
+        var expectedC = Test
+            .CSharpSourceGeneratorVerifier<SystemGenerator>.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0024))
+            .WithLocation(2);
         await VerifyCS.VerifySourceGeneratorAsync(source, expectedA, expectedB, expectedC);
     }
 
     [TestMethod]
     public async Task NO_SGICE_BUT_HAS_CSHARP_COMPILE_ERRORS_2()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -56,7 +57,8 @@ public class SystemAPIErrorTests
     [TestMethod]
     public async Task NO_SGICE_BUT_HAS_CSHARP_COMPILE_ERRORS_3()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -77,7 +79,8 @@ public class SystemAPIErrorTests
     [TestMethod]
     public async Task NO_SGICE_BUT_HAS_CSHARP_COMPILE_ERRORS_4()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -97,7 +100,8 @@ public class SystemAPIErrorTests
     [TestMethod]
     public async Task SGSA0001()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             using static Unity.Entities.SystemAPI;
@@ -118,7 +122,8 @@ public class SystemAPIErrorTests
     [TestMethod]
     public async Task SGSA0002()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             using static Unity.Entities.SystemAPI;

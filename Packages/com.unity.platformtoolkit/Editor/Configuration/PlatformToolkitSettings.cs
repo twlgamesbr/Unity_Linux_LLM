@@ -16,7 +16,7 @@ namespace Unity.PlatformToolkit.Editor
         private StoredAchievementObserver m_StoredAchievementObserver;
 
         [SerializeField]
-        public StoredSettings StoredSettings = new ();
+        public StoredSettings StoredSettings = new();
         private Dictionary<string, ISettingsConfiguration> m_SettingsConfigurations = new();
 
         public static event Action OnStoredAchievementsChanged;
@@ -27,7 +27,7 @@ namespace Unity.PlatformToolkit.Editor
             EditorApplication.delayCall += Save;
             SupportDeclarationTargetsManager.SupportDeclarationTargetChanged += Save;
 
-            m_StoredAchievementObserver = new (StoredAchievements);
+            m_StoredAchievementObserver = new(StoredAchievements);
 
             m_StoredAchievementObserver.AchievementsChanged += StoredAchievementsChanged;
             StoredSettings.SettingsChanged += Save;
@@ -42,7 +42,6 @@ namespace Unity.PlatformToolkit.Editor
 
         private void StoredAchievementsChanged()
         {
-
             OnStoredAchievementsChanged?.Invoke();
             Save();
         }

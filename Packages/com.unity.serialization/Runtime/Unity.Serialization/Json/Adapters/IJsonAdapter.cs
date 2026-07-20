@@ -3,10 +3,7 @@ namespace Unity.Serialization.Json
     /// <summary>
     /// Base interface for json adapters.
     /// </summary>
-    public interface IJsonAdapter
-    {
-
-    }
+    public interface IJsonAdapter { }
 
     /// <summary>
     /// Implement this interface to override serialization and deserialization behaviour for a given type.

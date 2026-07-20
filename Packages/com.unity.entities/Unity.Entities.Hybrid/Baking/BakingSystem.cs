@@ -55,15 +55,15 @@ namespace Unity.Entities
         /// </summary>
         protected override void OnUpdate() { }
 
-        internal BakingSettings    BakingSettings;
-        Scene             Scene;
+        internal BakingSettings BakingSettings;
+        Scene Scene;
 
-        BakedEntityData          _BakedEntities;
+        BakedEntityData _BakedEntities;
         IncrementalBakingContext _BakingContext;
         TransformAuthoringBaking _TransformAuthoringBaking;
 
-        List<Component>          _ComponentsCache = new List<Component>();
-        List<Transform>          _TransformCache = new List<Transform>();
+        List<Component> _ComponentsCache = new List<Component>();
+        List<Transform> _TransformCache = new List<Transform>();
 
         /// <summary>
         /// Access to the <see cref="BlobAssetStore"/> used during baking.
@@ -76,7 +76,7 @@ namespace Unity.Entities
 
 #if UNITY_EDITOR
         // The last refresh version of the asset database (If it changes, we recheck if any of the assets we depend on have changed)
-        ulong                    _RefreshVersion;
+        ulong _RefreshVersion;
 #endif
 
         static ProfilerMarker s_ClearCaches = new ProfilerMarker("Baking.ClearCaches");
@@ -85,13 +85,20 @@ namespace Unity.Entities
 
         internal bool IsLiveConversion()
         {
-            return (BakingSettings.BakingFlags & (BakingUtility.BakingFlags.SceneViewLiveConversion | BakingUtility.BakingFlags.GameViewLiveConversion)) != 0;
+            return (
+                    BakingSettings.BakingFlags
+                    & (
+                        BakingUtility.BakingFlags.SceneViewLiveConversion
+                        | BakingUtility.BakingFlags.GameViewLiveConversion
+                    )
+                ) != 0;
         }
 
         internal Entity GetEntity(Component component)
         {
             return _BakedEntities.GetEntity(component);
         }
+
         internal Entity GetEntity(GameObject gameObject)
         {
             return _BakedEntities.GetEntity(gameObject);
@@ -133,42 +140,72 @@ namespace Unity.Entities
                 if (BakingSettings.PrefabRoot != null)
                     RegisterPrefabForBaking(BakingSettings.PrefabRoot);
 #endif
-                instructions = _BakingContext.BuildInitialInstructions(Scene, cleanRootGameObjects, ref _TransformAuthoringBaking);
+                instructions = _BakingContext.BuildInitialInstructions(
+                    Scene,
+                    cleanRootGameObjects,
+                    ref _TransformAuthoringBaking
+                );
             }
             else
             {
 #if UNITY_EDITOR
-                if(assetsChanged)
+                if (assetsChanged)
                     _BakedEntities.UpdatePrefabs(changeTracker);
 #endif
 
                 IncrementalBakingBatch batch = new IncrementalBakingBatch();
                 changeTracker.FillBatch(ref batch);
                 CheckForUserDeletedEntities(ref batch);
-                instructions = _BakingContext.BuildIncrementalInstructions(batch, ref _TransformAuthoringBaking, assetsChanged);
+                instructions = _BakingContext.BuildIncrementalInstructions(
+                    batch,
+                    ref _TransformAuthoringBaking,
+                    assetsChanged
+                );
 
                 // The asset pipeline might have changed some assets, yet there is nothing that actually changed as a result
                 if (!instructions.HasChanged)
                     return false;
             }
 
-            _BakedEntities.ApplyBakeInstructions(ref _BakingContext._Dependencies, instructions, BlobAssetStore, BakingSettings, ref _BakingContext._Components);
+            _BakedEntities.ApplyBakeInstructions(
+                ref _BakingContext._Dependencies,
+                instructions,
+                BlobAssetStore,
+                BakingSettings,
+                ref _BakingContext._Components
+            );
 
             // We must continue to iterate additional game objects as prefabs can express prefabs and so on
             // In addition, Prefabs can be un-referenced and in need of being destroyed
             while (_BakedEntities.HasAdditionalGameObjectsToBake() || _BakedEntities.HasPrefabsToCheck())
             {
                 var additionalObjectsToBake = _BakedEntities.GetAndClearAdditionalObjectsToBake(Allocator.Temp);
-                var prefabObjectsToDestroy = _BakedEntities.GetAndClearPrefabObjectsToDestroy(ref _BakingContext._Hierarchy, Allocator.Temp);
-                instructions = _BakingContext.BuildAdditionalInstructions(additionalObjectsToBake, prefabObjectsToDestroy, ref _TransformAuthoringBaking);
+                var prefabObjectsToDestroy = _BakedEntities.GetAndClearPrefabObjectsToDestroy(
+                    ref _BakingContext._Hierarchy,
+                    Allocator.Temp
+                );
+                instructions = _BakingContext.BuildAdditionalInstructions(
+                    additionalObjectsToBake,
+                    prefabObjectsToDestroy,
+                    ref _TransformAuthoringBaking
+                );
 
                 additionalObjectsToBake.Dispose();
                 prefabObjectsToDestroy.Dispose();
 
-                var jobHandle = _TransformAuthoringBaking.Prepare(_BakingContext._Hierarchy, instructions.ChangedTransforms);
+                var jobHandle = _TransformAuthoringBaking.Prepare(
+                    _BakingContext._Hierarchy,
+                    instructions.ChangedTransforms
+                );
                 jobHandle.Complete();
 
-                _BakedEntities.ApplyBakeInstructions(ref _BakingContext._Dependencies, instructions, BlobAssetStore, BakingSettings, ref _BakingContext._Components);
+                _BakedEntities.ApplyBakeInstructions(
+                    ref _BakingContext._Dependencies,
+                    instructions,
+                    BlobAssetStore,
+                    BakingSettings,
+                    ref _BakingContext._Components
+                );
             }
 
             // apply the static and active state on the additional entities
@@ -213,7 +250,6 @@ namespace Unity.Entities
             _BakedEntities.Clear();
             EntityManager.DestroyEntity(EntityManager.UniversalQuery);
         }
-
 
         internal void UpdateReferencedEntities()
         {

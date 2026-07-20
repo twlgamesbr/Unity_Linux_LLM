@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
-using System.Linq;
 
 namespace UnityEditor.Build.Pipeline.Utilities
 {
@@ -18,7 +18,8 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <summary>
         /// Obsolete, no longer does anything.
         /// </summary>
-        [Obsolete] protected Dictionary<string, HashSet<string>> serializedClassesPerAssembly = null;
+        [Obsolete]
+        protected Dictionary<string, HashSet<string>> serializedClassesPerAssembly = null;
         Dictionary<string, HashSet<string>> m_SerializedClassesPerAssembly = new Dictionary<string, HashSet<string>>();
 
         /// <summary>
@@ -43,9 +44,18 @@ namespace UnityEditor.Build.Pipeline.Utilities
             var editor = Assembly.GetAssembly(typeof(UnityEditor.BuildPipeline));
             return new[]
             {
-                new KeyValuePair<Type, Type>(typeof(UnityEditor.Animations.AnimatorController), typeof(UnityEngine.RuntimeAnimatorController)),
-                new KeyValuePair<Type, Type>(editor.GetType("UnityEditor.Audio.AudioMixerController"), typeof(UnityEngine.Audio.AudioMixer)),
-                new KeyValuePair<Type, Type>(editor.GetType("UnityEditor.Audio.AudioMixerGroupController"), typeof(UnityEngine.Audio.AudioMixerGroup)),
+                new KeyValuePair<Type, Type>(
+                    typeof(UnityEditor.Animations.AnimatorController),
+                    typeof(UnityEngine.RuntimeAnimatorController)
+                ),
+                new KeyValuePair<Type, Type>(
+                    editor.GetType("UnityEditor.Audio.AudioMixerController"),
+                    typeof(UnityEngine.Audio.AudioMixer)
+                ),
+                new KeyValuePair<Type, Type>(
+                    editor.GetType("UnityEditor.Audio.AudioMixerGroupController"),
+                    typeof(UnityEngine.Audio.AudioMixerGroup)
+                ),
                 new KeyValuePair<Type, Type>(typeof(UnityEditor.MonoScript), typeof(UnityEngine.Object)),
             };
         }
@@ -110,7 +120,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
             {
                 var indexOfAssembly = t.IndexOf(':');
                 if (indexOfAssembly != -1)
-                    AddSerializedClassInternal(t.Substring(0, indexOfAssembly), t.Substring(indexOfAssembly + 1, t.Length - (indexOfAssembly + 1)));
+                    AddSerializedClassInternal(
+                        t.Substring(0, indexOfAssembly),
+                        t.Substring(indexOfAssembly + 1, t.Length - (indexOfAssembly + 1))
+                    );
             }
         }
 

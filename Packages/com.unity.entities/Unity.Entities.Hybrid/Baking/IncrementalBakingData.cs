@@ -9,7 +9,7 @@ namespace Unity.Entities.Baking
     {
         public struct ChangedComponentsInfo
         {
-            public EntityId  instanceID;
+            public EntityId instanceID;
             public TypeIndex unityTypeIndex;
         }
 
@@ -27,7 +27,7 @@ namespace Unity.Entities.Baking
                     InstanceID = gameObject.GetEntityId(),
                     NameHash = gameObject.name.GetHashCode(),
                     Layer = gameObject.layer,
-                    TagHash = gameObject.tag.GetHashCode()
+                    TagHash = gameObject.tag.GetHashCode(),
                 };
                 return properties;
             }
@@ -37,7 +37,7 @@ namespace Unity.Entities.Baking
         {
             Normal,
             ForceBake,
-            RecreateAll
+            RecreateAll,
         }
 
         public NativeList<EntityId> ChangedAssets;
@@ -53,7 +53,11 @@ namespace Unity.Entities.Baking
 
         public bool HasStructuralChanges()
         {
-            return !DeletedAssets.IsEmpty || !RemovedGameObjects.IsEmpty || ChangedGameObjects.Count != 0 || !ParentChangeInstanceIds.IsEmpty || !ParentWithChildrenOrderChangedInstanceIds.IsEmpty;
+            return !DeletedAssets.IsEmpty
+                || !RemovedGameObjects.IsEmpty
+                || ChangedGameObjects.Count != 0
+                || !ParentChangeInstanceIds.IsEmpty
+                || !ParentWithChildrenOrderChangedInstanceIds.IsEmpty;
         }
 
         public static IncrementalBakingData Create()
@@ -68,7 +72,7 @@ namespace Unity.Entities.Baking
                 ChangedGameObjectProperties = new NativeList<GameObjectProperties>(Allocator.Persistent),
                 ParentChangeInstanceIds = new NativeList<IncrementalBakingChanges.ParentChange>(Allocator.Persistent),
                 ParentWithChildrenOrderChangedInstanceIds = new NativeList<EntityId>(Allocator.Persistent),
-                LightBakingChanged = false
+                LightBakingChanged = false,
             };
         }
 
@@ -104,7 +108,7 @@ namespace Unity.Entities.Baking
         }
     }
 
-        /// <summary>
+    /// <summary>
     /// Contains a summary of all changes that happened since the last conversion.
     /// ATTENTION: This is future public API.
     /// </summary>
@@ -143,17 +147,20 @@ namespace Unity.Entities.Baking
             /// The entityId of the game object whose parenting has changed.
             /// </summary>
             public EntityId EntityId;
+
             /// <summary>
             /// The entityId of the game object that was the previous parent.
             /// </summary>
             public EntityId PreviousParentEntityId;
+
             /// <summary>
             /// The entityId of the game object that is the new parent.
             /// </summary>
             public EntityId NewParentEntityId;
         }
 
-        public void CollectGameObjectsWithComponentChange<T>(NativeList<EntityId> instanceIDs) where T : Component
+        public void CollectGameObjectsWithComponentChange<T>(NativeList<EntityId> instanceIDs)
+            where T : Component
         {
             var changes = ChangedComponents;
             for (int i = 0; i < changes.Count; i++)

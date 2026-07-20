@@ -26,15 +26,15 @@ namespace Unity.Multiplayer.Tools.Common
         /// a Simple Moving Average with N samples.
         /// A proof of this relationship is described here:
         /// https://en.wikipedia.org/wiki/Moving_average#Relationship_between_SMA_and_EMA
-        public static float GetParameterApproximatingSimpleMovingAverage(int sampleCount)
-            => 2f / (sampleCount + 1);
+        public static float GetParameterApproximatingSimpleMovingAverage(int sampleCount) => 2f / (sampleCount + 1);
 
         public ExponentialMovingAverage(float parameter, float value = 0f)
         {
             if (!(0 <= parameter && parameter <= 1f))
             {
                 throw new ArgumentException(
-                    $"ExponentialMovingAverage parameter {parameter} should be in range [0, 1]");
+                    $"ExponentialMovingAverage parameter {parameter} should be in range [0, 1]"
+                );
             }
             Parameter = parameter;
             Value = value;

@@ -1,7 +1,7 @@
+using System;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal.Commands;
-using System;
 
 namespace UnityEngine.TestTools
 {
@@ -35,7 +35,7 @@ namespace UnityEngine.TestTools
     /// <para>It could also be used together with `Values` attribute in [NUnit](http://www.nunit.org/).</para>
     /// <code>using NUnit.Framework;
     /// using UnityEngine.TestTools;
-    /// 
+    ///
     /// public class MyTestsClass
     /// {
     ///     [Test]
@@ -55,6 +55,7 @@ namespace UnityEngine.TestTools
         /// Argument combination for the test case to ignore.
         /// </summary>
         public object[] Arguments { get; }
+
         /// <summary>
         /// Reason for the ignore.
         /// </summary>

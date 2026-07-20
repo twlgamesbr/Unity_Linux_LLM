@@ -18,10 +18,11 @@ namespace UnityEngine.Rendering.Universal
             /// Describes an index array where a set of two consecutive points describes a line segment.
             /// </summary>
             Lines,
+
             /// <summary>
             /// Describes an index array where a set of three consecutive points describes a triangle.
             /// </summary>
-            Triangles
+            Triangles,
         }
 
         /// <summary>
@@ -33,10 +34,11 @@ namespace UnityEngine.Rendering.Universal
             /// Describes an index array where all polygons have vertices in a clockwise order
             /// </summary>
             Clockwise,
+
             /// <summary>
             /// Describes an index array where all polygons have vertices in a counterclockwise order
             /// </summary>
-            CounterClockwise
+            CounterClockwise,
         }
 
         /// <summary>
@@ -69,7 +71,15 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="windingOrder">The winding order of the supplied geometry.</param>
         /// <param name="allowContraction">Specifies if the ShadowCaster2D is allowed to contract the supplied shape(s).</param>
         /// <param name="createInteriorGeometry">Specifies if the ShadowCaster2D should create interior geometry. Required for shadow casters that do not use renderers as their source.</param>
-        public abstract void SetShape(NativeArray<Vector3> vertices, NativeArray<int> indices, NativeArray<float> radii, Matrix4x4 transform, WindingOrder windingOrder = WindingOrder.Clockwise, bool allowContraction = true, bool createInteriorGeometry = false);
+        public abstract void SetShape(
+            NativeArray<Vector3> vertices,
+            NativeArray<int> indices,
+            NativeArray<float> radii,
+            Matrix4x4 transform,
+            WindingOrder windingOrder = WindingOrder.Clockwise,
+            bool allowContraction = true,
+            bool createInteriorGeometry = false
+        );
 
         /// <summary>
         /// SetShape creates shadow geometry using the supplied geometry
@@ -80,6 +90,13 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="windingOrder">The winding order of the supplied geometry.</param>
         /// <param name="allowContraction">Specifies if the ShadowCaster2D is allowed to contract the supplied shape(s).</param>
         /// <param name="createInteriorGeometry">Specifies if the ShadowCaster2D should create interior geometry. Required for shadow casters that do not use renderers as their source.</param>
-        public abstract void SetShape(NativeArray<Vector3> vertices, NativeArray<int> indices, OutlineTopology outlineTopology, WindingOrder windingOrder = WindingOrder.Clockwise, bool allowContraction = true, bool createInteriorGeometry = false);
+        public abstract void SetShape(
+            NativeArray<Vector3> vertices,
+            NativeArray<int> indices,
+            OutlineTopology outlineTopology,
+            WindingOrder windingOrder = WindingOrder.Clockwise,
+            bool allowContraction = true,
+            bool createInteriorGeometry = false
+        );
     }
 }

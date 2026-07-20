@@ -6,6 +6,7 @@ using UnityEngine.Profiling;
 using UnityEngine.Scripting;
 
 [assembly: AlwaysLinkAssembly]
+
 namespace Unity.Multiplayer.Tools.NetworkProfiler.Runtime
 {
     static class ProfilerAdapterEventListener
@@ -16,21 +17,19 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Runtime
 #if UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void ResetStaticsOnLoad()
-        {            
+        {
             s_Initialized = false;
             s_UnsubscribeFromAllAdapters = null;
         }
 #endif
-        
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void SubscribeToAdapterAndMetricEvents()
         {
             if (!s_Initialized)
             {
                 s_Initialized = true;
-                s_UnsubscribeFromAllAdapters = NetworkAdapters.SubscribeToAll(
-                    OnAdapterAdded,
-                    OnAdapterRemoved);
+                s_UnsubscribeFromAllAdapters = NetworkAdapters.SubscribeToAll(OnAdapterAdded, OnAdapterRemoved);
                 Application.quitting += OnApplicationExit;
             }
         }
@@ -72,10 +71,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Runtime
             ProfilerCounters.Instance.UpdateFromMetrics(collection);
 
             using var result = s_NetStatSerializer.Serialize(collection);
-            Profiler.EmitFrameMetaData(
-                FrameInfo.NetworkProfilerGuid,
-                FrameInfo.NetworkProfilerDataTag,
-                result);
+            Profiler.EmitFrameMetaData(FrameInfo.NetworkProfilerGuid, FrameInfo.NetworkProfilerDataTag, result);
         }
     }
 }

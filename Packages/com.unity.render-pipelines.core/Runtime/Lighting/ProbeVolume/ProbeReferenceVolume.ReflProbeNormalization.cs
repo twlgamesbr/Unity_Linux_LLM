@@ -19,16 +19,21 @@ namespace UnityEngine.Rendering
         internal static readonly int s_BakingID = 912345678;
 
         private static AdditionalGIBakeRequestsManager s_Instance = new AdditionalGIBakeRequestsManager();
+
         /// <summary>
         /// Get the manager that governs the additional light probe rendering requests.
         /// </summary>
-        public static AdditionalGIBakeRequestsManager instance { get { return s_Instance; } }
+        public static AdditionalGIBakeRequestsManager instance
+        {
+            get { return s_Instance; }
+        }
 
         const float kInvalidSH = 1f;
         const float kInvalidValidity = 1f;
         const float kValidSHThresh = 0.33f;
 
-        private static Dictionary<EntityId, SphericalHarmonicsL2> m_SHCoefficients = new Dictionary<EntityId, SphericalHarmonicsL2>();
+        private static Dictionary<EntityId, SphericalHarmonicsL2> m_SHCoefficients =
+            new Dictionary<EntityId, SphericalHarmonicsL2>();
         private static Dictionary<EntityId, float> m_SHValidity = new Dictionary<EntityId, float>();
         private static Dictionary<EntityId, Vector3> m_RequestPositions = new Dictionary<EntityId, Vector3>();
 
@@ -88,7 +93,12 @@ namespace UnityEngine.Rendering
         /// <param name ="sh"> The output SH coefficients that have been computed.</param>
         /// <param name ="validity"> The output validity that has been computed.</param>
         /// <returns>True if the request ID is valid.</returns>
-        public bool RetrieveProbe(EntityId probeInstanceID, out Vector3 pos, out SphericalHarmonicsL2 sh, out float validity)
+        public bool RetrieveProbe(
+            EntityId probeInstanceID,
+            out Vector3 pos,
+            out SphericalHarmonicsL2 sh,
+            out float validity
+        )
         {
             if (m_SHCoefficients.ContainsKey(probeInstanceID))
             {
@@ -106,7 +116,7 @@ namespace UnityEngine.Rendering
             return false;
         }
 
-        static internal bool GetPositionForRequest(EntityId probeInstanceID, out Vector3 pos)
+        internal static bool GetPositionForRequest(EntityId probeInstanceID, out Vector3 pos)
         {
             if (m_SHCoefficients.ContainsKey(probeInstanceID))
             {
@@ -137,13 +147,18 @@ namespace UnityEngine.Rendering
             }
         }
 
-        static internal List<Vector3> GetProbeNormalizationRequests() => new List<Vector3>(m_RequestPositions.Values);
+        internal static List<Vector3> GetProbeNormalizationRequests() => new List<Vector3>(m_RequestPositions.Values);
 
-        static internal void OnAdditionalProbesBakeCompleted(NativeArray<SphericalHarmonicsL2> sh, NativeArray<float> validity)
+        internal static void OnAdditionalProbesBakeCompleted(
+            NativeArray<SphericalHarmonicsL2> sh,
+            NativeArray<float> validity
+        )
         {
             SetSHCoefficients(sh, validity);
 
-            ProbeReferenceVolume.instance.retrieveExtraDataAction?.Invoke(new ProbeReferenceVolume.ExtraDataActionInput());
+            ProbeReferenceVolume.instance.retrieveExtraDataAction?.Invoke(
+                new ProbeReferenceVolume.ExtraDataActionInput()
+            );
         }
 
         static bool IsZero(in SphericalHarmonicsL2 s)
@@ -159,7 +174,7 @@ namespace UnityEngine.Rendering
             return true;
         }
 
-        static internal void SetSHCoefficients(NativeArray<SphericalHarmonicsL2> sh, NativeArray<float> validity)
+        internal static void SetSHCoefficients(NativeArray<SphericalHarmonicsL2> sh, NativeArray<float> validity)
         {
             Debug.Assert(sh.Length == m_SHCoefficients.Count);
             Debug.Assert(sh.Length == validity.Length);
@@ -170,7 +185,7 @@ namespace UnityEngine.Rendering
                 SetSHCoefficients(requestsInstanceIDs[i], sh[i], validity[i]);
         }
 
-        static internal void SetSHCoefficients(EntityId instanceID, SphericalHarmonicsL2 sh, float validity)
+        internal static void SetSHCoefficients(EntityId instanceID, SphericalHarmonicsL2 sh, float validity)
         {
             if (validity < kValidSHThresh)
             {

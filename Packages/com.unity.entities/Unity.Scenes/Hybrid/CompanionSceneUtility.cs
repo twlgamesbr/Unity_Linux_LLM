@@ -15,10 +15,10 @@ namespace Unity.Entities
         static Scene _companionSceneLiveConversion;
 
         const HideFlags CompanionFlags =
-            HideFlags.HideInHierarchy |
-            HideFlags.DontSaveInBuild |
-            HideFlags.DontUnloadUnusedAsset |
-            HideFlags.NotEditable;
+            HideFlags.HideInHierarchy
+            | HideFlags.DontSaveInBuild
+            | HideFlags.DontUnloadUnusedAsset
+            | HideFlags.NotEditable;
 
 #if DOTS_COMPANION_COMPONENTS_DEBUG_NAME
         private static int _companionNameUniqueId = 0;
@@ -31,6 +31,7 @@ namespace Unity.Entities
             gameObject.name = $"Companion of {entity} (UID {_companionNameUniqueId += 1})";
 #endif
         }
+
         internal static GameObject InstantiateCompanionObject(Entity entity, GameObject sourceGameObject)
         {
             var companion = UnityObject.Instantiate(sourceGameObject);
@@ -69,7 +70,11 @@ namespace Unity.Entities
 
         static void CreateCompanionScenes()
         {
-            var previewSceneFlags = PreviewSceneFlags.AllowMonoBehaviourEvents | PreviewSceneFlags.AllowCamerasForRendering | PreviewSceneFlags.IsPreviewScene | PreviewSceneFlags.IsPlayableScene;
+            var previewSceneFlags =
+                PreviewSceneFlags.AllowMonoBehaviourEvents
+                | PreviewSceneFlags.AllowCamerasForRendering
+                | PreviewSceneFlags.IsPreviewScene
+                | PreviewSceneFlags.IsPlayableScene;
             _companionScene = EditorSceneManager.NewPreviewScene(true, previewSceneFlags);
             var companionSceneCullingMask = SceneCullingMasks.DefaultSceneCullingMask;
             _companionScene.name = "CompanionScene";
@@ -78,7 +83,10 @@ namespace Unity.Entities
             _companionSceneLiveConversion = EditorSceneManager.NewPreviewScene(true, previewSceneFlags);
             var companionSceneLiveConversionCullingMask = SceneCullingMasks.GameViewObjects;
             _companionSceneLiveConversion.name = "CompanionSceneLiveConversion";
-            EditorSceneManager.SetSceneCullingMask(_companionSceneLiveConversion, companionSceneLiveConversionCullingMask);
+            EditorSceneManager.SetSceneCullingMask(
+                _companionSceneLiveConversion,
+                companionSceneLiveConversionCullingMask
+            );
 
             AssemblyReloadEvents.beforeAssemblyReload += AssemblyReloadEventsOnbeforeAssemblyReload;
         }
@@ -94,13 +102,19 @@ namespace Unity.Entities
             if (liveConversionMode == LiveConversionMode.SceneViewShowsAuthoring)
             {
                 // When Scene View is showing Editing State, we set the companion scene culling to GameView so that it does NOT render in the Scene View
-                EditorSceneManager.SetSceneCullingMask(_companionSceneLiveConversion, SceneCullingMasks.GameViewObjects);
+                EditorSceneManager.SetSceneCullingMask(
+                    _companionSceneLiveConversion,
+                    SceneCullingMasks.GameViewObjects
+                );
                 _companionSceneLiveConversion.name = "CompanionSceneLiveConversion - (Game View Only)";
             }
             else if (liveConversionMode == LiveConversionMode.SceneViewShowsRuntime)
             {
                 // When Scene View is showing Live Game State, we set the companion scene culling to Default so show the same in Scene AND Game View
-                EditorSceneManager.SetSceneCullingMask(_companionSceneLiveConversion, SceneCullingMasks.DefaultSceneCullingMask);
+                EditorSceneManager.SetSceneCullingMask(
+                    _companionSceneLiveConversion,
+                    SceneCullingMasks.DefaultSceneCullingMask
+                );
                 _companionSceneLiveConversion.name = "CompanionSceneLiveConversion - (Scene and Game View)";
             }
             else

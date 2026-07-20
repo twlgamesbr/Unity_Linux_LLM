@@ -11,18 +11,21 @@ namespace UnityEditor.Rendering.Universal
         // Instance can be null when building AssetBundles, otherwise the lifetime will be given by URPPreprocessBuild
         static URPBuildData m_Instance = null;
 
-        public static URPBuildData instance => m_Instance ??= new(EditorUserBuildSettings.activeBuildTarget, Debug.isDebugBuild);
+        public static URPBuildData instance =>
+            m_Instance ??= new(EditorUserBuildSettings.activeBuildTarget, Debug.isDebugBuild);
 
         public bool buildingPlayerForUniversalRenderPipeline { get; private set; }
 
-        public List<UniversalRenderPipelineAsset> renderPipelineAssets { get; private set; } = new List<UniversalRenderPipelineAsset>();
+        public List<UniversalRenderPipelineAsset> renderPipelineAssets { get; private set; } =
+            new List<UniversalRenderPipelineAsset>();
 
         public URPBuildData(BuildTarget buildTarget, bool isDevelopmentBuild)
         {
             m_Instance = this;
 
-            buildingPlayerForUniversalRenderPipeline = CoreBuildData.instance.buildingPlayerForRenderPipeline &&
-                                                       CoreBuildData.instance.currentRenderPipelineAssetType == typeof(UniversalRenderPipelineAsset);
+            buildingPlayerForUniversalRenderPipeline =
+                CoreBuildData.instance.buildingPlayerForRenderPipeline
+                && CoreBuildData.instance.currentRenderPipelineAssetType == typeof(UniversalRenderPipelineAsset);
 
             if (buildingPlayerForUniversalRenderPipeline)
             {

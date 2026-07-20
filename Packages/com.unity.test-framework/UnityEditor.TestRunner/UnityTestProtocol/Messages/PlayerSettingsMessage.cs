@@ -6,6 +6,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
     internal class PlayerSettingsMessage : Message
     {
         public PlayerSettings PlayerSettings;
+
         public PlayerSettingsMessage()
         {
             type = "PlayerSettings";

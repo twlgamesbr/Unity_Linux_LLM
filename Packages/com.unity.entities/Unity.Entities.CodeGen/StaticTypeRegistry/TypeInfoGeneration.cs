@@ -9,7 +9,6 @@ using System.Linq;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeGenInfoList = System.Collections.Generic.List<Unity.Entities.CodeGen.StaticTypeRegistryPostProcessor.TypeGenInfo>;
 using SystemList = System.Collections.Generic.List<Unity.Entities.CodeGen.StaticTypeRegistryPostProcessor.SystemTypeGenInfo>;
-
 using Unity.Cecil.Awesome;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
@@ -24,8 +23,7 @@ namespace Unity.Entities.CodeGen
 {
     internal partial class StaticTypeRegistryPostProcessor : EntitiesILPostProcessor
     {
-
-	//These are automatically filled in from the actual values in the engine
+        //These are automatically filled in from the actual values in the engine
         public static int MaximumTypesCount;
         public static int HasNoEntityReferencesFlag; // this flag is inverted to ensure the type id of Entity can still be 1
         public static int IsNotChunkSerializableTypeFlag;
@@ -50,9 +48,10 @@ namespace Unity.Entities.CodeGen
         public static int MaximumChunkCapacity;
         public static int MaximumSupportedAlignment;
         public static int DefaultBufferCapacityNumerator;
+
         /* This must be kept in sync with TypeManager.TypeInfo in the engine,
-	 * but we have a check enforcing that
-	 */
+     * but we have a check enforcing that
+     */
         public readonly struct TypeInfo
         {
             public TypeInfo(
@@ -78,7 +77,8 @@ namespace Unity.Entities.CodeGen
                 int unityObjectRefOffsetCount,
                 int unityObjectRefOffsetStartIndex,
                 int typeSize,
-                ulong bloomFilterMask = 0L)
+                ulong bloomFilterMask = 0L
+            )
             {
                 TypeIndex = typeIndex;
                 Category = category;
@@ -104,6 +104,7 @@ namespace Unity.Entities.CodeGen
                 UnityObjectRefOffsetStartIndex = unityObjectRefOffsetStartIndex;
                 TypeSize = typeSize;
             }
+
             public readonly int TypeIndex;
             public readonly int SizeInChunk;
             public readonly int ElementSize;
@@ -198,24 +199,34 @@ namespace Unity.Entities.CodeGen
             hasWeakAssetReferences = 8,
         }
 
-        private Dictionary<TypeReference, HasReferencesBits> HasReferencesCache = new Dictionary<TypeReference, HasReferencesBits>(TypeReferenceEqualityComparer.Instance);
-	
+        private Dictionary<TypeReference, HasReferencesBits> HasReferencesCache = new Dictionary<
+            TypeReference,
+            HasReferencesBits
+        >(TypeReferenceEqualityComparer.Instance);
+
         internal FieldReference GenerateConstantData(TypeDefinition constantStorageTypeDef, byte[] data)
         {
             const string kConstantDataFieldNamePrefix = "ConstantData";
-            int constantDataCount = constantStorageTypeDef.NestedTypes.Count(t => t.Name.StartsWith(kConstantDataFieldNamePrefix, StringComparison.Ordinal));
+            int constantDataCount = constantStorageTypeDef.NestedTypes.Count(t =>
+                t.Name.StartsWith(kConstantDataFieldNamePrefix, StringComparison.Ordinal)
+            );
 
             var constantDataTypeDef = new TypeDefinition(
                 constantStorageTypeDef.Namespace,
                 $"{kConstantDataFieldNamePrefix}{constantDataCount}",
                 TypeAttributes.Class | TypeAttributes.NestedPublic | TypeAttributes.Sealed | TypeAttributes.AnsiClass,
-                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ValueTypeDef));
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ValueTypeDef)
+            );
             constantStorageTypeDef.NestedTypes.Add(constantDataTypeDef);
             constantDataTypeDef.IsExplicitLayout = true;
             constantDataTypeDef.PackingSize = 1;
             constantDataTypeDef.ClassSize = data.Length;
 
-            var constantDataFieldDef = new FieldDefinition($"Value{constantDataCount}", FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.HasFieldRVA, constantDataTypeDef);
+            var constantDataFieldDef = new FieldDefinition(
+                $"Value{constantDataCount}",
+                FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.HasFieldRVA,
+                constantDataTypeDef
+            );
             constantDataFieldDef.InitialValue = data;
             constantStorageTypeDef.Fields.Add(constantDataFieldDef);
 
@@ -226,7 +237,12 @@ namespace Unity.Entities.CodeGen
         /// Populates the registry's BlobAssetReferenceOffsets int array.
         /// Offsets are laid out contiguously in memory such that the memory layout for Types A (2 entities), B (3 entities), C (0 entities) D (2 entities) is as such: aabbbdd
         /// </summary>
-        internal void GenerateBlobAssetReferenceArray(ILProcessor il, in TypeGenInfoList typeGenInfoList, FieldReference fieldRef, bool isStaticField)
+        internal void GenerateBlobAssetReferenceArray(
+            ILProcessor il,
+            in TypeGenInfoList typeGenInfoList,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
             var intRef = AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def);
             PushNewArray(il, intRef, m_TotalBlobAssetRefOffsetCount);
@@ -249,9 +265,18 @@ namespace Unity.Entities.CodeGen
         /// Populates the registry's entityOffset int array.
         /// Offsets are laid out contiguously in memory such that the memory layout for Types A (2 entites), B (3 entities), C (0 entities) D (2 entities) is as such: aabbbdd
         /// </summary>
-        internal void GenerateEntityOffsetInfoArray(ILProcessor il, in TypeGenInfoList typeGenInfoList, FieldReference fieldRef, bool isStaticField)
+        internal void GenerateEntityOffsetInfoArray(
+            ILProcessor il,
+            in TypeGenInfoList typeGenInfoList,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
-            PushNewArray(il, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def), m_TotalEntityOffsetCount);
+            PushNewArray(
+                il,
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def),
+                m_TotalEntityOffsetCount
+            );
 
             int entityOffsetIndex = 0;
             foreach (var typeGenInfo in typeGenInfoList)
@@ -260,7 +285,10 @@ namespace Unity.Entities.CodeGen
                 {
                     PushNewArrayElement(il, entityOffsetIndex++);
                     EmitLoadConstant(il, offset);
-                    il.Emit(OpCodes.Stelem_Any, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def));
+                    il.Emit(
+                        OpCodes.Stelem_Any,
+                        AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)
+                    );
                 }
             }
 
@@ -270,7 +298,12 @@ namespace Unity.Entities.CodeGen
         /// <summary>
         ///  Populates the registry's System.Type array for all types in typeIndex order.
         /// </summary>
-        internal void GenerateTypeArray(ILProcessor il, List<TypeReference> typeReferences, FieldReference fieldRef, bool isStaticField)
+        internal void GenerateTypeArray(
+            ILProcessor il,
+            List<TypeReference> typeReferences,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
             PushNewArray(il, AssemblyDefinition.MainModule.ImportReference(typeof(Type)), typeReferences.Count);
 
@@ -287,15 +320,23 @@ namespace Unity.Entities.CodeGen
             StoreTopOfStackToField(il, fieldRef, isStaticField);
         }
 
-
-
         /// <summary>
         ///  Populates the registry's SystemTypeSizes array for all System types in typeIndex order.
         ///  Currently sets 0 for size of managed systems.
         /// </summary>
-        internal void GenerateSystemTypeSizeArray(ILProcessor il, List<TypeReference> typeReferences, FieldReference fieldRef, bool isStaticField, int archbits)
+        internal void GenerateSystemTypeSizeArray(
+            ILProcessor il,
+            List<TypeReference> typeReferences,
+            FieldReference fieldRef,
+            bool isStaticField,
+            int archbits
+        )
         {
-            PushNewArray(il, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def), typeReferences.Count);
+            PushNewArray(
+                il,
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def),
+                typeReferences.Count
+            );
 
             for (int typeIndex = 0; typeIndex < typeReferences.Count; ++typeIndex)
             {
@@ -313,16 +354,30 @@ namespace Unity.Entities.CodeGen
         /// <summary>
         ///  Populates the registry's SystemTypeHashes array for all System types in typeIndex order.
         /// </summary>
-        internal void GenerateSystemTypeHashArray(ILProcessor il, List<TypeReference> typeReferences, FieldReference fieldRef, bool isStaticField)
+        internal void GenerateSystemTypeHashArray(
+            ILProcessor il,
+            List<TypeReference> typeReferences,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
-            PushNewArray(il, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int64Def), typeReferences.Count);
+            PushNewArray(
+                il,
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int64Def),
+                typeReferences.Count
+            );
 
             for (int typeIndex = 0; typeIndex < typeReferences.Count; ++typeIndex)
             {
                 TypeReference typeRef = EnsureImported(typeReferences[typeIndex]);
 
                 PushNewArrayElement(il, typeIndex);
-                il.Emit(OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._BurstRuntime_GetHashCode64Def.MakeGenericInstanceMethod(typeRef))); // Call BurstRuntime.GetHashCode64 with the above stack arg. Return value pushed on the stack
+                il.Emit(
+                    OpCodes.Call,
+                    AssemblyDefinition.MainModule.ImportReference(
+                        runnerOfMe._BurstRuntime_GetHashCode64Def.MakeGenericInstanceMethod(typeRef)
+                    )
+                ); // Call BurstRuntime.GetHashCode64 with the above stack arg. Return value pushed on the stack
                 il.Emit(OpCodes.Stelem_I8);
             }
 
@@ -334,7 +389,12 @@ namespace Unity.Entities.CodeGen
         /// WriteGroup TypeIndices are laid out contiguously in memory such that the memory layout for Types A (2 writegroup elements),
         /// B (3 writegroup elements), C (0 writegroup elements) D (2 writegroup elements) is as such: aabbbdd
         /// </summary>
-        internal void GenerateWriteGroupArray(ILProcessor il, TypeGenInfoList typeGenInfoList, FieldReference fieldRef, bool isStaticField)
+        internal void GenerateWriteGroupArray(
+            ILProcessor il,
+            TypeGenInfoList typeGenInfoList,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
             PushNewArray(il, AssemblyDefinition.MainModule.ImportReference(typeof(Type)), m_TotalWriteGroupCount);
 
@@ -374,7 +434,6 @@ namespace Unity.Entities.CodeGen
                         TypeFlags = typeGenInfo.TypeFlags,
                         SystemAttributeCount = typeGenInfo.Attributes.Count,
                         SystemAttributeStartIndex = attributesSoFar,
-
                     };
                     attributesSoFar += typeGenInfo.Attributes.Count;
                     *((SystemTypeInfo*)pData + i) = typeInfo;
@@ -383,7 +442,6 @@ namespace Unity.Entities.CodeGen
 
             return blob;
         }
-
 
         /// <summary>
         /// Populates the registry's TypeInfo array in typeIndex order.
@@ -431,6 +489,7 @@ namespace Unity.Entities.CodeGen
 
             return blob;
         }
+
         public static bool IsPowerOfTwo(int value)
         {
             return (value & (value - 1)) == 0;
@@ -448,7 +507,12 @@ namespace Unity.Entities.CodeGen
         /// <summary>
         /// Populates the registry's TypeInfo array in typeIndex order.
         /// </summary>
-        internal void GenerateTypeInfoArray(ILProcessor il, TypeGenInfoList typeGenInfoList, FieldReference fieldRef, bool isStaticField)
+        internal void GenerateTypeInfoArray(
+            ILProcessor il,
+            TypeGenInfoList typeGenInfoList,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
             PushNewArray(il, runnerOfMe._TypeManager_TypeInfoDef, typeGenInfoList.Count);
 
@@ -496,10 +560,29 @@ namespace Unity.Entities.CodeGen
             var boxedEqualsFn = new MethodDefinition(
                 "Equals",
                 MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
-                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_BoolDef));
-            boxedEqualsFn.Parameters.Add(new ParameterDefinition("lhs", Mono.Cecil.ParameterAttributes.None, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)));
-            boxedEqualsFn.Parameters.Add(new ParameterDefinition("rhs", Mono.Cecil.ParameterAttributes.None, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)));
-            boxedEqualsFn.Parameters.Add(new ParameterDefinition("typeIndex", Mono.Cecil.ParameterAttributes.None, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)));
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_BoolDef)
+            );
+            boxedEqualsFn.Parameters.Add(
+                new ParameterDefinition(
+                    "lhs",
+                    Mono.Cecil.ParameterAttributes.None,
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)
+                )
+            );
+            boxedEqualsFn.Parameters.Add(
+                new ParameterDefinition(
+                    "rhs",
+                    Mono.Cecil.ParameterAttributes.None,
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)
+                )
+            );
+            boxedEqualsFn.Parameters.Add(
+                new ParameterDefinition(
+                    "typeIndex",
+                    Mono.Cecil.ParameterAttributes.None,
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)
+                )
+            );
             GeneratedRegistryDef.Methods.Add(boxedEqualsFn);
 
             // Declares: static public bool Equals(object lhs, void* rhs, int typeIndex)
@@ -507,29 +590,53 @@ namespace Unity.Entities.CodeGen
             var boxedEqualsPtrFn = new MethodDefinition(
                 "Equals",
                 MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
-                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_BoolDef));
-            boxedEqualsPtrFn.Parameters.Add(new ParameterDefinition("lhs", Mono.Cecil.ParameterAttributes.None, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)));
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_BoolDef)
+            );
+            boxedEqualsPtrFn.Parameters.Add(
+                new ParameterDefinition(
+                    "lhs",
+                    Mono.Cecil.ParameterAttributes.None,
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)
+                )
+            );
             boxedEqualsPtrFn.Parameters.Add(
                 new ParameterDefinition(
                     "rhs",
                     Mono.Cecil.ParameterAttributes.None,
-                    AssemblyDefinition.MainModule.ImportReference(
-                        runnerOfMe._voidStarRef)));
-                        //AssemblyDefinition.MainModule.TypeSystem.Void.MakePointerType())));
-            boxedEqualsPtrFn.Parameters.Add(new ParameterDefinition(
-                "typeIndex",
-                Mono.Cecil.ParameterAttributes.None,
-                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)));
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._voidStarRef)
+                )
+            );
+            //AssemblyDefinition.MainModule.TypeSystem.Void.MakePointerType())));
+            boxedEqualsPtrFn.Parameters.Add(
+                new ParameterDefinition(
+                    "typeIndex",
+                    Mono.Cecil.ParameterAttributes.None,
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)
+                )
+            );
             GeneratedRegistryDef.Methods.Add(boxedEqualsPtrFn);
 
             // Declares: static public int GetHashCode(object val, int typeIndex)
             // This function is required to allow users to query for equality when a Generic <T> param isn't available but the 'int' typeIndex is
             var boxedGetHashCodeFn = new MethodDefinition(
-                 "BoxedGetHashCode",
-                 MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
-                 AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def));
-            boxedGetHashCodeFn.Parameters.Add(new ParameterDefinition("val", Mono.Cecil.ParameterAttributes.None, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)));
-            boxedGetHashCodeFn.Parameters.Add(new ParameterDefinition("typeIndex", Mono.Cecil.ParameterAttributes.None, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)));
+                "BoxedGetHashCode",
+                MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)
+            );
+            boxedGetHashCodeFn.Parameters.Add(
+                new ParameterDefinition(
+                    "val",
+                    Mono.Cecil.ParameterAttributes.None,
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_ObjectDef)
+                )
+            );
+            boxedGetHashCodeFn.Parameters.Add(
+                new ParameterDefinition(
+                    "typeIndex",
+                    Mono.Cecil.ParameterAttributes.None,
+                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)
+                )
+            );
             GeneratedRegistryDef.Methods.Add(boxedGetHashCodeFn);
 
             // List of instructions in an array where index == typeIndex
@@ -558,7 +665,12 @@ namespace Unity.Entities.CodeGen
                             instructionList.Add(eqIL.Create(OpCodes.Ldarg_1));
                             instructionList.Add(eqIL.Create(OpCodes.Unbox, thisTypeRef));
                             instructionList.Add(eqIL.Create(OpCodes.Ldc_I8, (long)typeGenInfo.AlignAndSize.size));
-                            instructionList.Add(eqIL.Create(OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._UnsafeUtility_MemCmpFnDef)));
+                            instructionList.Add(
+                                eqIL.Create(
+                                    OpCodes.Call,
+                                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._UnsafeUtility_MemCmpFnDef)
+                                )
+                            );
                             instructionList.Add(eqIL.Create(OpCodes.Ldc_I4_0));
                             instructionList.Add(eqIL.Create(OpCodes.Ceq));
                         }
@@ -577,7 +689,9 @@ namespace Unity.Entities.CodeGen
                             {
                                 var userImpl = GetTypesEqualsMethodReference(typeGenInfo.TypeReference)?.Resolve();
                                 if (userImpl == null)
-                                    throw new ArgumentException($"Component type '{typeRef.FullName}' contains managed references. It must implement IEquatable<>");
+                                    throw new ArgumentException(
+                                        $"Component type '{typeRef.FullName}' contains managed references. It must implement IEquatable<>"
+                                    );
 
                                 var loc0 = new VariableDefinition(thisTypeRef);
                                 boxedEqualsFn.Body.Variables.Add(loc0);
@@ -588,7 +702,9 @@ namespace Unity.Entities.CodeGen
                                 instructionList.Add(eqIL.Create(OpCodes.Ldloca, loc0));
                                 instructionList.Add(eqIL.Create(OpCodes.Ldarg_1));
                                 instructionList.Add(eqIL.Create(OpCodes.Unbox_Any, thisTypeRef));
-                                instructionList.Add(eqIL.Create(OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(userImpl)));
+                                instructionList.Add(
+                                    eqIL.Create(OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(userImpl))
+                                );
                             }
                         }
 
@@ -602,24 +718,44 @@ namespace Unity.Entities.CodeGen
                         boxedPtrEqJumpTable[i] = new List<Instruction>();
                         var instructionList = boxedPtrEqJumpTable[i];
 
-
                         if (!typeGenInfo.IsManaged)
                         {
                             instructionList.Add(eqIL.Create(OpCodes.Ldarg_0));
                             instructionList.Add(eqIL.Create(OpCodes.Unbox, thisTypeRef));
                             instructionList.Add(eqIL.Create(OpCodes.Ldarg_1));
                             instructionList.Add(eqIL.Create(OpCodes.Ldc_I8, (long)typeGenInfo.AlignAndSize.size));
-                            instructionList.Add(eqIL.Create(OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._UnsafeUtility_MemCmpFnDef)));
+                            instructionList.Add(
+                                eqIL.Create(
+                                    OpCodes.Call,
+                                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._UnsafeUtility_MemCmpFnDef)
+                                )
+                            );
                             instructionList.Add(eqIL.Create(OpCodes.Ldc_I4_0));
                             instructionList.Add(eqIL.Create(OpCodes.Ceq));
                             instructionList.Add(eqIL.Create(OpCodes.Ret));
                         }
                         else
                         {
-                            instructionList.Add(eqIL.Create(OpCodes.Ldstr, "Equals(object, void*) is not supported for managed types in DOTSRuntime"));
-                            var notSupportedExConstructor = AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef).Resolve().GetConstructors()
-                                .Single(c => c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String);
-                            instructionList.Add(eqIL.Create(OpCodes.Newobj, AssemblyDefinition.MainModule.ImportReference(notSupportedExConstructor)));
+                            instructionList.Add(
+                                eqIL.Create(
+                                    OpCodes.Ldstr,
+                                    "Equals(object, void*) is not supported for managed types in DOTSRuntime"
+                                )
+                            );
+                            var notSupportedExConstructor = AssemblyDefinition
+                                .MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef)
+                                .Resolve()
+                                .GetConstructors()
+                                .Single(c =>
+                                    c.Parameters.Count == 1
+                                    && c.Parameters[0].ParameterType.MetadataType == MetadataType.String
+                                );
+                            instructionList.Add(
+                                eqIL.Create(
+                                    OpCodes.Newobj,
+                                    AssemblyDefinition.MainModule.ImportReference(notSupportedExConstructor)
+                                )
+                            );
                             instructionList.Add(eqIL.Create(OpCodes.Throw));
                         }
                     }
@@ -639,7 +775,12 @@ namespace Unity.Entities.CodeGen
                             instructionList.Add(hashIL.Create(OpCodes.Unbox, thisTypeRef));
                             instructionList.Add(hashIL.Create(OpCodes.Ldc_I4, typeGenInfo.AlignAndSize.size));
                             instructionList.Add(hashIL.Create(OpCodes.Ldc_I4_0));
-                            instructionList.Add(hashIL.Create(OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._XXHash_Hash32Def)));
+                            instructionList.Add(
+                                hashIL.Create(
+                                    OpCodes.Call,
+                                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._XXHash_Hash32Def)
+                                )
+                            );
                         }
                         else
                         {
@@ -654,7 +795,9 @@ namespace Unity.Entities.CodeGen
                             {
                                 var userImpl = GetTypesGetHashCodeMethodReference(typeRef)?.Resolve();
                                 if (userImpl == null)
-                                    throw new ArgumentException($"Component type '{typeRef.FullName}' contains managed references. It must implement IEquatable<>");
+                                    throw new ArgumentException(
+                                        $"Component type '{typeRef.FullName}' contains managed references. It must implement IEquatable<>"
+                                    );
 
                                 var loc0 = new VariableDefinition(thisTypeRef);
                                 boxedGetHashCodeFn.Body.Variables.Add(loc0);
@@ -664,7 +807,12 @@ namespace Unity.Entities.CodeGen
                                 instructionList.Add(hashIL.Create(OpCodes.Stloc, loc0));
                                 instructionList.Add(hashIL.Create(OpCodes.Ldloca, loc0));
                                 instructionList.Add(hashIL.Create(OpCodes.Constrained, thisTypeRef));
-                                instructionList.Add(hashIL.Create(OpCodes.Callvirt, AssemblyDefinition.MainModule.ImportReference(userImpl)));
+                                instructionList.Add(
+                                    hashIL.Create(
+                                        OpCodes.Callvirt,
+                                        AssemblyDefinition.MainModule.ImportReference(userImpl)
+                                    )
+                                );
                             }
                         }
                         instructionList.Add(hashIL.Create(OpCodes.Ret));
@@ -680,7 +828,10 @@ namespace Unity.Entities.CodeGen
                 var eqIL = boxedEqualsFn.Body.GetILProcessor();
                 List<Instruction> jumps = new List<Instruction>(boxedEqJumpTable.Length);
                 Instruction loadTypeIndex = eqIL.Create(OpCodes.Ldarg_2);
-                Instruction defaultCaseOp = Instruction.Create(OpCodes.Ldstr, "FATAL: Tried to call TypeManager.Equals() for a component type unknown to the static TypeRegistry");
+                Instruction defaultCaseOp = Instruction.Create(
+                    OpCodes.Ldstr,
+                    "FATAL: Tried to call TypeManager.Equals() for a component type unknown to the static TypeRegistry"
+                );
                 eqIL.Append(loadTypeIndex); // Load typeIndex
 
                 foreach (var instructionList in boxedEqJumpTable)
@@ -702,8 +853,13 @@ namespace Unity.Entities.CodeGen
 
                 // default case
                 eqIL.Append(defaultCaseOp);
-                var notSupportedExConstructor = AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef).Resolve().GetConstructors()
-                    .Single(c => c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+                var notSupportedExConstructor = AssemblyDefinition
+                    .MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef)
+                    .Resolve()
+                    .GetConstructors()
+                    .Single(c =>
+                        c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String
+                    );
                 eqIL.Emit(OpCodes.Newobj, AssemblyDefinition.MainModule.ImportReference(notSupportedExConstructor));
                 eqIL.Emit(OpCodes.Throw);
 
@@ -717,7 +873,10 @@ namespace Unity.Entities.CodeGen
                 var eqIL = boxedEqualsPtrFn.Body.GetILProcessor();
                 List<Instruction> jumps = new List<Instruction>(boxedPtrEqJumpTable.Length);
                 Instruction loadTypeIndex = eqIL.Create(OpCodes.Ldarg_2);
-                Instruction defaultCaseOp = Instruction.Create(OpCodes.Ldstr, "FATAL: Tried to call TypeManager.Equals() for a component type unknown to the static TypeRegistry");
+                Instruction defaultCaseOp = Instruction.Create(
+                    OpCodes.Ldstr,
+                    "FATAL: Tried to call TypeManager.Equals() for a component type unknown to the static TypeRegistry"
+                );
                 eqIL.Append(loadTypeIndex); // Load typeIndex
 
                 foreach (var instructionList in boxedPtrEqJumpTable)
@@ -739,8 +898,13 @@ namespace Unity.Entities.CodeGen
 
                 // default case
                 eqIL.Append(defaultCaseOp);
-                var notSupportedExConstructor = AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef).Resolve().GetConstructors()
-                    .Single(c => c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+                var notSupportedExConstructor = AssemblyDefinition
+                    .MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef)
+                    .Resolve()
+                    .GetConstructors()
+                    .Single(c =>
+                        c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String
+                    );
                 eqIL.Emit(OpCodes.Newobj, AssemblyDefinition.MainModule.ImportReference(notSupportedExConstructor));
                 eqIL.Emit(OpCodes.Throw);
 
@@ -754,7 +918,10 @@ namespace Unity.Entities.CodeGen
                 var hashIL = boxedGetHashCodeFn.Body.GetILProcessor();
                 List<Instruction> jumps = new List<Instruction>(boxedHashJumpTable.Length);
                 Instruction loadTypeIndex = hashIL.Create(OpCodes.Ldarg_1);
-                Instruction defaultCaseOp = Instruction.Create(OpCodes.Ldstr, "FATAL: Tried to call TypeManager.GetHashCode() for a component type unknown to the static TypeRegistry");
+                Instruction defaultCaseOp = Instruction.Create(
+                    OpCodes.Ldstr,
+                    "FATAL: Tried to call TypeManager.GetHashCode() for a component type unknown to the static TypeRegistry"
+                );
                 hashIL.Append(loadTypeIndex); // Load typeIndex
 
                 foreach (var instructionList in boxedHashJumpTable)
@@ -776,8 +943,13 @@ namespace Unity.Entities.CodeGen
 
                 // default case
                 hashIL.Append(defaultCaseOp);
-                var notSupportedExConstructor = AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef).Resolve().GetConstructors()
-                    .Single(c => c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+                var notSupportedExConstructor = AssemblyDefinition
+                    .MainModule.ImportReference(runnerOfMe._System_NotSupportedExceptionDef)
+                    .Resolve()
+                    .GetConstructors()
+                    .Single(c =>
+                        c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String
+                    );
                 hashIL.Emit(OpCodes.Newobj, AssemblyDefinition.MainModule.ImportReference(notSupportedExConstructor));
                 hashIL.Emit(OpCodes.Throw);
 
@@ -796,10 +968,9 @@ namespace Unity.Entities.CodeGen
 
         private static MethodDefinition GetTypesEqualsMethodReference(TypeDefinition typeDef)
         {
-            var candidate = typeDef.Methods.FirstOrDefault(
-                m => m.Name == "Equals"
-                && m.Parameters.Count == 1
-                && m.Parameters[0].ParameterType == typeDef);
+            var candidate = typeDef.Methods.FirstOrDefault(m =>
+                m.Name == "Equals" && m.Parameters.Count == 1 && m.Parameters[0].ParameterType == typeDef
+            );
 
             if (candidate == null)
             {
@@ -819,8 +990,7 @@ namespace Unity.Entities.CodeGen
         {
             // This code is kind of weak. We actually want to confirm this function is overriding System.Object.GetHashCode however
             // as far as I can tell, cecil is not detecting legitimate overrides so we resort to this.
-            return typeDef.Methods.FirstOrDefault(
-                m => m.Name == "GetHashCode" && m.Parameters.Count == 0);
+            return typeDef.Methods.FirstOrDefault(m => m.Name == "GetHashCode" && m.Parameters.Count == 0);
         }
 
         private TypeReference EnsureImported(TypeReference type)
@@ -840,9 +1010,21 @@ namespace Unity.Entities.CodeGen
         internal MethodReference GenerateEqualsFunction(TypeDefinition registryDef, TypeGenInfo typeGenInfo)
         {
             var typeRef = AssemblyDefinition.MainModule.ImportReference(typeGenInfo.TypeReference);
-            var equalsFn = new MethodDefinition("DoEquals", MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_BoolDef));
-            var arg0 = new ParameterDefinition("i0", Mono.Cecil.ParameterAttributes.None, typeRef.IsValueType() ? new ByReferenceType(typeRef) : typeRef);
-            var arg1 = new ParameterDefinition("i1", Mono.Cecil.ParameterAttributes.None, typeRef.IsValueType() ? new ByReferenceType(typeRef) : typeRef);
+            var equalsFn = new MethodDefinition(
+                "DoEquals",
+                MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_BoolDef)
+            );
+            var arg0 = new ParameterDefinition(
+                "i0",
+                Mono.Cecil.ParameterAttributes.None,
+                typeRef.IsValueType() ? new ByReferenceType(typeRef) : typeRef
+            );
+            var arg1 = new ParameterDefinition(
+                "i1",
+                Mono.Cecil.ParameterAttributes.None,
+                typeRef.IsValueType() ? new ByReferenceType(typeRef) : typeRef
+            );
             equalsFn.Parameters.Add(arg0);
             equalsFn.Parameters.Add(arg1);
             registryDef.Methods.Add(equalsFn);
@@ -877,7 +1059,12 @@ namespace Unity.Entities.CodeGen
             return equalsFn;
         }
 
-        internal void GenerateEqualsFunctionRecurse(ILProcessor il, ParameterDefinition arg0, ParameterDefinition arg1, TypeGenInfo typeGenInfo)
+        internal void GenerateEqualsFunctionRecurse(
+            ILProcessor il,
+            ParameterDefinition arg0,
+            ParameterDefinition arg1,
+            TypeGenInfo typeGenInfo
+        )
         {
             int typeSize = typeGenInfo.AlignAndSize.size;
 
@@ -899,11 +1086,14 @@ namespace Unity.Entities.CodeGen
             var importedTypeRef = AssemblyDefinition.MainModule.ImportReference(typeRef);
             var hashFn = new MethodDefinition(
                 "DoHash",
-                MethodAttributes.Static
-                | MethodAttributes.Public
-                | MethodAttributes.HideBySig,
-                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def));
-            var arg0 = new ParameterDefinition("val", Mono.Cecil.ParameterAttributes.None, typeRef.IsValueType() ? new ByReferenceType(importedTypeRef) : importedTypeRef);
+                MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
+                AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Int32Def)
+            );
+            var arg0 = new ParameterDefinition(
+                "val",
+                Mono.Cecil.ParameterAttributes.None,
+                typeRef.IsValueType() ? new ByReferenceType(importedTypeRef) : importedTypeRef
+            );
             hashFn.Parameters.Add(arg0);
             registryDef.Methods.Add(hashFn);
 
@@ -947,7 +1137,13 @@ namespace Unity.Entities.CodeGen
             return hashFn;
         }
 
-        internal void GenerateHashFunctionRecurse(ILProcessor il, List<Instruction> hashInstructions, List<Instruction> fieldLoadChain, ParameterDefinition val, TypeReference typeRef)
+        internal void GenerateHashFunctionRecurse(
+            ILProcessor il,
+            List<Instruction> hashInstructions,
+            List<Instruction> fieldLoadChain,
+            ParameterDefinition val,
+            TypeReference typeRef
+        )
         {
             // http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-1a
             const int FNV1a_32_PRIME = 16777619;
@@ -977,14 +1173,15 @@ namespace Unity.Entities.CodeGen
                         hashInstructions.Add(il.Create(OpCodes.Ldc_I4, FNV1a_32_PRIME));
                         hashInstructions.Add(il.Create(OpCodes.Mul));
 
-
                         hashInstructions.Add(il.Create(OpCodes.Ldarg, val));
                         // Since we need to find the offset to nested members we need to chain field loads
                         hashInstructions.AddRange(fieldLoadChain);
 
                         if (isFixed)
                         {
-                            hashInstructions.Add(il.Create(OpCodes.Ldflda, AssemblyDefinition.MainModule.ImportReference(field)));
+                            hashInstructions.Add(
+                                il.Create(OpCodes.Ldflda, AssemblyDefinition.MainModule.ImportReference(field))
+                            );
                             hashInstructions.Add(il.Create(OpCodes.Ldind_I4));
                         }
                         else
@@ -994,7 +1191,9 @@ namespace Unity.Entities.CodeGen
                                 // Xor top and bottom of pointer
                                 //
                                 // Bottom 32 Bits
-                                hashInstructions.Add(il.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field)));
+                                hashInstructions.Add(
+                                    il.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field))
+                                );
                                 hashInstructions.Add(il.Create(OpCodes.Conv_I8)); // do I need this if we know the ptr is 64-bit
                                 hashInstructions.Add(il.Create(OpCodes.Ldc_I4_M1)); // 0x00000000FFFFFFFF
                                 hashInstructions.Add(il.Create(OpCodes.Conv_I8));
@@ -1004,7 +1203,9 @@ namespace Unity.Entities.CodeGen
                                 // Top 32 bits
                                 hashInstructions.Add(il.Create(OpCodes.Ldarg, val));
                                 hashInstructions.AddRange(fieldLoadChain);
-                                hashInstructions.Add(il.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field)));
+                                hashInstructions.Add(
+                                    il.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field))
+                                );
                                 hashInstructions.Add(il.Create(OpCodes.Conv_I8)); // do I need this if we know the ptr is 64-bit
                                 hashInstructions.Add(il.Create(OpCodes.Ldc_I4, 32));
                                 hashInstructions.Add(il.Create(OpCodes.Shr_Un));
@@ -1016,7 +1217,9 @@ namespace Unity.Entities.CodeGen
                             }
                             else
                             {
-                                hashInstructions.Add(il.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field)));
+                                hashInstructions.Add(
+                                    il.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field))
+                                );
                             }
                         }
 
@@ -1044,13 +1247,22 @@ namespace Unity.Entities.CodeGen
                             // Since we need to find the offset to nested members we need to chain field loads
                             hashInstructions.AddRange(fieldLoadChain);
 
-                            hashInstructions.Add(il.Create(OpCodes.Ldflda, AssemblyDefinition.MainModule.ImportReference(field)));
-                            hashInstructions.Add(il.Create(OpCodes.Call, AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Guid_GetHashCode)));
+                            hashInstructions.Add(
+                                il.Create(OpCodes.Ldflda, AssemblyDefinition.MainModule.ImportReference(field))
+                            );
+                            hashInstructions.Add(
+                                il.Create(
+                                    OpCodes.Call,
+                                    AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Guid_GetHashCode)
+                                )
+                            );
                             hashInstructions.Add(il.Create(OpCodes.Xor));
                         }
                         else
                         {
-                            fieldLoadChain.Add(Instruction.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field)));
+                            fieldLoadChain.Add(
+                                Instruction.Create(OpCodes.Ldfld, AssemblyDefinition.MainModule.ImportReference(field))
+                            );
                             GenerateHashFunctionRecurse(il, hashInstructions, fieldLoadChain, val, fieldTypeRef);
                             fieldLoadChain.RemoveAt(fieldLoadChain.Count - 1);
                         }
@@ -1074,12 +1286,15 @@ namespace Unity.Entities.CodeGen
 
             if (typeDef.CustomAttributes.Count > 0)
             {
-                var forcedMemoryOrderAttribute = typeDef.CustomAttributes.FirstOrDefault(ca => ca.Constructor.DeclaringType.Name == "ForcedMemoryOrderingAttribute");
+                var forcedMemoryOrderAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
+                    ca.Constructor.DeclaringType.Name == "ForcedMemoryOrderingAttribute"
+                );
                 if (forcedMemoryOrderAttribute != null)
                 {
-                    memoryOrder = (ulong)forcedMemoryOrderAttribute.ConstructorArguments
-                        .First(arg => arg.Type.MetadataType == MetadataType.UInt64)
-                        .Value;
+                    memoryOrder = (ulong)
+                        forcedMemoryOrderAttribute
+                            .ConstructorArguments.First(arg => arg.Type.MetadataType == MetadataType.UInt64)
+                            .Value;
                 }
             }
         }
@@ -1131,7 +1346,9 @@ namespace Unity.Entities.CodeGen
         // True when a component is valid to using in world serialization. A component IsSerializable when it is valid to blit
         // the data across storage media. Thus components containing pointers have an IsSerializable of false as the component
         // is blittable but no longer valid upon deserialization.
-        private (bool isSerializable, bool hasChunkSerializableAttribute) IsTypeValidForSerialization(TypeReference type)
+        private (bool isSerializable, bool hasChunkSerializableAttribute) IsTypeValidForSerialization(
+            TypeReference type
+        )
         {
             var result = (false, false);
             if (m_ChunkSerializableCache.TryGetValue(type, out result))
@@ -1155,9 +1372,7 @@ namespace Unity.Entities.CodeGen
                 if (fieldType.IsGenericParameter)
                     continue;
 
-                if (fieldType.IsPointer
-                    || fieldType.Name == nameof(IntPtr)
-                    || fieldType.Name == nameof(UIntPtr))
+                if (fieldType.IsPointer || fieldType.Name == nameof(IntPtr) || fieldType.Name == nameof(UIntPtr))
                 {
                     m_ChunkSerializableCache.Add(type, result);
                     return result;
@@ -1189,7 +1404,11 @@ namespace Unity.Entities.CodeGen
             // Shared Components are expected to be handled specially when serializing and are not required to be blittable.
             // They cannot contain an entity reference today as they are not patched however for unmanaged components
             // we should be able to correct this behaviour DOTS-7613
-            if (!isSerializable.hasChunkSerializableAttribute && category == TypeCategory.ISharedComponentData && hasEntityReference)
+            if (
+                !isSerializable.hasChunkSerializableAttribute
+                && category == TypeCategory.ISharedComponentData
+                && hasEntityReference
+            )
             {
                 isSerializable.isSerializable = false;
             }
@@ -1206,15 +1425,26 @@ namespace Unity.Entities.CodeGen
             out bool hasBlobReferences,
             out bool hasUnityObjReferences,
             out bool hasWeakAssetReferences,
-            int maxDepth = 128)
+            int maxDepth = 128
+        )
         {
             try
             {
-                ProcessReferencesRecursiveManaged(type, out hasEntityReferences, out hasBlobReferences, out hasUnityObjReferences, out hasWeakAssetReferences, 0, maxDepth);
+                ProcessReferencesRecursiveManaged(
+                    type,
+                    out hasEntityReferences,
+                    out hasBlobReferences,
+                    out hasUnityObjReferences,
+                    out hasWeakAssetReferences,
+                    0,
+                    maxDepth
+                );
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException($"While processing type {type}, caught exception {e}; this is always a bug in an ILPostProcessor. Please report with Help->Report a bug... or to the DOTS team directly. Thanks!");
+                throw new InvalidOperationException(
+                    $"While processing type {type}, caught exception {e}; this is always a bug in an ILPostProcessor. Please report with Help->Report a bug... or to the DOTS team directly. Thanks!"
+                );
             }
         }
 
@@ -1228,7 +1458,8 @@ namespace Unity.Entities.CodeGen
             out bool hasUnityObjReferences,
             out bool hasWeakAssetReferences,
             int depth,
-            int maxDepth = 10)
+            int maxDepth = 10
+        )
         {
             hasEntityReferences = false;
             hasBlobReferences = false;
@@ -1244,12 +1475,12 @@ namespace Unity.Entities.CodeGen
                 hasWeakAssetReferences |= ((answer & HasReferencesBits.hasWeakAssetReferences) != 0);
                 return;
             }
-	    
+
             //we don't follow pointers for patching anyway, so don't follow them for looking for
             //entity or blob references either
             if (type.IsPointer)
             {
-                HasReferencesCache[type] = HasReferencesBits.None;		
+                HasReferencesCache[type] = HasReferencesBits.None;
                 return;
             }
 
@@ -1260,13 +1491,14 @@ namespace Unity.Entities.CodeGen
             {
                 // Force true
                 var forceReference = typeDef.CustomAttributes.FirstOrDefault(ca =>
-                    ca.Constructor.DeclaringType.Name == "ForceReferenceAttribute");
+                    ca.Constructor.DeclaringType.Name == "ForceReferenceAttribute"
+                );
 
                 if (forceReference != null)
                 {
-                    hasEntityReferences = (bool) forceReference.ConstructorArguments[0].Value;
-                    hasBlobReferences = (bool) forceReference.ConstructorArguments[1].Value;
-                    hasUnityObjReferences = (bool) forceReference.ConstructorArguments[2].Value;
+                    hasEntityReferences = (bool)forceReference.ConstructorArguments[0].Value;
+                    hasBlobReferences = (bool)forceReference.ConstructorArguments[1].Value;
+                    hasUnityObjReferences = (bool)forceReference.ConstructorArguments[2].Value;
                 }
             }
 
@@ -1276,11 +1508,16 @@ namespace Unity.Entities.CodeGen
                 // The max depth is reached on searching for nested Entity References, Blob References or Unity Object References
                 // It will ignore any Entity, Blob or Unity Object References. If you are certain that there is any of these types
                 // somewhere in the nesting structure, please add the [{nameof(TypeManager.ForceReferenceSearchAttribute)}] attribute to the type.
-                HasReferencesCache[type] = MakeHasReferencesBits(hasEntityReferences, hasBlobReferences, hasUnityObjReferences, hasWeakAssetReferences);
+                HasReferencesCache[type] = MakeHasReferencesBits(
+                    hasEntityReferences,
+                    hasBlobReferences,
+                    hasUnityObjReferences,
+                    hasWeakAssetReferences
+                );
                 return;
             }
 
-            var fields = typeDef.Fields.Where(f=>!f.IsStatic);
+            var fields = typeDef.Fields.Where(f => !f.IsStatic);
 
             var typeResolver = TypeResolver.For(type);
 
@@ -1301,14 +1538,18 @@ namespace Unity.Entities.CodeGen
                 if (fieldRef.IsArray)
                 {
                     fieldRef = ((TypeSpecification)fieldRef).ElementType;
-
                 }
                 else if (fieldRef is GenericInstanceType ginst)
                 {
                     fieldType = fieldRef.Resolve();
-                    if (TypeReferenceEqualityComparer.AreEqual(
-                        fieldType,
-                        AssemblyDefinition.MainModule.ImportReference(runnerOfMe._System_Collections_Generic_List_T_Def)))
+                    if (
+                        TypeReferenceEqualityComparer.AreEqual(
+                            fieldType,
+                            AssemblyDefinition.MainModule.ImportReference(
+                                runnerOfMe._System_Collections_Generic_List_T_Def
+                            )
+                        )
+                    )
                     {
                         fieldRef = ginst.GenericArguments[0];
                     }
@@ -1316,14 +1557,8 @@ namespace Unity.Entities.CodeGen
 
                 fieldType = typeResolver.Resolve(fieldRef).Resolve();
 
-                if (fieldType.IsPrimitive)
-                {
-
-                }
-                else if (fieldType.IsChildTypeOf(runnerOfMe._UnityEngine_ObjectDef))
-                {
-
-                }
+                if (fieldType.IsPrimitive) { }
+                else if (fieldType.IsChildTypeOf(runnerOfMe._UnityEngine_ObjectDef)) { }
                 else if (TypeReferenceEqualityComparer.AreEqual(fieldType, runnerOfMe._EntityDef))
                 {
                     hasEntityReferences = true;
@@ -1344,7 +1579,12 @@ namespace Unity.Entities.CodeGen
                 {
                     // Classes can have cyclical type definitions so to prevent an infinite loop,
                     // we make all future occurence of fieldType resolve to what we have so far
-                    HasReferencesCache[type] = MakeHasReferencesBits(hasEntityReferences, hasBlobReferences, hasUnityObjReferences, hasWeakAssetReferences);
+                    HasReferencesCache[type] = MakeHasReferencesBits(
+                        hasEntityReferences,
+                        hasBlobReferences,
+                        hasUnityObjReferences,
+                        hasWeakAssetReferences
+                    );
                     ProcessReferencesRecursiveManaged(
                         fieldRef,
                         out var recursiveHasEntityRefs,
@@ -1352,14 +1592,20 @@ namespace Unity.Entities.CodeGen
                         out var recursiveHasUnityObjRefs,
                         out var recursiveHasWeakAssetRefs,
                         depth + 1,
-                        maxDepth);
+                        maxDepth
+                    );
 
                     hasEntityReferences |= recursiveHasEntityRefs;
                     hasBlobReferences |= recursiveHasBlobRefs;
                     hasUnityObjReferences |= recursiveHasUnityObjRefs;
                     hasWeakAssetReferences |= recursiveHasWeakAssetRefs;
                     //update it right away before the loop continues
-                    HasReferencesCache[type] = MakeHasReferencesBits(hasEntityReferences, hasBlobReferences, hasUnityObjReferences, hasWeakAssetReferences);
+                    HasReferencesCache[type] = MakeHasReferencesBits(
+                        hasEntityReferences,
+                        hasBlobReferences,
+                        hasUnityObjReferences,
+                        hasWeakAssetReferences
+                    );
                 }
                 else
                 {
@@ -1368,11 +1614,21 @@ namespace Unity.Entities.CodeGen
                     // somewhere in the nesting structure, please add the [{nameof(TypeManager.ForceReferenceSearchAttribute)}] attribute to the type.
                 }
             }
-       
-            HasReferencesCache[type] = MakeHasReferencesBits(hasEntityReferences, hasBlobReferences, hasUnityObjReferences, hasWeakAssetReferences);
+
+            HasReferencesCache[type] = MakeHasReferencesBits(
+                hasEntityReferences,
+                hasBlobReferences,
+                hasUnityObjReferences,
+                hasWeakAssetReferences
+            );
         }
 
-        private static HasReferencesBits MakeHasReferencesBits(bool recursiveHasEntityRefs, bool recursiveHasBlobRefs, bool recursiveHasUnityObjRefs, bool recursiveHasWeakAssetRefs)
+        private static HasReferencesBits MakeHasReferencesBits(
+            bool recursiveHasEntityRefs,
+            bool recursiveHasBlobRefs,
+            bool recursiveHasUnityObjRefs,
+            bool recursiveHasWeakAssetRefs
+        )
         {
             var trueAnswer = HasReferencesBits.None;
             if (recursiveHasEntityRefs)
@@ -1385,6 +1641,7 @@ namespace Unity.Entities.CodeGen
                 trueAnswer |= HasReferencesBits.hasWeakAssetReferences;
             return trueAnswer;
         }
+
         /*
          * copied and translated from reflection from TypeManager.cs
          */
@@ -1393,12 +1650,19 @@ namespace Unity.Entities.CodeGen
             // Validate the class component data type is usable:
             // - Has a default constructor
             if (type.GetConstructor(Type.EmptyTypes) == null)
-                throw new ArgumentException($"{type} is a class based {baseTypeDesc}. Class based {baseTypeDesc} must implement a default constructor.");
+                throw new ArgumentException(
+                    $"{type} is a class based {baseTypeDesc}. Class based {baseTypeDesc} must implement a default constructor."
+                );
         }
+
         /*
          * copied and translated from reflection from TypeManager.cs
          */
-        internal static void ThrowOnDisallowedComponentData(TypeReference typeRef, TypeReference baseType, string baseTypeDesc)
+        internal static void ThrowOnDisallowedComponentData(
+            TypeReference typeRef,
+            TypeReference baseType,
+            string baseTypeDesc
+        )
         {
             if (typeRef.IsPrimitive)
                 return;
@@ -1414,9 +1678,12 @@ namespace Unity.Entities.CodeGen
             {
                 if (typeRef == baseType)
                     throw new ArgumentException(
-                        $"{typeRef} is a {baseTypeDesc} and thus must be a struct containing only primitive or blittable members.");
+                        $"{typeRef} is a {baseTypeDesc} and thus must be a struct containing only primitive or blittable members."
+                    );
 
-                throw new ArgumentException($"{baseType} contains a field of {typeRef}, which is neither primitive nor blittable.");
+                throw new ArgumentException(
+                    $"{baseType} contains a field of {typeRef}, which is neither primitive nor blittable."
+                );
             }
 
             foreach (var f in typeDef.Fields)
@@ -1428,6 +1695,7 @@ namespace Unity.Entities.CodeGen
                 }
             }
         }
+
         /*
          * this is inefficient: it traverses through the type twice, once inside IsManagedType, and once in ThrowOnWhatever.
          */
@@ -1437,12 +1705,11 @@ namespace Unity.Entities.CodeGen
                 return;
 
             // it can't be used -- so we expect this to find and throw
-            ThrowOnDisallowedComponentData(type, type, baseTypeDesc);//, allowedComponentCache);
+            ThrowOnDisallowedComponentData(type, type, baseTypeDesc); //, allowedComponentCache);
 
             // if something went wrong and the above didn't throw, then throw
             throw new ArgumentException($"{type} cannot be used as component data for unknown reasons (BUG)");
         }
-
 
         /*
          * copied and translated from reflection from TypeManager.cs
@@ -1470,13 +1737,14 @@ namespace Unity.Entities.CodeGen
 
         bool AnybodyUpTheChainImplements(TypeDefinition type, TypeDefinition iface)
         {
-            return type.TypeImplements(iface) || (type.BaseType != null && AnybodyUpTheChainImplements(type.BaseType.Resolve(), iface));
+            return type.TypeImplements(iface)
+                || (type.BaseType != null && AnybodyUpTheChainImplements(type.BaseType.Resolve(), iface));
         }
 
         /*
          * copied and translated from reflection from TypeManager.cs
          */
-        internal TypeGenInfo BuildComponentType(TypeReference typeRef)//, BuildComponentCache caches)
+        internal TypeGenInfo BuildComponentType(TypeReference typeRef) //, BuildComponentCache caches)
         {
             var typeDef = typeRef.Resolve();
 
@@ -1500,15 +1768,20 @@ namespace Unity.Entities.CodeGen
             var unityObjectRefOffsets = new List<int>();
 
             //xxx don't use a string
-            var maxCapacityAttribute = typeDef.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == "MaximumChunkCapacityAttribute");
+            var maxCapacityAttribute = typeDef.CustomAttributes.FirstOrDefault(a =>
+                a.AttributeType.Name == "MaximumChunkCapacityAttribute"
+            );
             if (typeDef.CustomAttributes.Count > 0)
             {
-                var maxChunkCapacityAttribute = typeDef.CustomAttributes.FirstOrDefault(ca => ca.AttributeType.Name == "MaximumChunkCapacityAttribute");
+                var maxChunkCapacityAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
+                    ca.AttributeType.Name == "MaximumChunkCapacityAttribute"
+                );
                 if (maxChunkCapacityAttribute != null)
                 {
-                    var chunkCapacityFromAttribute = (int)maxChunkCapacityAttribute.ConstructorArguments
-                        .First(arg => arg.Type.MetadataType == MetadataType.Int32)
-                        .Value;
+                    var chunkCapacityFromAttribute = (int)
+                        maxChunkCapacityAttribute
+                            .ConstructorArguments.First(arg => arg.Type.MetadataType == MetadataType.Int32)
+                            .Value;
                     if (chunkCapacityFromAttribute < maxChunkCapacity)
                         maxChunkCapacity = chunkCapacityFromAttribute;
                 }
@@ -1533,12 +1806,12 @@ namespace Unity.Entities.CodeGen
             bool implementsICD = AnybodyUpTheChainImplements(typeDef, runnerOfMe._IComponentDataDef);
             if (implementsICD && !isManaged)
             {
-                CheckIsAllowedAsComponentData(typeRef, "IComponentData");//, caches.AllowedComponentCache);
+                CheckIsAllowedAsComponentData(typeRef, "IComponentData"); //, caches.AllowedComponentCache);
 
                 category = TypeCategory.ComponentData;
 
                 var alignAndSize = TypeUtilsInstance.AlignAndSizeOfType(typeRef, 64);
-                valueTypeSize = alignAndSize.size;//UnsafeUtility.SizeOf(typeRef);
+                valueTypeSize = alignAndSize.size; //UnsafeUtility.SizeOf(typeRef);
                 //elliotc xxx todo: figure out the relationship between the alignment from TypeUtils.AlignAndSizeOfType and that from CalculateAlignmentInChunk
                 alignmentInBytes = CalculateAlignmentInChunk(valueTypeSize);
 
@@ -1550,13 +1823,25 @@ namespace Unity.Entities.CodeGen
                 entityOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._EntityDef, typeRef, 64);
                 if (entityOffsets.Count > 0)
                     hasEntityReferences = true;
-                blobAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._BlobAssetReferenceDataDef, typeRef, 64);
+                blobAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                    runnerOfMe._BlobAssetReferenceDataDef,
+                    typeRef,
+                    64
+                );
                 if (blobAssetRefOffsets.Count > 0)
                     hasBlobReferences = true;
-                weakAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._UntypedWeakReferenceIdDef, typeRef, ArchBits);
+                weakAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                    runnerOfMe._UntypedWeakReferenceIdDef,
+                    typeRef,
+                    ArchBits
+                );
                 if (weakAssetRefOffsets.Count > 0)
                     hasWeakAssetReferences = true;
-                unityObjectRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._UntypedUnityObjectRefDef, typeRef, ArchBits);
+                unityObjectRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                    runnerOfMe._UntypedUnityObjectRefDef,
+                    typeRef,
+                    ArchBits
+                );
                 if (unityObjectRefOffsets.Count > 0)
                     hasUnityObjectReferences = true;
             }
@@ -1564,11 +1849,19 @@ namespace Unity.Entities.CodeGen
             else if (implementsICD && isManaged)
             {
                 if (!typeDef.GetConstructors().Any(c => c.Parameters.Count == 0))
-                    throw new ArgumentException($"{typeDef} is a class based IComponentData. Class based IComponentData must implement a default constructor.");
+                    throw new ArgumentException(
+                        $"{typeDef} is a class based IComponentData. Class based IComponentData must implement a default constructor."
+                    );
 
                 category = TypeCategory.ComponentData;
                 sizeInChunk = sizeof(int);
-                HasEntityReferencesManaged(typeRef, out var entityRefResult, out var blobRefResult, out var unityObjRefResult, out var weakAssetRefResult);
+                HasEntityReferencesManaged(
+                    typeRef,
+                    out var entityRefResult,
+                    out var blobRefResult,
+                    out var unityObjRefResult,
+                    out var weakAssetRefResult
+                );
 
                 hasEntityReferences = entityRefResult;
                 hasBlobReferences = blobRefResult;
@@ -1582,7 +1875,6 @@ namespace Unity.Entities.CodeGen
 
                 category = TypeCategory.BufferData;
 
-
                 var alignAndSize = TypeUtilsInstance.AlignAndSizeOfType(typeRef, 64);
                 valueTypeSize = alignAndSize.size;
 
@@ -1592,28 +1884,45 @@ namespace Unity.Entities.CodeGen
 
                 if (typeDef.CustomAttributes.Count > 0)
                 {
-                    var forcedCapacityAttribute = typeDef.CustomAttributes.FirstOrDefault(ca => ca.Constructor.DeclaringType.Name == "InternalBufferCapacityAttribute");
+                    var forcedCapacityAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
+                        ca.Constructor.DeclaringType.Name == "InternalBufferCapacityAttribute"
+                    );
                     if (forcedCapacityAttribute != null)
                     {
-                        bufferCapacity = (int)forcedCapacityAttribute.ConstructorArguments
-                            .First(arg => arg.Type.MetadataType == MetadataType.Int32)
-                            .Value;
+                        bufferCapacity = (int)
+                            forcedCapacityAttribute
+                                .ConstructorArguments.First(arg => arg.Type.MetadataType == MetadataType.Int32)
+                                .Value;
                     }
                 }
                 if (bufferCapacity == -1)
                     bufferCapacity = DefaultBufferCapacityNumerator / elementSize; // Rather than 2*cachelinesize, to make it cross platform deterministic
 
-                sizeInChunk = TypeUtilsInstance.AlignAndSizeOfType(runnerOfMe._BufferHeaderDef, 64).size + bufferCapacity * elementSize;
+                sizeInChunk =
+                    TypeUtilsInstance.AlignAndSizeOfType(runnerOfMe._BufferHeaderDef, 64).size
+                    + bufferCapacity * elementSize;
                 entityOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._EntityDef, typeRef, 64);
                 if (entityOffsets.Count > 0)
                     hasEntityReferences = true;
-                blobAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._BlobAssetReferenceDataDef, typeRef, 64);
+                blobAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                    runnerOfMe._BlobAssetReferenceDataDef,
+                    typeRef,
+                    64
+                );
                 if (blobAssetRefOffsets.Count > 0)
                     hasBlobReferences = true;
-                weakAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._UntypedWeakReferenceIdDef, typeRef, ArchBits);
+                weakAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                    runnerOfMe._UntypedWeakReferenceIdDef,
+                    typeRef,
+                    ArchBits
+                );
                 if (weakAssetRefOffsets.Count > 0)
                     hasWeakAssetReferences = true;
-                unityObjectRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._UntypedUnityObjectRefDef, typeRef, ArchBits);
+                unityObjectRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                    runnerOfMe._UntypedUnityObjectRefDef,
+                    typeRef,
+                    ArchBits
+                );
                 if (unityObjectRefOffsets.Count > 0)
                     hasUnityObjectReferences = true;
             }
@@ -1632,14 +1941,19 @@ namespace Unity.Entities.CodeGen
                 if (!isManaged)
                     alignAndSize = TypeUtilsInstance.AlignAndSizeOfType(typeRef, 64);
 
-                valueTypeSize = alignAndSize.size;//UnsafeUtility.SizeOf(typeRef);
+                valueTypeSize = alignAndSize.size; //UnsafeUtility.SizeOf(typeRef);
 
                 category = TypeCategory.ISharedComponentData;
 
-
                 if (isManaged)
                 {
-                    HasEntityReferencesManaged(typeRef, out _, out var blobRefResult, out var unityObjRefResult, out var weakAssetRefResult);//, caches.HasEntityOrBlobAssetReferenceCache);
+                    HasEntityReferencesManaged(
+                        typeRef,
+                        out _,
+                        out var blobRefResult,
+                        out var unityObjRefResult,
+                        out var weakAssetRefResult
+                    ); //, caches.HasEntityOrBlobAssetReferenceCache);
 
                     // Managed shared components explicitly do not allow patching of entity references
                     hasEntityReferences = false;
@@ -1653,13 +1967,25 @@ namespace Unity.Entities.CodeGen
                     entityOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._EntityDef, typeRef, 64);
                     if (entityOffsets.Count > 0)
                         hasEntityReferences = true;
-                    blobAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._BlobAssetReferenceDataDef, typeRef, 64);
+                    blobAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                        runnerOfMe._BlobAssetReferenceDataDef,
+                        typeRef,
+                        64
+                    );
                     if (blobAssetRefOffsets.Count > 0)
                         hasBlobReferences = true;
-                    weakAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._UntypedWeakReferenceIdDef, typeRef, ArchBits);
+                    weakAssetRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                        runnerOfMe._UntypedWeakReferenceIdDef,
+                        typeRef,
+                        ArchBits
+                    );
                     if (weakAssetRefOffsets.Count > 0)
                         hasWeakAssetReferences = true;
-                    unityObjectRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(runnerOfMe._UntypedUnityObjectRefDef, typeRef, ArchBits);
+                    unityObjectRefOffsets = TypeUtilsInstance.GetFieldOffsetsOf(
+                        runnerOfMe._UntypedUnityObjectRefDef,
+                        typeRef,
+                        ArchBits
+                    );
                     if (unityObjectRefOffsets.Count > 0)
                         hasUnityObjectReferences = true;
                 }
@@ -1673,7 +1999,7 @@ namespace Unity.Entities.CodeGen
                 hasBlobReferences = false;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-               if (!typeDef.IsChildTypeOf(runnerOfMe._UnityEngine_ObjectDef))
+                if (!typeDef.IsChildTypeOf(runnerOfMe._UnityEngine_ObjectDef))
                     throw new ArgumentException($"{typeRef} must inherit from {runnerOfMe._UnityEngine_ObjectDef}.");
 #endif
             }
@@ -1686,7 +2012,8 @@ namespace Unity.Entities.CodeGen
             if (typeDef.CustomAttributes.Count > 0)
             {
                 var overrideAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
-                    ca.Constructor.DeclaringType.Name == "TypeOverridesAttribute");
+                    ca.Constructor.DeclaringType.Name == "TypeOverridesAttribute"
+                );
 
                 var hasOverrideAttribute = overrideAttribute != null;
 
@@ -1711,9 +2038,16 @@ namespace Unity.Entities.CodeGen
             //AddFastEqualityInfo(typeRef, category == TypeCategory.UnityEngineObject, caches.FastEqualityLayoutInfoCache);
 
             int typeIndex = m_TotalTypeCount++;
-            bool isCleanupBufferElement = typeDef.Interfaces.Select(i => i.InterfaceType.Name).Contains("ICleanupBufferElementData");
-            bool isCleanupSharedComponent = typeDef.Interfaces.Select(i => i.InterfaceType.Name).Contains("ICleanupSharedComponentData");
-            bool isCleanupComponent = typeDef.Interfaces.Select(i => i.InterfaceType.Name).Contains("ICleanupComponentData") || isCleanupSharedComponent || isCleanupBufferElement;
+            bool isCleanupBufferElement = typeDef
+                .Interfaces.Select(i => i.InterfaceType.Name)
+                .Contains("ICleanupBufferElementData");
+            bool isCleanupSharedComponent = typeDef
+                .Interfaces.Select(i => i.InterfaceType.Name)
+                .Contains("ICleanupSharedComponentData");
+            bool isCleanupComponent =
+                typeDef.Interfaces.Select(i => i.InterfaceType.Name).Contains("ICleanupComponentData")
+                || isCleanupSharedComponent
+                || isCleanupBufferElement;
 
             bool isEnableable = typeDef.Interfaces.Any(i => i.InterfaceType.Name.Contains("IEnableableComponent"));
 
@@ -1735,13 +2069,19 @@ namespace Unity.Entities.CodeGen
                 }
             }
 
-            bool isChunkSerializable = isManaged || IsComponentChunkSerializable(typeRef, category, hasEntityReferences);
+            bool isChunkSerializable =
+                isManaged || IsComponentChunkSerializable(typeRef, category, hasEntityReferences);
 
             // Cleanup shared components are also considered cleanup components
             if (isEnableable)
             {
-                if (!(category == TypeCategory.ComponentData || category == TypeCategory.BufferData) || isCleanupComponent)
-                    throw new ArgumentException($"IEnableableComponent is not supported for type {typeRef}. Only IComponentData and IBufferElementData can be disabled. Cleanup components are not supported.");
+                if (
+                    !(category == TypeCategory.ComponentData || category == TypeCategory.BufferData)
+                    || isCleanupComponent
+                )
+                    throw new ArgumentException(
+                        $"IEnableableComponent is not supported for type {typeRef}. Only IComponentData and IBufferElementData can be disabled. Cleanup components are not supported."
+                    );
             }
 
             bool isTemporaryBakingType = false;
@@ -1753,7 +2093,9 @@ namespace Unity.Entities.CodeGen
                 else if (c.AttributeType.Name == "BakingTypeAttribute")
                     isBakingOnlyType = true;
             }
-            var isIEquatable = typeDef.TypeImplements(AssemblyDefinition.MainModule.ImportReference(typeof(IEquatable<>)));
+            var isIEquatable = typeDef.TypeImplements(
+                AssemblyDefinition.MainModule.ImportReference(typeof(IEquatable<>))
+            );
 
             if (sizeInChunk == 0)
                 typeIndex |= ZeroSizeInChunkTypeFlag;
@@ -1797,14 +2139,14 @@ namespace Unity.Entities.CodeGen
             if (!isChunkSerializable)
                 typeIndex |= IsNotChunkSerializableTypeFlag;
 
-
             /* note: typegeninfo has the actual list of offsets for all the kinds of offsets,
              * whereas typeinfo just has indices into the giant array, because typeinfo is global
              * and typegeninfo is local
             */
 
             typeDef.MakeTypeInternal();
-            var ret = new TypeGenInfo() {
+            var ret = new TypeGenInfo()
+            {
                 TypeReference = TypeReferenceExtensions.LaunderTypeRef(typeRef, AssemblyDefinition.MainModule),
                 TypeIndex = typeIndex,
                 TypeCategory = category,
@@ -1849,7 +2191,11 @@ namespace Unity.Entities.CodeGen
             {
                 var typeRef = typeGenInfo.TypeReference;
                 var typeDef = typeRef.Resolve();
-                foreach (var attribute in typeDef.CustomAttributes.Where(a => a.AttributeType.Name == "WriteGroupAttribute" && a.AttributeType.Namespace == "Unity.Entities"))
+                foreach (
+                    var attribute in typeDef.CustomAttributes.Where(a =>
+                        a.AttributeType.Name == "WriteGroupAttribute" && a.AttributeType.Namespace == "Unity.Entities"
+                    )
+                )
                 {
                     if (!writeGroupMap.ContainsKey(typeRef))
                     {

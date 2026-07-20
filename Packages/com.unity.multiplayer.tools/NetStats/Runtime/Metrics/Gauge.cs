@@ -6,9 +6,7 @@ namespace Unity.Multiplayer.Tools.NetStats
     class Gauge : Metric<double>
     {
         public Gauge(MetricId metricId, double defaultValue = default)
-            : base(metricId, defaultValue)
-        {
-        }
+            : base(metricId, defaultValue) { }
 
         public void Set(double value)
         {

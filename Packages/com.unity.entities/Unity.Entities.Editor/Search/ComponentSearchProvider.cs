@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Editor.Bridge;
+using Unity.Entities.UI;
 using Unity.Properties;
 using UnityEditor;
 using UnityEditor.Search;
 using UnityEngine;
-using Unity.Editor.Bridge;
-using Unity.Entities.UI;
 
 namespace Unity.Entities.Editor
 {
@@ -22,9 +22,9 @@ namespace Unity.Entities.Editor
             Entity = 1 << 4,
             Tag = 1 << 5,
             Managed = 1 << 6,
-            Companion = 1 << 7
-        }        
-        
+            Companion = 1 << 7,
+        }
+
         public readonly TypeManager.TypeInfo info;
         public readonly string name;
         public readonly DebugTypeCategory category;
@@ -73,6 +73,7 @@ namespace Unity.Entities.Editor
             }
         }
     }
+
     [ExcludeFromPreset]
     internal class ComponentInfo : SearchItemWrapper<ComponentTypeDescriptor>
     {
@@ -85,9 +86,7 @@ namespace Unity.Entities.Editor
     [CustomEditor(typeof(ComponentInfo))]
     internal class ComponentWrapperEditor : UnityEditor.Editor
     {
-        private void OnEnable()
-        {
-        }
+        private void OnEnable() { }
 
         public override void OnInspectorGUI()
         {
@@ -106,12 +105,20 @@ namespace Unity.Entities.Editor
             EditorGUILayout.LabelField($"Type Index", desc.info.TypeIndex.Value.ToString());
             EditorGUILayout.TextField($"Stable Type Hash", desc.info.StableTypeHash.ToString());
             EditorGUILayout.LabelField($"Category", desc.category.ToString());
-            EditorGUILayout.LabelField($"Buffer Capacity in Chunk", FormattingUtility.BytesToString((ulong)desc.info.BufferCapacity));
+            EditorGUILayout.LabelField(
+                $"Buffer Capacity in Chunk",
+                FormattingUtility.BytesToString((ulong)desc.info.BufferCapacity)
+            );
             EditorGUILayout.LabelField($"Type Size", FormattingUtility.BytesToString((ulong)desc.info.TypeSize));
             EditorGUILayout.LabelField($"Size in Chunk", FormattingUtility.BytesToString((ulong)desc.info.SizeInChunk));
-            EditorGUILayout.LabelField($"Alignment", FormattingUtility.BytesToString((ulong)desc.info.AlignmentInBytes));
-            EditorGUILayout.LabelField($"Alignment in Chunk", FormattingUtility.BytesToString((ulong)desc.info.AlignmentInChunkInBytes));
-
+            EditorGUILayout.LabelField(
+                $"Alignment",
+                FormattingUtility.BytesToString((ulong)desc.info.AlignmentInBytes)
+            );
+            EditorGUILayout.LabelField(
+                $"Alignment in Chunk",
+                FormattingUtility.BytesToString((ulong)desc.info.AlignmentInChunkInBytes)
+            );
 
             EditorGUIUtility.labelWidth = oldWidth;
         }
@@ -163,23 +170,18 @@ namespace Unity.Entities.Editor
                     {
                         SelectItem(items[0], null);
                     },
-                    closeWindowAfterExecution = false
-                }
-
+                    closeWindowAfterExecution = false,
+                },
             };
         }
 
         static void SelectItem(SearchItem item, SearchContext ctx)
         {
             var data = (ComponentTypeDescriptor)item.data;
-            SelectionUtility.ShowInInspector(new ComponentContentProvider
-            {
-                ComponentType = data.info.Type
-            }, new InspectorContentParameters
-            {
-                ApplyInspectorStyling = false,
-                UseDefaultMargins = false
-            });
+            SelectionUtility.ShowInInspector(
+                new ComponentContentProvider { ComponentType = data.info.Type },
+                new InspectorContentParameters { ApplyInspectorStyling = false, UseDefaultMargins = false }
+            );
         }
 
         [SearchItemProvider]
@@ -210,7 +212,7 @@ namespace Unity.Entities.Editor
                     wrapper.item = item;
                     wrapper.objItem = (ComponentTypeDescriptor)item.data;
                     return wrapper;
-                }
+                },
             };
             SearchBridge.SetTableConfig(p, GetDefaultTableConfig);
             return p;
@@ -225,16 +227,26 @@ namespace Unity.Entities.Editor
                 {
                     switch (column.selector)
                     {
-                        case "category": return data.category.ToString();
-                        case "typeindex": return data.info.TypeIndex.Value;
-                        case "capacity": return data.info.BufferCapacity;
-                        case "hasblobassetrefs": return data.info.HasBlobAssetRefs;
-                        case "hasweakassetrefs": return data.info.HasWeakAssetRefs;
-                        case "haswritegroups": return data.info.HasWriteGroups;
-                        case "sizeinchunk": return data.info.SizeInChunk;
-                        case "typesize": return data.info.TypeSize;
-                        case "bakingonlytype": return data.info.BakingOnlyType;
-                        case "temporarybakingtype": return data.info.TemporaryBakingType;
+                        case "category":
+                            return data.category.ToString();
+                        case "typeindex":
+                            return data.info.TypeIndex.Value;
+                        case "capacity":
+                            return data.info.BufferCapacity;
+                        case "hasblobassetrefs":
+                            return data.info.HasBlobAssetRefs;
+                        case "hasweakassetrefs":
+                            return data.info.HasWeakAssetRefs;
+                        case "haswritegroups":
+                            return data.info.HasWriteGroups;
+                        case "sizeinchunk":
+                            return data.info.SizeInChunk;
+                        case "typesize":
+                            return data.info.TypeSize;
+                        case "bakingonlytype":
+                            return data.info.BakingOnlyType;
+                        case "temporarybakingtype":
+                            return data.info.TemporaryBakingType;
                     }
                 }
 
@@ -255,37 +267,91 @@ namespace Unity.Entities.Editor
             s_QueryEngine.SetSearchDataCallback(GetWords);
 
             SearchBridge.SetFilter(s_QueryEngine, "category", data => data.category);
-            SearchBridge.SetFilter(s_QueryEngine, "capacity", data => data.info.BufferCapacity)
-                .AddOrUpdateProposition(category: null, label: "Capacity", replacement: "capacity>1024", help: "Search Components by Buffer Capacity");
-            SearchBridge.SetFilter(s_QueryEngine, "index", data => data.info.TypeIndex.Value)
-                .AddOrUpdateProposition(category: null, label: "Type Index", replacement: "index=839002", help: "Search Components by Type Index");
-            SearchBridge.SetFilter(s_QueryEngine, "hasblobassetrefs", data => data.info.HasBlobAssetRefs)
-                .AddOrUpdateProposition(category: null, label: "HasBlobAssetRefs", replacement: "hasblobassetrefs=true", help: "Search Components with BlobAssetRefs");
-            SearchBridge.SetFilter(s_QueryEngine, "hasweakassetrefs", data => data.info.HasWeakAssetRefs)
-                .AddOrUpdateProposition(category: null, label: "HasWeakAssetRefs", replacement: "hasweakassetrefs=true", help: "Search Components with WeakAssetRefs");
-            SearchBridge.SetFilter(s_QueryEngine, "haswritegroups", data => data.info.HasWriteGroups)
-                .AddOrUpdateProposition(category: null, label: "HasWriteGroups", replacement: "haswritegroups=true", help: "Search Components with WriteGroups");
-            SearchBridge.SetFilter(s_QueryEngine, "iszerosized", data => data.info.IsZeroSized)
-                .AddOrUpdateProposition(category: null, label: "IsZeroSized", replacement: "iszerosized=true", help: "Search Components with size of zero");
-            SearchBridge.SetFilter(s_QueryEngine, "sizeinchunk", data => data.info.SizeInChunk)
-                .AddOrUpdateProposition(category: null, label: "SizeInChunk", replacement: "sizeinchunk>1024", help: "Search Components with chunk size");
-            SearchBridge.SetFilter(s_QueryEngine, "typesize", data => data.info.TypeSize)
-                .AddOrUpdateProposition(category: null, label: "TypeSize", replacement: "typesize>1024", help: "Search Components with size");
-            SearchBridge.SetFilter(s_QueryEngine, "bakingonlytype", data => data.info.BakingOnlyType)
-                .AddOrUpdateProposition(category: null, label: "BakingOnlyType", replacement: "bakingonlytype=true", help: "Search Components that are used only in Baking");
-            SearchBridge.SetFilter(s_QueryEngine, "temporarybakingtype", data => data.info.TemporaryBakingType)
-                .AddOrUpdateProposition(category: null, label: "TemporaryBakingType", replacement: "temporarybakingtype=true", help: "Search Components that are used temporarily in Baking");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "capacity", data => data.info.BufferCapacity)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Capacity",
+                    replacement: "capacity>1024",
+                    help: "Search Components by Buffer Capacity"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "index", data => data.info.TypeIndex.Value)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Type Index",
+                    replacement: "index=839002",
+                    help: "Search Components by Type Index"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "hasblobassetrefs", data => data.info.HasBlobAssetRefs)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "HasBlobAssetRefs",
+                    replacement: "hasblobassetrefs=true",
+                    help: "Search Components with BlobAssetRefs"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "hasweakassetrefs", data => data.info.HasWeakAssetRefs)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "HasWeakAssetRefs",
+                    replacement: "hasweakassetrefs=true",
+                    help: "Search Components with WeakAssetRefs"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "haswritegroups", data => data.info.HasWriteGroups)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "HasWriteGroups",
+                    replacement: "haswritegroups=true",
+                    help: "Search Components with WriteGroups"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "iszerosized", data => data.info.IsZeroSized)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "IsZeroSized",
+                    replacement: "iszerosized=true",
+                    help: "Search Components with size of zero"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "sizeinchunk", data => data.info.SizeInChunk)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "SizeInChunk",
+                    replacement: "sizeinchunk>1024",
+                    help: "Search Components with chunk size"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "typesize", data => data.info.TypeSize)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "TypeSize",
+                    replacement: "typesize>1024",
+                    help: "Search Components with size"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "bakingonlytype", data => data.info.BakingOnlyType)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "BakingOnlyType",
+                    replacement: "bakingonlytype=true",
+                    help: "Search Components that are used only in Baking"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "temporarybakingtype", data => data.info.TemporaryBakingType)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "TemporaryBakingType",
+                    replacement: "temporarybakingtype=true",
+                    help: "Search Components that are used temporarily in Baking"
+                );
         }
 
-        static void OnEnable()
-        {
+        static void OnEnable() { }
 
-        }
-
-        static void OnDisable()
-        {
-
-        }
+        static void OnDisable() { }
 
         static SearchTable GetDefaultTableConfig(SearchContext context)
         {
@@ -338,7 +404,15 @@ namespace Unity.Entities.Editor
             var score = 0;
             foreach (var data in results)
             {
-                var item = provider.CreateItem(context, data.info.GetHashCode().ToString(), score++, data.displayName, data.category.ToString(), data.icon, data);
+                var item = provider.CreateItem(
+                    context,
+                    data.info.GetHashCode().ToString(),
+                    score++,
+                    data.displayName,
+                    data.category.ToString(),
+                    data.icon,
+                    data
+                );
                 yield return item;
             }
         }

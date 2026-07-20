@@ -8,8 +8,9 @@ namespace Unity.Entities.Editor.Inspectors
     [UsedImplicitly]
     class EntityGuidInspector : PropertyInspector<EntityGuid>
     {
-        static readonly string k_OriginatingIdName =
-            ObjectNames.NicifyVariableName(nameof(EntityGuid.OriginatingEntityId));
+        static readonly string k_OriginatingIdName = ObjectNames.NicifyVariableName(
+            nameof(EntityGuid.OriginatingEntityId)
+        );
 
         static readonly string k_SerialName = ObjectNames.NicifyVariableName(nameof(EntityGuid.Serial));
 

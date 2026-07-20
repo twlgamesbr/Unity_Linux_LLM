@@ -20,11 +20,14 @@ namespace UnityEngine.TestTools.Utils
         /// <summary>
         /// A comparer instance with the default error value set to 0.0001f.
         ///</summary>
-        public static Vector2EqualityComparer Instance { get { return m_Instance; } }
-
-        private Vector2EqualityComparer() : this(k_DefaultError)
+        public static Vector2EqualityComparer Instance
         {
+            get { return m_Instance; }
         }
+
+        private Vector2EqualityComparer()
+            : this(k_DefaultError) { }
+
         /// <summary>
         /// Initializes an instance of Vector2Equality comparer with custom allowed calculation error.
         /// </summary>
@@ -67,8 +70,8 @@ namespace UnityEngine.TestTools.Utils
         /// </example>
         public bool Equals(Vector2 expected, Vector2 actual)
         {
-            return Utils.AreFloatsEqual(expected.x, actual.x, AllowedError) &&
-                Utils.AreFloatsEqual(expected.y, actual.y, AllowedError);
+            return Utils.AreFloatsEqual(expected.x, actual.x, AllowedError)
+                && Utils.AreFloatsEqual(expected.y, actual.y, AllowedError);
         }
 
         /// <summary>

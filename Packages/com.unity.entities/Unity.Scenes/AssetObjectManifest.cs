@@ -1,18 +1,18 @@
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Entities.Serialization;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using Unity.Entities.Serialization;
 
 namespace Unity.Scenes
 {
     internal class AssetObjectManifest : ScriptableObject
     {
         public RuntimeGlobalObjectId[] GlobalObjectIds;
-        public Object[]                Objects;
+        public Object[] Objects;
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     internal class AssetObjectManifestBuilder
     {
         public static unsafe void BuildManifest(GUID guid, AssetObjectManifest manifest)
@@ -29,12 +29,12 @@ namespace Unity.Scenes
 
             GlobalObjectId.GetGlobalObjectIdsSlow(objects, globalobjectIds);
 
-            fixed(GlobalObjectId* src = globalobjectIds)
-            fixed(RuntimeGlobalObjectId * dst = manifest.GlobalObjectIds)
+            fixed (GlobalObjectId* src = globalobjectIds)
+            fixed (RuntimeGlobalObjectId* dst = manifest.GlobalObjectIds)
             {
                 UnsafeUtility.MemCpy(dst, src, UnsafeUtility.SizeOf<RuntimeGlobalObjectId>() * objects.Length);
             }
         }
     }
-    #endif
+#endif
 }

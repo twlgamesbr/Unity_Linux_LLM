@@ -17,9 +17,8 @@ namespace UnityEditor.SettingsManagement
         /// </summary>
         /// <param name="package">The name of the package to store the serialized data under.</param>
         /// <param name="name">The base filename to use for the serialized data location.</param>
-        public PackageSettingsRepository(string package, string name) : base(GetSettingsPath(package, name))
-        {
-        }
+        public PackageSettingsRepository(string package, string name)
+            : base(GetSettingsPath(package, name)) { }
 
         // Cannot call FindFromAssembly from a constructor or field initializer
         //        static string CreateSettingsPath(Assembly assembly, string name)

@@ -29,7 +29,10 @@ namespace UnityEngine.InputSystem.Editor
 
                 case InputSettings.InputActionPropertyDrawerMode.MultilineEffective:
                 case InputSettings.InputActionPropertyDrawerMode.MultilineBoth:
-                    return GetMultilineHeight(property, drawerMode == InputSettings.InputActionPropertyDrawerMode.MultilineEffective);
+                    return GetMultilineHeight(
+                        property,
+                        drawerMode == InputSettings.InputActionPropertyDrawerMode.MultilineEffective
+                    );
             }
         }
 
@@ -52,7 +55,12 @@ namespace UnityEngine.InputSystem.Editor
 
                 case InputSettings.InputActionPropertyDrawerMode.MultilineEffective:
                 case InputSettings.InputActionPropertyDrawerMode.MultilineBoth:
-                    DrawMultilineGUI(position, property, label, drawerMode == InputSettings.InputActionPropertyDrawerMode.MultilineEffective);
+                    DrawMultilineGUI(
+                        position,
+                        property,
+                        label,
+                        drawerMode == InputSettings.InputActionPropertyDrawerMode.MultilineEffective
+                    );
                     break;
             }
 
@@ -62,7 +70,9 @@ namespace UnityEngine.InputSystem.Editor
         static float GetCompactHeight(SerializedProperty property)
         {
             var useReference = property.FindPropertyRelative("m_UseReference");
-            var effectiveProperty = useReference.boolValue ? property.FindPropertyRelative("m_Reference") : property.FindPropertyRelative("m_Action");
+            var effectiveProperty = useReference.boolValue
+                ? property.FindPropertyRelative("m_Reference")
+                : property.FindPropertyRelative("m_Action");
             return EditorGUI.GetPropertyHeight(effectiveProperty);
         }
 
@@ -98,7 +108,9 @@ namespace UnityEngine.InputSystem.Editor
             position = EditorGUI.PrefixLabel(position, label);
 
             var useReference = property.FindPropertyRelative("m_UseReference");
-            var effectiveProperty = useReference.boolValue ? property.FindPropertyRelative("m_Reference") : property.FindPropertyRelative("m_Action");
+            var effectiveProperty = useReference.boolValue
+                ? property.FindPropertyRelative("m_Reference")
+                : property.FindPropertyRelative("m_Action");
 
             // Calculate rect for configuration button
             var buttonRect = position;
@@ -117,7 +129,12 @@ namespace UnityEngine.InputSystem.Editor
             EditorGUI.BeginProperty(buttonRect, GUIContent.none, useReference);
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                var newPopupIndex = EditorGUI.Popup(buttonRect, GetCompactPopupIndex(useReference), Contents.compactPopupOptions, popupStyle);
+                var newPopupIndex = EditorGUI.Popup(
+                    buttonRect,
+                    GetCompactPopupIndex(useReference),
+                    Contents.compactPopupOptions,
+                    popupStyle
+                );
                 if (check.changed)
                     useReference.boolValue = IsUseReference(newPopupIndex);
             }
@@ -129,7 +146,12 @@ namespace UnityEngine.InputSystem.Editor
             EditorGUI.indentLevel = indent;
         }
 
-        static void DrawMultilineGUI(Rect position, SerializedProperty property, GUIContent label, bool showEffectiveOnly)
+        static void DrawMultilineGUI(
+            Rect position,
+            SerializedProperty property,
+            GUIContent label,
+            bool showEffectiveOnly
+        )
         {
             const float kIndent = 15f;
 
@@ -146,7 +168,8 @@ namespace UnityEngine.InputSystem.Editor
             var firstValueRect = position;
             firstValueRect.x += kIndent;
             firstValueRect.width -= kIndent;
-            firstValueRect.y += (titleRect.height + useReferenceToggleRect.height) + (EditorGUIUtility.standardVerticalSpacing * 2f);
+            firstValueRect.y +=
+                (titleRect.height + useReferenceToggleRect.height) + (EditorGUIUtility.standardVerticalSpacing * 2f);
 
             var reference = property.FindPropertyRelative("m_Reference");
             var action = property.FindPropertyRelative("m_Action");
@@ -180,6 +203,7 @@ namespace UnityEngine.InputSystem.Editor
         // 0 == Use Reference, 1 == Use Action
         // Keep synced with Contents.compactPopupOptions.
         static int GetCompactPopupIndex(SerializedProperty useReference) => useReference.boolValue ? 0 : 1;
+
         static bool IsUseReference(int index) => index == 0;
 
         static class Contents
@@ -191,7 +215,10 @@ namespace UnityEngine.InputSystem.Editor
 
         static class Styles
         {
-            public static readonly GUIStyle popup = new GUIStyle("PaneOptions") { imagePosition = ImagePosition.ImageOnly };
+            public static readonly GUIStyle popup = new GUIStyle("PaneOptions")
+            {
+                imagePosition = ImagePosition.ImageOnly,
+            };
         }
     }
 }

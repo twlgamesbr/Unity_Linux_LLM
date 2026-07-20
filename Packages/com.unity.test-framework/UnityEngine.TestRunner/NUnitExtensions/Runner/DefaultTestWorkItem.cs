@@ -15,6 +15,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
     internal class DefaultTestWorkItem : UnityWorkItem
     {
         private TestCommand _command;
+
         public DefaultTestWorkItem(TestMethod test, ITestFilter filter)
             : base(test, null)
         {

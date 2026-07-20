@@ -33,9 +33,11 @@ namespace Unity.Entities
                 var mask = JobsUtility.CacheLineSize - 1;
                 var bytes = (block.Bytes + mask) & ~mask;
 
-                if(m_next + bytes > m_bytes)
+                if (m_next + bytes > m_bytes)
                 {
-                    throw new InvalidOperationException($"ScratchpadAllocator: Request {block.Bytes} bytes on top of current {m_next} bytes which exceeds max available {m_bytes}.");
+                    throw new InvalidOperationException(
+                        $"ScratchpadAllocator: Request {block.Bytes} bytes on top of current {m_next} bytes which exceeds max available {m_bytes}."
+                    );
                 }
 
                 m_next += (int)bytes;
@@ -87,27 +89,40 @@ namespace Unity.Entities
         /// global table, for times when a reference to the allocator object isn't available.
         /// </summary>
         /// <value>The AllocatorHandle retrieved.</value>
-        public AllocatorManager.AllocatorHandle Handle { get { return m_handle; } set { m_handle = value; } }
+        public AllocatorManager.AllocatorHandle Handle
+        {
+            get { return m_handle; }
+            set { m_handle = value; }
+        }
 
         /// <summary>
         /// Retrieve the Allocator associated with this allocator handle.
         /// </summary>
         /// <value>The Allocator retrieved.</value>
-        public Allocator ToAllocator { get { return m_handle.ToAllocator; } }
+        public Allocator ToAllocator
+        {
+            get { return m_handle.ToAllocator; }
+        }
 
         /// <summary>
         /// Check whether this allocator is a custom allocator.
         /// </summary>
         /// <remarks>The AllocatorHandle is a custom allocator if its Index is larger or equal to `FirstUserIndex`.</remarks>
         /// <value>True if this AllocatorHandle is a custom allocator.</value>
-        public bool IsCustomAllocator { get { return m_handle.IsCustomAllocator; } }
+        public bool IsCustomAllocator
+        {
+            get { return m_handle.IsCustomAllocator; }
+        }
 
         /// <summary>
         /// Check whether this allocator will automatically dispose allocations.
         /// </summary>
         /// <remarks>Allocations made by Scrachpad allocator are automatically disposed.</remarks>
         /// <value>Always true</value>
-        public bool IsAutoDispose { get { return true; } }
+        public bool IsAutoDispose
+        {
+            get { return true; }
+        }
 
         /// <summary>
         /// Dispose the allocator.
@@ -139,20 +154,21 @@ namespace Unity.Entities
         }
 
         /// <summary>
-        /// Allocate a NativeArray of type T from memory that's guaranteed to 
+        /// Allocate a NativeArray of type T from memory that's guaranteed to
         /// remain valid until <see cref="Rewind"/> is called on the Scratchpad.
         /// </summary>
         /// <remarks>
-        /// This memory isn't shared between threads and you don't need to Dispose 
-        /// the NativeArray so it's allocated. You can't Dispose the memory to free 
+        /// This memory isn't shared between threads and you don't need to Dispose
+        /// the NativeArray so it's allocated. You can't Dispose the memory to free
         /// it: it's automatically freed when <see cref="Rewind"/> is called.
         /// </remarks>
         /// <param name="length">The number of items in the NativeArray.</param>
         /// <typeparam name="T">The NativeArray.</typeparam>
         /// <returns>Returns the NativeArray.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public NativeArray<T> AllocateNativeArray<T>(int length) where T : unmanaged
-        { 
+        public NativeArray<T> AllocateNativeArray<T>(int length)
+            where T : unmanaged
+        {
             unsafe
             {
                 var container = new NativeArray<T>();
@@ -163,7 +179,10 @@ namespace Unity.Entities
                 container.m_MinIndex = 0;
                 container.m_MaxIndex = length - 1;
                 container.m_Safety = CollectionHelper.CreateSafetyHandle(ToAllocator);
-                CollectionHelper.SetStaticSafetyId<NativeArray<T>>(ref container.m_Safety, ref NativeArrayExtensions.NativeArrayStaticId<T>.s_staticSafetyId.Data);
+                CollectionHelper.SetStaticSafetyId<NativeArray<T>>(
+                    ref container.m_Safety,
+                    ref NativeArrayExtensions.NativeArrayStaticId<T>.s_staticSafetyId.Data
+                );
                 Handle.AddSafetyHandle(container.m_Safety);
 #endif
                 return container;
@@ -171,11 +190,11 @@ namespace Unity.Entities
         }
 
         /// <summary>
-        /// Allocate a NativeList of type T from memory that's guaranteed to 
+        /// Allocate a NativeList of type T from memory that's guaranteed to
         /// remain valid until <see cref="Rewind"/> is called on the Scratchpad.
         /// </summary>
         /// <remarks>
-        /// This memory isn't shared between threads and you don't need to Dispose 
+        /// This memory isn't shared between threads and you don't need to Dispose
         /// the NativeList so it's allocated. You can't Dispose the memory to free
         /// it: it's automatically freed when <see cref="Rewind"/> is called.
         /// </remarks>
@@ -183,7 +202,8 @@ namespace Unity.Entities
         /// <param name="capacity">The number of items the list can hold.</param>
         /// <returns>Returns the NativeList</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public NativeList<T> AllocateNativeList<T>(int capacity) where T : unmanaged
+        public NativeList<T> AllocateNativeList<T>(int capacity)
+            where T : unmanaged
         {
             unsafe
             {
@@ -195,7 +215,10 @@ namespace Unity.Entities
                 container.m_ListData->Allocator = Handle;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 container.m_Safety = CollectionHelper.CreateSafetyHandle(ToAllocator);
-                CollectionHelper.SetStaticSafetyId<NativeList<T>>(ref container.m_Safety, ref NativeList<T>.s_staticSafetyId.Data);
+                CollectionHelper.SetStaticSafetyId<NativeList<T>>(
+                    ref container.m_Safety,
+                    ref NativeList<T>.s_staticSafetyId.Data
+                );
                 AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(container.m_Safety, true);
                 Handle.AddSafetyHandle(container.m_Safety);
 #endif
@@ -203,7 +226,6 @@ namespace Unity.Entities
             }
         }
     };
-
 
     /// <summary>
     /// A scratch pad that contains multiple scratch pad allocators.  User can can get a scratch pad allocator from the pad
@@ -250,7 +272,12 @@ namespace Unity.Entities
         /// <param name="numScratchpadAllocators">The number of ScratchpadAllocators the created Scratchpad should contain.</param>
         /// <param name="initialSizeInBytes">The initial size of the Scratchpad in bytes. Set to 32,768 by default.</param>
         [ExcludeFromBurstCompatTesting("Accesses managed delegates")]
-        public Scratchpad(int numScratchpadAllocators, int initialSizeInBytes = 32768, bool isGlobal = false, int globalIndex = 0)
+        public Scratchpad(
+            int numScratchpadAllocators,
+            int initialSizeInBytes = 32768,
+            bool isGlobal = false,
+            int globalIndex = 0
+        )
         {
             this = default;
             Initialize(numScratchpadAllocators, initialSizeInBytes, isGlobal, globalIndex);
@@ -264,17 +291,29 @@ namespace Unity.Entities
         /// <param name="globalIndex">Base index into the global function table of the allocator to be created.</param>
         /// <param name="initialSizeInBytes">The initial size of the Scratchpad in bytes. Set to 32,768 by default.</param>
         [ExcludeFromBurstCompatTesting("Accesses managed delegate")]
-        public void Initialize(int numScratchpadAllocators, int initialSizeInBytes = 32768, bool isGlobal = false, int globalIndex = 0)
+        public void Initialize(
+            int numScratchpadAllocators,
+            int initialSizeInBytes = 32768,
+            bool isGlobal = false,
+            int globalIndex = 0
+        )
         {
             m_numAllocatorHelpers = numScratchpadAllocators;
 
-            m_allocatorHelpers = (AllocatorHelper<ScratchpadAllocator>*)Memory.Unmanaged.Allocate(sizeof(AllocatorHelper<ScratchpadAllocator>) * m_numAllocatorHelpers,
-                                                                                                        JobsUtility.CacheLineSize,
-                                                                                                        Allocator.Persistent);
+            m_allocatorHelpers = (AllocatorHelper<ScratchpadAllocator>*)
+                Memory.Unmanaged.Allocate(
+                    sizeof(AllocatorHelper<ScratchpadAllocator>) * m_numAllocatorHelpers,
+                    JobsUtility.CacheLineSize,
+                    Allocator.Persistent
+                );
 
             for (var i = 0; i < m_numAllocatorHelpers; i++)
             {
-                m_allocatorHelpers[i] = new AllocatorHelper<ScratchpadAllocator>(Allocator.Persistent, isGlobal, globalIndex + i);
+                m_allocatorHelpers[i] = new AllocatorHelper<ScratchpadAllocator>(
+                    Allocator.Persistent,
+                    isGlobal,
+                    globalIndex + i
+                );
                 m_allocatorHelpers[i].Allocator.Initialize(initialSizeInBytes);
             }
         }
@@ -327,7 +366,10 @@ namespace Unity.Entities
         /// <summary>
         /// A flag indicating whether the global scratchpad is initialized.
         /// </summary>
-        internal static readonly SharedStatic<byte> IsInstalled = SharedStatic<byte>.GetOrCreate<GlobalScratchpad, byte>();
+        internal static readonly SharedStatic<byte> IsInstalled = SharedStatic<byte>.GetOrCreate<
+            GlobalScratchpad,
+            byte
+        >();
 
         /// <summary>
         /// A thread index which is used to for each individual thread to its scratchpad allocator.
@@ -337,7 +379,10 @@ namespace Unity.Entities
         /// <summary>
         /// A shared static to hold the global scratchpad allocators.
         /// </summary>
-        internal static readonly SharedStatic<Scratchpad> Pad = SharedStatic<Scratchpad>.GetOrCreate<GlobalScratchpad, Scratchpad>();
+        internal static readonly SharedStatic<Scratchpad> Pad = SharedStatic<Scratchpad>.GetOrCreate<
+            GlobalScratchpad,
+            Scratchpad
+        >();
 
         /// <summary>
         /// Initialize the global scratchpad, create and register all the global scratchpad allocators.

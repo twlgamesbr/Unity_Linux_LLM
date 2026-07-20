@@ -34,9 +34,13 @@ namespace Unity.Entities.Editor
             public int Count => m_Entities.Length;
             public bool IsReadOnly => true;
             public bool IsFixedSize => true;
+
             public bool Contains(EntitiesJournaling.EntityView item) => m_Entities.Contains(item);
+
             public bool Contains(object value) => Contains((EntitiesJournaling.EntityView)value);
+
             public int IndexOf(EntitiesJournaling.EntityView item) => m_Entities.IndexOf(item);
+
             public int IndexOf(object value) => IndexOf((EntitiesJournaling.EntityView)value);
 
             public void CopyTo(EntitiesJournaling.EntityView[] array, int startIndex)
@@ -52,18 +56,29 @@ namespace Unity.Entities.Editor
             }
 
             public EntityViewArray.Enumerator GetEnumerator() => m_Entities.GetEnumerator();
-            IEnumerator<EntitiesJournaling.EntityView> IEnumerable<EntitiesJournaling.EntityView>.GetEnumerator() => m_Entities.GetEnumerator();
+
+            IEnumerator<EntitiesJournaling.EntityView> IEnumerable<EntitiesJournaling.EntityView>.GetEnumerator() =>
+                m_Entities.GetEnumerator();
+
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public bool IsSynchronized => throw new NotSupportedException();
             public object SyncRoot => throw new NotSupportedException();
+
             public void Add(EntitiesJournaling.EntityView item) => throw new NotSupportedException();
+
             public int Add(object value) => throw new NotSupportedException();
+
             public void Clear() => throw new NotSupportedException();
+
             public void Insert(int index, EntitiesJournaling.EntityView item) => throw new NotSupportedException();
+
             public void Insert(int index, object value) => throw new NotSupportedException();
+
             public bool Remove(EntitiesJournaling.EntityView item) => throw new NotSupportedException();
+
             public void Remove(object value) => throw new NotSupportedException();
+
             public void RemoveAt(int index) => throw new NotSupportedException();
         }
     }

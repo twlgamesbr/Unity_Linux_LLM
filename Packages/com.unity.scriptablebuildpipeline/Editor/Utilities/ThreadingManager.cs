@@ -10,7 +10,7 @@ static class ThreadingManager
         SaveQueue,
         UploadQueue,
         PruneQueue,
-        TotalQueues
+        TotalQueues,
     }
 
     static Task[] m_Tasks = new Task[(int)ThreadQueues.TotalQueues];
@@ -38,7 +38,13 @@ static class ThreadingManager
             var tasks = m_Tasks.Where(x => x != null).ToArray();
             m_Tasks = new Task[(int)ThreadQueues.TotalQueues];
             if (tasks.Length > 0)
-                task = Task.WhenAll(tasks).ContinueWith(delegate { action.Invoke(state); });
+                task = Task.WhenAll(tasks)
+                    .ContinueWith(
+                        delegate
+                        {
+                            action.Invoke(state);
+                        }
+                    );
             else
                 task = Task.Factory.StartNew(action, state);
         }
@@ -47,12 +53,22 @@ static class ThreadingManager
             // New Upload or Save tasks need to be done after any queued prune tasks
             var pruneTask = m_Tasks[(int)ThreadQueues.PruneQueue];
             if (pruneTask != null)
-                task = pruneTask.ContinueWith(delegate { action.Invoke(state); });
+                task = pruneTask.ContinueWith(
+                    delegate
+                    {
+                        action.Invoke(state);
+                    }
+                );
             else
                 task = Task.Factory.StartNew(action, state);
         }
         else
-            task = task.ContinueWith(delegate { action.Invoke(state); });
+            task = task.ContinueWith(
+                delegate
+                {
+                    action.Invoke(state);
+                }
+            );
         m_Tasks[(int)queue] = task;
     }
 }

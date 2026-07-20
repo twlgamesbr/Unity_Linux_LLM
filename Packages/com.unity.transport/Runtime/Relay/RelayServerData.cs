@@ -65,7 +65,7 @@ namespace Unity.Networking.Transport.Relay
 
             HostString = default;
 
-            fixed(byte* hmacPtr = HMAC)
+            fixed (byte* hmacPtr = HMAC)
             {
                 ComputeBindHMAC(hmacPtr, Nonce, ref ConnectionData, ref HMACKey);
             }
@@ -87,8 +87,16 @@ namespace Unity.Networking.Transport.Relay
         /// <param name="key">HMAC signature of the allocation.</param>
         /// <param name="isSecure">Whether the Relay connection is to be secured or not.</param>
         /// <param name="isWebSocket">Whether the Relay connection is using WebSockets or not.</param>
-        public RelayServerData(string host, ushort port, byte[] allocationId, byte[] connectionData,
-                               byte[] hostConnectionData, byte[] key, bool isSecure, bool isWebSocket)
+        public RelayServerData(
+            string host,
+            ushort port,
+            byte[] allocationId,
+            byte[] connectionData,
+            byte[] hostConnectionData,
+            byte[] key,
+            bool isSecure,
+            bool isWebSocket
+        )
             : this(allocationId, connectionData, hostConnectionData, key)
         {
             Endpoint = HostToEndpoint(host, port);
@@ -99,10 +107,16 @@ namespace Unity.Networking.Transport.Relay
 
         // Keeping this WebSocket-less version around to avoid breaking the API...
         /// <inheritdoc cref="RelayServerData(string, ushort, byte[], byte[], byte[], byte[], bool, bool)"/>
-        public RelayServerData(string host, ushort port, byte[] allocationId, byte[] connectionData,
-                               byte[] hostConnectionData, byte[] key, bool isSecure)
-            : this(host, port, allocationId, connectionData, hostConnectionData, key, isSecure, false)
-        {}
+        public RelayServerData(
+            string host,
+            ushort port,
+            byte[] allocationId,
+            byte[] connectionData,
+            byte[] hostConnectionData,
+            byte[] key,
+            bool isSecure
+        )
+            : this(host, port, allocationId, connectionData, hostConnectionData, key, isSecure, false) { }
 
         /// <summary>Create a new Relay server data structure (low-level constructor).</summary>
         /// <param name="endpoint">Endpoint of the Relay server.</param>
@@ -113,9 +127,16 @@ namespace Unity.Networking.Transport.Relay
         /// <param name="key">HMAC signature of the allocation.</param>
         /// <param name="isSecure">Whether the Relay connection is to be secured or not.</param>
         /// <param name="isWebSocket">Whether the Relay connection is using WebSockets or not.</param>
-        public RelayServerData(ref NetworkEndpoint endpoint, ushort nonce, ref RelayAllocationId allocationId,
-                               ref RelayConnectionData connectionData, ref RelayConnectionData hostConnectionData,
-                               ref RelayHMACKey key, bool isSecure, bool isWebSocket)
+        public RelayServerData(
+            ref NetworkEndpoint endpoint,
+            ushort nonce,
+            ref RelayAllocationId allocationId,
+            ref RelayConnectionData connectionData,
+            ref RelayConnectionData hostConnectionData,
+            ref RelayHMACKey key,
+            bool isSecure,
+            bool isWebSocket
+        )
         {
             Endpoint = endpoint;
             Nonce = nonce;
@@ -127,7 +148,7 @@ namespace Unity.Networking.Transport.Relay
             IsSecure = isSecure ? (byte)1 : (byte)0;
             IsWebSocket = isWebSocket ? (byte)1 : (byte)0;
 
-            fixed(byte* hmacPtr = HMAC)
+            fixed (byte* hmacPtr = HMAC)
             {
                 ComputeBindHMAC(hmacPtr, Nonce, ref connectionData, ref key);
             }
@@ -137,29 +158,48 @@ namespace Unity.Networking.Transport.Relay
 
         // Keeping this WebSocket-less version around to avoid breaking the API...
         /// <inheritdoc cref="RelayServerData(ref NetworkEndpont, ushort, ref RelayAllocationId, ref RelayConnectionData, ref RelayConnectionData, ref RelayHMACKey, bool, bool)"/>
-        public RelayServerData(ref NetworkEndpoint endpoint, ushort nonce, ref RelayAllocationId allocationId,
-                               ref RelayConnectionData connectionData, ref RelayConnectionData hostConnectionData,
-                               ref RelayHMACKey key, bool isSecure)
-            : this(ref endpoint, nonce, ref allocationId, ref connectionData, ref hostConnectionData, ref key, isSecure, false)
-        {}
+        public RelayServerData(
+            ref NetworkEndpoint endpoint,
+            ushort nonce,
+            ref RelayAllocationId allocationId,
+            ref RelayConnectionData connectionData,
+            ref RelayConnectionData hostConnectionData,
+            ref RelayHMACKey key,
+            bool isSecure
+        )
+            : this(
+                ref endpoint,
+                nonce,
+                ref allocationId,
+                ref connectionData,
+                ref hostConnectionData,
+                ref key,
+                isSecure,
+                false
+            ) { }
 
         /// <summary>Increment the nonce and recompute the HMAC.</summary>
         public void IncrementNonce()
         {
             Nonce++;
 
-            fixed(byte* hmacPtr = HMAC)
+            fixed (byte* hmacPtr = HMAC)
             {
                 ComputeBindHMAC(hmacPtr, Nonce, ref ConnectionData, ref HMACKey);
             }
         }
 
-        private static void ComputeBindHMAC(byte* result, ushort nonce, ref RelayConnectionData connectionData, ref RelayHMACKey key)
+        private static void ComputeBindHMAC(
+            byte* result,
+            ushort nonce,
+            ref RelayConnectionData connectionData,
+            ref RelayHMACKey key
+        )
         {
             const int keyArrayLength = 64;
             var keyArray = stackalloc byte[keyArrayLength];
 
-            fixed(byte* keyValue = &key.Value[0])
+            fixed (byte* keyValue = &key.Value[0])
             {
                 UnsafeUtility.MemCpy(keyArray, keyValue, keyArrayLength);
 
@@ -174,7 +214,7 @@ namespace Unity.Networking.Transport.Relay
                 messageBytes[6] = (byte)(nonce >> 8);
                 messageBytes[7] = 255;
 
-                fixed(byte* connValue = &connectionData.Value[0])
+                fixed (byte* connValue = &connectionData.Value[0])
                 {
                     UnsafeUtility.MemCpy(messageBytes + 8, connValue, 255);
                 }

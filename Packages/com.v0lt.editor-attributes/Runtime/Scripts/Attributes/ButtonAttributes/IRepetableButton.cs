@@ -1,9 +1,9 @@
 namespace EditorAttributes
 {
-	public interface IRepetableButton
+    public interface IRepetableButton
     {
-		public bool IsRepetable { get; }
-		public long PressDelay { get; }
-		public long RepetitionInterval { get; }
-	}
+        public bool IsRepetable { get; }
+        public long PressDelay { get; }
+        public long RepetitionInterval { get; }
+    }
 }

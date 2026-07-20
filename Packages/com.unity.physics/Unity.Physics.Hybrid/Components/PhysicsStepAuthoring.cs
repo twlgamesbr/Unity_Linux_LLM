@@ -1,6 +1,6 @@
-using UnityEngine;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 using static Unity.Physics.PhysicsStep;
 
 namespace Unity.Physics.Authoring
@@ -14,7 +14,7 @@ namespace Unity.Physics.Authoring
     [HelpURL(HelpURLs.PhysicsStepAuthoring)]
     public sealed class PhysicsStepAuthoring : MonoBehaviour
     {
-        PhysicsStepAuthoring() {}
+        PhysicsStepAuthoring() { }
 
         /// <summary>
         ///     Specifies the type of physics engine to be used.
@@ -24,6 +24,7 @@ namespace Unity.Physics.Authoring
             get => m_SimulationType;
             set => m_SimulationType = value;
         }
+
         [SerializeField]
         [Tooltip("Specifies the type of physics engine to be used.")]
         SimulationType m_SimulationType = Default.SimulationType;
@@ -36,6 +37,7 @@ namespace Unity.Physics.Authoring
             get => m_Gravity;
             set => m_Gravity = value;
         }
+
         [SerializeField]
         [Tooltip("Specifies the amount of gravity present in the physics simulation.")]
         float3 m_Gravity = Default.Gravity;
@@ -49,9 +51,12 @@ namespace Unity.Physics.Authoring
             get => m_EnableGyroscopicTorque;
             set => m_EnableGyroscopicTorque = value;
         }
+
         [SerializeField]
-        [Tooltip("Enables simulation of gyroscopic torque which increases the realism of the simulation and enhances " +
-            "the stability of rotating dynamic bodies.")]
+        [Tooltip(
+            "Enables simulation of gyroscopic torque which increases the realism of the simulation and enhances "
+                + "the stability of rotating dynamic bodies."
+        )]
         bool m_EnableGyroscopicTorque = Default.EnableGyroscopicTorque;
 
         /// <summary>
@@ -63,11 +68,14 @@ namespace Unity.Physics.Authoring
             get => m_SubstepCount;
             set => m_SubstepCount = value;
         }
+
         [SerializeField]
-        [Tooltip("Specifies the number of substep iterations the physics engine will perform.\n" +
-            "Higher values mean smaller timesteps will be taken per frame. This can be more \n" +
-            "stable up to a point where the timestep becomes so small computational numerical " +
-            "errors can be introduced.")]
+        [Tooltip(
+            "Specifies the number of substep iterations the physics engine will perform.\n"
+                + "Higher values mean smaller timesteps will be taken per frame. This can be more \n"
+                + "stable up to a point where the timestep becomes so small computational numerical "
+                + "errors can be introduced."
+        )]
         int m_SubstepCount = Default.SubstepCount;
 
         /// <summary>
@@ -79,9 +87,12 @@ namespace Unity.Physics.Authoring
             get => m_SolverIterationCount;
             set => m_SolverIterationCount = value;
         }
+
         [SerializeField]
-        [Tooltip("Specifies the number of solver iterations the physics engine will perform.\n" +
-            "Higher values mean more stability, but also worse performance.")]
+        [Tooltip(
+            "Specifies the number of solver iterations the physics engine will perform.\n"
+                + "Higher values mean more stability, but also worse performance."
+        )]
         int m_SolverIterationCount = Default.SolverIterationCount;
 
         /// <summary>
@@ -92,6 +103,7 @@ namespace Unity.Physics.Authoring
             get => m_DirectSolverSettings;
             set => m_DirectSolverSettings = value;
         }
+
         [SerializeField]
         [Tooltip("The direct solver settings.")]
         Solver.DirectSolverSettings m_DirectSolverSettings = Default.DirectSolverSettings;
@@ -104,9 +116,12 @@ namespace Unity.Physics.Authoring
             get => m_EnableSolverStabilizationHeuristic;
             set => m_EnableSolverStabilizationHeuristic = value;
         }
+
         [SerializeField]
         [Tooltip("Enables the contact solver stabilization heuristic.")]
-        bool m_EnableSolverStabilizationHeuristic = Default.SolverStabilizationHeuristicSettings.EnableSolverStabilization;
+        bool m_EnableSolverStabilizationHeuristic = Default
+            .SolverStabilizationHeuristicSettings
+            .EnableSolverStabilization;
 
         /// <summary>
         ///     <para>Enables multi-threaded processing.</para>
@@ -117,9 +132,12 @@ namespace Unity.Physics.Authoring
             get => m_MultiThreaded;
             set => m_MultiThreaded = value;
         }
+
         [SerializeField]
-        [Tooltip("Enables multi-threaded processing.\n" +
-            "Enabling this option will maximize the use of parallelization in the entire simulation pipeline while disabling it will result in minimal thread usage.")]
+        [Tooltip(
+            "Enables multi-threaded processing.\n"
+                + "Enabling this option will maximize the use of parallelization in the entire simulation pipeline while disabling it will result in minimal thread usage."
+        )]
         bool m_MultiThreaded = Default.MultiThreaded > 0 ? true : false;
 
         /// <summary>
@@ -132,10 +150,13 @@ namespace Unity.Physics.Authoring
             get => m_CollisionTolerance;
             set => m_CollisionTolerance = value;
         }
+
         [SerializeField]
-        [Tooltip("Sets the collision tolerance.\n" +
-            "The collision tolerance specifies the minimum distance required for contacts between rigid bodies to be created.\n" +
-            "This value can be increased if undesired collision tunneling is observed in the simulation.")]
+        [Tooltip(
+            "Sets the collision tolerance.\n"
+                + "The collision tolerance specifies the minimum distance required for contacts between rigid bodies to be created.\n"
+                + "This value can be increased if undesired collision tunneling is observed in the simulation."
+        )]
         float m_CollisionTolerance = Default.CollisionTolerance;
 
         /// <summary>
@@ -146,8 +167,11 @@ namespace Unity.Physics.Authoring
             get => m_SynchronizeCollisionWorld;
             set => m_SynchronizeCollisionWorld = value;
         }
+
         [SerializeField]
-        [Tooltip("Specifies whether to update the collision world an additional time after the step for more precise collider queries.")]
+        [Tooltip(
+            "Specifies whether to update the collision world an additional time after the step for more precise collider queries."
+        )]
         bool m_SynchronizeCollisionWorld = Default.SynchronizeCollisionWorld > 0 ? true : false;
 
         /// <summary>
@@ -160,10 +184,13 @@ namespace Unity.Physics.Authoring
             get => m_IncrementalDynamicBroadphase;
             set => m_IncrementalDynamicBroadphase = value;
         }
+
         [SerializeField]
-        [Tooltip("Enables the incremental dynamic broadphase.\n" +
-            "Enabling this option will update the dynamic broadphase incrementally whenever changes between simulation steps occur, " +
-            "potentially leading to time savings for cases with many dynamic rigid bodies that don't move or otherwise change.")]
+        [Tooltip(
+            "Enables the incremental dynamic broadphase.\n"
+                + "Enabling this option will update the dynamic broadphase incrementally whenever changes between simulation steps occur, "
+                + "potentially leading to time savings for cases with many dynamic rigid bodies that don't move or otherwise change."
+        )]
         bool m_IncrementalDynamicBroadphase = Default.IncrementalDynamicBroadphase;
 
         /// <summary>
@@ -176,10 +203,13 @@ namespace Unity.Physics.Authoring
             get => m_IncrementalStaticBroadphase;
             set => m_IncrementalStaticBroadphase = value;
         }
+
         [SerializeField]
-        [Tooltip("Enables the incremental static broadphase.\n" +
-            "Enabling this option will update the static broadphase incrementally whenever changes between simulation steps occur, " +
-            "potentially leading to time savings for cases with many static rigid bodies that don't move or otherwise change.")]
+        [Tooltip(
+            "Enables the incremental static broadphase.\n"
+                + "Enabling this option will update the static broadphase incrementally whenever changes between simulation steps occur, "
+                + "potentially leading to time savings for cases with many static rigid bodies that don't move or otherwise change."
+        )]
         bool m_IncrementalStaticBroadphase = Default.IncrementalStaticBroadphase;
 
         /// <summary>   Maximum relative velocity that can be produced when separating intersecting dynamic rigid bodies. </summary>
@@ -188,6 +218,7 @@ namespace Unity.Physics.Authoring
             get => m_MaxDynamicDepenetrationVelocity;
             set => m_MaxDynamicDepenetrationVelocity = value;
         }
+
         [SerializeField]
         [Tooltip("Maximum relative velocity that can be produced when separating intersecting dynamic rigid bodies.")]
         float m_MaxDynamicDepenetrationVelocity = Default.MaxDynamicDepenetrationVelocity;
@@ -198,35 +229,41 @@ namespace Unity.Physics.Authoring
             get => m_MaxStaticDepenetrationVelocity;
             set => m_MaxStaticDepenetrationVelocity = value;
         }
+
         [SerializeField]
-        [Tooltip("Maximum relative velocity that can be produced when separating dynamic rigid bodies intersecting with static rigid bodies.")]
+        [Tooltip(
+            "Maximum relative velocity that can be produced when separating dynamic rigid bodies intersecting with static rigid bodies."
+        )]
         float m_MaxStaticDepenetrationVelocity = Default.MaxStaticDepenetrationVelocity;
 
-        internal PhysicsStep AsComponent => new PhysicsStep
-        {
-            SimulationType = SimulationType,
-            Gravity = Gravity,
-            EnableGyroscopicTorque = EnableGyroscopicTorque,
-            SubstepCount = SubstepCount,
-            SolverIterationCount = SolverIterationCount,
-            DirectSolverSettings = DirectSolverSettings,
-            SolverStabilizationHeuristicSettings = EnableSolverStabilizationHeuristic ?
-                new Solver.StabilizationHeuristicSettings
+        internal PhysicsStep AsComponent =>
+            new PhysicsStep
             {
-                EnableSolverStabilization = true,
-                EnableFrictionVelocities = Default.SolverStabilizationHeuristicSettings.EnableFrictionVelocities,
-                VelocityClippingFactor = Default.SolverStabilizationHeuristicSettings.VelocityClippingFactor,
-                InertiaScalingFactor = Default.SolverStabilizationHeuristicSettings.InertiaScalingFactor
-            } :
-            Solver.StabilizationHeuristicSettings.Default,
-            MultiThreaded = (byte)(MultiThreaded ? 1 : 0),
-            CollisionTolerance = CollisionTolerance,
-            SynchronizeCollisionWorld = (byte)(SynchronizeCollisionWorld ? 1 : 0),
-            IncrementalDynamicBroadphase = IncrementalDynamicBroadphase,
-            IncrementalStaticBroadphase = IncrementalStaticBroadphase,
-            MaxDynamicDepenetrationVelocity = MaxDynamicDepenetrationVelocity,
-            MaxStaticDepenetrationVelocity = MaxStaticDepenetrationVelocity,
-        };
+                SimulationType = SimulationType,
+                Gravity = Gravity,
+                EnableGyroscopicTorque = EnableGyroscopicTorque,
+                SubstepCount = SubstepCount,
+                SolverIterationCount = SolverIterationCount,
+                DirectSolverSettings = DirectSolverSettings,
+                SolverStabilizationHeuristicSettings = EnableSolverStabilizationHeuristic
+                    ? new Solver.StabilizationHeuristicSettings
+                    {
+                        EnableSolverStabilization = true,
+                        EnableFrictionVelocities = Default
+                            .SolverStabilizationHeuristicSettings
+                            .EnableFrictionVelocities,
+                        VelocityClippingFactor = Default.SolverStabilizationHeuristicSettings.VelocityClippingFactor,
+                        InertiaScalingFactor = Default.SolverStabilizationHeuristicSettings.InertiaScalingFactor,
+                    }
+                    : Solver.StabilizationHeuristicSettings.Default,
+                MultiThreaded = (byte)(MultiThreaded ? 1 : 0),
+                CollisionTolerance = CollisionTolerance,
+                SynchronizeCollisionWorld = (byte)(SynchronizeCollisionWorld ? 1 : 0),
+                IncrementalDynamicBroadphase = IncrementalDynamicBroadphase,
+                IncrementalStaticBroadphase = IncrementalStaticBroadphase,
+                MaxDynamicDepenetrationVelocity = MaxDynamicDepenetrationVelocity,
+                MaxStaticDepenetrationVelocity = MaxStaticDepenetrationVelocity,
+            };
 
         void OnValidate()
         {

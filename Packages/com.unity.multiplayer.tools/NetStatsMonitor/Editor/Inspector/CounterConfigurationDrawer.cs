@@ -28,33 +28,34 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
         static CounterConfigurationInspector()
         {
-            var fields = typeof(CounterConfiguration)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+            var fields = typeof(CounterConfiguration).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-            string GetFieldName(string propertyName)
-                => fields.First(field => field.Name.Contains(propertyName)).Name;
+            string GetFieldName(string propertyName) => fields.First(field => field.Name.Contains(propertyName)).Name;
 
             k_SmoothingMethodFieldName = GetFieldName(nameof(CounterConfiguration.SmoothingMethod));
             k_AggregationMethodFieldName = GetFieldName(nameof(CounterConfiguration.AggregationMethod));
             k_SignificantDigitsFieldName = GetFieldName(nameof(CounterConfiguration.SignificantDigits));
             k_HighlightLowerBoundFieldName = GetFieldName(nameof(CounterConfiguration.HighlightLowerBound));
             k_HighlightUpperBoundFieldName = GetFieldName(nameof(CounterConfiguration.HighlightUpperBound));
-            k_ExponentialMovingAverageFieldName = GetFieldName(nameof(CounterConfiguration.ExponentialMovingAverageParams));
+            k_ExponentialMovingAverageFieldName = GetFieldName(
+                nameof(CounterConfiguration.ExponentialMovingAverageParams)
+            );
             k_SimpleMovingAverageFieldName = GetFieldName(nameof(CounterConfiguration.SimpleMovingAverageParams));
         }
 
         readonly Foldout m_Foldout;
         VisualElement Content => m_Foldout.contentContainer;
 
-        internal CounterConfigurationInspector(
-            SerializedProperty configurationProp,
-            PropertyField typeField = null)
+        internal CounterConfigurationInspector(SerializedProperty configurationProp, PropertyField typeField = null)
         {
             m_Foldout = new Foldout();
             m_Foldout.text = configurationProp.displayName;
             Add(m_Foldout);
 
-            var (smoothingMethodProp, smoothingMethodField) = Content.AddFieldForProperty(configurationProp, k_SmoothingMethodFieldName);
+            var (smoothingMethodProp, smoothingMethodField) = Content.AddFieldForProperty(
+                configurationProp,
+                k_SmoothingMethodFieldName
+            );
 
             Content.AddFieldForProperty(configurationProp, k_AggregationMethodFieldName);
             Content.AddFieldForProperty(configurationProp, k_SignificantDigitsFieldName);

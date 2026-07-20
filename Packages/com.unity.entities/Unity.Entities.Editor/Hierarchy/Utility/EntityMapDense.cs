@@ -21,7 +21,8 @@ namespace Unity.Entities.Editor
     /// This data structure has a fixed memory overhead of 8 bytes per entity and will expand as data is added.
     /// </remarks>
     /// <typeparam name="T">The data type to store per entity.</typeparam>
-    unsafe struct EntityMapDense<T> : IEntityMap<T> where T : unmanaged
+    unsafe struct EntityMapDense<T> : IEntityMap<T>
+        where T : unmanaged
     {
         /// <summary>
         /// The allocator used to construct this instance.
@@ -31,7 +32,8 @@ namespace Unity.Entities.Editor
         /// <summary>
         /// The internal unsafe implementation.
         /// </summary>
-        [NativeDisableUnsafePtrRestriction] UnsafeEntityMapDense<T>* m_EntityMapDenseData;
+        [NativeDisableUnsafePtrRestriction]
+        UnsafeEntityMapDense<T>* m_EntityMapDenseData;
 
         /// <summary>
         /// Returns the upper bound of the sparse array.
@@ -56,7 +58,7 @@ namespace Unity.Entities.Editor
         public EntityMapDense(int initialCapacity, Allocator allocator)
         {
             m_Allocator = allocator;
-            var handle = (AllocatorManager.AllocatorHandle) allocator;
+            var handle = (AllocatorManager.AllocatorHandle)allocator;
             m_EntityMapDenseData = AllocatorManager.Allocate<UnsafeEntityMapDense<T>>(handle);
             *m_EntityMapDenseData = new UnsafeEntityMapDense<T>(initialCapacity, allocator);
         }
@@ -131,58 +133,49 @@ namespace Unity.Entities.Editor
         /// NOTE: If this value is changed all entities which are assigned this value are also updated.
         /// </remarks>
         /// <param name="value">The shared default value to set.</param>
-        public void SetSharedDefaultValue(T value)
-            => m_EntityMapDenseData->SetSharedDefaultValue(value);
+        public void SetSharedDefaultValue(T value) => m_EntityMapDenseData->SetSharedDefaultValue(value);
 
         /// <summary>
         /// Gets the shared default value.
         /// </summary>
-        public T GetSharedDefaultValue()
-            => m_EntityMapDenseData->GetSharedDefaultValue();
+        public T GetSharedDefaultValue() => m_EntityMapDenseData->GetSharedDefaultValue();
 
-        internal void GetDefaultEntities(Entity* entities)
-            => m_EntityMapDenseData->GetDefaultEntities(entities);
+        internal void GetDefaultEntities(Entity* entities) => m_EntityMapDenseData->GetDefaultEntities(entities);
 
         /// <summary>
         /// Clears the storage for re-use.
         /// </summary>
-        public void Clear()
-            => m_EntityMapDenseData->Clear();
+        public void Clear() => m_EntityMapDenseData->Clear();
 
         /// <summary>
         /// Resizes to sparse data set to the given capacity.
         /// </summary>
         /// <param name="capacity">The capacity to set.</param>
-        public void Resize(int capacity)
-            => m_EntityMapDenseData->Resize(capacity);
+        public void Resize(int capacity) => m_EntityMapDenseData->Resize(capacity);
 
         /// <summary>
         /// Returns <see langword="true"/> if the specified entity exists in the storage.
         /// </summary>
         /// <param name="entity">The entity to check existence for.</param>
         /// <returns><see langword="true"/> if the entity exists in the storage; <see langword="false"/> otherwise.</returns>
-        public bool Exists(Entity entity)
-            => m_EntityMapDenseData->Exists(entity);
+        public bool Exists(Entity entity) => m_EntityMapDenseData->Exists(entity);
 
         /// <summary>
         /// Removes the data for the specified entity.
         /// </summary>
         /// <param name="entity">The entity to remove data for.</param>
-        public void Remove(Entity entity)
-            => m_EntityMapDenseData->Remove(entity);
+        public void Remove(Entity entity) => m_EntityMapDenseData->Remove(entity);
 
         /// <summary>
         /// Registers an entity to the dense set and assigns it the default value. This method performs no validation for free list checking. Use with caution.
         /// </summary>
         /// <param name="entity">The entity to assign the default value to.</param>
-        public void SetValueDefaultUnchecked(Entity entity)
-            => m_EntityMapDenseData->SetValueDefaultUnchecked(entity);
+        public void SetValueDefaultUnchecked(Entity entity) => m_EntityMapDenseData->SetValueDefaultUnchecked(entity);
 
-        public Enumerator GetEnumerator()
-            => new Enumerator(m_EntityMapDenseData->GetEnumerator());
+        public Enumerator GetEnumerator() => new Enumerator(m_EntityMapDenseData->GetEnumerator());
 
-        public NonDefaultEntityEnumerator GetNonDefaultEntityEnumerator()
-            => new NonDefaultEntityEnumerator(m_EntityMapDenseData->GetNonDefaultEntityEnumerator());
+        public NonDefaultEntityEnumerator GetNonDefaultEntityEnumerator() =>
+            new NonDefaultEntityEnumerator(m_EntityMapDenseData->GetNonDefaultEntityEnumerator());
 
         public struct Enumerator : IEnumerator<EntityWithValue<T>>
         {
@@ -193,21 +186,15 @@ namespace Unity.Entities.Editor
                 m_Enumerator = enumerator;
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
-            public bool MoveNext()
-                => m_Enumerator.MoveNext();
+            public bool MoveNext() => m_Enumerator.MoveNext();
 
-            public void Reset()
-                => m_Enumerator.Reset();
+            public void Reset() => m_Enumerator.Reset();
 
-            public EntityWithValue<T> Current
-                => m_Enumerator.Current;
+            public EntityWithValue<T> Current => m_Enumerator.Current;
 
-            object IEnumerator.Current
-                => Current;
+            object IEnumerator.Current => Current;
         }
 
         public struct NonDefaultEntityEnumerator : IEnumerator<EntityWithValue<T>>
@@ -219,28 +206,23 @@ namespace Unity.Entities.Editor
                 m_Enumerator = enumerator;
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
-            public bool MoveNext()
-                => m_Enumerator.MoveNext();
+            public bool MoveNext() => m_Enumerator.MoveNext();
 
-            public void Reset()
-                => m_Enumerator.Reset();
+            public void Reset() => m_Enumerator.Reset();
 
-            public EntityWithValue<T> Current
-                => m_Enumerator.Current;
+            public EntityWithValue<T> Current => m_Enumerator.Current;
 
-            object IEnumerator.Current
-                => Current;
+            object IEnumerator.Current => Current;
         }
     }
 
     /// <summary>
     /// The internal storage for the <see cref="EntityMapDense{T}"/>.
     /// </summary>
-    unsafe struct UnsafeEntityMapDense<T> : IDisposable where T : unmanaged
+    unsafe struct UnsafeEntityMapDense<T> : IDisposable
+        where T : unmanaged
     {
 #if ENTITY_STORE_V1
         /// <summary>
@@ -296,7 +278,7 @@ namespace Unity.Entities.Editor
         {
             m_IndexByEntity = new(initialCapacity, allocator);
             m_FreeIndex = new UnsafeList<int>(initialCapacity, allocator);
-            m_DataByIndex = new UnsafeList<T>(initialCapacity, allocator) {default};
+            m_DataByIndex = new UnsafeList<T>(initialCapacity, allocator) { default };
         }
 
         /// <summary>
@@ -463,16 +445,15 @@ namespace Unity.Entities.Editor
         /// Registers an entity to the dense set and assigns it the default value. This method performs no validation for free list checking. Use with caution.
         /// </summary>
         /// <param name="entity">The entity to assign the default value to.</param>
-        public void SetValueDefaultUnchecked(Entity entity)
-            => m_IndexByEntity[entity] = 0;
+        public void SetValueDefaultUnchecked(Entity entity) => m_IndexByEntity[entity] = 0;
 
         /// <summary>
         /// Returns true if the given value matches the shared default.
         /// </summary>
         /// <param name="value">The value to compare.</param>
         /// <returns>True if the values match.</returns>
-        bool IsSharedDefault(T value)
-            => UnsafeUtility.MemCmp(&value, m_DataByIndex.Ptr, UnsafeUtility.SizeOf<T>()) == 0;
+        bool IsSharedDefault(T value) =>
+            UnsafeUtility.MemCmp(&value, m_DataByIndex.Ptr, UnsafeUtility.SizeOf<T>()) == 0;
 
         /// <summary>
         /// Gets the next index, either from the free list or the next available data slot.
@@ -510,11 +491,10 @@ namespace Unity.Entities.Editor
             m_DataByIndex[index] = value;
         }
 
-        public Enumerator GetEnumerator()
-            => new Enumerator(m_IndexByEntity.GetEnumerator(), m_DataByIndex);
+        public Enumerator GetEnumerator() => new Enumerator(m_IndexByEntity.GetEnumerator(), m_DataByIndex);
 
-        public NonDefaultEntityEnumerator GetNonDefaultEntityEnumerator()
-            => new NonDefaultEntityEnumerator(m_IndexByEntity.GetEnumerator(), m_DataByIndex);
+        public NonDefaultEntityEnumerator GetNonDefaultEntityEnumerator() =>
+            new NonDefaultEntityEnumerator(m_IndexByEntity.GetEnumerator(), m_DataByIndex);
 
         /// <summary>
         /// An enumerator which will iterate all key-value pairs in the map.
@@ -541,9 +521,7 @@ namespace Unity.Entities.Editor
             }
 #endif
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {
@@ -568,7 +546,7 @@ namespace Unity.Entities.Editor
 #else
                         Entity = entityWithIndex.Key,
 #endif
-                        Value = m_Data[entityWithIndex.Value]
+                        Value = m_Data[entityWithIndex.Value],
                     };
                 }
             }
@@ -586,7 +564,10 @@ namespace Unity.Entities.Editor
 #if ENTITY_STORE_V1
             UnsafeEntityMapSparse<int>.Enumerator m_Enumerator;
 
-            public NonDefaultEntityEnumerator(UnsafeEntityMapSparse<int>.Enumerator enumerator, UnsafeList<T> dataByIndex)
+            public NonDefaultEntityEnumerator(
+                UnsafeEntityMapSparse<int>.Enumerator enumerator,
+                UnsafeList<T> dataByIndex
+            )
             {
                 m_Enumerator = enumerator;
                 m_DataByIndex = dataByIndex;
@@ -594,16 +575,17 @@ namespace Unity.Entities.Editor
 #else
             UnsafeHashMap<Entity, int>.Enumerator m_Enumerator;
 
-            public NonDefaultEntityEnumerator(UnsafeHashMap<Entity, int>.Enumerator enumerator, UnsafeList<T> dataByIndex)
+            public NonDefaultEntityEnumerator(
+                UnsafeHashMap<Entity, int>.Enumerator enumerator,
+                UnsafeList<T> dataByIndex
+            )
             {
                 m_Enumerator = enumerator;
                 m_DataByIndex = dataByIndex;
             }
 #endif
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {
@@ -613,8 +595,7 @@ namespace Unity.Entities.Editor
                     {
                         return false;
                     }
-                }
-                while (m_Enumerator.Current.Value == 0);
+                } while (m_Enumerator.Current.Value == 0);
 
                 return true;
             }
@@ -637,7 +618,7 @@ namespace Unity.Entities.Editor
 #else
                         Entity = entityWithIndex.Key,
 #endif
-                        Value = m_DataByIndex[entityWithIndex.Value]
+                        Value = m_DataByIndex[entityWithIndex.Value],
                     };
                 }
             }

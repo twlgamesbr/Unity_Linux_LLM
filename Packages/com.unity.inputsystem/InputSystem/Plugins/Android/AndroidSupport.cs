@@ -24,11 +24,13 @@ namespace UnityEngine.InputSystem.Android
             InputSystem.RegisterLayout<AndroidGamepad>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
-                    .WithDeviceClass("AndroidGameController"));
+                    .WithDeviceClass("AndroidGameController")
+            );
             InputSystem.RegisterLayout<AndroidJoystick>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
-                    .WithDeviceClass("AndroidGameController"));
+                    .WithDeviceClass("AndroidGameController")
+            );
             InputSystem.RegisterLayout<DualShock4GamepadAndroid>();
             InputSystem.RegisterLayout<XboxOneGamepadAndroid>();
 
@@ -44,82 +46,103 @@ namespace UnityEngine.InputSystem.Android
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.Accelerometer));
+                    .WithCapability("sensorType", AndroidSensorType.Accelerometer)
+            );
             InputSystem.RegisterLayout<AndroidMagneticFieldSensor>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.MagneticField));
+                    .WithCapability("sensorType", AndroidSensorType.MagneticField)
+            );
             InputSystem.RegisterLayout<AndroidGyroscope>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.Gyroscope));
+                    .WithCapability("sensorType", AndroidSensorType.Gyroscope)
+            );
             InputSystem.RegisterLayout<AndroidLightSensor>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.Light));
+                    .WithCapability("sensorType", AndroidSensorType.Light)
+            );
             InputSystem.RegisterLayout<AndroidPressureSensor>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.Pressure));
+                    .WithCapability("sensorType", AndroidSensorType.Pressure)
+            );
             InputSystem.RegisterLayout<AndroidProximity>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.Proximity));
+                    .WithCapability("sensorType", AndroidSensorType.Proximity)
+            );
             InputSystem.RegisterLayout<AndroidGravitySensor>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.Gravity));
+                    .WithCapability("sensorType", AndroidSensorType.Gravity)
+            );
             InputSystem.RegisterLayout<AndroidLinearAccelerationSensor>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.LinearAcceleration));
+                    .WithCapability("sensorType", AndroidSensorType.LinearAcceleration)
+            );
             InputSystem.RegisterLayout<AndroidRotationVector>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.RotationVector));
+                    .WithCapability("sensorType", AndroidSensorType.RotationVector)
+            );
             InputSystem.RegisterLayout<AndroidRelativeHumidity>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.RelativeHumidity));
+                    .WithCapability("sensorType", AndroidSensorType.RelativeHumidity)
+            );
             InputSystem.RegisterLayout<AndroidAmbientTemperature>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.AmbientTemperature));
+                    .WithCapability("sensorType", AndroidSensorType.AmbientTemperature)
+            );
             InputSystem.RegisterLayout<AndroidGameRotationVector>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.GameRotationVector));
+                    .WithCapability("sensorType", AndroidSensorType.GameRotationVector)
+            );
             InputSystem.RegisterLayout<AndroidStepCounter>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.StepCounter));
+                    .WithCapability("sensorType", AndroidSensorType.StepCounter)
+            );
             InputSystem.RegisterLayout<AndroidHingeAngle>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(kAndroidInterface)
                     .WithDeviceClass("AndroidSensor")
-                    .WithCapability("sensorType", AndroidSensorType.HingeAngle));
+                    .WithCapability("sensorType", AndroidSensorType.HingeAngle)
+            );
 
             InputSystem.onFindLayoutForDevice += OnFindLayoutForDevice;
         }
 
-        internal static string OnFindLayoutForDevice(ref InputDeviceDescription description,
-            string matchedLayout, InputDeviceExecuteCommandDelegate executeCommandDelegate)
+        internal static string OnFindLayoutForDevice(
+            ref InputDeviceDescription description,
+            string matchedLayout,
+            InputDeviceExecuteCommandDelegate executeCommandDelegate
+        )
         {
             // If we already have a matching layout, someone registered a better match.
             // We only want to act as a fallback.
-            if (!string.IsNullOrEmpty(matchedLayout) && matchedLayout != "AndroidGamepad" && matchedLayout != "AndroidJoystick")
+            if (
+                !string.IsNullOrEmpty(matchedLayout)
+                && matchedLayout != "AndroidGamepad"
+                && matchedLayout != "AndroidJoystick"
+            )
                 return null;
 
             if (description.interfaceName != "Android" || string.IsNullOrEmpty(description.capabilities))
@@ -146,10 +169,12 @@ namespace UnityEngine.InputSystem.Android
 
                     // Tested with controllers: PS4 DualShock; XboxOne; Nvidia Shield
                     // Tested on devices: Shield console Android 9; Galaxy s9+ Android 10
-                    if (caps.motionAxes.Contains(AndroidAxis.Z) &&
-                        caps.motionAxes.Contains(AndroidAxis.Rz) &&
-                        caps.motionAxes.Contains(AndroidAxis.HatX) &&
-                        caps.motionAxes.Contains(AndroidAxis.HatY))
+                    if (
+                        caps.motionAxes.Contains(AndroidAxis.Z)
+                        && caps.motionAxes.Contains(AndroidAxis.Rz)
+                        && caps.motionAxes.Contains(AndroidAxis.HatX)
+                        && caps.motionAxes.Contains(AndroidAxis.HatY)
+                    )
                     {
                         if (caps.vendorId == kVendorMicrosoft)
                             return "XboxOneGamepadAndroid";
@@ -157,10 +182,8 @@ namespace UnityEngine.InputSystem.Android
                             return "DualShock4GamepadAndroid";
                     }
 
-
                     // Fallback to generic gamepads
-                    if (caps.motionAxes.Contains(AndroidAxis.HatX) &&
-                        caps.motionAxes.Contains(AndroidAxis.HatY))
+                    if (caps.motionAxes.Contains(AndroidAxis.HatX) && caps.motionAxes.Contains(AndroidAxis.HatY))
                         return "AndroidGamepadWithDpadAxes";
 
                     return "AndroidGamepadWithDpadButtons";

@@ -11,7 +11,12 @@ namespace UnityEditor.TestTools.TestRunner
         private TestPlatform m_Platform;
         private Action<ITestAdaptor> m_Callback;
         private IEnumerator<ITestAdaptor> m_ResultEnumerator;
-        public TestListJob(CachingTestListProvider testListProvider, TestPlatform platform, Action<ITestAdaptor> callback)
+
+        public TestListJob(
+            CachingTestListProvider testListProvider,
+            TestPlatform platform,
+            Action<ITestAdaptor> callback
+        )
         {
             m_TestListProvider = testListProvider;
             m_Platform = platform;

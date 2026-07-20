@@ -86,7 +86,8 @@ namespace Unity.Entities
 
                 if (leaf.States == null)
                 {
-                    leaf.States = (SystemState*)Memory.Unmanaged.Allocate(64 * sizeof(SystemState), 16, Allocator.Persistent);
+                    leaf.States = (SystemState*)
+                        Memory.Unmanaged.Allocate(64 * sizeof(SystemState), 16, Allocator.Persistent);
                 }
 
                 leaf.FreeBits &= ~(1ul << subIndex);
@@ -197,6 +198,6 @@ namespace Unity.Entities
 
     internal struct SystemInstance : IComponentData
     {
-        unsafe internal SystemState* state;
+        internal unsafe SystemState* state;
     }
 }

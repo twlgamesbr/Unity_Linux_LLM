@@ -23,6 +23,6 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// <summary>
         /// The test ran and failed.
         /// </summary>
-        Failed
+        Failed,
     }
 }

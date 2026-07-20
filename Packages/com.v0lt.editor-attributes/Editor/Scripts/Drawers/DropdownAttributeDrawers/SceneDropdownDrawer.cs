@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.UIElements;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -12,7 +12,10 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The SceneDropdown Attribute can only be attached to a string or int", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The SceneDropdown Attribute can only be attached to a string or int",
+                    HelpBoxMessageType.Error
+                );
 
             VisualElement root = new();
             HelpBox errorBox = new();
@@ -20,13 +23,16 @@ namespace EditorAttributes.Editor
             List<string> sceneNames = GetSceneList(errorBox);
             DropdownField dropdownField = CreateDropdownField(sceneNames, property);
 
-            UpdateVisualElement(dropdownField, () =>
-            {
-                List<string> sceneNames = GetSceneList(errorBox);
+            UpdateVisualElement(
+                dropdownField,
+                () =>
+                {
+                    List<string> sceneNames = GetSceneList(errorBox);
 
-                if (IsCollectionValid(sceneNames))
-                    dropdownField.choices = sceneNames;
-            });
+                    if (IsCollectionValid(sceneNames))
+                        dropdownField.choices = sceneNames;
+                }
+            );
 
             root.Add(dropdownField);
 
@@ -38,7 +44,9 @@ namespace EditorAttributes.Editor
         {
             var dropdown = element as DropdownField;
 
-            string sceneName = int.TryParse(clipboardValue, out int sceneIndex) ? SceneNameFromIndex(sceneIndex) : clipboardValue;
+            string sceneName = int.TryParse(clipboardValue, out int sceneIndex)
+                ? SceneNameFromIndex(sceneIndex)
+                : clipboardValue;
 
             if (dropdown.choices.Contains(sceneName))
             {
@@ -46,15 +54,21 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"Could not paste value <b>{clipboardValue}</b> since is not availiable as an option in the dropdown");
+                Debug.LogWarning(
+                    $"Could not paste value <b>{clipboardValue}</b> since is not availiable as an option in the dropdown"
+                );
             }
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType is SerializedPropertyType.String or SerializedPropertyType.Integer;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType is SerializedPropertyType.String or SerializedPropertyType.Integer;
 
         protected override string SetDropdownDefaultValue(List<string> collectionValues, SerializedProperty property)
         {
-            string propertyStringValue = property.propertyType == SerializedPropertyType.String ? property.stringValue : SceneNameFromIndex(property.intValue);
+            string propertyStringValue =
+                property.propertyType == SerializedPropertyType.String
+                    ? property.stringValue
+                    : SceneNameFromIndex(property.intValue);
             return collectionValues.Contains(propertyStringValue) ? propertyStringValue : collectionValues[0];
         }
 
@@ -75,9 +89,15 @@ namespace EditorAttributes.Editor
             property.serializedObject.ApplyModifiedProperties();
         }
 
-        protected override void SetDropdownValueFromProperty(SerializedProperty trackedProperty, DropdownField dropdownField)
+        protected override void SetDropdownValueFromProperty(
+            SerializedProperty trackedProperty,
+            DropdownField dropdownField
+        )
         {
-            string sceneName = trackedProperty.propertyType == SerializedPropertyType.Integer ? SceneNameFromIndex(trackedProperty.intValue) : trackedProperty.stringValue;
+            string sceneName =
+                trackedProperty.propertyType == SerializedPropertyType.Integer
+                    ? SceneNameFromIndex(trackedProperty.intValue)
+                    : trackedProperty.stringValue;
 
             if (dropdownField.choices.Contains(sceneName))
             {
@@ -85,7 +105,10 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"The value <b>{GetPropertyValueAsString(trackedProperty)}</b> set to the <b>{trackedProperty.name}</b> variable is not a valid scene identifier", trackedProperty.serializedObject.targetObject);
+                Debug.LogWarning(
+                    $"The value <b>{GetPropertyValueAsString(trackedProperty)}</b> set to the <b>{trackedProperty.name}</b> variable is not a valid scene identifier",
+                    trackedProperty.serializedObject.targetObject
+                );
             }
         }
 

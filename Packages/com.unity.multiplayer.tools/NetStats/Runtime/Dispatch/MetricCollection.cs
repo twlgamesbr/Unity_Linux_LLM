@@ -12,28 +12,26 @@ namespace Unity.Multiplayer.Tools.NetStats
         IReadOnlyDictionary<MetricId, IMetric<TimeSpan>> m_Timers;
         IReadOnlyDictionary<MetricId, IEventMetric> m_PayloadEvents;
 
-
         internal MetricCollection(
             IReadOnlyDictionary<MetricId, IMetric<long>> counters,
             IReadOnlyDictionary<MetricId, IMetric<double>> gauges,
             IReadOnlyDictionary<MetricId, IMetric<TimeSpan>> timers,
-            IReadOnlyDictionary<MetricId, IEventMetric> payloadEvents)
+            IReadOnlyDictionary<MetricId, IEventMetric> payloadEvents
+        )
         {
             m_Counters = counters;
             m_Gauges = gauges;
             m_Timers = timers;
             m_PayloadEvents = payloadEvents;
 
-            Metrics = counters.Values
-                .Concat<IMetric>(gauges.Values)
+            Metrics = counters
+                .Values.Concat<IMetric>(gauges.Values)
                 .Concat(timers.Values)
                 .Concat(m_PayloadEvents.Values)
                 .ToList();
         }
 
-        internal MetricCollection(
-            IReadOnlyCollection<IMetric> metrics,
-            ulong localConnectionId)
+        internal MetricCollection(IReadOnlyCollection<IMetric> metrics, ulong localConnectionId)
         {
             static MetricId ByMetricId(IMetric metric) => metric.Id;
             m_Counters = metrics.OfType<IMetric<long>>().ToDictionary(ByMetricId);

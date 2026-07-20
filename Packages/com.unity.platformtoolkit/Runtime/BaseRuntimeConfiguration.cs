@@ -11,6 +11,7 @@ namespace Unity.PlatformToolkit
                 PlatformToolkit.InjectImplementation(implementation);
         }
 #endif
+
         public abstract IPlatformToolkit InstantiatePlatformToolkit();
     }
 }

@@ -52,7 +52,7 @@ namespace UnityEditor.Rendering
             {
                 if (providerType.IsAbstract)
                     continue;
-                    
+
                 var provider = Activator.CreateInstance(providerType) as IMaterialUpgradersProvider;
 
                 var upgraders = provider.GetUpgraders();
@@ -67,7 +67,7 @@ namespace UnityEditor.Rendering
                 foreach (var pipelineType in pipelineTypes)
                 {
                     var upgradersForPipeline = GetOrCreateMaterialUpgradersForPipeline(pipelineType);
-                    foreach(var upgrader in upgraders) 
+                    foreach (var upgrader in upgraders)
                     {
                         upgradersForPipeline.Add(upgrader);
                     }
@@ -79,16 +79,20 @@ namespace UnityEditor.Rendering
         {
             var attr = upgraderType.GetCustomAttribute<SupportedOnRenderPipelineAttribute>();
             if (attr == null)
-                throw new InvalidOperationException($"Missing {nameof(SupportedOnRenderPipelineAttribute)} on {upgraderType}");
+                throw new InvalidOperationException(
+                    $"Missing {nameof(SupportedOnRenderPipelineAttribute)} on {upgraderType}"
+                );
 
             return attr.renderPipelineTypes;
         }
 
-
         private List<MaterialUpgrader> GetOrCreateMaterialUpgradersForPipeline(Type renderPipelineAssetType)
         {
             if (!typeof(RenderPipelineAsset).IsAssignableFrom(renderPipelineAssetType))
-                throw new ArgumentException($"Type '{renderPipelineAssetType.FullName}' must inherit from RenderPipelineAsset.", nameof(renderPipelineAssetType));
+                throw new ArgumentException(
+                    $"Type '{renderPipelineAssetType.FullName}' must inherit from RenderPipelineAsset.",
+                    nameof(renderPipelineAssetType)
+                );
 
             if (!m_UpgradersSupportedByPipeline.TryGetValue(renderPipelineAssetType, out var upgradersForPipeline))
             {

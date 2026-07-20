@@ -11,7 +11,6 @@ namespace UnityEditor.Rendering
     /// <summary>
     /// IES class which is common for the Importers
     /// </summary>
-
     [System.Serializable]
     public class IESEngine
     {
@@ -20,7 +19,10 @@ namespace UnityEditor.Rendering
 
         internal IESReader m_iesReader = new IESReader();
 
-        internal string FileFormatVersion { get => m_iesReader.FileFormatVersion; }
+        internal string FileFormatVersion
+        {
+            get => m_iesReader.FileFormatVersion;
+        }
 
         internal TextureImporterType m_TextureGenerationType = TextureImporterType.Cookie;
 
@@ -127,7 +129,14 @@ namespace UnityEditor.Rendering
                     break;
             }
 
-            return GenerateTexture(m_TextureGenerationType, TextureImporterShape.TextureCube, compression, width, height, colorBuffer);
+            return GenerateTexture(
+                m_TextureGenerationType,
+                TextureImporterShape.TextureCube,
+                compression,
+                width,
+                height,
+                colorBuffer
+            );
         }
 
         // Gnomonic projection reference:
@@ -140,7 +149,12 @@ namespace UnityEditor.Rendering
         /// <param name="textureSize">The resquested size.</param>
         /// <param name="applyLightAttenuation">Bool to enable or not the Light Attenuation based on the squared distance.</param>
         /// <returns>A Generated 2D texture doing the projection of the IES using the Gnomonic projection of the bottom half hemisphere with the given 'cone angle'</returns>
-        public (string, Texture) Generate2DCookie(TextureImporterCompression compression, float coneAngle, int textureSize, bool applyLightAttenuation)
+        public (string, Texture) Generate2DCookie(
+            TextureImporterCompression compression,
+            float coneAngle,
+            int textureSize,
+            bool applyLightAttenuation
+        )
         {
             NativeArray<Color> colorBuffer;
 
@@ -157,7 +171,14 @@ namespace UnityEditor.Rendering
                     break;
             }
 
-            return GenerateTexture(m_TextureGenerationType, TextureImporterShape.Texture2D, compression, textureSize, textureSize, colorBuffer);
+            return GenerateTexture(
+                m_TextureGenerationType,
+                TextureImporterShape.Texture2D,
+                compression,
+                textureSize,
+                textureSize,
+                colorBuffer
+            );
         }
 
         private (string, Texture) GenerateCylindricalTexture(TextureImporterCompression compression, int textureSize)
@@ -180,10 +201,24 @@ namespace UnityEditor.Rendering
                     break;
             }
 
-            return GenerateTexture(TextureImporterType.Default, TextureImporterShape.Texture2D, compression, width, height, colorBuffer);
+            return GenerateTexture(
+                TextureImporterType.Default,
+                TextureImporterShape.Texture2D,
+                compression,
+                width,
+                height,
+                colorBuffer
+            );
         }
 
-        (string, Texture) GenerateTexture(TextureImporterType type, TextureImporterShape shape, TextureImporterCompression compression, int width, int height, NativeArray<Color> colorBuffer)
+        (string, Texture) GenerateTexture(
+            TextureImporterType type,
+            TextureImporterShape shape,
+            TextureImporterCompression compression,
+            int width,
+            int height,
+            NativeArray<Color> colorBuffer
+        )
         {
             // Default values set by the TextureGenerationSettings constructor can be found in this file on GitHub:
             // https://github.com/Unity-Technologies/UnityCsReference/blob/master/Editor/Mono/AssetPipeline/TextureGenerator.bindings.cs
@@ -206,7 +241,11 @@ namespace UnityEditor.Rendering
             textureImporterSettings.readable = true;
             textureImporterSettings.sRGBTexture = false;
             textureImporterSettings.textureShape = shape;
-            textureImporterSettings.wrapMode = textureImporterSettings.wrapModeU = textureImporterSettings.wrapModeV = textureImporterSettings.wrapModeW = TextureWrapMode.Clamp;
+            textureImporterSettings.wrapMode =
+                textureImporterSettings.wrapModeU =
+                textureImporterSettings.wrapModeV =
+                textureImporterSettings.wrapModeW =
+                    TextureWrapMode.Clamp;
 
             TextureImporterPlatformSettings platformSettings = settings.platformSettings;
             platformSettings.maxTextureSize = 2048;
@@ -226,7 +265,9 @@ namespace UnityEditor.Rendering
 
         Color ComputePixelColor(float horizontalAnglePosition, float verticalAnglePosition, float attenuation = 1.0f)
         {
-            float value = m_iesReader.InterpolateBilinear(horizontalAnglePosition, verticalAnglePosition) / (m_iesReader.MaxCandelas * attenuation);
+            float value =
+                m_iesReader.InterpolateBilinear(horizontalAnglePosition, verticalAnglePosition)
+                / (m_iesReader.MaxCandelas * attenuation);
             return new Color(value, value, value, value);
         }
 
@@ -235,7 +276,11 @@ namespace UnityEditor.Rendering
             float stepU = 360f / (width - 1);
             float stepV = 180f / (height - 1);
 
-            var textureBuffer = new NativeArray<Color>(width * height, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var textureBuffer = new NativeArray<Color>(
+                width * height,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             for (int y = 0; y < height; y++)
             {
@@ -263,7 +308,11 @@ namespace UnityEditor.Rendering
             float stepU = k_TwoPi / (width - 1);
             float stepV = Mathf.PI / (height - 1);
 
-            var textureBuffer = new NativeArray<Color>(width * height, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var textureBuffer = new NativeArray<Color>(
+                width * height,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             for (int y = 0; y < height; y++)
             {
@@ -283,7 +332,7 @@ namespace UnityEditor.Rendering
 
                     // Since a type B luminaire is turned on its side, rotate it to make its polar axis horizontal.
                     float longitude = Mathf.Atan2(sinV, cosU * cosV) * Mathf.Rad2Deg; // in range [-180..+180] degrees
-                    float latitude = Mathf.Asin(-sinU * cosV) * Mathf.Rad2Deg;        // in range [-90..+90] degrees
+                    float latitude = Mathf.Asin(-sinU * cosV) * Mathf.Rad2Deg; // in range [-90..+90] degrees
 
                     float horizontalAnglePosition = m_iesReader.ComputeTypeAorBHorizontalAnglePosition(longitude);
                     float verticalAnglePosition = m_iesReader.ComputeVerticalAnglePosition(latitude);
@@ -300,7 +349,11 @@ namespace UnityEditor.Rendering
             float stepU = k_TwoPi / (width - 1);
             float stepV = Mathf.PI / (height - 1);
 
-            var textureBuffer = new NativeArray<Color>(width * height, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var textureBuffer = new NativeArray<Color>(
+                width * height,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             for (int y = 0; y < height; y++)
             {
@@ -320,7 +373,7 @@ namespace UnityEditor.Rendering
 
                     // Since a type C luminaire is generally aimed at nadir, orient it toward +Z at the center of the cylindrical texture.
                     float longitude = ((Mathf.Atan2(sinU * cosV, sinV) + k_TwoPi) % k_TwoPi) * Mathf.Rad2Deg; // in range [0..360] degrees
-                    float latitude = (Mathf.Asin(-cosU * cosV) + k_HalfPi) * Mathf.Rad2Deg;                  // in range [0..180] degrees
+                    float latitude = (Mathf.Asin(-cosU * cosV) + k_HalfPi) * Mathf.Rad2Deg; // in range [0..180] degrees
 
                     float horizontalAnglePosition = m_iesReader.ComputeTypeCHorizontalAnglePosition(longitude);
                     float verticalAnglePosition = m_iesReader.ComputeVerticalAnglePosition(latitude);
@@ -352,7 +405,7 @@ namespace UnityEditor.Rendering
 
                     float rayLengthSquared = u * u + v * v + 1;
 
-                    float longitude = Mathf.Atan(u) * Mathf.Rad2Deg;                               // in range [-90..+90] degrees
+                    float longitude = Mathf.Atan(u) * Mathf.Rad2Deg; // in range [-90..+90] degrees
                     float latitude = Mathf.Asin(v / Mathf.Sqrt(rayLengthSquared)) * Mathf.Rad2Deg; // in range [-90..+90] degrees
 
                     float horizontalAnglePosition = m_iesReader.ComputeTypeCHorizontalAnglePosition(longitude);
@@ -389,7 +442,7 @@ namespace UnityEditor.Rendering
                     float rayLengthSquared = u * u + v * v + 1;
 
                     // Since a type B luminaire is turned on its side, U and V are flipped.
-                    float longitude = Mathf.Atan(v) * Mathf.Rad2Deg;                               // in range [-90..+90] degrees
+                    float longitude = Mathf.Atan(v) * Mathf.Rad2Deg; // in range [-90..+90] degrees
                     float latitude = Mathf.Asin(u / Mathf.Sqrt(rayLengthSquared)) * Mathf.Rad2Deg; // in range [-90..+90] degrees
 
                     float horizontalAnglePosition = m_iesReader.ComputeTypeCHorizontalAnglePosition(longitude);
@@ -426,7 +479,7 @@ namespace UnityEditor.Rendering
                     float uvLength = Mathf.Sqrt(u * u + v * v);
 
                     float longitude = ((Mathf.Atan2(v, u) - k_HalfPi + k_TwoPi) % k_TwoPi) * Mathf.Rad2Deg; // in range [0..360] degrees
-                    float latitude = Mathf.Atan(uvLength) * Mathf.Rad2Deg;                                  // in range [0..90] degrees
+                    float latitude = Mathf.Atan(uvLength) * Mathf.Rad2Deg; // in range [0..90] degrees
 
                     float horizontalAnglePosition = m_iesReader.ComputeTypeCHorizontalAnglePosition(longitude);
                     float verticalAnglePosition = m_iesReader.ComputeVerticalAnglePosition(latitude);

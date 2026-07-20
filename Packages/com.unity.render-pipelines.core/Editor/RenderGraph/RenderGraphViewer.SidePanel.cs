@@ -7,18 +7,13 @@ namespace UnityEditor.Rendering
 {
     public partial class RenderGraphViewer
     {
-        static readonly string[] k_PassTypeNames =
-        {
-            "Unsafe Render Pass",
-            "Raster Render Pass",
-            "Compute Pass"
-        };
+        static readonly string[] k_PassTypeNames = { "Unsafe Render Pass", "Raster Render Pass", "Compute Pass" };
 
         static readonly string[] k_PassTypeNamesNotMergedMessage =
         {
             "This is an Unsafe Render Pass. Only Raster Render Passes can be merged.",
             "Pass merging was disabled.",
-            "This is a Compute Pass. Only Raster Render Passes can be merged."
+            "This is a Compute Pass. Only Raster Render Passes can be merged.",
         };
 
         static partial class Names
@@ -28,6 +23,7 @@ namespace UnityEditor.Rendering
             public const string kPassListFoldout = "panel-pass-list";
             public const string kSearchField = "search-field";
         }
+
         static partial class Classes
         {
             public const string kPanelListLineBreak = "panel-list__line-break";
@@ -49,10 +45,10 @@ namespace UnityEditor.Rendering
         float m_ContentSplitViewFixedPaneWidth = 280;
 
         // Lists of text elements that the search filters are able to highlight
-        Dictionary<VisualElement, List<TextElement>> m_SidePanelResourceTexts = new ();
-        Dictionary<VisualElement, List<TextElement>> m_SidePanelPassTexts = new ();
-        Dictionary<VisualElement, List<TextElement>> m_GridResourceListTexts = new ();
-        Dictionary<VisualElement, List<TextElement>> m_GridPassListTexts = new ();
+        Dictionary<VisualElement, List<TextElement>> m_SidePanelResourceTexts = new();
+        Dictionary<VisualElement, List<TextElement>> m_SidePanelPassTexts = new();
+        Dictionary<VisualElement, List<TextElement>> m_GridResourceListTexts = new();
+        Dictionary<VisualElement, List<TextElement>> m_GridPassListTexts = new();
         UIElementSearchFilter m_SearchFilter;
 
         void InitializeSidePanel()
@@ -114,7 +110,11 @@ namespace UnityEditor.Rendering
             m_SearchFilter.InitializeSearchField(Names.kSearchField);
         }
 
-        internal static void PerformSearch(Dictionary<VisualElement, List<TextElement>> elementCache, string searchString, bool hideRootElementIfNoMatch = false)
+        internal static void PerformSearch(
+            Dictionary<VisualElement, List<TextElement>> elementCache,
+            string searchString,
+            bool hideRootElementIfNoMatch = false
+        )
         {
             foreach (var (rootElement, textElements) in elementCache)
             {
@@ -156,7 +156,9 @@ namespace UnityEditor.Rendering
             int visibleResourceIndex = 0;
             foreach (var visibleResourceElement in m_ResourceElementsInfo)
             {
-                var resourceData = m_CurrentDebugData.resourceLists[(int)visibleResourceElement.type][visibleResourceElement.index];
+                var resourceData = m_CurrentDebugData.resourceLists[(int)visibleResourceElement.type][
+                    visibleResourceElement.index
+                ];
 
                 var resourceItem = new Foldout();
                 resourceItem.text = resourceData.name;
@@ -178,7 +180,10 @@ namespace UnityEditor.Rendering
 
                 var foldoutCheckmark = resourceItem.Q("unity-checkmark");
                 // Add resource type icon before the label
-                foldoutCheckmark.parent.Insert(1, CreateResourceTypeIcon(visibleResourceElement.type, resourceData.memoryless));
+                foldoutCheckmark.parent.Insert(
+                    1,
+                    CreateResourceTypeIcon(visibleResourceElement.type, resourceData.memoryless)
+                );
                 foldoutCheckmark.parent.Add(iconContainer);
                 foldoutCheckmark.BringToFront(); // Move foldout checkmark to the right
 
@@ -192,7 +197,11 @@ namespace UnityEditor.Rendering
                     var lineBreak = new VisualElement();
                     lineBreak.AddToClassList(Classes.kPanelListLineBreak);
                     resourceItem.Add(lineBreak);
-                    resourceItem.Add(new Label($"Size: {resourceData.textureData.width}x{resourceData.textureData.height}x{resourceData.textureData.depth}"));
+                    resourceItem.Add(
+                        new Label(
+                            $"Size: {resourceData.textureData.width}x{resourceData.textureData.height}x{resourceData.textureData.depth}"
+                        )
+                    );
                     resourceItem.Add(new Label($"Format: {resourceData.textureData.format.ToString()}"));
                     resourceItem.Add(new Label($"Clear: {resourceData.textureData.clearBuffer}"));
                     resourceItem.Add(new Label($"BindMS: {resourceData.textureData.bindMS}"));
@@ -272,7 +281,10 @@ namespace UnityEditor.Rendering
                     if (nativePassInfo.mergedPassIds.Count == 1)
                         CreateTextElement(passItem, "Native Pass was created from Raster Render Pass.");
                     else if (nativePassInfo.mergedPassIds.Count > 1)
-                        CreateTextElement(passItem, $"Native Pass was created by merging {nativePassInfo.mergedPassIds.Count} Raster Render Passes.");
+                        CreateTextElement(
+                            passItem,
+                            $"Native Pass was created by merging {nativePassInfo.mergedPassIds.Count} Raster Render Passes."
+                        );
 
                     CreateTextElement(passItem, "Pass break reasoning", Classes.kSubHeaderText);
                     CreateTextElement(passItem, nativePassInfo.passBreakReasoning);
@@ -293,7 +305,7 @@ namespace UnityEditor.Rendering
                         Debug.Assert(pass.nrpInfo != null); // This overlay currently assumes NRP compiler
 
                         var passFoldout = new Foldout();
-                        passFoldout.text = $"<b>{pass.name}</b> ({k_PassTypeNames[(int) pass.type]})";
+                        passFoldout.text = $"<b>{pass.name}</b> ({k_PassTypeNames[(int)pass.type]})";
 
                         var foldoutTextElement = passFoldout.Q<TextElement>(className: Foldout.textUssClassName);
                         foldoutTextElement.displayTooltipWhenElided = false; // no tooltip override when ellipsis is active
@@ -311,7 +323,8 @@ namespace UnityEditor.Rendering
 
                         passFoldout.AddToClassList(Classes.kInfoFoldout);
                         passFoldout.AddToClassList(Classes.kCustomFoldoutArrow);
-                        passFoldout.Q<Toggle>().tooltip = $"The {k_PassTypeNames[(int) pass.type]} <b>{pass.name}</b> belongs to native subpass {pass.nativeSubPassIndex}.";
+                        passFoldout.Q<Toggle>().tooltip =
+                            $"The {k_PassTypeNames[(int)pass.type]} <b>{pass.name}</b> belongs to native subpass {pass.nativeSubPassIndex}.";
 
                         var foldoutCheckmark = passFoldout.Q("unity-checkmark");
                         foldoutCheckmark.BringToFront(); // Move foldout checkmark to the right
@@ -320,8 +333,10 @@ namespace UnityEditor.Rendering
                         lineBreak.AddToClassList(Classes.kPanelListLineBreak);
                         passFoldout.Add(lineBreak);
 
-                        CreateTextElement(passFoldout,
-                            $"Attachment dimensions: {pass.nrpInfo.width}x{pass.nrpInfo.height}x{pass.nrpInfo.volumeDepth}");
+                        CreateTextElement(
+                            passFoldout,
+                            $"Attachment dimensions: {pass.nrpInfo.width}x{pass.nrpInfo.height}x{pass.nrpInfo.volumeDepth}"
+                        );
                         CreateTextElement(passFoldout, $"Has depth attachment: {pass.nrpInfo.hasDepth}");
                         CreateTextElement(passFoldout, $"MSAA samples: {pass.nrpInfo.samples}");
                         CreateTextElement(passFoldout, $"Async compute: {pass.async}");
@@ -347,13 +362,16 @@ namespace UnityEditor.Rendering
                             Label attachmentIndexLabel = new Label($"<br>Attachment #{attachmentInfo.attachmentIndex}");
                             attachmentIndexLabel.AddToClassList(Classes.kInfoFoldoutSecondaryText);
 
-                            var foldoutTextElement = attachmentFoldout.Q<TextElement>(className: Foldout.textUssClassName);
+                            var foldoutTextElement = attachmentFoldout.Q<TextElement>(
+                                className: Foldout.textUssClassName
+                            );
                             foldoutTextElement.displayTooltipWhenElided = false; // no tooltip override when ellipsis is active
                             foldoutTextElement.Add(attachmentIndexLabel);
 
                             attachmentFoldout.AddToClassList(Classes.kInfoFoldout);
                             attachmentFoldout.AddToClassList(Classes.kCustomFoldoutArrow);
-                            attachmentFoldout.Q<Toggle>().tooltip = $"Texture <b>{attachmentInfo.resourceName}</b> is bound at attachment index {attachmentInfo.attachmentIndex}.";
+                            attachmentFoldout.Q<Toggle>().tooltip =
+                                $"Texture <b>{attachmentInfo.resourceName}</b> is bound at attachment index {attachmentInfo.attachmentIndex}.";
 
                             var foldoutCheckmark = attachmentFoldout.Q("unity-checkmark");
                             foldoutCheckmark.BringToFront(); // Move foldout checkmark to the right
@@ -362,16 +380,20 @@ namespace UnityEditor.Rendering
                             lineBreak.AddToClassList(Classes.kPanelListLineBreak);
                             attachmentFoldout.Add(lineBreak);
 
-                            attachmentFoldout.Add(new TextElement
-                            {
-                                text = $"<b>Load action:</b> {attachmentInfo.attachment.loadAction}\n- {attachmentInfo.loadReason}"
-                            });
+                            attachmentFoldout.Add(
+                                new TextElement
+                                {
+                                    text =
+                                        $"<b>Load action:</b> {attachmentInfo.attachment.loadAction}\n- {attachmentInfo.loadReason}",
+                                }
+                            );
 
                             bool addMsaaInfo = !string.IsNullOrEmpty(attachmentInfo.storeMsaaReason);
                             string resolvedTexturePrefix = addMsaaInfo ? "Resolved surface: " : "";
 
-                            string storeActionText = $"<b>Store action:</b> {attachmentInfo.attachment.storeAction}" +
-                                                     $"\n - {resolvedTexturePrefix}{attachmentInfo.storeReason}";
+                            string storeActionText =
+                                $"<b>Store action:</b> {attachmentInfo.attachment.storeAction}"
+                                + $"\n - {resolvedTexturePrefix}{attachmentInfo.storeReason}";
 
                             if (addMsaaInfo)
                             {
@@ -426,7 +448,10 @@ namespace UnityEditor.Rendering
             else
             {
                 // Update aspect ratio in case user has dragged the split view
-                if (m_SidePanelFixedPaneHeight > kFoldoutHeaderHeightPx && m_SidePanelFixedPaneHeight < panelHeightPx - kFoldoutHeaderHeightPx)
+                if (
+                    m_SidePanelFixedPaneHeight > kFoldoutHeaderHeightPx
+                    && m_SidePanelFixedPaneHeight < panelHeightPx - kFoldoutHeaderHeightPx
+                )
                 {
                     m_SidePanelVerticalAspectRatio = m_SidePanelFixedPaneHeight / panelHeightPx;
                 }
@@ -469,35 +494,37 @@ namespace UnityEditor.Rendering
         void ScrollToFoldout(VisualElement parent, int index)
         {
             ScrollView scrollView = parent.Q<ScrollView>();
-            scrollView.Query<Foldout>(classes: Classes.kPanelListItem).ForEach(foldout =>
-            {
-                if (index == (int) foldout.userData)
+            scrollView
+                .Query<Foldout>(classes: Classes.kPanelListItem)
+                .ForEach(foldout =>
                 {
-                    // Trigger animation
-                    foldout.AddToClassList(Classes.kPanelListItemSelectionAnimation);
-
-                    // This repaint hack is needed because transition animations have poor framerate. So we are hooking to editor update
-                    // loop for the duration of the animation to force repaints and have a smooth highlight animation.
-                    // See https://jira.unity3d.com/browse/UIE-1326
-                    EditorApplication.update += Repaint;
-
-                    foldout.RegisterCallbackOnce<TransitionEndEvent>(_ =>
+                    if (index == (int)foldout.userData)
                     {
-                        // "Highlight in" animation finished
-                        foldout.RemoveFromClassList(Classes.kPanelListItemSelectionAnimation);
+                        // Trigger animation
+                        foldout.AddToClassList(Classes.kPanelListItemSelectionAnimation);
+
+                        // This repaint hack is needed because transition animations have poor framerate. So we are hooking to editor update
+                        // loop for the duration of the animation to force repaints and have a smooth highlight animation.
+                        // See https://jira.unity3d.com/browse/UIE-1326
+                        EditorApplication.update += Repaint;
+
                         foldout.RegisterCallbackOnce<TransitionEndEvent>(_ =>
                         {
-                            // "Highlight out" animation finished
-                            EditorApplication.update -= Repaint;
+                            // "Highlight in" animation finished
+                            foldout.RemoveFromClassList(Classes.kPanelListItemSelectionAnimation);
+                            foldout.RegisterCallbackOnce<TransitionEndEvent>(_ =>
+                            {
+                                // "Highlight out" animation finished
+                                EditorApplication.update -= Repaint;
+                            });
                         });
-                    });
 
-                    // Open foldout
-                    foldout.value = true;
-                    // Defer scrolling to allow foldout to be expanded first
-                    scrollView.schedule.Execute(() => scrollView.ScrollTo(foldout)).StartingIn(50);
-                }
-            });
+                        // Open foldout
+                        foldout.value = true;
+                        // Defer scrolling to allow foldout to be expanded first
+                        scrollView.schedule.Execute(() => scrollView.ScrollTo(foldout)).StartingIn(50);
+                    }
+                });
         }
     }
 }

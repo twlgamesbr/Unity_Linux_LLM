@@ -41,7 +41,13 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
         {
             var exceptions = new List<Exception>();
 
-            foreach (var targetClassType in attributeFinder.Search(testJobData.testTree, testJobData.testFilter, testJobData.TargetRuntimePlatform))
+            foreach (
+                var targetClassType in attributeFinder.Search(
+                    testJobData.testTree,
+                    testJobData.testFilter,
+                    testJobData.TargetRuntimePlatform
+                )
+            )
             {
                 try
                 {

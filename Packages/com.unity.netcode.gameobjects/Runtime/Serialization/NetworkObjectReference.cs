@@ -37,7 +37,9 @@ namespace Unity.Netcode
 
             if (networkObject.IsSpawned == false)
             {
-                throw new ArgumentException($"{nameof(NetworkObjectReference)} can only be created from spawned {nameof(NetworkObject)}s.");
+                throw new ArgumentException(
+                    $"{nameof(NetworkObjectReference)} can only be created from spawned {nameof(NetworkObject)}s."
+                );
             }
 
             m_NetworkObjectId = networkObject.NetworkObjectId;
@@ -60,12 +62,16 @@ namespace Unity.Netcode
             var networkObject = gameObject.GetComponent<NetworkObject>();
             if (!networkObject)
             {
-                throw new ArgumentException($"Cannot create {nameof(NetworkObjectReference)} from {nameof(GameObject)} without a {nameof(NetworkObject)} component.");
+                throw new ArgumentException(
+                    $"Cannot create {nameof(NetworkObjectReference)} from {nameof(GameObject)} without a {nameof(NetworkObject)} component."
+                );
             }
 
             if (networkObject.IsSpawned == false)
             {
-                throw new ArgumentException($"{nameof(NetworkObjectReference)} can only be created from spawned {nameof(NetworkObject)}s.");
+                throw new ArgumentException(
+                    $"{nameof(NetworkObjectReference)} can only be created from spawned {nameof(NetworkObject)}s."
+                );
             }
 
             m_NetworkObjectId = networkObject.NetworkObjectId;
@@ -90,14 +96,20 @@ namespace Unity.Netcode
         /// <param name="networkManager">The networkmanager. Uses <see cref="NetworkManager.Singleton"/> to resolve if null.</param>
         /// <returns>The resolved <see cref="NetworkObject"/>. Returns null if the networkobject was not found</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static NetworkObject Resolve(NetworkObjectReference networkObjectRef, NetworkManager networkManager = null)
+        private static NetworkObject Resolve(
+            NetworkObjectReference networkObjectRef,
+            NetworkManager networkManager = null
+        )
         {
             if (networkObjectRef.m_NetworkObjectId == k_NullId)
             {
                 return null;
             }
             networkManager = networkManager ?? NetworkManager.Singleton;
-            networkManager.SpawnManager.SpawnedObjects.TryGetValue(networkObjectRef.m_NetworkObjectId, out NetworkObject networkObject);
+            networkManager.SpawnManager.SpawnedObjects.TryGetValue(
+                networkObjectRef.m_NetworkObjectId,
+                out NetworkObject networkObject
+            );
 
             return networkObject;
         }
@@ -121,7 +133,8 @@ namespace Unity.Netcode
         }
 
         /// <inheritdoc/>
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             serializer.SerializeValue(ref m_NetworkObjectId);
         }
@@ -131,14 +144,16 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="networkObjectRef">The <see cref="NetworkObjectReference"/> to convert from.</param>
         /// <returns>The <see cref="NetworkObject"/> the <see cref="NetworkObjectReference"/> is referencing</returns>
-        public static implicit operator NetworkObject(NetworkObjectReference networkObjectRef) => Resolve(networkObjectRef);
+        public static implicit operator NetworkObject(NetworkObjectReference networkObjectRef) =>
+            Resolve(networkObjectRef);
 
         /// <summary>
         /// Implicitly convert <see cref="NetworkObject"/> to <see cref="NetworkObjectReference"/>.
         /// </summary>
         /// <param name="networkObject">The <see cref="NetworkObject"/> to convert from.</param>
         /// <returns>The <see cref="NetworkObjectReference"/> created from the <see cref="NetworkObject"/> parameter</returns>
-        public static implicit operator NetworkObjectReference(NetworkObject networkObject) => new NetworkObjectReference(networkObject);
+        public static implicit operator NetworkObjectReference(NetworkObject networkObject) =>
+            new NetworkObjectReference(networkObject);
 
         /// <summary>
         /// Implicitly convert <see cref="NetworkObjectReference"/> to <see cref="GameObject"/>.
@@ -161,6 +176,7 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="gameObject">The <see cref="GameObject"/> to convert from.</param>
         /// <returns>The <see cref="NetworkObjectReference"/> created from the <see cref="GameObject"/> parameter that has a <see cref="NetworkObject"/> component attached to it</returns>
-        public static implicit operator NetworkObjectReference(GameObject gameObject) => new NetworkObjectReference(gameObject);
+        public static implicit operator NetworkObjectReference(GameObject gameObject) =>
+            new NetworkObjectReference(gameObject);
     }
 }

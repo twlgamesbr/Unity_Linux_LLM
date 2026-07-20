@@ -39,7 +39,7 @@ namespace UnityEditor.Rendering.Universal
         static void ListAvailableConverters()
         {
             // Get all converters and group them by container
-            var containersDict = DictionaryPool<string,List<string>>.Get();
+            var containersDict = DictionaryPool<string, List<string>>.Get();
             foreach (var container in TypeCache.GetTypesWithAttribute<BatchModeConverterClassInfo>())
             {
                 if (container.IsAbstract || container.IsInterface)
@@ -73,15 +73,19 @@ namespace UnityEditor.Rendering.Universal
 
             // Description
             helpMessage.AppendLine("\n");
-            helpMessage.AppendLine( "The batchmode converter is a tool to help you upgrade your projects from one scriptable render pipeline\n" +
-                                   "to another. Using this API can lead to incomplete or unpredictable conversion outcomes.\n" +
-                                   "For reliable results, please perform the conversion via the dedicated window: Window > Rendering > Render Pipeline Converter.");
+            helpMessage.AppendLine(
+                "The batchmode converter is a tool to help you upgrade your projects from one scriptable render pipeline\n"
+                    + "to another. Using this API can lead to incomplete or unpredictable conversion outcomes.\n"
+                    + "For reliable results, please perform the conversion via the dedicated window: Window > Rendering > Render Pipeline Converter."
+            );
             helpMessage.AppendLine("\n");
 
             // Usage
-            helpMessage.AppendLine($"usage: \t<path to Unity executable> -projectPath <project path> {k_BatchmodeCommand} -executeMethod UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine\n" +
-                                   $"\t \t[{k_HelpCommand}] [{k_ListCommand}]\n" +
-                                   $"\t \t[{k_ContainerCommand} <name of container>] [{k_TypesFilterCommand} <types to include or exclude>] [{k_InclusiveFlag}|{k_ExclusiveFlag}]");
+            helpMessage.AppendLine(
+                $"usage: \t<path to Unity executable> -projectPath <project path> {k_BatchmodeCommand} -executeMethod UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine\n"
+                    + $"\t \t[{k_HelpCommand}] [{k_ListCommand}]\n"
+                    + $"\t \t[{k_ContainerCommand} <name of container>] [{k_TypesFilterCommand} <types to include or exclude>] [{k_InclusiveFlag}|{k_ExclusiveFlag}]"
+            );
             helpMessage.AppendLine("\n");
 
             // Commands
@@ -92,16 +96,28 @@ namespace UnityEditor.Rendering.Universal
 
             // Options
             helpMessage.AppendLine("Options");
-            helpMessage.AppendLine($"\t{k_ContainerCommand} <name of container> \t \t \t The name of the container which will be batched (required).");
-            helpMessage.AppendLine($"\t{k_TypesFilterCommand} <types to include or exclude> \t The list of converters types that will be either included or excluded from batching. These converters need to be part of the passed in container for them to run.");
-            helpMessage.AppendLine($"\t{k_InclusiveFlag}|{k_ExclusiveFlag} \t \t \t Whether the list of converters specified with {k_TypesFilterCommand} will be included or excluded when batching.");
+            helpMessage.AppendLine(
+                $"\t{k_ContainerCommand} <name of container> \t \t \t The name of the container which will be batched (required)."
+            );
+            helpMessage.AppendLine(
+                $"\t{k_TypesFilterCommand} <types to include or exclude> \t The list of converters types that will be either included or excluded from batching. These converters need to be part of the passed in container for them to run."
+            );
+            helpMessage.AppendLine(
+                $"\t{k_InclusiveFlag}|{k_ExclusiveFlag} \t \t \t Whether the list of converters specified with {k_TypesFilterCommand} will be included or excluded when batching."
+            );
             helpMessage.AppendLine("\n");
 
             helpMessage.AppendLine("Notes");
             helpMessage.AppendLine($"\t Use either {k_InclusiveFlag} or {k_ExclusiveFlag}, not both.");
-            helpMessage.AppendLine($"\t When using {k_InclusiveFlag}, you must specify values for {k_TypesFilterCommand}.");
-            helpMessage.AppendLine($"\t Values for {k_TypesFilterCommand} must be provided as a space-separated list: {k_TypesFilterCommand} typeA typeB typeC");
-            helpMessage.AppendLine("\nOnline documentation: https://docs.unity3d.com/6000.5/Documentation/Manual/urp/convert-assets-to-urp.html\n");
+            helpMessage.AppendLine(
+                $"\t When using {k_InclusiveFlag}, you must specify values for {k_TypesFilterCommand}."
+            );
+            helpMessage.AppendLine(
+                $"\t Values for {k_TypesFilterCommand} must be provided as a space-separated list: {k_TypesFilterCommand} typeA typeB typeC"
+            );
+            helpMessage.AppendLine(
+                "\nOnline documentation: https://docs.unity3d.com/6000.5/Documentation/Manual/urp/convert-assets-to-urp.html\n"
+            );
 
             Debug.Log(helpMessage);
         }
@@ -109,14 +125,21 @@ namespace UnityEditor.Rendering.Universal
         internal static void SuggestUpdatedCommand(string container, List<string> converters, bool isInclusive)
         {
             var containerParameter = $" {k_ContainerCommand} {container}";
-            var converterParameter = converters.Count == 0 ? "" : $" {k_TypesFilterCommand} {string.Join(" ", converters)}";
+            var converterParameter =
+                converters.Count == 0 ? "" : $" {k_TypesFilterCommand} {string.Join(" ", converters)}";
             var filterModeFlag = isInclusive ? $" {k_InclusiveFlag}" : $" {k_ExclusiveFlag}";
-            Debug.Log("The method you're trying to use is deprecated. Try running the following command in the command line:\n" +
-                      $"<path to Unity> -projectPath <path to project> {k_BatchmodeCommand} -executeMethod UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine{filterModeFlag}{containerParameter}{converterParameter}");
+            Debug.Log(
+                "The method you're trying to use is deprecated. Try running the following command in the command line:\n"
+                    + $"<path to Unity> -projectPath <path to project> {k_BatchmodeCommand} -executeMethod UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine{filterModeFlag}{containerParameter}{converterParameter}"
+            );
         }
 
         // Return all converters we will be running
-        internal static List<Type> FilterConverters(string containerName, List<string> convertedTypesFilter, bool isInclusive = false)
+        internal static List<Type> FilterConverters(
+            string containerName,
+            List<string> convertedTypesFilter,
+            bool isInclusive = false
+        )
         {
             var allConverters = TypeCache.GetTypesWithAttribute<BatchModeConverterClassInfo>();
             var filteredList = new List<Type>(allConverters.Count);
@@ -147,12 +170,12 @@ namespace UnityEditor.Rendering.Universal
             if (batchmodeArgIndex == -1)
                 throw new ArgumentException($"No {k_BatchmodeCommand} argument found. Exiting.");
 
-            var parsedArgs = DictionaryPool<string,List<string>>.Get();
+            var parsedArgs = DictionaryPool<string, List<string>>.Get();
             parsedArgs["Flags"] = new List<string>();
 
             string currentKey = null; // are we collecting values for a key?
 
-            for(int i = batchmodeArgIndex + 1; i < rawArgs.Length; i++)
+            for (int i = batchmodeArgIndex + 1; i < rawArgs.Length; i++)
             {
                 if (rawArgs[i].StartsWith("--")) // new flag
                 {
@@ -184,7 +207,7 @@ namespace UnityEditor.Rendering.Universal
         /// <param name="containerName">The name of the container which will be batched. All Converters in this Container will run if prerequisites are met.</param>
         public static void RunInBatchMode(string containerName)
         {
-             RunInBatchMode(containerName, null, isInclusive: false);
+            RunInBatchMode(containerName, null, isInclusive: false);
         }
 
         /// <summary>
@@ -227,9 +250,13 @@ namespace UnityEditor.Rendering.Universal
 
                 // ContainerType -----
                 if (!args.TryGetValue(k_ContainerCommand, out var converter))
-                    throw new ArgumentException($"Missing required {k_ContainerCommand} <name of container>. Use {k_ListCommand} to see available converter.");
-                if(converter.Count != 1)
-                    throw new ArgumentException($"Please specify only one container. Use {k_ListCommand} to see available converters.");
+                    throw new ArgumentException(
+                        $"Missing required {k_ContainerCommand} <name of container>. Use {k_ListCommand} to see available converter."
+                    );
+                if (converter.Count != 1)
+                    throw new ArgumentException(
+                        $"Please specify only one container. Use {k_ListCommand} to see available converters."
+                    );
 
                 // Filter + Include/Exclude ------
                 var hasInclusive = args["Flags"].Contains(k_InclusiveFlag);
@@ -238,12 +265,16 @@ namespace UnityEditor.Rendering.Universal
 
                 if (hasTypesFilter && hasExclusive == hasInclusive)
                 {
-                    throw new ArgumentException($"When using {k_TypesFilterCommand}, please specify exactly one of {k_InclusiveFlag} or {k_ExclusiveFlag}. Use {k_HelpCommand} for usage.");
+                    throw new ArgumentException(
+                        $"When using {k_TypesFilterCommand}, please specify exactly one of {k_InclusiveFlag} or {k_ExclusiveFlag}. Use {k_HelpCommand} for usage."
+                    );
                 }
 
                 if (hasInclusive && !hasTypesFilter)
-                    throw new ArgumentException($"When using {k_InclusiveFlag} mode, please specify types to include using {k_TypesFilterCommand} otherwise nothing will be converted. " +
-                                                $"Use {k_ListCommand} to see available types.");
+                    throw new ArgumentException(
+                        $"When using {k_InclusiveFlag} mode, please specify types to include using {k_TypesFilterCommand} otherwise nothing will be converted. "
+                            + $"Use {k_ListCommand} to see available types."
+                    );
 
                 RunInBatchMode(converter[0], filteredTypes, hasInclusive);
             }
@@ -258,14 +289,16 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-         /// <summary>
+        /// <summary>
         /// Call this method to run a specific list of converters in batch mode.
         /// </summary>
         /// <param name="converterTypes">The list of converters to run</param>
         /// <returns>False if there were errors.</returns>
         internal static bool RunInBatchMode(List<Type> converterTypes)
         {
-            Debug.LogWarning($"Using this API can lead to incomplete or unpredictable conversion outcomes. For reliable results, please perform the conversion via the dedicated window: Window > Rendering > Render Pipeline Converter.");
+            Debug.LogWarning(
+                $"Using this API can lead to incomplete or unpredictable conversion outcomes. For reliable results, please perform the conversion via the dedicated window: Window > Rendering > Render Pipeline Converter."
+            );
 
             List<IRenderPipelineConverter> convertersToExecute = new();
 
@@ -318,16 +351,18 @@ namespace UnityEditor.Rendering.Universal
                         switch (status)
                         {
                             case Status.Pending:
-                                throw new InvalidOperationException("Converter returned a pending status when converting. This is not supported.");
+                                throw new InvalidOperationException(
+                                    "Converter returned a pending status when converting. This is not supported."
+                                );
                             case Status.Error:
                             case Status.Warning:
                                 sb.AppendLine($"- {item.name} ({status}) ({message})");
                                 break;
                             case Status.Success:
-                            {
-                                sb.AppendLine($"- {item.name} ({status})");
-                            }
-                            break;
+                                {
+                                    sb.AppendLine($"- {item.name} ({status})");
+                                }
+                                break;
                         }
                     }
                     converter.AfterConvert();

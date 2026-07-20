@@ -8,7 +8,11 @@ namespace UnityEngine.InputSystem.LowLevel
     /// <summary>
     /// Enum of different player loop positions where the input system can invoke its update mechanism.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames", Justification = "Not consistently used as flags, many using APIs expect only one type to be passed.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Microsoft.Naming",
+        "CA1714:FlagsEnumsShouldHavePluralNames",
+        Justification = "Not consistently used as flags, many using APIs expect only one type to be passed."
+    )]
     [Flags]
     public enum InputUpdateType
     {
@@ -76,10 +80,10 @@ namespace UnityEngine.InputSystem.LowLevel
         public static uint s_UpdateStepCount; // read only, but kept as a variable for performance reasons
         public static InputUpdateType s_LatestUpdateType;
         public static UpdateStepCount s_PlayerUpdateStepCount;
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public static InputUpdateType s_LatestNonEditorUpdateType;
         public static UpdateStepCount s_EditorUpdateStepCount;
-        #endif
+#endif
 
         [Serializable]
         public struct UpdateStepCount
@@ -108,10 +112,10 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             public InputUpdateType lastUpdateType;
             public UpdateStepCount playerUpdateStepCount;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             public InputUpdateType lastNonEditorUpdateType;
             public UpdateStepCount editorUpdateStepCount;
-            #endif
+#endif
         }
 
         internal static void OnBeforeUpdate(InputUpdateType type)
@@ -124,16 +128,16 @@ namespace UnityEngine.InputSystem.LowLevel
                 case InputUpdateType.Fixed:
                     s_PlayerUpdateStepCount.OnBeforeUpdate();
                     s_UpdateStepCount = s_PlayerUpdateStepCount.value;
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     s_LatestNonEditorUpdateType = type;
-                    #endif
+#endif
                     break;
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 case InputUpdateType.Editor:
                     s_EditorUpdateStepCount.OnBeforeUpdate();
                     s_UpdateStepCount = s_EditorUpdateStepCount.value;
                     break;
-                #endif
+#endif
             }
         }
 
@@ -147,27 +151,26 @@ namespace UnityEngine.InputSystem.LowLevel
                 case InputUpdateType.Fixed:
                     s_PlayerUpdateStepCount.OnUpdate();
                     s_UpdateStepCount = s_PlayerUpdateStepCount.value;
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     s_LatestNonEditorUpdateType = type;
-                    #endif
+#endif
                     break;
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 case InputUpdateType.Editor:
                     s_EditorUpdateStepCount.OnUpdate();
                     s_UpdateStepCount = s_EditorUpdateStepCount.value;
                     break;
-                #endif
+#endif
             }
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         internal static void RestoreStateAfterEditorUpdate()
         {
             s_LatestUpdateType = s_LatestNonEditorUpdateType;
             s_UpdateStepCount = s_PlayerUpdateStepCount.value;
         }
-
-        #endif
+#endif
 
         public static SerializedState Save()
         {
@@ -175,10 +178,10 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 lastUpdateType = s_LatestUpdateType,
                 playerUpdateStepCount = s_PlayerUpdateStepCount,
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 lastNonEditorUpdateType = s_LatestNonEditorUpdateType,
                 editorUpdateStepCount = s_EditorUpdateStepCount
-                #endif
+#endif
             };
         }
 
@@ -186,10 +189,10 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             s_LatestUpdateType = state.lastUpdateType;
             s_PlayerUpdateStepCount = state.playerUpdateStepCount;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             s_LatestNonEditorUpdateType = state.lastNonEditorUpdateType;
             s_EditorUpdateStepCount = state.editorUpdateStepCount;
-            #endif
+#endif
 
             switch (s_LatestUpdateType)
             {
@@ -198,11 +201,11 @@ namespace UnityEngine.InputSystem.LowLevel
                 case InputUpdateType.Fixed:
                     s_UpdateStepCount = s_PlayerUpdateStepCount.value;
                     break;
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 case InputUpdateType.Editor:
                     s_UpdateStepCount = s_EditorUpdateStepCount.value;
                     break;
-                #endif
+#endif
                 default:
                     // if there was no previous update type, reset the counter
                     s_UpdateStepCount = 0;
@@ -231,12 +234,12 @@ namespace UnityEngine.InputSystem.LowLevel
             return updateType != default;
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public static bool IsEditorUpdate(this InputUpdateType updateType)
         {
             return updateType == InputUpdateType.Editor;
         }
 
-        #endif
+#endif
     }
 }

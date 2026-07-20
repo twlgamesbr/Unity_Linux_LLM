@@ -30,7 +30,9 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             var timeDelta = TimeNow() - undoStartTime;
             if (timeDelta.TotalMilliseconds >= warningThreshold)
             {
-                LogWarning($"Undo after editor test run took {timeDelta.Seconds} second{(timeDelta.Seconds == 1 ? "" : "s")}.");
+                LogWarning(
+                    $"Undo after editor test run took {timeDelta.Seconds} second{(timeDelta.Seconds == 1 ? "" : "s")}."
+                );
             }
 
             ClearProgressBar();

@@ -321,7 +321,10 @@ namespace Unity.Entities
                 if (hash == desiredHash)
                 {
                     var archetype = archetypes.Ptr[offset];
-                    if (archetype->TypesCount == types && 0 == UnsafeUtility.MemCmp(archetype->Types, type, types * sizeof(ComponentTypeInArchetype)))
+                    if (
+                        archetype->TypesCount == types
+                        && 0 == UnsafeUtility.MemCmp(archetype->Types, type, types * sizeof(ComponentTypeInArchetype))
+                    )
                         return archetype;
                 }
                 offset = (offset + 1) & hashMask;

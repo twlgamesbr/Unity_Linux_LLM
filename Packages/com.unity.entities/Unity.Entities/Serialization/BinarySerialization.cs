@@ -5,7 +5,6 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.Entities.Serialization
 {
-
     /// <summary>
     /// An interface that writes primitive types to a binary buffer.
     /// </summary>
@@ -72,7 +71,7 @@ namespace Unity.Entities.Serialization
         /// <param name="bytes">The data to write.</param>
         public static void Write(this BinaryWriter writer, byte[] bytes)
         {
-            fixed(byte* p = bytes)
+            fixed (byte* p = bytes)
             {
                 writer.WriteBytes(p, bytes.Length);
             }
@@ -84,10 +83,15 @@ namespace Unity.Entities.Serialization
         /// <param name="writer">The BinaryReader to write to.</param>
         /// <param name="data">The data to write.</param>
         /// <typeparam name="T">The type of data to write from the native array.</typeparam>
-        public static void WriteArray<T>(this BinaryWriter writer, NativeArray<T> data) where T: struct
+        public static void WriteArray<T>(this BinaryWriter writer, NativeArray<T> data)
+            where T : struct
         {
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-            writer.ImHexPattern.WriteArrayOfTypeWithPosition<T>($"{typeof(T).Name}_Array", writer.Position, data.Length);
+            writer.ImHexPattern.WriteArrayOfTypeWithPosition<T>(
+                $"{typeof(T).Name}_Array",
+                writer.Position,
+                data.Length
+            );
 #endif
             writer.WriteBytes(data.GetUnsafeReadOnlyPtr(), data.Length * UnsafeUtility.SizeOf<T>());
         }
@@ -98,7 +102,8 @@ namespace Unity.Entities.Serialization
         /// <param name="writer">The BinaryReader to write to.</param>
         /// <param name="data">The data to write.</param>
         /// <typeparam name="T">The type of data to write from the native list.</typeparam>
-        public static void WriteList<T>(this BinaryWriter writer, NativeList<T> data) where T: unmanaged
+        public static void WriteList<T>(this BinaryWriter writer, NativeList<T> data)
+            where T : unmanaged
         {
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
             writer.ImHexPattern.WriteArrayOfTypeWithPosition<T>($"{typeof(T).Name}_List", writer.Position, data.Length);
@@ -115,7 +120,8 @@ namespace Unity.Entities.Serialization
         /// <param name="count">The number of elements to write.</param>
         /// <typeparam name="T">The type of data to write from the native list.</typeparam>
         /// <exception cref="ArgumentException">Throws if the index is outside of the buffer range.</exception>
-        public static void WriteList<T>(this BinaryWriter writer, NativeList<T> data, int index, int count) where T: unmanaged
+        public static void WriteList<T>(this BinaryWriter writer, NativeList<T> data, int index, int count)
+            where T : unmanaged
         {
             if (index + count > data.Length)
             {
@@ -127,7 +133,7 @@ namespace Unity.Entities.Serialization
 #endif
 
             var size = UnsafeUtility.SizeOf<T>();
-            writer.WriteBytes((byte*)data.GetUnsafePtr() + size*index, count * size);
+            writer.WriteBytes((byte*)data.GetUnsafePtr() + size * index, count * size);
         }
     }
 
@@ -211,7 +217,8 @@ namespace Unity.Entities.Serialization
         /// <param name="elements">The native array to read of.</param>
         /// <param name="count">The number of elements to read.</param>
         /// <typeparam name="T">The type of the elements in the native array.</typeparam>
-        public static void ReadArray<T>(this BinaryReader reader, NativeArray<T> elements, int count) where T: struct
+        public static void ReadArray<T>(this BinaryReader reader, NativeArray<T> elements, int count)
+            where T : struct
         {
             reader.ReadBytes((byte*)elements.GetUnsafeReadOnlyPtr(), count * UnsafeUtility.SizeOf<T>());
         }
@@ -238,28 +245,28 @@ namespace Unity.Entities.Serialization
                 throw new ArgumentException("The filepath can neither be null nor empty", nameof(filePath));
 
             FilePath = filePath;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             buffer = new byte[bufferSize];
-            #else
+#else
             Position = 0;
-            #endif
+#endif
         }
 
         public void Dispose()
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             stream.Dispose();
-            #endif
+#endif
         }
 
         public void ReadBytes(void* data, int bytes)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             int remaining = bytes;
             int bufferSize = buffer.Length;
 
-            fixed(byte* fixedBuffer = buffer)
+            fixed (byte* fixedBuffer = buffer)
             {
                 while (remaining != 0)
                 {
@@ -269,16 +276,23 @@ namespace Unity.Entities.Serialization
                     data = (byte*)data + read;
                 }
             }
-            #else
+#else
             var readCmd = new ReadCommand
             {
-                Size = bytes, Offset = Position, Buffer = data
+                Size = bytes,
+                Offset = Position,
+                Buffer = data,
             };
             Assert.IsFalse(string.IsNullOrEmpty(FilePath));
 #if ENABLE_PROFILER
             // When AsyncReadManagerMetrics are available, mark up the file read for more informative IO metrics.
             // Metrics can be retrieved by AsyncReadManagerMetrics.GetMetrics
-            var readHandle = AsyncReadManager.Read(FilePath, &readCmd, 1, subsystem: AssetLoadingSubsystem.EntitiesStreamBinaryReader);
+            var readHandle = AsyncReadManager.Read(
+                FilePath,
+                &readCmd,
+                1,
+                subsystem: AssetLoadingSubsystem.EntitiesStreamBinaryReader
+            );
 #else
             var readHandle = AsyncReadManager.Read(FilePath, &readCmd, 1);
 #endif
@@ -289,7 +303,7 @@ namespace Unity.Entities.Serialization
                 throw new IOException($"Failed to read from {FilePath}!");
             }
             Position += bytes;
-            #endif
+#endif
         }
     }
 
@@ -346,7 +360,7 @@ namespace Unity.Entities.Serialization
                     int bytesToWrite = Math.Min(remaining, bufferSize);
                     UnsafeUtility.MemCpy(fixedBuffer, data, bytesToWrite);
                     stream.Write(buffer, 0, bytesToWrite);
-                    data = (byte*) data + bytesToWrite;
+                    data = (byte*)data + bytesToWrite;
                     remaining -= bytesToWrite;
                 }
             }
@@ -386,7 +400,10 @@ namespace Unity.Entities.Serialization
         public MemoryBinaryWriter(EntityManager entityManager = default)
         {
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-            m_ImHexPattern = ImHexPatternEntitySceneBinaryWriter.Create(nameof(MemoryBinaryWriter), entityManager: entityManager);
+            m_ImHexPattern = ImHexPatternEntitySceneBinaryWriter.Create(
+                nameof(MemoryBinaryWriter),
+                entityManager: entityManager
+            );
 #endif
         }
 
@@ -499,9 +516,7 @@ namespace Unity.Entities.Serialization
         /// <summary>
         /// Disposes the MemoryBinaryReader.
         /// </summary>
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         /// <summary>
         /// Reads the specified number of bytes and advances the current read position by that number of bytes.
@@ -526,7 +541,12 @@ namespace Unity.Entities.Serialization
         /// <returns>The BurstableMemoryBinaryReader.</returns>
         public static explicit operator BurstableMemoryBinaryReader(MemoryBinaryReader src)
         {
-            return new BurstableMemoryBinaryReader {content = src.content, length = src.length, Position = src.Position};
+            return new BurstableMemoryBinaryReader
+            {
+                content = src.content,
+                length = src.length,
+                Position = src.Position,
+            };
         }
     }
 
@@ -560,9 +580,7 @@ namespace Unity.Entities.Serialization
         /// <summary>
         /// Disposes the MemoryBinaryReader.
         /// </summary>
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         /// <summary>
         /// Reads a byte and advances the current read position by a byte.
@@ -591,7 +609,7 @@ namespace Unity.Entities.Serialization
             if (Position + sizeof(int) > length)
                 throw new ArgumentException("ReadInt reads beyond end of memory block");
 #endif
-            var res = *(int*) (content + Position);
+            var res = *(int*)(content + Position);
             Position += sizeof(int);
             return res;
         }
@@ -607,7 +625,7 @@ namespace Unity.Entities.Serialization
             if (Position + sizeof(ulong) > length)
                 throw new ArgumentException("ReadULong reads beyond end of memory block");
 #endif
-            var res = *(ulong*) (content + Position);
+            var res = *(ulong*)(content + Position);
             Position += sizeof(ulong);
             return res;
         }

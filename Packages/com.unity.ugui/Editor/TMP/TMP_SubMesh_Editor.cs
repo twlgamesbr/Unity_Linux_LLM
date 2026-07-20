@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
@@ -35,7 +35,6 @@ namespace TMPro.EditorUtilities
             m_SortingLayerNames = SortingLayerHelper.sortingLayerNames;
         }
 
-
         public override void OnInspectorGUI()
         {
             EditorGUI.indentLevel = 0;
@@ -64,7 +63,6 @@ namespace TMPro.EditorUtilities
             int newSortingLayerOrder = EditorGUILayout.IntField("Order in Layer", m_Renderer.sortingOrder);
             if (newSortingLayerOrder != m_Renderer.sortingOrder)
                 m_Renderer.sortingOrder = newSortingLayerOrder;
-
         }
     }
 }

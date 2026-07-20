@@ -78,7 +78,8 @@ namespace Unity.Multiplayer.Tools.Adapters
         /// </returns>
         public static UnsubscribeFromAllAdapters SubscribeToAll(
             Action<INetworkAdapter> subscribeToAdapter,
-            Action<INetworkAdapter> unsubscribeFromAdapter)
+            Action<INetworkAdapter> unsubscribeFromAdapter
+        )
         {
             foreach (var adapter in s_Adapters)
             {
@@ -96,7 +97,6 @@ namespace Unity.Multiplayer.Tools.Adapters
                 OnAdapterAdded -= subscribeToAdapter;
                 OnAdapterRemoved -= unsubscribeFromAdapter;
             }
-
             ;
             return UnsubscribeFromAllAdapters;
         }

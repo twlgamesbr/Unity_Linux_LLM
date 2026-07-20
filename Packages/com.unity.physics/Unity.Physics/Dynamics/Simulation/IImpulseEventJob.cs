@@ -18,9 +18,7 @@ namespace Unity.Physics
     }
 
     /// <summary>   Interface for impulse events job. </summary>
-    public interface IImpulseEventsJob : IImpulseEventsJobBase
-    {
-    }
+    public interface IImpulseEventsJob : IImpulseEventsJobBase { }
 
     /// <summary>   An extension class for scheduling ImpulseEventsJob. </summary>
     public static class IImpulseEventJobExtensions
@@ -55,7 +53,12 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleParallel<T>(this T job, int innerLoopBatchCount, SimulationSingleton simulationSingleton, JobHandle inputDeps)
+        public static JobHandle ScheduleParallel<T>(
+            this T job,
+            int innerLoopBatchCount,
+            SimulationSingleton simulationSingleton,
+            JobHandle inputDeps
+        )
             where T : struct, IImpulseEventsJobBase
         {
             // Should work only for UnityPhysics
@@ -63,13 +66,25 @@ namespace Unity.Physics
             {
                 return inputDeps;
             }
-            return ScheduleParallelUnityPhysicsImpulseEventsJob(job, innerLoopBatchCount, simulationSingleton.AsSimulation(), inputDeps);
+            return ScheduleParallelUnityPhysicsImpulseEventsJob(
+                job,
+                innerLoopBatchCount,
+                simulationSingleton.AsSimulation(),
+                inputDeps
+            );
         }
 
-        static unsafe JobHandle ScheduleUnityPhysicsImpulseEventsJob<T>(T job, Simulation simulation, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleUnityPhysicsImpulseEventsJob<T>(
+            T job,
+            Simulation simulation,
+            JobHandle inputDeps
+        )
             where T : struct, IImpulseEventsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.Idle);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.Idle
+            );
             if (!simulation.ReadyForEventScheduling)
                 return inputDeps;
 
@@ -77,20 +92,33 @@ namespace Unity.Physics
             {
                 UserJobData = job,
                 EventReader = simulation.ImpulseEvents.EventDataStream.AsReader(),
-                IsParallel = false
+                IsParallel = false,
             };
 
             var jobReflectionData = ImpulseEventJobProcess<T>.jobReflectionData.Data;
             ImpulseEventJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-            var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Single);
+            var parameters = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref data),
+                jobReflectionData,
+                inputDeps,
+                ScheduleMode.Single
+            );
             return JobsUtility.Schedule(ref parameters);
         }
 
-        static unsafe JobHandle ScheduleParallelUnityPhysicsImpulseEventsJob<T>(T jobData, int innerLoopBatchCount, Simulation simulation, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleParallelUnityPhysicsImpulseEventsJob<T>(
+            T jobData,
+            int innerLoopBatchCount,
+            Simulation simulation,
+            JobHandle inputDeps
+        )
             where T : struct, IImpulseEventsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.Idle);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.Idle
+            );
             if (!simulation.ReadyForEventScheduling)
                 return inputDeps;
 
@@ -99,34 +127,54 @@ namespace Unity.Physics
             {
                 UserJobData = jobData,
                 EventReader = eventDataStream.AsReader(),
-                IsParallel = true
+                IsParallel = true,
             };
 
             var jobReflectionData = ImpulseEventJobProcess<T>.jobReflectionData.Data;
             ImpulseEventJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-            var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Parallel);
+            var parameters = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref data),
+                jobReflectionData,
+                inputDeps,
+                ScheduleMode.Parallel
+            );
             var forEachCountPtr = NativeStreamUnsafeUtility.GetUnsafeForEachCountPtr(ref eventDataStream);
             var listDataPtr = (byte*)forEachCountPtr - sizeof(void*);
-            return JobsUtility.ScheduleParallelForDeferArraySize(ref parameters, innerLoopBatchCount, listDataPtr, null);
+            return JobsUtility.ScheduleParallelForDeferArraySize(
+                ref parameters,
+                innerLoopBatchCount,
+                listDataPtr,
+                null
+            );
         }
 
-        internal struct ImpulseEventJobData<T> where T : struct
+        internal struct ImpulseEventJobData<T>
+            where T : struct
         {
             public T UserJobData;
-            [NativeDisableContainerSafetyRestriction] public NativeStream.Reader EventReader;
+
+            [NativeDisableContainerSafetyRestriction]
+            public NativeStream.Reader EventReader;
             public bool IsParallel;
         }
 
-        internal struct ImpulseEventJobProcess<T> where T : struct, IImpulseEventsJobBase
+        internal struct ImpulseEventJobProcess<T>
+            where T : struct, IImpulseEventsJobBase
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<ImpulseEventJobProcess<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                ImpulseEventJobProcess<T>
+            >();
 
             [Preserve]
             public static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(ImpulseEventJobData<T>), typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(ImpulseEventJobData<T>),
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
             [System.Diagnostics.Conditional("ENABLE_UNITY_COLLECTIONS_CHECK")]
@@ -136,11 +184,21 @@ namespace Unity.Physics
                     throw new InvalidOperationException("Reflection data was not set up by an Initialize() call");
             }
 
-            public delegate void ExecuteJobFunction(ref ImpulseEventJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref ImpulseEventJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
-            public unsafe static void Execute(ref ImpulseEventJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static unsafe void Execute(
+                ref ImpulseEventJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
@@ -149,17 +207,31 @@ namespace Unity.Physics
 
                     if (jobData.IsParallel)
                     {
-                        if (!JobsUtility.GetWorkStealingRange(ref ranges, jobIndex, out forEachIndexBegin,
-                                out forEachIndexEnd))
+                        if (
+                            !JobsUtility.GetWorkStealingRange(
+                                ref ranges,
+                                jobIndex,
+                                out forEachIndexBegin,
+                                out forEachIndexEnd
+                            )
+                        )
                             break;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData),
-                            forEachIndexBegin, forEachIndexEnd - forEachIndexBegin);
+                        JobsUtility.PatchBufferMinMaxRanges(
+                            bufferRangePatchData,
+                            UnsafeUtility.AddressOf(ref jobData),
+                            forEachIndexBegin,
+                            forEachIndexEnd - forEachIndexBegin
+                        );
 #endif
                     }
 
-                    var eventEnumerator = new ImpulseEvents.Enumerator(jobData.EventReader, forEachIndexBegin, forEachIndexEnd);
+                    var eventEnumerator = new ImpulseEvents.Enumerator(
+                        jobData.EventReader,
+                        forEachIndexBegin,
+                        forEachIndexEnd
+                    );
 
                     while (eventEnumerator.MoveNext())
                     {

@@ -37,8 +37,15 @@ namespace UnityEditor.Rendering
                 }
 
                 // Generate all files
-                await Task.WhenAll(sourceGenerators.Select(async it =>
-                    await GenerateAsync($"{it.Key}.hlsl", $"{Path.ChangeExtension(it.Key, "custom")}.hlsl", it.Value)));
+                await Task.WhenAll(
+                    sourceGenerators.Select(async it =>
+                        await GenerateAsync(
+                            $"{it.Key}.hlsl",
+                            $"{Path.ChangeExtension(it.Key, "custom")}.hlsl",
+                            it.Value
+                        )
+                    )
+                );
             }
             finally
             {
@@ -59,8 +66,11 @@ namespace UnityEditor.Rendering
         /// <param name="targetCustomFilename">Path of the custom file to include. (If it exists)</param>
         /// <param name="generators">Generators to execute.</param>
         /// <returns>Awaitable task.</returns>
-        private static async Task GenerateAsync(string targetFilename, string targetCustomFilename,
-            List<ShaderTypeGenerator> generators)
+        private static async Task GenerateAsync(
+            string targetFilename,
+            string targetCustomFilename,
+            List<ShaderTypeGenerator> generators
+        )
         {
             var skipFile = false;
 
@@ -116,7 +126,9 @@ namespace UnityEditor.Rendering
                 guard = "_" + guard;
 
             await writer.WriteLineAsync("//");
-            await writer.WriteLineAsync("// This file was automatically generated. Please don't edit by hand. Execute Editor command [ Edit > Rendering > Generate Shader Includes ] instead");
+            await writer.WriteLineAsync(
+                "// This file was automatically generated. Please don't edit by hand. Execute Editor command [ Edit > Rendering > Generate Shader Includes ] instead"
+            );
             await writer.WriteLineAsync("//");
             await writer.WriteLineAsync();
             await writer.WriteLineAsync("#ifndef " + guard);
@@ -136,8 +148,11 @@ namespace UnityEditor.Rendering
                 await writer.WriteAsync(gen.EmitSetters(emitInitters).Replace("\n", writer.NewLine));
             }
 
-            foreach (var gen in generators.Where(gen =>
-                gen.hasStatics && gen.hasFields && gen.needParamDebug && !gen.hasPackedInfo))
+            foreach (
+                var gen in generators.Where(gen =>
+                    gen.hasStatics && gen.hasFields && gen.needParamDebug && !gen.hasPackedInfo
+                )
+            )
                 await writer.WriteLineAsync(gen.EmitFunctions().Replace("\n", writer.NewLine));
 
             foreach (var gen in generators.Where(gen => gen.hasPackedInfo))

@@ -14,7 +14,8 @@ namespace Unity.PlatformToolkit.PlayMode
         public PlayModeControlsAccountDataField(PlayModeControlsViewModel playModeControlsView)
         {
             var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAccountDataField.uxml");
+                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAccountDataField.uxml"
+            );
             uxml.CloneTree(this);
             m_AchievementsList = this.Q<PlayModeControlsAccountAchievementsList>();
             m_AchievementsList.dataSource = s_DefaultAchievementListData;

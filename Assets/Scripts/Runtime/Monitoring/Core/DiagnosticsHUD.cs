@@ -19,12 +19,14 @@ namespace NPCSystem.Monitoring
         [Header("Position")]
         [SerializeField]
         int _anchorX = 10;
+
         [SerializeField]
         int _anchorY = 10;
 
         [Header("Style")]
         [SerializeField]
         int _fontSize = 12;
+
         [SerializeField]
         string _textColor = "#00ff00";
 
@@ -36,9 +38,7 @@ namespace NPCSystem.Monitoring
         void Start()
         {
             _diagnostics = FindAnyObjectByType<WebGLDiagnosticsService>(FindObjectsInactive.Include);
-            _visible = _visibleByDefault
-                || Debug.isDebugBuild
-                || Application.isEditor;
+            _visible = _visibleByDefault || Debug.isDebugBuild || Application.isEditor;
         }
 
         void Update()
@@ -74,9 +74,10 @@ namespace NPCSystem.Monitoring
             float fps = _diagnostics != null ? _diagnostics.CurrentFps : 1f / Time.unscaledDeltaTime;
             long memMb = _diagnostics != null ? _diagnostics.CurrentMemoryMb : SystemInfo.graphicsMemorySize;
 
-            string platform = Application.platform == RuntimePlatform.WebGLPlayer
-                ? "WebGL"
-                : Application.platform.ToString().Replace("Player", "");
+            string platform =
+                Application.platform == RuntimePlatform.WebGLPlayer
+                    ? "WebGL"
+                    : Application.platform.ToString().Replace("Player", "");
 
             int qualityLevel = QualitySettings.GetQualityLevel();
             string qualityName = QualitySettings.names[qualityLevel];
@@ -118,10 +119,14 @@ namespace NPCSystem.Monitoring
                 var singleton = networkManagerType.GetProperty("Singleton")?.GetValue(null, null);
                 if (singleton != null)
                 {
-                    bool isListening = (bool)(networkManagerType.GetProperty("IsListening")?.GetValue(singleton, null) ?? false);
+                    bool isListening = (bool)(
+                        networkManagerType.GetProperty("IsListening")?.GetValue(singleton, null) ?? false
+                    );
                     if (isListening)
                     {
-                        bool isServer = (bool)(networkManagerType.GetProperty("IsServer")?.GetValue(singleton, null) ?? false);
+                        bool isServer = (bool)(
+                            networkManagerType.GetProperty("IsServer")?.GetValue(singleton, null) ?? false
+                        );
                         string role = isServer ? "Server" : "Client";
                         GUI.Label(new Rect(x, y, 240, lineHeight), $"Netcode: {role}", _style);
                     }

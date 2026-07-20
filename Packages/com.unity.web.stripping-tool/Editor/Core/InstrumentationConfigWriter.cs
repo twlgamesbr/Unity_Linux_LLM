@@ -61,9 +61,10 @@ namespace Unity.Web.Stripping.Editor
         {
             m_FunctionSubmodulesMap.Clear();
             var config = new List<string>();
-            var expandedSubmodules = SubmodulesToInstrument != null
-                ? SubmoduleListUtils.ExpandNestedSubmodules(SubmodulesToInstrument, SubmoduleConfig, ErrorLog)
-                : null;
+            var expandedSubmodules =
+                SubmodulesToInstrument != null
+                    ? SubmoduleListUtils.ExpandNestedSubmodules(SubmodulesToInstrument, SubmoduleConfig, ErrorLog)
+                    : null;
 
             foreach (var submodule in SubmoduleConfig.submodules)
             {
@@ -119,13 +120,14 @@ namespace Unity.Web.Stripping.Editor
                 config.Add($"{FunctionListWriter.EscapeFunctionName(function)};{submoduleName}");
             }
             else if (
-                SymbolFile.TryGetValue(function, out var functionIndex) &&
-                FunctionMap.TryGetValue(functionIndex, out var functionId)
+                SymbolFile.TryGetValue(function, out var functionIndex)
+                && FunctionMap.TryGetValue(functionIndex, out var functionId)
             )
             {
                 // Translate the index of the function to the internal numerical function name
                 config.Add($"{functionId};{submoduleName}");
-            } else
+            }
+            else
             {
                 ErrorLog.WriteLine($"Could not find function id for {function}");
             }

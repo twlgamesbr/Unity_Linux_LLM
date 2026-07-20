@@ -9,6 +9,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         /// Line Graph
         /// </summary>
         LineGraph,
+
         /// <summary>
         /// StackedArea
         /// </summary>

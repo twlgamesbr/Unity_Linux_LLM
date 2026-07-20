@@ -26,19 +26,28 @@ namespace Unity.Mathematics
         /// The size of the AABB
         /// </summary>
         /// <returns>The size of the AABB, in three dimensions. All three dimensions must be positive.</returns>
-        public float3 Size { get { return Extents * 2; } }
+        public float3 Size
+        {
+            get { return Extents * 2; }
+        }
 
         /// <summary>
         /// The minimum coordinate of the AABB
         /// </summary>
         /// <returns>The minimum coordinate of the AABB, in three dimensions.</returns>
-        public float3 Min { get { return Center - Extents; } }
+        public float3 Min
+        {
+            get { return Center - Extents; }
+        }
 
         /// <summary>
         /// The maximum coordinate of the AABB
         /// </summary>
         /// <returns>The maximum coordinate of the AABB, in three dimensions.</returns>
-        public float3 Max { get { return Center + Extents; } }
+        public float3 Max
+        {
+            get { return Center + Extents; }
+        }
 
         /// <summary>Returns a string representation of the AABB.</summary>
         /// <returns>a string representation of the AABB.</returns>
@@ -78,7 +87,12 @@ namespace Unity.Mathematics
         public static AABB Transform(float4x4 transform, AABB localBounds)
         {
             AABB transformed;
-            transformed.Extents = RotateExtents(localBounds.Extents, transform.c0.xyz, transform.c1.xyz, transform.c2.xyz);
+            transformed.Extents = RotateExtents(
+                localBounds.Extents,
+                transform.c0.xyz,
+                transform.c1.xyz,
+                transform.c2.xyz
+            );
             transformed.Center = math.transform(transform, localBounds.Center);
             return transformed;
         }

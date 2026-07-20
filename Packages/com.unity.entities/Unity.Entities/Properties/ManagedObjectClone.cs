@@ -12,12 +12,12 @@ namespace Unity.Entities
     /// <remarks>
     /// An instance of this class can be re-used for multiple clone operations.
     /// </remarks>
-    class ManagedObjectClone :
-        IPropertyBagVisitor,
-        IListPropertyBagVisitor,
-        ISetPropertyBagVisitor,
-        IDictionaryPropertyBagVisitor,
-        IPropertyVisitor
+    class ManagedObjectClone
+        : IPropertyBagVisitor,
+            IListPropertyBagVisitor,
+            ISetPropertyBagVisitor,
+            IDictionaryPropertyBagVisitor,
+            IPropertyVisitor
     {
         /// <summary>
         /// Map used to track and copy references within the same object.
@@ -105,7 +105,10 @@ namespace Unity.Entities
         /// <param name="srcContainer">The source list being visited.</param>
         /// <typeparam name="TList">The list type.</typeparam>
         /// <typeparam name="TElement">The element type.</typeparam>
-        void IListPropertyBagVisitor.Visit<TList, TElement>(IListPropertyBag<TList, TElement> properties, ref TList srcContainer)
+        void IListPropertyBagVisitor.Visit<TList, TElement>(
+            IListPropertyBag<TList, TElement> properties,
+            ref TList srcContainer
+        )
         {
             // Unbox the current destination container being written to.
             var dstContainer = (TList)m_Stack;
@@ -145,7 +148,10 @@ namespace Unity.Entities
         /// <param name="srcContainer">The source set being visited.</param>
         /// <typeparam name="TSet">The set type.</typeparam>
         /// <typeparam name="TElement">The element type.</typeparam>
-        void ISetPropertyBagVisitor.Visit<TSet, TElement>(ISetPropertyBag<TSet, TElement> properties, ref TSet srcContainer)
+        void ISetPropertyBagVisitor.Visit<TSet, TElement>(
+            ISetPropertyBag<TSet, TElement> properties,
+            ref TSet srcContainer
+        )
         {
             // Unbox the current destination container being written to.
             var dstContainer = (TSet)m_Stack;
@@ -171,7 +177,10 @@ namespace Unity.Entities
         /// <typeparam name="TDictionary">The dictionary type.</typeparam>
         /// <typeparam name="TKey">The key type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
-        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(IDictionaryPropertyBag<TDictionary, TKey, TValue> properties, ref TDictionary srcContainer)
+        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(
+            IDictionaryPropertyBag<TDictionary, TKey, TValue> properties,
+            ref TDictionary srcContainer
+        )
         {
             // Unbox the current destination container being written to.
             var dstContainer = (TDictionary)m_Stack;
@@ -200,7 +209,10 @@ namespace Unity.Entities
         /// <param name="srcContainer">The source container.</param>
         /// <typeparam name="TContainer">The container type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
-        void IPropertyVisitor.Visit<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer srcContainer)
+        void IPropertyVisitor.Visit<TContainer, TValue>(
+            Property<TContainer, TValue> property,
+            ref TContainer srcContainer
+        )
         {
             // Unbox the current destination container being written to.
             var dstContainer = (TContainer)m_Stack;

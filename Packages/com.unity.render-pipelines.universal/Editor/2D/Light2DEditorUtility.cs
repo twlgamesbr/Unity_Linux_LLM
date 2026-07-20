@@ -10,15 +10,30 @@ namespace UnityEditor.Rendering.Universal
     {
         private static class Styles
         {
-            public static GUIContent lightTypeFreeform = new GUIContent("Freeform", Resources.Load("InspectorIcons/FreeformLight") as Texture);
-            public static GUIContent lightTypeSprite = new GUIContent("Sprite", Resources.Load("InspectorIcons/SpriteLight") as Texture);
-            public static GUIContent lightTypePoint = new GUIContent("Spot", Resources.Load("InspectorIcons/PointLight") as Texture);
-            public static GUIContent lightTypeGlobal = new GUIContent("Global", Resources.Load("InspectorIcons/GlobalLight") as Texture);
+            public static GUIContent lightTypeFreeform = new GUIContent(
+                "Freeform",
+                Resources.Load("InspectorIcons/FreeformLight") as Texture
+            );
+            public static GUIContent lightTypeSprite = new GUIContent(
+                "Sprite",
+                Resources.Load("InspectorIcons/SpriteLight") as Texture
+            );
+            public static GUIContent lightTypePoint = new GUIContent(
+                "Spot",
+                Resources.Load("InspectorIcons/PointLight") as Texture
+            );
+            public static GUIContent lightTypeGlobal = new GUIContent(
+                "Global",
+                Resources.Load("InspectorIcons/GlobalLight") as Texture
+            );
         }
 
         static Material s_TexCapMaterial = CoreUtils.CreateEngineMaterial(Shader.Find("Hidden/Internal-GUITexture"));
         static Mesh k_MeshQuad_Cache;
-        static Mesh k_MeshQuad => k_MeshQuad_Cache == null || k_MeshQuad_Cache.Equals(null) ? (k_MeshQuad_Cache = Resources.GetBuiltinResource<Mesh>("Quad.fbx")) : k_MeshQuad_Cache;
+        static Mesh k_MeshQuad =>
+            k_MeshQuad_Cache == null || k_MeshQuad_Cache.Equals(null)
+                ? (k_MeshQuad_Cache = Resources.GetBuiltinResource<Mesh>("Quad.fbx"))
+                : k_MeshQuad_Cache;
 
         /// <summary>
         /// Draws the Light Type dropdown for a Light2D component using the provider system.
@@ -38,7 +53,12 @@ namespace UnityEditor.Rendering.Universal
         /// <param name="label">The label to display next to the dropdown. Pass <see cref="GUIContent.none"/> for no label.</param>
         /// <param name="serializedObject">The SerializedObject containing the Light2D component. Must not be null.</param>
         /// <param name="layoutMode">If true, uses EditorGUILayout for automatic layout. If false, uses EditorGUI with the provided <paramref name="position"/> rect.</param>
-        public static void DrawLightTypePopup(Rect position, GUIContent label, SerializedObject serializedObject, bool layoutMode)
+        public static void DrawLightTypePopup(
+            Rect position,
+            GUIContent label,
+            SerializedObject serializedObject,
+            bool layoutMode
+        )
         {
             serializedObject.Update();
 
@@ -67,7 +87,11 @@ namespace UnityEditor.Rendering.Universal
             };
 
             // Refresh sources to scan for custom providers on the GameObject
-            int selectedIndex = Provider2DSources<Light2DProvider, Light2DProviderSource>.RefreshSources(sources, light2D.gameObject, 0);
+            int selectedIndex = Provider2DSources<Light2DProvider, Light2DProviderSource>.RefreshSources(
+                sources,
+                light2D.gameObject,
+                0
+            );
 
             // Add built-in types
             var additionalSourcesList = sources.GetAdditionalSources();
@@ -79,14 +103,22 @@ namespace UnityEditor.Rendering.Universal
             }
 
             // Refresh again to include the built-in types
-            selectedIndex = Provider2DSources<Light2DProvider, Light2DProviderSource>.RefreshSources(sources, light2D.gameObject, 0);
+            selectedIndex = Provider2DSources<Light2DProvider, Light2DProviderSource>.RefreshSources(
+                sources,
+                light2D.gameObject,
+                0
+            );
 
             // Sync m_SelectionSources with the actual m_LightType value
             // This is needed because Light Explorer may have changed m_LightType directly
             if (lightType.intValue != (int)Light2D.LightType.Provider && sources.selectedHashCode != lightType.intValue)
             {
                 sources.selectedHashCode = lightType.intValue;
-                selectedIndex = Provider2DSources<Light2DProvider, Light2DProviderSource>.RefreshSources(sources, light2D.gameObject, 0);
+                selectedIndex = Provider2DSources<Light2DProvider, Light2DProviderSource>.RefreshSources(
+                    sources,
+                    light2D.gameObject,
+                    0
+                );
             }
 
             // Get all source names for the dropdown
@@ -109,20 +141,28 @@ namespace UnityEditor.Rendering.Universal
             // Only apply changes if the user actually changed the value
             if (EditorGUI.EndChangeCheck())
             {
-                Provider2DSources<Light2DProvider, Light2DProviderSource>.UpdateSelectionFromIndex(sources, newSelectedIndex);
+                Provider2DSources<Light2DProvider, Light2DProviderSource>.UpdateSelectionFromIndex(
+                    sources,
+                    newSelectedIndex
+                );
                 selectionSources.boxedValue = sources;
                 Light2DProviderSources.SetSourceType(selectionSources);
             }
         }
 
-        static internal bool ContainsVisibleInspectorProperites(Provider2D provider)
+        internal static bool ContainsVisibleInspectorProperites(Provider2D provider)
         {
             Debug.Assert(provider != null);
             var type = provider.GetType();
             return type.GetFields(BindingFlags.Instance | BindingFlags.Public).Length > 0;
         }
 
-        static internal void DrawHeaderFoldoutWithToggle(GUIContent title, SavedBool foldoutState, SerializedProperty toggleState, string documentationURL = "")
+        internal static void DrawHeaderFoldoutWithToggle(
+            GUIContent title,
+            SavedBool foldoutState,
+            SerializedProperty toggleState,
+            string documentationURL = ""
+        )
         {
             const float height = 17f;
             var backgroundRect = GUILayoutUtility.GetRect(0, 0);
@@ -133,7 +173,7 @@ namespace UnityEditor.Rendering.Universal
             labelRect.xMin += 16f;
             labelRect.xMax -= 20f;
 
-            bool newToggleState = GUI.Toggle(labelRect, toggleState.boolValue, " ");  // Needs a space because the checkbox won't have a proper outline if we don't make a space here
+            bool newToggleState = GUI.Toggle(labelRect, toggleState.boolValue, " "); // Needs a space because the checkbox won't have a proper outline if we don't make a space here
             bool newFoldoutState = CoreEditorUtils.DrawHeaderFoldout("", foldoutState.value);
 
             if (newToggleState != toggleState.boolValue)
@@ -142,13 +182,19 @@ namespace UnityEditor.Rendering.Universal
             if (newFoldoutState != foldoutState.value)
                 foldoutState.value = newFoldoutState;
 
-
             labelRect.xMin += 20;
             EditorGUI.LabelField(labelRect, title, EditorStyles.boldLabel);
         }
 
-
-        static internal void GUITextureCap(int controlID, Texture texture, Vector3 position, Quaternion rotation, float size, EventType eventType, bool isAngleHandle)
+        internal static void GUITextureCap(
+            int controlID,
+            Texture texture,
+            Vector3 position,
+            Quaternion rotation,
+            float size,
+            EventType eventType,
+            bool isAngleHandle
+        )
         {
             switch (eventType)
             {
@@ -163,24 +209,24 @@ namespace UnityEditor.Rendering.Universal
                 }
 
                 case (EventType.Repaint):
-                {
-                    s_TexCapMaterial.mainTexture = texture;
-                    s_TexCapMaterial.SetPass(0);
+                    {
+                        s_TexCapMaterial.mainTexture = texture;
+                        s_TexCapMaterial.SetPass(0);
 
-                    float w = texture.width;
-                    float h = texture.height;
-                    float max = Mathf.Max(w, h);
-                    Vector3 scale = new Vector2(w / max, h / max) * size * 0.5f;
+                        float w = texture.width;
+                        float h = texture.height;
+                        float max = Mathf.Max(w, h);
+                        Vector3 scale = new Vector2(w / max, h / max) * size * 0.5f;
 
-                    if (Camera.current == null)
-                        scale.y *= -1f;
+                        if (Camera.current == null)
+                            scale.y *= -1f;
 
-                    Matrix4x4 matrix = new Matrix4x4();
-                    matrix.SetTRS(position, rotation, scale);
+                        Matrix4x4 matrix = new Matrix4x4();
+                        matrix.SetTRS(position, rotation, scale);
 
-                    Graphics.DrawMeshNow(k_MeshQuad, matrix);
-                }
-                break;
+                        Graphics.DrawMeshNow(k_MeshQuad, matrix);
+                    }
+                    break;
             }
         }
 
@@ -204,7 +250,11 @@ namespace UnityEditor.Rendering.Universal
             {
                 if ((points[i].y > pos.y) != (points[j].y > pos.y))
                 {
-                    if (pos.x < (points[j].x - points[i].x) * (pos.y - points[i].y) / (points[j].y - points[i].y) + points[i].x)
+                    if (
+                        pos.x
+                        < (points[j].x - points[i].x) * (pos.y - points[i].y) / (points[j].y - points[i].y)
+                            + points[i].x
+                    )
                         oddNodes = !oddNodes;
                 }
 
@@ -214,7 +264,8 @@ namespace UnityEditor.Rendering.Universal
             if (!oddNodes)
             {
                 // Distance to closest edge (not so fast)
-                float dist, closestDist = -1f;
+                float dist,
+                    closestDist = -1f;
                 j = 1;
 
                 for (int i = 0; i < 4; ++i)
@@ -242,14 +293,14 @@ namespace UnityEditor.Rendering.Universal
             {
                 foreach (Camera camera in Camera.allCameras)
                 {
-                    UniversalAdditionalCameraData additionalCameraData = camera.GetComponent<UniversalAdditionalCameraData>();
+                    UniversalAdditionalCameraData additionalCameraData =
+                        camera.GetComponent<UniversalAdditionalCameraData>();
                     ScriptableRenderer renderer = additionalCameraData?.scriptableRenderer;
                     Renderer2D renderer2D = renderer as Renderer2D;
                     if (renderer2D != null)
                         return renderer2D.GetRenderer2DData();
                 }
             }
-
 
             return rendererData;
         }

@@ -73,7 +73,8 @@ namespace Unity.Entities.Conversion
         /// </summary>
         /// <param name="index">The index to get the child indices of.</param>
         /// <returns>An enumerator for the indices of the children.</returns>
-        public Children GetChildIndicesForIndex(int index) => new Children(IncrementalHierarchyFunctions.GetChildren(_childIndicesByIndex, index));
+        public Children GetChildIndicesForIndex(int index) =>
+            new Children(IncrementalHierarchyFunctions.GetChildren(_childIndicesByIndex, index));
 
         public bool IsActive(int index)
         {
@@ -135,16 +136,23 @@ namespace Unity.Entities.Conversion
             {
                 _iter = iter;
             }
+
             public bool MoveNext() => _iter.MoveNext();
+
             public void Reset() => _iter.Reset();
+
             public int Current => _iter.Current;
+
             [ExcludeFromBurstCompatTesting("Returns managed object")]
             object IEnumerator.Current => Current;
+
             public void Dispose() => _iter.Dispose();
 
             public Children GetEnumerator() => this;
+
             [ExcludeFromBurstCompatTesting("Returning interface value boxes")]
             IEnumerator<int> IEnumerable<int>.GetEnumerator() => this;
+
             [ExcludeFromBurstCompatTesting("Returning interface value boxes")]
             IEnumerator IEnumerable.GetEnumerator() => (this as IEnumerable<int>).GetEnumerator();
         }
@@ -160,13 +168,20 @@ namespace Unity.Entities.Conversion
         /// <param name="hierarchy">The hierarchy to operate on.</param>
         /// <param name="rootEntityIds">The instance ids of the root objects.</param>
         /// <param name="visitedInstanceIds">A hashset that is used to output the collected instance ids.</param>
-        public static void CollectHierarchyInstanceIds(this SceneHierarchy hierarchy, NativeArray<EntityId> rootEntityIds,
-            NativeParallelHashSet<EntityId> visitedInstanceIds)
+        public static void CollectHierarchyInstanceIds(
+            this SceneHierarchy hierarchy,
+            NativeArray<EntityId> rootEntityIds,
+            NativeParallelHashSet<EntityId> visitedInstanceIds
+        )
         {
             CollectHierarchyInstanceIdsImpl(hierarchy, rootEntityIds, visitedInstanceIds);
         }
 
-        static void CollectHierarchyInstanceIdsImpl(SceneHierarchy hierarchy, NativeArray<EntityId> rootEntityIds, NativeParallelHashSet<EntityId> visitedInstanceIds)
+        static void CollectHierarchyInstanceIdsImpl(
+            SceneHierarchy hierarchy,
+            NativeArray<EntityId> rootEntityIds,
+            NativeParallelHashSet<EntityId> visitedInstanceIds
+        )
         {
             var openIndices = new NativeList<int>(0, Allocator.Temp);
             for (int i = 0; i < rootEntityIds.Length; i++)
@@ -194,10 +209,13 @@ namespace Unity.Entities.Conversion
         {
             [ReadOnly]
             internal SceneHierarchy Hierarchy;
+
             [ReadOnly]
             internal NativeArray<EntityId> Roots;
+
             [WriteOnly]
             internal NativeParallelHashSet<EntityId> VisitedInstances;
+
             void IJob.Execute()
             {
                 CollectHierarchyInstanceIds(Hierarchy, Roots, VisitedInstances);
@@ -212,13 +230,18 @@ namespace Unity.Entities.Conversion
         /// <param name="visitedInstanceIds">A hashset that is used to output the collected instance ids.</param>
         /// <param name="dependency">The dependency for the job.</param>
         /// <returns>A job handle representing the job.</returns>
-        public static JobHandle CollectHierarchyInstanceIdsAsync(this SceneHierarchy hierarchy, NativeArray<EntityId> rootEntityIds, NativeParallelHashSet<EntityId> visitedInstanceIds, JobHandle dependency=default)
+        public static JobHandle CollectHierarchyInstanceIdsAsync(
+            this SceneHierarchy hierarchy,
+            NativeArray<EntityId> rootEntityIds,
+            NativeParallelHashSet<EntityId> visitedInstanceIds,
+            JobHandle dependency = default
+        )
         {
             return new CollectHierarchyInstanceIdsJob
             {
                 Hierarchy = hierarchy,
                 Roots = rootEntityIds,
-                VisitedInstances = visitedInstanceIds
+                VisitedInstances = visitedInstanceIds,
             }.Schedule(dependency);
         }
 
@@ -233,22 +256,30 @@ namespace Unity.Entities.Conversion
         /// it was a root, false otherwise.</param>
         /// <param name="dependency">The dependency for the job.</param>
         /// <returns>A job handle representing the job.</returns>
-        public static JobHandle CollectHierarchyInstanceIdsAndIndicesAsync(this SceneHierarchy hierarchy, NativeList<EntityId> EntityIds, NativeParallelHashMap<int, bool> visitedIndices, JobHandle dependency=default)
+        public static JobHandle CollectHierarchyInstanceIdsAndIndicesAsync(
+            this SceneHierarchy hierarchy,
+            NativeList<EntityId> EntityIds,
+            NativeParallelHashMap<int, bool> visitedIndices,
+            JobHandle dependency = default
+        )
         {
             return new CollectHierarchyInstanceIdsAndIndicesJob
             {
                 Hierarchy = hierarchy,
                 VisitedEntityIds = EntityIds,
-                VisitedIndices = visitedIndices
+                VisitedIndices = visitedIndices,
             }.Schedule(dependency);
         }
 
         [BurstCompile]
         internal struct CollectHierarchyInstanceIdsAndIndicesJob : IJob
         {
-            [ReadOnly] internal SceneHierarchy Hierarchy;
+            [ReadOnly]
+            internal SceneHierarchy Hierarchy;
             internal NativeList<EntityId> VisitedEntityIds;
-            [WriteOnly] internal NativeParallelHashMap<int, bool> VisitedIndices; // true if part of the input, false if child
+
+            [WriteOnly]
+            internal NativeParallelHashMap<int, bool> VisitedIndices; // true if part of the input, false if child
 
             public void Execute()
             {

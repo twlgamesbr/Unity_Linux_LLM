@@ -1,7 +1,8 @@
+using UnityEngine.Rendering;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine.Rendering;
+
 
 namespace UnityEngine
 {
@@ -20,17 +21,22 @@ namespace UnityEngine
 
         [SerializeField, Min(0)]
         float m_Distance = 0f;
+
         [SerializeField]
         UpDirection m_FrameSpace = UpDirection.World;
+
         [SerializeField]
         Transform m_AnchorPositionOverride;
+
         [SerializeField]
         Vector3 m_AnchorPositionOffset;
 
         [SerializeField]
         float m_Yaw;
+
         [SerializeField]
         float m_Pitch;
+
         [SerializeField]
         float m_Roll;
 
@@ -88,10 +94,11 @@ namespace UnityEngine
             /// Up vector is world space Vector3.up
             /// </summary>
             World = Space.World,
+
             /// <summary>
             /// Up vector is the up of the main camera
             /// </summary>
-            Local = Space.Self
+            Local = Space.Self,
         }
 
         /// <summary>
@@ -111,7 +118,8 @@ namespace UnityEngine
             get
             {
                 if (anchorPositionOverride != null)
-                    return anchorPositionOverride.position + anchorPositionOverride.TransformDirection(anchorPositionOffset);
+                    return anchorPositionOverride.position
+                        + anchorPositionOverride.TransformDirection(anchorPositionOffset);
                 else
                     return transform.position + transform.forward * distance;
             }
@@ -172,7 +180,7 @@ namespace UnityEngine
                 worldAnchorToLight = -transform.forward;
 
             Vector3 projectOnGround = Vector3.ProjectOnPlane(worldAnchorToLight, axes.up);
-            if(projectOnGround.magnitude < 0.0001f)
+            if (projectOnGround.magnitude < 0.0001f)
                 projectOnGround = Vector3.ProjectOnPlane(worldAnchorToLight, axes.up + axes.right * 0.0001f);
             projectOnGround.Normalize();
 
@@ -217,7 +225,9 @@ namespace UnityEngine
             if (m_FrameSpace == UpDirection.Local)
             {
                 Vector3 localUp = Camera.main.transform.up;
-                viewToWorld = Matrix4x4.Scale(new Vector3(1, 1, -1)) * Matrix4x4.LookAt(camera.transform.position, anchor, localUp).inverse;
+                viewToWorld =
+                    Matrix4x4.Scale(new Vector3(1, 1, -1))
+                    * Matrix4x4.LookAt(camera.transform.position, anchor, localUp).inverse;
                 viewToWorld = viewToWorld.inverse;
             }
             // Correct view to world for perspective
@@ -225,7 +235,9 @@ namespace UnityEngine
             {
                 var d = (anchor - camera.transform.position).normalized;
                 var f = Quaternion.LookRotation(d);
-                viewToWorld = Matrix4x4.Scale(new Vector3(1, 1, -1)) * Matrix4x4.TRS(camera.transform.position, f, Vector3.one).inverse;
+                viewToWorld =
+                    Matrix4x4.Scale(new Vector3(1, 1, -1))
+                    * Matrix4x4.TRS(camera.transform.position, f, Vector3.one).inverse;
                 viewToWorld = viewToWorld.inverse;
             }
 
@@ -237,7 +249,7 @@ namespace UnityEngine
             {
                 up = up,
                 right = right,
-                forward = forward
+                forward = forward,
             };
         }
 

@@ -19,7 +19,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 ProfilerCounters.objectDestroyed.Bytes.Received,
                 ProfilerCounters.ownershipChange.Bytes.Sent,
                 ProfilerCounters.ownershipChange.Bytes.Received,
-            });
+            }
+        );
 
         internal static readonly ProfilerModuleDefinition MessagesProfilerModule = new ProfilerModuleDefinition(
             ModuleNames.Message,
@@ -33,15 +34,12 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 ProfilerCounters.unnamedMessage.Bytes.Received,
                 ProfilerCounters.sceneEvent.Bytes.Sent,
                 ProfilerCounters.sceneEvent.Bytes.Received,
-            });
+            }
+        );
 
         static ProfilerModuleDefinitions()
         {
-            Modules = new[]
-            {
-                MessagesProfilerModule,
-                ObjectsProfilerModule
-            };
+            Modules = new[] { MessagesProfilerModule, ObjectsProfilerModule };
         }
 
         public static IReadOnlyList<ProfilerModuleDefinition> Modules { get; }

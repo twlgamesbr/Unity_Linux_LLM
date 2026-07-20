@@ -13,9 +13,8 @@ namespace UnityEngine.TestTools
 {
     internal class StrictCheckCommand : DelegatingTestCommand, IEnumerableTestMethodCommand
     {
-        public StrictCheckCommand(TestCommand innerCommand) : base(innerCommand)
-        {
-        }
+        public StrictCheckCommand(TestCommand innerCommand)
+            : base(innerCommand) { }
 
         public override TestResult Execute(ITestExecutionContext context)
         {
@@ -46,6 +45,7 @@ namespace UnityEngine.TestTools
                 context.CurrentResult.SetResult(ResultState.Failure, "A pending domain reload was detected.");
             }
         }
+
         private static bool isDomainReloadPending()
         {
 #if UNITY_EDITOR

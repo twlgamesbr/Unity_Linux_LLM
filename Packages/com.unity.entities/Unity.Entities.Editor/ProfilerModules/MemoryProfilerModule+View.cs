@@ -34,15 +34,23 @@ namespace Unity.Entities.Editor
             static readonly string s_ComponentSizeInChunkTooltip = L10n.Tr("Component size in chunk.");
             static readonly string s_ComponentsSizeInChunkTooltip = L10n.Tr("Components size in chunk.");
 
-            static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate("ProfilerModules/memory-profiler-window");
-            static readonly VisualElementTemplate s_LeftPaneTemplate = PackageResources.LoadTemplate("ProfilerModules/memory-profiler-left-pane");
-            static readonly VisualElementTemplate s_RightPaneTemplate = PackageResources.LoadTemplate("ProfilerModules/memory-profiler-right-pane");
-            static readonly VisualElementTemplate s_ComponentTemplate = PackageResources.LoadTemplate("ProfilerModules/memory-profiler-component");
+            static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate(
+                "ProfilerModules/memory-profiler-window"
+            );
+            static readonly VisualElementTemplate s_LeftPaneTemplate = PackageResources.LoadTemplate(
+                "ProfilerModules/memory-profiler-left-pane"
+            );
+            static readonly VisualElementTemplate s_RightPaneTemplate = PackageResources.LoadTemplate(
+                "ProfilerModules/memory-profiler-right-pane"
+            );
+            static readonly VisualElementTemplate s_ComponentTemplate = PackageResources.LoadTemplate(
+                "ProfilerModules/memory-profiler-component"
+            );
 
-            static readonly ObjectPool<VisualElement> k_CellLabelPool = new (() => new VisualElement());
+            static readonly ObjectPool<VisualElement> k_CellLabelPool = new(() => new VisualElement());
 
             MemoryProfilerTreeViewItemData[] m_ArchetypesDataSource;
-            readonly List<MemoryProfilerTreeViewItemData> m_ArchetypesDataFiltered = new ();
+            readonly List<MemoryProfilerTreeViewItemData> m_ArchetypesDataFiltered = new();
 
             VisualElement m_Window;
             TwoPaneSplitView m_Splitter;
@@ -101,32 +109,67 @@ namespace Unity.Entities.Editor
                 m_SearchElement = toolbar.Q<SearchElement>("search");
                 m_SearchElement.AddSearchDataCallback<MemoryProfilerTreeViewItemData>(data =>
                 {
-                    return data.ComponentTypes
-                        .Select(TypeManager.GetType)
+                    return data
+                        .ComponentTypes.Select(TypeManager.GetType)
                         .Where(t => t != null)
                         .Select(t => t.Name)
                         .Append(FormattingUtility.HashToString(data.StableHash))
                         .ToArray();
                 });
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, ulong>("allocated", data => data.AllocatedBytes, "Allocated Bytes");
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, ulong>("unused", data => data.UnusedBytes, "Unused Bytes");
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>("entities", data => data.EntityCount, "Entity Count");
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>("unusedEntities", data => data.UnusedEntityCount, "Unused Entity Count");
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>("chunks", data => data.ChunkCount, "Chunk Count");
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>("capacity", data => data.ChunkCapacity, "Chunk Capacity");
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>("segments", data => data.SegmentCount, "Segment Count");
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>("components", data => data.ComponentTypes.Length, "Component Type Count");
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, ulong>(
+                    "allocated",
+                    data => data.AllocatedBytes,
+                    "Allocated Bytes"
+                );
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, ulong>(
+                    "unused",
+                    data => data.UnusedBytes,
+                    "Unused Bytes"
+                );
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>(
+                    "entities",
+                    data => data.EntityCount,
+                    "Entity Count"
+                );
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>(
+                    "unusedEntities",
+                    data => data.UnusedEntityCount,
+                    "Unused Entity Count"
+                );
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>(
+                    "chunks",
+                    data => data.ChunkCount,
+                    "Chunk Count"
+                );
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>(
+                    "capacity",
+                    data => data.ChunkCapacity,
+                    "Chunk Capacity"
+                );
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>(
+                    "segments",
+                    data => data.SegmentCount,
+                    "Segment Count"
+                );
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<MemoryProfilerTreeViewItemData, int>(
+                    "components",
+                    data => data.ComponentTypes.Length,
+                    "Component Type Count"
+                );
                 m_SearchElement.FilterPopupWidth = 250;
 
-                m_SearchElement.parent.Add(SearchUtils.CreateJumpButton(() => ArchetypeSearchProvider.OpenProvider(m_SearchElement.value)));
+                m_SearchElement.parent.Add(
+                    SearchUtils.CreateJumpButton(() => ArchetypeSearchProvider.OpenProvider(m_SearchElement.value))
+                );
 
                 var searchHandler = new SearchHandler<MemoryProfilerTreeViewItemData>(m_SearchElement)
                 {
-                    Mode = SearchHandlerType.async
+                    Mode = SearchHandlerType.async,
                 };
                 searchHandler.SetSearchDataProvider(() =>
                 {
-                    return m_ArchetypesDataSource?.Where(a => a.EntityCount > 0 || showEmptyArchetypes) ?? Enumerable.Empty<MemoryProfilerTreeViewItemData>();
+                    return m_ArchetypesDataSource?.Where(a => a.EntityCount > 0 || showEmptyArchetypes)
+                        ?? Enumerable.Empty<MemoryProfilerTreeViewItemData>();
                 });
                 searchHandler.OnBeginSearch += query =>
                 {
@@ -148,11 +191,15 @@ namespace Unity.Entities.Editor
                 options.clicked += () =>
                 {
                     var menu = new GenericMenu();
-                    menu.AddItem(new GUIContent(s_ShowEmptyArchetypes), showEmptyArchetypes, () =>
-                    {
-                        showEmptyArchetypes = !showEmptyArchetypes;
-                        m_SearchElement.Search();
-                    });
+                    menu.AddItem(
+                        new GUIContent(s_ShowEmptyArchetypes),
+                        showEmptyArchetypes,
+                        () =>
+                        {
+                            showEmptyArchetypes = !showEmptyArchetypes;
+                            m_SearchElement.Search();
+                        }
+                    );
                     menu.DropDown(options.worldBound);
                 };
 
@@ -167,7 +214,7 @@ namespace Unity.Entities.Editor
                     fixedItemHeight = 18,
                     autoExpand = true,
                     viewDataKey = "full-view",
-                    selectionType = SelectionType.Single
+                    selectionType = SelectionType.Single,
                 };
                 m_TreeView.AddToClassList("memory-profiler-left-pane__tree-view");
                 CreateColumns(m_TreeView);
@@ -194,7 +241,7 @@ namespace Unity.Entities.Editor
                     destroyCell = DestroyCellLabel,
                     resizable = true,
                     minWidth = 100,
-                    width = 300
+                    width = 300,
                 };
 
                 var allocatedColumn = new Column()
@@ -210,7 +257,7 @@ namespace Unity.Entities.Editor
                     bindCell = BindAllocatedItem,
                     destroyCell = DestroyCellLabel,
                     resizable = true,
-                    width = 100
+                    width = 100,
                 };
 
                 var unusedColumn = new Column()
@@ -226,7 +273,7 @@ namespace Unity.Entities.Editor
                     bindCell = BindUnusedItem,
                     destroyCell = DestroyCellLabel,
                     resizable = true,
-                    width = 100
+                    width = 100,
                 };
 
                 treeView.columns.Add(archetypeColumn);
@@ -236,10 +283,7 @@ namespace Unity.Entities.Editor
 
             static VisualElement MakeHeaderLabel()
             {
-                var label = new Label
-                {
-                    name = "Header",
-                };
+                var label = new Label { name = "Header" };
                 label.AddToClassList("memory-profiler-left-pane__column-header");
                 return label;
             }
@@ -247,10 +291,7 @@ namespace Unity.Entities.Editor
             static VisualElement MakeCellLabel()
             {
                 var element = k_CellLabelPool.Get();
-                var label = new Label
-                {
-                    name = "Cell"
-                };
+                var label = new Label { name = "Cell" };
                 element.Add(label);
                 return element;
             }
@@ -326,15 +367,20 @@ namespace Unity.Entities.Editor
                     return;
 
                 var itemId = 0;
-                var rootItem = new TreeViewItemData<MemoryProfilerTreeViewItem>(itemId++, new MemoryProfilerTreeViewItem { displayName = s_All });
+                var rootItem = new TreeViewItemData<MemoryProfilerTreeViewItem>(
+                    itemId++,
+                    new MemoryProfilerTreeViewItem { displayName = s_All }
+                );
 
                 foreach (var worldName in m_ArchetypesDataFiltered.Select(x => x.WorldName).Distinct())
                 {
-                    TreeViewItemDataBridge<MemoryProfilerTreeViewItem>.AddChild(rootItem,
-                        new TreeViewItemData<MemoryProfilerTreeViewItem>(itemId++, new MemoryProfilerTreeViewItem()
-                        {
-                            displayName = worldName
-                        }));
+                    TreeViewItemDataBridge<MemoryProfilerTreeViewItem>.AddChild(
+                        rootItem,
+                        new TreeViewItemData<MemoryProfilerTreeViewItem>(
+                            itemId++,
+                            new MemoryProfilerTreeViewItem() { displayName = worldName }
+                        )
+                    );
                 }
 
                 foreach (var archetypeData in m_ArchetypesDataFiltered)
@@ -355,11 +401,14 @@ namespace Unity.Entities.Editor
 
                     if (!foundArchetypeItem)
                     {
-                        archetypeDataItem = new TreeViewItemData<MemoryProfilerTreeViewItem>(itemId++, new MemoryProfilerTreeViewItem()
-                        {
-                            displayName = $"Archetype {FormattingUtility.HashToString(archetypeData.StableHash)}",
-                            data = archetypeData
-                        });
+                        archetypeDataItem = new TreeViewItemData<MemoryProfilerTreeViewItem>(
+                            itemId++,
+                            new MemoryProfilerTreeViewItem()
+                            {
+                                displayName = $"Archetype {FormattingUtility.HashToString(archetypeData.StableHash)}",
+                                data = archetypeData,
+                            }
+                        );
                         TreeViewItemDataBridge<MemoryProfilerTreeViewItem>.AddChild(worldItem, archetypeDataItem);
                     }
 
@@ -462,14 +511,21 @@ namespace Unity.Entities.Editor
                                 componentIcon.AddToClassList("memory-profiler-component__icon-component");
 
                             var type = TypeManager.GetType(typeIndex);
-                            componentName.text = type?.IsNested == true ? $"{type.DeclaringType.Name}+{type.Name}" : type?.Name ?? s_Unknown;
+                            componentName.text =
+                                type?.IsNested == true
+                                    ? $"{type.DeclaringType.Name}+{type.Name}"
+                                    : type?.Name ?? s_Unknown;
 
                             // Chunk and shared components store data outside archetype
-                            if (!TypeManager.IsChunkComponent(typeIndex) &&
-                                !TypeManager.IsSharedComponentType(typeIndex))
+                            if (
+                                !TypeManager.IsChunkComponent(typeIndex)
+                                && !TypeManager.IsSharedComponentType(typeIndex)
+                            )
                             {
                                 var typeInfo = TypeManager.GetTypeInfo(typeIndex);
-                                componentSizeInChunk.text = FormattingUtility.BytesToString((ulong)typeInfo.SizeInChunk);
+                                componentSizeInChunk.text = FormattingUtility.BytesToString(
+                                    (ulong)typeInfo.SizeInChunk
+                                );
                             }
                         }
 
@@ -481,20 +537,25 @@ namespace Unity.Entities.Editor
                             m_ComponentsFoldout.Add(component);
                     }
 
-                    m_ComponentsFoldout.text = $"{s_Components} ({FormattingUtility.CountToString(m_ComponentsFoldout.childCount)})";
+                    m_ComponentsFoldout.text =
+                        $"{s_Components} ({FormattingUtility.CountToString(m_ComponentsFoldout.childCount)})";
                     m_ComponentsSizeInChunk.text = FormattingUtility.BytesToString((ulong)item.data.InstanceSize);
 
-                    m_ExternalComponents.SetVisibility(m_ChunkComponentsFoldout.childCount > 0 || m_SharedComponentsFoldout.childCount > 0);
+                    m_ExternalComponents.SetVisibility(
+                        m_ChunkComponentsFoldout.childCount > 0 || m_SharedComponentsFoldout.childCount > 0
+                    );
 
                     if (m_ChunkComponentsFoldout.childCount > 0)
                     {
-                        m_ChunkComponentsFoldout.text = $"{s_ChunkComponents} ({FormattingUtility.CountToString(m_ChunkComponentsFoldout.childCount)})";
+                        m_ChunkComponentsFoldout.text =
+                            $"{s_ChunkComponents} ({FormattingUtility.CountToString(m_ChunkComponentsFoldout.childCount)})";
                         m_ChunkComponentsFoldout.SetVisibility(true);
                     }
 
                     if (m_SharedComponentsFoldout.childCount > 0)
                     {
-                        m_SharedComponentsFoldout.text = $"{s_SharedComponents} ({FormattingUtility.CountToString(m_SharedComponentsFoldout.childCount)})";
+                        m_SharedComponentsFoldout.text =
+                            $"{s_SharedComponents} ({FormattingUtility.CountToString(m_SharedComponentsFoldout.childCount)})";
                         m_SharedComponentsFoldout.SetVisibility(true);
                     }
 

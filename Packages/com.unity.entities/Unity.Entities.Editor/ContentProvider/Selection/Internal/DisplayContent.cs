@@ -11,15 +11,22 @@ namespace Unity.Entities.UI
         public readonly SerializableContent Content;
         public readonly DynamicInspectionContext InspectionContext = new DynamicInspectionContext();
 
-        [NonSerialized] ContentStatus m_PreviousState;
-        [NonSerialized] bool m_RequestQuit;
+        [NonSerialized]
+        ContentStatus m_PreviousState;
 
-        [NonSerialized] VisualElement m_Root;
-        [NonSerialized] PropertyElement m_ContentRoot;
-        [NonSerialized] PropertyElement m_ContentNotReadyRoot;
+        [NonSerialized]
+        bool m_RequestQuit;
 
-        public bool IsValid
-            => !m_RequestQuit && null != Provider && Provider.IsValid();
+        [NonSerialized]
+        VisualElement m_Root;
+
+        [NonSerialized]
+        PropertyElement m_ContentRoot;
+
+        [NonSerialized]
+        PropertyElement m_ContentNotReadyRoot;
+
+        public bool IsValid => !m_RequestQuit && null != Provider && Provider.IsValid();
 
         public DisplayContent(SerializableContent content)
         {
@@ -39,7 +46,10 @@ namespace Unity.Entities.UI
             };
             m_ContentRoot.AddContext(InspectionContext);
             if (InspectionContext.ApplyInspectorStyling)
-                m_ContentRoot.RegisterCallback<GeometryChangedEvent, VisualElement>((evt, element) => StylingUtility.AlignInspectorLabelWidth(element), m_ContentRoot);
+                m_ContentRoot.RegisterCallback<GeometryChangedEvent, VisualElement>(
+                    (evt, element) => StylingUtility.AlignInspectorLabelWidth(element),
+                    m_ContentRoot
+                );
             m_ContentNotReadyRoot = new PropertyElement();
             m_Root.contentContainer.Add(m_ContentRoot);
             m_Root.contentContainer.Add(m_ContentNotReadyRoot);
@@ -102,7 +112,9 @@ namespace Unity.Entities.UI
                 var value = Provider.GetContent();
                 if (null == value)
                 {
-                    Debug.LogError($"{TypeUtility.GetTypeDisplayName(Provider.GetType())}: Releasing content named '{Provider.Name}' because it returned null value.");
+                    Debug.LogError(
+                        $"{TypeUtility.GetTypeDisplayName(Provider.GetType())}: Releasing content named '{Provider.Name}' because it returned null value."
+                    );
                     m_RequestQuit = true;
                     return;
                 }
@@ -112,13 +124,20 @@ namespace Unity.Entities.UI
                 m_ContentRoot.RemoveFromHierarchy();
                 m_ContentNotReadyRoot.RemoveFromHierarchy();
 
-                var visitor = new SetTargetVisitor {Content = Content, InspectionContext = InspectionContext, Inspector = m_ContentRoot};
+                var visitor = new SetTargetVisitor
+                {
+                    Content = Content,
+                    InspectionContext = InspectionContext,
+                    Inspector = m_ContentRoot,
+                };
                 PropertyContainer.Accept(visitor, ref value);
                 m_Root.contentContainer.Add(m_ContentRoot);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"{TypeUtility.GetTypeDisplayName(Provider.GetType())}: Releasing content named '{Provider.Name}' because it threw an exception.");
+                Debug.LogError(
+                    $"{TypeUtility.GetTypeDisplayName(Provider.GetType())}: Releasing content named '{Provider.Name}' because it threw an exception."
+                );
                 m_RequestQuit = true;
                 Debug.LogException(ex);
             }

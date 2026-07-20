@@ -10,17 +10,26 @@ namespace UnityEngine.InputSystem.Editor
     [CustomPropertyDrawer(typeof(InputActionAsset))]
     internal sealed class InputActionAssetDrawer : PropertyDrawer
     {
-        private readonly SearchContext m_Context = UnityEditor.Search.SearchService.CreateContext(new[]
-        {
-            InputActionAssetSearchProviders.CreateInputActionAssetSearchProvider(),
-            InputActionAssetSearchProviders.CreateInputActionAssetSearchProviderForProjectWideActions(),
-        }, string.Empty, SearchConstants.PickerSearchFlags);
-
+        private readonly SearchContext m_Context = UnityEditor.Search.SearchService.CreateContext(
+            new[]
+            {
+                InputActionAssetSearchProviders.CreateInputActionAssetSearchProvider(),
+                InputActionAssetSearchProviders.CreateInputActionAssetSearchProviderForProjectWideActions(),
+            },
+            string.Empty,
+            SearchConstants.PickerSearchFlags
+        );
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            ObjectField.DoObjectField(position, property, typeof(InputActionAsset), label,
-                m_Context, SearchConstants.PickerViewFlags);
+            ObjectField.DoObjectField(
+                position,
+                property,
+                typeof(InputActionAsset),
+                label,
+                m_Context,
+                SearchConstants.PickerViewFlags
+            );
         }
     }
 }

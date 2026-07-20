@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 
@@ -37,7 +37,7 @@ namespace UnityEngine.Rendering
 
                 if (Time.realtimeSinceStartupAsDouble - s_LastSubdivisionTime > debugDisplay.subdivisionDelayInSeconds)
                 {
-                    #pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                     var probeVolume = GameObject.FindFirstObjectByType<ProbeVolume>();
 #pragma warning restore CS0618 // Type or member is obsolete
                     if (probeVolume == null || !probeVolume.isActiveAndEnabled)
@@ -57,7 +57,8 @@ namespace UnityEngine.Rendering
                     int updatePerFrame = debugDisplay.subdivisionCellUpdatePerFrame;
                     // From simplification level 5 and higher, the cost of calculating one cell is very high, so we adjust that number.
                     if (profile.simplificationLevels > 4)
-                        updatePerFrame = (int)Mathf.Max(1, updatePerFrame / Mathf.Pow(9, profile.simplificationLevels - 4));
+                        updatePerFrame = (int)
+                            Mathf.Max(1, updatePerFrame / Mathf.Pow(9, profile.simplificationLevels - 4));
                     for (int i = 0; i < debugDisplay.subdivisionCellUpdatePerFrame; i++)
                     {
                         if (!s_CurrentSubdivision.MoveNext())
@@ -77,7 +78,7 @@ namespace UnityEngine.Rendering
                         var cullCtx = new ProbeVolume.CellCullingContext
                         {
                             ActiveCamera = null,
-                            FrustumPlanes = stackalloc Plane[6]
+                            FrustumPlanes = stackalloc Plane[6],
                         };
                         ProbeVolume.PrepareCellCulling(ref cullCtx);
 
@@ -88,7 +89,12 @@ namespace UnityEngine.Rendering
                         for (int i = ctx.cells.Count - 1; i >= 0; i--)
                         {
                             var cell = ctx.cells[i];
-                            bool shouldRemove = probeVolume.ShouldCullCell(cullCtx, sceneToBakingSetMap, probeRefVol, cell.position);
+                            bool shouldRemove = probeVolume.ShouldCullCell(
+                                cullCtx,
+                                sceneToBakingSetMap,
+                                probeRefVol,
+                                cell.position
+                            );
                             if (shouldRemove)
                                 ctx.cells.RemoveAt(i);
                         }
@@ -99,13 +105,15 @@ namespace UnityEngine.Rendering
                         if (activeCamera != null)
                         {
                             var cameraPos = activeCamera.transform.position;
-                            ctx.cells.Sort((c1, c2) =>
-                            {
-                                float c1Distance = Vector3.Distance(cameraPos, c1.bounds.center);
-                                float c2Distance = Vector3.Distance(cameraPos, c2.bounds.center);
+                            ctx.cells.Sort(
+                                (c1, c2) =>
+                                {
+                                    float c1Distance = Vector3.Distance(cameraPos, c1.bounds.center);
+                                    float c2Distance = Vector3.Distance(cameraPos, c2.bounds.center);
 
-                                return c1Distance.CompareTo(c2Distance);
-                            });
+                                    return c1Distance.CompareTo(c2Distance);
+                                }
+                            );
                         }
 
                         // Progressively update cells:
@@ -126,10 +134,17 @@ namespace UnityEngine.Rendering
                             ctx.cells.Add(cell);
 
                             bool canceledByUser = false;
-                            var result = AdaptiveProbeVolumes.BakeBricks(ctx, contributors, showProgress, ref canceledByUser);
+                            var result = AdaptiveProbeVolumes.BakeBricks(
+                                ctx,
+                                contributors,
+                                showProgress,
+                                ref canceledByUser
+                            );
 
                             if (result.cells.Count != 0)
-                                ProbeReferenceVolume.instance.realtimeSubdivisionInfo[cell.bounds] = result.cells[0].bricks;
+                                ProbeReferenceVolume.instance.realtimeSubdivisionInfo[cell.bounds] = result
+                                    .cells[0]
+                                    .bricks;
                             else
                                 ProbeReferenceVolume.instance.realtimeSubdivisionInfo.Remove(cell.bounds);
 
@@ -142,8 +157,8 @@ namespace UnityEngine.Rendering
             }
         }
 
-        public List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)> probeVolumes = new ();
-        public List<(Vector3Int position, Bounds bounds)> cells = new ();
+        public List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)> probeVolumes = new();
+        public List<(Vector3Int position, Bounds bounds)> cells = new();
         public ProbeVolumeBakingSet bakingSet;
         public ProbeVolumeProfileInfo profile;
 
@@ -183,7 +198,13 @@ namespace UnityEngine.Rendering
                             var cellPos = new Vector3Int(x, y, z);
                             if (cellPositions.Add(cellPos))
                             {
-                                var center = profileInfo.probeOffset + new Vector3((cellPos.x + 0.5f) * cellSize, (cellPos.y + 0.5f) * cellSize, (cellPos.z + 0.5f) * cellSize);
+                                var center =
+                                    profileInfo.probeOffset
+                                    + new Vector3(
+                                        (cellPos.x + 0.5f) * cellSize,
+                                        (cellPos.y + 0.5f) * cellSize,
+                                        (cellPos.z + 0.5f) * cellSize
+                                    );
                                 cells.Add((cellPos, new Bounds(center, cellDimensions)));
                             }
                         }

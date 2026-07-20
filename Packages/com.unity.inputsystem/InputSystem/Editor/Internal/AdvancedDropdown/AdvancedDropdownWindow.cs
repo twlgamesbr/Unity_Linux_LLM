@@ -26,7 +26,7 @@ namespace UnityEngine.InputSystem.Editor
         private bool m_ScrollToSelected = true;
         private float m_InitialSelectionPosition;
         ////FIXME: looks like a bug?
-        #pragma warning disable CS0649
+#pragma warning disable CS0649
         private Rect m_ButtonRectScreenPos;
         private Stack<AdvancedDropdownItem> m_ViewsStack = new Stack<AdvancedDropdownItem>();
         private bool m_DirtyList = true;
@@ -120,7 +120,8 @@ namespace UnityEngine.InputSystem.Editor
             windowDestroyed?.Invoke();
         }
 
-        public static T CreateAndInit<T>(Rect rect, AdvancedDropdownState state) where T : AdvancedDropdownWindow
+        public static T CreateAndInit<T>(Rect rect, AdvancedDropdownState state)
+            where T : AdvancedDropdownWindow
         {
             var instance = CreateInstance<T>();
             instance.m_State = state;
@@ -153,7 +154,7 @@ namespace UnityEngine.InputSystem.Editor
             ShowAsDropDown(buttonRect, CalculateWindowSize(m_ButtonRectScreenPos, out var requiredDropdownSize));
 
             // If the dropdown is as height as the screen height, give it some margin
-            if (position.height  < requiredDropdownSize.y)
+            if (position.height < requiredDropdownSize.y)
             {
                 var pos = position;
                 pos.y += 5;
@@ -302,10 +303,14 @@ namespace UnityEngine.InputSystem.Editor
 
         private void OnGUISearch()
         {
-            m_Gui.DrawSearchField(isSearchFieldDisabled, m_Search, (newSearch) =>
-            {
-                searchString = newSearch;
-            });
+            m_Gui.DrawSearchField(
+                isSearchFieldDisabled,
+                m_Search,
+                (newSearch) =>
+                {
+                    searchString = newSearch;
+                }
+            );
         }
 
         private void HandleKeyboard()
@@ -420,7 +425,10 @@ namespace UnityEngine.InputSystem.Editor
         private void DrawList(AdvancedDropdownItem item)
         {
             // Start of scroll view list
-            m_State.SetScrollState(item, GUILayout.BeginScrollView(m_State.GetScrollState(item), GUIStyle.none, GUI.skin.verticalScrollbar));
+            m_State.SetScrollState(
+                item,
+                GUILayout.BeginScrollView(m_State.GetScrollState(item), GUIStyle.none, GUI.skin.verticalScrollbar)
+            );
             EditorGUIUtility.SetIconSize(m_Gui.iconSize);
             Rect selectedRect = new Rect();
             for (var i = 0; i < item.children.Count(); i++)
@@ -434,7 +442,15 @@ namespace UnityEngine.InputSystem.Editor
                 }
                 else
                 {
-                    m_Gui.DrawItem(child, child.name, child.icon, child.enabled, child.children.Any(), selected, hasSearch);
+                    m_Gui.DrawItem(
+                        child,
+                        child.name,
+                        child.icon,
+                        child.enabled,
+                        child.children.Any(),
+                        selected,
+                        hasSearch
+                    );
                 }
 
                 var r = GUILayoutUtility.GetLastRect();
@@ -447,7 +463,10 @@ namespace UnityEngine.InputSystem.Editor
 
                 // Select the element the mouse cursor is over.
                 // Only do it on mouse move - keyboard controls are allowed to overwrite this until the next time the mouse moves.
-                if ((Event.current.type == EventType.MouseMove || Event.current.type == EventType.MouseDrag) && child.enabled)
+                if (
+                    (Event.current.type == EventType.MouseMove || Event.current.type == EventType.MouseDrag)
+                    && child.enabled
+                )
                 {
                     if (!selected && r.Contains(Event.current.mousePosition))
                     {
@@ -565,8 +584,12 @@ namespace UnityEngine.InputSystem.Editor
         private static class Styles
         {
             public static readonly GUIStyle background = "grey_border";
-            public static readonly GUIStyle previewHeader = new GUIStyle(EditorStyles.label).WithPadding(new RectOffset(5, 5, 1, 2));
-            public static readonly GUIStyle previewText = new GUIStyle(EditorStyles.wordWrappedLabel).WithPadding(new RectOffset(3, 5, 4, 4));
+            public static readonly GUIStyle previewHeader = new GUIStyle(EditorStyles.label).WithPadding(
+                new RectOffset(5, 5, 1, 2)
+            );
+            public static readonly GUIStyle previewText = new GUIStyle(EditorStyles.wordWrappedLabel).WithPadding(
+                new RectOffset(3, 5, 4, 4)
+            );
         }
     }
 }

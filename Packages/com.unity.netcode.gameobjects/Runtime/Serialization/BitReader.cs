@@ -97,7 +97,10 @@ namespace Unity.Netcode
 #if DEBUG
             if (bitCount > 64)
             {
-                throw new ArgumentOutOfRangeException(nameof(bitCount), "Cannot read more than 64 bits from a 64-bit value!");
+                throw new ArgumentOutOfRangeException(
+                    nameof(bitCount),
+                    "Cannot read more than 64 bits from a 64-bit value!"
+                );
             }
 
             int checkPos = (int)(m_BitPosition + bitCount);
@@ -168,7 +171,8 @@ namespace Unity.Netcode
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private unsafe void ReadPartialValue<T>(out T value, int bytesToRead, int offsetBytes = 0) where T : unmanaged
+        private unsafe void ReadPartialValue<T>(out T value, int bytesToRead, int offsetBytes = 0)
+            where T : unmanaged
         {
             var val = new T();
             byte* ptr = ((byte*)&val) + offsetBytes;
@@ -183,7 +187,10 @@ namespace Unity.Netcode
         {
             if (bitCount > 8)
             {
-                throw new ArgumentOutOfRangeException(nameof(bitCount), "Cannot read more than 8 bits into an 8-bit value!");
+                throw new ArgumentOutOfRangeException(
+                    nameof(bitCount),
+                    "Cannot read more than 8 bits into an 8-bit value!"
+                );
             }
 
             if (bitCount < 0)

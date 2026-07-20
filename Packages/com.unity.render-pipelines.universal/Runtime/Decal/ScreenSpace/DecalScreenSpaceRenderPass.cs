@@ -6,7 +6,9 @@ namespace UnityEngine.Rendering.Universal
 {
     internal class DecalDrawScreenSpaceSystem : DecalDrawSystem
     {
-        public DecalDrawScreenSpaceSystem(DecalEntityManager entityManager) : base("DecalDrawScreenSpaceSystem.Execute", entityManager) { }
+        public DecalDrawScreenSpaceSystem(DecalEntityManager entityManager)
+            : base("DecalDrawScreenSpaceSystem.Execute", entityManager) { }
+
         protected override int GetPassIndex(DecalCachedChunk decalCachedChunk) => decalCachedChunk.passIndexScreenSpace;
     }
 
@@ -18,7 +20,11 @@ namespace UnityEngine.Rendering.Universal
         private DecalScreenSpaceSettings m_Settings;
         private bool m_DecalLayers;
 
-        public DecalScreenSpaceRenderPass(DecalScreenSpaceSettings settings, DecalDrawScreenSpaceSystem drawSystem, bool decalLayers)
+        public DecalScreenSpaceRenderPass(
+            DecalScreenSpaceSettings settings,
+            DecalDrawScreenSpaceSystem drawSystem,
+            bool decalLayers
+        )
         {
             renderPassEvent = RenderPassEvent.AfterRenderingSkybox;
 
@@ -39,10 +45,20 @@ namespace UnityEngine.Rendering.Universal
                 m_ShaderTagIdList.Add(new ShaderTagId(DecalShaderPassNames.DecalScreenSpaceMesh));
         }
 
-        private RendererListParams CreateRenderListParams(UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+        private RendererListParams CreateRenderListParams(
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData
+        )
         {
             SortingCriteria sortingCriteria = SortingCriteria.None;
-            DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(m_ShaderTagIdList, renderingData, cameraData, lightData, sortingCriteria);
+            DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(
+                m_ShaderTagIdList,
+                renderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
             return new RendererListParams(renderingData.cullResults, drawingSettings, m_FilteringSettings);
         }
 
@@ -71,9 +87,18 @@ namespace UnityEngine.Rendering.Universal
         {
             NormalReconstruction.SetupProperties(cmd, passData.cameraData);
 
-            cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendLow, passData.settings.normalBlend == DecalNormalBlend.Low);
-            cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendMedium, passData.settings.normalBlend == DecalNormalBlend.Medium);
-            cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendHigh, passData.settings.normalBlend == DecalNormalBlend.High);
+            cmd.SetKeyword(
+                ShaderGlobalKeywords.DecalNormalBlendLow,
+                passData.settings.normalBlend == DecalNormalBlend.Low
+            );
+            cmd.SetKeyword(
+                ShaderGlobalKeywords.DecalNormalBlendMedium,
+                passData.settings.normalBlend == DecalNormalBlend.Medium
+            );
+            cmd.SetKeyword(
+                ShaderGlobalKeywords.DecalNormalBlendHigh,
+                passData.settings.normalBlend == DecalNormalBlend.High
+            );
 
             if (!passData.isGLDevice)
                 cmd.SetKeyword(ShaderGlobalKeywords.DecalLayers, passData.decalLayers);
@@ -89,7 +114,9 @@ namespace UnityEngine.Rendering.Universal
             TextureHandle cameraDepthTexture = resourceData.cameraDepthTexture;
             TextureHandle renderingLayersTexture = resourceData.renderingLayersTexture;
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 UniversalRenderingData renderingData = frameData.Get<UniversalRenderingData>();
                 UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
@@ -121,11 +148,13 @@ namespace UnityEngine.Rendering.Universal
 
                 builder.AllowGlobalStateModification(true);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext rgContext) =>
-                {
-                    RenderingUtils.SetScaleBiasRt(rgContext.cmd, in data.cameraData, data.colorTarget);
-                    ExecutePass(rgContext.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext rgContext) =>
+                    {
+                        RenderingUtils.SetScaleBiasRt(rgContext.cmd, in data.cameraData, data.colorTarget);
+                        ExecutePass(rgContext.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
 
@@ -140,7 +169,6 @@ namespace UnityEngine.Rendering.Universal
             cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendMedium, false);
             cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendHigh, false);
             cmd.SetKeyword(ShaderGlobalKeywords.DecalLayers, false);
-
         }
     }
 }

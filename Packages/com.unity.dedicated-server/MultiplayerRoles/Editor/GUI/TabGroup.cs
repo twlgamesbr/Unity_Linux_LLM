@@ -16,7 +16,9 @@ namespace Unity.Multiplayer.Editor
 
         public TabGroup()
         {
-            var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.unity.dedicated-server/MultiplayerRoles/Editor/GUI/TabGroup.uss");
+            var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(
+                "Packages/com.unity.dedicated-server/MultiplayerRoles/Editor/GUI/TabGroup.uss"
+            );
             styleSheets.Add(styleSheet);
 
             m_Header = new Toolbar();

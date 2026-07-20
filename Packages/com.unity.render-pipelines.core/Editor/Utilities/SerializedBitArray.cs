@@ -9,7 +9,10 @@ namespace UnityEditor.Rendering
         /// <param name="serializedProperty">The SerializedProperty</param>
         /// <param name="targetSerializedObjects">An individual SerializedObject for each targetObject</param>
         /// <returns>A SerializedBitArrayAny</returns>
-        public static SerializedBitArrayAny ToSerializedBitArray(this SerializedProperty serializedProperty, SerializedObject[] targetSerializedObjects)
+        public static SerializedBitArrayAny ToSerializedBitArray(
+            this SerializedProperty serializedProperty,
+            SerializedObject[] targetSerializedObjects
+        )
         {
             if (!TryGetCapacityFromTypeName(serializedProperty, out uint capacity))
                 throw new Exception("Cannot get SerializeBitArray's Capacity");
@@ -33,7 +36,11 @@ namespace UnityEditor.Rendering
         /// <param name="targetSerializedObjects">An individual SerializedObject for each targetObject</param>
         /// <param name="serializedBitArray">Out SerializedBitArray</param>
         /// <returns>True if construction was successful</returns>
-        public static bool TryGetSerializedBitArray(this SerializedProperty serializedProperty, SerializedObject[] targetSerializedObjects, out SerializedBitArrayAny serializedBitArray)
+        public static bool TryGetSerializedBitArray(
+            this SerializedProperty serializedProperty,
+            SerializedObject[] targetSerializedObjects,
+            out SerializedBitArrayAny serializedBitArray
+        )
         {
             serializedBitArray = null;
             if (!TryGetCapacityFromTypeName(serializedProperty, out uint capacity))
@@ -48,7 +55,10 @@ namespace UnityEditor.Rendering
         /// <returns>True if construction was successful</returns>
         /// <remarks>Note that this variant doesn't properly support editing multiple targets, especially if there
         /// are several BitArrays on the target objects.</remarks>
-        public static bool TryGetSerializedBitArray(this SerializedProperty serializedProperty, out SerializedBitArrayAny serializedBitArray)
+        public static bool TryGetSerializedBitArray(
+            this SerializedProperty serializedProperty,
+            out SerializedBitArrayAny serializedBitArray
+        )
         {
             serializedBitArray = null;
             if (!TryGetCapacityFromTypeName(serializedProperty, out uint capacity))
@@ -62,8 +72,7 @@ namespace UnityEditor.Rendering
             capacity = 0u;
             const string baseTypeName = "BitArray";
             string type = serializedProperty.type;
-            return type.StartsWith(baseTypeName)
-                && uint.TryParse(type.Substring(baseTypeName.Length), out capacity);
+            return type.StartsWith(baseTypeName) && uint.TryParse(type.Substring(baseTypeName.Length), out capacity);
         }
     }
 
@@ -72,14 +81,17 @@ namespace UnityEditor.Rendering
     {
         /// <summary>Capacity of the bitarray</summary>
         uint capacity { get; }
+
         /// <summary>Get the bit at given index</summary>
         /// <param name="bitIndex">The index</param>
         /// <returns>Bit value</returns>
         bool GetBitAt(uint bitIndex);
+
         /// <summary>Set the bit at given index</summary>
         /// <param name="bitIndex">The index</param>
         /// <param name="value">The value</param>
         void SetBitAt(uint bitIndex, bool value);
+
         /// <summary>Does the bit at given index have multiple different values?</summary>
         /// <param name="bitIndex">The index</param>
         /// <returns>True: Multiple different value</returns>
@@ -104,13 +116,18 @@ namespace UnityEditor.Rendering
         /// <summary>Capacity of the bitarray</summary>
         public uint capacity { get; }
 
-        internal SerializedBitArrayAny(SerializedProperty serializedProperty, SerializedObject[] targetSerializedObjects, uint capacity)
+        internal SerializedBitArrayAny(
+            SerializedProperty serializedProperty,
+            SerializedObject[] targetSerializedObjects,
+            uint capacity
+        )
         {
             this.capacity = capacity;
             m_SerializedPropertyPerTargets = new SerializedProperty[targetSerializedObjects.Length];
             for (int i = 0; i < targetSerializedObjects.Length; i++)
             {
-                m_SerializedPropertyPerTargets[i] = targetSerializedObjects[i].FindProperty(serializedProperty.propertyPath);
+                m_SerializedPropertyPerTargets[i] = targetSerializedObjects[i]
+                    .FindProperty(serializedProperty.propertyPath);
             }
         }
 
@@ -118,50 +135,73 @@ namespace UnityEditor.Rendering
         internal SerializedBitArrayAny(SerializedProperty serializedProperty, uint capacity)
         {
             this.capacity = capacity;
-            m_SerializedPropertyPerTargets = new SerializedProperty[serializedProperty.serializedObject.targetObjects.Length];
+            m_SerializedPropertyPerTargets = new SerializedProperty[
+                serializedProperty.serializedObject.targetObjects.Length
+            ];
             for (int i = 0; i < serializedProperty.serializedObject.targetObjects.Length; i++)
             {
-                m_SerializedPropertyPerTargets[i] = new SerializedObject(serializedProperty.serializedObject.targetObjects[i]).FindProperty(serializedProperty.propertyPath);
+                m_SerializedPropertyPerTargets[i] = new SerializedObject(
+                    serializedProperty.serializedObject.targetObjects[i]
+                ).FindProperty(serializedProperty.propertyPath);
             }
         }
 
         //To update if we need container over 256bits
-        ulong GetTargetValueUnverified(int targetIndex, int part)
-            => part switch
+        ulong GetTargetValueUnverified(int targetIndex, int part) =>
+            part switch
             {
-                0 => Unbox(m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative(capacity <= 64 ? "data" : "data1").boxedValue),
-                1 => Unbox(m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data2")?.boxedValue ?? 0ul),
-                2 => Unbox(m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data3")?.boxedValue ?? 0ul),
-                3 => Unbox(m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data4")?.boxedValue ?? 0ul),
-                _ => 0ul
+                0 => Unbox(
+                    m_SerializedPropertyPerTargets[targetIndex]
+                        .FindPropertyRelative(capacity <= 64 ? "data" : "data1")
+                        .boxedValue
+                ),
+                1 => Unbox(
+                    m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data2")?.boxedValue ?? 0ul
+                ),
+                2 => Unbox(
+                    m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data3")?.boxedValue ?? 0ul
+                ),
+                3 => Unbox(
+                    m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data4")?.boxedValue ?? 0ul
+                ),
+                _ => 0ul,
             };
 
         void SetTargetValueUnverified(int targetIndex, int part, object value)
         {
             switch (part)
             {
-                case 0: m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative(capacity <= 64 ? "data" : "data1").boxedValue = value; break;
-                case 1: m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data2").boxedValue = value; break;
-                case 2: m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data3").boxedValue = value; break;
-                case 3: m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data4").boxedValue = value; break;
+                case 0:
+                    m_SerializedPropertyPerTargets[targetIndex]
+                        .FindPropertyRelative(capacity <= 64 ? "data" : "data1")
+                        .boxedValue = value;
+                    break;
+                case 1:
+                    m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data2").boxedValue = value;
+                    break;
+                case 2:
+                    m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data3").boxedValue = value;
+                    break;
+                case 3:
+                    m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data4").boxedValue = value;
+                    break;
             }
-
             ;
         }
 
         //we cannot directly cast from boxed value to the ulong we want in C#, We first need to unbox in the true type
-        ulong Unbox(object boxedValue)
-            => capacity switch
+        ulong Unbox(object boxedValue) =>
+            capacity switch
             {
                 8 => (byte)boxedValue,
                 16 => (ushort)boxedValue,
                 32 => (uint)boxedValue,
                 64 => (ulong)boxedValue,
-                _ => (ulong)boxedValue //any higher is a composition of ulong
+                _ => (ulong)boxedValue, //any higher is a composition of ulong
             };
 
-        bool ExtractBitFrom64BitsPart(ulong part, uint bitIndexInPart)
-            => (part & (1ul << (int) (bitIndexInPart % 64))) != 0;
+        bool ExtractBitFrom64BitsPart(ulong part, uint bitIndexInPart) =>
+            (part & (1ul << (int)(bitIndexInPart % 64))) != 0;
 
         void AssertInRange(uint bitIndex)
         {
@@ -188,7 +228,10 @@ namespace UnityEditor.Rendering
         {
             AssertInRange(bitIndex);
 
-            return ExtractBitFrom64BitsPart(HasBitMultipleDifferentValueBitwiseOver64Bits((int)bitIndex / 64), bitIndex % 64);
+            return ExtractBitFrom64BitsPart(
+                HasBitMultipleDifferentValueBitwiseOver64Bits((int)bitIndex / 64),
+                bitIndex % 64
+            );
         }
 
         /// <summary>Get the bit at given index</summary>

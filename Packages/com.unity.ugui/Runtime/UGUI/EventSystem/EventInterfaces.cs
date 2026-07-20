@@ -3,9 +3,7 @@ namespace UnityEngine.EventSystems
     /// <summary>
     /// Base class that all EventSystem events inherit from.
     /// </summary>
-    public interface IEventSystemHandler
-    {
-    }
+    public interface IEventSystemHandler { }
 
     /// <summary>
     /// Interface to implement if you wish to receive OnPointerMove callbacks.

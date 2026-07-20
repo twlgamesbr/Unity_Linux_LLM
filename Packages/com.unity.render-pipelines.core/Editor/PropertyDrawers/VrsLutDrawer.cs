@@ -1,7 +1,7 @@
 using System.Reflection;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace UnityEditor.Rendering
@@ -16,11 +16,7 @@ namespace UnityEditor.Rendering
         /// <inheritdoc/>
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            var foldout = new Foldout()
-            {
-                text = property.displayName,
-                value = property.isExpanded,
-            };
+            var foldout = new Foldout() { text = property.displayName, value = property.isExpanded };
 
             var vrsLutData = GetVrsLutData(property);
             VrsLutDataGUI(foldout.contentContainer, vrsLutData);
@@ -43,10 +39,13 @@ namespace UnityEditor.Rendering
         {
             foreach (var fragmentSizeInfo in shadingRateFragmentSizeFields)
             {
-                var fragmentSizeValue = (ShadingRateFragmentSize) fragmentSizeInfo.GetValue(null);
+                var fragmentSizeValue = (ShadingRateFragmentSize)fragmentSizeInfo.GetValue(null);
                 var inspectorNameAttribute = fragmentSizeInfo.GetCustomAttribute<InspectorNameAttribute>();
-                var displayName = inspectorNameAttribute == null ? ObjectNames.NicifyVariableName(fragmentSizeValue.ToString()) : inspectorNameAttribute.displayName;
-                var lutProp = vrsLutData.GetArrayElementAtIndex((int) fragmentSizeValue);
+                var displayName =
+                    inspectorNameAttribute == null
+                        ? ObjectNames.NicifyVariableName(fragmentSizeValue.ToString())
+                        : inspectorNameAttribute.displayName;
+                var lutProp = vrsLutData.GetArrayElementAtIndex((int)fragmentSizeValue);
                 var propertyField = new PropertyField(lutProp, displayName);
                 contentContainer.Add(propertyField);
             }
@@ -54,6 +53,7 @@ namespace UnityEditor.Rendering
 
         static SerializedProperty GetVrsLutData(SerializedProperty property) => property.FindPropertyRelative("m_Data");
 
-        static FieldInfo[] shadingRateFragmentSizeFields => typeof(ShadingRateFragmentSize).GetFields(BindingFlags.Static | BindingFlags.Public);
+        static FieldInfo[] shadingRateFragmentSizeFields =>
+            typeof(ShadingRateFragmentSize).GetFields(BindingFlags.Static | BindingFlags.Public);
     }
 }

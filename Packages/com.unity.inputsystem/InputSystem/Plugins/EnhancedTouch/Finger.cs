@@ -17,8 +17,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
     /// corresponds to the Nth touch on the given screen.
     /// </remarks>
     /// <seealso cref="Touch"/>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        Justification = "Holds on to internally managed memory which should not be disposed by the user.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Microsoft.Usage",
+        "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "Holds on to internally managed memory which should not be disposed by the user."
+    )]
     public class Finger
     {
         // This class stores pretty much all the data that is kept by the enhanced touch system. All
@@ -162,8 +165,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             Touch.s_GlobalState.playerState.haveBuiltActiveTouches = false;
 
             // Record the extra data we maintain for each touch.
-            var extraData = (Touch.ExtraDataPerTouchState*)((byte*)touchHeader + m_StateHistory.bytesPerRecord -
-                UnsafeUtility.SizeOf<Touch.ExtraDataPerTouchState>());
+            var extraData = (Touch.ExtraDataPerTouchState*)(
+                (byte*)touchHeader
+                + m_StateHistory.bytesPerRecord
+                - UnsafeUtility.SizeOf<Touch.ExtraDataPerTouchState>()
+            );
             extraData->uniqueId = ++Touch.s_GlobalState.playerState.lastId;
 
             // We get accumulated deltas from Touchscreen. Store the accumulated
@@ -179,8 +185,9 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                     var previousTouchHeader = m_StateHistory.GetRecordUnchecked(previousRecordIndex);
                     var previousTouchState = (TouchState*)previousTouchHeader->statePtrWithoutControlIndex;
                     touchState->delta -= previousTouchState->delta;
-                    touchState->beganInSameFrame = previousTouchState->beganInSameFrame &&
-                        previousTouchState->updateStepCount == touchState->updateStepCount;
+                    touchState->beganInSameFrame =
+                        previousTouchState->beganInSameFrame
+                        && previousTouchState->updateStepCount == touchState->updateStepCount;
                 }
             }
             else
@@ -192,10 +199,18 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             switch (touchState->phase)
             {
                 case TouchPhase.Began:
-                    DelegateHelpers.InvokeCallbacksSafe(ref Touch.s_GlobalState.onFingerDown, this, "Touch.onFingerDown");
+                    DelegateHelpers.InvokeCallbacksSafe(
+                        ref Touch.s_GlobalState.onFingerDown,
+                        this,
+                        "Touch.onFingerDown"
+                    );
                     break;
                 case TouchPhase.Moved:
-                    DelegateHelpers.InvokeCallbacksSafe(ref Touch.s_GlobalState.onFingerMove, this, "Touch.onFingerMove");
+                    DelegateHelpers.InvokeCallbacksSafe(
+                        ref Touch.s_GlobalState.onFingerMove,
+                        this,
+                        "Touch.onFingerMove"
+                    );
                     break;
                 case TouchPhase.Ended:
                 case TouchPhase.Canceled:
@@ -239,7 +254,11 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             var count = 0;
             if (touch.phase != TouchPhase.Began)
             {
-                for (var previousRecord = touch.m_TouchRecord.previous; previousRecord.valid; previousRecord = previousRecord.previous)
+                for (
+                    var previousRecord = touch.m_TouchRecord.previous;
+                    previousRecord.valid;
+                    previousRecord = previousRecord.previous
+                )
                 {
                     var touchState = (TouchState*)previousRecord.GetUnsafeMemoryPtr();
 

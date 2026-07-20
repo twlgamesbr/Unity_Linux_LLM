@@ -28,12 +28,13 @@ namespace Unity.Serialization.Json
     /// <summary>
     /// A visitor that traverses a property container and outputs a JSON string.
     /// </summary>
-    class JsonPropertyWriter : JsonPropertyVisitor,
-        IPropertyBagVisitor,
-        ICollectionPropertyBagVisitor,
-        IListPropertyBagVisitor,
-        IDictionaryPropertyBagVisitor,
-        IPropertyVisitor
+    class JsonPropertyWriter
+        : JsonPropertyVisitor,
+            IPropertyBagVisitor,
+            ICollectionPropertyBagVisitor,
+            IListPropertyBagVisitor,
+            IDictionaryPropertyBagVisitor,
+            IPropertyVisitor
     {
         struct SerializedId
         {
@@ -54,16 +55,22 @@ namespace Unity.Serialization.Json
         {
             public override string Name => k_SerializedId;
             public override bool IsReadOnly => true;
+
             public override int GetValue(ref SerializedId container) => container.Id;
-            public override void SetValue(ref SerializedId container, int value) => throw new InvalidOperationException("Property is ReadOnly.");
+
+            public override void SetValue(ref SerializedId container, int value) =>
+                throw new InvalidOperationException("Property is ReadOnly.");
         }
 
         class SerializedTypeProperty : Property<SerializedType, string>
         {
             public override string Name => k_SerializedTypeKey;
             public override bool IsReadOnly => true;
+
             public override string GetValue(ref SerializedType container) => FormatFullTypeName(container.Type);
-            public override void SetValue(ref SerializedType container, string value) => throw new InvalidOperationException("Property is ReadOnly.");
+
+            public override void SetValue(ref SerializedType container, string value) =>
+                throw new InvalidOperationException("Property is ReadOnly.");
 
             /// <summary>
             /// Builds a string containing the type's FullName but accounts for nested generic type argument.
@@ -104,27 +111,25 @@ namespace Unity.Serialization.Json
                         if (t.Namespace == null)
                             sb.Append(t.Name);
                         else
-                            sb.Append(t.Namespace)
-                                .Append(".")
-                                .Append(t.Name);
+                            sb.Append(t.Namespace).Append(".").Append(t.Name);
                     }
                     if (t.IsGenericType)
                     {
                         // `1 is already in t.Name
-                        sb.Append( "[");
+                        sb.Append("[");
                         for (var index = 0; index < t.GenericTypeArguments.Length; index++)
                         {
                             if (index > 0)
                             {
-                                sb.Append( ", ");
+                                sb.Append(", ");
                             }
 
-                            sb.Append( "[");
+                            sb.Append("[");
                             var typeArgument = t.GenericTypeArguments[index];
-                            FormatFullTypeNameRecursive(typeArgument,sb, false);
-                            sb.Append( "]");
+                            FormatFullTypeNameRecursive(typeArgument, sb, false);
+                            sb.Append("]");
                         }
-                        sb.Append( "]");
+                        sb.Append("]");
                     }
 
                     if (!omitAssembly && !t.IsPrimitive && t.Assembly != typeof(int).Assembly)
@@ -140,8 +145,11 @@ namespace Unity.Serialization.Json
         {
             public override string Name => k_SerializedVersionKey;
             public override bool IsReadOnly => true;
+
             public override int GetValue(ref SerializedVersion container) => container.Version;
-            public override void SetValue(ref SerializedVersion container, int value) => throw new InvalidOperationException("Property is ReadOnly.");
+
+            public override void SetValue(ref SerializedVersion container, int value) =>
+                throw new InvalidOperationException("Property is ReadOnly.");
         }
 
         struct SerializedContainerMetadata
@@ -191,14 +199,11 @@ namespace Unity.Serialization.Json
 
         public JsonWriter Writer => m_Writer;
 
-        public void SetWriter(JsonWriter writer)
-            => m_Writer = writer;
+        public void SetWriter(JsonWriter writer) => m_Writer = writer;
 
-        public void SetSerializedType(Type type)
-            => m_SerializedType = type;
+        public void SetSerializedType(Type type) => m_SerializedType = type;
 
-        public void SetDisableRootAdapters(bool disableRootAdapters)
-            => m_DisableRootAdapters = disableRootAdapters;
+        public void SetDisableRootAdapters(bool disableRootAdapters) => m_DisableRootAdapters = disableRootAdapters;
 
         public void SetGlobalAdapters(List<IJsonAdapter> adapters)
         {
@@ -209,17 +214,17 @@ namespace Unity.Serialization.Json
         public void SetUserDefinedAdapters(List<IJsonAdapter> adapters)
         {
             m_Adapters.UserDefined = adapters;
-            m_HasPrimitiveOrStringUserDefinedAdapters = JsonAdapterCollection.ContainsPrimitiveOrStringAdapter(adapters);
+            m_HasPrimitiveOrStringUserDefinedAdapters = JsonAdapterCollection.ContainsPrimitiveOrStringAdapter(
+                adapters
+            );
         }
 
-        public void SetGlobalMigrations(List<IJsonMigration> migrations)
-            => m_Migrations.Global = migrations;
+        public void SetGlobalMigrations(List<IJsonMigration> migrations) => m_Migrations.Global = migrations;
 
-        public void SetUserDefinedMigration(List<IJsonMigration> migrations)
-            => m_Migrations.UserDefined = migrations;
+        public void SetUserDefinedMigration(List<IJsonMigration> migrations) => m_Migrations.UserDefined = migrations;
 
-        public void SetSerializedReferences(SerializedReferences serializedReferences)
-            => m_SerializedReferences = serializedReferences;
+        public void SetSerializedReferences(SerializedReferences serializedReferences) =>
+            m_SerializedReferences = serializedReferences;
 
         public JsonPropertyWriter()
         {
@@ -240,15 +245,14 @@ namespace Unity.Serialization.Json
             {
                 var reference = container as object;
 
-                if (m_SerializedReferences != null && m_SerializedReferences.TryGetSerializedReference(reference, out var id))
+                if (
+                    m_SerializedReferences != null
+                    && m_SerializedReferences.TryGetSerializedReference(reference, out var id)
+                )
                 {
                     if (!m_SerializedReferences.SetSerialized(reference))
                     {
-                        return new SerializedContainerMetadata
-                        {
-                            IsSerializedReference = true,
-                            SerializedId = id
-                        };
+                        return new SerializedContainerMetadata { IsSerializedReference = true, SerializedId = id };
                     }
 
                     metadata.HasSerializedId = true;
@@ -267,21 +271,28 @@ namespace Unity.Serialization.Json
             // 1) The type is the same as the declared property type. This means deserialization can infer the property type.
             // 2) The root type was explicitly provided. This means the user is expected to provide a type upon deserialization.
             // 3) This is a nullable type. This means deserialization can infer the underlying property type.
-            metadata.HasSerializedType = type != declaredValueType && !isRootAndTypeWasGiven && Nullable.GetUnderlyingType(declaredValueType) != type;
+            metadata.HasSerializedType =
+                type != declaredValueType
+                && !isRootAndTypeWasGiven
+                && Nullable.GetUnderlyingType(declaredValueType) != type;
             metadata.HasSerializedVersion = m_Migrations.TryGetSerializedVersion<TContainer>(out var serializedVersion);
             metadata.SerializedVersion = serializedVersion;
 
             return metadata;
         }
 
-        void WriteSerializedContainerMetadata<TContainer>(ref TContainer container, SerializedContainerMetadata metadata, ref int count)
+        void WriteSerializedContainerMetadata<TContainer>(
+            ref TContainer container,
+            SerializedContainerMetadata metadata,
+            ref int count
+        )
         {
             if (metadata.HasSerializedId)
             {
                 using (CreatePropertyScope(s_SerializedIdProperty))
                 {
-                    var serializedId = new SerializedId {Id = metadata.SerializedId};
-                    ((IPropertyAccept<SerializedId>) s_SerializedIdProperty).Accept(this, ref serializedId);
+                    var serializedId = new SerializedId { Id = metadata.SerializedId };
+                    ((IPropertyAccept<SerializedId>)s_SerializedIdProperty).Accept(this, ref serializedId);
                 }
             }
 
@@ -289,8 +300,8 @@ namespace Unity.Serialization.Json
             {
                 using (CreatePropertyScope(s_SerializedTypeProperty))
                 {
-                    var typeInfo = new SerializedType {Type = container.GetType()};
-                    ((IPropertyAccept<SerializedType>) s_SerializedTypeProperty).Accept(this, ref typeInfo);
+                    var typeInfo = new SerializedType { Type = container.GetType() };
+                    ((IPropertyAccept<SerializedType>)s_SerializedTypeProperty).Accept(this, ref typeInfo);
                 }
             }
 
@@ -298,8 +309,11 @@ namespace Unity.Serialization.Json
             {
                 using (CreatePropertyScope(s_SerializedVersionProperty))
                 {
-                    var serializedVersion = new SerializedVersion {Version = metadata.SerializedVersion};
-                    ((IPropertyAccept<SerializedVersion>) s_SerializedVersionProperty).Accept(this, ref serializedVersion);
+                    var serializedVersion = new SerializedVersion { Version = metadata.SerializedVersion };
+                    ((IPropertyAccept<SerializedVersion>)s_SerializedVersionProperty).Accept(
+                        this,
+                        ref serializedVersion
+                    );
                 }
             }
         }
@@ -348,7 +362,10 @@ namespace Unity.Serialization.Json
             }
         }
 
-        void ICollectionPropertyBagVisitor.Visit<TCollection, TElement>(ICollectionPropertyBag<TCollection, TElement> properties, ref TCollection container)
+        void ICollectionPropertyBagVisitor.Visit<TCollection, TElement>(
+            ICollectionPropertyBag<TCollection, TElement> properties,
+            ref TCollection container
+        )
         {
             var metadata = GetSerializedContainerMetadata(ref container);
 
@@ -382,7 +399,10 @@ namespace Unity.Serialization.Json
             }
         }
 
-        void IListPropertyBagVisitor.Visit<TList, TElement>(IListPropertyBag<TList, TElement> properties, ref TList container)
+        void IListPropertyBagVisitor.Visit<TList, TElement>(
+            IListPropertyBag<TList, TElement> properties,
+            ref TList container
+        )
         {
             var metadata = GetSerializedContainerMetadata(ref container);
 
@@ -416,11 +436,14 @@ namespace Unity.Serialization.Json
             }
         }
 
-        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(IDictionaryPropertyBag<TDictionary, TKey, TValue> properties, ref TDictionary container)
+        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(
+            IDictionaryPropertyBag<TDictionary, TKey, TValue> properties,
+            ref TDictionary container
+        )
         {
             if (typeof(TKey) != typeof(string))
             {
-                ((ICollectionPropertyBagVisitor) this).Visit(properties, ref container);
+                ((ICollectionPropertyBagVisitor)this).Visit(properties, ref container);
             }
             else
             {
@@ -449,7 +472,7 @@ namespace Unity.Serialization.Json
                     foreach (var kvp in container)
                     {
                         property.Key = kvp.Key;
-                        ((IPropertyAccept<TDictionary>) property).Accept(this, ref container);
+                        ((IPropertyAccept<TDictionary>)property).Accept(this, ref container);
                     }
                 }
 
@@ -493,7 +516,11 @@ namespace Unity.Serialization.Json
             WriteValueWithAdapters(value, m_Adapters.GetEnumerator(filter), isRoot);
         }
 
-        internal void WriteValueWithAdapters<TValue>(TValue value, JsonAdapterCollection.Enumerator adapters, bool isRoot)
+        internal void WriteValueWithAdapters<TValue>(
+            TValue value,
+            JsonAdapterCollection.Enumerator adapters,
+            bool isRoot
+        )
         {
             while (adapters.MoveNext())
             {
@@ -504,7 +531,11 @@ namespace Unity.Serialization.Json
                         return;
                     case IContravariantJsonAdapter<TValue> typedContravariant:
                         // NOTE: Boxing
-                        typedContravariant.Serialize((IJsonSerializationContext) new JsonSerializationContext<TValue>(this, adapters, value, isRoot), value);
+                        typedContravariant.Serialize(
+                            (IJsonSerializationContext)
+                                new JsonSerializationContext<TValue>(this, adapters, value, isRoot),
+                            value
+                        );
                         return;
                 }
             }
@@ -521,7 +552,9 @@ namespace Unity.Serialization.Json
                 {
                     if (value is UnityEngine.Object)
                     {
-                        throw new NotSupportedException("JsonSerialization does not support polymorphic unity object references.");
+                        throw new NotSupportedException(
+                            "JsonSerialization does not support polymorphic unity object references."
+                        );
                     }
                 }
             }
@@ -619,40 +652,40 @@ namespace Unity.Serialization.Json
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.SByte:
-                    writer.WriteValue((sbyte) value);
+                    writer.WriteValue((sbyte)value);
                     return;
                 case TypeCode.Int16:
-                    writer.WriteValue((short) value);
+                    writer.WriteValue((short)value);
                     return;
                 case TypeCode.Int32:
-                    writer.WriteValue((int) value);
+                    writer.WriteValue((int)value);
                     return;
                 case TypeCode.Int64:
-                    writer.WriteValue((long) value);
+                    writer.WriteValue((long)value);
                     return;
                 case TypeCode.Byte:
-                    writer.WriteValue((byte) value);
+                    writer.WriteValue((byte)value);
                     return;
                 case TypeCode.UInt16:
-                    writer.WriteValue((ushort) value);
+                    writer.WriteValue((ushort)value);
                     return;
                 case TypeCode.UInt32:
-                    writer.WriteValue((uint) value);
+                    writer.WriteValue((uint)value);
                     return;
                 case TypeCode.UInt64:
-                    writer.WriteValue((ulong) value);
+                    writer.WriteValue((ulong)value);
                     return;
                 case TypeCode.Single:
-                    writer.WriteValue((float) value);
+                    writer.WriteValue((float)value);
                     return;
                 case TypeCode.Double:
-                    writer.WriteValue((double) value);
+                    writer.WriteValue((double)value);
                     return;
                 case TypeCode.Boolean:
-                    writer.WriteValueLiteral(((bool) value) ? "true" : "false");
+                    writer.WriteValueLiteral(((bool)value) ? "true" : "false");
                     return;
                 case TypeCode.Char:
-                    writer.WriteValue((char) value);
+                    writer.WriteValue((char)value);
                     return;
                 case TypeCode.String:
                     writer.WriteValue(value as string);

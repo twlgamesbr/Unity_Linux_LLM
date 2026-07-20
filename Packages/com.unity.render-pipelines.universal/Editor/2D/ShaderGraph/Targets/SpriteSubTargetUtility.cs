@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using UnityEngine;
 using UnityEditor.ShaderGraph;
-using UnityEngine.UIElements;
 using UnityEditor.ShaderGraph.Internal;
+using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEditor.Rendering.Universal.ShaderGraph.UniversalTarget;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
@@ -18,7 +18,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             if (target.zWriteControl == ZWriteControl.ForceEnabled)
                 result.Add(RenderState.ZWrite(ZWrite.On));
             else
-                result.Add(RenderState.ZWrite(ZWrite.Off), new FieldCondition(UniversalFields.SurfaceTransparent, true));
+                result.Add(
+                    RenderState.ZWrite(ZWrite.Off),
+                    new FieldCondition(UniversalFields.SurfaceTransparent, true)
+                );
 
             // Add Z test
             result.Add(RenderState.ZTest(target.zTestMode.ToString()));
@@ -65,70 +68,99 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             context.AddBlock(BlockFields.SurfaceDescription.AlphaClipThreshold, target.alphaClip);
         }
 
-        public static void AddDefaultPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo, UniversalTarget target)
+        public static void AddDefaultPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo,
+            UniversalTarget target
+        )
         {
-            context.AddProperty("Blending Mode", new UnityEngine.UIElements.EnumField(AlphaMode.Alpha) { value = target.alphaMode }, (evt) =>
-            {
-                if (Equals(target.alphaMode, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Blending Mode",
+                new UnityEngine.UIElements.EnumField(AlphaMode.Alpha) { value = target.alphaMode },
+                (evt) =>
+                {
+                    if (Equals(target.alphaMode, evt.newValue))
+                        return;
 
-                registerUndo("Change Blend");
-                target.alphaMode = (AlphaMode)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Blend");
+                    target.alphaMode = (AlphaMode)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Depth Write", new EnumField(ZWriteControl.ForceDisabled) { value = target.zWriteControl }, (evt) =>
-            {
-                if (Equals(target.zWriteControl, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Depth Write",
+                new EnumField(ZWriteControl.ForceDisabled) { value = target.zWriteControl },
+                (evt) =>
+                {
+                    if (Equals(target.zWriteControl, evt.newValue))
+                        return;
 
-                registerUndo("Change Depth Write Control");
-                target.zWriteControl = (ZWriteControl)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Depth Write Control");
+                    target.zWriteControl = (ZWriteControl)evt.newValue;
+                    onChange();
+                }
+            );
 
             if (target.zWriteControl == ZWriteControl.ForceEnabled)
             {
-                context.AddProperty("Depth Test", new EnumField(ZTestModeForUI.LEqual) { value = (ZTestModeForUI)target.zTestMode }, (evt) =>
-                {
-                    if (Equals(target.zTestMode, evt.newValue))
-                        return;
+                context.AddProperty(
+                    "Depth Test",
+                    new EnumField(ZTestModeForUI.LEqual) { value = (ZTestModeForUI)target.zTestMode },
+                    (evt) =>
+                    {
+                        if (Equals(target.zTestMode, evt.newValue))
+                            return;
 
-                    registerUndo("Change Depth Test");
-                    target.zTestMode = (ZTestMode)evt.newValue;
-                    onChange();
-                });
+                        registerUndo("Change Depth Test");
+                        target.zTestMode = (ZTestMode)evt.newValue;
+                        onChange();
+                    }
+                );
             }
 
-            context.AddProperty("Alpha Clipping", new Toggle() { value = target.alphaClip }, (evt) =>
-            {
-                if (Equals(target.alphaClip, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Alpha Clipping",
+                new Toggle() { value = target.alphaClip },
+                (evt) =>
+                {
+                    if (Equals(target.alphaClip, evt.newValue))
+                        return;
 
-                registerUndo("Change Alpha Clip");
-                target.alphaClip = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Alpha Clip");
+                    target.alphaClip = evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Disable Color Tint", new Toggle() { value = target.disableTint }, (evt) =>
-            {
-                if (Equals(target.disableTint, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Disable Color Tint",
+                new Toggle() { value = target.disableTint },
+                (evt) =>
+                {
+                    if (Equals(target.disableTint, evt.newValue))
+                        return;
 
-                registerUndo("Change Disable Tint");
-                target.disableTint = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Disable Tint");
+                    target.disableTint = evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Sort 3D as 2D Compatible", new Toggle() { value = target.sort3DAs2DCompatible }, (evt) =>
-            {
-                if (Equals(target.sort3DAs2DCompatible, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Sort 3D as 2D Compatible",
+                new Toggle() { value = target.sort3DAs2DCompatible },
+                (evt) =>
+                {
+                    if (Equals(target.sort3DAs2DCompatible, evt.newValue))
+                        return;
 
-                registerUndo("Change Sort 3D as 2D Compatible");
-                target.sort3DAs2DCompatible = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Sort 3D as 2D Compatible");
+                    target.sort3DAs2DCompatible = evt.newValue;
+                    onChange();
+                }
+            );
         }
 
         public static void AddAlphaClipControlToPass(ref PassDescriptor pass, UniversalTarget target)
@@ -147,7 +179,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
                 overrideHLSLDeclaration = true,
                 generatePropertyBlock = true,
-                
             };
 
             collector.AddShaderProperty(property);

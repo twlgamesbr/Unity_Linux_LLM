@@ -5,14 +5,14 @@ using System.Runtime.InteropServices;
 namespace UnityEngine.Rendering.Universal
 {
     [StructLayout(LayoutKind.Sequential)]
-    struct Fixed2<T> where T : unmanaged
+    struct Fixed2<T>
+        where T : unmanaged
     {
         public T item1;
         public T item2;
 
-        public Fixed2(T item1) : this(item1, item1)
-        {
-        }
+        public Fixed2(T item1)
+            : this(item1, item1) { }
 
         public Fixed2(T item1, T item2)
         {

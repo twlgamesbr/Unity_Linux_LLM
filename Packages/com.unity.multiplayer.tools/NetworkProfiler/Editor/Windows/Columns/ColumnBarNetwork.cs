@@ -51,7 +51,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             ColumnClicked onNameClicked,
             ColumnClicked onTypeClicked,
             ColumnClicked onByteSentClicked,
-            ColumnClicked onBytesReceivedClicked)
+            ColumnClicked onBytesReceivedClicked
+        )
         {
             m_OnNameClicked = onNameClicked;
             m_OnTypeClicked = onTypeClicked;

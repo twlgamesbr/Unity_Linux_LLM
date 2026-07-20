@@ -1,6 +1,7 @@
 namespace Unity.PlatformToolkit
 {
-    internal class AchievementProgressState<T> where T : AchievementDefinition
+    internal class AchievementProgressState<T>
+        where T : AchievementDefinition
     {
         public readonly T Definition;
         public long NextProgress;

@@ -12,8 +12,15 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
         private Action<string> m_LogWarningAction;
         internal Func<string, bool> fileExistsCheck = File.Exists;
         private Func<bool> m_ScriptCompilationFailedCheck;
-        internal Func<string, string[]> readAllLines = filePath => File.ReadAllText(filePath).Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-        public SettingsBuilder(ITestSettingsDeserializer testSettingsDeserializer, Action<string> logAction, Action<string> logWarningAction, Func<bool> scriptCompilationFailedCheck)
+        internal Func<string, string[]> readAllLines = filePath =>
+            File.ReadAllText(filePath).Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+        public SettingsBuilder(
+            ITestSettingsDeserializer testSettingsDeserializer,
+            Action<string> logAction,
+            Action<string> logWarningAction,
+            Func<bool> scriptCompilationFailedCheck
+        )
         {
             m_LogAction = logAction;
             m_LogWarningAction = logWarningAction;
@@ -37,23 +44,112 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             int repeat = 0;
             int randomOrderSeed = 0;
 
-
             var optionSet = new CommandLineOptionSet(
-                new CommandLineOption("quit", () => { quit = true; }),
-                new CommandLineOption("testPlatform", platform => { testPlatform = platform; }),
-                new CommandLineOption("editorTestsFilter", filters => { testFilters = filters; }),
-                new CommandLineOption("testFilter", filters => { testFilters = filters; }),
-                new CommandLineOption("editorTestsCategories", catagories => { testCategories = catagories; }),
-                new CommandLineOption("testCategory", catagories => { testCategories = catagories; }),
-                new CommandLineOption("testSettingsFile", settingsFilePath => { testSettingsFilePath = settingsFilePath; }),
-                new CommandLineOption("playerHeartbeatTimeout", timeout => { playerHeartbeatTimeout = int.Parse(timeout); }),
-                new CommandLineOption("runSynchronously", () => { runSynchronously = true; }),
-                new CommandLineOption("assemblyNames", assemblyNames => { testAssemblyNames = assemblyNames; }),
-                new CommandLineOption("buildPlayerPath", buildPath => { buildPlayerPath = buildPath; }),
-                new CommandLineOption("orderedTestListFile", filePath => { orderedTestListFilePath = filePath; }),
-                new CommandLineOption("randomOrderSeed", seed => { randomOrderSeed = int.Parse(seed);}),
-                new CommandLineOption("retry", n => { retry = int.Parse(n); }),
-                new CommandLineOption("repeat", n => { repeat = int.Parse(n); })
+                new CommandLineOption(
+                    "quit",
+                    () =>
+                    {
+                        quit = true;
+                    }
+                ),
+                new CommandLineOption(
+                    "testPlatform",
+                    platform =>
+                    {
+                        testPlatform = platform;
+                    }
+                ),
+                new CommandLineOption(
+                    "editorTestsFilter",
+                    filters =>
+                    {
+                        testFilters = filters;
+                    }
+                ),
+                new CommandLineOption(
+                    "testFilter",
+                    filters =>
+                    {
+                        testFilters = filters;
+                    }
+                ),
+                new CommandLineOption(
+                    "editorTestsCategories",
+                    catagories =>
+                    {
+                        testCategories = catagories;
+                    }
+                ),
+                new CommandLineOption(
+                    "testCategory",
+                    catagories =>
+                    {
+                        testCategories = catagories;
+                    }
+                ),
+                new CommandLineOption(
+                    "testSettingsFile",
+                    settingsFilePath =>
+                    {
+                        testSettingsFilePath = settingsFilePath;
+                    }
+                ),
+                new CommandLineOption(
+                    "playerHeartbeatTimeout",
+                    timeout =>
+                    {
+                        playerHeartbeatTimeout = int.Parse(timeout);
+                    }
+                ),
+                new CommandLineOption(
+                    "runSynchronously",
+                    () =>
+                    {
+                        runSynchronously = true;
+                    }
+                ),
+                new CommandLineOption(
+                    "assemblyNames",
+                    assemblyNames =>
+                    {
+                        testAssemblyNames = assemblyNames;
+                    }
+                ),
+                new CommandLineOption(
+                    "buildPlayerPath",
+                    buildPath =>
+                    {
+                        buildPlayerPath = buildPath;
+                    }
+                ),
+                new CommandLineOption(
+                    "orderedTestListFile",
+                    filePath =>
+                    {
+                        orderedTestListFilePath = filePath;
+                    }
+                ),
+                new CommandLineOption(
+                    "randomOrderSeed",
+                    seed =>
+                    {
+                        randomOrderSeed = int.Parse(seed);
+                    }
+                ),
+                new CommandLineOption(
+                    "retry",
+                    n =>
+                    {
+                        retry = int.Parse(n);
+                    }
+                ),
+                new CommandLineOption(
+                    "repeat",
+                    n =>
+                    {
+                        repeat = int.Parse(n);
+                    }
+                )
             );
             optionSet.Parse(commandLineArgs);
 
@@ -67,12 +163,12 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
                 testMode = testPlatform.ToLower() == "editmode" ? TestMode.EditMode : TestMode.PlayMode,
                 groupNames = testFilters,
                 categoryNames = testCategories,
-                assemblyNames = testAssemblyNames
+                assemblyNames = testAssemblyNames,
             };
 
             var settings = new Api.ExecutionSettings
             {
-                filters = new []{ filter },
+                filters = new[] { filter },
                 overloadTestRunSettings = new RunSettings(testSettings),
                 ignoreTests = testSettings?.ignoreTests,
                 featureFlags = testSettings?.featureFlags,
@@ -82,7 +178,7 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
                 orderedTestNames = GetOrderedTestList(orderedTestListFilePath),
                 repeatCount = repeat,
                 retryCount = retry,
-                randomOrderSeed = randomOrderSeed
+                randomOrderSeed = randomOrderSeed,
             };
 
             if (playerHeartbeatTimeout != null)
@@ -99,16 +195,34 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             string deviceLogsDirectory = null;
 
             var optionSet = new CommandLineOptionSet(
-                new CommandLineOption("editorTestsResultFile", filePath => { resultFilePath = filePath; }),
-                new CommandLineOption("testResults", filePath => { resultFilePath = filePath; }),
-                new CommandLineOption("deviceLogs", dirPath => { deviceLogsDirectory = dirPath; })
+                new CommandLineOption(
+                    "editorTestsResultFile",
+                    filePath =>
+                    {
+                        resultFilePath = filePath;
+                    }
+                ),
+                new CommandLineOption(
+                    "testResults",
+                    filePath =>
+                    {
+                        resultFilePath = filePath;
+                    }
+                ),
+                new CommandLineOption(
+                    "deviceLogs",
+                    dirPath =>
+                    {
+                        deviceLogsDirectory = dirPath;
+                    }
+                )
             );
             optionSet.Parse(commandLineArgs);
 
             return new ExecutionSettings
             {
                 TestResultsFile = resultFilePath,
-                DeviceLogsDirectory = deviceLogsDirectory
+                DeviceLogsDirectory = deviceLogsDirectory,
             };
         }
 
@@ -116,7 +230,9 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
         {
             if (quitIsGiven)
             {
-                m_LogWarningAction("Running tests from command line arguments will not work when \"quit\" is specified.");
+                m_LogWarningAction(
+                    "Running tests from command line arguments will not work when \"quit\" is specified."
+                );
             }
         }
 
@@ -135,7 +251,10 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             {
                 if (!fileExistsCheck(testSettingsFilePath))
                 {
-                    throw new SetupException(SetupException.ExceptionType.TestSettingsFileNotFound, testSettingsFilePath);
+                    throw new SetupException(
+                        SetupException.ExceptionType.TestSettingsFileNotFound,
+                        testSettingsFilePath
+                    );
                 }
 
                 testSettings = m_TestSettingsDeserializer.GetSettingsFromJsonFile(testSettingsFilePath);
@@ -149,7 +268,10 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             {
                 if (!fileExistsCheck(orderedTestListFilePath))
                 {
-                    throw new SetupException(SetupException.ExceptionType.OrderedTestListFileNotFound, orderedTestListFilePath);
+                    throw new SetupException(
+                        SetupException.ExceptionType.OrderedTestListFileNotFound,
+                        orderedTestListFilePath
+                    );
                 }
 
                 return readAllLines(orderedTestListFilePath);
@@ -160,8 +282,12 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
         private static BuildTarget? GetBuildTarget(string testPlatform)
         {
             var testPlatformLower = testPlatform.ToLower();
-            if (testPlatformLower == "editmode" || testPlatformLower == "playmode" || testPlatformLower == "editor" ||
-                string.IsNullOrEmpty(testPlatformLower))
+            if (
+                testPlatformLower == "editmode"
+                || testPlatformLower == "playmode"
+                || testPlatformLower == "editor"
+                || string.IsNullOrEmpty(testPlatformLower)
+            )
             {
                 return null;
             }

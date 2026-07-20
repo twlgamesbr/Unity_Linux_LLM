@@ -3,7 +3,7 @@ namespace Unity.Entities
     /// <summary>
     /// Utilities to manipulate version numbers
     /// </summary>
-    static public class ChangeVersionUtility
+    public static class ChangeVersionUtility
     {
         /// <summary>
         /// Test whether two version numbers indicate that a change has occurred.

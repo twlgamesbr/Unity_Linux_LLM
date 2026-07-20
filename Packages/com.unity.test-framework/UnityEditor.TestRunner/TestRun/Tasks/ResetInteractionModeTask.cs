@@ -12,12 +12,14 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             RunOnError = ErrorRunMode.RunAlways;
             RunOnCancel = true;
         }
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             SetInteractionModeToUserSetting(testJobData);
             EditorApplication.UpdateInteractionModeSettings();
             yield break;
         }
+
         private void SetInteractionModeToUserSetting(TestJobData testJobData)
         {
             if (testJobData.UserApplicationIdleTime != -1)

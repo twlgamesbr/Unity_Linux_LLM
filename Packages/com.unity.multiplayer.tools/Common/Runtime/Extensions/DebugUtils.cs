@@ -6,7 +6,6 @@ namespace Unity.Multiplayer.Tools.Common
 {
     static class DebugUtil
     {
-
         /// <summary>
         /// Define UNITY_MP_TOOLS_DEBUG_TRACE, either at the call site or in project settings, to enable logging
         /// </summary>
@@ -46,7 +45,8 @@ namespace Unity.Multiplayer.Tools.Common
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static void TraceMethodName(
             [CallerFilePath] string filepath = "",
-            [CallerMemberName] string methodName = "")
+            [CallerMemberName] string methodName = ""
+        )
         {
 #if UNITY_MP_TOOLS_DEBUG_TRACE
             var filenameWithoutExtension = Path.GetFileNameWithoutExtension(filepath);

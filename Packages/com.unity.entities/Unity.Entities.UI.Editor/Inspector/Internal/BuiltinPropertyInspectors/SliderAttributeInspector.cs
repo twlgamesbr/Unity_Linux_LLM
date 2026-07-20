@@ -7,8 +7,8 @@ using UnityEngine.UIElements;
 
 namespace Unity.Entities.UI
 {
-    abstract class
-        SliderAttributeInspectorBase<TSlider, TFieldType, TValue> : BaseFieldAttributeInspector<TSlider, TFieldType, TValue, RangeAttribute>
+    abstract class SliderAttributeInspectorBase<TSlider, TFieldType, TValue>
+        : BaseFieldAttributeInspector<TSlider, TFieldType, TValue, RangeAttribute>
         where TSlider : BaseSlider<TFieldType>, new()
         where TFieldType : IComparable<TFieldType>
     {

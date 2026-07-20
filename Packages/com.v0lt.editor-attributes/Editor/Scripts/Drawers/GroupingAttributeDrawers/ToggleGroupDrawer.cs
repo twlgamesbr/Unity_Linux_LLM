@@ -21,14 +21,17 @@ namespace EditorAttributes.Editor
                 text = toggleGroup.GroupName,
                 tooltip = property.tooltip,
                 style = { unityFontStyleAndWeight = FontStyle.Bold },
-                value = EditorPrefs.GetBool(foldoutSaveKey)
+                value = EditorPrefs.GetBool(foldoutSaveKey),
             };
 
             Toggle toggleBox = new()
             {
                 text = "",
                 style = { marginRight = 10f },
-                value = property.propertyType == SerializedPropertyType.Boolean ? property.boolValue : EditorPrefs.GetBool(toggleSaveKey)
+                value =
+                    property.propertyType == SerializedPropertyType.Boolean
+                        ? property.boolValue
+                        : EditorPrefs.GetBool(toggleSaveKey),
             };
 
             foldout.contentContainer.SetEnabled(toggleBox.value);
@@ -46,39 +49,50 @@ namespace EditorAttributes.Editor
                 foldout.Add(groupProperty);
             }
 
-            toggleBox.RegisterValueChangedCallback((callback) =>
-            {
-                if (property.propertyType == SerializedPropertyType.Boolean)
+            toggleBox.RegisterValueChangedCallback(
+                (callback) =>
                 {
-                    property.boolValue = callback.newValue;
-                    property.serializedObject.ApplyModifiedProperties();
-                }
-                else
-                {
-                    EditorPrefs.SetBool(toggleSaveKey, callback.newValue); // The value is already serialized via the property, there is no point in saving it.
-                }
+                    if (property.propertyType == SerializedPropertyType.Boolean)
+                    {
+                        property.boolValue = callback.newValue;
+                        property.serializedObject.ApplyModifiedProperties();
+                    }
+                    else
+                    {
+                        EditorPrefs.SetBool(toggleSaveKey, callback.newValue); // The value is already serialized via the property, there is no point in saving it.
+                    }
 
-                foldout.contentContainer.SetEnabled(callback.newValue);
-            });
+                    foldout.contentContainer.SetEnabled(callback.newValue);
+                }
+            );
 
             root.Add(foldout);
 
-            foldout.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var toggle = foldout.Q<Toggle>();
+            foldout.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    var toggle = foldout.Q<Toggle>();
 
-                toggle.style.backgroundColor = CanApplyGlobalColor ? EditorExtension.GLOBAL_COLOR / 3f : new Color(0.1f, 0.1f, 0.1f, 0.2f);
+                    toggle.style.backgroundColor = CanApplyGlobalColor
+                        ? EditorExtension.GLOBAL_COLOR / 3f
+                        : new Color(0.1f, 0.1f, 0.1f, 0.2f);
 
-                var parentElement = foldout.Q<Label>().parent;
+                    var parentElement = foldout.Q<Label>().parent;
 
-                parentElement.Insert(1, toggleBox);
+                    parentElement.Insert(1, toggleBox);
 
-                // Register this callback later since value changed callbacks are called on inspector initalization and we don't want to save values on initalization
-                foldout.RegisterValueChangedCallback((callback) => EditorPrefs.SetBool(foldoutSaveKey, callback.newValue));
-            });
+                    // Register this callback later since value changed callbacks are called on inspector initalization and we don't want to save values on initalization
+                    foldout.RegisterValueChangedCallback(
+                        (callback) => EditorPrefs.SetBool(foldoutSaveKey, callback.newValue)
+                    );
+                }
+            );
 
             if (property.propertyType == SerializedPropertyType.Boolean)
-                toggleBox.TrackPropertyValue(property, (serializedProperty) => toggleBox.value = serializedProperty.boolValue);
+                toggleBox.TrackPropertyValue(
+                    property,
+                    (serializedProperty) => toggleBox.value = serializedProperty.boolValue
+                );
 
             return root;
         }

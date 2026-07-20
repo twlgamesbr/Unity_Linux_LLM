@@ -1,9 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -13,7 +11,8 @@ public class ForEachNoErrorTests
     [TestMethod]
     public async Task ForEachIteration_InSystemBase()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             public partial class SomeSystem : SystemBase {
@@ -27,7 +26,8 @@ public class ForEachNoErrorTests
     [TestMethod]
     public async Task DifferentAssemblies_ComponentDataRef()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             public partial struct SomeSystem : ISystem {
@@ -41,7 +41,8 @@ public class ForEachNoErrorTests
     [TestMethod]
     public async Task EnableableBufferElement()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -56,7 +57,8 @@ public class ForEachNoErrorTests
     [TestMethod]
     public async Task SystemBasePartialTypes_IdiomaticForEach()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             public partial class UserWrittenPartial : SystemBase {
@@ -81,7 +83,8 @@ public class ForEachNoErrorTests
     [TestMethod]
     public async Task ISystemPartialTypes_IdiomaticForEach()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             public partial struct UserWrittenPartial : ISystem {
@@ -106,7 +109,8 @@ public class ForEachNoErrorTests
     [TestMethod]
     public async Task IdiomaticForEach_WithErrorTypeParam()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             using Namespace1;
@@ -138,7 +142,8 @@ public class ForEachNoErrorTests
     [TestMethod]
     public async Task SGFE010_QueryingTypeWithNonGenericTypeArgument()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 

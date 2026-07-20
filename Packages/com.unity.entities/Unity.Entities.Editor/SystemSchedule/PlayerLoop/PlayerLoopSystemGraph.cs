@@ -28,13 +28,19 @@ namespace Unity.Entities.Editor
         {
             // The integration of `ComponentSystemBase` into the player loop is done through a wrapper type.
             // If the target of the player loop system is the wrapper type, we will parse this as a `ComponentSystemBase`.
-            if (null != playerLoopSystem.updateDelegate && playerLoopSystem.updateDelegate.Target is SystemWrapper wrapper)
+            if (
+                null != playerLoopSystem.updateDelegate
+                && playerLoopSystem.updateDelegate.Target is SystemWrapper wrapper
+            )
             {
                 var systemWorld = wrapper.System.World;
-                if (systemWorld is not {IsCreated: true})
+                if (systemWorld is not { IsCreated: true })
                     return;
 
-                AddSystem(new SystemProxy(wrapper.System, WorldProxyManager.GetWorldProxyForGivenWorld(systemWorld)), parent);
+                AddSystem(
+                    new SystemProxy(wrapper.System, WorldProxyManager.GetWorldProxyForGivenWorld(systemWorld)),
+                    parent
+                );
                 return;
             }
 

@@ -15,7 +15,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         BitArray m_Updates;
         bool m_gpuBufferDirty = true;
         int m_ElementCount = 0;
-        public int elementCount { get { return m_ElementCount; } }
+        public int elementCount
+        {
+            get { return m_ElementCount; }
+        }
 
         public PersistentGpuArray(int initialSize)
         {
@@ -53,7 +56,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         public BlockAllocator.Allocation[] Add(int elementCount)
         {
-            m_ElementCount+= elementCount;
+            m_ElementCount += elementCount;
             var slotAllocation = m_SlotAllocator.Allocate(elementCount);
             if (!slotAllocation.valid)
             {
@@ -64,7 +67,6 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             return m_SlotAllocator.SplitAllocation(slotAllocation, elementCount);
         }
-
 
         public void Remove(BlockAllocator.Allocation allocation)
         {
@@ -123,7 +125,13 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                     else if (copyStartIndex != -1)
                     {
                         int copyEndIndex = i;
-                        cmd.SetBufferData(m_GpuBuffer, m_CpuList, copyStartIndex, copyStartIndex, copyEndIndex - copyStartIndex);
+                        cmd.SetBufferData(
+                            m_GpuBuffer,
+                            m_CpuList,
+                            copyStartIndex,
+                            copyStartIndex,
+                            copyEndIndex - copyStartIndex
+                        );
                         copyStartIndex = -1;
                     }
                 }
@@ -131,7 +139,13 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 if (copyStartIndex != -1)
                 {
                     int copyEndIndex = m_Updates.Length;
-                    cmd.SetBufferData(m_GpuBuffer, m_CpuList, copyStartIndex, copyStartIndex, copyEndIndex - copyStartIndex);
+                    cmd.SetBufferData(
+                        m_GpuBuffer,
+                        m_CpuList,
+                        copyStartIndex,
+                        copyStartIndex,
+                        copyEndIndex - copyStartIndex
+                    );
                 }
 
                 m_gpuBufferDirty = false;
@@ -160,4 +174,3 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
     }
 }
-

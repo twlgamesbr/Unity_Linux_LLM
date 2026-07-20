@@ -12,8 +12,10 @@ namespace UnityEditor.Rendering.Universal
     {
         protected override Type OldSettingsType { get; } = typeof(BIRPRendering.Grain);
 
-        protected override void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldSettings,
-            VolumeProfile targetProfile)
+        protected override void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldSettings,
+            VolumeProfile targetProfile
+        )
         {
             var oldGrain = oldSettings as BIRPRendering.Grain;
 

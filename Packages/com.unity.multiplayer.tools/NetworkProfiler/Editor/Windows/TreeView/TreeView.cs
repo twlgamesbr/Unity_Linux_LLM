@@ -24,10 +24,28 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
         public new class UxmlTraits : VisualElement.UxmlTraits
         {
-            readonly UxmlIntAttributeDescription m_ItemHeight = new UxmlIntAttributeDescription { name = "item-height", defaultValue = 30 };
-            readonly UxmlBoolAttributeDescription m_ShowBorder = new UxmlBoolAttributeDescription { name = "show-border", defaultValue = false };
-            readonly UxmlEnumAttributeDescription<SelectionType> m_SelectionType = new UxmlEnumAttributeDescription<SelectionType> { name = "selection-type", defaultValue = SelectionType.Single };
-            readonly UxmlEnumAttributeDescription<AlternatingRowBackground> m_ShowAlternatingRowBackgrounds = new UxmlEnumAttributeDescription<AlternatingRowBackground> { name = "show-alternating-row-backgrounds", defaultValue = AlternatingRowBackground.None };
+            readonly UxmlIntAttributeDescription m_ItemHeight = new UxmlIntAttributeDescription
+            {
+                name = "item-height",
+                defaultValue = 30,
+            };
+            readonly UxmlBoolAttributeDescription m_ShowBorder = new UxmlBoolAttributeDescription
+            {
+                name = "show-border",
+                defaultValue = false,
+            };
+            readonly UxmlEnumAttributeDescription<SelectionType> m_SelectionType =
+                new UxmlEnumAttributeDescription<SelectionType>
+                {
+                    name = "selection-type",
+                    defaultValue = SelectionType.Single,
+                };
+            readonly UxmlEnumAttributeDescription<AlternatingRowBackground> m_ShowAlternatingRowBackgrounds =
+                new UxmlEnumAttributeDescription<AlternatingRowBackground>
+                {
+                    name = "show-alternating-row-backgrounds",
+                    defaultValue = AlternatingRowBackground.None,
+                };
 
             public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
             {
@@ -48,7 +66,10 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
                 treeView.showBorder = m_ShowBorder.GetValueFromBag(bag, creationContext);
                 treeView.selectionType = m_SelectionType.GetValueFromBag(bag, creationContext);
-                treeView.showAlternatingRowBackgrounds = m_ShowAlternatingRowBackgrounds.GetValueFromBag(bag, creationContext);
+                treeView.showAlternatingRowBackgrounds = m_ShowAlternatingRowBackgrounds.GetValueFromBag(
+                    bag,
+                    creationContext
+                );
             }
         }
 #endif
@@ -187,7 +208,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             {
                 name = k_ListViewName,
                 itemsSource = m_ItemWrappers,
-                viewDataKey = k_ListViewName
+                viewDataKey = k_ListViewName,
             };
             m_ListView.AddToClassList(k_ListViewName);
 
@@ -212,7 +233,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             IList<ITreeViewItem> items,
             int itemHeight,
             Func<VisualElement> makeItem,
-            Action<VisualElement, ITreeViewItem> bindItem)
+            Action<VisualElement, ITreeViewItem> bindItem
+        )
             : this()
         {
             m_ListView.fixedItemHeight = itemHeight;
@@ -572,18 +594,12 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             var indents = new VisualElement
             {
                 name = k_ItemIndentsContainerName,
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
+                style = { flexDirection = FlexDirection.Row },
             };
             indents.AddToClassList(k_ItemIndentsContainerName);
             itemContainer.hierarchy.Add(indents);
 
-            var toggle = new Toggle
-            {
-                name = k_ItemToggleName
-            };
+            var toggle = new Toggle { name = k_ItemToggleName };
             toggle.AddToClassList(Foldout.toggleUssClassName);
             toggle.RegisterValueChangedCallback(ToggleExpandedState);
             itemContainer.hierarchy.Add(toggle);
@@ -591,10 +607,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             var userContentContainer = new VisualElement
             {
                 name = k_ItemContentContainerName,
-                style =
-                {
-                    flexGrow = 1,
-                },
+                style = { flexGrow = 1 },
             };
             userContentContainer.AddToClassList(k_ItemContentContainerName);
             itemContainer.Add(userContentContainer);
@@ -718,11 +731,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         {
             foreach (var item in treeViewItems)
             {
-                var wrapper = new TreeViewItemWrapper
-                {
-                    depth = depth,
-                    item = item,
-                };
+                var wrapper = new TreeViewItemWrapper { depth = depth, item = item };
 
                 wrappers.Add(wrapper);
 

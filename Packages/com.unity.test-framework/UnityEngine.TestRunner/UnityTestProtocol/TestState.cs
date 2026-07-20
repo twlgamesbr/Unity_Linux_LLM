@@ -7,6 +7,6 @@ namespace UnityEngine.TestRunner.TestProtocol
         Ignored = 3,
         Success = 4,
         Failure = 5,
-        Error = 6
+        Error = 6,
     }
 }

@@ -9,7 +9,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         DebugMessageHandler m_DebugMessageHandler = ScriptableObject.CreateInstance<DebugMessageHandler>();
 
-        public RenderGraphEditorRemoteDebugSession() : base()
+        public RenderGraphEditorRemoteDebugSession()
+            : base()
         {
             m_DebugMessageHandler.Register(OnMessageFromPlayer);
 
@@ -47,19 +48,28 @@ namespace UnityEngine.Rendering.RenderGraphModule
                         debugDataPayload.graphName,
                         debugDataPayload.executionId,
                         debugDataPayload.debugData.executionName,
-                        debugDataPayload.debugData);
+                        debugDataPayload.debugData
+                    );
                 }
             }
             else if (messageType == DebugMessageHandler.MessageType.AnalyticsData)
             {
                 if (payload is DebugMessageHandler.AnalyticsPayload { isCompatible: true } analyticsPayload)
                 {
-                    RenderGraphViewerSessionCreatedAnalytic.Send(RenderGraphViewerSessionCreatedAnalytic.SessionType.Remote, analyticsPayload);
+                    RenderGraphViewerSessionCreatedAnalytic.Send(
+                        RenderGraphViewerSessionCreatedAnalytic.SessionType.Remote,
+                        analyticsPayload
+                    );
                 }
             }
         }
 
-        void RegisterAndUpdateDebugData(string graphName, EntityId executionId, string executionName, DebugData debugData)
+        void RegisterAndUpdateDebugData(
+            string graphName,
+            EntityId executionId,
+            string executionName,
+            DebugData debugData
+        )
         {
             RegisterGraph(graphName);
             RegisterExecution(graphName, executionId, executionName);

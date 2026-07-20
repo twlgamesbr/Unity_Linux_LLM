@@ -6,14 +6,20 @@ namespace Unity.Entities.Editor
 {
     static class WorldCategoryHelper
     {
-        static readonly WorldFlags[] OrderedFlags = { WorldFlags.Live, WorldFlags.Conversion, WorldFlags.Streaming, WorldFlags.Shadow };
+        static readonly WorldFlags[] OrderedFlags =
+        {
+            WorldFlags.Live,
+            WorldFlags.Conversion,
+            WorldFlags.Streaming,
+            WorldFlags.Shadow,
+        };
 
         static readonly Dictionary<WorldFlags, string> CategoryNames = new Dictionary<WorldFlags, string>
         {
             { WorldFlags.Live, "Live Worlds" },
             { WorldFlags.Conversion, "Conversion Worlds" },
             { WorldFlags.Streaming, "Streaming Worlds" },
-            { WorldFlags.Shadow, "Shadow Worlds" }
+            { WorldFlags.Shadow, "Shadow Worlds" },
         };
 
         static readonly Dictionary<WorldFlags, List<World>> Collector = new Dictionary<WorldFlags, List<World>>();

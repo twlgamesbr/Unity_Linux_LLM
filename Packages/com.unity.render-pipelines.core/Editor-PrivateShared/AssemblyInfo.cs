@@ -15,7 +15,6 @@ using System.Runtime.CompilerServices;
 //  Every new entry here should be discussed. It is always better to have good public API.
 //  Don't add logic in this assemblie. It is only to share private methods. Only redirection allowed.
 
-
 /*EXAMPLE:
 //In Unity.RenderPipeline.Core.Editor:
 namespace TestNamespace

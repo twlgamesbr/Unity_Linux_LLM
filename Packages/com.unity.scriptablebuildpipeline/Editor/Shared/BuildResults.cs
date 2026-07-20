@@ -19,6 +19,7 @@ namespace UnityEditor.Build.Pipeline
         /// A hash of all the serialized files
         /// </summary>
         public Hash128 RawFileHash;
+
         /// <summary>
         /// Hash of file contents. Some resource files may choose to exclude sections of their content from this hash. For example,
         /// serialized files exclude the header of their content which allows this hash not to change with new Unity versions.
@@ -35,10 +36,13 @@ namespace UnityEditor.Build.Pipeline
     {
         /// <inheritdoc />
         public ScriptCompilationResult ScriptResults { get; set; }
+
         /// <inheritdoc />
         public Dictionary<string, WriteResult> WriteResults { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, SerializedFileMetaData> WriteResultsMetaData { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<GUID, AssetResultData> AssetResults { get; private set; }
 
@@ -60,12 +64,16 @@ namespace UnityEditor.Build.Pipeline
     {
         /// <inheritdoc />
         public ScriptCompilationResult ScriptResults { get; set; }
+
         /// <inheritdoc />
         public Dictionary<string, BundleDetails> BundleInfos { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, WriteResult> WriteResults { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<string, SerializedFileMetaData> WriteResultsMetaData { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<GUID, AssetResultData> AssetResults { get; private set; }
 

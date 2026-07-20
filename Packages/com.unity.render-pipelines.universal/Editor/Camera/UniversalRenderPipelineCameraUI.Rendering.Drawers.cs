@@ -13,63 +13,89 @@ namespace UnityEditor.Rendering.Universal
             static bool s_PostProcessingWarningShown = false;
 
             private static readonly CED.IDrawer PostProcessingWarningDrawer = CED.Conditional(
-                (serialized, owner) => IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset) && serialized.renderPostProcessing.boolValue,
+                (serialized, owner) =>
+                    IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset)
+                    && serialized.renderPostProcessing.boolValue,
                 (serialized, owner) =>
                 {
                     int selectedRendererOption = serialized.renderer.intValue;
-                    
-                    var rendererData = selectedRendererOption == -1 ? UniversalRenderPipeline.asset.scriptableRendererData : UniversalRenderPipeline.asset.m_RendererDataList[selectedRendererOption];
+
+                    var rendererData =
+                        selectedRendererOption == -1
+                            ? UniversalRenderPipeline.asset.scriptableRendererData
+                            : UniversalRenderPipeline.asset.m_RendererDataList[selectedRendererOption];
 
                     CoreEditorUtils.DrawFixMeBox(
-                       string.Format(Styles.disabledPostprocessing),
-                       MessageType.Warning,
-                       "Open",
-                       () => AssetDatabase.OpenAsset(rendererData));
+                        string.Format(Styles.disabledPostprocessing),
+                        MessageType.Warning,
+                        "Open",
+                        () => AssetDatabase.OpenAsset(rendererData)
+                    );
 
                     s_PostProcessingWarningShown = true;
-                });
+                }
+            );
 
             private static readonly CED.IDrawer PostProcessingAAWarningDrawer = CED.Conditional(
-                (serialized, owner) => !s_PostProcessingWarningShown && IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset) && (AntialiasingMode)serialized.antialiasing.intValue != AntialiasingMode.None,
+                (serialized, owner) =>
+                    !s_PostProcessingWarningShown
+                    && IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset)
+                    && (AntialiasingMode)serialized.antialiasing.intValue != AntialiasingMode.None,
                 (serialized, owner) =>
                 {
                     EditorGUILayout.HelpBox(Styles.disabledPostprocessing, MessageType.Warning);
                     s_PostProcessingWarningShown = true;
-                });
+                }
+            );
 
             private static readonly CED.IDrawer DisabledPostProcessingAAWarningDrawer = CED.Conditional(
-                (serialized, owner) => !serialized.renderPostProcessing.boolValue && (AntialiasingMode)serialized.antialiasing.intValue != AntialiasingMode.None,
-                (serialized, owner) => EditorGUILayout.HelpBox(Styles.disabledPostprocessingAntiAliasWarning, MessageType.Warning));
+                (serialized, owner) =>
+                    !serialized.renderPostProcessing.boolValue
+                    && (AntialiasingMode)serialized.antialiasing.intValue != AntialiasingMode.None,
+                (serialized, owner) =>
+                    EditorGUILayout.HelpBox(Styles.disabledPostprocessingAntiAliasWarning, MessageType.Warning)
+            );
 
             private static readonly CED.IDrawer MSAAWarningDrawer = CED.Conditional(
-                (serialized, owner) => (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset asset && asset.msaaSampleCount > 1) && serialized.baseCameraSettings.allowMSAA.boolValue == true && (AntialiasingMode)serialized.antialiasing.intValue == AntialiasingMode.TemporalAntiAliasing,
-                (serialized, owner) => EditorGUILayout.HelpBox(Styles.MSAAWarning, MessageType.Warning));
+                (serialized, owner) =>
+                    (
+                        GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset asset
+                        && asset.msaaSampleCount > 1
+                    )
+                    && serialized.baseCameraSettings.allowMSAA.boolValue == true
+                    && (AntialiasingMode)serialized.antialiasing.intValue == AntialiasingMode.TemporalAntiAliasing,
+                (serialized, owner) => EditorGUILayout.HelpBox(Styles.MSAAWarning, MessageType.Warning)
+            );
 
             private static readonly CED.IDrawer PostProcessingStopNaNsWarningDrawer = CED.Conditional(
-                (serialized, owner) => !s_PostProcessingWarningShown && IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset) && serialized.stopNaNs.boolValue,
+                (serialized, owner) =>
+                    !s_PostProcessingWarningShown
+                    && IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset)
+                    && serialized.stopNaNs.boolValue,
                 (serialized, owner) =>
                 {
                     EditorGUILayout.HelpBox(Styles.disabledPostprocessing, MessageType.Warning);
                     s_PostProcessingWarningShown = true;
-                });
+                }
+            );
 
             private static readonly CED.IDrawer PostProcessingDitheringWarningDrawer = CED.Conditional(
-                (serialized, owner) => !s_PostProcessingWarningShown && IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset) && serialized.dithering.boolValue,
+                (serialized, owner) =>
+                    !s_PostProcessingWarningShown
+                    && IsAnyRendererHasPostProcessingEnabled(serialized, UniversalRenderPipeline.asset)
+                    && serialized.dithering.boolValue,
                 (serialized, owner) =>
                 {
                     EditorGUILayout.HelpBox(Styles.disabledPostprocessing, MessageType.Warning);
                     s_PostProcessingWarningShown = true;
-                });
+                }
+            );
 
             static readonly CED.IDrawer BaseCameraRenderTypeDrawer = CED.Conditional(
                 (serialized, owner) => (CameraRenderType)serialized.cameraType.intValue == CameraRenderType.Base,
-                CED.Group(
-                    DrawerRenderingRenderPostProcessing
-                    ),
+                CED.Group(DrawerRenderingRenderPostProcessing),
                 PostProcessingWarningDrawer,
-                CED.Group(
-                    DrawerRenderingAntialiasing
-                    ),
+                CED.Group(DrawerRenderingAntialiasing),
                 PostProcessingAAWarningDrawer,
                 DisabledPostProcessingAAWarningDrawer,
                 MSAAWarningDrawer,
@@ -77,29 +103,26 @@ namespace UnityEditor.Rendering.Universal
                     (serialized, owner) => !serialized.antialiasing.hasMultipleDifferentValues,
                     CED.Group(
                         GroupOption.Indent,
-                        new[]{
+                        new[]
+                        {
                             CED.Conditional(
-                                (serialized, owner) => (AntialiasingMode)serialized.antialiasing.intValue ==
-                                AntialiasingMode.SubpixelMorphologicalAntiAliasing,
-                                CED.Group(
-                                    DrawerRenderingSMAAQuality
-                                )),
+                                (serialized, owner) =>
+                                    (AntialiasingMode)serialized.antialiasing.intValue
+                                    == AntialiasingMode.SubpixelMorphologicalAntiAliasing,
+                                CED.Group(DrawerRenderingSMAAQuality)
+                            ),
                             CED.Conditional(
-                                (serialized, owner) => (AntialiasingMode)serialized.antialiasing.intValue ==
-                                AntialiasingMode.TemporalAntiAliasing,
-                                CED.Group(
-                                    DrawerRenderingTAAQuality
-                                ))
+                                (serialized, owner) =>
+                                    (AntialiasingMode)serialized.antialiasing.intValue
+                                    == AntialiasingMode.TemporalAntiAliasing,
+                                CED.Group(DrawerRenderingTAAQuality)
+                            ),
                         }
                     )
-                    ),
-                CED.Group(
-                    CameraUI.Rendering.Drawer_Rendering_StopNaNs
-                    ),
+                ),
+                CED.Group(CameraUI.Rendering.Drawer_Rendering_StopNaNs),
                 PostProcessingStopNaNsWarningDrawer,
-                CED.Group(
-                    CameraUI.Rendering.Drawer_Rendering_Dithering
-                    ),
+                CED.Group(CameraUI.Rendering.Drawer_Rendering_Dithering),
                 PostProcessingDitheringWarningDrawer,
                 CED.Group(
                     DrawerRenderingRenderShadows,
@@ -111,15 +134,9 @@ namespace UnityEditor.Rendering.Universal
 
             static readonly CED.IDrawer OverlayCameraRenderTypeDrawer = CED.Conditional(
                 (serialized, owner) => (CameraRenderType)serialized.cameraType.intValue == CameraRenderType.Overlay,
-                CED.Group(
-                    DrawerRenderingRenderPostProcessing
-                    ),
+                CED.Group(DrawerRenderingRenderPostProcessing),
                 PostProcessingWarningDrawer,
-                CED.Group(
-                    DrawerRenderingClearDepth,
-                    DrawerRenderingRenderShadows,
-                    DrawerRenderingDepthTexture
-                )
+                CED.Group(DrawerRenderingClearDepth, DrawerRenderingRenderShadows, DrawerRenderingDepthTexture)
             );
 
             public static readonly CED.IDrawer Drawer;
@@ -135,9 +152,7 @@ namespace UnityEditor.Rendering.Universal
                     ExpandableAdditional.Rendering,
                     k_ExpandedAdditionalState,
                     CED.Group(
-                        CED.Group(
-                            DrawerRenderingRenderer
-                        ),
+                        CED.Group(DrawerRenderingRenderer),
                         BaseCameraRenderTypeDrawer,
                         OverlayCameraRenderTypeDrawer,
                         CED.Group(
@@ -175,7 +190,13 @@ namespace UnityEditor.Rendering.Universal
                 EditorGUI.BeginProperty(controlRect, Styles.rendererType, p.renderer);
 
                 EditorGUI.showMixedValue = p.renderer.hasMultipleDifferentValues;
-                int selectedRenderer = EditorGUI.IntPopup(controlRect, Styles.rendererType, selectedRendererOption, rpAsset.rendererDisplayList, rpAsset.rendererIndexList);
+                int selectedRenderer = EditorGUI.IntPopup(
+                    controlRect,
+                    Styles.rendererType,
+                    selectedRendererOption,
+                    rpAsset.rendererDisplayList,
+                    rpAsset.rendererIndexList
+                );
                 EditorGUI.EndProperty();
                 if (!rpAsset.ValidateRendererDataList())
                 {
@@ -187,7 +208,9 @@ namespace UnityEditor.Rendering.Universal
                     var rect = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect());
                     if (GUI.Button(rect, Styles.selectRenderPipelineAsset))
                     {
-                        Selection.activeObject = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(AssetDatabase.GetAssetPath(UniversalRenderPipeline.asset));
+                        Selection.activeObject = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(
+                            AssetDatabase.GetAssetPath(UniversalRenderPipeline.asset)
+                        );
                     }
                     GUILayout.Space(5);
                 }
@@ -196,17 +219,30 @@ namespace UnityEditor.Rendering.Universal
                     p.renderer.intValue = selectedRenderer;
             }
 
-            static bool IsAnyRendererHasPostProcessingEnabled(UniversalRenderPipelineSerializedCamera p, UniversalRenderPipelineAsset rpAsset)
+            static bool IsAnyRendererHasPostProcessingEnabled(
+                UniversalRenderPipelineSerializedCamera p,
+                UniversalRenderPipelineAsset rpAsset
+            )
             {
                 int selectedRendererOption = p.renderer.intValue;
 
-                if (selectedRendererOption < -1 || selectedRendererOption >= rpAsset.m_RendererDataList.Length || p.renderer.hasMultipleDifferentValues)
+                if (
+                    selectedRendererOption < -1
+                    || selectedRendererOption >= rpAsset.m_RendererDataList.Length
+                    || p.renderer.hasMultipleDifferentValues
+                )
                     return false;
 
-                var rendererData = selectedRendererOption == -1 ? rpAsset.scriptableRendererData : rpAsset.m_RendererDataList[selectedRendererOption];
+                var rendererData =
+                    selectedRendererOption == -1
+                        ? rpAsset.scriptableRendererData
+                        : rpAsset.m_RendererDataList[selectedRendererOption];
 
                 var forwardRendererData = rendererData as UniversalRendererData;
-                if (forwardRendererData != null && !rpAsset.GetRenderer(selectedRendererOption).supportedRenderingFeatures.postProcessing)
+                if (
+                    forwardRendererData != null
+                    && !rpAsset.GetRenderer(selectedRendererOption).supportedRenderingFeatures.postProcessing
+                )
                     return true;
 
                 var renderer2DData = rendererData as UnityEngine.Rendering.Universal.Renderer2DData;
@@ -219,7 +255,13 @@ namespace UnityEditor.Rendering.Universal
                 EditorGUI.BeginProperty(antiAliasingRect, Styles.antialiasing, p.antialiasing);
                 {
                     EditorGUI.BeginChangeCheck();
-                    int selectedValue = (int)(AntialiasingMode)EditorGUI.EnumPopup(antiAliasingRect, Styles.antialiasing, (AntialiasingMode)p.antialiasing.intValue);
+                    int selectedValue = (int)
+                        (AntialiasingMode)
+                            EditorGUI.EnumPopup(
+                                antiAliasingRect,
+                                Styles.antialiasing,
+                                (AntialiasingMode)p.antialiasing.intValue
+                            );
                     if (EditorGUI.EndChangeCheck())
                         p.antialiasing.intValue = selectedValue;
                 }
@@ -247,34 +289,54 @@ namespace UnityEditor.Rendering.Universal
 
                 {
                     // FSR overrides TAA CAS settings. Disable this setting when FSR is enabled.
-                    bool disableSharpnessControl = UniversalRenderPipeline.asset != null
+                    bool disableSharpnessControl =
+                        UniversalRenderPipeline.asset != null
 #if ENABLE_UPSCALER_FRAMEWORK
-                        ? (UniversalRenderPipeline.asset.upscalerName == UniversalRenderPipeline.k_UpscalerName_FSR1)
+                            ? (
+                                UniversalRenderPipeline.asset.upscalerName
+                                == UniversalRenderPipeline.k_UpscalerName_FSR1
+                            )
 #else
-                        ? (UniversalRenderPipeline.asset.upscalingFilter == UpscalingFilterSelection.FSR)
+                            ? (UniversalRenderPipeline.asset.upscalingFilter == UpscalingFilterSelection.FSR)
 #endif
-                        : false;
+                            : false;
                     using var disable = new EditorGUI.DisabledScope(disableSharpnessControl);
 
-                    EditorGUILayout.Slider(p.taaContrastAdaptiveSharpening, 0.0f, 1.0f, Styles.taaContrastAdaptiveSharpening);
+                    EditorGUILayout.Slider(
+                        p.taaContrastAdaptiveSharpening,
+                        0.0f,
+                        1.0f,
+                        Styles.taaContrastAdaptiveSharpening
+                    );
                 }
 
-                bool additionalPropertiesVisible = k_ExpandedState[Expandable.Rendering] && k_ExpandedAdditionalState[ExpandableAdditional.Rendering];
+                bool additionalPropertiesVisible =
+                    k_ExpandedState[Expandable.Rendering] && k_ExpandedAdditionalState[ExpandableAdditional.Rendering];
                 if (additionalPropertiesVisible)
                 {
-                    p.taaFrameInfluence.floatValue = 1.0f - EditorGUILayout.Slider(Styles.taaBaseBlendFactor, 1.0f - p.taaFrameInfluence.floatValue, 0.6f, 0.98f);
+                    p.taaFrameInfluence.floatValue =
+                        1.0f
+                        - EditorGUILayout.Slider(
+                            Styles.taaBaseBlendFactor,
+                            1.0f - p.taaFrameInfluence.floatValue,
+                            0.6f,
+                            0.98f
+                        );
                     EditorGUILayout.Slider(p.taaJitterScale, 0.0f, 1.0f, Styles.taaJitterScale);
                     EditorGUILayout.Slider(p.taaMipBias, -1.0f, 0.0f, Styles.taaMipBias);
 
-                    if(p.taaQuality.intValue >= (int)TemporalAAQuality.Medium)
+                    if (p.taaQuality.intValue >= (int)TemporalAAQuality.Medium)
                         EditorGUILayout.Slider(p.taaVarianceClampScale, 0.6f, 1.2f, Styles.taaVarianceClampScale);
 
                     bool isEditorInDeveloperMode = EditorPrefs.GetBool("DeveloperMode");
                     if (isEditorInDeveloperMode)
                     {
                         UniversalRenderPipelineCameraEditor urpCamEditor = owner as UniversalRenderPipelineCameraEditor;
-                        if (urpCamEditor != null && urpCamEditor.camera != null &&
-                            urpCamEditor.camera.TryGetComponent<UniversalAdditionalCameraData>(out var urpAddCamData))
+                        if (
+                            urpCamEditor != null
+                            && urpCamEditor.camera != null
+                            && urpCamEditor.camera.TryGetComponent<UniversalAdditionalCameraData>(out var urpAddCamData)
+                        )
                         {
                             ref var taa = ref urpAddCamData.taaSettings;
                             var rect = GUILayoutUtility.GetRect(Styles.taaResetHistory, GUIStyle.none);
@@ -288,7 +350,10 @@ namespace UnityEditor.Rendering.Universal
                 }
             }
 
-            static void DrawerRenderingRenderPostProcessing(UniversalRenderPipelineSerializedCamera serialized, Editor owner)
+            static void DrawerRenderingRenderPostProcessing(
+                UniversalRenderPipelineSerializedCamera serialized,
+                Editor owner
+            )
             {
                 EditorGUILayout.PropertyField(serialized.renderPostProcessing, Styles.renderPostProcessing);
             }
@@ -301,18 +366,36 @@ namespace UnityEditor.Rendering.Universal
             static void DrawerRenderingDepthTexture(UniversalRenderPipelineSerializedCamera serialized, Editor owner)
             {
                 EditorGUILayout.PropertyField(serialized.renderDepth, Styles.requireDepthTexture);
-                DisplayTileOnlyModeWarning(serialized.renderDepth, p => p.intValue == (int)CameraOverrideOption.On, Styles.requireDepthTexture, serialized);
+                DisplayTileOnlyModeWarning(
+                    serialized.renderDepth,
+                    p => p.intValue == (int)CameraOverrideOption.On,
+                    Styles.requireDepthTexture,
+                    serialized
+                );
             }
 
             static void DrawerRenderingOpaqueTexture(UniversalRenderPipelineSerializedCamera serialized, Editor owner)
             {
                 EditorGUILayout.PropertyField(serialized.renderOpaque, Styles.requireOpaqueTexture);
-                DisplayTileOnlyModeWarning(serialized.renderOpaque, p => p.intValue == (int)CameraOverrideOption.On, Styles.requireOpaqueTexture, serialized);
+                DisplayTileOnlyModeWarning(
+                    serialized.renderOpaque,
+                    p => p.intValue == (int)CameraOverrideOption.On,
+                    Styles.requireOpaqueTexture,
+                    serialized
+                );
             }
-            
-            static void OcclusionCullingWithWarningTileOnlyMode(UniversalRenderPipelineSerializedCamera serialized, Editor owner)
+
+            static void OcclusionCullingWithWarningTileOnlyMode(
+                UniversalRenderPipelineSerializedCamera serialized,
+                Editor owner
+            )
             {
-                DisplayTileOnlyModeWarning(serialized.baseCameraSettings.occlusionCulling, p => p.boolValue, CameraUI.Rendering.Styles.occlusionCulling, serialized);
+                DisplayTileOnlyModeWarning(
+                    serialized.baseCameraSettings.occlusionCulling,
+                    p => p.boolValue,
+                    CameraUI.Rendering.Styles.occlusionCulling,
+                    serialized
+                );
             }
         }
     }

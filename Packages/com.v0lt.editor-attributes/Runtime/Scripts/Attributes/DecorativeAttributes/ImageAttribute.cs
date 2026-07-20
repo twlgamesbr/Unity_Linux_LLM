@@ -19,7 +19,13 @@ namespace EditorAttributes
         /// <param name="imageWidth">The width of the image in pixels</param>
         /// <param name="imageHeight">The height of the image in pixels</param>
         /// <param name="stringInputMode">Set if the string input is set trough a constant or dynamically trough another member</param>
-        public ImageAttribute(string imagePath, float imageWidth = 0f, float imageHeight = 0f, StringInputMode stringInputMode = StringInputMode.Constant) : base(true)
+        public ImageAttribute(
+            string imagePath,
+            float imageWidth = 0f,
+            float imageHeight = 0f,
+            StringInputMode stringInputMode = StringInputMode.Constant
+        )
+            : base(true)
         {
             ImagePath = imagePath;
             ImageWidth = imageWidth;

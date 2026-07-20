@@ -8,8 +8,8 @@ namespace UnityEngine.Rendering
     /// <summary>
     /// An Asset which holds a set of settings to use with a <see cref="Volume"/>.
     /// </summary>
-    [PipelineHelpURL("UniversalRenderPipelineAsset","Volume-Profile")]
-    [PipelineHelpURL("HDRenderPipelineAsset","create-a-volume-profile")]
+    [PipelineHelpURL("UniversalRenderPipelineAsset", "Volume-Profile")]
+    [PipelineHelpURL("HDRenderPipelineAsset", "create-a-volume-profile")]
     [Icon("Packages/com.unity.render-pipelines.core/Editor/Icons/Processed/VolumeProfile Icon.asset")]
     public sealed class VolumeProfile : ScriptableObject
     {
@@ -36,12 +36,13 @@ namespace UnityEngine.Rendering
             }
         }
 
-        [Flags] internal enum DirtyState
+        [Flags]
+        internal enum DirtyState
         {
             None = 0,
             DirtyByComponentChange = 1,
             DirtyByProfileReset = 2,
-            Other = 4
+            Other = 4,
         }
 
         internal DirtyState dirtyState;
@@ -62,7 +63,7 @@ namespace UnityEngine.Rendering
         internal void OnDisable()
         {
             if (components == null)
-               return;
+                return;
 
             for (int i = 0; i < components.Count; i++)
             {
@@ -75,8 +76,7 @@ namespace UnityEngine.Rendering
         /// Resets the dirty state of the Volume Profile. Unity uses this to force-refresh and redraw the
         /// Volume Profile editor when you modify the Asset via script instead of the Inspector.
         /// </summary>
-        public void Reset()
-            => dirtyState |= DirtyState.DirtyByProfileReset;
+        public void Reset() => dirtyState |= DirtyState.DirtyByProfileReset;
 
         /// <summary>
         /// Adds a <see cref="VolumeComponent"/> to this Volume Profile.

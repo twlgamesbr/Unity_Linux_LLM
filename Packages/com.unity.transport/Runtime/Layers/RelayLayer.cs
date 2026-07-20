@@ -90,12 +90,27 @@ namespace Unity.Networking.Transport
         public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dependency)
         {
             if (m_UnderlyingConnections.IsCreated)
-                return ScheduleReceive(new ReceiveJob<UnderlyingConnectionList>(), new UnderlyingConnectionList(ref m_UnderlyingConnections), ref arguments, dependency);
+                return ScheduleReceive(
+                    new ReceiveJob<UnderlyingConnectionList>(),
+                    new UnderlyingConnectionList(ref m_UnderlyingConnections),
+                    ref arguments,
+                    dependency
+                );
             else
-                return ScheduleReceive(new ReceiveJob<NullUnderlyingConnectionList>(), default, ref arguments, dependency);
+                return ScheduleReceive(
+                    new ReceiveJob<NullUnderlyingConnectionList>(),
+                    default,
+                    ref arguments,
+                    dependency
+                );
         }
 
-        private JobHandle ScheduleReceive<T>(ReceiveJob<T> job, T underlyingConnectionList, ref ReceiveJobArguments arguments, JobHandle dependency)
+        private JobHandle ScheduleReceive<T>(
+            ReceiveJob<T> job,
+            T underlyingConnectionList,
+            ref ReceiveJobArguments arguments,
+            JobHandle dependency
+        )
             where T : unmanaged, IUnderlyingConnectionList
         {
             job.Connections = m_Connections;
@@ -150,7 +165,12 @@ namespace Unity.Networking.Transport
                     var connection = packetProcessor.ConnectionRef;
                     var endpoint = Connections.GetConnectionEndpoint(connection);
 
-                    RelayMessageRelay.Write(ref packetProcessor, ref fromAllocationId, ref endpoint.AsRelayAllocationId(), (ushort)packetProcessor.Length);
+                    RelayMessageRelay.Write(
+                        ref packetProcessor,
+                        ref fromAllocationId,
+                        ref endpoint.AsRelayAllocationId(),
+                        (ushort)packetProcessor.Length
+                    );
                     packetProcessor.ConnectionRef = underlyingConnectionId;
                     packetProcessor.EndpointRef = underlyingEndpoint;
 
@@ -171,7 +191,8 @@ namespace Unity.Networking.Transport
         }
 
         [BurstCompile]
-        internal struct ReceiveJob<T> : IJob where T : unmanaged, IUnderlyingConnectionList
+        internal struct ReceiveJob<T> : IJob
+            where T : unmanaged, IUnderlyingConnectionList
         {
             public ConnectionList Connections;
             public ConnectionDataMap<ConnectionData> ConnectionsData;
@@ -241,7 +262,9 @@ namespace Unity.Networking.Transport
                             else
                             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                                Debug.LogError("Received a Relay Accepted message but there is not one connection in the list. One and only one connection is expected when initiating a connection using Relay");
+                                Debug.LogError(
+                                    "Received a Relay Accepted message but there is not one connection in the list. One and only one connection is expected when initiating a connection using Relay"
+                                );
 #endif
                             }
 
@@ -251,14 +274,17 @@ namespace Unity.Networking.Transport
                         case RelayMessageType.Rejected:
                         {
                             Debug.LogError("Relay allocation maximum connected players limit reached.");
-                            
+
                             if (Connections.Count == 1)
                             {
                                 var connectionId = Connections.ConnectionAt(0);
-                                
+
                                 if (Connections.GetConnectionState(connectionId) == NetworkConnection.State.Connecting)
                                 {
-                                    Connections.StartDisconnecting(ref connectionId, Error.DisconnectReason.ClosedByRemote);
+                                    Connections.StartDisconnecting(
+                                        ref connectionId,
+                                        Error.DisconnectReason.ClosedByRemote
+                                    );
                                     Connections.FinishDisconnecting(ref connectionId);
                                     protocolData.ConnectionStatus = RelayConnectionStatus.AllocationInvalid;
                                 }
@@ -277,7 +303,10 @@ namespace Unity.Networking.Transport
                                 var endpoint = disconnectMessage.FromAllocationId.ToNetworkEndpoint();
                                 if (EndpointsHashmap.TryGetValue(endpoint, out var connectionId))
                                 {
-                                    Connections.StartDisconnecting(ref connectionId, Error.DisconnectReason.ProtocolError);
+                                    Connections.StartDisconnecting(
+                                        ref connectionId,
+                                        Error.DisconnectReason.ProtocolError
+                                    );
                                     Connections.FinishDisconnecting(ref connectionId);
                                     EndpointsHashmap.Remove(endpoint);
                                 }
@@ -377,12 +406,19 @@ namespace Unity.Networking.Transport
                         protocolData.LastSentTime = Time;
                     }
 
-                    if ((!isNewConnection || isFirstConnectAttempt || isAttemptTimeoutExpired) &&
-                        UnderlyingConnections.TryConnect(ref protocolData.ServerData.Endpoint, ref protocolData.UnderlyingConnection))
+                    if (
+                        (!isNewConnection || isFirstConnectAttempt || isAttemptTimeoutExpired)
+                        && UnderlyingConnections.TryConnect(
+                            ref protocolData.ServerData.Endpoint,
+                            ref protocolData.UnderlyingConnection
+                        )
+                    )
                     {
                         if (Time - protocolData.ConnectStartTime > protocolData.MaxConnectTime)
                         {
-                            Debug.LogError("Failed to establish connection with the Relay server (server didn't answer any BIND message).");
+                            Debug.LogError(
+                                "Failed to establish connection with the Relay server (server didn't answer any BIND message)."
+                            );
                             protocolData.ConnectionStatus = RelayConnectionStatus.AllocationInvalid;
                         }
                         else if (isFirstConnectAttempt || isAttemptTimeoutExpired)
@@ -426,7 +462,11 @@ namespace Unity.Networking.Transport
                     // regular messages with errors if the allocation has timed out. The only way to
                     // know about this condition is to attempt to rebind to the server.
                     var rebindTimeout = heartbeatTimeout * 3;
-                    if (heartbeatTimeout > 0 && protocolData.LastReceiveTime > 0 && Time - protocolData.LastReceiveTime >= rebindTimeout)
+                    if (
+                        heartbeatTimeout > 0
+                        && protocolData.LastReceiveTime > 0
+                        && Time - protocolData.LastReceiveTime >= rebindTimeout
+                    )
                     {
                         if (DeferredSendQueue.EnqueuePacket(out var packetProcessor))
                         {
@@ -490,9 +530,11 @@ namespace Unity.Networking.Transport
                     if (DeferredSendQueue.EnqueuePacket(out var packetProcessor))
                     {
                         var endpoint = Connections.GetConnectionEndpoint(connectionId);
-                        RelayMessageDisconnect.Write(ref packetProcessor,
+                        RelayMessageDisconnect.Write(
+                            ref packetProcessor,
                             ref protocolData.ServerData.AllocationId,
-                            ref endpoint.AsRelayAllocationId());
+                            ref endpoint.AsRelayAllocationId()
+                        );
 
                         packetProcessor.ConnectionRef = protocolData.UnderlyingConnection;
                         packetProcessor.EndpointRef = protocolData.ServerData.Endpoint;
@@ -530,9 +572,11 @@ namespace Unity.Networking.Transport
                         // Send a ConnectRequest message
                         if (DeferredSendQueue.EnqueuePacket(out var packetProcessor))
                         {
-                            RelayMessageConnectRequest.Write(ref packetProcessor,
+                            RelayMessageConnectRequest.Write(
+                                ref packetProcessor,
                                 ref protocolData.ServerData.AllocationId,
-                                ref protocolData.ServerData.HostConnectionData);
+                                ref protocolData.ServerData.HostConnectionData
+                            );
 
                             packetProcessor.ConnectionRef = protocolData.UnderlyingConnection;
                             packetProcessor.EndpointRef = protocolData.ServerData.Endpoint;

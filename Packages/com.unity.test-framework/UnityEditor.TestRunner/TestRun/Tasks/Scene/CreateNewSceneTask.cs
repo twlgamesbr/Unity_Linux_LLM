@@ -9,9 +9,10 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks.Scene
     {
         internal Func<int> GetSceneCount = () => SceneManager.sceneCount;
         internal Func<int, ISceneWrapper> GetSceneAt = i => new SceneWrapper(SceneManager.GetSceneAt(i));
-        internal Func<NewSceneSetup, NewSceneMode, ISceneWrapper> NewScene = (setup, mode) => new SceneWrapper(EditorSceneManager.NewScene(setup, mode));
+        internal Func<NewSceneSetup, NewSceneMode, ISceneWrapper> NewScene = (setup, mode) =>
+            new SceneWrapper(EditorSceneManager.NewScene(setup, mode));
         internal Action<ISceneWrapper> SetActiveScene = scene => SceneManager.SetActiveScene(scene.WrappedScene);
-        
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             if (GetSceneCount() == 1 && string.IsNullOrEmpty(GetSceneAt(0).path))

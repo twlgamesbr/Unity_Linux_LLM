@@ -10,13 +10,15 @@ namespace Unity.Web.Stripping.Editor
         /// <summary>
         /// Constructs a detail label.
         /// </summary>
-        public DetailLabel() : this(string.Empty) {}
+        public DetailLabel()
+            : this(string.Empty) { }
 
         /// <summary>
         /// Constructs a detail label.
         /// <param name="text">The text to be displayed.</param>
         /// </summary>
-        public DetailLabel(string text) : base(text)
+        public DetailLabel(string text)
+            : base(text)
         {
             selection.isSelectable = true;
         }

@@ -18,7 +18,9 @@ namespace Unity.Networking.Transport.Relay
             switch (ErrorCode)
             {
                 case 0:
-                    Debug.LogError("Received error message from Relay: invalid protocol version. Make sure your Unity Transport package is up to date.");
+                    Debug.LogError(
+                        "Received error message from Relay: invalid protocol version. Make sure your Unity Transport package is up to date."
+                    );
                     break;
                 case 1:
                     Debug.LogError("Received error message from Relay: player timed out due to inactivity.");
@@ -45,7 +47,9 @@ namespace Unity.Networking.Transport.Relay
 
             if (ErrorCode == 1 || ErrorCode == 4)
             {
-                Debug.LogError("Relay allocation is invalid. See NetworkDriver.GetRelayConnectionStatus and RelayConnectionStatus.AllocationInvalid for details on how to handle this situation.");
+                Debug.LogError(
+                    "Relay allocation is invalid. See NetworkDriver.GetRelayConnectionStatus and RelayConnectionStatus.AllocationInvalid for details on how to handle this situation."
+                );
             }
         }
     }

@@ -111,7 +111,11 @@ namespace Unity.Entities
         /// <returns>A command buffer that will be executed by this system.</returns>
         public EntityCommandBuffer CreateCommandBuffer()
         {
-            return CreateCommandBuffer(ref PendingBuffers, m_EntityCommandBufferAllocator.Allocator.Handle.ToAllocator, World.Unmanaged);
+            return CreateCommandBuffer(
+                ref PendingBuffers,
+                m_EntityCommandBufferAllocator.Allocator.Handle.ToAllocator,
+                World.Unmanaged
+            );
         }
 
         /// <summary>
@@ -226,7 +230,9 @@ namespace Unity.Entities
                     {
                         var system = World.FindSystemStateForId(buffer.SystemID);
                         var systemType = system != null ? system->DebugName.ToString() : "Unknown";
-                        var error = $"{e.Message}\nEntityCommandBuffer was recorded in {systemType} and played back in {GetType()}.\n" + e.StackTrace;
+                        var error =
+                            $"{e.Message}\nEntityCommandBuffer was recorded in {systemType} and played back in {GetType()}.\n"
+                            + e.StackTrace;
                         if (playbackErrorLog == null)
                         {
                             playbackErrorLog = new List<string>();
@@ -258,7 +264,9 @@ namespace Unity.Entities
                 {
                     var system = World.FindSystemStateForId(buffer.SystemID);
                     var systemType = system != null ? system->DebugName.ToString() : "Unknown";
-                    var error = $"{e.Message}\nEntityCommandBuffer was recorded in {systemType} and disposed in {GetType()}.\n" + e.StackTrace;
+                    var error =
+                        $"{e.Message}\nEntityCommandBuffer was recorded in {systemType} and disposed in {GetType()}.\n"
+                        + e.StackTrace;
                     if (playbackErrorLog == null)
                     {
                         playbackErrorLog = new List<string>();
@@ -296,7 +304,8 @@ namespace Unity.Entities
         public static EntityCommandBuffer CreateCommandBuffer(
             ref UnsafeList<EntityCommandBuffer> pendingBuffers,
             AllocatorManager.AllocatorHandle allocator,
-            WorldUnmanaged world)
+            WorldUnmanaged world
+        )
         {
             var cmds = new EntityCommandBuffer(allocator, PlaybackPolicy.SinglePlayback);
             var state = world.ResolveSystemState(world.ExecutingSystem);
@@ -317,7 +326,8 @@ namespace Unity.Entities
         /// <returns>Returns the command buffer</returns>
         public static EntityCommandBuffer CreateCommandBuffer(
             ref UnsafeList<EntityCommandBuffer> pendingBuffers,
-            WorldUnmanaged world)
+            WorldUnmanaged world
+        )
         {
             return CreateCommandBuffer(ref pendingBuffers, world.UpdateAllocator.Handle.ToAllocator, world);
         }
@@ -344,12 +354,16 @@ namespace Unity.Entities
         public static void RegisterSingleton<T>(
             this EntityCommandBufferSystem system,
             ref UnsafeList<EntityCommandBuffer> pendingBuffers,
-            WorldUnmanaged world)
+            WorldUnmanaged world
+        )
             where T : unmanaged, IECBSingleton, IComponentData
         {
             world.EntityManager.AddComponent(system.SystemHandle, ComponentType.ReadWrite<T>());
 
-            var query = new EntityQueryBuilder(system.WorldUpdateAllocator).WithAllRW<T>().WithOptions(EntityQueryOptions.IncludeSystems).Build(system);
+            var query = new EntityQueryBuilder(system.WorldUpdateAllocator)
+                .WithAllRW<T>()
+                .WithOptions(EntityQueryOptions.IncludeSystems)
+                .Build(system);
             ref var s = ref query.GetSingletonRW<T>().ValueRW;
 
             s.SetPendingBufferList(ref pendingBuffers);
@@ -369,7 +383,8 @@ namespace Unity.Entities
             this EntityCommandBufferSystem system,
             ref UnsafeList<EntityCommandBuffer> pendingBuffers,
             WorldUnmanaged world,
-            string entityName)
+            string entityName
+        )
             where T : unmanaged, IECBSingleton, IComponentData
         {
             RegisterSingleton<T>(system, ref pendingBuffers, world);

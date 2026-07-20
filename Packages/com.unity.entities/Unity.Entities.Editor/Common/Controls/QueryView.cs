@@ -13,14 +13,23 @@ namespace Unity.Entities.Editor
             Resources.Templates.QueryView.AddStyles(this);
             this.Q(className: "unity-foldout__content").AddToClassList(UssClasses.QueryView.ToggleContent);
 
-            ActionButton.RegisterCallback<MouseDownEvent, QueryView>((evt, @this) =>
-            {
-                evt.StopPropagation();
+            ActionButton.RegisterCallback<MouseDownEvent, QueryView>(
+                (evt, @this) =>
+                {
+                    evt.StopPropagation();
 #if !UNITY_2023_2_OR_NEWER
-                evt.PreventDefault();
+                    evt.PreventDefault();
 #endif
-                QueryWindowHelper.OpenNewWindow(@this.m_Data.Context.World, @this.m_Data.Context.Query, @this.m_Data.Context.SystemProxy, @this.m_Data.QueryId, EntityQueryContentTab.Components);
-            }, this);
+                    QueryWindowHelper.OpenNewWindow(
+                        @this.m_Data.Context.World,
+                        @this.m_Data.Context.Query,
+                        @this.m_Data.Context.SystemProxy,
+                        @this.m_Data.QueryId,
+                        EntityQueryContentTab.Components
+                    );
+                },
+                this
+            );
 
             m_EmptyMessage = new Label(L10n.Tr("All entities"));
             m_EmptyMessage.AddToClassList(UssClasses.QueryView.EmptyMessage);

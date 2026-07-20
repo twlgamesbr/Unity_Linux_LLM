@@ -15,9 +15,14 @@ namespace Unity.PlatformToolkit.PlayMode
         // Set by the PlayModeAccountData that owns this object.
         internal ScriptableObjectDataChangePersistor Persistor;
 
-        [SerializeField] private string m_Name;
-        [SerializeField] private bool m_Unlocked;
-        [SerializeField] private int m_Progress;
+        [SerializeField]
+        private string m_Name;
+
+        [SerializeField]
+        private bool m_Unlocked;
+
+        [SerializeField]
+        private int m_Progress;
 
         internal PlayModeAchievementData(StoredAchievement commonAchievement)
         {

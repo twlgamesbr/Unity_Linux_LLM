@@ -23,11 +23,17 @@ namespace Unity.Entities.Content
             for (int i = 0; i < data.Archives.Length; i++)
                 printFunc($"Archives[{i}] = ArchiveId:{data.Archives[i].ArchiveId}");
             for (int i = 0; i < data.Files.Length; i++)
-                printFunc($"Files[{i}] = FileId:{data.Files[i].FileId}, ArchiveIndex:{data.Files[i].ArchiveIndex}, DependencyIndex:{data.Files[i].DependencyIndex}");
+                printFunc(
+                    $"Files[{i}] = FileId:{data.Files[i].FileId}, ArchiveIndex:{data.Files[i].ArchiveIndex}, DependencyIndex:{data.Files[i].DependencyIndex}"
+                );
             for (int i = 0; i < data.Objects.Length; i++)
-                printFunc($"Objects[{i}] = ObjectId:{data.Objects[i].ObjectId}, FileIndex:{data.Objects[i].FileIndex}, LocalIdentifierInFile:{data.Objects[i].LocalIdentifierInFile}");
+                printFunc(
+                    $"Objects[{i}] = ObjectId:{data.Objects[i].ObjectId}, FileIndex:{data.Objects[i].FileIndex}, LocalIdentifierInFile:{data.Objects[i].LocalIdentifierInFile}"
+                );
             for (int i = 0; i < data.Scenes.Length; i++)
-                printFunc($"Scenes[{i}] = SceneId:{data.Scenes[i].SceneId}, FileIndex:{data.Scenes[i].FileIndex}, SceneName:{data.Scenes[i].SceneName}");
+                printFunc(
+                    $"Scenes[{i}] = SceneId:{data.Scenes[i].SceneId}, FileIndex:{data.Scenes[i].FileIndex}, SceneName:{data.Scenes[i].SceneName}"
+                );
             for (int i = 0; i < data.Dependencies.Length; i++)
             {
                 var sb = new StringBuilder();
@@ -38,7 +44,11 @@ namespace Unity.Entities.Content
         }
 
         //Given a set of files, find or create the index of the matching set in the map
-        static int GetDependencyIndex(IEnumerable<ContentFileId> files, ref Dictionary<uint2, int> depMap, ref List<List<ContentFileId>> depList)
+        static int GetDependencyIndex(
+            IEnumerable<ContentFileId> files,
+            ref Dictionary<uint2, int> depMap,
+            ref List<List<ContentFileId>> depList
+        )
         {
             var ss = new xxHash3.StreamingState(true);
             foreach (var d in files)
@@ -59,7 +69,12 @@ namespace Unity.Entities.Content
         /// <param name="blobBuilder">The builder to use when creating the data.</param>
         /// <param name="blobDataRoot">The root object to create data into.</param>
         /// <param name="idRemapFunc">Functor to remap <seealso cref="ContentRuntimeId"/>.</param>
-        public static void Create(IRuntimeCatalogDataSource dataSource, ref BlobBuilder blobBuilder, ref RuntimeContentCatalogData blobDataRoot, Func<UntypedWeakReferenceId, UntypedWeakReferenceId> idRemapFunc)
+        public static void Create(
+            IRuntimeCatalogDataSource dataSource,
+            ref BlobBuilder blobBuilder,
+            ref RuntimeContentCatalogData blobDataRoot,
+            Func<UntypedWeakReferenceId, UntypedWeakReferenceId> idRemapFunc
+        )
         {
             var archiveEnum = dataSource.GetArchiveIds();
             var archiveCount = archiveEnum.Count();
@@ -97,21 +112,35 @@ namespace Unity.Entities.Content
                 {
                     FileId = fi.Item1,
                     ArchiveIndex = fi.Item2,
-                    DependencyIndex = GetDependencyIndex(dataSource.GetDependencies(fi.Item1), ref dependencyMap, ref allDependencies)
+                    DependencyIndex = GetDependencyIndex(
+                        dataSource.GetDependencies(fi.Item1),
+                        ref dependencyMap,
+                        ref allDependencies
+                    ),
                 };
             }
             var objects = blobBuilder.Allocate(ref blobDataRoot.Objects, allObjects.Count);
             for (int i = 0; i < allObjects.Count; i++)
             {
                 var oi = allObjects[i];
-                objects[i] = new ContentObjectLocation() { ObjectId = new UnsafeUntypedWeakReferenceId(idRemapFunc(oi.Item1)), LocalIdentifierInFile = oi.Item2, FileIndex = oi.Item3 };
+                objects[i] = new ContentObjectLocation()
+                {
+                    ObjectId = new UnsafeUntypedWeakReferenceId(idRemapFunc(oi.Item1)),
+                    LocalIdentifierInFile = oi.Item2,
+                    FileIndex = oi.Item3,
+                };
             }
 
             var scenes = blobBuilder.Allocate(ref blobDataRoot.Scenes, allScenes.Count);
             for (int i = 0; i < allScenes.Count; i++)
             {
                 var oi = allScenes[i];
-                scenes[i] = new ContentSceneLocation() { SceneId = new UnsafeUntypedWeakReferenceId(idRemapFunc(oi.Item1)), SceneName = oi.Item2, FileIndex = oi.Item3 };
+                scenes[i] = new ContentSceneLocation()
+                {
+                    SceneId = new UnsafeUntypedWeakReferenceId(idRemapFunc(oi.Item1)),
+                    SceneName = oi.Item2,
+                    FileIndex = oi.Item3,
+                };
             }
 
             var dependencies = blobBuilder.Allocate(ref blobDataRoot.Dependencies, allDependencies.Count);

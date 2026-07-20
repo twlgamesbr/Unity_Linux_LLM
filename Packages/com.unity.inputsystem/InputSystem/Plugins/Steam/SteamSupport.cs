@@ -34,7 +34,9 @@ namespace UnityEngine.InputSystem.Steam
         internal static ISteamControllerAPI GetAPIAndRequireItToBeSet()
         {
             if (s_API == null)
-                throw new InvalidOperationException("ISteamControllerAPI implementation has not been set on SteamSupport");
+                throw new InvalidOperationException(
+                    "ISteamControllerAPI implementation has not been set on SteamSupport"
+                );
             return s_API;
         }
 
@@ -157,19 +159,20 @@ namespace UnityEngine.InputSystem.Steam
                 {
                     // Rather than directly creating a device with the layout, let it go through
                     // the usual matching process.
-                    var device = InputSystem.AddDevice(new InputDeviceDescription
-                    {
-                        interfaceName = SteamController.kSteamInterface,
-                        product = layout
-                    });
+                    var device = InputSystem.AddDevice(
+                        new InputDeviceDescription { interfaceName = SteamController.kSteamInterface, product = layout }
+                    );
 
                     // Make sure it's a SteamController we got.
                     var steamDevice = device as SteamController;
                     if (steamDevice == null)
                     {
-                        Debug.LogError(string.Format(
-                            "InputDevice created from layout '{0}' based on the 'SteamController' layout is not a SteamController",
-                            device.layout));
+                        Debug.LogError(
+                            string.Format(
+                                "InputDevice created from layout '{0}' based on the 'SteamController' layout is not a SteamController",
+                                device.layout
+                            )
+                        );
                         continue;
                     }
 

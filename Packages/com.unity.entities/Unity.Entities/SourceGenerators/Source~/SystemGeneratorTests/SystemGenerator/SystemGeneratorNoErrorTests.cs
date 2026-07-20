@@ -1,8 +1,6 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators
 {
@@ -12,7 +10,8 @@ namespace Unity.Entities.SourceGenerators
         [TestMethod]
         public async Task MultipleUserWrittenSystemPartsWithGeneratedQueriesSystem()
         {
-            const string source = @"
+            const string source =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 using Unity.Mathematics;
@@ -49,7 +48,8 @@ namespace Unity.Entities.SourceGenerators
         [TestMethod]
         public async Task ExpressionBody()
         {
-            const string source = @"
+            const string source =
+                @"
                 using Unity.Entities;
                 using Unity.Mathematics;
                 using Unity.Burst;
@@ -64,7 +64,8 @@ namespace Unity.Entities.SourceGenerators
         [TestMethod]
         public async Task ExpressionBodyWithReturn()
         {
-            const string source = @"
+            const string source =
+                @"
                 using Unity.Entities;
                 using Unity.Mathematics;
                 using Unity.Burst;
@@ -80,7 +81,8 @@ namespace Unity.Entities.SourceGenerators
         [TestMethod]
         public async Task MultiplePartialUnsafe()
         {
-            const string sourceA = @"
+            const string sourceA =
+                @"
                 using Unity.Entities;
 
                 public partial struct TestSystem1 : ISystem
@@ -93,7 +95,8 @@ namespace Unity.Entities.SourceGenerators
                     }
                 }";
 
-            const string sourceB = @"
+            const string sourceB =
+                @"
                 using Unity.Entities;
                 using Unity.Burst.Intrinsics;
 
@@ -112,11 +115,7 @@ namespace Unity.Entities.SourceGenerators
                     }
                 }";
 
-            await VerifyCS.VerifySourceGeneratorAsync(new []
-            {
-                sourceA,
-                sourceB
-            });
+            await VerifyCS.VerifySourceGeneratorAsync(new[] { sourceA, sourceB });
         }
     }
 }

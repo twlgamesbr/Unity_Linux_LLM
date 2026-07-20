@@ -7,15 +7,19 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
     {
         /// The minimum x-axis render bound of the graph in pixels
         float m_BoundsXMin;
+
         /// The maximum x-axis render bound of the graph in pixels
         float m_BoundsXMax;
+
         /// The minimum y-axis render bound of the graph in pixels
         float m_BoundsYMin;
+
         /// The maximum y-axis render bound of the graph in pixels
         float m_BoundsYMax;
 
         /// The minimum y-value of the graph in reported units such as ms or B/s
         float m_YValueMin;
+
         /// The maximum y-value of the graph in reported units such as ms or B/s
         float m_YValueMax;
 
@@ -27,7 +31,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float boundsYMin,
             float boundsYMax,
             float yValueMin,
-            float yValueMax)
+            float yValueMax
+        )
         {
             m_BoundsXMin = boundsXMin;
             m_BoundsXMax = boundsXMax;
@@ -37,10 +42,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             m_YValueMax = yValueMax;
         }
 
-        LinearTransform ComputeXAxisTransform(
-            float newRenderBoundsXMin,
-            float newRenderBoundsXMax,
-            int pointsToAdvance)
+        LinearTransform ComputeXAxisTransform(float newRenderBoundsXMin, float newRenderBoundsXMax, int pointsToAdvance)
         {
             return LinearTransform.Identity;
         }
@@ -49,12 +51,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float newBoundsYMin,
             float newBoundsYMax,
             float newYValueMin,
-            float newYValueMax)
+            float newYValueMax
+        )
         {
-            if (newBoundsYMin == m_BoundsYMin &&
-                newBoundsYMax == m_BoundsYMax &&
-                newYValueMin == m_YValueMin &&
-                newYValueMax == m_YValueMax)
+            if (
+                newBoundsYMin == m_BoundsYMin
+                && newBoundsYMax == m_BoundsYMax
+                && newYValueMin == m_YValueMin
+                && newYValueMax == m_YValueMax
+            )
             {
                 // Return identity exactly in this case, as otherwise the
                 // floating point error from the full computation will produce
@@ -107,15 +112,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         /// Computes the transforms that must be applied to existing graph geometry
         /// in response to changes in graph bounds, scale, and the scrolling movement
         /// of the graph as new points are added
-        public (LinearTransform transformX, LinearTransform transformY)
-            ComputeTransformsForNewBounds(
-                float newBoundsXMin,
-                float newBoundsXMax,
-                float newBoundsYMin,
-                float newBoundsYMax,
-                float newYAxisMin,
-                float newYAxisMax,
-                int pointsToAdvance)
+        public (LinearTransform transformX, LinearTransform transformY) ComputeTransformsForNewBounds(
+            float newBoundsXMin,
+            float newBoundsXMax,
+            float newBoundsYMin,
+            float newBoundsYMax,
+            float newYAxisMin,
+            float newYAxisMax,
+            int pointsToAdvance
+        )
         {
             return (
                 ComputeXAxisTransform(newBoundsXMin, newBoundsXMax, pointsToAdvance),

@@ -18,7 +18,14 @@ namespace UnityEngine.InputSystem.XR.Haptics
         /// <param name="frequencyHz">The buffer frequency the device operates at in Hertz.</param>
         /// <param name="maxBufferSize">The max amount of buffer data that can be stored by the device.</param>
         /// <param name="optimalBufferSize">The optimal size of a device's buffer, taking into account frequency and latency.</param>
-        public HapticCapabilities(uint numChannels, bool supportsImpulse, bool supportsBuffer, uint frequencyHz, uint maxBufferSize, uint optimalBufferSize)
+        public HapticCapabilities(
+            uint numChannels,
+            bool supportsImpulse,
+            bool supportsBuffer,
+            uint frequencyHz,
+            uint maxBufferSize,
+            uint optimalBufferSize
+        )
         {
             this.numChannels = numChannels;
             this.supportsImpulse = supportsImpulse;
@@ -36,9 +43,7 @@ namespace UnityEngine.InputSystem.XR.Haptics
         /// <param name="frequencyHz">The buffer frequency the device operates at in Hertz.</param>
         /// <param name="maxBufferSize">The max amount of buffer data that can be stored by the device.</param>
         public HapticCapabilities(uint numChannels, uint frequencyHz, uint maxBufferSize)
-            : this(numChannels, false, false, frequencyHz, maxBufferSize, 0U)
-        {
-        }
+            : this(numChannels, false, false, frequencyHz, maxBufferSize, 0U) { }
 
         /// <summary>
         /// The number of haptic channels available on this device.
@@ -137,7 +142,15 @@ namespace UnityEngine.InputSystem.XR.Haptics
         /// <summary>
         /// The haptic capabilities of the device, populated after this command is executed.
         /// </summary>
-        public HapticCapabilities capabilities => new HapticCapabilities(numChannels, supportsImpulse, supportsBuffer, frequencyHz, maxBufferSize, optimalBufferSize);
+        public HapticCapabilities capabilities =>
+            new HapticCapabilities(
+                numChannels,
+                supportsImpulse,
+                supportsBuffer,
+                frequencyHz,
+                maxBufferSize,
+                optimalBufferSize
+            );
 
         /// <summary>
         /// Creates and returns a new initialized input device command struct for retrieving
@@ -147,10 +160,7 @@ namespace UnityEngine.InputSystem.XR.Haptics
         /// <seealso cref="InputDevice.ExecuteCommand{TCommand}(ref TCommand)"/>
         public static GetHapticCapabilitiesCommand Create()
         {
-            return new GetHapticCapabilitiesCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize),
-            };
+            return new GetHapticCapabilitiesCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Unity.Serialization.Binary
         /// Continues serialization for the current type without running any more adapters. This will perform the default behaviour.
         /// </summary>
         void ContinueVisitationWithoutAdapters();
-        
+
         /// <summary>
         /// Writes the given <paramref name="value"/> to the stream. This will run all adapters.
         /// </summary>
@@ -31,7 +31,7 @@ namespace Unity.Serialization.Binary
     }
 
     /// <summary>
-    /// The <see cref="BinarySerializationContext{T}"/> is available from adapters. It provides access to the current adapter enumerator and allows for control of serialization for a given type. 
+    /// The <see cref="BinarySerializationContext{T}"/> is available from adapters. It provides access to the current adapter enumerator and allows for control of serialization for a given type.
     /// </summary>
     /// <typeparam name="TValue">The value type being serialized.</typeparam>
     public readonly unsafe struct BinarySerializationContext<TValue> : IBinarySerializationContext
@@ -46,7 +46,12 @@ namespace Unity.Serialization.Binary
         /// </summary>
         public UnsafeAppendBuffer* Writer => m_Visitor.Writer;
 
-        internal BinarySerializationContext(BinaryPropertyWriter visitor, BinaryAdapterCollection.Enumerator adapters, TValue value, bool isRoot)
+        internal BinarySerializationContext(
+            BinaryPropertyWriter visitor,
+            BinaryAdapterCollection.Enumerator adapters,
+            TValue value,
+            bool isRoot
+        )
         {
             m_Visitor = visitor;
             m_Adapters = adapters;
@@ -57,22 +62,19 @@ namespace Unity.Serialization.Binary
         /// <summary>
         /// Continues visitation for the current type. This will run the next adapter in the sequence, or the default behaviour.
         /// </summary>
-        public void ContinueVisitation()
-            => m_Visitor.WriteValueWithAdapters(m_Value, m_Adapters, m_IsRoot);
+        public void ContinueVisitation() => m_Visitor.WriteValueWithAdapters(m_Value, m_Adapters, m_IsRoot);
 
         /// <summary>
         /// Continues visitation for the current type without running any more adapters. This will perform the default behaviour.
         /// </summary>
-        public void ContinueVisitationWithoutAdapters()
-            => m_Visitor.WriteValueWithoutAdapters(m_Value, m_IsRoot);
+        public void ContinueVisitationWithoutAdapters() => m_Visitor.WriteValueWithoutAdapters(m_Value, m_IsRoot);
 
         /// <summary>
         /// Writes the given <paramref name="value"/> to the stream. This will run all adapters.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <typeparam name="T">The value type to write.</typeparam>
-        public void SerializeValue<T>(T value)
-            => m_Visitor.WriteValue(value);
+        public void SerializeValue<T>(T value) => m_Visitor.WriteValue(value);
     }
 
     /// <summary>
@@ -81,7 +83,7 @@ namespace Unity.Serialization.Binary
     public unsafe interface IBinaryDeserializationContext
     {
         /// <summary>
-        /// Gets the serialized view for value being deserialized. 
+        /// Gets the serialized view for value being deserialized.
         /// </summary>
         UnsafeAppendBuffer.Reader* Reader { get; }
 
@@ -90,7 +92,7 @@ namespace Unity.Serialization.Binary
         /// </summary>
         /// <returns>The deserialized value.</returns>
         object ContinueVisitation();
-        
+
         /// <summary>
         /// Continues de-serialization for the current type without running any more adapters. This will perform the default behaviour.
         /// </summary>
@@ -106,7 +108,7 @@ namespace Unity.Serialization.Binary
     }
 
     /// <summary>
-    /// The <see cref="BinaryDeserializationContext{T}"/> is available from adapters. It provides access to the current adapter enumerator and allows for control of deserialization for a given type. 
+    /// The <see cref="BinaryDeserializationContext{T}"/> is available from adapters. It provides access to the current adapter enumerator and allows for control of deserialization for a given type.
     /// </summary>
     /// <typeparam name="TValue">The value type being deserialized.</typeparam>
     public readonly unsafe struct BinaryDeserializationContext<TValue> : IBinaryDeserializationContext
@@ -120,7 +122,11 @@ namespace Unity.Serialization.Binary
         /// </summary>
         public UnsafeAppendBuffer.Reader* Reader => m_Visitor.Reader;
 
-        internal BinaryDeserializationContext(BinaryPropertyReader visitor, BinaryAdapterCollection.Enumerator adapters, bool isRoot)
+        internal BinaryDeserializationContext(
+            BinaryPropertyReader visitor,
+            BinaryAdapterCollection.Enumerator adapters,
+            bool isRoot
+        )
         {
             m_Visitor = visitor;
             m_Adapters = adapters;
@@ -157,7 +163,7 @@ namespace Unity.Serialization.Binary
             m_Visitor.ReadValueWithoutAdapters(ref value, m_IsRoot);
             return value;
         }
-        
+
         /// <summary>
         /// Continues visitation for the current type. This will invoke the default behaviour and return the deserialized value.
         /// </summary>
@@ -169,10 +175,10 @@ namespace Unity.Serialization.Binary
 
         /// <inheritdoc cref="IBinaryDeserializationContext.ContinueVisitation"/>
         object IBinaryDeserializationContext.ContinueVisitation() => ContinueVisitation();
-        
+
         /// <inheritdoc cref="IBinaryDeserializationContext.ContinueVisitationWithoutAdapters"/>
         object IBinaryDeserializationContext.ContinueVisitationWithoutAdapters() => ContinueVisitationWithoutAdapters();
-        
+
         /// <summary>
         /// Reads the next value in the stream as <typeparamref name="T"/> and returns it. This will run all adapters.
         /// </summary>

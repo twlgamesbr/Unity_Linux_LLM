@@ -19,7 +19,7 @@ namespace Unity.Netcode
         /// Applies authoritative updates even if they are older than the current anticipated state.
         /// This triggers reanticipation to calculate a new anticipated value based on the authoritative state.
         /// </summary>
-        Reanticipate
+        Reanticipate,
     }
 
 #pragma warning disable IDE0001
@@ -106,7 +106,11 @@ namespace Unity.Netcode
         /// <param name="variable">The network variable that changed</param>
         /// <param name="previousValue">The previous value before the change</param>
         /// <param name="newValue">The new value after the change</param>
-        public delegate void OnAuthoritativeValueChangedDelegate(AnticipatedNetworkVariable<T> variable, in T previousValue, in T newValue);
+        public delegate void OnAuthoritativeValueChangedDelegate(
+            AnticipatedNetworkVariable<T> variable,
+            in T previousValue,
+            in T newValue
+        );
 
         /// <summary>
         /// Invoked any time the authoritative value changes, even when the data is stale or has been changed locally.
@@ -150,7 +154,11 @@ namespace Unity.Netcode
             m_AuthoritativeValue.Initialize(m_NetworkBehaviour);
             NetworkVariableSerialization<T>.Duplicate(m_AuthoritativeValue.Value, ref m_AnticipatedValue);
             NetworkVariableSerialization<T>.Duplicate(m_AnticipatedValue, ref m_PreviousAnticipatedValue);
-            if (m_NetworkBehaviour != null && m_NetworkBehaviour.NetworkManager != null && m_NetworkBehaviour.NetworkManager.AnticipationSystem != null)
+            if (
+                m_NetworkBehaviour != null
+                && m_NetworkBehaviour.NetworkManager != null
+                && m_NetworkBehaviour.NetworkManager.AnticipationSystem != null
+            )
             {
                 m_AnticipatedObject = new AnticipatedObject { Variable = this };
                 m_NetworkBehaviour.NetworkManager.AnticipationSystem.AllAnticipatedObjects.Add(m_AnticipatedObject);
@@ -187,11 +195,7 @@ namespace Unity.Netcode
         /// has been overwritten by the authoritative value from the
         /// server; the previous anticipated value is stored in <see cref="PreviousAnticipatedState"/>
         /// </summary>
-        public bool ShouldReanticipate
-        {
-            get;
-            private set;
-        }
+        public bool ShouldReanticipate { get; private set; }
 
         /// <summary>
         /// Holds the most recent anticipated value, whatever was
@@ -268,15 +272,14 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="value">The initial value for the network variable. Defaults to the type's default value if not specified.</param>
         /// <param name="staleDataHandling">Determines how the variable handles authoritative updates that are older than the current anticipated state. Defaults to StaleDataHandling.Ignore.</param>
-        public AnticipatedNetworkVariable(T value = default,
-            StaleDataHandling staleDataHandling = StaleDataHandling.Ignore)
+        public AnticipatedNetworkVariable(
+            T value = default,
+            StaleDataHandling staleDataHandling = StaleDataHandling.Ignore
+        )
             : base()
         {
             StaleDataHandling = staleDataHandling;
-            m_AuthoritativeValue = new NetworkVariable<T>(value)
-            {
-                OnValueChanged = OnValueChangedInternal
-            };
+            m_AuthoritativeValue = new NetworkVariable<T>(value) { OnValueChanged = OnValueChangedInternal };
         }
 
         /// <summary>
@@ -301,12 +304,20 @@ namespace Unity.Netcode
                 return;
             }
 
-            if (m_NetworkBehaviour != null && m_NetworkBehaviour.NetworkManager != null && m_NetworkBehaviour.NetworkManager.AnticipationSystem != null)
+            if (
+                m_NetworkBehaviour != null
+                && m_NetworkBehaviour.NetworkManager != null
+                && m_NetworkBehaviour.NetworkManager.AnticipationSystem != null
+            )
             {
                 if (m_AnticipatedObject != null)
                 {
-                    m_NetworkBehaviour.NetworkManager.AnticipationSystem.AllAnticipatedObjects.Remove(m_AnticipatedObject);
-                    m_NetworkBehaviour.NetworkManager.AnticipationSystem.ObjectsToReanticipate.Remove(m_AnticipatedObject);
+                    m_NetworkBehaviour.NetworkManager.AnticipationSystem.AllAnticipatedObjects.Remove(
+                        m_AnticipatedObject
+                    );
+                    m_NetworkBehaviour.NetworkManager.AnticipationSystem.ObjectsToReanticipate.Remove(
+                        m_AnticipatedObject
+                    );
                     m_AnticipatedObject = null;
                 }
             }
@@ -356,12 +367,14 @@ namespace Unity.Netcode
             if (!m_SettingAuthoritativeValue)
             {
                 m_LastAuthorityUpdateCounter = m_NetworkBehaviour.NetworkManager.AnticipationSystem.LastAnticipationAck;
-                if (StaleDataHandling == StaleDataHandling.Ignore && m_LastAnticipationCounter > m_LastAuthorityUpdateCounter)
+                if (
+                    StaleDataHandling == StaleDataHandling.Ignore
+                    && m_LastAnticipationCounter > m_LastAuthorityUpdateCounter
+                )
                 {
                     // Keep the anticipated value unchanged because it is more recent than the authoritative one.
                     return;
                 }
-
 
                 ShouldReanticipate = true;
                 m_NetworkBehaviour.NetworkManager.AnticipationSystem.ObjectsToReanticipate.Add(m_AnticipatedObject);

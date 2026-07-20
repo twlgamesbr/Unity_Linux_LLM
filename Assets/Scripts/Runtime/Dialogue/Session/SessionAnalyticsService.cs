@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+
 namespace NPCSystem.Dialogue.Session
 {
     /// <summary>
@@ -46,11 +45,15 @@ namespace NPCSystem.Dialogue.Session
         [SerializeField]
         EditorAttributes.Void behaviourGroup;
 
-        [SerializeField, HideProperty, Tooltip(
-            "When true (default), turn-count metadata is synced to "
-            + "Supabase after each saved turn. When false, only local "
-            + "state is tracked."
-        )]
+        [
+            SerializeField,
+            HideProperty,
+            Tooltip(
+                "When true (default), turn-count metadata is synced to "
+                    + "Supabase after each saved turn. When false, only local "
+                    + "state is tracked."
+            )
+        ]
         bool _enableServerAnalytics = true;
 
         [FoldoutGroup("Debug", true, nameof(_activeSessionId), nameof(_currentNpcSlug))]
@@ -68,8 +71,9 @@ namespace NPCSystem.Dialogue.Session
 
         // ── State ────────────────────────────────────────────────
 
-        readonly Dictionary<string, int> _localTurnCounts =
-            new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        readonly Dictionary<string, int> _localTurnCounts = new Dictionary<string, int>(
+            StringComparer.OrdinalIgnoreCase
+        );
 
         SessionAnalyticsResult _cachedAnalytics;
         NPCFlowLogger _logger;
@@ -108,9 +112,7 @@ namespace NPCSystem.Dialogue.Session
 
             _dialogueRepository = GetComponent<SupabaseDialogueRepository>();
             if (_dialogueRepository == null)
-                _dialogueRepository = FindAnyObjectByType<SupabaseDialogueRepository>(
-                    FindObjectsInactive.Include
-                );
+                _dialogueRepository = FindAnyObjectByType<SupabaseDialogueRepository>(FindObjectsInactive.Include);
         }
 
         // ── Public API ────────────────────────────────────────────
@@ -137,10 +139,7 @@ namespace NPCSystem.Dialogue.Session
                 {
                     JObject result = await _authService.SupabaseClient.Rpc<JObject>(
                         "update_session_turn_count",
-                        new Dictionary<string, object>
-                        {
-                            ["p_session_id"] = Guid.Parse(sessionId),
-                        }
+                        new Dictionary<string, object> { ["p_session_id"] = Guid.Parse(sessionId) }
                     );
 
                     bool success = result?.Value<bool>("success") ?? false;
@@ -181,10 +180,7 @@ namespace NPCSystem.Dialogue.Session
         /// Fetch session analytics from the server for the current player.
         /// Results are cached and returned.
         /// </summary>
-        public async Task<SessionAnalyticsResult> GetAnalyticsAsync(
-            string npcSlug = null,
-            bool forceRefresh = false
-        )
+        public async Task<SessionAnalyticsResult> GetAnalyticsAsync(string npcSlug = null, bool forceRefresh = false)
         {
             if (!forceRefresh && _cachedAnalytics != null)
                 return _cachedAnalytics;
@@ -262,9 +258,7 @@ namespace NPCSystem.Dialogue.Session
                     NPCFlowStage.HistoryPersist,
                     success ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
                     NPCFlowLogLevel.Info,
-                    success
-                        ? $"Session closed for NPC '{npcSlug}'."
-                        : $"No open session to close for NPC '{npcSlug}'.",
+                    success ? $"Session closed for NPC '{npcSlug}'." : $"No open session to close for NPC '{npcSlug}'.",
                     source: nameof(SessionAnalyticsService)
                 );
 
@@ -297,10 +291,7 @@ namespace NPCSystem.Dialogue.Session
 
         // ── Internal ──────────────────────────────────────────────
 
-        bool IsReady =>
-            _authService != null
-            && _authService.SupabaseClient != null
-            && _authService.IsAuthenticated;
+        bool IsReady => _authService != null && _authService.SupabaseClient != null && _authService.IsAuthenticated;
 
         // ── Editor Validation ─────────────────────────────────────
 

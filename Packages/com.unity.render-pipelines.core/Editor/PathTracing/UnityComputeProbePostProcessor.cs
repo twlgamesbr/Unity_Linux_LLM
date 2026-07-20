@@ -1,6 +1,6 @@
-using UnityEngine.PathTracing.Core;
 using UnityEngine.LightTransport;
 using UnityEngine.LightTransport.PostProcessing;
+using UnityEngine.PathTracing.Core;
 using UnityEngine.Rendering;
 
 namespace UnityEngine.PathTracing.PostProcessing
@@ -28,11 +28,15 @@ namespace UnityEngine.PathTracing.PostProcessing
             return true;
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
-        public bool AddSphericalHarmonicsL2(IDeviceContext context, BufferSlice<SphericalHarmonicsL2> a, BufferSlice<SphericalHarmonicsL2> b, BufferSlice<SphericalHarmonicsL2> sum, int probeCount)
+        public bool AddSphericalHarmonicsL2(
+            IDeviceContext context,
+            BufferSlice<SphericalHarmonicsL2> a,
+            BufferSlice<SphericalHarmonicsL2> b,
+            BufferSlice<SphericalHarmonicsL2> sum,
+            int probeCount
+        )
         {
             var unityCtx = context as UnityComputeDeviceContext;
             Debug.Assert(unityCtx != null);
@@ -45,12 +49,18 @@ namespace UnityEngine.PathTracing.PostProcessing
                 (uint)a.Offset,
                 (uint)b.Offset,
                 (uint)sum.Offset,
-                (uint)probeCount);
+                (uint)probeCount
+            );
 
             return true;
         }
 
-        public bool ConvertToUnityFormat(IDeviceContext context, BufferSlice<SphericalHarmonicsL2> irradianceIn, BufferSlice<SphericalHarmonicsL2> irradianceOut, int probeCount)
+        public bool ConvertToUnityFormat(
+            IDeviceContext context,
+            BufferSlice<SphericalHarmonicsL2> irradianceIn,
+            BufferSlice<SphericalHarmonicsL2> irradianceOut,
+            int probeCount
+        )
         {
             var unityCtx = context as UnityComputeDeviceContext;
             Debug.Assert(unityCtx != null);
@@ -61,12 +71,18 @@ namespace UnityEngine.PathTracing.PostProcessing
                 unityCtx.GetComputeBuffer(irradianceOut.Id),
                 (uint)irradianceIn.Offset,
                 (uint)irradianceOut.Offset,
-                (uint)probeCount);
+                (uint)probeCount
+            );
 
             return true;
         }
 
-        public bool ConvolveRadianceToIrradiance(IDeviceContext context, BufferSlice<SphericalHarmonicsL2> radianceIn, BufferSlice<SphericalHarmonicsL2> irradianceOut, int probeCount)
+        public bool ConvolveRadianceToIrradiance(
+            IDeviceContext context,
+            BufferSlice<SphericalHarmonicsL2> radianceIn,
+            BufferSlice<SphericalHarmonicsL2> irradianceOut,
+            int probeCount
+        )
         {
             var unityCtx = context as UnityComputeDeviceContext;
             Debug.Assert(unityCtx != null);
@@ -77,12 +93,19 @@ namespace UnityEngine.PathTracing.PostProcessing
                 unityCtx.GetComputeBuffer(irradianceOut.Id),
                 (uint)radianceIn.Offset,
                 (uint)irradianceOut.Offset,
-                (uint)probeCount);
+                (uint)probeCount
+            );
 
             return true;
         }
 
-        public bool ScaleSphericalHarmonicsL2(IDeviceContext context, BufferSlice<SphericalHarmonicsL2> shIn, BufferSlice<SphericalHarmonicsL2> shOut, int probeCount, float scale)
+        public bool ScaleSphericalHarmonicsL2(
+            IDeviceContext context,
+            BufferSlice<SphericalHarmonicsL2> shIn,
+            BufferSlice<SphericalHarmonicsL2> shOut,
+            int probeCount,
+            float scale
+        )
         {
             var unityCtx = context as UnityComputeDeviceContext;
             Debug.Assert(unityCtx != null);
@@ -94,12 +117,18 @@ namespace UnityEngine.PathTracing.PostProcessing
                 (uint)shIn.Offset,
                 (uint)shOut.Offset,
                 (uint)probeCount,
-                scale);
+                scale
+            );
 
             return true;
         }
 
-        public bool WindowSphericalHarmonicsL2(IDeviceContext context, BufferSlice<SphericalHarmonicsL2> shIn, BufferSlice<SphericalHarmonicsL2> shOut, int probeCount)
+        public bool WindowSphericalHarmonicsL2(
+            IDeviceContext context,
+            BufferSlice<SphericalHarmonicsL2> shIn,
+            BufferSlice<SphericalHarmonicsL2> shOut,
+            int probeCount
+        )
         {
             var unityCtx = context as UnityComputeDeviceContext;
             Debug.Assert(unityCtx != null);
@@ -110,12 +139,18 @@ namespace UnityEngine.PathTracing.PostProcessing
                 unityCtx.GetComputeBuffer(shOut.Id),
                 (uint)shIn.Offset,
                 (uint)shOut.Offset,
-                (uint)probeCount);
+                (uint)probeCount
+            );
 
             return true;
         }
 
-        public bool DeringSphericalHarmonicsL2(IDeviceContext context, BufferSlice<SphericalHarmonicsL2> shIn, BufferSlice<SphericalHarmonicsL2> shOut, int probeCount)
+        public bool DeringSphericalHarmonicsL2(
+            IDeviceContext context,
+            BufferSlice<SphericalHarmonicsL2> shIn,
+            BufferSlice<SphericalHarmonicsL2> shOut,
+            int probeCount
+        )
         {
             using var radeonRaysProbePostProcessor = new RadeonRaysProbePostProcessor();
             return radeonRaysProbePostProcessor.DeringSphericalHarmonicsL2(context, shIn, shOut, probeCount);

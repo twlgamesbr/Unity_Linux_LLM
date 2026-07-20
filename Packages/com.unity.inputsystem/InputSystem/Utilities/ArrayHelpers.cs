@@ -46,7 +46,12 @@ namespace UnityEngine.InputSystem.Utilities
             count = 0;
         }
 
-        public static void EnsureCapacity<TValue>(ref TValue[] array, int count, int capacity, int capacityIncrement = 10)
+        public static void EnsureCapacity<TValue>(
+            ref TValue[] array,
+            int count,
+            int capacity,
+            int capacityIncrement = 10
+        )
         {
             if (capacity == 0)
                 return;
@@ -64,7 +69,12 @@ namespace UnityEngine.InputSystem.Utilities
             DuplicateWithCapacity(ref array, count, capacity, capacityIncrement);
         }
 
-        public static void DuplicateWithCapacity<TValue>(ref TValue[] array, int count, int capacity, int capacityIncrement = 10)
+        public static void DuplicateWithCapacity<TValue>(
+            ref TValue[] array,
+            int count,
+            int capacity,
+            int capacityIncrement = 10
+        )
         {
             if (array == null)
             {
@@ -107,14 +117,24 @@ namespace UnityEngine.InputSystem.Utilities
             return IndexOfReference(array, value, count) != -1;
         }
 
-        public static bool ContainsReference<TFirst, TSecond>(this TFirst[] array, int startIndex, int count, TSecond value)
+        public static bool ContainsReference<TFirst, TSecond>(
+            this TFirst[] array,
+            int startIndex,
+            int count,
+            TSecond value
+        )
             where TSecond : class
             where TFirst : TSecond
         {
             return IndexOfReference(array, value, startIndex, count) != -1;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "index", Justification = "Keep this for future implementation")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Usage",
+            "CA1801:ReviewUnusedParameters",
+            MessageId = "index",
+            Justification = "Keep this for future implementation"
+        )]
         public static bool HaveDuplicateReferences<TFirst>(this TFirst[] first, int index, int count)
         {
             for (var i = 0; i < count; ++i)
@@ -177,7 +197,12 @@ namespace UnityEngine.InputSystem.Utilities
             return -1;
         }
 
-        public static int IndexOf<TValue>(this TValue[] array, Predicate<TValue> predicate, int startIndex = 0, int count = -1)
+        public static int IndexOf<TValue>(
+            this TValue[] array,
+            Predicate<TValue> predicate,
+            int startIndex = 0,
+            int count = -1
+        )
         {
             if (array == null)
                 return -1;
@@ -199,7 +224,12 @@ namespace UnityEngine.InputSystem.Utilities
             return IndexOfReference(array, value, 0, count);
         }
 
-        public static int IndexOfReference<TFirst, TSecond>(this TFirst[] array, TSecond value, int startIndex, int count)
+        public static int IndexOfReference<TFirst, TSecond>(
+            this TFirst[] array,
+            TSecond value,
+            int startIndex,
+            int count
+        )
             where TSecond : class
             where TFirst : TSecond
         {
@@ -249,8 +279,11 @@ namespace UnityEngine.InputSystem.Utilities
             if (oldSize != 0)
             {
                 // Copy contents from old array.
-                UnsafeUtility.MemCpy(newArray.GetUnsafePtr(), array.GetUnsafeReadOnlyPtr(),
-                    UnsafeUtility.SizeOf<TValue>() * (newSize < oldSize ? newSize : oldSize));
+                UnsafeUtility.MemCpy(
+                    newArray.GetUnsafePtr(),
+                    array.GetUnsafeReadOnlyPtr(),
+                    UnsafeUtility.SizeOf<TValue>() * (newSize < oldSize ? newSize : oldSize)
+                );
                 array.Dispose();
             }
             array = newArray;
@@ -314,7 +347,12 @@ namespace UnityEngine.InputSystem.Utilities
             return array.Length;
         }
 
-        public static int AppendWithCapacity<TValue>(ref TValue[] array, ref int count, TValue value, int capacityIncrement = 10)
+        public static int AppendWithCapacity<TValue>(
+            ref TValue[] array,
+            ref int count,
+            TValue value,
+            int capacityIncrement = 10
+        )
         {
             if (array == null)
             {
@@ -338,7 +376,12 @@ namespace UnityEngine.InputSystem.Utilities
             return index;
         }
 
-        public static int AppendListWithCapacity<TValue, TValues>(ref TValue[] array, ref int length, TValues values, int capacityIncrement = 10)
+        public static int AppendListWithCapacity<TValue, TValues>(
+            ref TValue[] array,
+            ref int length,
+            TValues values,
+            int capacityIncrement = 10
+        )
             where TValues : IReadOnlyList<TValue>
         {
             var numToAdd = values.Count;
@@ -367,8 +410,13 @@ namespace UnityEngine.InputSystem.Utilities
             return index;
         }
 
-        public static int AppendWithCapacity<TValue>(ref NativeArray<TValue> array, ref int count, TValue value,
-            int capacityIncrement = 10, Allocator allocator = Allocator.Persistent)
+        public static int AppendWithCapacity<TValue>(
+            ref NativeArray<TValue> array,
+            ref int count,
+            TValue value,
+            int capacityIncrement = 10,
+            Allocator allocator = Allocator.Persistent
+        )
             where TValue : struct
         {
             var capacity = array.Length;
@@ -406,7 +454,13 @@ namespace UnityEngine.InputSystem.Utilities
             array[index] = value;
         }
 
-        public static void InsertAtWithCapacity<TValue>(ref TValue[] array, ref int count, int index, TValue value, int capacityIncrement = 10)
+        public static void InsertAtWithCapacity<TValue>(
+            ref TValue[] array,
+            ref int count,
+            int index,
+            TValue value,
+            int capacityIncrement = 10
+        )
         {
             EnsureCapacity(ref array, count, count + 1, capacityIncrement);
 
@@ -440,7 +494,11 @@ namespace UnityEngine.InputSystem.Utilities
             return oldLength;
         }
 
-        public static unsafe int GrowBy<TValue>(ref NativeArray<TValue> array, int count, Allocator allocator = Allocator.Persistent)
+        public static unsafe int GrowBy<TValue>(
+            ref NativeArray<TValue> array,
+            int count,
+            Allocator allocator = Allocator.Persistent
+        )
             where TValue : struct
         {
             var length = array.Length;
@@ -452,14 +510,23 @@ namespace UnityEngine.InputSystem.Utilities
 
             var newArray = new NativeArray<TValue>(length + count, allocator);
             // CopyFrom() expects length to match. Copy manually.
-            UnsafeUtility.MemCpy(newArray.GetUnsafePtr(), array.GetUnsafeReadOnlyPtr(), (long)length * UnsafeUtility.SizeOf<TValue>());
+            UnsafeUtility.MemCpy(
+                newArray.GetUnsafePtr(),
+                array.GetUnsafeReadOnlyPtr(),
+                (long)length * UnsafeUtility.SizeOf<TValue>()
+            );
             array.Dispose();
             array = newArray;
 
             return length;
         }
 
-        public static int GrowWithCapacity<TValue>(ref TValue[] array, ref int count, int growBy, int capacityIncrement = 10)
+        public static int GrowWithCapacity<TValue>(
+            ref TValue[] array,
+            ref int count,
+            int growBy,
+            int capacityIncrement = 10
+        )
         {
             var length = array != null ? array.Length : 0;
             if (length < count + growBy)
@@ -474,8 +541,13 @@ namespace UnityEngine.InputSystem.Utilities
             return offset;
         }
 
-        public static int GrowWithCapacity<TValue>(ref NativeArray<TValue> array, ref int count, int growBy,
-            int capacityIncrement = 10, Allocator allocator = Allocator.Persistent)
+        public static int GrowWithCapacity<TValue>(
+            ref NativeArray<TValue> array,
+            ref int count,
+            int growBy,
+            int capacityIncrement = 10,
+            Allocator allocator = Allocator.Persistent
+        )
             where TValue : struct
         {
             var length = array.Length;
@@ -610,8 +682,11 @@ namespace UnityEngine.InputSystem.Utilities
                 var elementSize = UnsafeUtility.SizeOf<TValue>();
                 var arrayPtr = (byte*)array.GetUnsafePtr();
 
-                UnsafeUtility.MemCpy(arrayPtr + elementSize * index, arrayPtr + elementSize * (index + 1),
-                    (count - index - 1) * elementSize);
+                UnsafeUtility.MemCpy(
+                    arrayPtr + elementSize * index,
+                    arrayPtr + elementSize * (index + 1),
+                    (count - index - 1) * elementSize
+                );
             }
 
             --count;

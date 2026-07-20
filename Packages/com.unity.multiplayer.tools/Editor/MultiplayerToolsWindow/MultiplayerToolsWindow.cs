@@ -31,7 +31,9 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
         {
             rootVisualElement.Clear();
             var theme = EditorGUIUtility.isProSkin ? "dark" : "light";
-            rootVisualElement.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>($"{k_PathInPackage}/UI/{theme}.uss"));
+            rootVisualElement.styleSheets.Add(
+                AssetDatabase.LoadAssetAtPath<StyleSheet>($"{k_PathInPackage}/UI/{theme}.uss")
+            );
             var windowTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_MainUxmlPath);
             var sectionTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_SectionUxmlPath);
             var root = windowTree.CloneTree();
@@ -57,7 +59,9 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
             var statusIcon = root.Q("StatusIcon");
             statusIcon.AddToClassList(feature.IsAvailable ? "okIcon" : "logIcon");
 #if UNITY_2022_1_OR_NEWER
-            statusIcon.style.backgroundPositionY = new StyleBackgroundPosition(new BackgroundPosition(BackgroundPositionKeyword.Top));
+            statusIcon.style.backgroundPositionY = new StyleBackgroundPosition(
+                new BackgroundPosition(BackgroundPositionKeyword.Top)
+            );
 #endif
             var docIcon = root.Q("DocButton");
             docIcon.tooltip = $"Open documentation for {feature.Name}";
@@ -93,9 +97,24 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 
         void AddPackageVersions(VisualElement parent)
         {
-            AddOnePackageVersion(parent, "com.unity.netcode.gameobjects", "Netcode for GameObjects", "https://docs-multiplayer.unity3d.com/netcode/current/installation/");
-            AddOnePackageVersion(parent, "com.unity.transport", "Unity Transport", "https://docs-multiplayer.unity3d.com/transport/current/install/");
-            AddOnePackageVersion(parent, "com.unity.multiplayer.tools", "Multiplayer Tools", "https://docs-multiplayer.unity3d.com/tools/current/install-tools/");
+            AddOnePackageVersion(
+                parent,
+                "com.unity.netcode.gameobjects",
+                "Netcode for GameObjects",
+                "https://docs-multiplayer.unity3d.com/netcode/current/installation/"
+            );
+            AddOnePackageVersion(
+                parent,
+                "com.unity.transport",
+                "Unity Transport",
+                "https://docs-multiplayer.unity3d.com/transport/current/install/"
+            );
+            AddOnePackageVersion(
+                parent,
+                "com.unity.multiplayer.tools",
+                "Multiplayer Tools",
+                "https://docs-multiplayer.unity3d.com/tools/current/install-tools/"
+            );
             OpenedAnalyticHelper.Send(m_InstalledDependencies.ToArray());
             m_InstalledDependencies.Clear();
         }

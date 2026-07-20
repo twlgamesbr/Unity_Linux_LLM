@@ -15,11 +15,8 @@ namespace Unity.Entities
     ///     - Attribute transfers with aggragations: struct A has this attribute, struct B has a field of type A; both A and B
     ///     are concidered to have the attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct
-        | AttributeTargets.Method
-        | AttributeTargets.Property
-        | AttributeTargets.Interface)]
-    public class DisallowRefReturnCrossingThisAttribute : Attribute
-    {
-    }
+    [AttributeUsage(
+        AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Interface
+    )]
+    public class DisallowRefReturnCrossingThisAttribute : Attribute { }
 }

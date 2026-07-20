@@ -10,10 +10,13 @@ namespace UnityEngine.Rendering.Universal
     {
         /// <summary>No wireframe.</summary>
         None,
+
         /// <summary>Unfilled wireframe.</summary>
         Wireframe,
+
         /// <summary>Solid, filled wireframe.</summary>
         SolidWireframe,
+
         /// <summary>Solid, shaded wireframe.</summary>
         ShadedWireframe,
     }
@@ -48,7 +51,6 @@ namespace UnityEngine.Rendering.Universal
         /// Whether debug overdraw mode is active.
         /// </summary>
         [Obsolete("overdraw has been deprecated. Use overdrawMode instead. #from(2022.2) #breakingFrom(2023.1)", true)]
-
         public bool overdraw
         {
             get => m_Overdraw;
@@ -95,7 +97,10 @@ namespace UnityEngine.Rendering.Universal
                     sceneOverrideMode = DebugSceneOverrideMode.ShadedWireframe;
                     break;
                 default:
-                    sceneOverrideMode = overdrawMode != DebugOverdrawMode.None ? DebugSceneOverrideMode.Overdraw : DebugSceneOverrideMode.None;
+                    sceneOverrideMode =
+                        overdrawMode != DebugOverdrawMode.None
+                            ? DebugSceneOverrideMode.Overdraw
+                            : DebugSceneOverrideMode.None;
                     break;
             }
         }
@@ -150,14 +155,20 @@ namespace UnityEngine.Rendering.Universal
         /// By default we will show information for the entire material (and not a specific texture slot) where it makes sense.
         /// </summary>
         public bool showInfoForAllSlots { get; set; } = true;
-        internal bool canAggregateData {
-            get { return mipInfoMode == DebugMipInfoMode.MipStreamingStatus || mipInfoMode == DebugMipInfoMode.MipStreamingActivity; }
+        internal bool canAggregateData
+        {
+            get
+            {
+                return mipInfoMode == DebugMipInfoMode.MipStreamingStatus
+                    || mipInfoMode == DebugMipInfoMode.MipStreamingActivity;
+            }
         }
 
         /// <summary>
         /// The terrain layer for which texture mipmap streaming debug information is shown.
         /// </summary>
-        public DebugMipMapModeTerrainTexture mipDebugTerrainTexture { get; set; } = DebugMipMapModeTerrainTexture.Control;
+        public DebugMipMapModeTerrainTexture mipDebugTerrainTexture { get; set; } =
+            DebugMipMapModeTerrainTexture.Control;
 
         /// <summary>
         /// Current debug post processing mode.
@@ -181,13 +192,17 @@ namespace UnityEngine.Rendering.Universal
         {
             /// <summary>The default non-debug TAA rendering.</summary>
             None = 0,
+
             /// <summary>Output the jittered raw frame render. TAA current frame influence 100%.</summary>
             ShowRawFrame,
+
             /// <summary>Output the raw frame render, but with jitter disabled. TAA current frame influence 100%.</summary>
             ShowRawFrameNoJitter,
+
             /// <summary>Output the clamped (rectified), reprojected TAA history. Current frame influence 0%.</summary>
             ShowClampedHistory,
         }
+
         /// <summary>
         /// Current TAA debug mode.
         /// </summary>
@@ -202,8 +217,14 @@ namespace UnityEngine.Rendering.Universal
             get
             {
                 var camera = Camera.main;
-                return camera == null ? false :
-                    (fullScreenDebugMode == DebugFullScreenMode.ReflectionProbeAtlas && !(camera.GetUniversalAdditionalCameraData().scriptableRenderer as UniversalRenderer).usesClusterLightLoop);
+                return camera == null
+                    ? false
+                    : (
+                        fullScreenDebugMode == DebugFullScreenMode.ReflectionProbeAtlas
+                        && !(
+                            camera.GetUniversalAdditionalCameraData().scriptableRenderer as UniversalRenderer
+                        ).usesClusterLightLoop
+                    );
             }
         }
 
@@ -211,10 +232,14 @@ namespace UnityEngine.Rendering.Universal
         /// Whether to block the STP overlay display. Returns true when STP debug mode is selected
         /// but the Universal Render Pipeline's upscaling filter is not set to STP.
         /// </summary>
-        internal bool blockSTPOverlay {
-            get {
-                var asset = UniversalRenderPipeline.asset; 
-                return asset != null && fullScreenDebugMode == DebugFullScreenMode.STP &&
+        internal bool blockSTPOverlay
+        {
+            get
+            {
+                var asset = UniversalRenderPipeline.asset;
+                return asset != null
+                    && fullScreenDebugMode == DebugFullScreenMode.STP
+                    &&
 #if ENABLE_UPSCALER_FRAMEWORK
                     asset.upscalerName != STPIUpscaler.upscalerName;
 #else
@@ -251,179 +276,296 @@ namespace UnityEngine.Rendering.Universal
         {
             public const string RangeValidationSettingsContainerName = "Pixel Range Settings";
 
-            public static readonly NameAndTooltip MapOverlays = new() { name = "Map Overlays", tooltip = "Overlays render pipeline textures to validate the scene." };
-            public static readonly NameAndTooltip ReflectionProbeAtlasDebugWarning = new() { name = "Warning: Reflection Probe Atlas visualization not supported for the current rendering path. Switch to Forward+ or Deferred+ to use this debug view.", tooltip = "Switch to Forward+ or Deferred+ in the main camera's Universal Renderer Data asset to use this debug overlay." };
-            public static readonly NameAndTooltip StpDebugWarning = new() { name = "Warning: STP Overlay Not Active. Enable STP upscaling filter in the render pipeline asset to use these debug view.", tooltip = "Enable STP upscaling filter in the render pipeline asset to use these debug views." };
-            public static readonly NameAndTooltip StpDebugViews = new() { name = "STP Debug Views", tooltip = "Debug visualizations provided by STP." };
-            public static readonly NameAndTooltip MapSize = new() { name = "Map Size", tooltip = "Set the size of the render pipeline texture in the scene." };
-            public static readonly NameAndTooltip AdditionalWireframeModes = new() { name = "Additional Wireframe Modes", tooltip = "Debug the scene with additional wireframe shader views that are different from those in the scene view." };
-            public static readonly NameAndTooltip WireframeNotSupportedWarning = new() { name = "Warning: This platform might not support wireframe rendering.", tooltip = "Some platforms, for example, mobile platforms using OpenGL ES and Vulkan, might not support wireframe rendering." };
-            public static readonly NameAndTooltip OverdrawMode = new() { name = "Overdraw Mode", tooltip = "Debug anywhere materials that overdrawn pixels top of each other." };
-            public static readonly NameAndTooltip MaxOverdrawCount = new() { name = "Max Overdraw Count", tooltip = "Maximum overdraw count allowed for a single pixel." };
-            public static readonly NameAndTooltip MipMapDisableMipCaching = new() {name = "Disable Mip Caching", tooltip = "By disabling mip caching, the data on GPU accurately reflects what the TextureStreamer calculates. While this can significantly increase CPU-to-GPU traffic, it can be an invaluable tool to validate that the Streamer behaves as expected."};
-            public static readonly NameAndTooltip MipMapDebugView = new() { name = "Debug View", tooltip = "Use the drop-down to select a mipmap property to debug." };
-            public static readonly NameAndTooltip MipMapDebugOpacity = new() { name = "Debug Opacity", tooltip = "Opacity of texture mipmap streaming debug colors." };
-            public static readonly NameAndTooltip MipMapMaterialTextureSlot = new() { name = "Material Texture Slot", tooltip = "Use the drop-down to select the material texture slot to debug (does not affect terrain).\n\nThe slot indices follow the default order by which texture properties appear in the Material Inspector.\nThe default order is itself defined by the order in which (non-hidden) texture properties appear in the shader's \"Properties\" block." };
-            public static readonly NameAndTooltip MipMapTerrainTexture = new() { name = "Terrain Texture", tooltip = "Use the drop-down to select the terrain Texture to debug the mipmap for." };
-            public static readonly NameAndTooltip MipMapDisplayStatusCodes = new() { name = "Display Status Codes", tooltip = "Show detailed status codes indicating why textures are not streaming or highlighting points of attention." };
-            public static readonly NameAndTooltip MipMapActivityTimespan = new() { name = "Activity Timespan", tooltip = "How long a texture should be shown as \"recently updated\"." };
-            public static readonly NameAndTooltip MipMapCombinePerMaterial = new() { name = "Combined per Material", tooltip = "Combine the information over all slots per material." };
-            public static readonly NameAndTooltip PostProcessing = new() { name = "Post-processing", tooltip = "Override the controls for Post Processing in the scene." };
-            public static readonly NameAndTooltip MSAA = new() { name = "MSAA", tooltip = "Use the checkbox to disable MSAA in the scene." };
-            public static readonly NameAndTooltip HDR = new() { name = "HDR", tooltip = "Use the checkbox to disable High Dynamic Range in the scene." };
-            public static readonly NameAndTooltip TaaDebugMode = new() { name = "TAA Debug Mode", tooltip = "Choose whether to force TAA to output the raw jittered frame or clamped reprojected history." };
-            public static readonly NameAndTooltip PixelValidationMode = new() { name = "Pixel Validation Mode", tooltip = "Choose between modes that validate pixel on screen." };
-            public static readonly NameAndTooltip Channels = new() { name = "Channels", tooltip = "Choose the texture channel used to validate the scene." };
-            public static readonly NameAndTooltip ValueRangeMin = new() { name = "Value Range Min", tooltip = "Any values set below this field will be considered invalid and will appear red on screen." };
-            public static readonly NameAndTooltip ValueRangeMax = new() { name = "Value Range Max", tooltip = "Any values set above this field will be considered invalid and will appear blue on screen." };
+            public static readonly NameAndTooltip MapOverlays = new()
+            {
+                name = "Map Overlays",
+                tooltip = "Overlays render pipeline textures to validate the scene.",
+            };
+            public static readonly NameAndTooltip ReflectionProbeAtlasDebugWarning = new()
+            {
+                name =
+                    "Warning: Reflection Probe Atlas visualization not supported for the current rendering path. Switch to Forward+ or Deferred+ to use this debug view.",
+                tooltip =
+                    "Switch to Forward+ or Deferred+ in the main camera's Universal Renderer Data asset to use this debug overlay.",
+            };
+            public static readonly NameAndTooltip StpDebugWarning = new()
+            {
+                name =
+                    "Warning: STP Overlay Not Active. Enable STP upscaling filter in the render pipeline asset to use these debug view.",
+                tooltip = "Enable STP upscaling filter in the render pipeline asset to use these debug views.",
+            };
+            public static readonly NameAndTooltip StpDebugViews = new()
+            {
+                name = "STP Debug Views",
+                tooltip = "Debug visualizations provided by STP.",
+            };
+            public static readonly NameAndTooltip MapSize = new()
+            {
+                name = "Map Size",
+                tooltip = "Set the size of the render pipeline texture in the scene.",
+            };
+            public static readonly NameAndTooltip AdditionalWireframeModes = new()
+            {
+                name = "Additional Wireframe Modes",
+                tooltip =
+                    "Debug the scene with additional wireframe shader views that are different from those in the scene view.",
+            };
+            public static readonly NameAndTooltip WireframeNotSupportedWarning = new()
+            {
+                name = "Warning: This platform might not support wireframe rendering.",
+                tooltip =
+                    "Some platforms, for example, mobile platforms using OpenGL ES and Vulkan, might not support wireframe rendering.",
+            };
+            public static readonly NameAndTooltip OverdrawMode = new()
+            {
+                name = "Overdraw Mode",
+                tooltip = "Debug anywhere materials that overdrawn pixels top of each other.",
+            };
+            public static readonly NameAndTooltip MaxOverdrawCount = new()
+            {
+                name = "Max Overdraw Count",
+                tooltip = "Maximum overdraw count allowed for a single pixel.",
+            };
+            public static readonly NameAndTooltip MipMapDisableMipCaching = new()
+            {
+                name = "Disable Mip Caching",
+                tooltip =
+                    "By disabling mip caching, the data on GPU accurately reflects what the TextureStreamer calculates. While this can significantly increase CPU-to-GPU traffic, it can be an invaluable tool to validate that the Streamer behaves as expected.",
+            };
+            public static readonly NameAndTooltip MipMapDebugView = new()
+            {
+                name = "Debug View",
+                tooltip = "Use the drop-down to select a mipmap property to debug.",
+            };
+            public static readonly NameAndTooltip MipMapDebugOpacity = new()
+            {
+                name = "Debug Opacity",
+                tooltip = "Opacity of texture mipmap streaming debug colors.",
+            };
+            public static readonly NameAndTooltip MipMapMaterialTextureSlot = new()
+            {
+                name = "Material Texture Slot",
+                tooltip =
+                    "Use the drop-down to select the material texture slot to debug (does not affect terrain).\n\nThe slot indices follow the default order by which texture properties appear in the Material Inspector.\nThe default order is itself defined by the order in which (non-hidden) texture properties appear in the shader's \"Properties\" block.",
+            };
+            public static readonly NameAndTooltip MipMapTerrainTexture = new()
+            {
+                name = "Terrain Texture",
+                tooltip = "Use the drop-down to select the terrain Texture to debug the mipmap for.",
+            };
+            public static readonly NameAndTooltip MipMapDisplayStatusCodes = new()
+            {
+                name = "Display Status Codes",
+                tooltip =
+                    "Show detailed status codes indicating why textures are not streaming or highlighting points of attention.",
+            };
+            public static readonly NameAndTooltip MipMapActivityTimespan = new()
+            {
+                name = "Activity Timespan",
+                tooltip = "How long a texture should be shown as \"recently updated\".",
+            };
+            public static readonly NameAndTooltip MipMapCombinePerMaterial = new()
+            {
+                name = "Combined per Material",
+                tooltip = "Combine the information over all slots per material.",
+            };
+            public static readonly NameAndTooltip PostProcessing = new()
+            {
+                name = "Post-processing",
+                tooltip = "Override the controls for Post Processing in the scene.",
+            };
+            public static readonly NameAndTooltip MSAA = new()
+            {
+                name = "MSAA",
+                tooltip = "Use the checkbox to disable MSAA in the scene.",
+            };
+            public static readonly NameAndTooltip HDR = new()
+            {
+                name = "HDR",
+                tooltip = "Use the checkbox to disable High Dynamic Range in the scene.",
+            };
+            public static readonly NameAndTooltip TaaDebugMode = new()
+            {
+                name = "TAA Debug Mode",
+                tooltip =
+                    "Choose whether to force TAA to output the raw jittered frame or clamped reprojected history.",
+            };
+            public static readonly NameAndTooltip PixelValidationMode = new()
+            {
+                name = "Pixel Validation Mode",
+                tooltip = "Choose between modes that validate pixel on screen.",
+            };
+            public static readonly NameAndTooltip Channels = new()
+            {
+                name = "Channels",
+                tooltip = "Choose the texture channel used to validate the scene.",
+            };
+            public static readonly NameAndTooltip ValueRangeMin = new()
+            {
+                name = "Value Range Min",
+                tooltip = "Any values set below this field will be considered invalid and will appear red on screen.",
+            };
+            public static readonly NameAndTooltip ValueRangeMax = new()
+            {
+                name = "Value Range Max",
+                tooltip = "Any values set above this field will be considered invalid and will appear blue on screen.",
+            };
         }
 
         #endregion
 
         internal static class WidgetFactory
         {
-            internal static DebugUI.Widget CreateMapOverlays(DebugDisplaySettingsRendering data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.MapOverlays,
-                autoEnum = typeof(DebugFullScreenMode),
-                getter = () => (int)data.fullScreenDebugMode,
-                setter = (value) => data.fullScreenDebugMode = (DebugFullScreenMode)value,
-                getIndex = () => (int)data.fullScreenDebugMode,
-                setIndex = (value) => data.fullScreenDebugMode = (DebugFullScreenMode)value
-            };
-
-            internal static DebugUI.Widget CreateStpDebugViews(DebugDisplaySettingsRendering data) => new DebugUI.Container()
-            {
-                children =
+            internal static DebugUI.Widget CreateMapOverlays(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField
                 {
-                    new DebugUI.MessageBox
+                    nameAndTooltip = Strings.MapOverlays,
+                    autoEnum = typeof(DebugFullScreenMode),
+                    getter = () => (int)data.fullScreenDebugMode,
+                    setter = (value) => data.fullScreenDebugMode = (DebugFullScreenMode)value,
+                    getIndex = () => (int)data.fullScreenDebugMode,
+                    setIndex = (value) => data.fullScreenDebugMode = (DebugFullScreenMode)value,
+                };
+
+            internal static DebugUI.Widget CreateStpDebugViews(DebugDisplaySettingsRendering data) =>
+                new DebugUI.Container()
+                {
+                    children =
                     {
-                        nameAndTooltip = Strings.StpDebugWarning,
-                        style = DebugUI.MessageBox.Style.Warning,
-                        isHiddenCallback = () => !data.blockSTPOverlay,
+                        new DebugUI.MessageBox
+                        {
+                            nameAndTooltip = Strings.StpDebugWarning,
+                            style = DebugUI.MessageBox.Style.Warning,
+                            isHiddenCallback = () => !data.blockSTPOverlay,
+                        },
+                        new DebugUI.EnumField
+                        {
+                            nameAndTooltip = Strings.StpDebugViews,
+                            isHiddenCallback = () => data.fullScreenDebugMode != DebugFullScreenMode.STP,
+                            enumNames = STP.debugViewDescriptions,
+                            enumValues = STP.debugViewIndices,
+                            getter = () => (int)data.stpDebugViewIndex,
+                            setter = (value) => data.stpDebugViewIndex = value,
+                            getIndex = () => (int)data.stpDebugViewIndex,
+                            setIndex = (value) => data.stpDebugViewIndex = value,
+                        },
                     },
-                    new DebugUI.EnumField
-                    {
-                        nameAndTooltip = Strings.StpDebugViews,
-                        isHiddenCallback = () => data.fullScreenDebugMode != DebugFullScreenMode.STP,
-                        enumNames = STP.debugViewDescriptions,
-                        enumValues = STP.debugViewIndices,
-                        getter = () => (int)data.stpDebugViewIndex,
-                        setter = (value) => data.stpDebugViewIndex = value,
-                        getIndex = () => (int)data.stpDebugViewIndex,
-                        setIndex = (value) => data.stpDebugViewIndex = value
-                    }
-                }
-            };
+                };
 
-
-            internal static DebugUI.Widget CreateMapOverlaySize(DebugDisplaySettingsRendering data) => new DebugUI.Container()
-            {
-                children =
+            internal static DebugUI.Widget CreateMapOverlaySize(DebugDisplaySettingsRendering data) =>
+                new DebugUI.Container()
                 {
-                    new DebugUI.MessageBox
+                    children =
                     {
-                        nameAndTooltip = Strings.ReflectionProbeAtlasDebugWarning,
-                        style = DebugUI.MessageBox.Style.Warning,
-                        isHiddenCallback = () => !data.blockReflectionProbeAtlasOverlay,
+                        new DebugUI.MessageBox
+                        {
+                            nameAndTooltip = Strings.ReflectionProbeAtlasDebugWarning,
+                            style = DebugUI.MessageBox.Style.Warning,
+                            isHiddenCallback = () => !data.blockReflectionProbeAtlasOverlay,
+                        },
+                        new DebugUI.IntField
+                        {
+                            nameAndTooltip = Strings.MapSize,
+                            isHiddenCallback = () => data.blockReflectionProbeAtlasOverlay,
+                            getter = () => data.fullScreenDebugModeOutputSizeScreenPercent,
+                            setter = value => data.fullScreenDebugModeOutputSizeScreenPercent = value,
+                            incStep = 10,
+                            incStepMult = 50,
+                            min = () => 0,
+                            max = () => 100,
+                        },
                     },
-                    new DebugUI.IntField
-                    {
-                        nameAndTooltip = Strings.MapSize,
-                        isHiddenCallback = () => data.blockReflectionProbeAtlasOverlay,
-                        getter = () => data.fullScreenDebugModeOutputSizeScreenPercent,
-                        setter = value => data.fullScreenDebugModeOutputSizeScreenPercent = value,
-                        incStep = 10,
-                        incStepMult = 50,
-                        min = () => 0,
-                        max = () => 100
-                    }
-                }
-            };
+                };
 
-            internal static DebugUI.Widget CreateAdditionalWireframeShaderViews(DebugDisplaySettingsRendering data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.AdditionalWireframeModes,
-                autoEnum = typeof(DebugWireframeMode),
-                getter = () => (int)data.wireframeMode,
-                setter = (value) => data.wireframeMode = (DebugWireframeMode)value,
-                getIndex = () => (int)data.wireframeMode,
-                setIndex = (value) => data.wireframeMode = (DebugWireframeMode)value
-            };
-
-            internal static DebugUI.Widget CreateWireframeNotSupportedWarning(DebugDisplaySettingsRendering data) => new DebugUI.MessageBox
-            {
-                nameAndTooltip = Strings.WireframeNotSupportedWarning,
-                style = DebugUI.MessageBox.Style.Warning,
-                isHiddenCallback = () =>
+            internal static DebugUI.Widget CreateAdditionalWireframeShaderViews(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField
                 {
+                    nameAndTooltip = Strings.AdditionalWireframeModes,
+                    autoEnum = typeof(DebugWireframeMode),
+                    getter = () => (int)data.wireframeMode,
+                    setter = (value) => data.wireframeMode = (DebugWireframeMode)value,
+                    getIndex = () => (int)data.wireframeMode,
+                    setIndex = (value) => data.wireframeMode = (DebugWireframeMode)value,
+                };
+
+            internal static DebugUI.Widget CreateWireframeNotSupportedWarning(DebugDisplaySettingsRendering data) =>
+                new DebugUI.MessageBox
+                {
+                    nameAndTooltip = Strings.WireframeNotSupportedWarning,
+                    style = DebugUI.MessageBox.Style.Warning,
+                    isHiddenCallback = () =>
+                    {
 #if UNITY_EDITOR
-                    return true;
+                        return true;
 #else
-                    switch (SystemInfo.graphicsDeviceType)
-                    {
-                        case GraphicsDeviceType.OpenGLES3:
-                        case GraphicsDeviceType.Vulkan:
-                            return data.wireframeMode == DebugWireframeMode.None;
-                        default:
-                            return true;
-                    }
+                        switch (SystemInfo.graphicsDeviceType)
+                        {
+                            case GraphicsDeviceType.OpenGLES3:
+                            case GraphicsDeviceType.Vulkan:
+                                return data.wireframeMode == DebugWireframeMode.None;
+                            default:
+                                return true;
+                        }
 #endif
-                }
-            };
-
-            internal static DebugUI.Widget CreateOverdrawMode(DebugDisplaySettingsRendering data) => new DebugUI.EnumField()
-            {
-                nameAndTooltip = Strings.OverdrawMode,
-                autoEnum = typeof(DebugOverdrawMode),
-                getter = () => (int)data.overdrawMode,
-                setter = (value) => data.overdrawMode = (DebugOverdrawMode)value,
-                getIndex = () => (int)data.overdrawMode,
-                setIndex = (value) => data.overdrawMode = (DebugOverdrawMode)value
-            };
-
-            internal static DebugUI.Widget CreateMaxOverdrawCount(DebugDisplaySettingsRendering data) => new DebugUI.Container()
-            {
-                isHiddenCallback = () => data.overdrawMode == DebugOverdrawMode.None,
-                children =
-                {
-                    new DebugUI.IntField
-                    {
-                        nameAndTooltip = Strings.MaxOverdrawCount,
-                        getter = () => data.maxOverdrawCount,
-                        setter = value => data.maxOverdrawCount = value,
-                        incStep = 10,
-                        min = () => 1,
-                        max = () => 500
-                    }
-                }
-            };
-
-            internal static DebugUI.Widget CreateMipMapDebugWidget(DebugDisplaySettingsRendering data) => new DebugUI.Container()
-            {
-                displayName = "Mipmap Streaming",
-                children =
-                {
-                    new DebugUI.BoolField()
-                    {
-                        nameAndTooltip = Strings.MipMapDisableMipCaching,
-                        getter = () => Texture.streamingTextureDiscardUnusedMips,
-                        setter = (value) => Texture.streamingTextureDiscardUnusedMips = value,
                     },
-                    CreateMipMapMode(data),
-                    CreateMipMapDebugSettings(data)
-                }
-            };
+                };
 
-            internal static DebugUI.Widget CreateMipMapMode(DebugDisplaySettingsRendering data) => new DebugUI.EnumField()
-            {
-                nameAndTooltip = Strings.MipMapDebugView,
-                autoEnum = typeof(DebugMipInfoMode),
-                getter = () => (int)data.mipInfoMode,
-                setter = (value) => data.mipInfoMode = (DebugMipInfoMode)value,
-                getIndex = () => (int)data.mipInfoMode,
-                setIndex = (value) => data.mipInfoMode = (DebugMipInfoMode)value
-            };
+            internal static DebugUI.Widget CreateOverdrawMode(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField()
+                {
+                    nameAndTooltip = Strings.OverdrawMode,
+                    autoEnum = typeof(DebugOverdrawMode),
+                    getter = () => (int)data.overdrawMode,
+                    setter = (value) => data.overdrawMode = (DebugOverdrawMode)value,
+                    getIndex = () => (int)data.overdrawMode,
+                    setIndex = (value) => data.overdrawMode = (DebugOverdrawMode)value,
+                };
+
+            internal static DebugUI.Widget CreateMaxOverdrawCount(DebugDisplaySettingsRendering data) =>
+                new DebugUI.Container()
+                {
+                    isHiddenCallback = () => data.overdrawMode == DebugOverdrawMode.None,
+                    children =
+                    {
+                        new DebugUI.IntField
+                        {
+                            nameAndTooltip = Strings.MaxOverdrawCount,
+                            getter = () => data.maxOverdrawCount,
+                            setter = value => data.maxOverdrawCount = value,
+                            incStep = 10,
+                            min = () => 1,
+                            max = () => 500,
+                        },
+                    },
+                };
+
+            internal static DebugUI.Widget CreateMipMapDebugWidget(DebugDisplaySettingsRendering data) =>
+                new DebugUI.Container()
+                {
+                    displayName = "Mipmap Streaming",
+                    children =
+                    {
+                        new DebugUI.BoolField()
+                        {
+                            nameAndTooltip = Strings.MipMapDisableMipCaching,
+                            getter = () => Texture.streamingTextureDiscardUnusedMips,
+                            setter = (value) => Texture.streamingTextureDiscardUnusedMips = value,
+                        },
+                        CreateMipMapMode(data),
+                        CreateMipMapDebugSettings(data),
+                    },
+                };
+
+            internal static DebugUI.Widget CreateMipMapMode(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField()
+                {
+                    nameAndTooltip = Strings.MipMapDebugView,
+                    autoEnum = typeof(DebugMipInfoMode),
+                    getter = () => (int)data.mipInfoMode,
+                    setter = (value) => data.mipInfoMode = (DebugMipInfoMode)value,
+                    getIndex = () => (int)data.mipInfoMode,
+                    setIndex = (value) => data.mipInfoMode = (DebugMipInfoMode)value,
+                };
 
             internal static DebugUI.Widget CreateMipMapDebugSettings(DebugDisplaySettingsRendering data)
             {
@@ -445,13 +587,14 @@ namespace UnityEngine.Rendering.Universal
                         {
                             nameAndTooltip = Strings.MipMapDebugOpacity,
                             getter = () => data.mipDebugOpacity,
-                            setter = value => { data.mipDebugOpacity = value; },
+                            setter = value =>
+                            {
+                                data.mipDebugOpacity = value;
+                            },
                             min = () => 0.0f,
-                            max = () => 1.0f
+                            max = () => 1.0f,
                         },
-
                         CreateMipMapDebugSlotSelector(data, () => data.canAggregateData, texSlotStrings, texSlotValues), // if we can aggregate, we want to show this under a checkbox instead (see next)
-
                         new DebugUI.BoolField()
                         {
                             isHiddenCallback = () => !data.canAggregateData,
@@ -460,7 +603,9 @@ namespace UnityEngine.Rendering.Universal
                             setter = value =>
                             {
                                 data.showInfoForAllSlots = value;
-                                data.mipDebugStatusMode = value ? DebugMipMapStatusMode.Material : DebugMipMapStatusMode.Texture;
+                                data.mipDebugStatusMode = value
+                                    ? DebugMipMapStatusMode.Material
+                                    : DebugMipMapStatusMode.Texture;
                             },
                         },
                         new DebugUI.Container()
@@ -469,10 +614,9 @@ namespace UnityEngine.Rendering.Universal
                             children =
                             {
                                 CreateMipMapDebugSlotSelector(data, () => false, texSlotStrings, texSlotValues),
-                                CreateMipMapShowStatusCodeToggle(data)
-                            }
+                                CreateMipMapShowStatusCodeToggle(data),
+                            },
                         },
-
                         new DebugUI.EnumField
                         {
                             nameAndTooltip = Strings.MipMapTerrainTexture,
@@ -480,113 +624,128 @@ namespace UnityEngine.Rendering.Universal
                             setter = value => data.mipDebugTerrainTexture = (DebugMipMapModeTerrainTexture)value,
                             autoEnum = typeof(DebugMipMapModeTerrainTexture),
                             getIndex = () => (int)data.mipDebugTerrainTexture,
-                            setIndex = value => data.mipDebugTerrainTexture = (DebugMipMapModeTerrainTexture)value
+                            setIndex = value => data.mipDebugTerrainTexture = (DebugMipMapModeTerrainTexture)value,
                         },
-
-                        CreateMipMapDebugCooldownSlider(data)
-                    }
+                        CreateMipMapDebugCooldownSlider(data),
+                    },
                 };
             }
 
-            internal static DebugUI.Widget CreateMipMapDebugSlotSelector(DebugDisplaySettingsRendering data, Func<bool> hiddenCB, GUIContent[] texSlotStrings, int[] texSlotValues) => new DebugUI.EnumField()
-            {
-                isHiddenCallback = hiddenCB,
-                nameAndTooltip = Strings.MipMapMaterialTextureSlot,
-                getter = () => data.mipDebugMaterialTextureSlot,
-                setter = value => data.mipDebugMaterialTextureSlot = value,
-                getIndex = () => data.mipDebugMaterialTextureSlot,
-                setIndex = value => data.mipDebugMaterialTextureSlot = value,
-                enumNames = texSlotStrings,
-                enumValues = texSlotValues,
-            };
+            internal static DebugUI.Widget CreateMipMapDebugSlotSelector(
+                DebugDisplaySettingsRendering data,
+                Func<bool> hiddenCB,
+                GUIContent[] texSlotStrings,
+                int[] texSlotValues
+            ) =>
+                new DebugUI.EnumField()
+                {
+                    isHiddenCallback = hiddenCB,
+                    nameAndTooltip = Strings.MipMapMaterialTextureSlot,
+                    getter = () => data.mipDebugMaterialTextureSlot,
+                    setter = value => data.mipDebugMaterialTextureSlot = value,
+                    getIndex = () => data.mipDebugMaterialTextureSlot,
+                    setIndex = value => data.mipDebugMaterialTextureSlot = value,
+                    enumNames = texSlotStrings,
+                    enumValues = texSlotValues,
+                };
 
-            internal static DebugUI.Widget CreateMipMapDebugCooldownSlider(DebugDisplaySettingsRendering data) => new DebugUI.FloatField()
-            {
-                isHiddenCallback = () => data.mipInfoMode != DebugMipInfoMode.MipStreamingActivity,
-                nameAndTooltip = Strings.MipMapActivityTimespan,
-                getter = () => data.mipDebugRecentUpdateCooldown,
-                setter = value => data.mipDebugRecentUpdateCooldown = value,
-                min = () => 0.0f,
-                max = () => 60.0f
-            };
+            internal static DebugUI.Widget CreateMipMapDebugCooldownSlider(DebugDisplaySettingsRendering data) =>
+                new DebugUI.FloatField()
+                {
+                    isHiddenCallback = () => data.mipInfoMode != DebugMipInfoMode.MipStreamingActivity,
+                    nameAndTooltip = Strings.MipMapActivityTimespan,
+                    getter = () => data.mipDebugRecentUpdateCooldown,
+                    setter = value => data.mipDebugRecentUpdateCooldown = value,
+                    min = () => 0.0f,
+                    max = () => 60.0f,
+                };
 
-            internal static DebugUI.Widget CreateMipMapShowStatusCodeToggle(DebugDisplaySettingsRendering data) => new DebugUI.BoolField()
-            {
-                isHiddenCallback = () => data.mipInfoMode != DebugMipInfoMode.MipStreamingStatus,
-                nameAndTooltip = Strings.MipMapDisplayStatusCodes,
-                getter = () => data.mipDebugStatusShowCode,
-                setter = (value) => data.mipDebugStatusShowCode = value,
-            };
+            internal static DebugUI.Widget CreateMipMapShowStatusCodeToggle(DebugDisplaySettingsRendering data) =>
+                new DebugUI.BoolField()
+                {
+                    isHiddenCallback = () => data.mipInfoMode != DebugMipInfoMode.MipStreamingStatus,
+                    nameAndTooltip = Strings.MipMapDisplayStatusCodes,
+                    getter = () => data.mipDebugStatusShowCode,
+                    setter = (value) => data.mipDebugStatusShowCode = value,
+                };
 
-            internal static DebugUI.Widget CreatePostProcessing(DebugDisplaySettingsRendering data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.PostProcessing,
-                autoEnum = typeof(DebugPostProcessingMode),
-                getter = () => (int)data.postProcessingDebugMode,
-                setter = (value) => data.postProcessingDebugMode = (DebugPostProcessingMode)value,
-                getIndex = () => (int)data.postProcessingDebugMode,
-                setIndex = (value) => data.postProcessingDebugMode = (DebugPostProcessingMode)value
-            };
+            internal static DebugUI.Widget CreatePostProcessing(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.PostProcessing,
+                    autoEnum = typeof(DebugPostProcessingMode),
+                    getter = () => (int)data.postProcessingDebugMode,
+                    setter = (value) => data.postProcessingDebugMode = (DebugPostProcessingMode)value,
+                    getIndex = () => (int)data.postProcessingDebugMode,
+                    setIndex = (value) => data.postProcessingDebugMode = (DebugPostProcessingMode)value,
+                };
 
-            internal static DebugUI.Widget CreateMSAA(DebugDisplaySettingsRendering data) => new DebugUI.BoolField
-            {
-                nameAndTooltip = Strings.MSAA,
-                getter = () => data.enableMsaa,
-                setter = (value) => data.enableMsaa = value
-            };
+            internal static DebugUI.Widget CreateMSAA(DebugDisplaySettingsRendering data) =>
+                new DebugUI.BoolField
+                {
+                    nameAndTooltip = Strings.MSAA,
+                    getter = () => data.enableMsaa,
+                    setter = (value) => data.enableMsaa = value,
+                };
 
-            internal static DebugUI.Widget CreateHDR(DebugDisplaySettingsRendering data) => new DebugUI.BoolField
-            {
-                nameAndTooltip = Strings.HDR,
-                getter = () => data.enableHDR,
-                setter = (value) => data.enableHDR = value
-            };
+            internal static DebugUI.Widget CreateHDR(DebugDisplaySettingsRendering data) =>
+                new DebugUI.BoolField
+                {
+                    nameAndTooltip = Strings.HDR,
+                    getter = () => data.enableHDR,
+                    setter = (value) => data.enableHDR = value,
+                };
 
-            internal static DebugUI.Widget CreateTaaDebugMode(DebugDisplaySettingsRendering data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.TaaDebugMode,
-                autoEnum = typeof(TaaDebugMode),
-                getter = () => (int)data.taaDebugMode,
-                setter = (value) => data.taaDebugMode = (TaaDebugMode)value,
-                getIndex = () => (int)data.taaDebugMode,
-                setIndex = (value) => data.taaDebugMode = (TaaDebugMode)value
-            };
+            internal static DebugUI.Widget CreateTaaDebugMode(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.TaaDebugMode,
+                    autoEnum = typeof(TaaDebugMode),
+                    getter = () => (int)data.taaDebugMode,
+                    setter = (value) => data.taaDebugMode = (TaaDebugMode)value,
+                    getIndex = () => (int)data.taaDebugMode,
+                    setIndex = (value) => data.taaDebugMode = (TaaDebugMode)value,
+                };
 
-            internal static DebugUI.Widget CreatePixelValidationMode(DebugDisplaySettingsRendering data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.PixelValidationMode,
-                autoEnum = typeof(DebugValidationMode),
-                getter = () => (int)data.validationMode,
-                setter = (value) => data.validationMode = (DebugValidationMode)value,
-                getIndex = () => (int)data.validationMode,
-                setIndex = (value) => data.validationMode = (DebugValidationMode)value
-            };
+            internal static DebugUI.Widget CreatePixelValidationMode(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.PixelValidationMode,
+                    autoEnum = typeof(DebugValidationMode),
+                    getter = () => (int)data.validationMode,
+                    setter = (value) => data.validationMode = (DebugValidationMode)value,
+                    getIndex = () => (int)data.validationMode,
+                    setIndex = (value) => data.validationMode = (DebugValidationMode)value,
+                };
 
-            internal static DebugUI.Widget CreatePixelValidationChannels(DebugDisplaySettingsRendering data) => new DebugUI.EnumField
-            {
-                nameAndTooltip = Strings.Channels,
-                autoEnum = typeof(PixelValidationChannels),
-                getter = () => (int)data.validationChannels,
-                setter = (value) => data.validationChannels = (PixelValidationChannels)value,
-                getIndex = () => (int)data.validationChannels,
-                setIndex = (value) => data.validationChannels = (PixelValidationChannels)value
-            };
+            internal static DebugUI.Widget CreatePixelValidationChannels(DebugDisplaySettingsRendering data) =>
+                new DebugUI.EnumField
+                {
+                    nameAndTooltip = Strings.Channels,
+                    autoEnum = typeof(PixelValidationChannels),
+                    getter = () => (int)data.validationChannels,
+                    setter = (value) => data.validationChannels = (PixelValidationChannels)value,
+                    getIndex = () => (int)data.validationChannels,
+                    setIndex = (value) => data.validationChannels = (PixelValidationChannels)value,
+                };
 
-            internal static DebugUI.Widget CreatePixelValueRangeMin(DebugDisplaySettingsRendering data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.ValueRangeMin,
-                getter = () => data.validationRangeMin,
-                setter = (value) => data.validationRangeMin = value,
-                incStep = 0.01f
-            };
+            internal static DebugUI.Widget CreatePixelValueRangeMin(DebugDisplaySettingsRendering data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.ValueRangeMin,
+                    getter = () => data.validationRangeMin,
+                    setter = (value) => data.validationRangeMin = value,
+                    incStep = 0.01f,
+                };
 
-            internal static DebugUI.Widget CreatePixelValueRangeMax(DebugDisplaySettingsRendering data) => new DebugUI.FloatField
-            {
-                nameAndTooltip = Strings.ValueRangeMax,
-                getter = () => data.validationRangeMax,
-                setter = (value) => data.validationRangeMax = value,
-                incStep = 0.01f
-            };
+            internal static DebugUI.Widget CreatePixelValueRangeMax(DebugDisplaySettingsRendering data) =>
+                new DebugUI.FloatField
+                {
+                    nameAndTooltip = Strings.ValueRangeMax,
+                    getter = () => data.validationRangeMax,
+                    setter = (value) => data.validationRangeMax = value,
+                    incStep = 0.01f,
+                };
         }
 
         [DisplayInfo(name = "Rendering", order = 1)]
@@ -598,86 +757,96 @@ namespace UnityEngine.Rendering.Universal
             {
                 AddWidget(new DebugUI.RuntimeDebugShadersMessageBox());
 
-                AddWidget(new DebugUI.Foldout
-                {
-                    displayName = "Rendering Debug",
-                    opened = true,
-                    children =
+                AddWidget(
+                    new DebugUI.Foldout
                     {
-                        WidgetFactory.CreateMapOverlays(data),
-                        WidgetFactory.CreateStpDebugViews(data),
-                        WidgetFactory.CreateMapOverlaySize(data),
-                        WidgetFactory.CreateHDR(data),
-                        WidgetFactory.CreateMSAA(data),
-                        WidgetFactory.CreateTaaDebugMode(data),
-                        WidgetFactory.CreatePostProcessing(data),
-                        WidgetFactory.CreateAdditionalWireframeShaderViews(data),
-                        WidgetFactory.CreateWireframeNotSupportedWarning(data),
-                        WidgetFactory.CreateOverdrawMode(data),
-                        WidgetFactory.CreateMaxOverdrawCount(data),
-                        WidgetFactory.CreateMipMapDebugWidget(data)
-                    }
-                });
-
-                AddWidget(new DebugUI.Foldout
-                {
-                    displayName = "Pixel Validation",
-                    opened = true,
-                    children =
-                    {
-                        WidgetFactory.CreatePixelValidationMode(data),
-                        new DebugUI.Container()
+                        displayName = "Rendering Debug",
+                        opened = true,
+                        children =
                         {
-                            displayName = Strings.RangeValidationSettingsContainerName,
-                            isHiddenCallback = () => data.validationMode != DebugValidationMode.HighlightOutsideOfRange,
-                            children =
-                            {
-                                WidgetFactory.CreatePixelValidationChannels(data),
-                                WidgetFactory.CreatePixelValueRangeMin(data),
-                                WidgetFactory.CreatePixelValueRangeMax(data)
-                            }
-                        }
-                    }
-                });
-
-                AddWidget(new DebugUI.Foldout
-                {
-                    displayName = "HDR Output",
-                    opened = true,
-                    children =
-                    {
-                        new DebugUI.MessageBox
-                        {
-                            displayName = "The values in the Rendering Debugger editor window might not be accurate. Please use the Rendering Debugger Overlay instead (Ctrl+Backspace in Play mode).",
-                            style = DebugUI.MessageBox.Style.Warning,
-                            flags = DebugUI.Flags.EditorOnly
+                            WidgetFactory.CreateMapOverlays(data),
+                            WidgetFactory.CreateStpDebugViews(data),
+                            WidgetFactory.CreateMapOverlaySize(data),
+                            WidgetFactory.CreateHDR(data),
+                            WidgetFactory.CreateMSAA(data),
+                            WidgetFactory.CreateTaaDebugMode(data),
+                            WidgetFactory.CreatePostProcessing(data),
+                            WidgetFactory.CreateAdditionalWireframeShaderViews(data),
+                            WidgetFactory.CreateWireframeNotSupportedWarning(data),
+                            WidgetFactory.CreateOverdrawMode(data),
+                            WidgetFactory.CreateMaxOverdrawCount(data),
+                            WidgetFactory.CreateMipMapDebugWidget(data),
                         },
-                        DebugDisplaySettingsHDROutput.CreateHDROuputDisplayTable()
                     }
-                });
+                );
+
+                AddWidget(
+                    new DebugUI.Foldout
+                    {
+                        displayName = "Pixel Validation",
+                        opened = true,
+                        children =
+                        {
+                            WidgetFactory.CreatePixelValidationMode(data),
+                            new DebugUI.Container()
+                            {
+                                displayName = Strings.RangeValidationSettingsContainerName,
+                                isHiddenCallback = () =>
+                                    data.validationMode != DebugValidationMode.HighlightOutsideOfRange,
+                                children =
+                                {
+                                    WidgetFactory.CreatePixelValidationChannels(data),
+                                    WidgetFactory.CreatePixelValueRangeMin(data),
+                                    WidgetFactory.CreatePixelValueRangeMax(data),
+                                },
+                            },
+                        },
+                    }
+                );
+
+                AddWidget(
+                    new DebugUI.Foldout
+                    {
+                        displayName = "HDR Output",
+                        opened = true,
+                        children =
+                        {
+                            new DebugUI.MessageBox
+                            {
+                                displayName =
+                                    "The values in the Rendering Debugger editor window might not be accurate. Please use the Rendering Debugger Overlay instead (Ctrl+Backspace in Play mode).",
+                                style = DebugUI.MessageBox.Style.Warning,
+                                flags = DebugUI.Flags.EditorOnly,
+                            },
+                            DebugDisplaySettingsHDROutput.CreateHDROuputDisplayTable(),
+                        },
+                    }
+                );
             }
         }
 
         #region IDebugDisplaySettingsData
 
         /// <inheritdoc/>
-        public bool AreAnySettingsActive => (postProcessingDebugMode != DebugPostProcessingMode.Auto) ||
-        (fullScreenDebugMode != DebugFullScreenMode.None) ||
-        (sceneOverrideMode != DebugSceneOverrideMode.None) ||
-        (mipInfoMode != DebugMipInfoMode.None) ||
-        (validationMode != DebugValidationMode.None) ||
-        !enableMsaa ||
-        !enableHDR ||
-        (taaDebugMode != TaaDebugMode.None);
+        public bool AreAnySettingsActive =>
+            (postProcessingDebugMode != DebugPostProcessingMode.Auto)
+            || (fullScreenDebugMode != DebugFullScreenMode.None)
+            || (sceneOverrideMode != DebugSceneOverrideMode.None)
+            || (mipInfoMode != DebugMipInfoMode.None)
+            || (validationMode != DebugValidationMode.None)
+            || !enableMsaa
+            || !enableHDR
+            || (taaDebugMode != TaaDebugMode.None);
 
         /// <inheritdoc/>
-        public bool IsPostProcessingAllowed => (postProcessingDebugMode != DebugPostProcessingMode.Disabled) &&
-        (sceneOverrideMode == DebugSceneOverrideMode.None) &&
-        (mipInfoMode == DebugMipInfoMode.None);
+        public bool IsPostProcessingAllowed =>
+            (postProcessingDebugMode != DebugPostProcessingMode.Disabled)
+            && (sceneOverrideMode == DebugSceneOverrideMode.None)
+            && (mipInfoMode == DebugMipInfoMode.None);
 
         /// <inheritdoc/>
-        public bool IsLightingActive => (sceneOverrideMode == DebugSceneOverrideMode.None) &&
-        (mipInfoMode == DebugMipInfoMode.None);
+        public bool IsLightingActive =>
+            (sceneOverrideMode == DebugSceneOverrideMode.None) && (mipInfoMode == DebugMipInfoMode.None);
 
         /// <inheritdoc/>
         public bool TryGetScreenClearColor(ref Color color)

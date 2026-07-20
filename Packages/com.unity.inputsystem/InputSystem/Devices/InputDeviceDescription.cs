@@ -148,13 +148,13 @@ namespace UnityEngine.InputSystem.Layouts
         /// <see cref="version"/>, or <see cref="capabilities"/> is not <c>null</c> and
         /// not empty.</value>
         public bool empty =>
-            string.IsNullOrEmpty(m_InterfaceName) &&
-            string.IsNullOrEmpty(m_DeviceClass) &&
-            string.IsNullOrEmpty(m_Manufacturer) &&
-            string.IsNullOrEmpty(m_Product) &&
-            string.IsNullOrEmpty(m_Serial) &&
-            string.IsNullOrEmpty(m_Version) &&
-            string.IsNullOrEmpty(m_Capabilities);
+            string.IsNullOrEmpty(m_InterfaceName)
+            && string.IsNullOrEmpty(m_DeviceClass)
+            && string.IsNullOrEmpty(m_Manufacturer)
+            && string.IsNullOrEmpty(m_Product)
+            && string.IsNullOrEmpty(m_Serial)
+            && string.IsNullOrEmpty(m_Version)
+            && string.IsNullOrEmpty(m_Capabilities);
 
         /// <summary>
         /// Return a string representation of the description useful for
@@ -225,12 +225,13 @@ namespace UnityEngine.InputSystem.Layouts
         /// </remarks>
         public bool Equals(InputDeviceDescription other)
         {
-            return m_InterfaceName.InvariantEqualsIgnoreCase(other.m_InterfaceName) &&
-                m_DeviceClass.InvariantEqualsIgnoreCase(other.m_DeviceClass) &&
-                m_Manufacturer.InvariantEqualsIgnoreCase(other.m_Manufacturer) &&
-                m_Product.InvariantEqualsIgnoreCase(other.m_Product) &&
-                m_Serial.InvariantEqualsIgnoreCase(other.m_Serial) &&
-                m_Version.InvariantEqualsIgnoreCase(other.m_Version) &&
+            return m_InterfaceName.InvariantEqualsIgnoreCase(other.m_InterfaceName)
+                && m_DeviceClass.InvariantEqualsIgnoreCase(other.m_DeviceClass)
+                && m_Manufacturer.InvariantEqualsIgnoreCase(other.m_Manufacturer)
+                && m_Product.InvariantEqualsIgnoreCase(other.m_Product)
+                && m_Serial.InvariantEqualsIgnoreCase(other.m_Serial)
+                && m_Version.InvariantEqualsIgnoreCase(other.m_Version)
+                &&
                 ////REVIEW: this would ideally compare JSON contents not just the raw string
                 m_Capabilities.InvariantEqualsIgnoreCase(other.m_Capabilities);
         }
@@ -275,7 +276,7 @@ namespace UnityEngine.InputSystem.Layouts
         /// <param name="right">Second device description.</param>
         /// <returns>True if the two descriptions are equivalent.</returns>
         /// <seealso cref="Equals(InputDeviceDescription)"/>
-        public static bool operator==(InputDeviceDescription left, InputDeviceDescription right)
+        public static bool operator ==(InputDeviceDescription left, InputDeviceDescription right)
         {
             return left.Equals(right);
         }
@@ -287,7 +288,7 @@ namespace UnityEngine.InputSystem.Layouts
         /// <param name="right">Second device description.</param>
         /// <returns>True if the two descriptions are not equivalent.</returns>
         /// <seealso cref="Equals(InputDeviceDescription)"/>
-        public static bool operator!=(InputDeviceDescription left, InputDeviceDescription right)
+        public static bool operator !=(InputDeviceDescription left, InputDeviceDescription right)
         {
             return !left.Equals(right);
         }
@@ -335,7 +336,7 @@ namespace UnityEngine.InputSystem.Layouts
                 manufacturer = manufacturer,
                 serial = serial,
                 version = version,
-                capabilities = capabilities
+                capabilities = capabilities,
             };
             return JsonUtility.ToJson(data, true);
         }
@@ -376,11 +377,15 @@ namespace UnityEngine.InputSystem.Layouts
                 manufacturer = data.manufacturer,
                 serial = data.serial,
                 version = data.version,
-                capabilities = data.capabilities
+                capabilities = data.capabilities,
             };
         }
 
-        internal static bool ComparePropertyToDeviceDescriptor(string propertyName, JsonParser.JsonString propertyValue, string deviceDescriptor)
+        internal static bool ComparePropertyToDeviceDescriptor(
+            string propertyName,
+            JsonParser.JsonString propertyValue,
+            string deviceDescriptor
+        )
         {
             // We use JsonParser instead of JsonUtility.Parse in order to not allocate GC memory here.
 
@@ -395,13 +400,26 @@ namespace UnityEngine.InputSystem.Layouts
             return json.CurrentPropertyHasValueEqualTo(propertyValue);
         }
 
-        [SerializeField] private string m_InterfaceName;
-        [SerializeField] private string m_DeviceClass;
-        [SerializeField] private string m_Manufacturer;
-        [SerializeField] private string m_Product;
-        [SerializeField] private string m_Serial;
-        [SerializeField] private string m_Version;
-        [SerializeField] private string m_Capabilities;
+        [SerializeField]
+        private string m_InterfaceName;
+
+        [SerializeField]
+        private string m_DeviceClass;
+
+        [SerializeField]
+        private string m_Manufacturer;
+
+        [SerializeField]
+        private string m_Product;
+
+        [SerializeField]
+        private string m_Serial;
+
+        [SerializeField]
+        private string m_Version;
+
+        [SerializeField]
+        private string m_Capabilities;
 
         private struct DeviceDescriptionJson
         {

@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +20,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions
 
         public TestSuite ModifySuite(TestSuite root)
         {
-            if((m_OrderedTestNames == null || m_OrderedTestNames?.Length == 0) && m_randomOrderSeed == 0)
+            if ((m_OrderedTestNames == null || m_OrderedTestNames?.Length == 0) && m_randomOrderSeed == 0)
             {
                 return root;
             }
@@ -55,7 +53,10 @@ namespace UnityEngine.TestRunner.NUnitExtensions
             return suite;
         }
 
-        private static List<ITest> InsertTestInCurrentStackIncludingAllMissingAncestors(ITest test, List<ITest> newAncestorStack)
+        private static List<ITest> InsertTestInCurrentStackIncludingAllMissingAncestors(
+            ITest test,
+            List<ITest> newAncestorStack
+        )
         {
             var originalAncestorStack = GetAncestorStack(test);
 
@@ -85,7 +86,9 @@ namespace UnityEngine.TestRunner.NUnitExtensions
 
         private static bool DoAncestorsDiverge(List<ITest> newAncestorStack, List<ITest> originalAncestorStack, int i)
         {
-            return i >= newAncestorStack.Count || originalAncestorStack[i].Name != newAncestorStack[i].Name || !originalAncestorStack[i].HasChildren;
+            return i >= newAncestorStack.Count
+                || originalAncestorStack[i].Name != newAncestorStack[i].Name
+                || !originalAncestorStack[i].HasChildren;
         }
 
         private static Test CloneNode(ITest test)
@@ -109,7 +112,9 @@ namespace UnityEngine.TestRunner.NUnitExtensions
                 if (existingFixture.Arguments?.Length > 0)
                 {
                     // Newer versions of NUnit has a constructor that allows for setting this argument. Our custom NUnit version only allows for setting it through reflection at the moment.
-                    typeof(TestFixture).GetProperty(nameof(existingFixture.Arguments)).SetValue(newTest, existingFixture.Arguments);
+                    typeof(TestFixture)
+                        .GetProperty(nameof(existingFixture.Arguments))
+                        .SetValue(newTest, existingFixture.Arguments);
                 }
             }
             else if (type == typeof(TestMethod))
@@ -200,9 +205,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions
         {
             if (node.HasChildren)
             {
-                return node.Tests
-                    .Select(test => FindTest(test, fullName))
-                    .FirstOrDefault(match => match != null);
+                return node.Tests.Select(test => FindTest(test, fullName)).FirstOrDefault(match => match != null);
             }
 
             return node.FullName == fullName ? node : null;

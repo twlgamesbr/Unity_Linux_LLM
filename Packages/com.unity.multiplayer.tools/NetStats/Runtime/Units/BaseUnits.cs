@@ -7,9 +7,7 @@ namespace Unity.Multiplayer.Tools.NetStats
         internal sbyte BytesExponent { get; }
         internal sbyte SecondsExponent { get; }
 
-        public BaseUnits(
-            sbyte bytesExponent = 0,
-            sbyte secondsExponent = 0)
+        public BaseUnits(sbyte bytesExponent = 0, sbyte secondsExponent = 0)
         {
             BytesExponent = bytesExponent;
             SecondsExponent = secondsExponent;
@@ -17,15 +15,12 @@ namespace Unity.Multiplayer.Tools.NetStats
 
         public BaseUnits WithSeconds(sbyte seconds)
         {
-            return new BaseUnits(
-                bytesExponent: BytesExponent,
-                secondsExponent: seconds);
+            return new BaseUnits(bytesExponent: BytesExponent, secondsExponent: seconds);
         }
 
         public bool Equals(BaseUnits other)
         {
-            return BytesExponent == other.BytesExponent &&
-                   SecondsExponent == other.SecondsExponent;
+            return BytesExponent == other.BytesExponent && SecondsExponent == other.SecondsExponent;
         }
 
         public override bool Equals(object obj)
@@ -48,8 +43,7 @@ namespace Unity.Multiplayer.Tools.NetStats
             }
         }
 
-        static readonly char[] k_Superscripts = new char[]
-            { '⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹', };
+        static readonly char[] k_Superscripts = new char[] { '⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹' };
 
         /// The numerator and denominator display strings
         /// If there are no units in the numerator, the numerator returned will be an empty string.
@@ -81,9 +75,7 @@ namespace Unity.Multiplayer.Tools.NetStats
                     str += k_Superscripts[exponent / 10];
                 }
 
-                for (var unit = (BaseUnit)0;
-                    (int)unit < BaseUnitConstants.k_BaseUnitCount;
-                    ++unit)
+                for (var unit = (BaseUnit)0; (int)unit < BaseUnitConstants.k_BaseUnitCount; ++unit)
                 {
                     var exponent = GetExponent(unit);
                     if (exponent > 0)
@@ -108,7 +100,6 @@ namespace Unity.Multiplayer.Tools.NetStats
             }
         }
 
-        public override string ToString()
-            => DisplayString;
+        public override string ToString() => DisplayString;
     }
 }

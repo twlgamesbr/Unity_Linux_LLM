@@ -8,7 +8,5 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
     /// </summary>
     [BurstCompile]
     [GenerateTestsForBurstCompatibility]
-    internal unsafe readonly partial struct Vector
-    {
-    }
+    internal readonly unsafe partial struct Vector { }
 }

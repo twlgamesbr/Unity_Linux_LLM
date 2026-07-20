@@ -8,13 +8,17 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI;
 
 public class SystemContextSystemModule : ISystemModule
 {
-    readonly Dictionary<TypeDeclarationSyntax, List<CandidateSyntax>> m_Candidates = new Dictionary<TypeDeclarationSyntax, List<CandidateSyntax>>();
+    readonly Dictionary<TypeDeclarationSyntax, List<CandidateSyntax>> m_Candidates =
+        new Dictionary<TypeDeclarationSyntax, List<CandidateSyntax>>();
 
     public IEnumerable<(SyntaxNode SyntaxNode, TypeDeclarationSyntax SystemType)> Candidates
     {
-        get {
-            foreach (var type in m_Candidates) {
-                foreach (var candidate in type.Value) {
+        get
+        {
+            foreach (var type in m_Candidates)
+            {
+                foreach (var candidate in type.Value)
+                {
                     yield return (candidate.Node, type.Key);
                 }
             }
@@ -23,11 +27,17 @@ public class SystemContextSystemModule : ISystemModule
 
     public bool RequiresReferenceToBurst => false;
 
-    public void OnReceiveSyntaxNode(SyntaxNode node, Dictionary<SyntaxNode, SourceGen.Common.CandidateSyntax> candidateOwnership)
+    public void OnReceiveSyntaxNode(
+        SyntaxNode node,
+        Dictionary<SyntaxNode, SourceGen.Common.CandidateSyntax> candidateOwnership
+    )
     {
         switch (node)
         {
-            case InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: { } nameSyntax } } invocation: // makes sure to use SystemAPI.*** as the reference instead of *** as the SystemAPI part should also dissapear
+            case InvocationExpressionSyntax
+            {
+                Expression: MemberAccessExpressionSyntax { Name: { } nameSyntax }
+            } invocation: // makes sure to use SystemAPI.*** as the reference instead of *** as the SystemAPI part should also dissapear
                 InvocationWithNameOrMember(invocation, nameSyntax);
                 break;
             case InvocationExpressionSyntax { Expression: SimpleNameSyntax nameSyntax } invocation:
@@ -60,7 +70,11 @@ public class SystemContextSystemModule : ISystemModule
                             // E.g. In the case of "Time" (where SystemAPI is not explicitly written), we want to replace the entire expression
                             candidateNode = nameSyntax;
 
-                        var candidateSyntax = new CandidateSyntax(CandidateType.TimeData, CandidateFlags.None, candidateNode);
+                        var candidateSyntax = new CandidateSyntax(
+                            CandidateType.TimeData,
+                            CandidateFlags.None,
+                            candidateNode
+                        );
                         candidateOwnership[candidateNode] = candidateSyntax;
                         m_Candidates.Add(systemTypeSyntax, candidateSyntax);
                     }
@@ -68,8 +82,11 @@ public class SystemContextSystemModule : ISystemModule
             }
         }
 
-        void InvocationWithNameOrMember(InvocationExpressionSyntax invocation, SimpleNameSyntax nodeContainedByInvocation) {
-
+        void InvocationWithNameOrMember(
+            InvocationExpressionSyntax invocation,
+            SimpleNameSyntax nodeContainedByInvocation
+        )
+        {
             int argsCount = invocation.ArgumentList.Arguments.Count;
 
             switch (nodeContainedByInvocation.Identifier.ValueText)
@@ -133,8 +150,10 @@ public class SystemContextSystemModule : ISystemModule
                     AddCandidate(CandidateFlags.ReadOnly, CandidateType.SingletonWithoutArgument);
                     break;
                 case "GetSingletonEntity" when argsCount is 0:
-                    AddCandidate(CandidateFlags.ReadOnly | CandidateFlags.NoGenericGeneration,
-                        CandidateType.SingletonWithoutArgument);
+                    AddCandidate(
+                        CandidateFlags.ReadOnly | CandidateFlags.NoGenericGeneration,
+                        CandidateType.SingletonWithoutArgument
+                    );
                     break;
                 case "SetSingleton" when argsCount is 1:
                     AddCandidate(CandidateFlags.None, CandidateType.SingletonWithArgument);
@@ -182,7 +201,8 @@ public class SystemContextSystemModule : ISystemModule
 
                         m_Candidates.Add(
                             nodeContainedByInvocation.AncestorOfKind<TypeDeclarationSyntax>(),
-                            candidateSyntax);
+                            candidateSyntax
+                        );
                     }
             }
         }

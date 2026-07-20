@@ -7,12 +7,16 @@ namespace Unity.PlatformToolkit.Editor
     {
         GenericDropdownMenu m_DropdownMenu;
         public IAchievement Achievement { get; set; }
+
         public AchievementIgnoreDropdown()
         {
             m_DropdownMenu = new GenericDropdownMenu();
             m_DropdownMenu.AddItem("Toggle Ignore", false, OnIgnoreToggle, null);
 
-            clickable.clicked += () => { m_DropdownMenu.DropDown(worldBound, this, DropdownMenuSizeMode.Auto); };
+            clickable.clicked += () =>
+            {
+                m_DropdownMenu.DropDown(worldBound, this, DropdownMenuSizeMode.Auto);
+            };
         }
 
         private void OnIgnoreToggle(object e)

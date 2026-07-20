@@ -16,7 +16,7 @@ namespace UnityEditor.Rendering
             {
                 foreach (var rendererData in urpAssetForBuild.m_RendererDataList)
                 {
-                    if(rendererData is not UniversalRendererData)
+                    if (rendererData is not UniversalRendererData)
                         continue;
 
                     foreach (var rendererFeature in rendererData.rendererFeatures)
@@ -31,7 +31,11 @@ namespace UnityEditor.Rendering
 
         internal static bool CanRemoveSurfaceCacheSettings(List<UniversalRenderPipelineAsset> urpAssets)
         {
-            if (GraphicsSettings.TryGetRenderPipelineSettings<URPShaderStrippingSetting>(out var urpShaderStrippingSettings) && !urpShaderStrippingSettings.stripUnusedVariants)
+            if (
+                GraphicsSettings.TryGetRenderPipelineSettings<URPShaderStrippingSetting>(
+                    out var urpShaderStrippingSettings
+                ) && !urpShaderStrippingSettings.stripUnusedVariants
+            )
                 return false;
 
             if (IsSurfaceCacheEnabled(urpAssets))
@@ -41,23 +45,29 @@ namespace UnityEditor.Rendering
         }
     }
 
-    class UniversalSurfaceCacheIntegrationStripper : IRenderPipelineGraphicsSettingsStripper<UnityEngine.Rendering.Universal.SurfaceCacheRenderPipelineResourceSet>
+    class UniversalSurfaceCacheIntegrationStripper
+        : IRenderPipelineGraphicsSettingsStripper<UnityEngine.Rendering.Universal.SurfaceCacheRenderPipelineResourceSet>
     {
         public bool active => URPBuildData.instance.buildingPlayerForUniversalRenderPipeline;
 
         public bool CanRemoveSettings(UnityEngine.Rendering.Universal.SurfaceCacheRenderPipelineResourceSet settings)
         {
-            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(URPBuildData.instance.renderPipelineAssets);
+            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(
+                URPBuildData.instance.renderPipelineAssets
+            );
         }
     }
 
-    class UniversalSurfaceCacheCoreStripper : IRenderPipelineGraphicsSettingsStripper<UnityEngine.Rendering.SurfaceCacheRenderPipelineResourceSet>
+    class UniversalSurfaceCacheCoreStripper
+        : IRenderPipelineGraphicsSettingsStripper<UnityEngine.Rendering.SurfaceCacheRenderPipelineResourceSet>
     {
         public bool active => URPBuildData.instance.buildingPlayerForUniversalRenderPipeline;
 
         public bool CanRemoveSettings(UnityEngine.Rendering.SurfaceCacheRenderPipelineResourceSet settings)
         {
-            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(URPBuildData.instance.renderPipelineAssets);
+            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(
+                URPBuildData.instance.renderPipelineAssets
+            );
         }
     }
 
@@ -67,7 +77,9 @@ namespace UnityEditor.Rendering
 
         public bool CanRemoveSettings(RayTracingRenderPipelineResources settings)
         {
-            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(URPBuildData.instance.renderPipelineAssets);
+            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(
+                URPBuildData.instance.renderPipelineAssets
+            );
         }
     }
 
@@ -77,7 +89,9 @@ namespace UnityEditor.Rendering
 
         public bool CanRemoveSettings(WorldRenderPipelineResources settings)
         {
-            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(URPBuildData.instance.renderPipelineAssets);
+            return SurfaceCacheStripperUtility.CanRemoveSurfaceCacheSettings(
+                URPBuildData.instance.renderPipelineAssets
+            );
         }
     }
 }

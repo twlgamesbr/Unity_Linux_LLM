@@ -15,6 +15,6 @@ namespace Unity.Netcode
         /// <summary>
         /// Eight byte hash
         /// </summary>
-        VarIntEightBytes
+        VarIntEightBytes,
     }
 }

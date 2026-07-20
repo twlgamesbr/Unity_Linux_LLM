@@ -34,18 +34,16 @@ namespace Unity.Entities.Editor
 
             static Formatting()
             {
-                k_EntityNull = (FixedString64Bytes) "Entity.Null";
-                k_EntityFormat = (FixedString64Bytes) "Entity({0}:{1})";
-                k_HandleFormat = (FixedString64Bytes) "Handle({0}:{1}:{2})";
+                k_EntityNull = (FixedString64Bytes)"Entity.Null";
+                k_EntityFormat = (FixedString64Bytes)"Entity({0}:{1})";
+                k_HandleFormat = (FixedString64Bytes)"Handle({0}:{1}:{2})";
 
-                k_EntityNullLowerInvariant = (FixedString64Bytes) "entity.null";
-                k_EntityLowerInvariantFormat = (FixedString64Bytes) "entity({0}:{1})";
-                k_HandleLowerInvariantFormat = (FixedString64Bytes) "handle({0}:{1}:{2})";
+                k_EntityNullLowerInvariant = (FixedString64Bytes)"entity.null";
+                k_EntityLowerInvariantFormat = (FixedString64Bytes)"entity({0}:{1})";
+                k_HandleLowerInvariantFormat = (FixedString64Bytes)"handle({0}:{1}:{2})";
             }
 
-            public static void Initialize()
-            {
-            }
+            public static void Initialize() { }
 
             public static void FormatEntityNull(ref FixedString64Bytes name)
             {
@@ -80,7 +78,7 @@ namespace Unity.Entities.Editor
                 FixedString32Bytes version = default;
                 version.Append(handle.ToEntity().Version);
                 FixedString32Bytes kind = default;
-                index.Append((int) handle.Kind);
+                index.Append((int)handle.Kind);
                 name.AppendFormat(k_HandleFormat, kind, index, version);
             }
 
@@ -92,11 +90,10 @@ namespace Unity.Entities.Editor
                 FixedString32Bytes version = default;
                 version.Append(handle.ToEntity().Version);
                 FixedString32Bytes kind = default;
-                index.Append((int) handle.Kind);
+                index.Append((int)handle.Kind);
                 name.AppendFormat(k_HandleLowerInvariantFormat, kind, index, version);
             }
         }
-
 
         World m_World;
 
@@ -108,13 +105,16 @@ namespace Unity.Entities.Editor
 #endif
 
         internal NativeParallelHashMap<HierarchyNodeHandle, FixedString64Bytes> NameByHandle => m_Names;
-        internal NativeParallelHashMap<HierarchyNodeHandle, FixedString64Bytes> NameByHandleLowerInvariant => m_NamesLowerInvariant;
+        internal NativeParallelHashMap<HierarchyNodeHandle, FixedString64Bytes> NameByHandleLowerInvariant =>
+            m_NamesLowerInvariant;
 
 #if !DOTS_DISABLE_DEBUG_NAMES
 #if ENTITY_STORE_V1
-        internal EntityName* NameByEntity => m_World.EntityManager.GetCheckedEntityDataAccess()->EntityComponentStore->NameByEntity;
+        internal EntityName* NameByEntity =>
+            m_World.EntityManager.GetCheckedEntityDataAccess()->EntityComponentStore->NameByEntity;
 #else
-        internal EntityNameStoreAccess NameStoreAccess => m_World.EntityManager.GetCheckedEntityDataAccess()->EntityComponentStore->NameStoreAccess;
+        internal EntityNameStoreAccess NameStoreAccess =>
+            m_World.EntityManager.GetCheckedEntityDataAccess()->EntityComponentStore->NameStoreAccess;
 #endif
         internal EntityNameStorageLowerInvariant EntityNameStorageLowerInvariant => m_EntityNameStorageLowerInvariant;
 #endif
@@ -126,7 +126,10 @@ namespace Unity.Entities.Editor
             m_Names = new NativeParallelHashMap<HierarchyNodeHandle, FixedString64Bytes>(16, allocator);
             m_NamesLowerInvariant = new NativeParallelHashMap<HierarchyNodeHandle, FixedString64Bytes>(16, allocator);
 #if !DOTS_DISABLE_DEBUG_NAMES
-            m_EntityNameStorageLowerInvariant = new EntityNameStorageLowerInvariant(EntityNameStorage.kMaxChars, allocator);
+            m_EntityNameStorageLowerInvariant = new EntityNameStorageLowerInvariant(
+                EntityNameStorage.kMaxChars,
+                allocator
+            );
 #endif
         }
 
@@ -156,7 +159,10 @@ namespace Unity.Entities.Editor
                     if (!m_World.EntityManager.GetCheckedEntityDataAccess()->Exists(handle.ToEntity()))
                         return false;
 
-                    return m_World.EntityManager.GetCheckedEntityDataAccess()->EntityComponentStore->GetEntityNameByEntityIndex(handle.ToEntity().Index).Index > 0;
+                    return m_World
+                            .EntityManager.GetCheckedEntityDataAccess()
+                            ->EntityComponentStore->GetEntityNameByEntityIndex(handle.ToEntity().Index)
+                            .Index > 0;
 #else
                     return false;
 #endif // !DOTS_DISABLE_DEBUG_NAMES
@@ -184,7 +190,9 @@ namespace Unity.Entities.Editor
                     }
 
 #if !DOTS_DISABLE_DEBUG_NAMES
-                    var entityComponentStore = m_World.EntityManager.GetCheckedEntityDataAccessExclusive()->EntityComponentStore;
+                    var entityComponentStore = m_World
+                        .EntityManager.GetCheckedEntityDataAccessExclusive()
+                        ->EntityComponentStore;
                     var entry = entityComponentStore->GetEntityNameByEntityIndex(handle.ToEntity().Index);
 
                     if (entry.Index != 0 && entityComponentStore->Exists(handle.ToEntity()))
@@ -226,7 +234,9 @@ namespace Unity.Entities.Editor
             switch (handle.Kind)
             {
                 case NodeKind.Entity:
-                    throw new InvalidOperationException($"Unable to assign a name to an entity in the hierarchy. This must be done through {nameof(EntityManager)}.{nameof(EntityManager.SetName)}.");
+                    throw new InvalidOperationException(
+                        $"Unable to assign a name to an entity in the hierarchy. This must be done through {nameof(EntityManager)}.{nameof(EntityManager.SetName)}."
+                    );
                 default:
                     FixedString64Bytes fs = default;
                     fs.CopyFromTruncated(name);
@@ -241,7 +251,9 @@ namespace Unity.Entities.Editor
             switch (handle.Kind)
             {
                 case NodeKind.Entity:
-                    throw new InvalidOperationException($"Unable to remove a name for an entity in the hierarchy. This must be done through {nameof(EntityManager)}.{nameof(EntityManager.SetName)}.");
+                    throw new InvalidOperationException(
+                        $"Unable to remove a name for an entity in the hierarchy. This must be done through {nameof(EntityManager)}.{nameof(EntityManager.SetName)}."
+                    );
                 default:
                     m_Names.Remove(handle);
                     m_NamesLowerInvariant.Remove(handle);
@@ -263,7 +275,10 @@ namespace Unity.Entities.Editor
             foreach (var scene in changes.LoadedScenes)
             {
                 if (!scene.isSubScene)
-                    SetName(HierarchyNodeHandle.FromScene(scene), string.IsNullOrEmpty(scene.name) ? k_UntitledScene : scene.name);
+                    SetName(
+                        HierarchyNodeHandle.FromScene(scene),
+                        string.IsNullOrEmpty(scene.name) ? k_UntitledScene : scene.name
+                    );
 
                 if (!scene.isLoaded)
                     continue;
@@ -294,7 +309,7 @@ namespace Unity.Entities.Editor
                     if (!scene.isSubScene)
                         SetName(HierarchyNodeHandle.FromScene(scene), sceneName);
                 }
-                else if((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.Destroyed) != 0)
+                else if ((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.Destroyed) != 0)
                 {
                     RemoveName(HierarchyNodeHandle.FromGameObject(changeTrackerEvent.EntityId));
                 }
@@ -332,6 +347,5 @@ namespace Unity.Entities.Editor
                 }
             }
         }
-
     }
 }

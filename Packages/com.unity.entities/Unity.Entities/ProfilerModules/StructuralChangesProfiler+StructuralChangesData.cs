@@ -13,7 +13,12 @@ namespace Unity.Entities
             public readonly ulong WorldSequenceNumber;
             public readonly StructuralChangeType Type;
 
-            public StructuralChangeData(long elapsed, StructuralChangeType type, ulong worldSeqNumber, in SystemHandle executingSystem)
+            public StructuralChangeData(
+                long elapsed,
+                StructuralChangeType type,
+                ulong worldSeqNumber,
+                in SystemHandle executingSystem
+            )
             {
                 ElapsedNanoseconds = elapsed;
                 Type = type;

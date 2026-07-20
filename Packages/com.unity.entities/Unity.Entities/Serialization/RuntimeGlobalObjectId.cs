@@ -17,18 +17,22 @@ namespace Unity.Entities.Serialization
         /// Unique identifier within a scene
         /// </summary>
         public long SceneObjectIdentifier0;
+
         /// <summary>
         /// Unused.
         /// </summary>
         public long SceneObjectIdentifier1;
+
         /// <summary>
         /// Asset GUID.
         /// </summary>
         public Hash128 AssetGUID;
+
         /// <summary>
         /// Identifier type.
         /// </summary>
         public int IdentifierType;
+
         /// <summary>
         /// True if the id is valid.
         /// </summary>

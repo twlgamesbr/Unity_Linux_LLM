@@ -37,11 +37,23 @@ namespace UnityEngine.Rendering.Universal
             var passName = k_NormalPass;
             LayerDebug.FormatPassName(layerBatch, ref passName);
 
-            using (var builder = graph.AddRasterRenderPass<PassData>(passName, out var passData, LayerDebug.GetProfilingSampler(passName, m_ProfilingSampler)))
+            using (
+                var builder = graph.AddRasterRenderPass<PassData>(
+                    passName,
+                    out var passData,
+                    LayerDebug.GetProfilingSampler(passName, m_ProfilingSampler)
+                )
+            )
             {
                 LayerUtility.GetFilterSettings(rendererData, layerBatch, out var filterSettings);
 
-                var drawSettings = CreateDrawingSettings(k_NormalsRenderingPassName, renderingData, cameraData, lightData, SortingCriteria.CommonTransparent);
+                var drawSettings = CreateDrawingSettings(
+                    k_NormalsRenderingPassName,
+                    renderingData,
+                    cameraData,
+                    lightData,
+                    SortingCriteria.CommonTransparent
+                );
                 var sortSettings = drawSettings.sortingSettings;
                 RendererLighting.GetTransparencySortingMode(rendererData, cameraData.camera, ref sortSettings);
                 drawSettings.sortingSettings = sortSettings;
@@ -53,7 +65,9 @@ namespace UnityEngine.Rendering.Universal
                 // Depth needed for sprite mask stencil or z test for 3d meshes
                 if (Renderer2D.IsDepthUsageAllowed(frameData, rendererData))
                 {
-                    var depth = universal2DResourceData.normalsDepth.IsValid() ? universal2DResourceData.normalsDepth : commonResourceData.activeDepthTexture;
+                    var depth = universal2DResourceData.normalsDepth.IsValid()
+                        ? universal2DResourceData.normalsDepth
+                        : commonResourceData.activeDepthTexture;
                     builder.SetRenderAttachmentDepth(depth);
                 }
 
@@ -61,10 +75,12 @@ namespace UnityEngine.Rendering.Universal
                 passData.rendererList = graph.CreateRendererList(param);
                 builder.UseRendererList(passData.rendererList);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    Execute(context.cmd, data);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        Execute(context.cmd, data);
+                    }
+                );
             }
         }
     }

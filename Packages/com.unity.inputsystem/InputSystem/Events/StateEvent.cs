@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
-using UnityEngine.InputSystem.Utilities;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.InputSystem.Utilities;
 
 namespace UnityEngine.InputSystem.LowLevel
 {
@@ -37,7 +37,7 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(byte* data = stateData)
+                fixed (byte* data = stateData)
                 {
                     return data;
                 }
@@ -46,7 +46,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public InputEventPtr ToEventPtr()
         {
-            fixed(StateEvent * ptr = &this)
+            fixed (StateEvent* ptr = &this)
             {
                 return new InputEventPtr((InputEvent*)ptr);
             }
@@ -72,9 +72,15 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             var result = default(TState);
             if (stateFormat != result.format)
-                throw new InvalidOperationException($"Expected state format '{result.format}' but got '{stateFormat}' instead");
+                throw new InvalidOperationException(
+                    $"Expected state format '{result.format}' but got '{stateFormat}' instead"
+                );
 
-            UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref result), state, Math.Min(stateSizeInBytes, UnsafeUtility.SizeOf<TState>()));
+            UnsafeUtility.MemCpy(
+                UnsafeUtility.AddressOf(ref result),
+                state,
+                Math.Min(stateSizeInBytes, UnsafeUtility.SizeOf<TState>())
+            );
 
             return result;
         }
@@ -143,8 +149,16 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <returns>Buffer of unmanaged memory allocated for the event.</returns>
         /// <exception cref="ArgumentException"><paramref name="device"/> has not been added to the system.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="device"/> is <c>null</c>.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
-        public static NativeArray<byte> From(InputDevice device, out InputEventPtr eventPtr,  Allocator allocator = Allocator.Temp)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1021:AvoidOutParameters",
+            MessageId = "1#"
+        )]
+        public static NativeArray<byte> From(
+            InputDevice device,
+            out InputEventPtr eventPtr,
+            Allocator allocator = Allocator.Temp
+        )
         {
             return From(device, out eventPtr, allocator, useDefaultState: false);
         }
@@ -162,30 +176,48 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <returns>Buffer of unmanaged memory allocated for the event.</returns>
         /// <exception cref="ArgumentException"><paramref name="device"/> has not been added to the system.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="device"/> is <c>null</c>.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
-        public static NativeArray<byte> FromDefaultStateFor(InputDevice device, out InputEventPtr eventPtr,  Allocator allocator = Allocator.Temp)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1021:AvoidOutParameters",
+            MessageId = "1#"
+        )]
+        public static NativeArray<byte> FromDefaultStateFor(
+            InputDevice device,
+            out InputEventPtr eventPtr,
+            Allocator allocator = Allocator.Temp
+        )
         {
             return From(device, out eventPtr, allocator, useDefaultState: true);
         }
 
-        private static NativeArray<byte> From(InputDevice device, out InputEventPtr eventPtr,  Allocator allocator, bool useDefaultState)
+        private static NativeArray<byte> From(
+            InputDevice device,
+            out InputEventPtr eventPtr,
+            Allocator allocator,
+            bool useDefaultState
+        )
         {
             if (device == null)
                 throw new ArgumentNullException(nameof(device));
             if (!device.added)
-                throw new ArgumentException($"Device '{device}' has not been added to system",
-                    nameof(device));
+                throw new ArgumentException($"Device '{device}' has not been added to system", nameof(device));
 
             var stateFormat = device.m_StateBlock.format;
             var stateSize = device.m_StateBlock.alignedSizeInBytes;
             var stateOffset = device.m_StateBlock.byteOffset;
-            var statePtr = (byte*)(useDefaultState ? device.defaultStatePtr : device.currentStatePtr) + (int)stateOffset;
+            var statePtr =
+                (byte*)(useDefaultState ? device.defaultStatePtr : device.currentStatePtr) + (int)stateOffset;
             var eventSize = InputEvent.kBaseEventSize + sizeof(int) + stateSize;
 
             var buffer = new NativeArray<byte>((int)eventSize.AlignToMultipleOf(4), allocator);
             var stateEventPtr = (StateEvent*)buffer.GetUnsafePtr();
 
-            stateEventPtr->baseEvent = new InputEvent(Type, (int)eventSize, device.deviceId, InputRuntime.s_Instance.currentTime);
+            stateEventPtr->baseEvent = new InputEvent(
+                Type,
+                (int)eventSize,
+                device.deviceId,
+                InputRuntime.s_Instance.currentTime
+            );
             stateEventPtr->stateFormat = stateFormat;
 
             UnsafeUtility.MemCpy(stateEventPtr->state, statePtr, stateSize);

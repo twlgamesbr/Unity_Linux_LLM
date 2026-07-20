@@ -27,9 +27,10 @@ namespace UnityEngine.InputSystem.Editor
         public InputActionsTreeViewItem()
         {
             var template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                InputActionsEditorConstants.PackagePath +
-                InputActionsEditorConstants.ResourcesPath +
-                InputActionsEditorConstants.InputActionsTreeViewItemUxml);
+                InputActionsEditorConstants.PackagePath
+                    + InputActionsEditorConstants.ResourcesPath
+                    + InputActionsEditorConstants.InputActionsTreeViewItemUxml
+            );
             template.CloneTree(this);
 
             focusable = true;
@@ -42,7 +43,9 @@ namespace UnityEngine.InputSystem.Editor
             {
                 OnContextualMenuPopulateEvent?.Invoke(menuBuilder);
             })
-            { target = this };
+            {
+                target = this,
+            };
         }
 
         public Label label => this.Q<Label>();

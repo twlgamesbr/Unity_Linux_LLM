@@ -15,8 +15,10 @@ namespace UnityEngine.TestTools
 {
     internal class SetUpTearDownCommand : BeforeAfterTestCommandBase<MethodInfo>
     {
-        private static readonly Dictionary<Type, List<MethodInfo>> m_BeforeActionsCache = new Dictionary<Type, List<MethodInfo>>();
-        private static readonly Dictionary<Type, List<MethodInfo>> m_AfterActionsCache = new Dictionary<Type, List<MethodInfo>>();
+        private static readonly Dictionary<Type, List<MethodInfo>> m_BeforeActionsCache =
+            new Dictionary<Type, List<MethodInfo>>();
+        private static readonly Dictionary<Type, List<MethodInfo>> m_AfterActionsCache =
+            new Dictionary<Type, List<MethodInfo>>();
 
         public SetUpTearDownCommand(TestCommand innerCommand)
             : base(innerCommand, "SetUp", "TearDown")
@@ -25,8 +27,20 @@ namespace UnityEngine.TestTools
             {
                 if (Test.TypeInfo.Type != null)
                 {
-                    BeforeActions = GetActions(m_BeforeActionsCache, Test.TypeInfo.Type, typeof(SetUpAttribute), new[] {typeof(void), typeof(Task)});
-                    AfterActions =  GetActions(m_AfterActionsCache, Test.TypeInfo.Type, typeof(TearDownAttribute), new[] {typeof(void), typeof(Task)}).Reverse().ToArray();
+                    BeforeActions = GetActions(
+                        m_BeforeActionsCache,
+                        Test.TypeInfo.Type,
+                        typeof(SetUpAttribute),
+                        new[] { typeof(void), typeof(Task) }
+                    );
+                    AfterActions = GetActions(
+                            m_AfterActionsCache,
+                            Test.TypeInfo.Type,
+                            typeof(TearDownAttribute),
+                            new[] { typeof(void), typeof(Task) }
+                        )
+                        .Reverse()
+                        .ToArray();
                 }
             }
         }
@@ -50,7 +64,11 @@ namespace UnityEngine.TestTools
 
                 if (task.IsFaulted)
                 {
-                    ExceptionDispatchInfo.Capture(task.Exception.InnerExceptions.Count == 1 ? task.Exception.InnerException : task.Exception).Throw();
+                    ExceptionDispatchInfo
+                        .Capture(
+                            task.Exception.InnerExceptions.Count == 1 ? task.Exception.InnerException : task.Exception
+                        )
+                        .Throw();
                 }
             }
             else
@@ -75,7 +93,11 @@ namespace UnityEngine.TestTools
 
                 if (task.IsFaulted)
                 {
-                    ExceptionDispatchInfo.Capture(task.Exception.InnerExceptions.Count == 1 ? task.Exception.InnerException : task.Exception).Throw();
+                    ExceptionDispatchInfo
+                        .Capture(
+                            task.Exception.InnerExceptions.Count == 1 ? task.Exception.InnerException : task.Exception
+                        )
+                        .Throw();
                 }
             }
             else

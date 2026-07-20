@@ -74,6 +74,5 @@ namespace UnityEditor.UIElements.TestFramework
             }
             return null;
         }
-
     }
 }

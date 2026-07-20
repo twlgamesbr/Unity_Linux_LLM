@@ -1,9 +1,9 @@
 using System;
-using UnityEngine;
 using UnityEditor.ShaderGraph;
-using UnityEngine.UIElements;
-using UnityEngine.Rendering.Universal;
 using UnityEditor.ShaderGraph.Internal;
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.UIElements;
 using ShaderUtils = Unity.Rendering.Universal.ShaderUtils;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
@@ -16,14 +16,38 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             public const string header = "Surface Options";
 
-            public static GUIContent affectAlbedoText = new GUIContent("Affect BaseColor", "When enabled, this decal uses its base color. When disabled, the decal has no base color effect.");
-            public static GUIContent affectNormalText = new GUIContent("Affect Normal", "When enabled, this decal uses its normal. When disabled, the decal has no normal effect.");
-            public static GUIContent affectNormalBlendText = new GUIContent("Affect Normal Blend", "When enabled, this decal uses its normal blending. When disabled, the decal has no normal blending effect.");
-            public static GUIContent affectMetalText = new GUIContent("Affect Metal", "When enabled, this decal uses the metallic channel of its Mask Map. When disabled, the decal has no metallic effect.");
-            public static GUIContent affectAmbientOcclusionText = new GUIContent("Affect Ambient Occlusion", "When enabled, this decal uses the smoothness channel of its Mask Map. When disabled, the decal has no smoothness effect.");
-            public static GUIContent affectSmoothnessText = new GUIContent("Affect Smoothness", "When enabled, this decal uses the ambient occlusion channel of its Mask Map. When disabled, the decal has no ambient occlusion effect.");
-            public static GUIContent affectEmissionText = new GUIContent("Affect Emission", "When enabled, this decal becomes emissive and appears self-illuminated. Affect Emission does not support Affects Transparent option on Decal Projector.");
-            public static GUIContent supportLodCrossFadeText = new GUIContent("Support LOD CrossFade", "When enabled, this decal material supports LOD Cross fade if use on a Mesh.");
+            public static GUIContent affectAlbedoText = new GUIContent(
+                "Affect BaseColor",
+                "When enabled, this decal uses its base color. When disabled, the decal has no base color effect."
+            );
+            public static GUIContent affectNormalText = new GUIContent(
+                "Affect Normal",
+                "When enabled, this decal uses its normal. When disabled, the decal has no normal effect."
+            );
+            public static GUIContent affectNormalBlendText = new GUIContent(
+                "Affect Normal Blend",
+                "When enabled, this decal uses its normal blending. When disabled, the decal has no normal blending effect."
+            );
+            public static GUIContent affectMetalText = new GUIContent(
+                "Affect Metal",
+                "When enabled, this decal uses the metallic channel of its Mask Map. When disabled, the decal has no metallic effect."
+            );
+            public static GUIContent affectAmbientOcclusionText = new GUIContent(
+                "Affect Ambient Occlusion",
+                "When enabled, this decal uses the smoothness channel of its Mask Map. When disabled, the decal has no smoothness effect."
+            );
+            public static GUIContent affectSmoothnessText = new GUIContent(
+                "Affect Smoothness",
+                "When enabled, this decal uses the ambient occlusion channel of its Mask Map. When disabled, the decal has no ambient occlusion effect."
+            );
+            public static GUIContent affectEmissionText = new GUIContent(
+                "Affect Emission",
+                "When enabled, this decal becomes emissive and appears self-illuminated. Affect Emission does not support Affects Transparent option on Decal Projector."
+            );
+            public static GUIContent supportLodCrossFadeText = new GUIContent(
+                "Support LOD CrossFade",
+                "When enabled, this decal material supports LOD Cross fade if use on a Mesh."
+            );
         }
 
         private const string kMaterial = "Material";
@@ -75,10 +99,17 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             base.Setup(ref context);
             context.AddAssetDependency(kSourceCodeGuid, AssetCollection.Flags.SourceDependency);
-            context.AddCustomEditorForRenderPipeline("UnityEditor.Rendering.Universal.DecalShaderGraphGUI", typeof(UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)); // TODO: This should be owned by URP
+            context.AddCustomEditorForRenderPipeline(
+                "UnityEditor.Rendering.Universal.DecalShaderGraphGUI",
+                typeof(UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)
+            ); // TODO: This should be owned by URP
 
             {
-                SubShaderDescriptor subShader = SubShaders.Decal(decalData.supportLodCrossFade ? $"{UnityEditor.ShaderGraph.DisableBatching.LODFading}" : $"{UnityEditor.ShaderGraph.DisableBatching.False}");
+                SubShaderDescriptor subShader = SubShaders.Decal(
+                    decalData.supportLodCrossFade
+                        ? $"{UnityEditor.ShaderGraph.DisableBatching.LODFading}"
+                        : $"{UnityEditor.ShaderGraph.DisableBatching.False}"
+                );
 
                 var passes = new PassCollection();
                 foreach (var pass in subShader.passes)
@@ -97,8 +128,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
         private void CollectPassRenderState(ref PassDescriptor pass)
         {
-            if (pass.lightMode == DecalShaderPassNames.DecalGBufferProjector ||
-                pass.lightMode == DecalShaderPassNames.DecalGBufferMesh)
+            if (
+                pass.lightMode == DecalShaderPassNames.DecalGBufferProjector
+                || pass.lightMode == DecalShaderPassNames.DecalGBufferMesh
+            )
             {
                 // Make copy to avoid overwriting static
                 pass.renderStates = new RenderStateCollection() { pass.renderStates };
@@ -119,8 +152,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 pass.renderStates.Add(RenderState.ColorMask("ColorMask RGB 3"));
             }
 
-            if (pass.lightMode == DecalShaderPassNames.DBufferProjector ||
-                pass.lightMode == DecalShaderPassNames.DBufferMesh)
+            if (
+                pass.lightMode == DecalShaderPassNames.DBufferProjector
+                || pass.lightMode == DecalShaderPassNames.DBufferMesh
+            )
             {
                 // Make copy to avoid overwriting static
                 pass.renderStates = new RenderStateCollection() { pass.renderStates };
@@ -153,16 +188,18 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             drawOrder.value = 0;
             collector.AddShaderProperty(drawOrder);
 
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                overrideReferenceName = "_DecalMeshBiasType",
-                displayName = "DecalMesh BiasType",
-                floatType = FloatType.Enum,
-                value = (int)DecalMeshDepthBiasType.DepthBias,
-                enumNames = { "Depth Bias", "View Bias" },
-                enumValues = { (int)DecalMeshDepthBiasType.DepthBias, (int)DecalMeshDepthBiasType.ViewBias },
-                hidden = true
-            });
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    overrideReferenceName = "_DecalMeshBiasType",
+                    displayName = "DecalMesh BiasType",
+                    floatType = FloatType.Enum,
+                    value = (int)DecalMeshDepthBiasType.DepthBias,
+                    enumNames = { "Depth Bias", "View Bias" },
+                    enumValues = { (int)DecalMeshDepthBiasType.DepthBias, (int)DecalMeshDepthBiasType.ViewBias },
+                    hidden = true,
+                }
+            );
 
             Vector1ShaderProperty decalMeshDepthBias = new Vector1ShaderProperty();
             decalMeshDepthBias.overrideReferenceName = "_DecalMeshDepthBias";
@@ -200,8 +237,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             context.AddField(AffectsNormalBlend, decalData.affectsNormalBlend);
             context.AddField(AffectsMAOS, decalData.affectsMAOS);
             context.AddField(AffectsEmission, decalData.affectsEmission);
-            context.AddField(AffectsDBuffer, decalData.affectsAlbedo || decalData.affectsNormal || decalData.affectsMAOS);
-            context.AddField(DecalDefault, decalData.affectsAlbedo || decalData.affectsNormal || decalData.affectsMAOS || decalData.affectsEmission);
+            context.AddField(
+                AffectsDBuffer,
+                decalData.affectsAlbedo || decalData.affectsNormal || decalData.affectsMAOS
+            );
+            context.AddField(
+                DecalDefault,
+                decalData.affectsAlbedo || decalData.affectsNormal || decalData.affectsMAOS || decalData.affectsEmission
+            );
             context.AddField(Fields.LodCrossFade, decalData.supportLodCrossFade);
             context.AddField(AngleFade, decalData.angleFade);
         }
@@ -215,9 +258,15 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
             // Decal
             context.AddBlock(BlockFields.SurfaceDescription.BaseColor, decalData.affectsAlbedo);
-            context.AddBlock(BlockFields.SurfaceDescription.Alpha, decalData.affectsAlbedo || decalData.affectsEmission);
+            context.AddBlock(
+                BlockFields.SurfaceDescription.Alpha,
+                decalData.affectsAlbedo || decalData.affectsEmission
+            );
             context.AddBlock(BlockFields.SurfaceDescription.NormalTS, decalData.affectsNormal);
-            context.AddBlock(UniversalBlockFields.SurfaceDescription.NormalAlpha, decalData.affectsNormal && decalData.affectsNormalBlend);
+            context.AddBlock(
+                UniversalBlockFields.SurfaceDescription.NormalAlpha,
+                decalData.affectsNormal && decalData.affectsNormalBlend
+            );
             context.AddBlock(BlockFields.SurfaceDescription.Metallic, decalData.affectsMAOS);
             context.AddBlock(BlockFields.SurfaceDescription.Occlusion, decalData.affectsMAOS);
             context.AddBlock(BlockFields.SurfaceDescription.Smoothness, decalData.affectsMAOS);
@@ -225,79 +274,111 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             context.AddBlock(BlockFields.SurfaceDescription.Emission, decalData.affectsEmission);
         }
 
-        public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public override void GetPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
-            context.AddProperty("Affect BaseColor", new Toggle() { value = decalData.affectsAlbedo }, (evt) =>
-            {
-                if (Equals(decalData.affectsAlbedo, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Affect BaseColor",
+                new Toggle() { value = decalData.affectsAlbedo },
+                (evt) =>
+                {
+                    if (Equals(decalData.affectsAlbedo, evt.newValue))
+                        return;
 
-                registerUndo("Change Affect BaseColor");
-                decalData.affectsAlbedo = (bool)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Affect BaseColor");
+                    decalData.affectsAlbedo = (bool)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Affect Normal", new Toggle() { value = decalData.affectsNormal }, (evt) =>
-            {
-                if (Equals(decalData.affectsNormal, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Affect Normal",
+                new Toggle() { value = decalData.affectsNormal },
+                (evt) =>
+                {
+                    if (Equals(decalData.affectsNormal, evt.newValue))
+                        return;
 
-                registerUndo("Change Affects Normal");
-                decalData.affectsNormal = (bool)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Affects Normal");
+                    decalData.affectsNormal = (bool)evt.newValue;
+                    onChange();
+                }
+            );
 
             context.globalIndentLevel++;
-            context.AddProperty("Blend", new Toggle() { value = decalData.affectsNormalBlend }, (evt) =>
-            {
-                if (Equals(decalData.affectsNormalBlend, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Blend",
+                new Toggle() { value = decalData.affectsNormalBlend },
+                (evt) =>
+                {
+                    if (Equals(decalData.affectsNormalBlend, evt.newValue))
+                        return;
 
-                registerUndo("Change Affects Normal Blend");
-                decalData.affectsNormalBlend = (bool)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Affects Normal Blend");
+                    decalData.affectsNormalBlend = (bool)evt.newValue;
+                    onChange();
+                }
+            );
             context.globalIndentLevel--;
 
-            context.AddProperty("Affect MAOS", new Toggle() { value = decalData.affectsMAOS }, (evt) =>
-            {
-                if (Equals(decalData.affectsMAOS, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Affect MAOS",
+                new Toggle() { value = decalData.affectsMAOS },
+                (evt) =>
+                {
+                    if (Equals(decalData.affectsMAOS, evt.newValue))
+                        return;
 
-                registerUndo("Change Affect MAOS");
-                decalData.affectsMAOS = (bool)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Affect MAOS");
+                    decalData.affectsMAOS = (bool)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Affect Emission", new Toggle() { value = decalData.affectsEmission }, (evt) =>
-            {
-                if (Equals(decalData.affectsEmission, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Affect Emission",
+                new Toggle() { value = decalData.affectsEmission },
+                (evt) =>
+                {
+                    if (Equals(decalData.affectsEmission, evt.newValue))
+                        return;
 
-                registerUndo("Change Affect Emission");
-                decalData.affectsEmission = (bool)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Affect Emission");
+                    decalData.affectsEmission = (bool)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Supports LOD Cross Fade", new Toggle() { value = decalData.supportLodCrossFade }, (evt) =>
-            {
-                if (Equals(decalData.supportLodCrossFade, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Supports LOD Cross Fade",
+                new Toggle() { value = decalData.supportLodCrossFade },
+                (evt) =>
+                {
+                    if (Equals(decalData.supportLodCrossFade, evt.newValue))
+                        return;
 
-                registerUndo("Change Supports LOD Cross Fade");
-                decalData.supportLodCrossFade = (bool)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Supports LOD Cross Fade");
+                    decalData.supportLodCrossFade = (bool)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Angle Fade", new Toggle() { value = decalData.angleFade }, (evt) =>
-            {
-                if (Equals(decalData.angleFade, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Angle Fade",
+                new Toggle() { value = decalData.angleFade },
+                (evt) =>
+                {
+                    if (Equals(decalData.angleFade, evt.newValue))
+                        return;
 
-                registerUndo("Change Angle Fade");
-                decalData.angleFade = (bool)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Angle Fade");
+                    decalData.angleFade = (bool)evt.newValue;
+                    onChange();
+                }
+            );
         }
 
         #region SubShader
@@ -332,6 +413,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         static class DecalPasses
         {
             public static PassDescriptor ScenePicking = GetScenePicking(DecalPragmas.Instanced);
+
             public static PassDescriptor GetScenePicking(PragmaCollection pragma)
             {
                 return new PassDescriptor
@@ -409,7 +491,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = DecalIncludes.DBuffer,
             };
 
-            public static PassDescriptor ScreenSpaceProjector = GetScreenSpaceProjector(DecalPragmas.ScreenSpace, DecalKeywords.ScreenSpaceProjector);
+            public static PassDescriptor ScreenSpaceProjector = GetScreenSpaceProjector(
+                DecalPragmas.ScreenSpace,
+                DecalKeywords.ScreenSpaceProjector
+            );
 
             public static PassDescriptor GetScreenSpaceProjector(PragmaCollection pragma, KeywordCollection keywords)
             {
@@ -524,7 +609,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = DecalIncludes.DBuffer,
             };
 
-            public static PassDescriptor ScreenSpaceMesh = GetScreenSpaceMesh(DecalPragmas.ScreenSpace, DecalKeywords.ScreenSpaceMesh);
+            public static PassDescriptor ScreenSpaceMesh = GetScreenSpaceMesh(
+                DecalPragmas.ScreenSpace,
+                DecalKeywords.ScreenSpaceMesh
+            );
 
             public static PassDescriptor GetScreenSpaceMesh(PragmaCollection pragma, KeywordCollection keywords)
             {
@@ -615,7 +703,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 BlockFields.SurfaceDescription.Metallic,
                 BlockFields.SurfaceDescription.Occlusion,
                 BlockFields.SurfaceDescription.Smoothness,
-
                 UniversalBlockFields.SurfaceDescription.MAOSAlpha,
                 BlockFields.SurfaceDescription.Emission,
             };
@@ -645,7 +732,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 UniversalStructFields.Varyings.sh,
                 UniversalStructFields.Varyings.probeOcclusion,
                 UniversalStructFields.Varyings.fogFactorAndVertexLight, // fog and vertex lighting, vert input is dependency
-                UniversalStructFields.Varyings.shadowCoord,             // shadow coord, vert input is dependency
+                UniversalStructFields.Varyings.shadowCoord, // shadow coord, vert input is dependency
             };
 
             public static FieldCollection GBufferProjector = new FieldCollection()
@@ -655,7 +742,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 UniversalStructFields.Varyings.dynamicLightmapUV,
                 UniversalStructFields.Varyings.sh,
                 UniversalStructFields.Varyings.probeOcclusion,
-                UniversalStructFields.Varyings.shadowCoord,             // shadow coord, vert input is dependency
+                UniversalStructFields.Varyings.shadowCoord, // shadow coord, vert input is dependency
             };
 
             public static FieldCollection ScreenSpaceMesh = new FieldCollection()
@@ -673,7 +760,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 UniversalStructFields.Varyings.sh,
                 UniversalStructFields.Varyings.probeOcclusion,
                 UniversalStructFields.Varyings.fogFactorAndVertexLight, // fog and vertex lighting, vert input is dependency
-                UniversalStructFields.Varyings.shadowCoord,             // shadow coord, vert input is dependency
+                UniversalStructFields.Varyings.shadowCoord, // shadow coord, vert input is dependency
             };
         }
         #endregion
@@ -693,13 +780,13 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region RenderStates
         static class DecalRenderStates
         {
-            private readonly static string[] s_DBufferBlends = new string[]
+            private static readonly string[] s_DBufferBlends = new string[]
             {
                 "Blend 0 SrcAlpha OneMinusSrcAlpha, Zero OneMinusSrcAlpha",
                 "Blend 1 SrcAlpha OneMinusSrcAlpha, Zero OneMinusSrcAlpha",
                 "Blend 2 SrcAlpha OneMinusSrcAlpha, Zero OneMinusSrcAlpha",
             };
-            private readonly static string[] s_GBufferBlends = new string[]
+            private static readonly string[] s_GBufferBlends = new string[]
             {
                 "Blend 0 SrcAlpha OneMinusSrcAlpha",
                 "Blend 1 SrcAlpha OneMinusSrcAlpha",
@@ -887,7 +974,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { Descriptors.AffectsNormal, 1, new FieldCondition(AffectsNormal, true) },
                 { Descriptors.AffectsNormalBlend, 1, new FieldCondition(AffectsNormalBlend, true) },
                 { Descriptors.AffectsMAOS, 1, new FieldCondition(AffectsMAOS, true) },
-                { Descriptors.AngleFade, 1, new FieldCondition(AngleFade, true) }
+                { Descriptors.AngleFade, 1, new FieldCondition(AngleFade, true) },
             };
 
             public static DefineCollection ProjectorEmission = new DefineCollection
@@ -908,7 +995,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { Descriptors.AffectsNormal, 1, new FieldCondition(AffectsNormal, true) },
                 { Descriptors.AffectsNormalBlend, 1, new FieldCondition(AffectsNormalBlend, true) },
                 { Descriptors.AffectsMAOS, 1, new FieldCondition(AffectsMAOS, true) },
-                { CoreKeywordDescriptors.UseUnityCrossFade, 1, new FieldCondition(Fields.LodCrossFade, true) }
+                { CoreKeywordDescriptors.UseUnityCrossFade, 1, new FieldCondition(Fields.LodCrossFade, true) },
             };
 
             public static DefineCollection MeshEmission = new DefineCollection
@@ -922,7 +1009,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { Descriptors.AffectsEmission, 1, new FieldCondition(AffectsEmission, true) },
             };
 
-            public static DefineCollection ScenePicking = new DefineCollection { { Descriptors.ScenePickingPass, 1 }, };
+            public static DefineCollection ScenePicking = new DefineCollection { { Descriptors.ScenePickingPass, 1 } };
         }
         #endregion
 
@@ -943,7 +1030,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                         new KeywordEntry() { displayName = "LOW", referenceName = "LOW" },
                         new KeywordEntry() { displayName = "MEDIUM", referenceName = "MEDIUM" },
                         new KeywordEntry() { displayName = "HIGH", referenceName = "HIGH" },
-                    }
+                    },
                 };
 
                 public static readonly KeywordDescriptor DecalLayers = new KeywordDescriptor()
@@ -998,7 +1085,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             {
                 { ScreenSpaceMeshGl },
                 { Descriptors.DecalLayers },
-
             };
 
             public static readonly KeywordCollection ScreenSpaceProjector = new KeywordCollection
@@ -1050,13 +1136,18 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         static class DecalIncludes
         {
             const string kDecalInput = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DecalInput.hlsl";
-            const string kShaderVariablesDecal = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderVariablesDecal.hlsl";
-            const string kPassDecal = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPassDecal.hlsl";
-            const string kShaderPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl";
-            const string kVaryings = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Varyings.hlsl";
+            const string kShaderVariablesDecal =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderVariablesDecal.hlsl";
+            const string kPassDecal =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPassDecal.hlsl";
+            const string kShaderPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl";
+            const string kVaryings =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Varyings.hlsl";
             const string kDBuffer = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DBuffer.hlsl";
             const string kGBuffer = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutput.hlsl";
-            const string kLODCrossFade = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/LODCrossFade.hlsl";
+            const string kLODCrossFade =
+                "Packages/com.unity.render-pipelines.universal/ShaderLibrary/LODCrossFade.hlsl";
 
             public static IncludeCollection DecalPregraph = new IncludeCollection
             {
@@ -1082,7 +1173,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { DecalPregraph },
                 { kDBuffer, IncludeLocation.Pregraph },
                 { kLODCrossFade, IncludeLocation.Pregraph, new FieldCondition(Fields.LodCrossFade, true) },
-
                 // Post-graph
                 { DecalPostgraph },
             };
@@ -1097,7 +1187,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ProbeVolumePregraph },
                 { DecalPregraph },
                 { kLODCrossFade, IncludeLocation.Pregraph, new FieldCondition(Fields.LodCrossFade, true) },
-
                 // Post-graph
                 { DecalPostgraph },
             };
@@ -1113,7 +1202,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { kGBuffer, IncludeLocation.Pregraph },
                 { DecalPregraph },
                 { kLODCrossFade, IncludeLocation.Pregraph, new FieldCondition(Fields.LodCrossFade, true) },
-
                 // Post-graph
                 { DecalPostgraph },
                 { CoreIncludes.GBufferOutputFormat },
@@ -1125,7 +1213,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.CorePregraph },
                 { CoreIncludes.ShaderGraphPregraph },
                 { DecalPregraph },
-
                 // Post-graph
                 { DecalPostgraph },
             };

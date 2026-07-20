@@ -42,13 +42,24 @@ namespace UnityEngine.Experimental.Rendering
             }
         }
 
-        internal void RenderVisibleMeshCustomMaterial(CommandBuffer cmd, float occlusionMeshScale, Material material, MaterialPropertyBlock materialBlock, int shaderPass, bool yFlip = false)
+        internal void RenderVisibleMeshCustomMaterial(
+            CommandBuffer cmd,
+            float occlusionMeshScale,
+            Material material,
+            MaterialPropertyBlock materialBlock,
+            int shaderPass,
+            bool yFlip = false
+        )
         {
             if (IsVisibleMeshSupported())
             {
                 using (new ProfilingScope(cmd, k_VisibleMeshProfilingSampler))
                 {
-                    Vector3 scale = new Vector3(occlusionMeshScale, yFlip ? occlusionMeshScale : -occlusionMeshScale, 1.0f);
+                    Vector3 scale = new Vector3(
+                        occlusionMeshScale,
+                        yFlip ? occlusionMeshScale : -occlusionMeshScale,
+                        1.0f
+                    );
                     Mesh VisMesh = m_Pass.singlePassEnabled ? m_CombinedMesh : m_Pass.GetVisibleMesh(0);
                     cmd.DrawMesh(VisMesh, Matrix4x4.Scale(scale), material, 0, shaderPass, materialBlock);
                 }
@@ -57,7 +68,11 @@ namespace UnityEngine.Experimental.Rendering
 
         internal void UpdateCombinedMesh()
         {
-            if (IsVisibleMeshSupported() && m_Pass.singlePassEnabled && TryGetVisibleMeshCombinedHashCode(out var hashCode))
+            if (
+                IsVisibleMeshSupported()
+                && m_Pass.singlePassEnabled
+                && TryGetVisibleMeshCombinedHashCode(out var hashCode)
+            )
             {
                 if (m_CombinedMesh == null || hashCode != m_CombinedMeshHashCode)
                 {

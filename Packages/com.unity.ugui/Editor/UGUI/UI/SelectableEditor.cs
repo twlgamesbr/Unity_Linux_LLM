@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
+using UnityEditor.AnimatedValues;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor.AnimatedValues;
 
 namespace UnityEditor.UI
 {
@@ -23,11 +23,14 @@ namespace UnityEditor.UI
         SerializedProperty m_AnimTriggerProperty;
         SerializedProperty m_NavigationProperty;
 
-        GUIContent m_VisualizeNavigation = EditorGUIUtility.TrTextContent("Visualize", "Show navigation flows between selectable UI elements.");
+        GUIContent m_VisualizeNavigation = EditorGUIUtility.TrTextContent(
+            "Visualize",
+            "Show navigation flows between selectable UI elements."
+        );
 
-        AnimBool m_ShowColorTint       = new AnimBool();
+        AnimBool m_ShowColorTint = new AnimBool();
         AnimBool m_ShowSpriteTrasition = new AnimBool();
-        AnimBool m_ShowAnimTransition  = new AnimBool();
+        AnimBool m_ShowAnimTransition = new AnimBool();
 
         private static List<SelectableEditor> s_Editors = new List<SelectableEditor>();
         private static bool s_ShowNavigation = false;
@@ -39,14 +42,14 @@ namespace UnityEditor.UI
 
         protected virtual void OnEnable()
         {
-            m_Script                = serializedObject.FindProperty("m_Script");
-            m_InteractableProperty  = serializedObject.FindProperty("m_Interactable");
+            m_Script = serializedObject.FindProperty("m_Script");
+            m_InteractableProperty = serializedObject.FindProperty("m_Interactable");
             m_TargetGraphicProperty = serializedObject.FindProperty("m_TargetGraphic");
-            m_TransitionProperty    = serializedObject.FindProperty("m_Transition");
-            m_ColorBlockProperty    = serializedObject.FindProperty("m_Colors");
-            m_SpriteStateProperty   = serializedObject.FindProperty("m_SpriteState");
-            m_AnimTriggerProperty   = serializedObject.FindProperty("m_AnimationTriggers");
-            m_NavigationProperty    = serializedObject.FindProperty("m_Navigation");
+            m_TransitionProperty = serializedObject.FindProperty("m_Transition");
+            m_ColorBlockProperty = serializedObject.FindProperty("m_Colors");
+            m_SpriteStateProperty = serializedObject.FindProperty("m_SpriteState");
+            m_AnimTriggerProperty = serializedObject.FindProperty("m_AnimationTriggers");
+            m_NavigationProperty = serializedObject.FindProperty("m_Navigation");
 
             m_PropertyPathToExcludeForChildClasses = new[]
             {
@@ -61,9 +64,9 @@ namespace UnityEditor.UI
             };
 
             var trans = GetTransition(m_TransitionProperty);
-            m_ShowColorTint.value       = (trans == Selectable.Transition.ColorTint);
+            m_ShowColorTint.value = (trans == Selectable.Transition.ColorTint);
             m_ShowSpriteTrasition.value = (trans == Selectable.Transition.SpriteSwap);
-            m_ShowAnimTransition.value  = (trans == Selectable.Transition.Animation);
+            m_ShowAnimTransition.value = (trans == Selectable.Transition.Animation);
 
             m_ShowColorTint.valueChanged.AddListener(Repaint);
             m_ShowSpriteTrasition.valueChanged.AddListener(Repaint);
@@ -108,9 +111,15 @@ namespace UnityEditor.UI
                 graphic = (target as Selectable).GetComponent<Graphic>();
 
             var animator = (target as Selectable).GetComponent<Animator>();
-            m_ShowColorTint.target = (!m_TransitionProperty.hasMultipleDifferentValues && trans == Button.Transition.ColorTint);
-            m_ShowSpriteTrasition.target = (!m_TransitionProperty.hasMultipleDifferentValues && trans == Button.Transition.SpriteSwap);
-            m_ShowAnimTransition.target = (!m_TransitionProperty.hasMultipleDifferentValues && trans == Button.Transition.Animation);
+            m_ShowColorTint.target = (
+                !m_TransitionProperty.hasMultipleDifferentValues && trans == Button.Transition.ColorTint
+            );
+            m_ShowSpriteTrasition.target = (
+                !m_TransitionProperty.hasMultipleDifferentValues && trans == Button.Transition.SpriteSwap
+            );
+            m_ShowAnimTransition.target = (
+                !m_TransitionProperty.hasMultipleDifferentValues && trans == Button.Transition.Animation
+            );
 
             EditorGUILayout.PropertyField(m_TransitionProperty);
 
@@ -125,12 +134,18 @@ namespace UnityEditor.UI
                 {
                     case Selectable.Transition.ColorTint:
                         if (graphic == null)
-                            EditorGUILayout.HelpBox("You must have a Graphic target in order to use a color transition.", MessageType.Warning);
+                            EditorGUILayout.HelpBox(
+                                "You must have a Graphic target in order to use a color transition.",
+                                MessageType.Warning
+                            );
                         break;
 
                     case Selectable.Transition.SpriteSwap:
                         if (graphic as Image == null)
-                            EditorGUILayout.HelpBox("You must have a Image target in order to use a sprite swap transition.", MessageType.Warning);
+                            EditorGUILayout.HelpBox(
+                                "You must have a Image target in order to use a sprite swap transition.",
+                                MessageType.Warning
+                            );
                         break;
                 }
 
@@ -156,7 +171,10 @@ namespace UnityEditor.UI
                         buttonRect.xMin += EditorGUIUtility.labelWidth;
                         if (GUI.Button(buttonRect, "Auto Generate Animation", EditorStyles.miniButton))
                         {
-                            var controller = GenerateSelectableAnimatorContoller((target as Selectable).animationTriggers, target as Selectable);
+                            var controller = GenerateSelectableAnimatorContoller(
+                                (target as Selectable).animationTriggers,
+                                target as Selectable
+                            );
                             if (controller != null)
                             {
                                 if (animator == null)
@@ -190,14 +208,14 @@ namespace UnityEditor.UI
             ChildClassPropertiesGUI();
 
             //if the TargetGraphic is changed, reset the outgoing Graphic
-			if (graphic && graphic != m_TargetGraphicProperty.objectReferenceValue)
-			{
-				CanvasRenderer renderer = graphic.GetComponent<CanvasRenderer>();
-				if (renderer != null)
-				{
-					renderer.SetColor(Color.white);
-				}
-			}
+            if (graphic && graphic != m_TargetGraphicProperty.objectReferenceValue)
+            {
+                CanvasRenderer renderer = graphic.GetComponent<CanvasRenderer>();
+                if (renderer != null)
+                {
+                    renderer.SetColor(Color.white);
+                }
+            }
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -218,7 +236,10 @@ namespace UnityEditor.UI
             return GetType() != typeof(SelectableEditor);
         }
 
-        private static Animations.AnimatorController GenerateSelectableAnimatorContoller(AnimationTriggers animationTriggers, Selectable target)
+        private static Animations.AnimatorController GenerateSelectableAnimatorContoller(
+            AnimationTriggers animationTriggers,
+            Selectable target
+        )
         {
             if (target == null)
                 return null;
@@ -229,11 +250,21 @@ namespace UnityEditor.UI
                 return null;
 
             // figure out clip names
-            var normalName = string.IsNullOrEmpty(animationTriggers.normalTrigger) ? "Normal" : animationTriggers.normalTrigger;
-            var highlightedName = string.IsNullOrEmpty(animationTriggers.highlightedTrigger) ? "Highlighted" : animationTriggers.highlightedTrigger;
-            var pressedName = string.IsNullOrEmpty(animationTriggers.pressedTrigger) ? "Pressed" : animationTriggers.pressedTrigger;
-            var selectedName = string.IsNullOrEmpty(animationTriggers.selectedTrigger) ? "Selected" : animationTriggers.selectedTrigger;
-            var disabledName = string.IsNullOrEmpty(animationTriggers.disabledTrigger) ? "Disabled" : animationTriggers.disabledTrigger;
+            var normalName = string.IsNullOrEmpty(animationTriggers.normalTrigger)
+                ? "Normal"
+                : animationTriggers.normalTrigger;
+            var highlightedName = string.IsNullOrEmpty(animationTriggers.highlightedTrigger)
+                ? "Highlighted"
+                : animationTriggers.highlightedTrigger;
+            var pressedName = string.IsNullOrEmpty(animationTriggers.pressedTrigger)
+                ? "Pressed"
+                : animationTriggers.pressedTrigger;
+            var selectedName = string.IsNullOrEmpty(animationTriggers.selectedTrigger)
+                ? "Selected"
+                : animationTriggers.selectedTrigger;
+            var disabledName = string.IsNullOrEmpty(animationTriggers.disabledTrigger)
+                ? "Disabled"
+                : animationTriggers.disabledTrigger;
 
             // Create controller and hook up transitions.
             var controller = Animations.AnimatorController.CreateAnimatorControllerAtPath(path);
@@ -262,12 +293,20 @@ namespace UnityEditor.UI
             var highlightedKeys = new[] { new Keyframe(0f, 1f), new Keyframe(0.5f, 1.1f), new Keyframe(1f, 1f) };
             var highlightedCurve = new AnimationCurve(highlightedKeys);
             foreach (var channel in channels)
-                AnimationUtility.SetEditorCurve(highlightedClip, EditorCurveBinding.FloatCurve(animationPath, typeof(Transform), channel), highlightedCurve);
+                AnimationUtility.SetEditorCurve(
+                    highlightedClip,
+                    EditorCurveBinding.FloatCurve(animationPath, typeof(Transform), channel),
+                    highlightedCurve
+                );
 
             var pressedKeys = new[] { new Keyframe(0f, 1.15f) };
             var pressedCurve = new AnimationCurve(pressedKeys);
             foreach (var channel in channels)
-                AnimationUtility.SetEditorCurve(pressedClip, EditorCurveBinding.FloatCurve(animationPath, typeof(Transform), channel), pressedCurve);
+                AnimationUtility.SetEditorCurve(
+                    pressedClip,
+                    EditorCurveBinding.FloatCurve(animationPath, typeof(Transform), channel),
+                    pressedCurve
+                );
         }
 
         private static string BuildAnimationPath(Selectable target)
@@ -303,7 +342,10 @@ namespace UnityEditor.UI
             return animPath.ToString();
         }
 
-        private static AnimationClip GenerateTriggerableTransition(string name, Animations.AnimatorController controller)
+        private static AnimationClip GenerateTriggerableTransition(
+            string name,
+            Animations.AnimatorController controller
+        )
         {
             // Create the clip
             var clip = Animations.AnimatorController.AllocateAnimatorClip(name);
@@ -365,7 +407,9 @@ namespace UnityEditor.UI
             Transform toTransform = toObj.transform;
 
             Vector2 sideDir = new Vector2(direction.y, -direction.x);
-            Vector3 fromPoint = fromTransform.TransformPoint(GetPointOnRectEdge(fromTransform as RectTransform, direction));
+            Vector3 fromPoint = fromTransform.TransformPoint(
+                GetPointOnRectEdge(fromTransform as RectTransform, direction)
+            );
             Vector3 toPoint = toTransform.TransformPoint(GetPointOnRectEdge(toTransform as RectTransform, -direction));
             float fromSize = HandleUtility.GetHandleSize(fromPoint) * 0.05f;
             float toSize = HandleUtility.GetHandleSize(toPoint) * 0.05f;
@@ -375,9 +419,25 @@ namespace UnityEditor.UI
             Vector3 fromTangent = fromTransform.rotation * direction * length * 0.3f;
             Vector3 toTangent = toTransform.rotation * -direction * length * 0.3f;
 
-            Handles.DrawBezier(fromPoint, toPoint, fromPoint + fromTangent, toPoint + toTangent, Handles.color, null, kArrowThickness);
-            Handles.DrawAAPolyLine(kArrowThickness, toPoint, toPoint + toTransform.rotation * (-direction - sideDir) * toSize * kArrowHeadSize);
-            Handles.DrawAAPolyLine(kArrowThickness, toPoint, toPoint + toTransform.rotation * (-direction + sideDir) * toSize * kArrowHeadSize);
+            Handles.DrawBezier(
+                fromPoint,
+                toPoint,
+                fromPoint + fromTangent,
+                toPoint + toTangent,
+                Handles.color,
+                null,
+                kArrowThickness
+            );
+            Handles.DrawAAPolyLine(
+                kArrowThickness,
+                toPoint,
+                toPoint + toTransform.rotation * (-direction - sideDir) * toSize * kArrowHeadSize
+            );
+            Handles.DrawAAPolyLine(
+                kArrowThickness,
+                toPoint,
+                toPoint + toTransform.rotation * (-direction + sideDir) * toSize * kArrowHeadSize
+            );
         }
 
         private static Vector3 GetPointOnRectEdge(RectTransform rect, Vector2 dir)

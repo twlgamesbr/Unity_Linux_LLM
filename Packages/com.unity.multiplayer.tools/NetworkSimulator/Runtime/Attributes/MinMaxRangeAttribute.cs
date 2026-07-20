@@ -11,14 +11,17 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
         /// The min value
         /// </summary>
         public readonly float Min;
+
         /// <summary>
         /// The max value
         /// </summary>
         public readonly float Max;
+
         /// <summary>
-        /// If rounding to int is wanted, set to true 
+        /// If rounding to int is wanted, set to true
         /// </summary>
         public readonly bool RoundToInt = false;
+
         /// <summary>
         /// Constructor for the Attribute, default is a float range
         /// </summary>

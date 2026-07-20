@@ -16,10 +16,15 @@ namespace Unity.Networking.Transport.Relay
         // public fixed byte ConnectionData[k_ConnectionDataLength];
         // public fixed byte HMAC[k_HMACLength];
 
-        public static unsafe void Write(DataStreamWriter writer, byte acceptMode, ushort nonce, byte* connectionDataPtr, byte* hmac)
+        public static unsafe void Write(
+            DataStreamWriter writer,
+            byte acceptMode,
+            ushort nonce,
+            byte* connectionDataPtr,
+            byte* hmac
+        )
         {
             var header = RelayMessageHeader.Create(RelayMessageType.Bind);
-
 
             writer.WriteBytesUnsafe((byte*)&header, RelayMessageHeader.k_Length);
             writer.WriteByte(acceptMode);
@@ -37,8 +42,8 @@ namespace Unity.Networking.Transport.Relay
             packetProcessor.AppendToPayload<byte>(k_ConnectionDataLength);
             packetProcessor.AppendToPayload<RelayConnectionData>(serverData.ConnectionData);
 
-            fixed(byte* hmacPtr = serverData.HMAC)
-            packetProcessor.AppendToPayload(hmacPtr, k_HMACLength);
+            fixed (byte* hmacPtr = serverData.HMAC)
+                packetProcessor.AppendToPayload(hmacPtr, k_HMACLength);
         }
     }
 }

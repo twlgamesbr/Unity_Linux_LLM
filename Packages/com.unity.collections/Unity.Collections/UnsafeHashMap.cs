@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Unity.Mathematics;
-using Unity.Jobs;
 using System.Runtime.InteropServices;
+using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
+using Unity.Mathematics;
 
 namespace Unity.Collections.LowLevel.Unsafe
 {
@@ -89,8 +89,17 @@ namespace Unity.Collections.LowLevel.Unsafe
             Allocator = allocator;
             SizeOfTValue = sizeOfValueT;
 
-            long keyOffset, nextOffset, bucketOffset;
-            long totalSize = CalculateDataSize(capacity, BucketCapacity, sizeOfValueT, out keyOffset, out nextOffset, out bucketOffset);
+            long keyOffset,
+                nextOffset,
+                bucketOffset;
+            long totalSize = CalculateDataSize(
+                capacity,
+                BucketCapacity,
+                sizeOfValueT,
+                out keyOffset,
+                out nextOffset,
+                out bucketOffset
+            );
 
             Ptr = (byte*)Memory.Unmanaged.Allocate(totalSize, JobsUtility.CacheLineSize, allocator);
             Keys = (TKey*)(Ptr + keyOffset);
@@ -111,9 +120,19 @@ namespace Unity.Collections.LowLevel.Unsafe
             BucketCapacity = 0;
         }
 
-        internal static HashMapHelper<TKey>* Alloc(int capacity, int sizeOfValueT, int minGrowth, AllocatorManager.AllocatorHandle allocator)
+        internal static HashMapHelper<TKey>* Alloc(
+            int capacity,
+            int sizeOfValueT,
+            int minGrowth,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
-            var data = (HashMapHelper<TKey>*)Memory.Unmanaged.Allocate(sizeof(HashMapHelper<TKey>), UnsafeUtility.AlignOf<HashMapHelper<TKey>>(), allocator);
+            var data = (HashMapHelper<TKey>*)
+                Memory.Unmanaged.Allocate(
+                    sizeof(HashMapHelper<TKey>),
+                    UnsafeUtility.AlignOf<HashMapHelper<TKey>>(),
+                    allocator
+                );
             data->Init(capacity, sizeOfValueT, minGrowth, allocator);
 
             return data;
@@ -123,7 +142,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             if (data == null)
             {
-                throw new InvalidOperationException("Hash based container has yet to be created or has been destroyed!");
+                throw new InvalidOperationException(
+                    "Hash based container has yet to be created or has been destroyed!"
+                );
             }
             data->Dispose();
 
@@ -147,8 +168,17 @@ namespace Unity.Collections.LowLevel.Unsafe
 
         internal void ResizeExact(int newCapacity, int newBucketCapacity)
         {
-            long keyOffset, nextOffset, bucketOffset;
-            long totalSize = CalculateDataSize(newCapacity, newBucketCapacity, SizeOfTValue, out keyOffset, out nextOffset, out bucketOffset);
+            long keyOffset,
+                nextOffset,
+                bucketOffset;
+            long totalSize = CalculateDataSize(
+                newCapacity,
+                newBucketCapacity,
+                SizeOfTValue,
+                out keyOffset,
+                out nextOffset,
+                out bucketOffset
+            );
 
             var oldPtr = Ptr;
             var oldKeys = Keys;
@@ -183,7 +213,14 @@ namespace Unity.Collections.LowLevel.Unsafe
             ResizeExact(capacity, GetBucketSize(capacity));
         }
 
-        internal static long CalculateDataSize(int capacity, int bucketCapacity, int sizeOfTValue, out long outKeyOffset, out long outNextOffset, out long outBucketOffset)
+        internal static long CalculateDataSize(
+            int capacity,
+            int bucketCapacity,
+            int sizeOfTValue,
+            out long outKeyOffset,
+            out long outNextOffset,
+            out long outBucketOffset
+        )
         {
             long sizeOfTKey = sizeof(TKey);
             long sizeOfInt = sizeof(int);
@@ -401,12 +438,13 @@ namespace Unity.Collections.LowLevel.Unsafe
 
         internal NativeArray<TKey> GetKeyArray(AllocatorManager.AllocatorHandle allocator)
         {
-            var result = CollectionHelper.CreateNativeArray<TKey>(Count, allocator, NativeArrayOptions.UninitializedMemory);
+            var result = CollectionHelper.CreateNativeArray<TKey>(
+                Count,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
 
-            for (int i = 0, count = 0, max = result.Length, capacity = BucketCapacity
-                ; i < capacity && count < max
-                ; ++i
-                )
+            for (int i = 0, count = 0, max = result.Length, capacity = BucketCapacity; i < capacity && count < max; ++i)
             {
                 int bucket = Buckets[i];
 
@@ -424,12 +462,13 @@ namespace Unity.Collections.LowLevel.Unsafe
         internal NativeArray<TValue> GetValueArray<TValue>(AllocatorManager.AllocatorHandle allocator)
             where TValue : unmanaged
         {
-            var result = CollectionHelper.CreateNativeArray<TValue>(Count, allocator, NativeArrayOptions.UninitializedMemory);
+            var result = CollectionHelper.CreateNativeArray<TValue>(
+                Count,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
 
-            for (int i = 0, count = 0, max = result.Length, capacity = BucketCapacity
-                ; i < capacity && count < max
-                ; ++i
-                )
+            for (int i = 0, count = 0, max = result.Length, capacity = BucketCapacity; i < capacity && count < max; ++i)
             {
                 int bucket = Buckets[i];
 
@@ -444,15 +483,18 @@ namespace Unity.Collections.LowLevel.Unsafe
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        internal NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays<TValue>(AllocatorManager.AllocatorHandle allocator)
+        internal NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays<TValue>(
+            AllocatorManager.AllocatorHandle allocator
+        )
             where TValue : unmanaged
         {
-            var result = new NativeKeyValueArrays<TKey, TValue>(Count, allocator, NativeArrayOptions.UninitializedMemory);
+            var result = new NativeKeyValueArrays<TKey, TValue>(
+                Count,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
 
-            for (int i = 0, count = 0, max = result.Length, capacity = BucketCapacity
-                ; i < capacity && count < max
-                ; ++i
-                )
+            for (int i = 0, count = 0, max = result.Length, capacity = BucketCapacity; i < capacity && count < max; ++i)
             {
                 int bucket = Buckets[i];
 
@@ -532,7 +574,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             if (capacity > kMaxCapacity)
             {
-                throw new ArgumentException($"Capacity {capacity} value too large. Maximum capacity is {kMaxCapacity}.");
+                throw new ArgumentException(
+                    $"Capacity {capacity} value too large. Maximum capacity is {kMaxCapacity}."
+                );
             }
         }
     }
@@ -545,9 +589,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     [StructLayout(LayoutKind.Sequential)]
     [DebuggerTypeProxy(typeof(UnsafeHashMapDebuggerTypeProxy<,>))]
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-    public unsafe struct UnsafeHashMap<TKey, TValue>
-        : INativeDisposable
-        , IEnumerable<KVPair<TKey, TValue>> // Used by collection initializers.
+    public unsafe struct UnsafeHashMap<TKey, TValue> : INativeDisposable, IEnumerable<KVPair<TKey, TValue>> // Used by collection initializers.
         where TKey : unmanaged, IEquatable<TKey>
         where TValue : unmanaged
     {
@@ -577,7 +619,6 @@ namespace Unity.Collections.LowLevel.Unsafe
 
             m_Data.Dispose();
         }
-
 
         /// <summary>
         /// Creates and schedules a job that will dispose this hash map.
@@ -753,7 +794,6 @@ namespace Unity.Collections.LowLevel.Unsafe
 
                 return result;
             }
-
             set
             {
                 var idx = m_Data.Find(key);
@@ -772,14 +812,16 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>An array with a copy of all this hash map's keys (in no particular order).</returns>
-        public NativeArray<TKey> GetKeyArray(AllocatorManager.AllocatorHandle allocator) => m_Data.GetKeyArray(allocator);
+        public NativeArray<TKey> GetKeyArray(AllocatorManager.AllocatorHandle allocator) =>
+            m_Data.GetKeyArray(allocator);
 
         /// <summary>
         /// Returns an array with a copy of all this hash map's values (in no particular order).
         /// </summary>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>An array with a copy of all this hash map's values (in no particular order).</returns>
-        public NativeArray<TValue> GetValueArray(AllocatorManager.AllocatorHandle allocator) => m_Data.GetValueArray<TValue>(allocator);
+        public NativeArray<TValue> GetValueArray(AllocatorManager.AllocatorHandle allocator) =>
+            m_Data.GetValueArray<TValue>(allocator);
 
         /// <summary>
         /// Returns a NativeKeyValueArrays with a copy of all this hash map's keys and values.
@@ -787,7 +829,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <remarks>The key-value pairs are copied in no particular order. For all `i`, `Values[i]` will be the value associated with `Keys[i]`.</remarks>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>A NativeKeyValueArrays with a copy of all this hash map's keys and values.</returns>
-        public NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays(AllocatorManager.AllocatorHandle allocator) => m_Data.GetKeyValueArrays<TValue>(allocator);
+        public NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays(AllocatorManager.AllocatorHandle allocator) =>
+            m_Data.GetKeyValueArrays<TValue>(allocator);
 
         /// <summary>
         /// Returns an enumerator over the key-value pairs of this hash map.
@@ -880,8 +923,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// A read-only alias for the value of a UnsafeHashMap. Does not have its own allocated storage.
         /// </summary>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public struct ReadOnly
-            : IEnumerable<KVPair<TKey, TValue>>
+        public struct ReadOnly : IEnumerable<KVPair<TKey, TValue>>
         {
             [NativeDisableUnsafePtrRestriction]
             internal HashMapHelper<TKey> m_Data;
@@ -971,14 +1013,16 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// </summary>
             /// <param name="allocator">The allocator to use.</param>
             /// <returns>An array with a copy of all this hash map's keys (in no particular order).</returns>
-            public readonly NativeArray<TKey> GetKeyArray(AllocatorManager.AllocatorHandle allocator) => m_Data.GetKeyArray(allocator);
+            public readonly NativeArray<TKey> GetKeyArray(AllocatorManager.AllocatorHandle allocator) =>
+                m_Data.GetKeyArray(allocator);
 
             /// <summary>
             /// Returns an array with a copy of all this hash map's values (in no particular order).
             /// </summary>
             /// <param name="allocator">The allocator to use.</param>
             /// <returns>An array with a copy of all this hash map's values (in no particular order).</returns>
-            public readonly NativeArray<TValue> GetValueArray(AllocatorManager.AllocatorHandle allocator) => m_Data.GetValueArray<TValue>(allocator);
+            public readonly NativeArray<TValue> GetValueArray(AllocatorManager.AllocatorHandle allocator) =>
+                m_Data.GetValueArray<TValue>(allocator);
 
             /// <summary>
             /// Returns a NativeKeyValueArrays with a copy of all this hash map's keys and values.
@@ -986,7 +1030,9 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <remarks>The key-value pairs are copied in no particular order. For all `i`, `Values[i]` will be the value associated with `Keys[i]`.</remarks>
             /// <param name="allocator">The allocator to use.</param>
             /// <returns>A NativeKeyValueArrays with a copy of all this hash map's keys and values.</returns>
-            public readonly NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays(AllocatorManager.AllocatorHandle allocator) => m_Data.GetKeyValueArrays<TValue>(allocator);
+            public readonly NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays(
+                AllocatorManager.AllocatorHandle allocator
+            ) => m_Data.GetKeyValueArrays<TValue>(allocator);
 
             /// <summary>
             /// Returns an enumerator over the key-value pairs of this hash map.
@@ -1036,7 +1082,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         void ThrowAtMaxCapacity()
         {
-            throw new InvalidOperationException($"Capacity is insufficient, and resize would fail (Capacity {Capacity} / {MaxCapacity}, Count {Count})!");
+            throw new InvalidOperationException(
+                $"Capacity is insufficient, and resize would fail (Capacity {Capacity} / {MaxCapacity}, Count {Count})!"
+            );
         }
     }
 

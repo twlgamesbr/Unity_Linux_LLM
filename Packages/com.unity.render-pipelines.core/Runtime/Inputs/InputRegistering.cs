@@ -7,14 +7,16 @@ namespace UnityEngine
 #if UNITY_EDITOR
     using UnityEditor;
 
-    [Obsolete("This class is only needed with InputManager which is a legacy system. This class is not used with Input System. #from(6000.5)")]
+    [Obsolete(
+        "This class is only needed with InputManager which is a legacy system. This class is not used with Input System. #from(6000.5)"
+    )]
     public class InputManagerEntry
     {
         public enum Kind
         {
             KeyOrButton,
             Mouse,
-            Axis
+            Axis,
         }
 
         public enum Axis
@@ -26,14 +28,14 @@ namespace UnityEngine
             Fifth,
             Sixth,
             Seventh,
-            Eigth
+            Eigth,
         }
 
         public enum Joy
         {
             All,
             First,
-            Second
+            Second,
         }
 
         public string name = "";
@@ -52,7 +54,9 @@ namespace UnityEngine
         public Joy joystick = Joy.All;
     }
 
-    [Obsolete("This class is only needed with InputManager which is a legacy system. This class is not used with Input System. #from(6000.5)")]
+    [Obsolete(
+        "This class is only needed with InputManager which is a legacy system. This class is not used with Input System. #from(6000.5)"
+    )]
     public static class InputRegistering
     {
         static void CopyEntry(SerializedProperty spAxis, InputManagerEntry entry)
@@ -91,14 +95,22 @@ namespace UnityEngine
         static List<(string name, InputManagerEntry.Kind kind)> GetCachedInputs(SerializedProperty spAxes)
         {
             int size = spAxes.arraySize;
-            List<(string name, InputManagerEntry.Kind kind)> result = new List<(string name, InputManagerEntry.Kind kind)>(size);
+            List<(string name, InputManagerEntry.Kind kind)> result = new List<(
+                string name,
+                InputManagerEntry.Kind kind
+            )>(size);
 
             if (size == 0)
                 return result;
 
             SerializedProperty spAxis = spAxes.GetArrayElementAtIndex(0);
             for (int i = 0; i < size; ++i, spAxis.Next(false))
-                result.Add((spAxis.FindPropertyRelative("m_Name").stringValue, (InputManagerEntry.Kind)spAxis.FindPropertyRelative("type").intValue));
+                result.Add(
+                    (
+                        spAxis.FindPropertyRelative("m_Name").stringValue,
+                        (InputManagerEntry.Kind)spAxis.FindPropertyRelative("type").intValue
+                    )
+                );
             return result;
         }
 
@@ -110,10 +122,15 @@ namespace UnityEngine
                 .ToList();
         }
 
-        internal static List<InputManagerEntry> GetEntriesWithoutAlreadyRegistered(List<InputManagerEntry> entries, List<(string name, InputManagerEntry.Kind kind)> cachedEntries)
+        internal static List<InputManagerEntry> GetEntriesWithoutAlreadyRegistered(
+            List<InputManagerEntry> entries,
+            List<(string name, InputManagerEntry.Kind kind)> cachedEntries
+        )
         {
             return entries
-                .Where(entry => !cachedEntries.Any(cachedEntry => cachedEntry.name == entry.name && cachedEntry.kind == entry.kind))
+                .Where(entry =>
+                    !cachedEntries.Any(cachedEntry => cachedEntry.name == entry.name && cachedEntry.kind == entry.kind)
+                )
                 .ToList();
         }
 

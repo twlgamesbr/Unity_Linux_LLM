@@ -1,17 +1,15 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEditor.EventSystems;
 using UnityEditor.Presets;
 using UnityEditor.SceneManagement;
-using UnityEditor.EventSystems;
-using UnityEngine.UI;
+using UnityEngine;
 using UnityEngine.EventSystems;
-
+using UnityEngine.UI;
 
 namespace TMPro.EditorUtilities
 {
     public static class TMPro_CreateObjectMenu
     {
-
         /// <summary>
         /// Create a TextMeshPro object that works with the Mesh Renderer
         /// </summary>
@@ -70,7 +68,6 @@ namespace TMPro.EditorUtilities
             Selection.activeGameObject = go;
         }
 
-
         /// <summary>
         /// Create a TextMeshPro object that works with the CanvasRenderer
         /// </summary>
@@ -127,7 +124,6 @@ namespace TMPro.EditorUtilities
             PlaceUIElementRoot(go, menuCommand);
         }
 
-
         [MenuItem("GameObject/UI (Canvas)/Input Field - TextMeshPro", false, 2037)]
         static void AddTextMeshProInputField(MenuCommand menuCommand)
         {
@@ -135,14 +131,12 @@ namespace TMPro.EditorUtilities
             PlaceUIElementRoot(go, menuCommand);
         }
 
-
         [MenuItem("GameObject/UI (Canvas)/Dropdown - TextMeshPro", false, 2036)]
         public static void AddDropdown(MenuCommand menuCommand)
         {
             GameObject go = TMP_DefaultControls.CreateDropdown(GetStandardResources());
             PlaceUIElementRoot(go, menuCommand);
         }
-
 
         private const string kUILayerName = "UI";
 
@@ -156,14 +150,15 @@ namespace TMPro.EditorUtilities
 
         private static TMP_DefaultControls.Resources s_StandardResources;
 
-
         private static TMP_DefaultControls.Resources GetStandardResources()
         {
             if (s_StandardResources.standard == null)
             {
                 s_StandardResources.standard = AssetDatabase.GetBuiltinExtraResource<Sprite>(kStandardSpritePath);
                 s_StandardResources.background = AssetDatabase.GetBuiltinExtraResource<Sprite>(kBackgroundSpritePath);
-                s_StandardResources.inputField = AssetDatabase.GetBuiltinExtraResource<Sprite>(kInputFieldBackgroundPath);
+                s_StandardResources.inputField = AssetDatabase.GetBuiltinExtraResource<Sprite>(
+                    kInputFieldBackgroundPath
+                );
                 s_StandardResources.knob = AssetDatabase.GetBuiltinExtraResource<Sprite>(kKnobPath);
                 s_StandardResources.checkmark = AssetDatabase.GetBuiltinExtraResource<Sprite>(kCheckmarkPath);
                 s_StandardResources.dropdown = AssetDatabase.GetBuiltinExtraResource<Sprite>(kDropdownArrowPath);
@@ -171,7 +166,6 @@ namespace TMPro.EditorUtilities
             }
             return s_StandardResources;
         }
-
 
         private static void PlaceUIElementRoot(GameObject element, MenuCommand menuCommand)
         {
@@ -242,7 +236,6 @@ namespace TMPro.EditorUtilities
                 SetLayerRecursively(t.GetChild(i).gameObject, layer);
         }
 
-
         public static GameObject CreateNewUI()
         {
             // Root for the UI
@@ -274,12 +267,10 @@ namespace TMPro.EditorUtilities
             return root;
         }
 
-
         private static void CreateEventSystem(bool select)
         {
             CreateEventSystem(select, null);
         }
-
 
         private static void CreateEventSystem(bool select, GameObject parent)
         {
@@ -299,7 +290,6 @@ namespace TMPro.EditorUtilities
                 Selection.activeGameObject = esys.gameObject;
             }
         }
-
 
         // Helper function that returns a Canvas GameObject; preferably a parent of the selection, or other existing Canvas.
         public static GameObject GetOrCreateCanvasGameObject()

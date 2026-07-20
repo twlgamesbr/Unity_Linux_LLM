@@ -35,10 +35,12 @@ namespace Unity.Networking.Transport.TLS
             var bytes = Encoding.ASCII.GetBytes(pem);
 
             if (bytes.Length > MaxLength)
-                throw new ArgumentException($"String is too large to fit in {nameof(FixedPEMString)} (length: {bytes.Length}, capacity: {MaxLength}).");
+                throw new ArgumentException(
+                    $"String is too large to fit in {nameof(FixedPEMString)} (length: {bytes.Length}, capacity: {MaxLength})."
+                );
 
-            fixed(byte* bytesPtr = bytes)
-            fixed(byte* bufferPtr = m_Buffer)
+            fixed (byte* bytesPtr = bytes)
+            fixed (byte* bufferPtr = m_Buffer)
             {
                 UnsafeUtility.MemCpy(bufferPtr, bytesPtr, bytes.Length);
                 bufferPtr[bytes.Length] = (byte)0;
@@ -52,7 +54,7 @@ namespace Unity.Networking.Transport.TLS
         /// <remarks>Will not perform any kind of string validation.</remarks>
         internal FixedPEMString(ref FixedString4096Bytes pem)
         {
-            fixed(byte* bufferPtr = m_Buffer)
+            fixed (byte* bufferPtr = m_Buffer)
             {
                 UnsafeUtility.MemCpy(bufferPtr, pem.GetUnsafePtr(), pem.Length);
                 bufferPtr[pem.Length] = (byte)0;
@@ -65,7 +67,8 @@ namespace Unity.Networking.Transport.TLS
         /// <remarks>Only reliable if the structure itself is already fixed in memory.</remarks>
         internal byte* GetUnsafePtr()
         {
-            fixed(byte* bufferPtr = m_Buffer) return bufferPtr;
+            fixed (byte* bufferPtr = m_Buffer)
+                return bufferPtr;
         }
     }
 }

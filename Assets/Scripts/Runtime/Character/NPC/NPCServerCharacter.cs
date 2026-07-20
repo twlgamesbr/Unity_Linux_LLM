@@ -1,21 +1,20 @@
 using System.Collections.Generic;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Character.NPC
 {
     [RequireComponent(typeof(NetworkObject))]
@@ -33,8 +32,7 @@ namespace NPCSystem.Character.NPC
             NetworkVariableWritePermission.Server
         );
 
-        public string DisplayName =>
-            string.IsNullOrWhiteSpace(npcDisplayName.Value) ? "NPC" : npcDisplayName.Value;
+        public string DisplayName => string.IsNullOrWhiteSpace(npcDisplayName.Value) ? "NPC" : npcDisplayName.Value;
         public string Slug => string.IsNullOrWhiteSpace(npcSlug.Value) ? "npc" : npcSlug.Value;
 
         public override void OnNetworkSpawn()

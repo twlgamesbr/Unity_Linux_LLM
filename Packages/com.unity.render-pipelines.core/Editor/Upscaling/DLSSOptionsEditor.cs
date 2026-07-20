@@ -14,6 +14,7 @@ public class DLSSOptionsEditor : Editor
     private SerializedProperty m_PresetPerformance;
     private SerializedProperty m_PresetUltraPerformance;
     private SerializedProperty m_PresetDLAA;
+
     private void OnEnable()
     {
         // Find each property by its exact field name in DLSSOptions.cs
@@ -28,14 +29,15 @@ public class DLSSOptionsEditor : Editor
 
     #region STYLES
     private static readonly string[] DLSSPerfQualityLabels =
-    {   // should follow enum value ordering in DLSSQuality enum
+    { // should follow enum value ordering in DLSSQuality enum
         DLSSQuality.MaximumPerformance.ToString(),
         DLSSQuality.Balanced.ToString(),
         DLSSQuality.MaximumQuality.ToString(),
         DLSSQuality.UltraPerformance.ToString(),
-        DLSSQuality.DLAA.ToString()
+        DLSSQuality.DLAA.ToString(),
     };
     private static string[][] DLSSPresetOptionsForEachPerfQuality = PopulateDLSSQualityPresetLabels();
+
     private static string[][] PopulateDLSSQualityPresetLabels()
     {
         int CountBits(uint bitMask) // System.Numerics.BitOperations not available
@@ -70,14 +72,18 @@ public class DLSSOptionsEditor : Editor
                 if ((presetBitmask & (uint)preset) != 0)
                 {
                     string presetName = preset.ToString().Replace('_', ' ');
-                    labels[(int)quality][iWrite++] = presetName + " - " + GraphicsDevice.GetDLSSPresetExplanation(preset);
+                    labels[(int)quality][iWrite++] =
+                        presetName + " - " + GraphicsDevice.GetDLSSPresetExplanation(preset);
                 }
             }
         }
         return labels;
     }
 
-    private static readonly GUIContent renderPresetsLabel = new GUIContent("Render Presets", "Selects an internal DLSS tuning profile. Presets adjust reconstruction behavior, trading off between sharpness, stability, and performance. Different presets may work better depending on scene content and motion.");
+    private static readonly GUIContent renderPresetsLabel = new GUIContent(
+        "Render Presets",
+        "Selects an internal DLSS tuning profile. Presets adjust reconstruction behavior, trading off between sharpness, stability, and performance. Different presets may work better depending on scene content and motion."
+    );
     #endregion
 
 
@@ -93,7 +99,8 @@ public class DLSSOptionsEditor : Editor
         bool propHasInvalidPresetValue = presetProp.uintValue != 0 && (presetBitmask & presetProp.uintValue) == 0;
         if (propHasInvalidPresetValue)
         {
-            Debug.LogWarningFormat("DLSS Preset {0} not found for quality setting {1}, resetting to default value.",
+            Debug.LogWarningFormat(
+                "DLSS Preset {0} not found for quality setting {1}, resetting to default value.",
                 ((DLSSPreset)presetProp.uintValue).ToString(),
                 perfQuality.ToString()
             );
@@ -129,7 +136,11 @@ public class DLSSOptionsEditor : Editor
             }
             if (index != 0)
             {
-                Debug.LogWarningFormat("DLSSPreset (index={0}) not found in the supported preset list (mask={1}), setting to default value.", index, presetBitmask);
+                Debug.LogWarningFormat(
+                    "DLSSPreset (index={0}) not found in the supported preset list (mask={1}), setting to default value.",
+                    index,
+                    presetBitmask
+                );
                 return 0;
             }
             // Debug.LogFormat("Setting preset {0} : {1}", ((DLSSPreset)val).ToString(), val);
@@ -137,10 +148,15 @@ public class DLSSOptionsEditor : Editor
         }
 
         int presetIndex = FindPresetGUIIndex(presetBitmask, presetProp.uintValue);
-        int iNew = EditorGUILayout.Popup(DLSSPerfQualityLabels[(int)perfQuality], presetIndex, DLSSPresetOptionsForEachPerfQuality[(int)perfQuality]);
+        int iNew = EditorGUILayout.Popup(
+            DLSSPerfQualityLabels[(int)perfQuality],
+            presetIndex,
+            DLSSPresetOptionsForEachPerfQuality[(int)perfQuality]
+        );
         if (iNew != presetIndex)
             presetProp.uintValue = GUIIndexToPresetValue(presetBitmask, (uint)iNew);
     }
+
     public override void OnInspectorGUI()
     {
         serializedObject.Update();

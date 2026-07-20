@@ -21,10 +21,15 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
         Button TriggerButton => this.Q<Button>(nameof(TriggerButton));
 
         void Enter100() => EnterLagSpikeDuration(100);
+
         void Enter200() => EnterLagSpikeDuration(200);
+
         void Enter500() => EnterLagSpikeDuration(500);
+
         void Enter1000() => EnterLagSpikeDuration(1000);
+
         void Enter2000() => EnterLagSpikeDuration(2000);
+
         void Enter5000() => EnterLagSpikeDuration(5000);
 
         readonly Runtime.NetworkSimulator m_NetworkSimulator;

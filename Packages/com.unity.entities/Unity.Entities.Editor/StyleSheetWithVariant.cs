@@ -21,7 +21,12 @@ namespace Unity.Entities.Editor
         {
             m_Name = name;
             m_StyleSheet = new Lazy<StyleSheet>(() => EditorResources.Load<StyleSheet>($"uss/{name}.uss", false));
-            m_StyleSheetVariant = new Lazy<StyleSheet>(() => EditorResources.Load<StyleSheet>($"uss/{name}_{(EditorGUIUtility.isProSkin ? "dark" : "light")}.uss", false));
+            m_StyleSheetVariant = new Lazy<StyleSheet>(() =>
+                EditorResources.Load<StyleSheet>(
+                    $"uss/{name}_{(EditorGUIUtility.isProSkin ? "dark" : "light")}.uss",
+                    false
+                )
+            );
         }
 
         /// <summary>
@@ -32,8 +37,16 @@ namespace Unity.Entities.Editor
         public StyleSheetWithVariant(string packageId, string name)
         {
             m_Name = name;
-            m_StyleSheet = new Lazy<StyleSheet>(() => EditorResources.Load<StyleSheet>(packageId, $"uss/{name}.uss", false));
-            m_StyleSheetVariant = new Lazy<StyleSheet>(() => EditorResources.Load<StyleSheet>(packageId, $"uss/{name}_{(EditorGUIUtility.isProSkin ? "dark" : "light")}.uss", false));
+            m_StyleSheet = new Lazy<StyleSheet>(() =>
+                EditorResources.Load<StyleSheet>(packageId, $"uss/{name}.uss", false)
+            );
+            m_StyleSheetVariant = new Lazy<StyleSheet>(() =>
+                EditorResources.Load<StyleSheet>(
+                    packageId,
+                    $"uss/{name}_{(EditorGUIUtility.isProSkin ? "dark" : "light")}.uss",
+                    false
+                )
+            );
         }
 
         /// <summary>

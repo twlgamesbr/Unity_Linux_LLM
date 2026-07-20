@@ -1,5 +1,4 @@
 using System;
-
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 
@@ -26,20 +25,14 @@ namespace Unity.Serialization.Json
         /// </summary>
         /// <param name="result">The result that describes the error.</param>
         internal InvalidJsonException(JsonValidationResult result)
-            : base(result.ToString())
-        {
+            : base(result.ToString()) { }
 
-        }
-        
         /// <summary>
         /// Initialized a new instance of the <see cref="InvalidJsonException"/> class with a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         public InvalidJsonException(string message)
-            : base(message)
-        {
-
-        }
+            : base(message) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidJsonException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception.
@@ -47,10 +40,8 @@ namespace Unity.Serialization.Json
         /// <param name="message">The message that describes the error.</param>
         /// <param name="inner">The inner exception reference.</param>
         public InvalidJsonException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
-        
+            : base(message, inner) { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidJsonException" /> class with serialized data.
         /// </summary>

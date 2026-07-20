@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -43,13 +43,19 @@ namespace UnityEditor.Rendering
             var assetPath = asset.GetAssetPath();
             if (!File.Exists(assetPath))
             {
-                Debug.LogError($"Missing APV data asset {assetPath}. Please make sure that the lighting has been baked properly.");
+                Debug.LogError(
+                    $"Missing APV data asset {assetPath}. Please make sure that the lighting has been baked properly."
+                );
                 return;
             }
             File.Copy(assetPath, Path.Combine(basePath, asset.assetGUID + ".bytes"));
         }
 
-        void GetProbeVolumeProjectSettings(BuildTarget target, out bool supportProbeVolume, out ProbeVolumeSHBands maxSHBands)
+        void GetProbeVolumeProjectSettings(
+            BuildTarget target,
+            out bool supportProbeVolume,
+            out ProbeVolumeSHBands maxSHBands
+        )
         {
             // Grab all assets used for the build.
             List<RenderPipelineAsset> srpAssets = new List<RenderPipelineAsset>();
@@ -77,7 +83,11 @@ namespace UnityEditor.Rendering
 
         public override void PrepareForBuild(BuildPlayerContext buildPlayerContext)
         {
-            GetProbeVolumeProjectSettings(buildPlayerContext.BuildPlayerOptions.target, out bool supportProbeVolume, out var maxSHBands);
+            GetProbeVolumeProjectSettings(
+                buildPlayerContext.BuildPlayerOptions.target,
+                out bool supportProbeVolume,
+                out var maxSHBands
+            );
 
             if (!supportProbeVolume)
                 return;
@@ -127,8 +137,9 @@ namespace UnityEditor.Rendering
                         if (index == -1)
                         {
                             Debug.LogError(
-                                $"The scene '{scene}' contains baked Adaptive Probe Volumes, but the build target is WebGL. " +
-                                "Adaptive Probe Volumes are not supported when targeting WebGL.");
+                                $"The scene '{scene}' contains baked Adaptive Probe Volumes, but the build target is WebGL. "
+                                    + "Adaptive Probe Volumes are not supported when targeting WebGL."
+                            );
                             continue;
                         }
                     }
@@ -138,7 +149,9 @@ namespace UnityEditor.Rendering
 
                     Directory.CreateDirectory(basePath);
 
-                    bool useStreamingAsset = !GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeGlobalSettings>().probeVolumeDisableStreamingAssets;
+                    bool useStreamingAsset = !GraphicsSettings
+                        .GetRenderPipelineSettings<ProbeVolumeGlobalSettings>()
+                        .probeVolumeDisableStreamingAssets;
 
                     IncludeStreamableAsset(bakingSet.cellSharedDataAsset, basePath, useStreamingAsset);
                     IncludeStreamableAsset(bakingSet.cellBricksDataAsset, basePath, useStreamingAsset);
@@ -159,7 +172,11 @@ namespace UnityEditor.Rendering
                             StripStreambleAsset(scenario.Value.cellOptionalDataAsset);
 
                         if (bakingSet.bakedProbeOcclusion)
-                            IncludeStreamableAsset(scenario.Value.cellProbeOcclusionDataAsset, basePath, useStreamingAsset);
+                            IncludeStreamableAsset(
+                                scenario.Value.cellProbeOcclusionDataAsset,
+                                basePath,
+                                useStreamingAsset
+                            );
                         else
                             StripStreambleAsset(scenario.Value.cellProbeOcclusionDataAsset);
                     }
@@ -168,7 +185,10 @@ namespace UnityEditor.Rendering
                 }
             }
 
-            buildPlayerContext.AddAdditionalPathToStreamingAssets(tempStreamingAssetsPath, AdaptiveProbeVolumes.kAPVStreamingAssetsPath);
+            buildPlayerContext.AddAdditionalPathToStreamingAssets(
+                tempStreamingAssetsPath,
+                AdaptiveProbeVolumes.kAPVStreamingAssetsPath
+            );
         }
 
         public void OnPostprocessBuild(BuildReport report)

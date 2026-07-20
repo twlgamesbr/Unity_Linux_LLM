@@ -8,7 +8,8 @@ namespace UnityEditor.Rendering
     [UxmlElement]
     public partial class HeaderFoldout : Foldout
     {
-        const string k_StylesheetPathFormat = "Packages/com.unity.render-pipelines.core/Editor/StyleSheets/HeaderFoldout{0}.uss";
+        const string k_StylesheetPathFormat =
+            "Packages/com.unity.render-pipelines.core/Editor/StyleSheets/HeaderFoldout{0}.uss";
         const string k_MainClass = "header-foldout";
         const string k_EnableClass = k_MainClass + "__enable";
         const string k_IconClass = k_MainClass + "__icon";
@@ -38,7 +39,7 @@ namespace UnityEditor.Rendering
                 m_HelpButton?.SetEnabled(!string.IsNullOrEmpty(m_DocumentationURL));
             }
         }
-        
+
         /// <summary>Context menu to show on click of the context button. If null, button don't show.</summary>
         public Func<GenericMenu> contextMenuGenerator //Use ImGUI for now
         {
@@ -52,7 +53,7 @@ namespace UnityEditor.Rendering
                 m_ContextMenuButton?.SetEnabled(m_ContextMenuGenerator != null);
             }
         }
-        
+
         /// <summary>Optional icon image. If not set, no icon is shown.</summary>
         public Texture2D icon
         {
@@ -67,14 +68,14 @@ namespace UnityEditor.Rendering
                 m_IconElement.style.display = m_Icon != null ? DisplayStyle.Flex : DisplayStyle.None;
             }
         }
-        
+
         /// <summary>Property to get the enablement state</summary>
         public bool enabled
         {
             get => m_Toggle.value;
             set => m_Toggle.value = value;
         }
-        
+
         /// <summary>Property to get the enablement visibility state</summary>
         public bool showEnableCheckbox
         {
@@ -103,10 +104,15 @@ namespace UnityEditor.Rendering
         Rect m_TooltipRect;
 
         /// <summary>Constructor</summary>
-        public HeaderFoldout() : base()
+        public HeaderFoldout()
+            : base()
         {
             styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(string.Format(k_StylesheetPathFormat, "")));
-            styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(string.Format(k_StylesheetPathFormat, EditorGUIUtility.isProSkin ? "Dark" : "Light")));
+            styleSheets.Add(
+                AssetDatabase.LoadAssetAtPath<StyleSheet>(
+                    string.Format(k_StylesheetPathFormat, EditorGUIUtility.isProSkin ? "Dark" : "Light")
+                )
+            );
             AddToClassList(k_MainClass);
 
             RegisterCallback<AttachToPanelEvent>(DelayedInit);
@@ -119,12 +125,7 @@ namespace UnityEditor.Rendering
                 const float tipWidth = 200f;
                 const float tipHeight = 24f;
 
-                m_TooltipRect = new Rect(
-                    e.position.x,
-                    e.position.y,
-                    tipWidth,
-                    tipHeight
-                );
+                m_TooltipRect = new Rect(e.position.x, e.position.y, tipWidth, tipHeight);
             });
             line.RegisterCallback<PointerLeaveEvent>(e =>
             {
@@ -143,16 +144,13 @@ namespace UnityEditor.Rendering
             {
                 style =
                 {
-                    display = DisplayStyle.None // hidden by default, will be enabled if icon is set
-                }
+                    display = DisplayStyle.None, // hidden by default, will be enabled if icon is set
+                },
             };
             m_IconElement.AddToClassList(k_IconClass);
             line.Add(m_IconElement);
 
-            m_Toggle = new Toggle() 
-            {
-                value = true
-            };
+            m_Toggle = new Toggle() { value = true };
             m_Toggle.AddToClassList(k_EnableClass);
             m_Toggle.RegisterValueChangedCallback(HandleDisabling);
             m_Toggle.style.display = DisplayStyle.None; // hidden by default
@@ -162,12 +160,18 @@ namespace UnityEditor.Rendering
             m_Text.AddToClassList(k_LabelClass);
             line.Add(m_Text);
 
-            m_HelpButton = new Button(Background.FromTexture2D(CoreEditorStyles.iconHelp), () => Help.BrowseURL(m_DocumentationURL));
+            m_HelpButton = new Button(
+                Background.FromTexture2D(CoreEditorStyles.iconHelp),
+                () => Help.BrowseURL(m_DocumentationURL)
+            );
             m_HelpButton.AddToClassList(k_HelpButtonClass);
             m_HelpButton.SetEnabled(!string.IsNullOrEmpty(m_DocumentationURL));
             line.Add(m_HelpButton);
 
-            m_ContextMenuButton = new Button(Background.FromTexture2D(CoreEditorStyles.paneOptionsIcon), () => ShowMenu());
+            m_ContextMenuButton = new Button(
+                Background.FromTexture2D(CoreEditorStyles.paneOptionsIcon),
+                () => ShowMenu()
+            );
             m_ContextMenuButton.AddToClassList(k_ContextButtonClass);
             m_ContextMenuButton.SetEnabled(m_ContextMenuGenerator != null);
             line.Add(m_ContextMenuButton);
@@ -193,19 +197,23 @@ namespace UnityEditor.Rendering
         void ShowMenu()
         {
             var menu = m_ContextMenuGenerator.Invoke();
-            menu.DropDown(new Rect(m_ContextMenuButton.worldBound.position + m_ContextMenuButton.worldBound.size.y * Vector2.up, Vector2.zero));
+            menu.DropDown(
+                new Rect(
+                    m_ContextMenuButton.worldBound.position + m_ContextMenuButton.worldBound.size.y * Vector2.up,
+                    Vector2.zero
+                )
+            );
         }
 
-        void HandleDisabling(ChangeEvent<bool> evt)
-            => contentContainer.SetEnabled(evt.newValue);
+        void HandleDisabling(ChangeEvent<bool> evt) => contentContainer.SetEnabled(evt.newValue);
     }
-    
+
     /// <summary> UITK component to display header styled foldout. This variant have an enable checkbox.</summary>
     [Obsolete("Please directly use HeaderFoldout now. #from(6000.2) (UnityUpgradable) -> HeaderFoldout")]
     public class HeaderToggleFoldout : HeaderFoldout
     {
         /// <summary>Constructor</summary>
-        public HeaderToggleFoldout() : base()
-            => showEnableCheckbox = true;
+        public HeaderToggleFoldout()
+            : base() => showEnableCheckbox = true;
     }
 }

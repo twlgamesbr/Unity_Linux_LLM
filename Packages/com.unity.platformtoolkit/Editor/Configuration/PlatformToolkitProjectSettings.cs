@@ -10,48 +10,58 @@ namespace Unity.PlatformToolkit.Editor
         public static SettingsProvider[] CreateProviders()
         {
             var providers = new List<SettingsProvider>();
-            providers.Add(new SettingsProvider("Project/PlatformToolkit", SettingsScope.Project)
-            {
-                label = "Platform Toolkit",
-                activateHandler = (_, rootElement) =>
+            providers.Add(
+                new SettingsProvider("Project/PlatformToolkit", SettingsScope.Project)
                 {
-                    CreateSettingsView(out var root, out var title, out var content);
+                    label = "Platform Toolkit",
+                    activateHandler = (_, rootElement) =>
+                    {
+                        CreateSettingsView(out var root, out var title, out var content);
 
-                    content.dataSource = new PlatformToolkitProjectSettingsViewModel();
+                        content.dataSource = new PlatformToolkitProjectSettingsViewModel();
 
-                    title.text = "Platform Toolkit";
-                    content.Add(new SupportDeclarationTargetsList());
+                        title.text = "Platform Toolkit";
+                        content.Add(new SupportDeclarationTargetsList());
 
-                    rootElement.Add(root);
+                        rootElement.Add(root);
+                    },
                 }
-            });
+            );
 
             foreach (var supportDeclaration in SupportDeclarationManager.SupportDeclarations)
             {
                 if (supportDeclaration.SettingsProvider != null)
                 {
-                    var settingsConfiguration = PlatformToolkitSettings.instance.GetSettingsConfiguration(supportDeclaration.Key);
-                    providers.Add(new SettingsProvider($"Project/PlatformToolkit/{supportDeclaration.DisplayName}", SettingsScope.Project) {
-                        label = $"{supportDeclaration.DisplayName}",
-                        activateHandler = (_, rootElement) =>
+                    var settingsConfiguration = PlatformToolkitSettings.instance.GetSettingsConfiguration(
+                        supportDeclaration.Key
+                    );
+                    providers.Add(
+                        new SettingsProvider(
+                            $"Project/PlatformToolkit/{supportDeclaration.DisplayName}",
+                            SettingsScope.Project
+                        )
                         {
-                            CreateSettingsView(out var root, out var title, out var content);
-                            title.text = supportDeclaration.DisplayName;
-                            var settingsContainer = new VisualElement();
-                            var attributeContainer = new VisualElement();
-                            settingsConfiguration.CreateSettingsUI(settingsContainer, attributeContainer);
-                            if (settingsContainer.childCount > 0)
+                            label = $"{supportDeclaration.DisplayName}",
+                            activateHandler = (_, rootElement) =>
                             {
-                                settingsContainer.AddToClassList("settings-block");
-                                content.Add(settingsContainer);
-                            }
-                            if (attributeContainer.childCount > 0)
-                            {
-                                content.Add(attributeContainer);
-                            }
-                            rootElement.Add(root);
+                                CreateSettingsView(out var root, out var title, out var content);
+                                title.text = supportDeclaration.DisplayName;
+                                var settingsContainer = new VisualElement();
+                                var attributeContainer = new VisualElement();
+                                settingsConfiguration.CreateSettingsUI(settingsContainer, attributeContainer);
+                                if (settingsContainer.childCount > 0)
+                                {
+                                    settingsContainer.AddToClassList("settings-block");
+                                    content.Add(settingsContainer);
+                                }
+                                if (attributeContainer.childCount > 0)
+                                {
+                                    content.Add(attributeContainer);
+                                }
+                                rootElement.Add(root);
+                            },
                         }
-                    });
+                    );
                 }
             }
 
@@ -60,7 +70,9 @@ namespace Unity.PlatformToolkit.Editor
 
         private static void CreateSettingsView(out VisualElement root, out Label title, out VisualElement content)
         {
-            var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/EditorResources/UI/ProjectSettingsContainer.uxml");
+            var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/EditorResources/UI/ProjectSettingsContainer.uxml"
+            );
 
             root = visualTreeAsset.Instantiate();
             title = root.Q<Label>("title");

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
 #if UNITY_EDITOR
 using System.Linq;
 using UnityEditor;
@@ -36,10 +35,15 @@ namespace UnityEngine.Rendering.Universal
         /// <returns>The instance of ScriptableRenderer</returns>
         protected abstract ScriptableRenderer Create();
 
-        [SerializeField] internal List<ScriptableRendererFeature> m_RendererFeatures = new List<ScriptableRendererFeature>(10);
-        [SerializeField] internal List<long> m_RendererFeatureMap = new List<long>(10);
+        [SerializeField]
+        internal List<ScriptableRendererFeature> m_RendererFeatures = new List<ScriptableRendererFeature>(10);
+
+        [SerializeField]
+        internal List<long> m_RendererFeatureMap = new List<long>(10);
+
         [NonSerialized]
         bool m_StripShadowsOffVariants = false;
+
         [NonSerialized]
         bool m_StripAdditionalLightOffVariants = false;
 
@@ -120,7 +124,8 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="rendererFeature">RenderFeature output parameter.</param>
         /// <typeparam name="T">Renderer Feature type.</typeparam>
         /// <returns></returns>
-        public bool TryGetRendererFeature<T>(out T rendererFeature) where T : ScriptableRendererFeature
+        public bool TryGetRendererFeature<T>(out T rendererFeature)
+            where T : ScriptableRendererFeature
         {
             foreach (var target in rendererFeatures)
             {
@@ -178,7 +183,13 @@ namespace UnityEngine.Rendering.Universal
             {
                 if (!m_RendererFeatures[i])
                     continue;
-                if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(m_RendererFeatures[i], out var guid, out long localId))
+                if (
+                    AssetDatabase.TryGetGUIDAndLocalFileIdentifier(
+                        m_RendererFeatures[i],
+                        out var guid,
+                        out long localId
+                    )
+                )
                 {
                     linkedIds.Add(localId);
                 }
@@ -200,7 +211,10 @@ namespace UnityEngine.Rendering.Universal
                     }
                     else
                     {
-                        m_RendererFeatures[i] = (ScriptableRendererFeature)GetUnusedAsset(ref linkedIds, ref loadedAssets);
+                        m_RendererFeatures[i] = (ScriptableRendererFeature)GetUnusedAsset(
+                            ref linkedIds,
+                            ref loadedAssets
+                        );
                     }
                 }
 
@@ -212,7 +226,10 @@ namespace UnityEngine.Rendering.Universal
             if (!m_RendererFeatures.Contains(null))
                 return true;
 
-            Debug.LogError($"{name} is missing RendererFeatures\nThis could be due to missing scripts or compile error.", this);
+            Debug.LogError(
+                $"{name} is missing RendererFeatures\nThis could be due to missing scripts or compile error.",
+                this
+            );
             return false;
         }
 
@@ -285,7 +302,13 @@ namespace UnityEngine.Rendering.Universal
             {
                 if (m_RendererFeatures[i] == null)
                     continue;
-                if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(m_RendererFeatures[i], out var guid, out long localId))
+                if (
+                    !AssetDatabase.TryGetGUIDAndLocalFileIdentifier(
+                        m_RendererFeatures[i],
+                        out var guid,
+                        out long localId
+                    )
+                )
                     continue;
 
                 m_RendererFeatureMap[i] = localId;

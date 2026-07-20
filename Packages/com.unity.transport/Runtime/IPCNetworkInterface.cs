@@ -48,7 +48,8 @@ namespace Unity.Networking.Transport
     [BurstCompile]
     public struct IPCNetworkInterface : INetworkInterface
     {
-        [ReadOnly] private NativeArray<NetworkEndpoint> m_LocalEndpoint;
+        [ReadOnly]
+        private NativeArray<NetworkEndpoint> m_LocalEndpoint;
 
         /// <inheritdoc/>
         public NetworkEndpoint LocalEndpoint => m_LocalEndpoint[0];
@@ -144,7 +145,12 @@ namespace Unity.Networking.Transport
         /// <inheritdoc/>
         public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dep)
         {
-            var sendJob = new SendUpdate {ipcManager = IPCManager.Instance, SendQueue = arguments.SendQueue, localEndPoint = m_LocalEndpoint[0]};
+            var sendJob = new SendUpdate
+            {
+                ipcManager = IPCManager.Instance,
+                SendQueue = arguments.SendQueue,
+                localEndPoint = m_LocalEndpoint[0],
+            };
             dep = sendJob.Schedule(JobHandle.CombineDependencies(dep, IPCManager.ManagerAccessHandle));
             IPCManager.ManagerAccessHandle = dep;
             return dep;
@@ -155,7 +161,9 @@ namespace Unity.Networking.Transport
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!endpoint.IsLoopback && !endpoint.IsAny)
-                throw new InvalidOperationException($"Trying to bind IPC interface to a non-loopback endpoint ({endpoint})");
+                throw new InvalidOperationException(
+                    $"Trying to bind IPC interface to a non-loopback endpoint ({endpoint})"
+                );
 #endif
 
             m_LocalEndpoint[0] = IPCManager.Instance.CreateEndpoint(endpoint.Port);

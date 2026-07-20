@@ -16,11 +16,13 @@ namespace Unity.Rendering
             if (authoring.lightProbeUsage != LightProbeUsage.BlendProbes || authoring.probeAnchor == null)
                 return;
             var e = GetEntity(TransformUsageFlags.None);
-            AddComponent(e, new OverrideLightProbeAnchorComponent
-            {
-                entity = GetEntity(authoring.probeAnchor, TransformUsageFlags.Dynamic)
-            });
-
+            AddComponent(
+                e,
+                new OverrideLightProbeAnchorComponent
+                {
+                    entity = GetEntity(authoring.probeAnchor, TransformUsageFlags.Dynamic),
+                }
+            );
         }
     }
 }

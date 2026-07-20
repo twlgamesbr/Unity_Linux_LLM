@@ -1,8 +1,8 @@
 using System;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -12,67 +12,94 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedType(property.propertyType))
-                return new HelpBox("The UnitField Attribute can only be attached to numeric types", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The UnitField Attribute can only be attached to numeric types",
+                    HelpBoxMessageType.Error
+                );
 
             var unitFieldAttribute = attribute as UnitFieldAttribute;
 
-            UnitConverter convertedUnit = UnitConverter.GetConversion(unitFieldAttribute.DisplayUnit, unitFieldAttribute.ConversionUnit);
+            UnitConverter convertedUnit = UnitConverter.GetConversion(
+                unitFieldAttribute.DisplayUnit,
+                unitFieldAttribute.ConversionUnit
+            );
 
             if (convertedUnit == null)
-                return new HelpBox($"No conversion found for <b>{unitFieldAttribute.DisplayUnit}</b> to <b>{unitFieldAttribute.ConversionUnit}</b>. You can add custom conversions in the <b>ProjectSettings/EditorAttributes</b> window", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    $"No conversion found for <b>{unitFieldAttribute.DisplayUnit}</b> to <b>{unitFieldAttribute.ConversionUnit}</b>. You can add custom conversions in the <b>ProjectSettings/EditorAttributes</b> window",
+                    HelpBoxMessageType.Error
+                );
 
             Type numericType = GetFieldNumericType(property);
-            VisualElement numericField = CreateFieldForType(numericType, property.displayName, GetConvertedPropertyValue(property, convertedUnit.conversion), property.hasMultipleDifferentValues);
+            VisualElement numericField = CreateFieldForType(
+                numericType,
+                property.displayName,
+                GetConvertedPropertyValue(property, convertedUnit.conversion),
+                property.hasMultipleDifferentValues
+            );
 
-            numericField.TrackPropertyValue(property, (trackedProperty) => SetFieldValue(numericField, GetConvertedPropertyValue(trackedProperty, convertedUnit.conversion)));
-            RegisterValueChangedCallbackByType(numericType, numericField, (value) => SetNumericPropertyValue(property, value, convertedUnit.conversion));
+            numericField.TrackPropertyValue(
+                property,
+                (trackedProperty) =>
+                    SetFieldValue(numericField, GetConvertedPropertyValue(trackedProperty, convertedUnit.conversion))
+            );
+            RegisterValueChangedCallbackByType(
+                numericType,
+                numericField,
+                (value) => SetNumericPropertyValue(property, value, convertedUnit.conversion)
+            );
 
-            numericField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var inputFields = numericField.Query<VisualElement>(className: TextInputBaseField<Void>.inputUssClassName).ToList();
-
-                foreach (var inputField in inputFields)
+            numericField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
                 {
-                    Label unitLabel = new(convertedUnit.unitLabel)
-                    {
-                        focusable = false,
-                        tooltip = unitFieldAttribute.DisplayUnit,
-                        style =
-                        {
-                            color = CanApplyGlobalColor ? EditorExtension.GLOBAL_COLOR : Color.gray,
-                            unityTextAlign = TextAnchor.MiddleRight,
-                            flexGrow = 1f,
-                            flexShrink = 1f
-                        },
-                    };
+                    var inputFields = numericField
+                        .Query<VisualElement>(className: TextInputBaseField<Void>.inputUssClassName)
+                        .ToList();
 
-                    inputField.Add(unitLabel);
+                    foreach (var inputField in inputFields)
+                    {
+                        Label unitLabel = new(convertedUnit.unitLabel)
+                        {
+                            focusable = false,
+                            tooltip = unitFieldAttribute.DisplayUnit,
+                            style =
+                            {
+                                color = CanApplyGlobalColor ? EditorExtension.GLOBAL_COLOR : Color.gray,
+                                unityTextAlign = TextAnchor.MiddleRight,
+                                flexGrow = 1f,
+                                flexShrink = 1f,
+                            },
+                        };
+
+                        inputField.Add(unitLabel);
+                    }
                 }
-            });
+            );
 
             return numericField;
         }
 
-        private Type GetFieldNumericType(SerializedProperty property) => property.numericType switch
-        {
-            SerializedPropertyNumericType.Int32 => typeof(int),
-            SerializedPropertyNumericType.Int64 => typeof(long),
-            SerializedPropertyNumericType.UInt32 => typeof(uint),
-            SerializedPropertyNumericType.UInt64 => typeof(ulong),
-            SerializedPropertyNumericType.Float => typeof(float),
-            SerializedPropertyNumericType.Double => typeof(double),
-            _ => property.propertyType switch
+        private Type GetFieldNumericType(SerializedProperty property) =>
+            property.numericType switch
             {
-                SerializedPropertyType.Vector2 => typeof(Vector2),
-                SerializedPropertyType.Vector3 => typeof(Vector3),
-                SerializedPropertyType.Vector4 => typeof(Vector4),
-                SerializedPropertyType.Rect => typeof(Rect),
-                SerializedPropertyType.Vector2Int => typeof(Vector2Int),
-                SerializedPropertyType.Vector3Int => typeof(Vector3Int),
-                SerializedPropertyType.RectInt => typeof(RectInt),
-                _ => null,
-            }
-        };
+                SerializedPropertyNumericType.Int32 => typeof(int),
+                SerializedPropertyNumericType.Int64 => typeof(long),
+                SerializedPropertyNumericType.UInt32 => typeof(uint),
+                SerializedPropertyNumericType.UInt64 => typeof(ulong),
+                SerializedPropertyNumericType.Float => typeof(float),
+                SerializedPropertyNumericType.Double => typeof(double),
+                _ => property.propertyType switch
+                {
+                    SerializedPropertyType.Vector2 => typeof(Vector2),
+                    SerializedPropertyType.Vector3 => typeof(Vector3),
+                    SerializedPropertyType.Vector4 => typeof(Vector4),
+                    SerializedPropertyType.Rect => typeof(Rect),
+                    SerializedPropertyType.Vector2Int => typeof(Vector2Int),
+                    SerializedPropertyType.Vector3Int => typeof(Vector3Int),
+                    SerializedPropertyType.RectInt => typeof(RectInt),
+                    _ => null,
+                },
+            };
 
         private object GetConvertedPropertyValue(SerializedProperty property, double conversion)
         {
@@ -132,8 +159,8 @@ namespace EditorAttributes.Editor
                         (int)(property.rectIntValue.width * displayFactor),
                         (int)(property.rectIntValue.height * displayFactor)
                     ),
-                    _ => null
-                }
+                    _ => null,
+                },
             };
         }
 
@@ -178,37 +205,66 @@ namespace EditorAttributes.Editor
                     {
                         case SerializedPropertyType.Vector2:
                             var vector2Value = (Vector2)value;
-                            property.vector2Value = new Vector2(vector2Value.x * (float)conversion, vector2Value.y * (float)conversion);
+                            property.vector2Value = new Vector2(
+                                vector2Value.x * (float)conversion,
+                                vector2Value.y * (float)conversion
+                            );
                             break;
 
                         case SerializedPropertyType.Vector3:
                             var vector3Value = (Vector3)value;
-                            property.vector3Value = new Vector3(vector3Value.x * (float)conversion, vector3Value.y * (float)conversion, vector3Value.z * (float)conversion);
+                            property.vector3Value = new Vector3(
+                                vector3Value.x * (float)conversion,
+                                vector3Value.y * (float)conversion,
+                                vector3Value.z * (float)conversion
+                            );
                             break;
 
                         case SerializedPropertyType.Vector4:
                             var vector4Value = (Vector4)value;
-                            property.vector4Value = new Vector4(vector4Value.x * (float)conversion, vector4Value.y * (float)conversion, vector4Value.z * (float)conversion, vector4Value.w * (float)conversion);
+                            property.vector4Value = new Vector4(
+                                vector4Value.x * (float)conversion,
+                                vector4Value.y * (float)conversion,
+                                vector4Value.z * (float)conversion,
+                                vector4Value.w * (float)conversion
+                            );
                             break;
 
                         case SerializedPropertyType.Rect:
                             var rectValue = (Rect)value;
-                            property.rectValue = new Rect(rectValue.x * (float)conversion, rectValue.y * (float)conversion, rectValue.width * (float)conversion, rectValue.height * (float)conversion);
+                            property.rectValue = new Rect(
+                                rectValue.x * (float)conversion,
+                                rectValue.y * (float)conversion,
+                                rectValue.width * (float)conversion,
+                                rectValue.height * (float)conversion
+                            );
                             break;
 
                         case SerializedPropertyType.Vector2Int:
                             var vector2IntValue = (Vector2Int)value;
-                            property.vector2IntValue = new Vector2Int((int)(vector2IntValue.x * conversion), (int)(vector2IntValue.y * conversion));
+                            property.vector2IntValue = new Vector2Int(
+                                (int)(vector2IntValue.x * conversion),
+                                (int)(vector2IntValue.y * conversion)
+                            );
                             break;
 
                         case SerializedPropertyType.Vector3Int:
                             var vector3IntValue = (Vector3Int)value;
-                            property.vector3IntValue = new Vector3Int((int)(vector3IntValue.x * conversion), (int)(vector3IntValue.y * conversion), (int)(vector3IntValue.z * conversion));
+                            property.vector3IntValue = new Vector3Int(
+                                (int)(vector3IntValue.x * conversion),
+                                (int)(vector3IntValue.y * conversion),
+                                (int)(vector3IntValue.z * conversion)
+                            );
                             break;
 
                         case SerializedPropertyType.RectInt:
                             var rectIntValue = (RectInt)value;
-                            property.rectIntValue = new RectInt((int)(rectIntValue.x * conversion), (int)(rectIntValue.y * conversion), (int)(rectIntValue.width * conversion), (int)(rectIntValue.height * conversion));
+                            property.rectIntValue = new RectInt(
+                                (int)(rectIntValue.x * conversion),
+                                (int)(rectIntValue.y * conversion),
+                                (int)(rectIntValue.width * conversion),
+                                (int)(rectIntValue.height * conversion)
+                            );
                             break;
                     }
                     break;
@@ -217,8 +273,16 @@ namespace EditorAttributes.Editor
             property.serializedObject.ApplyModifiedProperties();
         }
 
-        private bool IsSupportedType(SerializedPropertyType propertyType) => propertyType is SerializedPropertyType.Float or SerializedPropertyType.Integer
-            or SerializedPropertyType.Vector2 or SerializedPropertyType.Vector3 or SerializedPropertyType.Vector4 or SerializedPropertyType.Vector2Int or SerializedPropertyType.Vector3Int
-            or SerializedPropertyType.Rect or SerializedPropertyType.RectInt;
+        private bool IsSupportedType(SerializedPropertyType propertyType) =>
+            propertyType
+                is SerializedPropertyType.Float
+                    or SerializedPropertyType.Integer
+                    or SerializedPropertyType.Vector2
+                    or SerializedPropertyType.Vector3
+                    or SerializedPropertyType.Vector4
+                    or SerializedPropertyType.Vector2Int
+                    or SerializedPropertyType.Vector3Int
+                    or SerializedPropertyType.Rect
+                    or SerializedPropertyType.RectInt;
     }
 }

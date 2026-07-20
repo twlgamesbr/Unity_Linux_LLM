@@ -17,6 +17,7 @@ namespace Unity.Collections
         {
             return value & ~(alignPow2 - 1);
         }
+
         internal static int AlignUp(int value, int alignPow2)
         {
             return AlignDown(value + alignPow2 - 1, alignPow2);
@@ -99,7 +100,11 @@ namespace Unity.Collections
             var numBitsPerStep = 64;
             var maxBits = numSteps * numBitsPerStep;
 
-            for (int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep; i < end; ++i)
+            for (
+                int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep;
+                i < end;
+                ++i
+            )
             {
                 if (bits[i] != 0)
                 {
@@ -151,7 +156,11 @@ namespace Unity.Collections
             var numBitsPerStep = 32;
             var maxBits = numSteps * numBitsPerStep;
 
-            for (int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep; i < end; ++i)
+            for (
+                int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep;
+                i < end;
+                ++i
+            )
             {
                 if (bits[i] != 0)
                 {
@@ -203,7 +212,11 @@ namespace Unity.Collections
             var numBitsPerStep = 16;
             var maxBits = numSteps * numBitsPerStep;
 
-            for (int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep; i < end; ++i)
+            for (
+                int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep;
+                i < end;
+                ++i
+            )
             {
                 if (bits[i] != 0)
                 {
@@ -255,7 +268,11 @@ namespace Unity.Collections
             var numBitsPerStep = 8;
             var maxBits = numSteps * numBitsPerStep;
 
-            for (int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep; i < end; ++i)
+            for (
+                int i = beginBit / numBitsPerStep, end = AlignUp(endBit, numBitsPerStep) / numBitsPerStep;
+                i < end;
+                ++i
+            )
             {
                 if (bits[i] != 0)
                 {
@@ -464,7 +481,8 @@ namespace Unity.Collections
             return int.MaxValue;
         }
 
-        internal static int Find(ulong* ptr, int pos, int count, int numBits) => FindWithBeginEnd(ptr, pos, pos + count, numBits);
+        internal static int Find(ulong* ptr, int pos, int count, int numBits) =>
+            FindWithBeginEnd(ptr, pos, pos + count, numBits);
 
         internal static bool TestNone(ulong* ptr, int length, int pos, int numBits = 1)
         {
@@ -621,7 +639,6 @@ namespace Unity.Collections
 
             return (valueE << (64 - shiftB)) | valueB;
         }
-
     }
 
     /// <summary>
@@ -775,12 +792,11 @@ namespace Unity.Collections
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         static void CheckArgs(int pos, int numBits)
         {
-            if (pos > 31
-                || numBits == 0
-                || numBits > 32
-                || pos + numBits > 32)
+            if (pos > 31 || numBits == 0 || numBits > 32 || pos + numBits > 32)
             {
-                throw new ArgumentException($"BitField32 invalid arguments: pos {pos} (must be 0-31), numBits {numBits} (must be 1-32).");
+                throw new ArgumentException(
+                    $"BitField32 invalid arguments: pos {pos} (must be 0-31), numBits {numBits} (must be 1-32)."
+                );
             }
         }
     }
@@ -840,6 +856,7 @@ namespace Unity.Collections
         {
             Value = 0ul;
         }
+
         /// <summary>
         /// Sets a single bit to 1 or 0.
         /// </summary>
@@ -851,7 +868,6 @@ namespace Unity.Collections
             CheckArgs(pos, 1);
             Value = Bitwise.SetBits(Value, pos, 1, value);
         }
-
 
         /// <summary>
         /// Sets one or more contiguous bits to 1 or 0.
@@ -959,12 +975,11 @@ namespace Unity.Collections
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         static void CheckArgs(int pos, int numBits)
         {
-            if (pos > 63
-                || numBits == 0
-                || numBits > 64
-                || pos + numBits > 64)
+            if (pos > 63 || numBits == 0 || numBits > 64 || pos + numBits > 64)
             {
-                throw new ArgumentException($"BitField32 invalid arguments: pos {pos} (must be 0-63), numBits {numBits} (must be 1-64).");
+                throw new ArgumentException(
+                    $"BitField32 invalid arguments: pos {pos} (must be 0-63), numBits {numBits} (must be 1-64)."
+                );
             }
         }
     }

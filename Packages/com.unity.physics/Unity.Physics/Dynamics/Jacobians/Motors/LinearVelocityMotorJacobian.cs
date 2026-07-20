@@ -38,9 +38,14 @@ namespace Unity.Physics
 
         // Build the Jacobian
         public void Build(
-            MTransform aFromConstraint, MTransform bFromConstraint,
-            MotionData motionA, MotionData motionB,
-            Constraint constraint, float tau, float damping)
+            MTransform aFromConstraint,
+            MTransform bFromConstraint,
+            MotionData motionA,
+            MotionData motionB,
+            Constraint constraint,
+            float tau,
+            float damping
+        )
         {
             AnchorFrameInBodyA = aFromConstraint;
             AnchorFrameInBodyB = bFromConstraint;
@@ -49,7 +54,7 @@ namespace Unity.Physics
 
             AxisIndex = constraint.ConstrainedAxis1D;
             AxisInB = bFromConstraint.Rotation[constraint.ConstrainedAxis1D];
-            Target = AxisInB * constraint.Target[constraint.ConstrainedAxis1D];  // is velocity vector relative to bodyB, in m/s
+            Target = AxisInB * constraint.Target[constraint.ConstrainedAxis1D]; // is velocity vector relative to bodyB, in m/s
 
             Damping = damping;
 
@@ -65,7 +70,13 @@ namespace Unity.Physics
             WorldFromB = motionB.WorldFromMotion;
         }
 
-        private static void ApplyImpulse(float3 impulse, float3 ang0, float3 ang1, float3 ang2, ref MotionVelocity velocity)
+        private static void ApplyImpulse(
+            float3 impulse,
+            float3 ang0,
+            float3 ang1,
+            float3 ang2,
+            ref MotionVelocity velocity
+        )
         {
             velocity.ApplyLinearImpulse(impulse);
             velocity.ApplyAngularImpulse(impulse.x * ang0 + impulse.y * ang1 + impulse.z * ang2);
@@ -73,8 +84,12 @@ namespace Unity.Physics
 
         // Solve the Jacobian
         // Predict error at the end of the step and calculate the impulse to correct it
-        public void Solve(ref JacobianHeader jacHeader, ref MotionVelocity velocityA, ref MotionVelocity velocityB,
-            Solver.StepInput stepInput)
+        public void Solve(
+            ref JacobianHeader jacHeader,
+            ref MotionVelocity velocityA,
+            ref MotionVelocity velocityB,
+            Solver.StepInput stepInput
+        )
         {
             // Predict the motions' transforms at the end of the step
             MTransform futureWorldFromA;
@@ -84,33 +99,98 @@ namespace Unity.Physics
                 quaternion dqB = Integrator.IntegrateAngularVelocity(velocityB.AngularVelocity, stepInput.Timestep);
                 quaternion futureOrientationA = math.normalize(math.mul(WorldFromA.rot, dqA));
                 quaternion futureOrientationB = math.normalize(math.mul(WorldFromB.rot, dqB));
-                futureWorldFromA = new MTransform(futureOrientationA, WorldFromA.pos + velocityA.LinearVelocity * stepInput.Timestep);
-                futureWorldFromB = new MTransform(futureOrientationB, WorldFromB.pos + velocityB.LinearVelocity * stepInput.Timestep);
+                futureWorldFromA = new MTransform(
+                    futureOrientationA,
+                    WorldFromA.pos + velocityA.LinearVelocity * stepInput.Timestep
+                );
+                futureWorldFromB = new MTransform(
+                    futureOrientationB,
+                    WorldFromB.pos + velocityB.LinearVelocity * stepInput.Timestep
+                );
             }
 
             // Calculate the angulars
-            CalculateAngulars(AnchorFrameInBodyA.Translation, futureWorldFromA.Rotation, out float3 angA0, out float3 angA1, out float3 angA2);
-            CalculateAngulars(AnchorFrameInBodyB.Translation, futureWorldFromB.Rotation, out float3 angB0, out float3 angB1, out float3 angB2);
+            CalculateAngulars(
+                AnchorFrameInBodyA.Translation,
+                futureWorldFromA.Rotation,
+                out float3 angA0,
+                out float3 angA1,
+                out float3 angA2
+            );
+            CalculateAngulars(
+                AnchorFrameInBodyB.Translation,
+                futureWorldFromB.Rotation,
+                out float3 angB0,
+                out float3 angB1,
+                out float3 angB2
+            );
 
             // Calculate effective mass
-            float3 EffectiveMassDiag, EffectiveMassOffDiag;
+            float3 EffectiveMassDiag,
+                EffectiveMassOffDiag;
             {
                 // Calculate the inverse effective mass matrix
                 float3 invEffectiveMassDiag = new float3(
-                    JacobianUtilities.CalculateInvEffectiveMassDiag(angA0, velocityA.InverseInertia, velocityA.InverseMass,
-                        angB0, velocityB.InverseInertia, velocityB.InverseMass),
-                    JacobianUtilities.CalculateInvEffectiveMassDiag(angA1, velocityA.InverseInertia, velocityA.InverseMass,
-                        angB1, velocityB.InverseInertia, velocityB.InverseMass),
-                    JacobianUtilities.CalculateInvEffectiveMassDiag(angA2, velocityA.InverseInertia, velocityA.InverseMass,
-                        angB2, velocityB.InverseInertia, velocityB.InverseMass));
+                    JacobianUtilities.CalculateInvEffectiveMassDiag(
+                        angA0,
+                        velocityA.InverseInertia,
+                        velocityA.InverseMass,
+                        angB0,
+                        velocityB.InverseInertia,
+                        velocityB.InverseMass
+                    ),
+                    JacobianUtilities.CalculateInvEffectiveMassDiag(
+                        angA1,
+                        velocityA.InverseInertia,
+                        velocityA.InverseMass,
+                        angB1,
+                        velocityB.InverseInertia,
+                        velocityB.InverseMass
+                    ),
+                    JacobianUtilities.CalculateInvEffectiveMassDiag(
+                        angA2,
+                        velocityA.InverseInertia,
+                        velocityA.InverseMass,
+                        angB2,
+                        velocityB.InverseInertia,
+                        velocityB.InverseMass
+                    )
+                );
 
                 float3 invEffectiveMassOffDiag = new float3(
-                    JacobianUtilities.CalculateInvEffectiveMassOffDiag(angA0, angA1, velocityA.InverseInertia, angB0, angB1, velocityB.InverseInertia),
-                    JacobianUtilities.CalculateInvEffectiveMassOffDiag(angA0, angA2, velocityA.InverseInertia, angB0, angB2, velocityB.InverseInertia),
-                    JacobianUtilities.CalculateInvEffectiveMassOffDiag(angA1, angA2, velocityA.InverseInertia, angB1, angB2, velocityB.InverseInertia));
+                    JacobianUtilities.CalculateInvEffectiveMassOffDiag(
+                        angA0,
+                        angA1,
+                        velocityA.InverseInertia,
+                        angB0,
+                        angB1,
+                        velocityB.InverseInertia
+                    ),
+                    JacobianUtilities.CalculateInvEffectiveMassOffDiag(
+                        angA0,
+                        angA2,
+                        velocityA.InverseInertia,
+                        angB0,
+                        angB2,
+                        velocityB.InverseInertia
+                    ),
+                    JacobianUtilities.CalculateInvEffectiveMassOffDiag(
+                        angA1,
+                        angA2,
+                        velocityA.InverseInertia,
+                        angB1,
+                        angB2,
+                        velocityB.InverseInertia
+                    )
+                );
 
                 // Invert to get the effective mass matrix
-                JacobianUtilities.InvertSymmetricMatrix(invEffectiveMassDiag, invEffectiveMassOffDiag, out EffectiveMassDiag, out EffectiveMassOffDiag);
+                JacobianUtilities.InvertSymmetricMatrix(
+                    invEffectiveMassDiag,
+                    invEffectiveMassOffDiag,
+                    out EffectiveMassDiag,
+                    out EffectiveMassOffDiag
+                );
             }
 
             float3x3 effectiveMass = JacobianUtilities.BuildSymmetricMatrix(EffectiveMassDiag, EffectiveMassOffDiag);
@@ -128,7 +208,13 @@ namespace Unity.Physics
 
         #region Helpers
 
-        private static void CalculateAngulars(float3 pivotInMotion, float3x3 worldFromMotionRotation, out float3 ang0, out float3 ang1, out float3 ang2)
+        private static void CalculateAngulars(
+            float3 pivotInMotion,
+            float3x3 worldFromMotionRotation,
+            out float3 ang0,
+            out float3 ang1,
+            out float3 ang2
+        )
         {
             // Jacobian directions are i, j, k
             // Angulars are pivotInMotion x (motionFromWorld * direction)

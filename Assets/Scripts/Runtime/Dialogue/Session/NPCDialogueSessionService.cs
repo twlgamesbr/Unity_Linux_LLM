@@ -1,24 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Monitoring.Datadog;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Dialogue.Session
 {
     /// <summary>
@@ -111,9 +110,7 @@ namespace NPCSystem.Dialogue.Session
         /// </summary>
         public void SetRuntimePlayerContext(string playerName, ulong? clientId = null)
         {
-            _activePlayerNameOverride = string.IsNullOrWhiteSpace(playerName)
-                ? string.Empty
-                : playerName.Trim();
+            _activePlayerNameOverride = string.IsNullOrWhiteSpace(playerName) ? string.Empty : playerName.Trim();
             _activePlayerClientIdOverride = clientId;
         }
 
@@ -166,11 +163,7 @@ namespace NPCSystem.Dialogue.Session
                 service: "unity-dedicated-server",
                 resource: $"NPC/{slug}",
                 type: "dialogue",
-                tags: new[]
-                {
-                    $"npc:{slug}",
-                    $"request_id:{reqId}",
-                }
+                tags: new[] { $"npc:{slug}", $"request_id:{reqId}" }
             );
 
             var turnSw = System.Diagnostics.Stopwatch.StartNew();
@@ -181,13 +174,7 @@ namespace NPCSystem.Dialogue.Session
                 string prompt = await BuildRAGPromptAsync(respondingProfile, playerMessage, reqId);
                 string dialogueMessage = string.Empty;
 
-                dialogueMessage = await SendToLocalAIAsync(
-                    respondingProfile,
-                    playerMessage,
-                    prompt,
-                    reqId,
-                    slug
-                );
+                dialogueMessage = await SendToLocalAIAsync(respondingProfile, playerMessage, prompt, reqId, slug);
                 dialogueMessage = dialogueMessage?.Trim() ?? string.Empty;
                 dialogueMessage = NPCFlowTextSanitizer.CleanDialogueText(dialogueMessage);
 
@@ -200,26 +187,23 @@ namespace NPCSystem.Dialogue.Session
                 var responseSw = System.Diagnostics.Stopwatch.StartNew();
                 if (!string.IsNullOrWhiteSpace(dialogueMessage))
                 {
-                    await _historyService.AppendConversationAsync(
-                        respondingProfile,
-                        playerMessage,
-                        dialogueMessage
-                    );
+                    await _historyService.AppendConversationAsync(respondingProfile, playerMessage, dialogueMessage);
                 }
                 responseSw.Stop();
 
                 turnSw.Stop();
                 turnSpan.SetTag("has_response", string.IsNullOrEmpty(dialogueMessage) ? "false" : "true");
                 turnSpan.SetTag("status", "success");
-                DatadogMetricsService.Timer("dialogue.session.turn.duration", turnSw.ElapsedMilliseconds, tags: new[]
-                {
-                    $"npc:{slug}",
-                    $"has_response:{(string.IsNullOrEmpty(dialogueMessage) ? "false" : "true")}",
-                });
-                DatadogMetricsService.Increment("dialogue.session.turn.count", tags: new[]
-                {
-                    $"npc:{slug}",
-                });
+                DatadogMetricsService.Timer(
+                    "dialogue.session.turn.duration",
+                    turnSw.ElapsedMilliseconds,
+                    tags: new[]
+                    {
+                        $"npc:{slug}",
+                        $"has_response:{(string.IsNullOrEmpty(dialogueMessage) ? "false" : "true")}",
+                    }
+                );
+                DatadogMetricsService.Increment("dialogue.session.turn.count", tags: new[] { $"npc:{slug}" });
 
                 OnResponseComplete?.Invoke(respondingProfile.GetDisplayName(), dialogueMessage);
 
@@ -234,11 +218,10 @@ namespace NPCSystem.Dialogue.Session
             {
                 turnSw.Stop();
                 turnSpan.SetError(ex.Message);
-                DatadogMetricsService.Increment("dialogue.session.error", tags: new[]
-                {
-                    $"npc:{slug}",
-                    $"exception:{ex.GetType().Name}",
-                });
+                DatadogMetricsService.Increment(
+                    "dialogue.session.error",
+                    tags: new[] { $"npc:{slug}", $"exception:{ex.GetType().Name}" }
+                );
 
                 logger.Log(
                     NPCFlowStage.DialogueGeneration,
@@ -267,8 +250,7 @@ namespace NPCSystem.Dialogue.Session
 
         // ─────────────────────────────────── LocalAI Backend ────
 
-        string DirectLocalAiEndpointPreview =>
-            $"http://{_remoteHost}:{_remotePort}/v1/chat/completions";
+        string DirectLocalAiEndpointPreview => $"http://{_remoteHost}:{_remotePort}/v1/chat/completions";
 
         /// <summary>
         /// Model string from NPCDialogueManager.remoteModel, set during Initialize.
@@ -276,9 +258,7 @@ namespace NPCSystem.Dialogue.Session
         /// fallback for standalone use (not the dialogue path).
         /// </summary>
         string ResolvedModelName =>
-            !string.IsNullOrWhiteSpace(_chatModel)
-                ? _chatModel.Trim()
-                : "llama-3.2-3b-instruct:q8_0";
+            !string.IsNullOrWhiteSpace(_chatModel) ? _chatModel.Trim() : "llama-3.2-3b-instruct:q8_0";
 
         async Task<string> SendToLocalAIAsync(
             NPCProfile profile,
@@ -345,27 +325,16 @@ namespace NPCSystem.Dialogue.Session
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning(
-                        $"[NPCDialogueSessionService] Failed to load player context: {ex.Message}"
-                    );
+                    Debug.LogWarning($"[NPCDialogueSessionService] Failed to load player context: {ex.Message}");
                 }
             }
 
-            messages.Add(
-                new NPCOpenAIMessage { role = "system", content = sysPrompt + "\n" + prompt }
-            );
+            messages.Add(new NPCOpenAIMessage { role = "system", content = sysPrompt + "\n" + prompt });
 
             int historyTurns = 0;
-            foreach (
-                var entry in _historyService?.GetHistoryForSlug(slug)
-                    ?? new List<DialogueEntry>()
-            )
+            foreach (var entry in _historyService?.GetHistoryForSlug(slug) ?? new List<DialogueEntry>())
             {
-                string role = string.Equals(
-                    entry.Role,
-                    "assistant",
-                    StringComparison.OrdinalIgnoreCase
-                )
+                string role = string.Equals(entry.Role, "assistant", StringComparison.OrdinalIgnoreCase)
                     ? "assistant"
                     : "user";
                 messages.Add(new NPCOpenAIMessage { role = role, content = entry.Content });
@@ -381,11 +350,7 @@ namespace NPCSystem.Dialogue.Session
                 service: "unity-dedicated-server",
                 resource: $"LocalAI/{ResolvedModelName}",
                 type: "llm",
-                tags: new[]
-                {
-                    $"npc:{slug}",
-                    $"model:{ResolvedModelName}",
-                }
+                tags: new[] { $"npc:{slug}", $"model:{ResolvedModelName}" }
             );
             bool requestSucceeded = false;
 
@@ -417,18 +382,25 @@ namespace NPCSystem.Dialogue.Session
 
             localAiSw.Stop();
             localAiSpan.SetTag("status", requestSucceeded ? "success" : "empty");
-            DatadogMetricsService.Timer("dialogue.localai.request.duration", localAiSw.ElapsedMilliseconds, tags: new[]
-            {
-                $"npc:{slug}",
-                $"model:{ResolvedModelName}",
-                $"status:{(requestSucceeded ? "success" : "empty")}",
-            });
-            DatadogMetricsService.Increment("dialogue.localai.request.count", tags: new[]
-            {
-                $"npc:{slug}",
-                $"model:{ResolvedModelName}",
-                $"status:{(requestSucceeded ? "success" : "empty")}",
-            });
+            DatadogMetricsService.Timer(
+                "dialogue.localai.request.duration",
+                localAiSw.ElapsedMilliseconds,
+                tags: new[]
+                {
+                    $"npc:{slug}",
+                    $"model:{ResolvedModelName}",
+                    $"status:{(requestSucceeded ? "success" : "empty")}",
+                }
+            );
+            DatadogMetricsService.Increment(
+                "dialogue.localai.request.count",
+                tags: new[]
+                {
+                    $"npc:{slug}",
+                    $"model:{ResolvedModelName}",
+                    $"status:{(requestSucceeded ? "success" : "empty")}",
+                }
+            );
 
             scope.Success(
                 "LocalAI response received.",
@@ -447,11 +419,7 @@ namespace NPCSystem.Dialogue.Session
 
         // ────────────────────────────── RAG Prompt Build ────
 
-        async Task<string> BuildRAGPromptAsync(
-            NPCProfile profile,
-            string playerMessage,
-            string reqId = null
-        )
+        async Task<string> BuildRAGPromptAsync(NPCProfile profile, string playerMessage, string reqId = null)
         {
             using var scope = NPCFlowScope.Start(
                 NPCFlowLogger.FindOrCreate(),
@@ -468,11 +436,7 @@ namespace NPCSystem.Dialogue.Session
             {
                 if (_retrievalService != null)
                 {
-                    ragKnowledge = await _retrievalService.SearchAsync(
-                        profile,
-                        playerMessage,
-                        reqId
-                    );
+                    ragKnowledge = await _retrievalService.SearchAsync(profile, playerMessage, reqId);
                 }
             }
             catch (Exception ex)
@@ -484,10 +448,7 @@ namespace NPCSystem.Dialogue.Session
             {
                 scope.Skipped(
                     "No retrieval context found.",
-                    new Dictionary<string, object>
-                    {
-                        ["technicalQuestion"] = isTechnicalQuestion,
-                    }
+                    new Dictionary<string, object> { ["technicalQuestion"] = isTechnicalQuestion }
                 );
 
                 if (isTechnicalQuestion)

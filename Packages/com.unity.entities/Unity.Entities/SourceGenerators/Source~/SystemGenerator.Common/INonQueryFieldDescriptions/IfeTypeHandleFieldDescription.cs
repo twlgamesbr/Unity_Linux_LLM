@@ -7,6 +7,7 @@ public readonly struct IfeTypeHandleFieldDescription : IEquatable<IfeTypeHandleF
 {
     string ContainerTypeName { get; }
     public string GeneratedFieldName { get; }
+
     public void AppendMemberDeclaration(IndentedTextWriter w, bool forcePublic = false)
     {
         if (forcePublic)
@@ -15,8 +16,7 @@ public readonly struct IfeTypeHandleFieldDescription : IEquatable<IfeTypeHandleF
         w.WriteLine();
     }
 
-    public string GetMemberAssignment()
-        => $"{GeneratedFieldName} = new {ContainerTypeName}.TypeHandle(ref state);";
+    public string GetMemberAssignment() => $"{GeneratedFieldName} = new {ContainerTypeName}.TypeHandle(ref state);";
 
     public IfeTypeHandleFieldDescription(string containerTypeName)
     {
@@ -25,5 +25,6 @@ public readonly struct IfeTypeHandleFieldDescription : IEquatable<IfeTypeHandleF
     }
 
     public bool Equals(IfeTypeHandleFieldDescription other) => ContainerTypeName == other.ContainerTypeName;
+
     public override int GetHashCode() => ContainerTypeName != null ? ContainerTypeName.GetHashCode() : 0;
 }

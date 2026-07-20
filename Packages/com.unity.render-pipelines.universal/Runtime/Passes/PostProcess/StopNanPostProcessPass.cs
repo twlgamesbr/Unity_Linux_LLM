@@ -29,6 +29,7 @@ namespace UnityEngine.Rendering.Universal
             internal TextureHandle sourceTexture;
             internal Material stopNaN;
         }
+
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             if (!m_IsValid)
@@ -40,31 +41,46 @@ namespace UnityEngine.Rendering.Universal
 
             var resourceData = frameData.Get<UniversalResourceData>();
             var sourceTexture = resourceData.cameraColor;
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, sourceTexture, k_TargetName, true, FilterMode.Bilinear);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                sourceTexture,
+                k_TargetName,
+                true,
+                FilterMode.Bilinear
+            );
 
-            using (var builder = renderGraph.AddRasterRenderPass<StopNaNsPassData>(passName, out var passData,
-                       profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<StopNaNsPassData>(
+                    passName,
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 builder.SetRenderAttachment(destinationTexture, 0, AccessFlags.ReadWrite);
                 passData.sourceTexture = sourceTexture;
                 builder.UseTexture(sourceTexture, AccessFlags.Read);
                 passData.stopNaN = m_Material;
-                builder.SetRenderFunc(static (StopNaNsPassData data, RasterGraphContext context) =>
-                {
-                    var cmd = context.cmd;
-                    RTHandle sourceTextureHdl = data.sourceTexture;
-                    Vector2 viewportScale = sourceTextureHdl.useScaling? new Vector2(sourceTextureHdl.rtHandleProperties.rtHandleScale.x, sourceTextureHdl.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, data.stopNaN, 0);
-                });
+                builder.SetRenderFunc(
+                    static (StopNaNsPassData data, RasterGraphContext context) =>
+                    {
+                        var cmd = context.cmd;
+                        RTHandle sourceTextureHdl = data.sourceTexture;
+                        Vector2 viewportScale = sourceTextureHdl.useScaling
+                            ? new Vector2(
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.x,
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.y
+                            )
+                            : Vector2.one;
+                        Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, data.stopNaN, 0);
+                    }
+                );
             }
 
             resourceData.cameraColor = destinationTexture;
         }
 
-
         // Precomputed shader ids to same some CPU cycles (mostly affects mobile)
-        public static class ShaderConstants
-        {
-        }
+        public static class ShaderConstants { }
     }
 }

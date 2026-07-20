@@ -13,34 +13,55 @@ namespace UnityEngine.Rendering
             Initial,
 
             Count,
-            Latest = Count - 1
+            Latest = Count - 1,
         }
-        [SerializeField, HideInInspector] Version m_Version = Version.Latest;
+
+        [SerializeField, HideInInspector]
+        Version m_Version = Version.Latest;
         int IRenderPipelineGraphicsSettings.version => (int)m_Version;
 
-        [SerializeField, ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceDataBufferCopyKernels.compute")]
+        [
+            SerializeField,
+            ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceDataBufferCopyKernels.compute")
+        ]
         ComputeShader m_InstanceDataBufferCopyKernels;
-        
+
         /// <summary> InstanceDataBufferCopyKernels compute shader reference </summary>
         public ComputeShader instanceDataBufferCopyKernels
         {
             get => m_InstanceDataBufferCopyKernels;
-            set => this.SetValueAndNotify(ref m_InstanceDataBufferCopyKernels, value, nameof(m_InstanceDataBufferCopyKernels));
+            set =>
+                this.SetValueAndNotify(
+                    ref m_InstanceDataBufferCopyKernels,
+                    value,
+                    nameof(m_InstanceDataBufferCopyKernels)
+                );
         }
 
-        [SerializeField, ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceDataBufferUploadKernels.compute")]
+        [
+            SerializeField,
+            ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceDataBufferUploadKernels.compute")
+        ]
         ComputeShader m_InstanceDataBufferUploadKernels;
-        
+
         /// <summary> InstanceDataBufferUploadKernels compute shader reference </summary>
         public ComputeShader instanceDataBufferUploadKernels
         {
             get => m_InstanceDataBufferUploadKernels;
-            set => this.SetValueAndNotify(ref m_InstanceDataBufferUploadKernels, value, nameof(m_InstanceDataBufferUploadKernels));
+            set =>
+                this.SetValueAndNotify(
+                    ref m_InstanceDataBufferUploadKernels,
+                    value,
+                    nameof(m_InstanceDataBufferUploadKernels)
+                );
         }
 
-        [SerializeField, ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceTransformUpdateKernels.compute")]
+        [
+            SerializeField,
+            ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceTransformUpdateKernels.compute")
+        ]
         ComputeShader m_TransformUpdaterKernels;
-        
+
         /// <summary> TransformUpdaterKernels compute shader reference </summary>
         public ComputeShader transformUpdaterKernels
         {
@@ -48,7 +69,10 @@ namespace UnityEngine.Rendering
             set => this.SetValueAndNotify(ref m_TransformUpdaterKernels, value, nameof(m_TransformUpdaterKernels));
         }
 
-        [SerializeField, ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceWindDataUpdateKernels.compute")]
+        [
+            SerializeField,
+            ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceWindDataUpdateKernels.compute")
+        ]
         public ComputeShader m_WindDataUpdaterKernels;
 
         /// <summary>
@@ -69,10 +93,14 @@ namespace UnityEngine.Rendering
         public ComputeShader occluderDepthPyramidKernels
         {
             get => m_OccluderDepthPyramidKernels;
-            set => this.SetValueAndNotify(ref m_OccluderDepthPyramidKernels, value, nameof(m_OccluderDepthPyramidKernels));
+            set =>
+                this.SetValueAndNotify(ref m_OccluderDepthPyramidKernels, value, nameof(m_OccluderDepthPyramidKernels));
         }
 
-        [SerializeField, ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceOcclusionCullingKernels.compute")]
+        [
+            SerializeField,
+            ResourcePath("Runtime/RenderPipelineResources/GPUDriven/InstanceOcclusionCullingKernels.compute")
+        ]
         ComputeShader m_InstanceOcclusionCullingKernels;
 
         /// <summary>
@@ -81,7 +109,12 @@ namespace UnityEngine.Rendering
         public ComputeShader instanceOcclusionCullingKernels
         {
             get => m_InstanceOcclusionCullingKernels;
-            set => this.SetValueAndNotify(ref m_InstanceOcclusionCullingKernels, value, nameof(m_InstanceOcclusionCullingKernels));
+            set =>
+                this.SetValueAndNotify(
+                    ref m_InstanceOcclusionCullingKernels,
+                    value,
+                    nameof(m_InstanceOcclusionCullingKernels)
+                );
         }
 
         [SerializeField, ResourcePath("Runtime/RenderPipelineResources/GPUDriven/OcclusionCullingDebug.compute")]
@@ -93,7 +126,12 @@ namespace UnityEngine.Rendering
         public ComputeShader occlusionCullingDebugKernels
         {
             get => m_OcclusionCullingDebugKernels;
-            set => this.SetValueAndNotify(ref m_OcclusionCullingDebugKernels, value, nameof(m_OcclusionCullingDebugKernels));
+            set =>
+                this.SetValueAndNotify(
+                    ref m_OcclusionCullingDebugKernels,
+                    value,
+                    nameof(m_OcclusionCullingDebugKernels)
+                );
         }
 
         [SerializeField, ResourcePath("Runtime/RenderPipelineResources/GPUDriven/DebugOcclusionTest.shader")]

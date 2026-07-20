@@ -19,13 +19,13 @@ namespace Unity.Collections
     [NativeContainer]
     [DebuggerDisplay("Length = {Length}, IsCreated = {IsCreated}")]
     [GenerateTestsForBurstCompatibility]
-    public unsafe struct NativeBitArray
-        : INativeDisposable
+    public unsafe struct NativeBitArray : INativeDisposable
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         internal AtomicSafetyHandle m_Safety;
         static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<NativeBitArray>();
 #endif
+
         [NativeDisableUnsafePtrRestriction]
         internal UnsafeBitArray* m_BitArray;
         internal AllocatorHandle m_Allocator;
@@ -36,16 +36,24 @@ namespace Unity.Collections
         /// <param name="numBits">The number of bits.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public NativeBitArray(int numBits, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public NativeBitArray(
+            int numBits,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
         {
             CollectionHelper.CheckAllocator(allocator);
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             m_Safety = CollectionHelper.CreateSafetyHandle(allocator);
-            CollectionHelper.SetStaticSafetyId(ref m_Safety, ref s_staticSafetyId.Data, "Unity.Collections.NativeBitArray");
+            CollectionHelper.SetStaticSafetyId(
+                ref m_Safety,
+                ref s_staticSafetyId.Data,
+                "Unity.Collections.NativeBitArray"
+            );
 #endif
             m_BitArray = UnsafeBitArray.Alloc(allocator);
             m_Allocator = allocator;
-            * m_BitArray = new UnsafeBitArray(numBits, allocator, options);
+            *m_BitArray = new UnsafeBitArray(numBits, allocator, options);
         }
 
         /// <summary>
@@ -139,16 +147,26 @@ namespace Unity.Collections
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            var jobHandle = new NativeBitArrayDisposeJob { Data = new NativeBitArrayDispose { m_BitArrayData = m_BitArray, m_Allocator = m_Allocator, m_Safety = m_Safety } }.Schedule(inputDeps);
+            var jobHandle = new NativeBitArrayDisposeJob
+            {
+                Data = new NativeBitArrayDispose
+                {
+                    m_BitArrayData = m_BitArray,
+                    m_Allocator = m_Allocator,
+                    m_Safety = m_Safety,
+                },
+            }.Schedule(inputDeps);
             AtomicSafetyHandle.Release(m_Safety);
 #else
-            var jobHandle = new NativeBitArrayDisposeJob { Data = new NativeBitArrayDispose { m_BitArrayData = m_BitArray, m_Allocator = m_Allocator } }.Schedule(inputDeps);
+            var jobHandle = new NativeBitArrayDisposeJob
+            {
+                Data = new NativeBitArrayDispose { m_BitArrayData = m_BitArray, m_Allocator = m_Allocator },
+            }.Schedule(inputDeps);
 #endif
             m_BitArray = null;
             m_Allocator = Invalid;
 
             return jobHandle;
-
         }
 
         /// <summary>
@@ -200,15 +218,20 @@ namespace Unity.Collections
         /// <exception cref="InvalidOperationException">Thrown if the number of bits in this array
         /// is not evenly divisible by the size of T in bits (`sizeof(T) * 8`).</exception>
         /// <returns>A native array that aliases the content of this array.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public NativeArray<T> AsNativeArray<T>() where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public NativeArray<T> AsNativeArray<T>()
+            where T : unmanaged
         {
             CheckReadBounds<T>();
 
             var bitsPerElement = sizeof(T) * 8;
             var length = m_BitArray->Length / bitsPerElement;
 
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(m_BitArray->Ptr, length, Allocator.None);
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                m_BitArray->Ptr,
+                length,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.UseSecondaryVersion(ref m_Safety);
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, m_Safety);
@@ -439,6 +462,7 @@ namespace Unity.Collections
             AtomicSafetyHandle m_Safety;
             internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<ReadOnly>();
 #endif
+
             [NativeDisableUnsafePtrRestriction]
             internal UnsafeBitArray.ReadOnly m_BitArray;
 
@@ -604,7 +628,8 @@ namespace Unity.Collections
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        void CheckReadBounds<T>() where T : unmanaged
+        void CheckReadBounds<T>()
+            where T : unmanaged
         {
             CheckRead();
 
@@ -613,11 +638,15 @@ namespace Unity.Collections
 
             if (length == 0)
             {
-                throw new InvalidOperationException($"Number of bits in the NativeBitArray {m_BitArray->Length} is not sufficient to cast to NativeArray<T> {sizeof(T) * 8}.");
+                throw new InvalidOperationException(
+                    $"Number of bits in the NativeBitArray {m_BitArray->Length} is not sufficient to cast to NativeArray<T> {sizeof(T) * 8}."
+                );
             }
-            else if (m_BitArray->Length != bitsPerElement* length)
+            else if (m_BitArray->Length != bitsPerElement * length)
             {
-                throw new InvalidOperationException($"Number of bits in the NativeBitArray {m_BitArray->Length} couldn't hold multiple of T {sizeof(T)}. Output array would be truncated.");
+                throw new InvalidOperationException(
+                    $"Number of bits in the NativeBitArray {m_BitArray->Length} couldn't hold multiple of T {sizeof(T)}. Output array would be truncated."
+                );
             }
         }
 
@@ -674,7 +703,10 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <param name="container">Array from which to get an AtomicSafetyHandle.</param>
         /// <returns>This array's atomic safety handle.</returns>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+        )]
         public static AtomicSafetyHandle GetAtomicSafetyHandle(in NativeBitArray container)
         {
             return container.m_Safety;
@@ -685,7 +717,10 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <param name="container">Array which the AtomicSafetyHandle is for.</param>
         /// <param name="safety">Atomic safety handle for this array.</param>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+        )]
         public static void SetAtomicSafetyHandle(ref NativeBitArray container, AtomicSafetyHandle safety)
         {
             container.m_Safety = safety;
@@ -699,16 +734,16 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="sizeInBytes">Size of the buffer in bytes. Must be a multiple of 8.</param>
         /// <param name="allocator">The allocator that was used to create the buffer.</param>
         /// <returns>A bit array with content aliasing a buffer.</returns>
-        public static unsafe NativeBitArray ConvertExistingDataToNativeBitArray(void* ptr, int sizeInBytes, AllocatorManager.AllocatorHandle allocator)
+        public static unsafe NativeBitArray ConvertExistingDataToNativeBitArray(
+            void* ptr,
+            int sizeInBytes,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             var bitArray = UnsafeBitArray.Alloc(Allocator.Persistent);
             *bitArray = new UnsafeBitArray(ptr, sizeInBytes, allocator);
 
-            return new NativeBitArray
-            {
-                m_BitArray = bitArray,
-                m_Allocator = Allocator.Persistent,
-            };
+            return new NativeBitArray { m_BitArray = bitArray, m_Allocator = Allocator.Persistent };
         }
     }
 }

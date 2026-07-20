@@ -5,6 +5,7 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
     internal class RunSettings : ITestRunSettings
     {
         private ITestSettings m_TestSettings;
+
         public RunSettings(ITestSettings testSettings)
         {
             m_TestSettings = testSettings;

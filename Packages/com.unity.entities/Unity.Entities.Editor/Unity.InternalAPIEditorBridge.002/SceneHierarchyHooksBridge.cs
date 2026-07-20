@@ -24,12 +24,15 @@ namespace Unity.Editor.Bridge
 
         public static void AddCustomSubSceneHeaderContextMenuItems(DropdownMenu menu, SubScene subScene)
         {
-            SceneHierarchyHooks.AddCustomSubSceneHeaderContextMenuItems(k_MenuWrapper.GenericMenu, new SceneHierarchyHooks.SubSceneInfo()
-            {
-                scene = subScene.EditingScene,
-                sceneAsset = subScene.SceneAsset,
-                sceneName = subScene.SceneAsset ? subScene.SceneName : string.Empty
-            });
+            SceneHierarchyHooks.AddCustomSubSceneHeaderContextMenuItems(
+                k_MenuWrapper.GenericMenu,
+                new SceneHierarchyHooks.SubSceneInfo()
+                {
+                    scene = subScene.EditingScene,
+                    sceneAsset = subScene.SceneAsset,
+                    sceneName = subScene.SceneAsset ? subScene.SceneName : string.Empty,
+                }
+            );
             k_MenuWrapper.ApplyGenericMenuItemsTo(menu);
         }
     }

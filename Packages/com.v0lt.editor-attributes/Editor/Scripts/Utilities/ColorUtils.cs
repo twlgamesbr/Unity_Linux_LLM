@@ -1,6 +1,6 @@
-using UnityEngine;
-using UnityEditor;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor.Utility
@@ -30,40 +30,44 @@ namespace EditorAttributes.Editor.Utility
         /// <param name="delay">How many milliseconds to delay before applying the color</param>
         public static void ApplyColor(VisualElement visualElement, Color color, int delay = 50)
         {
-            visualElement.schedule.Execute(() =>
-            {
-                var labels = visualElement.Query<Label>().ToList();
-
-                foreach (var label in labels)
-                    label.style.color = color;
-
-                var textElements = visualElement.Query<TextElement>().ToList();
-
-                foreach (var textElement in textElements)
-                    textElement.style.color = color;
-
-                var scrollviews = visualElement.Query<ScrollView>(className: "unity-collection-view__scroll-view").ToList();
-
-                foreach (var scrollview in scrollviews)
-                    scrollview.style.backgroundColor = color / 3f;
-
-                var inputFields = visualElement.Query(className: "unity-base-field__input").ToList();
-
-                foreach (var inputField in inputFields)
-                    inputField.style.backgroundColor = color / 3f;
-
-                var checkMarks = visualElement.Query(className: "unity-toggle__checkmark").ToList();
-
-                foreach (var checkMark in checkMarks)
+            visualElement
+                .schedule.Execute(() =>
                 {
-                    checkMark.style.unityBackgroundImageTintColor = color;
-                    checkMark.parent.style.backgroundColor = StyleKeyword.Initial;
-                }
+                    var labels = visualElement.Query<Label>().ToList();
 
-            }).ExecuteLater(delay);
+                    foreach (var label in labels)
+                        label.style.color = color;
+
+                    var textElements = visualElement.Query<TextElement>().ToList();
+
+                    foreach (var textElement in textElements)
+                        textElement.style.color = color;
+
+                    var scrollviews = visualElement
+                        .Query<ScrollView>(className: "unity-collection-view__scroll-view")
+                        .ToList();
+
+                    foreach (var scrollview in scrollviews)
+                        scrollview.style.backgroundColor = color / 3f;
+
+                    var inputFields = visualElement.Query(className: "unity-base-field__input").ToList();
+
+                    foreach (var inputField in inputFields)
+                        inputField.style.backgroundColor = color / 3f;
+
+                    var checkMarks = visualElement.Query(className: "unity-toggle__checkmark").ToList();
+
+                    foreach (var checkMark in checkMarks)
+                    {
+                        checkMark.style.unityBackgroundImageTintColor = color;
+                        checkMark.parent.style.backgroundColor = StyleKeyword.Initial;
+                    }
+                })
+                .ExecuteLater(delay);
         }
 
-        internal static Color? GetPropertyColor(SerializedProperty property) => GetPropertyColor(property, EditorExtension.GLOBAL_COLOR.a);
+        internal static Color? GetPropertyColor(SerializedProperty property) =>
+            GetPropertyColor(property, EditorExtension.GLOBAL_COLOR.a);
 
         internal static Color? GetPropertyColor(SerializedProperty property, float customAlpha)
         {
@@ -75,7 +79,12 @@ namespace EditorAttributes.Editor.Utility
             }
             else if (EditorExtension.GLOBAL_COLOR != EditorExtension.DEFAULT_GLOBAL_COLOR)
             {
-                return new Color(EditorExtension.GLOBAL_COLOR.r, EditorExtension.GLOBAL_COLOR.g, EditorExtension.GLOBAL_COLOR.b, customAlpha);
+                return new Color(
+                    EditorExtension.GLOBAL_COLOR.r,
+                    EditorExtension.GLOBAL_COLOR.g,
+                    EditorExtension.GLOBAL_COLOR.b,
+                    customAlpha
+                );
             }
 
             return null;
@@ -104,7 +113,8 @@ namespace EditorAttributes.Editor.Utility
         /// <param name="attribute">The color attribute</param>
         /// <param name="errorBox">The error box to display any errors to</param>
         /// <returns>The color from the attribute</returns>
-        public static Color GetColorFromAttribute(IColorAttribute attribute, HelpBox errorBox) => GetColorFromAttribute(attribute, 1f, errorBox);
+        public static Color GetColorFromAttribute(IColorAttribute attribute, HelpBox errorBox) =>
+            GetColorFromAttribute(attribute, 1f, errorBox);
 
         /// <summary>
         /// Gets the color value from a color attribute with custom alpha
@@ -133,7 +143,8 @@ namespace EditorAttributes.Editor.Utility
         /// </summary>
         /// <param name="colorAttribute">The color attribute</param>
         /// <returns>The color value</returns>
-        public static Color ColorAttributeToColor(IColorAttribute colorAttribute) => ColorAttributeToColor(colorAttribute, 1f);
+        public static Color ColorAttributeToColor(IColorAttribute colorAttribute) =>
+            ColorAttributeToColor(colorAttribute, 1f);
 
         /// <summary>
         /// Converts the color attribute values from the color attribute to a color
@@ -180,7 +191,12 @@ namespace EditorAttributes.Editor.Utility
                 GUIColor.Purple => new(158f / 255f, 5f / 255f, 247f / 255f, alpha),
                 GUIColor.Pink => new(247f / 255f, 5f / 255f, 171f / 255f, alpha),
                 GUIColor.Lime => new(145f / 255f, 1f, 0f, alpha),
-                _ => new(EditorExtension.DEFAULT_GLOBAL_COLOR.r, EditorExtension.DEFAULT_GLOBAL_COLOR.g, EditorExtension.DEFAULT_GLOBAL_COLOR.b, alpha)
+                _ => new(
+                    EditorExtension.DEFAULT_GLOBAL_COLOR.r,
+                    EditorExtension.DEFAULT_GLOBAL_COLOR.g,
+                    EditorExtension.DEFAULT_GLOBAL_COLOR.b,
+                    alpha
+                ),
             };
         }
     }

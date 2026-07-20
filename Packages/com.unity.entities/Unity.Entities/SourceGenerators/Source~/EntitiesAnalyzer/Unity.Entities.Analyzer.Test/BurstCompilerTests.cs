@@ -1,8 +1,9 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VerifyCS = Unity.Entities.Analyzer.Test.CSharpCodeFixVerifier<
     Unity.Entities.Analyzer.BurstCompilerAnalyzer,
-    Unity.Entities.Analyzer.EntitiesCodeFixProvider>;
+    Unity.Entities.Analyzer.EntitiesCodeFixProvider
+>;
 
 namespace Unity.Entities.Analyzer
 {
@@ -12,14 +13,16 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task MissingBurstCompileAttributeOnStaticClass()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Burst;
                 static class {|#0:ContainingType|}
                 {
                     [BurstCompile]
                     public static void BurstMethod(){}
                 }";
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Burst;
                 [BurstCompile]
                 static class ContainingType
@@ -28,7 +31,9 @@ namespace Unity.Entities.Analyzer
                     public static void BurstMethod(){}
                 }";
 
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.k_Ea0010Descriptor).WithLocation(0)
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.k_Ea0010Descriptor)
+                .WithLocation(0)
                 .WithArguments("ContainingType", "BurstMethod");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
@@ -36,7 +41,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task MissingBurstCompileAttributeOnSecondContainingClass()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Burst;
                 static class {|#0:ContainingType2|}
                 {
@@ -47,7 +53,8 @@ namespace Unity.Entities.Analyzer
                         public static void BurstMethod(){}
                     }
                 }";
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Burst;
                 [BurstCompile]
                 static class ContainingType2
@@ -60,7 +67,9 @@ namespace Unity.Entities.Analyzer
                     }
                 }";
 
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.k_Ea0010Descriptor).WithLocation(0)
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.k_Ea0010Descriptor)
+                .WithLocation(0)
                 .WithArguments("ContainingType2", "BurstMethod");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
@@ -68,14 +77,16 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task MissingBurstCompileAttributeOnStruct()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Burst;
                 struct {|#0:ContainingType|}
                 {
                     [BurstCompile]
                     public static void BurstMethod(){}
                 }";
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Burst;
                 [BurstCompile]
                 struct ContainingType
@@ -84,7 +95,9 @@ namespace Unity.Entities.Analyzer
                     public static void BurstMethod(){}
                 }";
 
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.k_Ea0010Descriptor).WithLocation(0)
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.k_Ea0010Descriptor)
+                .WithLocation(0)
                 .WithArguments("ContainingType", "BurstMethod");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
@@ -92,7 +105,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task BurstCompileAttributeOnSinglePartialNoError()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Burst;
                 partial struct ContainingType
                 {
@@ -113,7 +127,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task MissingBurstCompileAttributeOnISystemNoError()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Burst;
                 using Unity.Entities;
                 partial struct SomeSystem : ISystem

@@ -1,26 +1,25 @@
 using System;
 using System.Collections.Generic;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Monitoring.Datadog;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Network.Core
 {
     [DefaultExecutionOrder(-2500)]
@@ -256,19 +255,14 @@ namespace NPCSystem.Network.Core
 
             DatadogMetricsService.Increment(
                 "network.client.connected",
-                tags: new[]
-                {
-                    $"is_server:{NetworkManager.IsServer}",
-                    $"is_client:{NetworkManager.IsClient}",
-                }
+                tags: new[] { $"is_server:{NetworkManager.IsServer}", $"is_client:{NetworkManager.IsClient}" }
             );
         }
 
         void HandleClientDisconnected(ulong clientId)
         {
             _logger = NPCFlowLogger.FindOrCreate();
-            string disconnectReason =
-                NetworkManager != null ? NetworkManager.DisconnectReason : string.Empty;
+            string disconnectReason = NetworkManager != null ? NetworkManager.DisconnectReason : string.Empty;
             _logger?.Log(
                 NPCFlowStage.NetworkHost,
                 NPCFlowStatus.Success,
@@ -286,10 +280,7 @@ namespace NPCSystem.Network.Core
 
             DatadogMetricsService.Increment(
                 "network.client.disconnected",
-                tags: new[]
-                {
-                    $"reason:{(!string.IsNullOrEmpty(disconnectReason) ? "explicit" : "unknown")}",
-                }
+                tags: new[] { $"reason:{(!string.IsNullOrEmpty(disconnectReason) ? "explicit" : "unknown")}" }
             );
         }
 
@@ -302,11 +293,7 @@ namespace NPCSystem.Network.Core
                 service: "unity-dedicated-server",
                 resource: TransportConfig.AutoStartMode.ToString(),
                 type: "networking",
-                tags: new[]
-                {
-                    $"mode:{TransportConfig.AutoStartMode}",
-                    $"port:{TransportConfig.Port}",
-                }
+                tags: new[] { $"mode:{TransportConfig.AutoStartMode}", $"port:{TransportConfig.Port}" }
             );
 
             if (NetworkManager == null)
@@ -363,28 +350,19 @@ namespace NPCSystem.Network.Core
             switch (TransportConfig.AutoStartMode)
             {
                 case NPCNetworkAutoStartMode.Client:
-                    DatadogMetricsService.Increment(
-                        "network.mode.start",
-                        tags: new[] { "mode:client" }
-                    );
+                    DatadogMetricsService.Increment("network.mode.start", tags: new[] { "mode:client" });
                     bool clientStarted = NetworkManager.StartClient();
                     netSpan.SetTag("started", clientStarted.ToString());
                     netSpan.SetTag("status", clientStarted ? "success" : "failed");
                     return clientStarted;
                 case NPCNetworkAutoStartMode.Host:
-                    DatadogMetricsService.Increment(
-                        "network.mode.start",
-                        tags: new[] { "mode:host" }
-                    );
+                    DatadogMetricsService.Increment("network.mode.start", tags: new[] { "mode:host" });
                     bool hostStarted = NetworkManager.StartHost();
                     netSpan.SetTag("started", hostStarted.ToString());
                     netSpan.SetTag("status", hostStarted ? "success" : "failed");
                     return hostStarted;
                 case NPCNetworkAutoStartMode.Server:
-                    DatadogMetricsService.Increment(
-                        "network.mode.start",
-                        tags: new[] { "mode:server" }
-                    );
+                    DatadogMetricsService.Increment("network.mode.start", tags: new[] { "mode:server" });
                     bool serverStarted = NetworkManager.StartServer();
                     netSpan.SetTag("started", serverStarted.ToString());
                     netSpan.SetTag("status", serverStarted ? "success" : "failed");

@@ -55,10 +55,17 @@ namespace UnityEngine.Rendering.RadeonRays
 
         public void Execute(
             CommandBuffer cmd,
-            GraphicsBuffer vertices, int verticesOffset, uint vertexStride,
-            GraphicsBuffer indices, int indicesOffset, int baseIndex, IndexFormat indexFormat, uint triangleCount,
+            GraphicsBuffer vertices,
+            int verticesOffset,
+            uint vertexStride,
+            GraphicsBuffer indices,
+            int indicesOffset,
+            int baseIndex,
+            IndexFormat indexFormat,
+            uint triangleCount,
             GraphicsBuffer scratch,
-            in BottomLevelLevelAccelStruct result)
+            in BottomLevelLevelAccelStruct result
+        )
         {
             Common.EnableKeyword(cmd, shaderBuildHlbvh, "TOP_LEVEL", false);
             Common.EnableKeyword(cmd, shaderBuildHlbvh, "UINT16_INDICES", indexFormat == IndexFormat.Int16);
@@ -71,7 +78,11 @@ namespace UnityEngine.Rendering.RadeonRays
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_constants_triangle_count, (int)triangleCount);
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_bvh_offset, (int)result.bvhOffset);
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_bvh_leaves_offset, (int)result.bvhLeavesOffset);
-            cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_internal_node_range_offset, (int)scratchLayout.InternalNodeRange);
+            cmd.SetComputeIntParam(
+                shaderBuildHlbvh,
+                SID.g_internal_node_range_offset,
+                (int)scratchLayout.InternalNodeRange
+            );
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_leaf_parents_offset, (int)scratchLayout.LeafParents);
             cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_aabb_offset, (int)scratchLayout.Aabb);
 
@@ -79,18 +90,51 @@ namespace UnityEngine.Rendering.RadeonRays
             cmd.DispatchCompute(shaderBuildHlbvh, kernelInit, 1, 1, 1);
 
             BindKernelArguments(cmd, kernelCalculateAabb, vertices, indices, scratch, scratchLayout, result, false);
-            cmd.DispatchCompute(shaderBuildHlbvh, kernelCalculateAabb, (int)Common.CeilDivide(triangleCount, kTrianglesPerGroup), 1, 1);
+            cmd.DispatchCompute(
+                shaderBuildHlbvh,
+                kernelCalculateAabb,
+                (int)Common.CeilDivide(triangleCount, kTrianglesPerGroup),
+                1,
+                1
+            );
 
-            BindKernelArguments(cmd, kernelCalculateMortonCodes, vertices, indices, scratch, scratchLayout, result, false);
-            cmd.DispatchCompute(shaderBuildHlbvh, kernelCalculateMortonCodes, (int)Common.CeilDivide(triangleCount, kTrianglesPerGroup), 1, 1);
+            BindKernelArguments(
+                cmd,
+                kernelCalculateMortonCodes,
+                vertices,
+                indices,
+                scratch,
+                scratchLayout,
+                result,
+                false
+            );
+            cmd.DispatchCompute(
+                shaderBuildHlbvh,
+                kernelCalculateMortonCodes,
+                (int)Common.CeilDivide(triangleCount, kTrianglesPerGroup),
+                1,
+                1
+            );
 
-            radixSort.Execute(cmd, scratch,
-                scratchLayout.MortonCodes, scratchLayout.SortedMortonCodes,
-                scratchLayout.PrimitiveRefs, scratchLayout.SortedPrimitiveRefs,
-                scratchLayout.SortMemory, triangleCount);
+            radixSort.Execute(
+                cmd,
+                scratch,
+                scratchLayout.MortonCodes,
+                scratchLayout.SortedMortonCodes,
+                scratchLayout.PrimitiveRefs,
+                scratchLayout.SortedPrimitiveRefs,
+                scratchLayout.SortMemory,
+                triangleCount
+            );
 
             BindKernelArguments(cmd, kernelBuildTreeBottomUp, vertices, indices, scratch, scratchLayout, result, true);
-            cmd.DispatchCompute(shaderBuildHlbvh, kernelBuildTreeBottomUp, (int)Common.CeilDivide(triangleCount, kTrianglesPerGroup), 1, 1);
+            cmd.DispatchCompute(
+                shaderBuildHlbvh,
+                kernelBuildTreeBottomUp,
+                (int)Common.CeilDivide(triangleCount, kTrianglesPerGroup),
+                1,
+                1
+            );
         }
 
         private void BindKernelArguments(
@@ -101,7 +145,8 @@ namespace UnityEngine.Rendering.RadeonRays
             GraphicsBuffer scratch,
             ScratchBufferLayout scratchLayout,
             BottomLevelLevelAccelStruct result,
-            bool setSortedCodes)
+            bool setSortedCodes
+        )
         {
             cmd.SetComputeBufferParam(shaderBuildHlbvh, kernel, SID.g_vertices, vertices);
             cmd.SetComputeBufferParam(shaderBuildHlbvh, kernel, SID.g_indices, indices);
@@ -111,8 +156,16 @@ namespace UnityEngine.Rendering.RadeonRays
 
             if (setSortedCodes)
             {
-                cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_morton_codes_offset, (int)scratchLayout.SortedMortonCodes);
-                cmd.SetComputeIntParam(shaderBuildHlbvh, SID.g_primitive_refs_offset, (int)scratchLayout.SortedPrimitiveRefs);
+                cmd.SetComputeIntParam(
+                    shaderBuildHlbvh,
+                    SID.g_morton_codes_offset,
+                    (int)scratchLayout.SortedMortonCodes
+                );
+                cmd.SetComputeIntParam(
+                    shaderBuildHlbvh,
+                    SID.g_primitive_refs_offset,
+                    (int)scratchLayout.SortedPrimitiveRefs
+                );
             }
             else
             {
@@ -136,7 +189,9 @@ namespace UnityEngine.Rendering.RadeonRays
             public static ScratchBufferLayout Create(uint triangleCount)
             {
                 var result = new ScratchBufferLayout();
-                result.SortMemory = result.Reserve(math.max((uint)RadixSort.GetScratchDataSizeInDwords(triangleCount), triangleCount));
+                result.SortMemory = result.Reserve(
+                    math.max((uint)RadixSort.GetScratchDataSizeInDwords(triangleCount), triangleCount)
+                );
                 result.PrimitiveRefs = result.Reserve(triangleCount);
                 result.MortonCodes = result.Reserve(triangleCount);
                 result.SortedPrimitiveRefs = result.Reserve(triangleCount);

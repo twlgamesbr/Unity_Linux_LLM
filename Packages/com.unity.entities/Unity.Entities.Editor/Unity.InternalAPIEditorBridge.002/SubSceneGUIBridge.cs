@@ -10,7 +10,10 @@ namespace Unity.Editor.Bridge
 
         public static void CreateClosedSubSceneContextClick(DropdownMenu menu, SceneAsset subSceneSceneAsset)
         {
-            SubSceneGUI.CreateClosedSubSceneContextClick(k_MenuWrapper.GenericMenu, new SceneHierarchyHooks.SubSceneInfo() { sceneAsset = subSceneSceneAsset });
+            SubSceneGUI.CreateClosedSubSceneContextClick(
+                k_MenuWrapper.GenericMenu,
+                new SceneHierarchyHooks.SubSceneInfo() { sceneAsset = subSceneSceneAsset }
+            );
             k_MenuWrapper.ApplyGenericMenuItemsTo(menu);
         }
     }

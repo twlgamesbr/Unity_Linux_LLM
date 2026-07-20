@@ -7,10 +7,17 @@ namespace UnityEngine.Rendering.Universal
     [Serializable]
     internal class SelectionSource
     {
-        [SerializeField] public int        m_HashCode;
-        [SerializeField] public int        m_SourceType;
-        [SerializeField] public int        m_MenuPriority;
-        [SerializeField] public GUIContent m_MenuName;
+        [SerializeField]
+        public int m_HashCode;
+
+        [SerializeField]
+        public int m_SourceType;
+
+        [SerializeField]
+        public int m_MenuPriority;
+
+        [SerializeField]
+        public GUIContent m_MenuName;
 
         public override int GetHashCode()
         {
@@ -18,11 +25,18 @@ namespace UnityEngine.Rendering.Universal
             return m_HashCode;
         }
 
-        public GUIContent GetSourceName() { return m_MenuName; }
+        public GUIContent GetSourceName()
+        {
+            return m_MenuName;
+        }
 
         public virtual void SetSourceType(SerializedObject serializedObject) { }
 
-        public virtual void DrawUI(SerializedProperty property, SerializedObject serializedObject, UnityEngine.Object[] targets) { }
+        public virtual void DrawUI(
+            SerializedProperty property,
+            SerializedObject serializedObject,
+            UnityEngine.Object[] targets
+        ) { }
     }
 }
 #endif

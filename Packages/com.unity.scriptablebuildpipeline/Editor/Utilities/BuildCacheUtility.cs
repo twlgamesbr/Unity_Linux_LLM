@@ -22,15 +22,18 @@ internal class AutoBuildCacheUtility : IDisposable
     {
         BuildCacheUtility.ClearCacheHashes();
         HashingMethods.ClearFileHashCache(out var requestCount, out var requestCacheHits);
-    //    Debug.Log($"File Hash Cache: {requestCacheHits}/{requestCount} - {(float)requestCacheHits / requestCount * 100}% hit rate.");
+        //    Debug.Log($"File Hash Cache: {requestCacheHits}/{requestCount} - {(float)requestCacheHits / requestCount * 100}% hit rate.");
     }
 }
 
 internal static class BuildCacheUtility
 {
-    internal static Dictionary<KeyValuePair<GUID, int>, CacheEntry> m_GuidToHash = new Dictionary<KeyValuePair<GUID, int>, CacheEntry>();
-    static Dictionary<KeyValuePair<string, int>, CacheEntry> m_PathToHash = new Dictionary<KeyValuePair<string, int>, CacheEntry>();
-    static Dictionary<KeyValuePair<Type, int>, CacheEntry> m_TypeToHash = new Dictionary<KeyValuePair<Type, int>, CacheEntry>();
+    internal static Dictionary<KeyValuePair<GUID, int>, CacheEntry> m_GuidToHash =
+        new Dictionary<KeyValuePair<GUID, int>, CacheEntry>();
+    static Dictionary<KeyValuePair<string, int>, CacheEntry> m_PathToHash =
+        new Dictionary<KeyValuePair<string, int>, CacheEntry>();
+    static Dictionary<KeyValuePair<Type, int>, CacheEntry> m_TypeToHash =
+        new Dictionary<KeyValuePair<Type, int>, CacheEntry>();
     static Dictionary<ObjectIdentifier, Type[]> m_ObjectToType = new Dictionary<ObjectIdentifier, Type[]>();
     static TypeDB m_TypeDB;
     internal static HashSet<GUID> m_ExplicitAssets = new HashSet<GUID>();
@@ -59,7 +62,10 @@ internal static class BuildCacheUtility
         string path = AssetDatabase.GUIDToAssetPath(asset.ToString());
         entry.Type = CacheEntry.EntryType.Asset;
 
-        if (path.Equals(CommonStrings.UnityBuiltInExtraPath, StringComparison.OrdinalIgnoreCase) || path.Equals(CommonStrings.UnityDefaultResourcePath, StringComparison.OrdinalIgnoreCase))
+        if (
+            path.Equals(CommonStrings.UnityBuiltInExtraPath, StringComparison.OrdinalIgnoreCase)
+            || path.Equals(CommonStrings.UnityDefaultResourcePath, StringComparison.OrdinalIgnoreCase)
+        )
             entry.Hash = HashingMethods.Calculate(Application.unityVersion, path).ToHash128();
         else
         {
@@ -67,13 +73,21 @@ internal static class BuildCacheUtility
             if (!entry.Hash.isValid && File.Exists(path))
                 entry.Hash = HashingMethods.CalculateFile(path).ToHash128();
             if (path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase))
-                entry.Hash = HashingMethods.Calculate(entry.Hash, BuildInterfacesWrapper.SceneCallbackVersionHash, PlayerSettings.stripUnusedMeshComponents).ToHash128();
+                entry.Hash = HashingMethods
+                    .Calculate(
+                        entry.Hash,
+                        BuildInterfacesWrapper.SceneCallbackVersionHash,
+                        PlayerSettings.stripUnusedMeshComponents
+                    )
+                    .ToHash128();
         }
 
         if (entry.Hash.isValid)
             entry.Hash = HashingMethods.Calculate(entry.Hash, entry.Version).ToHash128();
 
-        entry.Inclusion = m_ExplicitAssets.Contains(asset) ? CacheEntry.InclusionType.Explicit : CacheEntry.InclusionType.Implicit;
+        entry.Inclusion = m_ExplicitAssets.Contains(asset)
+            ? CacheEntry.InclusionType.Explicit
+            : CacheEntry.InclusionType.Implicit;
 
         m_GuidToHash[key] = entry;
         return entry;

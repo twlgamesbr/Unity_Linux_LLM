@@ -9,7 +9,8 @@ namespace Unity.Entities.Editor
     {
         static readonly Regex k_Regex = new Regex(
             @$"\b(?<token>[{Constants.ComponentSearch.TokenCaseInsensitive}]{Constants.ComponentSearch.Op})\s*(?<componentType>(\S)*)",
-            RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+            RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture
+        );
 
         static readonly StringBuilder k_UnmatchedInputBuilder = new StringBuilder();
 
@@ -63,13 +64,16 @@ namespace Unity.Entities.Editor
             var entityTypeIndex = TypeManager.GetTypeIndex<Entity>();
             componentTypes.RemoveWhere(t => t.TypeIndex == entityTypeIndex);
 
-            return Result.Valid(new EntityQueryDesc
-            {
-                // Temp patch: Using `All` since most users seem to prefer that behaviour.
-                // The real solution is to properly support entity queries in search.
-                All = componentTypes.ToArray(),
-                Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities
-            }, k_UnmatchedInputBuilder.ToString());
+            return Result.Valid(
+                new EntityQueryDesc
+                {
+                    // Temp patch: Using `All` since most users seem to prefer that behaviour.
+                    // The real solution is to properly support entity queries in search.
+                    All = componentTypes.ToArray(),
+                    Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities,
+                },
+                k_UnmatchedInputBuilder.ToString()
+            );
         }
 
         public struct Result
@@ -79,13 +83,31 @@ namespace Unity.Entities.Editor
             public string ErrorComponentType;
             public string Filter;
 
-            public static readonly Result ValidBecauseEmpty = new Result { IsValid = true, EntityQueryDesc = null, Filter = string.Empty, ErrorComponentType = string.Empty };
+            public static readonly Result ValidBecauseEmpty = new Result
+            {
+                IsValid = true,
+                EntityQueryDesc = null,
+                Filter = string.Empty,
+                ErrorComponentType = string.Empty,
+            };
 
-            public static Result Invalid(string errorComponentType)
-                => new Result { IsValid = false, EntityQueryDesc = null, Filter = string.Empty, ErrorComponentType = errorComponentType };
+            public static Result Invalid(string errorComponentType) =>
+                new Result
+                {
+                    IsValid = false,
+                    EntityQueryDesc = null,
+                    Filter = string.Empty,
+                    ErrorComponentType = errorComponentType,
+                };
 
-            public static Result Valid(EntityQueryDesc queryDesc, string filter)
-                => new Result { IsValid = true, EntityQueryDesc = queryDesc, Filter = filter, ErrorComponentType = string.Empty };
+            public static Result Valid(EntityQueryDesc queryDesc, string filter) =>
+                new Result
+                {
+                    IsValid = true,
+                    EntityQueryDesc = queryDesc,
+                    Filter = filter,
+                    ErrorComponentType = string.Empty,
+                };
         }
     }
 }

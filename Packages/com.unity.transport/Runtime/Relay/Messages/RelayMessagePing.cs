@@ -17,7 +17,7 @@ namespace Unity.Networking.Transport.Relay
             {
                 Header = RelayMessageHeader.Create(RelayMessageType.Ping),
                 FromAllocationId = fromAllocationId,
-                SequenceNumber = 1
+                SequenceNumber = 1,
             };
         }
 

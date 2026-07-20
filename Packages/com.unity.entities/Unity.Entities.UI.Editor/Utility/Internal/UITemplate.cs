@@ -39,7 +39,9 @@ namespace Unity.Entities.UI
         {
             m_Container = CloneTemplate(m_Container);
             if (m_Container.childCount > 1)
-                Debug.LogWarning($"{nameof(UITemplate)}.{nameof(CloneWithoutTemplateContainer)} should only be called with uxml files containing a single root. Template called `{m_Name}` contains {m_Container.childCount} roots.");
+                Debug.LogWarning(
+                    $"{nameof(UITemplate)}.{nameof(CloneWithoutTemplateContainer)} should only be called with uxml files containing a single root. Template called `{m_Name}` contains {m_Container.childCount} roots."
+                );
 
             var child = m_Container[0];
             AddStyleSheetSkinVariant(child);

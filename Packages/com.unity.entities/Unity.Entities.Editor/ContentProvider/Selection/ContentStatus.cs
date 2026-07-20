@@ -23,6 +23,6 @@ namespace Unity.Entities.UI
         /// <summary>
         /// Indicates that the content should be reloaded.
         /// </summary>
-        ReloadContent = 3
+        ReloadContent = 3,
     }
 }

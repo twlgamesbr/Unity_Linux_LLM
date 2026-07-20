@@ -32,38 +32,103 @@ namespace Unity.Entities.SourceGenerators.Test
         /// </summary>
         static bool k_OverrideSourceOfTruthOnTestThrow = false;
 
-        public static DiagnosticResult CompilerError(string compileError) => DiagnosticResult.CompilerError(compileError);
-        public static DiagnosticResult CompilerWarning(string compilerWarning) => DiagnosticResult.CompilerWarning(compilerWarning);
-        public static DiagnosticResult CompilerInfo(string compilerInfo) => new (compilerInfo, DiagnosticSeverity.Info);
+        public static DiagnosticResult CompilerError(string compileError) =>
+            DiagnosticResult.CompilerError(compileError);
 
-        public static async Task VerifySourceGeneratorAsync(string source, string generatedFolderName = "Default", params string[] expectedFileNames)
-            => await VerifySourceGeneratorAsync(new []{source}, DiagnosticResult.EmptyDiagnosticResults, preprocessorSymbols: Array.Empty<string>(), true, generatedFolderName, expectedFileNames);
+        public static DiagnosticResult CompilerWarning(string compilerWarning) =>
+            DiagnosticResult.CompilerWarning(compilerWarning);
 
-        public static async Task VerifySourceGeneratorWithPreprocessorSymbolAsync(string source, string[] preprocessorSymbols, string generatedFolderName = "Default", params string[] expectedFileNames)
-            => await VerifySourceGeneratorAsync(new []{source}, DiagnosticResult.EmptyDiagnosticResults, preprocessorSymbols, true, generatedFolderName, expectedFileNames);
-        public static async Task VerifySourceGeneratorAsync(string source, params DiagnosticResult[] expected)
-            => await VerifySourceGeneratorAsync(new []{source}, expected, preprocessorSymbols: Array.Empty<string>(), false);
-        public static async Task VerifySourceGeneratorAsync(string[] sources, params DiagnosticResult[] expected)
-            => await VerifySourceGeneratorAsync(sources, expected, preprocessorSymbols: Array.Empty<string>(), false);
+        public static DiagnosticResult CompilerInfo(string compilerInfo) => new(compilerInfo, DiagnosticSeverity.Info);
 
-        public static async Task VerifySourceGeneratorAsync(string source, DiagnosticResult expected, Assembly additionalAssemblyOverride)
-            => await VerifySourceGeneratorAsync(new []{source}, new []{expected}, new []{additionalAssemblyOverride}, preprocessorSymbols: Array.Empty<string>(), false);
+        public static async Task VerifySourceGeneratorAsync(
+            string source,
+            string generatedFolderName = "Default",
+            params string[] expectedFileNames
+        ) =>
+            await VerifySourceGeneratorAsync(
+                new[] { source },
+                DiagnosticResult.EmptyDiagnosticResults,
+                preprocessorSymbols: Array.Empty<string>(),
+                true,
+                generatedFolderName,
+                expectedFileNames
+            );
 
-        static async Task VerifySourceGeneratorAsync(string[] sources, DiagnosticResult[] expected, string[] preprocessorSymbols, bool checksGeneratedSource = true, string generatedFolderName = "Default", params string[] expectedFileNames)
-            => await VerifySourceGeneratorAsync(sources, expected, new []{
-            typeof(EntitiesMock).Assembly,
-            typeof(EntitiesHybridMock).Assembly,
-            typeof(BurstMock).Assembly,
-            typeof(CollectionsMock).Assembly
-        }, preprocessorSymbols, checksGeneratedSource, generatedFolderName, expectedFileNames);
+        public static async Task VerifySourceGeneratorWithPreprocessorSymbolAsync(
+            string source,
+            string[] preprocessorSymbols,
+            string generatedFolderName = "Default",
+            params string[] expectedFileNames
+        ) =>
+            await VerifySourceGeneratorAsync(
+                new[] { source },
+                DiagnosticResult.EmptyDiagnosticResults,
+                preprocessorSymbols,
+                true,
+                generatedFolderName,
+                expectedFileNames
+            );
 
-        static async Task VerifySourceGeneratorAsync(string[] sources, DiagnosticResult[] expected, IEnumerable<Assembly> additionalAssembliesOverride, string[] preprocessorSymbols, bool checksGeneratedSource = true, string generatedFolderName = "Default", params string[] expectedFileNames)
+        public static async Task VerifySourceGeneratorAsync(string source, params DiagnosticResult[] expected) =>
+            await VerifySourceGeneratorAsync(
+                new[] { source },
+                expected,
+                preprocessorSymbols: Array.Empty<string>(),
+                false
+            );
+
+        public static async Task VerifySourceGeneratorAsync(string[] sources, params DiagnosticResult[] expected) =>
+            await VerifySourceGeneratorAsync(sources, expected, preprocessorSymbols: Array.Empty<string>(), false);
+
+        public static async Task VerifySourceGeneratorAsync(
+            string source,
+            DiagnosticResult expected,
+            Assembly additionalAssemblyOverride
+        ) =>
+            await VerifySourceGeneratorAsync(
+                new[] { source },
+                new[] { expected },
+                new[] { additionalAssemblyOverride },
+                preprocessorSymbols: Array.Empty<string>(),
+                false
+            );
+
+        static async Task VerifySourceGeneratorAsync(
+            string[] sources,
+            DiagnosticResult[] expected,
+            string[] preprocessorSymbols,
+            bool checksGeneratedSource = true,
+            string generatedFolderName = "Default",
+            params string[] expectedFileNames
+        ) =>
+            await VerifySourceGeneratorAsync(
+                sources,
+                expected,
+                new[]
+                {
+                    typeof(EntitiesMock).Assembly,
+                    typeof(EntitiesHybridMock).Assembly,
+                    typeof(BurstMock).Assembly,
+                    typeof(CollectionsMock).Assembly,
+                },
+                preprocessorSymbols,
+                checksGeneratedSource,
+                generatedFolderName,
+                expectedFileNames
+            );
+
+        static async Task VerifySourceGeneratorAsync(
+            string[] sources,
+            DiagnosticResult[] expected,
+            IEnumerable<Assembly> additionalAssembliesOverride,
+            string[] preprocessorSymbols,
+            bool checksGeneratedSource = true,
+            string generatedFolderName = "Default",
+            params string[] expectedFileNames
+        )
         {
             // Initial Test setup
-            var test = new Test(preprocessorSymbols)
-            {
-                TestCode = sources[0].ReplaceLineEndings()
-            };
+            var test = new Test(preprocessorSymbols) { TestCode = sources[0].ReplaceLineEndings() };
             foreach (var additionalReference in additionalAssembliesOverride)
                 test.TestState.AdditionalReferences.Add(additionalReference);
             for (var index = 1; index < sources.Length; index++)
@@ -82,7 +147,10 @@ namespace Unity.Entities.SourceGenerators.Test
                 {
                     var generatedFolderPath = Path.Join(executingAssemblyPath, "results", generatedFolderName);
                     Directory.CreateDirectory(generatedFolderPath);
-                    var foundExpectedFiles = Directory.EnumerateFiles(generatedFolderPath).Select(Path.GetFileName).Where(expectedFileNames.Contains);
+                    var foundExpectedFiles = Directory
+                        .EnumerateFiles(generatedFolderPath)
+                        .Select(Path.GetFileName)
+                        .Where(expectedFileNames.Contains);
                     var existingSources = foundExpectedFiles.Select(file =>
                     {
                         if (file == null)
@@ -96,7 +164,9 @@ namespace Unity.Entities.SourceGenerators.Test
                 }
 
                 // Run Test
-                test.TestBehaviors = checksGeneratedSource ? TestBehaviors.None : TestBehaviors.SkipGeneratedSourcesCheck;
+                test.TestBehaviors = checksGeneratedSource
+                    ? TestBehaviors.None
+                    : TestBehaviors.SkipGeneratedSourcesCheck;
                 test.ExpectedDiagnostics.AddRange(expected);
                 await test.RunAsync(CancellationToken.None);
             }
@@ -110,24 +180,37 @@ namespace Unity.Entities.SourceGenerators.Test
                 var (correctSources, originalSource) = await test.GenerateCorrectSources();
 
                 // Asserts an error if what it generated is different than the files input by the test
-                var generatedFilesNotPartOfExpectedFileNames = correctSources.Select(s => s.fileName).Where(s => !expectedFileNames.Contains(s)).ToArray();
+                var generatedFilesNotPartOfExpectedFileNames = correctSources
+                    .Select(s => s.fileName)
+                    .Where(s => !expectedFileNames.Contains(s))
+                    .ToArray();
                 if (generatedFilesNotPartOfExpectedFileNames.Length > 0)
                 {
-                    var filesJoined = string.Join(", ", generatedFilesNotPartOfExpectedFileNames.Select(actualFileName => $"\"{actualFileName}\""));
+                    var filesJoined = string.Join(
+                        ", ",
+                        generatedFilesNotPartOfExpectedFileNames.Select(actualFileName => $"\"{actualFileName}\"")
+                    );
                     var plural = generatedFilesNotPartOfExpectedFileNames.Length > 1;
                     var anoutputfile = plural ? "output files" : "an output file";
                     var fileNames = plural ? "filenames" : "filename";
                     var was = plural ? "were" : "was";
                     var @is = plural ? "are" : "is";
                     var argument = plural ? "arguments" : "argument";
-                    var expectedFileNameDiffErrorMsg = $"The test {generatedFolderName} generated {anoutputfile} which {was} not listed when calling VerifyCS.VerifySourceGeneratorAsync. ";
-                    expectedFileNameDiffErrorMsg += $"To fix, add the {fileNames} that {@is} expected to be output from this test as the last {argument} to VerifySourceGeneratorAsync. ";
-                    expectedFileNameDiffErrorMsg += $"(`await VerifyCS.VerifySourceGeneratorAsync(source, nameof({generatedFolderName}), {filesJoined});`).";
+                    var expectedFileNameDiffErrorMsg =
+                        $"The test {generatedFolderName} generated {anoutputfile} which {was} not listed when calling VerifyCS.VerifySourceGeneratorAsync. ";
+                    expectedFileNameDiffErrorMsg +=
+                        $"To fix, add the {fileNames} that {@is} expected to be output from this test as the last {argument} to VerifySourceGeneratorAsync. ";
+                    expectedFileNameDiffErrorMsg +=
+                        $"(`await VerifyCS.VerifySourceGeneratorAsync(source, nameof({generatedFolderName}), {filesJoined});`).";
                     Assert.Fail($"{expectedFileNameDiffErrorMsg}");
                 }
 
                 // Recreate Testing Folder
-                var verificationPath = Path.Join(Path.Combine(executingAssemblyPath, "..","..",".."), "results", generatedFolderName);
+                var verificationPath = Path.Join(
+                    Path.Combine(executingAssemblyPath, "..", "..", ".."),
+                    "results",
+                    generatedFolderName
+                );
                 if (Directory.Exists(verificationPath))
                 {
                     var dir = new DirectoryInfo(verificationPath);
@@ -137,10 +220,16 @@ namespace Unity.Entities.SourceGenerators.Test
                 Directory.CreateDirectory(verificationPath);
 
                 // Write new sources
-                var writers = new Task[correctSources.Length+1];
+                var writers = new Task[correctSources.Length + 1];
                 for (var i = 0; i < correctSources.Length; i++)
-                    writers[i] = File.WriteAllTextAsync(Path.Join(verificationPath, correctSources[i].fileName), correctSources[i].content.ToString());
-                writers[^1] = File.WriteAllTextAsync(Path.Join(verificationPath, originalSource.fileName), originalSource.content.ToString());
+                    writers[i] = File.WriteAllTextAsync(
+                        Path.Join(verificationPath, correctSources[i].fileName),
+                        correctSources[i].content.ToString()
+                    );
+                writers[^1] = File.WriteAllTextAsync(
+                    Path.Join(verificationPath, originalSource.fileName),
+                    originalSource.content.ToString()
+                );
                 Task.WaitAll(writers);
 
                 // Make sure to still throw original error.
@@ -152,30 +241,39 @@ namespace Unity.Entities.SourceGenerators.Test
         {
             public Test(string[] preprocessorSymbols)
             {
-                ReferenceAssemblies = new ReferenceAssemblies("net6.0", new PackageIdentity("Microsoft.NETCore.App.Ref", "6.0.0"), Path.Combine("ref", "net6.0"));
-                SolutionTransforms.Add((solution, projectId) =>
-                {
-                    var project = solution.GetProject(projectId);
+                ReferenceAssemblies = new ReferenceAssemblies(
+                    "net6.0",
+                    new PackageIdentity("Microsoft.NETCore.App.Ref", "6.0.0"),
+                    Path.Combine("ref", "net6.0")
+                );
+                SolutionTransforms.Add(
+                    (solution, projectId) =>
+                    {
+                        var project = solution.GetProject(projectId);
 
-                    var compilationOptions = project?.CompilationOptions;
+                        var compilationOptions = project?.CompilationOptions;
 
-                    if (compilationOptions == null)
-                        throw new ArgumentException("ProjectId does not exist");
+                        if (compilationOptions == null)
+                            throw new ArgumentException("ProjectId does not exist");
 
-                    var parseOptions = project?.ParseOptions;
+                        var parseOptions = project?.ParseOptions;
 
-                    if (parseOptions == null)
-                        parseOptions = new CSharpParseOptions(preprocessorSymbols: preprocessorSymbols);
-                    else if (parseOptions is CSharpParseOptions cSharpParseOptions)
-                        parseOptions =
-                            cSharpParseOptions.WithPreprocessorSymbols(
-                                cSharpParseOptions.PreprocessorSymbolNames.Concat(preprocessorSymbols));
+                        if (parseOptions == null)
+                            parseOptions = new CSharpParseOptions(preprocessorSymbols: preprocessorSymbols);
+                        else if (parseOptions is CSharpParseOptions cSharpParseOptions)
+                            parseOptions = cSharpParseOptions.WithPreprocessorSymbols(
+                                cSharpParseOptions.PreprocessorSymbolNames.Concat(preprocessorSymbols)
+                            );
 
-                    compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(
-                        compilationOptions.SpecificDiagnosticOptions.SetItems(CSharpVerifierHelper.NullableWarnings));
+                        compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(
+                            compilationOptions.SpecificDiagnosticOptions.SetItems(CSharpVerifierHelper.NullableWarnings)
+                        );
 
-                    return solution.WithProjectCompilationOptions(projectId, compilationOptions).WithProjectParseOptions(projectId, parseOptions);
-                });
+                        return solution
+                            .WithProjectCompilationOptions(projectId, compilationOptions)
+                            .WithProjectParseOptions(projectId, parseOptions);
+                    }
+                );
             }
 
             /// <summary>
@@ -186,27 +284,59 @@ namespace Unity.Entities.SourceGenerators.Test
             /// Filename of file we expect generator to have created.
             /// </param>
             /// <returns>relative filepath of source generated files</returns>
-            public static string GetTestPath(string filename)
-                => Path.Join(GetFilePathPrefixForGenerator(typeof(TSourceGenerator)), filename);
+            public static string GetTestPath(string filename) =>
+                Path.Join(GetFilePathPrefixForGenerator(typeof(TSourceGenerator)), filename);
 
-            public async Task<((string fileName, SourceText content)[] generatedSources, (string fileName, SourceText content) source)> GenerateCorrectSources()
+            public async Task<(
+                (string fileName, SourceText content)[] generatedSources,
+                (string fileName, SourceText content) source
+            )> GenerateCorrectSources()
             {
                 // Initial Setup
                 var cancellationToken = CancellationToken.None;
                 var fixableDiagnostics = ImmutableArray<string>.Empty;
-                var testState = TestState.WithInheritedValuesApplied(null, fixableDiagnostics).WithProcessedMarkup(MarkupOptions, null, ImmutableArray<DiagnosticDescriptor>.Empty, fixableDiagnostics, DefaultFilePath);
+                var testState = TestState
+                    .WithInheritedValuesApplied(null, fixableDiagnostics)
+                    .WithProcessedMarkup(
+                        MarkupOptions,
+                        null,
+                        ImmutableArray<DiagnosticDescriptor>.Empty,
+                        fixableDiagnostics,
+                        DefaultFilePath
+                    );
                 var sourceGenerators = GetSourceGenerators().ToImmutableArray();
 
                 // Create project with applied generators
-                var project = await CreateProjectAsync(new EvaluatedProjectState(testState, ReferenceAssemblies), testState.AdditionalProjects.Values.Select(additionalProject => new EvaluatedProjectState(additionalProject, ReferenceAssemblies)).ToImmutableArray(), cancellationToken);
-                (project, _) = await ApplySourceGeneratorAsync(sourceGenerators, project, Verify, cancellationToken).ConfigureAwait(false);
+                var project = await CreateProjectAsync(
+                    new EvaluatedProjectState(testState, ReferenceAssemblies),
+                    testState
+                        .AdditionalProjects.Values.Select(additionalProject => new EvaluatedProjectState(
+                            additionalProject,
+                            ReferenceAssemblies
+                        ))
+                        .ToImmutableArray(),
+                    cancellationToken
+                );
+                (project, _) = await ApplySourceGeneratorAsync(sourceGenerators, project, Verify, cancellationToken)
+                    .ConfigureAwait(false);
 
                 // Splits project.Documents output into 'Generated Files' and Original Source Input
-                var generatedSources = project.Documents
-                    .Where(d => d.Name.Contains(".g.cs"))
-                    .Select(async doc => (Path.GetFileName(doc.Name), await GetSourceTextFromDocumentAsync(doc, cancellationToken).ConfigureAwait(false)));
-                return (generatedSources.Select(t=>t.Result).ToArray(),
-                    (Path.GetFileName(project.Documents.First().Name), await GetSourceTextFromDocumentAsync(project.Documents.First(), cancellationToken).ConfigureAwait(false)));
+                var generatedSources = project
+                    .Documents.Where(d => d.Name.Contains(".g.cs"))
+                    .Select(async doc =>
+                        (
+                            Path.GetFileName(doc.Name),
+                            await GetSourceTextFromDocumentAsync(doc, cancellationToken).ConfigureAwait(false)
+                        )
+                    );
+                return (
+                    generatedSources.Select(t => t.Result).ToArray(),
+                    (
+                        Path.GetFileName(project.Documents.First().Name),
+                        await GetSourceTextFromDocumentAsync(project.Documents.First(), cancellationToken)
+                            .ConfigureAwait(false)
+                    )
+                );
             }
 
             #region Copied From Roslyn!
@@ -214,24 +344,36 @@ namespace Unity.Entities.SourceGenerators.Test
             /// <summary>
             /// Based on <see cref="GeneratorDriver.GetFilePathPrefixForGenerator"/> which is internal.
             /// </summary>
-            static string GetFilePathPrefixForGenerator(Type sourceGenType)
-                => Path.Combine(sourceGenType.Assembly.GetName().Name ?? string.Empty, sourceGenType.FullName!);
+            static string GetFilePathPrefixForGenerator(Type sourceGenType) =>
+                Path.Combine(sourceGenType.Assembly.GetName().Name ?? string.Empty, sourceGenType.FullName!);
 
             /// <summary>
             /// <see cref="SourceGeneratorTest{TVerifier}.ApplySourceGeneratorAsync"/> is private so this is a copy of it
             /// </summary>
-            async Task<(Project project, ImmutableArray<Diagnostic> diagnostics)> ApplySourceGeneratorAsync(ImmutableArray<ISourceGenerator> sourceGenerators, Project project, IVerifier verifier, CancellationToken cancellationToken)
+            async Task<(Project project, ImmutableArray<Diagnostic> diagnostics)> ApplySourceGeneratorAsync(
+                ImmutableArray<ISourceGenerator> sourceGenerators,
+                Project project,
+                IVerifier verifier,
+                CancellationToken cancellationToken
+            )
             {
                 var compilation = await project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
                 verifier.True(compilation is { });
 
-                var driver = CreateGeneratorDriver(project, sourceGenerators).RunGenerators(compilation, cancellationToken);
+                var driver = CreateGeneratorDriver(project, sourceGenerators)
+                    .RunGenerators(compilation, cancellationToken);
                 var result = driver.GetRunResult();
 
                 var updatedProject = project;
                 foreach (var tree in result.GeneratedTrees)
                 {
-                    updatedProject = updatedProject.AddDocument(tree.FilePath, await tree.GetTextAsync(cancellationToken).ConfigureAwait(false), filePath: tree.FilePath).Project;
+                    updatedProject = updatedProject
+                        .AddDocument(
+                            tree.FilePath,
+                            await tree.GetTextAsync(cancellationToken).ConfigureAwait(false),
+                            filePath: tree.FilePath
+                        )
+                        .Project;
                 }
 
                 return (updatedProject, result.Diagnostics);
@@ -240,10 +382,17 @@ namespace Unity.Entities.SourceGenerators.Test
             /// <summary>
             /// <see cref="SourceGeneratorTest{TVerifier}.GetSourceTextFromDocumentAsync"/> is private so this is a copy of it
             /// </summary>
-            static async Task<SourceText> GetSourceTextFromDocumentAsync(Document document, CancellationToken cancellationToken)
+            static async Task<SourceText> GetSourceTextFromDocumentAsync(
+                Document document,
+                CancellationToken cancellationToken
+            )
             {
-                var simplifiedDoc = await Simplifier.ReduceAsync(document, Simplifier.Annotation, cancellationToken: cancellationToken).ConfigureAwait(false);
-                var formatted = await Formatter.FormatAsync(simplifiedDoc, Formatter.Annotation, cancellationToken: cancellationToken).ConfigureAwait(false);
+                var simplifiedDoc = await Simplifier
+                    .ReduceAsync(document, Simplifier.Annotation, cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+                var formatted = await Formatter
+                    .FormatAsync(simplifiedDoc, Formatter.Annotation, cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
                 return await formatted.GetTextAsync(cancellationToken).ConfigureAwait(false);
             }
 

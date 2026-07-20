@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Events;
-using System.Collections;
-
 
 namespace TMPro
 {
@@ -26,7 +25,7 @@ namespace TMPro
         {
             All,
             RGB,
-            Alpha
+            Alpha,
         }
 
         public class ColorTweenCallback : UnityEvent<Color> { }
@@ -187,7 +186,8 @@ namespace TMPro
     // Tween runner, executes the given tween.
     // The coroutine will live within the given
     // behaviour container.
-    internal class TweenRunner<T> where T : struct, ITweenValue
+    internal class TweenRunner<T>
+        where T : struct, ITweenValue
     {
         protected MonoBehaviour m_CoroutineContainer;
         protected IEnumerator m_Tween;

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
 #if UNITY_6000_5_OR_NEWER
 using UnityEngine.Assemblies;
 #endif
@@ -24,9 +24,14 @@ namespace Unity.Multiplayer.Editor
             }
         }
 
-        [SerializeField] private bool m_StripRenderComponents;
-        [SerializeField] private bool m_StripUIComponents;
-        [SerializeField] private bool m_StripAudioComponents;
+        [SerializeField]
+        private bool m_StripRenderComponents;
+
+        [SerializeField]
+        private bool m_StripUIComponents;
+
+        [SerializeField]
+        private bool m_StripAudioComponents;
 
         public bool StripRenderingComponents
         {
@@ -68,7 +73,8 @@ namespace Unity.Multiplayer.Editor
             }
         }
 
-        [SerializeField] private SerializedDictionary<SerializedType, MultiplayerRoleFlags> m_CustomComponentsList;
+        [SerializeField]
+        private SerializedDictionary<SerializedType, MultiplayerRoleFlags> m_CustomComponentsList;
         private SerializedDictionary<SerializedType, MultiplayerRoleFlags> CustomComponentsList
         {
             get
@@ -112,11 +118,11 @@ namespace Unity.Multiplayer.Editor
             BakeCompleteComponentsList();
         }
 
-        public MultiplayerRoleFlags GetMultiplayerRoleMaskForComponentType(Type type)
-            => GetMultiplayerRoleFlagsForType(type);
+        public MultiplayerRoleFlags GetMultiplayerRoleMaskForComponentType(Type type) =>
+            GetMultiplayerRoleFlagsForType(type);
 
-        public void SetMultiplayerRoleMaskForComponentType(Type type, MultiplayerRoleFlags mask)
-            => SetCustomComponentMultiplayerRoleFlags(type, mask, true);
+        public void SetMultiplayerRoleMaskForComponentType(Type type, MultiplayerRoleFlags mask) =>
+            SetCustomComponentMultiplayerRoleFlags(type, mask, true);
 
         internal void SetCustomComponentMultiplayerRoleFlags(Type type, MultiplayerRoleFlags target, bool bake = true)
         {
@@ -142,22 +148,27 @@ namespace Unity.Multiplayer.Editor
             return options;
         }
 
-        internal static void GetBuiltinStrippingComponentsForServer(in AutomaticSelectionOptions options, List<Type> types)
+        internal static void GetBuiltinStrippingComponentsForServer(
+            in AutomaticSelectionOptions options,
+            List<Type> types
+        )
         {
             if (options.StripRenderingComponents)
             {
-                var components = TypeCache.GetTypesDerivedFrom<Renderer>()
-                    .Concat(new[]
-                    {
-                        typeof(Camera),
-                        typeof(Light),
-
-                        typeof(ReflectionProbe),
-                        typeof(LightProbeGroup),
+                var components = TypeCache
+                    .GetTypesDerivedFrom<Renderer>()
+                    .Concat(
+                        new[]
+                        {
+                            typeof(Camera),
+                            typeof(Light),
+                            typeof(ReflectionProbe),
+                            typeof(LightProbeGroup),
 #pragma warning disable 0618
-                        typeof(LightProbeProxyVolume)
+                            typeof(LightProbeProxyVolume)
 #pragma warning restore 0618
-                    });
+                        }
+                    );
 
 #if UNITY_RENDER_PIPELINE_PRESENT
                 components = components.Concat(TypeCache.GetTypesDerivedFrom<UnityEngine.Rendering.IAdditionalData>());
@@ -170,18 +181,23 @@ namespace Unity.Multiplayer.Editor
             if (options.StripUIComponents)
             {
 #if UNITY_6000_5_OR_NEWER
-                var assemblies = CurrentAssemblies.GetLoadedAssemblies().Where
+                var assemblies = CurrentAssemblies
+                    .GetLoadedAssemblies()
+                    .Where
 #else
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where
+                var assemblies = AppDomain
+                    .CurrentDomain.GetAssemblies()
+                    .Where
 #endif
-                    (
-                        a =>
-                            a.GetName().Name == "UnityEngine.UI" ||
-                            a.GetName().Name == "UnityEngine.Canvas" ||
-                            a.GetName().Name == "UnityEngine.UIElementsModule"
+                    (a =>
+                        a.GetName().Name == "UnityEngine.UI"
+                        || a.GetName().Name == "UnityEngine.Canvas"
+                        || a.GetName().Name == "UnityEngine.UIElementsModule"
                     );
 
-                var components = assemblies.SelectMany(a => a.GetTypes().Where(t => IsClassOrSubclassOf(t, typeof(Component))));
+                var components = assemblies.SelectMany(a =>
+                    a.GetTypes().Where(t => IsClassOrSubclassOf(t, typeof(Component)))
+                );
 
                 foreach (var component in components)
                     types.Add(component);
@@ -224,14 +240,16 @@ namespace Unity.Multiplayer.Editor
             }
         }
 
-        internal static bool IsClassOrSubclassOf(Type type, Type parentType)
-            => type == parentType || type.IsSubclassOf(parentType);
+        internal static bool IsClassOrSubclassOf(Type type, Type parentType) =>
+            type == parentType || type.IsSubclassOf(parentType);
 
-        internal bool IsComponentSelected(Type type)
-            => CompleteComponentsList.Keys.Any(selectedType => IsClassOrSubclassOf(type, selectedType));
+        internal bool IsComponentSelected(Type type) =>
+            CompleteComponentsList.Keys.Any(selectedType => IsClassOrSubclassOf(type, selectedType));
 
-        internal IEnumerable<KeyValuePair<Type, MultiplayerRoleFlags>> GetSelectedParentComponents(Type type)
-            => CompleteComponentsList.Where(selectionValue => AutomaticSelectionOptions.IsClassOrSubclassOf(type, selectionValue.Key));
+        internal IEnumerable<KeyValuePair<Type, MultiplayerRoleFlags>> GetSelectedParentComponents(Type type) =>
+            CompleteComponentsList.Where(selectionValue =>
+                AutomaticSelectionOptions.IsClassOrSubclassOf(type, selectionValue.Key)
+            );
 
         internal MultiplayerRoleFlags GetMultiplayerRoleFlagsForType(Type type)
         {

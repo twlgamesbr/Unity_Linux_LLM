@@ -5,10 +5,11 @@ namespace Unity.Entities.Editor
 {
     class HierarchySelectionContext : ScriptableObject
     {
-        [SerializeField] HierarchyNodeHandle m_HierarchyNodeHandle;
+        [SerializeField]
+        HierarchyNodeHandle m_HierarchyNodeHandle;
 
         public HierarchyNodeHandle Handle => m_HierarchyNodeHandle;
-        
+
         public static HierarchySelectionContext CreateInstance(HierarchyNodeHandle handle)
         {
             var context = CreateInstance<HierarchySelectionContext>();

@@ -11,17 +11,14 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
     {
         public event Action<MeshShadingFillGradientField> OnGradientSelected;
 
-        [UxmlQuery] VisualElement GradientContainer;
+        [UxmlQuery]
+        VisualElement GradientContainer;
 
         public MeshShadingGradientPicker()
         {
             foreach (var preset in EnumUtil.GetValuesAndNames(skip: MeshShadingGradientPreset.None))
             {
-                var gradient = new MeshShadingGradient
-                {
-                    Preset = preset.value,
-                    Gradient = preset.value.ToGradient(),
-                };
+                var gradient = new MeshShadingGradient { Preset = preset.value, Gradient = preset.value.ToGradient() };
 
                 var field = new MeshShadingFillGradientField
                 {
@@ -35,6 +32,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
                 GradientContainer.Add(field);
             }
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<MeshShadingGradientPicker, UxmlTraits> { }
 #endif

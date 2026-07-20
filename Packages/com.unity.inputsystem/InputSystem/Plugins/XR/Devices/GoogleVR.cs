@@ -10,36 +10,48 @@ namespace Unity.XR.GoogleVr
     /// A head-mounted display powered by Google Daydream.
     /// </summary>
     [InputControlLayout(displayName = "Daydream Headset", hideInUI = true)]
-    public class DaydreamHMD : XRHMD
-    {
-    }
+    public class DaydreamHMD : XRHMD { }
 
     /// <summary>
     /// An XR controller powered by Google Daydream.
     /// </summary>
-    [InputControlLayout(displayName = "Daydream Controller", commonUsages = new[] { "LeftHand", "RightHand" }, hideInUI = true)]
+    [InputControlLayout(
+        displayName = "Daydream Controller",
+        commonUsages = new[] { "LeftHand", "RightHand" },
+        hideInUI = true
+    )]
     public class DaydreamController : XRController
     {
         [InputControl]
         public Vector2Control touchpad { get; protected set; }
+
         [InputControl]
         public ButtonControl volumeUp { get; protected set; }
+
         [InputControl]
         public ButtonControl recentered { get; protected set; }
+
         [InputControl]
         public ButtonControl volumeDown { get; protected set; }
+
         [InputControl]
         public ButtonControl recentering { get; protected set; }
+
         [InputControl]
         public ButtonControl app { get; protected set; }
+
         [InputControl]
         public ButtonControl home { get; protected set; }
+
         [InputControl]
         public ButtonControl touchpadClicked { get; protected set; }
+
         [InputControl]
         public ButtonControl touchpadTouched { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control deviceVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control deviceAcceleration { get; protected set; }
 

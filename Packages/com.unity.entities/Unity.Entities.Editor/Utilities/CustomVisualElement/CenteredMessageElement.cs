@@ -33,7 +33,6 @@ namespace Unity.Entities.Editor
             }
         }
 #endif
-        
         public CenteredMessageElement()
         {
             Resources.Templates.CenteredMessageElement.Clone(this);

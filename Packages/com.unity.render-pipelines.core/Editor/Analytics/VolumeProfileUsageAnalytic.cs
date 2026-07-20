@@ -10,7 +10,7 @@ namespace UnityEditor.Rendering.Analytics
     // taxonomy = editor.analytics.uVolumeProfileUsageAnalytic.v4
     internal class VolumeProfileUsageAnalytic
     {
-        [AnalyticInfo(eventName: "uVolumeProfileUsageAnalytic", version: 4, vendorKey: "unity.srp" )]
+        [AnalyticInfo(eventName: "uVolumeProfileUsageAnalytic", version: 4, vendorKey: "unity.srp")]
         class Analytic : IAnalytic
         {
             public Analytic(Volume volume, VolumeProfile volumeProfile)
@@ -19,7 +19,9 @@ namespace UnityEditor.Rendering.Analytics
                 {
                     data.volume_name = Hash128.Compute(volume.name).ToString();
                     data.scene_name = EditorSceneManager.GetActiveScene().GetGUID();
-                    data.volume_profile_asset_guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(volumeProfile.GetEntityId()));
+                    data.volume_profile_asset_guid = AssetDatabase.AssetPathToGUID(
+                        AssetDatabase.GetAssetPath(volumeProfile.GetEntityId())
+                    );
                     m_Data = data;
                 }
             }
@@ -33,12 +35,14 @@ namespace UnityEditor.Rendering.Analytics
                 public string scene_name;
                 public string volume_profile_asset_guid;
             }
+
             public bool TryGatherData(out IAnalytic.IData data, out Exception error)
             {
                 data = m_Data;
                 error = null;
                 return true;
             }
+
             Data m_Data;
         };
 

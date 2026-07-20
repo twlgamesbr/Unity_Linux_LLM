@@ -13,12 +13,18 @@ namespace UnityEngine.Rendering
     [Categorization.CategoryInfo(Name = "Lighting", Order = 21)]
     public class URPReflectionProbeSettings : IRenderPipelineGraphicsSettings
     {
-        [SerializeField, HideInInspector] private int version = 1;
+        [SerializeField, HideInInspector]
+        private int version = 1;
 
         int IRenderPipelineGraphicsSettings.version => version;
         bool IRenderPipelineGraphicsSettings.isAvailableInPlayerBuild => true;
 
-        [SerializeField, Tooltip("Use ReflectionProbe rotation. Enabling this will improve the appearance of reflections when the ReflectionProbe isn't axis aligned, but may worsen performance on lower end platforms.")]
+        [
+            SerializeField,
+            Tooltip(
+                "Use ReflectionProbe rotation. Enabling this will improve the appearance of reflections when the ReflectionProbe isn't axis aligned, but may worsen performance on lower end platforms."
+            )
+        ]
         private bool useReflectionProbeRotation = true;
 
         /// <summary>
@@ -29,7 +35,9 @@ namespace UnityEngine.Rendering
             get
             {
 #if UNITY_EDITOR
-                var mode = useReflectionProbeRotation ? SupportedRenderingFeatures.ReflectionProbeModes.Rotation : SupportedRenderingFeatures.ReflectionProbeModes.None;
+                var mode = useReflectionProbeRotation
+                    ? SupportedRenderingFeatures.ReflectionProbeModes.Rotation
+                    : SupportedRenderingFeatures.ReflectionProbeModes.None;
                 if (mode != SupportedRenderingFeatures.active.reflectionProbeModes)
                 {
                     SupportedRenderingFeatures.active.reflectionProbeModes = mode;
@@ -43,7 +51,9 @@ namespace UnityEngine.Rendering
                 this.SetValueAndNotify(ref useReflectionProbeRotation, value, nameof(useReflectionProbeRotation));
                 if (QualitySettings.renderPipeline is UniversalRenderPipelineAsset urpAsset)
                 {
-                    SupportedRenderingFeatures.active.reflectionProbeModes = value ? SupportedRenderingFeatures.ReflectionProbeModes.Rotation : SupportedRenderingFeatures.ReflectionProbeModes.None;
+                    SupportedRenderingFeatures.active.reflectionProbeModes = value
+                        ? SupportedRenderingFeatures.ReflectionProbeModes.Rotation
+                        : SupportedRenderingFeatures.ReflectionProbeModes.None;
                 }
             }
 #endif

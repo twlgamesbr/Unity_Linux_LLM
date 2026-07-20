@@ -7,14 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Collections;
 using UnityEngine.Assertions;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
-using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.RenderGraphModule;
-using Unity.Burst;
-
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -116,11 +115,20 @@ namespace UnityEngine.Rendering
         /// <param name="renderGraph">Render graph that will have a compute pass added.</param>
         /// <param name="settings">The view to update and occlusion test to use.</param>
         /// <param name="subviewOcclusionTests">Specifies the occluder subviews to use with each culling split index.</param>
-        public static void InstanceOcclusionTest(RenderGraph renderGraph, in OcclusionCullingSettings settings, ReadOnlySpan<SubviewOcclusionTest> subviewOcclusionTests)
+        public static void InstanceOcclusionTest(
+            RenderGraph renderGraph,
+            in OcclusionCullingSettings settings,
+            ReadOnlySpan<SubviewOcclusionTest> subviewOcclusionTests
+        )
         {
             if (s_Instance == null || !s_Instance.m_InstanceDataSystem.hasBoundingSpheres)
                 return;
-            s_Instance.m_Culler.InstanceOcclusionTest(renderGraph, settings, subviewOcclusionTests, s_Instance.m_GRDContext);
+            s_Instance.m_Culler.InstanceOcclusionTest(
+                renderGraph,
+                settings,
+                subviewOcclusionTests,
+                s_Instance.m_GRDContext
+            );
         }
 
         /// <summary>
@@ -133,11 +141,20 @@ namespace UnityEngine.Rendering
         /// <param name="renderGraph">Render graph that will have a compute pass added.</param>
         /// <param name="occluderParameters">Parameter to specify the view and depth buffer to read.</param>
         /// <param name="occluderSubviewUpdates">Specifies which occluder subviews to update from slices of the input depth buffer.</param>
-        public static void UpdateInstanceOccluders(RenderGraph renderGraph, in OccluderParameters occluderParameters, ReadOnlySpan<OccluderSubviewUpdate> occluderSubviewUpdates)
+        public static void UpdateInstanceOccluders(
+            RenderGraph renderGraph,
+            in OccluderParameters occluderParameters,
+            ReadOnlySpan<OccluderSubviewUpdate> occluderSubviewUpdates
+        )
         {
             if (s_Instance == null || !s_Instance.m_InstanceDataSystem.hasBoundingSpheres)
                 return;
-            s_Instance.m_OcclusionCullingCommon.UpdateInstanceOccluders(renderGraph, s_Instance.m_GRDContext, occluderParameters, occluderSubviewUpdates);
+            s_Instance.m_OcclusionCullingCommon.UpdateInstanceOccluders(
+                renderGraph,
+                s_Instance.m_GRDContext,
+                occluderParameters,
+                occluderSubviewUpdates
+            );
         }
 
         /// <summary>
@@ -165,9 +182,19 @@ namespace UnityEngine.Rendering
         /// <param name="debugSettings">The rendering debugger debug settings to read parameters from.</param>
         /// <param name="viewID">The EntityId of the camera using a GPU occlusion test.</param>
         /// <param name="colorBuffer">The color buffer to render the overlay on.</param>
-        public static void RenderDebugOcclusionTestOverlay(RenderGraph renderGraph, DebugDisplayGPUResidentDrawer debugSettings, EntityId viewID, TextureHandle colorBuffer)
+        public static void RenderDebugOcclusionTestOverlay(
+            RenderGraph renderGraph,
+            DebugDisplayGPUResidentDrawer debugSettings,
+            EntityId viewID,
+            TextureHandle colorBuffer
+        )
         {
-            s_Instance?.m_OcclusionCullingCommon.RenderDebugOcclusionTestOverlay(renderGraph, debugSettings, viewID, colorBuffer);
+            s_Instance?.m_OcclusionCullingCommon.RenderDebugOcclusionTestOverlay(
+                renderGraph,
+                debugSettings,
+                viewID,
+                colorBuffer
+            );
         }
 
         /// <summary>
@@ -178,36 +205,58 @@ namespace UnityEngine.Rendering
         /// <param name="screenPos">The screen position to render the overlay at.</param>
         /// <param name="maxHeight">The maximum screen height of the overlay.</param>
         /// <param name="colorBuffer">The color buffer to render the overlay on.</param>
-        public static void RenderDebugOccluderOverlay(RenderGraph renderGraph, DebugDisplayGPUResidentDrawer debugSettings, Vector2 screenPos, float maxHeight, TextureHandle colorBuffer)
+        public static void RenderDebugOccluderOverlay(
+            RenderGraph renderGraph,
+            DebugDisplayGPUResidentDrawer debugSettings,
+            Vector2 screenPos,
+            float maxHeight,
+            TextureHandle colorBuffer
+        )
         {
-            s_Instance?.m_OcclusionCullingCommon.RenderDebugOccluderOverlay(renderGraph, debugSettings, screenPos, maxHeight, colorBuffer);
+            s_Instance?.m_OcclusionCullingCommon.RenderDebugOccluderOverlay(
+                renderGraph,
+                debugSettings,
+                screenPos,
+                maxHeight,
+                colorBuffer
+            );
         }
 
         #endregion
 
-        internal static bool IsEnabledFromSettings() => GetGlobalSettingsFromRPAsset().mode != GPUResidentDrawerMode.Disabled;
+        internal static bool IsEnabledFromSettings() =>
+            GetGlobalSettingsFromRPAsset().mode != GPUResidentDrawerMode.Disabled;
 
         internal static bool IsInitialized() => s_Instance != null;
 
         internal static uint GetInstanceVersion() => s_InstanceVersion;
 
-        internal static NativeReference<GPUArchetypeManager> GetGPUArchetypeManager() => s_Instance != null ? s_Instance.m_InstanceDataSystem.archetypeManager : default;
+        internal static NativeReference<GPUArchetypeManager> GetGPUArchetypeManager() =>
+            s_Instance != null ? s_Instance.m_InstanceDataSystem.archetypeManager : default;
 
-        internal static ref DefaultGPUComponents GetDefaultGPUComponents() => ref s_Instance.m_InstanceDataSystem.defaultGPUComponents;
+        internal static ref DefaultGPUComponents GetDefaultGPUComponents() =>
+            ref s_Instance.m_InstanceDataSystem.defaultGPUComponents;
 
-        internal static GPUInstanceDataBuffer.ReadOnly GetInstanceDataBuffer() => s_Instance != null ? s_Instance.m_InstanceDataSystem.gpuBuffer.AsReadOnly() : default;
+        internal static GPUInstanceDataBuffer.ReadOnly GetInstanceDataBuffer() =>
+            s_Instance != null ? s_Instance.m_InstanceDataSystem.gpuBuffer.AsReadOnly() : default;
 
-        internal static GPUInstanceDataBufferReadback<T> ReadbackInstanceDataBuffer<T>() where T : unmanaged => s_Instance != null ? s_Instance.m_InstanceDataSystem.ReadbackInstanceDataBuffer<T>() : default;
+        internal static GPUInstanceDataBufferReadback<T> ReadbackInstanceDataBuffer<T>()
+            where T : unmanaged =>
+            s_Instance != null ? s_Instance.m_InstanceDataSystem.ReadbackInstanceDataBuffer<T>() : default;
 
         internal static DebugRendererBatcherStats GetDebugStats() => s_Instance?.m_GRDContext.debugStats;
 
-        internal static void PushMeshRendererUpdateBatches(NativeArray<MeshRendererUpdateBatch> batches) => s_Instance.m_WorldProcessor.PushMeshRendererUpdateBatches(batches);
+        internal static void PushMeshRendererUpdateBatches(NativeArray<MeshRendererUpdateBatch> batches) =>
+            s_Instance.m_WorldProcessor.PushMeshRendererUpdateBatches(batches);
 
-        internal static void PushLODGroupUpdateBatches(NativeArray<LODGroupUpdateBatch> batches) => s_Instance.m_WorldProcessor.PushLODGroupUpdateBatches(batches);
+        internal static void PushLODGroupUpdateBatches(NativeArray<LODGroupUpdateBatch> batches) =>
+            s_Instance.m_WorldProcessor.PushLODGroupUpdateBatches(batches);
 
-        internal static void PushMeshRendererDeletionBatches(NativeArray<NativeArray<EntityId>> batches) => s_Instance.m_WorldProcessor.PushMeshRendererDeletionBatch(batches);
+        internal static void PushMeshRendererDeletionBatches(NativeArray<NativeArray<EntityId>> batches) =>
+            s_Instance.m_WorldProcessor.PushMeshRendererDeletionBatch(batches);
 
-        internal static void PushLODGroupDeletionBatches(NativeArray<NativeArray<EntityId>> batches) => s_Instance.m_WorldProcessor.PushLODGroupDeletionBatch(batches);
+        internal static void PushLODGroupDeletionBatches(NativeArray<NativeArray<EntityId>> batches) =>
+            s_Instance.m_WorldProcessor.PushLODGroupDeletionBatch(batches);
 
         internal static DebugDisplayGPUResidentDrawer debugDisplaySettings => s_Instance?.m_DebugDisplaySettings;
 
@@ -333,7 +382,9 @@ namespace UnityEngine.Rendering
 #if UNITY_EDITOR
             catch (Exception exception)
             {
-                Debug.LogError($"The GPU Resident Drawer encountered an error during initialization. The standard SRP path will be used instead. [Error: {exception.Message}]");
+                Debug.LogError(
+                    $"The GPU Resident Drawer encountered an error during initialization. The standard SRP path will be used instead. [Error: {exception.Message}]"
+                );
                 Debug.LogError($"GPU Resident drawer stack trace: {exception.StackTrace}");
                 Cleanup();
             }
@@ -422,14 +473,24 @@ namespace UnityEngine.Rendering
         }
 #endif
 
-        internal GPUResidentDrawer(in GPUResidentDrawerSettings settings) : this(settings, InternalGPUResidentDrawerSettings.Default) {}
+        internal GPUResidentDrawer(in GPUResidentDrawerSettings settings)
+            : this(settings, InternalGPUResidentDrawerSettings.Default) { }
 
-        internal GPUResidentDrawer(in GPUResidentDrawerSettings settings, in InternalGPUResidentDrawerSettings internalSettings)
+        internal GPUResidentDrawer(
+            in GPUResidentDrawerSettings settings,
+            in InternalGPUResidentDrawerSettings internalSettings
+        )
         {
             Assert.IsTrue(settings.mode != GPUResidentDrawerMode.Disabled);
 
-            var resources = internalSettings.resources != null ? internalSettings.resources : GraphicsSettings.GetRenderPipelineSettings<GPUResidentDrawerResources>();
-            var renderPipelineAsset = internalSettings.renderPipelineAsset != null ? internalSettings.renderPipelineAsset : GraphicsSettings.currentRenderPipeline;
+            var resources =
+                internalSettings.resources != null
+                    ? internalSettings.resources
+                    : GraphicsSettings.GetRenderPipelineSettings<GPUResidentDrawerResources>();
+            var renderPipelineAsset =
+                internalSettings.renderPipelineAsset != null
+                    ? internalSettings.renderPipelineAsset
+                    : GraphicsSettings.currentRenderPipeline;
 
             if (renderPipelineAsset is not IGPUResidentRenderPipeline)
                 Assert.IsTrue(internalSettings.isManagedByUnitTest, "No compatible Render Pipeline found");
@@ -448,13 +509,15 @@ namespace UnityEngine.Rendering
             m_Culler = new InstanceCuller();
             m_OcclusionCullingCommon = new OcclusionCullingCommon();
             m_Batcher = new InstanceCullingBatcher();
-            m_GRDContext = new GPUResidentContext(settings,
+            m_GRDContext = new GPUResidentContext(
+                settings,
                 m_InstanceDataSystem,
                 m_LODGroupDataSystem,
                 m_Culler,
                 m_OcclusionCullingCommon,
                 m_Batcher,
-                resources);
+                resources
+            );
             m_SpeedTreeWindGPUDataUpdater = new SpeedTreeWindGPUDataUpdater();
             m_WorldProcessor = new WorldProcessor();
 
@@ -462,7 +525,9 @@ namespace UnityEngine.Rendering
             m_ObjectDispatcher.EnableTypeTracking<Material>();
             m_ObjectDispatcher.EnableTypeTracking<MeshRenderer>(ObjectDispatcher.TypeTrackingFlags.SceneObjects);
             m_ObjectDispatcher.EnableTypeTracking<LODGroup>(ObjectDispatcher.TypeTrackingFlags.SceneObjects);
-            m_ObjectDispatcher.EnableTypeTracking<Camera>(ObjectDispatcher.TypeTrackingFlags.SceneObjects | ObjectDispatcher.TypeTrackingFlags.EditorOnlyObjects);
+            m_ObjectDispatcher.EnableTypeTracking<Camera>(
+                ObjectDispatcher.TypeTrackingFlags.SceneObjects | ObjectDispatcher.TypeTrackingFlags.EditorOnlyObjects
+            );
             m_ObjectDispatcher.EnableTransformTracking<MeshRenderer>(ObjectDispatcher.TransformTrackingType.GlobalTRS);
             m_ObjectDispatcher.EnableTransformTracking<LODGroup>(ObjectDispatcher.TransformTrackingType.GlobalTRS);
 
@@ -638,11 +703,11 @@ namespace UnityEngine.Rendering
 
         private void OnFinishedCulling(IntPtr customCullingResult)
         {
-            m_Culler.EnsureValidOcclusionTestResults(viewID : EntityId.FromULong((ulong)customCullingResult));
+            m_Culler.EnsureValidOcclusionTestResults(viewID: EntityId.FromULong((ulong)customCullingResult));
             m_SpeedTreeWindGPUDataUpdater.UpdateGPUData();
         }
 
-        private void OnPostCullBeginCameraRendering(RenderRequestBatcherContext context) {}
+        private void OnPostCullBeginCameraRendering(RenderRequestBatcherContext context) { }
 
         private void UpdateAmbientProbeAndGPUBuffer(bool forceUpdate)
         {

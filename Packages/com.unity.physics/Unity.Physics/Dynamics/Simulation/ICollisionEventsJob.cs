@@ -21,14 +21,10 @@ namespace Unity.Physics
         void Execute(CollisionEvent collisionEvent);
     }
 
-
     /// <summary>
     /// Interface for jobs that iterate through the list of collision events produced by the solver.
     /// </summary>
-    public interface ICollisionEventsJob : ICollisionEventsJobBase
-    {
-    }
-
+    public interface ICollisionEventsJob : ICollisionEventsJobBase { }
 
     /// <summary>   A collision event job extensions. </summary>
     public static class ICollisionEventJobExtensions
@@ -64,7 +60,12 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleParallel<T>(this T job, int innerLoopBatchCount, SimulationSingleton simulationSingleton, JobHandle inputDeps)
+        public static JobHandle ScheduleParallel<T>(
+            this T job,
+            int innerLoopBatchCount,
+            SimulationSingleton simulationSingleton,
+            JobHandle inputDeps
+        )
             where T : struct, ICollisionEventsJobBase
         {
             // Should work only for UnityPhysics
@@ -73,16 +74,28 @@ namespace Unity.Physics
                 return inputDeps;
             }
 
-            return ScheduleParallelUnityPhysicsCollisionEventsJob(job, innerLoopBatchCount, simulationSingleton.AsSimulation(), inputDeps);
+            return ScheduleParallelUnityPhysicsCollisionEventsJob(
+                job,
+                innerLoopBatchCount,
+                simulationSingleton.AsSimulation(),
+                inputDeps
+            );
         }
 
-        static unsafe JobHandle ScheduleUnityPhysicsCollisionEventsJob<T>(T job, Simulation simulation, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleUnityPhysicsCollisionEventsJob<T>(
+            T job,
+            Simulation simulation,
+            JobHandle inputDeps
+        )
             where T : struct, ICollisionEventsJobBase
         {
             // Idle means before or after simulation, which is fine in 99% of cases - the one case where we have trouble is the following:
             // Sim type == Unity.Physics
             // The simulation hasn't run at least once (can happen if we put [UpdateBefore(typeof(PhysicsCreateBodyPairsGroup)] on the first frame, so we need extra checks
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.Idle);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.Idle
+            );
             if (!simulation.ReadyForEventScheduling)
                 return inputDeps;
 
@@ -92,23 +105,36 @@ namespace Unity.Physics
                 EventReader = simulation.CollisionEvents.EventDataStream.AsReader(),
                 InputVelocities = simulation.CollisionEvents.InputVelocities,
                 TimeStep = simulation.CollisionEvents.TimeStep,
-                IsParallel = false
+                IsParallel = false,
             };
 
             var jobReflectionData = CollisionEventJobProcess<T>.jobReflectionData.Data;
             CollisionEventJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-            var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Single);
+            var parameters = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref data),
+                jobReflectionData,
+                inputDeps,
+                ScheduleMode.Single
+            );
             return JobsUtility.Schedule(ref parameters);
         }
 
-        static unsafe JobHandle ScheduleParallelUnityPhysicsCollisionEventsJob<T>(T job, int innerLoopBatchCount, Simulation simulation, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleParallelUnityPhysicsCollisionEventsJob<T>(
+            T job,
+            int innerLoopBatchCount,
+            Simulation simulation,
+            JobHandle inputDeps
+        )
             where T : struct, ICollisionEventsJobBase
         {
             // Idle means before or after simulation, which is fine in 99% of cases - the one case where we have trouble is the following:
             // Sim type == Unity.Physics
             // The simulation hasn't run at least once (can happen if we put [UpdateBefore(typeof(PhysicsCreateBodyPairsGroup)] on the first frame, so we need extra checks
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.Idle);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.Idle
+            );
             if (!simulation.ReadyForEventScheduling)
                 return inputDeps;
 
@@ -119,45 +145,75 @@ namespace Unity.Physics
                 EventReader = eventDataStream.AsReader(),
                 InputVelocities = simulation.CollisionEvents.InputVelocities,
                 TimeStep = simulation.CollisionEvents.TimeStep,
-                IsParallel = true
+                IsParallel = true,
             };
 
             var jobReflectionData = CollisionEventJobProcess<T>.jobReflectionData.Data;
             CollisionEventJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-            var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Parallel);
+            var parameters = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref data),
+                jobReflectionData,
+                inputDeps,
+                ScheduleMode.Parallel
+            );
             var forEachCountPtr = NativeStreamUnsafeUtility.GetUnsafeForEachCountPtr(ref eventDataStream);
             var listDataPtr = (byte*)forEachCountPtr - sizeof(void*);
-            return JobsUtility.ScheduleParallelForDeferArraySize(ref parameters, innerLoopBatchCount, listDataPtr, null);
+            return JobsUtility.ScheduleParallelForDeferArraySize(
+                ref parameters,
+                innerLoopBatchCount,
+                listDataPtr,
+                null
+            );
         }
 
-        internal struct CollisionEventJobData<T> where T : struct
+        internal struct CollisionEventJobData<T>
+            where T : struct
         {
             public T UserJobData;
 
             [NativeDisableContainerSafetyRestriction]
             public NativeStream.Reader EventReader;
+
             [ReadOnly, NativeDisableContainerSafetyRestriction]
             public NativeArray<Velocity> InputVelocities;
             public float TimeStep;
             public bool IsParallel;
         }
 
-        internal struct CollisionEventJobProcess<T> where T : struct, ICollisionEventsJobBase
+        internal struct CollisionEventJobProcess<T>
+            where T : struct, ICollisionEventsJobBase
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<CollisionEventJobProcess<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                CollisionEventJobProcess<T>
+            >();
 
             [Preserve]
             public static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(CollisionEventJobData<T>), typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(CollisionEventJobData<T>),
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
-            public delegate void ExecuteJobFunction(ref CollisionEventJobData<T> jobData, IntPtr additionalData, IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref CollisionEventJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
-            public unsafe static void Execute(ref CollisionEventJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static unsafe void Execute(
+                ref CollisionEventJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
@@ -166,18 +222,33 @@ namespace Unity.Physics
 
                     if (jobData.IsParallel)
                     {
-                        if (!JobsUtility.GetWorkStealingRange(ref ranges, jobIndex, out forEachIndexBegin,
-                                out forEachIndexEnd))
+                        if (
+                            !JobsUtility.GetWorkStealingRange(
+                                ref ranges,
+                                jobIndex,
+                                out forEachIndexBegin,
+                                out forEachIndexEnd
+                            )
+                        )
                             break;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData),
-                            forEachIndexBegin, forEachIndexEnd - forEachIndexBegin);
+                        JobsUtility.PatchBufferMinMaxRanges(
+                            bufferRangePatchData,
+                            UnsafeUtility.AddressOf(ref jobData),
+                            forEachIndexBegin,
+                            forEachIndexEnd - forEachIndexBegin
+                        );
 #endif
                     }
 
-                    var eventEnumerator = new CollisionEvents.Enumerator(jobData.EventReader,
-                        jobData.InputVelocities, jobData.TimeStep, forEachIndexBegin, forEachIndexEnd);
+                    var eventEnumerator = new CollisionEvents.Enumerator(
+                        jobData.EventReader,
+                        jobData.InputVelocities,
+                        jobData.TimeStep,
+                        forEachIndexBegin,
+                        forEachIndexEnd
+                    );
 
                     while (eventEnumerator.MoveNext())
                     {
@@ -194,7 +265,9 @@ namespace Unity.Physics
             internal static void CheckReflectionDataCorrect(IntPtr reflectionData)
             {
                 if (reflectionData == IntPtr.Zero)
-                    SafetyChecks.ThrowInvalidOperationException("Reflection data was not set up by an Initialize() call");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Reflection data was not set up by an Initialize() call"
+                    );
             }
         }
 

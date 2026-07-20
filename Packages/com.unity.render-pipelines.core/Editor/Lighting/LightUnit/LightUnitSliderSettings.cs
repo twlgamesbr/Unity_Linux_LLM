@@ -17,8 +17,14 @@ namespace UnityEditor.Rendering
         /// <param name="unitName">The name of the unit</param>
         /// <param name="hasMarkers">If has markers</param>
         /// <param name="clampValue">If the value will be clamped to the <see cref="valueRanges"/></param>
-        public LightUnitSliderUIDescriptor(LightUnitSliderUIRange[] valueRanges, float[] sliderDistribution,
-                                           string cautionTooltip, string unitName, bool hasMarkers = true, bool clampValue = false)
+        public LightUnitSliderUIDescriptor(
+            LightUnitSliderUIRange[] valueRanges,
+            float[] sliderDistribution,
+            string cautionTooltip,
+            string unitName,
+            bool hasMarkers = true,
+            bool clampValue = false
+        )
             : this(valueRanges, sliderDistribution, cautionTooltip, cautionTooltip, unitName, hasMarkers, clampValue)
         { }
 
@@ -32,8 +38,15 @@ namespace UnityEditor.Rendering
         /// <param name="unitName">The name of the unit</param>
         /// <param name="hasMarkers">If has markers</param>
         /// <param name="clampValue">If the value will be clamped to the <see cref="valueRanges"/></param>
-        public LightUnitSliderUIDescriptor(LightUnitSliderUIRange[] valueRanges, float[] sliderDistribution, string belowRangeTooltip,
-                                           string aboveRangeTooltip, string unitName, bool hasMarkers = true, bool clampValue = false)
+        public LightUnitSliderUIDescriptor(
+            LightUnitSliderUIRange[] valueRanges,
+            float[] sliderDistribution,
+            string belowRangeTooltip,
+            string aboveRangeTooltip,
+            string unitName,
+            bool hasMarkers = true,
+            bool clampValue = false
+        )
         {
             this.valueRanges = valueRanges;
             this.belowRangeTooltip = belowRangeTooltip;
@@ -43,40 +56,44 @@ namespace UnityEditor.Rendering
             this.hasMarkers = hasMarkers;
             this.clampValue = clampValue;
 
-            sliderRange = new Vector2(
-                this.valueRanges.Min(x => x.value.x),
-                this.valueRanges.Max(x => x.value.y)
-            );
+            sliderRange = new Vector2(this.valueRanges.Min(x => x.value.x), this.valueRanges.Max(x => x.value.y));
         }
 
         /// <summary>
         /// The distribution
         /// </summary>
         public readonly float[] sliderDistribution;
+
         /// <summary>
         /// The ranges that the value can have
         /// </summary>
         public readonly LightUnitSliderUIRange[] valueRanges;
+
         /// <summary>
         /// The ranges that the slider can have
         /// </summary>
         public readonly Vector2 sliderRange;
+
         /// <summary>
         /// The tooltip if the value goes below the range
         /// </summary>
         public readonly string belowRangeTooltip;
+
         /// <summary>
         /// The tooltip if the value goes above the range
         /// </summary>
         public readonly string aboveRangeTooltip;
+
         /// <summary>
         /// The name of the unit
         /// </summary>
         public readonly string unitName;
+
         /// <summary>
         /// If has markers
         /// </summary>
         public readonly bool hasMarkers;
+
         /// <summary>
         /// If the value needs to be clamp
         /// </summary>
@@ -95,9 +112,8 @@ namespace UnityEditor.Rendering
         /// <param name="tooltip">The tooltip</param>
         /// <param name="value">The min and max values</param>
         public LightUnitSliderUIRange(Texture2D icon, string tooltip, Vector2 value)
-        // If no preset value provided, then by default it is the average of the value range.
-            : this(icon, tooltip, value, 0.5f * (value.x + value.y))
-        { }
+            // If no preset value provided, then by default it is the average of the value range.
+            : this(icon, tooltip, value, 0.5f * (value.x + value.y)) { }
 
         /// <summary>
         /// Constructor
@@ -111,7 +127,10 @@ namespace UnityEditor.Rendering
             this.content = new GUIContent(icon, tooltip);
             this.value = value;
 
-            Debug.Assert(presetValue > value.x && presetValue < value.y, "Preset value is outside the slider value range.");
+            Debug.Assert(
+                presetValue > value.x && presetValue < value.y,
+                "Preset value is outside the slider value range."
+            );
 
             // Preset values are arbitrarily chosen by artist, and we must use it instead of
             // deriving it automatically (ie, the value range average).
@@ -124,13 +143,14 @@ namespace UnityEditor.Rendering
         /// <param name="tooltip">The tooltip</param>
         /// <param name="value">The min and max values</param>
         /// <returns>A configured LightUnitSliderUIRange instance representing a caution range.</returns>
-        public static LightUnitSliderUIRange CautionRange(string tooltip, float value) => new LightUnitSliderUIRange
-        {
-            // Load the buildin caution icon with provided tooltip.
-            content = new GUIContent(EditorGUIUtility.TrIconContent("console.warnicon").image, tooltip),
-            value = new Vector2(-1, value),
-            presetValue = -1
-        };
+        public static LightUnitSliderUIRange CautionRange(string tooltip, float value) =>
+            new LightUnitSliderUIRange
+            {
+                // Load the buildin caution icon with provided tooltip.
+                content = new GUIContent(EditorGUIUtility.TrIconContent("console.warnicon").image, tooltip),
+                value = new Vector2(-1, value),
+                presetValue = -1,
+            };
 
         /// <summary>
         /// The content
@@ -200,39 +220,139 @@ namespace UnityEditor.Rendering
         {
             public static readonly LightUnitSliderUIRange[] LumenValueTable =
             {
-                new LightUnitSliderUIRange(LightUnitIcon.ExteriorLight,  LightUnitTooltips.k_PunctualExterior,   new Vector2(3000, 40000), 10000),
-                new LightUnitSliderUIRange(LightUnitIcon.InteriorLight,  LightUnitTooltips.k_PunctualInterior,   new Vector2(300,  3000),  1000),
-                new LightUnitSliderUIRange(LightUnitIcon.DecorativeLight, LightUnitTooltips.k_PunctualDecorative, new Vector2(15,   300),   100),
-                new LightUnitSliderUIRange(LightUnitIcon.Candlelight,    LightUnitTooltips.k_PunctualCandle,     new Vector2(0,    15),    12.5f),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.ExteriorLight,
+                    LightUnitTooltips.k_PunctualExterior,
+                    new Vector2(3000, 40000),
+                    10000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.InteriorLight,
+                    LightUnitTooltips.k_PunctualInterior,
+                    new Vector2(300, 3000),
+                    1000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.DecorativeLight,
+                    LightUnitTooltips.k_PunctualDecorative,
+                    new Vector2(15, 300),
+                    100
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Candlelight,
+                    LightUnitTooltips.k_PunctualCandle,
+                    new Vector2(0, 15),
+                    12.5f
+                ),
             };
 
             public static readonly LightUnitSliderUIRange[] LuxValueTable =
             {
-                new LightUnitSliderUIRange(LightUnitIcon.BrightSky,     LightUnitTooltips.k_LuxBrightSky,     new Vector2(80000, 130000), 100000),
-                new LightUnitSliderUIRange(LightUnitIcon.Overcast,      LightUnitTooltips.k_LuxOvercastSky,   new Vector2(10000, 80000),  20000),
-                new LightUnitSliderUIRange(LightUnitIcon.SunriseSunset, LightUnitTooltips.k_LuxSunriseSunset, new Vector2(1,     10000),  5000),
-                new LightUnitSliderUIRange(LightUnitIcon.Moonlight,     LightUnitTooltips.k_LuxMoonlight,     new Vector2(0,     1),      0.5f),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.BrightSky,
+                    LightUnitTooltips.k_LuxBrightSky,
+                    new Vector2(80000, 130000),
+                    100000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Overcast,
+                    LightUnitTooltips.k_LuxOvercastSky,
+                    new Vector2(10000, 80000),
+                    20000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.SunriseSunset,
+                    LightUnitTooltips.k_LuxSunriseSunset,
+                    new Vector2(1, 10000),
+                    5000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Moonlight,
+                    LightUnitTooltips.k_LuxMoonlight,
+                    new Vector2(0, 1),
+                    0.5f
+                ),
             };
 
             public static readonly LightUnitSliderUIRange[] ExposureValueTable =
             {
-                new LightUnitSliderUIRange(LightUnitIcon.BrightSky,     LightUnitTooltips.k_ExposureBrightSky,     new Vector2(12, 15), 13),
-                new LightUnitSliderUIRange(LightUnitIcon.Overcast,      LightUnitTooltips.k_ExposureOvercastSky,   new Vector2(8,  12)),
-                new LightUnitSliderUIRange(LightUnitIcon.SunriseSunset, LightUnitTooltips.k_ExposureSunriseSunset, new Vector2(6,   8)),
-                new LightUnitSliderUIRange(LightUnitIcon.InteriorLight, LightUnitTooltips.k_ExposureInterior,      new Vector2(3,   6)),
-                new LightUnitSliderUIRange(LightUnitIcon.Moonlight,     LightUnitTooltips.k_ExposureMoonlitSky,    new Vector2(0,   3)),
-                new LightUnitSliderUIRange(LightUnitIcon.MoonlessNight, LightUnitTooltips.k_ExposureMoonlessNight, new Vector2(-5,  0)),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.BrightSky,
+                    LightUnitTooltips.k_ExposureBrightSky,
+                    new Vector2(12, 15),
+                    13
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Overcast,
+                    LightUnitTooltips.k_ExposureOvercastSky,
+                    new Vector2(8, 12)
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.SunriseSunset,
+                    LightUnitTooltips.k_ExposureSunriseSunset,
+                    new Vector2(6, 8)
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.InteriorLight,
+                    LightUnitTooltips.k_ExposureInterior,
+                    new Vector2(3, 6)
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Moonlight,
+                    LightUnitTooltips.k_ExposureMoonlitSky,
+                    new Vector2(0, 3)
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.MoonlessNight,
+                    LightUnitTooltips.k_ExposureMoonlessNight,
+                    new Vector2(-5, 0)
+                ),
             };
 
             public static readonly LightUnitSliderUIRange[] KelvinValueTableNew =
             {
-                new LightUnitSliderUIRange(LightUnitIcon.BlueSky,          LightUnitTooltips.k_TemperatureBlueSky,          new Vector2(10000, 20000), 15000),
-                new LightUnitSliderUIRange(LightUnitIcon.Shade,            LightUnitTooltips.k_TemperatureShade,            new Vector2(7000,  10000), 8000),
-                new LightUnitSliderUIRange(LightUnitIcon.CloudySky,        LightUnitTooltips.k_TemperatureCloudySky,        new Vector2(6000,   7000), 6500),
-                new LightUnitSliderUIRange(LightUnitIcon.DirectSunlight,   LightUnitTooltips.k_TemperatureDirectSunlight,   new Vector2(4500,   6000), 5500),
-                new LightUnitSliderUIRange(LightUnitIcon.Fluorescent,      LightUnitTooltips.k_TemperatureFluorescent,      new Vector2(3500,   4500), 4000),
-                new LightUnitSliderUIRange(LightUnitIcon.IntenseAreaLight, LightUnitTooltips.k_TemperatureIncandescent,     new Vector2(2500,   3500), 3000),
-                new LightUnitSliderUIRange(LightUnitIcon.Candlelight,      LightUnitTooltips.k_TemperatureCandle,           new Vector2(1500,   2500), 1900),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.BlueSky,
+                    LightUnitTooltips.k_TemperatureBlueSky,
+                    new Vector2(10000, 20000),
+                    15000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Shade,
+                    LightUnitTooltips.k_TemperatureShade,
+                    new Vector2(7000, 10000),
+                    8000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.CloudySky,
+                    LightUnitTooltips.k_TemperatureCloudySky,
+                    new Vector2(6000, 7000),
+                    6500
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.DirectSunlight,
+                    LightUnitTooltips.k_TemperatureDirectSunlight,
+                    new Vector2(4500, 6000),
+                    5500
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Fluorescent,
+                    LightUnitTooltips.k_TemperatureFluorescent,
+                    new Vector2(3500, 4500),
+                    4000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.IntenseAreaLight,
+                    LightUnitTooltips.k_TemperatureIncandescent,
+                    new Vector2(2500, 3500),
+                    3000
+                ),
+                new LightUnitSliderUIRange(
+                    LightUnitIcon.Candlelight,
+                    LightUnitTooltips.k_TemperatureCandle,
+                    new Vector2(1500, 2500),
+                    1900
+                ),
             };
         }
 
@@ -248,7 +368,7 @@ namespace UnityEditor.Rendering
                 1 * LumenStep,
                 2 * LumenStep,
                 3 * LumenStep,
-                4 * LumenStep
+                4 * LumenStep,
             };
 
             private const float ExposureStep = 1 / 6f;
@@ -260,7 +380,7 @@ namespace UnityEditor.Rendering
                 3 * ExposureStep,
                 4 * ExposureStep,
                 5 * ExposureStep,
-                6 * ExposureStep
+                6 * ExposureStep,
             };
         }
 
@@ -270,7 +390,11 @@ namespace UnityEditor.Rendering
             // Maybe the resource reloader can be improved to support icon loading (thus supporting skinning)?
             static Texture2D GetLightUnitIcon(string name)
             {
-                return CoreEditorUtils.LoadIcon(@"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/LightUnitIcons", name, ".png");
+                return CoreEditorUtils.LoadIcon(
+                    @"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/LightUnitIcons",
+                    name,
+                    ".png"
+                );
             }
 
             // TODO: Move all light unit icons from the package into the built-in resources.

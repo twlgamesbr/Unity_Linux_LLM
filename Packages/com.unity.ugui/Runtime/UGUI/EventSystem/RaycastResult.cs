@@ -136,6 +136,7 @@ namespace UnityEngine.EventSystems
 
         //This is a visualElement but we rely on the getter being stripped to not pulling the type.
         internal IEventHandler m_element;
+
         /// <summary>
         /// The UIToolkit Visual Element that was intersected by this raycast, if any.
         /// </summary>
@@ -176,18 +177,41 @@ namespace UnityEngine.EventSystems
             if (!isValid)
                 return "";
 
-            return "Name: " + gameObject + "\n" +
-                "module: " + module + "\n" +
-                "distance: " + distance + "\n" +
-                "index: " + index + "\n" +
-                "depth: " + depth + "\n" +
-                "worldNormal: " + worldNormal + "\n" +
-                "worldPosition: " + worldPosition + "\n" +
-                "screenPosition: " + screenPosition + "\n" +
-                "module.sortOrderPriority: " + module.sortOrderPriority + "\n" +
-                "module.renderOrderPriority: " + module.renderOrderPriority + "\n" +
-                "sortingLayer: " + sortingLayer + "\n" +
-                "sortingOrder: " + sortingOrder;
+            return "Name: "
+                + gameObject
+                + "\n"
+                + "module: "
+                + module
+                + "\n"
+                + "distance: "
+                + distance
+                + "\n"
+                + "index: "
+                + index
+                + "\n"
+                + "depth: "
+                + depth
+                + "\n"
+                + "worldNormal: "
+                + worldNormal
+                + "\n"
+                + "worldPosition: "
+                + worldPosition
+                + "\n"
+                + "screenPosition: "
+                + screenPosition
+                + "\n"
+                + "module.sortOrderPriority: "
+                + module.sortOrderPriority
+                + "\n"
+                + "module.renderOrderPriority: "
+                + module.renderOrderPriority
+                + "\n"
+                + "sortingLayer: "
+                + sortingLayer
+                + "\n"
+                + "sortingOrder: "
+                + sortingOrder;
         }
     }
 }

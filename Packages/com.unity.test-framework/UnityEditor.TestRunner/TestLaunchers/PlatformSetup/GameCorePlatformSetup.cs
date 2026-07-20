@@ -71,7 +71,15 @@ namespace UnityEditor.TestTools.TestRunner
         {
             var commandLineArgs = Environment.GetCommandLineArgs();
             var testSettingsFilePath = string.Empty;
-            var optionSet = new CommandLineOptionSet(new CommandLineOption("testSettingsFile", settingsFilePath => { testSettingsFilePath = settingsFilePath; }));
+            var optionSet = new CommandLineOptionSet(
+                new CommandLineOption(
+                    "testSettingsFile",
+                    settingsFilePath =>
+                    {
+                        testSettingsFilePath = settingsFilePath;
+                    }
+                )
+            );
             optionSet.Parse(commandLineArgs);
             Dictionary<string, object> settingsDictionary = null;
             if (!string.IsNullOrEmpty(testSettingsFilePath))
@@ -88,7 +96,8 @@ namespace UnityEditor.TestTools.TestRunner
             if (settingsDictionary.ContainsKey(k_GameCorePackageDeployment))
             {
                 settingsDictionary.TryGetValue(k_GameCorePackageDeployment, out var argumentValue);
-                gameCoreDeploymentMethod = (GameCoreDeployMethod)Enum.Parse(typeof(GameCoreDeployMethod), argumentValue.ToString());
+                gameCoreDeploymentMethod = (GameCoreDeployMethod)
+                    Enum.Parse(typeof(GameCoreDeployMethod), argumentValue.ToString());
                 return true;
             }
 
@@ -123,7 +132,8 @@ namespace UnityEditor.TestTools.TestRunner
 
             if (!IsValidScidAndTitleId(settings.SCID, settings.GameConfig.TitleId))
             {
-                m_Warning = $"Invalid SCID '{settings.SCID}' or TitleId '{settings.GameConfig.TitleId}'. Setting to default values (TitleId: {k_TitleID}, SCID: {k_SCID}).";
+                m_Warning =
+                    $"Invalid SCID '{settings.SCID}' or TitleId '{settings.GameConfig.TitleId}'. Setting to default values (TitleId: {k_TitleID}, SCID: {k_SCID}).";
                 settings.GameConfig.TitleId = k_TitleID;
                 settings.SCID = k_SCID;
                 changed = true;
@@ -147,17 +157,11 @@ namespace UnityEditor.TestTools.TestRunner
 #endif
         }
 
-        public void PostBuildAction()
-        {
-        }
+        public void PostBuildAction() { }
 
-        public void PostSuccessfulBuildAction()
-        {
-        }
+        public void PostSuccessfulBuildAction() { }
 
-        public void PostSuccessfulLaunchAction()
-        {
-        }
+        public void PostSuccessfulLaunchAction() { }
 
         public void CleanUp()
         {

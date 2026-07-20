@@ -5,30 +5,36 @@ using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
 using Newtonsoft.Json;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Monitoring.Datadog;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Dialogue.RAG
 {
     public class QdrantRAGService : MonoBehaviour
     {
-        [FoldoutGroup("Qdrant Endpoint", true, nameof(_qdrantUrl), nameof(_collectionName), nameof(_denseVectorName), nameof(_sparseVectorName))]
+        [FoldoutGroup(
+            "Qdrant Endpoint",
+            true,
+            nameof(_qdrantUrl),
+            nameof(_collectionName),
+            nameof(_denseVectorName),
+            nameof(_sparseVectorName)
+        )]
         [SerializeField]
         private EditorAttributes.Void qdrantEndpointGroup;
 
@@ -53,10 +59,7 @@ namespace NPCSystem.Dialogue.RAG
         [SerializeField]
         private EditorAttributes.Void embedderGroup;
 
-        [HelpBox(
-            "Assign the NPCLocalAIEmbedder used to encode queries before searching Qdrant.",
-            MessageMode.Log
-        )]
+        [HelpBox("Assign the NPCLocalAIEmbedder used to encode queries before searching Qdrant.", MessageMode.Log)]
         [SerializeField, HideProperty, FormerlySerializedAs("embedder")]
         NPCLocalAIEmbedder _embedder;
 
@@ -155,13 +158,16 @@ namespace NPCSystem.Dialogue.RAG
 
             try
             {
-                var response = JsonConvert.DeserializeObject<QdrantCollectionInfoResponse>(request.downloadHandler.text);
+                var response = JsonConvert.DeserializeObject<QdrantCollectionInfoResponse>(
+                    request.downloadHandler.text
+                );
                 if (response?.result?.config?.params_config?.vectors?.dense == null)
                     return "Invalid response structure.";
 
                 int denseSize = response.result.config.params_config.vectors.dense.size;
-                bool hasSparse = response.result.config.params_config.sparse_vectors != null &&
-                                 response.result.config.params_config.sparse_vectors.ContainsKey(_sparseVectorName);
+                bool hasSparse =
+                    response.result.config.params_config.sparse_vectors != null
+                    && response.result.config.params_config.sparse_vectors.ContainsKey(_sparseVectorName);
 
                 // ── Datadog: emit live dimension so dashboards catch mismatches instantly ──
                 DatadogMetricsService.Gauge(
@@ -237,12 +243,22 @@ namespace NPCSystem.Dialogue.RAG
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     inspectorStatus = $"Connection failed: {request.error}";
-                    logger.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error, inspectorStatus);
+                    logger.Log(
+                        NPCFlowStage.ConfigurationValidation,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        inspectorStatus
+                    );
                     return;
                 }
 
                 inspectorStatus = "Qdrant is reachable.";
-                logger.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info, inspectorStatus);
+                logger.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    inspectorStatus
+                );
             }
             catch (Exception ex)
             {
@@ -251,8 +267,7 @@ namespace NPCSystem.Dialogue.RAG
             }
         }
 
-        public string BuildQueryEndpoint() =>
-            $"{_qdrantUrl}/collections/{_collectionName}/points/query";
+        public string BuildQueryEndpoint() => $"{_qdrantUrl}/collections/{_collectionName}/points/query";
 
         public async Task<List<string>> SearchAsync(string query, int limit = 5)
         {
@@ -264,11 +279,7 @@ namespace NPCSystem.Dialogue.RAG
                 service: "unity-dedicated-server",
                 resource: $"{_collectionName}.query",
                 type: "vector_db",
-                tags: new[]
-                {
-                    $"collection:{_collectionName}",
-                    $"limit:{limit}",
-                }
+                tags: new[] { $"collection:{_collectionName}", $"limit:{limit}" }
             );
 
             var searchSw = System.Diagnostics.Stopwatch.StartNew();
@@ -296,12 +307,12 @@ namespace NPCSystem.Dialogue.RAG
                 {
                     query = queryVector,
                     limit = limit,
-                    with_payload = true
+                    with_payload = true,
                 };
 
                 string json = JsonConvert.SerializeObject(payload);
                 string responseText = await SendSearchRequestAsync(BuildQueryEndpoint(), json);
-                
+
                 if (string.IsNullOrWhiteSpace(responseText))
                     return new List<string>();
 
@@ -309,7 +320,12 @@ namespace NPCSystem.Dialogue.RAG
                 List<string> results = ExtractPayloadTexts(searchResult);
 
                 searchSw.Stop();
-                DatadogMetricsService.Timer("qdrant.search.duration", searchSw.ElapsedMilliseconds, 1.0, new[] { "mode:hybrid" });
+                DatadogMetricsService.Timer(
+                    "qdrant.search.duration",
+                    searchSw.ElapsedMilliseconds,
+                    1.0,
+                    new[] { "mode:hybrid" }
+                );
 
                 return results;
             }
@@ -362,8 +378,12 @@ namespace NPCSystem.Dialogue.RAG
             return request.downloadHandler.text;
         }
 
-        public bool HasValidQdrantUrl() => !string.IsNullOrWhiteSpace(_qdrantUrl) && (_qdrantUrl.StartsWith("http://") || _qdrantUrl.StartsWith("https://"));
-        public bool HasValidCollectionName() => !string.IsNullOrWhiteSpace(_collectionName) && !_collectionName.Contains(" ");
+        public bool HasValidQdrantUrl() =>
+            !string.IsNullOrWhiteSpace(_qdrantUrl)
+            && (_qdrantUrl.StartsWith("http://") || _qdrantUrl.StartsWith("https://"));
+
+        public bool HasValidCollectionName() =>
+            !string.IsNullOrWhiteSpace(_collectionName) && !_collectionName.Contains(" ");
 
         [Serializable]
         class QueryPayload
@@ -400,4 +420,3 @@ namespace NPCSystem.Dialogue.RAG
         }
     }
 }
-

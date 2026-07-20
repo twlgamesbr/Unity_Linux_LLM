@@ -24,7 +24,13 @@ namespace UnityEngine.InputSystem.Editor
 
         private static readonly string[] kInputSettingsKeywords =
         {
-            "Input", "Action", "Controls", "Gamepad", "Keyboard", "Mouse", "Touch"
+            "Input",
+            "Action",
+            "Controls",
+            "Gamepad",
+            "Keyboard",
+            "Mouse",
+            "Touch",
         };
 
         public static void Open()
@@ -40,7 +46,7 @@ namespace UnityEngine.InputSystem.Editor
                 // We put this in a child node called "Settings" when Project-wide Actions is enabled.
                 // When not enabled it sits on the main package Settings node.
                 label = "Settings",
-                keywords = kInputSettingsKeywords
+                keywords = kInputSettingsKeywords,
             };
         }
 
@@ -72,15 +78,27 @@ namespace UnityEngine.InputSystem.Editor
 
         public override void OnTitleBarGUI()
         {
-            if (EditorGUILayout.DropdownButton(EditorGUIUtility.IconContent("_Popup"), FocusType.Passive, EditorStyles.label))
+            if (
+                EditorGUILayout.DropdownButton(
+                    EditorGUIUtility.IconContent("_Popup"),
+                    FocusType.Passive,
+                    EditorStyles.label
+                )
+            )
             {
                 var menu = new GenericMenu();
                 menu.AddDisabledItem(new GUIContent("Available Settings Assets:"));
                 menu.AddSeparator("");
                 for (var i = 0; i < m_AvailableSettingsAssetsOptions.Length; i++)
-                    menu.AddItem(new GUIContent(m_AvailableSettingsAssetsOptions[i]), m_CurrentSelectedInputSettingsAsset == i, (path) => {
-                        InputSystem.settings = AssetDatabase.LoadAssetAtPath<InputSettings>((string)path);
-                    }, m_AvailableInputSettingsAssets[i]);
+                    menu.AddItem(
+                        new GUIContent(m_AvailableSettingsAssetsOptions[i]),
+                        m_CurrentSelectedInputSettingsAsset == i,
+                        (path) =>
+                        {
+                            InputSystem.settings = AssetDatabase.LoadAssetAtPath<InputSettings>((string)path);
+                        },
+                        m_AvailableInputSettingsAssets[i]
+                    );
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("New Settings Asset…"), false, CreateNewSettingsAsset);
                 menu.ShowAsContext();
@@ -96,7 +114,8 @@ namespace UnityEngine.InputSystem.Editor
             {
                 EditorGUILayout.HelpBox(
                     "Settings for the new input system are stored in an asset. Click the button below to create a settings asset you can edit.",
-                    MessageType.Info);
+                    MessageType.Info
+                );
                 if (GUILayout.Button("Create settings asset", GUILayout.Height(30)))
                     CreateNewSettingsAsset("Assets/InputSystem.inputsettings.asset");
                 GUILayout.Space(20);
@@ -120,14 +139,20 @@ namespace UnityEngine.InputSystem.Editor
                 using (new EditorGUI.DisabledScope(!runInBackground))
                     EditorGUILayout.PropertyField(m_BackgroundBehavior, m_BackgroundBehaviorContent);
                 if (!runInBackground)
-                    EditorGUILayout.HelpBox("Focus change behavior can only be changed if 'Run In Background' is enabled in Player Settings.", MessageType.Info);
+                    EditorGUILayout.HelpBox(
+                        "Focus change behavior can only be changed if 'Run In Background' is enabled in Player Settings.",
+                        MessageType.Info
+                    );
 
 #if UNITY_INPUT_SYSTEM_PLATFORM_SCROLL_DELTA
                 EditorGUILayout.PropertyField(m_ScrollDeltaBehavior, m_ScrollDeltaBehaviorContent);
 #endif
 
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(m_CompensateForScreenOrientation, m_CompensateForScreenOrientationContent);
+                EditorGUILayout.PropertyField(
+                    m_CompensateForScreenOrientation,
+                    m_CompensateForScreenOrientationContent
+                );
 
                 // NOTE: We do NOT make showing this one conditional on whether runInBackground is actually set in the
                 //       player settings as regardless of whether it's on or not, Unity will force it on in standalone
@@ -151,10 +176,13 @@ namespace UnityEngine.InputSystem.Editor
                 EditorGUILayout.Separator();
                 EditorGUILayout.Space();
 
-                EditorGUILayout.HelpBox("Leave 'Supported Devices' empty if you want the input system to support all input devices it can recognize. If, however, "
-                    + "you are only interested in a certain set of devices, adding them here will narrow the scope of what's presented in the editor "
-                    + "and avoid picking up input from devices not relevant to the project. When you add devices here, any device that will not be classified "
-                    + "as supported will appear under 'Unsupported Devices' in the input debugger.", MessageType.None);
+                EditorGUILayout.HelpBox(
+                    "Leave 'Supported Devices' empty if you want the input system to support all input devices it can recognize. If, however, "
+                        + "you are only interested in a certain set of devices, adding them here will narrow the scope of what's presented in the editor "
+                        + "and avoid picking up input from devices not relevant to the project. When you add devices here, any device that will not be classified "
+                        + "as supported will appear under 'Unsupported Devices' in the input debugger.",
+                    MessageType.None
+                );
 
                 m_SupportedDevices.DoLayoutList();
 
@@ -172,14 +200,16 @@ namespace UnityEngine.InputSystem.Editor
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(m_ShortcutKeysConsumeInputs, m_ShortcutKeysConsumeInputsContent);
                 if (m_ShortcutKeysConsumeInputs.boolValue)
-                    EditorGUILayout.HelpBox("Please note that enabling Improved Shortcut Support will cause actions with composite bindings to consume input and block any other actions which are enabled and sharing the same controls. "
-                        + "Input consumption is performed in priority order, with the action containing the greatest number of bindings checked first. "
-                        + "Therefore actions requiring fewer keypresses will not be triggered if an action using more keypresses is triggered and has overlapping controls. "
-                        + "This works for shortcut keys, however in other cases this might not give the desired result, especially where there are actions with the exact same number of composite controls, in which case it is non-deterministic which action will be triggered. "
-                        + "These conflicts may occur even between actions which belong to different Action Maps e.g. if using an UIInputModule with the Arrow Keys bound to the Navigate Action in the UI Action Map, this would interfere with other Action Maps using those keys. "
-                        + "However conflicts would not occur between actions which belong to different Action Assets. "
-                        + "Since event consumption only occurs for enabled actions, you can resolve unexpected issues by ensuring that only those Actions or Action Maps that are relevant to your game's current context are enabled. Enabling or disabling actions as your game or application moves between different contexts. "
-                        , MessageType.None);
+                    EditorGUILayout.HelpBox(
+                        "Please note that enabling Improved Shortcut Support will cause actions with composite bindings to consume input and block any other actions which are enabled and sharing the same controls. "
+                            + "Input consumption is performed in priority order, with the action containing the greatest number of bindings checked first. "
+                            + "Therefore actions requiring fewer keypresses will not be triggered if an action using more keypresses is triggered and has overlapping controls. "
+                            + "This works for shortcut keys, however in other cases this might not give the desired result, especially where there are actions with the exact same number of composite controls, in which case it is non-deterministic which action will be triggered. "
+                            + "These conflicts may occur even between actions which belong to different Action Maps e.g. if using an UIInputModule with the Arrow Keys bound to the Navigate Action in the UI Action Map, this would interfere with other Action Maps using those keys. "
+                            + "However conflicts would not occur between actions which belong to different Action Assets. "
+                            + "Since event consumption only occurs for enabled actions, you can resolve unexpected issues by ensuring that only those Actions or Action Maps that are relevant to your game's current context are enabled. Enabling or disabling actions as your game or application moves between different contexts. ",
+                        MessageType.None
+                    );
 
                 if (EditorGUI.EndChangeCheck())
                     Apply();
@@ -211,7 +241,10 @@ namespace UnityEngine.InputSystem.Editor
         {
             // Create and install the settings. This will lead to an InputSystem.onSettingsChange event which in turn
             // will cause us to re-initialize.
-            InputSystem.settings = InputAssetEditorUtils.CreateAsset(ScriptableObject.CreateInstance<InputSettings>(), relativePath);
+            InputSystem.settings = InputAssetEditorUtils.CreateAsset(
+                ScriptableObject.CreateInstance<InputSettings>(),
+                relativePath
+            );
         }
 
         private static void CreateNewSettingsAsset()
@@ -219,14 +252,19 @@ namespace UnityEngine.InputSystem.Editor
             var result = InputAssetEditorUtils.PromptUserForAsset(
                 friendlyName: "Input Settings",
                 suggestedAssetFilePathWithoutExtension: InputAssetEditorUtils.MakeProjectFileName("inputsettings"),
-                assetFileExtension: "asset");
+                assetFileExtension: "asset"
+            );
             if (result.result == InputAssetEditorUtils.DialogResult.Valid)
                 CreateNewSettingsAsset(result.relativePath);
         }
 
         private void InitializeWithCurrentSettingsIfNecessary()
         {
-            if (InputSystem.settings == m_Settings && m_Settings != null && m_SettingsDirtyCount == EditorUtility.GetDirtyCount(m_Settings))
+            if (
+                InputSystem.settings == m_Settings
+                && m_Settings != null
+                && m_SettingsDirtyCount == EditorUtility.GetDirtyCount(m_Settings)
+            )
                 return;
 
             InitializeWithCurrentSettings();
@@ -255,12 +293,17 @@ namespace UnityEngine.InputSystem.Editor
             }
             else
             {
-                m_CurrentSelectedInputSettingsAsset = ArrayHelpers.IndexOf(m_AvailableInputSettingsAssets, currentSettingsPath);
+                m_CurrentSelectedInputSettingsAsset = ArrayHelpers.IndexOf(
+                    m_AvailableInputSettingsAssets,
+                    currentSettingsPath
+                );
                 if (m_CurrentSelectedInputSettingsAsset == -1)
                 {
                     // This is odd and shouldn't happen. Solve by just adding the path to the list.
-                    m_CurrentSelectedInputSettingsAsset =
-                        ArrayHelpers.Append(ref m_AvailableInputSettingsAssets, currentSettingsPath);
+                    m_CurrentSelectedInputSettingsAsset = ArrayHelpers.Append(
+                        ref m_AvailableInputSettingsAssets,
+                        currentSettingsPath
+                    );
                 }
 
                 ////REVIEW: should we store this by platform?
@@ -303,45 +346,90 @@ namespace UnityEngine.InputSystem.Editor
 
             m_UpdateModeContent = new GUIContent("Update Mode", "When should the Input System be updated?");
 #if UNITY_INPUT_SYSTEM_PLATFORM_SCROLL_DELTA
-            m_ScrollDeltaBehaviorContent = new GUIContent("Scroll Delta Behavior", "Controls whether the value returned by the Scroll Wheel Delta is normalized (to be uniform across all platforms), or returns the non-normalized platform-specific range which can vary between platforms.");
+            m_ScrollDeltaBehaviorContent = new GUIContent(
+                "Scroll Delta Behavior",
+                "Controls whether the value returned by the Scroll Wheel Delta is normalized (to be uniform across all platforms), or returns the non-normalized platform-specific range which can vary between platforms."
+            );
 #endif
-            m_CompensateForScreenOrientationContent = new GUIContent("Compensate Orientation", "Whether sensor input on mobile devices should be transformed to be relative to the current device orientation.");
-            m_BackgroundBehaviorContent = new GUIContent("Background Behavior", "If runInBackground is true (and in standalone *development* players and the editor), "
-                + "determines what happens to InputDevices and events when the application moves in and out of running in the foreground.\n\n"
-                + "'Reset And Disable Non-Background Devices' soft-resets and disables devices that cannot run in the background while the application does not have focus. Devices "
-                + "that can run in the background remain enabled and will keep receiving input.\n"
-                + "'Reset And Disable All Devices' soft-resets and disables *all* devices while the application does not have focus. No device will receive input while the application "
-                + "is running in the background.\n"
-                + "'Ignore Focus' leaves all devices untouched when application focus changes. While running in the background, all input that is received is processed as if "
-                + "running in the foreground.");
-            m_EditorInputBehaviorInPlayModeContent = new GUIContent("Play Mode Input Behavior", "When in play mode, determines how focus of the Game View is handled with respect to input.\n\n"
-                + "'Pointers And Keyboards Respect Game View Focus' requires Game View focus only for pointers (mice, touch, etc.) and keyboards. Other devices will feed input to the game regardless "
-                + "of whether the Game View is focused or not. Note that this means that input on these devices is not visible in other EditorWindows.\n"
-                + "'All Devices Respect Game View Focus' requires Game View focus for all input devices. While focus is not on the Game View, all input on InputDevices will go to the editor and not "
-                + "the game.\n"
-                + "'All Device Input Always Goes To Game View' causes input to treat 'Background Behavior' exactly as in the player including devices potentially being disabled entirely while the Game View "
-                + "does not have focus. In this setting, no input from the Input System will be visible to EditorWindows.");
-            m_DefaultDeadzoneMinContent = new GUIContent("Default Deadzone Min", "Default 'min' value for Stick Deadzone and Axis Deadzone processors.");
-            m_DefaultDeadzoneMaxContent = new GUIContent("Default Deadzone Max", "Default 'max' value for Stick Deadzone and Axis Deadzone processors.");
-            m_DefaultButtonPressPointContent = new GUIContent("Default Button Press Point", "The default press point used for Button controls as well as for various interactions. For button controls which have analog physical inputs, this configures how far they need to   be held down to be considered 'pressed'.");
-            m_ButtonReleaseThresholdContent = new GUIContent("Button Release Threshold", "Percent of press point at which a Button is considered released again. At 1, release points are identical to press points. At 0, a Button must be fully released before it can be pressed again.");
-            m_DefaultTapTimeContent = new GUIContent("Default Tap Time", "Default duration to be used for Tap and MultiTap interactions. Also used by by Touch screen devices to distinguish taps from to new touches.");
-            m_DefaultSlowTapTimeContent = new GUIContent("Default Slow Tap Time", "Default duration to be used for SlowTap interactions.");
-            m_DefaultHoldTimeContent = new GUIContent("Default Hold Time", "Default duration to be used for Hold interactions.");
-            m_TapRadiusContent = new GUIContent("Tap Radius", "Maximum distance between two finger taps on a touch screen device allowed for the system to consider this a tap of the same touch (as opposed to a new touch).");
-            m_MultiTapDelayTimeContent = new GUIContent("MultiTap Delay Time", "Default delay to be allowed between taps for MultiTap interactions. Also used by by touch devices to count multi taps.");
-            m_ShortcutKeysConsumeInputsContent = new GUIContent("Enable Input Consumption", "Actions are exclusively triggered and will consume/block other actions sharing the same input. E.g. when pressing the 'Shift+B' keys, the associated action would trigger but any action bound to just the 'B' key would be prevented from triggering at the same time.");
+            m_CompensateForScreenOrientationContent = new GUIContent(
+                "Compensate Orientation",
+                "Whether sensor input on mobile devices should be transformed to be relative to the current device orientation."
+            );
+            m_BackgroundBehaviorContent = new GUIContent(
+                "Background Behavior",
+                "If runInBackground is true (and in standalone *development* players and the editor), "
+                    + "determines what happens to InputDevices and events when the application moves in and out of running in the foreground.\n\n"
+                    + "'Reset And Disable Non-Background Devices' soft-resets and disables devices that cannot run in the background while the application does not have focus. Devices "
+                    + "that can run in the background remain enabled and will keep receiving input.\n"
+                    + "'Reset And Disable All Devices' soft-resets and disables *all* devices while the application does not have focus. No device will receive input while the application "
+                    + "is running in the background.\n"
+                    + "'Ignore Focus' leaves all devices untouched when application focus changes. While running in the background, all input that is received is processed as if "
+                    + "running in the foreground."
+            );
+            m_EditorInputBehaviorInPlayModeContent = new GUIContent(
+                "Play Mode Input Behavior",
+                "When in play mode, determines how focus of the Game View is handled with respect to input.\n\n"
+                    + "'Pointers And Keyboards Respect Game View Focus' requires Game View focus only for pointers (mice, touch, etc.) and keyboards. Other devices will feed input to the game regardless "
+                    + "of whether the Game View is focused or not. Note that this means that input on these devices is not visible in other EditorWindows.\n"
+                    + "'All Devices Respect Game View Focus' requires Game View focus for all input devices. While focus is not on the Game View, all input on InputDevices will go to the editor and not "
+                    + "the game.\n"
+                    + "'All Device Input Always Goes To Game View' causes input to treat 'Background Behavior' exactly as in the player including devices potentially being disabled entirely while the Game View "
+                    + "does not have focus. In this setting, no input from the Input System will be visible to EditorWindows."
+            );
+            m_DefaultDeadzoneMinContent = new GUIContent(
+                "Default Deadzone Min",
+                "Default 'min' value for Stick Deadzone and Axis Deadzone processors."
+            );
+            m_DefaultDeadzoneMaxContent = new GUIContent(
+                "Default Deadzone Max",
+                "Default 'max' value for Stick Deadzone and Axis Deadzone processors."
+            );
+            m_DefaultButtonPressPointContent = new GUIContent(
+                "Default Button Press Point",
+                "The default press point used for Button controls as well as for various interactions. For button controls which have analog physical inputs, this configures how far they need to   be held down to be considered 'pressed'."
+            );
+            m_ButtonReleaseThresholdContent = new GUIContent(
+                "Button Release Threshold",
+                "Percent of press point at which a Button is considered released again. At 1, release points are identical to press points. At 0, a Button must be fully released before it can be pressed again."
+            );
+            m_DefaultTapTimeContent = new GUIContent(
+                "Default Tap Time",
+                "Default duration to be used for Tap and MultiTap interactions. Also used by by Touch screen devices to distinguish taps from to new touches."
+            );
+            m_DefaultSlowTapTimeContent = new GUIContent(
+                "Default Slow Tap Time",
+                "Default duration to be used for SlowTap interactions."
+            );
+            m_DefaultHoldTimeContent = new GUIContent(
+                "Default Hold Time",
+                "Default duration to be used for Hold interactions."
+            );
+            m_TapRadiusContent = new GUIContent(
+                "Tap Radius",
+                "Maximum distance between two finger taps on a touch screen device allowed for the system to consider this a tap of the same touch (as opposed to a new touch)."
+            );
+            m_MultiTapDelayTimeContent = new GUIContent(
+                "MultiTap Delay Time",
+                "Default delay to be allowed between taps for MultiTap interactions. Also used by by touch devices to count multi taps."
+            );
+            m_ShortcutKeysConsumeInputsContent = new GUIContent(
+                "Enable Input Consumption",
+                "Actions are exclusively triggered and will consume/block other actions sharing the same input. E.g. when pressing the 'Shift+B' keys, the associated action would trigger but any action bound to just the 'B' key would be prevented from triggering at the same time."
+            );
 
             // Initialize ReorderableList for list of supported devices.
             var supportedDevicesProperty = m_SettingsObject.FindProperty("m_SupportedDevices");
             m_SupportedDevices = new ReorderableList(m_SettingsObject, supportedDevicesProperty)
             {
-                drawHeaderCallback =
-                    rect => { EditorGUI.LabelField(rect, m_SupportedDevicesText); },
-                onChangedCallback =
-                    list => { Apply(); },
-                onAddDropdownCallback =
-                    (rect, list) =>
+                drawHeaderCallback = rect =>
+                {
+                    EditorGUI.LabelField(rect, m_SupportedDevicesText);
+                },
+                onChangedCallback = list =>
+                {
+                    Apply();
+                },
+                onAddDropdownCallback = (rect, list) =>
                 {
                     var dropdown = new InputControlPickerDropdown(
                         new InputControlPickerState(),
@@ -358,16 +446,15 @@ namespace UnityEngine.InputSystem.Editor
                             }
                             var numDevices = supportedDevicesProperty.arraySize;
                             supportedDevicesProperty.InsertArrayElementAtIndex(numDevices);
-                            supportedDevicesProperty.GetArrayElementAtIndex(numDevices)
-                                .stringValue = layoutName;
+                            supportedDevicesProperty.GetArrayElementAtIndex(numDevices).stringValue = layoutName;
                             m_SupportedDevices.index = numDevices;
                             Apply();
                         },
-                        mode: InputControlPicker.Mode.PickDevice);
+                        mode: InputControlPicker.Mode.PickDevice
+                    );
                     dropdown.Show(rect);
                 },
-                drawElementCallback =
-                    (rect, index, isActive, isFocused) =>
+                drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
                     var layoutName = m_Settings.supportedDevices[index];
                     var icon = EditorInputControlLayoutCache.GetIconForLayout(layoutName);
@@ -382,7 +469,7 @@ namespace UnityEngine.InputSystem.Editor
                     }
 
                     EditorGUI.LabelField(rect, layoutName);
-                }
+                },
             };
 
             m_iOSProvider = new InputSettingsiOSProvider(m_SettingsObject);
@@ -422,34 +509,80 @@ namespace UnityEngine.InputSystem.Editor
             return guids.Select(guid => AssetDatabase.GUIDToAssetPath(guid)).ToArray();
         }
 
-        [SerializeField] private InputSettings m_Settings;
-        [SerializeField] private bool m_SettingsIsNotAnAsset;
+        [SerializeField]
+        private InputSettings m_Settings;
 
-        [NonSerialized] private int m_SettingsDirtyCount;
-        [NonSerialized] private SerializedObject m_SettingsObject;
-        [NonSerialized] private SerializedProperty m_UpdateMode;
-        [NonSerialized] private SerializedProperty m_ScrollDeltaBehavior;
-        [NonSerialized] private SerializedProperty m_CompensateForScreenOrientation;
-        [NonSerialized] private SerializedProperty m_BackgroundBehavior;
-        [NonSerialized] private SerializedProperty m_EditorInputBehaviorInPlayMode;
-        [NonSerialized] private SerializedProperty m_DefaultDeadzoneMin;
-        [NonSerialized] private SerializedProperty m_DefaultDeadzoneMax;
-        [NonSerialized] private SerializedProperty m_DefaultButtonPressPoint;
-        [NonSerialized] private SerializedProperty m_ButtonReleaseThreshold;
-        [NonSerialized] private SerializedProperty m_DefaultTapTime;
-        [NonSerialized] private SerializedProperty m_DefaultSlowTapTime;
-        [NonSerialized] private SerializedProperty m_DefaultHoldTime;
-        [NonSerialized] private SerializedProperty m_TapRadius;
-        [NonSerialized] private SerializedProperty m_MultiTapDelayTime;
-        [NonSerialized] private SerializedProperty m_ShortcutKeysConsumeInputs;
+        [SerializeField]
+        private bool m_SettingsIsNotAnAsset;
 
-        [NonSerialized] private ReorderableList m_SupportedDevices;
-        [NonSerialized] private string[] m_AvailableInputSettingsAssets;
-        [NonSerialized] private GUIContent[] m_AvailableSettingsAssetsOptions;
-        [NonSerialized] private int m_CurrentSelectedInputSettingsAsset;
+        [NonSerialized]
+        private int m_SettingsDirtyCount;
 
-        [NonSerialized] private GUIContent m_SupportedDevicesText = EditorGUIUtility.TrTextContent("Supported Devices");
-        [NonSerialized] private GUIStyle m_NewAssetButtonStyle;
+        [NonSerialized]
+        private SerializedObject m_SettingsObject;
+
+        [NonSerialized]
+        private SerializedProperty m_UpdateMode;
+
+        [NonSerialized]
+        private SerializedProperty m_ScrollDeltaBehavior;
+
+        [NonSerialized]
+        private SerializedProperty m_CompensateForScreenOrientation;
+
+        [NonSerialized]
+        private SerializedProperty m_BackgroundBehavior;
+
+        [NonSerialized]
+        private SerializedProperty m_EditorInputBehaviorInPlayMode;
+
+        [NonSerialized]
+        private SerializedProperty m_DefaultDeadzoneMin;
+
+        [NonSerialized]
+        private SerializedProperty m_DefaultDeadzoneMax;
+
+        [NonSerialized]
+        private SerializedProperty m_DefaultButtonPressPoint;
+
+        [NonSerialized]
+        private SerializedProperty m_ButtonReleaseThreshold;
+
+        [NonSerialized]
+        private SerializedProperty m_DefaultTapTime;
+
+        [NonSerialized]
+        private SerializedProperty m_DefaultSlowTapTime;
+
+        [NonSerialized]
+        private SerializedProperty m_DefaultHoldTime;
+
+        [NonSerialized]
+        private SerializedProperty m_TapRadius;
+
+        [NonSerialized]
+        private SerializedProperty m_MultiTapDelayTime;
+
+        [NonSerialized]
+        private SerializedProperty m_ShortcutKeysConsumeInputs;
+
+        [NonSerialized]
+        private ReorderableList m_SupportedDevices;
+
+        [NonSerialized]
+        private string[] m_AvailableInputSettingsAssets;
+
+        [NonSerialized]
+        private GUIContent[] m_AvailableSettingsAssetsOptions;
+
+        [NonSerialized]
+        private int m_CurrentSelectedInputSettingsAsset;
+
+        [NonSerialized]
+        private GUIContent m_SupportedDevicesText = EditorGUIUtility.TrTextContent("Supported Devices");
+
+        [NonSerialized]
+        private GUIStyle m_NewAssetButtonStyle;
 
         private GUIContent m_UpdateModeContent;
 #if UNITY_INPUT_SYSTEM_PLATFORM_SCROLL_DELTA
@@ -469,7 +602,8 @@ namespace UnityEngine.InputSystem.Editor
         private GUIContent m_MultiTapDelayTimeContent;
         private GUIContent m_ShortcutKeysConsumeInputsContent;
 
-        [NonSerialized] private InputSettingsiOSProvider m_iOSProvider;
+        [NonSerialized]
+        private InputSettingsiOSProvider m_iOSProvider;
 
         private static InputSettingsProvider s_Instance;
 
@@ -498,8 +632,13 @@ namespace UnityEngine.InputSystem.Editor
 
             EditorGUILayout.Space();
 
-            InputAssetEditorUtils.DrawMakeActiveGui(InputSystem.settings, target as InputSettings,
-                target.name, "settings", (value) => InputSystem.settings = value);
+            InputAssetEditorUtils.DrawMakeActiveGui(
+                InputSystem.settings,
+                target as InputSettings,
+                target.name,
+                "settings",
+                (value) => InputSystem.settings = value
+            );
         }
 
         protected override bool ShouldHideOpenButton()

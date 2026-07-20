@@ -12,9 +12,7 @@ namespace UnityEngine.InputSystem.UI
         public InputDevice device { get; set; }
 
         public ExtendedSubmitCancelEventData(EventSystem eventSystem)
-            : base(eventSystem)
-        {
-        }
+            : base(eventSystem) { }
     }
 }
 #endif

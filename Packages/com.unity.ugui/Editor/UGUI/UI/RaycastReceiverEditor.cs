@@ -1,8 +1,8 @@
 using System;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 
 namespace UnityEditor.UI
 {
@@ -83,7 +83,7 @@ namespace UnityEditor.UI
             {
                 text = "Raycast Padding",
                 viewDataKey = "RaycastReceiver_PaddingFoldout", // Use to have the foldout's state persist
-                value = false // Default to closed (false)
+                value = false, // Default to closed (false)
             };
 
             //We need to bind specific float fields to the Vector4 sub-properties

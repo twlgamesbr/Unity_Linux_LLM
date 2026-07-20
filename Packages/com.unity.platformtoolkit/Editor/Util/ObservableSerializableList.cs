@@ -43,7 +43,9 @@ namespace Unity.PlatformToolkit.Editor
         public void Add(T item)
         {
             items.Add(item);
-            InvokeCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, items.Count  - 1));
+            InvokeCollectionChanged(
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, items.Count - 1)
+            );
         }
 
         public void Clear()
@@ -68,7 +70,9 @@ namespace Unity.PlatformToolkit.Editor
             var removed = items.Remove(item);
             if (removed)
             {
-                InvokeCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+                InvokeCollectionChanged(
+                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index)
+                );
             }
             return removed;
         }
@@ -85,14 +89,18 @@ namespace Unity.PlatformToolkit.Editor
         public void Insert(int index, T item)
         {
             items.Insert(index, item);
-            InvokeCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+            InvokeCollectionChanged(
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index)
+            );
         }
 
         public void RemoveAt(int index)
         {
             var removedItem = items[index];
             items.RemoveAt(index);
-            InvokeCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItem, index));
+            InvokeCollectionChanged(
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItem, index)
+            );
         }
 
         public T this[int index]
@@ -104,7 +112,14 @@ namespace Unity.PlatformToolkit.Editor
                 if (!EqualityComparer<T>.Default.Equals(oldValue, value))
                 {
                     items[index] = value;
-                    InvokeCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, oldValue, index));
+                    InvokeCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Replace,
+                            value,
+                            oldValue,
+                            index
+                        )
+                    );
                 }
             }
         }

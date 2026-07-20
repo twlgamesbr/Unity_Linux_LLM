@@ -25,9 +25,9 @@ namespace Unity.Physics.Authoring
         public override int GetHashCode() =>
             (int)math.hash(new uint2((uint)BlobDataHash.GetHashCode(), (uint)AuthoringComponentEntityId.GetHashCode()));
 
-        public static bool operator==(ColliderInstanceId left, ColliderInstanceId right) => left.Equals(right);
+        public static bool operator ==(ColliderInstanceId left, ColliderInstanceId right) => left.Equals(right);
 
-        public static bool operator!=(ColliderInstanceId left, ColliderInstanceId right) => !left.Equals(right);
+        public static bool operator !=(ColliderInstanceId left, ColliderInstanceId right) => !left.Equals(right);
     }
 
     // structure with minimal data needed to incrementally convert a shape that is possibly part of a compound collider
@@ -35,7 +35,7 @@ namespace Unity.Physics.Authoring
     {
         public EntityId AuthoringComponentEntityId;
         public EntityId ConvertedAuthoringEntityId; // Entity ID of the GameObject with the Collider
-        public EntityId ConvertedBodyEntityId;      // Entity ID of the GameObject with the body
+        public EntityId ConvertedBodyEntityId; // Entity ID of the GameObject with the body
         public Entity BodyEntity;
         public Entity ShapeEntity;
         public Entity ChildEntity;

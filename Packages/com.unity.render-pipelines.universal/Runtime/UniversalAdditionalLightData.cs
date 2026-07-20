@@ -34,7 +34,8 @@ namespace UnityEngine.Rendering.Universal
     public partial class UniversalAdditionalLightData : MonoBehaviour, ISerializationCallbackReceiver, IAdditionalData
     {
         [Tooltip("Controls if light Shadow Bias parameters use pipeline settings.")]
-        [SerializeField] bool m_UsePipelineSettings = true;
+        [SerializeField]
+        bool m_UsePipelineSettings = true;
 
         /// <summary>
         /// Controls if light Shadow Bias parameters use pipeline settings or not.
@@ -68,14 +69,16 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// The default shadow resolution tier for additional lights.
         /// </summary>
-        public static readonly int AdditionalLightsShadowDefaultResolutionTier = AdditionalLightsShadowResolutionTierHigh;
+        public static readonly int AdditionalLightsShadowDefaultResolutionTier =
+            AdditionalLightsShadowResolutionTierHigh;
 
         /// <summary>
         /// The default custom shadow resolution for additional lights.
         /// </summary>
         public static readonly int AdditionalLightsShadowDefaultCustomResolution = 128;
 
-        [NonSerialized] private Light m_Light;
+        [NonSerialized]
+        private Light m_Light;
 
         /// <summary>
         /// Returns the cached light component associated with the game object that owns this light data.
@@ -96,7 +99,8 @@ namespace UnityEngine.Rendering.Universal
         public static readonly int AdditionalLightsShadowMinimumResolution = 128;
 
         [Tooltip("Controls if light shadow resolution uses pipeline settings.")]
-        [SerializeField] int m_AdditionalLightsShadowResolutionTier = AdditionalLightsShadowDefaultResolutionTier;
+        [SerializeField]
+        int m_AdditionalLightsShadowResolutionTier = AdditionalLightsShadowDefaultResolutionTier;
 
         /// <summary>
         /// Gets or sets the selected shadow resolution tier.
@@ -109,12 +113,15 @@ namespace UnityEngine.Rendering.Universal
             set
             {
                 if (!Application.isPlaying)
-                    throw new InvalidOperationException("Cannot modify additionalLightsShadowResolutionTier outside of play mode.");
+                    throw new InvalidOperationException(
+                        "Cannot modify additionalLightsShadowResolutionTier outside of play mode."
+                    );
                 m_AdditionalLightsShadowResolutionTier = value;
             }
         }
 
-        [SerializeField] bool m_CustomShadowLayers = false;
+        [SerializeField]
+        bool m_CustomShadowLayers = false;
 
         /// <summary>
         /// Indicates whether shadows need custom layers.
@@ -122,10 +129,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public bool customShadowLayers
         {
-            get
-            {
-                return m_CustomShadowLayers;
-            }
+            get { return m_CustomShadowLayers; }
             set
             {
                 if (m_CustomShadowLayers != value)
@@ -145,7 +149,9 @@ namespace UnityEngine.Rendering.Universal
             get => m_LightCookieSize;
             set => m_LightCookieSize = value;
         }
-        [SerializeField] Vector2 m_LightCookieSize = Vector2.one;
+
+        [SerializeField]
+        Vector2 m_LightCookieSize = Vector2.one;
 
         /// <summary>
         /// Controls the offset of the cookie mask currently assigned to the light.
@@ -156,7 +162,9 @@ namespace UnityEngine.Rendering.Universal
             get => m_LightCookieOffset;
             set => m_LightCookieOffset = value;
         }
-        [SerializeField] Vector2 m_LightCookieOffset = Vector2.zero;
+
+        [SerializeField]
+        Vector2 m_LightCookieOffset = Vector2.zero;
 
         /// <summary>
         /// Light soft shadow filtering quality.
@@ -167,9 +175,12 @@ namespace UnityEngine.Rendering.Universal
             get => m_SoftShadowQuality;
             set => m_SoftShadowQuality = value;
         }
-        [SerializeField] SoftShadowQuality m_SoftShadowQuality = SoftShadowQuality.UsePipelineSettings;
-        
-        [SerializeField] RenderingLayerMask m_RenderingLayersMask = RenderingLayerMask.defaultRenderingLayerMask;
+
+        [SerializeField]
+        SoftShadowQuality m_SoftShadowQuality = SoftShadowQuality.UsePipelineSettings;
+
+        [SerializeField]
+        RenderingLayerMask m_RenderingLayersMask = RenderingLayerMask.defaultRenderingLayerMask;
 
         /// <summary>
         /// Specifies which rendering layers this light will affect.
@@ -185,9 +196,10 @@ namespace UnityEngine.Rendering.Universal
                 SyncLightAndShadowLayers();
             }
         }
-        
-        [SerializeField] RenderingLayerMask m_ShadowRenderingLayersMask = RenderingLayerMask.defaultRenderingLayerMask;
-        
+
+        [SerializeField]
+        RenderingLayerMask m_ShadowRenderingLayersMask = RenderingLayerMask.defaultRenderingLayerMask;
+
         /// <summary>
         /// Specifies which rendering layers this light shadows will affect.
         /// </summary>
@@ -208,18 +220,19 @@ namespace UnityEngine.Rendering.Universal
             if (light)
                 light.renderingLayerMask = m_CustomShadowLayers ? m_ShadowRenderingLayersMask : m_RenderingLayersMask;
         }
-        
+
         enum Version
         {
             Initial = 0,
             RenderingLayers = 2,
             SoftShadowQuality = 3,
             RenderingLayersMask = 4,
-            
-            Count
+
+            Count,
         }
-        
-        [SerializeField] Version m_Version = Version.Count;
+
+        [SerializeField]
+        Version m_Version = Version.Count;
 
         // This piece of code is needed because some objects could have been created before existence of Version enum
         /// <summary>OnBeforeSerialize needed to handle migration before the versioning system was in place.</summary>
@@ -234,7 +247,7 @@ namespace UnityEngine.Rendering.Universal
         {
             if (m_Version == Version.Count) // deserializing and object without version
                 m_Version = Version.Initial; // reset to run the migration
-            
+
             if (m_Version < Version.RenderingLayers)
             {
 #pragma warning disable 618 // Obsolete warning
@@ -247,11 +260,13 @@ namespace UnityEngine.Rendering.Universal
             if (m_Version < Version.SoftShadowQuality)
             {
                 // SoftShadowQuality.UsePipelineSettings added at index 0. Bump existing serialized values by 1. e.g. Low(0) -> Low(1).
-                m_SoftShadowQuality = (SoftShadowQuality)(Math.Clamp((int)m_SoftShadowQuality + 1, 0, (int)SoftShadowQuality.High));
+                m_SoftShadowQuality = (SoftShadowQuality)(
+                    Math.Clamp((int)m_SoftShadowQuality + 1, 0, (int)SoftShadowQuality.High)
+                );
                 m_Version = Version.SoftShadowQuality;
             }
-            
-            if (m_Version <  Version.RenderingLayersMask)
+
+            if (m_Version < Version.RenderingLayersMask)
             {
 #pragma warning disable 618 // Obsolete warning
                 m_RenderingLayersMask = m_RenderingLayers;
@@ -261,6 +276,4 @@ namespace UnityEngine.Rendering.Universal
             }
         }
     }
-    
-    
 }

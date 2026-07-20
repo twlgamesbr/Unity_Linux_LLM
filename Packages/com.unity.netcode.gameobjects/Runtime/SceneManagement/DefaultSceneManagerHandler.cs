@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 namespace Unity.Netcode
 {
     /// <summary>
@@ -18,11 +17,19 @@ namespace Unity.Netcode
             public bool IsAssigned;
             public Scene Scene;
         }
-        public bool IsIntegrationTest() { return false; }
+
+        public bool IsIntegrationTest()
+        {
+            return false;
+        }
 
         internal Dictionary<string, Dictionary<NetworkSceneHandle, SceneEntry>> SceneNameToSceneHandles = new();
 
-        public AsyncOperation LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode, SceneEventProgress sceneEventProgress)
+        public AsyncOperation LoadSceneAsync(
+            string sceneName,
+            LoadSceneMode loadSceneMode,
+            SceneEventProgress sceneEventProgress
+        )
         {
             var operation = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
             sceneEventProgress.SetAsyncOperation(operation);
@@ -74,16 +81,14 @@ namespace Unity.Netcode
 
             if (!SceneNameToSceneHandles[scene.name].ContainsKey(scene.handle))
             {
-                var sceneEntry = new SceneEntry()
-                {
-                    IsAssigned = true,
-                    Scene = scene
-                };
+                var sceneEntry = new SceneEntry() { IsAssigned = true, Scene = scene };
                 SceneNameToSceneHandles[scene.name].Add(scene.handle, sceneEntry);
             }
             else
             {
-                throw new Exception($"[Duplicate Handle] Scene {scene.name} already has scene handle {scene.handle} registered!");
+                throw new Exception(
+                    $"[Duplicate Handle] Scene {scene.name} already has scene handle {scene.handle} registered!"
+                );
             }
         }
 
@@ -168,7 +173,10 @@ namespace Unity.Netcode
         /// same application instance is still running, the same scenes are still loaded on the client, and
         /// upon reconnecting the client doesn't have to unload the scenes and then reload them)
         /// </summary>
-        public void PopulateLoadedScenes(ref Dictionary<NetworkSceneHandle, Scene> scenesLoaded, NetworkManager networkManager)
+        public void PopulateLoadedScenes(
+            ref Dictionary<NetworkSceneHandle, Scene> scenesLoaded,
+            NetworkManager networkManager
+        )
         {
             SceneNameToSceneHandles.Clear();
             var sceneCount = SceneManager.sceneCount;
@@ -182,11 +190,7 @@ namespace Unity.Netcode
 
                 if (!SceneNameToSceneHandles[scene.name].ContainsKey(scene.handle))
                 {
-                    var sceneEntry = new SceneEntry()
-                    {
-                        IsAssigned = false,
-                        Scene = scene
-                    };
+                    var sceneEntry = new SceneEntry() { IsAssigned = false, Scene = scene };
                     SceneNameToSceneHandles[scene.name].Add(scene.handle, sceneEntry);
                     if (!scenesLoaded.ContainsKey(scene.handle))
                     {
@@ -195,7 +199,9 @@ namespace Unity.Netcode
                 }
                 else
                 {
-                    throw new Exception($"[Duplicate Handle] Scene {scene.name} already has scene handle {scene.handle} registered!");
+                    throw new Exception(
+                        $"[Duplicate Handle] Scene {scene.name} already has scene handle {scene.handle} registered!"
+                    );
                 }
             }
         }
@@ -217,7 +223,10 @@ namespace Unity.Netcode
                 {
                     if (!sceneHandleEntry.Value.IsAssigned)
                     {
-                        if (sceneManager.VerifySceneBeforeUnloading == null || sceneManager.VerifySceneBeforeUnloading.Invoke(sceneHandleEntry.Value.Scene))
+                        if (
+                            sceneManager.VerifySceneBeforeUnloading == null
+                            || sceneManager.VerifySceneBeforeUnloading.Invoke(sceneHandleEntry.Value.Scene)
+                        )
                         {
                             m_ScenesToUnload.Add(sceneHandleEntry.Value.Scene);
                         }
@@ -263,9 +272,17 @@ namespace Unity.Netcode
         /// <param name="clientSynchronizationMode">the current client synchronization mode</param>
         /// <param name="networkManager"><see cref="NetworkManager"/> instance</param>
         /// <returns></returns>
-        public bool ClientShouldPassThrough(string sceneName, bool isPrimaryScene, LoadSceneMode clientSynchronizationMode, NetworkManager networkManager)
+        public bool ClientShouldPassThrough(
+            string sceneName,
+            bool isPrimaryScene,
+            LoadSceneMode clientSynchronizationMode,
+            NetworkManager networkManager
+        )
         {
-            var shouldPassThrough = clientSynchronizationMode == LoadSceneMode.Single ? false : DoesSceneHaveUnassignedEntry(sceneName, networkManager);
+            var shouldPassThrough =
+                clientSynchronizationMode == LoadSceneMode.Single
+                    ? false
+                    : DoesSceneHaveUnassignedEntry(sceneName, networkManager);
             var activeScene = SceneManager.GetActiveScene();
 
             // If shouldPassThrough is not yet true and the scene to be loaded is the currently active scene
@@ -273,7 +290,10 @@ namespace Unity.Netcode
             {
                 // In additive mode we always pass through, but in LoadSceneMode.Single we only pass through if the currently active scene
                 // is the primary scene to be loaded
-                if (clientSynchronizationMode == LoadSceneMode.Additive || (isPrimaryScene && clientSynchronizationMode == LoadSceneMode.Single))
+                if (
+                    clientSynchronizationMode == LoadSceneMode.Additive
+                    || (isPrimaryScene && clientSynchronizationMode == LoadSceneMode.Single)
+                )
                 {
                     // don't try to reload this scene and pass through to post load processing.
                     shouldPassThrough = true;
@@ -296,7 +316,10 @@ namespace Unity.Netcode
             var distributedAuthority = networkManager.DistributedAuthorityMode;
             foreach (var networkObject in localSpawnedObjectsHashSet)
             {
-                if (networkObject == null || (networkObject != null && networkObject.gameObject.scene.handle != scene.handle))
+                if (
+                    networkObject == null
+                    || (networkObject != null && networkObject.gameObject.scene.handle != scene.handle)
+                )
                 {
                     continue;
                 }
@@ -308,7 +331,10 @@ namespace Unity.Netcode
                 }
 
                 // Only NetworkObjects marked to not be destroyed with the scene and are not already in the DDOL are preserved
-                if (!networkObject.DestroyWithScene && networkObject.gameObject.scene != networkManager.SceneManager.DontDestroyOnLoadScene)
+                if (
+                    !networkObject.DestroyWithScene
+                    && networkObject.gameObject.scene != networkManager.SceneManager.DontDestroyOnLoadScene
+                )
                 {
                     // Only move dynamically spawned NetworkObjects with no parent as the children will follow
                     if (networkObject.gameObject.transform.parent == null && !networkObject.InScenePlaced)
@@ -355,16 +381,24 @@ namespace Unity.Netcode
             {
                 if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                 {
-                    NetworkLog.LogWarning("Clients should not set this value as it is automatically synchronized with the server's setting!");
+                    NetworkLog.LogWarning(
+                        "Clients should not set this value as it is automatically synchronized with the server's setting!"
+                    );
                 }
                 return;
             }
             else // Warn users if they are changing this after there are clients already connected and synchronized
-            if (!networkManager.DistributedAuthorityMode && networkManager.ConnectedClientsIds.Count > (networkManager.IsHost ? 1 : 0) && sceneManager.ClientSynchronizationMode != mode)
+            if (
+                !networkManager.DistributedAuthorityMode
+                && networkManager.ConnectedClientsIds.Count > (networkManager.IsHost ? 1 : 0)
+                && sceneManager.ClientSynchronizationMode != mode
+            )
             {
                 if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                 {
-                    NetworkLog.LogWarning("Server is changing client synchronization mode after clients have been synchronized! It is recommended to do this before clients are connected!");
+                    NetworkLog.LogWarning(
+                        "Server is changing client synchronization mode after clients have been synchronized! It is recommended to do this before clients are connected!"
+                    );
                 }
             }
 
@@ -380,7 +414,13 @@ namespace Unity.Netcode
                     if (sceneManager.VerifySceneBeforeLoading != null)
                     {
                         // Determine if we should take this scene into consideration
-                        if (!sceneManager.VerifySceneBeforeLoading.Invoke(scene.buildIndex, scene.name, LoadSceneMode.Additive))
+                        if (
+                            !sceneManager.VerifySceneBeforeLoading.Invoke(
+                                scene.buildIndex,
+                                scene.name,
+                                LoadSceneMode.Additive
+                            )
+                        )
                         {
                             continue;
                         }

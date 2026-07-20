@@ -32,14 +32,19 @@ namespace NPCSystem.Initialization
         // ── Inspector Fields ──
 
         [Header("Phase Configuration")]
-        [HelpBox("Enable/disable individual phases and set per-phase timeouts. Phases not listed here default to enabled with 30s timeout.", MessageMode.Log)]
+        [HelpBox(
+            "Enable/disable individual phases and set per-phase timeouts. Phases not listed here default to enabled with 30s timeout.",
+            MessageMode.Log
+        )]
         [SerializeField]
         [Tooltip("Per-phase configuration. Phases not listed here default to enabled with 30s timeout.")]
         List<PhaseConfig> _phases = new List<PhaseConfig>();
 
         [Header("Pipeline Settings")]
         [SerializeField]
-        [Tooltip("When true, Phases 1-2 run immediately and 3-8 defer until ContinueInitializationAsync() (WebGL memory-smart start).")]
+        [Tooltip(
+            "When true, Phases 1-2 run immediately and 3-8 defer until ContinueInitializationAsync() (WebGL memory-smart start)."
+        )]
         bool _deferredOnWebGL = true;
 
         [SerializeField]
@@ -75,17 +80,15 @@ namespace NPCSystem.Initialization
             {
                 Phase = phase,
                 Enabled = true,
-                TimeoutSeconds = 30f
+                TimeoutSeconds = 30f,
             };
         }
 
         /// <summary>Convenience: check if a phase is enabled.</summary>
-        public bool IsPhaseEnabled(NPCSceneInitializationPhase phase)
-            => GetConfig(phase).Enabled;
+        public bool IsPhaseEnabled(NPCSceneInitializationPhase phase) => GetConfig(phase).Enabled;
 
         /// <summary>Convenience: get timeout for a phase.</summary>
-        public float GetPhaseTimeout(NPCSceneInitializationPhase phase)
-            => GetConfig(phase).TimeoutSeconds;
+        public float GetPhaseTimeout(NPCSceneInitializationPhase phase) => GetConfig(phase).TimeoutSeconds;
 
         // ── Inspector Helpers ──
 
@@ -100,12 +103,14 @@ namespace NPCSystem.Initialization
             _phases.Clear();
             foreach (NPCSceneInitializationPhase phase in Enum.GetValues(typeof(NPCSceneInitializationPhase)))
             {
-                _phases.Add(new PhaseConfig
-                {
-                    Phase = phase,
-                    Enabled = true,
-                    TimeoutSeconds = 30f
-                });
+                _phases.Add(
+                    new PhaseConfig
+                    {
+                        Phase = phase,
+                        Enabled = true,
+                        TimeoutSeconds = 30f,
+                    }
+                );
             }
 
             _deferredOnWebGL = true;

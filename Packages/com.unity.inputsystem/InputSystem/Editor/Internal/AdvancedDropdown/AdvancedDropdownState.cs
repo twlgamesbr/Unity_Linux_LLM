@@ -49,8 +49,7 @@ namespace UnityEngine.InputSystem.Editor
             do
             {
                 ++selectedIndex;
-            }
-            while (selectedIndex < item.children.Count() && item.children.ElementAt(selectedIndex).IsSeparator());
+            } while (selectedIndex < item.children.Count() && item.children.ElementAt(selectedIndex).IsSeparator());
 
             if (selectedIndex >= item.children.Count())
                 selectedIndex = 0;
@@ -66,8 +65,7 @@ namespace UnityEngine.InputSystem.Editor
             do
             {
                 --selectedIndex;
-            }
-            while (selectedIndex >= 0 && item.children.ElementAt(selectedIndex).IsSeparator());
+            } while (selectedIndex >= 0 && item.children.ElementAt(selectedIndex).IsSeparator());
 
             if (selectedIndex < 0)
                 selectedIndex = item.children.Count() - 1;

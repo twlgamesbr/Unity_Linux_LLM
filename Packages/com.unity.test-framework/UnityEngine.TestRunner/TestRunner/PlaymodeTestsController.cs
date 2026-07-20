@@ -23,22 +23,19 @@ namespace UnityEngine.TestTools.TestRunner
         private List<string> m_AssembliesWithTests;
         public List<string> AssembliesWithTests
         {
-            get
-            {
-                return m_AssembliesWithTests;
-            }
-            set
-            {
-                m_AssembliesWithTests = value;
-            }
+            get { return m_AssembliesWithTests; }
+            set { m_AssembliesWithTests = value; }
         }
 
         [SerializeField]
         internal TestStartedEvent testStartedEvent = new TestStartedEvent();
+
         [SerializeField]
         internal TestFinishedEvent testFinishedEvent = new TestFinishedEvent();
+
         [SerializeField]
         internal RunStartedEvent runStartedEvent = new RunStartedEvent();
+
         [SerializeField]
         internal RunFinishedEvent runFinishedEvent = new RunFinishedEvent();
 
@@ -47,6 +44,7 @@ namespace UnityEngine.TestTools.TestRunner
 
         [SerializeField]
         public PlaymodeTestsControllerSettings settings = new PlaymodeTestsControllerSettings();
+
         [NonSerialized]
         public bool RunInfrastructureHasRegistered = false;
 
@@ -59,7 +57,7 @@ namespace UnityEngine.TestTools.TestRunner
                 FeatureFlags = settings.featureFlags,
                 RetryCount = settings.retryCount,
                 RepeatCount = settings.repeatCount,
-                Automated = settings.automated
+                Automated = settings.automated,
             };
             ActiveController = this;
             //Skip 2 frame because Unity.
@@ -70,7 +68,7 @@ namespace UnityEngine.TestTools.TestRunner
             {
                 yield return null;
             }
-            
+
             StartCoroutine(Run());
         }
 
@@ -119,7 +117,7 @@ namespace UnityEngine.TestTools.TestRunner
                 // Wait for the infrastructure to be ready
                 yield return null;
             }
-            
+
             CoroutineTestWorkItem.monoBehaviourCoroutineRunner = this;
             gameObject.hideFlags |= HideFlags.DontSave;
 
@@ -130,9 +128,17 @@ namespace UnityEngine.TestTools.TestRunner
             }
 
             var testListUtil = new PlayerTestAssemblyProvider(new AssemblyLoadProxy(), m_AssembliesWithTests);
-            m_Runner = new UnityTestAssemblyRunner(new UnityTestAssemblyBuilder(settings.orderedTestNames, settings.randomOrderSeed), new PlaymodeWorkItemFactory(), UnityTestExecutionContext.CurrentContext);
+            m_Runner = new UnityTestAssemblyRunner(
+                new UnityTestAssemblyBuilder(settings.orderedTestNames, settings.randomOrderSeed),
+                new PlaymodeWorkItemFactory(),
+                UnityTestExecutionContext.CurrentContext
+            );
 
-            var loadedTests = m_Runner.Load(testListUtil.GetUserAssemblies().Select(a => a.Assembly).ToArray(), TestPlatform.PlayMode, UnityTestAssemblyBuilder.GetNUnitTestBuilderSettings(TestPlatform.PlayMode));
+            var loadedTests = m_Runner.Load(
+                testListUtil.GetUserAssemblies().Select(a => a.Assembly).ToArray(),
+                TestPlatform.PlayMode,
+                UnityTestAssemblyBuilder.GetNUnitTestBuilderSettings(TestPlatform.PlayMode)
+            );
             loadedTests.ParseForNameDuplicates();
             runStartedEvent.Invoke(m_Runner.LoadedTest);
 

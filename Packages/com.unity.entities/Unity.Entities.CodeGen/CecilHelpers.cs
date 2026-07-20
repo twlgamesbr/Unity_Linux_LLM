@@ -8,14 +8,16 @@ namespace Unity.Entities.CodeGen
     {
         public static SequencePoint FindBestSequencePointFor(MethodDefinition method, Instruction instruction)
         {
-            var sequencePoints = method.DebugInformation?.GetSequencePointMapping().Values.OrderBy(s => s.Offset).ToList();
+            var sequencePoints = method
+                .DebugInformation?.GetSequencePointMapping()
+                .Values.OrderBy(s => s.Offset)
+                .ToList();
             if (sequencePoints == null || !sequencePoints.Any())
                 return null;
 
-            for (int i = 0; i != sequencePoints.Count-1; i++)
+            for (int i = 0; i != sequencePoints.Count - 1; i++)
             {
-                if (sequencePoints[i].Offset < instruction.Offset &&
-                    sequencePoints[i + 1].Offset > instruction.Offset)
+                if (sequencePoints[i].Offset < instruction.Offset && sequencePoints[i + 1].Offset > instruction.Offset)
                     return sequencePoints[i];
             }
 

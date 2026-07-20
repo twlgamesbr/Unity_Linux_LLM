@@ -1,6 +1,6 @@
-using Unity.Entities;
 using System;
 using System.Collections.Generic;
+using Unity.Entities;
 
 namespace Unity.Physics.Systems
 {
@@ -10,9 +10,7 @@ namespace Unity.Physics.Systems
     /// that order.
     /// </summary>
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
-    public partial class PhysicsSystemGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsSystemGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// This abstract class can be used to create a system group for a custom physics world.
@@ -22,6 +20,7 @@ namespace Unity.Physics.Systems
     {
         /// <summary>   PhysicsWorldData. </summary>
         protected PhysicsWorldData m_WorldData;
+
         /// <summary>   PhysicsWorldIndex. </summary>
         protected PhysicsWorldIndex m_WorldFilter;
 
@@ -47,16 +46,15 @@ namespace Unity.Physics.Systems
         /// </summary>
         ///
         /// <param name="systems">  The systems. </param>
-        protected virtual void AddExistingSystemsToUpdate(List<Type> systems)
-        {}
+        protected virtual void AddExistingSystemsToUpdate(List<Type> systems) { }
+
         /// <summary>
         /// An interface method to specify an additional set of unmanaged systems which are copied to the
         /// custom physics world. This will be called the first time OnUpdate runs.
         /// </summary>
         ///
         /// <param name="systems">  The systems. </param>
-        protected virtual void AddExistingUnmanagedSystemsToUpdate(List<Type> systems)
-        {}
+        protected virtual void AddExistingUnmanagedSystemsToUpdate(List<Type> systems) { }
 
         /// <summary>
         /// Called before the systems in this group are updated. It is useful in cases of needing to store system state (such as NativeArrays, NativeLists etc), before it is ran in a custom group.
@@ -99,9 +97,15 @@ namespace Unity.Physics.Systems
                 AddSystemToUpdateList(World.Unmanaged.GetExistingUnmanagedSystem<ExportPhysicsWorld>());
                 AddSystemToUpdateList(World.GetExistingSystemManaged<BeforePhysicsSystemGroup>());
                 AddSystemToUpdateList(World.GetExistingSystemManaged<AfterPhysicsSystemGroup>());
-                AddSystemToUpdateList(World.GetExistingSystem<Unity.Physics.GraphicsIntegration.BufferInterpolatedRigidBodiesMotion>());
-                AddSystemToUpdateList(World.GetExistingSystem<Unity.Physics.GraphicsIntegration.CopyPhysicsVelocityToSmoothing>());
-                AddSystemToUpdateList(World.GetExistingSystem<Unity.Physics.GraphicsIntegration.RecordMostRecentFixedTime>());
+                AddSystemToUpdateList(
+                    World.GetExistingSystem<Unity.Physics.GraphicsIntegration.BufferInterpolatedRigidBodiesMotion>()
+                );
+                AddSystemToUpdateList(
+                    World.GetExistingSystem<Unity.Physics.GraphicsIntegration.CopyPhysicsVelocityToSmoothing>()
+                );
+                AddSystemToUpdateList(
+                    World.GetExistingSystem<Unity.Physics.GraphicsIntegration.RecordMostRecentFixedTime>()
+                );
                 AddSystemToUpdateList(World.Unmanaged.GetExistingUnmanagedSystem<SyncCustomPhysicsProxySystem>());
 
                 var userSystems = new List<Type>();
@@ -130,7 +134,9 @@ namespace Unity.Physics.Systems
             bpwData.PhysicsData = m_WorldData;
             bpwData.WorldFilter = m_WorldFilter;
 
-            SystemAPI.SetSingleton(new PhysicsWorldSingleton { PhysicsWorld = m_WorldData.PhysicsWorld, PhysicsWorldIndex = m_WorldFilter });
+            SystemAPI.SetSingleton(
+                new PhysicsWorldSingleton { PhysicsWorld = m_WorldData.PhysicsWorld, PhysicsWorldIndex = m_WorldFilter }
+            );
 
             PreGroupUpdateCallback();
 
@@ -155,9 +161,7 @@ namespace Unity.Physics.Systems
     /// </summary>
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateBefore(typeof(PhysicsSimulationGroup))]
-    public partial class PhysicsInitializeGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsInitializeGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// The second group to run in physics pipeline. It simulates the world. If you want to modify
@@ -168,9 +172,7 @@ namespace Unity.Physics.Systems
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateAfter(typeof(PhysicsInitializeGroup))]
     [UpdateBefore(typeof(ExportPhysicsWorld))]
-    public partial class PhysicsSimulationGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsSimulationGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// The first system group to run in <see cref="PhysicsSimulationGroup"/>. It finds all
@@ -179,9 +181,7 @@ namespace Unity.Physics.Systems
     /// </summary>
     [UpdateInGroup(typeof(PhysicsSimulationGroup))]
     [UpdateBefore(typeof(PhysicsCreateContactsGroup))]
-    public partial class PhysicsCreateBodyPairsGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsCreateBodyPairsGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// The second system group to run in <see cref="PhysicsSimulationGroup"/>. It is doing collision
@@ -192,9 +192,7 @@ namespace Unity.Physics.Systems
     [UpdateInGroup(typeof(PhysicsSimulationGroup))]
     [UpdateAfter(typeof(PhysicsCreateBodyPairsGroup))]
     [UpdateBefore(typeof(PhysicsCreateJacobiansGroup))]
-    public partial class PhysicsCreateContactsGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsCreateContactsGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// The third system group to run in <see cref="PhysicsSimulationGroup"/>. It is converting
@@ -205,9 +203,7 @@ namespace Unity.Physics.Systems
     [UpdateInGroup(typeof(PhysicsSimulationGroup))]
     [UpdateAfter(typeof(PhysicsCreateContactsGroup))]
     [UpdateBefore(typeof(PhysicsSolveAndIntegrateGroup))]
-    public partial class PhysicsCreateJacobiansGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsCreateJacobiansGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// The final system group to run in <see cref="PhysicsSimulationGroup"/>. It is solving the
@@ -216,9 +212,7 @@ namespace Unity.Physics.Systems
     /// </summary>
     [UpdateInGroup(typeof(PhysicsSimulationGroup))]
     [UpdateAfter(typeof(PhysicsCreateJacobiansGroup))]
-    public partial class PhysicsSolveAndIntegrateGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsSolveAndIntegrateGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// A system group that runs before physics.
@@ -228,9 +222,7 @@ namespace Unity.Physics.Systems
     /// </summary>
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateBefore(typeof(PhysicsInitializeGroup))]
-    public partial class BeforePhysicsSystemGroup : ComponentSystemGroup
-    {
-    }
+    public partial class BeforePhysicsSystemGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// A system group that runs after physics.
@@ -240,7 +232,5 @@ namespace Unity.Physics.Systems
     /// </summary>
     [UpdateInGroup(typeof(PhysicsSystemGroup))]
     [UpdateAfter(typeof(ExportPhysicsWorld))]
-    public partial class AfterPhysicsSystemGroup : ComponentSystemGroup
-    {
-    }
+    public partial class AfterPhysicsSystemGroup : ComponentSystemGroup { }
 }

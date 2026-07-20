@@ -14,8 +14,8 @@ namespace Unity.Entities.Baking
     /// An unmanaged, resizable list per thread.
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
-    internal struct UnsafeDependencyStream<T>        : IDisposable, IEnumerable<T>
-                                                        where T : unmanaged, IEquatable<T>
+    internal struct UnsafeDependencyStream<T> : IDisposable, IEnumerable<T>
+        where T : unmanaged, IEquatable<T>
     {
         private UnsafeList<UnsafeList<T>> listPerThread;
 
@@ -67,10 +67,7 @@ namespace Unity.Entities.Baking
             listPerThread.Dispose();
         }
 
-        public void BeginWriting()
-        {
-
-        }
+        public void BeginWriting() { }
 
         public JobHandle EndWriting(JobHandle dependency)
         {
@@ -82,14 +79,14 @@ namespace Unity.Entities.Baking
             var resizeHashSetJob = new ResizeHashSetJob()
             {
                 changedComponentsPerThread = listPerThread,
-                outputChangedComponents = outputHashSet
+                outputChangedComponents = outputHashSet,
             };
 
             var resizeHashSetJobHandle = resizeHashSetJob.Schedule(dependency);
             var ComposeHashSetJob = new ComposeHashSetJob()
             {
                 changedComponentsPerThread = listPerThread,
-                outputChangedComponentsWriter = outputHashSet.AsParallelWriter()
+                outputChangedComponentsWriter = outputHashSet.AsParallelWriter(),
             };
 
             return ComposeHashSetJob.Schedule(listPerThread.Length, 2, resizeHashSetJobHandle);
@@ -152,9 +149,7 @@ namespace Unity.Entities.Baking
                 this.m_InternalIndex = -1;
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {
@@ -181,14 +176,16 @@ namespace Unity.Entities.Baking
 
             public T Current => this.m_Internal.listPerThread[this.m_GlobalIndex][m_InternalIndex];
 
-            object IEnumerator.Current => (object) this.Current;
+            object IEnumerator.Current => (object)this.Current;
         }
 
-        public UnsafeDependencyStream<T>.Enumerator GetEnumerator() => new UnsafeDependencyStream<T>.Enumerator(ref this);
+        public UnsafeDependencyStream<T>.Enumerator GetEnumerator() =>
+            new UnsafeDependencyStream<T>.Enumerator(ref this);
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => (IEnumerator<T>) new UnsafeDependencyStream<T>.Enumerator(ref this);
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
+            (IEnumerator<T>)new UnsafeDependencyStream<T>.Enumerator(ref this);
 
-        IEnumerator IEnumerable.GetEnumerator() => (IEnumerator) this.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => (IEnumerator)this.GetEnumerator();
     }
 #else
     /// <summary>
@@ -196,8 +193,8 @@ namespace Unity.Entities.Baking
     /// It also handle the stream readers to copy the data to a HashSet
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
-    internal struct UnsafeDependencyStream<T>        :  IDisposable
-                                                        where T : unmanaged, IEquatable<T>
+    internal struct UnsafeDependencyStream<T> : IDisposable
+        where T : unmanaged, IEquatable<T>
     {
         private UnsafeStream stream;
         private UnsafeList<UnsafeStream.Writer> writers;
@@ -248,10 +245,7 @@ namespace Unity.Entities.Baking
         /// <returns>The handle of a new job that will call EndForEachIndex for each writer.</returns>
         public JobHandle EndWriting(JobHandle inputDeps)
         {
-            var endWritingJob = new EndWritingJob()
-            {
-                stream = this,
-            };
+            var endWritingJob = new EndWritingJob() { stream = this };
             return endWritingJob.Schedule(inputDeps);
         }
 
@@ -286,13 +280,12 @@ namespace Unity.Entities.Baking
         /// <returns>The handle of a new job that will perform the copy.</returns>
         public JobHandle CopyTo(UnsafeParallelHashSet<T> outputHashSet, JobHandle inputDeps)
         {
-            var resizeHashSetJob = new ResizeHashSetJob()
-            {
-                stream = this,
-                outputHashSet = outputHashSet
-            };
+            var resizeHashSetJob = new ResizeHashSetJob() { stream = this, outputHashSet = outputHashSet };
 
-            UnsafeList<UnsafeStream.Reader> readers = new UnsafeList<UnsafeStream.Reader>(stream.ForEachCount, Allocator.TempJob);
+            UnsafeList<UnsafeStream.Reader> readers = new UnsafeList<UnsafeStream.Reader>(
+                stream.ForEachCount,
+                Allocator.TempJob
+            );
             for (int index = 0; index < stream.ForEachCount; ++index)
             {
                 readers.Add(stream.AsReader());
@@ -302,7 +295,7 @@ namespace Unity.Entities.Baking
             var ComposeHashSetJob = new ComposeHashSetJob()
             {
                 readers = readers,
-                outputHashSet = outputHashSet.AsParallelWriter()
+                outputHashSet = outputHashSet.AsParallelWriter(),
             };
 
             var composeHashSetJobHandle = ComposeHashSetJob.Schedule(stream.ForEachCount, 2, resizeHashSetJobHandle);

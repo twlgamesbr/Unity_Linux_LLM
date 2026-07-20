@@ -39,7 +39,8 @@ namespace UnityEditor.Build.Pipeline
         }
 
         /// <inheritdoc />
-        public void SetContextObject<T>(IContextObject contextObject) where T : IContextObject
+        public void SetContextObject<T>(IContextObject contextObject)
+            where T : IContextObject
         {
             if (contextObject == null)
                 throw new ArgumentNullException("contextObject");
@@ -48,7 +49,9 @@ namespace UnityEditor.Build.Pipeline
             if (!type.IsInterface)
                 throw new InvalidOperationException(string.Format("Passed in type '{0}' is not an interface.", type));
             if (!(contextObject is T))
-                throw new InvalidOperationException(string.Format("'{0}' is not of passed in type '{1}'.", contextObject.GetType(), type));
+                throw new InvalidOperationException(
+                    string.Format("'{0}' is not of passed in type '{1}'.", contextObject.GetType(), type)
+                );
             m_ContextObjects[typeof(T)] = contextObject;
         }
 
@@ -61,7 +64,9 @@ namespace UnityEditor.Build.Pipeline
             if (!type.IsInterface)
                 throw new InvalidOperationException(string.Format("Passed in type '{0}' is not an interface.", type));
             if (!type.IsInstanceOfType(contextObject))
-                throw new InvalidOperationException(string.Format("'{0}' is not of passed in type '{1}'.", contextObject.GetType(), type));
+                throw new InvalidOperationException(
+                    string.Format("'{0}' is not of passed in type '{1}'.", contextObject.GetType(), type)
+                );
             m_ContextObjects[type] = contextObject;
         }
 
@@ -87,7 +92,9 @@ namespace UnityEditor.Build.Pipeline
 
             List<Type> types = new List<Type>(WalkAssignableTypes(contextObject));
             if (types.Count == 0)
-                throw new Exception($"Could not determine context object type for object of type {contextObject.GetType().FullName}");
+                throw new Exception(
+                    $"Could not determine context object type for object of type {contextObject.GetType().FullName}"
+                );
             types.ForEach(x => m_ContextObjects[x] = contextObject);
         }
 
@@ -105,7 +112,9 @@ namespace UnityEditor.Build.Pipeline
 
             List<Type> types = new List<Type>(WalkAssignableTypes(contextObject));
             if (types.Count == 0)
-                throw new Exception($"Could not determine context object type for object of type {contextObject.GetType().FullName}");
+                throw new Exception(
+                    $"Could not determine context object type for object of type {contextObject.GetType().FullName}"
+                );
 
             types.ForEach(x =>
             {
@@ -114,11 +123,11 @@ namespace UnityEditor.Build.Pipeline
                     m_ContextObjects[x] = contextObject;
                 }
             });
-
         }
 
         /// <inheritdoc />
-        public bool ContainsContextObject<T>() where T : IContextObject
+        public bool ContainsContextObject<T>()
+            where T : IContextObject
         {
             return ContainsContextObject(typeof(T));
         }
@@ -133,7 +142,8 @@ namespace UnityEditor.Build.Pipeline
         }
 
         /// <inheritdoc />
-        public T GetContextObject<T>() where T : IContextObject
+        public T GetContextObject<T>()
+            where T : IContextObject
         {
             return (T)GetContextObject(typeof(T));
         }
@@ -151,7 +161,8 @@ namespace UnityEditor.Build.Pipeline
         }
 
         /// <inheritdoc />
-        public bool TryGetContextObject<T>(out T contextObject) where T : IContextObject
+        public bool TryGetContextObject<T>(out T contextObject)
+            where T : IContextObject
         {
             IContextObject cachedContextObject;
             if (m_ContextObjects.TryGetValue(typeof(T), out cachedContextObject) && cachedContextObject is T)
@@ -168,7 +179,10 @@ namespace UnityEditor.Build.Pipeline
         public bool TryGetContextObject(Type type, out IContextObject contextObject)
         {
             IContextObject cachedContextObject;
-            if (m_ContextObjects.TryGetValue(type, out cachedContextObject) && type.IsInstanceOfType(cachedContextObject))
+            if (
+                m_ContextObjects.TryGetValue(type, out cachedContextObject)
+                && type.IsInstanceOfType(cachedContextObject)
+            )
             {
                 contextObject = cachedContextObject;
                 return true;

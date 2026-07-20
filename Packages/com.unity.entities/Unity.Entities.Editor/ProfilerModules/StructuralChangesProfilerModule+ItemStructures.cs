@@ -12,7 +12,11 @@ namespace Unity.Entities.Editor
             public readonly StructuralChangeType Type;
             public readonly long ElapsedNanoseconds;
 
-            public StructuralChangesProfilerTreeViewItemData(WorldData worldData, SystemData systemData, StructuralChangeData structuralChangeData)
+            public StructuralChangesProfilerTreeViewItemData(
+                WorldData worldData,
+                SystemData systemData,
+                StructuralChangeData structuralChangeData
+            )
             {
                 WorldName = worldData.Name;
                 SystemName = !string.IsNullOrEmpty(systemData.Name) ? systemData.Name : "<No System>";
@@ -20,7 +24,7 @@ namespace Unity.Entities.Editor
                 ElapsedNanoseconds = structuralChangeData.ElapsedNanoseconds;
             }
         }
-        
+
         class StructuralChangesProfilerTreeViewItem
         {
             public string displayName { get; set; }

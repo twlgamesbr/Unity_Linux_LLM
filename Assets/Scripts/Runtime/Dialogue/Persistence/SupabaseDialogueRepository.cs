@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
 using Newtonsoft.Json.Linq;
-using static Postgrest.Constants;
-using UnityEngine;
-using UnityEngine.Serialization;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+using UnityEngine.Serialization;
+using static Postgrest.Constants;
+
 namespace NPCSystem.Dialogue.Persistence
 {
     [Serializable]
@@ -41,13 +40,7 @@ namespace NPCSystem.Dialogue.Persistence
         [SerializeField, HideProperty, Suffix("s")]
         float requestTimeoutSeconds = 10f;
 
-        [FoldoutGroup(
-            "Debug",
-            true,
-            nameof(lastStatus),
-            nameof(lastOperation),
-            nameof(lastOperationDurationMs)
-        )]
+        [FoldoutGroup("Debug", true, nameof(lastStatus), nameof(lastOperation), nameof(lastOperationDurationMs))]
         [SerializeField]
         EditorAttributes.Void debugGroup;
 
@@ -79,17 +72,11 @@ namespace NPCSystem.Dialogue.Persistence
                 .FindOrCreate()
                 ?.Log(
                     NPCFlowStage.ConfigurationValidation,
-                    validAuth && authed
-                        ? NPCFlowStatus.Success
-                        : NPCFlowStatus.Warning,
+                    validAuth && authed ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
                     NPCFlowLogLevel.Info,
                     lastStatus,
                     source: nameof(SupabaseDialogueRepository),
-                    data: new Dictionary<string, object>
-                    {
-                        ["authAssigned"] = validAuth,
-                        ["isAuthenticated"] = authed,
-                    }
+                    data: new Dictionary<string, object> { ["authAssigned"] = validAuth, ["isAuthenticated"] = authed }
                 );
         }
 
@@ -108,16 +95,12 @@ namespace NPCSystem.Dialogue.Persistence
             // Auto-discover analytics service (may not be present)
             if (_analyticsService == null)
             {
-                _analyticsService = FindAnyObjectByType<SessionAnalyticsService>(
-                    FindObjectsInactive.Include
-                );
+                _analyticsService = FindAnyObjectByType<SessionAnalyticsService>(FindObjectsInactive.Include);
             }
         }
 
         public bool IsConfigured =>
-            _authService != null
-            && _authService.SupabaseClient != null
-            && _authService.IsAuthenticated;
+            _authService != null && _authService.SupabaseClient != null && _authService.IsAuthenticated;
 
         Supabase.Client GetClient()
         {
@@ -140,11 +123,10 @@ namespace NPCSystem.Dialogue.Persistence
             {
                 var client = GetClient();
 
-                string sessionId = await client.Rpc<string>("find_or_create_dialogue_session", new
-                {
-                    p_player_id = _authService.CurrentSession.playerId,
-                    p_npc_slug = npcSlug,
-                });
+                string sessionId = await client.Rpc<string>(
+                    "find_or_create_dialogue_session",
+                    new { p_player_id = _authService.CurrentSession.playerId, p_npc_slug = npcSlug }
+                );
 
                 if (string.IsNullOrWhiteSpace(sessionId))
                     return null;
@@ -168,8 +150,7 @@ namespace NPCSystem.Dialogue.Persistence
                     }
                 }
 
-                lastStatus =
-                    $"Loaded {entries.Count} turns from session {sessionId} for NPC '{npcSlug}'.";
+                lastStatus = $"Loaded {entries.Count} turns from session {sessionId} for NPC '{npcSlug}'.";
                 Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Success, lastStatus);
 
                 return entries;
@@ -177,17 +158,12 @@ namespace NPCSystem.Dialogue.Persistence
             catch (Exception ex)
             {
                 lastStatus = $"Load failed for NPC '{npcSlug}': {ex.Message}";
-                Log(
-                    NPCFlowStage.HistoryLoad,
-                    NPCFlowStatus.Error,
-                    lastStatus + $" ({ex.GetType().Name})"
-                );
+                Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Error, lastStatus + $" ({ex.GetType().Name})");
                 return null;
             }
             finally
             {
-                lastOperationDurationMs =
-                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
+                lastOperationDurationMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
             }
         }
 
@@ -207,11 +183,10 @@ namespace NPCSystem.Dialogue.Persistence
 
                 if (string.IsNullOrWhiteSpace(_lastSessionId))
                 {
-                    string sessionId = await client.Rpc<string>("find_or_create_dialogue_session", new
-                    {
-                        p_player_id = _authService.CurrentSession.playerId,
-                        p_npc_slug = npcSlug,
-                    });
+                    string sessionId = await client.Rpc<string>(
+                        "find_or_create_dialogue_session",
+                        new { p_player_id = _authService.CurrentSession.playerId, p_npc_slug = npcSlug }
+                    );
                     if (string.IsNullOrWhiteSpace(sessionId))
                         return false;
                     _lastSessionId = sessionId;
@@ -246,8 +221,7 @@ namespace NPCSystem.Dialogue.Persistence
             }
             finally
             {
-                lastOperationDurationMs =
-                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
+                lastOperationDurationMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
             }
         }
 
@@ -266,11 +240,10 @@ namespace NPCSystem.Dialogue.Persistence
                 var client = GetClient();
 
                 // Close the session via pgmq-enabled RPC
-                JObject result = await client.Rpc<JObject>("close_dialogue_session", new
-                {
-                    p_player_id = _authService.CurrentSession.playerId,
-                    p_npc_slug = npcSlug,
-                });
+                JObject result = await client.Rpc<JObject>(
+                    "close_dialogue_session",
+                    new { p_player_id = _authService.CurrentSession.playerId, p_npc_slug = npcSlug }
+                );
 
                 _lastSessionId = null;
                 lastStatus = $"History deleted for NPC '{npcSlug}'.";
@@ -290,8 +263,7 @@ namespace NPCSystem.Dialogue.Persistence
             }
             finally
             {
-                lastOperationDurationMs =
-                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
+                lastOperationDurationMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
             }
         }
 

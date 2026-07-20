@@ -7,11 +7,12 @@ namespace UnityEngine.InputSystem.Editor
     internal class CallbackDataSource : AdvancedDropdownDataSource
     {
         private readonly Func<AdvancedDropdownItem> m_BuildCallback;
-        private readonly Func<string, IEnumerable<AdvancedDropdownItem>, AdvancedDropdownItem>
-        m_SearchCallback;
+        private readonly Func<string, IEnumerable<AdvancedDropdownItem>, AdvancedDropdownItem> m_SearchCallback;
 
-        internal CallbackDataSource(Func<AdvancedDropdownItem> buildCallback,
-                                    Func<string, IEnumerable<AdvancedDropdownItem>, AdvancedDropdownItem> searchCallback = null)
+        internal CallbackDataSource(
+            Func<AdvancedDropdownItem> buildCallback,
+            Func<string, IEnumerable<AdvancedDropdownItem>, AdvancedDropdownItem> searchCallback = null
+        )
         {
             m_BuildCallback = buildCallback;
             m_SearchCallback = searchCallback;

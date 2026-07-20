@@ -37,11 +37,8 @@ namespace UnityEngine.InputSystem.WebGL
         {
             // If the device isn't a WebGL device, we're not interested.
             if (
-                string.Compare(
-                    description.interfaceName,
-                    InterfaceName,
-                    StringComparison.InvariantCultureIgnoreCase
-                ) != 0
+                string.Compare(description.interfaceName, InterfaceName, StringComparison.InvariantCultureIgnoreCase)
+                != 0
             )
                 return null;
 
@@ -55,12 +52,7 @@ namespace UnityEngine.InputSystem.WebGL
             {
                 capabilities = WebGLDeviceCapabilities.FromJson(description.capabilities),
             };
-            InputSystem.RegisterLayoutBuilder(
-                () => layout.Build(),
-                description.product,
-                "Joystick",
-                deviceMatcher
-            );
+            InputSystem.RegisterLayoutBuilder(() => layout.Build(), description.product, "Joystick", deviceMatcher);
 
             return description.product;
         }

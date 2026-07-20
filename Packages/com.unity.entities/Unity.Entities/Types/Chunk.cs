@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
 #if ENABLE_UNITY_CHUNK_METADATA_ACCESSOR_COUNTERS
 using Unity.Profiling;
 using UnityEngine.Assertions;
@@ -18,32 +17,65 @@ namespace Unity.Entities
         None = 0,
         Unused0 = 1 << 0,
         Unused1 = 1 << 1,
-        TempAssertWillDestroyAllInLinkedEntityGroup = 1 << 2
+        TempAssertWillDestroyAllInLinkedEntityGroup = 1 << 2,
     }
 
     [DebuggerTypeProxy(typeof(ChunkIndexDebugProxy))]
     struct ChunkIndex : IComparable<ChunkIndex>
     {
 #if ENABLE_UNITY_CHUNK_METADATA_ACCESSOR_COUNTERS
-        static ProfilerCounterOptions AccessCounterOptions => ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush;
-        static readonly ProfilerCounterValue<int> k_AccessCounterSequenceNumber = new(ProfilerCategory.Scripts, "Chunk.SequenceNumber Access",
-            ProfilerMarkerDataUnit.Count, AccessCounterOptions);
-        static readonly ProfilerCounterValue<int> k_AccessCounterListIndex = new(ProfilerCategory.Scripts, "Chunk.ListIndex Access",
-            ProfilerMarkerDataUnit.Count, AccessCounterOptions);
-        static readonly ProfilerCounterValue<int> k_AccessCounterCount = new(ProfilerCategory.Scripts, "Chunk.Count Access",
-            ProfilerMarkerDataUnit.Count, AccessCounterOptions);
-        static readonly ProfilerCounterValue<int> k_AccessCounterListWithEmptySlotsIndex = new(ProfilerCategory.Scripts, "Chunk.ListWithEmptySlotsIndex Access",
-            ProfilerMarkerDataUnit.Count, AccessCounterOptions);
-        static readonly ProfilerCounterValue<int> k_AccessCounterMetaChunkEntity = new(ProfilerCategory.Scripts, "Chunk.MetaChunkEntity Access",
-            ProfilerMarkerDataUnit.Count, AccessCounterOptions);
-        static readonly ProfilerCounterValue<int> k_AccessCounterBuffer = new(ProfilerCategory.Scripts, "Chunk.Buffer Access",
-            ProfilerMarkerDataUnit.Count, AccessCounterOptions);
-        static readonly ProfilerCounterValue<int> k_AccessCounterFlags = new(ProfilerCategory.Scripts, "Chunk.Flags Access",
-            ProfilerMarkerDataUnit.Count, AccessCounterOptions);
+        static ProfilerCounterOptions AccessCounterOptions =>
+            ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush;
+        static readonly ProfilerCounterValue<int> k_AccessCounterSequenceNumber = new(
+            ProfilerCategory.Scripts,
+            "Chunk.SequenceNumber Access",
+            ProfilerMarkerDataUnit.Count,
+            AccessCounterOptions
+        );
+        static readonly ProfilerCounterValue<int> k_AccessCounterListIndex = new(
+            ProfilerCategory.Scripts,
+            "Chunk.ListIndex Access",
+            ProfilerMarkerDataUnit.Count,
+            AccessCounterOptions
+        );
+        static readonly ProfilerCounterValue<int> k_AccessCounterCount = new(
+            ProfilerCategory.Scripts,
+            "Chunk.Count Access",
+            ProfilerMarkerDataUnit.Count,
+            AccessCounterOptions
+        );
+        static readonly ProfilerCounterValue<int> k_AccessCounterListWithEmptySlotsIndex = new(
+            ProfilerCategory.Scripts,
+            "Chunk.ListWithEmptySlotsIndex Access",
+            ProfilerMarkerDataUnit.Count,
+            AccessCounterOptions
+        );
+        static readonly ProfilerCounterValue<int> k_AccessCounterMetaChunkEntity = new(
+            ProfilerCategory.Scripts,
+            "Chunk.MetaChunkEntity Access",
+            ProfilerMarkerDataUnit.Count,
+            AccessCounterOptions
+        );
+        static readonly ProfilerCounterValue<int> k_AccessCounterBuffer = new(
+            ProfilerCategory.Scripts,
+            "Chunk.Buffer Access",
+            ProfilerMarkerDataUnit.Count,
+            AccessCounterOptions
+        );
+        static readonly ProfilerCounterValue<int> k_AccessCounterFlags = new(
+            ProfilerCategory.Scripts,
+            "Chunk.Flags Access",
+            ProfilerMarkerDataUnit.Count,
+            AccessCounterOptions
+        );
 
         public static void ResetProfilerCounters()
         {
-            Assert.AreEqual(AccessCounterOptions, ProfilerCounterOptions.None, "Toggle this value depending on if the counters are being used in a test or in the profiler");
+            Assert.AreEqual(
+                AccessCounterOptions,
+                ProfilerCounterOptions.None,
+                "Toggle this value depending on if the counters are being used in a test or in the profiler"
+            );
             k_AccessCounterSequenceNumber.Value = 0;
             k_AccessCounterListIndex.Value = 0;
             k_AccessCounterCount.Value = 0;
@@ -70,23 +102,28 @@ namespace Unity.Entities
         public static ChunkIndex Null => new();
 
         public ChunkIndex(int value) => Value = value;
+
         public static implicit operator int(ChunkIndex index) => index.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal unsafe Chunk* GetPtr() => EntityComponentStore.s_chunkStore.Data.GetChunkPointer(Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe bool MatchesFilter(MatchingArchetype* match, ref EntityQueryFilter filter)
-            => match->ChunkMatchesFilter(ListIndex, ref filter);
+        public unsafe bool MatchesFilter(MatchingArchetype* match, ref EntityQueryFilter filter) =>
+            match->ChunkMatchesFilter(ListIndex, ref filter);
 
         public static bool operator ==(ChunkIndex a, ChunkIndex b) => a.Value == b.Value;
+
         public static bool operator !=(ChunkIndex a, ChunkIndex b) => !(a == b);
 
         public static bool operator <(ChunkIndex a, ChunkIndex b) => a.Value < b.Value;
+
         public static bool operator >(ChunkIndex a, ChunkIndex b) => a.Value > b.Value;
 
         public bool Equals(ChunkIndex other) => Value == other.Value;
+
         public override bool Equals(object obj) => obj is ChunkIndex other && Equals(other);
+
         public override int GetHashCode() => Value;
 
         internal ulong SequenceNumber
@@ -339,6 +376,7 @@ namespace Unity.Entities
         // This is where the actual chunk data starts.
         // It's declared like this so we can skip the header part of the chunk and just get to the data.
         public const int kBufferOffset = 64; // (must be cache line aligned)
+
         [FieldOffset(kBufferOffset)]
         public fixed byte Buffer[4];
 

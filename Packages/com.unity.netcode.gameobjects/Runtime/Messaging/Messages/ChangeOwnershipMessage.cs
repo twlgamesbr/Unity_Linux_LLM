@@ -12,6 +12,7 @@ namespace Unity.Netcode
 
         public ulong NetworkObjectId;
         public ulong OwnerClientId;
+
         // SERVICE NOTES:
         // When forwarding the message to clients on the CMB Service side,
         // you can set the ClientIdCount to 0 and skip writing the ClientIds.
@@ -50,7 +51,9 @@ namespace Unity.Netcode
                 {
                     if (ClientIdCount != ClientIds.Length)
                     {
-                        throw new System.Exception($"[{nameof(ChangeOwnershipMessage)}] ClientIdCount is {ClientIdCount} but the ClientIds length is {ClientIds.Length}!");
+                        throw new System.Exception(
+                            $"[{nameof(ChangeOwnershipMessage)}] ClientIdCount is {ClientIdCount} but the ClientIds length is {ClientIds.Length}!"
+                        );
                     }
                     foreach (var clientId in ClientIds)
                     {
@@ -60,7 +63,11 @@ namespace Unity.Netcode
 
                 writer.WriteValueSafe(ChangeMessageType);
 
-                if (ChangeMessageType == ChangeType.OwnershipFlagsUpdate || ChangeMessageType == ChangeType.OwnershipChanging || ChangeMessageType == ChangeType.RequestApproved)
+                if (
+                    ChangeMessageType == ChangeType.OwnershipFlagsUpdate
+                    || ChangeMessageType == ChangeType.OwnershipChanging
+                    || ChangeMessageType == ChangeType.RequestApproved
+                )
                 {
                     writer.WriteValueSafe(OwnershipFlags);
                 }
@@ -68,7 +75,11 @@ namespace Unity.Netcode
                 // When requesting, RequestClientId is the requestor
                 // When approving, RequestClientId is the owner that approved
                 // When denied, RequestClientId is the requestor
-                if (ChangeMessageType == ChangeType.RequestOwnership || ChangeMessageType == ChangeType.RequestApproved || ChangeMessageType == ChangeType.RequestDenied)
+                if (
+                    ChangeMessageType == ChangeType.RequestOwnership
+                    || ChangeMessageType == ChangeType.RequestApproved
+                    || ChangeMessageType == ChangeType.RequestDenied
+                )
                 {
                     writer.WriteValueSafe(RequestClientId);
 
@@ -104,7 +115,11 @@ namespace Unity.Netcode
                 }
 
                 reader.ReadValueSafe(out ChangeMessageType);
-                if (ChangeMessageType == ChangeType.OwnershipFlagsUpdate || ChangeMessageType == ChangeType.OwnershipChanging || ChangeMessageType == ChangeType.RequestApproved)
+                if (
+                    ChangeMessageType == ChangeType.OwnershipFlagsUpdate
+                    || ChangeMessageType == ChangeType.OwnershipChanging
+                    || ChangeMessageType == ChangeType.RequestApproved
+                )
                 {
                     reader.ReadValueSafe(out OwnershipFlags);
                 }
@@ -112,7 +127,11 @@ namespace Unity.Netcode
                 // When requesting, RequestClientId is the requestor
                 // When approving, RequestClientId is the owner that approved
                 // When denied, RequestClientId is the requestor
-                if (ChangeMessageType == ChangeType.RequestOwnership || ChangeMessageType == ChangeType.RequestApproved || ChangeMessageType == ChangeType.RequestDenied)
+                if (
+                    ChangeMessageType == ChangeType.RequestOwnership
+                    || ChangeMessageType == ChangeType.RequestApproved
+                    || ChangeMessageType == ChangeType.RequestDenied
+                )
                 {
                     // We are receiving a request for ownership, or an approval or denial of our request.
                     reader.ReadValueSafe(out RequestClientId);
@@ -129,14 +148,19 @@ namespace Unity.Netcode
                 ChangeMessageType = ChangeType.OwnershipChanging;
             }
 
-
             // If we are not a DAHost instance and the NetworkObject does not exist then defer it as it very likely is not spawned yet.
             // Otherwise if we are the DAHost and it does not exist then we want to forward this message because when the NetworkObject
             // is made visible again, the ownership flags and owner information will be synchronized with the DAHost by the current
             // authority of the NetworkObject in question.
             if (!networkManager.DAHost && !networkManager.SpawnManager.SpawnedObjects.ContainsKey(NetworkObjectId))
             {
-                networkManager.DeferredMessageManager.DeferMessage(IDeferredNetworkMessageManager.TriggerType.OnSpawn, NetworkObjectId, reader, ref context, k_Name);
+                networkManager.DeferredMessageManager.DeferMessage(
+                    IDeferredNetworkMessageManager.TriggerType.OnSpawn,
+                    NetworkObjectId,
+                    reader,
+                    ref context,
+                    k_Name
+                );
                 return false;
             }
             return true;
@@ -145,12 +169,20 @@ namespace Unity.Netcode
         public void Handle(ref NetworkContext context)
         {
             var networkManager = (NetworkManager)context.SystemOwner;
-            var hasObject = networkManager.SpawnManager.SpawnedObjects.TryGetValue(NetworkObjectId, out var networkObject);
+            var hasObject = networkManager.SpawnManager.SpawnedObjects.TryGetValue(
+                NetworkObjectId,
+                out var networkObject
+            );
 
             // If we are the DAHost then forward this message
             if (networkManager.DAHost)
             {
-                var shouldProcessLocally = HandleDAHostMessageForwarding(ref networkManager, context.SenderId, hasObject, ref networkObject);
+                var shouldProcessLocally = HandleDAHostMessageForwarding(
+                    ref networkManager,
+                    context.SenderId,
+                    hasObject,
+                    ref networkObject
+                );
                 if (!shouldProcessLocally)
                 {
                     return;
@@ -161,7 +193,9 @@ namespace Unity.Netcode
             {
                 if (networkManager.LogLevel <= LogLevel.Normal)
                 {
-                    NetworkLog.LogError("Ownership change received for an unknown network object. This should not happen.");
+                    NetworkLog.LogError(
+                        "Ownership change received for an unknown network object. This should not happen."
+                    );
                 }
                 return;
             }
@@ -170,7 +204,9 @@ namespace Unity.Netcode
             {
                 if (networkManager.LogLevel <= LogLevel.Normal)
                 {
-                    NetworkLog.LogError($"[{networkObject.name}] Ownership change received for network object that is not yet spawned.");
+                    NetworkLog.LogError(
+                        $"[{networkObject.name}] Ownership change received for network object that is not yet spawned."
+                    );
                 }
                 return;
             }
@@ -178,7 +214,11 @@ namespace Unity.Netcode
             // If ownership is changing (either a straight change or a request approval), then run through the ownership changed sequence
             // Note: There is some extended ownership script at the bottom of HandleOwnershipChange
             // If not in distributed authority mode, ChangeMessageType will always be OwnershipChanging.
-            if (ChangeMessageType == ChangeType.OwnershipChanging || ChangeMessageType == ChangeType.RequestApproved || !networkManager.DistributedAuthorityMode)
+            if (
+                ChangeMessageType == ChangeType.OwnershipChanging
+                || ChangeMessageType == ChangeType.RequestApproved
+                || !networkManager.DistributedAuthorityMode
+            )
             {
                 HandleOwnershipChange(ref context, ref networkManager, ref networkObject);
             }
@@ -207,7 +247,9 @@ namespace Unity.Netcode
             }
             else if (ChangeMessageType == ChangeType.RequestDenied)
             {
-                networkObject.OwnershipRequestResponse((NetworkObject.OwnershipRequestResponseStatus)OwnershipRequestResponseStatus);
+                networkObject.OwnershipRequestResponse(
+                    (NetworkObject.OwnershipRequestResponseStatus)OwnershipRequestResponseStatus
+                );
             }
         }
 
@@ -215,7 +257,11 @@ namespace Unity.Netcode
         /// Handle the traditional change in ownership message type logic
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void HandleOwnershipChange(ref NetworkContext context, ref NetworkManager networkManager, ref NetworkObject networkObject)
+        private void HandleOwnershipChange(
+            ref NetworkContext context,
+            ref NetworkManager networkManager,
+            ref NetworkObject networkObject
+        )
         {
             var distributedAuthorityMode = networkManager.DistributedAuthorityMode;
 
@@ -223,7 +269,9 @@ namespace Unity.Netcode
             if (networkObject.OwnerClientId == OwnerClientId)
             {
                 // Log error and then ignore the message
-                NetworkLog.LogError($"[Receiver: Client-{networkManager.LocalClientId}][Sender: Client-{context.SenderId}][RID: {RequestClientId}] Detected unnecessary ownership changed message for {networkObject.name} (NID:{NetworkObjectId}).");
+                NetworkLog.LogError(
+                    $"[Receiver: Client-{networkManager.LocalClientId}][Sender: Client-{context.SenderId}][RID: {RequestClientId}] Detected unnecessary ownership changed message for {networkObject.name} (NID:{NetworkObjectId})."
+                );
                 return;
             }
 
@@ -265,7 +313,11 @@ namespace Unity.Netcode
                 }
             }
 
-            networkManager.NetworkMetrics.TrackOwnershipChangeReceived(context.SenderId, networkObject, context.MessageSize);
+            networkManager.NetworkMetrics.TrackOwnershipChangeReceived(
+                context.SenderId,
+                networkObject,
+                context.MessageSize
+            );
         }
 
         /// <summary>
@@ -278,7 +330,12 @@ namespace Unity.Netcode
         /// <param name="networkObject">The networkObject we are changing ownership on. Will be null if hasObject is false.</param>
         /// <returns>true if this message should also be processed locally; false if the message should only be forwarded</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool HandleDAHostMessageForwarding(ref NetworkManager networkManager, ulong senderId, bool hasObject, ref NetworkObject networkObject)
+        private bool HandleDAHostMessageForwarding(
+            ref NetworkManager networkManager,
+            ulong senderId,
+            bool hasObject,
+            ref NetworkObject networkObject
+        )
         {
             var message = new ChangeOwnershipMessage()
             {
@@ -324,7 +381,9 @@ namespace Unity.Netcode
                 {
                     // if the DAHost can see this object, forward the message to all observers.
                     // if the DAHost can't see the object, forward the message to everyone.
-                    clientList = hasObject ? networkObject.Observers.ToArray() : networkManager.ConnectedClientsIds.ToArray();
+                    clientList = hasObject
+                        ? networkObject.Observers.ToArray()
+                        : networkManager.ConnectedClientsIds.ToArray();
 
                     // Both clientList arrays will have the local client so we can not throw an error.
                     errorOnSender = false;
@@ -342,7 +401,9 @@ namespace Unity.Netcode
                     {
                         if (errorOnSender)
                         {
-                            Debug.LogError($"client-{senderId} sent a ChangeOwnershipMessage with themself inside the ClientIds list.");
+                            Debug.LogError(
+                                $"client-{senderId} sent a ChangeOwnershipMessage with themself inside the ClientIds list."
+                            );
                         }
 
                         continue;

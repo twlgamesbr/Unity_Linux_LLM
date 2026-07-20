@@ -167,10 +167,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         {
             m_TreeViewContainer?.RemoveFromHierarchy();
 
-            m_TreeViewContainer = new VisualElement
-            {
-                name = "TreeView Container"
-            };
+            m_TreeViewContainer = new VisualElement { name = "TreeView Container" };
             m_TreeViewContainer.style.flexGrow = 1f;
             m_TreeViewContainer.style.flexShrink = 0f;
             m_TreeViewContainer.style.flexBasis = 0f;
@@ -214,9 +211,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 return;
             }
 
-            var sort = isAscending
-                ? SortDirection.NameAscending
-                : SortDirection.NameDescending;
+            var sort = isAscending ? SortDirection.NameAscending : SortDirection.NameDescending;
             m_SortDirection = sort;
             BuildTreeView(sort);
         }
@@ -228,9 +223,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 return;
             }
 
-            var sort = isAscending
-                ? SortDirection.TypeAscending
-                : SortDirection.TypeDescending;
+            var sort = isAscending ? SortDirection.TypeAscending : SortDirection.TypeDescending;
             m_SortDirection = sort;
             BuildTreeView(sort);
         }
@@ -242,9 +235,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 return;
             }
 
-            var sort = isAscending
-                ? SortDirection.BytesSentAscending
-                : SortDirection.BytesSentDescending;
+            var sort = isAscending ? SortDirection.BytesSentAscending : SortDirection.BytesSentDescending;
             m_SortDirection = sort;
             BuildTreeView(sort);
         }
@@ -256,9 +247,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 return;
             }
 
-            var sort = isAscending
-                ? SortDirection.BytesReceivedAscending
-                : SortDirection.BytesReceivedDescending;
+            var sort = isAscending ? SortDirection.BytesReceivedAscending : SortDirection.BytesReceivedDescending;
             m_SortDirection = sort;
             BuildTreeView(sort);
         }

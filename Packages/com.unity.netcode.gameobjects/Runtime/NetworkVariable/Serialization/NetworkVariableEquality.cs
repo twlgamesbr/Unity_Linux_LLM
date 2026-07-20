@@ -11,7 +11,8 @@ namespace Unity.Netcode
         // Compares two values of the same unmanaged type by underlying memory
         // Ignoring any overridden value checks
         // Size is fixed
-        internal static unsafe bool ValueEquals<TValueType>(ref TValueType a, ref TValueType b) where TValueType : unmanaged
+        internal static unsafe bool ValueEquals<TValueType>(ref TValueType a, ref TValueType b)
+            where TValueType : unmanaged
         {
             // get unmanaged pointers
             var aptr = UnsafeUtility.AddressOf(ref a);
@@ -25,7 +26,11 @@ namespace Unity.Netcode
         // Compares two values of the same unmanaged type by underlying memory
         // Ignoring any overridden value checks
         // Size is fixed
-        internal static unsafe bool ValueEqualsList<TValueType>(ref NativeList<TValueType> a, ref NativeList<TValueType> b) where TValueType : unmanaged
+        internal static unsafe bool ValueEqualsList<TValueType>(
+            ref NativeList<TValueType> a,
+            ref NativeList<TValueType> b
+        )
+            where TValueType : unmanaged
         {
             if (a.IsCreated != b.IsCreated)
             {
@@ -52,7 +57,11 @@ namespace Unity.Netcode
         // Compares two values of the same unmanaged type by underlying memory
         // Ignoring any overridden value checks
         // Size is fixed
-        internal static unsafe bool ValueEqualsArray<TValueType>(ref NativeArray<TValueType> a, ref NativeArray<TValueType> b) where TValueType : unmanaged
+        internal static unsafe bool ValueEqualsArray<TValueType>(
+            ref NativeArray<TValueType> a,
+            ref NativeArray<TValueType> b
+        )
+            where TValueType : unmanaged
         {
             if (a.IsCreated != b.IsCreated)
             {
@@ -74,7 +83,8 @@ namespace Unity.Netcode
             return UnsafeUtility.MemCmp(aptr, bptr, sizeof(TValueType) * a.Length) == 0;
         }
 
-        internal static bool EqualityEqualsObject<TValueType>(ref TValueType a, ref TValueType b) where TValueType : class, IEquatable<TValueType>
+        internal static bool EqualityEqualsObject<TValueType>(ref TValueType a, ref TValueType b)
+            where TValueType : class, IEquatable<TValueType>
         {
             if (a == null)
             {
@@ -89,7 +99,8 @@ namespace Unity.Netcode
             return a.Equals(b);
         }
 
-        internal static bool EqualityEquals<TValueType>(ref TValueType a, ref TValueType b) where TValueType : unmanaged, IEquatable<TValueType>
+        internal static bool EqualityEquals<TValueType>(ref TValueType a, ref TValueType b)
+            where TValueType : unmanaged, IEquatable<TValueType>
         {
             return a.Equals(b);
         }
@@ -124,7 +135,8 @@ namespace Unity.Netcode
             return true;
         }
 
-        internal static bool EqualityEqualsHashSet<TValueType>(ref HashSet<TValueType> a, ref HashSet<TValueType> b) where TValueType : IEquatable<TValueType>
+        internal static bool EqualityEqualsHashSet<TValueType>(ref HashSet<TValueType> a, ref HashSet<TValueType> b)
+            where TValueType : IEquatable<TValueType>
         {
             if (a == null != (b == null))
             {
@@ -155,7 +167,11 @@ namespace Unity.Netcode
         // Compares two values of the same unmanaged type by underlying memory
         // Ignoring any overridden value checks
         // Size is fixed
-        internal static unsafe bool EqualityEqualsArray<TValueType>(ref NativeArray<TValueType> a, ref NativeArray<TValueType> b) where TValueType : unmanaged, IEquatable<TValueType>
+        internal static unsafe bool EqualityEqualsArray<TValueType>(
+            ref NativeArray<TValueType> a,
+            ref NativeArray<TValueType> b
+        )
+            where TValueType : unmanaged, IEquatable<TValueType>
         {
             if (a.IsCreated != b.IsCreated)
             {
@@ -185,7 +201,8 @@ namespace Unity.Netcode
             return true;
         }
 
-        internal static bool ClassEquals<TValueType>(ref TValueType a, ref TValueType b) where TValueType : class
+        internal static bool ClassEquals<TValueType>(ref TValueType a, ref TValueType b)
+            where TValueType : class
         {
             return a == b;
         }
@@ -194,7 +211,11 @@ namespace Unity.Netcode
         // Compares two values of the same unmanaged type by underlying memory
         // Ignoring any overridden value checks
         // Size is fixed
-        internal static unsafe bool EqualityEqualsNativeList<TValueType>(ref NativeList<TValueType> a, ref NativeList<TValueType> b) where TValueType : unmanaged, IEquatable<TValueType>
+        internal static unsafe bool EqualityEqualsNativeList<TValueType>(
+            ref NativeList<TValueType> a,
+            ref NativeList<TValueType> b
+        )
+            where TValueType : unmanaged, IEquatable<TValueType>
         {
             if (a.IsCreated != b.IsCreated)
             {
@@ -225,7 +246,11 @@ namespace Unity.Netcode
             return true;
         }
 
-        internal static bool EqualityEqualsNativeHashSet<TValueType>(ref NativeHashSet<TValueType> a, ref NativeHashSet<TValueType> b) where TValueType : unmanaged, IEquatable<TValueType>
+        internal static bool EqualityEqualsNativeHashSet<TValueType>(
+            ref NativeHashSet<TValueType> a,
+            ref NativeHashSet<TValueType> b
+        )
+            where TValueType : unmanaged, IEquatable<TValueType>
         {
             if (a.IsCreated != b.IsCreated)
             {

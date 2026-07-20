@@ -11,7 +11,8 @@ namespace UnityEditor.Rendering.Universal
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            ShadowShape2DProvider_SpriteSkin provider = property.managedReferenceValue as ShadowShape2DProvider_SpriteSkin;
+            ShadowShape2DProvider_SpriteSkin provider =
+                property.managedReferenceValue as ShadowShape2DProvider_SpriteSkin;
             base.OnGUI(position, property, label);
 
             if (PlayerSettings.gpuSkinning)
@@ -22,7 +23,6 @@ namespace UnityEditor.Rendering.Universal
         {
             return base.GetPropertyHeight(property, label);
         }
-
     }
 }
 #endif

@@ -51,6 +51,5 @@ namespace UnityEngine.Rendering
     /// </code>
     /// </example>
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class ReloadGroupAttribute : Attribute
-    { }
+    public sealed class ReloadGroupAttribute : Attribute { }
 }

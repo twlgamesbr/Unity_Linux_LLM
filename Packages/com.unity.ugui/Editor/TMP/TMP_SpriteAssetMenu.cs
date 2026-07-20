@@ -1,11 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.TextCore;
 using UnityEngine.U2D;
-using UnityEditor;
-using System.Linq;
-using System.IO;
-using System.Collections.Generic;
-
 
 namespace TMPro.EditorUtilities
 {
@@ -49,7 +48,6 @@ namespace TMPro.EditorUtilities
             UpdateSpriteAsset(spriteAsset);
         }
 
-
         internal static void UpdateSpriteAsset(TMP_SpriteAsset spriteAsset)
         {
             // Get a list of all the sprites contained in the texture referenced by the sprite asset.
@@ -60,12 +58,21 @@ namespace TMPro.EditorUtilities
                 return;
 
             // Get all the sprites defined in the sprite sheet texture referenced by this sprite asset.
-            Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(filePath).Select(x => x as Sprite).Where(x => x != null).ToArray();
+            Sprite[] sprites = AssetDatabase
+                .LoadAllAssetsAtPath(filePath)
+                .Select(x => x as Sprite)
+                .Where(x => x != null)
+                .ToArray();
 
             // Return if sprite sheet texture does not have any sprites defined in it.
             if (sprites.Length == 0)
             {
-                Debug.Log("Sprite Asset <color=#FFFF80>[" + spriteAsset.name + "]</color>'s atlas texture does not appear to have any sprites defined in it. Use the Unity Sprite Editor to define sprites for this texture.", spriteAsset.spriteSheet);
+                Debug.Log(
+                    "Sprite Asset <color=#FFFF80>["
+                        + spriteAsset.name
+                        + "]</color>'s atlas texture does not appear to have any sprites defined in it. Use the Unity Sprite Editor to define sprites for this texture.",
+                    spriteAsset.spriteSheet
+                );
                 return;
             }
 
@@ -98,7 +105,12 @@ namespace TMPro.EditorUtilities
                 if (spriteGlyph != null)
                 {
                     // update existing sprite glyph
-                    if (spriteGlyph.glyphRect.x != sprite.rect.x || spriteGlyph.glyphRect.y != sprite.rect.y || spriteGlyph.glyphRect.width != sprite.rect.width || spriteGlyph.glyphRect.height != sprite.rect.height)
+                    if (
+                        spriteGlyph.glyphRect.x != sprite.rect.x
+                        || spriteGlyph.glyphRect.y != sprite.rect.y
+                        || spriteGlyph.glyphRect.width != sprite.rect.width
+                        || spriteGlyph.glyphRect.height != sprite.rect.height
+                    )
                         spriteGlyph.glyphRect = new GlyphRect(sprite.rect);
                 }
                 else
@@ -109,14 +121,20 @@ namespace TMPro.EditorUtilities
                     if (spriteAsset.spriteCharacterTable != null && spriteAsset.spriteCharacterTable.Count > 0)
                     {
                         spriteCharacter = spriteAsset.spriteCharacterTable.FirstOrDefault(x => x.name == sprite.name);
-                        spriteGlyph = spriteCharacter != null ? spriteGlyphTable[(int)spriteCharacter.glyphIndex] : null;
+                        spriteGlyph =
+                            spriteCharacter != null ? spriteGlyphTable[(int)spriteCharacter.glyphIndex] : null;
 
                         if (spriteGlyph != null)
                         {
                             // Update sprite reference and data
                             spriteGlyph.sprite = sprite;
 
-                            if (spriteGlyph.glyphRect.x != sprite.rect.x || spriteGlyph.glyphRect.y != sprite.rect.y || spriteGlyph.glyphRect.width != sprite.rect.width || spriteGlyph.glyphRect.height != sprite.rect.height)
+                            if (
+                                spriteGlyph.glyphRect.x != sprite.rect.x
+                                || spriteGlyph.glyphRect.y != sprite.rect.y
+                                || spriteGlyph.glyphRect.width != sprite.rect.width
+                                || spriteGlyph.glyphRect.height != sprite.rect.height
+                            )
                                 spriteGlyph.glyphRect = new GlyphRect(sprite.rect);
                         }
                     }
@@ -133,7 +151,13 @@ namespace TMPro.EditorUtilities
                     else
                         spriteGlyph.index = (uint)spriteGlyphTable.Count;
 
-                    spriteGlyph.metrics = new GlyphMetrics(sprite.rect.width, sprite.rect.height, -sprite.pivot.x, sprite.rect.height - sprite.pivot.y, sprite.rect.width);
+                    spriteGlyph.metrics = new GlyphMetrics(
+                        sprite.rect.width,
+                        sprite.rect.height,
+                        -sprite.pivot.x,
+                        sprite.rect.height - sprite.pivot.y,
+                        sprite.rect.width
+                    );
                     spriteGlyph.glyphRect = new GlyphRect(sprite.rect);
                     spriteGlyph.scale = 1.0f;
                     spriteGlyph.sprite = sprite;
@@ -142,7 +166,7 @@ namespace TMPro.EditorUtilities
 
                     spriteCharacter = new TMP_SpriteCharacter(0xFFFE, spriteGlyph);
 
-					// Special handling for .notdef sprite name.
+                    // Special handling for .notdef sprite name.
                     string fileNameToLowerInvariant = sprite.name.ToLowerInvariant();
                     if (fileNameToLowerInvariant == ".notdef" || fileNameToLowerInvariant == "notdef")
                     {
@@ -152,7 +176,12 @@ namespace TMPro.EditorUtilities
                     else
                     {
                         spriteCharacter.unicode = 0xFFFE;
-                        if (!string.IsNullOrEmpty(sprite.name) && sprite.name.Length > 2 && sprite.name[0] == '0' && (sprite.name[1] == 'x' || sprite.name[1] == 'X'))
+                        if (
+                            !string.IsNullOrEmpty(sprite.name)
+                            && sprite.name.Length > 2
+                            && sprite.name[0] == '0'
+                            && (sprite.name[1] == 'x' || sprite.name[1] == 'X')
+                        )
                         {
                             spriteCharacter.unicode = (uint)TMP_TextUtilities.StringHexToInt(sprite.name.Remove(0, 2));
                         }
@@ -178,9 +207,7 @@ namespace TMPro.EditorUtilities
             spriteAsset.UpdateLookupTables();
             TMPro_EventManager.ON_SPRITE_ASSET_PROPERTY_CHANGED(true, spriteAsset);
             EditorUtility.SetDirty(spriteAsset);
-
         }
-
 
         [MenuItem("Assets/Create/TextMeshPro/Sprite Asset", false, 200)]
         static void CreateSpriteAsset()
@@ -209,14 +236,18 @@ namespace TMPro.EditorUtilities
                 // Make sure the selection is a font file
                 if (target == null || target.GetType() != typeof(Texture2D))
                 {
-                    Debug.LogWarning("Selected Object [" + target.name + "] is not a Sprite Texture. A Sprite Texture must be selected in order to create a Sprite Asset.", target);
+                    Debug.LogWarning(
+                        "Selected Object ["
+                            + target.name
+                            + "] is not a Sprite Texture. A Sprite Texture must be selected in order to create a Sprite Asset.",
+                        target
+                    );
                     continue;
                 }
 
                 CreateSpriteAssetFromSelectedObject(target);
             }
         }
-
 
         static void CreateSpriteAssetFromSelectedObject(Object target)
         {
@@ -282,20 +313,29 @@ namespace TMPro.EditorUtilities
 
             AssetDatabase.SaveAssets();
 
-            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(spriteAsset));  // Re-import font asset to get the new updated version.
+            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(spriteAsset)); // Re-import font asset to get the new updated version.
 
             //AssetDatabase.Refresh();
         }
 
-
-        static void PopulateSpriteTables(Texture source, ref List<TMP_SpriteCharacter> spriteCharacterTable, ref List<TMP_SpriteGlyph> spriteGlyphTable)
+        static void PopulateSpriteTables(
+            Texture source,
+            ref List<TMP_SpriteCharacter> spriteCharacterTable,
+            ref List<TMP_SpriteGlyph> spriteGlyphTable
+        )
         {
             //Debug.Log("Creating new Sprite Asset.");
 
             string filePath = AssetDatabase.GetAssetPath(source);
 
             // Get all the Sprites sorted by Index
-            Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(filePath).Select(x => x as Sprite).Where(x => x != null).OrderByDescending(x => x.rect.y).ThenBy(x => x.rect.x).ToArray();
+            Sprite[] sprites = AssetDatabase
+                .LoadAllAssetsAtPath(filePath)
+                .Select(x => x as Sprite)
+                .Where(x => x != null)
+                .OrderByDescending(x => x.rect.y)
+                .ThenBy(x => x.rect.x)
+                .ToArray();
 
             for (int i = 0; i < sprites.Length; i++)
             {
@@ -303,7 +343,13 @@ namespace TMPro.EditorUtilities
 
                 TMP_SpriteGlyph spriteGlyph = new TMP_SpriteGlyph();
                 spriteGlyph.index = (uint)i;
-                spriteGlyph.metrics = new GlyphMetrics(sprite.rect.width, sprite.rect.height, -sprite.pivot.x, sprite.rect.height - sprite.pivot.y, sprite.rect.width);
+                spriteGlyph.metrics = new GlyphMetrics(
+                    sprite.rect.width,
+                    sprite.rect.height,
+                    -sprite.pivot.x,
+                    sprite.rect.height - sprite.pivot.y,
+                    sprite.rect.width
+                );
                 spriteGlyph.glyphRect = new GlyphRect(sprite.rect);
                 spriteGlyph.scale = 1.0f;
                 spriteGlyph.sprite = sprite;
@@ -321,7 +367,12 @@ namespace TMPro.EditorUtilities
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(sprite.name) && sprite.name.Length > 2 && sprite.name[0] == '0' && (sprite.name[1] == 'x' || sprite.name[1] == 'X'))
+                    if (
+                        !string.IsNullOrEmpty(sprite.name)
+                        && sprite.name.Length > 2
+                        && sprite.name[0] == '0'
+                        && (sprite.name[1] == 'x' || sprite.name[1] == 'X')
+                    )
                     {
                         spriteCharacter.unicode = (uint)TMP_TextUtilities.StringHexToInt(sprite.name.Remove(0, 2));
                     }
@@ -334,8 +385,11 @@ namespace TMPro.EditorUtilities
             }
         }
 
-
-        static void PopulateSpriteTables(SpriteAtlas spriteAtlas, ref List<TMP_SpriteCharacter> spriteCharacterTable, ref List<TMP_SpriteGlyph> spriteGlyphTable)
+        static void PopulateSpriteTables(
+            SpriteAtlas spriteAtlas,
+            ref List<TMP_SpriteCharacter> spriteCharacterTable,
+            ref List<TMP_SpriteGlyph> spriteGlyphTable
+        )
         {
             // Get number of sprites contained in the sprite atlas.
             int spriteCount = spriteAtlas.spriteCount;
@@ -350,7 +404,13 @@ namespace TMPro.EditorUtilities
 
                 TMP_SpriteGlyph spriteGlyph = new TMP_SpriteGlyph();
                 spriteGlyph.index = (uint)i;
-                spriteGlyph.metrics = new GlyphMetrics(sprite.textureRect.width, sprite.textureRect.height, -sprite.pivot.x, sprite.textureRect.height - sprite.pivot.y, sprite.textureRect.width);
+                spriteGlyph.metrics = new GlyphMetrics(
+                    sprite.textureRect.width,
+                    sprite.textureRect.height,
+                    -sprite.pivot.x,
+                    sprite.textureRect.height - sprite.pivot.y,
+                    sprite.textureRect.width
+                );
                 spriteGlyph.glyphRect = new GlyphRect(sprite.textureRect);
                 spriteGlyph.scale = 1.0f;
                 spriteGlyph.sprite = sprite;
@@ -364,7 +424,6 @@ namespace TMPro.EditorUtilities
                 spriteCharacterTable.Add(spriteCharacter);
             }
         }
-
 
         /// <summary>
         /// Create and add new default material to sprite asset.
@@ -381,7 +440,6 @@ namespace TMPro.EditorUtilities
             AssetDatabase.AddObjectToAsset(material, spriteAsset);
         }
 
-
         // Update existing SpriteInfo
         static List<TMP_Sprite> UpdateSpriteInfo(TMP_SpriteAsset spriteAsset)
         {
@@ -390,7 +448,13 @@ namespace TMPro.EditorUtilities
             string filePath = AssetDatabase.GetAssetPath(spriteAsset.spriteSheet);
 
             // Get all the Sprites sorted Left to Right / Top to Bottom
-            Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(filePath).Select(x => x as Sprite).Where(x => x != null).OrderByDescending(x => x.rect.y).ThenBy(x => x.rect.x).ToArray();
+            Sprite[] sprites = AssetDatabase
+                .LoadAllAssetsAtPath(filePath)
+                .Select(x => x as Sprite)
+                .Where(x => x != null)
+                .OrderByDescending(x => x.rect.y)
+                .ThenBy(x => x.rect.x)
+                .ToArray();
 
             for (int i = 0; i < sprites.Length; i++)
             {
@@ -399,7 +463,9 @@ namespace TMPro.EditorUtilities
                 // Check if the sprite is already contained in the SpriteInfoList
                 int index = -1;
                 if (spriteAsset.spriteInfoList.Count > i && spriteAsset.spriteInfoList[i].sprite != null)
-                    index = spriteAsset.spriteInfoList.FindIndex(item => item.sprite.GetEntityId() == sprite.GetEntityId());
+                    index = spriteAsset.spriteInfoList.FindIndex(item =>
+                        item.sprite.GetEntityId() == sprite.GetEntityId()
+                    );
 
                 // Use existing SpriteInfo if it already exists
                 TMP_Sprite spriteInfo = index == -1 ? new TMP_Sprite() : spriteAsset.spriteInfoList[index];
@@ -411,10 +477,16 @@ namespace TMPro.EditorUtilities
                 spriteInfo.height = spriteRect.height;
 
                 // Get Sprite Pivot
-                Vector2 pivot = new Vector2(0 - (sprite.bounds.min.x) / (sprite.bounds.extents.x * 2), 0 - (sprite.bounds.min.y) / (sprite.bounds.extents.y * 2));
+                Vector2 pivot = new Vector2(
+                    0 - (sprite.bounds.min.x) / (sprite.bounds.extents.x * 2),
+                    0 - (sprite.bounds.min.y) / (sprite.bounds.extents.y * 2)
+                );
 
                 // The position of the pivot influences the Offset position.
-                spriteInfo.pivot = new Vector2(0 - pivot.x * spriteRect.width, spriteRect.height - pivot.y * spriteRect.height);
+                spriteInfo.pivot = new Vector2(
+                    0 - pivot.x * spriteRect.width,
+                    spriteRect.height - pivot.y * spriteRect.height
+                );
 
                 if (index == -1)
                 {
@@ -422,7 +494,7 @@ namespace TMPro.EditorUtilities
                     int[] ids = spriteAsset.spriteInfoList.Select(item => item.id).ToArray();
 
                     int id = 0;
-                    for (int j = 0; j < ids.Length; j++ )
+                    for (int j = 0; j < ids.Length; j++)
                     {
                         if (ids[0] != 0)
                             break;

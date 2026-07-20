@@ -4,11 +4,11 @@ using Unity.Mathematics;
 namespace Unity.Deformations
 {
     /// <summary>
-    /// Float buffer that contains weight values that determine how much a 
+    /// Float buffer that contains weight values that determine how much a
     /// corresponding blend shape is applied to the mesh.
     /// </summary>
     /// <remarks>
-    /// This data structure is used for mesh deformations. 
+    /// This data structure is used for mesh deformations.
     /// </remarks>
     public struct BlendShapeWeight : IBufferElementData
     {
@@ -19,7 +19,7 @@ namespace Unity.Deformations
     }
 
     /// <summary>
-    ///  Matrix buffer that contains the skinned transformations of bones in 
+    ///  Matrix buffer that contains the skinned transformations of bones in
     ///  relation to the bind pose.
     /// </summary>
     /// <remarks>

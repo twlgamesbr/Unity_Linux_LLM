@@ -12,10 +12,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             // > value when serializing objects and set members to their default value when
             // > deserializing.
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-            Converters = new List<JsonConverter>
-            {
-                new JsonColorConverter(),
-            }
+            Converters = new List<JsonConverter> { new JsonColorConverter() },
         };
 
         public static string ToJson<T>(T value)

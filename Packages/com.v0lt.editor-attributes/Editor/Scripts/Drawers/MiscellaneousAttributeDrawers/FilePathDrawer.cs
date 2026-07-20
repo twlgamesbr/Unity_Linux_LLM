@@ -1,8 +1,8 @@
 using System.IO;
-using UnityEngine;
 using UnityEditor;
-using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -37,7 +37,11 @@ namespace EditorAttributes.Editor
             {
                 string filePath = EditorUtility.OpenFilePanel("Select file", "Assets", filePathAttribute.Filters);
 
-                if (filePathAttribute.GetRelativePath && !string.IsNullOrEmpty(filePath) && Path.IsPathFullyQualified(filePath))
+                if (
+                    filePathAttribute.GetRelativePath
+                    && !string.IsNullOrEmpty(filePath)
+                    && Path.IsPathFullyQualified(filePath)
+                )
                 {
                     string projectRoot = Application.dataPath[..^"Assets".Length];
 
@@ -52,6 +56,7 @@ namespace EditorAttributes.Editor
             }
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.String;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.String;
     }
 }

@@ -21,13 +21,15 @@ namespace UnityEngine.Rendering.Universal
             int shadowDataCount = shadowData.Length;
             if (shadowDataCount > 0)
             {
-                bool isClosed = shadowData[0].x == shadowData[shadowDataCount - 1].x && shadowData[0].y == shadowData[shadowDataCount - 1].y;
+                bool isClosed =
+                    shadowData[0].x == shadowData[shadowDataCount - 1].x
+                    && shadowData[0].y == shadowData[shadowDataCount - 1].y;
                 int vertexCount = isClosed ? shadowDataCount - 1 : shadowDataCount;
 
                 int indexArraySize = 2 * shadowDataCount;
 
                 NativeArray<Vector3> vertices = new NativeArray<Vector3>(vertexCount, Allocator.Temp);
-                NativeArray<int> indices = new NativeArray<int>(indexArraySize-2, Allocator.Temp);
+                NativeArray<int> indices = new NativeArray<int>(indexArraySize - 2, Allocator.Temp);
 
                 // Copy vertices
                 for (int i = 0; i < vertexCount; i++)
@@ -40,10 +42,10 @@ namespace UnityEngine.Rendering.Universal
                 {
                     int startIndex = 2 * i;
                     indices[startIndex] = i;
-                    indices[startIndex + 1] = i+1;
+                    indices[startIndex + 1] = i + 1;
                 }
 
-                if(isClosed)
+                if (isClosed)
                 {
                     int lastEdgeIndex = 2 * vertexCount;
                     indices[lastEdgeIndex - 1] = 0;
@@ -58,7 +60,10 @@ namespace UnityEngine.Rendering.Universal
             shadowData.Dispose();
         }
 
-        public override int MenuPriority() { return 10; }  // give higher than default menu priority
+        public override int MenuPriority()
+        {
+            return 10;
+        } // give higher than default menu priority
 
         public override void Enabled(Component sourceComponent, ShadowShape2D persistantShadowShape)
         {
@@ -82,13 +87,20 @@ namespace UnityEngine.Rendering.Universal
 
             spriteShapeController.TryGetComponent<SpriteShapeRenderer>(out spriteShapeRenderer);
 
-            float trimEdge = ShadowShapeProvider2DUtility.GetTrimEdgeFromBounds(spriteShapeRenderer.bounds, k_InitialTrim);
+            float trimEdge = ShadowShapeProvider2DUtility.GetTrimEdgeFromBounds(
+                spriteShapeRenderer.bounds,
+                k_InitialTrim
+            );
             persistantShadowShape.SetDefaultTrim(trimEdge);
 
             UpdateShadows(spriteShapeController, persistantShadowShape);
         }
 
-        public override void OnBeforeRender(Component sourceComponent, Bounds worldCullingBounds, ShadowShape2D persistantShadowShape)
+        public override void OnBeforeRender(
+            Component sourceComponent,
+            Bounds worldCullingBounds,
+            ShadowShape2D persistantShadowShape
+        )
         {
             UpdateShadows((SpriteShapeController)sourceComponent, persistantShadowShape);
         }

@@ -20,8 +20,12 @@ namespace Unity.Entities
             [ExcludeFromBurstCompatTesting("Takes managed string")]
             public BytesCounter(string name)
             {
-                m_Counter = new ProfilerCounterValue<ulong>(Category, name, ProfilerMarkerDataUnit.Bytes,
-                    ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush);
+                m_Counter = new ProfilerCounterValue<ulong>(
+                    Category,
+                    name,
+                    ProfilerMarkerDataUnit.Bytes,
+                    ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush
+                );
             }
         }
     }

@@ -50,7 +50,10 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="messageBuffer">The message stream containing the data</param>
         /// <param name="networkDelivery">The delivery type (QoS) to send data with</param>
-        public void SendUnnamedMessageToAll(FastBufferWriter messageBuffer, NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        public void SendUnnamedMessageToAll(
+            FastBufferWriter messageBuffer,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced
+        )
         {
             SendUnnamedMessage(m_NetworkManager.ConnectedClientsIds, messageBuffer, networkDelivery);
         }
@@ -61,7 +64,11 @@ namespace Unity.Netcode
         /// <param name="clientIds">The clients to send to, sends to everyone if null</param>
         /// <param name="messageBuffer">The message stream containing the data</param>
         /// <param name="networkDelivery">The delivery type (QoS) to send data with</param>
-        public void SendUnnamedMessage(IReadOnlyList<ulong> clientIds, FastBufferWriter messageBuffer, NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        public void SendUnnamedMessage(
+            IReadOnlyList<ulong> clientIds,
+            FastBufferWriter messageBuffer,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced
+        )
         {
             if (clientIds == null)
             {
@@ -84,7 +91,9 @@ namespace Unity.Netcode
             {
                 if (clientIds.Count > 1)
                 {
-                    Debug.LogError("Sending an unnamed message to multiple clients is not yet supported in distributed authority.");
+                    Debug.LogError(
+                        "Sending an unnamed message to multiple clients is not yet supported in distributed authority."
+                    );
                     return;
                 }
             }
@@ -111,10 +120,7 @@ namespace Unity.Netcode
                     }
                 }
             }
-            var message = new UnnamedMessage
-            {
-                SendData = messageBuffer
-            };
+            var message = new UnnamedMessage { SendData = messageBuffer };
             var size = m_NetworkManager.ConnectionManager.SendMessage(ref message, networkDelivery, clientIds);
 
             // Size is zero if we were only sending the message to ourself in which case it isn't sent.
@@ -130,7 +136,11 @@ namespace Unity.Netcode
         /// <param name="clientId">The client to send the message to</param>
         /// <param name="messageBuffer">The message stream containing the data</param>
         /// <param name="networkDelivery">The delivery type (QoS) to send data with</param>
-        public void SendUnnamedMessage(ulong clientId, FastBufferWriter messageBuffer, NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        public void SendUnnamedMessage(
+            ulong clientId,
+            FastBufferWriter messageBuffer,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced
+        )
         {
             ValidateMessageSize(messageBuffer, networkDelivery, isNamed: false);
 
@@ -146,10 +156,7 @@ namespace Unity.Netcode
                     return;
                 }
             }
-            var message = new UnnamedMessage
-            {
-                SendData = messageBuffer
-            };
+            var message = new UnnamedMessage { SendData = messageBuffer };
             var size = m_NetworkManager.ConnectionManager.SendMessage(ref message, networkDelivery, clientId);
             // Size is zero if we were only sending the message to ourself in which case it isn't sent.
             if (size != 0)
@@ -165,8 +172,10 @@ namespace Unity.Netcode
         /// <param name="messagePayload">The buffer containing the message data to be read</param>
         public delegate void HandleNamedMessageDelegate(ulong senderClientId, FastBufferReader messagePayload);
 
-        private Dictionary<ulong, HandleNamedMessageDelegate> m_NamedMessageHandlers32 = new Dictionary<ulong, HandleNamedMessageDelegate>();
-        private Dictionary<ulong, HandleNamedMessageDelegate> m_NamedMessageHandlers64 = new Dictionary<ulong, HandleNamedMessageDelegate>();
+        private Dictionary<ulong, HandleNamedMessageDelegate> m_NamedMessageHandlers32 =
+            new Dictionary<ulong, HandleNamedMessageDelegate>();
+        private Dictionary<ulong, HandleNamedMessageDelegate> m_NamedMessageHandlers64 =
+            new Dictionary<ulong, HandleNamedMessageDelegate>();
 
         private Dictionary<ulong, string> m_MessageHandlerNameLookup32 = new Dictionary<ulong, string>();
         private Dictionary<ulong, string> m_MessageHandlerNameLookup64 = new Dictionary<ulong, string>();
@@ -232,7 +241,9 @@ namespace Unity.Netcode
             {
                 if (m_NetworkManager.LogLevel <= LogLevel.Error)
                 {
-                    Debug.LogError($"[{nameof(RegisterNamedMessageHandler)}] Cannot register a named message of type null or empty!");
+                    Debug.LogError(
+                        $"[{nameof(RegisterNamedMessageHandler)}] Cannot register a named message of type null or empty!"
+                    );
                 }
                 return;
             }
@@ -241,9 +252,13 @@ namespace Unity.Netcode
 
             if (m_NetworkManager.LogLevel <= LogLevel.Developer)
             {
-                if (m_MessageHandlerNameLookup32.ContainsKey(hash32) || m_MessageHandlerNameLookup64.ContainsKey(hash64))
+                if (
+                    m_MessageHandlerNameLookup32.ContainsKey(hash32) || m_MessageHandlerNameLookup64.ContainsKey(hash64)
+                )
                 {
-                    Debug.LogWarning($"Registering {name} named message over existing registration! Your previous registration's callback is being overwritten!");
+                    Debug.LogWarning(
+                        $"Registering {name} named message over existing registration! Your previous registration's callback is being overwritten!"
+                    );
                 }
             }
 
@@ -264,7 +279,9 @@ namespace Unity.Netcode
             {
                 if (m_NetworkManager.LogLevel <= LogLevel.Error)
                 {
-                    Debug.LogError($"[{nameof(UnregisterNamedMessageHandler)}] Cannot unregister a named message of type null or empty!");
+                    Debug.LogError(
+                        $"[{nameof(UnregisterNamedMessageHandler)}] Cannot unregister a named message of type null or empty!"
+                    );
                 }
                 return;
             }
@@ -285,7 +302,11 @@ namespace Unity.Netcode
         /// <param name="messageName">The message name to send</param>
         /// <param name="messageStream">The message stream containing the data</param>
         /// <param name="networkDelivery">The delivery type (QoS) to send data with</param>
-        public void SendNamedMessageToAll(string messageName, FastBufferWriter messageStream, NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        public void SendNamedMessageToAll(
+            string messageName,
+            FastBufferWriter messageStream,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced
+        )
         {
             SendNamedMessage(messageName, m_NetworkManager.ConnectedClientsIds, messageStream, networkDelivery);
         }
@@ -297,7 +318,12 @@ namespace Unity.Netcode
         /// <param name="clientId">The client to send the message to</param>
         /// <param name="messageStream">The message stream containing the data</param>
         /// <param name="networkDelivery">The delivery type (QoS) to send data with</param>
-        public void SendNamedMessage(string messageName, ulong clientId, FastBufferWriter messageStream, NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        public void SendNamedMessage(
+            string messageName,
+            ulong clientId,
+            FastBufferWriter messageStream,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced
+        )
         {
             ValidateMessageSize(messageStream, networkDelivery, isNamed: true);
 
@@ -326,11 +352,7 @@ namespace Unity.Netcode
                 }
             }
 
-            var message = new NamedMessage
-            {
-                Hash = hash,
-                SendData = messageStream,
-            };
+            var message = new NamedMessage { Hash = hash, SendData = messageStream };
             var size = m_NetworkManager.ConnectionManager.SendMessage(ref message, networkDelivery, clientId);
 
             // Size is zero if we were only sending the message to ourself in which case it isn't sent.
@@ -347,11 +369,19 @@ namespace Unity.Netcode
         /// <param name="clientIds">The clients to send to</param>
         /// <param name="messageStream">The message stream containing the data</param>
         /// <param name="networkDelivery">The delivery type (QoS) to send data with</param>
-        public void SendNamedMessage(string messageName, IReadOnlyList<ulong> clientIds, FastBufferWriter messageStream, NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        public void SendNamedMessage(
+            string messageName,
+            IReadOnlyList<ulong> clientIds,
+            FastBufferWriter messageStream,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced
+        )
         {
             if (clientIds == null)
             {
-                throw new ArgumentNullException(nameof(clientIds), "Client list is null! You must pass in a valid clientId list to send a named message.");
+                throw new ArgumentNullException(
+                    nameof(clientIds),
+                    "Client list is null! You must pass in a valid clientId list to send a named message."
+                );
             }
 
             if (!m_NetworkManager.DistributedAuthorityMode && !m_NetworkManager.IsServer)
@@ -371,7 +401,9 @@ namespace Unity.Netcode
             {
                 if (clientIds.Count > 1)
                 {
-                    Debug.LogError("Sending a named message to multiple clients is not yet supported in distributed authority.");
+                    Debug.LogError(
+                        "Sending a named message to multiple clients is not yet supported in distributed authority."
+                    );
                     return;
                 }
             }
@@ -409,11 +441,7 @@ namespace Unity.Netcode
                     }
                 }
             }
-            var message = new NamedMessage
-            {
-                Hash = hash,
-                SendData = messageStream
-            };
+            var message = new NamedMessage { Hash = hash, SendData = messageStream };
             var size = m_NetworkManager.ConnectionManager.SendMessage(ref message, networkDelivery, clientIds);
 
             // Size is zero if we were only sending the message to ourself in which case it isn't sent.
@@ -432,20 +460,31 @@ namespace Unity.Netcode
         /// <param name="networkDelivery">Delivery method</param>
         /// <param name="isNamed">Is the message named (or unnamed)</param>
         /// <exception cref="OverflowException">Exception thrown in case validation fails</exception>
-        private unsafe void ValidateMessageSize(FastBufferWriter messageStream, NetworkDelivery networkDelivery, bool isNamed)
+        private unsafe void ValidateMessageSize(
+            FastBufferWriter messageStream,
+            NetworkDelivery networkDelivery,
+            bool isNamed
+        )
         {
 #if DEBUG
-            var maxNonFragmentedSize = m_NetworkManager.MessageManager.NonFragmentedMessageMaxSize - FastBufferWriter.GetWriteSize<NetworkMessageHeader>() - sizeof(NetworkBatchHeader);
+            var maxNonFragmentedSize =
+                m_NetworkManager.MessageManager.NonFragmentedMessageMaxSize
+                - FastBufferWriter.GetWriteSize<NetworkMessageHeader>()
+                - sizeof(NetworkBatchHeader);
             if (isNamed)
             {
                 maxNonFragmentedSize -= sizeof(ulong); // MessageName hash
             }
-            if (networkDelivery != NetworkDelivery.ReliableFragmentedSequenced
-                && messageStream.Length > maxNonFragmentedSize)
+            if (
+                networkDelivery != NetworkDelivery.ReliableFragmentedSequenced
+                && messageStream.Length > maxNonFragmentedSize
+            )
             {
-                throw new OverflowException($"Given message size ({messageStream.Length} bytes) is greater than " +
-                    $"the maximum allowed for the selected delivery method ({maxNonFragmentedSize} bytes). Try using " +
-                    $"ReliableFragmentedSequenced delivery method instead.");
+                throw new OverflowException(
+                    $"Given message size ({messageStream.Length} bytes) is greater than "
+                        + $"the maximum allowed for the selected delivery method ({maxNonFragmentedSize} bytes). Try using "
+                        + $"ReliableFragmentedSequenced delivery method instead."
+                );
             }
 #endif
         }

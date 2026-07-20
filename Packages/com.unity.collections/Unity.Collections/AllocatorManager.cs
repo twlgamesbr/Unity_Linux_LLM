@@ -2,15 +2,15 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using AOT;
 using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
-using Unity.Jobs.LowLevel.Unsafe;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace Unity.Collections
 {
@@ -55,8 +55,7 @@ namespace Unity.Collections
         internal bool TryAcquire()
         {
             // First do a memory load (read) to check if lock is free in order to prevent uncessary cache missed.
-            return Volatile.Read(ref m_Lock) == 0 &&
-                Interlocked.CompareExchange(ref m_Lock, 1, 0) == 0;
+            return Volatile.Read(ref m_Lock) == 0 && Interlocked.CompareExchange(ref m_Lock, 1, 0) == 0;
         }
 
         /// <summary>
@@ -89,9 +88,10 @@ namespace Unity.Collections
     /// <summary>
     /// Manages custom memory allocators.
     /// </summary>
-    public unsafe static class AllocatorManager
+    public static unsafe class AllocatorManager
     {
-        internal static Block AllocateBlock<T>(ref this T t, int sizeOf, int alignOf, int items) where T : unmanaged, IAllocator
+        internal static Block AllocateBlock<T>(ref this T t, int sizeOf, int alignOf, int items)
+            where T : unmanaged, IAllocator
         {
             CheckValid(t.Handle);
             Block block = default;
@@ -107,7 +107,9 @@ namespace Unity.Collections
             return block;
         }
 
-        internal static Block AllocateBlock<T,U>(ref this T t, U u, int items) where T : unmanaged, IAllocator where U : unmanaged
+        internal static Block AllocateBlock<T, U>(ref this T t, U u, int items)
+            where T : unmanaged, IAllocator
+            where U : unmanaged
         {
             return AllocateBlock(ref t, UnsafeUtility.SizeOf<U>(), UnsafeUtility.AlignOf<U>(), items);
         }
@@ -121,22 +123,28 @@ namespace Unity.Collections
         /// <param name="alignOf">The alignment in bytes.</param>
         /// <param name="items">The number of items. Defaults to 1.</param>
         /// <returns>A pointer to the allocated memory.</returns>
-        public static unsafe void* Allocate<T>(ref this T t, int sizeOf, int alignOf, int items = 1) where T : unmanaged, IAllocator
+        public static unsafe void* Allocate<T>(ref this T t, int sizeOf, int alignOf, int items = 1)
+            where T : unmanaged, IAllocator
         {
             return (void*)AllocateBlock(ref t, sizeOf, alignOf, items).Range.Pointer;
         }
 
-        internal static unsafe U* Allocate<T,U>(ref this T t, U u, int items) where T : unmanaged, IAllocator where U : unmanaged
+        internal static unsafe U* Allocate<T, U>(ref this T t, U u, int items)
+            where T : unmanaged, IAllocator
+            where U : unmanaged
         {
             return (U*)Allocate(ref t, UnsafeUtility.SizeOf<U>(), UnsafeUtility.AlignOf<U>(), items);
         }
 
-        internal static unsafe void* AllocateStruct<T, U>(ref this T t, U u, int items) where T : unmanaged, IAllocator where U : unmanaged
+        internal static unsafe void* AllocateStruct<T, U>(ref this T t, U u, int items)
+            where T : unmanaged, IAllocator
+            where U : unmanaged
         {
             return (void*)Allocate(ref t, UnsafeUtility.SizeOf<U>(), UnsafeUtility.AlignOf<U>(), items);
         }
 
-        internal static unsafe void FreeBlock<T>(ref this T t, ref Block block) where T : unmanaged, IAllocator
+        internal static unsafe void FreeBlock<T>(ref this T t, ref Block block)
+            where T : unmanaged, IAllocator
         {
             CheckValid(t.Handle);
             block.Range.Items = 0;
@@ -144,7 +152,8 @@ namespace Unity.Collections
             CheckFailedToFree(error);
         }
 
-        internal static unsafe void Free<T>(ref this T t, void* pointer, int sizeOf, int alignOf, int items) where T : unmanaged, IAllocator
+        internal static unsafe void Free<T>(ref this T t, void* pointer, int sizeOf, int alignOf, int items)
+            where T : unmanaged, IAllocator
         {
             if (pointer == null)
                 return;
@@ -156,7 +165,9 @@ namespace Unity.Collections
             t.FreeBlock(ref block);
         }
 
-        internal static unsafe void Free<T,U>(ref this T t, U* pointer, int items) where T : unmanaged, IAllocator where U : unmanaged
+        internal static unsafe void Free<T, U>(ref this T t, U* pointer, int items)
+            where T : unmanaged, IAllocator
+            where U : unmanaged
         {
             Free(ref t, pointer, UnsafeUtility.SizeOf<U>(), UnsafeUtility.AlignOf<U>(), items);
         }
@@ -169,7 +180,12 @@ namespace Unity.Collections
         /// <param name="alignmentInBytes">The alignment in bytes (must be a power of two).</param>
         /// <param name="items">The number of values to allocate space for. Defaults to 1.</param>
         /// <returns>A pointer to the allocated memory.</returns>
-        public unsafe static void* Allocate(AllocatorHandle handle, int itemSizeInBytes, int alignmentInBytes, int items = 1)
+        public static unsafe void* Allocate(
+            AllocatorHandle handle,
+            int itemSizeInBytes,
+            int alignmentInBytes,
+            int items = 1
+        )
         {
             return handle.Allocate(itemSizeInBytes, alignmentInBytes, items);
         }
@@ -181,7 +197,8 @@ namespace Unity.Collections
         /// <param name="handle">A handle to the allocator.</param>
         /// <param name="items">The number of values to allocate for space for. Defaults to 1.</param>
         /// <returns>A pointer to the allocated memory.</returns>
-        public unsafe static T* Allocate<T>(AllocatorHandle handle, int items = 1) where T : unmanaged
+        public static unsafe T* Allocate<T>(AllocatorHandle handle, int items = 1)
+            where T : unmanaged
         {
             return handle.Allocate(default(T), items);
         }
@@ -196,7 +213,13 @@ namespace Unity.Collections
         /// <param name="itemSizeInBytes">The size in bytes of the allocation.</param>
         /// <param name="alignmentInBytes">The alignment in bytes (must be a power of two).</param>
         /// <param name="items">The number of values that the memory was allocated for.</param>
-        public unsafe static void Free(AllocatorHandle handle, void* pointer, int itemSizeInBytes, int alignmentInBytes, int items = 1)
+        public static unsafe void Free(
+            AllocatorHandle handle,
+            void* pointer,
+            int itemSizeInBytes,
+            int alignmentInBytes,
+            int items = 1
+        )
         {
             handle.Free(pointer, itemSizeInBytes, alignmentInBytes, items);
         }
@@ -206,7 +229,7 @@ namespace Unity.Collections
         /// </summary>
         /// <param name="handle">A handle to the allocator.</param>
         /// <param name="pointer">A pointer to the allocated memory.</param>
-        public unsafe static void Free(AllocatorHandle handle, void* pointer)
+        public static unsafe void Free(AllocatorHandle handle, void* pointer)
         {
             handle.Free((byte*)pointer, 1);
         }
@@ -220,7 +243,8 @@ namespace Unity.Collections
         /// <param name="handle">A handle to the allocator.</param>
         /// <param name="pointer">A pointer to the allocated memory.</param>
         /// <param name="items">The number of values that the memory was allocated for.</param>
-        public unsafe static void Free<T>(AllocatorHandle handle, T* pointer, int items = 1) where T : unmanaged
+        public static unsafe void Free<T>(AllocatorHandle handle, T* pointer, int items = 1)
+            where T : unmanaged
         {
             handle.Free(pointer, items);
         }
@@ -289,7 +313,8 @@ namespace Unity.Collections
         public struct AllocatorHandle : IAllocator, IEquatable<AllocatorHandle>, IComparable<AllocatorHandle>
         {
             internal ref TableEntry TableEntry => ref SharedStatics.TableEntry.Ref.Data.ElementAt(Index);
-            internal bool IsInstalled => ((SharedStatics.IsInstalled.Ref.Data.ElementAt(Index>>6) >> (Index&63)) & 1) != 0;
+            internal bool IsInstalled =>
+                ((SharedStatics.IsInstalled.Ref.Data.ElementAt(Index >> 6) >> (Index & 63)) & 1) != 0;
 
             internal void IncrementVersion()
             {
@@ -332,7 +357,8 @@ namespace Unity.Collections
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             internal ref ushort OfficialVersion => ref SharedStatics.Version.Ref.Data.ElementAt(Index);
-            internal ref UnsafeList<AllocatorHandle> ChildAllocators => ref SharedStatics.ChildAllocators.Ref.Data.ElementAt(Index);
+            internal ref UnsafeList<AllocatorHandle> ChildAllocators =>
+                ref SharedStatics.ChildAllocators.Ref.Data.ElementAt(Index);
             internal ref AllocatorHandle Parent => ref SharedStatics.Parent.Ref.Data.ElementAt(Index);
             internal ref int IndexInParent => ref SharedStatics.IndexInParent.Ref.Data.ElementAt(Index);
 
@@ -341,7 +367,8 @@ namespace Unity.Collections
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             internal ref Spinner ChildSpinLock => ref SharedStatics.ChildSpinLock.Ref.Data.ElementAt(Index);
-            internal ref UnsafeList<AtomicSafetyHandle> ChildSafetyHandles => ref SharedStatics.ChildSafetyHandles.Ref.Data.ElementAt(Index);
+            internal ref UnsafeList<AtomicSafetyHandle> ChildSafetyHandles =>
+                ref SharedStatics.ChildSafetyHandles.Ref.Data.ElementAt(Index);
 
             /// <summary>
             ///   <para>Determines if the handle is still valid, because we intend to release it if it is.</para>
@@ -350,16 +377,16 @@ namespace Unity.Collections
             internal static unsafe bool CheckExists(AtomicSafetyHandle handle)
             {
                 bool res = false;
-                int* versionNode = (int*) (void*) handle.versionNode;
+                int* versionNode = (int*)(void*)handle.versionNode;
                 res = (handle.version == (*versionNode & AtomicSafetyHandle.ReadWriteDisposeCheck));
                 return res;
             }
 
             internal static unsafe bool AreTheSame(AtomicSafetyHandle a, AtomicSafetyHandle b)
             {
-                if(a.version != b.version)
+                if (a.version != b.version)
                     return false;
-                if(a.versionNode != b.versionNode)
+                if (a.versionNode != b.versionNode)
                     return false;
                 return true;
             }
@@ -372,7 +399,7 @@ namespace Unity.Collections
 
             internal int AddSafetyHandle(AtomicSafetyHandle handle)
             {
-                if(!NeedsUseAfterFreeTracking())
+                if (!NeedsUseAfterFreeTracking())
                     return InvalidChildSafetyHandleIndex;
                 ChildSpinLock.Acquire();
                 var result = ChildSafetyHandles.Length;
@@ -383,19 +410,19 @@ namespace Unity.Collections
 
             internal bool TryRemoveSafetyHandle(AtomicSafetyHandle handle, int safetyHandleIndex)
             {
-                if(!NeedsUseAfterFreeTracking())
+                if (!NeedsUseAfterFreeTracking())
                     return false;
-                if(safetyHandleIndex == InvalidChildSafetyHandleIndex)
+                if (safetyHandleIndex == InvalidChildSafetyHandleIndex)
                     return false;
 
                 ChildSpinLock.Acquire();
                 safetyHandleIndex = math.min(safetyHandleIndex, ChildSafetyHandles.Length - 1);
-                while(safetyHandleIndex >= 0)
+                while (safetyHandleIndex >= 0)
                 {
                     unsafe
                     {
                         var safetyHandle = ChildSafetyHandles.Ptr + safetyHandleIndex;
-                        if(AreTheSame(*safetyHandle, handle))
+                        if (AreTheSame(*safetyHandle, handle))
                         {
                             ChildSafetyHandles.RemoveAtSwapBack(safetyHandleIndex);
                             ChildSpinLock.Release();
@@ -437,7 +464,7 @@ namespace Unity.Collections
 
             internal int AddChildAllocator(AllocatorHandle handle)
             {
-                if(!NeedsUseAfterFreeTracking())
+                if (!NeedsUseAfterFreeTracking())
                     return InvalidChildAllocatorIndex;
                 var result = ChildAllocators.Length;
                 ChildAllocators.Add(handle);
@@ -448,17 +475,17 @@ namespace Unity.Collections
 
             internal bool TryRemoveChildAllocator(AllocatorHandle handle, int childAllocatorIndex)
             {
-                if(!NeedsUseAfterFreeTracking())
+                if (!NeedsUseAfterFreeTracking())
                     return false;
-                if(childAllocatorIndex == InvalidChildAllocatorIndex)
+                if (childAllocatorIndex == InvalidChildAllocatorIndex)
                     return false;
                 childAllocatorIndex = math.min(childAllocatorIndex, ChildAllocators.Length - 1);
-                while(childAllocatorIndex >= 0)
+                while (childAllocatorIndex >= 0)
                 {
                     unsafe
                     {
                         var allocatorHandle = ChildAllocators.Ptr + childAllocatorIndex;
-                        if(AreTheSame(*allocatorHandle, handle))
+                        if (AreTheSame(*allocatorHandle, handle))
                         {
                             ChildAllocators.RemoveAtSwapBack(childAllocatorIndex);
                             return true;
@@ -497,7 +524,7 @@ namespace Unity.Collections
                     unsafe
                     {
                         AtomicSafetyHandle* handle = ChildSafetyHandles.Ptr + i;
-                        if(CheckExists(*handle))
+                        if (CheckExists(*handle))
                             AtomicSafetyHandle.Release(*handle);
                     }
                 }
@@ -521,7 +548,6 @@ namespace Unity.Collections
                 ChildAllocators.Clear();
                 ChildAllocators.TrimExcess();
             }
-
 #endif
 
             /// <summary>
@@ -529,11 +555,8 @@ namespace Unity.Collections
             /// </summary>
             /// <param name="a">The Allocator to convert.</param>
             /// <returns>The AllocatorHandle of an allocator.</returns>
-            public static implicit operator AllocatorHandle(Allocator a) => new AllocatorHandle
-            {
-                Index = (ushort)((uint)a & 0xFFFF),
-                Version = 0
-            };
+            public static implicit operator AllocatorHandle(Allocator a) =>
+                new AllocatorHandle { Index = (ushort)((uint)a & 0xFFFF), Version = 0 };
 
             /// <summary>
             /// This allocator's index into the global table of allocator functions.
@@ -565,13 +588,14 @@ namespace Unity.Collections
             /// <param name="block">Outputs the allocated block.</param>
             /// <param name="items">The number of values to allocate for.</param>
             /// <returns>0 if successful. Otherwise, returns the error code from the allocator function.</returns>
-            public int TryAllocateBlock<T>(out Block block, int items) where T : unmanaged
+            public int TryAllocateBlock<T>(out Block block, int items)
+                where T : unmanaged
             {
                 block = new Block
                 {
                     Range = new Range { Items = items, Allocator = this },
                     BytesPerItem = sizeof(T),
-                    Alignment = 1 << math.min(3, math.tzcnt(sizeof(T)))
+                    Alignment = 1 << math.min(3, math.tzcnt(sizeof(T))),
                 };
                 var returnCode = Try(ref block);
                 return returnCode;
@@ -584,7 +608,8 @@ namespace Unity.Collections
             /// <param name="items">The number of values to allocate for.</param>
             /// <returns>The allocated block.</returns>
             /// <exception cref="ArgumentException">Thrown if the allocator is not valid or if the allocation failed.</exception>
-            public Block AllocateBlock<T>(int items) where T : unmanaged
+            public Block AllocateBlock<T>(int items)
+                where T : unmanaged
             {
                 CheckValid(this);
                 var error = TryAllocateBlock<T>(out Block block, items);
@@ -621,7 +646,11 @@ namespace Unity.Collections
             /// This handle.
             /// </summary>
             /// <value>This handle.</value>
-            public AllocatorHandle Handle { get { return this; } set { this = value; } }
+            public AllocatorHandle Handle
+            {
+                get { return this; }
+                set { this = value; }
+            }
 
             /// <summary>
             /// Retrieve the Allocator associated with this allocator handle.
@@ -643,13 +672,19 @@ namespace Unity.Collections
             /// </summary>
             /// <remarks>The AllocatorHandle is a custom allocator if its Index is larger or equal to `FirstUserIndex`.</remarks>
             /// <value>True if this AllocatorHandle is a custom allocator.</value>
-            public bool IsCustomAllocator { get { return this.Index >= FirstUserIndex; } }
+            public bool IsCustomAllocator
+            {
+                get { return this.Index >= FirstUserIndex; }
+            }
 
             /// <summary>
             /// Check whether this allocator will automatically dispose allocations.
             /// </summary>
             /// <value>True if allocations made by this AllocatorHandle are not automatically disposed.</value>
-            public bool IsAutoDispose { get { return ((SharedStatics.IsAutoDispose.Ref.Data.ElementAt(Index >> 6) >> (Index & 63)) & 1) != 0; } }
+            public bool IsAutoDispose
+            {
+                get { return ((SharedStatics.IsAutoDispose.Ref.Data.ElementAt(Index >> 6) >> (Index & 63)) & 1) != 0; }
+            }
 
             /// <summary>
             /// Dispose the allocator.
@@ -674,7 +709,7 @@ namespace Unity.Collections
             public override bool Equals(object obj)
             {
                 if (obj is AllocatorHandle)
-                    return Value == ((AllocatorHandle) obj).Value;
+                    return Value == ((AllocatorHandle)obj).Value;
 
                 if (obj is Allocator)
                     return ToAllocator == ((Allocator)obj);
@@ -911,14 +946,14 @@ namespace Unity.Collections
             /// </summary>
             /// <remarks>The actual allocation size may be larger due to alignment.</remarks>
             /// <value>Number of bytes requested for this block.</value>
-            public long Bytes => (long) BytesPerItem * Range.Items;
+            public long Bytes => (long)BytesPerItem * Range.Items;
 
             /// <summary>
             /// Number of bytes allocated for this block.
             /// </summary>
             /// <remarks>The requested allocation size may be smaller. Any excess is due to alignment</remarks>
             /// <value>Number of bytes allocated for this block.</value>
-            public long AllocatedBytes => (long) BytesPerItem * AllocatedItems;
+            public long AllocatedBytes => (long)BytesPerItem * AllocatedItems;
 
             /// <summary>
             /// The alignment.
@@ -1035,7 +1070,10 @@ namespace Unity.Collections
             /// Check whether an allocator will automatically dispose allocations.
             /// </summary>
             /// <remarks>Allocations made by allocator are not automatically disposed by default.</remarks>
-            bool IsAutoDispose { get { return false; } }
+            bool IsAutoDispose
+            {
+                get { return false; }
+            }
         }
 
         /// <summary>
@@ -1090,14 +1128,15 @@ namespace Unity.Collections
         {
             if (handle.Value >= FirstUserIndex)
                 return Allocator.Persistent;
-            return (Allocator) handle.Value;
+            return (Allocator)handle.Value;
         }
 
         static unsafe int TryLegacy(ref Block block)
         {
             if (block.Range.Pointer == IntPtr.Zero) // Allocate
             {
-                block.Range.Pointer = (IntPtr)Memory.Unmanaged.Allocate(block.Bytes, block.Alignment, LegacyOf(block.Range.Allocator));
+                block.Range.Pointer = (IntPtr)
+                    Memory.Unmanaged.Allocate(block.Bytes, block.Alignment, LegacyOf(block.Range.Allocator));
                 block.AllocatedItems = block.Range.Items;
                 return (block.Range.Pointer == IntPtr.Zero) ? -1 : 0;
             }
@@ -1155,9 +1194,19 @@ namespace Unity.Collections
         [BurstCompile]
         internal struct StackAllocator : IAllocator, IDisposable
         {
-            public AllocatorHandle Handle { get { return m_handle; } set { m_handle = value; } }
-            public Allocator ToAllocator { get { return m_handle.ToAllocator; } }
-            public bool IsCustomAllocator { get { return m_handle.IsCustomAllocator; } }
+            public AllocatorHandle Handle
+            {
+                get { return m_handle; }
+                set { m_handle = value; }
+            }
+            public Allocator ToAllocator
+            {
+                get { return m_handle.ToAllocator; }
+            }
+            public bool IsCustomAllocator
+            {
+                get { return m_handle.IsCustomAllocator; }
+            }
 
             internal AllocatorHandle m_handle;
 
@@ -1190,7 +1239,10 @@ namespace Unity.Collections
 
                 if (block.Bytes == 0) // Free
                 {
-                    if ((byte*)block.Range.Pointer - (byte*)m_storage.Range.Pointer == (long)(m_top - block.AllocatedBytes))
+                    if (
+                        (byte*)block.Range.Pointer - (byte*)m_storage.Range.Pointer
+                        == (long)(m_top - block.AllocatedBytes)
+                    )
                     {
                         m_top -= block.AllocatedBytes;
                         var blockSizeInBytes = block.AllocatedItems * block.BytesPerItem;
@@ -1207,7 +1259,7 @@ namespace Unity.Collections
             }
 
             [BurstCompile]
-			[MonoPInvokeCallback(typeof(TryFunction))]
+            [MonoPInvokeCallback(typeof(TryFunction))]
             public static unsafe int Try(IntPtr allocatorState, ref Block block)
             {
                 return ((StackAllocator*)allocatorState)->Try(ref block);
@@ -1227,11 +1279,21 @@ namespace Unity.Collections
         [BurstCompile]
         internal struct SlabAllocator : IAllocator, IDisposable
         {
-            public AllocatorHandle Handle { get { return m_handle; } set { m_handle = value; } }
+            public AllocatorHandle Handle
+            {
+                get { return m_handle; }
+                set { m_handle = value; }
+            }
 
-            public Allocator ToAllocator { get { return m_handle.ToAllocator; } }
+            public Allocator ToAllocator
+            {
+                get { return m_handle.ToAllocator; }
+            }
 
-            public bool IsCustomAllocator { get { return m_handle.IsCustomAllocator; } }
+            public bool IsCustomAllocator
+            {
+                get { return m_handle.IsCustomAllocator; }
+            }
 
             internal AllocatorHandle m_handle;
 
@@ -1285,8 +1347,8 @@ namespace Unity.Collections
                             if ((word & (1 << bitIndex)) == 0)
                             {
                                 Occupied[wordIndex] |= 1 << bitIndex;
-                                block.Range.Pointer = Storage.Range.Pointer +
-                                    (int)(SlabSizeInBytes * (wordIndex * 32U + bitIndex));
+                                block.Range.Pointer =
+                                    Storage.Range.Pointer + (int)(SlabSizeInBytes * (wordIndex * 32U + bitIndex));
                                 block.AllocatedItems = SlabSizeInBytes / block.BytesPerItem;
                                 allocatedBytes += block.Bytes;
                                 return 0;
@@ -1298,8 +1360,7 @@ namespace Unity.Collections
 
                 if (block.Bytes == 0) // Free
                 {
-                    var slabIndex = ((ulong)block.Range.Pointer - (ulong)Storage.Range.Pointer) >>
-                        Log2SlabSizeInBytes;
+                    var slabIndex = ((ulong)block.Range.Pointer - (ulong)Storage.Range.Pointer) >> Log2SlabSizeInBytes;
                     int wordIndex = (int)(slabIndex >> 5);
                     int bitIndex = (int)(slabIndex & 31);
                     Occupied[wordIndex] &= ~(1 << bitIndex);
@@ -1315,7 +1376,7 @@ namespace Unity.Collections
             }
 
             [BurstCompile]
-			[MonoPInvokeCallback(typeof(TryFunction))]
+            [MonoPInvokeCallback(typeof(TryFunction))]
             public static unsafe int Try(IntPtr allocatorState, ref Block block)
             {
                 return ((SlabAllocator*)allocatorState)->Try(ref block);
@@ -1335,29 +1396,94 @@ namespace Unity.Collections
             internal IntPtr state;
         }
 
-        internal struct Array16<T> where T : unmanaged
+        internal struct Array16<T>
+            where T : unmanaged
         {
-            internal T f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15;
+            internal T f0,
+                f1,
+                f2,
+                f3,
+                f4,
+                f5,
+                f6,
+                f7,
+                f8,
+                f9,
+                f10,
+                f11,
+                f12,
+                f13,
+                f14,
+                f15;
         }
-        internal struct Array256<T> where T : unmanaged
+
+        internal struct Array256<T>
+            where T : unmanaged
         {
-            internal Array16<T> f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15;
+            internal Array16<T> f0,
+                f1,
+                f2,
+                f3,
+                f4,
+                f5,
+                f6,
+                f7,
+                f8,
+                f9,
+                f10,
+                f11,
+                f12,
+                f13,
+                f14,
+                f15;
         }
-        internal struct Array4096<T> where T : unmanaged
+
+        internal struct Array4096<T>
+            where T : unmanaged
         {
-            internal Array256<T> f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15;
+            internal Array256<T> f0,
+                f1,
+                f2,
+                f3,
+                f4,
+                f5,
+                f6,
+                f7,
+                f8,
+                f9,
+                f10,
+                f11,
+                f12,
+                f13,
+                f14,
+                f15;
         }
-        internal struct Array32768<T> : IIndexable<T> where T : unmanaged
+
+        internal struct Array32768<T> : IIndexable<T>
+            where T : unmanaged
         {
-            internal Array4096<T> f0, f1, f2, f3, f4, f5, f6, f7;
-            public int Length { get { return 32768; } set {} }
+            internal Array4096<T> f0,
+                f1,
+                f2,
+                f3,
+                f4,
+                f5,
+                f6,
+                f7;
+            public int Length
+            {
+                get { return 32768; }
+                set { }
+            }
+
             public ref T ElementAt(int index)
             {
                 unsafe
                 {
                     fixed (Array4096<T>* p = &f0)
                     {
-                        return ref UnsafeUtility.AsRef<T>((T*)p + index); }
+                        return ref UnsafeUtility.AsRef<T>((T*)p + index);
+                    }
                 }
             }
         }
@@ -1367,18 +1493,67 @@ namespace Unity.Collections
         /// </summary>
         internal sealed class SharedStatics
         {
-            internal sealed class IsInstalled { internal static readonly SharedStatic<Long1024> Ref = SharedStatic<Long1024>.GetOrCreate<IsInstalled>(); }
-            internal sealed class TableEntry { internal static readonly SharedStatic<Array32768<AllocatorManager.TableEntry>> Ref = SharedStatic<Array32768<AllocatorManager.TableEntry>>.GetOrCreate<TableEntry>(); }
-            internal sealed class IsAutoDispose { internal static readonly SharedStatic<Long1024> Ref = SharedStatic<Long1024>.GetOrCreate<IsAutoDispose>(); }
+            internal sealed class IsInstalled
+            {
+                internal static readonly SharedStatic<Long1024> Ref = SharedStatic<Long1024>.GetOrCreate<IsInstalled>();
+            }
+
+            internal sealed class TableEntry
+            {
+                internal static readonly SharedStatic<Array32768<AllocatorManager.TableEntry>> Ref = SharedStatic<
+                    Array32768<AllocatorManager.TableEntry>
+                >.GetOrCreate<TableEntry>();
+            }
+
+            internal sealed class IsAutoDispose
+            {
+                internal static readonly SharedStatic<Long1024> Ref =
+                    SharedStatic<Long1024>.GetOrCreate<IsAutoDispose>();
+            }
+
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            internal sealed class ChildSpinLock { internal static readonly SharedStatic<Array32768<Spinner>> Ref = SharedStatic<Array32768<Spinner>>.GetOrCreate<ChildSpinLock>(); }
-            internal sealed class ChildSafetyHandles { internal static readonly SharedStatic<Array32768<UnsafeList<AtomicSafetyHandle>>> Ref = SharedStatic<Array32768<UnsafeList<AtomicSafetyHandle>>>.GetOrCreate<ChildSafetyHandles>(); }
+            internal sealed class ChildSpinLock
+            {
+                internal static readonly SharedStatic<Array32768<Spinner>> Ref = SharedStatic<
+                    Array32768<Spinner>
+                >.GetOrCreate<ChildSpinLock>();
+            }
+
+            internal sealed class ChildSafetyHandles
+            {
+                internal static readonly SharedStatic<Array32768<UnsafeList<AtomicSafetyHandle>>> Ref = SharedStatic<
+                    Array32768<UnsafeList<AtomicSafetyHandle>>
+                >.GetOrCreate<ChildSafetyHandles>();
+            }
 #endif
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            internal sealed class Version { internal static readonly SharedStatic<Array32768<ushort>> Ref = SharedStatic<Array32768<ushort>>.GetOrCreate<Version>(); }
-            internal sealed class ChildAllocators { internal static readonly SharedStatic<Array32768<UnsafeList<AllocatorHandle>>> Ref = SharedStatic<Array32768<UnsafeList<AllocatorHandle>>>.GetOrCreate<ChildAllocators>(); }
-            internal sealed class Parent { internal static readonly SharedStatic<Array32768<AllocatorHandle>> Ref = SharedStatic<Array32768<AllocatorHandle>>.GetOrCreate<Parent>(); }
-            internal sealed class IndexInParent { internal static readonly SharedStatic<Array32768<int>> Ref = SharedStatic<Array32768<int>>.GetOrCreate<IndexInParent>(); }
+            internal sealed class Version
+            {
+                internal static readonly SharedStatic<Array32768<ushort>> Ref = SharedStatic<
+                    Array32768<ushort>
+                >.GetOrCreate<Version>();
+            }
+
+            internal sealed class ChildAllocators
+            {
+                internal static readonly SharedStatic<Array32768<UnsafeList<AllocatorHandle>>> Ref = SharedStatic<
+                    Array32768<UnsafeList<AllocatorHandle>>
+                >.GetOrCreate<ChildAllocators>();
+            }
+
+            internal sealed class Parent
+            {
+                internal static readonly SharedStatic<Array32768<AllocatorHandle>> Ref = SharedStatic<
+                    Array32768<AllocatorHandle>
+                >.GetOrCreate<Parent>();
+            }
+
+            internal sealed class IndexInParent
+            {
+                internal static readonly SharedStatic<Array32768<int>> Ref = SharedStatic<
+                    Array32768<int>
+                >.GetOrCreate<IndexInParent>();
+            }
 #endif
         }
 
@@ -1397,9 +1572,11 @@ namespace Unity.Collections
             [ExcludeFromBurstCompatTesting("Uses managed delegate")]
             public static void RegisterDelegate(int index, TryFunction function)
             {
-                if(index >= MaxNumCustomAllocators)
+                if (index >= MaxNumCustomAllocators)
                 {
-                    throw new ArgumentException("index to be registered in TryFunction delegate table exceeds maximum.");
+                    throw new ArgumentException(
+                        "index to be registered in TryFunction delegate table exceeds maximum."
+                    );
                 }
                 // Register TryFunction delegates for managed caller to avoid garbage collections
                 Managed.TryFunctionDelegates[index] = function;
@@ -1414,7 +1591,9 @@ namespace Unity.Collections
             {
                 if (index >= MaxNumCustomAllocators)
                 {
-                    throw new ArgumentException("index to be unregistered in TryFunction delegate table exceeds maximum.");
+                    throw new ArgumentException(
+                        "index to be unregistered in TryFunction delegate table exceeds maximum."
+                    );
                 }
                 Managed.TryFunctionDelegates[index] = default;
             }
@@ -1423,9 +1602,7 @@ namespace Unity.Collections
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public static void Initialize()
-        {
-        }
+        public static void Initialize() { }
 
         /// <summary>
         /// Saves an allocator's function pointers at a particular index in the global function table.
@@ -1435,13 +1612,15 @@ namespace Unity.Collections
         /// <param name="functionPointer">The allocator function to install in the global function table.</param>
         /// <param name="function">The allocator function to install in the global function table.</param>
         /// <param name="IsAutoDispose">Flag indicating if the allocator will automatically dispose allocations.</param>
-        internal static void Install(AllocatorHandle handle,
-                                        IntPtr allocatorState,
-                                        FunctionPointer<TryFunction> functionPointer,
-                                        TryFunction function,
-                                        bool IsAutoDispose = false)
+        internal static void Install(
+            AllocatorHandle handle,
+            IntPtr allocatorState,
+            FunctionPointer<TryFunction> functionPointer,
+            TryFunction function,
+            bool IsAutoDispose = false
+        )
         {
-            if(functionPointer.Value == IntPtr.Zero)
+            if (functionPointer.Value == IntPtr.Zero)
                 handle.Unregister();
             else
             {
@@ -1468,9 +1647,10 @@ namespace Unity.Collections
         /// <param name="function">The allocator function to install in the global function table.</param>
         internal static void Install(AllocatorHandle handle, IntPtr allocatorState, TryFunction function)
         {
-            var functionPointer = (function == null)
-                ? new FunctionPointer<TryFunction>(IntPtr.Zero)
-                : BurstCompiler.CompileFunctionPointer(function);
+            var functionPointer =
+                (function == null)
+                    ? new FunctionPointer<TryFunction>(IntPtr.Zero)
+                    : BurstCompiler.CompileFunctionPointer(function);
             Install(handle, allocatorState, functionPointer, function);
         }
 
@@ -1483,11 +1663,13 @@ namespace Unity.Collections
         /// <param name="isGlobal">Flag indicating if the allocator is a global allocator.</param>
         /// <param name="globalIndex">Index into the global function table of the allocator to be created.</param>
         /// <returns>Returns a handle to the newly registered allocator function.</returns>
-        internal static AllocatorHandle Register(IntPtr allocatorState,
-                                                    FunctionPointer<TryFunction> functionPointer,
-                                                    bool IsAutoDispose = false,
-                                                    bool isGlobal = false,
-                                                    int globalIndex = 0)
+        internal static AllocatorHandle Register(
+            IntPtr allocatorState,
+            FunctionPointer<TryFunction> functionPointer,
+            bool IsAutoDispose = false,
+            bool isGlobal = false,
+            int globalIndex = 0
+        )
         {
             int error;
             int offset;
@@ -1502,11 +1684,17 @@ namespace Unity.Collections
             }
             else
             {
-                error = ConcurrentMask.TryAllocate(ref SharedStatics.IsInstalled.Ref.Data, out offset, (FirstUserIndex + 63) >> 6, (int)(GlobalAllocatorBaseIndex - 1), 1);
+                error = ConcurrentMask.TryAllocate(
+                    ref SharedStatics.IsInstalled.Ref.Data,
+                    out offset,
+                    (FirstUserIndex + 63) >> 6,
+                    (int)(GlobalAllocatorBaseIndex - 1),
+                    1
+                );
             }
             var tableEntry = new TableEntry { state = allocatorState, function = functionPointer.Value };
             AllocatorHandle handle = default;
-            if(ConcurrentMask.Succeeded(error))
+            if (ConcurrentMask.Succeeded(error))
             {
                 handle.Index = (ushort)offset;
                 handle.Install(tableEntry);
@@ -1524,7 +1712,8 @@ namespace Unity.Collections
             return handle;
         }
 
-        static class AllocatorCache<T> where T : unmanaged, IAllocator
+        static class AllocatorCache<T>
+            where T : unmanaged, IAllocator
         {
             public static FunctionPointer<TryFunction> TryFunction;
             public static TryFunction CachedFunction;
@@ -1539,7 +1728,13 @@ namespace Unity.Collections
         /// <param name="isGlobal">Flag indicating if the allocator is a global allocator.</param>
         /// <param name="globalIndex">Index into the global function table of the allocator to be created.</param>
         [ExcludeFromBurstCompatTesting("Uses managed delegate")]
-        public static unsafe void Register<T>(ref this T t, bool IsAutoDispose = false, bool isGlobal = false, int globalIndex = 0) where T : unmanaged, IAllocator
+        public static unsafe void Register<T>(
+            ref this T t,
+            bool IsAutoDispose = false,
+            bool isGlobal = false,
+            int globalIndex = 0
+        )
+            where T : unmanaged, IAllocator
         {
             FunctionPointer<TryFunction> functionPointer;
             var func = t.Function;
@@ -1554,13 +1749,21 @@ namespace Unity.Collections
                 }
                 functionPointer = AllocatorCache<T>.TryFunction;
             }
-            t.Handle = Register((IntPtr)UnsafeUtility.AddressOf(ref t), functionPointer, IsAutoDispose, isGlobal, globalIndex);
+            t.Handle = Register(
+                (IntPtr)UnsafeUtility.AddressOf(ref t),
+                functionPointer,
+                IsAutoDispose,
+                isGlobal,
+                globalIndex
+            );
 
             Managed.RegisterDelegate(t.Handle.Index, t.Function);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (!t.Handle.IsValid)
-                throw new InvalidOperationException("Allocator registration succeeded, but failed to produce valid handle.");
+                throw new InvalidOperationException(
+                    "Allocator registration succeeded, but failed to produce valid handle."
+                );
 #endif
         }
 
@@ -1569,9 +1772,10 @@ namespace Unity.Collections
         /// </summary>
         /// <typeparam name="T">The type of allocator to unregister.</typeparam>
         /// <param name="t">Reference to the allocator.</param>
-        public static void UnmanagedUnregister<T>(ref this T t) where T : unmanaged, IAllocator
+        public static void UnmanagedUnregister<T>(ref this T t)
+            where T : unmanaged, IAllocator
         {
-            if(t.Handle.IsInstalled)
+            if (t.Handle.IsInstalled)
             {
                 t.Handle.Install(default);
                 ConcurrentMask.TryFree(ref SharedStatics.IsInstalled.Ref.Data, t.Handle.Value, 1);
@@ -1585,9 +1789,10 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of allocator to unregister.</typeparam>
         /// <param name="t">Reference to the allocator.</param>
         [ExcludeFromBurstCompatTesting("Uses managed delegate")]
-        public static void Unregister<T>(ref this T t) where T : unmanaged, IAllocator
+        public static void Unregister<T>(ref this T t)
+            where T : unmanaged, IAllocator
         {
-            if(t.Handle.IsInstalled)
+            if (t.Handle.IsInstalled)
             {
                 t.Handle.Dispose();
                 ConcurrentMask.TryFree(ref SharedStatics.IsInstalled.Ref.Data, t.Handle.Value, 1);
@@ -1605,7 +1810,11 @@ namespace Unity.Collections
         /// <param name="globalIndex">Index into the global function table of the allocator to be created.</param>
         /// <returns>Returns reference to the newly created allocator.</returns>
         [ExcludeFromBurstCompatTesting("Register uses managed delegate")]
-        internal static ref T CreateAllocator<T>(AllocatorHandle backingAllocator, bool isGlobal = false, int globalIndex = 0)
+        internal static ref T CreateAllocator<T>(
+            AllocatorHandle backingAllocator,
+            bool isGlobal = false,
+            int globalIndex = 0
+        )
             where T : unmanaged, IAllocator
         {
             unsafe
@@ -1640,9 +1849,7 @@ namespace Unity.Collections
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public static void Shutdown()
-        {
-        }
+        public static void Shutdown() { }
 
         /// <summary>
         /// Index in the global function table of the first user-defined allocator.
@@ -1661,7 +1868,7 @@ namespace Unity.Collections
         /// </summary>
         /// <remarks>Number of global scratchpad allocators reserved in the global function table. Make sure it is larger than or equals to the max number of jobs that can run at the same time.</remarks>
 #if UNITY_2022_2_14F1_OR_NEWER
-        internal static readonly ushort NumGlobalScratchAllocators = (ushort) (JobsUtility.ThreadIndexCount);
+        internal static readonly ushort NumGlobalScratchAllocators = (ushort)(JobsUtility.ThreadIndexCount);
 #else
         internal const ushort NumGlobalScratchAllocators = JobsUtility.MaxJobThreadCount + 1;
 #endif
@@ -1682,7 +1889,9 @@ namespace Unity.Collections
         /// <remarks>The indexes from `GlobalAllocatorBaseIndex` up to `MaxNumCustomAllocators` are reserved which
         /// should not be used for your own allocators.</remarks>
         /// <value>Base index in the global function table for global allocators.</value>
-        internal static readonly uint GlobalAllocatorBaseIndex = (uint)(MaxNumCustomAllocators - MaxNumGlobalAllocators);
+        internal static readonly uint GlobalAllocatorBaseIndex = (uint)(
+            MaxNumCustomAllocators - MaxNumGlobalAllocators
+        );
 
         /// <summary>
         /// Index in the global function table of the first global scratchpad allocator.
@@ -1750,7 +1959,11 @@ namespace Unity.Collections
         /// <param name="isGlobal">Flag indicating if the allocator is a global allocator.</param>
         /// <param name="globalIndex">Index into the global function table of the allocator to be created.</param>
         [ExcludeFromBurstCompatTesting("CreateAllocator is unburstable")]
-        public AllocatorHelper(AllocatorManager.AllocatorHandle backingAllocator, bool isGlobal = false, int globalIndex = 0)
+        public AllocatorHelper(
+            AllocatorManager.AllocatorHandle backingAllocator,
+            bool isGlobal = false,
+            int globalIndex = 0
+        )
         {
             ref var allocator = ref AllocatorManager.CreateAllocator<T>(backingAllocator, isGlobal, globalIndex);
             m_allocator = (T*)UnsafeUtility.AddressOf<T>(ref allocator);

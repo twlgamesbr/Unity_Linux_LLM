@@ -18,6 +18,7 @@ namespace UnityEngine.Rendering
         {
             /// <summary>The current baking step.</summary>
             public abstract ulong currentStep { get; }
+
             /// <summary>The total amount of step.</summary>
             public abstract ulong stepCount { get; }
 
@@ -110,17 +111,32 @@ namespace UnityEngine.Rendering
                 probeData = new ProbeData[k_MaxProbeCountPerBatch];
                 batchResult = new Vector3[k_MaxProbeCountPerBatch];
 
-                var computeBufferTarget = GraphicsBuffer.Target.CopyDestination | GraphicsBuffer.Target.CopySource
+                var computeBufferTarget =
+                    GraphicsBuffer.Target.CopyDestination
+                    | GraphicsBuffer.Target.CopySource
                     | GraphicsBuffer.Target.Structured;
 
                 // Create acceletation structure
                 m_AccelerationStructure = BuildAccelerationStructure(voSettings.collisionMask);
                 var virtualOffsetShader = s_TracingContext.shaderVO;
 
-                probeBuffer = new GraphicsBuffer(computeBufferTarget, k_MaxProbeCountPerBatch, Marshal.SizeOf<ProbeData>());
-                offsetBuffer = new GraphicsBuffer(computeBufferTarget, k_MaxProbeCountPerBatch, Marshal.SizeOf<Vector3>());
-                scratchBuffer = RayTracingHelper.CreateScratchBufferForBuildAndDispatch(m_AccelerationStructure.GetAccelerationStructure(), virtualOffsetShader,
-                    (uint)k_MaxProbeCountPerBatch, 1, 1);
+                probeBuffer = new GraphicsBuffer(
+                    computeBufferTarget,
+                    k_MaxProbeCountPerBatch,
+                    Marshal.SizeOf<ProbeData>()
+                );
+                offsetBuffer = new GraphicsBuffer(
+                    computeBufferTarget,
+                    k_MaxProbeCountPerBatch,
+                    Marshal.SizeOf<Vector3>()
+                );
+                scratchBuffer = RayTracingHelper.CreateScratchBufferForBuildAndDispatch(
+                    m_AccelerationStructure.GetAccelerationStructure(),
+                    virtualOffsetShader,
+                    (uint)k_MaxProbeCountPerBatch,
+                    1,
+                    1
+                );
 
                 var cmd = new CommandBuffer();
                 m_AccelerationStructure.Build(cmd, ref scratchBuffer);
@@ -151,7 +167,14 @@ namespace UnityEngine.Rendering
                     Span<bool> perSubMeshOpaqueness = stackalloc bool[subMeshCount];
                     perSubMeshOpaqueness.Fill(true);
 
-                    accelStruct.AddInstance(EntityId.ToULong(renderer.component.GetEntityId()), renderer.component, maskAndMatDummy, maskAndMatDummy, perSubMeshOpaqueness, 1);
+                    accelStruct.AddInstance(
+                        EntityId.ToULong(renderer.component.GetEntityId()),
+                        renderer.component,
+                        maskAndMatDummy,
+                        maskAndMatDummy,
+                        perSubMeshOpaqueness,
+                        1
+                    );
                 }
 
                 foreach (var terrain in contributors.terrains)
@@ -160,7 +183,14 @@ namespace UnityEngine.Rendering
                     if ((layerMask & mask) == 0)
                         continue;
 
-                    accelStruct.AddInstance(EntityId.ToULong(terrain.component.GetEntityId()), terrain.component, new uint[1] { 0xFFFFFFFF }, new uint[1] { 0xFFFFFFFF }, new bool[1] { true }, 1);
+                    accelStruct.AddInstance(
+                        EntityId.ToULong(terrain.component.GetEntityId()),
+                        terrain.component,
+                        new uint[1] { 0xFFFFFFFF },
+                        new uint[1] { 0xFFFFFFFF },
+                        new bool[1] { true },
+                        1
+                    );
                 }
 
                 return accelStruct;
@@ -220,8 +250,7 @@ namespace UnityEngine.Rendering
                         validityThreshold = validityThreshold,
                         probeIndex = batchPosIdx,
                     };
-                }
-                while (++batchPosIdx < positions.Length && probeCountInBatch < k_MaxProbeCountPerBatch);
+                } while (++batchPosIdx < positions.Length && probeCountInBatch < k_MaxProbeCountPerBatch);
 
                 if (probeCountInBatch == 0)
                     return true;
@@ -262,7 +291,7 @@ namespace UnityEngine.Rendering
             }
         }
 
-        static internal void RecomputeVOForDebugOnly()
+        internal static void RecomputeVOForDebugOnly()
         {
             var prv = ProbeReferenceVolume.instance;
             if (prv.perSceneDataList.Count == 0)
@@ -382,7 +411,12 @@ namespace UnityEngine.Rendering
     {
         struct TouchupsPerCell
         {
-            public List<(ProbeAdjustmentVolume touchup, ProbeReferenceVolume.Volume obb, Vector3 center, Vector3 offset)> appliers;
+            public List<(
+                ProbeAdjustmentVolume touchup,
+                ProbeReferenceVolume.Volume obb,
+                Vector3 center,
+                Vector3 offset
+            )> appliers;
             public List<(ProbeAdjustmentVolume touchup, ProbeReferenceVolume.Volume obb, Vector3 center)> overriders;
         }
 
@@ -396,7 +430,10 @@ namespace UnityEngine.Rendering
             {
                 var volume = adjustment.volume;
                 var mode = volume.mode;
-                if (mode != ProbeAdjustmentVolume.Mode.ApplyVirtualOffset && mode != ProbeAdjustmentVolume.Mode.OverrideVirtualOffsetSettings)
+                if (
+                    mode != ProbeAdjustmentVolume.Mode.ApplyVirtualOffset
+                    && mode != ProbeAdjustmentVolume.Mode.OverrideVirtualOffsetSettings
+                )
                     continue;
 
                 hasAppliers |= mode == ProbeAdjustmentVolume.Mode.ApplyVirtualOffset;
@@ -412,14 +449,19 @@ namespace UnityEngine.Rendering
                         {
                             var cell = PosToIndex(new Vector3Int(x, y, z));
                             if (!cellToVolumes.TryGetValue(cell, out var volumes))
-                                cellToVolumes[cell] = volumes = new TouchupsPerCell() { appliers = new(), overriders = new() };
+                                cellToVolumes[cell] = volumes = new TouchupsPerCell()
+                                {
+                                    appliers = new(),
+                                    overriders = new(),
+                                };
 
                             if (mode == ProbeAdjustmentVolume.Mode.ApplyVirtualOffset)
-                                volumes.appliers.Add((volume, adjustment.obb, volume.transform.position, volume.GetVirtualOffset()));
+                                volumes.appliers.Add(
+                                    (volume, adjustment.obb, volume.transform.position, volume.GetVirtualOffset())
+                                );
                             else
                                 volumes.overriders.Add((volume, adjustment.obb, volume.transform.position));
                         }
-
                     }
                 }
             }
@@ -427,7 +469,11 @@ namespace UnityEngine.Rendering
             return cellToVolumes;
         }
 
-        static void DoApplyVirtualOffsetsFromAdjustmentVolumes(NativeArray<Vector3> positions, NativeArray<Vector3> offsets, Dictionary<int, TouchupsPerCell> cellToVolumes)
+        static void DoApplyVirtualOffsetsFromAdjustmentVolumes(
+            NativeArray<Vector3> positions,
+            NativeArray<Vector3> offsets,
+            Dictionary<int, TouchupsPerCell> cellToVolumes
+        )
         {
             for (int i = 0; i < positions.Length; i++)
             {
@@ -505,15 +551,17 @@ namespace UnityEngine.Rendering
             m_VirtualOffsets = newed ? Activator.CreateInstance(m_VirtualOffsetsType, ptr) : null;
             Debug.Assert(m_VirtualOffsets != null, "Unexpected, could not new up a VirtualOffsets");
         }
-        internal void SetVirtualOffsets(Vector3[] offsets) =>
-            InvokeMethod(new object[] { offsets }, out _);
 
-        public void Dispose() =>
-            InvokeMethod(new object[] { }, out _);
+        internal void SetVirtualOffsets(Vector3[] offsets) => InvokeMethod(new object[] { offsets }, out _);
+
+        public void Dispose() => InvokeMethod(new object[] { }, out _);
 
         void InvokeMethod(object[] parameters, out object result, [CallerMemberName] string methodName = "")
         {
-            MethodInfo methodInfo = m_VirtualOffsetsType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            MethodInfo methodInfo = m_VirtualOffsetsType.GetMethod(
+                methodName,
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+            );
             bool gotMethod = methodInfo != null;
             Debug.Assert(gotMethod, $"Unexpected, could not find {methodName} on VirtualOffsets");
             result = !gotMethod ? null : methodInfo.Invoke(m_VirtualOffsets, parameters);

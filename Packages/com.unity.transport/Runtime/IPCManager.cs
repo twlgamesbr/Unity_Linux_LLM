@@ -1,11 +1,11 @@
 using System;
 using System.Runtime.InteropServices;
+using Unity.Burst;
 using Unity.Collections;
-using Unity.Networking.Transport.Utilities;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
-using Unity.Burst;
+using Unity.Networking.Transport.Utilities;
 using UnityEngine;
 
 namespace Unity.Networking.Transport
@@ -27,9 +27,14 @@ namespace Unity.Networking.Transport
         [StructLayout(LayoutKind.Explicit)]
         internal unsafe struct IPCData
         {
-            [FieldOffset(0)] public ushort fromPort;
-            [FieldOffset(2)] public int length;
-            [FieldOffset(6)] public fixed byte data[NetworkParameterConstants.AbsoluteMaxMessageSize];
+            [FieldOffset(0)]
+            public ushort fromPort;
+
+            [FieldOffset(2)]
+            public int length;
+
+            [FieldOffset(6)]
+            public fixed byte data[NetworkParameterConstants.AbsoluteMaxMessageSize];
         }
 
         private NativeMultiQueue<IPCData> m_IPCQueue;
@@ -169,7 +174,12 @@ namespace Unity.Networking.Transport
             return m_IPCQueue.Peek(localChannel, out _);
         }
 
-        public unsafe int ReceiveMessageEx(NetworkEndpoint local, void* payloadData, int payloadLen, ref NetworkEndpoint remote)
+        public unsafe int ReceiveMessageEx(
+            NetworkEndpoint local,
+            void* payloadData,
+            int payloadLen,
+            ref NetworkEndpoint remote
+        )
         {
             if (!GetChannelByEndpoint(ref local, out var localChannel))
                 return 0;

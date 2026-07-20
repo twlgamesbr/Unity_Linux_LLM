@@ -35,7 +35,9 @@ namespace Unity.Web.Stripping.Editor
             public string FrameworkFile { get; internal set; }
 
             public BuildAlreadyInstrumented(string frameworkFile)
-                : base($"The build appears to be already instrumented for profiling. JavaScript framework file: {frameworkFile}")
+                : base(
+                    $"The build appears to be already instrumented for profiling. JavaScript framework file: {frameworkFile}"
+                )
             {
                 FrameworkFile = frameworkFile;
             }
@@ -45,6 +47,7 @@ namespace Unity.Web.Stripping.Editor
         /// Paths to all submodule definitions files
         /// </summary>
         public List<string> SubmoduleDefinitionFiles { get; set; } = new();
+
         /// <summary>
         /// Path to a symbol file if the build uses external debug symbols.
         /// </summary>
@@ -125,12 +128,14 @@ namespace Unity.Web.Stripping.Editor
         /// <summary>
         /// Log function code replacement for un-minified code.
         /// </summary>
-        public string LogFunctionCode { get; set; } = "var wasmImports = {\n  \"log_execution\": function(funcId, labelId) { },";
+        public string LogFunctionCode { get; set; } =
+            "var wasmImports = {\n  \"log_execution\": function(funcId, labelId) { },";
 
         /// <summary>
         /// Log function code replacement for minified code.
         /// </summary>
-        public string MinifiedLogFunctionCode { get; set; } = "var wasmImports={\"log_execution\":function(funcId, labelId){},";
+        public string MinifiedLogFunctionCode { get; set; } =
+            "var wasmImports={\"log_execution\":function(funcId, labelId){},";
 
         /// <summary>
         /// Log output. Default: System.Console.Out
@@ -142,18 +147,36 @@ namespace Unity.Web.Stripping.Editor
         /// </summary>
         public TextWriter ErrorLog = Console.Error;
 
-        private string m_TempInstrumentationConfigFile = Path.Combine(Path.GetTempPath(), $"tmp_config_{Path.GetRandomFileName()}.txt");
-        private string m_TempUnpackedWasmFile = Path.Combine(Path.GetTempPath(), $"tmp_{Path.GetRandomFileName()}.wasm");
-        private string m_TempInstrumentedWasmFile = Path.Combine(Path.GetTempPath(), $"tmp_{Path.GetRandomFileName()}_instrumented.wasm");
-        private string m_TempUnpackedSymbolFile = Path.Combine(Path.GetTempPath(), $"tmp_{Path.GetRandomFileName()}.symbols.json");
-        private string m_TempUnpackedFrameworkFile = Path.Combine(Path.GetTempPath(), $"tmp_{Path.GetRandomFileName()}.framework.js");
-        private string m_TempPatchedFrameworkFile = Path.Combine(Path.GetTempPath(), $"tmp_{Path.GetRandomFileName()}.framework.js");
+        private string m_TempInstrumentationConfigFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_config_{Path.GetRandomFileName()}.txt"
+        );
+        private string m_TempUnpackedWasmFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_{Path.GetRandomFileName()}.wasm"
+        );
+        private string m_TempInstrumentedWasmFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_{Path.GetRandomFileName()}_instrumented.wasm"
+        );
+        private string m_TempUnpackedSymbolFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_{Path.GetRandomFileName()}.symbols.json"
+        );
+        private string m_TempUnpackedFrameworkFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_{Path.GetRandomFileName()}.framework.js"
+        );
+        private string m_TempPatchedFrameworkFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_{Path.GetRandomFileName()}.framework.js"
+        );
         private string m_WasmImportsModule = "env";
         private Compression? m_Compression = null;
 
         // Regex and replacements to modify framework file
-        private static readonly Regex WasmImportModuleRegex = new ("[\"']?([\\w\\d_-]+)[\"']?:\\s*wasmImports");
-        private static readonly Regex WasmImportDefinitionRegex = new (@"(var )?wasmImports\s*=\s*\{");
+        private static readonly Regex WasmImportModuleRegex = new("[\"']?([\\w\\d_-]+)[\"']?:\\s*wasmImports");
+        private static readonly Regex WasmImportDefinitionRegex = new(@"(var )?wasmImports\s*=\s*\{");
 
         /// <summary>
         /// Adds instrumentation code to a WebAssembly file to profile for used/unused submodules.
@@ -163,7 +186,13 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="frameworkFile">The input JavaScript framework file.</param>
         /// <param name="outputFrameworkFile">The output JavaScript framework file with submodule profiling code.</param>
         /// <param name="instrumentationDataOutputPath">The output path for generated functions.json and labels.json file.</param>
-        public void InstrumentBuild(string wasmFile, string outputWasmFile, string frameworkFile, string outputFrameworkFile, string instrumentationDataOutputPath)
+        public void InstrumentBuild(
+            string wasmFile,
+            string outputWasmFile,
+            string frameworkFile,
+            string outputFrameworkFile,
+            string instrumentationDataOutputPath
+        )
         {
             try
             {
@@ -185,7 +214,14 @@ namespace Unity.Web.Stripping.Editor
                 AddSubmoduleProfilingCodeToFramework(frameworkFile, outputFrameworkFile);
 
                 // Instrument WebAssembly
-                InstrumentWebAssembly(wasmFile, outputWasmFile, instrumentationDataOutputPath, submoduleDefinition, methodMap, symbolFile);
+                InstrumentWebAssembly(
+                    wasmFile,
+                    outputWasmFile,
+                    instrumentationDataOutputPath,
+                    submoduleDefinition,
+                    methodMap,
+                    symbolFile
+                );
             }
             finally
             {
@@ -203,7 +239,7 @@ namespace Unity.Web.Stripping.Editor
                 SevenZipPath = SevenZipPath,
                 BrotliPath = BrotliPath,
                 Log = (text) => Log.WriteLine(text),
-                ErrorLog = (text) => ErrorLog.WriteLine(text)
+                ErrorLog = (text) => ErrorLog.WriteLine(text),
             };
         }
 
@@ -266,16 +302,21 @@ namespace Unity.Web.Stripping.Editor
                 m_WasmImportsModule = FindWasmImportsName(frameworkFile, frameWorkContent);
 
                 // Search for definition of wasmImports and inject log_execution function
-                frameWorkContent = WasmImportDefinitionRegex.Replace(frameWorkContent, (match) =>
-                {
-                    // Emscripten 4 builds assign wasmImport later in certain configurations. Drop the "var " in this case.
-                    bool usesVar = match.Value.StartsWith("var wasmImports");
-                    bool useMinifiedCode = match.Value != "var wasmImports = {" && match.Value != "wasmImports = {";
-                    if (usesVar)
-                        return useMinifiedCode ? MinifiedLogFunctionCode : LogFunctionCode;
-                    else
-                        return useMinifiedCode ? MinifiedLogFunctionCode.Replace("var wasmImports", "wasmImports") : LogFunctionCode.Replace("var wasmImports", "wasmImports");
-                });
+                frameWorkContent = WasmImportDefinitionRegex.Replace(
+                    frameWorkContent,
+                    (match) =>
+                    {
+                        // Emscripten 4 builds assign wasmImport later in certain configurations. Drop the "var " in this case.
+                        bool usesVar = match.Value.StartsWith("var wasmImports");
+                        bool useMinifiedCode = match.Value != "var wasmImports = {" && match.Value != "wasmImports = {";
+                        if (usesVar)
+                            return useMinifiedCode ? MinifiedLogFunctionCode : LogFunctionCode;
+                        else
+                            return useMinifiedCode
+                                ? MinifiedLogFunctionCode.Replace("var wasmImports", "wasmImports")
+                                : LogFunctionCode.Replace("var wasmImports", "wasmImports");
+                    }
+                );
 
                 // Write patched framework file and compress if necessary
                 switch (compressionType)
@@ -334,10 +375,10 @@ namespace Unity.Web.Stripping.Editor
                     KeepDebugInformation = KeepDebugInformation,
                     EnableSimdSupport = true,
                     EnableEmscripten4Features = EnableEmscripten4Features,
-                    Development =  Development,
+                    Development = Development,
                     CodeOptimization = CodeOptimization,
                     Log = Log,
-                    ErrorLog = ErrorLog
+                    ErrorLog = ErrorLog,
                 };
 
                 // Decompress WebAssembly if necessary
@@ -375,14 +416,13 @@ namespace Unity.Web.Stripping.Editor
                     SubmodulesToInstrument = SubmodulesToInstrument,
                     MethodMap = methodMap,
                     SymbolFile = symbolFile,
-                    ErrorLog = ErrorLog
+                    ErrorLog = ErrorLog,
                 };
                 if (functionMap != null)
                 {
                     instrumentationConfigWriter.FunctionMap = functionMap;
                 }
                 instrumentationConfigWriter.Write(m_TempInstrumentationConfigFile);
-
 
                 // Run wasm-opt instrumentation pass
                 // Instrument WebAssembly
@@ -398,7 +438,7 @@ namespace Unity.Web.Stripping.Editor
                         InstrumentationConfigFile = m_TempInstrumentationConfigFile,
                         WasmImportModule = m_WasmImportsModule,
                         LabelsFile = labelsFile,
-                        FunctionsMapFile = functionsMapFile
+                        FunctionsMapFile = functionsMapFile,
                     }
                 );
 
@@ -426,7 +466,11 @@ namespace Unity.Web.Stripping.Editor
             }
         }
 
-        private void ReplaceNamesInFunctionsMapFile(string functionsMapFile, Dictionary<string, long>? symbolFile, Dictionary<long, string>? functionIndexMap)
+        private void ReplaceNamesInFunctionsMapFile(
+            string functionsMapFile,
+            Dictionary<string, long>? symbolFile,
+            Dictionary<long, string>? functionIndexMap
+        )
         {
             // Skip this if build has embedded debug symbols
             if (symbolFile == null || functionIndexMap == null)
@@ -445,7 +489,9 @@ namespace Unity.Web.Stripping.Editor
                 inverseFunctionIndexMap[entry.Value] = entry.Key;
             }
 
-            var functionsMap = JsonConvert.DeserializeObject<Dictionary<long, string>>(File.ReadAllText(functionsMapFile));
+            var functionsMap = JsonConvert.DeserializeObject<Dictionary<long, string>>(
+                File.ReadAllText(functionsMapFile)
+            );
             // Skip if functionsMapFile could not be loaded
             if (functionsMap == null)
                 return;
@@ -456,8 +502,9 @@ namespace Unity.Web.Stripping.Editor
                 // Convert function id to proper name with two stage process
                 // functionId -> function index in original wasm -> function name
 
-                if (inverseFunctionIndexMap.TryGetValue(entry.Value, out var functionIndex) &&
-                    inverseSymbolFile.TryGetValue(functionIndex, out var functionName)
+                if (
+                    inverseFunctionIndexMap.TryGetValue(entry.Value, out var functionIndex)
+                    && inverseSymbolFile.TryGetValue(functionIndex, out var functionName)
                 )
                 {
                     // Set proper function name in entry

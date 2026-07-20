@@ -115,7 +115,11 @@ namespace Unity.Physics
         /// <para> If required, the lists will be resized when <see cref="Insert">inserting</see> new nodes. The caller is responsible
         /// for disposing the lists when required.</para>
         /// </summary>
-        public unsafe BoundingVolumeHierarchy(UnsafeList<Node>* nodes, UnsafeList<CollisionFilter>* nodeFilters, bool clear = true)
+        public unsafe BoundingVolumeHierarchy(
+            UnsafeList<Node>* nodes,
+            UnsafeList<CollisionFilter>* nodeFilters,
+            bool clear = true
+        )
         {
             SafetyChecks.CheckAreEqualAndThrow(nodes->Length, nodeFilters->Length);
             SafetyChecks.CheckAreEqualAndThrow(true, nodes->IsCreated && nodeFilters->IsCreated);
@@ -162,16 +166,20 @@ namespace Unity.Physics
         public struct Node
         {
             [FieldOffset(0)]
-            public FourTransposedAabbs Bounds;              // 96 bytes
+            public FourTransposedAabbs Bounds; // 96 bytes
+
             [FieldOffset(96)]
-            public int4 Data;                               // 16 bytes
+            public int4 Data; // 16 bytes
+
             [FieldOffset(112)]
             // Packed node data: 24 bits for parent node index followed by 8 bits for leaf/internal node type flag.
-            private uint m_NodeData;                        // 4 bytes
+            private uint m_NodeData; // 4 bytes
+
             [FieldOffset(116)]
             public unsafe fixed ushort NumFreeLeafSlots[4]; // 8 bytes
+
             [FieldOffset(124)]
-            public uint NumElements;                        // 4 bytes
+            public uint NumElements; // 4 bytes
 
             static readonly int k_ParentShift = 8;
             static readonly uint k_ParentMask = 0xFFFFFF00;
@@ -211,7 +219,7 @@ namespace Unity.Physics
                             Data = int4.zero,
                             NumElements = 0,
                             Parent = 0,
-                            IsLeaf = false
+                            IsLeaf = false,
                         };
                         InitFreeSlotsArray(node.NumFreeLeafSlots, 4);
                         return node;
@@ -234,7 +242,7 @@ namespace Unity.Physics
                             Data = new int4(-1),
                             NumElements = 0,
                             Parent = 0,
-                            IsLeaf = true
+                            IsLeaf = true,
                         };
                         // Note: children store their free leaf slots count in the first entry.
                         node.NumFreeLeafSlots[0] = 4;
@@ -374,7 +382,10 @@ namespace Unity.Physics
 
             public IncrementalInsertionContext(int capacity, Allocator allocator)
             {
-                m_ElementLocationDataHashMap = new NativeParallelMultiHashMap<int, ElementLocationData>(capacity, allocator);
+                m_ElementLocationDataHashMap = new NativeParallelMultiHashMap<int, ElementLocationData>(
+                    capacity,
+                    allocator
+                );
             }
 
             public bool IsCreated => m_ElementLocationDataHashMap.IsCreated;
@@ -394,12 +405,15 @@ namespace Unity.Physics
 
             public void Insert(ref BoundingVolumeHierarchy bvh, InsertionResult result)
             {
-                m_ElementLocationDataHashMap.Add(result.NodeIndex, new ElementLocationData
-                {
-                    ElementIndex = result.ElementIndex,
-                    NodeIndex = result.NodeIndex,
-                    LeafSlotIndex = result.ChildIndex
-                });
+                m_ElementLocationDataHashMap.Add(
+                    result.NodeIndex,
+                    new ElementLocationData
+                    {
+                        ElementIndex = result.ElementIndex,
+                        NodeIndex = result.NodeIndex,
+                        LeafSlotIndex = result.ChildIndex,
+                    }
+                );
 
                 if (result.LeafNodeWasMigrated)
                 {
@@ -413,13 +427,15 @@ namespace Unity.Physics
                     {
                         if (migratedNode.IsChildValid(j))
                         {
-                            m_ElementLocationDataHashMap.Add(result.MigratedLeafNodeIndexNew,
+                            m_ElementLocationDataHashMap.Add(
+                                result.MigratedLeafNodeIndexNew,
                                 new ElementLocationData
                                 {
                                     ElementIndex = migratedNode.Data[j],
                                     NodeIndex = result.MigratedLeafNodeIndexNew,
-                                    LeafSlotIndex = j
-                                });
+                                    LeafSlotIndex = j,
+                                }
+                            );
                         }
                     }
                 }
@@ -463,7 +479,7 @@ namespace Unity.Physics
             {
                 None = 0,
                 UpdateAabb = 1 << 0,
-                UpdateFilter = 1 << 1
+                UpdateFilter = 1 << 1,
             }
 
             public Aabb Aabb;
@@ -483,10 +499,14 @@ namespace Unity.Physics
             }
         }
 
-        public void Remove(NativeArray<RemovalData> removals, NativeArray<CollisionFilter> leafFiltersInfo)
-            => RemoveOrUpdate(removals, new NativeArray<UpdateData>(), leafFiltersInfo);
+        public void Remove(NativeArray<RemovalData> removals, NativeArray<CollisionFilter> leafFiltersInfo) =>
+            RemoveOrUpdate(removals, new NativeArray<UpdateData>(), leafFiltersInfo);
 
-        public unsafe void RemoveOrUpdate(NativeArray<RemovalData> removals, NativeArray<UpdateData> updates, NativeArray<CollisionFilter> leafFiltersInfo)
+        public unsafe void RemoveOrUpdate(
+            NativeArray<RemovalData> removals,
+            NativeArray<UpdateData> updates,
+            NativeArray<CollisionFilter> leafFiltersInfo
+        )
         {
             var elementsToProcess = removals.Length + updates.Length;
             SafetyChecks.CheckAreEqualAndThrow(true, elementsToProcess > 0);
@@ -550,7 +570,10 @@ namespace Unity.Physics
             for (int i = updates.Length - 1; i >= 0; --i)
             {
                 var updateData = updates[i];
-                SafetyChecks.CheckAreEqualAndThrow(true, updateData.UpdateCommandFlags != (byte)UpdateData.CommandFlags.None);
+                SafetyChecks.CheckAreEqualAndThrow(
+                    true,
+                    updateData.UpdateCommandFlags != (byte)UpdateData.CommandFlags.None
+                );
                 var slotIndex = updateData.LeafSlotIndex;
                 ref var leafNode = ref GetNode(updateData.NodeIndex);
                 SafetyChecks.CheckAreEqualAndThrow(true, leafNode.IsLeaf);
@@ -642,10 +665,9 @@ namespace Unity.Physics
                 }
 
                 lastParentIndex = parentIndex;
-            }
-            while (lastParentIndex != 0);   // Note: The parent of the root of the tree is the invalid node with
-                                            // index 0. Once we have reached this node we are done processing the root
-                                            // (index 1) and are done.
+            } while (lastParentIndex != 0); // Note: The parent of the root of the tree is the invalid node with
+            // index 0. Once we have reached this node we are done processing the root
+            // (index 1) and are done.
 #if BVH_CHECK_INTEGRITY
             CheckIntegrity();
 #endif
@@ -758,8 +780,11 @@ namespace Unity.Physics
                         var surfaceArea = union.SurfaceArea;
 
                         var childNode = m_Nodes + currentNode->Data[i];
-                        data.Score = math.select(surfaceArea, surfaceArea * kNoFreeSlotPenaltyFactor,
-                            currentNode->NumFreeLeafSlots[i] == 0);
+                        data.Score = math.select(
+                            surfaceArea,
+                            surfaceArea * kNoFreeSlotPenaltyFactor,
+                            currentNode->NumFreeLeafSlots[i] == 0
+                        );
                         data.NodePtr = childNode;
                     }
                     else
@@ -948,7 +973,7 @@ namespace Unity.Physics
                     NodeIndex = newLeafNodeIndex,
                     ChildIndex = 0,
                     MigratedLeafNodeIndexNew = migratedLeafNodeIndexNew,
-                    MigratedLeafNodeIndexOld = migratedLeafNodeIndexOld
+                    MigratedLeafNodeIndexOld = migratedLeafNodeIndexOld,
                 };
             }
             // else: inner node
@@ -1000,7 +1025,12 @@ namespace Unity.Physics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static unsafe void UpdateNumFreeLeafSlots(Node* nodes, int2* nodeIndexStack, int nodeIndexStackCount, ushort slotIncrement)
+        static unsafe void UpdateNumFreeLeafSlots(
+            Node* nodes,
+            int2* nodeIndexStack,
+            int nodeIndexStackCount,
+            ushort slotIncrement
+        )
         {
             for (int i = nodeIndexStackCount - 1; i >= 0; --i)
             {
@@ -1015,7 +1045,11 @@ namespace Unity.Physics
         /// <seealso cref="Broadphase.CalculateTreeSplitDataJob"/>
         /// <seealso cref="Broadphase.ScheduleFindOverlapsJobs"/>
         /// </summary>
-        public unsafe void CalculateTreeSplitData(NativeArray<Builder.Range> branchRanges, int threadCount, out int branchCount)
+        public unsafe void CalculateTreeSplitData(
+            NativeArray<Builder.Range> branchRanges,
+            int threadCount,
+            out int branchCount
+        )
         {
             // Note: this function is a modified version of BoundingVolumeHierarchy.BuildFirstNLevels, containing
             // only the portions relevant to the calculation of the tree split data, which is reported as the number of branches
@@ -1047,7 +1081,11 @@ namespace Unity.Physics
                 for (int i = 0; i < level0Size; ++i)
                 {
                     var node = m_Nodes + level0[i].Root;
-                    if (node->IsInternal && level0[i].Length > smallRangeThreshold && freeNodeIndex < maxNumBranchesMinusOneSplit)
+                    if (
+                        node->IsInternal
+                        && level0[i].Length > smallRangeThreshold
+                        && freeNodeIndex < maxNumBranchesMinusOneSplit
+                    )
                     {
                         var validChildren = 0;
                         for (int j = 0; j < 4; ++j)
@@ -1085,15 +1123,19 @@ namespace Unity.Physics
                 level0Size = level1Size;
                 level1Size = 0;
                 smallRangeThreshold = largestAllowedRange;
-            }
-            while (level0Size < Constants.MaxNumTreeBranches && largestRangeInLastLevel > largestAllowedRange);
+            } while (level0Size < Constants.MaxNumTreeBranches && largestRangeInLastLevel > largestAllowedRange);
 
             RangeSizeAndIndex* rangeMapBySize = stackalloc RangeSizeAndIndex[Constants.MaxNumTreeBranches];
 
             int nodeOffset = freeNodeIndex;
             for (int i = 0; i < level0Size; i++)
             {
-                rangeMapBySize[i] = new RangeSizeAndIndex { RangeIndex = i, RangeSize = level0[i].Length, RangeFirstNodeOffset = nodeOffset };
+                rangeMapBySize[i] = new RangeSizeAndIndex
+                {
+                    RangeIndex = i,
+                    RangeSize = level0[i].Length,
+                    RangeFirstNodeOffset = nodeOffset,
+                };
                 nodeOffset += level0[i].Length;
             }
 
@@ -1118,21 +1160,28 @@ namespace Unity.Physics
             void FlushIfNeeded();
         }
 
-        public unsafe void BvhOverlap<T>(ref T pairWriter, BoundingVolumeHierarchy other, int rootA = 1, int rootB = 1) where T : struct, ITreeOverlapCollector
+        public unsafe void BvhOverlap<T>(ref T pairWriter, BoundingVolumeHierarchy other, int rootA = 1, int rootB = 1)
+            where T : struct, ITreeOverlapCollector
         {
             TreeOverlap(ref pairWriter, m_Nodes, other.m_Nodes, m_NodeFilters, other.m_NodeFilters, rootA, rootB);
         }
 
-        public unsafe void SelfBvhOverlap<T>(ref T pairWriter, int rootA = 1, int rootB = 1) where T : struct, ITreeOverlapCollector
+        public unsafe void SelfBvhOverlap<T>(ref T pairWriter, int rootA = 1, int rootB = 1)
+            where T : struct, ITreeOverlapCollector
         {
             TreeOverlap(ref pairWriter, m_Nodes, m_Nodes, m_NodeFilters, m_NodeFilters, rootA, rootB);
         }
 
         public static unsafe void TreeOverlap<T>(
             ref T pairWriter,
-            Node* treeA, Node* treeB,
-            CollisionFilter* collisionFilterA = null, CollisionFilter* collisionFilterB = null,
-            int rootA = 1, int rootB = 1) where T : struct, ITreeOverlapCollector
+            Node* treeA,
+            Node* treeB,
+            CollisionFilter* collisionFilterA = null,
+            CollisionFilter* collisionFilterB = null,
+            int rootA = 1,
+            int rootB = 1
+        )
+            where T : struct, ITreeOverlapCollector
         {
             int* binaryStackA = stackalloc int[Constants.BinaryStackSize];
             int* binaryStackB = stackalloc int[Constants.BinaryStackSize];
@@ -1150,9 +1199,19 @@ namespace Unity.Physics
                 do
                 {
                     int nodeIndex = *(--stack);
-                    if (collisionFilterA == null || CollisionFilter.IsCollisionEnabled(collisionFilterA[nodeIndex], collisionFilterB[nodeIndex]))
+                    if (
+                        collisionFilterA == null
+                        || CollisionFilter.IsCollisionEnabled(collisionFilterA[nodeIndex], collisionFilterB[nodeIndex])
+                    )
                     {
-                        ProcessAA(ref treeA[nodeIndex], compressedDataBuffer, ref stack, ref stackA, ref stackB, ref pairWriter);
+                        ProcessAA(
+                            ref treeA[nodeIndex],
+                            compressedDataBuffer,
+                            ref stack,
+                            ref stackA,
+                            ref stackB,
+                            ref pairWriter
+                        );
                     }
                     pairWriter.FlushIfNeeded();
 
@@ -1161,14 +1220,28 @@ namespace Unity.Physics
                         int nodeIndexA = *(--stackA);
                         int nodeIndexB = *(--stackB);
 
-                        if (collisionFilterA == null || CollisionFilter.IsCollisionEnabled(collisionFilterA[nodeIndexA], collisionFilterB[nodeIndexB]))
+                        if (
+                            collisionFilterA == null
+                            || CollisionFilter.IsCollisionEnabled(
+                                collisionFilterA[nodeIndexA],
+                                collisionFilterB[nodeIndexB]
+                            )
+                        )
                         {
-                            ProcessAB(&treeA[nodeIndexA], &treeA[nodeIndexB], treeA, treeA, compressedDataBuffer, ref stackA, ref stackB, ref pairWriter);
+                            ProcessAB(
+                                &treeA[nodeIndexA],
+                                &treeA[nodeIndexB],
+                                treeA,
+                                treeA,
+                                compressedDataBuffer,
+                                ref stackA,
+                                ref stackB,
+                                ref pairWriter
+                            );
                         }
                         pairWriter.FlushIfNeeded();
                     }
-                }
-                while (stack > unaryStack);
+                } while (stack > unaryStack);
             }
             else
             {
@@ -1179,19 +1252,41 @@ namespace Unity.Physics
                 {
                     int nodeIndexA = *(--stackA);
                     int nodeIndexB = *(--stackB);
-                    if (collisionFilterA == null || CollisionFilter.IsCollisionEnabled(collisionFilterA[nodeIndexA], collisionFilterB[nodeIndexB]))
+                    if (
+                        collisionFilterA == null
+                        || CollisionFilter.IsCollisionEnabled(
+                            collisionFilterA[nodeIndexA],
+                            collisionFilterB[nodeIndexB]
+                        )
+                    )
                     {
-                        ProcessAB(&treeA[nodeIndexA], &treeB[nodeIndexB], treeA, treeB, compressedDataBuffer, ref stackA, ref stackB, ref pairWriter);
+                        ProcessAB(
+                            &treeA[nodeIndexA],
+                            &treeB[nodeIndexB],
+                            treeA,
+                            treeB,
+                            compressedDataBuffer,
+                            ref stackA,
+                            ref stackB,
+                            ref pairWriter
+                        );
                     }
 
                     pairWriter.FlushIfNeeded();
-                }
-                while (stackA > binaryStackA);
+                } while (stackA > binaryStackA);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void ProcessAA<T>(ref Node node, int4* compressedData, ref int* stack, ref int* stackA, ref int* stackB, ref T pairWriter) where T : struct, ITreeOverlapCollector
+        private static unsafe void ProcessAA<T>(
+            ref Node node,
+            int4* compressedData,
+            ref int* stack,
+            ref int* stackA,
+            ref int* stackB,
+            ref T pairWriter
+        )
+            where T : struct, ITreeOverlapCollector
         {
             int4 nodeData = node.Data;
             FourTransposedAabbs nodeBounds = node.Bounds;
@@ -1207,9 +1302,24 @@ namespace Unity.Physics
             masks[2] = new bool4(false, false, false, true);
 
             int3 compressedCounts = int3.zero;
-            compressedCounts[0] = math.compress((int*)(compressedData + 0), 0, nodeData, aabbT[0].Overlap1Vs4(ref nodeBounds) & masks[0]);
-            compressedCounts[1] = math.compress((int*)(compressedData + 1), 0, nodeData, aabbT[1].Overlap1Vs4(ref nodeBounds) & masks[1]);
-            compressedCounts[2] = math.compress((int*)(compressedData + 2), 0, nodeData, aabbT[2].Overlap1Vs4(ref nodeBounds) & masks[2]);
+            compressedCounts[0] = math.compress(
+                (int*)(compressedData + 0),
+                0,
+                nodeData,
+                aabbT[0].Overlap1Vs4(ref nodeBounds) & masks[0]
+            );
+            compressedCounts[1] = math.compress(
+                (int*)(compressedData + 1),
+                0,
+                nodeData,
+                aabbT[1].Overlap1Vs4(ref nodeBounds) & masks[1]
+            );
+            compressedCounts[2] = math.compress(
+                (int*)(compressedData + 2),
+                0,
+                nodeData,
+                aabbT[2].Overlap1Vs4(ref nodeBounds) & masks[2]
+            );
 
             if (node.IsLeaf)
             {
@@ -1237,10 +1347,16 @@ namespace Unity.Physics
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe void ProcessAB<T>(
-            Node* nodeA, Node* nodeB,
-            Node* treeA, Node* treeB,
+            Node* nodeA,
+            Node* nodeB,
+            Node* treeA,
+            Node* treeB,
             int4* compressedData,
-            ref int* stackA, ref int* stackB, ref T pairWriter) where T : struct, ITreeOverlapCollector
+            ref int* stackA,
+            ref int* stackB,
+            ref T pairWriter
+        )
+            where T : struct, ITreeOverlapCollector
         {
             bool swapped = false;
             if (nodeA->IsInternal && nodeB->IsLeaf)
@@ -1303,7 +1419,12 @@ namespace Unity.Physics
                         {
                             Node* internalNode = treeB + *(--internalStack);
                             int4 internalCompressedData;
-                            int internalCount = math.compress((int*)&internalCompressedData, 0, internalNode->Data, aabbT.Overlap1Vs4(ref internalNode->Bounds));
+                            int internalCount = math.compress(
+                                (int*)&internalCompressedData,
+                                0,
+                                internalNode->Data,
+                                aabbT.Overlap1Vs4(ref internalNode->Bounds)
+                            );
                             if (internalCount > 0)
                             {
                                 if (internalNode->IsLeaf)
@@ -1317,8 +1438,7 @@ namespace Unity.Physics
                                     internalStack += internalCount;
                                 }
                             }
-                        }
-                        while (internalStack != stackA);
+                        } while (internalStack != stackA);
                     }
                 }
             }
@@ -1331,10 +1451,16 @@ namespace Unity.Physics
         public interface IAabbOverlapLeafProcessor
         {
             // Called when the query overlaps a leaf node of the bounding volume hierarchy
-            void AabbLeaf<T>(OverlapAabbInput input, int leafData, ref T collector) where T : struct, IOverlapCollector;
+            void AabbLeaf<T>(OverlapAabbInput input, int leafData, ref T collector)
+                where T : struct, IOverlapCollector;
         }
 
-        public unsafe void AabbOverlap<TProcessor, TCollector>(OverlapAabbInput input, ref TProcessor processor, ref TCollector collector, int root = 1)
+        public unsafe void AabbOverlap<TProcessor, TCollector>(
+            OverlapAabbInput input,
+            ref TProcessor processor,
+            ref TCollector collector,
+            int root = 1
+        )
             where TProcessor : struct, IAabbOverlapLeafProcessor
             where TCollector : struct, IOverlapCollector
         {
@@ -1364,8 +1490,7 @@ namespace Unity.Physics
                     *((int4*)stack) = compressedValues;
                     stack += compressedCount;
                 }
-            }
-            while (stack > binaryStack);
+            } while (stack > binaryStack);
         }
 
         #endregion
@@ -1375,15 +1500,21 @@ namespace Unity.Physics
         public interface IRaycastLeafProcessor
         {
             // Called when the query hits a leaf node of the bounding volume hierarchy
-            bool RayLeaf<T>(RaycastInput input, int leafData, ref T collector) where T : struct, ICollector<RaycastHit>;
+            bool RayLeaf<T>(RaycastInput input, int leafData, ref T collector)
+                where T : struct, ICollector<RaycastHit>;
         }
 
-        public unsafe bool Raycast<TProcessor, TCollector>(RaycastInput input, ref TProcessor leafProcessor, ref TCollector collector)
+        public unsafe bool Raycast<TProcessor, TCollector>(
+            RaycastInput input,
+            ref TProcessor leafProcessor,
+            ref TCollector collector
+        )
             where TProcessor : struct, IRaycastLeafProcessor
             where TCollector : struct, ICollector<RaycastHit>
         {
             bool hadHit = false;
-            int* stack = stackalloc int[Constants.UnaryStackSize], top = stack;
+            int* stack = stackalloc int[Constants.UnaryStackSize],
+                top = stack;
             *top++ = 1;
             do
             {
@@ -1408,8 +1539,7 @@ namespace Unity.Physics
                     *((int4*)top) = hitData;
                     top += hitCount;
                 }
-            }
-            while (top > stack);
+            } while (top > stack);
 
             return hadHit;
         }
@@ -1421,18 +1551,25 @@ namespace Unity.Physics
         public interface IColliderCastLeafProcessor
         {
             // Called when the query hits a leaf node of the bounding volume hierarchy
-            bool ColliderCastLeaf<T>(ColliderCastInput input, int leafData, ref T collector) where T : struct, ICollector<ColliderCastHit>;
+            bool ColliderCastLeaf<T>(ColliderCastInput input, int leafData, ref T collector)
+                where T : struct, ICollector<ColliderCastHit>;
         }
 
-        public unsafe bool ColliderCast<TProcessor, TCollector>(ColliderCastInput input, ref TProcessor leafProcessor, ref TCollector collector)
+        public unsafe bool ColliderCast<TProcessor, TCollector>(
+            ColliderCastInput input,
+            ref TProcessor leafProcessor,
+            ref TCollector collector
+        )
             where TProcessor : struct, IColliderCastLeafProcessor
             where TCollector : struct, ICollector<ColliderCastHit>
         {
             float3 aabbExtents;
             Ray aabbRay;
             {
-                Aabb aabb = input.Collider->CalculateAabb(new RigidTransform { pos = input.Start, rot = input.Orientation },
-                    input.QueryContext.InvTargetScale * input.QueryColliderScale);
+                Aabb aabb = input.Collider->CalculateAabb(
+                    new RigidTransform { pos = input.Start, rot = input.Orientation },
+                    input.QueryContext.InvTargetScale * input.QueryColliderScale
+                );
                 aabbExtents = aabb.Extents;
                 aabbRay = input.Ray;
                 aabbRay.Origin = aabb.Min;
@@ -1440,7 +1577,8 @@ namespace Unity.Physics
 
             bool hadHit = false;
 
-            int* stack = stackalloc int[Constants.UnaryStackSize], top = stack;
+            int* stack = stackalloc int[Constants.UnaryStackSize],
+                top = stack;
             *top++ = 1;
             do
             {
@@ -1469,8 +1607,7 @@ namespace Unity.Physics
                     *((int4*)top) = hitData;
                     top += hitCount;
                 }
-            }
-            while (top > stack);
+            } while (top > stack);
 
             return hadHit;
         }
@@ -1482,10 +1619,15 @@ namespace Unity.Physics
         public interface IPointDistanceLeafProcessor
         {
             // Called when the query hits a leaf node of the bounding volume hierarchy
-            bool DistanceLeaf<T>(PointDistanceInput input, int leafData, ref T collector) where T : struct, ICollector<DistanceHit>;
+            bool DistanceLeaf<T>(PointDistanceInput input, int leafData, ref T collector)
+                where T : struct, ICollector<DistanceHit>;
         }
 
-        public unsafe bool Distance<TProcessor, TCollector>(PointDistanceInput input, ref TProcessor leafProcessor, ref TCollector collector)
+        public unsafe bool Distance<TProcessor, TCollector>(
+            PointDistanceInput input,
+            ref TProcessor leafProcessor,
+            ref TCollector collector
+        )
             where TProcessor : struct, IPointDistanceLeafProcessor
             where TCollector : struct, ICollector<DistanceHit>
         {
@@ -1530,8 +1672,7 @@ namespace Unity.Physics
                     *((int4*)stack) = hitData;
                     stack += hitCount;
                 }
-            }
-            while (stack > binaryStack);
+            } while (stack > binaryStack);
 
             return hadHit;
         }
@@ -1543,10 +1684,15 @@ namespace Unity.Physics
         public interface IColliderDistanceLeafProcessor
         {
             // Called when the query hits a leaf node of the bounding volume hierarchy
-            bool DistanceLeaf<T>(ColliderDistanceInput input, int leafData, ref T collector) where T : struct, ICollector<DistanceHit>;
+            bool DistanceLeaf<T>(ColliderDistanceInput input, int leafData, ref T collector)
+                where T : struct, ICollector<DistanceHit>;
         }
 
-        public unsafe bool Distance<TProcessor, TCollector>(ColliderDistanceInput input, ref TProcessor leafProcessor, ref TCollector collector)
+        public unsafe bool Distance<TProcessor, TCollector>(
+            ColliderDistanceInput input,
+            ref TProcessor leafProcessor,
+            ref TCollector collector
+        )
             where TProcessor : struct, IColliderDistanceLeafProcessor
             where TCollector : struct, ICollector<DistanceHit>
         {
@@ -1561,8 +1707,7 @@ namespace Unity.Physics
             var invScaleSq = input.QueryContext.InvTargetScale;
             invScaleSq *= invScaleSq;
 
-            Aabb aabb = input.Collider->CalculateAabb(input.Transform,
-                input.QueryContext.InvTargetScale * input.Scale);
+            Aabb aabb = input.Collider->CalculateAabb(input.Transform, input.QueryContext.InvTargetScale * input.Scale);
 
             FourTransposedAabbs aabbT;
             (&aabbT)->SetAllAabbs(aabb);
@@ -1595,8 +1740,7 @@ namespace Unity.Physics
                     *((int4*)stack) = hitData;
                     stack += hitCount;
                 }
-            }
-            while (stack > binaryStack);
+            } while (stack > binaryStack);
 
             return hadHit;
         }

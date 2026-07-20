@@ -12,17 +12,15 @@ namespace Unity.Entities.UI
         /// Initializes a new instance of the <see cref="InvalidBindingException"/> class with a specified path.
         /// </summary>
         /// <param name="message">The exception message.</param>
-        public InvalidBindingException(string message) : base(message)
-        {
-        }
+        public InvalidBindingException(string message)
+            : base(message) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidBindingException"/> class with a specified type and a reference to the inner exception that is the cause of this exception.
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="inner">The inner exception reference.</param>
-        public InvalidBindingException(string message, Exception inner) : base(message, inner)
-        {
-        }
+        public InvalidBindingException(string message, Exception inner)
+            : base(message, inner) { }
     }
 }

@@ -5,7 +5,13 @@ namespace Unity.Entities
     /// </summary>
     // ReSharper disable once InconsistentNaming
     [UpdateInGroup(typeof(InitializationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.LocalSimulation | WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ServerSimulation | WorldSystemFilterFlags.ThinClientSimulation | WorldSystemFilterFlags.Editor)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.LocalSimulation
+            | WorldSystemFilterFlags.ClientSimulation
+            | WorldSystemFilterFlags.ServerSimulation
+            | WorldSystemFilterFlags.ThinClientSimulation
+            | WorldSystemFilterFlags.Editor
+    )]
     public partial struct WorldUpdateAllocatorResetSystem : ISystem
     {
         /// <summary>

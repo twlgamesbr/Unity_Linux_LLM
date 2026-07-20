@@ -5,9 +5,8 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
     internal class TestResultRendererCallback : MonoBehaviour, ITestRunnerListener
     {
         private TestResultRenderer m_ResultRenderer;
-        public void RunStarted(ITest testsToRun)
-        {
-        }
+
+        public void RunStarted(ITest testsToRun) { }
 
         public void RunFinished(ITestResult testResults)
         {
@@ -25,12 +24,8 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
                 m_ResultRenderer.Draw();
         }
 
-        public void TestStarted(ITest test)
-        {
-        }
+        public void TestStarted(ITest test) { }
 
-        public void TestFinished(ITestResult result)
-        {
-        }
+        public void TestFinished(ITestResult result) { }
     }
 }

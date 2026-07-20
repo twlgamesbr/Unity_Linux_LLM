@@ -5,7 +5,6 @@ namespace UnityEngine.Rendering.Universal
     /// <summary>
     /// Invokes OnRenderObject callback
     /// </summary>
-
     internal class InvokeOnRenderObjectCallbackPass : ScriptableRenderPass
     {
         public InvokeOnRenderObjectCallbackPass(RenderPassEvent evt)
@@ -29,11 +28,13 @@ namespace UnityEngine.Rendering.Universal
                 passData.depthTarget = depthTarget;
                 builder.UseTexture(depthTarget, AccessFlags.Write);
                 builder.AllowPassCulling(false);
-                builder.SetRenderFunc(static (PassData data, UnsafeGraphContext context) =>
-                {
-                    context.cmd.SetRenderTarget(data.colorTarget, data.depthTarget);
-                    context.cmd.InvokeOnRenderObjectCallbacks();
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, UnsafeGraphContext context) =>
+                    {
+                        context.cmd.SetRenderTarget(data.colorTarget, data.depthTarget);
+                        context.cmd.InvokeOnRenderObjectCallbacks();
+                    }
+                );
             }
         }
     }

@@ -1,9 +1,9 @@
 using System;
 using AOT;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Networking.Transport.Utilities;
-using Unity.Burst;
 
 namespace Unity.Networking.Transport
 {
@@ -34,7 +34,11 @@ namespace Unity.Networking.Transport
     public unsafe struct ReliableSequencedPipelineStage : INetworkPipelineStage
     {
         /// <inheritdoc/>
-        public NetworkPipelineStage StaticInitialize(byte* staticInstanceBuffer, int staticInstanceBufferLength, NetworkSettings settings)
+        public NetworkPipelineStage StaticInitialize(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            NetworkSettings settings
+        )
         {
             ReliableUtility.Parameters param = settings.GetReliableStageParameters();
             param.WindowSize = (param.WindowSize + 7) & ~7; // Ensure window size is a multiple of 8.
@@ -43,7 +47,9 @@ namespace Unity.Networking.Transport
             return new NetworkPipelineStage(
                 Receive: new TransportFunctionPointer<NetworkPipelineStage.ReceiveDelegate>(Receive),
                 Send: new TransportFunctionPointer<NetworkPipelineStage.SendDelegate>(Send),
-                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(InitializeConnection),
+                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(
+                    InitializeConnection
+                ),
                 ReceiveCapacity: ReliableUtility.ProcessCapacityNeeded(param),
                 SendCapacity: ReliableUtility.ProcessCapacityNeeded(param),
                 HeaderCapacity: ReliableUtility.MaxPacketHeaderWireSize(param.WindowSize),
@@ -56,7 +62,12 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.ReceiveDelegate))]
-        private static void Receive(ref NetworkPipelineContext ctx, ref InboundRecvBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+        private static void Receive(
+            ref NetworkPipelineContext ctx,
+            ref InboundRecvBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        )
         {
             // Request a send update to see if a queued packet needs to be resent later or if an ack packet should be sent
             requests = NetworkPipelineStage.Requests.SendUpdate;
@@ -68,7 +79,12 @@ namespace Unity.Networking.Transport
             if (inboundBuffer.buffer != null)
             {
                 var bufferSpan = new ReadOnlySpan<byte>(inboundBuffer.buffer, inboundBuffer.bufferLength);
-                var headerSize = ReliableUtility.ReadHeader(bufferSpan, out var header, out var mask, shared->WindowSize);
+                var headerSize = ReliableUtility.ReadHeader(
+                    bufferSpan,
+                    out var header,
+                    out var mask,
+                    shared->WindowSize
+                );
                 if (headerSize <= 0)
                 {
                     // Failed to read the header, drop the packet.
@@ -103,7 +119,11 @@ namespace Unity.Networking.Transport
                         else
                         {
                             // Received packet is later in the sequence. Save it for later.
-                            ReliableUtility.SetPacket(ctx.internalProcessBuffer, receivedSequenceId, packetWithoutHeader);
+                            ReliableUtility.SetPacket(
+                                ctx.internalProcessBuffer,
+                                receivedSequenceId,
+                                packetWithoutHeader
+                            );
                         }
                     }
                 }
@@ -122,7 +142,12 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.SendDelegate))]
-        private static int Send(ref NetworkPipelineContext ctx, ref InboundSendBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+        private static int Send(
+            ref NetworkPipelineContext ctx,
+            ref InboundSendBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        )
         {
             // Request an update to see if a queued packet needs to be resent later or if an ack packet should be sent
             requests = NetworkPipelineStage.Requests.Update;
@@ -184,7 +209,8 @@ namespace Unity.Networking.Transport
                 // along with our acknowledgement. This will be ignored by the receiver.
                 // TODO: Fix the pipeline machinery to avoid needing to do this.
                 inboundBuffer.bufferWithHeadersLength = inboundBuffer.headerPadding + 1;
-                inboundBuffer.bufferWithHeaders = (byte*)UnsafeUtility.Malloc(inboundBuffer.bufferWithHeadersLength, 8, Allocator.Temp);
+                inboundBuffer.bufferWithHeaders = (byte*)
+                    UnsafeUtility.Malloc(inboundBuffer.bufferWithHeadersLength, 8, Allocator.Temp);
                 inboundBuffer.SetBufferFromBufferWithHeaders();
 
                 return (int)Error.StatusCode.Success;
@@ -195,9 +221,16 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.InitializeConnectionDelegate))]
-        private static void InitializeConnection(byte* staticInstanceBuffer, int staticInstanceBufferLength,
-            byte* sendProcessBuffer, int sendProcessBufferLength, byte* recvProcessBuffer, int recvProcessBufferLength,
-            byte* sharedProcessBuffer, int sharedProcessBufferLength)
+        private static void InitializeConnection(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            byte* sendProcessBuffer,
+            int sendProcessBufferLength,
+            byte* recvProcessBuffer,
+            int recvProcessBufferLength,
+            byte* sharedProcessBuffer,
+            int sharedProcessBufferLength
+        )
         {
             ReliableUtility.Parameters param;
             UnsafeUtility.MemCpy(&param, staticInstanceBuffer, UnsafeUtility.SizeOf<ReliableUtility.Parameters>());
@@ -205,7 +238,9 @@ namespace Unity.Networking.Transport
             if (sharedProcessBufferLength != ReliableUtility.SharedCapacityNeeded(param))
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException("sharedProcessBufferLength is wrong length for ReliableUtility.Parameters!");
+                throw new InvalidOperationException(
+                    "sharedProcessBufferLength is wrong length for ReliableUtility.Parameters!"
+                );
 #else
                 return;
 #endif
@@ -214,13 +249,23 @@ namespace Unity.Networking.Transport
             if (sendProcessBufferLength + recvProcessBufferLength < ReliableUtility.ProcessCapacityNeeded(param) * 2)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException("sendProcessBufferLength + recvProcessBufferLength is wrong length for ReliableUtility.ProcessCapacityNeeded!");
+                throw new InvalidOperationException(
+                    "sendProcessBufferLength + recvProcessBufferLength is wrong length for ReliableUtility.ProcessCapacityNeeded!"
+                );
 #else
                 return;
 #endif
             }
 
-            ReliableUtility.InitializeContext(sharedProcessBuffer, sharedProcessBufferLength, sendProcessBuffer, sendProcessBufferLength, recvProcessBuffer, recvProcessBufferLength, param);
+            ReliableUtility.InitializeContext(
+                sharedProcessBuffer,
+                sharedProcessBufferLength,
+                sendProcessBuffer,
+                sendProcessBufferLength,
+                recvProcessBuffer,
+                recvProcessBufferLength,
+                param
+            );
         }
     }
 }

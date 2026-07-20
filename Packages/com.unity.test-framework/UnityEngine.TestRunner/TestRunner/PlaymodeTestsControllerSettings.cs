@@ -18,6 +18,7 @@ namespace UnityEngine.TestTools.TestRunner
         public string bootstrapScene;
         public string[] orderedTestNames;
         public FeatureFlags featureFlags;
+
         [SerializeField]
         public int retryCount;
 
@@ -30,7 +31,15 @@ namespace UnityEngine.TestTools.TestRunner
         [SerializeField]
         public int randomOrderSeed;
 
-        public static PlaymodeTestsControllerSettings CreateRunnerSettings(RuntimeTestRunnerFilter[] filters, string[] orderedTestNames, int randomSeed, FeatureFlags featureFlags, int retryCount, int repeatCount, bool automated)
+        public static PlaymodeTestsControllerSettings CreateRunnerSettings(
+            RuntimeTestRunnerFilter[] filters,
+            string[] orderedTestNames,
+            int randomSeed,
+            FeatureFlags featureFlags,
+            int retryCount,
+            int repeatCount,
+            bool automated
+        )
         {
             var settings = new PlaymodeTestsControllerSettings
             {
@@ -43,7 +52,7 @@ namespace UnityEngine.TestTools.TestRunner
                 featureFlags = featureFlags,
                 retryCount = retryCount,
                 repeatCount = repeatCount,
-                automated = automated
+                automated = automated,
             };
             return settings;
         }

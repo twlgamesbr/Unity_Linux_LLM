@@ -8,7 +8,7 @@ namespace UnityEngine.TestTools
     internal class ImmediateEnumerableCommand : DelegatingTestCommand
     {
         public ImmediateEnumerableCommand(TestCommand innerCommand)
-            : base(innerCommand) {}
+            : base(innerCommand) { }
 
         public override TestResult Execute(ITestExecutionContext context)
         {

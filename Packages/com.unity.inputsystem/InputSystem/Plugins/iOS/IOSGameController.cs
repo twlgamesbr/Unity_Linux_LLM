@@ -25,7 +25,7 @@ namespace UnityEngine.InputSystem.iOS.LowLevel
         A,
         B,
         Start,
-        Select
+        Select,
 
         // Note: If you'll add an element here, be sure to update kMaxButtons const below
     };
@@ -35,7 +35,7 @@ namespace UnityEngine.InputSystem.iOS.LowLevel
         LeftStickX,
         LeftStickY,
         RightStickX,
-        RightStickY
+        RightStickY,
 
         // Note: If you'll add an element here, be sure to update kMaxAxis const below
     };
@@ -69,6 +69,7 @@ namespace UnityEngine.InputSystem.iOS.LowLevel
         public fixed float buttonValues[MaxButtons];
 
         private const uint kAxisOffset = sizeof(uint) + sizeof(float) * MaxButtons;
+
         [InputControl(name = "leftStick", offset = (uint)iOSAxis.LeftStickX * sizeof(float) + kAxisOffset)]
         [InputControl(name = "rightStick", offset = (uint)iOSAxis.RightStickX * sizeof(float) + kAxisOffset)]
         public fixed float axisValues[MaxAxis];
@@ -107,32 +108,24 @@ namespace UnityEngine.InputSystem.iOS
     /// be represented as an iOSGameController.
     /// </remarks>
     [InputControlLayout(stateType = typeof(iOSGameControllerState), displayName = "iOS Gamepad")]
-    public class iOSGameController : Gamepad
-    {
-    }
+    public class iOSGameController : Gamepad { }
 
     /// <summary>
     /// An Xbox One Bluetooth controller connected to an iOS device.
     /// </summary>
     [InputControlLayout(stateType = typeof(iOSGameControllerState), displayName = "iOS Xbox One Gamepad")]
-    public class XboxOneGampadiOS : XInput.XInputController
-    {
-    }
+    public class XboxOneGampadiOS : XInput.XInputController { }
 
     /// <summary>
     /// A PlayStation DualShock 4 controller connected to an iOS device.
     /// </summary>
     [InputControlLayout(stateType = typeof(iOSGameControllerState), displayName = "iOS DualShock 4 Gamepad")]
-    public class DualShock4GampadiOS : DualShockGamepad
-    {
-    }
+    public class DualShock4GampadiOS : DualShockGamepad { }
 
     /// <summary>
     /// A PlayStation DualSense controller connected to an iOS device.
     /// </summary>
     [InputControlLayout(stateType = typeof(iOSGameControllerState), displayName = "iOS DualSense Gamepad")]
-    public class DualSenseGampadiOS : DualShockGamepad
-    {
-    }
+    public class DualSenseGampadiOS : DualShockGamepad { }
 }
 #endif // UNITY_EDITOR || UNITY_IOS || UNITY_TVOS || UNITY_VISIONOS

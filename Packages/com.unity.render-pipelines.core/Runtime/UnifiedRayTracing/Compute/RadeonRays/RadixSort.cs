@@ -1,4 +1,3 @@
-
 namespace UnityEngine.Rendering.RadeonRays
 {
     internal class RadixSort
@@ -11,9 +10,9 @@ namespace UnityEngine.Rendering.RadeonRays
 
         readonly Scan scan;
 
-        const uint kKeysPerThread  = 4u;
-        const uint kGroupSize      = 256u;
-        const uint kKeysPerGroup   = kKeysPerThread * kGroupSize;
+        const uint kKeysPerThread = 4u;
+        const uint kGroupSize = 256u;
+        const uint kKeysPerGroup = kKeysPerThread * kGroupSize;
         const int kNumBitsPerPass = 4;
 
         public RadixSort(RadeonRaysShaders shaders)
@@ -26,18 +25,23 @@ namespace UnityEngine.Rendering.RadeonRays
 
             scan = new Scan(shaders);
         }
+
         public void Execute(
             CommandBuffer cmd,
             GraphicsBuffer buffer,
-            uint inputKeysOffset, uint outputKeysOffset,
-            uint inputValuesOffset, uint outputValuesOffset,
-            uint scratchDataOffset, uint size)
+            uint inputKeysOffset,
+            uint outputKeysOffset,
+            uint inputValuesOffset,
+            uint outputValuesOffset,
+            uint scratchDataOffset,
+            uint size
+        )
         {
             uint num_histogram_values = (1 << kNumBitsPerPass) * Common.CeilDivide(size, kKeysPerGroup);
             uint num_groups = Common.CeilDivide(size, kKeysPerGroup);
 
             uint tempsKeys = scratchDataOffset;
-            uint tempValues = tempsKeys + size ;
+            uint tempValues = tempsKeys + size;
             uint groupHistograms = tempValues + size;
             uint scan_scratch = groupHistograms + num_histogram_values;
 
@@ -52,11 +56,19 @@ namespace UnityEngine.Rendering.RadeonRays
                 // Calculate histograms
                 {
                     cmd.SetComputeIntParam(shaderBitHistogram, SID.g_constants_num_keys, (int)size);
-                    cmd.SetComputeIntParam(shaderBitHistogram, SID.g_constants_num_blocks, (int)Common.CeilDivide(size, kKeysPerGroup));
+                    cmd.SetComputeIntParam(
+                        shaderBitHistogram,
+                        SID.g_constants_num_blocks,
+                        (int)Common.CeilDivide(size, kKeysPerGroup)
+                    );
                     cmd.SetComputeIntParam(shaderBitHistogram, SID.g_constants_bit_shift, (int)bitshift);
 
                     cmd.SetComputeBufferParam(shaderBitHistogram, kernelBitHistogram, SID.g_buffer, buffer);
-                    cmd.SetComputeIntParam(shaderBitHistogram, SID.g_input_keys_offset, (int)(bitshift == 0 ? inputKeysOffset : i));
+                    cmd.SetComputeIntParam(
+                        shaderBitHistogram,
+                        SID.g_input_keys_offset,
+                        (int)(bitshift == 0 ? inputKeysOffset : i)
+                    );
                     cmd.SetComputeIntParam(shaderBitHistogram, SID.g_group_histograms_offset, (int)groupHistograms);
 
                     cmd.DispatchCompute(shaderBitHistogram, kernelBitHistogram, (int)num_groups, 1, 1);
@@ -68,14 +80,26 @@ namespace UnityEngine.Rendering.RadeonRays
                 // Scatter key values
                 {
                     cmd.SetComputeIntParam(shaderScatter, SID.g_constants_num_keys, (int)size);
-                    cmd.SetComputeIntParam(shaderScatter, SID.g_constants_num_blocks, (int)Common.CeilDivide(size, kKeysPerGroup));
+                    cmd.SetComputeIntParam(
+                        shaderScatter,
+                        SID.g_constants_num_blocks,
+                        (int)Common.CeilDivide(size, kKeysPerGroup)
+                    );
                     cmd.SetComputeIntParam(shaderScatter, SID.g_constants_bit_shift, (int)bitshift);
 
                     cmd.SetComputeBufferParam(shaderScatter, kernelScatter, SID.g_buffer, buffer);
-                    cmd.SetComputeIntParam(shaderScatter, SID.g_input_keys_offset, (int)(bitshift == 0 ? inputKeysOffset : i));
+                    cmd.SetComputeIntParam(
+                        shaderScatter,
+                        SID.g_input_keys_offset,
+                        (int)(bitshift == 0 ? inputKeysOffset : i)
+                    );
                     cmd.SetComputeIntParam(shaderScatter, SID.g_group_histograms_offset, (int)groupHistograms);
                     cmd.SetComputeIntParam(shaderScatter, SID.g_output_keys_offset, (int)o);
-                    cmd.SetComputeIntParam(shaderScatter, SID.g_input_values_offset, (int)(bitshift == 0 ? inputValuesOffset : iv));
+                    cmd.SetComputeIntParam(
+                        shaderScatter,
+                        SID.g_input_values_offset,
+                        (int)(bitshift == 0 ? inputValuesOffset : iv)
+                    );
                     cmd.SetComputeIntParam(shaderScatter, SID.g_output_values_offset, (int)ov);
 
                     cmd.DispatchCompute(shaderScatter, kernelScatter, (int)num_groups, 1, 1);
@@ -86,7 +110,8 @@ namespace UnityEngine.Rendering.RadeonRays
                 (ov, iv) = (iv, ov);
             }
         }
-        static public ulong GetScratchDataSizeInDwords(uint size)
+
+        public static ulong GetScratchDataSizeInDwords(uint size)
         {
             uint num_histogram_values = (1 << kNumBitsPerPass) * Common.CeilDivide(size, kKeysPerGroup);
 

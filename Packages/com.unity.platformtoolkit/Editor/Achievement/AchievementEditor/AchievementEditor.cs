@@ -26,21 +26,27 @@ namespace Unity.PlatformToolkit.Editor
 
         public AchievementCommonConfiguration CommonConfiguration { get; }
 
-        private readonly List<(IAchievementConfiguration, IAchievementConfigurationContext)>
-            m_ConfigurationsAndContext = new();
+        private readonly List<(
+            IAchievementConfiguration,
+            IAchievementConfigurationContext
+        )> m_ConfigurationsAndContext = new();
 
-        public IReadOnlyList<(IAchievementConfiguration configuration, IAchievementConfigurationContext context)>
-            ConfigurationsAndContext => m_ConfigurationsAndContext;
+        public IReadOnlyList<(
+            IAchievementConfiguration configuration,
+            IAchievementConfigurationContext context
+        )> ConfigurationsAndContext => m_ConfigurationsAndContext;
 
-        private readonly IReadOnlyCollection<IPlatformToolkitSupportDeclaration>
-            m_PlatformSupportDeclarationsWithAchievements;
+        private readonly IReadOnlyCollection<IPlatformToolkitSupportDeclaration> m_PlatformSupportDeclarationsWithAchievements;
 
-        public AchievementEditor(ObservableSerializableList<StoredAchievement> achievements,
-            IReadOnlyCollection<IPlatformToolkitSupportDeclaration> platformSupportDeclarations)
+        public AchievementEditor(
+            ObservableSerializableList<StoredAchievement> achievements,
+            IReadOnlyCollection<IPlatformToolkitSupportDeclaration> platformSupportDeclarations
+        )
         {
             Achievements = achievements;
             m_PlatformSupportDeclarationsWithAchievements = platformSupportDeclarations
-                .Where(platform => platform.AchievementsSupported).ToList();
+                .Where(platform => platform.AchievementsSupported)
+                .ToList();
             CommonConfiguration = new AchievementCommonConfiguration(Achievements);
 
             foreach (var supportDeclaration in platformSupportDeclarations)
@@ -49,8 +55,9 @@ namespace Unity.PlatformToolkit.Editor
                     continue;
 
                 var achievementContext = new AchievementConfigurationContext(supportDeclaration.Key, Achievements);
-                m_ConfigurationsAndContext.Add((supportDeclaration.CreateAchievementConfiguration(achievementContext),
-                    achievementContext));
+                m_ConfigurationsAndContext.Add(
+                    (supportDeclaration.CreateAchievementConfiguration(achievementContext), achievementContext)
+                );
             }
         }
 
@@ -99,15 +106,23 @@ namespace Unity.PlatformToolkit.Editor
             ValidateAchievementData(Achievements);
 
             var dataColumns = ConvertAchievementsToDataColumns(Achievements);
-            foreach ((IAchievementConfiguration configuration, IAchievementConfigurationContext context) configurationAndContext in m_ConfigurationsAndContext)
+            foreach (
+                (
+                    IAchievementConfiguration configuration,
+                    IAchievementConfigurationContext context
+                ) configurationAndContext in m_ConfigurationsAndContext
+            )
             {
-                var dataColumn = new DataColumn(configurationAndContext.configuration.ImportExportProvider.ExportKey,
-                    new string[Achievements.Count]);
+                var dataColumn = new DataColumn(
+                    configurationAndContext.configuration.ImportExportProvider.ExportKey,
+                    new string[Achievements.Count]
+                );
                 dataColumns.Add(dataColumn);
-                for (int i = 0; i < Achievements.Count ; i++)
+                for (int i = 0; i < Achievements.Count; i++)
                 {
-                    var cellData = configurationAndContext.configuration.ImportExportProvider.Export(configurationAndContext.context
-                        .Achievements[i]);
+                    var cellData = configurationAndContext.configuration.ImportExportProvider.Export(
+                        configurationAndContext.context.Achievements[i]
+                    );
 
                     dataColumn.Data[i] = cellData.Ignore == false ? cellData.ConfigurationData : AchievementIgnoreTag;
                 }
@@ -130,7 +145,9 @@ namespace Unity.PlatformToolkit.Editor
             }
         }
 
-        private List<DataColumn> ConvertAchievementsToDataColumns(ObservableSerializableList<StoredAchievement> achievements)
+        private List<DataColumn> ConvertAchievementsToDataColumns(
+            ObservableSerializableList<StoredAchievement> achievements
+        )
         {
             var result = new List<DataColumn>();
             var idData = new string[achievements.Count];
@@ -185,11 +202,13 @@ namespace Unity.PlatformToolkit.Editor
                 }
 
                 var column = dataColumns.FirstOrDefault(column =>
-                    column.Header == configuration.ImportExportProvider.ExportKey);
+                    column.Header == configuration.ImportExportProvider.ExportKey
+                );
                 if (column == null)
                 {
                     Debug.LogWarning(
-                        $"Did not find {configuration.ImportExportProvider.ExportKey} in CSV file, whilst this platform is installed.");
+                        $"Did not find {configuration.ImportExportProvider.ExportKey} in CSV file, whilst this platform is installed."
+                    );
 
                     // Here we copy over the old data to the new data if present for the specific platform
                     // If imported data does not contain a column for a known platform, the data for that platform will not be changed.
@@ -203,8 +222,10 @@ namespace Unity.PlatformToolkit.Editor
 
                 for (var index = 0; index < toOverrideData.Count; index++)
                 {
-                    configuration.ImportExportProvider.Import(column.Data[index],
-                        achievementContext.Achievements[index]);
+                    configuration.ImportExportProvider.Import(
+                        column.Data[index],
+                        achievementContext.Achievements[index]
+                    );
                 }
             }
 
@@ -215,11 +236,16 @@ namespace Unity.PlatformToolkit.Editor
             }
         }
 
-        private static List<string> GetLocalData(ObservableSerializableList<StoredAchievement> oldAchievements,
-            IAchievementConfiguration configuration)
+        private static List<string> GetLocalData(
+            ObservableSerializableList<StoredAchievement> oldAchievements,
+            IAchievementConfiguration configuration
+        )
         {
             var platformAchievement = oldAchievements.Where(old =>
-                !string.IsNullOrEmpty(old.GetImplementationData(configuration.ImportExportProvider.ExportKey).ConfigurationData));
+                !string.IsNullOrEmpty(
+                    old.GetImplementationData(configuration.ImportExportProvider.ExportKey).ConfigurationData
+                )
+            );
 
             var allData = new List<string>();
             foreach (var oldData in platformAchievement)
@@ -232,7 +258,8 @@ namespace Unity.PlatformToolkit.Editor
         }
 
         private ObservableSerializableList<StoredAchievement> GetStoredAchievementDataFromColumns(
-            IReadOnlyList<DataColumn> dataColumns)
+            IReadOnlyList<DataColumn> dataColumns
+        )
         {
             var errors = ValidateHeader(dataColumns);
             if (errors.Count > 0)
@@ -260,7 +287,10 @@ namespace Unity.PlatformToolkit.Editor
                     Id = idData[i],
                     ProgressTarget = int.Parse(progressTargetData[i]),
                     // We add 0 as an edge case, because else it will set it to Progressive
-                    UnlockType = int.Parse(progressTargetData[i]) == 0 || int.Parse(progressTargetData[i]) == 1 ? UnlockType.Single : UnlockType.Progressive
+                    UnlockType =
+                        int.Parse(progressTargetData[i]) == 0 || int.Parse(progressTargetData[i]) == 1
+                            ? UnlockType.Single
+                            : UnlockType.Progressive,
                 };
                 storedAchievements.Add(storedAchievement);
             }

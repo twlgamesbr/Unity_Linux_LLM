@@ -33,7 +33,9 @@ namespace UnityEngine.PathTracing.Core
 #if UNITY_EDITOR
         public static ComputeShader LoadShader()
         {
-            return UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>("Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/SegmentedReduction.compute");
+            return UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/SegmentedReduction.compute"
+            );
         }
 #endif
 
@@ -45,7 +47,8 @@ namespace UnityEngine.PathTracing.Core
             out uint truncateInterval,
             out uint truncatedSegmentWidth,
             out uint secondPassSegmentCount,
-            out uint secondPassSegmentWidth)
+            out uint secondPassSegmentWidth
+        )
         {
             // Split each segments into a number of segments with size close to sqrt(segmentWidth).
             firstPassSegmentWidth = (uint)Mathf.Floor(Mathf.Sqrt(segmentWidth));
@@ -66,7 +69,16 @@ namespace UnityEngine.PathTracing.Core
 
         public static uint GetScratchBufferSizeInDwords(uint segmentWidth, uint segmentStride, uint segmentCount)
         {
-            CalculateParametersForTwoPassReduction(segmentWidth, segmentCount, out uint firstPassSegmentCount, out _, out _, out _, out _, out _);
+            CalculateParametersForTwoPassReduction(
+                segmentWidth,
+                segmentCount,
+                out uint firstPassSegmentCount,
+                out _,
+                out _,
+                out _,
+                out _,
+                out _
+            );
             return firstPassSegmentCount * segmentStride;
         }
 
@@ -82,7 +94,8 @@ namespace UnityEngine.PathTracing.Core
             GraphicsBuffer inputBuffer,
             GraphicsBuffer scratchBuffer,
             GraphicsBuffer outputBuffer,
-            bool overwriteOutput)
+            bool overwriteOutput
+        )
         {
             CalculateParametersForTwoPassReduction(
                 segmentWidth,
@@ -92,10 +105,35 @@ namespace UnityEngine.PathTracing.Core
                 out uint truncateInterval,
                 out uint truncatedSegmentWidth,
                 out uint secondPassSegmentCount,
-                out uint secondPassSegmentWidth);
+                out uint secondPassSegmentWidth
+            );
 
-            DispatchReductionKernel(cmd, firstPassSegmentWidth, segmentStride, firstPassSegmentCount, inputOffset, 0, inputBuffer, scratchBuffer, true, truncateInterval, truncatedSegmentWidth);
-            DispatchReductionKernel(cmd, secondPassSegmentWidth, segmentStride, secondPassSegmentCount, inputOffset, outputOffset, scratchBuffer, outputBuffer, overwriteOutput, 0, 0);
+            DispatchReductionKernel(
+                cmd,
+                firstPassSegmentWidth,
+                segmentStride,
+                firstPassSegmentCount,
+                inputOffset,
+                0,
+                inputBuffer,
+                scratchBuffer,
+                true,
+                truncateInterval,
+                truncatedSegmentWidth
+            );
+            DispatchReductionKernel(
+                cmd,
+                secondPassSegmentWidth,
+                segmentStride,
+                secondPassSegmentCount,
+                inputOffset,
+                outputOffset,
+                scratchBuffer,
+                outputBuffer,
+                overwriteOutput,
+                0,
+                0
+            );
         }
 
         // Performs segmented reduction in a single pass. This is slower than the 2 pass
@@ -110,9 +148,22 @@ namespace UnityEngine.PathTracing.Core
             uint outputOffset,
             GraphicsBuffer inputBuffer,
             GraphicsBuffer outputBuffer,
-            bool overwriteOutput)
+            bool overwriteOutput
+        )
         {
-            DispatchReductionKernel(cmd, segmentWidth, segmentStride, segmentCount, inputOffset, outputOffset, inputBuffer, outputBuffer, overwriteOutput, 0, 0);
+            DispatchReductionKernel(
+                cmd,
+                segmentWidth,
+                segmentStride,
+                segmentCount,
+                inputOffset,
+                outputOffset,
+                inputBuffer,
+                outputBuffer,
+                overwriteOutput,
+                0,
+                0
+            );
         }
 
         private void DispatchReductionKernel(
@@ -126,19 +177,44 @@ namespace UnityEngine.PathTracing.Core
             GraphicsBuffer outputBuffer,
             bool overwriteOutput,
             uint truncateInterval,
-            uint truncatedSegmentWidth)
+            uint truncatedSegmentWidth
+        )
         {
             cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.SegmentWidth, (int)segmentWidth);
             cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.SegmentStride, (int)segmentStride);
             cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.SegmentCount, (int)segmentCount);
             cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.InputOffset, (int)inputOffset);
             cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.OutputOffset, (int)outputOffset);
-            cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.OverwriteOutput, overwriteOutput ? 1 : 0);
+            cmd.SetComputeIntParam(
+                _segmentedReductionShader,
+                ShaderProperties.OverwriteOutput,
+                overwriteOutput ? 1 : 0
+            );
             cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.TruncateInterval, (int)truncateInterval);
-            cmd.SetComputeIntParam(_segmentedReductionShader, ShaderProperties.TruncatedSegmentWidth, (int)truncatedSegmentWidth);
-            cmd.SetComputeBufferParam(_segmentedReductionShader, _reductionKernel, ShaderProperties.InputFloatBuffer, inputBuffer);
-            cmd.SetComputeBufferParam(_segmentedReductionShader, _reductionKernel, ShaderProperties.OutputFloatBuffer, outputBuffer);
-            cmd.DispatchCompute(_segmentedReductionShader, _reductionKernel, (int)GraphicsHelpers.DivUp(segmentCount, _threadGroupSize), 1, 1);
+            cmd.SetComputeIntParam(
+                _segmentedReductionShader,
+                ShaderProperties.TruncatedSegmentWidth,
+                (int)truncatedSegmentWidth
+            );
+            cmd.SetComputeBufferParam(
+                _segmentedReductionShader,
+                _reductionKernel,
+                ShaderProperties.InputFloatBuffer,
+                inputBuffer
+            );
+            cmd.SetComputeBufferParam(
+                _segmentedReductionShader,
+                _reductionKernel,
+                ShaderProperties.OutputFloatBuffer,
+                outputBuffer
+            );
+            cmd.DispatchCompute(
+                _segmentedReductionShader,
+                _reductionKernel,
+                (int)GraphicsHelpers.DivUp(segmentCount, _threadGroupSize),
+                1,
+                1
+            );
         }
     }
 }

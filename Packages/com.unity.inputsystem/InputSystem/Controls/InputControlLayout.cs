@@ -28,8 +28,11 @@ namespace UnityEngine.InputSystem.Layouts
     /// <seealso cref="InputSystem.onFindLayoutForDevice"/>
     /// <seealso cref="InputSystem.RegisterLayoutBuilder"/>
     /// <seealso cref="InputControlLayout"/>
-    public delegate string InputDeviceFindControlLayoutDelegate(ref InputDeviceDescription description,
-        string matchedLayout, InputDeviceExecuteCommandDelegate executeDeviceCommand);
+    public delegate string InputDeviceFindControlLayoutDelegate(
+        ref InputDeviceDescription description,
+        string matchedLayout,
+        InputDeviceExecuteCommandDelegate executeDeviceCommand
+    );
 
     /// <summary>
     /// A control layout specifies the composition of an <see cref="InputControl"/> or
@@ -263,7 +266,9 @@ namespace UnityEngine.InputSystem.Layouts
                 result.isModifyingExistingControl = isModifyingExistingControl;
 
                 result.displayName = string.IsNullOrEmpty(displayName) ? other.displayName : displayName;
-                result.shortDisplayName = string.IsNullOrEmpty(shortDisplayName) ? other.shortDisplayName : shortDisplayName;
+                result.shortDisplayName = string.IsNullOrEmpty(shortDisplayName)
+                    ? other.shortDisplayName
+                    : shortDisplayName;
                 result.layout = layout.IsEmpty() ? other.layout : layout;
                 result.variants = variants.IsEmpty() ? other.variants : variants;
                 result.useStateFrom = useStateFrom ?? other.useStateFrom;
@@ -453,7 +458,10 @@ namespace UnityEngine.InputSystem.Layouts
         /// <seealso cref="InputSettings.backgroundBehavior"/>
         public bool? canRunInBackground
         {
-            get => (m_Flags & Flags.CanRunInBackgroundIsSet) != 0 ? (bool?)((m_Flags & Flags.CanRunInBackground) != 0) : null;
+            get =>
+                (m_Flags & Flags.CanRunInBackgroundIsSet) != 0
+                    ? (bool?)((m_Flags & Flags.CanRunInBackground) != 0)
+                    : null;
             internal set
             {
                 if (!value.HasValue)
@@ -540,9 +548,19 @@ namespace UnityEngine.InputSystem.Layouts
                 ////FIXME: what this can't handle is "outerArray4/innerArray5"; not sure we care, though
                 // NOTE: This will *not* match something like "touch4/tap". Which is what we want.
                 //       In case there is a ControlItem
-                if (control.isArray && arrayNameLength > 0 && arrayNameLength == control.name.length &&
-                    string.Compare(control.name.ToString(), 0, path, 0, arrayNameLength,
-                        StringComparison.InvariantCultureIgnoreCase) == 0)
+                if (
+                    control.isArray
+                    && arrayNameLength > 0
+                    && arrayNameLength == control.name.length
+                    && string.Compare(
+                        control.name.ToString(),
+                        0,
+                        path,
+                        0,
+                        arrayNameLength,
+                        StringComparison.InvariantCultureIgnoreCase
+                    ) == 0
+                )
                 {
                     arrayIndex = arrayIndexAccumulated;
                     return control;
@@ -737,7 +755,8 @@ namespace UnityEngine.InputSystem.Layouts
                         if (usages[i].IsEmpty())
                             throw new ArgumentException(
                                 $"Empty usage entry at index {i} for control '{builder.m_Controls[index].name}' in layout '{builder.name}'",
-                                nameof(usages));
+                                nameof(usages)
+                            );
 
                     builder.m_Controls[index].usages = new ReadOnlyArray<InternedString>(usages);
                     return this;
@@ -810,20 +829,19 @@ namespace UnityEngine.InputSystem.Layouts
                 if (string.IsNullOrEmpty(name))
                     throw new ArgumentException(name);
 
-                var index = ArrayHelpers.AppendWithCapacity(ref m_Controls, ref m_ControlCount,
+                var index = ArrayHelpers.AppendWithCapacity(
+                    ref m_Controls,
+                    ref m_ControlCount,
                     new ControlItem
                     {
                         name = new InternedString(name),
                         isModifyingExistingControl = name.IndexOf('/') != -1,
                         offset = InputStateBlock.InvalidOffset,
-                        bit = InputStateBlock.InvalidOffset
-                    });
+                        bit = InputStateBlock.InvalidOffset,
+                    }
+                );
 
-                return new ControlBuilder
-                {
-                    builder = this,
-                    index = index
-                };
+                return new ControlBuilder { builder = this, index = index };
             }
 
             public Builder WithName(string name)
@@ -879,16 +897,19 @@ namespace UnityEngine.InputSystem.Layouts
 
                 // Allow layout to be unnamed. The system will automatically set the
                 // name that the layout has been registered under.
-                var layout =
-                    new InputControlLayout(new InternedString(name),
-                        type == null && string.IsNullOrEmpty(extendsLayout) ? typeof(InputDevice) : type)
+                var layout = new InputControlLayout(
+                    new InternedString(name),
+                    type == null && string.IsNullOrEmpty(extendsLayout) ? typeof(InputDevice) : type
+                )
                 {
                     m_DisplayName = displayName,
                     m_StateFormat = stateFormat,
                     m_StateSizeInBytes = stateSizeInBytes,
-                    m_BaseLayouts = !string.IsNullOrEmpty(extendsLayout) ? new InlinedArray<InternedString>(new InternedString(extendsLayout)) : default,
+                    m_BaseLayouts = !string.IsNullOrEmpty(extendsLayout)
+                        ? new InlinedArray<InternedString>(new InternedString(extendsLayout))
+                        : default,
                     m_Controls = controls,
-                    m_UpdateBeforeRender = updateBeforeRender
+                    m_UpdateBeforeRender = updateBeforeRender,
                 };
 
                 return layout;
@@ -944,12 +965,11 @@ namespace UnityEngine.InputSystem.Layouts
                 m_Description = layoutAttribute?.description,
                 m_DisplayName = layoutAttribute?.displayName,
                 canRunInBackground = layoutAttribute?.canRunInBackgroundInternal,
-                isNoisy = layoutAttribute?.isNoisy ?? false
+                isNoisy = layoutAttribute?.isNoisy ?? false,
             };
 
             if (layoutAttribute?.commonUsages != null)
-                layout.m_CommonUsages =
-                    ArrayHelpers.Select(layoutAttribute.commonUsages, x => new InternedString(x));
+                layout.m_CommonUsages = ArrayHelpers.Select(layoutAttribute.commonUsages, x => new InternedString(x));
 
             return layout;
         }
@@ -992,7 +1012,7 @@ namespace UnityEngine.InputSystem.Layouts
             IsOverride = 1 << 2,
             CanRunInBackground = 1 << 3,
             CanRunInBackgroundIsSet = 1 << 4,
-            IsNoisy = 1 << 5
+            IsNoisy = 1 << 5,
         }
 
         private InputControlLayout(string name, Type type)
@@ -1017,15 +1037,25 @@ namespace UnityEngine.InputSystem.Layouts
 
         // Add ControlLayouts for every public property in the given type that has
         // InputControlAttribute applied to it or has an InputControl-derived value type.
-        private static void AddControlItemsFromProperties(Type type, List<ControlItem> controlLayouts, string layoutName)
+        private static void AddControlItemsFromProperties(
+            Type type,
+            List<ControlItem> controlLayouts,
+            string layoutName
+        )
         {
-            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            var properties = type.GetProperties(
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly
+            );
             AddControlItemsFromMembers(properties, controlLayouts, layoutName);
         }
 
         // Add ControlLayouts for every member in the list that has InputControlAttribute applied to it
         // or has an InputControl-derived value type.
-        private static void AddControlItemsFromMembers(MemberInfo[] members, List<ControlItem> controlItems, string layoutName)
+        private static void AddControlItemsFromMembers(
+            MemberInfo[] members,
+            List<ControlItem> controlItems,
+            string layoutName
+        )
         {
             foreach (var member in members)
             {
@@ -1038,7 +1068,11 @@ namespace UnityEngine.InputSystem.Layouts
 
                 // If the value type of the member is a struct type and implements the IInputStateTypeInfo
                 // interface, dive inside and look. This is useful for composing states of one another.
-                if (valueType != null && valueType.IsValueType && typeof(IInputStateTypeInfo).IsAssignableFrom(valueType))
+                if (
+                    valueType != null
+                    && valueType.IsValueType
+                    && typeof(IInputStateTypeInfo).IsAssignableFrom(valueType)
+                )
                 {
                     var controlCountBefore = controlItems.Count;
 
@@ -1085,8 +1119,11 @@ namespace UnityEngine.InputSystem.Layouts
             }
         }
 
-        private static void AddControlItemsFromMember(MemberInfo member,
-            InputControlAttribute[] attributes, List<ControlItem> controlItems)
+        private static void AddControlItemsFromMember(
+            MemberInfo member,
+            InputControlAttribute[] attributes,
+            List<ControlItem> controlItems
+        )
         {
             // InputControlAttribute can be applied multiple times to the same member,
             // generating a separate control for each occurrence. However, it can also
@@ -1127,8 +1164,11 @@ namespace UnityEngine.InputSystem.Layouts
 
             // Determine layout.
             var layout = attribute?.layout;
-            if (string.IsNullOrEmpty(layout) && !isModifyingChildControlByPath &&
-                (!(member is FieldInfo) || member.GetCustomAttribute<FixedBufferAttribute>(false) == null)) // Ignore fixed buffer fields.
+            if (
+                string.IsNullOrEmpty(layout)
+                && !isModifyingChildControlByPath
+                && (!(member is FieldInfo) || member.GetCustomAttribute<FixedBufferAttribute>(false) == null)
+            ) // Ignore fixed buffer fields.
             {
                 var valueType = TypeHelpers.GetValueType(member);
                 layout = InferLayoutFromValueType(valueType);
@@ -1450,8 +1490,7 @@ namespace UnityEngine.InputSystem.Layouts
                     // Filter out controls coming from the base layout which are targeting variants
                     // that we're not interested in.
                     var indexStart = controls.Count;
-                    controls.AddRange(
-                        baseControlTable.Values.Where(x => VariantsMatch(m_Variants, x.variants)));
+                    controls.AddRange(baseControlTable.Values.Where(x => VariantsMatch(m_Variants, x.variants)));
 
                     // Mark the controls as being inherited.
                     for (var i = indexStart; i < controls.Count; ++i)
@@ -1467,7 +1506,9 @@ namespace UnityEngine.InputSystem.Layouts
         }
 
         private static Dictionary<string, ControlItem> CreateLookupTableForControls(
-            ControlItem[] controlItems, List<string> variants = null)
+            ControlItem[] controlItems,
+            List<string> variants = null
+        )
         {
             var table = new Dictionary<string, ControlItem>();
             for (var i = 0; i < controlItems.Length; ++i)
@@ -1509,8 +1550,14 @@ namespace UnityEngine.InputSystem.Layouts
         {
             ////REVIEW: does this make sense?
             // Default variant works with any other expected variant.
-            if (actual != null &&
-                StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(DefaultVariant, actual, VariantSeparator[0]))
+            if (
+                actual != null
+                && StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                    DefaultVariant,
+                    actual,
+                    VariantSeparator[0]
+                )
+            )
                 return true;
 
             // If we don't expect a specific variant, we accept any variant.
@@ -1523,11 +1570,19 @@ namespace UnityEngine.InputSystem.Layouts
                 return true;
 
             // Match if the two variant sets intersect on at least one element.
-            return StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(expected, actual, VariantSeparator[0]);
+            return StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                expected,
+                actual,
+                VariantSeparator[0]
+            );
         }
 
-        internal static void ParseHeaderFieldsFromJson(string json, out InternedString name,
-            out InlinedArray<InternedString> baseLayouts, out InputDeviceMatcher deviceMatcher)
+        internal static void ParseHeaderFieldsFromJson(
+            string json,
+            out InternedString name,
+            out InlinedArray<InternedString> baseLayouts,
+            out InputDeviceMatcher deviceMatcher
+        )
         {
             var header = JsonUtility.FromJson<LayoutJsonNameAndDescriptorOnly>(json);
             name = new InternedString(header.name);
@@ -1556,7 +1611,7 @@ namespace UnityEngine.InputSystem.Layouts
         {
             // Disable warnings that these fields are never assigned to. They are set
             // by JsonUtility.
-            #pragma warning disable 0649
+#pragma warning disable 0649
             // ReSharper disable MemberCanBePrivate.Local
 
             public string name;
@@ -1575,7 +1630,7 @@ namespace UnityEngine.InputSystem.Layouts
             public ControlItemJson[] controls;
 
             // ReSharper restore MemberCanBePrivate.Local
-            #pragma warning restore 0649
+#pragma warning restore 0649
 
             public InputControlLayout ToLayout()
             {
@@ -1590,12 +1645,15 @@ namespace UnityEngine.InputSystem.Layouts
                     if (type == null)
                     {
                         Debug.Log(
-                            $"Cannot find type '{this.type}' used by layout '{name}'; falling back to using InputDevice");
+                            $"Cannot find type '{this.type}' used by layout '{name}'; falling back to using InputDevice"
+                        );
                         type = typeof(InputDevice);
                     }
                     else if (!typeof(InputControl).IsAssignableFrom(type))
                     {
-                        throw new InvalidOperationException($"'{this.type}' used by layout '{name}' is not an InputControl");
+                        throw new InvalidOperationException(
+                            $"'{this.type}' used by layout '{name}' is not an InputControl"
+                        );
                     }
                 }
                 else if (string.IsNullOrEmpty(extend))
@@ -1630,7 +1688,9 @@ namespace UnityEngine.InputSystem.Layouts
                     else if (beforeRenderLowerCase == "update")
                         layout.m_UpdateBeforeRender = true;
                     else
-                        throw new InvalidOperationException($"Invalid beforeRender setting '{beforeRender}' (should be 'ignore' or 'update')");
+                        throw new InvalidOperationException(
+                            $"Invalid beforeRender setting '{beforeRender}' (should be 'ignore' or 'update')"
+                        );
                 }
 
                 // CanRunInBackground flag.
@@ -1642,7 +1702,9 @@ namespace UnityEngine.InputSystem.Layouts
                     else if (runInBackgroundLowerCase == "disabled")
                         layout.canRunInBackground = false;
                     else
-                        throw new InvalidOperationException($"Invalid runInBackground setting '{beforeRender}' (should be 'enabled' or 'disabled')");
+                        throw new InvalidOperationException(
+                            $"Invalid runInBackground setting '{beforeRender}' (should be 'enabled' or 'disabled')"
+                        );
                 }
 
                 // Add controls.
@@ -1674,11 +1736,15 @@ namespace UnityEngine.InputSystem.Layouts
                     isGenericTypeOfDevice = layout.isGenericTypeOfDevice,
                     hideInUI = layout.hideInUI,
                     extend = layout.m_BaseLayouts.length == 1 ? layout.m_BaseLayouts[0].ToString() : null,
-                    extendMultiple = layout.m_BaseLayouts.length > 1 ? layout.m_BaseLayouts.ToArray(x => x.ToString()) : null,
+                    extendMultiple =
+                        layout.m_BaseLayouts.length > 1 ? layout.m_BaseLayouts.ToArray(x => x.ToString()) : null,
                     format = layout.stateFormat.ToString(),
                     commonUsages = ArrayHelpers.Select(layout.m_CommonUsages, x => x.ToString()),
                     controls = ControlItemJson.FromControlItems(layout.m_Controls),
-                    beforeRender = layout.m_UpdateBeforeRender != null ? (layout.m_UpdateBeforeRender.Value ? "Update" : "Ignore") : null,
+                    beforeRender =
+                        layout.m_UpdateBeforeRender != null
+                            ? (layout.m_UpdateBeforeRender.Value ? "Update" : "Ignore")
+                            : null,
                 };
             }
         }
@@ -1692,7 +1758,7 @@ namespace UnityEngine.InputSystem.Layouts
         {
             // Disable warnings that these fields are never assigned to. They are set
             // by JsonUtility.
-            #pragma warning disable 0649
+#pragma warning disable 0649
             // ReSharper disable MemberCanBePrivate.Local
 
             public string name;
@@ -1725,7 +1791,7 @@ namespace UnityEngine.InputSystem.Layouts
             public string maxValue;
 
             // ReSharper restore MemberCanBePrivate.Local
-            #pragma warning restore 0649
+#pragma warning restore 0649
 
             public ControlItemJson()
             {
@@ -1764,7 +1830,9 @@ namespace UnityEngine.InputSystem.Layouts
                         usagesList.Add(usage);
                     if (usages != null)
                         usagesList.AddRange(usages);
-                    layout.usages = new ReadOnlyArray<InternedString>(usagesList.Select(x => new InternedString(x)).ToArray());
+                    layout.usages = new ReadOnlyArray<InternedString>(
+                        usagesList.Select(x => new InternedString(x)).ToArray()
+                    );
                 }
 
                 if (!string.IsNullOrEmpty(alias) || aliases != null)
@@ -1774,14 +1842,18 @@ namespace UnityEngine.InputSystem.Layouts
                         aliasesList.Add(alias);
                     if (aliases != null)
                         aliasesList.AddRange(aliases);
-                    layout.aliases = new ReadOnlyArray<InternedString>(aliasesList.Select(x => new InternedString(x)).ToArray());
+                    layout.aliases = new ReadOnlyArray<InternedString>(
+                        aliasesList.Select(x => new InternedString(x)).ToArray()
+                    );
                 }
 
                 if (!string.IsNullOrEmpty(parameters))
                     layout.parameters = new ReadOnlyArray<NamedValue>(NamedValue.ParseMultiple(parameters));
 
                 if (!string.IsNullOrEmpty(processors))
-                    layout.processors = new ReadOnlyArray<NameAndParameters>(NameAndParameters.ParseMultiple(processors).ToArray());
+                    layout.processors = new ReadOnlyArray<NameAndParameters>(
+                        NameAndParameters.ParseMultiple(processors).ToArray()
+                    );
 
                 if (defaultState != null)
                     layout.defaultState = PrimitiveValue.FromObject(defaultState);
@@ -1833,7 +1905,6 @@ namespace UnityEngine.InputSystem.Layouts
             }
         }
 
-
         internal struct Collection
         {
             public const float kBaseScoreForNonGeneratedLayouts = 1.0f;
@@ -1857,6 +1928,7 @@ namespace UnityEngine.InputSystem.Layouts
             public Dictionary<InternedString, InternedString[]> layoutOverrides;
             public HashSet<InternedString> layoutOverrideNames;
             public Dictionary<InternedString, PrecompiledLayout> precompiledLayouts;
+
             ////TODO: find a smarter approach that doesn't require linearly scanning through all matchers
             ////  (also ideally shouldn't be a List but with Collection being a struct and given how it's
             ////  stored by InputManager.m_Layouts and in s_Layouts; we can't make it a plain array)
@@ -1911,8 +1983,9 @@ namespace UnityEngine.InputSystem.Layouts
 
             public bool HasLayout(InternedString name)
             {
-                return layoutTypes.ContainsKey(name) || layoutStrings.ContainsKey(name) ||
-                    layoutBuilders.ContainsKey(name);
+                return layoutTypes.ContainsKey(name)
+                    || layoutStrings.ContainsKey(name)
+                    || layoutBuilders.ContainsKey(name);
             }
 
             private InputControlLayout TryLoadLayoutInternal(InternedString name)
@@ -1940,7 +2013,10 @@ namespace UnityEngine.InputSystem.Layouts
                 return null;
             }
 
-            public InputControlLayout TryLoadLayout(InternedString name, Dictionary<InternedString, InputControlLayout> table = null)
+            public InputControlLayout TryLoadLayout(
+                InternedString name,
+                Dictionary<InternedString, InputControlLayout> table = null
+            )
             {
                 // See if we have it cached.
                 if (table != null && table.TryGetValue(name, out var layout))
@@ -1968,7 +2044,8 @@ namespace UnityEngine.InputSystem.Layouts
                         var baseLayout = TryLoadLayout(baseLayoutName, table);
                         if (baseLayout == null)
                             throw new LayoutNotFoundException(
-                                $"Cannot find base layout '{baseLayoutName}' of layout '{name}'");
+                                $"Cannot find base layout '{baseLayoutName}' of layout '{name}'"
+                            );
                         layout.MergeLayout(baseLayout);
 
                         if (layout.m_BaseLayouts.length == 0)
@@ -2025,7 +2102,11 @@ namespace UnityEngine.InputSystem.Layouts
                 return layoutName;
             }
 
-            public bool ComputeDistanceInInheritanceHierarchy(InternedString firstLayout, InternedString secondLayout, out int distance)
+            public bool ComputeDistanceInInheritanceHierarchy(
+                InternedString firstLayout,
+                InternedString secondLayout,
+                out int distance
+            )
             {
                 distance = 0;
 
@@ -2121,8 +2202,11 @@ namespace UnityEngine.InputSystem.Layouts
                 if (controlType == null)
                     return false;
 
-                var valueTypOfControl =
-                    TypeHelpers.GetGenericTypeArgumentFromHierarchy(controlType, typeof(InputControl<>), 0);
+                var valueTypOfControl = TypeHelpers.GetGenericTypeArgumentFromHierarchy(
+                    controlType,
+                    typeof(InputControl<>),
+                    0
+                );
                 if (valueTypOfControl == null)
                     return false;
 
@@ -2162,7 +2246,7 @@ namespace UnityEngine.InputSystem.Layouts
                         return;
 
                 // Append.
-                layoutMatchers.Add(new LayoutMatcher {layoutName = layout, deviceMatcher = matcher});
+                layoutMatchers.Add(new LayoutMatcher { layoutName = layout, deviceMatcher = matcher });
             }
         }
 
@@ -2173,9 +2257,7 @@ namespace UnityEngine.InputSystem.Layouts
         {
             public string layout { get; }
 
-            public LayoutNotFoundException()
-            {
-            }
+            public LayoutNotFoundException() { }
 
             public LayoutNotFoundException(string name, string message)
                 : base(message)
@@ -2189,15 +2271,11 @@ namespace UnityEngine.InputSystem.Layouts
                 layout = name;
             }
 
-            public LayoutNotFoundException(string message, Exception innerException) :
-                base(message, innerException)
-            {
-            }
+            public LayoutNotFoundException(string message, Exception innerException)
+                : base(message, innerException) { }
 
-            protected LayoutNotFoundException(SerializationInfo info,
-                                              StreamingContext context) : base(info, context)
-            {
-            }
+            protected LayoutNotFoundException(SerializationInfo info, StreamingContext context)
+                : base(info, context) { }
         }
 
         // Constructs InputControlLayout instances and caches them.
@@ -2249,12 +2327,13 @@ namespace UnityEngine.InputSystem.Layouts
         internal static CacheRefInstance CacheRef()
         {
             ++s_CacheInstanceRef;
-            return new CacheRefInstance {valid = true};
+            return new CacheRefInstance { valid = true };
         }
 
         internal struct CacheRefInstance : IDisposable
         {
             public bool valid; // Make sure we can distinguish default-initialized instances.
+
             public void Dispose()
             {
                 if (!valid)

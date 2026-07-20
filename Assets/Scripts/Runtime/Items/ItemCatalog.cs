@@ -1,21 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+
 namespace NPCSystem.Items
 {
     /// <summary>
@@ -72,9 +71,7 @@ namespace NPCSystem.Items
         /// </summary>
         public NPCItemDefinition[] FindByTag(string tag)
         {
-            return _definitions
-                .Where(d => d != null && d.HasTag(tag))
-                .ToArray();
+            return _definitions.Where(d => d != null && d.HasTag(tag)).ToArray();
         }
 
         /// <summary>
@@ -82,9 +79,7 @@ namespace NPCSystem.Items
         /// </summary>
         public NPCItemDefinition[] FindByCategory(ItemCategory category)
         {
-            return _definitions
-                .Where(d => d != null && d.Category == category)
-                .ToArray();
+            return _definitions.Where(d => d != null && d.Category == category).ToArray();
         }
 
         void OnEnable()

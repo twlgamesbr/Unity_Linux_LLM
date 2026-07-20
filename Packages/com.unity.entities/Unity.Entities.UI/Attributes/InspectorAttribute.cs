@@ -7,7 +7,5 @@ namespace Unity.Entities.UI
     /// Base class to derive property attributes that can work on fields and properties.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public abstract class InspectorAttribute : PropertyAttribute
-    {
-    }
+    public abstract class InspectorAttribute : PropertyAttribute { }
 }

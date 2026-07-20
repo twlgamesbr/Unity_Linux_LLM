@@ -10,7 +10,10 @@ using UnityEngine;
 [assembly: InternalsVisibleTo("Unity.Scenes")]
 
 [assembly: GeneratePropertyBagsForTypesQualifiedWith(typeof(Unity.Entities.ISharedComponentData))]
-[assembly: GeneratePropertyBagsForTypesQualifiedWith(typeof(Unity.Entities.IComponentData), TypeGenerationOptions.ReferenceType)]
+[assembly: GeneratePropertyBagsForTypesQualifiedWith(
+    typeof(Unity.Entities.IComponentData),
+    TypeGenerationOptions.ReferenceType
+)]
 
 namespace Unity.Entities.Serialization
 {
@@ -39,7 +42,7 @@ namespace Unity.Entities.Serialization
         {
             return new UnityEngine.Keyframe(kf.Time, kf.Value, kf.InTangent, kf.OutTangent, kf.InWeight, kf.OutWeight)
             {
-                weightedMode = (UnityEngine.WeightedMode) kf.WeightedMode
+                weightedMode = (UnityEngine.WeightedMode)kf.WeightedMode,
             };
         }
 
@@ -55,9 +58,10 @@ namespace Unity.Entities.Serialization
     /// <remarks>
     /// This is used as a wrapper around <see cref="Unity.Serialization.Binary.BinarySerialization"/> with a custom layer for <see cref="UnityEngine.Object"/>.
     /// </remarks>
-    unsafe class ManagedObjectBinaryWriter : Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>,
-        IBinaryAdapter<UnityEngine.AnimationCurve>,
-        Unity.Serialization.Binary.IBinaryAdapter<UntypedUnityObjectRef>
+    unsafe class ManagedObjectBinaryWriter
+        : Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>,
+            IBinaryAdapter<UnityEngine.AnimationCurve>,
+            Unity.Serialization.Binary.IBinaryAdapter<UntypedUnityObjectRef>
     {
         readonly UnsafeAppendBuffer* m_Stream;
         readonly BinarySerializationParameters m_Params;
@@ -73,7 +77,7 @@ namespace Unity.Entities.Serialization
             m_Stream = stream;
             m_Params = new BinarySerializationParameters
             {
-                UserDefinedAdapters = new List<IBinaryAdapter> {this},
+                UserDefinedAdapters = new List<IBinaryAdapter> { this },
                 State = new BinarySerializationState(),
             };
             m_UnityObjectRefs = unityObjectRefs;
@@ -99,7 +103,10 @@ namespace Unity.Entities.Serialization
             BinarySerialization.ToBinary(m_Stream, obj, parameters);
         }
 
-        void Unity.Serialization.Binary.IBinaryAdapter<UntypedUnityObjectRef>.Serialize(in BinarySerializationContext<UntypedUnityObjectRef> context, UntypedUnityObjectRef value)
+        void Unity.Serialization.Binary.IBinaryAdapter<UntypedUnityObjectRef>.Serialize(
+            in BinarySerializationContext<UntypedUnityObjectRef> context,
+            UntypedUnityObjectRef value
+        )
         {
             var index = -1;
 
@@ -118,10 +125,15 @@ namespace Unity.Entities.Serialization
 
         public UntypedUnityObjectRef Deserialize(in BinaryDeserializationContext<UntypedUnityObjectRef> context)
         {
-            throw new InvalidOperationException($"Deserialize should never be invoked by {nameof(ManagedObjectBinaryWriter)}");
+            throw new InvalidOperationException(
+                $"Deserialize should never be invoked by {nameof(ManagedObjectBinaryWriter)}"
+            );
         }
 
-        void Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Serialize(IBinarySerializationContext context, UnityEngine.Object value)
+        void Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Serialize(
+            IBinarySerializationContext context,
+            UnityEngine.Object value
+        )
         {
             var index = -1;
 
@@ -142,12 +154,19 @@ namespace Unity.Entities.Serialization
             context.Writer->Add(index);
         }
 
-        object Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Deserialize(IBinaryDeserializationContext context)
+        object Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Deserialize(
+            IBinaryDeserializationContext context
+        )
         {
-            throw new InvalidOperationException($"Deserialize should never be invoked by {nameof(ManagedObjectBinaryWriter)}");
+            throw new InvalidOperationException(
+                $"Deserialize should never be invoked by {nameof(ManagedObjectBinaryWriter)}"
+            );
         }
 
-        void IBinaryAdapter<UnityEngine.AnimationCurve>.Serialize(in BinarySerializationContext<UnityEngine.AnimationCurve> context, UnityEngine.AnimationCurve value)
+        void IBinaryAdapter<UnityEngine.AnimationCurve>.Serialize(
+            in BinarySerializationContext<UnityEngine.AnimationCurve> context,
+            UnityEngine.AnimationCurve value
+        )
         {
             if (value != null)
             {
@@ -157,7 +176,7 @@ namespace Unity.Entities.Serialization
 
                 for (int i = 0, count = value.length; i < count; ++i)
                 {
-                    context.Writer->Add((SerializedKeyFrame) value[i]);
+                    context.Writer->Add((SerializedKeyFrame)value[i]);
                 }
             }
             else
@@ -166,9 +185,13 @@ namespace Unity.Entities.Serialization
             }
         }
 
-        UnityEngine.AnimationCurve IBinaryAdapter<UnityEngine.AnimationCurve>.Deserialize(in BinaryDeserializationContext<UnityEngine.AnimationCurve> context)
+        UnityEngine.AnimationCurve IBinaryAdapter<UnityEngine.AnimationCurve>.Deserialize(
+            in BinaryDeserializationContext<UnityEngine.AnimationCurve> context
+        )
         {
-            throw new InvalidOperationException($"Deserialize should never be invoked by {nameof(ManagedObjectBinaryWriter)}");
+            throw new InvalidOperationException(
+                $"Deserialize should never be invoked by {nameof(ManagedObjectBinaryWriter)}"
+            );
         }
     }
 
@@ -178,9 +201,10 @@ namespace Unity.Entities.Serialization
     /// <remarks>
     /// This is used as a wrapper around <see cref="Unity.Serialization.Binary.BinarySerialization"/> with a custom layer for <see cref="UnityEngine.Object"/>.
     /// </remarks>
-    unsafe class ManagedObjectBinaryReader : Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>,
-        IBinaryAdapter<UnityEngine.AnimationCurve>,
-        Unity.Serialization.Binary.IBinaryAdapter<UntypedUnityObjectRef>
+    unsafe class ManagedObjectBinaryReader
+        : Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>,
+            IBinaryAdapter<UnityEngine.AnimationCurve>,
+            Unity.Serialization.Binary.IBinaryAdapter<UntypedUnityObjectRef>
     {
         readonly UnsafeAppendBuffer.Reader* m_Stream;
         readonly BinarySerializationParameters m_Params;
@@ -197,7 +221,7 @@ namespace Unity.Entities.Serialization
             m_Stream = stream;
             m_Params = new BinarySerializationParameters
             {
-                UserDefinedAdapters = new List<IBinaryAdapter> {this},
+                UserDefinedAdapters = new List<IBinaryAdapter> { this },
                 State = new BinarySerializationState(),
             };
             m_UnityObjects = unityObjects;
@@ -210,7 +234,6 @@ namespace Unity.Entities.Serialization
         /// </summary>
         /// <param name="adapter">The custom adapter to add.</param>
         public void AddAdapter(IBinaryAdapter adapter) => m_Params.UserDefinedAdapters.Add(adapter);
-
 
         /// <summary>
         /// Reads from the binary stream and returns the next object.
@@ -227,12 +250,19 @@ namespace Unity.Entities.Serialization
             return BinarySerialization.FromBinary<object>(m_Stream, parameters);
         }
 
-        void Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Serialize(IBinarySerializationContext context, UnityEngine.Object value)
+        void Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Serialize(
+            IBinarySerializationContext context,
+            UnityEngine.Object value
+        )
         {
-            throw new InvalidOperationException($"Serialize should never be invoked by {nameof(ManagedObjectBinaryReader)}.");
+            throw new InvalidOperationException(
+                $"Serialize should never be invoked by {nameof(ManagedObjectBinaryReader)}."
+            );
         }
 
-        object Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Deserialize(IBinaryDeserializationContext context)
+        object Unity.Serialization.Binary.IContravariantBinaryAdapter<UnityEngine.Object>.Deserialize(
+            IBinaryDeserializationContext context
+        )
         {
             var index = context.Reader->ReadNext<int>();
 
@@ -240,31 +270,38 @@ namespace Unity.Entities.Serialization
                 return null;
 
             if (!m_UnityObjects.IsCreated)
-                throw new ArgumentException("We are reading a UnityEngine.Object however no ObjectTable was provided to the ManagedObjectBinaryReader.");
+                throw new ArgumentException(
+                    "We are reading a UnityEngine.Object however no ObjectTable was provided to the ManagedObjectBinaryReader."
+                );
 
             if ((uint)index >= m_UnityObjects.Length)
-                throw new ArgumentException("We are reading a UnityEngine.Object but the deserialized index is out of range for the given object table.");
+                throw new ArgumentException(
+                    "We are reading a UnityEngine.Object but the deserialized index is out of range for the given object table."
+                );
 
             return m_UnityObjectsArray[index];
         }
 
-        void IBinaryAdapter<UnityEngine.AnimationCurve>.Serialize(in BinarySerializationContext<UnityEngine.AnimationCurve> context, UnityEngine.AnimationCurve value)
+        void IBinaryAdapter<UnityEngine.AnimationCurve>.Serialize(
+            in BinarySerializationContext<UnityEngine.AnimationCurve> context,
+            UnityEngine.AnimationCurve value
+        )
         {
-            throw new InvalidOperationException($"Serialize should never be invoked by {nameof(ManagedObjectBinaryReader)}.");
+            throw new InvalidOperationException(
+                $"Serialize should never be invoked by {nameof(ManagedObjectBinaryReader)}."
+            );
         }
 
-        UnityEngine.AnimationCurve IBinaryAdapter<UnityEngine.AnimationCurve>.Deserialize(in BinaryDeserializationContext<UnityEngine.AnimationCurve> context)
+        UnityEngine.AnimationCurve IBinaryAdapter<UnityEngine.AnimationCurve>.Deserialize(
+            in BinaryDeserializationContext<UnityEngine.AnimationCurve> context
+        )
         {
             var length = context.Reader->ReadNext<int>();
             if (length >= 0)
             {
                 var preMode = context.Reader->ReadNext<UnityEngine.WrapMode>();
                 var postMode = context.Reader->ReadNext<UnityEngine.WrapMode>();
-                var ac = new UnityEngine.AnimationCurve()
-                {
-                    preWrapMode = preMode,
-                    postWrapMode = postMode
-                };
+                var ac = new UnityEngine.AnimationCurve() { preWrapMode = preMode, postWrapMode = postMode };
                 for (int i = 0; i < length; ++i)
                     ac.AddKey(context.Reader->ReadNext<SerializedKeyFrame>());
 
@@ -276,7 +313,9 @@ namespace Unity.Entities.Serialization
 
         public void Serialize(in BinarySerializationContext<UntypedUnityObjectRef> context, UntypedUnityObjectRef value)
         {
-            throw new InvalidOperationException($"Serialize should never be invoked by {nameof(ManagedObjectBinaryReader)}.");
+            throw new InvalidOperationException(
+                $"Serialize should never be invoked by {nameof(ManagedObjectBinaryReader)}."
+            );
         }
 
         public UntypedUnityObjectRef Deserialize(in BinaryDeserializationContext<UntypedUnityObjectRef> context)
@@ -287,10 +326,14 @@ namespace Unity.Entities.Serialization
                 return default;
 
             if (!m_UnityObjects.IsCreated)
-                throw new ArgumentException("We are reading a UnityEngine.Object however no ObjectTable was provided to the ManagedObjectBinaryReader.");
+                throw new ArgumentException(
+                    "We are reading a UnityEngine.Object however no ObjectTable was provided to the ManagedObjectBinaryReader."
+                );
 
             if ((uint)index >= m_UnityObjects.Length)
-                throw new ArgumentException("We are reading a UnityEngine.Object but the deserialized index is out of range for the given object table.");
+                throw new ArgumentException(
+                    "We are reading a UnityEngine.Object but the deserialized index is out of range for the given object table."
+                );
 
             return new UntypedUnityObjectRef { entityId = m_UnityObjects[index] };
         }

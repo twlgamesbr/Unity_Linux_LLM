@@ -14,10 +14,7 @@ namespace UnityEngine.Rendering
         internal static Line LineOfPlaneIntersectingPlane(float4 a, float4 b)
         {
             // planes do not need to have a unit length normal
-            return new Line {
-                m = a.w*b.xyz - b.w*a.xyz,
-                t = math.cross(a.xyz, b.xyz),
-            };
+            return new Line { m = a.w * b.xyz - b.w * a.xyz, t = math.cross(a.xyz, b.xyz) };
         }
 
         internal static float4 PlaneContainingLineAndPoint(Line a, float3 b)
@@ -56,11 +53,7 @@ namespace UnityEngine.Rendering
 
         internal static ReceiverPlanes CreateEmptyForTesting(Allocator allocator)
         {
-            return new ReceiverPlanes()
-            {
-                planes = new NativeList<Plane>(allocator),
-                lightFacingPlaneCount = 0,
-            };
+            return new ReceiverPlanes() { planes = new NativeList<Plane>(allocator), lightFacingPlaneCount = 0 };
         }
 
         internal void Dispose(JobHandle job)
@@ -70,11 +63,7 @@ namespace UnityEngine.Rendering
 
         internal static ReceiverPlanes Create(in BatchCullingContext cc, Allocator allocator)
         {
-            var result = new ReceiverPlanes()
-            {
-                planes = new NativeList<Plane>(allocator),
-                lightFacingPlaneCount = 0,
-            };
+            var result = new ReceiverPlanes() { planes = new NativeList<Plane>(allocator), lightFacingPlaneCount = 0 };
 
             if (cc.viewType == BatchCullingViewType.Light && cc.receiverPlaneCount != 0)
             {
@@ -126,12 +115,15 @@ namespace UnityEngine.Rendering
                                 var planeEqA = new float4(planeA.normal, planeA.distance);
                                 var planeEqB = new float4(planeB.normal, planeB.distance);
                                 var silhouetteEdge = Line.LineOfPlaneIntersectingPlane(planeEqA, planeEqB);
-                                var silhouettePlaneEq = Line.PlaneContainingLineWithNormalPerpendicularToVector(silhouetteEdge, lightDir);
+                                var silhouettePlaneEq = Line.PlaneContainingLineWithNormalPerpendicularToVector(
+                                    silhouetteEdge,
+                                    lightDir
+                                );
 
                                 // try to normalize
                                 silhouettePlaneEq = silhouettePlaneEq / math.length(silhouettePlaneEq.xyz);
                                 if (!math.any(math.isnan(silhouettePlaneEq)))
-                                     result.planes.Add(new Plane(silhouettePlaneEq.xyz, silhouettePlaneEq.w));
+                                    result.planes.Add(new Plane(silhouettePlaneEq.xyz, silhouettePlaneEq.w));
                             }
                         }
                     }
@@ -183,7 +175,7 @@ namespace UnityEngine.Rendering
                                 // try to normalize
                                 silhouettePlaneEq = silhouettePlaneEq / math.length(silhouettePlaneEq.xyz);
                                 if (!math.any(math.isnan(silhouettePlaneEq)))
-                                     result.planes.Add(new Plane(silhouettePlaneEq.xyz, silhouettePlaneEq.w));
+                                    result.planes.Add(new Plane(silhouettePlaneEq.xyz, silhouettePlaneEq.w));
                             }
                         }
                     }
@@ -202,6 +194,7 @@ namespace UnityEngine.Rendering
             public float4 ny;
             public float4 nz;
             public float4 d;
+
             // Store absolute values of plane normals to avoid recalculating per instance
             public float4 nxAbs;
             public float4 nyAbs;
@@ -237,7 +230,12 @@ namespace UnityEngine.Rendering
             splitInfos.Dispose(job);
         }
 
-        internal static FrustumPlaneCuller Create(in BatchCullingContext cc, NativeArray<Plane> receiverPlanes, in ReceiverSphereCuller receiverSphereCuller, Allocator allocator)
+        internal static FrustumPlaneCuller Create(
+            in BatchCullingContext cc,
+            NativeArray<Plane> receiverPlanes,
+            in ReceiverSphereCuller receiverSphereCuller,
+            Allocator allocator
+        )
         {
             int splitCount = cc.cullingSplits.Length;
 
@@ -245,7 +243,7 @@ namespace UnityEngine.Rendering
             for (int splitIndex = 0; splitIndex < splitCount; ++splitIndex)
             {
                 int planeCount = receiverPlanes.Length + cc.cullingSplits[splitIndex].cullingPlaneCount;
-                totalPacketCount += (planeCount + 3)/4;
+                totalPacketCount += (planeCount + 3) / 4;
             }
 
             FrustumPlaneCuller result = new FrustumPlaneCuller()
@@ -272,21 +270,26 @@ namespace UnityEngine.Rendering
                 if (receiverSphereCuller.UseReceiverPlanes())
                     tmpPlanes.AddRange(receiverPlanes);
 
-                int packetCount = (tmpPlanes.Length + 3)/4;
-                result.splitInfos[splitIndex] = new SplitInfo()
-                {
-                    packetCount = packetCount,
-                };
+                int packetCount = (tmpPlanes.Length + 3) / 4;
+                result.splitInfos[splitIndex] = new SplitInfo() { packetCount = packetCount };
 
                 for (int i = 0; i < packetCount; ++i)
-                    result.planePackets[packetBase + i] = new PlanePacket4(tmpPlanes.AsArray(), 4*i, tmpPlanes.Length - 1);
+                    result.planePackets[packetBase + i] = new PlanePacket4(
+                        tmpPlanes.AsArray(),
+                        4 * i,
+                        tmpPlanes.Length - 1
+                    );
                 packetBase += packetCount;
             }
             tmpPlanes.Dispose();
             return result;
         }
 
-        internal static uint ComputeSplitVisibilityMask(NativeArray<PlanePacket4> planePackets, NativeArray<SplitInfo> splitInfos, in AABB bounds)
+        internal static uint ComputeSplitVisibilityMask(
+            NativeArray<PlanePacket4> planePackets,
+            NativeArray<SplitInfo> splitInfos,
+            in AABB bounds
+        )
         {
             float4 cx = bounds.center.xxxx;
             float4 cy = bounds.center.yyyy;
@@ -308,8 +311,8 @@ namespace UnityEngine.Rendering
                 for (int i = 0; i < splitInfo.packetCount; ++i)
                 {
                     PlanePacket4 p = planePackets[packetBase + i];
-                    float4 distances = p.nx*cx + p.ny*cy + p.nz*cz + p.d;
-                    float4 radii = p.nxAbs*ex + p.nyAbs*ey + p.nzAbs*ez;
+                    float4 distances = p.nx * cx + p.ny * cy + p.nz * cz + p.d;
+                    float4 radii = p.nxAbs * ex + p.nyAbs * ey + p.nzAbs * ez;
 
                     isCulled = isCulled | (distances + radii < float4.zero);
                 }
@@ -384,7 +387,8 @@ namespace UnityEngine.Rendering
 
                 float4 receiverSphereLightSpace = new float4(
                     math.mul(result.worldToLightSpaceRotation, cullingSplit.sphereCenter),
-                    cullingSplit.sphereRadius);
+                    cullingSplit.sphereRadius
+                );
 
                 result.splitInfos[splitIndex] = new SplitInfo()
                 {
@@ -400,18 +404,19 @@ namespace UnityEngine.Rendering
             float3 cylinderCenter,
             float3 cylinderDirection,
             float cylinderRadius,
-            Plane plane)
+            Plane plane
+        )
         {
             float cosEpsilon = 0.001f; // clamp the cosine of glancing angles
 
             // compute the distance until the center intersects the plane
             float cosTheta = math.max(math.abs(math.dot(plane.normal, cylinderDirection)), cosEpsilon);
             float heightAbovePlane = math.dot(plane.normal, cylinderCenter) + plane.distance;
-            float centerDistanceToPlane = heightAbovePlane/cosTheta;
+            float centerDistanceToPlane = heightAbovePlane / cosTheta;
 
             // compute the additional distance until the edge of the cylinder intersects the plane
-            float sinTheta = math.sqrt(math.max(1.0f - cosTheta*cosTheta, 0.0f));
-            float edgeDistanceToPlane = cylinderRadius*sinTheta/cosTheta;
+            float sinTheta = math.sqrt(math.max(1.0f - cosTheta * cosTheta, 0.0f));
+            float edgeDistanceToPlane = cylinderRadius * sinTheta / cosTheta;
 
             return centerDistanceToPlane + edgeDistanceToPlane;
         }
@@ -420,7 +425,8 @@ namespace UnityEngine.Rendering
             NativeArray<Plane> lightFacingFrustumPlanes,
             NativeArray<SplitInfo> splitInfos,
             float3x3 worldToLightSpaceRotation,
-            in AABB bounds)
+            in AABB bounds
+        )
         {
             float3 casterCenterWorldSpace = bounds.center;
             float3 casterCenterLightSpace = math.mul(worldToLightSpaceRotation, bounds.center);
@@ -432,11 +438,15 @@ namespace UnityEngine.Rendering
             float shadowLength = math.INFINITY;
             for (int i = 0; i < lightFacingFrustumPlanes.Length; ++i)
             {
-                shadowLength = math.min(shadowLength, DistanceUntilCylinderFullyCrossesPlane(
-                    casterCenterWorldSpace,
-                    shadowDirection,
-                    casterRadius,
-                    lightFacingFrustumPlanes[i]));
+                shadowLength = math.min(
+                    shadowLength,
+                    DistanceUntilCylinderFullyCrossesPlane(
+                        casterCenterWorldSpace,
+                        shadowDirection,
+                        casterRadius,
+                        lightFacingFrustumPlanes[i]
+                    )
+                );
             }
             shadowLength = math.max(shadowLength, 0.0f);
 
@@ -451,14 +461,18 @@ namespace UnityEngine.Rendering
 
                 // compute the light space z coordinate where the caster sphere and receiver sphere just intersect
                 float sphereIntersectionMaxDistance = casterRadius + receiverRadius;
-                float zSqAtSphereIntersection = math.lengthsq(sphereIntersectionMaxDistance) - math.lengthsq(receiverToCasterLightSpace.xy);
+                float zSqAtSphereIntersection =
+                    math.lengthsq(sphereIntersectionMaxDistance) - math.lengthsq(receiverToCasterLightSpace.xy);
 
                 // if this is negative, the spheres do not overlap as circles in the XY plane, so cull the caster
                 if (zSqAtSphereIntersection < 0.0f)
                     continue;
 
                 // if the caster is outside of the receiver sphere in the light direction, it cannot cast a shadow on it, so cull it
-                if (receiverToCasterLightSpace.z > 0.0f && math.lengthsq(receiverToCasterLightSpace.z) > zSqAtSphereIntersection)
+                if (
+                    receiverToCasterLightSpace.z > 0.0f
+                    && math.lengthsq(receiverToCasterLightSpace.z) > zSqAtSphereIntersection
+                )
                     continue;
 
                 // render the caster in this split
@@ -469,9 +483,13 @@ namespace UnityEngine.Rendering
                 // then cull this caster from all the larger index splits (break from this loop)
                 // (it is sufficient to test that only the capsule start and end spheres are within the "core" receiver sphere)
                 float coreRadius = receiverRadius * splitInfo.cascadeBlendCullingFactor;
-                float3 receiverToShadowEndLightSpace = receiverToCasterLightSpace + new float3(0.0f, 0.0f, shadowLength);
+                float3 receiverToShadowEndLightSpace =
+                    receiverToCasterLightSpace + new float3(0.0f, 0.0f, shadowLength);
                 float capsuleMaxDistance = coreRadius - casterRadius;
-                float capsuleDistanceSq = math.max(math.lengthsq(receiverToCasterLightSpace), math.lengthsq(receiverToShadowEndLightSpace));
+                float capsuleDistanceSq = math.max(
+                    math.lengthsq(receiverToCasterLightSpace),
+                    math.lengthsq(receiverToShadowEndLightSpace)
+                );
                 if (capsuleMaxDistance > 0.0f && capsuleDistanceSq < math.lengthsq(capsuleMaxDistance))
                     break;
             }

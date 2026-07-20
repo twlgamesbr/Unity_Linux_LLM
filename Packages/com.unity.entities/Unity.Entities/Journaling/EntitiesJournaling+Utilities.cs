@@ -20,8 +20,11 @@ namespace Unity.Entities
         /// <returns><see langword="true"/> if successful, <see langword="false"/> otherwise.</returns>
         public static unsafe bool TryGetRecordDataAsSystemView(RecordView record, out SystemView systemView)
         {
-            if ((record.RecordType != RecordType.SystemAdded && record.RecordType != RecordType.SystemRemoved) ||
-                record.DataPtr == null || record.DataLength != UnsafeUtility.SizeOf<SystemHandle>())
+            if (
+                (record.RecordType != RecordType.SystemAdded && record.RecordType != RecordType.SystemRemoved)
+                || record.DataPtr == null
+                || record.DataLength != UnsafeUtility.SizeOf<SystemHandle>()
+            )
             {
                 systemView = default;
                 return false;
@@ -42,13 +45,21 @@ namespace Unity.Entities
         /// <param name="componentDataArray">The component data array boxed.</param>
         /// <returns><see langword="true"/> if successful, <see langword="false"/> otherwise.</returns>
         [ExcludeFromBurstCompatTesting("Returns managed object")]
-        public static unsafe bool TryGetRecordDataAsComponentDataArrayBoxed(RecordView record, out Array componentDataArray)
+        public static unsafe bool TryGetRecordDataAsComponentDataArrayBoxed(
+            RecordView record,
+            out Array componentDataArray
+        )
         {
-            if ((record.RecordType != RecordType.GetComponentDataRW &&
-                record.RecordType != RecordType.SetComponentData &&
-                record.RecordType != RecordType.SetSharedComponentData) ||
-                record.ComponentTypes.Length != 1 ||
-                record.DataPtr == null || record.DataLength == 0)
+            if (
+                (
+                    record.RecordType != RecordType.GetComponentDataRW
+                    && record.RecordType != RecordType.SetComponentData
+                    && record.RecordType != RecordType.SetSharedComponentData
+                )
+                || record.ComponentTypes.Length != 1
+                || record.DataPtr == null
+                || record.DataLength == 0
+            )
             {
                 componentDataArray = null;
                 return false;
@@ -119,7 +130,8 @@ namespace Unity.Entities
             /// <param name="count">The count of records.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] Range(int index, int count) => TryGetRecords(Ordering.Descending).Skip(index).Take(count).ToArray();
+            public static RecordView[] Range(int index, int count) =>
+                TryGetRecords(Ordering.Descending).Skip(index).Take(count).ToArray();
 
             /// <summary>
             /// Get the record matching a record index.
@@ -130,7 +142,8 @@ namespace Unity.Entities
             /// <param name="name">The record index.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithRecordIndex(ulong index) => TryGetRecords(Ordering.Descending).WithRecordIndex(index).ToArray();
+            public static RecordView[] WithRecordIndex(ulong index) =>
+                TryGetRecords(Ordering.Descending).WithRecordIndex(index).ToArray();
 
             /// <summary>
             /// Get all records matching a record type.
@@ -141,7 +154,8 @@ namespace Unity.Entities
             /// <param name="name">The record type.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithRecordType(RecordType type) => TryGetRecords(Ordering.Descending).WithRecordType(type).ToArray();
+            public static RecordView[] WithRecordType(RecordType type) =>
+                TryGetRecords(Ordering.Descending).WithRecordType(type).ToArray();
 
             /// <summary>
             /// Get all records matching a frame index.
@@ -152,7 +166,8 @@ namespace Unity.Entities
             /// <param name="name">The frame index.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithFrameIndex(int index) => TryGetRecords(Ordering.Descending).WithFrameIndex(index).ToArray();
+            public static RecordView[] WithFrameIndex(int index) =>
+                TryGetRecords(Ordering.Descending).WithFrameIndex(index).ToArray();
 
             /// <summary>
             /// Get all records matching a world name.
@@ -163,7 +178,8 @@ namespace Unity.Entities
             /// <param name="name">The world name.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithWorld(string name) => TryGetRecords(Ordering.Descending).WithWorld(name).ToArray();
+            public static RecordView[] WithWorld(string name) =>
+                TryGetRecords(Ordering.Descending).WithWorld(name).ToArray();
 
             /// <summary>
             /// Get all records matching a world sequence number.
@@ -174,7 +190,8 @@ namespace Unity.Entities
             /// <param name="name">The world sequence number.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithWorld(ulong sequenceNumber) => TryGetRecords(Ordering.Descending).WithWorld(sequenceNumber).ToArray();
+            public static RecordView[] WithWorld(ulong sequenceNumber) =>
+                TryGetRecords(Ordering.Descending).WithWorld(sequenceNumber).ToArray();
 
             /// <summary>
             /// Get all records matching an existing world.
@@ -185,7 +202,8 @@ namespace Unity.Entities
             /// <param name="name">The world.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithWorld(World world) => TryGetRecords(Ordering.Descending).WithWorld(world).ToArray();
+            public static RecordView[] WithWorld(World world) =>
+                TryGetRecords(Ordering.Descending).WithWorld(world).ToArray();
 
             /// <summary>
             /// Get all records matching a system type name.
@@ -196,7 +214,8 @@ namespace Unity.Entities
             /// <param name="name">The system type name.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithSystem(string name) => TryGetRecords(Ordering.Descending).WithSystem(name).ToArray();
+            public static RecordView[] WithSystem(string name) =>
+                TryGetRecords(Ordering.Descending).WithSystem(name).ToArray();
 
             /// <summary>
             /// Get all records matching a system handle untyped.
@@ -207,7 +226,8 @@ namespace Unity.Entities
             /// <param name="name">The system handle untyped.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithSystem(SystemHandle handle) => TryGetRecords(Ordering.Descending).WithSystem(handle).ToArray();
+            public static RecordView[] WithSystem(SystemHandle handle) =>
+                TryGetRecords(Ordering.Descending).WithSystem(handle).ToArray();
 
             /// <summary>
             /// Get all records matching an executing system type name.
@@ -218,7 +238,8 @@ namespace Unity.Entities
             /// <param name="name">The system type name.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithExecutingSystem(string name) => TryGetRecords(Ordering.Descending).WithExecutingSystem(name).ToArray();
+            public static RecordView[] WithExecutingSystem(string name) =>
+                TryGetRecords(Ordering.Descending).WithExecutingSystem(name).ToArray();
 
             /// <summary>
             /// Get all records matching an executing system handle untyped.
@@ -229,7 +250,8 @@ namespace Unity.Entities
             /// <param name="name">The system handle untyped.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithExecutingSystem(SystemHandle handle) => TryGetRecords(Ordering.Descending).WithExecutingSystem(handle).ToArray();
+            public static RecordView[] WithExecutingSystem(SystemHandle handle) =>
+                TryGetRecords(Ordering.Descending).WithExecutingSystem(handle).ToArray();
 
             /// <summary>
             /// Get all records matching an origin system type name.
@@ -240,7 +262,8 @@ namespace Unity.Entities
             /// <param name="name">The system type name.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithOriginSystem(string name) => TryGetRecords(Ordering.Descending).WithOriginSystem(name).ToArray();
+            public static RecordView[] WithOriginSystem(string name) =>
+                TryGetRecords(Ordering.Descending).WithOriginSystem(name).ToArray();
 
             /// <summary>
             /// Get all records matching an origin system handle untyped.
@@ -251,7 +274,8 @@ namespace Unity.Entities
             /// <param name="name">The system handle untyped.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithOriginSystem(SystemHandle handle) => TryGetRecords(Ordering.Descending).WithOriginSystem(handle).ToArray();
+            public static RecordView[] WithOriginSystem(SystemHandle handle) =>
+                TryGetRecords(Ordering.Descending).WithOriginSystem(handle).ToArray();
 
             /// <summary>
             /// Get all records matching a component type name.
@@ -262,7 +286,8 @@ namespace Unity.Entities
             /// <param name="name">The component type name.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithComponentType(string name) => TryGetRecords(Ordering.Descending).WithComponentType(name).ToArray();
+            public static RecordView[] WithComponentType(string name) =>
+                TryGetRecords(Ordering.Descending).WithComponentType(name).ToArray();
 
             /// <summary>
             /// Get all records matching a component type.
@@ -273,7 +298,8 @@ namespace Unity.Entities
             /// <param name="typeIndex">The component type.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithComponentType(ComponentType componentType) => TryGetRecords(Ordering.Descending).WithComponentType(componentType).ToArray();
+            public static RecordView[] WithComponentType(ComponentType componentType) =>
+                TryGetRecords(Ordering.Descending).WithComponentType(componentType).ToArray();
 
             /// <summary>
             /// Get all records matching a component type index.
@@ -284,7 +310,8 @@ namespace Unity.Entities
             /// <param name="typeIndex">The component type index.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithComponentType(TypeIndex typeIndex) => TryGetRecords(Ordering.Descending).WithComponentType(typeIndex).ToArray();
+            public static RecordView[] WithComponentType(TypeIndex typeIndex) =>
+                TryGetRecords(Ordering.Descending).WithComponentType(typeIndex).ToArray();
 
             /// <summary>
             /// Get all records matching an entity index.
@@ -295,7 +322,8 @@ namespace Unity.Entities
             /// <param name="index">The entity index.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithEntity(int index) => TryGetRecords(Ordering.Descending).WithEntity(index).ToArray();
+            public static RecordView[] WithEntity(int index) =>
+                TryGetRecords(Ordering.Descending).WithEntity(index).ToArray();
 
             /// <summary>
             /// Get all records matching an entity index and version.
@@ -307,7 +335,8 @@ namespace Unity.Entities
             /// <param name="version">The entity version.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithEntity(int index, int version) => TryGetRecords(Ordering.Descending).WithEntity(index, version).ToArray();
+            public static RecordView[] WithEntity(int index, int version) =>
+                TryGetRecords(Ordering.Descending).WithEntity(index, version).ToArray();
 
             /// <summary>
             /// Get all records matching an entity.
@@ -318,7 +347,8 @@ namespace Unity.Entities
             /// <param name="entity">The entity.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithEntity(Entity entity) => TryGetRecords(Ordering.Descending).WithEntity(entity).ToArray();
+            public static RecordView[] WithEntity(Entity entity) =>
+                TryGetRecords(Ordering.Descending).WithEntity(entity).ToArray();
 
             /// <summary>
             /// Get all records matching an existing entity name.
@@ -329,12 +359,15 @@ namespace Unity.Entities
             /// <param name="name">The entity name.</param>
             /// <returns>Array of <see cref="RecordView"/>.</returns>
             [ExcludeFromBurstCompatTesting("LINQ")]
-            public static RecordView[] WithEntity(string name) => TryGetRecords(Ordering.Descending).WithEntity(name).ToArray();
+            public static RecordView[] WithEntity(string name) =>
+                TryGetRecords(Ordering.Descending).WithEntity(name).ToArray();
         }
 
         static bool IsManagedComponent(TypeIndex typeIndex)
         {
-            return TypeManager.IsSharedComponentType(typeIndex) ? TypeManager.IsManagedSharedComponent(typeIndex) : TypeManager.IsManagedComponent(typeIndex);
+            return TypeManager.IsSharedComponentType(typeIndex)
+                ? TypeManager.IsManagedSharedComponent(typeIndex)
+                : TypeManager.IsManagedComponent(typeIndex);
         }
     }
 }

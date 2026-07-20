@@ -34,12 +34,23 @@ namespace UnityEditor.TestTools
         /// <param name="test">The test to modify</param>
         void IApplyToTest.ApplyToTest(Test test)
         {
-            test.Properties.Add(PropertyNames.Category, string.Format("RequirePlatformSupport({0})", string.Join(", ", platforms.Select(p => p.ToString()).OrderBy(p => p).ToArray())));
+            test.Properties.Add(
+                PropertyNames.Category,
+                string.Format(
+                    "RequirePlatformSupport({0})",
+                    string.Join(", ", platforms.Select(p => p.ToString()).OrderBy(p => p).ToArray())
+                )
+            );
 
             if (!platforms.All(p => BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Unknown, p)))
             {
-                var missingPlatforms = platforms.Where(p => !BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Unknown, p)).Select(p => p.ToString()).ToArray();
-                string skipReason = "Test cannot be run as it requires support for the following platforms to be installed: " + string.Join(", ", missingPlatforms);
+                var missingPlatforms = platforms
+                    .Where(p => !BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Unknown, p))
+                    .Select(p => p.ToString())
+                    .ToArray();
+                string skipReason =
+                    "Test cannot be run as it requires support for the following platforms to be installed: "
+                    + string.Join(", ", missingPlatforms);
 
                 test.RunState = RunState.Skipped;
                 test.Properties.Add(PropertyNames.SkipReason, skipReason);

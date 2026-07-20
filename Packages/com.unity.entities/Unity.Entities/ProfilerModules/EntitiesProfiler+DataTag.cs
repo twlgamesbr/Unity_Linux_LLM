@@ -8,7 +8,7 @@ namespace Unity.Entities
             WorldData,
             SystemData,
             ArchetypeData,
-            ArchetypeComponentData
+            ArchetypeComponentData,
         }
     }
 }

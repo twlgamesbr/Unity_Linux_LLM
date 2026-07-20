@@ -52,7 +52,6 @@ namespace Unity.Numerics.Memory
             /// </summary>
             public readonly Collections.Allocator allocator;
 
-
             public Allocator(long size, Collections.Allocator allocator)
             {
                 var guardSize = UnsafeUtility.SizeOf<Block>();
@@ -72,7 +71,7 @@ namespace Unity.Numerics.Memory
                 lastSearch = heap;
             }
 
-            [return : NoAlias]
+            [return: NoAlias]
             public byte* Allocate(long size)
             {
                 size = Align(size);
@@ -125,7 +124,7 @@ namespace Unity.Numerics.Memory
                 return block->Data;
             }
 
-            [return : NoAlias]
+            [return: NoAlias]
             private byte* ReserveMemory(long size)
             {
                 size = AllocSize(size);
@@ -146,23 +145,27 @@ namespace Unity.Numerics.Memory
                 var block = GetHeader(ptr);
                 var size = block->Size;
                 var last = block->content | (long)Usage.Available;
-                if (Interlocked.CompareExchange(ref block->content, size | (long)(Usage.Free | Usage.Available), last) != last)
+                if (
+                    Interlocked.CompareExchange(ref block->content, size | (long)(Usage.Free | Usage.Available), last)
+                    != last
+                )
                 {
                     throw new Exception("Bad block in Allocator.Free()");
                 }
             }
 
-            [return : NoAlias]
+            [return: NoAlias]
             Block* FindFreeBlock(long size)
             {
                 if (!heap->IsValid)
                     return null;
 
-                Block* leftNode = null, rightNode;
+                Block* leftNode = null,
+                    rightNode;
 
                 Block* leftNext = heap;
 
-            searchAgain:
+                searchAgain:
                 while (true)
                 {
                     Block* t = heap;
@@ -268,19 +271,22 @@ namespace Unity.Numerics.Memory
 
             Block* lastSearch;
 
-            public Block* HeapTop { get => (Block*)topAddr; }
+            public Block* HeapTop
+            {
+                get => (Block*)topAddr;
+            }
 
             static Block* GetHeader(void* ptr)
             {
-                return (Block *)((byte*)ptr - Block.HeaderSize);
+                return (Block*)((byte*)ptr - Block.HeaderSize);
             }
 
             static long Align(long size)
             {
                 //return (size + 0xf) & ~0xf;
                 return (size + 0x7) & ~0x7;
-//                var wordSize = UnsafeUtility.SizeOf<IntPtr>();
-//                return (size + wordSize - 1) & ~(wordSize - 1);
+                //                var wordSize = UnsafeUtility.SizeOf<IntPtr>();
+                //                return (size + wordSize - 1) & ~(wordSize - 1);
             }
 
             static long AllocSize(long size)

@@ -12,9 +12,7 @@ namespace Unity.Entities.UI
     /// <typeparam name="T">The type of the value to inspect.</typeparam>
     internal abstract class InspectorBase<T> : IInspector<T>
     {
-        internal InspectorBase()
-        {
-        }
+        internal InspectorBase() { }
 
         InspectorContext<T> IInspector<T>.Context { get; set; }
 
@@ -219,9 +217,7 @@ namespace Unity.Entities.UI
         }
 
         /// <inheritdoc/>
-        public virtual void Update()
-        {
-        }
+        public virtual void Update() { }
 
         /// <inheritdoc/>
         public bool IsPathValid(PropertyPath path)
@@ -249,8 +245,8 @@ namespace Unity.Entities.UI
         /// </summary>
         /// <param name="parent">The parent element.</param>
         /// <param name="propertyPath">The property path to the field that needs to be drawn.</param>
-        public void DoDefaultGui(VisualElement parent, string propertyPath)
-            => DoDefaultGui(parent, new PropertyPath(propertyPath));
+        public void DoDefaultGui(VisualElement parent, string propertyPath) =>
+            DoDefaultGui(parent, new PropertyPath(propertyPath));
 
         /// <summary>
         /// Allows to revert to the default drawing handler for a specific property path.
@@ -332,7 +328,9 @@ namespace Unity.Entities.UI
         void EnsureValidContext([CallerMemberName] string caller = "")
         {
             if (EqualityComparer<InspectorContext<T>>.Default.Equals(Internal.Context, default))
-                throw new InvalidOperationException($"{TypeUtility.GetTypeDisplayName(typeof(InspectorBase<T>))}: Cannot call `{caller}` before the `{nameof(Build)}` method has been called.");
+                throw new InvalidOperationException(
+                    $"{TypeUtility.GetTypeDisplayName(typeof(InspectorBase<T>))}: Cannot call `{caller}` before the `{nameof(Build)}` method has been called."
+                );
         }
     }
 }

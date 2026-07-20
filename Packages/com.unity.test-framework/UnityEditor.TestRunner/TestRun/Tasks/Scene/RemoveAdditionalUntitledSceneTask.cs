@@ -9,7 +9,9 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks.Scene
     {
         internal Func<int> GetSceneCount = () => SceneManager.sceneCount;
         internal Func<int, ISceneWrapper> GetSceneAt = i => new SceneWrapper(SceneManager.GetSceneAt(i));
-        internal Func<ISceneWrapper, bool, bool> CloseScene = (scene, remove) => EditorSceneManager.CloseScene(scene.WrappedScene, remove);
+        internal Func<ISceneWrapper, bool, bool> CloseScene = (scene, remove) =>
+            EditorSceneManager.CloseScene(scene.WrappedScene, remove);
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             var sceneCount = GetSceneCount();

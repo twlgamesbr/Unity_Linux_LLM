@@ -4,6 +4,6 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         Unsafe,
         Raster,
-        Compute
+        Compute,
     }
 }

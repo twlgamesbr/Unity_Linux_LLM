@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-
 #if UNITY_EDITOR
 using UnityEditor;
-using ProbeVolumeWithBoundsList = System.Collections.Generic.List<(UnityEngine.Rendering.ProbeVolume component, UnityEngine.Rendering.ProbeReferenceVolume.Volume volume, UnityEngine.Bounds bounds)>;
+using ProbeVolumeWithBoundsList = System.Collections.Generic.List<(
+    UnityEngine.Rendering.ProbeVolume component,
+    UnityEngine.Rendering.ProbeReferenceVolume.Volume volume,
+    UnityEngine.Bounds bounds
+)>;
 #endif
 
 namespace UnityEngine.Rendering
@@ -33,7 +36,12 @@ namespace UnityEngine.Rendering
 
         public int Count => renderers.Count + terrains.Count;
 
-        internal enum ContributorFilter { All, Scene, Selection };
+        internal enum ContributorFilter
+        {
+            All,
+            Scene,
+            Selection,
+        };
 
         internal static bool ContributesGI(GameObject go) =>
             (GameObjectUtility.GetStaticEditorFlags(go) & StaticEditorFlags.ContributeGI) != 0;
@@ -42,7 +50,8 @@ namespace UnityEngine.Rendering
 
         static Bounds TransformBounds(Bounds bounds, Matrix4x4 transform)
         {
-            Vector3 boundsMin = bounds.min, boundsMax = bounds.max;
+            Vector3 boundsMin = bounds.min,
+                boundsMax = bounds.max;
             m_Vertices[0] = new Vector3(boundsMin.x, boundsMin.y, boundsMin.z);
             m_Vertices[1] = new Vector3(boundsMax.x, boundsMin.y, boundsMin.z);
             m_Vertices[2] = new Vector3(boundsMax.x, boundsMax.y, boundsMin.z);
@@ -67,7 +76,7 @@ namespace UnityEngine.Rendering
             return result;
         }
 
-        static internal Matrix4x4 GetTreeInstanceTransform(Terrain terrain, TreeInstance tree)
+        internal static Matrix4x4 GetTreeInstanceTransform(Terrain terrain, TreeInstance tree)
         {
             var position = terrain.GetPosition() + Vector3.Scale(tree.position, terrain.terrainData.size);
             var rotation = Quaternion.Euler(0, tree.rotation * Mathf.Rad2Deg, 0);
@@ -83,15 +92,17 @@ namespace UnityEngine.Rendering
 
             Profiling.Profiler.BeginSample("GIContributors.Find");
 
-            var contributors = new GIContributors()
-            {
-                renderers = new(),
-                terrains = new(),
-            };
+            var contributors = new GIContributors() { renderers = new(), terrains = new() };
 
             void PushRenderer(Renderer renderer)
             {
-                if (!ContributesGI(renderer.gameObject) || !renderer.gameObject.TryGetComponent<MeshFilter>(out var _) || !renderer.gameObject.activeInHierarchy || !renderer.enabled || !renderer.isLOD0)
+                if (
+                    !ContributesGI(renderer.gameObject)
+                    || !renderer.gameObject.TryGetComponent<MeshFilter>(out var _)
+                    || !renderer.gameObject.activeInHierarchy
+                    || !renderer.enabled
+                    || !renderer.isLOD0
+                )
                     return;
 
                 var bounds = renderer.bounds;
@@ -101,7 +112,12 @@ namespace UnityEngine.Rendering
 
             void PushTerrain(Terrain terrain)
             {
-                if (!ContributesGI(terrain.gameObject) || !terrain.gameObject.activeInHierarchy || !terrain.enabled || terrain.terrainData == null)
+                if (
+                    !ContributesGI(terrain.gameObject)
+                    || !terrain.gameObject.activeInHierarchy
+                    || !terrain.enabled
+                    || terrain.terrainData == null
+                )
                     return;
 
                 var terrainData = terrain.terrainData;
@@ -133,7 +149,8 @@ namespace UnityEngine.Rendering
                         var tr = prefab.transform;
                         // For some reason, tree instances are not affected by rotation and position of prefab root
                         // But they are affected by scale, and by any other transform in the hierarchy
-                        var transform = Matrix4x4.TRS(tr.position, tr.rotation, Vector3.one).inverse * renderer.localToWorldMatrix;
+                        var transform =
+                            Matrix4x4.TRS(tr.position, tr.rotation, Vector3.one).inverse * renderer.localToWorldMatrix;
 
                         // Compute prefab bounds. This will be used to compute highest tree to expand terrain bounds
                         // and to approximate the bounds of tree instances for culling during voxelization.
@@ -170,13 +187,15 @@ namespace UnityEngine.Rendering
                 var totalBounds = new Bounds();
                 totalBounds.SetMinMax(terrainBounds.min, totalMax);
 
-                contributors.terrains.Add(new TerrainContributor()
-                {
-                    component = terrain,
-                    boundsWithTrees = totalBounds,
-                    boundsTerrainOnly = terrainBounds,
-                    treePrototypes = treePrototypes,
-                });
+                contributors.terrains.Add(
+                    new TerrainContributor()
+                    {
+                        component = terrain,
+                        boundsWithTrees = totalBounds,
+                        boundsTerrainOnly = terrainBounds,
+                        treePrototypes = treePrototypes,
+                    }
+                );
             }
 
             if (filter == ContributorFilter.Selection)
@@ -196,9 +215,9 @@ namespace UnityEngine.Rendering
             }
             else
             {
-                #pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                 var renderers = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.InstanceID);
-                #pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
                 Profiling.Profiler.BeginSample($"Find Renderers ({renderers.Length})");
                 foreach (var renderer in renderers)
                 {
@@ -207,7 +226,7 @@ namespace UnityEngine.Rendering
                 }
                 Profiling.Profiler.EndSample();
 
-                #pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                 var terrains = Object.FindObjectsByType<Terrain>(FindObjectsSortMode.InstanceID);
 #pragma warning restore CS0618 // Type or member is obsolete
                 Profiling.Profiler.BeginSample($"Find Terrains ({terrains.Length})");
@@ -223,7 +242,12 @@ namespace UnityEngine.Rendering
             return contributors;
         }
 
-        static bool DiscardedByProbeVolume(ProbeVolume pv, ProbeVolumeBakingSet bakingSet, float boundsVolume, int layerMask)
+        static bool DiscardedByProbeVolume(
+            ProbeVolume pv,
+            ProbeVolumeBakingSet bakingSet,
+            float boundsVolume,
+            int layerMask
+        )
         {
             if (bakingSet == null)
                 return false;
@@ -241,15 +265,15 @@ namespace UnityEngine.Rendering
             return (boundsVolume < minRendererBoundingBoxSize) || (layerMask & renderersLayerMask) == 0;
         }
 
-        public GIContributors Filter(ProbeVolumeBakingSet bakingSet, Bounds cellBounds, ProbeVolumeWithBoundsList probeVolumes)
+        public GIContributors Filter(
+            ProbeVolumeBakingSet bakingSet,
+            Bounds cellBounds,
+            ProbeVolumeWithBoundsList probeVolumes
+        )
         {
             Profiling.Profiler.BeginSample("Filter GIContributors");
 
-            var contributors = new GIContributors()
-            {
-                renderers = new(),
-                terrains = new(),
-            };
+            var contributors = new GIContributors() { renderers = new(), terrains = new() };
 
             Profiling.Profiler.BeginSample($"Filter Renderers ({renderers.Count})");
             foreach (var renderer in renderers)
@@ -263,8 +287,19 @@ namespace UnityEngine.Rendering
 
                 foreach (var probeVolume in probeVolumes)
                 {
-                    if (DiscardedByProbeVolume(probeVolume.component, bakingSet, rendererBoundsVolume, rendererLayerMask) ||
-                        !ProbeVolumePositioning.OBBAABBIntersect(probeVolume.volume, renderer.bounds, probeVolume.bounds))
+                    if (
+                        DiscardedByProbeVolume(
+                            probeVolume.component,
+                            bakingSet,
+                            rendererBoundsVolume,
+                            rendererLayerMask
+                        )
+                        || !ProbeVolumePositioning.OBBAABBIntersect(
+                            probeVolume.volume,
+                            renderer.bounds,
+                            probeVolume.bounds
+                        )
+                    )
                         continue;
 
                     contributors.renderers.Add(renderer);
@@ -287,8 +322,14 @@ namespace UnityEngine.Rendering
                 bool contributes = false;
                 foreach (var probeVolume in probeVolumes)
                 {
-                    if (DiscardedByProbeVolume(probeVolume.component, bakingSet, terrainBoundsVolume, terrainLayerMask) ||
-                        !ProbeVolumePositioning.OBBAABBIntersect(probeVolume.volume, terrain.boundsWithTrees, probeVolume.bounds))
+                    if (
+                        DiscardedByProbeVolume(probeVolume.component, bakingSet, terrainBoundsVolume, terrainLayerMask)
+                        || !ProbeVolumePositioning.OBBAABBIntersect(
+                            probeVolume.volume,
+                            terrain.boundsWithTrees,
+                            probeVolume.bounds
+                        )
+                    )
                         continue;
 
                     contributes = true;
@@ -316,7 +357,14 @@ namespace UnityEngine.Rendering
                     {
                         // Ignore bounds volume check for trees, assume they are always big enough
                         // Otherwise we have to do the complex math stuff to compute the actual tree bounds
-                        if (!DiscardedByProbeVolume(probeVolume.component, bakingSet, float.MaxValue, prototypeLayerMask))
+                        if (
+                            !DiscardedByProbeVolume(
+                                probeVolume.component,
+                                bakingSet,
+                                float.MaxValue,
+                                prototypeLayerMask
+                            )
+                        )
                             probeVolumesForProto.Add(probeVolume.bounds);
                     }
                     if (probeVolumesForProto.Count == 0)
@@ -372,11 +420,7 @@ namespace UnityEngine.Rendering
         {
             Profiling.Profiler.BeginSample("Filter GIContributors LayerMask");
 
-            var contributors = new GIContributors()
-            {
-                renderers = new(),
-                terrains = new(),
-            };
+            var contributors = new GIContributors() { renderers = new(), terrains = new() };
 
             foreach (var renderer in renderers)
             {

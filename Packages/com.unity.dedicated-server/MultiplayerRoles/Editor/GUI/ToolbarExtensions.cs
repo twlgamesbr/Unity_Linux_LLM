@@ -36,9 +36,24 @@ namespace Unity.Multiplayer.Editor
         {
             var activeRole = EditorMultiplayerRolesManager.ActiveMultiplayerRoleMask;
             var menu = new GenericMenu();
-            menu.AddItem(new GUIContent("Client"), activeRole == MultiplayerRoleFlags.Client, SwitchProfile, MultiplayerRoleFlags.Client);
-            menu.AddItem(new GUIContent("Server"), activeRole == MultiplayerRoleFlags.Server, SwitchProfile, MultiplayerRoleFlags.Server);
-            menu.AddItem(new GUIContent("Client and Server"), activeRole == MultiplayerRoleFlags.ClientAndServer, SwitchProfile, MultiplayerRoleFlags.ClientAndServer);
+            menu.AddItem(
+                new GUIContent("Client"),
+                activeRole == MultiplayerRoleFlags.Client,
+                SwitchProfile,
+                MultiplayerRoleFlags.Client
+            );
+            menu.AddItem(
+                new GUIContent("Server"),
+                activeRole == MultiplayerRoleFlags.Server,
+                SwitchProfile,
+                MultiplayerRoleFlags.Server
+            );
+            menu.AddItem(
+                new GUIContent("Client and Server"),
+                activeRole == MultiplayerRoleFlags.ClientAndServer,
+                SwitchProfile,
+                MultiplayerRoleFlags.ClientAndServer
+            );
             menu.DropDown(s_ToolbarButton.worldBound);
         }
 
@@ -54,7 +69,14 @@ namespace Unity.Multiplayer.Editor
                 return;
 
             // s_ToolbarButton.text = $"{EditorMultiplayerRolesManager.activeMultiplayerRoleMask.ToString()}";
-            s_ToolbarButton.icon = EditorGUIUtility.IconContent(MultiplayerRoleField.GetIconForRoleFlags(EditorMultiplayerRolesManager.ActiveMultiplayerRoleMask)).image as Texture2D;
+            s_ToolbarButton.icon =
+                EditorGUIUtility
+                    .IconContent(
+                        MultiplayerRoleField.GetIconForRoleFlags(
+                            EditorMultiplayerRolesManager.ActiveMultiplayerRoleMask
+                        )
+                    )
+                    .image as Texture2D;
         }
 
         private static void OnEnableMultiplayerRolesChanged()

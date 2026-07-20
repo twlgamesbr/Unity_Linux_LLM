@@ -1,10 +1,10 @@
 using System;
 using System.Runtime.InteropServices;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.InputSystem.Layouts;
 
 ////FIXME: display names for keys should be localized key names, not just printable characters (e.g. "Space" should be called "Leertaste")
 
@@ -49,8 +49,21 @@ namespace UnityEngine.InputSystem.LowLevel
         private const int kSizeInBits = Keyboard.ExtendedKeyCount;
         internal const int kSizeInBytes = (kSizeInBits + 7) / 8;
 
-        [InputControl(name = "anyKey", displayName = "Any Key", layout = "AnyKey", bit = 1, sizeInBits = kSizeInBits, synthetic = true)]
-        [InputControl(name = "escape", displayName = "Escape", layout = "Key", usages = new[] {"Back", "Cancel"}, bit = (int)Key.Escape)]
+        [InputControl(
+            name = "anyKey",
+            displayName = "Any Key",
+            layout = "AnyKey",
+            bit = 1,
+            sizeInBits = kSizeInBits,
+            synthetic = true
+        )]
+        [InputControl(
+            name = "escape",
+            displayName = "Escape",
+            layout = "Key",
+            usages = new[] { "Back", "Cancel" },
+            bit = (int)Key.Escape
+        )]
         [InputControl(name = "space", displayName = "Space", layout = "Key", bit = (int)Key.Space)]
         [InputControl(name = "enter", displayName = "Enter", layout = "Key", usage = "Submit", bit = (int)Key.Enter)]
         [InputControl(name = "tab", displayName = "Tab", layout = "Key", bit = (int)Key.Tab)]
@@ -105,18 +118,102 @@ namespace UnityEngine.InputSystem.LowLevel
         [InputControl(name = "8", displayName = "8", layout = "Key", bit = (int)Key.Digit8)]
         [InputControl(name = "9", displayName = "9", layout = "Key", bit = (int)Key.Digit9)]
         [InputControl(name = "0", displayName = "0", layout = "Key", bit = (int)Key.Digit0)]
-        [InputControl(name = "leftShift", displayName = "Left Shift", layout = "Key", usage = "Modifier", bit = (int)Key.LeftShift)]
-        [InputControl(name = "rightShift", displayName = "Right Shift", layout = "Key", usage = "Modifier", bit = (int)Key.RightShift)]
-        [InputControl(name = "shift", displayName = "Shift", layout = "DiscreteButton", usage = "Modifier", bit = (int)Key.LeftShift, sizeInBits = 2, synthetic = true, parameters = "minValue=1,maxValue=3,writeMode=1")]
-        [InputControl(name = "leftAlt", displayName = "Left Alt", layout = "Key", usage = "Modifier", bit = (int)Key.LeftAlt)]
-        [InputControl(name = "rightAlt", displayName = "Right Alt", layout = "Key", usage = "Modifier", bit = (int)Key.RightAlt, alias = "AltGr")]
-        [InputControl(name = "alt", displayName = "Alt", layout = "DiscreteButton", usage = "Modifier", bit = (int)Key.LeftAlt, sizeInBits = 2, synthetic = true, parameters = "minValue=1,maxValue=3,writeMode=1")]
-        [InputControl(name = "leftCtrl", displayName = "Left Control", layout = "Key", usage = "Modifier", bit = (int)Key.LeftCtrl)]
-        [InputControl(name = "rightCtrl", displayName = "Right Control", layout = "Key", usage = "Modifier", bit = (int)Key.RightCtrl)]
-        [InputControl(name = "ctrl", displayName = "Control", layout = "DiscreteButton", usage = "Modifier", bit = (int)Key.LeftCtrl, sizeInBits = 2, synthetic = true, parameters = "minValue=1,maxValue=3,writeMode=1")]
-        [InputControl(name = "leftMeta", displayName = "Left System", layout = "Key", usage = "Modifier", bit = (int)Key.LeftMeta, aliases = new[] { "LeftWindows", "LeftApple", "LeftCommand" })]
-        [InputControl(name = "rightMeta", displayName = "Right System", layout = "Key", usage = "Modifier", bit = (int)Key.RightMeta, aliases = new[] { "RightWindows", "RightApple", "RightCommand" })]
-        [InputControl(name = "contextMenu", displayName = "Context Menu", layout = "Key", usage = "Modifier", bit = (int)Key.ContextMenu)]
+        [InputControl(
+            name = "leftShift",
+            displayName = "Left Shift",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.LeftShift
+        )]
+        [InputControl(
+            name = "rightShift",
+            displayName = "Right Shift",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.RightShift
+        )]
+        [InputControl(
+            name = "shift",
+            displayName = "Shift",
+            layout = "DiscreteButton",
+            usage = "Modifier",
+            bit = (int)Key.LeftShift,
+            sizeInBits = 2,
+            synthetic = true,
+            parameters = "minValue=1,maxValue=3,writeMode=1"
+        )]
+        [InputControl(
+            name = "leftAlt",
+            displayName = "Left Alt",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.LeftAlt
+        )]
+        [InputControl(
+            name = "rightAlt",
+            displayName = "Right Alt",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.RightAlt,
+            alias = "AltGr"
+        )]
+        [InputControl(
+            name = "alt",
+            displayName = "Alt",
+            layout = "DiscreteButton",
+            usage = "Modifier",
+            bit = (int)Key.LeftAlt,
+            sizeInBits = 2,
+            synthetic = true,
+            parameters = "minValue=1,maxValue=3,writeMode=1"
+        )]
+        [InputControl(
+            name = "leftCtrl",
+            displayName = "Left Control",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.LeftCtrl
+        )]
+        [InputControl(
+            name = "rightCtrl",
+            displayName = "Right Control",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.RightCtrl
+        )]
+        [InputControl(
+            name = "ctrl",
+            displayName = "Control",
+            layout = "DiscreteButton",
+            usage = "Modifier",
+            bit = (int)Key.LeftCtrl,
+            sizeInBits = 2,
+            synthetic = true,
+            parameters = "minValue=1,maxValue=3,writeMode=1"
+        )]
+        [InputControl(
+            name = "leftMeta",
+            displayName = "Left System",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.LeftMeta,
+            aliases = new[] { "LeftWindows", "LeftApple", "LeftCommand" }
+        )]
+        [InputControl(
+            name = "rightMeta",
+            displayName = "Right System",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.RightMeta,
+            aliases = new[] { "RightWindows", "RightApple", "RightCommand" }
+        )]
+        [InputControl(
+            name = "contextMenu",
+            displayName = "Context Menu",
+            layout = "Key",
+            usage = "Modifier",
+            bit = (int)Key.ContextMenu
+        )]
         [InputControl(name = "backspace", displayName = "Backspace", layout = "Key", bit = (int)Key.Backspace)]
         [InputControl(name = "pageDown", displayName = "Page Down", layout = "Key", bit = (int)Key.PageDown)]
         [InputControl(name = "pageUp", displayName = "Page Up", layout = "Key", bit = (int)Key.PageUp)]
@@ -175,11 +272,21 @@ namespace UnityEngine.InputSystem.LowLevel
         [InputControl(name = "f22", displayName = "F22", layout = "Key", bit = (int)Key.F22)]
         [InputControl(name = "f23", displayName = "F23", layout = "Key", bit = (int)Key.F23)]
         [InputControl(name = "f24", displayName = "F24", layout = "Key", bit = (int)Key.F24)]
-        [InputControl(name = "mediaPlayPause", displayName = "MediaPlayPause", layout = "Key", bit = (int)Key.MediaPlayPause)]
+        [InputControl(
+            name = "mediaPlayPause",
+            displayName = "MediaPlayPause",
+            layout = "Key",
+            bit = (int)Key.MediaPlayPause
+        )]
         [InputControl(name = "mediaRewind", displayName = "MediaRewind", layout = "Key", bit = (int)Key.MediaRewind)]
         [InputControl(name = "mediaForward", displayName = "MediaForward", layout = "Key", bit = (int)Key.MediaForward)]
         [InputControl(name = "IMESelected", layout = "Button", bit = (int)KeyEx.RemappedIMESelected, synthetic = true)] // Use the last bit to hold IME selected state.
-        [InputControl(name = "IMESelectedObsoleteKey", layout = "Key", bit = (int)KeyEx.RemappedIMESelected, synthetic = true)]
+        [InputControl(
+            name = "IMESelectedObsoleteKey",
+            layout = "Key",
+            bit = (int)KeyEx.RemappedIMESelected,
+            synthetic = true
+        )]
         public fixed byte keys[kSizeInBytes];
 
         // will be the default in new editor [InputControl(name = "IMESelected", layout = "Button", bit = 0, sizeInBits = 1, synthetic = true)]
@@ -191,9 +298,8 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <remarks>IMESelected state will not be set.</remarks>
         /// <param name="pressedKeys">pressed keys</param>
         /// <exception cref="ArgumentNullException">If <paramref name="pressedKeys"/> is <c>null</c></exception>
-        public KeyboardState(params Key[] pressedKeys) : this(false, pressedKeys)
-        {
-        }
+        public KeyboardState(params Key[] pressedKeys)
+            : this(false, pressedKeys) { }
 
         /// <summary>
         /// Create a new KeyboardState with the given keys pressed.
@@ -205,7 +311,7 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             if (pressedKeys == null)
                 throw new ArgumentNullException(nameof(pressedKeys));
-            fixed(byte* keysPtr = keys)
+            fixed (byte* keysPtr = keys)
             {
                 UnsafeUtility.MemClear(keysPtr, kSizeInBytes);
 
@@ -221,13 +327,13 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public void Set(Key key, bool state)
         {
-            fixed(byte* keysPtr = keys)
-            MemoryHelpers.WriteSingleBit(keysPtr, (uint)key, state);
+            fixed (byte* keysPtr = keys)
+                MemoryHelpers.WriteSingleBit(keysPtr, (uint)key, state);
         }
 
         internal bool Get(Key key)
         {
-            fixed(byte* keysPtr = keys)
+            fixed (byte* keysPtr = keys)
             {
                 return MemoryHelpers.ReadSingleBit(keysPtr, (uint)key);
             }
@@ -2589,8 +2695,7 @@ namespace UnityEngine.InputSystem
                 ////        and it just seems somewhat dirty to jam the data into the control here
                 m_Keys[i].keyCode = (Key)(i + 1);
             }
-            Debug.Assert(keyStrings[(int)Key.F24 - 1] == "f24",
-                "keyString array layout doe not match Key enum layout");
+            Debug.Assert(keyStrings[(int)Key.F24 - 1] == "f24", "keyString array layout doe not match Key enum layout");
             anyKey = GetChildControl<AnyKeyControl>("anyKey");
             shiftKey = GetChildControl<ButtonControl>("shift");
             ctrlKey = GetChildControl<ButtonControl>("ctrl");

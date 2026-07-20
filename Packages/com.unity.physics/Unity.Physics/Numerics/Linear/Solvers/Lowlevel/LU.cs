@@ -73,7 +73,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             }
         }
 
-        public static void BlockFactorRecursive(in Matrix A, int blockSize, [WriteOnly] ref NativeArray<int> pivots, out int singularRow)
+        public static void BlockFactorRecursive(
+            in Matrix A,
+            int blockSize,
+            [WriteOnly] ref NativeArray<int> pivots,
+            out int singularRow
+        )
         {
             // A00 |   A01   |     | L00 |    0    |   | U00 |   U01   |
             // ----+---------+     +-----+---------+   +-----+---------+
@@ -133,7 +138,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             }
         }
 
-        public static void BlockFactor(in Matrix A, int blockSize, [WriteOnly] ref NativeArray<int> pivots, out int singularRow)
+        public static void BlockFactor(
+            in Matrix A,
+            int blockSize,
+            [WriteOnly] ref NativeArray<int> pivots,
+            out int singularRow
+        )
         {
             var minDim = A.MinDimension;
             if (blockSize <= 1 || blockSize > minDim)
@@ -181,7 +191,14 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                     // compute block row
                     var blockRow = A.Submatrix(i, i + currentBlockSize, currentBlockSize, colBlockSize);
                     var eqs = A.Submatrix(i, i, currentBlockSize, currentBlockSize);
-                    blockRow.SolveGeneralizedTriangular(Side.Left, TriangularType.Lower, Op.None, DiagonalType.Unit, 1.0f, eqs);
+                    blockRow.SolveGeneralizedTriangular(
+                        Side.Left,
+                        TriangularType.Lower,
+                        Op.None,
+                        DiagonalType.Unit,
+                        1.0f,
+                        eqs
+                    );
                     eqs.Dispose();
                     blockRow.Dispose();
 
@@ -232,8 +249,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         [GenerateTestsForBurstCompatibility]
         public struct Job : IJob
         {
-            [ReadOnly] public Matrix M;
-            [WriteOnly] public NativeArray<int> P;
+            [ReadOnly]
+            public Matrix M;
+
+            [WriteOnly]
+            public NativeArray<int> P;
+
             public void Execute()
             {
                 Factor(M, ref P, out var singularRow);

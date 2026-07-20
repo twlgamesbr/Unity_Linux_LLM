@@ -10,7 +10,8 @@ namespace Unity.Editor.Bridge
     {
         public const string kDummyPrefabStageRootObjectName = PrefabUtility.kDummyPrefabStageRootObjectName;
 
-        public static bool IsGameObjectThePrefabRootInAnyPrefabStage(GameObject gameObject) => PrefabStageUtility.IsGameObjectThePrefabRootInAnyPrefabStage(gameObject);
+        public static bool IsGameObjectThePrefabRootInAnyPrefabStage(GameObject gameObject) =>
+            PrefabStageUtility.IsGameObjectThePrefabRootInAnyPrefabStage(gameObject);
 
         public static string GetAssetPathOfSourcePrefab([NotNull] UnityObject prefabPart, out bool isRoot)
         {
@@ -41,35 +42,39 @@ namespace Unity.Editor.Bridge
             var prefabRootGameObject = PrefabUtility.GetPrefabAssetRootGameObject(prefab);
             var prefabRootGameObjectID = prefabRootGameObject ? prefabRootGameObject.GetEntityId() : EntityId.None;
             var originalSourceOrVariantRoot = PrefabUtility.GetOriginalSourceOrVariantRoot(prefab);
-            var originalSourceOrVariantRootID = originalSourceOrVariantRoot ? originalSourceOrVariantRoot.GetEntityId() : EntityId.None;
+            var originalSourceOrVariantRootID = originalSourceOrVariantRoot
+                ? originalSourceOrVariantRoot.GetEntityId()
+                : EntityId.None;
 
             var nearestPrefabRoot = PrefabUtility.GetNearestPrefabInstanceRoot(prefab);
             var nearestPrefabRootID = nearestPrefabRoot ? nearestPrefabRoot.GetEntityId() : EntityId.None;
 
-            Debug.Log("Prefab state:\n" +
-                              $"    IsPartOfAnyPrefab = {PrefabUtility.IsPartOfAnyPrefab(prefab)}\n" +
-                              $"    IsPartOfPrefabAsset = {PrefabUtility.IsPartOfPrefabAsset(prefab)}\n" +
-                              $"    IsPartOfPrefabInstance = {PrefabUtility.IsPartOfPrefabInstance(prefab)}\n" +
-                              $"    IsAnyPrefabInstanceRoot = {prefabAsGameObject && PrefabUtility.IsAnyPrefabInstanceRoot(prefabAsGameObject)}\n" +
-                              $"    IsOutermostPrefabInstanceRoot = {prefabAsGameObject && PrefabUtility.IsOutermostPrefabInstanceRoot(prefabAsGameObject)}\n" +
-                              $"    IsObjectOnRootInAsset = {PrefabUtility.IsObjectOnRootInAsset(prefab, prefabAssetPath)}\n" +
-                              $"    IsPartOfPrefabThatCanBeAppliedTo = {PrefabUtility.IsPartOfPrefabThatCanBeAppliedTo(prefab)}\n" +
-                              $"    GetPrefabAssetType = {PrefabUtility.GetPrefabAssetType(prefab)}\n" +
-                              $"    InstanceID = {prefabInstanceID}\n" +
-                              $"    GetPrefabAssetRootGameObject.InstanceID = {prefabRootGameObjectID}\n" +
-                              $"    GetCorrespondingObjectFromSource.InstanceID = {objFromSourceID}\n" +
-                              $"    GetCorrespondingObjectFromOriginalSource.InstanceID = {objFromOrigSourceID}\n" +
-                              $"    GetCorrespondingObjectFromSourceAtPath.InstanceID = {objFromSourcePathID}\n" +
-                              $"    GetCorrespondingObjectFromSourceInAsset.InstanceID = {objFromSourceInAssetID}\n" +
-                              $"    GetOriginalSourceOrVariantRoot.InstanceID = {originalSourceOrVariantRootID}\n" +
-                              $"    GetNearestPrefabInstanceRoot.InstanceID = {nearestPrefabRootID}\n" +
-                              $"    AssetPath = {prefabAssetPath}\n" +
-                              $"    GetPrefabAssetRootGameObject.AssetPath = {AssetDatabase.GetAssetPath(prefabRootGameObjectID)}\n" +
-                              $"    GetCorrespondingObjectFromSourceAtPath.AssetPath = {AssetDatabase.GetAssetPath(objFromSourcePathID)}\n" +
-                              $"    GetCorrespondingObjectFromSourceInAsset.AssetPath = {AssetDatabase.GetAssetPath(objFromSourceInAssetID)}\n" +
-                              $"    GetAssetPathOfSourcePrefab = {PrefabUtility.GetAssetPathOfSourcePrefab(prefab)}\n" +
-                              $"    GetPrefabAssetPathOfNearestInstanceRoot = {PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefab)}\n" +
-                              "");
+            Debug.Log(
+                "Prefab state:\n"
+                    + $"    IsPartOfAnyPrefab = {PrefabUtility.IsPartOfAnyPrefab(prefab)}\n"
+                    + $"    IsPartOfPrefabAsset = {PrefabUtility.IsPartOfPrefabAsset(prefab)}\n"
+                    + $"    IsPartOfPrefabInstance = {PrefabUtility.IsPartOfPrefabInstance(prefab)}\n"
+                    + $"    IsAnyPrefabInstanceRoot = {prefabAsGameObject && PrefabUtility.IsAnyPrefabInstanceRoot(prefabAsGameObject)}\n"
+                    + $"    IsOutermostPrefabInstanceRoot = {prefabAsGameObject && PrefabUtility.IsOutermostPrefabInstanceRoot(prefabAsGameObject)}\n"
+                    + $"    IsObjectOnRootInAsset = {PrefabUtility.IsObjectOnRootInAsset(prefab, prefabAssetPath)}\n"
+                    + $"    IsPartOfPrefabThatCanBeAppliedTo = {PrefabUtility.IsPartOfPrefabThatCanBeAppliedTo(prefab)}\n"
+                    + $"    GetPrefabAssetType = {PrefabUtility.GetPrefabAssetType(prefab)}\n"
+                    + $"    InstanceID = {prefabInstanceID}\n"
+                    + $"    GetPrefabAssetRootGameObject.InstanceID = {prefabRootGameObjectID}\n"
+                    + $"    GetCorrespondingObjectFromSource.InstanceID = {objFromSourceID}\n"
+                    + $"    GetCorrespondingObjectFromOriginalSource.InstanceID = {objFromOrigSourceID}\n"
+                    + $"    GetCorrespondingObjectFromSourceAtPath.InstanceID = {objFromSourcePathID}\n"
+                    + $"    GetCorrespondingObjectFromSourceInAsset.InstanceID = {objFromSourceInAssetID}\n"
+                    + $"    GetOriginalSourceOrVariantRoot.InstanceID = {originalSourceOrVariantRootID}\n"
+                    + $"    GetNearestPrefabInstanceRoot.InstanceID = {nearestPrefabRootID}\n"
+                    + $"    AssetPath = {prefabAssetPath}\n"
+                    + $"    GetPrefabAssetRootGameObject.AssetPath = {AssetDatabase.GetAssetPath(prefabRootGameObjectID)}\n"
+                    + $"    GetCorrespondingObjectFromSourceAtPath.AssetPath = {AssetDatabase.GetAssetPath(objFromSourcePathID)}\n"
+                    + $"    GetCorrespondingObjectFromSourceInAsset.AssetPath = {AssetDatabase.GetAssetPath(objFromSourceInAssetID)}\n"
+                    + $"    GetAssetPathOfSourcePrefab = {PrefabUtility.GetAssetPathOfSourcePrefab(prefab)}\n"
+                    + $"    GetPrefabAssetPathOfNearestInstanceRoot = {PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefab)}\n"
+                    + ""
+            );
         }
     }
 }

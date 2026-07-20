@@ -1,12 +1,15 @@
+using UnityEditor.Rendering.Fullscreen.ShaderGraph;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
-using UnityEditor.Rendering.Fullscreen.ShaderGraph;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
-    class UniversalFullscreenSubTarget : FullscreenSubTarget<UniversalTarget>, IRequiresData<FullscreenData>, IHasMetadata
+    class UniversalFullscreenSubTarget
+        : FullscreenSubTarget<UniversalTarget>,
+            IRequiresData<FullscreenData>,
+            IHasMetadata
     {
-        static readonly GUID kSourceCodeGuid = new GUID("48080a5025a54a84087e882e2f988642");  // UniversalFullscreenSubTarget.cs // TODO
+        static readonly GUID kSourceCodeGuid = new GUID("48080a5025a54a84087e882e2f988642"); // UniversalFullscreenSubTarget.cs // TODO
 
         public override void Setup(ref TargetSetupContext context)
         {
@@ -28,13 +31,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
         const string kURPInput = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl";
 
-        protected override IncludeCollection pregraphIncludes => new IncludeCollection
-        {
-            { kURPInput, IncludeLocation.Pregraph }, // Include before kInstancing
-            { kInstancing, IncludeLocation.Pregraph }, // For VR
-            { CoreIncludes.CorePregraph },
-            { CoreIncludes.ShaderGraphPregraph },
-        };
+        protected override IncludeCollection pregraphIncludes =>
+            new IncludeCollection
+            {
+                { kURPInput, IncludeLocation.Pregraph }, // Include before kInstancing
+                { kInstancing, IncludeLocation.Pregraph }, // For VR
+                { CoreIncludes.CorePregraph },
+                { CoreIncludes.ShaderGraphPregraph },
+            };
 
         public UniversalFullscreenSubTarget()
         {

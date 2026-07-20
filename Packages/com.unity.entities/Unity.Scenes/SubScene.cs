@@ -12,10 +12,9 @@ using UnityEditor.SceneManagement;
 #endif
 #pragma warning disable 649
 
-
 namespace Unity.Scenes
 {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     [InitializeOnLoad]
     internal static class SubSceneUtility
     {
@@ -122,15 +121,21 @@ namespace Unity.Scenes
     {
 #if UNITY_EDITOR
         [FormerlySerializedAs("sceneAsset")]
-        [SerializeField] SceneAsset _SceneAsset;
-        [SerializeField] Color _HierarchyColor = Color.gray;
+        [SerializeField]
+        SceneAsset _SceneAsset;
+
+        [SerializeField]
+        Color _HierarchyColor = Color.gray;
 
         static List<SubScene> m_AllSubScenes = new List<SubScene>();
 
         /// <summary>
         /// The list of loaded sub scenes.
         /// </summary>
-        public static IReadOnlyCollection<SubScene> AllSubScenes { get { return m_AllSubScenes; } }
+        public static IReadOnlyCollection<SubScene> AllSubScenes
+        {
+            get { return m_AllSubScenes; }
+        }
 #endif
 
         /// <summary>Set when the scene should load.</summary>
@@ -199,10 +204,7 @@ namespace Unity.Scenes
         /// </summary>
         public string EditableScenePath
         {
-            get
-            {
-                return _SceneAsset != null ? AssetDatabase.GetAssetPath(_SceneAsset) : "";
-            }
+            get { return _SceneAsset != null ? AssetDatabase.GetAssetPath(_SceneAsset) : ""; }
         }
 
         /// <summary>
@@ -241,7 +243,10 @@ namespace Unity.Scenes
 
                     if (subscene.SceneAsset == SceneAsset)
                     {
-                        UnityEngine.Debug.LogWarning($"Sub Scenes can not reference the same scene ('{EditableScenePath}') multiple times.", this);
+                        UnityEngine.Debug.LogWarning(
+                            $"Sub Scenes can not reference the same scene ('{EditableScenePath}') multiple times.",
+                            this
+                        );
                         return;
                     }
                 }
@@ -255,11 +260,14 @@ namespace Unity.Scenes
                 _SceneGUID = AssetDatabaseCompatibility.PathToGUID(AssetDatabase.GetAssetPath(_SceneAsset));
             else
                 _SceneGUID = default;
-            
+
 #if UNITY_EDITOR
             if (_SceneGUID != default)
-                SubSceneManager.Register(gameObject, new SubSceneDescription { SceneGuid = _SceneGUID, Color = HierarchyColor });
-#endif            
+                SubSceneManager.Register(
+                    gameObject,
+                    new SubSceneDescription { SceneGuid = _SceneGUID, Color = HierarchyColor }
+                );
+#endif
 
             if (_IsAddedToListOfAllSubScenes && IsInMainStage())
             {
@@ -296,9 +304,9 @@ namespace Unity.Scenes
 
         internal bool IsInMainStage()
         {
-            return !EditorUtility.IsPersistent(gameObject) && StageUtility.GetStageHandle(gameObject) == StageUtility.GetMainStageHandle();
+            return !EditorUtility.IsPersistent(gameObject)
+                && StageUtility.GetStageHandle(gameObject) == StageUtility.GetMainStageHandle();
         }
-
 #endif
 
         /// <summary>
@@ -313,9 +321,12 @@ namespace Unity.Scenes
 
             _IsAddedToListOfAllSubScenes = true;
             m_AllSubScenes.Add(this);
-            
+
             if (SceneAsset != null)
-                SubSceneManager.Register(gameObject, new SubSceneDescription { SceneGuid = SceneGUID, Color = HierarchyColor });            
+                SubSceneManager.Register(
+                    gameObject,
+                    new SubSceneDescription { SceneGuid = SceneGUID, Color = HierarchyColor }
+                );
 
             // If this is an import worker, we do not want to initialise an Entity world
             if (AssetDatabaseCompatibility.IsAssetImportWorkerProcess())
@@ -370,10 +381,7 @@ namespace Unity.Scenes
                 var stateptr = world.Unmanaged.ResolveSystemState(sceneSystem);
                 if (stateptr != null)
                 {
-                    var loadParams = new SceneSystem.LoadParameters
-                    {
-                        Flags = flags
-                    };
+                    var loadParams = new SceneSystem.LoadParameters { Flags = flags };
 
                     var sceneEntity = SceneSystem.LoadSceneAsync(world.Unmanaged, _SceneGUID, loadParams);
                     stateptr->EntityManager.AddComponentObject(sceneEntity, this);
@@ -405,7 +413,11 @@ namespace Unity.Scenes
                         if (streamingSystem != null)
                             streamingSystem.CancelOperationsForScene(sceneGUID);
 
-                        SceneSystem.UnloadScene(world.Unmanaged, sceneGUID, SceneSystem.UnloadParameters.DestroyMetaEntities);
+                        SceneSystem.UnloadScene(
+                            world.Unmanaged,
+                            sceneGUID,
+                            SceneSystem.UnloadParameters.DestroyMetaEntities
+                        );
                     }
                 }
             }

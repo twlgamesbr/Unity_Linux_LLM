@@ -1,6 +1,6 @@
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.XR.Haptics;
 using UnityEngine.InputSystem.Layouts;
+using UnityEngine.InputSystem.XR.Haptics;
 using UnityEngine.XR;
 
 namespace UnityEngine.InputSystem.XR
@@ -82,7 +82,11 @@ namespace UnityEngine.InputSystem.XR
     /// <summary>
     /// The base type for all XR handed controllers.
     /// </summary>
-    [InputControlLayout(commonUsages = new[] { "LeftHand", "RightHand" }, isGenericTypeOfDevice = true, displayName = "XR Controller")]
+    [InputControlLayout(
+        commonUsages = new[] { "LeftHand", "RightHand" },
+        isGenericTypeOfDevice = true,
+        displayName = "XR Controller"
+    )]
     public class XRController : TrackedDevice
     {
         /// <summary>

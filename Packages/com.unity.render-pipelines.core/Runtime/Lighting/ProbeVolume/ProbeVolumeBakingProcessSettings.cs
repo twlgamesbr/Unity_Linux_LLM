@@ -18,7 +18,10 @@ namespace UnityEngine.Rendering
             squaredDistWeighting = true;
         }
 
-        internal void UpgradeFromTo(ProbeVolumeBakingProcessSettings.SettingsVersion from, ProbeVolumeBakingProcessSettings.SettingsVersion to) { }
+        internal void UpgradeFromTo(
+            ProbeVolumeBakingProcessSettings.SettingsVersion from,
+            ProbeVolumeBakingProcessSettings.SettingsVersion to
+        ) { }
     }
 
     [System.Serializable]
@@ -28,10 +31,18 @@ namespace UnityEngine.Rendering
         internal const int kPhysicsDefaultRaycastLayers = ~(1 << 2);
 
         public bool useVirtualOffset;
-        [Range(0f, 0.95f)] public float validityThreshold;
-        [Range(0f, 1f)] public float outOfGeoOffset;
-        [Range(0f, 2f)] public float searchMultiplier;
-        [Range(-0.05f, 0f)] public float rayOriginBias;
+
+        [Range(0f, 0.95f)]
+        public float validityThreshold;
+
+        [Range(0f, 1f)]
+        public float outOfGeoOffset;
+
+        [Range(0f, 2f)]
+        public float searchMultiplier;
+
+        [Range(-0.05f, 0f)]
+        public float rayOriginBias;
         public LayerMask collisionMask;
 
         internal void SetDefaults()
@@ -40,12 +51,21 @@ namespace UnityEngine.Rendering
             validityThreshold = 0.25f;
             outOfGeoOffset = 0.01f;
             searchMultiplier = 0.2f;
-            UpgradeFromTo(ProbeVolumeBakingProcessSettings.SettingsVersion.Initial, ProbeVolumeBakingProcessSettings.SettingsVersion.ThreadedVirtualOffset);
+            UpgradeFromTo(
+                ProbeVolumeBakingProcessSettings.SettingsVersion.Initial,
+                ProbeVolumeBakingProcessSettings.SettingsVersion.ThreadedVirtualOffset
+            );
         }
 
-        internal void UpgradeFromTo(ProbeVolumeBakingProcessSettings.SettingsVersion from, ProbeVolumeBakingProcessSettings.SettingsVersion to)
+        internal void UpgradeFromTo(
+            ProbeVolumeBakingProcessSettings.SettingsVersion from,
+            ProbeVolumeBakingProcessSettings.SettingsVersion to
+        )
         {
-            if (from < ProbeVolumeBakingProcessSettings.SettingsVersion.ThreadedVirtualOffset && to >= ProbeVolumeBakingProcessSettings.SettingsVersion.ThreadedVirtualOffset)
+            if (
+                from < ProbeVolumeBakingProcessSettings.SettingsVersion.ThreadedVirtualOffset
+                && to >= ProbeVolumeBakingProcessSettings.SettingsVersion.ThreadedVirtualOffset
+            )
             {
                 rayOriginBias = -0.001f;
                 collisionMask = kPhysicsDefaultRaycastLayers;
@@ -57,7 +77,9 @@ namespace UnityEngine.Rendering
     [System.Serializable]
     internal struct ProbeVolumeBakingProcessSettings
     {
-        internal static ProbeVolumeBakingProcessSettings Default { get
+        internal static ProbeVolumeBakingProcessSettings Default
+        {
+            get
             {
                 var s = new ProbeVolumeBakingProcessSettings();
                 s.SetDefaults();
@@ -71,10 +93,13 @@ namespace UnityEngine.Rendering
             ThreadedVirtualOffset,
 
             Max,
-            Current = Max - 1
+            Current = Max - 1,
         }
 
-        internal ProbeVolumeBakingProcessSettings(ProbeDilationSettings dilationSettings, VirtualOffsetSettings virtualOffsetSettings)
+        internal ProbeVolumeBakingProcessSettings(
+            ProbeDilationSettings dilationSettings,
+            VirtualOffsetSettings virtualOffsetSettings
+        )
         {
             m_Version = SettingsVersion.Current;
             this.dilationSettings = dilationSettings;
@@ -100,7 +125,8 @@ namespace UnityEngine.Rendering
             }
         }
 
-        [SerializeField] SettingsVersion m_Version;
+        [SerializeField]
+        SettingsVersion m_Version;
 
         public ProbeDilationSettings dilationSettings;
         public VirtualOffsetSettings virtualOffsetSettings;

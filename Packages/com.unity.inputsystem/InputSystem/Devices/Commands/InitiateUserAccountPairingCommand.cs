@@ -15,14 +15,21 @@ namespace UnityEngine.InputSystem.LowLevel
     [StructLayout(LayoutKind.Explicit, Size = kSize)]
     public struct InitiateUserAccountPairingCommand : IInputDeviceCommandInfo
     {
-        public static FourCC Type { get { return new FourCC('P', 'A', 'I', 'R'); } }
+        public static FourCC Type
+        {
+            get { return new FourCC('P', 'A', 'I', 'R'); }
+        }
 
         internal const int kSize = InputDeviceCommand.kBaseCommandSize;
 
         [FieldOffset(0)]
         public InputDeviceCommand baseCommand;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue", Justification = "Enum values mandated by native code")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1008:EnumsShouldHaveZeroValue",
+            Justification = "Enum values mandated by native code"
+        )]
         public enum Result
         {
             /// <summary>
@@ -49,10 +56,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static InitiateUserAccountPairingCommand Create()
         {
-            return new InitiateUserAccountPairingCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize),
-            };
+            return new InitiateUserAccountPairingCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

@@ -40,7 +40,8 @@ namespace EditorAttributes
         /// <param name="blue">Blue amount</param>
         /// <param name="alpha">Alpha amount</param>
         /// <param name="lineThickness">The thickness of the line in pixels</param>
-        public LineAttribute(float red, float green, float blue, float alpha = 1f, float lineThickness = 3f) : this(GUIColor.Default, alpha, lineThickness)
+        public LineAttribute(float red, float green, float blue, float alpha = 1f, float lineThickness = 3f)
+            : this(GUIColor.Default, alpha, lineThickness)
         {
             UseRGB = true;
             R = red;
@@ -54,6 +55,7 @@ namespace EditorAttributes
         /// <param name="hexColor">The color in hexadecimal</param>
         /// <param name="alpha">Alpha amount</param>
         /// <param name="lineThickness">The thickness of the line in pixels</param>
-        public LineAttribute(string hexColor, float alpha = 1f, float lineThickness = 3f) : this(GUIColor.Default, alpha, lineThickness) => HexColor = hexColor;
+        public LineAttribute(string hexColor, float alpha = 1f, float lineThickness = 3f)
+            : this(GUIColor.Default, alpha, lineThickness) => HexColor = hexColor;
     }
 }

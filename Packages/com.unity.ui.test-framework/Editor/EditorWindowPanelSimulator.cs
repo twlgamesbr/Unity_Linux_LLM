@@ -64,19 +64,18 @@ namespace UnityEditor.UIElements.TestFramework
                 m_InitialDisableInputEvents = m_Window.disableInputEvents;
 
                 m_Window.disableInputEvents = true; //we don't want user input to mess with our tests
-
-                #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                 SetPanel((Panel)window.rootVisualElement.panel);
                 SetRootVisualElement(window.rootVisualElement);
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
             }
             else
             {
                 nativeView = null;
-                #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                 SetPanel(null);
                 SetRootVisualElement(null);
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
             }
         }
 
@@ -120,30 +119,30 @@ namespace UnityEditor.UIElements.TestFramework
         /// <seealso cref="PanelSimulator.FrameUpdateMs(long)"/>
         public sealed override void FrameUpdate(double time)
         {
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             EnsureFrameUpdateCalledDuringTest();
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
 
-            #pragma warning disable CS0618 // IMGUI is not fully supported
+#pragma warning disable CS0618 // IMGUI is not fully supported
             if (needsImprovedIMGUISupport && m_Window != null)
             {
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
 
-                #pragma warning disable CS0618 // IMGUI is not fully supported
+#pragma warning disable CS0618 // IMGUI is not fully supported
                 ExecuteWithinIMGUIContext(() =>
                 {
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
 
-                    #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                     DoFrameUpdate(time);
-                    #pragma warning restore CS0618
+#pragma warning restore CS0618
                 });
             }
             else
             {
-                #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                 DoFrameUpdate(time);
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
             }
         }
     }

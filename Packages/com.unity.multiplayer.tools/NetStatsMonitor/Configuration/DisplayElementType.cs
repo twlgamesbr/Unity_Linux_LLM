@@ -9,10 +9,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// Counter type for <see cref="DisplayElementConfiguration"/>
         /// </summary>
         Counter,
+
         /// <summary>
         /// Line graph type for <see cref="DisplayElementConfiguration"/>
         /// </summary>
         LineGraph,
+
         /// <summary>
         /// Stacked area graph type for <see cref="DisplayElementConfiguration"/>
         /// </summary>

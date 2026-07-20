@@ -34,6 +34,7 @@ namespace UnityEngine.Rendering.Universal
             public Hash128 imageContentsHash;
             public int size;
             public int mipCount;
+
             // One for each mip.
             public fixed int dataIndices[k_MaxMipCount];
             public fixed int levels[k_MaxMipCount];
@@ -75,16 +76,18 @@ namespace UnityEngine.Rendering.Universal
             {
                 format = GraphicsFormat.R16G16B16A16_SFloat;
             }
-            m_AtlasTexture0 = new RenderTexture(new RenderTextureDescriptor
-            {
-                width = m_Resolution.x,
-                height = m_Resolution.y,
-                volumeDepth = 1,
-                dimension = TextureDimension.Tex2D,
-                graphicsFormat = format,
-                useMipMap = false,
-                msaaSamples = 1
-            });
+            m_AtlasTexture0 = new RenderTexture(
+                new RenderTextureDescriptor
+                {
+                    width = m_Resolution.x,
+                    height = m_Resolution.y,
+                    volumeDepth = 1,
+                    dimension = TextureDimension.Tex2D,
+                    graphicsFormat = format,
+                    useMipMap = false,
+                    msaaSamples = 1,
+                }
+            );
             m_AtlasTexture0.name = k_ReflectionProbeAtlasName;
             m_AtlasTexture0.filterMode = FilterMode.Bilinear;
             m_AtlasTexture0.hideFlags = HideFlags.HideAndDontSave;
@@ -125,16 +128,20 @@ namespace UnityEngine.Rendering.Universal
                 // - The texture no longer exists
                 // - The texture size changed
                 // - The cached texture no longer matches the texture of the reflection probe (it was reassigned)
-                if (Math.Abs(cachedProbe.lastUsed - frameIndex) > 1 ||
-                    !cachedProbe.texture ||
-                    cachedProbe.size != cachedProbe.texture.width ||
-                    (cachedProbe.sourceProbe && cachedProbe.texture != cachedProbe.sourceProbe.texture))
+                if (
+                    Math.Abs(cachedProbe.lastUsed - frameIndex) > 1
+                    || !cachedProbe.texture
+                    || cachedProbe.size != cachedProbe.texture.width
+                    || (cachedProbe.sourceProbe && cachedProbe.texture != cachedProbe.sourceProbe.texture)
+                )
                 {
                     m_NeedsRemove.Add(id);
                     for (var i = 0; i < k_MaxMipCount; i++)
                     {
                         if (cachedProbe.dataIndices[i] != -1)
-                            m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
+                            m_AtlasAllocator.Free(
+                                new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i])
+                            );
                     }
                 }
             }
@@ -200,7 +207,9 @@ namespace UnityEngine.Rendering.Universal
                         // We split up the allocation struct because C# cannot do struct fixed arrays :(
                         cachedProbe.levels[mip] = allocation.level;
                         cachedProbe.dataIndices[mip] = allocation.index;
-                        var scaleOffset = (int4)(GetScaleOffset(mipLevel, allocation.index, true, false) * m_Resolution.xyxy);
+                        var scaleOffset = (int4)(
+                            GetScaleOffset(mipLevel, allocation.index, true, false) * m_Resolution.xyxy
+                        );
                         requiredAtlasSize = math.max(requiredAtlasSize, scaleOffset.zw + scaleOffset.xy);
                     }
 
@@ -213,7 +222,9 @@ namespace UnityEngine.Rendering.Universal
                         m_WarningCache[id] = frameIndex;
 #pragma warning restore 618
                         for (var i = 0; i < mip; i++)
-                            m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
+                            m_AtlasAllocator.Free(
+                                new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i])
+                            );
                         for (var i = 0; i < k_MaxMipCount; i++)
                             cachedProbe.dataIndices[i] = -1;
                         continue;
@@ -229,7 +240,7 @@ namespace UnityEngine.Rendering.Universal
 #if UNITY_EDITOR
                 needsUpdate |= cachedProbe.imageContentsHash != texture.imageContentsHash;
 #endif
-                needsUpdate |= cachedProbe.hdrData != probe.hdrData;    // The probe needs update if the runtime intensity multiplier changes
+                needsUpdate |= cachedProbe.hdrData != probe.hdrData; // The probe needs update if the runtime intensity multiplier changes
 
                 if (needsUpdate)
                 {
@@ -243,7 +254,10 @@ namespace UnityEngine.Rendering.Universal
                 }
 
                 // If the probe is set to be updated every frame, we assign the last used frame to -1 so it's evicted in next frame.
-                if (probe.reflectionProbe.mode == ReflectionProbeMode.Realtime && probe.reflectionProbe.refreshMode == ReflectionProbeRefreshMode.EveryFrame)
+                if (
+                    probe.reflectionProbe.mode == ReflectionProbeMode.Realtime
+                    && probe.reflectionProbe.refreshMode == ReflectionProbeRefreshMode.EveryFrame
+                )
                     cachedProbe.lastUsed = -1;
                 else
                     cachedProbe.lastUsed = frameIndex;
@@ -269,11 +283,29 @@ namespace UnityEngine.Rendering.Universal
                 {
                     if (SystemInfo.copyTextureSupport != CopyTextureSupport.None)
                     {
-                        Graphics.CopyTexture(m_AtlasTexture0, 0, 0, 0, 0, m_Resolution.x, m_Resolution.y, m_AtlasTexture1, 0, 0, 0, 0);
+                        Graphics.CopyTexture(
+                            m_AtlasTexture0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            m_Resolution.x,
+                            m_Resolution.y,
+                            m_AtlasTexture1,
+                            0,
+                            0,
+                            0,
+                            0
+                        );
                     }
                     else
                     {
-                        Graphics.Blit(m_AtlasTexture0, m_AtlasTexture1, (float2)m_Resolution / requiredAtlasSize, Vector2.zero);
+                        Graphics.Blit(
+                            m_AtlasTexture0,
+                            m_AtlasTexture1,
+                            (float2)m_Resolution / requiredAtlasSize,
+                            Vector2.zero
+                        );
                     }
                 }
 
@@ -295,18 +327,40 @@ namespace UnityEngine.Rendering.Universal
                     skipCount++;
                     continue;
                 }
-                m_BoxMax[dataIndex] = new Vector4(probe.bounds.max.x, probe.bounds.max.y, probe.bounds.max.z, probe.blendDistance);
-                m_BoxMin[dataIndex] = new Vector4(probe.bounds.min.x, probe.bounds.min.y, probe.bounds.min.z, probe.importance);
-                m_ProbePosition[dataIndex] = new Vector4(probe.localToWorldMatrix.m03, probe.localToWorldMatrix.m13, probe.localToWorldMatrix.m23, (probe.isBoxProjection ? 1 : -1) * (cachedProbe.mipCount));
+                m_BoxMax[dataIndex] = new Vector4(
+                    probe.bounds.max.x,
+                    probe.bounds.max.y,
+                    probe.bounds.max.z,
+                    probe.blendDistance
+                );
+                m_BoxMin[dataIndex] = new Vector4(
+                    probe.bounds.min.x,
+                    probe.bounds.min.y,
+                    probe.bounds.min.z,
+                    probe.importance
+                );
+                m_ProbePosition[dataIndex] = new Vector4(
+                    probe.localToWorldMatrix.m03,
+                    probe.localToWorldMatrix.m13,
+                    probe.localToWorldMatrix.m23,
+                    (probe.isBoxProjection ? 1 : -1) * (cachedProbe.mipCount)
+                );
                 for (var i = 0; i < cachedProbe.mipCount; i++)
-                    m_MipScaleOffset[dataIndex * k_MaxMipCount + i] = GetScaleOffset(cachedProbe.levels[i], cachedProbe.dataIndices[i], false, false);
+                    m_MipScaleOffset[dataIndex * k_MaxMipCount + i] = GetScaleOffset(
+                        cachedProbe.levels[i],
+                        cachedProbe.dataIndices[i],
+                        false,
+                        false
+                    );
                 var rot = Quaternion.Inverse(probe.reflectionProbe.transform.rotation);
                 m_Rotations[dataIndex] = new Vector4(rot.x, rot.y, rot.z, rot.w);
             }
 
             if (showFullWarning)
             {
-                Debug.LogWarning("A number of reflection probes have been skipped due to the reflection probe atlas being full.\nTo fix this, you can decrease the number or resolution of probes.");
+                Debug.LogWarning(
+                    "A number of reflection probes have been skipped due to the reflection probe atlas being full.\nTo fix this, you can decrease the number or resolution of probes."
+                );
             }
 
             using (new ProfilingScope(cmd, ProfilingSampler.Get(URPProfileId.UpdateReflectionProbeAtlas)))
@@ -324,7 +378,16 @@ namespace UnityEngine.Rendering.Universal
                         // By doing this we won't have to y-flip the lookup in the shader code.
                         var scaleBias = GetScaleOffset(level, dataIndex, true, !SystemInfo.graphicsUVStartsAtTop);
                         var sizeWithoutPadding = (1 << (m_AtlasAllocator.levelCount + 1 - level)) - 2;
-                        Blitter.BlitCubeToOctahedral2DQuadWithPadding(cmd, cachedProbe.texture, new Vector2(sizeWithoutPadding, sizeWithoutPadding), scaleBias, mip, true, 2, cachedProbe.hdrData);
+                        Blitter.BlitCubeToOctahedral2DQuadWithPadding(
+                            cmd,
+                            cachedProbe.texture,
+                            new Vector2(sizeWithoutPadding, sizeWithoutPadding),
+                            scaleBias,
+                            mip,
+                            true,
+                            2,
+                            cachedProbe.hdrData
+                        );
                     }
                 }
 
@@ -349,7 +412,7 @@ namespace UnityEngine.Rendering.Universal
             var size = (1 << (m_AtlasAllocator.levelCount + 1 - level));
             var coordinate = SpaceFillingCurves.DecodeMorton2D((uint)dataIndex);
             var scale = (size - (includePadding ? 0 : 2)) / ((float2)m_Resolution);
-            var bias = ((float2) coordinate * size + (includePadding ? 0 : 1)) / (m_Resolution);
+            var bias = ((float2)coordinate * size + (includePadding ? 0 : 1)) / (m_Resolution);
             if (yflip)
                 bias.y = 1.0f - bias.y - scale.y;
             return math.float4(scale, bias);

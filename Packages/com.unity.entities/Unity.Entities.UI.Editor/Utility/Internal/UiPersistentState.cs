@@ -51,7 +51,11 @@ namespace Unity.Entities.UI
                 return;
 
             var state = UserSettings<UiPersistentState>.GetOrCreate(Key);
-            state.PaginationState[ComputeHash(type, path)] = new PaginationData {PaginationSize = size, CurrentPage = page};
+            state.PaginationState[ComputeHash(type, path)] = new PaginationData
+            {
+                PaginationSize = size,
+                CurrentPage = page,
+            };
         }
 
         public static PaginationData GetPaginationState(Type type, PropertyPath path)

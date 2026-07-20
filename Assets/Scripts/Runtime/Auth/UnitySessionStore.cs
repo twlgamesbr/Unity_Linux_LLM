@@ -2,24 +2,23 @@ using System;
 using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Auth
 {
     /// <summary>
@@ -91,9 +90,7 @@ namespace NPCSystem.Auth
             if (session.User != null && !string.IsNullOrWhiteSpace(session.User.Email))
             {
                 int atIndex = session.User.Email.IndexOf('@');
-                username = atIndex > 0
-                    ? session.User.Email.Substring(0, atIndex)
-                    : session.User.Email;
+                username = atIndex > 0 ? session.User.Email.Substring(0, atIndex) : session.User.Email;
             }
 
             return new PlayerAuthSessionResponse
@@ -131,20 +128,18 @@ namespace NPCSystem.Auth
                 RefreshToken = authSession.refreshToken ?? string.Empty,
                 TokenType = "bearer",
                 CreatedAt = DateTime.UtcNow,
-                User = new User
-                {
-                    Id = authSession.playerId,
-                    Email = $"{authSession.username}@npc-game.local",
-                },
+                User = new User { Id = authSession.playerId, Email = $"{authSession.username}@npc-game.local" },
             };
 
-            if (!string.IsNullOrWhiteSpace(authSession.expiresAtUtc)
+            if (
+                !string.IsNullOrWhiteSpace(authSession.expiresAtUtc)
                 && DateTime.TryParse(
                     authSession.expiresAtUtc,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal,
                     out DateTime expiresAt
-                ))
+                )
+            )
             {
                 session.ExpiresIn = (long)(expiresAt - DateTime.UtcNow).TotalSeconds;
                 if (session.ExpiresIn < 0)

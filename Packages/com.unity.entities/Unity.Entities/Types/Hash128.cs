@@ -15,7 +15,25 @@ namespace Unity.Entities
         /// </summary>
         public uint4 Value;
 
-        static readonly char[] k_HexToLiteral = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        static readonly char[] k_HexToLiteral =
+        {
+            '0',
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            'a',
+            'b',
+            'c',
+            'd',
+            'e',
+            'f',
+        };
 
         /// <summary>
         /// Construct a hash from a 128-bit input value.
@@ -41,7 +59,7 @@ namespace Unity.Entities
         /// <param name="value">32 character hex string.</param>
         public unsafe Hash128(string value)
         {
-            fixed(char* ptr = value)
+            fixed (char* ptr = value)
             {
                 Value = StringToHash(ptr, value.Length);
             }
@@ -85,19 +103,261 @@ namespace Unity.Entities
 
         static readonly sbyte[] k_LiteralToHex =
         {
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-            -1, -1, -1, -1, -1, -1, -1,
-            10, 11, 12, 13, 14, 15,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            10, 11, 12, 13, 14, 15,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
         };
 
         const int k_GUIDStringLength = 32;
@@ -158,7 +418,7 @@ namespace Unity.Entities
         /// <param name="obj1">The first hash to compare.</param>
         /// <param name="obj2">The second hash to compare.</param>
         /// <returns>Whether the two hashes are equal.</returns>
-        public static bool operator==(Hash128 obj1, Hash128 obj2)
+        public static bool operator ==(Hash128 obj1, Hash128 obj2)
         {
             return obj1.Value.Equals(obj2.Value);
         }
@@ -169,7 +429,7 @@ namespace Unity.Entities
         /// <param name="obj1">The first hash to compare.</param>
         /// <param name="obj2">The second hash to compare.</param>
         /// <returns>Whether the two hashes are unequal.</returns>
-        public static bool operator!=(Hash128 obj1, Hash128 obj2)
+        public static bool operator !=(Hash128 obj1, Hash128 obj2)
         {
             return !obj1.Value.Equals(obj2.Value);
         }
@@ -200,7 +460,7 @@ namespace Unity.Entities
         /// <param name="a">The first hash to compare.</param>
         /// <param name="b">The second hash to compare.</param>
         /// <returns>Whether the first hash is less than the second hash, or not.</returns>
-        public static bool operator<(Hash128 a, Hash128 b)
+        public static bool operator <(Hash128 a, Hash128 b)
         {
             if (a.Value.w != b.Value.w)
                 return a.Value.w < b.Value.w;
@@ -217,7 +477,7 @@ namespace Unity.Entities
         /// <param name="a">The first hash to compare.</param>
         /// <param name="b">The second hash to compare.</param>
         /// <returns>Whether the first hash is greater than the second hash, or not.</returns>
-        public static bool operator>(Hash128 a, Hash128 b)
+        public static bool operator >(Hash128 a, Hash128 b)
         {
             if (a.Value.w != b.Value.w)
                 return a.Value.w > b.Value.w;
@@ -266,7 +526,7 @@ namespace Unity.Entities
         /// </returns>
         public bool IsValid => !Value.Equals(uint4.zero);
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         /// <summary>
         /// Implicitly convert a UnityEditor.GUID to a Hash128.
         /// </summary>
@@ -279,8 +539,8 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="guid">The Hash128 to convert.</param>
         /// <returns>The corresponding UnityEditor.GUID.</returns>
-        public static unsafe implicit operator UnityEngine.GUID(Hash128 guid) => *(UnityEngine.GUID*) & guid;
-        #endif
+        public static unsafe implicit operator UnityEngine.GUID(Hash128 guid) => *(UnityEngine.GUID*)&guid;
+#endif
 
         /// <summary>
         /// Implicitly convert a UnityEngine.Hash128 to a Hash128.
@@ -294,6 +554,6 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="guid">The Hash128 to convert.</param>
         /// <returns>The corresponding UnityEngine.Hash128.</returns>
-        public static unsafe implicit operator UnityEngine.Hash128(Hash128 guid) => *(UnityEngine.Hash128*) & guid;
+        public static unsafe implicit operator UnityEngine.Hash128(Hash128 guid) => *(UnityEngine.Hash128*)&guid;
     }
 }

@@ -2,25 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Dialogue.RAG
 {
     [DefaultExecutionOrder(-2)]
@@ -30,12 +28,20 @@ namespace NPCSystem.Dialogue.RAG
         [FormerlySerializedAs("host")]
         [SerializeField]
         string _host = "localhost";
-        public string Host { get => _host; set => _host = value; }
+        public string Host
+        {
+            get => _host;
+            set => _host = value;
+        }
 
         [FormerlySerializedAs("port")]
         [SerializeField]
         int _port = 8080;
-        public int Port { get => _port; set => _port = value; }
+        public int Port
+        {
+            get => _port;
+            set => _port = value;
+        }
 
         [FormerlySerializedAs("apiKey")]
         [SerializeField]
@@ -45,13 +51,17 @@ namespace NPCSystem.Dialogue.RAG
         [FormerlySerializedAs("model")]
         [SerializeField]
         string _model = "nomic-embed-text-v1.5";
-public string Model => _model;
+        public string Model => _model;
 
         [Header("Settings")]
         [FormerlySerializedAs("numRetries")]
         [SerializeField]
         int _numRetries = 3;
-        public int NumRetries { get => _numRetries; set => _numRetries = value; }
+        public int NumRetries
+        {
+            get => _numRetries;
+            set => _numRetries = value;
+        }
 
         NPCFlowLogger _logger;
 
@@ -76,11 +86,7 @@ public string Model => _model;
                 NPCFlowLogLevel.Info,
                 $"Embedding query ({query.Length} chars).",
                 source: nameof(NPCLocalAIEmbedder),
-                data: new Dictionary<string, object>
-                {
-                    ["queryLength"] = query.Length,
-                    ["uri"] = uri,
-                }
+                data: new Dictionary<string, object> { ["queryLength"] = query.Length, ["uri"] = uri }
             );
 
             for (int attempt = 0; attempt <= _numRetries; attempt++)
@@ -89,9 +95,7 @@ public string Model => _model;
                 {
                     var payload = new LocalAIEmbeddingRequest
                     {
-                        model = string.IsNullOrWhiteSpace(Model)
-                            ? "default-embedding"
-                            : Model.Trim(),
+                        model = string.IsNullOrWhiteSpace(Model) ? "default-embedding" : Model.Trim(),
                         input = query,
                     };
 
@@ -129,11 +133,7 @@ public string Model => _model;
 
                     var response = JsonUtility.FromJson<LocalAIEmbeddingResponse>(responseText);
 
-                    if (
-                        response?.data != null
-                        && response.data.Length > 0
-                        && response.data[0].embedding != null
-                    )
+                    if (response?.data != null && response.data.Length > 0 && response.data[0].embedding != null)
                     {
                         int dims = response.data[0].embedding.Length;
                         _logger?.Log(
@@ -143,11 +143,7 @@ public string Model => _model;
                             $"Embedding generated ({dims} dims).",
                             source: nameof(NPCLocalAIEmbedder),
                             durationMs: 0,
-                            data: new Dictionary<string, object>
-                            {
-                                ["dimensions"] = dims,
-                                ["attempt"] = attempt,
-                            }
+                            data: new Dictionary<string, object> { ["dimensions"] = dims, ["attempt"] = attempt }
                         );
                         return new List<float>(response.data[0].embedding);
                     }

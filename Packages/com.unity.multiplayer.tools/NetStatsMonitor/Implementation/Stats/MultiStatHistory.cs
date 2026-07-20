@@ -21,11 +21,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         /// Record sample time-stamps for graphs and counters, so that
         /// we can gracefully handle irregularly-timed metric dispatches.
         [NotNull]
-        public EnumMap<SampleRate, RingBuffer<double>> TimeStamps { get; } = new EnumMap<SampleRate, RingBuffer<double>>()
-        {
-            { SampleRate.PerFrame,  new(0) },
-            { SampleRate.PerSecond, new(0) },
-        };
+        public EnumMap<SampleRate, RingBuffer<double>> TimeStamps { get; } =
+            new EnumMap<SampleRate, RingBuffer<double>>()
+            {
+                { SampleRate.PerFrame, new(0) },
+                { SampleRate.PerSecond, new(0) },
+            };
 
         public void Clear()
         {
@@ -51,9 +52,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             var allStatRequirements = requirements.Data;
 
             // Remove existing data that is no longer required
-            var statsToRemove = m_Data.Keys
-                .Where(metricId => !allStatRequirements.ContainsKey(metricId))
-                .ToList();
+            var statsToRemove = m_Data.Keys.Where(metricId => !allStatRequirements.ContainsKey(metricId)).ToList();
             foreach (var statName in statsToRemove)
             {
                 m_Data.Remove(statName);
@@ -95,7 +94,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             MetricId metricId,
             SampleRate sampleRate,
             int maxSampleCount,
-            double time)
+            double time
+        )
         {
             if (!Data.TryGetValue(metricId, out StatHistory statHistory))
             {
@@ -116,10 +116,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             return rate;
         }
 
-        double? GetSimpleMovingAverageForGauge(
-            MetricId metricId,
-            SampleRate sampleRate,
-            int maxSampleCount)
+        double? GetSimpleMovingAverageForGauge(MetricId metricId, SampleRate sampleRate, int maxSampleCount)
         {
             if (!Data.TryGetValue(metricId, out StatHistory statHistory))
             {
@@ -139,11 +136,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             return average;
         }
 
-        public double? GetSimpleMovingAverage(
-            MetricId metricId,
-            SampleRate sampleRate,
-            int maxSampleCount,
-            double time)
+        public double? GetSimpleMovingAverage(MetricId metricId, SampleRate sampleRate, int maxSampleCount, double time)
         {
             var metricKind = metricId.MetricKind;
             switch (metricKind)

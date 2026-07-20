@@ -76,7 +76,8 @@ namespace UnityEngine.InputSystem.Controls
                         x.ReadValueFromStateWithCaching(statePtr),
                         y.ReadValueFromStateWithCaching(statePtr),
                         z.ReadValueFromStateWithCaching(statePtr),
-                        w.ReadUnprocessedValueFromStateWithCaching(statePtr));
+                        w.ReadUnprocessedValueFromStateWithCaching(statePtr)
+                    );
             }
         }
 
@@ -100,20 +101,21 @@ namespace UnityEngine.InputSystem.Controls
         protected override FourCC CalculateOptimizedControlDataType()
         {
             if (
-                m_StateBlock.sizeInBits == sizeof(float) * 4 * 8 &&
-                m_StateBlock.bitOffset == 0 &&
-                x.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                y.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                z.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                w.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                y.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 4 &&
-                z.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 8 &&
-                w.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 12 &&
+                m_StateBlock.sizeInBits == sizeof(float) * 4 * 8
+                && m_StateBlock.bitOffset == 0
+                && x.optimizedControlDataType == InputStateBlock.FormatFloat
+                && y.optimizedControlDataType == InputStateBlock.FormatFloat
+                && z.optimizedControlDataType == InputStateBlock.FormatFloat
+                && w.optimizedControlDataType == InputStateBlock.FormatFloat
+                && y.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 4
+                && z.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 8
+                && w.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 12
+                &&
                 // For some unknown reason ReadUnprocessedValueFromState here uses ReadValueFromState on x/y/z (but not w)
                 // which means we can't optimize if there any processors on x/y/z
-                x.m_ProcessorStack.length == 0 &&
-                y.m_ProcessorStack.length == 0 &&
-                z.m_ProcessorStack.length == 0
+                x.m_ProcessorStack.length == 0
+                && y.m_ProcessorStack.length == 0
+                && z.m_ProcessorStack.length == 0
             )
                 return InputStateBlock.FormatQuaternion;
 

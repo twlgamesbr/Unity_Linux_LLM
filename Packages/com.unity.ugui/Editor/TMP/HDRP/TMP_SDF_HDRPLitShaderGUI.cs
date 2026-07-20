@@ -1,56 +1,53 @@
 ﻿#if HDRP_10_7_OR_NEWER
 using UnityEngine;
 using UnityEditor;
-
 using UnityEditor.Rendering.HighDefinition;
 
 namespace TMPro.EditorUtilities
 {
     internal class TMP_SDF_HDRPLitShaderGUI : TMP_BaseHDRPLitShaderGUI
     {
-        static ShaderFeature s_OutlineFeature, s_UnderlayFeature, s_BevelFeature, s_GlowFeature, s_MaskFeature;
+        static ShaderFeature s_OutlineFeature,
+            s_UnderlayFeature,
+            s_BevelFeature,
+            s_GlowFeature,
+            s_MaskFeature;
 
-        static bool s_Face = true, s_Outline = true, s_Outline2 = true, s_Outline3 = true, s_Underlay = true, s_Lighting = true, s_Glow, s_Bevel, s_Light, s_Bump, s_Env;
+        static bool s_Face = true,
+            s_Outline = true,
+            s_Outline2 = true,
+            s_Outline3 = true,
+            s_Underlay = true,
+            s_Lighting = true,
+            s_Glow,
+            s_Bevel,
+            s_Light,
+            s_Bump,
+            s_Env;
 
-        static string[]
-            s_FaceUVSpeedName = { "_FaceUVSpeed" },
-            s_FaceUvSpeedNames = { "_FaceUVSpeedX", "_FaceUVSpeedY" },
-            s_OutlineUvSpeedNames = { "_OutlineUVSpeedX", "_OutlineUVSpeedY" },
-            s_OutlineUvSpeedName = { "_OutlineUVSpeed" };
+        static string[] s_FaceUVSpeedName =  { "_FaceUVSpeed" },
+            s_FaceUvSpeedNames =  { "_FaceUVSpeedX", "_FaceUVSpeedY" },
+            s_OutlineUvSpeedNames =  { "_OutlineUVSpeedX", "_OutlineUVSpeedY" },
+            s_OutlineUvSpeedName =  { "_OutlineUVSpeed" };
 
         /// <summary>
         ///
         /// </summary>
         static TMP_SDF_HDRPLitShaderGUI()
         {
-            s_OutlineFeature = new ShaderFeature()
-            {
-                undoLabel = "Outline",
-                keywords = new[] { "OUTLINE_ON" }
-            };
+            s_OutlineFeature = new ShaderFeature() { undoLabel = "Outline", keywords = new[] { "OUTLINE_ON" } };
 
             s_UnderlayFeature = new ShaderFeature()
             {
                 undoLabel = "Underlay",
                 keywords = new[] { "UNDERLAY_ON", "UNDERLAY_INNER" },
                 label = new GUIContent("Underlay Type"),
-                keywordLabels = new[]
-                {
-                    new GUIContent("None"), new GUIContent("Normal"), new GUIContent("Inner")
-                }
+                keywordLabels = new[] { new GUIContent("None"), new GUIContent("Normal"), new GUIContent("Inner") },
             };
 
-            s_BevelFeature = new ShaderFeature()
-            {
-                undoLabel = "Bevel",
-                keywords = new[] { "BEVEL_ON" }
-            };
+            s_BevelFeature = new ShaderFeature() { undoLabel = "Bevel", keywords = new[] { "BEVEL_ON" } };
 
-            s_GlowFeature = new ShaderFeature()
-            {
-                undoLabel = "Glow",
-                keywords = new[] { "GLOW_ON" }
-            };
+            s_GlowFeature = new ShaderFeature() { undoLabel = "Glow", keywords = new[] { "GLOW_ON" } };
 
             s_MaskFeature = new ShaderFeature()
             {
@@ -59,8 +56,10 @@ namespace TMPro.EditorUtilities
                 label = new GUIContent("Mask"),
                 keywordLabels = new[]
                 {
-                    new GUIContent("Mask Off"), new GUIContent("Mask Hard"), new GUIContent("Mask Soft")
-                }
+                    new GUIContent("Mask Off"),
+                    new GUIContent("Mask Hard"),
+                    new GUIContent("Mask Soft"),
+                },
             };
         }
 
@@ -123,11 +122,11 @@ namespace TMPro.EditorUtilities
 
             // Draw HDRP panels
             uiBlocks.OnGUI(m_Editor, m_Properties);
-            #if HDRP_12_OR_NEWER
+#if HDRP_12_OR_NEWER
             ValidateMaterial(m_Material);
-            #else
+#else
             SetupMaterialKeywordsAndPass(m_Material);
-            #endif
+#endif
         }
 
         void DoFacePanel()
@@ -290,11 +289,7 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
         }
 
-        static GUIContent[] s_BevelTypeLabels =
-        {
-            new GUIContent("Outer Bevel"),
-            new GUIContent("Inner Bevel")
-        };
+        static GUIContent[] s_BevelTypeLabels = { new GUIContent("Outer Bevel"), new GUIContent("Inner Bevel") };
 
         void DrawLightingPanel()
         {

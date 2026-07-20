@@ -12,7 +12,13 @@ namespace Unity.Networking.Transport
         /// <param name="messageBytes">Message to hash</param>
         /// <param name="messageLength">Length of the message</param>
         /// <param name="result">Where to write resulting 32 bytes hash</param>
-        public static unsafe void ComputeHash(byte* keyValue, int keyArrayLength, byte* messageBytes, int messageLength, byte* result)
+        public static unsafe void ComputeHash(
+            byte* keyValue,
+            int keyArrayLength,
+            byte* messageBytes,
+            int messageLength,
+            byte* result
+        )
         {
             const int B = 64;
             const int sha256SizeBytes = 32;

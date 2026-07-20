@@ -31,10 +31,7 @@ namespace Unity.Rendering
         public AABB Value;
     }
 
-    internal struct SkipWorldRenderBoundsUpdate : IComponentData
-    {
-
-    }
+    internal struct SkipWorldRenderBoundsUpdate : IComponentData { }
 
     /// <summary>
     /// An unmanaged component that represents the render bounds of a chunk.

@@ -20,17 +20,23 @@ namespace UnityEngine.PathTracing.Core
 
         internal int ToInt()
         {
-            Debug.Assert(UnsafeUtility.SizeOf<EntityId>() == sizeof(int),
-                "If this assert is firing, the size of EntityId has changed. This function should no longer be used.");
+            Debug.Assert(
+                UnsafeUtility.SizeOf<EntityId>() == sizeof(int),
+                "If this assert is firing, the size of EntityId has changed. This function should no longer be used."
+            );
 
             return (int)Value;
         }
 
         // Value type semantics
         public override int GetHashCode() => Value.GetHashCode();
+
         public override bool Equals(object obj) => obj is Handle<T> other && other.Value == Value;
+
         public override string ToString() => $"Handle<{typeof(T).Name}>({Value})";
+
         public static bool operator ==(Handle<T> a, Handle<T> b) => a.Value == b.Value;
+
         public static bool operator !=(Handle<T> a, Handle<T> b) => a.Value != b.Value;
     }
 

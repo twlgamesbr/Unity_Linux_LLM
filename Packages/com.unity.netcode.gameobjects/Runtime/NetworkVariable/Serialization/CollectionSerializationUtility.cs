@@ -8,7 +8,12 @@ namespace Unity.Netcode
 {
     internal static partial class CollectionSerializationUtility
     {
-        public static void WriteNativeArrayDelta<T>(FastBufferWriter writer, ref NativeArray<T> value, ref NativeArray<T> previousValue) where T : unmanaged
+        public static void WriteNativeArrayDelta<T>(
+            FastBufferWriter writer,
+            ref NativeArray<T> value,
+            ref NativeArray<T> previousValue
+        )
+            where T : unmanaged
         {
             // This bit vector serializes the list of which fields have changed using 1 bit per field.
             // This will always be 1 bit per field of the whole array (rounded up to the nearest 8 bits)
@@ -42,7 +47,10 @@ namespace Unity.Netcode
             // If the size of serializing the dela is greater than the size of serializing the whole array (i.e.,
             // because almost the entire array has changed and the overhead of the change set increases bandwidth),
             // then we just do a normal full serialization instead of a delta.
-            if (changes.GetSerializedSize() + FastBufferWriter.GetWriteSize<T>() * numChanges > FastBufferWriter.GetWriteSize<T>() * value.Length)
+            if (
+                changes.GetSerializedSize() + FastBufferWriter.GetWriteSize<T>() * numChanges
+                > FastBufferWriter.GetWriteSize<T>() * value.Length
+            )
             {
                 // 1 = full serialization
                 writer.WriteByteSafe(1);
@@ -76,7 +84,9 @@ namespace Unity.Netcode
                 }
             }
         }
-        public static void ReadNativeArrayDelta<T>(FastBufferReader reader, ref NativeArray<T> value) where T : unmanaged
+
+        public static void ReadNativeArrayDelta<T>(FastBufferReader reader, ref NativeArray<T> value)
+            where T : unmanaged
         {
             // 1 = full serialization, 0 = delta serialization
             reader.ReadByteSafe(out byte full);
@@ -102,7 +112,11 @@ namespace Unity.Netcode
                     var newArray = new NativeArray<T>(length, Allocator.Persistent);
                     unsafe
                     {
-                        UnsafeUtility.MemCpy(newArray.GetUnsafePtr(), value.GetUnsafePtr(), math.min(newArray.Length * sizeof(T), value.Length * sizeof(T)));
+                        UnsafeUtility.MemCpy(
+                            newArray.GetUnsafePtr(),
+                            value.GetUnsafePtr(),
+                            math.min(newArray.Length * sizeof(T), value.Length * sizeof(T))
+                        );
                     }
                     value.Dispose();
                     value = newArray;
@@ -130,6 +144,7 @@ namespace Unity.Netcode
                 }
             }
         }
+
         public static void WriteListDelta<T>(FastBufferWriter writer, ref List<T> value, ref List<T> previousValue)
         {
             // Lists can be null, so we have to handle that case.
@@ -207,6 +222,7 @@ namespace Unity.Netcode
                 }
             }
         }
+
         public static void ReadListDelta<T>(FastBufferReader reader, ref List<T> value)
         {
             // 1 = full serialization, 0 = delta serialization
@@ -269,11 +285,13 @@ namespace Unity.Netcode
                 k_AddedList.Clear();
                 return k_AddedList;
             }
+
             public static List<T> GetRemovedList()
             {
                 k_RemovedList.Clear();
                 return k_RemovedList;
             }
+
             public static List<T> GetChangedList()
             {
                 k_ChangedList.Clear();
@@ -281,7 +299,11 @@ namespace Unity.Netcode
             }
         }
 
-        public static void WriteHashSetDelta<T>(FastBufferWriter writer, ref HashSet<T> value, ref HashSet<T> previousValue)
+        public static void WriteHashSetDelta<T>(
+            FastBufferWriter writer,
+            ref HashSet<T> value,
+            ref HashSet<T> previousValue
+        )
         {
             // HashSets can be null, so we have to handle that case.
             // We do that by marking this as a full serialization and using the existing null handling logic
@@ -362,7 +384,12 @@ namespace Unity.Netcode
                 value.Remove(item);
             }
         }
-        public static void WriteDictionaryDelta<TKey, TVal>(FastBufferWriter writer, ref Dictionary<TKey, TVal> value, ref Dictionary<TKey, TVal> previousValue)
+
+        public static void WriteDictionaryDelta<TKey, TVal>(
+            FastBufferWriter writer,
+            ref Dictionary<TKey, TVal> value,
+            ref Dictionary<TKey, TVal> previousValue
+        )
             where TKey : IEquatable<TKey>
         {
             if (value == null || previousValue == null)
@@ -469,7 +496,12 @@ namespace Unity.Netcode
         }
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-        public static void WriteNativeListDelta<T>(FastBufferWriter writer, ref NativeList<T> value, ref NativeList<T> previousValue) where T : unmanaged
+        public static void WriteNativeListDelta<T>(
+            FastBufferWriter writer,
+            ref NativeList<T> value,
+            ref NativeList<T> previousValue
+        )
+            where T : unmanaged
         {
             // See WriteListDelta and WriteNativeArrayDelta to understand most of this. It's basically the same,
             // just adjusted for the NativeList API
@@ -493,7 +525,10 @@ namespace Unity.Netcode
                 changes.Set(i);
             }
 
-            if (changes.GetSerializedSize() + FastBufferWriter.GetWriteSize<T>() * numChanges > FastBufferWriter.GetWriteSize<T>() * value.Length)
+            if (
+                changes.GetSerializedSize() + FastBufferWriter.GetWriteSize<T>() * numChanges
+                > FastBufferWriter.GetWriteSize<T>() * value.Length
+            )
             {
                 writer.WriteByteSafe(1);
                 writer.WriteValueSafe(value);
@@ -523,7 +558,9 @@ namespace Unity.Netcode
                 }
             }
         }
-        public static void ReadNativeListDelta<T>(FastBufferReader reader, ref NativeList<T> value) where T : unmanaged
+
+        public static void ReadNativeListDelta<T>(FastBufferReader reader, ref NativeList<T> value)
+            where T : unmanaged
         {
             // See ReadListDelta and ReadNativeArrayDelta to understand most of this. It's basically the same,
             // just adjusted for the NativeList API
@@ -568,7 +605,12 @@ namespace Unity.Netcode
             }
         }
 
-        public static unsafe void WriteNativeHashSetDelta<T>(FastBufferWriter writer, ref NativeHashSet<T> value, ref NativeHashSet<T> previousValue) where T : unmanaged, IEquatable<T>
+        public static unsafe void WriteNativeHashSetDelta<T>(
+            FastBufferWriter writer,
+            ref NativeHashSet<T> value,
+            ref NativeHashSet<T> previousValue
+        )
+            where T : unmanaged, IEquatable<T>
         {
             // See WriteHashSet; this is the same algorithm, adjusted for the NativeHashSet API
             var added = stackalloc T[value.Count];
@@ -613,7 +655,8 @@ namespace Unity.Netcode
             }
         }
 
-        public static void ReadNativeHashSetDelta<T>(FastBufferReader reader, ref NativeHashSet<T> value) where T : unmanaged, IEquatable<T>
+        public static void ReadNativeHashSetDelta<T>(FastBufferReader reader, ref NativeHashSet<T> value)
+            where T : unmanaged, IEquatable<T>
         {
             // See ReadHashSet; this is the same algorithm, adjusted for the NativeHashSet API
             reader.ReadByteSafe(out byte full);
@@ -638,7 +681,11 @@ namespace Unity.Netcode
             }
         }
 
-        public static unsafe void WriteNativeHashMapDelta<TKey, TVal>(FastBufferWriter writer, ref NativeHashMap<TKey, TVal> value, ref NativeHashMap<TKey, TVal> previousValue)
+        public static unsafe void WriteNativeHashMapDelta<TKey, TVal>(
+            FastBufferWriter writer,
+            ref NativeHashMap<TKey, TVal> value,
+            ref NativeHashMap<TKey, TVal> previousValue
+        )
             where TKey : unmanaged, IEquatable<TKey>
             where TVal : unmanaged
         {
@@ -652,7 +699,6 @@ namespace Unity.Netcode
             var removedCount = 0;
             foreach (var item in value)
             {
-
                 var hasPrevVal = previousValue.TryGetValue(item.Key, out var prevVal);
                 if (!hasPrevVal)
                 {
@@ -705,7 +751,10 @@ namespace Unity.Netcode
             }
         }
 
-        public static void ReadNativeHashMapDelta<TKey, TVal>(FastBufferReader reader, ref NativeHashMap<TKey, TVal> value)
+        public static void ReadNativeHashMapDelta<TKey, TVal>(
+            FastBufferReader reader,
+            ref NativeHashMap<TKey, TVal> value
+        )
             where TKey : unmanaged, IEquatable<TKey>
             where TVal : unmanaged
         {

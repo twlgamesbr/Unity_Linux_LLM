@@ -21,7 +21,10 @@ namespace Unity.Entities.Hybrid.Baking
                 .WithAll<AdditionalEntitiesBakingData>()
                 .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
                 .Build(this);
-            Assert.IsFalse(_AdditionalEntityQuery.HasFilter(), "The use of EntityQueryMask in this job will not respect the query's active filter settings.");
+            Assert.IsFalse(
+                _AdditionalEntityQuery.HasFilter(),
+                "The use of EntityQueryMask in this job will not respect the query's active filter settings."
+            );
             _HasAdditionalEntityMask = _AdditionalEntityQuery.GetEntityQueryMask();
 
             // Only add LinkedEntityGroups to Entities that are not marked BakingOnlyEntity
@@ -35,7 +38,10 @@ namespace Unity.Entities.Hybrid.Baking
                 .WithNone<BakingOnlyEntity, RemoveUnusedEntityInBake>()
                 .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
                 .Build(this);
-            Assert.IsFalse(_NoBakeOnlyQuery.HasFilter(), "The use of EntityQueryMask in this job will not respect the query's active filter settings.");
+            Assert.IsFalse(
+                _NoBakeOnlyQuery.HasFilter(),
+                "The use of EntityQueryMask in this job will not respect the query's active filter settings."
+            );
             _NoBakeOnlyMask = _NoBakeOnlyQuery.GetEntityQueryMask();
         }
 
@@ -45,11 +51,13 @@ namespace Unity.Entities.Hybrid.Baking
             var additionalEntityJob = new AddLinkedEntityGroupBakingJob
             {
                 AdditionalEntities = EntityManager.GetBufferLookup<AdditionalEntitiesBakingData>(true),
-                LinkedEntityGroupBakingDataHandle = EntityManager.GetBufferTypeHandle<LinkedEntityGroupBakingData>(true),
+                LinkedEntityGroupBakingDataHandle = EntityManager.GetBufferTypeHandle<LinkedEntityGroupBakingData>(
+                    true
+                ),
                 Entities = EntityManager.GetEntityTypeHandle(),
                 Commands = cmd.AsParallelWriter(),
                 HasAdditionalEntityMask = _HasAdditionalEntityMask,
-                NoBakeOnlyMask = _NoBakeOnlyMask
+                NoBakeOnlyMask = _NoBakeOnlyMask,
             };
             var jobHandle = additionalEntityJob.ScheduleParallelByRef(_LinkedEntityGroupBakingDataQuery, Dependency);
 
@@ -62,16 +70,23 @@ namespace Unity.Entities.Hybrid.Baking
     [BurstCompile]
     unsafe struct AddLinkedEntityGroupBakingJob : IJobChunk
     {
-        public EntityTypeHandle                              Entities;
-        public EntityQueryMask                               HasAdditionalEntityMask;
-        public EntityQueryMask                               NoBakeOnlyMask;
-        [ReadOnly]
-        public BufferLookup<AdditionalEntitiesBakingData>      AdditionalEntities;
-        [ReadOnly]
-        public BufferTypeHandle<LinkedEntityGroupBakingData>       LinkedEntityGroupBakingDataHandle;
-        public EntityCommandBuffer.ParallelWriter            Commands;
+        public EntityTypeHandle Entities;
+        public EntityQueryMask HasAdditionalEntityMask;
+        public EntityQueryMask NoBakeOnlyMask;
 
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        [ReadOnly]
+        public BufferLookup<AdditionalEntitiesBakingData> AdditionalEntities;
+
+        [ReadOnly]
+        public BufferTypeHandle<LinkedEntityGroupBakingData> LinkedEntityGroupBakingDataHandle;
+        public EntityCommandBuffer.ParallelWriter Commands;
+
+        public void Execute(
+            in ArchetypeChunk chunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMask
+        )
         {
             Assert.IsFalse(useEnabledMask);
             var legBuffer = chunk.GetBufferAccessorRO(ref LinkedEntityGroupBakingDataHandle);
@@ -88,18 +103,25 @@ namespace Unity.Entities.Hybrid.Baking
                     // Only append if not BakeOnlyEntity
                     if (NoBakeOnlyMask.MatchesIgnoreFilter(entity))
                     {
-                        Commands.AppendToBuffer(unfilteredChunkIndex, entities[i], new LinkedEntityGroup() {Value = entity});
+                        Commands.AppendToBuffer(
+                            unfilteredChunkIndex,
+                            entities[i],
+                            new LinkedEntityGroup() { Value = entity }
+                        );
                     }
 
                     if (HasAdditionalEntityMask.MatchesIgnoreFilter(entity))
                     {
-
                         var additionalEntities = AdditionalEntities[entity];
                         for (var k = 0; k < additionalEntities.Length; k++)
                         {
                             if (NoBakeOnlyMask.MatchesIgnoreFilter(additionalEntities[k].Value))
                             {
-                                Commands.AppendToBuffer(unfilteredChunkIndex, entities[i], new LinkedEntityGroup() {Value = additionalEntities[k].Value});
+                                Commands.AppendToBuffer(
+                                    unfilteredChunkIndex,
+                                    entities[i],
+                                    new LinkedEntityGroup() { Value = additionalEntities[k].Value }
+                                );
                             }
                         }
                     }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
-
 using UnityEngine;
 
 namespace UnityEditor.Build.Pipeline.Utilities.USerialize
@@ -116,9 +115,7 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         // Serialization data format version number.  Written to the stream to provide a means for upgrade should it be necessary in the future
         internal const byte SerializationVersion = 1;
 
-        internal Serializer()
-        {
-        }
+        internal Serializer() { }
 
         internal Serializer(params ICustomSerializer[] customSerializers)
         {
@@ -155,7 +152,6 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             m_TypeQualifiedNameIndices.Clear();
         }
 
-
         // Main serialization function.  Serializes 'objectToSerialize' to the given stream inserting the supplied object version number in the data.  The object version number can be obtained by DeSerializer.ObjectVersion when deserializing the data
         internal void Serialize(Stream stream, object objectToSerialize, int objectVersion)
         {
@@ -171,8 +167,8 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
 
             // Leave space for the offsets to the type and data stringtables data that we write after the serialization data proper
             long stringTableOffsetPosition = m_Writer.Seek(0, SeekOrigin.Current);
-            m_Writer.Write(0uL);    // Space for the offset to the type string table data
-            m_Writer.Write(0uL);    // Space for the offset to the data string table data
+            m_Writer.Write(0uL); // Space for the offset to the type string table data
+            m_Writer.Write(0uL); // Space for the offset to the data string table data
 
             // Write serialization data for the object
             WriteObject(objectToSerialize);
@@ -207,10 +203,14 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             {
                 // Cache data about the fields that is slow to retrieve every time an instance of this type is processed
 
-                FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                FieldInfo[] fieldInfos = type.GetFields(
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                );
                 typeData = new TypeData() { m_Fields = new FieldData[fieldInfos.Length] };
                 typeData.m_AssemblyQualifiedName = type.AssemblyQualifiedName;
-                typeData.m_AssemblyQualifiedNameIndex = m_TypeStringTable.GetStringIndex(typeData.m_AssemblyQualifiedName);
+                typeData.m_AssemblyQualifiedNameIndex = m_TypeStringTable.GetStringIndex(
+                    typeData.m_AssemblyQualifiedName
+                );
 
                 for (int fieldNum = 0; fieldNum < fieldInfos.Length; fieldNum++)
                 {
@@ -229,7 +229,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                         fieldData.m_ElementTypeIsValueType = fieldData.m_ElementType.IsValueType;
                         fieldData.m_Getter = CreateObjectGetter(type, field);
                     }
-                    else if (field.FieldType.IsGenericType && (field.FieldType.GetGenericTypeDefinition() == typeof(List<>)))
+                    else if (
+                        field.FieldType.IsGenericType && (field.FieldType.GetGenericTypeDefinition() == typeof(List<>))
+                    )
                     {
                         fieldData.m_DataType = DataType.List;
                         fieldData.m_ElementType = field.FieldType.GetGenericArguments()[0];
@@ -307,12 +309,13 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             else if (typeData.m_AssemblyQualifiedNameIndex == -1)
             {
                 // This type is in our cache but it hasn't been used by the object being serialized yet.  Find/add it's type and field names to the type string table so we have a valid index
-                typeData.m_AssemblyQualifiedNameIndex = m_TypeStringTable.GetStringIndex(typeData.m_AssemblyQualifiedName);
+                typeData.m_AssemblyQualifiedNameIndex = m_TypeStringTable.GetStringIndex(
+                    typeData.m_AssemblyQualifiedName
+                );
                 foreach (FieldData fieldData in typeData.m_Fields)
                 {
                     fieldData.m_NameIndex = m_TypeStringTable.GetStringIndex(fieldData.m_Name);
                 }
-
             }
             return typeData;
         }
@@ -321,14 +324,21 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         static Func<object, GetterType> CreateGetter<GetterType>(Type type, FieldInfo field)
         {
             ParameterExpression valueExp = Expression.Parameter(typeof(object), "value");
-            return Expression.Lambda<Func<object, GetterType>>(Expression.Field(Expression.Convert(valueExp, type), field), valueExp).Compile();
+            return Expression
+                .Lambda<Func<object, GetterType>>(Expression.Field(Expression.Convert(valueExp, type), field), valueExp)
+                .Compile();
         }
 
         // Create a function object to get the value from a field as a generic object.  It is much faster to call this compiled function object than to use the reflection API
         static Func<object, object> CreateObjectGetter(Type type, FieldInfo field)
         {
             ParameterExpression valueExp = Expression.Parameter(typeof(object), "value");
-            return Expression.Lambda<Func<object, object>>(Expression.Convert(Expression.Field(Expression.Convert(valueExp, type), field), typeof(object)), valueExp).Compile();
+            return Expression
+                .Lambda<Func<object, object>>(
+                    Expression.Convert(Expression.Field(Expression.Convert(valueExp, type), field), typeof(object)),
+                    valueExp
+                )
+                .Compile();
         }
 
         // Write an object to the serialization stream
@@ -344,7 +354,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             WriteStringIndex(typeData.m_AssemblyQualifiedNameIndex);
 
             if (typeData.m_Fields.Length > ushort.MaxValue)
-                throw new InvalidDataException($"USerialize cannot serialize objects with more than {ushort.MaxValue} fields");
+                throw new InvalidDataException(
+                    $"USerialize cannot serialize objects with more than {ushort.MaxValue} fields"
+                );
             m_Writer.Write((ushort)typeData.m_Fields.Length);
 
             // Process each field in turn
@@ -352,249 +364,266 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             {
                 switch (field.m_DataType)
                 {
-                case DataType.Array:
-                {
-                    WriteFieldInfo(field, DataType.Array);
-                    Array array = (Array)((Func<object, object>)field.m_Getter)(objectToWrite);
-                    if (WriteNullFlag(array))
+                    case DataType.Array:
                     {
-                        // We only support rank 1 for now
-                        m_Writer.Write(array.Rank);
-                        m_Writer.Write(array.Length);
-
-                        if (array.Rank != 1)
-                            throw new InvalidDataException($"USerialize currently doesn't support arrays with ranks other than one - field {field.m_Name} of type {field.m_FieldInfo.FieldType.Name} has rank {array.Rank}");
-
-                        Type elementType = field.m_ElementType;
-                        if (field.m_ElementTypeIsPrimitive)
+                        WriteFieldInfo(field, DataType.Array);
+                        Array array = (Array)((Func<object, object>)field.m_Getter)(objectToWrite);
+                        if (WriteNullFlag(array))
                         {
-                            // A primitive array, write the bytes as optimally as possible for types we support
-                            if (elementType == typeof(byte))
+                            // We only support rank 1 for now
+                            m_Writer.Write(array.Rank);
+                            m_Writer.Write(array.Length);
+
+                            if (array.Rank != 1)
+                                throw new InvalidDataException(
+                                    $"USerialize currently doesn't support arrays with ranks other than one - field {field.m_Name} of type {field.m_FieldInfo.FieldType.Name} has rank {array.Rank}"
+                                );
+
+                            Type elementType = field.m_ElementType;
+                            if (field.m_ElementTypeIsPrimitive)
                             {
-                                // byte[]
-                                m_Writer.Write((byte)DataType.Byte);
-                                m_Writer.Write((byte[])array, 0, array.Length);
+                                // A primitive array, write the bytes as optimally as possible for types we support
+                                if (elementType == typeof(byte))
+                                {
+                                    // byte[]
+                                    m_Writer.Write((byte)DataType.Byte);
+                                    m_Writer.Write((byte[])array, 0, array.Length);
+                                }
+                                // Per customer request
+                                else if (elementType == typeof(ulong))
+                                {
+                                    ulong[] ulongArray = (ulong[])array;
+                                    m_Writer.Write((byte)DataType.ULong);
+                                    for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
+                                    {
+                                        m_Writer.Write(ulongArray[elementIndex]);
+                                    }
+                                }
+                                else
+                                    throw new InvalidDataException(
+                                        $"USerialize currently doesn't support primitive arrays of type {elementType.Name} - field {field.m_Name} of type {field.m_FieldInfo.FieldType.Name}"
+                                    );
                             }
-                            // Per customer request
-                            else if (elementType == typeof(ulong))
+                            else if (elementType == typeof(string))
                             {
-                                ulong[] ulongArray = (ulong[])array;
-                                m_Writer.Write((byte)DataType.ULong);
+                                // String[]
+                                string[] stringArray = (string[])array;
+                                m_Writer.Write((byte)DataType.String);
                                 for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
                                 {
-                                    m_Writer.Write(ulongArray[elementIndex]);
+                                    WriteDataString(stringArray[elementIndex]);
                                 }
                             }
-                            else
-                                throw new InvalidDataException($"USerialize currently doesn't support primitive arrays of type {elementType.Name} - field {field.m_Name} of type {field.m_FieldInfo.FieldType.Name}");
-                        }
-                        else if (elementType == typeof(string))
-                        {
-                            // String[]
-                            string[] stringArray = (string[])array;
-                            m_Writer.Write((byte)DataType.String);
-                            for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
+                            else if (elementType == typeof(Type))
                             {
-                                WriteDataString(stringArray[elementIndex]);
-                            }
-                        }
-                        else if (elementType == typeof(Type))
-                        {
-                            // Type[]
-                            Type[] typeArray = (Type[])array;
-                            m_Writer.Write((byte)DataType.Type);
-                            for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
-                            {
-                                if (typeArray[elementIndex] != null)
-                                    WriteStringIndex(GetTypeQualifiedNameIndex(typeArray[elementIndex]));
-                                else
-                                    WriteStringIndex(USerialize.InvalidStringIndex);
-
-                            }
-                        }
-                        else if (field.m_ElementTypeIsClass)
-                        {
-                            // An array of class instances
-                            m_Writer.Write((byte)DataType.Class);
-                            WriteStringIndex(GetTypeQualifiedNameIndex(elementType));
-                            for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
-                            {
-                                object elementToWrite = array.GetValue(elementIndex);
-
-                                // If the element isn't null see if we have a custom serializer for the type of this instance.
-                                // The array type might be a base class for the actual instances which may not all be the same derived type so we use the runtime type of each instance individually to check for custom serializers rather than using the type of the array itself
-                                if (elementToWrite != null)
+                                // Type[]
+                                Type[] typeArray = (Type[])array;
+                                m_Writer.Write((byte)DataType.Type);
+                                for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
                                 {
-                                    Type elementObjectType = elementToWrite.GetType();
-                                    if (m_CustomSerializers.TryGetValue(elementObjectType, out ICustomSerializer customSerializer))
+                                    if (typeArray[elementIndex] != null)
+                                        WriteStringIndex(GetTypeQualifiedNameIndex(typeArray[elementIndex]));
+                                    else
+                                        WriteStringIndex(USerialize.InvalidStringIndex);
+                                }
+                            }
+                            else if (field.m_ElementTypeIsClass)
+                            {
+                                // An array of class instances
+                                m_Writer.Write((byte)DataType.Class);
+                                WriteStringIndex(GetTypeQualifiedNameIndex(elementType));
+                                for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
+                                {
+                                    object elementToWrite = array.GetValue(elementIndex);
+
+                                    // If the element isn't null see if we have a custom serializer for the type of this instance.
+                                    // The array type might be a base class for the actual instances which may not all be the same derived type so we use the runtime type of each instance individually to check for custom serializers rather than using the type of the array itself
+                                    if (elementToWrite != null)
                                     {
-                                        m_Writer.Write((byte)DataType.Custom);
-                                        WriteStringIndex(GetTypeQualifiedNameIndex(elementObjectType));
-                                        customSerializer.USerializer(this, elementToWrite);
-                                    }
-                                    else if (elementObjectType == typeof(string))
-                                    {
-                                        m_Writer.Write((byte)DataType.String);
-                                        WriteDataString((string)elementToWrite);
-                                    }
-                                    else if (elementObjectType == typeof(Int32))
-                                    {
-                                        m_Writer.Write((byte)DataType.Int);
-                                        m_Writer.Write((int)elementToWrite);
+                                        Type elementObjectType = elementToWrite.GetType();
+                                        if (
+                                            m_CustomSerializers.TryGetValue(
+                                                elementObjectType,
+                                                out ICustomSerializer customSerializer
+                                            )
+                                        )
+                                        {
+                                            m_Writer.Write((byte)DataType.Custom);
+                                            WriteStringIndex(GetTypeQualifiedNameIndex(elementObjectType));
+                                            customSerializer.USerializer(this, elementToWrite);
+                                        }
+                                        else if (elementObjectType == typeof(string))
+                                        {
+                                            m_Writer.Write((byte)DataType.String);
+                                            WriteDataString((string)elementToWrite);
+                                        }
+                                        else if (elementObjectType == typeof(Int32))
+                                        {
+                                            m_Writer.Write((byte)DataType.Int);
+                                            m_Writer.Write((int)elementToWrite);
+                                        }
+                                        else
+                                        {
+                                            if (elementObjectType.IsPrimitive)
+                                                throw new InvalidDataException(
+                                                    $"USerialize cannot handle type '{elementObjectType.Name}' in object[] array '{objectType.Name}.{field.m_Name}'"
+                                                );
+                                            m_Writer.Write((byte)DataType.Class);
+                                            WriteObject(elementToWrite);
+                                        }
                                     }
                                     else
                                     {
-                                        if (elementObjectType.IsPrimitive)
-                                            throw new InvalidDataException($"USerialize cannot handle type '{elementObjectType.Name}' in object[] array '{objectType.Name}.{field.m_Name}'");
                                         m_Writer.Write((byte)DataType.Class);
-                                        WriteObject(elementToWrite);
+                                        m_Writer.Write(IsNull);
                                     }
                                 }
-                                else
+                            }
+                            else if (field.m_ElementTypeIsValueType)
+                            {
+                                // An array of struct instances
+                                m_Writer.Write((byte)DataType.Struct);
+                                WriteStringIndex(GetTypeQualifiedNameIndex(elementType));
+                                for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
                                 {
-                                    m_Writer.Write((byte)DataType.Class);
-                                    m_Writer.Write(IsNull);
+                                    WriteObject(array.GetValue(elementIndex));
                                 }
                             }
+                            else
+                                throw new InvalidDataException(
+                                    $"USerialize doesn't support serializing array field {field.m_Name} of type {field.m_FieldInfo.FieldType.Name} which is of type {elementType.Name}"
+                                );
                         }
-                        else if (field.m_ElementTypeIsValueType)
+                        break;
+                    }
+
+                    case DataType.List:
+                    {
+                        // A List<>
+                        WriteFieldInfo(field, DataType.List);
+                        System.Collections.IList list =
+                            field.m_FieldInfo.GetValue(objectToWrite) as System.Collections.IList;
+                        if (WriteNullFlag(list))
                         {
-                            // An array of struct instances
-                            m_Writer.Write((byte)DataType.Struct);
-                            WriteStringIndex(GetTypeQualifiedNameIndex(elementType));
-                            for (int elementIndex = 0; elementIndex < array.Length; elementIndex++)
+                            m_Writer.Write(list.Count);
+                            WriteStringIndex(GetTypeQualifiedNameIndex(field.m_ElementType));
+                            for (int elementIndex = 0; elementIndex < list.Count; elementIndex++)
                             {
-                                WriteObject(array.GetValue(elementIndex));
+                                WriteObject(list[elementIndex]);
                             }
                         }
-                        else
-                            throw new InvalidDataException($"USerialize doesn't support serializing array field {field.m_Name} of type {field.m_FieldInfo.FieldType.Name} which is of type {elementType.Name}");
+                        break;
                     }
-                    break;
-                }
 
-                case DataType.List:
-                {
-                    // A List<>
-                    WriteFieldInfo(field, DataType.List);
-                    System.Collections.IList list = field.m_FieldInfo.GetValue(objectToWrite) as System.Collections.IList;
-                    if (WriteNullFlag(list))
+                    case DataType.Guid:
                     {
-                        m_Writer.Write(list.Count);
-                        WriteStringIndex(GetTypeQualifiedNameIndex(field.m_ElementType));
-                        for (int elementIndex = 0; elementIndex < list.Count; elementIndex++)
+                        // GUID instance
+                        WriteFieldInfo(field, DataType.Guid);
+                        GUID guid = ((Func<object, GUID>)field.m_Getter)(objectToWrite);
+                        unsafe
                         {
-                            WriteObject(list[elementIndex]);
+                            UInt64* guidPtr = (UInt64*)&guid;
+                            m_Writer.Write(guidPtr[0]);
+                            m_Writer.Write(guidPtr[1]);
                         }
+                        break;
                     }
-                    break;
-                }
 
-                case DataType.Guid:
-                {
-                    // GUID instance
-                    WriteFieldInfo(field, DataType.Guid);
-                    GUID guid = ((Func<object, GUID>)field.m_Getter)(objectToWrite);
-                    unsafe
+                    case DataType.Hash128:
                     {
-                        UInt64* guidPtr = (UInt64*)&guid;
-                        m_Writer.Write(guidPtr[0]);
-                        m_Writer.Write(guidPtr[1]);
+                        // Hash128 instance
+                        WriteFieldInfo(field, DataType.Hash128);
+                        Hash128 hash = ((Func<object, Hash128>)field.m_Getter)(objectToWrite);
+                        unsafe
+                        {
+                            UInt64* hashPtr = (UInt64*)&hash;
+                            m_Writer.Write(hashPtr[0]);
+                            m_Writer.Write(hashPtr[1]);
+                        }
+                        break;
                     }
-                    break;
-                }
 
-                case DataType.Hash128:
-                {
-                    // Hash128 instance
-                    WriteFieldInfo(field, DataType.Hash128);
-                    Hash128 hash = ((Func<object, Hash128>)field.m_Getter)(objectToWrite);
-                    unsafe
+                    case DataType.Enum:
+                        // An enum, we write it's value as an Int32
+                        WriteFieldInfo(field, DataType.Enum);
+                        m_Writer.Write((int)((Func<object, object>)field.m_Getter)(objectToWrite));
+                        break;
+
+                    case DataType.String:
                     {
-                        UInt64* hashPtr = (UInt64*)&hash;
-                        m_Writer.Write(hashPtr[0]);
-                        m_Writer.Write(hashPtr[1]);
+                        // String instance
+                        WriteFieldInfo(field, DataType.String);
+                        WriteDataString(((Func<object, string>)field.m_Getter)(objectToWrite));
+                        break;
                     }
-                    break;
-                }
 
-                case DataType.Enum:
-                    // An enum, we write it's value as an Int32
-                    WriteFieldInfo(field, DataType.Enum);
-                    m_Writer.Write((int)((Func<object, object>)field.m_Getter)(objectToWrite));
-                    break;
-
-                case DataType.String:
-                {
-                    // String instance
-                    WriteFieldInfo(field, DataType.String);
-                    WriteDataString(((Func<object, string>)field.m_Getter)(objectToWrite));
-                    break;
-                }
-
-                case DataType.Class:
-                {
-                    // Is a class instance. If the value isn't null check to see if we have been given a custom serializer for it's type.
-                    // If the value is null or there is no custom serializer registered for the value's type write it as normal
-                    // Note the type of the actual object is used to locate custom serializers rather than the type of the field in case the object is actually of a derived type
-                    object fieldValue = ((Func<object, object>)field.m_Getter)(objectToWrite);
-                    if ((fieldValue == null) || (!DoCustomSerialization(field, fieldValue)))
+                    case DataType.Class:
                     {
-                        WriteFieldInfo(field, DataType.Class);
-                        WriteObject(fieldValue);
+                        // Is a class instance. If the value isn't null check to see if we have been given a custom serializer for it's type.
+                        // If the value is null or there is no custom serializer registered for the value's type write it as normal
+                        // Note the type of the actual object is used to locate custom serializers rather than the type of the field in case the object is actually of a derived type
+                        object fieldValue = ((Func<object, object>)field.m_Getter)(objectToWrite);
+                        if ((fieldValue == null) || (!DoCustomSerialization(field, fieldValue)))
+                        {
+                            WriteFieldInfo(field, DataType.Class);
+                            WriteObject(fieldValue);
+                        }
+                        break;
                     }
-                    break;
-                }
 
-                case DataType.Struct:
-                {
-                    // Is a struct instance. Check to see if we have been given a custom serializer for it's type, if not write it as normal
-                    object fieldValue = ((Func<object, object>)field.m_Getter)(objectToWrite);
-                    if (!DoCustomSerialization(field, fieldValue))
+                    case DataType.Struct:
                     {
-                        WriteFieldInfo(field, DataType.Struct);
-                        WriteObject(fieldValue);
+                        // Is a struct instance. Check to see if we have been given a custom serializer for it's type, if not write it as normal
+                        object fieldValue = ((Func<object, object>)field.m_Getter)(objectToWrite);
+                        if (!DoCustomSerialization(field, fieldValue))
+                        {
+                            WriteFieldInfo(field, DataType.Struct);
+                            WriteObject(fieldValue);
+                        }
+                        break;
                     }
-                    break;
-                }
 
-                case DataType.Byte:
-                    WriteFieldInfo(field, DataType.Byte);
-                    m_Writer.Write(((Func<object, byte>)field.m_Getter)(objectToWrite));
-                    break;
+                    case DataType.Byte:
+                        WriteFieldInfo(field, DataType.Byte);
+                        m_Writer.Write(((Func<object, byte>)field.m_Getter)(objectToWrite));
+                        break;
 
-                case DataType.Bool:
-                    WriteFieldInfo(field, DataType.Bool);
-                    m_Writer.Write(((Func<object, bool>)field.m_Getter)(objectToWrite));
-                    break;
+                    case DataType.Bool:
+                        WriteFieldInfo(field, DataType.Bool);
+                        m_Writer.Write(((Func<object, bool>)field.m_Getter)(objectToWrite));
+                        break;
 
-                case DataType.Int:
-                    WriteFieldInfo(field, DataType.Int);
-                    m_Writer.Write(((Func<object, int>)field.m_Getter)(objectToWrite));
-                    break;
+                    case DataType.Int:
+                        WriteFieldInfo(field, DataType.Int);
+                        m_Writer.Write(((Func<object, int>)field.m_Getter)(objectToWrite));
+                        break;
 
-                case DataType.UInt:
-                    WriteFieldInfo(field, DataType.UInt);
-                    m_Writer.Write(((Func<object, uint>)field.m_Getter)(objectToWrite));
-                    break;
+                    case DataType.UInt:
+                        WriteFieldInfo(field, DataType.UInt);
+                        m_Writer.Write(((Func<object, uint>)field.m_Getter)(objectToWrite));
+                        break;
 
-                case DataType.Long:
-                    WriteFieldInfo(field, DataType.Long);
-                    m_Writer.Write(((Func<object, long>)field.m_Getter)(objectToWrite));
-                    break;
+                    case DataType.Long:
+                        WriteFieldInfo(field, DataType.Long);
+                        m_Writer.Write(((Func<object, long>)field.m_Getter)(objectToWrite));
+                        break;
 
-                case DataType.ULong:
-                    WriteFieldInfo(field, DataType.ULong);
-                    m_Writer.Write(((Func<object, ulong>)field.m_Getter)(objectToWrite));
-                    break;
+                    case DataType.ULong:
+                        WriteFieldInfo(field, DataType.ULong);
+                        m_Writer.Write(((Func<object, ulong>)field.m_Getter)(objectToWrite));
+                        break;
 
-                case DataType.Type:
-                    WriteFieldInfo(field, DataType.Type);
-                    WriteStringIndex(GetTypeQualifiedNameIndex(((Func<object, Type>)field.m_Getter)(objectToWrite)));
-                    break;
+                    case DataType.Type:
+                        WriteFieldInfo(field, DataType.Type);
+                        WriteStringIndex(
+                            GetTypeQualifiedNameIndex(((Func<object, Type>)field.m_Getter)(objectToWrite))
+                        );
+                        break;
 
-                default:
-                    throw new InvalidDataException($"USerialize doesn't know how to serialize field {objectType.Name}.{field.m_Name} of type {field.m_FieldInfo.FieldType.Name}");
+                    default:
+                        throw new InvalidDataException(
+                            $"USerialize doesn't know how to serialize field {objectType.Name}.{field.m_Name} of type {field.m_FieldInfo.FieldType.Name}"
+                        );
                 }
             }
         }

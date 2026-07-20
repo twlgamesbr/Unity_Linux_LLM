@@ -46,14 +46,22 @@ namespace Unity.PlatformToolkit.Editor
             {
                 if (columns[columnIndex].Header.Length > AchievementEditor.AchievementCharacterLimit)
                 {
-                    exceptions.Add(new AggregateException($"Character limit exceeded at header: {AchievementEditor.AchievementHeaderId}, index: {columnIndex}. Character limit: {AchievementEditor.AchievementCharacterLimit}."));
+                    exceptions.Add(
+                        new AggregateException(
+                            $"Character limit exceeded at header: {AchievementEditor.AchievementHeaderId}, index: {columnIndex}. Character limit: {AchievementEditor.AchievementCharacterLimit}."
+                        )
+                    );
                 }
 
                 for (int dataIndex = 0; dataIndex < columns[columnIndex].Data.Length; dataIndex++)
                 {
                     if (columns[columnIndex].Data[dataIndex].Length > AchievementEditor.AchievementCharacterLimit)
                     {
-                        exceptions.Add(new AggregateException($"Character limit exceeded at column header: {columns[columnIndex].Header}, row: {dataIndex}. Character limit: {AchievementEditor.AchievementCharacterLimit}."));
+                        exceptions.Add(
+                            new AggregateException(
+                                $"Character limit exceeded at column header: {columns[columnIndex].Header}, row: {dataIndex}. Character limit: {AchievementEditor.AchievementCharacterLimit}."
+                            )
+                        );
                     }
                 }
             }
@@ -69,7 +77,12 @@ namespace Unity.PlatformToolkit.Editor
             {
                 if (!Regex.IsMatch(idData.Data[i], AchievementEditor.CommonIdRegexPattern))
                 {
-                    exceptions.Add(new AggregateException(AchievementEditor.AchievementDataError + $" At header: {AchievementEditor.AchievementHeaderId}, index {i}. Only characters a-z, A-Z, '-' and '_' are allowed for common ids."));
+                    exceptions.Add(
+                        new AggregateException(
+                            AchievementEditor.AchievementDataError
+                                + $" At header: {AchievementEditor.AchievementHeaderId}, index {i}. Only characters a-z, A-Z, '-' and '_' are allowed for common ids."
+                        )
+                    );
                 }
             }
 
@@ -208,11 +221,17 @@ namespace Unity.PlatformToolkit.Editor
                 }
             }
 
-            if(!columnNames.Contains(AchievementEditor.AchievementHeaderId))
-                exceptions.Add(new FormatException(GenerateHeaderDoestContainExceptionText(AchievementEditor.AchievementHeaderId)));
+            if (!columnNames.Contains(AchievementEditor.AchievementHeaderId))
+                exceptions.Add(
+                    new FormatException(GenerateHeaderDoestContainExceptionText(AchievementEditor.AchievementHeaderId))
+                );
 
-            if(!columnNames.Contains(AchievementEditor.AchievementHeaderProgressTarget))
-                exceptions.Add(new FormatException(GenerateHeaderDoestContainExceptionText(AchievementEditor.AchievementHeaderProgressTarget)));
+            if (!columnNames.Contains(AchievementEditor.AchievementHeaderProgressTarget))
+                exceptions.Add(
+                    new FormatException(
+                        GenerateHeaderDoestContainExceptionText(AchievementEditor.AchievementHeaderProgressTarget)
+                    )
+                );
 
             if (exceptions.Count > 0)
             {

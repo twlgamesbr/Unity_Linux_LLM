@@ -21,7 +21,6 @@ namespace UnityEngine.UIElements.TestFramework
         [System.Obsolete("For Internal Use Only.")]
         internal CommonUITestFixture currentFixture => m_CurrentFixture;
 
-
         [System.Obsolete("For Internal Use Only.")]
         internal static Func<CommonUITestFixture> s_EditorDefaultFixtureCreation { get; set; }
 
@@ -32,7 +31,11 @@ namespace UnityEngine.UIElements.TestFramework
         internal sealed override LifetimeState lifetimeState => m_CurrentFixture.lifetimeState;
 
         /// <inheritdoc cref="AbstractUITestFixture.simulate"/>
-        public sealed override PanelSimulator simulate { get => m_CurrentFixture.simulate; set => m_CurrentFixture.simulate = value; }
+        public sealed override PanelSimulator simulate
+        {
+            get => m_CurrentFixture.simulate;
+            set => m_CurrentFixture.simulate = value;
+        }
 
         /// <summary>
         /// The size of the `rootVisualElement` of the panel.
@@ -41,16 +44,32 @@ namespace UnityEngine.UIElements.TestFramework
         /// Set the `panelSize` in your tests or set up methods
         /// to ensure that the panel is large enough to display your UI.
         /// </remarks>
-        public sealed override Vector2 panelSize { get => m_CurrentFixture.panelSize; set => m_CurrentFixture.panelSize = value; }
+        public sealed override Vector2 panelSize
+        {
+            get => m_CurrentFixture.panelSize;
+            set => m_CurrentFixture.panelSize = value;
+        }
 
         /// <inheritdoc cref="AbstractUITestFixture.clearContentAfterTest"/>
-        public sealed override bool clearContentAfterTest { get => m_CurrentFixture.clearContentAfterTest; set => m_CurrentFixture.clearContentAfterTest = value; }
+        public sealed override bool clearContentAfterTest
+        {
+            get => m_CurrentFixture.clearContentAfterTest;
+            set => m_CurrentFixture.clearContentAfterTest = value;
+        }
 
         /// <inheritdoc cref="AbstractUITestFixture.themeStyleSheet"/>
-        public sealed override ThemeStyleSheet themeStyleSheet { get => m_CurrentFixture.themeStyleSheet; set => m_CurrentFixture.themeStyleSheet = value; }
+        public sealed override ThemeStyleSheet themeStyleSheet
+        {
+            get => m_CurrentFixture.themeStyleSheet;
+            set => m_CurrentFixture.themeStyleSheet = value;
+        }
 
         /// <inheritdoc cref="AbstractUITestFixture.debugMode"/>
-        public sealed override bool debugMode { get => m_CurrentFixture.debugMode; set => m_CurrentFixture.debugMode = value; }
+        public sealed override bool debugMode
+        {
+            get => m_CurrentFixture.debugMode;
+            set => m_CurrentFixture.debugMode = value;
+        }
 
         /// <summary>
         /// The type of fixture to create during instantiation.
@@ -61,7 +80,7 @@ namespace UnityEngine.UIElements.TestFramework
             /// Automatically detects the type of fixture to create.
             /// </summary>
             /// <remarks>
-            /// It uses the Assembly and whether the test is currently 
+            /// It uses the Assembly and whether the test is currently
             /// in Play mode to decide the fixture type.
             /// </remarks>
             AutoDetect,
@@ -74,7 +93,7 @@ namespace UnityEngine.UIElements.TestFramework
             /// <summary>
             /// Runtime fixture type for tests around a runtime panel.
             /// </summary>
-            Runtime
+            Runtime,
         }
 
         class PlayModeTestFixture : RuntimeUITestFixture { }
@@ -82,13 +101,15 @@ namespace UnityEngine.UIElements.TestFramework
         /// <summary>
         /// Instantiates a `UITestFixture` using the <see cref="FixtureType.AutoDetect"/> functionality.
         /// </summary>
-        protected UITestFixture() : this(FixtureType.AutoDetect) { }
+        protected UITestFixture()
+            : this(FixtureType.AutoDetect) { }
 
         /// <summary>
         /// Instantiates a `UITestFixture` using the <see cref="FixtureType.AutoDetect"/> functionality.
         /// </summary>
         /// <param name="debugMode">Enables debugging for tests.</param>
-        protected UITestFixture(bool debugMode) : this(FixtureType.AutoDetect, debugMode) { }
+        protected UITestFixture(bool debugMode)
+            : this(FixtureType.AutoDetect, debugMode) { }
 
         /// <summary>
         /// Instantiates a `UITestFixture` for the supplied <paramref name="fixtureType"/>.
@@ -209,7 +230,6 @@ namespace UnityEngine.UIElements.TestFramework
 
             m_CurrentFixture.AddTestComponent(component, this);
 #pragma warning restore CS0618
-
         }
 
         /// <inheritdoc cref="AbstractUITestFixture.RemoveTestComponent(UITestComponent)"/>

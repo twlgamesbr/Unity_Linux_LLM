@@ -18,16 +18,18 @@ namespace Unity.Physics
 
             public const uint InvalidSimplexVertex = 0xffffffff;
 
-            public int SimplexDimension => Simplex.z == InvalidSimplexVertex ? (Simplex.y == InvalidSimplexVertex ? 1 : 2) : 3;
+            public int SimplexDimension =>
+                Simplex.z == InvalidSimplexVertex ? (Simplex.y == InvalidSimplexVertex ? 1 : 2) : 3;
 
             public int SimplexVertexA(int index) => (int)(Simplex[index] >> 16);
+
             public int SimplexVertexB(int index) => (int)(Simplex[index] & 0xffff);
         }
 
         public enum PenetrationHandling
         {
             DotNotCompute,
-            Exact3D
+            Exact3D,
         }
 
         // Supporting vertex
@@ -44,7 +46,10 @@ namespace Unity.Physics
         // Simplex
         private struct Simplex
         {
-            public SupportVertex A, B, C, D;
+            public SupportVertex A,
+                B,
+                C,
+                D;
             public float3 Direction; // Points from the origin towards the closest point on the simplex
             public float ScaledDistance; // ClosestPoint = Direction * ScaledDistance / lengthSq(Direction)
             public int NumVertices;
@@ -66,13 +71,13 @@ namespace Unity.Physics
 
                     // Line.
                     case 2:
-                    {
-                        float3 delta = B.Xyz - A.Xyz;
-                        float den = math.dot(delta, delta);
-                        float num = math.dot(-A.Xyz, delta);
+                        {
+                            float3 delta = B.Xyz - A.Xyz;
+                            float den = math.dot(delta, delta);
+                            float num = math.dot(-A.Xyz, delta);
 
-                        // Reduce if closest point do not project on the line segment.
-                        if (num >= den)
+                            // Reduce if closest point do not project on the line segment.
+                            if (num >= den)
                             {
                                 NumVertices = 1;
                                 A = B;
@@ -81,7 +86,7 @@ namespace Unity.Physics
 
                             // Compute support direction
                             Direction = math.cross(math.cross(delta, A.Xyz), delta);
-                        ScaledDistance = math.dot(Direction, A.Xyz);
+                            ScaledDistance = math.dot(Direction, A.Xyz);
                         }
                         break;
 
@@ -155,32 +160,32 @@ namespace Unity.Physics
                         if (math.any(onFace))
                         {
                             if (onFace.y)
-                                {
-                                    A = B;
-                                    B = C;
-                                }
-                                else if (onFace.z)
-                                {
-                                    B = C;
-                                }
+                            {
+                                A = B;
+                                B = C;
                             }
-                            else
+                            else if (onFace.z)
+                            {
+                                B = C;
+                            }
+                        }
+                        else
                         {
                             // Check if the closest point is on an edge
                             // TODO maybe we can safely drop two vertices in this case
                             bool3 insideVertex = (edges.Dot(d) >= 0).xyz;
                             bool3 onEdge = (!insideEdge0 & !insideEdge1.zxy & insideVertex);
                             if (math.any(onEdge.yz))
-                                {
-                                    A = B;
-                                    B = C;
-                                }
+                            {
+                                A = B;
+                                B = C;
                             }
+                        }
 
-                            C = D;
+                        C = D;
                         NumVertices = 3;
                         goto case 3;
-                        }
+                    }
                 }
             }
 
@@ -212,7 +217,11 @@ namespace Unity.Physics
                         if (sum == 0.0f) // Very rare case, simplex is really 2D.  Happens because of int->float conversion from the hull builder.
                         {
                             // Choose the two farthest apart vertices to keep
-                            float3 lengthsSq = new float3(math.lengthsq(A.Xyz - B.Xyz), math.lengthsq(B.Xyz - C.Xyz), math.lengthsq(C.Xyz - A.Xyz));
+                            float3 lengthsSq = new float3(
+                                math.lengthsq(A.Xyz - B.Xyz),
+                                math.lengthsq(B.Xyz - C.Xyz),
+                                math.lengthsq(C.Xyz - A.Xyz)
+                            );
                             bool3 longest = math.cmin(lengthsSq) == lengthsSq;
                             if (longest.y)
                             {
@@ -262,8 +271,13 @@ namespace Unity.Physics
         /// <param name="penetrationHandling">How to compute penetration.</param>
         /// <returns></returns>
         public static unsafe Result ConvexConvex(
-            float3* verticesA, int numVerticesA, float3* verticesB, int numVerticesB,
-            [NoAlias] in MTransform aFromB, PenetrationHandling penetrationHandling)
+            float3* verticesA,
+            int numVerticesA,
+            float3* verticesB,
+            int numVerticesB,
+            [NoAlias] in MTransform aFromB,
+            PenetrationHandling penetrationHandling
+        )
         {
             const float epsTerminationSq = 1e-8f; // Main loop quits when it cannot find a point that improves the simplex by at least this much
             const float epsPenetrationSq = 1e-9f; // Epsilon used to check for penetration.  Should be smaller than shape cast ConvexConvex keepDistance^2.
@@ -271,7 +285,14 @@ namespace Unity.Physics
             // Initialize simplex.
             Simplex simplex = new Simplex();
             simplex.NumVertices = 1;
-            simplex.A = GetSupportingVertex(new float3(1, 0, 0), verticesA, numVerticesA, verticesB, numVerticesB, aFromB);
+            simplex.A = GetSupportingVertex(
+                new float3(1, 0, 0),
+                verticesA,
+                numVerticesA,
+                verticesB,
+                numVerticesB,
+                aFromB
+            );
             simplex.Direction = simplex.A.Xyz;
             simplex.ScaledDistance = math.lengthsq(simplex.A.Xyz);
             float scaleSq = simplex.ScaledDistance;
@@ -283,7 +304,14 @@ namespace Unity.Physics
             for (; iteration < maxIterations; ++iteration)
             {
                 // Find a new support vertex
-                SupportVertex newSv = GetSupportingVertex(-simplex.Direction, verticesA, numVerticesA, verticesB, numVerticesB, aFromB);
+                SupportVertex newSv = GetSupportingVertex(
+                    -simplex.Direction,
+                    verticesA,
+                    numVerticesA,
+                    verticesB,
+                    numVerticesB,
+                    aFromB
+                );
 
                 // If the new vertex is not significantly closer to the origin, quit
                 float scaledImprovement = math.dot(simplex.A.Xyz - newSv.Xyz, simplex.Direction);
@@ -295,9 +323,15 @@ namespace Unity.Physics
                 // Add the new vertex and reduce the simplex
                 switch (simplex.NumVertices++)
                 {
-                    case 1: simplex.B = newSv; break;
-                    case 2: simplex.C = newSv; break;
-                    default: simplex.D = newSv; break;
+                    case 1:
+                        simplex.B = newSv;
+                        break;
+                    case 2:
+                        simplex.C = newSv;
+                        break;
+                    default:
+                        simplex.D = newSv;
+                        break;
                 }
                 simplex.SolveDistance();
 
@@ -324,8 +358,15 @@ namespace Unity.Physics
                 ConvexHullBuilder.Triangle* triangles = stackalloc ConvexHullBuilder.Triangle[triangleCapacity];
                 Aabb domain = GetSupportingAabb(verticesA, numVerticesA, verticesB, numVerticesB, aFromB);
                 const float simplificationTolerance = 0.0f;
-                var hull = new ConvexHullBuilder(verticesCapacity, vertices, triangles, null,
-                    domain, simplificationTolerance, ConvexHullBuilder.IntResolution.Low);
+                var hull = new ConvexHullBuilder(
+                    verticesCapacity,
+                    vertices,
+                    triangles,
+                    null,
+                    domain,
+                    simplificationTolerance,
+                    ConvexHullBuilder.IntResolution.Low
+                );
 
                 // Add simplex vertices to the hull, remove any vertices from the simplex that do not increase the hull dimension
                 hull.AddPoint(simplex.A.Xyz, simplex.A.Id);
@@ -364,7 +405,9 @@ namespace Unity.Physics
                 while (hull.Dimension < 3)
                 {
                     // Choose expansion directions
-                    float3 support0, support1, support2;
+                    float3 support0,
+                        support1,
+                        support2;
                     switch (simplex.NumVertices)
                     {
                         case 1:
@@ -373,7 +416,11 @@ namespace Unity.Physics
                             support2 = new float3(0, 0, 1);
                             break;
                         case 2:
-                            Math.CalculatePerpendicularNormalized(math.normalize(simplex.B.Xyz - simplex.A.Xyz), out support0, out support1);
+                            Math.CalculatePerpendicularNormalized(
+                                math.normalize(simplex.B.Xyz - simplex.A.Xyz),
+                                out support0,
+                                out support1
+                            );
                             support2 = float3.zero;
                             break;
                         default:
@@ -391,15 +438,28 @@ namespace Unity.Physics
                     {
                         for (int j = 0; j < 2; j++) // +/- each direction
                         {
-                            SupportVertex vertex = GetSupportingVertex(support0, verticesA, numVerticesA, verticesB, numVerticesB, aFromB);
+                            SupportVertex vertex = GetSupportingVertex(
+                                support0,
+                                verticesA,
+                                numVerticesA,
+                                verticesB,
+                                numVerticesB,
+                                aFromB
+                            );
                             hull.AddPoint(vertex.Xyz, vertex.Id);
                             if (hull.Dimension == simplex.NumVertices)
                             {
                                 switch (simplex.NumVertices)
                                 {
-                                    case 1: simplex.B = vertex; break;
-                                    case 2: simplex.C = vertex; break;
-                                    default: simplex.D = vertex; break;
+                                    case 1:
+                                        simplex.B = vertex;
+                                        break;
+                                    case 2:
+                                        simplex.C = vertex;
+                                        break;
+                                    default:
+                                        simplex.D = vertex;
+                                        break;
                                 }
 
                                 // Next dimension
@@ -479,7 +539,10 @@ namespace Unity.Physics
                                 uidsCache[triangleIndex] = hull.Triangles[triangleIndex].Uid;
                                 distancesCache[triangleIndex] = hull.ComputePlane(triangleIndex).Distance;
                             }
-                            if (closestTriangleIndex == -1 || distancesCache[closestTriangleIndex] < distancesCache[triangleIndex])
+                            if (
+                                closestTriangleIndex == -1
+                                || distancesCache[closestTriangleIndex] < distancesCache[triangleIndex]
+                            )
                             {
                                 closestTriangleIndex = triangleIndex;
                             }
@@ -487,14 +550,20 @@ namespace Unity.Physics
                         closestPlane = hull.ComputePlane(closestTriangleIndex);
 
                         // Add supporting vertex or exit.
-                        SupportVertex sv = GetSupportingVertex(closestPlane.Normal, verticesA, numVerticesA, verticesB, numVerticesB, aFromB);
+                        SupportVertex sv = GetSupportingVertex(
+                            closestPlane.Normal,
+                            verticesA,
+                            numVerticesA,
+                            verticesB,
+                            numVerticesB,
+                            aFromB
+                        );
                         float d2P = math.dot(closestPlane.Normal, sv.Xyz) + closestPlane.Distance;
                         if (math.abs(d2P) > stopThreshold && hull.AddPoint(sv.Xyz, sv.Id))
                             stopThreshold *= 1.3f;
                         else
                             break;
-                    }
-                    while (++iteration < maxIterations);
+                    } while (++iteration < maxIterations);
 
                     // There could be multiple triangles in the closest plane, pick the one that has the closest point to the origin on its face
                     foreach (int triangleIndex in hull.Triangles.Indices)
@@ -509,7 +578,8 @@ namespace Unity.Physics
                             float3 dets = new float3(
                                 math.dot(math.cross(a - c, cross), a),
                                 math.dot(math.cross(b - a, cross), b),
-                                math.dot(math.cross(c - b, cross), c));
+                                math.dot(math.cross(c - b, cross), c)
+                            );
                             if (math.all(dets >= 0))
                             {
                                 Plane plane = hull.ComputePlane(triangleIndex);
@@ -549,7 +619,11 @@ namespace Unity.Physics
                 float invLength = math.rsqrt(lengthSq);
                 bool smallLength = lengthSq == 0;
                 ret.ClosestPoints.Distance = math.select(simplex.ScaledDistance * invLength, 0.0f, smallLength);
-                ret.ClosestPoints.NormalInA = math.select(simplex.Direction * invLength, new float3(1, 0, 0), smallLength);
+                ret.ClosestPoints.NormalInA = math.select(
+                    simplex.Direction * invLength,
+                    new float3(1, 0, 0),
+                    smallLength
+                );
 
                 // Make sure the normal is always valid.
                 if (!math.all(math.isfinite(ret.ClosestPoints.NormalInA)))
@@ -562,10 +636,10 @@ namespace Unity.Physics
             float3 closestPoint = ret.ClosestPoints.NormalInA * ret.ClosestPoints.Distance;
             float4 coordinates = simplex.ComputeBarycentricCoordinates(closestPoint);
             ret.ClosestPoints.PositionOnAinA =
-                verticesA[simplex.A.IdA] * coordinates.x +
-                verticesA[simplex.B.IdA] * coordinates.y +
-                verticesA[simplex.C.IdA] * coordinates.z +
-                verticesA[simplex.D.IdA] * coordinates.w;
+                verticesA[simplex.A.IdA] * coordinates.x
+                + verticesA[simplex.B.IdA] * coordinates.y
+                + verticesA[simplex.C.IdA] * coordinates.z
+                + verticesA[simplex.D.IdA] * coordinates.w;
 
             // Encode simplex.
             ret.Simplex.x = simplex.A.Id;
@@ -597,16 +671,31 @@ namespace Unity.Physics
 
         // Returns the supporting vertex of the CSO given a direction in 'A' space.
         private static unsafe SupportVertex GetSupportingVertex(
-            float3 direction, float3* verticesA, int numVerticesA, float3* verticesB, int numVerticesB, [NoAlias] in MTransform aFromB)
+            float3 direction,
+            float3* verticesA,
+            int numVerticesA,
+            float3* verticesB,
+            int numVerticesB,
+            [NoAlias] in MTransform aFromB
+        )
         {
             int ia = GetSupportingVertexIndex(direction, verticesA, numVerticesA);
             int ib = GetSupportingVertexIndex(math.mul(aFromB.InverseRotation, -direction), verticesB, numVerticesB);
-            return new SupportVertex { Xyz = verticesA[ia] - Mul(aFromB, verticesB[ib]), Id = ((uint)ia) << 16 | (uint)ib };
+            return new SupportVertex
+            {
+                Xyz = verticesA[ia] - Mul(aFromB, verticesB[ib]),
+                Id = ((uint)ia) << 16 | (uint)ib,
+            };
         }
 
         // Returns an AABB containing the CSO in A-space
         private static unsafe Aabb GetSupportingAabb(
-            float3* verticesA, int numVerticesA, float3* verticesB, int numVerticesB, MTransform aFromB)
+            float3* verticesA,
+            int numVerticesA,
+            float3* verticesB,
+            int numVerticesB,
+            MTransform aFromB
+        )
         {
             Aabb aabbA = new Aabb { Min = verticesA[0], Max = verticesA[0] };
             for (int i = 1; i < numVerticesA; i++)

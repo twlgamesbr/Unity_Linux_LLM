@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 namespace TMPro
 {
     // Helpers used by the different sorting layer classes.
@@ -9,10 +8,7 @@ namespace TMPro
         // Gets an array of sorting layer names.
         public static string[] sortingLayerNames
         {
-            get
-            {
-                return GetSortingLayerNames();
-            }
+            get { return GetSortingLayerNames(); }
         }
 
         static string[] GetSortingLayerNames()

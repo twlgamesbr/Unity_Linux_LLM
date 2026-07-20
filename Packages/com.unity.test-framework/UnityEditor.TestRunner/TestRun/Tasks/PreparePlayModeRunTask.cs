@@ -11,7 +11,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             testJobData.OriginalProjectSettings = new TestJobData.SavedProjectSettings
             {
                 consoleErrorPaused = ConsoleWindow.GetConsoleErrorPause(),
-                runInBackgroundValue = Application.runInBackground
+                runInBackgroundValue = Application.runInBackground,
             };
             ConsoleWindow.SetConsoleErrorPause(false);
             Application.runInBackground = true;

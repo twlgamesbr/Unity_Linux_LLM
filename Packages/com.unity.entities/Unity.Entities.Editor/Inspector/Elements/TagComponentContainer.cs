@@ -21,21 +21,24 @@ namespace Unity.Entities.Editor
             contentContainer.SetEnabled(!Context.IsReadOnly);
         }
 
-        public void PreUpdate()
-        {
-        }
+        public void PreUpdate() { }
 
         public void Update()
         {
             // The tag container will only be shown if there are actual tags that are displayed.
-            if (contentContainer.Children().Any(e => e.style.display == DisplayStyle.Flex || e.style.display == new StyleEnum<DisplayStyle>(StyleKeyword.Null)))
+            if (
+                contentContainer
+                    .Children()
+                    .Any(e =>
+                        e.style.display == DisplayStyle.Flex
+                        || e.style.display == new StyleEnum<DisplayStyle>(StyleKeyword.Null)
+                    )
+            )
                 this.Show();
             else
                 this.Hide();
         }
 
-        public void Release()
-        {
-        }
+        public void Release() { }
     }
 }

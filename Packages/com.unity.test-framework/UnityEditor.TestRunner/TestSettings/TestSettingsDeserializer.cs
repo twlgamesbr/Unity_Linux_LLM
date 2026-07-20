@@ -15,73 +15,113 @@ namespace UnityEditor.TestTools.TestRunner
     {
         private static readonly SettingsMap[] s_SettingsMapping =
         {
-            new SettingsMap<ScriptingImplementation>("scriptingBackend", (settings, value) => settings.scriptingBackend = value),
+            new SettingsMap<ScriptingImplementation>(
+                "scriptingBackend",
+                (settings, value) => settings.scriptingBackend = value
+            ),
             new SettingsMap<string>("architecture", (settings, value) => settings.Architecture = value),
             new SettingsMap<ApiCompatibilityLevel>("apiProfile", (settings, value) => settings.apiProfile = value),
-            new SettingsMap<bool>("appleEnableAutomaticSigning", (settings, value) => settings.appleEnableAutomaticSigning = value),
+            new SettingsMap<bool>(
+                "appleEnableAutomaticSigning",
+                (settings, value) => settings.appleEnableAutomaticSigning = value
+            ),
             new SettingsMap<string>("appleDeveloperTeamID", (settings, value) => settings.appleDeveloperTeamID = value),
-            new SettingsMap<ProvisioningProfileType>("iOSManualProvisioningProfileType", (settings, value) => settings.iOSManualProvisioningProfileType = value),
-            new SettingsMap<string>("iOSManualProvisioningProfileID", (settings, value) => settings.iOSManualProvisioningProfileID = value),
+            new SettingsMap<ProvisioningProfileType>(
+                "iOSManualProvisioningProfileType",
+                (settings, value) => settings.iOSManualProvisioningProfileType = value
+            ),
+            new SettingsMap<string>(
+                "iOSManualProvisioningProfileID",
+                (settings, value) => settings.iOSManualProvisioningProfileID = value
+            ),
             new SettingsMap<string>("iOSTargetSDK", (settings, value) => settings.iOSTargetSDK = value),
-            new SettingsMap<ProvisioningProfileType>("tvOSManualProvisioningProfileType", (settings, value) => settings.tvOSManualProvisioningProfileType = value),
-            new SettingsMap<string>("tvOSManualProvisioningProfileID", (settings, value) => settings.tvOSManualProvisioningProfileID = value),
+            new SettingsMap<ProvisioningProfileType>(
+                "tvOSManualProvisioningProfileType",
+                (settings, value) => settings.tvOSManualProvisioningProfileType = value
+            ),
+            new SettingsMap<string>(
+                "tvOSManualProvisioningProfileID",
+                (settings, value) => settings.tvOSManualProvisioningProfileID = value
+            ),
             new SettingsMap<string>("tvOSTargetSDK", (settings, value) => settings.tvOSTargetSDK = value),
-            new SettingsMap<string>("playerGraphicsAPI", (settings, value) =>
-            {
-                settings.autoGraphicsAPIs = false;
-                settings.playerGraphicsAPIs = new[] {value};
-            }),
-            new SettingsMap<bool>("androidBuildAppBundle", (settings, value) =>
-            {
-                settings.androidBuildAppBundle = value;
-            }),
-            new SettingsMap<List<object>>("ignoreTests", (settings, list) =>
-            {
-                settings.ignoreTests = list.Select(item =>
+            new SettingsMap<string>(
+                "playerGraphicsAPI",
+                (settings, value) =>
                 {
-                    var dictionary = (Dictionary<string, object>)item;
-                    if (dictionary.ContainsKey("test") && dictionary.ContainsKey("ignoreComment"))
-                    {
-                        return new IgnoreTest()
+                    settings.autoGraphicsAPIs = false;
+                    settings.playerGraphicsAPIs = new[] { value };
+                }
+            ),
+            new SettingsMap<bool>(
+                "androidBuildAppBundle",
+                (settings, value) =>
+                {
+                    settings.androidBuildAppBundle = value;
+                }
+            ),
+            new SettingsMap<List<object>>(
+                "ignoreTests",
+                (settings, list) =>
+                {
+                    settings.ignoreTests = list.Select(item =>
                         {
-                            test = dictionary["test"] as string,
-                            ignoreComment = dictionary["ignoreComment"] as string
-                        };
+                            var dictionary = (Dictionary<string, object>)item;
+                            if (dictionary.ContainsKey("test") && dictionary.ContainsKey("ignoreComment"))
+                            {
+                                return new IgnoreTest()
+                                {
+                                    test = dictionary["test"] as string,
+                                    ignoreComment = dictionary["ignoreComment"] as string,
+                                };
+                            }
+
+                            throw new Exception(
+                                "Wrong format for ignore test. Expected \"test\" and \"ignoreComment\"."
+                            );
+                        })
+                        .ToArray();
+                }
+            ),
+            new SettingsMap<Dictionary<string, object>>(
+                "featureFlags",
+                (settings, dictionary) =>
+                {
+                    var converted = dictionary.ToDictionary(pair => pair.Key, pair => (bool)pair.Value);
+                    var featureFlags = new FeatureFlags();
+                    if (converted.ContainsKey("fileCleanUpCheck"))
+                    {
+                        featureFlags.fileCleanUpCheck = converted["fileCleanUpCheck"];
+                    }
+                    if (converted.ContainsKey("strictDomainReload"))
+                    {
+                        featureFlags.strictDomainReload = converted["strictDomainReload"];
+                    }
+                    if (converted.ContainsKey("requiresSplashScreen"))
+                    {
+                        featureFlags.requiresSplashScreen = converted["requiresSplashScreen"];
+                    }
+                    if (converted.ContainsKey("disableNestedEnumeratorBugfix"))
+                    {
+                        featureFlags.disableNestedEnumeratorBugfix = converted["disableNestedEnumeratorBugfix"];
                     }
 
-                    throw new Exception("Wrong format for ignore test. Expected \"test\" and \"ignoreComment\".");
-                }).ToArray();
-            }),
-            new SettingsMap<Dictionary<string, object>>("featureFlags", (settings, dictionary) =>
-            {
-                var converted = dictionary.ToDictionary(pair => pair.Key, pair => (bool)pair.Value);
-                var featureFlags = new FeatureFlags();
-                if (converted.ContainsKey("fileCleanUpCheck"))
-                {
-                    featureFlags.fileCleanUpCheck = converted["fileCleanUpCheck"];
+                    settings.featureFlags = featureFlags;
                 }
-                if (converted.ContainsKey("strictDomainReload"))
-                {
-                    featureFlags.strictDomainReload = converted["strictDomainReload"];
-                }
-                if (converted.ContainsKey("requiresSplashScreen"))
-                {
-                    featureFlags.requiresSplashScreen = converted["requiresSplashScreen"];
-                }
-                if (converted.ContainsKey("disableNestedEnumeratorBugfix"))
-                {
-                    featureFlags.disableNestedEnumeratorBugfix = converted["disableNestedEnumeratorBugfix"];
-                }
-
-                settings.featureFlags = featureFlags;
-            }),
+            ),
 #if UNITY_2023_2_OR_NEWER
-            new SettingsMap<WebGLClientBrowserType>("webGLClientBrowserType", (settings, value) => settings.webGLClientBrowserType = value),
-            new SettingsMap<string>("webGLClientBrowserPath", (settings, value) => settings.webGLClientBrowserPath = value),
+            new SettingsMap<WebGLClientBrowserType>(
+                "webGLClientBrowserType",
+                (settings, value) => settings.webGLClientBrowserType = value
+            ),
+            new SettingsMap<string>(
+                "webGLClientBrowserPath",
+                (settings, value) => settings.webGLClientBrowserPath = value
+            ),
 #endif
         };
 
         private readonly Func<ITestSettings> m_TestSettingsFactory;
+
         public TestSettingsDeserializer(Func<ITestSettings> testSettingsFactory)
         {
             m_TestSettingsFactory = testSettingsFactory;
@@ -107,11 +147,21 @@ namespace UnityEditor.TestTools.TestRunner
 
                 if (settingsMap.Type.IsEnum)
                 {
-                    SetEnumValue(settingsMap.Key, settingsDictionary[settingsMap.Key], settingsMap.Type, value => settingsMap.ApplyToSettings(testSettings, value));
+                    SetEnumValue(
+                        settingsMap.Key,
+                        settingsDictionary[settingsMap.Key],
+                        settingsMap.Type,
+                        value => settingsMap.ApplyToSettings(testSettings, value)
+                    );
                 }
                 else
                 {
-                    SetValue(settingsMap.Key, settingsDictionary[settingsMap.Key], settingsMap.Type, value => settingsMap.ApplyToSettings(testSettings, value));
+                    SetValue(
+                        settingsMap.Key,
+                        settingsDictionary[settingsMap.Key],
+                        settingsMap.Type,
+                        value => settingsMap.ApplyToSettings(testSettings, value)
+                    );
                 }
             }
 
@@ -122,6 +172,7 @@ namespace UnityEditor.TestTools.TestRunner
         {
             public string Key { get; }
             public Type Type { get; }
+
             protected SettingsMap(string key, Type type)
             {
                 Key = key;
@@ -134,7 +185,9 @@ namespace UnityEditor.TestTools.TestRunner
         private class SettingsMap<T> : SettingsMap
         {
             private Action<ITestSettings, T> m_Setter;
-            public SettingsMap(string key, Action<ITestSettings, T> setter) : base(key, typeof(T))
+
+            public SettingsMap(string key, Action<ITestSettings, T> setter)
+                : base(key, typeof(T))
             {
                 m_Setter = setter;
             }
@@ -154,9 +207,18 @@ namespace UnityEditor.TestTools.TestRunner
                 return;
             }
 
-            var acceptedValues = string.Join(", ", Enum.GetValues(type).OfType<object>().Select(val => val.ToString()).ToArray());
+            var acceptedValues = string.Join(
+                ", ",
+                Enum.GetValues(type).OfType<object>().Select(val => val.ToString()).ToArray()
+            );
 
-            Debug.LogFormat("Could not convert '{0}' argument '{1}' to a valid {2}. Accepted values: {3}.", key, value, type.Name, acceptedValues);
+            Debug.LogFormat(
+                "Could not convert '{0}' argument '{1}' to a valid {2}. Accepted values: {3}.",
+                key,
+                value,
+                type.Name,
+                acceptedValues
+            );
         }
 
         private static bool TryGetEnum(string value, Type type, out object enumValue)

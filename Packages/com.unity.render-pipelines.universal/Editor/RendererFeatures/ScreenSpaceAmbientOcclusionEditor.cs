@@ -25,7 +25,9 @@ namespace UnityEditor.Rendering.Universal
         private HeaderBool m_ShowQualitySettings;
         private bool m_ShowAfterOpaqueTileOnlyError;
 
-        private static readonly string k_AfterOpaqueIncompatibleWithTileOnlyMode = L10n.Tr("'After Opaque' is incompatible with the enabled 'Tile-Only Mode'. Disable After Opaque.");
+        private static readonly string k_AfterOpaqueIncompatibleWithTileOnlyMode = L10n.Tr(
+            "'After Opaque' is incompatible with the enabled 'Tile-Only Mode'. Disable After Opaque."
+        );
 
         /// <summary>
         /// The renderer data that owns the feature when the inspector is drawn.
@@ -54,23 +56,55 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-
         // Structs
         private struct Styles
         {
-            public static GUIContent AOMethod = EditorGUIUtility.TrTextContent("Method", "The noise method to use when calculating the Ambient Occlusion value.");
-            public static GUIContent Intensity = EditorGUIUtility.TrTextContent("Intensity", "The degree of darkness that Ambient Occlusion adds.");
-            public static GUIContent Radius = EditorGUIUtility.TrTextContent("Radius", "The radius around a given point, where Unity calculates and applies the effect.");
-            public static GUIContent Falloff = EditorGUIUtility.TrTextContent("Falloff Distance", "The distance from the camera where Ambient Occlusion should be visible.");
-            public static GUIContent DirectLightingStrength = EditorGUIUtility.TrTextContent("Direct Lighting Strength", "Controls how much the ambient occlusion affects direct lighting.");
+            public static GUIContent AOMethod = EditorGUIUtility.TrTextContent(
+                "Method",
+                "The noise method to use when calculating the Ambient Occlusion value."
+            );
+            public static GUIContent Intensity = EditorGUIUtility.TrTextContent(
+                "Intensity",
+                "The degree of darkness that Ambient Occlusion adds."
+            );
+            public static GUIContent Radius = EditorGUIUtility.TrTextContent(
+                "Radius",
+                "The radius around a given point, where Unity calculates and applies the effect."
+            );
+            public static GUIContent Falloff = EditorGUIUtility.TrTextContent(
+                "Falloff Distance",
+                "The distance from the camera where Ambient Occlusion should be visible."
+            );
+            public static GUIContent DirectLightingStrength = EditorGUIUtility.TrTextContent(
+                "Direct Lighting Strength",
+                "Controls how much the ambient occlusion affects direct lighting."
+            );
 
             public static GUIContent Quality = EditorGUIUtility.TrTextContent("Quality", "");
-            public static GUIContent Source = EditorGUIUtility.TrTextContent("Source", "The source of the normal vector values.\nDepth Normals: the feature uses the values generated in the Depth Normal prepass.\nDepth: the feature reconstructs the normal values using the depth buffer.\nIn the Deferred rendering path, the feature uses the G-buffer normals texture.");
-            public static GUIContent NormalQuality = new GUIContent("Normal Quality", "The number of depth texture samples that Unity takes when computing the normals. Low:1 sample, Medium: 5 samples, High: 9 samples.");
-            public static GUIContent Downsample = EditorGUIUtility.TrTextContent("Downsample", "With this option enabled, Unity downsamples the SSAO effect texture to improve performance. Each dimension of the texture is reduced by a factor of 2.");
-            public static GUIContent AfterOpaque = EditorGUIUtility.TrTextContent("After Opaque", "With this option enabled, Unity calculates and apply SSAO after the opaque pass to improve performance on mobile platforms with tiled-based GPU architectures. This is not physically correct.");
-            public static GUIContent BlurQuality = EditorGUIUtility.TrTextContent("Blur Quality", "High: Bilateral, Medium: Gaussian. Low: Kawase (Single Pass).");
-            public static GUIContent Samples = EditorGUIUtility.TrTextContent("Samples", "The number of samples that Unity takes when calculating the obscurance value. Low:4 samples, Medium: 8 samples, High: 12 samples.");
+            public static GUIContent Source = EditorGUIUtility.TrTextContent(
+                "Source",
+                "The source of the normal vector values.\nDepth Normals: the feature uses the values generated in the Depth Normal prepass.\nDepth: the feature reconstructs the normal values using the depth buffer.\nIn the Deferred rendering path, the feature uses the G-buffer normals texture."
+            );
+            public static GUIContent NormalQuality = new GUIContent(
+                "Normal Quality",
+                "The number of depth texture samples that Unity takes when computing the normals. Low:1 sample, Medium: 5 samples, High: 9 samples."
+            );
+            public static GUIContent Downsample = EditorGUIUtility.TrTextContent(
+                "Downsample",
+                "With this option enabled, Unity downsamples the SSAO effect texture to improve performance. Each dimension of the texture is reduced by a factor of 2."
+            );
+            public static GUIContent AfterOpaque = EditorGUIUtility.TrTextContent(
+                "After Opaque",
+                "With this option enabled, Unity calculates and apply SSAO after the opaque pass to improve performance on mobile platforms with tiled-based GPU architectures. This is not physically correct."
+            );
+            public static GUIContent BlurQuality = EditorGUIUtility.TrTextContent(
+                "Blur Quality",
+                "High: Bilateral, Medium: Gaussian. Low: Kawase (Single Pass)."
+            );
+            public static GUIContent Samples = EditorGUIUtility.TrTextContent(
+                "Samples",
+                "The number of samples that Unity takes when calculating the obscurance value. Low:4 samples, Medium: 8 samples, High: 12 samples."
+            );
         }
 
         private void Init()
@@ -104,7 +138,12 @@ namespace UnityEditor.Rendering.Universal
             EditorGUILayout.PropertyField(m_Intensity, Styles.Intensity);
             EditorGUILayout.PropertyField(m_Radius, Styles.Radius);
             EditorGUILayout.PropertyField(m_Falloff, Styles.Falloff);
-            m_DirectLightingStrength.floatValue = EditorGUILayout.Slider(Styles.DirectLightingStrength, m_DirectLightingStrength.floatValue, 0f, 1f);
+            m_DirectLightingStrength.floatValue = EditorGUILayout.Slider(
+                Styles.DirectLightingStrength,
+                m_DirectLightingStrength.floatValue,
+                0f,
+                1f
+            );
 
             // Make sure these fields are never below 0.0...
             m_Intensity.floatValue = Mathf.Max(m_Intensity.floatValue, 0f);
@@ -123,7 +162,9 @@ namespace UnityEditor.Rendering.Universal
                 EditorGUILayout.PropertyField(m_Source, Styles.Source);
 
                 // We only enable this field when depth source is selected...
-                GUI.enabled = !isDeferredRenderingMode && m_Source.enumValueIndex == (int)ScreenSpaceAmbientOcclusionSettings.DepthSource.Depth;
+                GUI.enabled =
+                    !isDeferredRenderingMode
+                    && m_Source.enumValueIndex == (int)ScreenSpaceAmbientOcclusionSettings.DepthSource.Depth;
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_NormalQuality, Styles.NormalQuality);
                 EditorGUI.indentLevel--;
@@ -134,7 +175,8 @@ namespace UnityEditor.Rendering.Universal
 
                 if (Event.current.type == EventType.Layout)
                 {
-                    var rendererData = (this as IOwningRendererDataConsumer).owningRendererData as UniversalRendererData;
+                    var rendererData =
+                        (this as IOwningRendererDataConsumer).owningRendererData as UniversalRendererData;
                     bool tileOnlyMode = rendererData != null && rendererData.tileOnlyMode;
                     bool afterOpaque = m_AfterOpaque.boolValue;
                     m_ShowAfterOpaqueTileOnlyError = tileOnlyMode && afterOpaque;
@@ -151,8 +193,9 @@ namespace UnityEditor.Rendering.Universal
 
         private bool RendererIsDeferred()
         {
-            ScreenSpaceAmbientOcclusion ssaoFeature = (ScreenSpaceAmbientOcclusion) target;
-            UniversalRenderPipelineAsset pipelineAsset = (UniversalRenderPipelineAsset) GraphicsSettings.currentRenderPipeline;
+            ScreenSpaceAmbientOcclusion ssaoFeature = (ScreenSpaceAmbientOcclusion)target;
+            UniversalRenderPipelineAsset pipelineAsset = (UniversalRenderPipelineAsset)
+                GraphicsSettings.currentRenderPipeline;
 
             if (ssaoFeature == null || pipelineAsset == null)
                 return false;

@@ -66,10 +66,7 @@ namespace UnityEngine.TestTools
         /// </example>
         public PrebuildSetupWithTestDataAttribute(string targetClassName)
         {
-            TargetClass = AttributeHelper.GetTargetClassFromName(
-                targetClassName,
-                typeof(IPrebuildSetupWithTestData)
-            );
+            TargetClass = AttributeHelper.GetTargetClassFromName(targetClassName, typeof(IPrebuildSetupWithTestData));
         }
 
         internal Type TargetClass { get; private set; }

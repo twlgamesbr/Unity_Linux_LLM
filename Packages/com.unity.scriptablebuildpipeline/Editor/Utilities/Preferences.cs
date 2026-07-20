@@ -1,7 +1,7 @@
-using UnityEngine;
-using System.Threading;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using UnityEngine;
 
 namespace UnityEditor.Build.Pipeline.Utilities
 {
@@ -13,6 +13,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
         private class GUIScope : GUI.Scope
         {
             float m_LabelWidth;
+
             public GUIScope(float layoutMaxWidth)
             {
                 m_LabelWidth = EditorGUIUtility.labelWidth;
@@ -23,9 +24,8 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 GUILayout.Space(15);
             }
 
-            public GUIScope() : this(500)
-            {
-            }
+            public GUIScope()
+                : this(500) { }
 
             protected override void CloseScope()
             {
@@ -38,15 +38,39 @@ namespace UnityEditor.Build.Pipeline.Utilities
         internal class Properties
         {
             public static readonly GUIContent generalSettings = EditorGUIUtility.TrTextContent("General Settings");
-            public static readonly GUIContent threadedArchiving = EditorGUIUtility.TrTextContent("Threaded Archiving", "Thread the archiving and compress build stage.");
-            public static readonly GUIContent logCacheMiss = EditorGUIUtility.TrTextContent("Log Cache Miss", "Log a warning on build cache misses. Warning will contain which asset and dependency caused the miss.");
-            public static readonly GUIContent logAssetWarnings = EditorGUIUtility.TrTextContent("Log Asset Warnings", "Log a warning on invalid asset references.");
-            public static readonly GUIContent slimWriteResults = EditorGUIUtility.TrTextContent("Slim Write Results", "Reduces the caching of WriteResults data down to the bare minimum for improved cache performance.");
-            public static readonly GUIContent v2Hasher = EditorGUIUtility.TrTextContent("Use V2 Hasher", "Use the same hasher as Asset Database V2. This hasher improves build cache performance, but invalidates the existing build cache.");
-            public static readonly GUIContent hashSeed = EditorGUIUtility.TrTextContent("FileID Generator Seed", "Allows you to specify an additional seed to avoid file identifier collisions during build. This changes the layout of all objects in all bundles and we suggest not changing this value after release.");
+            public static readonly GUIContent threadedArchiving = EditorGUIUtility.TrTextContent(
+                "Threaded Archiving",
+                "Thread the archiving and compress build stage."
+            );
+            public static readonly GUIContent logCacheMiss = EditorGUIUtility.TrTextContent(
+                "Log Cache Miss",
+                "Log a warning on build cache misses. Warning will contain which asset and dependency caused the miss."
+            );
+            public static readonly GUIContent logAssetWarnings = EditorGUIUtility.TrTextContent(
+                "Log Asset Warnings",
+                "Log a warning on invalid asset references."
+            );
+            public static readonly GUIContent slimWriteResults = EditorGUIUtility.TrTextContent(
+                "Slim Write Results",
+                "Reduces the caching of WriteResults data down to the bare minimum for improved cache performance."
+            );
+            public static readonly GUIContent v2Hasher = EditorGUIUtility.TrTextContent(
+                "Use V2 Hasher",
+                "Use the same hasher as Asset Database V2. This hasher improves build cache performance, but invalidates the existing build cache."
+            );
+            public static readonly GUIContent hashSeed = EditorGUIUtility.TrTextContent(
+                "FileID Generator Seed",
+                "Allows you to specify an additional seed to avoid file identifier collisions during build. This changes the layout of all objects in all bundles and we suggest not changing this value after release."
+            );
             public static readonly GUIContent randSeed = EditorGUIUtility.TrTextContent("Random");
-            public static readonly GUIContent headerSize = EditorGUIUtility.TrTextContent("Prefab Packed Header Size", "Allows you to specify the size of the header for PrefabPacked asset bundles to avoid file identifier collisions during build. This changes the layout of all objects in all bundles and we suggest not changing this value after release.");
-            public static readonly GUIContent maxCacheSize = EditorGUIUtility.TrTextContent("Maximum Cache Size (GB)", "The size of the Build Cache folder will be kept below this maximum value when possible.");
+            public static readonly GUIContent headerSize = EditorGUIUtility.TrTextContent(
+                "Prefab Packed Header Size",
+                "Allows you to specify the size of the header for PrefabPacked asset bundles to avoid file identifier collisions during build. This changes the layout of all objects in all bundles and we suggest not changing this value after release."
+            );
+            public static readonly GUIContent maxCacheSize = EditorGUIUtility.TrTextContent(
+                "Maximum Cache Size (GB)",
+                "The size of the Build Cache folder will be kept below this maximum value when possible."
+            );
             public static readonly GUIContent buildCache = EditorGUIUtility.TrTextContent("Build Cache");
             public static readonly GUIContent purgeCache = EditorGUIUtility.TrTextContent("Purge Cache");
             public static readonly GUIContent pruneCache = EditorGUIUtility.TrTextContent("Prune Cache");
@@ -54,7 +78,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
             public static readonly GUIContent pleaseWait = EditorGUIUtility.TrTextContent("Please wait...");
             public static bool startedCalculation = false;
             public static long currentCacheSize = -1;
-            public static readonly GUIContent useDetailedBuildLog = EditorGUIUtility.TrTextContent("Use Detailed Build Log", "Writes detailed event information in the build log.");
+            public static readonly GUIContent useDetailedBuildLog = EditorGUIUtility.TrTextContent(
+                "Use Detailed Build Log",
+                "Writes detailed event information in the build log."
+            );
         }
 
         [System.Serializable]
@@ -83,14 +110,11 @@ namespace UnityEditor.Build.Pipeline.Utilities
         {
             get
             {
-                if(s_SettingsInstance == null)
+                if (s_SettingsInstance == null)
                     s_SettingsInstance = new Settings();
                 return s_SettingsInstance;
             }
-            set
-            {
-                s_SettingsInstance = value;
-            }
+            set { s_SettingsInstance = value; }
         }
 
         /// <summary>
@@ -249,11 +273,14 @@ namespace UnityEditor.Build.Pipeline.Utilities
         [SettingsProvider]
         static SettingsProvider CreateBuildCacheProvider()
         {
-            var provider = new SettingsProvider("Preferences/Scriptable Build Pipeline", SettingsScope.User, SettingsProvider.GetSearchKeywordsFromGUIContentProperties<Properties>());
+            var provider = new SettingsProvider(
+                "Preferences/Scriptable Build Pipeline",
+                SettingsScope.User,
+                SettingsProvider.GetSearchKeywordsFromGUIContentProperties<Properties>()
+            );
             provider.guiHandler = sarchContext => OnGUI();
             return provider;
         }
-
 #else
         [PreferenceItem("Scriptable Build Pipeline")]
 #endif
@@ -275,12 +302,24 @@ namespace UnityEditor.Build.Pipeline.Utilities
             GUILayout.Label(Properties.generalSettings, EditorStyles.boldLabel);
 
             if (ReflectionExtensions.SupportsMultiThreadedArchiving)
-                s_Settings.threadedArchiving = EditorGUILayout.Toggle(Properties.threadedArchiving, s_Settings.threadedArchiving);
+                s_Settings.threadedArchiving = EditorGUILayout.Toggle(
+                    Properties.threadedArchiving,
+                    s_Settings.threadedArchiving
+                );
 
             s_Settings.logCacheMiss = EditorGUILayout.Toggle(Properties.logCacheMiss, s_Settings.logCacheMiss);
-            s_Settings.logAssetWarnings = EditorGUILayout.Toggle(Properties.logAssetWarnings, s_Settings.logAssetWarnings);
-            s_Settings.slimWriteResults = EditorGUILayout.Toggle(Properties.slimWriteResults, s_Settings.slimWriteResults);
-            s_Settings.useDetailedBuildLog = EditorGUILayout.Toggle(Properties.useDetailedBuildLog, s_Settings.useDetailedBuildLog);
+            s_Settings.logAssetWarnings = EditorGUILayout.Toggle(
+                Properties.logAssetWarnings,
+                s_Settings.logAssetWarnings
+            );
+            s_Settings.slimWriteResults = EditorGUILayout.Toggle(
+                Properties.slimWriteResults,
+                s_Settings.slimWriteResults
+            );
+            s_Settings.useDetailedBuildLog = EditorGUILayout.Toggle(
+                Properties.useDetailedBuildLog,
+                s_Settings.useDetailedBuildLog
+            );
 #if UNITY_2020_1_OR_NEWER
             s_Settings.useV2Hasher = EditorGUILayout.Toggle(Properties.v2Hasher, s_Settings.useV2Hasher);
 #endif
@@ -289,7 +328,12 @@ namespace UnityEditor.Build.Pipeline.Utilities
             if (GUILayout.Button(Properties.randSeed, GUILayout.Width(120)))
                 s_Settings.fileIDHashSeed = (int)(Random.value * uint.MaxValue);
             GUILayout.EndHorizontal();
-            s_Settings.prefabPackedHeaderSize = EditorGUILayout.IntSlider(Properties.headerSize, s_Settings.prefabPackedHeaderSize, 1, 4);
+            s_Settings.prefabPackedHeaderSize = EditorGUILayout.IntSlider(
+                Properties.headerSize,
+                s_Settings.prefabPackedHeaderSize,
+                1,
+                4
+            );
         }
 
         static void DrawBuildCacheProperties()
@@ -300,7 +344,12 @@ namespace UnityEditor.Build.Pipeline.Utilities
             const int kMaxSizeInGigabytes = 200;
 
             // Write size in GigaBytes.
-            s_Settings.maximumCacheSize = EditorGUILayout.IntSlider(Properties.maxCacheSize, s_Settings.maximumCacheSize, kMinSizeInGigabytes, kMaxSizeInGigabytes);
+            s_Settings.maximumCacheSize = EditorGUILayout.IntSlider(
+                Properties.maxCacheSize,
+                s_Settings.maximumCacheSize,
+                kMinSizeInGigabytes,
+                kMaxSizeInGigabytes
+            );
 
             GUILayout.BeginHorizontal(GUILayout.MaxWidth(500));
             if (GUILayout.Button(Properties.purgeCache, GUILayout.Width(120)))
@@ -320,14 +369,21 @@ namespace UnityEditor.Build.Pipeline.Utilities
             if (!Properties.startedCalculation)
             {
                 Properties.startedCalculation = true;
-                ThreadPool.QueueUserWorkItem((state) =>
-                {
-                    BuildCache.ComputeCacheSizeAndFolders(out Properties.currentCacheSize, out List<BuildCache.CacheFolder> cacheFolders);
-                });
+                ThreadPool.QueueUserWorkItem(
+                    (state) =>
+                    {
+                        BuildCache.ComputeCacheSizeAndFolders(
+                            out Properties.currentCacheSize,
+                            out List<BuildCache.CacheFolder> cacheFolders
+                        );
+                    }
+                );
             }
 
             if (Properties.currentCacheSize >= 0)
-                GUILayout.Label(Properties.cacheSizeIs.text + " " + EditorUtility.FormatBytes(Properties.currentCacheSize));
+                GUILayout.Label(
+                    Properties.cacheSizeIs.text + " " + EditorUtility.FormatBytes(Properties.currentCacheSize)
+                );
             else
                 GUILayout.Label(Properties.cacheSizeIs.text + " is being calculated...");
         }

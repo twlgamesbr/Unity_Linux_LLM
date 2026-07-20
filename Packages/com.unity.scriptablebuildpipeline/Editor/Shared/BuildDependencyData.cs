@@ -22,8 +22,10 @@ namespace UnityEditor.Build.Pipeline
 
         /// <inheritdoc />
         public Dictionary<GUID, SceneDependencyInfo> SceneInfo { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<GUID, BuildUsageTagSet> SceneUsage { get; private set; }
+
         /// <inheritdoc />
         public Dictionary<GUID, Hash128> DependencyHash { get; private set; }
 

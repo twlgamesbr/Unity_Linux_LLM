@@ -28,6 +28,7 @@ namespace Unity.Entities.Build
         }
 
         public string CustomDependency => GetFilePath();
+
         void IEntitiesPlayerSettings.RegisterCustomDependency()
         {
             if (!AssetDatabase.IsAssetImportWorkerProcess())
@@ -70,7 +71,7 @@ namespace Unity.Entities.Build
 
             if (!EditorApplication.isUpdating)
             {
-                ((IEntitiesPlayerSettings) this).RegisterCustomDependency();
+                ((IEntitiesPlayerSettings)this).RegisterCustomDependency();
             }
 
             Save(true);
@@ -100,7 +101,7 @@ namespace Unity.Entities.Build
             Save(true);
             //This safeguard is necessary because the RegisterCustomDependency throw exceptions
             //if this is called when the editor is refreshing the database.
-            if(!EditorApplication.isUpdating)
+            if (!EditorApplication.isUpdating)
             {
                 ((IEntitiesPlayerSettings)this).RegisterCustomDependency();
                 AssetDatabase.Refresh();
@@ -115,7 +116,7 @@ namespace Unity.Entities.Build
 
         public override int Importance
         {
-            get{ return 0; }
+            get { return 0; }
         }
 
         public override DotsGlobalSettings.PlayerType GetPlayerType()
@@ -147,11 +148,10 @@ namespace Unity.Entities.Build
             var prop = so.FindProperty("FilterSettings.ExcludedBakingSystemAssemblies");
             var propField = new PropertyField(prop);
             propField.BindProperty(prop);
-            propField.RegisterCallback<ChangeEvent<string>>(
-                evt =>
-                {
-                    EntitiesClientSettings.instance.FilterSettings.SetDirty();
-                });
+            propField.RegisterCallback<ChangeEvent<string>>(evt =>
+            {
+                EntitiesClientSettings.instance.FilterSettings.SetDirty();
+            });
             targetS.Add(propField);
 
             m_BuildSettingsContainer.Add(targetS);

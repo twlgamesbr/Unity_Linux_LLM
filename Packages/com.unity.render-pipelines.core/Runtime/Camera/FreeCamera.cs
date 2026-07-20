@@ -3,7 +3,6 @@
 using UnityEngine.InputSystem;
 #endif
 
-
 namespace UnityEngine.Rendering
 {
     /// <summary>
@@ -18,18 +17,22 @@ namespace UnityEngine.Rendering
         /// Rotation speed when using a controller.
         /// </summary>
         public float m_LookSpeedController = 120f;
+
         /// <summary>
         /// Rotation speed when using the mouse.
         /// </summary>
         public float m_LookSpeedMouse = 4.0f;
+
         /// <summary>
         /// Movement speed.
         /// </summary>
         public float m_MoveSpeed = 10.0f;
+
         /// <summary>
         /// Value added to the speed when incrementing.
         /// </summary>
         public float m_MoveSpeedIncrement = 2.5f;
+
         /// <summary>
         /// Scale factor of the turbo mode.
         /// </summary>
@@ -70,7 +73,8 @@ namespace UnityEngine.Rendering
             yMoveAction = map.AddAction("yMove");
 
             lookAction.AddBinding("<Gamepad>/rightStick").WithProcessor("scaleVector2(x=15, y=15)");
-            moveAction.AddCompositeBinding("Dpad")
+            moveAction
+                .AddCompositeBinding("Dpad")
                 .With("Up", "<Keyboard>/w")
                 .With("Up", "<Keyboard>/upArrow")
                 .With("Down", "<Keyboard>/s")
@@ -79,10 +83,9 @@ namespace UnityEngine.Rendering
                 .With("Left", "<Keyboard>/leftArrow")
                 .With("Right", "<Keyboard>/d")
                 .With("Right", "<Keyboard>/rightArrow");
-            speedAction.AddCompositeBinding("Dpad")
-                .With("Up", "<Keyboard>/home")
-                .With("Down", "<Keyboard>/end");
-            yMoveAction.AddCompositeBinding("Dpad")
+            speedAction.AddCompositeBinding("Dpad").With("Up", "<Keyboard>/home").With("Down", "<Keyboard>/end");
+            yMoveAction
+                .AddCompositeBinding("Dpad")
                 .With("Up", "<Keyboard>/pageUp")
                 .With("Down", "<Keyboard>/pageDown")
                 .With("Up", "<Keyboard>/e")
@@ -101,24 +104,95 @@ namespace UnityEngine.Rendering
             List<InputManagerEntry> inputEntries = new List<InputManagerEntry>();
 
             // Add new bindings
-            inputEntries.Add(new InputManagerEntry { name = kRightStickX, kind = InputManagerEntry.Kind.Axis, axis = InputManagerEntry.Axis.Fourth, sensitivity = 1.0f, gravity = 1.0f, deadZone = 0.2f });
-            inputEntries.Add(new InputManagerEntry { name = kRightStickY, kind = InputManagerEntry.Kind.Axis, axis = InputManagerEntry.Axis.Fifth, sensitivity = 1.0f, gravity = 1.0f, deadZone = 0.2f, invert = true });
+            inputEntries.Add(
+                new InputManagerEntry
+                {
+                    name = kRightStickX,
+                    kind = InputManagerEntry.Kind.Axis,
+                    axis = InputManagerEntry.Axis.Fourth,
+                    sensitivity = 1.0f,
+                    gravity = 1.0f,
+                    deadZone = 0.2f,
+                }
+            );
+            inputEntries.Add(
+                new InputManagerEntry
+                {
+                    name = kRightStickY,
+                    kind = InputManagerEntry.Kind.Axis,
+                    axis = InputManagerEntry.Axis.Fifth,
+                    sensitivity = 1.0f,
+                    gravity = 1.0f,
+                    deadZone = 0.2f,
+                    invert = true,
+                }
+            );
 
-            inputEntries.Add(new InputManagerEntry { name = kYAxis, kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "page up", altBtnPositive = "joystick button 5", btnNegative = "page down", altBtnNegative = "joystick button 4", gravity = 1000.0f, deadZone = 0.001f, sensitivity = 1000.0f });
-            inputEntries.Add(new InputManagerEntry { name = kYAxis, kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "q", btnNegative = "e", gravity = 1000.0f, deadZone = 0.001f, sensitivity = 1000.0f });
+            inputEntries.Add(
+                new InputManagerEntry
+                {
+                    name = kYAxis,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "page up",
+                    altBtnPositive = "joystick button 5",
+                    btnNegative = "page down",
+                    altBtnNegative = "joystick button 4",
+                    gravity = 1000.0f,
+                    deadZone = 0.001f,
+                    sensitivity = 1000.0f,
+                }
+            );
+            inputEntries.Add(
+                new InputManagerEntry
+                {
+                    name = kYAxis,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "q",
+                    btnNegative = "e",
+                    gravity = 1000.0f,
+                    deadZone = 0.001f,
+                    sensitivity = 1000.0f,
+                }
+            );
 
-            inputEntries.Add(new InputManagerEntry { name = kSpeedAxis, kind = InputManagerEntry.Kind.KeyOrButton, btnPositive = "home", btnNegative = "end", gravity = 1000.0f, deadZone = 0.001f, sensitivity = 1000.0f });
-            inputEntries.Add(new InputManagerEntry { name = kSpeedAxis, kind = InputManagerEntry.Kind.Axis, axis = InputManagerEntry.Axis.Seventh, gravity = 1000.0f, deadZone = 0.001f, sensitivity = 1000.0f });
+            inputEntries.Add(
+                new InputManagerEntry
+                {
+                    name = kSpeedAxis,
+                    kind = InputManagerEntry.Kind.KeyOrButton,
+                    btnPositive = "home",
+                    btnNegative = "end",
+                    gravity = 1000.0f,
+                    deadZone = 0.001f,
+                    sensitivity = 1000.0f,
+                }
+            );
+            inputEntries.Add(
+                new InputManagerEntry
+                {
+                    name = kSpeedAxis,
+                    kind = InputManagerEntry.Kind.Axis,
+                    axis = InputManagerEntry.Axis.Seventh,
+                    gravity = 1000.0f,
+                    deadZone = 0.001f,
+                    sensitivity = 1000.0f,
+                }
+            );
 
             InputRegistering.RegisterInputs(inputEntries);
 #pragma warning restore CS0618 // Type or member is obsolete
 #endif
         }
 
-        float inputRotateAxisX, inputRotateAxisY;
+        float inputRotateAxisX,
+            inputRotateAxisY;
         float inputChangeSpeed;
-        float inputVertical, inputHorizontal, inputYAxis;
-        bool leftShiftBoost, leftShift, fire1;
+        float inputVertical,
+            inputHorizontal,
+            inputYAxis;
+        bool leftShiftBoost,
+            leftShift,
+            fire1;
 
         void UpdateInputs()
         {
@@ -177,7 +251,12 @@ namespace UnityEngine.Rendering
                     m_MoveSpeed = m_MoveSpeedIncrement;
             }
 
-            bool moved = inputRotateAxisX != 0.0f || inputRotateAxisY != 0.0f || inputVertical != 0.0f || inputHorizontal != 0.0f || inputYAxis != 0.0f;
+            bool moved =
+                inputRotateAxisX != 0.0f
+                || inputRotateAxisY != 0.0f
+                || inputVertical != 0.0f
+                || inputHorizontal != 0.0f
+                || inputYAxis != 0.0f;
             if (moved)
             {
                 float rotationX = transform.localEulerAngles.x;
@@ -195,9 +274,10 @@ namespace UnityEngine.Rendering
                 float moveSpeed = Time.deltaTime * m_MoveSpeed;
                 if (fire1 || leftShiftBoost && leftShift)
                     moveSpeed *= m_Turbo;
-                transform.position += transform.forward * (moveSpeed * inputVertical)
-                                      + transform.right * (moveSpeed * inputHorizontal)
-                                      + Vector3.up * (moveSpeed * inputYAxis);
+                transform.position +=
+                    transform.forward * (moveSpeed * inputVertical)
+                    + transform.right * (moveSpeed * inputHorizontal)
+                    + Vector3.up * (moveSpeed * inputYAxis);
             }
         }
     }

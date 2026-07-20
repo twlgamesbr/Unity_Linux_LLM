@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -26,10 +26,7 @@ namespace UnityEngine.Rendering.Universal
         static AttachmentDescriptor s_EmptyAttachment = new AttachmentDescriptor(GraphicsFormat.None);
         internal static AttachmentDescriptor emptyAttachment
         {
-            get
-            {
-                return s_EmptyAttachment;
-            }
+            get { return s_EmptyAttachment; }
         }
 
         static Mesh s_FullscreenMesh = null;
@@ -37,7 +34,9 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Returns a mesh that you can use with <see cref="CommandBuffer.DrawMesh(Mesh, Matrix4x4, Material)"/> to render full-screen effects.
         /// </summary>
-        [Obsolete("Use Blitter.BlitCameraTexture instead of CommandBuffer.DrawMesh(fullscreenMesh, ...). #from(2022.2)")]  // TODO OBSOLETE: need to fix the URP test failures when bumping
+        [Obsolete(
+            "Use Blitter.BlitCameraTexture instead of CommandBuffer.DrawMesh(fullscreenMesh, ...). #from(2022.2)"
+        )] // TODO OBSOLETE: need to fix the URP test failures when bumping
         public static Mesh fullscreenMesh
         {
             get
@@ -49,21 +48,26 @@ namespace UnityEngine.Rendering.Universal
                 float bottomV = 0.0f;
 
                 s_FullscreenMesh = new Mesh { name = "Fullscreen Quad" };
-                s_FullscreenMesh.SetVertices(new List<Vector3>
-                {
-                    new Vector3(-1.0f, -1.0f, 0.0f),
-                    new Vector3(-1.0f,  1.0f, 0.0f),
-                    new Vector3(1.0f, -1.0f, 0.0f),
-                    new Vector3(1.0f,  1.0f, 0.0f)
-                });
+                s_FullscreenMesh.SetVertices(
+                    new List<Vector3>
+                    {
+                        new Vector3(-1.0f, -1.0f, 0.0f),
+                        new Vector3(-1.0f, 1.0f, 0.0f),
+                        new Vector3(1.0f, -1.0f, 0.0f),
+                        new Vector3(1.0f, 1.0f, 0.0f),
+                    }
+                );
 
-                s_FullscreenMesh.SetUVs(0, new List<Vector2>
-                {
-                    new Vector2(0.0f, bottomV),
-                    new Vector2(0.0f, topV),
-                    new Vector2(1.0f, bottomV),
-                    new Vector2(1.0f, topV)
-                });
+                s_FullscreenMesh.SetUVs(
+                    0,
+                    new List<Vector2>
+                    {
+                        new Vector2(0.0f, bottomV),
+                        new Vector2(0.0f, topV),
+                        new Vector2(1.0f, bottomV),
+                        new Vector2(1.0f, topV),
+                    }
+                );
 
                 s_FullscreenMesh.SetIndices(new[] { 0, 1, 2, 2, 1, 3 }, MeshTopology.Triangles, 0, false);
                 s_FullscreenMesh.UploadMeshData(true);
@@ -109,16 +113,25 @@ namespace UnityEngine.Rendering.Universal
         /// </list>
         /// When adding or changing requirements or pipeline behavior, update this method and the corresponding editor validation (e.g. FullScreenPassRendererFeatureEditor) so they stay consistent.
         /// </remarks>
-        internal static bool IsCompatibleWithTileOnlyMode(ScriptableRenderPassInput requirements, RenderPassEvent renderPassEvent)
+        internal static bool IsCompatibleWithTileOnlyMode(
+            ScriptableRenderPassInput requirements,
+            RenderPassEvent renderPassEvent
+        )
         {
             if ((requirements & ScriptableRenderPassInput.Color) != ScriptableRenderPassInput.None)
                 return false;
             // Depth without Normal: pipeline uses a depth copy when the pass runs after opaque; when pass is before or at opaque, pipeline adds a prepass instead (compatible).
-            if ((requirements & ScriptableRenderPassInput.Depth) != ScriptableRenderPassInput.None && (requirements & ScriptableRenderPassInput.Normal) == ScriptableRenderPassInput.None
-                && renderPassEvent > RenderPassEvent.BeforeRenderingOpaques)
+            if (
+                (requirements & ScriptableRenderPassInput.Depth) != ScriptableRenderPassInput.None
+                && (requirements & ScriptableRenderPassInput.Normal) == ScriptableRenderPassInput.None
+                && renderPassEvent > RenderPassEvent.BeforeRenderingOpaques
+            )
                 return false;
-            if ((requirements & ScriptableRenderPassInput.Motion) != ScriptableRenderPassInput.None && (requirements & ScriptableRenderPassInput.Normal) == ScriptableRenderPassInput.None
-                && renderPassEvent > RenderPassEvent.BeforeRenderingOpaques)
+            if (
+                (requirements & ScriptableRenderPassInput.Motion) != ScriptableRenderPassInput.None
+                && (requirements & ScriptableRenderPassInput.Normal) == ScriptableRenderPassInput.None
+                && renderPassEvent > RenderPassEvent.BeforeRenderingOpaques
+            )
                 return false;
             return true;
         }
@@ -153,7 +166,20 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="viewMatrix">View matrix to be set.</param>
         /// <param name="projectionMatrix">Projection matrix to be set.</param>
         /// <param name="setInverseMatrices">Set this to true if you also need to set inverse camera matrices.</param>
-        public static void SetViewAndProjectionMatrices(CommandBuffer cmd, Matrix4x4 viewMatrix, Matrix4x4 projectionMatrix, bool setInverseMatrices) { SetViewAndProjectionMatrices(CommandBufferHelpers.GetRasterCommandBuffer(cmd), viewMatrix, projectionMatrix, setInverseMatrices); }
+        public static void SetViewAndProjectionMatrices(
+            CommandBuffer cmd,
+            Matrix4x4 viewMatrix,
+            Matrix4x4 projectionMatrix,
+            bool setInverseMatrices
+        )
+        {
+            SetViewAndProjectionMatrices(
+                CommandBufferHelpers.GetRasterCommandBuffer(cmd),
+                viewMatrix,
+                projectionMatrix,
+                setInverseMatrices
+            );
+        }
 
         /// <summary>
         /// Set view and projection matrices.
@@ -164,7 +190,12 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="viewMatrix">View matrix to be set.</param>
         /// <param name="projectionMatrix">Projection matrix to be set.</param>
         /// <param name="setInverseMatrices">Set this to true if you also need to set inverse camera matrices.</param>
-        public static void SetViewAndProjectionMatrices(RasterCommandBuffer cmd, Matrix4x4 viewMatrix, Matrix4x4 projectionMatrix, bool setInverseMatrices)
+        public static void SetViewAndProjectionMatrices(
+            RasterCommandBuffer cmd,
+            Matrix4x4 viewMatrix,
+            Matrix4x4 projectionMatrix,
+            bool setInverseMatrices
+        )
         {
             Matrix4x4 viewAndProjectionMatrix = projectionMatrix * viewMatrix;
             cmd.SetGlobalMatrix(ShaderPropertyId.viewMatrix, viewMatrix);
@@ -183,25 +214,41 @@ namespace UnityEngine.Rendering.Universal
         }
 
         //TODO FrameData: Merge these two SetScaleBiasRt() functions
-        internal static void SetScaleBiasRt(RasterCommandBuffer cmd, in UniversalCameraData cameraData, RTHandle rTHandle)
+        internal static void SetScaleBiasRt(
+            RasterCommandBuffer cmd,
+            in UniversalCameraData cameraData,
+            RTHandle rTHandle
+        )
         {
             // SetRenderTarget has logic to flip projection matrix when rendering to render texture. Flip the uv to account for that case.
-            bool isCameraColorFinalTarget = (cameraData.cameraType == CameraType.Game && rTHandle.nameID == BuiltinRenderTextureType.CameraTarget && cameraData.camera.targetTexture == null);
+            bool isCameraColorFinalTarget = (
+                cameraData.cameraType == CameraType.Game
+                && rTHandle.nameID == BuiltinRenderTextureType.CameraTarget
+                && cameraData.camera.targetTexture == null
+            );
             bool yflip = !isCameraColorFinalTarget;
             float flipSign = yflip ? -1.0f : 1.0f;
-            Vector4 scaleBiasRt = (flipSign < 0.0f)
-                ? new Vector4(flipSign, 1.0f, -1.0f, 1.0f)
-                : new Vector4(flipSign, 0.0f, 1.0f, 1.0f);
+            Vector4 scaleBiasRt =
+                (flipSign < 0.0f) ? new Vector4(flipSign, 1.0f, -1.0f, 1.0f) : new Vector4(flipSign, 0.0f, 1.0f, 1.0f);
             cmd.SetGlobalVector(Shader.PropertyToID("_ScaleBiasRt"), scaleBiasRt);
         }
 
-        internal static void SetupOffscreenUIViewportParams(Material material, ref Rect pixelRect, bool isRenderToBackBufferTarget)
+        internal static void SetupOffscreenUIViewportParams(
+            Material material,
+            ref Rect pixelRect,
+            bool isRenderToBackBufferTarget
+        )
         {
             Vector4 offscreenUIViewportParams = new Vector4(0f, 0f, 1f, 1f);
             if (isRenderToBackBufferTarget)
             {
                 var rcpScreenSize = new Vector2(1f / Screen.width, 1f / Screen.height);
-                offscreenUIViewportParams = new Vector4(pixelRect.x * rcpScreenSize.x, pixelRect.y * rcpScreenSize.y, pixelRect.width * rcpScreenSize.x, pixelRect.height * rcpScreenSize.y);
+                offscreenUIViewportParams = new Vector4(
+                    pixelRect.x * rcpScreenSize.x,
+                    pixelRect.y * rcpScreenSize.y,
+                    pixelRect.width * rcpScreenSize.x,
+                    pixelRect.height * rcpScreenSize.y
+                );
             }
             material.SetVector(ShaderPropertyId.offscreenUIViewportParams, offscreenUIViewportParams);
         }
@@ -209,14 +256,20 @@ namespace UnityEngine.Rendering.Universal
         // This is used to render materials that contain built-in shader passes not compatible with URP.
         // It will render those legacy passes with error/pink shader.
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
-        internal static void CreateRendererParamsObjectsWithError(ref CullingResults cullResults, Camera camera, FilteringSettings filterSettings, SortingCriteria sortFlags, ref RendererListParams param)
+        internal static void CreateRendererParamsObjectsWithError(
+            ref CullingResults cullResults,
+            Camera camera,
+            FilteringSettings filterSettings,
+            SortingCriteria sortFlags,
+            ref RendererListParams param
+        )
         {
             SortingSettings sortingSettings = new SortingSettings(camera) { criteria = sortFlags };
             DrawingSettings errorSettings = new DrawingSettings(m_LegacyShaderPassNames[0], sortingSettings)
             {
                 perObjectData = PerObjectData.None,
                 overrideMaterial = errorMaterial,
-                overrideMaterialPassIndex = 0
+                overrideMaterialPassIndex = 0,
             };
             for (int i = 1; i < m_LegacyShaderPassNames.Count; ++i)
                 errorSettings.SetShaderPassName(i, m_LegacyShaderPassNames[i]);
@@ -227,7 +280,14 @@ namespace UnityEngine.Rendering.Universal
         // This is used to render materials that contain built-in shader passes not compatible with URP.
         // It will render those legacy passes with error/pink shader.
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
-        internal static void CreateRendererListObjectsWithError(RenderGraph renderGraph, ref CullingResults cullResults, Camera camera, FilteringSettings filterSettings, SortingCriteria sortFlags, ref RendererListHandle rl)
+        internal static void CreateRendererListObjectsWithError(
+            RenderGraph renderGraph,
+            ref CullingResults cullResults,
+            Camera camera,
+            FilteringSettings filterSettings,
+            SortingCriteria sortFlags,
+            ref RendererListHandle rl
+        )
         {
             // TODO: When importing project, AssetPreviewUpdater::CreatePreviewForAsset will be called multiple times.
             // This might be in a point that some resources required for the pipeline are not finished importing yet.
@@ -251,24 +311,36 @@ namespace UnityEngine.Rendering.Universal
 
         static ShaderTagId[] s_ShaderTagValues = new ShaderTagId[1];
         static RenderStateBlock[] s_RenderStateBlocks = new RenderStateBlock[1];
+
         // Create a RendererList using a RenderStateBlock override is quite common so we have this optimized utility function for it
-        internal static void CreateRendererListWithRenderStateBlock(RenderGraph renderGraph, ref CullingResults cullResults, DrawingSettings ds, FilteringSettings fs, RenderStateBlock rsb, ref RendererListHandle rl)
+        internal static void CreateRendererListWithRenderStateBlock(
+            RenderGraph renderGraph,
+            ref CullingResults cullResults,
+            DrawingSettings ds,
+            FilteringSettings fs,
+            RenderStateBlock rsb,
+            ref RendererListHandle rl
+        )
         {
             s_ShaderTagValues[0] = ShaderTagId.none;
             s_RenderStateBlocks[0] = rsb;
             NativeArray<ShaderTagId> tagValues = new NativeArray<ShaderTagId>(s_ShaderTagValues, Allocator.Temp);
-            NativeArray<RenderStateBlock> stateBlocks = new NativeArray<RenderStateBlock>(s_RenderStateBlocks, Allocator.Temp);
+            NativeArray<RenderStateBlock> stateBlocks = new NativeArray<RenderStateBlock>(
+                s_RenderStateBlocks,
+                Allocator.Temp
+            );
             var param = new RendererListParams(cullResults, ds, fs)
             {
                 tagValues = tagValues,
                 stateBlocks = stateBlocks,
-                isPassTagName = false
+                isPassTagName = false,
             };
             rl = renderGraph.CreateRendererList(param);
         }
 
         // Caches render texture format support. SystemInfo.SupportsRenderTextureFormat allocates memory due to boxing.
-        static Dictionary<RenderTextureFormat, bool> m_RenderTextureFormatSupport = new Dictionary<RenderTextureFormat, bool>();
+        static Dictionary<RenderTextureFormat, bool> m_RenderTextureFormatSupport =
+            new Dictionary<RenderTextureFormat, bool>();
 
         internal static void ClearSystemInfoCache()
         {
@@ -304,7 +376,7 @@ namespace UnityEngine.Rendering.Universal
             GraphicsFormatUsage graphicsFormatUsage = (GraphicsFormatUsage)(1 << (int)usage);
             return SystemInfo.IsFormatSupported(format, graphicsFormatUsage);
         }
-        
+
         internal static bool MultisampleDepthResolveSupported()
         {
             // Temporarily disabling depth resolve a driver bug on OSX when using some AMD graphics cards. Temporarily disabling depth resolve on that platform
@@ -329,7 +401,7 @@ namespace UnityEngine.Rendering.Universal
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
                 bindMS = false;
 
-            return bindMS; 
+            return bindMS;
         }
 
         /// <summary>
@@ -339,10 +411,7 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="descriptor">Descriptor for the RTHandle to match</param>
         /// <param name="scaled">Check if the RTHandle has auto scaling enabled if not, check the widths and heights</param>
         /// <returns></returns>
-        internal static bool RTHandleNeedsReAlloc(
-            RTHandle handle,
-            in TextureDesc descriptor,
-            bool scaled)
+        internal static bool RTHandleNeedsReAlloc(RTHandle handle, in TextureDesc descriptor, bool scaled)
         {
             if (handle == null || handle.rt == null)
                 return true;
@@ -355,28 +424,30 @@ namespace UnityEngine.Rendering.Universal
 
             //We should always prefer to cache data from Native to prevent duplicate copy operations when re-fetching
             var rtDescriptor = handle.rt.descriptor;
-            var rtHandleFormat = (rtDescriptor.depthStencilFormat != GraphicsFormat.None) ? rtDescriptor.depthStencilFormat : rtDescriptor.graphicsFormat;
+            var rtHandleFormat =
+                (rtDescriptor.depthStencilFormat != GraphicsFormat.None)
+                    ? rtDescriptor.depthStencilFormat
+                    : rtDescriptor.graphicsFormat;
             var isShadowMap = rtDescriptor.shadowSamplingMode != ShadowSamplingMode.None;
 
-            return
-                rtHandleFormat != descriptor.format ||
-                rtDescriptor.dimension != descriptor.dimension ||
-                rtDescriptor.volumeDepth != descriptor.slices ||
-                rtDescriptor.enableRandomWrite != descriptor.enableRandomWrite ||
-                rtDescriptor.enableShadingRate != descriptor.enableShadingRate ||
-                rtDescriptor.useMipMap != descriptor.useMipMap ||
-                rtDescriptor.autoGenerateMips != descriptor.autoGenerateMips ||
-                isShadowMap != descriptor.isShadowMap ||
-                (MSAASamples)rtDescriptor.msaaSamples != descriptor.msaaSamples ||
-                rtDescriptor.bindMS != descriptor.bindTextureMS ||
-                rtDescriptor.useDynamicScale != descriptor.useDynamicScale ||
-                rtDescriptor.useDynamicScaleExplicit != descriptor.useDynamicScaleExplicit ||
-                rtDescriptor.memoryless != descriptor.memoryless ||
-                handle.rt.filterMode != descriptor.filterMode ||
-                handle.rt.wrapMode != descriptor.wrapMode ||
-                handle.rt.anisoLevel != descriptor.anisoLevel ||
-                Mathf.Abs(handle.rt.mipMapBias - descriptor.mipMapBias) > Mathf.Epsilon ||
-                handle.name != descriptor.name;
+            return rtHandleFormat != descriptor.format
+                || rtDescriptor.dimension != descriptor.dimension
+                || rtDescriptor.volumeDepth != descriptor.slices
+                || rtDescriptor.enableRandomWrite != descriptor.enableRandomWrite
+                || rtDescriptor.enableShadingRate != descriptor.enableShadingRate
+                || rtDescriptor.useMipMap != descriptor.useMipMap
+                || rtDescriptor.autoGenerateMips != descriptor.autoGenerateMips
+                || isShadowMap != descriptor.isShadowMap
+                || (MSAASamples)rtDescriptor.msaaSamples != descriptor.msaaSamples
+                || rtDescriptor.bindMS != descriptor.bindTextureMS
+                || rtDescriptor.useDynamicScale != descriptor.useDynamicScale
+                || rtDescriptor.useDynamicScaleExplicit != descriptor.useDynamicScaleExplicit
+                || rtDescriptor.memoryless != descriptor.memoryless
+                || handle.rt.filterMode != descriptor.filterMode
+                || handle.rt.wrapMode != descriptor.wrapMode
+                || handle.rt.anisoLevel != descriptor.anisoLevel
+                || Mathf.Abs(handle.rt.mipMapBias - descriptor.mipMapBias) > Mathf.Epsilon
+                || handle.name != descriptor.name;
         }
 
         /// <summary>
@@ -391,7 +462,9 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="mipMapBias">Bias applied to mipmaps during filtering.</param>
         /// <param name="name">Name of the RTHandle.</param>
         /// <returns>If an allocation was done.</returns>
-        [Obsolete("This method will be removed in a future release. Please use ReAllocateHandleIfNeeded instead. #from(2023.3)")]
+        [Obsolete(
+            "This method will be removed in a future release. Please use ReAllocateHandleIfNeeded instead. #from(2023.3)"
+        )]
         public static bool ReAllocateIfNeeded(
             ref RTHandle handle,
             in RenderTextureDescriptor descriptor,
@@ -400,14 +473,31 @@ namespace UnityEngine.Rendering.Universal
             bool isShadowMap = false,
             int anisoLevel = 1,
             float mipMapBias = 0,
-            string name = "")
+            string name = ""
+        )
         {
-            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(descriptor, TextureSizeMode.Explicit, anisoLevel, 0, filterMode, wrapMode, name);
+            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                descriptor,
+                TextureSizeMode.Explicit,
+                anisoLevel,
+                0,
+                filterMode,
+                wrapMode,
+                name
+            );
             if (RTHandleNeedsReAlloc(handle, requestRTDesc, false))
             {
                 if (handle != null && handle.rt != null)
                 {
-                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(handle.rt.descriptor, TextureSizeMode.Explicit, handle.rt.anisoLevel, handle.rt.mipMapBias, handle.rt.filterMode, handle.rt.wrapMode, handle.name);
+                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                        handle.rt.descriptor,
+                        TextureSizeMode.Explicit,
+                        handle.rt.anisoLevel,
+                        handle.rt.mipMapBias,
+                        handle.rt.filterMode,
+                        handle.rt.wrapMode,
+                        handle.name
+                    );
                     AddStaleResourceToPoolOrRelease(currentRTDesc, handle);
                 }
 
@@ -417,7 +507,15 @@ namespace UnityEngine.Rendering.Universal
                 }
                 else
                 {
-                    handle = RTHandles.Alloc(descriptor, filterMode, wrapMode, isShadowMap, anisoLevel, mipMapBias, name);
+                    handle = RTHandles.Alloc(
+                        descriptor,
+                        filterMode,
+                        wrapMode,
+                        isShadowMap,
+                        anisoLevel,
+                        mipMapBias,
+                        name
+                    );
                     return true;
                 }
             }
@@ -437,7 +535,9 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="mipMapBias">Bias applied to mipmaps during filtering.</param>
         /// <param name="name">Name of the RTHandle.</param>
         /// <returns>If the RTHandle should be re-allocated</returns>
-        [Obsolete("This method will be removed in a future release. Please use ReAllocateHandleIfNeeded instead. #from(2023.3)")]
+        [Obsolete(
+            "This method will be removed in a future release. Please use ReAllocateHandleIfNeeded instead. #from(2023.3)"
+        )]
         public static bool ReAllocateIfNeeded(
             ref RTHandle handle,
             Vector2 scaleFactor,
@@ -447,15 +547,30 @@ namespace UnityEngine.Rendering.Universal
             bool isShadowMap = false,
             int anisoLevel = 1,
             float mipMapBias = 0,
-            string name = "")
+            string name = ""
+        )
         {
             var usingConstantScale = handle != null && handle.useScaling && handle.scaleFactor == scaleFactor;
-            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(descriptor, TextureSizeMode.Scale, anisoLevel, 0, filterMode, wrapMode);
+            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                descriptor,
+                TextureSizeMode.Scale,
+                anisoLevel,
+                0,
+                filterMode,
+                wrapMode
+            );
             if (!usingConstantScale || RTHandleNeedsReAlloc(handle, requestRTDesc, true))
             {
                 if (handle != null && handle.rt != null)
                 {
-                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(handle.rt.descriptor, TextureSizeMode.Scale, handle.rt.anisoLevel, handle.rt.mipMapBias, handle.rt.filterMode, handle.rt.wrapMode);
+                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                        handle.rt.descriptor,
+                        TextureSizeMode.Scale,
+                        handle.rt.anisoLevel,
+                        handle.rt.mipMapBias,
+                        handle.rt.filterMode,
+                        handle.rt.wrapMode
+                    );
                     AddStaleResourceToPoolOrRelease(currentRTDesc, handle);
                 }
 
@@ -465,7 +580,16 @@ namespace UnityEngine.Rendering.Universal
                 }
                 else
                 {
-                    handle = RTHandles.Alloc(scaleFactor, descriptor, filterMode, wrapMode, isShadowMap, anisoLevel, mipMapBias, name);
+                    handle = RTHandles.Alloc(
+                        scaleFactor,
+                        descriptor,
+                        filterMode,
+                        wrapMode,
+                        isShadowMap,
+                        anisoLevel,
+                        mipMapBias,
+                        name
+                    );
                     return true;
                 }
             }
@@ -485,7 +609,9 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="mipMapBias">Bias applied to mipmaps during filtering.</param>
         /// <param name="name">Name of the RTHandle.</param>
         /// <returns>If an allocation was done</returns>
-        [Obsolete("This method will be removed in a future release. Please use ReAllocateHandleIfNeeded instead. #from(2023.3)")]
+        [Obsolete(
+            "This method will be removed in a future release. Please use ReAllocateHandleIfNeeded instead. #from(2023.3)"
+        )]
         public static bool ReAllocateIfNeeded(
             ref RTHandle handle,
             ScaleFunc scaleFunc,
@@ -495,15 +621,30 @@ namespace UnityEngine.Rendering.Universal
             bool isShadowMap = false,
             int anisoLevel = 1,
             float mipMapBias = 0,
-            string name = "")
+            string name = ""
+        )
         {
             var usingScaleFunction = handle != null && handle.useScaling && handle.scaleFactor == Vector2.zero;
-            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(descriptor, TextureSizeMode.Functor, anisoLevel, 0, filterMode, wrapMode);
+            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                descriptor,
+                TextureSizeMode.Functor,
+                anisoLevel,
+                0,
+                filterMode,
+                wrapMode
+            );
             if (!usingScaleFunction || RTHandleNeedsReAlloc(handle, requestRTDesc, true))
             {
                 if (handle != null && handle.rt != null)
                 {
-                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(handle.rt.descriptor, TextureSizeMode.Functor, handle.rt.anisoLevel, handle.rt.mipMapBias, handle.rt.filterMode, handle.rt.wrapMode);
+                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                        handle.rt.descriptor,
+                        TextureSizeMode.Functor,
+                        handle.rt.anisoLevel,
+                        handle.rt.mipMapBias,
+                        handle.rt.filterMode,
+                        handle.rt.wrapMode
+                    );
                     AddStaleResourceToPoolOrRelease(currentRTDesc, handle);
                 }
 
@@ -513,7 +654,16 @@ namespace UnityEngine.Rendering.Universal
                 }
                 else
                 {
-                    handle = RTHandles.Alloc(scaleFunc, descriptor, filterMode, wrapMode, isShadowMap, anisoLevel, mipMapBias, name);
+                    handle = RTHandles.Alloc(
+                        scaleFunc,
+                        descriptor,
+                        filterMode,
+                        wrapMode,
+                        isShadowMap,
+                        anisoLevel,
+                        mipMapBias,
+                        name
+                    );
                     return true;
                 }
             }
@@ -538,16 +688,35 @@ namespace UnityEngine.Rendering.Universal
             TextureWrapMode wrapMode = TextureWrapMode.Repeat,
             int anisoLevel = 1,
             float mipMapBias = 0,
-            string name = "")
+            string name = ""
+        )
         {
-            Assertions.Assert.IsTrue(descriptor.graphicsFormat == GraphicsFormat.None ^ descriptor.depthStencilFormat == GraphicsFormat.None);
+            Assertions.Assert.IsTrue(
+                descriptor.graphicsFormat == GraphicsFormat.None ^ descriptor.depthStencilFormat == GraphicsFormat.None
+            );
 
-            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(descriptor, TextureSizeMode.Explicit, anisoLevel, 0, filterMode, wrapMode, name);
+            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                descriptor,
+                TextureSizeMode.Explicit,
+                anisoLevel,
+                0,
+                filterMode,
+                wrapMode,
+                name
+            );
             if (RTHandleNeedsReAlloc(handle, requestRTDesc, false))
             {
                 if (handle != null && handle.rt != null)
                 {
-                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(handle.rt.descriptor, TextureSizeMode.Explicit, handle.rt.anisoLevel, handle.rt.mipMapBias, handle.rt.filterMode, handle.rt.wrapMode, handle.name);
+                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                        handle.rt.descriptor,
+                        TextureSizeMode.Explicit,
+                        handle.rt.anisoLevel,
+                        handle.rt.mipMapBias,
+                        handle.rt.filterMode,
+                        handle.rt.wrapMode,
+                        handle.name
+                    );
                     AddStaleResourceToPoolOrRelease(currentRTDesc, handle);
                 }
 
@@ -570,10 +739,7 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="descriptor">TextureDesc for the RTHandle to match</param>
         /// <param name="name">Name of the RTHandle.</param>
         /// <returns>If an allocation was done.</returns>
-        public static bool ReAllocateHandleIfNeeded(
-            ref RTHandle handle,
-            TextureDesc descriptor,
-            string name)
+        public static bool ReAllocateHandleIfNeeded(ref RTHandle handle, TextureDesc descriptor, string name)
         {
             descriptor.name = name;
             descriptor.sizeMode = TextureSizeMode.Explicit;
@@ -582,7 +748,15 @@ namespace UnityEngine.Rendering.Universal
             {
                 if (handle != null && handle.rt != null)
                 {
-                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(handle.rt.descriptor, TextureSizeMode.Explicit, handle.rt.anisoLevel, handle.rt.mipMapBias, handle.rt.filterMode, handle.rt.wrapMode, handle.name);
+                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                        handle.rt.descriptor,
+                        TextureSizeMode.Explicit,
+                        handle.rt.anisoLevel,
+                        handle.rt.mipMapBias,
+                        handle.rt.filterMode,
+                        handle.rt.wrapMode,
+                        handle.name
+                    );
                     AddStaleResourceToPoolOrRelease(currentRTDesc, handle);
                 }
 
@@ -618,15 +792,30 @@ namespace UnityEngine.Rendering.Universal
             TextureWrapMode wrapMode = TextureWrapMode.Repeat,
             int anisoLevel = 1,
             float mipMapBias = 0,
-            string name = "")
+            string name = ""
+        )
         {
             var usingConstantScale = handle != null && handle.useScaling && handle.scaleFactor == scaleFactor;
-            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(descriptor, TextureSizeMode.Scale, anisoLevel, 0, filterMode, wrapMode);
+            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                descriptor,
+                TextureSizeMode.Scale,
+                anisoLevel,
+                0,
+                filterMode,
+                wrapMode
+            );
             if (!usingConstantScale || RTHandleNeedsReAlloc(handle, requestRTDesc, true))
             {
                 if (handle != null && handle.rt != null)
                 {
-                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(handle.rt.descriptor, TextureSizeMode.Scale, handle.rt.anisoLevel, handle.rt.mipMapBias, handle.rt.filterMode, handle.rt.wrapMode);
+                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                        handle.rt.descriptor,
+                        TextureSizeMode.Scale,
+                        handle.rt.anisoLevel,
+                        handle.rt.mipMapBias,
+                        handle.rt.filterMode,
+                        handle.rt.wrapMode
+                    );
                     AddStaleResourceToPoolOrRelease(currentRTDesc, handle);
                 }
 
@@ -662,15 +851,30 @@ namespace UnityEngine.Rendering.Universal
             TextureWrapMode wrapMode = TextureWrapMode.Repeat,
             int anisoLevel = 1,
             float mipMapBias = 0,
-            string name = "")
+            string name = ""
+        )
         {
             var usingScaleFunction = handle != null && handle.useScaling && handle.scaleFactor == Vector2.zero;
-            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(descriptor, TextureSizeMode.Functor, anisoLevel, 0, filterMode, wrapMode);
+            TextureDesc requestRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                descriptor,
+                TextureSizeMode.Functor,
+                anisoLevel,
+                0,
+                filterMode,
+                wrapMode
+            );
             if (!usingScaleFunction || RTHandleNeedsReAlloc(handle, requestRTDesc, true))
             {
                 if (handle != null && handle.rt != null)
                 {
-                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(handle.rt.descriptor, TextureSizeMode.Functor, handle.rt.anisoLevel, handle.rt.mipMapBias, handle.rt.filterMode, handle.rt.wrapMode);
+                    TextureDesc currentRTDesc = RTHandleResourcePool.CreateTextureDesc(
+                        handle.rt.descriptor,
+                        TextureSizeMode.Functor,
+                        handle.rt.anisoLevel,
+                        handle.rt.mipMapBias,
+                        handle.rt.filterMode,
+                        handle.rt.wrapMode
+                    );
                     AddStaleResourceToPoolOrRelease(currentRTDesc, handle);
                 }
 
@@ -721,7 +925,11 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns></returns>
         /// <seealso cref="DrawingSettings"/>
-        public static DrawingSettings CreateDrawingSettings(ShaderTagId shaderTagId, ref RenderingData renderingData, SortingCriteria sortingCriteria)
+        public static DrawingSettings CreateDrawingSettings(
+            ShaderTagId shaderTagId,
+            ref RenderingData renderingData,
+            SortingCriteria sortingCriteria
+        )
         {
             UniversalRenderingData universalRenderingData = renderingData.frameData.Get<UniversalRenderingData>();
             UniversalCameraData cameraData = renderingData.frameData.Get<UniversalCameraData>();
@@ -740,8 +948,13 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns></returns>
         /// <seealso cref="DrawingSettings"/>
-        public static DrawingSettings CreateDrawingSettings(ShaderTagId shaderTagId, UniversalRenderingData renderingData,
-            UniversalCameraData cameraData, UniversalLightData lightData, SortingCriteria sortingCriteria)
+        public static DrawingSettings CreateDrawingSettings(
+            ShaderTagId shaderTagId,
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData,
+            SortingCriteria sortingCriteria
+        )
         {
             Camera camera = cameraData.camera;
             SortingSettings sortingSettings = new SortingSettings(camera) { criteria = sortingCriteria };
@@ -756,7 +969,9 @@ namespace UnityEngine.Rendering.Universal
                 // Disable instancing for preview cameras. This is consistent with the built-in forward renderer. Also fixes case 1127324.
                 enableInstancing = camera.cameraType != CameraType.Preview,
                 // stencil-based LOD doesn't support native render pass for now.
-                lodCrossFadeStencilMask = renderingData.stencilLodCrossFadeEnabled ? (int)UniversalRendererStencilRef.CrossFadeStencilRef_All : 0,
+                lodCrossFadeStencilMask = renderingData.stencilLodCrossFadeEnabled
+                    ? (int)UniversalRendererStencilRef.CrossFadeStencilRef_All
+                    : 0,
             };
             return settings;
         }
@@ -769,13 +984,22 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns></returns>
         /// <seealso cref="DrawingSettings"/>
-        public static DrawingSettings CreateDrawingSettings(List<ShaderTagId> shaderTagIdList,
-            ref RenderingData renderingData, SortingCriteria sortingCriteria)
+        public static DrawingSettings CreateDrawingSettings(
+            List<ShaderTagId> shaderTagIdList,
+            ref RenderingData renderingData,
+            SortingCriteria sortingCriteria
+        )
         {
             UniversalRenderingData universalRenderingData = renderingData.frameData.Get<UniversalRenderingData>();
             UniversalCameraData cameraData = renderingData.frameData.Get<UniversalCameraData>();
             UniversalLightData lightData = renderingData.frameData.Get<UniversalLightData>();
-            return CreateDrawingSettings(shaderTagIdList, universalRenderingData, cameraData, lightData, sortingCriteria);
+            return CreateDrawingSettings(
+                shaderTagIdList,
+                universalRenderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
         }
 
         /// <summary>
@@ -788,17 +1012,35 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns></returns>
         /// <seealso cref="DrawingSettings"/>
-        public static DrawingSettings CreateDrawingSettings(List<ShaderTagId> shaderTagIdList,
-            UniversalRenderingData renderingData, UniversalCameraData cameraData,
-            UniversalLightData lightData, SortingCriteria sortingCriteria)
+        public static DrawingSettings CreateDrawingSettings(
+            List<ShaderTagId> shaderTagIdList,
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData,
+            SortingCriteria sortingCriteria
+        )
         {
             if (shaderTagIdList == null || shaderTagIdList.Count == 0)
             {
-                Debug.LogWarning("ShaderTagId list is invalid. DrawingSettings is created with default pipeline ShaderTagId");
-                return CreateDrawingSettings(new ShaderTagId("UniversalPipeline"), renderingData, cameraData, lightData, sortingCriteria);
+                Debug.LogWarning(
+                    "ShaderTagId list is invalid. DrawingSettings is created with default pipeline ShaderTagId"
+                );
+                return CreateDrawingSettings(
+                    new ShaderTagId("UniversalPipeline"),
+                    renderingData,
+                    cameraData,
+                    lightData,
+                    sortingCriteria
+                );
             }
 
-            DrawingSettings settings = CreateDrawingSettings(shaderTagIdList[0], renderingData, cameraData, lightData, sortingCriteria);
+            DrawingSettings settings = CreateDrawingSettings(
+                shaderTagIdList[0],
+                renderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
             for (int i = 1; i < shaderTagIdList.Count; ++i)
                 settings.SetShaderPassName(i, shaderTagIdList[i]);
             return settings;
@@ -814,7 +1056,7 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="textureHandle">Texture handle representing the texture in the render graph to check.</param>
         /// <returns>If the texture should be rendered flipped.</returns>
         internal static bool IsHandleYFlipped(in RasterGraphContext renderGraphContext, in TextureHandle textureHandle)
-        { 
+        {
             return renderGraphContext.GetTextureUVOrigin(textureHandle) == TextureUVOrigin.BottomLeft;
         }
 
@@ -826,23 +1068,45 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="destination"></param>
         /// <param name="cameraData"></param>
         /// <returns></returns>
-        internal static Vector4 GetFinalBlitScaleBias(RTHandle source, RTHandle destination, UniversalCameraData cameraData)
+        internal static Vector4 GetFinalBlitScaleBias(
+            RTHandle source,
+            RTHandle destination,
+            UniversalCameraData cameraData
+        )
         {
-            Vector2 scale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 scale = source.useScaling
+                ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                : Vector2.one;
             var yflip = cameraData.IsRenderTargetProjectionMatrixFlipped(destination);
-            Vector4 scaleBias = !yflip ? new Vector4(scale.x, -scale.y, 0, scale.y) : new Vector4(scale.x, scale.y, 0, 0);
+            Vector4 scaleBias = !yflip
+                ? new Vector4(scale.x, -scale.y, 0, scale.y)
+                : new Vector4(scale.x, scale.y, 0, 0);
 
             return scaleBias;
         }
 #endif
-        internal static Vector4 GetFinalBlitScaleBias(in RasterGraphContext renderGraphContext, in TextureHandle source, in TextureHandle destination)
+
+        internal static Vector4 GetFinalBlitScaleBias(
+            in RasterGraphContext renderGraphContext,
+            in TextureHandle source,
+            in TextureHandle destination
+        )
         {
             RTHandle srcRTHandle = source;
-            Vector2 scale = srcRTHandle is { useScaling: true } ? new Vector2(srcRTHandle.rtHandleProperties.rtHandleScale.x, srcRTHandle.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 scale = srcRTHandle is { useScaling: true }
+                ? new Vector2(
+                    srcRTHandle.rtHandleProperties.rtHandleScale.x,
+                    srcRTHandle.rtHandleProperties.rtHandleScale.y
+                )
+                : Vector2.one;
 
-            var yflip = renderGraphContext.GetTextureUVOrigin(in source) != renderGraphContext.GetTextureUVOrigin(in destination);
+            var yflip =
+                renderGraphContext.GetTextureUVOrigin(in source)
+                != renderGraphContext.GetTextureUVOrigin(in destination);
 
-            Vector4 scaleBias = yflip ? new Vector4(scale.x, -scale.y, 0, scale.y) : new Vector4(scale.x, scale.y, 0, 0);
+            Vector4 scaleBias = yflip
+                ? new Vector4(scale.x, -scale.y, 0, scale.y)
+                : new Vector4(scale.x, scale.y, 0, 0);
 
             return scaleBias;
         }
@@ -865,13 +1129,17 @@ namespace UnityEngine.Rendering.Universal
         internal static TextureUVOrigin GetBackBufferUVOrientation(UniversalCameraData cameraData)
         {
             // Backbuffer orientation is used for either the actual backbuffer (not a texture), or in XR for the eye texture.
-            bool useRealBackbufferOrientation = !cameraData.isSceneViewCamera && !cameraData.isPreviewCamera && cameraData.targetTexture == null;
-            return useRealBackbufferOrientation ? RenderingUtils.GetRealBackBufferUVOrientation() : TextureUVOrigin.BottomLeft;
+            bool useRealBackbufferOrientation =
+                !cameraData.isSceneViewCamera && !cameraData.isPreviewCamera && cameraData.targetTexture == null;
+            return useRealBackbufferOrientation
+                ? RenderingUtils.GetRealBackBufferUVOrientation()
+                : TextureUVOrigin.BottomLeft;
         }
+
         /// <summary>
         /// Returns the TextureUVOrigin of the camera targets. These include the intermediate textures (UniversalResourceData.cameraColor, cameraDepth),
         /// the Gbuffers (UniversalResourceData.gbuffer) and any copy of those. Since these are all textures, they normally are all using the
-        /// Unity texture convention of BottomLeft. However, in the On-Tile Renderer, these can adopt the backbuffer UV orientation. 
+        /// Unity texture convention of BottomLeft. However, in the On-Tile Renderer, these can adopt the backbuffer UV orientation.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TextureUVOrigin GetCameraTargetsUVOrientation(UniversalCameraData cameraData)
@@ -922,19 +1190,36 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="textureUVOrigin">The UV origin of the texture (typically from GetTextureUVOrigin)</param>
         /// <param name="cameraData">Camera data containing view and projection matrices</param>
         /// <returns>The inverse view-projection matrix matching the texture orientation</returns>
-        internal static Matrix4x4 ComputeInverseViewProjectionMatrix(TextureUVOrigin textureUVOrigin, UniversalCameraData cameraData)
+        internal static Matrix4x4 ComputeInverseViewProjectionMatrix(
+            TextureUVOrigin textureUVOrigin,
+            UniversalCameraData cameraData
+        )
         {
             bool isFlipped = (textureUVOrigin == TextureUVOrigin.BottomLeft);
             Matrix4x4 projection = cameraData.GetGPUProjectionMatrix(isFlipped);
             Matrix4x4 view = cameraData.GetViewMatrix();
-            Matrix4x4 viewProj = CoreMatrixUtils.MultiplyProjectionMatrix(projection, view, cameraData.camera.orthographic);
+            Matrix4x4 viewProj = CoreMatrixUtils.MultiplyProjectionMatrix(
+                projection,
+                view,
+                cameraData.camera.orthographic
+            );
             return Matrix4x4.Inverse(viewProj);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static RTHandleAllocInfo CreateRTHandleAllocInfo(in RenderTextureDescriptor descriptor, FilterMode filterMode, TextureWrapMode wrapMode, int anisoLevel, float mipMapBias, string name)
+        internal static RTHandleAllocInfo CreateRTHandleAllocInfo(
+            in RenderTextureDescriptor descriptor,
+            FilterMode filterMode,
+            TextureWrapMode wrapMode,
+            int anisoLevel,
+            float mipMapBias,
+            string name
+        )
         {
-            var actualFormat = descriptor.graphicsFormat != GraphicsFormat.None ? descriptor.graphicsFormat : descriptor.depthStencilFormat;
+            var actualFormat =
+                descriptor.graphicsFormat != GraphicsFormat.None
+                    ? descriptor.graphicsFormat
+                    : descriptor.depthStencilFormat;
 
             // NOTE: this calls default(RTHandleAllocInfo) not RTHandleAllocInfo(string = "")
             RTHandleAllocInfo allocInfo = new RTHandleAllocInfo();

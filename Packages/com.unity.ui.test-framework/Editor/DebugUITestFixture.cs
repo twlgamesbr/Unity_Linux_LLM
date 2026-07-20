@@ -23,7 +23,7 @@ namespace UnityEditor.UIElements.TestFramework
         class InvocableDebugUITestFixture : DebugUITestFixture { }
 
         /// <summary>
-        /// Instantiates an <see cref="EditorWindowUITestFixture{EditorWindowType}"/> 
+        /// Instantiates an <see cref="EditorWindowUITestFixture{EditorWindowType}"/>
         /// and sets <see cref="EditorWindowUITestFixture{EditorWindowType}.debugMode"/> to `true`.
         /// </summary>
         /// <remarks>

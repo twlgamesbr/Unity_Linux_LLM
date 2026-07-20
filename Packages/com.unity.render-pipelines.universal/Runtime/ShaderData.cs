@@ -12,9 +12,7 @@ namespace UnityEngine.Rendering.Universal
         ComputeBuffer m_AdditionalLightShadowParamsStructuredBuffer = null;
         ComputeBuffer m_AdditionalLightShadowSliceMatricesStructuredBuffer = null;
 
-        ShaderData()
-        {
-        }
+        ShaderData() { }
 
         internal static ShaderData instance
         {
@@ -55,7 +53,8 @@ namespace UnityEngine.Rendering.Universal
             return GetOrUpdateBuffer<Matrix4x4>(ref m_AdditionalLightShadowSliceMatricesStructuredBuffer, size);
         }
 
-        ComputeBuffer GetOrUpdateBuffer<T>(ref ComputeBuffer buffer, int size) where T : struct
+        ComputeBuffer GetOrUpdateBuffer<T>(ref ComputeBuffer buffer, int size)
+            where T : struct
         {
             if (buffer == null)
             {

@@ -15,11 +15,11 @@ namespace Unity.Serialization.Json
         {
             None = 1 << 0,
             Indent = 1 << 1,
-            StringEscapeHandling = 1 << 2
+            StringEscapeHandling = 1 << 2,
         }
 
         Overrides m_Overrides;
-        
+
         int m_Indent;
         bool m_StringEscapeHandling;
 
@@ -27,7 +27,7 @@ namespace Unity.Serialization.Json
         /// Gets or sets the value indicating whether the <see cref="JsonWriter"/> should skip formatting the output. This skips indentation, newlines and whitespace.
         /// </summary>
         public bool Minified { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the value indicating whether the <see cref="JsonWriter"/> should use JSON formatting. This skips optional quotes and commas.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Unity.Serialization.Json
                 m_Indent = value;
             }
         }
-        
+
         /// <summary>
         /// Defines how special characters should be escaped when writing strings.
         /// </summary>
@@ -59,7 +59,7 @@ namespace Unity.Serialization.Json
             }
         }
     }
-    
+
     /// <summary>
     /// The <see cref="JsonWriter"/> provides forward only writing of encoded JSON text.
     /// </summary>
@@ -79,7 +79,7 @@ namespace Unity.Serialization.Json
             enum StateType
             {
                 Object,
-                Array
+                Array,
             }
 
             /// <summary>
@@ -90,7 +90,7 @@ namespace Unity.Serialization.Json
                 public StateType Type;
                 public int Count;
             }
-            
+
             /// <summary>
             /// Structure used to keep track of member variables. This is stored in unmanaged memory.
             /// </summary>
@@ -113,17 +113,18 @@ namespace Unity.Serialization.Json
             /// The allocator used when initializing this object. Used when disposing memory.
             /// </summary>
             readonly Allocator m_Label;
-            
+
             /// <summary>
             /// Pointer to member variables. To ensure we share the same data when passed by value.
             /// </summary>
-            [NativeDisableUnsafePtrRestriction] Data* m_Data;
+            [NativeDisableUnsafePtrRestriction]
+            Data* m_Data;
 
             /// <summary>
             /// Buffer used to store characters.
             /// </summary>
             NativeList<char> m_Buffer;
-        
+
             /// <summary>
             /// Stack used to track object and collection scopes. This is only used for validation.
             /// </summary>
@@ -139,13 +140,13 @@ namespace Unity.Serialization.Json
             /// </summary>
             /// <value>The character count.</value>
             public int Length => m_Buffer.Length;
-            
+
             /// <summary>
             /// Gets a pointer to the memory buffer containing the characters.
             /// </summary>
             /// <returns>A pointer to the memory buffer.</returns>
-            public char* GetUnsafeReadOnlyPtr() => (char*) m_Buffer.GetUnsafeReadOnlyPtr();
-            
+            public char* GetUnsafeReadOnlyPtr() => (char*)m_Buffer.GetUnsafeReadOnlyPtr();
+
             /// <summary>
             /// Initializes a new instance of <see cref="Unsafe"/>.
             /// </summary>
@@ -155,9 +156,9 @@ namespace Unity.Serialization.Json
             public Unsafe(int initialCapacity, Allocator label, JsonWriterOptions options = default)
             {
                 m_Label = label;
-                m_Data = (Data*) UnsafeUtility.Malloc(sizeof(Data), UnsafeUtility.AlignOf<Data>(), label);
+                m_Data = (Data*)UnsafeUtility.Malloc(sizeof(Data), UnsafeUtility.AlignOf<Data>(), label);
                 UnsafeUtility.MemClear(m_Data, sizeof(Data));
-            
+
                 m_Buffer = new NativeList<char>(initialCapacity, label);
                 m_Stack = new NativeList<State>(label);
                 m_Options = options;
@@ -172,11 +173,11 @@ namespace Unity.Serialization.Json
                 UnsafeUtility.Free(m_Data, m_Label);
                 m_Data = null;
             }
-            
+
             /// <inheritdoc/>
             public override string ToString()
             {
-                return new string((char*) m_Buffer.GetUnsafeReadOnlyPtr(), 0, m_Buffer.Length);
+                return new string((char*)m_Buffer.GetUnsafeReadOnlyPtr(), 0, m_Buffer.Length);
             }
 
             /// <summary>
@@ -206,7 +207,7 @@ namespace Unity.Serialization.Json
             public void WriteBeginObject()
             {
                 ValidateWriteBeginObject();
-                
+
                 if (m_Stack.Length != 0 && PeekState().Type == StateType.Array)
                     WriteMemberSeparator();
 
@@ -222,19 +223,19 @@ namespace Unity.Serialization.Json
             public void WriteEndObject()
             {
                 ValidateWriteEndObject();
-                
+
                 m_Data->Indent--;
-                
+
                 if (!m_Options.Minified && PeekState().Count > 0)
                     WriteIndent();
-                
+
                 Write(k_EndObjectToken);
                 PopState();
 
                 if (m_Stack.Length == 0)
                     m_Data->End = true;
             }
-            
+
             /// <summary>
             /// Writes a keyed begin array token '"key": [' and starts an array scope.
             /// </summary>
@@ -245,17 +246,17 @@ namespace Unity.Serialization.Json
                 WriteKey(ptr, length);
                 WriteBeginArray();
             }
-            
+
             /// <summary>
             /// Writes the begin array token '[' and starts an array scope.
             /// </summary>
             public void WriteBeginArray()
             {
                 ValidateWriteBeginArray();
-                
+
                 if (m_Stack.Length != 0 && PeekState().Type == StateType.Array)
                     WriteMemberSeparator();
-                
+
                 m_Data->Key = false;
                 Write(k_BeginArrayToken);
                 PushState(StateType.Array);
@@ -268,15 +269,15 @@ namespace Unity.Serialization.Json
             public void WriteEndArray()
             {
                 ValidateWriteEndArray();
-                
+
                 m_Data->Indent--;
-                
+
                 if (!m_Options.Minified && PeekState().Count > 0)
                     WriteIndent();
-                
+
                 Write(k_EndArrayToken);
                 PopState();
-                
+
                 if (m_Stack.Length == 0)
                     m_Data->End = true;
             }
@@ -290,23 +291,23 @@ namespace Unity.Serialization.Json
             {
                 ValidateWriteKey();
                 WriteMemberSeparator();
-                
+
                 var useQuotes = !m_Options.Simplified || ContainsAnySpecialCharacters(ptr, length);
 
-                if (useQuotes) 
+                if (useQuotes)
                     Write(k_QuoteToken);
-            
+
                 Write(ptr, length);
-            
-                if (useQuotes) 
+
+                if (useQuotes)
                     Write(k_QuoteToken);
-            
+
                 if (!m_Options.Minified && m_Options.Simplified)
                     Write(k_SpaceToken);
-            
+
                 Write(m_Options.Simplified ? '=' : ':');
-            
-                if (!m_Options.Minified) 
+
+                if (!m_Options.Minified)
                     Write(k_SpaceToken);
 
                 m_Data->Key = true;
@@ -319,7 +320,7 @@ namespace Unity.Serialization.Json
             public void WriteValue(int value)
             {
                 FixedString128Bytes f = default;
-                
+
                 f.Append(value);
                 WriteValue(f);
             }
@@ -331,7 +332,7 @@ namespace Unity.Serialization.Json
             public void WriteValue(long value)
             {
                 FixedString128Bytes f = default;
-                
+
                 f.Append(value);
                 WriteValue(f);
             }
@@ -353,10 +354,10 @@ namespace Unity.Serialization.Json
                 {
                     FixedString128Bytes f = default;
                     f.Append(value);
-                    WriteValue(f);   
+                    WriteValue(f);
                 }
             }
-            
+
             /// <summary>
             /// Writes the specified boolean value to the buffer with the correct formatting.
             /// </summary>
@@ -365,12 +366,12 @@ namespace Unity.Serialization.Json
             {
                 if (value)
                 {
-                    var chars = stackalloc char[4] {'t', 'r', 'u', 'e'};
+                    var chars = stackalloc char[4] { 't', 'r', 'u', 'e' };
                     WriteValueLiteral(chars, 4);
                 }
                 else
                 {
-                    var chars = stackalloc char[5] {'f', 'a', 'l', 's', 'e'};
+                    var chars = stackalloc char[5] { 'f', 'a', 'l', 's', 'e' };
                     WriteValueLiteral(chars, 5);
                 }
             }
@@ -380,28 +381,28 @@ namespace Unity.Serialization.Json
             /// </summary>
             public void WriteNull()
             {
-                var chars = stackalloc char[4] {'n', 'u', 'l', 'l'};
+                var chars = stackalloc char[4] { 'n', 'u', 'l', 'l' };
                 WriteValueLiteral(chars, 4);
             }
-            
+
             /// <summary>
             /// Writes the literal value 'infinity' to the buffer with the correct formatting.
             /// </summary>
             void WritePositiveInfinity()
             {
-                var chars = stackalloc char[8] {'i', 'n', 'f', 'i', 'n', 'i', 't', 'y'};
+                var chars = stackalloc char[8] { 'i', 'n', 'f', 'i', 'n', 'i', 't', 'y' };
                 WriteValueLiteral(chars, 8);
             }
-            
+
             /// <summary>
             /// Writes the literal value '-infinity' to the buffer with the correct formatting.
             /// </summary>
             void WriteNegativeInfinity()
             {
-                var chars = stackalloc char[9] {'-', 'i', 'n', 'f', 'i', 'n', 'i', 't', 'y'};
+                var chars = stackalloc char[9] { '-', 'i', 'n', 'f', 'i', 'n', 'i', 't', 'y' };
                 WriteValueLiteral(chars, 9);
             }
-            
+
             /// <summary>
             /// Writes the specified char value to the buffer with the correct formatting.
             /// </summary>
@@ -410,7 +411,7 @@ namespace Unity.Serialization.Json
             {
                 WriteValue(&value, 1);
             }
-            
+
             /// <summary>
             /// Writes the specified string value to the buffer as an encoded JSON string.
             /// </summary>
@@ -419,13 +420,13 @@ namespace Unity.Serialization.Json
             public void WriteValue(char* ptr, int length)
             {
                 ValidateWriteValue();
-                    
+
                 // Special case where the entire object is represented as a single value.
                 if (m_Stack.Length != 0)
                 {
                     if (PeekState().Type == StateType.Array)
                         WriteMemberSeparator();
-                
+
                     m_Data->Key = false;
                 }
                 else
@@ -438,15 +439,15 @@ namespace Unity.Serialization.Json
                     WriteNull();
                     return;
                 }
-                
+
                 Write('"');
-                
+
                 if (m_Options.StringEscapeHandling)
                 {
-                    for (var i=0; i<length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         var c = ptr[i];
-                    
+
                         switch (c)
                         {
                             case '\\':
@@ -485,13 +486,13 @@ namespace Unity.Serialization.Json
                 }
                 else
                 {
-                    for (var i=0; i<length; i++)
+                    for (var i = 0; i < length; i++)
                         Write(ptr[i]);
                 }
 
                 Write('"');
             }
-            
+
             /// <summary>
             /// Writes the specified fixed string to the buffer as a literal.
             /// </summary>
@@ -499,8 +500,8 @@ namespace Unity.Serialization.Json
             void WriteValue(FixedString128Bytes value)
             {
                 var value_ptr = UnsafeUtility.AddressOf(ref value);
-                var value_len = *(ushort*) value_ptr;
-                var value_bytes = (byte*) value_ptr + sizeof(ushort);
+                var value_len = *(ushort*)value_ptr;
+                var value_bytes = (byte*)value_ptr + sizeof(ushort);
                 var utf16_buffer = stackalloc char[value_len];
 
                 // This is not actually correct -- We need Utf8ToUCS but that doesn't exist
@@ -519,7 +520,7 @@ namespace Unity.Serialization.Json
             {
                 WriteValueLiteral(&value, 1);
             }
-            
+
             /// <summary>
             /// Writes the specified string to the buffer as a literal.
             /// </summary>
@@ -538,23 +539,23 @@ namespace Unity.Serialization.Json
                 {
                     if (PeekState().Type == StateType.Array)
                         WriteMemberSeparator();
-                
+
                     m_Data->Key = false;
                 }
                 else
                 {
                     m_Data->End = true;
                 }
-                
+
                 if (null == ptr)
                 {
                     WriteNull();
                     return;
                 }
-                
+
                 Write(ptr, length);
             }
-            
+
             /// <summary>
             /// Writes the specified key-value pair with to the buffer with the correct formatting.
             /// </summary>
@@ -566,7 +567,7 @@ namespace Unity.Serialization.Json
                 WriteKey(ptr, length);
                 WriteValue(value);
             }
-            
+
             /// <summary>
             /// Writes the specified key-value pair with to the buffer with the correct formatting.
             /// </summary>
@@ -578,7 +579,7 @@ namespace Unity.Serialization.Json
                 WriteKey(ptr, length);
                 WriteValue(value);
             }
-            
+
             /// <summary>
             /// Writes the specified key-value pair with to the buffer with the correct formatting.
             /// </summary>
@@ -590,7 +591,7 @@ namespace Unity.Serialization.Json
                 WriteKey(ptr, length);
                 WriteValue(value);
             }
-            
+
             /// <summary>
             /// Writes the specified key-value pair with to the buffer with the correct formatting.
             /// </summary>
@@ -602,7 +603,7 @@ namespace Unity.Serialization.Json
                 WriteKey(ptr, length);
                 WriteValue(value);
             }
-            
+
             /// <summary>
             /// Writes the specified key-value pair with to the buffer with the correct formatting.
             /// </summary>
@@ -614,7 +615,7 @@ namespace Unity.Serialization.Json
                 WriteKey(ptr, length);
                 WriteValue(value);
             }
-            
+
             /// <summary>
             /// Writes the specified key-value pair with to the buffer with the correct formatting.
             /// </summary>
@@ -627,7 +628,7 @@ namespace Unity.Serialization.Json
                 WriteKey(keyPtr, keyLength);
                 WriteValue(valuePtr, valueLength);
             }
-            
+
             /// <summary>
             /// Writes the specified key-value pair with to the buffer with the correct formatting.
             /// </summary>
@@ -644,10 +645,10 @@ namespace Unity.Serialization.Json
             void WriteMemberSeparator()
             {
                 var count = PeekState().Count;
-            
+
                 if (!m_Options.Simplified)
                 {
-                    if (count > 0) 
+                    if (count > 0)
                         Write(',');
 
                     if (!m_Options.Minified)
@@ -660,21 +661,21 @@ namespace Unity.Serialization.Json
                     else if (count > 0)
                         Write(' ');
                 }
-                
+
                 IncrementElementCount();
             }
-            
+
             void WriteIndent()
             {
-                if (m_Options.Minified) 
+                if (m_Options.Minified)
                     return;
-            
+
                 Write(k_NewlineToken);
-                
+
                 for (var i = 0; i < m_Options.Indent * m_Data->Indent; i++)
                     Write(k_SpaceToken);
             }
-            
+
             void Write(char* ptr, int length)
             {
                 m_Buffer.AddRange(ptr, length);
@@ -691,7 +692,6 @@ namespace Unity.Serialization.Json
                 if (m_Stack.Length == 0)
                     throw new InvalidOperationException();
 #endif
-                
                 return m_Stack[m_Stack.Length - 1];
             }
 
@@ -707,7 +707,7 @@ namespace Unity.Serialization.Json
 
             void PushState(StateType type)
             {
-                m_Stack.Add(new State { Type = type, Count = 0});
+                m_Stack.Add(new State { Type = type, Count = 0 });
             }
 
             void PopState()
@@ -719,70 +719,82 @@ namespace Unity.Serialization.Json
 
                 m_Stack.RemoveAt(m_Stack.Length - 1);
             }
-            
+
             static bool ContainsAnySpecialCharacters(char* ptr, int length)
             {
                 for (var i = 0; i < length; i++)
                 {
                     var c = ptr[i];
-                    if (c == ' ' ||
-                        c == '\t' ||
-                        c == '\r' ||
-                        c == '\n' ||
-                        c == '\0' ||
-                        c == ',' ||
-                        c == '[' ||
-                        c == ']' ||
-                        c == '{' ||
-                        c == '}' ||
-                        c == ':' ||
-                        c == '=')
+                    if (
+                        c == ' '
+                        || c == '\t'
+                        || c == '\r'
+                        || c == '\n'
+                        || c == '\0'
+                        || c == ','
+                        || c == '['
+                        || c == ']'
+                        || c == '{'
+                        || c == '}'
+                        || c == ':'
+                        || c == '='
+                    )
                         return true;
                 }
 
                 return false;
             }
-            
+
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
             void ValidateWriteBeginObject()
             {
                 if (m_Data->End || !(m_Stack.Length == 0 || m_Data->Key) && PeekState().Type != StateType.Array)
-                    throw new InvalidOperationException($"{nameof(WriteBeginObject)} can only called as a root element, array element or after {nameof(WriteKey)}.");
+                    throw new InvalidOperationException(
+                        $"{nameof(WriteBeginObject)} can only called as a root element, array element or after {nameof(WriteKey)}."
+                    );
             }
-            
+
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
             void ValidateWriteEndObject()
             {
                 if (m_Data->End || m_Stack.Length == 0 || m_Data->Key || PeekState().Type != StateType.Object)
-                    throw new InvalidOperationException($"{nameof(WriteEndObject)} can only called after {nameof(WriteBeginObject)} or {nameof(WriteValue)}.");
+                    throw new InvalidOperationException(
+                        $"{nameof(WriteEndObject)} can only called after {nameof(WriteBeginObject)} or {nameof(WriteValue)}."
+                    );
             }
-            
+
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
             void ValidateWriteBeginArray()
             {
                 if (m_Data->End || !(m_Stack.Length == 0 || m_Data->Key) && PeekState().Type != StateType.Array)
-                    throw new InvalidOperationException($"{nameof(WriteBeginArray)} can only called as a root element, array element, or after {nameof(WriteKey)}.");
+                    throw new InvalidOperationException(
+                        $"{nameof(WriteBeginArray)} can only called as a root element, array element, or after {nameof(WriteKey)}."
+                    );
             }
-            
+
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
             void ValidateWriteEndArray()
             {
                 if (m_Data->End || m_Stack.Length == 0 || m_Data->Key || PeekState().Type != StateType.Array)
-                    throw new InvalidOperationException($"{nameof(WriteEndArray)} can only called after {nameof(WriteBeginArray)} or {nameof(WriteValue)}.");
+                    throw new InvalidOperationException(
+                        $"{nameof(WriteEndArray)} can only called after {nameof(WriteBeginArray)} or {nameof(WriteValue)}."
+                    );
             }
-            
+
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
             void ValidateWriteKey()
             {
                 if (m_Data->End || m_Stack.Length == 0 || m_Data->Key || PeekState().Type != StateType.Object)
                     throw new InvalidOperationException($"{nameof(WriteKey)} can only be called in an object scope.");
             }
-            
+
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
             void ValidateWriteValue()
             {
                 if (m_Data->End || !(m_Stack.Length == 0 || m_Data->Key) && PeekState().Type != StateType.Array)
-                    throw new InvalidOperationException($"{nameof(WriteValue)} can only be called as a root element, array element, or after {nameof(WriteKey)}.");
+                    throw new InvalidOperationException(
+                        $"{nameof(WriteValue)} can only be called as a root element, array element, or after {nameof(WriteKey)}."
+                    );
             }
         }
 
@@ -805,10 +817,9 @@ namespace Unity.Serialization.Json
             }
 
             /// <inheritdoc/>
-            public void Dispose()
-                => Writer.WriteEndObject();
+            public void Dispose() => Writer.WriteEndObject();
         }
-        
+
         /// <summary>
         /// Disposable struct to manage opening and closing array scopes.
         /// </summary>
@@ -828,36 +839,33 @@ namespace Unity.Serialization.Json
             }
 
             /// <inheritdoc/>
-            public void Dispose()
-                => Writer.WriteEndArray();
+            public void Dispose() => Writer.WriteEndArray();
         }
 
         Unsafe m_Impl;
-        
+
         /// <summary>
         /// Initializes a new instance of <see cref="JsonWriter"/>.
         /// </summary>
         /// <param name="label">The allocator label to use.</param>
         /// <param name="options">Options to define custom behaviour.</param>
-        public JsonWriter(Allocator label, JsonWriterOptions options = default)
-            => m_Impl = new Unsafe(32, label, options);
-        
+        public JsonWriter(Allocator label, JsonWriterOptions options = default) =>
+            m_Impl = new Unsafe(32, label, options);
+
         /// <summary>
         /// Initializes a new instance of <see cref="JsonWriter"/>.
         /// </summary>
         /// <param name="initialCapacity">The initial capacity to use for the internal buffer.</param>
         /// <param name="label">The allocator label to use.</param>
         /// <param name="options">Options to define custom behaviour.</param>
-        public JsonWriter(int initialCapacity, Allocator label, JsonWriterOptions options = default)
-            => m_Impl = new Unsafe(initialCapacity, label, options);
+        public JsonWriter(int initialCapacity, Allocator label, JsonWriterOptions options = default) =>
+            m_Impl = new Unsafe(initialCapacity, label, options);
 
         /// <inheritdoc/>
-        public void Dispose()
-            => m_Impl.Dispose();
+        public void Dispose() => m_Impl.Dispose();
 
         /// <inheritdoc/>
-        public override string ToString()
-            => m_Impl.ToString();
+        public override string ToString() => m_Impl.ToString();
 
         /// <summary>
         /// Returns the unsafe writer which can be used in bursted jobs.
@@ -868,25 +876,22 @@ namespace Unity.Serialization.Json
         /// <summary>
         /// Clears the writer for re-use.
         /// </summary>
-        public void Clear()
-            => m_Impl.Clear();
+        public void Clear() => m_Impl.Clear();
 
         /// <summary>
         /// Creates an object scope which writes the beginning '"key": {' and ending '}' tokens.
         /// </summary>
         /// <param name="key">The key to write.</param>
         /// <returns>A disposable object scope.</returns>
-        public ObjectScope WriteObjectScope(string key = null)
-            => new ObjectScope(this, key);
+        public ObjectScope WriteObjectScope(string key = null) => new ObjectScope(this, key);
 
         /// <summary>
         /// Creates a collection scope which writes the beginning '"key": [' and ending ']' tokens.
         /// </summary>
         /// <param name="key">The key to write.</param>
         /// <returns>A disposable collection scope.</returns>
-        public ArrayScope WriteArrayScope(string key = null)
-            => new ArrayScope(this, key);
-        
+        public ArrayScope WriteArrayScope(string key = null) => new ArrayScope(this, key);
+
         /// <summary>
         /// Writes a keyed object token '"key": [' and opens an object scope.
         /// </summary>
@@ -898,7 +903,7 @@ namespace Unity.Serialization.Json
                 m_Impl.WriteBeginObject();
                 return;
             }
-            
+
             unsafe
             {
                 fixed (char* ptr = key)
@@ -907,27 +912,27 @@ namespace Unity.Serialization.Json
                 }
             }
         }
-        
+
         /// <summary>
         /// Writes the end object token '}' and closes the object scope.
         /// </summary>
         public void WriteEndObject()
-        {  
+        {
             m_Impl.WriteEndObject();
         }
-        
+
         /// <summary>
         /// Writes a keyed array token '"key": [' and opens an array scope.
         /// </summary>
         /// <param name="key">The key to write.</param>
         public void WriteBeginArray(string key = null)
-        {  
+        {
             if (string.IsNullOrEmpty(key))
             {
                 m_Impl.WriteBeginArray();
                 return;
             }
-            
+
             unsafe
             {
                 fixed (char* ptr = key)
@@ -936,15 +941,15 @@ namespace Unity.Serialization.Json
                 }
             }
         }
-        
+
         /// <summary>
         /// Writes the end array token ']' and closes the array scope.
         /// </summary>
         public void WriteEndArray()
-        {  
+        {
             m_Impl.WriteEndArray();
         }
-        
+
         /// <summary>
         /// Writes the specified key to the buffer with the correct formatting.
         /// </summary>
@@ -967,29 +972,25 @@ namespace Unity.Serialization.Json
         /// Writes the specified 32-bit signed integer value to the buffer with the correct formatting.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        public void WriteValue(int value)
-            => m_Impl.WriteValue(value);
+        public void WriteValue(int value) => m_Impl.WriteValue(value);
 
         /// <summary>
         /// Writes the specified 64-bit signed integer value to the buffer with the correct formatting.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        public void WriteValue(long value)
-            => m_Impl.WriteValue(value);
+        public void WriteValue(long value) => m_Impl.WriteValue(value);
 
         /// <summary>
         /// Writes the specified 32-bit floating-point value to the buffer with the correct formatting.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        public void WriteValue(float value)
-            => m_Impl.WriteValue(value);
-        
+        public void WriteValue(float value) => m_Impl.WriteValue(value);
+
         /// <summary>
         /// Writes the specified boolean value to the buffer with the correct formatting.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        public void WriteValue(bool value)
-            => m_Impl.WriteValue(value);
+        public void WriteValue(bool value) => m_Impl.WriteValue(value);
 
         /// <summary>
         /// Writes the specified 32-bit unsigned integer value to the buffer with the correct formatting.
@@ -1024,7 +1025,7 @@ namespace Unity.Serialization.Json
                 }
             }
         }
-        
+
         /// <summary>
         /// Writes the specified 64-bit floating-point value to the buffer with the correct formatting.
         /// </summary>
@@ -1032,7 +1033,7 @@ namespace Unity.Serialization.Json
         public void WriteValue(double value)
         {
             var str = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
-            
+
             unsafe
             {
                 fixed (char* ptr = str)
@@ -1041,19 +1042,17 @@ namespace Unity.Serialization.Json
                 }
             }
         }
-        
+
         /// <summary>
         /// Writes the literal value 'null' to the buffer with the correct formatting.
         /// </summary>
-        public void WriteNull()
-            => m_Impl.WriteNull();
+        public void WriteNull() => m_Impl.WriteNull();
 
         /// <summary>
         /// Writes the specified char value to the buffer with the correct formatting.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        public void WriteValue(char value)
-            => m_Impl.WriteValue(value);
+        public void WriteValue(char value) => m_Impl.WriteValue(value);
 
         /// <summary>
         /// Writes the specified string value to the buffer with the correct formatting.
@@ -1066,7 +1065,7 @@ namespace Unity.Serialization.Json
                 WriteNull();
                 return;
             }
-            
+
             unsafe
             {
                 fixed (char* ptr = value)
@@ -1080,8 +1079,7 @@ namespace Unity.Serialization.Json
         /// Writes the specified char value to the buffer with the correct formatting.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        public void WriteValueLiteral(char value)
-            => m_Impl.WriteValueLiteral(value);
+        public void WriteValueLiteral(char value) => m_Impl.WriteValueLiteral(value);
 
         /// <summary>
         /// Writes the specified string value to the buffer with the correct formatting.
@@ -1094,7 +1092,7 @@ namespace Unity.Serialization.Json
                 WriteNull();
                 return;
             }
-            
+
             unsafe
             {
                 fixed (char* ptr = value)
@@ -1114,7 +1112,7 @@ namespace Unity.Serialization.Json
             WriteKey(key);
             WriteValue(value);
         }
-        
+
         /// <summary>
         /// Writes the specified key-value pair with to the buffer with the correct formatting.
         /// </summary>
@@ -1125,7 +1123,7 @@ namespace Unity.Serialization.Json
             WriteKey(key);
             WriteValue(value);
         }
-        
+
         /// <summary>
         /// Writes the specified key-value pair with to the buffer with the correct formatting.
         /// </summary>
@@ -1158,7 +1156,7 @@ namespace Unity.Serialization.Json
             WriteKey(key);
             WriteValue(value);
         }
-        
+
         /// <summary>
         /// Writes the specified key-value pair with to the buffer with the correct formatting.
         /// </summary>
@@ -1169,7 +1167,7 @@ namespace Unity.Serialization.Json
             WriteKey(key);
             WriteValue(value);
         }
-        
+
         /// <summary>
         /// Writes the specified key-value pair with to the buffer with the correct formatting.
         /// </summary>
@@ -1190,8 +1188,8 @@ namespace Unity.Serialization.Json
         {
             WriteKey(key);
             WriteValue(value);
-        }      
-        
+        }
+
         /// <summary>
         /// Writes the specified key-value pair with to the buffer with the correct formatting.
         /// </summary>

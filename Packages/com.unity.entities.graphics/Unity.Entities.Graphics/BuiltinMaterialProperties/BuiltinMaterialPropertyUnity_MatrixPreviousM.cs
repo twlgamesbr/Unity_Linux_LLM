@@ -9,7 +9,5 @@ namespace Unity.Rendering
         public float4x4 Value;
     }
 
-    internal struct SkipBuiltinMaterialPropertyUnity_MatrixPreviousMUpdate : IComponentData
-    {
-    }
+    internal struct SkipBuiltinMaterialPropertyUnity_MatrixPreviousMUpdate : IComponentData { }
 }

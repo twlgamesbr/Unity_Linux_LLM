@@ -26,6 +26,7 @@ namespace Unity.Multiplayer.Tools.Common
                 }
             }
         }
+
         public static void Resize<T>(this List<T> list, int size, Func<T> generator)
         {
             var count = list.Count;

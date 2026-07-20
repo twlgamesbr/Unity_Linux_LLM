@@ -8,9 +8,9 @@ namespace UnityEngine.Rendering.Universal
 {
     /// <summary>
     /// Input requirements for <c>ScriptableRenderPass</c>.
-    /// 
+    ///
     /// URP adds render passes to generate the inputs, or reuses inputs that are already available from earlier in the frame.
-    /// 
+    ///
     /// URP binds the inputs as global shader texture properties.
     /// </summary>
     /// <seealso cref="ConfigureInput"/>
@@ -24,30 +24,30 @@ namespace UnityEngine.Rendering.Universal
 
         /// <summary>
         /// Used when a <c>ScriptableRenderPass</c> requires a depth texture.
-        /// 
+        ///
         /// To sample the depth texture in a shader, include `Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl`, then use the `SampleSceneDepth` method.
         /// </summary>
         Depth = 1 << 0,
 
         /// <summary>
         /// Used when a <c>ScriptableRenderPass</c> requires a normal texture.
-        /// 
+        ///
         /// To sample the normals texture in a shader, include `Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareNormalsTexture.hlsl`, then use the `SampleSceneNormals` method.
         /// </summary>
         Normal = 1 << 1,
 
         /// <summary>
         /// Used when a <c>ScriptableRenderPass</c> requires a color texture.
-        /// 
-        /// To sample the color texture in a shader, include `Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl`, then use the `SampleSceneColor` method. 
-        /// 
+        ///
+        /// To sample the color texture in a shader, include `Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl`, then use the `SampleSceneColor` method.
+        ///
         /// **Note:** The opaque texture might be a downscaled copy of the framebuffer from before rendering transparent objects.
         /// </summary>
         Color = 1 << 2,
 
         /// <summary>
         /// Used when a <c>ScriptableRenderPass</c> requires a motion vectors texture.
-        /// 
+        ///
         /// To sample the motion vectors texture in a shader, use `TEXTURE2D_X(_MotionVectorTexture)`, then `LOAD_TEXTURE2D_X_LOD(_MotionVectorTexture, pixelCoords, 0).xy`.
         /// </summary>
         Motion = 1 << 3,
@@ -165,7 +165,7 @@ namespace UnityEngine.Rendering.Universal
     internal enum FramebufferFetchEvent
     {
         None = 0,
-        FetchGbufferInDeferred = 1
+        FetchGbufferInDeferred = 1,
     }
 
     internal static class RenderPassEventsEnumValues
@@ -219,7 +219,7 @@ namespace UnityEngine.Rendering.Universal
 
         private ProfilingSampler m_ProfingSampler;
         private string m_PassName;
-        
+
         /// <summary>
         /// A ProfilingSampler for the entire render pass. Used as a profiling name by <c>ScriptableRenderer</c> when executing the pass.
         /// The default is named as the class type of the sub-class.
@@ -240,19 +240,22 @@ namespace UnityEngine.Rendering.Universal
             set
             {
                 m_ProfingSampler = value;
-                m_PassName = (value != null) ? value.name : this.GetType().Name;                
+                m_PassName = (value != null) ? value.name : this.GetType().Name;
             }
         }
 
         /// <summary>
-        /// The name of the pass that will show up in profiler and other tools. This will be indentical to the 
+        /// The name of the pass that will show up in profiler and other tools. This will be indentical to the
         /// name of <c>profilingSampler</c>. <c>profilingSampler</c> is set to null in the release build (non-development)
         /// so this <c>passName</c> property is the safe way to access the name and use it consistently. This will always return a valid string.
         /// </summary>
-        protected internal string passName{ get { return m_PassName; } }
+        protected internal string passName
+        {
+            get { return m_PassName; }
+        }
 
         internal bool isBlitRenderPass { get; set; }
-        
+
         // index to track the position in the current frame
         internal int renderPassQueueIndex { get; set; }
 
@@ -263,7 +266,7 @@ namespace UnityEngine.Rendering.Universal
 
         ScriptableRenderPassInput m_Input = ScriptableRenderPassInput.None;
 
-        static internal DebugHandler GetActiveDebugHandler(UniversalCameraData cameraData)
+        internal static DebugHandler GetActiveDebugHandler(UniversalCameraData cameraData)
         {
             var debugHandler = cameraData.renderer.DebugHandler;
             if ((debugHandler != null) && debugHandler.IsActiveForCamera(cameraData.isPreviewCamera))
@@ -274,7 +277,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Creates a new <c>ScriptableRenderPass"</c> instance.
         /// </summary>
-        public ScriptableRenderPass()            
+        public ScriptableRenderPass()
         {
             renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
             profilingSampler = new ProfilingSampler(this.GetType().Name);
@@ -298,16 +301,18 @@ namespace UnityEngine.Rendering.Universal
         /// This method should be called for all cameras in a camera stack.
         /// </summary>
         /// <param name="cmd">Use this CommandBuffer to cleanup any generated data</param>
-        public virtual void OnCameraCleanup(CommandBuffer cmd)
-        {
-        }
+        public virtual void OnCameraCleanup(CommandBuffer cmd) { }
 
         /// <inheritdoc cref="IRenderGraphRecorder.RecordRenderGraph"/>
         public virtual void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            Debug.LogWarning("The render pass " + this.ToString() + " does not have an implementation of the RecordRenderGraph method. Please implement this method, or consider turning on Compatibility Mode (RenderGraph disabled) in the menu Edit > Project Settings > Graphics > URP. Otherwise the render pass will have no effect. For more information, refer to https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest/index.html?subfolder=/manual/customizing-urp.html.");
+            Debug.LogWarning(
+                "The render pass "
+                    + this.ToString()
+                    + " does not have an implementation of the RecordRenderGraph method. Please implement this method, or consider turning on Compatibility Mode (RenderGraph disabled) in the menu Edit > Project Settings > Graphics > URP. Otherwise the render pass will have no effect. For more information, refer to https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest/index.html?subfolder=/manual/customizing-urp.html."
+            );
         }
-        
+
         /// <summary>
         /// Creates <c>DrawingSettings</c> based on current the rendering state.
         /// </summary>
@@ -316,14 +321,24 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns>Returns the draw settings created.</returns>
         /// <seealso cref="DrawingSettings"/>
-        public DrawingSettings CreateDrawingSettings(ShaderTagId shaderTagId, ref RenderingData renderingData, SortingCriteria sortingCriteria)
+        public DrawingSettings CreateDrawingSettings(
+            ShaderTagId shaderTagId,
+            ref RenderingData renderingData,
+            SortingCriteria sortingCriteria
+        )
         {
             ContextContainer frameData = renderingData.frameData;
             UniversalRenderingData universalRenderingData = frameData.Get<UniversalRenderingData>();
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalLightData lightData = frameData.Get<UniversalLightData>();
 
-            return RenderingUtils.CreateDrawingSettings(shaderTagId, universalRenderingData, cameraData, lightData, sortingCriteria);
+            return RenderingUtils.CreateDrawingSettings(
+                shaderTagId,
+                universalRenderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
         }
 
         /// <summary>
@@ -336,10 +351,21 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns>Returns the draw settings created.</returns>
         /// <seealso cref="DrawingSettings"/>
-        public DrawingSettings CreateDrawingSettings(ShaderTagId shaderTagId, UniversalRenderingData renderingData,
-            UniversalCameraData cameraData, UniversalLightData lightData, SortingCriteria sortingCriteria)
+        public DrawingSettings CreateDrawingSettings(
+            ShaderTagId shaderTagId,
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData,
+            SortingCriteria sortingCriteria
+        )
         {
-            return RenderingUtils.CreateDrawingSettings(shaderTagId, renderingData, cameraData, lightData, sortingCriteria);
+            return RenderingUtils.CreateDrawingSettings(
+                shaderTagId,
+                renderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
         }
 
         /// <summary>
@@ -350,15 +376,24 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns>Returns the draw settings created.</returns>
         /// <seealso cref="DrawingSettings"/>
-        public DrawingSettings CreateDrawingSettings(List<ShaderTagId> shaderTagIdList,
-            ref RenderingData renderingData, SortingCriteria sortingCriteria)
+        public DrawingSettings CreateDrawingSettings(
+            List<ShaderTagId> shaderTagIdList,
+            ref RenderingData renderingData,
+            SortingCriteria sortingCriteria
+        )
         {
             ContextContainer frameData = renderingData.frameData;
             UniversalRenderingData universalRenderingData = frameData.Get<UniversalRenderingData>();
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalLightData lightData = frameData.Get<UniversalLightData>();
 
-            return RenderingUtils.CreateDrawingSettings(shaderTagIdList, universalRenderingData, cameraData, lightData, sortingCriteria);
+            return RenderingUtils.CreateDrawingSettings(
+                shaderTagIdList,
+                universalRenderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
         }
 
         /// <summary>
@@ -371,11 +406,21 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="sortingCriteria">Criteria to sort objects being rendered.</param>
         /// <returns>Returns the draw settings created.</returns>
         /// <seealso cref="DrawingSettings"/>
-        public DrawingSettings CreateDrawingSettings(List<ShaderTagId> shaderTagIdList,
-            UniversalRenderingData renderingData, UniversalCameraData cameraData,
-            UniversalLightData lightData, SortingCriteria sortingCriteria)
+        public DrawingSettings CreateDrawingSettings(
+            List<ShaderTagId> shaderTagIdList,
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData,
+            SortingCriteria sortingCriteria
+        )
         {
-            return RenderingUtils.CreateDrawingSettings(shaderTagIdList, renderingData, cameraData, lightData, sortingCriteria);
+            return RenderingUtils.CreateDrawingSettings(
+                shaderTagIdList,
+                renderingData,
+                cameraData,
+                lightData,
+                sortingCriteria
+            );
         }
 
         /// <summary>
@@ -406,7 +451,7 @@ namespace UnityEngine.Rendering.Universal
             int currentIndex = 0;
 
             // find the index of the renderPassEvent in the values array
-            for(int i = 0; i < numEvents; ++i)
+            for (int i = 0; i < numEvents; ++i)
             {
                 if (RenderPassEventsEnumValues.values[currentIndex] == (int)renderPassEvent)
                     break;
@@ -416,7 +461,9 @@ namespace UnityEngine.Rendering.Universal
 
             if (currentIndex >= numEvents)
             {
-                Debug.LogError("GetRenderPassEventRange: invalid renderPassEvent value cannot be found in the RenderPassEvent enumeration");
+                Debug.LogError(
+                    "GetRenderPassEventRange: invalid renderPassEvent value cannot be found in the RenderPassEvent enumeration"
+                );
                 return 0;
             }
 
@@ -425,7 +472,7 @@ namespace UnityEngine.Rendering.Universal
 
             int nextValue = RenderPassEventsEnumValues.values[currentIndex + 1];
 
-            return nextValue - (int) renderPassEvent;
+            return nextValue - (int)renderPassEvent;
         }
     }
 }

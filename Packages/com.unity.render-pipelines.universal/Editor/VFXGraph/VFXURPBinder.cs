@@ -25,17 +25,32 @@ namespace UnityEditor.VFX.URP
             BaseShaderGUI.MotionVectorPassEnabledChanged -= OnMotionVectorPassEnabledChanged;
         }
 
-        public override string templatePath { get { return "Packages/com.unity.render-pipelines.universal/Editor/VFXGraph/Shaders"; } }
-        public override string runtimePath { get { return "Packages/com.unity.render-pipelines.universal/Runtime/VFXGraph/Shaders"; } }
-        public override string SRPAssetTypeStr { get { return "UniversalRenderPipelineAsset"; } }
-        public override Type SRPOutputDataType { get { return typeof(VFXURPSubOutput); } }
+        public override string templatePath
+        {
+            get { return "Packages/com.unity.render-pipelines.universal/Editor/VFXGraph/Shaders"; }
+        }
+        public override string runtimePath
+        {
+            get { return "Packages/com.unity.render-pipelines.universal/Runtime/VFXGraph/Shaders"; }
+        }
+        public override string SRPAssetTypeStr
+        {
+            get { return "UniversalRenderPipelineAsset"; }
+        }
+        public override Type SRPOutputDataType
+        {
+            get { return typeof(VFXURPSubOutput); }
+        }
 
         public override bool IsShaderVFXCompatible(Shader shader)
         {
             return shader.TryGetMetadataOfType<UniversalMetadata>(out var metadata) && metadata.isVFXCompatible;
         }
 
-        public override bool GetSupportsMotionVectorPerVertex(ShaderGraphVfxAsset shaderGraph, VFXMaterialSerializedSettings materialSettings)
+        public override bool GetSupportsMotionVectorPerVertex(
+            ShaderGraphVfxAsset shaderGraph,
+            VFXMaterialSerializedSettings materialSettings
+        )
         {
             var path = AssetDatabase.GetAssetPath(shaderGraph);
             var shader = AssetDatabase.LoadAssetAtPath<Shader>(path);
@@ -47,7 +62,12 @@ namespace UnityEditor.VFX.URP
             return true;
         }
 
-        public override void SetupMaterial(Material material, bool hasMotionVector = false, bool hasShadowCasting = false, ShaderGraphVfxAsset shaderGraph = null)
+        public override void SetupMaterial(
+            Material material,
+            bool hasMotionVector = false,
+            bool hasShadowCasting = false,
+            ShaderGraphVfxAsset shaderGraph = null
+        )
         {
             if (!hasMotionVector)
                 material.shaderKeywords = material.shaderKeywords.Append(disableMotionVectorKeyword).ToArray();
@@ -72,20 +92,34 @@ namespace UnityEditor.VFX.URP
             return base.AllowMaterialOverride(shaderGraph);
         }
 
-        public override bool TryGetQueueOffset(ShaderGraphVfxAsset shaderGraph, VFXMaterialSerializedSettings materialSettings, out int queueOffset)
+        public override bool TryGetQueueOffset(
+            ShaderGraphVfxAsset shaderGraph,
+            VFXMaterialSerializedSettings materialSettings,
+            out int queueOffset
+        )
         {
             //N.B.: Queue offset is always overridable in URP
             queueOffset = 0;
 
             var path = AssetDatabase.GetAssetPath(shaderGraph);
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (!materialSettings.TryGetFloat(Rendering.Universal.Property.QueueOffset, material, out float queueOffsetFloat))
+            if (
+                !materialSettings.TryGetFloat(
+                    Rendering.Universal.Property.QueueOffset,
+                    material,
+                    out float queueOffsetFloat
+                )
+            )
                 return false;
             queueOffset = (int)queueOffsetFloat;
             return true;
         }
 
-        public override bool TryGetCastShadowFromMaterial(ShaderGraphVfxAsset shaderGraph, VFXMaterialSerializedSettings materialSettings, out bool castShadow)
+        public override bool TryGetCastShadowFromMaterial(
+            ShaderGraphVfxAsset shaderGraph,
+            VFXMaterialSerializedSettings materialSettings,
+            out bool castShadow
+        )
         {
             castShadow = false;
 
@@ -108,7 +142,10 @@ namespace UnityEditor.VFX.URP
             return false;
         }
 
-        public override VFXAbstractRenderedOutput.BlendMode GetBlendModeFromMaterial(ShaderGraphVfxAsset shaderGraph, VFXMaterialSerializedSettings materialSettings)
+        public override VFXAbstractRenderedOutput.BlendMode GetBlendModeFromMaterial(
+            ShaderGraphVfxAsset shaderGraph,
+            VFXMaterialSerializedSettings materialSettings
+        )
         {
             //N.B: About BlendMode multiply, it isn't officially supported by the VFX
             //but when using generatesWithShaderGraph, the shaderGraph generates the appropriate blendState.
@@ -121,10 +158,18 @@ namespace UnityEditor.VFX.URP
                 {
                     switch (metaData.alphaMode)
                     {
-                        case AlphaMode.Alpha: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Alpha; break;
-                        case AlphaMode.Premultiply: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.AlphaPremultiplied; break;
-                        case AlphaMode.Additive: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive; break;
-                        case AlphaMode.Multiply: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive; break;
+                        case AlphaMode.Alpha:
+                            vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Alpha;
+                            break;
+                        case AlphaMode.Premultiply:
+                            vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.AlphaPremultiplied;
+                            break;
+                        case AlphaMode.Additive:
+                            vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive;
+                            break;
+                        case AlphaMode.Multiply:
+                            vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive;
+                            break;
                     }
                 }
             }
@@ -134,15 +179,26 @@ namespace UnityEditor.VFX.URP
                 if (materialSettings.TryGetFloat(Property.SurfaceType, material, out var surfaceTypeFloat))
                 {
                     var surfaceType = (BaseShaderGUI.SurfaceType)surfaceTypeFloat;
-                    if (surfaceType == BaseShaderGUI.SurfaceType.Transparent && materialSettings.TryGetFloat(Property.BlendMode, material, out var blendModeTypeFloat))
+                    if (
+                        surfaceType == BaseShaderGUI.SurfaceType.Transparent
+                        && materialSettings.TryGetFloat(Property.BlendMode, material, out var blendModeTypeFloat)
+                    )
                     {
                         var blendMode = (BaseShaderGUI.BlendMode)blendModeTypeFloat;
                         switch (blendMode)
                         {
-                            case BaseShaderGUI.BlendMode.Alpha: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Alpha; break;
-                            case BaseShaderGUI.BlendMode.Premultiply: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.AlphaPremultiplied; break;
-                            case BaseShaderGUI.BlendMode.Additive: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive; break;
-                            case BaseShaderGUI.BlendMode.Multiply: vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive; break;
+                            case BaseShaderGUI.BlendMode.Alpha:
+                                vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Alpha;
+                                break;
+                            case BaseShaderGUI.BlendMode.Premultiply:
+                                vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.AlphaPremultiplied;
+                                break;
+                            case BaseShaderGUI.BlendMode.Additive:
+                                vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive;
+                                break;
+                            case BaseShaderGUI.BlendMode.Multiply:
+                                vfxBlendMode = VFXAbstractRenderedOutput.BlendMode.Additive;
+                                break;
                         }
                     }
                 }
@@ -158,18 +214,25 @@ namespace UnityEditor.VFX.URP
             {
                 switch (metaData.shaderID)
                 {
-                    case ShaderUtils.ShaderID.SG_Unlit: return "Unlit";
-                    case ShaderUtils.ShaderID.SG_SpriteUnlit: return "Sprite Unlit";
-                    case ShaderUtils.ShaderID.SG_Lit: return "Lit";
-                    case ShaderUtils.ShaderID.SG_SpriteLit: return "Sprite Lit";
-                    case ShaderUtils.ShaderID.SG_SpriteCustomLit: return "Sprite Custom Lit";
-                    case ShaderUtils.ShaderID.SG_SixWaySmokeLit: return "Six-way Lit";
+                    case ShaderUtils.ShaderID.SG_Unlit:
+                        return "Unlit";
+                    case ShaderUtils.ShaderID.SG_SpriteUnlit:
+                        return "Sprite Unlit";
+                    case ShaderUtils.ShaderID.SG_Lit:
+                        return "Lit";
+                    case ShaderUtils.ShaderID.SG_SpriteLit:
+                        return "Sprite Lit";
+                    case ShaderUtils.ShaderID.SG_SpriteCustomLit:
+                        return "Sprite Custom Lit";
+                    case ShaderUtils.ShaderID.SG_SixWaySmokeLit:
+                        return "Six-way Lit";
                 }
             }
             return string.Empty;
         }
 
         private const string disableShadowCasterKeyword = "__VFX_DISABLE_SHADOW_CASTER";
+
         public static bool DoesVFXControlShadowCaster(Material material, out bool vfxShadowCasterEnabled)
         {
             vfxShadowCasterEnabled = false;
@@ -189,6 +252,7 @@ namespace UnityEditor.VFX.URP
         }
 
         private const string disableMotionVectorKeyword = "__VFX_DISABLE_MOTION_VECTOR";
+
         public static bool DoesVFXControlMotionVector(Material material, out bool vfxMotionVectorEnabled)
         {
             vfxMotionVectorEnabled = false;
@@ -210,24 +274,53 @@ namespace UnityEditor.VFX.URP
         static readonly DependencyCollection ElementSpaceDependencies = new DependencyCollection
         {
             // Interpolator dependency.
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.worldToElement, StructFields.Varyings.worldToElement0),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.worldToElement, StructFields.Varyings.worldToElement1),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.worldToElement, StructFields.Varyings.worldToElement2),
-
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.elementToWorld, StructFields.Varyings.elementToWorld0),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.elementToWorld, StructFields.Varyings.elementToWorld1),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.elementToWorld, StructFields.Varyings.elementToWorld2),
-
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.worldToElement,
+                StructFields.Varyings.worldToElement0
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.worldToElement,
+                StructFields.Varyings.worldToElement1
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.worldToElement,
+                StructFields.Varyings.worldToElement2
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.elementToWorld,
+                StructFields.Varyings.elementToWorld0
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.elementToWorld,
+                StructFields.Varyings.elementToWorld1
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.elementToWorld,
+                StructFields.Varyings.elementToWorld2
+            ),
             // Note: Normal is dependent on elementToWorld for inverse transpose multiplication.
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.ObjectSpaceNormal,             StructFields.SurfaceDescriptionInputs.elementToWorld),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.ObjectSpaceTangent,            StructFields.SurfaceDescriptionInputs.worldToElement),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.ObjectSpaceBiTangent,          StructFields.SurfaceDescriptionInputs.worldToElement),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.ObjectSpacePosition,           StructFields.SurfaceDescriptionInputs.worldToElement),
-            new FieldDependency(StructFields.SurfaceDescriptionInputs.ObjectSpaceViewDirection,      StructFields.SurfaceDescriptionInputs.worldToElement),
-
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.ObjectSpaceNormal,
+                StructFields.SurfaceDescriptionInputs.elementToWorld
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.ObjectSpaceTangent,
+                StructFields.SurfaceDescriptionInputs.worldToElement
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.ObjectSpaceBiTangent,
+                StructFields.SurfaceDescriptionInputs.worldToElement
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.ObjectSpacePosition,
+                StructFields.SurfaceDescriptionInputs.worldToElement
+            ),
+            new FieldDependency(
+                StructFields.SurfaceDescriptionInputs.ObjectSpaceViewDirection,
+                StructFields.SurfaceDescriptionInputs.worldToElement
+            ),
             new FieldDependency(Fields.WorldToObject, StructFields.SurfaceDescriptionInputs.worldToElement),
             new FieldDependency(Fields.ObjectToWorld, StructFields.SurfaceDescriptionInputs.elementToWorld),
-
             // NormalDropOffOS requires worldToElement (see _NORMAL_DROPOFF_OS condition calling TransformObjectToWorldNormal which uses world inverse transpose)
             new FieldDependency(UniversalFields.NormalDropOffOS, StructFields.SurfaceDescriptionInputs.worldToElement),
         };
@@ -250,19 +343,29 @@ namespace UnityEditor.VFX.URP
                 StructFields.Attributes.uv6,
                 StructFields.Attributes.uv7,
                 StructFields.Attributes.color,
-
                 // InstanceID without the Preprocessor.
-                new FieldDescriptor(StructFields.Attributes.name, "instanceID", "", ShaderValueType.Uint, "INSTANCEID_SEMANTIC"),
-
+                new FieldDescriptor(
+                    StructFields.Attributes.name,
+                    "instanceID",
+                    "",
+                    ShaderValueType.Uint,
+                    "INSTANCEID_SEMANTIC"
+                ),
                 StructFields.Attributes.weights,
                 StructFields.Attributes.indices,
-
                 // VertexID without the Preprocessor.
-                new FieldDescriptor(StructFields.Attributes.name, "vertexID", "ATTRIBUTES_NEED_VERTEXID", ShaderValueType.Uint, "VERTEXID_SEMANTIC")
-            }
+                new FieldDescriptor(
+                    StructFields.Attributes.name,
+                    "vertexID",
+                    "ATTRIBUTES_NEED_VERTEXID",
+                    ShaderValueType.Uint,
+                    "VERTEXID_SEMANTIC"
+                ),
+            },
         };
 
-        static readonly FieldDescriptor[] VaryingsAdditionalFields = {
+        static readonly FieldDescriptor[] VaryingsAdditionalFields =
+        {
             StructFields.Varyings.worldToElement0,
             StructFields.Varyings.worldToElement1,
             StructFields.Varyings.worldToElement2,
@@ -271,7 +374,10 @@ namespace UnityEditor.VFX.URP
             StructFields.Varyings.elementToWorld2,
         };
 
-        static IEnumerable<FieldDescriptor> GenerateSurfaceDescriptionInput(VFXContext context, VFXTaskCompiledData contextData)
+        static IEnumerable<FieldDescriptor> GenerateSurfaceDescriptionInput(
+            VFXContext context,
+            VFXTaskCompiledData contextData
+        )
         {
             var alreadyAddedField = new HashSet<string>();
 
@@ -282,20 +388,30 @@ namespace UnityEditor.VFX.URP
                 yield return field;
             }
 
-			// VFX Material Properties
-			if (contextData.SGInputs != null)
+            // VFX Material Properties
+            if (contextData.SGInputs != null)
             {
                 foreach (var input in contextData.SGInputs.fragInputs)
                 {
-                    var (name, exp) = (input.Key,input.Value);
+                    var (name, exp) = (input.Key, input.Value);
 
-                    if (!VFXSubTarget.kVFXShaderValueTypeMap.TryGetValue(VFXExpression.TypeToType(exp.valueType), out var shaderValueType))
+                    if (
+                        !VFXSubTarget.kVFXShaderValueTypeMap.TryGetValue(
+                            VFXExpression.TypeToType(exp.valueType),
+                            out var shaderValueType
+                        )
+                    )
                         throw new Exception($"Unsupported property type for {name}: {exp.valueType}");
 
-					if (alreadyAddedField.Contains(name))
-						throw new Exception($"Name conflict detected in SurfaceDescriptionInputs: {name}");
+                    if (alreadyAddedField.Contains(name))
+                        throw new Exception($"Name conflict detected in SurfaceDescriptionInputs: {name}");
 
-                    yield return new FieldDescriptor(StructFields.SurfaceDescriptionInputs.name, name, "", shaderValueType);
+                    yield return new FieldDescriptor(
+                        StructFields.SurfaceDescriptionInputs.name,
+                        name,
+                        "",
+                        shaderValueType
+                    );
                 }
             }
         }
@@ -306,11 +422,12 @@ namespace UnityEditor.VFX.URP
             {
                 name = StructFields.SurfaceDescriptionInputs.name,
                 populateWithCustomInterpolators = true,
-                fields = GenerateSurfaceDescriptionInput(context, data).ToArray()
+                fields = GenerateSurfaceDescriptionInput(context, data).ToArray(),
             };
 
             var output = context as VFXAbstractRenderedOutput;
-            List<(KeywordDescriptor oldDesc, int value)> keywordsToDefines = new List<(KeywordDescriptor oldDesc, int value)>();
+            List<(KeywordDescriptor oldDesc, int value)> keywordsToDefines =
+                new List<(KeywordDescriptor oldDesc, int value)>();
             if (output != null)
             {
                 keywordsToDefines.Add((CoreKeywordDescriptors.StaticLightmap, 0));
@@ -327,23 +444,22 @@ namespace UnityEditor.VFX.URP
                 {
                     AttributesMeshVFX, // TODO: Could probably re-use the original HD Attributes Mesh and just ensure Instancing enabled.
                     Structs.VertexDescriptionInputs,
-                    surfaceDescriptionInputWithVFX
+                    surfaceDescriptionInputWithVFX,
                 },
                 varyingsAdditionalFields = VaryingsAdditionalFields,
 
                 fieldDependencies = ElementSpaceDependencies,
-                pragmasReplacement = new []
+                pragmasReplacement = new[]
                 {
-                    ( Pragma.Vertex("vert"), Pragma.Vertex("VertVFX") ),
-
+                    (Pragma.Vertex("vert"), Pragma.Vertex("VertVFX")),
                     //Minimal target of VFX is always Target45 (2.0 is used with GLCore)
-                    ( Pragma.Target(ShaderModel.Target20), Pragma.Target(ShaderModel.Target45) ),
-                    ( Pragma.Target(ShaderModel.Target30), Pragma.Target(ShaderModel.Target45) ),
-                    ( Pragma.Target(ShaderModel.Target35), Pragma.Target(ShaderModel.Target45) ),
-                    ( Pragma.Target(ShaderModel.Target40), Pragma.Target(ShaderModel.Target45) ),
+                    (Pragma.Target(ShaderModel.Target20), Pragma.Target(ShaderModel.Target45)),
+                    (Pragma.Target(ShaderModel.Target30), Pragma.Target(ShaderModel.Target45)),
+                    (Pragma.Target(ShaderModel.Target35), Pragma.Target(ShaderModel.Target45)),
+                    (Pragma.Target(ShaderModel.Target40), Pragma.Target(ShaderModel.Target45)),
                 },
                 useFragInputs = false,
-                keywordsToDefines = keywordsToDefines.ToArray()
+                keywordsToDefines = keywordsToDefines.ToArray(),
             };
         }
 
@@ -351,7 +467,7 @@ namespace UnityEditor.VFX.URP
         {
             List<PassCollection.Item> filteredPasses = new List<PassCollection.Item>(passes.Count());
             var outputContext = context as VFXAbstractParticleOutput;
-            bool hasMotionVector =  outputContext.hasMotionVector;
+            bool hasMotionVector = outputContext.hasMotionVector;
             bool hasShadowCasting = outputContext.hasShadowCasting;
             bool isOpaque = outputContext.isBlendModeOpaque;
 
@@ -362,8 +478,10 @@ namespace UnityEditor.VFX.URP
                 skipPass |= item.descriptor.lightMode == "XRMotionVectors";
                 skipPass |= (!hasMotionVector && item.descriptor.lightMode == "MotionVectors");
                 skipPass |= (!hasShadowCasting && item.descriptor.lightMode == "ShadowCaster");
-                skipPass |= (!isOpaque && item.descriptor.lightMode is "UniversalGBuffer" or "DepthOnly" or "DepthNormals");
-                if(!skipPass)
+                skipPass |= (
+                    !isOpaque && item.descriptor.lightMode is "UniversalGBuffer" or "DepthOnly" or "DepthNormals"
+                );
+                if (!skipPass)
                     filteredPasses.Add(item);
             }
             return filteredPasses;
@@ -372,7 +490,10 @@ namespace UnityEditor.VFX.URP
 
     class VFXLWRPBinder : VFXURPBinder
     {
-        public override string SRPAssetTypeStr { get { return "LightweightRenderPipelineAsset"; } }
+        public override string SRPAssetTypeStr
+        {
+            get { return "LightweightRenderPipelineAsset"; }
+        }
     }
 }
 #endif

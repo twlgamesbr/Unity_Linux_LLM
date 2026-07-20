@@ -17,7 +17,8 @@ namespace Unity.Entities.Editor
         public readonly NativeList<UnloadedScene> UnloadedScenes;
         public readonly NativeList<GameObjectChangeTrackerEvent> GameObjectChangeTrackerEvents;
 
-        public bool HasChanges() => LoadedScenes.Length > 0 || UnloadedScenes.Length > 0 || GameObjectChangeTrackerEvents.Length > 0;
+        public bool HasChanges() =>
+            LoadedScenes.Length > 0 || UnloadedScenes.Length > 0 || GameObjectChangeTrackerEvents.Length > 0;
 
         public HierarchyGameObjectChanges(Allocator allocator)
         {
@@ -58,17 +59,13 @@ namespace Unity.Entities.Editor
             handle = scene.handle;
         }
 
-        public override int GetHashCode()
-            => handle.GetHashCode();
+        public override int GetHashCode() => handle.GetHashCode();
 
-        public bool Equals(UnloadedScene other)
-            => handle == other.handle;
+        public bool Equals(UnloadedScene other) => handle == other.handle;
 
-        public override bool Equals(object obj)
-            => obj is UnloadedScene other && Equals(other);
+        public override bool Equals(object obj) => obj is UnloadedScene other && Equals(other);
 
-        public static implicit operator UnloadedScene(Scene scene)
-            => new UnloadedScene(scene, false);
+        public static implicit operator UnloadedScene(Scene scene) => new UnloadedScene(scene, false);
     }
 
     class HierarchyGameObjectChangeTracker : IDisposable
@@ -78,7 +75,7 @@ namespace Unity.Entities.Editor
         readonly HashSet<Scene> m_LoadedScenes = new HashSet<Scene>();
         readonly HashSet<UnloadedScene> m_UnloadedScenes = new HashSet<UnloadedScene>();
         readonly NativeList<GameObjectChangeTrackerEvent> m_ChangeEventsQueue;
-        readonly NativeParallelHashMap<EntityId,int> m_ChangeEventsIndex;
+        readonly NativeParallelHashMap<EntityId, int> m_ChangeEventsIndex;
         NativeArray<GameObjectChangeTrackerEvent> m_SingleGameObjectChangeTrackerEvents;
 
         public HierarchyGameObjectChangeTracker(Allocator allocator)
@@ -86,7 +83,10 @@ namespace Unity.Entities.Editor
             m_ChangeEventsQueue = new NativeList<GameObjectChangeTrackerEvent>(2048, allocator);
             m_ChangeEventsIndex = new NativeParallelHashMap<EntityId, int>(2048, allocator);
 
-            m_SingleGameObjectChangeTrackerEvents = new NativeArray<GameObjectChangeTrackerEvent>(1, Allocator.Persistent);
+            m_SingleGameObjectChangeTrackerEvents = new NativeArray<GameObjectChangeTrackerEvent>(
+                1,
+                Allocator.Persistent
+            );
 
             GameObjectChangeTrackerBridge.GameObjectsChanged += OnGameObjectsChanged;
             EditorSceneManager.sceneOpened += OnSceneOpened;
@@ -127,8 +127,13 @@ namespace Unity.Entities.Editor
             }
         }
 
-        void OnGameObjectsChanged(in NativeArray<GameObjectChangeTrackerEvent> events)
-            => new MergeEventsJob { EventsIndex = m_ChangeEventsIndex, Events = m_ChangeEventsQueue, EventsToAdd = events }.Run();
+        void OnGameObjectsChanged(in NativeArray<GameObjectChangeTrackerEvent> events) =>
+            new MergeEventsJob
+            {
+                EventsIndex = m_ChangeEventsIndex,
+                Events = m_ChangeEventsQueue,
+                EventsToAdd = events,
+            }.Run();
 
         public void Dispose()
         {
@@ -159,7 +164,10 @@ namespace Unity.Entities.Editor
             // We detect subScene renames via SceneAssetPostProcessor.
             if (scene.isSubScene)
                 return;
-            m_SingleGameObjectChangeTrackerEvents[0] = new GameObjectChangeTrackerEvent(EntityId.FromULong(scene.handle.GetRawData()), GameObjectChangeTrackerEventType.SceneWasRenamed);
+            m_SingleGameObjectChangeTrackerEvents[0] = new GameObjectChangeTrackerEvent(
+                EntityId.FromULong(scene.handle.GetRawData()),
+                GameObjectChangeTrackerEventType.SceneWasRenamed
+            );
             GameObjectChangeTrackerBridge.PublishEvents(m_SingleGameObjectChangeTrackerEvents);
         }
 
@@ -219,9 +227,10 @@ namespace Unity.Entities.Editor
         internal struct MergeEventsJob : IJob
         {
             public NativeList<GameObjectChangeTrackerEvent> Events;
-            public NativeParallelHashMap<EntityId,int> EventsIndex;
+            public NativeParallelHashMap<EntityId, int> EventsIndex;
 
-            [ReadOnly] public NativeArray<GameObjectChangeTrackerEvent> EventsToAdd;
+            [ReadOnly]
+            public NativeArray<GameObjectChangeTrackerEvent> EventsToAdd;
 
             public unsafe void Execute()
             {
@@ -240,7 +249,10 @@ namespace Unity.Entities.Editor
                         ref var existingEvent = ref Events.ElementAt(existingIndex);
                         if ((existingEvent.EventType & evtToAdd.EventType) != evtToAdd.EventType)
                         {
-                            Events[existingIndex] = new GameObjectChangeTrackerEvent(existingEvent.EntityId, existingEvent.EventType | evtToAdd.EventType);
+                            Events[existingIndex] = new GameObjectChangeTrackerEvent(
+                                existingEvent.EntityId,
+                                existingEvent.EventType | evtToAdd.EventType
+                            );
                         }
                     }
                 }

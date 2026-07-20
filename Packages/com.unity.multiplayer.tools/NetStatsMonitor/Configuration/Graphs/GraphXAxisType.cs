@@ -9,6 +9,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// Graph x-axis labels will display the duration of the graph in samples.
         /// </summary>
         Samples,
+
         /// <summary>
         /// Graph x-axis labels will display the duration of the graph in seconds.
         /// </summary>

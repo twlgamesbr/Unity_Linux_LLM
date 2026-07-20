@@ -1,6 +1,6 @@
 using System;
-using UnityEngine.UIElements;
 using System.Linq;
+using UnityEngine.UIElements;
 
 namespace Unity.PlatformToolkit.PlayMode
 {

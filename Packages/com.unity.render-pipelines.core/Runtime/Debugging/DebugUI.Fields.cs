@@ -8,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Assert = UnityEngine.Assertions.Assert;
-
 #if ENABLE_RENDERING_DEBUGGER_UI
 using UnityEngine.UIElements;
 #endif
@@ -43,14 +42,15 @@ namespace UnityEngine.Rendering
         /// <typeparam name="T">The type of data managed by the field.</typeparam>
         public abstract class Field<T> : Widget
 #pragma warning disable CS0618 // Type or member is obsolete
-            , IValueField
+                , IValueField
 #pragma warning restore CS0618 // Type or member is obsolete
-            , ISupportsLegacyStateHandling
+                , ISupportsLegacyStateHandling
         {
             /// <summary>
             /// Getter for this field.
             /// </summary>
             public Func<T> getter { get; set; }
+
             /// <summary>
             /// Setter for this field.
             /// </summary>
@@ -146,7 +146,8 @@ namespace UnityEngine.Rendering
                     if (obj == null)
                         return false;
 
-                    var fields = obj.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                    var fields = obj.GetType()
+                        .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
                     foreach (var field in fields)
                     {
                         var value = field.GetValue(obj);
@@ -159,7 +160,9 @@ namespace UnityEngine.Rendering
                 var getterClosure = getter.Target;
                 if (getterClosure != null)
                 {
-                    bool foundISerializedDebugDisplaySettings = FieldsHaveISerializedDebugDisplaySettings(getterClosure);
+                    bool foundISerializedDebugDisplaySettings = FieldsHaveISerializedDebugDisplaySettings(
+                        getterClosure
+                    );
                     return !foundISerializedDebugDisplaySettings;
                 }
                 return false;
@@ -193,10 +196,7 @@ namespace UnityEngine.Rendering
             {
                 var valueContainer = new UIElements.VisualElement();
                 valueContainer.AddToClassList("debug-window-historyboolfield");
-                var label = new Label(displayName)
-                {
-                    style = { width = ValueTuple.GetLabelWidth(m_Context) }
-                };
+                var label = new Label(displayName) { style = { width = ValueTuple.GetLabelWidth(m_Context) } };
                 label.AddToClassList("debug-window-search-filter-target");
                 valueContainer.Add(label);
 
@@ -212,11 +212,7 @@ namespace UnityEngine.Rendering
 
                 foreach (var value in historyGetter)
                 {
-                    var historyBoolField = new DebugUI.BoolField()
-                    {
-                        displayName = string.Empty,
-                        getter = value
-                    };
+                    var historyBoolField = new DebugUI.BoolField() { displayName = string.Empty, getter = value };
                     childWidgets.Add(historyBoolField);
 
                     var field = historyBoolField.ToVisualElement(m_Context);
@@ -229,16 +225,19 @@ namespace UnityEngine.Rendering
                 return valueContainer;
             }
 #endif
+
             internal List<Widget> childWidgets { private set; get; } = new List<Widget>();
 
             /// <summary>
             /// History getter for this field.
             /// </summary>
             public Func<bool>[] historyGetter { get; set; }
+
             /// <summary>
             /// Depth of the field's history.
             /// </summary>
             public int historyDepth => historyGetter?.Length ?? 0;
+
             /// <summary>
             /// Get the value of the field at a certain history index.
             /// </summary>
@@ -262,6 +261,7 @@ namespace UnityEngine.Rendering
             /// Minimum value function.
             /// </summary>
             public Func<int> min;
+
             /// <summary>
             /// Maximum value function.
             /// </summary>
@@ -272,11 +272,13 @@ namespace UnityEngine.Rendering
             /// Step increment.
             /// </summary>
             public int incStep = 1;
+
             /// <summary>
             /// Step increment multiplier.
             /// </summary>
             [Obsolete("Use incStepMult instead #from(6000.5) (UnityUpgradable) -> incStepMult")]
             public int intStepMult = 10;
+
             /// <summary>
             /// Step increment multiplier.
             /// </summary>
@@ -314,7 +316,7 @@ namespace UnityEngine.Rendering
                 int maxValue = max != null ? max() : int.MaxValue;
 
                 // Check if addition would cause overflow, set to max value instead of wrapping around
-                int newValue = currentValue <= maxValue-step ? currentValue + step : maxValue;
+                int newValue = currentValue <= maxValue - step ? currentValue + step : maxValue;
                 SetValue(newValue);
             }
 
@@ -361,6 +363,7 @@ namespace UnityEngine.Rendering
             /// Minimum value function.
             /// </summary>
             public Func<uint> min;
+
             /// <summary>
             /// Maximum value function.
             /// </summary>
@@ -371,11 +374,13 @@ namespace UnityEngine.Rendering
             /// Step increment.
             /// </summary>
             public uint incStep = 1u;
+
             /// <summary>
             /// Step increment multiplier.
             /// </summary>
             [Obsolete("Use incStepMult instead #from(6000.5) (UnityUpgradable) -> incStepMult")]
             public uint intStepMult = 10u;
+
             /// <summary>
             /// Step increment multiplier.
             /// </summary>
@@ -413,7 +418,7 @@ namespace UnityEngine.Rendering
                 uint maxValue = max != null ? max() : uint.MaxValue;
 
                 // Check if addition would cause overflow, set to max value instead of wrapping around
-                uint newValue = currentValue <= maxValue-step ? currentValue + step : maxValue;
+                uint newValue = currentValue <= maxValue - step ? currentValue + step : maxValue;
                 SetValue(newValue);
             }
 
@@ -443,10 +448,12 @@ namespace UnityEngine.Rendering
                     );
                 }
                 BaseFieldHelper.ConfigureBaseField(this, field);
-                field.RegisterCallback<ChangeEvent<uint>>((evt) =>
-                {
-                    field.SetValueWithoutNotify(ValidateValue(evt.newValue));
-                });
+                field.RegisterCallback<ChangeEvent<uint>>(
+                    (evt) =>
+                    {
+                        field.SetValueWithoutNotify(ValidateValue(evt.newValue));
+                    }
+                );
                 return field;
             }
 #endif
@@ -461,6 +468,7 @@ namespace UnityEngine.Rendering
             /// Minimum value function.
             /// </summary>
             public Func<float> min;
+
             /// <summary>
             /// Maximum value function.
             /// </summary>
@@ -471,10 +479,12 @@ namespace UnityEngine.Rendering
             /// Step increment.
             /// </summary>
             public float incStep = 0.1f;
+
             /// <summary>
             /// Step increment multiplier.
             /// </summary>
             public float incStepMult = 10f;
+
             /// <summary>
             /// Number of decimals.
             /// </summary>
@@ -517,7 +527,7 @@ namespace UnityEngine.Rendering
                 float maxValue = max != null ? max() : float.MaxValue;
 
                 // Check if addition would cause overflow, set to max value instead of wrapping around
-                float newValue = currentValue <= maxValue-step ? currentValue + step : maxValue;
+                float newValue = currentValue <= maxValue - step ? currentValue + step : maxValue;
 
                 // Float precision: detect desired number of decimal places based on the step, and round to that
                 newValue = DebugUIStepperHelper.RoundToPrecision(newValue, currentValue, step);
@@ -566,7 +576,7 @@ namespace UnityEngine.Rendering
             static readonly NameAndTooltip s_RenderingLayerColors = new()
             {
                 name = "Layers Color",
-                tooltip = "Select the display color for each Rendering Layer"
+                tooltip = "Select the display color for each Rendering Layer",
             };
 
             private string[] m_RenderingLayersNames = Array.Empty<string>();
@@ -578,9 +588,15 @@ namespace UnityEngine.Rendering
                 get
                 {
 #if UNITY_EDITOR
-                    if (UnityEditor.Rendering.EditorGraphicsSettings.
-                        TryGetFirstRenderPipelineSettingsFromInterface<UnityEditor.Rendering.RenderingLayersLimitSettings>(out var settings))
-                        return Mathf.Min(settings.maxSupportedRenderingLayers, RenderingLayerMask.GetRenderingLayerCount());
+                    if (
+                        UnityEditor.Rendering.EditorGraphicsSettings.TryGetFirstRenderPipelineSettingsFromInterface<UnityEditor.Rendering.RenderingLayersLimitSettings>(
+                            out var settings
+                        )
+                    )
+                        return Mathf.Min(
+                            settings.maxSupportedRenderingLayers,
+                            RenderingLayerMask.GetRenderingLayerCount()
+                        );
 #endif
 
                     return RenderingLayerMask.GetRenderingLayerCount();
@@ -596,12 +612,17 @@ namespace UnityEngine.Rendering
                 {
                     SetValue(evt.newValue);
                 });
-                this.ScheduleTracked(maskField, () => maskField.schedule.Execute(() =>
-                {
-                    var value = GetValue();
-                    maskField.SetValueWithoutNotify(Convert.ToInt32(value));
-                })
-                .Every(100));
+                this.ScheduleTracked(
+                    maskField,
+                    () =>
+                        maskField
+                            .schedule.Execute(() =>
+                            {
+                                var value = GetValue();
+                                maskField.SetValueWithoutNotify(Convert.ToInt32(value));
+                            })
+                            .Every(100)
+                );
                 maskField.AddToClassList(UIElements.BaseField<int>.alignedFieldUssClassName);
                 HackPopupHoverColor(maskField, m_Context);
 
@@ -654,20 +675,28 @@ namespace UnityEngine.Rendering
                 for (int i = 0; i < m_RenderingLayersNames.Length; i++)
                 {
                     var index = i; // capture the variable for the color field index
-                    layersColor.children.Add(new DebugUI.ColorField
-                    {
-                        displayName = m_RenderingLayersNames[index],
-                        getter = () =>
+                    layersColor.children.Add(
+                        new DebugUI.ColorField
                         {
-                            Assert.IsNotNull(getRenderingLayerColor, "Please specify a method for getting the rendering layer color");
-                            return getRenderingLayerColor(index);
-                        },
-                        setter = value =>
-                        {
-                            Assert.IsNotNull(setRenderingLayerColor, "Please specify a method for setting the rendering layer color");
-                            setRenderingLayerColor(value, index);
+                            displayName = m_RenderingLayersNames[index],
+                            getter = () =>
+                            {
+                                Assert.IsNotNull(
+                                    getRenderingLayerColor,
+                                    "Please specify a method for getting the rendering layer color"
+                                );
+                                return getRenderingLayerColor(index);
+                            },
+                            setter = value =>
+                            {
+                                Assert.IsNotNull(
+                                    setRenderingLayerColor,
+                                    "Please specify a method for setting the rendering layer color"
+                                );
+                                setRenderingLayerColor(value, index);
+                            },
                         }
-                    });
+                    );
                 }
 
                 GenerateQueryPath();
@@ -711,6 +740,7 @@ namespace UnityEngine.Rendering
             /// Obtains the color in a given index
             /// </summary>
             public Func<int, Vector4> getRenderingLayerColor { get; set; }
+
             /// <summary>
             /// Sets the color for a given index
             /// </summary>
@@ -739,25 +769,31 @@ namespace UnityEngine.Rendering
                 var field = new UIElements.PopupField<string>()
                 {
                     label = displayName,
-                    choices = enumNames.Select(e => e.text).ToList()
+                    choices = enumNames.Select(e => e.text).ToList(),
                 };
                 field.AddToClassList("debug-window-enumfield");
                 field.labelElement.AddToClassList("debug-window-search-filter-target");
                 field.AddToClassList(UIElements.BaseField<int>.alignedFieldUssClassName);
 
-                this.ScheduleTracked(field, () => field.schedule.Execute(() =>
-                {
-                    T value = GetValue();
-                    var index = Array.IndexOf(enumValues, value);
-                    if (index >= 0 && index < enumNames.Length)
-                    {
-                        var expectedValue = enumNames[index].text;
-                        if (field.value != expectedValue)
-                        {
-                            field.SetValueWithoutNotify(expectedValue);
-                        }
-                    }
-                }).Every(100));
+                this.ScheduleTracked(
+                    field,
+                    () =>
+                        field
+                            .schedule.Execute(() =>
+                            {
+                                T value = GetValue();
+                                var index = Array.IndexOf(enumValues, value);
+                                if (index >= 0 && index < enumNames.Length)
+                                {
+                                    var expectedValue = enumNames[index].text;
+                                    if (field.value != expectedValue)
+                                    {
+                                        field.SetValueWithoutNotify(expectedValue);
+                                    }
+                                }
+                            })
+                            .Every(100)
+                );
 
                 m_AdditionalSearchText = string.Join(",", field.choices);
 
@@ -781,11 +817,12 @@ namespace UnityEngine.Rendering
                 set
                 {
                     if (value?.Distinct().Count() != value?.Count())
-                        Debug.LogWarning($"{displayName} - The values of the enum are duplicated, this might lead to a errors displaying the enum");
+                        Debug.LogWarning(
+                            $"{displayName} - The values of the enum are duplicated, this might lead to a errors displaying the enum"
+                        );
                     m_EnumValues = value;
                 }
             }
-
 
             // Space-delimit PascalCase (https://stackoverflow.com/questions/155303/net-how-can-you-split-a-caps-delimited-string-into-an-array)
             static Regex s_NicifyRegEx = new("([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", RegexOptions.Compiled);
@@ -803,12 +840,18 @@ namespace UnityEngine.Rendering
                 using (ListPool<GUIContent>.Get(out var tmpNames))
                 using (ListPool<int>.Get(out var tmpValues))
                 {
-                    var enumEntries = enumType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                        .Where(fieldInfo => !fieldInfo.IsDefined(typeof(ObsoleteAttribute)) && !fieldInfo.IsDefined(typeof(HideInInspector)));
+                    var enumEntries = enumType
+                        .GetFields(BindingFlags.Public | BindingFlags.Static)
+                        .Where(fieldInfo =>
+                            !fieldInfo.IsDefined(typeof(ObsoleteAttribute))
+                            && !fieldInfo.IsDefined(typeof(HideInInspector))
+                        );
                     foreach (var fieldInfo in enumEntries)
                     {
                         var description = fieldInfo.GetCustomAttribute<InspectorNameAttribute>();
-                        var displayName = new GUIContent(description == null ? s_NicifyRegEx.Replace(fieldInfo.Name, "$1 ") : description.displayName);
+                        var displayName = new GUIContent(
+                            description == null ? s_NicifyRegEx.Replace(fieldInfo.Name, "$1 ") : description.displayName
+                        );
 
                         int fieldValue = (int)Enum.Parse(enumType, fieldInfo.Name);
                         if (removeZeroElement && fieldValue == 0)
@@ -859,7 +902,7 @@ namespace UnityEngine.Rendering
                 var field = new UIElements.PopupField<string>()
                 {
                     label = displayName,
-                    choices = enumNames.Select(e => e.text).ToList()
+                    choices = enumNames.Select(e => e.text).ToList(),
                 };
                 field.AddToClassList("debug-window-enumfield");
                 field.labelElement.AddToClassList("debug-window-search-filter-target");
@@ -879,14 +922,20 @@ namespace UnityEngine.Rendering
                     }
                 });
 
-                this.ScheduleTracked(field, () => field.schedule.Execute(() =>
-                {
-                    // https://jira.unity3d.com/browse/UUM-138138: Clamp currentIndex to 0. This matches old IMGUI
-                    // DebugUIDrawer behavior where a negative index is sometimes used to denote an invalid/none value.
-                    int index = Mathf.Max(0, currentIndex);
-                    if (index < enumNames.Length)
-                        field.SetValueWithoutNotify(enumNames[index].text);
-                }).Every(100));
+                this.ScheduleTracked(
+                    field,
+                    () =>
+                        field
+                            .schedule.Execute(() =>
+                            {
+                                // https://jira.unity3d.com/browse/UUM-138138: Clamp currentIndex to 0. This matches old IMGUI
+                                // DebugUIDrawer behavior where a negative index is sometimes used to denote an invalid/none value.
+                                int index = Mathf.Max(0, currentIndex);
+                                if (index < enumNames.Length)
+                                    field.SetValueWithoutNotify(enumNames[index].text);
+                            })
+                            .Every(100)
+                );
 
                 m_AdditionalSearchText = string.Join(",", field.choices);
 
@@ -903,6 +952,7 @@ namespace UnityEngine.Rendering
             /// Get the enumeration value index.
             /// </summary>
             public Func<int> getIndex { get; set; }
+
             /// <summary>
             /// Set the enumeration value index.
             /// </summary>
@@ -1004,7 +1054,7 @@ namespace UnityEngine.Rendering
                     label = displayName,
                     choices = choices,
                     formatListItemCallback = o => o != null ? o.name : "None",
-                    formatSelectedValueCallback = o => o != null ? o.name : "None"
+                    formatSelectedValueCallback = o => o != null ? o.name : "None",
                 };
 
                 field.AddToClassList("debug-window-objectpopupfield");
@@ -1016,10 +1066,16 @@ namespace UnityEngine.Rendering
                     SetValue(evt.newValue);
                 });
 
-                this.ScheduleTracked(field, () => field.schedule.Execute(() =>
-                {
-                    field.SetValueWithoutNotify(GetValue());
-                }).Every(100));
+                this.ScheduleTracked(
+                    field,
+                    () =>
+                        field
+                            .schedule.Execute(() =>
+                            {
+                                field.SetValueWithoutNotify(GetValue());
+                            })
+                            .Every(100)
+                );
 
                 field.AddToClassList(UIElements.BaseField<UnityEngine.Object>.alignedFieldUssClassName);
                 return field;
@@ -1063,22 +1119,27 @@ namespace UnityEngine.Rendering
                 // Refresh the dropdown choices to keep it in sync with available cameras in the scene.
                 // NOTE: If the currently selected camera is deleted, PopupField handles it internally,
                 //       so we only need to maintain the available choices list.
-                this.ScheduleTracked(objectPopUpField, () => objectPopUpField.schedule.Execute(() =>
-                {
-                    // Using ListPool and SequenceEqual to avoid unnecessary allocations and UI updates
-                    using (UnityEngine.Pool.ListPool<UnityEngine.Object>.Get(out var tmp))
-                    {
-                        tmp.Add(null);
-                        tmp.AddRange(getObjects());
+                this.ScheduleTracked(
+                    objectPopUpField,
+                    () =>
+                        objectPopUpField
+                            .schedule.Execute(() =>
+                            {
+                                // Using ListPool and SequenceEqual to avoid unnecessary allocations and UI updates
+                                using (UnityEngine.Pool.ListPool<UnityEngine.Object>.Get(out var tmp))
+                                {
+                                    tmp.Add(null);
+                                    tmp.AddRange(getObjects());
 
-                        if (!tmp.SequenceEqual(objectPopUpField.choices))
-                        {
-                            objectPopUpField.choices.Clear();
-                            objectPopUpField.choices.AddRange(tmp);
-                        }
-                    }
-
-                }).Every(500));
+                                    if (!tmp.SequenceEqual(objectPopUpField.choices))
+                                    {
+                                        objectPopUpField.choices.Clear();
+                                        objectPopUpField.choices.AddRange(tmp);
+                                    }
+                                }
+                            })
+                            .Every(500)
+                );
 
                 return objectPopUpField;
             }
@@ -1135,10 +1196,7 @@ namespace UnityEngine.Rendering
                 var valueContainer = new UIElements.VisualElement();
                 valueContainer.AddToClassList("debug-window-historyenum");
 
-                var label = new Label(displayName)
-                {
-                    style = { width = ValueTuple.GetLabelWidth(m_Context) }
-                };
+                var label = new Label(displayName) { style = { width = ValueTuple.GetLabelWidth(m_Context) } };
                 label.AddToClassList("debug-window-search-filter-target");
                 valueContainer.Add(label);
 
@@ -1164,8 +1222,8 @@ namespace UnityEngine.Rendering
                         enumNames = enumNames,
                         enumValues = enumValues,
                         getIndex = value,
-                        setIndex = i => {},
-                        getter = value
+                        setIndex = i => { },
+                        getter = value,
                     };
                     childWidgets.Add(historyEnumField);
 
@@ -1186,10 +1244,12 @@ namespace UnityEngine.Rendering
             /// History getter for this field.
             /// </summary>
             public Func<int>[] historyIndexGetter { get; set; }
+
             /// <summary>
             /// Depth of the field's history.
             /// </summary>
             public int historyDepth => historyIndexGetter?.Length ?? 0;
+
             /// <summary>
             /// Get the value of the field at a certain history index.
             /// </summary>
@@ -1198,7 +1258,10 @@ namespace UnityEngine.Rendering
             public int GetHistoryValue(int historyIndex)
             {
                 Assert.IsNotNull(historyIndexGetter);
-                Assert.IsTrue(historyIndex >= 0 && historyIndex < historyIndexGetter.Length, "out of range historyIndex");
+                Assert.IsTrue(
+                    historyIndex >= 0 && historyIndex < historyIndexGetter.Length,
+                    "out of range historyIndex"
+                );
                 Assert.IsNotNull(historyIndexGetter[historyIndex]);
                 return historyIndexGetter[historyIndex]();
             }
@@ -1225,12 +1288,17 @@ namespace UnityEngine.Rendering
                     SetValue(value);
                 });
 
-                this.ScheduleTracked(maskField, () => maskField.schedule.Execute(() =>
-                {
-                    var value = GetValue();
-                    maskField.SetValueWithoutNotify(Convert.ToInt32(value));
-                })
-                .Every(100));
+                this.ScheduleTracked(
+                    maskField,
+                    () =>
+                        maskField
+                            .schedule.Execute(() =>
+                            {
+                                var value = GetValue();
+                                maskField.SetValueWithoutNotify(Convert.ToInt32(value));
+                            })
+                            .Every(100)
+                );
 
                 maskField.AddToClassList(UIElements.BaseField<int>.alignedFieldUssClassName);
 
@@ -1239,6 +1307,7 @@ namespace UnityEngine.Rendering
                 return maskField;
             }
 #endif
+
             Type m_EnumType;
 
             /// <summary>
@@ -1249,8 +1318,7 @@ namespace UnityEngine.Rendering
                 get => m_EnumType;
                 set
                 {
-                    if (!value.IsEnum ||
-                        value.GetCustomAttributes(typeof(FlagsAttribute), inherit: false).Length == 0)
+                    if (!value.IsEnum || value.GetCustomAttributes(typeof(FlagsAttribute), inherit: false).Length == 0)
                     {
                         throw new ArgumentException($"{nameof(value)} must be an Enum type with the Flags attribute");
                     }
@@ -1272,7 +1340,8 @@ namespace UnityEngine.Rendering
             private UIElements.FloatField greenField;
             private UIElements.FloatField blueField;
 
-            public RuntimeColorField(string label, bool showRGB) : base(label, null)
+            public RuntimeColorField(string label, bool showRGB)
+                : base(label, null)
             {
                 CreateVisualElements(showRGB);
             }
@@ -1283,7 +1352,7 @@ namespace UnityEngine.Rendering
                 contentContainer.style.flexDirection = FlexDirection.Row;
 
                 // RGB fields
-                if (showRGB )
+                if (showRGB)
                 {
                     redField = CreateColorComponentField();
                     greenField = CreateColorComponentField();
@@ -1345,10 +1414,7 @@ namespace UnityEngine.Rendering
 #if UNITY_EDITOR
                 if (m_Context == DebugUI.Context.Editor && showPicker)
                 {
-                    field = new UnityEditor.UIElements.ColorField()
-                    {
-                        label = displayName,
-                    };
+                    field = new UnityEditor.UIElements.ColorField() { label = displayName };
                 }
 #endif
                 if (field == null)
@@ -1362,10 +1428,16 @@ namespace UnityEngine.Rendering
                     field.labelElement.AddToClassList("debug-window-search-filter-target");
                     field.AddToClassList(UIElements.BaseField<Color>.alignedFieldUssClassName);
                     field.RegisterCallback<ChangeEvent<Color>>(evt => SetValue(evt.newValue));
-                    this.ScheduleTracked(field, () => field.schedule.Execute(() =>
-                    {
-                        field.SetValueWithoutNotify((Color)Convert.ChangeType(GetValue(), typeof(Color)));
-                    }).Every(100));
+                    this.ScheduleTracked(
+                        field,
+                        () =>
+                            field
+                                .schedule.Execute(() =>
+                                {
+                                    field.SetValueWithoutNotify((Color)Convert.ChangeType(GetValue(), typeof(Color)));
+                                })
+                                .Every(100)
+                    );
                 }
 
                 return field;
@@ -1376,6 +1448,7 @@ namespace UnityEngine.Rendering
             /// HDR color.
             /// </summary>
             public bool hdr = false;
+
             /// <summary>
             /// Show alpha of the color field.
             /// </summary>
@@ -1392,10 +1465,12 @@ namespace UnityEngine.Rendering
             /// Step increment.
             /// </summary>
             public float incStep = 0.025f;
+
             /// <summary>
             /// Step increment multiplier.
             /// </summary>
             public float incStepMult = 5f;
+
             /// <summary>
             /// Number of decimals.
             /// </summary>
@@ -1421,11 +1496,11 @@ namespace UnityEngine.Rendering
         }
 
 #if ENABLE_RENDERING_DEBUGGER_UI
-        class RuntimeBaseFieldWrapper<T> : UIElements.BaseField<T> where T : struct
+        class RuntimeBaseFieldWrapper<T> : UIElements.BaseField<T>
+            where T : struct
         {
-            public RuntimeBaseFieldWrapper(VisualElement container, string label) : base(label, container)
-            {
-            }
+            public RuntimeBaseFieldWrapper(VisualElement container, string label)
+                : base(label, container) { }
         }
 #endif
 
@@ -1433,17 +1508,20 @@ namespace UnityEngine.Rendering
         /// Generic base class for vector fields with stepper support for Runtime.
         /// </summary>
         /// <typeparam name="T">The numeric vector type</typeparam>
-        public abstract class VectorField<T> : DebugUI.Field<T> where T : struct
+        public abstract class VectorField<T> : DebugUI.Field<T>
+            where T : struct
         {
             // Runtime-only
             /// <summary>
             /// Step increment.
             /// </summary>
             public float incStep = 0.025f;
+
             /// <summary>
             /// Step increment multiplier.
             /// </summary>
             public float incStepMult = 10f;
+
             /// <summary>
             /// Number of decimals.
             /// </summary>
@@ -1487,15 +1565,21 @@ namespace UnityEngine.Rendering
                 }
 
                 // Sync values from data model to UI
-                this.ScheduleTracked(fieldsContainer, () => fieldsContainer.schedule.Execute(() =>
-                {
-                    var value = GetValue();
-                    var components = GetVectorComponents(value);
-                    for (int i = 0; i < componentFields.Length && i < components.Length; i++)
-                    {
-                        componentFields[i].SetValueWithoutNotify(components[i]);
-                    }
-                }).Every(100));
+                this.ScheduleTracked(
+                    fieldsContainer,
+                    () =>
+                        fieldsContainer
+                            .schedule.Execute(() =>
+                            {
+                                var value = GetValue();
+                                var components = GetVectorComponents(value);
+                                for (int i = 0; i < componentFields.Length && i < components.Length; i++)
+                                {
+                                    componentFields[i].SetValueWithoutNotify(components[i]);
+                                }
+                            })
+                            .Every(100)
+                );
 
                 return new RuntimeBaseFieldWrapper<T>(fieldsContainer, displayName);
             }
@@ -1505,7 +1589,6 @@ namespace UnityEngine.Rendering
                 var componentCount = GetComponentCount();
                 var componentFields = new UIElements.FloatField[componentCount];
                 var componentNames = GetComponentNames();
-
 
                 for (int i = 0; i < componentCount; i++)
                 {
@@ -1603,11 +1686,12 @@ namespace UnityEngine.Rendering
         {
 #if ENABLE_RENDERING_DEBUGGER_UI
             protected override int GetComponentCount() => 2;
+
             protected override string[] GetComponentNames() => new[] { "X", "Y" };
+
             protected override string GetVectorTypeName() => "vector2field";
 
-            protected override float[] GetVectorComponents(Vector2 vector) =>
-                new[] { vector.x, vector.y };
+            protected override float[] GetVectorComponents(Vector2 vector) => new[] { vector.x, vector.y };
 
             protected override float this[int index]
             {
@@ -1618,7 +1702,7 @@ namespace UnityEngine.Rendering
                     {
                         0 => vector.x,
                         1 => vector.y,
-                        _ => 0
+                        _ => 0,
                     };
                 }
             }
@@ -1629,12 +1713,11 @@ namespace UnityEngine.Rendering
                 {
                     0 => new Vector2(value, vector.y),
                     1 => new Vector2(vector.x, value),
-                    _ => vector
+                    _ => vector,
                 };
             }
 
-            protected override UIElements.BaseField<Vector2> CreateEditorVectorField() =>
-                new UIElements.Vector2Field();
+            protected override UIElements.BaseField<Vector2> CreateEditorVectorField() => new UIElements.Vector2Field();
 #endif
         }
 
@@ -1645,11 +1728,12 @@ namespace UnityEngine.Rendering
         {
 #if ENABLE_RENDERING_DEBUGGER_UI
             protected override int GetComponentCount() => 3;
+
             protected override string[] GetComponentNames() => new[] { "X", "Y", "Z" };
+
             protected override string GetVectorTypeName() => "vector3field";
 
-            protected override float[] GetVectorComponents(Vector3 vector) =>
-                new[] { vector.x, vector.y, vector.z };
+            protected override float[] GetVectorComponents(Vector3 vector) => new[] { vector.x, vector.y, vector.z };
 
             protected override float this[int index]
             {
@@ -1661,7 +1745,7 @@ namespace UnityEngine.Rendering
                         0 => vector.x,
                         1 => vector.y,
                         2 => vector.z,
-                        _ => 0
+                        _ => 0,
                     };
                 }
             }
@@ -1673,12 +1757,11 @@ namespace UnityEngine.Rendering
                     0 => new Vector3(value, vector.y, vector.z),
                     1 => new Vector3(vector.x, value, vector.z),
                     2 => new Vector3(vector.x, vector.y, value),
-                    _ => vector
+                    _ => vector,
                 };
             }
 
-            protected override UIElements.BaseField<Vector3> CreateEditorVectorField() =>
-                new UIElements.Vector3Field();
+            protected override UIElements.BaseField<Vector3> CreateEditorVectorField() => new UIElements.Vector3Field();
 #endif
         }
 
@@ -1689,7 +1772,9 @@ namespace UnityEngine.Rendering
         {
 #if ENABLE_RENDERING_DEBUGGER_UI
             protected override int GetComponentCount() => 4;
+
             protected override string[] GetComponentNames() => new[] { "X", "Y", "Z", "W" };
+
             protected override string GetVectorTypeName() => "vector4field";
 
             protected override float[] GetVectorComponents(Vector4 vector) =>
@@ -1706,7 +1791,7 @@ namespace UnityEngine.Rendering
                         1 => vector.y,
                         2 => vector.z,
                         3 => vector.w,
-                        _ => 0
+                        _ => 0,
                     };
                 }
             }
@@ -1719,12 +1804,11 @@ namespace UnityEngine.Rendering
                     1 => new Vector4(vector.x, value, vector.z, vector.w),
                     2 => new Vector4(vector.x, vector.y, value, vector.w),
                     3 => new Vector4(vector.x, vector.y, vector.z, value),
-                    _ => vector
+                    _ => vector,
                 };
             }
 
-            protected override UIElements.BaseField<Vector4> CreateEditorVectorField() =>
-                new UIElements.Vector4Field();
+            protected override UIElements.BaseField<Vector4> CreateEditorVectorField() => new UIElements.Vector4Field();
 #endif
         }
 
@@ -1733,7 +1817,8 @@ namespace UnityEngine.Rendering
         {
             private UIElements.Label objectPreview;
 
-            public RuntimeObjectField(string label, UIElements.Label visual) : base(label, visual)
+            public RuntimeObjectField(string label, UIElements.Label visual)
+                : base(label, visual)
             {
                 objectPreview = visual;
             }
@@ -1741,7 +1826,7 @@ namespace UnityEngine.Rendering
             public override void SetValueWithoutNotify(Object newValue)
             {
                 base.SetValueWithoutNotify(newValue);
-                objectPreview.text = newValue!=null ? newValue.name : "None";
+                objectPreview.text = newValue != null ? newValue.name : "None";
             }
         }
 #endif
@@ -1759,10 +1844,7 @@ namespace UnityEngine.Rendering
 #if UNITY_EDITOR
                 if (m_Context == DebugUI.Context.Editor)
                 {
-                    field = new UnityEditor.UIElements.ObjectField()
-                    {
-                        label = displayName
-                    };
+                    field = new UnityEditor.UIElements.ObjectField() { label = displayName };
                 }
 #endif
                 if (field == null)
@@ -1775,11 +1857,17 @@ namespace UnityEngine.Rendering
                 field.labelElement.AddToClassList("debug-window-search-filter-target");
                 field.AddToClassList(UIElements.BaseField<Object>.alignedFieldUssClassName);
                 field.RegisterCallback<ChangeEvent<Object>>(evt => SetValue(evt.newValue));
-                this.ScheduleTracked(field, () => field.schedule.Execute(() =>
-                {
-                    var selectedObject = GetValue();
-                    field.SetValueWithoutNotify(selectedObject);
-                }).Every(100));
+                this.ScheduleTracked(
+                    field,
+                    () =>
+                        field
+                            .schedule.Execute(() =>
+                            {
+                                var selectedObject = GetValue();
+                                field.SetValueWithoutNotify(selectedObject);
+                            })
+                            .Every(100)
+                );
 
                 return field;
             }
@@ -1842,7 +1930,10 @@ namespace UnityEngine.Rendering
                             field = null;
 #if UNITY_EDITOR
                             if (context == Context.Editor)
-                                field = new UnityEditor.UIElements.ObjectField { objectType = child != null ? child.GetType() : typeof(Object) };
+                                field = new UnityEditor.UIElements.ObjectField
+                                {
+                                    objectType = child != null ? child.GetType() : typeof(Object),
+                                };
 #endif
                             field ??= new RuntimeObjectField(string.Empty, new Label());
                             field.AddToClassList("debug-window-objectfield");
@@ -1891,10 +1982,16 @@ namespace UnityEngine.Rendering
 
                 if (messageCallback != null)
                 {
-                    this.ScheduleTracked(helpBox, () => helpBox.schedule.Execute(() =>
-                    {
-                        helpBox.text = message;
-                    }).Every(100));
+                    this.ScheduleTracked(
+                        helpBox,
+                        () =>
+                            helpBox
+                                .schedule.Execute(() =>
+                                {
+                                    helpBox.text = message;
+                                })
+                                .Every(100)
+                    );
                 }
 
                 return helpBox;
@@ -1910,18 +2007,21 @@ namespace UnityEngine.Rendering
                 /// None category - no icon in the message
                 /// </summary>
                 None,
+
                 /// <summary>
                 /// Info category
                 /// </summary>
                 Info,
+
                 /// <summary>
                 /// Warning category
                 /// </summary>
                 Warning,
+
                 /// <summary>
                 /// Error category
                 /// </summary>
-                Error
+                Error,
             }
 
             /// <summary>
@@ -1957,7 +2057,11 @@ namespace UnityEngine.Rendering
                 isHiddenCallback = () =>
                 {
 #if !UNITY_EDITOR
-                    if (GraphicsSettings.TryGetRenderPipelineSettings<ShaderStrippingSetting>(out var shaderStrippingSetting))
+                    if (
+                        GraphicsSettings.TryGetRenderPipelineSettings<ShaderStrippingSetting>(
+                            out var shaderStrippingSetting
+                        )
+                    )
                         return !shaderStrippingSetting.stripRuntimeDebugShaders;
 #endif
                     return true;
@@ -1966,5 +2070,3 @@ namespace UnityEngine.Rendering
         }
     }
 }
-
-

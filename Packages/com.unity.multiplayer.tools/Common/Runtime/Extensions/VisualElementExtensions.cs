@@ -7,7 +7,8 @@ namespace Unity.Multiplayer.Tools.Common
         public static void AddEventLifecycle(
             this VisualElement visualElement,
             EventCallback<AttachToPanelEvent> onAttach,
-            EventCallback<DetachFromPanelEvent> onDetach)
+            EventCallback<DetachFromPanelEvent> onDetach
+        )
         {
             // If the element is already attached, fire the onAttach callback immediately
             if (visualElement.hierarchy.parent != null)
@@ -28,9 +29,7 @@ namespace Unity.Multiplayer.Tools.Common
         /// </remarks>
         public static void SetInclude(this VisualElement visualElement, bool includeInLayout)
         {
-            visualElement.style.display = includeInLayout
-                ? DisplayStyle.Flex
-                : DisplayStyle.None;
+            visualElement.style.display = includeInLayout ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         /// <summary>
@@ -57,7 +56,8 @@ namespace Unity.Multiplayer.Tools.Common
             this VisualElement visualElement,
             EventCallback<TEventType> callback,
             string name = null,
-            string className = null)
+            string className = null
+        )
             where TEventType : EventBase<TEventType>, new()
         {
             visualElement.Query<VisualElement>(name, className).Build().ForEach(AddLifecycleEvents);

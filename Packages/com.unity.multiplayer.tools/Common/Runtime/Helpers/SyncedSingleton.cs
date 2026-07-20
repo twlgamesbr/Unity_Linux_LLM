@@ -10,7 +10,8 @@ namespace Unity.Multiplayer.Tools.Common
     // SyncedSingleton helps to synchronize data between Multiplayer Play mode instances through a file on the disk.
     // One Editor serializes the data to a file and the other Editors are notified about the file change
     // and will reload the data from that file.
-    internal class SyncedSingleton<T> : ScriptableSingleton<T> where T : ScriptableObject
+    internal class SyncedSingleton<T> : ScriptableSingleton<T>
+        where T : ScriptableObject
     {
         private static bool s_NeedsRegeneration;
         public static event Action DataChanged;

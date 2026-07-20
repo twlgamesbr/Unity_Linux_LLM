@@ -20,12 +20,13 @@ public partial class JobEntityModule
         public string CandidateTypeName => Candidate.CandidateTypeName;
         public SyntaxNode Node => Candidate.Node;
 
-        public static bool TryCreate(ref SystemDescription systemDescription, JobEntityCandidate candidate, out JobEntityInstanceInfo result)
+        public static bool TryCreate(
+            ref SystemDescription systemDescription,
+            JobEntityCandidate candidate,
+            out JobEntityInstanceInfo result
+        )
         {
-            result = new JobEntityInstanceInfo
-            {
-                Candidate = candidate
-            };
+            result = new JobEntityInstanceInfo { Candidate = candidate };
 
             // Checks if the Candidate is JobEntity and Get Type info
             ExpressionSyntax? jobEntityInstance = null;
@@ -57,16 +58,29 @@ public partial class JobEntityModule
             }
 
             // check if type is an error symbol
-            if (systemDescription.SemanticModel.GetSymbolInfo(candidate.MemberAccessExpressionSyntax).CandidateSymbols.Length > 0)
+            if (
+                systemDescription
+                    .SemanticModel.GetSymbolInfo(candidate.MemberAccessExpressionSyntax)
+                    .CandidateSymbols.Length > 0
+            )
             {
-                JobEntityGeneratorErrors.SGJE0024(systemDescription, candidate.MemberAccessExpressionSyntax.GetLocation());
+                JobEntityGeneratorErrors.SGJE0024(
+                    systemDescription,
+                    candidate.MemberAccessExpressionSyntax.GetLocation()
+                );
                 return false;
             }
 
             return true;
         }
 
-        public (bool Success, ObjectCreationExpressionSyntax? ObjectCreationExpressionSyntax, IdentifierNameSyntax? IdentifierNameSyntax, InvocationExpressionSyntax? InvocationExpressionSyntax, int JobArgumentIndexInExtensionMethod)            TryGetJobArgumentUsedInSchedulingInvocation()
+        public (
+            bool Success,
+            ObjectCreationExpressionSyntax? ObjectCreationExpressionSyntax,
+            IdentifierNameSyntax? IdentifierNameSyntax,
+            InvocationExpressionSyntax? InvocationExpressionSyntax,
+            int JobArgumentIndexInExtensionMethod
+        ) TryGetJobArgumentUsedInSchedulingInvocation()
         {
             var result = Candidate.MemberAccessExpressionSyntax.Expression;
 
@@ -80,28 +94,60 @@ public partial class JobEntityModule
                 result = Candidate.Invocation.ArgumentList.Arguments[jobDataArgumentIndex].Expression;
                 return result switch
                 {
-                    ObjectCreationExpressionSyntax objectCreationExpressionSyntax => (true, objectCreationExpressionSyntax, null, null, jobDataArgumentIndex),
-                    IdentifierNameSyntax identifierNameSyntax => (true, null, identifierNameSyntax, null, jobDataArgumentIndex),
-                    InvocationExpressionSyntax invocationExpressionSyntax => (true, null, null, invocationExpressionSyntax, jobDataArgumentIndex),
-                    _ => default
+                    ObjectCreationExpressionSyntax objectCreationExpressionSyntax => (
+                        true,
+                        objectCreationExpressionSyntax,
+                        null,
+                        null,
+                        jobDataArgumentIndex
+                    ),
+                    IdentifierNameSyntax identifierNameSyntax => (
+                        true,
+                        null,
+                        identifierNameSyntax,
+                        null,
+                        jobDataArgumentIndex
+                    ),
+                    InvocationExpressionSyntax invocationExpressionSyntax => (
+                        true,
+                        null,
+                        null,
+                        invocationExpressionSyntax,
+                        jobDataArgumentIndex
+                    ),
+                    _ => default,
                 };
             }
 
             return result switch
             {
-                ObjectCreationExpressionSyntax objectCreationExpressionSyntax => (true, objectCreationExpressionSyntax, null, null, -1),
+                ObjectCreationExpressionSyntax objectCreationExpressionSyntax => (
+                    true,
+                    objectCreationExpressionSyntax,
+                    null,
+                    null,
+                    -1
+                ),
                 IdentifierNameSyntax identifierNameSyntax => (true, null, identifierNameSyntax, null, -1),
-                InvocationExpressionSyntax invocationExpressionSyntax => (true, null, null, invocationExpressionSyntax, -1),
-                _ => default
+                InvocationExpressionSyntax invocationExpressionSyntax => (
+                    true,
+                    null,
+                    null,
+                    invocationExpressionSyntax,
+                    -1
+                ),
+                _ => default,
             };
         }
+
         public string? GetAndAddScheduleExpression(
             ref SystemDescription systemDescription,
             int uniqueId,
             int jobArgumentIndexInExtensionMethod,
             string schedulingJobEntityInstanceArg,
             string? userDefinedQueryArg,
-            string? userDefinedDependencyArg)
+            string? userDefinedDependencyArg
+        )
         {
             var jobEntityType = (INamedTypeSymbol)_typeInfo.Type!;
 
@@ -109,30 +155,35 @@ public partial class JobEntityModule
             if (IsExtensionMethodUsed)
             {
                 // Get JobEntity Symbol Passed To ExtensionMethod - Using Candidate for Semantic Reference
-                jobEntityType = Candidate.Invocation.ArgumentList.Arguments[jobArgumentIndexInExtensionMethod].Expression switch
+                jobEntityType = Candidate
+                    .Invocation
+                    .ArgumentList
+                    .Arguments[jobArgumentIndexInExtensionMethod]
+                    .Expression switch
                 {
                     ObjectCreationExpressionSyntax objectCreationExpressionSyntax
-                        when systemDescription.SemanticModel.GetSymbolInfo(objectCreationExpressionSyntax).Symbol is IMethodSymbol
-                        {
-                            ReceiverType: INamedTypeSymbol namedTypeSymbol
-                        } => namedTypeSymbol,
+                        when systemDescription.SemanticModel.GetSymbolInfo(objectCreationExpressionSyntax).Symbol
+                            is IMethodSymbol { ReceiverType: INamedTypeSymbol namedTypeSymbol } => namedTypeSymbol,
 
                     IdentifierNameSyntax identifierNameSyntax
-                        when systemDescription.SemanticModel.GetSymbolInfo(identifierNameSyntax).Symbol is ILocalSymbol
-                        {
-                            Type: INamedTypeSymbol namedTypeSymbol
-                        } => namedTypeSymbol,
-                    _ => null
+                        when systemDescription.SemanticModel.GetSymbolInfo(identifierNameSyntax).Symbol
+                            is ILocalSymbol { Type: INamedTypeSymbol namedTypeSymbol } => namedTypeSymbol,
+                    _ => null,
                 };
             }
 
             // Get Additional info
-            var scheduleMode = ScheduleModeHelpers.GetScheduleModeFromNameOfMemberAccess(Candidate.MemberAccessExpressionSyntax);
+            var scheduleMode = ScheduleModeHelpers.GetScheduleModeFromNameOfMemberAccess(
+                Candidate.MemberAccessExpressionSyntax
+            );
             if (!systemDescription.TryGetSystemStateParameterName(Candidate, out var systemStateExpression))
                 return null;
 
             // Get or create `__TypeHandle.MyJob__JobEntityHandle`
-            var jobEntityHandle = systemDescription.QueriesAndHandles.GetOrCreateJobEntityHandle(jobEntityType, userDefinedQueryArg == null);
+            var jobEntityHandle = systemDescription.QueriesAndHandles.GetOrCreateJobEntityHandle(
+                jobEntityType,
+                userDefinedQueryArg == null
+            );
             var jobEntityHandleAccess = $"__TypeHandle.{jobEntityHandle}";
 
             // is DynamicQuery ? `userQuery` : `__TypeHandle.MyJob__JobEntityHandle.DefaultQuery`
@@ -142,9 +193,11 @@ public partial class JobEntityModule
             {
                 ScheduleMode = scheduleMode,
                 MethodId = uniqueId,
-                FullTypeName =  jobEntityType.ToFullName(),
+                FullTypeName = jobEntityType.ToFullName(),
                 JobEntityHandle = jobEntityHandle,
-                CheckQuery = systemDescription.PreprocessorInfo.IsUnityCollectionChecksEnabled || systemDescription.PreprocessorInfo.IsDotsDebugMode
+                CheckQuery =
+                    systemDescription.PreprocessorInfo.IsUnityCollectionChecksEnabled
+                    || systemDescription.PreprocessorInfo.IsDotsDebugMode,
             };
 
             systemDescription.NewMiscellaneousMembers.Add(schedulingMethodWriter);
@@ -164,7 +217,11 @@ public partial class JobEntityModule
         {
             int jobDataArgumentIndex = -1;
 
-            for (var argumentIndex = 0; argumentIndex < invocationExpression.ArgumentList.Arguments.Count; argumentIndex++)
+            for (
+                var argumentIndex = 0;
+                argumentIndex < invocationExpression.ArgumentList.Arguments.Count;
+                argumentIndex++
+            )
             {
                 var argument = invocationExpression.ArgumentList.Arguments[argumentIndex];
                 if (argument.NameColon == null)
@@ -183,11 +240,17 @@ public partial class JobEntityModule
         {
             EntityQuery,
             Dependency,
-            JobEntity
+            JobEntity,
         }
 
-        internal static (ExpressionSyntax? UserDefinedEntityQuery, ExpressionSyntax? UserDefinedDependency)
-            GetUserDefinedQueryAndDependency(ref SystemDescription context, bool isExtensionMethodUsed, InvocationExpressionSyntax schedulingInvocation)
+        internal static (
+            ExpressionSyntax? UserDefinedEntityQuery,
+            ExpressionSyntax? UserDefinedDependency
+        ) GetUserDefinedQueryAndDependency(
+            ref SystemDescription context,
+            bool isExtensionMethodUsed,
+            InvocationExpressionSyntax schedulingInvocation
+        )
         {
             ExpressionSyntax? entityQueryArgument = null;
             ExpressionSyntax? dependencyArgument = null;
@@ -196,9 +259,10 @@ public partial class JobEntityModule
             {
                 var arg = schedulingInvocation.ArgumentList.Arguments[i];
 
-                var type = arg.NameColon == null
-                    ? ParseUnnamedArgument(ref context, i, isExtensionMethodUsed, arg)
-                    : ParseNamedArgument(arg);
+                var type =
+                    arg.NameColon == null
+                        ? ParseUnnamedArgument(ref context, i, isExtensionMethodUsed, arg)
+                        : ParseNamedArgument(arg);
 
                 switch (type)
                 {
@@ -214,19 +278,29 @@ public partial class JobEntityModule
             return (entityQueryArgument, dependencyArgument);
         }
 
-        static ArgumentType ParseUnnamedArgument(ref SystemDescription context, int argumentPosition, bool isExtensionMethodUsed, ArgumentSyntax semanticOriginalArgument)
+        static ArgumentType ParseUnnamedArgument(
+            ref SystemDescription context,
+            int argumentPosition,
+            bool isExtensionMethodUsed,
+            ArgumentSyntax semanticOriginalArgument
+        )
         {
-            switch (argumentPosition+(isExtensionMethodUsed?0:1))
+            switch (argumentPosition + (isExtensionMethodUsed ? 0 : 1))
             {
                 case 0:
                     return ArgumentType.JobEntity;
                 case 1: // Could be EntityQuery or dependsOn
                 {
-                    if (semanticOriginalArgument.Expression is DefaultExpressionSyntax {Type: var defaultType})
-                        return defaultType.ToString().Contains("JobHandle") ? ArgumentType.Dependency : ArgumentType.EntityQuery;
+                    if (semanticOriginalArgument.Expression is DefaultExpressionSyntax { Type: var defaultType })
+                        return defaultType.ToString().Contains("JobHandle")
+                            ? ArgumentType.Dependency
+                            : ArgumentType.EntityQuery;
 
-                    return context.SemanticModel.GetTypeInfo(semanticOriginalArgument.Expression).Type.ToFullName() == "global::Unity.Entities.EntityQuery"
-                        ? ArgumentType.EntityQuery : ArgumentType.Dependency;
+                    return
+                        context.SemanticModel.GetTypeInfo(semanticOriginalArgument.Expression).Type.ToFullName()
+                        == "global::Unity.Entities.EntityQuery"
+                        ? ArgumentType.EntityQuery
+                        : ArgumentType.Dependency;
                 }
                 case 2: // dependsOn
                     return ArgumentType.Dependency;
@@ -235,13 +309,13 @@ public partial class JobEntityModule
             throw new ArgumentOutOfRangeException();
         }
 
-        static ArgumentType ParseNamedArgument(ArgumentSyntax argumentSyntax)
-            => argumentSyntax.NameColon?.Name.Identifier.ValueText switch
+        static ArgumentType ParseNamedArgument(ArgumentSyntax argumentSyntax) =>
+            argumentSyntax.NameColon?.Name.Identifier.ValueText switch
             {
                 "query" => ArgumentType.EntityQuery,
                 "dependsOn" => ArgumentType.Dependency,
                 "jobData" => ArgumentType.JobEntity,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
 
         struct SchedulingMethodWriter : IMemberWriter
@@ -260,29 +334,46 @@ public partial class JobEntityModule
 
                 var methodWithArguments = ScheduleMode.GetScheduleMethodWithArguments();
                 var returnType = containsReturn ? "global::Unity.Jobs.JobHandle" : "void";
-                var returnExpression = $"{"return ".EmitIfTrue(containsReturn)}__TypeHandle.{JobEntityHandle}.{methodWithArguments}";
+                var returnExpression =
+                    $"{"return ".EmitIfTrue(containsReturn)}__TypeHandle.{JobEntityHandle}.{methodWithArguments}";
                 var refType = "ref ".EmitIfTrue(ScheduleMode.IsByRef());
 
-                writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-                writer.WriteLine($"{returnType} {DefaultMethodName}({refType}{FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency, ref global::Unity.Entities.SystemState state, bool hasUserDefinedQuery)");
+                writer.WriteLine(
+                    "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+                );
+                writer.WriteLine(
+                    $"{returnType} {DefaultMethodName}({refType}{FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency, ref global::Unity.Entities.SystemState state, bool hasUserDefinedQuery)"
+                );
                 writer.WriteLine("{");
                 writer.Indent++;
-                writer.WriteLine($"{FullTypeName}.InternalCompiler.CheckForErrors({ScheduleMode.GetScheduleTypeAsNumber()});");
+                writer.WriteLine(
+                    $"{FullTypeName}.InternalCompiler.CheckForErrors({ScheduleMode.GetScheduleTypeAsNumber()});"
+                );
 
                 if (CheckQuery)
                 {
                     writer.WriteLine("if (Unity.Burst.CompilerServices.Hint.Unlikely(hasUserDefinedQuery))");
                     writer.WriteLine("{");
                     writer.Indent++;
-                    writer.WriteLine($"int requiredComponentCount = {FullTypeName}.InternalCompilerQueryAndHandleData.GetRequiredComponentTypeCount();");
-                    writer.WriteLine("global::System.Span<Unity.Entities.ComponentType> requiredComponentTypes = stackalloc Unity.Entities.ComponentType[requiredComponentCount];");
-                    writer.WriteLine($"{FullTypeName}.InternalCompilerQueryAndHandleData.AddRequiredComponentTypes(ref requiredComponentTypes);");
+                    writer.WriteLine(
+                        $"int requiredComponentCount = {FullTypeName}.InternalCompilerQueryAndHandleData.GetRequiredComponentTypeCount();"
+                    );
+                    writer.WriteLine(
+                        "global::System.Span<Unity.Entities.ComponentType> requiredComponentTypes = stackalloc Unity.Entities.ComponentType[requiredComponentCount];"
+                    );
+                    writer.WriteLine(
+                        $"{FullTypeName}.InternalCompilerQueryAndHandleData.AddRequiredComponentTypes(ref requiredComponentTypes);"
+                    );
                     writer.WriteLine();
-                    writer.WriteLine($"if (!{FullTypeName}.InternalCompilerQueryAndHandleData.QueryHasRequiredComponentsForExecuteMethodToRun(ref query, ref requiredComponentTypes))");
+                    writer.WriteLine(
+                        $"if (!{FullTypeName}.InternalCompilerQueryAndHandleData.QueryHasRequiredComponentsForExecuteMethodToRun(ref query, ref requiredComponentTypes))"
+                    );
                     writer.WriteLine("{");
                     writer.Indent++;
                     writer.WriteLine("throw new global::System.InvalidOperationException(");
-                    writer.WriteLine($"\"When scheduling an instance of `{FullTypeName}` with a custom query, the query must (at the very minimum) contain all the components required for `{FullTypeName}.Execute()` to run.\");");
+                    writer.WriteLine(
+                        $"\"When scheduling an instance of `{FullTypeName}` with a custom query, the query must (at the very minimum) contain all the components required for `{FullTypeName}.Execute()` to run.\");"
+                    );
                     writer.Indent--;
                     writer.WriteLine("}");
                     writer.Indent--;

@@ -7,7 +7,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
     /// A flag enum content provider to be used with the <see cref="SelectionDropDown" /> control.
     /// </summary>
     /// <typeparam name="T">The flag enum type.</typeparam>
-    internal class FlagEnumContentProvider<T> : ISelectionDropDownContentProvider where T : Enum
+    internal class FlagEnumContentProvider<T> : ISelectionDropDownContentProvider
+        where T : Enum
     {
         private readonly Action<T> m_ValueChangedCallback;
         private readonly T[] m_Values;
@@ -38,7 +39,10 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
 
             if (valueChangedCallback == null)
             {
-                throw new ArgumentNullException(nameof(valueChangedCallback), "The value change callback must not be null.");
+                throw new ArgumentNullException(
+                    nameof(valueChangedCallback),
+                    "The value change callback must not be null."
+                );
             }
 
             m_CurrentValue = initialValue;

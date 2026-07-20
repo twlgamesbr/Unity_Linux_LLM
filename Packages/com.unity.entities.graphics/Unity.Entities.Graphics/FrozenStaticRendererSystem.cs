@@ -13,9 +13,16 @@ namespace Unity.Rendering
             var group = GetEntityQuery(
                 new EntityQueryDesc
                 {
-                    All = new ComponentType[] { typeof(SceneSection), typeof(RenderMeshUnmanaged), typeof(LocalToWorld), typeof(Static) },
-                    None = new ComponentType[] { typeof(FrozenRenderSceneTag) }
-                });
+                    All = new ComponentType[]
+                    {
+                        typeof(SceneSection),
+                        typeof(RenderMeshUnmanaged),
+                        typeof(LocalToWorld),
+                        typeof(Static),
+                    },
+                    None = new ComponentType[] { typeof(FrozenRenderSceneTag) },
+                }
+            );
 
             EntityManager.GetAllUniqueSharedComponents<SceneSection>(out var sections, Allocator.Temp);
 
@@ -31,7 +38,15 @@ namespace Unity.Rendering
             foreach (var section in sections)
             {
                 group.SetSharedComponentFilterManaged(section);
-                EntityManager.AddSharedComponentManaged(group, new FrozenRenderSceneTag { SceneGUID = section.SceneGUID, SectionIndex = section.Section, HasStreamedLOD = hasStreamedLOD});
+                EntityManager.AddSharedComponentManaged(
+                    group,
+                    new FrozenRenderSceneTag
+                    {
+                        SceneGUID = section.SceneGUID,
+                        SectionIndex = section.Section,
+                        HasStreamedLOD = hasStreamedLOD,
+                    }
+                );
             }
 
             group.ResetFilter();

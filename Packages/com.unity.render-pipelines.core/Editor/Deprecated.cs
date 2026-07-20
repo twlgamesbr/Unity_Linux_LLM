@@ -10,9 +10,7 @@ namespace UnityEditor.Rendering
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     [Obsolete("This attribute is not handled anymore. Use Advanced Properties. #from(6000.0)")]
-    public sealed class SetAdditionalPropertiesVisibilityAttribute : Attribute
-    {
-    }
+    public sealed class SetAdditionalPropertiesVisibilityAttribute : Attribute { }
 
     /// <summary>
     /// This attribute tells the <see cref="VolumeComponentEditor"/> class which type of
@@ -63,12 +61,13 @@ namespace UnityEditor.Rendering
         }
     }
 
-
     /// <summary>
     /// Interface that should be used with [ScriptableRenderPipelineExtension(type))] attribute to dispatch ContextualMenu calls on the different SRPs
     /// </summary>
     /// <typeparam name="T">This must be a component that require AdditionalData in your SRP</typeparam>
-    [Obsolete("The menu items are handled automatically for components with the AdditionalComponentData attribute. #from(2022.2)")]
+    [Obsolete(
+        "The menu items are handled automatically for components with the AdditionalComponentData attribute. #from(2022.2)"
+    )]
     public interface IRemoveAdditionalDataContextualMenu<T>
         where T : Component
     {
@@ -94,22 +93,34 @@ namespace UnityEditor.Rendering
             /// <summary>
             /// Shader Stripping
             /// </summary>
-            public static readonly GUIContent shaderStrippingSettingsLabel = EditorGUIUtility.TrTextContent("Shader Stripping", "Shader Stripping settings");
+            public static readonly GUIContent shaderStrippingSettingsLabel = EditorGUIUtility.TrTextContent(
+                "Shader Stripping",
+                "Shader Stripping settings"
+            );
 
             /// <summary>
             /// Shader Variant Log Level
             /// </summary>
-            public static readonly GUIContent shaderVariantLogLevelLabel = EditorGUIUtility.TrTextContent("Shader Variant Log Level", "Controls the level of logging of shader variant information outputted during the build process. Information appears in the Unity Console when the build finishes.");
+            public static readonly GUIContent shaderVariantLogLevelLabel = EditorGUIUtility.TrTextContent(
+                "Shader Variant Log Level",
+                "Controls the level of logging of shader variant information outputted during the build process. Information appears in the Unity Console when the build finishes."
+            );
 
             /// <summary>
             /// Export Shader Variants
             /// </summary>
-            public static readonly GUIContent exportShaderVariantsLabel = EditorGUIUtility.TrTextContent("Export Shader Variants", "Controls whether to output shader variant information to a file.");
+            public static readonly GUIContent exportShaderVariantsLabel = EditorGUIUtility.TrTextContent(
+                "Export Shader Variants",
+                "Controls whether to output shader variant information to a file."
+            );
 
             /// <summary>
             /// Stripping Of Rendering Debugger Shader Variants is enabled
             /// </summary>
-            public static readonly GUIContent stripRuntimeDebugShadersLabel = EditorGUIUtility.TrTextContent("Strip Runtime Debug Shaders", "When enabled, all debug display shader variants are removed when you build for the Unity Player. This decreases build time, but disables some features of Rendering Debugger in Player builds.");
+            public static readonly GUIContent stripRuntimeDebugShadersLabel = EditorGUIUtility.TrTextContent(
+                "Strip Runtime Debug Shaders",
+                "When enabled, all debug display shader variants are removed when you build for the Unity Player. This decreases build time, but disables some features of Rendering Debugger in Player builds."
+            );
         }
 
         /// <summary>
@@ -119,7 +130,11 @@ namespace UnityEditor.Rendering
         /// <param name="owner">The owner editor</param>
         /// <param name="additionalShaderStrippingSettings">Pass another drawer if you want to specify additional shader stripping settings</param>
         [Obsolete("Use ShaderStrippingSettings instead. #from(2023.2).")]
-        public static void DrawShaderStrippingSettings(ISerializedRenderPipelineGlobalSettings serialized, Editor owner, CoreEditorDrawer<ISerializedRenderPipelineGlobalSettings>.IDrawer additionalShaderStrippingSettings = null)
+        public static void DrawShaderStrippingSettings(
+            ISerializedRenderPipelineGlobalSettings serialized,
+            Editor owner,
+            CoreEditorDrawer<ISerializedRenderPipelineGlobalSettings>.IDrawer additionalShaderStrippingSettings = null
+        )
         {
             CoreEditorUtils.DrawSectionHeader(Styles.shaderStrippingSettingsLabel);
 
@@ -164,7 +179,10 @@ namespace UnityEditor.Rendering
         /// <summary>
         /// If the Runtime Rendering Debugger Debug Variants should be stripped
         /// </summary>
-        SerializedProperty stripDebugVariants { get => null; }
+        SerializedProperty stripDebugVariants
+        {
+            get => null;
+        }
     }
 
     public sealed partial class DefaultVolumeProfileEditor
@@ -189,8 +207,11 @@ namespace UnityEditor.Rendering
         /// </summary>
         /// <typeparam name="TSetting">Default Volume Profile Settings type</typeparam>
         /// <typeparam name="TRenderPipeline">Render Pipeline type</typeparam>
-        [Obsolete("Use DefaultVolumeProfileSettingsPropertyDrawer<T>.DefaultVolumeProfileSettingsContextMenu2<TSetting, TRenderPipeline> instead #from(6000.0)")]
-        public abstract class DefaultVolumeProfileSettingsContextMenu<TSetting, TRenderPipeline> : IRenderPipelineGraphicsSettingsContextMenu<TSetting>
+        [Obsolete(
+            "Use DefaultVolumeProfileSettingsPropertyDrawer<T>.DefaultVolumeProfileSettingsContextMenu2<TSetting, TRenderPipeline> instead #from(6000.0)"
+        )]
+        public abstract class DefaultVolumeProfileSettingsContextMenu<TSetting, TRenderPipeline>
+            : IRenderPipelineGraphicsSettingsContextMenu<TSetting>
             where TSetting : class, IDefaultVolumeProfileSettings
             where TRenderPipeline : RenderPipeline
         {
@@ -201,7 +222,11 @@ namespace UnityEditor.Rendering
             protected abstract string defaultVolumeProfilePath { get; }
 
             [Obsolete("Not used anymore. #from(6000.0)")]
-            void IRenderPipelineGraphicsSettingsContextMenu<TSetting>.PopulateContextMenu(TSetting setting, PropertyDrawer property, ref GenericMenu menu){ }
+            void IRenderPipelineGraphicsSettingsContextMenu<TSetting>.PopulateContextMenu(
+                TSetting setting,
+                PropertyDrawer property,
+                ref GenericMenu menu
+            ) { }
         }
     }
 
@@ -209,7 +234,10 @@ namespace UnityEditor.Rendering
     /// Builtin Drawer for Maskfield Debug Items.
     /// </summary>
     [DebugUIDrawer(typeof(DebugUI.MaskField))]
-    [Obsolete("DebugUI.MaskField has been deprecated and is not longer supported, please use BitField instead. #from(6000.2)", true)]
+    [Obsolete(
+        "DebugUI.MaskField has been deprecated and is not longer supported, please use BitField instead. #from(6000.2)",
+        true
+    )]
     public sealed class DebugUIDrawerMaskField : DebugUIFieldDrawer<uint, DebugUI.MaskField, DebugStateUInt>
     {
         /// <summary>

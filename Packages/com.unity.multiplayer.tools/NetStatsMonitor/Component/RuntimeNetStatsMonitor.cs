@@ -1,10 +1,10 @@
 using System;
 using JetBrains.Annotations;
+using Unity.Multiplayer.Tools.Common.Helpers;
 using Unity.Multiplayer.Tools.NetStats;
+using Unity.Multiplayer.Tools.NetStatsMonitor.Implementation;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Unity.Multiplayer.Tools.Common.Helpers;
-using Unity.Multiplayer.Tools.NetStatsMonitor.Implementation;
 
 namespace Unity.Multiplayer.Tools.NetStatsMonitor
 {
@@ -50,9 +50,11 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// The default refresh rate is 30fps.
         [SerializeField]
         [Min((float)ConfigurationLimits.k_RefreshRateMin)]
-        [Tooltip("The maximum rate at which the Runtime Net Stats Monitor's on-screen display is updated " +
-            "(per second). " +
-            "The on-screen display will never be updated faster than the overall refresh rate.")]
+        [Tooltip(
+            "The maximum rate at which the Runtime Net Stats Monitor's on-screen display is updated "
+                + "(per second). "
+                + "The on-screen display will never be updated faster than the overall refresh rate."
+        )]
         double m_MaxRefreshRate = 30;
 
         /// <summary>
@@ -67,9 +69,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// of the Runtime Net Stats Monitor scales on different devices and displays.
         /// </summary>
         [field: Tooltip(
-            "Optional panel settings that can be used to override the default. " +
-            "These panel settings can be used to control a number of things, including how the on-screen display " +
-            "of the Runtime Net Stats Monitor scales on different devices and displays. ")]
+            "Optional panel settings that can be used to override the default. "
+                + "These panel settings can be used to control a number of things, including how the on-screen display "
+                + "of the Runtime Net Stats Monitor scales on different devices and displays. "
+        )]
         [field: SerializeField]
         public PanelSettings PanelSettingsOverride { get; set; }
 
@@ -88,9 +91,9 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         [CanBeNull]
         [field: SerializeField]
         [field: Tooltip(
-            "The configuration asset used to configure the information displayed in this Runtime Net Stats Monitor. " +
-            "The NetStatsMonitorConfiguration can created from the Create menu, or from C# using " +
-            "ScriptableObject.CreateInstance."
+            "The configuration asset used to configure the information displayed in this Runtime Net Stats Monitor. "
+                + "The NetStatsMonitorConfiguration can created from the Create menu, or from C# using "
+                + "ScriptableObject.CreateInstance."
         )]
         public NetStatsMonitorConfiguration Configuration { get; set; }
 
@@ -181,7 +184,13 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         void SetupImplementation()
         {
             Implementation ??= new RnsmComponentImplementation();
-            Implementation?.SetupAndConfigure(Configuration, Position, CustomStyleSheet, PanelSettingsOverride, MaxRefreshRate);
+            Implementation?.SetupAndConfigure(
+                Configuration,
+                Position,
+                CustomStyleSheet,
+                PanelSettingsOverride,
+                MaxRefreshRate
+            );
         }
 
         void ConfigureImplementation()

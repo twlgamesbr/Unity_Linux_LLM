@@ -53,32 +53,32 @@ namespace NPCSystem.Monitoring.Datadog
                 _metricQueue = new ConcurrentQueue<string>();
                 _cts = new CancellationTokenSource();
 
-                _senderThread = new Thread(SenderLoop)
-                {
-                    Name = "DogStatsD Sender",
-                    IsBackground = true,
-                };
+                _senderThread = new Thread(SenderLoop) { Name = "DogStatsD Sender", IsBackground = true };
                 _senderThread.Start();
 
                 _initialized = true;
 
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Success,
-                    NPCFlowLogLevel.Info,
-                    $"[DatadogMetrics] Initialized — sending to {host}:{port}",
-                    source: nameof(DatadogMetricsService)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Success,
+                        NPCFlowLogLevel.Info,
+                        $"[DatadogMetrics] Initialized — sending to {host}:{port}",
+                        source: nameof(DatadogMetricsService)
+                    );
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Error,
-                    $"[DatadogMetrics] Failed to initialize: {ex.Message}",
-                    source: nameof(DatadogMetricsService)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"[DatadogMetrics] Failed to initialize: {ex.Message}",
+                        source: nameof(DatadogMetricsService)
+                    );
             }
         }
 
@@ -118,7 +118,8 @@ namespace NPCSystem.Monitoring.Datadog
             // Logger may already be destroyed during scene teardown — skip safely
             try
             {
-                NPCFlowLogger.FindOrCreate()
+                NPCFlowLogger
+                    .FindOrCreate()
                     ?.Log(
                         NPCFlowStage.SceneBootstrap,
                         NPCFlowStatus.Success,
@@ -149,34 +150,19 @@ namespace NPCSystem.Monitoring.Datadog
         }
 
         /// <summary>Record a gauge (current value).</summary>
-        public static void Gauge(
-            string metricName,
-            double value,
-            double sampleRate = 1.0,
-            string[] tags = null
-        )
+        public static void Gauge(string metricName, double value, double sampleRate = 1.0, string[] tags = null)
         {
             EnqueueMetric(FormatMetric(metricName, value, "g", sampleRate, tags));
         }
 
         /// <summary>Record a timing in milliseconds.</summary>
-        public static void Timer(
-            string metricName,
-            double milliseconds,
-            double sampleRate = 1.0,
-            string[] tags = null
-        )
+        public static void Timer(string metricName, double milliseconds, double sampleRate = 1.0, string[] tags = null)
         {
             EnqueueMetric(FormatMetric(metricName, milliseconds, "ms", sampleRate, tags));
         }
 
         /// <summary>Record a histogram value.</summary>
-        public static void Histogram(
-            string metricName,
-            double value,
-            double sampleRate = 1.0,
-            string[] tags = null
-        )
+        public static void Histogram(string metricName, double value, double sampleRate = 1.0, string[] tags = null)
         {
             EnqueueMetric(FormatMetric(metricName, value, "h", sampleRate, tags));
         }
@@ -195,27 +181,20 @@ namespace NPCSystem.Monitoring.Datadog
             // Drop oldest if queue overflows to avoid OOM
             if (_metricQueue.Count > MaxQueueSize && _metricQueue.TryDequeue(out _))
             {
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Warning,
-                    "[DatadogMetrics] Queue overflow — dropping oldest metric.",
-                    source: nameof(DatadogMetricsService),
-                    data: new Dictionary<string, object>
-                    {
-                        ["queueSize"] = MaxQueueSize,
-                    }
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        "[DatadogMetrics] Queue overflow — dropping oldest metric.",
+                        source: nameof(DatadogMetricsService),
+                        data: new Dictionary<string, object> { ["queueSize"] = MaxQueueSize }
+                    );
             }
         }
 
-        private static string FormatMetric(
-            string name,
-            double value,
-            string type,
-            double sampleRate,
-            string[] tags
-        )
+        private static string FormatMetric(string name, double value, string type, double sampleRate, string[] tags)
         {
             var sb = new StringBuilder();
             sb.Append(name);
@@ -227,9 +206,7 @@ namespace NPCSystem.Monitoring.Datadog
             if (Math.Abs(sampleRate - 1.0) > 0.001)
             {
                 sb.Append("|@");
-                sb.Append(
-                    sampleRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)
-                );
+                sb.Append(sampleRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture));
             }
 
             if (tags != null && tags.Length > 0)
@@ -293,13 +270,15 @@ namespace NPCSystem.Monitoring.Datadog
                 }
                 catch (Exception ex)
                 {
-                    NPCFlowLogger.FindOrCreate().Log(
-                        NPCFlowStage.SceneBootstrap,
-                        NPCFlowStatus.Error,
-                        NPCFlowLogLevel.Error,
-                        $"[DatadogMetrics] Sender error: {ex.Message}",
-                        source: nameof(DatadogMetricsService)
-                    );
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        .Log(
+                            NPCFlowStage.SceneBootstrap,
+                            NPCFlowStatus.Error,
+                            NPCFlowLogLevel.Error,
+                            $"[DatadogMetrics] Sender error: {ex.Message}",
+                            source: nameof(DatadogMetricsService)
+                        );
                     Thread.Sleep(1000);
                 }
             }
@@ -315,23 +294,27 @@ namespace NPCSystem.Monitoring.Datadog
             catch (ObjectDisposedException)
             {
                 // Shutdown race — silently ignore
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Debug,
-                    "[DatadogMetrics] Send skipped — ObjectDisposedException (shutdown race).",
-                    source: nameof(DatadogMetricsService)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Debug,
+                        "[DatadogMetrics] Send skipped — ObjectDisposedException (shutdown race).",
+                        source: nameof(DatadogMetricsService)
+                    );
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Error,
-                    $"[DatadogMetrics] Send error: {ex.Message}",
-                    source: nameof(DatadogMetricsService)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"[DatadogMetrics] Send error: {ex.Message}",
+                        source: nameof(DatadogMetricsService)
+                    );
             }
         }
     }

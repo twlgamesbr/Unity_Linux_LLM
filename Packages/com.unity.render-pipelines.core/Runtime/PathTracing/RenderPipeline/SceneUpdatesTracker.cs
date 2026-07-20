@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -49,10 +48,20 @@ namespace UnityEngine.Rendering.LiveGI
 
         public bool HasChanges()
         {
-            return (addedMeshRenderers.Count | removedMeshRenderers.Count | changedMeshRenderers.Count
-                | addedTerrains.Count | changedTerrains.Count | removedTerrains.Count
-                | addedMaterials.Count | removedMaterials.Count | changedMaterials.Count
-                | addedLights.Count | removedLights.Count | changedLights.Count) != 0;
+            return (
+                    addedMeshRenderers.Count
+                    | removedMeshRenderers.Count
+                    | changedMeshRenderers.Count
+                    | addedTerrains.Count
+                    | changedTerrains.Count
+                    | removedTerrains.Count
+                    | addedMaterials.Count
+                    | removedMaterials.Count
+                    | changedMaterials.Count
+                    | addedLights.Count
+                    | removedLights.Count
+                    | changedLights.Count
+                ) != 0;
         }
 
         public void Clear()
@@ -76,7 +85,14 @@ namespace UnityEngine.Rendering.LiveGI
     }
 
     [System.Flags]
-    internal enum ModifiedProperties { Transform = 1, Material = 2, IsStatic = 4, ShadowCasting = 8, Layer = 16 }
+    internal enum ModifiedProperties
+    {
+        Transform = 1,
+        Material = 2,
+        IsStatic = 4,
+        ShadowCasting = 8,
+        Layer = 16,
+    }
 
     internal struct MeshRendererInstanceChanges
     {
@@ -162,7 +178,6 @@ namespace UnityEngine.Rendering.LiveGI
         SceneChanges m_Changes;
         uint m_Timestamp;
 
-
         public SceneUpdatesTracker()
         {
             m_Changes = new SceneChanges();
@@ -181,7 +196,9 @@ namespace UnityEngine.Rendering.LiveGI
             m_ObjectDispatcher.EnableTransformTracking<MeshRenderer>(ObjectDispatcher.TransformTrackingType.GlobalTRS);
             m_ObjectDispatcher.EnableTypeTracking<Terrain>(ObjectDispatcher.TypeTrackingFlags.SceneObjects);
             m_ObjectDispatcher.EnableTransformTracking<Terrain>(ObjectDispatcher.TransformTrackingType.GlobalTRS);
-            m_ObjectDispatcher.EnableTypeTracking<Material>(ObjectDispatcher.TypeTrackingFlags.SceneObjects | ObjectDispatcher.TypeTrackingFlags.Assets);
+            m_ObjectDispatcher.EnableTypeTracking<Material>(
+                ObjectDispatcher.TypeTrackingFlags.SceneObjects | ObjectDispatcher.TypeTrackingFlags.Assets
+            );
             m_ObjectDispatcher.EnableTypeTracking<Light>(ObjectDispatcher.TypeTrackingFlags.SceneObjects);
             m_ObjectDispatcher.EnableTransformTracking<Light>(ObjectDispatcher.TransformTrackingType.GlobalTRS);
         }
@@ -207,7 +224,9 @@ namespace UnityEngine.Rendering.LiveGI
 
         private void FindMaterialsChanges()
         {
-            using var materialChanges = m_ObjectDispatcher.GetTypeChangesAndClear<Material>(Unity.Collections.Allocator.Temp);
+            using var materialChanges = m_ObjectDispatcher.GetTypeChangesAndClear<Material>(
+                Unity.Collections.Allocator.Temp
+            );
 
             // Handle added materials in mesh renderers
             foreach (var meshRendererInstance in m_MeshRenderers.Values)
@@ -296,13 +315,19 @@ namespace UnityEngine.Rendering.LiveGI
 #endif
         }
 
-        private static bool IntArraySequenceEqual(EntityId[] firstArray, EntityId[] secondArray) => ((ReadOnlySpan<EntityId>)firstArray).SequenceEqual(secondArray);
+        private static bool IntArraySequenceEqual(EntityId[] firstArray, EntityId[] secondArray) =>
+            ((ReadOnlySpan<EntityId>)firstArray).SequenceEqual(secondArray);
 
         private void FindMeshRendererChanges()
         {
             // Handle changed mesh renderers
-            using var meshRendererChanges = m_ObjectDispatcher.GetTypeChangesAndClear<MeshRenderer>(Unity.Collections.Allocator.Temp);
-            var transformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<MeshRenderer>(ObjectDispatcher.TransformTrackingType.GlobalTRS, false);
+            using var meshRendererChanges = m_ObjectDispatcher.GetTypeChangesAndClear<MeshRenderer>(
+                Unity.Collections.Allocator.Temp
+            );
+            var transformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<MeshRenderer>(
+                ObjectDispatcher.TransformTrackingType.GlobalTRS,
+                false
+            );
             var changedRenderers = MergeChanges<MeshRenderer>(meshRendererChanges.changed, transformChanges);
 
             // Handle removed mesh renderers
@@ -330,7 +355,6 @@ namespace UnityEngine.Rendering.LiveGI
 
             foreach (var key in m_Changes.removedMeshRenderers)
                 m_MeshRenderers.Remove(key);
-
 
             foreach (var item in changedRenderers)
             {
@@ -369,11 +393,9 @@ namespace UnityEngine.Rendering.LiveGI
 
                 if (changes != 0)
                 {
-                    m_Changes.changedMeshRenderers.Add(new MeshRendererInstanceChanges()
-                    {
-                        changes = changes,
-                        instance = meshRenderer
-                    });
+                    m_Changes.changedMeshRenderers.Add(
+                        new MeshRendererInstanceChanges() { changes = changes, instance = meshRenderer }
+                    );
 
                     m_MeshRenderers[meshRenderer.GetEntityId()] = data;
                 }
@@ -383,8 +405,13 @@ namespace UnityEngine.Rendering.LiveGI
         private void FindTerrainChanges()
         {
             // Handle changed terrains
-            using var terrainChanges = m_ObjectDispatcher.GetTypeChangesAndClear<Terrain>(Unity.Collections.Allocator.Temp);
-            var terrainTransformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<Terrain>(ObjectDispatcher.TransformTrackingType.GlobalTRS, false);
+            using var terrainChanges = m_ObjectDispatcher.GetTypeChangesAndClear<Terrain>(
+                Unity.Collections.Allocator.Temp
+            );
+            var terrainTransformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<Terrain>(
+                ObjectDispatcher.TransformTrackingType.GlobalTRS,
+                false
+            );
             var changedTerrains = MergeChanges<Terrain>(terrainChanges.changed, terrainTransformChanges);
 
             // Handle removed terrains
@@ -450,11 +477,9 @@ namespace UnityEngine.Rendering.LiveGI
 
                 if (changes != 0)
                 {
-                    m_Changes.changedTerrains.Add(new TerrainInstanceChanges()
-                    {
-                        changes = changes,
-                        instance = terrain
-                    });
+                    m_Changes.changedTerrains.Add(
+                        new TerrainInstanceChanges() { changes = changes, instance = terrain }
+                    );
 
                     m_Terrains[terrain.GetEntityId()] = data;
                 }
@@ -468,7 +493,10 @@ namespace UnityEngine.Rendering.LiveGI
                 timestamp = new Timestamp { lastVisit = timestamp, creation = timestamp },
                 isStatic = meshRenderer.gameObject.isStatic,
                 materials = meshRenderer.sharedMaterials,
-                materialIDs = Array.ConvertAll(meshRenderer.sharedMaterials, mat => mat != null ? mat.GetEntityId() : EntityId.None),
+                materialIDs = Array.ConvertAll(
+                    meshRenderer.sharedMaterials,
+                    mat => mat != null ? mat.GetEntityId() : EntityId.None
+                ),
                 shadowCastingMode = meshRenderer.shadowCastingMode,
                 renderer = meshRenderer,
             };
@@ -481,24 +509,28 @@ namespace UnityEngine.Rendering.LiveGI
                 timestamp = new Timestamp { lastVisit = timestamp, creation = timestamp },
                 isStatic = terrain.gameObject.isStatic,
                 material = terrain.splatBaseMaterial,
-                materialID = terrain.splatBaseMaterial != null ? terrain.splatBaseMaterial.GetEntityId() : EntityId.None,
+                materialID =
+                    terrain.splatBaseMaterial != null ? terrain.splatBaseMaterial.GetEntityId() : EntityId.None,
                 shadowCastingMode = terrain.shadowCastingMode,
                 terrain = terrain,
             };
         }
 
-        static private bool ShouldIncludeLight(Light light, bool filterBakedLights)
+        private static bool ShouldIncludeLight(Light light, bool filterBakedLights)
         {
-            return light.enabled &&
-                   light.gameObject.activeInHierarchy &&
-                   !(filterBakedLights && light.bakingOutput.isBaked);
+            return light.enabled
+                && light.gameObject.activeInHierarchy
+                && !(filterBakedLights && light.bakingOutput.isBaked);
         }
 
         private void FindLightChanges(bool filterBakedLights)
         {
             // Handle changed lights
             using var lightChanges = m_ObjectDispatcher.GetTypeChangesAndClear<Light>(Unity.Collections.Allocator.Temp);
-            var lightTransformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<Light>(ObjectDispatcher.TransformTrackingType.GlobalTRS, false);
+            var lightTransformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<Light>(
+                ObjectDispatcher.TransformTrackingType.GlobalTRS,
+                false
+            );
             var changedLights = MergeChanges<Light>(lightChanges.changed, lightTransformChanges);
 
             // Handle removed lights
@@ -569,12 +601,18 @@ namespace UnityEngine.Rendering.LiveGI
 
             foreach (Component component in changedTransforms)
             {
-                map.TryAdd(component.GetEntityId(), new ChangedObject<T>() { objectReference = (T)component, transformChanged = true });
+                map.TryAdd(
+                    component.GetEntityId(),
+                    new ChangedObject<T>() { objectReference = (T)component, transformChanged = true }
+                );
             }
 
             foreach (Component component in changedRenderers)
             {
-                map.TryAdd(component.GetEntityId(), new ChangedObject<T>() { objectReference = (T)component, transformChanged = false });
+                map.TryAdd(
+                    component.GetEntityId(),
+                    new ChangedObject<T>() { objectReference = (T)component, transformChanged = false }
+                );
             }
 
             return map;

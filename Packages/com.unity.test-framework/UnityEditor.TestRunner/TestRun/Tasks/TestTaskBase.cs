@@ -20,7 +20,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
         {
             DoNotRunOnError,
             RunOnlyOnError,
-            RunAlways
+            RunAlways,
         }
 
         public virtual string GetName()
@@ -69,7 +69,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                     return RunOnError != ErrorRunMode.RunOnlyOnError;
             }
         }
-        
+
         protected static bool IsAutomated()
         {
             var commandLineArgs = Environment.GetCommandLineArgs();

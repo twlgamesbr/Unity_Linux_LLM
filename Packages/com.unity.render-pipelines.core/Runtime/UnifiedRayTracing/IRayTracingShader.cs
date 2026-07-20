@@ -143,5 +143,3 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         uint3 GetThreadGroupSizes();
     }
 }
-
-

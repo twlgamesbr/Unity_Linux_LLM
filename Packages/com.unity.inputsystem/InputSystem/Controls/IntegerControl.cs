@@ -46,9 +46,11 @@ namespace UnityEngine.InputSystem.Controls
 
         protected override FourCC CalculateOptimizedControlDataType()
         {
-            if (m_StateBlock.format == InputStateBlock.FormatInt &&
-                m_StateBlock.sizeInBits == 32 &&
-                m_StateBlock.bitOffset == 0)
+            if (
+                m_StateBlock.format == InputStateBlock.FormatInt
+                && m_StateBlock.sizeInBits == 32
+                && m_StateBlock.bitOffset == 0
+            )
                 return InputStateBlock.FormatInt;
             return InputStateBlock.FormatInvalid;
         }

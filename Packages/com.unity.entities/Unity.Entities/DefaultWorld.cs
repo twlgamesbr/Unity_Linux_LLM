@@ -8,7 +8,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the beginning of the <see cref="InitializationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(InitializationSystemGroup), OrderFirst = true)]
     public partial class BeginInitializationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -67,6 +69,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -79,7 +82,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the end of the <see cref="InitializationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(InitializationSystemGroup), OrderLast = true)]
     public partial class EndInitializationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -138,6 +143,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -156,9 +162,7 @@ namespace Unity.Entities
         /// Default constructor
         /// </summary>
         [Preserve]
-        public InitializationSystemGroup()
-        {
-        }
+        public InitializationSystemGroup() { }
 
         /// <inheritdoc cref="ComponentSystemGroup.OnUpdate"/>
         protected override void OnUpdate()
@@ -173,7 +177,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the beginning of the <see cref="FixedStepSimulationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup), OrderFirst = true)]
     public partial class BeginFixedStepSimulationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -232,6 +238,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -244,7 +251,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the end of the <see cref="FixedStepSimulationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup), OrderLast = true)]
     public partial class EndFixedStepSimulationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -303,6 +312,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -323,7 +333,9 @@ namespace Unity.Entities
     /// The default fixed timestep is 1/60 seconds. This value can be overriden at runtime by modifying
     /// the system group's `Timestep` property.
     /// </remarks>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
     [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
     public partial class FixedStepSimulationSystemGroup : ComponentSystemGroup
@@ -356,7 +368,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the beginning of the <see cref="VariableRateSimulationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(VariableRateSimulationSystemGroup), OrderFirst = true)]
     public partial class BeginVariableRateSimulationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -415,6 +429,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -427,7 +442,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the end of the <see cref="VariableRateSimulationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(VariableRateSimulationSystemGroup), OrderLast = true)]
     public partial class EndVariableRateSimulationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -486,6 +503,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -503,7 +521,9 @@ namespace Unity.Entities
     /// while this group is updating to the value total elapsed time since the previous update.
     /// You can configure the update rate manually by replacing the <see cref="IRateManager"/>.
     /// </remarks>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
     [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
     public partial class VariableRateSimulationSystemGroup : ComponentSystemGroup
@@ -529,7 +549,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the beginning of the <see cref="SimulationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
     public partial class BeginSimulationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -588,6 +610,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -600,7 +623,9 @@ namespace Unity.Entities
     /// <summary>
     /// The <see cref="EntityCommandBufferSystem"/> at the end of the <see cref="SimulationSystemGroup"/>.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderLast = true)]
     public partial class EndSimulationEntityCommandBufferSystem : EntityCommandBufferSystem
     {
@@ -659,6 +684,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -672,10 +698,12 @@ namespace Unity.Entities
     /// Default group that runs at the end of the <see cref="SimulationSystemGroup"/>. Contains systems that perform simulation logic,
     /// but which should run after the main simulation logic is complete.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderLast = true)]
     [UpdateBefore(typeof(EndSimulationEntityCommandBufferSystem))]
-    public partial class LateSimulationSystemGroup : ComponentSystemGroup {}
+    public partial class LateSimulationSystemGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// Default system group that contains systems that update the simulated world for a new frame.
@@ -686,9 +714,7 @@ namespace Unity.Entities
         /// Default constructor
         /// </summary>
         [Preserve]
-        public SimulationSystemGroup()
-        {
-        }
+        public SimulationSystemGroup() { }
     }
 
     /// <summary>
@@ -753,6 +779,7 @@ namespace Unity.Entities
                 allocator = allocatorIn;
             }
         }
+
         /// <inheritdoc cref="EntityCommandBufferSystem.OnCreate"/>
         protected override void OnCreate()
         {
@@ -765,15 +792,16 @@ namespace Unity.Entities
     /// <summary>
     /// The system group containing systems related to rendering the simulated world.
     /// </summary>
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Presentation, WorldSystemFilterFlags.Presentation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Presentation,
+        WorldSystemFilterFlags.Presentation
+    )]
     public partial class PresentationSystemGroup : ComponentSystemGroup
     {
         /// <summary>
         /// Default constructor
         /// </summary>
         [Preserve]
-        public PresentationSystemGroup()
-        {
-        }
+        public PresentationSystemGroup() { }
     }
 }

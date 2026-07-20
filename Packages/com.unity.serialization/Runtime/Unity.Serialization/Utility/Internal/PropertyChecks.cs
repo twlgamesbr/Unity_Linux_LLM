@@ -8,15 +8,15 @@ namespace Unity.Serialization
     /// </summary>
     static class PropertyChecks
     {
-        internal static string GetReadOnlyValueTypeErrorMessage(Type type, string propertyName)
-            => $"Failed to deserialize Property=[{propertyName}] for Type=[{type.FullName}]. The property is readonly value type and can not be assigned. The property needs to be writable or ignored by serialization using [{nameof(DontSerializeAttribute)}].";
-        
-        internal static string GetReadOnlyReferenceTypeErrorMessage(Type type, string propertyName)
-            => $"Failed to deserialize Property=[{propertyName}] for Type=[{type.FullName}]. The property is readonly and the reference can not be assigned. The property needs to be writable, default constructed, or ignored by serialization using [{nameof(DontSerializeAttribute)}].";
+        internal static string GetReadOnlyValueTypeErrorMessage(Type type, string propertyName) =>
+            $"Failed to deserialize Property=[{propertyName}] for Type=[{type.FullName}]. The property is readonly value type and can not be assigned. The property needs to be writable or ignored by serialization using [{nameof(DontSerializeAttribute)}].";
 
-        internal static string GetReadOnlyReferenceTypeWithInvalidTypeErrorMessage(Type type, string propertyName)
-            => $"Failed to deserialize Property=[{propertyName}] for Type=[{type.FullName}]. The default constructed instance does not match the deserialized type. The property needs to be writable, default constructed with the correct type, or ignored by serialization using [{nameof(DontSerializeAttribute)}]";
-        
+        internal static string GetReadOnlyReferenceTypeErrorMessage(Type type, string propertyName) =>
+            $"Failed to deserialize Property=[{propertyName}] for Type=[{type.FullName}]. The property is readonly and the reference can not be assigned. The property needs to be writable, default constructed, or ignored by serialization using [{nameof(DontSerializeAttribute)}].";
+
+        internal static string GetReadOnlyReferenceTypeWithInvalidTypeErrorMessage(Type type, string propertyName) =>
+            $"Failed to deserialize Property=[{propertyName}] for Type=[{type.FullName}]. The default constructed instance does not match the deserialized type. The property needs to be writable, default constructed with the correct type, or ignored by serialization using [{nameof(DontSerializeAttribute)}]";
+
         /// <summary>
         /// Validates a readonly property was correctly deserialized. This can be used this to catch any errors which could fail silently.
         /// </summary>
@@ -27,14 +27,19 @@ namespace Unity.Serialization
         /// <typeparam name="TContainer">The container type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns><see langword="true"/> if the value was deserialized correctly despite being readonly; otherwise, <see langword="false"/>.</returns>
-        public static bool CheckReadOnlyPropertyForDeserialization<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value, out string error)
+        public static bool CheckReadOnlyPropertyForDeserialization<TContainer, TValue>(
+            Property<TContainer, TValue> property,
+            ref TContainer container,
+            ref TValue value,
+            out string error
+        )
         {
             if (!property.IsReadOnly)
             {
                 error = string.Empty;
                 return false;
             }
-            
+
             if (typeof(TValue).IsValueType)
             {
                 // The deserialized value is a `ValueType`, since this is a copy and we can not assign back this is a failure.
@@ -50,13 +55,14 @@ namespace Unity.Serialization
                 // We also check the existing instance for null in order to provide a more meaningful error message. If the existing instance is NOT null
                 // and the references do not match, this means a default constructor or field initializer was run AND a new instance was constructed by deserialization.
                 // This is most commonly caused by deserializing a polymorphic type that does not match the default constructed.
-                error = null == existing
-                    ? GetReadOnlyReferenceTypeErrorMessage(typeof(TContainer), property.Name)
-                    : GetReadOnlyReferenceTypeWithInvalidTypeErrorMessage(typeof(TContainer), property.Name);
+                error =
+                    null == existing
+                        ? GetReadOnlyReferenceTypeErrorMessage(typeof(TContainer), property.Name)
+                        : GetReadOnlyReferenceTypeWithInvalidTypeErrorMessage(typeof(TContainer), property.Name);
 
                 return true;
             }
-            
+
             error = string.Empty;
             return false;
         }

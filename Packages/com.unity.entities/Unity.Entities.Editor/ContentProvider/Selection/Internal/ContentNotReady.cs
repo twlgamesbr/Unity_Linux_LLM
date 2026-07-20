@@ -36,7 +36,8 @@ namespace Unity.Entities.UI
             if (m_PreviousName == name)
                 return;
             m_PreviousName = name;
-            m_CachedText = $"{(string.IsNullOrEmpty(name) ? TypeUtility.GetTypeDisplayName(m_Provider.GetType()) : name)} is not ready for display";
+            m_CachedText =
+                $"{(string.IsNullOrEmpty(name) ? TypeUtility.GetTypeDisplayName(m_Provider.GetType()) : name)} is not ready for display";
         }
     }
 
@@ -56,7 +57,9 @@ namespace Unity.Entities.UI
             var root = template.CloneTree();
             var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(k_BasePath + "uss/content-not-ready.uss");
             root.styleSheets.Add(styleSheet);
-            var skinStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(k_BasePath + $"uss/content-not-ready_{(EditorGUIUtility.isProSkin?"dark":"light")}.uss");
+            var skinStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(
+                k_BasePath + $"uss/content-not-ready_{(EditorGUIUtility.isProSkin ? "dark" : "light")}.uss"
+            );
             root.styleSheets.Add(skinStyleSheet);
 
             m_Spinner = root.Q(className: "content-not-ready__spinner");

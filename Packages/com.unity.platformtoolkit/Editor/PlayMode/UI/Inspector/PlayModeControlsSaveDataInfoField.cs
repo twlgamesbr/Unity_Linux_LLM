@@ -11,15 +11,20 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public PlayModeControlsSaveDataInfoField(PlayModeSaveData saveData)
         {
-            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsSaveDataInfoField.uxml");
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsSaveDataInfoField.uxml"
+            );
             uxml.CloneTree(this);
 
             PlayModeImportExportSave importExportSave = new PlayModeImportExportSave(saveData);
             Button importButton = this.Q<Button>("SaveImportButton");
             importButton.RegisterCallback<ClickEvent>(async _ =>
             {
-                var selectedZipFile =
-                    EditorUtility.OpenFilePanel("Select a Platform Toolkit save zip file to override this save with", Application.dataPath, "zip");
+                var selectedZipFile = EditorUtility.OpenFilePanel(
+                    "Select a Platform Toolkit save zip file to override this save with",
+                    Application.dataPath,
+                    "zip"
+                );
                 if (string.IsNullOrEmpty(selectedZipFile))
                     return;
 
@@ -36,8 +41,11 @@ namespace Unity.PlatformToolkit.PlayMode
             Button exportButton = this.Q<Button>("SaveExportButton");
             exportButton.RegisterCallback<ClickEvent>(async _ =>
             {
-                var selectedFolder =
-                    EditorUtility.OpenFolderPanel("Select a folder to export the save to", Application.dataPath, "");
+                var selectedFolder = EditorUtility.OpenFolderPanel(
+                    "Select a folder to export the save to",
+                    Application.dataPath,
+                    ""
+                );
                 if (string.IsNullOrEmpty(selectedFolder))
                     return;
 

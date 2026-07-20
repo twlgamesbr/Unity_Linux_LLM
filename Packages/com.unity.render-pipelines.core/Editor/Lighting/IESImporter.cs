@@ -1,6 +1,6 @@
 using System.IO;
-using UnityEngine;
 using UnityEditor.AssetImporters;
+using UnityEngine;
 
 namespace UnityEditor.Rendering
 {
@@ -25,7 +25,15 @@ namespace UnityEditor.Rendering
         /// Delegate prototype which will be sent by the pipeline implementation of the IES Importer
         /// Must be initialized during the creation of the SRP
         /// </summary>
-        public static event System.Action<AssetImportContext, string, bool, string, float, Light, Texture> createRenderPipelinePrefabLight;
+        public static event System.Action<
+            AssetImportContext,
+            string,
+            bool,
+            string,
+            float,
+            Light,
+            Texture
+        > createRenderPipelinePrefabLight;
 
         /// <summary>
         /// Common method performing the import of the asset
@@ -55,14 +63,22 @@ namespace UnityEditor.Rendering
 
                 string warningMessage;
 
-                (warningMessage, cookieTextureCube) = engine.GenerateCubeCookie(iesMetaData.CookieCompression, (int)iesMetaData.iesSize);
+                (warningMessage, cookieTextureCube) = engine.GenerateCubeCookie(
+                    iesMetaData.CookieCompression,
+                    (int)iesMetaData.iesSize
+                );
                 if (!string.IsNullOrEmpty(warningMessage))
                 {
                     ctx.LogImportWarning($"Cannot properly generate IES Cube texture: {warningMessage}");
                 }
                 cookieTextureCube.IncrementUpdateCount();
 
-                (warningMessage, cookieTexture2D) = engine.Generate2DCookie(iesMetaData.CookieCompression, iesMetaData.SpotAngle, (int)iesMetaData.iesSize, iesMetaData.ApplyLightAttenuation);
+                (warningMessage, cookieTexture2D) = engine.Generate2DCookie(
+                    iesMetaData.CookieCompression,
+                    iesMetaData.SpotAngle,
+                    (int)iesMetaData.iesSize,
+                    iesMetaData.ApplyLightAttenuation
+                );
                 if (!string.IsNullOrEmpty(warningMessage))
                 {
                     ctx.LogImportWarning($"Cannot properly generate IES 2D texture: {warningMessage}");
@@ -84,14 +100,22 @@ namespace UnityEditor.Rendering
 
             Light light = lightObject.AddComponent<Light>();
             light.type = (iesMetaData.PrefabLightType == IESLightType.Point) ? LightType.Point : LightType.Spot;
-            light.intensity = 1f;  // would need a better intensity value formula
+            light.intensity = 1f; // would need a better intensity value formula
             light.range = 10f; // would need a better range value formula
             light.spotAngle = iesMetaData.SpotAngle;
 
             ctx.AddObjectToAsset("IES", iesObject);
             ctx.SetMainObject(iesObject);
 
-            IESImporter.createRenderPipelinePrefabLight?.Invoke(ctx, iesFileName, iesMetaData.UseIESMaximumIntensity, iesMetaData.IESMaximumIntensityUnit, iesMetaData.IESMaximumIntensity, light, (iesMetaData.PrefabLightType == IESLightType.Point) ? cookieTextureCube : cookieTexture2D);
+            IESImporter.createRenderPipelinePrefabLight?.Invoke(
+                ctx,
+                iesFileName,
+                iesMetaData.UseIESMaximumIntensity,
+                iesMetaData.IESMaximumIntensityUnit,
+                iesMetaData.IESMaximumIntensity,
+                light,
+                (iesMetaData.PrefabLightType == IESLightType.Point) ? cookieTextureCube : cookieTexture2D
+            );
 
             if (cookieTextureCube != null)
             {

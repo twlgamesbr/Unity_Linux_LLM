@@ -19,7 +19,7 @@ namespace UnityEngine.Rendering.Universal
     /// <code>
     /// using UnityEngine.Rendering;
     /// using UnityEngine.Rendering.Universal;
-    /// 
+    ///
     /// public static class URPDefaultVolumeProfileHelper
     /// {
     ///     public static VolumeProfile volumeProfile
@@ -46,7 +46,8 @@ namespace UnityEngine.Rendering.Universal
             Initial = 0,
         }
 
-        [SerializeField][HideInInspector]
+        [SerializeField]
+        [HideInInspector]
         Version m_Version;
 
         /// <summary>
@@ -89,12 +90,15 @@ namespace UnityEngine.Rendering.Universal
         }
     }
 
-
 #if UNITY_EDITOR
     //Overriding "Reset" in menu that is not called at URPDefaultVolumeProfileSettings creation such Reset()
     struct ResetImplementation : IRenderPipelineGraphicsSettingsContextMenu2<URPDefaultVolumeProfileSettings>
     {
-        public void PopulateContextMenu(URPDefaultVolumeProfileSettings setting, SerializedProperty _, ref GenericMenu menu)
+        public void PopulateContextMenu(
+            URPDefaultVolumeProfileSettings setting,
+            SerializedProperty _,
+            ref GenericMenu menu
+        )
         {
             void Reset()
             {
@@ -110,7 +114,10 @@ namespace UnityEngine.Rendering.Universal
                     if (profile == null)
                     {
                         CoreUtils.EnsureFolderTreeInAssetFilePath(k_DefaultVolumeProfilePath);
-                        AssetDatabase.CopyAsset(UnityEditor.AssetDatabase.GetAssetPath(profileInResourcesFolder), k_DefaultVolumeProfilePath);
+                        AssetDatabase.CopyAsset(
+                            UnityEditor.AssetDatabase.GetAssetPath(profileInResourcesFolder),
+                            k_DefaultVolumeProfilePath
+                        );
                         profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(k_DefaultVolumeProfilePath);
                     }
                     else
@@ -124,16 +131,23 @@ namespace UnityEngine.Rendering.Universal
                                 c.parameters[i].SetValue(resourceComponent.parameters[i]);
                             }
                         }
-
                     }
 
                     return profile;
                 }
 
-                if (EditorGraphicsSettings.TryGetRenderPipelineSettingsForPipeline<UniversalRenderPipelineEditorAssets, UniversalRenderPipeline>(out var rpgs))
+                if (
+                    EditorGraphicsSettings.TryGetRenderPipelineSettingsForPipeline<
+                        UniversalRenderPipelineEditorAssets,
+                        UniversalRenderPipeline
+                    >(out var rpgs)
+                )
                 {
                     RenderPipelineGraphicsSettingsEditorUtility.Rebind(
-                        new URPDefaultVolumeProfileSettings() { volumeProfile = CopyVolumeProfileFromResourcesToAssets(rpgs.defaultVolumeProfile) },
+                        new URPDefaultVolumeProfileSettings()
+                        {
+                            volumeProfile = CopyVolumeProfileFromResourcesToAssets(rpgs.defaultVolumeProfile),
+                        },
                         typeof(UniversalRenderPipeline)
                     );
                 }

@@ -62,35 +62,55 @@ namespace UnityEditor.Rendering.Universal
             switch (light.type)
             {
                 case LightType.Spot:
-                    using (new Handles.DrawingScope(Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)))
+                    using (
+                        new Handles.DrawingScope(
+                            Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)
+                        )
+                    )
                     {
                         CoreLightEditorUtilities.DrawSpotLightGizmo(light);
                     }
                     break;
 
                 case LightType.Point:
-                    using (new Handles.DrawingScope(Matrix4x4.TRS(light.transform.position, Quaternion.identity, Vector3.one)))
+                    using (
+                        new Handles.DrawingScope(
+                            Matrix4x4.TRS(light.transform.position, Quaternion.identity, Vector3.one)
+                        )
+                    )
                     {
                         CoreLightEditorUtilities.DrawPointLightGizmo(light);
                     }
                     break;
 
                 case LightType.Rectangle:
-                    using (new Handles.DrawingScope(Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)))
+                    using (
+                        new Handles.DrawingScope(
+                            Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)
+                        )
+                    )
                     {
                         CoreLightEditorUtilities.DrawRectangleLightGizmo(light);
                     }
                     break;
 
                 case LightType.Disc:
-                    using (new Handles.DrawingScope(Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)))
+                    using (
+                        new Handles.DrawingScope(
+                            Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)
+                        )
+                    )
                     {
                         CoreLightEditorUtilities.DrawDiscLightGizmo(light);
                     }
                     break;
 
                 case LightType.Directional:
-                    using (new Handles.DrawingScope(Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)))
+                    using (
+                        new Handles.DrawingScope(
+                            Matrix4x4.TRS(light.transform.position, light.transform.rotation, Vector3.one)
+                        )
+                    )
                     {
                         CoreLightEditorUtilities.DrawDirectionalLightGizmo(light);
                     }

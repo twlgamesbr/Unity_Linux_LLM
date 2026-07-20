@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace TMPro.EditorUtilities
@@ -85,19 +85,17 @@ namespace TMPro.EditorUtilities
 
         protected static bool s_DebugExtended;
 
-        static int s_UndoRedoCount, s_LastSeenUndoRedoCount;
+        static int s_UndoRedoCount,
+            s_LastSeenUndoRedoCount;
 
-        static float[][] s_TempFloats =
-        {
-            null, new float[1], new float[2], new float[3], new float[4]
-        };
+        static float[][] s_TempFloats = { null, new float[1], new float[2], new float[3], new float[4] };
 
         protected static GUIContent[] s_XywhVectorLabels =
         {
             new GUIContent("X"),
             new GUIContent("Y"),
             new GUIContent("W", "Width"),
-            new GUIContent("H", "Height")
+            new GUIContent("H", "Height"),
         };
 
         protected static GUIContent[] s_LbrtVectorLabels =
@@ -105,14 +103,14 @@ namespace TMPro.EditorUtilities
             new GUIContent("L", "Left"),
             new GUIContent("B", "Bottom"),
             new GUIContent("R", "Right"),
-            new GUIContent("T", "Top")
+            new GUIContent("T", "Top"),
         };
 
         protected static GUIContent[] s_CullingTypeLabels =
         {
             new GUIContent("Off"),
             new GUIContent("Front"),
-            new GUIContent("Back")
+            new GUIContent("Back"),
         };
 
         static TMP_BaseShaderGUI()
@@ -179,7 +177,11 @@ namespace TMPro.EditorUtilities
         /// <summary>Override this method to create the specific shader GUI.</summary>
         protected abstract void DoGUI();
 
-        static string[] s_PanelStateLabel = new string[] { "\t- <i>Click to collapse</i> -", "\t- <i>Click to expand</i>  -" };
+        static string[] s_PanelStateLabel = new string[]
+        {
+            "\t- <i>Click to collapse</i> -",
+            "\t- <i>Click to expand</i>  -",
+        };
 
         protected bool BeginPanel(string panel, bool expanded)
         {
@@ -192,9 +194,18 @@ namespace TMPro.EditorUtilities
 
             bool enabled = GUI.enabled;
             GUI.enabled = true;
-            expanded = TMP_EditorUtility.EditorToggle(r, expanded, new GUIContent(panel), TMP_UIStyleManager.panelTitle);
+            expanded = TMP_EditorUtility.EditorToggle(
+                r,
+                expanded,
+                new GUIContent(panel),
+                TMP_UIStyleManager.panelTitle
+            );
             r.width -= 30;
-            EditorGUI.LabelField(r, new GUIContent(expanded ? s_PanelStateLabel[0] : s_PanelStateLabel[1]), TMP_UIStyleManager.rightLabel);
+            EditorGUI.LabelField(
+                r,
+                new GUIContent(expanded ? s_PanelStateLabel[0] : s_PanelStateLabel[1]),
+                TMP_UIStyleManager.rightLabel
+            );
             GUI.enabled = enabled;
 
             EditorGUI.indentLevel += 1;
@@ -231,9 +242,18 @@ namespace TMPro.EditorUtilities
 
             bool enabled = GUI.enabled;
             GUI.enabled = true;
-            expanded = TMP_EditorUtility.EditorToggle(r, expanded, new GUIContent(panel), TMP_UIStyleManager.panelTitle);
+            expanded = TMP_EditorUtility.EditorToggle(
+                r,
+                expanded,
+                new GUIContent(panel),
+                TMP_UIStyleManager.panelTitle
+            );
             r.width -= 10;
-            EditorGUI.LabelField(r, new GUIContent(expanded ? s_PanelStateLabel[0] : s_PanelStateLabel[1]), TMP_UIStyleManager.rightLabel);
+            EditorGUI.LabelField(
+                r,
+                new GUIContent(expanded ? s_PanelStateLabel[0] : s_PanelStateLabel[1]),
+                TMP_UIStyleManager.rightLabel
+            );
             GUI.enabled = enabled;
 
             GUILayout.EndHorizontal();
@@ -289,7 +309,13 @@ namespace TMPro.EditorUtilities
             DoTexture(name, label, typeof(Texture2D), withTilingOffset, speedNames);
         }
 
-        void DoTexture(string name, string label, System.Type type, bool withTilingOffset = false, string[] speedNames = null)
+        void DoTexture(
+            string name,
+            string label,
+            System.Type type,
+            bool withTilingOffset = false,
+            string[] speedNames = null
+        )
         {
             float objFieldSize = 60f;
             bool smallLayout = EditorGUIUtility.currentViewWidth <= 330f && (withTilingOffset || speedNames != null);
@@ -440,7 +466,14 @@ namespace TMPro.EditorUtilities
             MaterialProperty property = BeginProperty(name);
             s_TempLabel.text = label;
             bool isHDR = ((property.propertyFlags & ShaderPropertyFlags.HDR) != 0);
-            Color value = EditorGUI.ColorField(EditorGUILayout.GetControlRect(), s_TempLabel, property.colorValue, false, true, isHDR);
+            Color value = EditorGUI.ColorField(
+                EditorGUILayout.GetControlRect(),
+                s_TempLabel,
+                property.colorValue,
+                false,
+                true,
+                isHDR
+            );
             if (EndProperty())
             {
                 property.colorValue = value;
@@ -488,7 +521,13 @@ namespace TMPro.EditorUtilities
             MaterialProperty property = BeginProperty(name);
             Vector2 range = property.rangeLimits;
             s_TempLabel.text = label;
-            float value = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, property.floatValue, range.x, range.y);
+            float value = EditorGUI.Slider(
+                EditorGUILayout.GetControlRect(),
+                s_TempLabel,
+                property.floatValue,
+                range.x,
+                range.y
+            );
             if (EndProperty())
             {
                 property.floatValue = value;
@@ -499,7 +538,13 @@ namespace TMPro.EditorUtilities
         {
             MaterialProperty property = BeginProperty(name);
             s_TempLabel.text = label;
-            float value = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, property.floatValue, range.x, range.y);
+            float value = EditorGUI.Slider(
+                EditorGUILayout.GetControlRect(),
+                s_TempLabel,
+                property.floatValue,
+                range.x,
+                range.y
+            );
             if (EndProperty())
             {
                 property.floatValue = value;
@@ -517,16 +562,40 @@ namespace TMPro.EditorUtilities
             switch (propertyField)
             {
                 case "X":
-                    value.x = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.x, range.x, range.y);
+                    value.x = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.x,
+                        range.x,
+                        range.y
+                    );
                     break;
                 case "Y":
-                    value.y = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.y, range.x, range.y);
+                    value.y = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.y,
+                        range.x,
+                        range.y
+                    );
                     break;
                 case "Z":
-                    value.z = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.z, range.x, range.y);
+                    value.z = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.z,
+                        range.x,
+                        range.y
+                    );
                     break;
                 case "W":
-                    value.w = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.w, range.x, range.y);
+                    value.w = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.w,
+                        range.x,
+                        range.y
+                    );
                     break;
             }
 
@@ -546,16 +615,40 @@ namespace TMPro.EditorUtilities
             switch (propertyField)
             {
                 case "X":
-                    value.x = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.x, range.x, range.y);
+                    value.x = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.x,
+                        range.x,
+                        range.y
+                    );
                     break;
                 case "Y":
-                    value.y = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.y, range.x, range.y);
+                    value.y = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.y,
+                        range.x,
+                        range.y
+                    );
                     break;
                 case "Z":
-                    value.z = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.z, range.x, range.y);
+                    value.z = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.z,
+                        range.x,
+                        range.y
+                    );
                     break;
                 case "W":
-                    value.w = EditorGUI.Slider(EditorGUILayout.GetControlRect(), s_TempLabel, value.w, range.x, range.y);
+                    value.w = EditorGUI.Slider(
+                        EditorGUILayout.GetControlRect(),
+                        s_TempLabel,
+                        value.w,
+                        range.x,
+                        range.y
+                    );
                     break;
             }
 
@@ -643,7 +736,10 @@ namespace TMPro.EditorUtilities
                 DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
                 evt.Use();
             }
-            else if (evt.type == EventType.DragPerform && Rect.MinMaxRect(rect.xMin, m_DragAndDropMinY, rect.xMax, rect.yMax).Contains(evt.mousePosition))
+            else if (
+                evt.type == EventType.DragPerform
+                && Rect.MinMaxRect(rect.xMin, m_DragAndDropMinY, rect.xMax, rect.yMax).Contains(evt.mousePosition)
+            )
             {
                 DragAndDrop.AcceptDrag();
                 evt.Use();

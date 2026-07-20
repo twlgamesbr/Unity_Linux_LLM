@@ -19,7 +19,6 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private PlayModeControlsViewModel m_PlayModeControlsViewModel;
 
-
         public PlayModeControlsInputMappingField()
         {
             AddToClassList("mb-20");
@@ -85,15 +84,17 @@ namespace Unity.PlatformToolkit.PlayMode
                 container.Add(new Label(device.name));
 
                 var dropdown = new DropdownField(options, accounts.IndexOf(account));
-                dropdown.RegisterValueChangedCallback((changeEvent) =>
-                {
-                    var newAccount = accounts[dropdown.index];
+                dropdown.RegisterValueChangedCallback(
+                    (changeEvent) =>
+                    {
+                        var newAccount = accounts[dropdown.index];
 
-                    if (newAccount == null)
-                        m_PlayModeControlsViewModel.UnassignInputDevice(device.deviceId);
-                    else
-                        m_PlayModeControlsViewModel.AssignInputDevice(device.deviceId, newAccount);
-                });
+                        if (newAccount == null)
+                            m_PlayModeControlsViewModel.UnassignInputDevice(device.deviceId);
+                        else
+                            m_PlayModeControlsViewModel.AssignInputDevice(device.deviceId, newAccount);
+                    }
+                );
 
                 container.Add(dropdown);
                 container.AddToClassList("row");

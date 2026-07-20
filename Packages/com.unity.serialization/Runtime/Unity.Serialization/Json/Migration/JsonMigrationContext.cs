@@ -12,14 +12,14 @@ namespace Unity.Serialization.Json
         /// The deserialized version of the type.
         /// </summary>
         public readonly int SerializedVersion;
-        
+
         /// <summary>
         /// The in-memory representation of the value being deserialized.
         /// </summary>
         public readonly SerializedObjectView SerializedObject;
-        
+
         /// <summary>
-        /// The serialized type as reported by the underlying stream. This can be used in contravariant migrations. 
+        /// The serialized type as reported by the underlying stream. This can be used in contravariant migrations.
         /// </summary>
         public readonly Type SerializedType;
 
@@ -27,7 +27,7 @@ namespace Unity.Serialization.Json
         /// The user data provided in deserialization parameters.
         /// </summary>
         public readonly object UserData;
-        
+
         /// <summary>
         /// The internal visitor, used to re-enter in to normal deserialization.
         /// </summary>
@@ -40,7 +40,13 @@ namespace Unity.Serialization.Json
         /// <param name="serializedObject">The view over the serialized data.</param>
         /// <param name="serializedType">The serialized type from the stream.</param>
         /// <param name="visitor">The current deserialization visitor, used for re-entry into normal deserialization.</param>
-        internal JsonMigrationContext(int serializedVersion, SerializedObjectView serializedObject, Type serializedType, object userData, JsonPropertyReader visitor)
+        internal JsonMigrationContext(
+            int serializedVersion,
+            SerializedObjectView serializedObject,
+            Type serializedType,
+            object userData,
+            JsonPropertyReader visitor
+        )
         {
             SerializedVersion = serializedVersion;
             SerializedObject = serializedObject;
@@ -55,17 +61,15 @@ namespace Unity.Serialization.Json
         /// <param name="value">When this method returns, contains the deserialized value, if successful. otherwise the default value for the <typeparamref name="TValue"/>.</param>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns><see langword="true"/> if the value was read successfully; otherwise, <see langword="false"/></returns>
-        public bool TryRead<TValue>(out TValue value)
-            => TryRead<TValue>(SerializedObject, out value);
+        public bool TryRead<TValue>(out TValue value) => TryRead<TValue>(SerializedObject, out value);
 
         /// <summary>
         /// Reads the root object as the specified <typeparamref name="TValue"/> type.
         /// </summary>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns>A new instance of <typeparamref name="TValue"/> initialized with data from the root object.</returns>
-        public TValue Read<TValue>()
-            => Read<TValue>(SerializedObject);
-        
+        public TValue Read<TValue>() => Read<TValue>(SerializedObject);
+
         /// <summary>
         /// Reads a top level member as the specified <typeparamref name="TValue"/> type.
         /// </summary>
@@ -86,15 +90,14 @@ namespace Unity.Serialization.Json
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Reads a top level member as the specified <typeparamref name="TValue"/> type.
         /// </summary>
         /// <param name="name">The top level member name.</param>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns>A new instance of <typeparamref name="TValue"/> initialized with data from the view.</returns>
-        public TValue Read<TValue>(string name)
-            => Read<TValue>(SerializedObject[name]);
+        public TValue Read<TValue>(string name) => Read<TValue>(SerializedObject[name]);
 
         /// <summary>
         /// Reads the specified <see cref="SerializedValueView"/> as the specified <typeparamref name="TValue"/> type.
@@ -116,6 +119,7 @@ namespace Unity.Serialization.Json
                 return false;
             }
         }
+
         /// <summary>
         /// Reads the specified <see cref="SerializedValueView"/> as the specified <typeparamref name="TValue"/> type.
         /// </summary>
@@ -128,7 +132,7 @@ namespace Unity.Serialization.Json
             Read(ref value, view);
             return value;
         }
-        
+
         /// <summary>
         /// Reads the specified <see cref="SerializedValueView"/> in to the given reference.
         /// </summary>
@@ -182,10 +186,8 @@ namespace Unity.Serialization.Json
                 case TokenType.Object:
                 case TokenType.Array:
                 {
-                    var serializedType = !TypeTraits<TValue>.IsAbstractOrInterface
-                        ? typeof(TValue) 
-                        : null;
-                    
+                    var serializedType = !TypeTraits<TValue>.IsAbstractOrInterface ? typeof(TValue) : null;
+
                     using (m_Visitor.CreateSerializedTypeScope(serializedType))
                     using (m_Visitor.CreateViewScope(view.AsUnsafe()))
                     using (m_Visitor.CreateDisableRootMigrationScope(true))

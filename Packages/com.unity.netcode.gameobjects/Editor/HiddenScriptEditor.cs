@@ -1,9 +1,9 @@
-#if COM_UNITY_MODULES_ANIMATION || COM_UNITY_MODULES_PHYSICS || COM_UNITY_MODULES_PHYSICS2D
-using Unity.Netcode.Components;
-#endif
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
 using UnityEngine;
+#if COM_UNITY_MODULES_ANIMATION || COM_UNITY_MODULES_PHYSICS || COM_UNITY_MODULES_PHYSICS2D
+using Unity.Netcode.Components;
+#endif
 
 namespace Unity.Netcode.Editor
 {
@@ -49,7 +49,6 @@ namespace Unity.Netcode.Editor
         private const string k_AnyIpv4 = "0.0.0.0";
         private const string k_AnyIpv6 = "::";
 
-
         private void Initialize()
         {
             if (m_Initialized)
@@ -61,9 +60,15 @@ namespace Unity.Netcode.Editor
 
             var connectionDataProperty = serializedObject.FindProperty(nameof(UnityTransport.ConnectionData));
 
-            m_ServerAddressProperty = connectionDataProperty.FindPropertyRelative(nameof(UnityTransport.ConnectionAddressData.Address));
-            m_ServerPortProperty = connectionDataProperty.FindPropertyRelative(nameof(UnityTransport.ConnectionAddressData.Port));
-            m_WebSocketPathProperty = connectionDataProperty.FindPropertyRelative(nameof(UnityTransport.ConnectionAddressData.WebSocketPath));
+            m_ServerAddressProperty = connectionDataProperty.FindPropertyRelative(
+                nameof(UnityTransport.ConnectionAddressData.Address)
+            );
+            m_ServerPortProperty = connectionDataProperty.FindPropertyRelative(
+                nameof(UnityTransport.ConnectionAddressData.Port)
+            );
+            m_WebSocketPathProperty = connectionDataProperty.FindPropertyRelative(
+                nameof(UnityTransport.ConnectionAddressData.WebSocketPath)
+            );
         }
 
         /// <summary>
@@ -88,15 +93,30 @@ namespace Unity.Netcode.Editor
 
             serializedObject.ApplyModifiedProperties();
 
-            EditorGUILayout.HelpBox("It's recommended to leave remote connections disabled for local testing to avoid exposing ports on your device.", MessageType.Info);
-            bool allowRemoteConnections = m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv4 && m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv6 && !string.IsNullOrEmpty(m_UnityTransport.ConnectionData.ServerListenAddress);
-            allowRemoteConnections = EditorGUILayout.Toggle(new GUIContent("Allow Remote Connections?", $"Bind IP: {m_UnityTransport.ConnectionData.ServerListenAddress}"), allowRemoteConnections);
+            EditorGUILayout.HelpBox(
+                "It's recommended to leave remote connections disabled for local testing to avoid exposing ports on your device.",
+                MessageType.Info
+            );
+            bool allowRemoteConnections =
+                m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv4
+                && m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv6
+                && !string.IsNullOrEmpty(m_UnityTransport.ConnectionData.ServerListenAddress);
+            allowRemoteConnections = EditorGUILayout.Toggle(
+                new GUIContent(
+                    "Allow Remote Connections?",
+                    $"Bind IP: {m_UnityTransport.ConnectionData.ServerListenAddress}"
+                ),
+                allowRemoteConnections
+            );
 
             bool isIpV6 = m_UnityTransport.ConnectionData.IsIpv6;
 
             if (!allowRemoteConnections)
             {
-                if (m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv4 && m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv6)
+                if (
+                    m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv4
+                    && m_UnityTransport.ConnectionData.ServerListenAddress != k_LoopbackIpv6
+                )
                 {
                     if (isIpV6)
                     {
@@ -113,7 +133,12 @@ namespace Unity.Netcode.Editor
             using (new EditorGUI.DisabledScope(!allowRemoteConnections))
             {
                 string overrideIp = m_UnityTransport.ConnectionData.ServerListenAddress;
-                if (overrideIp == k_AnyIpv4 || overrideIp == k_AnyIpv6 || overrideIp == k_LoopbackIpv4 || overrideIp == k_LoopbackIpv6)
+                if (
+                    overrideIp == k_AnyIpv4
+                    || overrideIp == k_AnyIpv6
+                    || overrideIp == k_LoopbackIpv4
+                    || overrideIp == k_LoopbackIpv6
+                )
                 {
                     overrideIp = "";
                 }
@@ -148,10 +173,7 @@ namespace Unity.Netcode.Editor
     /// Internal use. Hides the script field for NetworkAnimator.
     /// </summary>
     [CustomEditor(typeof(NetworkAnimator), true)]
-    public class NetworkAnimatorEditor : HiddenScriptEditor
-    {
-
-    }
+    public class NetworkAnimatorEditor : HiddenScriptEditor { }
 #endif
 
 #if COM_UNITY_MODULES_PHYSICS
@@ -159,10 +181,7 @@ namespace Unity.Netcode.Editor
     /// Internal use. Hides the script field for NetworkRigidbody.
     /// </summary>
     [CustomEditor(typeof(NetworkRigidbody), true)]
-    public class NetworkRigidbodyEditor : HiddenScriptEditor
-    {
-
-    }
+    public class NetworkRigidbodyEditor : HiddenScriptEditor { }
 #endif
 
 #if COM_UNITY_MODULES_PHYSICS2D
@@ -170,9 +189,6 @@ namespace Unity.Netcode.Editor
     /// Internal use. Hides the script field for NetworkRigidbody2D.
     /// </summary>
     [CustomEditor(typeof(NetworkRigidbody2D), true)]
-    public class NetworkRigidbody2DEditor : HiddenScriptEditor
-    {
-
-    }
+    public class NetworkRigidbody2DEditor : HiddenScriptEditor { }
 #endif
 }

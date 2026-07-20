@@ -14,7 +14,12 @@ namespace UnityEditor.Rendering.Universal
             public int layerID;
             public System.Action<SerializedObject> onSelectionChanged;
 
-            public LayerSelectionData(SerializedObject so, int lid, Object[] tgts, System.Action<SerializedObject> selectionChangedCallback)
+            public LayerSelectionData(
+                SerializedObject so,
+                int lid,
+                Object[] tgts,
+                System.Action<SerializedObject> selectionChangedCallback
+            )
             {
                 serializedObject = so;
                 layerID = lid;
@@ -103,7 +108,12 @@ namespace UnityEditor.Rendering.Universal
             UpdateApplyToSortingLayersArray(layerSelectionDataObject);
         }
 
-        public void OnTargetSortingLayers(SerializedObject serializedObject, Object[] targets, GUIContent labelContent, System.Action<SerializedObject> selectionChangedCallback)
+        public void OnTargetSortingLayers(
+            SerializedObject serializedObject,
+            Object[] targets,
+            GUIContent labelContent,
+            System.Action<SerializedObject> selectionChangedCallback
+        )
         {
             Rect totalPosition = EditorGUILayout.GetControlRect();
             GUIContent actualLabel = EditorGUI.BeginProperty(totalPosition, labelContent, m_ApplyToSortingLayers);
@@ -133,16 +143,41 @@ namespace UnityEditor.Rendering.Universal
                 GenericMenu menu = new GenericMenu();
                 menu.allowDuplicateNames = true;
 
-                LayerSelectionData layerSelectionData = new LayerSelectionData(serializedObject, 0, targets, selectionChangedCallback);
-                menu.AddItem(Styles.sortingLayerNone, m_ApplyToSortingLayersList.Count == 0, OnNoSortingLayerSelected, layerSelectionData);
-                menu.AddItem(Styles.sortingLayerAll, m_ApplyToSortingLayersList.Count == m_AllSortingLayers.Length, OnAllSortingLayersSelected, layerSelectionData);
+                LayerSelectionData layerSelectionData = new LayerSelectionData(
+                    serializedObject,
+                    0,
+                    targets,
+                    selectionChangedCallback
+                );
+                menu.AddItem(
+                    Styles.sortingLayerNone,
+                    m_ApplyToSortingLayersList.Count == 0,
+                    OnNoSortingLayerSelected,
+                    layerSelectionData
+                );
+                menu.AddItem(
+                    Styles.sortingLayerAll,
+                    m_ApplyToSortingLayersList.Count == m_AllSortingLayers.Length,
+                    OnAllSortingLayersSelected,
+                    layerSelectionData
+                );
                 menu.AddSeparator("");
 
                 for (int i = 0; i < m_AllSortingLayers.Length; ++i)
                 {
                     var sortingLayer = m_AllSortingLayers[i];
-                    layerSelectionData = new LayerSelectionData(serializedObject, sortingLayer.id, targets, selectionChangedCallback);
-                    menu.AddItem(m_AllSortingLayerNames[i], m_ApplyToSortingLayersList.Contains(sortingLayer.id), OnSortingLayerSelected, layerSelectionData);
+                    layerSelectionData = new LayerSelectionData(
+                        serializedObject,
+                        sortingLayer.id,
+                        targets,
+                        selectionChangedCallback
+                    );
+                    menu.AddItem(
+                        m_AllSortingLayerNames[i],
+                        m_ApplyToSortingLayersList.Contains(sortingLayer.id),
+                        OnSortingLayerSelected,
+                        layerSelectionData
+                    );
                 }
 
                 menu.DropDown(position);

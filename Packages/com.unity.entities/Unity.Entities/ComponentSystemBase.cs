@@ -23,9 +23,7 @@ namespace Unity.Entities
         /// Initializes and returns an instance of a system.
         /// </summary>
         [RequiredMember]
-        public ComponentSystemBase()
-        {
-        }
+        public ComponentSystemBase() { }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal SystemState* m_StatePtr;
@@ -43,7 +41,6 @@ namespace Unity.Entities
             return state;
         }
 
-
         /// <summary>
         /// Controls whether this system executes when its OnUpdate function is called.
         /// </summary>
@@ -52,7 +49,11 @@ namespace Unity.Entities
         /// from the Entity Debugger window. A system with Enabled set to false will not update, even if its
         /// <see cref="ShouldRunSystem"/> function returns true. </remarks>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool Enabled { get => CheckedState()->Enabled; set => CheckedState()->Enabled = value; }
+        public bool Enabled
+        {
+            get => CheckedState()->Enabled;
+            set => CheckedState()->Enabled = value;
+        }
 
         /// <summary>
         /// The query objects cached by this system.
@@ -131,7 +132,6 @@ namespace Unity.Entities
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SystemHandle SystemHandle => m_StatePtr != null ? m_StatePtr->SystemHandle : default;
 
-
         /// <summary>Obsolete. Use <see cref="SystemHandle"/> instead.</summary>
         /// <remarks>**Obsolete.** Use <see cref="SystemHandle"/> instead.
         ///
@@ -149,7 +149,10 @@ namespace Unity.Entities
         /// <remarks> **Obsolete.** Use <see cref="SystemAPI.Time"/> or <see cref="World.Time"/> instead.
         ///
         /// The current Time data for this system's world. </remarks>
-        [Obsolete("Time has been deprecated as duplicate. Use SystemAPI.Time or World.Time instead (RemovedAfter 2023-08-08)", true)]
+        [Obsolete(
+            "Time has been deprecated as duplicate. Use SystemAPI.Time or World.Time instead (RemovedAfter 2023-08-08)",
+            true
+        )]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ref readonly TimeData Time => ref World.Time;
 
@@ -190,7 +193,6 @@ namespace Unity.Entities
 
         // ============
 
-
         internal void CreateInstance(World world)
         {
             ref var worldImpl = ref World.Unmanaged.GetImpl();
@@ -218,7 +220,6 @@ namespace Unity.Entities
             }
         }
 
-
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void OnCreateForCompiler()
         {
@@ -227,7 +228,10 @@ namespace Unity.Entities
 
         internal void DestroyInstance()
         {
-            var previousSystemGlobalState = new WorldUnmanagedImpl.PreviousSystemGlobalState(ref World.Unmanaged.GetImpl(), m_StatePtr);
+            var previousSystemGlobalState = new WorldUnmanagedImpl.PreviousSystemGlobalState(
+                ref World.Unmanaged.GetImpl(),
+                m_StatePtr
+            );
 
             try
             {
@@ -250,9 +254,7 @@ namespace Unity.Entities
         /// OnCreate is invoked before the the first time <see cref="OnStartRunning"/> and OnUpdate are invoked.
         /// </remarks>
         [RequiredMember]
-        protected virtual void OnCreate()
-        {
-        }
+        protected virtual void OnCreate() { }
 
         /// <summary>
         /// Called before the first call to OnUpdate and when a system resumes updating after being stopped or disabled.
@@ -263,9 +265,7 @@ namespace Unity.Entities
         /// called when a running system stops updating; OnStartRunning is called when it starts updating again.
         /// </remarks>
         [RequiredMember]
-        protected virtual void OnStartRunning()
-        {
-        }
+        protected virtual void OnStartRunning() { }
 
         /// <summary>
         /// Called when this system stops running because no entities match the system's <see cref="EntityQuery"/>
@@ -277,9 +277,7 @@ namespace Unity.Entities
         /// called when a running system stops updating; <see cref="OnStartRunning"/> is called when it starts updating again.
         /// </remarks>
         [RequiredMember]
-        protected virtual void OnStopRunning()
-        {
-        }
+        protected virtual void OnStopRunning() { }
 
         internal virtual void OnStopRunningInternal()
         {
@@ -293,9 +291,7 @@ namespace Unity.Entities
         /// call <see cref="World.DestroySystem"/>. In the Unity Editor, system destruction occurs when you exit
         /// Play Mode and when scripts are reloaded.</remarks>
         [RequiredMember]
-        protected virtual void OnDestroy()
-        {
-        }
+        protected virtual void OnDestroy() { }
 
         internal void OnDestroy_Internal()
         {
@@ -309,10 +305,9 @@ namespace Unity.Entities
         /// <seealso cref="SystemBase"/>
         /// <seealso cref="ComponentSystemGroup"/>
         /// <seealso cref="EntityCommandBufferSystem"/>
-        abstract public void Update();
+        public abstract void Update();
 
         // ===================
-
 
 #if ENABLE_PROFILER
         internal string GetProfilerMarkerName()
@@ -331,7 +326,8 @@ namespace Unity.Entities
                 return;
 
             throw new InvalidOperationException(
-                $"System {GetType()} is invalid. This usually means it was not created with World.GetOrCreateSystem<{GetType()}>() or has already been destroyed.");
+                $"System {GetType()} is invalid. This usually means it was not created with World.GetOrCreateSystem<{GetType()}>() or has already been destroyed."
+            );
 #endif
         }
 
@@ -367,9 +363,7 @@ namespace Unity.Entities
         /// <returns>True if the system should be updated, or false if not.</returns>
         public bool ShouldRunSystem() => CheckedState()->ShouldRunSystem();
 
-        internal virtual void OnBeforeCreateInternal(World world)
-        {
-        }
+        internal virtual void OnBeforeCreateInternal(World world) { }
 
         internal void OnAfterDestroyInternal()
         {
@@ -447,7 +441,8 @@ namespace Unity.Entities
         /// such as an <see cref="IJobChunk"/> job, to access that type of component inside the job. </remarks>
         /// <remarks> Prefer using <see cref="SystemAPI.GetComponentTypeHandle{T}"/> in <see cref="SystemAPI"/> as it will cache in OnCreate for you
         /// and call .Update(this) at the call-site. </remarks>
-        public ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false) where T : unmanaged, IComponentData
+        public ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false)
+            where T : unmanaged, IComponentData
         {
             return CheckedState()->GetComponentTypeHandle<T>(isReadOnly);
         }
@@ -540,6 +535,7 @@ namespace Unity.Entities
         {
             return CheckedState()->GetComponentLookup<T>(isReadOnly);
         }
+
         /// <summary>Obsolete. Use <see cref="GetComponentLookup{T}"/> instead.</summary>
         /// <remarks>
         /// **Obsolete.** Use <see cref="GetComponentLookup{T}"/> instead.
@@ -550,7 +546,10 @@ namespace Unity.Entities
         /// read-only whenever possible.</param>
         /// <typeparam name="T">A struct that implements <see cref="IComponentData"/>.</typeparam>
         /// <returns>All component data of type T.</returns>
-        [Obsolete("This method has been renamed to GetComponentLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> GetComponentLookup<T>(*)", false)]
+        [Obsolete(
+            "This method has been renamed to GetComponentLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> GetComponentLookup<T>(*)",
+            false
+        )]
         public ComponentLookup<T> GetComponentDataFromEntity<T>(bool isReadOnly = false)
             where T : unmanaged, IComponentData
         {
@@ -570,7 +569,8 @@ namespace Unity.Entities
         /// <seealso cref="ComponentLookup{T}"/>
         /// <remarks> Prefer using <see cref="SystemAPI.GetBufferLookup{T}"/> as it will cache in OnCreate for you
         /// and call .Update(this) at the call-site. </remarks>
-        public BufferLookup<T> GetBufferLookup<T>(bool isReadOnly = false) where T : unmanaged, IBufferElementData
+        public BufferLookup<T> GetBufferLookup<T>(bool isReadOnly = false)
+            where T : unmanaged, IBufferElementData
         {
             return CheckedState()->GetBufferLookup<T>(isReadOnly);
         }
@@ -586,8 +586,12 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of <see cref="IBufferElementData"/> stored in the buffer.</typeparam>
         /// <returns>An array-like object that provides access to buffers, indexed by <see cref="Entity"/>.</returns>
         /// <seealso cref="ComponentDataFromEntity{T}"/>
-        [Obsolete("This method has been renamed to GetBufferLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> GetBufferLookup<T>(*)", false)]
-        public BufferLookup<T> GetBufferFromEntity<T>(bool isReadOnly = false) where T : unmanaged, IBufferElementData
+        [Obsolete(
+            "This method has been renamed to GetBufferLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> GetBufferLookup<T>(*)",
+            false
+        )]
+        public BufferLookup<T> GetBufferFromEntity<T>(bool isReadOnly = false)
+            where T : unmanaged, IBufferElementData
         {
             return CheckedState()->GetBufferLookup<T>(isReadOnly);
         }
@@ -607,6 +611,7 @@ namespace Unity.Entities
         {
             return CheckedState()->GetEntityStorageInfoLookup();
         }
+
         /// <summary> Obsolete. Use <see cref="GetEntityStorageInfoLookup"/> instead.</summary>
         /// <remarks> **Obsolete.** Use <see cref="GetEntityStorageInfoLookup"/> instead.
         ///
@@ -616,7 +621,10 @@ namespace Unity.Entities
         /// <returns>An dictionary-like object that provides access to information about how Entities are stored,
         /// indexed by <see cref="Entity"/>.</returns>
         /// <seealso cref="StorageInfoFromEntity"/>
-        [Obsolete("This method has been renamed to GetEntityStorageInfoLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> GetEntityStorageInfoLookup(*)", false)]
+        [Obsolete(
+            "This method has been renamed to GetEntityStorageInfoLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> GetEntityStorageInfoLookup(*)",
+            false
+        )]
         public EntityStorageInfoLookup GetStorageInfoFromEntity()
         {
             return CheckedState()->GetEntityStorageInfoLookup();
@@ -664,7 +672,7 @@ namespace Unity.Entities
         /// <seealso cref="T:Unity.Entities.RequireMatchingQueriesForUpdateAttribute"/>
         public void RequireAnyForUpdate(params EntityQuery[] queries)
         {
-            fixed(EntityQuery* queriesPtr = queries)
+            fixed (EntityQuery* queriesPtr = queries)
             {
                 CheckedState()->RequireAnyForUpdate(queriesPtr, queries.Length);
             }
@@ -718,7 +726,10 @@ namespace Unity.Entities
         /// Require that a specific singleton component exist for this system to run.
         /// </remarks>
         /// <typeparam name="T">The <see cref="IComponentData"/> subtype of the singleton component.</typeparam>
-        [Obsolete("RequireSingletonForUpdate has been renamed. Use RequireForUpdate<T>() instead. (RemovedAfter Entities 1.0) (UnityUpgradable) -> RequireForUpdate<T>()", true)]
+        [Obsolete(
+            "RequireSingletonForUpdate has been renamed. Use RequireForUpdate<T>() instead. (RemovedAfter Entities 1.0) (UnityUpgradable) -> RequireForUpdate<T>()",
+            true
+        )]
         public void RequireSingletonForUpdate<T>()
         {
             RequireForUpdate<T>();
@@ -739,7 +750,8 @@ namespace Unity.Entities
             {
                 var typeName = typeIndex.ToFixedString();
                 throw new InvalidOperationException(
-                    $"Can't call HasSingleton<{typeName}>() with enableable component type {typeName}.");
+                    $"Can't call HasSingleton<{typeName}>() with enableable component type {typeName}."
+                );
             }
 #endif
             var type = ComponentType.ReadOnly<T>();
@@ -750,7 +762,8 @@ namespace Unity.Entities
             {
                 var typeName = typeIndex.ToFixedString();
                 throw new InvalidOperationException(
-                    $"HasSingleton<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one.");
+                    $"HasSingleton<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one."
+                );
             }
 #endif
             return matchingEntityCount == 1;
@@ -843,7 +856,8 @@ namespace Unity.Entities
             {
                 var typeName = type.TypeIndex.ToFixedString();
                 throw new InvalidOperationException(
-                    $"TryGetSingleton<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one.");
+                    $"TryGetSingleton<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one."
+                );
             }
 #endif
             bool hasSingleton = matchingEntityCount == 1;
@@ -871,7 +885,8 @@ namespace Unity.Entities
             {
                 var typeName = type.TypeIndex.ToFixedString();
                 throw new InvalidOperationException(
-                    $"TryGetSingletonBuffer<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one.");
+                    $"TryGetSingletonBuffer<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one."
+                );
             }
 #endif
             bool hasSingleton = matchingEntityCount == 1;
@@ -932,7 +947,8 @@ namespace Unity.Entities
             {
                 var typeName = type.TypeIndex.ToFixedString();
                 throw new InvalidOperationException(
-                    $"TryGetSingletonEntity<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one.");
+                    $"TryGetSingletonEntity<{typeName}>() found {matchingEntityCount} instances of {typeName}; there must only be either zero or one."
+                );
             }
 #endif
             bool hasSingleton = matchingEntityCount == 1;
@@ -947,7 +963,7 @@ namespace Unity.Entities
 
         internal EntityQuery GetEntityQueryInternal(ComponentType[] componentTypes)
         {
-            fixed(ComponentType* componentTypesPtr = componentTypes)
+            fixed (ComponentType* componentTypesPtr = componentTypes)
             {
                 return GetEntityQueryInternal(componentTypesPtr, componentTypes.Length);
             }
@@ -977,8 +993,7 @@ namespace Unity.Entities
         /// <returns>The new or cached query.</returns>
         protected EntityQuery GetEntityQuery(NativeArray<ComponentType> componentTypes)
         {
-            return GetEntityQueryInternal((ComponentType*)componentTypes.GetUnsafeReadOnlyPtr(),
-                componentTypes.Length);
+            return GetEntityQueryInternal((ComponentType*)componentTypes.GetUnsafeReadOnlyPtr(), componentTypes.Length);
         }
 
         /// <summary>
@@ -1039,7 +1054,7 @@ namespace Unity.Entities
         /// Return SystemElapsedTicks converted to float milliseconds.
         /// Only available with UNITY_ENTITIES_RUNTIME_TOOLING defined
         /// </summary>
-        public float SystemElapsedMilliseconds => (float) (SystemElapsedTicks * 1000.0 / Stopwatch.Frequency);
+        public float SystemElapsedMilliseconds => (float)(SystemElapsedTicks * 1000.0 / Stopwatch.Frequency);
 #endif
     }
 
@@ -1057,7 +1072,8 @@ namespace Unity.Entities
         /// <returns>The component.</returns>
         /// <seealso cref="EntityQuery.GetSingleton{T}"/>
         [Obsolete("Use SystemAPI.ManagedAPI.GetSingleton instead (RemovedAfter Entities 1.0)")]
-        public static T GetSingleton<T>(this ComponentSystemBase sys) where T : class, IComponentData, new()
+        public static T GetSingleton<T>(this ComponentSystemBase sys)
+            where T : class, IComponentData, new()
         {
             var type = ComponentType.ReadOnly<T>();
             var query = sys.CheckedState()->GetSingletonEntityQueryInternal(type);
@@ -1073,7 +1089,8 @@ namespace Unity.Entities
         /// <seealso cref="EntityQuery.GetSingleton{T}"/>
         /// <seealso cref="EntityQuery.GetSingletonRW{T}"/>
         [Obsolete("Use SystemAPI.ManagedAPI.GetSingletonRW instead (RemovedAfter Entities 1.0)")]
-        public static T GetSingletonRW<T>(this ComponentSystemBase sys) where T : class, IComponentData, new()
+        public static T GetSingletonRW<T>(this ComponentSystemBase sys)
+            where T : class, IComponentData, new()
         {
             var type = ComponentType.ReadWrite<T>();
             var query = sys.CheckedState()->GetSingletonEntityQueryInternal(type);
@@ -1088,7 +1105,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The <see cref="IComponentData"/> subtype of the singleton component.</typeparam>
         /// <seealso cref="EntityQuery.SetSingleton{T}"/>
         [Obsolete("Use SystemAPI.ManagedAPI.SetSingleton instead (RemovedAfter Entities 1.0)")]
-        public static void SetSingleton<T>(this ComponentSystemBase sys, T value) where T : class, IComponentData, new()
+        public static void SetSingleton<T>(this ComponentSystemBase sys, T value)
+            where T : class, IComponentData, new()
         {
             var type = ComponentType.ReadWrite<T>();
             var query = sys.CheckedState()->GetSingletonEntityQueryInternal(type);

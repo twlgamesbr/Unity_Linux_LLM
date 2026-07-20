@@ -25,6 +25,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         [SerializeField]
         private BuildTarget m_TargetPlatform;
+
         [SerializeField]
         private bool m_HasTargetPlatform;
 
@@ -36,17 +37,20 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         [SerializeField]
         internal Filter filter;
+
         ///<summary>
         ///A collection of <see cref="Filter"/> to execute tests on.
         ///</summary>
         [SerializeField]
         public Filter[] filters;
+
         /// <summary>
         ///  Note that this is only supported for EditMode tests, and that tests which take multiple frames (i.e. [UnityTest] tests, or tests with [UnitySetUp] or [UnityTearDown] scaffolding) will be filtered out.
         /// </summary>
         /// <value>If true, the call to Execute() will run tests synchronously, guaranteeing that all tests have finished running by the time the call returns.</value>
         [SerializeField]
         public bool runSynchronously;
+
         /// <summary>
         /// The time, in seconds, the editor should wait for heartbeats after starting a test run on a player. This defaults to 10 minutes.
         /// </summary>
@@ -91,7 +95,9 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         internal ITestFilter BuildNUnitFilter()
         {
-            return new OrFilter(filters.Select(f => f.ToRuntimeTestRunnerFilter(runSynchronously).BuildNUnitFilter()).ToArray());
+            return new OrFilter(
+                filters.Select(f => f.ToRuntimeTestRunnerFilter(runSynchronously).BuildNUnitFilter()).ToArray()
+            );
         }
 
         /// <summary>
@@ -138,7 +144,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
                 stringBuilder.AppendLine($"{nameof(filters)}[{i}] = ");
                 var filterStrings = filters[i]
                     .ToString()
-                    .Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                     .ToArray();
 
                 foreach (var filterString in filterStrings)
@@ -166,12 +172,19 @@ namespace UnityEditor.TestTools.TestRunner.Api
             else
             {
                 stringBuilder.AppendLine("Feature Flags:");
-                stringBuilder.AppendLine($"  {nameof(featureFlags.fileCleanUpCheck)} = {featureFlags.fileCleanUpCheck}");
-				stringBuilder.AppendLine($"  {nameof(featureFlags.requiresSplashScreen)} = {featureFlags.requiresSplashScreen}");
-				stringBuilder.AppendLine($"  {nameof(featureFlags.strictDomainReload)} = {featureFlags.strictDomainReload}");
-                stringBuilder.AppendLine($"  {nameof(featureFlags.disableNestedEnumeratorBugfix)} = {featureFlags.disableNestedEnumeratorBugfix}");
+                stringBuilder.AppendLine(
+                    $"  {nameof(featureFlags.fileCleanUpCheck)} = {featureFlags.fileCleanUpCheck}"
+                );
+                stringBuilder.AppendLine(
+                    $"  {nameof(featureFlags.requiresSplashScreen)} = {featureFlags.requiresSplashScreen}"
+                );
+                stringBuilder.AppendLine(
+                    $"  {nameof(featureFlags.strictDomainReload)} = {featureFlags.strictDomainReload}"
+                );
+                stringBuilder.AppendLine(
+                    $"  {nameof(featureFlags.disableNestedEnumeratorBugfix)} = {featureFlags.disableNestedEnumeratorBugfix}"
+                );
             }
-
 
             stringBuilder.AppendLine();
 

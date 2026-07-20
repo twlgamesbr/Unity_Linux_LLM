@@ -49,7 +49,11 @@ namespace UnityEngine.Rendering
             // Remove & return
             if (m_Values.TryGetValue(valueWidget, out var existingVisualElement))
             {
-                DebugManager.instance.schedulerTracker.SetEnabled(DebugUI.Context.RuntimePersistent, valueWidget, false);
+                DebugManager.instance.schedulerTracker.SetEnabled(
+                    DebugUI.Context.RuntimePersistent,
+                    valueWidget,
+                    false
+                );
 
                 m_Values.Remove(valueWidget);
                 m_PersistentRoot.Remove(existingVisualElement);

@@ -18,9 +18,21 @@ namespace UnityEditor.VFX.URP
 
         public override CullMode defaultCullMode => CullMode.Back;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), Range(1, 4), Tooltip("Specifies the number of different meshes (up to 4). Mesh per particle can be specified with the meshIndex attribute."), SerializeField]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            Range(1, 4),
+            Tooltip(
+                "Specifies the number of different meshes (up to 4). Mesh per particle can be specified with the meshIndex attribute."
+            ),
+            SerializeField
+        ]
         private uint MeshCount = 1;
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), Tooltip("When enabled, screen space LOD is used to determine with meshIndex to use per particle."), SerializeField]
+
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            Tooltip("When enabled, screen space LOD is used to determine with meshIndex to use per particle."),
+            SerializeField
+        ]
         private bool lod = false;
         public uint meshCount => HasStrips(true) ? 1 : MeshCount;
 

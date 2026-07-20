@@ -9,6 +9,7 @@ namespace UnityEngine.Rendering.Universal
 
 #if ENABLE_VR && ENABLE_XR_MODULE
         static MaterialPropertyBlock s_XRSharedPropertyBlock = new MaterialPropertyBlock();
+
         internal static MaterialPropertyBlock GetMaterialPropertyBlock()
         {
             return s_XRSharedPropertyBlock;
@@ -55,18 +56,37 @@ namespace UnityEngine.Rendering.Universal
 #endif
         }
 
-        internal static void MarkShaderProperties(RasterCommandBuffer cmd, XRPassUniversal xrPass, bool renderIntoTexture)
+        internal static void MarkShaderProperties(
+            RasterCommandBuffer cmd,
+            XRPassUniversal xrPass,
+            bool renderIntoTexture
+        )
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             if (xrPass.isLateLatchEnabled && xrPass.canMarkLateLatch)
             {
-                cmd.MarkLateLatchMatrixShaderPropertyID(CameraLateLatchMatrixType.View, XRBuiltinShaderConstants.unity_StereoMatrixV);
-                cmd.MarkLateLatchMatrixShaderPropertyID(CameraLateLatchMatrixType.InverseView, XRBuiltinShaderConstants.unity_StereoMatrixInvV);
-                cmd.MarkLateLatchMatrixShaderPropertyID(CameraLateLatchMatrixType.ViewProjection, XRBuiltinShaderConstants.unity_StereoMatrixVP);
-                cmd.MarkLateLatchMatrixShaderPropertyID(CameraLateLatchMatrixType.InverseViewProjection, XRBuiltinShaderConstants.unity_StereoMatrixInvVP);
+                cmd.MarkLateLatchMatrixShaderPropertyID(
+                    CameraLateLatchMatrixType.View,
+                    XRBuiltinShaderConstants.unity_StereoMatrixV
+                );
+                cmd.MarkLateLatchMatrixShaderPropertyID(
+                    CameraLateLatchMatrixType.InverseView,
+                    XRBuiltinShaderConstants.unity_StereoMatrixInvV
+                );
+                cmd.MarkLateLatchMatrixShaderPropertyID(
+                    CameraLateLatchMatrixType.ViewProjection,
+                    XRBuiltinShaderConstants.unity_StereoMatrixVP
+                );
+                cmd.MarkLateLatchMatrixShaderPropertyID(
+                    CameraLateLatchMatrixType.InverseViewProjection,
+                    XRBuiltinShaderConstants.unity_StereoMatrixInvVP
+                );
 
                 for (int viewIndex = 0; viewIndex < 2; ++viewIndex)
-                    s_projMatrix[viewIndex] = GL.GetGPUProjectionMatrix(xrPass.GetProjMatrix(viewIndex), renderIntoTexture);
+                    s_projMatrix[viewIndex] = GL.GetGPUProjectionMatrix(
+                        xrPass.GetProjMatrix(viewIndex),
+                        renderIntoTexture
+                    );
 
                 cmd.SetLateLatchProjectionMatrices(s_projMatrix);
                 xrPass.hasMarkedLateLatch = true;

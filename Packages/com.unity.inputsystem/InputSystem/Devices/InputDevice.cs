@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.InputSystem.Utilities;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
+using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Utilities;
 
 ////TODO: runtime remapping of control usages on a per-device basis
 
@@ -203,10 +203,13 @@ namespace UnityEngine.InputSystem
         {
             get
             {
-                #if UNITY_EDITOR
-                if (InputState.currentUpdateType == InputUpdateType.Editor && (m_DeviceFlags & DeviceFlags.DisabledWhileInBackground) != 0)
+#if UNITY_EDITOR
+                if (
+                    InputState.currentUpdateType == InputUpdateType.Editor
+                    && (m_DeviceFlags & DeviceFlags.DisabledWhileInBackground) != 0
+                )
                     return true;
-                #endif
+#endif
 
                 if ((m_DeviceFlags & (DeviceFlags.DisabledInFrontend | DeviceFlags.DisabledWhileInBackground)) != 0)
                     return false;
@@ -250,17 +253,21 @@ namespace UnityEngine.InputSystem
                 // In the editor, "background" refers to "game view not focused", not to the editor not being active.
                 // So, we modulate canRunInBackground depending on how input should behave WRT game view according
                 // to the input settings.
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 var gameViewFocus = InputSystem.settings.editorInputBehaviorInPlayMode;
                 if (gameViewFocus == InputSettings.EditorInputBehaviorInPlayMode.AllDevicesRespectGameViewFocus)
                     return false; // No device considered being able to run without game view focus.
-                if (gameViewFocus == InputSettings.EditorInputBehaviorInPlayMode.PointersAndKeyboardsRespectGameViewFocus)
+                if (
+                    gameViewFocus
+                    == InputSettings.EditorInputBehaviorInPlayMode.PointersAndKeyboardsRespectGameViewFocus
+                )
                     return !(this is Pointer || this is Keyboard); // Anything but pointers and keyboards considered as being able to run in background.
-                #endif
+#endif
 
                 return canDeviceRunInBackground;
             }
         }
+
         /// <summary>
         /// In editor, it may differ from canRunInBackground depending on the gameViewFocus setting.
         /// This property is used by Device Debug View
@@ -337,7 +344,8 @@ namespace UnityEngine.InputSystem
         /// beginning of the frame will lead to a noticeable lag.
         /// </remarks>
         /// <seealso cref="InputUpdateType.BeforeRender"/>
-        public bool updateBeforeRender => (m_DeviceFlags & DeviceFlags.UpdateBeforeRender) == DeviceFlags.UpdateBeforeRender;
+        public bool updateBeforeRender =>
+            (m_DeviceFlags & DeviceFlags.UpdateBeforeRender) == DeviceFlags.UpdateBeforeRender;
 
         /// <summary>
         /// Unique numeric ID for the device.
@@ -363,7 +371,8 @@ namespace UnityEngine.InputSystem
         /// The "timeline" is reset to 0 when entering play mode. If there are any events incoming or device
         /// updates which occur prior to entering play mode, these will appear negative.
         /// </remarks>
-        public double lastUpdateTime => m_LastUpdateTimeInternal - InputRuntime.s_CurrentTimeOffsetToRealtimeSinceStartup;
+        public double lastUpdateTime =>
+            m_LastUpdateTimeInternal - InputRuntime.s_CurrentTimeOffsetToRealtimeSinceStartup;
 
         public bool wasUpdatedThisFrame => m_CurrentUpdateStepCount == InputUpdate.s_UpdateStepCount;
 
@@ -421,7 +430,7 @@ namespace UnityEngine.InputSystem
 
             var numBytes = stateBlock.alignedSizeInBytes;
             var array = new byte[numBytes];
-            fixed(byte* arrayPtr = array)
+            fixed (byte* arrayPtr = array)
             {
                 var adjustedStatePtr = (byte*)statePtr + m_StateBlock.byteOffset;
                 UnsafeUtility.MemCpy(arrayPtr, adjustedStatePtr, numBytes);
@@ -455,8 +464,8 @@ namespace UnityEngine.InputSystem
             var adjustedFirstStatePtr = (byte*)firstStatePtr + m_StateBlock.byteOffset;
             var adjustedSecondStatePtr = (byte*)firstStatePtr + m_StateBlock.byteOffset;
 
-            return UnsafeUtility.MemCmp(adjustedFirstStatePtr, adjustedSecondStatePtr,
-                m_StateBlock.alignedSizeInBytes) == 0;
+            return UnsafeUtility.MemCmp(adjustedFirstStatePtr, adjustedSecondStatePtr, m_StateBlock.alignedSizeInBytes)
+                == 0;
         }
 
         /// <summary>
@@ -502,9 +511,7 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="Gamepad.current"/>
         /// <seealso cref="Mouse.current"/>
         /// <seealso cref="Pen.current"/>
-        public virtual void MakeCurrent()
-        {
-        }
+        public virtual void MakeCurrent() { }
 
         /// <summary>
         /// Called by the system when the device is added to <see cref="InputSystem.devices"/>.
@@ -531,9 +538,7 @@ namespace UnityEngine.InputSystem
         /// }
         /// </code>
         /// </example>
-        protected virtual void OnAdded()
-        {
-        }
+        protected virtual void OnAdded() { }
 
         /// <summary>
         /// Called by the system when the device is removed from <see cref="InputSystem.devices"/>.
@@ -561,9 +566,7 @@ namespace UnityEngine.InputSystem
         /// }
         /// </code>
         /// </example>
-        protected virtual void OnRemoved()
-        {
-        }
+        protected virtual void OnRemoved() { }
 
         /// <summary>
         /// Called by the system when the device configuration is changed. This happens when the backend sends
@@ -579,9 +582,7 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputManager.OnUpdate"/>
         /// <seealso cref="InputDeviceChange.ConfigurationChanged"/>
         /// <seealso cref="OnConfigurationChanged"/>
-        protected virtual void OnConfigurationChanged()
-        {
-        }
+        protected virtual void OnConfigurationChanged() { }
 
         ////TODO: add overridable OnDisable/OnEnable that fire the device commands
 
@@ -618,7 +619,9 @@ namespace UnityEngine.InputSystem
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError($"{exception.GetType().Name} while executing 'InputSystem.onDeviceCommand' callbacks");
+                    Debug.LogError(
+                        $"{exception.GetType().Name} while executing 'InputSystem.onDeviceCommand' callbacks"
+                    );
                     Debug.LogException(exception);
                 }
             }
@@ -721,8 +724,10 @@ namespace UnityEngine.InputSystem
         internal DeviceFlags m_DeviceFlags;
         internal int m_DeviceId;
         internal int m_ParticipantId;
+
         // Index in InputManager.m_Devices.
         internal int m_DeviceIndex;
+
         // Amount of bytes processed in the current update step. Used only for logging purposes.
         internal uint m_CurrentProcessedEventBytesOnUpdate;
         internal InputDeviceDescription m_Description;
@@ -747,6 +752,7 @@ namespace UnityEngine.InputSystem
         // NOTE: The device's own usages are part of this array as well. They are always
         //       at the *end* of the array.
         internal InternedString[] m_UsagesForEachControl;
+
         // This one does NOT contain the device itself, i.e. it only contains controls on the device
         // and may this be shorter than m_UsagesForEachControl.
         internal InputControl[] m_UsageToControl;
@@ -828,23 +834,41 @@ namespace UnityEngine.InputSystem
         internal const int kStateOffsetBits = 13; // 1024 bytes max state size for entire device.
         internal const int kStateSizeBits = 9; // 64 bytes max for an individual leaf control.
 
-        internal static uint EncodeStateOffsetToControlMapEntry(uint controlIndex, uint stateOffsetInBits, uint stateSizeInBits)
+        internal static uint EncodeStateOffsetToControlMapEntry(
+            uint controlIndex,
+            uint stateOffsetInBits,
+            uint stateSizeInBits
+        )
         {
-            Debug.Assert(kControlIndexBits < 32, $"Expected kControlIndexBits < 32, so we fit into the 32 bit wide bitmask");
-            Debug.Assert(kStateOffsetBits < 32, $"Expected kStateOffsetBits < 32, so we fit into the 32 bit wide bitmask");
+            Debug.Assert(
+                kControlIndexBits < 32,
+                $"Expected kControlIndexBits < 32, so we fit into the 32 bit wide bitmask"
+            );
+            Debug.Assert(
+                kStateOffsetBits < 32,
+                $"Expected kStateOffsetBits < 32, so we fit into the 32 bit wide bitmask"
+            );
             Debug.Assert(kStateSizeBits < 32, $"Expected kStateSizeBits < 32, so we fit into the 32 bit wide bitmask");
             Debug.Assert(controlIndex < (1U << kControlIndexBits), "Control index beyond what is supported");
             Debug.Assert(stateOffsetInBits < (1U << kStateOffsetBits), "State offset beyond what is supported");
             Debug.Assert(stateSizeInBits < (1U << kStateSizeBits), "State size beyond what is supported");
-            return stateOffsetInBits << (kControlIndexBits + kStateSizeBits) | stateSizeInBits << kControlIndexBits | controlIndex;
+            return stateOffsetInBits << (kControlIndexBits + kStateSizeBits)
+                | stateSizeInBits << kControlIndexBits
+                | controlIndex;
         }
 
-        internal static void DecodeStateOffsetToControlMapEntry(uint entry, out uint controlIndex,
-            out uint stateOffset, out uint stateSize)
+        internal static void DecodeStateOffsetToControlMapEntry(
+            uint entry,
+            out uint controlIndex,
+            out uint stateOffset,
+            out uint stateSize
+        )
         {
             controlIndex = entry & (1U << kControlIndexBits) - 1;
             stateOffset = entry >> (kControlIndexBits + kStateSizeBits);
-            stateSize = (entry >> kControlIndexBits) & (((1U << (kControlIndexBits + kStateSizeBits)) - 1) >> kControlIndexBits);
+            stateSize =
+                (entry >> kControlIndexBits)
+                & (((1U << (kControlIndexBits + kStateSizeBits)) - 1) >> kControlIndexBits);
         }
 
         // NOTE: We don't store processors in a combined array the same way we do for
@@ -987,7 +1011,12 @@ namespace UnityEngine.InputSystem
             OnRemoved();
         }
 
-        internal static TDevice Build<TDevice>(string layoutName = default, string layoutVariants = default, InputDeviceDescription deviceDescription = default, bool noPrecompiledLayouts = false)
+        internal static TDevice Build<TDevice>(
+            string layoutName = default,
+            string layoutVariants = default,
+            InputDeviceDescription deviceDescription = default,
+            bool noPrecompiledLayouts = false
+        )
             where TDevice : InputDevice
         {
             var internedLayoutName = new InternedString(layoutName);
@@ -1003,9 +1032,14 @@ namespace UnityEngine.InputSystem
             // NOTE: We currently do not support layout variants with precompiled layouts.
             // NOTE: We remove precompiled layouts when they are invalidated by layout changes. So, we don't have to perform
             //       checks here.
-            if (!noPrecompiledLayouts &&
-                string.IsNullOrEmpty(layoutVariants) &&
-                InputControlLayout.s_Layouts.precompiledLayouts.TryGetValue(internedLayoutName, out var precompiledLayout))
+            if (
+                !noPrecompiledLayouts
+                && string.IsNullOrEmpty(layoutVariants)
+                && InputControlLayout.s_Layouts.precompiledLayouts.TryGetValue(
+                    internedLayoutName,
+                    out var precompiledLayout
+                )
+            )
             {
                 // Yes. This is pretty much a direct new() of the device.
                 return (TDevice)precompiledLayout.factoryMethod();
@@ -1014,20 +1048,28 @@ namespace UnityEngine.InputSystem
             // Slow path: use InputDeviceBuilder to construct the device from the InputControlLayout.
             using (InputDeviceBuilder.Ref())
             {
-                InputDeviceBuilder.instance.Setup(internedLayoutName, new InternedString(layoutVariants),
-                    deviceDescription: deviceDescription);
+                InputDeviceBuilder.instance.Setup(
+                    internedLayoutName,
+                    new InternedString(layoutVariants),
+                    deviceDescription: deviceDescription
+                );
                 var device = InputDeviceBuilder.instance.Finish();
                 if (!(device is TDevice deviceOfType))
                     throw new ArgumentException(
                         $"Expected device of type '{typeof(TDevice).Name}' but got device of type '{device.GetType().Name}' instead",
-                        "TDevice");
+                        "TDevice"
+                    );
 
                 return deviceOfType;
             }
         }
 
-        internal unsafe void WriteChangedControlStates(byte* deviceStateBuffer, void* statePtr, uint stateSizeInBytes,
-            uint stateOffsetInDevice)
+        internal unsafe void WriteChangedControlStates(
+            byte* deviceStateBuffer,
+            void* statePtr,
+            uint stateSizeInBytes,
+            uint stateOffsetInDevice
+        )
         {
             Debug.Assert(m_ControlTreeNodes != null && m_ControlTreeIndices != null);
 
@@ -1043,8 +1085,12 @@ namespace UnityEngine.InputSystem
             if (m_StateBlock.sizeInBits != stateSizeInBytes * 8)
             {
                 if (m_ControlTreeNodes[0].leftChildIndex != -1)
-                    WritePartialChangedControlStatesInternal(stateSizeInBytes * 8,
-                        stateOffsetInDevice * 8, m_ControlTreeNodes[0], 0);
+                    WritePartialChangedControlStatesInternal(
+                        stateSizeInBytes * 8,
+                        stateOffsetInDevice * 8,
+                        m_ControlTreeNodes[0],
+                        0
+                    );
             }
             else
             {
@@ -1053,13 +1099,19 @@ namespace UnityEngine.InputSystem
             }
         }
 
-        private void WritePartialChangedControlStatesInternal(uint stateSizeInBits,
-            uint stateOffsetInDeviceInBits, ControlBitRangeNode parentNode, uint startOffset)
+        private void WritePartialChangedControlStatesInternal(
+            uint stateSizeInBits,
+            uint stateOffsetInDeviceInBits,
+            ControlBitRangeNode parentNode,
+            uint startOffset
+        )
         {
             var leftNode = m_ControlTreeNodes[parentNode.leftChildIndex];
             // TODO recheck
-            if (Math.Max(stateOffsetInDeviceInBits, startOffset) <=
-                Math.Min(stateOffsetInDeviceInBits + stateSizeInBits, leftNode.endBitOffset))
+            if (
+                Math.Max(stateOffsetInDeviceInBits, startOffset)
+                <= Math.Min(stateOffsetInDeviceInBits + stateSizeInBits, leftNode.endBitOffset)
+            )
             {
                 var controlEndIndex = leftNode.controlStartIndex + leftNode.controlCount;
                 for (int i = leftNode.controlStartIndex; i < controlEndIndex; i++)
@@ -1072,13 +1124,20 @@ namespace UnityEngine.InputSystem
                 }
 
                 if (leftNode.leftChildIndex != -1)
-                    WritePartialChangedControlStatesInternal(stateSizeInBits, stateOffsetInDeviceInBits, leftNode, startOffset);
+                    WritePartialChangedControlStatesInternal(
+                        stateSizeInBits,
+                        stateOffsetInDeviceInBits,
+                        leftNode,
+                        startOffset
+                    );
             }
 
             var rightNode = m_ControlTreeNodes[parentNode.leftChildIndex + 1];
             // TODO recheck
-            if (Math.Max(stateOffsetInDeviceInBits, leftNode.endBitOffset) <=
-                Math.Min(stateOffsetInDeviceInBits + stateSizeInBits, rightNode.endBitOffset))
+            if (
+                Math.Max(stateOffsetInDeviceInBits, leftNode.endBitOffset)
+                <= Math.Min(stateOffsetInDeviceInBits + stateSizeInBits, rightNode.endBitOffset)
+            )
             {
                 var controlEndIndex = rightNode.controlStartIndex + rightNode.controlCount;
                 for (int i = rightNode.controlStartIndex; i < controlEndIndex; i++)
@@ -1091,11 +1150,22 @@ namespace UnityEngine.InputSystem
                 }
 
                 if (rightNode.leftChildIndex != -1)
-                    WritePartialChangedControlStatesInternal(stateSizeInBits, stateOffsetInDeviceInBits, rightNode, leftNode.endBitOffset);
+                    WritePartialChangedControlStatesInternal(
+                        stateSizeInBits,
+                        stateOffsetInDeviceInBits,
+                        rightNode,
+                        leftNode.endBitOffset
+                    );
             }
         }
 
-        private void DumpControlBitRangeNode(int nodeIndex, ControlBitRangeNode node, uint startOffset, uint sizeInBits, List<string> output)
+        private void DumpControlBitRangeNode(
+            int nodeIndex,
+            ControlBitRangeNode node,
+            uint startOffset,
+            uint sizeInBits,
+            List<string> output
+        )
         {
             var names = new List<string>();
             for (var i = 0; i < node.controlCount; i++)
@@ -1113,8 +1183,20 @@ namespace UnityEngine.InputSystem
         {
             var leftNode = m_ControlTreeNodes[parentNode.leftChildIndex];
             var rightNode = m_ControlTreeNodes[parentNode.leftChildIndex + 1];
-            DumpControlBitRangeNode(parentNode.leftChildIndex, leftNode, startOffset, leftNode.endBitOffset - startOffset, output);
-            DumpControlBitRangeNode(parentNode.leftChildIndex + 1, rightNode, leftNode.endBitOffset, (uint)(rightNode.endBitOffset - leftNode.endBitOffset), output);
+            DumpControlBitRangeNode(
+                parentNode.leftChildIndex,
+                leftNode,
+                startOffset,
+                leftNode.endBitOffset - startOffset,
+                output
+            );
+            DumpControlBitRangeNode(
+                parentNode.leftChildIndex + 1,
+                rightNode,
+                leftNode.endBitOffset,
+                (uint)(rightNode.endBitOffset - leftNode.endBitOffset),
+                output
+            );
 
             if (leftNode.leftChildIndex != -1)
                 DumpControlTree(leftNode, startOffset, output);
@@ -1130,8 +1212,12 @@ namespace UnityEngine.InputSystem
             return string.Join("\n", output);
         }
 
-        private unsafe void WriteChangedControlStatesInternal(void* statePtr,
-            byte* deviceStatePtr, ControlBitRangeNode parentNode, uint startOffset)
+        private unsafe void WriteChangedControlStatesInternal(
+            void* statePtr,
+            byte* deviceStatePtr,
+            ControlBitRangeNode parentNode,
+            uint startOffset
+        )
         {
             var leftNode = m_ControlTreeNodes[parentNode.leftChildIndex];
 
@@ -1152,8 +1238,13 @@ namespace UnityEngine.InputSystem
                     // because all controls have this offset baked into them, but deviceStatePtr points at the already
                     // offset block of device memory (remember, all devices share one big block of memory) and statePtr
                     // points at a block of memory of the same size as the device state.
-                    if (!control.CompareState(deviceStatePtr - m_StateBlock.byteOffset,
-                        (byte*)statePtr - m_StateBlock.byteOffset, null))
+                    if (
+                        !control.CompareState(
+                            deviceStatePtr - m_StateBlock.byteOffset,
+                            (byte*)statePtr - m_StateBlock.byteOffset,
+                            null
+                        )
+                    )
                     {
                         control.MarkAsStale();
                         if (control.isButton && ((ButtonControl)control).needsToCheckFramePress)
@@ -1163,20 +1254,27 @@ namespace UnityEngine.InputSystem
 
                 // process the left child node if it exists
                 if (leftNode.leftChildIndex != -1)
-                    WriteChangedControlStatesInternal(statePtr, deviceStatePtr,
-                        leftNode, startOffset);
+                    WriteChangedControlStatesInternal(statePtr, deviceStatePtr, leftNode, startOffset);
             }
 
             // process the right child node if it exists
             var rightNode = m_ControlTreeNodes[parentNode.leftChildIndex + 1];
 
-            Debug.Assert(leftNode.endBitOffset + (rightNode.endBitOffset - leftNode.endBitOffset) < m_StateBlock.sizeInBits,
-                "Tried to check state memory outside the bounds of the current device.");
+            Debug.Assert(
+                leftNode.endBitOffset + (rightNode.endBitOffset - leftNode.endBitOffset) < m_StateBlock.sizeInBits,
+                "Tried to check state memory outside the bounds of the current device."
+            );
 
             // if no bits in the range defined by the right node have changed, return
             // TODO recheck
-            if (!HasDataChangedInRange(deviceStatePtr, statePtr, leftNode.endBitOffset,
-                (uint)(rightNode.endBitOffset - leftNode.endBitOffset + 1)))
+            if (
+                !HasDataChangedInRange(
+                    deviceStatePtr,
+                    statePtr,
+                    leftNode.endBitOffset,
+                    (uint)(rightNode.endBitOffset - leftNode.endBitOffset + 1)
+                )
+            )
                 return;
 
             // update the state of any controls pointed to by the right node
@@ -1186,8 +1284,13 @@ namespace UnityEngine.InputSystem
                 var controlIndex = m_ControlTreeIndices[i];
                 var control = m_ChildrenForEachControl[controlIndex];
 
-                if (!control.CompareState(deviceStatePtr - m_StateBlock.byteOffset,
-                    (byte*)statePtr - m_StateBlock.byteOffset, null))
+                if (
+                    !control.CompareState(
+                        deviceStatePtr - m_StateBlock.byteOffset,
+                        (byte*)statePtr - m_StateBlock.byteOffset,
+                        null
+                    )
+                )
                 {
                     control.MarkAsStale();
                     if (control.isButton && ((ButtonControl)control).needsToCheckFramePress)
@@ -1196,18 +1299,21 @@ namespace UnityEngine.InputSystem
             }
 
             if (rightNode.leftChildIndex != -1)
-                WriteChangedControlStatesInternal(statePtr, deviceStatePtr,
-                    rightNode, leftNode.endBitOffset);
+                WriteChangedControlStatesInternal(statePtr, deviceStatePtr, rightNode, leftNode.endBitOffset);
         }
 
-        private static unsafe bool HasDataChangedInRange(byte* deviceStatePtr, void* statePtr, uint startOffset, uint sizeInBits)
+        private static unsafe bool HasDataChangedInRange(
+            byte* deviceStatePtr,
+            void* statePtr,
+            uint startOffset,
+            uint sizeInBits
+        )
         {
             if (sizeInBits == 1)
-                return MemoryHelpers.ReadSingleBit(deviceStatePtr, startOffset) !=
-                    MemoryHelpers.ReadSingleBit(statePtr, startOffset);
+                return MemoryHelpers.ReadSingleBit(deviceStatePtr, startOffset)
+                    != MemoryHelpers.ReadSingleBit(statePtr, startOffset);
 
-            return !MemoryHelpers.MemCmpBitRegion(deviceStatePtr, statePtr,
-                startOffset, sizeInBits);
+            return !MemoryHelpers.MemCmpBitRegion(deviceStatePtr, statePtr, startOffset, sizeInBits);
         }
     }
 }

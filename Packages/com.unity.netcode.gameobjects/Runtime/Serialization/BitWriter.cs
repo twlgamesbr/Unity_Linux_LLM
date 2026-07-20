@@ -113,7 +113,10 @@ namespace Unity.Netcode
 #if DEBUG
             if (bitCount > 64)
             {
-                throw new ArgumentOutOfRangeException(nameof(bitCount), "Cannot write more than 64 bits from a 64-bit value!");
+                throw new ArgumentOutOfRangeException(
+                    nameof(bitCount),
+                    "Cannot write more than 64 bits from a 64-bit value!"
+                );
             }
 
             int checkPos = (int)(m_BitPosition + bitCount);
@@ -185,11 +188,14 @@ namespace Unity.Netcode
             int offset = m_BitPosition & 7;
             int pos = BytePosition;
             ++m_BitPosition;
-            m_BufferPointer[pos] = (byte)(bit ? (m_BufferPointer[pos] & ~(1 << offset)) | (1 << offset) : (m_BufferPointer[pos] & ~(1 << offset)));
+            m_BufferPointer[pos] = (byte)(
+                bit ? (m_BufferPointer[pos] & ~(1 << offset)) | (1 << offset) : (m_BufferPointer[pos] & ~(1 << offset))
+            );
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private unsafe void WritePartialValue<T>(T value, int bytesToWrite, int offsetBytes = 0) where T : unmanaged
+        private unsafe void WritePartialValue<T>(T value, int bytesToWrite, int offsetBytes = 0)
+            where T : unmanaged
         {
             byte* ptr = ((byte*)&value) + offsetBytes;
             byte* bufferPointer = m_BufferPointer + BytePosition;

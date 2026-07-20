@@ -100,9 +100,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             m_NameLabel.style.color = textColorBase;
             m_TypeLabel.style.color = textColorBase;
 
-            var textColorBytes = rowDataItem.data.SentOverLocalConnection
-                ? new StyleColor(Color.gray)
-                : textColorBase;
+            var textColorBytes = rowDataItem.data.SentOverLocalConnection ? new StyleColor(Color.gray) : textColorBase;
 
             m_BytesSentLabel.style.color = textColorBytes;
             m_BytesReceivedLabel.style.color = textColorBytes;

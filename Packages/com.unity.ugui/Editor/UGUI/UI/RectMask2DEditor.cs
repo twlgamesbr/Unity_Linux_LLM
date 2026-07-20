@@ -19,7 +19,7 @@ namespace UnityEditor.UI
         GUIContent m_TopContent;
         GUIContent m_BottomContent;
 
-        static private bool m_ShowOffsets = false;
+        private static bool m_ShowOffsets = false;
 
         protected virtual void OnEnable()
         {

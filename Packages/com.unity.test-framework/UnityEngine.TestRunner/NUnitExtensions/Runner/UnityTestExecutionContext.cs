@@ -41,7 +41,6 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         public object TestObject { get; set; }
         public string WorkDirectory { get; set; }
 
-
         private TestExecutionStatus _executionStatus;
         public TestExecutionStatus ExecutionStatus
         {
@@ -80,8 +79,13 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             ErrorCount = GetErrorCount();
         }
 
-        public UnityTestExecutionContext(BeforeAfterTestCommandState setUpTearDownState, BeforeAfterTestCommandState oneTimeSetUpTearDownState,
-            BeforeAfterTestCommandState outerUnityTestActionState, EnumerableTestState enumerableTestState) : this()
+        public UnityTestExecutionContext(
+            BeforeAfterTestCommandState setUpTearDownState,
+            BeforeAfterTestCommandState oneTimeSetUpTearDownState,
+            BeforeAfterTestCommandState outerUnityTestActionState,
+            EnumerableTestState enumerableTestState
+        )
+            : this()
         {
             SetUpTearDownState = setUpTearDownState;
             OneTimeSetUpTearDownState = oneTimeSetUpTearDownState;
@@ -143,10 +147,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
         internal int AssertCount
         {
-            get
-            {
-                return _assertCount;
-            }
+            get { return _assertCount; }
         }
 
         public TestPlatform TestMode { get; set; }
@@ -163,8 +164,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
         public bool HasTimedOut()
         {
-            return Stopwatch.GetTimestamp() - StartTicks >
-                   TestCaseTimeout * (Stopwatch.Frequency / 1000f);
+            return Stopwatch.GetTimestamp() - StartTicks > TestCaseTimeout * (Stopwatch.Frequency / 1000f);
         }
 
         public bool HasErrorsAfterDomainReload()
@@ -181,7 +181,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         {
             int errorCount = 0;
 #if UNITY_EDITOR
-            int warningCount = 0, logCount = 0;
+            int warningCount = 0,
+                logCount = 0;
             UnityEditor.LogEntries.GetCountsByType(ref errorCount, ref warningCount, ref logCount);
 #endif
             return errorCount;

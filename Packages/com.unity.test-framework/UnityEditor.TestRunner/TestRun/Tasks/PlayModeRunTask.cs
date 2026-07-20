@@ -11,6 +11,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
         {
             SupportsResumingEnumerator = true;
         }
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             yield return null; // Allow for setting the test job data after a resume.
@@ -31,7 +32,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                 testJobData.RunFinishedEvent.Invoke(controller.m_Runner.Result);
                 yield break;
             }
-            
+
             controller.runStartedEvent.AddListener(testJobData.RunStartedEvent.Invoke);
             controller.testStartedEvent.AddListener(testJobData.TestStartedEvent.Invoke);
             controller.testFinishedEvent.AddListener(testJobData.TestFinishedEvent.Invoke);
@@ -40,10 +41,12 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             controller.RunInfrastructureHasRegistered = true;
 
             var runDone = false;
-            controller.runFinishedEvent.AddListener((_) =>
-            {
-                runDone = true;
-            });
+            controller.runFinishedEvent.AddListener(
+                (_) =>
+                {
+                    runDone = true;
+                }
+            );
 
             while (!runDone)
             {
@@ -56,7 +59,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                 {
                     throw new Exception("Playmode tests were aborted because the player was stopped.");
                 }
-                
+
                 yield return null;
             }
 

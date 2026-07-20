@@ -8,12 +8,12 @@ namespace Unity.Entities.Editor
     [Flags]
     enum NodeKind
     {
-        None             = 0,
-        Root             = 1 << 0,
-        Entity           = 1 << 1,
-        GameObject       = 1 << 2,
-        Scene            = 1 << 3,
-        SubScene         = 1 << 4
+        None = 0,
+        Root = 1 << 0,
+        Entity = 1 << 1,
+        GameObject = 1 << 2,
+        Scene = 1 << 3,
+        SubScene = 1 << 4,
     }
 
     /// <summary>
@@ -53,11 +53,16 @@ namespace Unity.Entities.Editor
         }
 
         public readonly ulong ToULong() => unchecked((uint)Index | ((ulong)(uint)Version << 32));
+
         public readonly EntityId ToEntityId() => EntityId.FromULong(ToULong());
 
-        public bool Equals(HierarchyNodeHandle other) => Kind == other.Kind && Index == other.Index && Version == other.Version;
+        public bool Equals(HierarchyNodeHandle other) =>
+            Kind == other.Kind && Index == other.Index && Version == other.Version;
+
         public override bool Equals(object obj) => obj is HierarchyNodeHandle other && Equals(other);
+
         public static bool operator ==(HierarchyNodeHandle lhs, HierarchyNodeHandle rhs) => lhs.Equals(rhs);
+
         public static bool operator !=(HierarchyNodeHandle lhs, HierarchyNodeHandle rhs) => !(lhs == rhs);
 
         public static bool operator ==(EntityId other, HierarchyNodeHandle handle)
@@ -73,7 +78,7 @@ namespace Unity.Entities.Editor
 
         public int CompareTo(HierarchyNodeHandle other)
         {
-            var value = ((byte) Kind).CompareTo((byte) other.Kind);
+            var value = ((byte)Kind).CompareTo((byte)other.Kind);
             if (value != 0)
                 return value;
             value = Index.CompareTo(other.Index);
@@ -93,34 +98,37 @@ namespace Unity.Entities.Editor
 
         public static readonly HierarchyNodeHandle Root = new HierarchyNodeHandle(NodeKind.Root);
 
-        public static HierarchyNodeHandle FromEntity(Entity entity)
-            => new HierarchyNodeHandle(NodeKind.Entity, entity.Index, entity.Version);
-        public static HierarchyNodeHandle FromGameObject(GameObject gameObject)
-            => new HierarchyNodeHandle(NodeKind.GameObject, gameObject.GetEntityId());
+        public static HierarchyNodeHandle FromEntity(Entity entity) =>
+            new HierarchyNodeHandle(NodeKind.Entity, entity.Index, entity.Version);
 
-        public static HierarchyNodeHandle FromGameObject(EntityId entityId)
-            => new HierarchyNodeHandle(NodeKind.GameObject, entityId);
+        public static HierarchyNodeHandle FromGameObject(GameObject gameObject) =>
+            new HierarchyNodeHandle(NodeKind.GameObject, gameObject.GetEntityId());
 
-        public static HierarchyNodeHandle FromScene(UnityEngine.SceneManagement.Scene scene)
-            => new HierarchyNodeHandle(NodeKind.Scene, scene.handle);
+        public static HierarchyNodeHandle FromGameObject(EntityId entityId) =>
+            new HierarchyNodeHandle(NodeKind.GameObject, entityId);
 
-        public static HierarchyNodeHandle FromScene(UnloadedScene scene)
-            => new HierarchyNodeHandle(NodeKind.Scene, scene.handle);
+        public static HierarchyNodeHandle FromScene(UnityEngine.SceneManagement.Scene scene) =>
+            new HierarchyNodeHandle(NodeKind.Scene, scene.handle);
 
-        public static HierarchyNodeHandle FromSubScene(int subSceneMapIndex)
-            => new HierarchyNodeHandle(NodeKind.SubScene, index: subSceneMapIndex);
+        public static HierarchyNodeHandle FromScene(UnloadedScene scene) =>
+            new HierarchyNodeHandle(NodeKind.Scene, scene.handle);
 
-        public override string ToString()
-            => Equals(Root) ? $"{nameof(HierarchyNodeHandle)}(Root)" : $"{nameof(HierarchyNodeHandle)}(Kind:{Kind}, Index:{Index}, Version:{Version})";
+        public static HierarchyNodeHandle FromSubScene(int subSceneMapIndex) =>
+            new HierarchyNodeHandle(NodeKind.SubScene, index: subSceneMapIndex);
 
-        public readonly Entity ToEntity()
-            => new Entity {Index = Index, Version = Version};
+        public override string ToString() =>
+            Equals(Root)
+                ? $"{nameof(HierarchyNodeHandle)}(Root)"
+                : $"{nameof(HierarchyNodeHandle)}(Kind:{Kind}, Index:{Index}, Version:{Version})";
 
+        public readonly Entity ToEntity() => new Entity { Index = Index, Version = Version };
 
         public GameObject ToGameObject()
         {
             if (Kind != NodeKind.GameObject)
-                throw new InvalidOperationException($"Cannot retrieve a GameObject instance from a node of kind {Kind}");
+                throw new InvalidOperationException(
+                    $"Cannot retrieve a GameObject instance from a node of kind {Kind}"
+                );
             return EditorUtility.EntityIdToObject(ToEntityId()) as GameObject;
         }
     }

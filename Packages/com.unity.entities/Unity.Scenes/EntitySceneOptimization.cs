@@ -1,4 +1,3 @@
-
 using System;
 using Unity.Collections;
 
@@ -6,9 +5,7 @@ namespace Unity.Entities.Streaming
 {
     [DisableAutoCreation]
     [WorldSystemFilter(WorldSystemFilterFlags.EntitySceneOptimizations)]
-    internal partial class OptimizationGroup : ComponentSystemGroup
-    {
-    }
+    internal partial class OptimizationGroup : ComponentSystemGroup { }
 
     internal static class EntitySceneOptimization
     {
@@ -18,7 +15,10 @@ namespace Unity.Entities.Streaming
             {
                 if (TypeManager.IsCleanupComponent(s.TypeIndex))
                 {
-                    entityManager.RemoveComponent(entityManager.UniversalQueryWithSystems, ComponentType.FromTypeIndex(s.TypeIndex));
+                    entityManager.RemoveComponent(
+                        entityManager.UniversalQueryWithSystems,
+                        ComponentType.FromTypeIndex(s.TypeIndex)
+                    );
                 }
             }
         }
@@ -60,7 +60,9 @@ namespace Unity.Entities.Streaming
 
         internal static void Optimize(World world)
         {
-            var systemList = DefaultWorldInitialization.GetAllSystemTypeIndices(WorldSystemFilterFlags.EntitySceneOptimizations);
+            var systemList = DefaultWorldInitialization.GetAllSystemTypeIndices(
+                WorldSystemFilterFlags.EntitySceneOptimizations
+            );
             OptimizeInternal(world, systemList);
         }
     }

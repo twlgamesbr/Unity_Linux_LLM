@@ -10,11 +10,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         public UnityEngine.TestTools.IgnoreTest ParseToEngine()
         {
-            return new UnityEngine.TestTools.IgnoreTest
-            {
-                test = test,
-                ignoreComment = ignoreComment
-            };
+            return new UnityEngine.TestTools.IgnoreTest { test = test, ignoreComment = ignoreComment };
         }
 
         public override string ToString()
@@ -22,5 +18,4 @@ namespace UnityEditor.TestTools.TestRunner.Api
             return $"'{test}': '{ignoreComment}'";
         }
     }
-
 }

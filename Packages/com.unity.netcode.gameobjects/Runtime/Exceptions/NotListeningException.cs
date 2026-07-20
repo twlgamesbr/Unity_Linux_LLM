@@ -17,13 +17,15 @@ namespace Unity.Netcode
         /// Constructs a NotListeningException with a message
         /// </summary>
         /// <param name="message">The exception message</param>
-        public NotListeningException(string message) : base(message) { }
+        public NotListeningException(string message)
+            : base(message) { }
 
         /// <summary>
         /// Constructs a NotListeningException with a message and a inner exception
         /// </summary>
         /// <param name="message">The exception message</param>
         /// <param name="inner">The inner exception</param>
-        public NotListeningException(string message, Exception inner) : base(message, inner) { }
+        public NotListeningException(string message, Exception inner)
+            : base(message, inner) { }
     }
 }

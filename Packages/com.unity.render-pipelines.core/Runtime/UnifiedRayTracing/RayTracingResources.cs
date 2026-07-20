@@ -21,7 +21,8 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
     [Categorization.CategoryInfo(Name = "R: Unified Ray Tracing", Order = 1000), HideInInspector]
     public sealed class RayTracingRenderPipelineResources : IRenderPipelineResources
     {
-        [SerializeField, HideInInspector] int m_Version = 1;
+        [SerializeField, HideInInspector]
+        int m_Version = 1;
 
         /// <summary>
         /// The version number of the resources container.
@@ -200,9 +201,6 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         /// </remarks>
         public ComputeShader restructureBvh { get; set; }
 
-
-        
-
 #if UNITY_EDITOR
         /// <summary>
         /// Intializes the RayTracingResources.
@@ -214,16 +212,34 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         {
             const string path = "Packages/com.unity.render-pipelines.core/Runtime/";
 
-            geometryPoolKernels        = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Common/GeometryPool/GeometryPoolKernels.compute");
-            copyBuffer                 = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Common/Utilities/CopyBuffer.compute");
+            geometryPoolKernels = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Common/GeometryPool/GeometryPoolKernels.compute"
+            );
+            copyBuffer = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Common/Utilities/CopyBuffer.compute"
+            );
 
-            copyPositions              = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/copyPositions.compute");
-            bitHistogram               = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/bit_histogram.compute");
-            blockReducePart            = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_reduce_part.compute");
-            blockScan                  = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_scan.compute");
-            buildHlbvh                 = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/build_hlbvh.compute");
-            restructureBvh             = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/restructure_bvh.compute");
-            scatter                    = AssetDatabase.LoadAssetAtPath<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/scatter.compute");
+            copyPositions = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/copyPositions.compute"
+            );
+            bitHistogram = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/bit_histogram.compute"
+            );
+            blockReducePart = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_reduce_part.compute"
+            );
+            blockScan = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_scan.compute"
+            );
+            buildHlbvh = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/build_hlbvh.compute"
+            );
+            restructureBvh = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/restructure_bvh.compute"
+            );
+            scatter = AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/scatter.compute"
+            );
         }
 #endif
 
@@ -239,16 +255,34 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         {
             const string path = "Packages/com.unity.render-pipelines.core/Runtime/";
 
-            geometryPoolKernels = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Common/GeometryPool/GeometryPoolKernels.compute");
-            copyBuffer = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Common/Utilities/CopyBuffer.compute");
+            geometryPoolKernels = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Common/GeometryPool/GeometryPoolKernels.compute"
+            );
+            copyBuffer = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Common/Utilities/CopyBuffer.compute"
+            );
 
-            copyPositions = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/copyPositions.compute");
-            bitHistogram = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/bit_histogram.compute");
-            blockReducePart = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_reduce_part.compute");
-            blockScan = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_scan.compute");
-            buildHlbvh = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/build_hlbvh.compute");
-            restructureBvh = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/restructure_bvh.compute");
-            scatter = assetBundle.LoadAsset<ComputeShader>(path + "UnifiedRayTracing/Compute/RadeonRays/kernels/scatter.compute");
+            copyPositions = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/copyPositions.compute"
+            );
+            bitHistogram = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/bit_histogram.compute"
+            );
+            blockReducePart = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_reduce_part.compute"
+            );
+            blockScan = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/block_scan.compute"
+            );
+            buildHlbvh = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/build_hlbvh.compute"
+            );
+            restructureBvh = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/restructure_bvh.compute"
+            );
+            scatter = assetBundle.LoadAsset<ComputeShader>(
+                path + "UnifiedRayTracing/Compute/RadeonRays/kernels/scatter.compute"
+            );
         }
 #endif
 
@@ -288,7 +322,4 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return true;
         }
     }
-
 }
-
-

@@ -35,10 +35,11 @@ namespace UnityEngine.Rendering.Universal
         /// Simple Reinhard tonemapping curve.
         /// </summary>
         Reinhard = HDRRangeReduction.Reinhard,
+
         /// <summary>
         /// Range reduction curve as specified in the BT.2390 standard.
         /// </summary>
-        BT2390 = HDRRangeReduction.BT2390
+        BT2390 = HDRRangeReduction.BT2390,
     }
 
     /// <summary>
@@ -50,10 +51,12 @@ namespace UnityEngine.Rendering.Universal
         /// Preset for a display with a maximum range of 1000 nits.
         /// </summary>
         ACES1000Nits = HDRRangeReduction.ACES1000Nits,
+
         /// <summary>
         /// Preset for a display with a maximum range of 2000 nits.
         /// </summary>
         ACES2000Nits = HDRRangeReduction.ACES2000Nits,
+
         /// <summary>
         /// Preset for a display with a maximum range of 4000 nits.
         /// </summary>
@@ -191,8 +194,12 @@ namespace UnityEngine.Rendering.Universal
         /// Specifies the range reduction mode used when HDR output is enabled and Neutral tonemapping is enabled.
         /// </summary>
         [AdditionalProperty]
-        [Tooltip("Specifies the range reduction mode used when HDR output is enabled and Neutral tonemapping is enabled.")]
-        public NeutralRangeReductionModeParameter neutralHDRRangeReductionMode = new NeutralRangeReductionModeParameter(NeutralRangeReductionMode.BT2390);
+        [Tooltip(
+            "Specifies the range reduction mode used when HDR output is enabled and Neutral tonemapping is enabled."
+        )]
+        public NeutralRangeReductionModeParameter neutralHDRRangeReductionMode = new NeutralRangeReductionModeParameter(
+            NeutralRangeReductionMode.BT2390
+        );
 
         /// <summary>
         /// Specifies the preset for HDR displays.
@@ -203,37 +210,49 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Specify how much hue to preserve. Values closer to 0 are likely to preserve hue. As values get closer to 1, Unity doesn't correct hue shifts.
         /// </summary>
-        [Tooltip("Specify how much hue to preserve. Values closer to 0 are likely to preserve hue. As values get closer to 1, Unity doesn't correct hue shifts.")]
+        [Tooltip(
+            "Specify how much hue to preserve. Values closer to 0 are likely to preserve hue. As values get closer to 1, Unity doesn't correct hue shifts."
+        )]
         public ClampedFloatParameter hueShiftAmount = new ClampedFloatParameter(0.0f, 0.0f, 1.0f);
 
         /// <summary>
         /// Enable to use values detected from the output device as paper white. When enabled, output images might differ between SDR and HDR. For best accuracy, set this value manually.
         /// </summary>
-        [Tooltip("Enable to use values detected from the output device as paper white. When enabled, output images might differ between SDR and HDR. For best accuracy, set this value manually.")]
+        [Tooltip(
+            "Enable to use values detected from the output device as paper white. When enabled, output images might differ between SDR and HDR. For best accuracy, set this value manually."
+        )]
         public BoolParameter detectPaperWhite = new BoolParameter(false);
 
         /// <summary>
         /// The reference brightness of a paper white surface. This property determines the maximum brightness of UI. The brightness of the scene is scaled relative to this value. The value is in nits.
         /// </summary>
-        [Tooltip("The reference brightness of a paper white surface. This property determines the maximum brightness of UI. The brightness of the scene is scaled relative to this value. The value is in nits.")]
+        [Tooltip(
+            "The reference brightness of a paper white surface. This property determines the maximum brightness of UI. The brightness of the scene is scaled relative to this value. The value is in nits."
+        )]
         public ClampedFloatParameter paperWhite = new ClampedFloatParameter(300.0f, 0.0f, 400.0f);
 
         /// <summary>
         /// Enable to use the minimum and maximum brightness values detected from the output device. For best accuracy, considering calibrating these values manually.
         /// </summary>
-        [Tooltip("Enable to use the minimum and maximum brightness values detected from the output device. For best accuracy, considering calibrating these values manually.")]
+        [Tooltip(
+            "Enable to use the minimum and maximum brightness values detected from the output device. For best accuracy, considering calibrating these values manually."
+        )]
         public BoolParameter detectBrightnessLimits = new BoolParameter(true);
 
         /// <summary>
         /// The minimum brightness of the screen (in nits). This value is assumed to be 0.005f with ACES Tonemap.
         /// </summary>
-        [Tooltip("The minimum brightness of the screen (in nits). This value is assumed to be 0.005f with ACES Tonemap.")]
+        [Tooltip(
+            "The minimum brightness of the screen (in nits). This value is assumed to be 0.005f with ACES Tonemap."
+        )]
         public ClampedFloatParameter minNits = new ClampedFloatParameter(0.005f, 0.0f, 50.0f);
 
         /// <summary>
         /// The maximum brightness of the screen (in nits). This value is defined by the preset when using ACES Tonemap.
         /// </summary>
-        [Tooltip("The maximum brightness of the screen (in nits). This value is defined by the preset when using ACES Tonemap.")]
+        [Tooltip(
+            "The maximum brightness of the screen (in nits). This value is defined by the preset when using ACES Tonemap."
+        )]
         public ClampedFloatParameter maxNits = new ClampedFloatParameter(1000.0f, 0.0f, 5000.0f);
 
         /// <summary>
@@ -261,7 +280,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <param name="value">The initial value to store in the parameter.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public TonemappingModeParameter(TonemappingMode value, bool overrideState = false) : base(value, overrideState) { }
+        public TonemappingModeParameter(TonemappingMode value, bool overrideState = false)
+            : base(value, overrideState) { }
     }
 
     /// <summary>
@@ -275,7 +295,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <param name="value">The initial value to store in the parameter.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public NeutralRangeReductionModeParameter(NeutralRangeReductionMode value, bool overrideState = false) : base(value, overrideState) { }
+        public NeutralRangeReductionModeParameter(NeutralRangeReductionMode value, bool overrideState = false)
+            : base(value, overrideState) { }
     }
 
     /// <summary>
@@ -289,6 +310,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <param name="value">The initial value to store in the parameter.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public HDRACESPresetParameter(HDRACESPreset value, bool overrideState = false) : base(value, overrideState) { }
+        public HDRACESPresetParameter(HDRACESPreset value, bool overrideState = false)
+            : base(value, overrideState) { }
     }
 }

@@ -3,11 +3,9 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
 
 #if UNITY_EDITOR
 [InitializeOnLoad]
@@ -18,7 +16,7 @@ static class RegisterSTP
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void InitRuntime() => UpscalerRegistry.Register<STPIUpscaler, STPOptions>(STPIUpscaler.upscalerName);
-} 
+}
 
 public class STPIUpscaler : AbstractUpscaler
 {
@@ -73,7 +71,7 @@ public class STPIUpscaler : AbstractUpscaler
             outputDesc.filterMode = FilterMode.Bilinear;
             outputColor = renderGraph.CreateTexture(outputDesc);
         }
-        
+
         // Populate the STP config
         STP.Config config = new();
         {
@@ -118,7 +116,6 @@ public class STPIUpscaler : AbstractUpscaler
             config.enableHwDrs = io.enableHwDrs;
             config.hasValidHistory = !io.resetHistory && hasValidHistory;
 
-
             config.numActiveViews = io.numActiveViews;
             config.perViewConfigs = STP.perViewConfigs;
             Debug.Assert(io.numActiveViews <= STP.perViewConfigs.Length);
@@ -144,9 +141,18 @@ public class STPIUpscaler : AbstractUpscaler
                 Vector3 lastPosition = io.previousWorldSpaceCameraPositions[viewIndex];
                 Vector3 lastLastPosition = io.previousPreviousWorldSpaceCameraPositions[viewIndex];
 
-                perViewConfig.currentView.SetColumn(3, new Vector4(-currentPosition.x, -currentPosition.y, -currentPosition.z, 1.0f));
-                perViewConfig.lastView.SetColumn(3, new Vector4(-lastPosition.x, -lastPosition.y, -lastPosition.z, 1.0f));
-                perViewConfig.lastLastView.SetColumn(3, new Vector4(-lastLastPosition.x, -lastLastPosition.y, -lastLastPosition.z, 1.0f));
+                perViewConfig.currentView.SetColumn(
+                    3,
+                    new Vector4(-currentPosition.x, -currentPosition.y, -currentPosition.z, 1.0f)
+                );
+                perViewConfig.lastView.SetColumn(
+                    3,
+                    new Vector4(-lastPosition.x, -lastPosition.y, -lastPosition.z, 1.0f)
+                );
+                perViewConfig.lastLastView.SetColumn(
+                    3,
+                    new Vector4(-lastLastPosition.x, -lastLastPosition.y, -lastLastPosition.z, 1.0f)
+                );
 
                 STP.perViewConfigs[viewIndex] = perViewConfig;
             }

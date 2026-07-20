@@ -50,7 +50,9 @@ namespace Unity.Collections.UnsafeUtility.CodeGen
             var pdb = new MemoryStream();
             var writerParameters = new WriterParameters
             {
-                SymbolWriterProvider = new PortablePdbWriterProvider(), SymbolStream = pdb, WriteSymbols = true
+                SymbolWriterProvider = new PortablePdbWriterProvider(),
+                SymbolStream = pdb,
+                WriteSymbols = true,
             };
 
             assemblyDefinition.Write(pe, writerParameters);
@@ -97,7 +99,7 @@ namespace Unity.Collections.UnsafeUtility.CodeGen
             {
                 SymbolStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PdbData),
                 SymbolReaderProvider = new PortablePdbReaderProvider(),
-                ReadingMode = ReadingMode.Immediate
+                ReadingMode = ReadingMode.Immediate,
             };
 
             var peStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PeData);
@@ -136,4 +138,3 @@ namespace Unity.Collections.UnsafeUtility.CodeGen
         }
     }
 }
-

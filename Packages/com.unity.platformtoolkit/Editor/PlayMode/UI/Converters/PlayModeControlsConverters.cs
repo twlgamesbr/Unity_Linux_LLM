@@ -9,11 +9,21 @@ namespace Unity.PlatformToolkit.PlayMode.Converters
         public static void RegisterConverters()
         {
             var stringToVisibility = new ConverterGroup("String field visibility");
-            stringToVisibility.AddConverter((ref string value) => string.IsNullOrEmpty(value) ? new StyleEnum<DisplayStyle>(DisplayStyle.None) : new StyleEnum<DisplayStyle>(DisplayStyle.Flex));
+            stringToVisibility.AddConverter(
+                (ref string value) =>
+                    string.IsNullOrEmpty(value)
+                        ? new StyleEnum<DisplayStyle>(DisplayStyle.None)
+                        : new StyleEnum<DisplayStyle>(DisplayStyle.Flex)
+            );
             ConverterGroups.RegisterConverterGroup(stringToVisibility);
 
             var boolToVisibility = new ConverterGroup("Bool field visibility");
-            boolToVisibility.AddConverter((ref bool value) => value ? new StyleEnum<DisplayStyle>(DisplayStyle.Flex) : new StyleEnum<DisplayStyle>(DisplayStyle.None));
+            boolToVisibility.AddConverter(
+                (ref bool value) =>
+                    value
+                        ? new StyleEnum<DisplayStyle>(DisplayStyle.Flex)
+                        : new StyleEnum<DisplayStyle>(DisplayStyle.None)
+            );
             ConverterGroups.RegisterConverterGroup(boolToVisibility);
         }
     }

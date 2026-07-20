@@ -1,16 +1,17 @@
+using System;
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor;
 using UnityEngine.UIElements;
-using System;
 
 namespace Unity.Entities.Editor
 {
     [DOTSEditorPreferencesSetting(Constants.Settings.Hierarchy), UsedImplicitly]
     class HierarchySettings : ISetting
     {
-        [InternalSetting] public HierarchyConfiguration Configuration = new HierarchyConfiguration();
+        [InternalSetting]
+        public HierarchyConfiguration Configuration = new HierarchyConfiguration();
 
         public event Action UseAdvanceSearchSettingChanged;
 
@@ -43,9 +44,20 @@ namespace Unity.Entities.Editor
                 var useAdvanceSearch = new VisualElement();
 
                 DoDefaultGui(updateModeType, nameof(Configuration) + "." + nameof(HierarchyConfiguration.UpdateMode));
-                DoDefaultGui(millisecondsBetweenUpdateCycles, nameof(Configuration) + "." + nameof(HierarchyConfiguration.MinimumMillisecondsBetweenHierarchyUpdateCycles));
-                DoDefaultGui(excludeUnnamedNodesForSearch, nameof(Configuration) + "." + nameof(HierarchyConfiguration.ExcludeUnnamedNodesForSearch));
-                DoDefaultGui(useAdvanceSearch, nameof(Configuration) + "." + nameof(HierarchyConfiguration.AdvancedSearch));
+                DoDefaultGui(
+                    millisecondsBetweenUpdateCycles,
+                    nameof(Configuration)
+                        + "."
+                        + nameof(HierarchyConfiguration.MinimumMillisecondsBetweenHierarchyUpdateCycles)
+                );
+                DoDefaultGui(
+                    excludeUnnamedNodesForSearch,
+                    nameof(Configuration) + "." + nameof(HierarchyConfiguration.ExcludeUnnamedNodesForSearch)
+                );
+                DoDefaultGui(
+                    useAdvanceSearch,
+                    nameof(Configuration) + "." + nameof(HierarchyConfiguration.AdvancedSearch)
+                );
 
                 root.Add(updateModeType);
                 root.Add(millisecondsBetweenUpdateCycles);
@@ -58,15 +70,31 @@ namespace Unity.Entities.Editor
                     m_ExportImmutableBatchSize = new VisualElement();
 
                     // Async specific options.
-                    DoDefaultGui(m_MillisecondsPerUpdate, nameof(Configuration) + "." + nameof(HierarchyConfiguration.MaximumMillisecondsPerEditorUpdate));
-                    DoDefaultGui(m_EntityChangeIntegrationBatchSize, nameof(Configuration) + "." + nameof(HierarchyConfiguration.EntityChangeIntegrationBatchSize));
-                    DoDefaultGui(m_GameObjectChangeIntegrationBatchSize, nameof(Configuration) + "." + nameof(HierarchyConfiguration.GameObjectChangeIntegrationBatchSize));
-                    DoDefaultGui(m_ExportImmutableBatchSize, nameof(Configuration) + "." + nameof(HierarchyConfiguration.ExportImmutableBatchSize));
+                    DoDefaultGui(
+                        m_MillisecondsPerUpdate,
+                        nameof(Configuration) + "." + nameof(HierarchyConfiguration.MaximumMillisecondsPerEditorUpdate)
+                    );
+                    DoDefaultGui(
+                        m_EntityChangeIntegrationBatchSize,
+                        nameof(Configuration) + "." + nameof(HierarchyConfiguration.EntityChangeIntegrationBatchSize)
+                    );
+                    DoDefaultGui(
+                        m_GameObjectChangeIntegrationBatchSize,
+                        nameof(Configuration)
+                            + "."
+                            + nameof(HierarchyConfiguration.GameObjectChangeIntegrationBatchSize)
+                    );
+                    DoDefaultGui(
+                        m_ExportImmutableBatchSize,
+                        nameof(Configuration) + "." + nameof(HierarchyConfiguration.ExportImmutableBatchSize)
+                    );
 
-                    updateModeType.Q<EnumField>().RegisterValueChangedCallback(evt =>
-                    {
-                        SetUpdateMode((Hierarchy.UpdateModeType) evt.newValue);
-                    });
+                    updateModeType
+                        .Q<EnumField>()
+                        .RegisterValueChangedCallback(evt =>
+                        {
+                            SetUpdateMode((Hierarchy.UpdateModeType)evt.newValue);
+                        });
 
                     root.Add(m_MillisecondsPerUpdate);
                     root.Add(m_EntityChangeIntegrationBatchSize);

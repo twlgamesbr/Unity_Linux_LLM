@@ -59,7 +59,10 @@ namespace UnityEditor.TestRunner.TestLaunchers
 
             try
             {
-                deploymentTargetManager = DeploymentTargetManager.CreateInstance(EditorUserBuildSettings.activeBuildTargetGroup, buildTarget);
+                deploymentTargetManager = DeploymentTargetManager.CreateInstance(
+                    EditorUserBuildSettings.activeBuildTargetGroup,
+                    buildTarget
+                );
 
                 if (deploymentTargetManager == null)
                     return null;

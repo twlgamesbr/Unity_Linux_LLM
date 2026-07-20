@@ -35,9 +35,7 @@ namespace NPCSystem.Monitoring
 
                 if (enableFileSink)
                 {
-                    var fileSink = new FileTelemetrySink(
-                        sessionId: sessionId ?? Guid.NewGuid().ToString("N")
-                    );
+                    var fileSink = new FileTelemetrySink(sessionId: sessionId ?? Guid.NewGuid().ToString("N"));
                     router.Register(fileSink);
                     Debug.Log(
                         $"[TelemetryBootstrapper] FileTelemetrySink registered → {Application.persistentDataPath}/Telemetry/"
@@ -59,9 +57,7 @@ namespace NPCSystem.Monitoring
 
                 router.Freeze();
 
-                Debug.Log(
-                    $"[TelemetryBootstrapper] Telemetry router initialized with {router.SinkCount} sink(s)."
-                );
+                Debug.Log($"[TelemetryBootstrapper] Telemetry router initialized with {router.SinkCount} sink(s).");
             }
             catch (Exception ex)
             {

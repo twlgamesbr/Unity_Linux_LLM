@@ -33,7 +33,10 @@ namespace Unity.Entities.Editor
         /// <typeparam name="TFilterConstant">The operator's right hand side type.</typeparam>
         /// <param name="op">The filter operator.</param>
         /// <param name="handler">Callback to handle the operation. Takes a TFilterVariable (value returned by the filter handler, will vary for each element) and a TFilterConstant (right hand side value of the operator, which is constant), and returns a boolean indicating if the filter passes or not.</param>
-        void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, bool> handler);
+        void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, bool> handler
+        );
 
         /// <summary>
         /// Add a custom filter operator handler.
@@ -42,7 +45,10 @@ namespace Unity.Entities.Editor
         /// <typeparam name="TFilterConstant">The operator's right hand side type.</typeparam>
         /// <param name="op">The filter operator.</param>
         /// <param name="handler">Callback to handle the operation. Takes a TFilterVariable (value returned by the filter handler, will vary for each element), a TFilterConstant (right hand side value of the operator, which is constant), a StringComparison option and returns a boolean indicating if the filter passes or not.</param>
-        void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler);
+        void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler
+        );
 
         /// <summary>
         /// String comparison options for word matching and filter handling (if not overridden).
@@ -72,7 +78,11 @@ namespace Unity.Entities.Editor
         /// <param name="getFilterDataFunc">The filter callback which returns a strongly typed value from <see cref="TData"/>.</param>
         /// <param name="options">The set of filter options.</param>
         /// <typeparam name="TFilter">The strongly typed value.</typeparam>
-        void AddSearchFilterCallback<TFilter>(string token, Func<TData, TFilter> getFilterDataFunc, SearchFilterOptions options);
+        void AddSearchFilterCallback<TFilter>(
+            string token,
+            Func<TData, TFilter> getFilterDataFunc,
+            SearchFilterOptions options
+        );
 
         /// <summary>
         /// Applies the given search text and generates a query object which can be applied to a collection of <see cref="TData"/> objects.

@@ -6,26 +6,54 @@ namespace Unity.PlatformToolkit.PlayMode
     [UxmlElement]
     internal partial class PlayModeControlsAccountField : VisualElement
     {
-        private readonly IReadOnlyDictionary<SetPrimaryAccountStatus, string> k_SetPrimaryAccountStatusTooltips = new Dictionary<SetPrimaryAccountStatus, string>
+        private readonly IReadOnlyDictionary<SetPrimaryAccountStatus, string> k_SetPrimaryAccountStatusTooltips =
+            new Dictionary<SetPrimaryAccountStatus, string>
             {
-                { SetPrimaryAccountStatus.CannotSignIn, "This account cannot currently be signed in, hence it cannot be set as primary." },
-                { SetPrimaryAccountStatus.NotSupported, "This platform does not support the concept of primary accounts." },
-                { SetPrimaryAccountStatus.NotSupportedInPlaymode, "Setting the primary account is only allowed outside of Play Mode on this platform." }
+                {
+                    SetPrimaryAccountStatus.CannotSignIn,
+                    "This account cannot currently be signed in, hence it cannot be set as primary."
+                },
+                {
+                    SetPrimaryAccountStatus.NotSupported,
+                    "This platform does not support the concept of primary accounts."
+                },
+                {
+                    SetPrimaryAccountStatus.NotSupportedInPlaymode,
+                    "Setting the primary account is only allowed outside of Play Mode on this platform."
+                },
             };
 
-        private readonly IReadOnlyDictionary<SignInStatus, string> k_SignInStateTooltips = new Dictionary<SignInStatus, string>()
+        private readonly IReadOnlyDictionary<SignInStatus, string> k_SignInStateTooltips = new Dictionary<
+            SignInStatus,
+            string
+        >()
+        {
             {
-                { SignInStatus.AdditionalAccountsNotSupported, "This platform only supports one signed-in account at a time." },
-                { SignInStatus.MaximumAccountsReached, "The maximum number of supported signed-in accounts for this platform has been reached." },
-                { SignInStatus.OnlyAllowedWithRequests, "Accounts can only sign-in on this platform in response to a Platform Toolkit API request." }
-            };
-
-        private readonly IReadOnlyDictionary<SignOutStatus, string> k_SignOutStatusTooltips = new Dictionary<SignOutStatus, string>
+                SignInStatus.AdditionalAccountsNotSupported,
+                "This platform only supports one signed-in account at a time."
+            },
             {
-                { SignOutStatus.CannotSignOutPrimaryInPlayMode, "The primary account cannot be signed out while in Play Mode on this platform." }
-            };
+                SignInStatus.MaximumAccountsReached,
+                "The maximum number of supported signed-in accounts for this platform has been reached."
+            },
+            {
+                SignInStatus.OnlyAllowedWithRequests,
+                "Accounts can only sign-in on this platform in response to a Platform Toolkit API request."
+            },
+        };
 
-        public PlayModeControlsAccountField() {}
+        private readonly IReadOnlyDictionary<SignOutStatus, string> k_SignOutStatusTooltips = new Dictionary<
+            SignOutStatus,
+            string
+        >
+        {
+            {
+                SignOutStatus.CannotSignOutPrimaryInPlayMode,
+                "The primary account cannot be signed out while in Play Mode on this platform."
+            },
+        };
+
+        public PlayModeControlsAccountField() { }
 
         public PlayModeControlsAccountField(PlayModeAccountData accountData, PlayModeControlsViewModel playModeView)
         {
@@ -83,7 +111,6 @@ namespace Unity.PlatformToolkit.PlayMode
             }
             else if (!isSignedIn)
             {
-
                 if (canSignInManually != SignInStatus.Allowed)
                 {
                     isSignedInToggle.SetEnabled(false);
@@ -104,13 +131,15 @@ namespace Unity.PlatformToolkit.PlayMode
             selectAccount.AddToClassList("bold");
             selectAccount.AddToClassList("wide");
             selectAccount.SetEnabled(false);
-            switch(canSignInWithRequest)
+            switch (canSignInWithRequest)
             {
                 case SignInStatus.AdditionalAccountsNotSupported:
-                    selectAccount.tooltip = "This account cannot be selected and signed in because this platform does not support additional accounts.";
+                    selectAccount.tooltip =
+                        "This account cannot be selected and signed in because this platform does not support additional accounts.";
                     break;
                 case SignInStatus.MaximumAccountsReached:
-                    selectAccount.tooltip = "This account cannot be selected and signed in because the maximum number of supported signed-in accounts for this platform has been reached.";
+                    selectAccount.tooltip =
+                        "This account cannot be selected and signed in because the maximum number of supported signed-in accounts for this platform has been reached.";
                     break;
                 default:
                     selectAccount.SetEnabled(true);

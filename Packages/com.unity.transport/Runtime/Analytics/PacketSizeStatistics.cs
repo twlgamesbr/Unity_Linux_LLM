@@ -41,7 +41,7 @@ namespace Unity.Networking.Transport.Analytics
         public float Mean => m_RunningStats.Mean;
 
         /// <summary>Standard deviation of packet sizes over all packets recorded.</summary>
-        public float StandardDeviation =>m_RunningStats.StandardDeviation;
+        public float StandardDeviation => m_RunningStats.StandardDeviation;
 
         /// <summary>Smallest packet size recorded.</summary>
         public uint Minimum => m_RunningStats.Minimum;

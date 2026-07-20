@@ -13,9 +13,7 @@ namespace Unity.Entities
     /// For more information, see the documentation on [components](xref:ecs-components).
     /// </remarks>
     [RequireImplementors]
-    public interface IComponentData : IQueryTypeParameter
-    {
-    }
+    public interface IComponentData : IQueryTypeParameter { }
 
     /// <summary>
     /// An interface for creating structs that can be stored in a <see cref="DynamicBuffer{T}"/>.
@@ -30,9 +28,7 @@ namespace Unity.Entities
     /// <code lang="csharp" source="../../DocCodeSamples.Tests/DynamicBufferExamples.cs" region="dynamicbuffer.class" title="DynamicBuffer Example"/>
     /// </example>
     [RequireImplementors]
-    public interface IBufferElementData
-    {
-    }
+    public interface IBufferElementData { }
 
     /// <summary>
     /// Specifies the maximum number of elements to store inside a chunk.
@@ -112,9 +108,7 @@ namespace Unity.Entities
     /// using this attribute, your code assumes responsibility for handling pointer serialization and deserialization.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public class ChunkSerializableAttribute : Attribute
-    {
-    }
+    public class ChunkSerializableAttribute : Attribute { }
 
     // [TODO: Document shared components with Jobs...]
     /// <summary>
@@ -124,9 +118,7 @@ namespace Unity.Entities
     /// For more information, see the documentation on [Shared components](xref:components-shared).
     /// </remarks>
     [RequireImplementors]
-    public interface ISharedComponentData : IQueryTypeParameter
-    {
-    }
+    public interface ISharedComponentData : IQueryTypeParameter { }
 
     /// <summary>
     /// An interface for a component that must be removed individually after its entity is destroyed.
@@ -138,9 +130,7 @@ namespace Unity.Entities
     /// See [Cleanup Components](xref:components-cleanup) for additional information.
     /// </remarks>
     [RequireImplementors]
-    public interface ICleanupComponentData : IComponentData
-    {
-    }
+    public interface ICleanupComponentData : IComponentData { }
 
     /// <summary>
     /// Obsolete. Use <see cref="ICleanupComponentData"/> instead.
@@ -150,10 +140,11 @@ namespace Unity.Entities
     ///
     /// An interface for a component that must be removed individually after its entity is destroyed.
     /// </remarks>
-    [Obsolete("ISystemStateComponentData has been renamed to ICleanupComponentData. This old type has been kept for transition purposes, but it will not function correctly, so you should replace it with ICleanupComponentData immediately. (UnityUpgradable) -> ICleanupComponentData", true)]
-    public interface ISystemStateComponentData : IComponentData
-    {
-    }
+    [Obsolete(
+        "ISystemStateComponentData has been renamed to ICleanupComponentData. This old type has been kept for transition purposes, but it will not function correctly, so you should replace it with ICleanupComponentData immediately. (UnityUpgradable) -> ICleanupComponentData",
+        true
+    )]
+    public interface ISystemStateComponentData : IComponentData { }
 
     /// <summary>
     /// An interface for a buffer component that must be removed individually after its entity is destroyed.
@@ -167,9 +158,7 @@ namespace Unity.Entities
     /// <seealso cref="ICleanupComponentData"/>
     /// <seealso cref="IBufferElementData"/>
     [RequireImplementors]
-    public interface ICleanupBufferElementData : IBufferElementData
-    {
-    }
+    public interface ICleanupBufferElementData : IBufferElementData { }
 
     /// <summary>
     /// Obsolete. Use <see cref="ICleanupBufferElementData"/> instead.
@@ -179,10 +168,11 @@ namespace Unity.Entities
     /// An interface for a buffer component that must be removed individually after its entity is destroyed.</remarks>
     /// <seealso cref="ICleanupComponentData"/>
     /// <seealso cref="IBufferElementData"/>
-    [Obsolete("ISystemStateBufferElementData has been renamed to ICleanupBufferElementData. This old type has been kept for transition purposes, but it will not function correctly, so you should replace it with ICleanupBufferElementData immediately. (UnityUpgradable) -> ICleanupBufferElementData", true)]
-    public interface ISystemStateBufferElementData : IBufferElementData
-    {
-    }
+    [Obsolete(
+        "ISystemStateBufferElementData has been renamed to ICleanupBufferElementData. This old type has been kept for transition purposes, but it will not function correctly, so you should replace it with ICleanupBufferElementData immediately. (UnityUpgradable) -> ICleanupBufferElementData",
+        true
+    )]
+    public interface ISystemStateBufferElementData : IBufferElementData { }
 
     /// <summary>
     /// An interface for a shared component that must be removed individually after its entity is destroyed.
@@ -196,9 +186,7 @@ namespace Unity.Entities
     /// <seealso cref="ICleanupComponentData"/>
     /// <seealso cref="ISharedComponentData"/>
     [RequireImplementors]
-    public interface ICleanupSharedComponentData : ISharedComponentData
-    {
-    }
+    public interface ICleanupSharedComponentData : ISharedComponentData { }
 
     /// <summary>
     /// Obsolete. Use <see cref="ICleanupSharedComponentData"/> instead.
@@ -208,10 +196,11 @@ namespace Unity.Entities
     /// An interface for a shared component that must be removed individually after its entity is destroyed.</remarks>
     /// <seealso cref="ICleanupComponentData"/>
     /// <seealso cref="IBufferElementData"/>
-    [Obsolete("ISystemStateSharedComponentData has been renamed to ICleanupSharedComponentData. This old type has been kept for transition purposes, but it will not function correctly, so you should replace it with ICleanupSharedComponentData immediately. (UnityUpgradable) -> ICleanupSharedComponentData", true)]
-    public interface ISystemStateSharedComponentData : IBufferElementData
-    {
-    }
+    [Obsolete(
+        "ISystemStateSharedComponentData has been renamed to ICleanupSharedComponentData. This old type has been kept for transition purposes, but it will not function correctly, so you should replace it with ICleanupSharedComponentData immediately. (UnityUpgradable) -> ICleanupSharedComponentData",
+        true
+    )]
+    public interface ISystemStateSharedComponentData : IBufferElementData { }
 
     /// <summary>
     /// An interface for a component type which allows the component to be enabled and disabled at runtime without a
@@ -231,9 +220,7 @@ namespace Unity.Entities
     /// <seealso cref="ArchetypeChunk.SetComponentEnabled{T}(ref ComponentTypeHandle{T},int,bool)"/>
     /// <seealso cref="ArchetypeChunk.IsComponentEnabled{T}(ref ComponentTypeHandle{T},int)"/>
     [RequireImplementors]
-    public interface IEnableableComponent
-    {
-    }
+    public interface IEnableableComponent { }
 
     /// <summary>
     /// Disables the entity.
@@ -243,9 +230,7 @@ namespace Unity.Entities
     /// <see cref="EntityQueryDesc"/> object used to create the query.</remarks>
     /// <seealso href="Unity.Entities.EntityManager.IsEnabled.html#Unity_Entities_EntityManager_IsEnabled_Unity_Entities_Entity_">IsEnabled(Entity)</seealso>
     /// <seealso href="Unity.Entities.EntityManager.SetEnabled.html#Unity_Entities_EntityManager_SetEnabled_Unity_Entities_Entity_System_Boolean_">SetEnabled(Entity, bool)</seealso>
-    public struct Disabled : IComponentData
-    {
-    }
+    public struct Disabled : IComponentData { }
 
     /// <summary>
     /// Marks the entity as a prefab, which implicitly disables the entity.
@@ -253,16 +238,12 @@ namespace Unity.Entities
     /// <remarks> By default, an <see cref="EntityQuery"/> ignores all entities that have a Prefab component. You
     /// can override this default behavior by setting the EntityQueryOptions.IncludePrefab flag of the
     /// <see cref="EntityQueryDesc"/> object used to create the query.</remarks>
-    public struct Prefab : IComponentData
-    {
-    }
+    public struct Prefab : IComponentData { }
 
     /// <summary>
     /// Marks the entity as an asset, which is used for the Export phase of GameObject conversion.
     /// </summary>
-    public struct Asset : IComponentData
-    {
-    }
+    public struct Asset : IComponentData { }
 
     /// <summary>
     /// The LinkedEntityGroup buffer makes the entity be the root of a set of connected entities.
@@ -287,7 +268,7 @@ namespace Unity.Entities
         /// <returns>A new buffer element.</returns>
         public static implicit operator LinkedEntityGroup(Entity e)
         {
-            return new LinkedEntityGroup {Value = e};
+            return new LinkedEntityGroup { Value = e };
         }
     }
 
@@ -306,8 +287,7 @@ namespace Unity.Entities
     /// Omitting the LinkedEntityGroup might make it difficult to associate the children entities with their prefab
     /// roots. In such cases, you can use components with entity references like <see cref="T:Unity.Transforms.Parent"/>.
     /// </remarks>
-    public struct OmitLinkedEntityGroupFromPrefabInstance : IComponentData
-    { }
+    public struct OmitLinkedEntityGroupFromPrefabInstance : IComponentData { }
 
     /// <summary>
     /// A Unity-defined shared component assigned to all entities in the same subscene.
@@ -318,7 +298,7 @@ namespace Unity.Entities
         /// <summary>
         /// The root entity of the subscene.
         /// </summary>
-        public Entity  SceneEntity;
+        public Entity SceneEntity;
 
         /// <summary>
         /// A unique hash code for comparison.
@@ -356,7 +336,5 @@ namespace Unity.Entities
     /// subset of entities matching a specific query - such as prediction systems in netcode - need to include this
     /// component in their queries to make sure entities which are not supposed to be simulated at the moment
     /// are skipped.</remarks>
-    public struct Simulate : IComponentData, IEnableableComponent
-    {
-    }
+    public struct Simulate : IComponentData, IEnableableComponent { }
 }

@@ -8,7 +8,12 @@ namespace UnityEngine.InputSystem.Utilities
         // InvokeCallbacksSafe protects both against the callback getting removed while being called
         // and against exceptions being thrown by the callback.
 
-        public static void InvokeCallbacksSafe(ref CallbackArray<Action> callbacks, ProfilerMarker marker, string callbackName, object context = null)
+        public static void InvokeCallbacksSafe(
+            ref CallbackArray<Action> callbacks,
+            ProfilerMarker marker,
+            string callbackName,
+            object context = null
+        )
         {
             if (callbacks.length == 0)
                 return;
@@ -24,7 +29,9 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     Debug.LogException(exception);
                     if (context != null)
-                        Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'");
+                        Debug.LogError(
+                            $"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'"
+                        );
                     else
                         Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks");
                 }
@@ -33,7 +40,12 @@ namespace UnityEngine.InputSystem.Utilities
             marker.End();
         }
 
-        public static void InvokeCallbacksSafe<TValue>(ref CallbackArray<Action<TValue>> callbacks, TValue argument, string callbackName, object context = null)
+        public static void InvokeCallbacksSafe<TValue>(
+            ref CallbackArray<Action<TValue>> callbacks,
+            TValue argument,
+            string callbackName,
+            object context = null
+        )
         {
             if (callbacks.length == 0)
                 return;
@@ -49,7 +61,9 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     Debug.LogException(exception);
                     if (context != null)
-                        Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'");
+                        Debug.LogError(
+                            $"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'"
+                        );
                     else
                         Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks");
                 }
@@ -58,7 +72,14 @@ namespace UnityEngine.InputSystem.Utilities
             Profiling.Profiler.EndSample();
         }
 
-        public static void InvokeCallbacksSafe<TValue1, TValue2>(ref CallbackArray<Action<TValue1, TValue2>> callbacks, TValue1 argument1, TValue2 argument2, ProfilerMarker marker, string callbackName, object context = null)
+        public static void InvokeCallbacksSafe<TValue1, TValue2>(
+            ref CallbackArray<Action<TValue1, TValue2>> callbacks,
+            TValue1 argument1,
+            TValue2 argument2,
+            ProfilerMarker marker,
+            string callbackName,
+            object context = null
+        )
         {
             if (callbacks.length == 0)
                 return;
@@ -74,7 +95,9 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     Debug.LogException(exception);
                     if (context != null)
-                        Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'");
+                        Debug.LogError(
+                            $"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'"
+                        );
                     else
                         Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks");
                 }
@@ -83,8 +106,13 @@ namespace UnityEngine.InputSystem.Utilities
             marker.End();
         }
 
-        public static bool InvokeCallbacksSafe_AnyCallbackReturnsTrue<TValue1, TValue2>(ref CallbackArray<Func<TValue1, TValue2, bool>> callbacks,
-            TValue1 argument1, TValue2 argument2, string callbackName, object context = null)
+        public static bool InvokeCallbacksSafe_AnyCallbackReturnsTrue<TValue1, TValue2>(
+            ref CallbackArray<Func<TValue1, TValue2, bool>> callbacks,
+            TValue1 argument1,
+            TValue2 argument2,
+            string callbackName,
+            object context = null
+        )
         {
             if (callbacks.length == 0)
                 return true;
@@ -105,7 +133,9 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     Debug.LogException(exception);
                     if (context != null)
-                        Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'");
+                        Debug.LogError(
+                            $"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'"
+                        );
                     else
                         Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks");
                 }
@@ -124,8 +154,11 @@ namespace UnityEngine.InputSystem.Utilities
         /// and allow the external code make the decision about whether this code should be executed.
         /// </remarks>
         public static void InvokeCallbacksSafe_AndInvokeReturnedActions<TValue>(
-            ref CallbackArray<Func<TValue, Action>> callbacks, TValue argument,
-            string callbackName, object context = null)
+            ref CallbackArray<Func<TValue, Action>> callbacks,
+            TValue argument,
+            string callbackName,
+            object context = null
+        )
         {
             if (callbacks.length == 0)
                 return;
@@ -142,7 +175,9 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     Debug.LogException(exception);
                     if (context != null)
-                        Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'");
+                        Debug.LogError(
+                            $"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'"
+                        );
                     else
                         Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks");
                 }
@@ -158,8 +193,11 @@ namespace UnityEngine.InputSystem.Utilities
         /// Returns false if every callback invocation returned null.
         /// </remarks>
         public static bool InvokeCallbacksSafe_AnyCallbackReturnsObject<TValue, TReturn>(
-            ref CallbackArray<Func<TValue, TReturn>> callbacks, TValue argument,
-            string callbackName, object context = null)
+            ref CallbackArray<Func<TValue, TReturn>> callbacks,
+            TValue argument,
+            string callbackName,
+            object context = null
+        )
         {
             if (callbacks.length == 0)
                 return false;
@@ -182,7 +220,9 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     Debug.LogException(exception);
                     if (context != null)
-                        Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'");
+                        Debug.LogError(
+                            $"{exception.GetType().Name} while executing '{callbackName}' callbacks of '{context}'"
+                        );
                     else
                         Debug.LogError($"{exception.GetType().Name} while executing '{callbackName}' callbacks");
                 }

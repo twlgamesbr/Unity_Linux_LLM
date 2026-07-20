@@ -8,7 +8,8 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
     {
         public string Name => "Network Profiler";
 
-        public string ToolTip => "The network profiler modules enables you to analyze the bandwidth usage of your game.";
+        public string ToolTip =>
+            "The network profiler modules enables you to analyze the bandwidth usage of your game.";
 
         public string ButtonText => "Open";
 
@@ -17,7 +18,7 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 #if UNITY_NETCODE_GAMEOBJECTS_1_1_ABOVE
         public bool IsAvailable => true;
         public string AvailabilityMessage => "Available";
-        
+
         public void Open()
         {
             InteractedAnalyticHelper.Send(Name);
@@ -27,6 +28,7 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 #else
         public bool IsAvailable => false;
         public string AvailabilityMessage => "Network Profiler is only available with Netcode for GameObjects 1.1+";
+
         public void Open() => throw new NotImplementedException();
 #endif
     }

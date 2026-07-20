@@ -7,7 +7,12 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
     [Serializable]
     internal class BuildSettings
     {
-        public BuildSettings(string platform, string buildTarget, bool developmentPlayer, string androidBuildSystem = "")
+        public BuildSettings(
+            string platform,
+            string buildTarget,
+            bool developmentPlayer,
+            string androidBuildSystem = ""
+        )
         {
             Platform = platform;
             BuildTarget = buildTarget;

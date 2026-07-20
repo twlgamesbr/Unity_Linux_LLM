@@ -28,7 +28,7 @@ namespace Unity.EditorCoroutines.Editor
     /// <list type="bullet">
     ///     <item>
     ///         <description>Be aware of editor performance when using `EditorCoroutine` for intensive tasks; aim to optimize long-running
-    ///   operations to avoid impacting the Unity Editor's responsiveness. Remember that coroutines execute synchronously 
+    ///   operations to avoid impacting the Unity Editor's responsiveness. Remember that coroutines execute synchronously
     ///   on the main thread in between of yielding.</description>
     ///     </item>
     ///     <item>
@@ -49,7 +49,7 @@ namespace Unity.EditorCoroutines.Editor
     /// using UnityEditor;
     /// using UnityEngine;
     /// using System.Collections;
-    ///  
+    ///
     /// using System.Collections;
     /// using Unity.EditorCoroutines.Editor;
     /// using UnityEditor;
@@ -59,13 +59,13 @@ namespace Unity.EditorCoroutines.Editor
     /// {
     ///     int m_Counter;
     ///     EditorCoroutine m_Coroutine;
-    /// 
+    ///
     ///     [MenuItem("Window/Editor Coroutine Example")]
     ///     public static void ShowWindow()
     ///     {
     ///         GetWindow<EditorCoroutineExample>("Editor Coroutine Example");
     ///     }
-    /// 
+    ///
     ///     void OnGUI()
     ///     {
     ///         if (GUILayout.Button("Start Coroutine"))
@@ -74,7 +74,7 @@ namespace Unity.EditorCoroutines.Editor
     ///             EditorCoroutineUtility.StopCoroutine(m_Coroutine);
     ///         GUILayout.Label("Counter: " + m_Counter);
     ///     }
-    /// 
+    ///
     ///     IEnumerator IncrementCounter()
     ///     {
     ///         for (int i = 0; i < 10; i++)
@@ -99,6 +99,7 @@ namespace Unity.EditorCoroutines.Editor
                 EditorCoroutine = 2,
                 AsyncOP = 3,
             }
+
             struct ProcessorData
             {
                 public DataType type;
@@ -117,21 +118,26 @@ namespace Unity.EditorCoroutines.Editor
                 var dataType = DataType.None;
                 double targetTime = -1;
 
-                if(type == typeof(EditorWaitForSeconds))
+                if (type == typeof(EditorWaitForSeconds))
                 {
                     targetTime = EditorApplication.timeSinceStartup + (yield as EditorWaitForSeconds).WaitTime;
                     dataType = DataType.WaitForSeconds;
                 }
-                else if(type == typeof(EditorCoroutine))
+                else if (type == typeof(EditorCoroutine))
                 {
                     dataType = DataType.EditorCoroutine;
                 }
-                else if(type == typeof(AsyncOperation) || type.IsSubclassOf(typeof(AsyncOperation)))
+                else if (type == typeof(AsyncOperation) || type.IsSubclassOf(typeof(AsyncOperation)))
                 {
                     dataType = DataType.AsyncOP;
                 }
 
-                data = new ProcessorData { current = yield, targetTime = targetTime, type = dataType };
+                data = new ProcessorData
+                {
+                    current = yield,
+                    targetTime = targetTime,
+                    type = dataType,
+                };
             }
 
             public bool MoveNext(IEnumerator enumerator)
@@ -153,21 +159,21 @@ namespace Unity.EditorCoroutines.Editor
                         break;
                 }
 
-                if(advance)
+                if (advance)
                 {
-                    data = default(ProcessorData); 
+                    data = default(ProcessorData);
                     return enumerator.MoveNext();
                 }
                 return true;
             }
         }
 
-        private enum Status 
+        private enum Status
         {
             Invalid,
             Stopped,
             Running,
-            Done
+            Done,
         }
 
         internal WeakReference m_Owner;
@@ -207,7 +213,7 @@ namespace Unity.EditorCoroutines.Editor
                 return;
             }
 
-            if (!ProcessIEnumeratorRecursive(m_Routine)) 
+            if (!ProcessIEnumeratorRecursive(m_Routine))
             {
                 m_Status = Status.Done;
                 EditorApplication.update -= MoveNext;
@@ -215,10 +221,11 @@ namespace Unity.EditorCoroutines.Editor
         }
 
         static Stack<IEnumerator> kIEnumeratorProcessingStack = new Stack<IEnumerator>(32);
+
         private bool ProcessIEnumeratorRecursive(IEnumerator enumerator)
         {
             var root = enumerator;
-            while(enumerator.Current as IEnumerator != null)
+            while (enumerator.Current as IEnumerator != null)
             {
                 kIEnumeratorProcessingStack.Push(enumerator);
                 enumerator = enumerator.Current as IEnumerator;

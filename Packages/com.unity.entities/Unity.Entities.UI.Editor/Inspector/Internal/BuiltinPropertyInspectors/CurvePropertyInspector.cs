@@ -5,7 +5,5 @@ using UnityEngine;
 namespace Unity.Entities.UI
 {
     [UsedImplicitly]
-    class CurvePropertyInspector : BaseFieldPropertyInspector<CurveField, AnimationCurve>
-    {
-    }
+    class CurvePropertyInspector : BaseFieldPropertyInspector<CurveField, AnimationCurve> { }
 }

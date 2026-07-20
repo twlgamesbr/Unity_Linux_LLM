@@ -24,9 +24,12 @@ namespace Unity.Netcode
         /// <param name="orderByIdentifier">When true, the array returned will be sorted by identifier.</param>
         /// <returns>Results as an <see cref="Array"/> of type T</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T[] ByType<T>(bool includeInactive = false, bool orderByIdentifier = false) where T : Object
+        public static T[] ByType<T>(bool includeInactive = false, bool orderByIdentifier = false)
+            where T : Object
         {
-            var inactive = includeInactive ? UnityEngine.FindObjectsInactive.Include : UnityEngine.FindObjectsInactive.Exclude;
+            var inactive = includeInactive
+                ? UnityEngine.FindObjectsInactive.Include
+                : UnityEngine.FindObjectsInactive.Exclude;
 #if NGO_FINDOBJECTS_NOSORTING
             var results = Object.FindObjectsByType<T>(inactive);
 #if !NGO_FINDOBJECTS_UNORDERED_IDS
@@ -36,7 +39,10 @@ namespace Unity.Netcode
             }
 #endif
 #else
-            var results = Object.FindObjectsByType<T>(inactive, orderByIdentifier ? UnityEngine.FindObjectsSortMode.InstanceID : UnityEngine.FindObjectsSortMode.None);
+            var results = Object.FindObjectsByType<T>(
+                inactive,
+                orderByIdentifier ? UnityEngine.FindObjectsSortMode.InstanceID : UnityEngine.FindObjectsSortMode.None
+            );
 #endif
             return results;
         }
@@ -48,7 +54,8 @@ namespace Unity.Netcode
         /// <param name="includeInactive">When true, inactive objects will be included.</param>
         /// <typeparam name="T">Type of <see cref="Component"/> to get from the scene</typeparam>
         /// <returns>a generator that yields successive NetworkObjects in the current scene</returns>
-        public static IEnumerable<T> FromSceneByType<T>(Scene scene, bool includeInactive) where T : UnityEngine.Component
+        public static IEnumerable<T> FromSceneByType<T>(Scene scene, bool includeInactive)
+            where T : UnityEngine.Component
         {
             return new ObjectsInSceneEnumerator<T>(scene, includeInactive);
         }
@@ -57,7 +64,8 @@ namespace Unity.Netcode
         /// An Enumerator that enumerates over each component of type <see cref="T"/> in the given scene.
         /// </summary>
         /// <typeparam name="T">Type of <see cref="Component"/> to get from the scene</typeparam>
-        private struct ObjectsInSceneEnumerator<T> : IEnumerable<T>, IEnumerator<T> where T : UnityEngine.Component
+        private struct ObjectsInSceneEnumerator<T> : IEnumerable<T>, IEnumerator<T>
+            where T : UnityEngine.Component
         {
             private readonly UnityEngine.GameObject[] m_RootObjects;
             private int m_RootIndex;

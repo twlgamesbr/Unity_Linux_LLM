@@ -11,16 +11,19 @@ namespace UnityEditor.Rendering
     public class DecalPreferences : ICoreRenderPipelinePreferencesProvider
     {
         static readonly Color k_DecalGizmoColorBase = new Color(1, 1, 1, 8f / 255);
-        static Func<Color>    GetColorPrefDecalGizmoColor;
+        static Func<Color> GetColorPrefDecalGizmoColor;
 
         /// <summary>
         /// Obtains the color of the decal gizmo
         /// </summary>
-        public static Color   decalGizmoColor => GetColorPrefDecalGizmoColor();
+        public static Color decalGizmoColor => GetColorPrefDecalGizmoColor();
 
         static DecalPreferences()
         {
-            GetColorPrefDecalGizmoColor = RuntimeSRPPreferences.RegisterPreferenceColor("Scene/Decal", k_DecalGizmoColorBase);
+            GetColorPrefDecalGizmoColor = RuntimeSRPPreferences.RegisterPreferenceColor(
+                "Scene/Decal",
+                k_DecalGizmoColorBase
+            );
         }
 
         static List<string> s_SearchKeywords = new() { "Decals" };

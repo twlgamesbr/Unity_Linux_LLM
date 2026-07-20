@@ -1,12 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unity.Entities.SourceGen.Common;
-using Unity.Entities.SourceGen.SystemGenerator.SystemAPI.Query;
 using Unity.Entities.SourceGen.SystemGenerator;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using Unity.Entities.SourceGen.SystemGenerator.SystemAPI.Query;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -16,7 +14,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGQC001_QueryingUnsupportedType()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             struct NotAComponent { }
@@ -41,7 +40,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGQC004_SameTypeSpecifiedInWithNone_AndWithAll()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct TranslationSystem : ISystem
@@ -64,7 +64,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGQC004_SameTypeSpecifiedInWithNone_AndWithAny()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct TranslationSystem : ISystem
@@ -87,7 +88,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGQC004_SameTypeSpecifiedInWithAll_AndWithAny()
     {
-        const string source =@"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct TranslationSystem : ISystem
@@ -110,7 +112,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGSG0002_MethodWithoutSystemStateParameter()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct CharacterMovementSystem : ISystem
@@ -134,7 +137,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE003_TooManyChangeFilters()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct CharacterMovementSystem : ISystem
@@ -155,7 +159,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE007_TooManySharedComponentChangeFilters()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct CharacterMovementSystem : ISystem
@@ -176,7 +181,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE008_TooManyEntityQueryOptionsArguments()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -199,7 +205,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE001_SystemAPIQueryInvoked_WithoutForEach()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -216,7 +223,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE009_ValueTypeComponentDataInForEachIteration()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -239,7 +247,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task ForEachIteration_WithDataWithCycle()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -261,7 +270,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGQC005_QueryingGenericType()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -281,7 +291,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE011_QueryingGenericTypeInRef()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -301,7 +312,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE010_QueryingTypeWithGenericTypeArgumentInRef()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -321,7 +333,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE012_QueryingEnableableType_SpecifyTypeMustBeAbsent()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -341,7 +354,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE013_QueryingGenericType()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             public interface IMyInterface : IComponentData
@@ -361,7 +375,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE014_WrongTupleOrdering_ForEachVariableStatementSyntax_WithEntityAccess()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct TestSystem : ISystem
@@ -383,7 +398,8 @@ public class ForEachErrorTests
     [TestMethod]
     public async Task SGFE014_WrongTupleOrdering_ForEachStatementSyntax_WithEntityAccess()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct TestSystem : ISystem

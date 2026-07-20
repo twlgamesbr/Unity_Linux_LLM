@@ -14,7 +14,7 @@ namespace Unity.Web.Stripping.Editor
     {
         NotSelected = 0,
         PartiallySelected = 1,
-        Selected = 2
+        Selected = 2,
     }
 
     /// <summary>
@@ -256,10 +256,12 @@ namespace Unity.Web.Stripping.Editor
             }
 
             // Sort hierarchy by name
-            hierarchy.Traverse((node) =>
-            {
-                node.Children.Sort((a, b) => String.Compare(a.Name, b.Name));
-            });
+            hierarchy.Traverse(
+                (node) =>
+                {
+                    node.Children.Sort((a, b) => String.Compare(a.Name, b.Name));
+                }
+            );
 
             return hierarchy;
         }
@@ -271,11 +273,7 @@ namespace Unity.Web.Stripping.Editor
             if (InsertedSubmodules.Contains(submodule.name))
                 return;
 
-            var hierarchyNode = new SubmoduleHierarchyNode()
-            {
-                Submodule = submodule,
-                Parent = parent
-            };
+            var hierarchyNode = new SubmoduleHierarchyNode() { Submodule = submodule, Parent = parent };
             parent.Children.Add(hierarchyNode);
             InsertedSubmodules.Add(submodule.name);
 
@@ -293,11 +291,19 @@ namespace Unity.Web.Stripping.Editor
         {
             if (node.Submodule != null)
             {
-                output.AppendLine(string.Format(TableFormat, $"{GetIndentationString(indentation)}{node.Submodule.name}", node.Submodule.description));
+                output.AppendLine(
+                    string.Format(
+                        TableFormat,
+                        $"{GetIndentationString(indentation)}{node.Submodule.name}",
+                        node.Submodule.description
+                    )
+                );
 
                 // Add nested submodule list header
                 if (node.Children.Count > 0)
-                    output.AppendLine(string.Format(TableFormat, $"{GetIndentationString(indentation)}Submodules:", ""));
+                    output.AppendLine(
+                        string.Format(TableFormat, $"{GetIndentationString(indentation)}Submodules:", "")
+                    );
             }
 
             // Print nested submodules

@@ -60,7 +60,11 @@ namespace UnityEditor.TestTools.TestRunner.Api
             }
         }
 
-        public void WriteResultToStream(ITestResultAdaptor result, StreamWriter streamWriter, XmlWriterSettings settings = null)
+        public void WriteResultToStream(
+            ITestResultAdaptor result,
+            StreamWriter streamWriter,
+            XmlWriterSettings settings = null
+        )
         {
             settings = settings ?? new XmlWriterSettings();
             settings.Indent = true;
@@ -79,9 +83,15 @@ namespace UnityEditor.TestTools.TestRunner.Api
             var testRunNode = new TNode(k_TestRunNode);
 
             testRunNode.AddAttribute(k_Id, "2");
-            testRunNode.AddAttribute(k_Testcasecount, (result.PassCount + result.FailCount + result.SkipCount + result.InconclusiveCount).ToString());
+            testRunNode.AddAttribute(
+                k_Testcasecount,
+                (result.PassCount + result.FailCount + result.SkipCount + result.InconclusiveCount).ToString()
+            );
             testRunNode.AddAttribute(k_Result, result.ResultState);
-            testRunNode.AddAttribute(k_Total, (result.PassCount + result.FailCount + result.SkipCount + result.InconclusiveCount).ToString());
+            testRunNode.AddAttribute(
+                k_Total,
+                (result.PassCount + result.FailCount + result.SkipCount + result.InconclusiveCount).ToString()
+            );
             testRunNode.AddAttribute(k_Passed, result.PassCount.ToString());
             testRunNode.AddAttribute(k_Failed, result.FailCount.ToString());
             testRunNode.AddAttribute(k_Inconclusive, result.InconclusiveCount.ToString());

@@ -1,11 +1,9 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unity.Entities.SourceGen.JobEntityGenerator;
 using Unity.Entities.SourceGen.SystemGenerator;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpIncrementalGeneratorVerifier<
-        Unity.Entities.SourceGen.JobEntityGenerator.JobEntityGenerator>;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpIncrementalGeneratorVerifier<Unity.Entities.SourceGen.JobEntityGenerator.JobEntityGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -15,7 +13,8 @@ public class JobEntityErrorTests
     [TestMethod]
     public async Task SGJE0003_InvalidValueTypesInExecuteMethod1()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial struct WithInvalidValueTypeParameters : IJobEntity
             {
@@ -23,14 +22,15 @@ public class JobEntityErrorTests
                 {
                 }
             }";
-            var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0010)).WithLocation(0);
-            await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0010)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0003_InvalidValueTypesInExecuteMethod2()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial class PlayerVehicleControlSystem : SystemBase
             {
@@ -50,14 +50,15 @@ public class JobEntityErrorTests
                     translation.Value *= DeltaTime;
                 }
             }";
-            var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0010)).WithLocation(0);
-            await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0010)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0006_NonIntegerEntityInQueryParameter()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial struct NonIntegerEntityInQueryParameter : IJobEntity
             {
@@ -73,14 +74,15 @@ public class JobEntityErrorTests
                     Dependency = new NonIntegerEntityInQueryParameter().Schedule(Dependency);
                 }
             }";
-           var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0006)).WithLocation(0);
-           await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0006)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0006()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -95,14 +97,15 @@ public class JobEntityErrorTests
                     new ErrorJob().Run();
                 }
             }";
-           var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0006)).WithLocation(0);
-           await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0006)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0007()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -117,14 +120,15 @@ public class JobEntityErrorTests
                     new ErrorJob().Run();
                 }
             }";
-           var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0007)).WithLocation(0);
-           await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0007)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0007_TooManyIntegerEntityInQueryParameters()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial struct TooManyIntegerEntityInQueryParameters : IJobEntity
             {
@@ -138,14 +142,15 @@ public class JobEntityErrorTests
                     Dependency = new TooManyIntegerEntityInQueryParameters().Schedule(Dependency);
                 }
             }";
-           var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0007)).WithLocation(0);
-           await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0007)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0008_NoExecuteMethod()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial struct {|#0:NoExecuteMethod|} : IJobEntity
             {
@@ -159,14 +164,15 @@ public class JobEntityErrorTests
                     new NoExecuteMethod().Schedule();
                 }
             }";
-            var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0008)).WithLocation(0);
-            await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0008)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0008_TooManyExecuteMethods()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial struct {|#0:TooManyExecuteMethods|} : IJobEntity
             {
@@ -183,14 +189,15 @@ public class JobEntityErrorTests
                     Dependency = instance.Schedule(Dependency);
                 }
             }";
-            var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0008)).WithLocation(0);
-            await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0008)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0008_MoreThanOneUserDefinedExecuteMethods()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial class TooManyUserDefinedExecuteMethods : SystemBase
             {
@@ -211,14 +218,15 @@ public class JobEntityErrorTests
                     public void Execute(int someVal) {}
                 }
             }";
-            var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0008)).WithLocation(0);
-            await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0008)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0010_UnsupportedParameterTypeUsed()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             public partial class PlayerVehicleControlSystem : SystemBase
             {
@@ -243,14 +251,15 @@ public class JobEntityErrorTests
             {
                 public int IllegalValue { get; private set; } = 42;
             }";
-            var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0010)).WithLocation(0);
-            await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0010)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0013()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -265,14 +274,15 @@ public class JobEntityErrorTests
                     new SharedComponentJob().Run();
                 }
             }";
-           var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0013)).WithLocation(0);
-           await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0013)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0016_RefTagComponent()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -288,14 +298,15 @@ public class JobEntityErrorTests
                 {
                 }
             }";
-            var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0016)).WithLocation(0);
-            await VerifyCS.VerifySourceGeneratorAsync(source, expected);
+        var expected = VerifyCS.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0016)).WithLocation(0);
+        await VerifyCS.VerifySourceGeneratorAsync(source, expected);
     }
 
     [TestMethod]
     public async Task SGJE0017_DuplicateComponent()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -313,7 +324,8 @@ public class JobEntityErrorTests
     [TestMethod]
     public async Task SGJE0018_RefWrapperWithKeyword()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct SomeSystem : ISystem {
@@ -335,7 +347,8 @@ public class JobEntityErrorTests
     [TestMethod]
     public async Task SGJE0020_GenericJob()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -359,7 +372,8 @@ public class JobEntityErrorTests
     [TestMethod]
     public async Task SGJE0022_ManagedDataByIn()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct SomeJob : IJobEntity
@@ -374,7 +388,8 @@ public class JobEntityErrorTests
     [TestMethod]
     public async Task SGJE0022_ManagedDataByRef()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial struct SomeJob : IJobEntity
@@ -389,7 +404,8 @@ public class JobEntityErrorTests
     [TestMethod]
     public async Task SGJE0023_LessAccessibleParameterTypes()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             struct NonPublicComponent : IComponentData
@@ -416,7 +432,8 @@ public class JobEntityErrorTests
     [TestMethod]
     public async Task SGJE0024_FailedScheduleInvocationGeneration()
     {
-        const string source = @"
+        const string source =
+            @"
             using System;
             using Unity.Entities;
             using Unity.Entities.Internal;
@@ -437,11 +454,12 @@ public class JobEntityErrorTests
                 }
             }";
 
-        var expected = Test.CSharpSourceGeneratorVerifier<SystemGenerator>
-            .CompilerError(nameof(JobEntityGeneratorErrors.SGJE0024)).WithLocation(0);
+        var expected = Test
+            .CSharpSourceGeneratorVerifier<SystemGenerator>.CompilerError(nameof(JobEntityGeneratorErrors.SGJE0024))
+            .WithLocation(0);
         var expected1 = VerifyCS.CompilerError("CS0246").WithLocation(1);
         var expected2 = VerifyCS.CompilerError("CS8377").WithSpan(18, 25, 18, 33);
-        var allExpected = new[] { expected, expected1, expected2};
+        var allExpected = new[] { expected, expected1, expected2 };
         await Test.CSharpSourceGeneratorVerifier<SystemGenerator>.VerifySourceGeneratorAsync(source, allExpected);
     }
 }

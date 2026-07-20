@@ -35,7 +35,8 @@ namespace EditorAttributes
         /// <param name="g">Green amount</param>
         /// <param name="b">Blue amount</param>
         /// <param name="handleSpace">In which coordinate space to place the handle</param>
-        public DrawHandleAttribute(float r, float g, float b, Space handleSpace = Space.World) : this(GUIColor.Default, handleSpace)
+        public DrawHandleAttribute(float r, float g, float b, Space handleSpace = Space.World)
+            : this(GUIColor.Default, handleSpace)
         {
             UseRGB = true;
             R = r;
@@ -48,6 +49,7 @@ namespace EditorAttributes
         /// </summary>
         /// <param name="hexColor">The color in hexadecimal</param>
         /// <param name="handleSpace">In which coordinate space to place the handle</param>
-        public DrawHandleAttribute(string hexColor, Space handleSpace = Space.World) : this(GUIColor.Default, handleSpace) => HexColor = hexColor;
+        public DrawHandleAttribute(string hexColor, Space handleSpace = Space.World)
+            : this(GUIColor.Default, handleSpace) => HexColor = hexColor;
     }
 }

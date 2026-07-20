@@ -23,47 +23,145 @@ namespace UnityEngine.InputSystem.Switch.LowLevel
         public FourCC format => Format;
 
         [InputControl(name = "leftStick", layout = "Stick", format = "VC2B")]
-        [InputControl(name = "leftStick/x", offset = 0, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5")]
-        [InputControl(name = "leftStick/left", offset = 0, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.15,clampMax=0.5,invert")]
-        [InputControl(name = "leftStick/right", offset = 0, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=0.85")]
-        [InputControl(name = "leftStick/y", offset = 1, format = "BYTE", parameters = "invert,normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5")]
-        [InputControl(name = "leftStick/up", offset = 1, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.15,clampMax=0.5,invert")]
-        [InputControl(name = "leftStick/down", offset = 1, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=0.85,invert=false")]
-        [FieldOffset(0)] public byte leftStickX;
-        [FieldOffset(1)] public byte leftStickY;
+        [InputControl(
+            name = "leftStick/x",
+            offset = 0,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5"
+        )]
+        [InputControl(
+            name = "leftStick/left",
+            offset = 0,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.15,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "leftStick/right",
+            offset = 0,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=0.85"
+        )]
+        [InputControl(
+            name = "leftStick/y",
+            offset = 1,
+            format = "BYTE",
+            parameters = "invert,normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5"
+        )]
+        [InputControl(
+            name = "leftStick/up",
+            offset = 1,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.15,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "leftStick/down",
+            offset = 1,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=0.85,invert=false"
+        )]
+        [FieldOffset(0)]
+        public byte leftStickX;
+
+        [FieldOffset(1)]
+        public byte leftStickY;
 
         [InputControl(name = "rightStick", layout = "Stick", format = "VC2B")]
-        [InputControl(name = "rightStick/x", offset = 0, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5")]
-        [InputControl(name = "rightStick/left", offset = 0, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "rightStick/right", offset = 0, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1")]
-        [InputControl(name = "rightStick/y", offset = 1, format = "BYTE", parameters = "invert,normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5")]
-        [InputControl(name = "rightStick/up", offset = 1, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.15,clampMax=0.5,invert")]
-        [InputControl(name = "rightStick/down", offset = 1, format = "BYTE", parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=0.85,invert=false")]
-        [FieldOffset(2)] public byte rightStickX;
-        [FieldOffset(3)] public byte rightStickY;
+        [InputControl(
+            name = "rightStick/x",
+            offset = 0,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5"
+        )]
+        [InputControl(
+            name = "rightStick/left",
+            offset = 0,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "rightStick/right",
+            offset = 0,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1"
+        )]
+        [InputControl(
+            name = "rightStick/y",
+            offset = 1,
+            format = "BYTE",
+            parameters = "invert,normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5"
+        )]
+        [InputControl(
+            name = "rightStick/up",
+            offset = 1,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.15,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "rightStick/down",
+            offset = 1,
+            format = "BYTE",
+            parameters = "normalize,normalizeMin=0.15,normalizeMax=0.85,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=0.85,invert=false"
+        )]
+        [FieldOffset(2)]
+        public byte rightStickX;
+
+        [FieldOffset(3)]
+        public byte rightStickY;
 
         [InputControl(name = "dpad", format = "BIT", bit = 0, sizeInBits = 4)]
         [InputControl(name = "dpad/up", bit = (int)Button.Up)]
         [InputControl(name = "dpad/right", bit = (int)Button.Right)]
         [InputControl(name = "dpad/down", bit = (int)Button.Down)]
         [InputControl(name = "dpad/left", bit = (int)Button.Left)]
-        [InputControl(name = "buttonWest", displayName = "Y", shortDisplayName = "Y", bit = (int)Button.Y, usage = "SecondaryAction")]
+        [InputControl(
+            name = "buttonWest",
+            displayName = "Y",
+            shortDisplayName = "Y",
+            bit = (int)Button.Y,
+            usage = "SecondaryAction"
+        )]
         [InputControl(name = "buttonNorth", displayName = "X", shortDisplayName = "X", bit = (int)Button.X)]
-        [InputControl(name = "buttonSouth", displayName = "B", shortDisplayName = "B", bit = (int)Button.B, usages = new[] { "Back", "Cancel" })]
-        [InputControl(name = "buttonEast", displayName = "A", shortDisplayName = "A", bit = (int)Button.A, usages = new[] { "PrimaryAction", "Submit" })]
+        [InputControl(
+            name = "buttonSouth",
+            displayName = "B",
+            shortDisplayName = "B",
+            bit = (int)Button.B,
+            usages = new[] { "Back", "Cancel" }
+        )]
+        [InputControl(
+            name = "buttonEast",
+            displayName = "A",
+            shortDisplayName = "A",
+            bit = (int)Button.A,
+            usages = new[] { "PrimaryAction", "Submit" }
+        )]
         [InputControl(name = "leftShoulder", displayName = "L", shortDisplayName = "L", bit = (uint)Button.L)]
         [InputControl(name = "rightShoulder", displayName = "R", shortDisplayName = "R", bit = (uint)Button.R)]
         [InputControl(name = "leftStickPress", displayName = "Left Stick", bit = (uint)Button.StickL)]
         [InputControl(name = "rightStickPress", displayName = "Right Stick", bit = (uint)Button.StickR)]
-        [InputControl(name = "leftTrigger", displayName = "ZL", shortDisplayName = "ZL", format = "BIT", bit = (uint)Button.ZL)]
-        [InputControl(name = "rightTrigger", displayName = "ZR", shortDisplayName = "ZR", format = "BIT", bit = (uint)Button.ZR)]
+        [InputControl(
+            name = "leftTrigger",
+            displayName = "ZL",
+            shortDisplayName = "ZL",
+            format = "BIT",
+            bit = (uint)Button.ZL
+        )]
+        [InputControl(
+            name = "rightTrigger",
+            displayName = "ZR",
+            shortDisplayName = "ZR",
+            format = "BIT",
+            bit = (uint)Button.ZR
+        )]
         [InputControl(name = "start", displayName = "Plus", bit = (uint)Button.Plus, usage = "Menu")]
         [InputControl(name = "select", displayName = "Minus", bit = (uint)Button.Minus)]
-        [FieldOffset(4)] public ushort buttons1;
+        [FieldOffset(4)]
+        public ushort buttons1;
 
         [InputControl(name = "capture", layout = "Button", displayName = "Capture", bit = (uint)Button.Capture - 16)]
         [InputControl(name = "home", layout = "Button", displayName = "Home", bit = (uint)Button.Home - 16)]
-        [FieldOffset(6)] public byte buttons2;
+        [FieldOffset(6)]
+        public byte buttons2;
 
         public enum Button
         {
@@ -170,7 +268,7 @@ namespace UnityEngine.InputSystem.Switch
             SwitchMagicOutputReport.CommandIdType.Handshake,
             SwitchMagicOutputReport.CommandIdType.Highspeed,
             SwitchMagicOutputReport.CommandIdType.Handshake,
-            SwitchMagicOutputReport.CommandIdType.ForceUSB
+            SwitchMagicOutputReport.CommandIdType.ForceUSB,
             ////TODO: Should we add a step to revert back to simple interface?
             //// Because currently full reports don't work in old input system.
         };
@@ -193,8 +291,10 @@ namespace UnityEngine.InputSystem.Switch
             var currentTime = InputRuntime.s_Instance.currentTime;
 
             // There were no events for last few seconds, restart handshake
-            if (currentTime >= m_LastUpdateTimeInternal + handshakeRestartTimeout &&
-                currentTime >= m_HandshakeTimer + handshakeRestartTimeout)
+            if (
+                currentTime >= m_LastUpdateTimeInternal + handshakeRestartTimeout
+                && currentTime >= m_HandshakeTimer + handshakeRestartTimeout
+            )
                 m_HandshakeStepIndex = 0;
             // If handshake is complete, ignore the tick.
             else if (m_HandshakeStepIndex + 1 >= s_HandshakeSequence.Length)
@@ -234,19 +334,21 @@ namespace UnityEngine.InputSystem.Switch
         {
             if (eventPtr.type == StateEvent.Type && eventPtr.stateFormat == SwitchProControllerHIDInputState.Format)
             {
-                var currentState = (SwitchProControllerHIDInputState*)((byte*)currentStatePtr + m_StateBlock.byteOffset);
+                var currentState = (SwitchProControllerHIDInputState*)(
+                    (byte*)currentStatePtr + m_StateBlock.byteOffset
+                );
                 var newState = (SwitchProControllerHIDInputState*)StateEvent.FromUnchecked(eventPtr)->state;
 
                 var actuated =
                     // we need to make device current if axes are outside of deadzone specifying hardware jitter of sticks around zero point
-                    newState->leftStickX<JitterMaskLow
-                                         || newState->leftStickX> JitterMaskHigh
-                    || newState->leftStickY<JitterMaskLow
-                                            || newState->leftStickY> JitterMaskHigh
-                    || newState->rightStickX<JitterMaskLow
-                                             || newState->rightStickX> JitterMaskHigh
-                    || newState->rightStickY<JitterMaskLow
-                                             || newState->rightStickY> JitterMaskHigh
+                    newState->leftStickX < JitterMaskLow
+                    || newState->leftStickX > JitterMaskHigh
+                    || newState->leftStickY < JitterMaskLow
+                    || newState->leftStickY > JitterMaskHigh
+                    || newState->rightStickX < JitterMaskLow
+                    || newState->rightStickX > JitterMaskHigh
+                    || newState->rightStickY < JitterMaskLow
+                    || newState->rightStickY > JitterMaskHigh
                     // we need to make device current if buttons state change
                     || newState->buttons1 != currentState->buttons1
                     || newState->buttons2 != currentState->buttons2;
@@ -280,18 +382,27 @@ namespace UnityEngine.InputSystem.Switch
             if (stateEvent->stateFormat == SwitchProControllerHIDInputState.Format)
                 return true; // if someone queued SPVS directly, just use as-is
 
-            if (stateEvent->stateFormat != SwitchHIDGenericInputReport.Format || size < sizeof(SwitchHIDGenericInputReport))
+            if (
+                stateEvent->stateFormat != SwitchHIDGenericInputReport.Format
+                || size < sizeof(SwitchHIDGenericInputReport)
+            )
                 return false; // skip unrecognized state events otherwise they will corrupt control states
 
             var genericReport = (SwitchHIDGenericInputReport*)stateEvent->state;
-            if (genericReport->reportId == SwitchSimpleInputReport.ExpectedReportId && size >= SwitchSimpleInputReport.kSize)
+            if (
+                genericReport->reportId == SwitchSimpleInputReport.ExpectedReportId
+                && size >= SwitchSimpleInputReport.kSize
+            )
             {
                 var data = ((SwitchSimpleInputReport*)stateEvent->state)->ToHIDInputReport();
                 *((SwitchProControllerHIDInputState*)stateEvent->state) = data;
                 stateEvent->stateFormat = SwitchProControllerHIDInputState.Format;
                 return true;
             }
-            else if (genericReport->reportId == SwitchFullInputReport.ExpectedReportId && size >= SwitchFullInputReport.kSize)
+            else if (
+                genericReport->reportId == SwitchFullInputReport.ExpectedReportId
+                && size >= SwitchFullInputReport.kSize
+            )
             {
                 var data = ((SwitchFullInputReport*)stateEvent->state)->ToHIDInputReport();
                 *((SwitchProControllerHIDInputState*)stateEvent->state) = data;
@@ -317,13 +428,26 @@ namespace UnityEngine.InputSystem.Switch
         {
             public const int kSize = 7;
 
-            [FieldOffset(0)] public byte buttons0;
-            [FieldOffset(1)] public byte buttons1;
-            [FieldOffset(2)] public byte hat;
-            [FieldOffset(3)] public byte leftX;
-            [FieldOffset(4)] public byte leftY;
-            [FieldOffset(5)] public byte rightX;
-            [FieldOffset(6)] public byte rightY;
+            [FieldOffset(0)]
+            public byte buttons0;
+
+            [FieldOffset(1)]
+            public byte buttons1;
+
+            [FieldOffset(2)]
+            public byte hat;
+
+            [FieldOffset(3)]
+            public byte leftX;
+
+            [FieldOffset(4)]
+            public byte leftY;
+
+            [FieldOffset(5)]
+            public byte rightX;
+
+            [FieldOffset(6)]
+            public byte rightY;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public SwitchProControllerHIDInputState ToHIDInputReport()
@@ -333,7 +457,7 @@ namespace UnityEngine.InputSystem.Switch
                     leftStickX = leftX,
                     leftStickY = leftY,
                     rightStickX = rightX,
-                    rightStickY = rightY
+                    rightStickY = rightY,
                 };
 
                 state.Set(SwitchProControllerHIDInputState.Button.Y, (buttons0 & 0x01) != 0);
@@ -402,14 +526,29 @@ namespace UnityEngine.InputSystem.Switch
             public const int kSize = 12;
             public const byte ExpectedReportId = 0x3f;
 
-            [FieldOffset(0)] public byte reportId;
-            [FieldOffset(1)] public byte buttons0;
-            [FieldOffset(2)] public byte buttons1;
-            [FieldOffset(3)] public byte hat;
-            [FieldOffset(4)] public ushort leftX;
-            [FieldOffset(6)] public ushort leftY;
-            [FieldOffset(8)] public ushort rightX;
-            [FieldOffset(10)] public ushort rightY;
+            [FieldOffset(0)]
+            public byte reportId;
+
+            [FieldOffset(1)]
+            public byte buttons0;
+
+            [FieldOffset(2)]
+            public byte buttons1;
+
+            [FieldOffset(3)]
+            public byte hat;
+
+            [FieldOffset(4)]
+            public ushort leftX;
+
+            [FieldOffset(6)]
+            public ushort leftY;
+
+            [FieldOffset(8)]
+            public ushort rightX;
+
+            [FieldOffset(10)]
+            public ushort rightY;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public SwitchProControllerHIDInputState ToHIDInputReport()
@@ -424,7 +563,7 @@ namespace UnityEngine.InputSystem.Switch
                     leftStickX = leftXByte,
                     leftStickY = leftYByte,
                     rightStickX = rightXByte,
-                    rightStickY = rightYByte
+                    rightStickY = rightYByte,
                 };
 
                 state.Set(SwitchProControllerHIDInputState.Button.B, (buttons0 & 0x01) != 0);
@@ -494,16 +633,35 @@ namespace UnityEngine.InputSystem.Switch
             public const int kSize = 25;
             public const byte ExpectedReportId = 0x30;
 
-            [FieldOffset(0)] public byte reportId;
-            [FieldOffset(3)] public byte buttons0;
-            [FieldOffset(4)] public byte buttons1;
-            [FieldOffset(5)] public byte buttons2;
-            [FieldOffset(6)] public byte left0;
-            [FieldOffset(7)] public byte left1;
-            [FieldOffset(8)] public byte left2;
-            [FieldOffset(9)] public byte right0;
-            [FieldOffset(10)] public byte right1;
-            [FieldOffset(11)] public byte right2;
+            [FieldOffset(0)]
+            public byte reportId;
+
+            [FieldOffset(3)]
+            public byte buttons0;
+
+            [FieldOffset(4)]
+            public byte buttons1;
+
+            [FieldOffset(5)]
+            public byte buttons2;
+
+            [FieldOffset(6)]
+            public byte left0;
+
+            [FieldOffset(7)]
+            public byte left1;
+
+            [FieldOffset(8)]
+            public byte left2;
+
+            [FieldOffset(9)]
+            public byte right0;
+
+            [FieldOffset(10)]
+            public byte right1;
+
+            [FieldOffset(11)]
+            public byte right2;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public SwitchProControllerHIDInputState ToHIDInputReport()
@@ -516,16 +674,20 @@ namespace UnityEngine.InputSystem.Switch
                 var rightYRaw = (uint)(((right1 & 0xF0) >> 4) | (right2 << 4));
 
                 var leftXByte = (byte)NumberHelpers.RemapUIntBitsToNormalizeFloatToUIntBits(leftXRaw, 12, 8);
-                var leftYByte = (byte)(0xff - (byte)NumberHelpers.RemapUIntBitsToNormalizeFloatToUIntBits(leftYRaw, 12, 8));
+                var leftYByte = (byte)(
+                    0xff - (byte)NumberHelpers.RemapUIntBitsToNormalizeFloatToUIntBits(leftYRaw, 12, 8)
+                );
                 var rightXByte = (byte)NumberHelpers.RemapUIntBitsToNormalizeFloatToUIntBits(rightXRaw, 12, 8);
-                var rightYByte = (byte)(0xff - (byte)NumberHelpers.RemapUIntBitsToNormalizeFloatToUIntBits(rightYRaw, 12, 8));
+                var rightYByte = (byte)(
+                    0xff - (byte)NumberHelpers.RemapUIntBitsToNormalizeFloatToUIntBits(rightYRaw, 12, 8)
+                );
 
                 var state = new SwitchProControllerHIDInputState
                 {
                     leftStickX = leftXByte,
                     leftStickY = leftYByte,
                     rightStickX = rightXByte,
-                    rightStickY = rightYByte
+                    rightStickY = rightYByte,
                 };
 
                 state.Set(SwitchProControllerHIDInputState.Button.Y, (buttons0 & 0x01) != 0);
@@ -556,7 +718,8 @@ namespace UnityEngine.InputSystem.Switch
         {
             public static FourCC Format => new FourCC('H', 'I', 'D');
 
-            [FieldOffset(0)] public byte reportId;
+            [FieldOffset(0)]
+            public byte reportId;
         }
 
         [StructLayout(LayoutKind.Explicit, Size = kSize)]
@@ -566,12 +729,15 @@ namespace UnityEngine.InputSystem.Switch
 
             public const byte ExpectedReplyInputReportId = 0x81;
 
-            [FieldOffset(0)] public byte reportType;
-            [FieldOffset(1)] public byte commandId;
+            [FieldOffset(0)]
+            public byte reportType;
+
+            [FieldOffset(1)]
+            public byte commandId;
 
             internal enum ReportType
             {
-                Magic = 0x80
+                Magic = 0x80,
             }
 
             public enum CommandIdType
@@ -579,7 +745,7 @@ namespace UnityEngine.InputSystem.Switch
                 Status = 0x01,
                 Handshake = 0x02,
                 Highspeed = 0x03,
-                ForceUSB  = 0x04,
+                ForceUSB = 0x04,
             }
         }
 
@@ -591,8 +757,11 @@ namespace UnityEngine.InputSystem.Switch
 
             public const int kSize = InputDeviceCommand.kBaseCommandSize + 49;
 
-            [FieldOffset(0)] public InputDeviceCommand baseCommand;
-            [FieldOffset(InputDeviceCommand.kBaseCommandSize + 0)] public SwitchMagicOutputReport report;
+            [FieldOffset(0)]
+            public InputDeviceCommand baseCommand;
+
+            [FieldOffset(InputDeviceCommand.kBaseCommandSize + 0)]
+            public SwitchMagicOutputReport report;
 
             public static SwitchMagicOutputHIDBluetooth Create(SwitchMagicOutputReport.CommandIdType type)
             {
@@ -602,8 +771,8 @@ namespace UnityEngine.InputSystem.Switch
                     report = new SwitchMagicOutputReport
                     {
                         reportType = (byte)SwitchMagicOutputReport.ReportType.Magic,
-                        commandId = (byte)type
-                    }
+                        commandId = (byte)type,
+                    },
                 };
             }
         }
@@ -616,8 +785,11 @@ namespace UnityEngine.InputSystem.Switch
 
             public const int kSize = InputDeviceCommand.kBaseCommandSize + 64;
 
-            [FieldOffset(0)] public InputDeviceCommand baseCommand;
-            [FieldOffset(InputDeviceCommand.kBaseCommandSize + 0)] public SwitchMagicOutputReport report;
+            [FieldOffset(0)]
+            public InputDeviceCommand baseCommand;
+
+            [FieldOffset(InputDeviceCommand.kBaseCommandSize + 0)]
+            public SwitchMagicOutputReport report;
 
             public static SwitchMagicOutputHIDUSB Create(SwitchMagicOutputReport.CommandIdType type)
             {
@@ -627,8 +799,8 @@ namespace UnityEngine.InputSystem.Switch
                     report = new SwitchMagicOutputReport
                     {
                         reportType = (byte)SwitchMagicOutputReport.ReportType.Magic,
-                        commandId = (byte)type
-                    }
+                        commandId = (byte)type,
+                    },
                 };
             }
         }

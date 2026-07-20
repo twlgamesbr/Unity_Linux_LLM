@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using Unity.Burst;
-using System.Runtime.CompilerServices;
 
 namespace Unity.Collections
 {
@@ -16,14 +16,14 @@ namespace Unity.Collections
     /// <typeparam name="T">The type of the values.</typeparam>
     [StructLayout(LayoutKind.Sequential)]
     [DebuggerTypeProxy(typeof(NativeParallelHashSetDebuggerTypeProxy<>))]
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-    public unsafe struct NativeParallelHashSet<T>
-        : INativeDisposable
-        , IEnumerable<T> // Used by collection initializers.
+    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+    public unsafe struct NativeParallelHashSet<T> : INativeDisposable, IEnumerable<T> // Used by collection initializers.
         where T : unmanaged, IEquatable<T>
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<NativeParallelHashSet<T>>();
+        internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<
+            NativeParallelHashSet<T>
+        >();
 #endif
 
         internal NativeParallelHashMap<T, bool> m_Data;
@@ -37,7 +37,10 @@ namespace Unity.Collections
         {
             m_Data = new NativeParallelHashMap<T, bool>(capacity, allocator);
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            CollectionHelper.SetStaticSafetyId<NativeParallelHashSet<T>>(ref m_Data.m_Safety, ref s_staticSafetyId.Data);
+            CollectionHelper.SetStaticSafetyId<NativeParallelHashSet<T>>(
+                ref m_Data.m_Safety,
+                ref s_staticSafetyId.Data
+            );
 #endif
         }
 
@@ -141,7 +144,8 @@ namespace Unity.Collections
         /// </summary>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>An array with a copy of the set's values.</returns>
-        public NativeArray<T> ToNativeArray(AllocatorManager.AllocatorHandle allocator) => m_Data.GetKeyArray(allocator);
+        public NativeArray<T> ToNativeArray(AllocatorManager.AllocatorHandle allocator) =>
+            m_Data.GetKeyArray(allocator);
 
         /// <summary>
         /// Returns a parallel writer.
@@ -152,7 +156,10 @@ namespace Unity.Collections
             ParallelWriter writer;
             writer.m_Data = m_Data.AsParallelWriter();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            CollectionHelper.SetStaticSafetyId<ParallelWriter>(ref writer.m_Data.m_Safety, ref ParallelWriter.s_staticSafetyId.Data);
+            CollectionHelper.SetStaticSafetyId<ParallelWriter>(
+                ref writer.m_Data.m_Safety,
+                ref ParallelWriter.s_staticSafetyId.Data
+            );
 #endif
             return writer;
         }
@@ -164,11 +171,12 @@ namespace Unity.Collections
         /// Use <see cref="AsParallelWriter"/> to create a parallel writer for a set.
         /// </remarks>
         [NativeContainerIsAtomicWriteOnly]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public struct ParallelWriter
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<ParallelWriter>();
+            internal static readonly SharedStatic<int> s_staticSafetyId =
+                SharedStatic<int>.GetOrCreate<ParallelWriter>();
 #endif
             internal NativeParallelHashMap<T, bool>.ParallelWriter m_Data;
 
@@ -352,8 +360,7 @@ namespace Unity.Collections
         [NativeContainer]
         [NativeContainerIsReadOnly]
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public struct ReadOnly
-            : IEnumerable<T>
+        public struct ReadOnly : IEnumerable<T>
         {
             internal UnsafeParallelHashMap<T, bool> m_Data;
 
@@ -496,7 +503,7 @@ namespace Unity.Collections
         }
     }
 
-    sealed internal class NativeParallelHashSetDebuggerTypeProxy<T>
+    internal sealed class NativeParallelHashSetDebuggerTypeProxy<T>
         where T : unmanaged, IEquatable<T>
     {
         NativeParallelHashSet<T> Data;

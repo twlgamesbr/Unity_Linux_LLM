@@ -6,16 +6,15 @@ namespace Unity.Physics.Authoring
 {
     internal static class ColliderExtensions
     {
-        public static GameObject FindFirstEnabledAncestor<T>(GameObject shape, List<T> buffer) where T : Component
+        public static GameObject FindFirstEnabledAncestor<T>(GameObject shape, List<T> buffer)
+            where T : Component
         {
             // include inactive in case the supplied shape GameObject is a prefab that has not been instantiated
             shape.GetComponentsInParent(true, buffer);
             GameObject result = null;
             for (int i = 0, count = buffer.Count; i < count; ++i)
             {
-                if (
-                    (buffer[i] as UnityEngine.Collider)?.enabled ??
-                    (buffer[i] as MonoBehaviour)?.enabled ?? true)
+                if ((buffer[i] as UnityEngine.Collider)?.enabled ?? (buffer[i] as MonoBehaviour)?.enabled ?? true)
                 {
                     result = buffer[i].gameObject;
                     break;
@@ -72,7 +71,8 @@ namespace Unity.Physics.Authoring
             if (
                 host.gameObject.scene.isSubScene
                 // isSubScene is false in AssetImportWorker during sub-scene import
-                || UnityEditor.AssetDatabase.IsAssetImportWorkerProcess())
+                || UnityEditor.AssetDatabase.IsAssetImportWorkerProcess()
+            )
                 return true;
 #endif
             return mesh.isReadable;

@@ -23,15 +23,14 @@ namespace Unity.Netcode
                 }
                 return s_Instance;
             }
-            private set
-            {
-                s_Instance = value;
-            }
+            private set { s_Instance = value; }
         }
         private static CommandLineOptions s_Instance;
 
         // Contains the current application instance domain's command line arguments
-        private static readonly List<string> k_CommandLineArguments = new List<string>(Environment.GetCommandLineArgs());
+        private static readonly List<string> k_CommandLineArguments = new List<string>(
+            Environment.GetCommandLineArgs()
+        );
 
         /// <summary>
         /// Returns the value of an argument or null if the argument is not present

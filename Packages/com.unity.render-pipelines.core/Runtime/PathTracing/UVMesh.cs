@@ -23,7 +23,7 @@ namespace UnityEngine.PathTracing.Integration
         public bool Build(Mesh mesh)
         {
 #if UNITY_EDITOR
-                var inputDataArray = UnityEditor.MeshUtility.AcquireReadOnlyMeshData(mesh);
+            var inputDataArray = UnityEditor.MeshUtility.AcquireReadOnlyMeshData(mesh);
 #else
             var inputDataArray = Mesh.AcquireReadOnlyMeshData(mesh);
 #endif
@@ -40,11 +40,7 @@ namespace UnityEngine.PathTracing.Integration
             inputDataArray.Dispose();
             if (!ok)
                 return false;
-            Mesh = new Mesh
-            {
-                hideFlags = HideFlags.DontSaveInEditor,
-                name = mesh.name
-            };
+            Mesh = new Mesh { hideFlags = HideFlags.DontSaveInEditor, name = mesh.name };
             Mesh.ApplyAndDisposeWritableMeshData(outputDataArray, Mesh);
             Mesh.RecalculateBounds();
             Mesh.UploadMeshData(false); // should be passing true, but this doesn't work in playmode
@@ -52,12 +48,22 @@ namespace UnityEngine.PathTracing.Integration
         }
 
         // Make a new mesh which position values are taken from the UVs of the input mesh
-        private static bool Build(Mesh.MeshData outputMesh, Mesh.MeshData inputMesh, NativeArray<Vector2> tmpVtxArray0, out float uvAspectRatio)
+        private static bool Build(
+            Mesh.MeshData outputMesh,
+            Mesh.MeshData inputMesh,
+            NativeArray<Vector2> tmpVtxArray0,
+            out float uvAspectRatio
+        )
         {
             uvAspectRatio = 0f;
 
             // check that the input mesh has uv2 or uv
-            if (!(inputMesh.HasVertexAttribute(VertexAttribute.TexCoord0) || inputMesh.HasVertexAttribute(VertexAttribute.TexCoord1)))
+            if (
+                !(
+                    inputMesh.HasVertexAttribute(VertexAttribute.TexCoord0)
+                    || inputMesh.HasVertexAttribute(VertexAttribute.TexCoord1)
+                )
+            )
                 return false;
 
             // work out normalized uv bounds
@@ -65,7 +71,11 @@ namespace UnityEngine.PathTracing.Integration
             var inputUVData = tmpVtxArray0;
             inputMesh.GetUVs(inputMesh.HasVertexAttribute(VertexAttribute.TexCoord1) ? 1 : 0, inputUVData);
 
-            LightmapIntegrationHelpers.ComputeUVBounds(inputUVData, out Vector2 uvBoundSize, out Vector2 uvBoundsOffset);
+            LightmapIntegrationHelpers.ComputeUVBounds(
+                inputUVData,
+                out Vector2 uvBoundSize,
+                out Vector2 uvBoundsOffset
+            );
             if (!(uvBoundSize.x > 0.0f && uvBoundSize.y > 0.0f))
                 return false;
 
@@ -84,7 +94,11 @@ namespace UnityEngine.PathTracing.Integration
             {
                 OutputVertex outputVertex = new OutputVertex
                 {
-                    Position = new Vector3((inputUVData[i].x + normalizationOffset.x) * normalizationScale.x, (inputUVData[i].y + normalizationOffset.y) * normalizationScale.y , 0.0f),
+                    Position = new Vector3(
+                        (inputUVData[i].x + normalizationOffset.x) * normalizationScale.x,
+                        (inputUVData[i].y + normalizationOffset.y) * normalizationScale.y,
+                        0.0f
+                    ),
                 };
                 outputVertexData[i] = outputVertex;
             }

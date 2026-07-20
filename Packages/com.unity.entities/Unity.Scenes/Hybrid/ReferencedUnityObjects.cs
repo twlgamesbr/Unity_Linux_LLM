@@ -13,6 +13,7 @@ namespace Unity.Scenes
         /// The array of UnityEngine.Object references extracted from a <see cref="Unity.Entities.World"/> during serialization.
         /// </summary>
         public UnityEngine.Object[] Array;
+
         /// <summary>
         /// Represents the index of the entity referencing the object.
         /// </summary>

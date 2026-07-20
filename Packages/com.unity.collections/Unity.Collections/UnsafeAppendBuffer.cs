@@ -13,8 +13,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     /// The values written to an individual append buffer can be of different types.
     /// </remarks>
     [GenerateTestsForBurstCompatibility]
-    public unsafe struct UnsafeAppendBuffer
-        : INativeDisposable
+    public unsafe struct UnsafeAppendBuffer : INativeDisposable
     {
         /// <summary>
         /// The internal buffer where the content is stored.
@@ -200,8 +199,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <typeparam name="T">The type of the element.</typeparam>
         /// <param name="value">The value to be appended.</param>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public void Add<T>(T value) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public void Add<T>(T value)
+            where T : unmanaged
         {
             var structSize = sizeof(T);
             SetCapacity(Length + structSize);
@@ -211,7 +211,7 @@ namespace Unity.Collections.LowLevel.Unsafe
                 UnsafeUtility.CopyStructureToPtr(ref value, addr);
             else
                 UnsafeUtility.MemCpy(addr, &value, structSize);
-            
+
             Length += structSize;
         }
 
@@ -235,8 +235,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <remarks>The values themselves are stored, not their pointers.</remarks>
         /// <param name="ptr">A pointer to the buffer whose values will be appended.</param>
         /// <param name="length">The number of elements to append.</param>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public void AddArray<T>(void* ptr, int length) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public void AddArray<T>(void* ptr, int length)
+            where T : unmanaged
         {
             Add(length);
 
@@ -249,8 +250,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <param name="value">The array whose elements will all be appended.</param>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public void Add<T>(NativeArray<T> value) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public void Add<T>(NativeArray<T> value)
+            where T : unmanaged
         {
             Add(value.Length);
             Add(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(value), sizeof(T) * value.Length);
@@ -262,8 +264,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <typeparam name="T">The type of the element to remove.</typeparam>
         /// <remarks>It is your responsibility to specify the correct type. Do not pop when the append buffer is empty.</remarks>
         /// <returns>The element removed from the end of this append buffer.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public T Pop<T>() where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public T Pop<T>()
+            where T : unmanaged
         {
             int structSize = sizeof(T);
             long ptr = (long)Ptr;
@@ -365,8 +368,9 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <remarks>Advances the reader's offset by the size of T.</remarks>
             /// <typeparam name="T">The type of element to read.</typeparam>
             /// <param name="value">Output for the element read.</param>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public void ReadNext<T>(out T value) where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public void ReadNext<T>(out T value)
+                where T : unmanaged
             {
                 var structSize = sizeof(T);
                 CheckBounds(structSize);
@@ -387,8 +391,9 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <remarks>Advances the reader's offset by the size of T.</remarks>
             /// <typeparam name="T">The type of element to read.</typeparam>
             /// <returns>The element read.</returns>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public T ReadNext<T>() where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public T ReadNext<T>()
+                where T : unmanaged
             {
                 var structSize = sizeof(T);
                 CheckBounds(structSize);
@@ -399,7 +404,7 @@ namespace Unity.Collections.LowLevel.Unsafe
                     value = UnsafeUtility.ReadArrayElement<T>(addr, 0);
                 else
                     UnsafeUtility.MemCpy(&value, addr, structSize);
-                
+
                 Offset += structSize;
                 return value;
             }
@@ -426,11 +431,16 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <typeparam name="T">The type of element to read.</typeparam>
             /// <param name="value">Outputs a new array with length of 1. The read element is copied to the single index of this array.</param>
             /// <param name="allocator">The allocator to use.</param>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public void ReadNext<T>(out NativeArray<T> value, AllocatorManager.AllocatorHandle allocator) where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public void ReadNext<T>(out NativeArray<T> value, AllocatorManager.AllocatorHandle allocator)
+                where T : unmanaged
             {
                 var length = ReadNext<int>();
-                value = CollectionHelper.CreateNativeArray<T>(length, allocator, NativeArrayOptions.UninitializedMemory);
+                value = CollectionHelper.CreateNativeArray<T>(
+                    length,
+                    allocator,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 var size = length * sizeof(T);
                 if (size > 0)
                 {
@@ -449,8 +459,9 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <typeparam name="T">The type of elements in the array to read.</typeparam>
             /// <param name="length">Output which is the number of elements in the read array.</param>
             /// <returns>A pointer to where the first element of the read array resides in the append buffer.</returns>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-            public void* ReadNextArray<T>(out int length) where T : unmanaged
+            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+            public void* ReadNextArray<T>(out int length)
+                where T : unmanaged
             {
                 length = ReadNext<int>();
                 return (length == 0) ? null : ReadNext(length * sizeof(T));
@@ -461,7 +472,9 @@ namespace Unity.Collections.LowLevel.Unsafe
             {
                 if (Offset + structSize > Size)
                 {
-                    throw new ArgumentException($"Requested value outside bounds of UnsafeAppendOnlyBuffer. Remaining bytes: {Size - Offset} Requested: {structSize}");
+                    throw new ArgumentException(
+                        $"Requested value outside bounds of UnsafeAppendOnlyBuffer. Remaining bytes: {Size - Offset} Requested: {structSize}"
+                    );
                 }
             }
         }
@@ -475,7 +488,9 @@ namespace Unity.Collections.LowLevel.Unsafe
 
             if (!validAlignment)
             {
-                throw new ArgumentException($"Specified alignment must be non-zero positive power of two. Requested: {alignment}");
+                throw new ArgumentException(
+                    $"Specified alignment must be non-zero positive power of two. Requested: {alignment}"
+                );
             }
         }
     }

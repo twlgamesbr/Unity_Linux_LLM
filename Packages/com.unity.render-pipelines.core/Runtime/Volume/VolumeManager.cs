@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using Unity.Profiling;
 using UnityEngine.Assertions;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -40,11 +39,15 @@ namespace UnityEngine.Rendering
     /// <seealso cref="GraphicsSettings"/>
     public sealed partial class VolumeManager
     {
-        static readonly ProfilerMarker k_ProfilerMarkerInitialize = new ("VolumeManager.Initialize");
-        static readonly ProfilerMarker k_ProfilerMarkerInitializeBaseTypesArray = new ("VolumeManager.InitializeBaseTypesArray");
-        static readonly ProfilerMarker k_ProfilerMarkerUpdate = new ("VolumeManager.Update");
-        static readonly ProfilerMarker k_ProfilerMarkerReplaceData = new ("VolumeManager.ReplaceData");
-        static readonly ProfilerMarker k_ProfilerMarkerEvaluateVolumeDefaultState = new ("VolumeManager.EvaluateVolumeDefaultState");
+        static readonly ProfilerMarker k_ProfilerMarkerInitialize = new("VolumeManager.Initialize");
+        static readonly ProfilerMarker k_ProfilerMarkerInitializeBaseTypesArray = new(
+            "VolumeManager.InitializeBaseTypesArray"
+        );
+        static readonly ProfilerMarker k_ProfilerMarkerUpdate = new("VolumeManager.Update");
+        static readonly ProfilerMarker k_ProfilerMarkerReplaceData = new("VolumeManager.ReplaceData");
+        static readonly ProfilerMarker k_ProfilerMarkerEvaluateVolumeDefaultState = new(
+            "VolumeManager.EvaluateVolumeDefaultState"
+        );
 
         static readonly Lazy<VolumeManager> s_Instance = new Lazy<VolumeManager>(() => new VolumeManager());
 
@@ -75,7 +78,12 @@ namespace UnityEngine.Rendering
             if (!currentPipelineAssetType.IsSubclassOf(typeof(RenderPipelineAsset)))
                 throw new ArgumentException(nameof(currentPipelineAssetType));
 
-            if (s_SupportedVolumeComponentsForRenderPipeline.TryGetValue(currentPipelineAssetType, out var supportedVolumeComponents))
+            if (
+                s_SupportedVolumeComponentsForRenderPipeline.TryGetValue(
+                    currentPipelineAssetType,
+                    out var supportedVolumeComponents
+                )
+            )
                 return supportedVolumeComponents;
 
             if (baseComponentTypeArray == null)
@@ -162,7 +170,9 @@ namespace UnityEngine.Rendering
                 if (isInitialized)
                     return m_BaseComponentTypeArray;
 
-                throw new InvalidOperationException($"{nameof(VolumeManager)}.{nameof(instance)}.{nameof(baseComponentTypeArray)} cannot be called before the {nameof(VolumeManager)} is initialized. (See {nameof(VolumeManager)}.{nameof(instance)}.{nameof(isInitialized)} and {nameof(RenderPipelineManager)} for creation callback).");
+                throw new InvalidOperationException(
+                    $"{nameof(VolumeManager)}.{nameof(instance)}.{nameof(baseComponentTypeArray)} cannot be called before the {nameof(VolumeManager)} is initialized. (See {nameof(VolumeManager)}.{nameof(instance)}.{nameof(isInitialized)} and {nameof(RenderPipelineManager)} for creation callback)."
+                );
             }
             internal set => m_BaseComponentTypeArray = value; // internal only for tests
         }
@@ -236,10 +246,8 @@ namespace UnityEngine.Rendering
         // List of stacks created through VolumeManager.
         readonly List<VolumeStack> m_CreatedVolumeStacks = new();
 
- 		// Internal for tests
-        internal VolumeManager()
-        {
-        }
+        // Internal for tests
+        internal VolumeManager() { }
 
         // Note: The "isInitialized" state and explicit Initialize/Deinitialize are only required because VolumeManger
         // is a singleton whose lifetime exceeds that of RenderPipelines. Thus it must be initialized & deinitialized
@@ -257,7 +265,10 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <param name="globalDefaultVolumeProfile">Global default volume profile.</param>
         /// <param name="qualityDefaultVolumeProfile">Quality default volume profile.</param>
-        public void Initialize(VolumeProfile globalDefaultVolumeProfile = null, VolumeProfile qualityDefaultVolumeProfile = null)
+        public void Initialize(
+            VolumeProfile globalDefaultVolumeProfile = null,
+            VolumeProfile qualityDefaultVolumeProfile = null
+        )
         {
             using var profilerScope = k_ProfilerMarkerInitialize.Auto();
             Debug.Assert(!isInitialized);
@@ -274,7 +285,8 @@ namespace UnityEngine.Rendering
 #if !UNITY_EDITOR
             if (globalDefaultVolumeProfile == null)
             {
-                var defaultVolumeProfileSettings = GraphicsSettings.GetRenderPipelineSettings<IDefaultVolumeProfileAsset>();
+                var defaultVolumeProfileSettings =
+                    GraphicsSettings.GetRenderPipelineSettings<IDefaultVolumeProfileAsset>();
                 globalDefaultVolumeProfile = defaultVolumeProfileSettings?.defaultVolumeProfile;
             }
 #endif
@@ -282,7 +294,10 @@ namespace UnityEngine.Rendering
         }
 
         //This is called by test where the basetypes are tuned for the purpose of the test.
-        internal void InitializeInternal(VolumeProfile globalDefaultVolumeProfile = null, VolumeProfile qualityDefaultVolumeProfile = null)
+        internal void InitializeInternal(
+            VolumeProfile globalDefaultVolumeProfile = null,
+            VolumeProfile qualityDefaultVolumeProfile = null
+        )
         {
             InitializeVolumeComponents();
 
@@ -360,9 +375,11 @@ namespace UnityEngine.Rendering
             if (!isInitialized)
                 return;
 
-            if (globalDefaultProfile == profile ||
-                qualityDefaultProfile == profile ||
-                (customDefaultProfiles != null && customDefaultProfiles.Contains(profile)))
+            if (
+                globalDefaultProfile == profile
+                || qualityDefaultProfile == profile
+                || (customDefaultProfiles != null && customDefaultProfiles.Contains(profile))
+            )
                 EvaluateVolumeDefaultState();
         }
 
@@ -396,7 +413,9 @@ namespace UnityEngine.Rendering
         public VolumeStack CreateStack()
         {
             if (!isInitialized)
-                throw new InvalidOperationException($"{nameof(VolumeManager)}.{nameof(instance)}.{nameof(CreateStack)}() cannot be called before the {nameof(VolumeManager)} is initialized. (See {nameof(VolumeManager)}.{nameof(instance)}.{nameof(isInitialized)} and {nameof(RenderPipelineManager)} for creation callback).");
+                throw new InvalidOperationException(
+                    $"{nameof(VolumeManager)}.{nameof(instance)}.{nameof(CreateStack)}() cannot be called before the {nameof(VolumeManager)} is initialized. (See {nameof(VolumeManager)}.{nameof(instance)}.{nameof(isInitialized)} and {nameof(RenderPipelineManager)} for creation callback)."
+                );
 
             return CreateStackInternal();
         }
@@ -490,6 +509,7 @@ namespace UnityEngine.Rendering
             return m_BaseComponentTypeArray;
         }
 #endif
+
         /// <summary>
         /// Helper to choose a type loading depending if we are in Editor and Standalone.
         /// </summary>
@@ -541,7 +561,7 @@ namespace UnityEngine.Rendering
             using var _ = ListPool<VolumeComponent>.Get(out var componentsDefaultStateList);
             foreach (var type in m_BaseComponentTypeArray)
             {
-                componentsDefaultStateList.Add((VolumeComponent) ScriptableObject.CreateInstance(type));
+                componentsDefaultStateList.Add((VolumeComponent)ScriptableObject.CreateInstance(type));
             }
 
             void ApplyDefaultProfile(VolumeProfile profile)
@@ -552,8 +572,9 @@ namespace UnityEngine.Rendering
                 for (int i = 0; i < profile.components.Count; i++)
                 {
                     var profileComponent = profile.components[i];
-                    var defaultStateComponent = componentsDefaultStateList.FirstOrDefault(
-                        x => x.GetType() == profileComponent.GetType());
+                    var defaultStateComponent = componentsDefaultStateList.FirstOrDefault(x =>
+                        x.GetType() == profileComponent.GetType()
+                    );
 
                     if (defaultStateComponent != null && profileComponent.active)
                     {
@@ -567,9 +588,9 @@ namespace UnityEngine.Rendering
                 }
             }
 
-            ApplyDefaultProfile(globalDefaultProfile);          // Apply global default profile first
-            ApplyDefaultProfile(qualityDefaultProfile);         // Apply quality default profile second
-            if (customDefaultProfiles != null)                  // Finally, apply custom default profiles in order
+            ApplyDefaultProfile(globalDefaultProfile); // Apply global default profile first
+            ApplyDefaultProfile(qualityDefaultProfile); // Apply quality default profile second
+            if (customDefaultProfiles != null) // Finally, apply custom default profiles in order
                 foreach (var profile in customDefaultProfiles)
                     ApplyDefaultProfile(profile);
 
@@ -667,7 +688,6 @@ namespace UnityEngine.Rendering
             if (renderingDebuggerAttached)
                 overrideVolumeStackData?.Invoke(stack, volume, interpFactor);
 #endif
-
         }
 
         // Faster version of OverrideData to force replace values in the global state.
@@ -702,7 +722,10 @@ namespace UnityEngine.Rendering
         [Conditional("UNITY_EDITOR")]
         public void CheckDefaultVolumeState()
         {
-            if (m_ComponentsDefaultState == null || (m_ComponentsDefaultState.Length > 0 && m_ComponentsDefaultState[0] == null))
+            if (
+                m_ComponentsDefaultState == null
+                || (m_ComponentsDefaultState.Length > 0 && m_ComponentsDefaultState[0] == null)
+            )
             {
                 EvaluateVolumeDefaultState();
             }
@@ -917,7 +940,11 @@ namespace UnityEngine.Rendering
             if (!volume.cachedGameObject.scene.IsValid())
                 return true;
             // IsGameObjectRenderedByCamera does not behave correctly when camera is null so we have to catch it here.
-            return camera == null || UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera(volume.cachedGameObject, camera);
+            return camera == null
+                || UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera(
+                    volume.cachedGameObject,
+                    camera
+                );
 #else
             return true;
 #endif

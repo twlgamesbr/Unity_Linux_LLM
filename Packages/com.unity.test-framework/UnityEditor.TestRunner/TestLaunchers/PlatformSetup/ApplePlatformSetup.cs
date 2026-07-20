@@ -16,9 +16,7 @@ namespace UnityEditor.TestTools.TestRunner
         private List<int> m_XcodesToCloseAfterTests;
         private List<int> m_SimulatorsOpenBeforeTests;
 
-        public ApplePlatformSetup(BuildTarget buildTarget)
-        {
-        }
+        public ApplePlatformSetup(BuildTarget buildTarget) { }
 
         public void Setup()
         {
@@ -26,9 +24,10 @@ namespace UnityEditor.TestTools.TestRunner
             m_Stripping = PlayerSettings.stripEngineCode;
             PlayerSettings.stripEngineCode = false;
 
-            m_RunOnSimulator = EditorUserBuildSettings.activeBuildTarget == BuildTarget.iOS
-                ? PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK
-                : PlayerSettings.tvOS.sdkVersion == tvOSSdkVersion.Simulator;
+            m_RunOnSimulator =
+                EditorUserBuildSettings.activeBuildTarget == BuildTarget.iOS
+                    ? PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK
+                    : PlayerSettings.tvOS.sdkVersion == tvOSSdkVersion.Simulator;
 
             // Gather IDs of Xcodes that were already open before building and running the tests
             if (Application.isEditor && Application.isBatchMode)
@@ -71,16 +70,18 @@ namespace UnityEditor.TestTools.TestRunner
             }
         }
 
-        public void PostSuccessfulLaunchAction()
-        {
-        }
+        public void PostSuccessfulLaunchAction() { }
 
         public void CleanUp()
         {
             // Close Xcode that was opened while building the tests (batchmode only)
             // should be only one such Xcode, otherwise skip to avoid closing unrelated Xcodes
-            if (Application.isEditor && Application.isBatchMode &&
-                m_XcodesToCloseAfterTests != null && m_XcodesToCloseAfterTests.Count == 1)
+            if (
+                Application.isEditor
+                && Application.isBatchMode
+                && m_XcodesToCloseAfterTests != null
+                && m_XcodesToCloseAfterTests.Count == 1
+            )
             {
                 var xcodeToClose = Process.GetProcessById(m_XcodesToCloseAfterTests[0]);
 

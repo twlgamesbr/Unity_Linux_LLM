@@ -9,7 +9,7 @@ using Unity.Numerics.Memory;
 
 namespace Unity.Numerics.Linear.Dense.Primitives
 {
-    unsafe readonly ref struct MatWrapper
+    readonly unsafe ref struct MatWrapper
     {
         readonly Matrix matrix;
     }
@@ -28,24 +28,24 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             }
         }
 
-        public readonly Vector* Rows { get => rows; }
-        public readonly Vector* Cols { get => cols; }
+        public readonly Vector* Rows
+        {
+            get => rows;
+        }
+        public readonly Vector* Cols
+        {
+            get => cols;
+        }
 
         public readonly int NumRows { get; }
         public readonly int NumCols { get; }
         public int MinDimension
         {
-            get
-            {
-                return math.min(NumRows, NumCols);
-            }
+            get { return math.min(NumRows, NumCols); }
         }
         public int MaxDimension
         {
-            get
-            {
-                return math.max(NumRows, NumCols);
-            }
+            get { return math.max(NumRows, NumCols); }
         }
 
         public static Matrix Create(in MemoryManager heap, int numRows, int numCols)
@@ -67,18 +67,22 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
             for (int i = 0; i < numRows; i++)
             {
-                m.rows[i] = Vector.Create(heap,
-                    data:   m.data + i,
+                m.rows[i] = Vector.Create(
+                    heap,
+                    data: m.data + i,
                     stride: numRows, // rows are NOT contiguous in memory since data layout is column-major (see below)
-                    size:   numCols);
+                    size: numCols
+                );
             }
 
             for (int i = 0; i < numCols; i++)
             {
-                m.cols[i] = Vector.Create(heap,
-                    data:   m.data + i * numRows,
+                m.cols[i] = Vector.Create(
+                    heap,
+                    data: m.data + i * numRows,
                     stride: 1, // each column is contiguous in memory, i.e., the data layout is column-major
-                    size:   numRows);
+                    size: numRows
+                );
             }
 
             return m;
@@ -158,12 +162,13 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             var vectorSize = UnsafeUtility.SizeOf<Vector>();
             var vecData = Heap.Allocate<byte>((numRows + numColumns) * vectorSize);
 
-            Matrix m = new Matrix(Heap,
-                data:       data + startColumn + startRow * NumCols,
-                rows:       (Vector*)vecData,
-                cols:       (Vector*)(vecData + numRows * vectorSize),
-                numRows:    numRows,
-                numCols:    numColumns
+            Matrix m = new Matrix(
+                Heap,
+                data: data + startColumn + startRow * NumCols,
+                rows: (Vector*)vecData,
+                cols: (Vector*)(vecData + numRows * vectorSize),
+                numRows: numRows,
+                numCols: numColumns
             );
 
             var rows = m.Rows;
@@ -181,7 +186,13 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             return m;
         }
 
-        public void CreateSubmatrix(in Matrix submatrix, in NativeArray<int> rowIndices, in int numRows, in NativeArray<int> columnIndices, in int numColumns)
+        public void CreateSubmatrix(
+            in Matrix submatrix,
+            in NativeArray<int> rowIndices,
+            in int numRows,
+            in NativeArray<int> columnIndices,
+            in int numColumns
+        )
         {
             if (numRows == 0 || numColumns == 0)
             {
@@ -239,7 +250,8 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             this.Heap = heap;
         }
 
-        public T *ReinterpretCast<T>() where T : unmanaged
+        public T* ReinterpretCast<T>()
+            where T : unmanaged
         {
             return (T*)data;
         }

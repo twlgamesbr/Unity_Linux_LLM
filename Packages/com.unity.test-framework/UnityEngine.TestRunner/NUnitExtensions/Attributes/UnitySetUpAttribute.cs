@@ -223,7 +223,5 @@ namespace UnityEngine.TestTools
     /// </code>
     /// </example>
     [AttributeUsage(AttributeTargets.Method)]
-    public class UnitySetUpAttribute : NUnitAttribute
-    {
-    }
+    public class UnitySetUpAttribute : NUnitAttribute { }
 }

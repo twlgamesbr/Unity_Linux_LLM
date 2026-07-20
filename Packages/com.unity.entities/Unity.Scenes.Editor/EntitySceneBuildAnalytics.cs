@@ -4,7 +4,6 @@ using Unity.Entities.Content;
 using UnityEditor;
 using UnityEngine.Analytics;
 
-
 namespace Unity.Scenes.Editor
 {
     internal static class EntitySceneBuildAnalytics
@@ -48,7 +47,12 @@ namespace Unity.Scenes.Editor
         {
 #if !UNITY_2023_2_OR_NEWER
             bool eventSuccessfullyRegistered = false;
-            UnityEngine.Analytics.AnalyticsResult registerEvent = EditorAnalytics.RegisterEventWithLimit(eventName, 100, 100, VendorKey);
+            UnityEngine.Analytics.AnalyticsResult registerEvent = EditorAnalytics.RegisterEventWithLimit(
+                eventName,
+                100,
+                100,
+                VendorKey
+            );
             if (registerEvent == UnityEngine.Analytics.AnalyticsResult.Ok)
             {
                 registeredEvents.Add(eventName);
@@ -65,8 +69,14 @@ namespace Unity.Scenes.Editor
             return registeredEvents.Contains(eventName);
         }
 
-
-        internal static void ReportBuildEvent(IRuntimeCatalogDataSource buildResultsCatalogDataSource, int numberOfAssetsInSubscenes, int numberOfWeakAssetReferences, int numberOfSubScenesInBuild, int numberOfAssets, bool isUsingContentArchives)
+        internal static void ReportBuildEvent(
+            IRuntimeCatalogDataSource buildResultsCatalogDataSource,
+            int numberOfAssetsInSubscenes,
+            int numberOfWeakAssetReferences,
+            int numberOfSubScenesInBuild,
+            int numberOfAssets,
+            bool isUsingContentArchives
+        )
         {
             if (!EditorAnalytics.enabled)
                 return;
@@ -103,7 +113,7 @@ namespace Unity.Scenes.Editor
                 NumberOfSubScenes = numberOfSubScenesInBuild,
                 NumberOfContentFilesBuilt = numberOfContentFiles,
                 NumberOfAssetsInSubScenes = numberOfAssetsInSubscenes,
-                IsUsingContentArchives = isUsingContentArchives
+                IsUsingContentArchives = isUsingContentArchives,
             };
 
 #if !UNITY_2023_2_OR_NEWER
@@ -114,4 +124,3 @@ namespace Unity.Scenes.Editor
         }
     }
 }
-

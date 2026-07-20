@@ -5,7 +5,12 @@ namespace Unity.Serialization
 {
     static class NativeArrayUtility
     {
-        public static unsafe NativeArray<T> Resize<T>(NativeArray<T> array, int length, Allocator allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public static unsafe NativeArray<T> Resize<T>(
+            NativeArray<T> array,
+            int length,
+            Allocator allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
             where T : unmanaged
         {
             if (array.IsCreated && array.Length >= length)
@@ -19,17 +24,17 @@ namespace Unity.Serialization
             {
                 return buffer;
             }
-            
+
             UnsafeUtility.MemCpy(buffer.GetUnsafePtr(), array.GetUnsafePtr(), array.Length * sizeof(T));
             array.Dispose();
 
             return buffer;
         }
-        
+
         public static unsafe T* Resize<T>(T* ptr, int fromLength, int toLength, int alignment, Allocator allocator)
             where T : unmanaged
         {
-            var buffer = (T*) UnsafeUtility.Malloc(sizeof(T) * toLength, alignment, allocator);
+            var buffer = (T*)UnsafeUtility.Malloc(sizeof(T) * toLength, alignment, allocator);
             UnsafeUtility.MemCpy(buffer, ptr, fromLength * sizeof(T));
             UnsafeUtility.Free(ptr, allocator);
             return buffer;

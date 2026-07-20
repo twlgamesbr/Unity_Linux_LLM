@@ -34,7 +34,7 @@ namespace UnityEditor.SettingsManagement
         /// </summary>
         Unregistered = 1 << 3,
 
-        All = Visible | Hidden | Unlisted | Unregistered
+        All = Visible | Hidden | Unlisted | Unregistered,
     }
 
     /// <summary>
@@ -170,7 +170,13 @@ namespace UnityEditor.SettingsManagement
         /// <param name="key">The key for this value.</param>
         /// <param name="value">The default value for this key.</param>
         /// <param name="scope">The scope for this setting. By default, the scope is the project.</param>
-        public UserSetting(Settings settings, string repository, string key, T value, SettingsScope scope = SettingsScope.Project)
+        public UserSetting(
+            Settings settings,
+            string repository,
+            string key,
+            T value,
+            SettingsScope scope = SettingsScope.Project
+        )
         {
             m_Key = key;
             m_Repository = repository;
@@ -265,7 +271,16 @@ namespace UnityEditor.SettingsManagement
         {
             // we do want to allow null values
             if (value != null && !(value is T))
-                throw new ArgumentException("Value must be of type " + typeof(T) + "\n" + key + " expecting value of type " + type + ", received " + value.GetType());
+                throw new ArgumentException(
+                    "Value must be of type "
+                        + typeof(T)
+                        + "\n"
+                        + key
+                        + " expecting value of type "
+                        + type
+                        + ", received "
+                        + value.GetType()
+                );
             SetValue((T)value, saveProjectSettingsImmediately);
         }
 
@@ -332,7 +347,11 @@ namespace UnityEditor.SettingsManagement
             if (!m_Initialized)
             {
                 if (m_Scope == SettingsScope.Project && settings == null)
-                    throw new Exception("UserSetting \"" + m_Key + "\" is attempting to access SettingsScope.Project setting with no Settings instance!");
+                    throw new Exception(
+                        "UserSetting \""
+                            + m_Key
+                            + "\" is attempting to access SettingsScope.Project setting with no Settings instance!"
+                    );
 
                 m_Initialized = true;
 
@@ -368,7 +387,6 @@ namespace UnityEditor.SettingsManagement
                 Init();
                 return m_Value;
             }
-
             set { SetValue(value); }
         }
 

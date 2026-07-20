@@ -11,7 +11,6 @@ namespace UnityEngine.UIElements
     /// </summary>
     internal class UIToolkitInteroperabilityBridge
     {
-
         [Flags]
         public enum EventHandlerTypes
         {
@@ -86,8 +85,8 @@ namespace UnityEngine.UIElements
             }
         }
 
-        private bool shouldTrackPanels => overrideUIToolkitEvents && createDefaultPanelComponents &&
-                                          m_Started && m_Enabled;
+        private bool shouldTrackPanels =>
+            overrideUIToolkitEvents && createDefaultPanelComponents && m_Started && m_Enabled;
 
         private void StartTrackingUIToolkitPanels()
         {
@@ -106,12 +105,13 @@ namespace UnityEngine.UIElements
                 StartTrackingPanel(panel);
             }
 
-            IRuntimePanel.uIElementsRuntimeUtility.AddOnCreatePanelAction( StartTrackingPanel);
+            IRuntimePanel.uIElementsRuntimeUtility.AddOnCreatePanelAction(StartTrackingPanel);
             m_IsTrackingPanels = true;
         }
 
         // Use object storage to prevent generic type parameter from preserving BaseRuntimePanel during code stripping
         private readonly HashSet<IRuntimePanel> trackedPanels = new();
+
         private void StartTrackingPanel(IRuntimePanel panel)
         {
             trackedPanels.Add(panel);
@@ -123,7 +123,7 @@ namespace UnityEngine.UIElements
                 return;
 
             // Can be null if runtime panels have not been created or UI Toolkit is stripped
-            IRuntimePanel.uIElementsRuntimeUtility?.RemoveOnCreatePanelAction( StartTrackingPanel);
+            IRuntimePanel.uIElementsRuntimeUtility?.RemoveOnCreatePanelAction(StartTrackingPanel);
             m_IsTrackingPanels = false;
 
             foreach (var panelObj in trackedPanels)
@@ -150,6 +150,7 @@ namespace UnityEngine.UIElements
 
         // Use interface storage to prevent generic type parameter from preserving BaseRuntimePanel during code stripping
         private readonly Dictionary<object, Action> destroyedActions = new();
+
         private void CreatePanelGameObject(IRuntimePanel panel)
         {
             if (panel.selectableGameObject == null)
@@ -279,12 +280,14 @@ namespace UnityEngine.UIElements
         }
 
         private PanelInputSettings m_InputSettings = PanelInputSettings.Default;
+
         void Apply(IPanelInputProvider input)
         {
             m_InputSettings = input != null ? input.settings : PanelInputSettings.Default;
             m_OverrideUIToolkitEvents = m_InputSettings.shouldRedirectInput;
-            m_HandlerTypes = EventHandlerTypes.ScreenOverlay |
-                (m_InputSettings.processWorldSpaceInput ? EventHandlerTypes.WorldSpace : 0);
+            m_HandlerTypes =
+                EventHandlerTypes.ScreenOverlay
+                | (m_InputSettings.processWorldSpaceInput ? EventHandlerTypes.WorldSpace : 0);
             m_WorldPickingLayers = m_InputSettings.interactionLayers;
             m_WorldPickingMaxDistance = m_InputSettings.maxInteractionDistance;
             m_CreateDefaultPanelComponents = m_InputSettings.autoCreatePanelComponents;
@@ -393,6 +396,7 @@ namespace UnityEngine.UIElements
 
         // Use object storage to prevent generic type parameter from preserving BaseRuntimePanel during code stripping
         private List<IRuntimePanel> m_PanelsToRemove = new();
+
         private void UpdatePanelGameObjects()
         {
             if (!m_IsTrackingPanels)

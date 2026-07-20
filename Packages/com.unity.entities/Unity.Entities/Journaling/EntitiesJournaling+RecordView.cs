@@ -12,13 +12,16 @@ namespace Unity.Entities
         /// <summary>
         /// Record view into journal buffer.
         /// </summary>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [DebuggerDisplay("{Index} - {RecordType}, FrameIndex = {FrameIndex}")]
         [DebuggerTypeProxy(typeof(RecordViewDebugView))]
         [StructLayout(LayoutKind.Sequential)]
-        public unsafe readonly struct RecordView : IEquatable<RecordView>
+        public readonly unsafe struct RecordView : IEquatable<RecordView>
         {
-            [NativeDisableUnsafePtrRestriction] internal readonly byte* m_BufferPtr;
+            [NativeDisableUnsafePtrRestriction]
+            internal readonly byte* m_BufferPtr;
 
             Header* _HeaderPtr => (Header*)m_BufferPtr;
             int _EntitiesOffset => UnsafeUtility.SizeOf<Header>();
@@ -62,12 +65,14 @@ namespace Unity.Entities
             /// <summary>
             /// The record entities view.
             /// </summary>
-            public EntityViewArray Entities => new EntityViewArray(_EntitiesPtr, _HeaderPtr->EntityCount, &_HeaderPtr->WorldSequenceNumber);
+            public EntityViewArray Entities =>
+                new EntityViewArray(_EntitiesPtr, _HeaderPtr->EntityCount, &_HeaderPtr->WorldSequenceNumber);
 
             /// <summary>
             /// The record component types view.
             /// </summary>
-            public ComponentTypeViewArray ComponentTypes => new ComponentTypeViewArray(_TypeIndexPtr, _HeaderPtr->TypeCount);
+            public ComponentTypeViewArray ComponentTypes =>
+                new ComponentTypeViewArray(_TypeIndexPtr, _HeaderPtr->TypeCount);
 
             /// <summary>
             /// The record payload data pointer.
@@ -95,10 +100,16 @@ namespace Unity.Entities
             internal int Length => (int)(DataPtr + DataLength - m_BufferPtr);
 
             public bool Equals(RecordView other) => m_BufferPtr == other.m_BufferPtr;
-            [ExcludeFromBurstCompatTesting("Takes managed object")] public override bool Equals(object obj) => obj is RecordView record ? Equals(record) : false;
+
+            [ExcludeFromBurstCompatTesting("Takes managed object")]
+            public override bool Equals(object obj) => obj is RecordView record ? Equals(record) : false;
+
             public override int GetHashCode() => new IntPtr(m_BufferPtr).GetHashCode();
+
             public static bool operator ==(RecordView lhs, RecordView rhs) => lhs.m_BufferPtr == rhs.m_BufferPtr;
+
             public static bool operator !=(RecordView lhs, RecordView rhs) => !(lhs == rhs);
+
             public static RecordView Null => new RecordView();
         }
 

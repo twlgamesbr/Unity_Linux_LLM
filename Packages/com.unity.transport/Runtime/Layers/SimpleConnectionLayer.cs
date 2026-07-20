@@ -84,7 +84,11 @@ namespace Unity.Networking.Transport
             m_MaxConnectionAttempts = networkConfigParameters.maxConnectAttempts;
 
             connectionList = m_ConnectionList = ConnectionList.Create();
-            m_ConnectionsData = new ConnectionDataMap<SimpleConnectionData>(1, default(SimpleConnectionData), Collections.Allocator.Persistent);
+            m_ConnectionsData = new ConnectionDataMap<SimpleConnectionData>(
+                1,
+                default(SimpleConnectionData),
+                Collections.Allocator.Persistent
+            );
             m_TokensHashMap = new NativeHashMap<ConnectionToken, ConnectionId>(1, Allocator.Persistent);
             m_DeferredSends = new PacketsQueue(k_DeferredSendsQueueSize, networkConfigParameters.maxMessageSize);
             m_MaxMessageSize = networkConfigParameters.maxMessageSize;
@@ -106,15 +110,30 @@ namespace Unity.Networking.Transport
             if (m_UnderlyingConnectionList.IsCreated)
             {
                 var underlyingConnections = new UnderlyingConnectionList(ref m_UnderlyingConnectionList);
-                return ScheduleReceive(new ReceiveJob<UnderlyingConnectionList>(), underlyingConnections, ref arguments, dependency);
+                return ScheduleReceive(
+                    new ReceiveJob<UnderlyingConnectionList>(),
+                    underlyingConnections,
+                    ref arguments,
+                    dependency
+                );
             }
             else
             {
-                return ScheduleReceive(new ReceiveJob<NullUnderlyingConnectionList>(), default, ref arguments, dependency);
+                return ScheduleReceive(
+                    new ReceiveJob<NullUnderlyingConnectionList>(),
+                    default,
+                    ref arguments,
+                    dependency
+                );
             }
         }
 
-        private JobHandle ScheduleReceive<T>(ReceiveJob<T> job, T underlyingConnectionList, ref ReceiveJobArguments arguments, JobHandle dependency)
+        private JobHandle ScheduleReceive<T>(
+            ReceiveJob<T> job,
+            T underlyingConnectionList,
+            ref ReceiveJobArguments arguments,
+            JobHandle dependency
+        )
             where T : unmanaged, IUnderlyingConnectionList
         {
             job.Connections = m_ConnectionList;
@@ -208,7 +227,8 @@ namespace Unity.Networking.Transport
         }
 
         [BurstCompile]
-        internal struct ReceiveJob<T> : IJob where T : unmanaged, IUnderlyingConnectionList
+        internal struct ReceiveJob<T> : IJob
+            where T : unmanaged, IUnderlyingConnectionList
         {
             public ConnectionList Connections;
             public ConnectionDataMap<SimpleConnectionData> ConnectionsData;
@@ -243,8 +263,10 @@ namespace Unity.Networking.Transport
                         continue;
 
                     var connectionState = Connections.GetConnectionState(connectionId);
-                    if (connectionState == NetworkConnection.State.Disconnected ||
-                        connectionState == NetworkConnection.State.Disconnecting)
+                    if (
+                        connectionState == NetworkConnection.State.Disconnected
+                        || connectionState == NetworkConnection.State.Disconnecting
+                    )
                     {
                         continue;
                     }
@@ -282,7 +304,11 @@ namespace Unity.Networking.Transport
                 var connectionData = ConnectionsData[connectionId];
 
                 // If we're disconnecting on an established connection, send a disconnect.
-                if (connectionData.State == ConnectionState.Established || connectionData.State == ConnectionState.PathMtuDiscovery || connectionData.State == ConnectionState.PathMtuDiscoveryStageTwo)
+                if (
+                    connectionData.State == ConnectionState.Established
+                    || connectionData.State == ConnectionState.PathMtuDiscovery
+                    || connectionData.State == ConnectionState.PathMtuDiscoveryStageTwo
+                )
                 {
                     connectionData.State = ConnectionState.Disconnected;
                     EnqueueDeferredMessage(connectionId, MessageType.Disconnect, ref connectionData.Token);
@@ -378,7 +404,11 @@ namespace Unity.Networking.Transport
 
                         // Send connect request only if underlying connection has been fully established.
                         if (connectionState == ConnectionState.AwaitingAccept)
-                            EnqueueDeferredMessage(connectionId, HandshakeType.ConnectionRequest, ref connectionData.Token);
+                            EnqueueDeferredMessage(
+                                connectionId,
+                                HandshakeType.ConnectionRequest,
+                                ref connectionData.Token
+                            );
                     }
                 }
             }
@@ -401,7 +431,10 @@ namespace Unity.Networking.Transport
                 }
             }
 
-            private unsafe void SendMtuDiscoveryMessages(ConnectionId connectionId, ref SimpleConnectionData connectionData)
+            private unsafe void SendMtuDiscoveryMessages(
+                ConnectionId connectionId,
+                ref SimpleConnectionData connectionData
+            )
             {
                 connectionData.LastSendTime = Time;
                 connectionData.LastMtuSendTime = Time;
@@ -493,8 +526,10 @@ namespace Unity.Networking.Transport
                     // If we were still waiting on an accept message and receive any message for the
                     // connection, consider the connection accepted. This way we won't drop messages
                     // sent by the server if the accept is lost.
-                    if (connectionState == NetworkConnection.State.Connecting &&
-                        connectionData.State == ConnectionState.AwaitingAccept)
+                    if (
+                        connectionState == NetworkConnection.State.Connecting
+                        && connectionData.State == ConnectionState.AwaitingAccept
+                    )
                     {
                         ConnectionPayloads.Remove(connectionId);
 
@@ -520,8 +555,10 @@ namespace Unity.Networking.Transport
                     }
                     else if (connectionState != NetworkConnection.State.Connected)
                     {
-                        if (connectionData.State != ConnectionState.PathMtuDiscovery &&
-                            connectionData.State != ConnectionState.PathMtuDiscoveryStageTwo)
+                        if (
+                            connectionData.State != ConnectionState.PathMtuDiscovery
+                            && connectionData.State != ConnectionState.PathMtuDiscoveryStageTwo
+                        )
                         {
                             packetProcessor.Drop();
                             continue;
@@ -532,8 +569,10 @@ namespace Unity.Networking.Transport
                     {
                         case MessageType.MtuCheck:
                         {
-                            if (connectionState == NetworkConnection.State.Disconnecting ||
-                                connectionState == NetworkConnection.State.Disconnected)
+                            if (
+                                connectionState == NetworkConnection.State.Disconnecting
+                                || connectionState == NetworkConnection.State.Disconnected
+                            )
                             {
                                 packetProcessor.Drop();
                                 continue;
@@ -546,8 +585,10 @@ namespace Unity.Networking.Transport
                         }
                         case MessageType.MtuAck:
                         {
-                            if (connectionState == NetworkConnection.State.Disconnecting ||
-                                connectionState == NetworkConnection.State.Disconnected)
+                            if (
+                                connectionState == NetworkConnection.State.Disconnecting
+                                || connectionState == NetworkConnection.State.Disconnected
+                            )
                             {
                                 packetProcessor.Drop();
                                 continue;
@@ -557,8 +598,10 @@ namespace Unity.Networking.Transport
                             connectionData = ConnectionsData[connectionId];
                             connectionData.ReceivedMtuAck = true;
                             ConnectionsData[connectionId] = connectionData;
-                            if (connectionData.State == ConnectionState.PathMtuDiscovery ||
-                                connectionData.State == ConnectionState.PathMtuDiscoveryStageTwo)
+                            if (
+                                connectionData.State == ConnectionState.PathMtuDiscovery
+                                || connectionData.State == ConnectionState.PathMtuDiscoveryStageTwo
+                            )
                             {
                                 packetProcessor.RemoveFromPayloadStart<ushort>(); // Scrap the payload size.
                                 var size = packetProcessor.RemoveFromPayloadStart<ushort>(); // Read the MTU value.
@@ -658,14 +701,19 @@ namespace Unity.Networking.Transport
                 if (packetProcessor.Length < SimpleConnectionLayer.k_HandshakeSize)
                     return false;
 
-                if ((packetProcessor.GetPayloadDataRef<uint>(0) & 0x00FFFFFF) == (k_ProtocolSignatureAndVersion & 0x00FFFFFF))
+                if (
+                    (packetProcessor.GetPayloadDataRef<uint>(0) & 0x00FFFFFF)
+                    == (k_ProtocolSignatureAndVersion & 0x00FFFFFF)
+                )
                 {
                     var signatureAndVersion = packetProcessor.RemoveFromPayloadStart<uint>();
                     var protocolVersion = (byte)(signatureAndVersion >> 24);
                     if (protocolVersion != k_ProtocolVersion)
                     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        Debug.LogWarning($"Simple Connection Protocol version mismatch. This could happen if remote connection UTP version is different. (local: {k_ProtocolVersion}, remote: {protocolVersion})");
+                        Debug.LogWarning(
+                            $"Simple Connection Protocol version mismatch. This could happen if remote connection UTP version is different. (local: {k_ProtocolVersion}, remote: {protocolVersion})"
+                        );
 #endif
                         return true;
                     }
@@ -688,7 +736,7 @@ namespace Unity.Networking.Transport
                                     State = ConnectionState.PathMtuDiscovery,
                                     Token = connectionToken,
                                     UnderlyingConnection = packetProcessor.ConnectionRef,
-                                    IsLocal = false
+                                    IsLocal = false,
                                 };
                                 TokensHashMap.Add(connectionToken, connectionId);
                                 send = true;
@@ -711,9 +759,12 @@ namespace Unity.Networking.Transport
                             ConnectionsData[connectionId] = connectionData;
 
                             EnqueueDeferredMessage(connectionId, HandshakeType.ConnectionAccept, ref connectionToken);
-                            if(send)
+                            if (send)
                             {
-                                if (MaxMessageSize <= NetworkParameterConstants.AbsoluteMinimumMtuSize || !PerformMtuDiscovery)
+                                if (
+                                    MaxMessageSize <= NetworkParameterConstants.AbsoluteMinimumMtuSize
+                                    || !PerformMtuDiscovery
+                                )
                                 {
                                     Connections.SetConnectionPathMtu(connectionId, MaxMessageSize);
                                     connectionData.State = ConnectionState.Established;
@@ -737,7 +788,10 @@ namespace Unity.Networking.Transport
                                 connectionData.IsLocal = true;
                                 ConnectionsData[connectionId] = connectionData;
                                 ConnectionPayloads.Remove(connectionId);
-                                if (MaxMessageSize <= NetworkParameterConstants.AbsoluteMinimumMtuSize || !PerformMtuDiscovery)
+                                if (
+                                    MaxMessageSize <= NetworkParameterConstants.AbsoluteMinimumMtuSize
+                                    || !PerformMtuDiscovery
+                                )
                                 {
                                     Connections.SetConnectionPathMtu(connectionId, MaxMessageSize);
                                     connectionData.State = ConnectionState.Established;
@@ -761,7 +815,6 @@ namespace Unity.Networking.Transport
                                         ConnectionPayloads[connectionId] = acceptPayload;
                                     }
                                 }
-
                             }
                             else
                             {
@@ -786,7 +839,11 @@ namespace Unity.Networking.Transport
                 return false;
             }
 
-            private unsafe void EnqueueDeferredMessage(ConnectionId connection, HandshakeType type, ref ConnectionToken token)
+            private unsafe void EnqueueDeferredMessage(
+                ConnectionId connection,
+                HandshakeType type,
+                ref ConnectionToken token
+            )
             {
                 if (DeferredSends.EnqueuePacket(out var packetProcessor))
                 {
@@ -814,7 +871,12 @@ namespace Unity.Networking.Transport
                 }
             }
 
-            private unsafe void EnqueueDeferredMessage(ConnectionId connection, MessageType type, ref ConnectionToken token, ConnectionPayload payload)
+            private unsafe void EnqueueDeferredMessage(
+                ConnectionId connection,
+                MessageType type,
+                ref ConnectionToken token,
+                ConnectionPayload payload
+            )
             {
                 if (DeferredSends.EnqueuePacket(out var packetProcessor))
                 {

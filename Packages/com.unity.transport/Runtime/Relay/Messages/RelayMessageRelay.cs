@@ -28,7 +28,11 @@ namespace Unity.Networking.Transport.Relay
             return value;
         }
 
-        public static RelayMessageRelay Create(RelayAllocationId fromAllocationId, RelayAllocationId toAllocationId, ushort dataLength)
+        public static RelayMessageRelay Create(
+            RelayAllocationId fromAllocationId,
+            RelayAllocationId toAllocationId,
+            ushort dataLength
+        )
         {
             return new RelayMessageRelay
             {
@@ -39,7 +43,12 @@ namespace Unity.Networking.Transport.Relay
             };
         }
 
-        public static void Write(ref PacketProcessor packetProcessor, ref RelayAllocationId fromAllocationId, ref RelayAllocationId toAllocationId, ushort dataLength)
+        public static void Write(
+            ref PacketProcessor packetProcessor,
+            ref RelayAllocationId fromAllocationId,
+            ref RelayAllocationId toAllocationId,
+            ushort dataLength
+        )
         {
             packetProcessor.PrependToPayload<ushort>(SwitchEndianness(dataLength));
             packetProcessor.PrependToPayload<RelayAllocationId>(toAllocationId);

@@ -55,7 +55,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
             public DebugData GetDebugData(string renderGraph, EntityId executionId)
             {
                 if (!m_Container.TryGetValue(renderGraph, out var debugDataForGraph))
-                    throw new InvalidOperationException($"RenderGraph '{renderGraph}' was never registered with the debug session.");
+                    throw new InvalidOperationException(
+                        $"RenderGraph '{renderGraph}' was never registered with the debug session."
+                    );
                 return debugDataForGraph[executionId];
             }
 
@@ -145,7 +147,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         public static RenderGraphDebugSession currentDebugSession => s_CurrentDebugSession;
 
-        public static void Create<TSession>() where TSession : RenderGraphDebugSession, new()
+        public static void Create<TSession>()
+            where TSession : RenderGraphDebugSession, new()
         {
             EndSession();
             s_CurrentDebugSession = new TSession();
@@ -157,7 +160,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
             EndSession();
 
             if (sessionType.IsAssignableFrom(typeof(RenderGraphDebugSession)))
-                throw new ArgumentException("Incorrect session type. Type should be derived from RenderGraphDebugSession.");
+                throw new ArgumentException(
+                    "Incorrect session type. Type should be derived from RenderGraphDebugSession."
+                );
 
             s_CurrentDebugSession = Activator.CreateInstance(sessionType) as RenderGraphDebugSession;
         }
@@ -172,6 +177,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         }
 
         public static List<string> s_EmptyRegisteredGraphs = new();
+
         public static List<string> GetRegisteredGraphs()
         {
             if (s_CurrentDebugSession == null || s_CurrentDebugSession.debugDataContainer == null)
@@ -183,6 +189,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         }
 
         public static List<DebugExecutionItem> s_EmptyExecutions = new();
+
         public static List<DebugExecutionItem> GetExecutions(string graphName)
         {
             if (s_CurrentDebugSession == null || s_CurrentDebugSession.debugDataContainer == null)

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
-
 #if UNITY_6000_4_OR_NEWER
 using GUID = UnityEngine.GUID;
 #endif
@@ -29,7 +28,6 @@ namespace Unity.PlatformToolkit.Editor
         /// <summary>Build targets supported by the Platform Toolkit implementation.</summary>
         IReadOnlyCollection<BuildTarget> SupportedPlatforms { get; }
 
-
         /// <summary>
         /// Platform GUIDs supported by the Platform Toolkit implementation for Build Profile matching.
         /// GUIDs are the required mechanism for determining Build Profile platform support; <see cref="SupportedPlatforms"/> is only used by the legacy global settings API.
@@ -43,7 +41,10 @@ namespace Unity.PlatformToolkit.Editor
         /// <param name="achievementContext">Achievement context for the build.</param>
         /// <param name="settingsContext">Settings context for the build.</param>
         /// <returns>Builder for this Platform toolkit implementation.</returns>
-        IPlatformToolkitBuilder CreateBuilder(IAchievementConfigurationContext achievementContext = null, ISettingsConfigurationContext settingsContext = null)
+        IPlatformToolkitBuilder CreateBuilder(
+            IAchievementConfigurationContext achievementContext = null,
+            ISettingsConfigurationContext settingsContext = null
+        )
         {
             // TODO remove this default implementation, after all implementations have an implementation. Building is not optional.
             return null;
@@ -58,7 +59,9 @@ namespace Unity.PlatformToolkit.Editor
         /// <returns>New achievement configuration instance.</returns>
         IAchievementConfiguration CreateAchievementConfiguration(IAchievementConfigurationContext context)
         {
-            throw new InvalidOperationException("Achievements are not supported by the Platform Toolkit implementation.");
+            throw new InvalidOperationException(
+                "Achievements are not supported by the Platform Toolkit implementation."
+            );
         }
     }
 

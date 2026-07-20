@@ -40,11 +40,13 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
             }
 
             // ReSharper disable once BadControlBracesIndent
-        var editMode = settings.EditModeIncluded() || (PlayerSettings.runPlayModeTestAsEditModeTest && settings.PlayModeInEditorIncluded());
-        if (!editMode)
-        {
-            yield return new MarkRunAsPlayModeTask();
-        }
+            var editMode =
+                settings.EditModeIncluded()
+                || (PlayerSettings.runPlayModeTestAsEditModeTest && settings.PlayModeInEditorIncluded());
+            if (!editMode)
+            {
+                yield return new MarkRunAsPlayModeTask();
+            }
             yield return new SaveModifiedSceneTask();
             yield return new RegisterFilesForCleanupVerificationTask();
             yield return new SaveUndoIndexTask();
@@ -55,7 +57,11 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
             yield return new BuildNUnitFilterTask();
             yield return new BuildTestTreeTask(editMode ? TestPlatform.EditMode : TestPlatform.PlayMode);
             yield return new FilterTestTreeTask();
-            yield return new CreateBootstrapSceneTask(!editMode, !editMode, editMode ? NewSceneSetup.DefaultGameObjects : NewSceneSetup.EmptyScene);
+            yield return new CreateBootstrapSceneTask(
+                !editMode,
+                !editMode,
+                editMode ? NewSceneSetup.DefaultGameObjects : NewSceneSetup.EmptyScene
+            );
             yield return new CreateEventsTask();
             yield return new RegisterCallbackDelegatorEventsTask();
             yield return new RegisterTestRunCallbackEventsTask();
@@ -65,25 +71,25 @@ namespace UnityEditor.TestTools.TestRunner.TestRun
             yield return new InitializeTestProgressTask();
             yield return new UpdateTestProgressTask();
 
-        if (editMode)
-        {
-            yield return new GenerateContextTask();
-            yield return new SetupConstructDelegatorTask();
-            yield return new RunStartedInvocationEvent();
-            yield return new EditModeRunTask();
-            yield return new RunFinishedInvocationEvent();
-            yield return new CleanupConstructDelegatorTask();
-        }
-        else
-        {
-            yield return new GenerateContextTask();
-            yield return new PreparePlayModeRunTask();
-            yield return new EnterPlayModeTask();
-            yield return new PlayModeRunTask();
-            yield return new ExitPlayModeTask();
-            yield return new RestoreProjectSettingsTask();
-            yield return new CleanupTestControllerTask();
-        }
+            if (editMode)
+            {
+                yield return new GenerateContextTask();
+                yield return new SetupConstructDelegatorTask();
+                yield return new RunStartedInvocationEvent();
+                yield return new EditModeRunTask();
+                yield return new RunFinishedInvocationEvent();
+                yield return new CleanupConstructDelegatorTask();
+            }
+            else
+            {
+                yield return new GenerateContextTask();
+                yield return new PreparePlayModeRunTask();
+                yield return new EnterPlayModeTask();
+                yield return new PlayModeRunTask();
+                yield return new ExitPlayModeTask();
+                yield return new RestoreProjectSettingsTask();
+                yield return new CleanupTestControllerTask();
+            }
             yield return new PostbuildCleanupWithTestDataTask(settings);
             yield return new PostbuildCleanupTask();
             yield return new CleanUpContext();

@@ -87,13 +87,13 @@ namespace UnityEngine.Build.Pipeline
         }
 
         /// <inheritdoc/>
-        public static bool operator==(BundleDetails a, BundleDetails b)
+        public static bool operator ==(BundleDetails a, BundleDetails b)
         {
             return a.Equals(b);
         }
 
         /// <inheritdoc/>
-        public static bool operator!=(BundleDetails a, BundleDetails b)
+        public static bool operator !=(BundleDetails a, BundleDetails b)
         {
             return !(a == b);
         }
@@ -105,7 +105,10 @@ namespace UnityEngine.Build.Pipeline
         /// <returns>Returns true if the bundle details objects are equivalent. Returns false otherwise.</returns>
         public bool Equals(BundleDetails other)
         {
-            return string.Equals(FileName, other.FileName) && Crc == other.Crc && Hash.Equals(other.Hash) && Equals(Dependencies, other.Dependencies);
+            return string.Equals(FileName, other.FileName)
+                && Crc == other.Crc
+                && Hash.Equals(other.Hash)
+                && Equals(Dependencies, other.Dependencies);
         }
     }
 }

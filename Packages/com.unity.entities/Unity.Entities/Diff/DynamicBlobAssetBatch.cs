@@ -48,7 +48,12 @@ namespace Unity.Entities
 
         public static DynamicBlobAssetBatch* Allocate(AllocatorManager.AllocatorHandle allocator)
         {
-            var batch = (DynamicBlobAssetBatch*)Memory.Unmanaged.Allocate(sizeof(DynamicBlobAssetBatch), UnsafeUtility.AlignOf<DynamicBlobAssetBatch>(), allocator);
+            var batch = (DynamicBlobAssetBatch*)
+                Memory.Unmanaged.Allocate(
+                    sizeof(DynamicBlobAssetBatch),
+                    UnsafeUtility.AlignOf<DynamicBlobAssetBatch>(),
+                    allocator
+                );
             batch->m_FramesToRetainBlobAssets = 1;
             batch->m_Allocator = allocator;
             batch->m_BlobAssets = UnsafeList<BlobAssetPtr>.Create(1, allocator);
@@ -81,7 +86,8 @@ namespace Unity.Entities
 
         public BlobAssetPtr AllocateBlobAsset(void* data, int length, ulong hash)
         {
-            var blobAssetHeader = (BlobAssetHeader*)Memory.Unmanaged.Allocate(length + sizeof(BlobAssetHeader), 16, m_Allocator);
+            var blobAssetHeader = (BlobAssetHeader*)
+                Memory.Unmanaged.Allocate(length + sizeof(BlobAssetHeader), 16, m_Allocator);
 
             blobAssetHeader->Length = length;
             blobAssetHeader->ValidationPtr = blobAssetHeader + 1;
@@ -95,7 +101,12 @@ namespace Unity.Entities
             return new BlobAssetPtr(blobAssetHeader);
         }
 
-        public void SortByHash() => NativeSortExtension.Sort((BlobAssetPtr*)m_BlobAssets->Ptr, m_BlobAssets->Length, new BlobAssetPtrHashComparer());
+        public void SortByHash() =>
+            NativeSortExtension.Sort(
+                (BlobAssetPtr*)m_BlobAssets->Ptr,
+                m_BlobAssets->Length,
+                new BlobAssetPtrHashComparer()
+            );
 
         public bool TryGetBlobAsset(ulong hash, out BlobAssetPtr blobAssetPtr)
         {
@@ -123,8 +134,14 @@ namespace Unity.Entities
                 if (blobAssets[i].Hash != hash)
                     continue;
 
-                var entity = entityManager.CreateEntity(ComponentType.ReadWrite<RetainBlobAssets>(), ComponentType.ReadWrite<RetainBlobAssetPtr>());
-                entityManager.SetComponentData(entity, new RetainBlobAssets { FramesToRetainBlobAssets = m_FramesToRetainBlobAssets});
+                var entity = entityManager.CreateEntity(
+                    ComponentType.ReadWrite<RetainBlobAssets>(),
+                    ComponentType.ReadWrite<RetainBlobAssetPtr>()
+                );
+                entityManager.SetComponentData(
+                    entity,
+                    new RetainBlobAssets { FramesToRetainBlobAssets = m_FramesToRetainBlobAssets }
+                );
                 entityManager.SetComponentData(entity, new RetainBlobAssetPtr { BlobAsset = blobAssets[i].Header });
 
                 // Entity lifetime will be bound to the CleanupComponents we added above, we can safely call DestroyEntity(),

@@ -12,7 +12,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         DebugMessageHandler m_MessageHandler = ScriptableObject.CreateInstance<DebugMessageHandler>();
 
-        public RenderGraphPlayerRemoteDebugSession() : base()
+        public RenderGraphPlayerRemoteDebugSession()
+            : base()
         {
             m_MessageHandler.Register(OnMessageFromEditor);
             PlayerConnection.instance.RegisterConnection(OnEditorConnected);
@@ -76,11 +77,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             var debugData = GetDebugData(graph, executionId);
 
-            DebugMessageHandler.DebugDataPayload payload = new ()
+            DebugMessageHandler.DebugDataPayload payload = new()
             {
                 graphName = graph,
                 executionId = executionId,
-                debugData = debugData
+                debugData = debugData,
             };
             m_MessageHandler.Send(DebugMessageHandler.MessageType.DebugData, payload);
         }

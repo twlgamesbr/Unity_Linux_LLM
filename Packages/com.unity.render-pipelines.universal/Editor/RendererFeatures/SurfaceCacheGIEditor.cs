@@ -36,14 +36,29 @@ namespace UnityEditor.Rendering.Universal
             public static GUIContent MultiBounce = EditorGUIUtility.TrTextContent("Multi Bounce", "");
 
             public static GUIContent TemporalSmoothing = EditorGUIUtility.TrTextContent("Temporal Smoothing", "");
-            public static GUIContent SpatialFilterEnabled = EditorGUIUtility.TrTextContent("Spatial Filter Enabled", "");
-            public static GUIContent SpatialFilterSampleCount = EditorGUIUtility.TrTextContent("Spatial Sample Count", "");
+            public static GUIContent SpatialFilterEnabled = EditorGUIUtility.TrTextContent(
+                "Spatial Filter Enabled",
+                ""
+            );
+            public static GUIContent SpatialFilterSampleCount = EditorGUIUtility.TrTextContent(
+                "Spatial Sample Count",
+                ""
+            );
             public static GUIContent SpatialFilterRadius = EditorGUIUtility.TrTextContent("Spatial Radius", "");
-            public static GUIContent TemporalPostFilterEnabled = EditorGUIUtility.TrTextContent("Temporal Post Filter Enabled", "");
+            public static GUIContent TemporalPostFilterEnabled = EditorGUIUtility.TrTextContent(
+                "Temporal Post Filter Enabled",
+                ""
+            );
 
             public static GUIContent LookupSampleCount = EditorGUIUtility.TrTextContent("Lookup Sample Count", "");
-            public static GUIContent UpsamplingKernelSize = EditorGUIUtility.TrTextContent("Upsampling Kernel Size", "");
-            public static GUIContent UpsamplingSampleCount = EditorGUIUtility.TrTextContent("Upsampling Sample Count", "");
+            public static GUIContent UpsamplingKernelSize = EditorGUIUtility.TrTextContent(
+                "Upsampling Kernel Size",
+                ""
+            );
+            public static GUIContent UpsamplingSampleCount = EditorGUIUtility.TrTextContent(
+                "Upsampling Sample Count",
+                ""
+            );
 
             public static GUIContent VolumeSize = EditorGUIUtility.TrTextContent("Size", "");
             public static GUIContent VolumeResolution = EditorGUIUtility.TrTextContent("Resolution", "");
@@ -54,7 +69,10 @@ namespace UnityEditor.Rendering.Universal
 
             public static GUIContent DebugEnabled = EditorGUIUtility.TrTextContent("Debug Enabled", "");
             public static GUIContent DebugViewMode = EditorGUIUtility.TrTextContent("Debug View Mode", "");
-            public static GUIContent DebugShowSamplePosition = EditorGUIUtility.TrTextContent("Debug Show Sample Position", "");
+            public static GUIContent DebugShowSamplePosition = EditorGUIUtility.TrTextContent(
+                "Debug Show Sample Position",
+                ""
+            );
         }
 
         private void Init()
@@ -100,7 +118,10 @@ namespace UnityEditor.Rendering.Universal
 
             if (SceneView.lastActiveSceneView && !SceneView.lastActiveSceneView.sceneViewState.alwaysRefreshEnabled)
             {
-                EditorGUILayout.HelpBox("Enable \"Always Refresh\" in the Scene View to see realtime updates in the Scene View.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "Enable \"Always Refresh\" in the Scene View to see realtime updates in the Scene View.",
+                    MessageType.Info
+                );
             }
 
             EditorGUILayout.LabelField("Sampling", EditorStyles.boldLabel);
@@ -123,9 +144,17 @@ namespace UnityEditor.Rendering.Universal
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Volume", EditorStyles.boldLabel);
-            _volumeSize.floatValue = Mathf.Max(0.0f, EditorGUILayout.FloatField(TextContent.VolumeSize, _volumeSize.floatValue));
+            _volumeSize.floatValue = Mathf.Max(
+                0.0f,
+                EditorGUILayout.FloatField(TextContent.VolumeSize, _volumeSize.floatValue)
+            );
             EditorGUILayout.IntSlider(_volumeResolution, 16, 128, TextContent.VolumeResolution);
-            EditorGUILayout.IntSlider(_volumeCascadeCount, 1, (int)SurfaceCache.CascadeMax, TextContent.VolumeCascadeCount);
+            EditorGUILayout.IntSlider(
+                _volumeCascadeCount,
+                1,
+                (int)SurfaceCache.CascadeMax,
+                TextContent.VolumeCascadeCount
+            );
             EditorGUILayout.PropertyField(_volumeMovement, TextContent.VolumeMovement);
 
             EditorGUILayout.Space();

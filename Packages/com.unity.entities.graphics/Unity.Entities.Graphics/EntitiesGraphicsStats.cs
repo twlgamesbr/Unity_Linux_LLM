@@ -14,7 +14,7 @@ namespace Unity.Rendering
         /// <summary>
         /// The number of chunks that Entities Graphics considered for frustum culling.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This value includes any chunks successfully added into a batch, regardless of whether they contained any visible entities.
         /// </remarks>
         public int ChunkTotal;
@@ -60,7 +60,7 @@ namespace Unity.Rendering
         /// <summary>
         /// The number of chunks that contained at least one LOD change.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// An LOD change means that an entity that represented an LOD was either enabled or disabled depending on the LOD selection.
         /// </remarks>
         public int LodChanged;
@@ -77,9 +77,9 @@ namespace Unity.Rendering
         /// The number of entities that Entities Graphics rendered into at least one rendering pass.
         /// </summary>
         /// <remarks>
-        /// This doesn't perfectly represent the total number of times that Entities Graphics renders entities. 
+        /// This doesn't perfectly represent the total number of times that Entities Graphics renders entities.
         /// If Entities Graphics renders an entity multiple times, for example if it uses the same culling result to draw the entity into several rendering passes, this value only counts the entity once. This commonly happens if Entities Graphics draws the entity both into a depth prepass and into a G-Buffer or forward pass.
-        /// If Entities Graphics performs culling for the same entity multiple times, for example if the entity is visible in both a camera and the directional shadow map, this value counts the entity multiple times. 
+        /// If Entities Graphics performs culling for the same entity multiple times, for example if the entity is visible in both a camera and the directional shadow map, this value counts the entity multiple times.
         /// </remarks>
         public int RenderedEntityCount;
 
@@ -102,7 +102,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Total number of chunks
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int ChunkTotal;
@@ -115,7 +115,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Total number of chunks processed which are partially intersected with the view frustum.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int ChunkCountInstancesProcessed;
@@ -123,7 +123,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Total number of chunks processed which are fully inside of the view frustum.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int ChunkCountFullyIn;
@@ -131,7 +131,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Total number of instance checks across all LODs.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int InstanceTests;
@@ -139,7 +139,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Total number of LODs across all archetype entities chunks.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int LodTotal;
@@ -147,7 +147,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Number of the culling chunks without LOD data.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int LodNoRequirements;
@@ -155,7 +155,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Number of enabled or disabled LODs in this frame.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int LodChanged;
@@ -163,7 +163,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Number of tested LOD chunks.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int LodChunksTested;
@@ -171,7 +171,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Camera move distance since the last frame.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public float CameraMoveDistance;
@@ -184,7 +184,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Accumulated number of rendered entities across all threads.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int RenderedInstanceCount;
@@ -192,7 +192,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Accumulated number of the draw commands.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int DrawCommandCount;
@@ -200,7 +200,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Accumulated number of the draw ranges.
         /// </summary>
-        /// <remarks>        
+        /// <remarks>
         /// This stat is only available in the Editor.
         /// </remarks>
         public int DrawRangeCount;

@@ -28,7 +28,7 @@ namespace UnityEngine.TestTools.TestRunner.GUI
             AddFilters(filters, testNames, s => new FullNameFilter(s));
             AddFilters(filters, groupNames, OptimizedGroupFilter);
             AddFilters(filters, assemblyNames, s => new AssemblyNameFilter(s));
-            AddFilters(filters, categoryNames, s => new CategoryFilterExtended(s) {IsRegex = true});
+            AddFilters(filters, categoryNames, s => new CategoryFilterExtended(s) { IsRegex = true });
 
             if (synchronousOnly)
             {
@@ -72,8 +72,12 @@ namespace UnityEngine.TestTools.TestRunner.GUI
                 return;
             }
 
-            var inclusionFilters = values.Where(v => !v.StartsWith("!")).Select(v => builder(v) as ITestFilter).ToArray();
-            var exclusionFilters = values.Where(v => v.StartsWith("!"))
+            var inclusionFilters = values
+                .Where(v => !v.StartsWith("!"))
+                .Select(v => builder(v) as ITestFilter)
+                .ToArray();
+            var exclusionFilters = values
+                .Where(v => v.StartsWith("!"))
                 .Select(v => new NotFilter(builder(v.Substring(1))) as ITestFilter)
                 .ToArray();
             if (inclusionFilters.Length > 0 && exclusionFilters.Length > 0)

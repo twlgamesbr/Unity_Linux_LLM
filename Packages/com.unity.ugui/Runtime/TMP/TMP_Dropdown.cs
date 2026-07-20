@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace TMPro
 {
@@ -25,17 +25,36 @@ namespace TMPro
         {
             [SerializeField]
             private TMP_Text m_Text;
+
             [SerializeField]
             private Image m_Image;
+
             [SerializeField]
             private RectTransform m_RectTransform;
+
             [SerializeField]
             private Toggle m_Toggle;
 
-            public TMP_Text text { get { return m_Text; } set { m_Text = value; } }
-            public Image image { get { return m_Image; } set { m_Image = value; } }
-            public RectTransform rectTransform { get { return m_RectTransform; } set { m_RectTransform = value; } }
-            public Toggle toggle { get { return m_Toggle; } set { m_Toggle = value; } }
+            public TMP_Text text
+            {
+                get { return m_Text; }
+                set { m_Text = value; }
+            }
+            public Image image
+            {
+                get { return m_Image; }
+                set { m_Image = value; }
+            }
+            public RectTransform rectTransform
+            {
+                get { return m_RectTransform; }
+                set { m_RectTransform = value; }
+            }
+            public Toggle toggle
+            {
+                get { return m_Toggle; }
+                set { m_Toggle = value; }
+            }
 
             public virtual void OnPointerEnter(PointerEventData eventData)
             {
@@ -58,25 +77,39 @@ namespace TMPro
         {
             [SerializeField]
             private string m_Text;
+
             [SerializeField]
             private Sprite m_Image;
+
             [SerializeField]
             private Color m_Color = Color.white;
 
             /// <summary>
             /// The text associated with the option.
             /// </summary>
-            public string text { get { return m_Text; } set { m_Text = value; } }
+            public string text
+            {
+                get { return m_Text; }
+                set { m_Text = value; }
+            }
 
             /// <summary>
             /// The image associated with the option.
             /// </summary>
-            public Sprite image { get { return m_Image; } set { m_Image = value; } }
+            public Sprite image
+            {
+                get { return m_Image; }
+                set { m_Image = value; }
+            }
 
             /// <summary>
             /// The color associated with the option.
             /// </summary>
-            public Color color { get { return m_Color; } set { m_Color = value; } }
+            public Color color
+            {
+                get { return m_Color; }
+                set { m_Color = value; }
+            }
 
             public OptionData() { }
 
@@ -119,8 +152,11 @@ namespace TMPro
             /// <summary>
             /// The list of options for the dropdown list.
             /// </summary>
-            public List<OptionData> options { get { return m_Options; } set { m_Options = value; } }
-
+            public List<OptionData> options
+            {
+                get { return m_Options; }
+                set { m_Options = value; }
+            }
 
             public OptionDataList()
             {
@@ -145,7 +181,10 @@ namespace TMPro
         /// <summary>
         /// The Rect Transform of the template for the dropdown list.
         /// </summary>
-        public RectTransform template { get { return m_Template; } set
+        public RectTransform template
+        {
+            get { return m_Template; }
+            set
             {
                 m_Template = value;
                 RefreshShownValue();
@@ -159,7 +198,10 @@ namespace TMPro
         /// <summary>
         /// The Text component to hold the text of the currently selected option.
         /// </summary>
-        public TMP_Text captionText { get { return m_CaptionText; } set
+        public TMP_Text captionText
+        {
+            get { return m_CaptionText; }
+            set
             {
                 m_CaptionText = value;
                 RefreshShownValue();
@@ -172,7 +214,10 @@ namespace TMPro
         /// <summary>
         /// The Image component to hold the image of the currently selected option.
         /// </summary>
-        public Image captionImage { get { return m_CaptionImage; } set
+        public Image captionImage
+        {
+            get { return m_CaptionImage; }
+            set
             {
                 m_CaptionImage = value;
                 RefreshShownValue();
@@ -185,7 +230,10 @@ namespace TMPro
         /// <summary>
         /// The placeholder Graphic component. Shown when no option is selected.
         /// </summary>
-        public Graphic placeholder { get { return m_Placeholder; } set
+        public Graphic placeholder
+        {
+            get { return m_Placeholder; }
+            set
             {
                 m_Placeholder = value;
                 RefreshShownValue();
@@ -193,14 +241,16 @@ namespace TMPro
         }
 
         [Space]
-
         [SerializeField]
         private TMP_Text m_ItemText;
 
         /// <summary>
         /// The Text component to hold the text of the item.
         /// </summary>
-        public TMP_Text itemText { get { return m_ItemText; } set
+        public TMP_Text itemText
+        {
+            get { return m_ItemText; }
+            set
             {
                 m_ItemText = value;
                 RefreshShownValue();
@@ -213,7 +263,10 @@ namespace TMPro
         /// <summary>
         /// The Image component to hold the image of the item
         /// </summary>
-        public Image itemImage { get { return m_ItemImage; } set
+        public Image itemImage
+        {
+            get { return m_ItemImage; }
+            set
             {
                 m_ItemImage = value;
                 RefreshShownValue();
@@ -221,7 +274,6 @@ namespace TMPro
         }
 
         [Space]
-
         [SerializeField]
         private int m_Value;
 
@@ -229,7 +281,6 @@ namespace TMPro
         private bool m_MultiSelect;
 
         [Space]
-
         // Items that will be visible when the dropdown is shown.
         // We box this into its own class so we can use a Property Drawer for it.
         [SerializeField]
@@ -337,7 +388,6 @@ namespace TMPro
         }
 
         [Space]
-
         // Notification triggered when the dropdown changes.
         [SerializeField]
         private DropdownEvent m_OnValueChanged = new DropdownEvent();
@@ -383,7 +433,11 @@ namespace TMPro
         /// }
         /// </code>
         /// </example>
-        public DropdownEvent onValueChanged { get { return m_OnValueChanged; } set { m_OnValueChanged = value; } }
+        public DropdownEvent onValueChanged
+        {
+            get { return m_OnValueChanged; }
+            set { m_OnValueChanged = value; }
+        }
 
         [SerializeField]
         private float m_AlphaFadeSpeed = 0.15f;
@@ -391,7 +445,11 @@ namespace TMPro
         /// <summary>
         /// The time interval at which a drop down will appear and disappear
         /// </summary>
-        public float alphaFadeSpeed { get { return m_AlphaFadeSpeed; } set { m_AlphaFadeSpeed = value; } }
+        public float alphaFadeSpeed
+        {
+            get { return m_AlphaFadeSpeed; }
+            set { m_AlphaFadeSpeed = value; }
+        }
 
         private GameObject m_Dropdown;
         private GameObject m_Blocker;
@@ -447,14 +505,8 @@ namespace TMPro
         /// </example>
         public int value
         {
-            get
-            {
-                return m_Value;
-            }
-            set
-            {
-                SetValue(value);
-            }
+            get { return m_Value; }
+            set { SetValue(value); }
         }
 
         /// <summary>
@@ -486,18 +538,25 @@ namespace TMPro
             }
         }
 
-        public bool IsExpanded { get { return m_Dropdown != null; } }
+        public bool IsExpanded
+        {
+            get { return m_Dropdown != null; }
+        }
 
-        public bool MultiSelect { get { return m_MultiSelect; } set { m_MultiSelect = value; } }
+        public bool MultiSelect
+        {
+            get { return m_MultiSelect; }
+            set { m_MultiSelect = value; }
+        }
 
         protected TMP_Dropdown() { }
 
         protected override void Awake()
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
-            #endif
+#endif
 
             if (m_CaptionImage)
                 m_CaptionImage.enabled = (m_CaptionImage.sprite != null && m_CaptionImage.color.a > 0);
@@ -678,7 +737,10 @@ namespace TMPro
 
             if (!m_Template)
             {
-                Debug.LogError("The dropdown template is not assigned. The template needs to be assigned and must have a child GameObject with a Toggle component serving as the item.", this);
+                Debug.LogError(
+                    "The dropdown template is not assigned. The template needs to be assigned and must have a child GameObject with a Toggle component serving as the item.",
+                    this
+                );
                 return;
             }
 
@@ -690,22 +752,34 @@ namespace TMPro
             if (!itemToggle || itemToggle.transform == template)
             {
                 validTemplate = false;
-                Debug.LogError("The dropdown template is not valid. The template must have a child GameObject with a Toggle component serving as the item.", template);
+                Debug.LogError(
+                    "The dropdown template is not valid. The template must have a child GameObject with a Toggle component serving as the item.",
+                    template
+                );
             }
             else if (!(itemToggle.transform.parent is RectTransform))
             {
                 validTemplate = false;
-                Debug.LogError("The dropdown template is not valid. The child GameObject with a Toggle component (the item) must have a RectTransform on its parent.", template);
+                Debug.LogError(
+                    "The dropdown template is not valid. The child GameObject with a Toggle component (the item) must have a RectTransform on its parent.",
+                    template
+                );
             }
             else if (itemText != null && !itemText.transform.IsChildOf(itemToggle.transform))
             {
                 validTemplate = false;
-                Debug.LogError("The dropdown template is not valid. The Item Text must be on the item GameObject or children of it.", template);
+                Debug.LogError(
+                    "The dropdown template is not valid. The Item Text must be on the item GameObject or children of it.",
+                    template
+                );
             }
             else if (itemImage != null && !itemImage.transform.IsChildOf(itemToggle.transform))
             {
                 validTemplate = false;
-                Debug.LogError("The dropdown template is not valid. The Item Image must be on the item GameObject or children of it.", template);
+                Debug.LogError(
+                    "The dropdown template is not valid. The Item Image must be on the item GameObject or children of it.",
+                    template
+                );
             }
 
             if (!validTemplate)
@@ -760,7 +834,8 @@ namespace TMPro
             validTemplate = true;
         }
 
-        private static T GetOrAddComponent<T>(GameObject go) where T : Component
+        private static T GetOrAddComponent<T>(GameObject go)
+            where T : Component
         {
             T comp = go.GetComponent<T>();
             if (!comp)
@@ -872,8 +947,10 @@ namespace TMPro
             Rect itemTemplateRect = itemTemplate.rectTransform.rect;
 
             // Calculate the visual offset between the item's edges and the background's edges
-            Vector2 offsetMin = itemTemplateRect.min - dropdownContentRect.min + (Vector2)itemTemplate.rectTransform.localPosition;
-            Vector2 offsetMax = itemTemplateRect.max - dropdownContentRect.max + (Vector2)itemTemplate.rectTransform.localPosition;
+            Vector2 offsetMin =
+                itemTemplateRect.min - dropdownContentRect.min + (Vector2)itemTemplate.rectTransform.localPosition;
+            Vector2 offsetMax =
+                itemTemplateRect.max - dropdownContentRect.max + (Vector2)itemTemplate.rectTransform.localPosition;
             Vector2 itemSize = itemTemplateRect.size;
 
             m_Items.Clear();
@@ -962,7 +1039,10 @@ namespace TMPro
 
             float extraSpace = dropdownRectTransform.rect.height - contentRectTransform.rect.height;
             if (extraSpace > 0)
-                dropdownRectTransform.sizeDelta = new Vector2(dropdownRectTransform.sizeDelta.x, dropdownRectTransform.sizeDelta.y - extraSpace);
+                dropdownRectTransform.sizeDelta = new Vector2(
+                    dropdownRectTransform.sizeDelta.x,
+                    dropdownRectTransform.sizeDelta.y - extraSpace
+                );
 
             // Invert anchoring and position if dropdown is partially or fully outside of canvas rect.
             // Typically this will have the effect of placing the dropdown above the button instead of below,
@@ -978,8 +1058,16 @@ namespace TMPro
                 for (int i = 0; i < 4; i++)
                 {
                     Vector3 corner = rootCanvasRectTransform.InverseTransformPoint(corners[i]);
-                    if ((corner[axis] < rootCanvasRect.min[axis] && !Mathf.Approximately(corner[axis], rootCanvasRect.min[axis])) ||
-                        (corner[axis] > rootCanvasRect.max[axis] && !Mathf.Approximately(corner[axis], rootCanvasRect.max[axis])))
+                    if (
+                        (
+                            corner[axis] < rootCanvasRect.min[axis]
+                            && !Mathf.Approximately(corner[axis], rootCanvasRect.min[axis])
+                        )
+                        || (
+                            corner[axis] > rootCanvasRect.max[axis]
+                            && !Mathf.Approximately(corner[axis], rootCanvasRect.max[axis])
+                        )
+                    )
                     {
                         outside = true;
                         break;
@@ -994,7 +1082,10 @@ namespace TMPro
                 RectTransform itemRect = m_Items[i].rectTransform;
                 itemRect.anchorMin = new Vector2(itemRect.anchorMin.x, 0);
                 itemRect.anchorMax = new Vector2(itemRect.anchorMax.x, 0);
-                itemRect.anchoredPosition = new Vector2(itemRect.anchoredPosition.x, offsetMin.y + itemSize.y * (m_Items.Count - 1 - i) + itemSize.y * itemRect.pivot.y);
+                itemRect.anchoredPosition = new Vector2(
+                    itemRect.anchoredPosition.x,
+                    offsetMin.y + itemSize.y * (m_Items.Count - 1 - i) + itemSize.y * itemRect.pivot.y
+                );
                 itemRect.sizeDelta = new Vector2(itemRect.sizeDelta.x, itemSize.y);
             }
 
@@ -1093,7 +1184,6 @@ namespace TMPro
                 GetOrAddComponent<GraphicRaycaster>(blocker);
             }
 
-
             // Add image since it's needed to block, but make it clear.
             Image blockerImage = blocker.AddComponent<Image>();
             blockerImage.color = Color.clear;
@@ -1171,7 +1261,12 @@ namespace TMPro
         protected virtual void DestroyItem(DropdownItem item) { }
 
         // Add a new drop-down list item with the specified values.
-        private DropdownItem AddItem(OptionData data, bool selected, DropdownItem itemTemplate, List<DropdownItem> items)
+        private DropdownItem AddItem(
+            OptionData data,
+            bool selected,
+            DropdownItem itemTemplate,
+            List<DropdownItem> items
+        )
         {
             // Add a new item to the dropdown.
             DropdownItem item = CreateItem(itemTemplate);
@@ -1211,7 +1306,12 @@ namespace TMPro
             if (end.Equals(start))
                 return;
 
-            FloatTween tween = new FloatTween { duration = duration, startValue = start, targetValue = end };
+            FloatTween tween = new FloatTween
+            {
+                duration = duration,
+                startValue = start,
+                targetValue = end,
+            };
             tween.AddOnChangedCallback(SetAlpha);
             tween.ignoreTimeScale = true;
             m_AlphaTweenRunner.StartTween(tween);

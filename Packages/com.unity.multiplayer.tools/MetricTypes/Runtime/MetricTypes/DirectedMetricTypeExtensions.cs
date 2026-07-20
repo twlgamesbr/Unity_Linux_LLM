@@ -28,13 +28,12 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         }
 
         /// Create a DirectedMetricType from a MetricType and a Direction
-        internal static DirectedMetricType GetDirectedMetric(
-            this MetricType metricType,
-            NetworkDirection direction)
+        internal static DirectedMetricType GetDirectedMetric(this MetricType metricType, NetworkDirection direction)
         {
             return (DirectedMetricType)(
-                ((int)metricType << NetworkDirectionConstants.k_BitWidth) |
-                ((int)direction & NetworkDirectionConstants.k_Mask));
+                ((int)metricType << NetworkDirectionConstants.k_BitWidth)
+                | ((int)direction & NetworkDirectionConstants.k_Mask)
+            );
         }
 
         /// Get the MetricType from a DirectedMetricType

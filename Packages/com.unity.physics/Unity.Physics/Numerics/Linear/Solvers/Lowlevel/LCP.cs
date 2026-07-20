@@ -13,7 +13,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         {
             Free = 0,
             Tight = 1,
-            ForcedFree = 2
+            ForcedFree = 2,
         }
 
         // Index flags for Mixed Linear Complementarity Problems (MLCP)
@@ -21,7 +21,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         {
             Free = 0,
             LowerTight = 1,
-            UpperTight = 2
+            UpperTight = 2,
         }
 
         /// <summary>
@@ -49,9 +49,16 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         /// <returns>true if solution was found within the given maximum of iterations. Otherwise false.</returns>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public static bool SolveLCP(in Matrix M, in Vector q, ref NativeArray<LCPIndexFlag> indexSetArray,
-            [WriteOnly] ref Vector w, [WriteOnly] ref Vector z, in float eps = 1e-4f, in uint maxNumIterations = 100,
-            in uint maxNumBlockIterWithoutInfeasibilityReduction = 3)
+        public static bool SolveLCP(
+            in Matrix M,
+            in Vector q,
+            ref NativeArray<LCPIndexFlag> indexSetArray,
+            [WriteOnly] ref Vector w,
+            [WriteOnly] ref Vector z,
+            in float eps = 1e-4f,
+            in uint maxNumIterations = 100,
+            in uint maxNumBlockIterWithoutInfeasibilityReduction = 3
+        )
         {
             if (M.NumCols != M.NumRows)
             {
@@ -142,7 +149,8 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         if (singularRow != -1)
                         {
                             UnityEngine.Debug.LogError(
-                                "Principal submatrix M_FF is singular and could not be factorized. Aborting.");
+                                "Principal submatrix M_FF is singular and could not be factorized. Aborting."
+                            );
                             return false;
                         }
 
@@ -174,13 +182,25 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // Solve L * y = -q_F for y
                         // Note: Q_F.Col[0] = q_F, so we need alpha set to -1.0f below.
                         var alpha = -1.0f;
-                        Q_F.SolveGeneralizedTriangular(Side.Left, TriangularType.Lower, Op.None, DiagonalType.Unit,
-                            alpha, M_FF);
+                        Q_F.SolveGeneralizedTriangular(
+                            Side.Left,
+                            TriangularType.Lower,
+                            Op.None,
+                            DiagonalType.Unit,
+                            alpha,
+                            M_FF
+                        );
                         // Note: at this point, Q_F contains y
 
                         // Solve U * z_F = y for z_F
-                        Q_F.SolveGeneralizedTriangular(Side.Left, TriangularType.Upper, Op.None, DiagonalType.Explicit,
-                            1.0f, M_FF);
+                        Q_F.SolveGeneralizedTriangular(
+                            Side.Left,
+                            TriangularType.Upper,
+                            Op.None,
+                            DiagonalType.Explicit,
+                            1.0f,
+                            M_FF
+                        );
                         // quickly extract result from matrix Q_F where Q_F.Cols[0] = z_F (data is shared through use of Subvector function)
                         z_F = Q_F.Cols[0].Subvector(0);
 
@@ -224,8 +244,11 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
                     for (int i = 0; i < numFreeIndices; ++i)
                     {
-                        freeToTight += math.select(0, 1,
-                            indexSetArray[F[i]] != LCPIndexFlag.ForcedFree && z_F[i] < -eps);
+                        freeToTight += math.select(
+                            0,
+                            1,
+                            indexSetArray[F[i]] != LCPIndexFlag.ForcedFree && z_F[i] < -eps
+                        );
                     }
 
                     for (int i = 0; i < numTightIndices; ++i)
@@ -383,10 +406,19 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         /// <returns>true if solution was found within the given maximum of iterations. Otherwise false.</returns>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public static bool SolveMLCP(in Matrix M, in Vector q, in Vector l, in Vector u,
+        public static bool SolveMLCP(
+            in Matrix M,
+            in Vector q,
+            in Vector l,
+            in Vector u,
             ref NativeArray<MLCPIndexFlag> indexSetArray,
-            [WriteOnly] ref Vector w, [WriteOnly] ref Vector z, bool useCholeskyFactorization = false, float eps = 1e-4f, uint maxNumIterations = 100,
-            in uint maxNumBlockIterWithoutInfeasibilityReduction = 3)
+            [WriteOnly] ref Vector w,
+            [WriteOnly] ref Vector z,
+            bool useCholeskyFactorization = false,
+            float eps = 1e-4f,
+            uint maxNumIterations = 100,
+            in uint maxNumBlockIterWithoutInfeasibilityReduction = 3
+        )
         {
             if (M.NumCols != M.NumRows)
             {
@@ -444,8 +476,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                 var L = new NativeArray<int>(dim, Allocator.Temp);
                 var U = new NativeArray<int>(dim, Allocator.Temp);
                 var F = new NativeArray<int>(dim, Allocator.Temp);
-                var pivots = useCholeskyFactorization ? default
-                    : new NativeArray<int>(dim, Allocator.Temp);
+                var pivots = useCholeskyFactorization ? default : new NativeArray<int>(dim, Allocator.Temp);
                 Vector z_F = new Vector();
                 Vector l_L = new Vector();
                 Vector u_U = new Vector();
@@ -541,7 +572,8 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         if (singularRow != -1)
                         {
                             UnityEngine.Debug.LogError(
-                                "Principal submatrix M_FF is singular and could not be factorized. Aborting.");
+                                "Principal submatrix M_FF is singular and could not be factorized. Aborting."
+                            );
                             return false;
                         }
 
@@ -568,8 +600,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         if (numUpperTightIndices > 0)
                         {
                             // add M_FU * l_U to b
-                            Matrix M_FU = M_Max.Submatrix(0, numFreeIndices + numLowerTightIndices, numFreeIndices,
-                                numUpperTightIndices);
+                            Matrix M_FU = M_Max.Submatrix(
+                                0,
+                                numFreeIndices + numLowerTightIndices,
+                                numFreeIndices,
+                                numUpperTightIndices
+                            );
                             M.CreateSubmatrix(M_FU, F, numFreeIndices, U, numUpperTightIndices);
 
                             // add M_FU * u_U to b = M_FL * l_L + q_F yielding b = M_FU * u_U + M_FL * l_L + q_F
@@ -605,13 +641,25 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // Note: At this point we have B.Col[0] = b, so we need alpha set to -1 below to set the right hand side
                         // in the linear system solve correctly to -b.
                         var alpha = -1.0f;
-                        B.SolveGeneralizedTriangular(Side.Left, TriangularType.Lower, Op.None, DiagonalType.Unit,
-                            alpha, M_FF);
+                        B.SolveGeneralizedTriangular(
+                            Side.Left,
+                            TriangularType.Lower,
+                            Op.None,
+                            DiagonalType.Unit,
+                            alpha,
+                            M_FF
+                        );
                         // Note: at this point, B contains y
 
                         // Solve U * z_F = y for z_F
-                        B.SolveGeneralizedTriangular(Side.Left, TriangularType.Upper, Op.None, DiagonalType.Explicit,
-                            1.0f, M_FF);
+                        B.SolveGeneralizedTriangular(
+                            Side.Left,
+                            TriangularType.Upper,
+                            Op.None,
+                            DiagonalType.Explicit,
+                            1.0f,
+                            M_FF
+                        );
                         // quickly extract result from matrix B where B.Cols[0] = z_F (data is shared through use of Subvector function)
                         z_F = B.Cols[0].Subvector(0);
                         M_FF.Dispose();
@@ -642,8 +690,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         }
 
                         // w_L += M_LL * l_L
-                        var M_LL = M_Max.Submatrix(numFreeIndices, numFreeIndices, numLowerTightIndices,
-                            numLowerTightIndices);
+                        var M_LL = M_Max.Submatrix(
+                            numFreeIndices,
+                            numFreeIndices,
+                            numLowerTightIndices,
+                            numLowerTightIndices
+                        );
                         M.CreateSubmatrix(M_LL, L, numLowerTightIndices, L, numLowerTightIndices);
                         w_L.ScaleAndAddProduct(M_LL, Op.None, l_L, 1.0f, 1.0f);
                         M_LL.Dispose();
@@ -651,8 +703,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // w_L += M_LU * l_U
                         if (numUpperTightIndices > 0)
                         {
-                            var M_LU = M_Max.Submatrix(numFreeIndices, numFreeIndices + numLowerTightIndices,
-                                numLowerTightIndices, numUpperTightIndices);
+                            var M_LU = M_Max.Submatrix(
+                                numFreeIndices,
+                                numFreeIndices + numLowerTightIndices,
+                                numLowerTightIndices,
+                                numUpperTightIndices
+                            );
                             M.CreateSubmatrix(M_LU, L, numLowerTightIndices, U, numUpperTightIndices);
                             w_L.ScaleAndAddProduct(M_LU, Op.None, u_U, 1.0f, 1.0f);
                             M_LU.Dispose();
@@ -673,8 +729,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // w_U += M_UF * z_F
                         if (numFreeIndices > 0)
                         {
-                            var M_UF = M_Max.Submatrix(numFreeIndices + numLowerTightIndices, 0, numUpperTightIndices,
-                                numFreeIndices);
+                            var M_UF = M_Max.Submatrix(
+                                numFreeIndices + numLowerTightIndices,
+                                0,
+                                numUpperTightIndices,
+                                numFreeIndices
+                            );
                             M.CreateSubmatrix(M_UF, U, numUpperTightIndices, F, numFreeIndices);
                             w_U.ScaleAndAddProduct(M_UF, Op.None, z_F, 1.0f, 1.0f);
                             M_UF.Dispose();
@@ -683,16 +743,24 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // w_U += M_UL * l_L
                         if (numLowerTightIndices > 0)
                         {
-                            var M_UL = M_Max.Submatrix(numFreeIndices + numLowerTightIndices, numFreeIndices,
-                                numUpperTightIndices, numLowerTightIndices);
+                            var M_UL = M_Max.Submatrix(
+                                numFreeIndices + numLowerTightIndices,
+                                numFreeIndices,
+                                numUpperTightIndices,
+                                numLowerTightIndices
+                            );
                             M.CreateSubmatrix(M_UL, U, numUpperTightIndices, L, numLowerTightIndices);
                             w_U.ScaleAndAddProduct(M_UL, Op.None, l_L, 1.0f, 1.0f);
                             M_UL.Dispose();
                         }
 
                         // w_U += M_UU * u_U
-                        var M_UU = M_Max.Submatrix(numFreeIndices + numLowerTightIndices,
-                            numFreeIndices + numLowerTightIndices, numUpperTightIndices, numUpperTightIndices);
+                        var M_UU = M_Max.Submatrix(
+                            numFreeIndices + numLowerTightIndices,
+                            numFreeIndices + numLowerTightIndices,
+                            numUpperTightIndices,
+                            numUpperTightIndices
+                        );
                         M.CreateSubmatrix(M_UU, U, numUpperTightIndices, U, numUpperTightIndices);
                         w_U.ScaleAndAddProduct(M_UU, Op.None, u_U, 1.0f, 1.0f);
                         M_UU.Dispose();
@@ -1005,12 +1073,23 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         /// <returns>Finite LCP error if a solution was found. Otherwise, float.PositiveInfinity.</returns>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public static float SolveCoupledMLCP(in Matrix M, in Vector q, ref Vector l, ref Vector u,
-            ref NativeArray<MLCPIndexFlag> indexSetArray, ref NativeList<CouplingData> couplingDataArray,
-            [WriteOnly] ref Vector w, [WriteOnly] ref Vector z, bool useCholeskyFactorization = false, float eps = 1e-4f,
+        public static float SolveCoupledMLCP(
+            in Matrix M,
+            in Vector q,
+            ref Vector l,
+            ref Vector u,
+            ref NativeArray<MLCPIndexFlag> indexSetArray,
+            ref NativeList<CouplingData> couplingDataArray,
+            [WriteOnly] ref Vector w,
+            [WriteOnly] ref Vector z,
+            bool useCholeskyFactorization = false,
+            float eps = 1e-4f,
             uint maxNumIterations = 60,
             uint maxNumBlockIterWithoutInfeasibilityReduction = 3,
-            uint maxCouplingIterations = 10, uint minNumCouplingIterations = 2, uint minNumRefinementIterations = 10)
+            uint maxCouplingIterations = 10,
+            uint minNumCouplingIterations = 2,
+            uint minNumRefinementIterations = 10
+        )
         {
             if (M.NumCols != M.NumRows)
             {
@@ -1074,8 +1153,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                 var L = new NativeArray<int>(dim, Allocator.Temp);
                 var U = new NativeArray<int>(dim, Allocator.Temp);
                 var F = new NativeArray<int>(dim, Allocator.Temp);
-                var pivots = useCholeskyFactorization ? default
-                    : new NativeArray<int>(dim, Allocator.Temp);
+                var pivots = useCholeskyFactorization ? default : new NativeArray<int>(dim, Allocator.Temp);
 
                 Vector z_F = new Vector();
                 Vector l_L = new Vector();
@@ -1172,7 +1250,8 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         if (singularRow != -1)
                         {
                             UnityEngine.Debug.LogError(
-                                "Principal submatrix M_FF is singular and could not be factorized. Aborting.");
+                                "Principal submatrix M_FF is singular and could not be factorized. Aborting."
+                            );
                             return float.PositiveInfinity;
                         }
 
@@ -1199,8 +1278,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         if (numUpperTightIndices > 0)
                         {
                             // add M_FU * l_U to b
-                            Matrix M_FU = M_Max.Submatrix(0, numFreeIndices + numLowerTightIndices, numFreeIndices,
-                                numUpperTightIndices);
+                            Matrix M_FU = M_Max.Submatrix(
+                                0,
+                                numFreeIndices + numLowerTightIndices,
+                                numFreeIndices,
+                                numUpperTightIndices
+                            );
                             M.CreateSubmatrix(M_FU, F, numFreeIndices, U, numUpperTightIndices);
 
                             // add M_FU * u_U to b = M_FL * l_L + q_F yielding b = M_FU * u_U + M_FL * l_L + q_F
@@ -1238,13 +1321,25 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                             // Note: At this point we have B.Col[0] = b, so we need alpha set to -1 below to set the right hand side
                             // in the linear system solve correctly to -b.
 
-                            B.SolveGeneralizedTriangular(Side.Left, TriangularType.Lower, Op.None, DiagonalType.Explicit,
-                                alpha: -1, M_FF);
+                            B.SolveGeneralizedTriangular(
+                                Side.Left,
+                                TriangularType.Lower,
+                                Op.None,
+                                DiagonalType.Explicit,
+                                alpha: -1,
+                                M_FF
+                            );
                             // Note: at this point, B contains y
 
                             // Solve L^t * z_F = y for z_F
-                            B.SolveGeneralizedTriangular(Side.Left, TriangularType.Lower, Op.Transpose, DiagonalType.Explicit,
-                                alpha: 1, M_FF);
+                            B.SolveGeneralizedTriangular(
+                                Side.Left,
+                                TriangularType.Lower,
+                                Op.Transpose,
+                                DiagonalType.Explicit,
+                                alpha: 1,
+                                M_FF
+                            );
                         }
                         else
                         {
@@ -1252,13 +1347,25 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                             // Note: At this point we have B.Col[0] = b, so we need alpha set to -1 below to set the right hand side
                             // in the linear system solve correctly to -b.
 
-                            B.SolveGeneralizedTriangular(Side.Left, TriangularType.Lower, Op.None, DiagonalType.Unit,
-                                alpha: -1, M_FF);
+                            B.SolveGeneralizedTriangular(
+                                Side.Left,
+                                TriangularType.Lower,
+                                Op.None,
+                                DiagonalType.Unit,
+                                alpha: -1,
+                                M_FF
+                            );
                             // Note: at this point, B contains y
 
                             // Solve U * z_F = y for z_F
-                            B.SolveGeneralizedTriangular(Side.Left, TriangularType.Upper, Op.None, DiagonalType.Explicit,
-                                alpha: 1, M_FF);
+                            B.SolveGeneralizedTriangular(
+                                Side.Left,
+                                TriangularType.Upper,
+                                Op.None,
+                                DiagonalType.Explicit,
+                                alpha: 1,
+                                M_FF
+                            );
                         }
 
                         // quickly extract result from matrix B where B.Cols[0] = z_F (data is shared through use of Subvector function)
@@ -1291,8 +1398,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         }
 
                         // w_L += M_LL * l_L
-                        var M_LL = M_Max.Submatrix(numFreeIndices, numFreeIndices, numLowerTightIndices,
-                            numLowerTightIndices);
+                        var M_LL = M_Max.Submatrix(
+                            numFreeIndices,
+                            numFreeIndices,
+                            numLowerTightIndices,
+                            numLowerTightIndices
+                        );
                         M.CreateSubmatrix(M_LL, L, numLowerTightIndices, L, numLowerTightIndices);
                         w_L.ScaleAndAddProduct(M_LL, Op.None, l_L, 1.0f, 1.0f);
                         M_LL.Dispose();
@@ -1300,8 +1411,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // w_L += M_LU * l_U
                         if (numUpperTightIndices > 0)
                         {
-                            var M_LU = M_Max.Submatrix(numFreeIndices, numFreeIndices + numLowerTightIndices,
-                                numLowerTightIndices, numUpperTightIndices);
+                            var M_LU = M_Max.Submatrix(
+                                numFreeIndices,
+                                numFreeIndices + numLowerTightIndices,
+                                numLowerTightIndices,
+                                numUpperTightIndices
+                            );
                             M.CreateSubmatrix(M_LU, L, numLowerTightIndices, U, numUpperTightIndices);
                             w_L.ScaleAndAddProduct(M_LU, Op.None, u_U, 1.0f, 1.0f);
                             M_LU.Dispose();
@@ -1322,8 +1437,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // w_U += M_UF * z_F
                         if (numFreeIndices > 0)
                         {
-                            var M_UF = M_Max.Submatrix(numFreeIndices + numLowerTightIndices, 0, numUpperTightIndices,
-                                numFreeIndices);
+                            var M_UF = M_Max.Submatrix(
+                                numFreeIndices + numLowerTightIndices,
+                                0,
+                                numUpperTightIndices,
+                                numFreeIndices
+                            );
                             M.CreateSubmatrix(in M_UF, U, numUpperTightIndices, F, numFreeIndices);
                             w_U.ScaleAndAddProduct(M_UF, Op.None, z_F, 1.0f, 1.0f);
                             M_UF.Dispose();
@@ -1332,16 +1451,24 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                         // w_U += M_UL * l_L
                         if (numLowerTightIndices > 0)
                         {
-                            var M_UL = M_Max.Submatrix(numFreeIndices + numLowerTightIndices, numFreeIndices,
-                                numUpperTightIndices, numLowerTightIndices);
+                            var M_UL = M_Max.Submatrix(
+                                numFreeIndices + numLowerTightIndices,
+                                numFreeIndices,
+                                numUpperTightIndices,
+                                numLowerTightIndices
+                            );
                             M.CreateSubmatrix(in M_UL, U, numUpperTightIndices, L, numLowerTightIndices);
                             w_U.ScaleAndAddProduct(M_UL, Op.None, l_L, 1.0f, 1.0f);
                             M_UL.Dispose();
                         }
 
                         // w_U += M_UU * u_U
-                        var M_UU = M_Max.Submatrix(numFreeIndices + numLowerTightIndices,
-                            numFreeIndices + numLowerTightIndices, numUpperTightIndices, numUpperTightIndices);
+                        var M_UU = M_Max.Submatrix(
+                            numFreeIndices + numLowerTightIndices,
+                            numFreeIndices + numLowerTightIndices,
+                            numUpperTightIndices,
+                            numUpperTightIndices
+                        );
                         M.CreateSubmatrix(in M_UU, U, numUpperTightIndices, U, numUpperTightIndices);
                         w_U.ScaleAndAddProduct(M_UU, Op.None, u_U, 1.0f, 1.0f);
                         M_UU.Dispose();
@@ -1433,8 +1560,11 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
                     // check if number of infeasibilities has reduced
                     int numInf = freeToTight + lowerTightToFree + upperTightToFree;
-                    if (numInf == 0 &&  // no more infeasibilities
-                        (couplingDataArray.IsEmpty || couplingIter + 1 > minNumCouplingIterations)) // either no need for coupling, or we spent sufficient number of coupling iterations
+                    if (
+                        numInf == 0
+                        && // no more infeasibilities
+                        (couplingDataArray.IsEmpty || couplingIter + 1 > minNumCouplingIterations)
+                    ) // either no need for coupling, or we spent sufficient number of coupling iterations
                     {
                         // No more infeasibilities. We found a solution.
 
@@ -1620,7 +1750,11 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
                         // update the coupled bounds and force the variables to be in the free set so that we can solve for
                         // these variables again within their updated bounds
-                        if ((minError < eps || improvedSolution) && couplingIter < maxCouplingIterations && maxNumIterations - iter > minNumRefinementIterations)
+                        if (
+                            (minError < eps || improvedSolution)
+                            && couplingIter < maxCouplingIterations
+                            && maxNumIterations - iter > minNumRefinementIterations
+                        )
                         {
                             ++couplingIter;
 
@@ -1665,8 +1799,10 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                                         // current index flag
                                         var indexFlag = indexSetArray[coupledVariableIndex];
 
-                                        if ((indexFlag == MLCPIndexFlag.LowerTight && newLower < oldLower) ||
-                                            indexFlag == MLCPIndexFlag.UpperTight && newUpper > oldUpper)
+                                        if (
+                                            (indexFlag == MLCPIndexFlag.LowerTight && newLower < oldLower)
+                                            || indexFlag == MLCPIndexFlag.UpperTight && newUpper > oldUpper
+                                        )
                                         {
                                             indexSetArray[coupledVariableIndex] = MLCPIndexFlag.Free;
                                         }

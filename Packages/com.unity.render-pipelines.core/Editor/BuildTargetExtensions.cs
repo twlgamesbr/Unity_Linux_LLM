@@ -1,6 +1,6 @@
-using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -48,9 +48,11 @@ namespace UnityEditor.Rendering
                         foreach (var scene in EditorBuildSettings.scenes)
                             if (scene.enabled)
                                 scenesPaths.Add(scene.path);
-                    
+
                         // Get all enabled scenes path in the build settings.
-                        HashSet<string> depsHash = new HashSet<string>(AssetDatabase.GetDependencies(scenesPaths.ToArray()));
+                        HashSet<string> depsHash = new HashSet<string>(
+                            AssetDatabase.GetDependencies(scenesPaths.ToArray())
+                        );
                         for (int i = 0; i < assetsPaths.Count; ++i)
                         {
                             var assetPath = assetsPaths[i];
@@ -90,9 +92,14 @@ namespace UnityEditor.Rendering
             var activeBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
             var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(activeBuildTargetGroup);
 
-            QualitySettings.GetRenderPipelineAssetsForPlatform<T>(namedBuildTarget.TargetName, out var buildPipelineAssets, out var allQualityLevelsAreOverriden);
+            QualitySettings.GetRenderPipelineAssetsForPlatform<T>(
+                namedBuildTarget.TargetName,
+                out var buildPipelineAssets,
+                out var allQualityLevelsAreOverriden
+            );
 
-            bool noQualityLevels = QualitySettings.GetActiveQualityLevelsForPlatformCount(namedBuildTarget.TargetName) == 0;
+            bool noQualityLevels =
+                QualitySettings.GetActiveQualityLevelsForPlatformCount(namedBuildTarget.TargetName) == 0;
             if (noQualityLevels || !allQualityLevelsAreOverriden)
             {
                 // We need to check the fallback cases
@@ -102,7 +109,7 @@ namespace UnityEditor.Rendering
 
             if (buildPipelineAssets.Count != 0)
                 AddAdditionalRenderPipelineAssetsIncludedForBuild(buildPipelineAssets);
-            
+
             srpAssets.AddRange(buildPipelineAssets);
             return srpAssets.Count != 0;
         }

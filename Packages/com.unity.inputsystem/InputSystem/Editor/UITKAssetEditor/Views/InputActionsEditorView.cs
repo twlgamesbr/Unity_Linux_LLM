@@ -12,6 +12,7 @@ namespace UnityEngine.InputSystem.Editor
     {
         void OnPaste(InputActionsEditorState state);
     }
+
     internal class InputActionsEditorView : ViewBase<InputActionsEditorView.ViewState>, IPasteListener
     {
         private const string saveButtonId = "save-asset-toolbar-button";
@@ -26,16 +27,21 @@ namespace UnityEngine.InputSystem.Editor
 
         private ControlSchemesView m_ControlSchemesView;
 
-        public InputActionsEditorView(VisualElement root, StateContainer stateContainer, bool isProjectSettings,
-                                      Action saveAction)
+        public InputActionsEditorView(
+            VisualElement root,
+            StateContainer stateContainer,
+            bool isProjectSettings,
+            Action saveAction
+        )
             : base(root, stateContainer)
         {
             m_SaveAction = saveAction;
 
             var mainEditorAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                InputActionsEditorConstants.PackagePath +
-                InputActionsEditorConstants.ResourcesPath +
-                InputActionsEditorConstants.MainEditorViewNameUxml);
+                InputActionsEditorConstants.PackagePath
+                    + InputActionsEditorConstants.ResourcesPath
+                    + InputActionsEditorConstants.MainEditorViewNameUxml
+            );
 
             mainEditorAsset.CloneTree(root);
             var actionsTreeView = new ActionsTreeView(root, stateContainer);
@@ -45,9 +51,21 @@ namespace UnityEngine.InputSystem.Editor
 
             m_ControlSchemesToolbar = root.Q<ToolbarMenu>("control-schemes-toolbar-menu");
             m_ControlSchemesToolbar.menu.AppendAction("Add Control Scheme...", _ => AddOrUpdateControlScheme(root));
-            m_ControlSchemesToolbar.menu.AppendAction("Edit Control Scheme...", _ => AddOrUpdateControlScheme(root, true), DropdownMenuAction.Status.Disabled);
-            m_ControlSchemesToolbar.menu.AppendAction("Duplicate Control Scheme...", _ => DuplicateControlScheme(root), DropdownMenuAction.Status.Disabled);
-            m_ControlSchemesToolbar.menu.AppendAction("Delete Control Scheme...", DeleteControlScheme, DropdownMenuAction.Status.Disabled);
+            m_ControlSchemesToolbar.menu.AppendAction(
+                "Edit Control Scheme...",
+                _ => AddOrUpdateControlScheme(root, true),
+                DropdownMenuAction.Status.Disabled
+            );
+            m_ControlSchemesToolbar.menu.AppendAction(
+                "Duplicate Control Scheme...",
+                _ => DuplicateControlScheme(root),
+                DropdownMenuAction.Status.Disabled
+            );
+            m_ControlSchemesToolbar.menu.AppendAction(
+                "Delete Control Scheme...",
+                DeleteControlScheme,
+                DropdownMenuAction.Status.Disabled
+            );
 
             m_DevicesToolbar = root.Q<ToolbarMenu>("control-schemes-filter-toolbar-menu");
             m_DevicesToolbar.SetEnabled(false);
@@ -77,18 +95,23 @@ namespace UnityEngine.InputSystem.Editor
                 // This only exists in the project settings version
                 assetMenuButton = root.Q<VisualElement>(name: menuButtonId);
             }
-            catch {}
+            catch { }
 
             if (assetMenuButton != null)
             {
                 assetMenuButton.visible = isProjectSettings;
-                assetMenuButton.AddToClassList(EditorGUIUtility.isProSkin ? "asset-menu-button-dark-theme" : "asset-menu-button");
+                assetMenuButton.AddToClassList(
+                    EditorGUIUtility.isProSkin ? "asset-menu-button-dark-theme" : "asset-menu-button"
+                );
                 var _ = new ContextualMenuManipulator(menuEvent =>
                 {
                     menuEvent.menu.AppendAction("Reset to Defaults", _ => OnReset());
                     menuEvent.menu.AppendAction("Remove All Action Maps", _ => OnClearActionMaps());
                 })
-                { target = assetMenuButton, activators = { new ManipulatorActivationFilter() { button = MouseButton.LeftMouse } } };
+                {
+                    target = assetMenuButton,
+                    activators = { new ManipulatorActivationFilter() { button = MouseButton.LeftMouse } },
+                };
             }
 
             // only register the state changed event here in the parent. Changes will be cascaded
@@ -98,12 +121,14 @@ namespace UnityEngine.InputSystem.Editor
             CreateSelector(
                 s => s.selectedControlSchemeIndex,
                 s => new ViewStateCollection<InputControlScheme>(Selectors.GetControlSchemes(s)),
-                (_, controlSchemes, state) => new ViewState
-                {
-                    controlSchemes = controlSchemes,
-                    selectedControlSchemeIndex = state.selectedControlSchemeIndex,
-                    selectedDeviceIndex = state.selectedDeviceRequirementIndex
-                });
+                (_, controlSchemes, state) =>
+                    new ViewState
+                    {
+                        controlSchemes = controlSchemes,
+                        selectedControlSchemeIndex = state.selectedControlSchemeIndex,
+                        selectedDeviceIndex = state.selectedDeviceRequirementIndex,
+                    }
+            );
 
             s_OnPasteCutElements.Add(this);
 
@@ -170,24 +195,57 @@ namespace UnityEngine.InputSystem.Editor
 
             if (viewState.controlSchemes.Any())
             {
-                var elementAtOrDefault = viewState.controlSchemes.ElementAtOrDefault(viewState.selectedControlSchemeIndex);
-                m_ControlSchemesToolbar.text = elementAtOrDefault == default ? "All Control Schemes" : elementAtOrDefault.name;
+                var elementAtOrDefault = viewState.controlSchemes.ElementAtOrDefault(
+                    viewState.selectedControlSchemeIndex
+                );
+                m_ControlSchemesToolbar.text =
+                    elementAtOrDefault == default ? "All Control Schemes" : elementAtOrDefault.name;
 
-                m_ControlSchemesToolbar.menu.AppendAction("All Control Schemes", _ => SelectControlScheme(-1),
-                    viewState.selectedControlSchemeIndex == -1 ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal);
-                viewState.controlSchemes.ForEach((scheme, i) =>
-                    m_ControlSchemesToolbar.menu.AppendAction(SetupControlSchemeName(scheme.name), _ => SelectControlScheme(i),
-                        viewState.selectedControlSchemeIndex == i ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal));
+                m_ControlSchemesToolbar.menu.AppendAction(
+                    "All Control Schemes",
+                    _ => SelectControlScheme(-1),
+                    viewState.selectedControlSchemeIndex == -1
+                        ? DropdownMenuAction.Status.Checked
+                        : DropdownMenuAction.Status.Normal
+                );
+                viewState.controlSchemes.ForEach(
+                    (scheme, i) =>
+                        m_ControlSchemesToolbar.menu.AppendAction(
+                            SetupControlSchemeName(scheme.name),
+                            _ => SelectControlScheme(i),
+                            viewState.selectedControlSchemeIndex == i
+                                ? DropdownMenuAction.Status.Checked
+                                : DropdownMenuAction.Status.Normal
+                        )
+                );
                 m_ControlSchemesToolbar.menu.AppendSeparator();
             }
 
-            m_ControlSchemesToolbar.menu.AppendAction("Add Control Scheme...", _ => AddOrUpdateControlScheme(rootElement));
-            m_ControlSchemesToolbar.menu.AppendAction("Edit Control Scheme...", _ => AddOrUpdateControlScheme(rootElement, true),
-                viewState.selectedControlSchemeIndex != -1 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            m_ControlSchemesToolbar.menu.AppendAction("Duplicate Control Scheme...", _ => DuplicateControlScheme(rootElement),
-                viewState.selectedControlSchemeIndex != -1 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            m_ControlSchemesToolbar.menu.AppendAction("Delete Control Scheme...", DeleteControlScheme,
-                viewState.selectedControlSchemeIndex != -1 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
+            m_ControlSchemesToolbar.menu.AppendAction(
+                "Add Control Scheme...",
+                _ => AddOrUpdateControlScheme(rootElement)
+            );
+            m_ControlSchemesToolbar.menu.AppendAction(
+                "Edit Control Scheme...",
+                _ => AddOrUpdateControlScheme(rootElement, true),
+                viewState.selectedControlSchemeIndex != -1
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled
+            );
+            m_ControlSchemesToolbar.menu.AppendAction(
+                "Duplicate Control Scheme...",
+                _ => DuplicateControlScheme(rootElement),
+                viewState.selectedControlSchemeIndex != -1
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled
+            );
+            m_ControlSchemesToolbar.menu.AppendAction(
+                "Delete Control Scheme...",
+                DeleteControlScheme,
+                viewState.selectedControlSchemeIndex != -1
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled
+            );
         }
 
         private void SetUpDevicesMenu(ViewState viewState)
@@ -199,25 +257,35 @@ namespace UnityEngine.InputSystem.Editor
                 return;
             }
             m_DevicesToolbar.SetEnabled(true);
-            var currentControlScheme = viewState.controlSchemes.ElementAtOrDefault(viewState.selectedControlSchemeIndex);
+            var currentControlScheme = viewState.controlSchemes.ElementAtOrDefault(
+                viewState.selectedControlSchemeIndex
+            );
             if (viewState.selectedDeviceIndex == -1)
                 m_DevicesToolbar.text = "All Devices";
 
             m_DevicesToolbar.menu.MenuItems().Clear();
-            m_DevicesToolbar.menu.AppendAction("All Devices", _ => SelectDevice(-1), viewState.selectedDeviceIndex == -1
-                ? DropdownMenuAction.Status.Checked
-                : DropdownMenuAction.Status.Normal);
+            m_DevicesToolbar.menu.AppendAction(
+                "All Devices",
+                _ => SelectDevice(-1),
+                viewState.selectedDeviceIndex == -1
+                    ? DropdownMenuAction.Status.Checked
+                    : DropdownMenuAction.Status.Normal
+            );
             currentControlScheme.deviceRequirements.ForEach(
                 (device, i) =>
                 {
                     InputControlPath.ToHumanReadableString(device.controlPath, out var name, out _);
-                    m_DevicesToolbar.menu.AppendAction(name, _ => SelectDevice(i),
+                    m_DevicesToolbar.menu.AppendAction(
+                        name,
+                        _ => SelectDevice(i),
                         viewState.selectedDeviceIndex == i
-                        ? DropdownMenuAction.Status.Checked
-                        : DropdownMenuAction.Status.Normal);
+                            ? DropdownMenuAction.Status.Checked
+                            : DropdownMenuAction.Status.Normal
+                    );
                     if (viewState.selectedDeviceIndex == i)
                         m_DevicesToolbar.text = name;
-                });
+                }
+            );
         }
 
         private void AddOrUpdateControlScheme(VisualElement parent, bool updateExisting = false)

@@ -32,6 +32,5 @@ namespace Unity.Multiplayer.Tools.MetricTypes
                 return networkIDHash + bytesCountHash + connectionHash;
             }
         }
-
     }
 }

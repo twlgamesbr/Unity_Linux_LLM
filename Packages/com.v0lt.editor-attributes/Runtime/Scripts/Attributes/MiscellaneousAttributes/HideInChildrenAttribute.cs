@@ -14,6 +14,7 @@ namespace EditorAttributes
         /// Attribute to hide the inherited field in child classes
         /// </summary>
         /// <param name="childTypes">The field will be hidden only in these child classes</param>
-        public HideInChildrenAttribute(params Type[] childTypes) : base(true) => ChildTypes = childTypes;
+        public HideInChildrenAttribute(params Type[] childTypes)
+            : base(true) => ChildTypes = childTypes;
     }
 }

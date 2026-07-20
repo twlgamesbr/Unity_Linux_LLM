@@ -8,7 +8,9 @@ namespace Unity.RenderPipelines.Core.Runtime.Shared
         internal static bool TryMigrateRenderingLayersToTagManager<T>(string[] renderingLayerNames)
             where T : RenderPipeline
         {
-            return Bridge.RenderPipelineEditorUtilityBridge.TryMigrateRenderingLayersToTagManager<T>(renderingLayerNames);
+            return Bridge.RenderPipelineEditorUtilityBridge.TryMigrateRenderingLayersToTagManager<T>(
+                renderingLayerNames
+            );
         }
 
         internal static void ClearMigratedRenderPipelines()

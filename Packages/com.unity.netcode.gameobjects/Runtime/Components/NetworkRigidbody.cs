@@ -14,7 +14,6 @@ namespace Unity.Netcode.Components
     [HelpURL(HelpUrls.NetworkRigidbody)]
     public class NetworkRigidbody : NetworkRigidbodyBase
     {
-
         public Rigidbody Rigidbody => m_InternalRigidbody;
 
         protected virtual void Awake()

@@ -9,7 +9,8 @@ namespace UnityEngine.TestTools
     [Serializable]
     internal class BeforeAfterTestCommandState
     {
-        private const BindingFlags Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+        private const BindingFlags Flags =
+            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         public int NextBeforeStepIndex;
         public int NextBeforeStepPc;
         public int NextAfterStepIndex;
@@ -67,7 +68,11 @@ namespace UnityEngine.TestTools
             stringBuilder.Append(Output);
             context.StartTicks = StartTicks;
             context.StartTime = DateTime.FromOADate(StartTimeOA);
-            context.CurrentResult.SetResult(new ResultState(CurrentTestResultStatus, CurrentTestResultLabel, CurrentTestResultSite), CurrentTestMessage, CurrentTestStrackTrace);
+            context.CurrentResult.SetResult(
+                new ResultState(CurrentTestResultStatus, CurrentTestResultLabel, CurrentTestResultSite),
+                CurrentTestMessage,
+                CurrentTestStrackTrace
+            );
             ShouldRestore = false;
         }
     }

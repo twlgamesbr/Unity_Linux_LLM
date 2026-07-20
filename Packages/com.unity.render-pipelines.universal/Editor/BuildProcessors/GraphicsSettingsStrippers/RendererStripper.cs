@@ -15,7 +15,7 @@ namespace UnityEditor.Rendering
             foreach (var urpAssetForBuild in URPBuildData.instance.renderPipelineAssets)
             {
                 // UUM-57954: Use RendererData rather than Renderer which may be null during the build in some circumstances
-                foreach(var rendererData in urpAssetForBuild.m_RendererDataList)
+                foreach (var rendererData in urpAssetForBuild.m_RendererDataList)
                     if (rendererData is S)
                         return false;
             }
@@ -25,5 +25,6 @@ namespace UnityEditor.Rendering
     }
 
     class UniversalRendererResourcesStripper : RendererStripper<UniversalRendererResources, UniversalRendererData> { }
+
     class Renderer2DResourcesStripper : RendererStripper<Renderer2DResources, Renderer2DData> { }
 }

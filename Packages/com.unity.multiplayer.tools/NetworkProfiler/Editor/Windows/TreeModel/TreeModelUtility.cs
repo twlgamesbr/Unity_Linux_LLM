@@ -36,7 +36,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             "NamedMessage",
             "UnnamedMessage",
             "SceneEventMessage",
-            "ServerLogMessage"
+            "ServerLogMessage",
         };
 
         public static TreeModel CreateMessagesTreeStructure(MetricCollection metrics)
@@ -49,25 +49,35 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             return new TreeModelBuilder(metrics)
                 .AddUnderConnection(
                     MetricType.NamedMessage,
-                    (NamedMessageEvent metric, TreeModelNode node)
-                        => new NamedMessageEventViewModel(metric.TreeViewId, metric.Name.ToString(), node.RowData))
+                    (NamedMessageEvent metric, TreeModelNode node) =>
+                        new NamedMessageEventViewModel(metric.TreeViewId, metric.Name.ToString(), node.RowData)
+                )
                 .AddUnderConnection(
                     MetricType.UnnamedMessage,
-                    (UnnamedMessageEvent metric, TreeModelNode node)
-                        => new UnnamedMessageEventViewModel(metric.TreeViewId, node.RowData))
+                    (UnnamedMessageEvent metric, TreeModelNode node) =>
+                        new UnnamedMessageEventViewModel(metric.TreeViewId, node.RowData)
+                )
                 .AddUnderConnection(
                     MetricType.SceneEvent,
-                    (SceneEventMetric metric, TreeModelNode node)
-                        => new SceneEventViewModel(metric.TreeViewId, metric.SceneName.ToString(), metric.SceneEventType.ToString(), node.RowData))
+                    (SceneEventMetric metric, TreeModelNode node) =>
+                        new SceneEventViewModel(
+                            metric.TreeViewId,
+                            metric.SceneName.ToString(),
+                            metric.SceneEventType.ToString(),
+                            node.RowData
+                        )
+                )
                 .AddUnderConnection(
                     MetricType.ServerLog,
-                    (ServerLogEvent metric, TreeModelNode node)
-                        => new ServerLogEventViewModel(metric.TreeViewId, metric.LogLevel, node.RowData))
+                    (ServerLogEvent metric, TreeModelNode node) =>
+                        new ServerLogEventViewModel(metric.TreeViewId, metric.LogLevel, node.RowData)
+                )
                 .AddUnderConnection(
                     MetricType.NetworkMessage,
-                    (NetworkMessageEvent metric, TreeModelNode node)
-                        => new NetworkMessageEventViewModel(metric.TreeViewId, metric.Name.ToString(), node.RowData),
-                    metric => !k_ExcludedNetworkMessageTypeNames.Contains(metric.Name.ToString()))
+                    (NetworkMessageEvent metric, TreeModelNode node) =>
+                        new NetworkMessageEventViewModel(metric.TreeViewId, metric.Name.ToString(), node.RowData),
+                    metric => !k_ExcludedNetworkMessageTypeNames.Contains(metric.Name.ToString())
+                )
                 .Build();
         }
 
@@ -79,32 +89,41 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             }
 
             return new TreeModelBuilder(metrics)
-
                 .AddUnderNetworkObject(
                     MetricType.ObjectSpawned,
-                    (ObjectSpawnedEvent metric, TreeModelNode node)
-                        => new SpawnEventViewModel(metric.TreeViewId, metric.NetworkId, node.RowData))
-
+                    (ObjectSpawnedEvent metric, TreeModelNode node) =>
+                        new SpawnEventViewModel(metric.TreeViewId, metric.NetworkId, node.RowData)
+                )
                 .AddUnderNetworkObject(
                     MetricType.ObjectDestroyed,
-                    (ObjectDestroyedEvent metric, TreeModelNode node)
-                        => new DestroyEventViewModel(metric.TreeViewId, node.RowData))
-
+                    (ObjectDestroyedEvent metric, TreeModelNode node) =>
+                        new DestroyEventViewModel(metric.TreeViewId, node.RowData)
+                )
                 .AddUnderNetworkObject(
                     MetricType.OwnershipChange,
-                    (OwnershipChangeEvent metric, TreeModelNode node)
-                        => new OwnershipChangeEventViewModel(metric.TreeViewId, node.RowData))
-
+                    (OwnershipChangeEvent metric, TreeModelNode node) =>
+                        new OwnershipChangeEventViewModel(metric.TreeViewId, node.RowData)
+                )
                 .AddUnderNetworkObject(
                     MetricType.Rpc,
-                    (RpcEvent metric, TreeModelNode node)
-                        => new RpcEventViewModel(metric.TreeViewId, metric.NetworkBehaviourName.ToString(), metric.Name.ToString(), node.RowData))
-
+                    (RpcEvent metric, TreeModelNode node) =>
+                        new RpcEventViewModel(
+                            metric.TreeViewId,
+                            metric.NetworkBehaviourName.ToString(),
+                            metric.Name.ToString(),
+                            node.RowData
+                        )
+                )
                 .AddUnderNetworkObject(
                     MetricType.NetworkVariableDelta,
-                    (NetworkVariableEvent metric, TreeModelNode node)
-                        => new NetworkVariableEventViewModel(metric.TreeViewId, metric.NetworkBehaviourName.ToString(), metric.Name.ToString(), node.RowData))
-
+                    (NetworkVariableEvent metric, TreeModelNode node) =>
+                        new NetworkVariableEventViewModel(
+                            metric.TreeViewId,
+                            metric.NetworkBehaviourName.ToString(),
+                            metric.Name.ToString(),
+                            node.RowData
+                        )
+                )
                 .Build();
         }
     }

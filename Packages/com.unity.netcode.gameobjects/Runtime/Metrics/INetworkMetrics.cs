@@ -16,7 +16,11 @@ namespace Unity.Netcode
 
         public void TrackNamedMessageSent(ulong receiverClientId, string messageName, long bytesCount);
 
-        public void TrackNamedMessageSent(IReadOnlyCollection<ulong> receiverClientIds, string messageName, long bytesCount);
+        public void TrackNamedMessageSent(
+            IReadOnlyCollection<ulong> receiverClientIds,
+            string messageName,
+            long bytesCount
+        );
 
         public void TrackNamedMessageReceived(ulong senderClientId, string messageName, long bytesCount);
 
@@ -31,14 +35,16 @@ namespace Unity.Netcode
             NetworkObject networkObject,
             string variableName,
             string networkBehaviourName,
-            long bytesCount);
+            long bytesCount
+        );
 
         public void TrackNetworkVariableDeltaReceived(
             ulong senderClientId,
             NetworkObject networkObject,
             string variableName,
             string networkBehaviourName,
-            long bytesCount);
+            long bytesCount
+        );
 
         public void TrackOwnershipChangeSent(ulong receiverClientId, NetworkObject networkObject, long bytesCount);
 
@@ -57,31 +63,44 @@ namespace Unity.Netcode
             NetworkObject networkObject,
             string rpcName,
             string networkBehaviourName,
-            long bytesCount);
+            long bytesCount
+        );
 
         public void TrackRpcSent(
             ulong[] receiverClientIds,
             NetworkObject networkObject,
             string rpcName,
             string networkBehaviourName,
-            long bytesCount);
+            long bytesCount
+        );
 
         public void TrackRpcReceived(
             ulong senderClientId,
             NetworkObject networkObject,
             string rpcName,
             string networkBehaviourName,
-            long bytesCount);
+            long bytesCount
+        );
 
         public void TrackServerLogSent(ulong receiverClientId, uint logType, long bytesCount);
 
         public void TrackServerLogReceived(ulong senderClientId, uint logType, long bytesCount);
 
-        public void TrackSceneEventSent(IReadOnlyList<ulong> receiverClientIds, uint sceneEventType, string sceneName, long bytesCount);
+        public void TrackSceneEventSent(
+            IReadOnlyList<ulong> receiverClientIds,
+            uint sceneEventType,
+            string sceneName,
+            long bytesCount
+        );
 
         public void TrackSceneEventSent(ulong receiverClientId, uint sceneEventType, string sceneName, long bytesCount);
 
-        public void TrackSceneEventReceived(ulong senderClientId, uint sceneEventType, string sceneName, long bytesCount);
+        public void TrackSceneEventReceived(
+            ulong senderClientId,
+            uint sceneEventType,
+            string sceneName,
+            long bytesCount
+        );
 
         public void TrackPacketSent(uint packetCount);
 

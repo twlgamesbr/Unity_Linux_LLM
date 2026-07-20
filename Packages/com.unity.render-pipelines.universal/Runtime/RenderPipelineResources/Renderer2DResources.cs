@@ -7,7 +7,9 @@ namespace UnityEngine.Rendering.Universal
     [Categorization.CategoryInfo(Name = "R: 2D Renderer", Order = 1000), HideInInspector]
     class Renderer2DResources : IRenderPipelineResources
     {
-        [SerializeField][HideInInspector] private int m_Version = 0;
+        [SerializeField]
+        [HideInInspector]
+        private int m_Version = 0;
 
         /// <summary>Version of the resource. </summary>
         public int version => m_Version;
@@ -65,7 +67,7 @@ namespace UnityEngine.Rendering.Universal
             set => this.SetValueAndNotify(ref m_GeometryUnshadowShader, value, nameof(m_GeometryUnshadowShader));
         }
 
-        [SerializeField,ResourcePath("Shaders/Utils/CopyDepth.shader")]
+        [SerializeField, ResourcePath("Shaders/Utils/CopyDepth.shader")]
         private Shader m_CopyDepthPS;
 
         /// <summary>
@@ -101,8 +103,6 @@ namespace UnityEngine.Rendering.Universal
             get => m_DefaultMaskMaterial;
             set => this.SetValueAndNotify(ref m_DefaultMaskMaterial, value, nameof(m_DefaultMaskMaterial));
         }
-
-
 
         [SerializeField, ResourcePath("Runtime/Materials/Mesh2D-Lit-Default.mat")]
         Material m_DefaultMesh2DLitMaterial = null;

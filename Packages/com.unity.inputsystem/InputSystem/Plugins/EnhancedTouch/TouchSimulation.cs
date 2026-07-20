@@ -32,9 +32,9 @@ namespace UnityEngine.InputSystem.EnhancedTouch
     [AddComponentMenu("Input/Debug/Touch Simulation")]
     [ExecuteInEditMode]
     [HelpURL(InputSystem.kDocUrl + "/manual/Touch.html#touch-simulation")]
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     [InitializeOnLoad]
-    #endif
+#endif
     public class TouchSimulation : MonoBehaviour, IInputStateChangeMonitor
     {
         public Touchscreen simulatedTouchscreen { get; private set; }
@@ -168,12 +168,23 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                     if (positionStatePtr != null)
                         UpdateTouch(i, pointerIndex, TouchPhase.Moved, eventPtr);
                 }
-                else if (button.ReadValueFromState(buttonStatePtr) < (ButtonControl.s_GlobalDefaultButtonPressPoint * ButtonControl.s_GlobalDefaultButtonReleaseThreshold))
+                else if (
+                    button.ReadValueFromState(buttonStatePtr)
+                    < (
+                        ButtonControl.s_GlobalDefaultButtonPressPoint
+                        * ButtonControl.s_GlobalDefaultButtonReleaseThreshold
+                    )
+                )
                     UpdateTouch(i, pointerIndex, TouchPhase.Ended, eventPtr);
             }
 
             // Add/update touches for buttons that are pressed.
-            foreach (var control in eventPtr.EnumerateControls(InputControlExtensions.Enumerate.IgnoreControlsInDefaultState, device))
+            foreach (
+                var control in eventPtr.EnumerateControls(
+                    InputControlExtensions.Enumerate.IgnoreControlsInDefaultState,
+                    device
+                )
+            )
             {
                 if (!control.isButton)
                     continue;
@@ -291,10 +302,18 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             InputSystem.onEvent -= m_OnEvent;
         }
 
-        private unsafe void UpdateTouch(int touchIndex, int pointerIndex, TouchPhase phase, InputEventPtr eventPtr = default)
+        private unsafe void UpdateTouch(
+            int touchIndex,
+            int pointerIndex,
+            TouchPhase phase,
+            InputEventPtr eventPtr = default
+        )
         {
             Vector2 position = m_CurrentPositions[pointerIndex];
-            Debug.Assert(m_CurrentDisplayIndices[pointerIndex] <= byte.MaxValue, "Display index was larger than expected");
+            Debug.Assert(
+                m_CurrentDisplayIndices[pointerIndex] <= byte.MaxValue,
+                "Display index was larger than expected"
+            );
             byte displayIndex = (byte)m_CurrentDisplayIndices[pointerIndex];
 
             // We need to partially set TouchState in a similar way that the Native side would do, but deriving that
@@ -304,7 +323,7 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             {
                 phase = phase,
                 position = position,
-                displayIndex = displayIndex
+                displayIndex = displayIndex,
             };
 
             if (phase == TouchPhase.Began)
@@ -328,27 +347,42 @@ namespace UnityEngine.InputSystem.EnhancedTouch
             }
         }
 
-        [NonSerialized] private int m_NumPointers;
-        [NonSerialized] private Pointer[] m_Pointers;
-        [NonSerialized] private Vector2[] m_CurrentPositions;
-        [NonSerialized] private int[] m_CurrentDisplayIndices;
-        [NonSerialized] private ButtonControl[] m_Touches;
-        [NonSerialized] private int[] m_TouchIds;
+        [NonSerialized]
+        private int m_NumPointers;
 
-        [NonSerialized] private int m_LastTouchId;
-        [NonSerialized] private Action<InputDevice, InputDeviceChange> m_OnDeviceChange;
-        [NonSerialized] private Action<InputEventPtr, InputDevice> m_OnEvent;
+        [NonSerialized]
+        private Pointer[] m_Pointers;
+
+        [NonSerialized]
+        private Vector2[] m_CurrentPositions;
+
+        [NonSerialized]
+        private int[] m_CurrentDisplayIndices;
+
+        [NonSerialized]
+        private ButtonControl[] m_Touches;
+
+        [NonSerialized]
+        private int[] m_TouchIds;
+
+        [NonSerialized]
+        private int m_LastTouchId;
+
+        [NonSerialized]
+        private Action<InputDevice, InputDeviceChange> m_OnDeviceChange;
+
+        [NonSerialized]
+        private Action<InputEventPtr, InputDevice> m_OnEvent;
 
         internal static TouchSimulation s_Instance;
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         static TouchSimulation()
         {
             // We're a MonoBehaviour so our cctor may get called as part of the MonoBehaviour being
             // created. We don't want to trigger InputSystem initialization from there so delay-execute
             // the code here.
-            EditorApplication.delayCall +=
-                () =>
+            EditorApplication.delayCall += () =>
             {
                 InputSystem.onSettingsChange += OnSettingsChanged;
                 InputSystem.onBeforeUpdate += ReEnableAfterDomainReload;
@@ -377,35 +411,38 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                 new InputComponentEditorAnalytic(InputSystemComponent.TouchSimulation).Send();
             }
         }
-
-        #endif // UNITY_EDITOR
+#endif // UNITY_EDITOR
 
         ////TODO: Remove IInputStateChangeMonitor from this class when we can break the API
-        void IInputStateChangeMonitor.NotifyControlStateChanged(InputControl control, double time, InputEventPtr eventPtr, long monitorIndex)
-        {
-        }
+        void IInputStateChangeMonitor.NotifyControlStateChanged(
+            InputControl control,
+            double time,
+            InputEventPtr eventPtr,
+            long monitorIndex
+        ) { }
 
-        void IInputStateChangeMonitor.NotifyTimerExpired(InputControl control, double time, long monitorIndex, int timerIndex)
-        {
-        }
+        void IInputStateChangeMonitor.NotifyTimerExpired(
+            InputControl control,
+            double time,
+            long monitorIndex,
+            int timerIndex
+        ) { }
 
         // Disable warnings about unused parameters.
-        #pragma warning disable CA1801
+#pragma warning disable CA1801
 
         ////TODO: [Obsolete]
-        protected void InstallStateChangeMonitors(int startIndex = 0)
-        {
-        }
+        protected void InstallStateChangeMonitors(int startIndex = 0) { }
 
         ////TODO: [Obsolete]
-        protected void OnSourceControlChangedValue(InputControl control, double time, InputEventPtr eventPtr,
-            long sourceDeviceAndButtonIndex)
-        {
-        }
+        protected void OnSourceControlChangedValue(
+            InputControl control,
+            double time,
+            InputEventPtr eventPtr,
+            long sourceDeviceAndButtonIndex
+        ) { }
 
         ////TODO: [Obsolete]
-        protected void UninstallStateChangeMonitors(int startIndex = 0)
-        {
-        }
+        protected void UninstallStateChangeMonitors(int startIndex = 0) { }
     }
 }

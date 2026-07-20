@@ -2,24 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Initialization
 {
     [Serializable]
@@ -60,13 +59,23 @@ namespace NPCSystem.Initialization
 
         [SerializeField, HideProperty, FormerlySerializedAs("authService")]
         PlayerAuthService _authService;
+
         /// <summary>Public accessor (used by tests).</summary>
-        public PlayerAuthService AuthService { get => _authService; set => _authService = value; }
+        public PlayerAuthService AuthService
+        {
+            get => _authService;
+            set => _authService = value;
+        }
 
         [SerializeField, HideProperty, FormerlySerializedAs("DialogueManager")]
         NPCDialogueManager _dialogueManager;
+
         /// <summary>Public accessor (used by tests).</summary>
-        public NPCDialogueManager DialogueManager { get => _dialogueManager; set => _dialogueManager = value; }
+        public NPCDialogueManager DialogueManager
+        {
+            get => _dialogueManager;
+            set => _dialogueManager = value;
+        }
 
         [FoldoutGroup(
             "Probe Targets",
@@ -128,8 +137,7 @@ namespace NPCSystem.Initialization
         [SerializeField]
         long lastProbeDurationMs;
 
-        public NPCBackendReadinessSnapshot LastSnapshot { get; private set; } =
-            new NPCBackendReadinessSnapshot();
+        public NPCBackendReadinessSnapshot LastSnapshot { get; private set; } = new NPCBackendReadinessSnapshot();
 
         [ShowInInspector]
         string AuthProbePreview => BuildAuthProbeUrl();
@@ -160,13 +168,10 @@ namespace NPCSystem.Initialization
 
             if (_dialogueManager == null)
             {
-                _dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
-                    FindObjectsInactive.Include
-                );
+                _dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
             }
 
-            lastReadinessStatus =
-                $"References assigned. auth={AuthProbePreview} localai={LocalAiProbePreview}";
+            lastReadinessStatus = $"References assigned. auth={AuthProbePreview} localai={LocalAiProbePreview}";
         }
 
         [Button("Probe Backends")]
@@ -209,11 +214,7 @@ namespace NPCSystem.Initialization
                 }
             );
 
-            var authResult = await ProbeEndpointAsync(
-                "AuthBackend",
-                AuthProbePreview,
-                allowHttpErrorAsReachable: true
-            );
+            var authResult = await ProbeEndpointAsync("AuthBackend", AuthProbePreview, allowHttpErrorAsReachable: true);
             NPCBackendProbeResult localAiResult;
 
             if (probeLocalAi)
@@ -237,11 +238,7 @@ namespace NPCSystem.Initialization
                 };
             }
 
-            var snapshot = new NPCBackendReadinessSnapshot
-            {
-                auth = authResult,
-                localAi = localAiResult,
-            };
+            var snapshot = new NPCBackendReadinessSnapshot { auth = authResult, localAi = localAiResult };
 
             LastSnapshot = snapshot;
             lastProbeDurationMs = snapshot.auth.durationMs + snapshot.localAi.durationMs;
@@ -302,10 +299,8 @@ namespace NPCSystem.Initialization
                 request.result != UnityWebRequest.Result.ConnectionError
                 && request.result != UnityWebRequest.Result.DataProcessingError;
             bool reachable =
-                transportReachable
-                && (request.result == UnityWebRequest.Result.Success || allowHttpErrorAsReachable);
-            string responseCodeText =
-                request.responseCode <= 0 ? "n/a" : request.responseCode.ToString();
+                transportReachable && (request.result == UnityWebRequest.Result.Success || allowHttpErrorAsReachable);
+            string responseCodeText = request.responseCode <= 0 ? "n/a" : request.responseCode.ToString();
             string status = reachable
                 ? $"{backendName} reachable via {url} (HTTP {responseCodeText})."
                 : $"{backendName} unreachable via {url}: {request.error}";
@@ -323,8 +318,7 @@ namespace NPCSystem.Initialization
 
         string BuildAuthProbeUrl()
         {
-            string baseUrl =
-                _authService == null ? "http://localhost:8091" : _authService.SupabaseUrl;
+            string baseUrl = _authService == null ? "http://localhost:8091" : _authService.SupabaseUrl;
             return CombineUrl(baseUrl, authProbeRelativePath);
         }
 
@@ -343,15 +337,11 @@ namespace NPCSystem.Initialization
 
         static string CombineUrl(string baseUrl, string relativePath)
         {
-            string normalizedBase = string.IsNullOrWhiteSpace(baseUrl)
-                ? string.Empty
-                : baseUrl.Trim().TrimEnd('/');
+            string normalizedBase = string.IsNullOrWhiteSpace(baseUrl) ? string.Empty : baseUrl.Trim().TrimEnd('/');
             string normalizedPath = string.IsNullOrWhiteSpace(relativePath)
                 ? string.Empty
                 : relativePath.Trim().TrimStart('/');
-            return string.IsNullOrWhiteSpace(normalizedPath)
-                ? normalizedBase
-                : $"{normalizedBase}/{normalizedPath}";
+            return string.IsNullOrWhiteSpace(normalizedPath) ? normalizedBase : $"{normalizedBase}/{normalizedPath}";
         }
     }
 }

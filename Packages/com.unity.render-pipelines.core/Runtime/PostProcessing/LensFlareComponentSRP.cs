@@ -1,9 +1,10 @@
+using System;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-using System;
-using UnityEngine.Serialization;
+
 
 namespace UnityEngine.Rendering
 {
@@ -23,20 +24,17 @@ namespace UnityEngine.Rendering
             Initial,
         }
 
-        #pragma warning disable 414
+#pragma warning disable 414
         [SerializeField]
         Version version = Version.Initial;
-        #pragma warning restore 414
+#pragma warning restore 414
 
         /// <summary>
         /// Lens flare asset used on this component
         /// </summary>
         public LensFlareDataSRP lensFlareData
         {
-            get
-            {
-                return m_LensFlareData;
-            }
+            get { return m_LensFlareData; }
             set
             {
                 m_LensFlareData = value;
@@ -49,37 +47,53 @@ namespace UnityEngine.Rendering
         /// </summary>
         [Min(0.0f)]
         public float intensity = 1.0f;
+
         /// <summary>
         /// Distance used to scale the Distance Attenuation Curve
         /// </summary>
         [Min(1e-5f)]
         public float maxAttenuationDistance = 100.0f;
+
         /// <summary>
         /// Distance used to scale the Scale Attenuation Curve
         /// </summary>
         [Min(1e-5f)]
         public float maxAttenuationScale = 100.0f;
+
         /// <summary>
         /// Attenuation by distance
         /// </summary>
-        public AnimationCurve distanceAttenuationCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f), new Keyframe(1.0f, 0.0f));
+        public AnimationCurve distanceAttenuationCurve = new AnimationCurve(
+            new Keyframe(0.0f, 1.0f),
+            new Keyframe(1.0f, 0.0f)
+        );
+
         /// <summary>
         /// Scale by distance, use the same distance as distanceAttenuationCurve
         /// </summary>
-        public AnimationCurve scaleByDistanceCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f), new Keyframe(1.0f, 0.0f));
+        public AnimationCurve scaleByDistanceCurve = new AnimationCurve(
+            new Keyframe(0.0f, 1.0f),
+            new Keyframe(1.0f, 0.0f)
+        );
+
         /// <summary>
         /// If component attached to a light, attenuation the lens flare per light type
         /// </summary>
         public bool attenuationByLightShape = true;
+
         /// <summary>
         /// Attenuation used radially, which allow for instance to enable flare only on the edge of the screen
         /// </summary>
-        public AnimationCurve radialScreenAttenuationCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f), new Keyframe(1.0f, 1.0f));
+        public AnimationCurve radialScreenAttenuationCurve = new AnimationCurve(
+            new Keyframe(0.0f, 1.0f),
+            new Keyframe(1.0f, 1.0f)
+        );
 
         /// <summary>
         /// Enable Occlusion feature
         /// </summary>
         public bool useOcclusion = false;
+
         /// <summary>
         /// Enable Occlusion using Background Cloud (for instance: CloudLayer)
         /// Please use useFogOpacityOcclusion instead.
@@ -91,35 +105,42 @@ namespace UnityEngine.Rendering
         [FormerlySerializedAs("volumetricCloudOcclusion")]
         [FormerlySerializedAs("useFogOpacityOcclusion")]
         public bool environmentOcclusion = false;
+
         /// <summary>
         /// Enable Occlusion with Water
         /// </summary>
         [Obsolete("Replaced by environmentOcclusion. #from(6000.0)")]
         public bool useWaterOcclusion = false;
+
         /// <summary>
         /// Radius around the light used to occlude the flare (value in world space)
         /// </summary>
         [Min(0.0f)]
         public float occlusionRadius = 0.1f;
+
         /// <summary>
         /// Random Samples Count used inside the disk with 'occlusionRadius'
         /// </summary>
         [Range(1, 64)]
         public uint sampleCount = 32;
+
         /// <summary>
         /// Z Occlusion Offset allow us to offset the plane where the disc of occlusion is place (closer to camera), value on world space.
         /// Useful for instance to sample occlusion outside a light bulb if we place a flare inside the light bulb
         /// </summary>
         public float occlusionOffset = 0.05f;
+
         /// <summary>
         /// Global Scale
         /// </summary>
         [Min(0.0f)]
         public float scale = 1.0f;
+
         /// <summary>
         /// If allowOffScreen is true then If the lens flare is outside the screen we still emit the flare on screen
         /// </summary>
         public bool allowOffScreen = false;
+
         /// <summary>
         /// If volumetricCloudOcclusion is true then use the volumetric cloud (on HDRP only) for the occlusion
         /// Please use useFogOpacityOcclusion instead.
@@ -134,7 +155,12 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// OcclusionRemapCurve allow the occlusion [from 0 to 1] to be remap with any desired shape.
         /// </summary>
-        public TextureCurve occlusionRemapCurve = new TextureCurve(AnimationCurve.Linear(0.0f, 0.0f, 1.0f, 1.0f), 1.0f, false, new Vector2(0.0f, 1.0f));
+        public TextureCurve occlusionRemapCurve = new TextureCurve(
+            AnimationCurve.Linear(0.0f, 0.0f, 1.0f, 1.0f),
+            1.0f,
+            false,
+            new Vector2(0.0f, 1.0f)
+        );
 
         /// <summary>
         /// Light override, change the light which influences the flares including "modulate by light color" and "Attenuation By Light Shape" but not the position.
@@ -157,7 +183,9 @@ namespace UnityEngine.Rendering
         {
 #if UNITY_EDITOR
             if (!lensFlareData)
-                lensFlareData = AssetDatabase.LoadAssetAtPath<LensFlareDataSRP>("Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/Default Lens Flare (SRP).asset");
+                lensFlareData = AssetDatabase.LoadAssetAtPath<LensFlareDataSRP>(
+                    "Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/Default Lens Flare (SRP).asset"
+                );
 #endif
         }
 
@@ -202,6 +230,7 @@ namespace UnityEngine.Rendering
 
 #if UNITY_EDITOR
         private float sDebugClippingSafePercentage = 0.9f; //for debug gizmo, only push 90% further so we avoid clipping of debug lines.
+
         void OnDrawGizmosSelected()
         {
             Camera mainCam = Camera.current;
@@ -212,7 +241,9 @@ namespace UnityEngine.Rendering
                 Light light = GetComponent<Light>();
                 if (light != null && light.type == LightType.Directional)
                 {
-                    positionWS = -transform.forward * (mainCam.farClipPlane * sDebugClippingSafePercentage) + mainCam.transform.position;
+                    positionWS =
+                        -transform.forward * (mainCam.farClipPlane * sDebugClippingSafePercentage)
+                        + mainCam.transform.position;
                     adjustedOcclusionRadius = celestialProjectedOcclusionRadius(mainCam);
                 }
                 else

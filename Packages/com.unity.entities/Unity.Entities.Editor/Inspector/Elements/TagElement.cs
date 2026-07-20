@@ -8,7 +8,8 @@ namespace Unity.Entities.Editor
     {
         readonly Toggle m_Enabled;
 
-        public TagElement(IComponentProperty property, EntityInspectorContext context) : base(property, context)
+        public TagElement(IComponentProperty property, EntityInspectorContext context)
+            : base(property, context)
         {
             binding = this;
 
@@ -24,10 +25,12 @@ namespace Unity.Entities.Editor
 
             if (TypeManager.IsEnableable(TypeIndex))
             {
-                m_Enabled.RegisterValueChangedCallback((e) =>
-                {
-                    Context.EntityManager.SetComponentEnabled(Context.Entity, typeof(TComponent), e.newValue);
-                });
+                m_Enabled.RegisterValueChangedCallback(
+                    (e) =>
+                    {
+                        Context.EntityManager.SetComponentEnabled(Context.Entity, typeof(TComponent), e.newValue);
+                    }
+                );
             }
         }
 
@@ -41,9 +44,7 @@ namespace Unity.Entities.Editor
             // Nothing to do..
         }
 
-        void IBinding.PreUpdate()
-        {
-        }
+        void IBinding.PreUpdate() { }
 
         void IBinding.Update()
         {
@@ -53,10 +54,15 @@ namespace Unity.Entities.Editor
                 return;
             }
 
-            if (TypeManager.IsEnableable(TypeIndex) && Context.EntityManager.HasComponent(Context.Entity, typeof(TComponent)))
+            if (
+                TypeManager.IsEnableable(TypeIndex)
+                && Context.EntityManager.HasComponent(Context.Entity, typeof(TComponent))
+            )
             {
                 m_Enabled.visible = true;
-                m_Enabled.SetValueWithoutNotify(Context.EntityManager.IsComponentEnabled(Context.Entity, typeof(TComponent)));
+                m_Enabled.SetValueWithoutNotify(
+                    Context.EntityManager.IsComponentEnabled(Context.Entity, typeof(TComponent))
+                );
             }
             else
             {
@@ -65,8 +71,6 @@ namespace Unity.Entities.Editor
             }
         }
 
-        void IBinding.Release()
-        {
-        }
+        void IBinding.Release() { }
     }
 }

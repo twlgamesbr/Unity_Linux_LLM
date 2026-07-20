@@ -10,14 +10,15 @@ namespace UnityEngine.Rendering
             DrawDefaultInspector();
 
             // Add a "Reload All" button in inspector when we are in developer's mode
-            if (EditorPrefs.GetBool("DeveloperMode")
-                && GUILayout.Button("Reload All"))
+            if (EditorPrefs.GetBool("DeveloperMode") && GUILayout.Button("Reload All"))
             {
                 foreach (RenderPipelineResources t in targets)
                 {
                     if (string.IsNullOrEmpty(t.packagePath_Internal))
                     {
-                        Debug.LogError($"packagePath is not set in {t.GetType().Name}. We will not be able to reload it. Skipping.");
+                        Debug.LogError(
+                            $"packagePath is not set in {t.GetType().Name}. We will not be able to reload it. Skipping."
+                        );
                         continue;
                     }
 

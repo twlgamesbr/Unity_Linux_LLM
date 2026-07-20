@@ -24,10 +24,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static RequestSyncCommand Create()
         {
-            return new RequestSyncCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize)
-            };
+            return new RequestSyncCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

@@ -106,7 +106,7 @@ namespace UnityEngine.InputSystem.Utilities
             {
                 length = length,
                 firstValue = firstValue,
-                additionalValues = additionalValues != null ? ArrayHelpers.Copy(additionalValues) : null
+                additionalValues = additionalValues != null ? ArrayHelpers.Copy(additionalValues) : null,
             };
         }
 
@@ -191,7 +191,12 @@ namespace UnityEngine.InputSystem.Utilities
             else
             {
                 var numAdditionalValues = length - 1;
-                ArrayHelpers.AppendWithCapacity(ref additionalValues, ref numAdditionalValues, value, capacityIncrement: capacityIncrement);
+                ArrayHelpers.AppendWithCapacity(
+                    ref additionalValues,
+                    ref numAdditionalValues,
+                    value,
+                    capacityIncrement: capacityIncrement
+                );
             }
 
             var index = length;
@@ -323,8 +328,7 @@ namespace UnityEngine.InputSystem.Utilities
 
                     // Copy elements after entry. We already know that we're not removing
                     // the last entry so there have to be entries.
-                    Array.Copy(additionalValues, index + 1 - 1, newAdditionalValues, index - 1,
-                        length - index - 1);
+                    Array.Copy(additionalValues, index + 1 - 1, newAdditionalValues, index - 1, length - index - 1);
 
                     additionalValues = newAdditionalValues;
                 }
@@ -424,9 +428,7 @@ namespace UnityEngine.InputSystem.Utilities
             public TValue Current => array[index];
             object IEnumerator.Current => Current;
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
     }
 

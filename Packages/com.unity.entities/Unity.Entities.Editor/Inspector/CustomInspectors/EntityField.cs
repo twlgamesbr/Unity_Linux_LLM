@@ -59,15 +59,15 @@ namespace Unity.Entities.Editor.Inspectors
         /// <summary>
         /// Constructs a new instance of <see cref="EntityField"/> with no label.
         /// </summary>
-        public EntityField() : this(null)
-        {
-        }
+        public EntityField()
+            : this(null) { }
 
         /// <summary>
         /// Constructs a new instance of <see cref="EntityField"/> with a label.
         /// </summary>
         /// <param name="label">The label.</param>
-        public EntityField(string label) : base(label, null)
+        public EntityField(string label)
+            : base(label, null)
         {
             m_InputRoot = this.Q(className: UssClasses.UIToolkit.BaseField.Input);
             m_InputRoot.AddToClassList("unity-entity-field__input");

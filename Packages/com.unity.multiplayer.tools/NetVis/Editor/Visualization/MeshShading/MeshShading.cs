@@ -12,9 +12,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
     class MeshShading : IDisposable
     {
         [MaybeNull]
-        static Camera SceneViewCamera => SceneView.sceneViews.Count > 0
-            ? ((SceneView)SceneView.sceneViews[0]).camera
-            : null;
+        static Camera SceneViewCamera =>
+            SceneView.sceneViews.Count > 0 ? ((SceneView)SceneView.sceneViews[0]).camera : null;
 
         // External Dependencies:
         NetVisDataStore NetVisDataStore { get; }
@@ -29,9 +28,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
         [MaybeNull] // Null in the event that no scene view camera is available
         NetVisRenderer m_NetVisRenderer;
 
-        internal MeshShading(
-            NetVisConfiguration configuration,
-            NetVisDataStore netVisDataStore)
+        internal MeshShading(NetVisConfiguration configuration, NetVisDataStore netVisDataStore)
         {
             DebugUtil.TraceMethodName();
 
@@ -67,9 +64,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             if (m_NetVisRenderer?.Camera != SceneViewCamera)
             {
                 m_NetVisRenderer?.Dispose();
-                m_NetVisRenderer = currentSceneViewCamera == null
-                    ? null
-                    : new(SceneViewCamera);
+                m_NetVisRenderer = currentSceneViewCamera == null ? null : new(SceneViewCamera);
             }
             if (m_NetVisRenderer == null)
             {
@@ -112,7 +107,11 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
                     continue;
                 }
 
-                m_RenderDataRetriever.WriteValueToRendererInstanceIdsInDictionary(gameObject, color, m_InstanceIdToColor);
+                m_RenderDataRetriever.WriteValueToRendererInstanceIdsInDictionary(
+                    gameObject,
+                    color,
+                    m_InstanceIdToColor
+                );
             }
         }
     }

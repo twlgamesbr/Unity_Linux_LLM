@@ -17,11 +17,11 @@ namespace UnityEngine.InputSystem.Android.LowLevel
         None = 0,
         Accelerometer = 1,
         MagneticField = 2,
-        Orientation = 3,            // Was deprecated in API 8 https://developer.android.com/reference/android/hardware/Sensor#TYPE_ORIENTATION
+        Orientation = 3, // Was deprecated in API 8 https://developer.android.com/reference/android/hardware/Sensor#TYPE_ORIENTATION
         Gyroscope = 4,
         Light = 5,
         Pressure = 6,
-        Temperature = 7,            // Was deprecated in API 14 https://developer.android.com/reference/android/hardware/Sensor#TYPE_TEMPERATURE
+        Temperature = 7, // Was deprecated in API 14 https://developer.android.com/reference/android/hardware/Sensor#TYPE_TEMPERATURE
         Proximity = 8,
         Gravity = 9,
         LinearAcceleration = 10,
@@ -42,7 +42,7 @@ namespace UnityEngine.InputSystem.Android.LowLevel
         HeartBeat = 31,
         LowLatencyOffBodyDetect = 34,
         AccelerometerUncalibrated = 35,
-        HingeAngle = 36
+        HingeAngle = 36,
     }
 
     [Serializable]
@@ -90,21 +90,56 @@ namespace UnityEngine.InputSystem.Android.LowLevel
         // GeomagneticRotationVector - no alternative in old system
         // HeartRate - no alternative in old system
 
-        [InputControl(name = "acceleration", layout = "Vector3", processors = "AndroidCompensateDirection", variants = "Accelerometer")]
+        [InputControl(
+            name = "acceleration",
+            layout = "Vector3",
+            processors = "AndroidCompensateDirection",
+            variants = "Accelerometer"
+        )]
         [InputControl(name = "magneticField", layout = "Vector3", variants = "MagneticField")]
         // Note: Using CompensateDirection instead of AndroidCompensateDirection, because we don't need to normalize velocity
-        [InputControl(name = "angularVelocity", layout = "Vector3", processors = "CompensateDirection", variants = "Gyroscope")]
+        [InputControl(
+            name = "angularVelocity",
+            layout = "Vector3",
+            processors = "CompensateDirection",
+            variants = "Gyroscope"
+        )]
         [InputControl(name = "lightLevel", layout = "Axis", variants = "Light")]
         [InputControl(name = "atmosphericPressure", layout = "Axis", variants = "Pressure")]
         [InputControl(name = "distance", layout = "Axis", variants = "Proximity")]
-        [InputControl(name = "gravity", layout = "Vector3", processors = "AndroidCompensateDirection", variants = "Gravity")]
-        [InputControl(name = "acceleration", layout = "Vector3", processors = "AndroidCompensateDirection", variants = "LinearAcceleration")]
-        [InputControl(name = "attitude", layout = "Quaternion", processors = "AndroidCompensateRotation", variants = "RotationVector")]
+        [InputControl(
+            name = "gravity",
+            layout = "Vector3",
+            processors = "AndroidCompensateDirection",
+            variants = "Gravity"
+        )]
+        [InputControl(
+            name = "acceleration",
+            layout = "Vector3",
+            processors = "AndroidCompensateDirection",
+            variants = "LinearAcceleration"
+        )]
+        [InputControl(
+            name = "attitude",
+            layout = "Quaternion",
+            processors = "AndroidCompensateRotation",
+            variants = "RotationVector"
+        )]
         [InputControl(name = "relativeHumidity", layout = "Axis", variants = "RelativeHumidity")]
         [InputControl(name = "ambientTemperature", layout = "Axis", variants = "AmbientTemperature")]
-        [InputControl(name = "attitude", layout = "Quaternion", processors = "AndroidCompensateRotation", variants = "GameRotationVector")]
+        [InputControl(
+            name = "attitude",
+            layout = "Quaternion",
+            processors = "AndroidCompensateRotation",
+            variants = "GameRotationVector"
+        )]
         [InputControl(name = "stepCounter", layout = "Integer", variants = "StepCounter")]
-        [InputControl(name = "rotation", layout = "Quaternion", processors = "AndroidCompensateRotation", variants = "GeomagneticRotationVector")]
+        [InputControl(
+            name = "rotation",
+            layout = "Quaternion",
+            processors = "AndroidCompensateRotation",
+            variants = "GeomagneticRotationVector"
+        )]
         [InputControl(name = "rate", layout = "Axis", variants = "HeartRate")]
         [InputControl(name = "angle", layout = "Axis", variants = nameof(AndroidSensorType.HingeAngle))]
         public fixed float data[16];
@@ -167,127 +202,103 @@ namespace UnityEngine.InputSystem.Android
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_ACCELEROMETER"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "Accelerometer", hideInUI = true)]
-    public class AndroidAccelerometer : Accelerometer
-    {
-    }
+    public class AndroidAccelerometer : Accelerometer { }
 
     /// <summary>
     /// Magnetic field sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_MAGNETIC_FIELD"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "MagneticField", hideInUI = true)]
-    public class AndroidMagneticFieldSensor : MagneticFieldSensor
-    {
-    }
+    public class AndroidMagneticFieldSensor : MagneticFieldSensor { }
 
     /// <summary>
     /// Gyroscope device on android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_GYROSCOPE"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "Gyroscope", hideInUI = true)]
-    public class AndroidGyroscope : Gyroscope
-    {
-    }
+    public class AndroidGyroscope : Gyroscope { }
 
     /// <summary>
     /// Light sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_LIGHT"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "Light", hideInUI = true)]
-    public class AndroidLightSensor : LightSensor
-    {
-    }
+    public class AndroidLightSensor : LightSensor { }
 
     /// <summary>
     /// Pressure sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_PRESSURE"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "Pressure", hideInUI = true)]
-    public class AndroidPressureSensor : PressureSensor
-    {
-    }
+    public class AndroidPressureSensor : PressureSensor { }
 
     /// <summary>
     /// Proximity sensor type on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_PROXIMITY"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "Proximity", hideInUI = true)]
-    public class AndroidProximity : ProximitySensor
-    {
-    }
+    public class AndroidProximity : ProximitySensor { }
 
     /// <summary>
     /// Gravity sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_GRAVITY"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "Gravity", hideInUI = true)]
-    public class AndroidGravitySensor : GravitySensor
-    {
-    }
+    public class AndroidGravitySensor : GravitySensor { }
 
     /// <summary>
     /// Linear acceleration sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_LINEAR_ACCELERATION"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "LinearAcceleration", hideInUI = true)]
-    public class AndroidLinearAccelerationSensor : LinearAccelerationSensor
-    {
-    }
+    public class AndroidLinearAccelerationSensor : LinearAccelerationSensor { }
 
     /// <summary>
     /// Rotation vector sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_ROTATION_VECTOR"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "RotationVector", hideInUI = true)]
-    public class AndroidRotationVector : AttitudeSensor
-    {
-    }
+    public class AndroidRotationVector : AttitudeSensor { }
 
     /// <summary>
     /// Relative humidity sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_RELATIVE_HUMIDITY"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "RelativeHumidity", hideInUI = true)]
-    public class AndroidRelativeHumidity : HumiditySensor
-    {
-    }
+    public class AndroidRelativeHumidity : HumiditySensor { }
 
     /// <summary>
     /// Ambient temperature sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_AMBIENT_TEMPERATURE"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "AmbientTemperature", hideInUI = true)]
-    public class AndroidAmbientTemperature : AmbientTemperatureSensor
-    {
-    }
+    public class AndroidAmbientTemperature : AmbientTemperatureSensor { }
 
     /// <summary>
     /// Game rotation vector sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_GAME_ROTATION_VECTOR"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "GameRotationVector", hideInUI = true)]
-    public class AndroidGameRotationVector : AttitudeSensor
-    {
-    }
+    public class AndroidGameRotationVector : AttitudeSensor { }
 
     /// <summary>
     /// Step counter sensor device on Android.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_STEP_COUNTER"/>
     [InputControlLayout(stateType = typeof(AndroidSensorState), variants = "StepCounter", hideInUI = true)]
-    public class AndroidStepCounter : StepCounter
-    {
-    }
+    public class AndroidStepCounter : StepCounter { }
 
     /// <summary>
     /// Hinge angle sensor device on Android.
     /// This sensor is usually available on foldable devices.
     /// </summary>
     /// <seealso href="https://developer.android.com/reference/android/hardware/Sensor#TYPE_HINGE_ANGLE"/>
-    [InputControlLayout(stateType = typeof(AndroidSensorState), variants = nameof(AndroidSensorType.HingeAngle), hideInUI = true)]
-    public class AndroidHingeAngle : HingeAngle
-    {
-    }
+    [InputControlLayout(
+        stateType = typeof(AndroidSensorState),
+        variants = nameof(AndroidSensorType.HingeAngle),
+        hideInUI = true
+    )]
+    public class AndroidHingeAngle : HingeAngle { }
 }
 
 #endif

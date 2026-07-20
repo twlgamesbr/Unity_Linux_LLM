@@ -19,30 +19,37 @@ namespace UnityEngine.Rendering
         /// Contains the SH coefficients that correspond to the <c>unity_SHAr</c> shader property.
         /// </summary>
         public Vector4 SHAr;
+
         /// <summary>
         /// Contains the SH coefficients that correspond to the <c>unity_SHAg</c> shader property.
         /// </summary>
         public Vector4 SHAg;
+
         /// <summary>
         /// Contains the SH coefficients that correspond to the <c>unity_SHAb</c> shader property.
         /// </summary>
         public Vector4 SHAb;
+
         /// <summary>
         /// Contains the SH coefficients that correspond to the <c>unity_SHBr</c> shader property.
         /// </summary>
         public Vector4 SHBr;
+
         /// <summary>
         /// Contains the SH coefficients that correspond to the <c>unity_SHBg</c> shader property.
         /// </summary>
         public Vector4 SHBg;
+
         /// <summary>
         /// Contains the SH coefficients that correspond to the <c>unity_SHBb</c> shader property.
         /// </summary>
         public Vector4 SHBb;
+
         /// <summary>
         /// Contains the SH coefficients that correspond to the <c>unity_SHC</c> shader property.
         /// </summary>
         public Vector4 SHC;
+
         /// <summary>
         /// Contains the baked shadowing data that corresponds to the <c>unity_ProbesOcclusion</c> shader property.
         /// </summary>
@@ -102,7 +109,14 @@ namespace UnityEngine.Rendering
         /// <returns>True if contents are equal, False otherwise.</returns>
         public bool Equals(SHCoefficients other)
         {
-            return SHAr.Equals(other.SHAr) && SHAg.Equals(other.SHAg) && SHAb.Equals(other.SHAb) && SHBr.Equals(other.SHBr) && SHBg.Equals(other.SHBg) && SHBb.Equals(other.SHBb) && SHC.Equals(other.SHC) && ProbesOcclusion.Equals(other.ProbesOcclusion);
+            return SHAr.Equals(other.SHAr)
+                && SHAg.Equals(other.SHAg)
+                && SHAb.Equals(other.SHAb)
+                && SHBr.Equals(other.SHBr)
+                && SHBg.Equals(other.SHBg)
+                && SHBb.Equals(other.SHBb)
+                && SHC.Equals(other.SHC)
+                && ProbesOcclusion.Equals(other.ProbesOcclusion);
         }
 
         /// <summary>
@@ -153,7 +167,9 @@ namespace UnityEngine.Rendering
     /// <c>unity_DOTSInstanceGlobalValues</c> constant buffer the shader expects the default
     /// values in.
     /// </summary>
-    [Obsolete("BatchRendererGroupGlobals and associated cbuffer are now set automatically by Unity. Setting it manually is no longer necessary or supported. #from(2023.1)")]
+    [Obsolete(
+        "BatchRendererGroupGlobals and associated cbuffer are now set automatically by Unity. Setting it manually is no longer necessary or supported. #from(2023.1)"
+    )]
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     public struct BatchRendererGroupGlobals : IEquatable<BatchRendererGroupGlobals>
@@ -163,6 +179,7 @@ namespace UnityEngine.Rendering
         /// to read default values for the built-in properties contained in this struct.
         /// </summary>
         public const string kGlobalsPropertyName = "unity_DOTSInstanceGlobalValues";
+
         /// <summary>
         /// The unique identifier for <see cref="kGlobalsPropertyName"/>, retrieved using
         /// <see cref="Shader.PropertyToID"/>.
@@ -174,14 +191,17 @@ namespace UnityEngine.Rendering
         /// The default value to use for the <c>unity_ProbesOcclusion</c> built-in shader property.
         /// </summary>
         public Vector4 ProbesOcclusion;
+
         /// <summary>
         /// The default value to use for the <c>unity_SpecCube0_HDR</c> built-in shader property.
         /// </summary>
         public Vector4 SpecCube0_HDR;
+
         /// <summary>
         /// The default value to use for the <c>unity_SpecCube1_HDR</c> built-in shader property.
         /// </summary>
         public Vector4 SpecCube1_HDR;
+
         /// <summary>
         /// The default values to use for the built-in spherical harmonics shader properties.
         /// </summary>
@@ -212,7 +232,10 @@ namespace UnityEngine.Rendering
         /// <returns>True if contents are equal, False otherwise.</returns>
         public bool Equals(BatchRendererGroupGlobals other)
         {
-            return ProbesOcclusion.Equals(other.ProbesOcclusion) && SpecCube0_HDR.Equals(other.SpecCube0_HDR) && SpecCube1_HDR.Equals(other.SpecCube1_HDR) && SHCoefficients.Equals(other.SHCoefficients);
+            return ProbesOcclusion.Equals(other.ProbesOcclusion)
+                && SpecCube0_HDR.Equals(other.SpecCube0_HDR)
+                && SpecCube1_HDR.Equals(other.SpecCube1_HDR)
+                && SHCoefficients.Equals(other.SHCoefficients);
         }
 
         /// <summary>
@@ -256,5 +279,4 @@ namespace UnityEngine.Rendering
             return !left.Equals(right);
         }
     }
-
 }

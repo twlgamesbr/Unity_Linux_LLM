@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 
-
 /// <summary>
 /// This component is used in conjunction with <see cref="AttachableBehaviour"/> and is used to
 /// denote a specific child <see cref="UnityEngine.GameObject"/> that an <see cref="AttachableBehaviour"/>
@@ -104,16 +103,15 @@ public class AttachableNode : NetworkBehaviour
     /// Override this method to be notified when an <see cref="AttachableBehaviour"/> has attached to this node.
     /// </summary>
     /// <param name="attachableBehaviour">The <see cref="AttachableBehaviour"/> that has been attached.</param>
-    protected virtual void OnAttached(AttachableBehaviour attachableBehaviour)
-    {
-
-    }
+    protected virtual void OnAttached(AttachableBehaviour attachableBehaviour) { }
 
     internal void Attach(AttachableBehaviour attachableBehaviour)
     {
         if (m_AttachedBehaviours.Contains(attachableBehaviour))
         {
-            NetworkLog.LogError($"[{nameof(AttachableNode)}][{name}][Attach] {nameof(AttachableBehaviour)} {attachableBehaviour.name} is already attached!");
+            NetworkLog.LogError(
+                $"[{nameof(AttachableNode)}][{name}][Attach] {nameof(AttachableBehaviour)} {attachableBehaviour.name} is already attached!"
+            );
             return;
         }
         m_AttachedBehaviours.Add(attachableBehaviour);
@@ -124,16 +122,15 @@ public class AttachableNode : NetworkBehaviour
     /// Override this method to be notified when an <see cref="AttachableBehaviour"/> has detached from this node.
     /// </summary>
     /// <param name="attachableBehaviour">The <see cref="AttachableBehaviour"/> that has been detached.</param>
-    protected virtual void OnDetached(AttachableBehaviour attachableBehaviour)
-    {
-
-    }
+    protected virtual void OnDetached(AttachableBehaviour attachableBehaviour) { }
 
     internal void Detach(AttachableBehaviour attachableBehaviour)
     {
         if (!m_AttachedBehaviours.Contains(attachableBehaviour))
         {
-            NetworkLog.LogError($"[{nameof(AttachableNode)}][{name}][Detach] {nameof(AttachableBehaviour)} {attachableBehaviour.name} is not attached!");
+            NetworkLog.LogError(
+                $"[{nameof(AttachableNode)}][{name}][Detach] {nameof(AttachableBehaviour)} {attachableBehaviour.name} is not attached!"
+            );
             return;
         }
         m_AttachedBehaviours.Remove(attachableBehaviour);

@@ -13,8 +13,10 @@ namespace UnityEditor.Rendering.Universal
     {
         protected override Type OldSettingsType { get; } = typeof(BIRPRendering.LensDistortion);
 
-        protected override void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldSettings,
-            VolumeProfile targetProfile)
+        protected override void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldSettings,
+            VolumeProfile targetProfile
+        )
         {
             var oldLensDistortion = oldSettings as BIRPRendering.LensDistortion;
 
@@ -22,17 +24,21 @@ namespace UnityEditor.Rendering.Universal
 
             newVolumeComponent.active = oldLensDistortion.active;
 
-            oldLensDistortion.intensity.Convert(newVolumeComponent.intensity,
+            oldLensDistortion.intensity.Convert(
+                newVolumeComponent.intensity,
                 scale: 0.01f,
-                enabledState: oldLensDistortion.enabled);
+                enabledState: oldLensDistortion.enabled
+            );
             oldLensDistortion.intensityX.Convert(newVolumeComponent.xMultiplier);
             oldLensDistortion.intensityY.Convert(newVolumeComponent.yMultiplier);
             oldLensDistortion.scale.Convert(newVolumeComponent.scale);
 
             newVolumeComponent.center.overrideState =
                 oldLensDistortion.centerX.overrideState || oldLensDistortion.centerY.overrideState;
-            newVolumeComponent.center.value =
-                new Vector2(oldLensDistortion.centerX.value, oldLensDistortion.centerY.value);
+            newVolumeComponent.center.value = new Vector2(
+                oldLensDistortion.centerX.value,
+                oldLensDistortion.centerY.value
+            );
         }
     }
 }

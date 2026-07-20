@@ -34,7 +34,8 @@ namespace Unity.Networking.Transport
         internal ConnectionList CreateConnectionList() => tcp.CreateConnectionList();
 
         /// <inheritdoc/>
-        public int Initialize(ref NetworkSettings settings, ref int packetPadding) => tcp.Initialize(ref settings, ref packetPadding);
+        public int Initialize(ref NetworkSettings settings, ref int packetPadding) =>
+            tcp.Initialize(ref settings, ref packetPadding);
 
         /// <inheritdoc/>
         public int Bind(NetworkEndpoint endpoint) => tcp.Bind(endpoint);
@@ -43,10 +44,12 @@ namespace Unity.Networking.Transport
         public int Listen() => tcp.Listen();
 
         /// <inheritdoc/>
-        public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dep) => tcp.ScheduleReceive(ref arguments, dep);
+        public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dep) =>
+            tcp.ScheduleReceive(ref arguments, dep);
 
         /// <inheritdoc/>
-        public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dep) => tcp.ScheduleSend(ref arguments, dep);
+        public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dep) =>
+            tcp.ScheduleSend(ref arguments, dep);
     }
 }
 
@@ -54,7 +57,6 @@ namespace Unity.Networking.Transport
 
 using System;
 using System.Runtime.InteropServices;
-
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Networking.Transport.Relay;
@@ -284,7 +286,10 @@ namespace Unity.Networking.Transport
                         }
                         else if (status < 0)
                         {
-                            ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.MaxConnectionAttempts);
+                            ConnectionList.StartDisconnecting(
+                                ref connectionId,
+                                Error.DisconnectReason.MaxConnectionAttempts
+                            );
                             Abort(ref connectionId, ref connectionData);
                             continue;
                         }
@@ -292,7 +297,10 @@ namespace Unity.Networking.Transport
                         // Disconnect if we've reached the maximum connection timeout.
                         if (Time - connectionData.ConnectStartTime >= InternalData.Value.ConnectTimeoutMS)
                         {
-                            ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.MaxConnectionAttempts);
+                            ConnectionList.StartDisconnecting(
+                                ref connectionId,
+                                Error.DisconnectReason.MaxConnectionAttempts
+                            );
                             Abort(ref connectionId, ref connectionData);
                             continue;
                         }
@@ -319,7 +327,11 @@ namespace Unity.Networking.Transport
                         if (!ReceiveQueue.EnqueuePacket(out var packetProcessor))
                             break;
 
-                        nbytes = WebSocket.Recv(connectionData.Socket, (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset, packetProcessor.BytesAvailableAtEnd);
+                        nbytes = WebSocket.Recv(
+                            connectionData.Socket,
+                            (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset,
+                            packetProcessor.BytesAvailableAtEnd
+                        );
                         if (nbytes > 0)
                         {
                             packetProcessor.ConnectionRef = connectionId;
@@ -421,7 +433,11 @@ namespace Unity.Networking.Transport
 
                     var connectionData = ConnectionMap[connectionId];
 
-                    var nbytes = WebSocket.Send(connectionData.Socket, (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset, packetProcessor.Length);
+                    var nbytes = WebSocket.Send(
+                        connectionData.Socket,
+                        (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset,
+                        packetProcessor.Length
+                    );
                     if (nbytes != packetProcessor.Length)
                     {
                         // Disconnect

@@ -14,7 +14,9 @@ namespace Unity.Entities.Editor
             get
             {
                 var type = Value.type;
-                return type == null ? string.Empty : UnityEditor.ObjectNames.NicifyVariableName(Properties.TypeUtility.GetTypeDisplayName(type));
+                return type == null
+                    ? string.Empty
+                    : UnityEditor.ObjectNames.NicifyVariableName(Properties.TypeUtility.GetTypeDisplayName(type));
             }
         }
         public override string NameWithWorld => Name;
@@ -23,7 +25,9 @@ namespace Unity.Entities.Editor
             get
             {
                 var type = Value.type;
-                return type == null ? string.Empty : $"{type.Namespace}{(null == type.Namespace ? "" : ".")}{Properties.TypeUtility.GetTypeDisplayName(type)}";
+                return type == null
+                    ? string.Empty
+                    : $"{type.Namespace}{(null == type.Namespace ? "" : ".")}{Properties.TypeUtility.GetTypeDisplayName(type)}";
             }
         }
         public override bool Enabled

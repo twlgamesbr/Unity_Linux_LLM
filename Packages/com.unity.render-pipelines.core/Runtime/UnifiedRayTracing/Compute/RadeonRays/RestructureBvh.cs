@@ -26,8 +26,13 @@ namespace UnityEngine.Rendering.RadeonRays
             kernelRestructure = shader.FindKernel("Restructure");
             kernelPrepareTreeletsDispatchSize = shader.FindKernel("PrepareTreeletsDispatchSize");
 
-            treeletDispatchIndirectBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, 6, sizeof(uint));
+            treeletDispatchIndirectBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.IndirectArguments,
+                6,
+                sizeof(uint)
+            );
         }
+
         public void Dispose()
         {
             treeletDispatchIndirectBuffer.Dispose();
@@ -46,8 +51,13 @@ namespace UnityEngine.Rendering.RadeonRays
 
         public void Execute(
             CommandBuffer cmd,
-            GraphicsBuffer vertices, int verticesOffset, uint vertexStride, uint triangleCount,
-            GraphicsBuffer scratch, in BottomLevelLevelAccelStruct result)
+            GraphicsBuffer vertices,
+            int verticesOffset,
+            uint vertexStride,
+            uint triangleCount,
+            GraphicsBuffer scratch,
+            in BottomLevelLevelAccelStruct result
+        )
         {
             var scratchLayout = ScratchBufferLayout.Create(triangleCount);
 
@@ -67,10 +77,22 @@ namespace UnityEngine.Rendering.RadeonRays
                 cmd.SetComputeIntParam(shader, SID.g_constants_min_prims_per_treelet, (int)minPrimitivePerTreelet);
 
                 BindKernelArguments(cmd, kernelInitPrimitiveCounts, vertices, scratch, result);
-                cmd.DispatchCompute(shader, kernelInitPrimitiveCounts, (int)Common.CeilDivide(kTrianglesPerGroup, kGroupSize), 1, 1);
+                cmd.DispatchCompute(
+                    shader,
+                    kernelInitPrimitiveCounts,
+                    (int)Common.CeilDivide(kTrianglesPerGroup, kGroupSize),
+                    1,
+                    1
+                );
 
                 BindKernelArguments(cmd, kernelFindTreeletRoots, vertices, scratch, result);
-                cmd.DispatchCompute(shader, kernelFindTreeletRoots, (int)Common.CeilDivide(kTrianglesPerGroup, kGroupSize), 1, 1);
+                cmd.DispatchCompute(
+                    shader,
+                    kernelFindTreeletRoots,
+                    (int)Common.CeilDivide(kTrianglesPerGroup, kGroupSize),
+                    1,
+                    1
+                );
 
                 BindKernelArguments(cmd, kernelPrepareTreeletsDispatchSize, vertices, scratch, result);
                 cmd.DispatchCompute(shader, kernelPrepareTreeletsDispatchSize, 1, 1, 1);
@@ -90,9 +112,12 @@ namespace UnityEngine.Rendering.RadeonRays
         }
 
         private void BindKernelArguments(
-            CommandBuffer cmd, int kernel,
+            CommandBuffer cmd,
+            int kernel,
             GraphicsBuffer vertices,
-            GraphicsBuffer scratch, BottomLevelLevelAccelStruct result)
+            GraphicsBuffer scratch,
+            BottomLevelLevelAccelStruct result
+        )
         {
             cmd.SetComputeBufferParam(shader, kernel, SID.g_vertices, vertices);
             cmd.SetComputeBufferParam(shader, kernel, SID.g_scratch_buffer, scratch);
@@ -112,9 +137,9 @@ namespace UnityEngine.Rendering.RadeonRays
             public static ScratchBufferLayout Create(uint triangleCount)
             {
                 var result = new ScratchBufferLayout();
-                result.LeafParents     = result.Reserve(triangleCount);
-                result.TreeletCount    = result.Reserve(1);
-                result.TreeletRoots    = result.Reserve(triangleCount);
+                result.LeafParents = result.Reserve(triangleCount);
+                result.TreeletCount = result.Reserve(1);
+                result.TreeletRoots = result.Reserve(triangleCount);
                 result.PrimitiveCounts = result.Reserve(GetBvhNodeCount(triangleCount));
 
                 return result;
@@ -129,4 +154,3 @@ namespace UnityEngine.Rendering.RadeonRays
         }
     }
 }
-

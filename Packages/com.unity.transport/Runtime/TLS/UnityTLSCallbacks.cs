@@ -12,7 +12,7 @@ namespace Unity.Networking.Transport.TLS
 {
     /// <summary>Callbacks to use with UnityTLS.</summary>
     [BurstCompile]
-    internal unsafe static class UnityTLSCallbacks
+    internal static unsafe class UnityTLSCallbacks
     {
         /// <summary>Structure that callbacks expect a pointer to as their user data.</summary>
         public struct CallbackContext
@@ -40,14 +40,18 @@ namespace Unity.Networking.Transport.TLS
         /// <summary>Get a function pointer to the send callback.</summary>
         public static IntPtr GetSendCallbackPtr()
         {
-            var funcPtr = BurstCompiler.CompileFunctionPointer<Binding.unitytls_client_data_send_callback>(SendCallback);
+            var funcPtr = BurstCompiler.CompileFunctionPointer<Binding.unitytls_client_data_send_callback>(
+                SendCallback
+            );
             return funcPtr.Value;
         }
 
         /// <summary>Get a function pointer to the receive callback.</summary>
         public static IntPtr GetReceiveCallbackPtr()
         {
-            var funcPtr = BurstCompiler.CompileFunctionPointer<Binding.unitytls_client_data_receive_callback>(ReceiveCallback);
+            var funcPtr = BurstCompiler.CompileFunctionPointer<Binding.unitytls_client_data_receive_callback>(
+                ReceiveCallback
+            );
             return funcPtr.Value;
         }
 
@@ -81,7 +85,9 @@ namespace Unity.Networking.Transport.TLS
                 var newOffset = packet.Offset - ctx->PacketPadding;
                 if (newOffset < 0)
                 {
-                    Debug.LogError($"Invalid offset in packet processor ({packet.Offset}, should be >={ctx->PacketPadding}).");
+                    Debug.LogError(
+                        $"Invalid offset in packet processor ({packet.Offset}, should be >={ctx->PacketPadding})."
+                    );
                     // TODO Is this really the correct error code for this situation?
                     return UNITYTLS_ERR_SSL_WANT_WRITE;
                 }
@@ -135,7 +141,14 @@ namespace Unity.Networking.Transport.TLS
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(Binding.unitytls_client_log_callback))]
-        private static void LogCallback(int level, byte* file, UIntPtr line, byte* function, byte* message, UIntPtr messageLength)
+        private static void LogCallback(
+            int level,
+            byte* file,
+            UIntPtr line,
+            byte* function,
+            byte* message,
+            UIntPtr messageLength
+        )
         {
             FixedString512Bytes log = "[UnityTLS";
 
@@ -165,7 +178,7 @@ namespace Unity.Networking.Transport.TLS
         }
 
         // Can't believe we're reimplementing strlen() from C...
-        private static int RawStringLength(byte *str)
+        private static int RawStringLength(byte* str)
         {
             var length = 0;
             while (str[length] != '\0')

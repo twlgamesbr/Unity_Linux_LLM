@@ -16,7 +16,7 @@ namespace UnityEngine.Rendering.Universal
         }
 
         /// <summary>
-        /// Assigns the render context once at initialization time. 
+        /// Assigns the render context once at initialization time.
         /// </summary>
         /// <param name="renderContext">The render context to assign.</param>
         public void SetRenderContext(in ScriptableRenderContext renderContext)
@@ -45,7 +45,10 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="cullingResults">The scene culling results.</param>
         /// <param name="shadowCastersCullingInfos">The shadow casters culling informations.</param>
         /// <exception cref="InvalidOperationException">The parameters used for the shadow culling.</exception>
-        public void CullShadowCasters(CullingResults cullingResults, ShadowCastersCullingInfos shadowCastersCullingInfos)
+        public void CullShadowCasters(
+            CullingResults cullingResults,
+            ShadowCastersCullingInfos shadowCastersCullingInfos
+        )
         {
             if (!m_RenderContext.HasValue)
             {

@@ -9,7 +9,12 @@ namespace UnityEditor.TestTools.TestRunner
         private readonly ITestListProvider m_InnerTestListProvider;
         private readonly ITestListCache m_TestListCache;
         private readonly ITestAdaptorFactory m_TestAdaptorFactory;
-        public CachingTestListProvider(ITestListProvider innerTestListProvider, ITestListCache testListCache, ITestAdaptorFactory testAdaptorFactory)
+
+        public CachingTestListProvider(
+            ITestListProvider innerTestListProvider,
+            ITestListCache testListCache,
+            ITestAdaptorFactory testAdaptorFactory
+        )
         {
             m_InnerTestListProvider = innerTestListProvider;
             m_TestListCache = testListCache;
@@ -24,7 +29,6 @@ namespace UnityEditor.TestTools.TestRunner
                 yield return null;
             }
 
-
             if (testFromCache.Current != null)
             {
                 yield return testFromCache.Current;
@@ -36,7 +40,7 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     yield return null;
                 }
-                
+
                 m_TestListCache.CacheTest(platform, test.Current);
 #if !UNITY_2023_2_OR_NEWER
                 AnalyticsReporter.AnalyzeTestTreeAndReport(test.Current);

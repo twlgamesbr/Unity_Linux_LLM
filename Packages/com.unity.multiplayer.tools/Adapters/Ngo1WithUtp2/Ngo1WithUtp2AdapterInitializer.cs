@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Scripting;
 
 [assembly: AlwaysLinkAssembly]
+
 namespace Unity.Multiplayer.Tools.Adapters.Ngo1WithUtp2
 {
     static class Ngo1WithUtp2AdapterInitializer
@@ -14,23 +15,23 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1WithUtp2
         // EntityId support requires both NGO 2.8.0+ and Unity 6000.2+.
         // Unity 6000.2+ is required because the EntityId feature is only available in that version or newer.
 #if UNITY_NETCODE_GAMEOBJECTS_2_8_ABOVE && UNITY_6000_2_OR_NEWER
-        internal static readonly IDictionary<EntityId, Utp2Adapter> s_Adapters = new Dictionary<EntityId, Utp2Adapter>();
+        internal static readonly IDictionary<EntityId, Utp2Adapter> s_Adapters =
+            new Dictionary<EntityId, Utp2Adapter>();
 #else
         // Use the InstanceId key'd table
         internal static readonly IDictionary<int, Utp2Adapter> s_Adapters = new Dictionary<int, Utp2Adapter>();
 #endif
-        
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         internal static void InitializeAdapter()
         {
             if (s_Initialized)
             {
 #if UNITY_NETCODE_GAMEOBJECTS_2_8_ABOVE && UNITY_6000_2_OR_NEWER
-            UnityTransport.OnDriverInitialized -= AddAdapter;
-            UnityTransport.OnDisposingDriver -= RemoveAdapter;
+                UnityTransport.OnDriverInitialized -= AddAdapter;
+                UnityTransport.OnDisposingDriver -= RemoveAdapter;
 #else
-            UnityTransport.TransportInitialized -= AddAdapter;
-            UnityTransport.TransportDisposed -= RemoveAdapter;
+                UnityTransport.TransportInitialized -= AddAdapter;
+                UnityTransport.TransportDisposed -= RemoveAdapter;
 #endif
             }
             s_Adapters.Clear();
@@ -71,7 +72,6 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1WithUtp2
             NetworkAdapters.AddAdapter(adapter);
         }
 #endif
-
 
 #if UNITY_NETCODE_GAMEOBJECTS_2_8_ABOVE && UNITY_6000_2_OR_NEWER
         static void RemoveAdapter(EntityId entityId)

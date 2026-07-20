@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.InputSystem.Layouts;
 
 namespace UnityEngine.InputSystem
 {
@@ -389,8 +389,7 @@ namespace UnityEngine.InputSystem
             {
                 var control = InputControlPath.TryFindChild(this, path);
                 if (control == null)
-                    throw new KeyNotFoundException(
-                        $"Cannot find control '{path}' as child of '{this}'");
+                    throw new KeyNotFoundException($"Cannot find control '{path}' as child of '{this}'");
                 return control;
             }
         }
@@ -557,8 +556,7 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="WriteValueFromObjectIntoState"/>
         public virtual unsafe void WriteValueFromBufferIntoState(void* bufferPtr, int bufferSize, void* statePtr)
         {
-            throw new NotSupportedException(
-                $"Control '{this}' does not support writing");
+            throw new NotSupportedException($"Control '{this}' does not support writing");
         }
 
         /// <summary>
@@ -577,8 +575,7 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="WriteValueFromBufferIntoState"/>
         public virtual unsafe void WriteValueFromObjectIntoState(object value, void* statePtr)
         {
-            throw new NotSupportedException(
-                $"Control '{this}' does not support writing");
+            throw new NotSupportedException($"Control '{this}' does not support writing");
         }
 
         /// <summary>
@@ -660,7 +657,8 @@ namespace UnityEngine.InputSystem
             var controlOfType = control as TControl;
             if (controlOfType == null)
                 throw new InvalidOperationException(
-                    $"Expected control '{path}' to be of type '{typeof(TControl).Name}' but is of type '{control.GetType().Name}' instead!");
+                    $"Expected control '{path}' to be of type '{typeof(TControl).Name}' but is of type '{control.GetType().Name}' instead!"
+                );
 
             return controlOfType;
         }
@@ -711,7 +709,9 @@ namespace UnityEngine.InputSystem
 
             if (!(control is TControl controlOfType))
                 throw new ArgumentException(
-                    $"Expected control '{path}' to be of type '{typeof(TControl).Name}' but is of type '{control.GetType().Name}' instead!", nameof(path));
+                    $"Expected control '{path}' to be of type '{typeof(TControl).Name}' but is of type '{control.GetType().Name}' instead!",
+                    nameof(path)
+                );
 
             return controlOfType;
         }
@@ -751,9 +751,7 @@ namespace UnityEngine.InputSystem
         /// }
         /// </code>
         /// </example>
-        protected virtual void FinishSetup()
-        {
-        }
+        protected virtual void FinishSetup() { }
 
         /// <summary>
         /// Call <see cref="RefreshConfiguration"/> if the configuration has in the interim been invalidated
@@ -895,9 +893,7 @@ namespace UnityEngine.InputSystem
         /// }
         /// </code>
         /// </example>
-        protected virtual void RefreshConfiguration()
-        {
-        }
+        protected virtual void RefreshConfiguration() { }
 
         ////TODO: drop protected access
         /// <summary>
@@ -920,7 +916,8 @@ namespace UnityEngine.InputSystem
         /// <value>
         /// The state data buffer for the device from the previous frame.
         /// </value>
-        protected internal unsafe void* previousFrameStatePtr => InputStateBuffers.GetBackBufferForDevice(GetDeviceIndex());
+        protected internal unsafe void* previousFrameStatePtr =>
+            InputStateBuffers.GetBackBufferForDevice(GetDeviceIndex());
 
         /// <summary>
         /// The default state data buffer
@@ -1106,10 +1103,11 @@ namespace UnityEngine.InputSystem
             if (currentOptimizedControlDataType != optimizedControlDataType)
             {
                 Debug.LogError(
-                    $"Control '{name}' / '{path}' suddenly changed optimization state due to either format " +
-                    $"change or control parameters change (was '{optimizedControlDataType}' but became '{currentOptimizedControlDataType}'), " +
-                    "this hinders control hot path optimization, please call control.ApplyParameterChanges() " +
-                    "after the changes to the control to fix this error.");
+                    $"Control '{name}' / '{path}' suddenly changed optimization state due to either format "
+                        + $"change or control parameters change (was '{optimizedControlDataType}' but became '{currentOptimizedControlDataType}'), "
+                        + "this hinders control hot path optimization, please call control.ApplyParameterChanges() "
+                        + "after the changes to the control to fix this error."
+                );
 
                 // Automatically fix the issue
                 // Note this function is only executed in the editor
@@ -1229,7 +1227,8 @@ namespace UnityEngine.InputSystem
             var deviceIndex = m_Device.m_DeviceIndex;
             if (deviceIndex == InputDevice.kInvalidDeviceIndex)
                 throw new InvalidOperationException(
-                    $"Cannot query value of control '{path}' before '{device.name}' has been added to system!");
+                    $"Cannot query value of control '{path}' before '{device.name}' has been added to system!"
+                );
             return deviceIndex;
         }
 
@@ -1240,9 +1239,7 @@ namespace UnityEngine.InputSystem
             return value >= ButtonControl.s_GlobalDefaultButtonPressPoint;
         }
 
-        internal virtual void AddProcessor(object first)
-        {
-        }
+        internal virtual void AddProcessor(object first) { }
 
         internal void MarkAsStale()
         {
@@ -1261,20 +1258,20 @@ namespace UnityEngine.InputSystem
                 {
                     // If everything is becoming stale, update all press states so we can reevaluate
                     buttonControl.UpdateWasPressed();
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     buttonControl.UpdateWasPressedEditor();
-                    #endif
+#endif
                 }
             }
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         internal virtual IEnumerable<object> GetProcessors()
         {
             yield return null;
         }
 
-        #endif
+#endif
     }
 
     /// <summary>
@@ -1356,9 +1353,10 @@ namespace UnityEngine.InputSystem
                             namesList.Add(inputProcessor.ToString());
                         var names = string.Join(", ", namesList);
                         Debug.LogError(
-                            "Cached processed value unexpectedly became outdated due to InputProcessor's returning a different value, " +
-                            $"new value '{currentProcessedValue}' old value '{m_CachedValue}', current processors are: {names}. " +
-                            "If your processor need to be recomputed on every read please add \"public override CachingPolicy cachingPolicy => CachingPolicy.EvaluateOnEveryRead;\" to the processor.");
+                            "Cached processed value unexpectedly became outdated due to InputProcessor's returning a different value, "
+                                + $"new value '{currentProcessedValue}' old value '{m_CachedValue}', current processors are: {names}. "
+                                + "If your processor need to be recomputed on every read please add \"public override CachingPolicy cachingPolicy => CachingPolicy.EvaluateOnEveryRead;\" to the processor."
+                        );
                         m_CachedValue = currentProcessedValue;
                     }
                 }
@@ -1407,7 +1405,9 @@ namespace UnityEngine.InputSystem
                     var currentUnprocessedValue = ReadUnprocessedValueFromState(currentStatePtr);
                     if (CompareValue(ref currentUnprocessedValue, ref m_UnprocessedCachedValue))
                     {
-                        Debug.LogError($"Cached unprocessed value unexpectedly became outdated for unknown reason, new value '{currentUnprocessedValue}' old value '{m_UnprocessedCachedValue}'.");
+                        Debug.LogError(
+                            $"Cached unprocessed value unexpectedly became outdated for unknown reason, new value '{currentUnprocessedValue}' old value '{m_UnprocessedCachedValue}'."
+                        );
                         m_UnprocessedCachedValue = currentUnprocessedValue;
                     }
                 }
@@ -1557,8 +1557,7 @@ namespace UnityEngine.InputSystem
 
             var numBytes = UnsafeUtility.SizeOf<TValue>();
             if (bufferSize < numBytes)
-                throw new ArgumentException(
-                    $"bufferSize={bufferSize} < sizeof(TValue)={numBytes}", nameof(bufferSize));
+                throw new ArgumentException($"bufferSize={bufferSize} < sizeof(TValue)={numBytes}", nameof(bufferSize));
 
             var value = ReadValueFromState(statePtr);
             var valuePtr = UnsafeUtility.AddressOf(ref value);
@@ -1576,8 +1575,7 @@ namespace UnityEngine.InputSystem
 
             var numBytes = UnsafeUtility.SizeOf<TValue>();
             if (bufferSize < numBytes)
-                throw new ArgumentException(
-                    $"bufferSize={bufferSize} < sizeof(TValue)={numBytes}", nameof(bufferSize));
+                throw new ArgumentException($"bufferSize={bufferSize} < sizeof(TValue)={numBytes}", nameof(bufferSize));
 
             // C# won't let us use a pointer to a generically defined type. Work
             // around this by using UnsafeUtility.
@@ -1622,8 +1620,7 @@ namespace UnityEngine.InputSystem
         {
             ////REVIEW: should we be able to even tell from layouts which controls support writing and which don't?
 
-            throw new NotSupportedException(
-                $"Control '{this}' does not support writing");
+            throw new NotSupportedException($"Control '{this}' does not support writing");
         }
 
         /// <inheritdoc />
@@ -1636,7 +1633,8 @@ namespace UnityEngine.InputSystem
             if (bufferSize < valueSize)
                 throw new ArgumentException(
                     $"Expecting buffer of at least {valueSize} bytes for value of type {typeof(TValue).Name} but got buffer of only {bufferSize} bytes instead",
-                    nameof(bufferSize));
+                    nameof(bufferSize)
+                );
 
             var value = default(TValue);
             var valuePtr = UnsafeUtility.AddressOf(ref value);
@@ -1713,7 +1711,7 @@ namespace UnityEngine.InputSystem
         private TValue m_CachedValue;
         private TValue m_UnprocessedCachedValue;
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe ref readonly TValue ReadStateInEditor()
         {
@@ -1735,7 +1733,7 @@ namespace UnityEngine.InputSystem
         // need somewhere with a known lifetime to store these so they can be returned by ref.
         private TValue m_EditorValue;
         private TValue m_UnprocessedEditorValue;
-        #endif
+#endif
 
         // Only layouts are allowed to modify the processor stack.
         internal TProcessor TryGetProcessor<TProcessor>()
@@ -1757,18 +1755,19 @@ namespace UnityEngine.InputSystem
         {
             if (!(processor is InputProcessor<TValue> processorOfType))
                 throw new ArgumentException(
-                    $"Cannot add processor of type '{processor.GetType().Name}' to control of type '{GetType().Name}'", nameof(processor));
+                    $"Cannot add processor of type '{processor.GetType().Name}' to control of type '{GetType().Name}'",
+                    nameof(processor)
+                );
             m_ProcessorStack.Append(processorOfType);
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         internal override IEnumerable<object> GetProcessors()
         {
             foreach (var processor in m_ProcessorStack)
                 yield return processor;
         }
-
-        #endif
+#endif
 
         internal bool evaluateProcessorsEveryRead = false;
 

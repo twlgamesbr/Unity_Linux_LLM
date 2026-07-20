@@ -7,11 +7,16 @@ namespace Unity.Multiplayer.Tools.Common
     [Serializable]
     internal class SerializedDictionary<K, V> : SortedDictionary<K, V>, ISerializationCallbackReceiver
     {
-        [SerializeField] List<K> m_Keys = new List<K>();
-        [SerializeField] List<V> m_Values = new List<V>();
+        [SerializeField]
+        List<K> m_Keys = new List<K>();
+
+        [SerializeField]
+        List<V> m_Values = new List<V>();
 
         public SerializedDictionary() { }
-        public SerializedDictionary(Comparer<K> comparer) : base(comparer) { }
+
+        public SerializedDictionary(Comparer<K> comparer)
+            : base(comparer) { }
 
         public void OnBeforeSerialize()
         {

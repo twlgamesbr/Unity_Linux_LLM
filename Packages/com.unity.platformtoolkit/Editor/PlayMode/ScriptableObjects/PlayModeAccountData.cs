@@ -17,8 +17,10 @@ namespace Unity.PlatformToolkit.PlayMode
 
         [SerializeField]
         private string m_PublicName = "New User";
+
         [SerializeField]
         private string m_PrivateName = "New User";
+
         [SerializeField]
         private Texture2D m_Picture = null;
 
@@ -70,7 +72,11 @@ namespace Unity.PlatformToolkit.PlayMode
             }
         }
 
-        internal void Initialize(ScriptableObjectDataChangePersistor persistor, ObservableSerializableList<PlayModeControlsAttributeDefinition> attributeDefinitions, int userIndex)
+        internal void Initialize(
+            ScriptableObjectDataChangePersistor persistor,
+            ObservableSerializableList<PlayModeControlsAttributeDefinition> attributeDefinitions,
+            int userIndex
+        )
         {
             Persistor = persistor;
             Achievements.Initialize();

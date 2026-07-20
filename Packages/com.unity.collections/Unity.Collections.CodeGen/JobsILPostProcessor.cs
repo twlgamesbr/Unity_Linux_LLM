@@ -9,7 +9,7 @@ using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 
 namespace Unity.Jobs.CodeGen
-{   
+{
     // Jobs ILPP entry point
     internal partial class JobsILPostProcessor : ILPostProcessor
     {
@@ -22,7 +22,7 @@ namespace Unity.Jobs.CodeGen
             bool madeAnyChange = false;
             Defines = new HashSet<string>(compiledAssembly.Defines);
 
-            try 
+            try
             {
                 AssemblyDefinition = AssemblyDefinitionFor(compiledAssembly);
             }
@@ -33,10 +33,12 @@ namespace Unity.Jobs.CodeGen
 
             try
             {
-                // This only works because the PostProcessorAssemblyResolver is explicitly loading 
+                // This only works because the PostProcessorAssemblyResolver is explicitly loading
                 // transitive dependencies (and then some) and so if we can't find a references to
                 // Unity.Jobs (via EarlyInitHelpers) in there than we are confident the assembly doesn't need processing
-                var earlyInitHelpers = AssemblyDefinition.MainModule.ImportReference(typeof(EarlyInitHelpers)).CheckedResolve();
+                var earlyInitHelpers = AssemblyDefinition
+                    .MainModule.ImportReference(typeof(EarlyInitHelpers))
+                    .CheckedResolve();
             }
             catch (ResolutionException)
             {
@@ -76,7 +78,9 @@ namespace Unity.Jobs.CodeGen
             var pdb = new MemoryStream();
             var writerParameters = new WriterParameters
             {
-                SymbolWriterProvider = new PortablePdbWriterProvider(), SymbolStream = pdb, WriteSymbols = true
+                SymbolWriterProvider = new PortablePdbWriterProvider(),
+                SymbolStream = pdb,
+                WriteSymbols = true,
             };
 
             AssemblyDefinition.Write(pe, writerParameters);
@@ -119,7 +123,7 @@ namespace Unity.Jobs.CodeGen
 
         // *******************************************************************************
         // ** NOTE
-        // ** Everything below this is a copy of the same process used in EntitiesILPostProcessor and 
+        // ** Everything below this is a copy of the same process used in EntitiesILPostProcessor and
         // ** should stay synced with it.
         // *******************************************************************************
 
@@ -149,9 +153,7 @@ namespace Unity.Jobs.CodeGen
                 }
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public AssemblyDefinition Resolve(AssemblyNameReference name)
             {
@@ -194,7 +196,7 @@ namespace Unity.Jobs.CodeGen
                     if (paths.Count == 1)
                     {
                         var enumerator = paths.GetEnumerator();
-                        // enumerators begin before the first element 
+                        // enumerators begin before the first element
                         enumerator.MoveNext();
                         return enumerator.Current;
                     }
@@ -207,7 +209,9 @@ namespace Unity.Jobs.CodeGen
                         if (onDiskAssemblyName.FullName == name.FullName)
                             return path;
                     }
-                    throw new ArgumentException($"Tried to resolve a reference in assembly '{name.FullName}' however the assembly could not be found. Known references which did not match: \n{string.Join("\n",paths)}");
+                    throw new ArgumentException(
+                        $"Tried to resolve a reference in assembly '{name.FullName}' however the assembly could not be found. Known references which did not match: \n{string.Join("\n", paths)}"
+                    );
                 }
 
                 // Unfortunately the current ICompiledAssembly API only provides direct references.
@@ -238,18 +242,23 @@ namespace Unity.Jobs.CodeGen
 
             static MemoryStream MemoryStreamFor(string fileName)
             {
-                return Retry(10, TimeSpan.FromSeconds(1), () => {
-                    byte[] byteArray;
-                    using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                return Retry(
+                    10,
+                    TimeSpan.FromSeconds(1),
+                    () =>
                     {
-                        byteArray = new byte[fs.Length];
-                        var readLength = fs.Read(byteArray, 0, (int)fs.Length);
-                        if (readLength != fs.Length)
-                            throw new InvalidOperationException("File read length is not full length of file.");
-                    }
+                        byte[] byteArray;
+                        using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        {
+                            byteArray = new byte[fs.Length];
+                            var readLength = fs.Read(byteArray, 0, (int)fs.Length);
+                            if (readLength != fs.Length)
+                                throw new InvalidOperationException("File read length is not full length of file.");
+                        }
 
-                    return new MemoryStream(byteArray);
-                });
+                        return new MemoryStream(byteArray);
+                    }
+                );
             }
 
             private static MemoryStream Retry(int retryCount, TimeSpan waitTime, Func<MemoryStream> func)
@@ -283,7 +292,7 @@ namespace Unity.Jobs.CodeGen
                 SymbolReaderProvider = new PortablePdbReaderProvider(),
                 AssemblyResolver = resolver,
                 ReflectionImporterProvider = new PostProcessorReflectionImporterProvider(),
-                ReadingMode = ReadingMode.Immediate
+                ReadingMode = ReadingMode.Immediate,
             };
 
             var peStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PeData);
@@ -312,7 +321,8 @@ namespace Unity.Jobs.CodeGen
         private const string SystemPrivateCoreLib = "System.Private.CoreLib";
         private AssemblyNameReference _correctCorlib;
 
-        public PostProcessorReflectionImporter(ModuleDefinition module) : base(module)
+        public PostProcessorReflectionImporter(ModuleDefinition module)
+            : base(module)
         {
             _correctCorlib = default;
             foreach (var a in module.AssemblyReferences)

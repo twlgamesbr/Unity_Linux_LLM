@@ -3,23 +3,28 @@ using Unity.Mathematics;
 
 namespace UnityEngine.PathTracing.Core
 {
-    static internal class SphericalHarmonicsUtil
+    internal static class SphericalHarmonicsUtil
     {
         // 1/2 * sqrt(1/π)
         const float SH_L0_Normalization = 0.2820947917738781434740397257803862929220253146644994284220428608f;
+
         // 1/2 * sqrt(3/π)
         const float SH_L1_Normalization = 0.4886025119029199215863846228383470045758856081942277021382431574f;
+
         // sqrt(15/π)/2
         const float SH_L2_2_Normalization = 1.0925484305920790705433857058026884026904329595042589753478516999f;
+
         // sqrt(15/π)/2
         const float SH_L2_1_Normalization = SH_L2_2_Normalization;
+
         // sqrt(5/π)/4
         const float SH_L20_Normalization = 0.3153915652525200060308936902957104933242475070484115878434078878f;
+
         // sqrt(15/π)/2
         const float SH_L21_Normalization = SH_L2_2_Normalization;
+
         // sqrt(15/π)/4
         const float SH_L22_Normalization = 0.5462742152960395352716928529013442013452164797521294876739258499f;
-
 
         // Basis function Y_0.
         static float SHL0()
@@ -75,10 +80,10 @@ namespace UnityEngine.PathTracing.Core
             return SH_L22_Normalization * (direction.x * direction.x - direction.y * direction.y);
         }
 
-        static public float3 EvaluateSH(Span<float> sh, float3 direction)
+        public static float3 EvaluateSH(Span<float> sh, float3 direction)
         {
             float3 res = new float3();
-            res += new float3(sh[0], sh[9] , sh[18]) * SHL0();
+            res += new float3(sh[0], sh[9], sh[18]) * SHL0();
             res += new float3(sh[1], sh[10], sh[19]) * SHL1_1(direction);
             res += new float3(sh[2], sh[11], sh[20]) * SHL10(direction);
             res += new float3(sh[3], sh[12], sh[21]) * SHL11(direction);

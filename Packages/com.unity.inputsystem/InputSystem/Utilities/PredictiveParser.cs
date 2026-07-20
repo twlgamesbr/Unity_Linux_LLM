@@ -7,7 +7,9 @@ namespace UnityEngine.InputSystem.Utilities
         public void ExpectSingleChar(ReadOnlySpan<char> str, char c)
         {
             if (str[m_Position] != c)
-                throw new InvalidOperationException($"Expected a '{c}' character at position {m_Position} in : {str.ToString()}");
+                throw new InvalidOperationException(
+                    $"Expected a '{c}' character at position {m_Position} in : {str.ToString()}"
+                );
 
             ++m_Position;
         }
@@ -24,7 +26,7 @@ namespace UnityEngine.InputSystem.Utilities
             }
 
             int value = 0;
-            for (;;)
+            for (; ; )
             {
                 var n = str[pos];
                 if (n >= '0' && n <= '9')
@@ -48,11 +50,13 @@ namespace UnityEngine.InputSystem.Utilities
         {
             var startPos = m_Position;
             if (str[startPos] != '\"')
-                throw new InvalidOperationException($"Expected a '\"' character at position {m_Position} in {str.ToString()}");
+                throw new InvalidOperationException(
+                    $"Expected a '\"' character at position {m_Position} in {str.ToString()}"
+                );
 
             ++m_Position;
 
-            for (;;)
+            for (; ; )
             {
                 var c = str[m_Position];
                 c |= ' ';
@@ -67,7 +71,9 @@ namespace UnityEngine.InputSystem.Utilities
 
             // if the first non-alpha character is not a quote, throw
             if (str[m_Position] != '\"')
-                throw new InvalidOperationException($"Expected a closing '\"' character at position {m_Position} in string: {str.ToString()}");
+                throw new InvalidOperationException(
+                    $"Expected a closing '\"' character at position {m_Position} in string: {str.ToString()}"
+                );
 
             if (m_Position - startPos == 1)
                 return ReadOnlySpan<char>.Empty;
@@ -97,7 +103,7 @@ namespace UnityEngine.InputSystem.Utilities
 
             ++endPos;
 
-            for (;;)
+            for (; ; )
             {
                 var c = input[endPos];
                 c |= ' ';
@@ -130,7 +136,7 @@ namespace UnityEngine.InputSystem.Utilities
             if (str[m_Position] == '-')
                 ++m_Position;
 
-            for (;;)
+            for (; ; )
             {
                 var n = str[m_Position];
                 if (n >= '0' && n <= '9')

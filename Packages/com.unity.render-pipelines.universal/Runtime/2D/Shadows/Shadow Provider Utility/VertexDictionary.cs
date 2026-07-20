@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Collections;
-
+using UnityEngine;
 
 internal struct VertexDictionary
 {

@@ -20,7 +20,8 @@ namespace FlyingWormConsole3.LiteNetLib
         {
             get
             {
-                long sent = PacketsSent, loss = PacketLoss;
+                long sent = PacketsSent,
+                    loss = PacketLoss;
 
                 return sent == 0 ? 0 : loss * 100 / sent;
             }
@@ -67,15 +68,15 @@ namespace FlyingWormConsole3.LiteNetLib
 
         public override string ToString()
         {
-            return
-                string.Format(
-                    "BytesReceived: {0}\nPacketsReceived: {1}\nBytesSent: {2}\nPacketsSent: {3}\nPacketLoss: {4}\nPacketLossPercent: {5}\n",
-                    BytesReceived,
-                    PacketsReceived,
-                    BytesSent,
-                    PacketsSent,
-                    PacketLoss,
-                    PacketLossPercent);
+            return string.Format(
+                "BytesReceived: {0}\nPacketsReceived: {1}\nBytesSent: {2}\nPacketsSent: {3}\nPacketLoss: {4}\nPacketLossPercent: {5}\n",
+                BytesReceived,
+                PacketsReceived,
+                BytesSent,
+                PacketsSent,
+                PacketLoss,
+                PacketLossPercent
+            );
         }
     }
 }

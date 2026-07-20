@@ -18,7 +18,7 @@ namespace Unity.PlatformToolkit.LocalSaving
                 AccountManualSignOut = false,
                 AccountInputPairingSystem = false,
                 AdditionalAccountSystem = false,
-                LocalSavingSystem = true
+                LocalSavingSystem = true,
             };
 
             Capabilities = capabilityBuilder.ToCapabilities();

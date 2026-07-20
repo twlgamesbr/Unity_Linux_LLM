@@ -12,7 +12,8 @@ namespace UnityEngine.UIElements
     [AddComponentMenu("UI Toolkit/World Document Raycaster (UI Toolkit)")]
     public class WorldDocumentRaycaster : BaseRaycaster
     {
-        [SerializeField] private Camera m_EventCamera;
+        [SerializeField]
+        private Camera m_EventCamera;
 
         /// <summary>
         /// The camera that will generate rays for this raycaster.
@@ -28,7 +29,6 @@ namespace UnityEngine.UIElements
             get => m_EventCamera;
             set => m_EventCamera = value;
         }
-
 
         /// <summary>
         /// Raycast against the scene.
@@ -58,26 +58,39 @@ namespace UnityEngine.UIElements
                     return;
             }
 
-
             var uiElementsUtil = IRuntimePanel.uIElementsRuntimeUtility;
-            if (uiElementsUtil == null || !uiElementsUtil.TryPickWithCapture(pointerId, worldRay, maxDistance, layerMask, out _,
-                    out var panelComponent, out var elementUnderPointer, out var distance, out var captured))
+            if (
+                uiElementsUtil == null
+                || !uiElementsUtil.TryPickWithCapture(
+                    pointerId,
+                    worldRay,
+                    maxDistance,
+                    layerMask,
+                    out _,
+                    out var panelComponent,
+                    out var elementUnderPointer,
+                    out var distance,
+                    out var captured
+                )
+            )
                 return;
 
             var containerPanel = panelComponent?.GetContainerPanel();
 
-            resultAppendList.Add(new RaycastResult
-            {
-                // Discard hits against non-UI objects. They should block UI but not hide the PhysicsRaycaster results.
-                gameObject = panelComponent == null ? gameObject : containerPanel.selectableGameObject,
-                origin = worldRay.origin,
-                worldPosition = worldRay.origin + distance * worldRay.direction,
-                panelComponent = panelComponent,
-                m_element = elementUnderPointer,
-                module = this,
-                distance = distance,
-                sortingOrder = captured ? int.MaxValue : 0,
-            });
+            resultAppendList.Add(
+                new RaycastResult
+                {
+                    // Discard hits against non-UI objects. They should block UI but not hide the PhysicsRaycaster results.
+                    gameObject = panelComponent == null ? gameObject : containerPanel.selectableGameObject,
+                    origin = worldRay.origin,
+                    worldPosition = worldRay.origin + distance * worldRay.direction,
+                    panelComponent = panelComponent,
+                    m_element = elementUnderPointer,
+                    module = this,
+                    distance = distance,
+                    sortingOrder = captured ? int.MaxValue : 0,
+                }
+            );
         }
 
         /// <summary>
@@ -89,7 +102,12 @@ namespace UnityEngine.UIElements
         /// <param name="maxDistance">A distance constraint for the created ray.</param>
         /// <param name="layerMask">A layer constraint for the created ray.</param>
         /// <returns>Returns true if a valid ray could be created.</returns>
-        protected virtual bool GetWorldRay(PointerEventData eventData, out Ray worldRay, out float maxDistance, out int layerMask)
+        protected virtual bool GetWorldRay(
+            PointerEventData eventData,
+            out Ray worldRay,
+            out float maxDistance,
+            out int layerMask
+        )
         {
             var cam = m_EventCamera != null ? m_EventCamera : Camera.main;
             if (cam == null)

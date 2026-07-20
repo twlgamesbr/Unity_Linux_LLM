@@ -39,11 +39,7 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
             var data = SerializeObject(m_TestResultDataFactory.CreateFromTest(testsToRun));
             lock (m_LockQueue)
             {
-                m_SendQueue.Enqueue(new QueueData
-                {
-                    id = PlayerConnectionMessageIds.runStartedMessageId,
-                    data = data
-                });
+                m_SendQueue.Enqueue(new QueueData { id = PlayerConnectionMessageIds.runStartedMessageId, data = data });
             }
         }
 
@@ -63,7 +59,9 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
             var data = SerializeObject(m_TestResultDataFactory.CreateFromTestResult(testResults));
             lock (m_LockQueue)
             {
-                m_SendQueue.Enqueue(new QueueData { id = PlayerConnectionMessageIds.runFinishedMessageId, data = data, });
+                m_SendQueue.Enqueue(
+                    new QueueData { id = PlayerConnectionMessageIds.runFinishedMessageId, data = data }
+                );
             }
         }
 
@@ -72,11 +70,9 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
             var data = SerializeObject(m_TestResultDataFactory.CreateFromTest(test));
             lock (m_LockQueue)
             {
-                m_SendQueue.Enqueue(new QueueData
-                {
-                    id = PlayerConnectionMessageIds.testStartedMessageId,
-                    data = data
-                });
+                m_SendQueue.Enqueue(
+                    new QueueData { id = PlayerConnectionMessageIds.testStartedMessageId, data = data }
+                );
             }
         }
 
@@ -86,11 +82,9 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
             var resultData = SerializeObject(testRunnerResultForApi);
             lock (m_LockQueue)
             {
-                m_SendQueue.Enqueue(new QueueData
-                {
-                    id = PlayerConnectionMessageIds.testFinishedMessageId,
-                    data = resultData,
-                });
+                m_SendQueue.Enqueue(
+                    new QueueData { id = PlayerConnectionMessageIds.testFinishedMessageId, data = resultData }
+                );
             }
         }
 
@@ -101,41 +95,41 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
                 yield return new WaitForSeconds(1);
             }
 
-			while (true)
-			{
-			    lock (m_LockQueue)
-			    {
-			        if (m_SendQueue.Count > 0)
-			        {
-			            if (PlayerConnection.instance.isConnected)
-			            {
-			                ResetNextPlayerAliveMessageTime();
+            while (true)
+            {
+                lock (m_LockQueue)
+                {
+                    if (m_SendQueue.Count > 0)
+                    {
+                        if (PlayerConnection.instance.isConnected)
+                        {
+                            ResetNextPlayerAliveMessageTime();
 
-			                var bytesSent = 0;
-			                while (m_SendQueue.Count > 0)
-			                {
-			                    // Send some queue data.
-			                    var queueData = m_SendQueue.Dequeue();
-			                    PlayerConnection.instance.Send(queueData.id, queueData.data);
-			                    
+                            var bytesSent = 0;
+                            while (m_SendQueue.Count > 0)
+                            {
+                                // Send some queue data.
+                                var queueData = m_SendQueue.Dequeue();
+                                PlayerConnection.instance.Send(queueData.id, queueData.data);
+
                                 // Keep a total of bytes sent this frame.
                                 bytesSent += queueData.data.Length;
-                                
-			                    // Break if we've sent our limit this frame.
-			                    if (bytesSent >= k_MaximumBytesSentPerFrame)
-			                        break;
-			                }
-			            }
 
-			            yield return null;
-			        }
-			        else //This is needed so we dont stall the player totally
-			        {
-			            SendAliveMessageIfNeeded();
-			            yield return new WaitForSeconds(0.02f);
-			        }
-			    }
-			}
+                                // Break if we've sent our limit this frame.
+                                if (bytesSent >= k_MaximumBytesSentPerFrame)
+                                    break;
+                            }
+                        }
+
+                        yield return null;
+                    }
+                    else //This is needed so we dont stall the player totally
+                    {
+                        SendAliveMessageIfNeeded();
+                        yield return new WaitForSeconds(0.02f);
+                    }
+                }
+            }
         }
 
         private void SendAliveMessageIfNeeded()

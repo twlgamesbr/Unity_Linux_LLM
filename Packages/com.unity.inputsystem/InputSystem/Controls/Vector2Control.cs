@@ -63,7 +63,8 @@ namespace UnityEngine.InputSystem.Controls
                 default:
                     return new Vector2(
                         x.ReadUnprocessedValueFromStateWithCaching(statePtr),
-                        y.ReadUnprocessedValueFromStateWithCaching(statePtr));
+                        y.ReadUnprocessedValueFromStateWithCaching(statePtr)
+                    );
             }
         }
 
@@ -92,11 +93,11 @@ namespace UnityEngine.InputSystem.Controls
         protected override FourCC CalculateOptimizedControlDataType()
         {
             if (
-                m_StateBlock.sizeInBits == sizeof(float) * 2 * 8 &&
-                m_StateBlock.bitOffset == 0 &&
-                x.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                y.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                y.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 4
+                m_StateBlock.sizeInBits == sizeof(float) * 2 * 8
+                && m_StateBlock.bitOffset == 0
+                && x.optimizedControlDataType == InputStateBlock.FormatFloat
+                && y.optimizedControlDataType == InputStateBlock.FormatFloat
+                && y.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 4
             )
                 return InputStateBlock.FormatVector2;
 

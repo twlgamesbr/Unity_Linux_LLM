@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.Layouts;
 using UnityEngine.XR;
 
 namespace UnityEngine.InputSystem.XR
@@ -42,7 +42,7 @@ namespace UnityEngine.InputSystem.XR
         Rotation,
         Hand,
         Bone,
-        Eyes
+        Eyes,
     }
 
     /// <summary>
@@ -66,14 +66,17 @@ namespace UnityEngine.InputSystem.XR
         /// The name of the feature.
         /// </summary>
         public string name;
+
         /// <summary>
         /// The uses that this feature should represent, such as trigger, or grip, or touchpad.
         /// </summary>
         public List<UsageHint> usageHints;
+
         /// <summary>
         /// The type of data this feature exposes.
         /// </summary>
         public FeatureType featureType;
+
         /// <summary>
         /// The overall size of the feature.  This is only filled in when the <see cref="featureType"/> is <see cref="FeatureType.Custom"/>.
         /// </summary>
@@ -91,14 +94,17 @@ namespace UnityEngine.InputSystem.XR
         /// The name of the device.
         /// </summary>
         public string deviceName;
+
         /// <summary>
         /// The manufacturer of the device.
         /// </summary>
         public string manufacturer;
+
         /// <summary>
         /// The serial number of the device.  An empty string if no serial number is available.
         /// </summary>
         public string serialNumber;
+
         /// <summary>
         /// The capabilities of the device, used to help filter and identify devices that server a certain purpose (e.g. controller, or headset, or hardware tracker).
         /// </summary>
@@ -108,10 +114,12 @@ namespace UnityEngine.InputSystem.XR
         [SerializeField]
         private uint characteristics;
 #endif
+
         /// <summary>
         /// The underlying deviceId, this can be used with <see cref="UnityEngine.XR.InputDevices"/> to create a device.
         /// </summary>
         public int deviceId;
+
         /// <summary>
         /// A list of all input features.  <see cref="XRFeatureDescriptor"/>
         /// </summary>
@@ -194,26 +202,32 @@ namespace UnityEngine.InputSystem.XR
         /// The tracked position of the left eye.
         /// </summary>
         public Vector3 m_LeftEyePosition;
+
         /// <summary>
         /// The tracked rotation of the left eye.
         /// </summary>
         public Quaternion m_LeftEyeRotation;
+
         /// <summary>
         /// The tracked position of the right eye.
         /// </summary>
         public Vector3 m_RightEyePosition;
+
         /// <summary>
         /// The tracked rotation of the right eye.
         /// </summary>
         public Quaternion m_RightEyeRotation;
+
         /// <summary>
         /// The point in 3D space that the pair of eyes is looking.
         /// </summary>
         public Vector3 m_FixationPoint;
+
         /// <summary>
         /// The amount [0-1] the left eye is open or closed.  1.0 is fully open.
         /// </summary>
         public float m_LeftEyeOpenAmount;
+
         /// <summary>
         /// The amount [0-1] the right eye is open or closed.  1.0 is fully open.
         /// </summary>
@@ -287,8 +301,10 @@ namespace UnityEngine.InputSystem.XR
     {
         [InputControl(offset = 0, displayName = "parentBoneIndex")]
         public IntegerControl parentBoneIndex { get; set; }
+
         [InputControl(offset = 4, displayName = "Position")]
         public Vector3Control position { get; set; }
+
         [InputControl(offset = 16, displayName = "Rotation")]
         public QuaternionControl rotation { get; set; }
 
@@ -307,7 +323,7 @@ namespace UnityEngine.InputSystem.XR
             {
                 parentBoneIndex = (uint)parentBoneIndex.ReadUnprocessedValueFromStateWithCaching(statePtr),
                 position = position.ReadUnprocessedValueFromStateWithCaching(statePtr),
-                rotation = rotation.ReadUnprocessedValueFromStateWithCaching(statePtr)
+                rotation = rotation.ReadUnprocessedValueFromStateWithCaching(statePtr),
             };
         }
 
@@ -323,16 +339,22 @@ namespace UnityEngine.InputSystem.XR
     {
         [InputControl(offset = 0, displayName = "LeftEyePosition")]
         public Vector3Control leftEyePosition { get; set; }
+
         [InputControl(offset = 12, displayName = "LeftEyeRotation")]
         public QuaternionControl leftEyeRotation { get; set; }
+
         [InputControl(offset = 28, displayName = "RightEyePosition")]
         public Vector3Control rightEyePosition { get; set; }
+
         [InputControl(offset = 40, displayName = "RightEyeRotation")]
         public QuaternionControl rightEyeRotation { get; set; }
+
         [InputControl(offset = 56, displayName = "FixationPoint")]
         public Vector3Control fixationPoint { get; set; }
+
         [InputControl(offset = 68, displayName = "LeftEyeOpenAmount")]
         public AxisControl leftEyeOpenAmount { get; set; }
+
         [InputControl(offset = 72, displayName = "RightEyeOpenAmount")]
         public AxisControl rightEyeOpenAmount { get; set; }
 
@@ -359,7 +381,7 @@ namespace UnityEngine.InputSystem.XR
                 rightEyeRotation = rightEyeRotation.ReadUnprocessedValueFromStateWithCaching(statePtr),
                 fixationPoint = fixationPoint.ReadUnprocessedValueFromStateWithCaching(statePtr),
                 leftEyeOpenAmount = leftEyeOpenAmount.ReadUnprocessedValueFromStateWithCaching(statePtr),
-                rightEyeOpenAmount = rightEyeOpenAmount.ReadUnprocessedValueFromStateWithCaching(statePtr)
+                rightEyeOpenAmount = rightEyeOpenAmount.ReadUnprocessedValueFromStateWithCaching(statePtr),
             };
         }
 
@@ -425,29 +447,35 @@ namespace UnityEngine.InputSystem.XR
             InputSystem.RegisterLayout<Unity.XR.Oculus.Input.OculusHMD>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct("^(Oculus Rift)|^(Oculus Quest)|^(Oculus Go)"));
+                    .WithProduct("^(Oculus Rift)|^(Oculus Quest)|^(Oculus Go)")
+            );
             InputSystem.RegisterLayout<Unity.XR.Oculus.Input.OculusTouchController>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct(@"(^(Oculus Touch Controller))|(^(Oculus Quest Controller))"));
+                    .WithProduct(@"(^(Oculus Touch Controller))|(^(Oculus Quest Controller))")
+            );
             InputSystem.RegisterLayout<Unity.XR.Oculus.Input.OculusRemote>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct(@"Oculus Remote"));
+                    .WithProduct(@"Oculus Remote")
+            );
             InputSystem.RegisterLayout<Unity.XR.Oculus.Input.OculusTrackingReference>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct(@"((Tracking Reference)|(^(Oculus Rift [a-zA-Z0-9]* \(Camera)))"));
+                    .WithProduct(@"((Tracking Reference)|(^(Oculus Rift [a-zA-Z0-9]* \(Camera)))")
+            );
 
             InputSystem.RegisterLayout<Unity.XR.Oculus.Input.OculusHMDExtended>(
                 name: "GearVR",
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct("Oculus HMD"));
+                    .WithProduct("Oculus HMD")
+            );
             InputSystem.RegisterLayout<Unity.XR.Oculus.Input.GearVRTrackedController>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct("^(Oculus Tracked Remote)"));
+                    .WithProduct("^(Oculus Tracked Remote)")
+            );
 #endif
 
             // Built-in layouts replaced by the com.unity.xr.googlevr package.
@@ -455,11 +483,13 @@ namespace UnityEngine.InputSystem.XR
             InputSystem.RegisterLayout<Unity.XR.GoogleVr.DaydreamHMD>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct("Daydream HMD"));
+                    .WithProduct("Daydream HMD")
+            );
             InputSystem.RegisterLayout<Unity.XR.GoogleVr.DaydreamController>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct("^(Daydream Controller)"));
+                    .WithProduct("^(Daydream Controller)")
+            );
 #endif
 
             // Built-in layouts replaced by the com.unity.xr.openvr package.

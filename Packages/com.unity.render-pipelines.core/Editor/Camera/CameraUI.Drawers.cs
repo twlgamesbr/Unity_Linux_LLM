@@ -11,8 +11,9 @@ namespace UnityEditor.Rendering
         {
             /// <summary> Perspective</summary>
             Perspective,
+
             /// <summary> Orthographic</summary>
-            Orthographic
+            Orthographic,
         }
 
         /// <summary>Camera Projection matrix mode</summary>
@@ -20,8 +21,10 @@ namespace UnityEditor.Rendering
         {
             /// <summary> Explicit</summary>
             Explicit,
+
             /// <summary> Implicit</summary>
             Implicit,
+
             /// <summary> PhysicalPropertiesBased</summary>
             PhysicalPropertiesBased,
         }
@@ -41,7 +44,8 @@ namespace UnityEditor.Rendering
                 projectionType = cam.orthographic.boolValue ? ProjectionType.Orthographic : ProjectionType.Perspective;
 
                 EditorGUI.BeginChangeCheck();
-                projectionType = (ProjectionType)EditorGUI.EnumPopup(perspectiveRect, Styles.projectionContent, projectionType);
+                projectionType = (ProjectionType)
+                    EditorGUI.EnumPopup(perspectiveRect, Styles.projectionContent, projectionType);
                 if (EditorGUI.EndChangeCheck())
                     cam.orthographic.boolValue = (projectionType == ProjectionType.Orthographic);
             }
@@ -65,7 +69,8 @@ namespace UnityEditor.Rendering
 
             float fovCurrentValue;
             bool multipleDifferentFovValues = false;
-            bool isPhysicalCamera = p.projectionMatrixMode.intValue == (int)ProjectionMatrixMode.PhysicalPropertiesBased;
+            bool isPhysicalCamera =
+                p.projectionMatrixMode.intValue == (int)ProjectionMatrixMode.PhysicalPropertiesBased;
 
             var rect = EditorGUILayout.GetControlRect();
 
@@ -78,7 +83,9 @@ namespace UnityEditor.Rendering
 
             if (!fovAxisVertical && !cam.fovAxisMode.hasMultipleDifferentValues)
             {
-                float aspectRatio = isPhysicalCamera ? cam.sensorSize.vector2Value.x / cam.sensorSize.vector2Value.y : camera0.aspect;
+                float aspectRatio = isPhysicalCamera
+                    ? cam.sensorSize.vector2Value.x / cam.sensorSize.vector2Value.y
+                    : camera0.aspect;
                 // camera.aspect is not serialized so we have to check all targets.
                 fovCurrentValue = Camera.VerticalToHorizontalFieldOfView(camera0.fieldOfView, aspectRatio);
                 if (targets.Cast<Camera>().Any(camera => camera.fieldOfView != fovCurrentValue))
@@ -91,8 +98,16 @@ namespace UnityEditor.Rendering
             }
 
             EditorGUI.showMixedValue = multipleDifferentFovValues;
-            var content = EditorGUI.BeginProperty(EditorGUILayout.BeginHorizontal(), Styles.fieldOfViewContent, cam.verticalFOV);
-            EditorGUI.BeginDisabledGroup(p.projectionMatrixMode.hasMultipleDifferentValues || isPhysicalCamera && (cam.sensorSize.hasMultipleDifferentValues || cam.fovAxisMode.hasMultipleDifferentValues));
+            var content = EditorGUI.BeginProperty(
+                EditorGUILayout.BeginHorizontal(),
+                Styles.fieldOfViewContent,
+                cam.verticalFOV
+            );
+            EditorGUI.BeginDisabledGroup(
+                p.projectionMatrixMode.hasMultipleDifferentValues
+                    || isPhysicalCamera
+                        && (cam.sensorSize.hasMultipleDifferentValues || cam.fovAxisMode.hasMultipleDifferentValues)
+            );
             EditorGUI.BeginChangeCheck();
             s_FovLastValue = EditorGUILayout.Slider(content, fovCurrentValue, 0.00001f, 179f);
             s_FovChanged = EditorGUI.EndChangeCheck();
@@ -103,14 +118,20 @@ namespace UnityEditor.Rendering
 
             Drawer_FieldClippingPlanes(p, owner);
 
-            content = EditorGUI.BeginProperty(EditorGUILayout.BeginHorizontal(), Styles.physicalCameraContent, p.projectionMatrixMode);
+            content = EditorGUI.BeginProperty(
+                EditorGUILayout.BeginHorizontal(),
+                Styles.physicalCameraContent,
+                p.projectionMatrixMode
+            );
             EditorGUI.showMixedValue = p.projectionMatrixMode.hasMultipleDifferentValues;
 
             EditorGUI.BeginChangeCheck();
             isPhysicalCamera = EditorGUILayout.Toggle(content, isPhysicalCamera);
             if (EditorGUI.EndChangeCheck())
             {
-                p.projectionMatrixMode.intValue = isPhysicalCamera ? (int)ProjectionMatrixMode.PhysicalPropertiesBased : (int)ProjectionMatrixMode.Implicit;
+                p.projectionMatrixMode.intValue = isPhysicalCamera
+                    ? (int)ProjectionMatrixMode.PhysicalPropertiesBased
+                    : (int)ProjectionMatrixMode.Implicit;
                 s_FovChanged = true;
             }
             EditorGUILayout.EndHorizontal();
@@ -165,7 +186,8 @@ namespace UnityEditor.Rendering
             CoreEditorUtils.DrawMultipleFields(
                 Styles.clippingPlaneMultiFieldTitle,
                 new[] { p.baseCameraSettings.nearClippingPlane, p.baseCameraSettings.farClippingPlane },
-                new[] { Styles.nearPlaneContent, Styles.farPlaneContent });
+                new[] { Styles.nearPlaneContent, Styles.farPlaneContent }
+            );
         }
     }
 }

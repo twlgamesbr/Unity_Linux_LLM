@@ -93,9 +93,7 @@ namespace Unity.Web.Stripping.Editor
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public WebBuildReport()
-        {
-        }
+        public WebBuildReport() { }
 
         /// <summary>
         /// Reads the files from the build path and updates the fields accordingly.
@@ -111,8 +109,10 @@ namespace Unity.Web.Stripping.Editor
                 var oldBackupFolder = GetBackupFolderPath();
 
                 var buildGuidFilePath = Path.Combine(OutputPath, k_BuildGuidFileName);
-                if (File.Exists(buildGuidFilePath)
-                    && !GUID.TryParse(File.ReadAllText(buildGuidFilePath), out m_BuildGuid))
+                if (
+                    File.Exists(buildGuidFilePath)
+                    && !GUID.TryParse(File.ReadAllText(buildGuidFilePath), out m_BuildGuid)
+                )
                 {
                     Debug.LogWarning($"{buildGuidFilePath} did not contain a valid GUID, generating a new GUID.");
                 }
@@ -175,11 +175,9 @@ namespace Unity.Web.Stripping.Editor
                 .Where(fn => fn.EndsWith(FileBackup.BackupFileExtension))
                 .FirstOrDefault();
 
-            SymbolFilePath = GetFiles(buildPath, SymbolFilePattern)
-                .FirstOrDefault();
+            SymbolFilePath = GetFiles(buildPath, SymbolFilePattern).FirstOrDefault();
 
-            StrippingInfoFilePath = GetFiles(backupPath, SubmoduleStripper.StrippingInfoFileName)
-                .FirstOrDefault();
+            StrippingInfoFilePath = GetFiles(backupPath, SubmoduleStripper.StrippingInfoFileName).FirstOrDefault();
             if (!string.IsNullOrEmpty(StrippingInfoFilePath))
                 AdditionalFiles.Add(StrippingInfoFilePath);
 
@@ -207,7 +205,9 @@ namespace Unity.Web.Stripping.Editor
         {
             // Potential original settings take precedence
             if (File.Exists(OriginalPlayerSettingsFilePath))
-                return JsonConvert.DeserializeObject<WebPlayerSettings>(File.ReadAllText(OriginalPlayerSettingsFilePath));
+                return JsonConvert.DeserializeObject<WebPlayerSettings>(
+                    File.ReadAllText(OriginalPlayerSettingsFilePath)
+                );
             if (File.Exists(PlayerSettingsFilePath))
                 return JsonConvert.DeserializeObject<WebPlayerSettings>(File.ReadAllText(PlayerSettingsFilePath));
             return null;

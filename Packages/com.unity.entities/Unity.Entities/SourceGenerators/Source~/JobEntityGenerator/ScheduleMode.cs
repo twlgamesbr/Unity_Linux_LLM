@@ -27,15 +27,16 @@ static class ScheduleModeHelpers
 
             ScheduleMode.ScheduleParallel => "ScheduleParallel(ref job, query, dependency)",
             ScheduleMode.ScheduleParallelByRef => "ScheduleParallel(ref job, query, dependency)",
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
 
     // scheduleType 0:Run, 1:Schedule, 2:ScheduleParallel
-    internal static int GetScheduleTypeAsNumber(this ScheduleMode scheduleMode)
-        => (int) scheduleMode / 2;
+    internal static int GetScheduleTypeAsNumber(this ScheduleMode scheduleMode) => (int)scheduleMode / 2;
 
-    internal static ScheduleMode GetScheduleModeFromNameOfMemberAccess(MemberAccessExpressionSyntax memberAccessExpressionSyntax)
-        => memberAccessExpressionSyntax.Name.Identifier.ValueText switch
+    internal static ScheduleMode GetScheduleModeFromNameOfMemberAccess(
+        MemberAccessExpressionSyntax memberAccessExpressionSyntax
+    ) =>
+        memberAccessExpressionSyntax.Name.Identifier.ValueText switch
         {
             "Run" => ScheduleMode.Run,
             "RunByRef" => ScheduleMode.RunByRef,
@@ -43,9 +44,13 @@ static class ScheduleModeHelpers
             "ScheduleByRef" => ScheduleMode.ScheduleByRef,
             "ScheduleParallel" => ScheduleMode.ScheduleParallel,
             "ScheduleParallelByRef" => ScheduleMode.ScheduleParallelByRef,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
 
     public static bool IsRun(this ScheduleMode mode) => mode == ScheduleMode.Run || mode == ScheduleMode.RunByRef;
-    public static bool IsByRef(this ScheduleMode mode) => mode == ScheduleMode.RunByRef || mode == ScheduleMode.ScheduleByRef || mode == ScheduleMode.ScheduleParallelByRef;
+
+    public static bool IsByRef(this ScheduleMode mode) =>
+        mode == ScheduleMode.RunByRef
+        || mode == ScheduleMode.ScheduleByRef
+        || mode == ScheduleMode.ScheduleParallelByRef;
 }

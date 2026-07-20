@@ -23,11 +23,9 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
         static PositionConfigurationInspector()
         {
-            var fields = typeof(PositionConfiguration)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+            var fields = typeof(PositionConfiguration).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-            string GetFieldName(string propertyName)
-                => fields.First(field => field.Name.Contains(propertyName)).Name;
+            string GetFieldName(string propertyName) => fields.First(field => field.Name.Contains(propertyName)).Name;
 
             k_OverrideFieldName = GetFieldName(nameof(PositionConfiguration.OverridePosition));
 
@@ -37,7 +35,6 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
         readonly Foldout m_Foldout;
         VisualElement Content => m_Foldout.contentContainer;
-
 
         internal PositionConfigurationInspector(SerializedProperty property)
         {

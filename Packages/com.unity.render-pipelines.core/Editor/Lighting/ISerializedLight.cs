@@ -9,8 +9,10 @@ namespace UnityEditor.Rendering
     {
         /// <summary>The base settings of the light</summary>
         LightEditor.Settings settings { get; }
+
         /// <summary>The light serialized</summary>
         SerializedObject serializedObject { get; }
+
         /// <summary>The additinal light data serialized</summary>
         SerializedObject serializedAdditionalDataObject { get; }
 

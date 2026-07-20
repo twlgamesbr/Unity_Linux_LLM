@@ -3,8 +3,11 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_Thickness"            )]
-    public struct HDRPMaterialPropertyThickness : IComponentData { public float  Value; }
+    [MaterialProperty("_Thickness")]
+    public struct HDRPMaterialPropertyThickness : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyThicknessAuthoring : UnityEngine.MonoBehaviour

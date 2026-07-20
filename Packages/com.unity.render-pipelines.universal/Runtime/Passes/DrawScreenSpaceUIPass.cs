@@ -38,7 +38,12 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="screenWidth">The full screen width.</param>
         /// <param name="screenHeight">The full screen height.</param>
         /// <seealso cref="RenderTextureDescriptor"/>
-        private static void ConfigureDepthDescriptor(ref RenderTextureDescriptor descriptor, GraphicsFormat depthStencilFormat, int screenWidth, int screenHeight)
+        private static void ConfigureDepthDescriptor(
+            ref RenderTextureDescriptor descriptor,
+            GraphicsFormat depthStencilFormat,
+            int screenWidth,
+            int screenHeight
+        )
         {
             descriptor.graphicsFormat = GraphicsFormat.None;
             descriptor.depthStencilFormat = depthStencilFormat;
@@ -52,15 +57,17 @@ namespace UnityEngine.Rendering.Universal
         }
 
         // Specific to RG cases which have to go through Unsafe commands
-        private static void ExecutePass(UnsafeCommandBuffer commandBuffer, UnsafePassData passData, RendererList rendererList)
+        private static void ExecutePass(
+            UnsafeCommandBuffer commandBuffer,
+            UnsafePassData passData,
+            RendererList rendererList
+        )
         {
             commandBuffer.DrawRendererList(rendererList);
         }
 
-        public void Dispose()
-        {
-        }
-        
+        public void Dispose() { }
+
         //RenderGraph path
         private class PassData
         {
@@ -74,22 +81,41 @@ namespace UnityEngine.Rendering.Universal
             internal TextureHandle colorTarget;
         }
 
-        internal void RenderOffscreen(RenderGraph renderGraph, ContextContainer frameData, GraphicsFormat depthStencilFormat, TextureHandle overlayUITexture)
+        internal void RenderOffscreen(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            GraphicsFormat depthStencilFormat,
+            TextureHandle overlayUITexture
+        )
         {
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             RenderTextureDescriptor depthDescriptor = cameraData.cameraTargetDescriptor;
             ConfigureDepthDescriptor(ref depthDescriptor, depthStencilFormat, Screen.width, Screen.height);
-            TextureHandle depthBuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, depthDescriptor, "_OverlayUITexture_Depth", false);
+            TextureHandle depthBuffer = UniversalRenderer.CreateRenderGraphTexture(
+                renderGraph,
+                depthDescriptor,
+                "_OverlayUITexture_Depth",
+                false
+            );
 
             // Render uGUI and UIToolkit overlays
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Draw Screen Space UIToolkit/uGUI - Offscreen", out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(
+                    "Draw Screen Space UIToolkit/uGUI - Offscreen",
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 // UIToolkit/uGUI pass accept custom shaders, we need to make sure we use all global textures
                 builder.UseAllGlobalTextures(true);
 
                 builder.SetRenderAttachment(overlayUITexture, 0);
 
-                passData.rendererList = renderGraph.CreateUIOverlayRendererList(cameraData.camera, UISubset.UIToolkit_UGUI);
+                passData.rendererList = renderGraph.CreateUIOverlayRendererList(
+                    cameraData.camera,
+                    UISubset.UIToolkit_UGUI
+                );
                 builder.UseRendererList(passData.rendererList);
 
                 builder.SetRenderAttachmentDepth(depthBuffer, AccessFlags.ReadWrite);
@@ -97,17 +123,25 @@ namespace UnityEngine.Rendering.Universal
                 if (overlayUITexture.IsValid())
                     builder.SetGlobalTextureAfterPass(overlayUITexture, ShaderPropertyId.overlayUITexture);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    context.cmd.ClearRenderTarget(true, true, Color.clear);
-                    ExecutePass(context.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        context.cmd.ClearRenderTarget(true, true, Color.clear);
+                        ExecutePass(context.cmd, data, data.rendererList);
+                    }
+                );
             }
             // Render IMGUI overlay and software cursor in a UnsafePass
             // Doing so allow us to safely cover cases when graphics commands called through onGUI() in user scripts are not supported by RenderPass API
             // Besides, Vulkan backend doesn't support SetSRGWrite() in RenderPass API and we have some of them at IMGUI levels
             // Note, these specific UI calls doesn't need depth buffer unlike UIToolkit/uGUI
-            using (var builder = renderGraph.AddUnsafePass<UnsafePassData>("Draw Screen Space IMGUI/SoftwareCursor - Offscreen", out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddUnsafePass<UnsafePassData>(
+                    "Draw Screen Space IMGUI/SoftwareCursor - Offscreen",
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 passData.colorTarget = overlayUITexture;
                 builder.UseTexture(overlayUITexture, AccessFlags.Write);
@@ -115,28 +149,46 @@ namespace UnityEngine.Rendering.Universal
                 passData.rendererList = renderGraph.CreateUIOverlayRendererList(cameraData.camera, UISubset.LowLevel);
                 builder.UseRendererList(passData.rendererList);
 
-                builder.SetRenderFunc(static (UnsafePassData data, UnsafeGraphContext context) =>
-                {
-                    context.cmd.SetRenderTarget(data.colorTarget);
-                    ExecutePass(context.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (UnsafePassData data, UnsafeGraphContext context) =>
+                    {
+                        context.cmd.SetRenderTarget(data.colorTarget);
+                        ExecutePass(context.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
 
-        internal void RenderOverlay(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle colorBuffer, in TextureHandle depthBuffer)
+        internal void RenderOverlay(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle colorBuffer,
+            in TextureHandle depthBuffer
+        )
         {
             RenderOverlayUIToolkitAndUGUI(renderGraph, frameData, in colorBuffer, in depthBuffer);
             RenderOverlayIMGUI(renderGraph, frameData, in colorBuffer, in depthBuffer);
         }
 
-        internal void RenderOverlayUIToolkitAndUGUI(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle colorBuffer, in TextureHandle depthBuffer)
+        internal void RenderOverlayUIToolkitAndUGUI(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle colorBuffer,
+            in TextureHandle depthBuffer
+        )
         {
             var cameraData = frameData.Get<UniversalCameraData>();
             var resourceData = frameData.Get<UniversalResourceData>();
             var renderer = cameraData.renderer as UniversalRenderer;
 
             // Render uGUI and UIToolkit overlays
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Draw UIToolkit/uGUI Overlay", out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(
+                    "Draw UIToolkit/uGUI Overlay",
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 // UIToolkit/uGUI pass accept custom shaders, we need to make sure we use all global textures
                 builder.UseAllGlobalTextures(true);
@@ -144,17 +196,27 @@ namespace UnityEngine.Rendering.Universal
                 builder.SetRenderAttachment(colorBuffer, 0);
                 builder.SetRenderAttachmentDepth(depthBuffer, AccessFlags.ReadWrite);
 
-                passData.rendererList = renderGraph.CreateUIOverlayRendererList(cameraData.camera, UISubset.UIToolkit_UGUI);
+                passData.rendererList = renderGraph.CreateUIOverlayRendererList(
+                    cameraData.camera,
+                    UISubset.UIToolkit_UGUI
+                );
                 builder.UseRendererList(passData.rendererList);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    ExecutePass(context.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        ExecutePass(context.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
 
-        internal void RenderOverlayIMGUI(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle colorBuffer, in TextureHandle depthBuffer)
+        internal void RenderOverlayIMGUI(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle colorBuffer,
+            in TextureHandle depthBuffer
+        )
         {
             var cameraData = frameData.Get<UniversalCameraData>();
 
@@ -162,7 +224,13 @@ namespace UnityEngine.Rendering.Universal
             // Doing so allow us to safely cover cases when graphics commands called through onGUI() in user scripts are not supported by RenderPass API
             // Besides, Vulkan backend doesn't support SetSRGWrite() in RenderPass API and we have some of them at IMGUI levels
             // Note, these specific UI calls doesn't need depth buffer unlike UIToolkit/uGUI
-            using (var builder = renderGraph.AddUnsafePass<UnsafePassData>("Draw IMGUI/SoftwareCursor Overlay", out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddUnsafePass<UnsafePassData>(
+                    "Draw IMGUI/SoftwareCursor Overlay",
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 passData.colorTarget = colorBuffer;
                 builder.UseTexture(colorBuffer, AccessFlags.Write);
@@ -170,11 +238,13 @@ namespace UnityEngine.Rendering.Universal
                 passData.rendererList = renderGraph.CreateUIOverlayRendererList(cameraData.camera, UISubset.LowLevel);
                 builder.UseRendererList(passData.rendererList);
 
-                builder.SetRenderFunc(static (UnsafePassData data, UnsafeGraphContext context) =>
-                {
-                    context.cmd.SetRenderTarget(data.colorTarget);
-                    ExecutePass(context.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (UnsafePassData data, UnsafeGraphContext context) =>
+                    {
+                        context.cmd.SetRenderTarget(data.colorTarget);
+                        ExecutePass(context.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
     }

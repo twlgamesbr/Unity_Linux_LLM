@@ -79,7 +79,11 @@ namespace UnityEngine.Rendering.Universal
             {
                 m_Camera = camera;
                 for (int i = 0; i < m_EntityManager.chunkCount; ++i)
-                    Execute(m_EntityManager.cachedChunks[i], m_EntityManager.culledChunks[i], m_EntityManager.culledChunks[i].count);
+                    Execute(
+                        m_EntityManager.cachedChunks[i],
+                        m_EntityManager.culledChunks[i],
+                        m_EntityManager.culledChunks[i].count
+                    );
             }
         }
 

@@ -5,17 +5,22 @@ using UnityEngine;
 
 internal static class MessageDelivery
 {
-    private static Dictionary<NetworkMessageTypes, NetworkDelivery> s_MessageToDelivery = new Dictionary<NetworkMessageTypes, NetworkDelivery>();
+    private static Dictionary<NetworkMessageTypes, NetworkDelivery> s_MessageToDelivery =
+        new Dictionary<NetworkMessageTypes, NetworkDelivery>();
 
-    private static Dictionary<Type, NetworkMessageTypes> s_MessageToMessageType = new Dictionary<Type, NetworkMessageTypes>();
+    private static Dictionary<Type, NetworkMessageTypes> s_MessageToMessageType =
+        new Dictionary<Type, NetworkMessageTypes>();
 
     /// <summary>
     /// - Skip named and unnamed since they inherently can have their network delivery type adjusted
     /// when sending the message via public API.
     /// - Skip the time sync messages since it has always used unreliable network delivery.
     /// </summary>
-    private static readonly HashSet<NetworkMessageTypes> k_SkipMessageTypes = new HashSet<NetworkMessageTypes>(){
-        NetworkMessageTypes.NamedMessage, NetworkMessageTypes.Unnamed};
+    private static readonly HashSet<NetworkMessageTypes> k_SkipMessageTypes = new HashSet<NetworkMessageTypes>()
+    {
+        NetworkMessageTypes.NamedMessage,
+        NetworkMessageTypes.Unnamed,
+    };
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void OnApplicationStart()

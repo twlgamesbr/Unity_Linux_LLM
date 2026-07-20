@@ -9,7 +9,8 @@ namespace Unity.Networking.Transport
     /// functions for custom <see cref="INetworkPipelineStage"/> implementations.
     /// </summary>
     /// <typeparam name="T">Type of the delegate.</typeparam>
-    public struct TransportFunctionPointer<T> where T : Delegate
+    public struct TransportFunctionPointer<T>
+        where T : Delegate
     {
         /// <summary>
         /// Construct a wrapped function pointer from a delegate.

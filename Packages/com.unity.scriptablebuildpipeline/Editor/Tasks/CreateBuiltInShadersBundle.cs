@@ -12,10 +12,13 @@ namespace UnityEditor.Build.Pipeline.Tasks
     [Obsolete("CreateBuiltInShaders has been replaced with CreateBuiltInBundle.")]
     public class CreateBuiltInShadersBundle : IBuildTask
     {
-
         static readonly GUID k_BuiltInGuid = new GUID(CommonStrings.UnityBuiltInExtraGuid);
+
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -44,7 +47,7 @@ namespace UnityEditor.Build.Pipeline.Tasks
         {
             IBuildContext context = new BuildContext(m_DependencyData, m_Layout);
             CreateBuiltInBundle createBuiltInBundle = new CreateBuiltInBundle(ShaderBundleName);
-            ContextInjector.Inject(context, createBuiltInBundle );
+            ContextInjector.Inject(context, createBuiltInBundle);
             ReturnCode result = createBuiltInBundle.Run();
             ContextInjector.Extract(context, createBuiltInBundle);
 

@@ -18,7 +18,7 @@ namespace Unity.Scenes
 
     internal struct PrefabAssetReference : ICleanupComponentData
     {
-        internal EntityPrefabReference      _ReferenceId;
+        internal EntityPrefabReference _ReferenceId;
     }
 
     /// <summary>
@@ -54,7 +54,9 @@ namespace Unity.Scenes
     /// System for loading assets into a runtime world.
     /// </summary>
     [RequireMatchingQueriesForUpdate]
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.Streaming)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.Streaming
+    )]
     [UpdateInGroup(typeof(SceneSystemGroup))]
     [UpdateBefore(typeof(ResolveSceneReferenceSystem))]
     [BurstCompile]
@@ -67,11 +69,20 @@ namespace Unity.Scenes
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.EntityManager.AddComponentData(state.SystemHandle, new WeakAssetReferenceLoadingData
-            {
-                InProgressLoads = new NativeParallelMultiHashMap<EntityPrefabReference, Entity>(1, Allocator.Persistent),
-                LoadedPrefabs = new NativeParallelHashMap<EntityPrefabReference, WeakAssetReferenceLoadingData.LoadedPrefab>(1, Allocator.Persistent),
-            });
+            state.EntityManager.AddComponentData(
+                state.SystemHandle,
+                new WeakAssetReferenceLoadingData
+                {
+                    InProgressLoads = new NativeParallelMultiHashMap<EntityPrefabReference, Entity>(
+                        1,
+                        Allocator.Persistent
+                    ),
+                    LoadedPrefabs = new NativeParallelHashMap<
+                        EntityPrefabReference,
+                        WeakAssetReferenceLoadingData.LoadedPrefab
+                    >(1, Allocator.Persistent),
+                }
+            );
         }
 
         /// <summary>
@@ -81,7 +92,9 @@ namespace Unity.Scenes
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
-            ref var data = ref state.EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(state.SystemHandle).ValueRW;
+            ref var data = ref state
+                .EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(state.SystemHandle)
+                .ValueRW;
             data.InProgressLoads.Dispose();
             data.LoadedPrefabs.Dispose();
         }
@@ -94,7 +107,12 @@ namespace Unity.Scenes
         public void OnUpdate(ref SystemState state)
         {
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            foreach(var (req, e) in SystemAPI.Query<RequestEntityPrefabLoaded>().WithEntityAccess().WithNone<PrefabAssetReference>())
+            foreach (
+                var (req, e) in SystemAPI
+                    .Query<RequestEntityPrefabLoaded>()
+                    .WithEntityAccess()
+                    .WithNone<PrefabAssetReference>()
+            )
             {
                 StartLoadRequest(ref state, e, req.Prefab, ref ecb);
             }
@@ -104,8 +122,15 @@ namespace Unity.Scenes
             var prefabIdsToRemove = new NativeList<EntityPrefabReference>(Allocator.Temp);
             var inProgressLoadsToRemove = new NativeParallelHashMap<EntityPrefabReference, Entity>(16, Allocator.Temp);
             var PARSToRemove = new NativeList<Entity>(Allocator.Temp);
-            ref var loadingData = ref state.EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(state.SystemHandle).ValueRW;
-            foreach (var (prefabReference, e) in SystemAPI.Query<PrefabAssetReference>().WithEntityAccess().WithNone<RequestEntityPrefabLoaded>())
+            ref var loadingData = ref state
+                .EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(state.SystemHandle)
+                .ValueRW;
+            foreach (
+                var (prefabReference, e) in SystemAPI
+                    .Query<PrefabAssetReference>()
+                    .WithEntityAccess()
+                    .WithNone<RequestEntityPrefabLoaded>()
+            )
             {
                 if (loadingData.LoadedPrefabs.TryGetValue(prefabReference._ReferenceId, out var loadedPrefab))
                 {
@@ -130,7 +155,11 @@ namespace Unity.Scenes
 
             for (int i = 0; i < sceneEntitiesToUnload.Length; i++)
             {
-                SceneSystem.UnloadScene(state.WorldUnmanaged, sceneEntitiesToUnload[i], SceneSystem.UnloadParameters.DestroyMetaEntities);
+                SceneSystem.UnloadScene(
+                    state.WorldUnmanaged,
+                    sceneEntitiesToUnload[i],
+                    SceneSystem.UnloadParameters.DestroyMetaEntities
+                );
             }
 
             for (int i = 0; i < prefabIdsToRemove.Length; i++)
@@ -149,13 +178,20 @@ namespace Unity.Scenes
             }
         }
 
-        void StartLoadRequest(ref SystemState state, Entity entity, EntityPrefabReference loadRequestWeakReferenceId, ref EntityCommandBuffer ecb)
+        void StartLoadRequest(
+            ref SystemState state,
+            Entity entity,
+            EntityPrefabReference loadRequestWeakReferenceId,
+            ref EntityCommandBuffer ecb
+        )
         {
-            ref var loadingData = ref state.EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(state.SystemHandle).ValueRW;
+            ref var loadingData = ref state
+                .EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(state.SystemHandle)
+                .ValueRW;
             if (loadingData.LoadedPrefabs.TryGetValue(loadRequestWeakReferenceId, out var loadedPrefab))
             {
-                ecb.AddComponent(entity, new PrefabAssetReference { _ReferenceId = loadRequestWeakReferenceId});
-                ecb.AddComponent(entity, new PrefabLoadResult { PrefabRoot = loadedPrefab.PrefabRoot});
+                ecb.AddComponent(entity, new PrefabAssetReference { _ReferenceId = loadRequestWeakReferenceId });
+                ecb.AddComponent(entity, new PrefabLoadResult { PrefabRoot = loadedPrefab.PrefabRoot });
                 loadedPrefab.RefCount++;
                 loadingData.LoadedPrefabs.Remove(loadRequestWeakReferenceId);
                 loadingData.LoadedPrefabs.Add(loadRequestWeakReferenceId, loadedPrefab);
@@ -167,8 +203,15 @@ namespace Unity.Scenes
             if (!loadingData.InProgressLoads.ContainsKey(loadRequestWeakReferenceId))
             {
                 var loadParameters = new SceneSystem.LoadParameters { Flags = SceneLoadFlags.NewInstance };
-                var sceneEntity = SceneSystem.LoadPrefabAsync(state.WorldUnmanaged, loadRequestWeakReferenceId, loadParameters);
-                ecb.AddComponent(sceneEntity, new WeakAssetPrefabLoadRequest { WeakReferenceId = loadRequestWeakReferenceId });
+                var sceneEntity = SceneSystem.LoadPrefabAsync(
+                    state.WorldUnmanaged,
+                    loadRequestWeakReferenceId,
+                    loadParameters
+                );
+                ecb.AddComponent(
+                    sceneEntity,
+                    new WeakAssetPrefabLoadRequest { WeakReferenceId = loadRequestWeakReferenceId }
+                );
             }
 
             loadingData.InProgressLoads.Add(loadRequestWeakReferenceId, entity);
@@ -181,9 +224,18 @@ namespace Unity.Scenes
         /// <param name="sceneEntity">The entity representing the loading state of the scene.</param>
         /// <param name="prefabRoot">The root entity of a converted prefab.</param>
         /// <param name="weakReferenceId">The prefab reference used to initiate the load.</param>
-        public static void CompleteLoad(ref SystemState state, Entity sceneEntity, Entity prefabRoot, EntityPrefabReference weakReferenceId)
+        public static void CompleteLoad(
+            ref SystemState state,
+            Entity sceneEntity,
+            Entity prefabRoot,
+            EntityPrefabReference weakReferenceId
+        )
         {
-            ref var loadingData = ref state.EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(state.WorldUnmanaged.GetExistingUnmanagedSystem<WeakAssetReferenceLoadingSystem>()).ValueRW;
+            ref var loadingData = ref state
+                .EntityManager.GetComponentDataRW<WeakAssetReferenceLoadingData>(
+                    state.WorldUnmanaged.GetExistingUnmanagedSystem<WeakAssetReferenceLoadingSystem>()
+                )
+                .ValueRW;
             if (!loadingData.InProgressLoads.TryGetFirstValue(weakReferenceId, out var entity, out var it))
             {
 #if UNITY_EDITOR
@@ -203,20 +255,38 @@ namespace Unity.Scenes
                 }
 #endif
                 //No one was waiting for this load, unload it immediately
-                SceneSystem.UnloadScene(state.WorldUnmanaged, sceneEntity, SceneSystem.UnloadParameters.DestroyMetaEntities);
+                SceneSystem.UnloadScene(
+                    state.WorldUnmanaged,
+                    sceneEntity,
+                    SceneSystem.UnloadParameters.DestroyMetaEntities
+                );
                 return;
             }
 
-            state.EntityManager.AddComponentData(prefabRoot, new RequestEntityPrefabLoaded() {Prefab =  weakReferenceId});
+            state.EntityManager.AddComponentData(
+                prefabRoot,
+                new RequestEntityPrefabLoaded() { Prefab = weakReferenceId }
+            );
             int count = 0;
             do
             {
-                state.EntityManager.AddComponentData(entity, new PrefabAssetReference { _ReferenceId = weakReferenceId});
-                state.EntityManager.AddComponentData(entity, new PrefabLoadResult { PrefabRoot =  prefabRoot});
+                state.EntityManager.AddComponentData(
+                    entity,
+                    new PrefabAssetReference { _ReferenceId = weakReferenceId }
+                );
+                state.EntityManager.AddComponentData(entity, new PrefabLoadResult { PrefabRoot = prefabRoot });
                 count++;
             } while (loadingData.InProgressLoads.TryGetNextValue(out entity, ref it));
             loadingData.InProgressLoads.Remove(weakReferenceId);
-            loadingData.LoadedPrefabs.Add(weakReferenceId, new WeakAssetReferenceLoadingData.LoadedPrefab { SceneEntity = sceneEntity, PrefabRoot = prefabRoot, RefCount = count});
+            loadingData.LoadedPrefabs.Add(
+                weakReferenceId,
+                new WeakAssetReferenceLoadingData.LoadedPrefab
+                {
+                    SceneEntity = sceneEntity,
+                    PrefabRoot = prefabRoot,
+                    RefCount = count,
+                }
+            );
         }
     }
 }

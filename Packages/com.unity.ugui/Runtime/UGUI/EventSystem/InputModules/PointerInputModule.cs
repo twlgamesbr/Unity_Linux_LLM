@@ -41,10 +41,7 @@ namespace UnityEngine.EventSystems
         {
             if (!m_PointerData.TryGetValue(id, out data) && create)
             {
-                data = new PointerEventData(eventSystem)
-                {
-                    pointerId = id,
-                };
+                data = new PointerEventData(eventSystem) { pointerId = id };
                 m_PointerData.Add(id, data);
                 return true;
             }
@@ -213,7 +210,11 @@ namespace UnityEngine.EventSystems
                 return tracked;
             }
 
-            public void SetButtonState(PointerEventData.InputButton button, PointerEventData.FramePressState stateForMouseButton, PointerEventData data)
+            public void SetButtonState(
+                PointerEventData.InputButton button,
+                PointerEventData.FramePressState stateForMouseButton,
+                PointerEventData data
+            )
             {
                 var toModify = GetButtonState(button);
                 toModify.eventData.buttonState = stateForMouseButton;
@@ -241,7 +242,8 @@ namespace UnityEngine.EventSystems
             /// </summary>
             public bool PressedThisFrame()
             {
-                return buttonState == PointerEventData.FramePressState.Pressed || buttonState == PointerEventData.FramePressState.PressedAndReleased;
+                return buttonState == PointerEventData.FramePressState.Pressed
+                    || buttonState == PointerEventData.FramePressState.PressedAndReleased;
             }
 
             /// <summary>
@@ -249,7 +251,8 @@ namespace UnityEngine.EventSystems
             /// </summary>
             public bool ReleasedThisFrame()
             {
-                return buttonState == PointerEventData.FramePressState.Released || buttonState == PointerEventData.FramePressState.PressedAndReleased;
+                return buttonState == PointerEventData.FramePressState.Released
+                    || buttonState == PointerEventData.FramePressState.PressedAndReleased;
             }
         }
 
@@ -328,7 +331,12 @@ namespace UnityEngine.EventSystems
             return data;
         }
 
-        private static bool ShouldStartDrag(Vector2 pressPos, Vector2 currentPos, float threshold, bool useDragThreshold)
+        private static bool ShouldStartDrag(
+            Vector2 pressPos,
+            Vector2 currentPos,
+            float threshold,
+            bool useDragThreshold
+        )
         {
             if (!useDragThreshold)
                 return true;
@@ -341,7 +349,9 @@ namespace UnityEngine.EventSystems
         /// </summary>
         protected virtual void ProcessMove(PointerEventData pointerEvent)
         {
-            var targetGO = (Cursor.lockState == CursorLockMode.Locked ? null : pointerEvent.pointerCurrentRaycast.gameObject);
+            var targetGO = (
+                Cursor.lockState == CursorLockMode.Locked ? null : pointerEvent.pointerCurrentRaycast.gameObject
+            );
             HandlePointerExitAndEnter(pointerEvent, targetGO);
         }
 
@@ -350,13 +360,22 @@ namespace UnityEngine.EventSystems
         /// </summary>
         protected virtual void ProcessDrag(PointerEventData pointerEvent)
         {
-            if (!pointerEvent.IsPointerMoving() ||
-                Cursor.lockState == CursorLockMode.Locked ||
-                pointerEvent.pointerDrag == null)
+            if (
+                !pointerEvent.IsPointerMoving()
+                || Cursor.lockState == CursorLockMode.Locked
+                || pointerEvent.pointerDrag == null
+            )
                 return;
 
-            if (!pointerEvent.dragging
-                && ShouldStartDrag(pointerEvent.pressPosition, pointerEvent.position, eventSystem.pixelDragThreshold, pointerEvent.useDragThreshold))
+            if (
+                !pointerEvent.dragging
+                && ShouldStartDrag(
+                    pointerEvent.pressPosition,
+                    pointerEvent.position,
+                    eventSystem.pixelDragThreshold,
+                    pointerEvent.useDragThreshold
+                )
+            )
             {
                 ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.beginDragHandler);
                 pointerEvent.dragging = true;

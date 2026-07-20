@@ -13,7 +13,8 @@ namespace Unity.Netcode.Editor.CodeGen
     {
         public override ILPPInterface GetInstance() => this;
 
-        public override bool WillProcess(ICompiledAssembly compiledAssembly) => compiledAssembly.Name == CodeGenHelpers.RuntimeAssemblyName;
+        public override bool WillProcess(ICompiledAssembly compiledAssembly) =>
+            compiledAssembly.Name == CodeGenHelpers.RuntimeAssemblyName;
 
         private readonly List<DiagnosticMessage> m_Diagnostics = new List<DiagnosticMessage>();
 
@@ -71,7 +72,9 @@ namespace Unity.Netcode.Editor.CodeGen
             }
             else
             {
-                m_Diagnostics.AddError($"Cannot get main module from Netcode Runtime assembly definition: {compiledAssembly.Name}");
+                m_Diagnostics.AddError(
+                    $"Cannot get main module from Netcode Runtime assembly definition: {compiledAssembly.Name}"
+                );
             }
 
             // write
@@ -82,7 +85,7 @@ namespace Unity.Netcode.Editor.CodeGen
             {
                 SymbolWriterProvider = new PortablePdbWriterProvider(),
                 SymbolStream = pdb,
-                WriteSymbols = true
+                WriteSymbols = true,
             };
 
             assemblyDefinition.Write(pe, writerParameters);
@@ -146,7 +149,10 @@ namespace Unity.Netcode.Editor.CodeGen
 
             foreach (var fieldDefinition in typeDefinition.Fields)
             {
-                if (fieldDefinition.Name == nameof(NetworkBehaviour.__rpc_exec_stage) || fieldDefinition.Name == nameof(NetworkBehaviour.NetworkVariableFields))
+                if (
+                    fieldDefinition.Name == nameof(NetworkBehaviour.__rpc_exec_stage)
+                    || fieldDefinition.Name == nameof(NetworkBehaviour.NetworkVariableFields)
+                )
                 {
                     fieldDefinition.IsFamilyOrAssembly = true;
                 }
@@ -169,17 +175,19 @@ namespace Unity.Netcode.Editor.CodeGen
 
             foreach (var methodDefinition in typeDefinition.Methods)
             {
-                if (methodDefinition.Name == nameof(NetworkBehaviour.__beginSendServerRpc) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__endSendServerRpc) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__beginSendClientRpc) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__endSendClientRpc) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__beginSendRpc) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__endSendRpc) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__initializeVariables) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__initializeRpcs) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__registerRpc) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__nameNetworkVariable) ||
-                    methodDefinition.Name == nameof(NetworkBehaviour.__createNativeList))
+                if (
+                    methodDefinition.Name == nameof(NetworkBehaviour.__beginSendServerRpc)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__endSendServerRpc)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__beginSendClientRpc)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__endSendClientRpc)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__beginSendRpc)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__endSendRpc)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__initializeVariables)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__initializeRpcs)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__registerRpc)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__nameNetworkVariable)
+                    || methodDefinition.Name == nameof(NetworkBehaviour.__createNativeList)
+                )
                 {
                     methodDefinition.IsFamily = true;
                 }

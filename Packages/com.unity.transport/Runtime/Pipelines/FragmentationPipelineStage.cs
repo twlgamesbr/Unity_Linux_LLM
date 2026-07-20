@@ -32,17 +32,23 @@ namespace Unity.Networking.Transport
         {
             First = 1 << 15,
             Last = 1 << 14,
-            SeqMask = Last - 1
+            SeqMask = Last - 1,
         }
 
 #if FRAGMENTATION_DEBUG
-        const int FragHeaderCapacity = 2 + 4;    // 2 bits for First/Last flags, 14 bits sequence number
+        const int FragHeaderCapacity = 2 + 4; // 2 bits for First/Last flags, 14 bits sequence number
 #else
-        const int FragHeaderCapacity = 2;    // 2 bits for First/Last flags, 14 bits sequence number
+        const int FragHeaderCapacity = 2; // 2 bits for First/Last flags, 14 bits sequence number
 #endif
+
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.SendDelegate))]
-        private static int Send(ref NetworkPipelineContext ctx, ref InboundSendBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+        private static int Send(
+            ref NetworkPipelineContext ctx,
+            ref InboundSendBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        )
         {
             var fragContext = (FragContext*)ctx.internalProcessBuffer;
             var dataBuffer = ctx.internalProcessBuffer + sizeof(FragContext);
@@ -58,7 +64,9 @@ namespace Unity.Networking.Transport
                 if (inboundBuffer.buffer != null)
                 {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    throw new InvalidOperationException("Internal error: we encountered data in the fragmentation buffer, but this is not a resume call.");
+                    throw new InvalidOperationException(
+                        "Internal error: we encountered data in the fragmentation buffer, but this is not a resume call."
+                    );
 #else
                     return (int)Error.StatusCode.NetworkStateMismatch;
 #endif
@@ -86,7 +94,9 @@ namespace Unity.Networking.Transport
                 if (excessLength + inboundBuffer.headerPadding > payloadCapacity)
                 {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    throw new InvalidOperationException($"Fragmentation capacity exceeded. Capacity:{payloadCapacity} Payload:{excessLength + inboundBuffer.headerPadding}");
+                    throw new InvalidOperationException(
+                        $"Fragmentation capacity exceeded. Capacity:{payloadCapacity} Payload:{excessLength + inboundBuffer.headerPadding}"
+                    );
 #else
                     return (int)Error.StatusCode.NetworkPacketOverflow;
 #endif
@@ -109,7 +119,7 @@ namespace Unity.Networking.Transport
 
             var sequence = fragContext->sequence++;
 
-            var combined = (sequence & (int)FragFlags.SeqMask) | (int)flags;    // lower 14 bits sequence, top 2 bits flags
+            var combined = (sequence & (int)FragFlags.SeqMask) | (int)flags; // lower 14 bits sequence, top 2 bits flags
             ctx.header.WriteShort((short)combined);
 
 #if FRAGMENTATION_DEBUG
@@ -124,13 +134,22 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.ReceiveDelegate))]
-        private static void Receive(ref NetworkPipelineContext ctx, ref InboundRecvBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+        private static void Receive(
+            ref NetworkPipelineContext ctx,
+            ref InboundRecvBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        )
         {
             var fragContext = (FragContext*)ctx.internalProcessBuffer;
             var dataBuffer = ctx.internalProcessBuffer + sizeof(FragContext);
             var sharedContext = (FragSharedContext*)ctx.staticInstanceBuffer;
 
-            var inboundArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(inboundBuffer.buffer, inboundBuffer.bufferLength, Allocator.Invalid);
+            var inboundArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                inboundBuffer.buffer,
+                inboundBuffer.bufferLength,
+                Allocator.Invalid
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandle = AtomicSafetyHandle.GetTempMemoryHandle();
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref inboundArray, safetyHandle);
@@ -157,7 +176,7 @@ namespace Unity.Networking.Transport
             {
                 // We've missed a packet.
                 fragContext->packetError = true;
-                fragContext->endIndex = 0;        // Discard data we have already collected
+                fragContext->endIndex = 0; // Discard data we have already collected
             }
 
             if (!fragContext->packetError)
@@ -174,18 +193,18 @@ namespace Unity.Networking.Transport
 #endif
                     }
                     // Append the data to the end
-                    UnsafeUtility.MemCpy(dataBuffer + fragContext->endIndex, inboundBuffer.buffer, inboundBuffer.bufferLength);
+                    UnsafeUtility.MemCpy(
+                        dataBuffer + fragContext->endIndex,
+                        inboundBuffer.buffer,
+                        inboundBuffer.bufferLength
+                    );
                     fragContext->endIndex += inboundBuffer.bufferLength;
                 }
 
                 if (isLast && fragContext->endIndex > 0)
                 {
                     // Data is complete
-                    inboundBuffer = new InboundRecvBuffer
-                    {
-                        buffer = dataBuffer,
-                        bufferLength = fragContext->endIndex
-                    };
+                    inboundBuffer = new InboundRecvBuffer { buffer = dataBuffer, bufferLength = fragContext->endIndex };
                 }
             }
 
@@ -200,14 +219,23 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.InitializeConnectionDelegate))]
-        private static void InitializeConnection(byte* staticInstanceBuffer, int staticInstanceBufferLength,
-            byte* sendProcessBuffer, int sendProcessBufferLength, byte* recvProcessBuffer, int recvProcessBufferLength,
-            byte* sharedProcessBuffer, int sharedProcessBufferLength)
-        {
-        }
+        private static void InitializeConnection(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            byte* sendProcessBuffer,
+            int sendProcessBufferLength,
+            byte* recvProcessBuffer,
+            int recvProcessBufferLength,
+            byte* sharedProcessBuffer,
+            int sharedProcessBufferLength
+        ) { }
 
         /// <inheritdoc/>
-        public NetworkPipelineStage StaticInitialize(byte* staticInstanceBuffer, int staticInstanceBufferLength, NetworkSettings settings)
+        public NetworkPipelineStage StaticInitialize(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            NetworkSettings settings
+        )
         {
             var sharedContext = (FragSharedContext*)staticInstanceBuffer;
             sharedContext->PayloadCapacity = settings.GetFragmentationStageParameters().PayloadCapacity;
@@ -215,7 +243,9 @@ namespace Unity.Networking.Transport
             return new NetworkPipelineStage(
                 Receive: new TransportFunctionPointer<NetworkPipelineStage.ReceiveDelegate>(Receive),
                 Send: new TransportFunctionPointer<NetworkPipelineStage.SendDelegate>(Send),
-                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(InitializeConnection),
+                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(
+                    InitializeConnection
+                ),
                 ReceiveCapacity: sizeof(FragContext) + sharedContext->PayloadCapacity,
                 SendCapacity: sizeof(FragContext) + sharedContext->PayloadCapacity,
                 HeaderCapacity: FragHeaderCapacity,

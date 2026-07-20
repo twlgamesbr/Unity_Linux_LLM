@@ -29,7 +29,8 @@ namespace NPCSystem.Initialization
             InitTelemetry.PipelineStarted(
                 ctx.CorrelationId,
                 ctx.IsDeferred,
-                phaseCount: System.Enum.GetValues(typeof(NPCSceneInitializationPhase)).Length);
+                phaseCount: System.Enum.GetValues(typeof(NPCSceneInitializationPhase)).Length
+            );
 
             // Log to structured JSONL
             ctx.Logger?.Log(
@@ -41,8 +42,9 @@ namespace NPCSystem.Initialization
                 data: new System.Collections.Generic.Dictionary<string, object>
                 {
                     ["correlationId"] = ctx.CorrelationId,
-                    ["isDeferred"] = ctx.IsDeferred
-                });
+                    ["isDeferred"] = ctx.IsDeferred,
+                }
+            );
 
             return Task.CompletedTask;
         }

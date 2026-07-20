@@ -24,7 +24,9 @@ namespace UnityEditor.Rendering.Universal
         {
             Type rendererType = m_Editor.target.GetType();
 
-            SupportedOnRendererAttribute rendererFilterAttribute = Attribute.GetCustomAttribute(rendererFeatureType, typeof(SupportedOnRendererAttribute)) as SupportedOnRendererAttribute;
+            SupportedOnRendererAttribute rendererFilterAttribute =
+                Attribute.GetCustomAttribute(rendererFeatureType, typeof(SupportedOnRendererAttribute))
+                as SupportedOnRendererAttribute;
             if (rendererFilterAttribute != null)
             {
                 bool foundEditor = false;
@@ -55,12 +57,14 @@ namespace UnityEditor.Rendering.Universal
                 }
 
                 string path = GetMenuNameFromType(type);
-                tree.Add(new FeatureElement
-                {
-                    content = new GUIContent(path),
-                    level = 1,
-                    type = type
-                });
+                tree.Add(
+                    new FeatureElement
+                    {
+                        content = new GUIContent(path),
+                        level = 1,
+                        type = type,
+                    }
+                );
             }
         }
 

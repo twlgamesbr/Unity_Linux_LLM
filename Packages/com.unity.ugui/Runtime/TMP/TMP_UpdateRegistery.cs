@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-
 
 namespace TMPro
 {
@@ -34,7 +33,6 @@ namespace TMPro
             }
         }
 
-
         /// <summary>
         /// Register to receive callback from the Canvas System.
         /// </summary>
@@ -43,7 +41,6 @@ namespace TMPro
             //Debug.Log("Adding WillRenderCanvases");
             Canvas.willRenderCanvases += PerformUpdateForCanvasRendererObjects;
         }
-
 
         /// <summary>
         /// Function to register elements which require a layout rebuild.
@@ -67,7 +64,6 @@ namespace TMPro
             return true;
         }
 
-
         /// <summary>
         /// Function to register elements which require a graphic rebuild.
         /// </summary>
@@ -89,7 +85,6 @@ namespace TMPro
 
             return true;
         }
-
 
         /// <summary>
         /// Method to handle objects that need updating.
@@ -115,7 +110,6 @@ namespace TMPro
 
             // Update font assets before graphic rebuild
 
-
             // Processing elements that require a graphic rebuild.
             for (int index = 0; index < m_GraphicRebuildQueue.Count; index++)
             {
@@ -132,7 +126,6 @@ namespace TMPro
             }
         }
 
-
         /// <summary>
         /// Method to handle objects that need updating.
         /// </summary>
@@ -140,7 +133,6 @@ namespace TMPro
         {
             Debug.Log("Perform update of MeshRenderer objects.");
         }
-
 
         /// <summary>
         /// Function to unregister elements which no longer require a rebuild.
@@ -152,16 +144,14 @@ namespace TMPro
             TMP_UpdateRegistry.instance.InternalUnRegisterCanvasElementForGraphicRebuild(element);
         }
 
-
         private void InternalUnRegisterCanvasElementForLayoutRebuild(ICanvasElement element)
         {
-             EntityId id = (element as Object).GetEntityId();
+            EntityId id = (element as Object).GetEntityId();
 
             //element.LayoutComplete();
             TMP_UpdateRegistry.instance.m_LayoutRebuildQueue.Remove(element);
             m_GraphicQueueLookup.Remove(id);
         }
-
 
         private void InternalUnRegisterCanvasElementForGraphicRebuild(ICanvasElement element)
         {

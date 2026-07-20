@@ -7,8 +7,10 @@ namespace UnityEngine.Rendering
     {
         /// <summary>Current x coordinate.</summary>
         public int x { get; private set; }
+
         /// <summary>Current y coordinate.</summary>
         public int y { get; private set; }
+
         /// <summary>Current overlay size.</summary>
         public int overlaySize { get; private set; }
 

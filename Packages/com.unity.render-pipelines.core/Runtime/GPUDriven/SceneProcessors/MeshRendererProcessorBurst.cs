@@ -1,5 +1,5 @@
-using Unity.Collections;
 using Unity.Burst;
+using Unity.Collections;
 using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering
@@ -8,18 +8,24 @@ namespace UnityEngine.Rendering
     internal static class MeshRendererProcessorBurst
     {
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static unsafe void ComputeInstanceGPUArchetypes(in NativeReference<GPUArchetypeManager> archetypeManager,
+        public static unsafe void ComputeInstanceGPUArchetypes(
+            in NativeReference<GPUArchetypeManager> archetypeManager,
             in DefaultGPUComponents defaultGPUComponents,
             MeshRendererUpdateBatch* updateBatch,
             in GPUComponentSet overrideComponentSet,
             bool useSharedGPUArchetype,
-            ref NativeArray<GPUArchetypeHandle> archetypes)
+            ref NativeArray<GPUArchetypeHandle> archetypes
+        )
         {
             if (useSharedGPUArchetype)
             {
                 Assert.IsTrue(archetypes.Length == 1);
 
-                GPUComponentSet componentSet = MeshRendererProcessor.ComputeComponentSet(defaultGPUComponents, updateBatch->lightmapUsage, updateBatch->blendProbesUsage);
+                GPUComponentSet componentSet = MeshRendererProcessor.ComputeComponentSet(
+                    defaultGPUComponents,
+                    updateBatch->lightmapUsage,
+                    updateBatch->blendProbesUsage
+                );
                 componentSet.AddSet(overrideComponentSet);
                 archetypes[0] = archetypeManager.GetRef().GetOrCreateArchetype(componentSet);
             }
@@ -33,14 +39,23 @@ namespace UnityEngine.Rendering
                 int flatIndex = 0;
                 for (int sectionIndex = 0; sectionIndex < updateBatch->SectionCount; sectionIndex++)
                 {
-                    NativeArray<InternalMeshRendererSettings> rendererSettingsSection = updateBatch->GetRendererSettingsSectionOrDefault(sectionIndex);
-                    NativeArray<short> lightmapIndexSection = updateBatch->GetLightmapIndexSectionOrDefault(sectionIndex);
+                    NativeArray<InternalMeshRendererSettings> rendererSettingsSection =
+                        updateBatch->GetRendererSettingsSectionOrDefault(sectionIndex);
+                    NativeArray<short> lightmapIndexSection = updateBatch->GetLightmapIndexSectionOrDefault(
+                        sectionIndex
+                    );
 
                     for (int i = 0; i < updateBatch->GetSectionLength(sectionIndex); i++)
                     {
-                        InternalMeshRendererSettings rendererSettings = hasMeshRendererSettings ? rendererSettingsSection[i] : RenderWorld.DefaultRendererSettings;
+                        InternalMeshRendererSettings rendererSettings = hasMeshRendererSettings
+                            ? rendererSettingsSection[i]
+                            : RenderWorld.DefaultRendererSettings;
                         int lightmapIndex = hasLightmap ? lightmapIndexSection[i] : RenderWorld.DefaultLightmapIndex;
-                        GPUComponentSet componentSet = MeshRendererProcessor.ComputeComponentSet(defaultGPUComponents, rendererSettings, lightmapIndex);
+                        GPUComponentSet componentSet = MeshRendererProcessor.ComputeComponentSet(
+                            defaultGPUComponents,
+                            rendererSettings,
+                            lightmapIndex
+                        );
                         componentSet.AddSet(overrideComponentSet);
 
                         archetypes[flatIndex] = archetypeManager.GetRef().GetOrCreateArchetype(componentSet);
@@ -51,10 +66,12 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static unsafe void BuildGPUComponentOverrideUploadSources(in NativeReference<GPUArchetypeManager> archetypeManager,
+        public static unsafe void BuildGPUComponentOverrideUploadSources(
+            in NativeReference<GPUArchetypeManager> archetypeManager,
             in NativeArray<GPUComponentJaggedUpdate> componentUpdates,
             ref NativeArray<MeshRendererProcessor.GPUComponentUploadSource> uploadSources,
-            GPUComponentSet* overrideComponentSet)
+            GPUComponentSet* overrideComponentSet
+        )
         {
             Assert.IsTrue(componentUpdates.Length == componentUpdates.Length);
 
@@ -63,7 +80,9 @@ namespace UnityEngine.Rendering
             for (int i = 0; i < componentUpdates.Length; i++)
             {
                 ref readonly GPUComponentJaggedUpdate update = ref componentUpdates.ElementAt(i);
-                GPUComponentHandle component = archetypeManager.GetRef().GetOrCreateComponent(update.PropertyID, update.StrideInBytes, perInstance: true);
+                GPUComponentHandle component = archetypeManager
+                    .GetRef()
+                    .GetOrCreateComponent(update.PropertyID, update.StrideInBytes, perInstance: true);
                 componentSet.Add(component);
 
                 MeshRendererProcessor.GPUComponentUploadSource source = default;
@@ -78,7 +97,10 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static bool AnyInstanceUseBlendProbes(in NativeArray<InstanceHandle> instances, ref RenderWorld renderWorld)
+        public static bool AnyInstanceUseBlendProbes(
+            in NativeArray<InstanceHandle> instances,
+            ref RenderWorld renderWorld
+        )
         {
             for (int i = 0; i < instances.Length; i++)
             {
@@ -98,17 +120,20 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static unsafe bool DidGPUArchetypeChange(in NativeReference<GPUArchetypeManager> archetypeManager,
+        public static unsafe bool DidGPUArchetypeChange(
+            in NativeReference<GPUArchetypeManager> archetypeManager,
             in DefaultGPUComponents defaultGPUComponents,
             in NativeArray<InstanceHandle> instances,
             MeshRendererUpdateBatch* updateBatch,
             ref RenderWorld renderWorld,
-            in GPUComponentSet overrideComponentSet)
+            in GPUComponentSet overrideComponentSet
+        )
         {
             int flatIndex = 0;
             for (int sectionIndex = 0; sectionIndex < updateBatch->SectionCount; sectionIndex++)
             {
-                NativeArray<InternalMeshRendererSettings> rendererSettingsSection = updateBatch->GetRendererSettingsSectionOrDefault(sectionIndex);
+                NativeArray<InternalMeshRendererSettings> rendererSettingsSection =
+                    updateBatch->GetRendererSettingsSectionOrDefault(sectionIndex);
                 NativeArray<short> lightmapIndexSection = updateBatch->GetLightmapIndexSectionOrDefault(sectionIndex);
 
                 for (int i = 0; i < updateBatch->GetSectionLength(sectionIndex); i++)
@@ -119,7 +144,9 @@ namespace UnityEngine.Rendering
                     InternalMeshRendererSettings oldRendererSettings = renderWorld.rendererSettings[instanceIndex];
                     int oldLightmapIndex = renderWorld.lightmapIndices[instanceIndex];
 
-                    InternalMeshRendererSettings newRendererSettings = updateBatch->HasAnyComponent(MeshRendererComponentMask.RendererSettings)
+                    InternalMeshRendererSettings newRendererSettings = updateBatch->HasAnyComponent(
+                        MeshRendererComponentMask.RendererSettings
+                    )
                         ? rendererSettingsSection[i]
                         : oldRendererSettings;
 
@@ -127,8 +154,12 @@ namespace UnityEngine.Rendering
                         ? lightmapIndexSection[i]
                         : oldLightmapIndex;
 
-                    ulong oldBaseComponentMask = MeshRendererProcessor.ComputeComponentSet(defaultGPUComponents, oldRendererSettings, oldLightmapIndex).componentsMask;
-                    ulong newBaseComponentMask = MeshRendererProcessor.ComputeComponentSet(defaultGPUComponents, newRendererSettings, newLightmapIndex).componentsMask;
+                    ulong oldBaseComponentMask = MeshRendererProcessor
+                        .ComputeComponentSet(defaultGPUComponents, oldRendererSettings, oldLightmapIndex)
+                        .componentsMask;
+                    ulong newBaseComponentMask = MeshRendererProcessor
+                        .ComputeComponentSet(defaultGPUComponents, newRendererSettings, newLightmapIndex)
+                        .componentsMask;
 
                     // First compare the "base" component mask. So the component mask excluding the shader property overrides.
                     // Those two mask must match exactly, otherwise it means the update changed the GPU archetype.
@@ -139,7 +170,10 @@ namespace UnityEngine.Rendering
 
                     // Then retrieve the full component mask, which includes the shader property overrides.
                     GPUArchetypeHandle currentArchetype = renderWorld.gpuHandles[instanceIndex].archetype;
-                    ulong fullComponentMask = archetypeManager.GetRefRO().FindComponentSet(currentArchetype).componentsMask;
+                    ulong fullComponentMask = archetypeManager
+                        .GetRefRO()
+                        .FindComponentSet(currentArchetype)
+                        .componentsMask;
                     ulong overrideComponentMask = overrideComponentSet.componentsMask;
 
                     // For shader property overrides, it is only required that the components we want to update were already part of the archetype.

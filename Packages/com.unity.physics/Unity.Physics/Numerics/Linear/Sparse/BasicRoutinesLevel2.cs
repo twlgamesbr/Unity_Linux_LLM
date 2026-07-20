@@ -7,7 +7,7 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
     //
 
     [GenerateTestsForBurstCompatibility]
-    internal unsafe static partial class DenseVectorExtensions
+    internal static unsafe partial class DenseVectorExtensions
     {
         /// <summary>
         /// Compute v <- alpha op(A) x + beta v
@@ -19,7 +19,14 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
         /// <param name="alpha">The multiplier of the matrix product</param>
         /// <param name="beta">Te muliplier of the added vector</param>
         /// <remarks>BLAS equivalent: SGEMV</remarks>
-        public static void ScaleAndAddProduct(this Dense.Primitives.Vector v, ref Matrix A, Op op, ref Dense.Primitives.Vector x, float alpha, float beta)
+        public static void ScaleAndAddProduct(
+            this Dense.Primitives.Vector v,
+            ref Matrix A,
+            Op op,
+            ref Dense.Primitives.Vector x,
+            float alpha,
+            float beta
+        )
         {
             // Validate input
             if (op == Op.None)
@@ -82,7 +89,5 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
     }
 
     [GenerateTestsForBurstCompatibility]
-    internal unsafe partial struct Vector
-    {
-    }
+    internal unsafe partial struct Vector { }
 }

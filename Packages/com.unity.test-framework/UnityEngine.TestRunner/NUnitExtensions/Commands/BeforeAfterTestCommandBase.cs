@@ -12,19 +12,25 @@ using UnityEngine.TestTools.Logging;
 
 namespace UnityEngine.TestTools
 {
-    internal abstract class BeforeAfterTestCommandBase<T> : DelegatingTestCommand, IEnumerableTestMethodCommand where T : class
+    internal abstract class BeforeAfterTestCommandBase<T> : DelegatingTestCommand, IEnumerableTestMethodCommand
+        where T : class
     {
         [Flags]
         public enum ExecutionFlags
         {
             None = 0,
             SkipAfterActions = 1 << 0,
-            SkipStateReset = 1 << 1
+            SkipStateReset = 1 << 1,
         }
 
         private string m_BeforeErrorPrefix;
         private string m_AfterErrorPrefix;
-        protected BeforeAfterTestCommandBase(TestCommand innerCommand, string beforeErrorPrefix, string afterErrorPrefix)
+
+        protected BeforeAfterTestCommandBase(
+            TestCommand innerCommand,
+            string beforeErrorPrefix,
+            string afterErrorPrefix
+        )
             : base(innerCommand)
         {
             m_BeforeErrorPrefix = beforeErrorPrefix;
@@ -35,19 +41,24 @@ namespace UnityEngine.TestTools
 
         protected T[] AfterActions = new T[0];
 
-        protected static MethodInfo[] GetActions(IDictionary<Type, List<MethodInfo>> cacheStorage, Type fixtureType, Type attributeType, Type[] returnTypes)
+        protected static MethodInfo[] GetActions(
+            IDictionary<Type, List<MethodInfo>> cacheStorage,
+            Type fixtureType,
+            Type attributeType,
+            Type[] returnTypes
+        )
         {
             if (cacheStorage.TryGetValue(fixtureType, out var result))
             {
                 return result.ToArray();
             }
 
-            cacheStorage[fixtureType] = GetMethodsWithAttributeFromFixture(fixtureType,  attributeType, returnTypes);
+            cacheStorage[fixtureType] = GetMethodsWithAttributeFromFixture(fixtureType, attributeType, returnTypes);
 
             return cacheStorage[fixtureType].ToArray();
         }
 
-        protected static T[] GetTestActions(IDictionary<MethodInfo,  List<T>> cacheStorage, ITest test)
+        protected static T[] GetTestActions(IDictionary<MethodInfo, List<T>> cacheStorage, ITest test)
         {
             var methodInfo = test.Method.MethodInfo;
             if (cacheStorage.TryGetValue(methodInfo, out var result))
@@ -81,11 +92,17 @@ namespace UnityEngine.TestTools
             return cacheStorage[methodInfo].ToArray();
         }
 
-        private static List<MethodInfo> GetMethodsWithAttributeFromFixture(Type fixtureType, Type setUpType, Type[] returnTypes)
+        private static List<MethodInfo> GetMethodsWithAttributeFromFixture(
+            Type fixtureType,
+            Type setUpType,
+            Type[] returnTypes
+        )
         {
             MethodInfo[] methodsWithAttribute = Reflect.GetMethodsWithAttribute(fixtureType, setUpType, true);
             var methodsInfo = new List<MethodInfo>();
-            methodsInfo.AddRange(methodsWithAttribute.Where(method => returnTypes.Any(type => type == method.ReturnType)));
+            methodsInfo.AddRange(
+                methodsWithAttribute.Where(method => returnTypes.Any(type => type == method.ReturnType))
+            );
             return methodsInfo;
         }
 
@@ -165,12 +182,16 @@ namespace UnityEngine.TestTools
                             {
                                 if (unityContext.TestMode == TestPlatform.PlayMode)
                                 {
-                                    throw new Exception($"PlayMode test are not allowed to yield {enumerator.Current.GetType().Name}");
+                                    throw new Exception(
+                                        $"PlayMode test are not allowed to yield {enumerator.Current.GetType().Name}"
+                                    );
                                 }
 
                                 if (EnumeratorHelper.IsRunningNestedEnumerator)
                                 {
-                                    throw new Exception($"Nested enumerators are not allowed to yield {enumerator.Current.GetType().Name}");
+                                    throw new Exception(
+                                        $"Nested enumerators are not allowed to yield {enumerator.Current.GetType().Name}"
+                                    );
                                 }
                             }
                         }
@@ -188,7 +209,7 @@ namespace UnityEngine.TestTools
                             state.NextBeforeStepPc = EnumeratorHelper.GetEnumeratorPC();
                             state.StoreContext(unityContext);
                         }
-                        
+
                         if (!AllowFrameSkipAfterAction(action))
                         {
                             break;
@@ -249,7 +270,7 @@ namespace UnityEngine.TestTools
                                 logScope.EvaluateLogScope(true);
                                 break;
                             }
-                            
+
                             if (!AllowFrameSkipAfterAction(action)) // Evaluate the log scope right away for the commands where we do not yield
                             {
                                 logScope.EvaluateLogScope(true);
@@ -258,12 +279,16 @@ namespace UnityEngine.TestTools
                             {
                                 if (unityContext.TestMode == TestPlatform.PlayMode)
                                 {
-                                    throw new Exception($"PlayMode test are not allowed to yield {enumerator.Current.GetType().Name}");
+                                    throw new Exception(
+                                        $"PlayMode test are not allowed to yield {enumerator.Current.GetType().Name}"
+                                    );
                                 }
 
                                 if (EnumeratorHelper.IsRunningNestedEnumerator)
                                 {
-                                    throw new Exception($"Nested enumerators are not allowed to yield {enumerator.Current.GetType().Name}");
+                                    throw new Exception(
+                                        $"Nested enumerators are not allowed to yield {enumerator.Current.GetType().Name}"
+                                    );
                                 }
                             }
                         }
@@ -280,7 +305,7 @@ namespace UnityEngine.TestTools
                             state.NextAfterStepPc = EnumeratorHelper.GetEnumeratorPC();
                             state.StoreContext(unityContext);
                         }
-                        
+
                         if (!AllowFrameSkipAfterAction(action))
                         {
                             break;

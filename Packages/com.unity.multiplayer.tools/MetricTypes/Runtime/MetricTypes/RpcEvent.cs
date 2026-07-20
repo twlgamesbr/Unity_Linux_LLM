@@ -7,10 +7,28 @@ namespace Unity.Multiplayer.Tools.MetricTypes
     struct RpcEvent : INetworkMetricEvent, INetworkObjectEvent
     {
         /// String overload maintained for backwards compatibility
-        public RpcEvent(ConnectionInfo connection, NetworkObjectIdentifier networkId, string name, string networkBehaviourName, long bytesCount)
-            : this(connection, networkId, StringConversionUtility.ConvertToFixedString(name), StringConversionUtility.ConvertToFixedString(networkBehaviourName), bytesCount) { }
+        public RpcEvent(
+            ConnectionInfo connection,
+            NetworkObjectIdentifier networkId,
+            string name,
+            string networkBehaviourName,
+            long bytesCount
+        )
+            : this(
+                connection,
+                networkId,
+                StringConversionUtility.ConvertToFixedString(name),
+                StringConversionUtility.ConvertToFixedString(networkBehaviourName),
+                bytesCount
+            ) { }
 
-        public RpcEvent(ConnectionInfo connection, NetworkObjectIdentifier networkId, FixedString64Bytes name, FixedString64Bytes networkBehaviourName, long bytesCount)
+        public RpcEvent(
+            ConnectionInfo connection,
+            NetworkObjectIdentifier networkId,
+            FixedString64Bytes name,
+            FixedString64Bytes networkBehaviourName,
+            long bytesCount
+        )
         {
             Connection = connection;
             NetworkId = networkId;

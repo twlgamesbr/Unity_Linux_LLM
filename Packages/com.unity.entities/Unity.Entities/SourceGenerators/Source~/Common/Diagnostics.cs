@@ -1,8 +1,7 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
+using System.Text;
 using Microsoft.CodeAnalysis;
-
 using static Unity.Entities.SourceGen.Common.SourceGenHelpers;
 
 namespace Unity.Entities.SourceGen.Common
@@ -16,7 +15,13 @@ namespace Unity.Entities.SourceGen.Common
     public interface IDiagnosticLogger : IDisposable
     {
         void LogError(string errorCode, string title, string errorMessage, Location location, string description = "");
-        void LogWarning(string errorCode, string title, string errorMessage, Location location, string description = "");
+        void LogWarning(
+            string errorCode,
+            string title,
+            string errorMessage,
+            Location location,
+            string description = ""
+        );
         void LogInfo(string errorCode, string title, string errorMessage, Location location, string description = "");
     }
 
@@ -29,25 +34,48 @@ namespace Unity.Entities.SourceGen.Common
         readonly GeneratorExecutionContext _executionContext;
         readonly List<Diagnostic> _diagnostics = new();
 
-        public DiagnosticLogger(GeneratorExecutionContext executionContext) =>
-            _executionContext = executionContext;
+        public DiagnosticLogger(GeneratorExecutionContext executionContext) => _executionContext = executionContext;
 
-        public void LogError(string errorCode, string title, string errorMessage, Location location, string description = "")
+        public void LogError(
+            string errorCode,
+            string title,
+            string errorMessage,
+            Location location,
+            string description = ""
+        )
         {
             if (errorCode.Contains("ICE"))
-                errorMessage = "This error indicates a bug in the DOTS source generators. We'd appreciate a bug report (Help -> Report a Bug...). Thanks! " +
-                    $"Error message: '{errorMessage}'";
+                errorMessage =
+                    "This error indicates a bug in the DOTS source generators. We'd appreciate a bug report (Help -> Report a Bug...). Thanks! "
+                    + $"Error message: '{errorMessage}'";
 
             Log(DiagnosticSeverity.Error, errorCode, title, errorMessage, location, description);
         }
 
-        public void LogWarning(string errorCode, string title, string errorMessage, Location location, string description = "")
-            => Log(DiagnosticSeverity.Warning, errorCode, title, errorMessage, location, description);
+        public void LogWarning(
+            string errorCode,
+            string title,
+            string errorMessage,
+            Location location,
+            string description = ""
+        ) => Log(DiagnosticSeverity.Warning, errorCode, title, errorMessage, location, description);
 
-        public void LogInfo(string errorCode, string title, string errorMessage, Location location, string description = "")
-            => Log(DiagnosticSeverity.Info, errorCode, title, errorMessage, location, description);
+        public void LogInfo(
+            string errorCode,
+            string title,
+            string errorMessage,
+            Location location,
+            string description = ""
+        ) => Log(DiagnosticSeverity.Info, errorCode, title, errorMessage, location, description);
 
-        void Log(DiagnosticSeverity diagnosticSeverity, string errorCode, string title, string errorMessage, Location location, string description = "")
+        void Log(
+            DiagnosticSeverity diagnosticSeverity,
+            string errorCode,
+            string title,
+            string errorMessage,
+            Location location,
+            string description = ""
+        )
         {
             if (Service<IDiagnosticFrame>.Available)
             {
@@ -71,7 +99,15 @@ namespace Unity.Entities.SourceGen.Common
                 description = sbDescription.ToString();
             }
             SourceOutputHelpers.LogInfoToSourceGenLog($"{diagnosticSeverity}: {errorCode}, {title}, {errorMessage}");
-            var rule = new DiagnosticDescriptor(errorCode, title, errorMessage, "Source Generator", diagnosticSeverity, true, description);
+            var rule = new DiagnosticDescriptor(
+                errorCode,
+                title,
+                errorMessage,
+                "Source Generator",
+                diagnosticSeverity,
+                true,
+                description
+            );
             _diagnostics.Add(Diagnostic.Create(rule, location));
         }
 

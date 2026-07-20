@@ -19,7 +19,7 @@ namespace Unity.Rendering
             None = 0,
             Lightmapped = 1,
             Directional = 2,
-            ShadowMask = 4
+            ShadowMask = 4,
         }
 
         struct MaterialLookupKey
@@ -36,11 +36,7 @@ namespace Unity.Rendering
             public Hash128 ShadowMaskHash;
 
             public LightMapKey(LightmapData lightmapData)
-                : this(lightmapData.lightmapColor,
-                    lightmapData.lightmapDir,
-                    lightmapData.shadowMask)
-            {
-            }
+                : this(lightmapData.lightmapColor, lightmapData.lightmapDir, lightmapData.shadowMask) { }
 
             public LightMapKey(Texture2D color, Texture2D direction, Texture2D shadowMask)
             {
@@ -62,7 +58,9 @@ namespace Unity.Rendering
 
             public bool Equals(LightMapKey other)
             {
-                return ColorHash.Equals(other.ColorHash) && DirectionHash.Equals(other.DirectionHash) && ShadowMaskHash.Equals(other.ShadowMaskHash);
+                return ColorHash.Equals(other.ColorHash)
+                    && DirectionHash.Equals(other.DirectionHash)
+                    && ShadowMaskHash.Equals(other.ShadowMaskHash);
             }
 
             public override int GetHashCode()
@@ -71,7 +69,7 @@ namespace Unity.Rendering
                 hash.Update(ColorHash);
                 hash.Update(DirectionHash);
                 hash.Update(ShadowMaskHash);
-                return (int) hash.DigestHash64().x;
+                return (int)hash.DigestHash64().x;
             }
         }
 
@@ -87,7 +85,7 @@ namespace Unity.Rendering
         private int m_NumLightMappedMaterialCacheMisses;
 
         private Dictionary<LightMapKey, LightMapReference> m_LightMapArrayCache;
-        private Dictionary<MaterialLookupKey, Material> m_LightMappedMaterialCache = new ();
+        private Dictionary<MaterialLookupKey, Material> m_LightMappedMaterialCache = new();
 
         private List<int> m_UsedLightmapIndices = new List<int>();
         private Dictionary<int, LightMapReference> m_LightMapReferences;
@@ -103,7 +101,7 @@ namespace Unity.Rendering
         public void Reset()
         {
             m_LightMapArrayCache = new Dictionary<LightMapKey, LightMapReference>();
-            m_LightMappedMaterialCache = new ();
+            m_LightMappedMaterialCache = new();
 
             BeginConversion();
         }
@@ -122,7 +120,9 @@ namespace Unity.Rendering
         public void EndConversion()
         {
 #if DEBUG_LOG_LIGHT_MAP_CONVERSION
-            Debug.Log($"Light map cache: {m_NumLightMapCacheHits} hits, {m_NumLightMapCacheMisses} misses. Light mapped material cache: {m_NumLightMappedMaterialCacheHits} hits, {m_NumLightMappedMaterialCacheMisses} misses.");
+            Debug.Log(
+                $"Light map cache: {m_NumLightMapCacheHits} hits, {m_NumLightMapCacheMisses} misses. Light mapped material cache: {m_NumLightMappedMaterialCacheHits} hits, {m_NumLightMappedMaterialCacheMisses} misses."
+            );
 #endif
         }
 
@@ -141,7 +141,7 @@ namespace Unity.Rendering
             var uniqueIndices = m_UsedLightmapIndices
                 .Distinct()
                 .OrderBy(x => x)
-                .Where(x=> x >= 0 && x != 65534 && x < lightmaps.Length)
+                .Where(x => x >= 0 && x != 65534 && x < lightmaps.Length)
                 .ToArray();
 
             var colors = new List<Texture2D>();
@@ -184,11 +184,7 @@ namespace Unity.Rendering
 
                 for (int i = 0; i < lightMapIndices.Count; ++i)
                 {
-                    var lightMapRef = new LightMapReference
-                    {
-                        LightMaps = lightMapArray,
-                        LightMapIndex = i,
-                    };
+                    var lightMapRef = new LightMapReference { LightMaps = lightMapArray, LightMapIndex = i };
 
                     m_LightMapReferences[lightMapIndices[i]] = lightMapRef;
                     m_LightMapArrayCache[new LightMapKey(colors[i], directions[i], shadowMasks[i])] = lightMapRef;
@@ -196,10 +192,13 @@ namespace Unity.Rendering
             }
         }
 
-        public bool TryGetLightMapReference(int lightmapIndex, out LightMapReference lightMapRef)
-            => m_LightMapReferences.TryGetValue(lightmapIndex, out lightMapRef);
+        public bool TryGetLightMapReference(int lightmapIndex, out LightMapReference lightMapRef) =>
+            m_LightMapReferences.TryGetValue(lightmapIndex, out lightMapRef);
 
-        public UnityObjectRef<Material> GetLightMappedMaterial(UnityObjectRef<Material> baseMaterial, LightMapReference lightMapRef)
+        public UnityObjectRef<Material> GetLightMappedMaterial(
+            UnityObjectRef<Material> baseMaterial,
+            LightMapReference lightMapRef
+        )
         {
             var flags = LightMappingFlags.Lightmapped;
             if (lightMapRef.LightMaps.hasDirections)
@@ -211,7 +210,7 @@ namespace Unity.Rendering
             {
                 BaseMaterial = baseMaterial,
                 LightMaps = lightMapRef.LightMaps,
-                Flags = flags
+                Flags = flags,
             };
 
             if (m_LightMappedMaterialCache.TryGetValue(key, out var lightMappedMaterial))
@@ -260,8 +259,7 @@ namespace Unity.Rendering
         /// <summary>
         /// Constructs a baking context that operates within a baking system.
         /// </summary>
-        public RenderMeshBakingContext(
-            LightMapBakingContext lightMapBakingContext = null)
+        public RenderMeshBakingContext(LightMapBakingContext lightMapBakingContext = null)
         {
             m_LightMapBakingContext = lightMapBakingContext;
             m_LightMapBakingContext?.BeginConversion();
@@ -274,27 +272,34 @@ namespace Unity.Rendering
 
         public void CollectLightMapUsage(Renderer renderer)
         {
-            Assert.IsTrue(m_LightMapBakingContext != null,
-            "LightMapConversionContext must be set to call light mapping conversion methods.");
+            Assert.IsTrue(
+                m_LightMapBakingContext != null,
+                "LightMapConversionContext must be set to call light mapping conversion methods."
+            );
             m_LightMapBakingContext.CollectLightMapUsage(renderer);
         }
 
         public void ProcessLightMapsForConversion()
         {
-            Assert.IsTrue(m_LightMapBakingContext != null,
-            "LightMapConversionContext must be set to call light mapping conversion methods.");
+            Assert.IsTrue(
+                m_LightMapBakingContext != null,
+                "LightMapConversionContext must be set to call light mapping conversion methods."
+            );
             m_LightMapBakingContext.ProcessLightMapsForConversion();
         }
 
         internal (UnityObjectRef<Material>, LightMaps) GetHybridLightMapping(
             ref BuiltinMaterialPropertyUnity_LightmapIndex lightmapIndexRef,
-            int lightmapIndex, UnityObjectRef<Material> material)
+            int lightmapIndex,
+            UnityObjectRef<Material> material
+        )
         {
-            if (RenderMeshUtility.IsLightMapped(lightmapIndex) &&
-                m_LightMapBakingContext.TryGetLightMapReference(lightmapIndex, out var lightMapRef))
+            if (
+                RenderMeshUtility.IsLightMapped(lightmapIndex)
+                && m_LightMapBakingContext.TryGetLightMapReference(lightmapIndex, out var lightMapRef)
+            )
             {
-                var lightMappedMaterial =
-                    m_LightMapBakingContext.GetLightMappedMaterial(material, lightMapRef);
+                var lightMappedMaterial = m_LightMapBakingContext.GetLightMappedMaterial(material, lightMapRef);
                 lightmapIndexRef.Value = lightMapRef.LightMapIndex;
                 return (lightMappedMaterial, lightMapRef.LightMaps);
             }

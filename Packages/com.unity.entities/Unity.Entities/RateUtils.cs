@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
+using Unity.Collections;
 using Unity.Core;
 using Unity.Mathematics;
-using Unity.Collections;
 
 namespace Unity.Entities
 {
@@ -17,9 +17,11 @@ namespace Unity.Entities
         /// Note: This is called infinitely until it returns false.
         /// </returns>
         bool ShouldGroupUpdate(ComponentSystemGroup group);
+
         /// <summary> Obsolete. Use <see cref="IRateManager.Timestep"/> instead.</summary>
         float Timestep { get; set; }
     }
+
     /// <summary>
     /// Interface to define custom behaviors for controlling when a <see cref="ComponentSystemGroup"/> should update,
     /// and what timestep should be visible to the systems in that group. This allows the implementation of Unity's
@@ -36,6 +38,7 @@ namespace Unity.Entities
         /// Note: This is called infinitely until it returns false.
         /// </returns>
         bool ShouldGroupUpdate(ComponentSystemGroup group);
+
         /// <summary>
         /// The timestep since the previous group update (in seconds).
         /// </summary>
@@ -67,6 +70,7 @@ namespace Unity.Entities
         public unsafe class FixedRateSimpleManager : IRateManager
         {
             float m_FixedTimestep;
+
             /// <inheritdoc cref="IRateManager.Timestep"/>
             public float Timestep
             {
@@ -106,9 +110,7 @@ namespace Unity.Entities
                     return false;
                 }
 
-                group.World.PushTime(new TimeData(
-                    elapsedTime: m_LastFixedUpdateTime,
-                    deltaTime: m_FixedTimestep));
+                group.World.PushTime(new TimeData(elapsedTime: m_LastFixedUpdateTime, deltaTime: m_FixedTimestep));
 
                 m_LastFixedUpdateTime += m_FixedTimestep;
 
@@ -145,14 +147,12 @@ namespace Unity.Entities
         public unsafe class FixedRateCatchUpManager : IRateManager
         {
             float m_FixedTimestep;
+
             /// <inheritdoc cref="IRateManager.Timestep"/>
             public float Timestep
             {
                 get => m_FixedTimestep;
-                set
-                {
-                    m_FixedTimestep = math.clamp(value, MinFixedDeltaTime, MaxFixedDeltaTime);
-                }
+                set { m_FixedTimestep = math.clamp(value, MinFixedDeltaTime, MaxFixedDeltaTime); }
             }
 
             double m_LastFixedUpdateTime;
@@ -215,13 +215,11 @@ namespace Unity.Entities
 
                 m_FixedUpdateCount++;
 
-                group.World.PushTime(new TimeData(
-                    elapsedTime: m_LastFixedUpdateTime,
-                    deltaTime: m_FixedTimestep));
+                group.World.PushTime(new TimeData(elapsedTime: m_LastFixedUpdateTime, deltaTime: m_FixedTimestep));
 
                 // Set the world update allocator to be fixed rate system group allocator
                 // at the start of fixed updates
-                if(!m_DidPushTime)
+                if (!m_DidPushTime)
                 {
                     m_DidPushTime = true;
                     m_OldGroupAllocators = group.World.CurrentGroupAllocators;
@@ -383,9 +381,7 @@ namespace Unity.Entities
                 if (m_ShouldPushToWorld)
                 {
                     m_ElapsedTime += m_Timestep;
-                    group.World.PushTime(new TimeData(
-                        elapsedTime: m_ElapsedTime,
-                        deltaTime: m_Timestep));
+                    group.World.PushTime(new TimeData(elapsedTime: m_ElapsedTime, deltaTime: m_Timestep));
                     m_DidPushTime = true;
 
                     m_OldGroupAllocators = group.World.CurrentGroupAllocators;

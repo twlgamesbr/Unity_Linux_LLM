@@ -40,8 +40,11 @@ namespace Unity.Physics
         static readonly float3 k_DefaultPerpendicular = new float3(0f, 1f, 0f);
 
         /// <summary>   The identity <see cref="BodyFrame"/>. </summary>
-        public static readonly BodyFrame Identity =
-            new BodyFrame { Axis = k_DefaultAxis, PerpendicularAxis = k_DefaultPerpendicular };
+        public static readonly BodyFrame Identity = new BodyFrame
+        {
+            Axis = k_DefaultAxis,
+            PerpendicularAxis = k_DefaultPerpendicular,
+        };
 
         /// <summary>   Converts this object to a rigid transform. </summary>
         ///

@@ -13,16 +13,21 @@ namespace Unity.Entities
     /// </summary>
     /// <remarks>Do not store outside of stack</remarks>
     /// <typeparam name="T">Type of enabled component</typeparam>
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) }, RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS")]
-    public readonly struct EnabledRefRW<T> : IQueryTypeParameter where T : unmanaged, IEnableableComponent
+    [GenerateTestsForBurstCompatibility(
+        GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) },
+        RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS"
+    )]
+    public readonly struct EnabledRefRW<T> : IQueryTypeParameter
+        where T : unmanaged, IEnableableComponent
     {
         /// <summary>
         /// Convert into a read-only version EnabledRefRO of this EnabledRefRW
         /// </summary>
         /// <param name="componentEnabledRefRW">The read-write reference to convert to read-only</param>
         /// <returns>The EnabledRefRO</returns>
-        public static unsafe implicit operator EnabledRefRO<T>(EnabledRefRW<T> componentEnabledRefRW)
-            => new EnabledRefRO<T>(componentEnabledRefRW.m_Ptr);
+        public static unsafe implicit operator EnabledRefRO<T>(EnabledRefRW<T> componentEnabledRefRW) =>
+            new EnabledRefRO<T>(componentEnabledRefRW.m_Ptr);
+
         readonly SafeBitRef m_Ptr;
         readonly unsafe int* m_PtrChunkDisabledCount;
 
@@ -63,7 +68,8 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 if (Hint.Unlikely(m_PtrChunkDisabledCount == null))
                     throw new InvalidOperationException(
-                        "This EnabledRefRW was created from a read-only type handle or is uninitialized, and can not be used to set bit values.");
+                        "This EnabledRefRW was created from a read-only type handle or is uninitialized, and can not be used to set bit values."
+                    );
 #endif
                 bool wasSet = m_Ptr.GetBit();
                 m_Ptr.SetBit(value);

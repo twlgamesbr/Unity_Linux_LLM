@@ -10,7 +10,8 @@ namespace Unity.Networking.Transport.Utilities
     /// <see cref="UnsafeRingQueue{T}"/> from the Collections package which has a fixed capacity.
     /// </summary>
     /// <typeparam name="T">Type of elements to store in the queue.</typeparam>
-    internal unsafe struct UnsafeDynamicRingQueue<T> : IDisposable where T : unmanaged
+    internal unsafe struct UnsafeDynamicRingQueue<T> : IDisposable
+        where T : unmanaged
     {
         private struct RingQueueData
         {
@@ -22,7 +23,7 @@ namespace Unity.Networking.Transport.Utilities
 
             public Allocator Allocator;
         }
-        
+
         [NativeDisableUnsafePtrRestriction]
         private RingQueueData* m_Data;
 
@@ -31,11 +32,13 @@ namespace Unity.Networking.Transport.Utilities
         /// <param name="allocator">Allocator to use for the queue's memory.</param>
         public UnsafeDynamicRingQueue(int initialCapacity, Allocator allocator)
         {
-            m_Data = (RingQueueData*)UnsafeUtility.Malloc(
-                UnsafeUtility.SizeOf<RingQueueData>(),
-                UnsafeUtility.AlignOf<RingQueueData>(),
-                allocator);
-            
+            m_Data = (RingQueueData*)
+                UnsafeUtility.Malloc(
+                    UnsafeUtility.SizeOf<RingQueueData>(),
+                    UnsafeUtility.AlignOf<RingQueueData>(),
+                    allocator
+                );
+
             m_Data->Elements = new UnsafeList<T>(initialCapacity, allocator);
             m_Data->Elements.Length = initialCapacity;
             m_Data->Head = 0;

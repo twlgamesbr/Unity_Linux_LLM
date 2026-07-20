@@ -1,5 +1,5 @@
-using UnityEngine.UIElements;
 using EditorAttributes.Editor.Utility;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {

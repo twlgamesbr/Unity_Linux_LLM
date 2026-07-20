@@ -29,19 +29,22 @@ namespace UnityEngine.Rendering
                 throw new InvalidOperationException($"Type {typeof(T).FullName} has not been created yet.");
             }
 
-            return (T) m_Items[typeId].storage;
-
+            return (T)m_Items[typeId].storage;
         }
 
         /// <summary>
         /// Creates the value of type T.
         /// </summary>
         /// <typeparam name="T">Is the class which you are trying to fetch. T has to inherit from <c>ContextContainerItem</c></typeparam>
-         /// <returns>The value of type T created inside the <c>ContextContainer</c>.</returns>
+        /// <returns>The value of type T created inside the <c>ContextContainer</c>.</returns>
         /// <exception cref="InvalidOperationException">Thown if you try to create the value of type T agian after it is already created.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if CONTEXT_CONTAINER_ALLOCATOR_DEBUG
-        public T Create<T>([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string filePath = "")
+        public T Create<T>(
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string filePath = ""
+        )
 #else
         public T Create<T>()
 #endif
@@ -51,7 +54,9 @@ namespace UnityEngine.Rendering
             if (Contains(typeId))
             {
 #if CONTEXT_CONTAINER_ALLOCATOR_DEBUG
-                throw new InvalidOperationException($"Type {typeof(T).FullName} has already been created. It was previously created in member {m_Items[typeId].memberName} at line {m_Items[typeId].lineNumber} in {m_Items[typeId].filePath}.");
+                throw new InvalidOperationException(
+                    $"Type {typeof(T).FullName} has already been created. It was previously created in member {m_Items[typeId].memberName} at line {m_Items[typeId].lineNumber} in {m_Items[typeId].filePath}."
+                );
 #else
                 throw new InvalidOperationException($"Type {typeof(T).FullName} has already been created.");
 #endif
@@ -71,7 +76,11 @@ namespace UnityEngine.Rendering
         /// <returns>Returns the value of type T which is created or retrived.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if CONTEXT_CONTAINER_ALLOCATOR_DEBUG
-        public T GetOrCreate<T>([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string filePath = "")
+        public T GetOrCreate<T>(
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string filePath = ""
+        )
 #else
         public T GetOrCreate<T>()
 #endif
@@ -80,9 +89,8 @@ namespace UnityEngine.Rendering
             var typeId = TypeId<T>.value;
             if (Contains(typeId))
             {
-                return (T) m_Items[typeId].storage;
+                return (T)m_Items[typeId].storage;
             }
-
 
 #if CONTEXT_CONTAINER_ALLOCATOR_DEBUG
             return CreateAndGetData<T>(typeId, lineNumber, memberName, filePath);
@@ -169,7 +177,6 @@ namespace UnityEngine.Rendering
             public string filePath;
 #endif
         }
-
     }
 
     /// <summary>

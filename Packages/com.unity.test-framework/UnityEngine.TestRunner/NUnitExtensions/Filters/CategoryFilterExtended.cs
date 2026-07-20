@@ -7,9 +7,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Filters
     {
         public static string k_DefaultCategory = "Uncategorized";
 
-        public CategoryFilterExtended(string name) : base(name)
-        {
-        }
+        public CategoryFilterExtended(string name)
+            : base(name) { }
 
         public override bool Match(ITest test)
         {

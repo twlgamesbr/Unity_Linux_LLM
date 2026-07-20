@@ -1,20 +1,32 @@
 #nullable enable
 
 using System;
-using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace EditorAttributes.Editor.Utility
 {
     public class UnityTypeConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) =>
-            typeof(Vector2).IsAssignableFrom(objectType) || typeof(Vector2Int).IsAssignableFrom(objectType) || typeof(Vector3).IsAssignableFrom(objectType) || typeof(Vector3Int).IsAssignableFrom(objectType) ||
-            typeof(Vector4).IsAssignableFrom(objectType) || typeof(Color).IsAssignableFrom(objectType) || typeof(Rect).IsAssignableFrom(objectType) || typeof(RectInt).IsAssignableFrom(objectType) ||
-            typeof(Bounds).IsAssignableFrom(objectType) || typeof(BoundsInt).IsAssignableFrom(objectType);
+            typeof(Vector2).IsAssignableFrom(objectType)
+            || typeof(Vector2Int).IsAssignableFrom(objectType)
+            || typeof(Vector3).IsAssignableFrom(objectType)
+            || typeof(Vector3Int).IsAssignableFrom(objectType)
+            || typeof(Vector4).IsAssignableFrom(objectType)
+            || typeof(Color).IsAssignableFrom(objectType)
+            || typeof(Rect).IsAssignableFrom(objectType)
+            || typeof(RectInt).IsAssignableFrom(objectType)
+            || typeof(Bounds).IsAssignableFrom(objectType)
+            || typeof(BoundsInt).IsAssignableFrom(objectType);
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object? ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object? existingValue,
+            JsonSerializer serializer
+        )
         {
             JObject jsonObject = JObject.Load(reader);
 
@@ -114,22 +126,13 @@ namespace EditorAttributes.Editor.Utility
         {
             if (value is Vector2 vector2)
             {
-                JObject jsonObject = new()
-                {
-                    { "x", vector2.x },
-                    { "y", vector2.y }
-                };
+                JObject jsonObject = new() { { "x", vector2.x }, { "y", vector2.y } };
 
                 jsonObject.WriteTo(writer);
             }
             else if (value is Vector2Int vector2int)
             {
-
-                JObject jsonObject = new()
-                {
-                    { "x", vector2int.x },
-                    { "y", vector2int.y }
-                };
+                JObject jsonObject = new() { { "x", vector2int.x }, { "y", vector2int.y } };
 
                 jsonObject.WriteTo(writer);
             }
@@ -137,22 +140,20 @@ namespace EditorAttributes.Editor.Utility
             {
                 JObject jsonObject = new()
                 {
-
                     { "x", vector3.x },
                     { "y", vector3.y },
-                    { "z", vector3.z }
+                    { "z", vector3.z },
                 };
 
                 jsonObject.WriteTo(writer);
             }
             else if (value is Vector3Int vector3Int)
             {
-
                 JObject jsonObject = new()
                 {
                     { "x", vector3Int.x },
                     { "y", vector3Int.y },
-                    { "z", vector3Int.z }
+                    { "z", vector3Int.z },
                 };
 
                 jsonObject.WriteTo(writer);
@@ -164,7 +165,7 @@ namespace EditorAttributes.Editor.Utility
                     { "x", vector4.x },
                     { "y", vector4.y },
                     { "z", vector4.z },
-                    { "w", vector4.w }
+                    { "w", vector4.w },
                 };
 
                 jsonObject.WriteTo(writer);
@@ -176,7 +177,7 @@ namespace EditorAttributes.Editor.Utility
                     { "r", color.r },
                     { "g", color.g },
                     { "b", color.b },
-                    { "a", color.a }
+                    { "a", color.a },
                 };
 
                 jsonObject.WriteTo(writer);
@@ -188,7 +189,7 @@ namespace EditorAttributes.Editor.Utility
                     { "x", rect.x },
                     { "y", rect.y },
                     { "width", rect.width },
-                    { "height", rect.height }
+                    { "height", rect.height },
                 };
 
                 jsonObject.WriteTo(writer);
@@ -200,7 +201,7 @@ namespace EditorAttributes.Editor.Utility
                     { "x", rectInt.x },
                     { "y", rectInt.y },
                     { "width", rectInt.width },
-                    { "height", rectInt.height }
+                    { "height", rectInt.height },
                 };
 
                 jsonObject.WriteTo(writer);
@@ -214,7 +215,7 @@ namespace EditorAttributes.Editor.Utility
                     { "centerZ", bounds.center.z },
                     { "sizeX", bounds.size.x },
                     { "sizeY", bounds.size.y },
-                    { "sizeZ", bounds.size.z }
+                    { "sizeZ", bounds.size.z },
                 };
 
                 jsonObject.WriteTo(writer);
@@ -228,7 +229,7 @@ namespace EditorAttributes.Editor.Utility
                     { "centerZ", boundsInt.center.z },
                     { "sizeX", boundsInt.size.x },
                     { "sizeY", boundsInt.size.y },
-                    { "sizeZ", boundsInt.size.z }
+                    { "sizeZ", boundsInt.size.z },
                 };
 
                 jsonObject.WriteTo(writer);

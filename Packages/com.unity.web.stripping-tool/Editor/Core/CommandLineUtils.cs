@@ -31,17 +31,21 @@ namespace Unity.Web.Stripping.Editor
             /// Exit code of the command
             /// </summary>
             public int ExitCode { get; internal set; }
+
             /// <summary>
             /// Output of stderr.
             /// </summary>
             public string ErrorMessage { get; internal set; }
+
             /// <summary>
             /// Output of stdout.
             /// </summary>
             public string Output { get; internal set; }
 
             public CommandException(string command, string arguments, int exitCode, string errorMessage, string output)
-                : base($"An error occurred when running '{command} {arguments}'.\nExit code: {exitCode}.\nError message: {errorMessage}.\nOutput: {output}")
+                : base(
+                    $"An error occurred when running '{command} {arguments}'.\nExit code: {exitCode}.\nError message: {errorMessage}.\nOutput: {output}"
+                )
             {
                 this.Command = command;
                 this.Arguments = arguments;
@@ -83,7 +87,9 @@ namespace Unity.Web.Stripping.Editor
             }
 
             // Unity Editor should only run on Windows, MacOS or Linux
-            throw new PlatformNotSupportedException($"Platform \"{RuntimeInformation.OSDescription}\" is not supported.");
+            throw new PlatformNotSupportedException(
+                $"Platform \"{RuntimeInformation.OSDescription}\" is not supported."
+            );
         }
 
         /// <summary>
@@ -102,17 +108,18 @@ namespace Unity.Web.Stripping.Editor
             }
         }
 
-
         /// <summary>
         /// Options object for running commands.
         /// </summary>
         public class CommandOptions
         {
             public delegate void LogCallback(string text);
+
             /// <summary>
             /// A log callback that is called each time a new line is written to stdout.
             /// </summary>
             public LogCallback? Log = default;
+
             /// <summary>
             /// A log callback that is called each time a new line is written to stderr.
             /// </summary>
@@ -147,7 +154,13 @@ namespace Unity.Web.Stripping.Editor
         /// <exception cref="CommandException">
         /// Thrown if the command execution fails.
         /// </exception>
-        public static void Execute(string command, string arguments, out string stdout, out string stderror, CommandOptions? options = null)
+        public static void Execute(
+            string command,
+            string arguments,
+            out string stdout,
+            out string stderror,
+            CommandOptions? options = null
+        )
         {
             if (options == null)
                 options = new CommandOptions();

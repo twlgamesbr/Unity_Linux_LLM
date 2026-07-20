@@ -10,7 +10,6 @@ namespace UnityEditor.Rendering.Analytics
     // taxonomy = editor.analytics.uVolumePriorityUsageAnalyticData.v2
     internal class VolumePriorityUsageAnalytic
     {
-
         [AnalyticInfo(eventName: "uVolumePriorityUsageAnalyticData", version: 2, vendorKey: "unity.srp")]
         class Analytic : IAnalytic
         {
@@ -45,7 +44,6 @@ namespace UnityEditor.Rendering.Analytics
             Data m_Data;
         };
 
-       
         public static void Send(Volume volume)
         {
             if (volume == null)
@@ -58,7 +56,6 @@ namespace UnityEditor.Rendering.Analytics
 
             Analytic analytic = new Analytic(volume, sceneGUID);
             AnalyticsUtils.SendData(analytic);
-
         }
     }
 }

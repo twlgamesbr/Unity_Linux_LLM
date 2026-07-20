@@ -10,32 +10,36 @@ namespace UnityEngine.Rendering.Universal
     [ExcludeFromPreset]
     public abstract partial class ScriptableRendererFeature : ScriptableObject, IDisposable
     {
-        [SerializeField, HideInInspector] private bool m_Active = true;
+        [SerializeField, HideInInspector]
+        private bool m_Active = true;
+
         /// <summary>
         /// Returns the state of the ScriptableRenderFeature (true: the feature is active, false: the feature is inactive). Use the method ScriptableRenderFeature.SetActive to change the value of this variable.
         /// </summary>
         public bool isActive => m_Active;
-        
+
         /// <summary>
         /// Specifies whether a render pass makes use of an intermediate texture.
         /// This allows for early optimization by skipping incompatible passes.
         /// </summary>
         [Obsolete("This enum is not used. #from(6000.3)", false)]
-        public enum IntermediateTextureUsage 
+        public enum IntermediateTextureUsage
         {
             /// <summary>
             /// The usage is not specified. The system will attempt to run the passes and determine compatibility at execution time.
             /// </summary>
-            Unknown, 
+            Unknown,
+
             /// <summary>
             /// The passes require or use an intermediate texture.
             /// </summary>
-            Required, 
+            Required,
+
             /// <summary>
             /// The passes do not use an intermediate texture.
             /// This signals that the passes can be safely skipped if no intermediate texture is available.
             /// </summary>
-            NotRequired 
+            NotRequired,
         }
 
         /// <summary>
@@ -87,7 +91,12 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="atEvent">Requeted event at which rendering layers texture will be produced</param>
         /// <param name="maskSize">Requested bit size of rendering layers texture</param>
         /// <returns></returns>
-        internal virtual bool RequireRenderingLayers(bool isDeferred, bool needsGBufferAccurateNormals, out RenderingLayerUtils.Event atEvent, out RenderingLayerUtils.MaskSize maskSize)
+        internal virtual bool RequireRenderingLayers(
+            bool isDeferred,
+            bool needsGBufferAccurateNormals,
+            out RenderingLayerUtils.Event atEvent,
+            out RenderingLayerUtils.MaskSize maskSize
+        )
         {
             atEvent = RenderingLayerUtils.Event.Opaque;
             maskSize = RenderingLayerUtils.MaskSize.Bits8;
@@ -119,10 +128,9 @@ namespace UnityEngine.Rendering.Universal
         /// Override this function to clean up resources in your renderer.
         /// </summary>
         /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-        }
+        protected virtual void Dispose(bool disposing) { }
 
-        internal ScriptableRenderer.RenderingFeatures supportedRenderingFeatures { get; set; } = new ScriptableRenderer.RenderingFeatures();
+        internal ScriptableRenderer.RenderingFeatures supportedRenderingFeatures { get; set; } =
+            new ScriptableRenderer.RenderingFeatures();
     }
 }

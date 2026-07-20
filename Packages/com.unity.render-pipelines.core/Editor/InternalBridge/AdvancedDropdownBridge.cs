@@ -6,9 +6,7 @@ namespace UnityEditor.Rendering
     abstract class AdvancedDropdownItemBridge : AdvancedDropdownItem
     {
         public AdvancedDropdownItemBridge(string name)
-            : base(name)
-        {
-        }
+            : base(name) { }
     }
 
     abstract class AdvancedDropdownWindowBridge : AdvancedDropdownWindow
@@ -42,8 +40,9 @@ namespace UnityEditor.Rendering
             CurrentFolderContextualSearch = true;
         }
 
-        protected override AdvancedDropdownItem FetchData() { return null; }
-
-        
+        protected override AdvancedDropdownItem FetchData()
+        {
+            return null;
+        }
     }
 }

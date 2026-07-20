@@ -10,12 +10,20 @@ namespace Unity.PlatformToolkit.PlayMode
         private PlatformToolkitMetrics m_Metrics;
         int m_AccountId;
 
-        public PlayModeSavingSystem(IEnvironment environment, int accountId, PlayModeSaveData saveData, PlatformToolkitMetrics metrics)
+        public PlayModeSavingSystem(
+            IEnvironment environment,
+            int accountId,
+            PlayModeSaveData saveData,
+            PlatformToolkitMetrics metrics
+        )
         {
             m_Environment = environment;
             m_Metrics = metrics;
             m_AccountId = accountId;
-            m_GenericSystem = new(new PlayModeStorageSystem(environment, m_AccountId, saveData, m_Metrics), runInBackground: false);
+            m_GenericSystem = new(
+                new PlayModeStorageSystem(environment, m_AccountId, saveData, m_Metrics),
+                runInBackground: false
+            );
         }
 
         public async Task<IReadOnlyList<string>> EnumerateSaveNames()

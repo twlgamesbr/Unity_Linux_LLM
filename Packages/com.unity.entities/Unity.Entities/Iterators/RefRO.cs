@@ -9,8 +9,12 @@ namespace Unity.Entities
     /// ReadOnlyRef stores a safe read-only reference to a component data.
     /// </summary>
     /// <typeparam name="T">Type of this component</typeparam>
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData) }, RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS")]
-    public readonly struct RefRO<T> : IQueryTypeParameter where T : struct, IComponentData
+    [GenerateTestsForBurstCompatibility(
+        GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData) },
+        RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS"
+    )]
+    public readonly struct RefRO<T> : IQueryTypeParameter
+        where T : struct, IComponentData
     {
         readonly unsafe byte* _Data;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -31,6 +35,7 @@ namespace Unity.Entities
 #endif
             OutOfBoundsArrayConstructor(index, componentDataArray.Length);
         }
+
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         static void OutOfBoundsArrayConstructor(int index, int length)
         {
@@ -47,7 +52,8 @@ namespace Unity.Entities
         /// <param name="componentDataArray">The NativeArray of components.</param>
         /// <param name="index">The index of the components.</param>
         /// <returns>Read-only optional reference to component</returns>
-        public static RefRO<T> Optional(NativeArray<T> componentDataArray, int index) => componentDataArray.Length == 0 ? default : new RefRO<T>(componentDataArray, index);
+        public static RefRO<T> Optional(NativeArray<T> componentDataArray, int index) =>
+            componentDataArray.Length == 0 ? default : new RefRO<T>(componentDataArray, index);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         internal unsafe RefRO(void* ptr, AtomicSafetyHandle safety)

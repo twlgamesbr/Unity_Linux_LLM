@@ -14,7 +14,8 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                 testJobData.testTree,
                 testJobData.testFilter,
                 ref testJobData.filteredTests,
-                testJobData.TargetRuntimePlatform);
+                testJobData.TargetRuntimePlatform
+            );
 
             yield return null;
         }

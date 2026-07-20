@@ -10,6 +10,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Configuration
 
         public const float k_SceneSaturationMin = 0f;
         public const float k_SceneSaturationMax = 1f;
+
         [Range(k_SceneSaturationMin, k_SceneSaturationMax)]
         public float SceneSaturation;
     }

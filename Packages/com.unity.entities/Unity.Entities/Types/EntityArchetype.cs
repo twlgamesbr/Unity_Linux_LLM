@@ -31,7 +31,8 @@ namespace Unity.Entities
     [DebuggerTypeProxy(typeof(EntityArchetypeDebugView))]
     public unsafe struct EntityArchetype : IEquatable<EntityArchetype>
     {
-        [NativeDisableUnsafePtrRestriction] internal Archetype* Archetype;
+        [NativeDisableUnsafePtrRestriction]
+        internal Archetype* Archetype;
 
         internal EntityArchetype(Archetype* archetype)
         {
@@ -50,7 +51,7 @@ namespace Unity.Entities
         /// <param name="lhs">A EntityArchetype object.</param>
         /// <param name="rhs">Another EntityArchetype object.</param>
         /// <returns>True, if these EntityArchetype instances reference the same archetype.</returns>
-        public static bool operator==(EntityArchetype lhs, EntityArchetype rhs)
+        public static bool operator ==(EntityArchetype lhs, EntityArchetype rhs)
         {
             return lhs.Archetype == rhs.Archetype;
         }
@@ -61,7 +62,7 @@ namespace Unity.Entities
         /// <param name="lhs">A EntityArchetype object.</param>
         /// <param name="rhs">Another EntityArchetype object.</param>
         /// <returns>True, if these EntityArchetype instances reference different archetypes.</returns>
-        public static bool operator!=(EntityArchetype lhs, EntityArchetype rhs)
+        public static bool operator !=(EntityArchetype lhs, EntityArchetype rhs)
         {
             return lhs.Archetype != rhs.Archetype;
         }
@@ -134,7 +135,7 @@ namespace Unity.Entities
 
             // NOTE: Entity is excluded (Entity is always the first type in the archetype)
             for (var i = 1; i < archetypeCount; ++i)
-                types[i  - 1] = Archetype->Types[i].ToComponentType();
+                types[i - 1] = Archetype->Types[i].ToComponentType();
 
             return types;
         }
@@ -152,8 +153,13 @@ namespace Unity.Entities
         /// not in "after".  Buffer must be large enough to potentially hold all the types present in "before"</param>
         /// <param name="removedTypesCount">How many types were put into the removedTypes buffer</param>
         public static void CalculateDifference(
-            EntityArchetype before, EntityArchetype after,
-            TypeIndex* addedTypes, out int addedTypesCount, TypeIndex* removedTypes, out int removedTypesCount)
+            EntityArchetype before,
+            EntityArchetype after,
+            TypeIndex* addedTypes,
+            out int addedTypesCount,
+            TypeIndex* removedTypes,
+            out int removedTypesCount
+        )
         {
             int b = 1;
             int a = 1;
@@ -251,7 +257,9 @@ namespace Unity.Entities
         {
             if (!Valid)
             {
-                throw new ArgumentException("EntityArchetype argument is invalid. Calling new EntityArchetype() produces an invalid value. Call EntityManager.CreateArchetype() to get a valid EntityArchetype value.");
+                throw new ArgumentException(
+                    "EntityArchetype argument is invalid. Calling new EntityArchetype() produces an invalid value. Call EntityManager.CreateArchetype() to get a valid EntityArchetype value."
+                );
             }
         }
     }

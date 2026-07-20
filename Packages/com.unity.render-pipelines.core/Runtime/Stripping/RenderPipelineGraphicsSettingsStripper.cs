@@ -8,7 +8,11 @@ namespace UnityEngine.Rendering
 {
     internal static partial class RenderPipelineGraphicsSettingsStripper
     {
-        private static bool CanRemoveSettings(this List<IStripper> strippers, [DisallowNull] Type settingsType, [DisallowNull] IRenderPipelineGraphicsSettings settings)
+        private static bool CanRemoveSettings(
+            this List<IStripper> strippers,
+            [DisallowNull] Type settingsType,
+            [DisallowNull] IRenderPipelineGraphicsSettings settings
+        )
         {
             if (strippers == null)
                 return false;
@@ -21,7 +25,12 @@ namespace UnityEngine.Rendering
 
             foreach (var stripperInstance in strippers)
             {
-                var methodInfo = stripperInstance?.GetType().GetMethod($"{nameof(IRenderPipelineGraphicsSettingsStripper<IRenderPipelineGraphicsSettings>.CanRemoveSettings)}", flags);
+                var methodInfo = stripperInstance
+                    ?.GetType()
+                    .GetMethod(
+                        $"{nameof(IRenderPipelineGraphicsSettingsStripper<IRenderPipelineGraphicsSettings>.CanRemoveSettings)}",
+                        flags
+                    );
                 if (methodInfo != null)
                     canRemoveSettings &= (bool)methodInfo.Invoke(stripperInstance, methodArgs);
             }
@@ -33,7 +42,8 @@ namespace UnityEngine.Rendering
             [DisallowNull] Dictionary<Type, List<IStripper>> strippersMap,
             [DisallowNull] IRenderPipelineGraphicsSettings settings,
             out bool isAvailableOnPlayerBuild,
-            out bool strippersDefined)
+            out bool strippersDefined
+        )
         {
             isAvailableOnPlayerBuild = false;
             strippersDefined = false;
@@ -57,7 +67,8 @@ namespace UnityEngine.Rendering
 
         public static void PerformStripping(
             List<IRenderPipelineGraphicsSettings> settingsList,
-            List<IRenderPipelineGraphicsSettings> runtimeSettingsList)
+            List<IRenderPipelineGraphicsSettings> runtimeSettingsList
+        )
         {
             if (settingsList == null)
                 throw new ArgumentNullException(nameof(settingsList));
@@ -76,13 +87,19 @@ namespace UnityEngine.Rendering
                     if (settings == null)
                         continue;
 
-                    if (CanTransferSettingsToPlayer(strippersMap, settings, out var isAvailableOnPlayerBuild, out var strippersDefined))
+                    if (
+                        CanTransferSettingsToPlayer(
+                            strippersMap,
+                            settings,
+                            out var isAvailableOnPlayerBuild,
+                            out var strippersDefined
+                        )
+                    )
                         runtimeSettingsList.Add(settings);
 
                     report.AddStrippedSetting(settings.GetType(), isAvailableOnPlayerBuild, strippersDefined);
                 }
             }
-
         }
     }
 }

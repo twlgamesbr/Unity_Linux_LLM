@@ -1,21 +1,23 @@
-using AOT;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using UnityEngine.Assertions;
+using AOT;
 using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnityEngine.Assertions;
 
 namespace Unity.Collections
 {
-    internal struct UnmanagedArray<T> : IDisposable where T : unmanaged
+    internal struct UnmanagedArray<T> : IDisposable
+        where T : unmanaged
     {
         IntPtr m_pointer;
         int m_length;
         public int Length => m_length;
         AllocatorManager.AllocatorHandle m_allocator;
+
         public UnmanagedArray(int length, AllocatorManager.AllocatorHandle allocator)
         {
             unsafe
@@ -25,6 +27,7 @@ namespace Unity.Collections
             m_length = length;
             m_allocator = allocator;
         }
+
         public void Dispose()
         {
             unsafe
@@ -32,10 +35,12 @@ namespace Unity.Collections
                 Memory.Unmanaged.Free((T*)m_pointer, Allocator.Persistent);
             }
         }
+
         public unsafe T* GetUnsafePointer()
         {
             return (T*)m_pointer;
         }
+
         public ref T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,7 +48,8 @@ namespace Unity.Collections
             {
                 unsafe
                 {
-                    return ref ((T*)m_pointer)[index]; }
+                    return ref ((T*)m_pointer)[index];
+                }
             }
         }
     }
@@ -62,14 +68,17 @@ namespace Unity.Collections
             // Number of bits used to store current position in a block to give out memory.
             // This limits the maximum block size to 1TB (2^40).
             const int currentBits = 40;
+
             // Offset of current position in m_long
             const int currentOffset = 0;
+
             // Number of bits used to store the allocation count in a block
             const long currentMask = (1L << currentBits) - 1;
 
             // Number of bits used to store allocation count in a block.
             // This limits the maximum number of allocations per block to 16 millions (2^24)
             const int allocCountBits = 24;
+
             // Offset of allocation count in m_long
             const int allocCountOffset = currentOffset + currentBits;
             const long allocCountMask = (1L << allocCountBits) - 1;
@@ -78,11 +87,7 @@ namespace Unity.Collections
             internal long m_current
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    return (m_long >> currentOffset) & currentMask;
-                }
-
+                get { return (m_long >> currentOffset) & currentMask; }
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 set
                 {
@@ -95,11 +100,7 @@ namespace Unity.Collections
             internal long m_allocCount
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    return (m_long >> allocCountOffset) & allocCountMask;
-                }
-
+                get { return (m_long >> allocCountOffset) & allocCountMask; }
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 set
                 {
@@ -108,15 +109,19 @@ namespace Unity.Collections
                 }
             }
         }
+
         [GenerateTestsForBurstCompatibility]
         internal unsafe struct MemoryBlock : IDisposable
         {
             // can't align any coarser than this many bytes
             public const int kMaximumAlignment = 16384;
+
             // pointer to contiguous memory
             public byte* m_pointer;
+
             // how many bytes of contiguous memory it points to
             public long m_bytes;
+
             // Union of current position to give out memory and allocation counts
             public Union m_union;
 
@@ -155,7 +160,7 @@ namespace Unity.Collections
         const int kLog2MaxMemoryBlockSize = 26;
 
         // Maximum memory block size.  Can exceed maximum memory block size if user requested more.
-        const long kMaxMemoryBlockSize = 1L << kLog2MaxMemoryBlockSize;  // 64MB
+        const long kMaxMemoryBlockSize = 1L << kLog2MaxMemoryBlockSize; // 64MB
 
         /// Minimum memory block size, 128KB.
         const long kMinMemoryBlockSize = 128 * 1024;
@@ -172,10 +177,10 @@ namespace Unity.Collections
         Spinner m_spinner;
         AllocatorManager.AllocatorHandle m_handle;
         UnmanagedArray<MemoryBlock> m_block;
-        int m_last;                 // highest-index block that has memory to allocate from
-        int m_used;                 // highest-index block that we actually allocated from, since last rewind
-        byte m_enableBlockFree;     // flag indicating if allocator enables individual block free
-        byte m_reachMaxBlockSize;   // flag indicating if reach maximum block size
+        int m_last; // highest-index block that has memory to allocate from
+        int m_used; // highest-index block that we actually allocated from, since last rewind
+        byte m_enableBlockFree; // flag indicating if allocator enables individual block free
+        byte m_reachMaxBlockSize; // flag indicating if reach maximum block size
 
         /// <summary>
         /// Initializes the allocator. Must be called before first use.
@@ -226,7 +231,7 @@ namespace Unity.Collections
             get
             {
                 long totalBytes = 0;
-                for(int i = 0; i <= m_last; i++)
+                for (int i = 0; i <= m_last; i++)
                 {
                     totalBytes += m_block[i].m_bytes;
                 }
@@ -270,7 +275,13 @@ namespace Unity.Collections
         [ExcludeFromBurstCompatTesting("Uses managed delegate")]
         public AllocatorManager.TryFunction Function => Try;
 
-        unsafe int TryAllocate(ref AllocatorManager.Block block, int startIndex, int lastIndex, long alignedSize, long alignmentMask)
+        unsafe int TryAllocate(
+            ref AllocatorManager.Block block,
+            int startIndex,
+            int lastIndex,
+            long alignedSize,
+            long alignmentMask
+        )
         {
             for (int best = startIndex; best <= lastIndex; best++)
             {
@@ -289,12 +300,17 @@ namespace Unity.Collections
                     }
                     oldUnion = readUnion;
                     Union newUnion = default;
-                    newUnion.m_current = (begin + alignedSize) > m_block[best].m_bytes ? m_block[best].m_bytes : (begin + alignedSize);
+                    newUnion.m_current =
+                        (begin + alignedSize) > m_block[best].m_bytes ? m_block[best].m_bytes : (begin + alignedSize);
                     newUnion.m_allocCount = readUnion.m_allocCount + 1;
-                    readUnion.m_long = Interlocked.CompareExchange(ref m_block[best].m_union.m_long, newUnion.m_long, oldUnion.m_long);
+                    readUnion.m_long = Interlocked.CompareExchange(
+                        ref m_block[best].m_union.m_long,
+                        newUnion.m_long,
+                        oldUnion.m_long
+                    );
                 } while (readUnion.m_long != oldUnion.m_long);
 
-                if(skip)
+                if (skip)
                 {
                     continue;
                 }
@@ -407,7 +423,11 @@ namespace Unity.Collections
                                 {
                                     newUnion.m_current = 0;
                                 }
-                                readUnion.m_long = Interlocked.CompareExchange(ref m_block[blockIndex].m_union.m_long, newUnion.m_long, oldUnion.m_long);
+                                readUnion.m_long = Interlocked.CompareExchange(
+                                    ref m_block[blockIndex].m_union.m_long,
+                                    newUnion.m_long,
+                                    oldUnion.m_long
+                                );
                             } while (readUnion.m_long != oldUnion.m_long);
                         }
                     }
@@ -433,26 +453,39 @@ namespace Unity.Collections
         /// global table, for times when a reference to the allocator object isn't available.
         /// </summary>
         /// <value>The AllocatorHandle retrieved.</value>
-        public AllocatorManager.AllocatorHandle Handle { get { return m_handle; } set { m_handle = value; } }
+        public AllocatorManager.AllocatorHandle Handle
+        {
+            get { return m_handle; }
+            set { m_handle = value; }
+        }
 
         /// <summary>
         /// Retrieve the Allocator associated with this allocator.
         /// </summary>
         /// <value>The Allocator retrieved.</value>
-        public Allocator ToAllocator { get { return m_handle.ToAllocator; } }
+        public Allocator ToAllocator
+        {
+            get { return m_handle.ToAllocator; }
+        }
 
         /// <summary>
         /// Check whether this AllocatorHandle is a custom allocator.
         /// </summary>
         /// <value>True if this AllocatorHandle is a custom allocator.</value>
-        public bool IsCustomAllocator { get { return m_handle.IsCustomAllocator; } }
+        public bool IsCustomAllocator
+        {
+            get { return m_handle.IsCustomAllocator; }
+        }
 
         /// <summary>
         /// Check whether this allocator will automatically dispose allocations.
         /// </summary>
         /// <remarks>Allocations made by Rewindable allocator are automatically disposed.</remarks>
         /// <value>Always true</value>
-        public bool IsAutoDispose { get { return true; } }
+        public bool IsAutoDispose
+        {
+            get { return true; }
+        }
 
         /// <summary>
         /// Allocate a NativeArray of type T from memory that is guaranteed to remain valid until the end of the
@@ -464,7 +497,8 @@ namespace Unity.Collections
         /// <param name="length">The length of the NativeArray to allocate, measured in elements.</param>
         /// <returns>The NativeArray allocated by this function.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public NativeArray<T> AllocateNativeArray<T>(int length) where T : unmanaged
+        public NativeArray<T> AllocateNativeArray<T>(int length)
+            where T : unmanaged
         {
             var container = new NativeArray<T>();
             unsafe
@@ -477,7 +511,10 @@ namespace Unity.Collections
             container.m_MinIndex = 0;
             container.m_MaxIndex = length - 1;
             container.m_Safety = CollectionHelper.CreateSafetyHandle(ToAllocator);
-            CollectionHelper.SetStaticSafetyId<NativeArray<T>>(ref container.m_Safety, ref NativeArrayExtensions.NativeArrayStaticId<T>.s_staticSafetyId.Data);
+            CollectionHelper.SetStaticSafetyId<NativeArray<T>>(
+                ref container.m_Safety,
+                ref NativeArrayExtensions.NativeArrayStaticId<T>.s_staticSafetyId.Data
+            );
             Handle.AddSafetyHandle(container.m_Safety);
 #endif
             return container;
@@ -494,7 +531,8 @@ namespace Unity.Collections
         /// <param name="capacity">The capacity of the NativeList to allocate, measured in elements.</param>
         /// <returns>The NativeList allocated by this function.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public NativeList<T> AllocateNativeList<T>(int capacity) where T : unmanaged
+        public NativeList<T> AllocateNativeList<T>(int capacity)
+            where T : unmanaged
         {
             var container = new NativeList<T>();
             unsafe
@@ -507,7 +545,10 @@ namespace Unity.Collections
             }
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             container.m_Safety = CollectionHelper.CreateSafetyHandle(ToAllocator);
-            CollectionHelper.SetStaticSafetyId<NativeList<T>>(ref container.m_Safety, ref NativeList<T>.s_staticSafetyId.Data);
+            CollectionHelper.SetStaticSafetyId<NativeList<T>>(
+                ref container.m_Safety,
+                ref NativeList<T>.s_staticSafetyId.Data
+            );
             AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(container.m_Safety, true);
             Handle.AddSafetyHandle(container.m_Safety);
 #endif

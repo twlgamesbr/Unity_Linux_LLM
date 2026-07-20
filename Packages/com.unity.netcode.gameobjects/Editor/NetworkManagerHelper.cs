@@ -17,7 +17,8 @@ namespace Unity.Netcode.Editor
         internal static NetworkManagerHelper Singleton;
 
         // This is primarily to handle IntegrationTest scenarios where more than 1 NetworkManager could exist
-        private static Dictionary<NetworkManager, Transform> s_LastKnownNetworkManagerParents = new Dictionary<NetworkManager, Transform>();
+        private static Dictionary<NetworkManager, Transform> s_LastKnownNetworkManagerParents =
+            new Dictionary<NetworkManager, Transform>();
 
         /// <summary>
         /// Initializes the singleton instance and registers for:
@@ -50,7 +51,14 @@ namespace Unity.Netcode.Editor
                 if (settings.GenerateDefaultNetworkPrefabs)
                 {
                     manager.NetworkConfig = new NetworkConfig();
-                    manager.NetworkConfig.Prefabs.NetworkPrefabsLists = new List<NetworkPrefabsList> { NetworkPrefabProcessor.GetOrCreateNetworkPrefabs(NetworkPrefabProcessor.DefaultNetworkPrefabsPath, out _, true) };
+                    manager.NetworkConfig.Prefabs.NetworkPrefabsLists = new List<NetworkPrefabsList>
+                    {
+                        NetworkPrefabProcessor.GetOrCreateNetworkPrefabs(
+                            NetworkPrefabProcessor.DefaultNetworkPrefabsPath,
+                            out _,
+                            true
+                        ),
+                    };
                 }
             };
         }
@@ -60,17 +68,17 @@ namespace Unity.Netcode.Editor
             switch (playModeStateChange)
             {
                 case PlayModeStateChange.ExitingEditMode:
-                    {
-                        s_LastKnownNetworkManagerParents.Clear();
-                        ScenesInBuildActiveSceneCheck();
-                        EditorApplication.hierarchyChanged -= EditorApplication_hierarchyChanged;
-                        break;
-                    }
+                {
+                    s_LastKnownNetworkManagerParents.Clear();
+                    ScenesInBuildActiveSceneCheck();
+                    EditorApplication.hierarchyChanged -= EditorApplication_hierarchyChanged;
+                    break;
+                }
                 case PlayModeStateChange.EnteredEditMode:
-                    {
-                        EditorApplication.hierarchyChanged += EditorApplication_hierarchyChanged;
-                        break;
-                    }
+                {
+                    EditorApplication.hierarchyChanged += EditorApplication_hierarchyChanged;
+                    break;
+                }
             }
         }
 
@@ -101,10 +109,16 @@ namespace Unity.Netcode.Editor
             {
                 if (networkManager.NetworkConfig != null && networkManager.NetworkConfig.EnableSceneManagement)
                 {
-                    if (EditorUtility.DisplayDialog("Add Scene to Scenes in Build", $"The current scene was not found in the scenes" +
-                        $" in build and a {nameof(NetworkManager)} instance was found with scene management enabled! Clients will not be able " +
-                        $"to synchronize to this scene unless it is added to the scenes in build list.\n\nWould you like to add it now?",
-                        "Yes", "No - Continue"))
+                    if (
+                        EditorUtility.DisplayDialog(
+                            "Add Scene to Scenes in Build",
+                            $"The current scene was not found in the scenes"
+                                + $" in build and a {nameof(NetworkManager)} instance was found with scene management enabled! Clients will not be able "
+                                + $"to synchronize to this scene unless it is added to the scenes in build list.\n\nWould you like to add it now?",
+                            "Yes",
+                            "No - Continue"
+                        )
+                    )
                     {
                         scenesList.Add(new EditorBuildSettingsScene(activeScene.path, true));
                         EditorBuildSettings.scenes = scenesList.ToArray();
@@ -163,17 +177,26 @@ namespace Unity.Netcode.Editor
 
                 if (!EditorApplication.isPlaying && !editorTest)
                 {
-                    EditorUtility.DisplayDialog($"Removing {nameof(NetworkObject)}", k_NetworkManagerAndNetworkObjectNotAllowedMessage, "OK");
+                    EditorUtility.DisplayDialog(
+                        $"Removing {nameof(NetworkObject)}",
+                        k_NetworkManagerAndNetworkObjectNotAllowedMessage,
+                        "OK"
+                    );
                 }
                 else
                 {
-                    networkManager.Log.Error(new Context(LogLevel.Error, k_NetworkManagerAndNetworkObjectNotAllowedMessage));
+                    networkManager.Log.Error(
+                        new Context(LogLevel.Error, k_NetworkManagerAndNetworkObjectNotAllowedMessage)
+                    );
                 }
             }
         }
 
-        private static readonly string k_NetworkManagerAndNetworkObjectNotAllowedMessage = $"A {nameof(GameObject)} cannot have both a {nameof(NetworkManager)} and {nameof(NetworkObject)} assigned to it or any children under it.";
-        public string NetworkManagerAndNetworkObjectNotAllowedMessage() => k_NetworkManagerAndNetworkObjectNotAllowedMessage;
+        private static readonly string k_NetworkManagerAndNetworkObjectNotAllowedMessage =
+            $"A {nameof(GameObject)} cannot have both a {nameof(NetworkManager)} and {nameof(NetworkObject)} assigned to it or any children under it.";
+
+        public string NetworkManagerAndNetworkObjectNotAllowedMessage() =>
+            k_NetworkManagerAndNetworkObjectNotAllowedMessage;
 
         /// <summary>
         /// Handles notifying the user, via display dialog window, that they have nested a NetworkManager.
@@ -181,7 +204,11 @@ namespace Unity.Netcode.Editor
         /// When in play mode it just notifies the user when entering play mode as well as when the user
         /// tries to start a network session while a NetworkManager is still nested.
         /// </summary>
-        public bool NotifyUserOfNestedNetworkManager(NetworkManager networkManager, bool ignoreNetworkManagerCache = false, bool editorTest = false)
+        public bool NotifyUserOfNestedNetworkManager(
+            NetworkManager networkManager,
+            bool ignoreNetworkManagerCache = false,
+            bool editorTest = false
+        )
         {
             var gameObject = networkManager.gameObject;
             var transform = networkManager.transform;
@@ -205,7 +232,8 @@ namespace Unity.Netcode.Editor
             {
                 if (!EditorApplication.isPlaying && !editorTest)
                 {
-                    message += $"Click 'Auto-Fix' to automatically remove it from {transform.root.gameObject.name} or 'Manual-Fix' to fix it yourself in the hierarchy view.";
+                    message +=
+                        $"Click 'Auto-Fix' to automatically remove it from {transform.root.gameObject.name} or 'Manual-Fix' to fix it yourself in the hierarchy view.";
                     if (EditorUtility.DisplayDialog("Invalid Nested NetworkManager", message, "Auto-Fix", "Manual-Fix"))
                     {
                         transform.parent = null;

@@ -57,12 +57,14 @@ namespace Unity.Rendering
         /// <summary>
         /// Indicates whether the container stores any directional maps.
         /// </summary>
-        public bool hasDirections => directionsRef != null && directionsRef.Value != null && directionsRef.Value.depth > 0;
+        public bool hasDirections =>
+            directionsRef != null && directionsRef.Value != null && directionsRef.Value.depth > 0;
 
         /// <summary>
         /// Indicates whether the container stores any shadow masks.
         /// </summary>
-        public bool hasShadowMask => shadowMasksRef != null && shadowMasksRef.Value != null && shadowMasksRef.Value.depth > 0;
+        public bool hasShadowMask =>
+            shadowMasksRef != null && shadowMasksRef.Value != null && shadowMasksRef.Value.depth > 0;
 
         /// <summary>
         /// Indicates whether the container stores any color maps.
@@ -72,10 +74,9 @@ namespace Unity.Rendering
         /// <inheritdoc/>
         public bool Equals(LightMaps other)
         {
-            return
-                colorsRef == other.colorsRef &&
-                directionsRef == other.directionsRef &&
-                shadowMasksRef == other.shadowMasksRef;
+            return colorsRef == other.colorsRef
+                && directionsRef == other.directionsRef
+                && shadowMasksRef == other.shadowMasksRef;
         }
 
         /// <summary>
@@ -130,13 +131,17 @@ namespace Unity.Rendering
         /// <param name="inDirections">The list of Texture2D for direction lights.</param>
         /// <param name="inShadowMasks">The list of Texture2D for shadow masks.</param>
         /// <returns>Returns a new LightMaps object.</returns>
-        public static LightMaps ConstructLightMaps(List<Texture2D> inColors, List<Texture2D> inDirections, List<Texture2D> inShadowMasks)
+        public static LightMaps ConstructLightMaps(
+            List<Texture2D> inColors,
+            List<Texture2D> inDirections,
+            List<Texture2D> inShadowMasks
+        )
         {
             var result = new LightMaps
             {
                 colorsRef = CopyToTextureArray(inColors),
                 directionsRef = CopyToTextureArray(inDirections),
-                shadowMasksRef = CopyToTextureArray(inShadowMasks)
+                shadowMasksRef = CopyToTextureArray(inShadowMasks),
             };
             return result;
         }

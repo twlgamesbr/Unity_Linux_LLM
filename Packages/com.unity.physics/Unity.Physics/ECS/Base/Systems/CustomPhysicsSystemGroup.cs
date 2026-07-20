@@ -22,7 +22,8 @@ namespace Unity.Physics.Systems
         /// </summary>
         /// <param name="worldIndex"> A world index for a physics world. </param>
         /// <param name="shareStaticColliders"> Should static colliders be shared between main world and this one. </param>
-        protected CustomPhysicsSystemGroup(uint worldIndex, bool shareStaticColliders) : base(worldIndex, shareStaticColliders)
+        protected CustomPhysicsSystemGroup(uint worldIndex, bool shareStaticColliders)
+            : base(worldIndex, shareStaticColliders)
         {
             m_StoredSimulation = default;
         }
@@ -65,7 +66,8 @@ namespace Unity.Physics.Systems
             boradphaseData.m_UnityPhysicsSimulation = m_StoredSimulation;
             m_StoredSimulation = currentSimulation;
 
-            ref SystemState pickerSystemState = ref World.Unmanaged.GetExistingSystemState<PhysicsSimulationPickerSystem>();
+            ref SystemState pickerSystemState =
+                ref World.Unmanaged.GetExistingSystemState<PhysicsSimulationPickerSystem>();
             pickerSystemState.Enabled = false; // disable simulation switching in custom worlds
         }
 
@@ -81,7 +83,8 @@ namespace Unity.Physics.Systems
             boradphaseData.m_UnityPhysicsSimulation = m_StoredSimulation;
             m_StoredSimulation = currentSimulation;
 
-            ref SystemState pickerSystemState = ref World.Unmanaged.GetExistingSystemState<PhysicsSimulationPickerSystem>();
+            ref SystemState pickerSystemState =
+                ref World.Unmanaged.GetExistingSystemState<PhysicsSimulationPickerSystem>();
             pickerSystemState.Enabled = true; // enable switching back in main world
         }
     }

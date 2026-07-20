@@ -7,7 +7,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Jobs;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -21,7 +20,13 @@ namespace Unity.Entities
     internal static unsafe class TransformUnionCallbacks
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void UpdateTransformUnionsDelegate(IntPtr entityComponentStore, IntPtr entityIds, IntPtr hierarchy, IntPtr indices, int count);
+        private delegate void UpdateTransformUnionsDelegate(
+            IntPtr entityComponentStore,
+            IntPtr entityIds,
+            IntPtr hierarchy,
+            IntPtr indices,
+            int count
+        );
         private static bool s_Initialized;
 
         internal static void Initialize()
@@ -29,7 +34,9 @@ namespace Unity.Entities
             if (s_Initialized)
                 return;
 
-            var updateFnPtr = BurstCompiler.CompileFunctionPointer<UpdateTransformUnionsDelegate>(UpdateTransformUnionsCallback);
+            var updateFnPtr = BurstCompiler.CompileFunctionPointer<UpdateTransformUnionsDelegate>(
+                UpdateTransformUnionsCallback
+            );
             TransformHierarchy.SetUpdateTransformUnionsCallback(updateFnPtr.Value);
             s_Initialized = true;
         }
@@ -42,8 +49,13 @@ namespace Unity.Entities
 
         [BurstCompile]
         [AOT.MonoPInvokeCallback(typeof(UpdateTransformUnionsDelegate))]
-        private static void UpdateTransformUnionsCallback(IntPtr entityComponentStorePtr,
-            IntPtr entityIdsPtr, IntPtr hierarchyPtr, IntPtr indicesPtr, int count)
+        private static void UpdateTransformUnionsCallback(
+            IntPtr entityComponentStorePtr,
+            IntPtr entityIdsPtr,
+            IntPtr hierarchyPtr,
+            IntPtr indicesPtr,
+            int count
+        )
         {
             Entity* entityIds = (Entity*)entityIdsPtr;
             int* indices = (int*)indicesPtr;
@@ -53,8 +65,12 @@ namespace Unity.Entities
             for (int i = 0; i < count; i++)
             {
                 Entity entity = entityIds[i];
-                var union = (TransformUnion*)pComponentStore->GetComponentDataWithTypeRW(entity, typeIndex,
-                    pComponentStore->GlobalSystemVersion);
+                var union = (TransformUnion*)
+                    pComponentStore->GetComponentDataWithTypeRW(
+                        entity,
+                        typeIndex,
+                        pComponentStore->GlobalSystemVersion
+                    );
                 union->_UnsafeTransformHierarchyPointer = (TransformHierarchy*)hierarchyPtr;
                 union->_IndexInHierarchy = indices[i];
             }
@@ -74,28 +90,41 @@ namespace Unity.Entities
         // union of
 
         // Transform belongs in hierarchy
-        [FieldOffset(0)] public TransformHierarchy* _UnsafeTransformHierarchyPointer;   // 08 bytes
-        [FieldOffset(8)] public int _IndexInHierarchy;                                  // 04 bytes
-        [FieldOffset(12)] public byte _IsDirty;                                         // 01 byte
+        [FieldOffset(0)]
+        public TransformHierarchy* _UnsafeTransformHierarchyPointer; // 08 bytes
+
+        [FieldOffset(8)]
+        public int _IndexInHierarchy; // 04 bytes
+
+        [FieldOffset(12)]
+        public byte _IsDirty; // 01 byte
+
         // ------------------------------
 
         // or
 
         // "Loose" Transform has no Parent or Children
-        [FieldOffset(0)] public quaternion _Rotation;                                   // 16 bytes
-        [FieldOffset(16)] public float3 _Translation;                                   // 12 bytes
-        [FieldOffset(28)] public float3 _Scale;                                         // 12 bytes
+        [FieldOffset(0)]
+        public quaternion _Rotation; // 16 bytes
+
+        [FieldOffset(16)]
+        public float3 _Translation; // 12 bytes
+
+        [FieldOffset(28)]
+        public float3 _Scale; // 12 bytes
+
         //--------------------------------------------
 
         // TODO DOTS-10285: find somewhere to pack this
-        [FieldOffset(40)] public byte _HasHierarchy;                                    // 01 byte
+        [FieldOffset(40)]
+        public byte _HasHierarchy; // 01 byte
 
         private UnsafeTransformAccess GetTransformAccess()
         {
             return new UnsafeTransformAccess
             {
                 Hierarchy = (IntPtr)_UnsafeTransformHierarchyPointer,
-                Index = _IndexInHierarchy
+                Index = _IndexInHierarchy,
             };
         }
 
@@ -128,7 +157,8 @@ namespace Unity.Entities
             }
         }
 
-        public quaternion Rotation {
+        public quaternion Rotation
+        {
             get
             {
                 if (_HasHierarchy != 0)
@@ -213,12 +243,14 @@ namespace Unity.Entities
         /// <param name="localToParentMatrix">A matrix representing the parent-relative affine transformation.</param>
         public void SetLocalTransform(float4x4 localToParentMatrix)
         {
-            float3x3 rs = math.float3x3(localToParentMatrix.c0.xyz, localToParentMatrix.c1.xyz, localToParentMatrix.c2.xyz);
+            float3x3 rs = math.float3x3(
+                localToParentMatrix.c0.xyz,
+                localToParentMatrix.c1.xyz,
+                localToParentMatrix.c2.xyz
+            );
             quaternion r = math.rotation(rs);
             float3x3 sm = math.mul(math.float3x3(math.conjugate(r)), rs);
-            SetLocalTransform(localToParentMatrix.c3.xyz,
-                r,
-                math.float3(sm.c0.x, sm.c1.y, sm.c2.z));
+            SetLocalTransform(localToParentMatrix.c3.xyz, r, math.float3(sm.c0.x, sm.c1.y, sm.c2.z));
         }
 
         /// <summary>
@@ -367,9 +399,13 @@ namespace Unity.Entities
             }
         }
 
-
-        public void SetParent(EntityComponentStore* componentStore, TransformUnion* parent,
-            Entity parentEntity, Entity childEntity, bool preserveWorldTransform = true)
+        public void SetParent(
+            EntityComponentStore* componentStore,
+            TransformUnion* parent,
+            Entity parentEntity,
+            Entity childEntity,
+            bool preserveWorldTransform = true
+        )
         {
             UnsafeTransformAccess parentAccess = default;
             if (parent != null)
@@ -377,9 +413,14 @@ namespace Unity.Entities
                 if (parent->_HasHierarchy == 0)
                 {
                     // TODO DOTS-10288: get a better initial capacity from number of initial deep child count.
-                    parentAccess = TransformHierarchy.CreateHierarchy((IntPtr)componentStore,
-                        parent->Position, parent->Rotation, parent->Scale, Unsafe.As<Entity, ulong>(ref parentEntity),
-                        capacity:4);
+                    parentAccess = TransformHierarchy.CreateHierarchy(
+                        (IntPtr)componentStore,
+                        parent->Position,
+                        parent->Rotation,
+                        parent->Scale,
+                        Unsafe.As<Entity, ulong>(ref parentEntity),
+                        capacity: 4
+                    );
                     parent->_HasHierarchy = 1;
                     parent->_UnsafeTransformHierarchyPointer = (TransformHierarchy*)parentAccess.Hierarchy;
                     parent->_IndexInHierarchy = parentAccess.Index;
@@ -408,11 +449,21 @@ namespace Unity.Entities
 
                     position = newLocal.c3.xyz;
                     rotation = new quaternion(math.orthonormalize(new float3x3(newLocal)));
-                    scale = new float3(math.length(newLocal.c0.xyz), math.length(newLocal.c1.xyz), math.length(newLocal.c2.xyz));
+                    scale = new float3(
+                        math.length(newLocal.c0.xyz),
+                        math.length(newLocal.c1.xyz),
+                        math.length(newLocal.c2.xyz)
+                    );
                 }
 
-                var childAccess = TransformHierarchy.SetParent((IntPtr)componentStore,
-                    parentAccess, position, rotation, scale, Unsafe.As<Entity, ulong>(ref childEntity));
+                var childAccess = TransformHierarchy.SetParent(
+                    (IntPtr)componentStore,
+                    parentAccess,
+                    position,
+                    rotation,
+                    scale,
+                    Unsafe.As<Entity, ulong>(ref childEntity)
+                );
                 _HasHierarchy = 1;
                 _IsDirty = 1;
                 _UnsafeTransformHierarchyPointer = (TransformHierarchy*)childAccess.Hierarchy;
@@ -433,22 +484,30 @@ namespace Unity.Entities
 
                     childAccess.localPosition = newLocal.c3.xyz;
                     childAccess.localRotation = new quaternion(math.orthonormalize(new float3x3(newLocal)));
-                    childAccess.localScale = new float3(math.length(newLocal.c0.xyz), math.length(newLocal.c1.xyz), math.length(newLocal.c2.xyz));
+                    childAccess.localScale = new float3(
+                        math.length(newLocal.c0.xyz),
+                        math.length(newLocal.c1.xyz),
+                        math.length(newLocal.c2.xyz)
+                    );
                 }
 
                 // TODO DOTS-10361: If parent == null and deepChildCount == 1 then destroy
                 //  TransformHierarchy and store in chunk
 
-                var newAccess = TransformHierarchy.SetParent((IntPtr)componentStore,
-                    parentAccess, childAccess);
+                var newAccess = TransformHierarchy.SetParent((IntPtr)componentStore, parentAccess, childAccess);
                 _UnsafeTransformHierarchyPointer = (TransformHierarchy*)newAccess.Hierarchy;
                 _IndexInHierarchy = newAccess.Index;
                 _IsDirty = 1;
             }
         }
 
-        static void Internal_UpdateTransformUnions(IntPtr entityComponentStorePtr,
-            IntPtr entityIdsPtr, IntPtr hierarchyPtr, IntPtr indicesPtr, int count)
+        static void Internal_UpdateTransformUnions(
+            IntPtr entityComponentStorePtr,
+            IntPtr entityIdsPtr,
+            IntPtr hierarchyPtr,
+            IntPtr indicesPtr,
+            int count
+        )
         {
             Entity* entityIds = (Entity*)entityIdsPtr;
             int* indices = (int*)indicesPtr;
@@ -458,8 +517,12 @@ namespace Unity.Entities
             for (int i = 0; i < count; i++)
             {
                 Entity entity = entityIds[i];
-                var union = (TransformUnion*)pComponentStore->GetComponentDataWithTypeRW(entity, typeIndex,
-                    pComponentStore->GlobalSystemVersion);
+                var union = (TransformUnion*)
+                    pComponentStore->GetComponentDataWithTypeRW(
+                        entity,
+                        typeIndex,
+                        pComponentStore->GlobalSystemVersion
+                    );
                 union->_UnsafeTransformHierarchyPointer = (TransformHierarchy*)hierarchyPtr;
                 union->_IndexInHierarchy = indices[i];
             }

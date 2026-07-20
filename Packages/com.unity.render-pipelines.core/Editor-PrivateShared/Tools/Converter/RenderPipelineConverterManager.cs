@@ -5,10 +5,11 @@ using UnityEngine;
 
 namespace UnityEditor.Rendering.Converter
 {
-    class RenderPipelineConverterManager : ScriptableSingleton<RenderPipelineConverterManager>
-        , ISerializationCallbackReceiver
+    class RenderPipelineConverterManager
+        : ScriptableSingleton<RenderPipelineConverterManager>,
+            ISerializationCallbackReceiver
     {
-        [field:SerializeField]
+        [field: SerializeField]
         public List<ConverterState> converterStates { get; private set; } = new();
 
         public RenderPipelineConverterManager()
@@ -16,9 +17,9 @@ namespace UnityEditor.Rendering.Converter
             ReloadConverters();
         }
 
-        private void ReloadConverters() 
+        private void ReloadConverters()
         {
-            using(UnityEngine.Pool.HashSetPool<Type>.Get(out var availableConverterTypes))
+            using (UnityEngine.Pool.HashSetPool<Type>.Get(out var availableConverterTypes))
             {
                 foreach (var converterType in TypeCache.GetTypesDerivedFrom<IRenderPipelineConverter>())
                 {
@@ -47,16 +48,18 @@ namespace UnityEditor.Rendering.Converter
                         isSelected = false,
                         isInitialized = false,
                         items = new List<ConverterItemState>(),
-                        converter = renderPipelineConverter
+                        converter = renderPipelineConverter,
                     };
                     converterStates.Add(converterState);
                 }
 
-                foreach(var converter in converterStates)
+                foreach (var converter in converterStates)
                 {
                     if (!availableConverterTypes.Contains(converter.converter.GetType()))
                     {
-                        Debug.Log($"Removing converter state {converter.converter.GetType()} as it is no longer available or deprecated.");
+                        Debug.Log(
+                            $"Removing converter state {converter.converter.GetType()} as it is no longer available or deprecated."
+                        );
                         converterStates.Remove(converter);
                     }
                 }

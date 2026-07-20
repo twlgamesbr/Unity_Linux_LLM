@@ -97,7 +97,9 @@ namespace Unity.Collections
             public int failedWrites;
         }
 
-        [NativeDisableUnsafePtrRestriction] StreamData m_Data;
+        [NativeDisableUnsafePtrRestriction]
+        StreamData m_Data;
+
         /// <summary>
         /// Used for sending data asynchronously.
         /// </summary>
@@ -147,7 +149,11 @@ namespace Unity.Collections
         /// <returns>NativeArray representation of internal buffer.</returns>
         public NativeArray<byte> AsNativeArray()
         {
-            var na = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(m_Data.buffer, Length, Allocator.Invalid);
+            var na = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                m_Data.buffer,
+                Length,
+                Allocator.Invalid
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref na, m_Safety);
 #endif
@@ -226,6 +232,7 @@ namespace Unity.Collections
                 return m_Data.length + ((m_Data.bitIndex + 7) >> 3);
             }
         }
+
         /// <summary>
         /// The size of the buffer used in bits. See <see cref="Length"/> for the length in bytes.
         /// </summary>
@@ -393,7 +400,6 @@ namespace Unity.Collections
             return WriteBytesInternal((byte*)&netValue, sizeof(short));
         }
 
-
         /// <summary>
         /// Writes a 2-byte unsigned short to the current stream using Big-endian byte order and advances the stream position by two bytes.
         /// If the stream is in little-endian order, the byte order will be swapped.
@@ -524,8 +530,7 @@ namespace Unity.Collections
         public bool WritePackedULong(ulong value, in StreamCompressionModel model)
         {
             var data = (uint*)&value;
-            return WritePackedUInt(data[0], model) &
-                   WritePackedUInt(data[1], model);
+            return WritePackedUInt(data[0], model) & WritePackedUInt(data[1], model);
         }
 
         /// <summary>
@@ -537,7 +542,7 @@ namespace Unity.Collections
         /// <returns>Whether the write was successful</returns>
         public bool WritePackedInt(int value, in StreamCompressionModel model)
         {
-            uint interleaved = (uint)((value >> 31) ^ (value << 1));      // interleave negative values between positive values: 0, -1, 1, -2, 2
+            uint interleaved = (uint)((value >> 31) ^ (value << 1)); // interleave negative values between positive values: 0, -1, 1, -2, 2
             return WritePackedUInt(interleaved, model);
         }
 
@@ -549,7 +554,7 @@ namespace Unity.Collections
         /// <returns>Whether the write was successful</returns>
         public bool WritePackedLong(long value, in StreamCompressionModel model)
         {
-            ulong interleaved = (ulong)((value >> 63) ^ (value << 1));      // interleave negative values between positive values: 0, -1, 1, -2, 2
+            ulong interleaved = (ulong)((value >> 63) ^ (value << 1)); // interleave negative values between positive values: 0, -1, 1, -2, 2
             return WritePackedULong(interleaved, model);
         }
 
@@ -700,7 +705,6 @@ namespace Unity.Collections
             return true;
         }
 
-
         /// <summary>
         /// Writes a <c>FixedString32Bytes</c> value to the data stream.
         /// </summary>
@@ -768,7 +772,11 @@ namespace Unity.Collections
         /// <param name="baseline">The previous <c>FixedString32Bytes</c> value, used to compute the diff.</param>
         /// <param name="model"><see cref="StreamCompressionModel"/> model for writing value in a packed manner.</param>
         /// <returns>Whether the write was successful</returns>
-        public unsafe bool WritePackedFixedString32Delta(FixedString32Bytes str, FixedString32Bytes baseline, in StreamCompressionModel model)
+        public unsafe bool WritePackedFixedString32Delta(
+            FixedString32Bytes str,
+            FixedString32Bytes baseline,
+            in StreamCompressionModel model
+        )
         {
             ushort length = *((ushort*)&str);
             byte* data = ((byte*)&str) + 2;
@@ -782,7 +790,11 @@ namespace Unity.Collections
         /// <param name="baseline">The previous <c>FixedString64Bytes</c> value, used to compute the diff.</param>
         /// <param name="model"><see cref="StreamCompressionModel"/> model for writing value in a packed manner.</param>
         /// <returns>Whether the write was successful</returns>
-        public unsafe bool WritePackedFixedString64Delta(FixedString64Bytes str, FixedString64Bytes baseline, in StreamCompressionModel model)
+        public unsafe bool WritePackedFixedString64Delta(
+            FixedString64Bytes str,
+            FixedString64Bytes baseline,
+            in StreamCompressionModel model
+        )
         {
             ushort length = *((ushort*)&str);
             byte* data = ((byte*)&str) + 2;
@@ -796,7 +808,11 @@ namespace Unity.Collections
         /// <param name="baseline">The previous <c>FixedString128Bytes</c> value, used to compute the diff.</param>
         /// <param name="model"><see cref="StreamCompressionModel"/> model for writing value in a packed manner.</param>
         /// <returns>Whether the write was successful</returns>
-        public unsafe bool WritePackedFixedString128Delta(FixedString128Bytes str, FixedString128Bytes baseline, in StreamCompressionModel model)
+        public unsafe bool WritePackedFixedString128Delta(
+            FixedString128Bytes str,
+            FixedString128Bytes baseline,
+            in StreamCompressionModel model
+        )
         {
             ushort length = *((ushort*)&str);
             byte* data = ((byte*)&str) + 2;
@@ -810,7 +826,11 @@ namespace Unity.Collections
         /// <param name="baseline">The previous <c>FixedString512Bytes</c> value, used to compute the diff.</param>
         /// <param name="model"><see cref="StreamCompressionModel"/> model for writing value in a packed manner.</param>
         /// <returns>Whether the write was successful</returns>
-        public unsafe bool WritePackedFixedString512Delta(FixedString512Bytes str, FixedString512Bytes baseline, in StreamCompressionModel model)
+        public unsafe bool WritePackedFixedString512Delta(
+            FixedString512Bytes str,
+            FixedString512Bytes baseline,
+            in StreamCompressionModel model
+        )
         {
             ushort length = *((ushort*)&str);
             byte* data = ((byte*)&str) + 2;
@@ -824,7 +844,11 @@ namespace Unity.Collections
         /// <param name="baseline">The previous <c>FixedString4096Bytes</c> value, used to compute the diff.</param>
         /// <param name="model"><see cref="StreamCompressionModel"/> model for writing value in a packed manner.</param>
         /// <returns>Whether the write was successful</returns>
-        public unsafe bool WritePackedFixedString4096Delta(FixedString4096Bytes str, FixedString4096Bytes baseline, in StreamCompressionModel model)
+        public unsafe bool WritePackedFixedString4096Delta(
+            FixedString4096Bytes str,
+            FixedString4096Bytes baseline,
+            in StreamCompressionModel model
+        )
         {
             ushort length = *((ushort*)&str);
             byte* data = ((byte*)&str) + 2;
@@ -843,7 +867,13 @@ namespace Unity.Collections
         /// <param name="baseLength">The length of the previous value.</param>
         /// <param name="model"><see cref="StreamCompressionModel"/> model for writing value in a packed manner.</param>
         /// <returns>Whether the write was successful</returns>
-        unsafe bool WritePackedFixedStringDelta(byte* data, uint length, byte* baseData, uint baseLength, in StreamCompressionModel model)
+        unsafe bool WritePackedFixedStringDelta(
+            byte* data,
+            uint length,
+            byte* baseData,
+            uint baseLength,
+            in StreamCompressionModel model
+        )
         {
             var oldData = m_Data;
             if (!WritePackedUIntDelta(length, baseLength, model))
@@ -910,10 +940,14 @@ namespace Unity.Collections
         static void CheckBits(uint value, int numBits)
         {
             if (numBits < 0 || numBits > 32)
-                throw new ArgumentOutOfRangeException($"Invalid number of bits specified: {numBits}! Valid range is (0, 32) inclusive.");
+                throw new ArgumentOutOfRangeException(
+                    $"Invalid number of bits specified: {numBits}! Valid range is (0, 32) inclusive."
+                );
             var errValue = (1UL << numBits);
             if (value >= errValue)
-                throw new ArgumentOutOfRangeException($"Value {value} does not fit in the specified number of bits: {numBits}! Range (inclusive) is (0, {errValue-1})!");
+                throw new ArgumentOutOfRangeException(
+                    $"Value {value} does not fit in the specified number of bits: {numBits}! Range (inclusive) is (0, {errValue - 1})!"
+                );
         }
     }
 }

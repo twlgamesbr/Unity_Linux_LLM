@@ -7,14 +7,17 @@ namespace Unity.Entities.Editor
     {
         static SharedComponentTypeAutoComplete s_Instance;
         static string k_FilterToken = @"#(?<componentType>\S*)$";
-        public static SharedComponentTypeAutoComplete Instance => s_Instance ?? (s_Instance = new SharedComponentTypeAutoComplete());
-        private static Regex m_Regex = new Regex(k_FilterToken, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+        public static SharedComponentTypeAutoComplete Instance =>
+            s_Instance ?? (s_Instance = new SharedComponentTypeAutoComplete());
+        private static Regex m_Regex = new Regex(
+            k_FilterToken,
+            RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture
+        );
 
-        static SharedComponentTypeAutoComplete()
-            => SharedComponentTypesTrie.Initialize();
+        static SharedComponentTypeAutoComplete() => SharedComponentTypesTrie.Initialize();
 
         public bool ShouldStartAutoCompletion(string input, int caretPosition)
-        {            
+        {
             return GetToken(input, caretPosition) != null;
         }
 
@@ -46,5 +49,4 @@ namespace Unity.Entities.Editor
             return (final, componentType.Index + completedToken.Length);
         }
     }
-
 }

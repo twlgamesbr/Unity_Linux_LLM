@@ -28,7 +28,9 @@ namespace Unity.Netcode
         private HashSet<NetworkObject> m_PendingDirtyNetworkObjects = new HashSet<NetworkObject>();
 
 #if DEBUG
-        private ProfilerMarker m_NetworkBehaviourUpdate = new ProfilerMarker($"{nameof(NetworkBehaviour)}.{nameof(NetworkBehaviourUpdate)}");
+        private ProfilerMarker m_NetworkBehaviourUpdate = new ProfilerMarker(
+            $"{nameof(NetworkBehaviour)}.{nameof(NetworkBehaviourUpdate)}"
+        );
 #endif
 
         /// <summary>
@@ -93,8 +95,10 @@ namespace Unity.Netcode
                     // Set to true for NetworkVariable to ignore duplication of the
                     // "internal original value" for collections support.
                     behaviour.NetworkVariableFields[i].NetworkUpdaterCheck = true;
-                    if (behaviour.NetworkVariableFields[i].IsDirty() &&
-                        !behaviour.NetworkVariableIndexesToResetSet.Contains(i))
+                    if (
+                        behaviour.NetworkVariableFields[i].IsDirty()
+                        && !behaviour.NetworkVariableIndexesToResetSet.Contains(i)
+                    )
                     {
                         behaviour.NetworkVariableIndexesToResetSet.Add(i);
                         behaviour.NetworkVariableIndexesToReset.Add(i);

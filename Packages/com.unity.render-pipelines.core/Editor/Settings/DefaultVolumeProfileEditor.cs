@@ -12,17 +12,19 @@ namespace UnityEditor.Rendering
     /// </summary>
     public sealed partial class DefaultVolumeProfileEditor
     {
-        const string k_TemplatePath = "Packages/com.unity.render-pipelines.core/Editor/UXML/DefaultVolumeProfileEditor.uxml";
+        const string k_TemplatePath =
+            "Packages/com.unity.render-pipelines.core/Editor/UXML/DefaultVolumeProfileEditor.uxml";
 
         const int k_ContainerMarginLeft = 27;
         const int k_ImguiContainerPaddingLeft = 18;
 
-        static Lazy<GUIStyle> s_ImguiContainerScopeStyle = new(() => new GUIStyle
-        {
-            padding = new RectOffset(k_ImguiContainerPaddingLeft, 0, 0, 0)
-        });
+        static Lazy<GUIStyle> s_ImguiContainerScopeStyle = new(() =>
+            new GUIStyle { padding = new RectOffset(k_ImguiContainerPaddingLeft, 0, 0, 0) }
+        );
 
-        static Lazy<VisualTreeAsset> s_Template = new(() => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_TemplatePath));
+        static Lazy<VisualTreeAsset> s_Template = new(() =>
+            AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_TemplatePath)
+        );
 
         readonly Dictionary<VolumeComponentEditor, string> m_VolumeComponentHelpUrls = new();
         readonly VolumeProfile m_Profile;
@@ -196,7 +198,7 @@ namespace UnityEditor.Rendering
                     // This rect is drawn to suppress mouse hover highlight in order to match the old imgui
                     // implementation. Not doing this causes visual bugs with AdditionalProperties animations.
                     var highlightSuppressRect = scope.rect;
-                    highlightSuppressRect.xMin -= k_ImguiContainerPaddingLeft+k_ContainerMarginLeft;
+                    highlightSuppressRect.xMin -= k_ImguiContainerPaddingLeft + k_ContainerMarginLeft;
                     EditorGUI.DrawRect(highlightSuppressRect, CoreEditorStyles.backgroundColor);
 
                     editor.OnInternalInspectorGUI();
@@ -215,36 +217,68 @@ namespace UnityEditor.Rendering
             var targetComponent = targetEditor.volumeComponent;
             var menu = new GenericMenu();
 
-            menu.AddItem(VolumeProfileUtils.Styles.collapseAll, false, () =>
-            {
-                VolumeProfileUtils.SetComponentEditorsExpanded(allEditors, false);
-                RebuildListViews();
-            });
-            menu.AddItem(VolumeProfileUtils.Styles.expandAll, false, () =>
-            {
-                VolumeProfileUtils.SetComponentEditorsExpanded(allEditors, true);
-                RebuildListViews();
-            });
+            menu.AddItem(
+                VolumeProfileUtils.Styles.collapseAll,
+                false,
+                () =>
+                {
+                    VolumeProfileUtils.SetComponentEditorsExpanded(allEditors, false);
+                    RebuildListViews();
+                }
+            );
+            menu.AddItem(
+                VolumeProfileUtils.Styles.expandAll,
+                false,
+                () =>
+                {
+                    VolumeProfileUtils.SetComponentEditorsExpanded(allEditors, true);
+                    RebuildListViews();
+                }
+            );
             menu.AddSeparator(string.Empty);
 
-            menu.AddItem(VolumeProfileUtils.Styles.reset, false, () =>
-            {
-                VolumeProfileUtils.ResetComponentsInternal(targetEditor.serializedObject, m_Profile, new[] { targetComponent }, true);
-            });
+            menu.AddItem(
+                VolumeProfileUtils.Styles.reset,
+                false,
+                () =>
+                {
+                    VolumeProfileUtils.ResetComponentsInternal(
+                        targetEditor.serializedObject,
+                        m_Profile,
+                        new[] { targetComponent },
+                        true
+                    );
+                }
+            );
 
             menu.AddSeparator(string.Empty);
 
             if (targetEditor.hasAdditionalProperties)
-                menu.AddAdvancedPropertiesBoolMenuItem(() => targetEditor.showAdditionalProperties, () => targetEditor.showAdditionalProperties ^= true);
+                menu.AddAdvancedPropertiesBoolMenuItem(
+                    () => targetEditor.showAdditionalProperties,
+                    () => targetEditor.showAdditionalProperties ^= true
+                );
 
             menu.AddSeparator(string.Empty);
-            menu.AddItem(VolumeProfileUtils.Styles.openInRenderingDebugger, false, () => DebugDisplaySettingsVolume.OpenInRenderingDebugger(targetComponent));
+            menu.AddItem(
+                VolumeProfileUtils.Styles.openInRenderingDebugger,
+                false,
+                () => DebugDisplaySettingsVolume.OpenInRenderingDebugger(targetComponent)
+            );
 
             menu.AddSeparator(string.Empty);
-            menu.AddItem(VolumeProfileUtils.Styles.copySettings, false, () => VolumeComponentCopyPaste.CopySettings(targetComponent));
+            menu.AddItem(
+                VolumeProfileUtils.Styles.copySettings,
+                false,
+                () => VolumeComponentCopyPaste.CopySettings(targetComponent)
+            );
 
             if (VolumeComponentCopyPaste.CanPaste(targetComponent))
-                menu.AddItem(VolumeProfileUtils.Styles.pasteSettings, false, () => VolumeComponentCopyPaste.PasteSettings(targetComponent, m_Profile));
+                menu.AddItem(
+                    VolumeProfileUtils.Styles.pasteSettings,
+                    false,
+                    () => VolumeComponentCopyPaste.PasteSettings(targetComponent, m_Profile)
+                );
             else
                 menu.AddDisabledItem(VolumeProfileUtils.Styles.pasteSettings);
 

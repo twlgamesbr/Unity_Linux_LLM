@@ -43,6 +43,7 @@ namespace UnityEngine.TestTools
         /// A subset of platforms you need to have your tests run on.
         /// </summary>
         public RuntimePlatform[] include { get; set; }
+
         /// <summary>
         /// List the platforms you do not want to have your tests run on.
         /// </summary>
@@ -75,7 +76,11 @@ namespace UnityEngine.TestTools
         /// <param name="test">The test to modify</param>
         public void ApplyToTest(Test test)
         {
-            if (test.RunState == RunState.NotRunnable || test.RunState == RunState.Ignored || IsPlatformSupported(Application.platform))
+            if (
+                test.RunState == RunState.NotRunnable
+                || test.RunState == RunState.Ignored
+                || IsPlatformSupported(Application.platform)
+            )
             {
                 return;
             }
@@ -87,13 +92,19 @@ namespace UnityEngine.TestTools
         {
             if (include.Any() && !include.Any(x => x == testTargetPlatform))
             {
-                m_skippedReason = string.Format("Only supported on {0}", string.Join(", ", include.Select(x => x.ToString()).ToArray()));
+                m_skippedReason = string.Format(
+                    "Only supported on {0}",
+                    string.Join(", ", include.Select(x => x.ToString()).ToArray())
+                );
                 return false;
             }
 
             if (exclude.Any(x => x == testTargetPlatform))
             {
-                m_skippedReason = string.Format("Not supported on  {0}", string.Join(", ", exclude.Select(x => x.ToString()).ToArray()));
+                m_skippedReason = string.Format(
+                    "Not supported on  {0}",
+                    string.Join(", ", exclude.Select(x => x.ToString()).ToArray())
+                );
                 return false;
             }
             return true;

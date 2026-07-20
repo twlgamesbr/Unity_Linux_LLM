@@ -22,9 +22,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
         static InputActionAssetVerifier()
         {
             // Register an InputActionAsset verifier for this plugin.
-            ProjectWideActionsAsset.RegisterInputActionAssetVerifier(() =>
-                new InputActionAssetVerifier()
-            );
+            ProjectWideActionsAsset.RegisterInputActionAssetVerifier(() => new InputActionAssetVerifier());
 
             InputSystemProvider.SetOnRegisterActions(
                 (asset) =>
@@ -137,11 +135,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
                 );
             }
 
-            public void Verify(
-                string actionNameOrId,
-                InputActionType actionType,
-                string expectedControlType
-            )
+            public void Verify(string actionNameOrId, InputActionType actionType, string expectedControlType)
             {
                 var action = asset.FindAction(actionNameOrId);
                 if (action == null)

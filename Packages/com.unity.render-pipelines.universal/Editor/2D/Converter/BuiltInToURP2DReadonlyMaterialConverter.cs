@@ -11,9 +11,11 @@ namespace UnityEditor.Rendering.Universal
     [Serializable]
     [PipelineConverter("Built-in", "Universal Render Pipeline (2D Renderer)")]
     [BatchModeConverterClassInfo("BuiltInToURP2D", "ReadonlyMaterial2D")]
-    [ElementInfo(Name = "Material Reference Converter",
-                 Order = 100,
-                 Description = "Converts references to Built-In readonly materials to URP (2D) readonly materials.")]
+    [ElementInfo(
+        Name = "Material Reference Converter",
+        Order = 100,
+        Description = "Converts references to Built-In readonly materials to URP (2D) readonly materials."
+    )]
     internal class BuiltInToURP2DReadonlyMaterialConverter : ReadonlyMaterialConverter
     {
         public override bool isEnabled
@@ -27,7 +29,8 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        public override string isDisabledMessage => "Converter requires URP with a Renderer 2D. Convert your project to URP to use this converter.";
+        public override string isDisabledMessage =>
+            "Converter requires URP with a Renderer 2D. Convert your project to URP to use this converter.";
 
         protected override Dictionary<string, Func<Material>> materialMappings
         {
@@ -35,9 +38,12 @@ namespace UnityEditor.Rendering.Universal
             {
                 return new()
                 {
-                    ["Default-Material"] = () => GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultMesh2DLitMaterial,
-                    ["Sprites-Default"] = () => GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultLitMaterial,
-                    ["Sprites-Mask"] = () => GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultMaskMaterial,
+                    ["Default-Material"] = () =>
+                        GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultMesh2DLitMaterial,
+                    ["Sprites-Default"] = () =>
+                        GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultLitMaterial,
+                    ["Sprites-Mask"] = () =>
+                        GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultMaskMaterial,
                 };
             }
         }

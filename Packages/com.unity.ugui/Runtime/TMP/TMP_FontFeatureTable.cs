@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
-
 
 namespace TMPro
 {
@@ -77,7 +76,6 @@ namespace TMPro
         [SerializeField]
         internal List<MarkToMarkAdjustmentRecord> m_MarkToMarkAdjustmentRecords;
 
-
         // =============================================
         // Lookup data structures.
         // =============================================
@@ -120,7 +118,10 @@ namespace TMPro
         {
             // Sort List of Kerning Info
             if (m_GlyphPairAdjustmentRecords.Count > 0)
-                m_GlyphPairAdjustmentRecords = m_GlyphPairAdjustmentRecords.OrderBy(s => s.firstAdjustmentRecord.glyphIndex).ThenBy(s => s.secondAdjustmentRecord.glyphIndex).ToList();
+                m_GlyphPairAdjustmentRecords = m_GlyphPairAdjustmentRecords
+                    .OrderBy(s => s.firstAdjustmentRecord.glyphIndex)
+                    .ThenBy(s => s.secondAdjustmentRecord.glyphIndex)
+                    .ToList();
         }
 
         /// <summary>
@@ -130,7 +131,10 @@ namespace TMPro
         {
             // Sort List of Kerning Info
             if (m_MarkToBaseAdjustmentRecords.Count > 0)
-                m_MarkToBaseAdjustmentRecords = m_MarkToBaseAdjustmentRecords.OrderBy(s => s.baseGlyphID).ThenBy(s => s.markGlyphID).ToList();
+                m_MarkToBaseAdjustmentRecords = m_MarkToBaseAdjustmentRecords
+                    .OrderBy(s => s.baseGlyphID)
+                    .ThenBy(s => s.markGlyphID)
+                    .ToList();
         }
 
         /// <summary>
@@ -140,7 +144,10 @@ namespace TMPro
         {
             // Sort List of Kerning Info
             if (m_MarkToMarkAdjustmentRecords.Count > 0)
-                m_MarkToMarkAdjustmentRecords = m_MarkToMarkAdjustmentRecords.OrderBy(s => s.baseMarkGlyphID).ThenBy(s => s.combiningMarkGlyphID).ToList();
+                m_MarkToMarkAdjustmentRecords = m_MarkToMarkAdjustmentRecords
+                    .OrderBy(s => s.baseMarkGlyphID)
+                    .ThenBy(s => s.combiningMarkGlyphID)
+                    .ToList();
         }
     }
 }

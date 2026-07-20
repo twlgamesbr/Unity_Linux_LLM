@@ -10,7 +10,9 @@ namespace UnityEngine.Rendering.Universal
     [AddComponentMenu("Rendering/2D/Pixel Perfect Camera")]
     [RequireComponent(typeof(Camera))]
     [MovedFrom(true, "UnityEngine.Experimental.Rendering.Universal")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest/index.html?subfolder=/manual/2d-pixelperfect.html%23properties")]
+    [HelpURL(
+        "https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest/index.html?subfolder=/manual/2d-pixelperfect.html%23properties"
+    )]
     public class PixelPerfectCamera : MonoBehaviour, IPixelPerfectCamera, ISerializationCallbackReceiver
     {
         /// <summary>
@@ -22,22 +24,26 @@ namespace UnityEngine.Rendering.Universal
             /// No cropping.
             /// </summary>
             None,
+
             /// <summary>
             /// Black borders added to the left and right of viewport to match Reference Resolution.
             /// </summary>
             Pillarbox,
+
             /// <summary>
             /// Black borders added to the top and bottom of viewport to match Reference Resolution.
             /// </summary>
             Letterbox,
+
             /// <summary>
             /// Black borders added to all sides of viewport to match Reference Resolution.
             /// </summary>
             Windowbox,
+
             /// <summary>
             /// Expands the viewport to fit the screen resolution while maintaining the viewport's aspect ratio.
             /// </summary>
-            StretchFill
+            StretchFill,
         }
 
         /// <summary>
@@ -49,14 +55,16 @@ namespace UnityEngine.Rendering.Universal
             /// No snapping.
             /// </summary>
             None,
+
             /// <summary>
             /// Prevent subpixel movement and make Sprites appear to move in pixel-by-pixel increments.
             /// </summary>
             PixelSnapping,
+
             /// <summary>
             /// The scene is rendered to a temporary texture set as close as possible to the Reference Resolution, while maintaining the full screen aspect ratio. This temporary texture is then upscaled to fit the full screen.
             /// </summary>
-            UpscaleRenderTexture
+            UpscaleRenderTexture,
         }
 
         /// <summary>
@@ -68,6 +76,7 @@ namespace UnityEngine.Rendering.Universal
             /// Uses point filter to upscale to closest multiple of Reference Resolution, followed by bilinear filter to the target resolution.
             /// </summary>
             RetroAA,
+
             /// <summary>
             /// Uses point filter to upscale to target resolution.
             /// </summary>
@@ -77,43 +86,68 @@ namespace UnityEngine.Rendering.Universal
         private enum ComponentVersions
         {
             Version_Unserialized = 0,
-            Version_1 = 1
+            Version_1 = 1,
         }
 
 #if UNITY_EDITOR
         const ComponentVersions k_CurrentComponentVersion = ComponentVersions.Version_1;
-        [SerializeField] ComponentVersions m_ComponentVersion = ComponentVersions.Version_Unserialized;
+
+        [SerializeField]
+        ComponentVersions m_ComponentVersion = ComponentVersions.Version_Unserialized;
 #endif
 
         /// <summary>
         /// Defines how the output display will be cropped.
         /// </summary>
-        public CropFrame cropFrame { get { return m_CropFrame; } set { m_CropFrame = value; } }
+        public CropFrame cropFrame
+        {
+            get { return m_CropFrame; }
+            set { m_CropFrame = value; }
+        }
 
         /// <summary>
         /// Defines if pixels will be locked to a grid determined by assetsPPU.
         /// </summary>
-        public GridSnapping gridSnapping { get { return m_GridSnapping; } set { m_GridSnapping = value; } }
+        public GridSnapping gridSnapping
+        {
+            get { return m_GridSnapping; }
+            set { m_GridSnapping = value; }
+        }
 
         /// <summary>
         /// The target orthographic size of the camera.
         /// </summary>
-        public float orthographicSize { get { return m_Internal.orthoSize; } }
+        public float orthographicSize
+        {
+            get { return m_Internal.orthoSize; }
+        }
 
         /// <summary>
         /// Match this value to to the Pixels Per Unit values of all Sprites within the Scene.
         /// </summary>
-        public int assetsPPU { get { return m_AssetsPPU; } set { m_AssetsPPU = value > 0 ? value : 1; } }
+        public int assetsPPU
+        {
+            get { return m_AssetsPPU; }
+            set { m_AssetsPPU = value > 0 ? value : 1; }
+        }
 
         /// <summary>
         /// The original horizontal resolution your Assets are designed for.
         /// </summary>
-        public int refResolutionX { get { return m_RefResolutionX; } set { m_RefResolutionX = value > 0 ? value : 1; } }
+        public int refResolutionX
+        {
+            get { return m_RefResolutionX; }
+            set { m_RefResolutionX = value > 0 ? value : 1; }
+        }
 
         /// <summary>
         /// Original vertical resolution your Assets are designed for.
         /// </summary>
-        public int refResolutionY { get { return m_RefResolutionY; } set { m_RefResolutionY = value > 0 ? value : 1; } }
+        public int refResolutionY
+        {
+            get { return m_RefResolutionY; }
+            set { m_RefResolutionY = value > 0 ? value : 1; }
+        }
 
         /// <summary>
         /// Set to true to have the Scene rendered to a temporary texture set as close as possible to the Reference Resolution,
@@ -122,14 +156,8 @@ namespace UnityEngine.Rendering.Universal
         [System.Obsolete("Use gridSnapping instead #from(2021.2)")]
         public bool upscaleRT
         {
-            get
-            {
-                return m_GridSnapping == GridSnapping.UpscaleRenderTexture;
-            }
-            set
-            {
-                m_GridSnapping = value ? GridSnapping.UpscaleRenderTexture : GridSnapping.None;
-            }
+            get { return m_GridSnapping == GridSnapping.UpscaleRenderTexture; }
+            set { m_GridSnapping = value ? GridSnapping.UpscaleRenderTexture : GridSnapping.None; }
         }
 
         /// <summary>
@@ -139,14 +167,8 @@ namespace UnityEngine.Rendering.Universal
         [System.Obsolete("Use gridSnapping instead #from(2021.2)")]
         public bool pixelSnapping
         {
-            get
-            {
-                return m_GridSnapping == GridSnapping.PixelSnapping;
-            }
-            set
-            {
-                m_GridSnapping = value ? GridSnapping.PixelSnapping : GridSnapping.None;
-            }
+            get { return m_GridSnapping == GridSnapping.PixelSnapping; }
+            set { m_GridSnapping = value ? GridSnapping.PixelSnapping : GridSnapping.None; }
         }
 
         /// <summary>
@@ -157,7 +179,9 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                return m_CropFrame == CropFrame.StretchFill || m_CropFrame == CropFrame.Windowbox || m_CropFrame == CropFrame.Pillarbox;
+                return m_CropFrame == CropFrame.StretchFill
+                    || m_CropFrame == CropFrame.Windowbox
+                    || m_CropFrame == CropFrame.Pillarbox;
             }
             set
             {
@@ -186,7 +210,9 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                return m_CropFrame == CropFrame.StretchFill || m_CropFrame == CropFrame.Windowbox || m_CropFrame == CropFrame.Letterbox;
+                return m_CropFrame == CropFrame.StretchFill
+                    || m_CropFrame == CropFrame.Windowbox
+                    || m_CropFrame == CropFrame.Letterbox;
             }
             set
             {
@@ -214,10 +240,7 @@ namespace UnityEngine.Rendering.Universal
         [System.Obsolete("Use cropFrame instead. #from(2021.2)")]
         public bool stretchFill
         {
-            get
-            {
-                return m_CropFrame == CropFrame.StretchFill;
-            }
+            get { return m_CropFrame == CropFrame.StretchFill; }
             set
             {
                 if (value)
@@ -253,10 +276,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public bool requiresUpscalePass
         {
-            get
-            {
-                return m_Internal.requiresUpscaling;
-            }
+            get { return m_Internal.requiresUpscaling; }
         }
 
         /// <summary>
@@ -296,21 +316,40 @@ namespace UnityEngine.Rendering.Universal
                 return m_Internal.CorrectCinemachineOrthoSize(targetOrthoSize);
         }
 
-        [SerializeField] int m_AssetsPPU = 100;
-        [SerializeField] int m_RefResolutionX = 320;
-        [SerializeField] int m_RefResolutionY = 180;
+        [SerializeField]
+        int m_AssetsPPU = 100;
 
-        [SerializeField] CropFrame m_CropFrame;
-        [SerializeField] GridSnapping m_GridSnapping;
-        [SerializeField] PixelPerfectFilterMode m_FilterMode = PixelPerfectFilterMode.RetroAA;
+        [SerializeField]
+        int m_RefResolutionX = 320;
+
+        [SerializeField]
+        int m_RefResolutionY = 180;
+
+        [SerializeField]
+        CropFrame m_CropFrame;
+
+        [SerializeField]
+        GridSnapping m_GridSnapping;
+
+        [SerializeField]
+        PixelPerfectFilterMode m_FilterMode = PixelPerfectFilterMode.RetroAA;
 
         // These are obsolete. They are here only for migration.
 #if UNITY_EDITOR
-        [SerializeField] bool m_UpscaleRT;
-        [SerializeField] bool m_PixelSnapping;
-        [SerializeField] bool m_CropFrameX;
-        [SerializeField] bool m_CropFrameY;
-        [SerializeField] bool m_StretchFill;
+        [SerializeField]
+        bool m_UpscaleRT;
+
+        [SerializeField]
+        bool m_PixelSnapping;
+
+        [SerializeField]
+        bool m_CropFrameX;
+
+        [SerializeField]
+        bool m_CropFrameY;
+
+        [SerializeField]
+        bool m_StretchFill;
 #endif
 
         Camera m_Camera;
@@ -319,18 +358,12 @@ namespace UnityEngine.Rendering.Universal
 
         internal FilterMode finalBlitFilterMode
         {
-            get
-            {
-                return m_FilterMode == PixelPerfectFilterMode.RetroAA ? FilterMode.Bilinear : FilterMode.Point;
-            }
+            get { return m_FilterMode == PixelPerfectFilterMode.RetroAA ? FilterMode.Bilinear : FilterMode.Point; }
         }
 
         internal Vector2Int offscreenRTSize
         {
-            get
-            {
-                return new Vector2Int(m_Internal.offscreenRTWidth, m_Internal.offscreenRTHeight);
-            }
+            get { return new Vector2Int(m_Internal.offscreenRTWidth, m_Internal.offscreenRTHeight); }
         }
 
         Vector2Int cameraRTSize
@@ -338,7 +371,9 @@ namespace UnityEngine.Rendering.Universal
             get
             {
                 var targetTexture = m_Camera.targetTexture;
-                return targetTexture == null ? new Vector2Int(Screen.width, Screen.height) : new Vector2Int(targetTexture.width, targetTexture.height);
+                return targetTexture == null
+                    ? new Vector2Int(Screen.width, Screen.height)
+                    : new Vector2Int(targetTexture.width, targetTexture.height);
             }
         }
 
@@ -432,21 +467,29 @@ namespace UnityEngine.Rendering.Universal
 
             if (renderResolution.x % 2 != 0 || renderResolution.y % 2 != 0)
             {
-                string warning = string.Format("Rendering at an odd-numbered resolution ({0} * {1}). Pixel Perfect Camera may not work properly in this situation.", renderResolution.x, renderResolution.y);
+                string warning = string.Format(
+                    "Rendering at an odd-numbered resolution ({0} * {1}). Pixel Perfect Camera may not work properly in this situation.",
+                    renderResolution.x,
+                    renderResolution.y
+                );
                 GUILayout.Box(warning);
             }
 
             var targetTexture = m_Camera.targetTexture;
-            Vector2Int rtSize = targetTexture == null ? new Vector2Int(Screen.width, Screen.height) : new Vector2Int(targetTexture.width, targetTexture.height);
+            Vector2Int rtSize =
+                targetTexture == null
+                    ? new Vector2Int(Screen.width, Screen.height)
+                    : new Vector2Int(targetTexture.width, targetTexture.height);
 
             if (rtSize.x < refResolutionX || rtSize.y < refResolutionY)
             {
-                GUILayout.Box("Target resolution is smaller than the reference resolution. Image may appear stretched or cropped.");
+                GUILayout.Box(
+                    "Target resolution is smaller than the reference resolution. Image may appear stretched or cropped."
+                );
             }
 
             GUI.color = oldColor;
         }
-
 #endif
 
         /// <summary>

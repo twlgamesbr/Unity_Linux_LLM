@@ -64,34 +64,62 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
         [InputControl(name = "buttonEast", bit = (uint)Button.B, displayName = "B")]
         [InputControl(name = "buttonWest", bit = (uint)Button.X, displayName = "X")]
         [InputControl(name = "buttonNorth", bit = (uint)Button.Y, displayName = "Y")]
-
         [FieldOffset(2)]
         public ushort buttons;
 
         [InputControl(name = "leftTrigger", format = "BYTE")]
-        [FieldOffset(4)] public byte leftTrigger;
+        [FieldOffset(4)]
+        public byte leftTrigger;
+
         [InputControl(name = "rightTrigger", format = "BYTE")]
-        [FieldOffset(5)] public byte rightTrigger;
+        [FieldOffset(5)]
+        public byte rightTrigger;
 
         [InputControl(name = "leftStick", layout = "Stick", format = "VC2S")]
         [InputControl(name = "leftStick/x", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "leftStick/left", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "leftStick/right", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "leftStick/y", offset = 2, format = "SHRT", parameters = "invert")]
-        [InputControl(name = "leftStick/up", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true")]
-        [InputControl(name = "leftStick/down", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=0,clampMax=1,invert=false")]
-        [FieldOffset(6)] public short leftStickX;
-        [FieldOffset(8)] public short leftStickY;
+        [InputControl(
+            name = "leftStick/up",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true"
+        )]
+        [InputControl(
+            name = "leftStick/down",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=0,clampMax=1,invert=false"
+        )]
+        [FieldOffset(6)]
+        public short leftStickX;
+
+        [FieldOffset(8)]
+        public short leftStickY;
 
         [InputControl(name = "rightStick", layout = "Stick", format = "VC2S")]
         [InputControl(name = "rightStick/x", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "rightStick/left", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "rightStick/right", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "rightStick/y", offset = 2, format = "SHRT", parameters = "invert")]
-        [InputControl(name = "rightStick/up", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true")]
-        [InputControl(name = "rightStick/down", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=0,clampMax=1,invert=false")]
-        [FieldOffset(10)] public short rightStickX;
-        [FieldOffset(12)] public short rightStickY;
+        [InputControl(
+            name = "rightStick/up",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true"
+        )]
+        [InputControl(
+            name = "rightStick/down",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=0,clampMax=1,invert=false"
+        )]
+        [FieldOffset(10)]
+        public short rightStickX;
+
+        [FieldOffset(12)]
+        public short rightStickY;
 
         public FourCC format => kFormat;
 
@@ -146,30 +174,58 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
         public ushort buttons;
 
         [InputControl(name = "leftTrigger", format = "BYTE")]
-        [FieldOffset(6)] public byte leftTrigger;
+        [FieldOffset(6)]
+        public byte leftTrigger;
 
         [InputControl(name = "rightTrigger", format = "BYTE")]
-        [FieldOffset(8)] public byte rightTrigger;
+        [FieldOffset(8)]
+        public byte rightTrigger;
 
         [InputControl(name = "leftStick", layout = "Stick", format = "VC2S")]
         [InputControl(name = "leftStick/x", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "leftStick/left", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "leftStick/right", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "leftStick/y", offset = 2, format = "SHRT", parameters = "")]
-        [InputControl(name = "leftStick/up", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=0,clampMax=1,invert=false")]
-        [InputControl(name = "leftStick/down", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true")]
-        [FieldOffset(10)] public short leftStickX;
-        [FieldOffset(12)] public short leftStickY;
+        [InputControl(
+            name = "leftStick/up",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=0,clampMax=1,invert=false"
+        )]
+        [InputControl(
+            name = "leftStick/down",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true"
+        )]
+        [FieldOffset(10)]
+        public short leftStickX;
+
+        [FieldOffset(12)]
+        public short leftStickY;
 
         [InputControl(name = "rightStick", layout = "Stick", format = "VC2S")]
         [InputControl(name = "rightStick/x", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "rightStick/left", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "rightStick/right", offset = 0, format = "SHRT", parameters = "")]
         [InputControl(name = "rightStick/y", offset = 2, format = "SHRT", parameters = "")]
-        [InputControl(name = "rightStick/up", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=0,clampMax=1,invert=false")]
-        [InputControl(name = "rightStick/down", offset = 2, format = "SHRT", parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true")]
-        [FieldOffset(14)] public short rightStickX;
-        [FieldOffset(16)] public short rightStickY;
+        [InputControl(
+            name = "rightStick/up",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=0,clampMax=1,invert=false"
+        )]
+        [InputControl(
+            name = "rightStick/down",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=1,clampMin=-1,clampMax=0,invert=true"
+        )]
+        [FieldOffset(14)]
+        public short rightStickX;
+
+        [FieldOffset(16)]
+        public short rightStickY;
 
         public FourCC format => kFormat;
 
@@ -200,39 +256,149 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
             X = 3,
             Y = 4,
         }
+
         [FieldOffset(0)]
         private byte padding;
 
         [InputControl(name = "leftStick", layout = "Stick", format = "VC2S")]
-        [InputControl(name = "leftStick/x", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "leftStick/left", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "leftStick/right", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1")]
-        [InputControl(name = "leftStick/y", offset = 2, format = "USHT", parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "leftStick/up", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "leftStick/down", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false")]
-        [FieldOffset(1)] public ushort leftStickX;
-        [FieldOffset(3)] public ushort leftStickY;
+        [InputControl(
+            name = "leftStick/x",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "leftStick/left",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "leftStick/right",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1"
+        )]
+        [InputControl(
+            name = "leftStick/y",
+            offset = 2,
+            format = "USHT",
+            parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "leftStick/up",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "leftStick/down",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false"
+        )]
+        [FieldOffset(1)]
+        public ushort leftStickX;
+
+        [FieldOffset(3)]
+        public ushort leftStickY;
 
         [InputControl(name = "rightStick", layout = "Stick", format = "VC2S")]
-        [InputControl(name = "rightStick/x", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "rightStick/left", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "rightStick/right", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1")]
-        [InputControl(name = "rightStick/y", offset = 2, format = "USHT", parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "rightStick/up", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "rightStick/down", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false")]
-        [FieldOffset(5)] public ushort rightStickX;
-        [FieldOffset(7)] public ushort rightStickY;
+        [InputControl(
+            name = "rightStick/x",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "rightStick/left",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "rightStick/right",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1"
+        )]
+        [InputControl(
+            name = "rightStick/y",
+            offset = 2,
+            format = "USHT",
+            parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "rightStick/up",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "rightStick/down",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false"
+        )]
+        [FieldOffset(5)]
+        public ushort rightStickX;
 
-        [InputControl(name = "leftTrigger", format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998")]
-        [FieldOffset(9)] public ushort leftTrigger;
-        [InputControl(name = "rightTrigger", format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998")]
-        [FieldOffset(11)] public ushort rightTrigger;
+        [FieldOffset(7)]
+        public ushort rightStickY;
+
+        [InputControl(
+            name = "leftTrigger",
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998"
+        )]
+        [FieldOffset(9)]
+        public ushort leftTrigger;
+
+        [InputControl(
+            name = "rightTrigger",
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998"
+        )]
+        [FieldOffset(11)]
+        public ushort rightTrigger;
 
         [InputControl(name = "dpad", format = "BIT", layout = "Dpad", sizeInBits = 4)]
-        [InputControl(name = "dpad/up", format = "BIT", layout = "DiscreteButton", parameters = "minValue=8,maxValue=2,nullValue=0,wrapAtValue=9", bit = 0, sizeInBits = 4)]
-        [InputControl(name = "dpad/right", format = "BIT", layout = "DiscreteButton", parameters = "minValue=2,maxValue=4", bit = 0, sizeInBits = 4)]
-        [InputControl(name = "dpad/down", format = "BIT", layout = "DiscreteButton", parameters = "minValue=4,maxValue=6", bit = 0, sizeInBits = 4)]
-        [InputControl(name = "dpad/left", format = "BIT", layout = "DiscreteButton", parameters = "minValue=6, maxValue=8", bit = 0, sizeInBits = 4)]
+        [InputControl(
+            name = "dpad/up",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=8,maxValue=2,nullValue=0,wrapAtValue=9",
+            bit = 0,
+            sizeInBits = 4
+        )]
+        [InputControl(
+            name = "dpad/right",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=2,maxValue=4",
+            bit = 0,
+            sizeInBits = 4
+        )]
+        [InputControl(
+            name = "dpad/down",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=4,maxValue=6",
+            bit = 0,
+            sizeInBits = 4
+        )]
+        [InputControl(
+            name = "dpad/left",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=6, maxValue=8",
+            bit = 0,
+            sizeInBits = 4
+        )]
         [FieldOffset(13)]
         public byte dpad;
 
@@ -246,7 +412,6 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
         [InputControl(name = "buttonEast", bit = (uint)Button.B, displayName = "B")]
         [InputControl(name = "buttonWest", bit = (uint)Button.X, displayName = "X")]
         [InputControl(name = "buttonNorth", bit = (uint)Button.Y, displayName = "Y")]
-
         [FieldOffset(14)]
         public uint buttons;
 
@@ -265,13 +430,14 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
             return this;
         }
 
-        public static XInputControllerWirelessOSXState defaultState => new XInputControllerWirelessOSXState
-        {
-            rightStickX = k_StickZeroValue,
-            rightStickY = k_StickZeroValue,
-            leftStickX = k_StickZeroValue,
-            leftStickY = k_StickZeroValue
-        };
+        public static XInputControllerWirelessOSXState defaultState =>
+            new XInputControllerWirelessOSXState
+            {
+                rightStickX = k_StickZeroValue,
+                rightStickY = k_StickZeroValue,
+                leftStickX = k_StickZeroValue,
+                leftStickY = k_StickZeroValue,
+            };
     }
 
     [StructLayout(LayoutKind.Explicit)]
@@ -293,39 +459,149 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
             X = 3,
             Y = 4,
         }
+
         [FieldOffset(0)]
         private byte padding;
 
         [InputControl(name = "leftStick", layout = "Stick", format = "VC2S")]
-        [InputControl(name = "leftStick/x", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "leftStick/left", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "leftStick/right", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1")]
-        [InputControl(name = "leftStick/y", offset = 2, format = "USHT", parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "leftStick/up", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "leftStick/down", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false")]
-        [FieldOffset(1)] public ushort leftStickX;
-        [FieldOffset(3)] public ushort leftStickY;
+        [InputControl(
+            name = "leftStick/x",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "leftStick/left",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "leftStick/right",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1"
+        )]
+        [InputControl(
+            name = "leftStick/y",
+            offset = 2,
+            format = "USHT",
+            parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "leftStick/up",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "leftStick/down",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false"
+        )]
+        [FieldOffset(1)]
+        public ushort leftStickX;
+
+        [FieldOffset(3)]
+        public ushort leftStickY;
 
         [InputControl(name = "rightStick", layout = "Stick", format = "VC2S")]
-        [InputControl(name = "rightStick/x", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "rightStick/left", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "rightStick/right", offset = 0, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1")]
-        [InputControl(name = "rightStick/y", offset = 2, format = "USHT", parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5", defaultState = k_StickZeroValue)]
-        [InputControl(name = "rightStick/up", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert")]
-        [InputControl(name = "rightStick/down", offset = 2, format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false")]
-        [FieldOffset(5)] public ushort rightStickX;
-        [FieldOffset(7)] public ushort rightStickY;
+        [InputControl(
+            name = "rightStick/x",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "rightStick/left",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "rightStick/right",
+            offset = 0,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1"
+        )]
+        [InputControl(
+            name = "rightStick/y",
+            offset = 2,
+            format = "USHT",
+            parameters = "invert,normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5",
+            defaultState = k_StickZeroValue
+        )]
+        [InputControl(
+            name = "rightStick/up",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0,clampMax=0.5,invert"
+        )]
+        [InputControl(
+            name = "rightStick/down",
+            offset = 2,
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=1,normalizeZero=0.5,clamp=1,clampMin=0.5,clampMax=1,invert=false"
+        )]
+        [FieldOffset(5)]
+        public ushort rightStickX;
 
-        [InputControl(name = "leftTrigger", format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998")]
-        [FieldOffset(9)] public ushort leftTrigger;
-        [InputControl(name = "rightTrigger", format = "USHT", parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998")]
-        [FieldOffset(11)] public ushort rightTrigger;
+        [FieldOffset(7)]
+        public ushort rightStickY;
+
+        [InputControl(
+            name = "leftTrigger",
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998"
+        )]
+        [FieldOffset(9)]
+        public ushort leftTrigger;
+
+        [InputControl(
+            name = "rightTrigger",
+            format = "USHT",
+            parameters = "normalize,normalizeMin=0,normalizeMax=0.01560998"
+        )]
+        [FieldOffset(11)]
+        public ushort rightTrigger;
 
         [InputControl(name = "dpad", format = "BIT", layout = "Dpad", sizeInBits = 4)]
-        [InputControl(name = "dpad/up", format = "BIT", layout = "DiscreteButton", parameters = "minValue=8,maxValue=2,nullValue=0,wrapAtValue=9", bit = 0, sizeInBits = 4)]
-        [InputControl(name = "dpad/right", format = "BIT", layout = "DiscreteButton", parameters = "minValue=2,maxValue=4", bit = 0, sizeInBits = 4)]
-        [InputControl(name = "dpad/down", format = "BIT", layout = "DiscreteButton", parameters = "minValue=4,maxValue=6", bit = 0, sizeInBits = 4)]
-        [InputControl(name = "dpad/left", format = "BIT", layout = "DiscreteButton", parameters = "minValue=6, maxValue=8", bit = 0, sizeInBits = 4)]
+        [InputControl(
+            name = "dpad/up",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=8,maxValue=2,nullValue=0,wrapAtValue=9",
+            bit = 0,
+            sizeInBits = 4
+        )]
+        [InputControl(
+            name = "dpad/right",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=2,maxValue=4",
+            bit = 0,
+            sizeInBits = 4
+        )]
+        [InputControl(
+            name = "dpad/down",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=4,maxValue=6",
+            bit = 0,
+            sizeInBits = 4
+        )]
+        [InputControl(
+            name = "dpad/left",
+            format = "BIT",
+            layout = "DiscreteButton",
+            parameters = "minValue=6, maxValue=8",
+            bit = 0,
+            sizeInBits = 4
+        )]
         [FieldOffset(13)]
         public byte dpad;
 
@@ -339,7 +615,6 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
         [InputControl(name = "buttonEast", bit = (uint)Button.B, displayName = "B")]
         [InputControl(name = "buttonWest", bit = (uint)Button.X, displayName = "X")]
         [InputControl(name = "buttonNorth", bit = (uint)Button.Y, displayName = "Y")]
-
         [FieldOffset(14)]
         public uint buttons;
 
@@ -358,15 +633,17 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
             return this;
         }
 
-        public static XInputControllerWirelessOSXStateV2 defaultState => new XInputControllerWirelessOSXStateV2
-        {
-            rightStickX = k_StickZeroValue,
-            rightStickY = k_StickZeroValue,
-            leftStickX = k_StickZeroValue,
-            leftStickY = k_StickZeroValue
-        };
+        public static XInputControllerWirelessOSXStateV2 defaultState =>
+            new XInputControllerWirelessOSXStateV2
+            {
+                rightStickX = k_StickZeroValue,
+                rightStickY = k_StickZeroValue,
+                leftStickX = k_StickZeroValue,
+                leftStickY = k_StickZeroValue,
+            };
     }
 }
+
 namespace UnityEngine.InputSystem.XInput
 {
     /// <summary>
@@ -378,9 +655,7 @@ namespace UnityEngine.InputSystem.XInput
     /// On modern macOS versions, you will instead get a device with class XboxGamepadMacOSNative
     /// </remarks>
     [InputControlLayout(displayName = "Xbox Controller", stateType = typeof(XInputControllerOSXState), hideInUI = true)]
-    public class XboxGamepadMacOS : XInputController
-    {
-    }
+    public class XboxGamepadMacOS : XInputController { }
 
     /// <summary>
     /// A wired Xbox Gamepad connected to a macOS computer
@@ -392,10 +667,12 @@ namespace UnityEngine.InputSystem.XInput
     /// macOS's native controller support provides a bit mapping which is different to 360Controller's mapping
     /// As such this is a new device, in order to not break existing projects.
     /// </remarks>
-    [InputControlLayout(displayName = "Xbox Controller", stateType = typeof(XInputControllerNativeOSXState), hideInUI = true)]
-    public class XboxGamepadMacOSNative : XInputController
-    {
-    }
+    [InputControlLayout(
+        displayName = "Xbox Controller",
+        stateType = typeof(XInputControllerNativeOSXState),
+        hideInUI = true
+    )]
+    public class XboxGamepadMacOSNative : XInputController { }
 
     /// <summary>
     /// A wireless Xbox One Gamepad connected to a macOS computer.
@@ -407,10 +684,12 @@ namespace UnityEngine.InputSystem.XInput
     /// > with a proprietary Xbox wireless protocol, and cannot be used on a Mac.
     /// Unlike wired controllers, bluetooth-capable Xbox One controllers do not need a custom driver to work on older macOS versions
     /// </remarks>
-    [InputControlLayout(displayName = "Wireless Xbox Controller", stateType = typeof(XInputControllerWirelessOSXState), hideInUI = true)]
-    public class XboxOneGampadMacOSWireless : XInputController
-    {
-    }
+    [InputControlLayout(
+        displayName = "Wireless Xbox Controller",
+        stateType = typeof(XInputControllerWirelessOSXState),
+        hideInUI = true
+    )]
+    public class XboxOneGampadMacOSWireless : XInputController { }
 
     /// <summary>
     /// A wireless Xbox One or Xbox Series Gamepad connected to a macOS computer.
@@ -425,9 +704,11 @@ namespace UnityEngine.InputSystem.XInput
     /// > with a proprietary Xbox wireless protocol, and cannot be used on a Mac.
     /// Unlike wired controllers, bluetooth-cabable Xbox One controllers do not need a custom driver to work on older macOS versions
     /// </remarks>
-    [InputControlLayout(displayName = "Wireless Xbox Controller", stateType = typeof(XInputControllerWirelessOSXStateV2), hideInUI = true)]
-    public class XboxGamepadMacOSWireless : XInputController
-    {
-    }
+    [InputControlLayout(
+        displayName = "Wireless Xbox Controller",
+        stateType = typeof(XInputControllerWirelessOSXStateV2),
+        hideInUI = true
+    )]
+    public class XboxGamepadMacOSWireless : XInputController { }
 }
 #endif // UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX

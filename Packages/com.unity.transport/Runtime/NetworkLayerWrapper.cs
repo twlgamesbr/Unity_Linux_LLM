@@ -19,11 +19,16 @@ namespace Unity.Networking.Transport
         private ManagedCallWrapper m_ScheduleReceive_FPtr;
         private ManagedCallWrapper m_ScheduleSend_FPtr;
 
-        static public NetworkLayerWrapper Create<T>(ref T layer) where T : unmanaged, INetworkLayer
+        public static NetworkLayerWrapper Create<T>(ref T layer)
+            where T : unmanaged, INetworkLayer
         {
             var wrapper = new NetworkLayerWrapper
             {
-                m_RawLayerData = UnsafeUtility.Malloc(UnsafeUtility.SizeOf<T>(), UnsafeUtility.AlignOf<T>(), Allocator.Persistent),
+                m_RawLayerData = UnsafeUtility.Malloc(
+                    UnsafeUtility.SizeOf<T>(),
+                    UnsafeUtility.AlignOf<T>(),
+                    Allocator.Persistent
+                ),
                 m_TypeHash = BurstRuntime.GetHashCode64<T>(),
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 m_RawLayerDataSize = UnsafeUtility.SizeOf<T>(),
@@ -38,12 +43,14 @@ namespace Unity.Networking.Transport
             return wrapper;
         }
 
-        public bool IsType<T>() where T : unmanaged, INetworkLayer
+        public bool IsType<T>()
+            where T : unmanaged, INetworkLayer
         {
             return m_TypeHash == BurstRuntime.GetHashCode64<T>();
         }
 
-        public unsafe ref T CastRef<T>() where T : unmanaged, INetworkLayer
+        public unsafe ref T CastRef<T>()
+            where T : unmanaged, INetworkLayer
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!IsType<T>())
@@ -69,7 +76,8 @@ namespace Unity.Networking.Transport
             public void* LayerPtr;
         }
 
-        private static void DisposeWrapper<T>(void* argumentsPtr, int size) where T : unmanaged, INetworkLayer
+        private static void DisposeWrapper<T>(void* argumentsPtr, int size)
+            where T : unmanaged, INetworkLayer
         {
             ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<DisposeArguments>(argumentsPtr, size);
             UnsafeUtility.AsRef<T>(arguments.LayerPtr).Dispose();
@@ -96,10 +104,13 @@ namespace Unity.Networking.Transport
             public JobHandle Return;
         }
 
-        private static void ScheduleReceiveWrapper<T>(void* argumentsPtr, int size) where T : unmanaged, INetworkLayer
+        private static void ScheduleReceiveWrapper<T>(void* argumentsPtr, int size)
+            where T : unmanaged, INetworkLayer
         {
             ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<ScheduleReceiveArguments>(argumentsPtr, size);
-            arguments.Return = UnsafeUtility.AsRef<T>(arguments.LayerPtr).ScheduleReceive(ref arguments.JobArguments, arguments.Dependency);
+            arguments.Return = UnsafeUtility
+                .AsRef<T>(arguments.LayerPtr)
+                .ScheduleReceive(ref arguments.JobArguments, arguments.Dependency);
         }
 
         // ScheduleSend wrapper
@@ -123,10 +134,13 @@ namespace Unity.Networking.Transport
             public JobHandle Return;
         }
 
-        private static void ScheduleSendWrapper<T>(void* argumentsPtr, int size) where T : unmanaged, INetworkLayer
+        private static void ScheduleSendWrapper<T>(void* argumentsPtr, int size)
+            where T : unmanaged, INetworkLayer
         {
             ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<ScheduleSendArguments>(argumentsPtr, size);
-            arguments.Return = UnsafeUtility.AsRef<T>(arguments.LayerPtr).ScheduleSend(ref arguments.JobArguments, arguments.Dependency);
+            arguments.Return = UnsafeUtility
+                .AsRef<T>(arguments.LayerPtr)
+                .ScheduleSend(ref arguments.JobArguments, arguments.Dependency);
         }
     }
 }

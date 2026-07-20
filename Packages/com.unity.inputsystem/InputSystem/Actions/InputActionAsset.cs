@@ -83,6 +83,7 @@ namespace UnityEngine.InputSystem
         /// InputActionAssets.
         /// </remarks>
         public const string Extension = "inputactions";
+
         ////REVIEW: actually pre-populate with some stuff?
         internal const string kDefaultAssetLayoutJson = "{}";
 
@@ -120,7 +121,8 @@ namespace UnityEngine.InputSystem
         /// <value>Control schemes defined for the asset.</value>
         /// <seealso cref="InputActionSetupExtensions.AddControlScheme(InputActionAsset,string)"/>
         /// <seealso cref="InputActionSetupExtensions.RemoveControlScheme"/>
-        public ReadOnlyArray<InputControlScheme> controlSchemes => new ReadOnlyArray<InputControlScheme>(m_ControlSchemes);
+        public ReadOnlyArray<InputControlScheme> controlSchemes =>
+            new ReadOnlyArray<InputControlScheme>(m_ControlSchemes);
 
         /// <summary>
         /// Iterate over all bindings in the asset.
@@ -276,6 +278,7 @@ namespace UnityEngine.InputSystem
                 return action;
             }
         }
+
         /// <summary>
         /// File‐format version constants for InputActionAsset JSON.
         /// </summary>
@@ -289,7 +292,7 @@ namespace UnityEngine.InputSystem
             public const int Version1 = 1;
 
             /// <summary>The current version.</summary>
-            public const int Current  = Version1;
+            public const int Current = Version1;
         }
 
         /// <summary>
@@ -313,13 +316,16 @@ namespace UnityEngine.InputSystem
         public string ToJson()
         {
             var hasContent = m_ActionMaps.LengthSafe() > 0 || m_ControlSchemes.LengthSafe() > 0;
-            return JsonUtility.ToJson(new WriteFileJson
-            {
-                version = hasContent ? JsonVersion.Current : JsonVersion.Version0,
-                name = name,
-                maps = InputActionMap.WriteFileJson.FromMaps(m_ActionMaps).maps,
-                controlSchemes = InputControlScheme.SchemeJson.ToJson(m_ControlSchemes),
-            }, true);
+            return JsonUtility.ToJson(
+                new WriteFileJson
+                {
+                    version = hasContent ? JsonVersion.Current : JsonVersion.Version0,
+                    name = name,
+                    maps = InputActionMap.WriteFileJson.FromMaps(m_ActionMaps).maps,
+                    controlSchemes = InputControlScheme.SchemeJson.ToJson(m_ControlSchemes),
+                },
+                true
+            );
         }
 
         /// <summary>
@@ -581,8 +587,13 @@ namespace UnityEngine.InputSystem
                             for (var n = 0; n < actions.Length; ++n)
                             {
                                 var action = actions[n];
-                                if (Substring.Compare(action.name, actionName,
-                                    StringComparison.InvariantCultureIgnoreCase) == 0)
+                                if (
+                                    Substring.Compare(
+                                        action.name,
+                                        actionName,
+                                        StringComparison.InvariantCultureIgnoreCase
+                                    ) == 0
+                                )
                                     return action;
                             }
                         }
@@ -949,20 +960,33 @@ namespace UnityEngine.InputSystem
 
         ////TODO: ApplyBindingOverrides, RemoveBindingOverrides, RemoveAllBindingOverrides
 
-        [SerializeField] internal InputActionMap[] m_ActionMaps;
-        [SerializeField] internal InputControlScheme[] m_ControlSchemes;
-        [SerializeField] internal bool m_IsProjectWide;
+        [SerializeField]
+        internal InputActionMap[] m_ActionMaps;
+
+        [SerializeField]
+        internal InputControlScheme[] m_ControlSchemes;
+
+        [SerializeField]
+        internal bool m_IsProjectWide;
 
         ////TODO: make this persistent across domain reloads
         /// <summary>
         /// Shared state for all action maps in the asset.
         /// </summary>
-        [NonSerialized] internal InputActionState m_SharedStateForAllMaps;
-        [NonSerialized] internal InputBinding? m_BindingMask;
-        [NonSerialized] internal int m_ParameterOverridesCount;
-        [NonSerialized] internal InputActionRebindingExtensions.ParameterOverride[] m_ParameterOverrides;
+        [NonSerialized]
+        internal InputActionState m_SharedStateForAllMaps;
 
-        [NonSerialized] internal InputActionMap.DeviceArray m_Devices;
+        [NonSerialized]
+        internal InputBinding? m_BindingMask;
+
+        [NonSerialized]
+        internal int m_ParameterOverridesCount;
+
+        [NonSerialized]
+        internal InputActionRebindingExtensions.ParameterOverride[] m_ParameterOverrides;
+
+        [NonSerialized]
+        internal InputActionMap.DeviceArray m_Devices;
 
         [Serializable]
         internal struct WriteFileJson
@@ -991,7 +1015,7 @@ namespace UnityEngine.InputSystem
             public void ToAsset(InputActionAsset asset)
             {
                 asset.name = name;
-                asset.m_ActionMaps = new InputActionMap.ReadFileJson {maps = maps}.ToMaps();
+                asset.m_ActionMaps = new InputActionMap.ReadFileJson { maps = maps }.ToMaps();
                 asset.m_ControlSchemes = InputControlScheme.SchemeJson.ToSchemes(controlSchemes);
 
                 // Link maps to their asset.
@@ -1047,7 +1071,10 @@ namespace UnityEngine.InputSystem
                                 var param = nap.parameters[k];
                                 var updatedPar = param;
 
-                                var fieldInfo = procType.GetField(param.name, BindingFlags.Public | BindingFlags.Instance);
+                                var fieldInfo = procType.GetField(
+                                    param.name,
+                                    BindingFlags.Public | BindingFlags.Instance
+                                );
                                 if (fieldInfo != null && fieldInfo.FieldType.IsEnum)
                                 {
                                     var index = param.value.ToInt32();

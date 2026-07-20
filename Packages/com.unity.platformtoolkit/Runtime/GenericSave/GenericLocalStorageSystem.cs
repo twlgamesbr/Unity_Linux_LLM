@@ -56,8 +56,8 @@ namespace Unity.PlatformToolkit
         {
             GetPathsForSave(name, out var savePath, out var tempSavePath, out var backupSavePath);
             var saveExists = File.Exists(savePath);
-            var tempSaveExists =  File.Exists(tempSavePath);
-            var backupSaveExists =  File.Exists(backupSavePath);
+            var tempSaveExists = File.Exists(tempSavePath);
+            var backupSaveExists = File.Exists(backupSavePath);
 
             string savePathToOpen = savePath;
 
@@ -98,8 +98,8 @@ namespace Unity.PlatformToolkit
         {
             GetPathsForSave(name, out var savePath, out var tempSavePath, out var backupSavePath);
             var saveExists = File.Exists(savePath);
-            var tempSaveExists =  File.Exists(tempSavePath);
-            var backupSaveExists =  File.Exists(backupSavePath);
+            var tempSaveExists = File.Exists(tempSavePath);
+            var backupSaveExists = File.Exists(backupSavePath);
 
             if (saveExists)
             {
@@ -194,8 +194,12 @@ namespace Unity.PlatformToolkit
             return Path.Combine(m_SavesPath, saveName);
         }
 
-        private void GetPathsForSave(string saveName,
-            out string savePath, out string tempSavePath, out string backupSavePath)
+        private void GetPathsForSave(
+            string saveName,
+            out string savePath,
+            out string tempSavePath,
+            out string backupSavePath
+        )
         {
             savePath = GetPathForSave(saveName);
             tempSavePath = $"{savePath}{k_TempSaveSuffix}";
@@ -277,7 +281,9 @@ namespace Unity.PlatformToolkit
             }
             catch (Exception)
             {
-                throw new FileNotFoundException("Temporary files from previous write operations could not be deleted, this prevents the save from being written.");
+                throw new FileNotFoundException(
+                    "Temporary files from previous write operations could not be deleted, this prevents the save from being written."
+                );
             }
             throw new FileNotFoundException();
         }

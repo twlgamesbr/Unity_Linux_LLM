@@ -54,14 +54,15 @@ namespace UnityEditor.Rendering
         /// <summary>
         /// Obtains if all the volume components are visible
         /// </summary>
-        internal bool hasHiddenVolumeComponents => asset != null && m_Editors.Count(e => e.visible) != asset.components.Count;
+        internal bool hasHiddenVolumeComponents =>
+            asset != null && m_Editors.Count(e => e.visible) != asset.components.Count;
 
         Editor m_BaseEditor;
 
         SerializedObject m_SerializedObject;
         SerializedProperty m_ComponentsProperty;
 
-        SearchField m_SearchField = new ();
+        SearchField m_SearchField = new();
         string m_SearchString = "";
 
         List<VolumeComponentEditor> m_Editors = new();
@@ -121,10 +122,12 @@ namespace UnityEditor.Rendering
         {
             // Dumb hack to make sure the serialized object is up to date on undo (else there'll be
             // a state mismatch when this class is used in a GameObject inspector).
-            if (m_SerializedObject != null
+            if (
+                m_SerializedObject != null
                 && !m_SerializedObject.Equals(null)
                 && m_SerializedObject.targetObject != null
-                && !m_SerializedObject.targetObject.Equals(null))
+                && !m_SerializedObject.targetObject.Equals(null)
+            )
             {
                 m_SerializedObject.Update();
                 m_SerializedObject.ApplyModifiedProperties();
@@ -138,10 +141,14 @@ namespace UnityEditor.Rendering
         }
 
         // index is only used when we need to re-create a component in a specific spot (e.g. reset)
-        void CreateEditor(VolumeComponent component, SerializedProperty property, int index = -1,
-            bool forceOpen = false)
+        void CreateEditor(
+            VolumeComponent component,
+            SerializedProperty property,
+            int index = -1,
+            bool forceOpen = false
+        )
         {
-            var editor = (VolumeComponentEditor) Editor.CreateEditor(component);
+            var editor = (VolumeComponentEditor)Editor.CreateEditor(component);
             editor.SetVolume(m_BaseEditor.target as Volume); // May be null if we're editing the asset
             editor.SetVolumeProfile(asset);
             editor.enableOverrides = !m_IsDefaultVolumeProfile;
@@ -225,6 +232,7 @@ namespace UnityEditor.Rendering
         }
 
         readonly HashSet<VolumeComponentEditor> m_CurrentSearchFilteredEditors = new();
+
         void FilterEditorsBySearch()
         {
             m_CurrentSearchFilteredEditors.Clear();
@@ -237,10 +245,14 @@ namespace UnityEditor.Rendering
                     m_CurrentSearchFilteredEditors.Add(editor);
             }
         }
-        bool EditorIsIncludedInCurrentSearch(VolumeComponentEditor editor) => string.IsNullOrEmpty(m_SearchString) || m_CurrentSearchFilteredEditors.Contains(editor);
+
+        bool EditorIsIncludedInCurrentSearch(VolumeComponentEditor editor) =>
+            string.IsNullOrEmpty(m_SearchString) || m_CurrentSearchFilteredEditors.Contains(editor);
+
         bool MatchesSearchString(string title)
         {
-            return string.IsNullOrEmpty(m_SearchString) || title.Contains(m_SearchString, StringComparison.OrdinalIgnoreCase);
+            return string.IsNullOrEmpty(m_SearchString)
+                || title.Contains(m_SearchString, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -253,7 +265,10 @@ namespace UnityEditor.Rendering
 
             // Even if the asset is not dirty, the list of component may have been changed by another inspector.
             // In this case, only the hash will tell us that we need to refresh.
-            if (asset.dirtyState != VolumeProfile.DirtyState.None || asset.GetComponentListHashCode() != m_CurrentHashCode)
+            if (
+                asset.dirtyState != VolumeProfile.DirtyState.None
+                || asset.GetComponentListHashCode() != m_CurrentHashCode
+            )
             {
                 RefreshEditors();
                 VolumeManager.instance.OnVolumeProfileChanged(asset);
@@ -268,8 +283,9 @@ namespace UnityEditor.Rendering
 
             DetermineEditorsVisibility();
 
-            bool isEditable = !VersionControl.Provider.isActive
-                              || AssetDatabase.IsOpenForEdit(asset, StatusQueryOptions.UseCachedIfPossible);
+            bool isEditable =
+                !VersionControl.Provider.isActive
+                || AssetDatabase.IsOpenForEdit(asset, StatusQueryOptions.UseCachedIfPossible);
 
             using (new EditorGUI.DisabledScope(!isEditable))
             {
@@ -302,7 +318,7 @@ namespace UnityEditor.Rendering
                         editor.expanded,
                         activeProperty,
                         pos => OnContextClick(pos, editor, id),
-                        editor.hasAdditionalProperties ? () => editor.showAdditionalProperties : (Func<bool>) null,
+                        editor.hasAdditionalProperties ? () => editor.showAdditionalProperties : (Func<bool>)null,
                         () => editor.showAdditionalProperties ^= true,
                         m_VolumeComponentHelpUrls[editor]
                     );
@@ -335,8 +351,10 @@ namespace UnityEditor.Rendering
                     GUILayout.Space(2);
 
                     EditorGUILayout.HelpBox(
-                        "The values in the Default Volume can be overridden by a Volume Profile assigned to SRP asset " +
-                        "and Volumes inside scenes.", MessageType.Info);
+                        "The values in the Default Volume can be overridden by a Volume Profile assigned to SRP asset "
+                            + "and Volumes inside scenes.",
+                        MessageType.Info
+                    );
 
                     // Default volume profile displays all components in fixed order arranged into categories
                     GUILayout.Space(8);
@@ -401,8 +419,9 @@ namespace UnityEditor.Rendering
 
         private void CreateEditorsByCategory()
         {
-            var volumeComponentTypeList =
-                VolumeManager.instance.GetVolumeComponentsForDisplay(GraphicsSettings.currentRenderPipelineAssetType);
+            var volumeComponentTypeList = VolumeManager.instance.GetVolumeComponentsForDisplay(
+                GraphicsSettings.currentRenderPipelineAssetType
+            );
 
             m_EditorsByCategory.Clear();
 
@@ -421,7 +440,7 @@ namespace UnityEditor.Rendering
                     if (kv.Item2 == editor.volumeComponent.GetType())
                     {
                         var path = kv.Item1;
-                        var parts = path.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                        var parts = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                         if (parts.Length == 1)
                             editor.categoryTitle = "Main";
                         else
@@ -455,53 +474,86 @@ namespace UnityEditor.Rendering
                 menu.AddItem(EditorGUIUtility.TrTextContent("Move to Top"), false, () => MoveComponent(id, Move.Top));
                 menu.AddItem(EditorGUIUtility.TrTextContent("Move Up"), false, () => MoveComponent(id, Move.Up));
                 menu.AddItem(EditorGUIUtility.TrTextContent("Move Down"), false, () => MoveComponent(id, Move.Down));
-                menu.AddItem(EditorGUIUtility.TrTextContent("Move to Bottom"), false, () => MoveComponent(id, Move.Bottom));
+                menu.AddItem(
+                    EditorGUIUtility.TrTextContent("Move to Bottom"),
+                    false,
+                    () => MoveComponent(id, Move.Bottom)
+                );
                 menu.AddSeparator(string.Empty);
             }
 
-            menu.AddItem(EditorGUIUtility.TrTextContent("Collapse All"), false, () => SetComponentEditorsExpanded(false));
+            menu.AddItem(
+                EditorGUIUtility.TrTextContent("Collapse All"),
+                false,
+                () => SetComponentEditorsExpanded(false)
+            );
             menu.AddItem(EditorGUIUtility.TrTextContent("Expand All"), false, () => SetComponentEditorsExpanded(true));
             menu.AddSeparator(string.Empty);
 
-            menu.AddItem(EditorGUIUtility.TrTextContent("Reset"), false, () => ResetComponents(new []{ targetComponent }));
+            menu.AddItem(
+                EditorGUIUtility.TrTextContent("Reset"),
+                false,
+                () => ResetComponents(new[] { targetComponent })
+            );
             if (!m_IsDefaultVolumeProfile)
                 menu.AddItem(EditorGUIUtility.TrTextContent("Remove"), false, () => RemoveComponent(id));
-
 
             if (targetEditor.hasAdditionalProperties)
             {
                 menu.AddSeparator(string.Empty);
-                menu.AddAdvancedPropertiesBoolMenuItem(() => targetEditor.showAdditionalProperties,
-                                                       () => targetEditor.showAdditionalProperties ^= true);
+                menu.AddAdvancedPropertiesBoolMenuItem(
+                    () => targetEditor.showAdditionalProperties,
+                    () => targetEditor.showAdditionalProperties ^= true
+                );
             }
 
-            targetEditor.AddDefaultProfileContextMenuEntries(menu, VolumeManager.instance.globalDefaultProfile,
-                () => VolumeProfileUtils.CopyValuesToProfile(targetComponent, VolumeManager.instance.globalDefaultProfile));
+            targetEditor.AddDefaultProfileContextMenuEntries(
+                menu,
+                VolumeManager.instance.globalDefaultProfile,
+                () =>
+                    VolumeProfileUtils.CopyValuesToProfile(targetComponent, VolumeManager.instance.globalDefaultProfile)
+            );
 
             menu.AddSeparator(string.Empty);
-            menu.AddItem(EditorGUIUtility.TrTextContent("Open In Rendering Debugger"), false,
-                () => DebugDisplaySettingsVolume.OpenInRenderingDebugger(targetComponent));
+            menu.AddItem(
+                EditorGUIUtility.TrTextContent("Open In Rendering Debugger"),
+                false,
+                () => DebugDisplaySettingsVolume.OpenInRenderingDebugger(targetComponent)
+            );
 
             menu.AddSeparator(string.Empty);
-            menu.AddItem(EditorGUIUtility.TrTextContent("Copy Settings"), false, () =>
-                VolumeComponentCopyPaste.CopySettings(targetComponent));
+            menu.AddItem(
+                EditorGUIUtility.TrTextContent("Copy Settings"),
+                false,
+                () => VolumeComponentCopyPaste.CopySettings(targetComponent)
+            );
 
             if (VolumeComponentCopyPaste.CanPaste(targetComponent))
-                menu.AddItem(EditorGUIUtility.TrTextContent("Paste Settings"), false, () =>
-                {
-                    VolumeComponentCopyPaste.PasteSettings(targetComponent, asset);
-                    VolumeManager.instance.OnVolumeProfileChanged(asset);
-                });
+                menu.AddItem(
+                    EditorGUIUtility.TrTextContent("Paste Settings"),
+                    false,
+                    () =>
+                    {
+                        VolumeComponentCopyPaste.PasteSettings(targetComponent, asset);
+                        VolumeManager.instance.OnVolumeProfileChanged(asset);
+                    }
+                );
             else
                 menu.AddDisabledItem(EditorGUIUtility.TrTextContent("Paste Settings"));
 
             if (!m_IsDefaultVolumeProfile)
             {
                 menu.AddSeparator(string.Empty);
-                menu.AddItem(EditorGUIUtility.TrTextContent("Toggle All"), false,
-                    () => m_Editors[id].SetAllOverridesTo(true));
-                menu.AddItem(EditorGUIUtility.TrTextContent("Toggle None"), false,
-                    () => m_Editors[id].SetAllOverridesTo(false));
+                menu.AddItem(
+                    EditorGUIUtility.TrTextContent("Toggle All"),
+                    false,
+                    () => m_Editors[id].SetAllOverridesTo(true)
+                );
+                menu.AddItem(
+                    EditorGUIUtility.TrTextContent("Toggle None"),
+                    false,
+                    () => m_Editors[id].SetAllOverridesTo(false)
+                );
             }
 
             menu.DropDown(new Rect(position, Vector2.zero));
@@ -608,7 +660,7 @@ namespace UnityEditor.Rendering
             Up,
             Down,
             Top,
-            Bottom
+            Bottom,
         }
 
         internal void MoveComponent(int id, Move move)
@@ -621,20 +673,20 @@ namespace UnityEditor.Rendering
             switch (move)
             {
                 case Move.Up:
-                {
-                    do
                     {
-                        newIndex--;
-                    } while (newIndex >= 0 && !m_Editors[newIndex].visible);
-                }
+                        do
+                        {
+                            newIndex--;
+                        } while (newIndex >= 0 && !m_Editors[newIndex].visible);
+                    }
                     break;
                 case Move.Down:
-                {
-                    do
                     {
-                        newIndex++;
-                    } while (newIndex < m_Editors.Count && !m_Editors[newIndex].visible);
-                }
+                        do
+                        {
+                            newIndex++;
+                        } while (newIndex < m_Editors.Count && !m_Editors[newIndex].visible);
+                    }
                     break;
                 case Move.Top:
                     newIndex = 0;

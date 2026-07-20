@@ -1,10 +1,10 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
-using Unity.Burst;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace Unity.Physics.Authoring
 {
@@ -16,15 +16,21 @@ namespace Unity.Physics.Authoring
     public struct DisplayColliderAabbsJob : IJobParallelFor
     {
         private DebugDraw DebugDraw;
-        [ReadOnly] private NativeArray<RigidBody> RigidBodies;
 
-        public static JobHandle ScheduleJob(in DebugDraw debugDraw, in NativeArray<RigidBody> rigidBodies, JobHandle inputDeps)
+        [ReadOnly]
+        private NativeArray<RigidBody> RigidBodies;
+
+        public static JobHandle ScheduleJob(
+            in DebugDraw debugDraw,
+            in NativeArray<RigidBody> rigidBodies,
+            JobHandle inputDeps
+        )
         {
-            return new DisplayColliderAabbsJob
-            {
-                DebugDraw = debugDraw,
-                RigidBodies = rigidBodies
-            }.Schedule(rigidBodies.Length, 16, inputDeps);
+            return new DisplayColliderAabbsJob { DebugDraw = debugDraw, RigidBodies = rigidBodies }.Schedule(
+                rigidBodies.Length,
+                16,
+                inputDeps
+            );
         }
 
         public void Execute(int i)
@@ -48,8 +54,10 @@ namespace Unity.Physics.Authoring
 
         public void OnCreate(ref SystemState state)
         {
-            ColliderQuery = state.GetEntityQuery(ComponentType.ReadOnly<PhysicsCollider>(),
-                ComponentType.ReadOnly<LocalToWorld>());
+            ColliderQuery = state.GetEntityQuery(
+                ComponentType.ReadOnly<PhysicsCollider>(),
+                ComponentType.ReadOnly<LocalToWorld>()
+            );
 
             state.RequireForUpdate(ColliderQuery);
             state.RequireForUpdate<PhysicsDebugDisplayData>();
@@ -63,7 +71,10 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (!SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay) || debugDisplay.DrawColliderAabbs == 0)
+            if (
+                !SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay)
+                || debugDisplay.DrawColliderAabbs == 0
+            )
                 return;
 
             if (!SystemAPI.TryGetSingleton(out DebugDraw draw))
@@ -75,7 +86,11 @@ namespace Unity.Physics.Authoring
                 {
                     if (SystemAPI.TryGetSingleton(out PhysicsWorldSingleton physicsWorldSingleton))
                     {
-                        state.Dependency = DisplayColliderAabbsJob.ScheduleJob(draw, physicsWorldSingleton.PhysicsWorld.Bodies, state.Dependency);
+                        state.Dependency = DisplayColliderAabbsJob.ScheduleJob(
+                            draw,
+                            physicsWorldSingleton.PhysicsWorld.Bodies,
+                            state.Dependency
+                        );
                     }
                     break;
                 }
@@ -90,7 +105,11 @@ namespace Unity.Physics.Authoring
                         return;
                     }
 
-                    var displayHandle = DisplayColliderAabbsJob.ScheduleJob(draw, rigidBodiesList.AsArray(), state.Dependency);
+                    var displayHandle = DisplayColliderAabbsJob.ScheduleJob(
+                        draw,
+                        rigidBodiesList.AsArray(),
+                        state.Dependency
+                    );
                     var disposeHandle = rigidBodiesList.Dispose(displayHandle);
 
                     state.Dependency = disposeHandle;
@@ -112,8 +131,10 @@ namespace Unity.Physics.Authoring
 
         public void OnCreate(ref SystemState state)
         {
-            ColliderQuery = state.GetEntityQuery(ComponentType.ReadOnly<PhysicsCollider>(),
-                ComponentType.ReadOnly<LocalToWorld>());
+            ColliderQuery = state.GetEntityQuery(
+                ComponentType.ReadOnly<PhysicsCollider>(),
+                ComponentType.ReadOnly<LocalToWorld>()
+            );
 
             state.RequireForUpdate(ColliderQuery);
             state.RequireForUpdate<PhysicsDebugDisplayData>();
@@ -127,7 +148,10 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (!SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay) || debugDisplay.DrawColliderAabbs == 0)
+            if (
+                !SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay)
+                || debugDisplay.DrawColliderAabbs == 0
+            )
                 return;
 
             var rigidBodiesList = new NativeList<RigidBody>(Allocator.TempJob);

@@ -9,11 +9,17 @@ namespace UnityEditor.Rendering.Converter
 {
     internal class RenderPipelineConverterVisualElement : VisualElement
     {
-        const string k_Uxml = "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElement.uxml";
-        const string k_Uss = "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElement.uss";
+        const string k_Uxml =
+            "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElement.uxml";
+        const string k_Uss =
+            "Packages/com.unity.render-pipelines.core/Editor-PrivateShared/Tools/Converter/Window/RenderPipelineConverterVisualElement.uss";
 
-        static Lazy<VisualTreeAsset> s_VisualTreeAsset = new Lazy<VisualTreeAsset>(() => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_Uxml));
-        static Lazy<StyleSheet> s_StyleSheet = new Lazy<StyleSheet>(() => AssetDatabase.LoadAssetAtPath<StyleSheet>(k_Uss));
+        static Lazy<VisualTreeAsset> s_VisualTreeAsset = new Lazy<VisualTreeAsset>(() =>
+            AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_Uxml)
+        );
+        static Lazy<StyleSheet> s_StyleSheet = new Lazy<StyleSheet>(() =>
+            AssetDatabase.LoadAssetAtPath<StyleSheet>(k_Uss)
+        );
 
         Node<ConverterInfo> m_ConverterInfo;
 
@@ -48,33 +54,41 @@ namespace UnityEditor.Rendering.Converter
             m_HeaderFoldout.tooltip = (converter.isEnabled) ? description : converter.isDisabledMessage;
             m_HeaderFoldout.SetEnabled(converter.isEnabled);
             m_HeaderFoldout.value = state.isExpanded;
-            m_HeaderFoldout.RegisterCallback<ChangeEvent<bool>>((evt) =>
-            {
-                state.isExpanded = evt.newValue;
-            });
+            m_HeaderFoldout.RegisterCallback<ChangeEvent<bool>>(
+                (evt) =>
+                {
+                    state.isExpanded = evt.newValue;
+                }
+            );
             m_HeaderFoldout.showEnableCheckbox = true;
             m_HeaderFoldout.documentationURL = converterInfo.helpUrl;
 
             m_HeaderFoldout.enableToggle.SetValueWithoutNotify(state.isSelected);
-            m_HeaderFoldout.enableToggle.RegisterCallback<ClickEvent>((evt) =>
-            {
-                state.isSelected = !state.isSelected;
-                converterSelected?.Invoke();
-                UpdateConversionInfo();
-            });
+            m_HeaderFoldout.enableToggle.RegisterCallback<ClickEvent>(
+                (evt) =>
+                {
+                    state.isSelected = !state.isSelected;
+                    converterSelected?.Invoke();
+                    UpdateConversionInfo();
+                }
+            );
 
             var allLabel = m_RootVisualElement.Q<Label>("all");
-            allLabel.RegisterCallback<ClickEvent>((evt) =>
-            {
-                SetItemsActive(true);
-                Refresh();
-            });
+            allLabel.RegisterCallback<ClickEvent>(
+                (evt) =>
+                {
+                    SetItemsActive(true);
+                    Refresh();
+                }
+            );
             var noneLabel = m_RootVisualElement.Q<Label>("none");
-            noneLabel.RegisterCallback<ClickEvent>((evt) =>
-            {
-                SetItemsActive(false);
-                Refresh();
-            });
+            noneLabel.RegisterCallback<ClickEvent>(
+                (evt) =>
+                {
+                    SetItemsActive(false);
+                    Refresh();
+                }
+            );
 
             m_ListViewHeader = m_RootVisualElement.Q("listViewHeader");
 
@@ -111,7 +125,7 @@ namespace UnityEditor.Rendering.Converter
                 {
                     toggle.UnregisterCallback<ClickEvent>(previousBindItem.OnSelectionChanged);
                     previousBindItem.onIsSelectedChanged -= OnSelectionChanged;
-                }  
+                }
 
                 toggle.userData = itemState;
                 if (itemState.item.isEnabled)
@@ -128,7 +142,6 @@ namespace UnityEditor.Rendering.Converter
                 }
                 toggle.RegisterCallback<ClickEvent>(itemState.OnSelectionChanged);
                 itemState.onIsSelectedChanged += OnSelectionChanged;
-                
             };
 
             var iconColumn = m_TreeView.columns["icon"];
@@ -180,12 +193,14 @@ namespace UnityEditor.Rendering.Converter
             {
                 (element as Label).text = m_TreeView.GetItemDataForIndex<ConverterItemState>(index).item.info;
             };
-            
+
             var stateColumn = m_TreeView.columns["state"];
             stateColumn.makeCell = () => new Image();
             stateColumn.bindCell = (VisualElement element, int index) =>
             {
-                (Status Status, string Message) conversionResult = m_TreeView.GetItemDataForIndex<ConverterItemState>(index).conversionResult;
+                (Status Status, string Message) conversionResult = m_TreeView
+                    .GetItemDataForIndex<ConverterItemState>(index)
+                    .conversionResult;
 
                 Texture2D icon = null;
                 Status status = conversionResult.Status;
@@ -315,13 +330,9 @@ namespace UnityEditor.Rendering.Converter
 
             void OnConverterCompleteDataCollection(List<IRenderPipelineConverterItem> items)
             {
-                foreach(var item in items)
+                foreach (var item in items)
                 {
-                    var converterItemState = new ConverterItemState()
-                    {
-                        item = item,
-                        isSelected = item.isEnabled,
-                    };
+                    var converterItemState = new ConverterItemState() { item = item, isSelected = item.isEnabled };
 
                     state.AddItem(converterItemState);
                 }
@@ -352,9 +363,13 @@ namespace UnityEditor.Rendering.Converter
             int itemToConvertIndex = 0;
             foreach (var itemState in state.items)
             {
-                if (EditorUtility.DisplayCancelableProgressBar(progressTitle,
-                    $"({itemToConvertIndex} of {state.pending}) {itemState.item.name}",
-                    itemToConvertIndex / (float)state.pending))
+                if (
+                    EditorUtility.DisplayCancelableProgressBar(
+                        progressTitle,
+                        $"({itemToConvertIndex} of {state.pending}) {itemState.item.name}",
+                        itemToConvertIndex / (float)state.pending
+                    )
+                )
                     break;
 
                 if (!itemState.hasConverted && itemState.isSelected)
@@ -365,25 +380,29 @@ namespace UnityEditor.Rendering.Converter
                         switch (status)
                         {
                             case Status.Pending:
-                                throw new InvalidOperationException("Converter returned a pending status when converting. This is not supported.");
+                                throw new InvalidOperationException(
+                                    "Converter returned a pending status when converting. This is not supported."
+                                );
                             case Status.Error:
                             case Status.Warning:
                                 sb.AppendLine($"\t- {itemState.item.name} ({status}) ({message})");
                                 break;
                             case Status.Success:
-                            {
-                                sb.AppendLine($"\t- {itemState.item.name} ({status})");
-                                message = "Conversion successful!";
-                            }
+                                {
+                                    sb.AppendLine($"\t- {itemState.item.name} ({status})");
+                                    message = "Conversion successful!";
+                                }
                                 break;
                         }
 
                         itemState.conversionResult.Status = status;
                         itemState.conversionResult.Message = message;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        Debug.LogError($"Exception {ex.Message} while converting {itemState.item.name} from {displayName}");
+                        Debug.LogError(
+                            $"Exception {ex.Message} while converting {itemState.item.name} from {displayName}"
+                        );
                     }
                     itemToConvertIndex++;
                 }

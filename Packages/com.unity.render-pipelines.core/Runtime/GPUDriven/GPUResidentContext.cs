@@ -23,13 +23,15 @@ namespace UnityEngine.Rendering
         public SphericalHarmonicsL2 cachedAmbientProbe;
         public readonly float smallMeshScreenPercentage;
 
-        public GPUResidentContext(in GPUResidentDrawerSettings settings,
+        public GPUResidentContext(
+            in GPUResidentDrawerSettings settings,
             InstanceDataSystem instanceDataSystem,
             LODGroupDataSystem lodGroupDataSystem,
             InstanceCuller culler,
             OcclusionCullingCommon occlusionCullingCommon,
             InstanceCullingBatcher instanceCullingBatcher,
-            GPUResidentDrawerResources resources)
+            GPUResidentDrawerResources resources
+        )
         {
             m_InstanceDataSystem = instanceDataSystem;
             m_LODGroupDataSystem = lodGroupDataSystem;

@@ -9,7 +9,7 @@ namespace Unity.Serialization.Json
         /// The validation type that was used.
         /// </summary>
         public JsonValidationType ValidationType;
-        
+
         /// <summary>
         /// The type that was expected by the validator.
         /// </summary>

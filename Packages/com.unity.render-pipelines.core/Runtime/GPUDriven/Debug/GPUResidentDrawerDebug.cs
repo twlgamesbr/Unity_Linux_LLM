@@ -61,14 +61,22 @@ namespace UnityEngine.Rendering
             for (int viewIndex = 0; viewIndex < instanceCullerStats.Length; viewIndex++)
             {
                 InstanceCullerViewStats cullerStats = instanceCullerStats[viewIndex];
-                InstanceOcclusionEventStats lastOcclusionEventStats = GetLastInstanceOcclusionEventStatsForView(viewIndex);
+                InstanceOcclusionEventStats lastOcclusionEventStats = GetLastInstanceOcclusionEventStatsForView(
+                    viewIndex
+                );
 
                 if (lastOcclusionEventStats.viewID == cullerStats.viewID)
                 {
                     // The Min test is because the SelectionOutline view (and probably picking as well) share the same viewInstanceID with
                     // the scene camera for instance, so we pick up the camera's occlusion event. And we can't have more instances on GPU than we had on CPU.
-                    cullerStats.visibleInstancesOnGPU = Math.Min(lastOcclusionEventStats.visibleInstances, cullerStats.visibleInstancesOnCPU);
-                    cullerStats.visiblePrimitivesOnGPU = Math.Min(lastOcclusionEventStats.visiblePrimitives, cullerStats.visiblePrimitivesOnCPU);
+                    cullerStats.visibleInstancesOnGPU = Math.Min(
+                        lastOcclusionEventStats.visibleInstances,
+                        cullerStats.visibleInstancesOnCPU
+                    );
+                    cullerStats.visiblePrimitivesOnGPU = Math.Min(
+                        lastOcclusionEventStats.visiblePrimitives,
+                        cullerStats.visiblePrimitivesOnCPU
+                    );
                 }
                 else
                 {

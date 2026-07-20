@@ -16,7 +16,6 @@ namespace Unity.PlatformToolkit
 
         Task Commit();
 
-
         /// <summary>
         /// Dispose to be called by internal systems.
         /// </summary>

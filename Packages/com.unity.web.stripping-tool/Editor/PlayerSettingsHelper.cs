@@ -9,7 +9,8 @@ namespace Unity.Web.Stripping.Editor
     /// </summary>
     static class PlayerSettingsHelper
     {
-        static PropertyInfo? SubmoduleStrippingCompatibilitySetting => typeof(PlayerSettings.WebGL).GetProperty("enableSubmoduleStrippingCompatibility");
+        static PropertyInfo? SubmoduleStrippingCompatibilitySetting =>
+            typeof(PlayerSettings.WebGL).GetProperty("enableSubmoduleStrippingCompatibility");
 
         /// <summary>
         /// Check whether the current Unity version supports PlayerSettings.WebGL.enableSubmoduleStrippingCompatibility
@@ -28,10 +29,7 @@ namespace Unity.Web.Stripping.Editor
 
                 return (bool)SubmoduleStrippingCompatibilitySetting.GetValue(null);
             }
-            set
-            {
-                SubmoduleStrippingCompatibilitySetting?.SetValue(null, value);
-            }
+            set { SubmoduleStrippingCompatibilitySetting?.SetValue(null, value); }
         }
     }
 }

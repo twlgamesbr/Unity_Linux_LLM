@@ -26,7 +26,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// The number of significant digits to display for this counter.
         /// </summary>
         [field: SerializeField]
-        [field: Range(ConfigurationLimits.k_CounterSignificantDigitsMin, ConfigurationLimits.k_CounterSignificantDigitsMax)]
+        [field: Range(
+            ConfigurationLimits.k_CounterSignificantDigitsMin,
+            ConfigurationLimits.k_CounterSignificantDigitsMax
+        )]
         [field: Tooltip("The number of significant digits to display for this counter.")]
         int m_SignificantDigits = 3;
 
@@ -36,10 +39,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         public int SignificantDigits
         {
             get => m_SignificantDigits;
-            set => m_SignificantDigits = Mathf.Clamp(
-                value,
-                ConfigurationLimits.k_CounterSignificantDigitsMin,
-                ConfigurationLimits.k_CounterSignificantDigitsMax);
+            set =>
+                m_SignificantDigits = Mathf.Clamp(
+                    value,
+                    ConfigurationLimits.k_CounterSignificantDigitsMin,
+                    ConfigurationLimits.k_CounterSignificantDigitsMax
+                );
         }
 
         /// <summary>
@@ -49,10 +54,16 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// - rnsm-counter-below-threshold
         /// </summary>
         [field: SerializeField]
-        [field: Tooltip("Values below this threshold will be highlighted by the default styling, " +
-                        "and can be highlighted by custom styling using the following USS classes: " +
-                        "\"" + UssClassNames.k_CounterOutOfBounds + "\", or " +
-                        "\"" + UssClassNames.k_CounterBelowThreshold + "\"")]
+        [field: Tooltip(
+            "Values below this threshold will be highlighted by the default styling, "
+                + "and can be highlighted by custom styling using the following USS classes: "
+                + "\""
+                + UssClassNames.k_CounterOutOfBounds
+                + "\", or "
+                + "\""
+                + UssClassNames.k_CounterBelowThreshold
+                + "\""
+        )]
         public float HighlightLowerBound { get; set; } = float.NegativeInfinity;
 
         /// <summary>
@@ -62,10 +73,16 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// - rnsm-counter-above-threshold
         /// </summary>
         [field: SerializeField]
-        [field: Tooltip("Values above this threshold will be highlighted by the default styling, " +
-                        "and can be highlighted by custom styling using the following USS classes: " +
-                        "\"" + UssClassNames.k_CounterOutOfBounds + "\", or " +
-                        "\"" + UssClassNames.k_CounterAboveThreshold + "\"")]
+        [field: Tooltip(
+            "Values above this threshold will be highlighted by the default styling, "
+                + "and can be highlighted by custom styling using the following USS classes: "
+                + "\""
+                + UssClassNames.k_CounterOutOfBounds
+                + "\", or "
+                + "\""
+                + UssClassNames.k_CounterAboveThreshold
+                + "\""
+        )]
         public float HighlightUpperBound { get; set; } = float.PositiveInfinity;
 
         /// <summary>
@@ -85,9 +102,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// Note that if the <see cref="SmoothingMethod"/> is set to ExponentialMovingAverage,
         /// the sample count will be zero.
         /// </summary>
-        public int SampleCount => SmoothingMethod == SmoothingMethod.SimpleMovingAverage
-            ? SimpleMovingAverageParams.SampleCount
-            : 0;
+        public int SampleCount =>
+            SmoothingMethod == SmoothingMethod.SimpleMovingAverage ? SimpleMovingAverageParams.SampleCount : 0;
 
         /// <summary>
         /// The current configured sample rate.
@@ -96,9 +112,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// Note that if the <see cref="SmoothingMethod"/> is set to ExponentialMovingAverage
         /// the <see cref="SampleRate"/> will be PerFrame.
         /// </remarks>
-        internal SampleRate SampleRate => SmoothingMethod == SmoothingMethod.SimpleMovingAverage
-            ? SimpleMovingAverageParams.SampleRate
-            : SampleRate.PerFrame;
+        internal SampleRate SampleRate =>
+            SmoothingMethod == SmoothingMethod.SimpleMovingAverage
+                ? SimpleMovingAverageParams.SampleRate
+                : SampleRate.PerFrame;
 
         internal int ComputeHashCode()
         {
@@ -109,7 +126,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
                 HighlightLowerBound,
                 HighlightUpperBound,
                 ExponentialMovingAverageParams.ComputeHashCode(),
-                SimpleMovingAverageParams.ComputeHashCode());
+                SimpleMovingAverageParams.ComputeHashCode()
+            );
         }
     }
 }

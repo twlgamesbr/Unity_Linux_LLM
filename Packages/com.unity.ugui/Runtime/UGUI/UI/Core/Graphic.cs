@@ -1,12 +1,12 @@
 using System;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+using UnityEngine.Pool;
+using UnityEngine.Serialization;
+using UnityEngine.UI.CoroutineTween;
 #if UNITY_EDITOR
 using System.Reflection;
 #endif
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
-using UnityEngine.UI.CoroutineTween;
-using UnityEngine.Pool;
 
 namespace UnityEngine.UI
 {
@@ -77,18 +77,15 @@ namespace UnityEngine.UI
     /// ]]>
     ///</code>
     /// </example>
-    public abstract class Graphic
-        : UIBehaviour,
-          ICanvasElement
+    public abstract class Graphic : UIBehaviour, ICanvasElement
     {
-        static protected Material s_DefaultUI = null;
-        static protected Texture2D s_WhiteTexture = null;
+        protected static Material s_DefaultUI = null;
+        protected static Texture2D s_WhiteTexture = null;
 
         /// <summary>
         /// Default material used to draw UI elements if no explicit material was specified.
         /// </summary>
-
-        static public Material defaultGraphicMaterial
+        public static Material defaultGraphicMaterial
         {
             get
             {
@@ -100,12 +97,17 @@ namespace UnityEngine.UI
 
         // Cached and saved values
         [FormerlySerializedAs("m_Mat")]
-        [SerializeField] protected Material m_Material;
+        [SerializeField]
+        protected Material m_Material;
 
-        [SerializeField] private Color m_Color = Color.white;
+        [SerializeField]
+        private Color m_Color = Color.white;
 
-        [NonSerialized] protected bool m_SkipLayoutUpdate;
-        [NonSerialized] protected bool m_SkipMaterialUpdate;
+        [NonSerialized]
+        protected bool m_SkipLayoutUpdate;
+
+        [NonSerialized]
+        protected bool m_SkipMaterialUpdate;
 
         /// <summary>
         /// Base color of the Graphic.
@@ -152,14 +154,18 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public virtual Color color { get { return m_Color; } set
+        public virtual Color color
+        {
+            get { return m_Color; }
+            set
             {
                 if (SetPropertyUtility.SetColor(ref m_Color, value))
                     SetVerticesDirty();
             }
         }
 
-        [SerializeField] private bool m_RaycastTarget = true;
+        [SerializeField]
+        private bool m_RaycastTarget = true;
 
         private bool m_RaycastTargetCache = true;
 
@@ -168,10 +174,7 @@ namespace UnityEngine.UI
         /// </summary>
         public virtual bool raycastTarget
         {
-            get
-            {
-                return m_RaycastTarget;
-            }
+            get { return m_RaycastTarget; }
             set
             {
                 if (value != m_RaycastTarget)
@@ -201,28 +204,45 @@ namespace UnityEngine.UI
         public Vector4 raycastPadding
         {
             get { return m_RaycastPadding; }
-            set
-            {
-                m_RaycastPadding = value;
-            }
+            set { m_RaycastPadding = value; }
         }
 
-        [NonSerialized] private RectTransform m_RectTransform;
-        [NonSerialized] private CanvasRenderer m_CanvasRenderer;
-        [NonSerialized] private Canvas m_Canvas;
+        [NonSerialized]
+        private RectTransform m_RectTransform;
 
-        [NonSerialized] private bool m_VertsDirty;
-        [NonSerialized] private bool m_MaterialDirty;
+        [NonSerialized]
+        private CanvasRenderer m_CanvasRenderer;
 
-        [NonSerialized] protected UnityAction m_OnDirtyLayoutCallback;
-        [NonSerialized] protected UnityAction m_OnDirtyVertsCallback;
-        [NonSerialized] protected UnityAction m_OnDirtyMaterialCallback;
+        [NonSerialized]
+        private Canvas m_Canvas;
 
-        [NonSerialized] protected static Mesh s_Mesh;
-        [NonSerialized] private static readonly VertexHelper s_VertexHelper = new VertexHelper();
+        [NonSerialized]
+        private bool m_VertsDirty;
 
-        [NonSerialized] protected Mesh m_CachedMesh;
-        [NonSerialized] protected Vector2[] m_CachedUvs;
+        [NonSerialized]
+        private bool m_MaterialDirty;
+
+        [NonSerialized]
+        protected UnityAction m_OnDirtyLayoutCallback;
+
+        [NonSerialized]
+        protected UnityAction m_OnDirtyVertsCallback;
+
+        [NonSerialized]
+        protected UnityAction m_OnDirtyMaterialCallback;
+
+        [NonSerialized]
+        protected static Mesh s_Mesh;
+
+        [NonSerialized]
+        private static readonly VertexHelper s_VertexHelper = new VertexHelper();
+
+        [NonSerialized]
+        protected Mesh m_CachedMesh;
+
+        [NonSerialized]
+        protected Vector2[] m_CachedUvs;
+
         // Tween controls for the Graphic
         [NonSerialized]
         private readonly TweenRunner<ColorTween> m_ColorTweenRunner;
@@ -303,7 +323,7 @@ namespace UnityEngine.UI
             CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
 
 #if PACKAGE_POLYSPATIAL
-            // [AVPB-860] When vertices are dirtied, mark the component itself 
+            // [AVPB-860] When vertices are dirtied, mark the component itself
             // dirty as well so that ObjectDispatcher picks it up
             MarkDirty();
 #endif
@@ -336,7 +356,6 @@ namespace UnityEngine.UI
             {
                 if (m_RaycastTarget && isActiveAndEnabled)
                     GraphicRegistry.RegisterRaycastGraphicForCanvas(canvas, this);
-
                 else if (!m_RaycastTarget)
                     GraphicRegistry.UnregisterRaycastGraphicForCanvas(canvas, this);
             }
@@ -394,7 +413,10 @@ namespace UnityEngine.UI
         ///
         /// This value is used to determine draw and event ordering.
         /// </example>
-        public int depth { get { return canvasRenderer.absoluteDepth; } }
+        public int depth
+        {
+            get { return canvasRenderer.absoluteDepth; }
+        }
 
         /// <summary>
         /// The RectTransform component used by the Graphic. Cached for speed.
@@ -492,10 +514,7 @@ namespace UnityEngine.UI
         /// </summary>
         public virtual Material material
         {
-            get
-            {
-                return (m_Material != null) ? m_Material : defaultMaterial;
-            }
+            get { return (m_Material != null) ? m_Material : defaultMaterial; }
             set
             {
                 if (m_Material == value)
@@ -539,10 +558,7 @@ namespace UnityEngine.UI
         /// </remarks>
         public virtual Texture mainTexture
         {
-            get
-            {
-                return s_WhiteTexture;
-            }
+            get { return s_WhiteTexture; }
         }
 
         /// <summary>
@@ -667,11 +683,9 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual void LayoutComplete()
-        {}
+        public virtual void LayoutComplete() { }
 
-        public virtual void GraphicUpdateComplete()
-        {}
+        public virtual void GraphicUpdateComplete() { }
 
         /// <summary>
         /// Call to update the Material of the graphic onto the CanvasRenderer.
@@ -759,9 +773,10 @@ namespace UnityEngine.UI
                 return s_Mesh;
             }
         }
+
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete("Use OnPopulateMesh instead.", true)]
-        protected virtual void OnFillVBO(System.Collections.Generic.List<UIVertex> vbo) {}
+        protected virtual void OnFillVBO(System.Collections.Generic.List<UIVertex> vbo) { }
 
         [Obsolete("Use OnPopulateMesh(VertexHelper vh) instead.", false)]
         /// <summary>
@@ -817,7 +832,8 @@ namespace UnityEngine.UI
             {
                 if (mb == null)
                     continue;
-                var methodInfo = mb.GetType().GetMethod("OnValidate", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                var methodInfo = mb.GetType()
+                    .GetMethod("OnValidate", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (methodInfo != null)
                     methodInfo.Invoke(mb, null);
             }
@@ -828,7 +844,6 @@ namespace UnityEngine.UI
         {
             SetAllDirty();
         }
-
 #endif
 
         // Call from unity if animation properties have changed
@@ -841,7 +856,7 @@ namespace UnityEngine.UI
         /// <summary>
         /// Make the Graphic have the native size of its content.
         /// </summary>
-        public virtual void SetNativeSize() {}
+        public virtual void SetNativeSize() { }
 
         /// <summary>
         /// When a GraphicRaycaster is raycasting into the scene it does two things. First it filters the elements using their RectTransform rect. Then it uses this Raycast function to determine the elements hit by the raycast.
@@ -884,7 +899,7 @@ namespace UnityEngine.UI
                     if (canvas != null && canvas.overrideSorting)
                         continueTraversal = false;
 
-                    var filter = component as ICanvasRaycastFilter;  // Image, Mask, RectMask2D, CanvasGroup
+                    var filter = component as ICanvasRaycastFilter; // Image, Mask, RectMask2D, CanvasGroup
                     if (filter == null)
                         continue;
 
@@ -900,7 +915,7 @@ namespace UnityEngine.UI
                         {
                             if (group.ignoreParentGroups)
                                 ignoreParentGroups = true;
-    
+
                             raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
                             if (!raycastValid)
                                 break;
@@ -954,7 +969,6 @@ namespace UnityEngine.UI
             base.OnValidate();
             SetAllDirty();
         }
-
 #endif
 
         ///<summary>
@@ -967,7 +981,12 @@ namespace UnityEngine.UI
         ///</remarks>
         public Vector2 PixelAdjustPoint(Vector2 point)
         {
-            if (!canvas || canvas.renderMode == RenderMode.WorldSpace || canvas.scaleFactor == 0.0f || !canvas.pixelPerfect)
+            if (
+                !canvas
+                || canvas.renderMode == RenderMode.WorldSpace
+                || canvas.scaleFactor == 0.0f
+                || !canvas.pixelPerfect
+            )
                 return point;
             else
             {
@@ -984,7 +1003,12 @@ namespace UnityEngine.UI
         /// <returns>A Pixel perfect Rect.</returns>
         public Rect GetPixelAdjustedRect()
         {
-            if (!canvas || canvas.renderMode == RenderMode.WorldSpace || canvas.scaleFactor == 0.0f || !canvas.pixelPerfect)
+            if (
+                !canvas
+                || canvas.renderMode == RenderMode.WorldSpace
+                || canvas.scaleFactor == 0.0f
+                || !canvas.pixelPerfect
+            )
                 return rectTransform.rect;
             else
                 return RectTransformUtility.PixelAdjustRect(rectTransform, canvas);
@@ -1010,7 +1034,13 @@ namespace UnityEngine.UI
         ///<param name="ignoreTimeScale">Should ignore Time.scale?</param>
         ///<param name="useAlpha">Should also Tween the alpha channel?</param>
         /// <param name="useRGB">Should the color or the alpha be used to tween</param>
-        public virtual void CrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale, bool useAlpha, bool useRGB)
+        public virtual void CrossFadeColor(
+            Color targetColor,
+            float duration,
+            bool ignoreTimeScale,
+            bool useAlpha,
+            bool useRGB
+        )
         {
             if (canvasRenderer == null || (!useRGB && !useAlpha))
                 return;
@@ -1022,18 +1052,25 @@ namespace UnityEngine.UI
                 return;
             }
 
-            ColorTween.ColorTweenMode mode = (useRGB && useAlpha ?
-                ColorTween.ColorTweenMode.All :
-                (useRGB ? ColorTween.ColorTweenMode.RGB : ColorTween.ColorTweenMode.Alpha));
+            ColorTween.ColorTweenMode mode = (
+                useRGB && useAlpha
+                    ? ColorTween.ColorTweenMode.All
+                    : (useRGB ? ColorTween.ColorTweenMode.RGB : ColorTween.ColorTweenMode.Alpha)
+            );
 
-            var colorTween = new ColorTween {duration = duration, startColor = canvasRenderer.GetColor(), targetColor = targetColor};
+            var colorTween = new ColorTween
+            {
+                duration = duration,
+                startColor = canvasRenderer.GetColor(),
+                targetColor = targetColor,
+            };
             colorTween.AddOnChangedCallback(canvasRenderer.SetColor);
             colorTween.ignoreTimeScale = ignoreTimeScale;
             colorTween.tweenMode = mode;
             m_ColorTweenRunner.StartTween(colorTween);
         }
 
-        static private Color CreateColorFromAlpha(float alpha)
+        private static Color CreateColorFromAlpha(float alpha)
         {
             var alphaColor = Color.black;
             alphaColor.a = alpha;

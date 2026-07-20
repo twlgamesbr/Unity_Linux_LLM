@@ -18,12 +18,8 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             RemotePlayerLogController.instance.StopLogWriters();
         }
 
-        public void TestStarted(ITestAdaptor test)
-        {
-        }
+        public void TestStarted(ITestAdaptor test) { }
 
-        public void TestFinished(ITestResultAdaptor result)
-        {
-        }
+        public void TestFinished(ITestResultAdaptor result) { }
     }
 }

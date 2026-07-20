@@ -53,13 +53,15 @@ namespace Unity.Multiplayer.Tools.NetStats
             ReaderHandle* readerHandle = null;
             if (allocator == Allocator.None)
             {
-                readerHandle = (ReaderHandle*)UnsafeUtility.Malloc(sizeof(ReaderHandle) + length, UnsafeUtility.AlignOf<byte>(), Allocator.Temp);
+                readerHandle = (ReaderHandle*)
+                    UnsafeUtility.Malloc(sizeof(ReaderHandle) + length, UnsafeUtility.AlignOf<byte>(), Allocator.Temp);
                 readerHandle->BufferPointer = buffer;
                 readerHandle->Position = offset;
             }
             else
             {
-                readerHandle = (ReaderHandle*)UnsafeUtility.Malloc(sizeof(ReaderHandle) + length, UnsafeUtility.AlignOf<byte>(), allocator);
+                readerHandle = (ReaderHandle*)
+                    UnsafeUtility.Malloc(sizeof(ReaderHandle) + length, UnsafeUtility.AlignOf<byte>(), allocator);
                 UnsafeUtility.MemCpy(readerHandle + 1, buffer + offset, length);
                 readerHandle->BufferPointer = (byte*)(readerHandle + 1);
                 readerHandle->Position = 0;
@@ -93,7 +95,12 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="offset"></param>
         public unsafe FastBufferReader(NativeArray<byte> buffer, Allocator allocator, int length = -1, int offset = 0)
         {
-            Handle = CreateHandle((byte*)buffer.GetUnsafePtr(), Math.Max(1, length == -1 ? buffer.Length : length), offset, allocator);
+            Handle = CreateHandle(
+                (byte*)buffer.GetUnsafePtr(),
+                Math.Max(1, length == -1 ? buffer.Length : length),
+                offset,
+                allocator
+            );
         }
 
         /// <summary>
@@ -187,7 +194,12 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="offset">The offset of the buffer to start copying from</param>
         public unsafe FastBufferReader(FastBufferWriter writer, Allocator allocator, int length = -1, int offset = 0)
         {
-            Handle = CreateHandle(writer.GetUnsafePtr(), Math.Max(1, length == -1 ? writer.Length : length), offset, allocator);
+            Handle = CreateHandle(
+                writer.GetUnsafePtr(),
+                Math.Max(1, length == -1 ? writer.Length : length),
+                offset,
+                allocator
+            );
         }
 
         /// <summary>
@@ -221,7 +233,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + amount > Handle->AllowedReadMark)
             {
@@ -266,7 +279,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             if (Handle->Position + bytes > Handle->Length)
@@ -294,13 +308,15 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <returns>True if the read is allowed, false otherwise</returns>
         /// <exception cref="InvalidOperationException">If called while in a bitwise context</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe bool TryBeginReadValue<T>(in T value) where T : unmanaged
+        public unsafe bool TryBeginReadValue<T>(in T value)
+            where T : unmanaged
         {
 #if UNITY_ENABLE_CHECKS || UNITY_EDITOR
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             int len = sizeof(T);
@@ -328,7 +344,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             if (Handle->Position + bytes > Handle->Length)
@@ -386,7 +403,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="value">INetworkSerializable instance</param>
         /// <typeparam name="T"></typeparam>
         /// <exception cref="NotImplementedException"></exception>
-        public void ReadNetworkSerializable<T>(out T value) where T : INetworkSerializable, new()
+        public void ReadNetworkSerializable<T>(out T value)
+            where T : INetworkSerializable, new()
         {
             value = new T();
             var bufferSerializer = new BufferSerializer<BufferSerializerReader>(new BufferSerializerReader(this));
@@ -399,7 +417,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="value">INetworkSerializable instance</param>
         /// <typeparam name="T"></typeparam>
         /// <exception cref="NotImplementedException"></exception>
-        public void ReadNetworkSerializable<T>(out T[] value) where T : INetworkSerializable, new()
+        public void ReadNetworkSerializable<T>(out T[] value)
+            where T : INetworkSerializable, new()
         {
             ReadValueSafe(out int size);
             value = new T[size];
@@ -452,7 +471,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -492,7 +512,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// </summary>
         /// <param name="array">Stores the read array</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void ReadValue<T>(out T[] array) where T : unmanaged
+        public unsafe void ReadValue<T>(out T[] array)
+            where T : unmanaged
         {
             ReadValue(out int sizeInTs);
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -513,13 +534,15 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// </summary>
         /// <param name="array">Stores the read array</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void ReadValueSafe<T>(out T[] array) where T : unmanaged
+        public unsafe void ReadValueSafe<T>(out T[] array)
+            where T : unmanaged
         {
 #if UNITY_ENABLE_CHECKS || UNITY_EDITOR
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -551,13 +574,15 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="OverflowException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void ReadPartialValue<T>(out T value, int bytesToRead, int offsetBytes = 0) where T : unmanaged
+        public unsafe void ReadPartialValue<T>(out T value, int bytesToRead, int offsetBytes = 0)
+            where T : unmanaged
         {
 #if UNITY_ENABLE_CHECKS || UNITY_EDITOR
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + bytesToRead > Handle->AllowedReadMark)
             {
@@ -585,7 +610,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + 1 > Handle->AllowedReadMark)
             {
@@ -609,7 +635,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -633,7 +660,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + size > Handle->AllowedReadMark)
             {
@@ -660,7 +688,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -712,7 +741,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="value">The read value</param>
         /// <typeparam name="T">Any unmanaged type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void ReadValue<T>(out T value) where T : unmanaged
+        public unsafe void ReadValue<T>(out T value)
+            where T : unmanaged
         {
             int len = sizeof(T);
 
@@ -720,7 +750,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + len > Handle->AllowedReadMark)
             {
@@ -745,7 +776,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <param name="value">The read value</param>
         /// <typeparam name="T">Any unmanaged type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void ReadValueSafe<T>(out T value) where T : unmanaged
+        public unsafe void ReadValueSafe<T>(out T value)
+            where T : unmanaged
         {
             int len = sizeof(T);
 
@@ -753,7 +785,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -761,7 +794,6 @@ namespace Unity.Multiplayer.Tools.NetStats
             {
                 throw new OverflowException("Reading past the end of the buffer");
             }
-
 
             fixed (T* ptr = &value)
             {

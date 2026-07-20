@@ -31,9 +31,11 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
             }
 
 #if UNITY_6000_5_OR_NEWER
-            Types = CurrentAssemblies.GetLoadedAssemblies()
+            Types = CurrentAssemblies
+                .GetLoadedAssemblies()
 #else
-            Types = AppDomain.CurrentDomain.GetAssemblies()
+            Types = AppDomain
+                .CurrentDomain.GetAssemblies()
 #endif
                 .SelectMany(x => x.GetTypes())
                 .Where(TypeIsValidNetworkScenario)

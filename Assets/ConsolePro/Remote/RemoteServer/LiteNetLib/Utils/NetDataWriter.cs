@@ -36,15 +36,15 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
         }
 #endif
 
-        public static readonly ThreadLocal<UTF8Encoding> uTF8Encoding = new ThreadLocal<UTF8Encoding>(() => new UTF8Encoding(false, true));
+        public static readonly ThreadLocal<UTF8Encoding> uTF8Encoding = new ThreadLocal<UTF8Encoding>(() =>
+            new UTF8Encoding(false, true)
+        );
 
-        public NetDataWriter() : this(true, InitialSize)
-        {
-        }
+        public NetDataWriter()
+            : this(true, InitialSize) { }
 
-        public NetDataWriter(bool autoResize) : this(autoResize, InitialSize)
-        {
-        }
+        public NetDataWriter(bool autoResize)
+            : this(autoResize, InitialSize) { }
 
         public NetDataWriter(bool autoResize, int initialSize)
         {
@@ -65,7 +65,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
                 netDataWriter.Put(bytes);
                 return netDataWriter;
             }
-            return new NetDataWriter(true, 0) {_data = bytes, _position = bytes.Length};
+            return new NetDataWriter(true, 0) { _data = bytes, _position = bytes.Length };
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 
         public void PutArray(Array arr, int sz)
         {
-            ushort length = arr == null ? (ushort) 0 : (ushort)arr.Length;
+            ushort length = arr == null ? (ushort)0 : (ushort)arr.Length;
             sz *= length;
             if (_autoResize)
                 ResizeIfNeed(_position + sz + 2);
@@ -355,7 +355,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
                 Put(value[i], strMaxLength);
         }
 
-        public void PutArray<T>(T[] value) where T : INetSerializable, new()
+        public void PutArray<T>(T[] value)
+            where T : INetSerializable, new()
         {
             ushort strArrayLength = (ushort)(value?.Length ?? 0);
             Put(strArrayLength);
@@ -419,7 +420,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             _position += size;
         }
 
-        public void Put<T>(T obj) where T : INetSerializable
+        public void Put<T>(T obj)
+            where T : INetSerializable
         {
             obj.Serialize(this);
         }

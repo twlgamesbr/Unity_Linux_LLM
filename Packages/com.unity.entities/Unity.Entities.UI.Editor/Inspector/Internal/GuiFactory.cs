@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Unity.Properties;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 
 namespace Unity.Entities.UI
 {
@@ -13,46 +13,56 @@ namespace Unity.Entities.UI
         public static NullableFoldout<TValue> Foldout<TValue>(
             IProperty property,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => ConstructFoldout<NullableFoldout<TValue>>(property, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => ConstructFoldout<NullableFoldout<TValue>>(property, path, visitorInspectorContext);
 
         public static IListElement<TList, TElement> Foldout<TList, TElement>(
             IProperty property,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            where TList : IList<TElement>
-            => ConstructFoldout<IListElement<TList, TElement>>(property, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        )
+            where TList : IList<TElement> =>
+            ConstructFoldout<IListElement<TList, TElement>>(property, path, visitorInspectorContext);
 
         public static DictionaryElement<TDictionary, TKey, TValue> Foldout<TDictionary, TKey, TValue>(
             IProperty property,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            where TDictionary : IDictionary<TKey, TValue>
-            => ConstructFoldout<DictionaryElement<TDictionary, TKey, TValue>>(
-                property, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        )
+            where TDictionary : IDictionary<TKey, TValue> =>
+            ConstructFoldout<DictionaryElement<TDictionary, TKey, TValue>>(property, path, visitorInspectorContext);
 
         public static HashSetElement<TSet, TElement> SetFoldout<TSet, TElement>(
             IProperty property,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            where TSet : ISet<TElement>
-            => ConstructFoldout<HashSetElement<TSet, TElement>>(property, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        )
+            where TSet : ISet<TElement> =>
+            ConstructFoldout<HashSetElement<TSet, TElement>>(property, path, visitorInspectorContext);
 
         public static Toggle Toggle(
             IProperty property,
             ref bool value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<Toggle, bool>(property, ref value, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => Construct<Toggle, bool>(property, ref value, path, visitorInspectorContext);
 
         public static IntegerField SByteField(
             IProperty property,
             ref sbyte value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => ConstructWithConverter<IntegerField, int, sbyte>(property, ref value, path, visitorInspectorContext, s_IntToSByte);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) =>
+            ConstructWithConverter<IntegerField, int, sbyte>(
+                property,
+                ref value,
+                path,
+                visitorInspectorContext,
+                s_IntToSByte
+            );
 
         static readonly Func<int, sbyte> s_IntToSByte = IntToSByte;
+
         static sbyte IntToSByte(int arg)
         {
             return (sbyte)Mathf.Clamp(arg, sbyte.MinValue, sbyte.MaxValue);
@@ -62,10 +72,18 @@ namespace Unity.Entities.UI
             IProperty property,
             ref byte value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => ConstructWithConverter<IntegerField, int, byte>(property, ref value, path, visitorInspectorContext, s_IntToByte);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) =>
+            ConstructWithConverter<IntegerField, int, byte>(
+                property,
+                ref value,
+                path,
+                visitorInspectorContext,
+                s_IntToByte
+            );
 
         static readonly Func<int, byte> s_IntToByte = IntToByte;
+
         static byte IntToByte(int arg)
         {
             return (byte)Mathf.Clamp(arg, byte.MinValue, byte.MaxValue);
@@ -75,10 +93,18 @@ namespace Unity.Entities.UI
             IProperty property,
             ref ushort value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => ConstructWithConverter<IntegerField, int, ushort>(property, ref value, path, visitorInspectorContext, IntToUShort);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) =>
+            ConstructWithConverter<IntegerField, int, ushort>(
+                property,
+                ref value,
+                path,
+                visitorInspectorContext,
+                IntToUShort
+            );
 
         static readonly Func<int, ushort> s_IntToUShort = IntToUShort;
+
         static ushort IntToUShort(int arg)
         {
             return (ushort)Mathf.Clamp(arg, ushort.MinValue, ushort.MaxValue);
@@ -88,10 +114,18 @@ namespace Unity.Entities.UI
             IProperty property,
             ref short value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => ConstructWithConverter<IntegerField, int, short>(property, ref value, path, visitorInspectorContext, s_IntToShort);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) =>
+            ConstructWithConverter<IntegerField, int, short>(
+                property,
+                ref value,
+                path,
+                visitorInspectorContext,
+                s_IntToShort
+            );
 
         static readonly Func<int, short> s_IntToShort = IntToShort;
+
         static short IntToShort(int arg)
         {
             return (short)Mathf.Clamp(arg, short.MinValue, short.MaxValue);
@@ -101,17 +135,25 @@ namespace Unity.Entities.UI
             IProperty property,
             ref int value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<IntegerField, int>(property, ref value, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => Construct<IntegerField, int>(property, ref value, path, visitorInspectorContext);
 
         public static LongField UIntField(
             IProperty property,
             ref uint value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => ConstructWithConverter<LongField, long, uint>(property, ref value, path, visitorInspectorContext, s_LongToUInt);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) =>
+            ConstructWithConverter<LongField, long, uint>(
+                property,
+                ref value,
+                path,
+                visitorInspectorContext,
+                s_LongToUInt
+            );
 
         static readonly Func<long, uint> s_LongToUInt = LongToUInt;
+
         static uint LongToUInt(long arg)
         {
             return (uint)Mathf.Clamp(arg, uint.MinValue, uint.MaxValue);
@@ -121,58 +163,65 @@ namespace Unity.Entities.UI
             IProperty property,
             ref long value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<LongField, long>(property, ref value, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => Construct<LongField, long>(property, ref value, path, visitorInspectorContext);
 
         public static TextField ULongField(
             IProperty property,
             ref ulong value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<TextField, string, ulong>(property, ref value, path,
-                visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => Construct<TextField, string, ulong>(property, ref value, path, visitorInspectorContext);
 
         public static FloatField FloatField(
             IProperty property,
             ref float value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<FloatField, float>(property, ref value, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => Construct<FloatField, float>(property, ref value, path, visitorInspectorContext);
 
         public static DoubleField DoubleField(
             IProperty property,
             ref double value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<DoubleField, double>(property, ref value, path, visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => Construct<DoubleField, double>(property, ref value, path, visitorInspectorContext);
 
         public static TextField CharField(
             IProperty property,
             ref char value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<TextField, string, char>(property, ref value, path, visitorInspectorContext, (field, prop) => field.maxLength = 1);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) =>
+            Construct<TextField, string, char>(
+                property,
+                ref value,
+                path,
+                visitorInspectorContext,
+                (field, prop) => field.maxLength = 1
+            );
 
         public static TextField TextField(
             IProperty property,
             ref string value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
-            => Construct<TextField, string, string>(property, ref value, path,
-                visitorInspectorContext);
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        ) => Construct<TextField, string, string>(property, ref value, path, visitorInspectorContext);
 
         public static ObjectField ObjectField(
             IProperty property,
             ref UnityEngine.Object value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        )
         {
             var element = Construct<ObjectField, UnityEngine.Object, UnityEngine.Object>(
                 property,
                 ref value,
                 path,
                 visitorInspectorContext,
-                (field, p) => field.objectType = p.DeclaredValueType());
+                (field, p) => field.objectType = p.DeclaredValueType()
+            );
             return element;
         }
 
@@ -180,18 +229,15 @@ namespace Unity.Entities.UI
             IProperty property,
             ref TValue value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        )
         {
             if (!typeof(TValue).IsEnum)
             {
                 throw new ArgumentException();
             }
 
-            var element = Construct<EnumFlagsField, Enum, TValue>(
-                property,
-                ref value,
-                path,
-                visitorInspectorContext);
+            var element = Construct<EnumFlagsField, Enum, TValue>(property, ref value, path, visitorInspectorContext);
             element.Init(value as Enum);
             return element;
         }
@@ -200,22 +246,18 @@ namespace Unity.Entities.UI
             IProperty property,
             ref TValue value,
             PropertyPath path,
-            InspectorVisitor.InspectorContext visitorInspectorContext)
+            InspectorVisitor.InspectorContext visitorInspectorContext
+        )
         {
             if (!typeof(TValue).IsEnum)
             {
                 throw new ArgumentException();
             }
 
-            var element = Construct<EnumField, Enum, TValue>(
-                property,
-                ref value,
-                path,
-                visitorInspectorContext);
+            var element = Construct<EnumField, Enum, TValue>(property, ref value, path, visitorInspectorContext);
             element.Init(value as Enum);
             return element;
         }
-
 
         static TElement ConstructBase<TElement, TFieldValue>(IProperty property, VisualElement parent)
             where TElement : BaseField<TFieldValue>, new()
@@ -238,10 +280,13 @@ namespace Unity.Entities.UI
         /// </summary>
         static void AddRuntimeBar(AttachToPanelEvent evt, VisualElement parent)
         {
-            if (evt.target is not VisualElement element || element.ClassListContains(UssClasses.RuntimeBarElement.RuntimeBarAdded))
+            if (
+                evt.target is not VisualElement element
+                || element.ClassListContains(UssClasses.RuntimeBarElement.RuntimeBarAdded)
+            )
                 return;
 
-            var isParentLiveProperty = parent is PropertyElement {userData: { }};
+            var isParentLiveProperty = parent is PropertyElement { userData: { } };
             var isAncestorLiveProperty = parent?.GetFirstAncestorOfType<PropertyElement>()?.userData;
 
             if (isParentLiveProperty || isAncestorLiveProperty != null)
@@ -299,13 +344,11 @@ namespace Unity.Entities.UI
         internal static string GetDisplayName(IProperty property)
         {
             var name = property.Name;
-            return property is ICollectionElementProperty
-                ? $"Element {name}"
-                : property.HasAttribute<DisplayNameAttribute>()
-                    ? property.GetAttribute<DisplayNameAttribute>().Name
-                    : property.HasAttribute<InspectorNameAttribute>()
-                        ? property.GetAttribute<InspectorNameAttribute>().displayName
-                        : ObjectNames.NicifyVariableName(name);
+            return property is ICollectionElementProperty ? $"Element {name}"
+                : property.HasAttribute<DisplayNameAttribute>() ? property.GetAttribute<DisplayNameAttribute>().Name
+                : property.HasAttribute<InspectorNameAttribute>()
+                    ? property.GetAttribute<InspectorNameAttribute>().displayName
+                : ObjectNames.NicifyVariableName(name);
         }
 
         internal static void SetTooltip(IProperty property, VisualElement element)
@@ -326,7 +369,10 @@ namespace Unity.Entities.UI
 
         static void SetReadOnly(IProperty property, VisualElement element)
         {
-            if (property.IsReadOnly && (property.DeclaredValueType().IsValueType || !TypeTraits.IsContainer(property.DeclaredValueType())))
+            if (
+                property.IsReadOnly
+                && (property.DeclaredValueType().IsValueType || !TypeTraits.IsContainer(property.DeclaredValueType()))
+            )
             {
                 element.SetEnabled(false);
             }
@@ -340,8 +386,7 @@ namespace Unity.Entities.UI
         )
             where TElement : BaseField<TValue>, new()
         {
-            return Construct<TElement, TValue, TValue>(property, ref value, path,
-                visitorInspectorContext);
+            return Construct<TElement, TValue, TValue>(property, ref value, path, visitorInspectorContext);
         }
 
         static TElement ConstructFoldout<TElement>(
@@ -355,7 +400,9 @@ namespace Unity.Entities.UI
             element.SetContext(visitorInspectorContext.Root, path);
             var targetType = visitorInspectorContext.Root.GetTargetType();
             element.SetValueWithoutNotify(UiPersistentState.GetFoldoutState(targetType, path));
-            element.RegisterCallback<ChangeEvent<bool>>(evt => UiPersistentState.SetFoldoutState(targetType, path, evt.newValue));
+            element.RegisterCallback<ChangeEvent<bool>>(evt =>
+                UiPersistentState.SetFoldoutState(targetType, path, evt.newValue)
+            );
             return element;
         }
 
@@ -373,22 +420,17 @@ namespace Unity.Entities.UI
                 Path = path;
             }
 
-            public void PreUpdate()
-            {
-            }
+            public void PreUpdate() { }
 
             public abstract void Update();
 
-            public void Release()
-            {
-            }
+            public void Release() { }
         }
 
         class TextureBinding<TValue> : UIBinding<BindableElement, TValue>
         {
-            public TextureBinding(BindableElement element, BindingContextElement root, PropertyPath path) : base(element, root, path)
-            {
-            }
+            public TextureBinding(BindableElement element, BindingContextElement root, PropertyPath path)
+                : base(element, root, path) { }
 
             public override void Update()
             {
@@ -404,9 +446,8 @@ namespace Unity.Entities.UI
 
         class LabelBinding<TValue> : UIBinding<Label, TValue>
         {
-            public LabelBinding(Label element, BindingContextElement root, PropertyPath path) : base(element, root, path)
-            {
-            }
+            public LabelBinding(Label element, BindingContextElement root, PropertyPath path)
+                : base(element, root, path) { }
 
             public override void Update()
             {
@@ -419,9 +460,8 @@ namespace Unity.Entities.UI
 
         class PropertyBinding<TValue> : UIBinding<BindingContextElement, TValue>
         {
-            public PropertyBinding(BindingContextElement element, BindingContextElement root, PropertyPath path) : base(element, root, path)
-            {
-            }
+            public PropertyBinding(BindingContextElement element, BindingContextElement root, PropertyPath path)
+                : base(element, root, path) { }
 
             public override void Update()
             {
@@ -434,9 +474,8 @@ namespace Unity.Entities.UI
 
         class Binding<TFieldType, TValue> : UIBinding<BaseField<TFieldType>, TValue>
         {
-            public Binding(BaseField<TFieldType> element, BindingContextElement root, PropertyPath path) : base(element, root, path)
-            {
-            }
+            public Binding(BaseField<TFieldType> element, BindingContextElement root, PropertyPath path)
+                : base(element, root, path) { }
 
             public override void Update()
             {
@@ -493,7 +532,8 @@ namespace Unity.Entities.UI
             ref TValue value,
             PropertyPath path,
             BindingContextElement root,
-            BindingContextElement field)
+            BindingContextElement field
+        )
         {
             field.SetRoot(root);
             field.SetTarget(value);
@@ -514,7 +554,8 @@ namespace Unity.Entities.UI
             ref TValue value,
             PropertyPath path,
             BindingContextElement root,
-            BaseField<TFieldType> field)
+            BaseField<TFieldType> field
+        )
         {
             if (TypeConversion.TryConvert(ref value, out TFieldType fieldValue))
             {
@@ -522,11 +563,10 @@ namespace Unity.Entities.UI
                 field.binding = new Binding<TFieldType, TValue>(field, root, path);
             }
 
-            field.RegisterCallback<ChangeEvent<TFieldType>, ValueChangedContext<TFieldType, TValue>>(ValueChanged, new ValueChangedContext<TFieldType, TValue>
-            {
-                path = path,
-                converter = null
-            });
+            field.RegisterCallback<ChangeEvent<TFieldType>, ValueChangedContext<TFieldType, TValue>>(
+                ValueChanged,
+                new ValueChangedContext<TFieldType, TValue> { path = path, converter = null }
+            );
         }
 
         internal static void SetCallbacks<TFieldType, TValue>(
@@ -534,7 +574,8 @@ namespace Unity.Entities.UI
             PropertyPath path,
             BindingContextElement root,
             BaseField<TFieldType> field,
-            Func<TFieldType, TValue> converter)
+            Func<TFieldType, TValue> converter
+        )
         {
             if (TypeConversion.TryConvert(ref value, out TFieldType fieldValue))
             {
@@ -542,18 +583,18 @@ namespace Unity.Entities.UI
                 field.binding = new Binding<TFieldType, TValue>(field, root, path);
             }
 
-            field.RegisterCallback<ChangeEvent<TFieldType>, ValueChangedContext<TFieldType, TValue>>(ValueChanged, new ValueChangedContext<TFieldType, TValue>
-            {
-                path = path,
-                converter = converter
-            });
+            field.RegisterCallback<ChangeEvent<TFieldType>, ValueChangedContext<TFieldType, TValue>>(
+                ValueChanged,
+                new ValueChangedContext<TFieldType, TValue> { path = path, converter = converter }
+            );
         }
 
         internal static void SetCallbacks<TValue>(
             ref TValue value,
             PropertyPath path,
             BindingContextElement root,
-            BindableElement element)
+            BindableElement element
+        )
         {
             if (!TypeConversion.TryConvert(ref value, out Texture2D texture))
                 return;
@@ -566,7 +607,8 @@ namespace Unity.Entities.UI
             ref TValue value,
             PropertyPath path,
             BindingContextElement root,
-            Label label)
+            Label label
+        )
         {
             label.text = TypeConversion.TryConvert(ref value, out string strValue) ? strValue : value.ToString();
             label.binding = new LabelBinding<TValue>(label, root, path);
@@ -578,7 +620,10 @@ namespace Unity.Entities.UI
             public Func<TFieldType, TValue> converter;
         }
 
-        static void ValueChanged<TFieldType, TValue>(ChangeEvent<TFieldType> evt, ValueChangedContext<TFieldType, TValue> context)
+        static void ValueChanged<TFieldType, TValue>(
+            ChangeEvent<TFieldType> evt,
+            ValueChangedContext<TFieldType, TValue> context
+        )
         {
             var field = evt.target as BaseField<TFieldType>;
             var element = field?.GetFirstAncestorOfType<BindingContextElement>();

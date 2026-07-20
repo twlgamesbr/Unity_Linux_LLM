@@ -47,7 +47,7 @@ namespace Unity.Entities.Editor
             m_SelectedWorldProxy = proxy;
             SetActiveUpdater();
         }
-        
+
         void SetActiveUpdater()
         {
             if (m_SelectedWorldProxy == null)
@@ -61,7 +61,7 @@ namespace Unity.Entities.Editor
                 else
                     updater.DisableUpdater();
             }
-        }        
+        }
 
         public void CreateWorldProxiesForAllWorlds()
         {

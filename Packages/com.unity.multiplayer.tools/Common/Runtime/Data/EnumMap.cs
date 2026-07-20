@@ -87,8 +87,7 @@ namespace Unity.Multiplayer.Tools.Common
 
     static class EnumContinuity
     {
-        public static (int min, int max, int uniqueValueCount)
-            GetMinMaxAndUniqueValueCount<TEnum>()
+        public static (int min, int max, int uniqueValueCount) GetMinMaxAndUniqueValueCount<TEnum>()
             where TEnum : unmanaged, Enum
         {
             var enumValues = EnumUtil.GetValues<TEnum>();
@@ -156,34 +155,41 @@ namespace Unity.Multiplayer.Tools.Common
         where TEnum : unmanaged, Enum
     {
         public UnhandledEnumBackingTypeException()
-            : base($"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} " +
-                   $"because its backing type {Enum.GetUnderlyingType(typeof(TEnum))} is not {nameof(Int32)}. " +
-                   $"This constraint is required by EnumMap.CastEnumToInt.")
-        { }
+            : base(
+                $"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} "
+                    + $"because its backing type {Enum.GetUnderlyingType(typeof(TEnum))} is not {nameof(Int32)}. "
+                    + $"This constraint is required by EnumMap.CastEnumToInt."
+            ) { }
     }
+
     class EmptyEnumException<TEnum, TValue> : Exception
         where TEnum : unmanaged, Enum
     {
         public EmptyEnumException()
-            : base($"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} " +
-                   $"because it is empty and has no values.")
-        { }
+            : base(
+                $"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} "
+                    + $"because it is empty and has no values."
+            ) { }
     }
+
     class NonZeroEnumMinimumValueException<TEnum, TValue> : Exception
         where TEnum : unmanaged, Enum
     {
         public NonZeroEnumMinimumValueException()
-            : base($"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} " +
-                   $"because its minimum value is non-zero. Consider using a dictionary instead.")
-        { }
+            : base(
+                $"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} "
+                    + $"because its minimum value is non-zero. Consider using a dictionary instead."
+            ) { }
     }
+
     class DiscontinuousEnumException<TEnum, TValue> : Exception
         where TEnum : unmanaged, Enum
     {
         public DiscontinuousEnumException()
-            : base($"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} " +
-                   $"because it is discontinuous, and {nameof(EnumMap<TEnum, TValue>)} requires continuous " +
-                   $"keys for storage in a fixed array. Consider using a dictionary instead.")
-        { }
+            : base(
+                $"The enum {nameof(TEnum)} cannot be used as a key in an {nameof(EnumMap<TEnum, TValue>)} "
+                    + $"because it is discontinuous, and {nameof(EnumMap<TEnum, TValue>)} requires continuous "
+                    + $"keys for storage in a fixed array. Consider using a dictionary instead."
+            ) { }
     }
 }

@@ -6,7 +6,7 @@ namespace Unity.Physics
     /// <summary>   An event raised when a pair of bodies interact during solving. </summary>
     ///
     /// <typeparam name="T">    Generic type parameter. </typeparam>
-    public interface ISimulationEvent<T>: IComparable<T>
+    public interface ISimulationEvent<T> : IComparable<T>
     {
         /// <summary>   Gets the entity a. </summary>
         ///
@@ -52,7 +52,8 @@ namespace Unity.Physics
         /// Negative number if this object is less than the other, 0 if they are equal, or positive if this is
         /// greater.
         /// </returns>
-        public static int CompareEvents<T>(T thisEvent, T otherEvent) where T : struct, ISimulationEvent<T>
+        public static int CompareEvents<T>(T thisEvent, T otherEvent)
+            where T : struct, ISimulationEvent<T>
         {
             int i = thisEvent.EntityA.CompareTo(otherEvent.EntityA);
             if (i == 0)

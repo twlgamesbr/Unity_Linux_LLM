@@ -1,6 +1,4 @@
 namespace Unity.Entities
 {
-    internal struct CleanupEntity : IComponentData
-    {
-    }
+    internal struct CleanupEntity : IComponentData { }
 }

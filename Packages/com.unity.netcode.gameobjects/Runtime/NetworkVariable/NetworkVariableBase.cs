@@ -13,13 +13,17 @@ namespace Unity.Netcode
         /// <summary>
         /// The minimum amount of time that must pass between sending updates. If this amount of time has not passed since the last update, dirtiness will be ignored.
         /// </summary>
-        [Tooltip("The minimum amount of time that must pass between sending updates. If this amount of time has not passed since the last update, dirtiness will be ignored.")]
+        [Tooltip(
+            "The minimum amount of time that must pass between sending updates. If this amount of time has not passed since the last update, dirtiness will be ignored."
+        )]
         public float MinSecondsBetweenUpdates;
 
         /// <summary>
         /// The maximum amount of time that a variable can be dirty without sending an update. If this amount of time has passed since the last update, an update will be sent even if the dirtiness threshold has not been met.
         /// </summary>
-        [Tooltip("The maximum amount of time that a variable can be dirty without sending an update. If this amount of time has passed since the last update, an update will be sent even if the dirtiness threshold has not been met.")]
+        [Tooltip(
+            "The maximum amount of time that a variable can be dirty without sending an update. If this amount of time has passed since the last update, an update will be sent even if the dirtiness threshold has not been met."
+        )]
         public float MaxSecondsBetweenUpdates;
     }
 
@@ -87,7 +91,9 @@ namespace Unity.Netcode
             // Throw an exception if there is an invalid NetworkBehaviour parameter
             if (!networkBehaviour)
             {
-                throw new Exception($"[{GetType().Name}][Initialize] {nameof(NetworkBehaviour)} parameter passed in is null!");
+                throw new Exception(
+                    $"[{GetType().Name}][Initialize] {nameof(NetworkBehaviour)} parameter passed in is null!"
+                );
             }
             m_NetworkBehaviour = networkBehaviour;
 
@@ -122,7 +128,9 @@ namespace Unity.Netcode
             m_UseServerTime = m_NetworkManager.CMBServiceConnection || !m_NetworkManager.IsServer;
 
             // When in distributed authority mode, there is no such thing as server write permissions
-            InternalWritePerm = m_NetworkManager.DistributedAuthorityMode ? NetworkVariableWritePermission.Owner : InternalWritePerm;
+            InternalWritePerm = m_NetworkManager.DistributedAuthorityMode
+                ? NetworkVariableWritePermission.Owner
+                : InternalWritePerm;
 
             OnInitialize();
 
@@ -138,7 +146,9 @@ namespace Unity.Netcode
             }
             else if (m_NetworkManager.LogLevel == LogLevel.Developer)
             {
-                Debug.LogWarning($"[{m_NetworkBehaviour.name}][{m_NetworkBehaviour.GetType().Name}][{GetType().Name}][Initialize] {nameof(NetworkManager)} has no {nameof(NetworkTimeSystem)} assigned!");
+                Debug.LogWarning(
+                    $"[{m_NetworkBehaviour.name}][{m_NetworkBehaviour.GetType().Name}][{GetType().Name}][Initialize] {nameof(NetworkManager)} has no {nameof(NetworkTimeSystem)} assigned!"
+                );
             }
         }
 
@@ -169,10 +179,7 @@ namespace Unity.Netcode
         /// <summary>
         /// Invoked after the associated <see cref="NetworkBehaviour.OnNetworkPreDespawn"/> has been invoked.
         /// </summary>
-        internal void InternalOnPreDespawn()
-        {
-
-        }
+        internal void InternalOnPreDespawn() { }
 
         /// <summary>
         /// Deinitialize is invoked when a NetworkObject is despawned.
@@ -189,10 +196,7 @@ namespace Unity.Netcode
         /// <summary>
         /// Called on initialization
         /// </summary>
-        public virtual void OnInitialize()
-        {
-
-        }
+        public virtual void OnInitialize() { }
 
         /// <summary>
         /// Sets the update traits for this network variable to determine how frequently it will send updates.
@@ -232,7 +236,8 @@ namespace Unity.Netcode
         /// <param name="writePerm">the <see cref="NetworkVariableWritePermission"/> access settings</param>
         protected NetworkVariableBase(
             NetworkVariableReadPermission readPerm = DefaultReadPerm,
-            NetworkVariableWritePermission writePerm = DefaultWritePerm)
+            NetworkVariableWritePermission writePerm = DefaultWritePerm
+        )
         {
             ReadPerm = readPerm;
             InternalWritePerm = writePerm;
@@ -260,10 +265,7 @@ namespace Unity.Netcode
         /// </summary>
         public NetworkVariableWritePermission WritePerm
         {
-            get
-            {
-                return InternalWritePerm;
-            }
+            get { return InternalWritePerm; }
         }
 
         // We had to change the Write Permission in distributed authority.
@@ -287,23 +289,22 @@ namespace Unity.Netcode
         internal bool CanSend()
         {
             // When connected to a service or not the server, always use the synchronized server time as opposed to the local time
-            var time = m_UseServerTime ? m_NetworkManager.ServerTime.Time : m_NetworkManager.NetworkTimeSystem.LocalTime;
+            var time = m_UseServerTime
+                ? m_NetworkManager.ServerTime.Time
+                : m_NetworkManager.NetworkTimeSystem.LocalTime;
             var timeSinceLastUpdate = time - LastUpdateSent;
-            return
-                (
-                    UpdateTraits.MaxSecondsBetweenUpdates > 0 &&
-                    timeSinceLastUpdate >= UpdateTraits.MaxSecondsBetweenUpdates
-                ) ||
-                (
-                    timeSinceLastUpdate >= UpdateTraits.MinSecondsBetweenUpdates &&
-                    ExceedsDirtinessThreshold()
-                );
+            return (
+                    UpdateTraits.MaxSecondsBetweenUpdates > 0
+                    && timeSinceLastUpdate >= UpdateTraits.MaxSecondsBetweenUpdates
+                ) || (timeSinceLastUpdate >= UpdateTraits.MinSecondsBetweenUpdates && ExceedsDirtinessThreshold());
         }
 
         internal void UpdateLastSentTime()
         {
             // When connected to a service or not the server, always use the synchronized server time as opposed to the local time
-            LastUpdateSent = m_UseServerTime ? m_NetworkManager.ServerTime.Time : m_NetworkManager.NetworkTimeSystem.LocalTime;
+            LastUpdateSent = m_UseServerTime
+                ? m_NetworkManager.ServerTime.Time
+                : m_NetworkManager.NetworkTimeSystem.LocalTime;
         }
 
         internal static bool IgnoreInitializeWarning;
@@ -317,8 +318,10 @@ namespace Unity.Netcode
             {
                 if (!IgnoreInitializeWarning)
                 {
-                    Debug.LogWarning($"NetworkVariable is written to, but doesn't know its NetworkBehaviour yet. " +
-                                     "Are you modifying a NetworkVariable before the NetworkObject is spawned?");
+                    Debug.LogWarning(
+                        $"NetworkVariable is written to, but doesn't know its NetworkBehaviour yet. "
+                            + "Are you modifying a NetworkVariable before the NetworkObject is spawned?"
+                    );
                 }
                 return;
             }
@@ -326,8 +329,10 @@ namespace Unity.Netcode
             {
                 if (m_NetworkManager.LogLevel <= LogLevel.Developer)
                 {
-                    Debug.LogWarning($"NetworkVariable is written to during the NetworkManager shutdown! " +
-                 "Are you modifying a NetworkVariable within a NetworkBehaviour.OnDestroy or NetworkBehaviour.OnDespawn method?");
+                    Debug.LogWarning(
+                        $"NetworkVariable is written to during the NetworkManager shutdown! "
+                            + "Are you modifying a NetworkVariable within a NetworkBehaviour.OnDestroy or NetworkBehaviour.OnDespawn method?"
+                    );
                 }
                 return;
             }
@@ -336,8 +341,10 @@ namespace Unity.Netcode
             {
                 if (m_NetworkManager.LogLevel <= LogLevel.Developer)
                 {
-                    Debug.LogWarning($"NetworkVariable is written to after the NetworkManager has already shutdown! " +
-                     "Are you modifying a NetworkVariable within a NetworkBehaviour.OnDestroy or NetworkBehaviour.OnDespawn method?");
+                    Debug.LogWarning(
+                        $"NetworkVariable is written to after the NetworkManager has already shutdown! "
+                            + "Are you modifying a NetworkVariable within a NetworkBehaviour.OnDestroy or NetworkBehaviour.OnDespawn method?"
+                    );
                 }
                 return;
             }
@@ -439,10 +446,7 @@ namespace Unity.Netcode
         /// Primarily to check for collections dirty states when doing
         /// a fully owner read/write NetworkVariable update.
         /// </summary>
-        internal virtual void OnCheckIsDirtyState()
-        {
-
-        }
+        internal virtual void OnCheckIsDirtyState() { }
 
         /// <summary>
         /// Writes the dirty changes, that is, the changes since the variable was last dirty, to the writer
@@ -461,6 +465,7 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="reader">The stream to read the state from</param>
         public abstract void ReadField(FastBufferReader reader);
+
         /// <summary>
         /// Reads delta from the reader and applies them to the internal value
         /// </summary>
@@ -475,9 +480,7 @@ namespace Unity.Netcode
         /// until it is done serializing all valid NetworkVariable field deltas (relative to each client). This is invoked
         /// after it is done forwarding the deltas at the end of the <see cref="NetworkVariableDeltaMessage.Handle(ref NetworkContext)"/> method.
         /// </summary>
-        internal virtual void PostDeltaRead()
-        {
-        }
+        internal virtual void PostDeltaRead() { }
 
         /// <summary>
         /// WriteFieldSynchronization will write the current value only if there are no pending changes.

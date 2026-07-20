@@ -61,7 +61,7 @@ namespace Unity.Entities
             }
 
             FreeList.Set(index, true);
-            Buffers[index] = (IntPtr) bufferPtr;
+            Buffers[index] = (IntPtr)bufferPtr;
 
             return index;
         }
@@ -74,7 +74,7 @@ namespace Unity.Entities
         public void Free(int index)
         {
             CheckInvalidIndexToFree(index);
-            AllocatorManager.Free(Handle, (void*) Buffers[index]);
+            AllocatorManager.Free(Handle, (void*)Buffers[index]);
             FreeList.Set(index, false);
             Buffers[index] = IntPtr.Zero;
         }
@@ -83,7 +83,7 @@ namespace Unity.Entities
         /// Converts an index to a pointer.
         /// </summary>
         /// <param name="index">Index to a buffer.</param>
-        public void* this[int index] => (void*) Buffers[index];
+        public void* this[int index] => (void*)Buffers[index];
 
         /// <summary>
         /// Maximum number of buffers that can be allocated at once.
@@ -103,7 +103,7 @@ namespace Unity.Entities
         {
             for (int i = 0; i < Buffers.Length; ++i)
             {
-                AllocatorManager.Free(Handle, (void*) Buffers[i]);
+                AllocatorManager.Free(Handle, (void*)Buffers[i]);
             }
 
             Buffers.Dispose();
@@ -127,7 +127,9 @@ namespace Unity.Entities
         {
             if (index < 0 || index >= BufferCapacity)
             {
-                throw new ArgumentException($"Cannot free index {index}, it is outside the expected range [0, {BufferCapacity}).");
+                throw new ArgumentException(
+                    $"Cannot free index {index}, it is outside the expected range [0, {BufferCapacity})."
+                );
             }
         }
     }

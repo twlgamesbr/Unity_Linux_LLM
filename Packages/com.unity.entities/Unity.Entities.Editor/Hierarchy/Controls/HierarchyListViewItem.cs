@@ -75,14 +75,12 @@ namespace Unity.Entities.Editor
             OnRemove?.Invoke(decorator);
         }
 
-        public List<IHierarchyItemDecorator>.Enumerator GetEnumerator()
-            => m_Decorators.GetEnumerator();
+        public List<IHierarchyItemDecorator>.Enumerator GetEnumerator() => m_Decorators.GetEnumerator();
 
-        IEnumerator<IHierarchyItemDecorator> IEnumerable<IHierarchyItemDecorator>.GetEnumerator()
-            => m_Decorators.GetEnumerator();
+        IEnumerator<IHierarchyItemDecorator> IEnumerable<IHierarchyItemDecorator>.GetEnumerator() =>
+            m_Decorators.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     /// <summary>
@@ -138,7 +136,8 @@ namespace Unity.Entities.Editor
         /// <summary>
         /// The current handle this element is bound to.
         /// </summary>
-        public HierarchyNodeHandle Handle { get; private set; } = new HierarchyNodeHandle(NodeKind.None, index: -1, version: -1);
+        public HierarchyNodeHandle Handle { get; private set; } =
+            new HierarchyNodeHandle(NodeKind.None, index: -1, version: -1);
 
         /// <summary>
         /// Gets the <see cref="GameObject"/> this element is bound to, if any; null otherwise.
@@ -148,12 +147,13 @@ namespace Unity.Entities.Editor
         /// <summary>
         /// Gets the <see cref="Entity"/> this element is bound to, if any; Entity.Null otherwise.
         /// </summary>
-        public Entity Entity => Handle.Kind switch
-        {
-            NodeKind.Entity => Handle.ToEntity(),
-            NodeKind.SubScene => m_Model.SubSceneMap.GetEntityFromHandle(Handle),
-            _ => Entity.Null
-        };
+        public Entity Entity =>
+            Handle.Kind switch
+            {
+                NodeKind.Entity => Handle.ToEntity(),
+                NodeKind.SubScene => m_Model.SubSceneMap.GetEntityFromHandle(Handle),
+                _ => Entity.Null,
+            };
 
         /// <summary>
         /// Returns the currently active world for the hierarchy.
@@ -209,9 +209,17 @@ namespace Unity.Entities.Editor
             style.flexDirection = FlexDirection.Row;
 
             // Create tree view specific elements. Indent, foldout etc.
-            m_Toggle = new Toggle {name = k_UnityTreeViewItemToggleName};
-            m_IndentContainer = new VisualElement {name = k_UnityTreeViewItemIndentsName, style = {flexDirection = FlexDirection.Row}};
-            m_ContentContainer = new VisualElement {name = k_UnityTreeViewItemContentName, style = {flexGrow = 1, flexShrink = 1}};
+            m_Toggle = new Toggle { name = k_UnityTreeViewItemToggleName };
+            m_IndentContainer = new VisualElement
+            {
+                name = k_UnityTreeViewItemIndentsName,
+                style = { flexDirection = FlexDirection.Row },
+            };
+            m_ContentContainer = new VisualElement
+            {
+                name = k_UnityTreeViewItemContentName,
+                style = { flexGrow = 1, flexShrink = 1 },
+            };
             m_ModeIndent = new VisualElement { name = k_UnityTreeViewItemModeIndentName };
 
             // Setup styling for tree item specific elements.
@@ -229,14 +237,20 @@ namespace Unity.Entities.Editor
             m_SubSceneState = m_ContentContainer.Q<Label>(className: UssClasses.Hierarchy.Item.SubSceneState);
             m_Icon = m_ContentContainer.Q<VisualElement>(className: UssClasses.Hierarchy.Item.Icon);
             m_SystemButton = m_ContentContainer.Q<VisualElement>(className: UssClasses.Hierarchy.Item.SystemButton);
-            m_PingGameObject = m_ContentContainer.Q<VisualElement>(className: UssClasses.Hierarchy.Item.PingGameObjectButton);
-            m_PrefabStageButton = m_ContentContainer.Q<VisualElement>(className: UssClasses.Hierarchy.Item.PrefabStageButton);
+            m_PingGameObject = m_ContentContainer.Q<VisualElement>(
+                className: UssClasses.Hierarchy.Item.PingGameObjectButton
+            );
+            m_PrefabStageButton = m_ContentContainer.Q<VisualElement>(
+                className: UssClasses.Hierarchy.Item.PrefabStageButton
+            );
             m_SubSceneButton = m_ContentContainer.Q<Toggle>(className: UssClasses.Hierarchy.Item.SubSceneButton);
 
             m_SubSceneButton.tooltip = k_SubSceneButtonTooltip;
 
             var prefabStageClickable = new Clickable(OnOpenPrefab);
-            prefabStageClickable.activators.Add(new ManipulatorActivationFilter {button = MouseButton.LeftMouse, modifiers = EventModifiers.Alt});
+            prefabStageClickable.activators.Add(
+                new ManipulatorActivationFilter { button = MouseButton.LeftMouse, modifiers = EventModifiers.Alt }
+            );
             m_PrefabStageButton.AddManipulator(prefabStageClickable);
 
             m_SubSceneButton.RegisterValueChangedCallback(OnSubSceneToggle);
@@ -480,9 +494,10 @@ namespace Unity.Entities.Editor
                 var gameObject = Handle.ToGameObject();
                 var prefabType = m_Model.GetPrefabType(Handle);
 
-                var showOverride = null != gameObject
-                                    && prefabType == HierarchyModel.HierarchyPrefabType.PrefabRoot
-                                    && PrefabUtility.HasPrefabInstanceAnyOverrides(Handle.ToGameObject(), false);
+                var showOverride =
+                    null != gameObject
+                    && prefabType == HierarchyModel.HierarchyPrefabType.PrefabRoot
+                    && PrefabUtility.HasPrefabInstanceAnyOverrides(Handle.ToGameObject(), false);
 
                 m_ModeIndent.EnableInClassList(UssClasses.Hierarchy.Item.PrefabOverrideIndent, showOverride);
             }
@@ -492,13 +507,19 @@ namespace Unity.Entities.Editor
                 case NodeKind.GameObject when m_Model.DataMode is DataMode.Mixed:
                 {
                     var unityObject = m_Model.GetUnityObject(Handle) as GameObject;
-                    m_ModeIndent.EnableInClassList(UssClasses.Hierarchy.Item.RuntimeModeIndent, unityObject && !unityObject.scene.isSubScene);
+                    m_ModeIndent.EnableInClassList(
+                        UssClasses.Hierarchy.Item.RuntimeModeIndent,
+                        unityObject && !unityObject.scene.isSubScene
+                    );
                     break;
                 }
                 case NodeKind.GameObject:
                 case NodeKind.SubScene:
                 case NodeKind.Entity:
-                    m_ModeIndent.EnableInClassList(UssClasses.Hierarchy.Item.RuntimeModeIndent, m_Model.DataMode is DataMode.Mixed or DataMode.Runtime);
+                    m_ModeIndent.EnableInClassList(
+                        UssClasses.Hierarchy.Item.RuntimeModeIndent,
+                        m_Model.DataMode is DataMode.Mixed or DataMode.Runtime
+                    );
                     break;
             }
         }
@@ -569,7 +590,7 @@ namespace Unity.Entities.Editor
                     SubSceneLoadedState.NotLoaded => L10n.Tr("(not loaded)"),
                     SubSceneLoadedState.LiveConverted => L10n.Tr("(Live converted)"),
                     SubSceneLoadedState.Opened => L10n.Tr("(opened)"),
-                    _ => string.Empty
+                    _ => string.Empty,
                 };
 
                 style.opacity = state == SubSceneLoadedState.NotLoaded ? 0.5f : 1f;
@@ -628,11 +649,18 @@ namespace Unity.Entities.Editor
             var prefabInstance = EditorUtility.EntityIdToObject(m_Model.GetInstanceId(Handle)) as GameObject;
             var assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabInstance);
             var defaultPrefabMode = PreferencesProviderBridge.GetDefaultPrefabModeForHierarchy();
-            var alternativePrefabMode = (defaultPrefabMode == PrefabStage.Mode.InContext) ? PrefabStage.Mode.InIsolation : PrefabStage.Mode.InContext;
+            var alternativePrefabMode =
+                (defaultPrefabMode == PrefabStage.Mode.InContext)
+                    ? PrefabStage.Mode.InIsolation
+                    : PrefabStage.Mode.InContext;
 #if UNITY_2023_2_OR_NEWER
-            var mode = ((IPointerEvent)evt).modifiers.HasFlag(EventModifiers.Alt) ? alternativePrefabMode : defaultPrefabMode;
+            var mode = ((IPointerEvent)evt).modifiers.HasFlag(EventModifiers.Alt)
+                ? alternativePrefabMode
+                : defaultPrefabMode;
 #else
-            var mode = ((IMouseEvent)evt).modifiers.HasFlag(EventModifiers.Alt) ? alternativePrefabMode : defaultPrefabMode;
+            var mode = ((IMouseEvent)evt).modifiers.HasFlag(EventModifiers.Alt)
+                ? alternativePrefabMode
+                : defaultPrefabMode;
 #endif
             PrefabStageUtility.OpenPrefab(assetPath, prefabInstance, mode);
         }
@@ -661,7 +689,7 @@ namespace Unity.Entities.Editor
             foreach (var s in subScenes)
                 stack.Push(s);
 
-            while (stack.Count>0)
+            while (stack.Count > 0)
             {
                 var subScene = stack.Pop();
 
@@ -675,8 +703,8 @@ namespace Unity.Entities.Editor
                     continue;
 
                 foreach (var subSceneGameObject in subScene.EditingScene.GetRootGameObjects())
-                    foreach (var childSubScene in subSceneGameObject.GetComponentsInChildren<SubScene>())
-                        stack.Push(childSubScene);
+                foreach (var childSubScene in subSceneGameObject.GetComponentsInChildren<SubScene>())
+                    stack.Push(childSubScene);
             }
 
             var array = result.ToArray();

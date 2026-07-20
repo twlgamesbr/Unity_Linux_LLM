@@ -1,10 +1,10 @@
 using System;
+using System.Diagnostics;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using Unity.Burst;
 using Unity.Jobs.LowLevel.Unsafe;
-using System.Diagnostics;
 
 namespace Unity.Entities
 {
@@ -41,6 +41,7 @@ namespace Unity.Entities
     {
         public T Value;
         public int Index;
+
         public int CompareTo(IndexedValue<T> other) => Value.CompareTo(other.Value);
     }
 
@@ -50,29 +51,28 @@ namespace Unity.Entities
     {
         public int Value;
         public int Index;
+
         public int CompareTo(IndexedInt other) => Value.CompareTo(other.Value);
     }
 
     [BurstCompile]
     struct CopyIndexedInt : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<int> Src;
+        [ReadOnly]
+        public NativeArray<int> Src;
         public NativeArray<IndexedInt> Dst;
 
         public void Execute(int index)
         {
-            Dst[index] = new IndexedInt
-            {
-                Value = Src[index],
-                Index = index
-            };
+            Dst[index] = new IndexedInt { Value = Src[index], Index = index };
         }
     }
 
     [BurstCompile]
     struct SegmentSortInt : IJobParallelFor
     {
-        [NativeDisableParallelForRestriction] public NativeArray<IndexedInt> Data;
+        [NativeDisableParallelForRestriction]
+        public NativeArray<IndexedInt> Data;
         public int SegmentWidth;
 
         public void Execute(int index)
@@ -154,7 +154,6 @@ namespace Unity.Entities
         }
     }
 
-
     /// <summary>
     ///     Merge sort index list referencing NativeArray values.
     /// </summary>
@@ -172,7 +171,8 @@ namespace Unity.Entities
     /// </remarks>
     public struct NativeArraySharedInt : IDisposable
     {
-        [ReadOnly] private readonly NativeArray<int> m_SourceBuffer;
+        [ReadOnly]
+        private readonly NativeArray<int> m_SourceBuffer;
 
         // Sorted indices into m_SourceBuffer
         private NativeArray<int> m_SourceIndexBySortedSourceIndex;
@@ -229,22 +229,17 @@ namespace Unity.Entities
 
             var segmentCount = (length + 1023) / 1024;
             var copyIndexedValues = new NativeArray<IndexedInt>(length, Allocator.TempJob);
-            var copyIndexedValuesJob = new CopyIndexedInt
-            {
-                Src = m_SourceBuffer,
-                Dst = copyIndexedValues
-            };
+            var copyIndexedValuesJob = new CopyIndexedInt { Src = m_SourceBuffer, Dst = copyIndexedValues };
             var copyIndexValuesJobHandle = copyIndexedValuesJob.Schedule(length, 1024, inputDeps);
 
             int maxThreadCount = JobsUtility.ThreadIndexCount;
             var workerSegmentCount = segmentCount / maxThreadCount;
-            var segmentSortJob = new SegmentSortInt
-            {
-                Data = copyIndexedValues,
-                SegmentWidth = 1024
-            };
-            var segmentSortJobHandle =
-                segmentSortJob.Schedule(segmentCount, workerSegmentCount, copyIndexValuesJobHandle);
+            var segmentSortJob = new SegmentSortInt { Data = copyIndexedValues, SegmentWidth = 1024 };
+            var segmentSortJobHandle = segmentSortJob.Schedule(
+                segmentCount,
+                workerSegmentCount,
+                copyIndexValuesJobHandle
+            );
             var segmentSortMergeJob = new SegmentSortMergeInt
             {
                 IndexedSourceBuffer = copyIndexedValues,
@@ -252,7 +247,7 @@ namespace Unity.Entities
                 SortedSourceIndexBySharedIndex = m_SortedSourceIndexBySharedIndex,
                 SharedIndexCountsBySharedIndex = m_SharedIndexCountsBySharedIndex,
                 SharedIndicesBySourceIndex = m_SharedIndicesBySourceIndex,
-                SegmentWidth = 1024
+                SegmentWidth = 1024,
             };
             var segmentSortMergeJobHandle = segmentSortMergeJob.Schedule(segmentSortJobHandle);
 
@@ -347,9 +342,13 @@ namespace Unity.Entities
 
             // Capacity cannot be changed, so offset is valid.
             var rawIndices =
-                ((int*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(
-                    m_SourceIndexBySortedSourceIndex)) + sortedSourceIndex;
-            var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<int>(rawIndices, sharedValueIndexCount, Allocator.None);
+                ((int*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(m_SourceIndexBySortedSourceIndex))
+                + sortedSourceIndex;
+            var arr = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<int>(
+                rawIndices,
+                sharedValueIndexCount,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             SharedValueIndicesSetSafetyHandle(ref arr);
 #endif
@@ -360,10 +359,11 @@ namespace Unity.Entities
         private void SharedValueIndicesSetSafetyHandle(ref NativeArray<int> arr)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref arr,
-                NativeArrayUnsafeUtility.GetAtomicSafetyHandle(m_SourceIndexBySortedSourceIndex));
+            NativeArrayUnsafeUtility.SetAtomicSafetyHandle(
+                ref arr,
+                NativeArrayUnsafeUtility.GetAtomicSafetyHandle(m_SourceIndexBySortedSourceIndex)
+            );
 #endif
         }
-
     }
 }

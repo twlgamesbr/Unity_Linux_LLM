@@ -14,6 +14,7 @@ namespace UnityEngine.Rendering
         /// Index
         /// </summary>
         public readonly int index;
+
         /// <summary>
         /// Item
         /// </summary>
@@ -52,6 +53,7 @@ namespace UnityEngine.Rendering
         /// Added item event.
         /// </summary>
         public event ListChangedEventHandler<T> ItemAdded;
+
         /// <summary>
         /// Removed item event.
         /// </summary>

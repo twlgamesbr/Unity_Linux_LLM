@@ -1,23 +1,22 @@
 using System.Collections.Generic;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Character.Player
 {
     [DefaultExecutionOrder(-350)]
@@ -152,9 +151,7 @@ namespace NPCSystem.Character.Player
                         new Dictionary<string, object>
                         {
                             ["localClientId"] =
-                                NetworkManager.Singleton != null
-                                    ? NetworkManager.Singleton.LocalClientId
-                                    : 0ul,
+                                NetworkManager.Singleton != null ? NetworkManager.Singleton.LocalClientId : 0ul,
                             ["actionMap"] = ActionMapName,
                             ["moveAction"] = resolvedMoveAction,
                         }
@@ -177,10 +174,7 @@ namespace NPCSystem.Character.Player
 
                 DisableInput();
 #endif
-                LogAuthorityEvent(
-                    NPCFlowStatus.Success,
-                    "Spawned non-owner controller; local input disabled."
-                );
+                LogAuthorityEvent(NPCFlowStatus.Success, "Spawned non-owner controller; local input disabled.");
             }
         }
 
@@ -254,11 +248,7 @@ namespace NPCSystem.Character.Player
             }
         }
 
-        void LogAuthorityEvent(
-            NPCFlowStatus status,
-            string message,
-            Dictionary<string, object> data = null
-        )
+        void LogAuthorityEvent(NPCFlowStatus status, string message, Dictionary<string, object> data = null)
         {
             data ??= new Dictionary<string, object>();
             data["ownerClientId"] = OwnerClientId;
@@ -270,9 +260,7 @@ namespace NPCSystem.Character.Player
                 ?.Log(
                     NPCFlowStage.OwnershipAuthority,
                     status,
-                    status == NPCFlowStatus.Warning
-                        ? NPCFlowLogLevel.Warning
-                        : NPCFlowLogLevel.Info,
+                    status == NPCFlowStatus.Warning ? NPCFlowLogLevel.Warning : NPCFlowLogLevel.Info,
                     message,
                     source: nameof(NPCNetworkPlayerController),
                     data: data
@@ -334,9 +322,7 @@ namespace NPCSystem.Character.Player
         void ReadInput()
         {
             _moveInput =
-                _moveAction != null
-                    ? Vector2.ClampMagnitude(_moveAction.ReadValue<Vector2>(), 1f)
-                    : Vector2.zero;
+                _moveAction != null ? Vector2.ClampMagnitude(_moveAction.ReadValue<Vector2>(), 1f) : Vector2.zero;
             _lookInput = _lookAction != null ? _lookAction.ReadValue<Vector2>() : Vector2.zero;
 
             if (AllowKeyboardFallback && _moveInput.sqrMagnitude < 0.0001f)
@@ -392,10 +378,7 @@ namespace NPCSystem.Character.Player
                 || (
                     AllowKeyboardFallback
                     && Keyboard.current != null
-                    && (
-                        Keyboard.current.leftShiftKey.isPressed
-                        || Keyboard.current.rightShiftKey.isPressed
-                    )
+                    && (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed)
                 );
 #else
             bool sprinting = false;
@@ -408,9 +391,7 @@ namespace NPCSystem.Character.Player
             {
                 Vector3 cameraForward = CameraPlanarForward();
                 Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraForward).normalized;
-                Vector3 worldMove = (
-                    cameraForward * planarMove.z + cameraRight * planarMove.x
-                ).normalized;
+                Vector3 worldMove = (cameraForward * planarMove.z + cameraRight * planarMove.x).normalized;
                 Quaternion targetRotation = Quaternion.LookRotation(worldMove, Vector3.up);
                 transform.rotation = Quaternion.RotateTowards(
                     transform.rotation,
@@ -454,11 +435,7 @@ namespace NPCSystem.Character.Player
             Quaternion cameraYaw = Quaternion.Euler(0f, _yaw, 0f);
             Vector3 targetPosition = cameraFollowTarget.position + cameraYaw * cameraOffset;
             float t = 1f - Mathf.Exp(-CameraFollowSharpness * deltaTime);
-            _mainCamera.transform.position = Vector3.Lerp(
-                _mainCamera.transform.position,
-                targetPosition,
-                t
-            );
+            _mainCamera.transform.position = Vector3.Lerp(_mainCamera.transform.position, targetPosition, t);
             _mainCamera.transform.LookAt(cameraFollowTarget.position + Vector3.up * 1.25f);
         }
 

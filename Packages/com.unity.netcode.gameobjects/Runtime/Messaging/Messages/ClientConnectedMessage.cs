@@ -8,7 +8,6 @@ namespace Unity.Netcode
 
         public bool ShouldSynchronize;
 
-
         public void Serialize(FastBufferWriter writer, int targetVersion)
         {
             BytePacker.WriteValueBitPacked(writer, ClientId);
@@ -31,7 +30,13 @@ namespace Unity.Netcode
         public void Handle(ref NetworkContext context)
         {
             var networkManager = (NetworkManager)context.SystemOwner;
-            if (ShouldSynchronize && networkManager.NetworkConfig.EnableSceneManagement && networkManager.DistributedAuthorityMode && !networkManager.CMBServiceConnection && networkManager.LocalClient.IsSessionOwner)
+            if (
+                ShouldSynchronize
+                && networkManager.NetworkConfig.EnableSceneManagement
+                && networkManager.DistributedAuthorityMode
+                && !networkManager.CMBServiceConnection
+                && networkManager.LocalClient.IsSessionOwner
+            )
             {
                 networkManager.SceneManager.SynchronizeNetworkObjects(ClientId);
             }
@@ -50,7 +55,11 @@ namespace Unity.Netcode
             }
 
             // This handles object redistribution when scene management is disabled
-            if (networkManager.DistributedAuthorityMode && networkManager.CMBServiceConnection && !networkManager.NetworkConfig.EnableSceneManagement)
+            if (
+                networkManager.DistributedAuthorityMode
+                && networkManager.CMBServiceConnection
+                && !networkManager.NetworkConfig.EnableSceneManagement
+            )
             {
                 // Don't redistribute for the local instance
                 if (ClientId != networkManager.LocalClientId)

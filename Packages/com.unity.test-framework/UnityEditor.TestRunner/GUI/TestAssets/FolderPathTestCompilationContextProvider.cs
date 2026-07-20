@@ -13,7 +13,9 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
 
         internal static ICustomScriptAssemblyMappingFinder CustomScriptAssemblyMappingFinder
         {
-            private get => s_CustomScriptAssemblyMappingFinder ?? (s_CustomScriptAssemblyMappingFinder = new CustomScriptAssemblyMappingFinder());
+            private get =>
+                s_CustomScriptAssemblyMappingFinder
+                ?? (s_CustomScriptAssemblyMappingFinder = new CustomScriptAssemblyMappingFinder());
             set => s_CustomScriptAssemblyMappingFinder = value;
         }
 
@@ -31,9 +33,11 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
                 throw new ArgumentNullException(nameof(folderPath));
             }
 
-            var customScriptAssembly = CustomScriptAssemblyMappingFinder.FindCustomScriptAssemblyFromFolderPath(folderPath);
-            var assemblyIsCustomTestAssembly = customScriptAssembly != null
-                && customScriptAssembly.HasPrecompiledReference(nUnitLibraryFilename);
+            var customScriptAssembly = CustomScriptAssemblyMappingFinder.FindCustomScriptAssemblyFromFolderPath(
+                folderPath
+            );
+            var assemblyIsCustomTestAssembly =
+                customScriptAssembly != null && customScriptAssembly.HasPrecompiledReference(nUnitLibraryFilename);
             return assemblyIsCustomTestAssembly;
         }
 
@@ -58,10 +62,13 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
                 return true;
             }
 
-            var customScriptAssembly = CustomScriptAssemblyMappingFinder.FindCustomScriptAssemblyFromFolderPath(folderPath);
+            var customScriptAssembly = CustomScriptAssemblyMappingFinder.FindCustomScriptAssemblyFromFolderPath(
+                folderPath
+            );
             if (customScriptAssembly != null)
             {
-                var assemblyCanCompileTestScripts = customScriptAssembly.HasPrecompiledReference(nUnitLibraryFilename)
+                var assemblyCanCompileTestScripts =
+                    customScriptAssembly.HasPrecompiledReference(nUnitLibraryFilename)
                     || customScriptAssembly.HasAssemblyFlag(AssemblyFlags.EditorOnly);
                 return assemblyCanCompileTestScripts;
             }

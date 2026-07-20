@@ -8,9 +8,7 @@ namespace Unity.Entities
 {
     /// <summary> Obsolete. Use <see cref="ComponentTypeSet"/> instead.</summary>
     [Obsolete("ComponentTypes has been renamed to ComponentTypeSet. (UnityUpgradable) -> ComponentTypeSet", true)]
-    public struct ComponentTypes
-    {
-    }
+    public struct ComponentTypes { }
 
     /// <summary>
     /// An immutable set of <see cref="ComponentType"/> values.
@@ -29,6 +27,7 @@ namespace Unity.Entities
     public readonly unsafe struct ComponentTypeSet
     {
         readonly FixedList64Bytes<TypeIndex> _sorted;
+
         internal readonly struct Masks
         {
             public readonly UInt16 BufferMask;
@@ -263,7 +262,8 @@ namespace Unity.Entities
                 if (Hint.Unlikely(prev == current))
                 {
                     throw new ArgumentException(
-                        $"ComponentTypes cannot contain duplicate types. Remove all but one occurrence of \"{GetComponentType(i).ToString()}\"");
+                        $"ComponentTypes cannot contain duplicate types. Remove all but one occurrence of \"{GetComponentType(i).ToString()}\""
+                    );
                 }
                 prev = current;
             }

@@ -82,8 +82,7 @@ namespace UnityEditor.Rendering
         {
             using var writer = new StringWriter();
             var targetComponentsInOrder = new List<VolumeComponent>(targetComponents);
-            targetComponentsInOrder.Sort(
-                (l, r) => string.CompareOrdinal(GetTypeName(l), GetTypeName(r)));
+            targetComponentsInOrder.Sort((l, r) => string.CompareOrdinal(GetTypeName(l), GetTypeName(r)));
             foreach (var targetComponent in targetComponentsInOrder)
             {
                 WriteCopyBuffer(writer, targetComponent);

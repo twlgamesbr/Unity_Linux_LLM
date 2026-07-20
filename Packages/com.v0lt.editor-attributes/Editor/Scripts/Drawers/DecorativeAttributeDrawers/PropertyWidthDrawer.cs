@@ -13,13 +13,15 @@ namespace EditorAttributes.Editor
 
             PropertyField propertyField = CreatePropertyField(property);
 
-            propertyField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var fieldLabel = propertyField.Q<Label>();
+            propertyField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    var fieldLabel = propertyField.Q<Label>();
 
-                if (fieldLabel != null)
-                    fieldLabel.style.marginRight = propertyWidthAttribute.WidthOffset;
-            });
+                    if (fieldLabel != null)
+                        fieldLabel.style.marginRight = propertyWidthAttribute.WidthOffset;
+                }
+            );
 
             return propertyField;
         }

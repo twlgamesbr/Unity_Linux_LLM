@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Unity.Profiling;
 using UnityEditor;
-using System.Reflection;
-
 #if UNITY_EDITOR
 using Unity.Entities.Build;
 #endif
@@ -21,8 +20,8 @@ namespace Unity.Entities
     /// </summary>
     internal struct BakerDataUtility
     {
-        static Dictionary<TypeIndex, BakerData[]>             _IndexToBakerInstances;
-        internal static Dictionary<Assembly, AssemblyData>    _BakersByAssembly;
+        static Dictionary<TypeIndex, BakerData[]> _IndexToBakerInstances;
+        internal static Dictionary<Assembly, AssemblyData> _BakersByAssembly;
 
         static string unityAssembly = "Unity.";
         static string unityEngineAssembly = "UnityEngine.";
@@ -32,9 +31,10 @@ namespace Unity.Entities
 
         public struct BakerData
         {
-            public ProfilerMarker   Profiler;
-            public IBaker           Baker;
-            public AssemblyData     AssemblyData;
+            public ProfilerMarker Profiler;
+            public IBaker Baker;
+            public AssemblyData AssemblyData;
+
             /// <summary>
             /// The number of authoring components compatible with this baker.
             /// </summary>
@@ -46,8 +46,8 @@ namespace Unity.Entities
             /// Unity guarantees this order by sorting the bakers based on the number of components handled by each baker,
             /// with bakers handling more components (hence handling base types) being evaluated first.
             /// </remarks>
-            public int              CompatibleComponentCount;
-            public bool             ForceBakingForDisabledComponents;
+            public int CompatibleComponentCount;
+            public bool ForceBakingForDisabledComponents;
         }
 
 #if UNITY_EDITOR
@@ -71,7 +71,10 @@ namespace Unity.Entities
         //Method used by EntityBehaviour in motion
         internal static int GetBakerIndexInArray(TypeIndex authoringTypeIndex, Type bakerType)
         {
-            if (_IndexToBakerInstances == null || !_IndexToBakerInstances.TryGetValue(authoringTypeIndex, out var bakerData))
+            if (
+                _IndexToBakerInstances == null
+                || !_IndexToBakerInstances.TryGetValue(authoringTypeIndex, out var bakerData)
+            )
                 return 0;
             for (int i = 0; i < bakerData.Length; i++)
             {
@@ -132,7 +135,7 @@ namespace Unity.Entities
 
         static void AddBaker(Type type)
         {
-            var baker = (IBaker) Activator.CreateInstance(type);
+            var baker = (IBaker)Activator.CreateInstance(type);
             var authoringType = baker.GetAuthoringType();
             int compatibleComponentCount = 1;
 
@@ -165,7 +168,7 @@ namespace Unity.Entities
                     {
                         compatibleComponentCount++;
                         var typeIndex = TypeManager.GetTypeIndex(compatibleType);
-                        list.Add((type, (IBaker) Activator.CreateInstance(type), typeIndex));
+                        list.Add((type, (IBaker)Activator.CreateInstance(type), typeIndex));
                     }
                 }
                 foreach (var t in list)
@@ -196,7 +199,8 @@ namespace Unity.Entities
             {
                 assemblyData = new AssemblyData();
                 assemblyData.Enabled = true;
-                assemblyData.IsUnityAssembly = type.Assembly.GetName().Name.StartsWith(unityAssembly)
+                assemblyData.IsUnityAssembly =
+                    type.Assembly.GetName().Name.StartsWith(unityAssembly)
                     || type.Assembly.GetName().Name.StartsWith(unityEngineAssembly);
                 _BakersByAssembly.Add(type.Assembly, assemblyData);
             }
@@ -207,7 +211,7 @@ namespace Unity.Entities
                 Profiler = new ProfilerMarker(baker.GetType().Name),
                 AssemblyData = assemblyData,
                 CompatibleComponentCount = compatibleComponentCount,
-                ForceBakingForDisabledComponents = type.IsDefined(typeof(ForceBakingOnDisabledComponentsAttribute))
+                ForceBakingForDisabledComponents = type.IsDefined(typeof(ForceBakingOnDisabledComponentsAttribute)),
             };
 
             _IndexToBakerInstances[typeIndex] = bakers;
@@ -219,7 +223,7 @@ namespace Unity.Entities
         /// </summary>
         internal struct OverrideBakers : IDisposable
         {
-            Dictionary<TypeIndex, BakerData[]>     OldBakers;
+            Dictionary<TypeIndex, BakerData[]> OldBakers;
 
             public OverrideBakers(bool replaceExistingBakers, params Type[] bakerTypes)
             {

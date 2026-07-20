@@ -232,8 +232,9 @@ namespace UnityEngine.InputSystem.Layouts
             // If it's a string, check whether it's a regex.
             if (supportRegex && value is string str)
             {
-                var mayBeRegex = !str.All(ch => char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch)) &&
-                    !double.TryParse(str, out var _);              // Avoid '.' in floats forcing the value to be a regex.
+                var mayBeRegex =
+                    !str.All(ch => char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch))
+                    && !double.TryParse(str, out var _); // Avoid '.' in floats forcing the value to be a regex.
                 if (mayBeRegex)
                     value = new Regex(str, RegexOptions.IgnoreCase);
             }
@@ -304,38 +305,50 @@ namespace UnityEngine.InputSystem.Layouts
 
                 if (key == kInterfaceKey)
                 {
-                    if (string.IsNullOrEmpty(deviceDescription.interfaceName)
-                        || !MatchSingleProperty(pattern, deviceDescription.interfaceName))
+                    if (
+                        string.IsNullOrEmpty(deviceDescription.interfaceName)
+                        || !MatchSingleProperty(pattern, deviceDescription.interfaceName)
+                    )
                         return 0;
                 }
                 else if (key == kDeviceClassKey)
                 {
-                    if (string.IsNullOrEmpty(deviceDescription.deviceClass)
-                        || !MatchSingleProperty(pattern, deviceDescription.deviceClass))
+                    if (
+                        string.IsNullOrEmpty(deviceDescription.deviceClass)
+                        || !MatchSingleProperty(pattern, deviceDescription.deviceClass)
+                    )
                         return 0;
                 }
                 else if (key == kManufacturerKey)
                 {
-                    if (string.IsNullOrEmpty(deviceDescription.manufacturer)
-                        || !MatchSingleProperty(pattern, deviceDescription.manufacturer))
+                    if (
+                        string.IsNullOrEmpty(deviceDescription.manufacturer)
+                        || !MatchSingleProperty(pattern, deviceDescription.manufacturer)
+                    )
                         return 0;
                 }
                 else if (key == kManufacturerContainsKey)
                 {
-                    if (string.IsNullOrEmpty(deviceDescription.manufacturer)
-                        || !MatchSinglePropertyContains(pattern, deviceDescription.manufacturer))
+                    if (
+                        string.IsNullOrEmpty(deviceDescription.manufacturer)
+                        || !MatchSinglePropertyContains(pattern, deviceDescription.manufacturer)
+                    )
                         return 0;
                 }
                 else if (key == kProductKey)
                 {
-                    if (string.IsNullOrEmpty(deviceDescription.product)
-                        || !MatchSingleProperty(pattern, deviceDescription.product))
+                    if (
+                        string.IsNullOrEmpty(deviceDescription.product)
+                        || !MatchSingleProperty(pattern, deviceDescription.product)
+                    )
                         return 0;
                 }
                 else if (key == kVersionKey)
                 {
-                    if (string.IsNullOrEmpty(deviceDescription.version)
-                        || !MatchSingleProperty(pattern, deviceDescription.version))
+                    if (
+                        string.IsNullOrEmpty(deviceDescription.version)
+                        || !MatchSingleProperty(pattern, deviceDescription.version)
+                    )
                         return 0;
                 }
                 else
@@ -347,8 +360,12 @@ namespace UnityEngine.InputSystem.Layouts
                         return 0;
 
                     var graph = new JsonParser(deviceDescription.capabilities);
-                    if (!graph.NavigateToProperty(key.ToString()) ||
-                        !graph.CurrentPropertyHasValueEqualTo(new JsonParser.JsonValue { type = JsonParser.JsonValueType.Any, anyValue = pattern}))
+                    if (
+                        !graph.NavigateToProperty(key.ToString())
+                        || !graph.CurrentPropertyHasValueEqualTo(
+                            new JsonParser.JsonValue { type = JsonParser.JsonValueType.Any, anyValue = pattern }
+                        )
+                    )
                         return 0;
                 }
             }
@@ -460,7 +477,12 @@ namespace UnityEngine.InputSystem.Layouts
         /// same pattern occurs in each of the matchers. Order of the patterns does not
         /// matter.
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "False positive.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1062:Validate arguments of public methods",
+            MessageId = "0",
+            Justification = "False positive."
+        )]
         public bool Equals(InputDeviceMatcher other)
         {
             if (m_Patterns == other.m_Patterns)
@@ -515,7 +537,7 @@ namespace UnityEngine.InputSystem.Layouts
         /// <param name="right">Second device matcher.</param>
         /// <returns>True if the two matchers are equivalent.</returns>
         /// <seealso cref="Equals(InputDeviceMatcher)"/>
-        public static bool operator==(InputDeviceMatcher left, InputDeviceMatcher right)
+        public static bool operator ==(InputDeviceMatcher left, InputDeviceMatcher right)
         {
             return left.Equals(right);
         }
@@ -527,7 +549,7 @@ namespace UnityEngine.InputSystem.Layouts
         /// <param name="right">Second device matcher.</param>
         /// <returns>True if the two matchers are not equivalent.</returns>
         /// <seealso cref="Equals(InputDeviceMatcher)"/>
-        public static bool operator!=(InputDeviceMatcher left, InputDeviceMatcher right)
+        public static bool operator !=(InputDeviceMatcher left, InputDeviceMatcher right)
         {
             return !(left == right);
         }
@@ -618,7 +640,7 @@ namespace UnityEngine.InputSystem.Layouts
                     }
                     else
                     {
-                        ArrayHelpers.Append(ref json.capabilities, new Capability {path = key, value = value});
+                        ArrayHelpers.Append(ref json.capabilities, new Capability { path = key, value = value });
                     }
                 }
 

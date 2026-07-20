@@ -11,20 +11,20 @@ namespace UnityEngine.Rendering
         /// Calibration constant (K) used for our virtual reflected light meter. Modifying this will lead to a change on how average scene luminance
         /// gets mapped to exposure.
         /// </summary>
-        static public float s_LightMeterCalibrationConstant = 12.5f;
+        public static float s_LightMeterCalibrationConstant = 12.5f;
 
         /// <summary>
         /// Factor used for our lens system w.r.t. exposure calculation. Modifying this will lead to a change on how linear exposure
         /// multipliers are computed from EV100 values (and viceversa). s_LensAttenuation models transmission attenuation and lens vignetting.
         /// Note that according to the standard ISO 12232, a lens saturates at s_LensAttenuation = 0.78f (under ISO 100).
         /// </summary>
-        static public float s_LensAttenuation = 0.65f;
+        public static float s_LensAttenuation = 0.65f;
 
         /// <summary>
         /// Scale applied to exposure caused by lens imperfection. It is computed from s_LensAttenuation as follow:
         ///  (78 / ( S * q )) where S = 100 and q = s_LensAttenuation
         /// </summary>
-        static public float lensImperfectionExposureScale
+        public static float lensImperfectionExposureScale
         {
             get => (78.0f / (100.0f * s_LensAttenuation));
         }
@@ -88,7 +88,11 @@ namespace UnityEngine.Rendering
         /// <param name="inMidtones">A color used for midtones.</param>
         /// <param name="inHighlights">A color used for highlights.</param>
         /// <returns>The three input colors pre-filtered for shader use.</returns>
-        public static (Vector4, Vector4, Vector4) PrepareShadowsMidtonesHighlights(in Vector4 inShadows, in Vector4 inMidtones, in Vector4 inHighlights)
+        public static (Vector4, Vector4, Vector4) PrepareShadowsMidtonesHighlights(
+            in Vector4 inShadows,
+            in Vector4 inMidtones,
+            in Vector4 inHighlights
+        )
         {
             float weight;
 
@@ -132,7 +136,11 @@ namespace UnityEngine.Rendering
         /// <param name="inGamma">A color used for gamma.</param>
         /// <param name="inGain">A color used for gain.</param>
         /// <returns>The three input colors pre-filtered for shader use.</returns>
-        public static (Vector4, Vector4, Vector4) PrepareLiftGammaGain(in Vector4 inLift, in Vector4 inGamma, in Vector4 inGain)
+        public static (Vector4, Vector4, Vector4) PrepareLiftGammaGain(
+            in Vector4 inLift,
+            in Vector4 inGamma,
+            in Vector4 inGain
+        )
         {
             var lift = inLift;
             lift.x = Mathf.GammaToLinearSpace(lift.x) * 0.15f;
@@ -179,7 +187,11 @@ namespace UnityEngine.Rendering
         /// <param name="inHighlights">A color used for highlights.</param>
         /// <param name="balance">The balance between the shadow and highlight colors, in range [-100;100].</param>
         /// <returns>The two input colors pre-filtered for shader use.</returns>
-        public static (Vector4, Vector4) PrepareSplitToning(in Vector4 inShadows, in Vector4 inHighlights, float balance)
+        public static (Vector4, Vector4) PrepareSplitToning(
+            in Vector4 inShadows,
+            in Vector4 inHighlights,
+            float balance
+        )
         {
             // As counter-intuitive as it is, to make split-toning work the same way it does in
             // Adobe products we have to do all the maths in sRGB... So do not convert these to
@@ -200,7 +212,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <param name="color">The color to compute the luminance for.</param>
         /// <returns>A luminance value.</returns>
-        public static float Luminance(in Color color) => color.r * 0.2126729f + color.g * 0.7151522f + color.b * 0.072175f;
+        public static float Luminance(in Color color) =>
+            color.r * 0.2126729f + color.g * 0.7151522f + color.b * 0.072175f;
 
         /// <summary>
         /// Computes an exposure value (EV100) from physical camera settings.
@@ -284,20 +297,28 @@ namespace UnityEngine.Rendering
         /// <param name="shutterSpeed">The camera exposure time.</param>
         /// <param name="targetEV100">The target exposure value (EV100) to reach.</param>
         /// <returns>The required sensor sensitivity (ISO).</returns>
-        public static float ComputeISO(float aperture, float shutterSpeed, float targetEV100) => ((aperture * aperture) * 100f) / (shutterSpeed * Mathf.Pow(2f, targetEV100));
+        public static float ComputeISO(float aperture, float shutterSpeed, float targetEV100) =>
+            ((aperture * aperture) * 100f) / (shutterSpeed * Mathf.Pow(2f, targetEV100));
 
         /// <summary>
         /// Converts a color value to its 32-bit hexadecimal representation.
         /// </summary>
         /// <param name="c">The color to convert.</param>
         /// <returns>A 32-bit hexadecimal representation of the color.</returns>
-        public static uint ToHex(Color c) => ((uint)(c.a * 255) << 24) | ((uint)(c.r * 255) << 16) | ((uint)(c.g * 255) << 8) | (uint)(c.b * 255);
+        public static uint ToHex(Color c) =>
+            ((uint)(c.a * 255) << 24) | ((uint)(c.r * 255) << 16) | ((uint)(c.g * 255) << 8) | (uint)(c.b * 255);
 
         /// <summary>
         /// Converts a 32-bit hexadecimal value to a color value.
         /// </summary>
         /// <param name="hex">A 32-bit hexadecimal value.</param>
         /// <returns>A color value.</returns>
-        public static Color ToRGBA(uint hex) => new Color(((hex >> 16) & 0xff) / 255f, ((hex >> 8) & 0xff) / 255f, (hex & 0xff) / 255f, ((hex >> 24) & 0xff) / 255f);
+        public static Color ToRGBA(uint hex) =>
+            new Color(
+                ((hex >> 16) & 0xff) / 255f,
+                ((hex >> 8) & 0xff) / 255f,
+                (hex & 0xff) / 255f,
+                ((hex >> 24) & 0xff) / 255f
+            );
     }
 }

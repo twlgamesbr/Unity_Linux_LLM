@@ -25,7 +25,12 @@ namespace Unity.DebugDisplay
                     return default;
                 var found = Interlocked.CompareExchange(ref m_Next, end, begin);
                 if (found == begin)
-                    return new Unit { m_Begin = begin, m_Next = begin, m_End = end };
+                    return new Unit
+                    {
+                        m_Begin = begin,
+                        m_Next = begin,
+                        m_End = end,
+                    };
                 begin = found;
             }
         }

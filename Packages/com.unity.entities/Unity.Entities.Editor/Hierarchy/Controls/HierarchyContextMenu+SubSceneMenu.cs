@@ -13,18 +13,25 @@ namespace Unity.Entities.Editor
             // Not copy or duplicate, since multiple of the same Sub Scene is not supported anyway.
 
             menu.AppendAction(L10n.Tr("Cut"), _ => ClipboardUtilityBridge.CutGameObject());
-            menu.AppendAction(L10n.Tr("Paste"), _ => ClipboardUtilityBridge.PasteGameObject(null), // TODO: Use custom parent when in prefab stage
-                              ClipboardUtilityBridge.CanGameObjectsBePasted() || ClipboardUtilityBridge.CanPasteGameObjectsFromPasteboard()
-                                  ? DropdownMenuAction.Status.Normal
-                                  : DropdownMenuAction.Status.Disabled);
-            menu.AppendAction(L10n.Tr("Paste As Child"), _ => ClipboardUtilityBridge.PasteGameObjectAsChild(),
-                              ClipboardUtilityBridge.CanPasteAsChild()
-                                  ? DropdownMenuAction.Status.Normal
-                                  : DropdownMenuAction.Status.Disabled);
+            menu.AppendAction(
+                L10n.Tr("Paste"),
+                _ => ClipboardUtilityBridge.PasteGameObject(null), // TODO: Use custom parent when in prefab stage
+                ClipboardUtilityBridge.CanGameObjectsBePasted()
+                || ClipboardUtilityBridge.CanPasteGameObjectsFromPasteboard()
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled
+            );
+            menu.AppendAction(
+                L10n.Tr("Paste As Child"),
+                _ => ClipboardUtilityBridge.PasteGameObjectAsChild(),
+                ClipboardUtilityBridge.CanPasteAsChild()
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled
+            );
 
             menu.AppendSeparator();
 
-            menu.AppendAction(L10n.Tr("Delete"), _=> Object.DestroyImmediate(Selection.activeGameObject));
+            menu.AppendAction(L10n.Tr("Delete"), _ => Object.DestroyImmediate(Selection.activeGameObject));
         }
     }
 }

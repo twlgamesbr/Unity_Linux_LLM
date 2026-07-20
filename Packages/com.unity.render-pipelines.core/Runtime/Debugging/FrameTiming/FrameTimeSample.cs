@@ -81,16 +81,28 @@ namespace UnityEngine.Rendering
 
         internal void ComputeAggregateValues()
         {
-            void ForEachSampleMember(ref FrameTimeSample aggregate, FrameTimeSample sample, Func<float, float, float> func)
+            void ForEachSampleMember(
+                ref FrameTimeSample aggregate,
+                FrameTimeSample sample,
+                Func<float, float, float> func
+            )
             {
                 aggregate.FramesPerSecond = func(aggregate.FramesPerSecond, sample.FramesPerSecond);
                 aggregate.FullFrameTime = func(aggregate.FullFrameTime, sample.FullFrameTime);
-                aggregate.MainThreadCPUFrameTime = func(aggregate.MainThreadCPUFrameTime, sample.MainThreadCPUFrameTime);
-                aggregate.MainThreadCPUPresentWaitTime = func(aggregate.MainThreadCPUPresentWaitTime, sample.MainThreadCPUPresentWaitTime);
-                aggregate.RenderThreadCPUFrameTime = func(aggregate.RenderThreadCPUFrameTime, sample.RenderThreadCPUFrameTime);
+                aggregate.MainThreadCPUFrameTime = func(
+                    aggregate.MainThreadCPUFrameTime,
+                    sample.MainThreadCPUFrameTime
+                );
+                aggregate.MainThreadCPUPresentWaitTime = func(
+                    aggregate.MainThreadCPUPresentWaitTime,
+                    sample.MainThreadCPUPresentWaitTime
+                );
+                aggregate.RenderThreadCPUFrameTime = func(
+                    aggregate.RenderThreadCPUFrameTime,
+                    sample.RenderThreadCPUFrameTime
+                );
                 aggregate.GPUFrameTime = func(aggregate.GPUFrameTime, sample.GPUFrameTime);
             }
-
             ;
 
             FrameTimeSample average = new();

@@ -7,6 +7,7 @@ namespace Unity.Multiplayer.Tools.Adapters
         AdapterMetadata Metadata { get; }
 
         [CanBeNull]
-        T GetComponent<T>() where T : class, IAdapterComponent;
+        T GetComponent<T>()
+            where T : class, IAdapterComponent;
     }
 }

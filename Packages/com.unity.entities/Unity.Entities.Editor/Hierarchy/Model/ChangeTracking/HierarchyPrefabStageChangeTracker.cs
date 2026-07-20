@@ -69,7 +69,9 @@ namespace Unity.Entities.Editor
 
             if (null != stage)
             {
-                var root = stage.prefabContentsRoot.transform.parent ? stage.prefabContentsRoot.transform.parent.gameObject : stage.prefabContentsRoot;
+                var root = stage.prefabContentsRoot.transform.parent
+                    ? stage.prefabContentsRoot.transform.parent.gameObject
+                    : stage.prefabContentsRoot;
                 GatherChangesRecursive(root, events, m_Existing);
             }
 
@@ -92,7 +94,11 @@ namespace Unity.Entities.Editor
             }
         }
 
-        void GatherChangesRecursive(GameObject obj, NativeList<GameObjectChangeTrackerEvent> events, NativeParallelHashSet<EntityId> existing)
+        void GatherChangesRecursive(
+            GameObject obj,
+            NativeList<GameObjectChangeTrackerEvent> events,
+            NativeParallelHashSet<EntityId> existing
+        )
         {
             var entityId = obj.GetEntityId();
 
@@ -100,7 +106,9 @@ namespace Unity.Entities.Editor
 
             if (!m_EntityId.Contains(entityId))
             {
-                events.Add(new GameObjectChangeTrackerEvent(entityId, GameObjectChangeTrackerEventType.CreatedOrChanged));
+                events.Add(
+                    new GameObjectChangeTrackerEvent(entityId, GameObjectChangeTrackerEventType.CreatedOrChanged)
+                );
                 m_EntityId.Add(entityId);
             }
 
@@ -110,7 +118,9 @@ namespace Unity.Entities.Editor
             {
                 if (currentParentId != parentId)
                 {
-                    events.Add(new GameObjectChangeTrackerEvent(entityId, GameObjectChangeTrackerEventType.ChangedParent));
+                    events.Add(
+                        new GameObjectChangeTrackerEvent(entityId, GameObjectChangeTrackerEventType.ChangedParent)
+                    );
                     m_Parents[entityId] = parentId;
                 }
             }

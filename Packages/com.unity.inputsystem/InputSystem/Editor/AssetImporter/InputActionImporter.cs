@@ -26,10 +26,17 @@ namespace UnityEngine.InputSystem.Editor
     {
         private const int kVersion = 14;
 
-        [SerializeField] private bool m_GenerateWrapperCode;
-        [SerializeField] private string m_WrapperCodePath;
-        [SerializeField] private string m_WrapperClassName;
-        [SerializeField] private string m_WrapperCodeNamespace;
+        [SerializeField]
+        private bool m_GenerateWrapperCode;
+
+        [SerializeField]
+        private string m_WrapperCodePath;
+
+        [SerializeField]
+        private string m_WrapperClassName;
+
+        [SerializeField]
+        private string m_WrapperCodeNamespace;
 
         private static InlinedArray<Action> s_OnImportCallbacks;
 
@@ -69,7 +76,8 @@ namespace UnityEngine.InputSystem.Editor
                     if (!names.Add(map.name))
                     {
                         throw new Exception(
-                            "Unable to parse {context.assetPath} due to duplicate Action Map name: '{map.name}'. Make sure Action Map names are unique within the asset and reattempt import.");
+                            "Unable to parse {context.assetPath} due to duplicate Action Map name: '{map.name}'. Make sure Action Map names are unique within the asset and reattempt import."
+                        );
                     }
                 }
 
@@ -82,7 +90,8 @@ namespace UnityEngine.InputSystem.Editor
                         if (!names.Add(action.name))
                         {
                             throw new Exception(
-                                $"Unable to parse {{context.assetPath}} due to duplicate Action name: '{action.name}' within Action Map '{map.name}'. Make sure Action Map names are unique within the asset and reattempt import.");
+                                $"Unable to parse {{context.assetPath}} due to duplicate Action name: '{action.name}' within Action Map '{map.name}'. Make sure Action Map names are unique within the asset and reattempt import."
+                            );
                         }
                     }
 
@@ -104,7 +113,9 @@ namespace UnityEngine.InputSystem.Editor
             }
             catch (Exception exception)
             {
-                context.LogImportError($"Could not parse input actions in JSON format from '{context.assetPath}' ({exception})");
+                context.LogImportError(
+                    $"Could not parse input actions in JSON format from '{context.assetPath}' ({exception})"
+                );
                 DestroyImmediate(asset);
                 asset = null;
             }
@@ -128,14 +139,14 @@ namespace UnityEngine.InputSystem.Editor
             {
                 ctx.LogImportError(
                     $"{asset.name}: An action map in an .inputactions asset cannot be named the same as the asset itself if 'Generate C# Class' is used. "
-                    + "You can rename the action map in the asset, rename the asset itself or assign a different C# class name in the import settings.");
+                        + "You can rename the action map in the asset, rename the asset itself or assign a different C# class name in the import settings."
+                );
             }
         }
 
         internal static void SetupAsset(InputActionAsset asset)
         {
-            SetupAsset(asset, (identifier, subAsset, icon) =>
-                AssetDatabase.AddObjectToAsset(subAsset, asset));
+            SetupAsset(asset, (identifier, subAsset, icon) => AssetDatabase.AddObjectToAsset(subAsset, asset));
         }
 
         private delegate void AddObjectToAsset(string identifier, Object subAsset, Texture2D icon);
@@ -159,7 +170,10 @@ namespace UnityEngine.InputSystem.Editor
                 foreach (var action in map.actions)
                 {
                     var actionId = action.m_Id;
-                    if (string.IsNullOrEmpty(actionId) || asset.actionMaps.Sum(m => m.actions.Count(a => a.m_Id == actionId)) > 1)
+                    if (
+                        string.IsNullOrEmpty(actionId)
+                        || asset.actionMaps.Sum(m => m.actions.Count(a => a.m_Id == actionId)) > 1
+                    )
                         action.GenerateId();
                 }
 
@@ -167,7 +181,10 @@ namespace UnityEngine.InputSystem.Editor
                 for (var i = 0; i < map.m_Bindings.LengthSafe(); ++i)
                 {
                     var bindingId = map.m_Bindings[i].m_Id;
-                    if (string.IsNullOrEmpty(bindingId) || asset.actionMaps.Sum(m => m.bindings.Count(b => b.m_Id == bindingId)) > 1)
+                    if (
+                        string.IsNullOrEmpty(bindingId)
+                        || asset.actionMaps.Sum(m => m.bindings.Count(b => b.m_Id == bindingId)) > 1
+                    )
                         map.m_Bindings[i].GenerateId();
                 }
             }
@@ -209,13 +226,24 @@ namespace UnityEngine.InputSystem.Editor
         {
             // When using code generation, it is an error for any action map to be named the same as the asset itself.
             // https://fogbugz.unity3d.com/f/cases/1212052/
-            var className = !string.IsNullOrEmpty(codeClassName) ? codeClassName : CSharpCodeHelpers.MakeTypeName(asset.name);
-            return (asset.actionMaps.Any(x =>
-                CSharpCodeHelpers.MakeTypeName(x.name) == className ||
-                CSharpCodeHelpers.MakeIdentifier(x.name) == className));
+            var className = !string.IsNullOrEmpty(codeClassName)
+                ? codeClassName
+                : CSharpCodeHelpers.MakeTypeName(asset.name);
+            return (
+                asset.actionMaps.Any(x =>
+                    CSharpCodeHelpers.MakeTypeName(x.name) == className
+                    || CSharpCodeHelpers.MakeIdentifier(x.name) == className
+                )
+            );
         }
 
-        private static void GenerateWrapperCode(string assetPath, InputActionAsset asset, string codeNamespace, string codeClassName, string codePath)
+        private static void GenerateWrapperCode(
+            string assetPath,
+            InputActionAsset asset,
+            string codeNamespace,
+            string codeClassName,
+            string codePath
+        )
         {
             if (HasMapWithSameNameAsAsset(asset, codeClassName))
                 return;
@@ -228,15 +256,21 @@ namespace UnityEngine.InputSystem.Editor
                 var fileName = Path.GetFileNameWithoutExtension(assetPath);
                 wrapperFilePath = Path.Combine(directory, fileName) + ".cs";
             }
-            else if (wrapperFilePath.StartsWith("./") || wrapperFilePath.StartsWith(".\\") ||
-                     wrapperFilePath.StartsWith("../") || wrapperFilePath.StartsWith("..\\"))
+            else if (
+                wrapperFilePath.StartsWith("./")
+                || wrapperFilePath.StartsWith(".\\")
+                || wrapperFilePath.StartsWith("../")
+                || wrapperFilePath.StartsWith("..\\")
+            )
             {
                 // User-specified file relative to location of .inputactions file.
                 var directory = Path.GetDirectoryName(assetPath);
                 wrapperFilePath = Path.Combine(directory, wrapperFilePath);
             }
-            else if (!wrapperFilePath.StartsWith("assets/", StringComparison.InvariantCultureIgnoreCase) &&
-                     !wrapperFilePath.StartsWith("assets\\", StringComparison.InvariantCultureIgnoreCase))
+            else if (
+                !wrapperFilePath.StartsWith("assets/", StringComparison.InvariantCultureIgnoreCase)
+                && !wrapperFilePath.StartsWith("assets\\", StringComparison.InvariantCultureIgnoreCase)
+            )
             {
                 // User-specified file in Assets/ folder.
                 wrapperFilePath = Path.Combine("Assets", wrapperFilePath);
@@ -254,7 +288,9 @@ namespace UnityEngine.InputSystem.Editor
                 var autoGeneratedMarker = "This code was auto-generated by com.unity.inputsystem";
                 if (!text.Contains(autoGeneratedMarker))
                 {
-                    throw new Exception($"The target file for Input Actions code generation already exists: {wrapperFilePath}. Since it doesn't look to contain Input generated code that we can safely overwrite, we stopped to prevent any data loss. Consider renaming. ");
+                    throw new Exception(
+                        $"The target file for Input Actions code generation already exists: {wrapperFilePath}. Since it doesn't look to contain Input generated code that we can safely overwrite, we stopped to prevent any data loss. Consider renaming. "
+                    );
                 }
             }
 
@@ -264,7 +300,6 @@ namespace UnityEngine.InputSystem.Editor
                 namespaceName = codeNamespace,
                 className = codeClassName,
             };
-
 
             if (InputActionCodeGenerator.GenerateWrapperCode(wrapperFilePath, asset, options))
             {
@@ -280,9 +315,11 @@ namespace UnityEngine.InputSystem.Editor
         {
             // Get all InputActionReferences are stored at the same asset path as InputActionAsset
             // Note we exclude 'hidden' action references (which are present to support one of the pre releases)
-            return AssetDatabase.LoadAllAssetsAtPath(assetPath).Where(
-                o => o is InputActionReference &&
-                !((InputActionReference)o).hideFlags.HasFlag(HideFlags.HideInHierarchy))
+            return AssetDatabase
+                .LoadAllAssetsAtPath(assetPath)
+                .Where(o =>
+                    o is InputActionReference && !((InputActionReference)o).hideFlags.HasFlag(HideFlags.HideInHierarchy)
+                )
                 .Cast<InputActionReference>();
         }
 
@@ -296,13 +333,17 @@ namespace UnityEngine.InputSystem.Editor
         /// <param name="skipProjectWide">If true, excludes project-wide input actions from the result.</param>
         /// <returns></returns>
         internal static IEnumerable<InputActionReference> LoadInputActionReferencesFromAssetDatabase(
-            string[] foldersPath = null, bool skipProjectWide = false)
+            string[] foldersPath = null,
+            bool skipProjectWide = false
+        )
         {
             // Get all InputActionReference from assets in "Asset" folder by default.
             // It does not search inside "Packages" folder.
-            const string inputActionReferenceFilter = "t:" +  nameof(InputActionReference);
-            var inputActionReferenceGUIDs = AssetDatabase.FindAssets(inputActionReferenceFilter,
-                foldersPath ?? s_DefaultAssetSearchFolders);
+            const string inputActionReferenceFilter = "t:" + nameof(InputActionReference);
+            var inputActionReferenceGUIDs = AssetDatabase.FindAssets(
+                inputActionReferenceFilter,
+                foldersPath ?? s_DefaultAssetSearchFolders
+            );
 
             // To find all the InputActionReferences, the GUID of the asset containing at least one action reference is
             // used to find the asset path. This is because InputActionReferences are stored in the asset database as sub-assets of InputActionAsset.
@@ -328,13 +369,19 @@ namespace UnityEngine.InputSystem.Editor
         [MenuItem("Assets/Create/Input Actions")]
         public static void CreateInputAsset()
         {
-            #if UNITY_6000_4_OR_NEWER
-            ProjectWindowUtil.CreateAssetWithTextContent("New Actions." + InputActionAsset.Extension,
-                InputActionAsset.kDefaultAssetLayoutJson, InputActionAssetIconLoader.LoadAssetIcon());
-            #else
-            ProjectWindowUtil.CreateAssetWithContent("New Actions." + InputActionAsset.Extension,
-                InputActionAsset.kDefaultAssetLayoutJson, InputActionAssetIconLoader.LoadAssetIcon());
-            #endif
+#if UNITY_6000_4_OR_NEWER
+            ProjectWindowUtil.CreateAssetWithTextContent(
+                "New Actions." + InputActionAsset.Extension,
+                InputActionAsset.kDefaultAssetLayoutJson,
+                InputActionAssetIconLoader.LoadAssetIcon()
+            );
+#else
+            ProjectWindowUtil.CreateAssetWithContent(
+                "New Actions." + InputActionAsset.Extension,
+                InputActionAsset.kDefaultAssetLayoutJson,
+                InputActionAssetIconLoader.LoadAssetIcon()
+            );
+#endif
         }
 
         // File extension of the associated asset
@@ -382,8 +429,12 @@ namespace UnityEngine.InputSystem.Editor
         // the name will no longer be a mismatch and the cycle will be aborted.
         private class InputActionJsonNameModifierAssetProcessor : AssetPostprocessor
         {
-            private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
-                string[] movedAssets, string[] movedFromAssetPaths)
+            private static void OnPostprocessAllAssets(
+                string[] importedAssets,
+                string[] deletedAssets,
+                string[] movedAssets,
+                string[] movedFromAssetPaths
+            )
             {
                 var needToInvalidate = false;
                 foreach (var assetPath in importedAssets)
@@ -398,8 +449,13 @@ namespace UnityEngine.InputSystem.Editor
                             try
                             {
                                 var asset = InputActionAsset.FromJson(File.ReadAllText(assetPath));
-                                GenerateWrapperCode(assetPath, asset, importer.m_WrapperCodeNamespace,
-                                    importer.m_WrapperClassName, importer.m_WrapperCodePath);
+                                GenerateWrapperCode(
+                                    assetPath,
+                                    asset,
+                                    importer.m_WrapperCodeNamespace,
+                                    importer.m_WrapperClassName,
+                                    importer.m_WrapperCodePath
+                                );
                             }
                             catch (Exception e)
                             {
@@ -445,7 +501,9 @@ namespace UnityEngine.InputSystem.Editor
                     asset.name = desiredName;
                     if (!EditorHelpers.WriteAsset(assetPath, asset.ToJson()))
                     {
-                        Debug.LogError($"Unable to change JSON name for asset at \"{assetPath}\" since the asset-path could not be checked-out as editable in the underlying version-control system.");
+                        Debug.LogError(
+                            $"Unable to change JSON name for asset at \"{assetPath}\" since the asset-path could not be checked-out as editable in the underlying version-control system."
+                        );
                     }
                 }
                 catch (Exception ex)

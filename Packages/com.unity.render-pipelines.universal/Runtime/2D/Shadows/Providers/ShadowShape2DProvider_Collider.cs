@@ -20,13 +20,12 @@ namespace UnityEngine.Rendering.Universal
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Intersects(ref MinMaxBounds bounds)
             {
-                return
-                    min.x <= bounds.max.x &&
-                    max.x >= bounds.min.x &&
-                    min.y <= bounds.max.y &&
-                    max.y >= bounds.min.y &&
-                    min.z <= bounds.max.z &&
-                    max.z >= bounds.min.z;
+                return min.x <= bounds.max.x
+                    && max.x >= bounds.min.x
+                    && min.y <= bounds.max.y
+                    && max.y >= bounds.min.y
+                    && min.z <= bounds.max.z
+                    && max.z >= bounds.min.z;
             }
 
             public MinMaxBounds(ref Bounds bounds)
@@ -63,7 +62,12 @@ namespace UnityEngine.Rendering.Universal
         private static void ClearShapes(ShadowShape2D persistantShapeObject)
         {
             // Indicate no shape data.
-            persistantShapeObject.SetShape(new NativeArray<Vector3>(), new NativeArray<int>(), ShadowShape2D.OutlineTopology.Lines, ShadowShape2D.WindingOrder.CounterClockwise);
+            persistantShapeObject.SetShape(
+                new NativeArray<Vector3>(),
+                new NativeArray<int>(),
+                ShadowShape2D.OutlineTopology.Lines,
+                ShadowShape2D.WindingOrder.CounterClockwise
+            );
         }
 
         private List<Bounds> m_ShadowShapeBounds;
@@ -75,7 +79,11 @@ namespace UnityEngine.Rendering.Universal
         private UInt32 m_ShadowStateHash = 0;
         private PhysicsShapeGroup2D m_ShadowShapeGroup;
 
-        private void CalculateShadows(Collider2D collider, ShadowShape2D persistantShapeObject, Bounds worldCullingBounds)
+        private void CalculateShadows(
+            Collider2D collider,
+            ShadowShape2D persistantShapeObject,
+            Bounds worldCullingBounds
+        )
         {
             // Create a shadow shape group if not available yet.
             if (m_ShadowShapeGroup == null)
@@ -137,8 +145,10 @@ namespace UnityEngine.Rendering.Universal
             else
             {
                 // If the collider space nor the culling bounds have not changed then finish.
-                if (colliderSpace.Equals(m_LastColliderSpace) &&
-                    CompareApproximately(ref m_LastWorldCullingBounds, ref worldCullingBounds))
+                if (
+                    colliderSpace.Equals(m_LastColliderSpace)
+                    && CompareApproximately(ref m_LastWorldCullingBounds, ref worldCullingBounds)
+                )
                 {
                     // No, so finish.
                     return;
@@ -177,7 +187,11 @@ namespace UnityEngine.Rendering.Universal
             var shapeGroupVertices = m_ShadowShapeGroup.groupVertices;
 
             // Create visible shape indices.
-            var visibleShapeIndices = new NativeArray<int>(shapeCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var visibleShapeIndices = new NativeArray<int>(
+                shapeCount,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             // We have to iterate the shapes to figure out both the vertex and index counts
             // because we're dealing with NativeArray which we have to specify a size for up-front.ebug
@@ -320,12 +334,19 @@ namespace UnityEngine.Rendering.Universal
                 // Calculate transformation required to move the Collider geometry into shadow-space.
                 var toShadowSpace = collider.transform.worldToLocalMatrix * colliderSpace;
 
-
                 Renderer renderer;
                 bool createInteriorGeometry = !collider.TryGetComponent<Renderer>(out renderer);
 
                 // Set the shadow shape.
-                persistantShapeObject.SetShape(vertices, indices, radii, toShadowSpace, ShadowShape2D.WindingOrder.CounterClockwise, true, createInteriorGeometry);
+                persistantShapeObject.SetShape(
+                    vertices,
+                    indices,
+                    radii,
+                    toShadowSpace,
+                    ShadowShape2D.WindingOrder.CounterClockwise,
+                    true,
+                    createInteriorGeometry
+                );
 
                 // Clean up.
                 indices.Dispose();
@@ -345,7 +366,10 @@ namespace UnityEngine.Rendering.Universal
         //============================================================================================================
         //                                                  Public
         //============================================================================================================
-        public override bool IsRequiredComponentData(Component sourceComponent) { return sourceComponent is Collider2D; }
+        public override bool IsRequiredComponentData(Component sourceComponent)
+        {
+            return sourceComponent is Collider2D;
+        }
 
         public override void OnInitialized(Component sourceComponent, ShadowShape2D persistantShadowShapeData)
         {
@@ -354,7 +378,11 @@ namespace UnityEngine.Rendering.Universal
             m_LastColliderSpace = Matrix4x4.identity;
         }
 
-        public override void OnBeforeRender(Component sourceComponent, Bounds worldCullingBounds, ShadowShape2D persistantShadowShape)
+        public override void OnBeforeRender(
+            Component sourceComponent,
+            Bounds worldCullingBounds,
+            ShadowShape2D persistantShadowShape
+        )
         {
             Collider2D collider = (Collider2D)sourceComponent;
             CalculateShadows(collider, persistantShadowShape, worldCullingBounds);

@@ -2,15 +2,19 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Profiling;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
-using Unity.Profiling;
 
 namespace UnityEngine.InputSystem.LowLevel
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32", Justification = "byte to correspond to TouchState layout.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Microsoft.Design",
+        "CA1028:EnumStorageShouldBeInt32",
+        Justification = "byte to correspond to TouchState layout."
+    )]
     [Flags]
     internal enum TouchFlags : byte
     {
@@ -145,7 +149,13 @@ namespace UnityEngine.InputSystem.LowLevel
         [FieldOffset(34)]
         public byte displayIndex;
 
-        [InputControl(name = "indirectTouch", displayName = "Indirect Touch?", layout = "Button", bit = 0, synthetic = true)]
+        [InputControl(
+            name = "indirectTouch",
+            displayName = "Indirect Touch?",
+            layout = "Button",
+            bit = 0,
+            synthetic = true
+        )]
         [InputControl(name = "tap", displayName = "Tap", layout = "Button", bit = 4)]
         [FieldOffset(35)]
         public byte flags;
@@ -168,7 +178,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </remarks>
         /// <seealso cref="InputEvent.time"/>
         /// <seealso cref="TouchControl.startTime"/>
-        [InputControl(displayName = "Start Time", layout  = "Double", synthetic = true)]
+        [InputControl(displayName = "Start Time", layout = "Double", synthetic = true)]
         [FieldOffset(40)]
         public double startTime; // In *external* time, i.e. currentTimeOffsetToRealtimeSinceStartup baked in.
 
@@ -196,10 +206,10 @@ namespace UnityEngine.InputSystem.LowLevel
             set => phaseId = (byte)value;
         }
 
-        public bool isNoneEndedOrCanceled => phase == TouchPhase.None || phase == TouchPhase.Ended ||
-        phase == TouchPhase.Canceled;
-        public bool isInProgress => phase == TouchPhase.Began || phase == TouchPhase.Moved ||
-        phase == TouchPhase.Stationary;
+        public bool isNoneEndedOrCanceled =>
+            phase == TouchPhase.None || phase == TouchPhase.Ended || phase == TouchPhase.Canceled;
+        public bool isInProgress =>
+            phase == TouchPhase.Began || phase == TouchPhase.Moved || phase == TouchPhase.Stationary;
 
         /// <summary>
         /// Whether, after not having any touch contacts, this is part of the first touch contact that started.
@@ -343,7 +353,6 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </remarks>
         [InputControl(name = "primaryTouch", displayName = "Primary Touch", layout = "Touch", synthetic = true)]
         [InputControl(name = "primaryTouch/tap", usage = "PrimaryAction")]
-
         // Add controls compatible with what Pointer expects and redirect their
         // state to the state of touch0 so that this essentially becomes our
         // pointer control.
@@ -354,7 +363,13 @@ namespace UnityEngine.InputSystem.LowLevel
         [InputControl(name = "delta", useStateFrom = "primaryTouch/delta", layout = "Delta")]
         [InputControl(name = "pressure", useStateFrom = "primaryTouch/pressure")]
         [InputControl(name = "radius", useStateFrom = "primaryTouch/radius")]
-        [InputControl(name = "press", useStateFrom = "primaryTouch/phase", layout = "TouchPress", synthetic = true, usages = new string[0])]
+        [InputControl(
+            name = "press",
+            useStateFrom = "primaryTouch/phase",
+            layout = "TouchPress",
+            synthetic = true,
+            usages = new string[0]
+        )]
         [InputControl(name = "displayIndex", useStateFrom = "primaryTouch/displayIndex", format = "BYTE")] // added format to override the Pointer's USHT value
         [FieldOffset(0)]
         public fixed byte primaryTouchData[TouchState.kSizeInBytes];
@@ -369,8 +384,8 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(byte* ptr = primaryTouchData)
-                return (TouchState*)ptr;
+                fixed (byte* ptr = primaryTouchData)
+                    return (TouchState*)ptr;
             }
         }
 
@@ -378,8 +393,8 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(byte* ptr = touchData)
-                return (TouchState*)ptr;
+                fixed (byte* ptr = touchData)
+                    return (TouchState*)ptr;
             }
         }
 
@@ -503,7 +518,6 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         public ReadOnlyArray<TouchControl> touches { get; protected set; }
 
-
         static readonly ProfilerMarker k_TouchscreenUpdateMarker = new ProfilerMarker("Touchscreen.OnNextUpdate");
         static readonly ProfilerMarker k_TouchAllocateMarker = new ProfilerMarker("TouchAllocate");
 
@@ -518,7 +532,7 @@ namespace UnityEngine.InputSystem
         /// touchscreen connected to the system.
         /// </summary>
         /// <value>Current touch screen.</value>
-        public new static Touchscreen current { get; internal set; }
+        public static new Touchscreen current { get; internal set; }
 
         /// <inheritdoc />
         public override void MakeCurrent()
@@ -597,7 +611,9 @@ namespace UnityEngine.InputSystem
             ////TODO: early out and skip crawling through touches if we didn't change state in the last update
             ////      (also obsoletes the need for the if() check below)
             var statePtr = currentStatePtr;
-            var touchStatePtr = (TouchState*)((byte*)statePtr + stateBlock.byteOffset + TouchscreenState.kTouchDataOffset);
+            var touchStatePtr = (TouchState*)(
+                (byte*)statePtr + stateBlock.byteOffset + TouchscreenState.kTouchDataOffset
+            );
             for (var i = 0; i < touches.Count; ++i, ++touchStatePtr)
             {
                 // Reset delta.
@@ -609,14 +625,20 @@ namespace UnityEngine.InputSystem
                 //       that to do so we would have to add another record to keep track of timestamps for each touch. And
                 //       since we know the maximum time that a tap can take, we have a reasonable estimate for when a prior
                 //       tap must have ended.
-                if (touchStatePtr->tapCount > 0 && InputState.currentTime >= touchStatePtr->startTime + s_TapTime + s_TapDelayTime)
+                if (
+                    touchStatePtr->tapCount > 0
+                    && InputState.currentTime >= touchStatePtr->startTime + s_TapTime + s_TapDelayTime
+                )
                     InputState.Change(touches[i].tapCount, (byte)0);
             }
 
             var primaryTouchState = (TouchState*)((byte*)statePtr + stateBlock.byteOffset);
             if (primaryTouchState->delta != default)
                 InputState.Change(primaryTouch.delta, Vector2.zero);
-            if (primaryTouchState->tapCount > 0 && InputState.currentTime >= primaryTouchState->startTime + s_TapTime + s_TapDelayTime)
+            if (
+                primaryTouchState->tapCount > 0
+                && InputState.currentTime >= primaryTouchState->startTime + s_TapTime + s_TapDelayTime
+            )
                 InputState.Change(primaryTouch.tapCount, (byte)0);
 
             k_TouchscreenUpdateMarker.End();
@@ -664,7 +686,11 @@ namespace UnityEngine.InputSystem
             else
             {
                 newTouchState = default;
-                UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref newTouchState), stateEventPtr->state, stateEventPtr->stateSizeInBytes);
+                UnsafeUtility.MemCpy(
+                    UnsafeUtility.AddressOf(ref newTouchState),
+                    stateEventPtr->state,
+                    stateEventPtr->stateSizeInBytes
+                );
             }
 
             // Make sure we're not getting thrown off by noise on fields that we don't want to
@@ -704,8 +730,10 @@ namespace UnityEngine.InputSystem
                         newTouchState.startPosition = currentTouchState[i].startPosition;
 
                         // Detect taps.
-                        var isTap = newTouchState.isNoneEndedOrCanceled &&
-                            (eventPtr.time - newTouchState.startTime) <= s_TapTime &&
+                        var isTap =
+                            newTouchState.isNoneEndedOrCanceled
+                            && (eventPtr.time - newTouchState.startTime) <= s_TapTime
+                            &&
                             ////REVIEW: this only takes the final delta to start position into account, not the delta over the lifetime of the
                             ////        touch; is this robust enough or do we need to make sure that we never move more than the tap radius
                             ////        over the entire lifetime of the touch?
@@ -871,7 +899,11 @@ namespace UnityEngine.InputSystem
             OnStateEvent(eventPtr);
         }
 
-        unsafe bool IInputStateCallbackReceiver.GetStateOffsetForEvent(InputControl control, InputEventPtr eventPtr, ref uint offset)
+        unsafe bool IInputStateCallbackReceiver.GetStateOffsetForEvent(
+            InputControl control,
+            InputEventPtr eventPtr,
+            ref uint offset
+        )
         {
             // This code goes back to the trickery we perform in OnStateEvent. We consume events in TouchState format
             // instead of in TouchscreenState format. This means that the input system does not know how the state in those
@@ -909,8 +941,11 @@ namespace UnityEngine.InputSystem
                     var touch = &currentTouchState[i];
                     if (touch->touchId == eventTouchId || (!touch->isInProgress && eventTouchPhase.IsActive()))
                     {
-                        offset = primaryTouch.m_StateBlock.byteOffset + primaryTouch.m_StateBlock.alignedSizeInBytes - m_StateBlock.byteOffset +
-                            (uint)(i * UnsafeUtility.SizeOf<TouchState>());
+                        offset =
+                            primaryTouch.m_StateBlock.byteOffset
+                            + primaryTouch.m_StateBlock.alignedSizeInBytes
+                            - m_StateBlock.byteOffset
+                            + (uint)(i * UnsafeUtility.SizeOf<TouchState>());
                         return true;
                     }
                 }
@@ -963,7 +998,11 @@ namespace UnityEngine.InputSystem
                 {
                     UnsafeUtility.MemCpy(eventPtr->state, primaryTouchState, UnsafeUtility.SizeOf<TouchState>());
                     ((TouchState*)eventPtr->state)->phase = TouchPhase.Canceled;
-                    InputState.Change(primaryTouch.phase, TouchPhase.Canceled, eventPtr: new InputEventPtr((InputEvent*)eventPtr));
+                    InputState.Change(
+                        primaryTouch.phase,
+                        TouchPhase.Canceled,
+                        eventPtr: new InputEventPtr((InputEvent*)eventPtr)
+                    );
                 }
 
                 var touchStates = (TouchState*)((byte*)statePtr + touches[0].stateBlock.byteOffset);
@@ -974,7 +1013,11 @@ namespace UnityEngine.InputSystem
                     {
                         UnsafeUtility.MemCpy(eventPtr->state, &touchStates[i], UnsafeUtility.SizeOf<TouchState>());
                         ((TouchState*)eventPtr->state)->phase = TouchPhase.Canceled;
-                        InputState.Change(touches[i].phase, TouchPhase.Canceled, eventPtr: new InputEventPtr((InputEvent*)eventPtr));
+                        InputState.Change(
+                            touches[i].phase,
+                            TouchPhase.Canceled,
+                            eventPtr: new InputEventPtr((InputEvent*)eventPtr)
+                        );
                     }
                 }
             }
@@ -994,7 +1037,11 @@ namespace UnityEngine.InputSystem
             var currentState = (TouchState*)currentEvent->state;
             var nextState = (TouchState*)nextEvent->state;
 
-            if (currentState->touchId != nextState->touchId || currentState->phaseId != nextState->phaseId || currentState->flags != nextState->flags)
+            if (
+                currentState->touchId != nextState->touchId
+                || currentState->phaseId != nextState->phaseId
+                || currentState->flags != nextState->flags
+            )
                 return false;
 
             nextState->delta += currentState->delta;

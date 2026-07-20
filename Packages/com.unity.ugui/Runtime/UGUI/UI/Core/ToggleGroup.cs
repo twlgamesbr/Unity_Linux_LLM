@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI
@@ -16,7 +16,8 @@ namespace UnityEngine.UI
     /// </remarks>
     public class ToggleGroup : UIBehaviour
     {
-        [SerializeField] private bool m_AllowSwitchOff = false;
+        [SerializeField]
+        private bool m_AllowSwitchOff = false;
 
         /// <summary>
         /// Is it allowed that no toggle is switched on?
@@ -25,12 +26,15 @@ namespace UnityEngine.UI
         /// If this setting is enabled, pressing the toggle that is currently switched on will switch it off, so that no toggle is switched on. If this setting is disabled, pressing the toggle that is currently switched on will not change its state.
         /// Note that even if allowSwitchOff is false, the Toggle Group will not enforce its constraint right away if no toggles in the group are switched on when the scene is loaded or when the group is instantiated. It will only prevent the user from switching a toggle off.
         /// </remarks>
-        public bool allowSwitchOff { get { return m_AllowSwitchOff; } set { m_AllowSwitchOff = value; } }
+        public bool allowSwitchOff
+        {
+            get { return m_AllowSwitchOff; }
+            set { m_AllowSwitchOff = value; }
+        }
 
         protected List<Toggle> m_Toggles = new List<Toggle>();
 
-        protected ToggleGroup()
-        {}
+        protected ToggleGroup() { }
 
         /// <summary>
         /// Because all the Toggles have registered themselves in the OnEnabled, Start should check to
@@ -51,7 +55,9 @@ namespace UnityEngine.UI
         private void ValidateToggleIsInGroup(Toggle toggle)
         {
             if (toggle == null || !m_Toggles.Contains(toggle))
-                throw new ArgumentException(string.Format("Toggle {0} is not part of ToggleGroup {1}", new object[] {toggle, this}));
+                throw new ArgumentException(
+                    string.Format("Toggle {0} is not part of ToggleGroup {1}", new object[] { toggle, this })
+                );
         }
 
         /// <summary>

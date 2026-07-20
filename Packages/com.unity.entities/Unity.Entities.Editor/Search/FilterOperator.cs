@@ -15,10 +15,7 @@ namespace Unity.Entities.Editor
         /// <returns>An array of operator tokens.</returns>
         public static string[] GetSupportedOperators<T>()
         {
-            var operators = new List<string>
-            {
-                ":"
-            };
+            var operators = new List<string> { ":" };
 
             var equatable = typeof(IEquatable<T>).IsAssignableFrom(typeof(T));
             var comparable = typeof(IComparable<T>).IsAssignableFrom(typeof(T));

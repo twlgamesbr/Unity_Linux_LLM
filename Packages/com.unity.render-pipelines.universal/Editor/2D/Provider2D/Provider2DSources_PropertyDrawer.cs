@@ -1,11 +1,13 @@
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditorInternal;
+using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal
 {
-    internal abstract class Provider2DSources_PropertyDrawer<T, U> : PropertyDrawer where T : Provider2D where U : Provider2DSource
+    internal abstract class Provider2DSources_PropertyDrawer<T, U> : PropertyDrawer
+        where T : Provider2D
+        where U : Provider2DSource
     {
         public abstract int GetProviderType();
 
@@ -14,16 +16,15 @@ namespace UnityEditor.Rendering.Universal
             if (menuOptions == null || menuOptions.Length == 0)
                 menuOptions = new GUIContent[1] { new GUIContent("null") };
 
-            return EditorGUI.Popup(popupRect, label, selectedIndex, menuOptions);   // Will not deal well with duplicates.
+            return EditorGUI.Popup(popupRect, label, selectedIndex, menuOptions); // Will not deal well with duplicates.
         }
-
 
         public void UpdateCommonContent(ref GUIContent[] content, ref List<GUIContent> commonContent)
         {
             List<GUIContent> returnContent = new List<GUIContent>();
             if (commonContent == null)
             {
-                for(int i=0;i < content.Length;i++)
+                for (int i = 0; i < content.Length; i++)
                     returnContent.Add(content[i]);
             }
             else
@@ -31,7 +32,7 @@ namespace UnityEditor.Rendering.Universal
                 for (int i = 0; i < commonContent.Count; i++)
                 {
                     GUIContent curContent = commonContent[i];
-                    for (int j=0;j < content.Length; j++)
+                    for (int j = 0; j < content.Length; j++)
                     {
                         if (curContent.text.GetHashCode() == content[j].text.GetHashCode())
                         {
@@ -50,15 +51,14 @@ namespace UnityEditor.Rendering.Universal
 
             property.serializedObject.Update();
 
-
-            // I need 2 lists. First a list of content for each ShadowCaster2D. Second a list of common menu items 
+            // I need 2 lists. First a list of content for each ShadowCaster2D. Second a list of common menu items
             List<GUIContent[]> guiContent = new List<GUIContent[]>();
             List<GUIContent> commonContent = null;
             GUIContent selectedContent = null;
             bool showMixedContent = false;
 
             UnityEngine.Object[] targets = property.serializedObject.targetObjects;
-            for(int i=0;i<targets.Length;i++)
+            for (int i = 0; i < targets.Length; i++)
             {
                 Component targetComponent = targets[i] as Component;
                 SerializedObject serializedTarget = new SerializedObject(targetComponent);
@@ -66,7 +66,11 @@ namespace UnityEditor.Rendering.Universal
                 Provider2DSources<T, U> targetSources = targetProperty.boxedValue as Provider2DSources<T, U>;
 
                 // Here we need to build a list
-                int targetSelIndex = Provider2DSources<T, U>.RefreshSources(targetSources, targetComponent.gameObject, GetProviderType());
+                int targetSelIndex = Provider2DSources<T, U>.RefreshSources(
+                    targetSources,
+                    targetComponent.gameObject,
+                    GetProviderType()
+                );
                 GUIContent[] content = targetSources.GetSourceNames();
 
                 // Update all the content which is saved for later
@@ -76,9 +80,11 @@ namespace UnityEditor.Rendering.Universal
                 }
                 else
                 {
-                    if (content[targetSelIndex < 0 ? 0 : targetSelIndex].text.GetHashCode() != selectedContent.text.GetHashCode())
+                    if (
+                        content[targetSelIndex < 0 ? 0 : targetSelIndex].text.GetHashCode()
+                        != selectedContent.text.GetHashCode()
+                    )
                         showMixedContent = true;
-                    
                 }
                 guiContent.Add(content);
                 UpdateCommonContent(ref content, ref commonContent);
@@ -87,10 +93,9 @@ namespace UnityEditor.Rendering.Universal
             if (!property.serializedObject.isEditingMultipleObjects)
                 showMixedContent = false;
 
-
             // Find the selected content index in commonContent
             int selectedIndex = -1;
-            for(int i = 0; i < commonContent.Count; i++)
+            for (int i = 0; i < commonContent.Count; i++)
             {
                 if (commonContent[i].text.GetHashCode() == selectedContent.text.GetHashCode())
                 {
@@ -98,14 +103,13 @@ namespace UnityEditor.Rendering.Universal
                 }
             }
 
-
             EditorGUI.showMixedValue = showMixedContent;
 
             EditorGUI.BeginChangeCheck();
             int newSelectedIndex = DrawDropdown(position, label, selectedIndex, commonContent.ToArray());
             EditorGUI.showMixedValue = false;
 
-            if(EditorGUI.EndChangeCheck())
+            if (EditorGUI.EndChangeCheck())
             {
                 GUIContent newSelectedContent = commonContent[newSelectedIndex];
                 for (int i = 0; i < targets.Length; i++)
@@ -117,10 +121,10 @@ namespace UnityEditor.Rendering.Universal
                     Provider2DSources<T, U> targetSources = targetProperty.boxedValue as Provider2DSources<T, U>;
 
                     GUIContent[] savedGuiContent = guiContent[i];
-                    for (int j=0; j < savedGuiContent.Length; j++)
+                    for (int j = 0; j < savedGuiContent.Length; j++)
                     {
                         GUIContent content = savedGuiContent[j];
-                        if(content.text.GetHashCode() == newSelectedContent.text.GetHashCode())
+                        if (content.text.GetHashCode() == newSelectedContent.text.GetHashCode())
                         {
                             Provider2DSources<T, U>.UpdateSelectionFromIndex(targetSources, j);
                             // Persist the selection change by updating both the provider selection and m_LightType

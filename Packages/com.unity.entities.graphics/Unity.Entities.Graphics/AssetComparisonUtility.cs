@@ -38,9 +38,7 @@ namespace Unity.Rendering
 
             public bool Equals(AssetIdentifier other)
             {
-                return IsValid == other.IsValid &&
-                       Guid == other.Guid &&
-                       LocalFileId == other.LocalFileId;
+                return IsValid == other.IsValid && Guid == other.Guid && LocalFileId == other.LocalFileId;
             }
         }
 
@@ -56,7 +54,8 @@ namespace Unity.Rendering
         /// content-based hash instead. At runtime, returns an invalid identifier since GUID information
         /// is not available.
         /// </remarks>
-        internal static AssetIdentifier GetAssetIdentifier<T>(UnityObjectRef<T> assetRef) where T : Object
+        internal static AssetIdentifier GetAssetIdentifier<T>(UnityObjectRef<T> assetRef)
+            where T : Object
         {
 #if UNITY_EDITOR
             var entityId = assetRef.Id.entityId;
@@ -75,7 +74,7 @@ namespace Unity.Rendering
                     {
                         Guid = new Hash128(guid),
                         LocalFileId = localId,
-                        IsValid = true
+                        IsValid = true,
                     };
                 }
                 else if (obj is Material runtimeMaterial)
@@ -111,7 +110,13 @@ namespace Unity.Rendering
 
             if (material.shader != null)
             {
-                if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(material.shader, out var shaderGuid, out var shaderLocalId))
+                if (
+                    UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(
+                        material.shader,
+                        out var shaderGuid,
+                        out var shaderLocalId
+                    )
+                )
                 {
                     hash.Update(new Hash128(shaderGuid));
                     hash.Update(shaderLocalId);
@@ -137,7 +142,7 @@ namespace Unity.Rendering
             {
                 Guid = new Hash128(hash.DigestHash128()),
                 LocalFileId = 0,
-                IsValid = true
+                IsValid = true,
             };
         }
 #endif
@@ -150,7 +155,8 @@ namespace Unity.Rendering
         /// GUIDs use content-based hashing. Invalid identifiers sort after valid ones. At runtime, falls
         /// back to EntityId comparison since GUID information is not available.
         /// </remarks>
-        internal static int CompareUnityObjectRef<T>(UnityObjectRef<T> a, UnityObjectRef<T> b) where T : Object
+        internal static int CompareUnityObjectRef<T>(UnityObjectRef<T> a, UnityObjectRef<T> b)
+            where T : Object
         {
 #if UNITY_EDITOR
             var identifierA = GetAssetIdentifier(a);

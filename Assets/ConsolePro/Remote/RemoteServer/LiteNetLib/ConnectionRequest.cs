@@ -9,7 +9,7 @@ namespace FlyingWormConsole3.LiteNetLib
         None,
         Accept,
         Reject,
-        RejectForce
+        RejectForce,
     }
 
     public class ConnectionRequest
@@ -30,8 +30,10 @@ namespace FlyingWormConsole3.LiteNetLib
             if (connectRequest.ConnectionTime < InternalPacket.ConnectionTime)
                 return;
 
-            if (connectRequest.ConnectionTime == InternalPacket.ConnectionTime &&
-                connectRequest.ConnectionNumber == InternalPacket.ConnectionNumber)
+            if (
+                connectRequest.ConnectionTime == InternalPacket.ConnectionTime
+                && connectRequest.ConnectionNumber == InternalPacket.ConnectionNumber
+            )
                 return;
 
             InternalPacket = connectRequest;
@@ -42,7 +44,11 @@ namespace FlyingWormConsole3.LiteNetLib
             return Interlocked.CompareExchange(ref _used, 1, 0) == 0;
         }
 
-        internal ConnectionRequest(IPEndPoint remoteEndPoint, NetConnectRequestPacket requestPacket, NetManager listener)
+        internal ConnectionRequest(
+            IPEndPoint remoteEndPoint,
+            NetConnectRequestPacket requestPacket,
+            NetManager listener
+        )
         {
             InternalPacket = requestPacket;
             RemoteEndPoint = remoteEndPoint;
@@ -94,7 +100,6 @@ namespace FlyingWormConsole3.LiteNetLib
         {
             Reject(rejectData, start, length, false);
         }
-
 
         public void RejectForce(byte[] rejectData, int start, int length)
         {

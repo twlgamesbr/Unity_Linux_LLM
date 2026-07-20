@@ -36,10 +36,11 @@ namespace UnityEngine.Rendering
             in OccluderContext occluderCtx,
             in InstanceOcclusionTestSubviewSettings subviewSettings,
             bool occlusionOverlayCountVisible,
-            bool overrideOcclusionTestToAlwaysPass)
+            bool overrideOcclusionTestToAlwaysPass
+        )
         {
             for (int i = 0; i < occluderCtx.subviewCount; ++i)
-            { 
+            {
                 if (occluderCtx.IsSubviewValid(i))
                 {
                     unsafe
@@ -58,8 +59,8 @@ namespace UnityEngine.Rendering
             }
             _OccluderMipLayoutSizeX = (uint)occluderCtx.occluderMipLayoutSize.x;
             _OccluderMipLayoutSizeY = (uint)occluderCtx.occluderMipLayoutSize.y;
-            _OcclusionTestDebugFlags
-                = (overrideOcclusionTestToAlwaysPass ? (uint)OcclusionTestDebugFlag.AlwaysPass : 0)
+            _OcclusionTestDebugFlags =
+                (overrideOcclusionTestToAlwaysPass ? (uint)OcclusionTestDebugFlag.AlwaysPass : 0)
                 | (occlusionOverlayCountVisible ? (uint)OcclusionTestDebugFlag.CountVisible : 0);
             _OcclusionCullingCommonPad0 = 0;
 
@@ -71,17 +72,22 @@ namespace UnityEngine.Rendering
             _DepthSizeInOccluderPixels = occluderCtx.depthBufferSizeInOccluderPixels;
 
             Vector2Int textureSize = occluderCtx.occluderDepthPyramidSize;
-            _OccluderDepthPyramidSize = new Vector4(textureSize.x, textureSize.y, 1.0f / textureSize.x, 1.0f / textureSize.y);
+            _OccluderDepthPyramidSize = new Vector4(
+                textureSize.x,
+                textureSize.y,
+                1.0f / textureSize.x,
+                1.0f / textureSize.y
+            );
 
             for (int i = 0; i < occluderCtx.occluderMipBounds.Length; ++i)
             {
                 var mipBounds = occluderCtx.occluderMipBounds[i];
                 unsafe
                 {
-                    _OccluderMipBounds[4*i + 0] = (uint)mipBounds.offset.x;
-                    _OccluderMipBounds[4*i + 1] = (uint)mipBounds.offset.y;
-                    _OccluderMipBounds[4*i + 2] = (uint)mipBounds.size.x;
-                    _OccluderMipBounds[4*i + 3] = (uint)mipBounds.size.y;
+                    _OccluderMipBounds[4 * i + 0] = (uint)mipBounds.offset.x;
+                    _OccluderMipBounds[4 * i + 1] = (uint)mipBounds.offset.y;
+                    _OccluderMipBounds[4 * i + 2] = (uint)mipBounds.size.x;
+                    _OccluderMipBounds[4 * i + 3] = (uint)mipBounds.size.y;
                 }
             }
         }

@@ -8,11 +8,16 @@ namespace UnityEditor.Rendering
     /// </summary>
     public static class ShadowCascadeGUI
     {
-        private const string kPathToHorizontalGradientTexture = "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/HorizontalGradient.png";
-        private const string kPathToUpSnatchTexture = "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/UpSnatch.png";
-        private const string kPathToUpSnatchFocusedTexture = "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/UpSnatchFocused.png";
-        private const string kPathToDownSnatchTexture = "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/DownSnatch.png";
-        private const string kPathTDownSnatchFocusedTexture = "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/DownSnatchFocused.png";
+        private const string kPathToHorizontalGradientTexture =
+            "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/HorizontalGradient.png";
+        private const string kPathToUpSnatchTexture =
+            "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/UpSnatch.png";
+        private const string kPathToUpSnatchFocusedTexture =
+            "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/UpSnatchFocused.png";
+        private const string kPathToDownSnatchTexture =
+            "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/DownSnatch.png";
+        private const string kPathTDownSnatchFocusedTexture =
+            "Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/DownSnatchFocused.png";
 
         private const float kSliderbarMargin = 2.0f;
         private const float kSliderbarHeight = 28.0f;
@@ -39,7 +44,7 @@ namespace UnityEditor.Rendering
         private static readonly GUIStyle s_CascadeSliderBG = "LODSliderRange"; // Using a LODGroup skin
         private static readonly GUIStyle s_TextCenteredStyle = new GUIStyle(EditorStyles.whiteMiniLabel)
         {
-            alignment = TextAnchor.MiddleCenter
+            alignment = TextAnchor.MiddleCenter,
         };
 
         /// <summary>
@@ -51,10 +56,12 @@ namespace UnityEditor.Rendering
             /// Handle will not be drawn.
             /// </summary>
             Hidden,
+
             /// <summary>
             /// Handle will be disabled.
             /// </summary>
             Disabled,
+
             /// <summary>
             /// Handle will be enabled.
             /// </summary>
@@ -145,11 +152,17 @@ namespace UnityEditor.Rendering
                 GUIContent.none,
                 s_CascadeSliderBG,
                 GUILayout.Height(kSliderbarMargin + kSliderbarHeight + kSliderbarMargin),
-                GUILayout.ExpandWidth(true));
+                GUILayout.ExpandWidth(true)
+            );
             DrawBackgroundBoxGUI(sliderRect, Color.gray);
 
             var formatSymbol = useMetric ? 'm' : '%';
-            var usableRect = new Rect(sliderRect.x + kSliderbarMargin, sliderRect.y + kSliderbarMargin, sliderRect.width - kSliderbarMargin * 2, sliderRect.height - kSliderbarMargin * 2);
+            var usableRect = new Rect(
+                sliderRect.x + kSliderbarMargin,
+                sliderRect.y + kSliderbarMargin,
+                sliderRect.width - kSliderbarMargin * 2,
+                sliderRect.height - kSliderbarMargin * 2
+            );
             var partitionWidth = 2.0f / EditorGUIUtility.pixelsPerPoint;
             var partitionHalfWidth = partitionWidth * 0.5f;
 
@@ -162,8 +175,10 @@ namespace UnityEditor.Rendering
             {
                 float endX = startX + cascades[i].size * widthForCascades;
 
-                float pixelPerfectStartX = Mathf.Round(startX * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
-                float pixelPerfectEndX = Mathf.Round(endX * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
+                float pixelPerfectStartX =
+                    Mathf.Round(startX * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
+                float pixelPerfectEndX =
+                    Mathf.Round(endX * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
                 float pixelPerfectCascadeWidth = pixelPerfectEndX - pixelPerfectStartX;
 
                 cascadeWidths[i] = pixelPerfectCascadeWidth;
@@ -191,7 +206,10 @@ namespace UnityEditor.Rendering
                     borderValue = cascade.size * cascade.borderSize;
                     cascadeValue = cascade.size - borderValue;
                     var cascadeWidthWithoutPartition = cascadeWidth;
-                    cascadeWithoutBorderWidth = Mathf.Round(cascadeWidthWithoutPartition * (1 - cascade.borderSize) * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
+                    cascadeWithoutBorderWidth =
+                        Mathf.Round(
+                            cascadeWidthWithoutPartition * (1 - cascade.borderSize) * EditorGUIUtility.pixelsPerPoint
+                        ) / EditorGUIUtility.pixelsPerPoint;
                     borderWidth = cascadeWidth - cascadeWithoutBorderWidth;
                 }
                 else
@@ -222,14 +240,24 @@ namespace UnityEditor.Rendering
                         currentX - 6 - partitionHalfWidth,
                         usableRect.y + usableRect.height - 1,
                         12,
-                        18);
+                        18
+                    );
                     var enabled = cascade.borderHandleState == HandleState.Enabled;
                     var borderPartitionColor = enabled ? kCascadeColors[i] : kDisabledColor;
-                    var delta = DrawSnatchWithHandle(borderPartitionHandleRect, cascadeWidth, borderPartitionColor, GetUpSnatchStyle(), enabled);
+                    var delta = DrawSnatchWithHandle(
+                        borderPartitionHandleRect,
+                        cascadeWidth,
+                        borderPartitionColor,
+                        GetUpSnatchStyle(),
+                        enabled
+                    );
                     cascade.borderSize = Mathf.Clamp01(cascade.borderSize - delta);
 
                     // Draw border partition
-                    DrawBoxGUI(new Rect(currentX - partitionWidth, usableRect.y, partitionWidth, usableRect.height), Color.black);
+                    DrawBoxGUI(
+                        new Rect(currentX - partitionWidth, usableRect.y, partitionWidth, usableRect.height),
+                        Color.black
+                    );
 
                     // Draw border
                     var borderRect = new Rect(currentX, usableRect.y, borderWidth, usableRect.height);
@@ -261,10 +289,17 @@ namespace UnityEditor.Rendering
                             currentX - 6 - partitionHalfWidth,
                             usableRect.y - 19 + 1,
                             12,
-                            18);
+                            18
+                        );
                         var enabled = cascade.cascadeHandleState == HandleState.Enabled;
                         var cascadePartitionColor = enabled ? kCascadeColors[i + 1] : kDisabledColor;
-                        var delta = DrawSnatchWithHandle(cascadeHandleRect, usableRect.width, cascadePartitionColor, GetDownSnatchStyle(), enabled);
+                        var delta = DrawSnatchWithHandle(
+                            cascadeHandleRect,
+                            usableRect.width,
+                            cascadePartitionColor,
+                            GetDownSnatchStyle(),
+                            enabled
+                        );
 
                         if (delta != 0)
                         {
@@ -278,8 +313,11 @@ namespace UnityEditor.Rendering
 
                             // Force minimum cascade size and prevent cascade going out of bounds
                             var cascadeMinimumSize = 0.001f;
-                            var sliderPositionPixelPerfectClamped = Mathf.Clamp(sliderPosition,
-                                sliderMinimum + cascadeMinimumSize, sliderMaximum - cascadeMinimumSize);
+                            var sliderPositionPixelPerfectClamped = Mathf.Clamp(
+                                sliderPosition,
+                                sliderMinimum + cascadeMinimumSize,
+                                sliderMaximum - cascadeMinimumSize
+                            );
 
                             cascade.size = sliderPositionPixelPerfectClamped;
                             nextCascade.size = sliderMaximum - sliderPositionPixelPerfectClamped;
@@ -287,7 +325,10 @@ namespace UnityEditor.Rendering
                     }
 
                     // Draw cascade partition
-                    DrawBoxGUI(new Rect(currentX - partitionWidth, usableRect.y, partitionWidth, usableRect.height), Color.black);
+                    DrawBoxGUI(
+                        new Rect(currentX - partitionWidth, usableRect.y, partitionWidth, usableRect.height),
+                        Color.black
+                    );
                 }
             }
 
@@ -312,7 +353,9 @@ namespace UnityEditor.Rendering
         {
             if (s_HorizontalGradient == null)
             {
-                var horizontalGradientTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(kPathToHorizontalGradientTexture);
+                var horizontalGradientTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(
+                    kPathToHorizontalGradientTexture
+                );
                 Debug.Assert(horizontalGradientTexture != null);
 
                 s_HorizontalGradient = new GUIStyle();
@@ -356,7 +399,13 @@ namespace UnityEditor.Rendering
             return rect.width;
         }
 
-        private static float DrawSnatchWithHandle(Rect rect, float distance, Color color, GUIStyle snatch, bool enabled = true)
+        private static float DrawSnatchWithHandle(
+            Rect rect,
+            float distance,
+            Color color,
+            GUIStyle snatch,
+            bool enabled = true
+        )
         {
             // check for user input on any of the partition handles
             // this mechanism gets the current event in the queue... make sure that the mouse is over our control before consuming the event
@@ -457,7 +506,6 @@ namespace UnityEditor.Rendering
 
                 var downSnatchFocused = AssetDatabase.LoadAssetAtPath<Texture2D>(kPathTDownSnatchFocusedTexture);
                 Debug.Assert(downSnatchFocused != null);
-
 
                 s_DownSnatch = new GUIStyle();
                 s_DownSnatch.normal.background = downSnatch;

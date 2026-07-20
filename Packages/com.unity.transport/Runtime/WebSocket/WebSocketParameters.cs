@@ -20,7 +20,8 @@ namespace Unity.Networking.Transport
         /// <returns>Settings structure with modified values.</returns>
         public static ref NetworkSettings WithWebSocketParameters(
             ref this NetworkSettings settings,
-            FixedString128Bytes path = default)
+            FixedString128Bytes path = default
+        )
         {
             var parameter = new WebSocketParameter { Path = path == default ? "/" : path };
             settings.AddRawParameterStruct(ref parameter);

@@ -11,7 +11,10 @@ namespace Unity.DebugDisplay
 {
     class DebugDisplayProcessorBuild : IPreprocessBuildWithReport
     {
-        public int callbackOrder { get { return 0; } }
+        public int callbackOrder
+        {
+            get { return 0; }
+        }
         internal static string ResourcesPath => Path.Combine(Renderer.debugDirName, "Resources");
 
         public void OnPreprocessBuild(BuildReport report)
@@ -24,8 +27,16 @@ namespace Unity.DebugDisplay
                 }
 
                 // Get all .mat and .shader files from debugDirName
-                string[] materialFiles = Directory.GetFiles(Renderer.debugDirName, "*.mat", SearchOption.TopDirectoryOnly);
-                string[] shaderFiles = Directory.GetFiles(Renderer.debugDirName, "*.shader", SearchOption.TopDirectoryOnly);
+                string[] materialFiles = Directory.GetFiles(
+                    Renderer.debugDirName,
+                    "*.mat",
+                    SearchOption.TopDirectoryOnly
+                );
+                string[] shaderFiles = Directory.GetFiles(
+                    Renderer.debugDirName,
+                    "*.shader",
+                    SearchOption.TopDirectoryOnly
+                );
 
                 // Combine both arrays
                 string[] allFiles = new string[materialFiles.Length + shaderFiles.Length];

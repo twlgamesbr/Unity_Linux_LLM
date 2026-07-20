@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor;
 
 namespace Unity.Entities.Editor
@@ -41,39 +41,33 @@ namespace Unity.Entities.Editor
                 return string.Empty;
 
             if (!s_NicifiedSystemNameDict.TryGetValue(systemType, out var nicifyName))
-                s_NicifiedSystemNameDict[systemType] = nicifyName = ObjectNames.NicifyVariableName(TypeUtility.GetTypeDisplayName(systemType).Replace(".", " | "));
+                s_NicifiedSystemNameDict[systemType] = nicifyName = ObjectNames.NicifyVariableName(
+                    TypeUtility.GetTypeDisplayName(systemType).Replace(".", " | ")
+                );
 
             return nicifyName;
         }
 
         public static void ShowSystemInspectorContent(SystemProxy systemProxy)
         {
-            SelectionUtility.ShowInInspector(new SystemContentProvider
-            {
-                World = systemProxy.World,
-                SystemProxy = systemProxy
-            }, new InspectorContentParameters
-            {
-                UseDefaultMargins = false,
-                ApplyInspectorStyling = false
-            });
+            SelectionUtility.ShowInInspector(
+                new SystemContentProvider { World = systemProxy.World, SystemProxy = systemProxy },
+                new InspectorContentParameters { UseDefaultMargins = false, ApplyInspectorStyling = false }
+            );
         }
 
         public static void ShowComponentInspectorContent(Type componentType)
         {
-            SelectionUtility.ShowInInspector(new ComponentContentProvider
-            {
-                ComponentType = componentType
-            }, new InspectorContentParameters
-            {
-                ApplyInspectorStyling = false,
-                UseDefaultMargins = false
-            });
+            SelectionUtility.ShowInInspector(
+                new ComponentContentProvider { ComponentType = componentType },
+                new InspectorContentParameters { ApplyInspectorStyling = false, UseDefaultMargins = false }
+            );
         }
 
         public static string NicifyTypeName(string typeName)
         {
-            return ObjectNames.NicifyVariableName(typeName.Replace("<", "[").Replace(">", "]"))
+            return ObjectNames
+                .NicifyVariableName(typeName.Replace("<", "[").Replace(">", "]"))
                 .Replace("_", " | ")
                 .Replace(".", " | ")
                 .Replace("[", "<")

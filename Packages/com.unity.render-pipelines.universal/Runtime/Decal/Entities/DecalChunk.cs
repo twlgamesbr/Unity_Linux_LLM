@@ -12,7 +12,11 @@ namespace UnityEngine.Rendering.Universal
 
         public JobHandle currentJobHandle { get; set; }
 
-        public virtual void Push() { count++; }
+        public virtual void Push()
+        {
+            count++;
+        }
+
         public abstract void RemoveAtSwapBack(int index);
         public abstract void SetCapacity(int capacity);
 
@@ -30,7 +34,8 @@ namespace UnityEngine.Rendering.Universal
             array = newArray;
         }
 
-        protected void RemoveAtSwapBack<T>(ref NativeArray<T> array, int index, int count) where T : struct
+        protected void RemoveAtSwapBack<T>(ref NativeArray<T> array, int index, int count)
+            where T : struct
         {
             array[index] = array[count - 1];
         }

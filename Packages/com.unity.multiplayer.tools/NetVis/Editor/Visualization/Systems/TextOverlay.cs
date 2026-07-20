@@ -17,9 +17,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
 
         static GUIStyle s_TextLabelStyle;
 
-        public TextOverlay(
-            [NotNull] NetVisConfiguration configuration,
-            [NotNull] NetVisDataStore netVisDataStore)
+        public TextOverlay([NotNull] NetVisConfiguration configuration, [NotNull] NetVisDataStore netVisDataStore)
         {
             DebugUtil.TraceMethodName();
             m_Configuration = configuration;
@@ -77,7 +75,9 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
 
                 var content = m_Configuration.Metric switch
                 {
-                    NetVisMetric.Bandwidth => bandwidthAvailable ? m_NetVisDataStore.GetBandwidth(id).ToString("N0") : "No data",
+                    NetVisMetric.Bandwidth => bandwidthAvailable
+                        ? m_NetVisDataStore.GetBandwidth(id).ToString("N0")
+                        : "No data",
                     NetVisMetric.Ownership => m_NetVisDataStore.GetOwner(id).ToString(),
                     _ => string.Empty,
                 };
@@ -93,10 +93,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             s_TextLabelStyle ??= new GUIStyle
             {
                 padding = new RectOffset(2, 0, 0, 0),
-                normal =
-                {
-                    textColor = Color.black,
-                }
+                normal = { textColor = Color.black },
             };
 
             // For some reason the background texture is being reset to null in BossRoom when the scene view is
@@ -124,7 +121,12 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             return collider2D == targetCollider2D;
         }
 
-        static bool ObjectHasCollider(GameObject gameObject, out Collider collider, out Collider2D collider2D, out Vector3 colliderPosition)
+        static bool ObjectHasCollider(
+            GameObject gameObject,
+            out Collider collider,
+            out Collider2D collider2D,
+            out Vector3 colliderPosition
+        )
         {
             collider = null;
             collider2D = null;

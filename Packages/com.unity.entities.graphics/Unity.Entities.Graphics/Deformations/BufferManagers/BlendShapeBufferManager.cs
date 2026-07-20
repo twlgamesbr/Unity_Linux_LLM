@@ -10,7 +10,8 @@ namespace Unity.Rendering
         const int k_ChunkSize = 2048;
 
         static readonly int k_BlendShapeWeightsBuffer = Shader.PropertyToID("_BlendShapeWeights");
-        static readonly int k_MaxSize = (int)math.min(SystemInfo.maxGraphicsBufferSize / UnsafeUtility.SizeOf<float>(), int.MaxValue);
+        static readonly int k_MaxSize = (int)
+            math.min(SystemInfo.maxGraphicsBufferSize / UnsafeUtility.SizeOf<float>(), int.MaxValue);
 
         FencedBufferPool m_BufferPool;
 
@@ -35,7 +36,9 @@ namespace Unity.Rendering
                 {
                     // Only inform users if the content requires a buffer that is too big.
                     if (requiredSize > k_MaxSize)
-                        UnityEngine.Debug.LogWarning("The world contains too many blend shapes to fit into a single GraphicsBuffer. Not all deformed meshes are guaranteed to render correctly. Reduce the number of active deformed meshes.");
+                        UnityEngine.Debug.LogWarning(
+                            "The world contains too many blend shapes to fit into a single GraphicsBuffer. Not all deformed meshes are guaranteed to render correctly. Reduce the number of active deformed meshes."
+                        );
 
                     // Do not actually resize the buffer if we are already at max capacity.
                     if (size == k_MaxSize)
@@ -64,6 +67,6 @@ namespace Unity.Rendering
             buffer.UnlockBufferAfterWrite<float>(count);
             Shader.SetGlobalBuffer(k_BlendShapeWeightsBuffer, buffer);
             m_BufferPool.EndFrame();
-        }       
+        }
     }
 }

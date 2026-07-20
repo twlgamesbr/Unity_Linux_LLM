@@ -5,9 +5,9 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics.Extensions;
 using Unity.Transforms;
 using UnityEngine.Assertions;
-using Unity.Physics.Extensions;
 
 namespace Unity.Physics.Systems
 {
@@ -31,23 +31,65 @@ namespace Unity.Physics.Systems
         /// <param name="lastSystemVersion">                The last system version. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle SchedulePhysicsWorldBuild(ref SystemState systemState, ref PhysicsWorldData physicsData,
-            in JobHandle inputDep, float timeStep, bool isBroadphaseBuildMultiThreaded, float3 gravity, uint lastSystemVersion)
+        public static JobHandle SchedulePhysicsWorldBuild(
+            ref SystemState systemState,
+            ref PhysicsWorldData physicsData,
+            in JobHandle inputDep,
+            float timeStep,
+            bool isBroadphaseBuildMultiThreaded,
+            float3 gravity,
+            uint lastSystemVersion
+        )
         {
             physicsData.Update(ref systemState);
-            return SchedulePhysicsWorldBuild(ref systemState, ref physicsData.PhysicsWorld, ref physicsData.HaveStaticBodiesChanged, physicsData.ComponentHandles,
-                inputDep, timeStep, isBroadphaseBuildMultiThreaded, gravity, lastSystemVersion,
-                physicsData.DynamicEntityGroup, physicsData.StaticEntityGroup, physicsData.JointEntityGroup);
+            return SchedulePhysicsWorldBuild(
+                ref systemState,
+                ref physicsData.PhysicsWorld,
+                ref physicsData.HaveStaticBodiesChanged,
+                physicsData.ComponentHandles,
+                inputDep,
+                timeStep,
+                isBroadphaseBuildMultiThreaded,
+                gravity,
+                lastSystemVersion,
+                physicsData.DynamicEntityGroup,
+                physicsData.StaticEntityGroup,
+                physicsData.JointEntityGroup
+            );
         }
 
-        internal static JobHandle SchedulePhysicsWorldBuild(ref SystemState systemState, ref PhysicsWorldData physicsData,
-            in JobHandle inputDep, float timeStep, float collisionTolerance, bool isBroadphaseBuildMultiThreaded,
-            bool isDynamicBroadphaseIncremental, bool isStaticBroadphaseIncremental, float3 gravity, uint lastSystemVersion)
+        internal static JobHandle SchedulePhysicsWorldBuild(
+            ref SystemState systemState,
+            ref PhysicsWorldData physicsData,
+            in JobHandle inputDep,
+            float timeStep,
+            float collisionTolerance,
+            bool isBroadphaseBuildMultiThreaded,
+            bool isDynamicBroadphaseIncremental,
+            bool isStaticBroadphaseIncremental,
+            float3 gravity,
+            uint lastSystemVersion
+        )
         {
             physicsData.Update(ref systemState);
-            return SchedulePhysicsWorldBuild(ref systemState, ref physicsData.PhysicsWorld, ref physicsData.HaveStaticBodiesChanged, physicsData.ComponentHandles,
-                inputDep, timeStep, collisionTolerance, isBroadphaseBuildMultiThreaded, isDynamicBroadphaseIncremental, isStaticBroadphaseIncremental, gravity, lastSystemVersion,
-                physicsData.DynamicEntityGroup, physicsData.StaticEntityGroup, physicsData.JointEntityGroup, physicsData.InvalidatedTemporalCoherenceInfoGroup);
+            return SchedulePhysicsWorldBuild(
+                ref systemState,
+                ref physicsData.PhysicsWorld,
+                ref physicsData.HaveStaticBodiesChanged,
+                physicsData.ComponentHandles,
+                inputDep,
+                timeStep,
+                collisionTolerance,
+                isBroadphaseBuildMultiThreaded,
+                isDynamicBroadphaseIncremental,
+                isStaticBroadphaseIncremental,
+                gravity,
+                lastSystemVersion,
+                physicsData.DynamicEntityGroup,
+                physicsData.StaticEntityGroup,
+                physicsData.JointEntityGroup,
+                physicsData.InvalidatedTemporalCoherenceInfoGroup
+            );
         }
 
         /// <summary>
@@ -70,20 +112,59 @@ namespace Unity.Physics.Systems
         /// <param name="jointEntityQuery">                 Group the joint entity belongs to. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle SchedulePhysicsWorldBuild(ref SystemState systemState,
-            ref PhysicsWorld world, ref NativeReference<int> haveStaticBodiesChanged, in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles,
-            in JobHandle inputDep, float timeStep, bool isBroadphaseBuildMultiThreaded, float3 gravity, uint lastSystemVersion,
-            EntityQuery dynamicEntityQuery, EntityQuery staticEntityQuery, EntityQuery jointEntityQuery)
+        public static JobHandle SchedulePhysicsWorldBuild(
+            ref SystemState systemState,
+            ref PhysicsWorld world,
+            ref NativeReference<int> haveStaticBodiesChanged,
+            in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles,
+            in JobHandle inputDep,
+            float timeStep,
+            bool isBroadphaseBuildMultiThreaded,
+            float3 gravity,
+            uint lastSystemVersion,
+            EntityQuery dynamicEntityQuery,
+            EntityQuery staticEntityQuery,
+            EntityQuery jointEntityQuery
+        )
         {
-            return SchedulePhysicsWorldBuild(ref systemState, ref world, ref haveStaticBodiesChanged, componentHandles,
-                inputDep, timeStep, CollisionWorld.DefaultCollisionTolerance, isBroadphaseBuildMultiThreaded, false, false, gravity, lastSystemVersion,
-                dynamicEntityQuery, staticEntityQuery, jointEntityQuery, default);
+            return SchedulePhysicsWorldBuild(
+                ref systemState,
+                ref world,
+                ref haveStaticBodiesChanged,
+                componentHandles,
+                inputDep,
+                timeStep,
+                CollisionWorld.DefaultCollisionTolerance,
+                isBroadphaseBuildMultiThreaded,
+                false,
+                false,
+                gravity,
+                lastSystemVersion,
+                dynamicEntityQuery,
+                staticEntityQuery,
+                jointEntityQuery,
+                default
+            );
         }
 
-        static JobHandle SchedulePhysicsWorldBuild(ref SystemState systemState,
-            ref PhysicsWorld world, ref NativeReference<int> haveStaticBodiesChanged, in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles,
-            in JobHandle inputDep, float timeStep, float collisionTolerance, bool isBroadphaseBuildMultiThreaded, bool isDynamicBroadphaseIncremental, bool isStaticBroadphaseIncremental, float3 gravity, uint lastSystemVersion,
-            EntityQuery dynamicEntityQuery, EntityQuery staticEntityQuery, EntityQuery jointEntityQuery, EntityQuery invalidatedTemporalCoherenceInfoQuery)
+        static JobHandle SchedulePhysicsWorldBuild(
+            ref SystemState systemState,
+            ref PhysicsWorld world,
+            ref NativeReference<int> haveStaticBodiesChanged,
+            in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles,
+            in JobHandle inputDep,
+            float timeStep,
+            float collisionTolerance,
+            bool isBroadphaseBuildMultiThreaded,
+            bool isDynamicBroadphaseIncremental,
+            bool isStaticBroadphaseIncremental,
+            float3 gravity,
+            uint lastSystemVersion,
+            EntityQuery dynamicEntityQuery,
+            EntityQuery staticEntityQuery,
+            EntityQuery jointEntityQuery,
+            EntityQuery invalidatedTemporalCoherenceInfoQuery
+        )
         {
             JobHandle finalHandle = inputDep;
 
@@ -105,7 +186,8 @@ namespace Unity.Physics.Systems
             world.Reset(
                 numStaticBodies + 1, // +1 for the default static body
                 numDynamicBodies,
-                numJoints);
+                numJoints
+            );
 
             // Set the desired collision tolerance
             world.CollisionWorld.CollisionTolerance = collisionTolerance;
@@ -115,8 +197,7 @@ namespace Unity.Physics.Systems
 
             haveStaticBodiesChanged.Value = 0;
             {
-                if (world.NumStaticBodies != previousStaticBodyCount ||
-                    isStaticBroadphaseIncremental)
+                if (world.NumStaticBodies != previousStaticBodyCount || isStaticBroadphaseIncremental)
                 {
                     haveStaticBodiesChanged.Value = 1;
                 }
@@ -129,7 +210,7 @@ namespace Unity.Physics.Systems
                         PhysicsColliderType = componentHandles.PhysicsColliderType,
                         PhysicsSolverTypeType = componentHandles.PhysicsSolverTypeType,
                         m_LastSystemVersion = lastSystemVersion,
-                        Result = haveStaticBodiesChanged
+                        Result = haveStaticBodiesChanged,
                     }.ScheduleParallel(staticEntityQuery, inputDep);
                 }
             }
@@ -144,12 +225,14 @@ namespace Unity.Physics.Systems
 
                 // Create the default static body at the end of the body list
                 // TODO: could skip this if no joints present
-                jobHandles.Add(new Jobs.CreateDefaultStaticRigidBody
-                {
-                    NativeBodies = world.Bodies,
-                    BodyIndex = world.Bodies.Length - 1,
-                    EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter(),
-                }.Schedule(inputDep));
+                jobHandles.Add(
+                    new Jobs.CreateDefaultStaticRigidBody
+                    {
+                        NativeBodies = world.Bodies,
+                        BodyIndex = world.Bodies.Length - 1,
+                        EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter(),
+                    }.Schedule(inputDep)
+                );
 
                 // Dynamic bodies.
                 // Create these separately from static bodies to maintain a 1:1 mapping
@@ -158,9 +241,11 @@ namespace Unity.Physics.Systems
                 {
                     // Since these two jobs are scheduled against the same query, they can share a single
                     // entity index array.
-                    dynamicBodyChunkBaseEntityIndices =
-                        dynamicEntityQuery.CalculateBaseEntityIndexArrayAsync(systemState.WorldUpdateAllocator, inputDep,
-                            out var baseIndexJob);
+                    dynamicBodyChunkBaseEntityIndices = dynamicEntityQuery.CalculateBaseEntityIndexArrayAsync(
+                        systemState.WorldUpdateAllocator,
+                        inputDep,
+                        out var baseIndexJob
+                    );
                     var createBodiesJob = new Jobs.CreateRigidBodies
                     {
                         EntityType = componentHandles.EntityType,
@@ -177,7 +262,7 @@ namespace Unity.Physics.Systems
                         EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter(),
                         DirectSolverEnabledFlag = world.DynamicsWorld.DirectSolverEnabledFlag,
 
-                        ChunkBaseEntityIndices = dynamicBodyChunkBaseEntityIndices
+                        ChunkBaseEntityIndices = dynamicBodyChunkBaseEntityIndices,
                     }.ScheduleParallel(dynamicEntityQuery, baseIndexJob);
                     jobHandles.Add(createBodiesJob);
 
@@ -202,9 +287,11 @@ namespace Unity.Physics.Systems
                 // the dynamic and kinematic bodies
                 if (numStaticBodies > 0)
                 {
-                    staticBodyChunkBaseEntityIndices =
-                        staticEntityQuery.CalculateBaseEntityIndexArrayAsync(systemState.WorldUpdateAllocator, inputDep,
-                            out var baseIndexJob);
+                    staticBodyChunkBaseEntityIndices = staticEntityQuery.CalculateBaseEntityIndexArrayAsync(
+                        systemState.WorldUpdateAllocator,
+                        inputDep,
+                        out var baseIndexJob
+                    );
                     var createBodiesJob = new Jobs.CreateRigidBodies
                     {
                         EntityType = componentHandles.EntityType,
@@ -221,7 +308,7 @@ namespace Unity.Physics.Systems
                         EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter(),
                         DirectSolverEnabledFlag = world.DynamicsWorld.DirectSolverEnabledFlag,
 
-                        ChunkBaseEntityIndices = staticBodyChunkBaseEntityIndices
+                        ChunkBaseEntityIndices = staticBodyChunkBaseEntityIndices,
                     }.ScheduleParallel(staticEntityQuery, baseIndexJob);
                     jobHandles.Add(createBodiesJob);
                 }
@@ -232,9 +319,11 @@ namespace Unity.Physics.Systems
                 // Build joints
                 if (numJoints > 0)
                 {
-                    var chunkBaseEntityIndices =
-                        jointEntityQuery.CalculateBaseEntityIndexArrayAsync(systemState.WorldUpdateAllocator, combinedHandle,
-                            out var baseIndexJob);
+                    var chunkBaseEntityIndices = jointEntityQuery.CalculateBaseEntityIndexArrayAsync(
+                        systemState.WorldUpdateAllocator,
+                        combinedHandle,
+                        out var baseIndexJob
+                    );
                     var createJointsJob = new Jobs.CreateJoints
                     {
                         ConstrainedBodyPairComponentType = componentHandles.PhysicsConstrainedBodyPairType,
@@ -247,20 +336,38 @@ namespace Unity.Physics.Systems
                         EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap,
                         EntityJointIndexMap = world.DynamicsWorld.EntityJointIndexMap.AsParallelWriter(),
                         DirectSolverEnabledFlag = world.DynamicsWorld.DirectSolverEnabledFlag,
-                        ChunkBaseEntityIndices = chunkBaseEntityIndices
+                        ChunkBaseEntityIndices = chunkBaseEntityIndices,
                     }.ScheduleParallel(jointEntityQuery, baseIndexJob);
                     jobHandles.Add(createJointsJob);
                 }
 
                 var buildBroadphaseHandle = world.CollisionWorld.ScheduleBuildBroadphaseJobs(
-                    ref world, timeStep, gravity, numDynamicBodies, numStaticBodies, haveStaticBodiesChanged,
-                    dynamicEntityQuery, staticEntityQuery, invalidatedTemporalCoherenceInfoQuery, dynamicBodyChunkBaseEntityIndices, staticBodyChunkBaseEntityIndices,
-                    combinedHandle, systemState.WorldUpdateAllocator, componentHandles, lastSystemVersion,
-                    isBroadphaseBuildMultiThreaded, isDynamicBroadphaseIncremental, isStaticBroadphaseIncremental);
+                    ref world,
+                    timeStep,
+                    gravity,
+                    numDynamicBodies,
+                    numStaticBodies,
+                    haveStaticBodiesChanged,
+                    dynamicEntityQuery,
+                    staticEntityQuery,
+                    invalidatedTemporalCoherenceInfoQuery,
+                    dynamicBodyChunkBaseEntityIndices,
+                    staticBodyChunkBaseEntityIndices,
+                    combinedHandle,
+                    systemState.WorldUpdateAllocator,
+                    componentHandles,
+                    lastSystemVersion,
+                    isBroadphaseBuildMultiThreaded,
+                    isDynamicBroadphaseIncremental,
+                    isStaticBroadphaseIncremental
+                );
 
                 jobHandles.Add(buildBroadphaseHandle);
 
-                finalHandle = JobHandle.CombineDependencies(inputDep, JobHandle.CombineDependencies(jobHandles.AsArray()));
+                finalHandle = JobHandle.CombineDependencies(
+                    inputDep,
+                    JobHandle.CombineDependencies(jobHandles.AsArray())
+                );
             }
 
             return finalHandle;
@@ -279,12 +386,23 @@ namespace Unity.Physics.Systems
         /// <param name="gravity">                          The gravity. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleBroadphaseBVHBuild(ref PhysicsWorld world, NativeReference<int>.ReadOnly haveStaticBodiesChanged,
-            in JobHandle inputDep, float timeStep, bool isBroadphaseUpdateMultiThreaded, float3 gravity)
+        public static JobHandle ScheduleBroadphaseBVHBuild(
+            ref PhysicsWorld world,
+            NativeReference<int>.ReadOnly haveStaticBodiesChanged,
+            in JobHandle inputDep,
+            float timeStep,
+            bool isBroadphaseUpdateMultiThreaded,
+            float3 gravity
+        )
         {
             return world.CollisionWorld.ScheduleBuildBroadphaseJobs(
-                ref world, timeStep, gravity,
-                haveStaticBodiesChanged, inputDep, isBroadphaseUpdateMultiThreaded);
+                ref world,
+                timeStep,
+                gravity,
+                haveStaticBodiesChanged,
+                inputDep,
+                isBroadphaseUpdateMultiThreaded
+            );
         }
 
         /// <summary>
@@ -299,12 +417,23 @@ namespace Unity.Physics.Systems
         /// <param name="isBroadphaseUpdatedMultiThreaded">True if the broadphase update is multithreaded; false otherwise.</param>
         ///
         /// <returns>A JobHandle.</returns>
-        public static JobHandle ScheduleUpdateBroadphase(ref PhysicsWorldData physicsWorldData,
-            float timeStep, float3 gravity, uint lastSystemVersion, in JobHandle inputDep, bool isBroadphaseUpdatedMultiThreaded)
+        public static JobHandle ScheduleUpdateBroadphase(
+            ref PhysicsWorldData physicsWorldData,
+            float timeStep,
+            float3 gravity,
+            uint lastSystemVersion,
+            in JobHandle inputDep,
+            bool isBroadphaseUpdatedMultiThreaded
+        )
         {
             physicsWorldData.HaveStaticBodiesChanged.Value = 0;
             var jobHandle = physicsWorldData.PhysicsWorld.CollisionWorld.ScheduleUpdateDynamicTree(
-                ref physicsWorldData.PhysicsWorld, timeStep, gravity, inputDep, isBroadphaseUpdatedMultiThreaded);
+                ref physicsWorldData.PhysicsWorld,
+                timeStep,
+                gravity,
+                inputDep,
+                isBroadphaseUpdatedMultiThreaded
+            );
             jobHandle = new Jobs.CheckStaticBodyChangesJob
             {
                 LocalToWorldType = physicsWorldData.ComponentHandles.LocalToWorldType,
@@ -312,10 +441,14 @@ namespace Unity.Physics.Systems
                 PhysicsColliderType = physicsWorldData.ComponentHandles.PhysicsColliderType,
                 PhysicsSolverTypeType = physicsWorldData.ComponentHandles.PhysicsSolverTypeType,
                 m_LastSystemVersion = lastSystemVersion,
-                Result = physicsWorldData.HaveStaticBodiesChanged
+                Result = physicsWorldData.HaveStaticBodiesChanged,
             }.ScheduleParallel(physicsWorldData.StaticEntityGroup, inputDep);
             jobHandle = physicsWorldData.PhysicsWorld.CollisionWorld.ScheduleUpdateStaticTree(
-                ref physicsWorldData.PhysicsWorld, physicsWorldData.HaveStaticBodiesChanged.AsReadOnly(), jobHandle, isBroadphaseUpdatedMultiThreaded);
+                ref physicsWorldData.PhysicsWorld,
+                physicsWorldData.HaveStaticBodiesChanged.AsReadOnly(),
+                jobHandle,
+                isBroadphaseUpdatedMultiThreaded
+            );
             return jobHandle;
         }
 
@@ -329,7 +462,11 @@ namespace Unity.Physics.Systems
         /// <param name="inputDeps">the input dependencies</param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleUpdateMotionData(ref SystemState systemState, ref PhysicsWorldData physicsData, JobHandle inputDeps)
+        public static JobHandle ScheduleUpdateMotionData(
+            ref SystemState systemState,
+            ref PhysicsWorldData physicsData,
+            JobHandle inputDeps
+        )
         {
             var numDynamicBodies = physicsData.StaticEntityGroup.CalculateEntityCount();
             if (numDynamicBodies == 0)
@@ -337,7 +474,10 @@ namespace Unity.Physics.Systems
                 return inputDeps;
             }
             using var chunkBaseEntityIndices = physicsData.DynamicEntityGroup.CalculateBaseEntityIndexArrayAsync(
-                systemState.WorldUpdateAllocator, inputDeps, out var jobHandle);
+                systemState.WorldUpdateAllocator,
+                inputDeps,
+                out var jobHandle
+            );
             inputDeps = new Jobs.CreateMotions
             {
                 LocalTransformType = physicsData.ComponentHandles.LocalTransformType,
@@ -371,7 +511,9 @@ namespace Unity.Physics.Systems
                 physicsData.HaveStaticBodiesChanged.Value = 0;
                 return;
             }
-            using var chunkBaseEntityIndices = physicsData.DynamicEntityGroup.CalculateBaseEntityIndexArray(systemState.WorldUpdateAllocator);
+            using var chunkBaseEntityIndices = physicsData.DynamicEntityGroup.CalculateBaseEntityIndexArray(
+                systemState.WorldUpdateAllocator
+            );
             new Jobs.CreateMotions
             {
                 LocalTransformType = physicsData.ComponentHandles.LocalTransformType,
@@ -399,12 +541,26 @@ namespace Unity.Physics.Systems
         /// <param name="timeStep">             The time step. </param>
         /// <param name="gravity">              The gravity. </param>
         /// <param name="lastSystemVersion">    The last system version. </param>
-        public static void BuildPhysicsWorldImmediate(ref SystemState systemState, ref PhysicsWorldData physicsData,
-            float timeStep, float3 gravity, uint lastSystemVersion)
+        public static void BuildPhysicsWorldImmediate(
+            ref SystemState systemState,
+            ref PhysicsWorldData physicsData,
+            float timeStep,
+            float3 gravity,
+            uint lastSystemVersion
+        )
         {
             physicsData.Update(ref systemState);
-            BuildPhysicsWorldImmediate(ref physicsData.PhysicsWorld, physicsData.HaveStaticBodiesChanged, physicsData.ComponentHandles,
-                timeStep, gravity, lastSystemVersion, physicsData.DynamicEntityGroup, physicsData.StaticEntityGroup, physicsData.JointEntityGroup);
+            BuildPhysicsWorldImmediate(
+                ref physicsData.PhysicsWorld,
+                physicsData.HaveStaticBodiesChanged,
+                physicsData.ComponentHandles,
+                timeStep,
+                gravity,
+                lastSystemVersion,
+                physicsData.DynamicEntityGroup,
+                physicsData.StaticEntityGroup,
+                physicsData.JointEntityGroup
+            );
         }
 
         /// <summary>
@@ -422,9 +578,16 @@ namespace Unity.Physics.Systems
         /// <param name="staticEntityGroup">        Group the static entity belongs to. </param>
         /// <param name="jointEntityGroup">         Group the joint entity belongs to. </param>
         public static void BuildPhysicsWorldImmediate(
-            ref PhysicsWorld world, NativeReference<int> haveStaticBodiesChanged, in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles,
-            float timeStep, float3 gravity, uint lastSystemVersion,
-            EntityQuery dynamicEntityGroup, EntityQuery staticEntityGroup, EntityQuery jointEntityGroup)
+            ref PhysicsWorld world,
+            NativeReference<int> haveStaticBodiesChanged,
+            in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles,
+            float timeStep,
+            float3 gravity,
+            uint lastSystemVersion,
+            EntityQuery dynamicEntityGroup,
+            EntityQuery staticEntityGroup,
+            EntityQuery jointEntityGroup
+        )
         {
             int numDynamicBodies = dynamicEntityGroup.CalculateEntityCount();
             int numStaticBodies = staticEntityGroup.CalculateEntityCount();
@@ -444,7 +607,8 @@ namespace Unity.Physics.Systems
             world.Reset(
                 numStaticBodies + 1, // +1 for the default static body
                 numDynamicBodies,
-                numJoints);
+                numJoints
+            );
 
             haveStaticBodiesChanged.Value = 0;
             {
@@ -461,7 +625,7 @@ namespace Unity.Physics.Systems
                         PhysicsColliderType = componentHandles.PhysicsColliderType,
                         PhysicsSolverTypeType = componentHandles.PhysicsSolverTypeType,
                         m_LastSystemVersion = lastSystemVersion,
-                        Result = haveStaticBodiesChanged
+                        Result = haveStaticBodiesChanged,
                     }.Run(staticEntityGroup);
                 }
             }
@@ -472,7 +636,7 @@ namespace Unity.Physics.Systems
             {
                 NativeBodies = world.Bodies,
                 BodyIndex = world.Bodies.Length - 1,
-                EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter()
+                EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter(),
             }.Run();
 
             // Dynamic bodies.
@@ -496,7 +660,7 @@ namespace Unity.Physics.Systems
                     EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter(),
                     DirectSolverEnabledFlag = world.DynamicsWorld.DirectSolverEnabledFlag,
 
-                    ChunkBaseEntityIndices = chunkBaseEntityIndices
+                    ChunkBaseEntityIndices = chunkBaseEntityIndices,
                 }.Run(dynamicEntityGroup);
 
                 new Jobs.CreateMotions
@@ -535,7 +699,7 @@ namespace Unity.Physics.Systems
                     EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap.AsParallelWriter(),
                     DirectSolverEnabledFlag = world.DynamicsWorld.DirectSolverEnabledFlag,
 
-                    ChunkBaseEntityIndices = chunkBaseEntityIndices
+                    ChunkBaseEntityIndices = chunkBaseEntityIndices,
                 }.Run(staticEntityGroup);
             }
 
@@ -555,7 +719,7 @@ namespace Unity.Physics.Systems
                     EntityBodyIndexMap = world.CollisionWorld.EntityBodyIndexMap,
                     EntityJointIndexMap = world.DynamicsWorld.EntityJointIndexMap.AsParallelWriter(),
                     DirectSolverEnabledFlag = world.DynamicsWorld.DirectSolverEnabledFlag,
-                    ChunkBaseEntityIndices = chunkBaseEntityIndices
+                    ChunkBaseEntityIndices = chunkBaseEntityIndices,
                 }.Run(jointEntityGroup);
             }
 
@@ -571,7 +735,12 @@ namespace Unity.Physics.Systems
         /// <param name="haveStaticBodiesChanged">  True if have static bodies changed. </param>
         /// <param name="timeStep">                 The time step. </param>
         /// <param name="gravity">                  The gravity. </param>
-        public static void BuildBroadphaseBVHImmediate(ref PhysicsWorld world, bool haveStaticBodiesChanged, float timeStep, float3 gravity)
+        public static void BuildBroadphaseBVHImmediate(
+            ref PhysicsWorld world,
+            bool haveStaticBodiesChanged,
+            float timeStep,
+            float3 gravity
+        )
         {
             world.CollisionWorld.BuildBroadphase(ref world, timeStep, gravity, haveStaticBodiesChanged);
         }
@@ -584,10 +753,19 @@ namespace Unity.Physics.Systems
         /// <param name="timeStep"> The time step for which the broadphase update is performed. </param>
         /// <param name="gravity"> The gravity vector applied during the update. </param>
         /// <param name="lastSystemVersion"> The system version used to detect changes in components since the last update. </param>
-        public static void UpdateBroadphaseImmediate(ref PhysicsWorldData physicsWorldData, float timeStep, float3 gravity, uint lastSystemVersion)
+        public static void UpdateBroadphaseImmediate(
+            ref PhysicsWorldData physicsWorldData,
+            float timeStep,
+            float3 gravity,
+            uint lastSystemVersion
+        )
         {
             physicsWorldData.HaveStaticBodiesChanged.Value = 0;
-            physicsWorldData.PhysicsWorld.CollisionWorld.UpdateDynamicTree(ref physicsWorldData.PhysicsWorld, timeStep, gravity);
+            physicsWorldData.PhysicsWorld.CollisionWorld.UpdateDynamicTree(
+                ref physicsWorldData.PhysicsWorld,
+                timeStep,
+                gravity
+            );
             new Jobs.CheckStaticBodyChangesJob
             {
                 LocalToWorldType = physicsWorldData.ComponentHandles.LocalToWorldType,
@@ -595,7 +773,7 @@ namespace Unity.Physics.Systems
                 PhysicsColliderType = physicsWorldData.ComponentHandles.PhysicsColliderType,
                 PhysicsSolverTypeType = physicsWorldData.ComponentHandles.PhysicsSolverTypeType,
                 m_LastSystemVersion = lastSystemVersion,
-                Result = physicsWorldData.HaveStaticBodiesChanged
+                Result = physicsWorldData.HaveStaticBodiesChanged,
             }.Run(physicsWorldData.StaticEntityGroup);
             if (physicsWorldData.HaveStaticBodiesChanged.Value != 0)
             {
@@ -611,24 +789,37 @@ namespace Unity.Physics.Systems
             [BurstCompile]
             internal struct CheckStaticBodyChangesJob : IJobChunk
             {
-                [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorldType;
-                [ReadOnly] public ComponentTypeHandle<LocalTransform> LocalTransformType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsSolverType> PhysicsSolverTypeType;
+                [ReadOnly]
+                public ComponentTypeHandle<LocalToWorld> LocalToWorldType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<LocalTransform> LocalTransformType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsSolverType> PhysicsSolverTypeType;
+
                 [NativeDisableParallelForRestriction]
                 public NativeReference<int> Result;
 
                 public uint m_LastSystemVersion;
 
-                public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+                public void Execute(
+                    in ArchetypeChunk chunk,
+                    int unfilteredChunkIndex,
+                    bool useEnabledMask,
+                    in v128 chunkEnabledMask
+                )
                 {
                     SafetyChecks.CheckAreEqualAndThrow(false, useEnabledMask);
                     bool didBatchChange =
-                        chunk.DidChange(ref LocalToWorldType, m_LastSystemVersion)       ||
-                        chunk.DidChange(ref LocalTransformType, m_LastSystemVersion)     ||
-                        chunk.DidChange(ref PhysicsColliderType, m_LastSystemVersion)    ||
-                        chunk.DidChange(ref PhysicsSolverTypeType, m_LastSystemVersion)  ||
-                        chunk.DidOrderChange(m_LastSystemVersion);
+                        chunk.DidChange(ref LocalToWorldType, m_LastSystemVersion)
+                        || chunk.DidChange(ref LocalTransformType, m_LastSystemVersion)
+                        || chunk.DidChange(ref PhysicsColliderType, m_LastSystemVersion)
+                        || chunk.DidChange(ref PhysicsSolverTypeType, m_LastSystemVersion)
+                        || chunk.DidOrderChange(m_LastSystemVersion);
                     if (didBatchChange)
                     {
                         // Note that multiple worker threads may be running at the same time.
@@ -659,7 +850,7 @@ namespace Unity.Physics.Systems
                         Scale = 1.0f,
                         Collider = default,
                         Entity = Entity.Null,
-                        CustomTags = 0
+                        CustomTags = 0,
                     };
                     EntityBodyIndexMap.TryAdd(Entity.Null, BodyIndex);
                 }
@@ -668,22 +859,48 @@ namespace Unity.Physics.Systems
             [BurstCompile]
             internal struct CreateRigidBodies : IJobChunk
             {
-                [ReadOnly] public EntityTypeHandle EntityType;
-                [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorldType;
-                [ReadOnly] public ComponentTypeHandle<Parent> ParentType;
-                [ReadOnly] public ComponentTypeHandle<LocalTransform> LocalTransformType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsCustomTags> PhysicsCustomTagsType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsSolverType> PhysicsSolverTypeType;
-                [ReadOnly] public int FirstBodyIndex;
+                [ReadOnly]
+                public EntityTypeHandle EntityType;
 
-                [WriteOnly, NativeDisableContainerSafetyRestriction] public NativeArray<RigidBody> RigidBodies;
-                [NativeDisableContainerSafetyRestriction] public NativeParallelHashMap<Entity, int>.ParallelWriter EntityBodyIndexMap;
-                [WriteOnly, NativeDisableContainerSafetyRestriction] public NativeReference<bool> DirectSolverEnabledFlag;
+                [ReadOnly]
+                public ComponentTypeHandle<LocalToWorld> LocalToWorldType;
 
-                [ReadOnly] public NativeArray<int> ChunkBaseEntityIndices;
+                [ReadOnly]
+                public ComponentTypeHandle<Parent> ParentType;
 
-                public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+                [ReadOnly]
+                public ComponentTypeHandle<LocalTransform> LocalTransformType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsCustomTags> PhysicsCustomTagsType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsSolverType> PhysicsSolverTypeType;
+
+                [ReadOnly]
+                public int FirstBodyIndex;
+
+                [WriteOnly, NativeDisableContainerSafetyRestriction]
+                public NativeArray<RigidBody> RigidBodies;
+
+                [NativeDisableContainerSafetyRestriction]
+                public NativeParallelHashMap<Entity, int>.ParallelWriter EntityBodyIndexMap;
+
+                [WriteOnly, NativeDisableContainerSafetyRestriction]
+                public NativeReference<bool> DirectSolverEnabledFlag;
+
+                [ReadOnly]
+                public NativeArray<int> ChunkBaseEntityIndices;
+
+                public void Execute(
+                    in ArchetypeChunk chunk,
+                    int unfilteredChunkIndex,
+                    bool useEnabledMask,
+                    in v128 chunkEnabledMask
+                )
                 {
                     int firstEntityIndexInQuery = ChunkBaseEntityIndices[unfilteredChunkIndex];
                     NativeArray<PhysicsCollider> chunkColliders = chunk.GetNativeArray(ref PhysicsColliderType);
@@ -703,8 +920,7 @@ namespace Unity.Physics.Systems
                     RigidTransform worldFromBody = RigidTransform.identity;
                     bool enableDirectSolver = false;
 
-                    var entityEnumerator =
-                        new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                    var entityEnumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
                     while (entityEnumerator.NextEntityIndex(out int i))
                     {
                         int rbIndex = FirstBodyIndex + firstEntityIndexInQuery + i;
@@ -754,7 +970,7 @@ namespace Unity.Physics.Systems
                             Collider = hasChunkPhysicsColliderType ? chunkColliders[i].Value : default,
                             Entity = chunkEntities[i],
                             CustomTags = hasChunkPhysicsCustomTagsType ? chunkCustomTags[i].Value : (byte)0,
-                            SolverType = solverType
+                            SolverType = solverType,
                         };
 
                         EntityBodyIndexMap.TryAdd(chunkEntities[i], rbIndex);
@@ -770,27 +986,54 @@ namespace Unity.Physics.Systems
             [BurstCompile]
             internal struct CreateMotions : IJobChunk
             {
-                [ReadOnly] public ComponentTypeHandle<LocalTransform> LocalTransformType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsVelocity> PhysicsVelocityType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsMass> PhysicsMassType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsMassOverride> PhysicsMassOverrideType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsDamping> PhysicsDampingType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsGravityFactor> PhysicsGravityFactorType;
-                [ReadOnly] public ComponentTypeHandle<Simulate> SimulateType;
+                [ReadOnly]
+                public ComponentTypeHandle<LocalTransform> LocalTransformType;
 
-                [NativeDisableParallelForRestriction] public NativeArray<MotionData> MotionDatas;
-                [NativeDisableParallelForRestriction] public NativeArray<MotionVelocity> MotionVelocities;
-                [ReadOnly] public NativeArray<int> ChunkBaseEntityIndices;
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsVelocity> PhysicsVelocityType;
 
-                public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsMass> PhysicsMassType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsMassOverride> PhysicsMassOverrideType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsDamping> PhysicsDampingType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsGravityFactor> PhysicsGravityFactorType;
+
+                [ReadOnly]
+                public ComponentTypeHandle<Simulate> SimulateType;
+
+                [NativeDisableParallelForRestriction]
+                public NativeArray<MotionData> MotionDatas;
+
+                [NativeDisableParallelForRestriction]
+                public NativeArray<MotionVelocity> MotionVelocities;
+
+                [ReadOnly]
+                public NativeArray<int> ChunkBaseEntityIndices;
+
+                public void Execute(
+                    in ArchetypeChunk chunk,
+                    int unfilteredChunkIndex,
+                    bool useEnabledMask,
+                    in v128 chunkEnabledMask
+                )
                 {
                     int firstEntityIndexInQuery = ChunkBaseEntityIndices[unfilteredChunkIndex];
                     NativeArray<LocalTransform> chunkLocalTransforms = chunk.GetNativeArray(ref LocalTransformType);
                     NativeArray<PhysicsVelocity> chunkVelocities = chunk.GetNativeArray(ref PhysicsVelocityType);
                     NativeArray<PhysicsMass> chunkMasses = chunk.GetNativeArray(ref PhysicsMassType);
-                    NativeArray<PhysicsMassOverride> chunkMassOverrides = chunk.GetNativeArray(ref PhysicsMassOverrideType);
+                    NativeArray<PhysicsMassOverride> chunkMassOverrides = chunk.GetNativeArray(
+                        ref PhysicsMassOverrideType
+                    );
                     NativeArray<PhysicsDamping> chunkDampings = chunk.GetNativeArray(ref PhysicsDampingType);
-                    NativeArray<PhysicsGravityFactor> chunkGravityFactors = chunk.GetNativeArray(ref PhysicsGravityFactorType);
+                    NativeArray<PhysicsGravityFactor> chunkGravityFactors = chunk.GetNativeArray(
+                        ref PhysicsGravityFactorType
+                    );
 
                     int motionStart = firstEntityIndexInQuery;
 
@@ -810,29 +1053,35 @@ namespace Unity.Physics.Systems
                         InverseInertia = float3.zero,
                         AngularExpansionFactor = 1.0f,
                     };
-                    var zeroPhysicsVelocity = new PhysicsVelocity
-                    {
-                        Linear = float3.zero,
-                        Angular = float3.zero
-                    };
+                    var zeroPhysicsVelocity = new PhysicsVelocity { Linear = float3.zero, Angular = float3.zero };
 
                     // Note: if a dynamic body has infinite mass then assume no gravity should be applied
                     float defaultGravityFactor = hasChunkPhysicsMassType ? 1.0f : 0.0f;
 
-                    var entityEnumerator1 =
-                        new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                    var entityEnumerator1 = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
                     while (entityEnumerator1.NextEntityIndex(out int i))
                     {
                         int motionIndex = motionStart + i;
                         // A Body is Kinematic if it has no Mass component, or the Mass component is being overridden.
-                        var isKinematic = !hasChunkPhysicsMassType || (hasChunkPhysicsMassOverrideType && chunkMassOverrides[i].IsKinematic != 0) || !chunk.IsComponentEnabled(ref SimulateType, i);
+                        var isKinematic =
+                            !hasChunkPhysicsMassType
+                            || (hasChunkPhysicsMassOverrideType && chunkMassOverrides[i].IsKinematic != 0)
+                            || !chunk.IsComponentEnabled(ref SimulateType, i);
                         PhysicsMass mass = isKinematic ? defaultPhysicsMass : chunkMasses[i];
                         // If the Body is Kinematic its corresponding velocities may be optionally set to zero.
-                        var setVelocityToZero = isKinematic && ((hasChunkPhysicsMassOverrideType && chunkMassOverrides[i].SetVelocityToZero != 0) || !chunk.IsComponentEnabled(ref SimulateType, i));
+                        var setVelocityToZero =
+                            isKinematic
+                            && (
+                                (hasChunkPhysicsMassOverrideType && chunkMassOverrides[i].SetVelocityToZero != 0)
+                                || !chunk.IsComponentEnabled(ref SimulateType, i)
+                            );
                         PhysicsVelocity velocity = setVelocityToZero ? zeroPhysicsVelocity : chunkVelocities[i];
                         // If the Body is Kinematic or has an infinite mass gravity should also have no affect on the body's motion.
                         var hasInfiniteMass = isKinematic || mass.HasInfiniteMass;
-                        float gravityFactor = hasInfiniteMass ? 0 : hasChunkPhysicsGravityFactorType ? chunkGravityFactors[i].Value : defaultGravityFactor;
+                        float gravityFactor =
+                            hasInfiniteMass ? 0
+                            : hasChunkPhysicsGravityFactorType ? chunkGravityFactors[i].Value
+                            : defaultGravityFactor;
 
                         if (hasChunkLocalTransformType)
                         {
@@ -846,20 +1095,15 @@ namespace Unity.Physics.Systems
                             InverseInertia = mass.InverseInertia,
                             InverseMass = mass.InverseMass,
                             AngularExpansionFactor = mass.AngularExpansionFactor,
-                            GravityFactor = gravityFactor
+                            GravityFactor = gravityFactor,
                         };
                     }
 
                     // Note: these defaults assume a dynamic body with infinite mass, hence no damping
-                    var defaultPhysicsDamping = new PhysicsDamping
-                    {
-                        Linear = 0.0f,
-                        Angular = 0.0f,
-                    };
+                    var defaultPhysicsDamping = new PhysicsDamping { Linear = 0.0f, Angular = 0.0f };
 
                     // Create motion datas
-                    var entityEnumerator2 =
-                        new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                    var entityEnumerator2 = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
                     while (entityEnumerator2.NextEntityIndex(out int i))
                     {
                         int motionIndex = motionStart + i;
@@ -868,7 +1112,10 @@ namespace Unity.Physics.Systems
                         PhysicsMass mass = hasChunkPhysicsMassType ? chunkMasses[i] : defaultPhysicsMass;
                         PhysicsDamping damping = hasChunkPhysicsDampingType ? chunkDampings[i] : defaultPhysicsDamping;
                         // A Body is Kinematic if it has no Mass component, or the Mass component is being overridden.
-                        var isKinematic = !hasChunkPhysicsMassType || (hasChunkPhysicsMassOverrideType && chunkMassOverrides[i].IsKinematic != 0) || !chunk.IsComponentEnabled(ref SimulateType, i);
+                        var isKinematic =
+                            !hasChunkPhysicsMassType
+                            || (hasChunkPhysicsMassOverrideType && chunkMassOverrides[i].IsKinematic != 0)
+                            || !chunk.IsComponentEnabled(ref SimulateType, i);
                         // If the Body is Kinematic no resistive damping should be applied to it.
 
                         quaternion bodyRotationInWorld = quaternion.identity;
@@ -886,10 +1133,11 @@ namespace Unity.Physics.Systems
                         {
                             WorldFromMotion = new RigidTransform(
                                 math.mul(bodyRotationInWorld, mass.InertiaOrientation),
-                                math.rotate(bodyRotationInWorld, mass.CenterOfMass) + bodyPosInWorld),
+                                math.rotate(bodyRotationInWorld, mass.CenterOfMass) + bodyPosInWorld
+                            ),
                             BodyFromMotion = new RigidTransform(mass.InertiaOrientation, mass.CenterOfMass),
                             LinearDamping = isKinematic || mass.HasInfiniteMass ? 0.0f : damping.Linear,
-                            AngularDamping = isKinematic || mass.HasInfiniteInertia ? 0.0f : damping.Angular
+                            AngularDamping = isKinematic || mass.HasInfiniteInertia ? 0.0f : damping.Angular,
                         };
                     }
                 }
@@ -898,25 +1146,49 @@ namespace Unity.Physics.Systems
             [BurstCompile]
             internal struct CreateJoints : IJobChunk
             {
-                [ReadOnly] public ComponentTypeHandle<PhysicsConstrainedBodyPair> ConstrainedBodyPairComponentType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsJoint> JointComponentType;
-                [ReadOnly] public ComponentTypeHandle<PhysicsSolverType> SolverTypeComponentType;
-                [ReadOnly] public EntityTypeHandle EntityType;
-                [ReadOnly] public int NumDynamicBodies;
-                [ReadOnly] public NativeParallelHashMap<Entity, int> EntityBodyIndexMap;
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsConstrainedBodyPair> ConstrainedBodyPairComponentType;
 
-                [WriteOnly, NativeDisableParallelForRestriction] public NativeArray<Joint> Joints;
-                [NativeDisableParallelForRestriction] public NativeParallelHashMap<Entity, int>.ParallelWriter EntityJointIndexMap;
-                [WriteOnly, NativeDisableParallelForRestriction] public NativeReference<bool> DirectSolverEnabledFlag;
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsJoint> JointComponentType;
 
-                [ReadOnly] public NativeArray<int> ChunkBaseEntityIndices;
+                [ReadOnly]
+                public ComponentTypeHandle<PhysicsSolverType> SolverTypeComponentType;
+
+                [ReadOnly]
+                public EntityTypeHandle EntityType;
+
+                [ReadOnly]
+                public int NumDynamicBodies;
+
+                [ReadOnly]
+                public NativeParallelHashMap<Entity, int> EntityBodyIndexMap;
+
+                [WriteOnly, NativeDisableParallelForRestriction]
+                public NativeArray<Joint> Joints;
+
+                [NativeDisableParallelForRestriction]
+                public NativeParallelHashMap<Entity, int>.ParallelWriter EntityJointIndexMap;
+
+                [WriteOnly, NativeDisableParallelForRestriction]
+                public NativeReference<bool> DirectSolverEnabledFlag;
+
+                [ReadOnly]
+                public NativeArray<int> ChunkBaseEntityIndices;
 
                 public int DefaultStaticBodyIndex;
 
-                public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+                public void Execute(
+                    in ArchetypeChunk chunk,
+                    int unfilteredChunkIndex,
+                    bool useEnabledMask,
+                    in v128 chunkEnabledMask
+                )
                 {
                     int firstEntityIndex = ChunkBaseEntityIndices[unfilteredChunkIndex];
-                    NativeArray<PhysicsConstrainedBodyPair> chunkBodyPair = chunk.GetNativeArray(ref ConstrainedBodyPairComponentType);
+                    NativeArray<PhysicsConstrainedBodyPair> chunkBodyPair = chunk.GetNativeArray(
+                        ref ConstrainedBodyPairComponentType
+                    );
                     NativeArray<PhysicsJoint> chunkJoint = chunk.GetNativeArray(ref JointComponentType);
                     NativeArray<PhysicsSolverType> chunkSolverType = chunk.GetNativeArray(ref SolverTypeComponentType);
                     NativeArray<Entity> chunkEntities = chunk.GetNativeArray(EntityType);
@@ -924,8 +1196,7 @@ namespace Unity.Physics.Systems
                     var hasChunkSolverType = chunk.Has(ref SolverTypeComponentType);
                     bool enableDirectSolver = false;
 
-                    var entityEnumerator =
-                        new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                    var entityEnumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
                     while (entityEnumerator.NextEntityIndex(out var i))
                     {
                         var bodyPair = chunkBodyPair[i];
@@ -980,7 +1251,7 @@ namespace Unity.Physics.Systems
                             AFromJoint = joint.BodyAFromJoint.AsMTransform(),
                             BFromJoint = joint.BodyBFromJoint.AsMTransform(),
                             Version = joint.Version,
-                            Constraints = joint.m_Constraints
+                            Constraints = joint.m_Constraints,
                         };
                         EntityJointIndexMap.TryAdd(chunkEntities[i], firstEntityIndex + i);
                     }

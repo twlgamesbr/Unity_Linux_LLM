@@ -9,8 +9,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         // RendererList and async RendererList
         Renderers,
+
         // Other builtin rendererLists representing Gfx works scheduled by Unity core. Such as shadow/skybox/gizmo/etc
-        Legacy
+        Legacy,
     }
 
     /// <summary>
@@ -23,6 +24,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         internal RendererListHandleType type;
         bool m_IsValid;
         internal int handle { get; private set; }
+
         internal RendererListHandle(int handle, RendererListHandleType type = RendererListHandleType.Renderers)
         {
             this.handle = handle;
@@ -35,14 +37,20 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </summary>
         /// <param name="handle">Renderer List handle to convert.</param>
         /// <returns>The integer representation of the handle.</returns>
-        public static implicit operator int(RendererListHandle handle) { return handle.handle; }
+        public static implicit operator int(RendererListHandle handle)
+        {
+            return handle.handle;
+        }
 
         /// <summary>
         /// Cast to RendererList
         /// </summary>
         /// <param name="rendererList">Input RendererListHandle.</param>
         /// <returns>Resource as a RendererList.</returns>
-        public static implicit operator CoreRendererList(RendererListHandle rendererList) => rendererList.IsValid() ? RenderGraphResourceRegistry.current.GetRendererList(rendererList) : CoreRendererList.nullRendererList;
+        public static implicit operator CoreRendererList(RendererListHandle rendererList) =>
+            rendererList.IsValid()
+                ? RenderGraphResourceRegistry.current.GetRendererList(rendererList)
+                : CoreRendererList.nullRendererList;
 
         /// <summary>
         /// Return true if the handle is valid.
@@ -67,6 +75,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         public CoreRendererList rendererList;
         public bool isActive;
+
         internal RendererListLegacyResource(in bool active = false)
         {
             this.rendererList = new CoreRendererList(); // Invalid by default

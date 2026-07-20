@@ -72,14 +72,14 @@ static class EntitySelectionProxyUtility
         }
 
         UnityObject authoringObject = null;
-        
+
         if (entity == Entity.Null)
             Debug.LogWarning($"Could not find the entity with index: {entityIndex}");
         else if (world == null)
             Debug.LogWarning($"Could not find a world which Entity {entity} belongs to.");
         else
             authoringObject = world.EntityManager.Debug.GetAuthoringObjectForEntity(entity);
-        
+
         // If we did not find the GameObject associated with this entity, try to find it in the current selection.
         // We don't want to create a new EntitySelectionProxy for an Entity that is already selected. Otherwise some features like Ctrl+click to deselect an Entity won't work.
         // For example, Ctrl+click is basically checking if the newly picked object is already in the Selection.objects in list. If this is the case, then it deselects it.

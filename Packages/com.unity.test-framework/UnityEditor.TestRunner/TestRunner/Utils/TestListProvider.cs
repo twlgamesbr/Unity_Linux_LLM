@@ -11,7 +11,10 @@ namespace UnityEditor.TestTools.TestRunner
         private readonly EditorLoadedTestAssemblyProvider m_AssemblyProvider;
         private readonly UnityTestAssemblyBuilder m_AssemblyBuilder;
 
-        public TestListProvider(EditorLoadedTestAssemblyProvider assemblyProvider, UnityTestAssemblyBuilder assemblyBuilder)
+        public TestListProvider(
+            EditorLoadedTestAssemblyProvider assemblyProvider,
+            UnityTestAssemblyBuilder assemblyBuilder
+        )
         {
             m_AssemblyProvider = assemblyProvider;
             m_AssemblyBuilder = assemblyBuilder;
@@ -25,11 +28,17 @@ namespace UnityEditor.TestTools.TestRunner
                 yield return null;
             }
 
-            var assemblies = assembliesTask.Current.Where(pair => platform.IsFlagIncluded(pair.Key))
-                .SelectMany(pair => pair.Value.Select(assemblyInfo => Tuple.Create(assemblyInfo.Assembly, pair.Key))).ToArray();
+            var assemblies = assembliesTask
+                .Current.Where(pair => platform.IsFlagIncluded(pair.Key))
+                .SelectMany(pair => pair.Value.Select(assemblyInfo => Tuple.Create(assemblyInfo.Assembly, pair.Key)))
+                .ToArray();
 
             var settings = UnityTestAssemblyBuilder.GetNUnitTestBuilderSettings(platform);
-            var test =  m_AssemblyBuilder.BuildAsync(assemblies.Select(a => a.Item1).ToArray(), assemblies.Select(a => a.Item2).ToArray(), settings);
+            var test = m_AssemblyBuilder.BuildAsync(
+                assemblies.Select(a => a.Item1).ToArray(),
+                assemblies.Select(a => a.Item2).ToArray(),
+                settings
+            );
             while (test.MoveNext())
             {
                 yield return null;

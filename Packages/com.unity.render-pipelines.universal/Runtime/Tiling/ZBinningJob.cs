@@ -72,16 +72,38 @@ namespace UnityEngine.Rendering.Universal
             FillZBins(binStart, binEnd, 0, lightCount, 0, viewIndex * lightCount, binOffset);
 
             // Fill ZBins for reflection probes.
-            FillZBins(binStart, binEnd, lightCount, lightCount + reflectionProbeCount, 1, lightCount * (viewCount - 1) + viewIndex * reflectionProbeCount, binOffset);
+            FillZBins(
+                binStart,
+                binEnd,
+                lightCount,
+                lightCount + reflectionProbeCount,
+                1,
+                lightCount * (viewCount - 1) + viewIndex * reflectionProbeCount,
+                binOffset
+            );
         }
 
-        void FillZBins(int binStart, int binEnd, int itemStart, int itemEnd, int headerIndex, int itemOffset, int binOffset)
+        void FillZBins(
+            int binStart,
+            int binEnd,
+            int itemStart,
+            int itemEnd,
+            int headerIndex,
+            int itemOffset,
+            int binOffset
+        )
         {
             for (var index = itemStart; index < itemEnd; index++)
             {
                 var minMax = minMaxZs[itemOffset + index];
-                var minBin = math.max((int)((isOrthographic ? minMax.x : math.log2(minMax.x)) * zBinScale + zBinOffset), binStart);
-                var maxBin = math.min((int)((isOrthographic ? minMax.y : math.log2(minMax.y)) * zBinScale + zBinOffset), binEnd);
+                var minBin = math.max(
+                    (int)((isOrthographic ? minMax.x : math.log2(minMax.x)) * zBinScale + zBinOffset),
+                    binStart
+                );
+                var maxBin = math.min(
+                    (int)((isOrthographic ? minMax.y : math.log2(minMax.y)) * zBinScale + zBinOffset),
+                    binEnd
+                );
 
                 var wordIndex = index / 32;
                 var bitMask = 1u << (index % 32);

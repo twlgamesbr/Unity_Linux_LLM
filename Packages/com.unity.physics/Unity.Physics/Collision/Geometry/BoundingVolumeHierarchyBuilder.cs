@@ -35,12 +35,16 @@ namespace Unity.Physics
         {
             // Resultant bounding volume hierarchy (BVH)
             public BoundingVolumeHierarchy Bvh;
+
             // Points and indices of the objects hashed in the tree
             public NativeArray<PointAndIndex> Points;
+
             // Bounds of the objects hashed in the tree
             public NativeArray<Aabb> Aabbs;
+
             // Index of the next available node
             public int FreeNodeIndex;
+
             // Indicates whether the tree is build using the surface area heuristic (SAH)
             public bool UseSah;
 
@@ -65,7 +69,7 @@ namespace Unity.Physics
                 {
                     Start = start;
                     Length = length;
-                    Root = 1;   // 1 is the index of the root node in a BoundingVolumeHierarchy
+                    Root = 1; // 1 is the index of the root node in a BoundingVolumeHierarchy
                     Parent = 0; // default parent index 0, indicating an invalid node in the BoundingVolumeHierarchy
                     Domain = domain;
                 }
@@ -140,7 +144,15 @@ namespace Unity.Physics
                 public int SortAxis;
             }
 
-            void ProcessAxis(int rangeLength, int axis, NativeArray<float> scores, NativeArray<float4> points, ref int bestAxis, ref int pivot, ref float minScore)
+            void ProcessAxis(
+                int rangeLength,
+                int axis,
+                NativeArray<float> scores,
+                NativeArray<float4> points,
+                ref int bestAxis,
+                ref int pivot,
+                ref float minScore
+            )
             {
                 CompareVertices comparator;
                 comparator.SortAxis = axis;
@@ -183,7 +195,9 @@ namespace Unity.Physics
 
                 // This code relies on range.length always being less than or equal to the number of primitives, which
                 // happens to be Aabbs.length.  If that ever becomes not true then scratch memory size should be increased.
-                Assert.IsTrue(range.Length <= ScratchScores.Length /*, "Aabbs.Length isn't a large enough scratch memory size for SegregateSah3"*/);
+                Assert.IsTrue(
+                    range.Length <= ScratchScores.Length /*, "Aabbs.Length isn't a large enough scratch memory size for SegregateSah3"*/
+                );
 
                 float4* p = PointsAsFloat4 + range.Start;
 
@@ -194,7 +208,8 @@ namespace Unity.Physics
                     ScratchPointsZ[i] = p[i];
                 }
 
-                int bestAxis = -1, pivot = -1;
+                int bestAxis = -1,
+                    pivot = -1;
                 float minScore = float.MaxValue;
 
                 ProcessAxis(range.Length, 0, ScratchScores, ScratchPointsX, ref bestAxis, ref pivot, ref minScore);
@@ -236,7 +251,8 @@ namespace Unity.Physics
                 }
             }
 
-            private static void Swap<T>(ref T a, ref T b) where T : struct
+            private static void Swap<T>(ref T a, ref T b)
+                where T : struct
             {
                 T t = a;
                 a = b;
@@ -245,7 +261,9 @@ namespace Unity.Physics
 
             void Segregate(int axis, float pivot, Range range, int minItems, ref Range lRange, ref Range rRange)
             {
-                Assert.IsTrue(range.Length > 1 /*, "Range length must be greater than 1."*/);
+                Assert.IsTrue(
+                    range.Length > 1 /*, "Range length must be greater than 1."*/
+                );
 
                 Aabb lDomain = Aabb.Empty;
                 Aabb rDomain = Aabb.Empty;
@@ -276,9 +294,8 @@ namespace Unity.Physics
                     rDomain.Include((*start).xyz);
 
                     Swap(ref *(start++), ref *(end--));
-                }
-                while (true);
-            FINISHED:
+                } while (true);
+                FINISHED:
                 // Build sub-ranges.
                 int lSize = (int)(start - p);
                 int rSize = range.Length - lSize;
@@ -299,7 +316,14 @@ namespace Unity.Physics
                 rRange.Domain = rDomain;
             }
 
-            void CreateChildren(Range* subRanges, int numSubRanges, Range range, ref int freeNodeIndex, Range* rangeStack, ref int stackSize)
+            void CreateChildren(
+                Range* subRanges,
+                int numSubRanges,
+                Range range,
+                ref int freeNodeIndex,
+                Range* rangeStack,
+                ref int stackSize
+            )
             {
                 int4 parentData = int4.zero;
 
@@ -378,9 +402,10 @@ namespace Unity.Physics
                     hasLeftOvers = 0;
                     CreateChildren(subRanges, numSubRanges, range, ref freeNodeIndex, &range, ref hasLeftOvers);
 
-                    Assert.IsTrue(hasLeftOvers <= 1 /*, "Internal error"*/);
-                }
-                while (hasLeftOvers > 0);
+                    Assert.IsTrue(
+                        hasLeftOvers <= 1 /*, "Internal error"*/
+                    );
+                } while (hasLeftOvers > 0);
             }
 
             public void ProcessLargeRange(Range range, Range* subRanges)
@@ -411,7 +436,14 @@ namespace Unity.Physics
                 }
             }
 
-            public void CreateInternalNodes(Range* subRanges, int numSubRanges, Range range, Range* rangeStack, ref int stackSize, ref int freeNodeIndex)
+            public void CreateInternalNodes(
+                Range* subRanges,
+                int numSubRanges,
+                Range range,
+                Range* rangeStack,
+                ref int stackSize,
+                ref int freeNodeIndex
+            )
             {
                 int4 rootData = int4.zero;
 
@@ -456,8 +488,7 @@ namespace Unity.Physics
                             ProcessLargeRange(range, subRanges);
                             CreateChildren(subRanges, 4, range, ref FreeNodeIndex, ranges, ref rangeStackSize);
                         }
-                    }
-                    while (rangeStackSize > 0);
+                    } while (rangeStackSize > 0);
                 }
                 else // no need to further split the range if there are 4 or less objects in the range
                 {
@@ -468,13 +499,28 @@ namespace Unity.Physics
         }
 
         public unsafe JobHandle ScheduleBuildJobs(
-            NativeArray<PointAndIndex> points, NativeArray<Aabb> aabbs, NativeArray<CollisionFilter> bodyFilters, NativeReference<int>.ReadOnly shouldDoWork,
-            int numThreadsHint, JobHandle inputDeps, NativeArray<Builder.Range> ranges, NativeArray<int> numBranches)
+            NativeArray<PointAndIndex> points,
+            NativeArray<Aabb> aabbs,
+            NativeArray<CollisionFilter> bodyFilters,
+            NativeReference<int>.ReadOnly shouldDoWork,
+            int numThreadsHint,
+            JobHandle inputDeps,
+            NativeArray<Builder.Range> ranges,
+            NativeArray<int> numBranches
+        )
         {
             JobHandle handle = inputDeps;
 
-            var branchNodeOffsets = new NativeArray<int>(Constants.MaxNumTreeBranches, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var nodeCounts = new NativeArray<int>(Constants.MaxNumTreeBranches, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var branchNodeOffsets = new NativeArray<int>(
+                Constants.MaxNumTreeBranches,
+                Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory
+            );
+            var nodeCounts = new NativeArray<int>(
+                Constants.MaxNumTreeBranches,
+                Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory
+            );
             var oldNumBranches = new NativeArray<int>(1, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
 
             // Build initial branches
@@ -489,7 +535,7 @@ namespace Unity.Physics
                 BranchCount = numBranches,
                 OldBranchCount = oldNumBranches,
                 ThreadCount = numThreadsHint,
-                ShouldDoWork = shouldDoWork
+                ShouldDoWork = shouldDoWork,
             }.Schedule(handle);
 
             // Build branches (Note: deallocates Points array on completion)
@@ -503,7 +549,7 @@ namespace Unity.Physics
                 NodeFilters = m_NodeFilters,
                 Ranges = ranges,
                 BranchNodeOffsets = branchNodeOffsets,
-                NodeCounts = nodeCounts
+                NodeCounts = nodeCounts,
             }.ScheduleUnsafeIndex0(numBranches, 1, handle);
 
             // Note: This job also deallocates the aabbs and lookup arrays on completion
@@ -519,7 +565,7 @@ namespace Unity.Physics
                 NodeCounts = nodeCounts,
                 BranchCount = numBranches,
                 OldBranchCount = oldNumBranches,
-                ShouldDoWork = shouldDoWork
+                ShouldDoWork = shouldDoWork,
             }.Schedule(handle);
 
             return handle;
@@ -551,7 +597,12 @@ namespace Unity.Physics
         /// Each object is identified via an index and approximately located at some point, both being
         /// provided via the points array.
         /// </summary>
-        public unsafe void Build(NativeArray<PointAndIndex> points, NativeArray<Aabb> aabbs, out int nodeCount, bool useSah = false)
+        public unsafe void Build(
+            NativeArray<PointAndIndex> points,
+            NativeArray<Aabb> aabbs,
+            out int nodeCount,
+            bool useSah = false
+        )
         {
             m_Nodes[0] = Node.Empty;
 
@@ -563,7 +614,7 @@ namespace Unity.Physics
                     Points = points,
                     Aabbs = aabbs,
                     FreeNodeIndex = 2,
-                    UseSah = useSah
+                    UseSah = useSah,
                 };
 
                 Aabb aabb = new Aabb();
@@ -638,7 +689,11 @@ namespace Unity.Physics
         }
 
         // For each node between nodeStartIndex and nodeEnd index, set the collision filter info to the combination of the node's children
-        internal unsafe void BuildCombinedCollisionFilter(NativeArray<CollisionFilter> leafFilterInfo, int nodeStartIndex, int nodeEndIndex)
+        internal unsafe void BuildCombinedCollisionFilter(
+            NativeArray<CollisionFilter> leafFilterInfo,
+            int nodeStartIndex,
+            int nodeEndIndex
+        )
         {
             Node* baseNode = m_Nodes;
             SafetyChecks.CheckIndexAndThrow(nodeEndIndex, m_MaxNodeCount);
@@ -648,7 +703,8 @@ namespace Unity.Physics
             for (int i = nodeEndIndex; i >= nodeStartIndex; i--, currentNode--)
             {
                 SafetyChecks.CheckIndexAndThrow(i, m_MaxNodeCount);
-                m_NodeFilters[i] = currentNode->IsLeaf ? BuildCombinedCollisionFilterForLeafNode(leafFilters, ref UnsafeUtility.AsRef<Node>(currentNode))
+                m_NodeFilters[i] = currentNode->IsLeaf
+                    ? BuildCombinedCollisionFilterForLeafNode(leafFilters, ref UnsafeUtility.AsRef<Node>(currentNode))
                     : BuildCombinedCollisionFilterForInternalNode(ref UnsafeUtility.AsRef<Node>(currentNode));
             }
         }
@@ -770,8 +826,11 @@ namespace Unity.Physics
 
         internal unsafe void BuildFirstNLevels(
             NativeArray<PointAndIndex> points,
-            NativeArray<Builder.Range> branchRanges, NativeArray<int> branchNodeOffset,
-            int threadCount, out int branchCount)
+            NativeArray<Builder.Range> branchRanges,
+            NativeArray<int> branchNodeOffset,
+            int threadCount,
+            out int branchCount
+        )
         {
             Builder.Range* level0 = stackalloc Builder.Range[Constants.MaxNumTreeBranches];
             Builder.Range* level1 = stackalloc Builder.Range[Constants.MaxNumTreeBranches];
@@ -789,7 +848,12 @@ namespace Unity.Physics
             int maxNumBranchesMinusOneSplit = Constants.MaxNumTreeBranches - 3;
             int freeNodeIndex = 2;
 
-            var builder = new Builder { Bvh = this, Points = points, UseSah = false };
+            var builder = new Builder
+            {
+                Bvh = this,
+                Points = points,
+                UseSah = false,
+            };
 
             Builder.Range* subRanges = stackalloc Builder.Range[4];
 
@@ -828,15 +892,19 @@ namespace Unity.Physics
                 level0Size = level1Size;
                 level1Size = 0;
                 smallRangeThreshold = largestAllowedRange;
-            }
-            while (level0Size < Constants.MaxNumTreeBranches && largestRangeInLastLevel > largestAllowedRange);
+            } while (level0Size < Constants.MaxNumTreeBranches && largestRangeInLastLevel > largestAllowedRange);
 
             RangeSizeAndIndex* rangeMapBySize = stackalloc RangeSizeAndIndex[Constants.MaxNumTreeBranches];
 
             int nodeOffset = freeNodeIndex;
             for (int i = 0; i < level0Size; i++)
             {
-                rangeMapBySize[i] = new RangeSizeAndIndex { RangeIndex = i, RangeSize = level0[i].Length, RangeFirstNodeOffset = nodeOffset };
+                rangeMapBySize[i] = new RangeSizeAndIndex
+                {
+                    RangeIndex = i,
+                    RangeSize = level0[i].Length,
+                    RangeFirstNodeOffset = nodeOffset,
+                };
 
                 // The nodeOffset below defines the starting point in the final tree's nodes array for each subtree that we will
                 // build in parallel (see BuildBranchesJob).
@@ -880,14 +948,19 @@ namespace Unity.Physics
         }
 
         // Build the branch for range. Returns the index of the last built node in the range
-        internal int BuildBranch(NativeArray<PointAndIndex> points, NativeArray<Aabb> aabb, Builder.Range range, int firstNodeIndex)
+        internal int BuildBranch(
+            NativeArray<PointAndIndex> points,
+            NativeArray<Aabb> aabb,
+            Builder.Range range,
+            int firstNodeIndex
+        )
         {
             var builder = new Builder
             {
                 Bvh = this,
                 Points = points,
                 FreeNodeIndex = firstNodeIndex,
-                UseSah = false
+                UseSah = false,
             };
 
             builder.Build(range);
@@ -913,9 +986,11 @@ namespace Unity.Physics
         internal unsafe struct BuildFirstNLevelsJob : IJob
         {
             public NativeArray<PointAndIndex> Points;
+
             [NativeDisableUnsafePtrRestriction]
             public Node* Nodes;
             public int MaxNodeCount;
+
             [NativeDisableUnsafePtrRestriction]
             public CollisionFilter* NodeFilters;
             public NativeArray<Builder.Range> Ranges;
@@ -948,10 +1023,17 @@ namespace Unity.Physics
         [BurstCompile]
         internal unsafe struct BuildBranchesJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeArray<Aabb> Aabbs;
-            [ReadOnly] public NativeArray<CollisionFilter> BodyFilters;
-            [ReadOnly] public NativeArray<Builder.Range> Ranges;
-            [ReadOnly] public NativeArray<int> BranchNodeOffsets;
+            [ReadOnly]
+            public NativeArray<Aabb> Aabbs;
+
+            [ReadOnly]
+            public NativeArray<CollisionFilter> BodyFilters;
+
+            [ReadOnly]
+            public NativeArray<Builder.Range> Ranges;
+
+            [ReadOnly]
+            public NativeArray<int> BranchNodeOffsets;
 
             [NativeDisableParallelForRestriction]
             public NativeArray<int> NodeCounts;
@@ -959,11 +1041,13 @@ namespace Unity.Physics
             [NativeDisableUnsafePtrRestriction]
             public Node* Nodes;
             public int MaxNodeCount;
+
             [NativeDisableUnsafePtrRestriction]
             public CollisionFilter* NodeFilters;
 
             [NativeDisableContainerSafetyRestriction]
-            [DeallocateOnJobCompletion] public NativeArray<PointAndIndex> Points;
+            [DeallocateOnJobCompletion]
+            public NativeArray<PointAndIndex> Points;
 
             public void Execute(int index)
             {
@@ -984,20 +1068,37 @@ namespace Unity.Physics
         [BurstCompile]
         internal unsafe struct FinalizeTreeJob : IJob
         {
-            [ReadOnly][DeallocateOnJobCompletion] public NativeArray<Aabb> Aabbs;
-            [ReadOnly][DeallocateOnJobCompletion] public NativeArray<int> BranchNodeOffsets;
-            [ReadOnly][DeallocateOnJobCompletion] public NativeArray<int> NodeCounts;
-            [ReadOnly] public NativeArray<CollisionFilter> LeafFilters;
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<Aabb> Aabbs;
+
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<int> BranchNodeOffsets;
+
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<int> NodeCounts;
+
+            [ReadOnly]
+            public NativeArray<CollisionFilter> LeafFilters;
             public NativeReference<int>.ReadOnly ShouldDoWork;
+
             [NativeDisableUnsafePtrRestriction]
             public Node* Nodes;
+
             [NativeDisableUnsafePtrRestriction]
             public CollisionFilter* NodeFilters;
+
             [NativeDisableUnsafePtrRestriction]
             public UnsafeList<Node>* NodesList;
+
             [NativeDisableUnsafePtrRestriction]
             public UnsafeList<CollisionFilter>* NodeFiltersList;
-            [DeallocateOnJobCompletion][ReadOnly] public NativeArray<int> OldBranchCount;
+
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<int> OldBranchCount;
             public NativeArray<int> BranchCount;
 
             public void Execute()
@@ -1030,7 +1131,7 @@ namespace Unity.Physics
                     NodeFiltersList->Length = maxNodeCount;
                 }
 
-                var bvh = new BoundingVolumeHierarchy(Nodes, maxNodeCount , NodeFilters);
+                var bvh = new BoundingVolumeHierarchy(Nodes, maxNodeCount, NodeFilters);
                 bvh.Refit(Aabbs, 1, minBranchNodeIndex);
 
                 if (NodeFilters != null)
@@ -1070,7 +1171,9 @@ namespace Unity.Physics
                 // check if child node specifies correct parent node index
                 if (node.Parent != parentIndex)
                 {
-                    SafetyChecks.ThrowInvalidOperationException("Parent node index in child does not match actual parent node index.");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Parent node index in child does not match actual parent node index."
+                    );
                     return;
                 }
 
@@ -1080,7 +1183,9 @@ namespace Unity.Physics
                     var combinedFilter = BuildCombinedCollisionFilterForInternalNode(ref parent);
                     if (!combinedFilter.Equals(m_NodeFilters[parentIndex]))
                     {
-                        SafetyChecks.ThrowInvalidOperationException("Parent filter does not match combination of child filters.");
+                        SafetyChecks.ThrowInvalidOperationException(
+                            "Parent filter does not match combination of child filters."
+                        );
                         return;
                     }
                 }
@@ -1097,14 +1202,17 @@ namespace Unity.Physics
 
                 if (numElements != expectedNumElements)
                 {
-                    SafetyChecks.ThrowInvalidOperationException("Expected number of elements in leaf node does not match actual number of elements.");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Expected number of elements in leaf node does not match actual number of elements."
+                    );
                     return;
                 }
 
-                if ((parentValid && numFreeSlots != expectedNumFreeSlots)
-                    || numFreeSlots != node.NumFreeLeafSlotsTotal)
+                if ((parentValid && numFreeSlots != expectedNumFreeSlots) || numFreeSlots != node.NumFreeLeafSlotsTotal)
                 {
-                    SafetyChecks.ThrowInvalidOperationException("Actually available number of free slots in leaf node does not match expected number of free slots.");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Actually available number of free slots in leaf node does not match expected number of free slots."
+                    );
                     return;
                 }
             }
@@ -1123,7 +1231,9 @@ namespace Unity.Physics
                         // attach a leaf here.
                         if (node.NumFreeLeafSlots[i] != 4)
                         {
-                            SafetyChecks.ThrowInvalidOperationException("Internal node has no leaf at this index, but number of free slots is not 4.");
+                            SafetyChecks.ThrowInvalidOperationException(
+                                "Internal node has no leaf at this index, but number of free slots is not 4."
+                            );
                             return;
                         }
                     }
@@ -1139,14 +1249,16 @@ namespace Unity.Physics
                     if (specifiedNumFreeSlotsInChildrenTotal != expectedNumFreeSlots)
                     {
                         SafetyChecks.ThrowInvalidOperationException(
-                            "Expected number of free slots in parent does not match total number of free slots specified in children.");
+                            "Expected number of free slots in parent does not match total number of free slots specified in children."
+                        );
                     }
                 }
 
                 if (specifiedNumElementsInChildrenTotal != expectedNumElements)
                 {
                     SafetyChecks.ThrowInvalidOperationException(
-                        "Expected number of elements in nodes does not match total number of elements specified in children.");
+                        "Expected number of elements in nodes does not match total number of elements specified in children."
+                    );
                 }
             }
 
@@ -1254,7 +1366,8 @@ namespace Unity.Physics
                 {
                     success = false;
                     Debug.LogError(
-                        $"There are {elementIndexSet.Count} elements in the tree, but expected are {numElements} elements.");
+                        $"There are {elementIndexSet.Count} elements in the tree, but expected are {numElements} elements."
+                    );
                 }
             }
 
@@ -1286,7 +1399,9 @@ namespace Unity.Physics
                     var combinedFilter = BuildCombinedCollisionFilterForLeafNode(filters, ref node);
                     if (!combinedFilter.Equals(m_NodeFilters[nodeIndex]))
                     {
-                        SafetyChecks.ThrowInvalidOperationException("Leaf filter does not match combination of child filters.");
+                        SafetyChecks.ThrowInvalidOperationException(
+                            "Leaf filter does not match combination of child filters."
+                        );
                     }
                 }
             }
@@ -1299,7 +1414,7 @@ namespace Unity.Physics
             Node node = m_Nodes[nodeIndex];
 
             int shortestPath = int.MaxValue; //find the data in the shortest path through the tree
-            int longestPath = 0;  //find the data in the longest path through the tree
+            int longestPath = 0; //find the data in the longest path through the tree
             int pathCount = 0;
             for (int i = 0; i < 4; ++i)
             {
@@ -1327,7 +1442,16 @@ namespace Unity.Physics
                 }
             }
 
-            Debug.Log("Walk found " + elementCount + " elements in the tree. Path count: " + pathCount + " Shortest path: " + shortestPath + ". Longest path: " + longestPath);
+            Debug.Log(
+                "Walk found "
+                    + elementCount
+                    + " elements in the tree. Path count: "
+                    + pathCount
+                    + " Shortest path: "
+                    + shortestPath
+                    + ". Longest path: "
+                    + longestPath
+            );
         }
     }
 }

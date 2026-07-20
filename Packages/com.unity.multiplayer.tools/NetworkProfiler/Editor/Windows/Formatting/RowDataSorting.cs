@@ -10,18 +10,19 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             data.Sort((a, b) => SortOperation(a, b, sortDirection));
         }
 
-        public static int SortOperation(IRowData left, IRowData right, SortDirection sortDirection) => sortDirection switch
-        {
-            SortDirection.NameAscending => NameSortingUp(left, right),
-            SortDirection.NameDescending => NameSortingDown(left, right),
-            SortDirection.TypeAscending => TypeSortingUp(left, right),
-            SortDirection.TypeDescending => TypeSortingDown(left, right),
-            SortDirection.BytesSentAscending => BytesSentSortingUp(left, right),
-            SortDirection.BytesSentDescending => BytesSentSortingDown(left, right),
-            SortDirection.BytesReceivedAscending => BytesReceivedSortingUp(left, right),
-            SortDirection.BytesReceivedDescending => BytesReceivedSortingDown(left, right),
-            _ => throw new ArgumentOutOfRangeException(nameof(sortDirection), sortDirection, null),
-        };
+        public static int SortOperation(IRowData left, IRowData right, SortDirection sortDirection) =>
+            sortDirection switch
+            {
+                SortDirection.NameAscending => NameSortingUp(left, right),
+                SortDirection.NameDescending => NameSortingDown(left, right),
+                SortDirection.TypeAscending => TypeSortingUp(left, right),
+                SortDirection.TypeDescending => TypeSortingDown(left, right),
+                SortDirection.BytesSentAscending => BytesSentSortingUp(left, right),
+                SortDirection.BytesSentDescending => BytesSentSortingDown(left, right),
+                SortDirection.BytesReceivedAscending => BytesReceivedSortingUp(left, right),
+                SortDirection.BytesReceivedDescending => BytesReceivedSortingDown(left, right),
+                _ => throw new ArgumentOutOfRangeException(nameof(sortDirection), sortDirection, null),
+            };
 
         static int NameSortingUp(IRowData left, IRowData right)
         {
@@ -75,9 +76,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 return -1;
             }
 
-            return string.IsNullOrWhiteSpace(right)
-                ? 1
-                : string.Compare(left, right, StringComparison.Ordinal);
+            return string.IsNullOrWhiteSpace(right) ? 1 : string.Compare(left, right, StringComparison.Ordinal);
         }
     }
 }

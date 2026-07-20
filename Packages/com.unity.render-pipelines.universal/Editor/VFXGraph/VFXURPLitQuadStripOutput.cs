@@ -1,7 +1,6 @@
 #if HAS_VFX_GRAPH
 using System.Collections.Generic;
 using System.Linq;
-
 using UnityEngine;
 
 namespace UnityEditor.VFX.URP
@@ -10,17 +9,30 @@ namespace UnityEditor.VFX.URP
     [VFXInfo(name = "Output ParticleStrip|URP Lit|Quad", category = "#3Output Strip", experimental = true)]
     class VFXURPLitQuadStripOutput : VFXAbstractParticleURPLitOutput
     {
-        protected VFXURPLitQuadStripOutput() : base(true) {}  // strips
+        protected VFXURPLitQuadStripOutput()
+            : base(true) { } // strips
 
         public override string name => "Output ParticleStrip".AppendLabel("URP Lit").AppendLabel("Quad");
         public override string codeGeneratorTemplate => RenderPipeTemplate("VFXParticleLitPlanarPrimitive");
         public override VFXTaskType taskType => VFXTaskType.ParticleQuadOutput;
         public override bool supportsUV => true;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, a Normal Bending Factor slider becomes available in the output which can be used to adjust the curvature of the normals.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "When enabled, a Normal Bending Factor slider becomes available in the output which can be used to adjust the curvature of the normals."
+            )
+        ]
         protected bool normalBending = false;
 
-        [VFXSetting, SerializeField, Tooltip("Specifies the way the UVs are interpolated along the strip. They can either be stretched or repeated per segment.")]
+        [
+            VFXSetting,
+            SerializeField,
+            Tooltip(
+                "Specifies the way the UVs are interpolated along the strip. They can either be stretched or repeated per segment."
+            )
+        ]
         private StripTilingMode tilingMode = StripTilingMode.Stretch;
 
         [VFXSetting, SerializeField, Tooltip("When enabled, uvs for the strips are swapped.")]
@@ -34,7 +46,9 @@ namespace UnityEditor.VFX.URP
 
         public class CustomUVInputProperties
         {
-            [Tooltip("Specifies the texture coordinate value (u or v depending on swap UV being enabled) used along the strip.")]
+            [Tooltip(
+                "Specifies the texture coordinate value (u or v depending on swap UV being enabled) used along the strip."
+            )]
             public float texCoord = 0.0f;
         }
 
@@ -75,7 +89,9 @@ namespace UnityEditor.VFX.URP
             }
         }
 
-        protected override IEnumerable<VFXNamedExpression> CollectGPUExpressions(IEnumerable<VFXNamedExpression> slotExpressions)
+        protected override IEnumerable<VFXNamedExpression> CollectGPUExpressions(
+            IEnumerable<VFXNamedExpression> slotExpressions
+        )
         {
             foreach (var exp in base.CollectGPUExpressions(slotExpressions))
                 yield return exp;

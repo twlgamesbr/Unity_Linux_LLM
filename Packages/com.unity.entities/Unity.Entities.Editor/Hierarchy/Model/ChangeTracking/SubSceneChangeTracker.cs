@@ -48,7 +48,9 @@ namespace Unity.Entities.Editor
 
         public void GetChanges(SubSceneMapChanges changes)
         {
-            using var _ = EditorPerformanceTrackerBridge.CreateEditorPerformanceTracker($"{nameof(SubSceneChangeTracker)}.{nameof(GetChanges)}");
+            using var _ = EditorPerformanceTrackerBridge.CreateEditorPerformanceTracker(
+                $"{nameof(SubSceneChangeTracker)}.{nameof(GetChanges)}"
+            );
 
             changes.Clear();
 
@@ -62,14 +64,21 @@ namespace Unity.Entities.Editor
                     subScenes.Add(subScene.SceneGUID);
             }
 
-            m_SubScenesDiffer.GetCreatedAndRemovedItems(subScenes.AsArray(), changes.CreatedSubScenes, changes.RemovedSubScenes);
+            m_SubScenesDiffer.GetCreatedAndRemovedItems(
+                subScenes.AsArray(),
+                changes.CreatedSubScenes,
+                changes.RemovedSubScenes
+            );
             subScenes.Dispose();
 
             if (m_World is null)
                 return;
 
             var entityScenesEntities = m_Query.ToEntityListAsync(Allocator.TempJob, out var entityScenesJobHandle);
-            var entityScenesComponents = m_Query.ToComponentDataListAsync<SceneReference>(Allocator.TempJob, out var entityScenesComponentsJobHandle);
+            var entityScenesComponents = m_Query.ToComponentDataListAsync<SceneReference>(
+                Allocator.TempJob,
+                out var entityScenesComponentsJobHandle
+            );
             JobHandle.CombineDependencies(entityScenesJobHandle, entityScenesComponentsJobHandle).Complete();
             var entityScenes = new NativeArray<(Entity, SceneReference)>(entityScenesEntities.Length, Allocator.Temp);
             for (var i = 0; i < entityScenes.Length; i++)
@@ -77,14 +86,23 @@ namespace Unity.Entities.Editor
                 entityScenes[i] = (entityScenesEntities[i], entityScenesComponents[i]);
             }
 
-            m_EntityScenesDiffer.GetCreatedAndRemovedItems(entityScenes, changes.CreatedEntityScenes, changes.RemovedEntityScenes);
+            m_EntityScenesDiffer.GetCreatedAndRemovedItems(
+                entityScenes,
+                changes.CreatedEntityScenes,
+                changes.RemovedEntityScenes
+            );
             entityScenes.Dispose();
             entityScenesEntities.Dispose();
             entityScenesComponents.Dispose();
 
             unsafe
             {
-                m_World.EntityManager.GetCheckedEntityDataAccess()->EntityComponentStore->GetAllUniqueSharedComponents_Unmanaged<SceneTag>(out var allSceneTags, Allocator.Temp);
+                m_World
+                    .EntityManager.GetCheckedEntityDataAccess()
+                    ->EntityComponentStore->GetAllUniqueSharedComponents_Unmanaged<SceneTag>(
+                        out var allSceneTags,
+                        Allocator.Temp
+                    );
                 var validSceneTags = new NativeList<SceneTag>(allSceneTags.Length, Allocator.Temp);
                 foreach (var sceneTag in allSceneTags)
                 {
@@ -94,7 +112,11 @@ namespace Unity.Entities.Editor
                     }
                 }
 
-                m_SceneTagDiffer.GetCreatedAndRemovedItems(validSceneTags.AsArray(), changes.CreatedSceneTags, changes.RemovedSceneTags);
+                m_SceneTagDiffer.GetCreatedAndRemovedItems(
+                    validSceneTags.AsArray(),
+                    changes.CreatedSceneTags,
+                    changes.RemovedSceneTags
+                );
                 allSceneTags.Dispose();
                 validSceneTags.Dispose();
             }
@@ -127,12 +149,12 @@ namespace Unity.Entities.Editor
             }
 
             public bool HasChanges() =>
-                CreatedSubScenes.Length > 0 ||
-                RemovedSubScenes.Length > 0 ||
-                CreatedEntityScenes.Length > 0 ||
-                RemovedEntityScenes.Length > 0 ||
-                CreatedSceneTags.Length > 0 ||
-                RemovedSceneTags.Length > 0;
+                CreatedSubScenes.Length > 0
+                || RemovedSubScenes.Length > 0
+                || CreatedEntityScenes.Length > 0
+                || RemovedEntityScenes.Length > 0
+                || CreatedSceneTags.Length > 0
+                || RemovedSceneTags.Length > 0;
 
             public void Dispose()
             {

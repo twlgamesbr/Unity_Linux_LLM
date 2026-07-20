@@ -54,8 +54,10 @@ namespace UnityEditor.Rendering
             public const string kPassHighlightBorder = "pass--highlight-border";
             public const string kPassMergeIndicator = "pass-merge-indicator";
             public const string kPassCompatibilityMessageIndicator = "pass-compatibility-message-indicator";
-            public const string kPassCompatibilityMessageIndicatorAnimation = "pass-compatibility-message-indicator--anim";
-            public const string kPassCompatibilityMessageIndicatorCompatible = "pass-compatibility-message-indicator--compatible";
+            public const string kPassCompatibilityMessageIndicatorAnimation =
+                "pass-compatibility-message-indicator--anim";
+            public const string kPassCompatibilityMessageIndicatorCompatible =
+                "pass-compatibility-message-indicator--compatible";
             public const string kPassSynchronizationMessageIndicator = "pass-synchronization-message-indicator";
             public const string kResourceListItem = "resource-list__item";
             public const string kResourceListItemHighlight = "resource-list__item--highlight";
@@ -97,11 +99,15 @@ namespace UnityEditor.Rendering
         }
 
         const string k_TemplatePath = "Packages/com.unity.render-pipelines.core/Editor/UXML/RenderGraphViewer.uxml";
-        const string k_DarkStylePath = "Packages/com.unity.render-pipelines.core/Editor/StyleSheets/RenderGraphViewerDark.uss";
-        const string k_LightStylePath = "Packages/com.unity.render-pipelines.core/Editor/StyleSheets/RenderGraphViewerLight.uss";
-        const string k_ResourceListIconPath = "Packages/com.unity.render-pipelines.core/Editor/Icons/RenderGraphViewer/{0}Resources@2x.png";
-        const string k_PassListIconPath = "Packages/com.unity.render-pipelines.core/Editor/Icons/RenderGraphViewer/{0}PassInspector@2x.png";
-        const string k_EditorName ="Editor";
+        const string k_DarkStylePath =
+            "Packages/com.unity.render-pipelines.core/Editor/StyleSheets/RenderGraphViewerDark.uss";
+        const string k_LightStylePath =
+            "Packages/com.unity.render-pipelines.core/Editor/StyleSheets/RenderGraphViewerLight.uss";
+        const string k_ResourceListIconPath =
+            "Packages/com.unity.render-pipelines.core/Editor/Icons/RenderGraphViewer/{0}Resources@2x.png";
+        const string k_PassListIconPath =
+            "Packages/com.unity.render-pipelines.core/Editor/Icons/RenderGraphViewer/{0}PassInspector@2x.png";
+        const string k_EditorName = "Editor";
 
         // keep in sync with .uss
         const int kPassWidthPx = 26;
@@ -150,11 +156,14 @@ namespace UnityEditor.Rendering
         IVisualElementScheduledItem m_StoreSelectedExecutionDelayed;
         IVisualElementScheduledItem m_RefreshUIDelayed;
 
-        PassFilter m_PassFilter = PassFilter.CulledPasses | PassFilter.RasterPasses | PassFilter.UnsafePasses | PassFilter.ComputePasses;
+        PassFilter m_PassFilter =
+            PassFilter.CulledPasses | PassFilter.RasterPasses | PassFilter.UnsafePasses | PassFilter.ComputePasses;
 
         ResourceFilter m_ResourceFilter =
-            ResourceFilter.ImportedResources |  ResourceFilter.Textures |
-            ResourceFilter.Buffers | ResourceFilter.AccelerationStructures;
+            ResourceFilter.ImportedResources
+            | ResourceFilter.Textures
+            | ResourceFilter.Buffers
+            | ResourceFilter.AccelerationStructures;
 
         ViewOptions m_ViewOptions = ViewOptions.LoadStoreActions;
 
@@ -169,17 +178,23 @@ namespace UnityEditor.Rendering
             WaitingForCameraRender,
             EmptyPassFilterResult,
             EmptyResourceFilterResult,
-            IncompatibleDataReceived
+            IncompatibleDataReceived,
         };
 
         static readonly string[] kEmptyStateMessages =
         {
             "",
-            L10n.Tr("No Render Graph has been registered. The Render Graph Viewer is only functional when Render Graph API is in use."),
-            L10n.Tr("Waiting for the selected camera to render. Depending on the camera, you may need to trigger rendering by selecting the Scene or Game view.\n\nEnsure Render Graph is not disabled in Project Settings > Graphics."),
+            L10n.Tr(
+                "No Render Graph has been registered. The Render Graph Viewer is only functional when Render Graph API is in use."
+            ),
+            L10n.Tr(
+                "Waiting for the selected camera to render. Depending on the camera, you may need to trigger rendering by selecting the Scene or Game view.\n\nEnsure Render Graph is not disabled in Project Settings > Graphics."
+            ),
             L10n.Tr("No passes to display. Select a different Pass Filter to display contents."),
             L10n.Tr("No resources to display. Select a different Resource Filter to display contents."),
-            L10n.Tr("Editor received incompatible data. Rebuild the player with this version of the editor, or switch to an older version of the editor."),
+            L10n.Tr(
+                "Editor received incompatible data. Rebuild the player with this version of the editor, or switch to an older version of the editor."
+            ),
         };
 
         private static readonly string[] kLoadActionNames =
@@ -199,7 +214,9 @@ namespace UnityEditor.Rendering
             L10n.Tr("Don't Care"),
         };
 
-        static readonly string kOpenInCSharpEditorTooltip = L10n.Tr("Click to open <b>{0}</b> definition in C# editor.");
+        static readonly string kOpenInCSharpEditorTooltip = L10n.Tr(
+            "Click to open <b>{0}</b> definition in C# editor."
+        );
 
         [MenuItem("Window/Analysis/Render Graph Viewer", false, 10006)]
         static void Init()
@@ -340,7 +357,8 @@ namespace UnityEditor.Rendering
                 if (groupedIds.Count > 1)
                 {
                     AppendToTooltipIfNotEmpty(info.passBlock, $"{Environment.NewLine}");
-                    info.passBlock.tooltip += $"{groupedIds.Count} Raster Render Passes merged into a single Native Render Pass";
+                    info.passBlock.tooltip +=
+                        $"{groupedIds.Count} Raster Render Passes merged into a single Native Render Pass";
                 }
 
                 AppendToTooltipIfNotEmpty(info.passBlock, $"{Environment.NewLine}{Environment.NewLine}");
@@ -375,8 +393,12 @@ namespace UnityEditor.Rendering
                             if (selectedPassIds.Contains(passIdInLinkedPassGroup))
                                 continue; // Don't show compatibility info among passes that are merged
 
-                            if (m_PassIdToVisiblePassIndex.TryGetValue(passIdInLinkedPassGroup,
-                                    out int visiblePassIndexInLinkedPassGroup))
+                            if (
+                                m_PassIdToVisiblePassIndex.TryGetValue(
+                                    passIdInLinkedPassGroup,
+                                    out int visiblePassIndexInLinkedPassGroup
+                                )
+                            )
                             {
                                 var info = m_PassElementsInfo[visiblePassIndexInLinkedPassGroup];
                                 info.hasPassCompatibilityTooltip = true;
@@ -425,37 +447,47 @@ namespace UnityEditor.Rendering
             ResourceUsageRangeBorder = 1 << 2,
             ResourceHelperLine = 1 << 3,
 
-            All = ResourceListItem | ResourceUsageRangeBorder | ResourceHelperLine
+            All = ResourceListItem | ResourceUsageRangeBorder | ResourceHelperLine,
         }
 
         void ClearResourceHighlight(ResourceHighlightOptions highlightOptions = ResourceHighlightOptions.All)
         {
             if (highlightOptions.HasFlag(ResourceHighlightOptions.ResourceListItem))
             {
-                rootVisualElement.Query(classes: Classes.kResourceListItem).ForEach(elem =>
-                {
-                    elem.RemoveFromClassList(Classes.kResourceListItemHighlight);
-                });
+                rootVisualElement
+                    .Query(classes: Classes.kResourceListItem)
+                    .ForEach(elem =>
+                    {
+                        elem.RemoveFromClassList(Classes.kResourceListItemHighlight);
+                    });
             }
 
             if (highlightOptions.HasFlag(ResourceHighlightOptions.ResourceUsageRangeBorder))
             {
-                rootVisualElement.Query(classes: Classes.kResourceUsageRangeBlockHighlight).ForEach(elem =>
-                {
-                    elem.RemoveFromHierarchy();
-                });
+                rootVisualElement
+                    .Query(classes: Classes.kResourceUsageRangeBlockHighlight)
+                    .ForEach(elem =>
+                    {
+                        elem.RemoveFromHierarchy();
+                    });
             }
 
             if (highlightOptions.HasFlag(ResourceHighlightOptions.ResourceHelperLine))
             {
-                rootVisualElement.Query(classes: Classes.kResourceHelperLineHighlight).ForEach(elem =>
-                {
-                    elem.RemoveFromClassList(Classes.kResourceHelperLineHighlight);
-                });
+                rootVisualElement
+                    .Query(classes: Classes.kResourceHelperLineHighlight)
+                    .ForEach(elem =>
+                    {
+                        elem.RemoveFromClassList(Classes.kResourceHelperLineHighlight);
+                    });
             }
         }
 
-        void SetResourceHighlight(ResourceElementInfo info, int visibleResourceIndex, ResourceHighlightOptions highlightOptions)
+        void SetResourceHighlight(
+            ResourceElementInfo info,
+            int visibleResourceIndex,
+            ResourceHighlightOptions highlightOptions
+        )
         {
             if (highlightOptions.HasFlag(ResourceHighlightOptions.ResourceListItem))
             {
@@ -467,7 +499,7 @@ namespace UnityEditor.Rendering
                 var usageRangeHighlightBlock = new VisualElement();
                 usageRangeHighlightBlock.style.left = info.usageRangeBlock.style.left.value.value;
                 usageRangeHighlightBlock.style.width = info.usageRangeBlock.style.width.value.value + 1.0f;
-                usageRangeHighlightBlock.style.top =  visibleResourceIndex * kResourceRowHeightPx;
+                usageRangeHighlightBlock.style.top = visibleResourceIndex * kResourceRowHeightPx;
                 usageRangeHighlightBlock.pickingMode = PickingMode.Ignore;
                 usageRangeHighlightBlock.AddToClassList(Classes.kResourceUsageRangeBlockHighlight);
 
@@ -495,8 +527,16 @@ namespace UnityEditor.Rendering
             ResourceGridFocusOverlay = 1 << 8,
             PassTitleHover = 1 << 9,
 
-            All = PassBlockBorder | PassBlockFill | PassTitle | PassGridLines | ResourceRWBlocks |
-                  PassesWithCompatibilityMessage | PassesWithSynchronizationMessage | ResourceGridFocusOverlay | PassTitleHover
+            All =
+                PassBlockBorder
+                | PassBlockFill
+                | PassTitle
+                | PassGridLines
+                | ResourceRWBlocks
+                | PassesWithCompatibilityMessage
+                | PassesWithSynchronizationMessage
+                | ResourceGridFocusOverlay
+                | PassTitleHover,
         }
 
         void ClearPassHighlight(PassHighlightOptions highlightOptions = PassHighlightOptions.All)
@@ -527,19 +567,23 @@ namespace UnityEditor.Rendering
             // Remove grid line highlight
             if (highlightOptions.HasFlag(PassHighlightOptions.PassGridLines))
             {
-                rootVisualElement.Query(classes: Classes.kGridLine).ForEach(elem =>
-                {
-                    elem.RemoveFromClassList(Classes.kGridLineHighlight);
-                });
+                rootVisualElement
+                    .Query(classes: Classes.kGridLine)
+                    .ForEach(elem =>
+                    {
+                        elem.RemoveFromClassList(Classes.kGridLineHighlight);
+                    });
             }
 
             // Remove focus overlay
             if (highlightOptions.HasFlag(PassHighlightOptions.ResourceGridFocusOverlay))
             {
-                rootVisualElement.Query(classes: Classes.kResourceGridFocusOverlay).ForEach(elem =>
-                {
-                    elem.RemoveFromHierarchy();
-                });
+                rootVisualElement
+                    .Query(classes: Classes.kResourceGridFocusOverlay)
+                    .ForEach(elem =>
+                    {
+                        elem.RemoveFromHierarchy();
+                    });
             }
         }
 
@@ -574,24 +618,31 @@ namespace UnityEditor.Rendering
                 if (groupedPassIds.Contains(info.passId))
                     continue;
 
-                if (highlightOptions.HasFlag(PassHighlightOptions.PassesWithCompatibilityMessage) &&
-                    info.hasPassCompatibilityTooltip)
+                if (
+                    highlightOptions.HasFlag(PassHighlightOptions.PassesWithCompatibilityMessage)
+                    && info.hasPassCompatibilityTooltip
+                )
                 {
                     info.passBlock.AddToClassList(Classes.kPassCompatibilityMessageIndicator);
                     if (info.isPassCompatibleToMerge)
                     {
                         info.passBlock.schedule.Execute(() =>
-                        {
-                            info.passBlock.AddToClassList(Classes.kPassCompatibilityMessageIndicatorAnimation);
-                            info.passBlock.AddToClassList(Classes.kPassCompatibilityMessageIndicatorCompatible);
-                        }).StartingIn(100);
+                            {
+                                info.passBlock.AddToClassList(Classes.kPassCompatibilityMessageIndicatorAnimation);
+                                info.passBlock.AddToClassList(Classes.kPassCompatibilityMessageIndicatorCompatible);
+                            })
+                            .StartingIn(100);
                         info.passBlock.RegisterCallback<TransitionEndEvent, VisualElement>(
-                            ToggleCompatiblePassAnimation, info.passBlock);
+                            ToggleCompatiblePassAnimation,
+                            info.passBlock
+                        );
                     }
                 }
 
-                if (highlightOptions.HasFlag(PassHighlightOptions.PassesWithSynchronizationMessage) &&
-                    info.hasAsyncDependencyTooltip)
+                if (
+                    highlightOptions.HasFlag(PassHighlightOptions.PassesWithSynchronizationMessage)
+                    && info.hasAsyncDependencyTooltip
+                )
                     info.passBlock.AddToClassList(Classes.kPassSynchronizationMessageIndicator);
             }
 
@@ -605,7 +656,9 @@ namespace UnityEditor.Rendering
                 if (nextVisiblePassIndex != -1)
                     m_PassElementsInfo[nextVisiblePassIndex].leftGridLine.AddToClassList(Classes.kGridLineHighlight);
                 else
-                    rootVisualElement.Query(classes: Classes.kGridLine).Last()
+                    rootVisualElement
+                        .Query(classes: Classes.kGridLine)
+                        .Last()
                         .AddToClassList(Classes.kGridLineHighlight);
             }
 
@@ -613,7 +666,8 @@ namespace UnityEditor.Rendering
             {
                 int firstPassIndex = FindNextVisiblePassIndex(groupedPassIds[0]);
                 int afterLastPassIndex = FindNextVisiblePassIndex(groupedPassIds[^1] + 1);
-                int focusOverlayHeightPx = m_ResourceElementsInfo.Count * kResourceRowHeightPx + kResourceGridMarginTopPx;
+                int focusOverlayHeightPx =
+                    m_ResourceElementsInfo.Count * kResourceRowHeightPx + kResourceGridMarginTopPx;
                 int leftWidth = firstPassIndex * kPassWidthPx;
                 int rightWidth = (m_PassElementsInfo.Count - afterLastPassIndex) * kPassWidthPx;
 
@@ -673,14 +727,15 @@ namespace UnityEditor.Rendering
         {
             m_CurrentSelectedVisiblePassIndex = visiblePassIndex;
 
-            const PassHighlightOptions opts = PassHighlightOptions.PassTitle |
-                                              PassHighlightOptions.PassBlockFill |
-                                              PassHighlightOptions.PassGridLines |
-                                              PassHighlightOptions.PassBlockBorder |
-                                              PassHighlightOptions.ResourceRWBlocks |
-                                              PassHighlightOptions.PassesWithCompatibilityMessage |
-                                              PassHighlightOptions.PassesWithSynchronizationMessage |
-                                              PassHighlightOptions.ResourceGridFocusOverlay;
+            const PassHighlightOptions opts =
+                PassHighlightOptions.PassTitle
+                | PassHighlightOptions.PassBlockFill
+                | PassHighlightOptions.PassGridLines
+                | PassHighlightOptions.PassBlockBorder
+                | PassHighlightOptions.ResourceRWBlocks
+                | PassHighlightOptions.PassesWithCompatibilityMessage
+                | PassHighlightOptions.PassesWithSynchronizationMessage
+                | PassHighlightOptions.ResourceGridFocusOverlay;
 
             ClearPassHighlight(opts);
             ResetPassBlockState();
@@ -696,19 +751,26 @@ namespace UnityEditor.Rendering
 
         void HoverPass(int visiblePassIndex, int visibleResourceIndex)
         {
-            if (m_CurrentHoveredVisiblePassIndex != visiblePassIndex ||
-                m_CurrentHoveredVisibleResourceIndex != visibleResourceIndex)
+            if (
+                m_CurrentHoveredVisiblePassIndex != visiblePassIndex
+                || m_CurrentHoveredVisibleResourceIndex != visibleResourceIndex
+            )
             {
-                var highlight = PassHighlightOptions.PassBlockBorder |
-                                PassHighlightOptions.PassGridLines |
-                                PassHighlightOptions.PassBlockFill |
-                                PassHighlightOptions.PassTitleHover;
+                var highlight =
+                    PassHighlightOptions.PassBlockBorder
+                    | PassHighlightOptions.PassGridLines
+                    | PassHighlightOptions.PassBlockFill
+                    | PassHighlightOptions.PassTitleHover;
 
                 if (m_CurrentSelectedVisiblePassIndex != -1)
                 {
                     // Don't highlight or clear these when a pass is selected
-                    highlight &= ~(PassHighlightOptions.PassTitle | PassHighlightOptions.PassBlockFill |
-                                   PassHighlightOptions.PassBlockBorder | PassHighlightOptions.PassGridLines);
+                    highlight &= ~(
+                        PassHighlightOptions.PassTitle
+                        | PassHighlightOptions.PassBlockFill
+                        | PassHighlightOptions.PassBlockBorder
+                        | PassHighlightOptions.PassGridLines
+                    );
                 }
 
                 if (m_CurrentHoveredVisiblePassIndex != -1)
@@ -724,12 +786,17 @@ namespace UnityEditor.Rendering
 
         void HoverResourceByIndex(int visibleResourceIndex, int visiblePassIndex)
         {
-            if (m_CurrentHoveredVisibleResourceIndex != visibleResourceIndex ||
-                m_CurrentHoveredVisiblePassIndex != visiblePassIndex)
+            if (
+                m_CurrentHoveredVisibleResourceIndex != visibleResourceIndex
+                || m_CurrentHoveredVisiblePassIndex != visiblePassIndex
+            )
             {
-                var highlight = ResourceHighlightOptions.ResourceUsageRangeBorder | ResourceHighlightOptions.ResourceHelperLine;
-                if (m_CurrentHoveredVisibleResourceIndex >= 0 &&
-                    m_CurrentHoveredVisibleResourceIndex < m_ResourceElementsInfo.Count)
+                var highlight =
+                    ResourceHighlightOptions.ResourceUsageRangeBorder | ResourceHighlightOptions.ResourceHelperLine;
+                if (
+                    m_CurrentHoveredVisibleResourceIndex >= 0
+                    && m_CurrentHoveredVisibleResourceIndex < m_ResourceElementsInfo.Count
+                )
                 {
                     ClearResourceHighlight(highlight);
                     rootVisualElement.Q(Names.kHoverOverlay).AddToClassList(PanManipulator.k_ContentPanClassName);
@@ -745,8 +812,10 @@ namespace UnityEditor.Rendering
                         var passInfo = m_PassElementsInfo[visiblePassIndex];
                         foreach (var res in passInfo.resourceBlocks)
                         {
-                            if (res.visibleResourceIndex == visibleResourceIndex &&
-                                res.usage.HasFlag(ResourceRWBlock.UsageFlags.UpdatesGlobalResource))
+                            if (
+                                res.visibleResourceIndex == visibleResourceIndex
+                                && res.usage.HasFlag(ResourceRWBlock.UsageFlags.UpdatesGlobalResource)
+                            )
                             {
                                 disablePanning = true;
                             }
@@ -760,7 +829,8 @@ namespace UnityEditor.Rendering
 
                         if (disablePanning)
                         {
-                            rootVisualElement.Q(Names.kHoverOverlay)
+                            rootVisualElement
+                                .Q(Names.kHoverOverlay)
                                 .RemoveFromClassList(PanManipulator.k_ContentPanClassName);
                             m_PanManipulator.canStartDragging = false;
                         }
@@ -786,14 +856,19 @@ namespace UnityEditor.Rendering
         void GetVisiblePassAndResourceIndex(Vector2 pos, out int visiblePassIndex, out int visibleResourceIndex)
         {
             visiblePassIndex = Math.Min(Mathf.FloorToInt(pos.x / kPassWidthPx), m_PassElementsInfo.Count - 1);
-            visibleResourceIndex = Math.Min(Mathf.FloorToInt(pos.y / kResourceRowHeightPx),
-                m_ResourceElementsInfo.Count - 1);
+            visibleResourceIndex = Math.Min(
+                Mathf.FloorToInt(pos.y / kResourceRowHeightPx),
+                m_ResourceElementsInfo.Count - 1
+            );
         }
 
         void ResourceGridHovered(MouseMoveEvent evt)
         {
-            GetVisiblePassAndResourceIndex(evt.localMousePosition, out int visiblePassIndex,
-                out int visibleResourceIndex);
+            GetVisiblePassAndResourceIndex(
+                evt.localMousePosition,
+                out int visiblePassIndex,
+                out int visibleResourceIndex
+            );
             HoverResourceGrid(visiblePassIndex, visibleResourceIndex);
         }
 
@@ -839,8 +914,11 @@ namespace UnityEditor.Rendering
                     }
                 }
 
-                if (evt.tooltip == string.Empty &&
-                    passId >= resourceInfo.firstPassId && passId <= resourceInfo.lastPassId)
+                if (
+                    evt.tooltip == string.Empty
+                    && passId >= resourceInfo.firstPassId
+                    && passId <= resourceInfo.lastPassId
+                )
                 {
                     evt.tooltip = "Resource is alive but not used by this pass.";
                     evt.rect = resourceInfo.usageRangeBlock.worldBound;
@@ -876,7 +954,7 @@ namespace UnityEditor.Rendering
             var emptyStateElement = rootVisualElement.Q<VisualElement>(Names.kEmptyStateMessage);
             emptyStateElement.style.display = DisplayStyle.Flex;
             if (emptyStateElement[0] is TextElement emptyStateText)
-                emptyStateText.text = $"{kEmptyStateMessages[(int) reason]}";
+                emptyStateText.text = $"{kEmptyStateMessages[(int)reason]}";
         }
 
         void OnAutoPlayStatusChanged(ChangeEvent<bool> evt)
@@ -887,9 +965,11 @@ namespace UnityEditor.Rendering
 
             // When enabling Auto Update, if the current debug data is from a player that is no longer connected,
             // switch back to Editor target.
-            if (!m_Paused &&
-                RenderGraphDebugSession.currentDebugSession is RenderGraphEditorRemoteDebugSession &&
-                m_PlayerConnection.connectionState.connectedToTarget != ConnectionTarget.Player)
+            if (
+                !m_Paused
+                && RenderGraphDebugSession.currentDebugSession is RenderGraphEditorRemoteDebugSession
+                && m_PlayerConnection.connectionState.connectedToTarget != ConnectionTarget.Player
+            )
             {
                 ConnectDebugSession<RenderGraphEditorLocalDebugSession>();
             }
@@ -902,7 +982,8 @@ namespace UnityEditor.Rendering
         }
 
         // Helper method to check if an enum value has a specific flag.
-        bool HasFlag<T>(T value, T flag) where T : Enum
+        bool HasFlag<T>(T value, T flag)
+            where T : Enum
         {
             return (Convert.ToInt32(value) & Convert.ToInt32(flag)) == Convert.ToInt32(flag);
         }
@@ -911,7 +992,14 @@ namespace UnityEditor.Rendering
         readonly Dictionary<ToggleDropdown, Action<bool>> m_ToggleHandlers = new();
         readonly Dictionary<ToggleDropdown, Action<int[]>> m_SelectionHandlers = new();
 
-        void BuildEnumFlagsToggleDropdown<T>(ToggleDropdown dropdown, T currentValue, string prefsKey, Action<T> setValue, bool defaultEnabled = true) where T : Enum
+        void BuildEnumFlagsToggleDropdown<T>(
+            ToggleDropdown dropdown,
+            T currentValue,
+            string prefsKey,
+            Action<T> setValue,
+            bool defaultEnabled = true
+        )
+            where T : Enum
         {
             if (!HasValidDebugData)
             {
@@ -1017,14 +1105,26 @@ namespace UnityEditor.Rendering
         void RebuildViewOptionsUI()
         {
             var viewOptions = rootVisualElement.Q<ToggleDropdown>(Names.kViewOptionsField);
-            BuildEnumFlagsToggleDropdown(viewOptions, m_ViewOptions, kViewOptionsEditorPrefsKey, val => m_ViewOptions = val, false);
+            BuildEnumFlagsToggleDropdown(
+                viewOptions,
+                m_ViewOptions,
+                kViewOptionsEditorPrefsKey,
+                val => m_ViewOptions = val,
+                false
+            );
             viewOptions.text = L10n.Tr("View Options");
         }
 
         void RebuildResourceFilterUI()
         {
             var resourceFilter = rootVisualElement.Q<ToggleDropdown>(Names.kResourceFilterField);
-            BuildEnumFlagsToggleDropdown(resourceFilter, m_ResourceFilter, kResourceFilterEditorPrefsKey, val => m_ResourceFilter = val, true);
+            BuildEnumFlagsToggleDropdown(
+                resourceFilter,
+                m_ResourceFilter,
+                kResourceFilterEditorPrefsKey,
+                val => m_ResourceFilter = val,
+                true
+            );
             resourceFilter.text = L10n.Tr("Resource Filter");
         }
 
@@ -1032,7 +1132,13 @@ namespace UnityEditor.Rendering
         {
             var passFilter = rootVisualElement.Q<ToggleDropdown>(Names.kPassFilterField);
 
-            BuildEnumFlagsToggleDropdown(passFilter, m_PassFilter, kPassFilterEditorPrefsKey, val => m_PassFilter = val, true);
+            BuildEnumFlagsToggleDropdown(
+                passFilter,
+                m_PassFilter,
+                kPassFilterEditorPrefsKey,
+                val => m_PassFilter = val,
+                true
+            );
 
             passFilter.text = L10n.Tr("Pass Filter");
         }
@@ -1089,7 +1195,11 @@ namespace UnityEditor.Rendering
                 // If nothing is selected, try to select a previously selected execution. Note that because we allow
                 // duplicate camera names, if the camera name saved in EditorPrefs appears multiple times in the list,
                 // we cannot know which one needs to be activated and therefore must ignore it.
-                if (newExecutionIndex == -1 && previousSelectedExecutionFoundIndex != -1 && previousSelectedExecutionFoundCount == 1)
+                if (
+                    newExecutionIndex == -1
+                    && previousSelectedExecutionFoundIndex != -1
+                    && previousSelectedExecutionFoundCount == 1
+                )
                     newExecutionIndex = previousSelectedExecutionFoundIndex;
 
                 if (newExecutionIndex == -1)
@@ -1129,7 +1239,12 @@ namespace UnityEditor.Rendering
             for (int i = 0; i < m_ExecutionItems.Count; i++)
             {
                 var executionId = m_ExecutionItems[i];
-                toolbarMenu.menu.AppendAction(executionId.name, OnExecutionMenuItemClicked, GetExecutionMenuItemStatus, userData: i);
+                toolbarMenu.menu.AppendAction(
+                    executionId.name,
+                    OnExecutionMenuItemClicked,
+                    GetExecutionMenuItemStatus,
+                    userData: i
+                );
             }
 
             // Store selected camera in EditorPrefs with a delay. This allows time for several cameras to appear
@@ -1152,7 +1267,9 @@ namespace UnityEditor.Rendering
         DropdownMenuAction.Status GetExecutionMenuItemStatus(DropdownMenuAction action)
         {
             int menuItemExecutionIndex = (int)action.userData;
-            return m_SelectedExecutionIndex == menuItemExecutionIndex ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal;
+            return m_SelectedExecutionIndex == menuItemExecutionIndex
+                ? DropdownMenuAction.Status.Checked
+                : DropdownMenuAction.Status.Normal;
         }
 
         RenderGraph.DebugExecutionItem selectedExecutionItem
@@ -1180,8 +1297,10 @@ namespace UnityEditor.Rendering
                 return false;
             if (type == RenderGraphResourceType.Buffer && !m_ResourceFilter.HasFlag(ResourceFilter.Buffers))
                 return false;
-            if (type == RenderGraphResourceType.AccelerationStructure &&
-                !m_ResourceFilter.HasFlag(ResourceFilter.AccelerationStructures))
+            if (
+                type == RenderGraphResourceType.AccelerationStructure
+                && !m_ResourceFilter.HasFlag(ResourceFilter.AccelerationStructures)
+            )
                 return false;
 
             return true;
@@ -1194,7 +1313,7 @@ namespace UnityEditor.Rendering
                 RenderGraphPassType.Compute => m_PassFilter.HasFlag(PassFilter.ComputePasses),
                 RenderGraphPassType.Raster => m_PassFilter.HasFlag(PassFilter.RasterPasses),
                 RenderGraphPassType.Unsafe => m_PassFilter.HasFlag(PassFilter.UnsafePasses),
-                _ => true // Allow unknown types by default
+                _ => true, // Allow unknown types by default
             };
         }
 
@@ -1213,11 +1332,18 @@ namespace UnityEditor.Rendering
         }
 
         static readonly string[] k_ResourceNames =
-            { "Texture Resource", "Buffer Resource", "Acceleration Structure Resource" };
+        {
+            "Texture Resource",
+            "Buffer Resource",
+            "Acceleration Structure Resource",
+        };
 
         static readonly string[] k_MemorylessResourceNames =
-            { "Memoryless Texture Resource", "Memoryless Buffer Resource", "Memoryless Acceleration Structure Resource" };
-
+        {
+            "Memoryless Texture Resource",
+            "Memoryless Buffer Resource",
+            "Memoryless Acceleration Structure Resource",
+        };
 
         // Pass title ellipsis must be generated manually because it can't be done right for rotated text using uss.
         void TruncatePassTitle(GeometryChangedEvent evt)
@@ -1229,8 +1355,13 @@ namespace UnityEditor.Rendering
                 bool wasTruncated = false;
                 while (true)
                 {
-                    var rect = label.MeasureTextSize(label.text, 0, VisualElement.MeasureMode.Undefined, 0,
-                        VisualElement.MeasureMode.Undefined);
+                    var rect = label.MeasureTextSize(
+                        label.text,
+                        0,
+                        VisualElement.MeasureMode.Undefined,
+                        0,
+                        VisualElement.MeasureMode.Undefined
+                    );
 
                     if (float.IsNaN(rect.x))
                         return; // layout not ready yet
@@ -1368,7 +1499,7 @@ namespace UnityEditor.Rendering
                 passTitle = passTitle,
                 passId = passId,
                 isCulled = pass.culled,
-                isAsync = pass.async
+                isAsync = pass.async,
             };
 
             m_PassElementsInfo.Add(passInfo);
@@ -1395,10 +1526,12 @@ namespace UnityEditor.Rendering
             resourceTypeIcon.AddToClassList(Classes.kResourceIcon);
             string className = type switch
             {
-                RenderGraphResourceType.Texture => memoryless ? Classes.kResourceIconMemorylessTexture : Classes.kResourceIconTexture,
+                RenderGraphResourceType.Texture => memoryless
+                    ? Classes.kResourceIconMemorylessTexture
+                    : Classes.kResourceIconTexture,
                 RenderGraphResourceType.Buffer => Classes.kResourceIconBuffer,
                 RenderGraphResourceType.AccelerationStructure => Classes.kResourceIconAccelerationStructure,
-                _ => throw new ArgumentOutOfRangeException(nameof(type))
+                _ => throw new ArgumentOutOfRangeException(nameof(type)),
             };
             resourceTypeIcon.AddToClassList(className);
             resourceTypeIcon.tooltip = memoryless ? k_MemorylessResourceNames[(int)type] : k_ResourceNames[(int)type];
@@ -1459,7 +1592,9 @@ namespace UnityEditor.Rendering
                 var triangle = new TriangleElement();
                 triangle.width = kDependencyBlockWidthPx;
                 triangle.height = kDependencyBlockHeightPx;
-                triangle.color = EditorGUIUtility.isProSkin ? kReadWriteBlockFillColorDark : kReadWriteBlockFillColorLight;
+                triangle.color = EditorGUIUtility.isProSkin
+                    ? kReadWriteBlockFillColorDark
+                    : kReadWriteBlockFillColorLight;
                 block.element = triangle;
                 block.element.AddToClassList(Classes.kResourceDependencyBlockReadWrite);
                 accessType = "Read/write";
@@ -1508,7 +1643,8 @@ namespace UnityEditor.Rendering
                 else if (block.usage.HasFlag(ResourceRWBlock.UsageFlags.FramebufferFetch))
                     resourceIconClassName = Classes.kResourceIconFbfetch;
                 else if (block.usage.HasFlag(ResourceRWBlock.UsageFlags.UpdatesGlobalResource))
-                    resourceIconClassName = block.read || block.write ? Classes.kResourceIconGlobalLight : Classes.kResourceIconGlobalDark;
+                    resourceIconClassName =
+                        block.read || block.write ? Classes.kResourceIconGlobalLight : Classes.kResourceIconGlobalDark;
 
                 if (!string.IsNullOrEmpty(resourceIconClassName))
                 {
@@ -1557,7 +1693,7 @@ namespace UnityEditor.Rendering
                     block.element.Add(loadAction);
                 }
 
-                if( block.store != ResourceRWBlock.StoreAction.None)
+                if (block.store != ResourceRWBlock.StoreAction.None)
                 {
                     var storeActionBorder = new TriangleElement { useStyle = true };
                     storeActionBorder.AddToClassList(Classes.kStoreAction);
@@ -1597,7 +1733,8 @@ namespace UnityEditor.Rendering
             RenderGraphResourceType resourceType,
             int resourceIndex,
             ResourceElementInfo elementInfo,
-            int visibleResourceIndex)
+            int visibleResourceIndex
+        )
         {
             var row = new VisualElement();
             row.pickingMode = PickingMode.Ignore;
@@ -1677,14 +1814,16 @@ namespace UnityEditor.Rendering
                                     RenderBufferLoadAction.Load => ResourceRWBlock.LoadAction.Load,
                                     RenderBufferLoadAction.Clear => ResourceRWBlock.LoadAction.Clear,
                                     RenderBufferLoadAction.DontCare => ResourceRWBlock.LoadAction.DontCare,
-                                    _ => ResourceRWBlock.LoadAction.None
+                                    _ => ResourceRWBlock.LoadAction.None,
                                 };
 
                                 block.store = attachmentInfo.attachment.storeAction switch
                                 {
                                     RenderBufferStoreAction.Store => ResourceRWBlock.StoreAction.Store,
                                     RenderBufferStoreAction.Resolve => ResourceRWBlock.StoreAction.Resolve,
-                                    RenderBufferStoreAction.StoreAndResolve => ResourceRWBlock.StoreAction.StoreAndResolve,
+                                    RenderBufferStoreAction.StoreAndResolve => ResourceRWBlock
+                                        .StoreAction
+                                        .StoreAndResolve,
                                     RenderBufferStoreAction.DontCare => ResourceRWBlock.StoreAction.DontCare,
                                     _ => ResourceRWBlock.StoreAction.None,
                                 };
@@ -1826,9 +1965,9 @@ namespace UnityEditor.Rendering
             resourceGrid.style.width = numVisiblePasses * kPassWidthPx + kPassTitleAllowanceMargin;
 
             int visibleResourceIndex = 0;
-            for (int t = 0; t < (int) RenderGraphResourceType.Count; t++)
+            for (int t = 0; t < (int)RenderGraphResourceType.Count; t++)
             {
-                var resourceType = (RenderGraphResourceType) t;
+                var resourceType = (RenderGraphResourceType)t;
                 var resourceList = m_CurrentDebugData.resourceLists[t];
                 for (int resourceIndex = 0; resourceIndex < resourceList.Count; resourceIndex++)
                 {
@@ -1841,12 +1980,13 @@ namespace UnityEditor.Rendering
                         type = resourceType,
                         index = resourceIndex,
                         firstPassId = res.creationPassIndex,
-                        lastPassId = res.releasePassIndex
+                        lastPassId = res.releasePassIndex,
                     };
                     elementInfo.resourceListItem = CreateResourceListItem(res, resourceType);
                     resourceListScrollView.Add(elementInfo.resourceListItem);
-                    resourceGrid.Add(CreateResourceGridRow(res, resourceType, resourceIndex,
-                        elementInfo, visibleResourceIndex));
+                    resourceGrid.Add(
+                        CreateResourceGridRow(res, resourceType, resourceIndex, elementInfo, visibleResourceIndex)
+                    );
                     m_ResourceElementsInfo.Add(elementInfo);
 
                     visibleResourceIndex++;
@@ -1895,23 +2035,27 @@ namespace UnityEditor.Rendering
 
         void RerouteWheelEvent(VisualElement source, VisualElement target)
         {
-            source.RegisterCallback<WheelEvent>(evt =>
-            {
-                evt.StopImmediatePropagation();
-
-                // Need to create an intermediate Event to be able to call WheelEvent.GetPooled()
-                var imguiEvt = new Event {
-                    type = EventType.ScrollWheel,
-                    delta = new Vector2(evt.delta.x, evt.delta.y),
-                    mousePosition = evt.mousePosition,
-                    modifiers = evt.modifiers
-                };
-                using (var newEvt = WheelEvent.GetPooled(imguiEvt))
+            source.RegisterCallback<WheelEvent>(
+                evt =>
                 {
-                    newEvt.target = target;
-                    target.SendEvent(newEvt);
-                }
-            }, TrickleDown.TrickleDown);
+                    evt.StopImmediatePropagation();
+
+                    // Need to create an intermediate Event to be able to call WheelEvent.GetPooled()
+                    var imguiEvt = new Event
+                    {
+                        type = EventType.ScrollWheel,
+                        delta = new Vector2(evt.delta.x, evt.delta.y),
+                        mousePosition = evt.mousePosition,
+                        modifiers = evt.modifiers,
+                    };
+                    using (var newEvt = WheelEvent.GetPooled(imguiEvt))
+                    {
+                        newEvt.target = target;
+                        target.SendEvent(newEvt);
+                    }
+                },
+                TrickleDown.TrickleDown
+            );
         }
 
         // Initialize, register callbacks & manipulators etc. once
@@ -1922,10 +2066,9 @@ namespace UnityEditor.Rendering
             var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_TemplatePath);
             visualTreeAsset.CloneTree(rootVisualElement);
 
-            var themeStyleSheet =
-                AssetDatabase.LoadAssetAtPath<StyleSheet>(EditorGUIUtility.isProSkin
-                    ? k_DarkStylePath
-                    : k_LightStylePath);
+            var themeStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(
+                EditorGUIUtility.isProSkin ? k_DarkStylePath : k_LightStylePath
+            );
             rootVisualElement.styleSheets.Add(themeStyleSheet);
 
             // Hover overlay
@@ -1970,7 +2113,7 @@ namespace UnityEditor.Rendering
 
         void OnRegisteredGraphsChanged()
         {
-           OnRegisteredGraphsChangedInternal();
+            OnRegisteredGraphsChangedInternal();
         }
 
         void OnRegisteredGraphsChangedInternal(bool force = false)
@@ -1991,7 +2134,11 @@ namespace UnityEditor.Rendering
             }
 
             UpdateSelectedGraphAndExecution();
-            if (m_SelectedRenderGraph == graph && selectedExecutionItem != null && selectedExecutionItem.id == executionId)
+            if (
+                m_SelectedRenderGraph == graph
+                && selectedExecutionItem != null
+                && selectedExecutionItem.id == executionId
+            )
             {
                 UpdateCurrentDebugData();
             }
@@ -2038,7 +2185,10 @@ namespace UnityEditor.Rendering
 
             if (selectedExecutionItem != null)
             {
-                m_CurrentDebugData = RenderGraphDebugSession.GetDebugData(m_SelectedRenderGraph, selectedExecutionItem.id);
+                m_CurrentDebugData = RenderGraphDebugSession.GetDebugData(
+                    m_SelectedRenderGraph,
+                    selectedExecutionItem.id
+                );
             }
             else
             {
@@ -2087,8 +2237,12 @@ namespace UnityEditor.Rendering
 
             GraphicsToolLifetimeAnalytic.WindowOpened<RenderGraphViewer>();
 
-            m_ResourceListIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(string.Format(k_ResourceListIconPath, EditorGUIUtility.isProSkin ? "d_" : ""));
-            m_PassListIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(string.Format(k_PassListIconPath, EditorGUIUtility.isProSkin ? "d_" : ""));
+            m_ResourceListIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(
+                string.Format(k_ResourceListIconPath, EditorGUIUtility.isProSkin ? "d_" : "")
+            );
+            m_PassListIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(
+                string.Format(k_PassListIconPath, EditorGUIUtility.isProSkin ? "d_" : "")
+            );
 
             InitializeUI();
 
@@ -2124,7 +2278,9 @@ namespace UnityEditor.Rendering
         void OnPlayerConnected(int playerID)
         {
             ConnectDebugSession<RenderGraphEditorRemoteDebugSession>();
-            RenderGraphDebugSession.currentDebugSession.connectionName = m_PlayerConnection.connectionState.connectionName;
+            RenderGraphDebugSession.currentDebugSession.connectionName = m_PlayerConnection
+                .connectionState
+                .connectionName;
         }
 
         void OnPlayerDisconnected(int playerID)

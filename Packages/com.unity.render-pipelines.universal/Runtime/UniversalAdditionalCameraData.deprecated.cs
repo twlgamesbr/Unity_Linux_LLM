@@ -6,7 +6,9 @@ namespace UnityEngine.Rendering.Universal
     /// Options to control the renderer override.
     /// This enum is no longer in use.
     /// </summary>
-    [Obsolete("Renderer override is no longer used, renderers are referenced by index on the pipeline asset. #from(2023.1)")]
+    [Obsolete(
+        "Renderer override is no longer used, renderers are referenced by index on the pipeline asset. #from(2023.1)"
+    )]
     public enum RendererOverrideOption
     {
         /// <summary>
@@ -19,7 +21,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         UsePipelineSettings,
     }
-    
+
     public partial class UniversalAdditionalCameraData
     {
         /// <summary>

@@ -9,22 +9,22 @@ namespace Unity.Entities.UI
         {
             if (index < 0)
                 throw new ArgumentException(nameof(ArrayUtility) + ": index must be in [0, Length -1] range.");
-            
+
             var dest = new T[source.Length - 1];
-            if( index > 0 )
+            if (index > 0)
                 Copy(source, 0, dest, 0, index);
 
-            if( index < source.Length - 1 )
+            if (index < source.Length - 1)
                 Copy(source, index + 1, dest, index, source.Length - index - 1);
 
             return dest;
         }
-        
+
         public static T[] InsertAt<T>(T[] source, int index, T value)
         {
             if (index < 0 || index > source.Length)
                 throw new ArgumentException(nameof(ArrayUtility) + ": index must be in [0, Length] range.");
-            
+
             var dest = new T[source.Length + 1];
             if (index == 0)
             {
@@ -47,19 +47,17 @@ namespace Unity.Entities.UI
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void Copy<T>(
-            T[] sourceArray,
-            int sourceIndex,
-            T[] destinationArray,
-            int destinationIndex,
-            int count)
+        static void Copy<T>(T[] sourceArray, int sourceIndex, T[] destinationArray, int destinationIndex, int count)
         {
-            for (var index = 0; index < count && destinationIndex < destinationArray.Length; index++, destinationIndex++, sourceIndex++)
+            for (
+                var index = 0;
+                index < count && destinationIndex < destinationArray.Length;
+                index++, destinationIndex++, sourceIndex++
+            )
             {
                 var sourceValue = sourceArray[sourceIndex];
                 destinationArray[destinationIndex] = sourceValue;
             }
         }
-        
     }
 }

@@ -11,6 +11,7 @@ namespace UnityEngine.TestRunner.Utils
     internal class TestRunCallbackListener : ScriptableObject, ITestRunnerListener
     {
         private ITestRunCallback[] m_Callbacks;
+
         public void RunStarted(ITest testsToRun)
         {
             InvokeAllCallbacks(callback => callback.RunStarted(testsToRun));
@@ -23,8 +24,16 @@ namespace UnityEngine.TestRunner.Utils
 #else
             var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
-            allAssemblies = allAssemblies.Where(x => x.GetReferencedAssemblies().Any(z => z.Name == "UnityEngine.TestRunner")).ToArray();
-            var attributes = allAssemblies.SelectMany(assembly => assembly.GetCustomAttributes(typeof(TestRunCallbackAttribute), true).OfType<TestRunCallbackAttribute>()).ToArray();
+            allAssemblies = allAssemblies
+                .Where(x => x.GetReferencedAssemblies().Any(z => z.Name == "UnityEngine.TestRunner"))
+                .ToArray();
+            var attributes = allAssemblies
+                .SelectMany(assembly =>
+                    assembly
+                        .GetCustomAttributes(typeof(TestRunCallbackAttribute), true)
+                        .OfType<TestRunCallbackAttribute>()
+                )
+                .ToArray();
             return attributes.Select(attribute => attribute.ConstructCallback()).ToArray();
         }
 

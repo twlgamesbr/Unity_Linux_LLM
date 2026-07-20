@@ -39,7 +39,9 @@ namespace Unity.Netcode
         {
             if (m_Locked)
             {
-                throw new Exception($"RPC targets obtained through {nameof(RpcTargetUse)}.{RpcTargetUse.Temp} may not be disposed.");
+                throw new Exception(
+                    $"RPC targets obtained through {nameof(RpcTargetUse)}.{RpcTargetUse.Temp} may not be disposed."
+                );
             }
         }
 
@@ -48,9 +50,19 @@ namespace Unity.Netcode
         /// </summary>
         public abstract void Dispose();
 
-        internal abstract void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams);
+        internal abstract void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        );
 
-        private protected void SendMessageToClient(NetworkBehaviour behaviour, ulong clientId, ref RpcMessage message, NetworkDelivery delivery)
+        private protected void SendMessageToClient(
+            NetworkBehaviour behaviour,
+            ulong clientId,
+            ref RpcMessage message,
+            NetworkDelivery delivery
+        )
         {
             var size = behaviour.NetworkManager.MessageManager.SendMessage(ref message, delivery, clientId);
 #if MULTIPLAYER_TOOLS && (DEBUG || UNITY_MP_TOOLS_NET_STATS_MONITOR_ENABLED_IN_RELEASE)

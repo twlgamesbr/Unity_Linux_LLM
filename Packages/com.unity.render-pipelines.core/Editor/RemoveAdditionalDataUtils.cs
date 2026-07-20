@@ -1,8 +1,8 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -37,14 +37,24 @@ namespace UnityEditor.Rendering
         {
             using (ListPool<Type>.Get(out var componentTypesToRemove))
             {
-                if (!TryGetComponentsToRemove(additionalDataComponent as IAdditionalData, componentTypesToRemove, out var error))
+                if (
+                    !TryGetComponentsToRemove(
+                        additionalDataComponent as IAdditionalData,
+                        componentTypesToRemove,
+                        out var error
+                    )
+                )
                     throw error;
 
-                if (!promptDisplay || EditorUtility.DisplayDialog(
-                    title: $"Are you sure you want to proceed?",
-                    message: $"This operation will also remove {string.Join($"{Environment.NewLine} - ", componentTypesToRemove)}.",
-                    ok: $"Remove everything",
-                    cancel: "Cancel"))
+                if (
+                    !promptDisplay
+                    || EditorUtility.DisplayDialog(
+                        title: $"Are you sure you want to proceed?",
+                        message: $"This operation will also remove {string.Join($"{Environment.NewLine} - ", componentTypesToRemove)}.",
+                        ok: $"Remove everything",
+                        cancel: "Cancel"
+                    )
+                )
                 {
                     RemoveAdditionalDataComponentOnSelection(additionalDataComponent.GetType(), componentTypesToRemove);
                 }
@@ -55,8 +65,7 @@ namespace UnityEditor.Rendering
             }
         }
 
-        static void IgnoreNextPromptsForThisSelection()
-            => s_DialogToSkip = Selection.count - 1;
+        static void IgnoreNextPromptsForThisSelection() => s_DialogToSkip = Selection.count - 1;
 
         static bool ShouldPrompt()
         {
@@ -69,15 +78,24 @@ namespace UnityEditor.Rendering
             return true;
         }
 
-        static void RemoveAdditionalDataComponentOnSelection([DisallowNull] Type additionalDataType, [DisallowNull] List<Type> componentsTypeToRemove)
+        static void RemoveAdditionalDataComponentOnSelection(
+            [DisallowNull] Type additionalDataType,
+            [DisallowNull] List<Type> componentsTypeToRemove
+        )
         {
             foreach (var selectedGameObject in Selection.gameObjects)
             {
-                RemoveAdditionalDataComponent(selectedGameObject.GetComponent(additionalDataType), componentsTypeToRemove);
+                RemoveAdditionalDataComponent(
+                    selectedGameObject.GetComponent(additionalDataType),
+                    componentsTypeToRemove
+                );
             }
         }
 
-        static void RemoveAdditionalDataComponent([DisallowNull] Component additionalDataComponent, [DisallowNull] List<Type> componentsTypeToRemove)
+        static void RemoveAdditionalDataComponent(
+            [DisallowNull] Component additionalDataComponent,
+            [DisallowNull] List<Type> componentsTypeToRemove
+        )
         {
             using (ListPool<Component>.Get(out var components))
             {
@@ -97,7 +115,11 @@ namespace UnityEditor.Rendering
 
         //internal for tests
         [MustUseReturnValue]
-        internal static bool TryGetComponentsToRemove([DisallowNull] IAdditionalData additionalData, [DisallowNull] List<Type> componentsToRemove, [NotNullWhen(false)] out Exception error)
+        internal static bool TryGetComponentsToRemove(
+            [DisallowNull] IAdditionalData additionalData,
+            [DisallowNull] List<Type> componentsToRemove,
+            [NotNullWhen(false)] out Exception error
+        )
         {
             if (additionalData == null)
             {

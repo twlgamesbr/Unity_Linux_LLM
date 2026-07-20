@@ -8,6 +8,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
     {
         [SerializeField]
         public string RunGuid;
+
         [SerializeField]
         public ExecutionSettings ExecutionSettings;
 
@@ -16,8 +17,10 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         [SerializeField]
         public float Progress;
+
         [SerializeField]
         public string CurrentStepName;
+
         [SerializeField]
         public string CurrentStageName;
     }

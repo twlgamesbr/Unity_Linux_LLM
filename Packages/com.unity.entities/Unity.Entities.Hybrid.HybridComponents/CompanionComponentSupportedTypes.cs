@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.VFX;
@@ -8,8 +9,6 @@ using UnityEngine.Rendering.HighDefinition;
 #if URP_7_0_0_OR_NEWER
 using UnityEngine.Rendering.Universal;
 #endif
-
-using Unity.Entities;
 
 [assembly: RegisterUnityEngineComponentType(typeof(Light))]
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -65,6 +64,7 @@ using Unity.Entities;
 #endif
 
 [assembly: InternalsVisibleTo("Unity.Entities.Hybrid")]
+
 namespace Unity.Entities.Conversion
 {
     internal class CompanionComponentSupportedTypes

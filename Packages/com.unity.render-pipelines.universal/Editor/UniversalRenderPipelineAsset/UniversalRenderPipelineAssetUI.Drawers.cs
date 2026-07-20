@@ -14,14 +14,17 @@ namespace UnityEditor.Rendering.Universal
     //The internal one is private
     static class StringBuilderPool
     {
-        internal static readonly UnityEngine.Pool.ObjectPool<StringBuilder> s_Pool = new (
-            () => new StringBuilder(), 
-            null, 
-            sb => sb.Clear()    //clear on release
-            );
+        internal static readonly UnityEngine.Pool.ObjectPool<StringBuilder> s_Pool = new(
+            () => new StringBuilder(),
+            null,
+            sb => sb.Clear() //clear on release
+        );
 
         public static StringBuilder Get() => s_Pool.Get();
-        public static UnityEngine.Pool.PooledObject<StringBuilder> Get(out StringBuilder value) => s_Pool.Get(out value);
+
+        public static UnityEngine.Pool.PooledObject<StringBuilder> Get(out StringBuilder value) =>
+            s_Pool.Get(out value);
+
         public static void Release(StringBuilder toRelease) => s_Pool.Release(toRelease);
     }
 
@@ -30,15 +33,19 @@ namespace UnityEditor.Rendering.Universal
         private static class GraphicsSettingPanelButton
         {
             private const int k_OpenGraphicsSettingsPanelLeftMargin = 18;
+
             private static GUIStyle ButtonStylingWithInspectorIndent()
             {
                 var style = GUI.skin.button;
                 style.margin.left = k_OpenGraphicsSettingsPanelLeftMargin;
                 return style;
             }
+
             public const string k_OpenGraphicsSettingsPanelButtonText = "Open Project Settings > Graphics ...";
             public const string k_OpenGraphicsSettingsPanelButtonPath = "Project/Graphics";
-            public readonly static Lazy<GUIStyle> s_OpenGraphicsSettingsPanelButtonStyle = new(() => ButtonStylingWithInspectorIndent());
+            public static readonly Lazy<GUIStyle> s_OpenGraphicsSettingsPanelButtonStyle = new(() =>
+                ButtonStylingWithInspectorIndent()
+            );
         }
 
         internal enum Expandable
@@ -73,7 +80,10 @@ namespace UnityEditor.Rendering.Universal
             k_AdditionalPropertiesState.UnregisterEditor(editor);
         }
 
-        static bool ValidateRendererGraphicsAPIsForLightLayers(UniversalRenderPipelineAsset pipelineAsset, out string unsupportedGraphicsApisMessage)
+        static bool ValidateRendererGraphicsAPIsForLightLayers(
+            UniversalRenderPipelineAsset pipelineAsset,
+            out string unsupportedGraphicsApisMessage
+        )
         {
             unsupportedGraphicsApisMessage = null;
 
@@ -96,7 +106,10 @@ namespace UnityEditor.Rendering.Universal
             return unsupportedGraphicsApisMessage == null;
         }
 
-        static bool ValidateRendererGraphicsAPIs(UniversalRenderPipelineAsset pipelineAsset, out string unsupportedGraphicsApisMessage)
+        static bool ValidateRendererGraphicsAPIs(
+            UniversalRenderPipelineAsset pipelineAsset,
+            out string unsupportedGraphicsApisMessage
+        )
         {
             // Check the list of Renderers against all Graphics APIs the player is built with.
             unsupportedGraphicsApisMessage = null;
@@ -116,15 +129,22 @@ namespace UnityEditor.Rendering.Universal
                 for (int apiIndex = 0; apiIndex < unsupportedAPIs.Length; apiIndex++)
                 {
                     if (Array.FindIndex(graphicsAPIs, element => element == unsupportedAPIs[apiIndex]) >= 0)
-                        unsupportedGraphicsApisMessage += $"{renderer} at index {i} does not support {unsupportedAPIs[apiIndex]}.\n";
+                        unsupportedGraphicsApisMessage +=
+                            $"{renderer} at index {i} does not support {unsupportedAPIs[apiIndex]}.\n";
                 }
             }
 
             return unsupportedGraphicsApisMessage == null;
         }
 
-        static readonly ExpandedState<Expandable, UniversalRenderPipelineAsset> k_ExpandedState = new(Expandable.Rendering, "URP");
-        readonly static AdditionalPropertiesState<ExpandableAdditional, Light> k_AdditionalPropertiesState = new(0, "URP");
+        static readonly ExpandedState<Expandable, UniversalRenderPipelineAsset> k_ExpandedState = new(
+            Expandable.Rendering,
+            "URP"
+        );
+        static readonly AdditionalPropertiesState<ExpandableAdditional, Light> k_AdditionalPropertiesState = new(
+            0,
+            "URP"
+        );
 
         internal static void Expand(Expandable expandable, bool state)
         {
@@ -133,14 +153,49 @@ namespace UnityEditor.Rendering.Universal
 
         public static readonly CED.IDrawer Inspector = CED.Group(
             CED.Group(PrepareTileOnlyModeWarning),
-            CED.AdditionalPropertiesFoldoutGroup(Styles.renderingSettingsText, Expandable.Rendering, k_ExpandedState, ExpandableAdditional.Rendering, k_AdditionalPropertiesState, DrawRendering, DrawRenderingAdditional),
+            CED.AdditionalPropertiesFoldoutGroup(
+                Styles.renderingSettingsText,
+                Expandable.Rendering,
+                k_ExpandedState,
+                ExpandableAdditional.Rendering,
+                k_AdditionalPropertiesState,
+                DrawRendering,
+                DrawRenderingAdditional
+            ),
             CED.FoldoutGroup(Styles.qualitySettingsText, Expandable.Quality, k_ExpandedState, DrawQuality),
-            CED.AdditionalPropertiesFoldoutGroup(Styles.lightingSettingsText, Expandable.Lighting, k_ExpandedState, ExpandableAdditional.Lighting, k_AdditionalPropertiesState, DrawLighting, DrawLightingAdditional),
-            CED.AdditionalPropertiesFoldoutGroup(Styles.shadowSettingsText, Expandable.Shadows, k_ExpandedState, ExpandableAdditional.Shadows, k_AdditionalPropertiesState, DrawShadows, DrawShadowsAdditional),
-            CED.FoldoutGroup(Styles.postProcessingSettingsText, Expandable.PostProcessing, k_ExpandedState, DrawPostProcessing),
+            CED.AdditionalPropertiesFoldoutGroup(
+                Styles.lightingSettingsText,
+                Expandable.Lighting,
+                k_ExpandedState,
+                ExpandableAdditional.Lighting,
+                k_AdditionalPropertiesState,
+                DrawLighting,
+                DrawLightingAdditional
+            ),
+            CED.AdditionalPropertiesFoldoutGroup(
+                Styles.shadowSettingsText,
+                Expandable.Shadows,
+                k_ExpandedState,
+                ExpandableAdditional.Shadows,
+                k_AdditionalPropertiesState,
+                DrawShadows,
+                DrawShadowsAdditional
+            ),
+            CED.FoldoutGroup(
+                Styles.postProcessingSettingsText,
+                Expandable.PostProcessing,
+                k_ExpandedState,
+                DrawPostProcessing
+            ),
             CED.FoldoutGroup(Styles.volumeSettingsText, Expandable.Volumes, k_ExpandedState, DrawVolumes)
 #if ENABLE_ADAPTIVE_PERFORMANCE
-            , CED.FoldoutGroup(Styles.adaptivePerformanceText, Expandable.AdaptivePerformance, k_ExpandedState, CED.Group(DrawAdaptivePerformance))
+            ,
+            CED.FoldoutGroup(
+                Styles.adaptivePerformanceText,
+                Expandable.AdaptivePerformance,
+                k_ExpandedState,
+                CED.Group(DrawAdaptivePerformance)
+            )
 #endif
         );
 
@@ -157,13 +212,25 @@ namespace UnityEditor.Rendering.Universal
             else if (!serialized.asset.ValidateRendererDataList(true))
                 EditorGUILayout.HelpBox(Styles.rendererMissingMessage.text, MessageType.Warning, true);
             else if (!ValidateRendererGraphicsAPIs(serialized.asset, out var unsupportedGraphicsApisMessage))
-                EditorGUILayout.HelpBox(Styles.rendererUnsupportedAPIMessage.text + unsupportedGraphicsApisMessage, MessageType.Warning, true);
+                EditorGUILayout.HelpBox(
+                    Styles.rendererUnsupportedAPIMessage.text + unsupportedGraphicsApisMessage,
+                    MessageType.Warning,
+                    true
+                );
 
             EditorGUILayout.PropertyField(serialized.requireDepthTextureProp, Styles.requireDepthTextureText);
-            DisplayTileOnlyHelpBox(serialized.requireDepthTextureProp, p => p.boolValue, Styles.requireDepthTextureText);
+            DisplayTileOnlyHelpBox(
+                serialized.requireDepthTextureProp,
+                p => p.boolValue,
+                Styles.requireDepthTextureText
+            );
 
             EditorGUILayout.PropertyField(serialized.requireOpaqueTextureProp, Styles.requireOpaqueTextureText);
-            DisplayTileOnlyHelpBox(serialized.requireOpaqueTextureProp, p => p.boolValue, Styles.requireOpaqueTextureText);
+            DisplayTileOnlyHelpBox(
+                serialized.requireOpaqueTextureProp,
+                p => p.boolValue,
+                Styles.requireOpaqueTextureText
+            );
 
             EditorGUI.BeginDisabledGroup(!serialized.requireOpaqueTextureProp.boolValue);
             EditorGUILayout.PropertyField(serialized.opaqueDownsamplingProp, Styles.opaqueDownsamplingText);
@@ -172,9 +239,12 @@ namespace UnityEditor.Rendering.Universal
 
             EditorGUILayout.PropertyField(serialized.gpuResidentDrawerMode, Styles.gpuResidentDrawerMode);
 
-            var brgStrippingError = EditorGraphicsSettings.batchRendererGroupShaderStrippingMode != BatchRendererGroupStrippingMode.KeepAll;
+            var brgStrippingError =
+                EditorGraphicsSettings.batchRendererGroupShaderStrippingMode != BatchRendererGroupStrippingMode.KeepAll;
             var lightingModeError = !HasCorrectLightingModes(serialized.asset);
-            var staticBatchingWarning = PlayerSettings.GetStaticBatchingForPlatform(EditorUserBuildSettings.activeBuildTarget);
+            var staticBatchingWarning = PlayerSettings.GetStaticBatchingForPlatform(
+                EditorUserBuildSettings.activeBuildTarget
+            );
 
             if ((GPUResidentDrawerMode)serialized.gpuResidentDrawerMode.intValue != GPUResidentDrawerMode.Disabled)
             {
@@ -182,18 +252,37 @@ namespace UnityEditor.Rendering.Universal
                 using (new EditorGUI.MixedValueScope(serialized.smallMeshScreenPercentage.hasMultipleDifferentValues))
                 {
                     EditorGUI.BeginChangeCheck();
-                    float newSmallMeshScreenPercentage = Mathf.Clamp(EditorGUILayout.FloatField(Styles.smallMeshScreenPercentage, serialized.smallMeshScreenPercentage.floatValue), 0.0f, 20.0f);
+                    float newSmallMeshScreenPercentage = Mathf.Clamp(
+                        EditorGUILayout.FloatField(
+                            Styles.smallMeshScreenPercentage,
+                            serialized.smallMeshScreenPercentage.floatValue
+                        ),
+                        0.0f,
+                        20.0f
+                    );
                     if (EditorGUI.EndChangeCheck())
                         serialized.smallMeshScreenPercentage.floatValue = newSmallMeshScreenPercentage;
                 }
-                EditorGUILayout.PropertyField(serialized.gpuResidentDrawerEnableOcclusionCullingInCameras, Styles.gpuResidentDrawerEnableOcclusionCullingInCameras);
-                DisplayTileOnlyHelpBox(serialized.gpuResidentDrawerEnableOcclusionCullingInCameras, p => p.boolValue, Styles.gpuResidentDrawerEnableOcclusionCullingInCameras);
+                EditorGUILayout.PropertyField(
+                    serialized.gpuResidentDrawerEnableOcclusionCullingInCameras,
+                    Styles.gpuResidentDrawerEnableOcclusionCullingInCameras
+                );
+                DisplayTileOnlyHelpBox(
+                    serialized.gpuResidentDrawerEnableOcclusionCullingInCameras,
+                    p => p.boolValue,
+                    Styles.gpuResidentDrawerEnableOcclusionCullingInCameras
+                );
                 --EditorGUI.indentLevel;
 
                 if (brgStrippingError)
                 {
                     EditorGUILayout.HelpBox(Styles.brgShaderStrippingErrorMessage.text, MessageType.Warning, true);
-                    if (GUILayout.Button(GraphicsSettingPanelButton.k_OpenGraphicsSettingsPanelButtonText, GraphicsSettingPanelButton.s_OpenGraphicsSettingsPanelButtonStyle.Value))
+                    if (
+                        GUILayout.Button(
+                            GraphicsSettingPanelButton.k_OpenGraphicsSettingsPanelButtonText,
+                            GraphicsSettingPanelButton.s_OpenGraphicsSettingsPanelButtonStyle.Value
+                        )
+                    )
                     {
                         GraphicsSettingsInspectorUtility.OpenAndScrollTo("m_BrgStripping");
                     }
@@ -201,7 +290,11 @@ namespace UnityEditor.Rendering.Universal
                 if (lightingModeError)
                 {
                     var renderersToChange = GetRendererNamesWithoutCorrectLightingMode(serialized.asset);
-                    EditorGUILayout.HelpBox(string.Format(Styles.lightModeErrorFormatter, renderersToChange), MessageType.Error, true);
+                    EditorGUILayout.HelpBox(
+                        string.Format(Styles.lightModeErrorFormatter, renderersToChange),
+                        MessageType.Error,
+                        true
+                    );
                 }
                 if (staticBatchingWarning)
                     EditorGUILayout.HelpBox(Styles.staticBatchingInfoMessage.text, MessageType.Info, true);
@@ -243,7 +336,9 @@ namespace UnityEditor.Rendering.Universal
             return sb.ToString();
         }
 
-        private static IEnumerable<ScriptableRendererData> GetRenderersWithoutCorrectLightingMode(UniversalRenderPipelineAsset asset)
+        private static IEnumerable<ScriptableRendererData> GetRenderersWithoutCorrectLightingMode(
+            UniversalRenderPipelineAsset asset
+        )
         {
             if (asset?.m_RendererDataList == null)
                 yield break;
@@ -251,13 +346,16 @@ namespace UnityEditor.Rendering.Universal
             {
                 if (rendererData == null)
                     continue;
-                if (rendererData is not UniversalRendererData universalRendererData || !universalRendererData.usesClusterLightLoop)
+                if (
+                    rendererData is not UniversalRendererData universalRendererData
+                    || !universalRendererData.usesClusterLightLoop
+                )
                     yield return rendererData;
             }
         }
 
-        private static string GetRendererNamesWithoutCorrectLightingMode(UniversalRenderPipelineAsset asset)
-            => FormatRendererNames(GetRenderersWithoutCorrectLightingMode(asset));
+        private static string GetRendererNamesWithoutCorrectLightingMode(UniversalRenderPipelineAsset asset) =>
+            FormatRendererNames(GetRenderersWithoutCorrectLightingMode(asset));
 
         static void DrawRenderingAdditional(SerializedUniversalRenderPipelineAsset serialized, Editor ownerEditor)
         {
@@ -268,7 +366,10 @@ namespace UnityEditor.Rendering.Universal
             {
                 Debug.LogWarning(Styles.warningDynamicBatching);
             }
-            EditorGUILayout.PropertyField(serialized.storeActionsOptimizationProperty, Styles.storeActionsOptimizationText);
+            EditorGUILayout.PropertyField(
+                serialized.storeActionsOptimizationProperty,
+                Styles.storeActionsOptimizationText
+            );
         }
 
         static bool IsAndroidXRTargetted() //Include Quest platform
@@ -278,7 +379,9 @@ namespace UnityEditor.Rendering.Universal
             if (buildTargetGroup != BuildTargetGroup.Android)
                 return false;
 
-            var buildTargetSettings = XR.Management.XRGeneralSettingsPerBuildTarget.XRGeneralSettingsForBuildTarget(buildTargetGroup);
+            var buildTargetSettings = XR.Management.XRGeneralSettingsPerBuildTarget.XRGeneralSettingsForBuildTarget(
+                buildTargetGroup
+            );
             return buildTargetSettings != null
                 && buildTargetSettings.AssignedSettings != null
                 && buildTargetSettings.AssignedSettings.activeLoaders.Count > 0;
@@ -291,23 +394,32 @@ namespace UnityEditor.Rendering.Universal
         {
             DrawHDR(serialized, ownerEditor);
 
-            EditorGUILayout.PropertyField(serialized.msaa, Styles.msaaText);            
+            EditorGUILayout.PropertyField(serialized.msaa, Styles.msaaText);
             DisplayTileOnlyHelpBox(
-                serialized.msaa, 
-                p => p.intValue != (int)MsaaQuality.Disabled
+                serialized.msaa,
+                p =>
+                    p.intValue != (int)MsaaQuality.Disabled
                     // This operation is actually ok on Quest
-                    && !IsAndroidXRTargetted(), 
-                Styles.msaaText, MessageType.Info, Styles.msaaTileOnlyInfo);
+                    && !IsAndroidXRTargetted(),
+                Styles.msaaText,
+                MessageType.Info,
+                Styles.msaaTileOnlyInfo
+            );
 
             using (new EditorGUI.MixedValueScope(serialized.renderScale.hasMultipleDifferentValues))
             {
                 EditorGUI.BeginChangeCheck();
-                float newRenderScale = EditorGUILayout.Slider(Styles.renderScaleText, serialized.renderScale.floatValue, UniversalRenderPipeline.minRenderScale, UniversalRenderPipeline.maxRenderScale);
+                float newRenderScale = EditorGUILayout.Slider(
+                    Styles.renderScaleText,
+                    serialized.renderScale.floatValue,
+                    UniversalRenderPipeline.minRenderScale,
+                    UniversalRenderPipeline.maxRenderScale
+                );
                 if (EditorGUI.EndChangeCheck())
                     serialized.renderScale.floatValue = newRenderScale;
             }
             DisplayTileOnlyHelpBox(
-                serialized.renderScale, 
+                serialized.renderScale,
                 p =>
                 {
                     // Duplicating logic from UniversalRenderPipeline.InitializeStackedCameraData
@@ -315,11 +427,12 @@ namespace UnityEditor.Rendering.Universal
                     bool canRequireIntermediateTexture = Mathf.Abs(1.0f - p.floatValue) >= kRenderScaleThreshold;
                     if (!canRequireIntermediateTexture)
                         return false;
-                    
+
                     // This operation is actually ok on Quest
                     return !IsAndroidXRTargetted();
-                }, 
-                Styles.renderScaleText);
+                },
+                Styles.renderScaleText
+            );
 
             DrawUpscalingFilterDropdownAndOptions(serialized, ownerEditor);
 
@@ -333,16 +446,29 @@ namespace UnityEditor.Rendering.Universal
 
             if (serialized.renderScale.floatValue < 1.0f || stpUpscalingSelected || fsr1UpscalingSelected)
             {
-                EditorGUILayout.HelpBox("Camera depth isn't supported when Upscaling is turned on in the game view. We will automatically fall back to not doing depth-testing for this pass.", MessageType.Warning, true);
+                EditorGUILayout.HelpBox(
+                    "Camera depth isn't supported when Upscaling is turned on in the game view. We will automatically fall back to not doing depth-testing for this pass.",
+                    MessageType.Warning,
+                    true
+                );
             }
 
             EditorGUILayout.PropertyField(serialized.enableLODCrossFadeProp, Styles.enableLODCrossFadeText);
             EditorGUI.BeginDisabledGroup(!serialized.enableLODCrossFadeProp.boolValue);
-            EditorGUILayout.PropertyField(serialized.lodCrossFadeDitheringTypeProp, Styles.lodCrossFadeDitheringTypeText);
-            if (serialized.asset.enableLODCrossFade && serialized.asset.lodCrossFadeDitheringType == LODCrossFadeDitheringType.Stencil)
+            EditorGUILayout.PropertyField(
+                serialized.lodCrossFadeDitheringTypeProp,
+                Styles.lodCrossFadeDitheringTypeText
+            );
+            if (
+                serialized.asset.enableLODCrossFade
+                && serialized.asset.lodCrossFadeDitheringType == LODCrossFadeDitheringType.Stencil
+            )
             {
                 var rendererData = serialized.asset.m_RendererDataList[serialized.asset.m_DefaultRendererIndex];
-                if (rendererData is UniversalRendererData && ((UniversalRendererData)rendererData).defaultStencilState.overrideStencilState)
+                if (
+                    rendererData is UniversalRendererData
+                    && ((UniversalRendererData)rendererData).defaultStencilState.overrideStencilState
+                )
                 {
                     EditorGUILayout.HelpBox(Styles.stencilLodCrossFadeWarningMessage.text, MessageType.Warning, true);
                 }
@@ -351,7 +477,10 @@ namespace UnityEditor.Rendering.Universal
             EditorGUI.EndDisabledGroup();
         }
 
-        static void DrawUpscalingFilterDropdownAndOptions(SerializedUniversalRenderPipelineAsset serialized, Editor ownerEditor)
+        static void DrawUpscalingFilterDropdownAndOptions(
+            SerializedUniversalRenderPipelineAsset serialized,
+            Editor ownerEditor
+        )
         {
 #if ENABLE_UPSCALER_FRAMEWORK
             // --- 1. Get the available upscaler names ---
@@ -383,7 +512,11 @@ namespace UnityEditor.Rendering.Universal
                 serialized.selectedUpscalerName.stringValue = namesArray[selectedIndex];
             }
 
-            DisplayTileOnlyHelpBox(serialized.upscalingFilter, p => serialized.selectedUpscalerName.stringValue != UniversalRenderPipeline.k_UpscalerName_Auto, Styles.upscalingFilterText);
+            DisplayTileOnlyHelpBox(
+                serialized.upscalingFilter,
+                p => serialized.selectedUpscalerName.stringValue != UniversalRenderPipeline.k_UpscalerName_Auto,
+                Styles.upscalingFilterText
+            );
 
             // --- 5. Draw Options per upscaler ---
             string selectedName = namesArray[selectedIndex];
@@ -401,14 +534,19 @@ namespace UnityEditor.Rendering.Universal
                 {
                     ++EditorGUI.indentLevel;
                     EditorGUILayout.PropertyField(serialized.fsrOverrideSharpness, Styles.fsrOverrideSharpness);
-                    
+
                     // We put the FSR sharpness override value behind an override checkbox so we can tell when the user intends to use a custom value rather than the default.
                     if (serialized.fsrOverrideSharpness.boolValue)
                     {
                         using (new EditorGUI.MixedValueScope(serialized.fsrSharpness.hasMultipleDifferentValues))
                         {
                             EditorGUI.BeginChangeCheck();
-                            float newFsrSharpness = EditorGUILayout.Slider(Styles.fsrSharpnessText, serialized.fsrSharpness.floatValue, 0.0f, 1.0f);
+                            float newFsrSharpness = EditorGUILayout.Slider(
+                                Styles.fsrSharpnessText,
+                                serialized.fsrSharpness.floatValue,
+                                0.0f,
+                                1.0f
+                            );
                             if (EditorGUI.EndChangeCheck())
                                 serialized.fsrSharpness.floatValue = newFsrSharpness;
                         }
@@ -430,11 +568,14 @@ namespace UnityEditor.Rendering.Universal
                     }
 
                     // Warn users about performance expectations if they attempt to enable STP on a mobile platform
-                    if (selectedName == UniversalRenderPipeline.k_UpscalerName_STP && PlatformAutoDetect.isShaderAPIMobileDefined)
+                    if (
+                        selectedName == UniversalRenderPipeline.k_UpscalerName_STP
+                        && PlatformAutoDetect.isShaderAPIMobileDefined
+                    )
                     {
                         EditorGUILayout.HelpBox(Styles.stpMobilePlatformWarning, MessageType.Warning, true);
                     }
-                    
+
                     break;
             }
 #else
@@ -459,11 +600,10 @@ namespace UnityEditor.Rendering.Universal
             }
 
             // Get the current enum value
-            UpscalingFilterSelection curUpscaler =
-                (UpscalingFilterSelection)serialized.upscalingFilter.enumValueIndex;
+            UpscalingFilterSelection curUpscaler = (UpscalingFilterSelection)serialized.upscalingFilter.enumValueIndex;
 
             // Find the current selected index
-            int selectedIndex = 0;           // [0, iUpscalerCount + BuiltinUpscalerCount)
+            int selectedIndex = 0; // [0, iUpscalerCount + BuiltinUpscalerCount)
             {
                 selectedIndex = serialized.upscalingFilter.enumValueIndex;
             }
@@ -478,7 +618,11 @@ namespace UnityEditor.Rendering.Universal
                 serialized.upscalingFilter.enumValueIndex = Math.Min(selectedIndex, (int)UpscalingFilterSelection.STP);
             }
 
-            DisplayTileOnlyHelpBox(serialized.upscalingFilter, p => p.intValue != (int)UpscalingFilterSelection.Auto, Styles.upscalingFilterText);
+            DisplayTileOnlyHelpBox(
+                serialized.upscalingFilter,
+                p => p.intValue != (int)UpscalingFilterSelection.Auto,
+                Styles.upscalingFilterText
+            );
 
             // draw upscaler options, if any
             switch (serialized.asset.upscalingFilter)
@@ -495,7 +639,12 @@ namespace UnityEditor.Rendering.Universal
                             using (new EditorGUI.MixedValueScope(serialized.fsrSharpness.hasMultipleDifferentValues))
                             {
                                 EditorGUI.BeginChangeCheck();
-                                float newFsrSharpness = EditorGUILayout.Slider(Styles.fsrSharpnessText, serialized.fsrSharpness.floatValue, 0.0f, 1.0f);
+                                float newFsrSharpness = EditorGUILayout.Slider(
+                                    Styles.fsrSharpnessText,
+                                    serialized.fsrSharpness.floatValue,
+                                    0.0f,
+                                    1.0f
+                                );
                                 if (EditorGUI.EndChangeCheck())
                                     serialized.fsrSharpness.floatValue = newFsrSharpness;
                             }
@@ -518,21 +667,32 @@ namespace UnityEditor.Rendering.Universal
 #endif
         }
 
-        public static readonly string disabledPostprocessing = L10n.Tr("HDR is not supported by one of the Universal Render Pipeline renderers.");
+        public static readonly string disabledPostprocessing = L10n.Tr(
+            "HDR is not supported by one of the Universal Render Pipeline renderers."
+        );
 
         static void DrawHDR(SerializedUniversalRenderPipelineAsset serialized, Editor ownerEditor)
         {
             EditorGUILayout.PropertyField(serialized.hdr, Styles.hdrText);
 
             // A ScriptableRenderFeature can add HDR, for example the OnTilePostProcessing extension.
-            DisplayTileOnlyHelpBox(serialized.hdr, p => p.boolValue, Styles.hdrText, customMessage: Styles.tileOnlyModeMaybeMessage);
+            DisplayTileOnlyHelpBox(
+                serialized.hdr,
+                p => p.boolValue,
+                Styles.hdrText,
+                customMessage: Styles.tileOnlyModeMaybeMessage
+            );
 
             // Nested and in-between additional property
-            bool additionalProperties = k_ExpandedState[Expandable.Quality] && k_AdditionalPropertiesState[ExpandableAdditional.Quality];
+            bool additionalProperties =
+                k_ExpandedState[Expandable.Quality] && k_AdditionalPropertiesState[ExpandableAdditional.Quality];
             if (serialized.hdr.boolValue && additionalProperties)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(serialized.hdrColorBufferPrecisionProp, Styles.hdrColorBufferPrecisionText);
+                EditorGUILayout.PropertyField(
+                    serialized.hdrColorBufferPrecisionProp,
+                    Styles.hdrColorBufferPrecisionText
+                );
                 EditorGUI.indentLevel--;
             }
         }
@@ -542,19 +702,33 @@ namespace UnityEditor.Rendering.Universal
             // Main Light
             bool disableGroup = false;
             EditorGUI.BeginDisabledGroup(disableGroup);
-            CoreEditorUtils.DrawPopup(Styles.mainLightRenderingModeText, serialized.mainLightRenderingModeProp, Styles.mainLightOptions);
+            CoreEditorUtils.DrawPopup(
+                Styles.mainLightRenderingModeText,
+                serialized.mainLightRenderingModeProp,
+                Styles.mainLightOptions
+            );
             EditorGUI.EndDisabledGroup();
 
             EditorGUI.indentLevel++;
-            disableGroup |= serialized.mainLightRenderingModeProp.hasMultipleDifferentValues || !serialized.mainLightRenderingModeProp.boolValue;
+            disableGroup |=
+                serialized.mainLightRenderingModeProp.hasMultipleDifferentValues
+                || !serialized.mainLightRenderingModeProp.boolValue;
 
             EditorGUI.BeginDisabledGroup(disableGroup);
-            EditorGUILayout.PropertyField(serialized.mainLightShadowsSupportedProp, Styles.supportsMainLightShadowsText);
+            EditorGUILayout.PropertyField(
+                serialized.mainLightShadowsSupportedProp,
+                Styles.supportsMainLightShadowsText
+            );
             EditorGUI.EndDisabledGroup();
 
-            disableGroup |= serialized.mainLightShadowsSupportedProp.hasMultipleDifferentValues || !serialized.mainLightShadowsSupportedProp.boolValue;
+            disableGroup |=
+                serialized.mainLightShadowsSupportedProp.hasMultipleDifferentValues
+                || !serialized.mainLightShadowsSupportedProp.boolValue;
             EditorGUI.BeginDisabledGroup(disableGroup);
-            EditorGUILayout.PropertyField(serialized.mainLightShadowmapResolutionProp, Styles.mainLightShadowmapResolutionText);
+            EditorGUILayout.PropertyField(
+                serialized.mainLightShadowmapResolutionProp,
+                Styles.mainLightShadowmapResolutionText
+            );
             EditorGUI.EndDisabledGroup();
 
             EditorGUI.indentLevel--;
@@ -569,22 +743,40 @@ namespace UnityEditor.Rendering.Universal
                 EditorGUILayout.PropertyField(serialized.probeVolumeTextureSize, Styles.probeVolumeMemoryBudget);
                 EditorGUILayout.PropertyField(serialized.probeVolumeSHBands, Styles.probeVolumeSHBands);
 
-                EditorGUILayout.PropertyField(serialized.supportProbeVolumeGPUStreaming, Styles.supportProbeVolumeGPUStreaming);
-                EditorGUI.BeginDisabledGroup(serialized.supportProbeVolumeGPUStreaming.hasMultipleDifferentValues || !serialized.supportProbeVolumeGPUStreaming.boolValue);
+                EditorGUILayout.PropertyField(
+                    serialized.supportProbeVolumeGPUStreaming,
+                    Styles.supportProbeVolumeGPUStreaming
+                );
+                EditorGUI.BeginDisabledGroup(
+                    serialized.supportProbeVolumeGPUStreaming.hasMultipleDifferentValues
+                        || !serialized.supportProbeVolumeGPUStreaming.boolValue
+                );
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(serialized.supportProbeVolumeDiskStreaming, Styles.supportProbeVolumeDiskStreaming);
+                EditorGUILayout.PropertyField(
+                    serialized.supportProbeVolumeDiskStreaming,
+                    Styles.supportProbeVolumeDiskStreaming
+                );
                 EditorGUI.indentLevel--;
                 EditorGUI.EndDisabledGroup();
 
-                EditorGUILayout.PropertyField(serialized.supportProbeVolumeScenarios, Styles.supportProbeVolumeScenarios);
+                EditorGUILayout.PropertyField(
+                    serialized.supportProbeVolumeScenarios,
+                    Styles.supportProbeVolumeScenarios
+                );
                 if (serialized.supportProbeVolumeScenarios.boolValue)
                 {
                     EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(serialized.supportProbeVolumeScenarioBlending, Styles.supportProbeVolumeScenarioBlending);
+                    EditorGUILayout.PropertyField(
+                        serialized.supportProbeVolumeScenarioBlending,
+                        Styles.supportProbeVolumeScenarioBlending
+                    );
                     if (serialized.supportProbeVolumeScenarioBlending.boolValue)
                     {
                         EditorGUI.indentLevel++;
-                        EditorGUILayout.PropertyField(serialized.probeVolumeBlendingTextureSize, Styles.probeVolumeBlendingMemoryBudget);
+                        EditorGUILayout.PropertyField(
+                            serialized.probeVolumeBlendingTextureSize,
+                            Styles.probeVolumeBlendingMemoryBudget
+                        );
                         EditorGUI.indentLevel--;
                     }
                     EditorGUI.indentLevel--;
@@ -593,11 +785,19 @@ namespace UnityEditor.Rendering.Universal
                 int estimatedVMemCost = ProbeReferenceVolume.instance.GetVideoMemoryCost();
                 if (estimatedVMemCost == 0)
                 {
-                    EditorGUILayout.HelpBox($"Estimated GPU Memory cost: 0.\nProbe reference volume is not used in the scene and resources haven't been allocated yet.", MessageType.Info, wide: true);
+                    EditorGUILayout.HelpBox(
+                        $"Estimated GPU Memory cost: 0.\nProbe reference volume is not used in the scene and resources haven't been allocated yet.",
+                        MessageType.Info,
+                        wide: true
+                    );
                 }
                 else
                 {
-                    EditorGUILayout.HelpBox($"Estimated GPU Memory cost: {estimatedVMemCost / (1000 * 1000)} MB.", MessageType.Info, wide: true);
+                    EditorGUILayout.HelpBox(
+                        $"Estimated GPU Memory cost: {estimatedVMemCost / (1000 * 1000)} MB.",
+                        MessageType.Info,
+                        wide: true
+                    );
                 }
 
                 EditorGUI.indentLevel--;
@@ -605,50 +805,83 @@ namespace UnityEditor.Rendering.Universal
             }
 
             // Additional light
-            EditorGUILayout.PropertyField(serialized.additionalLightsRenderingModeProp, Styles.addditionalLightsRenderingModeText);
+            EditorGUILayout.PropertyField(
+                serialized.additionalLightsRenderingModeProp,
+                Styles.addditionalLightsRenderingModeText
+            );
             EditorGUI.indentLevel++;
 
-            disableGroup = serialized.additionalLightsRenderingModeProp.hasMultipleDifferentValues || serialized.additionalLightsRenderingModeProp.intValue == (int)LightRenderingMode.Disabled;
+            disableGroup =
+                serialized.additionalLightsRenderingModeProp.hasMultipleDifferentValues
+                || serialized.additionalLightsRenderingModeProp.intValue == (int)LightRenderingMode.Disabled;
             EditorGUI.BeginDisabledGroup(disableGroup);
-            using (new EditorGUI.MixedValueScope(serialized.additionalLightsPerObjectLimitProp.hasMultipleDifferentValues))
+            using (
+                new EditorGUI.MixedValueScope(serialized.additionalLightsPerObjectLimitProp.hasMultipleDifferentValues)
+            )
             {
                 EditorGUI.BeginChangeCheck();
-                int newPerObjectLimit = EditorGUILayout.IntSlider(Styles.perObjectLimit, serialized.additionalLightsPerObjectLimitProp.intValue, 0, UniversalRenderPipeline.maxPerObjectLights);
+                int newPerObjectLimit = EditorGUILayout.IntSlider(
+                    Styles.perObjectLimit,
+                    serialized.additionalLightsPerObjectLimitProp.intValue,
+                    0,
+                    UniversalRenderPipeline.maxPerObjectLights
+                );
                 if (EditorGUI.EndChangeCheck())
                     serialized.additionalLightsPerObjectLimitProp.intValue = newPerObjectLimit;
             }
 #if UNITY_META_QUEST
             if (serialized.additionalLightsPerObjectLimitProp.intValue > 1)
             {
-                EditorGUILayout.HelpBox("When targeting Meta Quest, setting the Per Object Limit to 1 will improve shader performance.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "When targeting Meta Quest, setting the Per Object Limit to 1 will improve shader performance.",
+                    MessageType.Info
+                );
             }
 #endif
             EditorGUI.EndDisabledGroup();
 
-            disableGroup |= serialized.additionalLightsPerObjectLimitProp.hasMultipleDifferentValues
+            disableGroup |=
+                serialized.additionalLightsPerObjectLimitProp.hasMultipleDifferentValues
                 || serialized.additionalLightsRenderingModeProp.hasMultipleDifferentValues
                 || serialized.additionalLightsPerObjectLimitProp.intValue == 0
                 || serialized.additionalLightsRenderingModeProp.intValue != (int)LightRenderingMode.PerPixel;
             EditorGUI.BeginDisabledGroup(disableGroup);
-            EditorGUILayout.PropertyField(serialized.additionalLightShadowsSupportedProp, Styles.supportsAdditionalShadowsText);
+            EditorGUILayout.PropertyField(
+                serialized.additionalLightShadowsSupportedProp,
+                Styles.supportsAdditionalShadowsText
+            );
             EditorGUI.EndDisabledGroup();
 
-            disableGroup |= serialized.additionalLightShadowsSupportedProp.hasMultipleDifferentValues || !serialized.additionalLightShadowsSupportedProp.boolValue;
+            disableGroup |=
+                serialized.additionalLightShadowsSupportedProp.hasMultipleDifferentValues
+                || !serialized.additionalLightShadowsSupportedProp.boolValue;
             EditorGUI.BeginDisabledGroup(disableGroup);
-            EditorGUILayout.PropertyField(serialized.additionalLightShadowmapResolutionProp, Styles.additionalLightsShadowmapResolution);
+            EditorGUILayout.PropertyField(
+                serialized.additionalLightShadowmapResolutionProp,
+                Styles.additionalLightsShadowmapResolution
+            );
             DrawShadowResolutionTierSettings(serialized, ownerEditor);
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space();
-            disableGroup = serialized.additionalLightsRenderingModeProp.hasMultipleDifferentValues || serialized.additionalLightsRenderingModeProp.intValue == (int)LightRenderingMode.Disabled
-                || serialized.supportsLightCookies.hasMultipleDifferentValues || !serialized.supportsLightCookies.boolValue;
+            disableGroup =
+                serialized.additionalLightsRenderingModeProp.hasMultipleDifferentValues
+                || serialized.additionalLightsRenderingModeProp.intValue == (int)LightRenderingMode.Disabled
+                || serialized.supportsLightCookies.hasMultipleDifferentValues
+                || !serialized.supportsLightCookies.boolValue;
 
             EditorGUI.BeginDisabledGroup(disableGroup);
-            EditorGUILayout.PropertyField(serialized.additionalLightCookieResolutionProp, Styles.additionalLightsCookieResolution);
+            EditorGUILayout.PropertyField(
+                serialized.additionalLightCookieResolutionProp,
+                Styles.additionalLightsCookieResolution
+            );
             EditorGUI.EndDisabledGroup();
 
             EditorGUI.BeginDisabledGroup(disableGroup);
-            EditorGUILayout.PropertyField(serialized.additionalLightCookieFormatProp, Styles.additionalLightsCookieFormat);
+            EditorGUILayout.PropertyField(
+                serialized.additionalLightCookieFormatProp,
+                Styles.additionalLightsCookieFormat
+            );
             EditorGUI.EndDisabledGroup();
 
             EditorGUI.indentLevel--;
@@ -670,12 +903,19 @@ namespace UnityEditor.Rendering.Universal
             if ((GPUResidentDrawerMode)serialized.gpuResidentDrawerMode.intValue != GPUResidentDrawerMode.Disabled)
             {
                 if (!serialized.reflectionProbeBlendingProp.boolValue || !serialized.reflectionProbeAtlasProp.boolValue)
-                    EditorGUILayout.HelpBox(Styles.reflectionProbeBlendingGpuResidentDrawerWarningText.text, MessageType.Warning, true);
+                    EditorGUILayout.HelpBox(
+                        Styles.reflectionProbeBlendingGpuResidentDrawerWarningText.text,
+                        MessageType.Warning,
+                        true
+                    );
             }
 
             EditorGUI.indentLevel--;
 
-            EditorGUILayout.PropertyField(serialized.reflectionProbeBoxProjectionProp, Styles.reflectionProbeBoxProjectionText);
+            EditorGUILayout.PropertyField(
+                serialized.reflectionProbeBoxProjectionProp,
+                Styles.reflectionProbeBoxProjectionText
+            );
 
             EditorGUI.indentLevel--;
         }
@@ -687,11 +927,21 @@ namespace UnityEditor.Rendering.Universal
             EditorGUILayout.PropertyField(serialized.supportsLightCookies, Styles.supportsLightCookies);
             EditorGUILayout.PropertyField(serialized.shEvalModeProp, Styles.shEvalModeText);
 
-            if (serialized.useRenderingLayers.boolValue && !ValidateRendererGraphicsAPIsForLightLayers(serialized.asset, out var unsupportedGraphicsApisMessage))
-                EditorGUILayout.HelpBox(Styles.lightlayersUnsupportedMessage.text + unsupportedGraphicsApisMessage, MessageType.Warning, true);
+            if (
+                serialized.useRenderingLayers.boolValue
+                && !ValidateRendererGraphicsAPIsForLightLayers(serialized.asset, out var unsupportedGraphicsApisMessage)
+            )
+                EditorGUILayout.HelpBox(
+                    Styles.lightlayersUnsupportedMessage.text + unsupportedGraphicsApisMessage,
+                    MessageType.Warning,
+                    true
+                );
         }
 
-        static void DrawShadowResolutionTierSettings(SerializedUniversalRenderPipelineAsset serialized, Editor ownerEditor)
+        static void DrawShadowResolutionTierSettings(
+            SerializedUniversalRenderPipelineAsset serialized,
+            Editor ownerEditor
+        )
         {
             // UI code adapted from HDRP U.I logic implemented in com.unity.render-pipelines.high-definition/Editor/RenderPipeline/Settings/SerializedScalableSetting.cs )
 
@@ -699,32 +949,52 @@ namespace UnityEditor.Rendering.Universal
             var contentRect = EditorGUI.PrefixLabel(rect, Styles.additionalLightsShadowResolutionTiers);
 
             const int k_ShadowResolutionTiersCount = 3;
-            var values = new[] { serialized.additionalLightsShadowResolutionTierLowProp, serialized.additionalLightsShadowResolutionTierMediumProp, serialized.additionalLightsShadowResolutionTierHighProp };
+            var values = new[]
+            {
+                serialized.additionalLightsShadowResolutionTierLowProp,
+                serialized.additionalLightsShadowResolutionTierMediumProp,
+                serialized.additionalLightsShadowResolutionTierHighProp,
+            };
 
-            var num = contentRect.width / (float)k_ShadowResolutionTiersCount;  // space allocated for every field including the label
+            var num = contentRect.width / (float)k_ShadowResolutionTiersCount; // space allocated for every field including the label
 
             var indentLevel = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0; // Reset the indentation
 
-            float pixelShift = 0;  // Variable to keep track of the current pixel shift in the rectangle we were assigned for this whole section.
+            float pixelShift = 0; // Variable to keep track of the current pixel shift in the rectangle we were assigned for this whole section.
             for (var index = 0; index < k_ShadowResolutionTiersCount; ++index)
             {
-                var labelWidth = Mathf.Clamp(EditorStyles.label.CalcSize(Styles.additionalLightsShadowResolutionTierNames[index]).x, 0, num);
-                EditorGUI.LabelField(new Rect(contentRect.x + pixelShift, contentRect.y, labelWidth, contentRect.height), Styles.additionalLightsShadowResolutionTierNames[index]);
-                pixelShift += labelWidth;           // We need to remove from the position the label size that we've just drawn and shift by it's length
+                var labelWidth = Mathf.Clamp(
+                    EditorStyles.label.CalcSize(Styles.additionalLightsShadowResolutionTierNames[index]).x,
+                    0,
+                    num
+                );
+                EditorGUI.LabelField(
+                    new Rect(contentRect.x + pixelShift, contentRect.y, labelWidth, contentRect.height),
+                    Styles.additionalLightsShadowResolutionTierNames[index]
+                );
+                pixelShift += labelWidth; // We need to remove from the position the label size that we've just drawn and shift by it's length
                 float spaceLeft = num - labelWidth; // The amount of space left for the field
                 if (spaceLeft > 2) // If at least two pixels are left to draw this field, draw it, otherwise, skip
                 {
-                    var fieldSlot = new Rect(contentRect.x + pixelShift, contentRect.y, num - labelWidth, contentRect.height); // Define the rectangle for the field
+                    var fieldSlot = new Rect(
+                        contentRect.x + pixelShift,
+                        contentRect.y,
+                        num - labelWidth,
+                        contentRect.height
+                    ); // Define the rectangle for the field
                     using (new EditorGUI.MixedValueScope(values[index].hasMultipleDifferentValues))
                     {
                         EditorGUI.BeginChangeCheck();
                         int value = EditorGUI.DelayedIntField(fieldSlot, values[index].intValue);
                         if (EditorGUI.EndChangeCheck())
-                            values[index].intValue = Mathf.Max(UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution, Mathf.NextPowerOfTwo(value));
+                            values[index].intValue = Mathf.Max(
+                                UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution,
+                                Mathf.NextPowerOfTwo(value)
+                            );
                     }
                 }
-                pixelShift += spaceLeft;  // Shift by the slot that was left for the field
+                pixelShift += spaceLeft; // Shift by the slot that was left for the field
             }
 
             EditorGUI.indentLevel = indentLevel;
@@ -735,7 +1005,10 @@ namespace UnityEditor.Rendering.Universal
             using (new EditorGUI.MixedValueScope(serialized.shadowDistanceProp.hasMultipleDifferentValues))
             {
                 EditorGUI.BeginChangeCheck();
-                float newShadowDistance = Mathf.Max(0.0f, EditorGUILayout.FloatField(Styles.shadowDistanceText, serialized.shadowDistanceProp.floatValue));
+                float newShadowDistance = Mathf.Max(
+                    0.0f,
+                    EditorGUILayout.FloatField(Styles.shadowDistanceText, serialized.shadowDistanceProp.floatValue)
+                );
                 if (EditorGUI.EndChangeCheck())
                     serialized.shadowDistanceProp.floatValue = newShadowDistance;
             }
@@ -743,14 +1016,20 @@ namespace UnityEditor.Rendering.Universal
             if (serialized.shadowCascadeCountProp.intValue != 0)
             {
                 EditorGUI.BeginChangeCheck();
-                unit = (EditorUtils.Unit)EditorGUILayout.EnumPopup(Styles.shadowWorkingUnitText, serialized.state.value);
+                unit = (EditorUtils.Unit)
+                    EditorGUILayout.EnumPopup(Styles.shadowWorkingUnitText, serialized.state.value);
                 if (EditorGUI.EndChangeCheck())
                 {
                     serialized.state.value = unit;
                 }
             }
 
-            EditorGUILayout.IntSlider(serialized.shadowCascadeCountProp, UniversalRenderPipelineAsset.k_ShadowCascadeMinCount, UniversalRenderPipelineAsset.k_ShadowCascadeMaxCount, Styles.shadowCascadesText);
+            EditorGUILayout.IntSlider(
+                serialized.shadowCascadeCountProp,
+                UniversalRenderPipelineAsset.k_ShadowCascadeMinCount,
+                UniversalRenderPipelineAsset.k_ShadowCascadeMaxCount,
+                Styles.shadowCascadesText
+            );
 
             int cascadeCount = serialized.shadowCascadeCountProp.intValue;
             EditorGUI.indentLevel++;
@@ -768,7 +1047,12 @@ namespace UnityEditor.Rendering.Universal
             using (new EditorGUI.MixedValueScope(serialized.shadowDepthBiasProp.hasMultipleDifferentValues))
             {
                 EditorGUI.BeginChangeCheck();
-                float newDepthBias = EditorGUILayout.Slider(Styles.shadowDepthBias, serialized.shadowDepthBiasProp.floatValue, 0.0f, UniversalRenderPipeline.maxShadowBias);
+                float newDepthBias = EditorGUILayout.Slider(
+                    Styles.shadowDepthBias,
+                    serialized.shadowDepthBiasProp.floatValue,
+                    0.0f,
+                    UniversalRenderPipeline.maxShadowBias
+                );
                 if (EditorGUI.EndChangeCheck())
                     serialized.shadowDepthBiasProp.floatValue = newDepthBias;
             }
@@ -776,7 +1060,12 @@ namespace UnityEditor.Rendering.Universal
             using (new EditorGUI.MixedValueScope(serialized.shadowNormalBiasProp.hasMultipleDifferentValues))
             {
                 EditorGUI.BeginChangeCheck();
-                float newNormalBias = EditorGUILayout.Slider(Styles.shadowNormalBias, serialized.shadowNormalBiasProp.floatValue, 0.0f, UniversalRenderPipeline.maxShadowBias);
+                float newNormalBias = EditorGUILayout.Slider(
+                    Styles.shadowNormalBias,
+                    serialized.shadowNormalBiasProp.floatValue,
+                    0.0f,
+                    UniversalRenderPipeline.maxShadowBias
+                );
                 if (EditorGUI.EndChangeCheck())
                     serialized.shadowNormalBiasProp.floatValue = newNormalBias;
             }
@@ -784,7 +1073,7 @@ namespace UnityEditor.Rendering.Universal
             if (serialized.softShadowsSupportedProp.boolValue)
             {
                 EditorGUI.indentLevel++;
-                    DrawShadowsSoftShadowQuality(serialized, ownerEditor);
+                DrawShadowsSoftShadowQuality(serialized, ownerEditor);
                 EditorGUI.indentLevel--;
             }
 
@@ -799,10 +1088,20 @@ namespace UnityEditor.Rendering.Universal
             {
                 using (var checkScope = new EditorGUI.ChangeCheckScope())
                 {
-                    selectedAssetSoftShadowQuality = EditorGUI.IntPopup(r, Styles.softShadowsQuality, selectedAssetSoftShadowQuality, Styles.softShadowsQualityAssetOptions, Styles.softShadowsQualityAssetValues);
+                    selectedAssetSoftShadowQuality = EditorGUI.IntPopup(
+                        r,
+                        Styles.softShadowsQuality,
+                        selectedAssetSoftShadowQuality,
+                        Styles.softShadowsQualityAssetOptions,
+                        Styles.softShadowsQualityAssetValues
+                    );
                     if (checkScope.changed)
                     {
-                        serialized.softShadowQualityProp.intValue = Math.Clamp(selectedAssetSoftShadowQuality, (int)SoftShadowQuality.Low, (int)SoftShadowQuality.High);
+                        serialized.softShadowQualityProp.intValue = Math.Clamp(
+                            selectedAssetSoftShadowQuality,
+                            (int)SoftShadowQuality.Low,
+                            (int)SoftShadowQuality.High
+                        );
                     }
                 }
             }
@@ -811,16 +1110,34 @@ namespace UnityEditor.Rendering.Universal
 
         static void DrawShadowsAdditional(SerializedUniversalRenderPipelineAsset serialized, Editor ownerEditor)
         {
-            EditorGUILayout.PropertyField(serialized.conservativeEnclosingSphereProp, Styles.conservativeEnclosingSphere);
+            EditorGUILayout.PropertyField(
+                serialized.conservativeEnclosingSphereProp,
+                Styles.conservativeEnclosingSphere
+            );
         }
 
-        static void DrawCascadeSliders(SerializedUniversalRenderPipelineAsset serialized, int splitCount, bool useMetric, float baseMetric)
+        static void DrawCascadeSliders(
+            SerializedUniversalRenderPipelineAsset serialized,
+            int splitCount,
+            bool useMetric,
+            float baseMetric
+        )
         {
             Vector4 shadowCascadeSplit = Vector4.one;
             if (splitCount == 3)
-                shadowCascadeSplit = new Vector4(serialized.shadowCascade4SplitProp.vector3Value.x, serialized.shadowCascade4SplitProp.vector3Value.y, serialized.shadowCascade4SplitProp.vector3Value.z, 1);
+                shadowCascadeSplit = new Vector4(
+                    serialized.shadowCascade4SplitProp.vector3Value.x,
+                    serialized.shadowCascade4SplitProp.vector3Value.y,
+                    serialized.shadowCascade4SplitProp.vector3Value.z,
+                    1
+                );
             else if (splitCount == 2)
-                shadowCascadeSplit = new Vector4(serialized.shadowCascade3SplitProp.vector2Value.x, serialized.shadowCascade3SplitProp.vector2Value.y, 1, 0);
+                shadowCascadeSplit = new Vector4(
+                    serialized.shadowCascade3SplitProp.vector2Value.x,
+                    serialized.shadowCascade3SplitProp.vector2Value.y,
+                    1,
+                    0
+                );
             else if (splitCount == 1)
                 shadowCascadeSplit = new Vector4(serialized.shadowCascade2SplitProp.floatValue, 1, 0, 0);
 
@@ -829,9 +1146,16 @@ namespace UnityEditor.Rendering.Universal
 
             // Ensure correct split order
             shadowCascadeSplit[0] = Mathf.Clamp(shadowCascadeSplit[0], 0f, shadowCascadeSplit[1] - splitBias);
-            shadowCascadeSplit[1] = Mathf.Clamp(shadowCascadeSplit[1], shadowCascadeSplit[0] + splitBias, shadowCascadeSplit[2] - splitBias);
-            shadowCascadeSplit[2] = Mathf.Clamp(shadowCascadeSplit[2], shadowCascadeSplit[1] + splitBias, shadowCascadeSplit[3] - splitBias);
-
+            shadowCascadeSplit[1] = Mathf.Clamp(
+                shadowCascadeSplit[1],
+                shadowCascadeSplit[0] + splitBias,
+                shadowCascadeSplit[2] - splitBias
+            );
+            shadowCascadeSplit[2] = Mathf.Clamp(
+                shadowCascadeSplit[2],
+                shadowCascadeSplit[1] + splitBias,
+                shadowCascadeSplit[3] - splitBias
+            );
 
             EditorGUI.BeginChangeCheck();
             for (int i = 0; i < splitCount; ++i)
@@ -844,14 +1168,32 @@ namespace UnityEditor.Rendering.Universal
                 if (useMetric)
                 {
                     float valueMetric = value * baseMetric;
-                    valueMetric = EditorGUILayout.Slider(EditorGUIUtility.TrTextContent($"Split {i + 1}", "The distance where this cascade ends and the next one starts."), valueMetric, 0f, baseMetric, null);
+                    valueMetric = EditorGUILayout.Slider(
+                        EditorGUIUtility.TrTextContent(
+                            $"Split {i + 1}",
+                            "The distance where this cascade ends and the next one starts."
+                        ),
+                        valueMetric,
+                        0f,
+                        baseMetric,
+                        null
+                    );
 
                     shadowCascadeSplit[i] = Mathf.Clamp(valueMetric * invBaseMetric, minimum, maximum);
                 }
                 else
                 {
                     float valueProcentage = value * 100f;
-                    valueProcentage = EditorGUILayout.Slider(EditorGUIUtility.TrTextContent($"Split {i + 1}", "The distance where this cascade ends and the next one starts."), valueProcentage, 0f, 100f, null);
+                    valueProcentage = EditorGUILayout.Slider(
+                        EditorGUIUtility.TrTextContent(
+                            $"Split {i + 1}",
+                            "The distance where this cascade ends and the next one starts."
+                        ),
+                        valueProcentage,
+                        0f,
+                        100f,
+                        null
+                    );
 
                     shadowCascadeSplit[i] = Mathf.Clamp(valueProcentage * 0.01f, minimum, maximum);
                 }
@@ -878,17 +1220,30 @@ namespace UnityEditor.Rendering.Universal
             EditorGUI.BeginChangeCheck();
             if (useMetric)
             {
-                var lastCascadeSplitSize = splitCount == 0 ? baseMetric : (1.0f - shadowCascadeSplit[splitCount - 1]) * baseMetric;
+                var lastCascadeSplitSize =
+                    splitCount == 0 ? baseMetric : (1.0f - shadowCascadeSplit[splitCount - 1]) * baseMetric;
                 var invLastCascadeSplitSize = lastCascadeSplitSize == 0 ? 0 : 1f / lastCascadeSplitSize;
                 float valueMetric = borderValue * lastCascadeSplitSize;
-                valueMetric = EditorGUILayout.Slider(EditorGUIUtility.TrTextContent("Last Border", "The distance of the last cascade."), valueMetric, 0f, lastCascadeSplitSize, null);
+                valueMetric = EditorGUILayout.Slider(
+                    EditorGUIUtility.TrTextContent("Last Border", "The distance of the last cascade."),
+                    valueMetric,
+                    0f,
+                    lastCascadeSplitSize,
+                    null
+                );
 
                 borderValue = valueMetric * invLastCascadeSplitSize;
             }
             else
             {
                 float valueProcentage = borderValue * 100f;
-                valueProcentage = EditorGUILayout.Slider(EditorGUIUtility.TrTextContent("Last Border", "The distance of the last cascade."), valueProcentage, 0f, 100f, null);
+                valueProcentage = EditorGUILayout.Slider(
+                    EditorGUIUtility.TrTextContent("Last Border", "The distance of the last cascade."),
+                    valueProcentage,
+                    0f,
+                    100f,
+                    null
+                );
 
                 borderValue = valueProcentage * 0.01f;
             }
@@ -899,7 +1254,12 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void DrawCascades(SerializedUniversalRenderPipelineAsset serialized, int cascadeCount, bool useMetric, float baseMetric)
+        static void DrawCascades(
+            SerializedUniversalRenderPipelineAsset serialized,
+            int cascadeCount,
+            bool useMetric,
+            float baseMetric
+        )
         {
             var cascades = new ShadowCascadeGUI.Cascade[cascadeCount];
 
@@ -966,20 +1326,35 @@ namespace UnityEditor.Rendering.Universal
                 EditorGUILayout.HelpBox(Styles.colorGradingModeWarning, MessageType.Warning);
             else if (isHdrOn && serialized.colorGradingMode.intValue == (int)ColorGradingMode.HighDynamicRange)
                 EditorGUILayout.HelpBox(Styles.colorGradingModeSpecInfo, MessageType.Info);
-            else if (isHdrOn && PlayerSettings.allowHDRDisplaySupport && serialized.colorGradingMode.intValue == (int)ColorGradingMode.LowDynamicRange)
+            else if (
+                isHdrOn
+                && PlayerSettings.allowHDRDisplaySupport
+                && serialized.colorGradingMode.intValue == (int)ColorGradingMode.LowDynamicRange
+            )
                 EditorGUILayout.HelpBox(Styles.colorGradingModeWithHDROutput, MessageType.Warning);
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.DelayedIntField(serialized.colorGradingLutSize, Styles.colorGradingLutSize);
             if (EditorGUI.EndChangeCheck())
-                serialized.colorGradingLutSize.intValue = Mathf.Clamp(serialized.colorGradingLutSize.intValue, UniversalRenderPipelineAsset.k_MinLutSize, UniversalRenderPipelineAsset.k_MaxLutSize);
-            if (isHdrOn && serialized.colorGradingMode.intValue == (int)ColorGradingMode.HighDynamicRange && serialized.colorGradingLutSize.intValue < 32)
+                serialized.colorGradingLutSize.intValue = Mathf.Clamp(
+                    serialized.colorGradingLutSize.intValue,
+                    UniversalRenderPipelineAsset.k_MinLutSize,
+                    UniversalRenderPipelineAsset.k_MaxLutSize
+                );
+            if (
+                isHdrOn
+                && serialized.colorGradingMode.intValue == (int)ColorGradingMode.HighDynamicRange
+                && serialized.colorGradingLutSize.intValue < 32
+            )
                 EditorGUILayout.HelpBox(Styles.colorGradingLutSizeWarning, MessageType.Warning);
 
-            HDRColorBufferPrecision hdrPrecision = (HDRColorBufferPrecision)serialized.hdrColorBufferPrecisionProp.intValue;
-            bool alphaEnabled = !isHdrOn /*RGBA8*/ || (isHdrOn && hdrPrecision == HDRColorBufferPrecision._64Bits); /*RGBA16Float*/
+            HDRColorBufferPrecision hdrPrecision = (HDRColorBufferPrecision)
+                serialized.hdrColorBufferPrecisionProp.intValue;
+            bool alphaEnabled =
+                !isHdrOn /*RGBA8*/
+                || (isHdrOn && hdrPrecision == HDRColorBufferPrecision._64Bits); /*RGBA16Float*/
             EditorGUILayout.PropertyField(serialized.allowPostProcessAlphaOutput, Styles.allowPostProcessAlphaOutput);
-            if(!alphaEnabled && serialized.allowPostProcessAlphaOutput.boolValue)
+            if (!alphaEnabled && serialized.allowPostProcessAlphaOutput.boolValue)
                 EditorGUILayout.HelpBox(Styles.alphaOutputWarning, MessageType.Warning);
 
             EditorGUILayout.PropertyField(serialized.useFastSRGBLinearConversion, Styles.useFastSRGBLinearConversion);
@@ -988,27 +1363,48 @@ namespace UnityEditor.Rendering.Universal
         }
 
         static Editor s_VolumeProfileEditor;
+
         static void DrawVolumes(SerializedUniversalRenderPipelineAsset serialized, Editor ownerEditor)
         {
-            CoreEditorUtils.DrawPopup(Styles.volumeFrameworkUpdateMode, serialized.volumeFrameworkUpdateModeProp, Styles.volumeFrameworkUpdateOptions);
+            CoreEditorUtils.DrawPopup(
+                Styles.volumeFrameworkUpdateMode,
+                serialized.volumeFrameworkUpdateModeProp,
+                Styles.volumeFrameworkUpdateOptions
+            );
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(serialized.volumeProfileProp, Styles.volumeProfileLabel);
             var profile = serialized.volumeProfileProp.objectReferenceValue as VolumeProfile;
-            if (EditorGUI.EndChangeCheck() && UniversalRenderPipeline.asset == serialized.serializedObject.targetObject && RenderPipelineManager.currentPipeline is UniversalRenderPipeline)
-                VolumeManager.instance.SetQualityDefaultProfile(serialized.volumeProfileProp.objectReferenceValue as VolumeProfile);
+            if (
+                EditorGUI.EndChangeCheck()
+                && UniversalRenderPipeline.asset == serialized.serializedObject.targetObject
+                && RenderPipelineManager.currentPipeline is UniversalRenderPipeline
+            )
+                VolumeManager.instance.SetQualityDefaultProfile(
+                    serialized.volumeProfileProp.objectReferenceValue as VolumeProfile
+                );
 
-            var contextMenuButtonRect = GUILayoutUtility.GetRect(CoreEditorStyles.contextMenuIcon,
-                Styles.volumeProfileContextMenuStyle.Value);
-            if (GUI.Button(contextMenuButtonRect, CoreEditorStyles.contextMenuIcon,
-                    Styles.volumeProfileContextMenuStyle.Value))
+            var contextMenuButtonRect = GUILayoutUtility.GetRect(
+                CoreEditorStyles.contextMenuIcon,
+                Styles.volumeProfileContextMenuStyle.Value
+            );
+            if (
+                GUI.Button(
+                    contextMenuButtonRect,
+                    CoreEditorStyles.contextMenuIcon,
+                    Styles.volumeProfileContextMenuStyle.Value
+                )
+            )
             {
                 var profileEditor = s_VolumeProfileEditor as VolumeProfileEditor;
                 var componentEditors = profileEditor != null ? profileEditor.componentList.editors : null;
                 var srpAsset = serialized.serializedObject.targetObject as UniversalRenderPipelineAsset;
                 var pos = new Vector2(contextMenuButtonRect.x, contextMenuButtonRect.yMax);
-                VolumeProfileUtils.OnVolumeProfileContextClick(pos, srpAsset.volumeProfile, componentEditors,
+                VolumeProfileUtils.OnVolumeProfileContextClick(
+                    pos,
+                    srpAsset.volumeProfile,
+                    componentEditors,
                     overrideStateOnReset: false,
                     defaultVolumeProfilePath: $"Assets/{srpAsset.name}_VolumeProfile.asset",
                     onNewVolumeProfileCreated: volumeProfile =>
@@ -1018,7 +1414,8 @@ namespace UnityEditor.Rendering.Universal
                         if (UniversalRenderPipeline.asset == srpAsset)
                             VolumeManager.instance.SetQualityDefaultProfile(volumeProfile);
                         EditorUtility.SetDirty(srpAsset);
-                    });
+                    }
+                );
             }
             EditorGUILayout.EndHorizontal();
             GUILayout.Space(2);
@@ -1043,6 +1440,7 @@ namespace UnityEditor.Rendering.Universal
             EditorGUILayout.PropertyField(serialized.useAdaptivePerformance, Styles.useAdaptivePerformance);
         }
 #endif
+
         struct TileOnlyModeInfos
         {
             public bool enabled => !string.IsNullOrEmpty(rendererNames);
@@ -1070,9 +1468,15 @@ namespace UnityEditor.Rendering.Universal
             //   - Additionally for both, for Post Processing section: only show names where Post Processing is enabled
 
             lastTileOnlyModeInfos = default;
-            
+
             // If impacted section are not opened, early exit
-            if (!(k_ExpandedState[Expandable.Rendering] || k_ExpandedState[Expandable.Quality] || k_ExpandedState[Expandable.PostProcessing]))
+            if (
+                !(
+                    k_ExpandedState[Expandable.Rendering]
+                    || k_ExpandedState[Expandable.Quality]
+                    || k_ExpandedState[Expandable.PostProcessing]
+                )
+            )
                 return;
 
             // Helper to iterate property of an array quickly (without GetArrayElementAtIndex)
@@ -1092,31 +1496,39 @@ namespace UnityEditor.Rendering.Universal
                 {
                     yield return iterator;
                     iterator.NextVisible(enterChildren: false);
-                } 
+                }
             }
-            
+
             // Helper to filter the list and get only unique result of UniversalRendererData that have Tile-Only Mode.
-            // The returned IDisposable is for being able to return the HashSet to the pool when Dispose is call like at end of Using. 
-            IDisposable SelectUniqueAndCast(IEnumerable<SerializedProperty> properties, out HashSet<UniversalRendererData> uniques)
+            // The returned IDisposable is for being able to return the HashSet to the pool when Dispose is call like at end of Using.
+            IDisposable SelectUniqueAndCast(
+                IEnumerable<SerializedProperty> properties,
+                out HashSet<UniversalRendererData> uniques
+            )
             {
                 var e = properties.GetEnumerator();
                 var disposer = HashSetPool<UniversalRendererData>.Get(out uniques);
                 while (e.MoveNext())
-                    if (!e.Current.hasMultipleDifferentValues 
-                        && e.Current.boxedValue is UniversalRendererData universalData 
-                        && universalData.tileOnlyMode)
+                    if (
+                        !e.Current.hasMultipleDifferentValues
+                        && e.Current.boxedValue is UniversalRendererData universalData
+                        && universalData.tileOnlyMode
+                    )
                         uniques.Add(universalData);
                 return disposer;
             }
 
             // Helper for multiple selection to distinguish element that remain at stable position (in the selection) from others
-            string ConcatCollectionInName(IEnumerable<UniversalRendererData> rightlyPositioned, IEnumerable<UniversalRendererData> wronglyPositioned)
+            string ConcatCollectionInName(
+                IEnumerable<UniversalRendererData> rightlyPositioned,
+                IEnumerable<UniversalRendererData> wronglyPositioned
+            )
             {
                 var firstPart = FormatRendererNames(rightlyPositioned);
                 var secondPart = FormatRendererNames(wronglyPositioned, Styles.suffixWhenDifferentPositionTileOnlyMode);
                 if (string.IsNullOrEmpty(firstPart))
                     return secondPart;
-                if (string.IsNullOrEmpty(secondPart)) 
+                if (string.IsNullOrEmpty(secondPart))
                     return firstPart;
                 return $"{firstPart}, {secondPart}";
             }
@@ -1148,25 +1560,40 @@ namespace UnityEditor.Rendering.Universal
             // We can retrieve element at stable position by directly checking the serialization of the selection.
             // Elements in the intersection that are not in the stable positio list are elements shared in all list but with moving index.
 
-
             // Helper to build the HashSet of UniversalRenderer that have Tile-Only Mode on one targeted asset.
             // The returned IDisposable is for being able to return the HashSet to the pool when Dispose is call like at end of Using.
-            IDisposable GetUniversalRendererWithTileOnlyModeEnabled(UniversalRenderPipelineAsset asset, out HashSet<UniversalRendererData> set)
+            IDisposable GetUniversalRendererWithTileOnlyModeEnabled(
+                UniversalRenderPipelineAsset asset,
+                out HashSet<UniversalRendererData> set
+            )
             {
                 IDisposable disposer = HashSetPool<UniversalRendererData>.Get(out set);
                 for (int rendererIndex = 0; rendererIndex < asset.rendererDataList.Length; ++rendererIndex)
-                    if (asset.rendererDataList[rendererIndex] is UniversalRendererData universalData && universalData.tileOnlyMode)
+                    if (
+                        asset.rendererDataList[rendererIndex] is UniversalRendererData universalData
+                        && universalData.tileOnlyMode
+                    )
                         set.Add(universalData);
                 return disposer;
             }
 
-            using (GetUniversalRendererWithTileOnlyModeEnabled((UniversalRenderPipelineAsset)serialized.serializedObject.targetObjects[0], out var movingPositions))
+            using (
+                GetUniversalRendererWithTileOnlyModeEnabled(
+                    (UniversalRenderPipelineAsset)serialized.serializedObject.targetObjects[0],
+                    out var movingPositions
+                )
+            )
             {
                 if (movingPositions.Count == 0)
                     return;
 
                 for (int i = 1; i < serialized.serializedObject.targetObjects.Length; ++i)
-                    using (GetUniversalRendererWithTileOnlyModeEnabled((UniversalRenderPipelineAsset)serialized.serializedObject.targetObjects[i], out var otherIntersection))
+                    using (
+                        GetUniversalRendererWithTileOnlyModeEnabled(
+                            (UniversalRenderPipelineAsset)serialized.serializedObject.targetObjects[i],
+                            out var otherIntersection
+                        )
+                    )
                     {
                         if (otherIntersection.Count == 0)
                             return;
@@ -1175,28 +1602,33 @@ namespace UnityEditor.Rendering.Universal
                             return;
                     }
 
-                using (SelectUniqueAndCast(ArrayElementPropertyEnumerator(serialized.rendererDatas), out var stablePositions))
+                using (
+                    SelectUniqueAndCast(
+                        ArrayElementPropertyEnumerator(serialized.rendererDatas),
+                        out var stablePositions
+                    )
+                )
                 {
                     foreach (var stablePositionElement in stablePositions)
                         movingPositions.Remove(stablePositionElement);
 
                     if (k_ExpandedState[Expandable.Rendering] || k_ExpandedState[Expandable.Quality])
-                        names = ConcatCollectionInName(stablePositions, movingPositions);                        
+                        names = ConcatCollectionInName(stablePositions, movingPositions);
                 }
 
-                lastTileOnlyModeInfos = new TileOnlyModeInfos(
-                    isSingleRendererCase: false,
-                    rendererNames: names
-                );
+                lastTileOnlyModeInfos = new TileOnlyModeInfos(isSingleRendererCase: false, rendererNames: names);
             }
         }
 
-        static void DisplayTileOnlyHelpBox(SerializedProperty prop, Func<SerializedProperty, bool> shouldDisplay, GUIContent label, MessageType messageType = MessageType.Warning, string customMessage = null)
+        static void DisplayTileOnlyHelpBox(
+            SerializedProperty prop,
+            Func<SerializedProperty, bool> shouldDisplay,
+            GUIContent label,
+            MessageType messageType = MessageType.Warning,
+            string customMessage = null
+        )
         {
-            if (prop == null
-                || shouldDisplay == null
-                || !lastTileOnlyModeInfos.enabled
-                || !shouldDisplay(prop))
+            if (prop == null || shouldDisplay == null || !lastTileOnlyModeInfos.enabled || !shouldDisplay(prop))
                 return;
 
             var fmt = !string.IsNullOrEmpty(customMessage) ? customMessage : Styles.formatterTileOnlyMode;

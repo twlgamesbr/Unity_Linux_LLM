@@ -7,11 +7,12 @@ namespace TMPro
         Single,
         HorizontalGradient,
         VerticalGradient,
-        FourCornersGradient
+        FourCornersGradient,
     }
 
     [TMPHelpURL("ColorGradients")]
-    [System.Serializable][ExcludeFromPresetAttribute]
+    [System.Serializable]
+    [ExcludeFromPresetAttribute]
     public class TMP_ColorGradient : ScriptableObject
     {
         public ColorMode colorMode = ColorMode.FourCornersGradient;

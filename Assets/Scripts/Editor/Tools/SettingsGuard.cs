@@ -39,7 +39,9 @@ namespace NPCSystem.Editor.Tools
 
             if (report.HasErrors)
             {
-                Debug.LogError($"{LogPrefix} VERIFY FAILED — {report.ErrorCount} error(s), {report.WarningCount} warning(s)");
+                Debug.LogError(
+                    $"{LogPrefix} VERIFY FAILED — {report.ErrorCount} error(s), {report.WarningCount} warning(s)"
+                );
                 if (config.autoFixOnVerify)
                 {
                     Debug.Log($"{LogPrefix} Auto-fix enabled — attempting repairs...");
@@ -121,9 +123,21 @@ namespace NPCSystem.Editor.Tools
             // Default overrides
             config.platformOverrides = new List<PlatformCompatOverride>
             {
-                new PlatformCompatOverride { platformName = "WebGL", requiredLevel = ApiCompatibilityLevel.NET_Standard },
-                new PlatformCompatOverride { platformName = "Standalone", requiredLevel = ApiCompatibilityLevel.NET_Standard },
-                new PlatformCompatOverride { platformName = "Server", requiredLevel = ApiCompatibilityLevel.NET_Standard },
+                new PlatformCompatOverride
+                {
+                    platformName = "WebGL",
+                    requiredLevel = ApiCompatibilityLevel.NET_Standard,
+                },
+                new PlatformCompatOverride
+                {
+                    platformName = "Standalone",
+                    requiredLevel = ApiCompatibilityLevel.NET_Standard,
+                },
+                new PlatformCompatOverride
+                {
+                    platformName = "Server",
+                    requiredLevel = ApiCompatibilityLevel.NET_Standard,
+                },
             };
 
             config.scriptingDefines = new List<PlatformDefines>
@@ -169,10 +183,12 @@ namespace NPCSystem.Editor.Tools
                 var expectedDefines = pd.defines;
                 if (!string.IsNullOrEmpty(expectedDefines))
                 {
-                    var currentSet = new HashSet<string>(currentDefines.Split(';')
-                        .Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)));
-                    var expectedSet = new HashSet<string>(expectedDefines.Split(';')
-                        .Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)));
+                    var currentSet = new HashSet<string>(
+                        currentDefines.Split(';').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s))
+                    );
+                    var expectedSet = new HashSet<string>(
+                        expectedDefines.Split(';').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s))
+                    );
 
                     var missing = expectedSet.Except(currentSet).ToList();
                     if (missing.Count > 0)
@@ -209,8 +225,8 @@ namespace NPCSystem.Editor.Tools
                 {
                     var targetName = target.TargetName;
                     report.AddError(
-                        $"ApiCompatibilityLevel for '{targetName}' is '{current}' ({(int)current}), expected '{expected}' ({(int)expected}). " +
-                        $"This will break Unity Transport/Serialization/RP Core packages on build."
+                        $"ApiCompatibilityLevel for '{targetName}' is '{current}' ({(int)current}), expected '{expected}' ({(int)expected}). "
+                            + $"This will break Unity Transport/Serialization/RP Core packages on build."
                     );
                 }
             }
@@ -228,8 +244,8 @@ namespace NPCSystem.Editor.Tools
                 if (current != expected)
                 {
                     report.AddWarning(
-                        $"Editor Assemblies Compatibility Level is '{current}', expected '{expected}'. " +
-                        "Consider updating SettingsGuardConfig.requiredEditorAssembliesLevel."
+                        $"Editor Assemblies Compatibility Level is '{current}', expected '{expected}'. "
+                            + "Consider updating SettingsGuardConfig.requiredEditorAssembliesLevel."
                     );
                 }
             }
@@ -273,7 +289,10 @@ namespace NPCSystem.Editor.Tools
             int fixes = 0;
 
             // 1. Fix default ApiCompatibilityLevel
-            if (PlayerSettings.GetApiCompatibilityLevel(NamedBuildTarget.Unknown) != config.requiredApiCompatibilityLevel)
+            if (
+                PlayerSettings.GetApiCompatibilityLevel(NamedBuildTarget.Unknown)
+                != config.requiredApiCompatibilityLevel
+            )
             {
                 PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Unknown, config.requiredApiCompatibilityLevel);
                 Debug.Log($"{LogPrefix} FIXED: Default ApiCompatibilityLevel → {config.requiredApiCompatibilityLevel}");
@@ -292,7 +311,9 @@ namespace NPCSystem.Editor.Tools
                     if (PlayerSettings.GetApiCompatibilityLevel(target.Value) != ovr.requiredLevel)
                     {
                         PlayerSettings.SetApiCompatibilityLevel(target.Value, ovr.requiredLevel);
-                        Debug.Log($"{LogPrefix} FIXED: '{ovr.platformName}' ApiCompatibilityLevel → {ovr.requiredLevel}");
+                        Debug.Log(
+                            $"{LogPrefix} FIXED: '{ovr.platformName}' ApiCompatibilityLevel → {ovr.requiredLevel}"
+                        );
                         fixes++;
                     }
                 }
@@ -308,7 +329,9 @@ namespace NPCSystem.Editor.Tools
                 if (current != config.requiredEditorAssembliesLevel)
                 {
                     PlayerSettings.SetEditorAssembliesCompatibilityLevel(config.requiredEditorAssembliesLevel);
-                    Debug.Log($"{LogPrefix} FIXED: EditorAssembliesCompatibilityLevel → {config.requiredEditorAssembliesLevel}");
+                    Debug.Log(
+                        $"{LogPrefix} FIXED: EditorAssembliesCompatibilityLevel → {config.requiredEditorAssembliesLevel}"
+                    );
                     fixes++;
                 }
             }
@@ -321,10 +344,12 @@ namespace NPCSystem.Editor.Tools
                     continue;
 
                 var currentDefines = PlayerSettings.GetScriptingDefineSymbols(target.Value);
-                var currentSet = new HashSet<string>(currentDefines.Split(';')
-                    .Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)));
-                var expectedSet = new HashSet<string>(pd.defines.Split(';')
-                    .Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)));
+                var currentSet = new HashSet<string>(
+                    currentDefines.Split(';').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s))
+                );
+                var expectedSet = new HashSet<string>(
+                    pd.defines.Split(';').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s))
+                );
 
                 var missing = expectedSet.Except(currentSet).ToList();
                 if (missing.Count > 0)
@@ -369,6 +394,7 @@ namespace NPCSystem.Editor.Tools
         public IReadOnlyList<string> Warnings => _warnings;
 
         public void AddError(string message) => _errors.Add(message);
+
         public void AddWarning(string message) => _warnings.Add(message);
 
         public string GetSummary()

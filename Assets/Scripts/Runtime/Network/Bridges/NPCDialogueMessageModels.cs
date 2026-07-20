@@ -1,20 +1,19 @@
 using System;
-using Unity.Netcode;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using Unity.Netcode;
+
 namespace NPCSystem.Network.Bridges
 {
     [Serializable]
@@ -24,9 +23,7 @@ namespace NPCSystem.Network.Bridges
 
         public void SanitizeInPlace()
         {
-            npcSlug = string.IsNullOrWhiteSpace(npcSlug)
-                ? string.Empty
-                : npcSlug.Trim().ToLowerInvariant();
+            npcSlug = string.IsNullOrWhiteSpace(npcSlug) ? string.Empty : npcSlug.Trim().ToLowerInvariant();
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer)
@@ -45,15 +42,9 @@ namespace NPCSystem.Network.Bridges
 
         public void SanitizeInPlace()
         {
-            requestId = string.IsNullOrWhiteSpace(requestId)
-                ? Guid.NewGuid().ToString("N")
-                : requestId.Trim();
-            npcSlug = string.IsNullOrWhiteSpace(npcSlug)
-                ? string.Empty
-                : npcSlug.Trim().ToLowerInvariant();
-            playerMessage = string.IsNullOrWhiteSpace(playerMessage)
-                ? string.Empty
-                : playerMessage.Trim();
+            requestId = string.IsNullOrWhiteSpace(requestId) ? Guid.NewGuid().ToString("N") : requestId.Trim();
+            npcSlug = string.IsNullOrWhiteSpace(npcSlug) ? string.Empty : npcSlug.Trim().ToLowerInvariant();
+            playerMessage = string.IsNullOrWhiteSpace(playerMessage) ? string.Empty : playerMessage.Trim();
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer)
@@ -76,9 +67,7 @@ namespace NPCSystem.Network.Bridges
         public void SanitizeInPlace()
         {
             requestId = string.IsNullOrWhiteSpace(requestId) ? string.Empty : requestId.Trim();
-            npcSlug = string.IsNullOrWhiteSpace(npcSlug)
-                ? string.Empty
-                : npcSlug.Trim().ToLowerInvariant();
+            npcSlug = string.IsNullOrWhiteSpace(npcSlug) ? string.Empty : npcSlug.Trim().ToLowerInvariant();
             displayName = string.IsNullOrWhiteSpace(displayName)
                 ? string.Empty
                 : NPCFlowTextSanitizer.CleanDialogueText(displayName);
@@ -96,6 +85,4 @@ namespace NPCSystem.Network.Bridges
             serializer.SerializeValue(ref content);
         }
     }
-
-
 }

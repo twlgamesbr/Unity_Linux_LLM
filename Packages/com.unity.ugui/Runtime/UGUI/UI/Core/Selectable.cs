@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {
@@ -14,12 +14,14 @@ namespace UnityEngine.UI
     /// Simple selectable object - derived from to create a selectable control.
     /// </summary>
     public class Selectable
-        :
-        UIBehaviour,
-        IMoveHandler,
-        IPointerDownHandler, IPointerUpHandler,
-        IPointerEnterHandler, IPointerExitHandler,
-        ISelectHandler, IDeselectHandler
+        : UIBehaviour,
+            IMoveHandler,
+            IPointerDownHandler,
+            IPointerUpHandler,
+            IPointerEnterHandler,
+            IPointerExitHandler,
+            ISelectHandler,
+            IDeselectHandler
     {
         protected static Selectable[] s_Selectables = new Selectable[10];
         protected static int s_SelectableCount = 0;
@@ -62,21 +64,19 @@ namespace UnityEngine.UI
         /// <summary>
         /// How many selectable elements are currently active.
         /// </summary>
-        public static int allSelectableCount { get { return s_SelectableCount; } }
+        public static int allSelectableCount
+        {
+            get { return s_SelectableCount; }
+        }
 
         /// <summary>
         /// A List instance of the allSelectablesArray to maintain API compatibility.
         /// </summary>
-
         [Obsolete("Replaced with allSelectablesArray to have better performance when disabling a element", false)]
         public static List<Selectable> allSelectables
         {
-            get
-            {
-                return new List<Selectable>(allSelectablesArray);
-            }
+            get { return new List<Selectable>(allSelectablesArray); }
         }
-
 
         /// <summary>
         /// Non allocating version for getting the all selectables.
@@ -150,7 +150,7 @@ namespace UnityEngine.UI
             /// <summary>
             /// Use an animation transition.
             /// </summary>
-            Animation
+            Animation,
         }
 
         // Type of the transition that occurs when the button state changes.
@@ -182,7 +182,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private Graphic m_TargetGraphic;
 
-
         private bool m_GroupsAllowInteraction = true;
         protected int m_CurrentIndex = -1;
 
@@ -209,7 +208,10 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Navigation        navigation        { get { return m_Navigation; } set
+        public Navigation navigation
+        {
+            get { return m_Navigation; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_Navigation, value))
                     OnSetProperty();
@@ -239,7 +241,10 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Transition        transition        { get { return m_Transition; } set
+        public Transition transition
+        {
+            get { return m_Transition; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_Transition, value))
                     OnSetProperty();
@@ -272,7 +277,10 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public ColorBlock        colors            { get { return m_Colors; } set
+        public ColorBlock colors
+        {
+            get { return m_Colors; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_Colors, value))
                     OnSetProperty();
@@ -308,7 +316,10 @@ namespace UnityEngine.UI
         /// ]]>
         /// </code>
         /// </example>
-        public SpriteState       spriteState       { get { return m_SpriteState; } set
+        public SpriteState spriteState
+        {
+            get { return m_SpriteState; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_SpriteState, value))
                     OnSetProperty();
@@ -321,7 +332,10 @@ namespace UnityEngine.UI
         /// <remarks>
         /// Modifications will not be visible if transition is not Animation.
         /// </remarks>
-        public AnimationTriggers animationTriggers { get { return m_AnimationTriggers; } set
+        public AnimationTriggers animationTriggers
+        {
+            get { return m_AnimationTriggers; }
+            set
             {
                 if (SetPropertyUtility.SetClass(ref m_AnimationTriggers, value))
                     OnSetProperty();
@@ -352,7 +366,10 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Graphic           targetGraphic     { get { return m_TargetGraphic; } set
+        public Graphic targetGraphic
+        {
+            get { return m_TargetGraphic; }
+            set
             {
                 if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value))
                     OnSetProperty();
@@ -388,26 +405,29 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public bool              interactable
+        public bool interactable
         {
             get { return m_Interactable; }
             set
             {
                 if (SetPropertyUtility.SetStruct(ref m_Interactable, value))
                 {
-                    if (!m_Interactable && EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
+                    if (
+                        !m_Interactable
+                        && EventSystem.current != null
+                        && EventSystem.current.currentSelectedGameObject == gameObject
+                    )
                         EventSystem.current.SetSelectedGameObject(null);
                     OnSetProperty();
                 }
             }
         }
 
-        private bool             isPointerInside   { get; set; }
-        private bool             isPointerDown     { get; set; }
-        private bool             hasSelection      { get; set; }
+        private bool isPointerInside { get; set; }
+        private bool isPointerDown { get; set; }
+        private bool hasSelection { get; set; }
 
-        protected Selectable()
-        {}
+        protected Selectable() { }
 
         /// <summary>
         /// Convenience function that converts the referenced Graphic to a Image, if possible.
@@ -456,6 +476,7 @@ namespace UnityEngine.UI
         }
 
         private readonly List<CanvasGroup> m_CanvasGroupCache = new List<CanvasGroup>();
+
         protected override void OnCanvasGroupChanged()
         {
             var parentGroupAllowsInteraction = ParentGroupAllowsInteraction();
@@ -570,7 +591,7 @@ namespace UnityEngine.UI
                 DoStateTransition(currentSelectionState, true);
             else
 #endif
-            DoStateTransition(currentSelectionState, false);
+                DoStateTransition(currentSelectionState, false);
         }
 
         // Remove from the list.
@@ -616,7 +637,11 @@ namespace UnityEngine.UI
             // OnSetProperty potentially access Animator or Graphics. (case 618186)
             if (isActiveAndEnabled)
             {
-                if (!interactable && EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
+                if (
+                    !interactable
+                    && EventSystem.current != null
+                    && EventSystem.current.currentSelectedGameObject == gameObject
+                )
                     EventSystem.current.SetSelectedGameObject(null);
                 // Need to clear out the override image on the target...
                 DoSpriteSwap(null);
@@ -634,7 +659,6 @@ namespace UnityEngine.UI
         {
             m_TargetGraphic = GetComponent<Graphic>();
         }
-
 #endif // if UNITY_EDITOR
 
         protected SelectionState currentSelectionState
@@ -814,7 +838,9 @@ namespace UnityEngine.UI
             float maxFurthestScore = Mathf.NegativeInfinity;
             float score = 0;
 
-            bool wantsWrapAround = navigation.wrapAround && (m_Navigation.mode == Navigation.Mode.Vertical || m_Navigation.mode == Navigation.Mode.Horizontal);
+            bool wantsWrapAround =
+                navigation.wrapAround
+                && (m_Navigation.mode == Navigation.Mode.Vertical || m_Navigation.mode == Navigation.Mode.Horizontal);
 
             Selectable bestPick = null;
             Selectable bestFurthestPick = null;
@@ -833,7 +859,13 @@ namespace UnityEngine.UI
                 // Apart from runtime use, FindSelectable is used by custom editors to
                 // draw arrows between different selectables. For scene view cameras,
                 // only selectables in the same stage should be considered.
-                if (Camera.current != null && !UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera(sel.gameObject, Camera.current))
+                if (
+                    Camera.current != null
+                    && !UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera(
+                        sel.gameObject,
+                        Camera.current
+                    )
+                )
                     continue;
 #endif
 
@@ -1133,7 +1165,13 @@ namespace UnityEngine.UI
         void TriggerAnimation(string triggername)
         {
 #if PACKAGE_ANIMATION
-            if (transition != Transition.Animation || animator == null || !animator.isActiveAndEnabled || !animator.hasBoundPlayables || string.IsNullOrEmpty(triggername))
+            if (
+                transition != Transition.Animation
+                || animator == null
+                || !animator.isActiveAndEnabled
+                || !animator.hasBoundPlayables
+                || string.IsNullOrEmpty(triggername)
+            )
                 return;
 
             animator.ResetTrigger(m_AnimationTriggers.normalTrigger);

@@ -18,8 +18,12 @@ namespace Unity.Entities.Editor
                 if (typeInfo.Type == null)
                     continue;
 
-                m_ComponentIndexedTypes.Add(new IndexedType(typeInfo.Type.Name.ToLowerInvariant().GetHashCode(), typeInfo.Type));
-                m_ComponentIndexedTypes.Add(new IndexedType(typeInfo.Type.FullName.ToLowerInvariant().GetHashCode(), typeInfo.Type));
+                m_ComponentIndexedTypes.Add(
+                    new IndexedType(typeInfo.Type.Name.ToLowerInvariant().GetHashCode(), typeInfo.Type)
+                );
+                m_ComponentIndexedTypes.Add(
+                    new IndexedType(typeInfo.Type.FullName.ToLowerInvariant().GetHashCode(), typeInfo.Type)
+                );
 
                 m_ComponentNameTypes.Add(new NameType(typeInfo.Type.Name.ToLowerInvariant(), typeInfo.Type));
                 m_ComponentNameTypes.Add(new NameType(typeInfo.Type.FullName.ToLowerInvariant(), typeInfo.Type));
@@ -37,21 +41,24 @@ namespace Unity.Entities.Editor
                 Type = type;
             }
 
-            public static implicit operator IndexedType(int i)
-                => new IndexedType(i, null);
+            public static implicit operator IndexedType(int i) => new IndexedType(i, null);
 
-            public bool Equals(IndexedType other)
-                => m_Hash == other.m_Hash && Type == other.Type;
+            public bool Equals(IndexedType other) => m_Hash == other.m_Hash && Type == other.Type;
 
-            public override bool Equals(object obj)
-                => obj is IndexedType other && Equals(other);
+            public override bool Equals(object obj) => obj is IndexedType other && Equals(other);
 
             public override int GetHashCode() => m_Hash;
 
             public int CompareTo(IndexedType other)
             {
                 var comparison = m_Hash.CompareTo(other.m_Hash);
-                return comparison != 0 ? comparison : string.Compare(Type?.AssemblyQualifiedName ?? string.Empty, other.Type?.AssemblyQualifiedName ?? string.Empty, StringComparison.Ordinal);
+                return comparison != 0
+                    ? comparison
+                    : string.Compare(
+                        Type?.AssemblyQualifiedName ?? string.Empty,
+                        other.Type?.AssemblyQualifiedName ?? string.Empty,
+                        StringComparison.Ordinal
+                    );
             }
         }
 
@@ -66,11 +73,9 @@ namespace Unity.Entities.Editor
                 Type = type;
             }
 
-            public bool Equals(NameType other)
-                => Name == other.Name && Type == other.Type;
+            public bool Equals(NameType other) => Name == other.Name && Type == other.Type;
 
-            public override bool Equals(object obj)
-                => obj is NameType other && Equals(other);
+            public override bool Equals(object obj) => obj is NameType other && Equals(other);
 
             public override int GetHashCode() => Name.GetHashCode();
         }

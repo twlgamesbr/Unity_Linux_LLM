@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -26,9 +26,14 @@ namespace Unity.Entities.Editor
             set => m_Context.SetTargetName(value);
         }
 
-        [CreateProperty, UsedImplicitly] public int Index => m_Context.Entity.Index;
-        [CreateProperty, UsedImplicitly] public int Version => m_Context.Entity.Version;
-        [CreateProperty, UsedImplicitly] public UnityEngine.Object ConvertedFrom => m_Context.GetSourceObject();
+        [CreateProperty, UsedImplicitly]
+        public int Index => m_Context.Entity.Index;
+
+        [CreateProperty, UsedImplicitly]
+        public int Version => m_Context.Entity.Version;
+
+        [CreateProperty, UsedImplicitly]
+        public UnityEngine.Object ConvertedFrom => m_Context.GetSourceObject();
 
         [UsedImplicitly]
         class EntityHeaderInspector : PropertyInspector<EntityHeader>
@@ -42,7 +47,9 @@ namespace Unity.Entities.Editor
 
                 root.Q<TextField>(k_EntityName).isDelayed = true;
 
-                var originatingGO = root.Q<ObjectField>(className: UssClasses.Inspector.EntityHeader.OriginatingGameObject);
+                var originatingGO = root.Q<ObjectField>(
+                    className: UssClasses.Inspector.EntityHeader.OriginatingGameObject
+                );
 
                 // Prevent users from dragging a GameObject on the field.
                 originatingGO.RegisterCallback<ChangeEvent<Object>, ObjectField>(ForceTargetGameObject, originatingGO);

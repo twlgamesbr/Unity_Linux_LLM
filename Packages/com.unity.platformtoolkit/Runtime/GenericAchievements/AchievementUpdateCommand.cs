@@ -2,7 +2,8 @@ using System;
 
 namespace Unity.PlatformToolkit
 {
-    internal class AchievementUpdateCommand<T> where T : AchievementDefinition
+    internal class AchievementUpdateCommand<T>
+        where T : AchievementDefinition
     {
         public readonly AchievementProgressState<T> Achievement;
 

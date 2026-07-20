@@ -55,7 +55,7 @@ namespace Unity.Physics.Authoring
                 centerOfMass = authoring.centerOfMass,
                 automaticInertiaTensor = authoring.automaticInertiaTensor,
                 inertiaTensor = authoring.inertiaTensor,
-                inertiaTensorRotation = authoring.inertiaTensorRotation
+                inertiaTensorRotation = authoring.inertiaTensorRotation,
             };
             AddComponent(entity, bakingData);
 
@@ -71,12 +71,15 @@ namespace Unity.Physics.Authoring
             GetComponentsInChildren(colliderComponents);
             if (colliderComponents.Count > 0)
             {
-                AddComponent(entity, new PhysicsCompoundData()
-                {
-                    AssociateBlobToBody = false,
-                    ConvertedBodyEntityId = authoring.GetEntityId(),
-                    Hash = default,
-                });
+                AddComponent(
+                    entity,
+                    new PhysicsCompoundData()
+                    {
+                        AssociateBlobToBody = false,
+                        ConvertedBodyEntityId = authoring.GetEntityId(),
+                        Hash = default,
+                    }
+                );
                 AddComponent<PhysicsRootBaked>(entity);
                 AddComponent<PhysicsCollider>(entity);
             }
@@ -91,28 +94,33 @@ namespace Unity.Physics.Authoring
 
                 if (authoring.interpolation == RigidbodyInterpolation.Interpolate)
                 {
-                    AddComponent(entity, new PhysicsGraphicalInterpolationBuffer
-                    {
-                        PreviousTransform = Math.DecomposeRigidBodyTransform(bodyTransform.localToWorldMatrix)
-                    });
+                    AddComponent(
+                        entity,
+                        new PhysicsGraphicalInterpolationBuffer
+                        {
+                            PreviousTransform = Math.DecomposeRigidBodyTransform(bodyTransform.localToWorldMatrix),
+                        }
+                    );
                 }
             }
 
             // Add default PhysicsMass component. The actual mass properties values will be set by the RigidbodyBakingSystem.
             var massProperties = MassProperties.UnitSphere;
-            AddComponent(entity, !authoring.isKinematic ?
-                PhysicsMass.CreateDynamic(massProperties, authoring.mass) :
-                PhysicsMass.CreateKinematic(massProperties));
+            AddComponent(
+                entity,
+                !authoring.isKinematic
+                    ? PhysicsMass.CreateDynamic(massProperties, authoring.mass)
+                    : PhysicsMass.CreateKinematic(massProperties)
+            );
 
             AddComponent(entity, new PhysicsVelocity());
 
             if (!authoring.isKinematic)
             {
-                AddComponent(entity, new PhysicsDamping
-                {
-                    Linear = authoring.linearDamping,
-                    Angular = authoring.angularDamping
-                });
+                AddComponent(
+                    entity,
+                    new PhysicsDamping { Linear = authoring.linearDamping, Angular = authoring.angularDamping }
+                );
                 if (!authoring.useGravity)
                     AddComponent(entity, new PhysicsGravityFactor { Value = 0f });
             }
@@ -129,7 +137,7 @@ namespace Unity.Physics.Authoring
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
     public partial struct RigidbodyBakingSystem : ISystem
     {
-        static readonly SimulationMode k_InvalidSimulationMode = (SimulationMode) ~0;
+        static readonly SimulationMode k_InvalidSimulationMode = (SimulationMode)~0;
         SimulationMode m_SavedSmulationMode;
         bool m_ProcessSimulationModeChange;
 
@@ -169,9 +177,12 @@ namespace Unity.Physics.Authoring
 
             // Set world index for bodies with world index baking data
             using var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
-            foreach (var(rigidBodyData, worldIndexData, entity) in
-                     SystemAPI.Query<RefRO<RigidbodyBakingData>, RefRO<PhysicsWorldIndexBakingData>>()
-                         .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities).WithEntityAccess())
+            foreach (
+                var (rigidBodyData, worldIndexData, entity) in SystemAPI
+                    .Query<RefRO<RigidbodyBakingData>, RefRO<PhysicsWorldIndexBakingData>>()
+                    .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
+                    .WithEntityAccess()
+            )
             {
                 ecb.SetSharedComponent(entity, new PhysicsWorldIndex(worldIndexData.ValueRO.WorldIndex));
             }
@@ -179,28 +190,46 @@ namespace Unity.Physics.Authoring
             var entityManager = state.EntityManager;
 
             // Set mass properties for rigid bodies without collider
-            foreach (var(physicsMass, bodyData, entity) in
-                     SystemAPI.Query<RefRW<PhysicsMass>, RefRO<RigidbodyBakingData>>()
-                         .WithEntityAccess()
-                         .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities))
+            foreach (
+                var (physicsMass, bodyData, entity) in SystemAPI
+                    .Query<RefRW<PhysicsMass>, RefRO<RigidbodyBakingData>>()
+                    .WithEntityAccess()
+                    .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
+            )
             {
-                physicsMass.ValueRW = CreatePhysicsMass(entityManager, entity, bodyData.ValueRO, MassProperties.UnitSphere);
+                physicsMass.ValueRW = CreatePhysicsMass(
+                    entityManager,
+                    entity,
+                    bodyData.ValueRO,
+                    MassProperties.UnitSphere
+                );
             }
 
             // Set mass properties for rigid bodies with collider
-            foreach (var(physicsMass, bodyData, collider, entity) in
-                     SystemAPI.Query<RefRW<PhysicsMass>, RefRO<RigidbodyBakingData>, RefRO<PhysicsCollider>>()
-                         .WithEntityAccess()
-                         .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities))
+            foreach (
+                var (physicsMass, bodyData, collider, entity) in SystemAPI
+                    .Query<RefRW<PhysicsMass>, RefRO<RigidbodyBakingData>, RefRO<PhysicsCollider>>()
+                    .WithEntityAccess()
+                    .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
+            )
             {
-                physicsMass.ValueRW = CreatePhysicsMass(entityManager, entity, bodyData.ValueRO, collider.ValueRO.MassProperties);
+                physicsMass.ValueRW = CreatePhysicsMass(
+                    entityManager,
+                    entity,
+                    bodyData.ValueRO,
+                    collider.ValueRO.MassProperties
+                );
             }
 
             ecb.Playback(state.EntityManager);
         }
 
-        static PhysicsMass CreatePhysicsMass(EntityManager entityManager, in Entity entity,
-            in RigidbodyBakingData inBodyData, in MassProperties inMassProperties)
+        static PhysicsMass CreatePhysicsMass(
+            EntityManager entityManager,
+            in Entity entity,
+            in RigidbodyBakingData inBodyData,
+            in MassProperties inMassProperties
+        )
         {
             var massProperties = inMassProperties;
             var scale = 1f;
@@ -229,9 +258,9 @@ namespace Unity.Physics.Authoring
 
             // Create the physics mass properties. Among others, this scales the unit mass inertia tensor
             // by the scalar mass of the rigid body.
-            var physicsMass = !inBodyData.isKinematic ?
-                PhysicsMass.CreateDynamic(massProperties, inBodyData.mass) :
-                PhysicsMass.CreateKinematic(massProperties);
+            var physicsMass = !inBodyData.isKinematic
+                ? PhysicsMass.CreateDynamic(massProperties, inBodyData.mass)
+                : PhysicsMass.CreateKinematic(massProperties);
 
             // Now, apply inverse scale to the final, baked physics mass properties in order to prevent invalid simulated mass properties
             // caused by runtime scaling of the mass properties later on while building the physics world.

@@ -10,8 +10,8 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
         internal Func<TestRunnerStateSerializer, ConstructDelegator> CreateConstructDelegator =
             stateSerializer => new ConstructDelegator(stateSerializer);
 
-        internal Action<Func<Type, object[], object>> SetConstructorCallWrapper =
-            func => Reflect.ConstructorCallWrapper = func;
+        internal Action<Func<Type, object[], object>> SetConstructorCallWrapper = func =>
+            Reflect.ConstructorCallWrapper = func;
 
         public SetupConstructDelegatorTask()
         {

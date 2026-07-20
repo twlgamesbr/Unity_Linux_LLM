@@ -14,17 +14,16 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
         TypeReference m_MetricIdTypeLibraryTypeRef;
         MethodReference m_MetricIdTypeLibraryRegisterTypeRef;
 
-        public bool ImportReferences(
-            ModuleDefinition moduleDefinition,
-            IAssemblyProcessingLogger logger)
+        public bool ImportReferences(ModuleDefinition moduleDefinition, IAssemblyProcessingLogger logger)
         {
             m_MetricTypeEnumAttributeTypeRef = moduleDefinition.ImportReference(typeof(MetricTypeEnumAttribute));
             m_MetricIdTypeLibraryTypeRef = moduleDefinition.ImportReference(typeof(MetricIdTypeLibrary));
-            m_MetricIdTypeLibraryRegisterTypeRef =
-                moduleDefinition.ImportReference(
-                    typeof(MetricIdTypeLibrary).GetMethod(
-                        nameof(MetricIdTypeLibrary.RegisterType),
-                        BindingFlags.Static | BindingFlags.Public));
+            m_MetricIdTypeLibraryRegisterTypeRef = moduleDefinition.ImportReference(
+                typeof(MetricIdTypeLibrary).GetMethod(
+                    nameof(MetricIdTypeLibrary.RegisterType),
+                    BindingFlags.Static | BindingFlags.Public
+                )
+            );
             return true;
         }
 
@@ -32,15 +31,18 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
             ICompiledAssembly compiledAssembly,
             AssemblyDefinition assemblyDefinition,
             ModuleDefinition mainModule,
-            IAssemblyProcessingLogger logger)
+            IAssemblyProcessingLogger logger
+        )
         {
-            var metricTypeEnums = mainModule.GetTypes()
+            var metricTypeEnums = mainModule
+                .GetTypes()
                 .Where(type =>
                     type.IsEnum
                     && type.HasCustomAttributes
-                    && type.CustomAttributes.Any(
-                        attribute =>
-                            attribute.AttributeType.Name.Equals(m_MetricTypeEnumAttributeTypeRef.Name)))
+                    && type.CustomAttributes.Any(attribute =>
+                        attribute.AttributeType.Name.Equals(m_MetricTypeEnumAttributeTypeRef.Name)
+                    )
+                )
                 .OrderBy(e => e.FullName)
                 .ToList();
 
@@ -65,12 +67,14 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
                                 mainModule,
                                 m_MetricIdTypeLibraryTypeRef,
                                 m_MetricIdTypeLibraryRegisterTypeRef,
-                                importedType);
+                                importedType
+                            );
                             instructions.Add(processor.Create(OpCodes.Call, genericInstanceMethod));
                         }
 
                         return instructions;
-                    });
+                    }
+                );
             }
             catch (Exception e)
             {

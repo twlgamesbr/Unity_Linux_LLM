@@ -55,8 +55,11 @@ namespace Unity.Rendering
         [BurstCompile]
         partial struct CopySkinMatricesToGPUJob : IJobEntity
         {
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, int> DeformedEntityToComputeIndex;
-            [NativeDisableContainerSafetyRestriction] public NativeArray<float3x4> SkinMatricesBuffer;
+            [ReadOnly]
+            public NativeParallelMultiHashMap<Entity, int> DeformedEntityToComputeIndex;
+
+            [NativeDisableContainerSafetyRestriction]
+            public NativeArray<float3x4> SkinMatricesBuffer;
 
             private void Execute(in DynamicBuffer<SkinMatrix> skinMatrices, in Entity entity)
             {
@@ -88,18 +91,23 @@ namespace Unity.Rendering
 
             k_Marker.Begin();
 
-            var deformedEntityToComputeIndex = new NativeParallelMultiHashMap<Entity, int>(m_SkinningEntityQuery.CalculateEntityCount(), Allocator.TempJob);
+            var deformedEntityToComputeIndex = new NativeParallelMultiHashMap<Entity, int>(
+                m_SkinningEntityQuery.CalculateEntityCount(),
+                Allocator.TempJob
+            );
             var deformedEntityToComputeIndexParallel = deformedEntityToComputeIndex.AsParallelWriter();
             Dependency = new ConstructHashMapJob
             {
-                DeformedEntityToComputeIndexParallel = deformedEntityToComputeIndexParallel
+                DeformedEntityToComputeIndexParallel = deformedEntityToComputeIndexParallel,
             }.ScheduleParallel(Dependency);
 
-            var skinMatricesBuffer = m_PushMeshDataSystem.SkinningBufferManager.LockSkinMatrixBufferForWrite(m_PushMeshDataSystem.SkinMatrixCount);
+            var skinMatricesBuffer = m_PushMeshDataSystem.SkinningBufferManager.LockSkinMatrixBufferForWrite(
+                m_PushMeshDataSystem.SkinMatrixCount
+            );
             Dependency = new CopySkinMatricesToGPUJob()
             {
                 DeformedEntityToComputeIndex = deformedEntityToComputeIndex,
-                SkinMatricesBuffer = skinMatricesBuffer
+                SkinMatricesBuffer = skinMatricesBuffer,
             }.ScheduleParallel(Dependency);
 
             Dependency = deformedEntityToComputeIndex.Dispose(Dependency);

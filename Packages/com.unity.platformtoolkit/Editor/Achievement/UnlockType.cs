@@ -5,7 +5,8 @@ namespace Unity.PlatformToolkit.Editor
     {
         /// <summary>Achievement can be either locked or unlocked.</summary>
         Single,
+
         /// <summary>Achievement has progress value from 0 to <see cref="IAchievement.ProgressTarget"/>.</summary>
-        Progressive
+        Progressive,
     }
 }

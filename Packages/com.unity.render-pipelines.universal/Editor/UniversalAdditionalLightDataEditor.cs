@@ -10,8 +10,6 @@ namespace UnityEditor.Rendering.Universal
     public class UniversalAdditionLightDataEditor : Editor
     {
         /// <inheritdoc/>
-        public override void OnInspectorGUI()
-        {
-        }
+        public override void OnInspectorGUI() { }
     }
 }

@@ -10,6 +10,7 @@ namespace Unity.PlatformToolkit.PlayMode
         private VisualElement m_InspectorRoot;
 
         private PlayModeTestAccountDataView m_TestAccountDataView;
+
         public override VisualElement CreateInspectorGUI()
         {
             // CreateInspectorGUI is called more than once in some circumstances.

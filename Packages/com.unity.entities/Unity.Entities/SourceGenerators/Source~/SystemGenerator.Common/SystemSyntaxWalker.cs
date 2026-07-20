@@ -38,8 +38,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
                 _systemDescription.GetStatementsRequiringLineDirectivesAndHiddenDirectives();
         }
 
-        public (bool MethodRequiresSourceGen, string SourceGeneratedMethod)
-            VisitMethodDeclarationInSystem(MethodDeclarationSyntax methodDeclarationSyntax)
+        public (bool MethodRequiresSourceGen, string SourceGeneratedMethod) VisitMethodDeclarationInSystem(
+            MethodDeclarationSyntax methodDeclarationSyntax
+        )
         {
             var originalMethodSymbol = _systemDescription.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
             var targetMethodNameAndSignature = originalMethodSymbol.GetMethodAndParamsAsString(_systemDescription);
@@ -58,7 +59,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             _currentInnerWriter.GetStringBuilder().Clear();
 
             // Append the `DOTSCompilerPatchedMethod` attribute to the method
-            _currentMethodAndPropertyWriter.WriteLine($"[global::Unity.Entities.DOTSCompilerPatchedMethod(\"{targetMethodNameAndSignature}\")]");
+            _currentMethodAndPropertyWriter.WriteLine(
+                $"[global::Unity.Entities.DOTSCompilerPatchedMethod(\"{targetMethodNameAndSignature}\")]"
+            );
 
             // Begin depth-first traversal of the method
             VisitMethodDeclaration(methodDeclarationSyntax);
@@ -66,8 +69,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             return (_currentMemberRequiresSourceGen, _currentMethodAndPropertyWriter.InnerWriter.ToString());
         }
 
-        public (bool PropertyRequiresSourceGen, string SourceGeneratedProperty)
-            VisitPropertyDeclarationInSystem(PropertyDeclarationSyntax propertyDeclarationSyntax)
+        public (bool PropertyRequiresSourceGen, string SourceGeneratedProperty) VisitPropertyDeclarationInSystem(
+            PropertyDeclarationSyntax propertyDeclarationSyntax
+        )
         {
             var originalPropertySymbol = _systemDescription.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
             var targetPropertyNameAndSignature = originalPropertySymbol.OriginalDefinition.ToString();
@@ -86,7 +90,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             _currentInnerWriter.GetStringBuilder().Clear();
 
             // Append the `DOTSCompilerPatchedProperty` attribute to the property
-            _currentMethodAndPropertyWriter.WriteLine($"[global::Unity.Entities.DOTSCompilerPatchedProperty(\"{targetPropertyNameAndSignature}\")]");
+            _currentMethodAndPropertyWriter.WriteLine(
+                $"[global::Unity.Entities.DOTSCompilerPatchedProperty(\"{targetPropertyNameAndSignature}\")]"
+            );
 
             // Begin depth-first traversal of the property
             VisitPropertyDeclaration(propertyDeclarationSyntax);
@@ -112,7 +118,7 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
                 // Append line directive
                 var line = string.IsNullOrEmpty(_systemDescription.OriginalFilePath)
                     ? ""
-                    : $"#line {node.GetLineNumber() +offset} \"{_systemDescription.OriginalFilePath}\"";
+                    : $"#line {node.GetLineNumber() + offset} \"{_systemDescription.OriginalFilePath}\"";
                 _currentMethodAndPropertyWriter.WriteLine(line);
             }
             base.Visit(node);
@@ -130,13 +136,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             }
         }
 
-        public override void VisitExplicitInterfaceSpecifier(ExplicitInterfaceSpecifierSyntax node)
-        {
-        }
+        public override void VisitExplicitInterfaceSpecifier(ExplicitInterfaceSpecifierSyntax node) { }
 
-        public override void VisitAttributeList(AttributeListSyntax node)
-        {
-        }
+        public override void VisitAttributeList(AttributeListSyntax node) { }
 
         public override void VisitToken(SyntaxToken token)
         {
@@ -159,42 +161,47 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
                     VisitLeadingTrivia(token);
 
                     // If the current token is the identifier token of the method/property name, append the new method/property name instead
-                    _currentMethodAndPropertyWriter.Write(token == _memberIdentifierToken ? _newMemberName : token.ToString());
+                    _currentMethodAndPropertyWriter.Write(
+                        token == _memberIdentifierToken ? _newMemberName : token.ToString()
+                    );
                     VisitTrailingTrivia(token);
                     break;
                 }
             }
         }
+
         public override void VisitTrivia(SyntaxTrivia trivia)
         {
             var triviaKind = trivia.Kind();
 
             if (triviaKind == SyntaxKind.EndOfLineTrivia)
                 _currentMethodAndPropertyWriter.WriteLine();
-
-            else if (triviaKind != SyntaxKind.DisabledTextTrivia &&
-                triviaKind != SyntaxKind.PreprocessingMessageTrivia &&
-                triviaKind != SyntaxKind.IfDirectiveTrivia &&
-                triviaKind != SyntaxKind.ElifDirectiveTrivia &&
-                triviaKind != SyntaxKind.ElseDirectiveTrivia &&
-                triviaKind != SyntaxKind.EndIfDirectiveTrivia &&
-                triviaKind != SyntaxKind.RegionDirectiveTrivia &&
-                triviaKind != SyntaxKind.EndRegionDirectiveTrivia &&
-                triviaKind != SyntaxKind.DefineDirectiveTrivia &&
-                triviaKind != SyntaxKind.UndefDirectiveTrivia &&
-                triviaKind != SyntaxKind.ErrorDirectiveTrivia &&
-                triviaKind != SyntaxKind.WarningDirectiveTrivia &&
-                triviaKind != SyntaxKind.PragmaWarningDirectiveTrivia &&
-                triviaKind != SyntaxKind.PragmaChecksumDirectiveTrivia &&
-                triviaKind != SyntaxKind.ReferenceDirectiveTrivia &&
-                triviaKind != SyntaxKind.BadDirectiveTrivia &&
-                triviaKind != SyntaxKind.SingleLineCommentTrivia &&
-                triviaKind != SyntaxKind.MultiLineCommentTrivia)
+            else if (
+                triviaKind != SyntaxKind.DisabledTextTrivia
+                && triviaKind != SyntaxKind.PreprocessingMessageTrivia
+                && triviaKind != SyntaxKind.IfDirectiveTrivia
+                && triviaKind != SyntaxKind.ElifDirectiveTrivia
+                && triviaKind != SyntaxKind.ElseDirectiveTrivia
+                && triviaKind != SyntaxKind.EndIfDirectiveTrivia
+                && triviaKind != SyntaxKind.RegionDirectiveTrivia
+                && triviaKind != SyntaxKind.EndRegionDirectiveTrivia
+                && triviaKind != SyntaxKind.DefineDirectiveTrivia
+                && triviaKind != SyntaxKind.UndefDirectiveTrivia
+                && triviaKind != SyntaxKind.ErrorDirectiveTrivia
+                && triviaKind != SyntaxKind.WarningDirectiveTrivia
+                && triviaKind != SyntaxKind.PragmaWarningDirectiveTrivia
+                && triviaKind != SyntaxKind.PragmaChecksumDirectiveTrivia
+                && triviaKind != SyntaxKind.ReferenceDirectiveTrivia
+                && triviaKind != SyntaxKind.BadDirectiveTrivia
+                && triviaKind != SyntaxKind.SingleLineCommentTrivia
+                && triviaKind != SyntaxKind.MultiLineCommentTrivia
+            )
             {
                 if (!trivia.HasStructure)
                     _currentMethodAndPropertyWriter.Write(trivia.ToString());
             }
         }
+
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             // If the current node is flagged for potential patching
@@ -203,7 +210,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
                 // Cede write control to the appropriate syntax walker by calling `walker.TryWriteSyntax()`.
                 // If the method returns true, then the controlling walker has written the syntax for the current node.
                 // If false, then it is the responsibility of the current walker to write the syntax for the current node.
-                var success = _systemDescription.SyntaxWalkers[candidateSyntax.GetOwningModule()].TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
+                var success = _systemDescription
+                    .SyntaxWalkers[candidateSyntax.GetOwningModule()]
+                    .TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
                 _currentMemberRequiresSourceGen |= success;
 
                 if (!success)
@@ -215,10 +224,15 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
 
         public override void VisitGenericName(GenericNameSyntax node)
         {
-            if (_systemDescription.CandidateNodes.TryGetValue(node, out CandidateSyntax candidateSyntax) && candidateSyntax.Type == CandidateType.Ife)
+            if (
+                _systemDescription.CandidateNodes.TryGetValue(node, out CandidateSyntax candidateSyntax)
+                && candidateSyntax.Type == CandidateType.Ife
+            )
             {
                 // Cede write control to the `IfeSyntaxWalker`. If it returns `true`, then it has written the syntax for the current node.
-                var success = _systemDescription.SyntaxWalkers[Module.Ife].TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
+                var success = _systemDescription
+                    .SyntaxWalkers[Module.Ife]
+                    .TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
                 _currentMemberRequiresSourceGen |= success;
 
                 // If the `IfeSyntaxWalker` did not write the syntax for the current node,
@@ -233,10 +247,15 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
         public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
             // If the current node is flagged for potential patching
-            if (_systemDescription.CandidateNodes.TryGetValue(node, out CandidateSyntax candidateSyntax) && candidateSyntax.Type <= CandidateType.MaxSystemAPI)
+            if (
+                _systemDescription.CandidateNodes.TryGetValue(node, out CandidateSyntax candidateSyntax)
+                && candidateSyntax.Type <= CandidateType.MaxSystemAPI
+            )
             {
                 // Cede write control to the `SystemApiWalker`. If it returns `true`, then it has written the syntax for the current node.
-                var success = _systemDescription.SyntaxWalkers[Module.SystemApiContext].TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
+                var success = _systemDescription
+                    .SyntaxWalkers[Module.SystemApiContext]
+                    .TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
                 _currentMemberRequiresSourceGen |= success;
 
                 // If the `SystemApiWalker` did not write the syntax for the current node,
@@ -251,10 +270,15 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
             // If the current node is flagged for potential patching
-            if (_systemDescription.CandidateNodes.TryGetValue(node, out CandidateSyntax candidateSyntax) && candidateSyntax.Type <= CandidateType.MaxSystemAPI)
+            if (
+                _systemDescription.CandidateNodes.TryGetValue(node, out CandidateSyntax candidateSyntax)
+                && candidateSyntax.Type <= CandidateType.MaxSystemAPI
+            )
             {
                 // Cede write control to the `SystemApiWalker`. If it returns `true`, then it has written the syntax for the current node.
-                var success = _systemDescription.SyntaxWalkers[Module.SystemApiContext].TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
+                var success = _systemDescription
+                    .SyntaxWalkers[Module.SystemApiContext]
+                    .TryWriteSyntax(_currentMethodAndPropertyWriter, candidateSyntax);
                 _currentMemberRequiresSourceGen |= success;
 
                 // If the `SystemApiWalker` did not write the syntax for the current node,

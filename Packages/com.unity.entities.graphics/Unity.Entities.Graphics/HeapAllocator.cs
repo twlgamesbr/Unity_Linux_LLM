@@ -1,10 +1,10 @@
 // #define DEBUG_ASSERTS
 
-using UnityEngine.Assertions;
 using System;
 using Unity.Collections;
-using Unity.Mathematics;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
+using UnityEngine.Assertions;
 
 namespace Unity.Rendering
 {
@@ -17,12 +17,18 @@ namespace Unity.Rendering
         /// <summary>
         /// The beginning of the allocated heap block.
         /// </summary>
-        public ulong begin { get { return m_Begin; } }
+        public ulong begin
+        {
+            get { return m_Begin; }
+        }
 
         /// <summary>
         /// The end of the allocated heap block.
         /// </summary>
-        public ulong end { get { return m_End; } }
+        public ulong end
+        {
+            get { return m_End; }
+        }
 
         private ulong m_Begin;
         private ulong m_End;
@@ -47,18 +53,30 @@ namespace Unity.Rendering
         /// <summary>
         /// The length of the HeapBlock.
         /// </summary>
-        public ulong Length { get { return m_End - m_Begin; } }
+        public ulong Length
+        {
+            get { return m_End - m_Begin; }
+        }
 
         /// <summary>
         /// Indicates whether the HeapBlock is empty. This is true if the HeapBlock is empty and false otherwise.
         /// </summary>
-        public bool Empty { get { return Length == 0; } }
+        public bool Empty
+        {
+            get { return Length == 0; }
+        }
 
         /// <inheritdoc/>
-        public int CompareTo(HeapBlock other) { return m_Begin.CompareTo(other.m_Begin); }
+        public int CompareTo(HeapBlock other)
+        {
+            return m_Begin.CompareTo(other.m_Begin);
+        }
 
         /// <inheritdoc/>
-        public bool Equals(HeapBlock other) { return CompareTo(other) == 0; }
+        public bool Equals(HeapBlock other)
+        {
+            return CompareTo(other) == 0;
+        }
     }
 
     /// <summary>
@@ -95,41 +113,63 @@ namespace Unity.Rendering
         /// <summary>
         /// Minimal HeapBlock alignment of this allocator.
         /// </summary>
-        internal uint MinimumAlignment { get { return 1u << m_MinimumAlignmentLog2; } }
-        
+        internal uint MinimumAlignment
+        {
+            get { return 1u << m_MinimumAlignmentLog2; }
+        }
+
         /// <summary>
         /// The amount of available free space in the allocator.
         /// </summary>
-        public ulong FreeSpace { get { return m_Free; } }
+        public ulong FreeSpace
+        {
+            get { return m_Free; }
+        }
 
         /// <summary>
         /// The amount of used space in the allocator.
         /// </summary>
-        public ulong UsedSpace { get { return m_Size - m_Free; } }
+        public ulong UsedSpace
+        {
+            get { return m_Size - m_Free; }
+        }
 
-        internal ulong OnePastHighestUsedAddress { get {
-            return m_FreeEndpoints.TryGetValue(m_Size, out var tailBegin) ? tailBegin : m_Size;
-        } }
+        internal ulong OnePastHighestUsedAddress
+        {
+            get { return m_FreeEndpoints.TryGetValue(m_Size, out var tailBegin) ? tailBegin : m_Size; }
+        }
 
         /// <summary>
         /// The size of the heap that the allocator manages.
         /// </summary>
-        public ulong Size { get { return m_Size; } }
+        public ulong Size
+        {
+            get { return m_Size; }
+        }
 
         /// <summary>
         /// Indicates whether the allocator is empty. This is true if the allocator is empty and false otherwise.
         /// </summary>
-        public bool Empty { get { return m_Free == m_Size; } }
+        public bool Empty
+        {
+            get { return m_Free == m_Size; }
+        }
 
         /// <summary>
         /// Indicates whether the allocator is full. This is true if the allocator is full and false otherwise.
         /// </summary>
-        public bool Full { get { return m_Free == 0; } }
+        public bool Full
+        {
+            get { return m_Free == 0; }
+        }
 
         /// <summary>
         /// Indicates whether the allocator has been created and not yet allocated.
         /// </summary>
-        public bool IsCreated { get { return m_IsCreated; } }
+        public bool IsCreated
+        {
+            get { return m_IsCreated; }
+        }
 
         /// <summary>
         /// Clears the allocator.
@@ -267,7 +307,7 @@ namespace Unity.Rendering
             // Store both endpoints of the free block to the hashmap for
             // easy coalescing.
             m_FreeEndpoints[block.begin] = block.end;
-            m_FreeEndpoints[block.end]   = block.begin;
+            m_FreeEndpoints[block.end] = block.begin;
         }
 
         // Do a slow exhaustive test of the allocator's internal state to verify
@@ -289,7 +329,11 @@ namespace Unity.Rendering
                     ++numNonEmptyBlocks;
             }
 
-            Assert.AreEqual(numBins, numNonEmptyBlocks, "There should be exactly one non-empty block list per size bin");
+            Assert.AreEqual(
+                numBins,
+                numNonEmptyBlocks,
+                "There should be exactly one non-empty block list per size bin"
+            );
             Assert.AreEqual(numEmptyBlocks, numFreeBlockLists, "All empty block lists should be in the free list");
 
             for (int i = 0; i < m_BlocksFreelist.Length; ++i)
@@ -337,8 +381,11 @@ namespace Unity.Rendering
             // Reported free space should be equal to the total size of the free blocks
             Assert.AreEqual(totalFreeSize, FreeSpace, "Free size reported incorrectly");
             Assert.IsTrue(totalFreeSize <= Size, "Amount of free size larger than maximum");
-            Assert.AreEqual(2 * totalFreeBlocks, m_FreeEndpoints.Count(),
-                "Each free block should have exactly 2 stored endpoints");
+            Assert.AreEqual(
+                2 * totalFreeBlocks,
+                m_FreeEndpoints.Count(),
+                "Each free block should have exactly 2 stored endpoints"
+            );
         }
 
         internal const int MaxAlignmentLog2 = 0x3f;
@@ -348,14 +395,14 @@ namespace Unity.Rendering
         private struct SizeBin : IComparable<SizeBin>, IEquatable<SizeBin>
         {
             public ulong sizeClass;
-            public int   blocksId;
+            public int blocksId;
 
             public SizeBin(ulong size, uint alignment = 1)
             {
                 int alignLog2 = math.tzcnt(alignment);
                 alignLog2 = math.min(MaxAlignmentLog2, alignLog2);
                 sizeClass = (size << AlignmentBits) | (uint)alignLog2;
-                blocksId  = -1;
+                blocksId = -1;
 
 #if DEBUG_ASSERTS
                 Assert.AreEqual(math.countbits(alignment), 1, "Only power-of-two alignments supported");
@@ -367,11 +414,18 @@ namespace Unity.Rendering
                 int alignLog2 = math.tzcnt(block.begin);
                 alignLog2 = math.min(MaxAlignmentLog2, alignLog2);
                 sizeClass = (block.Length << AlignmentBits) | (uint)alignLog2;
-                blocksId  = -1;
+                blocksId = -1;
             }
 
-            public int CompareTo(SizeBin other) { return sizeClass.CompareTo(other.sizeClass); }
-            public bool Equals(SizeBin other) { return CompareTo(other) == 0; }
+            public int CompareTo(SizeBin other)
+            {
+                return sizeClass.CompareTo(other.sizeClass);
+            }
+
+            public bool Equals(SizeBin other)
+            {
+                return CompareTo(other) == 0;
+            }
 
             public bool HasCompatibleAlignment(SizeBin requiredAlignment)
             {
@@ -380,9 +434,18 @@ namespace Unity.Rendering
                 return myAlign >= required;
             }
 
-            public ulong Size { get { return sizeClass >> AlignmentBits; } }
-            public int AlignmentLog2 { get { return (int)sizeClass & MaxAlignmentLog2; } }
-            public uint Alignment { get { return 1u << AlignmentLog2; } }
+            public ulong Size
+            {
+                get { return sizeClass >> AlignmentBits; }
+            }
+            public int AlignmentLog2
+            {
+                get { return (int)sizeClass & MaxAlignmentLog2; }
+            }
+            public uint Alignment
+            {
+                get { return 1u << AlignmentLog2; }
+            }
         }
 
         private unsafe struct BlocksOfSize : IDisposable
@@ -391,15 +454,20 @@ namespace Unity.Rendering
 
             public BlocksOfSize(int dummy)
             {
-                m_Blocks = (UnsafeList<HeapBlock>*)Memory.Unmanaged.Allocate(
-                    UnsafeUtility.SizeOf<UnsafeList<HeapBlock>>(),
-                    UnsafeUtility.AlignOf<UnsafeList<HeapBlock>>(),
-                    Allocator.Persistent);
+                m_Blocks = (UnsafeList<HeapBlock>*)
+                    Memory.Unmanaged.Allocate(
+                        UnsafeUtility.SizeOf<UnsafeList<HeapBlock>>(),
+                        UnsafeUtility.AlignOf<UnsafeList<HeapBlock>>(),
+                        Allocator.Persistent
+                    );
                 UnsafeUtility.MemClear(m_Blocks, UnsafeUtility.SizeOf<UnsafeList<HeapBlock>>());
                 m_Blocks->Allocator = Allocator.Persistent;
             }
 
-            public bool Empty { get { return m_Blocks->Length == 0; } }
+            public bool Empty
+            {
+                get { return m_Blocks->Length == 0; }
+            }
 
             // TODO: Priority queue semantics for address-ordered allocation
 
@@ -440,7 +508,11 @@ namespace Unity.Rendering
                 Memory.Unmanaged.Free(m_Blocks, Allocator.Persistent);
             }
 
-            public unsafe HeapBlock Block(int i) { return UnsafeUtility.ReadArrayElement<HeapBlock>(m_Blocks->Ptr, i); }
+            public unsafe HeapBlock Block(int i)
+            {
+                return UnsafeUtility.ReadArrayElement<HeapBlock>(m_Blocks->Ptr, i);
+            }
+
             public unsafe int Length => m_Blocks->Length;
         }
 
@@ -458,10 +530,10 @@ namespace Unity.Rendering
             if (m_SizeBins.Length == 0)
                 return 0;
 
-            int lo = 0;                 // Low endpoint of search, inclusive
+            int lo = 0; // Low endpoint of search, inclusive
             int hi = m_SizeBins.Length; // High endpoint of search, exclusive
 
-            for (;;)
+            for (; ; )
             {
                 int d2 = (hi - lo) / 2;
 
@@ -516,11 +588,8 @@ namespace Unity.Rendering
 
             int tail = m_SizeBins.Length - index;
             m_SizeBins.ResizeUninitialized(m_SizeBins.Length + 1);
-            SizeBin *p = (SizeBin *)m_SizeBins.GetUnsafePtr();
-            UnsafeUtility.MemMove(
-                p + (index + 1),
-                p + index,
-                tail * UnsafeUtility.SizeOf<SizeBin>());
+            SizeBin* p = (SizeBin*)m_SizeBins.GetUnsafePtr();
+            UnsafeUtility.MemMove(p + (index + 1), p + index, tail * UnsafeUtility.SizeOf<SizeBin>());
             p[index] = bin;
 
             return index;
@@ -533,10 +602,7 @@ namespace Unity.Rendering
 
             int tail = m_SizeBins.Length - (index + 1);
             SizeBin* p = (SizeBin*)m_SizeBins.GetUnsafePtr();
-            UnsafeUtility.MemMove(
-                p + index,
-                p + (index + 1),
-                tail * UnsafeUtility.SizeOf<SizeBin>());
+            UnsafeUtility.MemMove(p + index, p + (index + 1), tail * UnsafeUtility.SizeOf<SizeBin>());
             m_SizeBins.ResizeUninitialized(m_SizeBins.Length - 1);
 
             m_BlocksFreelist.Add(bin.blocksId);
@@ -567,8 +633,10 @@ namespace Unity.Rendering
             int index = FindSmallestSufficientBin(bin);
 
 #if DEBUG_ASSERTS
-            Assert.IsTrue(index >= 0 && m_SizeBins[index].sizeClass == bin.sizeClass,
-                "Expected to find exact match for size bin since block was supposed to exist");
+            Assert.IsTrue(
+                index >= 0 && m_SizeBins[index].sizeClass == bin.sizeClass,
+                "Expected to find exact match for size bin since block was supposed to exist"
+            );
 #endif
 
             bool removed = m_Blocks[m_SizeBins[index].blocksId].Remove(block);
@@ -586,15 +654,14 @@ namespace Unity.Rendering
             if (m_FreeEndpoints.TryGetValue(endpoint, out ulong otherEnd))
             {
 #if DEBUG_ASSERTS
-                if (math.min(endpoint, otherEnd) == block.begin &&
-                    math.max(endpoint, otherEnd) == block.end)
+                if (math.min(endpoint, otherEnd) == block.begin && math.max(endpoint, otherEnd) == block.end)
                 {
                     UnityEngine.Debug.Log("Inconsistent free block endpoint data");
                 }
                 Assert.IsFalse(
-                    math.min(endpoint, otherEnd) == block.begin &&
-                    math.max(endpoint, otherEnd) == block.end,
-                    "Block was already freed.");
+                    math.min(endpoint, otherEnd) == block.begin && math.max(endpoint, otherEnd) == block.end,
+                    "Block was already freed."
+                );
 #endif
 
                 if (endpoint == block.begin)
@@ -625,7 +692,7 @@ namespace Unity.Rendering
         private HeapBlock Coalesce(HeapBlock block)
         {
             block = Coalesce(block, block.begin); // Left
-            block = Coalesce(block, block.end);   // Right
+            block = Coalesce(block, block.end); // Right
             return block;
         }
 

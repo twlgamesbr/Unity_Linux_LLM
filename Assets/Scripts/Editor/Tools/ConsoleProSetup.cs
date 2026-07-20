@@ -62,9 +62,7 @@ namespace NPCSystem.Editor.Tools
 
             if (allGood)
             {
-                Debug.Log(
-                    "[ConsoleProSetup] ✅ Console Pro setup complete. See guide below for shared settings."
-                );
+                Debug.Log("[ConsoleProSetup] ✅ Console Pro setup complete. See guide below for shared settings.");
             }
 
             // Print guide
@@ -83,11 +81,7 @@ namespace NPCSystem.Editor.Tools
 
             if (existing != null)
             {
-                EditorUtility.DisplayDialog(
-                    "Console Pro",
-                    "ConsoleProRemoteServer already exists in scene.",
-                    "OK"
-                );
+                EditorUtility.DisplayDialog("Console Pro", "ConsoleProRemoteServer already exists in scene.", "OK");
                 return;
             }
 
@@ -127,10 +121,7 @@ namespace NPCSystem.Editor.Tools
             var windowType = FindConsoleProWindowType();
             if (windowType != null)
             {
-                var getWindow = windowType.GetMethod(
-                    "GetWindow",
-                    BindingFlags.Public | BindingFlags.Static
-                );
+                var getWindow = windowType.GetMethod("GetWindow", BindingFlags.Public | BindingFlags.Static);
                 getWindow?.Invoke(null, null);
             }
             else
@@ -221,15 +212,9 @@ namespace NPCSystem.Editor.Tools
                             );
                             foreach (var m in methods)
                             {
-                                if (
-                                    m.Name.Contains("Add")
-                                    || m.Name.Contains("Create")
-                                    || m.Name.Contains("Import")
-                                )
+                                if (m.Name.Contains("Add") || m.Name.Contains("Create") || m.Name.Contains("Import"))
                                 {
-                                    Debug.Log(
-                                        $"[ConsoleProSetup] Discovered Console Pro API: {t.Name}.{m.Name}()"
-                                    );
+                                    Debug.Log($"[ConsoleProSetup] Discovered Console Pro API: {t.Name}.{m.Name}()");
                                 }
                             }
                         }
@@ -238,9 +223,7 @@ namespace NPCSystem.Editor.Tools
             }
             catch (Exception ex)
             {
-                Debug.Log(
-                    $"[ConsoleProSetup] Console Pro custom filter auto-setup: {ex.Message} (non-critical)"
-                );
+                Debug.Log($"[ConsoleProSetup] Console Pro custom filter auto-setup: {ex.Message} (non-critical)");
             }
 
             Debug.Log(
@@ -346,11 +329,9 @@ namespace NPCSystem.Editor.Tools
         /// Public forwarding — ConsoleProIntegration's methods are private.
         /// We need public wrappers for the setup tool to call them.
         /// </summary>
-        public static bool EnsureScriptingDefinePublic() =>
-            ConsoleProIntegration.EnsureScriptingDefine();
+        public static bool EnsureScriptingDefinePublic() => ConsoleProIntegration.EnsureScriptingDefine();
 
-        public static string VerifyInstallationPublic() =>
-            ConsoleProIntegration.VerifyInstallation();
+        public static string VerifyInstallationPublic() => ConsoleProIntegration.VerifyInstallation();
 
         // Custom editor to show the guide in a window
         [MenuItem("Tools/Console Pro/Show Setup Guide", false, 200)]

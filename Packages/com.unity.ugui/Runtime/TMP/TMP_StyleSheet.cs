@@ -1,12 +1,12 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-
+using UnityEngine;
 
 namespace TMPro
 {
     [TMPHelpURL("StyleSheets")]
-    [Serializable][ExcludeFromPresetAttribute]
+    [Serializable]
+    [ExcludeFromPresetAttribute]
     public class TMP_StyleSheet : ScriptableObject
     {
         /// <summary>
@@ -99,11 +99,10 @@ namespace TMPro
                 m_StyleLookupDictionary.Add(normalStyleHashCode, style);
             }
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             //// Event to update objects when styles are changed in the editor.
             TMPro_EventManager.ON_TEXT_STYLE_PROPERTY_CHANGED(true);
-            #endif
+#endif
         }
     }
-
 }

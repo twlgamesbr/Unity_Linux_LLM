@@ -11,7 +11,8 @@ public class CSharpCompilerErrorCodeFixTests
     [TestMethod]
     public async Task CS1654_ModifyingValueTypeElementsNotClassifiedAsVariables()
     {
-        const string faultyCode = @"
+        const string faultyCode =
+            @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 using static Unity.Entities.SystemAPI;
@@ -27,7 +28,8 @@ public class CSharpCompilerErrorCodeFixTests
                     }
                 }";
 
-        const string fixedCode = @"
+        const string fixedCode =
+            @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 using static Unity.Entities.SystemAPI;
@@ -47,13 +49,15 @@ public class CSharpCompilerErrorCodeFixTests
         await CSharpCodeFixVerifier<BlobAssetAnalyzer, EntitiesCodeFixProvider>.VerifyCodeFixAsync(
             faultyCode,
             DiagnosticResult.CompilerError("CS1654").WithLocation(0).WithArguments("db", "foreach iteration variable"),
-            fixedCode);
+            fixedCode
+        );
     }
 
     [TestMethod]
     public async Task CS1654_ModifyingValueTypeElementsNotClassifiedAsVariables_EdgeCase()
     {
-        const string faultyCode = @"
+        const string faultyCode =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             using static Unity.Entities.SystemAPI;
@@ -69,7 +73,8 @@ public class CSharpCompilerErrorCodeFixTests
                 }
             }";
 
-        const string fixedCode = @"
+        const string fixedCode =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             using static Unity.Entities.SystemAPI;
@@ -87,8 +92,19 @@ public class CSharpCompilerErrorCodeFixTests
                 }
             }";
 
-        var expected1 = DiagnosticResult.CompilerError("CS1654").WithLocation(0).WithArguments("a", "foreach iteration variable");
-        var expected2 = DiagnosticResult.CompilerError("CS1654").WithLocation(1).WithArguments("b", "foreach iteration variable");
-        await CSharpCodeFixVerifier<BlobAssetAnalyzer, EntitiesCodeFixProvider>.VerifyCodeFixAsync(faultyCode, new []{expected1, expected2}, fixedCode, numIterationsExpected: 2);
+        var expected1 = DiagnosticResult
+            .CompilerError("CS1654")
+            .WithLocation(0)
+            .WithArguments("a", "foreach iteration variable");
+        var expected2 = DiagnosticResult
+            .CompilerError("CS1654")
+            .WithLocation(1)
+            .WithArguments("b", "foreach iteration variable");
+        await CSharpCodeFixVerifier<BlobAssetAnalyzer, EntitiesCodeFixProvider>.VerifyCodeFixAsync(
+            faultyCode,
+            new[] { expected1, expected2 },
+            fixedCode,
+            numIterationsExpected: 2
+        );
     }
 }

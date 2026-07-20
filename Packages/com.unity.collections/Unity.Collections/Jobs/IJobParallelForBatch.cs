@@ -1,13 +1,13 @@
 using System;
-using Unity.Jobs.LowLevel.Unsafe;
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Collections;
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs.LowLevel.Unsafe;
 
 namespace Unity.Jobs
 {
     /// <summary>
-    /// Job type allowing for data to be operated on in parallel batches. 
+    /// Job type allowing for data to be operated on in parallel batches.
     /// </summary>
     /// <remarks>
     /// When scheduling an IJobParallelForBatch job the number of elements to work on is specified along with a batch size. Jobs will then run in parallel
@@ -29,29 +29,51 @@ namespace Unity.Jobs
     /// </summary>
     public static class IJobParallelForBatchExtensions
     {
-        internal struct JobParallelForBatchProducer<T> where T : struct, IJobParallelForBatch
+        internal struct JobParallelForBatchProducer<T>
+            where T : struct, IJobParallelForBatch
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<JobParallelForBatchProducer<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                JobParallelForBatchProducer<T>
+            >();
 
             [BurstDiscard]
             internal static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
-            internal delegate void ExecuteJobFunction(ref T jobData, IntPtr additionalPtr, IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
-            public unsafe static void Execute(ref T jobData, IntPtr additionalPtr, IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            internal delegate void ExecuteJobFunction(
+                ref T jobData,
+                IntPtr additionalPtr,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
+
+            public static unsafe void Execute(
+                ref T jobData,
+                IntPtr additionalPtr,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
-                    if (!JobsUtility.GetWorkStealingRange(
-                        ref ranges,
-                        jobIndex, out int begin, out int end))
+                    if (!JobsUtility.GetWorkStealingRange(ref ranges, jobIndex, out int begin, out int end))
                         return;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData), begin, end - begin);
+                    JobsUtility.PatchBufferMinMaxRanges(
+                        bufferRangePatchData,
+                        UnsafeUtility.AddressOf(ref jobData),
+                        begin,
+                        end - begin
+                    );
 #endif
 
                     jobData.Execute(begin, end - begin);
@@ -65,7 +87,7 @@ namespace Unity.Jobs
         /// <typeparam name="T"></typeparam>
         /// <remarks>
         /// When the Jobs package is included in the project, Unity generates code to call EarlyJobInit at startup. This allows Burst compiled code to schedule jobs because the reflection part of initialization, which is not compatible with burst compiler constraints, has already happened in EarlyJobInit.
-        /// 
+        ///
         /// __Note__: While the Jobs package code generator handles this automatically for all closed job types, you must register those with generic arguments (like IJobParallelForBatch&amp;lt;MyJobType&amp;lt;T&amp;gt;&amp;gt;) manually for each specialization with [[Unity.Jobs.RegisterGenericJobTypeAttribute]].
         /// </remarks>
         public static void EarlyJobInit<T>()
@@ -94,10 +116,20 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle Schedule<T>(this T jobData, int arrayLength, int indicesPerJobCount,
-            JobHandle dependsOn = new JobHandle()) where T : struct, IJobParallelForBatch
+        public static unsafe JobHandle Schedule<T>(
+            this T jobData,
+            int arrayLength,
+            int indicesPerJobCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobParallelForBatch
         {
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobData), GetReflectionData<T>(), dependsOn, ScheduleMode.Single);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobData),
+                GetReflectionData<T>(),
+                dependsOn,
+                ScheduleMode.Single
+            );
             return JobsUtility.ScheduleParallelFor(ref scheduleParams, arrayLength, indicesPerJobCount);
         }
 
@@ -113,10 +145,20 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleByRef<T>(this ref T jobData, int arrayLength, int indicesPerJobCount,
-            JobHandle dependsOn = new JobHandle()) where T : struct, IJobParallelForBatch
+        public static unsafe JobHandle ScheduleByRef<T>(
+            this ref T jobData,
+            int arrayLength,
+            int indicesPerJobCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobParallelForBatch
         {
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobData), GetReflectionData<T>(), dependsOn, ScheduleMode.Single);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobData),
+                GetReflectionData<T>(),
+                dependsOn,
+                ScheduleMode.Single
+            );
             return JobsUtility.ScheduleParallelFor(ref scheduleParams, arrayLength, indicesPerJobCount);
         }
 
@@ -131,10 +173,20 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleParallel<T>(this T jobData, int arrayLength, int indicesPerJobCount,
-            JobHandle dependsOn = new JobHandle()) where T : struct, IJobParallelForBatch
+        public static unsafe JobHandle ScheduleParallel<T>(
+            this T jobData,
+            int arrayLength,
+            int indicesPerJobCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobParallelForBatch
         {
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobData), GetReflectionData<T>(), dependsOn, ScheduleMode.Parallel);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobData),
+                GetReflectionData<T>(),
+                dependsOn,
+                ScheduleMode.Parallel
+            );
             return JobsUtility.ScheduleParallelFor(ref scheduleParams, arrayLength, indicesPerJobCount);
         }
 
@@ -150,10 +202,20 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleParallelByRef<T>(this ref T jobData, int arrayLength, int indicesPerJobCount,
-            JobHandle dependsOn = new JobHandle()) where T : struct, IJobParallelForBatch
+        public static unsafe JobHandle ScheduleParallelByRef<T>(
+            this ref T jobData,
+            int arrayLength,
+            int indicesPerJobCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobParallelForBatch
         {
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobData), GetReflectionData<T>(), dependsOn, ScheduleMode.Parallel);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobData),
+                GetReflectionData<T>(),
+                dependsOn,
+                ScheduleMode.Parallel
+            );
             return JobsUtility.ScheduleParallelFor(ref scheduleParams, arrayLength, indicesPerJobCount);
         }
 
@@ -168,8 +230,13 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleBatch<T>(this T jobData, int arrayLength, int indicesPerJobCount,
-            JobHandle dependsOn = new JobHandle()) where T : struct, IJobParallelForBatch
+        public static unsafe JobHandle ScheduleBatch<T>(
+            this T jobData,
+            int arrayLength,
+            int indicesPerJobCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobParallelForBatch
         {
             return ScheduleParallel(jobData, arrayLength, indicesPerJobCount, dependsOn);
         }
@@ -186,8 +253,13 @@ namespace Unity.Jobs
         /// <param name="dependsOn">Dependencies are used to ensure that a job executes on workerthreads after the dependency has completed execution. Making sure that two jobs reading or writing to same data do not run in parallel.</param>
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe JobHandle ScheduleBatchByRef<T>(this ref T jobData, int arrayLength, int indicesPerJobCount,
-            JobHandle dependsOn = new JobHandle()) where T : struct, IJobParallelForBatch
+        public static unsafe JobHandle ScheduleBatchByRef<T>(
+            this ref T jobData,
+            int arrayLength,
+            int indicesPerJobCount,
+            JobHandle dependsOn = new JobHandle()
+        )
+            where T : struct, IJobParallelForBatch
         {
             return ScheduleParallelByRef(ref jobData, arrayLength, indicesPerJobCount, dependsOn);
         }
@@ -202,9 +274,15 @@ namespace Unity.Jobs
         /// <remarks>
         /// Unlike Schedule, since the job is running on the main thread no parallelization occurs and thus no `indicesPerJobCount` batch size is required to be specified.
         /// </remarks>
-        public static unsafe void Run<T>(this T jobData, int arrayLength, int indicesPerJobCount) where T : struct, IJobParallelForBatch
+        public static unsafe void Run<T>(this T jobData, int arrayLength, int indicesPerJobCount)
+            where T : struct, IJobParallelForBatch
         {
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobData), GetReflectionData<T>(), new JobHandle(), ScheduleMode.Run);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobData),
+                GetReflectionData<T>(),
+                new JobHandle(),
+                ScheduleMode.Run
+            );
             JobsUtility.ScheduleParallelFor(ref scheduleParams, arrayLength, arrayLength);
         }
 
@@ -216,9 +294,15 @@ namespace Unity.Jobs
         /// <param name="arrayLength">Total number of elements to consider when batching.</param>
         /// <param name="indicesPerJobCount">Number of elements to consider in a single parallel batch. This argument is ignored when using .RunByRef()</param>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe void RunByRef<T>(this ref T jobData, int arrayLength, int indicesPerJobCount) where T : struct, IJobParallelForBatch
+        public static unsafe void RunByRef<T>(this ref T jobData, int arrayLength, int indicesPerJobCount)
+            where T : struct, IJobParallelForBatch
         {
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobData), GetReflectionData<T>(), new JobHandle(), ScheduleMode.Run);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobData),
+                GetReflectionData<T>(),
+                new JobHandle(),
+                ScheduleMode.Run
+            );
             JobsUtility.ScheduleParallelFor(ref scheduleParams, arrayLength, arrayLength);
         }
 
@@ -231,7 +315,8 @@ namespace Unity.Jobs
         /// <remarks>
         /// Unlike ScheduleBatch, since the job is running on the main thread no parallelization occurs and thus no `indicesPerJobCount` batch size is required to be specified.
         /// </remarks>
-        public static unsafe void RunBatch<T>(this T jobData, int arrayLength) where T : struct, IJobParallelForBatch
+        public static unsafe void RunBatch<T>(this T jobData, int arrayLength)
+            where T : struct, IJobParallelForBatch
         {
             Run(jobData, arrayLength, arrayLength);
         }
@@ -243,7 +328,8 @@ namespace Unity.Jobs
         /// passed by reference, which may be necessary for unusually large job structs.</param>
         /// <param name="arrayLength">Total number of elements to consider when batching.</param>
         /// <typeparam name="T">Job type</typeparam>
-        public static unsafe void RunBatchByRef<T>(this ref T jobData, int arrayLength) where T : struct, IJobParallelForBatch
+        public static unsafe void RunBatchByRef<T>(this ref T jobData, int arrayLength)
+            where T : struct, IJobParallelForBatch
         {
             RunByRef(ref jobData, arrayLength, arrayLength);
         }

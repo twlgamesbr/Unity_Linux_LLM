@@ -2,10 +2,10 @@ using System;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.DebugDisplay;
-using Unity.Mathematics;
-using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace Unity.Physics.Authoring
 {
@@ -16,18 +16,14 @@ namespace Unity.Physics.Authoring
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.Default)]
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    public partial class PhysicsDebugDisplayGroup : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsDebugDisplayGroup : ComponentSystemGroup { }
 
     /// <summary>
     /// A component system group that contains the physics debug display systems while in edit mode.
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.Editor)]
     [UpdateAfter(typeof(TransformSystemGroup))]
-    public partial class PhysicsDebugDisplayGroup_Editor : ComponentSystemGroup
-    {
-    }
+    public partial class PhysicsDebugDisplayGroup_Editor : ComponentSystemGroup { }
 
     /// <summary>
     /// Debug draw singleton component with functions used for drawing debug display.
@@ -110,7 +106,11 @@ namespace Unity.Physics.Authoring
         /// <param name="vertices"> An array of vertices. </param>
         /// <param name="triangleIndices"> An array of triangle indices pointing into the vertices array. A triangle is drawn from every triplet of triangle indices. </param>
         /// <param name="color"> Color. </param>
-        public void TriangleEdges(in NativeArray<float3> vertices, in NativeArray<int> triangleIndices, ColorIndex color)
+        public void TriangleEdges(
+            in NativeArray<float3> vertices,
+            in NativeArray<int> triangleIndices,
+            ColorIndex color
+        )
         {
             var lines = new Lines(triangleIndices.Length, m_DrawData);
             for (int i = 0; i < triangleIndices.Length; i += 3)
@@ -373,16 +373,13 @@ namespace Unity.Physics.Authoring
             {
                 m_DrawComponentGameObject = new GameObject("PhysicsDebugDisplaySystem")
                 {
-                    hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy
+                    hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy,
                 };
 
                 // Note: we are adding an additional child here so that we can hide the parent in the hierarchy
                 // without hiding the child, which would prevent the OnDrawGizmos method on the DrawComponent in the child
                 // from being called.
-                var childGameObject = new GameObject("DrawComponent")
-                {
-                    hideFlags = HideFlags.DontSave
-                };
+                var childGameObject = new GameObject("DrawComponent") { hideFlags = HideFlags.DontSave };
                 childGameObject.transform.parent = m_DrawComponentGameObject.transform;
 
                 var drawComponent = childGameObject.AddComponent<DrawComponent>();
@@ -425,9 +422,7 @@ namespace Unity.Physics.Authoring
 #endif
         }
 
-        protected override void OnUpdate()
-        {
-        }
+        protected override void OnUpdate() { }
 
         /// <summary>
         ///  Completes dependencies for all systems in the physics debug display groups, which ensures that the debug display
@@ -463,8 +458,7 @@ namespace Unity.Physics.Authoring
     [WorldSystemFilter(WorldSystemFilterFlags.Default)]
     [UpdateInGroup(typeof(PhysicsDebugDisplayGroup), OrderLast = true)]
     [RequireMatchingQueriesForUpdate]
-    public partial class PhysicsDebugDisplaySystem_Default : PhysicsDebugDisplaySystem
-    {}
+    public partial class PhysicsDebugDisplaySystem_Default : PhysicsDebugDisplaySystem { }
 
     /// <summary>
     /// Draws physics debug display data while in edit mode.
@@ -472,8 +466,7 @@ namespace Unity.Physics.Authoring
     [WorldSystemFilter(WorldSystemFilterFlags.Editor)]
     [UpdateInGroup(typeof(PhysicsDebugDisplayGroup_Editor), OrderLast = true)]
     [RequireMatchingQueriesForUpdate]
-    public partial class PhysicsDebugDisplaySystem_Editor : PhysicsDebugDisplaySystem
-    {}
+    public partial class PhysicsDebugDisplaySystem_Editor : PhysicsDebugDisplaySystem { }
 
     #region Deprecated
 
@@ -484,10 +477,11 @@ namespace Unity.Physics.Authoring
     [DisableAutoCreation]
     [WorldSystemFilter(WorldSystemFilterFlags.Default)]
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    [Obsolete("PhysicsDisplayDebugGroup has been deprecated (RemovedAfter 2023-05-04). Use PhysicsDebugDisplayGroup instead. (UnityUpgradable) -> PhysicsDebugDisplayGroup", true)]
-    public partial class PhysicsDisplayDebugGroup : ComponentSystemGroup
-    {
-    }
+    [Obsolete(
+        "PhysicsDisplayDebugGroup has been deprecated (RemovedAfter 2023-05-04). Use PhysicsDebugDisplayGroup instead. (UnityUpgradable) -> PhysicsDebugDisplayGroup",
+        true
+    )]
+    public partial class PhysicsDisplayDebugGroup : ComponentSystemGroup { }
 
     partial class PhysicsDebugDisplaySystem
     {
@@ -498,7 +492,10 @@ namespace Unity.Physics.Authoring
         /// <param name="x"> World space position. </param>
         /// <param name="size"> Extents. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Point has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Point instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Point has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Point instead.",
+            true
+        )]
         public static void Point(float3 x, float size, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -511,7 +508,10 @@ namespace Unity.Physics.Authoring
         /// <param name="x0"> Point 0 in world space. </param>
         /// <param name="x1"> Point 1 in world space. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Line has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Line instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Line has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Line instead.",
+            true
+        )]
         public static void Line(float3 x0, float3 x1, Unity.DebugDisplay.ColorIndex color)
         {
             throw new NotImplementedException();
@@ -524,7 +524,10 @@ namespace Unity.Physics.Authoring
         /// <param name="lineVertices"> A pointer to a vertices array containing a sequence of point pairs. A line is drawn between every pair of points. </param>
         /// <param name="numVertices"> Number of vertices. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Lines has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Lines instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Lines has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Lines instead.",
+            true
+        )]
         public static unsafe void Lines(float3* lineVertices, int numVertices, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -536,7 +539,10 @@ namespace Unity.Physics.Authoring
         /// </summary>
         /// <param name="lineVertices"> A list of vertices containing a sequence of point pairs. A line is drawn between every pair of points. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Lines has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Lines instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Lines has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Lines instead.",
+            true
+        )]
         public static void Lines(in NativeList<float3> lineVertices, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -548,7 +554,10 @@ namespace Unity.Physics.Authoring
         /// </summary>
         /// <param name="lineVertices"> An array of vertices containing a sequence of point pairs. A line is drawn between every pair of points. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Lines has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Lines instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Lines has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Lines instead.",
+            true
+        )]
         public static void Lines(in NativeArray<float3> lineVertices, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -561,9 +570,15 @@ namespace Unity.Physics.Authoring
         /// <param name="vertices"> An array of vertices. </param>
         /// <param name="triangleIndices"> An array of triangle indices pointing into the vertices array. A triangle is drawn from every triplet of triangle indices. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.TriangleEdges has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.TriangleEdges instead.", true)]
-        public static void TriangleEdges(in NativeArray<float3> vertices, in NativeArray<int> triangleIndices,
-            ColorIndex color)
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.TriangleEdges has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.TriangleEdges instead.",
+            true
+        )]
+        public static void TriangleEdges(
+            in NativeArray<float3> vertices,
+            in NativeArray<int> triangleIndices,
+            ColorIndex color
+        )
         {
             throw new NotImplementedException();
         }
@@ -575,7 +590,10 @@ namespace Unity.Physics.Authoring
         /// <param name="x"> World space position of the arrow base. </param>
         /// <param name="v"> Arrow direction with length. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Arrow has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Arrow instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Arrow has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Arrow instead.",
+            true
+        )]
         public static void Arrow(float3 x, float3 v, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -588,7 +606,10 @@ namespace Unity.Physics.Authoring
         /// <param name="x"> Point in world space. </param>
         /// <param name="v"> Normal. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Plane has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Plane instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Plane has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Plane instead.",
+            true
+        )]
         public static void Plane(float3 x, float3 v, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -603,9 +624,17 @@ namespace Unity.Physics.Authoring
         /// <param name="arm"> Arc arm. </param>
         /// <param name="angle"> Arc angle. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Arc has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Arc instead.", true)]
-        public static void Arc(float3 center, float3 normal, float3 arm, float angle,
-            Unity.DebugDisplay.ColorIndex color)
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Arc has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Arc instead.",
+            true
+        )]
+        public static void Arc(
+            float3 center,
+            float3 normal,
+            float3 arm,
+            float angle,
+            Unity.DebugDisplay.ColorIndex color
+        )
         {
             throw new NotImplementedException();
         }
@@ -618,7 +647,10 @@ namespace Unity.Physics.Authoring
         /// <param name="axis"> Cone axis. </param>
         /// <param name="angle"> Cone angle. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Cone has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Cone instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Cone has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Cone instead.",
+            true
+        )]
         public static void Cone(float3 point, float3 axis, float angle, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -632,7 +664,10 @@ namespace Unity.Physics.Authoring
         /// <param name="center"> Center of the box in world space. </param>
         /// <param name="orientation"> Orientation of the box in world space. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Box has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Box instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Box has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Box instead.",
+            true
+        )]
         public static void Box(float3 size, float3 center, quaternion orientation, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -645,8 +680,15 @@ namespace Unity.Physics.Authoring
         /// <param name="vertices"> An array of vertices. </param>
         /// <param name="triangleIndices"> An array of triangle indices pointing into the vertices array. A triangle is drawn from every triplet of triangle indices. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.", true)]
-        public static void Triangles(in NativeArray<float3> vertices, in NativeArray<int> triangleIndices, ColorIndex color)
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.",
+            true
+        )]
+        public static void Triangles(
+            in NativeArray<float3> vertices,
+            in NativeArray<int> triangleIndices,
+            ColorIndex color
+        )
         {
             throw new NotImplementedException();
         }
@@ -658,7 +700,10 @@ namespace Unity.Physics.Authoring
         /// <param name="vertices"> An array containing a sequence of vertex triplets. A triangle is drawn from every triplet of vertices. </param>
         /// <param name="numVertices"> Number of vertices. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.",
+            true
+        )]
         public static unsafe void Triangles(float3* vertices, int numVertices, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -670,7 +715,10 @@ namespace Unity.Physics.Authoring
         /// </summary>
         /// <param name="vertices"> A list containing a sequence of vertex triplets. A triangle is drawn from every triplet of vertices. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.",
+            true
+        )]
         public static void Triangles(in NativeList<float3> vertices, ColorIndex color)
         {
             throw new NotImplementedException();
@@ -682,7 +730,10 @@ namespace Unity.Physics.Authoring
         /// </summary>
         /// <param name="vertices"> An array containing a sequence of vertex triplets. A triangle is drawn from every triplet of vertices. </param>
         /// <param name="color"> Color. </param>
-        [Obsolete("PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.", true)]
+        [Obsolete(
+            "PhysicsDebugDisplaySystem.Triangles has been deprecated (RemovedAfter 2024-06-11). Use DebugDraw.Triangles instead.",
+            true
+        )]
         public static void Triangles(in NativeArray<float3> vertices, ColorIndex color)
         {
             throw new NotImplementedException();

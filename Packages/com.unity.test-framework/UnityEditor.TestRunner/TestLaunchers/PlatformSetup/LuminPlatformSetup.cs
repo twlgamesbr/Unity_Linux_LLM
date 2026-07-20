@@ -7,17 +7,11 @@ namespace UnityEditor.TestTools.TestRunner
         private const string kDeviceAddress = "127.0.0.1";
         private const int kDevicePort = 55000;
 
-        public void Setup()
-        {
-        }
+        public void Setup() { }
 
-        public void PostBuildAction()
-        {
-        }
+        public void PostBuildAction() { }
 
-        public void PostSuccessfulBuildAction()
-        {
-        }
+        public void PostSuccessfulBuildAction() { }
 
         public void PostSuccessfulLaunchAction()
         {
@@ -28,8 +22,13 @@ namespace UnityEditor.TestTools.TestRunner
             {
                 Thread.Sleep(1000);
                 connectionResult = EditorConnectionInternal.ConnectPlayerProxy(kDeviceAddress, kDevicePort);
-                if (EditorUtility.DisplayCancelableProgressBar("Editor Connection", "Connecting to the player",
-                    1 - ((float)tryCount / maxTryCount)))
+                if (
+                    EditorUtility.DisplayCancelableProgressBar(
+                        "Editor Connection",
+                        "Connecting to the player",
+                        1 - ((float)tryCount / maxTryCount)
+                    )
+                )
                 {
                     EditorUtility.ClearProgressBar();
                     throw new TestLaunchFailedException();
@@ -38,11 +37,10 @@ namespace UnityEditor.TestTools.TestRunner
             EditorUtility.ClearProgressBar();
             if (connectionResult == -1)
                 throw new TestLaunchFailedException(
-                    "Timed out trying to connect to the player. Player failed to launch or crashed soon after launching");
+                    "Timed out trying to connect to the player. Player failed to launch or crashed soon after launching"
+                );
         }
 
-        public void CleanUp()
-        {
-        }
+        public void CleanUp() { }
     }
 }

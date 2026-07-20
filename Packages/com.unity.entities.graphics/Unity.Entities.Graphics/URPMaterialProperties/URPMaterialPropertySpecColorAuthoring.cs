@@ -13,14 +13,18 @@ namespace Unity.Rendering
     [UnityEngine.DisallowMultipleComponent]
     public class URPMaterialPropertySpecColorAuthoring : UnityEngine.MonoBehaviour
     {
-        [Unity.Entities.RegisterBinding(typeof(URPMaterialPropertySpecColor), nameof(URPMaterialPropertySpecColor.Value))]
+        [Unity.Entities.RegisterBinding(
+            typeof(URPMaterialPropertySpecColor),
+            nameof(URPMaterialPropertySpecColor.Value)
+        )]
         public UnityEngine.Color color;
 
         class URPMaterialPropertySpecColorBaker : Unity.Entities.Baker<URPMaterialPropertySpecColorAuthoring>
         {
             public override void Bake(URPMaterialPropertySpecColorAuthoring authoring)
             {
-                Unity.Rendering.URPMaterialPropertySpecColor component = default(Unity.Rendering.URPMaterialPropertySpecColor);
+                Unity.Rendering.URPMaterialPropertySpecColor component =
+                    default(Unity.Rendering.URPMaterialPropertySpecColor);
                 float4 colorValues;
                 colorValues.x = authoring.color.linear.r;
                 colorValues.y = authoring.color.linear.g;

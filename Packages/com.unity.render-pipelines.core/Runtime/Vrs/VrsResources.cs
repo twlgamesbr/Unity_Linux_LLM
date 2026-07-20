@@ -105,21 +105,29 @@ namespace UnityEngine.Rendering
 
             foreach (var availableFragmentSize in ShadingRateInfo.availableFragmentSizes)
             {
-                Array.Fill(fragmentSize,
+                Array.Fill(
+                    fragmentSize,
                     fragmentSizeNativeValue,
                     (int)lastAvailableFragmentSize,
-                    availableFragmentSize - lastAvailableFragmentSize + 1);
+                    availableFragmentSize - lastAvailableFragmentSize + 1
+                );
 
                 lastAvailableFragmentSize = availableFragmentSize;
                 fragmentSizeNativeValue = ShadingRateInfo.QueryNativeValue(lastAvailableFragmentSize);
             }
 
-            Array.Fill(fragmentSize,
+            Array.Fill(
+                fragmentSize,
                 fragmentSizeNativeValue,
                 (int)lastAvailableFragmentSize,
-                ShadingRateFragmentSize.FragmentSize4x4 - lastAvailableFragmentSize + 1);
+                ShadingRateFragmentSize.FragmentSize4x4 - lastAvailableFragmentSize + 1
+            );
 
-            validatedShadingRateFragmentSizeBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, fragmentSize.Length, sizeof(uint));
+            validatedShadingRateFragmentSizeBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                fragmentSize.Length,
+                sizeof(uint)
+            );
             validatedShadingRateFragmentSizeBuffer.SetData(fragmentSize);
         }
 
@@ -169,6 +177,7 @@ namespace UnityEngine.Rendering
             return true;
         }
 
-        static int TryFindKernel(ComputeShader computeShader, string name) => computeShader.HasKernel(name) ? computeShader.FindKernel(name) : -1;
+        static int TryFindKernel(ComputeShader computeShader, string name) =>
+            computeShader.HasKernel(name) ? computeShader.FindKernel(name) : -1;
     }
 }

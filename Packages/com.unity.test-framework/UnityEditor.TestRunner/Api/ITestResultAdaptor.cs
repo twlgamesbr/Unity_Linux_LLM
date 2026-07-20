@@ -13,10 +13,12 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// The test details of the test result tree node as a <see cref="TestAdaptor"/>
         /// </summary>
         ITestAdaptor Test { get; }
+
         ///<summary>
         ///The name of the test node.
         ///</summary>
         string Name { get; }
+
         /// <summary>
         /// Gets the full name of the test result
         /// </summary>
@@ -24,6 +26,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         ///The name of the test result.
         ///</value>
         string FullName { get; }
+
         ///<summary>
         ///Gets the state of the result as a string.
         ///</summary>
@@ -31,6 +34,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         ///It returns one of these values: `Inconclusive`, `Skipped`, `Skipped:Ignored`, `Skipped:Explicit`, `Passed`, `Failed`, `Failed:Error`, `Failed:Cancelled`, `Failed:Invalid`
         ///</value>
         string ResultState { get; }
+
         ///<summary>
         ///Gets the status of the test as an enum.
         ///</summary>
@@ -38,6 +42,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         ///It returns one of these values:`Inconclusive`, `Skipped`, `Passed`, or `Failed`
         ///</value>
         TestStatus TestStatus { get; }
+
         /// <summary>
         /// Gets the elapsed time for running the test in seconds
         /// </summary>
@@ -45,6 +50,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// Time in seconds.
         /// </value>
         double Duration { get; }
+
         /// <summary>
         /// Gets or sets the time the test started running.
         /// </summary>
@@ -52,6 +58,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         ///A DataTime object.
         ///</value>
         DateTime StartTime { get; }
+
         ///<summary>
         ///Gets or sets the time the test finished running.
         ///</summary>
@@ -110,6 +117,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// Gets any text output written to this result.
         /// </summary>
         string Output { get; }
+
         /// <summary>
         /// Use this to save the results to an XML file
         /// </summary>

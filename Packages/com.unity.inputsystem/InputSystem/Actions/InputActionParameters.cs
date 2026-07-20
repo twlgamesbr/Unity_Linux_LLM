@@ -73,7 +73,11 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="ApplyParameterOverride(InputActionMap,string,PrimitiveValue,InputBinding)"/>
         /// <seealso cref="ApplyBindingOverride(InputAction,string,string,string)"/>
         /// <seealso cref="Editor.InputParameterEditor"/>
-        public static PrimitiveValue? GetParameterValue(this InputAction action, string name, InputBinding bindingMask = default)
+        public static PrimitiveValue? GetParameterValue(
+            this InputAction action,
+            string name,
+            InputBinding bindingMask = default
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -89,7 +93,13 @@ namespace UnityEngine.InputSystem
 
             var actionMap = action.GetOrCreateActionMap();
             actionMap.ResolveBindingsIfNecessary();
-            foreach (var parameter in new ParameterEnumerable(actionMap.m_State, parameterOverride, actionMap.m_MapIndexInState))
+            foreach (
+                var parameter in new ParameterEnumerable(
+                    actionMap.m_State,
+                    parameterOverride,
+                    actionMap.m_MapIndexInState
+                )
+            )
             {
                 var value = parameter.field.GetValue(parameter.instance);
                 return PrimitiveValue.FromObject(value);
@@ -156,7 +166,11 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <exception cref="ArgumentNullException"><paramref name="action"/> is <c>null</c> -or- <paramref name="expr"/> is <c>null</c></exception>
         /// <seealso cref="ApplyParameterOverride{TObject,TValue}(InputAction,Expression{Func{TObject,TValue}},TValue,InputBinding)"/>
-        public static unsafe TValue? GetParameterValue<TObject, TValue>(this InputAction action, Expression<Func<TObject, TValue>> expr, InputBinding bindingMask = default)
+        public static unsafe TValue? GetParameterValue<TObject, TValue>(
+            this InputAction action,
+            Expression<Func<TObject, TValue>> expr,
+            InputBinding bindingMask = default
+        )
             where TValue : struct
         {
             if (action == null)
@@ -177,9 +191,7 @@ namespace UnityEngine.InputSystem
                 // Can't just cast here so use UnsafeUtility to work around that.
                 var v = value.Value;
                 var result = default(TValue);
-                UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref result),
-                    v.valuePtr,
-                    UnsafeUtility.SizeOf<TValue>());
+                UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref result), v.valuePtr, UnsafeUtility.SizeOf<TValue>());
                 return result;
             }
 
@@ -215,8 +227,12 @@ namespace UnityEngine.InputSystem
         /// </example>
         /// </remarks>
         /// <seealso cref="GetParameterValue{TObject,TValue}(InputAction,Expression{Func{TObject,TValue}},InputBinding)"/>
-        public static void ApplyParameterOverride<TObject, TValue>(this InputAction action, Expression<Func<TObject, TValue>> expr, TValue value,
-            InputBinding bindingMask = default)
+        public static void ApplyParameterOverride<TObject, TValue>(
+            this InputAction action,
+            Expression<Func<TObject, TValue>> expr,
+            TValue value,
+            InputBinding bindingMask = default
+        )
             where TValue : struct
         {
             if (action == null)
@@ -230,9 +246,13 @@ namespace UnityEngine.InputSystem
 
             var parameterOverride = ExtractParameterOverride(expr, bindingMask, PrimitiveValue.From(value));
 
-            ApplyParameterOverride(actionMap.m_State, actionMap.m_MapIndexInState,
-                ref actionMap.m_ParameterOverrides, ref actionMap.m_ParameterOverridesCount,
-                parameterOverride);
+            ApplyParameterOverride(
+                actionMap.m_State,
+                actionMap.m_MapIndexInState,
+                ref actionMap.m_ParameterOverrides,
+                ref actionMap.m_ParameterOverridesCount,
+                parameterOverride
+            );
         }
 
         /// <summary>
@@ -262,8 +282,12 @@ namespace UnityEngine.InputSystem
         /// </example>
         /// </remarks>
         /// <seealso cref="GetParameterValue{TObject,TValue}(InputAction,Expression{Func{TObject,TValue}},InputBinding)"/>
-        public static void ApplyParameterOverride<TObject, TValue>(this InputActionMap actionMap, Expression<Func<TObject, TValue>> expr, TValue value,
-            InputBinding bindingMask = default)
+        public static void ApplyParameterOverride<TObject, TValue>(
+            this InputActionMap actionMap,
+            Expression<Func<TObject, TValue>> expr,
+            TValue value,
+            InputBinding bindingMask = default
+        )
             where TValue : struct
         {
             if (actionMap == null)
@@ -275,9 +299,13 @@ namespace UnityEngine.InputSystem
 
             var parameterOverride = ExtractParameterOverride(expr, bindingMask, PrimitiveValue.From(value));
 
-            ApplyParameterOverride(actionMap.m_State, actionMap.m_MapIndexInState,
-                ref actionMap.m_ParameterOverrides, ref actionMap.m_ParameterOverridesCount,
-                parameterOverride);
+            ApplyParameterOverride(
+                actionMap.m_State,
+                actionMap.m_MapIndexInState,
+                ref actionMap.m_ParameterOverrides,
+                ref actionMap.m_ParameterOverridesCount,
+                parameterOverride
+            );
         }
 
         /// <summary>
@@ -308,8 +336,12 @@ namespace UnityEngine.InputSystem
         /// </example>
         /// </remarks>
         /// <seealso cref="GetParameterValue{TObject,TValue}(InputAction,Expression{Func{TObject,TValue}},InputBinding)"/>
-        public static void ApplyParameterOverride<TObject, TValue>(this InputActionAsset asset, Expression<Func<TObject, TValue>> expr, TValue value,
-            InputBinding bindingMask = default)
+        public static void ApplyParameterOverride<TObject, TValue>(
+            this InputActionAsset asset,
+            Expression<Func<TObject, TValue>> expr,
+            TValue value,
+            InputBinding bindingMask = default
+        )
             where TValue : struct
         {
             if (asset == null)
@@ -321,23 +353,37 @@ namespace UnityEngine.InputSystem
 
             var parameterOverride = ExtractParameterOverride(expr, bindingMask, PrimitiveValue.From(value));
 
-            ApplyParameterOverride(asset.m_SharedStateForAllMaps, -1,
-                ref asset.m_ParameterOverrides, ref asset.m_ParameterOverridesCount,
-                parameterOverride);
+            ApplyParameterOverride(
+                asset.m_SharedStateForAllMaps,
+                -1,
+                ref asset.m_ParameterOverrides,
+                ref asset.m_ParameterOverridesCount,
+                parameterOverride
+            );
         }
 
-        private static ParameterOverride ExtractParameterOverride<TObject, TValue>(Expression<Func<TObject, TValue>> expr,
-            InputBinding bindingMask = default, PrimitiveValue value = default)
+        private static ParameterOverride ExtractParameterOverride<TObject, TValue>(
+            Expression<Func<TObject, TValue>> expr,
+            InputBinding bindingMask = default,
+            PrimitiveValue value = default
+        )
         {
             if (!(expr is LambdaExpression lambda))
-                throw new ArgumentException($"Expression must be a LambdaExpression but was a {expr.GetType().Name} instead", nameof(expr));
+                throw new ArgumentException(
+                    $"Expression must be a LambdaExpression but was a {expr.GetType().Name} instead",
+                    nameof(expr)
+                );
 
             if (!(lambda.Body is MemberExpression body))
             {
                 // If the field type in the lambda doesn't match the TValue type being used,
                 // but there is a coercion, the compiler will automatically insert a Convert(x.name, TValue)
                 // expression.
-                if (lambda.Body is UnaryExpression unary && unary.NodeType == ExpressionType.Convert && unary.Operand is MemberExpression b)
+                if (
+                    lambda.Body is UnaryExpression unary
+                    && unary.NodeType == ExpressionType.Convert
+                    && unary.Operand is MemberExpression b
+                )
                 {
                     body = b;
                 }
@@ -345,7 +391,8 @@ namespace UnityEngine.InputSystem
                 {
                     throw new ArgumentException(
                         $"Body in LambdaExpression must be a MemberExpression (x.name) but was a {expr.GetType().Name} instead",
-                        nameof(expr));
+                        nameof(expr)
+                    );
                 }
             }
 
@@ -359,7 +406,8 @@ namespace UnityEngine.InputSystem
             else
                 throw new ArgumentException(
                     $"Given type must be an InputProcessor, IInputInteraction, or InputBindingComposite (was {typeof(TObject).Name})",
-                    nameof(TObject));
+                    nameof(TObject)
+                );
 
             return new ParameterOverride(objectRegistrationName, body.Member.Name, bindingMask, value);
         }
@@ -444,7 +492,12 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="actionMap"/> is <c>null</c> -or- <paramref name="name"/> is <c>null</c>
         /// or empty.</exception>
         /// <seealso cref="GetParameterValue(InputAction,string,InputBinding)"/>
-        public static void ApplyParameterOverride(this InputActionMap actionMap, string name, PrimitiveValue value, InputBinding bindingMask = default)
+        public static void ApplyParameterOverride(
+            this InputActionMap actionMap,
+            string name,
+            PrimitiveValue value,
+            InputBinding bindingMask = default
+        )
         {
             if (actionMap == null)
                 throw new ArgumentNullException(nameof(actionMap));
@@ -453,9 +506,13 @@ namespace UnityEngine.InputSystem
 
             actionMap.ResolveBindingsIfNecessary();
 
-            ApplyParameterOverride(actionMap.m_State, actionMap.m_MapIndexInState,
-                ref actionMap.m_ParameterOverrides, ref actionMap.m_ParameterOverridesCount,
-                new ParameterOverride(name, bindingMask, value));
+            ApplyParameterOverride(
+                actionMap.m_State,
+                actionMap.m_MapIndexInState,
+                ref actionMap.m_ParameterOverrides,
+                ref actionMap.m_ParameterOverridesCount,
+                new ParameterOverride(name, bindingMask, value)
+            );
         }
 
         /// <summary>
@@ -540,7 +597,12 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="asset"/> is <c>null</c> -or- <paramref name="name"/> is <c>null</c>
         /// or empty.</exception>
         /// <seealso cref="GetParameterValue(InputAction,string,InputBinding)"/>
-        public static void ApplyParameterOverride(this InputActionAsset asset, string name, PrimitiveValue value, InputBinding bindingMask = default)
+        public static void ApplyParameterOverride(
+            this InputActionAsset asset,
+            string name,
+            PrimitiveValue value,
+            InputBinding bindingMask = default
+        )
         {
             if (asset == null)
                 throw new ArgumentNullException(nameof(asset));
@@ -549,9 +611,13 @@ namespace UnityEngine.InputSystem
 
             asset.ResolveBindingsIfNecessary();
 
-            ApplyParameterOverride(asset.m_SharedStateForAllMaps, -1,
-                ref asset.m_ParameterOverrides, ref asset.m_ParameterOverridesCount,
-                new ParameterOverride(name, bindingMask, value));
+            ApplyParameterOverride(
+                asset.m_SharedStateForAllMaps,
+                -1,
+                ref asset.m_ParameterOverrides,
+                ref asset.m_ParameterOverridesCount,
+                new ParameterOverride(name, bindingMask, value)
+            );
         }
 
         /// <summary>
@@ -631,7 +697,12 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="action"/> is <c>null</c> -or- <paramref name="name"/> is <c>null</c>
         /// or empty.</exception>
         /// <seealso cref="GetParameterValue(InputAction,string,InputBinding)"/>
-        public static void ApplyParameterOverride(this InputAction action, string name, PrimitiveValue value, InputBinding bindingMask = default)
+        public static void ApplyParameterOverride(
+            this InputAction action,
+            string name,
+            PrimitiveValue value,
+            InputBinding bindingMask = default
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -642,9 +713,13 @@ namespace UnityEngine.InputSystem
             actionMap.ResolveBindingsIfNecessary();
             bindingMask.action = action.name;
 
-            ApplyParameterOverride(actionMap.m_State, actionMap.m_MapIndexInState,
-                ref actionMap.m_ParameterOverrides, ref actionMap.m_ParameterOverridesCount,
-                new ParameterOverride(name, bindingMask, value));
+            ApplyParameterOverride(
+                actionMap.m_State,
+                actionMap.m_MapIndexInState,
+                ref actionMap.m_ParameterOverrides,
+                ref actionMap.m_ParameterOverridesCount,
+                new ParameterOverride(name, bindingMask, value)
+            );
         }
 
         /// <summary>
@@ -668,7 +743,12 @@ namespace UnityEngine.InputSystem
         /// This method is a variation of <see cref="ApplyParameterOverride(InputActionMap,string,PrimitiveValue,InputBinding)"/> which
         /// allows specifying a binding by index. It otherwise behaves identically to that method.
         /// </remarks>
-        public static void ApplyParameterOverride(this InputAction action, string name, PrimitiveValue value, int bindingIndex)
+        public static void ApplyParameterOverride(
+            this InputAction action,
+            string name,
+            PrimitiveValue value,
+            int bindingIndex
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -683,8 +763,13 @@ namespace UnityEngine.InputSystem
             action.ApplyParameterOverride(name, value, bindingMask);
         }
 
-        private static void ApplyParameterOverride(InputActionState state, int mapIndex,
-            ref ParameterOverride[] parameterOverrides, ref int parameterOverridesCount, ParameterOverride parameterOverride)
+        private static void ApplyParameterOverride(
+            InputActionState state,
+            int mapIndex,
+            ref ParameterOverride[] parameterOverrides,
+            ref int parameterOverridesCount,
+            ParameterOverride parameterOverride
+        )
         {
             // Update the parameter overrides on the map or asset.
             var haveExistingOverride = false;
@@ -694,9 +779,15 @@ namespace UnityEngine.InputSystem
                 for (var i = 0; i < parameterOverridesCount; ++i)
                 {
                     ref var p = ref parameterOverrides[i];
-                    if (string.Equals(p.objectRegistrationName, parameterOverride.objectRegistrationName, StringComparison.OrdinalIgnoreCase) &&
-                        string.Equals(p.parameter, parameterOverride.parameter, StringComparison.OrdinalIgnoreCase) &&
-                        p.bindingMask == parameterOverride.bindingMask)
+                    if (
+                        string.Equals(
+                            p.objectRegistrationName,
+                            parameterOverride.objectRegistrationName,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                        && string.Equals(p.parameter, parameterOverride.parameter, StringComparison.OrdinalIgnoreCase)
+                        && p.bindingMask == parameterOverride.bindingMask
+                    )
                     {
                         haveExistingOverride = true;
                         // Update value on existing override.
@@ -719,12 +810,19 @@ namespace UnityEngine.InputSystem
                 // override and set that.
                 var actionMap = state.GetActionMap(parameter.bindingIndex);
                 ref var binding = ref state.GetBinding(parameter.bindingIndex);
-                var overrideToApply = ParameterOverride.Find(actionMap, ref binding, parameterOverride.parameter,
-                    parameterOverride.objectRegistrationName);
+                var overrideToApply = ParameterOverride.Find(
+                    actionMap,
+                    ref binding,
+                    parameterOverride.parameter,
+                    parameterOverride.objectRegistrationName
+                );
                 if (overrideToApply.HasValue)
                 {
                     var fieldTypeCode = Type.GetTypeCode(parameter.field.FieldType);
-                    parameter.field.SetValue(parameter.instance, overrideToApply.Value.value.ConvertTo(fieldTypeCode).ToObject());
+                    parameter.field.SetValue(
+                        parameter.instance,
+                        overrideToApply.Value.value.ConvertTo(fieldTypeCode).ToObject()
+                    );
                 }
             }
         }
@@ -822,11 +920,21 @@ namespace UnityEngine.InputSystem
                         continue;
 
                     // If we're only looking for processors, skip any that hasn't got any.
-                    if (m_MayBeProcessor && !m_MayBeComposite && !m_MayBeInteraction && bindingState.processorCount == 0)
+                    if (
+                        m_MayBeProcessor
+                        && !m_MayBeComposite
+                        && !m_MayBeInteraction
+                        && bindingState.processorCount == 0
+                    )
                         continue;
 
                     // If we're only looking for interactions, skip any that hasn't got any.
-                    if (m_MayBeInteraction && !m_MayBeComposite && !m_MayBeProcessor && bindingState.interactionCount == 0)
+                    if (
+                        m_MayBeInteraction
+                        && !m_MayBeComposite
+                        && !m_MayBeProcessor
+                        && bindingState.interactionCount == 0
+                    )
                         continue;
 
                     if (m_BindingMask.Matches(ref binding))
@@ -878,8 +986,9 @@ namespace UnityEngine.InputSystem
                 if (m_ObjectType != null && !m_ObjectType.IsInstanceOfType(instance))
                     return false;
 
-                var field = instance.GetType().GetField(m_ParameterName,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+                var field = instance
+                    .GetType()
+                    .GetField(m_ParameterName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
                 if (field == null)
                     return false;
 
@@ -904,7 +1013,9 @@ namespace UnityEngine.InputSystem
 
                     if (m_MayBeComposite && m_CurrentBindingIsComposite)
                     {
-                        var compositeIndex = m_State.GetBindingState(m_BindingCurrentIndex).compositeOrCompositeBindingIndex;
+                        var compositeIndex = m_State
+                            .GetBindingState(m_BindingCurrentIndex)
+                            .compositeOrCompositeBindingIndex;
                         var composite = m_State.composites[compositeIndex];
                         if (FindParameter(composite))
                             return true;
@@ -929,22 +1040,22 @@ namespace UnityEngine.InputSystem
                 else
                 {
                     m_BindingCurrentIndex = m_State.mapIndices[m_MapIndex].bindingStartIndex - 1; // Account for first MoveNext().
-                    m_BindingEndIndex = m_State.mapIndices[m_MapIndex].bindingStartIndex + m_State.mapIndices[m_MapIndex].bindingCount;
+                    m_BindingEndIndex =
+                        m_State.mapIndices[m_MapIndex].bindingStartIndex + m_State.mapIndices[m_MapIndex].bindingCount;
                 }
             }
 
-            public Parameter Current => new Parameter
-            {
-                instance = m_CurrentObject,
-                field = m_CurrentParameter,
-                bindingIndex = m_BindingCurrentIndex,
-            };
+            public Parameter Current =>
+                new Parameter
+                {
+                    instance = m_CurrentObject,
+                    field = m_CurrentParameter,
+                    bindingIndex = m_BindingCurrentIndex,
+                };
 
             object IEnumerator.Current => Current;
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
 
         internal struct ParameterOverride
@@ -976,7 +1087,12 @@ namespace UnityEngine.InputSystem
                 this.value = value;
             }
 
-            public ParameterOverride(string objectRegistrationName, string parameterName, InputBinding bindingMask, PrimitiveValue value = default)
+            public ParameterOverride(
+                string objectRegistrationName,
+                string parameterName,
+                InputBinding bindingMask,
+                PrimitiveValue value = default
+            )
             {
                 this.objectRegistrationName = objectRegistrationName;
                 this.parameter = parameterName;
@@ -985,24 +1101,45 @@ namespace UnityEngine.InputSystem
             }
 
             // Find the *most specific* override to apply to the given parameter.
-            public static ParameterOverride? Find(InputActionMap actionMap, ref InputBinding binding, string parameterName, string objectRegistrationName)
+            public static ParameterOverride? Find(
+                InputActionMap actionMap,
+                ref InputBinding binding,
+                string parameterName,
+                string objectRegistrationName
+            )
             {
                 // Look at level of map.
-                var overrideOnMap = Find(actionMap.m_ParameterOverrides, actionMap.m_ParameterOverridesCount, ref binding, parameterName,
-                    objectRegistrationName);
+                var overrideOnMap = Find(
+                    actionMap.m_ParameterOverrides,
+                    actionMap.m_ParameterOverridesCount,
+                    ref binding,
+                    parameterName,
+                    objectRegistrationName
+                );
 
                 // Look at level of asset (if present).
                 var asset = actionMap.asset;
-                var overrideOnAsset = asset != null
-                    ? Find(asset.m_ParameterOverrides, asset.m_ParameterOverridesCount, ref binding, parameterName,
-                    objectRegistrationName)
-                    : null;
+                var overrideOnAsset =
+                    asset != null
+                        ? Find(
+                            asset.m_ParameterOverrides,
+                            asset.m_ParameterOverridesCount,
+                            ref binding,
+                            parameterName,
+                            objectRegistrationName
+                        )
+                        : null;
 
                 return PickMoreSpecificOne(overrideOnMap, overrideOnAsset);
             }
 
-            private static ParameterOverride? Find(ParameterOverride[] overrides, int overrideCount,
-                ref InputBinding binding, string parameterName, string objectRegistrationName)
+            private static ParameterOverride? Find(
+                ParameterOverride[] overrides,
+                int overrideCount,
+                ref InputBinding binding,
+                string parameterName,
+                string objectRegistrationName
+            )
             {
                 ParameterOverride? result = null;
                 for (var i = 0; i < overrideCount; ++i)
@@ -1015,8 +1152,14 @@ namespace UnityEngine.InputSystem
                     if (!current.bindingMask.Matches(binding))
                         continue;
 
-                    if (current.objectRegistrationName != null && !string.Equals(current.objectRegistrationName, objectRegistrationName,
-                        StringComparison.OrdinalIgnoreCase))
+                    if (
+                        current.objectRegistrationName != null
+                        && !string.Equals(
+                            current.objectRegistrationName,
+                            objectRegistrationName,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    )
                         continue;
 
                     if (result == null)

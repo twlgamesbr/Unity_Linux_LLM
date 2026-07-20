@@ -9,22 +9,23 @@ namespace UnityEngine.Rendering
     {
         // Property set by XRSystem
         private static int m_MaxViews = 1;
+
         /// <summary>
         /// Maximum number of views handled by the XR system.
         /// </summary>
         public static int maxViews
         {
-            set
-            {
-                m_MaxViews = value;
-            }
+            set { m_MaxViews = value; }
         }
 
         // Property accessed when allocating a render target
         /// <summary>
         /// Number of slices used by the XR system.
         /// </summary>
-        public static int slices { get => m_MaxViews; }
+        public static int slices
+        {
+            get => m_MaxViews;
+        }
 
         // Must be in sync with shader define in TextureXR.hlsl
         /// <summary>
@@ -69,31 +70,43 @@ namespace UnityEngine.Rendering
         static Texture m_BlackUIntTexture;
         static RTHandle m_BlackUIntTexture2DArrayRTH;
         static RTHandle m_BlackUIntTextureRTH;
+
         /// <summary>
         /// Default black unsigned integer texture.
         /// </summary>
         /// <returns>The default black unsigned integer texture.</returns>
-        public static RTHandle GetBlackUIntTexture() { return useTexArray ? m_BlackUIntTexture2DArrayRTH : m_BlackUIntTextureRTH; }
+        public static RTHandle GetBlackUIntTexture()
+        {
+            return useTexArray ? m_BlackUIntTexture2DArrayRTH : m_BlackUIntTextureRTH;
+        }
 
         static Texture2DArray m_ClearTexture2DArray;
         static Texture2D m_ClearTexture;
         static RTHandle m_ClearTexture2DArrayRTH;
         static RTHandle m_ClearTextureRTH;
+
         /// <summary>
         /// Default clear color (0, 0, 0, 1) texture.
         /// </summary>
         /// <returns>The default clear color texture.</returns>
-        public static RTHandle GetClearTexture() { return useTexArray ? m_ClearTexture2DArrayRTH : m_ClearTextureRTH; }
+        public static RTHandle GetClearTexture()
+        {
+            return useTexArray ? m_ClearTexture2DArrayRTH : m_ClearTextureRTH;
+        }
 
         static Texture2DArray m_MagentaTexture2DArray;
         static Texture2D m_MagentaTexture;
         static RTHandle m_MagentaTexture2DArrayRTH;
         static RTHandle m_MagentaTextureRTH;
+
         /// <summary>
         /// Default magenta texture.
         /// </summary>
         /// <returns>The default magenta texture.</returns>
-        public static RTHandle GetMagentaTexture() { return useTexArray ? m_MagentaTexture2DArrayRTH : m_MagentaTextureRTH; }
+        public static RTHandle GetMagentaTexture()
+        {
+            return useTexArray ? m_MagentaTexture2DArrayRTH : m_MagentaTextureRTH;
+        }
 
         static Texture2D m_BlackTexture;
         static Texture3D m_BlackTexture3D;
@@ -101,30 +114,46 @@ namespace UnityEngine.Rendering
         static RTHandle m_BlackTexture2DArrayRTH;
         static RTHandle m_BlackTextureRTH;
         static RTHandle m_BlackTexture3DRTH;
+
         /// <summary>
         /// Default black texture.
         /// </summary>
         /// <returns>The default black texture.</returns>
-        public static RTHandle GetBlackTexture() { return useTexArray ? m_BlackTexture2DArrayRTH : m_BlackTextureRTH; }
+        public static RTHandle GetBlackTexture()
+        {
+            return useTexArray ? m_BlackTexture2DArrayRTH : m_BlackTextureRTH;
+        }
+
         /// <summary>
         /// Default black texture array.
         /// </summary>
         /// <returns>The default black texture array.</returns>
-        public static RTHandle GetBlackTextureArray() { return m_BlackTexture2DArrayRTH; }
+        public static RTHandle GetBlackTextureArray()
+        {
+            return m_BlackTexture2DArrayRTH;
+        }
+
         /// <summary>
         /// Default black texture 3D.
         /// </summary>
         /// <returns>The default black texture 3D.</returns>
-        public static RTHandle GetBlackTexture3D() { return m_BlackTexture3DRTH; }
+        public static RTHandle GetBlackTexture3D()
+        {
+            return m_BlackTexture3DRTH;
+        }
 
         static Texture2DArray m_WhiteTexture2DArray;
         static RTHandle m_WhiteTexture2DArrayRTH;
         static RTHandle m_WhiteTextureRTH;
+
         /// <summary>
         /// Default white texture.
         /// </summary>
         /// <returns>The default white texture.</returns>
-        public static RTHandle GetWhiteTexture() { return useTexArray ? m_WhiteTexture2DArrayRTH : m_WhiteTextureRTH; }
+        public static RTHandle GetWhiteTexture()
+        {
+            return useTexArray ? m_WhiteTexture2DArrayRTH : m_WhiteTextureRTH;
+        }
 
         /// <summary>
         /// Initialize XR textures. Must be called at least once.
@@ -145,7 +174,10 @@ namespace UnityEngine.Rendering
 
                 // Clear
                 RTHandles.Release(m_ClearTextureRTH);
-                m_ClearTexture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None) { name = "Clear Texture" };
+                m_ClearTexture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None)
+                {
+                    name = "Clear Texture",
+                };
                 m_ClearTexture.SetPixel(0, 0, Color.clear);
                 m_ClearTexture.Apply();
                 m_ClearTextureRTH = RTHandles.Alloc(m_ClearTexture);
@@ -155,7 +187,10 @@ namespace UnityEngine.Rendering
 
                 // Magenta
                 RTHandles.Release(m_MagentaTextureRTH);
-                m_MagentaTexture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None) { name = "Magenta Texture" };
+                m_MagentaTexture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None)
+                {
+                    name = "Magenta Texture",
+                };
                 m_MagentaTexture.SetPixel(0, 0, Color.magenta);
                 m_MagentaTexture.Apply();
                 m_MagentaTextureRTH = RTHandles.Alloc(m_MagentaTexture);
@@ -165,7 +200,10 @@ namespace UnityEngine.Rendering
 
                 // Black
                 RTHandles.Release(m_BlackTextureRTH);
-                m_BlackTexture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None) { name = "Black Texture" };
+                m_BlackTexture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None)
+                {
+                    name = "Black Texture",
+                };
                 m_BlackTexture.SetPixel(0, 0, Color.black);
                 m_BlackTexture.Apply();
                 m_BlackTextureRTH = RTHandles.Alloc(m_BlackTexture);
@@ -180,14 +218,20 @@ namespace UnityEngine.Rendering
                 RTHandles.Release(m_WhiteTextureRTH);
                 m_WhiteTextureRTH = RTHandles.Alloc(Texture2D.whiteTexture);
                 RTHandles.Release(m_WhiteTexture2DArrayRTH);
-                m_WhiteTexture2DArray = CreateTexture2DArrayFromTexture2D(Texture2D.whiteTexture, "White Texture2DArray");
+                m_WhiteTexture2DArray = CreateTexture2DArrayFromTexture2D(
+                    Texture2D.whiteTexture,
+                    "White Texture2DArray"
+                );
                 m_WhiteTexture2DArrayRTH = RTHandles.Alloc(m_WhiteTexture2DArray);
             }
         }
 
         static Texture2DArray CreateTexture2DArrayFromTexture2D(Texture2D source, string name)
         {
-            Texture2DArray texArray = new Texture2DArray(source.width, source.height, slices, source.format, false) { name = name };
+            Texture2DArray texArray = new Texture2DArray(source.width, source.height, slices, source.format, false)
+            {
+                name = name,
+            };
             for (int i = 0; i < slices; ++i)
                 Graphics.CopyTexture(source, 0, 0, texArray, i, 0);
 
@@ -203,7 +247,7 @@ namespace UnityEngine.Rendering
                 useMipMap = false,
                 autoGenerateMips = false,
                 enableRandomWrite = true,
-                name = "Black UInt Texture Array"
+                name = "Black UInt Texture Array",
             };
 
             blackUIntTexture2DArray.Create();
@@ -227,7 +271,7 @@ namespace UnityEngine.Rendering
                 useMipMap = false,
                 autoGenerateMips = false,
                 enableRandomWrite = true,
-                name = "Black UInt Texture"
+                name = "Black UInt Texture",
             };
 
             blackUIntTexture2D.Create();
@@ -244,7 +288,13 @@ namespace UnityEngine.Rendering
 
         static Texture3D CreateBlackTexture3D(string name)
         {
-            Texture3D texture3D = new Texture3D(width: 1, height: 1, depth: 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None);
+            Texture3D texture3D = new Texture3D(
+                width: 1,
+                height: 1,
+                depth: 1,
+                GraphicsFormat.R8G8B8A8_SRGB,
+                TextureCreationFlags.None
+            );
             texture3D.name = name;
             texture3D.SetPixel(0, 0, 0, Color.black, 0);
             texture3D.Apply(updateMipmaps: false);

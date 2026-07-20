@@ -23,14 +23,32 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            m_DynamicBodyQueryMask = TemporalCoherenceUtilities.CreateDynamicBodyQueryBuilder().Build(ref state).GetEntityQueryMask();
-            m_StaticBodyQueryMask = TemporalCoherenceUtilities.CreateStaticBodyQueryBuilder().Build(ref state).GetEntityQueryMask();
+            m_DynamicBodyQueryMask = TemporalCoherenceUtilities
+                .CreateDynamicBodyQueryBuilder()
+                .Build(ref state)
+                .GetEntityQueryMask();
+            m_StaticBodyQueryMask = TemporalCoherenceUtilities
+                .CreateStaticBodyQueryBuilder()
+                .Build(ref state)
+                .GetEntityQueryMask();
 
-            m_DynamicBodyWithTemporalCoherenceQuery = TemporalCoherenceUtilities.CreateDynamicBodyQueryBuilder().WithAll<PhysicsTemporalCoherenceTag>().Build(ref state);
-            m_DynamicBodyWithoutTemporalCoherenceQuery = TemporalCoherenceUtilities.CreateDynamicBodyQueryBuilder().WithNone<PhysicsTemporalCoherenceTag>().Build(ref state);
+            m_DynamicBodyWithTemporalCoherenceQuery = TemporalCoherenceUtilities
+                .CreateDynamicBodyQueryBuilder()
+                .WithAll<PhysicsTemporalCoherenceTag>()
+                .Build(ref state);
+            m_DynamicBodyWithoutTemporalCoherenceQuery = TemporalCoherenceUtilities
+                .CreateDynamicBodyQueryBuilder()
+                .WithNone<PhysicsTemporalCoherenceTag>()
+                .Build(ref state);
 
-            m_StaticBodyWithTemporalCoherenceQuery = TemporalCoherenceUtilities.CreateStaticBodyQueryBuilder().WithAll<PhysicsTemporalCoherenceTag>().Build(ref state);
-            m_StaticBodyWithoutTemporalCoherenceQuery = TemporalCoherenceUtilities.CreateStaticBodyQueryBuilder().WithNone<PhysicsTemporalCoherenceTag>().Build(ref state);
+            m_StaticBodyWithTemporalCoherenceQuery = TemporalCoherenceUtilities
+                .CreateStaticBodyQueryBuilder()
+                .WithAll<PhysicsTemporalCoherenceTag>()
+                .Build(ref state);
+            m_StaticBodyWithoutTemporalCoherenceQuery = TemporalCoherenceUtilities
+                .CreateStaticBodyQueryBuilder()
+                .WithNone<PhysicsTemporalCoherenceTag>()
+                .Build(ref state);
         }
 
         [BurstCompile]
@@ -47,33 +65,47 @@ namespace Unity.Physics.Authoring
             if (physicsStep.IncrementalDynamicBroadphase || physicsStep.IncrementalStaticBroadphase)
             {
                 // dynamic bodies
-                ecb.AddComponent<PhysicsTemporalCoherenceTag>(m_DynamicBodyWithoutTemporalCoherenceQuery,
-                    EntityQueryCaptureMode.AtPlayback);
+                ecb.AddComponent<PhysicsTemporalCoherenceTag>(
+                    m_DynamicBodyWithoutTemporalCoherenceQuery,
+                    EntityQueryCaptureMode.AtPlayback
+                );
 
                 // static bodies
-                ecb.AddComponent<PhysicsTemporalCoherenceTag>(m_StaticBodyWithoutTemporalCoherenceQuery,
-                    EntityQueryCaptureMode.AtPlayback);
+                ecb.AddComponent<PhysicsTemporalCoherenceTag>(
+                    m_StaticBodyWithoutTemporalCoherenceQuery,
+                    EntityQueryCaptureMode.AtPlayback
+                );
             }
             else
             {
                 // dynamic bodies
-                ecb.RemoveComponent<PhysicsTemporalCoherenceTag>(m_DynamicBodyWithTemporalCoherenceQuery,
-                    EntityQueryCaptureMode.AtPlayback);
+                ecb.RemoveComponent<PhysicsTemporalCoherenceTag>(
+                    m_DynamicBodyWithTemporalCoherenceQuery,
+                    EntityQueryCaptureMode.AtPlayback
+                );
 
                 // static bodies
-                ecb.RemoveComponent<PhysicsTemporalCoherenceTag>(m_StaticBodyWithTemporalCoherenceQuery,
-                    EntityQueryCaptureMode.AtPlayback);
+                ecb.RemoveComponent<PhysicsTemporalCoherenceTag>(
+                    m_StaticBodyWithTemporalCoherenceQuery,
+                    EntityQueryCaptureMode.AtPlayback
+                );
             }
 
             // cleanup temporal coherence data for entities that stopped being rigid bodies (either dynamic or static)
             {
-                foreach (var(_, entity) in SystemAPI.Query<PhysicsTemporalCoherenceTag>()
-                         .WithEntityAccess()
-                         .WithOptions(EntityQueryOptions.IncludePrefab |
-                             EntityQueryOptions.IncludeDisabledEntities))
+                foreach (
+                    var (_, entity) in SystemAPI
+                        .Query<PhysicsTemporalCoherenceTag>()
+                        .WithEntityAccess()
+                        .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
+                )
                 {
-                    if (!(m_DynamicBodyQueryMask.MatchesIgnoreFilter(entity) ||
-                          m_StaticBodyQueryMask.MatchesIgnoreFilter(entity)))
+                    if (
+                        !(
+                            m_DynamicBodyQueryMask.MatchesIgnoreFilter(entity)
+                            || m_StaticBodyQueryMask.MatchesIgnoreFilter(entity)
+                        )
+                    )
                     {
                         ecb.RemoveComponent<PhysicsTemporalCoherenceTag>(entity);
                     }

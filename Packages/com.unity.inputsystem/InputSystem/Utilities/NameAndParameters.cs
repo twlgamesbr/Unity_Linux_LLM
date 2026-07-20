@@ -39,7 +39,7 @@ namespace UnityEngine.InputSystem.Utilities
             return new NameAndParameters
             {
                 name = name,
-                parameters = new ReadOnlyArray<NamedValue>(parameters.ToArray())
+                parameters = new ReadOnlyArray<NamedValue>(parameters.ToArray()),
             };
         }
 
@@ -108,7 +108,7 @@ namespace UnityEngine.InputSystem.Utilities
                 throw new ArgumentException($"Expecting name at position {nameStart} in '{text}'", nameof(text));
             var name = text.Substring(nameStart, index - nameStart);
             if (nameOnly)
-                return new NameAndParameters {name = name};
+                return new NameAndParameters { name = name };
 
             // Skip whitespace.
             while (index < textLength && char.IsWhiteSpace(text[index]))
@@ -121,7 +121,10 @@ namespace UnityEngine.InputSystem.Utilities
                 ++index;
                 var closeParenIndex = text.IndexOf(')', index);
                 if (closeParenIndex == -1)
-                    throw new ArgumentException($"Expecting ')' after '(' at position {index} in '{text}'", nameof(text));
+                    throw new ArgumentException(
+                        $"Expecting ')' after '(' at position {index} in '{text}'",
+                        nameof(text)
+                    );
 
                 var parameterString = text.Substring(index, closeParenIndex - index);
                 parameters = NamedValue.ParseMultiple(parameterString);
@@ -131,7 +134,7 @@ namespace UnityEngine.InputSystem.Utilities
             if (index < textLength && (text[index] == ',' || text[index] == InputBinding.Separator))
                 ++index;
 
-            return new NameAndParameters {name = name, parameters = new ReadOnlyArray<NamedValue>(parameters)};
+            return new NameAndParameters { name = name, parameters = new ReadOnlyArray<NamedValue>(parameters) };
         }
     }
 }

@@ -14,17 +14,17 @@ namespace Unity.Entities.SourceGen.Common
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
                 globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
                 genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
-                miscellaneousOptions:
-                SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
-                SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers
+                    | SymbolDisplayMiscellaneousOptions.UseSpecialTypes
+            );
 
         static SymbolDisplayFormat QualifiedFormatWithoutGlobalPrefix { get; } =
             new(
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
                 genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
-                miscellaneousOptions:
-                SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
-                SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers
+                    | SymbolDisplayMiscellaneousOptions.UseSpecialTypes
+            );
 
         public static bool Is(this ITypeSymbol symbol, string fullyQualifiedName, bool checkBaseType = true)
         {
@@ -42,15 +42,18 @@ namespace Unity.Entities.SourceGen.Common
         public static bool IsInt(this ITypeSymbol symbol) => symbol.SpecialType == SpecialType.System_Int32;
 
         public static bool IsDynamicBuffer(this ITypeSymbol symbol) =>
-            symbol.Name == "DynamicBuffer" && symbol.ContainingNamespace.ToDisplayString(QualifiedFormat) == "global::Unity.Entities";
+            symbol.Name == "DynamicBuffer"
+            && symbol.ContainingNamespace.ToDisplayString(QualifiedFormat) == "global::Unity.Entities";
 
-        public static bool IsSharedComponent(this ITypeSymbol symbol) => symbol.InheritsFromInterface("Unity.Entities.ISharedComponentData");
+        public static bool IsSharedComponent(this ITypeSymbol symbol) =>
+            symbol.InheritsFromInterface("Unity.Entities.ISharedComponentData");
 
-        public static bool IsComponent(this ITypeSymbol symbol) => symbol.InheritsFromInterface("Unity.Entities.IComponentData");
+        public static bool IsComponent(this ITypeSymbol symbol) =>
+            symbol.InheritsFromInterface("Unity.Entities.IComponentData");
 
         public static bool IsZeroSizedComponent(this ITypeSymbol symbol, HashSet<ITypeSymbol> seenSymbols = null)
         {
-// TODO: This was recently fixed (https://github.com/dotnet/roslyn-analyzers/issues/5804), remove pragmas after we update .net
+            // TODO: This was recently fixed (https://github.com/dotnet/roslyn-analyzers/issues/5804), remove pragmas after we update .net
 #pragma warning disable RS1024
             seenSymbols ??= new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default) { symbol };
 #pragma warning restore RS1024
@@ -82,7 +85,8 @@ namespace Unity.Entities.SourceGen.Common
             return true;
         }
 
-        public static bool IsEnableableComponent(this ITypeSymbol symbol) => symbol.InheritsFromInterface("Unity.Entities.IEnableableComponent");
+        public static bool IsEnableableComponent(this ITypeSymbol symbol) =>
+            symbol.InheritsFromInterface("Unity.Entities.IEnableableComponent");
 
         public static string ToFullName(this ISymbol symbol) => symbol.ToDisplayString(QualifiedFormat);
 
@@ -95,32 +99,41 @@ namespace Unity.Entities.SourceGen.Common
             var typeArgumentBuilder = new StringBuilder(initialTypeArgument);
             var metaDataName = symbol switch
             {
-                IArrayTypeSymbol array => $"{array.ElementType.ToFullNameIL()}[{(array.Rank == 1 ? string.Empty : string.Join(",", Enumerable.Range(0, array.Rank).Select(_=>"0...")))}]",
-                IFunctionPointerTypeSymbol fp => $"method {fp.Signature.ReturnType.ToFullNameIL()} *({string.Join(",", fp.Signature.Parameters.Select(p => p.Type.ToFullNameIL()))})",
+                IArrayTypeSymbol array =>
+                    $"{array.ElementType.ToFullNameIL()}[{(array.Rank == 1 ? string.Empty : string.Join(",", Enumerable.Range(0, array.Rank).Select(_ => "0...")))}]",
+                IFunctionPointerTypeSymbol fp =>
+                    $"method {fp.Signature.ReturnType.ToFullNameIL()} *({string.Join(",", fp.Signature.Parameters.Select(p => p.Type.ToFullNameIL()))})",
                 IPointerTypeSymbol pointerTypeSymbol => $"{pointerTypeSymbol.PointedAtType.ToFullNameIL()}*",
-                _ => symbol.MetadataName
+                _ => symbol.MetadataName,
             };
             var nameBuilder = new StringBuilder(metaDataName);
 
             // Walk up containing types
-            for (var containingSymbol = symbol.ContainingSymbol; containingSymbol is not null; containingSymbol = containingSymbol.ContainingSymbol)
+            for (
+                var containingSymbol = symbol.ContainingSymbol;
+                containingSymbol is not null;
+                containingSymbol = containingSymbol.ContainingSymbol
+            )
             {
                 switch (containingSymbol)
                 {
                     case INamedTypeSymbol containingType when symbol is not ITypeParameterSymbol:
-                        nameBuilder.Insert(0, containingSymbol.MetadataName+'/');
+                        nameBuilder.Insert(0, containingSymbol.MetadataName + '/');
                         if (containingType.TypeArguments.Length > 0)
                         {
-                            var typeArgsFromContainingType = string.Join(",", containingType.TypeArguments.Select(t => t.ToFullNameIL()));
+                            var typeArgsFromContainingType = string.Join(
+                                ",",
+                                containingType.TypeArguments.Select(t => t.ToFullNameIL())
+                            );
                             if (typeArgumentBuilder.Length == 0)
                                 typeArgumentBuilder.Append(typeArgsFromContainingType);
                             else
-                                typeArgumentBuilder.Insert(0, typeArgsFromContainingType+',');
+                                typeArgumentBuilder.Insert(0, typeArgsFromContainingType + ',');
                         }
                         break;
                     case INamespaceSymbol namespaceSymbol when symbol is not ITypeParameterSymbol:
                         if (!namespaceSymbol.IsGlobalNamespace)
-                            nameBuilder.Insert(0, namespaceSymbol.MetadataName+".");
+                            nameBuilder.Insert(0, namespaceSymbol.MetadataName + ".");
                         break;
                 }
             }
@@ -136,7 +149,8 @@ namespace Unity.Entities.SourceGen.Common
             return nameBuilder.ToString();
         }
 
-        public static string ToSimpleName(this ITypeSymbol symbol) => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix);
+        public static string ToSimpleName(this ITypeSymbol symbol) =>
+            symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix);
 
         public static string ToValidIdentifier(this ITypeSymbol symbol)
         {
@@ -151,7 +165,9 @@ namespace Unity.Entities.SourceGen.Common
             interfaceName = PrependGlobalIfMissing(interfaceName);
 
             return symbol is ITypeSymbol typeSymbol
-                   && typeSymbol.AllInterfaces.Any(i => i.ToFullName() == interfaceName || i.InheritsFromInterface(interfaceName));
+                && typeSymbol.AllInterfaces.Any(i =>
+                    i.ToFullName() == interfaceName || i.InheritsFromInterface(interfaceName)
+                );
         }
 
         public static ITypeSymbol GetSymbolType(this ISymbol symbol)
@@ -163,11 +179,15 @@ namespace Unity.Entities.SourceGen.Common
                 INamedTypeSymbol namedTypeSymbol => namedTypeSymbol,
                 IMethodSymbol methodSymbol => methodSymbol.ContainingType,
                 IPropertySymbol propertySymbol => propertySymbol.ContainingType,
-                _ => throw new InvalidOperationException($"Unknown typeSymbol type {symbol.GetType()}")
+                _ => throw new InvalidOperationException($"Unknown typeSymbol type {symbol.GetType()}"),
             };
         }
 
-        public static bool InheritsFromInterface(this ITypeSymbol symbol, string interfaceName, bool checkBaseType = true)
+        public static bool InheritsFromInterface(
+            this ITypeSymbol symbol,
+            string interfaceName,
+            bool checkBaseType = true
+        )
         {
             if (symbol is null)
                 return false;
@@ -218,18 +238,30 @@ namespace Unity.Entities.SourceGen.Common
         public static bool HasAttribute(this ISymbol typeSymbol, string fullyQualifiedAttributeName)
         {
             fullyQualifiedAttributeName = PrependGlobalIfMissing(fullyQualifiedAttributeName);
-            return typeSymbol.GetAttributes().Any(attribute => attribute.AttributeClass.ToFullName() == fullyQualifiedAttributeName);
+            return typeSymbol
+                .GetAttributes()
+                .Any(attribute => attribute.AttributeClass.ToFullName() == fullyQualifiedAttributeName);
         }
 
-        public static bool HasAttributeOrFieldWithAttribute(this ITypeSymbol typeSymbol, string fullyQualifiedAttributeName)
+        public static bool HasAttributeOrFieldWithAttribute(
+            this ITypeSymbol typeSymbol,
+            string fullyQualifiedAttributeName
+        )
         {
             fullyQualifiedAttributeName = PrependGlobalIfMissing(fullyQualifiedAttributeName);
 
-            return typeSymbol.HasAttribute(fullyQualifiedAttributeName) ||
-                   typeSymbol.GetMembers().OfType<IFieldSymbol>().Any(f => !f.IsStatic && f.Type.HasAttributeOrFieldWithAttribute(fullyQualifiedAttributeName));
+            return typeSymbol.HasAttribute(fullyQualifiedAttributeName)
+                || typeSymbol
+                    .GetMembers()
+                    .OfType<IFieldSymbol>()
+                    .Any(f => !f.IsStatic && f.Type.HasAttributeOrFieldWithAttribute(fullyQualifiedAttributeName));
         }
 
-        public static string GetMethodAndParamsAsString<TDiagnostic>(this IMethodSymbol methodSymbol, TDiagnostic diagnosticReporter) where TDiagnostic : ISourceGeneratorDiagnosable
+        public static string GetMethodAndParamsAsString<TDiagnostic>(
+            this IMethodSymbol methodSymbol,
+            TDiagnostic diagnosticReporter
+        )
+            where TDiagnostic : ISourceGeneratorDiagnosable
         {
             var strBuilder = new StringBuilder();
 
@@ -249,7 +281,12 @@ namespace Unity.Entities.SourceGen.Common
                     strBuilder.Append($"_{paramILName}");
                 else
                 {
-                    diagnosticReporter.LogError("SGIL", "ILPP Failure", $"Failed to get IL name for parameter {param.Name}", param.Locations.FirstOrDefault() ?? Location.None);
+                    diagnosticReporter.LogError(
+                        "SGIL",
+                        "ILPP Failure",
+                        $"Failed to get IL name for parameter {param.Name}",
+                        param.Locations.FirstOrDefault() ?? Location.None
+                    );
                     return "";
                 }
 

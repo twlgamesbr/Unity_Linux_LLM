@@ -26,7 +26,7 @@ namespace UnityEngine.InputSystem.Editor
             /// <summary>
             /// The dialog was accepted by the user and the associated path is valid.
             /// </summary>
-            Valid
+            Valid,
         }
 
         internal struct PromptResult
@@ -46,7 +46,11 @@ namespace UnityEngine.InputSystem.Editor
             return PlayerSettings.productName + "." + projectNameSuffixNoExtension;
         }
 
-        internal static PromptResult PromptUserForAsset(string friendlyName, string suggestedAssetFilePathWithoutExtension, string assetFileExtension)
+        internal static PromptResult PromptUserForAsset(
+            string friendlyName,
+            string suggestedAssetFilePathWithoutExtension,
+            string assetFileExtension
+        )
         {
             // Prompt user for a file name.
             var fullAssetFileExtension = "." + assetFileExtension;
@@ -54,7 +58,8 @@ namespace UnityEngine.InputSystem.Editor
                 title: $"Create {friendlyName} File",
                 directory: "Assets",
                 defaultName: suggestedAssetFilePathWithoutExtension + "." + assetFileExtension,
-                extension: assetFileExtension);
+                extension: assetFileExtension
+            );
             if (string.IsNullOrEmpty(path))
                 return new PromptResult(DialogResult.Cancelled, null);
 
@@ -75,14 +80,22 @@ namespace UnityEngine.InputSystem.Editor
             return new PromptResult(DialogResult.Valid, "Assets/" + path.Substring(dataPath.Length));
         }
 
-        internal static T CreateAsset<T>(T asset, string relativePath) where T : ScriptableObject
+        internal static T CreateAsset<T>(T asset, string relativePath)
+            where T : ScriptableObject
         {
             AssetDatabase.CreateAsset(asset, relativePath);
             EditorGUIUtility.PingObject(asset);
             return asset;
         }
 
-        public static void DrawMakeActiveGui<T>(T current, T target, string targetName, string entity, Action<T> apply, bool allowAssignActive = true)
+        public static void DrawMakeActiveGui<T>(
+            T current,
+            T target,
+            string targetName,
+            string entity,
+            Action<T> apply,
+            bool allowAssignActive = true
+        )
             where T : ScriptableObject
         {
             if (current == target)
@@ -95,8 +108,12 @@ namespace UnityEngine.InputSystem.Editor
             if (current != null)
                 currentlyActiveAssetsPath = AssetDatabase.GetAssetPath(current);
             if (!string.IsNullOrEmpty(currentlyActiveAssetsPath))
-                currentlyActiveAssetsPath = $" The actions currently assigned as the {entity} are: {currentlyActiveAssetsPath}. ";
-            EditorGUILayout.HelpBox($"These actions are not assigned as the {entity} for the Input System. {currentlyActiveAssetsPath??""}", MessageType.Warning);
+                currentlyActiveAssetsPath =
+                    $" The actions currently assigned as the {entity} are: {currentlyActiveAssetsPath}. ";
+            EditorGUILayout.HelpBox(
+                $"These actions are not assigned as the {entity} for the Input System. {currentlyActiveAssetsPath ?? ""}",
+                MessageType.Warning
+            );
             GUI.enabled = allowAssignActive;
             if (GUILayout.Button($"Assign as the {entity}", EditorStyles.miniButton))
                 apply(target);
@@ -105,7 +122,8 @@ namespace UnityEngine.InputSystem.Editor
 
         public static bool IsValidFileExtension(string path)
         {
-            return path != null && path.EndsWith("." + InputActionAsset.Extension, StringComparison.InvariantCultureIgnoreCase);
+            return path != null
+                && path.EndsWith("." + InputActionAsset.Extension, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

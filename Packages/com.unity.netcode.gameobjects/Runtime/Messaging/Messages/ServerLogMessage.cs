@@ -7,6 +7,7 @@ namespace Unity.Netcode
         public ulong SenderId;
 
         public NetworkLog.LogType LogType;
+
         // It'd be lovely to be able to replace this with FixedString or NativeArray...
         // But it's not really practical. On the sending side, the user is likely to want
         // to work with strings and would need to convert, and on the receiving side,
@@ -25,7 +26,10 @@ namespace Unity.Netcode
         {
             var networkManager = (NetworkManager)context.SystemOwner;
 
-            if ((networkManager.IsServer || networkManager.LocalClient.IsSessionOwner) && networkManager.NetworkConfig.EnableNetworkLogs)
+            if (
+                (networkManager.IsServer || networkManager.LocalClient.IsSessionOwner)
+                && networkManager.NetworkConfig.EnableNetworkLogs
+            )
             {
                 reader.ReadValueSafe(out LogType);
                 ByteUnpacker.ReadValuePacked(reader, out Message);
@@ -34,8 +38,16 @@ namespace Unity.Netcode
                 if (networkManager.DAHost && networkManager.CurrentSessionOwner != networkManager.LocalClientId)
                 {
                     var message = this;
-                    var size = networkManager.ConnectionManager.SendMessage(ref message, NetworkDelivery.ReliableFragmentedSequenced, networkManager.CurrentSessionOwner);
-                    networkManager.NetworkMetrics.TrackServerLogSent(networkManager.CurrentSessionOwner, (uint)LogType, size);
+                    var size = networkManager.ConnectionManager.SendMessage(
+                        ref message,
+                        NetworkDelivery.ReliableFragmentedSequenced,
+                        networkManager.CurrentSessionOwner
+                    );
+                    networkManager.NetworkMetrics.TrackServerLogSent(
+                        networkManager.CurrentSessionOwner,
+                        (uint)LogType,
+                        size
+                    );
                     return false;
                 }
                 return true;
@@ -57,13 +69,19 @@ namespace Unity.Netcode
             switch (LogType)
             {
                 case NetworkLog.LogType.Info:
-                    networkManager.Log.Info(NetworkLog.BuildContextForServerMessage(networkManager, LogLevel.Normal, senderId, Message));
+                    networkManager.Log.Info(
+                        NetworkLog.BuildContextForServerMessage(networkManager, LogLevel.Normal, senderId, Message)
+                    );
                     break;
                 case NetworkLog.LogType.Warning:
-                    networkManager.Log.Warning(NetworkLog.BuildContextForServerMessage(networkManager, LogLevel.Error, senderId, Message));
+                    networkManager.Log.Warning(
+                        NetworkLog.BuildContextForServerMessage(networkManager, LogLevel.Error, senderId, Message)
+                    );
                     break;
                 case NetworkLog.LogType.Error:
-                    networkManager.Log.Error(NetworkLog.BuildContextForServerMessage(networkManager, LogLevel.Error, senderId, Message));
+                    networkManager.Log.Error(
+                        NetworkLog.BuildContextForServerMessage(networkManager, LogLevel.Error, senderId, Message)
+                    );
                     break;
             }
         }

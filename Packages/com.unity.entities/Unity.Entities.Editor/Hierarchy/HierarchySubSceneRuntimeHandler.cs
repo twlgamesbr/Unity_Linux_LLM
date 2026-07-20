@@ -11,11 +11,12 @@ namespace Unity.Entities.Editor
 {
     /// <summary>
     /// The hierarchy node type handler for Entity SubScenes.
-    /// </summary>    
+    /// </summary>
     internal class HierarchySubSceneRuntimeHandler : HierarchyNodeTypeHandler, IHierarchyEditorNodeTypeHandler
     {
         const string k_EntityUssClass = "hierarchy-item--subscene-node";
-        const string k_StyleSheetPath = "Packages/com.unity.entities/Editor Default Resources/uss/Hierarchy/hierarchy-entity-item.uss";
+        const string k_StyleSheetPath =
+            "Packages/com.unity.entities/Editor Default Resources/uss/Hierarchy/hierarchy-entity-item.uss";
 
         StyleSheet m_StyleSheet;
         StyleSheet m_ThemeStyleSheet;
@@ -25,16 +26,18 @@ namespace Unity.Entities.Editor
 
         HierarchyWorldHandler m_WorldHandler;
 
-        static readonly ProfilerMarker k_AllocatingHierarchyNodesMarker = new ("HierarchySubSceneRuntimeHandler.AllocatingNewHierarchyNodes");
-        static readonly ProfilerMarker k_CommandAddNodesMarker = new ("HierarchySubSceneRuntimeHandler.CommandAddNodes");
-        static readonly ProfilerMarker k_CommandSetNamesMarker = new ("HierarchySubSceneRuntimeHandler.CommandSetNames");
+        static readonly ProfilerMarker k_AllocatingHierarchyNodesMarker = new(
+            "HierarchySubSceneRuntimeHandler.AllocatingNewHierarchyNodes"
+        );
+        static readonly ProfilerMarker k_CommandAddNodesMarker = new("HierarchySubSceneRuntimeHandler.CommandAddNodes");
+        static readonly ProfilerMarker k_CommandSetNamesMarker = new("HierarchySubSceneRuntimeHandler.CommandSetNames");
 
         public override string GetNodeTypeName() => "SubSceneRuntime";
 
         protected override void Initialize()
         {
             base.Initialize();
-            
+
             UpdateHierarchySystem.OnAddSubSceneNodes += AddSubSceneNodes;
             UpdateHierarchySystem.OnRemoveEntityNodes += RemoveEntityNodes;
             UpdateHierarchySystem.OnResizeEntityHandlerMappingsCapacity += ResizeMappings;
@@ -49,7 +52,7 @@ namespace Unity.Entities.Editor
         {
             m_EntityToNodeMap.Dispose();
             m_NodeToEntityMap.Dispose();
-            
+
             UpdateHierarchySystem.OnAddSubSceneNodes -= AddSubSceneNodes;
             UpdateHierarchySystem.OnRemoveEntityNodes -= RemoveEntityNodes;
             UpdateHierarchySystem.OnResizeEntityHandlerMappingsCapacity -= ResizeMappings;
@@ -90,7 +93,11 @@ namespace Unity.Entities.Editor
         [InitializeOnLoadMethod, UsedImplicitly]
         internal static void RegisterHierarchyHandlers()
         {
-            EditorApplication.delayCall += Unity.Hierarchy.Editor.HierarchyWindow.RegisterNodeTypeHandler<HierarchySubSceneRuntimeHandler>;
+            EditorApplication.delayCall += Unity
+                .Hierarchy
+                .Editor
+                .HierarchyWindow
+                .RegisterNodeTypeHandler<HierarchySubSceneRuntimeHandler>;
         }
 
         [UsedImplicitly]
@@ -103,7 +110,7 @@ namespace Unity.Entities.Editor
         {
             if (nodes.Length == 0)
                 return;
-            
+
             var parentNode = m_WorldHandler.GetOrCreateWorldNode(world);
             AddNodes(parentNode, nodes);
         }
@@ -153,14 +160,14 @@ namespace Unity.Entities.Editor
             k_CommandSetNamesMarker.End();
 
             addedNodes.Dispose();
-            newHierarchyNodes.Dispose();            
+            newHierarchyNodes.Dispose();
         }
 
         void ResizeMappings(int count)
         {
-            if(m_EntityToNodeMap.Capacity < m_EntityToNodeMap.Count + count)
+            if (m_EntityToNodeMap.Capacity < m_EntityToNodeMap.Count + count)
                 m_EntityToNodeMap.Capacity = m_EntityToNodeMap.Count + count;
-            if(m_NodeToEntityMap.Capacity < m_NodeToEntityMap.Count + count)
+            if (m_NodeToEntityMap.Capacity < m_NodeToEntityMap.Count + count)
                 m_NodeToEntityMap.Capacity = m_NodeToEntityMap.Count + count;
         }
 
@@ -197,7 +204,7 @@ namespace Unity.Entities.Editor
             subSceneNode = default;
             return m_EntityToNodeMap.TryGetValue(subScene, out subSceneNode);
         }
-        
+
         internal Unity.Hierarchy.HierarchyNode GetOrCreateSubSceneNode(World world, Entity subScene)
         {
             if (m_EntityToNodeMap.TryGetValue(subScene, out var subSceneNode))
@@ -211,7 +218,7 @@ namespace Unity.Entities.Editor
             CommandList.SetName(subSceneNode, subSceneName.ToString());
 
             return subSceneNode;
-        }        
+        }
 
         protected override void OnBindView(HierarchyView view)
         {
@@ -270,27 +277,64 @@ namespace Unity.Entities.Editor
 
         #region IHierarchyEditorNodeTypeHandler
 
-        bool IHierarchyEditorNodeTypeHandler.CanSetName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnSetName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node, string name) => false;
-        string IHierarchyEditorNodeTypeHandler.GetDisplayName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) => Hierarchy.GetName(in node);
-        bool IHierarchyEditorNodeTypeHandler.CanDoubleClick(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnDoubleClick(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanCut(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnCut(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanCopy(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnCopy(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanPaste(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnPaste(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanPasteAsChild(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnPasteAsChild(HierarchyView view, bool keepWorldPos) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanDuplicate(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnDuplicate(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.CanDelete(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.OnDelete(HierarchyView view) => false;
-        bool IHierarchyEditorNodeTypeHandler.AcceptParent(HierarchyView view, in Unity.Hierarchy.HierarchyNode parent) => false;
-        bool IHierarchyEditorNodeTypeHandler.AcceptChild(HierarchyView view, in Unity.Hierarchy.HierarchyNode child) => false;
+        bool IHierarchyEditorNodeTypeHandler.CanSetName(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) =>
+            false;
 
-        bool IHierarchyEditorNodeTypeHandler.CanStartDrag(HierarchyView view, ReadOnlySpan<Unity.Hierarchy.HierarchyNode> nodes)
+        bool IHierarchyEditorNodeTypeHandler.OnSetName(
+            HierarchyView view,
+            in Unity.Hierarchy.HierarchyNode node,
+            string name
+        ) => false;
+
+        string IHierarchyEditorNodeTypeHandler.GetDisplayName(
+            HierarchyView view,
+            in Unity.Hierarchy.HierarchyNode node
+        ) => Hierarchy.GetName(in node);
+
+        bool IHierarchyEditorNodeTypeHandler.CanDoubleClick(
+            HierarchyView view,
+            in Unity.Hierarchy.HierarchyNode node
+        ) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnDoubleClick(HierarchyView view, in Unity.Hierarchy.HierarchyNode node) =>
+            false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanCut(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnCut(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanCopy(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnCopy(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanPaste(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnPaste(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanPasteAsChild(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnPasteAsChild(HierarchyView view, bool keepWorldPos) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanDuplicate(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnDuplicate(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanDelete(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.OnDelete(HierarchyView view) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.AcceptParent(
+            HierarchyView view,
+            in Unity.Hierarchy.HierarchyNode parent
+        ) => false;
+
+        bool IHierarchyEditorNodeTypeHandler.AcceptChild(HierarchyView view, in Unity.Hierarchy.HierarchyNode child) =>
+            false;
+
+        bool IHierarchyEditorNodeTypeHandler.CanStartDrag(
+            HierarchyView view,
+            ReadOnlySpan<Unity.Hierarchy.HierarchyNode> nodes
+        )
         {
             var canStartDrag = false;
             foreach (var node in nodes)
@@ -303,12 +347,28 @@ namespace Unity.Entities.Editor
         }
 
         void IHierarchyEditorNodeTypeHandler.OnStartDrag(in HierarchyViewDragAndDropSetupData data) { }
-        DragVisualMode IHierarchyEditorNodeTypeHandler.CanDrop(in HierarchyViewDragAndDropHandlingData data) => DragVisualMode.None;
+
+        DragVisualMode IHierarchyEditorNodeTypeHandler.CanDrop(in HierarchyViewDragAndDropHandlingData data) =>
+            DragVisualMode.None;
+
         bool IHierarchyEditorNodeTypeHandler.CanFindReferences(HierarchyView view) => false;
+
         bool IHierarchyEditorNodeTypeHandler.OnFindReferences(HierarchyView view) => false;
-        DragVisualMode IHierarchyEditorNodeTypeHandler.OnDrop(in HierarchyViewDragAndDropHandlingData data) => DragVisualMode.None;
-        void IHierarchyEditorNodeTypeHandler.GetTooltip(HierarchyViewItem item, bool isFiltering, StringBuilder tooltip) { }
-        void IHierarchyEditorNodeTypeHandler.PopulateContextMenu(HierarchyView view, HierarchyViewItem item, DropdownMenu menu) { }
+
+        DragVisualMode IHierarchyEditorNodeTypeHandler.OnDrop(in HierarchyViewDragAndDropHandlingData data) =>
+            DragVisualMode.None;
+
+        void IHierarchyEditorNodeTypeHandler.GetTooltip(
+            HierarchyViewItem item,
+            bool isFiltering,
+            StringBuilder tooltip
+        ) { }
+
+        void IHierarchyEditorNodeTypeHandler.PopulateContextMenu(
+            HierarchyView view,
+            HierarchyViewItem item,
+            DropdownMenu menu
+        ) { }
 
         #endregion
     }

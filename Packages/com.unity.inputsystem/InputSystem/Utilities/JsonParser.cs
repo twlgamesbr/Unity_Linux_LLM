@@ -86,7 +86,11 @@ namespace UnityEngine.InputSystem.Utilities
                 }
 
                 // See if we have a match.
-                if (m_Position < m_Length && m_Text[m_Position] == '"' && (pathPosition >= pathLength || path[pathPosition] == '/' || path[pathPosition] == '['))
+                if (
+                    m_Position < m_Length
+                    && m_Text[m_Position] == '"'
+                    && (pathPosition >= pathLength || path[pathPosition] == '/' || path[pathPosition] == '[')
+                )
                 {
                     // Have matched a property name. Navigate to value.
                     ++m_Position;
@@ -264,7 +268,7 @@ namespace UnityEngine.InputSystem.Utilities
                     result = new JsonString
                     {
                         text = new Substring(m_Text, startIndex, m_Position - startIndex - 1),
-                        hasEscapes = hasEscapes
+                        hasEscapes = hasEscapes,
                     };
                     return true;
                 }
@@ -581,7 +585,8 @@ namespace UnityEngine.InputSystem.Utilities
                 var thisLength = text.length;
                 var otherLength = other.text.length;
 
-                int thisIndex = 0, otherIndex = 0;
+                int thisIndex = 0,
+                    otherIndex = 0;
                 for (; thisIndex < thisLength && otherIndex < otherLength; ++thisIndex, ++otherIndex)
                 {
                     var thisChar = text[thisIndex];
@@ -623,12 +628,12 @@ namespace UnityEngine.InputSystem.Utilities
                 }
             }
 
-            public static bool operator==(JsonString left, JsonString right)
+            public static bool operator ==(JsonString left, JsonString right)
             {
                 return left.Equals(right);
             }
 
-            public static bool operator!=(JsonString left, JsonString right)
+            public static bool operator !=(JsonString left, JsonString right)
             {
                 return !left.Equals(right);
             }
@@ -654,10 +659,14 @@ namespace UnityEngine.InputSystem.Utilities
             {
                 switch (type)
                 {
-                    case JsonValueType.Bool: return boolValue;
-                    case JsonValueType.Integer: return integerValue != 0;
-                    case JsonValueType.Real: return NumberHelpers.Approximately(0, realValue);
-                    case JsonValueType.String: return Convert.ToBoolean(ToString());
+                    case JsonValueType.Bool:
+                        return boolValue;
+                    case JsonValueType.Integer:
+                        return integerValue != 0;
+                    case JsonValueType.Real:
+                        return NumberHelpers.Approximately(0, realValue);
+                    case JsonValueType.String:
+                        return Convert.ToBoolean(ToString());
                 }
                 return default;
             }
@@ -666,10 +675,14 @@ namespace UnityEngine.InputSystem.Utilities
             {
                 switch (type)
                 {
-                    case JsonValueType.Bool: return boolValue ? 1 : 0;
-                    case JsonValueType.Integer: return integerValue;
-                    case JsonValueType.Real: return (long)realValue;
-                    case JsonValueType.String: return Convert.ToInt64(ToString());
+                    case JsonValueType.Bool:
+                        return boolValue ? 1 : 0;
+                    case JsonValueType.Integer:
+                        return integerValue;
+                    case JsonValueType.Real:
+                        return (long)realValue;
+                    case JsonValueType.String:
+                        return Convert.ToInt64(ToString());
                 }
                 return default;
             }
@@ -678,10 +691,14 @@ namespace UnityEngine.InputSystem.Utilities
             {
                 switch (type)
                 {
-                    case JsonValueType.Bool: return boolValue ? 1 : 0;
-                    case JsonValueType.Integer: return integerValue;
-                    case JsonValueType.Real: return realValue;
-                    case JsonValueType.String: return Convert.ToSingle(ToString());
+                    case JsonValueType.Bool:
+                        return boolValue ? 1 : 0;
+                    case JsonValueType.Integer:
+                        return integerValue;
+                    case JsonValueType.Real:
+                        return realValue;
+                    case JsonValueType.String:
+                        return Convert.ToSingle(ToString());
                 }
                 return default;
             }
@@ -690,11 +707,16 @@ namespace UnityEngine.InputSystem.Utilities
             {
                 switch (type)
                 {
-                    case JsonValueType.None: return "null";
-                    case JsonValueType.Bool: return boolValue.ToString();
-                    case JsonValueType.Integer: return integerValue.ToString(CultureInfo.InvariantCulture);
-                    case JsonValueType.Real: return realValue.ToString(CultureInfo.InvariantCulture);
-                    case JsonValueType.String: return stringValue.ToString();
+                    case JsonValueType.None:
+                        return "null";
+                    case JsonValueType.Bool:
+                        return boolValue.ToString();
+                    case JsonValueType.Integer:
+                        return integerValue.ToString(CultureInfo.InvariantCulture);
+                    case JsonValueType.Real:
+                        return realValue.ToString(CultureInfo.InvariantCulture);
+                    case JsonValueType.String:
+                        return stringValue.ToString();
                     case JsonValueType.Array:
                         if (arrayValue == null)
                             return "[]";
@@ -704,36 +726,25 @@ namespace UnityEngine.InputSystem.Utilities
                             return "{}";
                         var elements = objectValue.Select(pair => $"\"{pair.Key}\" : \"{pair.Value}\"");
                         return $"{{{string.Join(",", elements)}}}";
-                    case JsonValueType.Any: return anyValue.ToString();
+                    case JsonValueType.Any:
+                        return anyValue.ToString();
                 }
                 return base.ToString();
             }
 
             public static implicit operator JsonValue(bool val)
             {
-                return new JsonValue
-                {
-                    type = JsonValueType.Bool,
-                    boolValue = val
-                };
+                return new JsonValue { type = JsonValueType.Bool, boolValue = val };
             }
 
             public static implicit operator JsonValue(long val)
             {
-                return new JsonValue
-                {
-                    type = JsonValueType.Integer,
-                    integerValue = val
-                };
+                return new JsonValue { type = JsonValueType.Integer, integerValue = val };
             }
 
             public static implicit operator JsonValue(double val)
             {
-                return new JsonValue
-                {
-                    type = JsonValueType.Real,
-                    realValue = val
-                };
+                return new JsonValue { type = JsonValueType.Real, realValue = val };
             }
 
             public static implicit operator JsonValue(string str)
@@ -741,44 +752,28 @@ namespace UnityEngine.InputSystem.Utilities
                 return new JsonValue
                 {
                     type = JsonValueType.String,
-                    stringValue = new JsonString { text = str }
+                    stringValue = new JsonString { text = str },
                 };
             }
 
             public static implicit operator JsonValue(JsonString str)
             {
-                return new JsonValue
-                {
-                    type = JsonValueType.String,
-                    stringValue = str
-                };
+                return new JsonValue { type = JsonValueType.String, stringValue = str };
             }
 
             public static implicit operator JsonValue(List<JsonValue> array)
             {
-                return new JsonValue
-                {
-                    type = JsonValueType.Array,
-                    arrayValue = array
-                };
+                return new JsonValue { type = JsonValueType.Array, arrayValue = array };
             }
 
             public static implicit operator JsonValue(Dictionary<string, JsonValue> obj)
             {
-                return new JsonValue
-                {
-                    type = JsonValueType.Object,
-                    objectValue = obj
-                };
+                return new JsonValue { type = JsonValueType.Object, objectValue = obj };
             }
 
             public static implicit operator JsonValue(Enum val)
             {
-                return new JsonValue
-                {
-                    type = JsonValueType.Any,
-                    anyValue = val
-                };
+                return new JsonValue { type = JsonValueType.Any, anyValue = val };
             }
 
             public bool Equals(JsonValue other)
@@ -788,14 +783,22 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     switch (type)
                     {
-                        case JsonValueType.None: return true;
-                        case JsonValueType.Bool: return boolValue == other.boolValue;
-                        case JsonValueType.Integer: return integerValue == other.integerValue;
-                        case JsonValueType.Real: return NumberHelpers.Approximately(realValue, other.realValue);
-                        case JsonValueType.String: return stringValue == other.stringValue;
-                        case JsonValueType.Object: throw new NotImplementedException();
-                        case JsonValueType.Array: throw new NotImplementedException();
-                        case JsonValueType.Any: return anyValue.Equals(other.anyValue);
+                        case JsonValueType.None:
+                            return true;
+                        case JsonValueType.Bool:
+                            return boolValue == other.boolValue;
+                        case JsonValueType.Integer:
+                            return integerValue == other.integerValue;
+                        case JsonValueType.Real:
+                            return NumberHelpers.Approximately(realValue, other.realValue);
+                        case JsonValueType.String:
+                            return stringValue == other.stringValue;
+                        case JsonValueType.Object:
+                            throw new NotImplementedException();
+                        case JsonValueType.Array:
+                            throw new NotImplementedException();
+                        case JsonValueType.Any:
+                            return anyValue.Equals(other.anyValue);
                     }
                     return false;
                 }
@@ -820,8 +823,10 @@ namespace UnityEngine.InputSystem.Utilities
                 {
                     switch (value.type)
                     {
-                        case JsonValueType.String: return value.stringValue == str;
-                        case JsonValueType.Integer: return long.TryParse(str, out var si) && si == value.integerValue;
+                        case JsonValueType.String:
+                            return value.stringValue == str;
+                        case JsonValueType.Integer:
+                            return long.TryParse(str, out var si) && si == value.integerValue;
                         case JsonValueType.Real:
                             return double.TryParse(str, out var sf) && NumberHelpers.Approximately(sf, value.realValue);
                         case JsonValueType.Bool:
@@ -842,8 +847,8 @@ namespace UnityEngine.InputSystem.Utilities
                     if (value.type == JsonValueType.Real)
                         return NumberHelpers.Approximately(d, value.realValue);
                     if (value.type == JsonValueType.String)
-                        return double.TryParse(value.ToString(), out var otherD) &&
-                            NumberHelpers.Approximately(d, otherD);
+                        return double.TryParse(value.ToString(), out var otherD)
+                            && NumberHelpers.Approximately(d, otherD);
                 }
                 if (obj is int i)
                 {
@@ -866,10 +871,10 @@ namespace UnityEngine.InputSystem.Utilities
                     if (value.type == JsonValueType.String)
                     {
                         if (b)
-                            return value.stringValue == "true" || value.stringValue == "True" ||
-                                value.stringValue == "1";
-                        return value.stringValue == "false" || value.stringValue == "False" ||
-                            value.stringValue == "0";
+                            return value.stringValue == "true"
+                                || value.stringValue == "True"
+                                || value.stringValue == "1";
+                        return value.stringValue == "false" || value.stringValue == "False" || value.stringValue == "0";
                     }
                 }
                 // NOTE: The enum-based comparisons allocate both on the Convert.ToInt64() and Enum.GetName() path. I've found
@@ -906,12 +911,12 @@ namespace UnityEngine.InputSystem.Utilities
                 }
             }
 
-            public static bool operator==(JsonValue left, JsonValue right)
+            public static bool operator ==(JsonValue left, JsonValue right)
             {
                 return left.Equals(right);
             }
 
-            public static bool operator!=(JsonValue left, JsonValue right)
+            public static bool operator !=(JsonValue left, JsonValue right)
             {
                 return !left.Equals(right);
             }

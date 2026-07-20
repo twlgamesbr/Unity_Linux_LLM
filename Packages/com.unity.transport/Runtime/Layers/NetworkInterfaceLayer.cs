@@ -3,7 +3,8 @@ using Unity.Jobs;
 
 namespace Unity.Networking.Transport
 {
-    internal struct NetworkInterfaceLayer<N> : INetworkLayer where N : unmanaged, INetworkInterface
+    internal struct NetworkInterfaceLayer<N> : INetworkLayer
+        where N : unmanaged, INetworkInterface
     {
         internal N m_NetworkInterface;
 
@@ -12,7 +13,11 @@ namespace Unity.Networking.Transport
             m_NetworkInterface = networkInterface;
         }
 
-        public unsafe int Initialize(ref NetworkSettings settings, ref ConnectionList connectionList, ref int packetPadding)
+        public unsafe int Initialize(
+            ref NetworkSettings settings,
+            ref ConnectionList connectionList,
+            ref int packetPadding
+        )
         {
             var result = m_NetworkInterface.Initialize(ref settings, ref packetPadding);
             if (result != 0)
@@ -21,7 +26,7 @@ namespace Unity.Networking.Transport
             // This is here only to support current websocket implementation where it requires to keep a reference to the connection list.
             if (BurstRuntime.GetHashCode64<N>() == BurstRuntime.GetHashCode64<WebSocketNetworkInterface>())
             {
-                fixed(void* interfacePtr = &m_NetworkInterface)
+                fixed (void* interfacePtr = &m_NetworkInterface)
                 {
                     ref var nif = ref *(WebSocketNetworkInterface*)interfacePtr;
                     connectionList = nif.CreateConnectionList();
@@ -30,7 +35,7 @@ namespace Unity.Networking.Transport
 #if !UNITY_WEBGL || UNITY_EDITOR
             else if (BurstRuntime.GetHashCode64<N>() == BurstRuntime.GetHashCode64<TCPNetworkInterface>())
             {
-                fixed(void* interfacePtr = &m_NetworkInterface)
+                fixed (void* interfacePtr = &m_NetworkInterface)
                 {
                     ref var nif = ref *(TCPNetworkInterface*)interfacePtr;
                     connectionList = nif.CreateConnectionList();

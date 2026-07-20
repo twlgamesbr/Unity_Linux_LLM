@@ -24,16 +24,12 @@ namespace UnityEditor.Rendering.Converter
                 onScanFinish?.Invoke(returnList);
             }
 
-            SearchServiceUtils.RunQueuedSearch
-            (
+            SearchServiceUtils.RunQueuedSearch(
                 SearchServiceUtils.IndexingOptions.DeepSearch,
                 contextSearchQueriesAndIds,
                 (item, description) =>
                 {
-                    var assetItem = new RenderPipelineConverterAssetItem(item.id)
-                    {
-                        info = description
-                    };
+                    var assetItem = new RenderPipelineConverterAssetItem(item.id) { info = description };
                     assets.Add(assetItem);
                 },
                 OnSearchFinish
@@ -52,7 +48,8 @@ namespace UnityEditor.Rendering.Converter
 
             if (obj == null)
             {
-                message = $"Failed to load {assetItem.name} Global ID {assetItem.GlobalObjectId} Asset Path {assetItem.assetPath}";
+                message =
+                    $"Failed to load {assetItem.name} Global ID {assetItem.GlobalObjectId} Asset Path {assetItem.assetPath}";
                 return Status.Error;
             }
 

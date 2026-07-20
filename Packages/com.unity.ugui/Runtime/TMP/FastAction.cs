@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 
-
 namespace TMPro
 {
     /// <summary>
@@ -10,7 +9,8 @@ namespace TMPro
     {
         LinkedList<System.Action> delegates = new LinkedList<System.Action>();
 
-        Dictionary<System.Action, LinkedListNode<System.Action>> lookup = new Dictionary<System.Action, LinkedListNode<System.Action>>();
+        Dictionary<System.Action, LinkedListNode<System.Action>> lookup =
+            new Dictionary<System.Action, LinkedListNode<System.Action>>();
 
         public void Add(System.Action rhs)
         {
@@ -49,7 +49,8 @@ namespace TMPro
     {
         LinkedList<System.Action<A>> delegates = new LinkedList<System.Action<A>>();
 
-        Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>> lookup = new Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>>();
+        Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>> lookup =
+            new Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>>();
 
         public void Add(System.Action<A> rhs)
         {
@@ -89,7 +90,8 @@ namespace TMPro
     {
         LinkedList<System.Action<A, B>> delegates = new LinkedList<System.Action<A, B>>();
 
-        Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>> lookup = new Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>>();
+        Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>> lookup =
+            new Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>>();
 
         public void Add(System.Action<A, B> rhs)
         {
@@ -130,7 +132,8 @@ namespace TMPro
     {
         LinkedList<System.Action<A, B, C>> delegates = new LinkedList<System.Action<A, B, C>>();
 
-        Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>> lookup = new Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>>();
+        Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>> lookup =
+            new Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>>();
 
         public void Add(System.Action<A, B, C> rhs)
         {

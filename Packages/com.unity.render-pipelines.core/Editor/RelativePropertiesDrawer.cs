@@ -39,11 +39,22 @@ namespace UnityEditor.Rendering
                 if (relativeProperty == null)
                     continue;
 
-                var height = EditorGUI.GetPropertyHeight(relativeProperty, true) +
-                             EditorGUIUtility.standardVerticalSpacing;
-                rect = rect != null ?
-                    new Rect(rect.Value.x, rect.Value.y + rect.Value.height + EditorGUIUtility.standardVerticalSpacing, rect.Value.width, height) :
-                    new Rect(position.x, position.y + EditorGUIUtility.standardVerticalSpacing, position.width, height);
+                var height =
+                    EditorGUI.GetPropertyHeight(relativeProperty, true) + EditorGUIUtility.standardVerticalSpacing;
+                rect =
+                    rect != null
+                        ? new Rect(
+                            rect.Value.x,
+                            rect.Value.y + rect.Value.height + EditorGUIUtility.standardVerticalSpacing,
+                            rect.Value.width,
+                            height
+                        )
+                        : new Rect(
+                            position.x,
+                            position.y + EditorGUIUtility.standardVerticalSpacing,
+                            position.width,
+                            height
+                        );
                 EditorGUI.PropertyField(rect.Value, relativeProperty);
             }
             EditorGUI.EndProperty();
@@ -59,7 +70,8 @@ namespace UnityEditor.Rendering
                 if (relativeProperty == null)
                     continue;
 
-                height += EditorGUI.GetPropertyHeight(relativeProperty, true) + EditorGUIUtility.standardVerticalSpacing;
+                height +=
+                    EditorGUI.GetPropertyHeight(relativeProperty, true) + EditorGUIUtility.standardVerticalSpacing;
             }
             return height;
         }

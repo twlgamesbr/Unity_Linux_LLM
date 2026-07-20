@@ -14,13 +14,13 @@ namespace Unity.Physics.Authoring
             var extents = 0.5f * size;
             var aabb = new Aabb { Min = float.MaxValue, Max = float.MinValue };
             aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(-1f, -1f, -1f)))); // 000
-            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(-1f, -1f,  1f)))); // 001
-            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(-1f,  1f, -1f)))); // 010
-            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(-1f,  1f,  1f)))); // 011
-            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f, -1f, -1f))));  // 100
-            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f, -1f,  1f))));  // 101
-            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f,  1f, -1f))));  // 110
-            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f,  1f,  1f))));  // 111
+            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(-1f, -1f, 1f)))); // 001
+            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(-1f, 1f, -1f)))); // 010
+            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(-1f, 1f, 1f)))); // 011
+            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f, -1f, -1f)))); // 100
+            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f, -1f, 1f)))); // 101
+            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f, 1f, -1f)))); // 110
+            aabb.Include(center + math.mul(orientation, math.mul(extents, new float3(1f, 1f, 1f)))); // 111
             return aabb;
         }
 
@@ -29,7 +29,7 @@ namespace Unity.Physics.Authoring
             var cylinder = new Aabb
             {
                 Min = center + new float3(2f * radius, -height, 2f * radius),
-                Max = center + new float3(2f * radius, height, 2f * radius)
+                Max = center + new float3(2f * radius, height, 2f * radius),
             };
             return RotatedBoxAabb(cylinder.Center, cylinder.Extents, orientation);
         }
@@ -54,7 +54,11 @@ namespace Unity.Physics.Authoring
                     var p = shapeData.BoxProperties;
                     bytes.Append(ref p);
                     var aabb = RotatedBoxAabb(p.Center, p.Size, shapeData.BoxProperties.Orientation);
-                    HashableShapeInputs.GetQuantizedTransformations(shapeData.BodyFromShape, aabb, out var transformations);
+                    HashableShapeInputs.GetQuantizedTransformations(
+                        shapeData.BodyFromShape,
+                        aabb,
+                        out var transformations
+                    );
                     bytes.Append(ref transformations);
                     break;
                 }
@@ -65,8 +69,17 @@ namespace Unity.Physics.Authoring
                     var v0 = p.Vertex0;
                     var v1 = p.Vertex1;
                     var r = p.Radius;
-                    var aabb = RotatedCylinderAabb(p.GetCenter(), p.GetHeight(), r, quaternion.LookRotationSafe(v0 - v1, math.up()));
-                    HashableShapeInputs.GetQuantizedTransformations(shapeData.BodyFromShape, aabb, out var transformations);
+                    var aabb = RotatedCylinderAabb(
+                        p.GetCenter(),
+                        p.GetHeight(),
+                        r,
+                        quaternion.LookRotationSafe(v0 - v1, math.up())
+                    );
+                    HashableShapeInputs.GetQuantizedTransformations(
+                        shapeData.BodyFromShape,
+                        aabb,
+                        out var transformations
+                    );
                     bytes.Append(ref transformations);
                     break;
                 }
@@ -74,8 +87,17 @@ namespace Unity.Physics.Authoring
                 {
                     var p = shapeData.CylinderProperties;
                     bytes.Append(ref p);
-                    var aabb = RotatedCylinderAabb(p.Center, p.Height, p.Radius, shapeData.CylinderProperties.Orientation);
-                    HashableShapeInputs.GetQuantizedTransformations(shapeData.BodyFromShape, aabb, out var transformations);
+                    var aabb = RotatedCylinderAabb(
+                        p.Center,
+                        p.Height,
+                        p.Radius,
+                        shapeData.CylinderProperties.Orientation
+                    );
+                    HashableShapeInputs.GetQuantizedTransformations(
+                        shapeData.BodyFromShape,
+                        aabb,
+                        out var transformations
+                    );
                     bytes.Append(ref transformations);
                     break;
                 }
@@ -85,8 +107,16 @@ namespace Unity.Physics.Authoring
                     bytes.Append(ref v);
                     var planeCenter = math.lerp(v.c0, v.c2, 0.5f);
                     var planeSize = math.abs(v.c0 - v.c2);
-                    var aabb = RotatedBoxAabb(planeCenter, planeSize, quaternion.LookRotationSafe(v.c1 - v.c2, math.cross(v.c1 - v.c0, v.c2 - v.c1)));
-                    HashableShapeInputs.GetQuantizedTransformations(shapeData.BodyFromShape, aabb, out var transformations);
+                    var aabb = RotatedBoxAabb(
+                        planeCenter,
+                        planeSize,
+                        quaternion.LookRotationSafe(v.c1 - v.c2, math.cross(v.c1 - v.c0, v.c2 - v.c1))
+                    );
+                    HashableShapeInputs.GetQuantizedTransformations(
+                        shapeData.BodyFromShape,
+                        aabb,
+                        out var transformations
+                    );
                     bytes.Append(ref transformations);
                     break;
                 }
@@ -94,8 +124,16 @@ namespace Unity.Physics.Authoring
                 {
                     var p = shapeData.SphereProperties;
                     bytes.Append(ref p);
-                    var aabb = new Aabb { Min = p.Center - new float3(p.Radius), Max = p.Center + new float3(p.Radius) };
-                    HashableShapeInputs.GetQuantizedTransformations(shapeData.BodyFromShape, aabb, out var transformations);
+                    var aabb = new Aabb
+                    {
+                        Min = p.Center - new float3(p.Radius),
+                        Max = p.Center + new float3(p.Radius),
+                    };
+                    HashableShapeInputs.GetQuantizedTransformations(
+                        shapeData.BodyFromShape,
+                        aabb,
+                        out var transformations
+                    );
                     bytes.Append(ref transformations);
                     break;
                 }
@@ -127,32 +165,50 @@ namespace Unity.Physics.Authoring
                 case ShapeType.Box:
                 {
                     return BoxCollider.CreateInternal(
-                        shapeData.BoxProperties, shapeData.CollisionFilter, shapeData.Material, shapeData.ForceUniqueIdentifier
+                        shapeData.BoxProperties,
+                        shapeData.CollisionFilter,
+                        shapeData.Material,
+                        shapeData.ForceUniqueIdentifier
                     );
                 }
                 case ShapeType.Capsule:
                 {
                     return CapsuleCollider.CreateInternal(
-                        shapeData.CapsuleProperties, shapeData.CollisionFilter, shapeData.Material, shapeData.ForceUniqueIdentifier
+                        shapeData.CapsuleProperties,
+                        shapeData.CollisionFilter,
+                        shapeData.Material,
+                        shapeData.ForceUniqueIdentifier
                     );
                 }
                 case ShapeType.Cylinder:
                 {
                     return CylinderCollider.CreateInternal(
-                        shapeData.CylinderProperties, shapeData.CollisionFilter, shapeData.Material, shapeData.ForceUniqueIdentifier
+                        shapeData.CylinderProperties,
+                        shapeData.CollisionFilter,
+                        shapeData.Material,
+                        shapeData.ForceUniqueIdentifier
                     );
                 }
                 case ShapeType.Plane:
                 {
                     var v = shapeData.PlaneVertices;
                     return PolygonCollider.CreateQuadInternal(
-                        v.c0, v.c1, v.c2, v.c3, shapeData.CollisionFilter, shapeData.Material, shapeData.ForceUniqueIdentifier
+                        v.c0,
+                        v.c1,
+                        v.c2,
+                        v.c3,
+                        shapeData.CollisionFilter,
+                        shapeData.Material,
+                        shapeData.ForceUniqueIdentifier
                     );
                 }
                 case ShapeType.Sphere:
                 {
                     return SphereCollider.CreateInternal(
-                        shapeData.SphereProperties, shapeData.CollisionFilter, shapeData.Material, shapeData.ForceUniqueIdentifier
+                        shapeData.SphereProperties,
+                        shapeData.CollisionFilter,
+                        shapeData.Material,
+                        shapeData.ForceUniqueIdentifier
                     );
                 }
                 // Note : Mesh and Hull are not computed here as they are in a separated set of jobs

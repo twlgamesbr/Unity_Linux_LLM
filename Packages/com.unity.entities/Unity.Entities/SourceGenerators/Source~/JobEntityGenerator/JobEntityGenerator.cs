@@ -22,28 +22,39 @@ public class JobEntityGenerator : IIncrementalGenerator
         var projectPathProvider = IncrementalSourceGenHelpers.GetSourceGenConfigProvider(context);
 
         // Do a simple filter for enums
-        var candidateProvider = context.SyntaxProvider
-            .CreateSyntaxProvider(
+        var candidateProvider = context
+            .SyntaxProvider.CreateSyntaxProvider(
                 predicate: JobEntitySyntaxFinder.IsSyntaxTargetForGeneration,
-                transform: JobEntitySyntaxFinder.GetSemanticTargetForGeneration)
-            .Where(t => t is {});
+                transform: JobEntitySyntaxFinder.GetSemanticTargetForGeneration
+            )
+            .Where(t => t is { });
 
         var compilationProvider = context.CompilationProvider;
         var combined = candidateProvider.Combine(compilationProvider).Combine(projectPathProvider);
 
-        context.RegisterSourceOutput(combined, (productionContext, sourceProviderTuple) =>
-        {
-            var ((structDeclarationSyntax, compilation), sourceGenConfig) = sourceProviderTuple;
+        context.RegisterSourceOutput(
+            combined,
+            (productionContext, sourceProviderTuple) =>
+            {
+                var ((structDeclarationSyntax, compilation), sourceGenConfig) = sourceProviderTuple;
 
-            Execute(productionContext,
-                compilation,
-                structDeclarationSyntax,
-                checkUserDefinedQueriesForSchedulingJobs: sourceGenConfig.performSafetyChecks || sourceGenConfig.isDotsDebugMode);
-        });
+                Execute(
+                    productionContext,
+                    compilation,
+                    structDeclarationSyntax,
+                    checkUserDefinedQueriesForSchedulingJobs: sourceGenConfig.performSafetyChecks
+                        || sourceGenConfig.isDotsDebugMode
+                );
+            }
+        );
     }
 
-    static void Execute(SourceProductionContext context, Compilation compilation,
-        StructDeclarationSyntax candidate, bool checkUserDefinedQueriesForSchedulingJobs)
+    static void Execute(
+        SourceProductionContext context,
+        Compilation compilation,
+        StructDeclarationSyntax candidate,
+        bool checkUserDefinedQueriesForSchedulingJobs
+    )
     {
         if (!SourceGenHelpers.ShouldRun(compilation, context.CancellationToken))
             return;
@@ -54,7 +65,11 @@ public class JobEntityGenerator : IIncrementalGenerator
             var syntaxTree = candidate.SyntaxTree;
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
 
-            var jobEntityDescription = new JobEntityDescription(candidate, semanticModel, checkUserDefinedQueriesForSchedulingJobs);
+            var jobEntityDescription = new JobEntityDescription(
+                candidate,
+                semanticModel,
+                checkUserDefinedQueriesForSchedulingJobs
+            );
             if (jobEntityDescription.Invalid)
             {
                 foreach (var diagnostic in jobEntityDescription.SourceGenDiagnostics)
@@ -62,8 +77,17 @@ public class JobEntityGenerator : IIncrementalGenerator
                 return;
             }
             var generatedJobEntity = jobEntityDescription.Generate();
-            var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(compilation.Assembly.Name, GeneratorName, candidate.GetLocation().GetLineSpan().StartLinePosition.Line);
-            var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(sourceFilePath.FullFilePath, candidate,generatedJobEntity, context.CancellationToken);
+            var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(
+                compilation.Assembly.Name,
+                GeneratorName,
+                candidate.GetLocation().GetLineSpan().StartLinePosition.Line
+            );
+            var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
+                sourceFilePath.FullFilePath,
+                candidate,
+                generatedJobEntity,
+                context.CancellationToken
+            );
 
             context.AddSource(syntaxTree.GetGeneratedSourceFileName(GeneratorName, candidate), outputSource);
 
@@ -75,9 +99,12 @@ public class JobEntityGenerator : IIncrementalGenerator
                 throw;
 
             context.ReportDiagnostic(
-                Diagnostic.Create(JobEntityDiagnostics.SGICE003Descriptor,
+                Diagnostic.Create(
+                    JobEntityDiagnostics.SGICE003Descriptor,
                     compilation.SyntaxTrees.First().GetRoot().GetLocation(),
-                    exception.ToUnityPrintableString()));
+                    exception.ToUnityPrintableString()
+                )
+            );
         }
     }
 }
@@ -86,8 +113,13 @@ public static class JobEntityDiagnostics
 {
     const string ID_SGICE003 = "SGICE003";
 
-    public static readonly DiagnosticDescriptor SGICE003Descriptor
-        = new DiagnosticDescriptor(ID_SGICE003, "IJobEntity Generator",
-            "This error indicates a bug in the DOTS source generators. We'd appreciate a bug report (Help -> Report a Bug...). Thanks! Error message: '{0}'.",
-            JobEntityGenerator.GeneratorName, DiagnosticSeverity.Error, isEnabledByDefault: true, description: "");
+    public static readonly DiagnosticDescriptor SGICE003Descriptor = new DiagnosticDescriptor(
+        ID_SGICE003,
+        "IJobEntity Generator",
+        "This error indicates a bug in the DOTS source generators. We'd appreciate a bug report (Help -> Report a Bug...). Thanks! Error message: '{0}'.",
+        JobEntityGenerator.GeneratorName,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: ""
+    );
 }

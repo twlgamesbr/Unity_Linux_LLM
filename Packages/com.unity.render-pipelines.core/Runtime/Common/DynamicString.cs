@@ -11,14 +11,15 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Create a DynamicString string with the default capacity.
         /// </summary>
-        public DynamicString() : base()
-        {}
+        public DynamicString()
+            : base() { }
 
         /// <summary>
         /// Create a DynamicString given a string.
         /// </summary>
         /// <param name="s">The string to initialize with.</param>
-        public DynamicString(string s) : base(s.Length, true)
+        public DynamicString(string s)
+            : base(s.Length, true)
         {
             for (int i = 0; i < s.Length; ++i)
                 m_Array[i] = s[i];
@@ -28,7 +29,8 @@ namespace UnityEngine.Rendering
         /// Allocate an empty dynamic string with the given number of characters allocated.
         /// </summary>
         /// <param name="capacity">The number of characters to pre-allocate.</param>
-        public DynamicString(int capacity) : base(capacity, false) { }
+        public DynamicString(int capacity)
+            : base(capacity, false) { }
 
         /// <summary>
         /// Append a string to the DynamicString. This will not allocate memory if the capacity is still sufficient.
@@ -39,7 +41,7 @@ namespace UnityEngine.Rendering
             int offset = size;
             Reserve(size + s.Length, true);
             for (int i = 0; i < s.Length; ++i)
-                m_Array[offset+i] = s[i];
+                m_Array[offset + i] = s[i];
             size += s.Length;
             BumpVersion();
         }
@@ -59,5 +61,4 @@ namespace UnityEngine.Rendering
             return new string(m_Array, 0, size);
         }
     }
-
 }

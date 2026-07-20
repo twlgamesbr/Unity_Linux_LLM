@@ -34,7 +34,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             if (!MetricIdTypeLibrary.IsValidTypeIndex(typeIndex))
             {
                 throw new ArgumentOutOfRangeException(
-                    $"Cannot construct {nameof(MetricId)} with out-of-range {nameof(TypeIndex)} {typeIndex}.");
+                    $"Cannot construct {nameof(MetricId)} with out-of-range {nameof(TypeIndex)} {typeIndex}."
+                );
             }
             TypeIndex = typeIndex;
             EnumValue = enumValue;

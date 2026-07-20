@@ -60,7 +60,12 @@ namespace Unity.Netcode
             var quatMax = Mathf.Max(quatAbsValue0, quatAbsValue1, quatAbsValue2, quatAbsValue3);
 
             // Find the index of the largest element, so we can skip that element while compressing and decompressing
-            var indexToSkip = (ushort)(quatAbsValue0 == quatMax ? 0 : quatAbsValue1 == quatMax ? 1 : quatAbsValue2 == quatMax ? 2 : 3);
+            var indexToSkip = (ushort)(
+                quatAbsValue0 == quatMax ? 0
+                : quatAbsValue1 == quatMax ? 1
+                : quatAbsValue2 == quatMax ? 2
+                : 3
+            );
 
             // Get the sign of the largest element which is all that is needed when calculating the sum of squares of a normalized quaternion.
             var quatMaxSign = (quaternion[indexToSkip] < 0 ? k_True : k_False);
@@ -71,11 +76,35 @@ namespace Unity.Netcode
             // Step 1: If we are on the index to skip, preserve the current compressed value, otherwise proceed to step 2 and 3
             // Step 2: Get the sign of the element we are processing. If it is not the same as the largest value's sign bit then we set the bit
             // Step 3: Get the compressed and encoded value by multiplying the absolute value of the current element by k_CompressionEncodingMask and round that result up
-            compressed = 0 != indexToSkip ? (compressed << 10) | (uint)((quaternion[0] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False) << k_ShiftNegativeBit | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue0) : compressed;
+            compressed =
+                0 != indexToSkip
+                    ? (compressed << 10)
+                        | (uint)((quaternion[0] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False)
+                            << k_ShiftNegativeBit
+                        | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue0)
+                    : compressed;
             // Repeat the 3 steps for the remaining elements
-            compressed = 1 != indexToSkip ? (compressed << 10) | (uint)((quaternion[1] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False) << k_ShiftNegativeBit | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue1) : compressed;
-            compressed = 2 != indexToSkip ? (compressed << 10) | (uint)((quaternion[2] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False) << k_ShiftNegativeBit | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue2) : compressed;
-            compressed = 3 != indexToSkip ? (compressed << 10) | (uint)((quaternion[3] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False) << k_ShiftNegativeBit | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue3) : compressed;
+            compressed =
+                1 != indexToSkip
+                    ? (compressed << 10)
+                        | (uint)((quaternion[1] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False)
+                            << k_ShiftNegativeBit
+                        | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue1)
+                    : compressed;
+            compressed =
+                2 != indexToSkip
+                    ? (compressed << 10)
+                        | (uint)((quaternion[2] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False)
+                            << k_ShiftNegativeBit
+                        | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue2)
+                    : compressed;
+            compressed =
+                3 != indexToSkip
+                    ? (compressed << 10)
+                        | (uint)((quaternion[3] < 0 ? k_True : k_False) != quatMaxSign ? k_True : k_False)
+                            << k_ShiftNegativeBit
+                        | (ushort)Mathf.Round(k_CompressionEncodingMask * quatAbsValue3)
+                    : compressed;
 
             // Return the compress quaternion
             return compressed;
@@ -101,7 +130,9 @@ namespace Unity.Netcode
                     continue;
                 }
                 // Check the negative bit and multiply that result with the decompressed and decoded value
-                quaternion[i] = ((compressed & k_NegShortBit) > 0 ? -1.0f : 1.0f) * ((compressed & k_PrecisionMask) * k_DecompressionDecodingMask);
+                quaternion[i] =
+                    ((compressed & k_NegShortBit) > 0 ? -1.0f : 1.0f)
+                    * ((compressed & k_PrecisionMask) * k_DecompressionDecodingMask);
                 sumOfSquaredMagnitudes += quaternion[i] * quaternion[i];
                 compressed = compressed >> 10;
             }

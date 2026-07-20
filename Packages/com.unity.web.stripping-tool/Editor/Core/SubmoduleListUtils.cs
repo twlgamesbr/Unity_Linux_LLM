@@ -1,7 +1,7 @@
 // NOTE: generic code, do not use UnityEngine here
 #nullable enable
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -17,7 +17,11 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="submoduleConfig">The submodule configuration file.</param>
         /// <param name="errorLog">Optional: error log output.</param>
         /// <returns>A list of unique submodule names with all submodules expanded.</returns>
-        public static HashSet<string> ExpandNestedSubmodules(IEnumerable<string> submodules, SubmoduleConfig submoduleConfig, TextWriter? errorLog=null)
+        public static HashSet<string> ExpandNestedSubmodules(
+            IEnumerable<string> submodules,
+            SubmoduleConfig submoduleConfig,
+            TextWriter? errorLog = null
+        )
         {
             var expandedSubmodules = new HashSet<string>();
 
@@ -29,7 +33,12 @@ namespace Unity.Web.Stripping.Editor
             return expandedSubmodules;
         }
 
-        private static void GetNestedSubmodules(string submodule, SubmoduleConfig submoduleConfig, TextWriter? errorLog, HashSet<string> outSubmodules)
+        private static void GetNestedSubmodules(
+            string submodule,
+            SubmoduleConfig submoduleConfig,
+            TextWriter? errorLog,
+            HashSet<string> outSubmodules
+        )
         {
             var submoduleDefinition = submoduleConfig.submodules.Find(x => x.name == submodule);
             if (submoduleDefinition == null)

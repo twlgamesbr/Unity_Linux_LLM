@@ -12,18 +12,45 @@ namespace UnityEditor.Rendering.Universal
         {
             public GUIContent x = new GUIContent("X");
             public GUIContent y = new GUIContent("Y");
-            public GUIContent assetsPPU = new GUIContent("Assets Pixels Per Unit", "The amount of pixels that make up one unit of the Scene. Set this value to match the PPU value of Sprites in the Scene.");
-            public GUIContent refRes = new GUIContent("Reference Resolution", "The original resolution the Assets are designed for.");
-            public GUIContent gridSnapping = new GUIContent("Grid Snapping", "Sets the snapping behavior for the camera and sprites.");
-            public GUIContent cropFrame = new GUIContent("Crop Frame", "Crops the viewport to match the Reference Resolution, along the checked axis. Black bars will be added to fit the screen aspect ratio.");
-            public GUIContent filterMode = new GUIContent("Filter Mode", "Use selected Filter Mode when using Stretch Fill to upscale from Reference Resolution.");
-            public GUIContent stretchFill = new GUIContent("Stretch Fill", "If enabled, expands the viewport to fit the screen resolution while maintaining the viewport aspect ratio.");
-            public GUIContent currentPixelRatio = new GUIContent("Current Pixel Ratio", "Ratio of the rendered Sprites compared to their original size.");
-            public GUIContent runInEditMode = new GUIContent("Run In Edit Mode", "Enable this to preview Camera setting changes in Edit Mode. This will cause constant changes to the Scene while active.");
-            public const string cameraStackingWarning = "Pixel Perfect Camera won't function properly if stacked with another camera.";
-            public const string nonRenderer2DWarning = "URP Pixel Perfect Camera requires a camera using a 2D Renderer. Some features, such as Upscale Render Texture, are not supported with other Renderers.";
+            public GUIContent assetsPPU = new GUIContent(
+                "Assets Pixels Per Unit",
+                "The amount of pixels that make up one unit of the Scene. Set this value to match the PPU value of Sprites in the Scene."
+            );
+            public GUIContent refRes = new GUIContent(
+                "Reference Resolution",
+                "The original resolution the Assets are designed for."
+            );
+            public GUIContent gridSnapping = new GUIContent(
+                "Grid Snapping",
+                "Sets the snapping behavior for the camera and sprites."
+            );
+            public GUIContent cropFrame = new GUIContent(
+                "Crop Frame",
+                "Crops the viewport to match the Reference Resolution, along the checked axis. Black bars will be added to fit the screen aspect ratio."
+            );
+            public GUIContent filterMode = new GUIContent(
+                "Filter Mode",
+                "Use selected Filter Mode when using Stretch Fill to upscale from Reference Resolution."
+            );
+            public GUIContent stretchFill = new GUIContent(
+                "Stretch Fill",
+                "If enabled, expands the viewport to fit the screen resolution while maintaining the viewport aspect ratio."
+            );
+            public GUIContent currentPixelRatio = new GUIContent(
+                "Current Pixel Ratio",
+                "Ratio of the rendered Sprites compared to their original size."
+            );
+            public GUIContent runInEditMode = new GUIContent(
+                "Run In Edit Mode",
+                "Enable this to preview Camera setting changes in Edit Mode. This will cause constant changes to the Scene while active."
+            );
+            public const string cameraStackingWarning =
+                "Pixel Perfect Camera won't function properly if stacked with another camera.";
+            public const string nonRenderer2DWarning =
+                "URP Pixel Perfect Camera requires a camera using a 2D Renderer. Some features, such as Upscale Render Texture, are not supported with other Renderers.";
             public const string nonRenderer2DError = "URP Pixel Perfect Camera requires a camera using a 2D Renderer.";
-            public const string renderScaleWarning = "Render Scale in Quality Settings is {0:F2}. Crop Frame and Upscale Render Texture are not supported when Render Scale is not 1.0.The Render Scale setting will be ignored.";
+            public const string renderScaleWarning =
+                "Render Scale in Quality Settings is {0:F2}. Crop Frame and Upscale Render Texture are not supported when Render Scale is not 1.0.The Render Scale setting will be ignored.";
 
             public GUIStyle centeredLabel;
 
@@ -203,19 +230,20 @@ namespace UnityEditor.Rendering.Universal
                 }
             }
 
-            // Warning for render scale quality setting 
+            // Warning for render scale quality setting
             var asset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
             if (asset != null && !Mathf.Approximately(asset.renderScale, 1.0f))
             {
                 bool usingCropFrame = m_CropFrame.enumValueIndex != (int)PixelPerfectCamera.CropFrame.None;
-                bool usingUpscaleRT = m_GridSnapping.enumValueIndex == (int)PixelPerfectCamera.GridSnapping.UpscaleRenderTexture;
+                bool usingUpscaleRT =
+                    m_GridSnapping.enumValueIndex == (int)PixelPerfectCamera.GridSnapping.UpscaleRenderTexture;
 
                 if (usingCropFrame || usingUpscaleRT)
                 {
-                    EditorGUILayout.HelpBox(string.Format(
-                        Style.renderScaleWarning,
-                        asset.renderScale),
-                        MessageType.Warning);
+                    EditorGUILayout.HelpBox(
+                        string.Format(Style.renderScaleWarning, asset.renderScale),
+                        MessageType.Warning
+                    );
                 }
             }
         }
@@ -237,7 +265,10 @@ namespace UnityEditor.Rendering.Universal
             float verticalOrthoSize;
             float horizontalOrthoSize;
 
-            if (obj.cropFrame == PixelPerfectCamera.CropFrame.StretchFill || obj.cropFrame == PixelPerfectCamera.CropFrame.Windowbox)
+            if (
+                obj.cropFrame == PixelPerfectCamera.CropFrame.StretchFill
+                || obj.cropFrame == PixelPerfectCamera.CropFrame.Windowbox
+            )
             {
                 verticalOrthoSize = obj.refResolutionY * 0.5f / obj.assetsPPU;
                 horizontalOrthoSize = verticalOrthoSize * ((float)obj.refResolutionX / obj.refResolutionY);

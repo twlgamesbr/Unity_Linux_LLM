@@ -14,26 +14,33 @@ namespace Unity.Physics
         // Contact Jacobians
         /// <summary>   An enum constant representing the contact jacobian. </summary>
         Contact,
+
         /// <summary>   An enum constant representing the trigger jacobian. </summary>
         Trigger,
 
         // Joint Jacobians
         /// <summary>   An enum constant representing the linear limit joint jacobian. </summary>
         LinearLimit,
+
         /// <summary>   An enum constant representing the angular limit 1 d joint jacobian. </summary>
         AngularLimit1D,
+
         /// <summary>   An enum constant representing the angular limit 2D joint jacobian. </summary>
         AngularLimit2D,
+
         /// <summary>   An enum constant representing the angular limit 3D joint jacobian. </summary>
         AngularLimit3D,
 
         // Motor Jacobians
         /// <summary>   An enum constant representing the rotation motor jacobian. </summary>
         RotationMotor,
+
         /// <summary>   An enum constant representing the angular velocity motor jacobian. </summary>
         AngularVelocityMotor,
+
         /// <summary>   An enum constant representing the position motor jacobian. </summary>
         PositionMotor,
+
         /// <summary>   An enum constant representing the linear velocity motor jacobian. </summary>
         LinearVelocityMotor,
     }
@@ -45,21 +52,26 @@ namespace Unity.Physics
         // These flags apply to all Jacobians
         /// <summary>   A binary constant representing the disabled flag. Applies to all jacobians. </summary>
         Disabled = 1 << 0,
+
         /// <summary>   A binary constant representing the enable mass factors flag. Applies to all jacobians.</summary>
         EnableMassFactors = 1 << 1,
 
         // These flags apply only to contact Jacobians:
         /// <summary> A binary constant representing whether both at least one of the two bodies in this contact is dynamic. </summary>
         IsContactDynamic = 1 << 3,
+
         /// <summary>
         /// A binary constant representing the detailed static mesh collision option which prevents ghost collisions
         /// with static meshes by further analyzing the colliders' trajectory at the contact point.
         /// </summary>
         EnableDetailedStaticMeshCollision = 1 << 4,
+
         /// <summary>   A binary constant representing the is trigger flag. Apples only to contact jacobian. </summary>
         IsTrigger = 1 << 5,
+
         /// <summary>   A binary constant representing the enable collision events flag. Apples only to contact jacobian. </summary>
         EnableCollisionEvents = 1 << 6,
+
         /// <summary>   A binary constant representing the enable surface velocity flag. Apples only to contact jacobian. </summary>
         EnableSurfaceVelocity = 1 << 7,
 
@@ -118,7 +130,8 @@ namespace Unity.Physics
 
         public bool IsAngular => Type >= JacobianType.AngularLimit1D && Type <= JacobianType.AngularVelocityMotor;
 
-        public bool IsVelocityConstraint => Type == JacobianType.AngularVelocityMotor || Type == JacobianType.LinearVelocityMotor;
+        public bool IsVelocityConstraint =>
+            Type == JacobianType.AngularVelocityMotor || Type == JacobianType.LinearVelocityMotor;
 
         // Whether the Jacobian contains manifold data for collision events or not
         public bool HasContactManifold => (Flags & JacobianFlags.EnableCollisionEvents) != 0;
@@ -132,7 +145,7 @@ namespace Unity.Physics
         // Collider keys for the collision events
         public ColliderKeyPair ColliderKeys
         {
-            get => HasContactManifold? AccessColliderKeys() : ColliderKeyPair.Empty;
+            get => HasContactManifold ? AccessColliderKeys() : ColliderKeyPair.Empty;
             set
             {
                 if (HasContactManifold)
@@ -146,7 +159,7 @@ namespace Unity.Physics
         public bool HasMassFactors => (Flags & JacobianFlags.EnableMassFactors) != 0;
         public MassFactors MassFactors
         {
-            get => HasMassFactors? AccessMassFactors() : MassFactors.Default;
+            get => HasMassFactors ? AccessMassFactors() : MassFactors.Default;
             set
             {
                 if (HasMassFactors)
@@ -160,7 +173,7 @@ namespace Unity.Physics
         public bool HasSurfaceVelocity => (Flags & JacobianFlags.EnableSurfaceVelocity) != 0;
         public SurfaceVelocity SurfaceVelocity
         {
-            get => HasSurfaceVelocity? AccessSurfaceVelocity() : new SurfaceVelocity();
+            get => HasSurfaceVelocity ? AccessSurfaceVelocity() : new SurfaceVelocity();
             set
             {
                 if (HasSurfaceVelocity)
@@ -179,14 +192,19 @@ namespace Unity.Physics
 
         // Update the MotionData of the Jacobians when substepping. This is used when there are more than one substeps,
         // prior to solver iteration and is needed so that the Jacobian Solve methods have access to up-to-date motion data.
-        public void UpdateContact(in MotionVelocity velocityA, in MotionVelocity velocityB, in Math.MTransform worldFromA,
-            in Math.MTransform worldFromB, Solver.StepInput stepInput)
+        public void UpdateContact(
+            in MotionVelocity velocityA,
+            in MotionVelocity velocityB,
+            in Math.MTransform worldFromA,
+            in Math.MTransform worldFromB,
+            Solver.StepInput stepInput
+        )
         {
             SafetyChecks.CheckAreEqualAndThrow(true, Type == JacobianType.Contact);
             if (Enabled)
             {
-                AccessBaseJacobian<ContactJacobian>().Update(ref this, in velocityA, in velocityB,
-                    in worldFromA, in worldFromB, stepInput);
+                AccessBaseJacobian<ContactJacobian>()
+                    .Update(ref this, in velocityA, in velocityB, in worldFromA, in worldFromB, stepInput);
             }
         }
 
@@ -231,45 +249,70 @@ namespace Unity.Physics
         }
 
         // Solve the Jacobian
-        public void Solve([NoAlias] ref MotionVelocity velocityA, [NoAlias] ref MotionVelocity velocityB, Solver.StepInput stepInput,
-            [NoAlias] ref NativeStream.Writer collisionEventsWriter, [NoAlias] ref NativeStream.Writer triggerEventsWriter,
-            [NoAlias] ref NativeStream.Writer impulseEventsWriter, bool enableFrictionVelocitiesHeuristic,
-            Solver.MotionStabilizationInput motionStabilizationSolverInputA, Solver.MotionStabilizationInput motionStabilizationSolverInputB)
+        public void Solve(
+            [NoAlias] ref MotionVelocity velocityA,
+            [NoAlias] ref MotionVelocity velocityB,
+            Solver.StepInput stepInput,
+            [NoAlias] ref NativeStream.Writer collisionEventsWriter,
+            [NoAlias] ref NativeStream.Writer triggerEventsWriter,
+            [NoAlias] ref NativeStream.Writer impulseEventsWriter,
+            bool enableFrictionVelocitiesHeuristic,
+            Solver.MotionStabilizationInput motionStabilizationSolverInputA,
+            Solver.MotionStabilizationInput motionStabilizationSolverInputB
+        )
         {
             if (Enabled)
             {
                 switch (Type)
                 {
                     case JacobianType.Contact:
-                        AccessBaseJacobian<ContactJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput, ref collisionEventsWriter,
-                            enableFrictionVelocitiesHeuristic, motionStabilizationSolverInputA, motionStabilizationSolverInputB);
+                        AccessBaseJacobian<ContactJacobian>()
+                            .Solve(
+                                ref this,
+                                ref velocityA,
+                                ref velocityB,
+                                stepInput,
+                                ref collisionEventsWriter,
+                                enableFrictionVelocitiesHeuristic,
+                                motionStabilizationSolverInputA,
+                                motionStabilizationSolverInputB
+                            );
                         break;
                     case JacobianType.Trigger:
-                        AccessBaseJacobian<TriggerJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput, ref triggerEventsWriter);
+                        AccessBaseJacobian<TriggerJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput, ref triggerEventsWriter);
                         break;
                     case JacobianType.LinearLimit:
-                        AccessBaseJacobian<LinearLimitJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
+                        AccessBaseJacobian<LinearLimitJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
                         break;
                     case JacobianType.AngularLimit1D:
-                        AccessBaseJacobian<AngularLimit1DJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
+                        AccessBaseJacobian<AngularLimit1DJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
                         break;
                     case JacobianType.AngularLimit2D:
-                        AccessBaseJacobian<AngularLimit2DJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
+                        AccessBaseJacobian<AngularLimit2DJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
                         break;
                     case JacobianType.AngularLimit3D:
-                        AccessBaseJacobian<AngularLimit3DJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
+                        AccessBaseJacobian<AngularLimit3DJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput, ref impulseEventsWriter);
                         break;
                     case JacobianType.RotationMotor:
-                        AccessBaseJacobian<RotationMotorJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput);
+                        AccessBaseJacobian<RotationMotorJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput);
                         break;
                     case JacobianType.AngularVelocityMotor:
-                        AccessBaseJacobian<AngularVelocityMotorJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput);
+                        AccessBaseJacobian<AngularVelocityMotorJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput);
                         break;
                     case JacobianType.PositionMotor:
-                        AccessBaseJacobian<PositionMotorJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput);
+                        AccessBaseJacobian<PositionMotorJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput);
                         break;
                     case JacobianType.LinearVelocityMotor:
-                        AccessBaseJacobian<LinearVelocityMotorJacobian>().Solve(ref this, ref velocityA, ref velocityB, stepInput);
+                        AccessBaseJacobian<LinearVelocityMotorJacobian>()
+                            .Solve(ref this, ref velocityA, ref velocityB, stepInput);
                         break;
                     default:
                         SafetyChecks.ThrowNotImplementedException();
@@ -287,67 +330,82 @@ namespace Unity.Physics
 
         public static int CalculateSize(JacobianType type, JacobianFlags flags, int numContactPoints = 0)
         {
-            return UnsafeUtility.SizeOf<JacobianHeader>() +
-                SizeOfBaseJacobian(type) + SizeOfModifierData(type, flags) +
-                numContactPoints * UnsafeUtility.SizeOf<ContactJacAngAndVelToReachCp>() +
-                SizeOfContactPointData(type, flags, numContactPoints);
+            return UnsafeUtility.SizeOf<JacobianHeader>()
+                + SizeOfBaseJacobian(type)
+                + SizeOfModifierData(type, flags)
+                + numContactPoints * UnsafeUtility.SizeOf<ContactJacAngAndVelToReachCp>()
+                + SizeOfContactPointData(type, flags, numContactPoints);
         }
 
         public static int CalculateJointSize(JacobianType type, JacobianFlags flags, SolverType solverType)
         {
             var baseJointSize = CalculateSize(type, flags, numContactPoints: 0);
-            return solverType == SolverType.Direct ?
-                baseJointSize + UnsafeUtility.SizeOf<DirectSolverRegularizationData>() : // extra solver data for joints processed by direct solver
+            return solverType == SolverType.Direct
+                ? baseJointSize + UnsafeUtility.SizeOf<DirectSolverRegularizationData>()
+                : // extra solver data for joints processed by direct solver
                 baseJointSize;
         }
 
         private static int SizeOfColliderKeys(JacobianType type, JacobianFlags flags)
         {
-            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableCollisionEvents) != 0) ?
-                UnsafeUtility.SizeOf<ColliderKeyPair>() : 0;
+            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableCollisionEvents) != 0)
+                ? UnsafeUtility.SizeOf<ColliderKeyPair>()
+                : 0;
         }
 
         private static int SizeOfEntityPair(JacobianType type, JacobianFlags flags)
         {
-            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableCollisionEvents) != 0) ?
-                UnsafeUtility.SizeOf<EntityPair>() : 0;
+            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableCollisionEvents) != 0)
+                ? UnsafeUtility.SizeOf<EntityPair>()
+                : 0;
         }
 
         private static int SizeOfSurfaceVelocity(JacobianType type, JacobianFlags flags)
         {
-            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableSurfaceVelocity) != 0) ?
-                UnsafeUtility.SizeOf<SurfaceVelocity>() : 0;
+            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableSurfaceVelocity) != 0)
+                ? UnsafeUtility.SizeOf<SurfaceVelocity>()
+                : 0;
         }
 
         private static int SizeOfMassFactors(JacobianType type, JacobianFlags flags)
         {
-            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableMassFactors) != 0) ?
-                UnsafeUtility.SizeOf<MassFactors>() : 0;
+            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableMassFactors) != 0)
+                ? UnsafeUtility.SizeOf<MassFactors>()
+                : 0;
         }
 
         private static int SizeOfJacobianContactCollidersData(JacobianType type, JacobianFlags flags)
         {
-            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableDetailedStaticMeshCollision) != 0) ?
-                UnsafeUtility.SizeOf<ContactJacobianPolygonData>() : 0;
+            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableDetailedStaticMeshCollision) != 0)
+                ? UnsafeUtility.SizeOf<ContactJacobianPolygonData>()
+                : 0;
         }
 
         private static int SizeOfModifierData(JacobianType type, JacobianFlags flags)
         {
-            return SizeOfColliderKeys(type, flags) + SizeOfEntityPair(type, flags) + SizeOfSurfaceVelocity(type, flags) +
-                SizeOfMassFactors(type, flags) + SizeOfImpulseEventSolverData(type, flags) + SizeOfJacobianContactCollidersData(type, flags);
+            return SizeOfColliderKeys(type, flags)
+                + SizeOfEntityPair(type, flags)
+                + SizeOfSurfaceVelocity(type, flags)
+                + SizeOfMassFactors(type, flags)
+                + SizeOfImpulseEventSolverData(type, flags)
+                + SizeOfJacobianContactCollidersData(type, flags);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining
+        )]
         private static int SizeOfImpulseEventSolverData(JacobianType type, JacobianFlags flags)
         {
-            return (IsNonMotorizedConstraint(type) && (flags & JacobianFlags.EnableImpulseEvents) != 0) ?
-                UnsafeUtility.SizeOf<ImpulseEventSolverData>() : 0;
+            return (IsNonMotorizedConstraint(type) && (flags & JacobianFlags.EnableImpulseEvents) != 0)
+                ? UnsafeUtility.SizeOf<ImpulseEventSolverData>()
+                : 0;
         }
 
         private static int SizeOfContactPointData(JacobianType type, JacobianFlags flags, int numContactPoints = 0)
         {
-            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableCollisionEvents) != 0) ?
-                numContactPoints * UnsafeUtility.SizeOf<ContactPoint>() : 0;
+            return (type == JacobianType.Contact && (flags & JacobianFlags.EnableCollisionEvents) != 0)
+                ? numContactPoints * UnsafeUtility.SizeOf<ContactPoint>()
+                : 0;
         }
 
         private static int SizeOfBaseJacobian(JacobianType type)
@@ -381,7 +439,8 @@ namespace Unity.Physics
         }
 
         // Access to "base" jacobian - a jacobian that comes after the header
-        public unsafe ref T AccessBaseJacobian<T>() where T : struct
+        public unsafe ref T AccessBaseJacobian<T>()
+            where T : struct
         {
             byte* ptr = (byte*)UnsafeUtility.AddressOf(ref this);
             ptr += UnsafeUtility.SizeOf<JacobianHeader>();
@@ -408,8 +467,11 @@ namespace Unity.Physics
         {
             Assert.IsTrue((Flags & JacobianFlags.EnableSurfaceVelocity) != 0);
             byte* ptr = (byte*)UnsafeUtility.AddressOf(ref this);
-            ptr += UnsafeUtility.SizeOf<JacobianHeader>() + SizeOfBaseJacobian(Type) +
-                SizeOfColliderKeys(Type, Flags) + SizeOfEntityPair(Type, Flags);
+            ptr +=
+                UnsafeUtility.SizeOf<JacobianHeader>()
+                + SizeOfBaseJacobian(Type)
+                + SizeOfColliderKeys(Type, Flags)
+                + SizeOfEntityPair(Type, Flags);
             return ref UnsafeUtility.AsRef<SurfaceVelocity>(ptr);
         }
 
@@ -417,8 +479,12 @@ namespace Unity.Physics
         {
             Assert.IsTrue((Flags & JacobianFlags.EnableMassFactors) != 0);
             byte* ptr = (byte*)UnsafeUtility.AddressOf(ref this);
-            ptr += UnsafeUtility.SizeOf<JacobianHeader>() + SizeOfBaseJacobian(Type) +
-                SizeOfColliderKeys(Type, Flags) + SizeOfEntityPair(Type, Flags) + SizeOfSurfaceVelocity(Type, Flags);
+            ptr +=
+                UnsafeUtility.SizeOf<JacobianHeader>()
+                + SizeOfBaseJacobian(Type)
+                + SizeOfColliderKeys(Type, Flags)
+                + SizeOfEntityPair(Type, Flags)
+                + SizeOfSurfaceVelocity(Type, Flags);
             return ref UnsafeUtility.AsRef<MassFactors>(ptr);
         }
 
@@ -426,8 +492,11 @@ namespace Unity.Physics
         {
             Assert.IsTrue(Type == JacobianType.Contact || Type == JacobianType.Trigger);
             byte* ptr = (byte*)UnsafeUtility.AddressOf(ref this);
-            ptr += UnsafeUtility.SizeOf<JacobianHeader>() + SizeOfBaseJacobian(Type) + SizeOfModifierData(Type, Flags) +
-                pointIndex * UnsafeUtility.SizeOf<ContactJacAngAndVelToReachCp>();
+            ptr +=
+                UnsafeUtility.SizeOf<JacobianHeader>()
+                + SizeOfBaseJacobian(Type)
+                + SizeOfModifierData(Type, Flags)
+                + pointIndex * UnsafeUtility.SizeOf<ContactJacAngAndVelToReachCp>();
             return ref UnsafeUtility.AsRef<ContactJacAngAndVelToReachCp>(ptr);
         }
 
@@ -437,9 +506,12 @@ namespace Unity.Physics
 
             var baseJac = AccessBaseJacobian<ContactJacobian>();
             byte* ptr = (byte*)UnsafeUtility.AddressOf(ref this);
-            ptr += UnsafeUtility.SizeOf<JacobianHeader>() + SizeOfBaseJacobian(Type) + SizeOfModifierData(Type, Flags) +
-                baseJac.BaseJacobian.NumContacts * UnsafeUtility.SizeOf<ContactJacAngAndVelToReachCp>() +
-                pointIndex * UnsafeUtility.SizeOf<ContactPoint>();
+            ptr +=
+                UnsafeUtility.SizeOf<JacobianHeader>()
+                + SizeOfBaseJacobian(Type)
+                + SizeOfModifierData(Type, Flags)
+                + baseJac.BaseJacobian.NumContacts * UnsafeUtility.SizeOf<ContactJacAngAndVelToReachCp>()
+                + pointIndex * UnsafeUtility.SizeOf<ContactPoint>();
             return ref UnsafeUtility.AsRef<ContactPoint>(ptr);
         }
 
@@ -456,9 +528,13 @@ namespace Unity.Physics
         {
             Assert.IsTrue((Flags & JacobianFlags.EnableDetailedStaticMeshCollision) != 0);
             byte* ptr = (byte*)UnsafeUtility.AddressOf(ref this);
-            ptr += UnsafeUtility.SizeOf<JacobianHeader>() + SizeOfBaseJacobian(Type) +
-                SizeOfColliderKeys(Type, Flags) + SizeOfEntityPair(Type, Flags) + SizeOfSurfaceVelocity(Type, Flags) +
-                SizeOfMassFactors(Type, Flags);
+            ptr +=
+                UnsafeUtility.SizeOf<JacobianHeader>()
+                + SizeOfBaseJacobian(Type)
+                + SizeOfColliderKeys(Type, Flags)
+                + SizeOfEntityPair(Type, Flags)
+                + SizeOfSurfaceVelocity(Type, Flags)
+                + SizeOfMassFactors(Type, Flags);
             return ref UnsafeUtility.AsRef<ContactJacobianPolygonData>(ptr);
         }
 
@@ -478,8 +554,14 @@ namespace Unity.Physics
         // This is the inverse function to CalculateConstraintTauAndDamping
         // Given a final Tau and Damping you can get the original Spring Frequency and Damping Ratio.
         // See Unity.Physics.Constraint struct for discussion about default Spring Frequency and Damping Ratio.
-        public static void CalculateSpringFrequencyAndDamping(float constraintTau, float constraintDamping,
-            float timeStep, int iterations, out float springFrequency, out float dampingRatio)
+        public static void CalculateSpringFrequencyAndDamping(
+            float constraintTau,
+            float constraintDamping,
+            float timeStep,
+            int iterations,
+            out float springFrequency,
+            out float dampingRatio
+        )
         {
             int n = iterations;
             float h = timeStep;
@@ -498,8 +580,14 @@ namespace Unity.Physics
         }
 
         // This is the inverse function to CalculateSpringFrequencyAndDamping
-        public static void CalculateConstraintTauAndDamping(float springFrequency, float dampingRatio, float timeStep,
-            int iterations, out float constraintTau, out float constraintDamping)
+        public static void CalculateConstraintTauAndDamping(
+            float springFrequency,
+            float dampingRatio,
+            float timeStep,
+            int iterations,
+            out float constraintTau,
+            out float constraintDamping
+        )
         {
             /*
             In the following we derive the formulas for converting spring frequency and damping ratio to the solver constraint regularization parameters tau and damping,
@@ -647,8 +735,13 @@ namespace Unity.Physics
         /// Eq. 59 in S. Andrews et al., SIGGRAPH'22 Course: Contact and Friction Simulation for Computer Graphics.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ComputeDirectSolverViscoelasticRegularizationTerms(out float epsilon, out float gamma, in float stiffness,
-            in float damping, in float timeStep)
+        public static void ComputeDirectSolverViscoelasticRegularizationTerms(
+            out float epsilon,
+            out float gamma,
+            in float stiffness,
+            in float damping,
+            in float timeStep
+        )
         {
             if (stiffness + damping > 0)
             {
@@ -667,7 +760,12 @@ namespace Unity.Physics
         /// Same as calling <see cref="ComputeDirectSolverViscoelasticRegularizationTerms"/> with damping set to 0.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ComputeDirectSolverElasticRegularizationTerms(out float epsilon, out float gamma, in float stiffness, in float timeStep)
+        public static void ComputeDirectSolverElasticRegularizationTerms(
+            out float epsilon,
+            out float gamma,
+            in float stiffness,
+            in float timeStep
+        )
         {
             epsilon = math.select(math.EPSILON, math.rcp(timeStep * timeStep * stiffness), stiffness > 0);
             gamma = 1.0f;
@@ -681,20 +779,38 @@ namespace Unity.Physics
         /// <param name="slip"></param>
         /// <param name="timeStep"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ComputeDirectSolverViscousRegularizationTerm(out float epsilon, in float slip, in float timeStep)
+        public static void ComputeDirectSolverViscousRegularizationTerm(
+            out float epsilon,
+            in float slip,
+            in float timeStep
+        )
         {
             // epsilon for zero stiffness, and considering that damping = 1/slip:
             //      epsilon = 1 / (timestep * damping) = 1 / (timestep * (1/slip)) = (1 / timestep) * slip = slip / timestep
             epsilon = slip / timeStep;
         }
 
-        public static JacobianHeader.DirectSolverRegularizationData CalculateDirectSolverRegularizationData(in JacobianHeader header,
-            in Constraint constraint, in MotionVelocity velocityA, in MotionVelocity velocityB,
-            in Solver.DirectSolverSettings directSolverSettings, in float timeStep)
+        public static JacobianHeader.DirectSolverRegularizationData CalculateDirectSolverRegularizationData(
+            in JacobianHeader header,
+            in Constraint constraint,
+            in MotionVelocity velocityA,
+            in MotionVelocity velocityB,
+            in Solver.DirectSolverSettings directSolverSettings,
+            in float timeStep
+        )
         {
-            var constrainedMass = header.IsAngular ? GetConstrainedBodyInertia(velocityA, velocityB) : GetConstrainedBodyMass(velocityA, velocityB);
-            var stiffnessCoefficient = CalculateSpringConstantFromSpringFrequency(constraint.SpringFrequency, constrainedMass);
-            var dampingCoefficient = CalculateDampingCoefficient(stiffnessCoefficient, constraint.DampingRatio, constrainedMass);
+            var constrainedMass = header.IsAngular
+                ? GetConstrainedBodyInertia(velocityA, velocityB)
+                : GetConstrainedBodyMass(velocityA, velocityB);
+            var stiffnessCoefficient = CalculateSpringConstantFromSpringFrequency(
+                constraint.SpringFrequency,
+                constrainedMass
+            );
+            var dampingCoefficient = CalculateDampingCoefficient(
+                stiffnessCoefficient,
+                constraint.DampingRatio,
+                constrainedMass
+            );
 
             float epsilon;
             float gamma = 1.0f; // Note: without any regularization, gamma is 1 in the formulation.
@@ -709,18 +825,23 @@ namespace Unity.Physics
             }
             else
             {
-                var cappedStiffnessCoefficient = math.min(stiffnessCoefficient, directSolverSettings.MaximumJointStiffness);
+                var cappedStiffnessCoefficient = math.min(
+                    stiffnessCoefficient,
+                    directSolverSettings.MaximumJointStiffness
+                );
                 var cappedDampingCoefficient = math.min(dampingCoefficient, directSolverSettings.MaximumJointDamping);
 
                 // position constraint: use visco-elastic constitutive model (spring/damper)
-                ComputeDirectSolverViscoelasticRegularizationTerms(out epsilon, out gamma, cappedStiffnessCoefficient, cappedDampingCoefficient, timeStep);
+                ComputeDirectSolverViscoelasticRegularizationTerms(
+                    out epsilon,
+                    out gamma,
+                    cappedStiffnessCoefficient,
+                    cappedDampingCoefficient,
+                    timeStep
+                );
             }
 
-            return new JacobianHeader.DirectSolverRegularizationData
-            {
-                Epsilon = epsilon,
-                Gamma = gamma,
-            };
+            return new JacobianHeader.DirectSolverRegularizationData { Epsilon = epsilon, Gamma = gamma };
         }
 
         // Calculates the spring frequency from the spring constant and mass for a simple mass-spring system.
@@ -803,8 +924,12 @@ namespace Unity.Physics
         }
 
         // Integrate the relative orientation of a pair of bodies, faster and less memory than storing both bodies' orientations and integrating them separately
-        public static quaternion IntegrateOrientationBFromA(quaternion bFromA, float3 angularVelocityA,
-            float3 angularVelocityB, float timestep)
+        public static quaternion IntegrateOrientationBFromA(
+            quaternion bFromA,
+            float3 angularVelocityA,
+            float3 angularVelocityB,
+            float timestep
+        )
         {
             quaternion dqA = Integrator.IntegrateAngularVelocity(angularVelocityA, timestep);
             quaternion dqB = Integrator.IntegrateAngularVelocity(angularVelocityB, timestep);
@@ -813,8 +938,13 @@ namespace Unity.Physics
 
         // Calculate the inverse effective mass of a linear jacobian
         public static float CalculateInvEffectiveMassDiag(
-            float3 angA, float3 invInertiaA, float invMassA,
-            float3 angB, float3 invInertiaB, float invMassB)
+            float3 angA,
+            float3 invInertiaA,
+            float invMassA,
+            float3 angB,
+            float3 invInertiaB,
+            float invMassB
+        )
         {
             float3 angularPart = angA * angA * invInertiaA + angB * angB * invInertiaB;
             float linearPart = invMassA + invMassB;
@@ -823,8 +953,13 @@ namespace Unity.Physics
 
         // Calculate the inverse effective mass for a pair of jacobians with perpendicular linear parts
         public static float CalculateInvEffectiveMassOffDiag(
-            float3 angA0, float3 angA1, float3 invInertiaA,
-            float3 angB0, float3 angB1, float3 invInertiaB)
+            float3 angA0,
+            float3 angA1,
+            float3 invInertiaA,
+            float3 angB0,
+            float3 angB1,
+            float3 invInertiaB
+        )
         {
             return math.csum(angA0 * angA1 * invInertiaA + angB0 * angB1 * invInertiaB);
         }
@@ -833,7 +968,9 @@ namespace Unity.Physics
         public static bool InvertSymmetricMatrix(float3 diag, float3 offDiag, out float3 invDiag, out float3 invOffDiag)
         {
             float3 offDiagSq = offDiag.zyx * offDiag.zyx;
-            float determinant = (Math.HorizontalMul(diag) + 2.0f * Math.HorizontalMul(offDiag) - math.csum(offDiagSq * diag));
+            float determinant = (
+                Math.HorizontalMul(diag) + 2.0f * Math.HorizontalMul(offDiag) - math.csum(offDiagSq * diag)
+            );
             bool determinantOk = (determinant != 0);
             float invDeterminant = math.select(0.0f, 1.0f / determinant, determinantOk);
             invDiag = (diag.yxx * diag.zzy - offDiagSq) * invDeterminant;
@@ -862,7 +999,8 @@ namespace Unity.Physics
             return new(
                 new float3(mat.c0.x, mat01, mat02),
                 new float3(mat01, mat.c1.y, mat12),
-                new float3(mat02, mat12, mat.c2.z));
+                new float3(mat02, mat12, mat.c2.z)
+            );
         }
 
         /// <summary>
@@ -931,7 +1069,10 @@ namespace Unity.Physics
 
             // Cases when threshold is exceeded:
             // Test Case C: No impulses accumulated and the impulse is larger than threshold:
-            if ((math.length(accumulatedImpulse) < math.EPSILON) && (math.length(impulse) - maxImpulseOfMotor > math.EPSILON))
+            if (
+                (math.length(accumulatedImpulse) < math.EPSILON)
+                && (math.length(impulse) - maxImpulseOfMotor > math.EPSILON)
+            )
             {
                 impulse = maxImpulseOfMotor * math.normalizesafe(impulse); //cap impulse at threshold
             }
@@ -948,11 +1089,20 @@ namespace Unity.Physics
         // isAxisInA should match how axisInA/axisInB is used in the Motor Baking
         // if the authoring axis is an axis relative to bodyA then set isAxisInA = T
         // if the authoring axis is an axis relative to bodyB, then set isAxisInA = F
-        internal static BodyFrame CalculateDefaultBodyFramesForConnectedBody(RigidTransform worldFromA, RigidTransform worldFromB,
-            float3 positionBodyA, float3 axis, out BodyFrame jointFrameB, bool isAxisInA)
+        internal static BodyFrame CalculateDefaultBodyFramesForConnectedBody(
+            RigidTransform worldFromA,
+            RigidTransform worldFromB,
+            float3 positionBodyA,
+            float3 axis,
+            out BodyFrame jointFrameB,
+            bool isAxisInA
+        )
         {
-            float3 positionBodyB, perpendicularAxisInA, perpendicularAxisInB;
-            float3 axisInA, axisInB;
+            float3 positionBodyB,
+                perpendicularAxisInA,
+                perpendicularAxisInB;
+            float3 axisInA,
+                axisInB;
 
             RigidTransform bFromA = math.mul(math.inverse(worldFromB), worldFromA);
 
@@ -965,7 +1115,7 @@ namespace Unity.Physics
             {
                 RigidTransform aFromB = math.mul(math.inverse(worldFromA), worldFromB);
                 axisInA = math.mul(aFromB.rot, axis); //motor axis relative to bodyA
-                axisInB = axis;  //motor axis in Connected Entity space
+                axisInB = axis; //motor axis in Connected Entity space
             }
 
             //position of motored body relative to Connected Entity in world space
@@ -979,13 +1129,13 @@ namespace Unity.Physics
             {
                 Axis = axisInA,
                 PerpendicularAxis = perpendicularAxisInA,
-                Position = positionBodyA
+                Position = positionBodyA,
             };
             jointFrameB = new BodyFrame
             {
                 Axis = axisInB,
                 PerpendicularAxis = perpendicularAxisInB,
-                Position = positionBodyB
+                Position = positionBodyB,
             };
 
             return jointFrameA;
@@ -1010,7 +1160,10 @@ namespace Unity.Physics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float GetConstrainedBodyInertia(in MotionVelocity motionVelocityA, in MotionVelocity motionVelocityB)
+        public static float GetConstrainedBodyInertia(
+            in MotionVelocity motionVelocityA,
+            in MotionVelocity motionVelocityB
+        )
         {
             float approxInertia = 0;
             if (!motionVelocityA.IsKinematic)
@@ -1042,14 +1195,21 @@ namespace Unity.Physics
         int m_CurrentConstraintIndex;
 #endif
 
-        public IslandJacobianIterator(in NativeStream.Reader jacobianStreamReader,
-            in DispatchPairSequencer.DirectSolverSchedulerInfo directSolverSchedulerInfo, int islandIndex)
+        public IslandJacobianIterator(
+            in NativeStream.Reader jacobianStreamReader,
+            in DispatchPairSequencer.DirectSolverSchedulerInfo directSolverSchedulerInfo,
+            int islandIndex
+        )
         {
             m_Reader = jacobianStreamReader.GetUnsafeReader();
             m_DirectSolverSchedulerInfo = directSolverSchedulerInfo;
-            m_NextDispatchPairIslandInfoIndex = directSolverSchedulerInfo.FirstDispatchPairIslandInfoIndices[islandIndex];
-            m_LastDispatchPairIslandInfoIndex = m_NextDispatchPairIslandInfoIndex
-                + directSolverSchedulerInfo.DispatchPairIslandInfoCounts[islandIndex] - 1;
+            m_NextDispatchPairIslandInfoIndex = directSolverSchedulerInfo.FirstDispatchPairIslandInfoIndices[
+                islandIndex
+            ];
+            m_LastDispatchPairIslandInfoIndex =
+                m_NextDispatchPairIslandInfoIndex
+                + directSolverSchedulerInfo.DispatchPairIslandInfoCounts[islandIndex]
+                - 1;
             m_NextDispatchPair = true;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             m_CurrentConstraintBlockLength = -1;
@@ -1078,13 +1238,20 @@ namespace Unity.Physics
             do
             {
                 // Get phased dispatch pair index from unphased dispatch pair index, and move to next index
-                int unphasedDispatchPairIndex = m_DirectSolverSchedulerInfo.DispatchPairIslandInfos[m_NextDispatchPairIslandInfoIndex++].UnphasedDispatchPairIndex;
-                int phasedDispatchPairIndex = m_DirectSolverSchedulerInfo.UnphasedToPhasedDispatchPairMap[unphasedDispatchPairIndex];
+                int unphasedDispatchPairIndex = m_DirectSolverSchedulerInfo
+                    .DispatchPairIslandInfos[m_NextDispatchPairIslandInfoIndex++]
+                    .UnphasedDispatchPairIndex;
+                int phasedDispatchPairIndex = m_DirectSolverSchedulerInfo.UnphasedToPhasedDispatchPairMap[
+                    unphasedDispatchPairIndex
+                ];
 
                 // Get Jacobian mapping for current pair
-                jacobianMapping = m_DirectSolverSchedulerInfo.PhasedDispatchPairJacobianMappings[phasedDispatchPairIndex];
-            }
-            while (!jacobianMapping.IsValid && m_NextDispatchPairIslandInfoIndex <= m_LastDispatchPairIslandInfoIndex);
+                jacobianMapping = m_DirectSolverSchedulerInfo.PhasedDispatchPairJacobianMappings[
+                    phasedDispatchPairIndex
+                ];
+            } while (
+                !jacobianMapping.IsValid && m_NextDispatchPairIslandInfoIndex <= m_LastDispatchPairIslandInfoIndex
+            );
 
             return jacobianMapping;
         }
@@ -1178,7 +1345,8 @@ namespace Unity.Physics
             return dataPtr;
         }
 
-        private ref T Read<T>() where T : struct
+        private ref T Read<T>()
+            where T : struct
         {
             int size = UnsafeUtility.SizeOf<T>();
             return ref UnsafeUtility.AsRef<T>(Read(size));

@@ -12,7 +12,8 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Registers an IUpscaler type without any custom options type.
         /// </summary>
-        public static void Register<TUpscaler>(string id) where TUpscaler : IUpscaler, new()
+        public static void Register<TUpscaler>(string id)
+            where TUpscaler : IUpscaler, new()
         {
             s_RegisteredUpscalers[typeof(TUpscaler)] = (null, id);
         }
@@ -37,13 +38,17 @@ namespace UnityEngine.Rendering
         private enum UpscalerIntegrationType
         {
             StandalonePass, // The upscaler is executed as a standalone Render Graph pass.
-            EmbeddedPass // The upscaler is baked into a pipeline-specific uber-pass (e.g., URP's Post-process pass).
+            EmbeddedPass, // The upscaler is baked into a pipeline-specific uber-pass (e.g., URP's Post-process pass).
         }
+
         private struct UpscalerEntry
         {
-            readonly public IUpscaler Instance { get; }
-            readonly public UpscalerIntegrationType IntegrationType { get; }
-            readonly public bool IsEmbedded { get { return IntegrationType == UpscalerIntegrationType.EmbeddedPass; } }
+            public readonly IUpscaler Instance { get; }
+            public readonly UpscalerIntegrationType IntegrationType { get; }
+            public readonly bool IsEmbedded
+            {
+                get { return IntegrationType == UpscalerIntegrationType.EmbeddedPass; }
+            }
 
             public UpscalerEntry(IUpscaler instance, UpscalerIntegrationType integrationType)
             {
@@ -65,12 +70,14 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Returns the active IUpscaler instance, null if none is selected.
         /// </summary>
-        public IUpscaler? activeUpscaler => (m_ActiveUpscalerIndex >= 0) ? m_Upscalers[m_ActiveUpscalerIndex].Instance : null;
+        public IUpscaler? activeUpscaler =>
+            (m_ActiveUpscalerIndex >= 0) ? m_Upscalers[m_ActiveUpscalerIndex].Instance : null;
 
         /// <summary>
         /// Returns true if the active upscaler is embedded in an uber pass.
         /// </summary>
-        public bool activeUpscalerIsEmbedded => (m_ActiveUpscalerIndex >= 0) && m_Upscalers[m_ActiveUpscalerIndex].IsEmbedded;
+        public bool activeUpscalerIsEmbedded =>
+            (m_ActiveUpscalerIndex >= 0) && m_Upscalers[m_ActiveUpscalerIndex].IsEmbedded;
 
         /// <summary>
         /// Initializes the Upscaling system. with the given list of upscaler options per upscaler type.
@@ -78,11 +85,11 @@ namespace UnityEngine.Rendering
         /// <param name="upscalerOptions">The list of options from the RP asset.</param>
         /// <param name="embeddedTypes">A set of types that the pipeline handles internally (e.g., Bilinear, Point in URP).</param>
         /// <param name="priorityOrder">
-        ///   An ordered list of Types. Upscalers matching these types will appear first 
+        ///   An ordered list of Types. Upscalers matching these types will appear first
         ///   in the list, in the order provided. All others appear after, alphabetically.
         /// </param>
         public Upscaling(
-            List<UpscalerOptions> upscalerOptions, 
+            List<UpscalerOptions> upscalerOptions,
             HashSet<Type>? embeddedTypes = null,
             Type[]? priorityOrder = null
         )
@@ -96,48 +103,62 @@ namespace UnityEngine.Rendering
                 // find any serialized options, if any provided by the package implementor
                 int optionsIndex = upscalerOptions.FindIndex(o => o != null && o.GetType() == optionsType);
                 bool optionsNotFound = optionsIndex == -1;
-                UpscalerOptions? options = optionsNotFound ? null: upscalerOptions[optionsIndex];
+                UpscalerOptions? options = optionsNotFound ? null : upscalerOptions[optionsIndex];
 
                 // construct upscaler
-                IUpscaler upscaler = optionsType != null
-                    ? (IUpscaler)Activator.CreateInstance(upscalerType, new object[] { options! })
-                    : (IUpscaler)Activator.CreateInstance(upscalerType);
+                IUpscaler upscaler =
+                    optionsType != null
+                        ? (IUpscaler)Activator.CreateInstance(upscalerType, new object[] { options! })
+                        : (IUpscaler)Activator.CreateInstance(upscalerType);
 
-                if(options != null && string.IsNullOrEmpty(options.upscalerName))
+                if (options != null && string.IsNullOrEmpty(options.upscalerName))
                 {
-                    Debug.LogWarningFormat("[Upscaling] UpscalerOptions with empty upscalerName for {0}", upscaler.name);
+                    Debug.LogWarningFormat(
+                        "[Upscaling] UpscalerOptions with empty upscalerName for {0}",
+                        upscaler.name
+                    );
                     options.upscalerName = upscaler.name;
                 }
 
                 bool isEmbedded = embeddedTypes != null && embeddedTypes.Contains(upscalerType);
-                m_Upscalers.Add(new UpscalerEntry(upscaler, isEmbedded ? UpscalerIntegrationType.EmbeddedPass : UpscalerIntegrationType.StandalonePass));
+                m_Upscalers.Add(
+                    new UpscalerEntry(
+                        upscaler,
+                        isEmbedded ? UpscalerIntegrationType.EmbeddedPass : UpscalerIntegrationType.StandalonePass
+                    )
+                );
             }
 
             // 2. Type-based sorting based on priorty order
-            m_Upscalers.Sort((a, b) =>
-            {
-                Type typeA = a.Instance.GetType();
-                Type typeB = b.Instance.GetType();
-
-                int indexA = -1;
-                int indexB = -1;
-
-                if (priorityOrder != null)
+            m_Upscalers.Sort(
+                (a, b) =>
                 {
-                    indexA = Array.IndexOf(priorityOrder, typeA);
-                    indexB = Array.IndexOf(priorityOrder, typeB);
+                    Type typeA = a.Instance.GetType();
+                    Type typeB = b.Instance.GetType();
+
+                    int indexA = -1;
+                    int indexB = -1;
+
+                    if (priorityOrder != null)
+                    {
+                        indexA = Array.IndexOf(priorityOrder, typeA);
+                        indexB = Array.IndexOf(priorityOrder, typeB);
+                    }
+
+                    // Priority Sort: If both are in the priority list, respect that order.
+                    if (indexA != -1 && indexB != -1)
+                        return indexA.CompareTo(indexB);
+
+                    // Mixed Sort: Priority items always come before non-priority items.
+                    if (indexA != -1)
+                        return -1;
+                    if (indexB != -1)
+                        return 1;
+
+                    // Fallback Sort: If neither are in the list (external upscalers), sort Alphabetically.
+                    return string.Compare(a.Instance.name, b.Instance.name, StringComparison.OrdinalIgnoreCase);
                 }
-
-                // Priority Sort: If both are in the priority list, respect that order.
-                if (indexA != -1 && indexB != -1) return indexA.CompareTo(indexB);
-
-                // Mixed Sort: Priority items always come before non-priority items.
-                if (indexA != -1) return -1;
-                if (indexB != -1) return 1;
-
-                // Fallback Sort: If neither are in the list (external upscalers), sort Alphabetically.
-                return string.Compare(a.Instance.name, b.Instance.name, StringComparison.OrdinalIgnoreCase);
-            });
+            );
 
             // 3. Populate name cache
             m_UpscalerNamesCache = new string[m_Upscalers.Count];
@@ -180,9 +201,10 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Returns null if no IUpscaler exists for given type
         /// </summary>
-        public IUpscaler? GetIUpscalerOfType<T>() where T : IUpscaler
+        public IUpscaler? GetIUpscalerOfType<T>()
+            where T : IUpscaler
         {
-            if(!UpscalerRegistry.s_RegisteredUpscalers.ContainsKey(typeof(T)))
+            if (!UpscalerRegistry.s_RegisteredUpscalers.ContainsKey(typeof(T)))
                 return null;
             foreach (UpscalerEntry entry in m_Upscalers)
                 if (entry.Instance.GetType() == typeof(T))

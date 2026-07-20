@@ -28,8 +28,12 @@ namespace UnityEngine.InputSystem.Editor
             set
             {
                 // Get the current persisted configuration and remove tag when changed
-                if (EditorBuildSettings.TryGetConfigObject(EditorBuildSettingsActionsConfigKey,
-                    out InputActionAsset current))
+                if (
+                    EditorBuildSettings.TryGetConfigObject(
+                        EditorBuildSettingsActionsConfigKey,
+                        out InputActionAsset current
+                    )
+                )
                 {
                     current.m_IsProjectWide = false;
                 }

@@ -5,7 +5,8 @@ using UnityEngine.UIElements;
 
 namespace Unity.Entities.UI
 {
-    abstract class MinAttributeInspectorBase<TElement, TFieldValue, TValue, TAttribute> : BaseFieldAttributeInspector<TElement, TFieldValue, TValue, TAttribute>
+    abstract class MinAttributeInspectorBase<TElement, TFieldValue, TValue, TAttribute>
+        : BaseFieldAttributeInspector<TElement, TFieldValue, TValue, TAttribute>
         where TElement : BaseField<TFieldValue>, new()
         where TAttribute : PropertyAttribute
     {
@@ -63,39 +64,77 @@ namespace Unity.Entities.UI
         }
     }
 
-    abstract class MinValueAttributeInspector<TElement, TFieldValue, TValue> : MinAttributeInspectorBase<TElement, TFieldValue, TValue, MinValueAttribute>
+    abstract class MinValueAttributeInspector<TElement, TFieldValue, TValue>
+        : MinAttributeInspectorBase<TElement, TFieldValue, TValue, MinValueAttribute>
         where TElement : BaseField<TFieldValue>, new()
     {
-        protected override float GetMinValue()
-            => GetAttribute<MinValueAttribute>().Min;
+        protected override float GetMinValue() => GetAttribute<MinValueAttribute>().Min;
     }
 
-    abstract class MinAttributeInspector<TElement, TFieldValue, TValue> : MinAttributeInspectorBase<TElement, TFieldValue, TValue, MinAttribute>
+    abstract class MinAttributeInspector<TElement, TFieldValue, TValue>
+        : MinAttributeInspectorBase<TElement, TFieldValue, TValue, MinAttribute>
         where TElement : BaseField<TFieldValue>, new()
     {
-        protected override float GetMinValue()
-            => GetAttribute<MinAttribute>().min;
+        protected override float GetMinValue() => GetAttribute<MinAttribute>().min;
     }
 
-    [UsedImplicitly] class MinFieldSByteAttributeInspector : MinAttributeInspector<IntegerField, int, sbyte> { }
-    [UsedImplicitly] class MinFieldByteAttributeInspector : MinAttributeInspector<IntegerField, int, byte> { }
-    [UsedImplicitly] class MinFieldShortAttributeInspector : MinAttributeInspector<IntegerField, int, short> { }
-    [UsedImplicitly] class MinFieldUShortAttributeInspector : MinAttributeInspector<IntegerField, int, ushort> { }
-    [UsedImplicitly] class MinFieldIntAttributeInspector : MinAttributeInspector<IntegerField, int, int> { }
-    [UsedImplicitly] class MinFieldUIntAttributeInspector : MinAttributeInspector<LongField, long, uint> { }
-    [UsedImplicitly] class MinFieldLongAttributeInspector : MinAttributeInspector<LongField, long, long> { }
-    [UsedImplicitly] class MinFieldULongAttributeInspector : MinAttributeInspector<FloatField, float, ulong> { }
-    [UsedImplicitly] class MinFieldFloatAttributeInspector : MinAttributeInspector<FloatField, float, float> { }
-    [UsedImplicitly] class MinFieldDoubleAttributeInspector : MinAttributeInspector<DoubleField, double, double> { }
+    [UsedImplicitly]
+    class MinFieldSByteAttributeInspector : MinAttributeInspector<IntegerField, int, sbyte> { }
 
-    [UsedImplicitly] class MinFieldSByteValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, sbyte> { }
-    [UsedImplicitly] class MinFieldByteValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, byte> { }
-    [UsedImplicitly] class MinFieldShortValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, short> { }
-    [UsedImplicitly] class MinFieldUShortValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, ushort> { }
-    [UsedImplicitly] class MinFieldIntValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, int> { }
-    [UsedImplicitly] class MinFieldUIntValueAttributeInspector : MinValueAttributeInspector<LongField, long, uint> { }
-    [UsedImplicitly] class MinFieldLongValueAttributeInspector : MinValueAttributeInspector<LongField, long, long> { }
-    [UsedImplicitly] class MinFieldULongValueAttributeInspector : MinValueAttributeInspector<FloatField, float, ulong> { }
-    [UsedImplicitly] class MinFieldFloatValueAttributeInspector : MinValueAttributeInspector<FloatField, float, float> { }
-    [UsedImplicitly] class MinFieldDoubleValueAttributeInspector : MinValueAttributeInspector<DoubleField, double, double> { }
+    [UsedImplicitly]
+    class MinFieldByteAttributeInspector : MinAttributeInspector<IntegerField, int, byte> { }
+
+    [UsedImplicitly]
+    class MinFieldShortAttributeInspector : MinAttributeInspector<IntegerField, int, short> { }
+
+    [UsedImplicitly]
+    class MinFieldUShortAttributeInspector : MinAttributeInspector<IntegerField, int, ushort> { }
+
+    [UsedImplicitly]
+    class MinFieldIntAttributeInspector : MinAttributeInspector<IntegerField, int, int> { }
+
+    [UsedImplicitly]
+    class MinFieldUIntAttributeInspector : MinAttributeInspector<LongField, long, uint> { }
+
+    [UsedImplicitly]
+    class MinFieldLongAttributeInspector : MinAttributeInspector<LongField, long, long> { }
+
+    [UsedImplicitly]
+    class MinFieldULongAttributeInspector : MinAttributeInspector<FloatField, float, ulong> { }
+
+    [UsedImplicitly]
+    class MinFieldFloatAttributeInspector : MinAttributeInspector<FloatField, float, float> { }
+
+    [UsedImplicitly]
+    class MinFieldDoubleAttributeInspector : MinAttributeInspector<DoubleField, double, double> { }
+
+    [UsedImplicitly]
+    class MinFieldSByteValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, sbyte> { }
+
+    [UsedImplicitly]
+    class MinFieldByteValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, byte> { }
+
+    [UsedImplicitly]
+    class MinFieldShortValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, short> { }
+
+    [UsedImplicitly]
+    class MinFieldUShortValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, ushort> { }
+
+    [UsedImplicitly]
+    class MinFieldIntValueAttributeInspector : MinValueAttributeInspector<IntegerField, int, int> { }
+
+    [UsedImplicitly]
+    class MinFieldUIntValueAttributeInspector : MinValueAttributeInspector<LongField, long, uint> { }
+
+    [UsedImplicitly]
+    class MinFieldLongValueAttributeInspector : MinValueAttributeInspector<LongField, long, long> { }
+
+    [UsedImplicitly]
+    class MinFieldULongValueAttributeInspector : MinValueAttributeInspector<FloatField, float, ulong> { }
+
+    [UsedImplicitly]
+    class MinFieldFloatValueAttributeInspector : MinValueAttributeInspector<FloatField, float, float> { }
+
+    [UsedImplicitly]
+    class MinFieldDoubleValueAttributeInspector : MinValueAttributeInspector<DoubleField, double, double> { }
 }

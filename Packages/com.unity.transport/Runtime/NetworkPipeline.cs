@@ -1,13 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using BurstRuntime = Unity.Burst.BurstRuntime;
 using static Unity.Networking.Transport.NetworkPipelineStage;
+using BurstRuntime = Unity.Burst.BurstRuntime;
 
 namespace Unity.Networking.Transport
 {
@@ -131,7 +131,11 @@ namespace Unity.Networking.Transport
         /// <param name="staticInstanceBufferLength">Static storage length.</param>
         /// <param name="settings">Settings provided to the driver.</param>
         /// <returns>Runtime information for a pipeline instance.</returns>
-        NetworkPipelineStage StaticInitialize(byte* staticInstanceBuffer, int staticInstanceBufferLength, NetworkSettings settings);
+        NetworkPipelineStage StaticInitialize(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            NetworkSettings settings
+        );
 
         /// <summary>
         /// Amount of data that the pipeline stage requires in "static" storage (storage shared by
@@ -159,14 +163,16 @@ namespace Unity.Networking.Transport
         /// <param name="HeaderCapacity">Length of the pipeline stage header.</param>
         /// <param name="SharedStateCapacity">Capacity of the shared buffer.</param>
         /// <param name="PayloadCapacity">Maximum payload size processable by the pipeline stage.</param>
-        public NetworkPipelineStage(TransportFunctionPointer<ReceiveDelegate> Receive,
-                                    TransportFunctionPointer<SendDelegate> Send,
-                                    TransportFunctionPointer<InitializeConnectionDelegate> InitializeConnection,
-                                    int ReceiveCapacity,
-                                    int SendCapacity,
-                                    int HeaderCapacity,
-                                    int SharedStateCapacity,
-                                    int PayloadCapacity = 0) // 0 means any size
+        public NetworkPipelineStage(
+            TransportFunctionPointer<ReceiveDelegate> Receive,
+            TransportFunctionPointer<SendDelegate> Send,
+            TransportFunctionPointer<InitializeConnectionDelegate> InitializeConnection,
+            int ReceiveCapacity,
+            int SendCapacity,
+            int HeaderCapacity,
+            int SharedStateCapacity,
+            int PayloadCapacity = 0
+        ) // 0 means any size
         {
             this.Receive = Receive;
             this.Send = Send;
@@ -187,14 +193,18 @@ namespace Unity.Networking.Transport
         {
             /// <summary>No request. Default value.</summary>
             None = 0,
+
             /// <summary>Request to run the receive/send method immediately again.</summary>
             Resume = 1,
+
             /// <summary>Request to run the receive method on the next update.</summary>
             Update = 2,
+
             /// <summary>Request to run the send method on the next update.</summary>
             SendUpdate = 4,
+
             /// <summary>Request to raise an error.</summary>
-            Error = 8
+            Error = 8,
         }
 
         // Be careful when changing the signature of the following delegates.
@@ -206,7 +216,12 @@ namespace Unity.Networking.Transport
         /// <param name="requests">Requests of the pipeline stage.</param>
         /// <param name="systemHeadersSize">Total header size for the pipeline.</param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void ReceiveDelegate(ref NetworkPipelineContext ctx, ref InboundRecvBuffer inboundBuffer, ref Requests requests, int systemHeadersSize);
+        public delegate void ReceiveDelegate(
+            ref NetworkPipelineContext ctx,
+            ref InboundRecvBuffer inboundBuffer,
+            ref Requests requests,
+            int systemHeadersSize
+        );
 
         /// <summary>Send method of the pipeline stage.</summary>
         /// <param name="ctx">Context for the pipeline stage.</param>
@@ -215,7 +230,12 @@ namespace Unity.Networking.Transport
         /// <param name="systemHeadersSize">Total header size for the pipeline.</param>
         /// <returns>Error code or 0 on success.</returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int SendDelegate(ref NetworkPipelineContext ctx, ref InboundSendBuffer inboundBuffer, ref Requests requests, int systemHeadersSize);
+        public delegate int SendDelegate(
+            ref NetworkPipelineContext ctx,
+            ref InboundSendBuffer inboundBuffer,
+            ref Requests requests,
+            int systemHeadersSize
+        );
 
         /// <summary>Connection initialization of the pipeline stage.</summary>
         /// <param name="staticInstanceBuffer">Pointer to static instance buffer.</param>
@@ -227,9 +247,16 @@ namespace Unity.Networking.Transport
         /// <param name="sharedProcessBuffer">Pointer to shared buffer.</param>
         /// <param name="sharedProcessBufferLength">Length of the shared buffer.</param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void InitializeConnectionDelegate(byte* staticInstanceBuffer, int staticInstanceBufferLength,
-            byte* sendProcessBuffer, int sendProcessBufferLength, byte* recvProcessBuffer, int recvProcessBufferLength,
-            byte* sharedProcessBuffer, int sharedProcessBufferLength);
+        public delegate void InitializeConnectionDelegate(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            byte* sendProcessBuffer,
+            int sendProcessBufferLength,
+            byte* recvProcessBuffer,
+            int recvProcessBufferLength,
+            byte* sharedProcessBuffer,
+            int sharedProcessBufferLength
+        );
 
         /// <summary>Function pointer for the receive method.</summary>
         public TransportFunctionPointer<ReceiveDelegate> Receive;
@@ -272,7 +299,8 @@ namespace Unity.Networking.Transport
         /// <summary>Get the stage ID for the given stage type.</summary>
         /// <typeparam name="T">Type of the <see cref="INetworkPipelineStage"/>.</typeparam>
         /// <returns>Stage ID for the given stage type.</returns>
-        public static NetworkPipelineStageId Get<T>() where T : unmanaged, INetworkPipelineStage
+        public static NetworkPipelineStageId Get<T>()
+            where T : unmanaged, INetworkPipelineStage
         {
             return new NetworkPipelineStageId { m_TypeHash = BurstRuntime.GetHashCode64<T>() };
         }
@@ -287,11 +315,11 @@ namespace Unity.Networking.Transport
         public bool Equals(NetworkPipelineStageId other) => m_TypeHash == other.m_TypeHash;
 
         /// <inheritdoc/>
-        public static bool operator==(NetworkPipelineStageId lhs, NetworkPipelineStageId rhs) =>
+        public static bool operator ==(NetworkPipelineStageId lhs, NetworkPipelineStageId rhs) =>
             lhs.m_TypeHash == rhs.m_TypeHash;
 
         /// <inheritdoc/>
-        public static bool operator!=(NetworkPipelineStageId lhs, NetworkPipelineStageId rhs) =>
+        public static bool operator !=(NetworkPipelineStageId lhs, NetworkPipelineStageId rhs) =>
             lhs.m_TypeHash != rhs.m_TypeHash;
     }
 
@@ -307,13 +335,13 @@ namespace Unity.Networking.Transport
         public static NetworkPipeline Null => default;
 
         /// <inheritdoc/>
-        public static bool operator==(NetworkPipeline lhs, NetworkPipeline rhs)
+        public static bool operator ==(NetworkPipeline lhs, NetworkPipeline rhs)
         {
             return lhs.Id == rhs.Id;
         }
 
         /// <inheritdoc/>
-        public static bool operator!=(NetworkPipeline lhs, NetworkPipeline rhs)
+        public static bool operator !=(NetworkPipeline lhs, NetworkPipeline rhs)
         {
             return lhs.Id != rhs.Id;
         }
@@ -364,12 +392,12 @@ namespace Unity.Networking.Transport
                 return this.Equals((UpdatePipeline)other);
             }
 
-            public static bool operator==(UpdatePipeline lhs, UpdatePipeline rhs)
+            public static bool operator ==(UpdatePipeline lhs, UpdatePipeline rhs)
             {
                 return lhs.Equals(rhs);
             }
 
-            public static bool operator!=(UpdatePipeline lhs, UpdatePipeline rhs)
+            public static bool operator !=(UpdatePipeline lhs, UpdatePipeline rhs)
             {
                 return !lhs.Equals(rhs);
             }
@@ -406,17 +434,34 @@ namespace Unity.Networking.Transport
 
         public struct Concurrent
         {
-            [ReadOnly] internal NativeList<NetworkPipelineStage> m_StageStructs;
-            [ReadOnly] internal NativeList<byte> m_StaticInstanceBuffer;
-            [ReadOnly] internal NativeList<PipelineImpl> m_Pipelines;
-            [ReadOnly] internal NativeList<int> m_PipelineStagesIndices;
-            [ReadOnly] internal NativeList<int> m_AccumulatedHeaderCapacity;
+            [ReadOnly]
+            internal NativeList<NetworkPipelineStage> m_StageStructs;
+
+            [ReadOnly]
+            internal NativeList<byte> m_StaticInstanceBuffer;
+
+            [ReadOnly]
+            internal NativeList<PipelineImpl> m_Pipelines;
+
+            [ReadOnly]
+            internal NativeList<int> m_PipelineStagesIndices;
+
+            [ReadOnly]
+            internal NativeList<int> m_AccumulatedHeaderCapacity;
             internal NativeQueue<UpdatePipeline>.ParallelWriter m_SendStageNeedsUpdateWrite;
-            [ReadOnly] internal NativeArray<int> sizePerConnection;
+
+            [ReadOnly]
+            internal NativeArray<int> sizePerConnection;
+
             // TODO: not really read-only, just hacking the safety system
-            [ReadOnly] internal NativeList<byte> sharedBuffer;
-            [ReadOnly] internal NativeList<byte> sendBuffer;
-            [ReadOnly] internal NativeArray<long> m_timestamp;
+            [ReadOnly]
+            internal NativeList<byte> sharedBuffer;
+
+            [ReadOnly]
+            internal NativeList<byte> sendBuffer;
+
+            [ReadOnly]
+            internal NativeArray<long> m_timestamp;
             internal int m_MaxPacketHeaderSize;
 
             public int SendHeaderCapacity(NetworkPipeline pipeline)
@@ -435,7 +480,13 @@ namespace Unity.Networking.Transport
                 return 0;
             }
 
-            public unsafe int Send(NetworkDriver.Concurrent driver, NetworkPipeline pipeline, NetworkConnection connection, NetworkInterfaceSendHandle sendHandle, int headerSize)
+            public unsafe int Send(
+                NetworkDriver.Concurrent driver,
+                NetworkPipeline pipeline,
+                NetworkConnection connection,
+                NetworkInterfaceSendHandle sendHandle,
+                int headerSize
+            )
             {
                 if (sendHandle.data == IntPtr.Zero)
                 {
@@ -452,15 +503,28 @@ namespace Unity.Networking.Transport
                 if (Interlocked.CompareExchange(ref *sendBufferLock, 1, 0) != 0)
                 {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    Debug.LogError("The parallel network driver needs to process a single unique connection per job, processing a single connection multiple times in a parallel for is not supported.");
+                    Debug.LogError(
+                        "The parallel network driver needs to process a single unique connection per job, processing a single connection multiple times in a parallel for is not supported."
+                    );
 #endif
                     driver.AbortSend(sendHandle);
                     return (int)Error.StatusCode.NetworkDriverParallelForErr;
                 }
 
-                NativeParallelHashSet<UpdatePipeline> currentUpdates = new NativeParallelHashSet<UpdatePipeline>(128, Allocator.Temp);
+                NativeParallelHashSet<UpdatePipeline> currentUpdates = new NativeParallelHashSet<UpdatePipeline>(
+                    128,
+                    Allocator.Temp
+                );
 
-                int retval = ProcessPipelineSend(driver, 0, pipeline, connection, sendHandle, headerSize, currentUpdates);
+                int retval = ProcessPipelineSend(
+                    driver,
+                    0,
+                    pipeline,
+                    connection,
+                    sendHandle,
+                    headerSize,
+                    currentUpdates
+                );
 
                 Interlocked.Exchange(ref *sendBufferLock, 0);
 
@@ -471,8 +535,15 @@ namespace Unity.Networking.Transport
                 return retval;
             }
 
-            internal unsafe int ProcessPipelineSend(NetworkDriver.Concurrent driver, int startStage, NetworkPipeline pipeline, NetworkConnection connection,
-                NetworkInterfaceSendHandle sendHandle, int headerSize, NativeParallelHashSet<UpdatePipeline> currentUpdates)
+            internal unsafe int ProcessPipelineSend(
+                NetworkDriver.Concurrent driver,
+                int startStage,
+                NetworkPipeline pipeline,
+                NetworkConnection connection,
+                NetworkInterfaceSendHandle sendHandle,
+                int headerSize,
+                NativeParallelHashSet<UpdatePipeline> currentUpdates
+            )
             {
                 int initialHeaderSize = headerSize;
                 int retval = sendHandle.size;
@@ -507,7 +578,8 @@ namespace Unity.Networking.Transport
                     headerSize = p.headerCapacity;
 
                     int internalBufferOffset = p.sendBufferOffset + sizePerConnection[SendSizeOffset] * connectionId;
-                    int internalSharedBufferOffset = p.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connectionId;
+                    int internalSharedBufferOffset =
+                        p.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connectionId;
 
                     // If this is not the first stage we need to fast forward the buffer offset to the correct place
                     if (startStage > 0)
@@ -519,8 +591,16 @@ namespace Unity.Networking.Transport
                         }
                         for (int i = 0; i < startStage; ++i)
                         {
-                            internalBufferOffset += (m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i]].SendCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
-                            internalSharedBufferOffset += (m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i]].SharedStateCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
+                            internalBufferOffset +=
+                                (
+                                    m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i]].SendCapacity
+                                    + AlignmentMinusOne
+                                ) & (~AlignmentMinusOne);
+                            internalSharedBufferOffset +=
+                                (
+                                    m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i]].SharedStateCapacity
+                                    + AlignmentMinusOne
+                                ) & (~AlignmentMinusOne);
                             headerSize -= m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i]].HeaderCapacity;
                         }
                     }
@@ -531,15 +611,24 @@ namespace Unity.Networking.Transport
                         int stageHeaderCapacity = networkPipelineStage.HeaderCapacity;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                         if (stageHeaderCapacity > headerSize)
-                            throw new InvalidOperationException($"Stage {i} '{networkPipelineStage}' does not contain enough header space to send the message");
+                            throw new InvalidOperationException(
+                                $"Stage {i} '{networkPipelineStage}' does not contain enough header space to send the message"
+                            );
 #endif
                         inboundBuffer.headerPadding = headerSize;
                         headerSize -= stageHeaderCapacity;
                         if (stageHeaderCapacity > 0 && inboundBuffer.bufferWithHeadersLength > 0)
                         {
-                            var headerArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(inboundBuffer.bufferWithHeaders + headerSize, stageHeaderCapacity, Allocator.Invalid);
+                            var headerArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                                inboundBuffer.bufferWithHeaders + headerSize,
+                                stageHeaderCapacity,
+                                Allocator.Invalid
+                            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                            NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref headerArray, AtomicSafetyHandle.GetTempMemoryHandle());
+                            NativeArrayUnsafeUtility.SetAtomicSafetyHandle(
+                                ref headerArray,
+                                AtomicSafetyHandle.GetTempMemoryHandle()
+                            );
 #endif
                             ctx.header = new DataStreamWriter(headerArray);
                         }
@@ -548,10 +637,27 @@ namespace Unity.Networking.Transport
                         var prevInbound = inboundBuffer;
                         NetworkPipelineStage.Requests requests = NetworkPipelineStage.Requests.None;
 
-                        var sendResult = ProcessSendStage(i, internalBufferOffset, internalSharedBufferOffset, p, ref resumeQ, ref ctx, ref inboundBuffer, ref requests, m_MaxPacketHeaderSize);
+                        var sendResult = ProcessSendStage(
+                            i,
+                            internalBufferOffset,
+                            internalSharedBufferOffset,
+                            p,
+                            ref resumeQ,
+                            ref ctx,
+                            ref inboundBuffer,
+                            ref requests,
+                            m_MaxPacketHeaderSize
+                        );
 
                         if ((requests & NetworkPipelineStage.Requests.Update) != 0)
-                            currentUpdates.Add(new UpdatePipeline { connection = connection, stage = i, pipeline = pipeline });
+                            currentUpdates.Add(
+                                new UpdatePipeline
+                                {
+                                    connection = connection,
+                                    stage = i,
+                                    pipeline = pipeline,
+                                }
+                            );
 
                         if (inboundBuffer.bufferWithHeadersLength == 0)
                         {
@@ -565,30 +671,47 @@ namespace Unity.Networking.Transport
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                         if (inboundBuffer.headerPadding != prevInbound.headerPadding)
-                            throw new InvalidOperationException($"Changing the header padding in a pipeline is not supported. Stage {i} '{networkPipelineStage}'.");
+                            throw new InvalidOperationException(
+                                $"Changing the header padding in a pipeline is not supported. Stage {i} '{networkPipelineStage}'."
+                            );
 #endif
                         if (inboundBuffer.buffer != prevInbound.buffer)
                         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                            if (inboundBuffer.buffer != inboundBuffer.bufferWithHeaders + inboundBuffer.headerPadding ||
-                                inboundBuffer.bufferLength + inboundBuffer.headerPadding > inboundBuffer.bufferWithHeadersLength)
-                                throw new InvalidOperationException($"When creating an internal buffer in pipelines the buffer must be a subset of the buffer with headers. Stage {i} '{networkPipelineStage}'.");
+                            if (
+                                inboundBuffer.buffer != inboundBuffer.bufferWithHeaders + inboundBuffer.headerPadding
+                                || inboundBuffer.bufferLength + inboundBuffer.headerPadding
+                                    > inboundBuffer.bufferWithHeadersLength
+                            )
+                                throw new InvalidOperationException(
+                                    $"When creating an internal buffer in pipelines the buffer must be a subset of the buffer with headers. Stage {i} '{networkPipelineStage}'."
+                                );
 #endif
                             // Copy header to new buffer so it is part of the payload
-                            UnsafeUtility.MemCpy(inboundBuffer.bufferWithHeaders + headerSize, ctx.header.AsNativeArray().GetUnsafeReadOnlyPtr(), ctx.header.Length);
+                            UnsafeUtility.MemCpy(
+                                inboundBuffer.bufferWithHeaders + headerSize,
+                                ctx.header.AsNativeArray().GetUnsafeReadOnlyPtr(),
+                                ctx.header.Length
+                            );
                         }
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                         else
                         {
                             if (inboundBuffer.bufferWithHeaders != prevInbound.bufferWithHeaders)
-                                throw new InvalidOperationException($"Changing the send buffer with headers without changing the buffer is not supported. Stage {i} '{networkPipelineStage}'.");
+                                throw new InvalidOperationException(
+                                    $"Changing the send buffer with headers without changing the buffer is not supported. Stage {i} '{networkPipelineStage}'."
+                                );
                         }
 #endif
                         if (ctx.header.Length < stageHeaderCapacity)
                         {
                             // Remove wasted space in the header
                             int wastedSpace = stageHeaderCapacity - ctx.header.Length;
-                            UnsafeUtility.MemMove(inboundBuffer.buffer - wastedSpace, inboundBuffer.buffer, inboundBuffer.bufferLength);
+                            UnsafeUtility.MemMove(
+                                inboundBuffer.buffer - wastedSpace,
+                                inboundBuffer.buffer,
+                                inboundBuffer.bufferLength
+                            );
                             inboundBuffer.bufferWithHeadersLength -= wastedSpace;
                         }
 
@@ -596,29 +719,42 @@ namespace Unity.Networking.Transport
                         inboundBuffer.buffer = inboundBuffer.bufferWithHeaders + headerSize;
                         inboundBuffer.bufferLength = ctx.header.Length + inboundBuffer.bufferLength;
 
-                        internalBufferOffset += (ctx.internalProcessBufferLength + AlignmentMinusOne) & (~AlignmentMinusOne);
-                        internalSharedBufferOffset += (ctx.internalSharedProcessBufferLength + AlignmentMinusOne) & (~AlignmentMinusOne);
+                        internalBufferOffset +=
+                            (ctx.internalProcessBufferLength + AlignmentMinusOne) & (~AlignmentMinusOne);
+                        internalSharedBufferOffset +=
+                            (ctx.internalSharedProcessBufferLength + AlignmentMinusOne) & (~AlignmentMinusOne);
                     }
 
                     if (inboundBuffer.bufferLength != 0)
                     {
-                        if (sendHandle.data != IntPtr.Zero && inboundBuffer.bufferWithHeaders == (byte*)sendHandle.data + initialHeaderSize)
+                        if (
+                            sendHandle.data != IntPtr.Zero
+                            && inboundBuffer.bufferWithHeaders == (byte*)sendHandle.data + initialHeaderSize
+                        )
                         {
                             // Actually send the data - after collapsing it again
                             if (inboundBuffer.buffer != inboundBuffer.bufferWithHeaders)
                             {
-                                UnsafeUtility.MemMove(inboundBuffer.bufferWithHeaders, inboundBuffer.buffer, inboundBuffer.bufferLength);
+                                UnsafeUtility.MemMove(
+                                    inboundBuffer.bufferWithHeaders,
+                                    inboundBuffer.buffer,
+                                    inboundBuffer.bufferLength
+                                );
                                 inboundBuffer.buffer = inboundBuffer.bufferWithHeaders;
                             }
                             int sendSize = initialHeaderSize + inboundBuffer.bufferLength;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                             if (sendSize > sendHandle.size)
-                                throw new InvalidOperationException("Pipeline increased the data in the buffer, this is not allowed");
+                                throw new InvalidOperationException(
+                                    "Pipeline increased the data in the buffer, this is not allowed"
+                                );
 #endif
                             sendHandle.size = sendSize;
                             if ((retval = driver.CompleteSend(connection, ref sendHandle)) < 0)
                             {
-                                Debug.LogWarning($"Sending from within pipeline failed with the following error code: {retval}");
+                                Debug.LogWarning(
+                                    $"Sending from within pipeline failed with the following error code: {retval}"
+                                );
                             }
                             else
                             {
@@ -647,7 +783,9 @@ namespace Unity.Networking.Transport
                                 }
 
                                 if (retval < 0)
-                                    Debug.LogWarning($"Sending from within pipeline failed with the following error code: {retval}");
+                                    Debug.LogWarning(
+                                        $"Sending from within pipeline failed with the following error code: {retval}"
+                                    );
                             }
                         }
                     }
@@ -668,27 +806,47 @@ namespace Unity.Networking.Transport
                 return savedErrorCode < 0 ? savedErrorCode : retval;
             }
 
-            private unsafe int ProcessSendStage(int startStage, int internalBufferOffset, int internalSharedBufferOffset,
-                PipelineImpl p, ref NativeList<int> resumeQ, ref NetworkPipelineContext ctx, ref InboundSendBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+            private unsafe int ProcessSendStage(
+                int startStage,
+                int internalBufferOffset,
+                int internalSharedBufferOffset,
+                PipelineImpl p,
+                ref NativeList<int> resumeQ,
+                ref NetworkPipelineContext ctx,
+                ref InboundSendBuffer inboundBuffer,
+                ref NetworkPipelineStage.Requests requests,
+                int systemHeaderSize
+            )
             {
                 var stageIndex = p.FirstStageIndex + startStage;
                 var pipelineStage = m_StageStructs[m_PipelineStagesIndices[stageIndex]];
                 ctx.accumulatedHeaderCapacity = m_AccumulatedHeaderCapacity[stageIndex];
-                ctx.staticInstanceBuffer = (byte*)m_StaticInstanceBuffer.GetUnsafeReadOnlyPtr() + pipelineStage.StaticStateStart;
+                ctx.staticInstanceBuffer =
+                    (byte*)m_StaticInstanceBuffer.GetUnsafeReadOnlyPtr() + pipelineStage.StaticStateStart;
                 ctx.staticInstanceBufferLength = pipelineStage.StaticStateCapacity;
                 ctx.internalProcessBuffer = (byte*)sendBuffer.GetUnsafeReadOnlyPtr() + internalBufferOffset;
                 ctx.internalProcessBufferLength = pipelineStage.SendCapacity;
 
-                ctx.internalSharedProcessBuffer = (byte*)sharedBuffer.GetUnsafeReadOnlyPtr() + internalSharedBufferOffset;
+                ctx.internalSharedProcessBuffer =
+                    (byte*)sharedBuffer.GetUnsafeReadOnlyPtr() + internalSharedBufferOffset;
                 ctx.internalSharedProcessBufferLength = pipelineStage.SharedStateCapacity;
 
                 requests = NetworkPipelineStage.Requests.None;
-                var retval = ((delegate * unmanaged[Cdecl] < ref NetworkPipelineContext, ref InboundSendBuffer, ref Requests, int, int >)pipelineStage.Send.Ptr.Value)(ref ctx, ref inboundBuffer, ref requests, systemHeaderSize);
+                var retval = (
+                    (delegate* unmanaged[Cdecl]<
+                        ref NetworkPipelineContext,
+                        ref InboundSendBuffer,
+                        ref Requests,
+                        int,
+                        int>)
+                        pipelineStage.Send.Ptr.Value
+                )(ref ctx, ref inboundBuffer, ref requests, systemHeaderSize);
                 if ((requests & NetworkPipelineStage.Requests.Resume) != 0)
                     resumeQ.Add(startStage);
                 return retval;
             }
         }
+
         private NativeList<NetworkPipelineStage> m_StageStructs;
         private NativeList<NetworkPipelineStageId> m_StageIds;
         private NativeList<int> m_PipelineStagesIndices;
@@ -777,7 +935,8 @@ namespace Unity.Networking.Transport
             internal set { m_timestamp[0] = value; }
         }
 
-        public unsafe void RegisterPipelineStage<T>(T stage, NetworkSettings settings) where T : unmanaged, INetworkPipelineStage
+        public unsafe void RegisterPipelineStage<T>(T stage, NetworkSettings settings)
+            where T : unmanaged, INetworkPipelineStage
         {
             // Resize the static buffer.
             var oldStaticBufferSize = m_StaticInstanceBuffer.Length;
@@ -812,9 +971,18 @@ namespace Unity.Networking.Transport
             if (m_SharedBuffer.Length < requiredSharedSize)
                 m_SharedBuffer.ResizeUninitialized(requiredSharedSize);
 
-            UnsafeUtility.MemClear((byte*)m_ReceiveBuffer.GetUnsafePtr() + con.InternalId * sizePerConnection[RecveiveSizeOffset], sizePerConnection[RecveiveSizeOffset]);
-            UnsafeUtility.MemClear((byte*)m_SendBuffer.GetUnsafePtr() + con.InternalId * sizePerConnection[SendSizeOffset], sizePerConnection[SendSizeOffset]);
-            UnsafeUtility.MemClear((byte*)m_SharedBuffer.GetUnsafePtr() + con.InternalId * sizePerConnection[SharedSizeOffset], sizePerConnection[SharedSizeOffset]);
+            UnsafeUtility.MemClear(
+                (byte*)m_ReceiveBuffer.GetUnsafePtr() + con.InternalId * sizePerConnection[RecveiveSizeOffset],
+                sizePerConnection[RecveiveSizeOffset]
+            );
+            UnsafeUtility.MemClear(
+                (byte*)m_SendBuffer.GetUnsafePtr() + con.InternalId * sizePerConnection[SendSizeOffset],
+                sizePerConnection[SendSizeOffset]
+            );
+            UnsafeUtility.MemClear(
+                (byte*)m_SharedBuffer.GetUnsafePtr() + con.InternalId * sizePerConnection[SharedSizeOffset],
+                sizePerConnection[SharedSizeOffset]
+            );
 
             InitializeStages(con.InternalId);
         }
@@ -827,13 +995,17 @@ namespace Unity.Networking.Transport
             {
                 var pipeline = m_Pipelines[i];
 
-                int recvBufferOffset = pipeline.receiveBufferOffset + sizePerConnection[RecveiveSizeOffset] * connectionId;
+                int recvBufferOffset =
+                    pipeline.receiveBufferOffset + sizePerConnection[RecveiveSizeOffset] * connectionId;
                 int sendBufferOffset = pipeline.sendBufferOffset + sizePerConnection[SendSizeOffset] * connectionId;
-                int sharedBufferOffset = pipeline.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connectionId;
+                int sharedBufferOffset =
+                    pipeline.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connectionId;
 
-                for (int stage = pipeline.FirstStageIndex;
-                     stage < pipeline.FirstStageIndex + pipeline.NumStages;
-                     stage++)
+                for (
+                    int stage = pipeline.FirstStageIndex;
+                    stage < pipeline.FirstStageIndex + pipeline.NumStages;
+                    stage++
+                )
                 {
                     var pipelineStage = m_StageStructs[m_PipelineStagesIndices[stage]];
                     var sendProcessBuffer = (byte*)m_SendBuffer.GetUnsafePtr() + sendBufferOffset;
@@ -843,11 +1015,22 @@ namespace Unity.Networking.Transport
                     var sharedProcessBuffer = (byte*)m_SharedBuffer.GetUnsafePtr() + sharedBufferOffset;
                     var sharedProcessBufferLength = pipelineStage.SharedStateCapacity;
 
-                    var staticInstanceBuffer = (byte*)m_StaticInstanceBuffer.GetUnsafePtr() + pipelineStage.StaticStateStart;
+                    var staticInstanceBuffer =
+                        (byte*)m_StaticInstanceBuffer.GetUnsafePtr() + pipelineStage.StaticStateStart;
                     var staticInstanceBufferLength = pipelineStage.StaticStateCapacity;
-                    ((delegate * unmanaged[Cdecl] < byte*, int, byte*, int, byte*, int, byte*, int, void >)pipelineStage.InitializeConnection.Ptr.Value)(staticInstanceBuffer, staticInstanceBufferLength,
-                        sendProcessBuffer, sendProcessBufferLength, recvProcessBuffer, recvProcessBufferLength,
-                        sharedProcessBuffer, sharedProcessBufferLength);
+                    (
+                        (delegate* unmanaged[Cdecl]<byte*, int, byte*, int, byte*, int, byte*, int, void>)
+                            pipelineStage.InitializeConnection.Ptr.Value
+                    )(
+                        staticInstanceBuffer,
+                        staticInstanceBufferLength,
+                        sendProcessBuffer,
+                        sendProcessBufferLength,
+                        recvProcessBuffer,
+                        recvProcessBufferLength,
+                        sharedProcessBuffer,
+                        sharedProcessBufferLength
+                    );
 
                     sendBufferOffset += (sendProcessBufferLength + AlignmentMinusOne) & (~AlignmentMinusOne);
                     recvBufferOffset += (recvProcessBufferLength + AlignmentMinusOne) & (~AlignmentMinusOne);
@@ -872,7 +1055,9 @@ namespace Unity.Networking.Transport
             // Check that fragmentation doesn't follow the reliability pipeline. This order is not
             // supported since the reliability pipeline can't handle packets larger than the MTU.
             if (reliableIndex >= 0 && fragmentedIndex >= 0 && fragmentedIndex > reliableIndex)
-                throw new InvalidOperationException("Cannot create pipeline with ReliableSequenced followed by Fragmentation stage. Should reverse their order.");
+                throw new InvalidOperationException(
+                    "Cannot create pipeline with ReliableSequenced followed by Fragmentation stage. Should reverse their order."
+                );
         }
 
         public NetworkPipeline CreatePipeline(NativeArray<NetworkPipelineStageId> stages)
@@ -898,12 +1083,13 @@ namespace Unity.Networking.Transport
                     throw new InvalidOperationException("Trying to create pipeline with invalid stage.");
 #endif
                 m_PipelineStagesIndices.Add(stageIndex);
-                m_AccumulatedHeaderCapacity.Add(headerCap);    // For every stage, compute how much header space has already bee used by other stages when sending
+                m_AccumulatedHeaderCapacity.Add(headerCap); // For every stage, compute how much header space has already bee used by other stages when sending
                 // Make sure all data buffers are aligned
                 receiveCap += (m_StageStructs[stageIndex].ReceiveCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
                 sendCap += (m_StageStructs[stageIndex].SendCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
                 headerCap += m_StageStructs[stageIndex].HeaderCapacity;
-                sharedCap += (m_StageStructs[stageIndex].SharedStateCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
+                sharedCap +=
+                    (m_StageStructs[stageIndex].SharedStateCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
                 if (payloadCap == 0)
                 {
                     payloadCap = m_StageStructs[stageIndex].PayloadCapacity; // The first non-zero stage determines the pipeline capacity
@@ -923,12 +1109,17 @@ namespace Unity.Networking.Transport
             pipeline.payloadCapacity = payloadCap;
 
             m_Pipelines.Add(pipeline);
-            return new NetworkPipeline {Id = m_Pipelines.Length};
+            return new NetworkPipeline { Id = m_Pipelines.Length };
         }
 
-        public void GetPipelineBuffers(NetworkPipeline pipelineId, NetworkPipelineStageId stageId, NetworkConnection connection,
-            out NativeArray<byte> readProcessingBuffer, out NativeArray<byte> writeProcessingBuffer,
-            out NativeArray<byte> sharedBuffer)
+        public void GetPipelineBuffers(
+            NetworkPipeline pipelineId,
+            NetworkPipelineStageId stageId,
+            NetworkConnection connection,
+            out NativeArray<byte> readProcessingBuffer,
+            out NativeArray<byte> writeProcessingBuffer,
+            out NativeArray<byte> sharedBuffer
+        )
         {
             if (pipelineId.Id - 1 < 0 || pipelineId.Id - 1 >= m_Pipelines.Length)
             {
@@ -944,24 +1135,35 @@ namespace Unity.Networking.Transport
 
             var pipeline = m_Pipelines[pipelineId.Id - 1];
 
-            int recvBufferOffset = pipeline.receiveBufferOffset + sizePerConnection[RecveiveSizeOffset] * connection.InternalId;
-            int sendBufferOffset = pipeline.sendBufferOffset + sizePerConnection[SendSizeOffset] * connection.InternalId;
-            int sharedBufferOffset = pipeline.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connection.InternalId;
+            int recvBufferOffset =
+                pipeline.receiveBufferOffset + sizePerConnection[RecveiveSizeOffset] * connection.InternalId;
+            int sendBufferOffset =
+                pipeline.sendBufferOffset + sizePerConnection[SendSizeOffset] * connection.InternalId;
+            int sharedBufferOffset =
+                pipeline.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connection.InternalId;
 
             int stageIndexInList;
             bool stageFound = false;
-            for (stageIndexInList = pipeline.FirstStageIndex;
-                 stageIndexInList < pipeline.FirstStageIndex + pipeline.NumStages;
-                 stageIndexInList++)
+            for (
+                stageIndexInList = pipeline.FirstStageIndex;
+                stageIndexInList < pipeline.FirstStageIndex + pipeline.NumStages;
+                stageIndexInList++
+            )
             {
                 if (m_StageIds[m_PipelineStagesIndices[stageIndexInList]] == stageId)
                 {
                     stageFound = true;
                     break;
                 }
-                sendBufferOffset += (m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SendCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
-                recvBufferOffset += (m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].ReceiveCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
-                sharedBufferOffset += (m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SharedStateCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
+                sendBufferOffset +=
+                    (m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SendCapacity + AlignmentMinusOne)
+                    & (~AlignmentMinusOne);
+                recvBufferOffset +=
+                    (m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].ReceiveCapacity + AlignmentMinusOne)
+                    & (~AlignmentMinusOne);
+                sharedBufferOffset +=
+                    (m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SharedStateCapacity + AlignmentMinusOne)
+                    & (~AlignmentMinusOne);
             }
 
             if (!stageFound)
@@ -972,9 +1174,21 @@ namespace Unity.Networking.Transport
                 return;
             }
 
-            writeProcessingBuffer = m_SendBuffer.AsArray().GetSubArray(sendBufferOffset, m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SendCapacity);
-            readProcessingBuffer = m_ReceiveBuffer.AsArray().GetSubArray(recvBufferOffset, m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].ReceiveCapacity);
-            sharedBuffer = m_SharedBuffer.AsArray().GetSubArray(sharedBufferOffset, m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SharedStateCapacity);
+            writeProcessingBuffer = m_SendBuffer
+                .AsArray()
+                .GetSubArray(sendBufferOffset, m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SendCapacity);
+            readProcessingBuffer = m_ReceiveBuffer
+                .AsArray()
+                .GetSubArray(
+                    recvBufferOffset,
+                    m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].ReceiveCapacity
+                );
+            sharedBuffer = m_SharedBuffer
+                .AsArray()
+                .GetSubArray(
+                    sharedBufferOffset,
+                    m_StageStructs[m_PipelineStagesIndices[stageIndexInList]].SharedStateCapacity
+                );
         }
 
         /// <summary>
@@ -989,7 +1203,9 @@ namespace Unity.Networking.Transport
             if (stageIndex == -1)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException("Could not find stage ID. Make sure the type for this stage ID is added when the pipeline is created.");
+                throw new InvalidOperationException(
+                    "Could not find stage ID. Make sure the type for this stage ID is added when the pipeline is created."
+                );
 #else
                 return null;
 #endif
@@ -1001,7 +1217,9 @@ namespace Unity.Networking.Transport
             if (staticInstanceBufferLength != sizeof(T))
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException($"GetPipelineParameterBuffer type mismatch! Expected staticInstanceBufferLength ({staticInstanceBufferLength}) to be of sizeof({typeof(T)}) ({sizeof(T)})!");
+                throw new InvalidOperationException(
+                    $"GetPipelineParameterBuffer type mismatch! Expected staticInstanceBufferLength ({staticInstanceBufferLength}) to be of sizeof({typeof(T)}) ({sizeof(T)})!"
+                );
 #else
                 return null;
 #endif
@@ -1015,11 +1233,18 @@ namespace Unity.Networking.Transport
             // Clear the send lock since it cannot be kept here and can be lost if there are exceptions in send
             NativeArray<byte> tmpBuffer = m_SendBuffer.AsArray();
             int* sendBufferLock = (int*)tmpBuffer.GetUnsafePtr();
-            for (int connectionOffset = 0; connectionOffset < m_SendBuffer.Length; connectionOffset += sizePerConnection[SendSizeOffset])
+            for (
+                int connectionOffset = 0;
+                connectionOffset < m_SendBuffer.Length;
+                connectionOffset += sizePerConnection[SendSizeOffset]
+            )
                 sendBufferLock[connectionOffset / 4] = 0;
 
             var concurrent = ToConcurrent();
-            NativeParallelHashSet<UpdatePipeline> currentUpdates = new NativeParallelHashSet<UpdatePipeline>(128, Allocator.Temp);
+            NativeParallelHashSet<UpdatePipeline> currentUpdates = new NativeParallelHashSet<UpdatePipeline>(
+                128,
+                Allocator.Temp
+            );
 
             while (m_SendStageNeedsUpdateRead.TryDequeue(out var update))
                 ProcessSendUpdate(ref concurrent, ref driver, update, currentUpdates, m_MaxPacketHeaderSize);
@@ -1033,11 +1258,25 @@ namespace Unity.Networking.Transport
                 m_SendStageNeedsUpdateRead.Enqueue(currentUpdate);
         }
 
-        private static void ProcessSendUpdate(ref Concurrent self, ref NetworkDriver.Concurrent driver, UpdatePipeline update, NativeParallelHashSet<UpdatePipeline> currentUpdates, int headerSize)
+        private static void ProcessSendUpdate(
+            ref Concurrent self,
+            ref NetworkDriver.Concurrent driver,
+            UpdatePipeline update,
+            NativeParallelHashSet<UpdatePipeline> currentUpdates,
+            int headerSize
+        )
         {
             if (driver.GetConnectionState(update.connection) == NetworkConnection.State.Connected)
             {
-                var result = self.ProcessPipelineSend(driver, update.stage, update.pipeline, update.connection, default, headerSize, currentUpdates);
+                var result = self.ProcessPipelineSend(
+                    driver,
+                    update.stage,
+                    update.pipeline,
+                    update.connection,
+                    default,
+                    headerSize,
+                    currentUpdates
+                );
                 if (result < 0)
                 {
                     Debug.LogWarning($"Sending from within pipeline failed with the following error code: {result}");
@@ -1061,15 +1300,31 @@ namespace Unity.Networking.Transport
 
                 var receiver = driver.Receiver;
                 var eventQueue = driver.EventQueue;
-                ProcessReceiveStagesFrom(ref receiver, ref eventQueue, receiveUpdate.stage, receiveUpdate.pipeline, receiveUpdate.connection, default);
+                ProcessReceiveStagesFrom(
+                    ref receiver,
+                    ref eventQueue,
+                    receiveUpdate.stage,
+                    receiveUpdate.pipeline,
+                    receiveUpdate.connection,
+                    default
+                );
             }
         }
 
-        public unsafe void Receive(byte pipelineId, ref NetworkDriverReceiver receiver, ref NetworkEventQueue eventQueue, ref NetworkConnection connection, byte* buffer, int bufferLength)
+        public unsafe void Receive(
+            byte pipelineId,
+            ref NetworkDriverReceiver receiver,
+            ref NetworkEventQueue eventQueue,
+            ref NetworkConnection connection,
+            byte* buffer,
+            int bufferLength
+        )
         {
             if (pipelineId == 0 || pipelineId > m_Pipelines.Length)
             {
-                Debug.LogError($"Received a packet with an invalid pipeline ({pipelineId}, should be between 1 and {m_Pipelines.Length}). Possible mismatch between pipeline definitions on each end of the connection.");
+                Debug.LogError(
+                    $"Received a packet with an invalid pipeline ({pipelineId}, should be between 1 and {m_Pipelines.Length}). Possible mismatch between pipeline definitions on each end of the connection."
+                );
                 return;
             }
             var p = m_Pipelines[pipelineId - 1];
@@ -1078,11 +1333,24 @@ namespace Unity.Networking.Transport
             InboundRecvBuffer inBuffer;
             inBuffer.buffer = buffer;
             inBuffer.bufferLength = bufferLength;
-            ProcessReceiveStagesFrom(ref receiver, ref eventQueue, startStage, new NetworkPipeline {Id = pipelineId}, connection, inBuffer);
+            ProcessReceiveStagesFrom(
+                ref receiver,
+                ref eventQueue,
+                startStage,
+                new NetworkPipeline { Id = pipelineId },
+                connection,
+                inBuffer
+            );
         }
 
-        private unsafe void ProcessReceiveStagesFrom(ref NetworkDriverReceiver receiver, ref NetworkEventQueue eventQueue, int startStage, NetworkPipeline pipeline,
-            NetworkConnection connection, InboundRecvBuffer buffer)
+        private unsafe void ProcessReceiveStagesFrom(
+            ref NetworkDriverReceiver receiver,
+            ref NetworkEventQueue eventQueue,
+            int startStage,
+            NetworkPipeline pipeline,
+            NetworkConnection connection,
+            InboundRecvBuffer buffer
+        )
         {
             var p = m_Pipelines[pipeline.Id - 1];
             var connectionId = connection.InternalId;
@@ -1093,35 +1361,65 @@ namespace Unity.Networking.Transport
 
             var inboundBuffer = buffer;
 
-            var ctx = new NetworkPipelineContext
-            {
-                timestamp = Timestamp,
-                header = default
-            };
+            var ctx = new NetworkPipelineContext { timestamp = Timestamp, header = default };
 
             while (true)
             {
                 bool needsUpdate = false;
                 bool needsSendUpdate = false;
                 int internalBufferOffset = p.receiveBufferOffset + sizePerConnection[RecveiveSizeOffset] * connectionId;
-                int internalSharedBufferOffset = p.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connectionId;
+                int internalSharedBufferOffset =
+                    p.sharedBufferOffset + sizePerConnection[SharedSizeOffset] * connectionId;
 
                 // Adjust offset accounting for stages in front of the starting stage, since we're parsing the stages in reverse order
                 for (int st = 0; st < startStage; ++st)
                 {
-                    internalBufferOffset += (m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + st]].ReceiveCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
-                    internalSharedBufferOffset += (m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + st]].SharedStateCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
+                    internalBufferOffset +=
+                        (
+                            m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + st]].ReceiveCapacity
+                            + AlignmentMinusOne
+                        ) & (~AlignmentMinusOne);
+                    internalSharedBufferOffset +=
+                        (
+                            m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + st]].SharedStateCapacity
+                            + AlignmentMinusOne
+                        ) & (~AlignmentMinusOne);
                 }
 
                 for (int i = startStage; i >= 0; --i)
                 {
-                    ProcessReceiveStage(i, pipeline, internalBufferOffset, internalSharedBufferOffset, ref ctx, ref inboundBuffer, ref resumeQ, ref needsUpdate, ref needsSendUpdate, systemHeaderSize);
+                    ProcessReceiveStage(
+                        i,
+                        pipeline,
+                        internalBufferOffset,
+                        internalSharedBufferOffset,
+                        ref ctx,
+                        ref inboundBuffer,
+                        ref resumeQ,
+                        ref needsUpdate,
+                        ref needsSendUpdate,
+                        systemHeaderSize
+                    );
 
                     if (needsUpdate)
-                        m_ReceiveStageNeedsUpdate.Add(new UpdatePipeline { connection = connection, stage = i, pipeline = pipeline });
+                        m_ReceiveStageNeedsUpdate.Add(
+                            new UpdatePipeline
+                            {
+                                connection = connection,
+                                stage = i,
+                                pipeline = pipeline,
+                            }
+                        );
 
                     if (needsSendUpdate)
-                        m_SendStageNeedsUpdate.Add(new UpdatePipeline { connection = connection, stage = i, pipeline = pipeline });
+                        m_SendStageNeedsUpdate.Add(
+                            new UpdatePipeline
+                            {
+                                connection = connection,
+                                stage = i,
+                                pipeline = pipeline,
+                            }
+                        );
 
                     if (inboundBuffer.buffer == null)
                         break;
@@ -1130,16 +1428,28 @@ namespace Unity.Networking.Transport
                     if (i > 0)
                     {
                         internalBufferOffset -=
-                            (m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i - 1]].ReceiveCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
+                            (
+                                m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i - 1]].ReceiveCapacity
+                                + AlignmentMinusOne
+                            ) & (~AlignmentMinusOne);
                         internalSharedBufferOffset -=
-                            (m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i - 1]].SharedStateCapacity + AlignmentMinusOne) & (~AlignmentMinusOne);
+                            (
+                                m_StageStructs[m_PipelineStagesIndices[p.FirstStageIndex + i - 1]].SharedStateCapacity
+                                + AlignmentMinusOne
+                            ) & (~AlignmentMinusOne);
                     }
 
                     needsUpdate = false;
                 }
 
                 if (inboundBuffer.buffer != null)
-                    receiver.PushDataEvent(connection, pipeline.Id, inboundBuffer.buffer, inboundBuffer.bufferLength, ref eventQueue);
+                    receiver.PushDataEvent(
+                        connection,
+                        pipeline.Id,
+                        inboundBuffer.buffer,
+                        inboundBuffer.bufferLength,
+                        ref eventQueue
+                    );
 
                 if (resumeQStart >= resumeQ.Length)
                 {
@@ -1151,9 +1461,18 @@ namespace Unity.Networking.Transport
             }
         }
 
-        private unsafe void ProcessReceiveStage(int stage, NetworkPipeline pipeline, int internalBufferOffset,
-            int internalSharedBufferOffset, ref NetworkPipelineContext ctx, ref InboundRecvBuffer inboundBuffer,
-            ref NativeList<int> resumeQ, ref bool needsUpdate, ref bool needsSendUpdate, int systemHeadersSize)
+        private unsafe void ProcessReceiveStage(
+            int stage,
+            NetworkPipeline pipeline,
+            int internalBufferOffset,
+            int internalSharedBufferOffset,
+            ref NetworkPipelineContext ctx,
+            ref InboundRecvBuffer inboundBuffer,
+            ref NativeList<int> resumeQ,
+            ref bool needsUpdate,
+            ref bool needsSendUpdate,
+            int systemHeadersSize
+        )
         {
             var p = m_Pipelines[pipeline.Id - 1];
 
@@ -1167,7 +1486,10 @@ namespace Unity.Networking.Transport
             ctx.internalSharedProcessBufferLength = pipelineStage.SharedStateCapacity;
             NetworkPipelineStage.Requests requests = NetworkPipelineStage.Requests.None;
 
-            ((delegate * unmanaged[Cdecl] < ref NetworkPipelineContext, ref InboundRecvBuffer, ref Requests, int, void >)pipelineStage.Receive.Ptr.Value)(ref ctx, ref inboundBuffer, ref requests, systemHeadersSize);
+            (
+                (delegate* unmanaged[Cdecl]<ref NetworkPipelineContext, ref InboundRecvBuffer, ref Requests, int, void>)
+                    pipelineStage.Receive.Ptr.Value
+            )(ref ctx, ref inboundBuffer, ref requests, systemHeadersSize);
 
             if ((requests & NetworkPipelineStage.Requests.Resume) != 0)
                 resumeQ.Add(stage);

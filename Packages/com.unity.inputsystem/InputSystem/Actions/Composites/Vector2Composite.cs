@@ -3,7 +3,6 @@ using System.ComponentModel;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
-
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.InputSystem.Editor;
@@ -51,7 +50,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int up;
+        [InputControl(layout = "Axis")]
+        public int up;
 
         /// <summary>
         /// Binding for the button represents the down (that is, <c>(0,-1)</c>) direction of the vector.
@@ -61,7 +61,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int down;
+        [InputControl(layout = "Axis")]
+        public int down;
 
         /// <summary>
         /// Binding for the button represents the left (that is, <c>(-1,0)</c>) direction of the vector.
@@ -71,7 +72,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int left;
+        [InputControl(layout = "Axis")]
+        public int left;
 
         /// <summary>
         /// Binding for the button that represents the right (that is, <c>(1,0)</c>) direction of the vector.
@@ -79,7 +81,8 @@ namespace UnityEngine.InputSystem.Composites
         /// <remarks>
         /// This property is automatically assigned by the input system.
         /// </remarks>
-        [InputControl(layout = "Axis")] public int right;
+        [InputControl(layout = "Axis")]
+        public int right;
 
         [Obsolete("Use Mode.DigitalNormalized with 'mode' instead")]
         public bool normalize = true;
@@ -146,12 +149,18 @@ namespace UnityEngine.InputSystem.Composites
 
             // Legacy. We need to reference the obsolete member here so temporarily
             // turn off the warning.
-            #pragma warning disable CS0618
+#pragma warning disable CS0618
             if (!normalize) // Was on by default.
                 mode = Mode.Digital;
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
 
-            return DpadControl.MakeDpadVector(upIsPressed, downIsPressed, leftIsPressed, rightIsPressed, mode == Mode.DigitalNormalized);
+            return DpadControl.MakeDpadVector(
+                upIsPressed,
+                downIsPressed,
+                leftIsPressed,
+                rightIsPressed,
+                mode == Mode.DigitalNormalized
+            );
         }
 
         /// <inheritdoc />
@@ -185,17 +194,19 @@ namespace UnityEngine.InputSystem.Composites
             /// that if, for example, both left and up are pressed, the resulting vector is (-1,1) and has a length
             /// greater than 1. The resulting 2D area is box-shaped.
             /// </summary>
-            Digital = 1
+            Digital = 1,
         }
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     internal class Vector2CompositeEditor : InputParameterEditor<Vector2Composite>
     {
-        private GUIContent m_ModeLabel = new GUIContent("Mode",
+        private GUIContent m_ModeLabel = new GUIContent(
+            "Mode",
             "How to synthesize a Vector2 from the inputs. Digital "
-            + "treats part bindings as buttons (on/off) whereas Analog preserves "
-            + "floating-point magnitudes as read from controls.");
+                + "treats part bindings as buttons (on/off) whereas Analog preserves "
+                + "floating-point magnitudes as read from controls."
+        );
 
         public override void OnGUI()
         {
@@ -207,10 +218,7 @@ namespace UnityEngine.InputSystem.Composites
 
         public override void OnDrawVisualElements(VisualElement root, Action onChangedCallback)
         {
-            var modeField = new EnumField(m_ModeLabel.text, target.mode)
-            {
-                tooltip = m_ModeLabel.tooltip
-            };
+            var modeField = new EnumField(m_ModeLabel.text, target.mode) { tooltip = m_ModeLabel.tooltip };
 
             modeField.RegisterValueChangedCallback(evt =>
             {
@@ -221,5 +229,5 @@ namespace UnityEngine.InputSystem.Composites
             root.Add(modeField);
         }
     }
-    #endif
+#endif
 }

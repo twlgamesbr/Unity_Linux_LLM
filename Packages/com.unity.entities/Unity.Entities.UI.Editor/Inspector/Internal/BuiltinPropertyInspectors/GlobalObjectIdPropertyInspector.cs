@@ -9,10 +9,17 @@ namespace Unity.Entities.UI
     {
         enum IdentifierType
         {
-            [UsedImplicitly] Null,
-            [UsedImplicitly] ImportedAsset,
-            [UsedImplicitly] SceneObject,
-            [UsedImplicitly] SourceAsset
+            [UsedImplicitly]
+            Null,
+
+            [UsedImplicitly]
+            ImportedAsset,
+
+            [UsedImplicitly]
+            SceneObject,
+
+            [UsedImplicitly]
+            SourceAsset,
         }
 
         EnumField m_IdentifierType;
@@ -21,13 +28,12 @@ namespace Unity.Entities.UI
 
         public override VisualElement Build()
         {
-            var root = new Foldout
-            {
-                text = DisplayName,
-                tooltip = Tooltip
-            };
+            var root = new Foldout { text = DisplayName, tooltip = Tooltip };
             var id = Target;
-            m_IdentifierType = new EnumField(ObjectNames.NicifyVariableName(nameof(GlobalObjectId.identifierType)), (IdentifierType)id.identifierType);
+            m_IdentifierType = new EnumField(
+                ObjectNames.NicifyVariableName(nameof(GlobalObjectId.identifierType)),
+                (IdentifierType)id.identifierType
+            );
             m_IdentifierType.SetEnabled(false);
             root.contentContainer.Add(m_IdentifierType);
             m_Guid = new TextField(ObjectNames.NicifyVariableName(nameof(GlobalObjectId.assetGUID)));
@@ -42,8 +48,6 @@ namespace Unity.Entities.UI
             return root;
         }
 
-        public override void Update()
-        {
-        }
+        public override void Update() { }
     }
 }

@@ -23,26 +23,31 @@ namespace Unity.Entities.Content
             /// The download has not been requested.
             /// </summary>
             None,
+
             /// <summary>
             /// The download is in the queue to be processed.
             /// </summary>
             Queued,
+
             /// <summary>
             /// The download is in progress.
             /// </summary>
             Downloading,
+
             /// <summary>
             /// The download is completed and is successful.
             /// </summary>
             Complete,
+
             /// <summary>
             /// The download was cancelled.
             /// </summary>
             Cancelled,
+
             /// <summary>
             /// The download failed.
             /// </summary>
-            Failed
+            Failed,
         }
 
         /// <summary>
@@ -54,10 +59,12 @@ namespace Unity.Entities.Content
             /// The state of the download process.
             /// </summary>
             public State DownloadState;
+
             /// <summary>
             /// The current number of bytes downloaded.
             /// </summary>
             public long BytesDownloaded;
+
             /// <summary>
             /// When complete, the local path of the file that was downloaded.
             /// </summary>
@@ -71,14 +78,17 @@ namespace Unity.Entities.Content
         {
             string tempDownloadPath;
             string finalDownloadPath;
+
             /// <summary>
             /// True if the operation has been cancelled.
             /// </summary>
             public bool IsCancelled { get; private set; }
+
             /// <summary>
             /// The location of the operation.
             /// </summary>
             public RemoteContentLocation Location { get; private set; }
+
             /// <summary>
             /// True if the operation has been started.  This will be false if the operation is queued.
             /// </summary>
@@ -133,6 +143,7 @@ namespace Unity.Entities.Content
                 }
                 return false;
             }
+
             /// <summary>
             /// Called when the operation can begin downloading it data.
             /// </summary>
@@ -188,19 +199,21 @@ namespace Unity.Entities.Content
         long activeDownloadedBytes = 0;
         long completeDownloadedBytes = 0;
 
-
         /// <summary>
         /// The root directory of the local cache.
         /// </summary>
         public string CacheRoot { get; protected set; }
+
         /// <summary>
         /// The download service name. Each service name must be unique.
         /// </summary>
-        public string Name {get; protected set;}
+        public string Name { get; protected set; }
+
         /// <summary>
         /// The priority of the service. Higher values will place it at the front of the service list.
         /// </summary>
         public int Priority { get; set; }
+
         /// <summary>
         /// Total bytes downloaded.
         /// </summary>
@@ -208,6 +221,7 @@ namespace Unity.Entities.Content
         /// If content is loaded from the cache, this value isn't affected. This value is reset when <see cref="ClearDownloadProgress"/> is called.
         /// </remarks>
         public long TotalDownloadedBytes => activeDownloadedBytes + completeDownloadedBytes;
+
         /// <summary>
         /// Total bytes processed.
         /// </summary>
@@ -224,7 +238,13 @@ namespace Unity.Entities.Content
         /// <param name="priority">The priority of the service. Higher values are placed at the front of the service list.</param>
         /// <param name="maxActiveDownloads">The maximum allowed concurrent downloads. When there are more requests than can be run concurrently, they are queued until some of the active operations complete.</param>
         /// <param name="createDownloadOpFunc">Allows for specifying a custom type of DownloadOperation. By default, this will use UnityWebRequest.</param>
-        public ContentDownloadService(string name, string cacheDir, int priority = 1, int maxActiveDownloads = 5, Func<DownloadOperation> createDownloadOpFunc = null)
+        public ContentDownloadService(
+            string name,
+            string cacheDir,
+            int priority = 1,
+            int maxActiveDownloads = 5,
+            Func<DownloadOperation> createDownloadOpFunc = null
+        )
         {
             Name = name;
             Priority = priority;
@@ -232,7 +252,8 @@ namespace Unity.Entities.Content
             CacheRoot = cacheDir;
             activeDownloads = new LinkedList<DownloadOperation>();
             downloadStates = new Dictionary<RemoteContentLocation, DownloadStatus>();
-            createOpFunc = createDownloadOpFunc == null ? () => new DownloadOperationUnityWebRequest() : createDownloadOpFunc;
+            createOpFunc =
+                createDownloadOpFunc == null ? () => new DownloadOperationUnityWebRequest() : createDownloadOpFunc;
             Directory.CreateDirectory(cacheDir);
         }
 
@@ -245,7 +266,7 @@ namespace Unity.Entities.Content
         /// Called when added to the content delivery service.
         /// </summary>
         /// <param name="contentDeliveryService">The content delivery service this service is being added to.</param>
-        public void OnAddedToDeliveryService(ContentDeliveryService contentDeliveryService){}
+        public void OnAddedToDeliveryService(ContentDeliveryService contentDeliveryService) { }
 
         /// <summary>
         /// Called when a download needs to be cancelled.  This is not guaranteed to cancel the operation.
@@ -258,7 +279,7 @@ namespace Unity.Entities.Content
                 status.DownloadState = State.Cancelled;
                 downloadStates[loc] = status;
             }
-            
+
             var node = activeDownloads.First;
             while (node != null)
             {
@@ -284,7 +305,12 @@ namespace Unity.Entities.Content
             {
                 if (GetLocalCacheFilePath(loc, out var cachePath))
                 {
-                    status = new DownloadStatus { BytesDownloaded = loc.Size, LocalPath = cachePath, DownloadState = State.Complete };
+                    status = new DownloadStatus
+                    {
+                        BytesDownloaded = loc.Size,
+                        LocalPath = cachePath,
+                        DownloadState = State.Complete,
+                    };
                     downloadStates[loc] = status;
                 }
             }
@@ -357,11 +383,11 @@ namespace Unity.Entities.Content
         /// </summary>
         /// <param name="loc">The content location.</param>
         /// <returns>The status of the download operation.  If the content is cached, this will return a complete status.</returns>
-        unsafe public DownloadStatus DownloadContent(in RemoteContentLocation loc)
+        public unsafe DownloadStatus DownloadContent(in RemoteContentLocation loc)
         {
             if (downloadStates.TryGetValue(loc, out var status))
             {
-                if(status.DownloadState == State.Cancelled || status.DownloadState == State.Failed)
+                if (status.DownloadState == State.Cancelled || status.DownloadState == State.Failed)
                     downloadStates.Remove(loc);
             }
             if (!downloadStates.TryGetValue(loc, out var s))
@@ -455,7 +481,6 @@ namespace Unity.Entities.Content
             operation = req.SendWebRequest();
         }
 
-
         protected override bool ProcessDownload(ref long downloadedBytes, ref string error)
         {
             downloadedBytes = (long)operation.webRequest.downloadedBytes;
@@ -488,6 +513,7 @@ namespace Unity.Entities.Content
         Task writeTask;
         FileStream writeStream;
         string targetPath;
+
         public DownloadOperationHttpClient(HttpClient client)
         {
             httpClient = client;
@@ -499,9 +525,7 @@ namespace Unity.Entities.Content
             downloadTask = httpClient.GetStreamAsync(remotePath);
         }
 
-        protected override void CancelDownload()
-        {
-        }
+        protected override void CancelDownload() { }
 
         protected override bool ProcessDownload(ref long downloadedBytes, ref string error)
         {

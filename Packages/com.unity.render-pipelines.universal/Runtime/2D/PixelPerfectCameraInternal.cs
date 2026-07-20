@@ -114,20 +114,20 @@ namespace UnityEngine.Rendering.Universal
                     }
                     else if (cropFrameY)
                     {
-                        offscreenRTWidth = screenWidth / zoom / 2 * 2;   // Make sure it's an even number by / 2 * 2.
+                        offscreenRTWidth = screenWidth / zoom / 2 * 2; // Make sure it's an even number by / 2 * 2.
                         offscreenRTHeight = refResolutionY;
                     }
-                    else    // crop frame X
+                    else // crop frame X
                     {
                         offscreenRTWidth = refResolutionX;
-                        offscreenRTHeight = screenHeight / zoom / 2 * 2;   // Make sure it's an even number by / 2 * 2.
+                        offscreenRTHeight = screenHeight / zoom / 2 * 2; // Make sure it's an even number by / 2 * 2.
                     }
                 }
             }
             else if (upscaleRT && zoom > 1)
             {
                 useOffscreenRT = true;
-                offscreenRTWidth = screenWidth / zoom / 2 * 2;        // Make sure it's an even number by / 2 * 2.
+                offscreenRTWidth = screenWidth / zoom / 2 * 2; // Make sure it's an even number by / 2 * 2.
                 offscreenRTHeight = screenHeight / zoom / 2 * 2;
             }
 
@@ -146,7 +146,8 @@ namespace UnityEngine.Rendering.Universal
                 orthoSize = (refResolutionY * 0.5f) / assetsPPU;
             else if (cropFrameX)
             {
-                float aspect = (pixelRect == Rect.zero) ? (float)screenWidth / screenHeight : pixelRect.width / pixelRect.height;
+                float aspect =
+                    (pixelRect == Rect.zero) ? (float)screenWidth / screenHeight : pixelRect.width / pixelRect.height;
                 orthoSize = ((refResolutionX / aspect) * 0.5f) / assetsPPU;
             }
             else if (upscaleRT && zoom > 1)

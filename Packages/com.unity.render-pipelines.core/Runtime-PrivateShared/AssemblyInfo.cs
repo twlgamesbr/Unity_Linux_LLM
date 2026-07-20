@@ -21,7 +21,10 @@ namespace Unity.RenderPipelines.Core.Runtime.Shared
 {
     internal static class CameraCaptureBridge
     {
-        public static System.Collections.Generic.IEnumerator<System.Action<UnityEngine.Rendering.RenderTargetIdentifier, UnityEngine.Rendering.CommandBuffer>>
-            GetCachedCaptureActionsEnumerator(UnityEngine.Camera camera) => UnityEngine.Rendering.CameraCaptureBridge.GetCachedCaptureActionsEnumerator(camera);
+        public static System.Collections.Generic.IEnumerator<System.Action<
+            UnityEngine.Rendering.RenderTargetIdentifier,
+            UnityEngine.Rendering.CommandBuffer
+        >> GetCachedCaptureActionsEnumerator(UnityEngine.Camera camera) =>
+            UnityEngine.Rendering.CameraCaptureBridge.GetCachedCaptureActionsEnumerator(camera);
     }
 }

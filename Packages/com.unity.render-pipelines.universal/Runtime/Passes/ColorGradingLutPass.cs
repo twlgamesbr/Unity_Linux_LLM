@@ -16,7 +16,7 @@ namespace UnityEngine.Rendering.Universal.Internal
         readonly Material m_LutBuilderHdr;
         internal readonly GraphicsFormat m_HdrLutFormat;
         internal readonly GraphicsFormat m_LdrLutFormat;
-        
+
         bool m_AllowColorGradingACESHDR = true;
 
         /// <summary>
@@ -53,7 +53,11 @@ namespace UnityEngine.Rendering.Universal.Internal
 
             m_LdrLutFormat = GraphicsFormat.R8G8B8A8_UNorm;
 
-            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3 && Graphics.minOpenGLESVersion <= OpenGLESVersion.OpenGLES30 && SystemInfo.graphicsDeviceName.StartsWith("Adreno (TM) 3"))
+            if (
+                SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3
+                && Graphics.minOpenGLESVersion <= OpenGLESVersion.OpenGLES30
+                && SystemInfo.graphicsDeviceName.StartsWith("Adreno (TM) 3")
+            )
                 m_AllowColorGradingACESHDR = false;
         }
 
@@ -62,9 +66,7 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// </summary>
         /// <param name="internalLut">The RTHandle to use to render to.</param>
         /// <seealso cref="RTHandle"/>
-        public void Setup(in RTHandle internalLut)
-        { 
-        }
+        public void Setup(in RTHandle internalLut) { }
 
         /// <summary>
         /// Get a descriptor and filter mode for the required texture for this pass
@@ -72,7 +74,11 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <param name="postProcessingData">The pass will use settings from <c>PostProcessingData</c> for the pass.</param>
         /// <param name="descriptor">The <c>RenderTextureDescriptor</c> used by the pass.</param>
         /// <param name="filterMode">The <c>FilterMode</c> used by the pass.</param>
-        public void ConfigureDescriptor(in PostProcessingData postProcessingData, out RenderTextureDescriptor descriptor, out FilterMode filterMode)
+        public void ConfigureDescriptor(
+            in PostProcessingData postProcessingData,
+            out RenderTextureDescriptor descriptor,
+            out FilterMode filterMode
+        )
         {
             ConfigureDescriptor(postProcessingData.universalPostProcessingData, out descriptor, out filterMode);
         }
@@ -83,7 +89,11 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <param name="postProcessingData">The pass will use settings from <c>PostProcessingData</c> for the pass.</param>
         /// <param name="descriptor">The <c>RenderTextureDescriptor</c> used by the pass.</param>
         /// <param name="filterMode">The <c>FilterMode</c> used by the pass.</param>
-        public void ConfigureDescriptor(in UniversalPostProcessingData postProcessingData, out RenderTextureDescriptor descriptor, out FilterMode filterMode)
+        public void ConfigureDescriptor(
+            in UniversalPostProcessingData postProcessingData,
+            out RenderTextureDescriptor descriptor,
+            out FilterMode filterMode
+        )
         {
             bool hdr = postProcessingData.gradingMode == ColorGradingMode.HighDynamicRange;
             int lutHeight = postProcessingData.lutSize;
@@ -135,11 +145,34 @@ namespace UnityEngine.Rendering.Universal.Internal
                 var material = hdr ? lutBuilderHdr : lutBuilderLdr;
 
                 // Prepare data
-                var lmsColorBalance = ColorUtils.ColorBalanceToLMSCoeffs(whiteBalance.temperature.value, whiteBalance.tint.value);
-                var hueSatCon = new Vector4(colorAdjustments.hueShift.value / 360f, colorAdjustments.saturation.value / 100f + 1f, colorAdjustments.contrast.value / 100f + 1f, 0f);
-                var channelMixerR = new Vector4(channelMixer.redOutRedIn.value / 100f, channelMixer.redOutGreenIn.value / 100f, channelMixer.redOutBlueIn.value / 100f, 0f);
-                var channelMixerG = new Vector4(channelMixer.greenOutRedIn.value / 100f, channelMixer.greenOutGreenIn.value / 100f, channelMixer.greenOutBlueIn.value / 100f, 0f);
-                var channelMixerB = new Vector4(channelMixer.blueOutRedIn.value / 100f, channelMixer.blueOutGreenIn.value / 100f, channelMixer.blueOutBlueIn.value / 100f, 0f);
+                var lmsColorBalance = ColorUtils.ColorBalanceToLMSCoeffs(
+                    whiteBalance.temperature.value,
+                    whiteBalance.tint.value
+                );
+                var hueSatCon = new Vector4(
+                    colorAdjustments.hueShift.value / 360f,
+                    colorAdjustments.saturation.value / 100f + 1f,
+                    colorAdjustments.contrast.value / 100f + 1f,
+                    0f
+                );
+                var channelMixerR = new Vector4(
+                    channelMixer.redOutRedIn.value / 100f,
+                    channelMixer.redOutGreenIn.value / 100f,
+                    channelMixer.redOutBlueIn.value / 100f,
+                    0f
+                );
+                var channelMixerG = new Vector4(
+                    channelMixer.greenOutRedIn.value / 100f,
+                    channelMixer.greenOutGreenIn.value / 100f,
+                    channelMixer.greenOutBlueIn.value / 100f,
+                    0f
+                );
+                var channelMixerB = new Vector4(
+                    channelMixer.blueOutRedIn.value / 100f,
+                    channelMixer.blueOutGreenIn.value / 100f,
+                    channelMixer.blueOutBlueIn.value / 100f,
+                    0f
+                );
 
                 var shadowsHighlightsLimits = new Vector4(
                     shadowsMidtonesHighlights.shadowsStart.value,
@@ -168,8 +201,12 @@ namespace UnityEngine.Rendering.Universal.Internal
 
                 int lutHeight = passData.lutSize;
                 int lutWidth = lutHeight * lutHeight;
-                var lutParameters = new Vector4(lutHeight, 0.5f / lutWidth, 0.5f / lutHeight,
-                    lutHeight / (lutHeight - 1f));
+                var lutParameters = new Vector4(
+                    lutHeight,
+                    0.5f / lutWidth,
+                    0.5f / lutHeight,
+                    lutHeight / (lutHeight - 1f)
+                );
 
                 // Fill in constants
                 material.SetVector(ShaderConstants._Lut_Params, lutParameters);
@@ -208,9 +245,18 @@ namespace UnityEngine.Rendering.Universal.Internal
 
                     switch (tonemapping.mode.value)
                     {
-                        case TonemappingMode.Neutral: material.EnableKeyword(ShaderKeywordStrings.TonemapNeutral); break;
-                        case TonemappingMode.ACES: material.EnableKeyword(allowColorGradingACESHDR ? ShaderKeywordStrings.TonemapACES : ShaderKeywordStrings.TonemapNeutral); break;
-                        default: break; // None
+                        case TonemappingMode.Neutral:
+                            material.EnableKeyword(ShaderKeywordStrings.TonemapNeutral);
+                            break;
+                        case TonemappingMode.ACES:
+                            material.EnableKeyword(
+                                allowColorGradingACESHDR
+                                    ? ShaderKeywordStrings.TonemapACES
+                                    : ShaderKeywordStrings.TonemapNeutral
+                            );
+                            break;
+                        default:
+                            break; // None
                     }
 
                     // HDR output is active
@@ -219,13 +265,22 @@ namespace UnityEngine.Rendering.Universal.Internal
                         Vector4 hdrOutputLuminanceParams;
                         Vector4 hdrOutputGradingParams;
 
-                        UniversalRenderPipeline.GetHDROutputLuminanceParameters(passData.cameraData.hdrDisplayInformation, passData.cameraData.hdrDisplayColorGamut, tonemapping, out hdrOutputLuminanceParams);
+                        UniversalRenderPipeline.GetHDROutputLuminanceParameters(
+                            passData.cameraData.hdrDisplayInformation,
+                            passData.cameraData.hdrDisplayColorGamut,
+                            tonemapping,
+                            out hdrOutputLuminanceParams
+                        );
                         UniversalRenderPipeline.GetHDROutputGradingParameters(tonemapping, out hdrOutputGradingParams);
 
                         material.SetVector(ShaderPropertyId.hdrOutputLuminanceParams, hdrOutputLuminanceParams);
                         material.SetVector(ShaderPropertyId.hdrOutputGradingParams, hdrOutputGradingParams);
 
-                        HDROutputUtils.ConfigureHDROutput(material, passData.cameraData.hdrDisplayColorGamut, HDROutputUtils.Operation.ColorConversion);
+                        HDROutputUtils.ConfigureHDROutput(
+                            material,
+                            passData.cameraData.hdrDisplayColorGamut,
+                            HDROutputUtils.Operation.ColorConversion
+                        );
                     }
                 }
 
@@ -244,9 +299,17 @@ namespace UnityEngine.Rendering.Universal.Internal
             UniversalPostProcessingData postProcessingData = frameData.Get<UniversalPostProcessingData>();
 
             this.ConfigureDescriptor(in postProcessingData, out var lutDesc, out var filterMode);
-            internalColorLut = UniversalRenderer.CreateRenderGraphTexture(renderGraph, lutDesc, k_InternalColorLutName, true, filterMode);
+            internalColorLut = UniversalRenderer.CreateRenderGraphTexture(
+                renderGraph,
+                lutDesc,
+                k_InternalColorLutName,
+                true,
+                filterMode
+            );
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 passData.cameraData = cameraData;
 
@@ -255,16 +318,18 @@ namespace UnityEngine.Rendering.Universal.Internal
                 passData.lutBuilderLdr = m_LutBuilderLdr;
                 passData.lutBuilderHdr = m_LutBuilderHdr;
                 passData.allowColorGradingACESHDR = m_AllowColorGradingACESHDR;
-                passData.lutSize    = postProcessingData.lutSize;
+                passData.lutSize = postProcessingData.lutSize;
                 passData.hdrGrading = postProcessingData.gradingMode == ColorGradingMode.HighDynamicRange;
 
                 //  TODO RENDERGRAPH: culling? force culling off for testing
                 builder.AllowPassCulling(false);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    ExecutePass(context.cmd, data, data.internalColorLut);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        ExecutePass(context.cmd, data, data.internalColorLut);
+                    }
+                );
 
                 return;
             }

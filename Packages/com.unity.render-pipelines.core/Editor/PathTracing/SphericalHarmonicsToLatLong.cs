@@ -1,18 +1,17 @@
+using System;
 using Unity.Mathematics;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.PathTracing.Core;
-using System;
-using UnityEngine;
-
 #if ENABLE_IMAGECONVERSION_MODULE
 using UnityEngine.Experimental.Rendering;
 #endif
 
 namespace Unity.PathTracing.Editor
 {
-    static internal class SphericalHarmonicsToLatLong
+    internal static class SphericalHarmonicsToLatLong
     {
-        static public byte[] SHL2TolatLongEXR(float[] probesShData, int imageHeight, int maxProbeCount = 10)
+        public static byte[] SHL2TolatLongEXR(float[] probesShData, int imageHeight, int maxProbeCount = 10)
         {
             Assert.AreEqual(probesShData.Length % 27, 0);
             int probeCount = math.min(probesShData.Length / 27, maxProbeCount);
@@ -29,13 +28,21 @@ namespace Unity.PathTracing.Editor
                         float2 imageUv = (new float2(x, y) + 0.5f) / new float2(imageWidth, imageHeight);
                         float3 dir = LatlongCoordsToDirection(imageUv);
 
-                        var eval = SphericalHarmonicsUtil.EvaluateSH(new Span<float>(probesShData, probe * 27, 27), dir);
+                        var eval = SphericalHarmonicsUtil.EvaluateSH(
+                            new Span<float>(probesShData, probe * 27, 27),
+                            dir
+                        );
                         outputColors[(y + probe * imageHeight) * imageWidth + x] = new Color(eval.x, eval.y, eval.z);
                     }
                 }
             }
 #if ENABLE_IMAGECONVERSION_MODULE
-            return ImageConversion.EncodeArrayToEXR(outputColors, GraphicsFormat.R32G32B32A32_SFloat, (uint)imageWidth, (uint)(imageHeight * probeCount));
+            return ImageConversion.EncodeArrayToEXR(
+                outputColors,
+                GraphicsFormat.R32G32B32A32_SFloat,
+                (uint)imageWidth,
+                (uint)(imageHeight * probeCount)
+            );
 #else
             Debug.Assert(false, "The Image Conversion Module is not available.");
             return Array.Empty<byte>();

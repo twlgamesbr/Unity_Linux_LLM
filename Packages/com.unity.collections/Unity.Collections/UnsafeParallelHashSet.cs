@@ -14,10 +14,8 @@ namespace Unity.Collections.LowLevel.Unsafe
     /// <typeparam name="T">The type of the values.</typeparam>
     [StructLayout(LayoutKind.Sequential)]
     [DebuggerTypeProxy(typeof(UnsafeParallelHashSetDebuggerTypeProxy<>))]
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-    public unsafe struct UnsafeParallelHashSet<T>
-        : INativeDisposable
-        , IEnumerable<T>  // Used by collection initializers.
+    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+    public unsafe struct UnsafeParallelHashSet<T> : INativeDisposable, IEnumerable<T> // Used by collection initializers.
         where T : unmanaged, IEquatable<T>
     {
         internal UnsafeParallelHashMap<T, bool> m_Data;
@@ -133,7 +131,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <param name="allocator">The allocator to use.</param>
         /// <returns>An array with a copy of the set's values.</returns>
-        public NativeArray<T> ToNativeArray(AllocatorManager.AllocatorHandle allocator) => m_Data.GetKeyArray(allocator);
+        public NativeArray<T> ToNativeArray(AllocatorManager.AllocatorHandle allocator) =>
+            m_Data.GetKeyArray(allocator);
 
         /// <summary>
         /// Returns a parallel writer.
@@ -151,7 +150,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// Use <see cref="AsParallelWriter"/> to create a parallel writer for a set.
         /// </remarks>
         [NativeContainerIsAtomicWriteOnly]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public struct ParallelWriter
         {
             internal UnsafeParallelHashMap<T, bool>.ParallelWriter m_Data;
@@ -297,8 +296,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// A read-only alias for the value of a UnsafeParallelHashSet. Does not have its own allocated storage.
         /// </summary>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public struct ReadOnly
-            : IEnumerable<T>
+        public struct ReadOnly : IEnumerable<T>
         {
             internal UnsafeParallelHashMap<T, bool> m_Data;
 
@@ -369,10 +367,7 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <returns>An enumerator over the items of this hash set.</returns>
             public readonly Enumerator GetEnumerator()
             {
-                return new Enumerator
-                {
-                    m_Enumerator = new UnsafeParallelHashMapDataEnumerator(m_Data.m_Buffer),
-                };
+                return new Enumerator { m_Enumerator = new UnsafeParallelHashMapDataEnumerator(m_Data.m_Buffer) };
             }
 
             /// <summary>
@@ -397,7 +392,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         }
     }
 
-    sealed internal class UnsafeParallelHashSetDebuggerTypeProxy<T>
+    internal sealed class UnsafeParallelHashSetDebuggerTypeProxy<T>
         where T : unmanaged, IEquatable<T>
     {
         UnsafeParallelHashSet<T> Data;

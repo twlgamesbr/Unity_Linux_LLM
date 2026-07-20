@@ -1,10 +1,11 @@
+using System;
+using UnityEngine.Experimental.Rendering;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using ShaderKeywordFilter = UnityEditor.ShaderKeywordFilter;
 #endif
-using System;
-using UnityEngine.Experimental.Rendering;
+
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -15,10 +16,12 @@ namespace UnityEngine.Rendering.Universal
     {
         /// <summary>Depth will be copied after the opaques pass</summary>
         AfterOpaques,
+
         /// <summary>Depth will be copied after the transparents pass</summary>
         AfterTransparents,
+
         /// <summary>Depth will be written by a depth prepass</summary>
-        ForcePrepass
+        ForcePrepass,
     }
 
     /// <summary>
@@ -28,15 +31,19 @@ namespace UnityEngine.Rendering.Universal
     public enum RenderPathCompatibility
     {
         /// <summary>Forward Rendering Path</summary>
-        Forward      = 1 << 0,
+        Forward = 1 << 0,
+
         /// <summary>Deferred Rendering Path</summary>
-        Deferred     = 1 << 1,
+        Deferred = 1 << 1,
+
         /// <summary>Forward+ Rendering Path</summary>
-        ForwardPlus  = 1 << 2,
+        ForwardPlus = 1 << 2,
+
         /// <summary>Forward+ Rendering Path</summary>
         DeferredPlus = 1 << 3,
+
         /// <summary>All Rendering Paths</summary>
-        All         = Forward | Deferred | ForwardPlus | DeferredPlus
+        All = Forward | Deferred | ForwardPlus | DeferredPlus,
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -112,18 +119,28 @@ namespace UnityEngine.Rendering.Universal
         {
             public override void Action(EntityId entityId, string pathName, string resourceFile)
             {
-                var instance = UniversalRenderPipelineAsset.CreateRendererAsset(pathName, RendererType.UniversalRenderer, false) as UniversalRendererData;
+                var instance =
+                    UniversalRenderPipelineAsset.CreateRendererAsset(pathName, RendererType.UniversalRenderer, false)
+                    as UniversalRendererData;
                 Selection.activeObject = instance;
             }
         }
 
-        [MenuItem("Assets/Create/Rendering/URP Universal Renderer", priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 2)]
+        [MenuItem(
+            "Assets/Create/Rendering/URP Universal Renderer",
+            priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 2
+        )]
         static void CreateUniversalRendererData()
         {
             var icon = CoreUtils.GetIconForType<ScriptableRendererData>();
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None, CreateInstance<CreateUniversalRendererAsset>(), "New Custom Universal Renderer Data.asset", icon, null);
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
+                EntityId.None,
+                CreateInstance<CreateUniversalRendererAsset>(),
+                "New Custom Universal Renderer Data.asset",
+                icon,
+                null
+            );
         }
-
 #endif
 
         /// <summary>
@@ -132,17 +149,39 @@ namespace UnityEngine.Rendering.Universal
         public PostProcessData postProcessData = null;
 
         const int k_LatestAssetVersion = 3;
-        [SerializeField] int m_AssetVersion = 0;
-        [SerializeField] LayerMask m_PrepassLayerMask = -1;
-        [SerializeField] LayerMask m_OpaqueLayerMask = -1;
-        [SerializeField] LayerMask m_TransparentLayerMask = -1;
-        [SerializeField] StencilStateData m_DefaultStencilState = new StencilStateData() { passOperation = StencilOp.Replace }; // This default state is compatible with deferred renderer.
-        [SerializeField] bool m_ShadowTransparentReceive = true;
-        [SerializeField] RenderingMode m_RenderingMode = RenderingMode.Forward;
-        [SerializeField] DepthPrimingMode m_DepthPrimingMode = DepthPrimingMode.Disabled; // Default disabled because there are some outstanding issues with Text Mesh rendering.
-        [SerializeField] CopyDepthMode m_CopyDepthMode = CopyDepthMode.AfterTransparents;
-        [SerializeField] DepthFormat m_DepthAttachmentFormat = DepthFormat.Default;
-        [SerializeField] DepthFormat m_DepthTextureFormat = DepthFormat.Default;
+
+        [SerializeField]
+        int m_AssetVersion = 0;
+
+        [SerializeField]
+        LayerMask m_PrepassLayerMask = -1;
+
+        [SerializeField]
+        LayerMask m_OpaqueLayerMask = -1;
+
+        [SerializeField]
+        LayerMask m_TransparentLayerMask = -1;
+
+        [SerializeField]
+        StencilStateData m_DefaultStencilState = new StencilStateData() { passOperation = StencilOp.Replace }; // This default state is compatible with deferred renderer.
+
+        [SerializeField]
+        bool m_ShadowTransparentReceive = true;
+
+        [SerializeField]
+        RenderingMode m_RenderingMode = RenderingMode.Forward;
+
+        [SerializeField]
+        DepthPrimingMode m_DepthPrimingMode = DepthPrimingMode.Disabled; // Default disabled because there are some outstanding issues with Text Mesh rendering.
+
+        [SerializeField]
+        CopyDepthMode m_CopyDepthMode = CopyDepthMode.AfterTransparents;
+
+        [SerializeField]
+        DepthFormat m_DepthAttachmentFormat = DepthFormat.Default;
+
+        [SerializeField]
+        DepthFormat m_DepthTextureFormat = DepthFormat.Default;
 #if UNITY_EDITOR
         // Do not strip accurateGbufferNormals on Mobile Vulkan as some GPUs do not support R8G8B8A8_SNorm, which then force us to use accurateGbufferNormals
         [ShaderKeywordFilter.ApplyRulesIfNotGraphicsAPI(GraphicsDeviceType.Vulkan)]
@@ -151,8 +190,11 @@ namespace UnityEngine.Rendering.Universal
         [SerializeField]
         bool m_AccurateGbufferNormals = false;
 
-        [SerializeField] IntermediateTextureMode m_IntermediateTextureMode = IntermediateTextureMode.Always;
-        [SerializeField] bool m_TileOnlyMode = false;
+        [SerializeField]
+        IntermediateTextureMode m_IntermediateTextureMode = IntermediateTextureMode.Always;
+
+        [SerializeField]
+        bool m_TileOnlyMode = false;
 
         /// <inheritdoc/>
         protected override ScriptableRenderer Create()
@@ -275,9 +317,17 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                if (m_DepthAttachmentFormat != DepthFormat.Default && !SystemInfo.IsFormatSupported((GraphicsFormat)m_DepthAttachmentFormat, GraphicsFormatUsage.Render))
+                if (
+                    m_DepthAttachmentFormat != DepthFormat.Default
+                    && !SystemInfo.IsFormatSupported(
+                        (GraphicsFormat)m_DepthAttachmentFormat,
+                        GraphicsFormatUsage.Render
+                    )
+                )
                 {
-                    Debug.LogWarning("Selected Depth Attachment Format is not supported on this platform, falling back to Default");
+                    Debug.LogWarning(
+                        "Selected Depth Attachment Format is not supported on this platform, falling back to Default"
+                    );
                     return DepthFormat.Default;
                 }
                 return m_DepthAttachmentFormat;
@@ -285,9 +335,14 @@ namespace UnityEngine.Rendering.Universal
             set
             {
                 SetDirty();
-                if (renderingMode == RenderingMode.Deferred && !GraphicsFormatUtility.IsStencilFormat((GraphicsFormat)value))
+                if (
+                    renderingMode == RenderingMode.Deferred
+                    && !GraphicsFormatUtility.IsStencilFormat((GraphicsFormat)value)
+                )
                 {
-                    Debug.LogWarning("Depth format without stencil is not supported on Deferred renderer, falling back to Default");
+                    Debug.LogWarning(
+                        "Depth format without stencil is not supported on Deferred renderer, falling back to Default"
+                    );
                     m_DepthAttachmentFormat = DepthFormat.Default;
                 }
                 else
@@ -304,9 +359,14 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                if (m_DepthTextureFormat != DepthFormat.Default && !SystemInfo.IsFormatSupported((GraphicsFormat) m_DepthTextureFormat, GraphicsFormatUsage.Render))
+                if (
+                    m_DepthTextureFormat != DepthFormat.Default
+                    && !SystemInfo.IsFormatSupported((GraphicsFormat)m_DepthTextureFormat, GraphicsFormatUsage.Render)
+                )
                 {
-                    Debug.LogWarning($"Selected Depth Texture Format {m_DepthTextureFormat.ToString()} is not supported on this platform, falling back to Default");
+                    Debug.LogWarning(
+                        $"Selected Depth Texture Format {m_DepthTextureFormat.ToString()} is not supported on this platform, falling back to Default"
+                    );
                     return DepthFormat.Default;
                 }
                 return m_DepthTextureFormat;
@@ -367,15 +427,15 @@ namespace UnityEngine.Rendering.Universal
         /// Returns true if the renderer uses a deferred lighting pass and GBuffers.
         /// This is true for the Deferred and Deferred+ rendering paths.
         /// </summary>
-        public bool usesDeferredLighting => m_RenderingMode == RenderingMode.Deferred ||
-                                            m_RenderingMode == RenderingMode.DeferredPlus;
+        public bool usesDeferredLighting =>
+            m_RenderingMode == RenderingMode.Deferred || m_RenderingMode == RenderingMode.DeferredPlus;
 
         /// <summary>
         /// Returns true if the renderer uses a spatially clustered/tiled light list.
         /// This is true for the Forward+ and Deferred+ rendering paths.
         /// </summary>
-        public bool usesClusterLightLoop => m_RenderingMode == RenderingMode.ForwardPlus ||
-                                            m_RenderingMode == RenderingMode.DeferredPlus;
+        public bool usesClusterLightLoop =>
+            m_RenderingMode == RenderingMode.ForwardPlus || m_RenderingMode == RenderingMode.DeferredPlus;
 
         internal override bool stripShadowsOffVariants
         {
@@ -391,6 +451,7 @@ namespace UnityEngine.Rendering.Universal
 
         [NonSerialized]
         bool m_StripShadowsOffVariants = true;
+
         [NonSerialized]
         bool m_StripAdditionalLightOffVariants = true;
 

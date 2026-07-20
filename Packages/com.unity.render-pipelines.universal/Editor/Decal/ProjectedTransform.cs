@@ -28,7 +28,10 @@ namespace UnityEngine.Rendering.Universal
                 }
             }
 
-            public readonly int x, y, z, xy;
+            public readonly int x,
+                y,
+                z,
+                xy;
 
             public int this[int index]
             {
@@ -36,10 +39,14 @@ namespace UnityEngine.Rendering.Universal
                 {
                     switch (index)
                     {
-                        case 0: return x;
-                        case 1: return y;
-                        case 2: return z;
-                        case 3: return xy;
+                        case 0:
+                            return x;
+                        case 1:
+                            return y;
+                        case 2:
+                            return z;
+                        case 3:
+                            return xy;
                     }
                     return -1;
                 }
@@ -47,10 +54,7 @@ namespace UnityEngine.Rendering.Universal
 
             public bool Has(int id)
             {
-                return x == id
-                    || y == id
-                    || z == id
-                    || xy == id;
+                return x == id || y == id || z == id || xy == id;
             }
 
             public PositionHandleIds(int x, int y, int z, int xy)
@@ -79,13 +83,23 @@ namespace UnityEngine.Rendering.Universal
         {
             public static PositionHandleParam defaultHandleXY = new PositionHandleParam(
                 Handle.X | Handle.Y | Handle.XY,
-                Vector3.zero, Vector3.one, Vector3.zero, Vector3.one * .25f,
-                Orientation.Signed, Orientation.Camera);
+                Vector3.zero,
+                Vector3.one,
+                Vector3.zero,
+                Vector3.one * .25f,
+                Orientation.Signed,
+                Orientation.Camera
+            );
 
             public static PositionHandleParam defaultHandleZ = new PositionHandleParam(
                 Handle.Z,
-                Vector3.zero, Vector3.one, Vector3.zero, Vector3.one * .25f,
-                Orientation.Signed, Orientation.Camera);
+                Vector3.zero,
+                Vector3.one,
+                Vector3.zero,
+                Vector3.one * .25f,
+                Orientation.Signed,
+                Orientation.Camera
+            );
 
             [Flags]
             public enum Handle
@@ -95,13 +109,13 @@ namespace UnityEngine.Rendering.Universal
                 Y = 1 << 1,
                 Z = 1 << 2,
                 XY = 1 << 3,
-                All = ~None
+                All = ~None,
             }
 
             public enum Orientation
             {
                 Signed,
-                Camera
+                Camera,
             }
 
             public readonly Vector3 axisOffset;
@@ -129,7 +143,8 @@ namespace UnityEngine.Rendering.Universal
                 Vector3 planeOffset,
                 Vector3 planeSize,
                 Orientation axesOrientation,
-                Orientation planeOrientation)
+                Orientation planeOrientation
+            )
             {
                 this.axisOffset = axisOffset;
                 this.axisSize = axisSize;
@@ -151,12 +166,14 @@ namespace UnityEngine.Rendering.Universal
 
         static Func<bool> s_IsGridSnappingActive;
 
-
         static ProjectedTransform()
         {
             //We need to know if grid snaping is active or not in Editor. Sadly this is internal so we must grab it by reflection.
             Type gridSnappingType = typeof(Handles).Assembly.GetType("UnityEditor.GridSnapping");
-            PropertyInfo activePropertyInfo = gridSnappingType.GetProperty("active", BindingFlags.Public | BindingFlags.Static);
+            PropertyInfo activePropertyInfo = gridSnappingType.GetProperty(
+                "active",
+                BindingFlags.Public | BindingFlags.Static
+            );
             MethodCallExpression activePropertyGetCall = Expression.Call(null, activePropertyInfo.GetGetMethod());
             var activeGetLambda = Expression.Lambda<Func<bool>>(activePropertyGetCall);
             s_IsGridSnappingActive = activeGetLambda.Compile();
@@ -174,7 +191,10 @@ namespace UnityEngine.Rendering.Universal
             var planarSize = Mathf.Max(planeSize[0], planeSize[s_DoPositionHandle_Internal_NextIndex[0]]);
             Vector3 sliderRotatedWorldPos = Quaternion.Inverse(rotation) * position;
             var size1D = HandleUtility.GetHandleSize(sliderRotatedWorldPos);
-            var size2D = HandleUtility.GetHandleSize(sliderRotatedWorldPos - new Vector3(0, 0, zProjectionDistance)) * planarSize * .5f;
+            var size2D =
+                HandleUtility.GetHandleSize(sliderRotatedWorldPos - new Vector3(0, 0, zProjectionDistance))
+                * planarSize
+                * .5f;
             Vector3 depthSlider = sliderRotatedWorldPos;
 
             EditorGUI.BeginChangeCheck();
@@ -203,10 +223,27 @@ namespace UnityEngine.Rendering.Universal
                         faceOpacity = 0.4f;
                     else
                         faceOpacity = 0.1f;
-                    Color faceColor = new Color(Handles.zAxisColor.r, Handles.zAxisColor.g, Handles.zAxisColor.b, Handles.zAxisColor.a * faceOpacity);
+                    Color faceColor = new Color(
+                        Handles.zAxisColor.r,
+                        Handles.zAxisColor.g,
+                        Handles.zAxisColor.b,
+                        Handles.zAxisColor.a * faceOpacity
+                    );
                     Handles.DrawSolidRectangleWithOutline(verts, faceColor, Color.clear);
                     EditorGUI.BeginChangeCheck();
-                    sliderFaceProjected = Handles.Slider2D(id, sliderFaceProjected, Vector3.forward, Vector3.right, Vector3.up, size2D, Handles.RectangleHandleCap, s_IsGridSnappingActive() ? Vector2.zero : new Vector2(EditorSnapSettings.move[0], EditorSnapSettings.move[1]), false);
+                    sliderFaceProjected = Handles.Slider2D(
+                        id,
+                        sliderFaceProjected,
+                        Vector3.forward,
+                        Vector3.right,
+                        Vector3.up,
+                        size2D,
+                        Handles.RectangleHandleCap,
+                        s_IsGridSnappingActive()
+                            ? Vector2.zero
+                            : new Vector2(EditorSnapSettings.move[0], EditorSnapSettings.move[1]),
+                        false
+                    );
                     if (EditorGUI.EndChangeCheck())
                     {
                         sliderRotatedWorldPos.x = sliderFaceProjected.x;

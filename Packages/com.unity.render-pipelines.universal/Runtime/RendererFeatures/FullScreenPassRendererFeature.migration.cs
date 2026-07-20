@@ -32,11 +32,11 @@ namespace UnityEngine.Rendering.Universal
             // on when and if serialization is done skipping any upgrading at runtime to avoid accidentally doing the
             // upgrade on the latest version. Upgrading at runtime does not really have much utility as it would mean
             // that the asset would need to have been produced in an editor which is an earlier build version than the player
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
             if (m_Version == Version.Latest)
                 return;
 
-            if(m_Version == Version.Initial)
+            if (m_Version == Version.Initial)
             {
                 // * Previously the ScriptableRenderPassInput.Color requirement was repurposed to mean "copy the active
                 //   color target" even though it is typically used to request '_CameraOpaqueTexture' and the copy color pass.
@@ -57,7 +57,7 @@ namespace UnityEngine.Rendering.Universal
                 if (this)
                     EditorUtility.SetDirty(this);
             };
-    #endif
+#endif
         }
 
         /// <inheritdoc/>

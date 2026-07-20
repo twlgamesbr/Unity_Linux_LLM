@@ -1,13 +1,15 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 using InternalManager = UnityEditor.Multiplayer.Internal.EditorMultiplayerManager;
 
 namespace Unity.Multiplayer.Editor
 {
     static class MultiplayerRoleField
     {
-        private const string k_AlwaysStrippedWarning = "This component is always stripped because its multiplayer role is not valid.";
-        private const string k_AutomaticSelectedMessage = "This component type is automatically strip for this role.\nSee Project Settings > Multiplayer > Multiplayer Roles.";
+        private const string k_AlwaysStrippedWarning =
+            "This component is always stripped because its multiplayer role is not valid.";
+        private const string k_AutomaticSelectedMessage =
+            "This component type is automatically strip for this role.\nSee Project Settings > Multiplayer > Multiplayer Roles.";
         private const string k_PrefabMessage = "Open the prefab for editing support.";
 
         [InitializeOnLoadMethod]
@@ -55,8 +57,11 @@ namespace Unity.Multiplayer.Editor
 
             var type = objects[0].GetType();
 
-            if ((!type.IsSubclassOf(typeof(Component)) && type != typeof(GameObject))
-                || type.IsSubclassOf(typeof(Transform)) || type == typeof(Transform))
+            if (
+                (!type.IsSubclassOf(typeof(Component)) && type != typeof(GameObject))
+                || type.IsSubclassOf(typeof(Transform))
+                || type == typeof(Transform)
+            )
                 return false;
 
             var role = GetMixedValue(objects, out _);
@@ -112,7 +117,11 @@ namespace Unity.Multiplayer.Editor
             return role;
         }
 
-        private static void DrawLocked(Rect rect, string tooltip, MultiplayerRoleFlags role = MultiplayerRoleFlags.ClientAndServer)
+        private static void DrawLocked(
+            Rect rect,
+            string tooltip,
+            MultiplayerRoleFlags role = MultiplayerRoleFlags.ClientAndServer
+        )
         {
             using var disabledScope = new EditorGUI.DisabledScope(true);
 
@@ -123,17 +132,28 @@ namespace Unity.Multiplayer.Editor
             GUI.Button(rect, content, style);
         }
 
-        private static void Draw(Rect rect, UnityEngine.Object[] objects, MultiplayerRoleFlags role, MultiplayerRoleFlags validRoles = MultiplayerRoleFlags.ClientAndServer)
+        private static void Draw(
+            Rect rect,
+            UnityEngine.Object[] objects,
+            MultiplayerRoleFlags role,
+            MultiplayerRoleFlags validRoles = MultiplayerRoleFlags.ClientAndServer
+        )
         {
             var style = EditorStyles.iconButton;
             var content = EditorGUIUtility.IconContent(GetIconForRoleFlags(role & validRoles));
-            content.tooltip = (role & validRoles) == 0 ? k_AlwaysStrippedWarning : "Select the Multiplayer Role for this object";
+            content.tooltip =
+                (role & validRoles) == 0 ? k_AlwaysStrippedWarning : "Select the Multiplayer Role for this object";
 
             if (GUI.Button(rect, content, style))
                 DrawContextMenu(rect, objects, role, validRoles);
         }
 
-        private static void DrawContextMenu(Rect rect, UnityEngine.Object[] objects, MultiplayerRoleFlags role, MultiplayerRoleFlags validRoles = MultiplayerRoleFlags.ClientAndServer)
+        private static void DrawContextMenu(
+            Rect rect,
+            UnityEngine.Object[] objects,
+            MultiplayerRoleFlags role,
+            MultiplayerRoleFlags validRoles = MultiplayerRoleFlags.ClientAndServer
+        )
         {
             var menu = new GenericMenu();
 
@@ -145,12 +165,16 @@ namespace Unity.Multiplayer.Editor
             }
             else
             {
-                menu.AddItem(new GUIContent("Client"), role.HasFlag(MultiplayerRoleFlags.Client), () =>
-                {
-                    role = ToggleRole(role, MultiplayerRoleFlags.Client);
-                    ApplyRoleToObjects(objects, role);
-                    // DrawContextMenu(rect, objects, role, validRoles);
-                });
+                menu.AddItem(
+                    new GUIContent("Client"),
+                    role.HasFlag(MultiplayerRoleFlags.Client),
+                    () =>
+                    {
+                        role = ToggleRole(role, MultiplayerRoleFlags.Client);
+                        ApplyRoleToObjects(objects, role);
+                        // DrawContextMenu(rect, objects, role, validRoles);
+                    }
+                );
             }
 
             if (!validRoles.HasFlag(MultiplayerRoleFlags.Server))
@@ -159,12 +183,16 @@ namespace Unity.Multiplayer.Editor
             }
             else
             {
-                menu.AddItem(new GUIContent("Server"), role.HasFlag(MultiplayerRoleFlags.Server), () =>
-                {
-                    role = ToggleRole(role, MultiplayerRoleFlags.Server);
-                    ApplyRoleToObjects(objects, role);
-                    // DrawContextMenu(rect, objects, role, validRoles);
-                });
+                menu.AddItem(
+                    new GUIContent("Server"),
+                    role.HasFlag(MultiplayerRoleFlags.Server),
+                    () =>
+                    {
+                        role = ToggleRole(role, MultiplayerRoleFlags.Server);
+                        ApplyRoleToObjects(objects, role);
+                        // DrawContextMenu(rect, objects, role, validRoles);
+                    }
+                );
             }
 
             menu.DropDown(rect);

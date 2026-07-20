@@ -26,7 +26,5 @@ namespace UnityEngine.Rendering
     /// <summary>
     /// Debug UI panel disposable
     /// </summary>
-    public interface IDebugDisplaySettingsPanelDisposable : IDebugDisplaySettingsPanel, IDisposable
-    {
-    }
+    public interface IDebugDisplaySettingsPanelDisposable : IDebugDisplaySettingsPanel, IDisposable { }
 }

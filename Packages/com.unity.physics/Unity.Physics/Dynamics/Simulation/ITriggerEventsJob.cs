@@ -24,9 +24,7 @@ namespace Unity.Physics
     /// <summary>
     /// Interface for jobs that iterate through the list of trigger events produced by the solver.
     /// </summary>
-    public interface ITriggerEventsJob : ITriggerEventsJobBase
-    {
-    }
+    public interface ITriggerEventsJob : ITriggerEventsJobBase { }
 
     /// <summary>   A trigger event job extensions. </summary>
     public static class ITriggerEventJobExtensions
@@ -62,7 +60,12 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleParallel<T>(this T job, int innerLoopBatchCount, SimulationSingleton simulationSingleton, JobHandle inputDeps)
+        public static JobHandle ScheduleParallel<T>(
+            this T job,
+            int innerLoopBatchCount,
+            SimulationSingleton simulationSingleton,
+            JobHandle inputDeps
+        )
             where T : struct, ITriggerEventsJobBase
         {
             // Should work only for UnityPhysics
@@ -71,13 +74,25 @@ namespace Unity.Physics
                 return inputDeps;
             }
 
-            return ScheduleParallelUnityPhysicsTriggerEventsJob(job, innerLoopBatchCount, simulationSingleton.AsSimulation(), inputDeps);
+            return ScheduleParallelUnityPhysicsTriggerEventsJob(
+                job,
+                innerLoopBatchCount,
+                simulationSingleton.AsSimulation(),
+                inputDeps
+            );
         }
 
-        static unsafe JobHandle ScheduleUnityPhysicsTriggerEventsJob<T>(T job, Simulation simulation, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleUnityPhysicsTriggerEventsJob<T>(
+            T job,
+            Simulation simulation,
+            JobHandle inputDeps
+        )
             where T : struct, ITriggerEventsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.Idle);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.Idle
+            );
             if (!simulation.ReadyForEventScheduling)
                 return inputDeps;
 
@@ -85,20 +100,33 @@ namespace Unity.Physics
             {
                 UserJobData = job,
                 EventReader = simulation.TriggerEvents.EventDataStream.AsReader(),
-                IsParallel = false
+                IsParallel = false,
             };
 
             var jobReflectionData = TriggerEventJobProcess<T>.jobReflectionData.Data;
             TriggerEventJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-            var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Single);
+            var parameters = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref data),
+                jobReflectionData,
+                inputDeps,
+                ScheduleMode.Single
+            );
             return JobsUtility.Schedule(ref parameters);
         }
 
-        static unsafe JobHandle ScheduleParallelUnityPhysicsTriggerEventsJob<T>(T job, int innerLoopBatchCount, Simulation simulation, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleParallelUnityPhysicsTriggerEventsJob<T>(
+            T job,
+            int innerLoopBatchCount,
+            Simulation simulation,
+            JobHandle inputDeps
+        )
             where T : struct, ITriggerEventsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.Idle);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.Idle
+            );
             if (!simulation.ReadyForEventScheduling)
                 return inputDeps;
 
@@ -107,34 +135,54 @@ namespace Unity.Physics
             {
                 UserJobData = job,
                 EventReader = eventDataStream.AsReader(),
-                IsParallel = true
+                IsParallel = true,
             };
 
             var jobReflectionData = TriggerEventJobProcess<T>.jobReflectionData.Data;
             TriggerEventJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-            var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Parallel);
+            var parameters = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref data),
+                jobReflectionData,
+                inputDeps,
+                ScheduleMode.Parallel
+            );
             var forEachCountPtr = NativeStreamUnsafeUtility.GetUnsafeForEachCountPtr(ref eventDataStream);
             var listDataPtr = (byte*)forEachCountPtr - sizeof(void*);
-            return JobsUtility.ScheduleParallelForDeferArraySize(ref parameters, innerLoopBatchCount, listDataPtr, null);
+            return JobsUtility.ScheduleParallelForDeferArraySize(
+                ref parameters,
+                innerLoopBatchCount,
+                listDataPtr,
+                null
+            );
         }
 
-        internal struct TriggerEventJobData<T> where T : struct
+        internal struct TriggerEventJobData<T>
+            where T : struct
         {
             public T UserJobData;
-            [NativeDisableContainerSafetyRestriction] public NativeStream.Reader EventReader;
+
+            [NativeDisableContainerSafetyRestriction]
+            public NativeStream.Reader EventReader;
             public bool IsParallel;
         }
 
-        internal struct TriggerEventJobProcess<T> where T : struct, ITriggerEventsJobBase
+        internal struct TriggerEventJobProcess<T>
+            where T : struct, ITriggerEventsJobBase
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<TriggerEventJobProcess<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                TriggerEventJobProcess<T>
+            >();
 
             [Preserve]
             public static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(TriggerEventJobData<T>), typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(TriggerEventJobData<T>),
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
             [System.Diagnostics.Conditional("ENABLE_UNITY_COLLECTIONS_CHECK")]
@@ -144,11 +192,21 @@ namespace Unity.Physics
                     throw new InvalidOperationException("Reflection data was not set up by an Initialize() call");
             }
 
-            public delegate void ExecuteJobFunction(ref TriggerEventJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref TriggerEventJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
-            public unsafe static void Execute(ref TriggerEventJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static unsafe void Execute(
+                ref TriggerEventJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
@@ -157,17 +215,31 @@ namespace Unity.Physics
 
                     if (jobData.IsParallel)
                     {
-                        if (!JobsUtility.GetWorkStealingRange(ref ranges, jobIndex, out forEachIndexBegin,
-                                out forEachIndexEnd))
+                        if (
+                            !JobsUtility.GetWorkStealingRange(
+                                ref ranges,
+                                jobIndex,
+                                out forEachIndexBegin,
+                                out forEachIndexEnd
+                            )
+                        )
                             break;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData),
-                            forEachIndexBegin, forEachIndexEnd - forEachIndexBegin);
+                        JobsUtility.PatchBufferMinMaxRanges(
+                            bufferRangePatchData,
+                            UnsafeUtility.AddressOf(ref jobData),
+                            forEachIndexBegin,
+                            forEachIndexEnd - forEachIndexBegin
+                        );
 #endif
                     }
 
-                    var eventEnumerator = new TriggerEvents.Enumerator(jobData.EventReader, forEachIndexBegin, forEachIndexEnd);
+                    var eventEnumerator = new TriggerEvents.Enumerator(
+                        jobData.EventReader,
+                        forEachIndexBegin,
+                        forEachIndexEnd
+                    );
 
                     while (eventEnumerator.MoveNext())
                     {

@@ -7,8 +7,12 @@ namespace Unity.Entities
     /// </summary>
     /// <remarks>Do not store outside of stack</remarks>
     /// <typeparam name="T">Type of enabled component</typeparam>
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) }, RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS")]
-    public readonly struct EnabledRefRO<T> : IQueryTypeParameter where T : unmanaged, IEnableableComponent
+    [GenerateTestsForBurstCompatibility(
+        GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) },
+        RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS"
+    )]
+    public readonly struct EnabledRefRO<T> : IQueryTypeParameter
+        where T : unmanaged, IEnableableComponent
     {
         readonly SafeBitRef m_Ptr;
 

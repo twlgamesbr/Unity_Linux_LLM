@@ -54,6 +54,7 @@ namespace Unity.PlatformToolkit.Editor
             }
 
             private readonly IPlatformToolkitSupportDeclaration m_SupportDeclaration;
+
             /// <summary>
             /// The unique identifier for this Platform Toolkit implementation.
             /// This key is used when setting configurations.
@@ -75,8 +76,11 @@ namespace Unity.PlatformToolkit.Editor
         /// <returns>A read-only list of <see cref="PlatformToolkitImplementationInfo"/> for all available implementations.</returns>
         public static IReadOnlyList<PlatformToolkitImplementationInfo> GetAvailableImplementations()
         {
-            List<PlatformToolkitImplementationInfo> availableConfigurations = new List<PlatformToolkitImplementationInfo>();
-            foreach (IPlatformToolkitSupportDeclaration supportDeclaration in SupportDeclarationManager.SupportDeclarations)
+            List<PlatformToolkitImplementationInfo> availableConfigurations =
+                new List<PlatformToolkitImplementationInfo>();
+            foreach (
+                IPlatformToolkitSupportDeclaration supportDeclaration in SupportDeclarationManager.SupportDeclarations
+            )
             {
                 availableConfigurations.Add(new PlatformToolkitImplementationInfo(supportDeclaration));
             }
@@ -99,7 +103,9 @@ namespace Unity.PlatformToolkit.Editor
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                Debug.LogError($"[PlatformToolkitEditor] Invalid declaration key provided for BuildTarget '{buildTarget}'. Key cannot be null or empty.");
+                Debug.LogError(
+                    $"[PlatformToolkitEditor] Invalid declaration key provided for BuildTarget '{buildTarget}'. Key cannot be null or empty."
+                );
                 return false;
             }
 
@@ -111,20 +117,33 @@ namespace Unity.PlatformToolkit.Editor
 
             if (!supportDeclaration.SupportedPlatforms.Contains(buildTarget))
             {
-                Debug.LogWarning($"[PlatformToolkitEditor] The Platform Toolkit implementation '{supportDeclaration.DisplayName}' (key: '{key}') does not support BuildTarget '{buildTarget}'. Configuration not set.");
+                Debug.LogWarning(
+                    $"[PlatformToolkitEditor] The Platform Toolkit implementation '{supportDeclaration.DisplayName}' (key: '{key}') does not support BuildTarget '{buildTarget}'. Configuration not set."
+                );
                 return false;
             }
 
-            if (PlatformToolkitSettings.instance.SupportDeclarationTargetsManager.GetTargetedPlatforms(key).Contains(buildTarget))
+            if (
+                PlatformToolkitSettings
+                    .instance.SupportDeclarationTargetsManager.GetTargetedPlatforms(key)
+                    .Contains(buildTarget)
+            )
             {
-                Debug.Log($"[PlatformToolkitEditor] The requested Platform Toolkit implementation '{supportDeclaration.DisplayName}' (key: '{key}') is already configured for BuildTarget '{buildTarget}'.");
+                Debug.Log(
+                    $"[PlatformToolkitEditor] The requested Platform Toolkit implementation '{supportDeclaration.DisplayName}' (key: '{key}') is already configured for BuildTarget '{buildTarget}'."
+                );
                 return true;
             }
 
-            bool success = PlatformToolkitSettings.instance.SupportDeclarationTargetsManager.TryAddBuildTarget(key, buildTarget);
+            bool success = PlatformToolkitSettings.instance.SupportDeclarationTargetsManager.TryAddBuildTarget(
+                key,
+                buildTarget
+            );
             if (!success)
             {
-                Debug.LogWarning($"[PlatformToolkitEditor] Failed to set configuration for BuildTarget '{buildTarget}' to '{key}'.");
+                Debug.LogWarning(
+                    $"[PlatformToolkitEditor] Failed to set configuration for BuildTarget '{buildTarget}' to '{key}'."
+                );
             }
             return success;
         }
@@ -138,7 +157,12 @@ namespace Unity.PlatformToolkit.Editor
         /// <returns>True if an implementations info was found for the specified build target; otherwise, false.</returns>
         public static bool TryGetImplementationInfo(BuildTarget buildTarget, out PlatformToolkitImplementationInfo info)
         {
-            if (PlatformToolkitSettings.instance.SupportDeclarationTargetsManager.TryGetDeclarationForBuildTarget(buildTarget, out var declarationKey))
+            if (
+                PlatformToolkitSettings.instance.SupportDeclarationTargetsManager.TryGetDeclarationForBuildTarget(
+                    buildTarget,
+                    out var declarationKey
+                )
+            )
             {
                 foreach (var declaration in SupportDeclarationManager.SupportDeclarations)
                 {
@@ -149,11 +173,15 @@ namespace Unity.PlatformToolkit.Editor
                     }
                 }
 
-                Debug.LogWarning($"[PlatformToolkitEditor] Failed to retrieve implementation info for BuildTarget '{buildTarget}', unable to find a matching key for '{declarationKey}'.");
+                Debug.LogWarning(
+                    $"[PlatformToolkitEditor] Failed to retrieve implementation info for BuildTarget '{buildTarget}', unable to find a matching key for '{declarationKey}'."
+                );
             }
             else
             {
-                Debug.LogWarning($"[PlatformToolkitEditor] No Platform Toolkit implementation info found for BuildTarget '{buildTarget}'.");
+                Debug.LogWarning(
+                    $"[PlatformToolkitEditor] No Platform Toolkit implementation info found for BuildTarget '{buildTarget}'."
+                );
             }
 
             info = null;

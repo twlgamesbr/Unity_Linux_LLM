@@ -2,7 +2,6 @@ using JetBrains.Annotations;
 using Unity.Mathematics;
 using Unity.Properties;
 using UnityEngine;
-
 using UnityEngine.UIElements;
 
 namespace Unity.Entities.Editor.Inspectors
@@ -12,8 +11,8 @@ namespace Unity.Entities.Editor.Inspectors
     {
         static Float2Inspector()
         {
-            TypeConversion.Register((ref float2 v) => (Vector2) v);
-            TypeConversion.Register((ref Vector2 v) => (float2) v);
+            TypeConversion.Register((ref float2 v) => (Vector2)v);
+            TypeConversion.Register((ref Vector2 v) => (float2)v);
         }
     }
 
@@ -22,8 +21,8 @@ namespace Unity.Entities.Editor.Inspectors
     {
         static Float3Inspector()
         {
-            TypeConversion.Register((ref float3 v) => (Vector3) v);
-            TypeConversion.Register((ref Vector3 v) => (float3) v);
+            TypeConversion.Register((ref float3 v) => (Vector3)v);
+            TypeConversion.Register((ref Vector3 v) => (float3)v);
         }
     }
 
@@ -32,8 +31,8 @@ namespace Unity.Entities.Editor.Inspectors
     {
         static Float4Inspector()
         {
-            TypeConversion.Register((ref float4 v) => (Vector4) v);
-            TypeConversion.Register((ref Vector4 v) => (float4) v);
+            TypeConversion.Register((ref float4 v) => (Vector4)v);
+            TypeConversion.Register((ref Vector4 v) => (float4)v);
         }
     }
 
@@ -42,7 +41,7 @@ namespace Unity.Entities.Editor.Inspectors
     {
         static QuaternionInspector()
         {
-            TypeConversion.Register((ref quaternion v) => (Vector4) v.value);
+            TypeConversion.Register((ref quaternion v) => (Vector4)v.value);
             TypeConversion.Register((ref Vector4 v) => new quaternion { value = v });
         }
     }

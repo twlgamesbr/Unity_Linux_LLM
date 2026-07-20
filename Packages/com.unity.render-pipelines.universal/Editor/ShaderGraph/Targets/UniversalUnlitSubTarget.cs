@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Legacy;
+using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
-using static UnityEditor.Rendering.Universal.ShaderGraph.SubShaderUtils;
 using static Unity.Rendering.Universal.ShaderUtils;
+using static UnityEditor.Rendering.Universal.ShaderGraph.SubShaderUtils;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
@@ -68,7 +68,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 context.AddCustomEditorForRenderPipeline(gui.FullName, universalRPType);
             }
             // Process SubShaders
-            context.AddSubShader(PostProcessSubShader(SubShaders.Unlit(target, target.renderType, target.renderQueue, target.disableBatching)));
+            context.AddSubShader(
+                PostProcessSubShader(
+                    SubShaders.Unlit(target, target.renderType, target.renderQueue, target.disableBatching)
+                )
+            );
         }
 
         public override void ProcessPreviewMaterial(Material material)
@@ -110,10 +114,19 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
         public override void GetActiveBlocks(ref TargetActiveBlockContext context)
         {
-            context.AddBlock(UniversalBlockFields.VertexDescription.MotionVector, target.additionalMotionVectorMode == AdditionalMotionVectorMode.Custom);
+            context.AddBlock(
+                UniversalBlockFields.VertexDescription.MotionVector,
+                target.additionalMotionVectorMode == AdditionalMotionVectorMode.Custom
+            );
 
-            context.AddBlock(BlockFields.SurfaceDescription.Alpha, (target.surfaceType == SurfaceType.Transparent || target.alphaClip) || target.allowMaterialOverride);
-            context.AddBlock(BlockFields.SurfaceDescription.AlphaClipThreshold, target.alphaClip || target.allowMaterialOverride);
+            context.AddBlock(
+                BlockFields.SurfaceDescription.Alpha,
+                (target.surfaceType == SurfaceType.Transparent || target.alphaClip) || target.allowMaterialOverride
+            );
+            context.AddBlock(
+                BlockFields.SurfaceDescription.AlphaClipThreshold,
+                target.alphaClip || target.allowMaterialOverride
+            );
         }
 
         public override void CollectShaderProperties(PropertyCollector collector, GenerationMode generationMode)
@@ -124,14 +137,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 collector.AddFloatProperty(Property.SurfaceType, (float)target.surfaceType);
                 collector.AddFloatProperty(Property.BlendMode, (float)target.alphaMode);
                 collector.AddFloatProperty(Property.AlphaClip, target.alphaClip ? 1.0f : 0.0f);
-                collector.AddFloatProperty(Property.SrcBlend, 1.0f);    // always set by material inspector
-                collector.AddFloatProperty(Property.DstBlend, 0.0f);    // always set by material inspector
-                collector.AddFloatProperty(Property.SrcBlendAlpha, 1.0f);    // always set by material inspector, ok to have incorrect values here
-                collector.AddFloatProperty(Property.DstBlendAlpha, 0.0f);    // always set by material inspector, ok to have incorrect values here
+                collector.AddFloatProperty(Property.SrcBlend, 1.0f); // always set by material inspector
+                collector.AddFloatProperty(Property.DstBlend, 0.0f); // always set by material inspector
+                collector.AddFloatProperty(Property.SrcBlendAlpha, 1.0f); // always set by material inspector, ok to have incorrect values here
+                collector.AddFloatProperty(Property.DstBlendAlpha, 0.0f); // always set by material inspector, ok to have incorrect values here
                 collector.AddToggleProperty(Property.ZWrite, (target.surfaceType == SurfaceType.Opaque));
                 collector.AddFloatProperty(Property.ZWriteControl, (float)target.zWriteControl);
-                collector.AddFloatProperty(Property.ZTest, (float)target.zTestMode);    // ztest mode is designed to directly pass as ztest
-                collector.AddFloatProperty(Property.CullMode, (float)target.renderFace);    // render face enum is designed to directly pass as a cull mode
+                collector.AddFloatProperty(Property.ZTest, (float)target.zTestMode); // ztest mode is designed to directly pass as ztest
+                collector.AddFloatProperty(Property.CullMode, (float)target.renderFace); // render face enum is designed to directly pass as a cull mode
 
                 bool enableAlphaToMask = (target.alphaClip && (target.surfaceType == SurfaceType.Opaque));
                 collector.AddFloatProperty(Property.AlphaToMask, enableAlphaToMask ? 1.0f : 0.0f);
@@ -149,47 +162,71 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             }
         }
 
-        public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public override void GetPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
             var universalTarget = (target as UniversalTarget);
             universalTarget.AddDefaultMaterialOverrideGUI(ref context, onChange, registerUndo);
-            universalTarget.AddDefaultSurfacePropertiesGUI(ref context, onChange, registerUndo, showReceiveShadows: false);
+            universalTarget.AddDefaultSurfacePropertiesGUI(
+                ref context,
+                onChange,
+                registerUndo,
+                showReceiveShadows: false
+            );
 
             // Unlit option to add additional realtime lighting variants. Useful for custom lighting.
-            context.AddProperty("Keep Lighting Variants", new Toggle() { value = keepLightingVariants }, (evt) =>
-            {
-                if (Equals(keepLightingVariants, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Keep Lighting Variants",
+                new Toggle() { value = keepLightingVariants },
+                (evt) =>
+                {
+                    if (Equals(keepLightingVariants, evt.newValue))
+                        return;
 
-                registerUndo("Change Keep Lighting Variants");
-                keepLightingVariants = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Keep Lighting Variants");
+                    keepLightingVariants = evt.newValue;
+                    onChange();
+                }
+            );
 
             // Unlit option to disable default decal blending behaviour.
-            context.AddProperty("Default Decal Blending", new Toggle() { value = defaultDecalBlending }, (evt) =>
-            {
-                if (Equals(defaultDecalBlending, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Default Decal Blending",
+                new Toggle() { value = defaultDecalBlending },
+                (evt) =>
+                {
+                    if (Equals(defaultDecalBlending, evt.newValue))
+                        return;
 
-                registerUndo("Change Default Decal Blending");
-                defaultDecalBlending = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Default Decal Blending");
+                    defaultDecalBlending = evt.newValue;
+                    onChange();
+                }
+            );
 
             // Unlit option to disable default SSAO behaviour.
-            context.AddProperty("Default SSAO", new Toggle() { value = defaultSSAO }, (evt) =>
-            {
-                if (Equals(defaultSSAO, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Default SSAO",
+                new Toggle() { value = defaultSSAO },
+                (evt) =>
+                {
+                    if (Equals(defaultSSAO, evt.newValue))
+                        return;
 
-                registerUndo("Change Default SSAO");
-                defaultSSAO = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Default SSAO");
+                    defaultSSAO = evt.newValue;
+                    onChange();
+                }
+            );
         }
 
-        public bool TryUpgradeFromMasterNode(IMasterNode1 masterNode, out Dictionary<BlockFieldDescriptor, int> blockMap)
+        public bool TryUpgradeFromMasterNode(
+            IMasterNode1 masterNode,
+            out Dictionary<BlockFieldDescriptor, int> blockMap
+        )
         {
             blockMap = null;
             if (!(masterNode is UnlitMasterNode1 unlitMasterNode))
@@ -231,7 +268,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region SubShader
         static class SubShaders
         {
-            public static SubShaderDescriptor Unlit(UniversalTarget target, string renderType, string renderQueue, string disableBatchingTag)
+            public static SubShaderDescriptor Unlit(
+                UniversalTarget target,
+                string renderType,
+                string renderQueue,
+                string disableBatchingTag
+            )
             {
                 var result = new SubShaderDescriptor()
                 {
@@ -241,7 +283,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     renderQueue = renderQueue,
                     disableBatchingTag = disableBatchingTag,
                     generatesPreview = true,
-                    passes = new PassCollection()
+                    passes = new PassCollection(),
                 };
 
                 result.passes.Add(UnlitPasses.Forward(target, UnlitKeywords.Forward));
@@ -250,7 +292,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     result.passes.Add(PassVariant(CorePasses.DepthOnly(target), CorePragmas.Instanced));
 
                 if (target.alwaysRenderMotionVectors)
-                    result.customTags = string.Concat(result.customTags, " ", UniversalTarget.kAlwaysRenderMotionVectorsTag);
+                    result.customTags = string.Concat(
+                        result.customTags,
+                        " ",
+                        UniversalTarget.kAlwaysRenderMotionVectorsTag
+                    );
                 result.passes.Add(PassVariant(CorePasses.MotionVectors(target), CorePragmas.MotionVectors));
 
                 if (IsSpacewarpSupported())
@@ -277,7 +323,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Passes
         static class UnlitPasses
         {
-            internal static void AddLightingVariantsControlToPass(ref PassDescriptor pass, UniversalUnlitSubTarget unlitSubTarget)
+            internal static void AddLightingVariantsControlToPass(
+                ref PassDescriptor pass,
+                UniversalUnlitSubTarget unlitSubTarget
+            )
             {
                 if (unlitSubTarget.keepLightingVariants)
                 {
@@ -288,7 +337,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 }
             }
 
-            internal static void AddDefaultDecalBlendingControlToPass(ref PassDescriptor pass, UniversalUnlitSubTarget unlitSubTarget)
+            internal static void AddDefaultDecalBlendingControlToPass(
+                ref PassDescriptor pass,
+                UniversalUnlitSubTarget unlitSubTarget
+            )
             {
                 if (unlitSubTarget.defaultDecalBlending)
                 {
@@ -296,7 +348,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 }
             }
 
-            internal static void AddDefaultSSAOControlToPass(ref PassDescriptor pass, UniversalUnlitSubTarget unlitSubTarget)
+            internal static void AddDefaultSSAOControlToPass(
+                ref PassDescriptor pass,
+                UniversalUnlitSubTarget unlitSubTarget
+            )
             {
                 if (unlitSubTarget.defaultSSAO)
                 {
@@ -334,7 +389,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = new IncludeCollection { UnlitIncludes.Forward },
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 CorePasses.AddTargetSurfaceControlsToPass(ref result, target);
@@ -382,7 +437,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = new IncludeCollection { CoreIncludes.DepthNormalsOnly },
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 CorePasses.AddTargetSurfaceControlsToPass(ref result, target);
@@ -424,7 +479,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = new IncludeCollection { UnlitIncludes.GBuffer },
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 CorePasses.AddTargetSurfaceControlsToPass(ref result, target);
@@ -451,7 +506,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 public static readonly FieldCollection Unlit = new FieldCollection()
                 {
                     StructFields.Varyings.positionWS,
-                    StructFields.Varyings.normalWS
+                    StructFields.Varyings.normalWS,
                 };
 
                 public static readonly FieldCollection DepthNormalsOnly = new FieldCollection()
@@ -463,7 +518,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 {
                     StructFields.Varyings.positionWS,
                     StructFields.Varyings.normalWS,
-                    UniversalStructFields.Varyings.sh,   // Satisfy !LIGHTMAP_ON requirements.
+                    UniversalStructFields.Varyings.sh, // Satisfy !LIGHTMAP_ON requirements.
                     UniversalStructFields.Varyings.probeOcclusion,
                 };
             }
@@ -481,7 +536,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 type = KeywordType.Boolean,
                 definition = KeywordDefinition.Predefined,
                 scope = KeywordScope.Local,
-                stages = KeywordShaderStage.Vertex | KeywordShaderStage.Fragment
+                stages = KeywordShaderStage.Vertex | KeywordShaderStage.Fragment,
             };
 
             public static readonly KeywordDescriptor DefaultDecalBlendingDefine = new KeywordDescriptor()
@@ -491,7 +546,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 type = KeywordType.Boolean,
                 definition = KeywordDefinition.Predefined,
                 scope = KeywordScope.Local,
-                stages = KeywordShaderStage.Fragment
+                stages = KeywordShaderStage.Fragment,
             };
 
             public static readonly KeywordDescriptor DefaultSSAODefine = new KeywordDescriptor()
@@ -501,7 +556,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 type = KeywordType.Boolean,
                 definition = KeywordDefinition.Predefined,
                 scope = KeywordScope.Local,
-                stages = KeywordShaderStage.Fragment
+                stages = KeywordShaderStage.Fragment,
             };
         }
         #endregion
@@ -529,7 +584,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 CoreKeywordDescriptors.ScreenSpaceAmbientOcclusion,
                 CoreKeywordDescriptors.RenderPassEnabled,
                 CoreKeywordDescriptors.GBufferNormalsOct,
-                CoreKeywordDescriptors.ShadowsShadowmask
+                CoreKeywordDescriptors.ShadowsShadowmask,
             };
 
             public static readonly KeywordCollection LightingVariants = new KeywordCollection()
@@ -554,8 +609,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Includes
         static class UnlitIncludes
         {
-            const string kUnlitPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/UnlitPass.hlsl";
-            const string kUnlitGBufferPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/UnlitGBufferPass.hlsl";
+            const string kUnlitPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/UnlitPass.hlsl";
+            const string kUnlitGBufferPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/UnlitGBufferPass.hlsl";
             const string kLighting = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl";
 
             public static IncludeCollection Forward = new IncludeCollection
@@ -568,7 +625,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { CoreIncludes.DBufferPregraph },
                 { CoreIncludes.WriteRenderLayersPregraph },
-
                 // Post-graph
                 { CoreIncludes.CorePostgraph },
                 { kUnlitPass, IncludeLocation.Postgraph },
@@ -582,7 +638,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { CoreIncludes.DBufferPregraph },
                 { CoreIncludes.WriteRenderLayersPregraph },
-
                 // Post-graph
                 { CoreIncludes.CorePostgraph },
                 { kUnlitGBufferPass, IncludeLocation.Postgraph },

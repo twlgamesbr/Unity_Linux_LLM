@@ -16,9 +16,7 @@ namespace UnityEditor.UI
             get
             {
                 if (s_ContrastTex == null)
-                    s_ContrastTex = CreateCheckerTex(
-                        new Color(0f, 0.0f, 0f, 0.5f),
-                        new Color(1f, 1f, 1f, 0.5f));
+                    s_ContrastTex = CreateCheckerTex(new Color(0f, 0.0f, 0f, 0.5f), new Color(1f, 1f, 1f, 0.5f));
                 return s_ContrastTex;
             }
         }
@@ -31,17 +29,17 @@ namespace UnityEditor.UI
             tex.hideFlags = HideFlags.DontSave;
 
             for (int y = 0; y < 8; ++y)
-                for (int x = 0; x < 8; ++x)
-                    tex.SetPixel(x, y, c1);
+            for (int x = 0; x < 8; ++x)
+                tex.SetPixel(x, y, c1);
             for (int y = 8; y < 16; ++y)
-                for (int x = 0; x < 8; ++x)
-                    tex.SetPixel(x, y, c0);
+            for (int x = 0; x < 8; ++x)
+                tex.SetPixel(x, y, c0);
             for (int y = 0; y < 8; ++y)
-                for (int x = 8; x < 16; ++x)
-                    tex.SetPixel(x, y, c0);
+            for (int x = 8; x < 16; ++x)
+                tex.SetPixel(x, y, c0);
             for (int y = 8; y < 16; ++y)
-                for (int x = 8; x < 16; ++x)
-                    tex.SetPixel(x, y, c1);
+            for (int x = 8; x < 16; ++x)
+                tex.SetPixel(x, y, c1);
 
             tex.Apply();
             tex.filterMode = FilterMode.Point;
@@ -118,7 +116,16 @@ namespace UnityEditor.UI
         }
 
         // Draw the specified Image.
-        private static void DrawSprite(Texture tex, Rect drawArea, Vector4 padding, Rect outer, Rect inner, Rect uv, Color color, Material mat)
+        private static void DrawSprite(
+            Texture tex,
+            Rect drawArea,
+            Vector4 padding,
+            Rect outer,
+            Rect inner,
+            Rect uv,
+            Color color,
+            Material mat
+        )
         {
             // Create the texture rectangle that is centered inside rect.
             Rect outerRect = drawArea;

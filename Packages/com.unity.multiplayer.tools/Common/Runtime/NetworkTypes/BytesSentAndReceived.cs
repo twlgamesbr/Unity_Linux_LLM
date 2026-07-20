@@ -29,19 +29,18 @@ namespace Unity.Multiplayer.Tools.Common
         /// 4. Returns 0 if the direction is None.
         /// </summary>
         public long this[NetworkDirection direction] =>
-            ((direction & NetworkDirection.Sent) != NetworkDirection.None ? Sent : 0) +
-            ((direction & NetworkDirection.Received) != NetworkDirection.None ? Received : 0);
+            ((direction & NetworkDirection.Sent) != NetworkDirection.None ? Sent : 0)
+            + ((direction & NetworkDirection.Received) != NetworkDirection.None ? Received : 0);
 
         public NetworkDirection Direction =>
-            (Sent > 0f ? NetworkDirection.Sent : NetworkDirection.None) |
-            (Received > 0f ? NetworkDirection.Received : NetworkDirection.None);
+            (Sent > 0f ? NetworkDirection.Sent : NetworkDirection.None)
+            | (Received > 0f ? NetworkDirection.Received : NetworkDirection.None);
 
         public long Total => Sent + Received;
 
         public bool Equals(BytesSentAndReceived other)
         {
-            return Sent == other.Sent &&
-                   Received == other.Received;
+            return Sent == other.Sent && Received == other.Received;
         }
 
         public override bool Equals(object obj)
@@ -49,11 +48,8 @@ namespace Unity.Multiplayer.Tools.Common
             return obj is BytesSentAndReceived other && Equals(other);
         }
 
-        public static BytesSentAndReceived operator +(
-            BytesSentAndReceived a,
-            BytesSentAndReceived b) => new BytesSentAndReceived(
-                a.Sent + b.Sent,
-                a.Received + b.Received);
+        public static BytesSentAndReceived operator +(BytesSentAndReceived a, BytesSentAndReceived b) =>
+            new BytesSentAndReceived(a.Sent + b.Sent, a.Received + b.Received);
 
         public override int GetHashCode() => HashCode.Combine(Sent, Received);
 

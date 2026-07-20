@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEditor;
 
-
 namespace TMPro.EditorUtilities
 {
     /// <summary>
@@ -21,7 +20,6 @@ namespace TMPro.EditorUtilities
         {
             this.coroutine = routine;
         }
-
 
         /// <summary>
         /// Starts a new EditorCoroutine.
@@ -43,15 +41,13 @@ namespace TMPro.EditorUtilities
             return coroutine;
         }
 
-
         /// <summary>
-        /// Clear delegate list 
+        /// Clear delegate list
         /// </summary>
         //public static void StopAllEditorCoroutines()
         //{
         //    EditorApplication.update = null;
         //}
-
 
         /// <summary>
         /// Register callback for editor updates
@@ -60,7 +56,6 @@ namespace TMPro.EditorUtilities
         {
             EditorApplication.update += EditorUpdate;
         }
-
 
         /// <summary>
         /// Unregister callback for editor updates.
@@ -72,7 +67,6 @@ namespace TMPro.EditorUtilities
 
             //s_ActiveCoroutines.Remove(this.GetHashCode());
         }
- 
 
         /// <summary>
         /// Delegate function called on editor updates.
@@ -84,10 +78,7 @@ namespace TMPro.EditorUtilities
                 Stop();
 
             // Process the different types of EditorCoroutines.
-            if (coroutine.Current != null)
-            {
-
-            }
+            if (coroutine.Current != null) { }
         }
     }
 }

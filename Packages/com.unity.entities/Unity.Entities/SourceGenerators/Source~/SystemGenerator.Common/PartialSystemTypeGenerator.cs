@@ -11,23 +11,34 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
 {
     public static class PartialSystemTypeGenerator
     {
-        static (int NumClosingBracesRequired, int NumNotClosedIfDirectives)
-            WriteOpeningSyntaxForGeneratedPart_AndReturnClosingSyntax(
-                IndentedTextWriter writer,
-                SyntaxNode originalType, INamedTypeSymbol systemTypeSymbol)
+        static (
+            int NumClosingBracesRequired,
+            int NumNotClosedIfDirectives
+        ) WriteOpeningSyntaxForGeneratedPart_AndReturnClosingSyntax(
+            IndentedTextWriter writer,
+            SyntaxNode originalType,
+            INamedTypeSymbol systemTypeSymbol
+        )
         {
-            static (Stack<(string Value, bool AddIndentAfter)> OpeningSyntaxes, int NumClosingBracesRequired) GetBaseDeclaration(SyntaxNode typeSyntax)
+            static (
+                Stack<(string Value, bool AddIndentAfter)> OpeningSyntaxes,
+                int NumClosingBracesRequired
+            ) GetBaseDeclaration(SyntaxNode typeSyntax)
             {
                 var opening = new Stack<(string Value, bool AddIndentAfter)>();
                 var numBracesToClose = 0;
 
                 var parentSyntax = typeSyntax.Parent as MemberDeclarationSyntax;
 
-                while (parentSyntax != null && (
-                       parentSyntax.IsKind(SyntaxKind.ClassDeclaration) ||
-                       parentSyntax.IsKind(SyntaxKind.StructDeclaration) ||
-                       parentSyntax.IsKind(SyntaxKind.RecordDeclaration) ||
-                       parentSyntax.IsKind(SyntaxKind.NamespaceDeclaration)))
+                while (
+                    parentSyntax != null
+                    && (
+                        parentSyntax.IsKind(SyntaxKind.ClassDeclaration)
+                        || parentSyntax.IsKind(SyntaxKind.StructDeclaration)
+                        || parentSyntax.IsKind(SyntaxKind.RecordDeclaration)
+                        || parentSyntax.IsKind(SyntaxKind.NamespaceDeclaration)
+                    )
+                )
                 {
                     switch (parentSyntax)
                     {
@@ -95,15 +106,22 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             return (baseDeclaration.NumClosingBracesRequired, numNotClosedIfDirectives);
         }
 
-        public static (SyntaxTreeInfo SyntaxTreeInfo, TypeDeclarationSyntax OriginalSystem, string GeneratedSyntaxTreeContainingGeneratedPartialSystem)
-            Generate(SystemDescription[] allDescriptionsForTheSameSystem)
+        public static (
+            SyntaxTreeInfo SyntaxTreeInfo,
+            TypeDeclarationSyntax OriginalSystem,
+            string GeneratedSyntaxTreeContainingGeneratedPartialSystem
+        ) Generate(SystemDescription[] allDescriptionsForTheSameSystem)
         {
             var description = allDescriptionsForTheSameSystem.First();
 
             using var sw = new StringWriter();
             using var indentedTextWriter = new IndentedTextWriter(sw);
 
-            var result = WriteOpeningSyntaxForGeneratedPart_AndReturnClosingSyntax(indentedTextWriter, description.SystemTypeSyntax, description.SystemTypeSymbol);
+            var result = WriteOpeningSyntaxForGeneratedPart_AndReturnClosingSyntax(
+                indentedTextWriter,
+                description.SystemTypeSyntax,
+                description.SystemTypeSymbol
+            );
             AppendBeginSystemType(indentedTextWriter, description.SystemTypeSyntax, description.SystemTypeSymbol);
 
             foreach (var desc in allDescriptionsForTheSameSystem)
@@ -134,7 +152,11 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
 
             AddMiscellaneousMembers(indentedTextWriter, allDescriptionsForTheSameSystem);
             AddEntityCommandBufferSystemFields(indentedTextWriter, allDescriptionsForTheSameSystem);
-            AddOnCreateForCompilerWithFields(indentedTextWriter, allDescriptionsForTheSameSystem, description.SystemType == SystemType.ISystem);
+            AddOnCreateForCompilerWithFields(
+                indentedTextWriter,
+                allDescriptionsForTheSameSystem,
+                description.SystemType == SystemType.ISystem
+            );
 
             for (int i = 0; i < result.NumNotClosedIfDirectives; i++)
                 indentedTextWriter.WriteLine("#endif");
@@ -148,10 +170,18 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
                 indentedTextWriter.WriteLine("}");
             }
 
-            return (description.SyntaxTreeInfo, description.SystemTypeSyntax, indentedTextWriter.InnerWriter.ToString());
+            return (
+                description.SyntaxTreeInfo,
+                description.SystemTypeSyntax,
+                indentedTextWriter.InnerWriter.ToString()
+            );
         }
 
-        static void AppendBeginSystemType(IndentedTextWriter writer, TypeDeclarationSyntax originalSyntax, INamedTypeSymbol systemTypeSymbol)
+        static void AppendBeginSystemType(
+            IndentedTextWriter writer,
+            TypeDeclarationSyntax originalSyntax,
+            INamedTypeSymbol systemTypeSymbol
+        )
         {
             writer.WriteLine("[global::System.Runtime.CompilerServices.CompilerGenerated]");
 
@@ -189,30 +219,39 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
             }
             if (hasPartial)
                 writer.Write(first ? "partial" : " partial");
-            
+
             switch (originalSyntax)
             {
                 case StructDeclarationSyntax _:
-                    writer.WriteLine(" struct {0}{1} : global::Unity.Entities.ISystemCompilerGenerated", originalSyntax.Identifier.ToString(), originalSyntax.TypeParameterList?.ToString());
+                    writer.WriteLine(
+                        " struct {0}{1} : global::Unity.Entities.ISystemCompilerGenerated",
+                        originalSyntax.Identifier.ToString(),
+                        originalSyntax.TypeParameterList?.ToString()
+                    );
                     break;
                 default:
-                    writer.WriteLine(" class {0}{1}", originalSyntax.Identifier.ToString(), originalSyntax.TypeParameterList?.ToString());
+                    writer.WriteLine(
+                        " class {0}{1}",
+                        originalSyntax.Identifier.ToString(),
+                        originalSyntax.TypeParameterList?.ToString()
+                    );
                     break;
             }
             writer.WriteLine("{");
             writer.Indent++;
         }
 
-        private static void AddMiscellaneousMembers(
-            IndentedTextWriter writer,
-            SystemDescription[] descriptions)
+        private static void AddMiscellaneousMembers(IndentedTextWriter writer, SystemDescription[] descriptions)
         {
             foreach (var desc in descriptions)
             foreach (var mem in desc.NewMiscellaneousMembers)
                 mem.WriteTo(writer);
         }
 
-        private static void AddEntityCommandBufferSystemFields(IndentedTextWriter writer, SystemDescription[] descriptions)
+        private static void AddEntityCommandBufferSystemFields(
+            IndentedTextWriter writer,
+            SystemDescription[] descriptions
+        )
         {
             var distinctEcbFields = new Dictionary<string, string>();
             foreach (var desc in descriptions)
@@ -226,20 +265,31 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
                 }
             }
         }
-        private static void AddOnCreateForCompilerWithFields(IndentedTextWriter writer, SystemDescription[] descriptions, bool isISystem)
+
+        private static void AddOnCreateForCompilerWithFields(
+            IndentedTextWriter writer,
+            SystemDescription[] descriptions,
+            bool isISystem
+        )
         {
             // Only needs to create OnCreateForCompiler in SystemBase if members are present
-            if (!descriptions.Any(d =>
-                    d.QueriesAndHandles.TypeHandleStructNestedFields.Count > 0 ||
-                    d.QueriesAndHandles.QueryFieldsToFieldNames.Count > 0 ||
-                    d.AdditionalStatementsInOnCreateForCompilerMethod.Count > 0))
+            if (
+                !descriptions.Any(d =>
+                    d.QueriesAndHandles.TypeHandleStructNestedFields.Count > 0
+                    || d.QueriesAndHandles.QueryFieldsToFieldNames.Count > 0
+                    || d.AdditionalStatementsInOnCreateForCompilerMethod.Count > 0
+                )
+            )
             {
                 if (isISystem)
                     writer.WriteLine("public void OnCreateForCompiler(ref SystemState state){}");
                 return;
             }
 
-            QueriesAndHandles.WriteTypeHandleStructAndAssignQueriesMethod(writer, descriptions.Select(d => d.QueriesAndHandles).ToArray());
+            QueriesAndHandles.WriteTypeHandleStructAndAssignQueriesMethod(
+                writer,
+                descriptions.Select(d => d.QueriesAndHandles).ToArray()
+            );
 
             var additionalStatementsInOnCreate = new HashSet<string>();
             foreach (var description in descriptions)

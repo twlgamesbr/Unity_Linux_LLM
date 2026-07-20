@@ -10,7 +10,10 @@ namespace Unity.Entities.Editor
 {
     internal class WorldProxyUpdater
     {
-        static ProfilerMarker s_UpdateTransientDataFromLocalWorldMarker = new (ProfilerCategory.Internal, "Update World Proxies");
+        static ProfilerMarker s_UpdateTransientDataFromLocalWorldMarker = new(
+            ProfilerCategory.Internal,
+            "Update World Proxies"
+        );
 
         readonly World m_LocalWorld;
         readonly WorldProxy m_WorldProxy;
@@ -83,7 +86,11 @@ namespace Unity.Entities.Editor
             UpdateFrameData();
         }
 
-        static void GatherRootSystemsRecursive(in World world, in PlayerLoopSystem playerLoopSystem, ref List<Type> rootSystemTypes)
+        static void GatherRootSystemsRecursive(
+            in World world,
+            in PlayerLoopSystem playerLoopSystem,
+            ref List<Type> rootSystemTypes
+        )
         {
             if (ScriptBehaviourUpdateOrder.IsDelegateForWorldSystem(world, playerLoopSystem))
             {
@@ -123,7 +130,13 @@ namespace Unity.Entities.Editor
                         // A root system always belong to the current world; that's where we just looked it up.
                         var systemProxy = CreateSystemProxy(m_WorldProxy, m_LocalWorld, true);
                         // Push group onto the queue to recursively process its contents below.
-                        workQueue.Enqueue(new GroupSystemInQueue { group = (ComponentSystemGroup)sysManaged, index = systemProxy.SystemIndex });
+                        workQueue.Enqueue(
+                            new GroupSystemInQueue
+                            {
+                                group = (ComponentSystemGroup)sysManaged,
+                                index = systemProxy.SystemIndex,
+                            }
+                        );
                     }
                 }
                 else
@@ -131,7 +144,10 @@ namespace Unity.Entities.Editor
                     // unmanaged system path
                     m_WorldProxy.m_SystemData.Add(new ScheduledSystemData(sysHandle, m_LocalWorld, -1));
                     // Unmanaged systems can not currently be groups.
-                    UnityEngine.Assertions.Assert.IsFalse(systemTypeIndex.IsGroup, "This code path is not expecting unmanaged system groups");
+                    UnityEngine.Assertions.Assert.IsFalse(
+                        systemTypeIndex.IsGroup,
+                        "This code path is not expecting unmanaged system groups"
+                    );
                 }
             }
 
@@ -177,8 +193,10 @@ namespace Unity.Entities.Editor
                         creationWorld = FindCreationWorld(unmanagedSystem.m_WorldSeqNo);
                         unsafe
                         {
-                            if (creationWorld != m_LocalWorld ||
-                                creationWorld.Unmanaged.ResolveSystemState(unmanagedSystem) == null)
+                            if (
+                                creationWorld != m_LocalWorld
+                                || creationWorld.Unmanaged.ResolveSystemState(unmanagedSystem) == null
+                            )
                             {
                                 removedSystemCount++;
                                 continue;
@@ -188,7 +206,11 @@ namespace Unity.Entities.Editor
                         scheduledSystemData = new ScheduledSystemData(unmanagedSystem, creationWorld, groupIndex);
                     }
 
-                    var systemProxy = CreateSystemProxy(m_WorldProxy, updateIndex.IsManaged? system?.World : m_LocalWorld, !updateIndex.IsManaged || system?.World == m_LocalWorld);
+                    var systemProxy = CreateSystemProxy(
+                        m_WorldProxy,
+                        updateIndex.IsManaged ? system?.World : m_LocalWorld,
+                        !updateIndex.IsManaged || system?.World == m_LocalWorld
+                    );
 
                     if (scheduledSystemData.Recorder != null)
                         scheduledSystemData.Recorder.enabled = true;
@@ -197,7 +219,9 @@ namespace Unity.Entities.Editor
 
                     if (system is ComponentSystemGroup childGroup)
                     {
-                        workQueue.Enqueue(new GroupSystemInQueue { group = childGroup, index = systemProxy.SystemIndex });
+                        workQueue.Enqueue(
+                            new GroupSystemInQueue { group = childGroup, index = systemProxy.SystemIndex }
+                        );
                     }
                 }
 
@@ -212,12 +236,20 @@ namespace Unity.Entities.Editor
             for (var i = 0; i < m_WorldProxy.m_SystemData.Count; i++)
             {
                 var data = m_WorldProxy.m_SystemData[i];
-                data.UpdateBeforeIndices = SystemIndicesForDependenciesFromLocalWorld<UpdateBeforeAttribute>(data, m_WorldProxy);
-                data.UpdateAfterIndices = SystemIndicesForDependenciesFromLocalWorld<UpdateAfterAttribute>(data, m_WorldProxy);
+                data.UpdateBeforeIndices = SystemIndicesForDependenciesFromLocalWorld<UpdateBeforeAttribute>(
+                    data,
+                    m_WorldProxy
+                );
+                data.UpdateAfterIndices = SystemIndicesForDependenciesFromLocalWorld<UpdateAfterAttribute>(
+                    data,
+                    m_WorldProxy
+                );
                 m_WorldProxy.m_SystemData[i] = data;
             }
 
-            m_WorldProxy.m_RootSystems.AddRange(m_WorldProxy.m_AllSystems.Where(s => rootSystemTypes.Any(t => s.TypeName == t.Name)));
+            m_WorldProxy.m_RootSystems.AddRange(
+                m_WorldProxy.m_AllSystems.Where(s => rootSystemTypes.Any(t => s.TypeName == t.Name))
+            );
 
             m_WorldProxy.OnGraphChange();
         }
@@ -290,7 +322,10 @@ namespace Unity.Entities.Editor
             return null;
         }
 
-        int[] SystemIndicesForDependenciesFromLocalWorld<TAttribute>(in ScheduledSystemData systemData, WorldProxy worldProxy)
+        int[] SystemIndicesForDependenciesFromLocalWorld<TAttribute>(
+            in ScheduledSystemData systemData,
+            WorldProxy worldProxy
+        )
             where TAttribute : System.Attribute
         {
             if (systemData.ParentIndex == -1)
@@ -340,7 +375,9 @@ namespace Unity.Entities.Editor
 
             Assert.IsTrue((sd.Category & SystemCategory.Unmanaged) != 0);
             var world = FindCreationWorld(sd.WorldSystemHandle.m_WorldSeqNo);
-            return SystemBaseRegistry.GetStructType(world.Unmanaged.ResolveSystemState(sd.WorldSystemHandle)->UnmanagedMetaIndex);
+            return SystemBaseRegistry.GetStructType(
+                world.Unmanaged.ResolveSystemState(sd.WorldSystemHandle)->UnmanagedMetaIndex
+            );
         }
     }
 }

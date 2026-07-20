@@ -20,7 +20,7 @@ namespace Unity.Rendering
             /// <summary>
             /// The LOD distance scale.
             /// </summary>
-            public float  distanceScale;
+            public float distanceScale;
 
             /// <summary>
             /// The camera position.
@@ -31,31 +31,29 @@ namespace Unity.Rendering
             /// Indicates whether the camera is in orthographic mode.
             /// </summary>
             [MarshalAs(UnmanagedType.U1)]
-            public bool   isOrtho;
+            public bool isOrtho;
 
             /// <summary>
             /// The orthographic size of the camera.
             /// </summary>
-            public float  orthosize;
+            public float orthosize;
 
             /// <inheritdoc/>
             public bool Equals(LODParams x, LODParams y)
             {
-                return
-                    x.distanceScale == y.distanceScale &&
-                    x.cameraPos.Equals(y.cameraPos) &&
-                    x.isOrtho == y.isOrtho &&
-                    x.orthosize == y.orthosize;
+                return x.distanceScale == y.distanceScale
+                    && x.cameraPos.Equals(y.cameraPos)
+                    && x.isOrtho == y.isOrtho
+                    && x.orthosize == y.orthosize;
             }
 
             /// <inheritdoc/>
             public bool Equals(LODParams x)
             {
-                return
-                    x.distanceScale == distanceScale &&
-                    x.cameraPos.Equals(cameraPos) &&
-                    x.isOrtho == isOrtho &&
-                    x.orthosize == orthosize;
+                return x.distanceScale == distanceScale
+                    && x.cameraPos.Equals(cameraPos)
+                    && x.isOrtho == isOrtho
+                    && x.orthosize == orthosize;
             }
 
             /// <inheritdoc/>
@@ -95,7 +93,12 @@ namespace Unity.Rendering
             lodParams.isOrtho = parameters.isOrthographic;
             lodParams.orthosize = parameters.orthoSize;
             if (overrideLODBias == 0.0F)
-                lodParams.distanceScale = CalculateLodDistanceScale(parameters.fieldOfView, QualitySettings.lodBias, lodParams.isOrtho, lodParams.orthosize);
+                lodParams.distanceScale = CalculateLodDistanceScale(
+                    parameters.fieldOfView,
+                    QualitySettings.lodBias,
+                    lodParams.isOrtho,
+                    lodParams.orthosize
+                );
             else
             {
                 // overrideLODBias is not affected by FOV etc
@@ -119,7 +122,12 @@ namespace Unity.Rendering
             lodParams.isOrtho = camera.orthographic;
             lodParams.orthosize = camera.orthographicSize;
             if (overrideLODBias == 0.0F)
-                lodParams.distanceScale = CalculateLodDistanceScale(camera.fieldOfView, QualitySettings.lodBias, lodParams.isOrtho, lodParams.orthosize);
+                lodParams.distanceScale = CalculateLodDistanceScale(
+                    camera.fieldOfView,
+                    QualitySettings.lodBias,
+                    lodParams.isOrtho,
+                    lodParams.orthosize
+                );
             else
             {
                 // overrideLODBias is not affected by FOV etc.
@@ -157,7 +165,12 @@ namespace Unity.Rendering
         /// <param name="worldReferencePoint">A world-space reference point to base the LOD index calculation on.</param>
         /// <param name="lodParams">The LOD parameters to use.</param>
         /// <returns>Returns the calculated LOD index.</returns>
-        public static int CalculateCurrentLODIndex(float4 lodDistances, float scale, float3 worldReferencePoint, ref LODParams lodParams)
+        public static int CalculateCurrentLODIndex(
+            float4 lodDistances,
+            float scale,
+            float3 worldReferencePoint,
+            ref LODParams lodParams
+        )
         {
             var distanceSqr = CalculateDistanceSqr(worldReferencePoint, ref lodParams);
             var lodIndex = CalculateCurrentLODIndex(lodDistances * scale, distanceSqr);
@@ -172,7 +185,12 @@ namespace Unity.Rendering
         /// <param name="worldReferencePoint">A world-space reference point to base the LOD index calculation on.</param>
         /// <param name="lodParams">The LOD parameters to use.</param>
         /// <returns>Returns the calculated LOD mask.</returns>
-        public static int CalculateCurrentLODMask(float4 lodDistances, float scale, float3 worldReferencePoint, ref LODParams lodParams)
+        public static int CalculateCurrentLODMask(
+            float4 lodDistances,
+            float scale,
+            float3 worldReferencePoint,
+            ref LODParams lodParams
+        )
         {
             var distanceSqr = CalculateDistanceSqr(worldReferencePoint, ref lodParams);
             return CalculateCurrentLODMask(lodDistances * scale, distanceSqr);
@@ -218,7 +236,8 @@ namespace Unity.Rendering
             }
             else
             {
-                return math.lengthsq(lodParams.cameraPos - worldReferencePoint) * (lodParams.distanceScale * lodParams.distanceScale);
+                return math.lengthsq(lodParams.cameraPos - worldReferencePoint)
+                    * (lodParams.distanceScale * lodParams.distanceScale);
             }
         }
 
@@ -242,7 +261,8 @@ namespace Unity.Rendering
         public static float CalculateLODSwitchDistance(float fieldOfView, LODGroup group, int lodIndex)
         {
             float halfAngle = math.tan(math.radians(fieldOfView) * 0.5F);
-            return GetWorldSpaceSize(group) / (2 * group.GetLODs()[lodIndex].screenRelativeTransitionHeight * halfAngle);
+            return GetWorldSpaceSize(group)
+                / (2 * group.GetLODs()[lodIndex].screenRelativeTransitionHeight * halfAngle);
         }
     }
 }

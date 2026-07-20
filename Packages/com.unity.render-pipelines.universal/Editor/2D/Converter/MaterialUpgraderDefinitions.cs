@@ -5,9 +5,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal
 {
-    internal interface IBuiltInToURP2dMaterialUpgrader
-    {
-    }
+    internal interface IBuiltInToURP2dMaterialUpgrader { }
 
     [SupportedOnRenderPipeline(typeof(UniversalRenderPipelineAsset))]
     class BuiltInToURP2DMaterialUpgraderProvider : IMaterialUpgradersProvider
@@ -37,7 +35,9 @@ namespace UnityEditor.Rendering.Universal
                 Shader newShader = null;
                 Renderer2DData data = Light2DEditorUtility.GetRenderer2DData();
                 if (data != null)
-                    newShader = data.GetDefaultMaterial(UnityEngine.Rendering.Universal.DefaultMaterialType.Sprite).shader;
+                    newShader = data.GetDefaultMaterial(
+                        UnityEngine.Rendering.Universal.DefaultMaterialType.Sprite
+                    ).shader;
                 else
                     newShader = Shader.Find("Universal Render Pipeline/2D/Sprite-Lit-Default");
 
@@ -50,9 +50,7 @@ namespace UnityEditor.Rendering.Universal
         }
     }
 
-    internal interface IURP3DToURP2dMaterialUpgrader
-    {
-    }
+    internal interface IURP3DToURP2dMaterialUpgrader { }
 
     [SupportedOnRenderPipeline(typeof(UniversalRenderPipelineAsset))]
     class URP3DToURP2DMaterialUpgraderProvider : IMaterialUpgradersProvider

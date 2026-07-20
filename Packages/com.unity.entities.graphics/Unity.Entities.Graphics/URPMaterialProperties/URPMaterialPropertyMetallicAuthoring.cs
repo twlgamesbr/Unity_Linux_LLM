@@ -13,14 +13,15 @@ namespace Unity.Rendering
     public class URPMaterialPropertyMetallicAuthoring : UnityEngine.MonoBehaviour
     {
         [Unity.Entities.RegisterBinding(typeof(URPMaterialPropertyMetallic), nameof(URPMaterialPropertyMetallic.Value))]
-        [UnityEngine.Range(0,1)]
+        [UnityEngine.Range(0, 1)]
         public float Value;
 
         class URPMaterialPropertyMetallicBaker : Unity.Entities.Baker<URPMaterialPropertyMetallicAuthoring>
         {
             public override void Bake(URPMaterialPropertyMetallicAuthoring authoring)
             {
-                Unity.Rendering.URPMaterialPropertyMetallic component = default(Unity.Rendering.URPMaterialPropertyMetallic);
+                Unity.Rendering.URPMaterialPropertyMetallic component =
+                    default(Unity.Rendering.URPMaterialPropertyMetallic);
                 component.Value = authoring.Value;
                 var entity = GetEntity(TransformUsageFlags.Renderable);
                 AddComponent(entity, component);

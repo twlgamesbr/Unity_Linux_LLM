@@ -54,22 +54,33 @@ namespace UnityEngine.Rendering.Universal
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
             var sourceTexture = resourceData.cameraColor;
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, sourceTexture, k_TargetName, false, FilterMode.Bilinear);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                sourceTexture,
+                k_TargetName,
+                false,
+                FilterMode.Bilinear
+            );
 
             TextureHandle cameraDepth = resourceData.cameraDepth;
             TextureHandle motionVectors = resourceData.motionVectorColor;
 
             Debug.Assert(motionVectors.IsValid(), "MotionVectors are invalid. TAA requires a motion vector texture.");
 
-            TemporalAA.Render(renderGraph, m_Material, cameraData, sourceTexture, in cameraDepth, in motionVectors, destinationTexture);
+            TemporalAA.Render(
+                renderGraph,
+                m_Material,
+                cameraData,
+                sourceTexture,
+                in cameraDepth,
+                in motionVectors,
+                destinationTexture
+            );
 
             resourceData.cameraColor = destinationTexture;
         }
 
-
         // Precomputed shader ids to same some CPU cycles (mostly affects mobile)
-        public static class ShaderConstants
-        {
-        }
+        public static class ShaderConstants { }
     }
 }

@@ -7,10 +7,11 @@ namespace Unity.Entities.Editor
     enum LifetimePolicy
     {
         Frame = 0,
-        Permanent = 1
+        Permanent = 1,
     }
 
-    class PoolablePool<T> where T : class, new()
+    class PoolablePool<T>
+        where T : class, new()
     {
         readonly HashSet<T> m_Inactive = new HashSet<T>();
         readonly HashSet<T> m_Active = new HashSet<T>();
@@ -32,7 +33,9 @@ namespace Unity.Entities.Editor
             UnityEditor.EditorApplication.update += ManageNextFrameLifetime;
         }
 
-        static readonly ProfilerMarker k_GetObjectMarker = new ProfilerMarker($"{nameof(PoolablePool<T>)}.{nameof(Get)}");
+        static readonly ProfilerMarker k_GetObjectMarker = new ProfilerMarker(
+            $"{nameof(PoolablePool<T>)}.{nameof(Get)}"
+        );
 
         public T Get(LifetimePolicy lifetime)
         {
@@ -119,7 +122,9 @@ namespace Unity.Entities.Editor
                 {
                     if (!m_Inactive.Contains(item))
                     {
-                        throw new TimeoutException($"Pooled elements with the {LifetimePolicy.Frame} lifetime policy must be returned to the pool during the same frame.");
+                        throw new TimeoutException(
+                            $"Pooled elements with the {LifetimePolicy.Frame} lifetime policy must be returned to the pool during the same frame."
+                        );
                     }
                 }
             }

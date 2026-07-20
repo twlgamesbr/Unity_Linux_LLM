@@ -27,6 +27,7 @@ namespace UnityEditor.Build.Pipeline.Injector
         /// Stores the how the attribute is used among build tasks.
         /// </summary>
         public ContextUsage Usage { get; set; }
+
         /// <summary>
         /// Stores whether using the context attribute is optional.
         /// </summary>
@@ -53,14 +54,16 @@ namespace UnityEditor.Build.Pipeline.Injector
         /// Use to indicate that the attribute can be injected to and extracted from a build task.
         /// </summary>
         InOut,
+
         /// <summary>
         /// Use to indicate that the attribute can only be injected to a build task.
         /// </summary>
         In,
+
         /// <summary>
         /// Use to indicate that the attribute can only be extracted from a build task.
         /// </summary>
-        Out
+        Out,
     }
 
     class ContextInjector
@@ -115,7 +118,9 @@ namespace UnityEditor.Build.Pipeline.Injector
                     continue;
 
                 if (field.FieldType == typeof(IBuildContext))
-                    throw new InvalidOperationException("IBuildContext can only be used with the ContextUsage.In option.");
+                    throw new InvalidOperationException(
+                        "IBuildContext can only be used with the ContextUsage.In option."
+                    );
 
                 IContextObject contextObject = field.GetValue(obj) as IContextObject;
                 if (!attr.Optional)

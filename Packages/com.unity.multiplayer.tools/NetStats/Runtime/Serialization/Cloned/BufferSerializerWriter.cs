@@ -16,7 +16,9 @@ namespace Unity.Multiplayer.Tools.NetStats
 
         public FastBufferReader GetFastBufferReader()
         {
-            throw new InvalidOperationException("Cannot retrieve a FastBufferReader from a serializer where IsReader = false");
+            throw new InvalidOperationException(
+                "Cannot retrieve a FastBufferReader from a serializer where IsReader = false"
+            );
         }
 
         public FastBufferWriter GetFastBufferWriter()
@@ -29,7 +31,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             m_Writer.WriteValueSafe(s, oneByteChars);
         }
 
-        public void SerializeValue<T>(ref T[] array) where T : unmanaged
+        public void SerializeValue<T>(ref T[] array)
+            where T : unmanaged
         {
             m_Writer.WriteValueSafe(array);
         }
@@ -39,12 +42,14 @@ namespace Unity.Multiplayer.Tools.NetStats
             m_Writer.WriteByteSafe(value);
         }
 
-        public void SerializeValue<T>(ref T value) where T : unmanaged
+        public void SerializeValue<T>(ref T value)
+            where T : unmanaged
         {
             m_Writer.WriteValueSafe(value);
         }
 
-        public void SerializeNetworkSerializable<T>(ref T value) where T : INetworkSerializable, new()
+        public void SerializeNetworkSerializable<T>(ref T value)
+            where T : INetworkSerializable, new()
         {
             m_Writer.WriteNetworkSerializable(value);
         }
@@ -59,7 +64,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             m_Writer.WriteValue(s, oneByteChars);
         }
 
-        public void SerializeValuePreChecked<T>(ref T[] array) where T : unmanaged
+        public void SerializeValuePreChecked<T>(ref T[] array)
+            where T : unmanaged
         {
             m_Writer.WriteValue(array);
         }
@@ -69,7 +75,8 @@ namespace Unity.Multiplayer.Tools.NetStats
             m_Writer.WriteByte(value);
         }
 
-        public void SerializeValuePreChecked<T>(ref T value) where T : unmanaged
+        public void SerializeValuePreChecked<T>(ref T value)
+            where T : unmanaged
         {
             m_Writer.WriteValue(value);
         }

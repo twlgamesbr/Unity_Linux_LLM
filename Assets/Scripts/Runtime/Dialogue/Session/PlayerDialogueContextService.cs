@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+
 namespace NPCSystem.Dialogue.Session
 {
     /// <summary>
@@ -45,11 +44,15 @@ namespace NPCSystem.Dialogue.Session
         [SerializeField]
         EditorAttributes.Void behaviourGroup;
 
-        [SerializeField, HideProperty, Tooltip(
-            "When true (default), loads player context from the Supabase "
-            + "get_player_dialogue_context RPC. When false, only local "
-            + "player state is used."
-        )]
+        [
+            SerializeField,
+            HideProperty,
+            Tooltip(
+                "When true (default), loads player context from the Supabase "
+                    + "get_player_dialogue_context RPC. When false, only local "
+                    + "player state is used."
+            )
+        ]
         bool _enableServerContext = true;
 
         [FoldoutGroup("Debug", true, nameof(_currentNpcSlug), nameof(_cachedContext))]
@@ -64,8 +67,10 @@ namespace NPCSystem.Dialogue.Session
 
         // ── State ────────────────────────────────────────────────────
 
-        readonly Dictionary<string, PlayerDialogueContext> _contextCache =
-            new Dictionary<string, PlayerDialogueContext>(StringComparer.OrdinalIgnoreCase);
+        readonly Dictionary<string, PlayerDialogueContext> _contextCache = new Dictionary<
+            string,
+            PlayerDialogueContext
+        >(StringComparer.OrdinalIgnoreCase);
 
         PlayerDialogueContext _lastLoadedContext;
         NPCFlowLogger _logger;
@@ -100,10 +105,7 @@ namespace NPCSystem.Dialogue.Session
         /// Subsequent calls return the cached value until
         /// <see cref="InvalidateContext"/> is called.
         /// </summary>
-        public async Task<PlayerDialogueContext> GetOrLoadContextAsync(
-            string npcSlug,
-            bool forceRefresh = false
-        )
+        public async Task<PlayerDialogueContext> GetOrLoadContextAsync(string npcSlug, bool forceRefresh = false)
         {
             string key = npcSlug ?? "__global__";
 
@@ -188,20 +190,14 @@ namespace NPCSystem.Dialogue.Session
             string playerName = AuthNetworkBridge.ActivePlayerName;
 
             // 1. Start with local state (always available)
-            PlayerDialogueContext localContext = PlayerDialogueContext.FromLocalState(
-                playerName,
-                playerId,
-                npcSlug
-            );
+            PlayerDialogueContext localContext = PlayerDialogueContext.FromLocalState(playerName, playerId, npcSlug);
 
             // 2. Try to hydrate from Supabase for persistent state
             if (_enableServerContext && _authService != null && _authService.IsAuthenticated)
             {
                 try
                 {
-                    PlayerDialogueContext serverContext = await FetchFromServerAsync(
-                        playerId, npcSlug, playerName
-                    );
+                    PlayerDialogueContext serverContext = await FetchFromServerAsync(playerId, npcSlug, playerName);
                     return Merge(localContext, serverContext);
                 }
                 catch (Exception ex)
@@ -219,11 +215,7 @@ namespace NPCSystem.Dialogue.Session
             return localContext;
         }
 
-        async Task<PlayerDialogueContext> FetchFromServerAsync(
-            string playerId,
-            string npcSlug,
-            string playerName
-        )
+        async Task<PlayerDialogueContext> FetchFromServerAsync(string playerId, string npcSlug, string playerName)
         {
             var client = _authService.SupabaseClient;
             if (client == null)
@@ -254,10 +246,7 @@ namespace NPCSystem.Dialogue.Session
             );
         }
 
-        static PlayerDialogueContext Merge(
-            PlayerDialogueContext local,
-            PlayerDialogueContext server
-        )
+        static PlayerDialogueContext Merge(PlayerDialogueContext local, PlayerDialogueContext server)
         {
             // Server wins for trust/mood/dialogue count (persistent across sessions).
             // Local wins for clues/items/locations discovered *this session*
@@ -281,12 +270,8 @@ namespace NPCSystem.Dialogue.Session
                 mergedLocations.Add(l);
 
             return new PlayerDialogueContext(
-                playerName: !string.IsNullOrWhiteSpace(server.PlayerName)
-                    ? server.PlayerName
-                    : local.PlayerName,
-                playerId: !string.IsNullOrWhiteSpace(server.PlayerId)
-                    ? server.PlayerId
-                    : local.PlayerId,
+                playerName: !string.IsNullOrWhiteSpace(server.PlayerName) ? server.PlayerName : local.PlayerName,
+                playerId: !string.IsNullOrWhiteSpace(server.PlayerId) ? server.PlayerId : local.PlayerId,
                 trustScore: server.TrustScore,
                 currentMood: server.CurrentMood,
                 dialogueCount: server.DialogueCount,

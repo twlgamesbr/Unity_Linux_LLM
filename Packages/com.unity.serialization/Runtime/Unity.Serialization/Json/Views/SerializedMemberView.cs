@@ -8,7 +8,8 @@ namespace Unity.Serialization.Json
     /// </summary>
     public readonly unsafe struct SerializedMemberView
     {
-        [NativeDisableUnsafePtrRestriction] readonly UnsafePackedBinaryStream* m_Stream;
+        [NativeDisableUnsafePtrRestriction]
+        readonly UnsafePackedBinaryStream* m_Stream;
         readonly Handle m_Handle;
 
         internal SerializedMemberView(UnsafePackedBinaryStream* stream, Handle handle)
@@ -16,7 +17,7 @@ namespace Unity.Serialization.Json
             m_Stream = stream;
             m_Handle = handle;
         }
-        
+
         /// <summary>
         /// Returns a <see cref="SerializedStringView"/> over the name of this member.
         /// </summary>
@@ -28,7 +29,7 @@ namespace Unity.Serialization.Json
         /// </summary>
         /// <returns>A view over the value.</returns>
         public SerializedValueView Value() => new SerializedValueView(m_Stream, m_Stream->GetFirstChild(m_Handle));
-        
+
         internal UnsafeMemberView AsUnsafe() => new UnsafeMemberView(m_Stream, m_Stream->GetTokenIndex(m_Handle));
     }
 }

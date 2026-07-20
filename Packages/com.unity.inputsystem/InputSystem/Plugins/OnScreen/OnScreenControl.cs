@@ -100,8 +100,14 @@ namespace UnityEngine.InputSystem.OnScreen
         private void SetupInputControl()
         {
             Debug.Assert(m_Control == null, "InputControl already initialized");
-            Debug.Assert(m_NextControlOnDevice == null, "Previous InputControl has not been properly uninitialized (m_NextControlOnDevice still set)");
-            Debug.Assert(!m_InputEventPtr.valid, "Previous InputControl has not been properly uninitialized (m_InputEventPtr still set)");
+            Debug.Assert(
+                m_NextControlOnDevice == null,
+                "Previous InputControl has not been properly uninitialized (m_NextControlOnDevice still set)"
+            );
+            Debug.Assert(
+                !m_InputEventPtr.valid,
+                "Previous InputControl has not been properly uninitialized (m_InputEventPtr still set)"
+            );
 
             // Nothing to do if we don't have a control path.
             var path = controlPathInternal;
@@ -114,7 +120,8 @@ namespace UnityEngine.InputSystem.OnScreen
             {
                 Debug.LogError(
                     $"Cannot determine device layout to use based on control path '{path}' used in {GetType().Name} component",
-                    this);
+                    this
+                );
                 return;
             }
 
@@ -143,7 +150,8 @@ namespace UnityEngine.InputSystem.OnScreen
                 catch (Exception exception)
                 {
                     Debug.LogError(
-                        $"Could not create device with layout '{layoutName}' used in '{GetType().Name}' component");
+                        $"Could not create device with layout '{layoutName}' used in '{GetType().Name}' component"
+                    );
                     Debug.LogException(exception);
                     return;
                 }
@@ -153,12 +161,14 @@ namespace UnityEngine.InputSystem.OnScreen
                 var buffer = StateEvent.From(device, out var eventPtr, Allocator.Persistent);
 
                 // Add to list.
-                deviceInfoIndex = s_OnScreenDevices.Append(new OnScreenDeviceInfo
-                {
-                    eventPtr = eventPtr,
-                    buffer = buffer,
-                    device = device,
-                });
+                deviceInfoIndex = s_OnScreenDevices.Append(
+                    new OnScreenDeviceInfo
+                    {
+                        eventPtr = eventPtr,
+                        buffer = buffer,
+                        device = device,
+                    }
+                );
             }
             else
             {
@@ -171,7 +181,8 @@ namespace UnityEngine.InputSystem.OnScreen
             {
                 Debug.LogError(
                     $"Cannot find control with path '{path}' on device of type '{layoutName}' referenced by component '{GetType().Name}'",
-                    this);
+                    this
+                );
 
                 // Remove the device, if we just created one.
                 if (s_OnScreenDevices[deviceInfoIndex].firstControl == null)
@@ -185,8 +196,7 @@ namespace UnityEngine.InputSystem.OnScreen
             m_InputEventPtr = s_OnScreenDevices[deviceInfoIndex].eventPtr;
 
             // We have all we need. Permanently add us.
-            s_OnScreenDevices[deviceInfoIndex] =
-                s_OnScreenDevices[deviceInfoIndex].AddControl(this);
+            s_OnScreenDevices[deviceInfoIndex] = s_OnScreenDevices[deviceInfoIndex].AddControl(this);
         }
 
         protected void SendValueToControl<TValue>(TValue value)
@@ -197,7 +207,9 @@ namespace UnityEngine.InputSystem.OnScreen
 
             if (!(m_Control is InputControl<TValue> control))
                 throw new ArgumentException(
-                    $"The control path {controlPath} yields a control of type {m_Control.GetType().Name} which is not an InputControl with value type {typeof(TValue).Name}", nameof(value));
+                    $"The control path {controlPath} yields a control of type {m_Control.GetType().Name} which is not an InputControl with value type {typeof(TValue).Name}",
+                    nameof(value)
+                );
 
             ////FIXME: this gives us a one-frame lag (use InputState.Change instead?)
             m_InputEventPtr.internalTime = InputRuntime.s_Instance.currentTime;
@@ -227,8 +239,7 @@ namespace UnityEngine.InputSystem.OnScreen
             if (m_Control == null)
                 return;
             // if we are in single player and if it the first active switch to the target device.
-            if (s_nbActiveInstances == 1 &&
-                PlayerInput.isSinglePlayer)
+            if (s_nbActiveInstances == 1 && PlayerInput.isSinglePlayer)
             {
                 var firstPlayer = PlayerInput.GetPlayerByIndex(0);
                 if (firstPlayer?.neverAutoSwitchControlSchemes == false)
@@ -312,8 +323,11 @@ namespace UnityEngine.InputSystem.OnScreen
                     firstControl = control.m_NextControlOnDevice;
                 else
                 {
-                    for (OnScreenControl current = firstControl.m_NextControlOnDevice, previous = firstControl;
-                         current != null; previous = current, current = current.m_NextControlOnDevice)
+                    for (
+                        OnScreenControl current = firstControl.m_NextControlOnDevice, previous = firstControl;
+                        current != null;
+                        previous = current, current = current.m_NextControlOnDevice
+                    )
                     {
                         if (current != control)
                             continue;

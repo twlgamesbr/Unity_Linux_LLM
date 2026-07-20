@@ -46,7 +46,7 @@ namespace UnityEngine.InputSystem.Editor
         }
 
         protected InputControlDropdownItem(string name)
-            : base(name) {}
+            : base(name) { }
     }
 
     // NOTE: Optional control items, unlike normal control items, are displayed with their internal control
@@ -60,7 +60,11 @@ namespace UnityEngine.InputSystem.Editor
     //       internal control names rather than display names.
     internal sealed class OptionalControlDropdownItem : InputControlDropdownItem
     {
-        public OptionalControlDropdownItem(EditorInputControlLayoutCache.OptionalControl optionalControl, string deviceControlId, string commonUsage)
+        public OptionalControlDropdownItem(
+            EditorInputControlLayoutCache.OptionalControl optionalControl,
+            string deviceControlId,
+            string commonUsage
+        )
             : base(optionalControl.name)
         {
             m_ControlPath = optionalControl.name;
@@ -73,6 +77,7 @@ namespace UnityEngine.InputSystem.Editor
     internal sealed class ControlUsageDropdownItem : InputControlDropdownItem
     {
         public override string controlPathWithDevice => BuildControlPath();
+
         private string BuildControlPath()
         {
             if (m_Device == "*")
@@ -93,7 +98,7 @@ namespace UnityEngine.InputSystem.Editor
         {
             m_Device = string.IsNullOrEmpty(device) ? "*" : device;
             m_Usage = usage;
-            m_ControlPath = $"{{{ controlUsage }}}";
+            m_ControlPath = $"{{{controlUsage}}}";
             name = controlUsage;
             id = controlPathWithDevice.GetHashCode();
             m_Searchable = true;
@@ -116,7 +121,14 @@ namespace UnityEngine.InputSystem.Editor
 
     internal sealed class ControlDropdownItem : InputControlDropdownItem
     {
-        public ControlDropdownItem(ControlDropdownItem parent, string controlName, string displayName, string device, string usage, bool searchable)
+        public ControlDropdownItem(
+            ControlDropdownItem parent,
+            string controlName,
+            string displayName,
+            string device,
+            string usage,
+            bool searchable
+        )
             : base("")
         {
             m_Device = device;

@@ -24,7 +24,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             ulong id = 0,
             ConnectionInfo? connection = null,
             ConnectionInfo? localConnection = null,
-            string treeViewPathComponent = null)
+            string treeViewPathComponent = null
+        )
             : this(
                 parent,
                 name,
@@ -34,9 +35,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 id,
                 connection,
                 localConnection,
-                treeViewPathComponent)
-        {
-        }
+                treeViewPathComponent
+            ) { }
 
         /// <param name="id"/>
         /// <param name="parent"/>
@@ -58,7 +58,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             ulong id = 0,
             ConnectionInfo? connection = null,
             ConnectionInfo? localConnection = null,
-            string treeViewPathComponent = null)
+            string treeViewPathComponent = null
+        )
         {
             Id = id;
             Parent = parent;

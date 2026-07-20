@@ -8,9 +8,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
     class NetcodeObjectsProfilerModule : ProfilerModule
     {
         public NetcodeObjectsProfilerModule()
-            : base(ProfilerModuleDefinitions.ObjectsProfilerModule.CountersAsDescriptors())
-        {
-        }
+            : base(ProfilerModuleDefinitions.ObjectsProfilerModule.CountersAsDescriptors()) { }
 
         public override ProfilerModuleViewController CreateDetailsViewController()
         {

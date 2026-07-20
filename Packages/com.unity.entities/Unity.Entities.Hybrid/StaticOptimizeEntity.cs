@@ -8,7 +8,5 @@ namespace Unity.Entities
     /// </summary>
     /// <remarks>The `Static` component is added to all the entities in the hierarchy.</remarks>
     [DisallowMultipleComponent]
-    public class StaticOptimizeEntity : MonoBehaviour
-    {
-    }
+    public class StaticOptimizeEntity : MonoBehaviour { }
 }

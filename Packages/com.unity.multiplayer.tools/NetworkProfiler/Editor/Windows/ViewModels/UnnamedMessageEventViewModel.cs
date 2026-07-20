@@ -13,7 +13,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 MetricType.UnnamedMessage,
                 onSelectedCallback,
                 TreeViewId,
-                treeViewPathComponent: $"{MetricType.UnnamedMessage.GetDisplayNameString()}: {Guid.NewGuid().ToString()}")
-        { }
+                treeViewPathComponent: $"{MetricType.UnnamedMessage.GetDisplayNameString()}: {Guid.NewGuid().ToString()}"
+            ) { }
     }
 }

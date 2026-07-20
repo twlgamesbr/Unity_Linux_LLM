@@ -1,13 +1,12 @@
 using System.Diagnostics;
 
-
 namespace TMPro
 {
     internal enum TextProcessingElementType
     {
         Undefined = 0x0,
         TextCharacterElement = 0x1,
-        TextMarkupElement = 0x2
+        TextMarkupElement = 0x2,
     }
 
     internal struct CharacterElement
@@ -87,10 +86,7 @@ namespace TMPro
         /// </summary>
         public int NameHashCode
         {
-            get
-            {
-                return m_Attributes == null ? 0 : m_Attributes[0].NameHashCode;
-            }
+            get { return m_Attributes == null ? 0 : m_Attributes[0].NameHashCode; }
             set
             {
                 if (m_Attributes == null)
@@ -228,12 +224,14 @@ namespace TMPro
             m_MarkupElement = markupElement;
         }
 
-        public static TextProcessingElement Undefined => new TextProcessingElement() { ElementType = TextProcessingElementType.Undefined };
-
+        public static TextProcessingElement Undefined =>
+            new TextProcessingElement() { ElementType = TextProcessingElementType.Undefined };
 
         private string DebuggerDisplay()
         {
-            return m_ElementType == TextProcessingElementType.TextCharacterElement ? $"Unicode ({m_CharacterElement.Unicode})   '{(char)m_CharacterElement.Unicode}' " : $"Markup = {(MarkupTag)m_MarkupElement.NameHashCode}";
+            return m_ElementType == TextProcessingElementType.TextCharacterElement
+                ? $"Unicode ({m_CharacterElement.Unicode})   '{(char)m_CharacterElement.Unicode}' "
+                : $"Markup = {(MarkupTag)m_MarkupElement.NameHashCode}";
         }
 
         // =============================================
@@ -247,6 +245,4 @@ namespace TMPro
         CharacterElement m_CharacterElement;
         MarkupElement m_MarkupElement;
     }
-
-
 }

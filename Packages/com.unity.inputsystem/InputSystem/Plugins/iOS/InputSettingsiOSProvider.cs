@@ -6,8 +6,11 @@ namespace UnityEngine.InputSystem
 {
     internal class InputSettingsiOSProvider
     {
-        [NonSerialized] private SerializedProperty m_MotionUsageEnabled;
-        [NonSerialized] private SerializedProperty m_MotionUsageDescription;
+        [NonSerialized]
+        private SerializedProperty m_MotionUsageEnabled;
+
+        [NonSerialized]
+        private SerializedProperty m_MotionUsageDescription;
 
         private GUIContent m_MotionUsageContent;
         private GUIContent m_MotionUsageDescriptionContent;
@@ -18,8 +21,14 @@ namespace UnityEngine.InputSystem
             m_MotionUsageEnabled = parent.FindProperty(prefix + ".m_Enabled");
             m_MotionUsageDescription = parent.FindProperty(prefix + ".m_Description");
 
-            m_MotionUsageContent = new GUIContent("Motion Usage", "Enables Motion Usage for the app, required for sensors like Step Counter. This also adds 'Privacy - Motion Usage Description' entry to Info.plist");
-            m_MotionUsageDescriptionContent = new GUIContent("  Description", "Describe why the app wants to access the device's Motion Usage sensor.");
+            m_MotionUsageContent = new GUIContent(
+                "Motion Usage",
+                "Enables Motion Usage for the app, required for sensors like Step Counter. This also adds 'Privacy - Motion Usage Description' entry to Info.plist"
+            );
+            m_MotionUsageDescriptionContent = new GUIContent(
+                "  Description",
+                "Describe why the app wants to access the device's Motion Usage sensor."
+            );
         }
 
         public void OnGUI()

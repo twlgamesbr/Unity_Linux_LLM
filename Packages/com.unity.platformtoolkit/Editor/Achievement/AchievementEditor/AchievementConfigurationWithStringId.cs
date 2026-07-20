@@ -8,7 +8,10 @@ using UnityEngine.UIElements;
 namespace Unity.PlatformToolkit.Editor
 {
     [Serializable]
-    internal class AchievementConfigurationWithStringId : IAchievementConfiguration, IAchievementEditorProvider, IAchievementImportExport
+    internal class AchievementConfigurationWithStringId
+        : IAchievementConfiguration,
+            IAchievementEditorProvider,
+            IAchievementImportExport
     {
         public static readonly string EmptyAchievementFound = "Empty achievement ID found.";
         private IAchievementConfigurationContext m_Context;
@@ -27,16 +30,23 @@ namespace Unity.PlatformToolkit.Editor
         private readonly string m_Title;
         public IAchievementImportExport ImportExportProvider => this;
         public string PlatformName => m_Title;
+
         // We need this empty view to eliminate UI Toolkit warnings when re-ordering achievements in the Achievements Editor
         private StringIdCellViewModel m_DummyCellViewModel;
 
-        public AchievementConfigurationWithStringId(IAchievementConfigurationContext context, string title, string exportKey)
+        public AchievementConfigurationWithStringId(
+            IAchievementConfigurationContext context,
+            string title,
+            string exportKey
+        )
         {
             m_Context = context;
             m_CellVisualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorStringIdCell.uxml");
+                "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorStringIdCell.uxml"
+            );
             m_HeaderVisualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorStringIdHeader.uxml");
+                "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorStringIdHeader.uxml"
+            );
             m_Title = title;
             HeaderViewModel = new HeaderViewModel() { HeaderText = m_Title };
             ExportKey = exportKey;
@@ -63,7 +73,8 @@ namespace Unity.PlatformToolkit.Editor
 
         public void Import(string exportedConfigurationData, IAchievement achievement)
         {
-            achievement.ImplementationData.ConfigurationData = exportedConfigurationData == AchievementEditor.AchievementIgnoreTag ? "" : exportedConfigurationData;
+            achievement.ImplementationData.ConfigurationData =
+                exportedConfigurationData == AchievementEditor.AchievementIgnoreTag ? "" : exportedConfigurationData;
             achievement.ImplementationData.Ignore = exportedConfigurationData == AchievementEditor.AchievementIgnoreTag;
         }
 
@@ -83,7 +94,7 @@ namespace Unity.PlatformToolkit.Editor
             var duplicates = new HashSet<string>();
             foreach (var achievement in m_Context.Achievements)
             {
-                if(achievement.ImplementationData.Ignore)
+                if (achievement.ImplementationData.Ignore)
                     continue;
                 if (string.IsNullOrEmpty(achievement.ImplementationData.ConfigurationData))
                     continue;
@@ -97,20 +108,28 @@ namespace Unity.PlatformToolkit.Editor
             return duplicates;
         }
 
-        public static AchievementDefinitionWithNativeId<string>[] BuildForRuntime(IAchievementConfigurationContext achievementContext)
+        public static AchievementDefinitionWithNativeId<string>[] BuildForRuntime(
+            IAchievementConfigurationContext achievementContext
+        )
         {
-            return achievementContext.Achievements
-                .Where(a => !string.IsNullOrEmpty(a.Id) && !string.IsNullOrEmpty(a.ImplementationData.ConfigurationData) && !a.ImplementationData.Ignore)
+            return achievementContext
+                .Achievements.Where(a =>
+                    !string.IsNullOrEmpty(a.Id)
+                    && !string.IsNullOrEmpty(a.ImplementationData.ConfigurationData)
+                    && !a.ImplementationData.Ignore
+                )
                 .Select(a => new AchievementDefinitionWithNativeId<string>(
                     a.Id,
                     a.ImplementationData.ConfigurationData,
                     a.UnlockType == UnlockType.Progressive,
                     a.ProgressTarget
-                    ))
+                ))
                 .ToArray();
         }
 
-        public static AchievementDefinitionWithNativeId<int>[] BuildForRuntimeWithIntIds(IAchievementConfigurationContext achievementContext)
+        public static AchievementDefinitionWithNativeId<int>[] BuildForRuntimeWithIntIds(
+            IAchievementConfigurationContext achievementContext
+        )
         {
             var achievementList = new List<AchievementDefinitionWithNativeId<int>>();
             foreach (var achievement in achievementContext.Achievements)
@@ -120,28 +139,36 @@ namespace Unity.PlatformToolkit.Editor
 
                 if (string.IsNullOrEmpty(achievement.Id))
                 {
-                    Debug.LogWarning("Found an achievement with an empty ID. The achievement will be excluded from the build.");
+                    Debug.LogWarning(
+                        "Found an achievement with an empty ID. The achievement will be excluded from the build."
+                    );
                     continue;
                 }
 
                 if (string.IsNullOrEmpty(achievement.ImplementationData.ConfigurationData))
                 {
-                    Debug.LogWarning($"Achievement {achievement.Id} has an empty platform ID. The achievement will be excluded from the build.");
+                    Debug.LogWarning(
+                        $"Achievement {achievement.Id} has an empty platform ID. The achievement will be excluded from the build."
+                    );
                     continue;
                 }
 
                 if (int.TryParse(achievement.ImplementationData.ConfigurationData, out var intNativeId))
                 {
-                    achievementList.Add(new AchievementDefinitionWithNativeId<int>(
-                        achievement.Id,
-                        intNativeId,
-                        achievement.UnlockType == UnlockType.Progressive,
-                        achievement.ProgressTarget
-                    ));
+                    achievementList.Add(
+                        new AchievementDefinitionWithNativeId<int>(
+                            achievement.Id,
+                            intNativeId,
+                            achievement.UnlockType == UnlockType.Progressive,
+                            achievement.ProgressTarget
+                        )
+                    );
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Could not parse a platform achievement ID for achievement {achievement.Id} an integer expected, but was {achievement.ImplementationData.ConfigurationData}.");
+                    throw new InvalidOperationException(
+                        $"Could not parse a platform achievement ID for achievement {achievement.Id} an integer expected, but was {achievement.ImplementationData.ConfigurationData}."
+                    );
                 }
             }
             return achievementList.ToArray();
@@ -149,7 +176,9 @@ namespace Unity.PlatformToolkit.Editor
 
         private IEnumerable<IAchievement> FindWithDuplicateNativeId()
         {
-            return m_Context.Achievements.GroupBy(a => a.ImplementationData.ConfigurationData).Where(g => g.Count() > 1)
+            return m_Context
+                .Achievements.GroupBy(a => a.ImplementationData.ConfigurationData)
+                .Where(g => g.Count() > 1)
                 .Select(g => g.First());
         }
 
@@ -202,7 +231,9 @@ namespace Unity.PlatformToolkit.Editor
             {
                 var storedAchievement = new StoredAchievement()
                 {
-                    Id = string.Empty, ProgressTarget = 0, UnlockType = UnlockType.Single,
+                    Id = string.Empty,
+                    ProgressTarget = 0,
+                    UnlockType = UnlockType.Single,
                 };
                 var achievement = new ConfigurationAchievement("empty", storedAchievement);
                 m_DummyCellViewModel = new StringIdCellViewModel(achievement);
@@ -218,7 +249,7 @@ namespace Unity.PlatformToolkit.Editor
 
             foreach (var achievement in m_Context.Achievements)
             {
-                if(achievement.ImplementationData.Ignore)
+                if (achievement.ImplementationData.Ignore)
                     continue;
                 var id = achievement.ImplementationData.ConfigurationData;
                 var cell = GetCellViewModel(achievement);

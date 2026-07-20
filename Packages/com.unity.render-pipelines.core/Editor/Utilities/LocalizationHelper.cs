@@ -7,7 +7,11 @@ namespace UnityEditor.Rendering.Utilities
     // Temporary helper class duplicated from GraphicsSettingsUtils.cs while better UXML localization support is not available.
     internal class LocalizationHelper
     {
-        static void Localize(VisualElement visualElement, Func<VisualElement, string> get, Action<VisualElement, string> set)
+        static void Localize(
+            VisualElement visualElement,
+            Func<VisualElement, string> get,
+            Action<VisualElement, string> set
+        )
         {
             var extractedText = get.Invoke(visualElement);
             if (string.IsNullOrWhiteSpace(extractedText))
@@ -36,12 +40,13 @@ namespace UnityEditor.Rendering.Utilities
         {
             root.Query<VisualElement>().ForEach(LocalizeTooltip);
             root.Query<PropertyField>().ForEach(LocalizePropertyField);
-            root.Query<Label>().ForEach(label =>
-            {
-                if (label.ClassListContains("unity-object-field-display__label"))
-                    return;
-                LocalizeText(label);
-            });
+            root.Query<Label>()
+                .ForEach(label =>
+                {
+                    if (label.ClassListContains("unity-object-field-display__label"))
+                        return;
+                    LocalizeText(label);
+                });
         }
     }
 }

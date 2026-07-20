@@ -19,8 +19,10 @@ namespace Unity.Multiplayer.Tools.NetStats
         {
             switch (unit)
             {
-                case BaseUnit.Byte: return "B";
-                case BaseUnit.Second: return "s";
+                case BaseUnit.Byte:
+                    return "B";
+                case BaseUnit.Second:
+                    return "s";
                 default:
                     throw new ArgumentException($"Unhandled BaseUnit {unit}");
             }

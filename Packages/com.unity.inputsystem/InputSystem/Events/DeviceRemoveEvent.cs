@@ -25,7 +25,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public unsafe InputEventPtr ToEventPtr()
         {
-            fixed(DeviceRemoveEvent * ptr = &this)
+            fixed (DeviceRemoveEvent* ptr = &this)
             {
                 return new InputEventPtr((InputEvent*)ptr);
             }
@@ -33,8 +33,10 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static DeviceRemoveEvent Create(int deviceId, double time = -1)
         {
-            var inputEvent =
-                new DeviceRemoveEvent {baseEvent = new InputEvent(Type, InputEvent.kBaseEventSize, deviceId, time)};
+            var inputEvent = new DeviceRemoveEvent
+            {
+                baseEvent = new InputEvent(Type, InputEvent.kBaseEventSize, deviceId, time),
+            };
             return inputEvent;
         }
     }

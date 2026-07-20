@@ -1,6 +1,6 @@
 using System;
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -37,15 +37,16 @@ namespace UnityEngine.Rendering.Universal
             internal bool enableAlphaOutput;
             internal Experimental.Rendering.XRPass xr;
         }
+
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            if(!m_IsValid)
+            if (!m_IsValid)
                 return;
 
             // Disable MotionBlur in EditMode, so that editing remains clear and readable.
             // NOTE: HDRP does the same via CoreUtils::AreAnimatedMaterialsEnabled().
             // Disable MotionBlurMode.CameraAndObjects on renderers that do not support motion vectors
-            if(!Application.isPlaying)
+            if (!Application.isPlaying)
                 return;
 
             var motionBlur = volumeStack.GetComponent<MotionBlur>();
@@ -61,9 +62,10 @@ namespace UnityEngine.Rendering.Universal
 
             if (motionBlur.mode.value == MotionBlurMode.CameraAndObjects)
             {
-                if(!motionVectorColor.IsValid())
+                if (!motionVectorColor.IsValid())
                 {
-                    var warning = "Disabling Motion Blur for Camera And Objects because of missing motion vectors. The renderer might not support rendering motion vectors.";
+                    var warning =
+                        "Disabling Motion Blur for Camera And Objects because of missing motion vectors. The renderer might not support rendering motion vectors.";
                     const int warningThrottleFrames = 60 * 1; // 60 FPS * 1 sec
                     if (Time.frameCount % warningThrottleFrames == 0)
                         Debug.LogWarning(warning);
@@ -73,15 +75,30 @@ namespace UnityEngine.Rendering.Universal
             }
 
             var sourceTexture = resourceData.cameraColor;
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, sourceTexture, k_TargetName, true, FilterMode.Bilinear);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                sourceTexture,
+                k_TargetName,
+                true,
+                FilterMode.Bilinear
+            );
 
             TextureHandle cameraDepthTexture = resourceData.cameraDepthTexture;
 
             var mode = motionBlur.mode.value;
             int passIndex = (int)motionBlur.quality.value;
-            passIndex += (mode == MotionBlurMode.CameraAndObjects) ? ShaderPass.k_CameraAndObjectMotionBlurLow : ShaderPass.k_CameraMotionBlurLow;
+            passIndex +=
+                (mode == MotionBlurMode.CameraAndObjects)
+                    ? ShaderPass.k_CameraAndObjectMotionBlurLow
+                    : ShaderPass.k_CameraMotionBlurLow;
 
-            using (var builder = renderGraph.AddRasterRenderPass<MotionBlurPassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<MotionBlurPassData>(
+                    passName,
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 builder.SetRenderAttachment(destinationTexture, 0, AccessFlags.Write);
                 passData.sourceTexture = sourceTexture;
@@ -89,13 +106,22 @@ namespace UnityEngine.Rendering.Universal
 
                 if (mode == MotionBlurMode.CameraAndObjects)
                 {
-                    Debug.Assert(ScriptableRenderer.current.SupportsMotionVectors(), "Current renderer does not support motion vectors.");
-                    Debug.Assert(motionVectorColor.IsValid(), "Motion vectors are invalid. Per-object motion blur requires a motion vector texture.");
+                    Debug.Assert(
+                        ScriptableRenderer.current.SupportsMotionVectors(),
+                        "Current renderer does not support motion vectors."
+                    );
+                    Debug.Assert(
+                        motionVectorColor.IsValid(),
+                        "Motion vectors are invalid. Per-object motion blur requires a motion vector texture."
+                    );
 
                     builder.UseTexture(motionVectorColor, AccessFlags.Read);
                 }
 
-                Debug.Assert(cameraDepthTexture.IsValid(), "Camera depth texture is invalid. Per-camera motion blur requires a depth texture.");
+                Debug.Assert(
+                    cameraDepthTexture.IsValid(),
+                    "Camera depth texture is invalid. Per-camera motion blur requires a depth texture."
+                );
                 builder.UseTexture(cameraDepthTexture, AccessFlags.Read);
                 passData.material = m_Material;
                 passData.passIndex = passIndex;
@@ -104,22 +130,33 @@ namespace UnityEngine.Rendering.Universal
                 passData.intensity = motionBlur.intensity.value;
                 passData.clamp = motionBlur.clamp.value;
                 passData.xr = cameraData.xr;
-                builder.SetRenderFunc(static (MotionBlurPassData data, RasterGraphContext context) =>
-                {
-                    var cmd = context.cmd;
-                    RTHandle sourceTextureHdl = data.sourceTexture;
+                builder.SetRenderFunc(
+                    static (MotionBlurPassData data, RasterGraphContext context) =>
+                    {
+                        var cmd = context.cmd;
+                        RTHandle sourceTextureHdl = data.sourceTexture;
 
-                    UpdateMotionBlurMatrices(data.material, data.camera, data.xr);
+                        UpdateMotionBlurMatrices(data.material, data.camera, data.xr);
 
-                    var sourceSize = PostProcessUtils.CalcShaderSourceSize(sourceTextureHdl);
-                    data.material.SetVector(ShaderConstants._SourceSize, sourceSize);
-                    data.material.SetFloat(ShaderConstants._Intensity, data.intensity);
-                    data.material.SetFloat(ShaderConstants._Clamp, data.clamp);
-                    CoreUtils.SetKeyword(data.material, ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT, data.enableAlphaOutput);
+                        var sourceSize = PostProcessUtils.CalcShaderSourceSize(sourceTextureHdl);
+                        data.material.SetVector(ShaderConstants._SourceSize, sourceSize);
+                        data.material.SetFloat(ShaderConstants._Intensity, data.intensity);
+                        data.material.SetFloat(ShaderConstants._Clamp, data.clamp);
+                        CoreUtils.SetKeyword(
+                            data.material,
+                            ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT,
+                            data.enableAlphaOutput
+                        );
 
-                    Vector2 viewportScale = sourceTextureHdl.useScaling ? new Vector2(sourceTextureHdl.rtHandleProperties.rtHandleScale.x, sourceTextureHdl.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, data.material, data.passIndex);
-                });
+                        Vector2 viewportScale = sourceTextureHdl.useScaling
+                            ? new Vector2(
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.x,
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.y
+                            )
+                            : Vector2.one;
+                        Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, data.material, data.passIndex);
+                    }
+                );
             }
 
             resourceData.cameraColor = destinationTexture;
@@ -130,7 +167,7 @@ namespace UnityEngine.Rendering.Universal
         {
             MotionVectorsPersistentData motionData = null;
 
-            if(camera.TryGetComponent<UniversalAdditionalCameraData>(out var additionalCameraData))
+            if (camera.TryGetComponent<UniversalAdditionalCameraData>(out var additionalCameraData))
                 motionData = additionalCameraData.motionVectorsPersistentData;
 
             if (motionData == null)
@@ -142,9 +179,21 @@ namespace UnityEngine.Rendering.Universal
                 // pass maximum of 2 matrices per pass. Need to access into the matrix array
                 var viewStartIndex = xr.viewCount * xr.multipassId;
                 // Using motionData.stagingMatrixStereo as staging buffer to avoid allocation
-                Array.Copy(motionData.previousViewProjectionStereo, viewStartIndex, motionData.stagingMatrixStereo, 0, xr.viewCount);
+                Array.Copy(
+                    motionData.previousViewProjectionStereo,
+                    viewStartIndex,
+                    motionData.stagingMatrixStereo,
+                    0,
+                    xr.viewCount
+                );
                 material.SetMatrixArray(ShaderConstants._PrevViewProjMStereo, motionData.stagingMatrixStereo);
-                Array.Copy(motionData.viewProjectionStereo, viewStartIndex, motionData.stagingMatrixStereo, 0, xr.viewCount);
+                Array.Copy(
+                    motionData.viewProjectionStereo,
+                    viewStartIndex,
+                    motionData.stagingMatrixStereo,
+                    0,
+                    xr.viewCount
+                );
                 material.SetMatrixArray(ShaderConstants._ViewProjMStereo, motionData.stagingMatrixStereo);
             }
             else
@@ -157,11 +206,13 @@ namespace UnityEngine.Rendering.Universal
 #endif
 
                 // TODO: These should be part of URP main matrix set. For now, we set them here for motion vector rendering.
-                material.SetMatrix(ShaderConstants._PrevViewProjM, motionData.previousViewProjectionStereo[viewProjMIdx]);
+                material.SetMatrix(
+                    ShaderConstants._PrevViewProjM,
+                    motionData.previousViewProjectionStereo[viewProjMIdx]
+                );
                 material.SetMatrix(ShaderConstants._ViewProjM, motionData.viewProjectionStereo[viewProjMIdx]);
             }
         }
-
 
         // Precomputed shader ids to same some CPU cycles (mostly affects mobile)
         public static class ShaderConstants

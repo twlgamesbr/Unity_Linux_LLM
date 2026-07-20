@@ -29,7 +29,9 @@ namespace Unity.Netcode.Components
         /// extrapolation and <see cref="NetworkTransform.Interpolate"/> is enabled, then non-authoritative instances will automatically be adjusted to use Rigidbody
         /// interpolation while the authoritative instance will still use extrapolation.
         /// </remarks>
-        [Tooltip("When enabled and a NetworkTransform component is attached, the NetworkTransform will use the rigid body for motion and detecting changes in state.")]
+        [Tooltip(
+            "When enabled and a NetworkTransform component is attached, the NetworkTransform will use the rigid body for motion and detecting changes in state."
+        )]
         public bool UseRigidBodyForMotion;
 
         /// <summary>
@@ -51,8 +53,8 @@ namespace Unity.Netcode.Components
         private bool m_IsRigidbody2D = false;
 #endif
 
-
         private NetworkManager m_LocalNetworkManager;
+
         // Used to cache the authority state of this Rigidbody during the last frame
         private bool m_IsAuthority;
 
@@ -72,8 +74,9 @@ namespace Unity.Netcode.Components
         {
             None,
             Interpolate,
-            Extrapolate
+            Extrapolate,
         }
+
         private InterpolationTypes m_OriginalInterpolation;
 
         /// <summary>
@@ -91,6 +94,7 @@ namespace Unity.Netcode.Components
         }
 
         public RigidbodyTypes RigidbodyType { get; private set; }
+
 #if COM_UNITY_MODULES_PHYSICS2D && !COM_UNITY_MODULES_PHYSICS
         /// <summary>
         /// Initializes the networked Rigidbody based on the <see cref="RigidbodyTypes"/>
@@ -102,7 +106,11 @@ namespace Unity.Netcode.Components
         /// <param name="rigidbodyType">type of rigid body being initialized</param>
         /// <param name="networkTransform">the <see cref="NetworkTransform"/> that is associated with this rigid body</param>
         /// <param name="rigidbody2D">(optional) The <see cref="Rigidbody2D"/> to be used</param>
-        protected void Initialize(RigidbodyTypes rigidbodyType, NetworkTransform networkTransform = null, Rigidbody2D rigidbody2D = null)
+        protected void Initialize(
+            RigidbodyTypes rigidbodyType,
+            NetworkTransform networkTransform = null,
+            Rigidbody2D rigidbody2D = null
+        )
         {
             // Don't initialize if already spawned
             if (IsSpawned)
@@ -132,7 +140,9 @@ namespace Unity.Netcode.Components
             }
             else
             {
-                throw new System.Exception($"[Missing {nameof(NetworkTransform)}] No {nameof(NetworkTransform)} is assigned or can be found during initialization!");
+                throw new System.Exception(
+                    $"[Missing {nameof(NetworkTransform)}] No {nameof(NetworkTransform)} is assigned or can be found during initialization!"
+                );
             }
 
             if (AutoUpdateKinematicState)
@@ -153,7 +163,11 @@ namespace Unity.Netcode.Components
         /// <param name="rigidbodyType">type of rigid body being initialized</param>
         /// <param name="networkTransform">the <see cref="NetworkTransform"/> that is associated with this rigid body</param>
         /// <param name="rigidbody">(optional) The <see cref="Rigidbody"/> to be used</param>
-        protected void Initialize(RigidbodyTypes rigidbodyType, NetworkTransform networkTransform = null, Rigidbody rigidbody = null)
+        protected void Initialize(
+            RigidbodyTypes rigidbodyType,
+            NetworkTransform networkTransform = null,
+            Rigidbody rigidbody = null
+        )
         {
             // Don't initialize if already spawned
             if (IsSpawned)
@@ -183,7 +197,9 @@ namespace Unity.Netcode.Components
             }
             else
             {
-                throw new System.Exception($"[Missing {nameof(NetworkTransform)}] No {nameof(NetworkTransform)} is assigned or can be found during initialization!");
+                throw new System.Exception(
+                    $"[Missing {nameof(NetworkTransform)}] No {nameof(NetworkTransform)} is assigned or can be found during initialization!"
+                );
             }
 
             if (AutoUpdateKinematicState)
@@ -205,7 +221,12 @@ namespace Unity.Netcode.Components
         /// <param name="networkTransform">the <see cref="NetworkTransform"/> that is associated with this rigid body</param>
         /// <param name="rigidbody2D">(optional) The <see cref="Rigidbody2D"/> to be used</param>
         /// <param name="rigidbody">(optional) The <see cref="Rigidbody"/> to be used</param>
-        protected void Initialize(RigidbodyTypes rigidbodyType, NetworkTransform networkTransform = null, Rigidbody2D rigidbody2D = null, Rigidbody rigidbody = null)
+        protected void Initialize(
+            RigidbodyTypes rigidbodyType,
+            NetworkTransform networkTransform = null,
+            Rigidbody2D rigidbody2D = null,
+            Rigidbody rigidbody = null
+        )
         {
             // Don't initialize if already spawned
             if (IsSpawned)
@@ -222,7 +243,6 @@ namespace Unity.Netcode.Components
             if (m_IsRigidbody2D && m_InternalRigidbody2D == null)
             {
                 m_InternalRigidbody2D = GetComponent<Rigidbody2D>();
-
             }
             else if (m_InternalRigidbody == null)
             {
@@ -242,7 +262,9 @@ namespace Unity.Netcode.Components
             }
             else
             {
-                throw new System.Exception($"[Missing {nameof(NetworkTransform)}] No {nameof(NetworkTransform)} is assigned or can be found during initialization!");
+                throw new System.Exception(
+                    $"[Missing {nameof(NetworkTransform)}] No {nameof(NetworkTransform)} is assigned or can be found during initialization!"
+                );
             }
 
             if (AutoUpdateKinematicState)
@@ -251,6 +273,7 @@ namespace Unity.Netcode.Components
             }
         }
 #endif
+
         internal Vector3 GetAdjustedPositionThreshold()
         {
             // Since the threshold is a measurement of unity world space units per tick, we will allow for the maximum threshold
@@ -651,20 +674,20 @@ namespace Unity.Netcode.Components
             switch (m_InternalRigidbody2D.interpolation)
             {
                 case RigidbodyInterpolation2D.None:
-                    {
-                        m_OriginalInterpolation = InterpolationTypes.None;
-                        break;
-                    }
+                {
+                    m_OriginalInterpolation = InterpolationTypes.None;
+                    break;
+                }
                 case RigidbodyInterpolation2D.Interpolate:
-                    {
-                        m_OriginalInterpolation = InterpolationTypes.Interpolate;
-                        break;
-                    }
+                {
+                    m_OriginalInterpolation = InterpolationTypes.Interpolate;
+                    break;
+                }
                 case RigidbodyInterpolation2D.Extrapolate:
-                    {
-                        m_OriginalInterpolation = InterpolationTypes.Extrapolate;
-                        break;
-                    }
+                {
+                    m_OriginalInterpolation = InterpolationTypes.Extrapolate;
+                    break;
+                }
             }
         }
 #endif
@@ -675,20 +698,20 @@ namespace Unity.Netcode.Components
             switch (m_InternalRigidbody.interpolation)
             {
                 case RigidbodyInterpolation.None:
-                    {
-                        m_OriginalInterpolation = InterpolationTypes.None;
-                        break;
-                    }
+                {
+                    m_OriginalInterpolation = InterpolationTypes.None;
+                    break;
+                }
                 case RigidbodyInterpolation.Interpolate:
-                    {
-                        m_OriginalInterpolation = InterpolationTypes.Interpolate;
-                        break;
-                    }
+                {
+                    m_OriginalInterpolation = InterpolationTypes.Interpolate;
+                    break;
+                }
                 case RigidbodyInterpolation.Extrapolate:
-                    {
-                        m_OriginalInterpolation = InterpolationTypes.Extrapolate;
-                        break;
-                    }
+                {
+                    m_OriginalInterpolation = InterpolationTypes.Extrapolate;
+                    break;
+                }
             }
         }
 #endif
@@ -716,7 +739,6 @@ namespace Unity.Netcode.Components
             SetOriginalInterpolation2D();
 #endif
         }
-
 
 #if COM_UNITY_MODULES_PHYSICS2D
         private void WakeIfSleeping2D()
@@ -877,7 +899,11 @@ namespace Unity.Netcode.Components
             }
             else
             {
-                SetInterpolation(m_IsAuthority ? m_OriginalInterpolation : (NetworkTransform.Interpolate ? InterpolationTypes.None : m_OriginalInterpolation));
+                SetInterpolation(
+                    m_IsAuthority
+                        ? m_OriginalInterpolation
+                        : (NetworkTransform.Interpolate ? InterpolationTypes.None : m_OriginalInterpolation)
+                );
             }
         }
 
@@ -888,20 +914,20 @@ namespace Unity.Netcode.Components
             switch (interpolationType)
             {
                 case InterpolationTypes.None:
-                    {
-                        m_InternalRigidbody2D.interpolation = RigidbodyInterpolation2D.None;
-                        break;
-                    }
+                {
+                    m_InternalRigidbody2D.interpolation = RigidbodyInterpolation2D.None;
+                    break;
+                }
                 case InterpolationTypes.Interpolate:
-                    {
-                        m_InternalRigidbody2D.interpolation = RigidbodyInterpolation2D.Interpolate;
-                        break;
-                    }
+                {
+                    m_InternalRigidbody2D.interpolation = RigidbodyInterpolation2D.Interpolate;
+                    break;
+                }
                 case InterpolationTypes.Extrapolate:
-                    {
-                        m_InternalRigidbody2D.interpolation = RigidbodyInterpolation2D.Extrapolate;
-                        break;
-                    }
+                {
+                    m_InternalRigidbody2D.interpolation = RigidbodyInterpolation2D.Extrapolate;
+                    break;
+                }
             }
         }
 #endif
@@ -913,20 +939,20 @@ namespace Unity.Netcode.Components
             switch (interpolationType)
             {
                 case InterpolationTypes.None:
-                    {
-                        m_InternalRigidbody.interpolation = RigidbodyInterpolation.None;
-                        break;
-                    }
+                {
+                    m_InternalRigidbody.interpolation = RigidbodyInterpolation.None;
+                    break;
+                }
                 case InterpolationTypes.Interpolate:
-                    {
-                        m_InternalRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-                        break;
-                    }
+                {
+                    m_InternalRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+                    break;
+                }
                 case InterpolationTypes.Extrapolate:
-                    {
-                        m_InternalRigidbody.interpolation = RigidbodyInterpolation.Extrapolate;
-                        break;
-                    }
+                {
+                    m_InternalRigidbody.interpolation = RigidbodyInterpolation.Extrapolate;
+                    break;
+                }
             }
         }
 #endif
@@ -1034,7 +1060,8 @@ namespace Unity.Netcode.Components
         // Alternately, users can affix the fixed joint to a child GameObject (without a rigid body) of the parent NetworkObject
         // and then add a NetworkTransform to that in order to get the parented child NetworkObject to move around in "local space"
 
-        internal System.Collections.Generic.List<NetworkRigidbodyBase> NetworkRigidbodyConnections = new System.Collections.Generic.List<NetworkRigidbodyBase>();
+        internal System.Collections.Generic.List<NetworkRigidbodyBase> NetworkRigidbodyConnections =
+            new System.Collections.Generic.List<NetworkRigidbodyBase>();
         internal NetworkRigidbodyBase ParentBody;
 
         private bool m_FixedJoint2DUsingGravity;
@@ -1045,25 +1072,26 @@ namespace Unity.Netcode.Components
         /// When using a custom <see cref="NetworkRigidbodyBase"/>, this virtual method is invoked when the
         /// <see cref="FixedJoint"/> is created in the event any additional adjustments are needed.
         /// </summary>
-        protected virtual void OnFixedJointCreated()
-        {
-
-        }
+        protected virtual void OnFixedJointCreated() { }
 
         /// <summary>
         /// When using a custom <see cref="NetworkRigidbodyBase"/>, this virtual method is invoked when the
         /// <see cref="FixedJoint2D"/> is created in the event any additional adjustments are needed.
         /// </summary>
-        protected virtual void OnFixedJoint2DCreated()
-        {
-
-        }
+        protected virtual void OnFixedJoint2DCreated() { }
 
 #if COM_UNITY_MODULES_PHYSICS2D
         public FixedJoint2D FixedJoint2D { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ApplyFixedJoint2D(NetworkRigidbodyBase bodyToConnect, Vector3 position, float connectedMassScale = 0.0f, float massScale = 1.0f, bool useGravity = false, bool zeroVelocity = true)
+        private void ApplyFixedJoint2D(
+            NetworkRigidbodyBase bodyToConnect,
+            Vector3 position,
+            float connectedMassScale = 0.0f,
+            float massScale = 1.0f,
+            bool useGravity = false,
+            bool zeroVelocity = true
+        )
         {
             transform.position = position;
             m_InternalRigidbody2D.position = position;
@@ -1096,7 +1124,14 @@ namespace Unity.Netcode.Components
         public FixedJoint FixedJoint { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ApplyFixedJoint(NetworkRigidbodyBase bodyToConnectTo, Vector3 position, float connectedMassScale = 0.0f, float massScale = 1.0f, bool useGravity = false, bool zeroVelocity = true)
+        private void ApplyFixedJoint(
+            NetworkRigidbodyBase bodyToConnectTo,
+            Vector3 position,
+            float connectedMassScale = 0.0f,
+            float massScale = 1.0f,
+            bool useGravity = false,
+            bool zeroVelocity = true
+        )
         {
             transform.position = position;
             m_InternalRigidbody.position = position;
@@ -1141,17 +1176,29 @@ namespace Unity.Netcode.Components
         /// <param name="zeroVelocity">When true (the default), both linear and angular velocities of this object are set to zero.</param>
         /// <param name="teleportObject">When true (the default), this object will teleport itself to the position of connection.</param>
         /// <returns>true (success) false (failed)</returns>
-        public bool AttachToFixedJoint(NetworkRigidbodyBase objectToConnectTo, Vector3 positionOfConnection, float connectedMassScale = 0.0f, float massScale = 1.0f, bool useGravity = false, bool zeroVelocity = true, bool teleportObject = true)
+        public bool AttachToFixedJoint(
+            NetworkRigidbodyBase objectToConnectTo,
+            Vector3 positionOfConnection,
+            float connectedMassScale = 0.0f,
+            float massScale = 1.0f,
+            bool useGravity = false,
+            bool zeroVelocity = true,
+            bool teleportObject = true
+        )
         {
             if (!UseRigidBodyForMotion)
             {
-                Debug.LogError($"[{GetType().Name}] {name} does not have {nameof(UseRigidBodyForMotion)} set! Either enable {nameof(UseRigidBodyForMotion)} on this component or do not use a {nameof(FixedJoint)} when parenting under a {nameof(NetworkObject)}.");
+                Debug.LogError(
+                    $"[{GetType().Name}] {name} does not have {nameof(UseRigidBodyForMotion)} set! Either enable {nameof(UseRigidBodyForMotion)} on this component or do not use a {nameof(FixedJoint)} when parenting under a {nameof(NetworkObject)}."
+                );
                 return false;
             }
 
             if (IsKinematic())
             {
-                Debug.LogError($"[{GetType().Name}] {name} is currently kinematic! You cannot use a {nameof(FixedJoint)} with Kinematic bodies!");
+                Debug.LogError(
+                    $"[{GetType().Name}] {name} is currently kinematic! You cannot use a {nameof(FixedJoint)} with Kinematic bodies!"
+                );
                 return false;
             }
 
@@ -1160,18 +1207,46 @@ namespace Unity.Netcode.Components
 #if COM_UNITY_MODULES_PHYSICS && COM_UNITY_MODULES_PHYSICS2D
                 if (m_IsRigidbody2D)
                 {
-                    ApplyFixedJoint2D(objectToConnectTo, positionOfConnection, connectedMassScale, massScale, useGravity, zeroVelocity);
+                    ApplyFixedJoint2D(
+                        objectToConnectTo,
+                        positionOfConnection,
+                        connectedMassScale,
+                        massScale,
+                        useGravity,
+                        zeroVelocity
+                    );
                 }
                 else
                 {
-                    ApplyFixedJoint(objectToConnectTo, positionOfConnection, connectedMassScale, massScale, useGravity, zeroVelocity);
+                    ApplyFixedJoint(
+                        objectToConnectTo,
+                        positionOfConnection,
+                        connectedMassScale,
+                        massScale,
+                        useGravity,
+                        zeroVelocity
+                    );
                 }
 #endif
 #if COM_UNITY_MODULES_PHYSICS && !COM_UNITY_MODULES_PHYSICS2D
-                ApplyFixedJoint(objectToConnectTo, positionOfConnection, connectedMassScale, massScale, useGravity, zeroVelocity);
+                ApplyFixedJoint(
+                    objectToConnectTo,
+                    positionOfConnection,
+                    connectedMassScale,
+                    massScale,
+                    useGravity,
+                    zeroVelocity
+                );
 #endif
 #if !COM_UNITY_MODULES_PHYSICS && COM_UNITY_MODULES_PHYSICS2D
-                ApplyFixedJoint2D(objectToConnectTo, positionOfConnection, connectedMassScale, massScale, useGravity, zeroVelocity);
+                ApplyFixedJoint2D(
+                    objectToConnectTo,
+                    positionOfConnection,
+                    connectedMassScale,
+                    massScale,
+                    useGravity,
+                    zeroVelocity
+                );
 #endif
                 ParentBody = objectToConnectTo;
                 ParentBody.NetworkRigidbodyConnections.Add(this);

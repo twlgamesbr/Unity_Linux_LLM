@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
 using UnityEngine.Analytics;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using UnityEditor.Build;
-using UnityEditor.Build.Reporting;
 
 namespace UnityEditor.Rendering.Universal
 {
@@ -16,14 +16,19 @@ namespace UnityEditor.Rendering.Universal
         const string k_VendorKey = "unity.universal";
         const string k_EventName = "uUniversalRenderPipelineUsage";
 
-
-        [AnalyticInfo(eventName: k_EventName, vendorKey: k_VendorKey, maxEventsPerHour: k_MaxEventsPerHour, maxNumberOfElements: k_MaxNumberOfElements)]
+        [AnalyticInfo(
+            eventName: k_EventName,
+            vendorKey: k_VendorKey,
+            maxEventsPerHour: k_MaxEventsPerHour,
+            maxNumberOfElements: k_MaxNumberOfElements
+        )]
         class Analytic : IAnalytic
         {
             public bool TryGatherData(out IAnalytic.IData data, out Exception error)
             {
                 data = null;
-                UniversalRenderPipelineAsset rendererAsset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+                UniversalRenderPipelineAsset rendererAsset =
+                    GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
 
                 if (rendererAsset != null)
                 {
@@ -63,12 +68,10 @@ namespace UnityEditor.Rendering.Universal
                         main_light_rendering_mode = mainLightMode,
                         additional_light_rendering_mode = additionalLightMode,
                     };
-
                 }
                 error = null;
                 return true;
             }
-
 
             [Serializable]
             struct AnalyticsData : IAnalytic.IData
@@ -92,8 +95,9 @@ namespace UnityEditor.Rendering.Universal
             Analytic analytic = new Analytic();
             EditorAnalytics.SendAnalytic(analytic);
         }
-        
+
         public int callbackOrder { get; }
+
         public void OnPostprocessBuild(BuildReport report)
         {
             SendUniversalEvent();

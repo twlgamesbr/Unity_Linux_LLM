@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-using UnityEditor;
-
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomPropertyDrawer(typeof(TMP_Style))]
     public class StyleDrawer : PropertyDrawer
     {
@@ -23,7 +21,6 @@ namespace TMPro.EditorUtilities
             SerializedProperty closingDefinitionProperty = property.FindPropertyRelative("m_ClosingDefinition");
             SerializedProperty openingDefinitionArray = property.FindPropertyRelative("m_OpeningTagArray");
             SerializedProperty closingDefinitionArray = property.FindPropertyRelative("m_ClosingTagArray");
-
 
             EditorGUIUtility.labelWidth = 86;
             position.height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
@@ -61,7 +58,10 @@ namespace TMPro.EditorUtilities
             position.y += labelHeight;
             GUI.Label(position, "Opening Tags");
             Rect textRect1 = new Rect(110, position.y, position.width - 86, 35);
-            openingDefinitionProperty.stringValue = EditorGUI.TextArea(textRect1, openingDefinitionProperty.stringValue);
+            openingDefinitionProperty.stringValue = EditorGUI.TextArea(
+                textRect1,
+                openingDefinitionProperty.stringValue
+            );
             if (EditorGUI.EndChangeCheck())
             {
                 // If any properties have changed, we need to update the Opening and Closing Arrays.
@@ -84,7 +84,10 @@ namespace TMPro.EditorUtilities
             position.y += 38;
             GUI.Label(position, "Closing Tags");
             Rect textRect2 = new Rect(110, position.y, position.width - 86, 35);
-            closingDefinitionProperty.stringValue = EditorGUI.TextArea(textRect2, closingDefinitionProperty.stringValue);
+            closingDefinitionProperty.stringValue = EditorGUI.TextArea(
+                textRect2,
+                closingDefinitionProperty.stringValue
+            );
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -104,12 +107,9 @@ namespace TMPro.EditorUtilities
         }
     }
 
-
-
     [CustomEditor(typeof(TMP_StyleSheet)), CanEditMultipleObjects]
     public class TMP_StyleEditor : Editor
     {
-
         TMP_StyleSheet m_StyleSheet;
         SerializedProperty m_StyleListProp;
 
@@ -118,13 +118,11 @@ namespace TMPro.EditorUtilities
 
         bool m_IsStyleSheetDirty;
 
-
         void OnEnable()
         {
             m_StyleSheet = target as TMP_StyleSheet;
             m_StyleListProp = serializedObject.FindProperty("m_StyleList");
         }
-
 
         public override void OnInspectorGUI()
         {
@@ -159,7 +157,12 @@ namespace TMPro.EditorUtilities
                     Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                     // Check for Item selection
-                    Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
+                    Rect selectionArea = new Rect(
+                        elementStartRegion.x,
+                        elementStartRegion.y,
+                        elementEndRegion.width,
+                        elementEndRegion.y - elementStartRegion.y
+                    );
                     if (DoSelectionCheck(selectionArea))
                     {
                         if (m_SelectedElement == i)
@@ -283,7 +286,6 @@ namespace TMPro.EditorUtilities
             // Clamp page range
             m_Page = Mathf.Clamp(m_Page, 0, elementCount / itemsPerPage);
 
-
             if (serializedObject.ApplyModifiedProperties())
             {
                 TMPro_EventManager.ON_TEXT_STYLE_PROPERTY_CHANGED(true);
@@ -300,7 +302,6 @@ namespace TMPro.EditorUtilities
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
                 m_SelectedElement = -1;
         }
-
 
         // Check if any of the Style elements were clicked on.
         static bool DoSelectionCheck(Rect selectionArea)
@@ -327,6 +328,5 @@ namespace TMPro.EditorUtilities
             m_SelectedElement = newIndex;
             m_IsStyleSheetDirty = true;
         }
-
     }
 }

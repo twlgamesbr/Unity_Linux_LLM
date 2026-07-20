@@ -30,10 +30,22 @@ namespace UnityEditor.Rendering.Universal
             public static GUIContent inputs = new GUIContent("Inputs");
             public static GUIContent advancedOptions = new GUIContent("Advanced Options");
 
-            public static GUIContent meshDecalBiasType = new GUIContent("Mesh Bias Type", "Set the type of bias that is applied to the mesh decal. Depth Bias applies a bias to the final depth value, while View bias applies a world space bias (in meters) alongside the view vector.");
-            public static GUIContent meshDecalDepthBiasText = new GUIContent("Depth Bias", "Sets a depth bias to stop the decal's Mesh from overlapping with other Meshes.");
-            public static GUIContent meshDecalViewBiasText = new GUIContent("View Bias", "Sets a world-space bias alongside the view vector to stop the decal's Mesh from overlapping with other Meshes. The unit is meters.");
-            public static GUIContent drawOrderText = new GUIContent("Priority", "Controls the draw order of Decal Projectors. URP draws decals with lower values first.");
+            public static GUIContent meshDecalBiasType = new GUIContent(
+                "Mesh Bias Type",
+                "Set the type of bias that is applied to the mesh decal. Depth Bias applies a bias to the final depth value, while View bias applies a world space bias (in meters) alongside the view vector."
+            );
+            public static GUIContent meshDecalDepthBiasText = new GUIContent(
+                "Depth Bias",
+                "Sets a depth bias to stop the decal's Mesh from overlapping with other Meshes."
+            );
+            public static GUIContent meshDecalViewBiasText = new GUIContent(
+                "View Bias",
+                "Sets a world-space bias alongside the view vector to stop the decal's Mesh from overlapping with other Meshes. The unit is meters."
+            );
+            public static GUIContent drawOrderText = new GUIContent(
+                "Priority",
+                "Controls the draw order of Decal Projectors. URP draws decals with lower values first."
+            );
         }
 
         protected enum Expandable
@@ -49,7 +61,9 @@ namespace UnityEditor.Rendering.Universal
         const string kDecalViewDepthBias = "_DecalMeshViewBias";
         const string kDrawOrder = "_DrawOrder";
 
-        readonly MaterialHeaderScopeList m_MaterialScopeList = new MaterialHeaderScopeList(uint.MaxValue & ~((uint)Expandable.Advanced));
+        readonly MaterialHeaderScopeList m_MaterialScopeList = new MaterialHeaderScopeList(
+            uint.MaxValue & ~((uint)Expandable.Advanced)
+        );
 
         MaterialEditor m_MaterialEditor;
         MaterialProperty[] m_Properties;
@@ -111,7 +125,12 @@ namespace UnityEditor.Rendering.Universal
             materialEditor.SetDefaultGUIWidths();
             for (var i = 0; i < properties.Length; i++)
             {
-                if ((properties[i].propertyFlags & (ShaderPropertyFlags.HideInInspector | ShaderPropertyFlags.PerRendererData)) != 0)
+                if (
+                    (
+                        properties[i].propertyFlags
+                        & (ShaderPropertyFlags.HideInInspector | ShaderPropertyFlags.PerRendererData)
+                    ) != 0
+                )
                     continue;
 
                 float h = materialEditor.GetPropertyHeight(properties[i], properties[i].displayName);
@@ -190,7 +209,10 @@ namespace UnityEditor.Rendering.Universal
             }
 
             if (hasDecalScreenSpace)
-                EditorGUILayout.HelpBox("Decals with Screen Space technique only support rendering with DecalProjector component.", MessageType.Warning);
+                EditorGUILayout.HelpBox(
+                    "Decals with Screen Space technique only support rendering with DecalProjector component.",
+                    MessageType.Warning
+                );
         }
     }
 }

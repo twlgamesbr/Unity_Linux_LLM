@@ -23,10 +23,7 @@ namespace Unity.Networking.Transport.Utilities
             int payloadCapacity = FragmentationUtility.Parameters.k_DefaultPayloadCapacity
         )
         {
-            var parameter = new FragmentationUtility.Parameters
-            {
-                PayloadCapacity = payloadCapacity,
-            };
+            var parameter = new FragmentationUtility.Parameters { PayloadCapacity = payloadCapacity };
 
             settings.AddRawParameterStruct(ref parameter);
 
@@ -82,7 +79,9 @@ namespace Unity.Networking.Transport.Utilities
                 if (PayloadCapacity >= k_MaxPayloadCapacity)
                 {
                     valid = false;
-                    Debug.LogError($"{nameof(PayloadCapacity)} value ({PayloadCapacity}) can't be greater than {k_MaxPayloadCapacity}");
+                    Debug.LogError(
+                        $"{nameof(PayloadCapacity)} value ({PayloadCapacity}) can't be greater than {k_MaxPayloadCapacity}"
+                    );
                 }
 
                 return valid;

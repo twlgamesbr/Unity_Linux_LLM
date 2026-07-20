@@ -13,6 +13,7 @@ namespace Unity.Netcode
         /// Everyone can read
         /// </summary>
         Everyone,
+
         /// <summary>
         /// Only the owner and the server can read
         /// </summary>
@@ -28,9 +29,10 @@ namespace Unity.Netcode
         /// Only the server can write
         /// </summary>
         Server,
+
         /// <summary>
         /// Only the owner can write
         /// </summary>
-        Owner
+        Owner,
     }
 }

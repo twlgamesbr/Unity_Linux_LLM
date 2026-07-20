@@ -7,9 +7,10 @@ namespace UnityEngine.Rendering.Universal
     [Serializable]
     internal class Shadow2DProviderSource : Provider2DSource
     {
-        [SerializeField] Component m_Component;
+        [SerializeField]
+        Component m_Component;
 
-        public override void Initialize(Provider2D provider, Component component, int providerType) 
+        public override void Initialize(Provider2D provider, Component component, int providerType)
         {
             base.Initialize(provider, component, providerType);
             m_Component = component;

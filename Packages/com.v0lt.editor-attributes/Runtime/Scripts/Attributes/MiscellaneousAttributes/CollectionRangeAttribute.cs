@@ -15,7 +15,8 @@ namespace EditorAttributes
         /// </summary>
         /// <param name="minRange">Minimum size of the collection</param>
         /// <param name="maxRange">Maximum size of the collection</param>
-        public CollectionRangeAttribute(int minRange, int maxRange) : base(true)
+        public CollectionRangeAttribute(int minRange, int maxRange)
+            : base(true)
         {
             MinRange = minRange;
             MaxRange = maxRange;

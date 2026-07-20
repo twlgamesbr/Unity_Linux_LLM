@@ -4,7 +4,8 @@ namespace UnityEngine.Rendering.Universal
     {
         private DecalTechnique m_Technique;
 
-        public DecalDrawErrorSystem(DecalEntityManager entityManager, DecalTechnique technique) : base("DecalDrawErrorSystem.Execute", entityManager)
+        public DecalDrawErrorSystem(DecalEntityManager entityManager, DecalTechnique technique)
+            : base("DecalDrawErrorSystem.Execute", entityManager)
         {
             m_Technique = technique;
         }
@@ -14,7 +15,9 @@ namespace UnityEngine.Rendering.Universal
             switch (m_Technique)
             {
                 case DecalTechnique.DBuffer:
-                    return ((decalCachedChunk.passIndexDBuffer == -1) && (decalCachedChunk.passIndexEmissive == -1)) ? 0 : -1;
+                    return ((decalCachedChunk.passIndexDBuffer == -1) && (decalCachedChunk.passIndexEmissive == -1))
+                        ? 0
+                        : -1;
                 case DecalTechnique.ScreenSpace:
                     return decalCachedChunk.passIndexScreenSpace == -1 ? 0 : -1;
                 case DecalTechnique.GBuffer:

@@ -1,4 +1,3 @@
-
 namespace UnityEngine.Rendering.RadeonRays
 {
     internal static class SID
@@ -14,7 +13,9 @@ namespace UnityEngine.Rendering.RadeonRays
         public static readonly int g_constants_num_keys = Shader.PropertyToID("g_constants_num_keys");
         public static readonly int g_constants_input_keys_offset = Shader.PropertyToID("g_constants_input_keys_offset");
         public static readonly int g_constants_part_sums_offset = Shader.PropertyToID("g_constants_part_sums_offset");
-        public static readonly int g_constants_output_keys_offset = Shader.PropertyToID("g_constants_output_keys_offset");
+        public static readonly int g_constants_output_keys_offset = Shader.PropertyToID(
+            "g_constants_output_keys_offset"
+        );
         public static readonly int g_constants_num_blocks = Shader.PropertyToID("g_constants_num_blocks");
         public static readonly int g_constants_bit_shift = Shader.PropertyToID("g_constants_bit_shift");
         public static readonly int g_input_keys_offset = Shader.PropertyToID("g_input_keys_offset");
@@ -29,7 +30,9 @@ namespace UnityEngine.Rendering.RadeonRays
         public static readonly int g_ray_count = Shader.PropertyToID("g_ray_count");
         public static readonly int g_rays = Shader.PropertyToID("g_rays");
         public static readonly int g_hits = Shader.PropertyToID("g_hits");
-        public static readonly int g_constants_min_prims_per_treelet = Shader.PropertyToID("g_constants_min_prims_per_treelet");
+        public static readonly int g_constants_min_prims_per_treelet = Shader.PropertyToID(
+            "g_constants_min_prims_per_treelet"
+        );
         public static readonly int g_treelet_count_offset = Shader.PropertyToID("g_treelet_count_offset");
         public static readonly int g_treelet_roots_offset = Shader.PropertyToID("g_treelet_roots_offset");
         public static readonly int g_primitive_counts_offset = Shader.PropertyToID("g_primitive_counts_offset");

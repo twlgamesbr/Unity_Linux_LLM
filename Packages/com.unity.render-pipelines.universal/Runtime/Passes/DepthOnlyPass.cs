@@ -44,11 +44,7 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <seealso cref="RenderTextureDescriptor"/>
         /// <seealso cref="RTHandle"/>
         /// <seealso cref="GraphicsFormat"/>
-        public void Setup(
-            RenderTextureDescriptor baseDescriptor,
-            RTHandle depthAttachmentHandle)
-        {
-        }
+        public void Setup(RenderTextureDescriptor baseDescriptor, RTHandle depthAttachmentHandle) { }
 
         private static void ExecutePass(RasterCommandBuffer cmd, RendererList rendererList)
         {
@@ -63,22 +59,40 @@ namespace UnityEngine.Rendering.Universal.Internal
             internal RendererListHandle rendererList;
         }
 
-        private RendererListParams InitRendererListParams(UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+        private RendererListParams InitRendererListParams(
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData
+        )
         {
             var sortFlags = cameraData.defaultOpaqueSortFlags;
-            var drawSettings = RenderingUtils.CreateDrawingSettings(this.shaderTagId, renderingData, cameraData, lightData, sortFlags);
+            var drawSettings = RenderingUtils.CreateDrawingSettings(
+                this.shaderTagId,
+                renderingData,
+                cameraData,
+                lightData,
+                sortFlags
+            );
             drawSettings.perObjectData = PerObjectData.None;
             drawSettings.lodCrossFadeStencilMask = 0; // For stencil-based Lod, we use texture dither instead of stencil testing because we have the same shader variants for cross-fade shadow.
             return new RendererListParams(renderingData.cullResults, drawSettings, m_FilteringSettings);
         }
 
-        internal void Render(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle depthTexture, uint batchLayerMask, bool setGlobalDepth)
+        internal void Render(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle depthTexture,
+            uint batchLayerMask,
+            bool setGlobalDepth
+        )
         {
             UniversalRenderingData renderingData = frameData.Get<UniversalRenderingData>();
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalLightData lightData = frameData.Get<UniversalLightData>();
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 var param = InitRendererListParams(renderingData, cameraData, lightData);
                 param.filteringSettings.batchLayerMask = batchLayerMask;
@@ -93,7 +107,9 @@ namespace UnityEngine.Rendering.Universal.Internal
                 builder.AllowGlobalStateModification(true);
                 if (cameraData.xr.enabled)
                 {
-                    builder.EnableFoveatedRasterization(cameraData.xr.supportsFoveatedRendering && cameraData.xrUniversal.canFoveateIntermediatePasses);
+                    builder.EnableFoveatedRasterization(
+                        cameraData.xr.supportsFoveatedRendering && cameraData.xrUniversal.canFoveateIntermediatePasses
+                    );
                     // Apply MultiviewRenderRegionsCompatible flag only to the peripheral view in Quad Views
                     if (cameraData.xr.multipassId == 0)
                     {
@@ -101,10 +117,12 @@ namespace UnityEngine.Rendering.Universal.Internal
                     }
                 }
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    ExecutePass(context.cmd, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        ExecutePass(context.cmd, data.rendererList);
+                    }
+                );
             }
         }
     }

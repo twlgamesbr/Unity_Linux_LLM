@@ -32,9 +32,11 @@ namespace UnityEngine.InputSystem.Utilities
 
                 // position the pointer so it points at the memory where we should start filling in
                 // the current line
-                var ptr = coloursPtr
-                    + (y + radius) * d  // the position of the memory at the start of the row at the current y coordinate
-                    + radius - halfWidth;   // the position along the row where we should start inserting colours
+                var ptr =
+                    coloursPtr
+                    + (y + radius) * d // the position of the memory at the start of the row at the current y coordinate
+                    + radius
+                    - halfWidth; // the position along the row where we should start inserting colours
 
                 // fill in two pixels at a time
                 for (var x = 0; x < halfWidth; x++)
@@ -46,7 +48,14 @@ namespace UnityEngine.InputSystem.Utilities
 
             texture.Apply();
 
-            var sprite = Sprite.Create(texture, new Rect(0, 0, d, d), new Vector2(radius, radius), 1, 0, SpriteMeshType.FullRect);
+            var sprite = Sprite.Create(
+                texture,
+                new Rect(0, 0, d, d),
+                new Vector2(radius, radius),
+                1,
+                0,
+                SpriteMeshType.FullRect
+            );
             return sprite;
         }
     }

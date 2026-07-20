@@ -9,7 +9,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     /// Provides utility methods for unsafe, untyped buffers.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static class UnsafeUtilityExtensions
+    public static unsafe class UnsafeUtilityExtensions
     {
         /// <summary>
         /// Swaps bytes between two buffers.
@@ -20,8 +20,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <exception cref="System.InvalidOperationException">Thrown if the two ranges of bytes to swap overlap in memory.</exception>
         internal static void MemSwap(void* ptr, void* otherPtr, long size)
         {
-            byte* dst = (byte*) ptr;
-            byte* src = (byte*) otherPtr;
+            byte* dst = (byte*)ptr;
+            byte* src = (byte*)otherPtr;
 
             CheckMemSwapOverlap(dst, src, size);
 
@@ -49,8 +49,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="capacity">The buffer capacity (in number of elements). Used for the bounds checking.</param>
         /// <returns>The element read from the buffer.</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown if the index is out of bounds.</exception>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public unsafe static T ReadArrayElementBoundsChecked<T>(void* source, int index, int capacity)
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static unsafe T ReadArrayElementBoundsChecked<T>(void* source, int index, int capacity)
             where T : unmanaged
         {
             CheckIndexRange(index, capacity);
@@ -67,8 +67,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="index">The index at which to store the element.</param>
         /// <param name="capacity">The buffer capacity (in number of elements). Used for the bounds checking.</param>
         /// <exception cref="IndexOutOfRangeException">Thrown if the index is out of bounds.</exception>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public unsafe static void WriteArrayElementBoundsChecked<T>(void* destination, int index, T value, int capacity)
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static unsafe void WriteArrayElementBoundsChecked<T>(void* destination, int index, T value, int capacity)
             where T : unmanaged
         {
             CheckIndexRange(index, capacity);
@@ -83,7 +83,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="value">A read-only reference.</param>
         /// <returns>A pointer to the referenced value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public static void* AddressOf<T>(in T value)
             where T : unmanaged
         {
@@ -99,7 +99,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="value">A read-only reference.</param>
         /// <returns>A read-write reference to the value referenced by `item`.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public static ref T AsRef<T>(in T value)
             where T : unmanaged
         {
@@ -122,8 +122,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             {
                 throw new IndexOutOfRangeException(
                     $"Attempt to read or write from array index {index}, which is out of bounds. Array capacity is {capacity}. "
-                    +"This may lead to a crash, data corruption, or reading invalid data."
-                    );
+                        + "This may lead to a crash, data corruption, or reading invalid data."
+                );
             }
         }
     }

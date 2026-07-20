@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using System;
 using UnityEditor;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
 #endif
@@ -44,8 +43,10 @@ namespace UnityEngine.InputSystem.Editor
 
             for (var i = 0; i < index; i++)
             {
-                if (property.FindPropertyRelative(nameof(InputAction.m_Id))?.stringValue ==
-                    array.GetArrayElementAtIndex(i)?.FindPropertyRelative(nameof(InputAction.m_Id))?.stringValue)
+                if (
+                    property.FindPropertyRelative(nameof(InputAction.m_Id))?.stringValue
+                    == array.GetArrayElementAtIndex(i)?.FindPropertyRelative(nameof(InputAction.m_Id))?.stringValue
+                )
                     return true;
             }
 

@@ -11,6 +11,7 @@ public class FSR2OptionsEditor : Editor
     private SerializedProperty m_FixedResolution;
     private SerializedProperty m_EnableSharpening;
     private SerializedProperty m_Sharpness;
+
     private void OnEnable()
     {
         // Find each property by its exact field name in FSR2Options.cs
@@ -19,6 +20,7 @@ public class FSR2OptionsEditor : Editor
         m_EnableSharpening = serializedObject.FindProperty("m_EnableSharpening");
         m_Sharpness = serializedObject.FindProperty("m_Sharpness");
     }
+
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
@@ -26,7 +28,7 @@ public class FSR2OptionsEditor : Editor
         EditorGUILayout.PropertyField(m_QualityMode);
         EditorGUILayout.PropertyField(m_FixedResolution);
         EditorGUILayout.PropertyField(m_EnableSharpening);
-        if(m_EnableSharpening.boolValue)
+        if (m_EnableSharpening.boolValue)
             EditorGUILayout.PropertyField(m_Sharpness);
 
         serializedObject.ApplyModifiedProperties();

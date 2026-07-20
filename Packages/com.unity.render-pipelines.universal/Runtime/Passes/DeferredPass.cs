@@ -42,7 +42,9 @@ namespace UnityEngine.Rendering.Universal.Internal
             var depth = resourceData.activeDepthTexture;
             var gbuffer = resourceData.gBuffer;
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 passData.cameraData = cameraData;
                 passData.lightData = lightData;
@@ -57,15 +59,23 @@ namespace UnityEngine.Rendering.Universal.Internal
                     if (i == m_DeferredLights.GBufferLightingIndex)
                         continue;
 
-                    builder.SetInputAttachment(gbuffer[i], idx++); 
+                    builder.SetInputAttachment(gbuffer[i], idx++);
                 }
 
                 builder.AllowGlobalStateModification(true);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    data.deferredLights.ExecuteDeferredPass(context.cmd, data.cameraData, data.lightData, data.shadowData, data.gbuffer);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        data.deferredLights.ExecuteDeferredPass(
+                            context.cmd,
+                            data.cameraData,
+                            data.lightData,
+                            data.shadowData,
+                            data.gbuffer
+                        );
+                    }
+                );
             }
         }
 

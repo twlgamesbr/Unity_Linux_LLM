@@ -7,6 +7,7 @@ namespace UnityEditor.Rendering.Universal
     internal struct RunItemContext
     {
         ConverterItemInfo m_Item;
+
         /// <summary> The item that will go through the conversion code. </summary>
         public ConverterItemInfo item => m_Item;
 

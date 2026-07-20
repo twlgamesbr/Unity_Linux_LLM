@@ -13,14 +13,14 @@ namespace UnityEngine.TestTools.TestRunner
     }
 
     [Serializable]
-    internal class TestFinishedEvent : UnityEvent<ITestResult> {}
+    internal class TestFinishedEvent : UnityEvent<ITestResult> { }
 
     [Serializable]
-    internal class TestStartedEvent : UnityEvent<ITest> {}
+    internal class TestStartedEvent : UnityEvent<ITest> { }
 
     [Serializable]
-    internal class RunFinishedEvent : UnityEvent<ITestResult> {}
+    internal class RunFinishedEvent : UnityEvent<ITestResult> { }
 
     [Serializable]
-    internal class RunStartedEvent : UnityEvent<ITest> {}
+    internal class RunStartedEvent : UnityEvent<ITest> { }
 }

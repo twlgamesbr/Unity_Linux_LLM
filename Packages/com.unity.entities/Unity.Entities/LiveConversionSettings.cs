@@ -47,13 +47,15 @@ namespace Unity.Entities.Conversion
             set => SessionState.SetBool(EditorPrefsConversionDebugLog, value);
         }
 
-        internal static bool IsFullyIncremental => Mode == ConversionMode.IncrementalConversion ||
-                                                 Mode == ConversionMode.IncrementalConversionWithDebug;
+        internal static bool IsFullyIncremental =>
+            Mode == ConversionMode.IncrementalConversion || Mode == ConversionMode.IncrementalConversionWithDebug;
 
         internal static ConversionMode Mode
         {
-            get => (ConversionMode) SessionState.GetInt(EditorPrefsConversionMode, (int) ConversionMode.IncrementalConversion);
-            set => SessionState.SetInt(EditorPrefsConversionMode, (int) value);
+            get =>
+                (ConversionMode)
+                    SessionState.GetInt(EditorPrefsConversionMode, (int)ConversionMode.IncrementalConversion);
+            set => SessionState.SetInt(EditorPrefsConversionMode, (int)value);
         }
 
         public static bool IsLiveBakingLoggingEnabled

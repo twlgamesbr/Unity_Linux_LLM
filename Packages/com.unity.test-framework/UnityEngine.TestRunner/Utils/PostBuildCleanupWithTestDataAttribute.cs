@@ -23,7 +23,10 @@ namespace UnityEngine.TestTools
         /// <param name="targetClassName">The name of the target class.</param>
         public PostBuildCleanupWithTestDataAttribute(string targetClassName)
         {
-            TargetClass = AttributeHelper.GetTargetClassFromName(targetClassName, typeof(IPostbuildCleanupWithTestData));
+            TargetClass = AttributeHelper.GetTargetClassFromName(
+                targetClassName,
+                typeof(IPostbuildCleanupWithTestData)
+            );
         }
 
         internal Type TargetClass { get; private set; }

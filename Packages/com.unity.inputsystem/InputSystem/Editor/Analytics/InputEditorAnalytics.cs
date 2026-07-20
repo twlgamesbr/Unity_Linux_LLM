@@ -15,7 +15,7 @@ namespace UnityEngine.InputSystem.Editor
             SendMessages = 0,
             BroadcastMessages = 1,
             UnityEvents = 2,
-            CSharpEvents = 3
+            CSharpEvents = 3,
         }
 
         /// <summary>

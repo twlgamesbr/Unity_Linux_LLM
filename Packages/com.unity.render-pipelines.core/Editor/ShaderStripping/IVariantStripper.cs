@@ -19,7 +19,11 @@ namespace UnityEditor.Rendering
         /// <param name="shaderVariant"><see cref="TShaderVariant"/></param>
         /// <param name="shaderCompilerData">The variant</param>
         /// <returns>true if the variant is not used and can be stripped</returns>
-        bool CanRemoveVariant([DisallowNull] TShader shader, [DisallowNull] TShaderVariant shaderVariant, ShaderCompilerData shaderCompilerData);
+        bool CanRemoveVariant(
+            [DisallowNull] TShader shader,
+            [DisallowNull] TShaderVariant shaderVariant,
+            ShaderCompilerData shaderCompilerData
+        );
     }
 
     /// <summary>

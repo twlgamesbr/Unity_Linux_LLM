@@ -13,6 +13,7 @@ namespace Unity.Netcode
         /// Check whether this implementation is a "reader" - if it's been constructed to deserialize data
         /// </summary>
         public bool IsReader { get; }
+
         /// <summary>
         /// Check whether this implementation is a "writer" - if it's been constructed to serialize data
         /// </summary>
@@ -24,6 +25,7 @@ namespace Unity.Netcode
         /// </summary>
         /// <returns>underlying FastBufferReader</returns>
         public FastBufferReader GetFastBufferReader();
+
         /// <summary>
         /// Get the underlying FastBufferWriter struct.
         /// Only valid when IsWriter == true
@@ -52,7 +54,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
+        public void SerializeValue<T>(ref T value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
 
         /// <summary>
         /// Read or write an array of primitive values (int, bool, etc)
@@ -62,7 +65,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
+        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
 
         /// <summary>
         /// Read or write an enum value
@@ -70,7 +74,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum;
+        public void SerializeValue<T>(ref T value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum;
 
         /// <summary>
         /// Read or write an array of enum values
@@ -78,7 +83,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum;
+        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum;
 
         /// <summary>
         /// Read or write a struct value implementing ISerializeByMemcpy
@@ -86,7 +92,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy;
+        public void SerializeValue<T>(ref T value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy;
 
         /// <summary>
         /// Read or write an array of struct values implementing ISerializeByMemcpy
@@ -94,7 +101,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy;
+        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy;
 
         /// <summary>
         /// Read or write a NativeArray of struct values implementing ISerializeByMemcpy
@@ -103,7 +111,12 @@ namespace Unity.Netcode
         /// <param name="allocator">The allocator to use to construct the resulting NativeArray when reading</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref NativeArray<T> value, Allocator allocator, FastBufferWriter.ForGeneric unused = default) where T : unmanaged;
+        public void SerializeValue<T>(
+            ref NativeArray<T> value,
+            Allocator allocator,
+            FastBufferWriter.ForGeneric unused = default
+        )
+            where T : unmanaged;
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
         /// <summary>
@@ -112,7 +125,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default) where T : unmanaged;
+        public void SerializeValue<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default)
+            where T : unmanaged;
 #endif
 
         /// <summary>
@@ -121,7 +135,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T value, FastBufferWriter.ForNetworkSerializable unused = default) where T : INetworkSerializable, new();
+        public void SerializeValue<T>(ref T value, FastBufferWriter.ForNetworkSerializable unused = default)
+            where T : INetworkSerializable, new();
 
         /// <summary>
         /// Read or write an array of struct or class values implementing INetworkSerializable
@@ -129,7 +144,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
-        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForNetworkSerializable unused = default) where T : INetworkSerializable, new();
+        public void SerializeValue<T>(ref T[] value, FastBufferWriter.ForNetworkSerializable unused = default)
+            where T : INetworkSerializable, new();
 
         /// <summary>
         /// Read or write a FixedString value
@@ -297,7 +313,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="value">The value to read/write</param>
         /// <typeparam name="T">The network serializable type</typeparam>
-        public void SerializeNetworkSerializable<T>(ref T value) where T : INetworkSerializable, new();
+        public void SerializeNetworkSerializable<T>(ref T value)
+            where T : INetworkSerializable, new();
 
         /// <summary>
         /// Performs an advance check to ensure space is available to read/write one or more values.
@@ -340,7 +357,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type being serialized</typeparam>
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref T value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
+        public void SerializeValuePreChecked<T>(ref T value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
 
         /// <summary>
         /// Serialize an array of primitives, "pre-checked", which skips buffer checks.
@@ -351,7 +369,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type being serialized</typeparam>
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref T[] value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
+        public void SerializeValuePreChecked<T>(ref T[] value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>;
 
         /// <summary>
         /// Serialize an enum, "pre-checked", which skips buffer checks.
@@ -362,7 +381,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type being serialized</typeparam>
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref T value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum;
+        public void SerializeValuePreChecked<T>(ref T value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum;
 
         /// <summary>
         /// Serialize an array of enums, "pre-checked", which skips buffer checks.
@@ -373,7 +393,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type being serialized</typeparam>
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref T[] value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum;
+        public void SerializeValuePreChecked<T>(ref T[] value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum;
 
         /// <summary>
         /// Serialize a struct, "pre-checked", which skips buffer checks.
@@ -384,7 +405,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type being serialized</typeparam>
         /// <param name="value">The value to read/write</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref T value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy;
+        public void SerializeValuePreChecked<T>(ref T value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy;
 
         /// <summary>
         /// Serialize an array of structs, "pre-checked", which skips buffer checks.
@@ -395,7 +417,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type being serialized</typeparam>
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref T[] value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy;
+        public void SerializeValuePreChecked<T>(ref T[] value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy;
 
         /// <summary>
         /// Serialize a NativeArray of structs, "pre-checked", which skips buffer checks.
@@ -407,7 +430,12 @@ namespace Unity.Netcode
         /// <param name="value">The values to read/write</param>
         /// <param name="allocator">The allocator to use to construct the resulting NativeArray when reading</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref NativeArray<T> value, Allocator allocator, FastBufferWriter.ForGeneric unused = default) where T : unmanaged;
+        public void SerializeValuePreChecked<T>(
+            ref NativeArray<T> value,
+            Allocator allocator,
+            FastBufferWriter.ForGeneric unused = default
+        )
+            where T : unmanaged;
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
         /// <summary>
@@ -419,7 +447,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type being serialized</typeparam>
         /// <param name="value">The values to read/write</param>
         /// <param name="unused">An unused parameter that can be used for enabling overload resolution based on generic constraints</param>
-        public void SerializeValuePreChecked<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default) where T : unmanaged;
+        public void SerializeValuePreChecked<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default)
+            where T : unmanaged;
 #endif
 
         /// <summary>

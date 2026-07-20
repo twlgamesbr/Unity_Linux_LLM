@@ -14,11 +14,22 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public static IEnumerable<PlayModeCapabilityAssetDefinition> GetPlayModeCapabilityAssets()
         {
-            return AssetDatabase.FindAssets($"t:{nameof(PlayModeCapabilityAssetDefinition)}").
-                Select(guid => AssetDatabase.LoadAssetAtPath<PlayModeCapabilityAssetDefinition>(AssetDatabase.GUIDToAssetPath(guid)));
+            return AssetDatabase
+                .FindAssets($"t:{nameof(PlayModeCapabilityAssetDefinition)}")
+                .Select(guid =>
+                    AssetDatabase.LoadAssetAtPath<PlayModeCapabilityAssetDefinition>(
+                        AssetDatabase.GUIDToAssetPath(guid)
+                    )
+                );
         }
 
-        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
+        private static void OnPostprocessAllAssets(
+            string[] importedAssets,
+            string[] deletedAssets,
+            string[] movedAssets,
+            string[] movedFromAssetPaths,
+            bool didDomainReload
+        )
         {
             if (!s_PlayModeCapabilityAssetsChanged)
             {
@@ -32,7 +43,7 @@ namespace Unity.PlatformToolkit.PlayMode
                 }
             }
 
-            if(s_PlayModeCapabilityAssetsChanged)
+            if (s_PlayModeCapabilityAssetsChanged)
             {
                 PlayModeCapabilityAssetsCreatedOrDeleted?.Invoke();
                 s_PlayModeCapabilityAssetsChanged = false;
@@ -46,14 +57,26 @@ namespace Unity.PlatformToolkit.PlayMode
 
         internal static IEnumerable<Texture2D> GetInitialAccountPictures()
         {
-            var accountPictureFolder = Path.Combine("Packages", "com.unity.platformtoolkit", "EditorResources", "PlayMode", "Accounts");
+            var accountPictureFolder = Path.Combine(
+                "Packages",
+                "com.unity.platformtoolkit",
+                "EditorResources",
+                "PlayMode",
+                "Accounts"
+            );
             string[] assets = AssetDatabase.FindAssets("a:packages t:Texture2D", new string[] { accountPictureFolder });
             return assets.Select(guid => AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath(guid)));
         }
 
         internal static Texture2D GetAttributeTextureByIndex(int userIndex)
         {
-            var folder = Path.Combine("Packages", "com.unity.platformtoolkit", "EditorResources", "PlayMode", "Attributes");
+            var folder = Path.Combine(
+                "Packages",
+                "com.unity.platformtoolkit",
+                "EditorResources",
+                "PlayMode",
+                "Attributes"
+            );
             var path = Path.Combine(folder, $"{userIndex:D4}.png");
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }

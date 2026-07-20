@@ -10,23 +10,22 @@ using UnityEngine;
 namespace Unity.Multiplayer.Tools.Adapters.Ngo1
 {
     class Ngo1Adapter
-
         : INetworkAdapter
-
-        // Events
-        // --------------------------------------------------------------------
-        , IGetConnectedClients
-        , IMetricCollectionEvent
-        , IGetConnectionStatus
-
-        // Queries
-        // --------------------------------------------------------------------
-        , IGetBandwidth
-        , IGetClientId
-        , IGetGameObject
-        , IGetObjectIds
-        , IGetOwnership
-        , IGetRpcCount
+            // Events
+            // --------------------------------------------------------------------
+            ,
+            IGetConnectedClients,
+            IMetricCollectionEvent,
+            IGetConnectionStatus
+            // Queries
+            // --------------------------------------------------------------------
+            ,
+            IGetBandwidth,
+            IGetClientId,
+            IGetGameObject,
+            IGetObjectIds,
+            IGetOwnership,
+            IGetRpcCount
     {
         [MaybeNull]
         NetworkManager m_NetworkManager;
@@ -129,22 +128,24 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
             }
         }
 
-        public AdapterMetadata Metadata { get; } = new AdapterMetadata
-        {
-            PackageInfo = new PackageInfo
+        public AdapterMetadata Metadata { get; } =
+            new AdapterMetadata
             {
-                PackageName = "com.unity.netcode.gameobjects",
-                Version = new PackageVersion
+                PackageInfo = new PackageInfo
                 {
-                    Major = 1,
-                    Minor = 0,
-                    Patch = 0,
-                    PreRelease = ""
-                }
-            }
-        };
+                    PackageName = "com.unity.netcode.gameobjects",
+                    Version = new PackageVersion
+                    {
+                        Major = 1,
+                        Minor = 0,
+                        Patch = 0,
+                        PreRelease = "",
+                    },
+                },
+            };
 
-        public T GetComponent<T>() where T : class, IAdapterComponent
+        public T GetComponent<T>()
+            where T : class, IAdapterComponent
         {
             return this as T;
         }
@@ -153,6 +154,7 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
         // --------------------------------------------------------------------
         public IReadOnlyList<ClientId> ConnectedClients => m_ClientIds;
         public event Action<ClientId> ClientConnectionEvent;
+
         void OnClientConnected(ulong clientId)
         {
             var typedClientId = (ClientId)clientId;
@@ -212,6 +214,7 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
         }
 
         public event Action<MetricCollection> MetricCollectionEvent;
+
         void OnMetricsReceived(MetricCollection metricCollection)
         {
             UpdateNetworkTrafficCaches(metricCollection);
@@ -302,9 +305,10 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
         public float GetBandwidthBytes(
             ObjectId objectId,
             BandwidthTypes bandwidthTypes = BandwidthTypes.All,
-            NetworkDirection networkDirection = NetworkDirection.SentAndReceived)
-            => m_BandwidthCache?.GetBandwidth(objectId, bandwidthTypes, networkDirection)
-                ?? throw new NoSubscribersException(nameof(IGetBandwidth), nameof(OnBandwidthUpdated));
+            NetworkDirection networkDirection = NetworkDirection.SentAndReceived
+        ) =>
+            m_BandwidthCache?.GetBandwidth(objectId, bandwidthTypes, networkDirection)
+            ?? throw new NoSubscribersException(nameof(IGetBandwidth), nameof(OnBandwidthUpdated));
 
         // IGetRpcCount
         // --------------------------------------------------------------------
@@ -326,9 +330,9 @@ namespace Unity.Multiplayer.Tools.Adapters.Ngo1
             }
         }
 
-        public int GetRpcCount(ObjectId objectId)
-            => m_RpcCountCache?.GetRpcCount(objectId)
-               ?? throw new NoSubscribersException(nameof(IGetRpcCount), nameof(OnRpcCountUpdated));
+        public int GetRpcCount(ObjectId objectId) =>
+            m_RpcCountCache?.GetRpcCount(objectId)
+            ?? throw new NoSubscribersException(nameof(IGetRpcCount), nameof(OnRpcCountUpdated));
 
         void ClearConnectedClients()
         {

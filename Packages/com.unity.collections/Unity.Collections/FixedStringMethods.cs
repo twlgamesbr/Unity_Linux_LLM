@@ -9,7 +9,7 @@ namespace Unity.Collections
     /// Provides extension methods for string, UnsafeText, and NativeText.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static partial class FixedStringMethods
+    public static unsafe partial class FixedStringMethods
     {
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         internal static void CheckSubstringInRange(int strLength, int startIndex, int length)
@@ -26,7 +26,9 @@ namespace Unity.Collections
 
             if (startIndex > strLength)
             {
-                throw new ArgumentOutOfRangeException($"startIndex {startIndex} cannot be larger than string length {strLength}.");
+                throw new ArgumentOutOfRangeException(
+                    $"startIndex {startIndex} cannot be larger than string length {strLength}."
+                );
             }
         }
 
@@ -74,7 +76,12 @@ namespace Unity.Collections
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <returns>A `NativeText` string with a length equivalent to `length` that starts at `startIndex` and an allocator type of `allocator`.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if startIndex or length parameter is negative, or if startIndex is larger than string length.</exception>
-        public static NativeText Substring(ref this NativeText str, int startIndex, int length, AllocatorManager.AllocatorHandle allocator)
+        public static NativeText Substring(
+            ref this NativeText str,
+            int startIndex,
+            int length,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             CheckSubstringInRange(str.Length, startIndex, length);
             length = math.min(length, str.Length - startIndex);
@@ -91,7 +98,11 @@ namespace Unity.Collections
         /// <param name="startIndex">Start index of substring.</param>
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <returns>A NativeText string that begins at `startIndex` and has an allocator of type `allocator`.</returns>
-        public static NativeText Substring(ref this NativeText str, int startIndex, AllocatorManager.AllocatorHandle allocator)
+        public static NativeText Substring(
+            ref this NativeText str,
+            int startIndex,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             return str.Substring(startIndex, str.Length - startIndex);
         }
@@ -133,7 +144,7 @@ namespace Unity.Collections
         {
             var dstLen = fs.Length;
             int index = 0;
-            while(index < dstLen)
+            while (index < dstLen)
             {
                 int tempIndex = index;
                 var runeAtIndex = Read(ref fs, ref tempIndex);
@@ -166,9 +177,7 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop :
-                {
-                }
+                end_of_loop: { }
             }
             return -1;
         }
@@ -184,7 +193,13 @@ namespace Unity.Collections
         /// <param name="distance">The last index in this string to consider as the first byte of the byte sequence.</param>
         /// <returns>The index of the first occurrence of the byte sequence in this string. Returns -1 if no occurrence is found.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]
-        public static int IndexOf<T>(ref this T fs, byte* bytes, int bytesLen, int startIndex, int distance = Int32.MaxValue)
+        public static int IndexOf<T>(
+            ref this T fs,
+            byte* bytes,
+            int bytesLen,
+            int startIndex,
+            int distance = Int32.MaxValue
+        )
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             var dst = fs.GetUnsafePtr();
@@ -196,9 +211,7 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop :
-                {
-                }
+                end_of_loop: { }
             }
             return -1;
         }
@@ -211,8 +224,10 @@ namespace Unity.Collections
         /// <param name="fs">A string to search.</param>
         /// <param name="other">A substring to search for within this string.</param>
         /// <returns>The index of the first occurrence of the second string within this string. Returns -1 if no occurrence is found.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static int IndexOf<T,T2>(ref this T fs, in T2 other)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static int IndexOf<T, T2>(ref this T fs, in T2 other)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -230,8 +245,10 @@ namespace Unity.Collections
         /// <param name="startIndex">The first index in this string to consider as an occurrence of the second string.</param>
         /// <param name="distance">The last index in this string to consider as an occurrence of the second string.</param>
         /// <returns>The index of the first occurrence of the substring within this string. Returns -1 if no occurrence is found.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static int IndexOf<T,T2>(ref this T fs, in T2 other, int startIndex, int distance = Int32.MaxValue)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static int IndexOf<T, T2>(ref this T fs, in T2 other, int startIndex, int distance = Int32.MaxValue)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -247,8 +264,10 @@ namespace Unity.Collections
         /// <param name="fs">A string to search.</param>
         /// <param name="other">A substring to search for within this string.</param>
         /// <returns>True if the substring occurs within this string.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static bool Contains<T,T2>(ref this T fs, in T2 other)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static bool Contains<T, T2>(ref this T fs, in T2 other)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -301,9 +320,7 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop :
-                {
-                }
+                end_of_loop: { }
             }
             return -1;
         }
@@ -319,7 +336,13 @@ namespace Unity.Collections
         /// <param name="distance">The greatest index in this string to consider as the first byte of the byte sequence.</param>
         /// <returns>The index of the last occurrence of the byte sequence within this string. Returns -1 if no occurrences found.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]
-        public static int LastIndexOf<T>(ref this T fs, byte* bytes, int bytesLen, int startIndex, int distance = int.MaxValue)
+        public static int LastIndexOf<T>(
+            ref this T fs,
+            byte* bytes,
+            int bytesLen,
+            int startIndex,
+            int distance = int.MaxValue
+        )
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             var dst = fs.GetUnsafePtr();
@@ -332,9 +355,7 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop :
-                {
-                }
+                end_of_loop: { }
             }
             return -1;
         }
@@ -347,8 +368,10 @@ namespace Unity.Collections
         /// <param name="fs">A string to search.</param>
         /// <param name="other">A substring to search for in the this string.</param>
         /// <returns>The index of the last occurrence of the substring within this string. Returns -1 if no occurrence is found.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static int LastIndexOf<T,T2>(ref this T fs, in T2 other)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static int LastIndexOf<T, T2>(ref this T fs, in T2 other)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -366,8 +389,10 @@ namespace Unity.Collections
         /// <param name="startIndex">The greatest index in this string to consider as an occurrence of the substring.</param>
         /// <param name="distance">The smallest index in this string to consider as an occurrence of the substring.</param>
         /// <returns>the index of the last occurrence of the substring within the first string. Returns -1 if no occurrence is found.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static int LastIndexOf<T,T2>(ref this T fs, in T2 other, int startIndex, int distance = Int32.MaxValue)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static int LastIndexOf<T, T2>(ref this T fs, in T2 other, int startIndex, int distance = Int32.MaxValue)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -422,8 +447,10 @@ namespace Unity.Collections
         /// -1 denotes that this string should be sorted to precede the other.<br/>
         /// +1 denotes that this first string should be sorted to follow the other.<br/>
         /// </returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static int CompareTo<T,T2>(ref this T fs, in T2 other)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static int CompareTo<T, T2>(ref this T fs, in T2 other)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -460,8 +487,10 @@ namespace Unity.Collections
         /// <param name="fs">A string to compare for equality.</param>
         /// <param name="other">Another string to compare for equality.</param>
         /// <returns>true if the two strings have the same length and matching content.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static bool Equals<T,T2>(ref this T fs, in T2 other)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static bool Equals<T, T2>(ref this T fs, in T2 other)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -583,9 +612,7 @@ namespace Unity.Collections
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             var len = rune.LengthInUtf8Bytes();
-            return fs.Length >= len
-                && 0 == UTF8ArrayUnsafeUtility.StrCmp(fs.GetUnsafePtr(), len, &rune, 1)
-                ;
+            return fs.Length >= len && 0 == UTF8ArrayUnsafeUtility.StrCmp(fs.GetUnsafePtr(), len, &rune, 1);
         }
 
         /// <summary>
@@ -596,15 +623,16 @@ namespace Unity.Collections
         /// <param name="fs">A string to search.</param>
         /// <param name="other">A substring to search for within this string.</param>
         /// <returns>True if the substring occurs at the beginning of this string.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
         public static bool StartsWith<T, U>(ref this T fs, in U other)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where U : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             var len = other.Length;
             return fs.Length >= len
-                && 0 == UTF8ArrayUnsafeUtility.StrCmp(fs.GetUnsafePtr(), len, other.GetUnsafePtr(), len)
-                ;
+                && 0 == UTF8ArrayUnsafeUtility.StrCmp(fs.GetUnsafePtr(), len, other.GetUnsafePtr(), len);
         }
 
         /// <summary>
@@ -620,8 +648,7 @@ namespace Unity.Collections
         {
             var len = rune.LengthInUtf8Bytes();
             return fs.Length >= len
-                && 0 == UTF8ArrayUnsafeUtility.StrCmp(fs.GetUnsafePtr() + fs.Length - len, len, &rune, 1)
-                ;
+                && 0 == UTF8ArrayUnsafeUtility.StrCmp(fs.GetUnsafePtr() + fs.Length - len, len, &rune, 1);
         }
 
         /// <summary>
@@ -632,15 +659,22 @@ namespace Unity.Collections
         /// <param name="fs">A string to search.</param>
         /// <param name="other">A substring to search for within this string.</param>
         /// <returns>True if the substring occurs at the end of this string.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
         public static bool EndsWith<T, U>(ref this T fs, in U other)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where U : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             var len = other.Length;
             return fs.Length >= len
-                && 0 == UTF8ArrayUnsafeUtility.StrCmp(fs.GetUnsafePtr() + fs.Length - len, len, other.GetUnsafePtr(), len)
-                ;
+                && 0
+                    == UTF8ArrayUnsafeUtility.StrCmp(
+                        fs.GetUnsafePtr() + fs.Length - len,
+                        len,
+                        other.GetUnsafePtr(),
+                        len
+                    );
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]
@@ -655,8 +689,7 @@ namespace Unity.Collections
             {
                 var prev = index;
                 var error = Unicode.Utf8ToUcs(out var rune, ptr, ref index, lengthInBytes);
-                if (error != ConversionError.None
-                || !rune.IsWhiteSpace())
+                if (error != ConversionError.None || !rune.IsWhiteSpace())
                 {
                     index -= index - prev;
                     break;
@@ -685,8 +718,7 @@ namespace Unity.Collections
                     doTrim |= trimRunes[i] == rune;
                 }
 
-                if (error != ConversionError.None
-                || !doTrim)
+                if (error != ConversionError.None || !doTrim)
                 {
                     index -= index - prev;
                     break;
@@ -708,8 +740,7 @@ namespace Unity.Collections
             {
                 var prev = index;
                 var error = Unicode.Utf8ToUcsReverse(out var rune, ptr, ref index, lengthInBytes);
-                if (error != ConversionError.None
-                || !rune.IsWhiteSpace())
+                if (error != ConversionError.None || !rune.IsWhiteSpace())
                 {
                     index += prev - index;
                     break;
@@ -738,8 +769,7 @@ namespace Unity.Collections
                     doTrim |= trimRunes[i] == rune;
                 }
 
-                if (error != ConversionError.None
-                || !doTrim)
+                if (error != ConversionError.None || !doTrim)
                 {
                     index += prev - index;
                     break;
@@ -823,7 +853,11 @@ namespace Unity.Collections
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <param name="trimRunes">Runes that should be trimmed.</param>
         /// <returns>Returns instance of this string with specific characters removed from the start of the string.</returns>
-        public static UnsafeText TrimStart(ref this UnsafeText fs, AllocatorManager.AllocatorHandle allocator, ReadOnlySpan<Unicode.Rune> trimRunes)
+        public static UnsafeText TrimStart(
+            ref this UnsafeText fs,
+            AllocatorManager.AllocatorHandle allocator,
+            ReadOnlySpan<Unicode.Rune> trimRunes
+        )
         {
             var index = fs.TrimStartIndex(trimRunes);
             var lengthInBytes = fs.Length - index;
@@ -840,7 +874,11 @@ namespace Unity.Collections
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <param name="trimRunes">Runes that should be trimmed.</param>
         /// <returns>Returns instance of this string with specific characters removed from the start of the string.</returns>
-        public static NativeText TrimStart(ref this NativeText fs, AllocatorManager.AllocatorHandle allocator, ReadOnlySpan<Unicode.Rune> trimRunes)
+        public static NativeText TrimStart(
+            ref this NativeText fs,
+            AllocatorManager.AllocatorHandle allocator,
+            ReadOnlySpan<Unicode.Rune> trimRunes
+        )
         {
             var index = fs.TrimStartIndex(trimRunes);
             var lengthInBytes = fs.Length - index;
@@ -924,7 +962,11 @@ namespace Unity.Collections
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <param name="trimRunes">Runes that should be trimmed.</param>
         /// <returns>Returns instance of this string with specific characters removed from the end of the string.</returns>
-        public static UnsafeText TrimEnd(ref this UnsafeText fs, AllocatorManager.AllocatorHandle allocator, ReadOnlySpan<Unicode.Rune> trimRunes)
+        public static UnsafeText TrimEnd(
+            ref this UnsafeText fs,
+            AllocatorManager.AllocatorHandle allocator,
+            ReadOnlySpan<Unicode.Rune> trimRunes
+        )
         {
             var index = fs.TrimEndIndex(trimRunes);
             var lengthInBytes = index;
@@ -941,7 +983,11 @@ namespace Unity.Collections
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <param name="trimRunes">Runes that should be trimmed.</param>
         /// <returns>Returns instance of this string with specific characters removed from the end of the string.</returns>
-        public static NativeText TrimEnd(ref this NativeText fs, AllocatorManager.AllocatorHandle allocator, ReadOnlySpan<Unicode.Rune> trimRunes)
+        public static NativeText TrimEnd(
+            ref this NativeText fs,
+            AllocatorManager.AllocatorHandle allocator,
+            ReadOnlySpan<Unicode.Rune> trimRunes
+        )
         {
             var index = fs.TrimEndIndex(trimRunes);
             var lengthInBytes = index;
@@ -1049,7 +1095,11 @@ namespace Unity.Collections
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <param name="trimRunes">Runes that should be trimmed.</param>
         /// <returns>Returns instance of this string with specific characters removed from the begining and the end of the string.</returns>
-        public static UnsafeText Trim(ref this UnsafeText fs, AllocatorManager.AllocatorHandle allocator, ReadOnlySpan<Unicode.Rune> trimRunes)
+        public static UnsafeText Trim(
+            ref this UnsafeText fs,
+            AllocatorManager.AllocatorHandle allocator,
+            ReadOnlySpan<Unicode.Rune> trimRunes
+        )
         {
             var start = fs.TrimStartIndex(trimRunes);
             if (start == fs.Length)
@@ -1072,7 +1122,11 @@ namespace Unity.Collections
         /// <param name="allocator">The <see cref="AllocatorManager.AllocatorHandle"/> allocator type to use.</param>
         /// <param name="trimRunes">Runes that should be trimmed.</param>
         /// <returns>Returns instance of this string with specific characters removed from the begining and the end of the string.</returns>
-        public static NativeText Trim(ref this NativeText fs, AllocatorManager.AllocatorHandle allocator, ReadOnlySpan<Unicode.Rune> trimRunes)
+        public static NativeText Trim(
+            ref this NativeText fs,
+            AllocatorManager.AllocatorHandle allocator,
+            ReadOnlySpan<Unicode.Rune> trimRunes
+        )
         {
             var start = fs.TrimStartIndex(trimRunes);
             if (start == fs.Length)
@@ -1105,7 +1159,7 @@ namespace Unity.Collections
 
             Unicode.Rune rune;
             var error = ConversionError.None;
-            for (var i = 0; i < lengthInBytes && error == ConversionError.None;)
+            for (var i = 0; i < lengthInBytes && error == ConversionError.None; )
             {
                 error = Unicode.Utf8ToUcs(out rune, ptr, ref i, lengthInBytes);
                 result.Append(rune.ToLowerAscii());
@@ -1129,7 +1183,7 @@ namespace Unity.Collections
 
             Unicode.Rune rune;
             var error = ConversionError.None;
-            for (var i = 0; i < lengthInBytes && error == ConversionError.None;)
+            for (var i = 0; i < lengthInBytes && error == ConversionError.None; )
             {
                 error = Unicode.Utf8ToUcs(out rune, ptr, ref i, lengthInBytes);
                 result.Append(rune.ToLowerAscii());
@@ -1153,7 +1207,7 @@ namespace Unity.Collections
 
             Unicode.Rune rune;
             var error = ConversionError.None;
-            for (var i = 0; i < lengthInBytes && error == ConversionError.None;)
+            for (var i = 0; i < lengthInBytes && error == ConversionError.None; )
             {
                 error = Unicode.Utf8ToUcs(out rune, ptr, ref i, lengthInBytes);
                 result.Append(rune.ToLowerAscii());
@@ -1179,7 +1233,7 @@ namespace Unity.Collections
 
             Unicode.Rune rune;
             var error = ConversionError.None;
-            for (var i = 0; i < lengthInBytes && error == ConversionError.None;)
+            for (var i = 0; i < lengthInBytes && error == ConversionError.None; )
             {
                 error = Unicode.Utf8ToUcs(out rune, ptr, ref i, lengthInBytes);
                 result.Append(rune.ToUpperAscii());
@@ -1203,7 +1257,7 @@ namespace Unity.Collections
 
             Unicode.Rune rune;
             var error = ConversionError.None;
-            for (var i = 0; i < lengthInBytes && error == ConversionError.None;)
+            for (var i = 0; i < lengthInBytes && error == ConversionError.None; )
             {
                 error = Unicode.Utf8ToUcs(out rune, ptr, ref i, lengthInBytes);
                 result.Append(rune.ToUpperAscii());
@@ -1227,7 +1281,7 @@ namespace Unity.Collections
 
             Unicode.Rune rune;
             var error = ConversionError.None;
-            for (var i = 0; i < lengthInBytes && error == ConversionError.None;)
+            for (var i = 0; i < lengthInBytes && error == ConversionError.None; )
             {
                 error = Unicode.Utf8ToUcs(out rune, ptr, ref i, lengthInBytes);
                 result.Append(rune.ToUpperAscii());

@@ -65,10 +65,7 @@ namespace Unity.Rendering
         /// Only valid if <see cref="HasMaterialMeshIndexRange"/> is true.
         /// </remarks>
         public (ushort start, byte length) MaterialMeshIndexRange =>
-        (
-            ExtractMaterialMeshIndexRangeStart(),
-            ExtractMaterialMeshIndexRangeLength()
-        );
+            (ExtractMaterialMeshIndexRangeStart(), ExtractMaterialMeshIndexRangeLength());
 
         /// <summary>
         /// The MaterialMeshIndex range. (as RangeInt)
@@ -80,11 +77,8 @@ namespace Unity.Rendering
         /// Only valid if <see cref="HasMaterialMeshIndexRange"/> is true.
         ///
         /// </remarks>
-        public RangeInt MaterialMeshIndexRangeAsInt => new()
-        {
-            start = ExtractMaterialMeshIndexRangeStart(),
-            length = ExtractMaterialMeshIndexRangeLength(),
-        };
+        public RangeInt MaterialMeshIndexRangeAsInt =>
+            new() { start = ExtractMaterialMeshIndexRangeStart(), length = ExtractMaterialMeshIndexRangeLength() };
 
         /// <summary>
         /// True if this SubMeshIndexInfo32 contains a range of submeshes
@@ -100,14 +94,20 @@ namespace Unity.Rendering
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         ushort ExtractMaterialMeshIndexRangeStart()
         {
-            Assert.IsTrue(HasMaterialMeshIndexRangeBit(), "MaterialMeshIndexRange is only valid when HasMaterialMeshIndexRange is true");
+            Assert.IsTrue(
+                HasMaterialMeshIndexRangeBit(),
+                "MaterialMeshIndexRange is only valid when HasMaterialMeshIndexRange is true"
+            );
             return (ushort)(m_Value & 0xfffff); // 0xfffff is 20 bits
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         byte ExtractMaterialMeshIndexRangeLength()
         {
-            Assert.IsTrue(HasMaterialMeshIndexRangeBit(), "MaterialMeshIndexRange is only valid when HasMaterialMeshIndexRange is true");
+            Assert.IsTrue(
+                HasMaterialMeshIndexRangeBit(),
+                "MaterialMeshIndexRange is only valid when HasMaterialMeshIndexRange is true"
+            );
             return (byte)((m_Value >> 20) & 0x7f); // 0x7f is 7 bits, 20 is the offset
         }
 
@@ -161,8 +161,9 @@ namespace Unity.Rendering
         /// <returns>
         /// A string representation of the SubMeshIndexInfo32.
         /// </returns>
-        public override string ToString() => HasMaterialMeshIndexRangeBit()
-            ? $"MaterialMeshIndexRange: From: {MaterialMeshIndexRange.start}, To: {MaterialMeshIndexRange.start + MaterialMeshIndexRange.length}"
-            : $"SubMesh: {SubMesh}";
+        public override string ToString() =>
+            HasMaterialMeshIndexRangeBit()
+                ? $"MaterialMeshIndexRange: From: {MaterialMeshIndexRange.start}, To: {MaterialMeshIndexRange.start + MaterialMeshIndexRange.length}"
+                : $"SubMesh: {SubMesh}";
     }
 }

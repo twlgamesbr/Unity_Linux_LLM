@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace TMPro
 {
     /// <summary>
@@ -21,14 +20,13 @@ namespace TMPro
             {
                 // Try loading the TMP Settings from a Resources folder in the user project.
                 s_TextSettings = Resources.Load<TMP_Settings>("TextSettings"); // ?? ScriptableObject.CreateInstance<TMP_Settings>();
-
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 if (s_TextSettings == null)
                 {
                     // Open TMP Resources Importer to enable the user to import the TMP Essential Resources and option TMP Examples & Extras
                     TMP_PackageResourceImporterWindow.ShowPackageImporterWindow();
                 }
-                #endif
+#endif
             }
 
             return s_TextSettings;
@@ -46,20 +44,28 @@ namespace TMPro
             public long familyNameAndStyleHashCode;
             public readonly TMP_FontAsset fontAsset;
 
-            public FontAssetRef(int nameHashCode, int familyNameHashCode, int styleNameHashCode, TMP_FontAsset fontAsset)
+            public FontAssetRef(
+                int nameHashCode,
+                int familyNameHashCode,
+                int styleNameHashCode,
+                TMP_FontAsset fontAsset
+            )
             {
                 // Use familyNameHashCode for font assets created at runtime as these asset do not typically have a names.
                 this.nameHashCode = nameHashCode != 0 ? nameHashCode : familyNameHashCode;
                 this.familyNameHashCode = familyNameHashCode;
                 this.styleNameHashCode = styleNameHashCode;
-                this.familyNameAndStyleHashCode = (long) styleNameHashCode << 32 | (uint) familyNameHashCode;
+                this.familyNameAndStyleHashCode = (long)styleNameHashCode << 32 | (uint)familyNameHashCode;
                 this.fontAsset = fontAsset;
             }
         }
 
-        static readonly Dictionary<EntityId, FontAssetRef> s_FontAssetReferences = new Dictionary<EntityId, FontAssetRef>();
-        static readonly Dictionary<int, TMP_FontAsset> s_FontAssetNameReferenceLookup = new Dictionary<int, TMP_FontAsset>();
-        static readonly Dictionary<long, TMP_FontAsset> s_FontAssetFamilyNameAndStyleReferenceLookup = new Dictionary<long, TMP_FontAsset>();
+        static readonly Dictionary<EntityId, FontAssetRef> s_FontAssetReferences =
+            new Dictionary<EntityId, FontAssetRef>();
+        static readonly Dictionary<int, TMP_FontAsset> s_FontAssetNameReferenceLookup =
+            new Dictionary<int, TMP_FontAsset>();
+        static readonly Dictionary<long, TMP_FontAsset> s_FontAssetFamilyNameAndStyleReferenceLookup =
+            new Dictionary<long, TMP_FontAsset>();
         static readonly List<EntityId> s_FontAssetRemovalList = new List<EntityId>(16);
 
         static readonly int k_RegularStyleHashCode = TMP_TextUtilities.GetHashCode("Regular");
@@ -74,7 +80,12 @@ namespace TMPro
 
             if (!s_FontAssetReferences.ContainsKey(entityId))
             {
-                FontAssetRef fontAssetRef = new FontAssetRef(fontAsset.hashCode, fontAsset.familyNameHashCode, fontAsset.styleNameHashCode, fontAsset);
+                FontAssetRef fontAssetRef = new FontAssetRef(
+                    fontAsset.hashCode,
+                    fontAsset.familyNameHashCode,
+                    fontAsset.styleNameHashCode,
+                    fontAsset
+                );
                 s_FontAssetReferences.Add(entityId, fontAssetRef);
 
                 // Add font asset to name reference lookup
@@ -83,14 +94,21 @@ namespace TMPro
 
                 // Add font asset to family name and style lookup
                 if (!s_FontAssetFamilyNameAndStyleReferenceLookup.ContainsKey(fontAssetRef.familyNameAndStyleHashCode))
-                    s_FontAssetFamilyNameAndStyleReferenceLookup.Add(fontAssetRef.familyNameAndStyleHashCode, fontAsset);
+                    s_FontAssetFamilyNameAndStyleReferenceLookup.Add(
+                        fontAssetRef.familyNameAndStyleHashCode,
+                        fontAsset
+                    );
             }
             else
             {
                 FontAssetRef fontAssetRef = s_FontAssetReferences[entityId];
 
                 // Return if font asset name, family and style name have not changed.
-                if (fontAssetRef.nameHashCode == fontAsset.hashCode && fontAssetRef.familyNameHashCode == fontAsset.familyNameHashCode && fontAssetRef.styleNameHashCode == fontAsset.styleNameHashCode)
+                if (
+                    fontAssetRef.nameHashCode == fontAsset.hashCode
+                    && fontAssetRef.familyNameHashCode == fontAsset.familyNameHashCode
+                    && fontAssetRef.styleNameHashCode == fontAsset.styleNameHashCode
+                )
                     return;
 
                 // Check if font asset name has changed
@@ -105,16 +123,27 @@ namespace TMPro
                 }
 
                 // Check if family or style name has changed
-                if (fontAssetRef.familyNameHashCode != fontAsset.familyNameHashCode || fontAssetRef.styleNameHashCode != fontAsset.styleNameHashCode)
+                if (
+                    fontAssetRef.familyNameHashCode != fontAsset.familyNameHashCode
+                    || fontAssetRef.styleNameHashCode != fontAsset.styleNameHashCode
+                )
                 {
                     s_FontAssetFamilyNameAndStyleReferenceLookup.Remove(fontAssetRef.familyNameAndStyleHashCode);
 
                     fontAssetRef.familyNameHashCode = fontAsset.familyNameHashCode;
                     fontAssetRef.styleNameHashCode = fontAsset.styleNameHashCode;
-                    fontAssetRef.familyNameAndStyleHashCode = (long) fontAsset.styleNameHashCode << 32 | (uint) fontAsset.familyNameHashCode;
+                    fontAssetRef.familyNameAndStyleHashCode =
+                        (long)fontAsset.styleNameHashCode << 32 | (uint)fontAsset.familyNameHashCode;
 
-                    if (!s_FontAssetFamilyNameAndStyleReferenceLookup.ContainsKey(fontAssetRef.familyNameAndStyleHashCode))
-                        s_FontAssetFamilyNameAndStyleReferenceLookup.Add(fontAssetRef.familyNameAndStyleHashCode, fontAsset);
+                    if (
+                        !s_FontAssetFamilyNameAndStyleReferenceLookup.ContainsKey(
+                            fontAssetRef.familyNameAndStyleHashCode
+                        )
+                    )
+                        s_FontAssetFamilyNameAndStyleReferenceLookup.Add(
+                            fontAssetRef.familyNameAndStyleHashCode,
+                            fontAsset
+                        );
                 }
 
                 s_FontAssetReferences[entityId] = fontAssetRef;
@@ -157,14 +186,18 @@ namespace TMPro
         /// <param name="styleNameHashCode"></param>
         /// <param name="fontAsset"></param>
         /// <returns></returns>
-        internal static bool TryGetFontAssetByFamilyName(int familyNameHashCode, int styleNameHashCode, out TMP_FontAsset fontAsset)
+        internal static bool TryGetFontAssetByFamilyName(
+            int familyNameHashCode,
+            int styleNameHashCode,
+            out TMP_FontAsset fontAsset
+        )
         {
             fontAsset = null;
 
             if (styleNameHashCode == 0)
                 styleNameHashCode = k_RegularStyleHashCode;
 
-            long familyAndStyleNameHashCode = (long) styleNameHashCode << 32 | (uint) familyNameHashCode;
+            long familyAndStyleNameHashCode = (long)styleNameHashCode << 32 | (uint)familyNameHashCode;
 
             return s_FontAssetFamilyNameAndStyleReferenceLookup.TryGetValue(familyAndStyleNameHashCode, out fontAsset);
         }

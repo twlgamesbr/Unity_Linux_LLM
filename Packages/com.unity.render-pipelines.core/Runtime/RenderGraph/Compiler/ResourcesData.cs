@@ -49,7 +49,12 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetName(CompilerContextData ctx, in ResourceHandle h) => ctx.GetResourceName(h);
 
-        public ResourceUnversionedData(TextureResource rll, ref RenderTargetInfo info, ref TextureDesc desc, bool isResBackBuffer)
+        public ResourceUnversionedData(
+            TextureResource rll,
+            ref RenderTargetInfo info,
+            ref TextureDesc desc,
+            bool isResBackBuffer
+        )
         {
             isImported = rll.imported;
             isShared = false;
@@ -101,7 +106,11 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             graphicsFormat = GraphicsFormat.None;
         }
 
-        public ResourceUnversionedData(IRenderGraphResource rll, ref RayTracingAccelerationStructureDesc _, bool isResBackBuffer)
+        public ResourceUnversionedData(
+            IRenderGraphResource rll,
+            ref RayTracingAccelerationStructureDesc _,
+            bool isResBackBuffer
+        )
         {
             // We don't do anything with the RayTracingAccelerationStructureDesc for now. The compiler doesn't really need the details of the acceleration structures like it does with textures
             // since for textures it needs the details to merge passes etc. Which is not relevant for acceleration structures.
@@ -153,7 +162,9 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             {
                 string passName = ctx.GetPassName(passId);
                 string resourceName = ctx.GetResourceName(h);
-                throw new Exception($"Only one pass can write to the same resource. Pass {passName} is trying to write {resourceName} a second time.");
+                throw new Exception(
+                    $"Only one pass can write to the same resource. Pass {passName} is trying to write {resourceName} a second time."
+                );
             }
 #endif
             writePassId = passId;
@@ -170,10 +181,15 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             {
                 string passName = ctx.GetPassName(passId);
                 string resourceName = ctx.GetResourceName(h);
-                throw new Exception($"Maximum '{ctx.resources.MaxReaders}' passes can use a single graph output as input. Pass {passName} is trying to read {resourceName}.");
+                throw new Exception(
+                    $"Maximum '{ctx.resources.MaxReaders}' passes can use a single graph output as input. Pass {passName} is trying to read {resourceName}."
+                );
             }
 #endif
-            ctx.resources.readerData[h.iType][ctx.resources.IndexReader(h, numReaders)] = new ResourceReaderData(passId, index);
+            ctx.resources.readerData[h.iType][ctx.resources.IndexReader(h, numReaders)] = new ResourceReaderData(
+                passId,
+                index
+            );
             numReaders++;
         }
 
@@ -181,7 +197,7 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveReadingPass(CompilerContextData ctx, in ResourceHandle h, int passId)
         {
-            for (int r = 0; r < numReaders;)
+            for (int r = 0; r < numReaders; )
             {
                 ref var reader = ref ctx.resources.readerData[h.iType].ElementAt(ctx.resources.IndexReader(h, r));
                 if (reader.passId == passId)
@@ -245,7 +261,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             }
         }
 
-        void AllocateAndResizeNativeListIfNeeded<T>(ref NativeList<T> nativeList, int size, NativeArrayOptions options) where T : unmanaged
+        void AllocateAndResizeNativeListIfNeeded<T>(ref NativeList<T> nativeList, int size, NativeArrayOptions options)
+            where T : unmanaged
         {
             // Allocate the first time or if Dispose() has been called through RenderGraph.Cleanup()
             // Length remains 0, list is still empty
@@ -261,14 +278,18 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         {
             for (int t = 0; t < (int)RenderGraphResourceType.Count; t++)
             {
-                RenderGraphResourceType resourceType = (RenderGraphResourceType) t;
+                RenderGraphResourceType resourceType = (RenderGraphResourceType)t;
                 var numResources = resources.GetResourceCount(resourceType);
 
                 uint maxReaders = 0;
                 uint maxWriters = 0;
 
                 // We don't clear the list as we reinitialize it right after
-                AllocateAndResizeNativeListIfNeeded(ref unversionedData[t], numResources, NativeArrayOptions.UninitializedMemory);
+                AllocateAndResizeNativeListIfNeeded(
+                    ref unversionedData[t],
+                    numResources,
+                    NativeArrayOptions.UninitializedMemory
+                );
 
                 resourceNames[t].Resize(numResources, true);
 
@@ -293,33 +314,33 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
                     switch (t)
                     {
                         case (int)RenderGraphResourceType.Texture:
-                            {
-                                var tex = rll as TextureResource;
-                                resources.GetRenderTargetInfo(h, out var info);
-                                ref var desc = ref tex.desc;
-                                bool isBackBuffer = resources.IsRenderGraphResourceBackBuffer(h);
+                        {
+                            var tex = rll as TextureResource;
+                            resources.GetRenderTargetInfo(h, out var info);
+                            ref var desc = ref tex.desc;
+                            bool isBackBuffer = resources.IsRenderGraphResourceBackBuffer(h);
 
-                                unversionedData[t][r] = new ResourceUnversionedData(tex, ref info, ref desc, isBackBuffer);
-                                break;
-                            }
+                            unversionedData[t][r] = new ResourceUnversionedData(tex, ref info, ref desc, isBackBuffer);
+                            break;
+                        }
                         case (int)RenderGraphResourceType.Buffer:
-                            {
-                                ref var desc = ref (rll as BufferResource).desc;
-                                bool isResourceShared = resources.IsRenderGraphResourceShared(h);
-                                bool isBackBuffer = resources.IsRenderGraphResourceBackBuffer(h);
+                        {
+                            ref var desc = ref (rll as BufferResource).desc;
+                            bool isResourceShared = resources.IsRenderGraphResourceShared(h);
+                            bool isBackBuffer = resources.IsRenderGraphResourceBackBuffer(h);
 
-                                unversionedData[t][r] = new ResourceUnversionedData(rll, ref desc, isBackBuffer);
-                                break;
-                            }
+                            unversionedData[t][r] = new ResourceUnversionedData(rll, ref desc, isBackBuffer);
+                            break;
+                        }
                         case (int)RenderGraphResourceType.AccelerationStructure:
-                            {
-                                ref var desc = ref (rll as RayTracingAccelerationStructureResource).desc;
-                                bool isResourceShared = resources.IsRenderGraphResourceShared(h);
-                                bool isBackBuffer = resources.IsRenderGraphResourceBackBuffer(h);
+                        {
+                            ref var desc = ref (rll as RayTracingAccelerationStructureResource).desc;
+                            bool isResourceShared = resources.IsRenderGraphResourceShared(h);
+                            bool isBackBuffer = resources.IsRenderGraphResourceBackBuffer(h);
 
-                                unversionedData[t][r] = new ResourceUnversionedData(rll, ref desc, isBackBuffer);
-                                break;
-                            }
+                            unversionedData[t][r] = new ResourceUnversionedData(rll, ref desc, isBackBuffer);
+                            break;
+                        }
                         default:
                             throw new Exception("Unsupported resource type: " + t);
                     }
@@ -330,11 +351,19 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
 
                 // The first resource is a null resource, so we need to add 1 to the count.
                 MaxReaders[t] = (int)maxReaders + 1;
-                MaxVersions[t]  = (int)maxWriters + 1;
+                MaxVersions[t] = (int)maxWriters + 1;
 
                 // Clear the other caching structures, they will be filled later
-                AllocateAndResizeNativeListIfNeeded(ref versionedData[t], MaxVersions[t] * numResources, NativeArrayOptions.ClearMemory);
-                AllocateAndResizeNativeListIfNeeded(ref readerData[t], MaxVersions[t] * MaxReaders[t] * numResources, NativeArrayOptions.ClearMemory);
+                AllocateAndResizeNativeListIfNeeded(
+                    ref versionedData[t],
+                    MaxVersions[t] * numResources,
+                    NativeArrayOptions.ClearMemory
+                );
+                AllocateAndResizeNativeListIfNeeded(
+                    ref readerData[t],
+                    MaxVersions[t] * MaxReaders[t] * numResources,
+                    NativeArrayOptions.ClearMemory
+                );
             }
         }
 

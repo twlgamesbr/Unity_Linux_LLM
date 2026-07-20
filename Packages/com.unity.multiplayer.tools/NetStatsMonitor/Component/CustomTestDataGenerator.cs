@@ -28,15 +28,16 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
     {
         [field: Tooltip("Pairs of metrics and trends to generate test data for")]
         [field: SerializeField]
-        internal List<MetricTrend> MetricTrends { get; set; } = new List<MetricTrend>
-        {
-            new MetricTrend
+        internal List<MetricTrend> MetricTrends { get; set; } =
+            new List<MetricTrend>
             {
-                // This bit of boilerplate ensures that the trend receives its default
-                // fields in the inspector, rather than being all zeroes
-                Trend = new LogNormalRandomWalk { }
-            }
-        };
+                new MetricTrend
+                {
+                    // This bit of boilerplate ensures that the trend receives its default
+                    // fields in the inspector, rather than being all zeroes
+                    Trend = new LogNormalRandomWalk { },
+                },
+            };
 
         RuntimeNetStatsMonitor m_Rnsm;
 

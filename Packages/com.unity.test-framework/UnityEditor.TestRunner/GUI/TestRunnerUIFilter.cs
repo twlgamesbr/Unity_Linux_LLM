@@ -15,6 +15,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             private static double s_EndTime;
             private static bool s_IsHooked;
             static TestRunnerUIFilter s_Target;
+
             internal static void Hook(TestRunnerUIFilter target)
             {
                 s_EndTime = EditorApplication.timeSinceStartup + k_DebounceDuration;
@@ -49,24 +50,35 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         private int m_InconclusiveCount;
         private int m_SkippedCount;
 
-        public int PassedCount { get { return m_PassedCount; } }
-        public int FailedCount { get { return m_FailedCount + m_InconclusiveCount; } }
-        public int NotRunCount { get { return m_NotRunCount + m_SkippedCount; } }
+        public int PassedCount
+        {
+            get { return m_PassedCount; }
+        }
+        public int FailedCount
+        {
+            get { return m_FailedCount + m_InconclusiveCount; }
+        }
+        public int NotRunCount
+        {
+            get { return m_NotRunCount + m_SkippedCount; }
+        }
 
         [SerializeField]
         public bool PassedHidden;
+
         [SerializeField]
         public bool FailedHidden;
+
         [SerializeField]
         public bool NotRunHidden;
 
         [SerializeField]
         public string m_SearchString;
+
         [SerializeField]
         private string[] selectedCategories = new string[0];
 
         public string[] availableCategories = new string[0];
-
 
         private GUIContent m_SucceededBtn;
         private GUIContent m_FailedBtn;
@@ -80,8 +92,11 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         {
             get
             {
-                return !string.IsNullOrEmpty(m_SearchString) || PassedHidden || FailedHidden || NotRunHidden ||
-                    (selectedCategories != null && selectedCategories.Length > 0);
+                return !string.IsNullOrEmpty(m_SearchString)
+                    || PassedHidden
+                    || FailedHidden
+                    || NotRunHidden
+                    || (selectedCategories != null && selectedCategories.Length > 0);
             }
         }
 
@@ -92,7 +107,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
         public void UpdateCounters(List<TestRunnerResult> resultList, Dictionary<string, TestTreeViewItem> filteredTree)
         {
-            m_PassedCount = m_FailedCount = m_NotRunCount =  m_InconclusiveCount = m_SkippedCount = 0;
+            m_PassedCount = m_FailedCount = m_NotRunCount = m_InconclusiveCount = m_SkippedCount = 0;
             foreach (var result in resultList)
             {
                 if (result.isSuite)
@@ -122,9 +137,17 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
             var succeededTooltip = string.Format("Show tests that succeeded\n{0} succeeded", m_PassedCount);
             m_SucceededBtn = new GUIContent(PassedCount.ToString(), Icons.s_SuccessImg, succeededTooltip);
-            var failedTooltip = string.Format("Show tests that failed\n{0} failed\n{1} inconclusive", m_FailedCount, m_InconclusiveCount);
+            var failedTooltip = string.Format(
+                "Show tests that failed\n{0} failed\n{1} inconclusive",
+                m_FailedCount,
+                m_InconclusiveCount
+            );
             m_FailedBtn = new GUIContent(FailedCount.ToString(), Icons.s_FailImg, failedTooltip);
-            var notRunTooltip = string.Format("Show tests that didn't run\n{0} didn't run\n{1} skipped or ignored", m_NotRunCount, m_SkippedCount);
+            var notRunTooltip = string.Format(
+                "Show tests that didn't run\n{0} didn't run\n{1} skipped or ignored",
+                m_NotRunCount,
+                m_SkippedCount
+            );
             m_NotRunBtn = new GUIContent(NotRunCount.ToString(), Icons.s_UnknownImg, notRunTooltip);
         }
 
@@ -147,21 +170,41 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
             else
             {
-                EditorGUILayout.Popup(0, new[] { "<No categories available>" }, EditorStyles.toolbarDropDown, GUILayout.MaxWidth(150));
+                EditorGUILayout.Popup(
+                    0,
+                    new[] { "<No categories available>" },
+                    EditorStyles.toolbarDropDown,
+                    GUILayout.MaxWidth(150)
+                );
             }
 
             EditorGUI.BeginChangeCheck();
             if (m_SucceededBtn != null)
             {
-                PassedHidden = !GUILayout.Toggle(!PassedHidden, m_SucceededBtn, EditorStyles.toolbarButton, GUILayout.MaxWidth(GetMaxWidth(PassedCount)));
+                PassedHidden = !GUILayout.Toggle(
+                    !PassedHidden,
+                    m_SucceededBtn,
+                    EditorStyles.toolbarButton,
+                    GUILayout.MaxWidth(GetMaxWidth(PassedCount))
+                );
             }
             if (m_FailedBtn != null)
             {
-                FailedHidden = !GUILayout.Toggle(!FailedHidden, m_FailedBtn, EditorStyles.toolbarButton, GUILayout.MaxWidth(GetMaxWidth(FailedCount)));
+                FailedHidden = !GUILayout.Toggle(
+                    !FailedHidden,
+                    m_FailedBtn,
+                    EditorStyles.toolbarButton,
+                    GUILayout.MaxWidth(GetMaxWidth(FailedCount))
+                );
             }
             if (m_NotRunBtn != null)
             {
-                NotRunHidden = !GUILayout.Toggle(!NotRunHidden, m_NotRunBtn, EditorStyles.toolbarButton, GUILayout.MaxWidth(GetMaxWidth(NotRunCount)));
+                NotRunHidden = !GUILayout.Toggle(
+                    !NotRunHidden,
+                    m_NotRunBtn,
+                    EditorStyles.toolbarButton,
+                    GUILayout.MaxWidth(GetMaxWidth(NotRunCount))
+                );
             }
 
             if (EditorGUI.EndChangeCheck() && RebuildTestList != null)
@@ -181,12 +224,15 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
         private ISelectionDropDownContentProvider BuildCategorySelectionProvider()
         {
-            var itemProvider = new MultiValueContentProvider<string>(availableCategories, selectedCategories,
+            var itemProvider = new MultiValueContentProvider<string>(
+                availableCategories,
+                selectedCategories,
                 categories =>
                 {
                     selectedCategories = categories;
                     UpdateTestTreeRoots();
-                });
+                }
+            );
 
             return itemProvider;
         }

@@ -301,7 +301,9 @@ namespace Unity.Netcode
                 var networkObject = networkPrefab.Prefab.GetComponent<NetworkObject>();
 
                 // This should never happen, but in the case it somehow does log an error and remove the duplicate entry
-                Debug.LogError($"{nameof(NetworkPrefab)} ({networkObject.name}) has a duplicate {nameof(NetworkObject.GlobalObjectIdHash)} source entry value of: {source}!");
+                Debug.LogError(
+                    $"{nameof(NetworkPrefab)} ({networkObject.name}) has a duplicate {nameof(NetworkObject.GlobalObjectIdHash)} source entry value of: {source}!"
+                );
                 return false;
             }
 

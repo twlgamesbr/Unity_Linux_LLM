@@ -11,7 +11,6 @@ namespace UnityEngine.UIElements.TestFramework
     public sealed class PopupMenuSimulator : MenuSimulator
 #pragma warning restore CS0618
     {
-
         /// <summary>
         /// The position of the menu.
         /// </summary>
@@ -25,13 +24,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <summary>
         /// `True` if the menu is anchored, `false` otherwise.
         /// </summary>
-        public bool anchored {  get; private set; }
+        public bool anchored { get; private set; }
 
         Func<AbstractGenericMenu> m_OriginalCreateMenuFunctor;
 
-        #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
         TestPopupMenu m_SimulatedMenu;
-        #pragma warning restore CS0618
+#pragma warning restore CS0618
 
         /// <inheritdoc/>
         protected override void BeforeTest()
@@ -41,9 +40,9 @@ namespace UnityEngine.UIElements.TestFramework
             Panel p = fixture.panel as Panel;
 
             m_OriginalCreateMenuFunctor = p.CreateMenuFunctor;
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             p.CreateMenuFunctor = () => new TestPopupMenu(this);
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         /// <inheritdoc/>
@@ -51,9 +50,9 @@ namespace UnityEngine.UIElements.TestFramework
         {
             DiscardMenu();
 
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             Panel p = fixture.panel as Panel;
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
 
             p.CreateMenuFunctor = m_OriginalCreateMenuFunctor;
             m_OriginalCreateMenuFunctor = null;
@@ -72,7 +71,7 @@ namespace UnityEngine.UIElements.TestFramework
             anchored = false;
         }
 
-        #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
         private void DoDisplayMenu(TestPopupMenu popup, Rect position, VisualElement targetElement, bool anchored)
         {
             SetMenuContent(popup.menu);
@@ -81,7 +80,7 @@ namespace UnityEngine.UIElements.TestFramework
             this.targetElement = targetElement;
             this.anchored = anchored;
         }
-        #pragma warning restore CS0618
+#pragma warning restore CS0618
 
         [Obsolete("For Internal Use Only.")]
         internal class TestPopupMenu : AbstractGenericMenu
@@ -95,7 +94,14 @@ namespace UnityEngine.UIElements.TestFramework
                 menu = new DropdownMenu();
             }
 
-            private void AddItem(string itemName, bool isChecked, bool isEnabled, Action action, Action<object> actionUserData, object data)
+            private void AddItem(
+                string itemName,
+                bool isChecked,
+                bool isEnabled,
+                Action action,
+                Action<object> actionUserData,
+                object data
+            )
             {
                 DropdownMenuAction.Status s = DropdownMenuAction.Status.None;
                 if (isChecked)
@@ -111,14 +117,16 @@ namespace UnityEngine.UIElements.TestFramework
                     s = DropdownMenuAction.Status.Normal;
                 }
 
-                menu.AppendAction(itemName,
+                menu.AppendAction(
+                    itemName,
                     (a) =>
                     {
                         action?.Invoke();
                         actionUserData?.Invoke(data);
                     },
                     (a) => s,
-                    data);
+                    data
+                );
             }
 
             public override void AddDisabledItem(string itemName, bool isChecked)
@@ -141,10 +149,19 @@ namespace UnityEngine.UIElements.TestFramework
                 menu.AppendSeparator(path);
             }
 
-            public override void DropDown(Rect position, VisualElement targetElement, DropdownMenuSizeMode dropdownMenuSizeMode)
+            public override void DropDown(
+                Rect position,
+                VisualElement targetElement,
+                DropdownMenuSizeMode dropdownMenuSizeMode
+            )
             {
-                m_PopupMenuSimulator.DoDisplayMenu(this, position, targetElement,
-                    dropdownMenuSizeMode == DropdownMenuSizeMode.Auto || dropdownMenuSizeMode == DropdownMenuSizeMode.Fixed);
+                m_PopupMenuSimulator.DoDisplayMenu(
+                    this,
+                    position,
+                    targetElement,
+                    dropdownMenuSizeMode == DropdownMenuSizeMode.Auto
+                        || dropdownMenuSizeMode == DropdownMenuSizeMode.Fixed
+                );
             }
         }
 

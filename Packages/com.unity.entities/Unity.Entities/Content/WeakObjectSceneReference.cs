@@ -28,12 +28,17 @@ namespace Unity.Entities.Content
                 if (Id.GenerationType != WeakReferenceGenerationType.GameObjectScene)
                     return false;
 
-                if (UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(UnityEditor.AssetDatabase.GUIDToAssetPath(Id.GlobalId.AssetGUID)) != typeof(UnityEditor.SceneAsset))
+                if (
+                    UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(
+                        UnityEditor.AssetDatabase.GUIDToAssetPath(Id.GlobalId.AssetGUID)
+                    ) != typeof(UnityEditor.SceneAsset)
+                )
                     return false;
 #endif
                 return true;
             }
         }
+
         /// <summary>
         /// Loads a scene.
         /// </summary>
@@ -43,7 +48,6 @@ namespace Unity.Entities.Content
         {
             return RuntimeContentManager.LoadSceneAsync(Id, loadParams);
         }
-
 
         /// <summary>
         /// Unloads a scene.
@@ -75,8 +79,6 @@ namespace Unity.Entities.Content
             return Id.GetHashCode();
         }
 
-
-
         /// <summary>
         /// True if the object is either being loaded or already finished loading.
         /// </summary>
@@ -99,7 +101,9 @@ namespace Unity.Entities.Content
         /// Releases the object.  This will decrement the reference count of this object.  When an objects reference count reaches 0, the archive file is released.  The archive file is only
         /// unloaded when its reference count reaches zero, which will then release the archive it was loaded from.  Archives will be unmounted when their reference count reaches 0.
         /// </summary>
-        [Obsolete("Release has been replaced with Unload(ref Scene scene).  You will need to use the scene returned from LoadAsync to unload the scene and its resources.")]
+        [Obsolete(
+            "Release has been replaced with Unload(ref Scene scene).  You will need to use the scene returned from LoadAsync to unload the scene and its resources."
+        )]
         public void Release() { }
     }
 }

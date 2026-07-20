@@ -14,24 +14,32 @@ namespace UnityEditor.Rendering.Universal
 
         public void AddConvertedProfileSettingsToProfile(
             BIRPRendering.PostProcessEffectSettings oldSettings,
-            VolumeProfile targetProfile)
+            VolumeProfile targetProfile
+        )
         {
-            if (oldSettings == null || oldSettings.GetType() != OldSettingsType) return;
-            if (targetProfile == null || targetProfile.Has(OldSettingsType)) return;
+            if (oldSettings == null || oldSettings.GetType() != OldSettingsType)
+                return;
+            if (targetProfile == null || targetProfile.Has(OldSettingsType))
+                return;
 
             ConvertToTarget(oldSettings, targetProfile);
         }
 
-        protected abstract void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldBloom,
-            VolumeProfile targetProfile);
+        protected abstract void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldBloom,
+            VolumeProfile targetProfile
+        );
 
-        protected T AddVolumeComponentToAsset<T>(VolumeProfile targetProfileAsset) where T : VolumeComponent
+        protected T AddVolumeComponentToAsset<T>(VolumeProfile targetProfileAsset)
+            where T : VolumeComponent
         {
-            if (!targetProfileAsset) return null;
+            if (!targetProfileAsset)
+                return null;
 
             var profilePath = AssetDatabase.GetAssetPath(targetProfileAsset);
 
-            if (string.IsNullOrEmpty(profilePath)) return null;
+            if (string.IsNullOrEmpty(profilePath))
+                return null;
 
             var newVolumeComponent = targetProfileAsset.Add<T>();
             AssetDatabase.AddObjectToAsset(newVolumeComponent, targetProfileAsset);

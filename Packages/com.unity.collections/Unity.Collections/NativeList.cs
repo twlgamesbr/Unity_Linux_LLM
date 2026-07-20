@@ -15,7 +15,8 @@ namespace Unity.Collections
     /// An indexable collection.
     /// </summary>
     /// <typeparam name="T">The type of the elements in the collection.</typeparam>
-    public interface IIndexable<T> where T : unmanaged
+    public interface IIndexable<T>
+        where T : unmanaged
     {
         /// <summary>
         /// The current number of elements in the collection.
@@ -35,7 +36,8 @@ namespace Unity.Collections
     /// A resizable list.
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
-    public interface INativeList<T> : IIndexable<T> where T : unmanaged
+    public interface INativeList<T> : IIndexable<T>
+        where T : unmanaged
     {
         /// <summary>
         /// The number of elements that fit in the current allocation.
@@ -72,13 +74,12 @@ namespace Unity.Collections
     /// <typeparam name="T">The type of the elements.</typeparam>
     [StructLayout(LayoutKind.Sequential)]
     [NativeContainer]
-    [DebuggerDisplay("Length = {m_ListData == null ? default : m_ListData->Length}, Capacity = {m_ListData == null ? default : m_ListData->Capacity}")]
+    [DebuggerDisplay(
+        "Length = {m_ListData == null ? default : m_ListData->Length}, Capacity = {m_ListData == null ? default : m_ListData->Capacity}"
+    )]
     [DebuggerTypeProxy(typeof(NativeListDebugView<>))]
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-    public unsafe struct NativeList<T>
-        : INativeDisposable
-        , INativeList<T>
-        , IEnumerable<T> // Used by collection initializers.
+    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+    public unsafe struct NativeList<T> : INativeDisposable, INativeList<T>, IEnumerable<T> // Used by collection initializers.
         where T : unmanaged
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -162,9 +163,7 @@ namespace Unity.Collections
         /// </summary>
         /// <param name="allocator">The allocator to use.</param>
         public NativeList(AllocatorManager.AllocatorHandle allocator)
-            : this(1, allocator)
-        {
-        }
+            : this(1, allocator) { }
 
         /// <summary>
         /// Initializes and returns a NativeList.
@@ -178,8 +177,9 @@ namespace Unity.Collections
             Initialize(initialCapacity, ref temp);
         }
 
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(AllocatorManager.AllocatorHandle) })]
-        internal void Initialize<U>(int initialCapacity, ref U allocator) where U : unmanaged, AllocatorManager.IAllocator
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(AllocatorManager.AllocatorHandle) })]
+        internal void Initialize<U>(int initialCapacity, ref U allocator)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
             var totalSize = sizeof(T) * (long)initialCapacity;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -198,8 +198,9 @@ namespace Unity.Collections
             m_ListData = UnsafeList<T>.Create(initialCapacity, ref allocator, NativeArrayOptions.UninitializedMemory);
         }
 
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(AllocatorManager.AllocatorHandle) })]
-        internal static NativeList<T> New<U>(int initialCapacity, ref U allocator) where U : unmanaged, AllocatorManager.IAllocator
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(AllocatorManager.AllocatorHandle) })]
+        internal static NativeList<T> New<U>(int initialCapacity, ref U allocator)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
             var nativelist = new NativeList<T>();
             nativelist.Initialize(initialCapacity, ref allocator);
@@ -222,7 +223,6 @@ namespace Unity.Collections
 #endif
                 return (*m_ListData)[index];
             }
-
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
@@ -299,7 +299,6 @@ namespace Unity.Collections
 #endif
                 return m_ListData->Capacity;
             }
-
             set
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -412,7 +411,7 @@ namespace Unity.Collections
         {
             AddRange(array.GetUnsafeReadOnlyPtr(), array.Length);
         }
-        
+
         /// <summary>
         /// Appends the elements of a NativeList to the end of this list.
         /// </summary>
@@ -635,7 +634,8 @@ namespace Unity.Collections
         /// <param name="allocator">The allocator that was used to allocate this list.</param>
         /// </summary>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(AllocatorManager.AllocatorHandle) })]
-        internal void Dispose<U>(ref U allocator) where U : unmanaged, AllocatorManager.IAllocator
+        internal void Dispose<U>(ref U allocator)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!AtomicSafetyHandle.IsDefaultValue(m_Safety))
@@ -675,10 +675,16 @@ namespace Unity.Collections
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            var jobHandle = new NativeListDisposeJob { Data = new NativeListDispose { m_ListData = (UntypedUnsafeList*)m_ListData, m_Safety = m_Safety } }.Schedule(inputDeps);
+            var jobHandle = new NativeListDisposeJob
+            {
+                Data = new NativeListDispose { m_ListData = (UntypedUnsafeList*)m_ListData, m_Safety = m_Safety },
+            }.Schedule(inputDeps);
             AtomicSafetyHandle.Release(m_Safety);
 #else
-            var jobHandle = new NativeListDisposeJob { Data = new NativeListDispose { m_ListData = (UntypedUnsafeList*)m_ListData } }.Schedule(inputDeps);
+            var jobHandle = new NativeListDisposeJob
+            {
+                Data = new NativeListDispose { m_ListData = (UntypedUnsafeList*)m_ListData },
+            }.Schedule(inputDeps);
 #endif
             m_ListData = null;
 
@@ -705,7 +711,10 @@ namespace Unity.Collections
         /// </remarks>
         /// <param name="nativeList">The list to alias.</param>
         /// <returns>A native array that aliases the content of the list.</returns>
-        [Obsolete("Implicit cast from `NativeList<T>` to `NativeArray<T>` has been deprecated; Use '.AsArray()' method to do explicit cast instead.", false)]
+        [Obsolete(
+            "Implicit cast from `NativeList<T>` to `NativeArray<T>` has been deprecated; Use '.AsArray()' method to do explicit cast instead.",
+            false
+        )]
         public static implicit operator NativeArray<T>(NativeList<T> nativeList)
         {
             return nativeList.AsArray();
@@ -722,7 +731,11 @@ namespace Unity.Collections
             var arraySafety = m_Safety;
             AtomicSafetyHandle.UseSecondaryVersion(ref arraySafety);
 #endif
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(m_ListData->Ptr, m_ListData->Length, Allocator.None);
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                m_ListData->Ptr,
+                m_ListData->Length,
+                Allocator.None
+            );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, arraySafety);
@@ -834,7 +847,11 @@ namespace Unity.Collections
         /// <returns>An array containing a copy of this list's content.</returns>
         public NativeArray<T> ToArray(AllocatorManager.AllocatorHandle allocator)
         {
-            NativeArray<T> result = CollectionHelper.CreateNativeArray<T>(Length, allocator, NativeArrayOptions.UninitializedMemory);
+            NativeArray<T> result = CollectionHelper.CreateNativeArray<T>(
+                Length,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
             AtomicSafetyHandle.CheckWriteAndThrow(result.m_Safety);
@@ -942,7 +959,7 @@ namespace Unity.Collections
         /// Returns a parallel reader of this list.
         /// </summary>
         /// <returns>A parallel reader of this list.</returns>
-//        [Obsolete("'AsParallelReader' has been deprecated; use 'AsReadOnly' instead. (UnityUpgradable) -> AsReadOnly")]
+        //        [Obsolete("'AsParallelReader' has been deprecated; use 'AsReadOnly' instead. (UnityUpgradable) -> AsReadOnly")]
         public NativeArray<T>.ReadOnly AsParallelReader()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -973,7 +990,7 @@ namespace Unity.Collections
         /// </remarks>
         [NativeContainer]
         [NativeContainerIsAtomicWriteOnly]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public unsafe struct ParallelWriter
         {
             /// <summary>
@@ -994,9 +1011,12 @@ namespace Unity.Collections
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             internal AtomicSafetyHandle m_Safety;
-            internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<ParallelWriter>();
+            internal static readonly SharedStatic<int> s_staticSafetyId =
+                SharedStatic<int>.GetOrCreate<ParallelWriter>();
 
-            [GenerateTestsForBurstCompatibility(CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+            [GenerateTestsForBurstCompatibility(
+                CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+            )]
             internal unsafe ParallelWriter(UnsafeList<T>* listData, ref AtomicSafetyHandle safety)
             {
                 ListData = listData;
@@ -1119,7 +1139,8 @@ namespace Unity.Collections
 
             if ((uint)value >= (uint)length)
                 throw new IndexOutOfRangeException(
-                    $"Value {value} is out of range in NativeList of '{length}' Length.");
+                    $"Value {value} is out of range in NativeList of '{length}' Length."
+                );
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
@@ -1132,12 +1153,18 @@ namespace Unity.Collections
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         void CheckHandleMatches(AllocatorManager.AllocatorHandle handle)
         {
-            if(m_ListData == null)
-                throw new ArgumentOutOfRangeException($"Allocator handle {handle} can't match because container is not initialized.");
-            if(m_ListData->Allocator.Index != handle.Index)
-                throw new ArgumentOutOfRangeException($"Allocator handle {handle} can't match because container handle index doesn't match.");
-            if(m_ListData->Allocator.Version != handle.Version)
-                throw new ArgumentOutOfRangeException($"Allocator handle {handle} matches container handle index, but has different version.");
+            if (m_ListData == null)
+                throw new ArgumentOutOfRangeException(
+                    $"Allocator handle {handle} can't match because container is not initialized."
+                );
+            if (m_ListData->Allocator.Index != handle.Index)
+                throw new ArgumentOutOfRangeException(
+                    $"Allocator handle {handle} can't match because container handle index doesn't match."
+                );
+            if (m_ListData->Allocator.Version != handle.Version)
+                throw new ArgumentOutOfRangeException(
+                    $"Allocator handle {handle} matches container handle index, but has different version."
+                );
         }
     }
 
@@ -1171,7 +1198,8 @@ namespace Unity.Collections
         }
     }
 
-    sealed unsafe class NativeListDebugView<T> where T : unmanaged
+    sealed unsafe class NativeListDebugView<T>
+        where T : unmanaged
     {
         UnsafeList<T>* Data;
 
@@ -1208,7 +1236,7 @@ namespace Unity.Collections
     /// Provides extension methods for UnsafeList.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static class NativeListExtensions
+    public static unsafe class NativeListExtensions
     {
         /// <summary>
         /// Returns true if this container and another have equal length and content.
@@ -1277,7 +1305,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     /// Provides unsafe utility methods for NativeList.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static class NativeListUnsafeUtility
+    public static unsafe class NativeListUnsafeUtility
     {
         /// <summary>
         /// Returns a pointer to this list's internal buffer.
@@ -1286,8 +1314,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="list">The list.</param>
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <returns>A pointer to this list's internal buffer.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public static T* GetUnsafePtr<T>(this NativeList<T> list) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static T* GetUnsafePtr<T>(this NativeList<T> list)
+            where T : unmanaged
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
@@ -1302,8 +1331,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="list">The list.</param>
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <returns>A pointer to this list's internal buffer.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public static unsafe T* GetUnsafeReadOnlyPtr<T>(this NativeList<T> list) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static unsafe T* GetUnsafeReadOnlyPtr<T>(this NativeList<T> list)
+            where T : unmanaged
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
@@ -1322,12 +1352,16 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// The job safety checks use a native collection's atomic safety handle to assert safety.
         ///
         /// This method is only available if the symbol `ENABLE_UNITY_COLLECTIONS_CHECKS` is defined.</remarks>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) }, RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
-        public static AtomicSafetyHandle GetAtomicSafetyHandle<T>(ref NativeList<T> list) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(int) },
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+        )]
+        public static AtomicSafetyHandle GetAtomicSafetyHandle<T>(ref NativeList<T> list)
+            where T : unmanaged
         {
             return list.m_Safety;
         }
-
 #endif
 
         /// <summary>
@@ -1337,9 +1371,13 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="list">The list.</param>
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <returns>A pointer to this list's internal unsafe list.</returns>
-        [Obsolete("GetInternalListDataPtrUnchecked() has been deprecated; Use 'NativeList.GetUnsafeList()' instead.", false)]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public static void* GetInternalListDataPtrUnchecked<T>(ref NativeList<T> list) where T : unmanaged
+        [Obsolete(
+            "GetInternalListDataPtrUnchecked() has been deprecated; Use 'NativeList.GetUnsafeList()' instead.",
+            false
+        )]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static void* GetInternalListDataPtrUnchecked<T>(ref NativeList<T> list)
+            where T : unmanaged
         {
             return list.GetUnsafeList();
         }

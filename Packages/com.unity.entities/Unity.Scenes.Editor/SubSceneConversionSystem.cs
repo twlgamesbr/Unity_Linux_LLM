@@ -8,7 +8,7 @@ namespace Unity.Scenes.Editor
         {
             // Subscene components don't require any transform components
             var entity = GetEntity(TransformUsageFlags.None);
-            AddComponent(entity, new SceneReference() {SceneGUID = authoring.SceneGUID});
+            AddComponent(entity, new SceneReference() { SceneGUID = authoring.SceneGUID });
             if (authoring.AutoLoadScene)
             {
                 AddComponent(entity, new RequestSceneLoaded());

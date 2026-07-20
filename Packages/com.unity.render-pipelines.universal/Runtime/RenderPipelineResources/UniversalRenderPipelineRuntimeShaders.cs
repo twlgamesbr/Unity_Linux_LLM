@@ -36,7 +36,9 @@ namespace UnityEngine.Rendering.Universal
     [Categorization.CategoryInfo(Name = "R: Runtime Shaders", Order = 1000), HideInInspector]
     public class UniversalRenderPipelineRuntimeShaders : IRenderPipelineResources
     {
-        [SerializeField][HideInInspector] private int m_Version = 0;
+        [SerializeField]
+        [HideInInspector]
+        private int m_Version = 0;
 
         /// <summary>Current version of the resource container. Used only for upgrading a project.</summary>
         public int version => m_Version;
@@ -53,7 +55,6 @@ namespace UnityEngine.Rendering.Universal
             get => m_FallbackErrorShader;
             set => this.SetValueAndNotify(ref m_FallbackErrorShader, value, nameof(m_FallbackErrorShader));
         }
-
 
         [SerializeField]
         [ResourcePath("Shaders/Utils/BlitHDROverlay.shader")]
@@ -109,36 +110,49 @@ namespace UnityEngine.Rendering.Universal
 
         #region Terrain
         [Header("Terrain")]
-
         // Original serialized fields preserved for migration purposes.
         // These fields maintain the original serialized data that was moved to UniversalRenderPipelineRuntimeTerrainShaders;
         // when the asset is migrated from version 9 to 10, these fields are copied to their equivalents in
         // UniversalRenderPipelineRuntimeTerrainShaders, and these are then set to null.
-        [SerializeField, HideInInspector] private Shader m_TerrainDetailLit;
-        [SerializeField, HideInInspector] private Shader m_TerrainDetailGrassBillboard;
-        [SerializeField, HideInInspector] private Shader m_TerrainDetailGrass;
-        
+        [SerializeField, HideInInspector]
+        private Shader m_TerrainDetailLit;
+
+        [SerializeField, HideInInspector]
+        private Shader m_TerrainDetailGrassBillboard;
+
+        [SerializeField, HideInInspector]
+        private Shader m_TerrainDetailGrass;
+
         // Internal methods to access original serialized fields for migration
         internal Shader GetOriginalTerrainDetailLitShader() => m_TerrainDetailLit;
+
         internal Shader GetOriginalTerrainDetailGrassBillboardShader() => m_TerrainDetailGrassBillboard;
+
         internal Shader GetOriginalTerrainDetailGrassShader() => m_TerrainDetailGrass;
+
         internal void ClearOriginalTerrainDetailShaders()
         {
             m_TerrainDetailLit = null;
             m_TerrainDetailGrassBillboard = null;
             m_TerrainDetailGrass = null;
         }
-        
+
         /// <summary>
         /// Returns the terrain detail lit shader that this asset uses.
         /// </summary>
-        [Obsolete("terrainDetailLitShader is obsolete. Use UniversalRenderPipelineRuntimeTerrainShaders.terrainDetailLitShader instead.", false)]
+        [Obsolete(
+            "terrainDetailLitShader is obsolete. Use UniversalRenderPipelineRuntimeTerrainShaders.terrainDetailLitShader instead.",
+            false
+        )]
         public Shader terrainDetailLitShader
         {
             get
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                    out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     return shadersResources.terrainDetailLitShader;
                 }
@@ -146,8 +160,11 @@ namespace UnityEngine.Rendering.Universal
             }
             set
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                    out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     shadersResources.terrainDetailLitShader = value;
                 }
@@ -157,13 +174,19 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Returns the terrain detail grass billboard shader that this asset uses.
         /// </summary>
-        [Obsolete("terrainDetailGrassBillboardShader is obsolete. Use UniversalRenderPipelineRuntimeTerrainShaders.terrainDetailGrassBillboardShader instead.", false)]
+        [Obsolete(
+            "terrainDetailGrassBillboardShader is obsolete. Use UniversalRenderPipelineRuntimeTerrainShaders.terrainDetailGrassBillboardShader instead.",
+            false
+        )]
         public Shader terrainDetailGrassBillboardShader
         {
             get
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                    out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     return shadersResources.terrainDetailGrassBillboardShader;
                 }
@@ -171,8 +194,11 @@ namespace UnityEngine.Rendering.Universal
             }
             set
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                    out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     shadersResources.terrainDetailGrassBillboardShader = value;
                 }
@@ -182,13 +208,19 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Returns the terrain detail grass shader that this asset uses.
         /// </summary>
-        [Obsolete("terrainDetailGrassShader is obsolete; Use UniversalRenderPipelineRuntimeTerrainShaders.terrainDetailGrassShader instead.)", false)]
+        [Obsolete(
+            "terrainDetailGrassShader is obsolete; Use UniversalRenderPipelineRuntimeTerrainShaders.terrainDetailGrassShader instead.)",
+            false
+        )]
         public Shader terrainDetailGrassShader
         {
             get
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                    out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     return shadersResources.terrainDetailGrassShader;
                 }
@@ -196,8 +228,11 @@ namespace UnityEngine.Rendering.Universal
             }
             set
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                    out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     shadersResources.terrainDetailGrassShader = value;
                 }

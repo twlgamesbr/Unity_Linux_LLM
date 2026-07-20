@@ -62,9 +62,8 @@ namespace NPCSystem.Items
         [SerializeField]
         [Tooltip("The Qdrant collection this item's knowledge lives in (default: unity_linux_llm_codebase_v2)")]
         string _qdrantCollection = "unity_linux_llm_codebase_v2";
-        public string QdrantCollection => string.IsNullOrWhiteSpace(_qdrantCollection)
-            ? "unity_linux_llm_codebase_v2"
-            : _qdrantCollection;
+        public string QdrantCollection =>
+            string.IsNullOrWhiteSpace(_qdrantCollection) ? "unity_linux_llm_codebase_v2" : _qdrantCollection;
 
         [SerializeField, Tooltip("Qdrant point ID if referencing a specific search result")]
         string _qdrantPointId = "";
@@ -73,8 +72,7 @@ namespace NPCSystem.Items
         // ── Helpers ──
 
         public bool HasTag(string tag) =>
-            !string.IsNullOrWhiteSpace(tag) && Tags.Any(t =>
-                string.Equals(t, tag, StringComparison.OrdinalIgnoreCase));
+            !string.IsNullOrWhiteSpace(tag) && Tags.Any(t => string.Equals(t, tag, StringComparison.OrdinalIgnoreCase));
 
         public bool IsStackable => MaxStackSize > 1;
 
@@ -104,6 +102,6 @@ namespace NPCSystem.Items
         Key,
         Material,
         Currency,
-        QuestItem
+        QuestItem,
     }
 }

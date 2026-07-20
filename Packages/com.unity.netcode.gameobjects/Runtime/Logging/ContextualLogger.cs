@@ -103,9 +103,11 @@ namespace Unity.Netcode.Logging
         [HideInCallstack]
         [Conditional(k_CompilationCondition)]
         public void Info(Context context) => Log(LogType.Log, context);
+
         [HideInCallstack]
         [Conditional(k_CompilationCondition)]
         public void Warning(Context context) => Log(LogType.Warning, context);
+
         [HideInCallstack]
         [Conditional(k_CompilationCondition)]
         public void Error(Context context) => Log(LogType.Error, context);
@@ -113,9 +115,11 @@ namespace Unity.Netcode.Logging
         [HideInCallstack]
         [Conditional(k_CompilationCondition)]
         public void InfoServer(Context context) => LogServer(LogType.Log, context);
+
         [HideInCallstack]
         [Conditional(k_CompilationCondition)]
         public void WarningServer(Context context) => LogServer(LogType.Warning, context);
+
         [HideInCallstack]
         [Conditional(k_CompilationCondition)]
         public void ErrorServer(Context context) => LogServer(LogType.Error, context);
@@ -125,6 +129,7 @@ namespace Unity.Netcode.Logging
         {
             Debug.unityLogger.LogException(exception, m_Object);
         }
+
         [HideInCallstack]
         public void Exception(Exception exception, Context context)
         {
@@ -135,9 +140,11 @@ namespace Unity.Netcode.Logging
             }
 
             var message = BuildLog(context);
-            Debug.unityLogger.LogException(new Exception(message, exception), context.RelevantObjectOverride ?? m_Object);
+            Debug.unityLogger.LogException(
+                new Exception(message, exception),
+                context.RelevantObjectOverride ?? m_Object
+            );
         }
-
 
         [HideInCallstack]
         private void Log(LogType logType, Context context)

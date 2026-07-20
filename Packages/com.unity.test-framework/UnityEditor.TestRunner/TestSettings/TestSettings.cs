@@ -15,13 +15,26 @@ namespace UnityEditor.TestTools.TestRunner
 #if UNITY_2021_2_OR_NEWER
             new TestSetting<ScriptingImplementation?>(
                 settings => settings.scriptingBackend,
-                () => PlayerSettings.GetScriptingBackend(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup)),
-                implementation => PlayerSettings.SetScriptingBackend(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup), implementation.Value)),
+                () =>
+                    PlayerSettings.GetScriptingBackend(
+                        NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup)
+                    ),
+                implementation =>
+                    PlayerSettings.SetScriptingBackend(
+                        NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup),
+                        implementation.Value
+                    )
+            ),
 #else
             new TestSetting<ScriptingImplementation?>(
                 settings => settings.scriptingBackend,
                 () => PlayerSettings.GetScriptingBackend(EditorUserBuildSettings.activeBuildTargetGroup),
-                implementation => PlayerSettings.SetScriptingBackend(EditorUserBuildSettings.activeBuildTargetGroup, implementation.Value)),
+                implementation =>
+                    PlayerSettings.SetScriptingBackend(
+                        EditorUserBuildSettings.activeBuildTargetGroup,
+                        implementation.Value
+                    )
+            ),
 #endif
             new TestSetting<string>(
                 settings => settings.Architecture,
@@ -32,9 +45,15 @@ namespace UnityEditor.TestTools.TestRunner
                         case BuildTarget.Android:
                             return PlayerSettings.Android.targetArchitectures.ToString();
                         case BuildTarget.StandaloneOSX:
-                            return EditorUserBuildSettings.GetPlatformSettings(BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneOSX), "Architecture");
+                            return EditorUserBuildSettings.GetPlatformSettings(
+                                BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneOSX),
+                                "Architecture"
+                            );
                         case BuildTarget.StandaloneWindows64:
-                            return EditorUserBuildSettings.GetPlatformSettings(BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneWindows64), "Architecture");
+                            return EditorUserBuildSettings.GetPlatformSettings(
+                                BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneWindows64),
+                                "Architecture"
+                            );
                         default:
                             return null;
                     }
@@ -43,33 +62,49 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (string.IsNullOrEmpty(architecture))
                         return;
-                    
+
                     switch (EditorUserBuildSettings.activeBuildTarget)
                     {
                         case BuildTarget.Android:
-                            var targetArchitectures = (AndroidArchitecture)Enum.Parse(typeof(AndroidArchitecture), architecture, true);
+                            var targetArchitectures = (AndroidArchitecture)
+                                Enum.Parse(typeof(AndroidArchitecture), architecture, true);
                             PlayerSettings.Android.targetArchitectures = targetArchitectures;
                             break;
                         case BuildTarget.StandaloneOSX:
-                            EditorUserBuildSettings.SetPlatformSettings(BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneOSX), "Architecture", architecture.ToLower());
+                            EditorUserBuildSettings.SetPlatformSettings(
+                                BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneOSX),
+                                "Architecture",
+                                architecture.ToLower()
+                            );
                             break;
                         case BuildTarget.StandaloneWindows64:
-                            EditorUserBuildSettings.SetPlatformSettings(BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneWindows64), "Architecture", architecture.ToLower());
+                            EditorUserBuildSettings.SetPlatformSettings(
+                                BuildPipeline.GetBuildTargetName(BuildTarget.StandaloneWindows64),
+                                "Architecture",
+                                architecture.ToLower()
+                            );
                             break;
                     }
-                }),
+                }
+            ),
 #if UNITY_2021_2_OR_NEWER
             new TestSetting<ApiCompatibilityLevel?>(
                 settings => settings.apiProfile,
-                () => PlayerSettings.GetApiCompatibilityLevel(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup)),
+                () =>
+                    PlayerSettings.GetApiCompatibilityLevel(
+                        NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup)
+                    ),
                 implementation =>
                 {
                     if (Enum.IsDefined(typeof(ApiCompatibilityLevel), implementation.Value))
                     {
-                        PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup),
-                            implementation.Value);
+                        PlayerSettings.SetApiCompatibilityLevel(
+                            NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup),
+                            implementation.Value
+                        );
                     }
-                }),
+                }
+            ),
 #else
             new TestSetting<ApiCompatibilityLevel?>(
                 settings => settings.apiProfile,
@@ -78,10 +113,13 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (Enum.IsDefined(typeof(ApiCompatibilityLevel), implementation.Value))
                     {
-                        PlayerSettings.SetApiCompatibilityLevel(EditorUserBuildSettings.activeBuildTargetGroup,
-                            implementation.Value);
+                        PlayerSettings.SetApiCompatibilityLevel(
+                            EditorUserBuildSettings.activeBuildTargetGroup,
+                            implementation.Value
+                        );
                     }
-                }),
+                }
+            ),
 #endif
             new TestSetting<bool?>(
                 settings => settings.appleEnableAutomaticSigning,
@@ -90,7 +128,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (enableAutomaticSigning != null)
                         PlayerSettings.iOS.appleEnableAutomaticSigning = enableAutomaticSigning.Value;
-                }),
+                }
+            ),
             new TestSetting<string>(
                 settings => settings.appleDeveloperTeamID,
                 () => PlayerSettings.iOS.appleDeveloperTeamID,
@@ -98,7 +137,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (developerTeam != null)
                         PlayerSettings.iOS.appleDeveloperTeamID = developerTeam;
-                }),
+                }
+            ),
             new TestSetting<ProvisioningProfileType?>(
                 settings => settings.iOSManualProvisioningProfileType,
                 () => PlayerSettings.iOS.iOSManualProvisioningProfileType,
@@ -106,7 +146,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (profileType != null)
                         PlayerSettings.iOS.iOSManualProvisioningProfileType = profileType.Value;
-                }),
+                }
+            ),
             new TestSetting<string>(
                 settings => settings.iOSManualProvisioningProfileID,
                 () => PlayerSettings.iOS.iOSManualProvisioningProfileID,
@@ -114,7 +155,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (provisioningUUID != null)
                         PlayerSettings.iOS.iOSManualProvisioningProfileID = provisioningUUID;
-                }),
+                }
+            ),
             new TestSetting<string>(
                 settings => settings.iOSTargetSDK,
                 () => (PlayerSettings.iOS.sdkVersion).ToString(),
@@ -127,7 +169,8 @@ namespace UnityEditor.TestTools.TestRunner
                         else if (targetSDK == "SimulatorSDK")
                             PlayerSettings.iOS.sdkVersion = iOSSdkVersion.SimulatorSDK;
                     }
-                }),
+                }
+            ),
             new TestSetting<ProvisioningProfileType?>(
                 settings => settings.tvOSManualProvisioningProfileType,
                 () => PlayerSettings.iOS.tvOSManualProvisioningProfileType,
@@ -135,7 +178,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (profileType != null)
                         PlayerSettings.iOS.tvOSManualProvisioningProfileType = profileType.Value;
-                }),
+                }
+            ),
             new TestSetting<string>(
                 settings => settings.tvOSManualProvisioningProfileID,
                 () => PlayerSettings.iOS.tvOSManualProvisioningProfileID,
@@ -143,7 +187,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (provisioningUUID != null)
                         PlayerSettings.iOS.tvOSManualProvisioningProfileID = provisioningUUID;
-                }),
+                }
+            ),
             new TestSetting<string>(
                 settings => settings.tvOSTargetSDK,
                 () => (PlayerSettings.tvOS.sdkVersion).ToString(),
@@ -156,17 +201,26 @@ namespace UnityEditor.TestTools.TestRunner
                         else if (targetSDK == "SimulatorSDK" || targetSDK == "Simulator")
                             PlayerSettings.tvOS.sdkVersion = tvOSSdkVersion.Simulator;
                     }
-                }),
+                }
+            ),
             new TestSetting<bool>(
                 settings => settings.autoGraphicsAPIs,
                 () => PlayerSettings.GetUseDefaultGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget),
                 autoGraphicsAPIs =>
                 {
-                    PlayerSettings.SetUseDefaultGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget, autoGraphicsAPIs);
-                }),
+                    PlayerSettings.SetUseDefaultGraphicsAPIs(
+                        EditorUserBuildSettings.activeBuildTarget,
+                        autoGraphicsAPIs
+                    );
+                }
+            ),
             new TestSetting<string[]>(
                 settings => settings.playerGraphicsAPIs,
-                () => PlayerSettings.GetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget).Select(api => api.ToString()).ToArray(),
+                () =>
+                    PlayerSettings
+                        .GetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget)
+                        .Select(api => api.ToString())
+                        .ToArray(),
                 playerGraphicsAPIs =>
                 {
                     if (playerGraphicsAPIs != null && playerGraphicsAPIs.Length > 0)
@@ -179,9 +233,13 @@ namespace UnityEditor.TestTools.TestRunner
                         }
 
                         if (graphicsAPIs.Count > 0)
-                            PlayerSettings.SetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget, graphicsAPIs.ToArray());
+                            PlayerSettings.SetGraphicsAPIs(
+                                EditorUserBuildSettings.activeBuildTarget,
+                                graphicsAPIs.ToArray()
+                            );
                     }
-                }),
+                }
+            ),
             new TestSetting<bool?>(
                 settings => settings.androidBuildAppBundle,
                 () => EditorUserBuildSettings.buildAppBundle,
@@ -193,7 +251,8 @@ namespace UnityEditor.TestTools.TestRunner
 #else
                     PlayerSettings.Android.useAPKExpansionFiles = androidAppBundle.Value;
 #endif
-                }),
+                }
+            ),
             new TestSetting<bool?>(
                 settings => settings.featureFlags.requiresSplashScreen,
                 () => PlayerSettings.SplashScreen.show,
@@ -203,7 +262,8 @@ namespace UnityEditor.TestTools.TestRunner
                     {
                         PlayerSettings.SplashScreen.show = requiresSplashScreen.Value;
                     }
-                }),
+                }
+            ),
             new TestSetting<bool?>(
                 settings => settings.featureFlags.requiresSplashScreen,
                 () => PlayerSettings.SplashScreen.showUnityLogo,
@@ -213,7 +273,8 @@ namespace UnityEditor.TestTools.TestRunner
                     {
                         PlayerSettings.SplashScreen.showUnityLogo = requiresSplashScreen.Value;
                     }
-                }),
+                }
+            ),
 #if UNITY_2023_2_OR_NEWER
             new TestSetting<WebGLClientBrowserType?>(
                 settings => settings.webGLClientBrowserType,
@@ -222,7 +283,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (browserType != null)
                         EditorUserBuildSettings.webGLClientBrowserType = browserType.Value;
-                }),
+                }
+            ),
             new TestSetting<string>(
                 settings => settings.webGLClientBrowserPath,
                 () => EditorUserBuildSettings.webGLClientBrowserPath,
@@ -230,7 +292,8 @@ namespace UnityEditor.TestTools.TestRunner
                 {
                     if (!string.IsNullOrEmpty(browserPath))
                         EditorUserBuildSettings.webGLClientBrowserPath = browserPath;
-                }),
+                }
+            ),
 #endif
         };
 

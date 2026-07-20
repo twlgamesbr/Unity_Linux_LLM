@@ -45,7 +45,12 @@ namespace UnityEngine.Rendering.Universal
             return false;
         }
 
-        private static void Execute(RasterCommandBuffer cmd, PassData passData, LayerBatch layerBatch, int lightTextureIndex)
+        private static void Execute(
+            RasterCommandBuffer cmd,
+            PassData passData,
+            LayerBatch layerBatch,
+            int lightTextureIndex
+        )
         {
             cmd.SetGlobalFloat(k_InverseHDREmulationScaleID, 1.0f / passData.rendererData.hdrEmulationScale);
 
@@ -64,19 +69,27 @@ namespace UnityEngine.Rendering.Universal
                 var light = lights[j];
 
                 // Check if light is valid
-                if (light == null ||
-                    light.lightType == Light2D.LightType.Global ||
-                    light.blendStyleIndex != blendStyleIndex)
+                if (
+                    light == null
+                    || light.lightType == Light2D.LightType.Global
+                    || light.blendStyleIndex != blendStyleIndex
+                )
                     continue;
 
                 // Check if light is volumetric
-                if (passData.isVolumetric &&
-                    (light.volumeIntensity <= 0.0f ||
-                    !light.volumetricEnabled ||
-                    layerBatch.endLayerValue != light.GetTopMostLitLayer()))
+                if (
+                    passData.isVolumetric
+                    && (
+                        light.volumeIntensity <= 0.0f
+                        || !light.volumetricEnabled
+                        || layerBatch.endLayerValue != light.GetTopMostLitLayer()
+                    )
+                )
                     continue;
 
-                var useShadows = (!passData.isVolumetric && passData.layerBatch.lightStats.useShadows) || (passData.isVolumetric && passData.layerBatch.lightStats.useVolumetricShadowLights);
+                var useShadows =
+                    (!passData.isVolumetric && passData.layerBatch.lightStats.useShadows)
+                    || (passData.isVolumetric && passData.layerBatch.lightStats.useVolumetricShadowLights);
                 useShadows &= layerBatch.shadowIndices.Contains(j);
                 var lightMaterial = passData.rendererData.GetLightMaterial(light, passData.isVolumetric, useShadows);
                 var lightMesh = light.lightMesh;
@@ -100,14 +113,37 @@ namespace UnityEngine.Rendering.Universal
                     RendererLighting.SetCookieShaderProperties(light, s_PropertyBlock);
 
                 // Set shader global properties
-                RendererLighting.SetPerLightShaderGlobals(cmd, light, slotIndex, passData.isVolumetric, useShadows, LightBatch.isBatchingSupported);
+                RendererLighting.SetPerLightShaderGlobals(
+                    cmd,
+                    light,
+                    slotIndex,
+                    passData.isVolumetric,
+                    useShadows,
+                    LightBatch.isBatchingSupported
+                );
 
-                if (light.normalMapQuality != Light2D.NormalMapQuality.Disabled || light.lightType == Light2D.LightType.Point)
-                    RendererLighting.SetPerPointLightShaderGlobals(cmd, light, slotIndex, LightBatch.isBatchingSupported);
+                if (
+                    light.normalMapQuality != Light2D.NormalMapQuality.Disabled
+                    || light.lightType == Light2D.LightType.Point
+                )
+                    RendererLighting.SetPerPointLightShaderGlobals(
+                        cmd,
+                        light,
+                        slotIndex,
+                        LightBatch.isBatchingSupported
+                    );
 
                 if (LightBatch.isBatchingSupported)
                 {
-                    RendererLighting.lightBatch.AddBatch(light, lightMaterial, light.GetMatrix(), lightMesh, 0, lightHash, index);
+                    RendererLighting.lightBatch.AddBatch(
+                        light,
+                        lightMaterial,
+                        light.GetMatrix(),
+                        lightMesh,
+                        0,
+                        lightHash,
+                        index
+                    );
                     RendererLighting.lightBatch.Flush(cmd);
                 }
                 else
@@ -132,7 +168,13 @@ namespace UnityEngine.Rendering.Universal
             internal int lightTextureIndex;
         }
 
-        void InitializeRenderPass(IRasterRenderGraphBuilder builder, ContextContainer frameData, PassData passData, int batchIndex, bool isVolumetric = false)
+        void InitializeRenderPass(
+            IRasterRenderGraphBuilder builder,
+            ContextContainer frameData,
+            PassData passData,
+            int batchIndex,
+            bool isVolumetric = false
+        )
         {
             Universal2DResourceData universal2DResourceData = frameData.Get<Universal2DResourceData>();
             CommonResourceData commonResourceData = frameData.Get<CommonResourceData>();
@@ -163,7 +205,9 @@ namespace UnityEngine.Rendering.Universal
             passData.layerBatch = layerBatch;
             passData.rendererData = rendererData;
             passData.isVolumetric = isVolumetric;
-            passData.normalMap = layerBatch.lightStats.useNormalMap ? universal2DResourceData.normalsTexture[batchIndex] : TextureHandle.nullHandle;
+            passData.normalMap = layerBatch.lightStats.useNormalMap
+                ? universal2DResourceData.normalsTexture[batchIndex]
+                : TextureHandle.nullHandle;
 
             builder.AllowGlobalStateModification(true);
         }
@@ -174,12 +218,14 @@ namespace UnityEngine.Rendering.Universal
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             var layerBatch = frameData.Get<Universal2DRenderingData>().layerBatches[batchIndex];
 
-            // Check for lighting in scene/prefab/preview camera 
+            // Check for lighting in scene/prefab/preview camera
             var isLightingActive = Renderer2D.IsSceneViewOrPreviewLightingActive(cameraData);
 
-            if (!layerBatch.lightStats.useLights ||
-                isVolumetric && !layerBatch.lightStats.useVolumetricLights ||
-                !isLightingActive)
+            if (
+                !layerBatch.lightStats.useLights
+                || isVolumetric && !layerBatch.lightStats.useVolumetricLights
+                || !isLightingActive
+            )
                 return;
 
             // Render single RTs by for apis that don't support MRTs
@@ -190,7 +236,13 @@ namespace UnityEngine.Rendering.Universal
 
                 for (var i = 0; i < layerBatch.activeBlendStylesIndices.Length; ++i)
                 {
-                    using (var builder = graph.AddRasterRenderPass<PassData>(passName, out var passData, LayerDebug.GetProfilingSampler(passName, m_ProfilingSampleSRT)))
+                    using (
+                        var builder = graph.AddRasterRenderPass<PassData>(
+                            passName,
+                            out var passData,
+                            LayerDebug.GetProfilingSampler(passName, m_ProfilingSampleSRT)
+                        )
+                    )
                     {
                         InitializeRenderPass(builder, frameData, passData, batchIndex, isVolumetric);
 
@@ -200,10 +252,12 @@ namespace UnityEngine.Rendering.Universal
 
                         passData.lightTextureIndex = i;
 
-                        builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                        {
-                            Execute(context.cmd, data, data.layerBatch, data.lightTextureIndex);
-                        });
+                        builder.SetRenderFunc(
+                            static (PassData data, RasterGraphContext context) =>
+                            {
+                                Execute(context.cmd, data, data.layerBatch, data.lightTextureIndex);
+                            }
+                        );
                     }
                 }
             }
@@ -214,20 +268,30 @@ namespace UnityEngine.Rendering.Universal
                 LayerDebug.FormatPassName(layerBatch, ref passName);
 
                 // Default Raster Pass with MRTs
-                using (var builder = graph.AddRasterRenderPass<PassData>(passName, out var passData, LayerDebug.GetProfilingSampler(passName, profilingSampler)))
+                using (
+                    var builder = graph.AddRasterRenderPass<PassData>(
+                        passName,
+                        out var passData,
+                        LayerDebug.GetProfilingSampler(passName, profilingSampler)
+                    )
+                )
                 {
                     InitializeRenderPass(builder, frameData, passData, batchIndex, isVolumetric);
 
-                    var lightTextures = !isVolumetric ? universal2DResourceData.lightTextures[batchIndex] : intermediateTexture;
+                    var lightTextures = !isVolumetric
+                        ? universal2DResourceData.lightTextures[batchIndex]
+                        : intermediateTexture;
 
                     for (var i = 0; i < lightTextures.Length; i++)
                         builder.SetRenderAttachment(lightTextures[i], i);
-                   
-                    builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                    {
-                        for (var i = 0; i < data.layerBatch.activeBlendStylesIndices.Length; ++i)
-                            Execute(context.cmd, data, data.layerBatch, i);
-                    });
+
+                    builder.SetRenderFunc(
+                        static (PassData data, RasterGraphContext context) =>
+                        {
+                            for (var i = 0; i < data.layerBatch.activeBlendStylesIndices.Length; ++i)
+                                Execute(context.cmd, data, data.layerBatch, i);
+                        }
+                    );
                 }
             }
         }

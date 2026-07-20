@@ -14,7 +14,11 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
     {
         public FourCC format => new FourCC('X', 'I', 'N', 'P');
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags", Justification = "False positive")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1027:MarkEnumsWithFlags",
+            Justification = "False positive"
+        )]
         public enum Button
         {
             DPadUp = 0,
@@ -48,34 +52,62 @@ namespace UnityEngine.InputSystem.XInput.LowLevel
         [InputControl(name = "buttonEast", bit = (uint)Button.B, displayName = "B")]
         [InputControl(name = "buttonWest", bit = (uint)Button.X, displayName = "X")]
         [InputControl(name = "buttonNorth", bit = (uint)Button.Y, displayName = "Y")]
-
         [FieldOffset(0)]
         public ushort buttons;
 
         [InputControl(name = "leftTrigger", format = "BYTE")]
-        [FieldOffset(2)] public byte leftTrigger;
+        [FieldOffset(2)]
+        public byte leftTrigger;
+
         [InputControl(name = "rightTrigger", format = "BYTE")]
-        [FieldOffset(3)] public byte rightTrigger;
+        [FieldOffset(3)]
+        public byte rightTrigger;
 
         [InputControl(name = "leftStick", layout = "Stick", format = "VC2S")]
-        [InputControl(name = "leftStick/x", offset = 0, format = "SHRT", parameters = "clamp=false,invert=false,normalize=false")]
+        [InputControl(
+            name = "leftStick/x",
+            offset = 0,
+            format = "SHRT",
+            parameters = "clamp=false,invert=false,normalize=false"
+        )]
         [InputControl(name = "leftStick/left", offset = 0, format = "SHRT")]
         [InputControl(name = "leftStick/right", offset = 0, format = "SHRT")]
-        [InputControl(name = "leftStick/y", offset = 2, format = "SHRT", parameters = "clamp=false,invert=false,normalize=false")]
+        [InputControl(
+            name = "leftStick/y",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=false,invert=false,normalize=false"
+        )]
         [InputControl(name = "leftStick/up", offset = 2, format = "SHRT")]
         [InputControl(name = "leftStick/down", offset = 2, format = "SHRT")]
-        [FieldOffset(4)] public short leftStickX;
-        [FieldOffset(6)] public short leftStickY;
+        [FieldOffset(4)]
+        public short leftStickX;
+
+        [FieldOffset(6)]
+        public short leftStickY;
 
         [InputControl(name = "rightStick", layout = "Stick", format = "VC2S")]
-        [InputControl(name = "rightStick/x", offset = 0, format = "SHRT", parameters = "clamp=false,invert=false,normalize=false")]
+        [InputControl(
+            name = "rightStick/x",
+            offset = 0,
+            format = "SHRT",
+            parameters = "clamp=false,invert=false,normalize=false"
+        )]
         [InputControl(name = "rightStick/left", offset = 0, format = "SHRT")]
         [InputControl(name = "rightStick/right", offset = 0, format = "SHRT")]
-        [InputControl(name = "rightStick/y", offset = 2, format = "SHRT", parameters = "clamp=false,invert=false,normalize=false")]
+        [InputControl(
+            name = "rightStick/y",
+            offset = 2,
+            format = "SHRT",
+            parameters = "clamp=false,invert=false,normalize=false"
+        )]
         [InputControl(name = "rightStick/up", offset = 2, format = "SHRT")]
         [InputControl(name = "rightStick/down", offset = 2, format = "SHRT")]
-        [FieldOffset(8)] public short rightStickX;
-        [FieldOffset(10)] public short rightStickY;
+        [FieldOffset(8)]
+        public short rightStickX;
+
+        [FieldOffset(10)]
+        public short rightStickY;
 
         public XInputControllerWindowsState WithButton(Button button)
         {
@@ -92,8 +124,6 @@ namespace UnityEngine.InputSystem.XInput
     /// An <see cref="XInputController"/> compatible game controller connected to a Windows desktop machine.
     /// </summary>
     [InputControlLayout(stateType = typeof(XInputControllerWindowsState), hideInUI = true)]
-    public class XInputControllerWindows : XInputController
-    {
-    }
+    public class XInputControllerWindows : XInputController { }
 }
 #endif // UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || UNITY_WSA

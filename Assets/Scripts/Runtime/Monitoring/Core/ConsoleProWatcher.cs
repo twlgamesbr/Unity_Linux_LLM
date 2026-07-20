@@ -26,37 +26,31 @@ namespace NPCSystem.Monitoring
             { "Performance/Memory (MB)", "0" },
             { "Performance/Frame Time (ms)", "0" },
             { "Performance/GC Alloc (MB/frame)", "0" },
-
             // LLM
             { "LLM/Request Duration (ms)", "—" },
             { "LLM/Requests Total", "0" },
             { "LLM/Requests This Session", "0" },
             { "LLM/Last Token Count", "0" },
             { "LLM/Last Model", "—" },
-
             // Qdrant / RAG
             { "RAG/Query Duration (ms)", "—" },
             { "RAG/Queries Total", "0" },
             { "RAG/Results Per Query", "0" },
             { "RAG/Last Collection", "—" },
-
             // Dialogue
             { "Dialogue/Active Sessions", "0" },
             { "Dialogue/Messages Sent", "0" },
             { "Dialogue/Messages Received", "0" },
             { "Dialogue/Current Speaker", "—" },
-
             // Auth
             { "Auth/Logins Total", "0" },
             { "Auth/Active Users", "0" },
             { "Auth/Last Login", "—" },
-
             // Network
             { "Network/Ping (ms)", "—" },
             { "Network/Connected Clients", "0" },
             { "Network/RPCs Sent", "0" },
             { "Network/Transport Mode", "—" },
-
             // Items
             { "Items/Total Traded", "0" },
             { "Items/Catalog Size", "0" },
@@ -88,8 +82,7 @@ namespace NPCSystem.Monitoring
         /// </summary>
         public static void IncrementWatch(string name, int delta = 1)
         {
-            if (Watches.TryGetValue(name, out var current)
-                && int.TryParse(current, out var val))
+            if (Watches.TryGetValue(name, out var current) && int.TryParse(current, out var val))
             {
                 Watches[name] = (val + delta).ToString();
             }
@@ -114,8 +107,9 @@ namespace NPCSystem.Monitoring
             // GC allocation per frame (sampled every 30 frames)
             if (_frameCount % 30 == 0)
             {
-                Watches["Performance/GC Alloc (MB/frame)"] =
-                    (Profiler.GetTotalAllocatedMemoryLong() / (1024L * 1024L)).ToString("F2");
+                Watches["Performance/GC Alloc (MB/frame)"] = (
+                    Profiler.GetTotalAllocatedMemoryLong() / (1024L * 1024L)
+                ).ToString("F2");
             }
 
             // Push all watches to Console Pro via CPAPI Watch protocol

@@ -17,13 +17,13 @@ namespace Unity.Entities
 {
     internal struct TransformAuthoringBaking
     {
-        EntityManager               _EntityManager;
-        EntityQuery                 _StaticQuery;
-        EntityQueryMask             _StaticQueryMask;
-        EntityQuery                 _AdditionalEntityParentQuery;
-        internal JobHandle          _JobHandle;
-        NativeParallelHashMap<int, bool>    _LocalToWorldIndices;
-        IncrementalHierarchy        _SceneHierarchy;
+        EntityManager _EntityManager;
+        EntityQuery _StaticQuery;
+        EntityQueryMask _StaticQueryMask;
+        EntityQuery _AdditionalEntityParentQuery;
+        internal JobHandle _JobHandle;
+        NativeParallelHashMap<int, bool> _LocalToWorldIndices;
+        IncrementalHierarchy _SceneHierarchy;
 
         public TransformAuthoringBaking(EntityManager entityManager)
         {
@@ -34,7 +34,10 @@ namespace Unity.Entities
                 .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
                 .Build(entityManager);
             _StaticQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<Static>().Build(entityManager);
-            Assert.IsFalse(_StaticQuery.HasFilter(), "The use of EntityQueryMask in this job will not respect the query's active filter settings.");
+            Assert.IsFalse(
+                _StaticQuery.HasFilter(),
+                "The use of EntityQueryMask in this job will not respect the query's active filter settings."
+            );
             _StaticQueryMask = _StaticQuery.GetEntityQueryMask();
             _LocalToWorldIndices = new NativeParallelHashMap<int, bool>(1024, Allocator.Persistent);
             _JobHandle = default;
@@ -57,21 +60,28 @@ namespace Unity.Entities
             _LocalToWorldIndices.Clear();
 
             var sceneHierarchy = hierarchy.AsReadOnly();
-            _JobHandle = sceneHierarchy.CollectHierarchyInstanceIdsAndIndicesAsync(changedTransforms, _LocalToWorldIndices);
+            _JobHandle = sceneHierarchy.CollectHierarchyInstanceIdsAndIndicesAsync(
+                changedTransforms,
+                _LocalToWorldIndices
+            );
 
             var bakeTransformAuthoring = new BakeToTransformAuthoringListJob
             {
                 Hierarchy = hierarchy.AsReadOnly(),
                 ChangedIndices = _LocalToWorldIndices,
                 ChangeVersion = _EntityManager.GlobalSystemVersion,
-                TransformAuthorings = _SceneHierarchy.TransformAuthorings.AsArray()
+                TransformAuthorings = _SceneHierarchy.TransformAuthorings.AsArray(),
             };
             _JobHandle = bakeTransformAuthoring.ScheduleReadOnly(_SceneHierarchy.TransformArray, 64, _JobHandle);
             return _JobHandle;
         }
 
         // Perform any work that relies on all entities having been constructed
-        public void UpdateTransforms(UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity, UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages, ref bool hasTransformUsageChanged)
+        public void UpdateTransforms(
+            UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity,
+            UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages,
+            ref bool hasTransformUsageChanged
+        )
         {
             using var marker = new ProfilerMarker("TransformHierarchyBaking.BakeToTransformAuthoring").Auto();
 
@@ -96,7 +106,7 @@ namespace Unity.Entities
                 HasTransformUsageChanged = hasTransformUsageChanged,
                 ChangeVersion = _EntityManager.GlobalSystemVersion,
                 ParentsToForceTransform = parentsToForceTransform,
-                ChangedUsage = changedUsage
+                ChangedUsage = changedUsage,
             };
 
             _JobHandle = job.ScheduleParallel(job.TransformAuthorings.Length, 128, _JobHandle);
@@ -115,7 +125,7 @@ namespace Unity.Entities
                 TransformUsages = transformUsages,
                 ChangeVersion = _EntityManager.GlobalSystemVersion,
                 ParentsToForceTransform = parentsToForceTransform,
-                ChangedUsage = changedUsage
+                ChangedUsage = changedUsage,
             };
             _JobHandle = additionalEntityJob.ScheduleParallelByRef(_AdditionalEntityParentQuery, _JobHandle);
 
@@ -126,7 +136,7 @@ namespace Unity.Entities
             new ForceTransformsOnParentsJob
             {
                 parentsToForceTransform = parentsToForceTransform,
-                TransformAuthoring = _EntityManager.GetComponentLookup<TransformAuthoring>()
+                TransformAuthoring = _EntityManager.GetComponentLookup<TransformAuthoring>(),
             }.Run();
 
             if (!hasTransformUsageChanged)
@@ -169,7 +179,13 @@ namespace Unity.Entities
             return (flags & TransformUsageFlags.NonUniformScale) != 0;
         }
 
-        static TransformUsageFlags GetTransformUsageFlagsFromIndex(int index, ref UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity, ref SceneHierarchy sceneHierarchy, ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages, out Entity entity)
+        static TransformUsageFlags GetTransformUsageFlagsFromIndex(
+            int index,
+            ref UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity,
+            ref SceneHierarchy sceneHierarchy,
+            ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages,
+            out Entity entity
+        )
         {
             if (!gameObjectToEntity.TryGetValue(sceneHierarchy.GetEntityIdForIndex(index), out entity))
                 Debug.LogError("InternalError");
@@ -177,11 +193,22 @@ namespace Unity.Entities
             return parentTransformUsage.Flags;
         }
 
-        static bool IsAnyParentDynamicOrManual(int parentIndex, ref UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity, ref SceneHierarchy sceneHierarchy, ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages)
+        static bool IsAnyParentDynamicOrManual(
+            int parentIndex,
+            ref UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity,
+            ref SceneHierarchy sceneHierarchy,
+            ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages
+        )
         {
             while (parentIndex != -1)
             {
-                var parentTransformUsageFlags = GetTransformUsageFlagsFromIndex(parentIndex, ref gameObjectToEntity, ref sceneHierarchy, ref transformUsages, out _);
+                var parentTransformUsageFlags = GetTransformUsageFlagsFromIndex(
+                    parentIndex,
+                    ref gameObjectToEntity,
+                    ref sceneHierarchy,
+                    ref transformUsages,
+                    out _
+                );
                 if (IsDynamic(parentTransformUsageFlags) || IsManualOverride(parentTransformUsageFlags))
                     return true;
 
@@ -195,7 +222,17 @@ namespace Unity.Entities
             return false;
         }
 
-        static void CalculateGlobalTransformUsage(ref SceneHierarchy sceneHierarchy, ref UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity, ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages, Entity entity, int parentIndex, int threadIndex, ref UnsafeDependencyStream<Entity> parentsToForceTransform, out Entity outParent, out RuntimeTransformComponentFlags outUsage)
+        static void CalculateGlobalTransformUsage(
+            ref SceneHierarchy sceneHierarchy,
+            ref UnsafeParallelHashMap<EntityId, Entity> gameObjectToEntity,
+            ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsages,
+            Entity entity,
+            int parentIndex,
+            int threadIndex,
+            ref UnsafeDependencyStream<Entity> parentsToForceTransform,
+            out Entity outParent,
+            out RuntimeTransformComponentFlags outUsage
+        )
         {
             transformUsages.TryGetValue(entity, out var entityTransformUsage);
             var computedUsage = entityTransformUsage.Flags;
@@ -211,7 +248,15 @@ namespace Unity.Entities
             if (IsManualOverride(computedUsage))
             {
                 // Check if there is any parent that is Dynamic or Manual with at least one intermediate node as None
-                if (parentIndex != -1 && IsAnyParentDynamicOrManual(parentIndex, ref gameObjectToEntity, ref sceneHierarchy, ref transformUsages))
+                if (
+                    parentIndex != -1
+                    && IsAnyParentDynamicOrManual(
+                        parentIndex,
+                        ref gameObjectToEntity,
+                        ref sceneHierarchy,
+                        ref transformUsages
+                    )
+                )
                 {
                     // Access the immediate parent
                     if (!gameObjectToEntity.TryGetValue(sceneHierarchy.GetEntityIdForIndex(parentIndex), out outParent))
@@ -240,7 +285,16 @@ namespace Unity.Entities
             }
 
             // The parent is irrelevant as it is requesting to be in world space or it hasn't got one
-            if (IsWorldSpace(computedUsage) || parentIndex == -1 || !IsAnyParentDynamicOrManual(parentIndex, ref gameObjectToEntity, ref sceneHierarchy, ref transformUsages))
+            if (
+                IsWorldSpace(computedUsage)
+                || parentIndex == -1
+                || !IsAnyParentDynamicOrManual(
+                    parentIndex,
+                    ref gameObjectToEntity,
+                    ref sceneHierarchy,
+                    ref transformUsages
+                )
+            )
             {
                 if (IsDynamic(computedUsage))
                 {
@@ -260,7 +314,8 @@ namespace Unity.Entities
                     parentsToForceTransform.Add(outParent, threadIndex);
                 }
 
-                outUsage |= RuntimeTransformComponentFlags.LocalTransform | RuntimeTransformComponentFlags.RequestParent;
+                outUsage |=
+                    RuntimeTransformComponentFlags.LocalTransform | RuntimeTransformComponentFlags.RequestParent;
             }
         }
 
@@ -286,9 +341,10 @@ namespace Unity.Entities
                         if (transformAuthoring.RuntimeTransformUsage != RuntimeTransformComponentFlags.None)
                             break;
 
-                        transformAuthoring.RuntimeTransformUsage = RuntimeTransformComponentFlags.LocalToWorld |
-                                                                   RuntimeTransformComponentFlags.LocalTransform |
-                                                                   RuntimeTransformComponentFlags.RequestParent;
+                        transformAuthoring.RuntimeTransformUsage =
+                            RuntimeTransformComponentFlags.LocalToWorld
+                            | RuntimeTransformComponentFlags.LocalTransform
+                            | RuntimeTransformComponentFlags.RequestParent;
 
                         // We need to assign the parent
                         transformAuthoring.RuntimeParent = transformAuthoring.AuthoringParent;
@@ -309,30 +365,40 @@ namespace Unity.Entities
         {
             [NativeDisableContainerSafetyRestriction]
             [ReadOnly]
-            public ComponentLookup<TransformAuthoring>   TransformAuthoringLookup;
-            public EntityQueryMask                               HasStatic;
+            public ComponentLookup<TransformAuthoring> TransformAuthoringLookup;
+            public EntityQueryMask HasStatic;
 
-            public EntityTypeHandle                              Entities;
-            public ComponentTypeHandle<TransformAuthoring>       TransformAuthoringHandle;
+            public EntityTypeHandle Entities;
+            public ComponentTypeHandle<TransformAuthoring> TransformAuthoringHandle;
+
             [ReadOnly]
-            public ComponentTypeHandle<AdditionalEntityParent>   AdditionalEntityParent;
+            public ComponentTypeHandle<AdditionalEntityParent> AdditionalEntityParent;
 
-            public EntityCommandBuffer.ParallelWriter            Commands;
+            public EntityCommandBuffer.ParallelWriter Commands;
 
             [ReadOnly]
             public UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> TransformUsages;
+
             [ReadOnly]
-            public SceneHierarchy                                    Hierarchy;
+            public SceneHierarchy Hierarchy;
+
             [ReadOnly]
-            public UnsafeParallelHashMap<EntityId, Entity>           GameObjectToEntity;
-            public uint                                              ChangeVersion;
-            public UnsafeDependencyStream<Entity>                    ParentsToForceTransform;
+            public UnsafeParallelHashMap<EntityId, Entity> GameObjectToEntity;
+            public uint ChangeVersion;
+            public UnsafeDependencyStream<Entity> ParentsToForceTransform;
+
             [NativeDisableParallelForRestriction]
-            public NativeArray<bool>                                 ChangedUsage;
+            public NativeArray<bool> ChangedUsage;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
                 var count = chunk.Count;
@@ -356,7 +422,11 @@ namespace Unity.Entities
                         if (isParentStatic)
                             Commands.AddComponent(unfilteredChunkIndex, entities[i], ComponentType.ReadWrite<Static>());
                         else
-                            Commands.RemoveComponent(unfilteredChunkIndex, entities[i], ComponentType.ReadWrite<Static>());
+                            Commands.RemoveComponent(
+                                unfilteredChunkIndex,
+                                entities[i],
+                                ComponentType.ReadWrite<Static>()
+                            );
                     }
                 }
 
@@ -367,10 +437,23 @@ namespace Unity.Entities
                     var parentTransform = TransformAuthoringLookup[parents[i].Parent];
 
                     var parentIndex = Hierarchy.GetIndexForEntityId(parents[i].ParentEntityId);
-                    CalculateGlobalTransformUsage(ref Hierarchy, ref GameObjectToEntity, ref TransformUsages, entities[i], parentIndex, m_ThreadIndex, ref ParentsToForceTransform, out var runtimeParent, out var runtimeTransformUsage);
+                    CalculateGlobalTransformUsage(
+                        ref Hierarchy,
+                        ref GameObjectToEntity,
+                        ref TransformUsages,
+                        entities[i],
+                        parentIndex,
+                        m_ThreadIndex,
+                        ref ParentsToForceTransform,
+                        out var runtimeParent,
+                        out var runtimeTransformUsage
+                    );
 
-
-                    if (parentTransform.ChangeVersion != transformsRO[i].ChangeVersion || transformsRO[i].RuntimeParent != runtimeParent || transformsRO[i].RuntimeTransformUsage != runtimeTransformUsage)
+                    if (
+                        parentTransform.ChangeVersion != transformsRO[i].ChangeVersion
+                        || transformsRO[i].RuntimeParent != runtimeParent
+                        || transformsRO[i].RuntimeTransformUsage != runtimeTransformUsage
+                    )
                     {
                         ChangedUsage[m_ThreadIndex] = true;
 
@@ -388,7 +471,8 @@ namespace Unity.Entities
                         transform.RuntimeTransformUsage = runtimeTransformUsage;
 
                         if (transformsRW == null)
-                            transformsRW = (TransformAuthoring*)chunk.GetComponentDataPtrRW(ref TransformAuthoringHandle);
+                            transformsRW = (TransformAuthoring*)
+                                chunk.GetComponentDataPtrRW(ref TransformAuthoringHandle);
                         transformsRW[i] = transform;
                     }
                 }
@@ -398,16 +482,18 @@ namespace Unity.Entities
         [BurstCompile]
         struct BakeToTransformAuthoringListJob : IJobParallelForTransform
         {
-            [ReadOnly] public SceneHierarchy           Hierarchy;
-            public NativeArray<TransformAuthoring>     TransformAuthorings;
+            [ReadOnly]
+            public SceneHierarchy Hierarchy;
+            public NativeArray<TransformAuthoring> TransformAuthorings;
 
-            [ReadOnly] public NativeParallelHashMap<int, bool> ChangedIndices;
-            public  uint                               ChangeVersion;
+            [ReadOnly]
+            public NativeParallelHashMap<int, bool> ChangedIndices;
+            public uint ChangeVersion;
 
             public unsafe void Execute(int index, TransformAccess transform)
             {
                 if (!ChangedIndices.TryGetValue(index, out var selfChanged))
-                     return;
+                    return;
 
                 var parentIndex = Hierarchy.GetParentForIndex(index);
                 EntityId parentInstanceID = EntityId.None;
@@ -433,33 +519,43 @@ namespace Unity.Entities
             }
         }
 
-
         [BurstCompile]
         struct BakeToTransformAuthoringComponentJob : IJobFor
         {
-            [ReadOnly] public SceneHierarchy Hierarchy;
-            [ReadOnly] public NativeParallelHashMap<int, bool> ChangedIndices;
-            [ReadOnly] public NativeArray<TransformAuthoring> TransformAuthorings;
+            [ReadOnly]
+            public SceneHierarchy Hierarchy;
+
+            [ReadOnly]
+            public NativeParallelHashMap<int, bool> ChangedIndices;
+
+            [ReadOnly]
+            public NativeArray<TransformAuthoring> TransformAuthorings;
 
             [NativeDisableParallelForRestriction]
             public ComponentLookup<TransformAuthoring> TransformAuthoring;
 
             [ReadOnly]
             public UnsafeParallelHashMap<EntityId, Entity> GameObjectToEntity;
+
             [ReadOnly]
             public UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> TransformUsages;
-            public uint                                              ChangeVersion;
-            public bool                                              HasTransformUsageChanged;
-            public UnsafeDependencyStream<Entity>                    ParentsToForceTransform;
+            public uint ChangeVersion;
+            public bool HasTransformUsageChanged;
+            public UnsafeDependencyStream<Entity> ParentsToForceTransform;
+
             [NativeDisableParallelForRestriction]
-            public NativeArray<bool>                                 ChangedUsage;
+            public NativeArray<bool> ChangedUsage;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
             public unsafe void Execute(int index)
             {
                 // TODO: Review the performance impact of this change.
-                var hasPossibleChange = HasTransformUsageChanged || !ChangedIndices.IsEmpty /*ChangedIndices.TryGetValue(index, out var selfChanged)*/;
+                var hasPossibleChange =
+                    HasTransformUsageChanged
+                    || !ChangedIndices.IsEmpty /*ChangedIndices.TryGetValue(index, out var selfChanged)*/
+                ;
                 if (!hasPossibleChange)
                     return;
 
@@ -475,13 +571,26 @@ namespace Unity.Entities
 
                 // Calculate hierarchical transform usage
                 var parentIndex = Hierarchy.GetIndexForEntityId(parentEntityId);
-                CalculateGlobalTransformUsage(ref Hierarchy, ref GameObjectToEntity, ref TransformUsages, entity, parentIndex, m_ThreadIndex, ref ParentsToForceTransform, out value.RuntimeParent, out value.RuntimeTransformUsage);
+                CalculateGlobalTransformUsage(
+                    ref Hierarchy,
+                    ref GameObjectToEntity,
+                    ref TransformUsages,
+                    entity,
+                    parentIndex,
+                    m_ThreadIndex,
+                    ref ParentsToForceTransform,
+                    out value.RuntimeParent,
+                    out value.RuntimeTransformUsage
+                );
 
                 // Apply it only if it changed, so that we don't dirty change filtering
                 var oldValue = TransformAuthoring[entity];
                 if (!oldValue.Equals(value))
                 {
-                    ChangedUsage[m_ThreadIndex] = ChangedUsage[m_ThreadIndex] || (oldValue.RuntimeParent != value.RuntimeParent) || (oldValue.RuntimeTransformUsage != value.RuntimeTransformUsage);
+                    ChangedUsage[m_ThreadIndex] =
+                        ChangedUsage[m_ThreadIndex]
+                        || (oldValue.RuntimeParent != value.RuntimeParent)
+                        || (oldValue.RuntimeTransformUsage != value.RuntimeTransformUsage);
                     value.ChangeVersion = ChangeVersion;
                     TransformAuthoring[entity] = value;
                 }

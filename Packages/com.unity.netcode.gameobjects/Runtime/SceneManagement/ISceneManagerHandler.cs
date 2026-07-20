@@ -10,11 +10,18 @@ namespace Unity.Netcode
     /// </summary>
     internal interface ISceneManagerHandler
     {
-        public AsyncOperation LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode, SceneEventProgress sceneEventProgress);
+        public AsyncOperation LoadSceneAsync(
+            string sceneName,
+            LoadSceneMode loadSceneMode,
+            SceneEventProgress sceneEventProgress
+        );
 
         public AsyncOperation UnloadSceneAsync(Scene scene, SceneEventProgress sceneEventProgress);
 
-        public void PopulateLoadedScenes(ref Dictionary<NetworkSceneHandle, Scene> scenesLoaded, NetworkManager networkManager = null);
+        public void PopulateLoadedScenes(
+            ref Dictionary<NetworkSceneHandle, Scene> scenesLoaded,
+            NetworkManager networkManager = null
+        );
         public Scene GetSceneFromLoadedScenes(string sceneName, NetworkManager networkManager = null);
 
         public bool DoesSceneHaveUnassignedEntry(string sceneName, NetworkManager networkManager = null);
@@ -31,7 +38,12 @@ namespace Unity.Netcode
 
         public void SetClientSynchronizationMode(ref NetworkManager networkManager, LoadSceneMode mode);
 
-        public bool ClientShouldPassThrough(string sceneName, bool isPrimaryScene, LoadSceneMode clientSynchronizationMode, NetworkManager networkManager);
+        public bool ClientShouldPassThrough(
+            string sceneName,
+            bool isPrimaryScene,
+            LoadSceneMode clientSynchronizationMode,
+            NetworkManager networkManager
+        );
 
         public bool IsIntegrationTest();
     }

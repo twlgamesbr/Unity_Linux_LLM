@@ -47,8 +47,8 @@ namespace Unity.Entities.UI
                     list.Add(type);
                 }
 
-                public RegistrationStatus GetStatus(Type t)
-                    => s_StatusPerType.TryGetValue(t, out var status) ? status : RegistrationStatus.Registered;
+                public RegistrationStatus GetStatus(Type t) =>
+                    s_StatusPerType.TryGetValue(t, out var status) ? status : RegistrationStatus.Registered;
             }
 
             public static readonly Dictionary<Type, List<Type>> s_InspectorsPerType;
@@ -83,9 +83,12 @@ namespace Unity.Entities.UI
                 }
             }
 
-            static void RegisterInspectorType(IDictionary<Type, List<Type>> typeMap, Type interfaceType,
+            static void RegisterInspectorType(
+                IDictionary<Type, List<Type>> typeMap,
+                Type interfaceType,
                 Type inspectorType,
-                RegistrationInfo info)
+                RegistrationInfo info
+            )
             {
                 if (!ValidateCustomInspectorRegistration(inspectorType, info))
                     return;
@@ -130,8 +133,10 @@ namespace Unity.Entities.UI
 
                 if (!inspectedType.IsGenericType)
                 {
-                    info.CacheInvalidInspectorType(type,
-                        RegistrationStatus.UnsupportedGenericInspectorForNonGenericType);
+                    info.CacheInvalidInspectorType(
+                        type,
+                        RegistrationStatus.UnsupportedGenericInspectorForNonGenericType
+                    );
                     return false;
                 }
 

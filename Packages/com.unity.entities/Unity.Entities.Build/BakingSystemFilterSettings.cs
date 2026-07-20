@@ -38,7 +38,7 @@ namespace Unity.Entities.Build
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public BakingSystemFilterSettings() {}
+        public BakingSystemFilterSettings() { }
 
         /// <summary>
         /// Constructor.
@@ -64,7 +64,9 @@ namespace Unity.Entities.Build
         /// <param name="excludedAssemblyDefinitionAssets">
         /// The list of assemblies containing bakers which are going to be excluded during the baking process.
         /// </param>
-        public BakingSystemFilterSettings(params UnityEditorInternal.AssemblyDefinitionAsset[] excludedAssemblyDefinitionAssets)
+        public BakingSystemFilterSettings(
+            params UnityEditorInternal.AssemblyDefinitionAsset[] excludedAssemblyDefinitionAssets
+        )
         {
             foreach (var asset in excludedAssemblyDefinitionAssets)
             {
@@ -77,7 +79,8 @@ namespace Unity.Entities.Build
 
         internal UnityEditorInternal.AssemblyDefinitionAsset FindAssemblyDefinitionAssetByName(string name)
         {
-            var assetPath = UnityEditor.AssetDatabase.FindAssets($"t: asmdef {name}")
+            var assetPath = UnityEditor
+                .AssetDatabase.FindAssets($"t: asmdef {name}")
                 .Select(UnityEditor.AssetDatabase.GUIDToAssetPath)
                 .FirstOrDefault(x => Path.GetFileNameWithoutExtension(x) == name);
             return UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEditorInternal.AssemblyDefinitionAsset>(assetPath);

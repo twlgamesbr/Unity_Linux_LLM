@@ -8,7 +8,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
     /// </summary>
     [BurstCompile]
     [GenerateTestsForBurstCompatibility]
-    internal unsafe readonly partial struct Matrix
+    internal readonly unsafe partial struct Matrix
     {
         /// <summary>
         /// Scans for the last nonzero row

@@ -34,7 +34,7 @@ namespace UnityEngine.Rendering
             {
                 displayName = Strings.hdrOutputAPI,
                 alternateRowColors = true,
-                isReadOnly = true
+                isReadOnly = true,
             };
 
             var row_hdrActive = new DebugUI.Table.Row { displayName = Strings.hdrActive };
@@ -45,174 +45,164 @@ namespace UnityEngine.Rendering
             var row_paperWhite = new DebugUI.Table.Row { displayName = Strings.paperWhite };
             var row_minLuminance = new DebugUI.Table.Row { displayName = Strings.minLuminance };
             var row_maxLuminance = new DebugUI.Table.Row { displayName = Strings.maxLuminance };
-            var row_maxFullFrameLuminance = new DebugUI.Table.Row { displayName = Strings.maxFullFrameLuminance};
+            var row_maxFullFrameLuminance = new DebugUI.Table.Row { displayName = Strings.maxFullFrameLuminance };
             var row_modeChangeRequested = new DebugUI.Table.Row { displayName = Strings.modeChangeRequested };
 
             //Iterate through all displays
             HDROutputSettings[] displays = HDROutputSettings.displays;
-            for(int i=0; i<displays.Length; i++)
+            for (int i = 0; i < displays.Length; i++)
             {
                 var d = displays[i];
 
                 //Check if main display
                 int idName = i + 1;
                 var name = Strings.displayName + idName;
-                if(HDROutputSettings.main == d)
+                if (HDROutputSettings.main == d)
                 {
                     name += Strings.displayMain;
                 }
 
                 //Fill rows
 
-                row_hdrActive.children.Add
-                (
+                row_hdrActive.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
                             return d.active;
-                        }
+                        },
                     }
                 );
 
-                row_hdrAvailable.children.Add
-                (
+                row_hdrAvailable.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
                             return d.available;
-                        }
+                        },
                     }
                 );
 
-                row_gamut.children.Add
-                (
+                row_gamut.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.displayColorGamut;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
 
-                row_format.children.Add
-                (
+                row_format.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.graphicsFormat;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
 
-                row_autoHdrTonemapping.children.Add
-                (
+                row_autoHdrTonemapping.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.automaticHDRTonemapping;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
 
-                row_paperWhite.children.Add
-                (
+                row_paperWhite.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.paperWhiteNits;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
 
-                row_minLuminance.children.Add
-                (
+                row_minLuminance.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.minToneMapLuminance;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
 
-                row_maxLuminance.children.Add
-                (
+                row_maxLuminance.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.maxToneMapLuminance;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
 
-                row_maxFullFrameLuminance.children.Add
-                (
+                row_maxFullFrameLuminance.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.maxFullFrameToneMapLuminance;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
 
-                row_modeChangeRequested.children.Add
-                (
+                row_modeChangeRequested.children.Add(
                     new DebugUI.Value()
                     {
                         displayName = name,
                         getter = () =>
                         {
-                            if(d.available)
+                            if (d.available)
                             {
                                 return d.HDRModeChangeRequested;
                             }
                             return Strings.notAvailable;
-                        }
+                        },
                     }
                 );
             }

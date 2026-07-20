@@ -10,12 +10,12 @@ namespace Unity.Networking.Transport
     /// A simple layer to provide message segmentation.
     /// </summary>
     /// <remarks>
-    /// This layer takes care of segmenting messages over stream-oriented layers at the cost of a minimum overhead 
-    /// (only 2 bytes per message). Stream oriented layers such as <see cref="TCPNetworkInterface"/> and the 
-    /// <see cref="TLSLayer"/> cannot offer the guarantee that a packet in the receive queue corresponds to exactly one 
-    /// message and thus require explicit segmentation. This layer should work correctly over datagram oriented layers 
-    /// but its use then would be redundant and only waste packet space since datagram oriented layers provide message 
-    /// segmentation for free. This layer is also unnecessary where there are already other layers in the stack that 
+    /// This layer takes care of segmenting messages over stream-oriented layers at the cost of a minimum overhead
+    /// (only 2 bytes per message). Stream oriented layers such as <see cref="TCPNetworkInterface"/> and the
+    /// <see cref="TLSLayer"/> cannot offer the guarantee that a packet in the receive queue corresponds to exactly one
+    /// message and thus require explicit segmentation. This layer should work correctly over datagram oriented layers
+    /// but its use then would be redundant and only waste packet space since datagram oriented layers provide message
+    /// segmentation for free. This layer is also unnecessary where there are already other layers in the stack that
     /// can provide message segmentation such as the <see cref="WebSocketLayer"/>.
     /// </remarks>
     internal struct StreamToDatagramLayer : INetworkLayer
@@ -24,12 +24,12 @@ namespace Unity.Networking.Transport
 
         // Maps a connection id from the connection list to its connection data.
         private ConnectionDataMap<ConnectionData> m_ConnectionMap;
-       
+
         public unsafe struct StreamToDatagramLayerPacketBuffer
         {
-            public const int Capacity = 2 * NetworkParameterConstants.AbsoluteMaxMessageSize; 
+            public const int Capacity = 2 * NetworkParameterConstants.AbsoluteMaxMessageSize;
 
-            public fixed byte Data[Capacity];                
+            public fixed byte Data[Capacity];
             public int Length;
         }
 
@@ -54,10 +54,7 @@ namespace Unity.Networking.Transport
 
         public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dep)
         {
-            return new SendJob
-            {
-                SendQueue = arguments.SendQueue,
-            }.Schedule(dep);
+            return new SendJob { SendQueue = arguments.SendQueue }.Schedule(dep);
         }
 
         [BurstCompile]
@@ -65,8 +62,8 @@ namespace Unity.Networking.Transport
         {
             public PacketsQueue SendQueue;
 
-            static ushort HostToNetwork(ushort value)
-                => (ushort)(BitConverter.IsLittleEndian ? ((value & 0xFF) << 8) | ((value >> 8) & 0xFF) : value);
+            static ushort HostToNetwork(ushort value) =>
+                (ushort)(BitConverter.IsLittleEndian ? ((value & 0xFF) << 8) | ((value >> 8) & 0xFF) : value);
 
             public void Execute()
             {
@@ -76,7 +73,10 @@ namespace Unity.Networking.Transport
                 {
                     var packetProcessor = SendQueue[i];
                     // Don't send empty packets or packets larger than we can receive on the other side.
-                    if (packetProcessor.Length == 0 || (ushort)packetProcessor.Length > (SendQueue.PayloadCapacity - k_HeaderSize))
+                    if (
+                        packetProcessor.Length == 0
+                        || (ushort)packetProcessor.Length > (SendQueue.PayloadCapacity - k_HeaderSize)
+                    )
                     {
                         packetProcessor.Drop();
                         continue;
@@ -90,11 +90,9 @@ namespace Unity.Networking.Transport
 
         public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dep)
         {
-            return new ReceiveJob
-            {
-                ReceiveQueue = arguments.ReceiveQueue,
-                ConnectionMap = m_ConnectionMap,
-            }.Schedule(dep);
+            return new ReceiveJob { ReceiveQueue = arguments.ReceiveQueue, ConnectionMap = m_ConnectionMap }.Schedule(
+                dep
+            );
         }
 
         [BurstCompile]
@@ -125,7 +123,11 @@ namespace Unity.Networking.Transport
                     if (ignored < packetProcessor.Length)
                     {
                         var nbytes = packetProcessor.Length - ignored;
-                        UnsafeUtility.MemCpy(connectionData.RecvBuffer.Data + connectionData.RecvBuffer.Length, (byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset + ignored, nbytes);
+                        UnsafeUtility.MemCpy(
+                            connectionData.RecvBuffer.Data + connectionData.RecvBuffer.Length,
+                            (byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset + ignored,
+                            nbytes
+                        );
                         connectionData.RecvBuffer.Length += nbytes;
                     }
 
@@ -133,12 +135,15 @@ namespace Unity.Networking.Transport
 
                     // At this point connectionData.ReceivePacketBuffer.Length is > 0 only if
                     // connectionData.ReceiveIgnore == 0, in other words, if we're not ignoring anything anymore.
-                    var total = connectionData.RecvBuffer.Length; 
+                    var total = connectionData.RecvBuffer.Length;
                     var start = 0;
                     while (total >= k_HeaderSize)
                     {
-                        // Try to pack a message 
-                        var msglen = (ushort)(((connectionData.RecvBuffer.Data[start] & 0xFF)  << 8) + (connectionData.RecvBuffer.Data[start +  1] & 0xFF));
+                        // Try to pack a message
+                        var msglen = (ushort)(
+                            ((connectionData.RecvBuffer.Data[start] & 0xFF) << 8)
+                            + (connectionData.RecvBuffer.Data[start + 1] & 0xFF)
+                        );
                         total -= k_HeaderSize;
 
                         // If incoming message is too large, just ignore
@@ -151,12 +156,12 @@ namespace Unity.Networking.Transport
                         else if (msglen == 0) // if message is empty there is nothing to do but advance in the buffer
                         {
                             // Skip the msg size
-                            start += k_HeaderSize;  
+                            start += k_HeaderSize;
                         }
                         else if (msglen <= total)
                         {
                             // Skip the msg size
-                            start += k_HeaderSize; 
+                            start += k_HeaderSize;
 
                             if (ReceiveQueue.EnqueuePacket(out var newPacketProcessor))
                             {
@@ -172,12 +177,16 @@ namespace Unity.Networking.Transport
 
                     // Move data to the beginning of the buffer if needed
                     if (start > 0 && start < connectionData.RecvBuffer.Length)
-                        UnsafeUtility.MemMove(connectionData.RecvBuffer.Data, connectionData.RecvBuffer.Data + start, connectionData.RecvBuffer.Length - start);
+                        UnsafeUtility.MemMove(
+                            connectionData.RecvBuffer.Data,
+                            connectionData.RecvBuffer.Data + start,
+                            connectionData.RecvBuffer.Length - start
+                        );
 
                     // Update the buffer length. It could have been partially consumed (start < Length), totally
                     // consumed (start == Length) or not consumed at all (start == 0).
                     connectionData.RecvBuffer.Length -= start;
-                    
+
                     ConnectionMap[connectionId] = connectionData;
                     packetProcessor.Drop();
                 }

@@ -1,5 +1,5 @@
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -67,10 +67,22 @@ namespace UnityEngine.Rendering.Universal
                 scalingSetupDesc.format = UniversalRenderPipeline.MakeUnormRenderTextureGraphicsFormat();
             }
 
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, scalingSetupDesc, k_TargetName, true, FilterMode.Point);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                scalingSetupDesc,
+                k_TargetName,
+                true,
+                FilterMode.Point
+            );
 
             // Scaled FXAA
-            using (var builder = renderGraph.AddRasterRenderPass<PostProcessingFinalSetupPassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PostProcessingFinalSetupPassData>(
+                    passName,
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 passData.destinationTexture = destinationTexture;
                 builder.SetRenderAttachment(destinationTexture, 0, AccessFlags.Write);
@@ -82,38 +94,64 @@ namespace UnityEngine.Rendering.Universal
                 passData.tonemapping = tonemapping;
                 passData.hdrOperations = m_HdrOperations;
 
-                builder.SetRenderFunc(static (PostProcessingFinalSetupPassData data, RasterGraphContext context) =>
-                {
-                    UniversalCameraData cameraData = data.cameraData;
-                    Material material = data.material;
-                    material.shaderKeywords = null;
+                builder.SetRenderFunc(
+                    static (PostProcessingFinalSetupPassData data, RasterGraphContext context) =>
+                    {
+                        UniversalCameraData cameraData = data.cameraData;
+                        Material material = data.material;
+                        material.shaderKeywords = null;
 
-                    bool hdrColorEncoding = data.hdrOperations.HasFlag(HDROutputUtils.Operation.ColorEncoding);
-                    bool isFxaaEnabled = PostProcessUtils.IsFxaaEnabled(cameraData);
-                    bool isFsrEnabled = PostProcessUtils.IsFsrEnabled(cameraData);
+                        bool hdrColorEncoding = data.hdrOperations.HasFlag(HDROutputUtils.Operation.ColorEncoding);
+                        bool isFxaaEnabled = PostProcessUtils.IsFxaaEnabled(cameraData);
+                        bool isFsrEnabled = PostProcessUtils.IsFsrEnabled(cameraData);
 
-                    if (isFxaaEnabled)
-                        material.EnableKeyword(ShaderKeywordStrings.Fxaa);
+                        if (isFxaaEnabled)
+                            material.EnableKeyword(ShaderKeywordStrings.Fxaa);
 
-                    if (isFsrEnabled)
-                        material.EnableKeyword( hdrColorEncoding ? ShaderKeywordStrings.Gamma20AndHDRInput : ShaderKeywordStrings.Gamma20);
+                        if (isFsrEnabled)
+                            material.EnableKeyword(
+                                hdrColorEncoding
+                                    ? ShaderKeywordStrings.Gamma20AndHDRInput
+                                    : ShaderKeywordStrings.Gamma20
+                            );
 
-                    if (hdrColorEncoding)
-                        PostProcessUtils.SetupHDROutput(material, cameraData.hdrDisplayInformation, cameraData.hdrDisplayColorGamut, data.tonemapping, data.hdrOperations, cameraData.rendersOverlayUI);
+                        if (hdrColorEncoding)
+                            PostProcessUtils.SetupHDROutput(
+                                material,
+                                cameraData.hdrDisplayInformation,
+                                cameraData.hdrDisplayColorGamut,
+                                data.tonemapping,
+                                data.hdrOperations,
+                                cameraData.rendersOverlayUI
+                            );
 
-                    if (data.cameraData.isAlphaOutputEnabled)
-                        CoreUtils.SetKeyword(material, ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT, cameraData.isAlphaOutputEnabled);
+                        if (data.cameraData.isAlphaOutputEnabled)
+                            CoreUtils.SetKeyword(
+                                material,
+                                ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT,
+                                cameraData.isAlphaOutputEnabled
+                            );
 
-                    material.SetVector(ShaderConstants._SourceSize, PostProcessUtils.CalcShaderSourceSize(data.sourceTexture));
+                        material.SetVector(
+                            ShaderConstants._SourceSize,
+                            PostProcessUtils.CalcShaderSourceSize(data.sourceTexture)
+                        );
 
-                    const bool isFinalPass = false; // This is a pass just before final pass. Viewport must match intermediate target.
-                    PostProcessUtils.ScaleViewportAndBlit(context, data.sourceTexture, data.destinationTexture, data.cameraData, data.material, isFinalPass);
-                });
+                        const bool isFinalPass = false; // This is a pass just before final pass. Viewport must match intermediate target.
+                        PostProcessUtils.ScaleViewportAndBlit(
+                            context,
+                            data.sourceTexture,
+                            data.destinationTexture,
+                            data.cameraData,
+                            data.material,
+                            isFinalPass
+                        );
+                    }
+                );
             }
 
             resourceData.cameraColor = destinationTexture;
         }
-
 
         // Precomputed shader ids to same some CPU cycles (mostly affects mobile)
         public static class ShaderConstants

@@ -23,12 +23,15 @@ namespace Unity.Entities.Editor
             static readonly string s_RemoveComponent = L10n.Tr(k_RemoveComponentCounterName);
             static readonly string s_SetSharedComponent = L10n.Tr(k_SetSharedComponentCounterName);
 
-            static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate("ProfilerModules/structural-changes-profiler-window");
+            static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate(
+                "ProfilerModules/structural-changes-profiler-window"
+            );
 
-            static readonly ObjectPool<VisualElement> k_CellLabelPool = new (() => new VisualElement());
+            static readonly ObjectPool<VisualElement> k_CellLabelPool = new(() => new VisualElement());
 
             TreeViewItemData<StructuralChangesProfilerTreeViewItemData>[] m_StructuralChangesDataSource;
-            readonly List<TreeViewItemData<StructuralChangesProfilerTreeViewItemData>> m_StructuralChangesDataFiltered = new ();
+            readonly List<TreeViewItemData<StructuralChangesProfilerTreeViewItemData>> m_StructuralChangesDataFiltered =
+                new();
 
             VisualElement m_Window;
             Label m_Message;
@@ -60,12 +63,18 @@ namespace Unity.Entities.Editor
                     result[2] = data.SystemName;
                     return result;
                 });
-                m_SearchElement.AddSearchFilterCallbackWithPopupItem<StructuralChangesProfilerTreeViewItemData, double>("cost", data => data.ElapsedNanoseconds * 1e-6, s_Cost);
+                m_SearchElement.AddSearchFilterCallbackWithPopupItem<StructuralChangesProfilerTreeViewItemData, double>(
+                    "cost",
+                    data => data.ElapsedNanoseconds * 1e-6,
+                    s_Cost
+                );
                 m_SearchElement.FilterPopupWidth = 250;
 
-                var searchHandler = new SearchHandler<TreeViewItemData<StructuralChangesProfilerTreeViewItemData>>(m_SearchElement)
+                var searchHandler = new SearchHandler<TreeViewItemData<StructuralChangesProfilerTreeViewItemData>>(
+                    m_SearchElement
+                )
                 {
-                    Mode = SearchHandlerType.async
+                    Mode = SearchHandlerType.async,
                 };
                 searchHandler.SetSearchDataProvider(() => m_StructuralChangesDataSource);
                 searchHandler.OnBeginSearch += _ =>
@@ -98,7 +107,7 @@ namespace Unity.Entities.Editor
                     fixedItemHeight = 18,
                     autoExpand = true,
                     viewDataKey = "full-view",
-                    selectionType = SelectionType.Single
+                    selectionType = SelectionType.Single,
                 };
                 m_TreeView.AddToClassList("structural-changes-profiler-window__tree-view");
                 CreateColumns(m_TreeView);
@@ -125,7 +134,7 @@ namespace Unity.Entities.Editor
                     destroyCell = DestroyCellLabel,
                     resizable = true,
                     minWidth = 100,
-                    width = 300
+                    width = 300,
                 };
 
                 var costColumn = new Column()
@@ -141,7 +150,7 @@ namespace Unity.Entities.Editor
                     bindCell = BindCostItem,
                     destroyCell = DestroyCellLabel,
                     resizable = true,
-                    width = 100
+                    width = 100,
                 };
 
                 var countColumn = new Column()
@@ -157,7 +166,7 @@ namespace Unity.Entities.Editor
                     bindCell = BindCountItem,
                     destroyCell = DestroyCellLabel,
                     resizable = true,
-                    width = 100
+                    width = 100,
                 };
 
                 treeView.columns.Add(structuralColumn);
@@ -167,10 +176,7 @@ namespace Unity.Entities.Editor
 
             static VisualElement MakeHeaderLabel()
             {
-                var label = new Label
-                {
-                    name = "Header",
-                };
+                var label = new Label { name = "Header" };
                 label.AddToClassList("structural-changes-profiler-tree-view-header");
                 return label;
             }
@@ -178,10 +184,7 @@ namespace Unity.Entities.Editor
             static VisualElement MakeCellLabel()
             {
                 var element = k_CellLabelPool.Get();
-                var label = new Label
-                {
-                    name = "Cell"
-                };
+                var label = new Label { name = "Cell" };
                 element.Add(label);
                 return element;
             }
@@ -215,12 +218,30 @@ namespace Unity.Entities.Editor
                     return;
 
                 var itemId = 0;
-                var rootItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(itemId++, new StructuralChangesProfilerTreeViewItem() { displayName = s_All });
-                var createEntityItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem> (itemId++, new StructuralChangesProfilerTreeViewItem() { displayName = s_CreateEntity });
-                var destroyEntityItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem> (itemId++, new StructuralChangesProfilerTreeViewItem() { displayName = s_DestroyEntity });
-                var addComponentItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem> (itemId++, new StructuralChangesProfilerTreeViewItem() { displayName = s_AddComponent });
-                var removeComponentItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem> (itemId++, new StructuralChangesProfilerTreeViewItem() { displayName = s_RemoveComponent });
-                var setSharedComponentItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem> (itemId++, new StructuralChangesProfilerTreeViewItem() { displayName = s_SetSharedComponent });
+                var rootItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                    itemId++,
+                    new StructuralChangesProfilerTreeViewItem() { displayName = s_All }
+                );
+                var createEntityItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                    itemId++,
+                    new StructuralChangesProfilerTreeViewItem() { displayName = s_CreateEntity }
+                );
+                var destroyEntityItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                    itemId++,
+                    new StructuralChangesProfilerTreeViewItem() { displayName = s_DestroyEntity }
+                );
+                var addComponentItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                    itemId++,
+                    new StructuralChangesProfilerTreeViewItem() { displayName = s_AddComponent }
+                );
+                var removeComponentItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                    itemId++,
+                    new StructuralChangesProfilerTreeViewItem() { displayName = s_RemoveComponent }
+                );
+                var setSharedComponentItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                    itemId++,
+                    new StructuralChangesProfilerTreeViewItem() { displayName = s_SetSharedComponent }
+                );
 
                 foreach (var item in m_StructuralChangesDataFiltered)
                 {
@@ -260,7 +281,10 @@ namespace Unity.Entities.Editor
 
                     if (!foundWorld)
                     {
-                        worldItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(itemId++, new StructuralChangesProfilerTreeViewItem() {displayName = item.data.WorldName});
+                        worldItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                            itemId++,
+                            new StructuralChangesProfilerTreeViewItem() { displayName = item.data.WorldName }
+                        );
                         TreeViewItemDataBridge<StructuralChangesProfilerTreeViewItem>.AddChild(eventItem, worldItem);
                     }
 
@@ -278,7 +302,10 @@ namespace Unity.Entities.Editor
 
                     if (!foundSystem)
                     {
-                        systemItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(itemId++, new StructuralChangesProfilerTreeViewItem() {displayName = item.data.SystemName});
+                        systemItem = new TreeViewItemData<StructuralChangesProfilerTreeViewItem>(
+                            itemId++,
+                            new StructuralChangesProfilerTreeViewItem() { displayName = item.data.SystemName }
+                        );
                         TreeViewItemDataBridge<StructuralChangesProfilerTreeViewItem>.AddChild(worldItem, systemItem);
                     }
 
@@ -299,15 +326,21 @@ namespace Unity.Entities.Editor
                 if (addComponentItem.hasChildren)
                     TreeViewItemDataBridge<StructuralChangesProfilerTreeViewItem>.AddChild(rootItem, addComponentItem);
                 if (removeComponentItem.hasChildren)
-                    TreeViewItemDataBridge<StructuralChangesProfilerTreeViewItem>.AddChild(rootItem, removeComponentItem);
+                    TreeViewItemDataBridge<StructuralChangesProfilerTreeViewItem>.AddChild(
+                        rootItem,
+                        removeComponentItem
+                    );
                 if (setSharedComponentItem.hasChildren)
-                    TreeViewItemDataBridge<StructuralChangesProfilerTreeViewItem>.AddChild(rootItem, setSharedComponentItem);
+                    TreeViewItemDataBridge<StructuralChangesProfilerTreeViewItem>.AddChild(
+                        rootItem,
+                        setSharedComponentItem
+                    );
 
                 AddLeafCountRecursive(rootItem);
 
                 if (rootItem.hasChildren)
                 {
-                    m_TreeView.SetRootItems(new [] { rootItem });
+                    m_TreeView.SetRootItems(new[] { rootItem });
                     m_TreeView.ExpandItem(rootItem.id);
                 }
                 else

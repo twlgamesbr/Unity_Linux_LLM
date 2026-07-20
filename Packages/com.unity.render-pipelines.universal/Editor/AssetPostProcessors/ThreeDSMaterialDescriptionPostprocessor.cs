@@ -1,6 +1,6 @@
 using System.IO;
-using UnityEngine;
 using UnityEditor.AssetImporters;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -21,7 +21,11 @@ namespace UnityEditor.Rendering.Universal
             return k_Order;
         }
 
-        public void OnPreprocessMaterialDescription(MaterialDescription description, Material material, AnimationClip[] clips)
+        public void OnPreprocessMaterialDescription(
+            MaterialDescription description,
+            Material material,
+            AnimationClip[] clips
+        )
         {
             var pipelineAsset = GraphicsSettings.currentRenderPipeline;
             if (!pipelineAsset || pipelineAsset.GetType() != typeof(UniversalRenderPipelineAsset))
@@ -81,8 +85,14 @@ namespace UnityEditor.Rendering.Universal
 
             Color diffuseColor = vectorProperty;
 
-            material.SetColor("_Color", PlayerSettings.colorSpace == ColorSpace.Linear ? diffuseColor.gamma : diffuseColor);
-            material.SetColor("_BaseColor", PlayerSettings.colorSpace == ColorSpace.Linear ? diffuseColor.gamma : diffuseColor);
+            material.SetColor(
+                "_Color",
+                PlayerSettings.colorSpace == ColorSpace.Linear ? diffuseColor.gamma : diffuseColor
+            );
+            material.SetColor(
+                "_BaseColor",
+                PlayerSettings.colorSpace == ColorSpace.Linear ? diffuseColor.gamma : diffuseColor
+            );
 
             if (description.TryGetProperty("EmissiveColor", out vectorProperty))
             {
@@ -106,7 +116,11 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void SetMaterialTextureProperty(string propertyName, Material material, TexturePropertyDescription textureProperty)
+        static void SetMaterialTextureProperty(
+            string propertyName,
+            Material material,
+            TexturePropertyDescription textureProperty
+        )
         {
             material.SetTexture(propertyName, textureProperty.texture);
             material.SetTextureOffset(propertyName, textureProperty.offset);

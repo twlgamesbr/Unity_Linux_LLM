@@ -1,4 +1,5 @@
 using Unity.Collections;
+
 namespace Unity.Netcode
 {
     internal class ServerRpcTarget : BaseRpcTarget
@@ -14,7 +15,12 @@ namespace Unity.Netcode
             m_ProxyRpcTarget = null;
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             // For distributed authority the "server" is considered the authority of the object
             if (behaviour.NetworkManager.DistributedAuthorityMode && behaviour.NetworkManager.CMBServiceConnection)
@@ -31,7 +37,7 @@ namespace Unity.Netcode
                         // RpcMessage doesn't access this stuff so it's just left empty.
                         Header = new NetworkMessageHeader(),
                         SerializedHeaderSize = 0,
-                        MessageSize = 0
+                        MessageSize = 0,
                     };
                     using var tempBuffer = new FastBufferReader(message.WriteBuffer, Allocator.None);
                     message.ReadBuffer = tempBuffer;
@@ -64,14 +70,16 @@ namespace Unity.Netcode
                 }
                 else
                 {
-                    m_UnderlyingTarget = new DirectSendRpcTarget(m_NetworkManager) { ClientId = NetworkManager.ServerClientId };
+                    m_UnderlyingTarget = new DirectSendRpcTarget(m_NetworkManager)
+                    {
+                        ClientId = NetworkManager.ServerClientId,
+                    };
                 }
             }
             m_UnderlyingTarget.Send(behaviour, ref message, delivery, rpcParams);
         }
 
-        internal ServerRpcTarget(NetworkManager manager) : base(manager)
-        {
-        }
+        internal ServerRpcTarget(NetworkManager manager)
+            : base(manager) { }
     }
 }

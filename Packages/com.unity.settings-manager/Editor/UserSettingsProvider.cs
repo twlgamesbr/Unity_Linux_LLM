@@ -101,11 +101,36 @@ namespace UnityEditor.SettingsManagement
             }
         }
 
-        internal static UserSetting<bool> showHiddenSettings = new UserSetting<bool>(userSettingsProviderSettings, "settings.showHidden", false, SettingsScope.User);
-        internal static UserSetting<bool> showUnregisteredSettings = new UserSetting<bool>(userSettingsProviderSettings, "settings.showUnregistered", false, SettingsScope.User);
-        internal static UserSetting<bool> listByKey = new UserSetting<bool>(userSettingsProviderSettings, "settings.listByKey", false, SettingsScope.User);
-        internal static UserSetting<bool> showUserSettings = new UserSetting<bool>(userSettingsProviderSettings, "settings.showUserSettings", true, SettingsScope.User);
-        internal static UserSetting<bool> showProjectSettings = new UserSetting<bool>(userSettingsProviderSettings, "settings.showProjectSettings", true, SettingsScope.User);
+        internal static UserSetting<bool> showHiddenSettings = new UserSetting<bool>(
+            userSettingsProviderSettings,
+            "settings.showHidden",
+            false,
+            SettingsScope.User
+        );
+        internal static UserSetting<bool> showUnregisteredSettings = new UserSetting<bool>(
+            userSettingsProviderSettings,
+            "settings.showUnregistered",
+            false,
+            SettingsScope.User
+        );
+        internal static UserSetting<bool> listByKey = new UserSetting<bool>(
+            userSettingsProviderSettings,
+            "settings.listByKey",
+            false,
+            SettingsScope.User
+        );
+        internal static UserSetting<bool> showUserSettings = new UserSetting<bool>(
+            userSettingsProviderSettings,
+            "settings.showUserSettings",
+            true,
+            SettingsScope.User
+        );
+        internal static UserSetting<bool> showProjectSettings = new UserSetting<bool>(
+            userSettingsProviderSettings,
+            "settings.showProjectSettings",
+            true,
+            SettingsScope.User
+        );
 
 #if SETTINGS_PROVIDER_ENABLED
         /// <summary>
@@ -116,7 +141,12 @@ namespace UnityEditor.SettingsManagement
         /// <param name="assemblies">A collection of assemblies to scan for <see cref="UserSettingAttribute"/> and <see cref="UserSettingBlockAttribute"/> attributes.</param>
         /// <param name="scopes">Which scopes this provider is valid for.</param>
         /// <exception cref="ArgumentNullException">Thrown if settings or assemblies is null.</exception>
-        public UserSettingsProvider(string path, Settings settings, Assembly[] assemblies, SettingsScope scopes = SettingsScope.User)
+        public UserSettingsProvider(
+            string path,
+            Settings settings,
+            Assembly[] assemblies,
+            SettingsScope scopes = SettingsScope.User
+        )
             : base(path, scopes)
 #else
         /// <summary>
@@ -165,8 +195,14 @@ namespace UnityEditor.SettingsManagement
 
             if (window != null)
             {
-                s_DefaultLabelWidth = window.PropertyType.GetProperty("s_DefaultLabelWidth", BindingFlags.Public | BindingFlags.Static);
-                s_DefaultLayoutMaxWidth = window.PropertyType.GetProperty("s_DefaultLayoutMaxWidth", BindingFlags.Public | BindingFlags.Static);
+                s_DefaultLabelWidth = window.PropertyType.GetProperty(
+                    "s_DefaultLabelWidth",
+                    BindingFlags.Public | BindingFlags.Static
+                );
+                s_DefaultLayoutMaxWidth = window.PropertyType.GetProperty(
+                    "s_DefaultLayoutMaxWidth",
+                    BindingFlags.Public | BindingFlags.Static
+                );
             }
         }
 #endif
@@ -212,17 +248,22 @@ namespace UnityEditor.SettingsManagement
 
             // collect instance fields/methods too, but only so we can throw a warning that they're invalid.
             var fields = types.SelectMany(x =>
-                    x.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
-                    .Where(prop => Attribute.IsDefined(prop, typeof(UserSettingAttribute))));
+                x.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+                    .Where(prop => Attribute.IsDefined(prop, typeof(UserSettingAttribute)))
+            );
 
-            var methods = types.SelectMany(x => x.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(y => Attribute.IsDefined(y, typeof(UserSettingBlockAttribute))));
+            var methods = types.SelectMany(x =>
+                x.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                    .Where(y => Attribute.IsDefined(y, typeof(UserSettingBlockAttribute)))
+            );
 
             foreach (var field in fields)
             {
                 if (!field.IsStatic)
                 {
-                    Debug.LogWarning("Cannot create setting entries for instance fields. Skipping \"" + field.Name + "\".");
+                    Debug.LogWarning(
+                        "Cannot create setting entries for instance fields. Skipping \"" + field.Name + "\"."
+                    );
                     continue;
                 }
 
@@ -235,7 +276,11 @@ namespace UnityEditor.SettingsManagement
 
                 if (pref == null)
                 {
-                    Debug.LogWarning("[UserSettingAttribute] is only valid for types implementing the IUserSetting interface. Skipping \"" + field.Name + "\"");
+                    Debug.LogWarning(
+                        "[UserSettingAttribute] is only valid for types implementing the IUserSetting interface. Skipping \""
+                            + field.Name
+                            + "\""
+                    );
                     continue;
                 }
 
@@ -255,7 +300,8 @@ namespace UnityEditor.SettingsManagement
 
             foreach (var method in methods)
             {
-                var attrib = (UserSettingBlockAttribute)Attribute.GetCustomAttribute(method, typeof(UserSettingBlockAttribute));
+                var attrib = (UserSettingBlockAttribute)
+                    Attribute.GetCustomAttribute(method, typeof(UserSettingBlockAttribute));
                 var category = string.IsNullOrEmpty(attrib.category) ? "Uncategorized" : attrib.category;
 
                 if (developerModeCategory.Equals(category) && !isDeveloperMode)
@@ -267,7 +313,11 @@ namespace UnityEditor.SettingsManagement
 
                 if (!method.IsStatic || parameters.Length < 1 || parameters[0].ParameterType != typeof(string))
                 {
-                    Debug.LogWarning("[UserSettingBlockAttribute] is only valid for static functions with a single string parameter. Ex, `static void MySettings(string searchContext)`. Skipping \"" + method.Name + "\"");
+                    Debug.LogWarning(
+                        "[UserSettingBlockAttribute] is only valid for static functions with a single string parameter. Ex, `static void MySettings(string searchContext)`. Skipping \""
+                            + method.Name
+                            + "\""
+                    );
                     continue;
                 }
 
@@ -281,7 +331,12 @@ namespace UnityEditor.SettingsManagement
             {
                 var unlisted = new List<PrefEntry>();
                 m_Settings.Add("Unlisted", unlisted);
-                foreach (var pref in UserSettings.FindUserSettings(m_Assemblies, SettingVisibility.Unlisted | SettingVisibility.Hidden))
+                foreach (
+                    var pref in UserSettings.FindUserSettings(
+                        m_Assemblies,
+                        SettingVisibility.Unlisted | SettingVisibility.Hidden
+                    )
+                )
                     unlisted.Add(new PrefEntry(new GUIContent(pref.key), pref));
             }
 
@@ -313,9 +368,12 @@ namespace UnityEditor.SettingsManagement
         }
 
 #if SETTINGS_PROVIDER_ENABLED
-        static readonly GUIContent k_OptionsMenu =
-            new GUIContent(null, null, "Options specific to this category of settings.");
-        
+        static readonly GUIContent k_OptionsMenu = new GUIContent(
+            null,
+            null,
+            "Options specific to this category of settings."
+        );
+
         /// <summary>
         /// Invoked by the SettingsProvider container when drawing the UI header.
         /// </summary>
@@ -355,59 +413,98 @@ namespace UnityEditor.SettingsManagement
         {
             var menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Reset All", "Reset all settings in this category."), false, () =>
+            menu.AddItem(
+                new GUIContent("Reset All", "Reset all settings in this category."),
+                false,
+                () =>
                 {
-                    if (!UnityEditor.EditorUtility.DisplayDialog("Reset All Settings", "Reset all settings? This is not undo-able.", "Reset", "Cancel"))
+                    if (
+                        !UnityEditor.EditorUtility.DisplayDialog(
+                            "Reset All Settings",
+                            "Reset all settings? This is not undo-able.",
+                            "Reset",
+                            "Cancel"
+                        )
+                    )
                         return;
 
                     // Do not reset SettingVisibility.Unregistered
-                    foreach (var pref in UserSettings.FindUserSettings(m_Assemblies, SettingVisibility.Visible | SettingVisibility.Hidden | SettingVisibility.Unlisted))
+                    foreach (
+                        var pref in UserSettings.FindUserSettings(
+                            m_Assemblies,
+                            SettingVisibility.Visible | SettingVisibility.Hidden | SettingVisibility.Unlisted
+                        )
+                    )
                         pref.Reset();
 
                     m_SettingsInstance.Save();
-                });
+                }
+            );
 
             if (EditorPrefs.GetBool("DeveloperMode", false))
             {
                 menu.AddSeparator("");
 
-                menu.AddItem(new GUIContent("Developer/List Settings By Key"), listByKey, () =>
+                menu.AddItem(
+                    new GUIContent("Developer/List Settings By Key"),
+                    listByKey,
+                    () =>
                     {
                         listByKey.SetValue(!listByKey, true);
                         SearchForUserSettingAttributes();
-                    });
+                    }
+                );
 
                 menu.AddSeparator("Developer/");
 
-                menu.AddItem(new GUIContent("Developer/Show User Settings"), showUserSettings, () =>
+                menu.AddItem(
+                    new GUIContent("Developer/Show User Settings"),
+                    showUserSettings,
+                    () =>
                     {
                         showUserSettings.SetValue(!showUserSettings, true);
                         SearchForUserSettingAttributes();
-                    });
+                    }
+                );
 
-                menu.AddItem(new GUIContent("Developer/Show Project Settings"), showProjectSettings, () =>
+                menu.AddItem(
+                    new GUIContent("Developer/Show Project Settings"),
+                    showProjectSettings,
+                    () =>
                     {
                         showProjectSettings.SetValue(!showProjectSettings, true);
                         SearchForUserSettingAttributes();
-                    });
+                    }
+                );
 
                 menu.AddSeparator("Developer/");
 
-                menu.AddItem(new GUIContent("Developer/Show Unlisted Settings"), showHiddenSettings, () =>
+                menu.AddItem(
+                    new GUIContent("Developer/Show Unlisted Settings"),
+                    showHiddenSettings,
+                    () =>
                     {
                         showHiddenSettings.SetValue(!showHiddenSettings, true);
                         SearchForUserSettingAttributes();
-                    });
+                    }
+                );
 
-                menu.AddItem(new GUIContent("Developer/Show Unregistered Settings"), showUnregisteredSettings, () =>
+                menu.AddItem(
+                    new GUIContent("Developer/Show Unregistered Settings"),
+                    showUnregisteredSettings,
+                    () =>
                     {
                         showUnregisteredSettings.SetValue(!showUnregisteredSettings, true);
                         SearchForUserSettingAttributes();
-                    });
+                    }
+                );
 
                 menu.AddSeparator("Developer/");
 
-                menu.AddItem(new GUIContent("Developer/Open Project Settings File"), false, () =>
+                menu.AddItem(
+                    new GUIContent("Developer/Open Project Settings File"),
+                    false,
+                    () =>
                     {
                         var project = m_SettingsInstance.GetRepository(SettingsScope.Project);
 
@@ -416,19 +513,28 @@ namespace UnityEditor.SettingsManagement
                             var path = Path.GetFullPath(project.path);
                             System.Diagnostics.Process.Start(path);
                         }
-                    });
+                    }
+                );
 
-                menu.AddItem(new GUIContent("Developer/Print All Settings"), false, () =>
+                menu.AddItem(
+                    new GUIContent("Developer/Print All Settings"),
+                    false,
+                    () =>
                     {
                         Debug.Log(UserSettings.GetSettingsString(m_Assemblies));
-                    });
+                    }
+                );
 
 #if UNITY_2019_1_OR_NEWER
                 menu.AddSeparator("Developer/");
 #if UNITY_2019_3_OR_NEWER
                 menu.AddItem(new GUIContent("Developer/Recompile Scripts"), false, EditorUtility.RequestScriptReload);
 #else
-                menu.AddItem(new GUIContent("Developer/Recompile Scripts"), false, UnityEditorInternal.InternalEditorUtility.RequestScriptReload);
+                menu.AddItem(
+                    new GUIContent("Developer/Recompile Scripts"),
+                    false,
+                    UnityEditorInternal.InternalEditorUtility.RequestScriptReload
+                );
 #endif
 #endif
             }
@@ -487,7 +593,12 @@ namespace UnityEditor.SettingsManagement
                 {
                     foreach (var setting in settingField.Value)
                     {
-                        if (searchKeywords.Any(x => !string.IsNullOrEmpty(x) && setting.content.text.IndexOf(x, StringComparison.InvariantCultureIgnoreCase) > -1))
+                        if (
+                            searchKeywords.Any(x =>
+                                !string.IsNullOrEmpty(x)
+                                && setting.content.text.IndexOf(x, StringComparison.InvariantCultureIgnoreCase) > -1
+                            )
+                        )
                             DoPreferenceField(setting.content, setting.pref);
                     }
                 }
@@ -611,7 +722,10 @@ namespace UnityEditor.SettingsManagement
             else
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(title, GUILayout.Width(EditorGUIUtility.labelWidth - EditorStyles.label.margin.right * 2));
+                GUILayout.Label(
+                    title,
+                    GUILayout.Width(EditorGUIUtility.labelWidth - EditorStyles.label.margin.right * 2)
+                );
                 var obj = pref.GetValue();
                 GUILayout.Label(obj == null ? "null" : pref.GetValue().ToString());
                 GUILayout.EndHorizontal();

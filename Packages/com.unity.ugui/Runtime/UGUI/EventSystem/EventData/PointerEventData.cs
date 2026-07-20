@@ -1,6 +1,6 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
+using System.Text;
 
 namespace UnityEngine.EventSystems
 {
@@ -27,7 +27,7 @@ namespace UnityEngine.EventSystems
             /// <summary>
             /// Middle button
             /// </summary>
-            Middle = 2
+            Middle = 2,
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace UnityEngine.EventSystems
             /// <summary>
             /// Same as last frame.
             /// </summary>
-            NotChanged
+            NotChanged,
         }
 
         /// <summary>
@@ -131,7 +131,6 @@ namespace UnityEngine.EventSystems
         /// <summary>
         /// World-space position where a ray cast into the screen hits something
         /// </summary>
-
         [Obsolete("Use either pointerCurrentRaycast.worldPosition or pointerPressRaycast.worldPosition")]
         public Vector3 worldPosition { get; set; }
 
@@ -195,7 +194,6 @@ namespace UnityEngine.EventSystems
         /// </summary>
         public InputButton button { get; set; }
 
-
         /// <summary>
         /// The amount of pressure currently applied by a touch.
         /// </summary>
@@ -204,11 +202,13 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public float pressure { get; set; }
+
         /// <summary>
         /// The pressure applied to an additional pressure-sensitive control on the stylus.
         /// </summary>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public float tangentialPressure { get; set; }
+
         /// <summary>
         /// The angle of the stylus relative to the surface, in radians
         /// </summary>
@@ -217,6 +217,7 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public float altitudeAngle { get; set; }
+
         /// <summary>
         /// The angle of the stylus relative to the x-axis, in radians.
         /// </summary>
@@ -225,21 +226,25 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public float azimuthAngle { get; set; }
+
         /// <summary>
         /// The rotation of the stylus around its axis, in radians.
         /// </summary>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public float twist { get; set; }
+
         /// <summary>
         /// Specifies the angle of the pen relative to the X &amp; Y axis, in radians.
         /// </summary>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public Vector2 tilt { get; set; }
+
         /// <summary>
         /// Specifies the state of the pen. For example, whether the pen is in contact with the screen or tablet, whether the pen is inverted, and whether buttons are pressed.
         /// </summary>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public PenStatus penStatus { get; set; }
+
         /// <summary>
         /// An estimate of the radius of a touch.
         /// </summary>
@@ -248,6 +253,7 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public Vector2 radius { get; set; }
+
         /// <summary>
         /// The accuracy of the touch radius.
         /// </summary>
@@ -255,17 +261,20 @@ namespace UnityEngine.EventSystems
         /// Add this value to the radius to get the maximum touch radius, subtract it to get the minimum touch radius.
         /// </remarks>
         public Vector2 radiusVariance { get; set; }
+
         /// <summary>
         /// Specifies in the case of a pointer exit if the pointer has fully exited the area or if it has just entered a child.
         /// </summary>
         public bool fullyExited { get; set; }
+
         /// <summary>
         /// Specifies in the case of a pointer enter if the pointer has entered a new area or if it has just reentered a parent after leaving a child.
         /// </summary>
         public bool reentered { get; set; }
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
 
-        public PointerEventData(EventSystem eventSystem) : base(eventSystem)
+        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+        public PointerEventData(EventSystem eventSystem)
+            : base(eventSystem)
         {
             eligibleForClick = false;
 

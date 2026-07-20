@@ -12,6 +12,7 @@ namespace Unity.Entities.Hybrid.Baking
         /// Represents the instance ID of the authoring component that created the Additional Entity in its Baker.
         /// </summary>
         public EntityId AuthoringComponentID;
+
         /// <summary>
         /// The Additional Entity associated with this Primary Entity
         /// </summary>

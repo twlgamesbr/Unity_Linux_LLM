@@ -34,19 +34,30 @@ namespace UnityEditor.Rendering.Universal
 
         static void EnsureVolumeProfile()
         {
-            if (GraphicsSettings.TryGetRenderPipelineSettings<URPDefaultVolumeProfileSettings>(out var volumeProfileSettings))
+            if (
+                GraphicsSettings.TryGetRenderPipelineSettings<URPDefaultVolumeProfileSettings>(
+                    out var volumeProfileSettings
+                )
+            )
             {
                 var initState = volumeProfileSettings.volumeProfile;
-                volumeProfileSettings.volumeProfile = UniversalRenderPipelineGlobalSettings.GetOrCreateDefaultVolumeProfile(volumeProfileSettings.volumeProfile);
+                volumeProfileSettings.volumeProfile =
+                    UniversalRenderPipelineGlobalSettings.GetOrCreateDefaultVolumeProfile(
+                        volumeProfileSettings.volumeProfile
+                    );
 
                 if (initState != volumeProfileSettings.volumeProfile)
                 {
-                    Debug.Log($"Default Volume Profile was missing, one has been created automatically at '{AssetDatabase.GetAssetPath(volumeProfileSettings.volumeProfile)}'.");
+                    Debug.Log(
+                        $"Default Volume Profile was missing, one has been created automatically at '{AssetDatabase.GetAssetPath(volumeProfileSettings.volumeProfile)}'."
+                    );
                 }
 
                 if (VolumeProfileUtils.TryEnsureAllOverridesForDefaultProfile(volumeProfileSettings.volumeProfile))
                 {
-                    Debug.Log("Default Volume Profile has been modified to ensure all overrides are present. This is required to avoid missing overrides at runtime which can lead to unexpected rendering issues. Please save these changes to avoid this message in the future.");
+                    Debug.Log(
+                        "Default Volume Profile has been modified to ensure all overrides are present. This is required to avoid missing overrides at runtime which can lead to unexpected rendering issues. Please save these changes to avoid this message in the future."
+                    );
                 }
             }
         }
@@ -65,7 +76,9 @@ namespace UnityEditor.Rendering.Universal
                     foreach (var rendererData in urpAsset.m_RendererDataList)
                     {
                         if (rendererData != null)
-                            assetsIncluded.AppendLine($"\t - {rendererData.name} - {AssetDatabase.GetAssetPath(rendererData)} - {rendererData.GetType()}");
+                            assetsIncluded.AppendLine(
+                                $"\t - {rendererData.name} - {AssetDatabase.GetAssetPath(rendererData)} - {rendererData.GetType()}"
+                            );
                     }
                 }
 

@@ -8,7 +8,5 @@ namespace Unity.Rendering
     /// <remarks>
     /// The ManageSHPropertiesSystem uses this to manage shadow harmonics.
     /// </remarks>
-    public struct CustomProbeTag : IComponentData
-    {
-    }
+    public struct CustomProbeTag : IComponentData { }
 }

@@ -15,122 +15,167 @@ namespace UnityEditor.Rendering
         // add them to the appropriate lists below.
 
         // Functions going in all command buffers
-        static List<FunctionInfo> baseFunctions = new List<FunctionInfo> {
-                new FunctionInfo("SetGlobalFloat", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalInt", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalInteger", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalVector", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalColor", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalMatrix", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalFloatArray", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalVectorArray", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalMatrixArray", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalTexture", textureArg: "value", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalBuffer", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetGlobalConstantBuffer", textureArg: "", modifiesGlobalState: true),
-                "SetLateLatchProjectionMatrices",
-                "MarkLateLatchMatrixShaderPropertyID",
-                "UnmarkLateLatchMatrix",
-                new FunctionInfo("EnableShaderKeyword", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("EnableKeyword", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("DisableShaderKeyword", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("DisableKeyword", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetKeyword", textureArg: "", modifiesGlobalState: true),
-                "SetShadowSamplingMode",
-                "SetSinglePassStereo",
-                "IssuePluginEvent",
-                "IssuePluginEventAndData",
-                "IssuePluginCustomBlit",
-                "IssuePluginCustomTextureUpdateV2",
-                "SetInvertCulling",
-                "EnableScissorRect",
-                "DisableScissorRect",
-                "SetViewport",
-                "SetGlobalDepthBias",
-                "BeginSample",
-                "EndSample",
-                "IncrementUpdateCount",
-                "SetViewProjectionMatrices",
-                "SetupCameraProperties",
-                "InvokeOnRenderObjectCallbacks"
-            };
+        static List<FunctionInfo> baseFunctions = new List<FunctionInfo>
+        {
+            new FunctionInfo("SetGlobalFloat", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalInt", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalInteger", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalVector", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalColor", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalMatrix", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalFloatArray", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalVectorArray", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalMatrixArray", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalTexture", textureArg: "value", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalBuffer", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetGlobalConstantBuffer", textureArg: "", modifiesGlobalState: true),
+            "SetLateLatchProjectionMatrices",
+            "MarkLateLatchMatrixShaderPropertyID",
+            "UnmarkLateLatchMatrix",
+            new FunctionInfo("EnableShaderKeyword", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("EnableKeyword", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("DisableShaderKeyword", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("DisableKeyword", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetKeyword", textureArg: "", modifiesGlobalState: true),
+            "SetShadowSamplingMode",
+            "SetSinglePassStereo",
+            "IssuePluginEvent",
+            "IssuePluginEventAndData",
+            "IssuePluginCustomBlit",
+            "IssuePluginCustomTextureUpdateV2",
+            "SetInvertCulling",
+            "EnableScissorRect",
+            "DisableScissorRect",
+            "SetViewport",
+            "SetGlobalDepthBias",
+            "BeginSample",
+            "EndSample",
+            "IncrementUpdateCount",
+            "SetViewProjectionMatrices",
+            "SetupCameraProperties",
+            "InvokeOnRenderObjectCallbacks",
+        };
 
         // Functions for compute only
-        static List<FunctionInfo> computeFunctions = new List<FunctionInfo> {
-                "SetComputeParamsFromMaterial",
-                "SetComputeFloatParam",
-                "SetComputeIntParam",
-                "SetComputeVectorArrayParam",
-                "SetComputeMatrixParam",
-                "SetComputeMatrixArrayParam",
-                "SetComputeFloatParams",
-                "SetComputeIntParams",
-                new FunctionInfo("SetComputeTextureParam", textureArg: "rt"),
-                "SetComputeBufferParam",
-                "SetComputeConstantBufferParam",
-                "SetComputeVectorParam",
-                "DispatchCompute",
-                "BuildRayTracingAccelerationStructure",
-                "SetRayTracingAccelerationStructure",
-                "SetRayTracingBufferParam",
-                "SetRayTracingConstantBufferParam",
-                new FunctionInfo("SetRayTracingTextureParam", textureArg: "rt"),
-                "SetRayTracingFloatParam",
-                "SetRayTracingFloatParams",
-                "SetRayTracingIntParam",
-                "SetRayTracingIntParams",
-                "SetRayTracingVectorParam",
-                "SetRayTracingVectorArrayParam",
-                "SetRayTracingMatrixParam",
-                "SetRayTracingMatrixArrayParam",
-                "SetRayTracingShaderPass",
-                "DispatchRays",
-                "SetBufferData",
-                "SetBufferCounterValue",
-                "CopyCounterValue"
-            };
+        static List<FunctionInfo> computeFunctions = new List<FunctionInfo>
+        {
+            "SetComputeParamsFromMaterial",
+            "SetComputeFloatParam",
+            "SetComputeIntParam",
+            "SetComputeVectorArrayParam",
+            "SetComputeMatrixParam",
+            "SetComputeMatrixArrayParam",
+            "SetComputeFloatParams",
+            "SetComputeIntParams",
+            new FunctionInfo("SetComputeTextureParam", textureArg: "rt"),
+            "SetComputeBufferParam",
+            "SetComputeConstantBufferParam",
+            "SetComputeVectorParam",
+            "DispatchCompute",
+            "BuildRayTracingAccelerationStructure",
+            "SetRayTracingAccelerationStructure",
+            "SetRayTracingBufferParam",
+            "SetRayTracingConstantBufferParam",
+            new FunctionInfo("SetRayTracingTextureParam", textureArg: "rt"),
+            "SetRayTracingFloatParam",
+            "SetRayTracingFloatParams",
+            "SetRayTracingIntParam",
+            "SetRayTracingIntParams",
+            "SetRayTracingVectorParam",
+            "SetRayTracingVectorArrayParam",
+            "SetRayTracingMatrixParam",
+            "SetRayTracingMatrixArrayParam",
+            "SetRayTracingShaderPass",
+            "DispatchRays",
+            "SetBufferData",
+            "SetBufferCounterValue",
+            "CopyCounterValue",
+        };
 
         // Functions for raster (native render passes) only
-        static List<FunctionInfo> rasterFunctions = new List<FunctionInfo> {
-                new FunctionInfo("DrawMesh", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawMultipleMeshes", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawRenderer", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawRendererList", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawProcedural", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawProceduralIndirect", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawMeshInstanced", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawMeshInstancedProcedural", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawMeshInstancedIndirect", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("DrawOcclusionMesh", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("SetInstanceMultiplier", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("ClearRenderTarget", textureArg : "", modifiesGlobalState : false, triggersRasterization: true),
-                new FunctionInfo("SetFoveatedRenderingMode", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("ConfigureFoveatedRendering", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetWireframe", textureArg: "", modifiesGlobalState: true),
-                new FunctionInfo("SetShadingRateFragmentSize", textureArg: "", modifiesGlobalState: false),
-                new FunctionInfo("SetShadingRateCombiner", textureArg: "", modifiesGlobalState: false),
+        static List<FunctionInfo> rasterFunctions = new List<FunctionInfo>
+        {
+            new FunctionInfo("DrawMesh", textureArg: "", modifiesGlobalState: false, triggersRasterization: true),
+            new FunctionInfo(
+                "DrawMultipleMeshes",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo("DrawRenderer", textureArg: "", modifiesGlobalState: false, triggersRasterization: true),
+            new FunctionInfo(
+                "DrawRendererList",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo("DrawProcedural", textureArg: "", modifiesGlobalState: false, triggersRasterization: true),
+            new FunctionInfo(
+                "DrawProceduralIndirect",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo(
+                "DrawMeshInstanced",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo(
+                "DrawMeshInstancedProcedural",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo(
+                "DrawMeshInstancedIndirect",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo(
+                "DrawOcclusionMesh",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo("SetInstanceMultiplier", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo(
+                "ClearRenderTarget",
+                textureArg: "",
+                modifiesGlobalState: false,
+                triggersRasterization: true
+            ),
+            new FunctionInfo("SetFoveatedRenderingMode", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("ConfigureFoveatedRendering", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetWireframe", textureArg: "", modifiesGlobalState: true),
+            new FunctionInfo("SetShadingRateFragmentSize", textureArg: "", modifiesGlobalState: false),
+            new FunctionInfo("SetShadingRateCombiner", textureArg: "", modifiesGlobalState: false),
         };
 
         // Functions for unsafe (wrapper around Commandbuffer) only
-        static List<FunctionInfo> unsafeFunctions = new List<FunctionInfo> {
-                "SetRenderTarget",
-                "Clear",
-                "RequestAsyncReadbackIntoNativeArray",
-                "RequestAsyncReadback",
-                "ClearRandomWriteTargets",
-                "SetRandomWriteTarget",
-                "CopyTexture",
-                "GenerateMips",
-                // Next APIs are already available in UnsafeCommandBuffer through compute or base functions lists,
-                // but the added overloads below relax safety rules to support texture parameters without texture handle usage.
-                new FunctionInfo("SetGlobalTexture", textureArg: "", modifiesGlobalState: true),
-                "SetRayTracingTextureParam",
-                "SetComputeTextureParam",
-                // End of added unsafe overloads
-            };
+        static List<FunctionInfo> unsafeFunctions = new List<FunctionInfo>
+        {
+            "SetRenderTarget",
+            "Clear",
+            "RequestAsyncReadbackIntoNativeArray",
+            "RequestAsyncReadback",
+            "ClearRandomWriteTargets",
+            "SetRandomWriteTarget",
+            "CopyTexture",
+            "GenerateMips",
+            // Next APIs are already available in UnsafeCommandBuffer through compute or base functions lists,
+            // but the added overloads below relax safety rules to support texture parameters without texture handle usage.
+            new FunctionInfo("SetGlobalTexture", textureArg: "", modifiesGlobalState: true),
+            "SetRayTracingTextureParam",
+            "SetComputeTextureParam",
+            // End of added unsafe overloads
+        };
+
         // Generated file header
         static string preamble =
-@"
+            @"
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -162,7 +207,7 @@ namespace UnityEngine.Rendering
 
         // Generated class header
         static string classPreamble =
-@"
+            @"
     /// <summary>
     /// @docString@
     /// </summary>
@@ -172,10 +217,9 @@ namespace UnityEngine.Rendering
         internal @type_name@(CommandBuffer wrapped, RenderGraphPass executingPass, bool isAsync) : base(wrapped, executingPass, isAsync) { }
 ";
 
-
         // Generated interface header
         static string interfacePeamble =
-@"
+            @"
     /// <summary>
     /// @docString@
     /// </summary>
@@ -185,14 +229,14 @@ namespace UnityEngine.Rendering
 
         // Generated file footer
         static string postamble =
-@"
+            @"
     }
 }
 ";
 
         // Generated individual function template
         static string functionTemplate =
-@"
+            @"
         /// <summary>Wraps [{0}](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.{0}.html) on a CommandBuffer.</summary>
 {1}
         public void {0}{5}({2}) {6} {{ {4} m_WrappedCommandBuffer.{0}({3}); }}
@@ -200,21 +244,26 @@ namespace UnityEngine.Rendering
 
         // Generated individual function template
         static string interfaceFunctionTemplate =
-@"
+            @"
         /// <summary>Wraps [{0}](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.{0}.html) on a CommandBuffer.</summary>
 {1}
         public void {0}{5}({2}) {6};
 ";
 
         static string paramDocTemplate =
-@"        /// <param name=""{0}"">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.{1}.html)</param>";
+            @"        /// <param name=""{0}"">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.{1}.html)</param>";
 
         static string typeParamDocTemplate =
-@"        /// <typeparam name=""{0}"">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.{1}.html)</typeparam>";
+            @"        /// <typeparam name=""{0}"">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.{1}.html)</typeparam>";
 
         struct FunctionInfo
         {
-            public FunctionInfo(string name, string textureArg, bool modifiesGlobalState = false, bool triggersRasterization = false)
+            public FunctionInfo(
+                string name,
+                string textureArg,
+                bool modifiesGlobalState = false,
+                bool triggersRasterization = false
+            )
             {
                 this.name = name;
                 this.textureArgs = textureArg;
@@ -229,15 +278,16 @@ namespace UnityEngine.Rendering
 
             // Name of the function to expose, all overloads are exposed with it.
             public string name;
+
             // Name of a texture pointer argument. This will receive extra validation for the Rendergraph.
             public string textureArgs;
+
             // Indicate if the function modifies global render state.
             public bool modifiesGlobalState;
+
             // Indicate if the function actually triggers rasterization and may thus cause pixel shader invocations.
             public bool triggersRasterization;
         }
-
-
 
         /// <summary>
         /// Generate a commandbuffer type exposing only certain methods of the base commandbuffer class
@@ -248,7 +298,14 @@ namespace UnityEngine.Rendering
         /// <param name="isInterface">Whether or not the new class is an interface</param>
         /// <param name="validateRaster">Whether or not the functions in this class should validate that a raster commandbuffer has any render targets</param>
         /// <param name="functionList">List of functions on commandbuffer to expose</param>
-        static void GenerateCommandBufferType(string className, string docString, string baseType, bool isInterface, bool validateRaster, IEnumerable<FunctionInfo> functionList)
+        static void GenerateCommandBufferType(
+            string className,
+            string docString,
+            string baseType,
+            bool isInterface,
+            bool validateRaster,
+            IEnumerable<FunctionInfo> functionList
+        )
         {
             StringBuilder result = new StringBuilder();
             result.Append(preamble);
@@ -345,13 +402,26 @@ namespace UnityEngine.Rendering
                     argDocList.AppendFormat(typeParamDocTemplate, "T", method.Name);
                 }
 
-                result.AppendFormat((isInterface) ? interfaceFunctionTemplate : functionTemplate, method.Name, argDocList.ToString(), typedArgList.ToString(), argList.ToString(), validationCode.ToString(), genericArgList.ToString(), genericConstraints.ToString());
+                result.AppendFormat(
+                    (isInterface) ? interfaceFunctionTemplate : functionTemplate,
+                    method.Name,
+                    argDocList.ToString(),
+                    typedArgList.ToString(),
+                    argList.ToString(),
+                    validationCode.ToString(),
+                    genericArgList.ToString(),
+                    genericConstraints.ToString()
+                );
             }
 
             result.Append(postamble);
             var outputFile = className + ".cs";
             File.WriteAllText(outputFile, result.ToString());
-            Debug.Log("Wrote generated file to: " + Path.GetFullPath(outputFile) + " please review it, and if approved, move it to the 'com.unity.render-pipelines.core/Runtime/CommandBuffers/' folder.");
+            Debug.Log(
+                "Wrote generated file to: "
+                    + Path.GetFullPath(outputFile)
+                    + " please review it, and if approved, move it to the 'com.unity.render-pipelines.core/Runtime/CommandBuffers/' folder."
+            );
         }
 
         // Replace CLI types with c# shorthands for cleaner code...
@@ -399,7 +469,6 @@ namespace UnityEngine.Rendering
             var t = arg.ParameterType;
             if (t.HasElementType)
             {
-
                 // Determine whether the type is an array.
                 if (t.IsArray)
                 {
@@ -411,13 +480,11 @@ namespace UnityEngine.Rendering
 
                     return prefix + CSharpFlavour(t.GetElementType()) + "[]";
                 }
-
                 // Determine whether the type is an 'in' argument,
                 else if (arg.IsIn)
                 {
                     return "in " + CSharpFlavour(t.GetElementType());
                 }
-
                 // Determine whether the type is a reference. 'in' is also a reference but this was already handled above.
                 else if (t.IsByRef)
                 {
@@ -458,14 +525,63 @@ namespace UnityEngine.Rendering
         [MenuItem("Edit/Rendering/Generate Core CommandBuffers")]
         static void GenerateCommandBufferTypes()
         {
-            GenerateCommandBufferType("IBaseCommandBuffer", "This interface declares functions shared by several command buffer types.", "", true, false, baseFunctions);
-            GenerateCommandBufferType("IRasterCommandBuffer", "This interface declares functions that are specific to a rasterization command buffer.", ": IBaseCommandBuffer", true, false, rasterFunctions);
-            GenerateCommandBufferType("IComputeCommandBuffer", "This interface declares functions that are specific to a compute command buffer.", ": IBaseCommandBuffer", true, false, computeFunctions);
-            GenerateCommandBufferType("IUnsafeCommandBuffer", "This interface declares functions that are specific to an unsafe command buffer.", ": IBaseCommandBuffer, IRasterCommandBuffer, IComputeCommandBuffer", true, false, unsafeFunctions);
+            GenerateCommandBufferType(
+                "IBaseCommandBuffer",
+                "This interface declares functions shared by several command buffer types.",
+                "",
+                true,
+                false,
+                baseFunctions
+            );
+            GenerateCommandBufferType(
+                "IRasterCommandBuffer",
+                "This interface declares functions that are specific to a rasterization command buffer.",
+                ": IBaseCommandBuffer",
+                true,
+                false,
+                rasterFunctions
+            );
+            GenerateCommandBufferType(
+                "IComputeCommandBuffer",
+                "This interface declares functions that are specific to a compute command buffer.",
+                ": IBaseCommandBuffer",
+                true,
+                false,
+                computeFunctions
+            );
+            GenerateCommandBufferType(
+                "IUnsafeCommandBuffer",
+                "This interface declares functions that are specific to an unsafe command buffer.",
+                ": IBaseCommandBuffer, IRasterCommandBuffer, IComputeCommandBuffer",
+                true,
+                false,
+                unsafeFunctions
+            );
 
-            GenerateCommandBufferType("RasterCommandBuffer", "A command buffer that is used with a rasterization render graph pass.", "BaseCommandBuffer, IRasterCommandBuffer", false, true, baseFunctions.Concat(rasterFunctions));
-            GenerateCommandBufferType("ComputeCommandBuffer",  "A command buffer that is used with a compute render graph pass.", "BaseCommandBuffer, IComputeCommandBuffer", false, false, baseFunctions.Concat(computeFunctions));
-            GenerateCommandBufferType("UnsafeCommandBuffer", "A command buffer that is used with an unsafe render graph pass.", "BaseCommandBuffer, IUnsafeCommandBuffer", false, false, baseFunctions.Concat(unsafeFunctions).Concat(rasterFunctions).Concat(computeFunctions));
+            GenerateCommandBufferType(
+                "RasterCommandBuffer",
+                "A command buffer that is used with a rasterization render graph pass.",
+                "BaseCommandBuffer, IRasterCommandBuffer",
+                false,
+                true,
+                baseFunctions.Concat(rasterFunctions)
+            );
+            GenerateCommandBufferType(
+                "ComputeCommandBuffer",
+                "A command buffer that is used with a compute render graph pass.",
+                "BaseCommandBuffer, IComputeCommandBuffer",
+                false,
+                false,
+                baseFunctions.Concat(computeFunctions)
+            );
+            GenerateCommandBufferType(
+                "UnsafeCommandBuffer",
+                "A command buffer that is used with an unsafe render graph pass.",
+                "BaseCommandBuffer, IUnsafeCommandBuffer",
+                false,
+                false,
+                baseFunctions.Concat(unsafeFunctions).Concat(rasterFunctions).Concat(computeFunctions)
+            );
         }
     }
 }

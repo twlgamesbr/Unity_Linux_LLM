@@ -1,7 +1,7 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics.Systems;
-using Unity.Collections;
 
 namespace Unity.Physics.GraphicsIntegration
 {
@@ -20,6 +20,7 @@ namespace Unity.Physics.GraphicsIntegration
     {
         /// <summary>   The delta time. </summary>
         public double DeltaTime;
+
         /// <summary>   The elapsed time. </summary>
         public double ElapsedTime;
     }
@@ -56,14 +57,20 @@ namespace Unity.Physics.GraphicsIntegration
             {
                 var mostRecentTimeEntity = SystemAPI.GetSingletonEntity<MostRecentFixedTime>();
                 //Let the graphics system smooth the rigid body motion for the physics world using recent smooth time.
-                SmoothRigidBodiesGraphicalMotion.RegisterPhysicsWorldForSmoothRigidBodyMotion(ref state, mostRecentTimeEntity, worldIndex);
+                SmoothRigidBodiesGraphicalMotion.RegisterPhysicsWorldForSmoothRigidBodyMotion(
+                    ref state,
+                    mostRecentTimeEntity,
+                    worldIndex
+                );
                 m_initializedWorlds.Add(worldIndex);
             }
-            var mostRecentTimeBuffer = SystemAPI.GetBuffer<MostRecentFixedTime>(SystemAPI.GetSingletonEntity<MostRecentFixedTime>());
+            var mostRecentTimeBuffer = SystemAPI.GetBuffer<MostRecentFixedTime>(
+                SystemAPI.GetSingletonEntity<MostRecentFixedTime>()
+            );
             mostRecentTimeBuffer[(int)worldIndex.Value] = new MostRecentFixedTime
             {
                 ElapsedTime = SystemAPI.Time.ElapsedTime,
-                DeltaTime = SystemAPI.Time.DeltaTime
+                DeltaTime = SystemAPI.Time.DeltaTime,
             };
         }
     }

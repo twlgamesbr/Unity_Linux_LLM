@@ -8,8 +8,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
     {
         public static ProfilerCounterDescriptor[] CountersAsDescriptors(this ProfilerModuleDefinition moduleDefinition)
         {
-            return moduleDefinition.Counters
-                .Select(counter => new ProfilerCounterDescriptor(counter, ProfilerCategory.Network.Name))
+            return moduleDefinition
+                .Counters.Select(counter => new ProfilerCounterDescriptor(counter, ProfilerCategory.Network.Name))
                 .ToArray();
         }
     }

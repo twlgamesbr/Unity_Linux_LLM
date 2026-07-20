@@ -9,7 +9,9 @@ namespace UnityEngine.Rendering.Universal
         static readonly string k_ShadowVolumetricPass = "Shadow2D Volumetric UnsafePass";
 
         private static readonly ProfilingSampler m_ProfilingSampler = new ProfilingSampler(k_ShadowPass);
-        private static readonly ProfilingSampler m_ProfilingSamplerVolume = new ProfilingSampler(k_ShadowVolumetricPass);
+        private static readonly ProfilingSampler m_ProfilingSamplerVolume = new ProfilingSampler(
+            k_ShadowVolumetricPass
+        );
 
         private static void ExecuteShadowPass(UnsafeCommandBuffer cmd, PassData passData, Light2D light, int batchIndex)
         {
@@ -21,7 +23,14 @@ namespace UnityEngine.Rendering.Universal
             var projectedShadowMaterial = passData.rendererData.GetProjectedShadowMaterial();
             var projectedUnshadowMaterial = passData.rendererData.GetProjectedUnshadowMaterial();
 
-            ShadowRendering.PrerenderShadows(cmd, passData.rendererData, ref passData.layerBatch, light, 0, light.shadowIntensity);
+            ShadowRendering.PrerenderShadows(
+                cmd,
+                passData.rendererData,
+                ref passData.layerBatch,
+                light,
+                0,
+                light.shadowIntensity
+            );
         }
 
         internal class PassData
@@ -40,15 +49,20 @@ namespace UnityEngine.Rendering.Universal
             Renderer2DData rendererData = frameData.Get<Universal2DRenderingData>().renderingData;
             var layerBatch = frameData.Get<Universal2DRenderingData>().layerBatches[batchIndex];
 
-            if (!layerBatch.lightStats.useShadows ||
-                isVolumetric && !layerBatch.lightStats.useVolumetricShadowLights)
+            if (!layerBatch.lightStats.useShadows || isVolumetric && !layerBatch.lightStats.useVolumetricShadowLights)
                 return;
 
             var passName = !isVolumetric ? k_ShadowPass : k_ShadowVolumetricPass;
             var profilingSampler = !isVolumetric ? m_ProfilingSampler : m_ProfilingSamplerVolume;
             LayerDebug.FormatPassName(layerBatch, ref passName);
 
-            using (var builder = graph.AddUnsafePass<PassData>(passName, out var passData, LayerDebug.GetProfilingSampler(passName, profilingSampler)))
+            using (
+                var builder = graph.AddUnsafePass<PassData>(
+                    passName,
+                    out var passData,
+                    LayerDebug.GetProfilingSampler(passName, profilingSampler)
+                )
+            )
             {
                 passData.isVolumetric = isVolumetric;
                 passData.layerBatch = layerBatch;
@@ -63,22 +77,27 @@ namespace UnityEngine.Rendering.Universal
 
                 builder.AllowGlobalStateModification(true);
 
-                builder.SetRenderFunc(static (PassData data, UnsafeGraphContext context) =>
-                {
-                    for (int i = 0; i < data.layerBatch.shadowIndices.Count; ++i)
+                builder.SetRenderFunc(
+                    static (PassData data, UnsafeGraphContext context) =>
                     {
-                        var cmd = context.cmd;
-                        var index = data.layerBatch.shadowIndices[i];
-                        var light = data.layerBatch.lights[index];
+                        for (int i = 0; i < data.layerBatch.shadowIndices.Count; ++i)
+                        {
+                            var cmd = context.cmd;
+                            var index = data.layerBatch.shadowIndices[i];
+                            var light = data.layerBatch.lights[index];
 
-                        if (data.isVolumetric && !RendererLighting.CanCastVolumetricShadows(light, data.layerBatch.endLayerValue))
-                            continue;
+                            if (
+                                data.isVolumetric
+                                && !RendererLighting.CanCastVolumetricShadows(light, data.layerBatch.endLayerValue)
+                            )
+                                continue;
 
-                        // Shadow Pass
-                        ExecuteShadowPass(cmd, data, light, i);
+                            // Shadow Pass
+                            ExecuteShadowPass(cmd, data, light, i);
+                        }
                     }
-                });
-            }                                                                                                                                                                                                                                                                                                                                                       
+                );
+            }
         }
     }
 }

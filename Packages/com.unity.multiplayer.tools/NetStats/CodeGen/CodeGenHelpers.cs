@@ -22,24 +22,36 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
             diagnostics.AddError((SequencePoint)null, message);
         }
 
-        public static void AddError(this List<DiagnosticMessage> diagnostics, MethodDefinition methodDefinition, string message)
+        public static void AddError(
+            this List<DiagnosticMessage> diagnostics,
+            MethodDefinition methodDefinition,
+            string message
+        )
         {
             diagnostics.AddError(methodDefinition.DebugInformation.SequencePoints.FirstOrDefault(), message);
         }
 
         static void AddError(this List<DiagnosticMessage> diagnostics, SequencePoint sequencePoint, string message)
         {
-            diagnostics.Add(new DiagnosticMessage
-            {
-                DiagnosticType = DiagnosticType.Error,
-                File = sequencePoint?.Document.Url.Replace($"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}", ""),
-                Line = sequencePoint?.StartLine ?? 0,
-                Column = sequencePoint?.StartColumn ?? 0,
-                MessageData = $" - {message}"
-            });
+            diagnostics.Add(
+                new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Error,
+                    File = sequencePoint?.Document.Url.Replace(
+                        $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}",
+                        ""
+                    ),
+                    Line = sequencePoint?.StartLine ?? 0,
+                    Column = sequencePoint?.StartColumn ?? 0,
+                    MessageData = $" - {message}",
+                }
+            );
         }
 
-        public static AssemblyDefinition AssemblyDefinitionFor(ICompiledAssembly compiledAssembly, out PostProcessorAssemblyResolver assemblyResolver)
+        public static AssemblyDefinition AssemblyDefinitionFor(
+            ICompiledAssembly compiledAssembly,
+            out PostProcessorAssemblyResolver assemblyResolver
+        )
         {
             assemblyResolver = new PostProcessorAssemblyResolver(compiledAssembly);
             var readerParameters = new ReaderParameters
@@ -48,10 +60,13 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
                 SymbolReaderProvider = new PortablePdbReaderProvider(),
                 AssemblyResolver = assemblyResolver,
                 ReflectionImporterProvider = new PostProcessorReflectionImporterProvider(),
-                ReadingMode = ReadingMode.Immediate
+                ReadingMode = ReadingMode.Immediate,
             };
 
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(new MemoryStream(compiledAssembly.InMemoryAssembly.PeData), readerParameters);
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(
+                new MemoryStream(compiledAssembly.InMemoryAssembly.PeData),
+                readerParameters
+            );
             assemblyResolver.AddAssemblyDefinitionBeingOperatedOn(assemblyDefinition);
 
             return assemblyDefinition;
@@ -60,7 +75,8 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
         public static void InjectTypeRegistration(
             AssemblyDefinition assembly,
             ModuleDefinition module,
-            Func<ILProcessor, List<Instruction>> instructionsFactory)
+            Func<ILProcessor, List<Instruction>> instructionsFactory
+        )
         {
             var type = module.Types.FirstOrDefault(t => t.FullName == TypeRegistration.k_ClassName);
 
@@ -75,20 +91,23 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
                     string.Empty,
                     TypeRegistration.k_ClassName,
                     TypeAttributes.Class | TypeAttributes.Public,
-                    module.TypeSystem.Object);
+                    module.TypeSystem.Object
+                );
 
                 method = new MethodDefinition(
                     TypeRegistration.k_MethodName,
                     MethodAttributes.Static,
-                    module.TypeSystem.Void);
+                    module.TypeSystem.Void
+                );
                 method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 
                 type.Methods.Add(method);
                 module.Types.Add(type);
 
                 var preserveConstructor = typeof(PreserveAttribute).GetConstructor(Type.EmptyTypes);
-                var typeRegistrationConstructor = typeof(AssemblyRequiresTypeRegistrationAttribute)
-                    .GetConstructor(Type.EmptyTypes);
+                var typeRegistrationConstructor = typeof(AssemblyRequiresTypeRegistrationAttribute).GetConstructor(
+                    Type.EmptyTypes
+                );
 
                 var preserveAttribute = module.ImportReference(preserveConstructor);
                 var typeRegistrationAttribute = module.ImportReference(typeRegistrationConstructor);
@@ -99,14 +118,17 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
 
             var processor = method.Body.GetILProcessor();
             var instructions = instructionsFactory.Invoke(processor);
-            instructions.ForEach(instruction => processor.Body.Instructions.Insert(processor.Body.Instructions.Count - 1, instruction));
+            instructions.ForEach(instruction =>
+                processor.Body.Instructions.Insert(processor.Body.Instructions.Count - 1, instruction)
+            );
         }
 
         public static GenericInstanceMethod CreateStaticGenericMethod(
             ModuleDefinition module,
             TypeReference staticType,
             MethodReference staticGenericMethod,
-            TypeReference genericTypeArgument)
+            TypeReference genericTypeArgument
+        )
         {
             var method = new MethodReference(staticGenericMethod.Name, module.TypeSystem.Void, staticType);
             var genericParameter = new GenericParameter(method);

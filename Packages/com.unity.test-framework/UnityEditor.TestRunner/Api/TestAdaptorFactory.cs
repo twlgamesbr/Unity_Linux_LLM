@@ -9,10 +9,12 @@ namespace UnityEditor.TestTools.TestRunner.Api
     internal class TestAdaptorFactory : ITestAdaptorFactory
     {
         private Dictionary<string, TestAdaptor> m_TestAdaptorCache = new Dictionary<string, TestAdaptor>();
-        private Dictionary<string, TestResultAdaptor> m_TestResultAdaptorCache = new Dictionary<string, TestResultAdaptor>();
+        private Dictionary<string, TestResultAdaptor> m_TestResultAdaptorCache =
+            new Dictionary<string, TestResultAdaptor>();
+
         public ITestAdaptor Create(ITest test)
         {
-            var cacheKey = string.Concat(test.GetUniqueName(),test.Properties.Get("platform"));
+            var cacheKey = string.Concat(test.GetUniqueName(), test.Properties.Get("platform"));
             if (test.Properties.ContainsKey("platform"))
             {
                 cacheKey = string.Concat(cacheKey, test.Properties.Get("platform"));
@@ -43,12 +45,21 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         public ITestResultAdaptor Create(ITestResult testResult)
         {
-            var cacheKey = string.Join(";", testResult.Test.GetUniqueName(), testResult.Test.GetRetryIteration(), testResult.Test.GetRepeatIteration());
+            var cacheKey = string.Join(
+                ";",
+                testResult.Test.GetUniqueName(),
+                testResult.Test.GetRetryIteration(),
+                testResult.Test.GetRepeatIteration()
+            );
             if (m_TestResultAdaptorCache.ContainsKey(cacheKey))
             {
                 return m_TestResultAdaptorCache[cacheKey];
             }
-            var adaptor = new TestResultAdaptor(testResult, Create(testResult.Test), testResult.Children.Select(Create).ToArray());
+            var adaptor = new TestResultAdaptor(
+                testResult,
+                Create(testResult.Test),
+                testResult.Children.Select(Create).ToArray()
+            );
             m_TestResultAdaptorCache[cacheKey] = adaptor;
             return adaptor;
         }
@@ -69,10 +80,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
                 return null;
             }
 
-            var children = test.Tests
-                .Select(c => Create(c, filter))
-                .Where(c => c != null)
-                .ToArray();
+            var children = test.Tests.Select(c => Create(c, filter)).Where(c => c != null).ToArray();
 
             var adaptor = new TestAdaptor(test, children: children);
 

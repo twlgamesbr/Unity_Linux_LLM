@@ -21,7 +21,7 @@ namespace Unity.Entities.Baking
             }
 
             public TypeIndex TypeIndex;
-            public EntityId  EntityId;
+            public EntityId EntityId;
         }
 
         //UnsafeParallelMultiHashMap<int, TransformData>      _TransformData;
@@ -29,10 +29,12 @@ namespace Unity.Entities.Baking
         // Used to keep the last converted state of each game object.
         UnsafeParallelHashMap<EntityId, UnsafeList<ComponentData>> _GameObjectComponentMetaData;
 
-
         public GameObjectComponents(Allocator allocator)
         {
-            _GameObjectComponentMetaData = new UnsafeParallelHashMap<EntityId, UnsafeList<ComponentData>>(1024, allocator);
+            _GameObjectComponentMetaData = new UnsafeParallelHashMap<EntityId, UnsafeList<ComponentData>>(
+                1024,
+                allocator
+            );
         }
 
         public UnsafeList<ComponentData>.ReadOnly GetComponents(EntityId entityId)
@@ -41,7 +43,7 @@ namespace Unity.Entities.Baking
             return componentList.AsReadOnly();
         }
 
-        public bool HasComponent (EntityId gameObjectEntityId, EntityId componentEntityId)
+        public bool HasComponent(EntityId gameObjectEntityId, EntityId componentEntityId)
         {
             if (_GameObjectComponentMetaData.TryGetValue(gameObjectEntityId, out var componentList))
             {
@@ -55,7 +57,7 @@ namespace Unity.Entities.Baking
             return false;
         }
 
-        public EntityId GetComponent (EntityId gameObjectEntityId, TypeIndex componentType)
+        public EntityId GetComponent(EntityId gameObjectEntityId, TypeIndex componentType)
         {
             if (_GameObjectComponentMetaData.TryGetValue(gameObjectEntityId, out var componentList))
             {
@@ -68,7 +70,11 @@ namespace Unity.Entities.Baking
             return EntityId.None;
         }
 
-        public void GetComponents (EntityId gameObjectEntityId, TypeIndex componentType, ref UnsafeList<EntityId> results)
+        public void GetComponents(
+            EntityId gameObjectEntityId,
+            TypeIndex componentType,
+            ref UnsafeList<EntityId> results
+        )
         {
             if (_GameObjectComponentMetaData.TryGetValue(gameObjectEntityId, out var componentList))
             {
@@ -80,7 +86,11 @@ namespace Unity.Entities.Baking
             }
         }
 
-        private void GetComponentsHash(EntityId gameObjectEntityId, TypeIndex componentType, ref xxHash3.StreamingState hash)
+        private void GetComponentsHash(
+            EntityId gameObjectEntityId,
+            TypeIndex componentType,
+            ref xxHash3.StreamingState hash
+        )
         {
             if (_GameObjectComponentMetaData.TryGetValue(gameObjectEntityId, out var componentList))
             {
@@ -99,12 +109,16 @@ namespace Unity.Entities.Baking
             return new Hash128(hashGenerator.DigestHash128());
         }
 
-        public static EntityId GetComponentInParent(ref GameObjectComponents components, ref SceneHierarchy hierarchy, EntityId gameObject, TypeIndex type)
+        public static EntityId GetComponentInParent(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            EntityId gameObject,
+            TypeIndex type
+        )
         {
             EntityId res = components.GetComponent(gameObject, type);
             if (res != EntityId.None)
                 return res;
-
 
             if (!hierarchy.TryGetIndexForEntityId(gameObject, out var index))
             {
@@ -145,7 +159,12 @@ namespace Unity.Entities.Baking
             _GameObjectComponentMetaData[entityId] = componentDataList;
         }
 
-        private static EntityId GetComponentInChildrenInternal(ref GameObjectComponents components, ref SceneHierarchy hierarchy, int index, TypeIndex type)
+        private static EntityId GetComponentInChildrenInternal(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            int index,
+            TypeIndex type
+        )
         {
             EntityId res = EntityId.None;
             var childIterator = hierarchy.GetChildIndicesForIndex(index);
@@ -167,7 +186,12 @@ namespace Unity.Entities.Baking
             return res;
         }
 
-        public static EntityId GetComponentInChildren(ref GameObjectComponents components, ref SceneHierarchy hierarchy, EntityId gameObject, TypeIndex type)
+        public static EntityId GetComponentInChildren(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            EntityId gameObject,
+            TypeIndex type
+        )
         {
             EntityId res = components.GetComponent(gameObject, type);
             if (res != EntityId.None)
@@ -180,7 +204,13 @@ namespace Unity.Entities.Baking
             return GetComponentInChildrenInternal(ref components, ref hierarchy, index, type);
         }
 
-        private static void GetComponentsInChildrenInternal(ref GameObjectComponents components, ref SceneHierarchy hierarchy, int index, TypeIndex type, ref UnsafeList<EntityId> results)
+        private static void GetComponentsInChildrenInternal(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            int index,
+            TypeIndex type,
+            ref UnsafeList<EntityId> results
+        )
         {
             var childIterator = hierarchy.GetChildIndicesForIndex(index);
             while (childIterator.MoveNext())
@@ -196,7 +226,13 @@ namespace Unity.Entities.Baking
             }
         }
 
-        public static void GetComponentsInChildren(ref GameObjectComponents components, ref SceneHierarchy hierarchy, EntityId gameObject, TypeIndex type, ref UnsafeList<EntityId> results)
+        public static void GetComponentsInChildren(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            EntityId gameObject,
+            TypeIndex type,
+            ref UnsafeList<EntityId> results
+        )
         {
             components.GetComponents(gameObject, type, ref results);
 
@@ -206,7 +242,13 @@ namespace Unity.Entities.Baking
             }
         }
 
-        private static void GetComponentsInChildrenInternalHash(ref GameObjectComponents components, ref SceneHierarchy hierarchy, int index, TypeIndex type, ref xxHash3.StreamingState hashGenerator)
+        private static void GetComponentsInChildrenInternalHash(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            int index,
+            TypeIndex type,
+            ref xxHash3.StreamingState hashGenerator
+        )
         {
             var childIterator = hierarchy.GetChildIndicesForIndex(index);
             while (childIterator.MoveNext())
@@ -222,7 +264,12 @@ namespace Unity.Entities.Baking
             }
         }
 
-        public static Hash128 GetComponentsInChildrenHash(ref GameObjectComponents components, ref SceneHierarchy hierarchy, EntityId gameObject, TypeIndex type)
+        public static Hash128 GetComponentsInChildrenHash(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            EntityId gameObject,
+            TypeIndex type
+        )
         {
             var hashGenerator = new xxHash3.StreamingState(false);
             components.GetComponentsHash(gameObject, type, ref hashGenerator);
@@ -234,7 +281,13 @@ namespace Unity.Entities.Baking
             return new Hash128(hashGenerator.DigestHash128());
         }
 
-        public static void GetComponentsInParent(ref GameObjectComponents components, ref SceneHierarchy hierarchy, EntityId gameObject, TypeIndex type, ref UnsafeList<EntityId> results)
+        public static void GetComponentsInParent(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            EntityId gameObject,
+            TypeIndex type,
+            ref UnsafeList<EntityId> results
+        )
         {
             components.GetComponents(gameObject, type, ref results);
 
@@ -252,7 +305,13 @@ namespace Unity.Entities.Baking
             }
         }
 
-        private static void GetComponentsInParentHash(ref GameObjectComponents components, ref SceneHierarchy hierarchy, EntityId gameObject, TypeIndex type, ref xxHash3.StreamingState hashGenerator)
+        private static void GetComponentsInParentHash(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            EntityId gameObject,
+            TypeIndex type,
+            ref xxHash3.StreamingState hashGenerator
+        )
         {
             components.GetComponentsHash(gameObject, type, ref hashGenerator);
 
@@ -270,7 +329,12 @@ namespace Unity.Entities.Baking
             }
         }
 
-        public static Hash128 GetComponentsInParentHash(ref GameObjectComponents components, ref SceneHierarchy hierarchy, EntityId gameObject, TypeIndex type)
+        public static Hash128 GetComponentsInParentHash(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            EntityId gameObject,
+            TypeIndex type
+        )
         {
             var hashGenerator = new xxHash3.StreamingState(false);
             GetComponentsInParentHash(ref components, ref hierarchy, gameObject, type, ref hashGenerator);
@@ -283,7 +347,13 @@ namespace Unity.Entities.Baking
         /// <param name="gameObject"></param>
         /// <param name="components"></param>
         /// <returns>Returns true if the game object was created</returns>
-        public unsafe bool UpdateGameObject(GameObject gameObject, List<Component> currentComponentsOnGameObject, List<Component> outAddedComponents, List<Component> outExistingComponents, ref UnsafeParallelHashSet<EntityId> removed)
+        public unsafe bool UpdateGameObject(
+            GameObject gameObject,
+            List<Component> currentComponentsOnGameObject,
+            List<Component> outAddedComponents,
+            List<Component> outExistingComponents,
+            ref UnsafeParallelHashSet<EntityId> removed
+        )
         {
             //TODO: DOTS-5453
 
@@ -334,7 +404,10 @@ namespace Unity.Entities.Baking
             {
                 // There are no previous components recorded, so all current are new
                 outAddedComponents.AddRange(currentComponentsOnGameObject);
-                componentDataList = new UnsafeList<ComponentData>(currentComponentsOnGameObject.Count, Allocator.Persistent);
+                componentDataList = new UnsafeList<ComponentData>(
+                    currentComponentsOnGameObject.Count,
+                    Allocator.Persistent
+                );
             }
 
             foreach (var com in currentComponentsOnGameObject)

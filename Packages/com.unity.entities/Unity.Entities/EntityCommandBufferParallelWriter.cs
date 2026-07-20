@@ -29,7 +29,9 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (m_Data->m_Allocator.ToAllocator == Allocator.Temp)
             {
-                throw new InvalidOperationException($"{nameof(EntityCommandBuffer.ParallelWriter)} can not use Allocator.Temp; use the EntityCommandBufferSystem's RewindableAllocator instead");
+                throw new InvalidOperationException(
+                    $"{nameof(EntityCommandBuffer.ParallelWriter)} can not use Allocator.Temp; use the EntityCommandBufferSystem's RewindableAllocator instead"
+                );
             }
 #endif
             parallelWriter.m_Data = m_Data;
@@ -43,16 +45,16 @@ namespace Unity.Entities
             return parallelWriter;
         }
 
-
         /// <summary>
         /// Allows concurrent (deterministic) command buffer recording.
         /// </summary>
         [NativeContainer]
         [NativeContainerIsAtomicWriteOnly]
         [StructLayout(LayoutKind.Sequential)]
-        unsafe public struct ParallelWriter
+        public unsafe struct ParallelWriter
         {
-            [NativeDisableUnsafePtrRestriction] internal EntityCommandBufferData* m_Data;
+            [NativeDisableUnsafePtrRestriction]
+            internal EntityCommandBufferData* m_Data;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             internal AtomicSafetyHandle m_Safety0;
@@ -73,13 +75,16 @@ namespace Unity.Entities
             private void CheckWriteAccess()
             {
                 if (m_Data == null)
-                    throw new NullReferenceException("The EntityCommandBuffer has not been initialized! The EntityCommandBuffer needs to be passed an Allocator when created!");
+                    throw new NullReferenceException(
+                        "The EntityCommandBuffer has not been initialized! The EntityCommandBuffer needs to be passed an Allocator when created!"
+                    );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckWriteAndThrow(m_Safety0);
 #endif
             }
 
-            private EntityCommandBufferChain* ThreadChain => (m_ThreadIndex >= 0) ? &m_Data->m_ThreadedChains[m_ThreadIndex] : &m_Data->m_MainThreadChain;
+            private EntityCommandBufferChain* ThreadChain =>
+                (m_ThreadIndex >= 0) ? &m_Data->m_ThreadedChains[m_ThreadIndex] : &m_Data->m_MainThreadChain;
 
             /// <summary>Records a command to create an entity with specified archetype.</summary>
             /// <remarks>At playback, this command will throw an error if the archetype contains the <see cref="Prefab"/> tag.</remarks>
@@ -119,7 +124,14 @@ namespace Unity.Entities
                 // approach or hijack the Version field of an Entity and store sortKey
                 var entity = m_Data->m_Entity;
                 entity.Index = Interlocked.Decrement(ref m_Data->m_Entity.Index);
-                m_Data->AddCreateCommand(chain, sortKey, ECBCommand.CreateEntity,  entity.Index, archetype, kBatchableCommand);
+                m_Data->AddCreateCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.CreateEntity,
+                    entity.Index,
+                    archetype,
+                    kBatchableCommand
+                );
                 return entity;
             }
 
@@ -149,7 +161,14 @@ namespace Unity.Entities
                 var chain = ThreadChain;
                 var entity = m_Data->m_Entity;
                 entity.Index = Interlocked.Decrement(ref m_Data->m_Entity.Index);
-                m_Data->AddEntityCommand(chain, sortKey, ECBCommand.InstantiateEntity, entity.Index, e, kBatchableCommand);
+                m_Data->AddEntityCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.InstantiateEntity,
+                    entity.Index,
+                    e,
+                    kBatchableCommand
+                );
                 return entity;
             }
 
@@ -172,14 +191,21 @@ namespace Unity.Entities
                 var chain = ThreadChain;
                 var entity = m_Data->m_Entity;
                 int baseIndex = Interlocked.Add(ref m_Data->m_Entity.Index, -entities.Length) + entities.Length - 1;
-                for (int i=0; i<entities.Length; ++i)
+                for (int i = 0; i < entities.Length; ++i)
                 {
                     entity.Index = baseIndex - i;
                     entities[i] = entity;
                 }
-                m_Data->AddMultipleEntityCommand(chain, sortKey, ECBCommand.InstantiateEntity, baseIndex, entities.Length, e, kBatchableCommand);
+                m_Data->AddMultipleEntityCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.InstantiateEntity,
+                    baseIndex,
+                    entities.Length,
+                    e,
+                    kBatchableCommand
+                );
             }
-
 
             /// <summary>Records a command to destroy an entity.</summary>
             /// <remarks>At playback, this command will throw an error if any of the entities are still deferred or were destroyed between recording and playback,
@@ -211,8 +237,18 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
-                m_Data->AppendMultipleEntitiesCommand(chain, sortKey, ECBCommand.DestroyMultipleEntities, entitiesCopy, entities.Length, containsDeferredEntities);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
+                m_Data->AppendMultipleEntitiesCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.DestroyMultipleEntities,
+                    entitiesCopy,
+                    entities.Length,
+                    containsDeferredEntities
+                );
             }
 
             /// <summary> Records a command to add component of type T to an entity. </summary>
@@ -227,7 +263,8 @@ namespace Unity.Entities
             /// <param name="component">The value to add on the new component in playback for the entity.</param>
             /// <typeparam name="T"> The type of component to add. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void AddComponent<T>(int sortKey, Entity e, T component) where T : unmanaged, IComponentData
+            public void AddComponent<T>(int sortKey, Entity e, T component)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
@@ -247,11 +284,25 @@ namespace Unity.Entities
             /// <param name="componentDataPtr"> The pointer to the data of the component to be copied. </param>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
             /// <exception cref="InvalidOperationException">Throws if this EntityCommandBuffer has already been played back.</exception>
-            internal void UnsafeAddComponent(int sortKey, Entity e, TypeIndex typeIndex, int typeSize, void* componentDataPtr)
+            internal void UnsafeAddComponent(
+                int sortKey,
+                Entity e,
+                TypeIndex typeIndex,
+                int typeSize,
+                void* componentDataPtr
+            )
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->UnsafeAddEntityComponentCommand(chain, sortKey, ECBCommand.AddComponent, e, typeIndex, typeSize, componentDataPtr);
+                m_Data->UnsafeAddEntityComponentCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponent,
+                    e,
+                    typeIndex,
+                    typeSize,
+                    componentDataPtr
+                );
             }
 
             /// <summary> Records a command to add component of type T to a NativeArray of entities. </summary>
@@ -266,13 +317,24 @@ namespace Unity.Entities
             /// <param name="component">The value to add on the new component in playback for all entities in the NativeArray.</param>
             /// <typeparam name="T"> The type of component to add. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void AddComponent<T>(int sortKey, NativeArray<Entity> entities, T component) where T : unmanaged, IComponentData
+            public void AddComponent<T>(int sortKey, NativeArray<Entity> entities, T component)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
-                m_Data->AppendMultipleEntitiesComponentCommandWithValue(chain, sortKey,
-                    ECBCommand.AddComponentForMultipleEntities, entitiesCopy, entities.Length, containsDeferredEntities, component);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
+                m_Data->AppendMultipleEntitiesComponentCommandWithValue(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponentForMultipleEntities,
+                    entitiesCopy,
+                    entities.Length,
+                    containsDeferredEntities,
+                    component
+                );
             }
 
             /// <summary> Records a command to add component of type T to an entity. </summary>
@@ -286,11 +348,18 @@ namespace Unity.Entities
             /// <param name="e"> The entity to have the component added. </param>
             /// <typeparam name="T"> The type of component to add. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void AddComponent<T>(int sortKey, Entity e) where T : unmanaged, IComponentData
+            public void AddComponent<T>(int sortKey, Entity e)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->AddEntityComponentTypeWithoutValueCommand(chain, sortKey, ECBCommand.AddComponent, e, ComponentType.ReadWrite<T>());
+                m_Data->AddEntityComponentTypeWithoutValueCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponent,
+                    e,
+                    ComponentType.ReadWrite<T>()
+                );
             }
 
             /// <summary> Records a command to add component of type T to a NativeArray of entities. </summary>
@@ -304,14 +373,24 @@ namespace Unity.Entities
             /// <param name="entities"> The NativeArray of entities to have the component added. </param>
             /// <typeparam name="T"> The type of component to add. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void AddComponent<T>(int sortKey, NativeArray<Entity> entities) where T : unmanaged, IComponentData
+            public void AddComponent<T>(int sortKey, NativeArray<Entity> entities)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
-                m_Data->AppendMultipleEntitiesComponentCommand(chain, sortKey,
-                    ECBCommand.AddComponentForMultipleEntities, entitiesCopy, entities.Length, containsDeferredEntities,
-                    ComponentType.ReadWrite<T>());
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
+                m_Data->AppendMultipleEntitiesComponentCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponentForMultipleEntities,
+                    entitiesCopy,
+                    entities.Length,
+                    containsDeferredEntities,
+                    ComponentType.ReadWrite<T>()
+                );
             }
 
             /// <summary> Records a command to add a component to an entity. </summary>
@@ -329,7 +408,13 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->AddEntityComponentTypeWithoutValueCommand(chain, sortKey, ECBCommand.AddComponent, e, componentType);
+                m_Data->AddEntityComponentTypeWithoutValueCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponent,
+                    e,
+                    componentType
+                );
             }
 
             /// <summary> Records a command to add a component to a NativeArray of entities. </summary>
@@ -347,9 +432,19 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
-                m_Data->AppendMultipleEntitiesComponentCommand(chain, sortKey,
-                    ECBCommand.AddComponentForMultipleEntities, entitiesCopy, entities.Length, containsDeferredEntities, componentType);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
+                m_Data->AppendMultipleEntitiesComponentCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponentForMultipleEntities,
+                    entitiesCopy,
+                    entities.Length,
+                    containsDeferredEntities,
+                    componentType
+                );
             }
 
             /// <summary> Records a command to add one or more components to an entity. </summary>
@@ -367,7 +462,7 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->AddEntityComponentTypesCommand(chain, sortKey,ECBCommand.AddMultipleComponents, e, typeSet);
+                m_Data->AddEntityComponentTypesCommand(chain, sortKey, ECBCommand.AddMultipleComponents, e, typeSet);
             }
 
             /// <summary> Records a command to add one or more components to a NativeArray of entities. </summary>
@@ -385,9 +480,19 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
-                m_Data->AppendMultipleEntitiesMultipleComponentsCommand(chain, sortKey,
-                    ECBCommand.AddMultipleComponentsForMultipleEntities, entitiesCopy, entities.Length, containsDeferredEntities, typeSet);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
+                m_Data->AppendMultipleEntitiesMultipleComponentsCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddMultipleComponentsForMultipleEntities,
+                    entitiesCopy,
+                    entities.Length,
+                    containsDeferredEntities,
+                    typeSet
+                );
             }
 
             /// <summary>Records a command to add a dynamic buffer to an entity.</summary>
@@ -405,12 +510,20 @@ namespace Unity.Entities
             /// <typeparam name="T">The <see cref="IBufferElementData"/> type stored by the <see cref="DynamicBuffer{T}"/>.</typeparam>
             /// <returns>The <see cref="DynamicBuffer{T}"/> that will be added when the command plays back.</returns>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public DynamicBuffer<T> AddBuffer<T>(int sortKey, Entity e) where T : unmanaged, IBufferElementData
+            public DynamicBuffer<T> AddBuffer<T>(int sortKey, Entity e)
+                where T : unmanaged, IBufferElementData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                return m_Data->CreateBufferCommand<T>(ECBCommand.AddBuffer, chain, sortKey, e, m_BufferSafety, m_ArrayInvalidationSafety);
+                return m_Data->CreateBufferCommand<T>(
+                    ECBCommand.AddBuffer,
+                    chain,
+                    sortKey,
+                    e,
+                    m_BufferSafety,
+                    m_ArrayInvalidationSafety
+                );
 #else
                 return m_Data->CreateBufferCommand<T>(ECBCommand.AddBuffer, chain, sortKey, e);
 #endif
@@ -427,12 +540,20 @@ namespace Unity.Entities
             /// <typeparam name="T">The <see cref="IBufferElementData"/> type stored by the <see cref="DynamicBuffer{T}"/>.</typeparam>
             /// <returns>The <see cref="DynamicBuffer{T}"/> that will be set when the command plays back.</returns>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public DynamicBuffer<T> SetBuffer<T>(int sortKey, Entity e) where T : unmanaged, IBufferElementData
+            public DynamicBuffer<T> SetBuffer<T>(int sortKey, Entity e)
+                where T : unmanaged, IBufferElementData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                return m_Data->CreateBufferCommand<T>(ECBCommand.SetBuffer, chain, sortKey, e, m_BufferSafety, m_ArrayInvalidationSafety);
+                return m_Data->CreateBufferCommand<T>(
+                    ECBCommand.SetBuffer,
+                    chain,
+                    sortKey,
+                    e,
+                    m_BufferSafety,
+                    m_ArrayInvalidationSafety
+                );
 #else
                 return m_Data->CreateBufferCommand<T>(ECBCommand.SetBuffer, chain, sortKey, e);
 #endif
@@ -451,7 +572,8 @@ namespace Unity.Entities
             /// <exception cref="InvalidOperationException">Thrown if the entity does not have a <see cref="DynamicBuffer{T}"/>
             /// component storing elements of type T at the time the entity command buffer executes this append-to-buffer command.</exception>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void AppendToBuffer<T>(int sortKey, Entity e, T element) where T : struct, IBufferElementData
+            public void AppendToBuffer<T>(int sortKey, Entity e, T element)
+                where T : struct, IBufferElementData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
@@ -470,7 +592,8 @@ namespace Unity.Entities
             /// <param name="component"> The component value to set. </param>
             /// <typeparam name="T"> The type of component to set. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void SetComponent<T>(int sortKey, Entity e, T component) where T : unmanaged, IComponentData
+            public void SetComponent<T>(int sortKey, Entity e, T component)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
@@ -491,11 +614,25 @@ namespace Unity.Entities
             /// <param name="componentDataPtr"> The pointer to the data of the component to be copied. </param>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
             /// <exception cref="InvalidOperationException">Throws if this EntityCommandBuffer has already been played back.</exception>
-            internal void UnsafeSetComponent(int sortKey, Entity e, TypeIndex typeIndex, int typeSize, void* componentDataPtr)
+            internal void UnsafeSetComponent(
+                int sortKey,
+                Entity e,
+                TypeIndex typeIndex,
+                int typeSize,
+                void* componentDataPtr
+            )
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->UnsafeAddEntityComponentCommand(chain, sortKey, ECBCommand.SetComponent, e, typeIndex, typeSize, componentDataPtr);
+                m_Data->UnsafeAddEntityComponentCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.SetComponent,
+                    e,
+                    typeIndex,
+                    typeSize,
+                    componentDataPtr
+                );
             }
 
             /// <summary>
@@ -535,14 +672,24 @@ namespace Unity.Entities
             /// pass the 'unfilteredChunkIndex' value from <see cref="IJobChunk.Execute"/>.</param>
             /// <param name="e">The entity whose component should be enabled or disabled.</param>
             /// <param name="value">True if the specified component should be enabled, or false if it should be disabled.</param>
-            [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) })]
-            public void SetComponentEnabled<T>(int sortKey, Entity e, bool value) where T: struct, IEnableableComponent
+            [GenerateTestsForBurstCompatibility(
+                GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) }
+            )]
+            public void SetComponentEnabled<T>(int sortKey, Entity e, bool value)
+                where T : struct, IEnableableComponent
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->AddEntityComponentEnabledCommand(chain, sortKey,
-                    ECBCommand.SetComponentEnabled, e, TypeManager.GetTypeIndex<T>(), value);
+                m_Data->AddEntityComponentEnabledCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.SetComponentEnabled,
+                    e,
+                    TypeManager.GetTypeIndex<T>(),
+                    value
+                );
             }
+
             /// <summary>
             /// Records a command to enable or disable a <see cref="ComponentType"/> on the specified <see cref="Entity"/>. This operation
             /// does not cause a structural change, or affect the value of the component. For the purposes
@@ -562,8 +709,14 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->AddEntityComponentEnabledCommand(chain, sortKey,
-                    ECBCommand.SetComponentEnabled, e, componentType.TypeIndex, value);
+                m_Data->AddEntityComponentEnabledCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.SetComponentEnabled,
+                    e,
+                    componentType.TypeIndex,
+                    value
+                );
             }
 
             /// <summary> Records a command to set a name of an entity if Debug Names is enabled.</summary>
@@ -630,7 +783,13 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->AddEntityComponentTypeWithoutValueCommand(chain, sortKey, ECBCommand.RemoveComponent, e, componentType);
+                m_Data->AddEntityComponentTypeWithoutValueCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.RemoveComponent,
+                    e,
+                    componentType
+                );
             }
 
             /// <summary> Records a command to remove one or more components from a NativeArray of entities. </summary>
@@ -648,9 +807,19 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
-                m_Data->AppendMultipleEntitiesComponentCommand(chain, sortKey,
-                    ECBCommand.RemoveComponentForMultipleEntities, entitiesCopy, entities.Length, containsDeferredEntities, componentType);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
+                m_Data->AppendMultipleEntitiesComponentCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.RemoveComponentForMultipleEntities,
+                    entitiesCopy,
+                    entities.Length,
+                    containsDeferredEntities,
+                    componentType
+                );
             }
 
             /// <summary> Records a command to remove one or more components from an entity. </summary>
@@ -668,7 +837,7 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                m_Data->AddEntityComponentTypesCommand(chain, sortKey,ECBCommand.RemoveMultipleComponents, e, typeSet);
+                m_Data->AddEntityComponentTypesCommand(chain, sortKey, ECBCommand.RemoveMultipleComponents, e, typeSet);
             }
 
             /// <summary> Records a command to remove one or more components from a NativeArray of entities. </summary>
@@ -686,9 +855,19 @@ namespace Unity.Entities
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
-                m_Data->AppendMultipleEntitiesMultipleComponentsCommand(chain, sortKey,
-                    ECBCommand.RemoveMultipleComponentsForMultipleEntities, entitiesCopy, entities.Length, containsDeferredEntities, typeSet);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
+                m_Data->AppendMultipleEntitiesMultipleComponentsCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.RemoveMultipleComponentsForMultipleEntities,
+                    entitiesCopy,
+                    entities.Length,
+                    containsDeferredEntities,
+                    typeSet
+                );
             }
 
             /// <summary> Records a command to add a shared component value on an entity.</summary>
@@ -703,16 +882,31 @@ namespace Unity.Entities
             /// <param name="sharedComponent"> The shared component value to add. </param>
             /// <typeparam name="T"> The type of shared component to add. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void AddSharedComponentManaged<T>(int sortKey, Entity e, T sharedComponent) where T : struct, ISharedComponentData
+            public void AddSharedComponentManaged<T>(int sortKey, Entity e, T sharedComponent)
+                where T : struct, ISharedComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 
                 int hashCode;
                 if (IsDefaultObject(ref sharedComponent, out hashCode))
-                    m_Data->AddEntitySharedComponentCommand<T>(chain, sortKey, ECBCommand.AddSharedComponentData, e, hashCode, null);
+                    m_Data->AddEntitySharedComponentCommand<T>(
+                        chain,
+                        sortKey,
+                        ECBCommand.AddSharedComponentData,
+                        e,
+                        hashCode,
+                        null
+                    );
                 else
-                    m_Data->AddEntitySharedComponentCommand<T>(chain, sortKey, ECBCommand.AddSharedComponentData, e, hashCode, sharedComponent);
+                    m_Data->AddEntitySharedComponentCommand<T>(
+                        chain,
+                        sortKey,
+                        ECBCommand.AddSharedComponentData,
+                        e,
+                        hashCode,
+                        sharedComponent
+                    );
             }
 
             /// <summary> Records a command to add an unmanaged shared component value on an entity.</summary>
@@ -734,12 +928,22 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 var typeIndex = TypeManager.GetTypeIndex<T>();
                 var isManaged = TypeManager.IsManagedSharedComponent(typeIndex);
-                UnityEngine.Assertions.Assert.IsFalse(isManaged, $"{sharedComponent}: is managed and was passed to AddSharedComponentUnmanaged");
+                UnityEngine.Assertions.Assert.IsFalse(
+                    isManaged,
+                    $"{sharedComponent}: is managed and was passed to AddSharedComponentUnmanaged"
+                );
 #endif
                 var componentData = IsDefaultObjectUnmanaged(ref sharedComponent, out var hashCode)
                     ? null
                     : UnsafeUtility.AddressOf(ref sharedComponent);
-                m_Data->AddEntityUnmanagedSharedComponentCommand<T>(ThreadChain, sortKey, ECBCommand.AddUnmanagedSharedComponentData, e, hashCode, componentData);
+                m_Data->AddEntityUnmanagedSharedComponentCommand<T>(
+                    ThreadChain,
+                    sortKey,
+                    ECBCommand.AddUnmanagedSharedComponentData,
+                    e,
+                    hashCode,
+                    componentData
+                );
             }
 
             /// <summary> Records a command to add a possibly-managed shared component value on a NativeArray of entities.</summary>
@@ -754,13 +958,17 @@ namespace Unity.Entities
             /// <param name="sharedComponent"> The shared component value to add. </param>
             /// <typeparam name="T"> The type of shared component to add. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void AddSharedComponentManaged<T>(int sortKey, NativeArray<Entity> entities, T sharedComponent) where T : struct, ISharedComponentData
+            public void AddSharedComponentManaged<T>(int sortKey, NativeArray<Entity> entities, T sharedComponent)
+                where T : struct, ISharedComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 
                 int hashCode;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
                 var isdefault = IsDefaultObject(ref sharedComponent, out hashCode);
 
                 if (TypeManager.IsManagedSharedComponent(TypeManager.GetTypeIndex<T>()))
@@ -773,8 +981,8 @@ namespace Unity.Entities
                         entities.Length,
                         containsDeferredEntities,
                         hashCode,
-                        isdefault ? (object) null : sharedComponent);
-
+                        isdefault ? (object)null : sharedComponent
+                    );
                 }
                 else
                 {
@@ -786,7 +994,8 @@ namespace Unity.Entities
                         entities.Length,
                         containsDeferredEntities,
                         hashCode,
-                        isdefault ? null : UnsafeUtility.AddressOf(ref sharedComponent));
+                        isdefault ? null : UnsafeUtility.AddressOf(ref sharedComponent)
+                    );
                 }
             }
 
@@ -809,8 +1018,10 @@ namespace Unity.Entities
                 var chain = ThreadChain;
 
                 int hashCode;
-                var entitiesCopy =
-                    m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
                 var isdefault = IsDefaultObjectUnmanaged(ref sharedComponent, out hashCode);
 
                 m_Data->AppendMultipleEntitiesCommand_WithUnmanagedSharedValue<T>(
@@ -821,7 +1032,8 @@ namespace Unity.Entities
                     entities.Length,
                     containsDeferredEntities,
                     hashCode,
-                    isdefault ? null : UnsafeUtility.AddressOf(ref sharedComponent));
+                    isdefault ? null : UnsafeUtility.AddressOf(ref sharedComponent)
+                );
             }
 
             /// <summary> Records a command to set a shared component value on an entity.</summary>
@@ -835,7 +1047,8 @@ namespace Unity.Entities
             /// <param name="sharedComponent"> The shared component value to set. </param>
             /// <typeparam name="T"> The type of shared component to set. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void SetSharedComponentManaged<T>(int sortKey, Entity e, T sharedComponent) where T : struct, ISharedComponentData
+            public void SetSharedComponentManaged<T>(int sortKey, Entity e, T sharedComponent)
+                where T : struct, ISharedComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
@@ -853,7 +1066,8 @@ namespace Unity.Entities
                         ECBCommand.SetSharedComponentData,
                         e,
                         hashCode,
-                        isDefaultObject ? (object) null : sharedComponent);
+                        isDefaultObject ? (object)null : sharedComponent
+                    );
                 }
                 else
                 {
@@ -863,7 +1077,8 @@ namespace Unity.Entities
                         ECBCommand.SetUnmanagedSharedComponentData,
                         e,
                         hashCode,
-                        isDefaultObject ? null : UnsafeUtility.AddressOf(ref sharedComponent));
+                        isDefaultObject ? null : UnsafeUtility.AddressOf(ref sharedComponent)
+                    );
                 }
             }
 
@@ -878,35 +1093,50 @@ namespace Unity.Entities
             /// <param name="sharedComponent"> The shared component value to set. </param>
             /// <typeparam name="T"> The type of shared component to set. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void SetSharedComponent<T>(int sortKey, Entity e, T sharedComponent) where T : unmanaged, ISharedComponentData
+            public void SetSharedComponent<T>(int sortKey, Entity e, T sharedComponent)
+                where T : unmanaged, ISharedComponentData
             {
                 CheckWriteAccess();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 var typeIndex = TypeManager.GetTypeIndex<T>();
                 var isManaged = TypeManager.IsManagedSharedComponent(typeIndex);
-                UnityEngine.Assertions.Assert.IsFalse(isManaged, $"{sharedComponent}: is managed and was passed to SetSharedComponentUnmanaged");
+                UnityEngine.Assertions.Assert.IsFalse(
+                    isManaged,
+                    $"{sharedComponent}: is managed and was passed to SetSharedComponentUnmanaged"
+                );
 #endif
-                var componentData = IsDefaultObjectUnmanaged(ref sharedComponent, out var hashCode) ? null : UnsafeUtility.AddressOf(ref sharedComponent);
+                var componentData = IsDefaultObjectUnmanaged(ref sharedComponent, out var hashCode)
+                    ? null
+                    : UnsafeUtility.AddressOf(ref sharedComponent);
                 m_Data->AddEntityUnmanagedSharedComponentCommand<T>(
                     ThreadChain,
                     sortKey,
                     ECBCommand.SetUnmanagedSharedComponentData,
                     e,
                     hashCode,
-                    componentData);
+                    componentData
+                );
             }
 
             /// <summary>
             /// Only for inserting a non-default value
             /// </summary>
-            internal void UnsafeSetSharedComponentNonDefault(int sortKey, Entity e, void* componentDataPtr, TypeIndex typeIndex)
+            internal void UnsafeSetSharedComponentNonDefault(
+                int sortKey,
+                Entity e,
+                void* componentDataPtr,
+                TypeIndex typeIndex
+            )
             {
                 CheckWriteAccess();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 var isManaged = TypeManager.IsManagedSharedComponent(typeIndex);
-                UnityEngine.Assertions.Assert.IsFalse(isManaged, $"{typeIndex}: is managed and was passed to UnsafeSetSharedComponentNonDefault");
+                UnityEngine.Assertions.Assert.IsFalse(
+                    isManaged,
+                    $"{typeIndex}: is managed and was passed to UnsafeSetSharedComponentNonDefault"
+                );
 #endif
                 // Guarantee that it is non-default
                 m_Data->AddEntityUnmanagedSharedComponentCommand(
@@ -917,7 +1147,8 @@ namespace Unity.Entities
                     TypeManager.SharedComponentGetHashCode(componentDataPtr, typeIndex),
                     typeIndex,
                     TypeManager.GetTypeInfo(typeIndex).TypeSize,
-                    componentDataPtr);
+                    componentDataPtr
+                );
             }
 
             /// <summary> Records a command to set a shared component value on a NativeArray of entities.</summary>
@@ -931,13 +1162,17 @@ namespace Unity.Entities
             /// <param name="sharedComponent"> The shared component value to set. </param>
             /// <typeparam name="T"> The type of shared component to set. </typeparam>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
-            public void SetSharedComponentManaged<T>(int sortKey, NativeArray<Entity> entities, T sharedComponent) where T : struct, ISharedComponentData
+            public void SetSharedComponentManaged<T>(int sortKey, NativeArray<Entity> entities, T sharedComponent)
+                where T : struct, ISharedComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 
                 int hashCode;
-                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
                 var isDefaultObject = IsDefaultObject(ref sharedComponent, out hashCode);
 
                 if (TypeManager.IsManagedSharedComponent(TypeManager.GetTypeIndex<T>()))
@@ -950,7 +1185,8 @@ namespace Unity.Entities
                         entities.Length,
                         containsDeferredEntities,
                         hashCode,
-                        isDefaultObject ? default : sharedComponent);
+                        isDefaultObject ? default : sharedComponent
+                    );
                 }
                 else
                 {
@@ -962,7 +1198,8 @@ namespace Unity.Entities
                         entities.Length,
                         containsDeferredEntities,
                         hashCode,
-                        isDefaultObject ? null : UnsafeUtility.AddressOf(ref sharedComponent));
+                        isDefaultObject ? null : UnsafeUtility.AddressOf(ref sharedComponent)
+                    );
                 }
             }
 
@@ -984,8 +1221,10 @@ namespace Unity.Entities
                 var chain = ThreadChain;
 
                 int hashCode;
-                var entitiesCopy =
-                    m_Data->CloneAndSearchForDeferredEntities(entities, out var containsDeferredEntities);
+                var entitiesCopy = m_Data->CloneAndSearchForDeferredEntities(
+                    entities,
+                    out var containsDeferredEntities
+                );
                 var isDefaultObject = IsDefaultObjectUnmanaged(ref sharedComponent, out hashCode);
 
                 m_Data->AppendMultipleEntitiesCommand_WithUnmanagedSharedValue<T>(
@@ -996,7 +1235,8 @@ namespace Unity.Entities
                     entities.Length,
                     containsDeferredEntities,
                     hashCode,
-                    isDefaultObject ? null : UnsafeUtility.AddressOf(ref sharedComponent));
+                    isDefaultObject ? null : UnsafeUtility.AddressOf(ref sharedComponent)
+                );
             }
 
             /// <summary>Records a command that adds a component to an entity's <see cref="LinkedEntityGroup"/> based on an <see cref="EntityQueryMask"/>.
@@ -1016,12 +1256,20 @@ namespace Unity.Entities
             /// <exception cref="ArgumentException">Throws if the component has a reference to a deferred entity, requiring fixup within the command buffer.</exception>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
             /// <exception cref="InvalidOperationException">Throws if this EntityCommandBuffer has already been played back.</exception>
-            public void AddComponentForLinkedEntityGroup<T>(int sortKey, Entity e, EntityQueryMask mask, T component) where T : unmanaged, IComponentData
+            public void AddComponentForLinkedEntityGroup<T>(int sortKey, Entity e, EntityQueryMask mask, T component)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 
-                m_Data->AddLinkedEntityGroupComponentCommand(chain, sortKey, ECBCommand.AddComponentLinkedEntityGroup, mask, e, component);
+                m_Data->AddLinkedEntityGroupComponentCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponentLinkedEntityGroup,
+                    mask,
+                    e,
+                    component
+                );
             }
 
             /// <summary>Records a command that adds a component to an entity's <see cref="LinkedEntityGroup"/> based on an <see cref="EntityQueryMask"/>.
@@ -1039,12 +1287,24 @@ namespace Unity.Entities
             /// <param name="componentType"> The component type to add. </param>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
             /// <exception cref="InvalidOperationException">Throws if this EntityCommandBuffer has already been played back.</exception>
-            public void AddComponentForLinkedEntityGroup(int sortKey, Entity e, EntityQueryMask mask, ComponentType componentType)
+            public void AddComponentForLinkedEntityGroup(
+                int sortKey,
+                Entity e,
+                EntityQueryMask mask,
+                ComponentType componentType
+            )
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 
-                m_Data->AddLinkedEntityGroupTypeCommand(chain, sortKey, ECBCommand.AddComponentLinkedEntityGroup, mask, e, componentType);
+                m_Data->AddLinkedEntityGroupTypeCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.AddComponentLinkedEntityGroup,
+                    mask,
+                    e,
+                    componentType
+                );
             }
 
             /// <summary>Records a command that sets a component for an entity's <see cref="LinkedEntityGroup"/> based on an <see cref="EntityQueryMask"/>.
@@ -1064,12 +1324,20 @@ namespace Unity.Entities
             /// <exception cref="ArgumentException">Throws if the component has a reference to a deferred entity, requiring fixup within the command buffer.</exception>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
             /// <exception cref="InvalidOperationException">Throws if this EntityCommandBuffer has already been played back.</exception>
-            public void SetComponentForLinkedEntityGroup<T>(int sortKey, Entity e, EntityQueryMask mask, T component) where T : unmanaged, IComponentData
+            public void SetComponentForLinkedEntityGroup<T>(int sortKey, Entity e, EntityQueryMask mask, T component)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 
-                m_Data->AddLinkedEntityGroupComponentCommand(chain, sortKey, ECBCommand.SetComponentLinkedEntityGroup, mask, e, component);
+                m_Data->AddLinkedEntityGroupComponentCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.SetComponentLinkedEntityGroup,
+                    mask,
+                    e,
+                    component
+                );
             }
 
             /// <summary>Records a command that replaces a component value for an entity's <see cref="LinkedEntityGroup"/>.
@@ -1086,14 +1354,20 @@ namespace Unity.Entities
             /// <exception cref="ArgumentException">Throws if the component has a reference to a deferred entity, requiring fixup within the command buffer.</exception>
             /// <exception cref="NullReferenceException">Throws if an Allocator was not passed in when the EntityCommandBuffer was created.</exception>
             /// <exception cref="InvalidOperationException">Throws if this EntityCommandBuffer has already been played back.</exception>
-            public void ReplaceComponentForLinkedEntityGroup<T>(int sortKey, Entity e, T component) where T : unmanaged, IComponentData
+            public void ReplaceComponentForLinkedEntityGroup<T>(int sortKey, Entity e, T component)
+                where T : unmanaged, IComponentData
             {
                 CheckWriteAccess();
                 var chain = ThreadChain;
 
-                m_Data->AddEntityComponentTypeWithValueCommand(chain, sortKey, ECBCommand.ReplaceComponentLinkedEntityGroup, e, component);
+                m_Data->AddEntityComponentTypeWithValueCommand(
+                    chain,
+                    sortKey,
+                    ECBCommand.ReplaceComponentLinkedEntityGroup,
+                    e,
+                    component
+                );
             }
         }
-
     }
 }

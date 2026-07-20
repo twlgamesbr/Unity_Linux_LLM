@@ -33,7 +33,7 @@ namespace UnityEngine.InputSystem
 #if UNITY_EDITOR && UNITY_2023_2_OR_NEWER
             : UnityEngine.Analytics.IAnalytic.IData
 #endif
-        {}
+        { }
 
         // Unity 2023.2+ deprecates legacy interfaces for registering and sending editor analytics and
         // replaces them with attribute annotations and required interface implementations.
@@ -46,7 +46,6 @@ namespace UnityEngine.InputSystem
 #endif // UNITY_EDITOR && UNITY_2023_2_OR_NEWER
         {
             InputAnalyticInfo info { get; } // May be removed when only supporting 2023.2+ versions
-
 #if !UNITY_EDITOR || !UNITY_2023_2_OR_NEWER
             // Conditionally mimic UnityEngine.Analytics.IAnalytic
             bool TryGatherData(out IInputAnalyticData data, out Exception error);
@@ -86,10 +85,10 @@ namespace UnityEngine.InputSystem
             public DeviceInfo[] unrecognized_devices;
 
             ////REVIEW: ATM we have no way of retrieving these in the player
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             public bool new_enabled;
             public bool old_enabled;
-            #endif
+#endif
 
             [Serializable]
             public struct DeviceInfo
@@ -99,7 +98,11 @@ namespace UnityEngine.InputSystem
                 public string product;
                 public bool native;
 
-                public static DeviceInfo FromDescription(InputDeviceDescription description, bool native = false, string layout = null)
+                public static DeviceInfo FromDescription(
+                    InputDeviceDescription description,
+                    bool native = false,
+                    string layout = null
+                )
                 {
                     string product;
                     if (!string.IsNullOrEmpty(description.product) && !string.IsNullOrEmpty(description.manufacturer))
@@ -117,14 +120,19 @@ namespace UnityEngine.InputSystem
                         layout = layout,
                         @interface = description.interfaceName,
                         product = product,
-                        native = native
+                        native = native,
                     };
                 }
             }
         }
 
 #if UNITY_EDITOR && UNITY_2023_2_OR_NEWER
-        [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour, maxNumberOfElements: kMaxNumberOfElements, vendorKey: kVendorKey)]
+        [UnityEngine.Analytics.AnalyticInfo(
+            eventName: kEventName,
+            maxEventsPerHour: kMaxEventsPerHour,
+            maxNumberOfElements: kMaxNumberOfElements,
+            vendorKey: kVendorKey
+        )]
 #endif // UNITY_EDITOR && UNITY_2023_2_OR_NEWER
         public struct StartupEventAnalytic : IInputAnalytic
         {
@@ -176,7 +184,10 @@ namespace UnityEngine.InputSystem
                 for (var i = 0; i < manager.devices.Count; ++i)
                 {
                     deviceInfo[i] = StartupEventData.DeviceInfo.FromDescription(
-                        manager.devices[i].description, manager.devices[i].native, manager.devices[i].layout);
+                        manager.devices[i].description,
+                        manager.devices[i].native,
+                        manager.devices[i].layout
+                    );
                 }
                 return deviceInfo;
             }
@@ -192,7 +203,9 @@ namespace UnityEngine.InputSystem
                         continue;
 
                     deviceInfo[n++] = StartupEventData.DeviceInfo.FromDescription(
-                        manager.m_AvailableDevices[i].description, manager.m_AvailableDevices[i].isNative);
+                        manager.m_AvailableDevices[i].description,
+                        manager.m_AvailableDevices[i].isNative
+                    );
                 }
 
                 if (deviceInfo.Length > n)
@@ -206,9 +219,7 @@ namespace UnityEngine.InputSystem
         /// Data about when after startup the user first interacted with the application.
         /// </summary>
         [Serializable]
-        public struct FirstUserInteractionEventData : IInputAnalyticData
-        {
-        }
+        public struct FirstUserInteractionEventData : IInputAnalyticData { }
 
         /// <summary>
         /// Data about what level of data we pumped through the system throughout its lifetime.
@@ -225,8 +236,12 @@ namespace UnityEngine.InputSystem
         }
 
 #if (UNITY_EDITOR && UNITY_2023_2_OR_NEWER)
-        [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-            maxNumberOfElements: kMaxNumberOfElements, vendorKey: kVendorKey)]
+        [UnityEngine.Analytics.AnalyticInfo(
+            eventName: kEventName,
+            maxEventsPerHour: kMaxEventsPerHour,
+            maxNumberOfElements: kMaxNumberOfElements,
+            vendorKey: kVendorKey
+        )]
 #endif // (UNITY_EDITOR && UNITY_2023_2_OR_NEWER)
         public readonly struct ShutdownEventDataAnalytic : IInputAnalytic
         {
@@ -276,7 +291,8 @@ namespace UnityEngine.InputSystem
 
     internal static class AnalyticExtensions
     {
-        internal static void Send<TSource>(this TSource analytic) where TSource : InputAnalytics.IInputAnalytic
+        internal static void Send<TSource>(this TSource analytic)
+            where TSource : InputAnalytics.IInputAnalytic
         {
             InputSystem.s_Manager?.m_Runtime?.SendAnalytic(analytic);
         }

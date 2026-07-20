@@ -19,7 +19,8 @@ namespace Unity.Editor.Bridge
 
         public static void PasteGameObject(Transform fallbackParent) => ClipboardUtility.PasteGO(fallbackParent);
 
-        public static void DuplicateGameObject(Transform fallbackParent) => ClipboardUtility.DuplicateGO(fallbackParent);
+        public static void DuplicateGameObject(Transform fallbackParent) =>
+            ClipboardUtility.DuplicateGO(fallbackParent);
 
         public static void SetString(string value) => Clipboard.stringValue = value;
     }

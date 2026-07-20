@@ -47,7 +47,7 @@ namespace UnityEngine.TestTools
                 while (enumeratorDone == false)
                 {
                     enumeratorDone = !AdvanceEnumerator(executingEnumerator);
-                    if (((UnityTestExecutionContext) context).HasTimedOut())
+                    if (((UnityTestExecutionContext)context).HasTimedOut())
                     {
                         context.CurrentResult.RecordException(new UnityTestTimeoutException(context.TestCaseTimeout));
                         yield break;
@@ -73,7 +73,10 @@ namespace UnityEngine.TestTools
             }
         }
 
-        private static IEnumerator ExecuteEnumerableAndRecordExceptions(IEnumerator enumerator, ITestExecutionContext context)
+        private static IEnumerator ExecuteEnumerableAndRecordExceptions(
+            IEnumerator enumerator,
+            ITestExecutionContext context
+        )
         {
             while (true)
             {

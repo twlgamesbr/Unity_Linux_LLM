@@ -12,7 +12,8 @@ namespace UnityEngine.Rendering
         readonly int m_MipPadding;
         const float k_MipmapFactorApprox = 1.33f;
 
-        private Dictionary<TextureIdentifier, Vector2Int> m_RequestedTextures = new Dictionary<TextureIdentifier, Vector2Int>();
+        private Dictionary<TextureIdentifier, Vector2Int> m_RequestedTextures =
+            new Dictionary<TextureIdentifier, Vector2Int>();
 
         /// <summary>
         /// Create a new texture atlas, must have power of two size.
@@ -23,7 +24,14 @@ namespace UnityEngine.Rendering
         /// <param name="filterMode">Atlas texture filter mode.</param>
         /// <param name="name">Name of the atlas</param>
         /// <param name="useMipMap">Use mip maps</param>
-        public PowerOfTwoTextureAtlas(int size, int mipPadding, GraphicsFormat format, FilterMode filterMode = FilterMode.Point, string name = "", bool useMipMap = true)
+        public PowerOfTwoTextureAtlas(
+            int size,
+            int mipPadding,
+            GraphicsFormat format,
+            FilterMode filterMode = FilterMode.Point,
+            string name = "",
+            bool useMipMap = true
+        )
             : base(size, size, format, filterMode, true, name, useMipMap)
         {
             this.m_MipPadding = mipPadding;
@@ -61,7 +69,11 @@ namespace UnityEngine.Rendering
         /// <param name="paddingSize">Padding size used for the source texture. </param>
         /// <param name="scaleOffset">Cached atlas location (scale and offset) for the source texture.</param>
         /// <returns>Scale and offset for the source texture without padding.</returns>
-        static public Vector4 GetPayloadScaleOffset(in Vector2 textureSize, in Vector2 paddingSize, in Vector4 scaleOffset)
+        public static Vector4 GetPayloadScaleOffset(
+            in Vector2 textureSize,
+            in Vector2 paddingSize,
+            in Vector4 scaleOffset
+        )
         {
             // Scale, Offset is a padded atlas sub-texture rectangle.
             // Actual texture data (payload) is inset, i.e. padded inwards.
@@ -69,10 +81,10 @@ namespace UnityEngine.Rendering
             Vector2 subTexOffset = new Vector2(scaleOffset.z, scaleOffset.w);
 
             // NOTE: Should match Blit() padding calculations.
-            Vector2 scalePadding = ((textureSize + paddingSize) / textureSize);            // Size of padding (sampling) rectangle relative to the payload texture.
-            Vector2 offsetPadding = (paddingSize / 2.0f) / (textureSize + paddingSize);    // Padding offset in the padding rectangle
+            Vector2 scalePadding = ((textureSize + paddingSize) / textureSize); // Size of padding (sampling) rectangle relative to the payload texture.
+            Vector2 offsetPadding = (paddingSize / 2.0f) / (textureSize + paddingSize); // Padding offset in the padding rectangle
 
-            Vector2 insetScale = subTexScale / scalePadding;                 // Size of payload rectangle in sub-tex
+            Vector2 insetScale = subTexScale / scalePadding; // Size of payload rectangle in sub-tex
             Vector2 insetOffset = subTexOffset + subTexScale * offsetPadding; // Offset of payload rectangle in sub-tex
 
             return new Vector4(insetScale.x, insetScale.y, insetOffset.x, insetOffset.y);
@@ -86,7 +98,14 @@ namespace UnityEngine.Rendering
             OctahedralPaddingMultiply,
         }
 
-        private void Blit2DTexture(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips, BlitType blitType)
+        private void Blit2DTexture(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips,
+            BlitType blitType
+        )
         {
             int mipCount = GetTextureMipmapCount(texture.width, texture.height);
             int pixelPadding = GetTexturePadding();
@@ -103,10 +122,54 @@ namespace UnityEngine.Rendering
                     cmd.SetRenderTarget(m_AtlasTexture, mipLevel);
                     switch (blitType)
                     {
-                        case BlitType.Padding: Blitter.BlitQuadWithPadding(cmd, texture, textureSize, sourceScaleOffset, scaleOffset, mipLevel, bilinear, pixelPadding); break;
-                        case BlitType.PaddingMultiply: Blitter.BlitQuadWithPaddingMultiply(cmd, texture, textureSize, sourceScaleOffset, scaleOffset, mipLevel, bilinear, pixelPadding); break;
-                        case BlitType.OctahedralPadding: Blitter.BlitOctahedralWithPadding(cmd, texture, textureSize, sourceScaleOffset, scaleOffset, mipLevel, bilinear, pixelPadding); break;
-                        case BlitType.OctahedralPaddingMultiply: Blitter.BlitOctahedralWithPaddingMultiply(cmd, texture, textureSize, sourceScaleOffset, scaleOffset, mipLevel, bilinear, pixelPadding); break;
+                        case BlitType.Padding:
+                            Blitter.BlitQuadWithPadding(
+                                cmd,
+                                texture,
+                                textureSize,
+                                sourceScaleOffset,
+                                scaleOffset,
+                                mipLevel,
+                                bilinear,
+                                pixelPadding
+                            );
+                            break;
+                        case BlitType.PaddingMultiply:
+                            Blitter.BlitQuadWithPaddingMultiply(
+                                cmd,
+                                texture,
+                                textureSize,
+                                sourceScaleOffset,
+                                scaleOffset,
+                                mipLevel,
+                                bilinear,
+                                pixelPadding
+                            );
+                            break;
+                        case BlitType.OctahedralPadding:
+                            Blitter.BlitOctahedralWithPadding(
+                                cmd,
+                                texture,
+                                textureSize,
+                                sourceScaleOffset,
+                                scaleOffset,
+                                mipLevel,
+                                bilinear,
+                                pixelPadding
+                            );
+                            break;
+                        case BlitType.OctahedralPaddingMultiply:
+                            Blitter.BlitOctahedralWithPaddingMultiply(
+                                cmd,
+                                texture,
+                                textureSize,
+                                sourceScaleOffset,
+                                scaleOffset,
+                                mipLevel,
+                                bilinear,
+                                pixelPadding
+                            );
+                            break;
                     }
                 }
             }
@@ -121,8 +184,18 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitTexture(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitTexture(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.", true)]
-        public override void BlitTexture(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips, int overrideInstanceID)
+        [Obsolete(
+            "BlitTexture(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitTexture(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.",
+            true
+        )]
+        public override void BlitTexture(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips,
+            int overrideInstanceID
+        )
         {
             int instanceID = overrideInstanceID != -1 ? overrideInstanceID : texture.GetEntityId();
             TextureIdentifier identifier = new TextureIdentifier((ulong)instanceID);
@@ -137,8 +210,17 @@ namespace UnityEngine.Rendering
         /// <param name="texture">Source Texture</param>
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitTexture(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitTexture(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.", true)]
-        public override void BlitTexture(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, int overrideInstanceID)
+        [Obsolete(
+            "BlitTexture(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitTexture(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.",
+            true
+        )]
+        public override void BlitTexture(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            int overrideInstanceID
+        )
         {
             BlitTexture(cmd, scaleOffset, texture, sourceScaleOffset, true, overrideInstanceID);
         }
@@ -152,13 +234,23 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="overrideIdentifier">Override texture identifier.</param>
-        public override void BlitTexture(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips = true, TextureIdentifier overrideIdentifier = default)
+        public override void BlitTexture(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips = true,
+            TextureIdentifier overrideIdentifier = default
+        )
         {
             // We handle ourself the 2D blit because cookies needs mipPadding for trilinear filtering
             if (Is2D(texture))
             {
                 Blit2DTexture(cmd, scaleOffset, texture, sourceScaleOffset, blitMips, BlitType.Padding);
-                MarkGPUTextureValid(overrideIdentifier != default ? overrideIdentifier : GetTextureIdentifier(texture), blitMips);
+                MarkGPUTextureValid(
+                    overrideIdentifier != default ? overrideIdentifier : GetTextureIdentifier(texture),
+                    blitMips
+                );
             }
         }
 
@@ -171,13 +263,22 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.", true)]
-        public void BlitTextureMultiply(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips, int overrideInstanceID)
+        [Obsolete(
+            "BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.",
+            true
+        )]
+        public void BlitTextureMultiply(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips,
+            int overrideInstanceID
+        )
         {
             int instanceID = overrideInstanceID != -1 ? overrideInstanceID : texture.GetEntityId();
             TextureIdentifier identifier = new TextureIdentifier((ulong)instanceID);
             BlitTextureMultiply(cmd, scaleOffset, texture, sourceScaleOffset, blitMips, identifier);
-
         }
 
         /// <summary>
@@ -188,8 +289,17 @@ namespace UnityEngine.Rendering
         /// <param name="texture">Source Texture</param>
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.", true)]
-        public void BlitTextureMultiply(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, int overrideInstanceID)
+        [Obsolete(
+            "BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, TextureIdentifier) instead.",
+            true
+        )]
+        public void BlitTextureMultiply(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            int overrideInstanceID
+        )
         {
             BlitTextureMultiply(cmd, scaleOffset, texture, sourceScaleOffset, true, overrideInstanceID);
         }
@@ -203,13 +313,23 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="overrideIdentifier">Override texture identifier.</param>
-        public void BlitTextureMultiply(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips = true, TextureIdentifier overrideIdentifier = default)
+        public void BlitTextureMultiply(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips = true,
+            TextureIdentifier overrideIdentifier = default
+        )
         {
             // We handle ourself the 2D blit because cookies needs mipPadding for trilinear filtering
             if (Is2D(texture))
             {
                 Blit2DTexture(cmd, scaleOffset, texture, sourceScaleOffset, blitMips, BlitType.PaddingMultiply);
-                MarkGPUTextureValid(overrideIdentifier != default ? overrideIdentifier : GetTextureIdentifier(texture), blitMips);
+                MarkGPUTextureValid(
+                    overrideIdentifier != default ? overrideIdentifier : GetTextureIdentifier(texture),
+                    blitMips
+                );
             }
         }
 
@@ -222,13 +342,22 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, bool ,TextureIdentifier ) instead.", true)]
-        public override void BlitOctahedralTexture(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips, int overrideInstanceID)
+        [Obsolete(
+            "BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, bool ,TextureIdentifier ) instead.",
+            true
+        )]
+        public override void BlitOctahedralTexture(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips,
+            int overrideInstanceID
+        )
         {
             int instanceID = overrideInstanceID != -1 ? overrideInstanceID : texture.GetEntityId();
             TextureIdentifier identifier = new TextureIdentifier((ulong)instanceID);
             BlitOctahedralTexture(cmd, scaleOffset, texture, sourceScaleOffset, blitMips, identifier);
-
         }
 
         /// <summary>
@@ -239,11 +368,19 @@ namespace UnityEngine.Rendering
         /// <param name="texture">Source Texture</param>
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, bool ,TextureIdentifier ) instead.", true)]
-        public override void BlitOctahedralTexture(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, int overrideInstanceID)
+        [Obsolete(
+            "BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitOctahedralTexture(CommandBuffer, Vector4, Texture, Vector4, bool ,TextureIdentifier ) instead.",
+            true
+        )]
+        public override void BlitOctahedralTexture(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            int overrideInstanceID
+        )
         {
             BlitOctahedralTexture(cmd, scaleOffset, texture, sourceScaleOffset, true, overrideInstanceID);
-
         }
 
         /// <summary>
@@ -255,13 +392,23 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="textureIdentifier">Override texture identifier.</param>
-        public override void BlitOctahedralTexture(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips = true, TextureIdentifier textureIdentifier = default)
+        public override void BlitOctahedralTexture(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips = true,
+            TextureIdentifier textureIdentifier = default
+        )
         {
             // We handle ourself the 2D blit because cookies needs mipPadding for trilinear filtering
             if (Is2D(texture))
             {
                 Blit2DTexture(cmd, scaleOffset, texture, sourceScaleOffset, blitMips, BlitType.OctahedralPadding);
-                MarkGPUTextureValid(textureIdentifier != default ? textureIdentifier : GetTextureIdentifier(texture), blitMips);
+                MarkGPUTextureValid(
+                    textureIdentifier != default ? textureIdentifier : GetTextureIdentifier(texture),
+                    blitMips
+                );
             }
         }
 
@@ -274,8 +421,18 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool,TextureIdentifier  ) instead.", true)]
-        public void BlitOctahedralTextureMultiply(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips, int overrideInstanceID )
+        [Obsolete(
+            "BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool, int) is obsolete, use BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool,TextureIdentifier  ) instead.",
+            true
+        )]
+        public void BlitOctahedralTextureMultiply(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips,
+            int overrideInstanceID
+        )
         {
             int instanceID = overrideInstanceID != -1 ? overrideInstanceID : texture.GetEntityId();
             TextureIdentifier identifier = new TextureIdentifier((ulong)instanceID);
@@ -290,8 +447,17 @@ namespace UnityEngine.Rendering
         /// <param name="texture">Source Texture</param>
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
-        [Obsolete("BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool,TextureIdentifier  ) instead.", true)]
-        public void BlitOctahedralTextureMultiply(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, int overrideInstanceID )
+        [Obsolete(
+            "BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, int) is obsolete, use BlitOctahedralTextureMultiply(CommandBuffer, Vector4, Texture, Vector4, bool,TextureIdentifier  ) instead.",
+            true
+        )]
+        public void BlitOctahedralTextureMultiply(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            int overrideInstanceID
+        )
         {
             BlitOctahedralTextureMultiply(cmd, scaleOffset, texture, sourceScaleOffset, true, overrideInstanceID);
         }
@@ -305,13 +471,30 @@ namespace UnityEngine.Rendering
         /// <param name="sourceScaleOffset">Source scale (.xy) and offset(.zw).</param>
         /// <param name="blitMips">Blit mip maps.</param>
         /// <param name="overrideIdentifier">Override texture identifier.</param>
-        public void BlitOctahedralTextureMultiply(CommandBuffer cmd, Vector4 scaleOffset, Texture texture, Vector4 sourceScaleOffset, bool blitMips = true, TextureIdentifier overrideIdentifier = default)
+        public void BlitOctahedralTextureMultiply(
+            CommandBuffer cmd,
+            Vector4 scaleOffset,
+            Texture texture,
+            Vector4 sourceScaleOffset,
+            bool blitMips = true,
+            TextureIdentifier overrideIdentifier = default
+        )
         {
             // We handle ourself the 2D blit because cookies needs mipPadding for trilinear filtering
             if (Is2D(texture))
             {
-                Blit2DTexture(cmd, scaleOffset, texture, sourceScaleOffset, blitMips, BlitType.OctahedralPaddingMultiply);
-                MarkGPUTextureValid(overrideIdentifier != default ? overrideIdentifier : GetTextureIdentifier(texture), blitMips);
+                Blit2DTexture(
+                    cmd,
+                    scaleOffset,
+                    texture,
+                    sourceScaleOffset,
+                    blitMips,
+                    BlitType.OctahedralPaddingMultiply
+                );
+                MarkGPUTextureValid(
+                    overrideIdentifier != default ? overrideIdentifier : GetTextureIdentifier(texture),
+                    blitMips
+                );
             }
         }
 
@@ -324,7 +507,8 @@ namespace UnityEngine.Rendering
 
         Vector2 GetPowerOfTwoTextureSize(Texture texture)
         {
-            int width = texture.width, height = texture.height;
+            int width = texture.width,
+                height = texture.height;
 
             TextureSizeToPowerOfTwo(texture, ref width, ref height);
             return new Vector2(width, height);
@@ -341,8 +525,18 @@ namespace UnityEngine.Rendering
         /// <param name="height">Request height in pixels.</param>
         /// <param name="overrideInstanceID">Override texture instance ID.</param>
         /// <returns>True on success, false otherwise.</returns>
-        [Obsolete("AllocateTexture(CommandBuffer, ref Vector4, Texture, int, int, int) is obsolete, use AllocateTexture(CommandBuffer, ref Vector4, Texture, int, int, TextureIdentifier) instead.", true)]
-        public override bool AllocateTexture(CommandBuffer cmd, ref Vector4 scaleOffset, Texture texture, int width, int height, int overrideInstanceID)
+        [Obsolete(
+            "AllocateTexture(CommandBuffer, ref Vector4, Texture, int, int, int) is obsolete, use AllocateTexture(CommandBuffer, ref Vector4, Texture, int, int, TextureIdentifier) instead.",
+            true
+        )]
+        public override bool AllocateTexture(
+            CommandBuffer cmd,
+            ref Vector4 scaleOffset,
+            Texture texture,
+            int width,
+            int height,
+            int overrideInstanceID
+        )
         {
             TextureIdentifier identifier = new TextureIdentifier((ulong)overrideInstanceID);
             return AllocateTexture(cmd, ref scaleOffset, texture, width, height, identifier);
@@ -359,12 +553,25 @@ namespace UnityEngine.Rendering
         /// <param name="height">Request height in pixels.</param>
         /// <param name="overrideIdentifier">Override texture identifier.</param>
         /// <returns>True on success, false otherwise.</returns>
-        public override bool AllocateTexture(CommandBuffer cmd, ref Vector4 scaleOffset, Texture texture, int width, int height, TextureIdentifier overrideIdentifier = default)
+        public override bool AllocateTexture(
+            CommandBuffer cmd,
+            ref Vector4 scaleOffset,
+            Texture texture,
+            int width,
+            int height,
+            TextureIdentifier overrideIdentifier = default
+        )
         {
             // This atlas only supports square textures
             if (height != width)
             {
-                Debug.LogError("Can't place " + texture + " in the atlas " + m_AtlasTexture.name + ": Only squared texture are allowed in this atlas.");
+                Debug.LogError(
+                    "Can't place "
+                        + texture
+                        + " in the atlas "
+                        + m_AtlasTexture.name
+                        + ": Only squared texture are allowed in this atlas."
+                );
                 return false;
             }
 
@@ -392,8 +599,8 @@ namespace UnityEngine.Rendering
         /// <param name="width">The width</param>
         /// <param name="height">The height</param>
         /// <returns>True if the space is reserved</returns>
-        public bool ReserveSpace(Texture texture, int width, int height)
-            => ReserveSpace(GetTextureIdentifier(texture), width, height);
+        public bool ReserveSpace(Texture texture, int width, int height) =>
+            ReserveSpace(GetTextureIdentifier(texture), width, height);
 
         /// <summary>
         /// Reserves the space on the texture atlas
@@ -403,8 +610,8 @@ namespace UnityEngine.Rendering
         /// <param name="width">The width</param>
         /// <param name="height">The height</param>
         /// <returns>True if the space is reserved</returns>
-        public bool ReserveSpace(Texture textureA, Texture textureB, int width, int height)
-            => ReserveSpace(GetTextureIdentifier(textureA, textureB), width, height);
+        public bool ReserveSpace(Texture textureA, Texture textureB, int width, int height) =>
+            ReserveSpace(GetTextureIdentifier(textureA, textureB), width, height);
 
         /// <summary>
         /// Reserves the space on the texture atlas
@@ -443,6 +650,7 @@ namespace UnityEngine.Rendering
             }
             return true;
         }
+
         /// <summary>
         /// sort all the requested allocation from biggest to smallest and re-insert them.
         /// This function does not moves the textures in the atlas, it only changes their coordinates
@@ -457,10 +665,12 @@ namespace UnityEngine.Rendering
             ResetAllocator();
 
             // Sort entries from biggest to smallest
-            entries.Sort((c1, c2) =>
-            {
-                return c2.size.magnitude.CompareTo(c1.size.magnitude);
-            });
+            entries.Sort(
+                (c1, c2) =>
+                {
+                    return c2.size.magnitude.CompareTo(c1.size.magnitude);
+                }
+            );
 
             bool success = true;
             Vector4 newScaleOffset = Vector4.zero;
@@ -478,8 +688,18 @@ namespace UnityEngine.Rendering
         /// <param name="hasMipmap">Atlas uses mip maps.</param>
         /// <param name="format">Atlas format.</param>
         /// <returns>The approximate size of the cache in bytes.</returns>
-        public static long GetApproxCacheSizeInByte(int nbElement, int resolution, bool hasMipmap, GraphicsFormat format)
-            => (long)(nbElement * resolution * resolution * (double)((hasMipmap ? k_MipmapFactorApprox : 1.0f) * GraphicsFormatUtility.GetBlockSize(format)));
+        public static long GetApproxCacheSizeInByte(
+            int nbElement,
+            int resolution,
+            bool hasMipmap,
+            GraphicsFormat format
+        ) =>
+            (long)(
+                nbElement
+                * resolution
+                * resolution
+                * (double)((hasMipmap ? k_MipmapFactorApprox : 1.0f) * GraphicsFormatUtility.GetBlockSize(format))
+            );
 
         /// <summary>
         /// Compute the max size of a power of two atlas for a given size in byte (weight).
@@ -490,7 +710,8 @@ namespace UnityEngine.Rendering
         /// <returns>The largest possible resolution for a square atlas, constrained by weight, as a power of two value.</returns>
         public static int GetMaxCacheSizeForWeightInByte(int weight, bool hasMipmap, GraphicsFormat format)
         {
-            float bytePerPixel = (float)GraphicsFormatUtility.GetBlockSize(format) * (hasMipmap ? k_MipmapFactorApprox : 1.0f);
+            float bytePerPixel =
+                (float)GraphicsFormatUtility.GetBlockSize(format) * (hasMipmap ? k_MipmapFactorApprox : 1.0f);
             var maxAtlasSquareSize = Mathf.Sqrt((float)weight / bytePerPixel);
             return CoreUtils.PreviousPowerOfTwo((int)maxAtlasSquareSize);
         }

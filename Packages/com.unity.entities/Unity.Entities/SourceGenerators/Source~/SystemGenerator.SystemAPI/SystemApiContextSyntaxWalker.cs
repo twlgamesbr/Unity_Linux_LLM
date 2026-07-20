@@ -38,8 +38,8 @@ public partial class SystemApiContextSyntaxWalker : CSharpSyntaxWalker, IModuleS
     private int _numClosingBracketsForNestedSystemApiInvocations;
     private bool _isWalkingNestedInvocation;
 
-    public SystemApiContextSyntaxWalker(SystemDescription systemDescription) : base(SyntaxWalkerDepth.Trivia) =>
-        _systemDescription = systemDescription;
+    public SystemApiContextSyntaxWalker(SystemDescription systemDescription)
+        : base(SyntaxWalkerDepth.Trivia) => _systemDescription = systemDescription;
 
     public bool TryWriteSyntax(IndentedTextWriter writer, CandidateSyntax candidateSyntax)
     {
@@ -176,25 +176,26 @@ public partial class SystemApiContextSyntaxWalker : CSharpSyntaxWalker, IModuleS
 
         if (triviaKind == SyntaxKind.EndOfLineTrivia)
             _writer.WriteLine();
-
-        else if (triviaKind != SyntaxKind.DisabledTextTrivia &&
-                 triviaKind != SyntaxKind.PreprocessingMessageTrivia &&
-                 triviaKind != SyntaxKind.IfDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ElifDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ElseDirectiveTrivia &&
-                 triviaKind != SyntaxKind.EndIfDirectiveTrivia &&
-                 triviaKind != SyntaxKind.RegionDirectiveTrivia &&
-                 triviaKind != SyntaxKind.EndRegionDirectiveTrivia &&
-                 triviaKind != SyntaxKind.DefineDirectiveTrivia &&
-                 triviaKind != SyntaxKind.UndefDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ErrorDirectiveTrivia &&
-                 triviaKind != SyntaxKind.WarningDirectiveTrivia &&
-                 triviaKind != SyntaxKind.PragmaWarningDirectiveTrivia &&
-                 triviaKind != SyntaxKind.PragmaChecksumDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ReferenceDirectiveTrivia &&
-                 triviaKind != SyntaxKind.BadDirectiveTrivia &&
-                 triviaKind != SyntaxKind.SingleLineCommentTrivia &&
-                 triviaKind != SyntaxKind.MultiLineCommentTrivia)
+        else if (
+            triviaKind != SyntaxKind.DisabledTextTrivia
+            && triviaKind != SyntaxKind.PreprocessingMessageTrivia
+            && triviaKind != SyntaxKind.IfDirectiveTrivia
+            && triviaKind != SyntaxKind.ElifDirectiveTrivia
+            && triviaKind != SyntaxKind.ElseDirectiveTrivia
+            && triviaKind != SyntaxKind.EndIfDirectiveTrivia
+            && triviaKind != SyntaxKind.RegionDirectiveTrivia
+            && triviaKind != SyntaxKind.EndRegionDirectiveTrivia
+            && triviaKind != SyntaxKind.DefineDirectiveTrivia
+            && triviaKind != SyntaxKind.UndefDirectiveTrivia
+            && triviaKind != SyntaxKind.ErrorDirectiveTrivia
+            && triviaKind != SyntaxKind.WarningDirectiveTrivia
+            && triviaKind != SyntaxKind.PragmaWarningDirectiveTrivia
+            && triviaKind != SyntaxKind.PragmaChecksumDirectiveTrivia
+            && triviaKind != SyntaxKind.ReferenceDirectiveTrivia
+            && triviaKind != SyntaxKind.BadDirectiveTrivia
+            && triviaKind != SyntaxKind.SingleLineCommentTrivia
+            && triviaKind != SyntaxKind.MultiLineCommentTrivia
+        )
         {
             if (!trivia.HasStructure)
                 _writer.Write(trivia.ToString());

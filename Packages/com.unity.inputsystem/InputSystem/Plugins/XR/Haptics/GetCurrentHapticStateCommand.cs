@@ -38,10 +38,7 @@ namespace UnityEngine.InputSystem.XR.Haptics
 
         public static GetCurrentHapticStateCommand Create()
         {
-            return new GetCurrentHapticStateCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize),
-            };
+            return new GetCurrentHapticStateCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

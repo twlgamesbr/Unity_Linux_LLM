@@ -13,7 +13,8 @@ namespace UnityEngine.InputSystem.Editor
     {
         private const string kDefaultAssetName = "InputSystem_Actions";
         private const string kDefaultAssetPath = "Assets/" + kDefaultAssetName + ".inputactions";
-        private const string kDefaultTemplateAssetPath = "Packages/com.unity.inputsystem/InputSystem/Editor/ProjectWideActions/ProjectWideActionsTemplate.json";
+        private const string kDefaultTemplateAssetPath =
+            "Packages/com.unity.inputsystem/InputSystem/Editor/ProjectWideActions/ProjectWideActionsTemplate.json";
 
         internal static class ProjectSettingsProjectWideActionsAssetConverter
         {
@@ -24,7 +25,13 @@ namespace UnityEngine.InputSystem.Editor
             {
                 private static bool migratedInputActionAssets = false;
 
-                private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
+                private static void OnPostprocessAllAssets(
+                    string[] importedAssets,
+                    string[] deletedAssets,
+                    string[] movedAssets,
+                    string[] movedFromAssetPaths,
+                    bool didDomainReload
+                )
                 {
                     if (!migratedInputActionAssets && importedAssets.Contains(kAssetPathInputManager))
                     {
@@ -49,12 +56,16 @@ namespace UnityEngine.InputSystem.Editor
                 if (objects == null)
                     return;
 
-                var inputActionsAssets = objects.Where(o => o != null && o.name == kAssetNameProjectWideInputActions && o is InputActionAsset);
+                var inputActionsAssets = objects.Where(o =>
+                    o != null && o.name == kAssetNameProjectWideInputActions && o is InputActionAsset
+                );
 
                 if (!inputActionsAssets.Any())
                     return;
 
-                Debug.Log("Migrating Project-wide Input Actions from InputManager.asset to InputSystem_Actions.inputactions asset");
+                Debug.Log(
+                    "Migrating Project-wide Input Actions from InputManager.asset to InputSystem_Actions.inputactions asset"
+                );
 
                 // workarround for serialization bug with ScriptableObject in ProjectSettings during reimporting all asset, it should not be null
                 if (allowRetry)
@@ -65,8 +76,13 @@ namespace UnityEngine.InputSystem.Editor
                         {
                             // unload asset to avoid serialization bug and will try again later
                             Resources.UnloadAsset(inputActionsAsset);
-                            Debug.Log($"Unexpected null action map encounted during the migration, will try again once later");
-                            EditorApplication.delayCall += () => { MoveInputManagerAssetActionsToProjectWideInputActionAsset(allowRetry: false); };
+                            Debug.Log(
+                                $"Unexpected null action map encounted during the migration, will try again once later"
+                            );
+                            EditorApplication.delayCall += () =>
+                            {
+                                MoveInputManagerAssetActionsToProjectWideInputActionAsset(allowRetry: false);
+                            };
                             return;
                         }
                     }
@@ -104,18 +120,23 @@ namespace UnityEngine.InputSystem.Editor
                         var json = inputActionsAsset.ToJson();
                         InputActionAssetManager.SaveAsset(EditorHelpers.GetPhysicalPath(path), json);
 
-                        Debug.Log($"Migrated Project-wide Input Actions from '{kAssetPathInputManager}' to '{path}' asset");
+                        Debug.Log(
+                            $"Migrated Project-wide Input Actions from '{kAssetPathInputManager}' to '{path}' asset"
+                        );
 
                         // Update current project-wide settings if needed (don't replace if already set to something else)
                         //
-                        if (InputSystem.actions == null || InputSystem.actions.name == kAssetNameProjectWideInputActions)
+                        if (
+                            InputSystem.actions == null
+                            || InputSystem.actions.name == kAssetNameProjectWideInputActions
+                        )
                         {
-                            InputSystem.actions = (InputActionAsset)AssetDatabase.LoadAssetAtPath(path, typeof(InputActionAsset));
+                            InputSystem.actions = (InputActionAsset)
+                                AssetDatabase.LoadAssetAtPath(path, typeof(InputActionAsset));
                             Debug.Log($"Loaded Project-wide Input Actions from '{path}' asset");
                         }
                     }
                 }
-
 
                 bool hasChanged = false;
                 // Handle deleting all InputActionAssets as older 1.8.0 pre release could create more than one project wide input asset in the file
@@ -154,7 +175,10 @@ namespace UnityEngine.InputSystem.Editor
         // Creates an asset at the given path containing the default template JSON.
         internal static InputActionAsset CreateDefaultAssetAtPath(string assetPath = kDefaultAssetPath)
         {
-            return CreateAssetAtPathFromJson(assetPath, File.ReadAllText(EditorHelpers.GetPhysicalPath(kDefaultTemplateAssetPath)));
+            return CreateAssetAtPathFromJson(
+                assetPath,
+                File.ReadAllText(EditorHelpers.GetPhysicalPath(kDefaultTemplateAssetPath))
+            );
         }
 
         // These may be moved out to internal types if decided to extend validation at a later point.
@@ -314,7 +338,8 @@ namespace UnityEngine.InputSystem.Editor
             /// <remarks>Throws <c>System.ArgumentNullException</c> if <c>asset</c> is <c>null</c>.</remarks>
             public static bool Verify(InputActionAsset asset, IReportInputActionAssetVerificationErrors reporter = null)
             {
-                return (s_VerifierFactories == null || s_VerifierFactories.Count == 0) || new Verifier(reporter).Verify(asset);
+                return (s_VerifierFactories == null || s_VerifierFactories.Count == 0)
+                    || new Verifier(reporter).Verify(asset);
             }
         }
 

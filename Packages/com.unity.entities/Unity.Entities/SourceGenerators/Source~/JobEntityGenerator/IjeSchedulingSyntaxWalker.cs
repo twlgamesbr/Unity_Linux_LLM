@@ -51,7 +51,10 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
     private ObjectCreationExpressionSyntax _jobEntityInstanceCreationSyntax;
     private InvocationExpressionSyntax _jobEntityInvocationSyntax;
 
-    internal IjeSchedulingSyntaxWalker(ref SystemDescription systemDescription, Dictionary<InvocationExpressionSyntax, JobEntityInstanceInfo> jobEntityInfos)
+    internal IjeSchedulingSyntaxWalker(
+        ref SystemDescription systemDescription,
+        Dictionary<InvocationExpressionSyntax, JobEntityInstanceInfo> jobEntityInfos
+    )
         : base(SyntaxWalkerDepth.Trivia)
     {
         _uniqueId = 0;
@@ -82,7 +85,9 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
         {
             if (_systemDescription.CandidateNodes.TryGetValue(node, out var candidateSyntax))
             {
-                var rewroteArg = _systemDescription.SyntaxWalkers[candidateSyntax.GetOwningModule()].TryWriteSyntax(_schedulingArgsWriter, candidateSyntax);
+                var rewroteArg = _systemDescription
+                    .SyntaxWalkers[candidateSyntax.GetOwningModule()]
+                    .TryWriteSyntax(_schedulingArgsWriter, candidateSyntax);
                 if (!rewroteArg)
                     base.VisitInvocationExpression(node);
             }
@@ -149,11 +154,13 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
 
                     _isWalkingSchedulingInvocationArgument = false;
                 }
-
             }
 
-            var result =
-                JobEntityInstanceInfo.GetUserDefinedQueryAndDependency(ref _systemDescription, jobEntityInfo.IsExtensionMethodUsed, node);
+            var result = JobEntityInstanceInfo.GetUserDefinedQueryAndDependency(
+                ref _systemDescription,
+                jobEntityInfo.IsExtensionMethodUsed,
+                node
+            );
 
             if (result.UserDefinedEntityQuery != null)
             {
@@ -178,14 +185,14 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
 
             _userDefinedDependency = result.UserDefinedDependency?.ToString();
 
-            string replacementCode =
-                jobEntityInfo.GetAndAddScheduleExpression(
-                    ref _systemDescription,
-                    _uniqueId++,
-                    tryGetJobArg.JobArgumentIndexInExtensionMethod,
-                    _schedulingJobEntityInstanceArgument,
-                    _userDefinedQueryArgument,
-                    _userDefinedDependency);
+            string replacementCode = jobEntityInfo.GetAndAddScheduleExpression(
+                ref _systemDescription,
+                _uniqueId++,
+                tryGetJobArg.JobArgumentIndexInExtensionMethod,
+                _schedulingJobEntityInstanceArgument,
+                _userDefinedQueryArgument,
+                _userDefinedDependency
+            );
 
             _writer.Write(replacementCode);
             _hasWrittenSyntax = true;
@@ -214,7 +221,9 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
         {
             if (_systemDescription.CandidateNodes.TryGetValue(node, out var candidateSyntax))
             {
-                var rewroteArg = _systemDescription.SyntaxWalkers[candidateSyntax.GetOwningModule()].TryWriteSyntax(_schedulingArgsWriter, candidateSyntax);
+                var rewroteArg = _systemDescription
+                    .SyntaxWalkers[candidateSyntax.GetOwningModule()]
+                    .TryWriteSyntax(_schedulingArgsWriter, candidateSyntax);
                 if (!rewroteArg)
                     base.VisitMemberAccessExpression(node);
             }
@@ -231,7 +240,9 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
         {
             if (_systemDescription.CandidateNodes.TryGetValue(node, out var candidateSyntax))
             {
-                var rewroteArg = _systemDescription.SyntaxWalkers[candidateSyntax.GetOwningModule()].TryWriteSyntax(_schedulingArgsWriter, candidateSyntax);
+                var rewroteArg = _systemDescription
+                    .SyntaxWalkers[candidateSyntax.GetOwningModule()]
+                    .TryWriteSyntax(_schedulingArgsWriter, candidateSyntax);
                 if (!rewroteArg)
                     base.VisitIdentifierName(node);
             }
@@ -241,6 +252,7 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
         else
             base.VisitIdentifierName(node);
     }
+
     public override void VisitToken(SyntaxToken token)
     {
         VisitLeadingTrivia(token);
@@ -264,25 +276,26 @@ public class IjeSchedulingSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
             else
                 _writer.WriteLine();
         }
-
-        else if (triviaKind != SyntaxKind.DisabledTextTrivia &&
-                 triviaKind != SyntaxKind.PreprocessingMessageTrivia &&
-                 triviaKind != SyntaxKind.IfDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ElifDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ElseDirectiveTrivia &&
-                 triviaKind != SyntaxKind.EndIfDirectiveTrivia &&
-                 triviaKind != SyntaxKind.RegionDirectiveTrivia &&
-                 triviaKind != SyntaxKind.EndRegionDirectiveTrivia &&
-                 triviaKind != SyntaxKind.DefineDirectiveTrivia &&
-                 triviaKind != SyntaxKind.UndefDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ErrorDirectiveTrivia &&
-                 triviaKind != SyntaxKind.WarningDirectiveTrivia &&
-                 triviaKind != SyntaxKind.PragmaWarningDirectiveTrivia &&
-                 triviaKind != SyntaxKind.PragmaChecksumDirectiveTrivia &&
-                 triviaKind != SyntaxKind.ReferenceDirectiveTrivia &&
-                 triviaKind != SyntaxKind.BadDirectiveTrivia &&
-                 triviaKind != SyntaxKind.SingleLineCommentTrivia &&
-                 triviaKind != SyntaxKind.MultiLineCommentTrivia)
+        else if (
+            triviaKind != SyntaxKind.DisabledTextTrivia
+            && triviaKind != SyntaxKind.PreprocessingMessageTrivia
+            && triviaKind != SyntaxKind.IfDirectiveTrivia
+            && triviaKind != SyntaxKind.ElifDirectiveTrivia
+            && triviaKind != SyntaxKind.ElseDirectiveTrivia
+            && triviaKind != SyntaxKind.EndIfDirectiveTrivia
+            && triviaKind != SyntaxKind.RegionDirectiveTrivia
+            && triviaKind != SyntaxKind.EndRegionDirectiveTrivia
+            && triviaKind != SyntaxKind.DefineDirectiveTrivia
+            && triviaKind != SyntaxKind.UndefDirectiveTrivia
+            && triviaKind != SyntaxKind.ErrorDirectiveTrivia
+            && triviaKind != SyntaxKind.WarningDirectiveTrivia
+            && triviaKind != SyntaxKind.PragmaWarningDirectiveTrivia
+            && triviaKind != SyntaxKind.PragmaChecksumDirectiveTrivia
+            && triviaKind != SyntaxKind.ReferenceDirectiveTrivia
+            && triviaKind != SyntaxKind.BadDirectiveTrivia
+            && triviaKind != SyntaxKind.SingleLineCommentTrivia
+            && triviaKind != SyntaxKind.MultiLineCommentTrivia
+        )
         {
             if (!trivia.HasStructure)
             {

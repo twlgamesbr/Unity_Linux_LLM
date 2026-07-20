@@ -65,9 +65,7 @@ namespace UnityEngine.InputSystem.Editor
         private class SeparatorDropdownItem : AdvancedDropdownItem
         {
             public SeparatorDropdownItem(string label = "")
-                : base(label)
-            {
-            }
+                : base(label) { }
         }
     }
 }

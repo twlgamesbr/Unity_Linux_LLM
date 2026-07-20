@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-
 namespace UnityEditor.Rendering.Universal
 {
     [CustomEditor(typeof(SkinnedMeshRenderer))]
@@ -13,11 +12,14 @@ namespace UnityEditor.Rendering.Universal
     {
         SerializedProperty m_MaskInteraction;
         SavedBool m_2DFoldout;
+
         new class Styles
         {
-            public static readonly GUIContent maskInteractionLabel = EditorGUIUtility.TrTextContent("Mask Interaction", "Renderer's interaction with a Sprite Mask");
+            public static readonly GUIContent maskInteractionLabel = EditorGUIUtility.TrTextContent(
+                "Mask Interaction",
+                "Renderer's interaction with a Sprite Mask"
+            );
         }
-
 
         public override void OnEnable()
         {
@@ -38,7 +40,12 @@ namespace UnityEditor.Rendering.Universal
                 if (m_2DFoldout)
                 {
                     EditorGUI.indentLevel++;
-                    m_MaskInteraction.intValue = Convert.ToInt32(EditorGUILayout.EnumPopup(Styles.maskInteractionLabel, (SpriteMaskInteraction)m_MaskInteraction.intValue));
+                    m_MaskInteraction.intValue = Convert.ToInt32(
+                        EditorGUILayout.EnumPopup(
+                            Styles.maskInteractionLabel,
+                            (SpriteMaskInteraction)m_MaskInteraction.intValue
+                        )
+                    );
                     EditorGUI.indentLevel--;
                 }
             }

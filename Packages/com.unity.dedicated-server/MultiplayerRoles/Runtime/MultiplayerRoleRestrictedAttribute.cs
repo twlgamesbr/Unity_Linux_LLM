@@ -7,7 +7,5 @@ namespace Unity.Multiplayer
     /// stripped in Server or Client platforms.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-    public sealed class MultiplayerRoleRestrictedAttribute : Attribute
-    {
-    }
+    public sealed class MultiplayerRoleRestrictedAttribute : Attribute { }
 }

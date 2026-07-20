@@ -27,11 +27,16 @@ namespace Unity.Multiplayer.Editor
             }
             else if (InternalUtility.IsStandalonePlatform(EditorUserBuildSettings.activeBuildTarget))
             {
-                multiplayerRole = EditorMultiplayerRolesManager.GetMultiplayerRoleForClassicTarget(EditorUserBuildSettings.activeBuildTarget, EditorUserBuildSettings.standaloneBuildSubtarget);
+                multiplayerRole = EditorMultiplayerRolesManager.GetMultiplayerRoleForClassicTarget(
+                    EditorUserBuildSettings.activeBuildTarget,
+                    EditorUserBuildSettings.standaloneBuildSubtarget
+                );
             }
             else
             {
-                multiplayerRole = EditorMultiplayerRolesManager.GetMultiplayerRoleForClassicTarget(EditorUserBuildSettings.activeBuildTarget);
+                multiplayerRole = EditorMultiplayerRolesManager.GetMultiplayerRoleForClassicTarget(
+                    EditorUserBuildSettings.activeBuildTarget
+                );
             }
 
             EditorMultiplayerRolesManager.ActiveMultiplayerRoleMask = multiplayerRole;

@@ -67,7 +67,11 @@ namespace Unity.PlatformToolkit
             }
         }
 
-        private static bool TryFindMostSpecificAssignableType(Type assignedType, IEnumerable<Type> assignableTypeCandidates, out Type mostSpecificAssignableType)
+        private static bool TryFindMostSpecificAssignableType(
+            Type assignedType,
+            IEnumerable<Type> assignableTypeCandidates,
+            out Type mostSpecificAssignableType
+        )
         {
             var assignableTypes = assignableTypeCandidates.Where(c => c.IsAssignableFrom(assignedType)).ToList();
             if (assignableTypes.Count == 0)

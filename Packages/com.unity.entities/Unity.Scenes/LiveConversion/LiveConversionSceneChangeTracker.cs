@@ -1,8 +1,8 @@
+using System;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections.LowLevel.Unsafe.NotBurstCompatible;
 using Unity.Entities;
-using System;
 
 namespace Unity.Scenes
 {
@@ -26,9 +26,9 @@ namespace Unity.Scenes
             return bytes;
         }
 
-        unsafe public static LiveConversionSceneMsg FromMsg(byte[] buffer, AllocatorManager.AllocatorHandle allocator)
+        public static unsafe LiveConversionSceneMsg FromMsg(byte[] buffer, AllocatorManager.AllocatorHandle allocator)
         {
-            fixed(byte* ptr = buffer)
+            fixed (byte* ptr = buffer)
             {
                 var reader = new UnsafeAppendBuffer.Reader(ptr, buffer.Length);
                 LiveConversionSceneMsg msg = default;
@@ -54,15 +54,20 @@ namespace Unity.Scenes
     {
         private EntityQuery _LoadedScenesQuery;
         private EntityQuery _UnloadedScenesQuery;
-        private NativeList<SceneReference>  m_PreviousScenes;
+        private NativeList<SceneReference> m_PreviousScenes;
         private NativeList<LiveConversionPatcher.LiveConvertedSceneCleanup> m_PreviousRemovedScenes;
 
         public LiveConversionSceneChangeTracker(EntityManager manager)
         {
             _LoadedScenesQuery = manager.CreateEntityQuery(typeof(SceneReference));
-            _UnloadedScenesQuery = manager.CreateEntityQuery(ComponentType.Exclude<SceneReference>(), ComponentType.ReadOnly<LiveConversionPatcher.LiveConvertedSceneCleanup>());
+            _UnloadedScenesQuery = manager.CreateEntityQuery(
+                ComponentType.Exclude<SceneReference>(),
+                ComponentType.ReadOnly<LiveConversionPatcher.LiveConvertedSceneCleanup>()
+            );
             m_PreviousScenes = new NativeList<SceneReference>(Allocator.Persistent);
-            m_PreviousRemovedScenes = new NativeList<LiveConversionPatcher.LiveConvertedSceneCleanup>(Allocator.Persistent);
+            m_PreviousRemovedScenes = new NativeList<LiveConversionPatcher.LiveConvertedSceneCleanup>(
+                Allocator.Persistent
+            );
         }
 
         public void Dispose()
@@ -83,12 +88,19 @@ namespace Unity.Scenes
         {
             msg = default;
 
-            if (_LoadedScenesQuery.CalculateChunkCount() == 0 && _UnloadedScenesQuery.CalculateChunkCount() == 0
-                && m_PreviousScenes.Length == 0 && m_PreviousRemovedScenes.Length == 0)
+            if (
+                _LoadedScenesQuery.CalculateChunkCount() == 0
+                && _UnloadedScenesQuery.CalculateChunkCount() == 0
+                && m_PreviousScenes.Length == 0
+                && m_PreviousRemovedScenes.Length == 0
+            )
                 return false;
 
             var loadedScenes = _LoadedScenesQuery.ToComponentDataArray<SceneReference>(Allocator.TempJob);
-            var removedScenes = _UnloadedScenesQuery.ToComponentDataArray<LiveConversionPatcher.LiveConvertedSceneCleanup>(Allocator.TempJob);
+            var removedScenes =
+                _UnloadedScenesQuery.ToComponentDataArray<LiveConversionPatcher.LiveConvertedSceneCleanup>(
+                    Allocator.TempJob
+                );
             var newRemovedScenes = SubtractArrays(removedScenes, m_PreviousRemovedScenes.AsArray());
 
             var noNewUnloads = newRemovedScenes.Length == 0;
@@ -113,7 +125,8 @@ namespace Unity.Scenes
             return true;
         }
 
-        internal static NativeArray<T> SubtractArrays<T>(NativeArray<T> minuend, NativeArray<T> subtrahend) where T : unmanaged, IEquatable<T>
+        internal static NativeArray<T> SubtractArrays<T>(NativeArray<T> minuend, NativeArray<T> subtrahend)
+            where T : unmanaged, IEquatable<T>
         {
             if (minuend.Length == 0 || minuend.ArraysEqual(subtrahend))
                 return new NativeArray<T>(0, Allocator.Persistent);

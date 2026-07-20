@@ -14,18 +14,17 @@ namespace Unity.Entities.UI
                 name = Name,
                 label = DisplayName,
                 tooltip = Tooltip,
-                bindingPath = "."
+                bindingPath = ".",
             };
             return m_Field;
         }
     }
 
     abstract class BaseFieldPropertyInspector<TField, TValue> : BaseFieldPropertyInspector<TField, TValue, TValue>
-        where TField : BaseField<TValue>, new()
-    {
-    }
+        where TField : BaseField<TValue>, new() { }
 
-    abstract class BaseFieldAttributeInspector<TField, TFieldValue, TValue, TAttribute> : PropertyInspector<TValue, TAttribute>
+    abstract class BaseFieldAttributeInspector<TField, TFieldValue, TValue, TAttribute>
+        : PropertyInspector<TValue, TAttribute>
         where TField : BaseField<TFieldValue>, new()
         where TAttribute : UnityEngine.PropertyAttribute
     {
@@ -38,15 +37,14 @@ namespace Unity.Entities.UI
                 name = Name,
                 label = DisplayName,
                 tooltip = Tooltip,
-                bindingPath = "."
+                bindingPath = ".",
             };
             return m_Field;
         }
     }
 
-    abstract class BaseFieldAttributeInspector<TField, TValue, TAttribute> : BaseFieldAttributeInspector<TField, TValue, TValue, TAttribute>
+    abstract class BaseFieldAttributeInspector<TField, TValue, TAttribute>
+        : BaseFieldAttributeInspector<TField, TValue, TValue, TAttribute>
         where TField : BaseField<TValue>, new()
-        where TAttribute : UnityEngine.PropertyAttribute
-    {
-    }
+        where TAttribute : UnityEngine.PropertyAttribute { }
 }

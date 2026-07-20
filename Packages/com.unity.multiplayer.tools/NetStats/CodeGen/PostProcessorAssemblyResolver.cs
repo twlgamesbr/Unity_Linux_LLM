@@ -23,7 +23,8 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
 
         public void Dispose() { }
 
-        public AssemblyDefinition Resolve(AssemblyNameReference name) => Resolve(name, new ReaderParameters(ReadingMode.Deferred));
+        public AssemblyDefinition Resolve(AssemblyNameReference name) =>
+            Resolve(name, new ReaderParameters(ReadingMode.Deferred));
 
         public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
         {
@@ -94,19 +95,28 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
 
         private static MemoryStream MemoryStreamFor(string fileName)
         {
-            return Retry(10, TimeSpan.FromSeconds(1), () =>
-            {
-                byte[] byteArray;
-                using var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                byteArray = new byte[fileStream.Length];
-                var readLength = fileStream.Read(byteArray, 0, (int)fileStream.Length);
-                if (readLength != fileStream.Length)
+            return Retry(
+                10,
+                TimeSpan.FromSeconds(1),
+                () =>
                 {
-                    throw new InvalidOperationException("File read length is not full length of file.");
-                }
+                    byte[] byteArray;
+                    using var fileStream = new FileStream(
+                        fileName,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.ReadWrite
+                    );
+                    byteArray = new byte[fileStream.Length];
+                    var readLength = fileStream.Read(byteArray, 0, (int)fileStream.Length);
+                    if (readLength != fileStream.Length)
+                    {
+                        throw new InvalidOperationException("File read length is not full length of file.");
+                    }
 
-                return new MemoryStream(byteArray);
-            });
+                    return new MemoryStream(byteArray);
+                }
+            );
         }
 
         private static MemoryStream Retry(int retryCount, TimeSpan waitTime, Func<MemoryStream> func)

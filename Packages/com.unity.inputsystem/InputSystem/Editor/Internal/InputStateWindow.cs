@@ -5,7 +5,6 @@ using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine.InputSystem.LowLevel;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
 #endif
@@ -100,7 +99,7 @@ namespace UnityEngine.InputSystem.Editor
 
             // Copy event data.
             var buffer = new byte[stateSize];
-            fixed(byte* bufferPtr = buffer)
+            fixed (byte* bufferPtr = buffer)
             {
                 UnsafeUtility.MemCpy(bufferPtr + stateOffset, dataPtr, dataSize);
             }
@@ -157,7 +156,7 @@ namespace UnityEngine.InputSystem.Editor
                     continue;
 
                 var buffer = new byte[stateSize];
-                fixed(byte* stateDataPtr = buffer)
+                fixed (byte* stateDataPtr = buffer)
                 {
                     UnsafeUtility.MemCpy(stateDataPtr, (byte*)deviceState + (int)stateOffset, stateSize);
                 }
@@ -221,15 +220,23 @@ namespace UnityEngine.InputSystem.Editor
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
             m_PollControlState = GUILayout.Toggle(m_PollControlState, Contents.live, EditorStyles.toolbarButton);
 
-            m_ShowRawBytes = GUILayout.Toggle(m_ShowRawBytes, Contents.showRawMemory, EditorStyles.toolbarButton,
-                GUILayout.Width(150));
+            m_ShowRawBytes = GUILayout.Toggle(
+                m_ShowRawBytes,
+                Contents.showRawMemory,
+                EditorStyles.toolbarButton,
+                GUILayout.Width(150)
+            );
 
             m_ShowAsBits = GUILayout.Toggle(m_ShowAsBits, Contents.showBits, EditorStyles.toolbarButton);
 
             if (m_CompareStateBuffers)
             {
-                var showDifferentOnly = GUILayout.Toggle(m_ShowDifferentOnly, Contents.showDifferentOnly,
-                    EditorStyles.toolbarButton, GUILayout.Width(150));
+                var showDifferentOnly = GUILayout.Toggle(
+                    m_ShowDifferentOnly,
+                    Contents.showDifferentOnly,
+                    EditorStyles.toolbarButton,
+                    GUILayout.Width(150)
+                );
                 if (showDifferentOnly != m_ShowDifferentOnly && m_ControlTree != null)
                 {
                     m_ControlTree.showDifferentOnly = showDifferentOnly;
@@ -243,8 +250,12 @@ namespace UnityEngine.InputSystem.Editor
             // add dropdown that allows selecting which buffer to display.
             if (m_StateBuffers.Length > 1 && !m_CompareStateBuffers)
             {
-                var selectedBuffer = EditorGUILayout.IntPopup(m_SelectedStateBuffer, m_BufferChoices,
-                    m_BufferChoiceValues, EditorStyles.toolbarPopup);
+                var selectedBuffer = EditorGUILayout.IntPopup(
+                    m_SelectedStateBuffer,
+                    m_BufferChoices,
+                    m_BufferChoiceValues,
+                    EditorStyles.toolbarPopup
+                );
                 if (selectedBuffer != m_SelectedStateBuffer)
                 {
                     m_SelectedStateBuffer = selectedBuffer;
@@ -265,13 +276,23 @@ namespace UnityEngine.InputSystem.Editor
                 {
                     if (m_CompareStateBuffers)
                     {
-                        m_ControlTree = InputControlTreeView.Create(m_Control, m_StateBuffers.Length, ref m_ControlTreeState, ref m_ControlTreeHeaderState);
+                        m_ControlTree = InputControlTreeView.Create(
+                            m_Control,
+                            m_StateBuffers.Length,
+                            ref m_ControlTreeState,
+                            ref m_ControlTreeHeaderState
+                        );
                         m_ControlTree.multipleStateBuffers = m_StateBuffers;
                         m_ControlTree.showDifferentOnly = m_ShowDifferentOnly;
                     }
                     else
                     {
-                        m_ControlTree = InputControlTreeView.Create(m_Control, 1, ref m_ControlTreeState, ref m_ControlTreeHeaderState);
+                        m_ControlTree = InputControlTreeView.Create(
+                            m_Control,
+                            1,
+                            ref m_ControlTreeState,
+                            ref m_ControlTreeHeaderState
+                        );
                         m_ControlTree.stateBuffer = m_StateBuffers[m_SelectedStateBuffer];
                     }
                     m_ControlTree.Reload();
@@ -346,9 +367,11 @@ namespace UnityEngine.InputSystem.Editor
                 var hexGroupRect = offsetLabelRect;
                 hexGroupRect.x += kOffsetLabelWidth + 10;
                 hexGroupRect.width = m_ShowAsBits ? kBitGroupWidth : kHexGroupWidth;
-                for (var group = 0;
-                     group < kHexGroupsPerLine && currentHexGroup < numHexGroups;
-                     ++group, ++currentHexGroup)
+                for (
+                    var group = 0;
+                    group < kHexGroupsPerLine && currentHexGroup < numHexGroups;
+                    ++group, ++currentHexGroup
+                )
                 {
                     // Convert bytes to hex.
                     var hex = string.Empty;
@@ -400,23 +423,48 @@ namespace UnityEngine.InputSystem.Editor
         // against any mutations.
         // When inspecting controls (as opposed to events), we copy all their various
         // state buffers and allow switching between them.
-        [SerializeField] private byte[][] m_StateBuffers;
-        [SerializeField] private int m_SelectedStateBuffer;
-        [SerializeField] private bool m_CompareStateBuffers;
-        [SerializeField] private bool m_ShowDifferentOnly;
-        [SerializeField] private bool m_ShowRawBytes;
-        [SerializeField] private bool m_ShowAsBits;
-        [SerializeField] private bool m_PollControlState;
-        [SerializeField] private TreeViewState m_ControlTreeState;
-        [SerializeField] private MultiColumnHeaderState m_ControlTreeHeaderState;
-        [SerializeField] private Vector2 m_HexDumpScrollPosition;
+        [SerializeField]
+        private byte[][] m_StateBuffers;
 
-        [NonSerialized] private InputControlTreeView m_ControlTree;
-        [NonSerialized] private GUIContent[] m_BufferChoices;
-        [NonSerialized] private int[] m_BufferChoiceValues;
+        [SerializeField]
+        private int m_SelectedStateBuffer;
+
+        [SerializeField]
+        private bool m_CompareStateBuffers;
+
+        [SerializeField]
+        private bool m_ShowDifferentOnly;
+
+        [SerializeField]
+        private bool m_ShowRawBytes;
+
+        [SerializeField]
+        private bool m_ShowAsBits;
+
+        [SerializeField]
+        private bool m_PollControlState;
+
+        [SerializeField]
+        private TreeViewState m_ControlTreeState;
+
+        [SerializeField]
+        private MultiColumnHeaderState m_ControlTreeHeaderState;
+
+        [SerializeField]
+        private Vector2 m_HexDumpScrollPosition;
+
+        [NonSerialized]
+        private InputControlTreeView m_ControlTree;
+
+        [NonSerialized]
+        private GUIContent[] m_BufferChoices;
+
+        [NonSerialized]
+        private int[] m_BufferChoiceValues;
 
         ////FIXME: we lose this on domain reload; how should we recover?
-        [NonSerialized] private InputControl m_Control;
+        [NonSerialized]
+        private InputControl m_Control;
 
         private enum BufferSelector
         {
@@ -427,7 +475,7 @@ namespace UnityEngine.InputSystem.Editor
             NoiseMaskBuffer,
             ResetMaskBuffer,
             COUNT,
-            Default = PlayerUpdateFrontBuffer
+            Default = PlayerUpdateFrontBuffer,
         }
 
         private static class Styles
@@ -438,7 +486,7 @@ namespace UnityEngine.InputSystem.Editor
                 fontStyle = FontStyle.BoldAndItalic,
                 font = EditorStyles.boldFont,
                 fontSize = EditorStyles.boldFont.fontSize - 2,
-                normal = new GUIStyleState { textColor = Color.black }
+                normal = new GUIStyleState { textColor = Color.black },
             };
 
             public static GUIStyle hexLabel = new GUIStyle
@@ -447,7 +495,7 @@ namespace UnityEngine.InputSystem.Editor
                 font = EditorGUIUtility.Load("Fonts/RobotoMono/RobotoMono-Regular.ttf") as Font,
                 fontSize = EditorStyles.label.fontSize + 2,
                 normal = new GUIStyleState { textColor = Color.white },
-                richText = true
+                richText = true,
             };
         }
 
@@ -464,7 +512,7 @@ namespace UnityEngine.InputSystem.Editor
                 new GUIContent("Editor (Current)"),
                 new GUIContent("Editor (Previous)"),
                 new GUIContent("Noise Mask"),
-                new GUIContent("Reset Mask")
+                new GUIContent("Reset Mask"),
             };
         }
     }

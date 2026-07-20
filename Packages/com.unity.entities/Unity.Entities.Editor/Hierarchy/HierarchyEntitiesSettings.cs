@@ -10,18 +10,19 @@ namespace Unity.Entities.Editor
     internal class HierarchyEntitiesSettings : ISetting
     {
         const WorldFlags k_DefaultWorldsShown = WorldFlags.Live;
-        
+
         public bool ShowHiddenEntities = false;
         public WorldFlags TypeOfWorldsShown = k_DefaultWorldsShown;
-        
+
         public static bool GetShowHiddenEntities() => GetBoolValue(nameof(ShowHiddenEntities));
+
         public static void SetShowHiddenEntities(bool val) => SetBoolValue(nameof(ShowHiddenEntities), val);
 
         public static WorldFlags GetTypesOfWorldsShown()
         {
             var val = GetIntValue(nameof(TypeOfWorldsShown));
             if (val != int.MinValue)
-                return (WorldFlags) val;
+                return (WorldFlags)val;
             return k_DefaultWorldsShown;
         }
 
@@ -37,18 +38,18 @@ namespace Unity.Entities.Editor
         {
             EditorUserSettings.SetConfigValue(key, val ? "true" : "false");
         }
-        
+
         static int GetIntValue(string key)
         {
             var setting = EditorUserSettings.GetConfigValue(key);
             return !string.IsNullOrEmpty(setting) ? Convert.ToInt32(setting) : int.MinValue;
         }
-        
+
         static void SetIntValue(string key, int val)
         {
             EditorUserSettings.SetConfigValue(key, val.ToString());
-        }        
-        
+        }
+
         public string[] GetSearchKeywords() => ISetting.GetSearchKeywordsFromType(GetType());
 
         public void OnSettingChanged(PropertyPath path)
@@ -61,7 +62,7 @@ namespace Unity.Entities.Editor
                     break;
                 case nameof(TypeOfWorldsShown):
                     SetTypesOfWorldsShown(TypeOfWorldsShown);
-                    break;                
+                    break;
             }
 
             var window = EditorWindow.GetWindow<Unity.Hierarchy.Editor.HierarchyWindow>();

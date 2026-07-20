@@ -1,7 +1,7 @@
-using UnityEditor;
 using System.Text;
-using UnityEngine.UIElements;
+using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -13,20 +13,28 @@ namespace EditorAttributes.Editor
             var renameAttribute = attribute as RenameAttribute;
 
             HelpBox errorBox = new();
-            PropertyField propertyField = CreatePropertyField(property, GetNewName(renameAttribute, property, errorBox));
+            PropertyField propertyField = CreatePropertyField(
+                property,
+                GetNewName(renameAttribute, property, errorBox)
+            );
 
             if (renameAttribute.StringInputMode == StringInputMode.Dynamic)
             {
-                propertyField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-                {
-                    var propertyLabel = propertyField.Q<Label>();
-
-                    UpdateVisualElement(propertyField, () =>
+                propertyField.RegisterCallbackOnce<GeometryChangedEvent>(
+                    (callback) =>
                     {
-                        if (propertyLabel != null)
-                            propertyLabel.text = GetNewName(renameAttribute, property, errorBox);
-                    });
-                });
+                        var propertyLabel = propertyField.Q<Label>();
+
+                        UpdateVisualElement(
+                            propertyField,
+                            () =>
+                            {
+                                if (propertyLabel != null)
+                                    propertyLabel.text = GetNewName(renameAttribute, property, errorBox);
+                            }
+                        );
+                    }
+                );
 
                 DisplayErrorBox(propertyField, errorBox);
             }
@@ -34,7 +42,11 @@ namespace EditorAttributes.Editor
             return propertyField;
         }
 
-        internal static string GetNewName(RenameAttribute renameAttribute, SerializedProperty property, HelpBox errorBox)
+        internal static string GetNewName(
+            RenameAttribute renameAttribute,
+            SerializedProperty property,
+            HelpBox errorBox
+        )
         {
             string newName = GetDynamicString(renameAttribute.Name, property, renameAttribute, errorBox);
 

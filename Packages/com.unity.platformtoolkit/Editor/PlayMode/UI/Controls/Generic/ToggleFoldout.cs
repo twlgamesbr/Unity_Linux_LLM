@@ -14,14 +14,12 @@ namespace Unity.PlatformToolkit.PlayMode
         Foldout m_Foldout = new Foldout();
         Toggle m_Toggle = new Toggle();
         Label m_Label = new Label();
-        VisualElement m_Container = new VisualElement
-        {
-            name = "pt-content"
-        };
+        VisualElement m_Container = new VisualElement { name = "pt-content" };
 
         private string m_ToggleValueDataSourcePath;
 
-        public ToggleFoldout() : base()
+        public ToggleFoldout()
+            : base()
         {
             m_Container.AddToClassList(Foldout.contentUssClassName);
 
@@ -36,10 +34,12 @@ namespace Unity.PlatformToolkit.PlayMode
             });
 
             // An event is needed to correct the visibility state once persistence data has deserialized and been applied for the child element. This doesn't notify as a normal data change.
-            m_Foldout.RegisterCallbackOnce((GeometryChangedEvent evt) =>
-            {
-                m_Container.style.display = m_Foldout.value ? DisplayStyle.Flex : DisplayStyle.None;
-            });
+            m_Foldout.RegisterCallbackOnce(
+                (GeometryChangedEvent evt) =>
+                {
+                    m_Container.style.display = m_Foldout.value ? DisplayStyle.Flex : DisplayStyle.None;
+                }
+            );
 
             // Default to folded before deserialization.
             m_Foldout.value = false;
@@ -64,36 +64,21 @@ namespace Unity.PlatformToolkit.PlayMode
         public string tooltipOverride
         {
             get => m_HeaderContainer.tooltip;
-            set
-            {
-                m_HeaderContainer.tooltip = value;
-            }
+            set { m_HeaderContainer.tooltip = value; }
         }
 
         [UxmlAttribute]
         public bool foldoutValue
         {
-            get
-            {
-                return m_Foldout.value;
-            }
-            set
-            {
-                m_Foldout.value = value;
-            }
+            get { return m_Foldout.value; }
+            set { m_Foldout.value = value; }
         }
 
         [UxmlAttribute]
         public string text
         {
-            get
-            {
-                return m_Label.text;
-            }
-            set
-            {
-                m_Label.text = value;
-            }
+            get { return m_Label.text; }
+            set { m_Label.text = value; }
         }
 
         /// <summary>
@@ -102,10 +87,7 @@ namespace Unity.PlatformToolkit.PlayMode
         [UxmlAttribute]
         public string toggleValueDataSourcePath
         {
-            get
-            {
-                return m_ToggleValueDataSourcePath;
-            }
+            get { return m_ToggleValueDataSourcePath; }
             set
             {
                 if (!string.Equals(m_ToggleValueDataSourcePath, value))
@@ -113,10 +95,7 @@ namespace Unity.PlatformToolkit.PlayMode
                     m_ToggleValueDataSourcePath = value;
 
                     m_Toggle.ClearBindings();
-                    m_Toggle.SetBinding("value", new DataBinding
-                    {
-                        dataSourcePath = new PropertyPath(value)
-                    });
+                    m_Toggle.SetBinding("value", new DataBinding { dataSourcePath = new PropertyPath(value) });
                 }
             }
         }
@@ -128,10 +107,7 @@ namespace Unity.PlatformToolkit.PlayMode
         [UxmlAttribute(nameof(viewDataKey))]
         public string viewDataKeyOverride
         {
-            get
-            {
-                return base.viewDataKey;
-            }
+            get { return base.viewDataKey; }
             set
             {
                 base.viewDataKey = value;

@@ -5,19 +5,14 @@ namespace Unity.Entities.Editor
 {
     partial class HierarchyWindow
     {
-        static readonly DataMode[] k_EditorDataModes = {DataMode.Authoring, DataMode.Mixed, DataMode.Runtime};
-        static readonly DataMode[] k_RuntimeDataModes = {DataMode.Authoring, DataMode.Mixed, DataMode.Runtime};
+        static readonly DataMode[] k_EditorDataModes = { DataMode.Authoring, DataMode.Mixed, DataMode.Runtime };
+        static readonly DataMode[] k_RuntimeDataModes = { DataMode.Authoring, DataMode.Mixed, DataMode.Runtime };
 
         // Internal for test purpose.
-        internal static DataMode[] GetSupportedDataModes()
-            => EditorApplication.isPlaying
-                ? k_RuntimeDataModes
-                : k_EditorDataModes;
+        internal static DataMode[] GetSupportedDataModes() =>
+            EditorApplication.isPlaying ? k_RuntimeDataModes : k_EditorDataModes;
 
-        static DataMode GetPreferredDataMode()
-            => EditorApplication.isPlaying
-                ? DataMode.Mixed
-                : DataMode.Authoring;
+        static DataMode GetPreferredDataMode() => EditorApplication.isPlaying ? DataMode.Mixed : DataMode.Authoring;
 
         void OnPlayModeStateChanged(PlayModeStateChange stateChange)
         {
@@ -37,10 +32,9 @@ namespace Unity.Entities.Editor
 
             Analytics.SendEditorEvent(
                 Analytics.Window.Hierarchy,
-                arg.changedThroughUI
-                    ? Analytics.EventType.DataModeManualSwitch
-                    : Analytics.EventType.DataModeSwitch,
-                newDataMode.ToString());
+                arg.changedThroughUI ? Analytics.EventType.DataModeManualSwitch : Analytics.EventType.DataModeSwitch,
+                newDataMode.ToString()
+            );
         }
     }
 }

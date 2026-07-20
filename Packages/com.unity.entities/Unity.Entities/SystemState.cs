@@ -2,8 +2,8 @@
 
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -24,25 +24,26 @@ namespace Unity.Entities
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         struct SystemStateKey { }
-        readonly static SharedStatic<IntPtr> s_SystemIdCellPtr = SharedStatic<IntPtr>.GetOrCreate<SystemStateKey>();
-#endif
-        static int                             ms_SystemIDAllocator;
 
-#region Always accessed during every system OnUpdate (Hot)
+        static readonly SharedStatic<IntPtr> s_SystemIdCellPtr = SharedStatic<IntPtr>.GetOrCreate<SystemStateKey>();
+#endif
+        static int ms_SystemIDAllocator;
+
+        #region Always accessed during every system OnUpdate (Hot)
 
         // For unmanaged systems, points to user struct that was allocated to front this system state
-        internal void*                         m_SystemPtr;                     // 8
-        internal JobHandle                     m_JobHandle;                     // 20 (+12)
-        uint                                   m_Flags;                         // 24
-        internal ComponentDependencyManager*   m_DependencyManager;             // 32
-        internal EntityComponentStore*         m_EntityComponentStore;          // 40
-        internal uint                          m_LastSystemVersion;             // 44
+        internal void* m_SystemPtr; // 8
+        internal JobHandle m_JobHandle; // 20 (+12)
+        uint m_Flags; // 24
+        internal ComponentDependencyManager* m_DependencyManager; // 32
+        internal EntityComponentStore* m_EntityComponentStore; // 40
+        internal uint m_LastSystemVersion; // 44
 #if ENABLE_PROFILER
-        internal ProfilerMarker                m_ProfilerMarker;
-        internal ProfilerMarker                m_ProfilerMarkerBurst;
+        internal ProfilerMarker m_ProfilerMarker;
+        internal ProfilerMarker m_ProfilerMarkerBurst;
 #endif
 #if TEST_FOR_COPY
-        private void*                          m_Self;
+        private void* m_Self;
         private void* This
         {
             get
@@ -54,49 +55,53 @@ namespace Unity.Entities
             }
         }
 #endif
+
         private void CheckThis()
         {
 #if TEST_FOR_COPY
             if (m_Self != This)
-                throw new InvalidOperationException("This is a value copy of the system state that will lead to memory corruption in the original system state data");
+                throw new InvalidOperationException(
+                    "This is a value copy of the system state that will lead to memory corruption in the original system state data"
+                );
 #endif
         }
 
 #if UNITY_ENTITIES_RUNTIME_TOOLING
-        internal long                          m_NewStartTime;
-        internal long                          m_LastSystemStartTime;
-        internal long                          m_LastSystemEndTime;
-        internal bool                          m_RanLastUpdate;
+        internal long m_NewStartTime;
+        internal long m_LastSystemStartTime;
+        internal long m_LastSystemEndTime;
+        internal bool m_RanLastUpdate;
 #endif
 
         #endregion
 
         #region Rarely accessed during System.OnUpdate depending on what they do (Cold)
-        internal SystemTypeIndex   m_SystemTypeIndex;
+        internal SystemTypeIndex m_SystemTypeIndex;
 
-        internal int                           m_SystemID;
+        internal int m_SystemID;
 
-        internal EntityManager                 m_EntityManager;
+        internal EntityManager m_EntityManager;
 
-        internal UnsafeList<TypeIndex>         m_JobDependencyForReadingSystems;
-        internal UnsafeList<TypeIndex>         m_JobDependencyForWritingSystems;
+        internal UnsafeList<TypeIndex> m_JobDependencyForReadingSystems;
+        internal UnsafeList<TypeIndex> m_JobDependencyForWritingSystems;
 
-        UnsafeList<EntityQuery>                m_EntityQueries;
-        UnsafeList<EntityQuery>                m_RequiredEntityQueries;
+        UnsafeList<EntityQuery> m_EntityQueries;
+        UnsafeList<EntityQuery> m_RequiredEntityQueries;
 
-        internal WorldUnmanaged                m_WorldUnmanaged;
+        internal WorldUnmanaged m_WorldUnmanaged;
 
         // a handle to this system state that can be used as a stable, safe reference but must be resolved via the
         // associated world.
-        internal SystemHandle           m_Handle;
+        internal SystemHandle m_Handle;
 
-        int                                    m_UnmanagedMetaIndex;
-        internal GCHandle                      m_World;
+        int m_UnmanagedMetaIndex;
+        internal GCHandle m_World;
+
         // used by managed systems to store a reference to the actual system
-        internal GCHandle                      m_ManagedSystem;
+        internal GCHandle m_ManagedSystem;
 
-        NativeText.ReadOnly                    m_DebugName;
-#endregion
+        NativeText.ReadOnly m_DebugName;
+        #endregion
 
 
         private const uint kEnabledMask = 0x1;
@@ -151,7 +156,7 @@ namespace Unity.Entities
         {
             get
             {
-                fixed(void* ptr = &m_EntityQueries)
+                fixed (void* ptr = &m_EntityQueries)
                 {
                     return ref UnsafeUtility.AsRef<UnsafeList<EntityQuery>>(ptr);
                 }
@@ -162,7 +167,7 @@ namespace Unity.Entities
         {
             get
             {
-                fixed(void* ptr = &m_RequiredEntityQueries)
+                fixed (void* ptr = &m_RequiredEntityQueries)
                 {
                     return ref UnsafeUtility.AsRef<UnsafeList<EntityQuery>>(ptr);
                 }
@@ -176,11 +181,27 @@ namespace Unity.Entities
         /// <remarks>The Enabled property is intended for debugging so that you can easily turn on and off systems
         /// from the Entity Debugger window. A system with Enabled set to false will not update, even if its
         /// <see cref="ShouldRunSystem"/> function returns true.</remarks>
-        public bool Enabled { get => (m_Flags & kEnabledMask) != 0; set => SetFlag(kEnabledMask, value); }
+        public bool Enabled
+        {
+            get => (m_Flags & kEnabledMask) != 0;
+            set => SetFlag(kEnabledMask, value);
+        }
 
-        internal bool RequireMatchingQueriesForUpdate { get => (m_Flags & kRequireMatchingQueriesForUpdateMask) != 0; set => SetFlag(kRequireMatchingQueriesForUpdateMask, value); }
-        internal bool PreviouslyEnabled { get => (m_Flags & kPreviouslyEnabledMask) != 0; set => SetFlag(kPreviouslyEnabledMask, value); }
-        private bool NeedToGetDependencyFromSafetyManager { get => (m_Flags & kNeedToGetDependencyFromSafetyManagerMask) != 0; set => SetFlag(kNeedToGetDependencyFromSafetyManagerMask, value); }
+        internal bool RequireMatchingQueriesForUpdate
+        {
+            get => (m_Flags & kRequireMatchingQueriesForUpdateMask) != 0;
+            set => SetFlag(kRequireMatchingQueriesForUpdateMask, value);
+        }
+        internal bool PreviouslyEnabled
+        {
+            get => (m_Flags & kPreviouslyEnabledMask) != 0;
+            set => SetFlag(kPreviouslyEnabledMask, value);
+        }
+        private bool NeedToGetDependencyFromSafetyManager
+        {
+            get => (m_Flags & kNeedToGetDependencyFromSafetyManagerMask) != 0;
+            set => SetFlag(kNeedToGetDependencyFromSafetyManagerMask, value);
+        }
 
         /// <summary>
         /// The current change version number in this <see cref="World"/>.
@@ -259,11 +280,15 @@ namespace Unity.Entities
         /// Obsolete. The current Time data for this system's world.
         /// </summary>
         /// <remarks> **Obsolete.** Use <see cref="SystemAPI.Time"/> or <see cref="WorldUnmanaged.Time"/> instead.</remarks>
-        [Obsolete("Time has been deprecated as duplicate. Use SystemAPI.Time or WorldUnmanaged.Time instead (RemovedAfter 2023-08-08)", true)]
+        [Obsolete(
+            "Time has been deprecated as duplicate. Use SystemAPI.Time or WorldUnmanaged.Time instead (RemovedAfter 2023-08-08)",
+            true
+        )]
         public ref readonly TimeData Time => ref WorldUnmanaged.Time;
 
         [ExcludeFromBurstCompatTesting("Returns managed system")]
-        internal ComponentSystemBase ManagedSystem => m_ManagedSystem.IsAllocated ? m_ManagedSystem.Target as ComponentSystemBase : null;
+        internal ComponentSystemBase ManagedSystem =>
+            m_ManagedSystem.IsAllocated ? m_ManagedSystem.Target as ComponentSystemBase : null;
 
         // Managed systems call this function to initialize their backing system state
         [ExcludeFromBurstCompatTesting("Takes managed World")]
@@ -290,7 +315,6 @@ namespace Unity.Entities
             m_ProfilerMarkerBurst = default;
 #endif
         }
-
 
         // Initialization common to managed and unmanaged systems
         private void CommonInit(World world, SystemHandle handle, int systemTypeIndex)
@@ -329,8 +353,10 @@ namespace Unity.Entities
 
             m_DebugName = TypeManager.GetSystemName(typeIndex);
 
-            var attrs = TypeManager.GetSystemAttributes(typeIndex,
-                TypeManager.SystemAttributeKind.RequireMatchingQueriesForUpdate);
+            var attrs = TypeManager.GetSystemAttributes(
+                typeIndex,
+                TypeManager.SystemAttributeKind.RequireMatchingQueriesForUpdate
+            );
             if (attrs.Length > 0)
                 RequireMatchingQueriesForUpdate = true;
 
@@ -411,9 +437,13 @@ namespace Unity.Entities
                 {
                     var depMgr = m_DependencyManager;
                     NeedToGetDependencyFromSafetyManager = false;
-                    m_JobHandle = depMgr->GetDependency(m_JobDependencyForReadingSystems.Ptr,
-                        m_JobDependencyForReadingSystems.Length, m_JobDependencyForWritingSystems.Ptr,
-                        m_JobDependencyForWritingSystems.Length, clearReadFencesAfterCombining:false);
+                    m_JobHandle = depMgr->GetDependency(
+                        m_JobDependencyForReadingSystems.Ptr,
+                        m_JobDependencyForReadingSystems.Length,
+                        m_JobDependencyForWritingSystems.Ptr,
+                        m_JobDependencyForWritingSystems.Length,
+                        clearReadFencesAfterCombining: false
+                    );
                 }
 
                 return m_JobHandle;
@@ -444,9 +474,12 @@ namespace Unity.Entities
 
         internal void CompleteDependencyInternal()
         {
-            m_DependencyManager->CompleteDependenciesNoChecks(m_JobDependencyForReadingSystems.Ptr,
-                m_JobDependencyForReadingSystems.Length, m_JobDependencyForWritingSystems.Ptr,
-                m_JobDependencyForWritingSystems.Length);
+            m_DependencyManager->CompleteDependenciesNoChecks(
+                m_JobDependencyForReadingSystems.Ptr,
+                m_JobDependencyForReadingSystems.Length,
+                m_JobDependencyForWritingSystems.Ptr,
+                m_JobDependencyForWritingSystems.Length
+            );
         }
 
         internal void BeforeUpdateVersioning()
@@ -546,9 +579,16 @@ namespace Unity.Entities
         void CheckOnUpdate_Query()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            if (Burst.CompilerServices.Hint.Unlikely((m_Flags & (kIsExecutingISystemOnUpdate | kDidWarnIsExecutingISystemOnUpdate)) == kIsExecutingISystemOnUpdate))
+            if (
+                Burst.CompilerServices.Hint.Unlikely(
+                    (m_Flags & (kIsExecutingISystemOnUpdate | kDidWarnIsExecutingISystemOnUpdate))
+                        == kIsExecutingISystemOnUpdate
+                )
+            )
             {
-                Unity.Debug.LogWarning($"'{new FixedString512Bytes(m_DebugName)}' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.");
+                Unity.Debug.LogWarning(
+                    $"'{new FixedString512Bytes(m_DebugName)}' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster."
+                );
                 m_Flags |= kDidWarnIsExecutingISystemOnUpdate;
             }
 #endif
@@ -558,9 +598,16 @@ namespace Unity.Entities
         void CheckOnUpdate_Handle()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            if (Burst.CompilerServices.Hint.Unlikely((m_Flags & (kIsExecutingISystemOnUpdate | kDidWarnIsExecutingISystemOnUpdate)) == kIsExecutingISystemOnUpdate))
+            if (
+                Burst.CompilerServices.Hint.Unlikely(
+                    (m_Flags & (kIsExecutingISystemOnUpdate | kDidWarnIsExecutingISystemOnUpdate))
+                        == kIsExecutingISystemOnUpdate
+                )
+            )
             {
-                Unity.Debug.LogWarning($"'{new FixedString512Bytes(m_DebugName)}' creates a type handle during OnUpdate. Please create the type handle in OnCreate instead and use type `_MyHandle.Update(ref systemState);` in OnUpdate to keep it up to date instead. This is significantly faster.");
+                Unity.Debug.LogWarning(
+                    $"'{new FixedString512Bytes(m_DebugName)}' creates a type handle during OnUpdate. Please create the type handle in OnCreate instead and use type `_MyHandle.Update(ref systemState);` in OnUpdate to keep it up to date instead. This is significantly faster."
+                );
                 m_Flags |= kDidWarnIsExecutingISystemOnUpdate;
             }
 #endif
@@ -569,10 +616,17 @@ namespace Unity.Entities
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         void CheckOnUpdate_Lookup()
         {
- #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-           if (Burst.CompilerServices.Hint.Unlikely((m_Flags & (kIsExecutingISystemOnUpdate | kDidWarnIsExecutingISystemOnUpdate)) == kIsExecutingISystemOnUpdate))
+#if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
+            if (
+                Burst.CompilerServices.Hint.Unlikely(
+                    (m_Flags & (kIsExecutingISystemOnUpdate | kDidWarnIsExecutingISystemOnUpdate))
+                        == kIsExecutingISystemOnUpdate
+                )
+            )
             {
-                Unity.Debug.LogWarning($"'{new FixedString512Bytes(m_DebugName)}' creates a Lookup object (e.g. ComponentLookup) during OnUpdate. Please create this object in OnCreate instead and use type `_MyLookup.Update(ref systemState);` in OnUpdate to keep it up to date instead. This is significantly faster.");
+                Unity.Debug.LogWarning(
+                    $"'{new FixedString512Bytes(m_DebugName)}' creates a Lookup object (e.g. ComponentLookup) during OnUpdate. Please create this object in OnCreate instead and use type `_MyLookup.Update(ref systemState);` in OnUpdate to keep it up to date instead. This is significantly faster."
+                );
                 m_Flags |= kDidWarnIsExecutingISystemOnUpdate;
             }
 #endif
@@ -597,40 +651,59 @@ namespace Unity.Entities
             if (!m_JobHandle.Equals(default(JobHandle)))
             {
                 JobHandle.ScheduleBatchedJobs();
-                m_JobHandle = m_DependencyManager->AddDependency(m_JobDependencyForReadingSystems.Ptr,
-                    m_JobDependencyForReadingSystems.Length, m_JobDependencyForWritingSystems.Ptr,
-                    m_JobDependencyForWritingSystems.Length, m_JobHandle);
+                m_JobHandle = m_DependencyManager->AddDependency(
+                    m_JobDependencyForReadingSystems.Ptr,
+                    m_JobDependencyForReadingSystems.Length,
+                    m_JobDependencyForWritingSystems.Ptr,
+                    m_JobDependencyForWritingSystems.Length,
+                    m_JobHandle
+                );
             }
         }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+        )]
         internal void LogSafetyErrors()
         {
             if (!JobsUtility.JobDebuggerEnabled)
                 return;
 
             var depMgr = m_DependencyManager;
-            if (SystemDependencySafetyUtility.FindSystemSchedulingErrors(m_SystemID, ref m_JobDependencyForReadingSystems, ref m_JobDependencyForWritingSystems, depMgr, out var details))
+            if (
+                SystemDependencySafetyUtility.FindSystemSchedulingErrors(
+                    m_SystemID,
+                    ref m_JobDependencyForReadingSystems,
+                    ref m_JobDependencyForWritingSystems,
+                    depMgr,
+                    out var details
+                )
+            )
             {
                 bool logged = false;
                 LogSafetyDetails(details, ref logged);
 
                 if (!logged)
                 {
-                    Debug.LogError("A system dependency error was detected but could not be logged accurately from Burst. Disable Burst compilation to see full error message.");
+                    Debug.LogError(
+                        "A system dependency error was detected but could not be logged accurately from Burst. Disable Burst compilation to see full error message."
+                    );
                 }
             }
         }
 
         [BurstDiscard]
-        private static void LogSafetyDetails(in SystemDependencySafetyUtility.SafetyErrorDetails details, ref bool logged)
+        private static void LogSafetyDetails(
+            in SystemDependencySafetyUtility.SafetyErrorDetails details,
+            ref bool logged
+        )
         {
             Debug.LogError(details.FormatToString());
             logged = true;
         }
-
 #endif
 
         /// <summary>
@@ -709,7 +782,13 @@ namespace Unity.Entities
 
         internal void AddReaderWriter(ComponentType componentType)
         {
-            if (CalculateReaderWriterDependency.Add(componentType, ref m_JobDependencyForReadingSystems, ref m_JobDependencyForWritingSystems))
+            if (
+                CalculateReaderWriterDependency.Add(
+                    componentType,
+                    ref m_JobDependencyForReadingSystems,
+                    ref m_JobDependencyForWritingSystems
+                )
+            )
             {
                 CompleteDependencyInternal();
             }
@@ -717,7 +796,12 @@ namespace Unity.Entities
 
         internal void AddReaderWriters(EntityQuery query)
         {
-            if (query.AddReaderWritersToLists(ref m_JobDependencyForReadingSystems, ref m_JobDependencyForWritingSystems))
+            if (
+                query.AddReaderWritersToLists(
+                    ref m_JobDependencyForReadingSystems,
+                    ref m_JobDependencyForWritingSystems
+                )
+            )
             {
                 CompleteDependencyInternal();
             }
@@ -752,8 +836,11 @@ namespace Unity.Entities
                 return query;
             }
 
-            using (var builder = new EntityQueryBuilder(Allocator.Temp, &type, 1)
-                .WithOptions(EntityQueryOptions.IncludeSystems))
+            using (
+                var builder = new EntityQueryBuilder(Allocator.Temp, &type, 1).WithOptions(
+                    EntityQueryOptions.IncludeSystems
+                )
+            )
             {
                 var newQuery = EntityManager.CreateEntityQueryUnowned(builder);
                 AddReaderWriters(newQuery);
@@ -888,7 +975,8 @@ namespace Unity.Entities
         /// <remarks> Prefer using <see cref="SystemAPI.GetComponentTypeHandle{T}"/> in <see cref="SystemAPI"/> as it will cache in OnCreate for you
         /// and call .Update(ref SystemState) at the call-site.</remarks>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData) })]
-        public ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false) where T : unmanaged, IComponentData
+        public ComponentTypeHandle<T> GetComponentTypeHandle<T>(bool isReadOnly = false)
+            where T : unmanaged, IComponentData
         {
             CheckOnUpdate_Handle();
             AddReaderWriter(isReadOnly ? ComponentType.ReadOnly<T>() : ComponentType.ReadWrite<T>());
@@ -949,7 +1037,9 @@ namespace Unity.Entities
         [GenerateTestsForBurstCompatibility]
         public TransformTypeHandle GetTransformTypeHandle(bool isReadOnly = false)
         {
-            AddReaderWriter(isReadOnly ? ComponentType.ReadOnly<TransformRef>() : ComponentType.ReadWrite<TransformRef>());
+            AddReaderWriter(
+                isReadOnly ? ComponentType.ReadOnly<TransformRef>() : ComponentType.ReadWrite<TransformRef>()
+            );
             return EntityManager.GetTransformTypeHandle(isReadOnly);
         }
 
@@ -966,7 +1056,9 @@ namespace Unity.Entities
         [GenerateTestsForBurstCompatibility]
         public TransformRef GetTransformRef(Entity entity, bool isReadOnly)
         {
-            AddReaderWriter(isReadOnly ? ComponentType.ReadOnly<TransformRef>() : ComponentType.ReadWrite<TransformRef>());
+            AddReaderWriter(
+                isReadOnly ? ComponentType.ReadOnly<TransformRef>() : ComponentType.ReadWrite<TransformRef>()
+            );
             return EntityManager.GetTransformRef(entity, isReadOnly);
         }
 #endif
@@ -980,7 +1072,9 @@ namespace Unity.Entities
         /// chunk.</returns>
         /// <remarks> Prefer using <see cref="SystemAPI.GetSharedComponentTypeHandle{T}"/> in <see cref="SystemAPI"/> as it will cache in OnCreate for you
         /// and call .Update(ref SystemState) at the call-site.</remarks>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleSharedComponentData) })]
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleSharedComponentData) }
+        )]
         public SharedComponentTypeHandle<T> GetSharedComponentTypeHandle<T>()
             where T : struct, ISharedComponentData
         {
@@ -1036,13 +1130,17 @@ namespace Unity.Entities
             AddReaderWriter(isReadOnly ? ComponentType.ReadOnly<T>() : ComponentType.ReadWrite<T>());
             return EntityManager.GetComponentLookup<T>(isReadOnly);
         }
+
         /// <summary> Obsolete. Use <see cref="GetComponentLookup{T}"/> instead.</summary>
         /// <param name="isReadOnly">Whether the data is only read, not written. Access data as
         /// read-only whenever possible.</param>
         /// <typeparam name="T">A struct that implements <see cref="IComponentData"/>.</typeparam>
         /// <returns>All component data of type T.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData) })]
-        [Obsolete("This method has been renamed to GetComponentLookup<T>(). (RemovedAFter Entities 1.0) (UnityUpgradable) -> GetComponentLookup<T>(*)", false)]
+        [Obsolete(
+            "This method has been renamed to GetComponentLookup<T>(). (RemovedAFter Entities 1.0) (UnityUpgradable) -> GetComponentLookup<T>(*)",
+            false
+        )]
         public ComponentLookup<T> GetComponentDataFromEntity<T>(bool isReadOnly = false)
             where T : unmanaged, IComponentData
         {
@@ -1063,12 +1161,14 @@ namespace Unity.Entities
         /// <remarks> Prefer using <see cref="SystemAPI.GetBufferLookup{T}"/> as it will cache in OnCreate for you
         /// and call .Update(ref state) at the call-site.</remarks>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleBufferElement) })]
-        public BufferLookup<T> GetBufferLookup<T>(bool isReadOnly = false) where T : unmanaged, IBufferElementData
+        public BufferLookup<T> GetBufferLookup<T>(bool isReadOnly = false)
+            where T : unmanaged, IBufferElementData
         {
             CheckOnUpdate_Lookup();
             AddReaderWriter(isReadOnly ? ComponentType.ReadOnly<T>() : ComponentType.ReadWrite<T>());
             return EntityManager.GetBufferLookup<T>(isReadOnly);
         }
+
         /// <summary> Obsolete. Use <see cref="GetBufferLookup{T}"/> instead.</summary>
         /// <param name="isReadOnly">Whether the buffer data is only read or is also written. Access data in
         /// a read-only fashion whenever possible.</param>
@@ -1076,8 +1176,12 @@ namespace Unity.Entities
         /// <returns>An array-like object that provides access to buffers, indexed by <see cref="Entity"/>.</returns>
         /// <seealso cref="ComponentLookup{T}"/>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleBufferElement) })]
-        [Obsolete("This method has been renamed to GetBufferLookup<T>(). (RemovedAFter Entities 1.0) (UnityUpgradable) -> GetBufferLookup<T>(*)", false)]
-        public BufferLookup<T> GetBufferFromEntity<T>(bool isReadOnly = false) where T : unmanaged, IBufferElementData
+        [Obsolete(
+            "This method has been renamed to GetBufferLookup<T>(). (RemovedAFter Entities 1.0) (UnityUpgradable) -> GetBufferLookup<T>(*)",
+            false
+        )]
+        public BufferLookup<T> GetBufferFromEntity<T>(bool isReadOnly = false)
+            where T : unmanaged, IBufferElementData
         {
             return GetBufferLookup<T>(isReadOnly);
         }
@@ -1109,7 +1213,9 @@ namespace Unity.Entities
         /// <seealso cref="ComponentLookup{T}"/>
         public TransformLookup GetTransformLookup(bool isReadOnly = false)
         {
-            AddReaderWriter(isReadOnly ? ComponentType.ReadOnly<TransformRef>() : ComponentType.ReadWrite<TransformRef>());
+            AddReaderWriter(
+                isReadOnly ? ComponentType.ReadOnly<TransformRef>() : ComponentType.ReadWrite<TransformRef>()
+            );
             return EntityManager.GetTransformLookup(isReadOnly);
         }
 #endif
@@ -1117,7 +1223,10 @@ namespace Unity.Entities
         ///<summary> Obsolete. Use <see cref="GetEntityStorageInfoLookup"/> instead.</summary>
         /// <returns>A EntityStorageInfoLookup object.</returns>
         [GenerateTestsForBurstCompatibility]
-        [Obsolete("This method has been renamed to GetEntityStorageInfoLookup(). (RemovedAFter Entities 1.0) (UnityUpgradable) -> GetEntityStorageInfoLookup(*)", false)]
+        [Obsolete(
+            "This method has been renamed to GetEntityStorageInfoLookup(). (RemovedAFter Entities 1.0) (UnityUpgradable) -> GetEntityStorageInfoLookup(*)",
+            false
+        )]
         public EntityStorageInfoLookup GetStorageInfoFromEntity()
         {
             return EntityManager.GetEntityStorageInfoLookup();
@@ -1168,7 +1277,9 @@ namespace Unity.Entities
         public void RequireForUpdate<T>()
         {
             var type = ComponentType.ReadOnly<T>();
-            using var builder = new EntityQueryBuilder(Allocator.Temp, &type, 1).WithOptions(EntityQueryOptions.IncludeSystems);
+            using var builder = new EntityQueryBuilder(Allocator.Temp, &type, 1).WithOptions(
+                EntityQueryOptions.IncludeSystems
+            );
             RequireForUpdate(GetEntityQueryInternal(builder));
         }
 
@@ -1196,7 +1307,7 @@ namespace Unity.Entities
         [ExcludeFromBurstCompatTesting("Takes a managed array params")]
         public void RequireAnyForUpdate(params EntityQuery[] queries)
         {
-            fixed(EntityQuery* queriesPtr = queries)
+            fixed (EntityQuery* queriesPtr = queries)
             {
                 RequireAnyForUpdate(queriesPtr, queries.Length);
             }
@@ -1263,32 +1374,56 @@ namespace Unity.Entities
                     var archetypeQuery = queryData->ArchetypeQueries[a];
                     for (var i = 0; i < archetypeQuery.AllCount; i++)
                     {
-                        var componentType = new ComponentType{ TypeIndex = archetypeQuery.All[i], AccessModeType = (ComponentType.AccessMode)archetypeQuery.AllAccessMode[i] };
+                        var componentType = new ComponentType
+                        {
+                            TypeIndex = archetypeQuery.All[i],
+                            AccessModeType = (ComponentType.AccessMode)archetypeQuery.AllAccessMode[i],
+                        };
                         builder.WithAll(&componentType, 1);
                     }
                     for (var i = 0; i < archetypeQuery.AnyCount; i++)
                     {
-                        var componentType = new ComponentType{ TypeIndex = archetypeQuery.Any[i], AccessModeType = (ComponentType.AccessMode)archetypeQuery.AnyAccessMode[i] };
+                        var componentType = new ComponentType
+                        {
+                            TypeIndex = archetypeQuery.Any[i],
+                            AccessModeType = (ComponentType.AccessMode)archetypeQuery.AnyAccessMode[i],
+                        };
                         builder.WithAny(&componentType, 1);
                     }
                     for (var i = 0; i < archetypeQuery.NoneCount; i++)
                     {
-                        var componentType = new ComponentType{ TypeIndex = archetypeQuery.None[i], AccessModeType = (ComponentType.AccessMode)archetypeQuery.NoneAccessMode[i] };
+                        var componentType = new ComponentType
+                        {
+                            TypeIndex = archetypeQuery.None[i],
+                            AccessModeType = (ComponentType.AccessMode)archetypeQuery.NoneAccessMode[i],
+                        };
                         builder.WithNone(&componentType, 1);
                     }
                     for (var i = 0; i < archetypeQuery.AbsentCount; i++)
                     {
-                        var componentType = new ComponentType{ TypeIndex = archetypeQuery.Absent[i], AccessModeType = (ComponentType.AccessMode)archetypeQuery.AbsentAccessMode[i] };
+                        var componentType = new ComponentType
+                        {
+                            TypeIndex = archetypeQuery.Absent[i],
+                            AccessModeType = (ComponentType.AccessMode)archetypeQuery.AbsentAccessMode[i],
+                        };
                         builder.WithAbsent(&componentType, 1);
                     }
                     for (var i = 0; i < archetypeQuery.DisabledCount; i++)
                     {
-                        var componentType = new ComponentType{ TypeIndex = archetypeQuery.Disabled[i], AccessModeType = (ComponentType.AccessMode)archetypeQuery.DisabledAccessMode[i] };
+                        var componentType = new ComponentType
+                        {
+                            TypeIndex = archetypeQuery.Disabled[i],
+                            AccessModeType = (ComponentType.AccessMode)archetypeQuery.DisabledAccessMode[i],
+                        };
                         builder.WithDisabled(&componentType, 1);
                     }
                     for (var i = 0; i < archetypeQuery.PresentCount; i++)
                     {
-                        var componentType = new ComponentType{ TypeIndex = archetypeQuery.Present[i], AccessModeType = (ComponentType.AccessMode)archetypeQuery.PresentAccessMode[i] };
+                        var componentType = new ComponentType
+                        {
+                            TypeIndex = archetypeQuery.Present[i],
+                            AccessModeType = (ComponentType.AccessMode)archetypeQuery.PresentAccessMode[i],
+                        };
                         builder.WithPresent(&componentType, 1);
                     }
                     builder.WithOptions(archetypeQuery.Options);
@@ -1302,7 +1437,10 @@ namespace Unity.Entities
 
         /// <summary> Obsolete. Use <see cref="RequireForUpdate{T}"/> instead.</summary>
         /// <typeparam name="T">The <see cref="IComponentData"/> subtype of the singleton component.</typeparam>
-        [Obsolete("RequireSingletonForUpdate has been renamed. Use RequireForUpdate<T>() instead. (RemovedAFter Entities 1.0) (UnityUpgradable) -> RequireForUpdate<T>()", true)]
+        [Obsolete(
+            "RequireSingletonForUpdate has been renamed. Use RequireForUpdate<T>() instead. (RemovedAFter Entities 1.0) (UnityUpgradable) -> RequireForUpdate<T>()",
+            true
+        )]
         public void RequireSingletonForUpdate<T>()
         {
             RequireForUpdate<T>();

@@ -3,7 +3,6 @@ using System.Linq;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngineInternal.Input;
-
 #if UNITY_EDITOR
 using System.Reflection;
 using UnityEditor;
@@ -36,13 +35,23 @@ namespace UnityEngine.InputSystem.LowLevel
             NativeInputSystem.QueueInputEvent((IntPtr)ptr);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "False positive.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1062:Validate arguments of public methods",
+            MessageId = "0",
+            Justification = "False positive."
+        )]
         public unsafe long DeviceCommand(int deviceId, InputDeviceCommand* commandPtr)
         {
             if (commandPtr == null)
                 throw new ArgumentNullException(nameof(commandPtr));
 
-            return NativeInputSystem.IOCTL(deviceId, commandPtr->type, new IntPtr(commandPtr->payloadPtr), commandPtr->payloadSizeInBytes);
+            return NativeInputSystem.IOCTL(
+                deviceId,
+                commandPtr->type,
+                new IntPtr(commandPtr->payloadPtr),
+                commandPtr->payloadSizeInBytes
+            );
         }
 
         public unsafe InputUpdateDelegate onUpdate
@@ -51,13 +60,14 @@ namespace UnityEngine.InputSystem.LowLevel
             set
             {
                 if (value != null)
-                    NativeInputSystem.onUpdate =
-                        (updateType, eventBufferPtr) =>
+                    NativeInputSystem.onUpdate = (updateType, eventBufferPtr) =>
                     {
-                        var buffer = new InputEventBuffer((InputEvent*)eventBufferPtr->eventBuffer,
+                        var buffer = new InputEventBuffer(
+                            (InputEvent*)eventBufferPtr->eventBuffer,
                             eventBufferPtr->eventCount,
                             sizeInBytes: eventBufferPtr->sizeInBytes,
-                            capacityInBytes: eventBufferPtr->capacityInBytes);
+                            capacityInBytes: eventBufferPtr->capacityInBytes
+                        );
 
                         try
                         {
@@ -67,7 +77,9 @@ namespace UnityEngine.InputSystem.LowLevel
                         {
                             // Always report the original exception first to confuse users less about what it the actual failure.
                             Debug.LogException(e);
-                            Debug.LogError($"{e.GetType().Name} during event processing of {updateType} update; resetting event buffer");
+                            Debug.LogError(
+                                $"{e.GetType().Name} during event processing of {updateType} update; resetting event buffer"
+                            );
                             buffer.Reset();
                         }
 
@@ -76,8 +88,9 @@ namespace UnityEngine.InputSystem.LowLevel
                             eventBufferPtr->eventCount = buffer.eventCount;
                             eventBufferPtr->sizeInBytes = (int)buffer.sizeInBytes;
                             eventBufferPtr->capacityInBytes = (int)buffer.capacityInBytes;
-                            eventBufferPtr->eventBuffer =
-                                NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(buffer.data);
+                            eventBufferPtr->eventBuffer = NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(
+                                buffer.data
+                            );
                         }
                         else
                         {
@@ -121,8 +134,9 @@ namespace UnityEngine.InputSystem.LowLevel
             }
         }
 
-        #if UNITY_EDITOR
-        private struct InputSystemPlayerLoopRunnerInitializationSystem {};
+#if UNITY_EDITOR
+        private struct InputSystemPlayerLoopRunnerInitializationSystem { };
+
         public Action onPlayerLoopInitialization
         {
             get => m_PlayerLoopInitialization;
@@ -135,20 +149,29 @@ namespace UnityEngine.InputSystem.LowLevel
                     // Inject ourselves directly to PlayerLoop.Initialization as first subsystem to run,
                     // Use InputSystemPlayerLoopRunnerInitializationSystem as system type
                     var playerLoop = UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop();
-                    var initStepIndex = playerLoop.subSystemList.IndexOf(x => x.type == typeof(PlayerLoop.Initialization));
+                    var initStepIndex = playerLoop.subSystemList.IndexOf(x =>
+                        x.type == typeof(PlayerLoop.Initialization)
+                    );
                     if (initStepIndex >= 0)
                     {
                         var systems = playerLoop.subSystemList[initStepIndex].subSystemList;
 
                         // Check if we're not already injected
-                        if (!systems.Select(x => x.type)
-                            .Contains(typeof(InputSystemPlayerLoopRunnerInitializationSystem)))
+                        if (
+                            !systems
+                                .Select(x => x.type)
+                                .Contains(typeof(InputSystemPlayerLoopRunnerInitializationSystem))
+                        )
                         {
-                            ArrayHelpers.InsertAt(ref systems, 0, new UnityEngine.LowLevel.PlayerLoopSystem
-                            {
-                                type = typeof(InputSystemPlayerLoopRunnerInitializationSystem),
-                                updateDelegate = () => m_PlayerLoopInitialization?.Invoke()
-                            });
+                            ArrayHelpers.InsertAt(
+                                ref systems,
+                                0,
+                                new UnityEngine.LowLevel.PlayerLoopSystem
+                                {
+                                    type = typeof(InputSystemPlayerLoopRunnerInitializationSystem),
+                                    updateDelegate = () => m_PlayerLoopInitialization?.Invoke(),
+                                }
+                            );
 
                             playerLoop.subSystemList[initStepIndex].subSystemList = systems;
                             UnityEngine.LowLevel.PlayerLoop.SetPlayerLoop(playerLoop);
@@ -159,7 +182,7 @@ namespace UnityEngine.InputSystem.LowLevel
                 m_PlayerLoopInitialization = value;
             }
         }
-        #endif
+#endif
 
         public Action<int, string> onDeviceDiscovered
         {
@@ -174,19 +197,19 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 if (value == null)
                 {
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     EditorApplication.wantsToQuit -= OnWantsToShutdown;
-                    #else
+#else
                     Application.quitting -= OnShutdown;
-                    #endif
+#endif
                 }
                 else if (m_ShutdownMethod == null)
                 {
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     EditorApplication.wantsToQuit += OnWantsToShutdown;
-                    #else
+#else
                     Application.quitting += OnShutdown;
-                    #endif
+#endif
                 }
 
                 m_ShutdownMethod = value;
@@ -210,16 +233,16 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public float pollingFrequency
         {
-            #if UNITY_INPUT_SYSTEM_PLATFORM_POLLING_FREQUENCY
+#if UNITY_INPUT_SYSTEM_PLATFORM_POLLING_FREQUENCY
             get => NativeInputSystem.GetPollingFrequency();
-            #else
+#else
             get => m_PollingFrequency;
-            #endif
+#endif
             set
             {
-                #if !UNITY_INPUT_SYSTEM_PLATFORM_POLLING_FREQUENCY
+#if !UNITY_INPUT_SYSTEM_PLATFORM_POLLING_FREQUENCY
                 m_PollingFrequency = value;
-                #endif
+#endif
                 NativeInputSystem.SetPollingFrequency(value);
             }
         }
@@ -229,13 +252,15 @@ namespace UnityEngine.InputSystem.LowLevel
         ////REVIEW: this applies the offset, currentTime doesn't
         public double currentTimeForFixedUpdate => Time.fixedUnscaledTime + currentTimeOffsetToRealtimeSinceStartup;
 
-        public double currentTimeOffsetToRealtimeSinceStartup => NativeInputSystem.currentTimeOffsetToRealtimeSinceStartup;
+        public double currentTimeOffsetToRealtimeSinceStartup =>
+            NativeInputSystem.currentTimeOffsetToRealtimeSinceStartup;
         public float unscaledGameTime => Time.unscaledTime;
 
         public bool runInBackground
         {
             get =>
-                Application.runInBackground ||
+                Application.runInBackground
+                ||
                 // certain platforms ignore the runInBackground flag and always run. Make sure we're
                 // not running on one of those and set the values when running on specific platforms.
                 m_RunInBackground;
@@ -248,16 +273,17 @@ namespace UnityEngine.InputSystem.LowLevel
         private InputUpdateDelegate m_OnUpdate;
         private Action<InputUpdateType> m_OnBeforeUpdate;
         private Func<InputUpdateType, bool> m_OnShouldRunUpdate;
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         private Action m_PlayerLoopInitialization;
-        #endif
-        #if !UNITY_INPUT_SYSTEM_PLATFORM_POLLING_FREQUENCY
+#endif
+#if !UNITY_INPUT_SYSTEM_PLATFORM_POLLING_FREQUENCY
         // From Unity 6000.3.0a2 (TODO Update comment and manifest before landing PR) this is handled by module
         // and initial value is suggested by the platform based on its supported device set.
         // In older version this is stored here and package override module/platform.
         private float m_PollingFrequency = 60.0f;
-        #endif
+#endif
         private bool m_DidCallOnShutdown = false;
+
         private void OnShutdown()
         {
             m_ShutdownMethod();
@@ -303,7 +329,7 @@ namespace UnityEngine.InputSystem.LowLevel
             get => NativeInputSystem.GetScrollWheelDeltaPerTick();
         }
 #endif
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
 
         public bool isInPlayMode => EditorApplication.isPlaying;
         public bool isEditorActive => InternalEditorUtility.isApplicationActive;
@@ -393,35 +419,40 @@ namespace UnityEngine.InputSystem.LowLevel
             }
         }
 
-        #endif // UNITY_EDITOR
+#endif // UNITY_EDITOR
 
-        #if UNITY_ANALYTICS || UNITY_EDITOR
+#if UNITY_ANALYTICS || UNITY_EDITOR
 
         public void SendAnalytic(InputAnalytics.IInputAnalytic analytic)
         {
-        #if ENABLE_CLOUD_SERVICES_ANALYTICS
-            #if (UNITY_EDITOR)
-                #if (UNITY_2023_2_OR_NEWER)
+#if ENABLE_CLOUD_SERVICES_ANALYTICS
+#if (UNITY_EDITOR)
+#if (UNITY_2023_2_OR_NEWER)
             EditorAnalytics.SendAnalytic(analytic);
-                #else
+#else
             // The preprocessor filtering is a workaround for the fact that the AnalyticsResult enum is not available before 2023.1.0a14 when not using the built-in Unity Analytics module.
-                    #if UNITY_INPUT_SYSTEM_ENABLE_ANALYTICS || UNITY_2023_1_OR_NEWER
+#if UNITY_INPUT_SYSTEM_ENABLE_ANALYTICS || UNITY_2023_1_OR_NEWER
             var info = analytic.info;
             EditorAnalytics.RegisterEventWithLimit(info.Name, info.MaxEventsPerHour, info.MaxNumberOfElements, InputAnalytics.kVendorKey);
             EditorAnalytics.SendEventWithLimit(info.Name, analytic);
-                    #endif // UNITY_INPUT_SYSTEM_ENABLE_ANALYTICS || UNITY_2023_1_OR_NEWER
-                #endif // UNITY_2023_2_OR_NEWER
-            #elif (UNITY_ANALYTICS) // Implicitly: !UNITY_EDITOR
+#endif // UNITY_INPUT_SYSTEM_ENABLE_ANALYTICS || UNITY_2023_1_OR_NEWER
+#endif // UNITY_2023_2_OR_NEWER
+#elif (UNITY_ANALYTICS) // Implicitly: !UNITY_EDITOR
             var info = analytic.info;
-            Analytics.Analytics.RegisterEvent(info.Name, info.MaxEventsPerHour, info.MaxNumberOfElements, InputAnalytics.kVendorKey);
+            Analytics.Analytics.RegisterEvent(
+                info.Name,
+                info.MaxEventsPerHour,
+                info.MaxNumberOfElements,
+                InputAnalytics.kVendorKey
+            );
             if (analytic.TryGatherData(out var data, out var error))
                 Analytics.Analytics.SendEvent(info.Name, data);
             else
-                Debug.Log(error);     // Non fatal
-            #endif //UNITY_EDITOR
-        #endif //ENABLE_CLOUD_SERVICES_ANALYTICS
+                Debug.Log(error); // Non fatal
+#endif //UNITY_EDITOR
+#endif //ENABLE_CLOUD_SERVICES_ANALYTICS
         }
 
-        #endif // UNITY_ANALYTICS || UNITY_EDITOR
+#endif // UNITY_ANALYTICS || UNITY_EDITOR
     }
 }

@@ -10,7 +10,13 @@ namespace Unity.Entities.Editor
         public readonly ComponentKind Kind;
         public readonly QueryOptions QueryOption;
 
-        public ComponentViewData(Type inComponentType, string name, ComponentType.AccessMode accessMode, ComponentKind componentKind, QueryOptions queryOption = QueryOptions.Default)
+        public ComponentViewData(
+            Type inComponentType,
+            string name,
+            ComponentType.AccessMode accessMode,
+            ComponentKind componentKind,
+            QueryOptions queryOption = QueryOptions.Default
+        )
         {
             InComponentType = inComponentType;
             Name = name;
@@ -21,12 +27,16 @@ namespace Unity.Entities.Editor
 
         public int CompareTo(ComponentViewData other)
         {
-            var accessModeComparison = SortOrderFromAccessMode(AccessMode).CompareTo(SortOrderFromAccessMode(other.AccessMode));
-            return accessModeComparison != 0 ? accessModeComparison : string.Compare(Name, other.Name, StringComparison.Ordinal);
+            var accessModeComparison = SortOrderFromAccessMode(AccessMode)
+                .CompareTo(SortOrderFromAccessMode(other.AccessMode));
+            return accessModeComparison != 0
+                ? accessModeComparison
+                : string.Compare(Name, other.Name, StringComparison.Ordinal);
         }
 
-        public bool Equals(ComponentViewData other)
-            => AccessMode == other.AccessMode && string.Equals(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
+        public bool Equals(ComponentViewData other) =>
+            AccessMode == other.AccessMode
+            && string.Equals(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
 
         static int SortOrderFromAccessMode(ComponentType.AccessMode mode)
         {
@@ -35,7 +45,7 @@ namespace Unity.Entities.Editor
                 ComponentType.AccessMode.ReadWrite => 0,
                 ComponentType.AccessMode.ReadOnly => 1,
                 ComponentType.AccessMode.Exclude => 2,
-                _ => throw new ArgumentException("Unrecognized AccessMode")
+                _ => throw new ArgumentException("Unrecognized AccessMode"),
             };
         }
 
@@ -46,7 +56,7 @@ namespace Unity.Entities.Editor
             Buffer = 2,
             Shared = 3,
             Chunk = 4,
-            Managed = 5
+            Managed = 5,
         }
 
         internal enum QueryOptions : byte

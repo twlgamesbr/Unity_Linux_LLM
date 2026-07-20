@@ -83,8 +83,10 @@ namespace NPCSystem.Monitoring
                     if (type == null)
                         continue;
 
-                    var method = type.GetMethod("GetWindow",
-                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                    var method = type.GetMethod(
+                        "GetWindow",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static
+                    );
                     method?.Invoke(null, null);
                     Debug.Log("[ConsoleProBehaviour] Console Pro window opened automatically.");
                     return;

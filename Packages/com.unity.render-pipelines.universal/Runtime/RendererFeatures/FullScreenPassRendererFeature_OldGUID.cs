@@ -2,14 +2,19 @@
 // guid than in the 6000.0 version. To update the GUID, we are bound to this strange inheritance and migration.
 // See also FullScreenPassRendererFeature_OldGUIDEditor, for the in editor downcasting.
 
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
 
 
-[System.Obsolete("Kept for migration purpose only. Do not use (see script for more info) #from(6000.0) #breakingFrom(6000.0) (UnityUpgradable) -> FullScreenPassRendererFeature", true)]
-class FullScreenPassRendererFeature_OldGUID : UnityEngine.Rendering.Universal.FullScreenPassRendererFeature, ISerializationCallbackReceiver
+[System.Obsolete(
+    "Kept for migration purpose only. Do not use (see script for more info) #from(6000.0) #breakingFrom(6000.0) (UnityUpgradable) -> FullScreenPassRendererFeature",
+    true
+)]
+class FullScreenPassRendererFeature_OldGUID
+    : UnityEngine.Rendering.Universal.FullScreenPassRendererFeature,
+        ISerializationCallbackReceiver
 {
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     {
@@ -18,7 +23,7 @@ class FullScreenPassRendererFeature_OldGUID : UnityEngine.Rendering.Universal.Fu
         EditorApplication.delayCall += DownCast;
 #endif
     }
-    
+
 #if UNITY_EDITOR
     void DownCast()
     {

@@ -19,8 +19,8 @@ namespace Unity.Networking.Transport
         private delegate void MethodDelegate(void* functionPtr, void* arguments, int argumentsSize);
 
         [MonoPInvokeCallback(typeof(MethodDelegate))]
-        private static void Method(void* functionPtr, void* arguments, int argumentsSize)
-            => ((delegate * < void*, int, void >)functionPtr)(arguments, argumentsSize);
+        private static void Method(void* functionPtr, void* arguments, int argumentsSize) =>
+            ((delegate* <void*, int, void>)functionPtr)(arguments, argumentsSize);
 
         private static GCHandle s_CachedWrapperHandle;
         private static IntPtr s_CachedWrapperPtr;
@@ -45,8 +45,11 @@ namespace Unity.Networking.Transport
             s_CachedWrapperPtr = Marshal.GetFunctionPointerForDelegate(methodDelegate);
         }
 
-        [NativeDisableUnsafePtrRestriction] IntPtr m_ManagedFunctionPtr;
-        [NativeDisableUnsafePtrRestriction] IntPtr m_WrapperPtr;
+        [NativeDisableUnsafePtrRestriction]
+        IntPtr m_ManagedFunctionPtr;
+
+        [NativeDisableUnsafePtrRestriction]
+        IntPtr m_WrapperPtr;
 
         public bool IsCreated => m_ManagedFunctionPtr != default;
 
@@ -57,7 +60,7 @@ namespace Unity.Networking.Transport
         /// The function pointer of a method that receives a void* containing
         /// the arguments and an int containing the size in bytes of those arguments.
         /// </param>
-        public ManagedCallWrapper(delegate* < void*, int, void > managedFunctionPtr)
+        public ManagedCallWrapper(delegate* <void*, int, void> managedFunctionPtr)
         {
             Initialize();
             m_WrapperPtr = s_CachedWrapperPtr;
@@ -69,18 +72,24 @@ namespace Unity.Networking.Transport
             if (m_ManagedFunctionPtr == default)
                 throw new NullReferenceException("Trying to invoke a null function pointer");
 
-            ((delegate * unmanaged[Cdecl] < void*, void*, int, void >)m_WrapperPtr)(((void*)m_ManagedFunctionPtr), arguments, argumentsSize);
+            ((delegate* unmanaged[Cdecl]<void*, void*, int, void>)m_WrapperPtr)(
+                ((void*)m_ManagedFunctionPtr),
+                arguments,
+                argumentsSize
+            );
         }
 
-        public void Invoke<T>(ref T arguments) where T : unmanaged
+        public void Invoke<T>(ref T arguments)
+            where T : unmanaged
         {
-            fixed(void* argumentsPtr = &arguments)
+            fixed (void* argumentsPtr = &arguments)
             {
                 Invoke(argumentsPtr, UnsafeUtility.SizeOf<T>());
             }
         }
 
-        public static ref A ArgumentsFromPtr<A>(void* argumentsPtr, int size) where A : unmanaged
+        public static ref A ArgumentsFromPtr<A>(void* argumentsPtr, int size)
+            where A : unmanaged
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (size != UnsafeUtility.SizeOf<A>())

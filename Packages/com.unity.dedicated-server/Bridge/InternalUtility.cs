@@ -7,15 +7,20 @@ namespace Unity.DedicatedServer.Editor.Internal
     internal static class InternalUtility
     {
         // This is the only internal API we should access from the BuildProfile module
-        public static void GetBuildProfileInternalData(BuildProfile buildProfile, out StandaloneBuildSubtarget buildSubtarget, out BuildTarget buildTarget, out string platformId)
+        public static void GetBuildProfileInternalData(
+            BuildProfile buildProfile,
+            out StandaloneBuildSubtarget buildSubtarget,
+            out BuildTarget buildTarget,
+            out string platformId
+        )
         {
             buildSubtarget = buildProfile.subtarget;
             buildTarget = buildProfile.buildTarget;
             platformId = buildProfile.platformId;
         }
 
-        public static bool IsStandalonePlatform(BuildTarget buildTarget)
-            => BuildPipeline.GetBuildTargetGroup(buildTarget) == BuildTargetGroup.Standalone;
+        public static bool IsStandalonePlatform(BuildTarget buildTarget) =>
+            BuildPipeline.GetBuildTargetGroup(buildTarget) == BuildTargetGroup.Standalone;
 
         public static bool IsServerProfile(BuildProfile buildProfile)
         {
@@ -39,9 +44,10 @@ namespace Unity.DedicatedServer.Editor.Internal
 #if !UNITY_6000_1_OR_NEWER
         public static string GetUniqueKeyForClassicTarget(BuildTarget buildTarget, StandaloneBuildSubtarget subtarget)
         {
-            var platformGuid = (subtarget == StandaloneBuildSubtarget.Server && IsStandalonePlatform(buildTarget))
-                ? BuildTargetDiscovery.GetGUIDFromBuildTarget(NamedBuildTarget.Server, buildTarget)
-                : BuildTargetDiscovery.GetGUIDFromBuildTarget(buildTarget);
+            var platformGuid =
+                (subtarget == StandaloneBuildSubtarget.Server && IsStandalonePlatform(buildTarget))
+                    ? BuildTargetDiscovery.GetGUIDFromBuildTarget(NamedBuildTarget.Server, buildTarget)
+                    : BuildTargetDiscovery.GetGUIDFromBuildTarget(buildTarget);
 
             return platformGuid.ToString();
         }

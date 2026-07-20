@@ -1,6 +1,6 @@
 using System;
-using UnityEngine;
 using System.Reflection;
+using UnityEngine;
 
 namespace UnityEditor.Rendering
 {
@@ -68,11 +68,28 @@ namespace UnityEditor.Rendering
     {
         const float k_HandleSizeCoef = 0.07f;
         static Material k_Material_Cache;
-        static Material k_Material => (k_Material_Cache == null || k_Material_Cache.Equals(null) ? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored"))) : k_Material_Cache);
+        static Material k_Material =>
+            (
+                k_Material_Cache == null || k_Material_Cache.Equals(null)
+                    ? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored")))
+                    : k_Material_Cache
+            );
         static Mesh k_MeshQuad_Cache;
-        static Mesh k_MeshQuad => k_MeshQuad_Cache == null || k_MeshQuad_Cache.Equals(null) ? (k_MeshQuad_Cache = Resources.GetBuiltinResource<Mesh>("Quad.fbx")) : k_MeshQuad_Cache;
+        static Mesh k_MeshQuad =>
+            k_MeshQuad_Cache == null || k_MeshQuad_Cache.Equals(null)
+                ? (k_MeshQuad_Cache = Resources.GetBuiltinResource<Mesh>("Quad.fbx"))
+                : k_MeshQuad_Cache;
 
-        enum NamedFace { Right, Top, Front, Left, Bottom, Back, None }
+        enum NamedFace
+        {
+            Right,
+            Top,
+            Front,
+            Left,
+            Bottom,
+            Back,
+            None,
+        }
 
         Material m_Material;
         readonly Color[] m_PolychromeHandleColor;
@@ -101,12 +118,20 @@ namespace UnityEditor.Rendering
         /// Allow to switch between the mode where all axis are controlled together or not
         /// Note that if there is several handles, they will use the polychrome colors.
         /// </summary>
-        public bool monoHandle { get => m_MonoHandle; set => m_MonoHandle = value; }
+        public bool monoHandle
+        {
+            get => m_MonoHandle;
+            set => m_MonoHandle = value;
+        }
 
         /// <summary>
         /// Allow to switch between the mode where box size can be negative or not.
         /// </summary>
-        public bool allowNegativeSize { get => m_AllowNegativeSize; set => m_AllowNegativeSize = value; }
+        public bool allowNegativeSize
+        {
+            get => m_AllowNegativeSize;
+            set => m_AllowNegativeSize = value;
+        }
 
         /// <summary>The position of the center of the box in Handle.matrix space.</summary>
         public Vector3 center { get; set; }
@@ -142,27 +167,46 @@ namespace UnityEditor.Rendering
         //Note: Handles.Slider not allow to use a specific ControlID.
         //Thus Slider1D is used (with reflection)
         static Type k_Slider1D = Type.GetType("UnityEditorInternal.Slider1D, UnityEditor");
-        static MethodInfo k_Slider1D_Do = k_Slider1D
-            .GetMethod(
+        static MethodInfo k_Slider1D_Do = k_Slider1D.GetMethod(
             "Do",
             BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
             null,
             CallingConventions.Any,
-            new[] { typeof(int), typeof(Vector3), typeof(Vector3), typeof(float), typeof(Handles.CapFunction), typeof(float) },
-            null);
-        static void Slider1D(int controlID, ref Vector3 handlePosition, Vector3 handleOrientation, float snapScale, Color color)
+            new[]
+            {
+                typeof(int),
+                typeof(Vector3),
+                typeof(Vector3),
+                typeof(float),
+                typeof(Handles.CapFunction),
+                typeof(float),
+            },
+            null
+        );
+
+        static void Slider1D(
+            int controlID,
+            ref Vector3 handlePosition,
+            Vector3 handleOrientation,
+            float snapScale,
+            Color color
+        )
         {
             using (new Handles.DrawingScope(color))
             {
-                handlePosition = (Vector3)k_Slider1D_Do.Invoke(null, new object[]
-                {
-                    controlID,
-                    handlePosition,
-                    handleOrientation,
-                    HandleUtility.GetHandleSize(handlePosition) * k_HandleSizeCoef,
-                    new Handles.CapFunction(Handles.DotHandleCap),
-                    snapScale
-                });
+                handlePosition = (Vector3)
+                    k_Slider1D_Do.Invoke(
+                        null,
+                        new object[]
+                        {
+                            controlID,
+                            handlePosition,
+                            handleOrientation,
+                            HandleUtility.GetHandleSize(handlePosition) * k_HandleSizeCoef,
+                            new Handles.CapFunction(Handles.DotHandleCap),
+                            snapScale,
+                        }
+                    );
             }
         }
 
@@ -178,11 +222,17 @@ namespace UnityEditor.Rendering
             m_Parent = parent;
             m_Material = new Material(k_Material);
             this.baseColor = baseColor;
-            m_PolychromeHandleColor = polychromeHandleColors ?? new Color[]
-            {
-                Handles.xAxisColor, Handles.yAxisColor, Handles.zAxisColor,
-                Handles.xAxisColor, Handles.yAxisColor, Handles.zAxisColor
-            };
+            m_PolychromeHandleColor =
+                polychromeHandleColors
+                ?? new Color[]
+                {
+                    Handles.xAxisColor,
+                    Handles.yAxisColor,
+                    Handles.zAxisColor,
+                    Handles.xAxisColor,
+                    Handles.yAxisColor,
+                    Handles.zAxisColor,
+                };
         }
 
         /// <summary>Draw the hull which means the boxes without the handles</summary>
@@ -195,16 +245,59 @@ namespace UnityEditor.Rendering
                 // Draw the hull
                 var xSize = new Vector3(size.z, size.y, 1f);
                 material.SetPass(0);
-                Graphics.DrawMeshNow(k_MeshQuad, Handles.matrix * Matrix4x4.TRS(center + size.x * .5f * Vector3.left, Quaternion.FromToRotation(Vector3.forward, Vector3.left), xSize));
-                Graphics.DrawMeshNow(k_MeshQuad, Handles.matrix * Matrix4x4.TRS(center + size.x * .5f * Vector3.right, Quaternion.FromToRotation(Vector3.forward, Vector3.right), xSize));
+                Graphics.DrawMeshNow(
+                    k_MeshQuad,
+                    Handles.matrix
+                        * Matrix4x4.TRS(
+                            center + size.x * .5f * Vector3.left,
+                            Quaternion.FromToRotation(Vector3.forward, Vector3.left),
+                            xSize
+                        )
+                );
+                Graphics.DrawMeshNow(
+                    k_MeshQuad,
+                    Handles.matrix
+                        * Matrix4x4.TRS(
+                            center + size.x * .5f * Vector3.right,
+                            Quaternion.FromToRotation(Vector3.forward, Vector3.right),
+                            xSize
+                        )
+                );
 
                 var ySize = new Vector3(size.x, size.z, 1f);
-                Graphics.DrawMeshNow(k_MeshQuad, Handles.matrix * Matrix4x4.TRS(center + size.y * .5f * Vector3.up, Quaternion.FromToRotation(Vector3.forward, Vector3.up), ySize));
-                Graphics.DrawMeshNow(k_MeshQuad, Handles.matrix * Matrix4x4.TRS(center + size.y * .5f * Vector3.down, Quaternion.FromToRotation(Vector3.forward, Vector3.down), ySize));
+                Graphics.DrawMeshNow(
+                    k_MeshQuad,
+                    Handles.matrix
+                        * Matrix4x4.TRS(
+                            center + size.y * .5f * Vector3.up,
+                            Quaternion.FromToRotation(Vector3.forward, Vector3.up),
+                            ySize
+                        )
+                );
+                Graphics.DrawMeshNow(
+                    k_MeshQuad,
+                    Handles.matrix
+                        * Matrix4x4.TRS(
+                            center + size.y * .5f * Vector3.down,
+                            Quaternion.FromToRotation(Vector3.forward, Vector3.down),
+                            ySize
+                        )
+                );
 
                 var zSize = new Vector3(size.x, size.y, 1f);
-                Graphics.DrawMeshNow(k_MeshQuad, Handles.matrix * Matrix4x4.TRS(center + size.z * .5f * Vector3.forward, Quaternion.identity, zSize));
-                Graphics.DrawMeshNow(k_MeshQuad, Handles.matrix * Matrix4x4.TRS(center + size.z * .5f * Vector3.back, Quaternion.FromToRotation(Vector3.forward, Vector3.back), zSize));
+                Graphics.DrawMeshNow(
+                    k_MeshQuad,
+                    Handles.matrix * Matrix4x4.TRS(center + size.z * .5f * Vector3.forward, Quaternion.identity, zSize)
+                );
+                Graphics.DrawMeshNow(
+                    k_MeshQuad,
+                    Handles.matrix
+                        * Matrix4x4.TRS(
+                            center + size.z * .5f * Vector3.back,
+                            Quaternion.FromToRotation(Vector3.forward, Vector3.back),
+                            zSize
+                        )
+                );
 
                 //if as a parent, also draw handle distance to the parent
                 if (m_Parent != null)
@@ -218,22 +311,40 @@ namespace UnityEditor.Rendering
                     zRecal.z = 0;
 
                     Handles.color = GetHandleColor(NamedFace.Left);
-                    Handles.DrawLine(m_Parent.center + xRecal + m_Parent.size.x * .5f * Vector3.left, center + size.x * .5f * Vector3.left);
+                    Handles.DrawLine(
+                        m_Parent.center + xRecal + m_Parent.size.x * .5f * Vector3.left,
+                        center + size.x * .5f * Vector3.left
+                    );
 
                     Handles.color = GetHandleColor(NamedFace.Right);
-                    Handles.DrawLine(m_Parent.center + xRecal + m_Parent.size.x * .5f * Vector3.right, center + size.x * .5f * Vector3.right);
+                    Handles.DrawLine(
+                        m_Parent.center + xRecal + m_Parent.size.x * .5f * Vector3.right,
+                        center + size.x * .5f * Vector3.right
+                    );
 
                     Handles.color = GetHandleColor(NamedFace.Top);
-                    Handles.DrawLine(m_Parent.center + yRecal + m_Parent.size.y * .5f * Vector3.up, center + size.y * .5f * Vector3.up);
+                    Handles.DrawLine(
+                        m_Parent.center + yRecal + m_Parent.size.y * .5f * Vector3.up,
+                        center + size.y * .5f * Vector3.up
+                    );
 
                     Handles.color = GetHandleColor(NamedFace.Bottom);
-                    Handles.DrawLine(m_Parent.center + yRecal + m_Parent.size.y * .5f * Vector3.down, center + size.y * .5f * Vector3.down);
+                    Handles.DrawLine(
+                        m_Parent.center + yRecal + m_Parent.size.y * .5f * Vector3.down,
+                        center + size.y * .5f * Vector3.down
+                    );
 
                     Handles.color = GetHandleColor(NamedFace.Front);
-                    Handles.DrawLine(m_Parent.center + zRecal + m_Parent.size.z * .5f * Vector3.forward, center + size.z * .5f * Vector3.forward);
+                    Handles.DrawLine(
+                        m_Parent.center + zRecal + m_Parent.size.z * .5f * Vector3.forward,
+                        center + size.z * .5f * Vector3.forward
+                    );
 
                     Handles.color = GetHandleColor(NamedFace.Back);
-                    Handles.DrawLine(m_Parent.center + zRecal + m_Parent.size.z * .5f * Vector3.back, center + size.z * .5f * Vector3.back);
+                    Handles.DrawLine(
+                        m_Parent.center + zRecal + m_Parent.size.z * .5f * Vector3.back,
+                        center + size.z * .5f * Vector3.back
+                    );
                 }
             }
 
@@ -270,32 +381,68 @@ namespace UnityEditor.Rendering
             EditorGUI.BeginChangeCheck();
 
             EditorGUI.BeginChangeCheck();
-            Slider1D(m_ControlIDs[(int)NamedFace.Left], ref leftPosition, Vector3.left, EditorSnapSettings.scale, GetHandleColor(NamedFace.Left));
+            Slider1D(
+                m_ControlIDs[(int)NamedFace.Left],
+                ref leftPosition,
+                Vector3.left,
+                EditorSnapSettings.scale,
+                GetHandleColor(NamedFace.Left)
+            );
             if (EditorGUI.EndChangeCheck())
                 theChangedFace = NamedFace.Left;
 
             EditorGUI.BeginChangeCheck();
-            Slider1D(m_ControlIDs[(int)NamedFace.Right], ref rightPosition, Vector3.right, EditorSnapSettings.scale, GetHandleColor(NamedFace.Right));
+            Slider1D(
+                m_ControlIDs[(int)NamedFace.Right],
+                ref rightPosition,
+                Vector3.right,
+                EditorSnapSettings.scale,
+                GetHandleColor(NamedFace.Right)
+            );
             if (EditorGUI.EndChangeCheck())
                 theChangedFace = NamedFace.Right;
 
             EditorGUI.BeginChangeCheck();
-            Slider1D(m_ControlIDs[(int)NamedFace.Top], ref topPosition, Vector3.up, EditorSnapSettings.scale, GetHandleColor(NamedFace.Top));
+            Slider1D(
+                m_ControlIDs[(int)NamedFace.Top],
+                ref topPosition,
+                Vector3.up,
+                EditorSnapSettings.scale,
+                GetHandleColor(NamedFace.Top)
+            );
             if (EditorGUI.EndChangeCheck())
                 theChangedFace = NamedFace.Top;
 
             EditorGUI.BeginChangeCheck();
-            Slider1D(m_ControlIDs[(int)NamedFace.Bottom], ref bottomPosition, Vector3.down, EditorSnapSettings.scale, GetHandleColor(NamedFace.Bottom));
+            Slider1D(
+                m_ControlIDs[(int)NamedFace.Bottom],
+                ref bottomPosition,
+                Vector3.down,
+                EditorSnapSettings.scale,
+                GetHandleColor(NamedFace.Bottom)
+            );
             if (EditorGUI.EndChangeCheck())
                 theChangedFace = NamedFace.Bottom;
 
             EditorGUI.BeginChangeCheck();
-            Slider1D(m_ControlIDs[(int)NamedFace.Front], ref frontPosition, Vector3.forward, EditorSnapSettings.scale, GetHandleColor(NamedFace.Front));
+            Slider1D(
+                m_ControlIDs[(int)NamedFace.Front],
+                ref frontPosition,
+                Vector3.forward,
+                EditorSnapSettings.scale,
+                GetHandleColor(NamedFace.Front)
+            );
             if (EditorGUI.EndChangeCheck())
                 theChangedFace = NamedFace.Front;
 
             EditorGUI.BeginChangeCheck();
-            Slider1D(m_ControlIDs[(int)NamedFace.Back], ref backPosition, Vector3.back, EditorSnapSettings.scale, GetHandleColor(NamedFace.Back));
+            Slider1D(
+                m_ControlIDs[(int)NamedFace.Back],
+                ref backPosition,
+                Vector3.back,
+                EditorSnapSettings.scale,
+                GetHandleColor(NamedFace.Back)
+            );
             if (EditorGUI.EndChangeCheck())
                 theChangedFace = NamedFace.Back;
 
@@ -304,12 +451,24 @@ namespace UnityEditor.Rendering
                 float delta = 0f;
                 switch (theChangedFace)
                 {
-                    case NamedFace.Left: delta = (leftPosition - center - size.x * .5f * Vector3.left).x; break;
-                    case NamedFace.Right: delta = -(rightPosition - center - size.x * .5f * Vector3.right).x; break;
-                    case NamedFace.Top: delta = -(topPosition - center - size.y * .5f * Vector3.up).y; break;
-                    case NamedFace.Bottom: delta = (bottomPosition - center - size.y * .5f * Vector3.down).y; break;
-                    case NamedFace.Front: delta = -(frontPosition - center - size.z * .5f * Vector3.forward).z; break;
-                    case NamedFace.Back: delta = (backPosition - center - size.z * .5f * Vector3.back).z; break;
+                    case NamedFace.Left:
+                        delta = (leftPosition - center - size.x * .5f * Vector3.left).x;
+                        break;
+                    case NamedFace.Right:
+                        delta = -(rightPosition - center - size.x * .5f * Vector3.right).x;
+                        break;
+                    case NamedFace.Top:
+                        delta = -(topPosition - center - size.y * .5f * Vector3.up).y;
+                        break;
+                    case NamedFace.Bottom:
+                        delta = (bottomPosition - center - size.y * .5f * Vector3.down).y;
+                        break;
+                    case NamedFace.Front:
+                        delta = -(frontPosition - center - size.z * .5f * Vector3.forward).z;
+                        break;
+                    case NamedFace.Back:
+                        delta = (backPosition - center - size.z * .5f * Vector3.back).z;
+                        break;
                 }
 
                 if (monoHandle || useHomothety && useSymetry)
@@ -344,12 +503,24 @@ namespace UnityEditor.Rendering
                     {
                         switch (theChangedFace)
                         {
-                            case NamedFace.Left: rightPosition.x -= delta; break;
-                            case NamedFace.Right: leftPosition.x += delta; break;
-                            case NamedFace.Top: bottomPosition.y += delta; break;
-                            case NamedFace.Bottom: topPosition.y -= delta; break;
-                            case NamedFace.Front: backPosition.z += delta; break;
-                            case NamedFace.Back: frontPosition.z -= delta; break;
+                            case NamedFace.Left:
+                                rightPosition.x -= delta;
+                                break;
+                            case NamedFace.Right:
+                                leftPosition.x += delta;
+                                break;
+                            case NamedFace.Top:
+                                bottomPosition.y += delta;
+                                break;
+                            case NamedFace.Bottom:
+                                topPosition.y -= delta;
+                                break;
+                            case NamedFace.Front:
+                                backPosition.z += delta;
+                                break;
+                            case NamedFace.Back:
+                                frontPosition.z -= delta;
+                                break;
                         }
 
                         //ensure that the box face are still facing outside
@@ -492,6 +663,7 @@ namespace UnityEditor.Rendering
             }
         }
 
-        Color GetHandleColor(NamedFace name) => monoHandle ? m_MonochromeHandleColor : GizmoUtility.GetHandleColor(m_PolychromeHandleColor[(int)name]);
+        Color GetHandleColor(NamedFace name) =>
+            monoHandle ? m_MonochromeHandleColor : GizmoUtility.GetHandleColor(m_PolychromeHandleColor[(int)name]);
     }
 }

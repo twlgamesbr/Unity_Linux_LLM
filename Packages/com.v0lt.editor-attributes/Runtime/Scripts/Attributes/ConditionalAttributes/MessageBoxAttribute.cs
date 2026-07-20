@@ -7,7 +7,7 @@ namespace EditorAttributes
         None,
         Log,
         Warning,
-        Error
+        Error,
     }
 
     /// <summary>
@@ -31,7 +31,14 @@ namespace EditorAttributes
         /// <param name="messageType">The type of the message</param>
         /// <param name="stringInputMode">Set if the string input is set trough a constant or dynamically trough another member</param>
         /// <param name="drawAbove">Draws the HelpBox above the attached field</param>
-        public MessageBoxAttribute(string message, string conditionName, MessageMode messageType = MessageMode.Log, StringInputMode stringInputMode = StringInputMode.Constant, bool drawAbove = false) : base(true)
+        public MessageBoxAttribute(
+            string message,
+            string conditionName,
+            MessageMode messageType = MessageMode.Log,
+            StringInputMode stringInputMode = StringInputMode.Constant,
+            bool drawAbove = false
+        )
+            : base(true)
         {
             Message = message;
             ConditionName = conditionName;
@@ -49,7 +56,14 @@ namespace EditorAttributes
         /// <param name="messageType">The type of the message</param>
         /// <param name="stringInputMode">Set if the string input is set trough a constant or dynamically trough another member</param>
         /// <param name="drawAbove">Draws the HelpBox above the attached field</param>
-        public MessageBoxAttribute(string message, string conditionName, object enumValue, MessageMode messageType = MessageMode.Log, StringInputMode stringInputMode = StringInputMode.Constant, bool drawAbove = false)
+        public MessageBoxAttribute(
+            string message,
+            string conditionName,
+            object enumValue,
+            MessageMode messageType = MessageMode.Log,
+            StringInputMode stringInputMode = StringInputMode.Constant,
+            bool drawAbove = false
+        )
             : this(message, conditionName, messageType, stringInputMode, drawAbove) => EnumValue = (int)enumValue;
     }
 }

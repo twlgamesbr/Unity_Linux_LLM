@@ -8,7 +8,8 @@ namespace UnityEngine.Rendering
     /// Base class for Rendering Debugger Display Stats.
     /// </summary>
     /// <typeparam name="TProfileId">Type of ProfileId the pipeline uses</typeparam>
-    public abstract class DebugDisplayStats<TProfileId> where TProfileId : Enum
+    public abstract class DebugDisplayStats<TProfileId>
+        where TProfileId : Enum
     {
         // Accumulate values to avg over one second.
         private class AccumulatedTiming
@@ -27,7 +28,7 @@ namespace UnityEngine.Rendering
         {
             CPU,
             InlineCPU,
-            GPU
+            GPU,
         }
 
         /// <summary>
@@ -94,7 +95,7 @@ namespace UnityEngine.Rendering
             }
         }
 
-        private static readonly string[] k_DetailedStatsColumnLabels = {"CPU", "CPUInline", "GPU"};
+        private static readonly string[] k_DetailedStatsColumnLabels = { "CPU", "CPUInline", "GPU" };
         private Dictionary<TProfileId, AccumulatedTiming>[] m_AccumulatedTiming = { new(), new(), new() };
         private float m_TimeSinceLastAvgValue = 0.0f;
         private int m_AccumulatedFrames = 0;
@@ -116,7 +117,11 @@ namespace UnityEngine.Rendering
         /// <returns>Foldout containing the list of sampler widgets</returns>
         protected DebugUI.Widget BuildDetailedStatsList(string title, List<TProfileId> samplers)
         {
-            var foldout = new DebugUI.Foldout(title, BuildProfilingSamplerWidgetList(samplers), k_DetailedStatsColumnLabels);
+            var foldout = new DebugUI.Foldout(
+                title,
+                BuildProfilingSamplerWidgetList(samplers),
+                k_DetailedStatsColumnLabels
+            );
             foldout.opened = true;
             foldout.alternateRowColors = true;
             return foldout;
@@ -130,13 +135,16 @@ namespace UnityEngine.Rendering
 
                 // Accumulate.
                 bool allValuesZero = true;
-                if (m_AccumulatedTiming[(int) DebugProfilingType.CPU].TryGetValue(samplerId, out var accCPUTiming))
+                if (m_AccumulatedTiming[(int)DebugProfilingType.CPU].TryGetValue(samplerId, out var accCPUTiming))
                 {
                     accCPUTiming.accumulatedValue += sampler.cpuElapsedTime;
                     allValuesZero &= accCPUTiming.accumulatedValue == 0;
                 }
 
-                if (m_AccumulatedTiming[(int)DebugProfilingType.InlineCPU].TryGetValue(samplerId, out var accInlineCPUTiming))
+                if (
+                    m_AccumulatedTiming[(int)DebugProfilingType.InlineCPU]
+                        .TryGetValue(samplerId, out var accInlineCPUTiming)
+                )
                 {
                     accInlineCPUTiming.accumulatedValue += sampler.inlineCpuElapsedTime;
                     allValuesZero &= accInlineCPUTiming.accumulatedValue == 0;
@@ -179,8 +187,11 @@ namespace UnityEngine.Rendering
         {
             var result = new ObservableList<DebugUI.Widget>();
 
-            DebugUI.Value CreateWidgetForSampler(TProfileId samplerId, ProfilingSampler sampler,
-                DebugProfilingType type)
+            DebugUI.Value CreateWidgetForSampler(
+                TProfileId samplerId,
+                ProfilingSampler sampler,
+                DebugProfilingType type
+            )
             {
                 // Find the right accumulated dictionary and add it there if not existing yet.
                 var accumulatedDictionary = m_AccumulatedTiming[(int)type];
@@ -193,7 +204,7 @@ namespace UnityEngine.Rendering
                 {
                     formatString = "{0:F2}ms",
                     refreshRate = 1.0f / 5.0f,
-                    getter = () => GetSamplerTiming(samplerId, sampler, type)
+                    getter = () => GetSamplerTiming(samplerId, sampler, type),
                 };
             }
 
@@ -207,18 +218,22 @@ namespace UnityEngine.Rendering
 
                 sampler.enableRecording = true;
 
-                result.Add(new DebugUI.ValueTuple
-                {
-                    displayName = sampler.name,
-                    isHiddenCallback = () =>
+                result.Add(
+                    new DebugUI.ValueTuple
                     {
-                        if (hideEmptyScopes && m_HiddenProfileIds.Contains(samplerId))
-                            return true;
-                        return false;
-                    },
-                    values = Enum.GetValues(typeof(DebugProfilingType)).Cast<DebugProfilingType>()
-                        .Select(e => CreateWidgetForSampler(samplerId, sampler, e)).ToArray()
-                });
+                        displayName = sampler.name,
+                        isHiddenCallback = () =>
+                        {
+                            if (hideEmptyScopes && m_HiddenProfileIds.Contains(samplerId))
+                                return true;
+                            return false;
+                        },
+                        values = Enum.GetValues(typeof(DebugProfilingType))
+                            .Cast<DebugProfilingType>()
+                            .Select(e => CreateWidgetForSampler(samplerId, sampler, e))
+                            .ToArray(),
+                    }
+                );
             }
 
             return result;

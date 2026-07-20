@@ -30,14 +30,10 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 
         internal void UpdatePresetDropdown([CanBeNull] string configurationName)
         {
-            configurationName = string.IsNullOrEmpty(configurationName)
-                ? Custom
-                : configurationName;
+            configurationName = string.IsNullOrEmpty(configurationName) ? Custom : configurationName;
 
             var newIndex = IndexOf(configurationName);
-            index = newIndex == -1
-                ? IndexOf(Custom)
-                : newIndex;
+            index = newIndex == -1 ? IndexOf(Custom) : newIndex;
         }
     }
 }

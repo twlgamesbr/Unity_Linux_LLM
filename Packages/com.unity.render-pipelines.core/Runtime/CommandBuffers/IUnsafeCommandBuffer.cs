@@ -1,4 +1,3 @@
-
 using System;
 using Unity.Collections;
 using UnityEngine.Experimental.Rendering;
@@ -22,61 +21,79 @@ using UnityEngine.Experimental.Rendering;
 // NOTE  NOTE  NOTE  NOTE  NOTE  NOTE  NOTE  NOTE  NOTE
 namespace UnityEngine.Rendering
 {
-
     /// <summary>
     /// This interface declares functions that are specific to an unsafe command buffer.
     /// </summary>
     public interface IUnsafeCommandBuffer : IBaseCommandBuffer, IRasterCommandBuffer, IComputeCommandBuffer
     {
+        /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
+        /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
+        /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
+        public void RequestAsyncReadback(ComputeBuffer src, Action<AsyncGPUReadbackRequest> callback);
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(ComputeBuffer src, Action<AsyncGPUReadbackRequest> callback) ;
-
-        /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
-        /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(GraphicsBuffer src, Action<AsyncGPUReadbackRequest> callback) ;
-
-        /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
-        /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(ComputeBuffer src, int size, int offset, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(GraphicsBuffer src, Action<AsyncGPUReadbackRequest> callback);
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(GraphicsBuffer src, int size, int offset, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(
+            ComputeBuffer src,
+            int size,
+            int offset,
+            Action<AsyncGPUReadbackRequest> callback
+        );
+
+        /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
+        /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
+        /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
+        /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
+        /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
+        public void RequestAsyncReadback(
+            GraphicsBuffer src,
+            int size,
+            int offset,
+            Action<AsyncGPUReadbackRequest> callback
+        );
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(Texture src, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(Texture src, Action<AsyncGPUReadbackRequest> callback);
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="mipIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(Texture src, int mipIndex, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(Texture src, int mipIndex, Action<AsyncGPUReadbackRequest> callback);
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="mipIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(Texture src, int mipIndex, TextureFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(
+            Texture src,
+            int mipIndex,
+            TextureFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        );
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="mipIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(Texture src, int mipIndex, GraphicsFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(
+            Texture src,
+            int mipIndex,
+            GraphicsFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        );
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
@@ -88,7 +105,17 @@ namespace UnityEngine.Rendering
         /// <param name="z">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(Texture src, int mipIndex, int x, int width, int y, int height, int z, int depth, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(
+            Texture src,
+            int mipIndex,
+            int x,
+            int width,
+            int y,
+            int height,
+            int z,
+            int depth,
+            Action<AsyncGPUReadbackRequest> callback
+        );
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
@@ -101,7 +128,18 @@ namespace UnityEngine.Rendering
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(Texture src, int mipIndex, int x, int width, int y, int height, int z, int depth, TextureFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(
+            Texture src,
+            int mipIndex,
+            int x,
+            int width,
+            int y,
+            int height,
+            int z,
+            int depth,
+            TextureFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        );
 
         /// <summary>Wraps [RequestAsyncReadback](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
@@ -114,14 +152,30 @@ namespace UnityEngine.Rendering
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadback.html)</param>
-        public void RequestAsyncReadback(Texture src, int mipIndex, int x, int width, int y, int height, int z, int depth, GraphicsFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) ;
+        public void RequestAsyncReadback(
+            Texture src,
+            int mipIndex,
+            int x,
+            int width,
+            int y,
+            int height,
+            int z,
+            int depth,
+            GraphicsFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        );
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, ComputeBuffer src, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            ComputeBuffer src,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -130,14 +184,26 @@ namespace UnityEngine.Rendering
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, ComputeBuffer src, int size, int offset, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            ComputeBuffer src,
+            int size,
+            int offset,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, GraphicsBuffer src, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            GraphicsBuffer src,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -146,14 +212,26 @@ namespace UnityEngine.Rendering
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, GraphicsBuffer src, int size, int offset, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            GraphicsBuffer src,
+            int size,
+            int offset,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, Texture src, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            Texture src,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -161,7 +239,13 @@ namespace UnityEngine.Rendering
         /// <param name="mipIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, Texture src, int mipIndex, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            Texture src,
+            int mipIndex,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -170,7 +254,14 @@ namespace UnityEngine.Rendering
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, Texture src, int mipIndex, TextureFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            Texture src,
+            int mipIndex,
+            TextureFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -179,7 +270,14 @@ namespace UnityEngine.Rendering
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, Texture src, int mipIndex, GraphicsFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            Texture src,
+            int mipIndex,
+            GraphicsFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -193,7 +291,19 @@ namespace UnityEngine.Rendering
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, Texture src, int mipIndex, int x, int width, int y, int height, int z, int depth, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            Texture src,
+            int mipIndex,
+            int x,
+            int width,
+            int y,
+            int height,
+            int z,
+            int depth,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -208,7 +318,20 @@ namespace UnityEngine.Rendering
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, Texture src, int mipIndex, int x, int width, int y, int height, int z, int depth, TextureFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            Texture src,
+            int mipIndex,
+            int x,
+            int width,
+            int y,
+            int height,
+            int z,
+            int depth,
+            TextureFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [RequestAsyncReadbackIntoNativeArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html) on a CommandBuffer.</summary>
         /// <param name="output">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
@@ -223,25 +346,40 @@ namespace UnityEngine.Rendering
         /// <param name="dstFormat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <param name="callback">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</param>
         /// <typeparam name="T">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.RequestAsyncReadbackIntoNativeArray.html)</typeparam>
-        public void RequestAsyncReadbackIntoNativeArray<T>(ref NativeArray<T> output, Texture src, int mipIndex, int x, int width, int y, int height, int z, int depth, GraphicsFormat dstFormat, Action<AsyncGPUReadbackRequest> callback) where T : struct;
+        public void RequestAsyncReadbackIntoNativeArray<T>(
+            ref NativeArray<T> output,
+            Texture src,
+            int mipIndex,
+            int x,
+            int width,
+            int y,
+            int height,
+            int z,
+            int depth,
+            GraphicsFormat dstFormat,
+            Action<AsyncGPUReadbackRequest> callback
+        )
+            where T : struct;
 
         /// <summary>Wraps [Clear](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.Clear.html) on a CommandBuffer.</summary>
-
-        public void Clear() ;
+        public void Clear();
 
         /// <summary>Wraps [ClearRandomWriteTargets](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRandomWriteTargets.html) on a CommandBuffer.</summary>
-
-        public void ClearRandomWriteTargets() ;
+        public void ClearRandomWriteTargets();
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier rt) ;
+        public void SetRenderTarget(RenderTargetIdentifier rt);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="loadAction">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="storeAction">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier rt, RenderBufferLoadAction loadAction, RenderBufferStoreAction storeAction) ;
+        public void SetRenderTarget(
+            RenderTargetIdentifier rt,
+            RenderBufferLoadAction loadAction,
+            RenderBufferStoreAction storeAction
+        );
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
@@ -249,43 +387,54 @@ namespace UnityEngine.Rendering
         /// <param name="colorStoreAction">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthLoadAction">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthStoreAction">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier rt, RenderBufferLoadAction colorLoadAction, RenderBufferStoreAction colorStoreAction, RenderBufferLoadAction depthLoadAction, RenderBufferStoreAction depthStoreAction) ;
+        public void SetRenderTarget(
+            RenderTargetIdentifier rt,
+            RenderBufferLoadAction colorLoadAction,
+            RenderBufferStoreAction colorStoreAction,
+            RenderBufferLoadAction depthLoadAction,
+            RenderBufferStoreAction depthStoreAction
+        );
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier rt, int mipLevel) ;
+        public void SetRenderTarget(RenderTargetIdentifier rt, int mipLevel);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="cubemapFace">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier rt, int mipLevel, CubemapFace cubemapFace) ;
+        public void SetRenderTarget(RenderTargetIdentifier rt, int mipLevel, CubemapFace cubemapFace);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="cubemapFace">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthSlice">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier rt, int mipLevel, CubemapFace cubemapFace, int depthSlice) ;
+        public void SetRenderTarget(RenderTargetIdentifier rt, int mipLevel, CubemapFace cubemapFace, int depthSlice);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="color">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier color, RenderTargetIdentifier depth) ;
+        public void SetRenderTarget(RenderTargetIdentifier color, RenderTargetIdentifier depth);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="color">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier color, RenderTargetIdentifier depth, int mipLevel) ;
+        public void SetRenderTarget(RenderTargetIdentifier color, RenderTargetIdentifier depth, int mipLevel);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="color">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="cubemapFace">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier color, RenderTargetIdentifier depth, int mipLevel, CubemapFace cubemapFace) ;
+        public void SetRenderTarget(
+            RenderTargetIdentifier color,
+            RenderTargetIdentifier depth,
+            int mipLevel,
+            CubemapFace cubemapFace
+        );
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="color">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
@@ -293,7 +442,13 @@ namespace UnityEngine.Rendering
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="cubemapFace">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthSlice">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier color, RenderTargetIdentifier depth, int mipLevel, CubemapFace cubemapFace, int depthSlice) ;
+        public void SetRenderTarget(
+            RenderTargetIdentifier color,
+            RenderTargetIdentifier depth,
+            int mipLevel,
+            CubemapFace cubemapFace,
+            int depthSlice
+        );
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="color">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
@@ -302,12 +457,19 @@ namespace UnityEngine.Rendering
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthLoadAction">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthStoreAction">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier color, RenderBufferLoadAction colorLoadAction, RenderBufferStoreAction colorStoreAction, RenderTargetIdentifier depth, RenderBufferLoadAction depthLoadAction, RenderBufferStoreAction depthStoreAction) ;
+        public void SetRenderTarget(
+            RenderTargetIdentifier color,
+            RenderBufferLoadAction colorLoadAction,
+            RenderBufferStoreAction colorStoreAction,
+            RenderTargetIdentifier depth,
+            RenderBufferLoadAction depthLoadAction,
+            RenderBufferStoreAction depthStoreAction
+        );
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="colors">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier[] colors, RenderTargetIdentifier depth) ;
+        public void SetRenderTarget(RenderTargetIdentifier[] colors, RenderTargetIdentifier depth);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="colors">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
@@ -315,32 +477,48 @@ namespace UnityEngine.Rendering
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="cubemapFace">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthSlice">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetIdentifier[] colors, RenderTargetIdentifier depth, int mipLevel, CubemapFace cubemapFace, int depthSlice) ;
+        public void SetRenderTarget(
+            RenderTargetIdentifier[] colors,
+            RenderTargetIdentifier depth,
+            int mipLevel,
+            CubemapFace cubemapFace,
+            int depthSlice
+        );
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="binding">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="cubemapFace">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
         /// <param name="depthSlice">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetBinding binding, int mipLevel, CubemapFace cubemapFace, int depthSlice) ;
+        public void SetRenderTarget(RenderTargetBinding binding, int mipLevel, CubemapFace cubemapFace, int depthSlice);
 
         /// <summary>Wraps [SetRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="binding">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRenderTarget.html)</param>
-        public void SetRenderTarget(RenderTargetBinding binding) ;
+        public void SetRenderTarget(RenderTargetBinding binding);
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="kernelIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, RenderTargetIdentifier rt) ;
+        public void SetComputeTextureParam(
+            ComputeShader computeShader,
+            int kernelIndex,
+            string name,
+            RenderTargetIdentifier rt
+        );
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="kernelIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, RenderTargetIdentifier rt) ;
+        public void SetComputeTextureParam(
+            ComputeShader computeShader,
+            int kernelIndex,
+            int nameID,
+            RenderTargetIdentifier rt
+        );
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -348,7 +526,13 @@ namespace UnityEngine.Rendering
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, RenderTargetIdentifier rt, int mipLevel) ;
+        public void SetComputeTextureParam(
+            ComputeShader computeShader,
+            int kernelIndex,
+            string name,
+            RenderTargetIdentifier rt,
+            int mipLevel
+        );
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -356,7 +540,13 @@ namespace UnityEngine.Rendering
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, RenderTargetIdentifier rt, int mipLevel) ;
+        public void SetComputeTextureParam(
+            ComputeShader computeShader,
+            int kernelIndex,
+            int nameID,
+            RenderTargetIdentifier rt,
+            int mipLevel
+        );
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -365,7 +555,14 @@ namespace UnityEngine.Rendering
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, RenderTargetIdentifier rt, int mipLevel, RenderTextureSubElement element) ;
+        public void SetComputeTextureParam(
+            ComputeShader computeShader,
+            int kernelIndex,
+            string name,
+            RenderTargetIdentifier rt,
+            int mipLevel,
+            RenderTextureSubElement element
+        );
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -374,66 +571,77 @@ namespace UnityEngine.Rendering
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, RenderTargetIdentifier rt, int mipLevel, RenderTextureSubElement element) ;
+        public void SetComputeTextureParam(
+            ComputeShader computeShader,
+            int kernelIndex,
+            int nameID,
+            RenderTargetIdentifier rt,
+            int mipLevel,
+            RenderTextureSubElement element
+        );
 
         /// <summary>Wraps [SetRayTracingTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="rayTracingShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
-        public void SetRayTracingTextureParam(RayTracingShader rayTracingShader, string name, RenderTargetIdentifier rt) ;
+        public void SetRayTracingTextureParam(
+            RayTracingShader rayTracingShader,
+            string name,
+            RenderTargetIdentifier rt
+        );
 
         /// <summary>Wraps [SetRayTracingTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="rayTracingShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
-        public void SetRayTracingTextureParam(RayTracingShader rayTracingShader, int nameID, RenderTargetIdentifier rt) ;
+        public void SetRayTracingTextureParam(RayTracingShader rayTracingShader, int nameID, RenderTargetIdentifier rt);
 
         /// <summary>Wraps [GenerateMips](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.GenerateMips.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.GenerateMips.html)</param>
-        public void GenerateMips(RenderTargetIdentifier rt) ;
+        public void GenerateMips(RenderTargetIdentifier rt);
 
         /// <summary>Wraps [GenerateMips](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.GenerateMips.html) on a CommandBuffer.</summary>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.GenerateMips.html)</param>
-        public void GenerateMips(RenderTexture rt) ;
+        public void GenerateMips(RenderTexture rt);
 
         /// <summary>Wraps [SetRandomWriteTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html) on a CommandBuffer.</summary>
         /// <param name="index">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
-        public void SetRandomWriteTarget(int index, RenderTargetIdentifier rt) ;
+        public void SetRandomWriteTarget(int index, RenderTargetIdentifier rt);
 
         /// <summary>Wraps [SetRandomWriteTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html) on a CommandBuffer.</summary>
         /// <param name="index">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
         /// <param name="preserveCounterValue">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
-        public void SetRandomWriteTarget(int index, ComputeBuffer buffer, bool preserveCounterValue) ;
+        public void SetRandomWriteTarget(int index, ComputeBuffer buffer, bool preserveCounterValue);
 
         /// <summary>Wraps [SetRandomWriteTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html) on a CommandBuffer.</summary>
         /// <param name="index">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
-        public void SetRandomWriteTarget(int index, ComputeBuffer buffer) ;
+        public void SetRandomWriteTarget(int index, ComputeBuffer buffer);
 
         /// <summary>Wraps [SetRandomWriteTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html) on a CommandBuffer.</summary>
         /// <param name="index">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
         /// <param name="preserveCounterValue">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
-        public void SetRandomWriteTarget(int index, GraphicsBuffer buffer, bool preserveCounterValue) ;
+        public void SetRandomWriteTarget(int index, GraphicsBuffer buffer, bool preserveCounterValue);
 
         /// <summary>Wraps [SetRandomWriteTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html) on a CommandBuffer.</summary>
         /// <param name="index">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRandomWriteTarget.html)</param>
-        public void SetRandomWriteTarget(int index, GraphicsBuffer buffer) ;
+        public void SetRandomWriteTarget(int index, GraphicsBuffer buffer);
 
         /// <summary>Wraps [CopyTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="dst">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
-        public void CopyTexture(RenderTargetIdentifier src, RenderTargetIdentifier dst) ;
+        public void CopyTexture(RenderTargetIdentifier src, RenderTargetIdentifier dst);
 
         /// <summary>Wraps [CopyTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="srcElement">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="dst">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="dstElement">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
-        public void CopyTexture(RenderTargetIdentifier src, int srcElement, RenderTargetIdentifier dst, int dstElement) ;
+        public void CopyTexture(RenderTargetIdentifier src, int srcElement, RenderTargetIdentifier dst, int dstElement);
 
         /// <summary>Wraps [CopyTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
@@ -442,7 +650,14 @@ namespace UnityEngine.Rendering
         /// <param name="dst">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="dstElement">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="dstMip">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
-        public void CopyTexture(RenderTargetIdentifier src, int srcElement, int srcMip, RenderTargetIdentifier dst, int dstElement, int dstMip) ;
+        public void CopyTexture(
+            RenderTargetIdentifier src,
+            int srcElement,
+            int srcMip,
+            RenderTargetIdentifier dst,
+            int dstElement,
+            int dstMip
+        );
 
         /// <summary>Wraps [CopyTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html) on a CommandBuffer.</summary>
         /// <param name="src">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
@@ -457,29 +672,41 @@ namespace UnityEngine.Rendering
         /// <param name="dstMip">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="dstX">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
         /// <param name="dstY">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.CopyTexture.html)</param>
-        public void CopyTexture(RenderTargetIdentifier src, int srcElement, int srcMip, int srcX, int srcY, int srcWidth, int srcHeight, RenderTargetIdentifier dst, int dstElement, int dstMip, int dstX, int dstY) ;
+        public void CopyTexture(
+            RenderTargetIdentifier src,
+            int srcElement,
+            int srcMip,
+            int srcX,
+            int srcY,
+            int srcWidth,
+            int srcHeight,
+            RenderTargetIdentifier dst,
+            int dstElement,
+            int dstMip,
+            int dstX,
+            int dstY
+        );
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(string name, RenderTargetIdentifier value) ;
+        public void SetGlobalTexture(string name, RenderTargetIdentifier value);
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(int nameID, RenderTargetIdentifier value) ;
+        public void SetGlobalTexture(int nameID, RenderTargetIdentifier value);
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(string name, RenderTargetIdentifier value, RenderTextureSubElement element) ;
+        public void SetGlobalTexture(string name, RenderTargetIdentifier value, RenderTextureSubElement element);
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(int nameID, RenderTargetIdentifier value, RenderTextureSubElement element) ;
-
+        public void SetGlobalTexture(int nameID, RenderTargetIdentifier value, RenderTextureSubElement element);
     }
 }

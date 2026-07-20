@@ -15,7 +15,8 @@ namespace Unity.Netcode
         /// <param name="clientId">The destination clientId</param>
         /// <param name="message">The message being sent</param>
         /// <param name="delivery"></param>
-        public void OnBeforeSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery) where T : INetworkMessage;
+        public void OnBeforeSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery)
+            where T : INetworkMessage;
 
         /// <summary>
         /// Called after an individual message is sent.
@@ -24,7 +25,8 @@ namespace Unity.Netcode
         /// <param name="message">The message being sent</param>
         /// <param name="delivery"></param>
         /// <param name="messageSizeBytes">Number of bytes in the message, not including the message header</param>
-        public void OnAfterSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery, int messageSizeBytes) where T : INetworkMessage;
+        public void OnAfterSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery, int messageSizeBytes)
+            where T : INetworkMessage;
 
         /// <summary>
         /// Called before an individual message is received.
@@ -76,7 +78,6 @@ namespace Unity.Netcode
         /// <param name="batchSizeInBytes">Number of bytes in the batch, including the batch header</param>
         public void OnAfterReceiveBatch(ulong senderId, int messageCount, int batchSizeInBytes);
 
-
         /// <summary>
         /// Called before a message is sent. If this returns false, the message will be discarded.
         /// </summary>
@@ -94,7 +95,12 @@ namespace Unity.Netcode
         /// <param name="messageContent">The FastBufferReader containing the message</param>
         /// <param name="context">The NetworkContext the message is being processed in</param>
         /// <returns></returns>
-        public bool OnVerifyCanReceive(ulong senderId, Type messageType, FastBufferReader messageContent, ref NetworkContext context);
+        public bool OnVerifyCanReceive(
+            ulong senderId,
+            Type messageType,
+            FastBufferReader messageContent,
+            ref NetworkContext context
+        );
 
         /// <summary>
         /// Called after a message is serialized, but before it's handled.
@@ -103,7 +109,8 @@ namespace Unity.Netcode
         /// <param name="message">The message object</param>
         /// <param name="context">The network context the message is being ahandled in</param>
         /// <typeparam name="T"></typeparam>
-        public void OnBeforeHandleMessage<T>(ref T message, ref NetworkContext context) where T : INetworkMessage;
+        public void OnBeforeHandleMessage<T>(ref T message, ref NetworkContext context)
+            where T : INetworkMessage;
 
         /// <summary>
         /// Called after a message is serialized and handled.
@@ -112,6 +119,7 @@ namespace Unity.Netcode
         /// <param name="message">The message object</param>
         /// <param name="context">The network context the message is being ahandled in</param>
         /// <typeparam name="T"></typeparam>
-        public void OnAfterHandleMessage<T>(ref T message, ref NetworkContext context) where T : INetworkMessage;
+        public void OnAfterHandleMessage<T>(ref T message, ref NetworkContext context)
+            where T : INetworkMessage;
     }
 }

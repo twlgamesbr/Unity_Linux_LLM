@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
-using UnityEngine.Rendering;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace UnityEditor.Rendering
 {
@@ -30,7 +30,12 @@ namespace UnityEditor.Rendering
 
         enum PrimitiveType
         {
-            Float, Int, UInt, Bool, Half, Real
+            Float,
+            Int,
+            UInt,
+            Bool,
+            Half,
+            Real,
         };
 
         static string PrimitiveToString(PrimitiveType type, int rows, int cols)
@@ -93,7 +98,14 @@ namespace UnityEditor.Rendering
 
         class ShaderFieldInfo : ICloneable
         {
-            public ShaderFieldInfo(PrimitiveType type, string name, int rows, int cols, int arraySize, string preprocessor)
+            public ShaderFieldInfo(
+                PrimitiveType type,
+                string name,
+                int rows,
+                int cols,
+                int arraySize,
+                string preprocessor
+            )
             {
                 this.type = type;
                 this.name = originalName = name;
@@ -107,7 +119,15 @@ namespace UnityEditor.Rendering
                 accessor = new Accessor(type, name, rows, cols);
             }
 
-            public ShaderFieldInfo(PrimitiveType type, string name, int rows, int cols, int arraySize, string comment, string preprocessor)
+            public ShaderFieldInfo(
+                PrimitiveType type,
+                string name,
+                int rows,
+                int cols,
+                int arraySize,
+                string comment,
+                string preprocessor
+            )
             {
                 this.type = type;
                 this.name = originalName = name;
@@ -183,7 +203,16 @@ namespace UnityEditor.Rendering
 
         class DebugFieldInfo
         {
-            public DebugFieldInfo(string defineName, string fieldName, Type fieldType, bool isDirection, bool isSRGB, bool checkIsNormalized, string displayName = "", string preprocessor = "")
+            public DebugFieldInfo(
+                string defineName,
+                string fieldName,
+                Type fieldType,
+                bool isDirection,
+                bool isSRGB,
+                bool checkIsNormalized,
+                string displayName = "",
+                string preprocessor = ""
+            )
             {
                 this.defineName = defineName;
                 this.fieldName = fieldName;
@@ -239,12 +268,29 @@ namespace UnityEditor.Rendering
             }
         }
 
-        void EmitPrimitiveType(PrimitiveType type, int elements, int arraySize, string name, string comment, string preprocessor, List<ShaderFieldInfo> fields)
+        void EmitPrimitiveType(
+            PrimitiveType type,
+            int elements,
+            int arraySize,
+            string name,
+            string comment,
+            string preprocessor,
+            List<ShaderFieldInfo> fields
+        )
         {
             fields.Add(new ShaderFieldInfo(type, name, elements, 1, arraySize, comment, preprocessor));
         }
 
-        void EmitMatrixType(PrimitiveType type, int rows, int cols, int arraySize, string name, string comment, string preprocessor, List<ShaderFieldInfo> fields)
+        void EmitMatrixType(
+            PrimitiveType type,
+            int rows,
+            int cols,
+            int arraySize,
+            string name,
+            string comment,
+            string preprocessor,
+            List<ShaderFieldInfo> fields
+        )
         {
             fields.Add(new ShaderFieldInfo(type, name, rows, cols, arraySize, comment, preprocessor));
         }
@@ -267,7 +313,13 @@ namespace UnityEditor.Rendering
 
                 if (!subField.FieldType.IsPrimitive)
                 {
-                    Error("'" + fieldName + "' can not be packed into a register, since it contains a non-primitive field type '" + subField.FieldType + "'");
+                    Error(
+                        "'"
+                            + fieldName
+                            + "' can not be packed into a register, since it contains a non-primitive field type '"
+                            + subField.FieldType
+                            + "'"
+                    );
                     return false;
                 }
                 if (subField.FieldType == typeof(float))
@@ -280,13 +332,21 @@ namespace UnityEditor.Rendering
                     boolFields.Add(subField);
                 else
                 {
-                    Error("'" + fieldName + "' can not be packed into a register, since it contains an unsupported field type '" + subField.FieldType + "'");
+                    Error(
+                        "'"
+                            + fieldName
+                            + "' can not be packed into a register, since it contains an unsupported field type '"
+                            + subField.FieldType
+                            + "'"
+                    );
                     return false;
                 }
 
                 if (numFields == 4)
                 {
-                    Error("'" + fieldName + "' can not be packed into a register because it contains more than 4 fields.");
+                    Error(
+                        "'" + fieldName + "' can not be packed into a register because it contains more than 4 fields."
+                    );
                     return false;
                 }
 
@@ -296,7 +356,8 @@ namespace UnityEditor.Rendering
             Array.Resize(ref descs, numFields);
 
             string comment = string.Concat(descs);
-            string mismatchErrorMsg = "'" + fieldName + "' can not be packed into a single register because it contains mixed basic types.";
+            string mismatchErrorMsg =
+                "'" + fieldName + "' can not be packed into a single register because it contains mixed basic types.";
 
             if (floatFields.Count > 0)
             {
@@ -305,7 +366,15 @@ namespace UnityEditor.Rendering
                     Error(mismatchErrorMsg);
                     return false;
                 }
-                EmitPrimitiveType(PrimitiveType.Float, floatFields.Count, 0, field.Name, comment, preprocessor, shaderFields);
+                EmitPrimitiveType(
+                    PrimitiveType.Float,
+                    floatFields.Count,
+                    0,
+                    field.Name,
+                    comment,
+                    preprocessor,
+                    shaderFields
+                );
             }
             else if (intFields.Count > 0)
             {
@@ -346,7 +415,7 @@ namespace UnityEditor.Rendering
         {
             Merged,
             Full,
-            Failed
+            Failed,
         };
 
         MergeResult PackFields(ShaderFieldInfo info, ref ShaderFieldInfo merged)
@@ -358,21 +427,41 @@ namespace UnityEditor.Rendering
 
             if (info.type != merged.type)
             {
-                Error("can't merge '" + merged.DeclString() + "' and '" + info.DeclString() + "' into the same register because they have incompatible types.  Consider reordering the fields so that adjacent fields have the same primitive type.");
-                return MergeResult.Failed;  // incompatible types
+                Error(
+                    "can't merge '"
+                        + merged.DeclString()
+                        + "' and '"
+                        + info.DeclString()
+                        + "' into the same register because they have incompatible types.  Consider reordering the fields so that adjacent fields have the same primitive type."
+                );
+                return MergeResult.Failed; // incompatible types
             }
 
             if (info.cols > 1 || merged.cols > 1)
             {
-                Error("merging matrix types not yet supported ('" + merged.DeclString() + "' and '" + info.DeclString() + "').  Consider reordering the fields to place matrix-typed variables on four-component vector boundaries.");
-                return MergeResult.Failed;  // don't merge matrix types
+                Error(
+                    "merging matrix types not yet supported ('"
+                        + merged.DeclString()
+                        + "' and '"
+                        + info.DeclString()
+                        + "').  Consider reordering the fields to place matrix-typed variables on four-component vector boundaries."
+                );
+                return MergeResult.Failed; // don't merge matrix types
             }
 
             if (info.rows + merged.rows > 4)
             {
                 // @TODO:  lift the restriction
-                Error("can't merge '" + merged.DeclString() + "' and '" + info.DeclString() + "' because then " + info.name + " would cross register boundary.  Consider reordering the fields so that none of them cross four-component vector boundaries when packed.");
-                return MergeResult.Failed;  // out of space
+                Error(
+                    "can't merge '"
+                        + merged.DeclString()
+                        + "' and '"
+                        + info.DeclString()
+                        + "' because then "
+                        + info.name
+                        + " would cross register boundary.  Consider reordering the fields so that none of them cross four-component vector boundaries when packed."
+                );
+                return MergeResult.Failed; // out of space
             }
 
             merged.rows += info.rows;
@@ -486,9 +575,23 @@ namespace UnityEditor.Rendering
                     setterName = setterOrInit + char.ToUpper(setterName[0]) + setterName.Substring(1);
 
                     if (shaderField.arraySize > 0)
-                        shaderText += "void " + setterName + "(int index, " + shaderField.typeString + " newValue, inout " + type.Name + " dest )\n";
+                        shaderText +=
+                            "void "
+                            + setterName
+                            + "(int index, "
+                            + shaderField.typeString
+                            + " newValue, inout "
+                            + type.Name
+                            + " dest )\n";
                     else
-                        shaderText += "void " + setterName + "(" + shaderField.typeString + " newValue, inout " + type.Name + " dest )\n";
+                        shaderText +=
+                            "void "
+                            + setterName
+                            + "("
+                            + shaderField.typeString
+                            + " newValue, inout "
+                            + type.Name
+                            + " dest )\n";
                     shaderText += "{\n";
 
                     string arrayAccess = "";
@@ -500,8 +603,11 @@ namespace UnityEditor.Rendering
 
                     shaderText +=
                         //"\t"
-                        "    "         // unity convention use space instead of tab...
-                        + "dest." + acc.name + arrayAccess + " = newValue;\n";
+                        "    " // unity convention use space instead of tab...
+                        + "dest."
+                        + acc.name
+                        + arrayAccess
+                        + " = newValue;\n";
                     shaderText += "}\n";
                 }
             }
@@ -525,7 +631,8 @@ namespace UnityEditor.Rendering
                     accessorName = "Get" + char.ToUpper(accessorName[0]) + accessorName.Substring(1);
 
                     if (shaderField.arraySize > 0)
-                        shaderText += shaderField.typeString + " " + accessorName + "(" + type.Name + " value, int index)\n";
+                        shaderText +=
+                            shaderField.typeString + " " + accessorName + "(" + type.Name + " value, int index)\n";
                     else
                         shaderText += shaderField.typeString + " " + accessorName + "(" + type.Name + " value)\n";
                     shaderText += "{\n";
@@ -550,8 +657,12 @@ namespace UnityEditor.Rendering
 
                     shaderText +=
                         //"\t"
-                        "    "         // unity convention use space instead of tab...
-                        + "return value." + acc.name + swizzle + arrayAccess + ";\n";
+                        "    " // unity convention use space instead of tab...
+                        + "return value."
+                        + acc.name
+                        + swizzle
+                        + arrayAccess
+                        + ";\n";
                     shaderText += "}\n";
                 }
             }
@@ -589,7 +700,14 @@ namespace UnityEditor.Rendering
             shaderText += "// Debug functions\n";
             shaderText += "//\n";
 
-            shaderText += "void GetGenerated" + type.Name + "Debug(uint paramId, " + type.Name + " " + lowerStructName + ", inout float3 result, inout bool needLinearToSRGB)\n";
+            shaderText +=
+                "void GetGenerated"
+                + type.Name
+                + "Debug(uint paramId, "
+                + type.Name
+                + " "
+                + lowerStructName
+                + ", inout float3 result, inout bool needLinearToSRGB)\n";
             shaderText += "{\n";
             shaderText += "    switch (paramId)\n";
             shaderText += "    {\n";
@@ -606,16 +724,23 @@ namespace UnityEditor.Rendering
                 {
                     if (debugField.isDirection)
                     {
-                        shaderText += "            result = " + lowerStructName + "." + debugField.fieldName + ".xxx * 0.5 + 0.5;\n";
+                        shaderText +=
+                            "            result = "
+                            + lowerStructName
+                            + "."
+                            + debugField.fieldName
+                            + ".xxx * 0.5 + 0.5;\n";
                     }
                     else
                     {
-                        shaderText += "            result = " + lowerStructName + "." + debugField.fieldName + ".xxx;\n";
+                        shaderText +=
+                            "            result = " + lowerStructName + "." + debugField.fieldName + ".xxx;\n";
                     }
                 }
                 else if (debugField.fieldType == typeof(Vector2))
                 {
-                    shaderText += "            result = float3(" + lowerStructName + "." + debugField.fieldName + ", 0.0);\n";
+                    shaderText +=
+                        "            result = float3(" + lowerStructName + "." + debugField.fieldName + ", 0.0);\n";
                 }
                 else if (debugField.fieldType == typeof(Vector3))
                 {
@@ -623,11 +748,25 @@ namespace UnityEditor.Rendering
                     {
                         if (debugField.checkIsNormalized)
                         {
-                            shaderText += "            result = IsNormalized(" + lowerStructName + "." + debugField.fieldName + ")? " + lowerStructName + "." + debugField.fieldName + " * 0.5 + 0.5 : float3(1.0, 0.0, 0.0);\n";
+                            shaderText +=
+                                "            result = IsNormalized("
+                                + lowerStructName
+                                + "."
+                                + debugField.fieldName
+                                + ")? "
+                                + lowerStructName
+                                + "."
+                                + debugField.fieldName
+                                + " * 0.5 + 0.5 : float3(1.0, 0.0, 0.0);\n";
                         }
                         else
                         {
-                            shaderText += "            result = " + lowerStructName + "." + debugField.fieldName + " * 0.5 + 0.5;\n";
+                            shaderText +=
+                                "            result = "
+                                + lowerStructName
+                                + "."
+                                + debugField.fieldName
+                                + " * 0.5 + 0.5;\n";
                         }
                     }
                     else
@@ -641,15 +780,22 @@ namespace UnityEditor.Rendering
                 }
                 else if (debugField.fieldType == typeof(bool))
                 {
-                    shaderText += "            result = (" + lowerStructName + "." + debugField.fieldName + ") ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);\n";
+                    shaderText +=
+                        "            result = ("
+                        + lowerStructName
+                        + "."
+                        + debugField.fieldName
+                        + ") ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);\n";
                 }
                 else if (debugField.fieldType == typeof(uint) || debugField.fieldType == typeof(int))
                 {
-                    shaderText += "            result = GetIndexColor(" + lowerStructName + "." + debugField.fieldName + ");\n";
+                    shaderText +=
+                        "            result = GetIndexColor(" + lowerStructName + "." + debugField.fieldName + ");\n";
                 }
                 else // This case left is suppose to be a complex structure. Either we don't support it or it is an enum. Consider it is an enum with GetIndexColor, user can override it if he want.
                 {
-                    shaderText += "            result = GetIndexColor(" + lowerStructName + "." + debugField.fieldName + ");\n";
+                    shaderText +=
+                        "            result = GetIndexColor(" + lowerStructName + "." + debugField.fieldName + ");\n";
                 }
 
                 if (debugField.isSRGB)
@@ -690,7 +836,14 @@ namespace UnityEditor.Rendering
             shaderText += "// Debug functions\n";
             shaderText += "//\n";
 
-            shaderText += "void GetGenerated" + type.Name + "Debug(uint paramId, " + type.Name + " " + lowerStructName + ", inout float3 result, inout bool needLinearToSRGB)\n";
+            shaderText +=
+                "void GetGenerated"
+                + type.Name
+                + "Debug(uint paramId, "
+                + type.Name
+                + " "
+                + lowerStructName
+                + ", inout float3 result, inout bool needLinearToSRGB)\n";
             shaderText += "{\n";
             shaderText += "    switch (paramId)\n";
             shaderText += "    {\n";
@@ -702,43 +855,87 @@ namespace UnityEditor.Rendering
                 {
                     if (debugField.isDirection)
                     {
-                        shaderText += "            result = Get" + debugField.displayName + "(" + lowerStructName + ")" + ".xxx * 0.5 + 0.5;\n";
+                        shaderText +=
+                            "            result = Get"
+                            + debugField.displayName
+                            + "("
+                            + lowerStructName
+                            + ")"
+                            + ".xxx * 0.5 + 0.5;\n";
                     }
                     else
                     {
-                        shaderText += "            result = Get" + debugField.displayName + "(" + lowerStructName + ")" + ".xxx;\n";
+                        shaderText +=
+                            "            result = Get"
+                            + debugField.displayName
+                            + "("
+                            + lowerStructName
+                            + ")"
+                            + ".xxx;\n";
                     }
                 }
                 else if (debugField.fieldType == typeof(Vector2))
                 {
-                    shaderText += "            result = float3(" + "Get" + debugField.displayName + "(" + lowerStructName + "), 0.0);\n";
+                    shaderText +=
+                        "            result = float3("
+                        + "Get"
+                        + debugField.displayName
+                        + "("
+                        + lowerStructName
+                        + "), 0.0);\n";
                 }
                 else if (debugField.fieldType == typeof(Vector3))
                 {
                     if (debugField.isDirection)
                     {
-                        shaderText += "            result = Get" + debugField.displayName + "(" + lowerStructName + ")" + " * 0.5 + 0.5;\n";
+                        shaderText +=
+                            "            result = Get"
+                            + debugField.displayName
+                            + "("
+                            + lowerStructName
+                            + ")"
+                            + " * 0.5 + 0.5;\n";
                     }
                     else
                     {
-                        shaderText += "            result = Get" + debugField.displayName + "(" + lowerStructName + ")" + ";\n";
+                        shaderText +=
+                            "            result = Get" + debugField.displayName + "(" + lowerStructName + ")" + ";\n";
                     }
                 }
                 else if (debugField.fieldType == typeof(Vector4))
                 {
-                    shaderText += "            result = Get" + debugField.displayName + "(" + lowerStructName + ")" + ".xyz;\n";
+                    shaderText +=
+                        "            result = Get" + debugField.displayName + "(" + lowerStructName + ")" + ".xyz;\n";
                 }
                 else if (debugField.fieldType == typeof(bool))
                 {
-                    shaderText += "            result = (" + "Get" + debugField.displayName + "(" + lowerStructName + ") ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);\n";
+                    shaderText +=
+                        "            result = ("
+                        + "Get"
+                        + debugField.displayName
+                        + "("
+                        + lowerStructName
+                        + ") ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);\n";
                 }
                 else if (debugField.fieldType == typeof(uint) || debugField.fieldType == typeof(int))
                 {
-                    shaderText += "            result = GetIndexColor(" + "Get" + debugField.displayName + "(" + lowerStructName + "));\n";
+                    shaderText +=
+                        "            result = GetIndexColor("
+                        + "Get"
+                        + debugField.displayName
+                        + "("
+                        + lowerStructName
+                        + "));\n";
                 }
                 else // This case left is suppose to be a complex structure. Either we don't support it or it is an enum. Consider it is an enum with GetIndexColor, user can override it if he want.
                 {
-                    shaderText += "            result = GetIndexColor(" + "Get" + debugField.displayName + "(" + lowerStructName + "));\n";
+                    shaderText +=
+                        "            result = GetIndexColor("
+                        + "Get"
+                        + debugField.displayName
+                        + "("
+                        + lowerStructName
+                        + "));\n";
                 }
 
                 if (debugField.isSRGB)
@@ -771,7 +968,8 @@ namespace UnityEditor.Rendering
             foreach (PackedFieldInfo packedInfo in m_PackedFieldsInfos)
             {
                 string sourceName = type.Name.ToLower();
-                string funcSignature = "Get" + packedInfo.packingAttribute.displayNames[0] + "(in " + type.Name + " " + sourceName + ")";
+                string funcSignature =
+                    "Get" + packedInfo.packingAttribute.displayNames[0] + "(in " + type.Name + " " + sourceName + ")";
                 string funcBody = "\n{\n    ";
                 string funcBodyBeforeReturn = "";
                 float minValue = packedInfo.packingAttribute.range[0];
@@ -785,20 +983,40 @@ namespace UnityEditor.Rendering
                 {
                     case FieldPacking.PackedFloat:
                         funcSignature = "float " + funcSignature;
-                        funcBodyBeforeReturn = "UnpackUIntToFloat(" + sourceName + "." + packedInfo.fieldName + ", " + packedInfo.packingAttribute.offsetInSource + ", " + packedInfo.packingAttribute.sizeInBits + ")";
+                        funcBodyBeforeReturn =
+                            "UnpackUIntToFloat("
+                            + sourceName
+                            + "."
+                            + packedInfo.fieldName
+                            + ", "
+                            + packedInfo.packingAttribute.offsetInSource
+                            + ", "
+                            + packedInfo.packingAttribute.sizeInBits
+                            + ")";
                         if (renormalizedRange)
                         {
-                            funcBodyBeforeReturn = "((" + funcBodyBeforeReturn + " * " + maxMinusMinString + ") " + minValueString + ")";
+                            funcBodyBeforeReturn =
+                                "((" + funcBodyBeforeReturn + " * " + maxMinusMinString + ") " + minValueString + ")";
                         }
 
                         funcBody += "return " + funcBodyBeforeReturn + ";";
                         break;
                     case FieldPacking.PackedUint:
                         funcSignature = "uint " + funcSignature;
-                        funcBodyBeforeReturn = "BitFieldExtract(" + sourceName + "." + packedInfo.fieldName + ", " + packedInfo.packingAttribute.offsetInSource + ", " + packedInfo.packingAttribute.sizeInBits + ")";
+                        funcBodyBeforeReturn =
+                            "BitFieldExtract("
+                            + sourceName
+                            + "."
+                            + packedInfo.fieldName
+                            + ", "
+                            + packedInfo.packingAttribute.offsetInSource
+                            + ", "
+                            + packedInfo.packingAttribute.sizeInBits
+                            + ")";
                         if (renormalizedRange)
                         {
-                            funcBodyBeforeReturn = "((" + funcBodyBeforeReturn + " * " + maxMinusMinString + ") " + minValueString + ")";
+                            funcBodyBeforeReturn =
+                                "((" + funcBodyBeforeReturn + " * " + maxMinusMinString + ") " + minValueString + ")";
                         }
                         funcBody += "return " + funcBodyBeforeReturn + ";";
                         break;
@@ -807,7 +1025,8 @@ namespace UnityEditor.Rendering
                         funcBodyBeforeReturn = "UnpackFromR11G11B10f(" + sourceName + "." + packedInfo.fieldName + ")";
                         if (renormalizedRange)
                         {
-                            funcBodyBeforeReturn = "((" + funcBodyBeforeReturn + " * " + maxMinusMinString + ") " + minValueString + ")";
+                            funcBodyBeforeReturn =
+                                "((" + funcBodyBeforeReturn + " * " + maxMinusMinString + ") " + minValueString + ")";
                         }
                         funcBody += "return " + funcBodyBeforeReturn + ";";
                         break;
@@ -880,27 +1099,81 @@ namespace UnityEditor.Rendering
                         newParamCode = newParamName;
                         if (renormalizedRange)
                         {
-                            newParamCode = "((" + newParamCode + " * " + maxMinusMinInvString + ") " + minOvermaxMinusMinString + ")";
+                            newParamCode =
+                                "(("
+                                + newParamCode
+                                + " * "
+                                + maxMinusMinInvString
+                                + ") "
+                                + minOvermaxMinusMinString
+                                + ")";
                         }
-                        funcBody += sourceName + "." + packedInfo.fieldName + " = BitFieldInsert(" + maskString + shiftString + ", UnpackInt(" + newParamCode + ", " + attr.sizeInBits + ")" + shiftString + ", " + sourceName + "." + packedInfo.fieldName + ");";
+                        funcBody +=
+                            sourceName
+                            + "."
+                            + packedInfo.fieldName
+                            + " = BitFieldInsert("
+                            + maskString
+                            + shiftString
+                            + ", UnpackInt("
+                            + newParamCode
+                            + ", "
+                            + attr.sizeInBits
+                            + ")"
+                            + shiftString
+                            + ", "
+                            + sourceName
+                            + "."
+                            + packedInfo.fieldName
+                            + ");";
                         break;
                     case FieldPacking.PackedUint:
                         funcSignature += "uint " + newParamName + ", inout " + type.Name + " " + sourceName + ")";
                         newParamCode = newParamName;
                         if (renormalizedRange)
                         {
-                            newParamCode = "((" + newParamCode + " * " + maxMinusMinInvString + ") " + minOvermaxMinusMinString + ")";
+                            newParamCode =
+                                "(("
+                                + newParamCode
+                                + " * "
+                                + maxMinusMinInvString
+                                + ") "
+                                + minOvermaxMinusMinString
+                                + ")";
                         }
-                        funcBody += sourceName + "." + packedInfo.fieldName + " = BitFieldInsert(" + maskString + shiftString + ", (" + newParamCode + ")" + shiftString + ", " + sourceName + "." + packedInfo.fieldName + ");";
+                        funcBody +=
+                            sourceName
+                            + "."
+                            + packedInfo.fieldName
+                            + " = BitFieldInsert("
+                            + maskString
+                            + shiftString
+                            + ", ("
+                            + newParamCode
+                            + ")"
+                            + shiftString
+                            + ", "
+                            + sourceName
+                            + "."
+                            + packedInfo.fieldName
+                            + ");";
                         break;
                     case FieldPacking.R11G11B10:
                         funcSignature += "float3 " + newParamName + ", inout " + type.Name + " " + sourceName + ")";
                         newParamCode = newParamName;
                         if (renormalizedRange)
                         {
-                            newParamCode = "((" + newParamCode + " * " + maxMinusMinInvString + ") " + minOvermaxMinusMinString + ")";
+                            newParamCode =
+                                "(("
+                                + newParamCode
+                                + " * "
+                                + maxMinusMinInvString
+                                + ") "
+                                + minOvermaxMinusMinString
+                                + ")";
                         }
-                        funcBody += sourceName + "." + packedInfo.fieldName + " = PackToR11G11B10f(" + newParamCode + ");";
+                        funcBody +=
+                            sourceName + "." + packedInfo.fieldName + " = PackToR11G11B10f(" + newParamCode + ");";
                         break;
                     case FieldPacking.NoPacking:
                         if (packedInfo.fieldType == typeof(uint))
@@ -933,7 +1206,6 @@ namespace UnityEditor.Rendering
                 funcSignature += "\n";
                 funcBody += "\n}\n";
 
-
                 settersString += funcSignature + funcBody;
             }
             return settersString;
@@ -965,7 +1237,6 @@ namespace UnityEditor.Rendering
                 minOvermaxMinusMinString += (Math.Abs(minOvermaxMinusMin)).ToString();
                 string maxMinusMinInvString = maxMinusMinInv.ToString();
 
-
                 string newParamCode;
                 switch (attr.packingScheme)
                 {
@@ -974,27 +1245,60 @@ namespace UnityEditor.Rendering
                         newParamCode = newParamName;
                         if (renormalizedRange)
                         {
-                            newParamCode = "((" + newParamCode + " * " + maxMinusMinInvString + ") " + minOvermaxMinusMinString + ")";
+                            newParamCode =
+                                "(("
+                                + newParamCode
+                                + " * "
+                                + maxMinusMinInvString
+                                + ") "
+                                + minOvermaxMinusMinString
+                                + ")";
                         }
-                        funcBody += sourceName + "." + packedInfo.fieldName + " |= UnpackInt(" + newParamCode + ", " + attr.sizeInBits + ")" + shiftString + "; ";
+                        funcBody +=
+                            sourceName
+                            + "."
+                            + packedInfo.fieldName
+                            + " |= UnpackInt("
+                            + newParamCode
+                            + ", "
+                            + attr.sizeInBits
+                            + ")"
+                            + shiftString
+                            + "; ";
                         break;
                     case FieldPacking.PackedUint:
                         funcSignature += "uint " + newParamName + ", inout " + type.Name + " " + sourceName + ")";
                         newParamCode = newParamName;
                         if (renormalizedRange)
                         {
-                            newParamCode = "((" + newParamCode + " * " + maxMinusMinInvString + ") " + minOvermaxMinusMinString + ")";
+                            newParamCode =
+                                "(("
+                                + newParamCode
+                                + " * "
+                                + maxMinusMinInvString
+                                + ") "
+                                + minOvermaxMinusMinString
+                                + ")";
                         }
-                        funcBody += sourceName + "." + packedInfo.fieldName + " |= (" + newParamCode + ")" + shiftString + ";";
+                        funcBody +=
+                            sourceName + "." + packedInfo.fieldName + " |= (" + newParamCode + ")" + shiftString + ";";
                         break;
                     case FieldPacking.R11G11B10:
                         funcSignature += "float3 " + newParamName + ", inout " + type.Name + " " + sourceName + ")";
                         newParamCode = newParamName;
                         if (renormalizedRange)
                         {
-                            newParamCode = "((" + newParamCode + " * " + maxMinusMinInvString + ") " + minOvermaxMinusMinString + ")";
+                            newParamCode =
+                                "(("
+                                + newParamCode
+                                + " * "
+                                + maxMinusMinInvString
+                                + ") "
+                                + minOvermaxMinusMinString
+                                + ")";
                         }
-                        funcBody += sourceName + "." + packedInfo.fieldName + " = PackToR11G11B10f(" + newParamCode + ");";
+                        funcBody +=
+                            sourceName + "." + packedInfo.fieldName + " = PackToR11G11B10f(" + newParamCode + ");";
                         break;
                     case FieldPacking.NoPacking:
                         if (packedInfo.fieldType == typeof(uint))
@@ -1033,8 +1337,10 @@ namespace UnityEditor.Rendering
 
         public string EmitPackedInfo()
         {
-            string pathToPackingHeader = "#include \"Packages/com.unity.render-pipelines.core/ShaderLibrary/Packing.hlsl\"\n";
-            string packedStructCode = pathToPackingHeader + EmitPackedGetters() + EmitPackedSetters() + EmitPackedInit() + "\n";
+            string pathToPackingHeader =
+                "#include \"Packages/com.unity.render-pipelines.core/ShaderLibrary/Packing.hlsl\"\n";
+            string packedStructCode =
+                pathToPackingHeader + EmitPackedGetters() + EmitPackedSetters() + EmitPackedInit() + "\n";
             if (attr.needParamDebug)
             {
                 packedStructCode += EmitFunctionsForPacked();
@@ -1094,12 +1400,19 @@ namespace UnityEditor.Rendering
                     if (arrayInfos.Length != 0)
                     {
                         // For constant buffers, every element of the array needs to be aligned to a Vector4
-                        if (attr.generateCBuffer &&
-                            arrayInfos[0].elementType != typeof(Vector4) &&
-                            arrayInfos[0].elementType != typeof(ShaderGenUInt4) &&
-                            arrayInfos[0].elementType != typeof(Matrix4x4))
+                        if (
+                            attr.generateCBuffer
+                            && arrayInfos[0].elementType != typeof(Vector4)
+                            && arrayInfos[0].elementType != typeof(ShaderGenUInt4)
+                            && arrayInfos[0].elementType != typeof(Matrix4x4)
+                        )
                         {
-                            Error("Invalid HLSLArray target: '" + field.FieldType + "'" + ", only Vector4, Matrix4x4 and ShaderGenUInt4 are supported for arrays in constant buffers.");
+                            Error(
+                                "Invalid HLSLArray target: '"
+                                    + field.FieldType
+                                    + "'"
+                                    + ", only Vector4, Matrix4x4 and ShaderGenUInt4 are supported for arrays in constant buffers."
+                            );
                             return false;
                         }
 
@@ -1114,7 +1427,12 @@ namespace UnityEditor.Rendering
                 }
                 else if (Attribute.IsDefined(field, typeof(HLSLArray)))
                 {
-                    Error("Invalid HLSLArray target: '" + field.FieldType + "'" + ", this attribute can only be used on fixed array");
+                    Error(
+                        "Invalid HLSLArray target: '"
+                            + field.FieldType
+                            + "'"
+                            + ", this attribute can only be used on fixed array"
+                    );
                     return false;
                 }
 
@@ -1122,7 +1440,9 @@ namespace UnityEditor.Rendering
                 {
                     string value = null;
                     if (fieldType == typeof(float))
-                        value = ((float)field.GetValue(null)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        value = ((float)field.GetValue(null)).ToString(
+                            System.Globalization.CultureInfo.InvariantCulture
+                        );
                     else if (fieldType == typeof(Vector3Int))
                     {
                         Vector3Int val = (Vector3Int)field.GetValue(null);
@@ -1159,7 +1479,8 @@ namespace UnityEditor.Rendering
                     // Check if the display name have been override by the users
                     if (Attribute.IsDefined(field, typeof(SurfaceDataAttributes)))
                     {
-                        var propertyAttr = (SurfaceDataAttributes[])field.GetCustomAttributes(typeof(SurfaceDataAttributes), false);
+                        var propertyAttr = (SurfaceDataAttributes[])
+                            field.GetCustomAttributes(typeof(SurfaceDataAttributes), false);
 
                         // User can want to only override isDirection and sRGBDisplay
                         // in this case it can specify empty string
@@ -1174,7 +1495,6 @@ namespace UnityEditor.Rendering
                         preprocessor = propertyAttr[0].preprocessor;
                     }
 
-
                     if (!attr.containsPackedFields)
                     {
                         string className = type.FullName.Substring(type.FullName.LastIndexOf((".")) + 1); // ClassName include nested class
@@ -1187,7 +1507,17 @@ namespace UnityEditor.Rendering
                             string defineName = ("DEBUGVIEW_" + className + "_" + name).ToUpper();
                             m_Statics[defineName] = Convert.ToString(attr.paramDefinesStart + debugCounter++);
 
-                            m_DebugFields.Add(new DebugFieldInfo(defineName, field.Name, fieldType, isDirection, sRGBDisplay, checkIsNormalized, preprocessor: preprocessor));
+                            m_DebugFields.Add(
+                                new DebugFieldInfo(
+                                    defineName,
+                                    field.Name,
+                                    fieldType,
+                                    isDirection,
+                                    sRGBDisplay,
+                                    checkIsNormalized,
+                                    preprocessor: preprocessor
+                                )
+                            );
                         }
                     }
                 }
@@ -1202,7 +1532,8 @@ namespace UnityEditor.Rendering
 
                     if (Attribute.IsDefined(field, typeof(PackingAttribute)))
                     {
-                        var packingAttributes = (PackingAttribute[])field.GetCustomAttributes(typeof(PackingAttribute), false);
+                        var packingAttributes = (PackingAttribute[])
+                            field.GetCustomAttributes(typeof(PackingAttribute), false);
                         isDirection = packingAttributes[0].isDirection;
                         sRGBDisplay = packingAttributes[0].sRGBDisplay;
                         checkIsNormalized = packingAttributes[0].checkIsNormalized;
@@ -1237,7 +1568,18 @@ namespace UnityEditor.Rendering
                                     typeForDebug = fieldType;
                                 }
 
-                                m_DebugFields.Add(new DebugFieldInfo(defineName, field.Name, typeForDebug, isDirection, sRGBDisplay, checkIsNormalized, packAttr.displayNames[0], preprocessor: preprocessor));
+                                m_DebugFields.Add(
+                                    new DebugFieldInfo(
+                                        defineName,
+                                        field.Name,
+                                        typeForDebug,
+                                        isDirection,
+                                        sRGBDisplay,
+                                        checkIsNormalized,
+                                        packAttr.displayNames[0],
+                                        preprocessor: preprocessor
+                                    )
+                                );
                             }
 
                             m_PackedFieldsInfos.Add(new PackedFieldInfo(packAttr, fieldType, field.Name));
@@ -1251,7 +1593,8 @@ namespace UnityEditor.Rendering
                     string preprocessor = "";
                     if (Attribute.IsDefined(field, typeof(SurfaceDataAttributes)))
                     {
-                        var propertyAttr = (SurfaceDataAttributes[])field.GetCustomAttributes(typeof(SurfaceDataAttributes), false);
+                        var propertyAttr = (SurfaceDataAttributes[])
+                            field.GetCustomAttributes(typeof(SurfaceDataAttributes), false);
                         if (propertyAttr[0].precision == FieldPrecision.Half)
                             floatPrecision = PrimitiveType.Half;
                         else if (propertyAttr[0].precision == FieldPrecision.Real)
@@ -1263,13 +1606,45 @@ namespace UnityEditor.Rendering
                     if (fieldType.IsPrimitive)
                     {
                         if (fieldType == typeof(float))
-                            EmitPrimitiveType(floatPrecision, 1, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                floatPrecision,
+                                1,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(int))
-                            EmitPrimitiveType(PrimitiveType.Int, 1, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.Int,
+                                1,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(uint))
-                            EmitPrimitiveType(PrimitiveType.UInt, 1, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.UInt,
+                                1,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(bool))
-                            EmitPrimitiveType(PrimitiveType.Bool, 1, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.Bool,
+                                1,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else
                         {
                             Error("unsupported field type '" + fieldType + "'");
@@ -1280,46 +1655,171 @@ namespace UnityEditor.Rendering
                     {
                         // handle special types, otherwise try parsing the struct
                         if (fieldType == typeof(Vector2))
-                            EmitPrimitiveType(floatPrecision, 2, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                floatPrecision,
+                                2,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(Vector3))
-                            EmitPrimitiveType(floatPrecision, 3, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                floatPrecision,
+                                3,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(Vector4))
-                            EmitPrimitiveType(floatPrecision, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                floatPrecision,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(Vector2Int))
-                            EmitPrimitiveType(PrimitiveType.Int, 2, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.Int,
+                                2,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(ShaderGenUInt4))
-                            EmitPrimitiveType(PrimitiveType.UInt, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.UInt,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(Matrix4x4))
-                            EmitMatrixType(floatPrecision, 4, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
-
+                            EmitMatrixType(
+                                floatPrecision,
+                                4,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         // Mathematics floating
                         else if (fieldType == typeof(float2))
-                            EmitPrimitiveType(floatPrecision, 2, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                floatPrecision,
+                                2,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(float3))
-                            EmitPrimitiveType(floatPrecision, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                floatPrecision,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(float4))
-                            EmitPrimitiveType(floatPrecision, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
-
+                            EmitPrimitiveType(
+                                floatPrecision,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         // Mathematics Signed integer
                         else if (fieldType == typeof(int2))
-                            EmitPrimitiveType(PrimitiveType.Int, 2, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.Int,
+                                2,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(int3))
-                            EmitPrimitiveType(PrimitiveType.Int, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.Int,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(int4))
-                            EmitPrimitiveType(PrimitiveType.Int, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
-
+                            EmitPrimitiveType(
+                                PrimitiveType.Int,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         // Mathematics Unsigned integer
                         else if (fieldType == typeof(uint2))
-                            EmitPrimitiveType(PrimitiveType.UInt, 2, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.UInt,
+                                2,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(uint3))
-                            EmitPrimitiveType(PrimitiveType.UInt, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
+                            EmitPrimitiveType(
+                                PrimitiveType.UInt,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (fieldType == typeof(uint4))
-                            EmitPrimitiveType(PrimitiveType.UInt, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
-
+                            EmitPrimitiveType(
+                                PrimitiveType.UInt,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         // Mathematics Matrix
                         else if (fieldType == typeof(float4x4))
-                            EmitMatrixType(floatPrecision, 4, 4, arraySize, field.Name, "", preprocessor, m_ShaderFields);
-
+                            EmitMatrixType(
+                                floatPrecision,
+                                4,
+                                4,
+                                arraySize,
+                                field.Name,
+                                "",
+                                preprocessor,
+                                m_ShaderFields
+                            );
                         else if (!ExtractComplex(field, preprocessor, m_ShaderFields))
                         {
                             // Error reporting done in ExtractComplex()

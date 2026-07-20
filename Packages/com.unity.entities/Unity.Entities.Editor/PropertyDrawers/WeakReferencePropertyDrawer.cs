@@ -1,10 +1,10 @@
-using UnityEditor;
-using UnityEngine;
-using Unity.Entities.Content;
-using Unity.Entities.Serialization;
 using System;
 using System.Collections;
+using Unity.Entities.Content;
+using Unity.Entities.Serialization;
+using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.Entities.Editor
@@ -23,37 +23,49 @@ namespace Unity.Entities.Editor
             var propertyY = property.serializedObject.FindProperty($"{gidName}.y");
             var propertyZ = property.serializedObject.FindProperty($"{gidName}.z");
             var propertyW = property.serializedObject.FindProperty($"{gidName}.w");
-            var propertyObjectId = property.serializedObject.FindProperty($"{property.propertyPath}.Id.GlobalId.SceneObjectIdentifier0");
-            var propertyIdType = property.serializedObject.FindProperty($"{property.propertyPath}.Id.GlobalId.IdentifierType");
+            var propertyObjectId = property.serializedObject.FindProperty(
+                $"{property.propertyPath}.Id.GlobalId.SceneObjectIdentifier0"
+            );
+            var propertyIdType = property.serializedObject.FindProperty(
+                $"{property.propertyPath}.Id.GlobalId.IdentifierType"
+            );
             var genType = property.serializedObject.FindProperty($"{property.propertyPath}.Id.GenerationType");
             var uwrid = new UntypedWeakReferenceId(
-                new Hash128((uint)propertyX.longValue, (uint)propertyY.longValue, (uint)propertyZ.longValue, (uint)propertyW.longValue),
+                new Hash128(
+                    (uint)propertyX.longValue,
+                    (uint)propertyY.longValue,
+                    (uint)propertyZ.longValue,
+                    (uint)propertyW.longValue
+                ),
                 propertyObjectId.longValue,
                 propertyIdType.intValue,
-                GenerationType);
+                GenerationType
+            );
 
             var currObject = UntypedWeakReferenceId.GetEditorObject(uwrid);
             var objectField = new ObjectField
             {
                 objectType = targetObjectType,
                 allowSceneObjects = false,
-                label = property.name
+                label = property.name,
             };
 
             objectField.SetValueWithoutNotify(currObject);
-            objectField.RegisterCallback((ChangeEvent<UnityEngine.Object> e) =>
-            {
-                var uwr = UntypedWeakReferenceId.CreateFromObjectInstance(e.newValue);
-                propertyX.longValue = uwr.GlobalId.AssetGUID.Value.x;
-                propertyY.longValue = uwr.GlobalId.AssetGUID.Value.y;
-                propertyZ.longValue = uwr.GlobalId.AssetGUID.Value.z;
-                propertyW.longValue = uwr.GlobalId.AssetGUID.Value.w;
-                propertyObjectId.longValue = uwr.GlobalId.SceneObjectIdentifier0;
-                propertyIdType.intValue = uwr.GlobalId.IdentifierType;
-                genType.enumValueIndex = (int)GenerationType;
-                property.serializedObject.ApplyModifiedProperties();
-            });
-           objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+            objectField.RegisterCallback(
+                (ChangeEvent<UnityEngine.Object> e) =>
+                {
+                    var uwr = UntypedWeakReferenceId.CreateFromObjectInstance(e.newValue);
+                    propertyX.longValue = uwr.GlobalId.AssetGUID.Value.x;
+                    propertyY.longValue = uwr.GlobalId.AssetGUID.Value.y;
+                    propertyZ.longValue = uwr.GlobalId.AssetGUID.Value.z;
+                    propertyW.longValue = uwr.GlobalId.AssetGUID.Value.w;
+                    propertyObjectId.longValue = uwr.GlobalId.SceneObjectIdentifier0;
+                    propertyIdType.intValue = uwr.GlobalId.IdentifierType;
+                    genType.enumValueIndex = (int)GenerationType;
+                    property.serializedObject.ApplyModifiedProperties();
+                }
+            );
+            objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
             container.Add(objectField);
 
             return container;
@@ -67,15 +79,25 @@ namespace Unity.Entities.Editor
             var propertyY = property.serializedObject.FindProperty($"{gidName}.y");
             var propertyZ = property.serializedObject.FindProperty($"{gidName}.z");
             var propertyW = property.serializedObject.FindProperty($"{gidName}.w");
-            var propertyObjectId = property.serializedObject.FindProperty($"{property.propertyPath}.Id.GlobalId.SceneObjectIdentifier0");
-            var propertyIdType = property.serializedObject.FindProperty($"{property.propertyPath}.Id.GlobalId.IdentifierType");
+            var propertyObjectId = property.serializedObject.FindProperty(
+                $"{property.propertyPath}.Id.GlobalId.SceneObjectIdentifier0"
+            );
+            var propertyIdType = property.serializedObject.FindProperty(
+                $"{property.propertyPath}.Id.GlobalId.IdentifierType"
+            );
             var genType = property.serializedObject.FindProperty($"{property.propertyPath}.Id.GenerationType");
 
             var uwrid = new UntypedWeakReferenceId(
-                new Hash128((uint)propertyX.longValue, (uint)propertyY.longValue, (uint)propertyZ.longValue, (uint)propertyW.longValue),
+                new Hash128(
+                    (uint)propertyX.longValue,
+                    (uint)propertyY.longValue,
+                    (uint)propertyZ.longValue,
+                    (uint)propertyW.longValue
+                ),
                 propertyObjectId.longValue,
                 propertyIdType.intValue,
-                GenerationType);
+                GenerationType
+            );
 
             var currObject = UntypedWeakReferenceId.GetEditorObject(uwrid);
 
@@ -94,7 +116,6 @@ namespace Unity.Entities.Editor
                 propertyIdType.intValue = uwr.GlobalId.IdentifierType;
                 genType.enumValueIndex = (int)GenerationType;
                 property.serializedObject.ApplyModifiedProperties();
-
             }
         }
 

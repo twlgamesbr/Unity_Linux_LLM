@@ -1,5 +1,4 @@
 using System;
-
 using static Unity.Multiplayer.Tools.Common.BandwidthTypes;
 
 namespace Unity.Multiplayer.Tools.Common
@@ -16,7 +15,7 @@ namespace Unity.Multiplayer.Tools.Common
         NetVar = 1 << 1,
         Rpc = 1 << 2,
 
-        All = Other | NetVar | Rpc
+        All = Other | NetVar | Rpc,
     }
 
     static class BandwidthTypesExtensions
@@ -35,9 +34,8 @@ namespace Unity.Multiplayer.Tools.Common
                 Other | Rpc => "RPCs and Other",
                 NetVar | Rpc => "NetVars and RPCs",
 
-                _ => throw new ArgumentOutOfRangeException($"Unknow {nameof(NetworkDirection)} {direction}")
+                _ => throw new ArgumentOutOfRangeException($"Unknow {nameof(NetworkDirection)} {direction}"),
             };
         }
     }
 }
-

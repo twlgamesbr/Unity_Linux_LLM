@@ -13,6 +13,6 @@ namespace Unity.Entities.CodeGen
             DiagnosticMessages = diagnosticMessages;
         }
 
-        public  override string ToString() => DiagnosticMessages.Select(dm => dm.MessageData).SeparateByComma();
+        public override string ToString() => DiagnosticMessages.Select(dm => dm.MessageData).SeparateByComma();
     }
 }

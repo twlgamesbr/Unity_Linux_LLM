@@ -2,7 +2,8 @@ namespace Unity.Netcode
 {
     internal class ProxyRpcTarget : ProxyRpcTargetGroup, IIndividualRpcTarget
     {
-        internal ProxyRpcTarget(ulong clientId, NetworkManager manager) : base(manager)
+        internal ProxyRpcTarget(ulong clientId, NetworkManager manager)
+            : base(manager)
         {
             Add(clientId);
         }

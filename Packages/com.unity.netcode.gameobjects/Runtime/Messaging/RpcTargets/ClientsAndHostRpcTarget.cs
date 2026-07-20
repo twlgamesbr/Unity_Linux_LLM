@@ -9,7 +9,12 @@ namespace Unity.Netcode
             m_UnderlyingTarget = null;
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             if (m_UnderlyingTarget == null)
             {
@@ -18,7 +23,10 @@ namespace Unity.Netcode
                 // So if the server is a host, this target includes it (as hosts run client logic)
                 // If the server is not a host, this target leaves it out, ergo the selection of NotServer.
                 // If we are in distributed authority mode and connected to a service, then send to all clients.
-                if (behaviour.NetworkManager.ServerIsHost || (m_NetworkManager.DistributedAuthorityMode && m_NetworkManager.CMBServiceConnection))
+                if (
+                    behaviour.NetworkManager.ServerIsHost
+                    || (m_NetworkManager.DistributedAuthorityMode && m_NetworkManager.CMBServiceConnection)
+                )
                 {
                     m_UnderlyingTarget = behaviour.RpcTarget.Everyone;
                 }
@@ -31,8 +39,7 @@ namespace Unity.Netcode
             m_UnderlyingTarget.Send(behaviour, ref message, delivery, rpcParams);
         }
 
-        internal ClientsAndHostRpcTarget(NetworkManager manager) : base(manager)
-        {
-        }
+        internal ClientsAndHostRpcTarget(NetworkManager manager)
+            : base(manager) { }
     }
 }

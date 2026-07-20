@@ -114,7 +114,7 @@ namespace Unity.Networking.Transport.Analytics
                 Current = BytesToKilobits(data.PeriodBytes),
                 Minimum = timeDelta >= k_PeriodLength ? BytesToKilobits(data.MinimumPeriodBytes) : 0.0f,
                 Maximum = timeDelta >= k_PeriodLength ? BytesToKilobits(data.MaximumPeriodBytes) : 0.0f,
-                MaximumBurst = data.MaximumBurst
+                MaximumBurst = data.MaximumBurst,
             };
         }
 

@@ -34,12 +34,19 @@ namespace UnityEngine.Rendering.Universal
             internal TextureHandle cameraColorAttachment;
         }
 
-        internal void Render(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle cameraColorAttachment, in TextureHandle cameraDepthAttachment)
+        internal void Render(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle cameraColorAttachment,
+            in TextureHandle cameraDepthAttachment
+        )
         {
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 passData.xr = cameraData.xr;
                 passData.cameraColorAttachment = cameraColorAttachment;
@@ -51,8 +58,11 @@ namespace UnityEngine.Rendering.Universal
                 builder.AllowGlobalStateModification(true);
                 if (cameraData.xr.enabled)
                 {
-                    bool passSupportsFoveation = cameraData.xrUniversal.canFoveateIntermediatePasses || resourceData.isActiveTargetBackBuffer;
-                    builder.EnableFoveatedRasterization(cameraData.xr.supportsFoveatedRendering && passSupportsFoveation);
+                    bool passSupportsFoveation =
+                        cameraData.xrUniversal.canFoveateIntermediatePasses || resourceData.isActiveTargetBackBuffer;
+                    builder.EnableFoveatedRasterization(
+                        cameraData.xr.supportsFoveatedRendering && passSupportsFoveation
+                    );
                     // Apply MultiviewRenderRegionsCompatible flag only to the peripheral view in Quad Views
                     if (cameraData.xr.multipassId == 0)
                     {
@@ -60,11 +70,13 @@ namespace UnityEngine.Rendering.Universal
                     }
                 }
 
-                builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
-                {
-                    passData.shouldYFlip = RenderingUtils.IsHandleYFlipped(context, in data.cameraColorAttachment);
-                    ExecutePass(context.cmd, data);
-                });
+                builder.SetRenderFunc(
+                    (PassData data, RasterGraphContext context) =>
+                    {
+                        passData.shouldYFlip = RenderingUtils.IsHandleYFlipped(context, in data.cameraColorAttachment);
+                        ExecutePass(context.cmd, data);
+                    }
+                );
 
                 return;
             }

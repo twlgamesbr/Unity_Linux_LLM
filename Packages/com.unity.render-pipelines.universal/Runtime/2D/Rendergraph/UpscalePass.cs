@@ -25,7 +25,14 @@ namespace UnityEngine.Rendering.Universal
             m_BlitMaterial = blitMaterial;
         }
 
-        public void Setup(RTHandle colorTargetHandle, int width, int height, FilterMode mode, RenderTextureDescriptor cameraTargetDescriptor, out RTHandle upscaleHandle)
+        public void Setup(
+            RTHandle colorTargetHandle,
+            int width,
+            int height,
+            FilterMode mode,
+            RenderTextureDescriptor cameraTargetDescriptor,
+            out RTHandle upscaleHandle
+        )
         {
             source = colorTargetHandle;
 
@@ -33,7 +40,13 @@ namespace UnityEngine.Rendering.Universal
             desc.width = width;
             desc.height = height;
             desc.depthStencilFormat = GraphicsFormat.None;
-            RenderingUtils.ReAllocateHandleIfNeeded(ref destination, desc, mode, TextureWrapMode.Clamp, name: "_UpscaleTexture");
+            RenderingUtils.ReAllocateHandleIfNeeded(
+                ref destination,
+                desc,
+                mode,
+                TextureWrapMode.Clamp,
+                name: "_UpscaleTexture"
+            );
 
             upscaleHandle = destination;
         }
@@ -47,18 +60,33 @@ namespace UnityEngine.Rendering.Universal
         {
             using (new ProfilingScope(cmd, m_ExecuteProfilingSampler))
             {
-                Vector2 viewportScale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                Blitter.BlitTexture(cmd, source, viewportScale, m_BlitMaterial, source.rt.filterMode == FilterMode.Bilinear ? 1 : 0);
+                Vector2 viewportScale = source.useScaling
+                    ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                    : Vector2.one;
+                Blitter.BlitTexture(
+                    cmd,
+                    source,
+                    viewportScale,
+                    m_BlitMaterial,
+                    source.rt.filterMode == FilterMode.Bilinear ? 1 : 0
+                );
             }
         }
 
-        public void Render(RenderGraph graph, Camera camera, in TextureHandle cameraColorAttachment, in TextureHandle upscaleHandle)
+        public void Render(
+            RenderGraph graph,
+            Camera camera,
+            in TextureHandle cameraColorAttachment,
+            in TextureHandle upscaleHandle
+        )
         {
             camera.TryGetComponent<PixelPerfectCamera>(out var ppc);
             if (ppc == null || !ppc.enabled || !ppc.requiresUpscalePass)
                 return;
 
-            using (var builder = graph.AddRasterRenderPass<PassData>(k_UpscalePass, out var passData, m_ProfilingSampler))
+            using (
+                var builder = graph.AddRasterRenderPass<PassData>(k_UpscalePass, out var passData, m_ProfilingSampler)
+            )
             {
                 passData.source = cameraColorAttachment;
                 builder.SetRenderAttachment(upscaleHandle, 0);
@@ -66,10 +94,12 @@ namespace UnityEngine.Rendering.Universal
 
                 builder.AllowPassCulling(false);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    ExecutePass(context.cmd, data.source);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        ExecutePass(context.cmd, data.source);
+                    }
+                );
             }
         }
     }

@@ -33,7 +33,11 @@ namespace Unity.Entities
             if (Hint.Unlikely(archetype != typeLookupCache.Archetype))
                 typeLookupCache.Update(archetype, typeIndex);
 
-            return IsComponentEnabled(entityInChunk.Chunk, entityInChunk.IndexInChunk, typeLookupCache.IndexInArchetype);
+            return IsComponentEnabled(
+                entityInChunk.Chunk,
+                entityInChunk.IndexInChunk,
+                typeLookupCache.IndexInArchetype
+            );
         }
 
         internal bool IsComponentEnabled(ChunkIndex chunk, int indexInChunk, int typeIndexInArchetype)
@@ -44,7 +48,9 @@ namespace Unity.Entities
             // the bitmask size is always 128 bits, so make sure we're not indexing outside the chunk's capacity.
             var capacity = archetype->ChunkCapacity;
             if (Hint.Unlikely(indexInChunk < 0 || indexInChunk >= capacity))
-                throw new ArgumentException($"indexInChunk {indexInChunk} is outside the valid range [0..{capacity - 1}]");
+                throw new ArgumentException(
+                    $"indexInChunk {indexInChunk} is outside the valid range [0..{capacity - 1}]"
+                );
 #endif
 
             var isComponentEnabled = ChunkDataUtility.GetEnabledRefRO(chunk, archetype, typeIndexInArchetype);
@@ -57,20 +63,43 @@ namespace Unity.Entities
             var archetype = GetArchetype(entityInChunk.Chunk);
             var typeOffset = ChunkDataUtility.GetIndexInTypeArray(archetype, typeIndex);
 
-            SetComponentEnabled(entityInChunk.Chunk, entityInChunk.IndexInChunk, typeOffset, value, GlobalSystemVersion);
+            SetComponentEnabled(
+                entityInChunk.Chunk,
+                entityInChunk.IndexInChunk,
+                typeOffset,
+                value,
+                GlobalSystemVersion
+            );
         }
 
-        internal void SetComponentEnabled(Entity entity, TypeIndex typeIndex, bool value, ref LookupCache typeLookupCache)
+        internal void SetComponentEnabled(
+            Entity entity,
+            TypeIndex typeIndex,
+            bool value,
+            ref LookupCache typeLookupCache
+        )
         {
             var entityInChunk = GetEntityInChunk(entity);
             var archetype = GetArchetype(entityInChunk.Chunk);
             if (Hint.Unlikely(archetype != typeLookupCache.Archetype))
                 typeLookupCache.Update(archetype, typeIndex);
 
-            SetComponentEnabled(entityInChunk.Chunk, entityInChunk.IndexInChunk, typeLookupCache.IndexInArchetype, value, GlobalSystemVersion);
+            SetComponentEnabled(
+                entityInChunk.Chunk,
+                entityInChunk.IndexInChunk,
+                typeLookupCache.IndexInArchetype,
+                value,
+                GlobalSystemVersion
+            );
         }
 
-        internal void SetComponentEnabled(ChunkIndex chunk, int indexInChunk, int typeIndexInArchetype, bool value, uint globalSystemVersion)
+        internal void SetComponentEnabled(
+            ChunkIndex chunk,
+            int indexInChunk,
+            int typeIndexInArchetype,
+            bool value,
+            uint globalSystemVersion
+        )
         {
             var archetype = GetArchetype(chunk);
             var capacity = archetype->ChunkCapacity;
@@ -78,10 +107,18 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             // the bit array size is padded up to 64 bits, so we validate we're not indexing outside the valid data.
             if (Hint.Unlikely(indexInChunk < 0 || indexInChunk >= capacity))
-                throw new ArgumentException($"indexInChunk {indexInChunk} is outside the valid range [0..{capacity - 1}]");
+                throw new ArgumentException(
+                    $"indexInChunk {indexInChunk} is outside the valid range [0..{capacity - 1}]"
+                );
 #endif
 
-            var bits = ChunkDataUtility.GetEnabledRefRW(chunk, archetype, typeIndexInArchetype, globalSystemVersion, out var ptrChunkDisabledCount);
+            var bits = ChunkDataUtility.GetEnabledRefRW(
+                chunk,
+                archetype,
+                typeIndexInArchetype,
+                globalSystemVersion,
+                out var ptrChunkDisabledCount
+            );
             var numStridesIntoBits = (indexInChunk / 64);
             var pBits = bits.Ptr + numStridesIntoBits;
             var indexInPBits = indexInChunk - (numStridesIntoBits * 64);
@@ -118,7 +155,14 @@ namespace Unity.Entities
         /// <param name="indexInBitField"></param>
         /// <param name="ptrChunkDisabledCount"></param>
         /// <returns></returns>
-        public ulong* GetEnabledRawRW(Entity entity, TypeIndex typeIndex, ref LookupCache typeLookupCache, uint globalSystemVersion, out int indexInBitField, out int* ptrChunkDisabledCount)
+        public ulong* GetEnabledRawRW(
+            Entity entity,
+            TypeIndex typeIndex,
+            ref LookupCache typeLookupCache,
+            uint globalSystemVersion,
+            out int indexInBitField,
+            out int* ptrChunkDisabledCount
+        )
         {
             AssertEntityHasComponent(entity, typeIndex, ref typeLookupCache);
             var entityInChunk = GetEntityInChunk(entity);
@@ -126,7 +170,15 @@ namespace Unity.Entities
             indexInBitField = entityInChunk.IndexInChunk;
             if (Hint.Unlikely(archetype != typeLookupCache.Archetype))
                 typeLookupCache.Update(archetype, typeIndex);
-            return ChunkDataUtility.GetEnabledRefRW(entityInChunk.Chunk, archetype, typeLookupCache.IndexInArchetype, globalSystemVersion, out ptrChunkDisabledCount).Ptr;
+            return ChunkDataUtility
+                .GetEnabledRefRW(
+                    entityInChunk.Chunk,
+                    archetype,
+                    typeLookupCache.IndexInArchetype,
+                    globalSystemVersion,
+                    out ptrChunkDisabledCount
+                )
+                .Ptr;
         }
 
         /// <summary>
@@ -139,7 +191,13 @@ namespace Unity.Entities
         /// <param name="indexInBitField"></param>
         /// <param name="ptrChunkDisabledCount"></param>
         /// <returns></returns>
-        public ulong* GetEnabledRawRO(Entity entity, TypeIndex typeIndex, ref LookupCache typeLookupCache, out int indexInBitField, out int* ptrChunkDisabledCount)
+        public ulong* GetEnabledRawRO(
+            Entity entity,
+            TypeIndex typeIndex,
+            ref LookupCache typeLookupCache,
+            out int indexInBitField,
+            out int* ptrChunkDisabledCount
+        )
         {
             AssertEntityHasComponent(entity, typeIndex, ref typeLookupCache);
             var entityInChunk = GetEntityInChunk(entity);
@@ -147,9 +205,16 @@ namespace Unity.Entities
             indexInBitField = entityInChunk.IndexInChunk;
             if (Hint.Unlikely(archetype != typeLookupCache.Archetype))
                 typeLookupCache.Update(archetype, typeIndex);
-            int memoryOrderIndexInArchetype = archetype->TypeIndexInArchetypeToMemoryOrderIndex[typeLookupCache.IndexInArchetype];
-            ptrChunkDisabledCount = archetype->Chunks.GetPointerToChunkDisabledCountForType(memoryOrderIndexInArchetype, entityInChunk.Chunk.ListIndex);
-            return ChunkDataUtility.GetEnabledRefRO(entityInChunk.Chunk, archetype, typeLookupCache.IndexInArchetype).Ptr;
+            int memoryOrderIndexInArchetype = archetype->TypeIndexInArchetypeToMemoryOrderIndex[
+                typeLookupCache.IndexInArchetype
+            ];
+            ptrChunkDisabledCount = archetype->Chunks.GetPointerToChunkDisabledCountForType(
+                memoryOrderIndexInArchetype,
+                entityInChunk.Chunk.ListIndex
+            );
+            return ChunkDataUtility
+                .GetEnabledRefRO(entityInChunk.Chunk, archetype, typeLookupCache.IndexInArchetype)
+                .Ptr;
         }
 
         //                              | ChangeVersion | OrderVersion |
@@ -165,8 +230,13 @@ namespace Unity.Entities
         // ChangeVersion : e.g. Should I update LocalToWorld from Translation?
         // OrderVersion : e.g. Should I re-allocate a lookaside cache based on chunk data?
 
-
-        internal void AllocateEntities(Archetype* arch, ChunkIndex chunk, int baseIndex, int count, Entity* outputEntities)
+        internal void AllocateEntities(
+            Archetype* arch,
+            ChunkIndex chunk,
+            int baseIndex,
+            int count,
+            Entity* outputEntities
+        )
         {
             Assert.AreEqual(arch->Offsets[0], 0);
             Assert.AreEqual(arch->SizeOfs[0], sizeof(Entity));
@@ -215,7 +285,12 @@ namespace Unity.Entities
 #endif
         }
 
-        internal void DeallocateDataEntitiesInChunk(ChunkIndex chunk, Archetype* archetype, int indexInChunk, int batchCount)
+        internal void DeallocateDataEntitiesInChunk(
+            ChunkIndex chunk,
+            Archetype* archetype,
+            int indexInChunk,
+            int batchCount
+        )
         {
             DeallocateBuffers(chunk, indexInChunk, batchCount);
             DeallocateManagedComponents(chunk, indexInChunk, batchCount);
@@ -244,7 +319,6 @@ namespace Unity.Entities
 #else
             s_entityStore.Data.DeallocateEntities(entities, batchCount);
 #endif
-
 
             // Compute the number of things that need to moved and patched.
             int patchCount = Math.Min(batchCount, chunk.Count - indexInChunk - batchCount);

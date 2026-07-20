@@ -1,20 +1,19 @@
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Character.Player
 {
     [RequireComponent(typeof(NetworkObject))]
@@ -77,11 +76,7 @@ namespace NPCSystem.Character.Player
                 string pendingName = AuthNetworkBridge.ActivePlayerName;
                 if (
                     !string.IsNullOrEmpty(pendingName)
-                    && !string.Equals(
-                        pendingName,
-                        "Player",
-                        System.StringComparison.OrdinalIgnoreCase
-                    )
+                    && !string.Equals(pendingName, "Player", System.StringComparison.OrdinalIgnoreCase)
                 )
                 {
                     RegisterPlayerNameServerRpc(pendingName);

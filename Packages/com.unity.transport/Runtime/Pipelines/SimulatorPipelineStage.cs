@@ -1,9 +1,9 @@
 using System;
 using AOT;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Networking.Transport.Utilities;
-using Unity.Burst;
 using UnityEngine;
 
 namespace Unity.Networking.Transport
@@ -17,19 +17,28 @@ namespace Unity.Networking.Transport
     public unsafe struct SimulatorPipelineStage : INetworkPipelineStage
     {
         /// <inheritdoc/>
-        public NetworkPipelineStage StaticInitialize(byte* staticInstanceBuffer, int staticInstanceBufferLength, NetworkSettings settings)
+        public NetworkPipelineStage StaticInitialize(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            NetworkSettings settings
+        )
         {
             SimulatorUtility.Parameters param = settings.GetSimulatorStageParameters();
             var simulatorParamsSizeOf = UnsafeUtility.SizeOf<SimulatorUtility.Parameters>();
-            if (simulatorParamsSizeOf != staticInstanceBufferLength) throw new InvalidOperationException($"simulatorParamsSizeOf {simulatorParamsSizeOf}");
+            if (simulatorParamsSizeOf != staticInstanceBufferLength)
+                throw new InvalidOperationException($"simulatorParamsSizeOf {simulatorParamsSizeOf}");
             UnsafeUtility.MemCpy(staticInstanceBuffer, &param, simulatorParamsSizeOf);
 
             return new NetworkPipelineStage(
                 Receive: new TransportFunctionPointer<NetworkPipelineStage.ReceiveDelegate>(Receive),
                 Send: new TransportFunctionPointer<NetworkPipelineStage.SendDelegate>(Send),
-                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(InitializeConnection),
-                ReceiveCapacity: param.MaxPacketCount * (param.MaxPacketSize + UnsafeUtility.SizeOf<SimulatorUtility.DelayedPacket>()),
-                SendCapacity: param.MaxPacketCount * (param.MaxPacketSize + UnsafeUtility.SizeOf<SimulatorUtility.DelayedPacket>()),
+                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(
+                    InitializeConnection
+                ),
+                ReceiveCapacity: param.MaxPacketCount
+                    * (param.MaxPacketSize + UnsafeUtility.SizeOf<SimulatorUtility.DelayedPacket>()),
+                SendCapacity: param.MaxPacketCount
+                    * (param.MaxPacketSize + UnsafeUtility.SizeOf<SimulatorUtility.DelayedPacket>()),
                 HeaderCapacity: 0,
                 SharedStateCapacity: UnsafeUtility.SizeOf<SimulatorUtility.Context>()
             );
@@ -37,9 +46,16 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.InitializeConnectionDelegate))]
-        static void InitializeConnection(byte* staticInstanceBuffer, int staticInstanceBufferLength,
-            byte* sendProcessBuffer, int sendProcessBufferLength, byte* recvProcessBuffer, int recvProcessBufferLength,
-            byte* sharedProcessBuffer, int sharedProcessBufferLength)
+        static void InitializeConnection(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            byte* sendProcessBuffer,
+            int sendProcessBufferLength,
+            byte* recvProcessBuffer,
+            int recvProcessBufferLength,
+            byte* sharedProcessBuffer,
+            int sharedProcessBufferLength
+        )
         {
             SimulatorUtility.Parameters param = default;
             UnsafeUtility.MemCpy(&param, staticInstanceBuffer, UnsafeUtility.SizeOf<SimulatorUtility.Parameters>());
@@ -47,7 +63,9 @@ namespace Unity.Networking.Transport
             if (staticInstanceBufferLength != UnsafeUtility.SizeOf<SimulatorUtility.Parameters>())
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException("staticInstanceBufferLength is wrong length for SimulatorUtility.Parameters!");
+                throw new InvalidOperationException(
+                    "staticInstanceBufferLength is wrong length for SimulatorUtility.Parameters!"
+                );
 #else
                 return;
 #endif
@@ -56,7 +74,9 @@ namespace Unity.Networking.Transport
             if (sharedProcessBufferLength != UnsafeUtility.SizeOf<SimulatorUtility.Context>())
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException("sharedProcessBufferLength is wrong length for SimulatorUtility.Context!");
+                throw new InvalidOperationException(
+                    "sharedProcessBufferLength is wrong length for SimulatorUtility.Context!"
+                );
 #else
                 return;
 #endif
@@ -67,7 +87,12 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.SendDelegate))]
-        static int Send(ref NetworkPipelineContext ctx, ref InboundSendBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+        static int Send(
+            ref NetworkPipelineContext ctx,
+            ref InboundSendBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        )
         {
             var context = (SimulatorUtility.Context*)ctx.internalSharedProcessBuffer;
             var param = *(SimulatorUtility.Parameters*)ctx.staticInstanceBuffer;
@@ -78,7 +103,9 @@ namespace Unity.Networking.Transport
             var inboundPacketSize = inboundBuffer.headerPadding + inboundBuffer.bufferLength;
             if (inboundPacketSize > param.MaxPacketSize)
             {
-                Debug.LogWarning($"Incoming packet too large for SimulatorPipeline internal storage buffer. Passing through. [buffer={inboundBuffer.headerPadding + inboundBuffer.bufferLength} MaxPacketSize={param.MaxPacketSize}]");
+                Debug.LogWarning(
+                    $"Incoming packet too large for SimulatorPipeline internal storage buffer. Passing through. [buffer={inboundBuffer.headerPadding + inboundBuffer.bufferLength} MaxPacketSize={param.MaxPacketSize}]"
+                );
                 return (int)Error.StatusCode.NetworkPacketOverflow;
             }
 
@@ -107,7 +134,10 @@ namespace Unity.Networking.Transport
                     }
                 }
 
-                if (SimulatorUtility.TrySkipDelayingPacket(ref param, ref requests, context) || !SimulatorUtility.TryDelayPacket(ref ctx, ref param, ref inboundBuffer, ref requests, timestamp))
+                if (
+                    SimulatorUtility.TrySkipDelayingPacket(ref param, ref requests, context)
+                    || !SimulatorUtility.TryDelayPacket(ref ctx, ref param, ref inboundBuffer, ref requests, timestamp)
+                )
                 {
                     return (int)Error.StatusCode.Success;
                 }
@@ -126,7 +156,12 @@ namespace Unity.Networking.Transport
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.ReceiveDelegate))]
-        static void Receive(ref NetworkPipelineContext ctx, ref InboundRecvBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+        static void Receive(
+            ref NetworkPipelineContext ctx,
+            ref InboundRecvBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        )
         {
             var context = (SimulatorUtility.Context*)ctx.internalSharedProcessBuffer;
             var param = *(SimulatorUtility.Parameters*)ctx.staticInstanceBuffer;
@@ -136,7 +171,9 @@ namespace Unity.Networking.Transport
 
             if (inboundBuffer.bufferLength > param.MaxPacketSize)
             {
-                Debug.LogWarning($"Incoming packet too large for SimulatorPipeline internal storage buffer. Passing through. [buffer={inboundBuffer.bufferLength} MaxPacketSize={param.MaxPacketSize}]");
+                Debug.LogWarning(
+                    $"Incoming packet too large for SimulatorPipeline internal storage buffer. Passing through. [buffer={inboundBuffer.bufferLength} MaxPacketSize={param.MaxPacketSize}]"
+                );
                 return;
             }
 
@@ -160,7 +197,6 @@ namespace Unity.Networking.Transport
                 bufferVec.bufferLength = inboundBuffer.bufferLength;
                 bufferVec.headerPadding = 0;
 
-
                 if (SimulatorUtility.ShouldDuplicatePacket(context, ref param))
                 {
                     if (SimulatorUtility.TryDelayPacket(ref ctx, ref param, ref bufferVec, ref requests, timestamp))
@@ -169,7 +205,10 @@ namespace Unity.Networking.Transport
                     }
                 }
 
-                if (SimulatorUtility.TrySkipDelayingPacket(ref param, ref requests, context) || !SimulatorUtility.TryDelayPacket(ref ctx, ref param, ref bufferVec, ref requests, timestamp))
+                if (
+                    SimulatorUtility.TrySkipDelayingPacket(ref param, ref requests, context)
+                    || !SimulatorUtility.TryDelayPacket(ref ctx, ref param, ref bufferVec, ref requests, timestamp)
+                )
                 {
                     return;
                 }

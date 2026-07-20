@@ -17,7 +17,9 @@ namespace Unity.Entities.Editor
         /// <param name="name">The name of the uxml asset, without extension.</param>
         public VisualElementTemplate(string name)
         {
-            m_Template = new Lazy<VisualTreeAsset>(() => EditorResources.Load<VisualTreeAsset>($"uxml/{name}.uxml", true));
+            m_Template = new Lazy<VisualTreeAsset>(() =>
+                EditorResources.Load<VisualTreeAsset>($"uxml/{name}.uxml", true)
+            );
             m_StyleSheet = new StyleSheetWithVariant(name);
         }
 
@@ -28,7 +30,9 @@ namespace Unity.Entities.Editor
         /// <param name="name">The name of the uxml asset, without extension.</param>
         public VisualElementTemplate(string packageId, string name)
         {
-            m_Template = new Lazy<VisualTreeAsset>(() => EditorResources.Load<VisualTreeAsset>(packageId, $"uxml/{name}.uxml", true));
+            m_Template = new Lazy<VisualTreeAsset>(() =>
+                EditorResources.Load<VisualTreeAsset>(packageId, $"uxml/{name}.uxml", true)
+            );
             m_StyleSheet = new StyleSheetWithVariant(packageId, name);
         }
 

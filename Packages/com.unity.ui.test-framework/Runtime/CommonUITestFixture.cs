@@ -27,7 +27,10 @@ namespace UnityEngine.UIElements.TestFramework
         ///          OneTimeTearDown() -> [Disposed]
         /// </summary>
         [System.Obsolete("For Internal Use Only.")]
-        internal sealed override LifetimeState lifetimeState { get => m_LifetimeState; }
+        internal sealed override LifetimeState lifetimeState
+        {
+            get => m_LifetimeState;
+        }
 
 #pragma warning disable CS0618 // Disable warning on Internal usage
         private LifetimeState m_LifetimeState = LifetimeState.Default;
@@ -143,7 +146,6 @@ namespace UnityEngine.UIElements.TestFramework
         /// </remarks>
         public sealed override bool clearContentAfterTest { get; set; } = true;
 
-
         [System.Obsolete("For Internal Use Only.")]
         internal ThemeStyleSheet m_ThemeStyleSheet;
 
@@ -210,7 +212,10 @@ namespace UnityEngine.UIElements.TestFramework
 #pragma warning restore CS0618
             {
 #pragma warning disable CS0618 // Disable warning on Internal usage
-                ValidateLifecycle("OneTimeTearDown() can only be called once after OneTimeSetup.", LifetimeState.Initialized);
+                ValidateLifecycle(
+                    "OneTimeTearDown() can only be called once after OneTimeSetup.",
+                    LifetimeState.Initialized
+                );
                 m_LifetimeState = LifetimeState.Disposed;
 #pragma warning restore CS0618
 
@@ -230,7 +235,10 @@ namespace UnityEngine.UIElements.TestFramework
             }
 
 #pragma warning disable CS0618 // Disable warning on Internal usage
-            ValidateLifecycle("SetUp() can only be called once at the beginning of a test case", LifetimeState.Initialized);
+            ValidateLifecycle(
+                "SetUp() can only be called once at the beginning of a test case",
+                LifetimeState.Initialized
+            );
             m_LifetimeState = LifetimeState.DuringTest;
 #pragma warning restore CS0618
 
@@ -248,7 +256,10 @@ namespace UnityEngine.UIElements.TestFramework
 #pragma warning disable CS0618 // Disable warning on Internal usage
             if (m_LifetimeState != LifetimeState.Suspended)
             {
-                ValidateLifecycle("TearDown() can only be called once at the end of a test case", LifetimeState.DuringTest);
+                ValidateLifecycle(
+                    "TearDown() can only be called once at the end of a test case",
+                    LifetimeState.DuringTest
+                );
                 m_LifetimeState = LifetimeState.Initialized;
 #pragma warning restore CS0618
 
@@ -293,9 +304,7 @@ namespace UnityEngine.UIElements.TestFramework
             {
                 componentMethod(m_TestComponents[i]);
             }
-
         }
-
 
         [System.Obsolete("For Internal Use Only.")]
         internal void UnsuspendTestExecution()
@@ -349,7 +358,8 @@ namespace UnityEngine.UIElements.TestFramework
             /// Whether the current test has a `Failed` outcome.
             /// `true` if the TestStatus is `Failed`, `false` otherwise.
             /// </summary>
-            public bool hasTestFailed => TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed;
+            public bool hasTestFailed =>
+                TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed;
 
             /// <summary>
             /// The name of the test that's currently running.

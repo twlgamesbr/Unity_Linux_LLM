@@ -10,52 +10,56 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// Cached unique id for unity_StereoCameraProjection
         /// </summary>
-        static public readonly int unity_StereoCameraProjection = Shader.PropertyToID("unity_StereoCameraProjection");
+        public static readonly int unity_StereoCameraProjection = Shader.PropertyToID("unity_StereoCameraProjection");
 
         /// <summary>
         /// Cached unique id for unity_StereoCameraInvProjection
         /// </summary>
-        static public readonly int unity_StereoCameraInvProjection = Shader.PropertyToID("unity_StereoCameraInvProjection");
+        public static readonly int unity_StereoCameraInvProjection = Shader.PropertyToID(
+            "unity_StereoCameraInvProjection"
+        );
 
         /// <summary>
         /// Cached unique id for unity_StereoMatrixV
         /// </summary>
-        static public readonly int unity_StereoMatrixV = Shader.PropertyToID("unity_StereoMatrixV");
+        public static readonly int unity_StereoMatrixV = Shader.PropertyToID("unity_StereoMatrixV");
 
         /// <summary>
         /// Cached unique id for unity_StereoMatrixInvV
         /// </summary>
-        static public readonly int unity_StereoMatrixInvV = Shader.PropertyToID("unity_StereoMatrixInvV");
+        public static readonly int unity_StereoMatrixInvV = Shader.PropertyToID("unity_StereoMatrixInvV");
 
         /// <summary>
         /// Cached unique id for unity_StereoMatrixP
         /// </summary>
-        static public readonly int unity_StereoMatrixP = Shader.PropertyToID("unity_StereoMatrixP");
+        public static readonly int unity_StereoMatrixP = Shader.PropertyToID("unity_StereoMatrixP");
 
         /// <summary>
         /// Cached unique id for unity_StereoMatrixInvP
         /// </summary>
-        static public readonly int unity_StereoMatrixInvP = Shader.PropertyToID("unity_StereoMatrixInvP");
+        public static readonly int unity_StereoMatrixInvP = Shader.PropertyToID("unity_StereoMatrixInvP");
 
         /// <summary>
         /// Cached unique id for unity_StereoMatrixVP
         /// </summary>
-        static public readonly int unity_StereoMatrixVP = Shader.PropertyToID("unity_StereoMatrixVP");
+        public static readonly int unity_StereoMatrixVP = Shader.PropertyToID("unity_StereoMatrixVP");
 
         /// <summary>
         /// Cached unique id for unity_StereoMatrixInvVP
         /// </summary>
-        static public readonly int unity_StereoMatrixInvVP = Shader.PropertyToID("unity_StereoMatrixInvVP");
+        public static readonly int unity_StereoMatrixInvVP = Shader.PropertyToID("unity_StereoMatrixInvVP");
 
         /// <summary>
         /// Cached unique id for unity_StereoWorldSpaceCameraPos
         /// </summary>
-        static public readonly int unity_StereoWorldSpaceCameraPos = Shader.PropertyToID("unity_StereoWorldSpaceCameraPos");
+        public static readonly int unity_StereoWorldSpaceCameraPos = Shader.PropertyToID(
+            "unity_StereoWorldSpaceCameraPos"
+        );
 
         /// <summary>
         /// Cached unique id for unity_StereoEyeIndex
         /// </summary>
-        static public readonly int unity_StereoEyeIndex = Shader.PropertyToID("unity_StereoEyeIndex");
+        public static readonly int unity_StereoEyeIndex = Shader.PropertyToID("unity_StereoEyeIndex");
 
         // Pre-allocate arrays to avoid GC
         static Matrix4x4[] s_cameraProjMatrix = new Matrix4x4[2];
@@ -75,7 +79,12 @@ namespace UnityEngine.Experimental.Rendering
         /// <param name="projMatrix"> The new projection matrix that XR shaders constant should update to use. </param>
         /// <param name="renderIntoTexture"> Determines the yflip state for the projection matrix. </param>
         /// <param name="viewIndex"> Index of the XR shader constant to update. </param>
-        public static void UpdateBuiltinShaderConstants(Matrix4x4 viewMatrix, Matrix4x4 projMatrix, bool renderIntoTexture, int viewIndex)
+        public static void UpdateBuiltinShaderConstants(
+            Matrix4x4 viewMatrix,
+            Matrix4x4 projMatrix,
+            bool renderIntoTexture,
+            int viewIndex
+        )
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             var gpuProjMatrix = GL.GetGPUProjectionMatrix(projMatrix, renderIntoTexture);
@@ -142,17 +151,20 @@ namespace UnityEngine.Experimental.Rendering
                 {
                     for (int viewIndex = 0; viewIndex < 2; ++viewIndex)
                     {
-                        s_cameraProjMatrix[viewIndex]     = xrPass.GetProjMatrix(viewIndex);
-                        s_viewMatrix[viewIndex]           = xrPass.GetViewMatrix(viewIndex);
-                        s_projMatrix[viewIndex]           = GL.GetGPUProjectionMatrix(s_cameraProjMatrix[viewIndex], renderIntoTexture);
-                        s_viewProjMatrix[viewIndex]       = s_projMatrix[viewIndex] * s_viewMatrix[viewIndex];
+                        s_cameraProjMatrix[viewIndex] = xrPass.GetProjMatrix(viewIndex);
+                        s_viewMatrix[viewIndex] = xrPass.GetViewMatrix(viewIndex);
+                        s_projMatrix[viewIndex] = GL.GetGPUProjectionMatrix(
+                            s_cameraProjMatrix[viewIndex],
+                            renderIntoTexture
+                        );
+                        s_viewProjMatrix[viewIndex] = s_projMatrix[viewIndex] * s_viewMatrix[viewIndex];
 
-                        s_invCameraProjMatrix[viewIndex]  = Matrix4x4.Inverse(s_cameraProjMatrix[viewIndex]);
+                        s_invCameraProjMatrix[viewIndex] = Matrix4x4.Inverse(s_cameraProjMatrix[viewIndex]);
                         Matrix4x4.Inverse3DAffine(s_viewMatrix[viewIndex], ref s_invViewMatrix[viewIndex]);
-                        s_invProjMatrix[viewIndex]        = Matrix4x4.Inverse(s_projMatrix[viewIndex]);
-                        s_invViewProjMatrix[viewIndex]    = Matrix4x4.Inverse(s_viewProjMatrix[viewIndex]);
+                        s_invProjMatrix[viewIndex] = Matrix4x4.Inverse(s_projMatrix[viewIndex]);
+                        s_invViewProjMatrix[viewIndex] = Matrix4x4.Inverse(s_viewProjMatrix[viewIndex]);
 
-                        s_worldSpaceCameraPos[viewIndex]  = s_invViewMatrix[viewIndex].GetColumn(3);
+                        s_worldSpaceCameraPos[viewIndex] = s_invViewMatrix[viewIndex].GetColumn(3);
                     }
 
                     cmd.SetGlobalMatrixArray(unity_StereoCameraProjection, s_cameraProjMatrix);

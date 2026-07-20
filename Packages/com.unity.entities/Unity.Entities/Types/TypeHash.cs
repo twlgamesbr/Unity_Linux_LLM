@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using UnityEngine.Assertions;
 using Unity.Collections;
+using UnityEngine.Assertions;
 
 namespace Unity.Entities
 {
@@ -78,7 +78,7 @@ namespace Unity.Entities
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             ulong result = kFNV1A64OffsetBasis;
-            for(int i = 0; i <text.Length; ++i)
+            for (int i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
                 result = kFNV1A64Prime * (result ^ (byte)(c & 255));
@@ -97,8 +97,8 @@ namespace Unity.Entities
             ulong result = kFNV1A64OffsetBasis;
             unchecked
             {
-                result = (((ulong)(val & 0x000000FF) >>  0) ^ result) * kFNV1A64Prime;
-                result = (((ulong)(val & 0x0000FF00) >>  8) ^ result) * kFNV1A64Prime;
+                result = (((ulong)(val & 0x000000FF) >> 0) ^ result) * kFNV1A64Prime;
+                result = (((ulong)(val & 0x0000FF00) >> 8) ^ result) * kFNV1A64Prime;
                 result = (((ulong)(val & 0x00FF0000) >> 16) ^ result) * kFNV1A64Prime;
                 result = (((ulong)(val & 0xFF000000) >> 24) ^ result) * kFNV1A64Prime;
             }
@@ -145,20 +145,28 @@ namespace Unity.Entities
 
             // If we shouldn't walk the type's fields just return the type name hash.
             // UnityEngine objects have their own serialization mechanism so exclude hashing their internals
-            if (type.IsArray || type.IsPointer || type.IsPrimitive || type.IsEnum || (TypeManager.UnityEngineObjectType?.IsAssignableFrom(type) == true))
+            if (
+                type.IsArray
+                || type.IsPointer
+                || type.IsPrimitive
+                || type.IsEnum
+                || (TypeManager.UnityEngineObjectType?.IsAssignableFrom(type) == true)
+            )
             {
                 cache.Add(type, hash);
                 return hash;
             }
 
             if (type.ContainsGenericParameters)
-                throw new ArgumentException($"'{type}' contains open generic parameters. Generic types must have all generic parameters specified to closed types when calculating stable type hashes");
+                throw new ArgumentException(
+                    $"'{type}' contains open generic parameters. Generic types must have all generic parameters specified to closed types when calculating stable type hashes"
+                );
 
             // Only non-pod and non-unityengine types could possibly have a version attribute
             hash = CombineFNV1A64(hash, HashVersionAttribute(type));
 
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            for(ulong fieldIndex = 0;  fieldIndex < (ulong)fields.Length; fieldIndex++)
+            for (ulong fieldIndex = 0; fieldIndex < (ulong)fields.Length; fieldIndex++)
             {
                 var field = fields[fieldIndex];
                 // statics have no effect on data layout
@@ -174,7 +182,7 @@ namespace Unity.Entities
                 // where field layout is important to identify via the hash alone
                 if (fieldType.IsClass)
                     fieldTypeHash = HashTypeName(fieldType);
-                else if(!cache.TryGetValue(fieldType, out fieldTypeHash))
+                else if (!cache.TryGetValue(fieldType, out fieldTypeHash))
                 {
                     fieldTypeHash = HashType(fieldType, cache);
                 }
@@ -235,7 +243,14 @@ namespace Unity.Entities
                 return CombineFNV1A64(hash, FNV1A64(type.Assembly.GetName().Name));
             }
 
-            if (type.IsGenericParameter || type.IsArray || type.IsPointer || type.IsPrimitive || type.IsEnum || WorkaroundTypes.Contains(type))
+            if (
+                type.IsGenericParameter
+                || type.IsArray
+                || type.IsPointer
+                || type.IsPrimitive
+                || type.IsEnum
+                || WorkaroundTypes.Contains(type)
+            )
                 return hash;
 
             foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
@@ -282,6 +297,7 @@ namespace Unity.Entities
 
             return hash;
         }
+
         private static ulong HashVersionAttribute(Type type, IEnumerable<CustomAttributeData> customAttributes = null)
         {
             int version = 0;
@@ -289,19 +305,19 @@ namespace Unity.Entities
             customAttributes = customAttributes ?? type.CustomAttributes;
             if (customAttributes.Any())
             {
-                var versionAttribute = customAttributes.FirstOrDefault(ca => ca.Constructor.DeclaringType == typeof(TypeManager.TypeVersionAttribute));
+                var versionAttribute = customAttributes.FirstOrDefault(ca =>
+                    ca.Constructor.DeclaringType == typeof(TypeManager.TypeVersionAttribute)
+                );
                 if (versionAttribute != null)
                 {
-                    version = (int)versionAttribute.ConstructorArguments
-                        .First(arg => arg.ArgumentType.Name == "Int32")
-                        .Value;
+                    version = (int)
+                        versionAttribute.ConstructorArguments.First(arg => arg.ArgumentType.Name == "Int32").Value;
                 }
             }
 
             return FNV1A64(version);
         }
 #endif
-
 
         private static ulong HashNamespace(Type type)
         {
@@ -336,7 +352,6 @@ namespace Unity.Entities
             return hash;
         }
 
-
         /// <summary>
         /// Calculates a stable type hash for the input type.
         /// </summary>
@@ -346,7 +361,11 @@ namespace Unity.Entities
         /// <returns>StableTypeHash for the input type.
         /// </returns>
         /// <remarks>This hash is NOT expected to remain the same across versions.</remarks>
-        public static ulong CalculateStableTypeHash(Type type, IEnumerable<CustomAttributeData> customAttributes = null, Dictionary<Type, ulong> hashCache = null)
+        public static ulong CalculateStableTypeHash(
+            Type type,
+            IEnumerable<CustomAttributeData> customAttributes = null,
+            Dictionary<Type, ulong> hashCache = null
+        )
         {
             // This API should not be called anymore but we can't deprecate it in a minor release so we forward to a new one
 #if UNITY_2022_3_11F1_OR_NEWER
@@ -361,7 +380,6 @@ namespace Unity.Entities
                 hashCache = new Dictionary<Type, ulong>();
 
             ulong typeHash = HashType(type, hashCache);
-
 
             return CombineFNV1A64(versionHash, typeHash);
 #endif
@@ -391,7 +409,11 @@ namespace Unity.Entities
         /// <param name="hasCustomMemoryOrder">Out param; set to true if the memory order has been explicitly overriden for the input type.</param>
         /// <param name="hashCache">Cache for Types and their hashes. Used for quicker lookups when hashing.</param>
         /// <returns>MemoryOrdering for the input type.</returns>
-        public static ulong CalculateMemoryOrdering(Type type, out bool hasCustomMemoryOrder, Dictionary<Type, ulong> hashCache = null)
+        public static ulong CalculateMemoryOrdering(
+            Type type,
+            out bool hasCustomMemoryOrder,
+            Dictionary<Type, ulong> hashCache = null
+        )
         {
             hasCustomMemoryOrder = false;
 
@@ -403,13 +425,18 @@ namespace Unity.Entities
             var customAttributes = type.CustomAttributes;
             if (customAttributes.Any())
             {
-                var forcedMemoryOrderAttribute = customAttributes.FirstOrDefault(ca => ca.Constructor.DeclaringType == typeof(TypeManager.ForcedMemoryOrderingAttribute));
+                var forcedMemoryOrderAttribute = customAttributes.FirstOrDefault(ca =>
+                    ca.Constructor.DeclaringType == typeof(TypeManager.ForcedMemoryOrderingAttribute)
+                );
                 if (forcedMemoryOrderAttribute != null)
                 {
                     hasCustomMemoryOrder = true;
-                    ulong memoryOrder = (ulong)forcedMemoryOrderAttribute.ConstructorArguments
-                        .First(arg => arg.ArgumentType.Name == "UInt64" || arg.ArgumentType.Name == "ulong")
-                        .Value;
+                    ulong memoryOrder = (ulong)
+                        forcedMemoryOrderAttribute
+                            .ConstructorArguments.First(arg =>
+                                arg.ArgumentType.Name == "UInt64" || arg.ArgumentType.Name == "ulong"
+                            )
+                            .Value;
 
                     return memoryOrder;
                 }

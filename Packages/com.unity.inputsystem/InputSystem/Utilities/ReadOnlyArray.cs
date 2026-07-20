@@ -122,7 +122,11 @@ namespace UnityEngine.InputSystem.Utilities
         /// Constructs a read-only array containing elements <paramref name="array"/>.
         /// </summary>
         /// <param name="array">An existing array containing elements to be wrapped as a read-only array.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates", Justification = "`ToXXX` message only really makes sense as static, which is not recommended for generic types.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Usage",
+            "CA2225:OperatorOverloadsHaveNamedAlternates",
+            Justification = "`ToXXX` message only really makes sense as static, which is not recommended for generic types."
+        )]
         public static implicit operator ReadOnlyArray<TValue>(TValue[] array)
         {
             return new ReadOnlyArray<TValue>(array);
@@ -173,9 +177,7 @@ namespace UnityEngine.InputSystem.Utilities
             }
 
             /// <inheritdoc/>
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             /// <inheritdoc/>
             public bool MoveNext()
@@ -264,7 +266,11 @@ namespace UnityEngine.InputSystem.Utilities
         /// <param name="array2">The second array to be evaluated.</param>
         /// <param name="count">The maximum number of elements to be compared.</param>
         /// <returns><c>true</c> if the <paramref name="count"/> first elements of <paramref name="array1"/> and <paramref name="array2"/> contain the same references, else false.</returns>
-        internal static bool HaveEqualReferences<TValue>(this ReadOnlyArray<TValue> array1, IReadOnlyList<TValue> array2, int count = int.MaxValue)
+        internal static bool HaveEqualReferences<TValue>(
+            this ReadOnlyArray<TValue> array1,
+            IReadOnlyList<TValue> array2,
+            int count = int.MaxValue
+        )
         {
             var length1 = Math.Min(array1.Count, count);
             var length2 = Math.Min(array2.Count, count);

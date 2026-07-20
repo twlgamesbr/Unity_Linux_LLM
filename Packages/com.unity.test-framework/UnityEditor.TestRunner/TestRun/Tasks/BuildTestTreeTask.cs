@@ -17,8 +17,14 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             RerunAfterResume = true;
         }
 
-        internal IEditorLoadedTestAssemblyProvider m_testAssemblyProvider = new EditorLoadedTestAssemblyProvider(new EditorCompilationInterfaceProxy(), new EditorAssembliesProxy());
-        internal Func<string[], int, IAsyncTestAssemblyBuilder> m_testAssemblyBuilderFactory = (orderedTestNames, seed) => new UnityTestAssemblyBuilder(orderedTestNames, seed);
+        internal IEditorLoadedTestAssemblyProvider m_testAssemblyProvider = new EditorLoadedTestAssemblyProvider(
+            new EditorCompilationInterfaceProxy(),
+            new EditorAssembliesProxy()
+        );
+        internal Func<string[], int, IAsyncTestAssemblyBuilder> m_testAssemblyBuilderFactory = (
+            orderedTestNames,
+            seed
+        ) => new UnityTestAssemblyBuilder(orderedTestNames, seed);
         internal ICallbacksDelegator m_CallbacksDelegator = CallbacksDelegator.instance;
 
         public override IEnumerator Execute(TestJobData testJobData)
@@ -39,17 +45,28 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                 throw new Exception("Assemblies not retrieved.");
             }
 
-            var assemblies = assembliesEnumerator.Current.Where(pair => m_TestPlatform.IsFlagIncluded(pair.Key)).SelectMany(pair => pair.Value).Select(x => x.Assembly).ToArray();
+            var assemblies = assembliesEnumerator
+                .Current.Where(pair => m_TestPlatform.IsFlagIncluded(pair.Key))
+                .SelectMany(pair => pair.Value)
+                .Select(x => x.Assembly)
+                .ToArray();
             var buildSettings = UnityTestAssemblyBuilder.GetNUnitTestBuilderSettings(m_TestPlatform);
-            var testAssemblyBuilder = m_testAssemblyBuilderFactory(testJobData.executionSettings.orderedTestNames, testJobData.executionSettings.randomOrderSeed);
-            var enumerator = testAssemblyBuilder.BuildAsync(assemblies, Enumerable.Repeat(m_TestPlatform, assemblies.Length).ToArray(), buildSettings);
+            var testAssemblyBuilder = m_testAssemblyBuilderFactory(
+                testJobData.executionSettings.orderedTestNames,
+                testJobData.executionSettings.randomOrderSeed
+            );
+            var enumerator = testAssemblyBuilder.BuildAsync(
+                assemblies,
+                Enumerable.Repeat(m_TestPlatform, assemblies.Length).ToArray(),
+                buildSettings
+            );
             while (enumerator.MoveNext())
             {
                 yield return null;
             }
 
             var testList = enumerator.Current;
-            if (testList== null)
+            if (testList == null)
             {
                 throw new Exception("Test list not retrieved.");
             }

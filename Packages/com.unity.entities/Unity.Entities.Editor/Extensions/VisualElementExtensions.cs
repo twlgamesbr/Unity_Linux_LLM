@@ -8,8 +8,12 @@ namespace Unity.Entities.Editor
     static class VisualElementExtensions
     {
         public static void Show(this VisualElement v) => SetVisibility(v, true);
+
         public static void Hide(this VisualElement v) => SetVisibility(v, false);
-        public static void SetVisibility(this VisualElement v, bool isVisible) => v.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+
+        public static void SetVisibility(this VisualElement v, bool isVisible) =>
+            v.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+
         public static void ToggleVisibility(this VisualElement v)
         {
             if (v.style.display == DisplayStyle.Flex)
@@ -17,6 +21,7 @@ namespace Unity.Entities.Editor
             else
                 v.style.display = DisplayStyle.Flex;
         }
+
         public static bool IsVisible(this VisualElement v) => v.style.display == DisplayStyle.Flex;
 
         public static void ForceUpdateBindings(this VisualElement element)
@@ -73,7 +78,11 @@ namespace Unity.Entities.Editor
             return child;
         }
 
-        internal static bool FindElementInTree(this VisualElement self, VisualElement element, List<int> outChildIndexes)
+        internal static bool FindElementInTree(
+            this VisualElement self,
+            VisualElement element,
+            List<int> outChildIndexes
+        )
         {
             var child = element;
             var hierarchyParent = child.hierarchy.parent;
@@ -95,7 +104,8 @@ namespace Unity.Entities.Editor
             return false;
         }
 
-        internal static TElement WithIconPrefix<TElement>(this TElement element, string name) where TElement : VisualElement
+        internal static TElement WithIconPrefix<TElement>(this TElement element, string name)
+            where TElement : VisualElement
         {
             Resources.Templates.DotsEditorCommon.AddStyles(element);
 

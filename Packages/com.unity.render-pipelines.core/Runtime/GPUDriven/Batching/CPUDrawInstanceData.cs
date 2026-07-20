@@ -1,7 +1,7 @@
-using UnityEngine.Assertions;
 using Unity.Collections;
-using Unity.Jobs;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
+using UnityEngine.Assertions;
 using UnityEngine.Profiling;
 
 namespace UnityEngine.Rendering
@@ -16,13 +16,13 @@ namespace UnityEngine.Rendering
         public NativeArray<int> drawBatchIndices => m_DrawBatchIndices.AsArray();
         public NativeArray<int> drawInstanceIndices => m_DrawInstanceIndices.AsArray();
 
-        private NativeParallelHashMap<RangeKey, int> m_RangeHash;       // index in m_DrawRanges, hashes by range state
+        private NativeParallelHashMap<RangeKey, int> m_RangeHash; // index in m_DrawRanges, hashes by range state
         private NativeList<DrawRange> m_DrawRanges;
-        private NativeParallelHashMap<DrawKey, int> m_BatchHash;        // index in m_DrawBatches, hashed by draw state
+        private NativeParallelHashMap<DrawKey, int> m_BatchHash; // index in m_DrawBatches, hashed by draw state
         private NativeList<DrawBatch> m_DrawBatches;
         private NativeList<DrawInstance> m_DrawInstances;
-        private NativeList<int> m_DrawInstanceIndices;          // DOTS instance index, arranged in contiguous blocks in m_DrawBatches order (see DrawBatch.instanceOffset, DrawBatch.instanceCount)
-        private NativeList<int> m_DrawBatchIndices;             // index in m_DrawBatches, arranged in contiguous blocks in m_DrawRanges order (see DrawRange.drawOffset, DrawRange.drawCount)
+        private NativeList<int> m_DrawInstanceIndices; // DOTS instance index, arranged in contiguous blocks in m_DrawBatches order (see DrawBatch.instanceOffset, DrawBatch.instanceCount)
+        private NativeList<int> m_DrawBatchIndices; // index in m_DrawBatches, arranged in contiguous blocks in m_DrawRanges order (see DrawRange.drawOffset, DrawRange.drawCount)
 
         private bool m_NeedsRebuild;
 
@@ -77,14 +77,18 @@ namespace UnityEngine.Rendering
             m_DrawInstanceIndices.ResizeUninitialized(m_DrawInstances.Length);
             m_DrawBatchIndices.ResizeUninitialized(m_DrawBatches.Length);
 
-            var internalDrawIndex = new NativeArray<int>(drawBatches.Length * BuildDrawListsJob.k_IntsPerCacheLine, Allocator.TempJob, NativeArrayOptions.ClearMemory);
+            var internalDrawIndex = new NativeArray<int>(
+                drawBatches.Length * BuildDrawListsJob.k_IntsPerCacheLine,
+                Allocator.TempJob,
+                NativeArrayOptions.ClearMemory
+            );
 
             var prefixSumDrawInstancesJob = new PrefixSumDrawInstancesJob()
             {
                 rangeHash = m_RangeHash,
                 drawRanges = m_DrawRanges,
                 drawBatches = m_DrawBatches,
-                drawBatchIndices = m_DrawBatchIndices.AsArray()
+                drawBatchIndices = m_DrawBatchIndices.AsArray(),
             };
 
             var prefixSumJobHandle = prefixSumDrawInstancesJob.Schedule();
@@ -96,8 +100,7 @@ namespace UnityEngine.Rendering
                 drawBatches = m_DrawBatches,
                 internalDrawIndex = internalDrawIndex,
                 drawInstanceIndices = m_DrawInstanceIndices.AsArray(),
-            }
-            .RunParallel(m_DrawInstances.Length, 128, prefixSumJobHandle);
+            }.RunParallel(m_DrawInstances.Length, 128, prefixSumJobHandle);
 
             internalDrawIndex.Dispose();
         }
@@ -109,12 +112,14 @@ namespace UnityEngine.Rendering
             Profiler.EndSample();
 
             Profiler.BeginSample("DestroyDrawInstanceIndices.RemoveDrawInstanceIndices");
-            CPUDrawInstanceDataBurst.RemoveDrawInstanceIndices(drawInstanceIndicesToDestroy,
+            CPUDrawInstanceDataBurst.RemoveDrawInstanceIndices(
+                drawInstanceIndicesToDestroy,
                 ref m_DrawInstances,
                 ref m_RangeHash,
                 ref m_BatchHash,
                 ref m_DrawRanges,
-                ref m_DrawBatches);
+                ref m_DrawBatches
+            );
             Profiler.EndSample();
         }
 
@@ -140,9 +145,8 @@ namespace UnityEngine.Rendering
             {
                 instancesSorted = destroyedInstancesSorted,
                 drawInstances = m_DrawInstances,
-                outDrawInstanceIndicesWriter = drawInstanceIndicesToDestroy.AsParallelWriter()
-            }
-            .RunBatchParallel(m_DrawInstances.Length, FindDrawInstancesJob.k_MaxBatchSize);
+                outDrawInstanceIndicesWriter = drawInstanceIndicesToDestroy.AsParallelWriter(),
+            }.RunBatchParallel(m_DrawInstances.Length, FindDrawInstancesJob.k_MaxBatchSize);
 
             DestroyDrawInstanceIndices(drawInstanceIndicesToDestroy.AsArray());
 
@@ -171,9 +175,8 @@ namespace UnityEngine.Rendering
             {
                 materialsSorted = destroyedBatchMaterialsSorted,
                 drawInstances = m_DrawInstances,
-                outDrawInstanceIndicesWriter = drawInstanceIndicesToDestroy.AsParallelWriter()
-            }
-            .RunBatchParallel(m_DrawInstances.Length, FindMaterialDrawInstancesJob.k_MaxBatchSize);
+                outDrawInstanceIndicesWriter = drawInstanceIndicesToDestroy.AsParallelWriter(),
+            }.RunBatchParallel(m_DrawInstances.Length, FindMaterialDrawInstancesJob.k_MaxBatchSize);
 
             DestroyDrawInstanceIndices(drawInstanceIndicesToDestroy.AsArray());
 

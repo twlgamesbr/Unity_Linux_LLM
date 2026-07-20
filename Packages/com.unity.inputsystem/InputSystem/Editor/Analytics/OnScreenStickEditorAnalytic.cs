@@ -8,8 +8,13 @@ namespace UnityEngine.InputSystem.Editor
     /// Analytics record for tracking engagement with Input Action Asset editor(s).
     /// </summary>
 #if UNITY_2023_2_OR_NEWER
-    [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-        maxNumberOfElements: kMaxNumberOfElements, vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey, version: 2)]
+    [UnityEngine.Analytics.AnalyticInfo(
+        eventName: kEventName,
+        maxEventsPerHour: kMaxEventsPerHour,
+        maxNumberOfElements: kMaxNumberOfElements,
+        vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey,
+        version: 2
+    )]
 #endif // UNITY_2023_2_OR_NEWER
     internal class OnScreenStickEditorAnalytic : UnityEngine.InputSystem.InputAnalytics.IInputAnalytic
     {

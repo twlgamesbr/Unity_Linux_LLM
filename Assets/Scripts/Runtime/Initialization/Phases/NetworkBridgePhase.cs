@@ -37,10 +37,8 @@ namespace NPCSystem.Initialization
                 NPCFlowLogLevel.Info,
                 "Network bridge initialized successfully.",
                 source: nameof(NetworkBridgePhase),
-                data: new Dictionary<string, object>
-                {
-                    ["correlationId"] = ctx.CorrelationId
-                });
+                data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId }
+            );
         }
 
         static void LogMissingRef(InitializationContext ctx, string refName)
@@ -50,13 +48,10 @@ namespace NPCSystem.Initialization
                 NPCFlowStatus.Error,
                 NPCFlowLogLevel.Error,
                 $"Required reference {refName} is not assigned. "
-                + "Wire it in the Inspector — FindAnyObjectByType is not used.",
+                    + "Wire it in the Inspector — FindAnyObjectByType is not used.",
                 source: nameof(NetworkBridgePhase),
-                data: new Dictionary<string, object>
-                {
-                    ["correlationId"] = ctx.CorrelationId,
-                    ["missingRef"] = refName
-                });
+                data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId, ["missingRef"] = refName }
+            );
         }
     }
 }

@@ -10,10 +10,14 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
     {
         public readonly string name;
         public readonly int utf8ByteCount;
+
         public Name(string name, bool computeUTF8ByteCount = false)
         {
             this.name = name;
-            this.utf8ByteCount = ((name?.Length > 0) && computeUTF8ByteCount) ? System.Text.Encoding.UTF8.GetByteCount((ReadOnlySpan<char>)name) : 0;
+            this.utf8ByteCount =
+                ((name?.Length > 0) && computeUTF8ByteCount)
+                    ? System.Text.Encoding.UTF8.GetByteCount((ReadOnlySpan<char>)name)
+                    : 0;
         }
     }
 
@@ -21,7 +25,12 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
     internal static class NativeListExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static unsafe ReadOnlySpan<T> MakeReadOnlySpan<T>(this ref NativeList<T> list, int first, int numElements) where T : unmanaged
+        internal static unsafe ReadOnlySpan<T> MakeReadOnlySpan<T>(
+            this ref NativeList<T> list,
+            int first,
+            int numElements
+        )
+            where T : unmanaged
         {
 #if UNITY_EDITOR
             if (first + numElements > list.Length)
@@ -31,7 +40,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int LastIndex<T>(this ref NativeList<T> list) where T : unmanaged
+        internal static int LastIndex<T>(this ref NativeList<T> list)
+            where T : unmanaged
         {
             return list.Length - 1;
         }
@@ -62,10 +72,10 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
                 fragmentData = new NativeList<PassFragmentData>(estimatedNumPasses * 4, AllocatorManager.Persistent);
                 sampledData = new NativeList<ResourceHandle>(estimatedNumPasses * 2, AllocatorManager.Persistent);
                 randomAccessResourceData = new NativeList<PassRandomWriteData>(4, AllocatorManager.Persistent); // We assume not a lot of passes use random write
-                nativePassData = new NativeList<NativePassData>(estimatedNumPasses, AllocatorManager.Persistent);// assume nothing gets merged
-                nativeSubPassData = new NativeList<SubPassDescriptor>(estimatedNumPasses, AllocatorManager.Persistent);// there should "never" be more subpasses than graph passes
-                createData = new NativeList<ResourceHandle>(estimatedNumPasses * 2, AllocatorManager.Persistent);    // assume every pass creates two resources
-                destroyData = new NativeList<ResourceHandle>(estimatedNumPasses * 2, AllocatorManager.Persistent);   // assume every pass destroys two resources
+                nativePassData = new NativeList<NativePassData>(estimatedNumPasses, AllocatorManager.Persistent); // assume nothing gets merged
+                nativeSubPassData = new NativeList<SubPassDescriptor>(estimatedNumPasses, AllocatorManager.Persistent); // there should "never" be more subpasses than graph passes
+                createData = new NativeList<ResourceHandle>(estimatedNumPasses * 2, AllocatorManager.Persistent); // assume every pass creates two resources
+                destroyData = new NativeList<ResourceHandle>(estimatedNumPasses * 2, AllocatorManager.Persistent); // assume every pass destroys two resources
 
                 m_AreNativeListsAllocated = true;
             }
@@ -157,7 +167,12 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         public NativeList<SubPassDescriptor> nativeSubPassData; //Tighty packed list of per nrp subpasses
 
         // resources can be added as fragment both as input and output so make sure not to add them twice (return true upon new addition)
-        public bool TryAddToFragmentList(in TextureAccess access, int listFirstIndex, int numItems, out string errorMessage)
+        public bool TryAddToFragmentList(
+            in TextureAccess access,
+            int listFirstIndex,
+            int numItems,
+            out string errorMessage
+        )
         {
             errorMessage = null;
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
@@ -188,12 +203,9 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             // not in the middle of the other lists
             Debug.Assert(listFirstIndex + numItems == fragmentData.Length);
 
-            fragmentData.Add(new PassFragmentData(
-                access.textureHandle.handle,
-                access.flags,
-                access.mipLevel,
-                access.depthSlice
-            ));
+            fragmentData.Add(
+                new PassFragmentData(access.textureHandle.handle, access.flags, access.mipLevel, access.depthSlice)
+            );
             return true;
         }
 
@@ -210,12 +222,22 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         public string GetResourceVersionedName(in ResourceHandle h) => GetResourceName(h) + " V" + h.version;
 
         // resources can be added as fragment both as input and output so make sure not to add them twice (return true upon new addition)
-        public bool TryAddToRandomAccessResourceList(in ResourceHandle h, int randomWriteSlotIndex, bool preserveCounterValue, int listFirstIndex, int numItems, out string errorMessage)
+        public bool TryAddToRandomAccessResourceList(
+            in ResourceHandle h,
+            int randomWriteSlotIndex,
+            bool preserveCounterValue,
+            int listFirstIndex,
+            int numItems,
+            out string errorMessage
+        )
         {
             errorMessage = null;
             for (var i = listFirstIndex; i < listFirstIndex + numItems; ++i)
             {
-                if (randomAccessResourceData[i].resource.index == h.index && randomAccessResourceData[i].resource.type == h.type)
+                if (
+                    randomAccessResourceData[i].resource.index == h.index
+                    && randomAccessResourceData[i].resource.type == h.type
+                )
                 {
                     if (randomAccessResourceData[i].resource.version != h.version)
                     {
@@ -243,6 +265,7 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
                 passData.ElementAt(passId).tag = value;
             }
         }
+
         public void CullAllPasses(bool isCulled)
         {
             for (int passId = 0; passId < passData.Length; passId++)
@@ -256,7 +279,9 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             if (targetHandle.handle.IsValid())
             {
                 ref readonly ResourceUnversionedData unversionedData = ref UnversionedResourceData(targetHandle.handle);
-                return unversionedData.textureUVOrigin == TextureUVOriginSelection.TopLeft ? TextureUVOrigin.TopLeft : TextureUVOrigin.BottomLeft;
+                return unversionedData.textureUVOrigin == TextureUVOriginSelection.TopLeft
+                    ? TextureUVOrigin.TopLeft
+                    : TextureUVOrigin.BottomLeft;
             }
             else
             {

@@ -18,25 +18,29 @@ namespace UnityEngine.UIElements.TestFramework
         /// <summary>
         /// Whether the context menu was displayed.
         /// </summary>
-        #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
         public bool menuIsDisplayed => displayedMenu != null;
-        #pragma warning restore CS0618
+#pragma warning restore CS0618
 
         /// <summary>
         /// The number of items currently in the displayed context menu.
         /// Returns `0` if no menu is displayed.
         /// </summary>
-        #pragma warning disable CS0618 // Disable warning on Internal usage
-        public int menuItemCount { get => displayedMenu != null ? displayedMenu.MenuItems().Count : 0; }
-        #pragma warning restore CS0618
+#pragma warning disable CS0618 // Disable warning on Internal usage
+        public int menuItemCount
+        {
+            get => displayedMenu != null ? displayedMenu.MenuItems().Count : 0;
+        }
+#pragma warning restore CS0618
 
         /// <summary>
         /// The items currently in the displayed context menu.
         /// Returns an empty list if no menu is displayed.
         /// </summary>
-        #pragma warning disable CS0618 // Disable warning on Internal usage
-        public IReadOnlyList<DropdownMenuItem> menuItems => displayedMenu != null ? displayedMenu.MenuItems() : System.Array.Empty<DropdownMenuItem>();
-        #pragma warning restore CS0618
+#pragma warning disable CS0618 // Disable warning on Internal usage
+        public IReadOnlyList<DropdownMenuItem> menuItems =>
+            displayedMenu != null ? displayedMenu.MenuItems() : System.Array.Empty<DropdownMenuItem>();
+#pragma warning restore CS0618
 
         [System.Obsolete("For Internal Use Only.")]
         internal DropdownMenu displayedMenu { get; private set; }
@@ -59,25 +63,27 @@ namespace UnityEngine.UIElements.TestFramework
         /// </summary>
         public virtual void DiscardMenu()
         {
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             displayedMenu = null;
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         [System.Obsolete("For Internal Use Only.")]
         internal void SetMenuContent(DropdownMenu menu)
         {
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             if (displayedMenu != null)
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
             {
-                Assert.Fail("Menu content has already been set. Use Reset() to clear the menu before setting new content.");
+                Assert.Fail(
+                    "Menu content has already been set. Use Reset() to clear the menu before setting new content."
+                );
             }
             else
             {
-                #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
                 displayedMenu = menu;
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
             }
         }
 
@@ -102,9 +108,9 @@ namespace UnityEngine.UIElements.TestFramework
                 return false;
             }
 
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             List<DropdownMenuItem> items = displayedMenu.MenuItems();
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
             var action = items[itemIndex] as DropdownMenuAction;
 
             if (action != null)
@@ -152,9 +158,9 @@ namespace UnityEngine.UIElements.TestFramework
                 return -1;
             }
 
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             List<DropdownMenuItem> items = displayedMenu.MenuItems();
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
             for (int i = 0; i < items.Count; i++)
             {
                 var action = items[i] as DropdownMenuAction;
@@ -192,9 +198,9 @@ namespace UnityEngine.UIElements.TestFramework
 
             Assert.AreNotEqual(index, -1, $"Menu does not contain action {name}");
 
-            #pragma warning disable CS0618 // Disable warning on Internal usage
+#pragma warning disable CS0618 // Disable warning on Internal usage
             var item = displayedMenu.MenuItems()[index];
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
             if (item is DropdownMenuAction action)
             {
                 Assert.AreEqual(expectedStatus, action.status, $"Expected menu item {name} status to match");

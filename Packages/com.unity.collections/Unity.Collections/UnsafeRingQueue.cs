@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Unity.Jobs;
 using System.Runtime.InteropServices;
+using Unity.Jobs;
 
 namespace Unity.Collections.LowLevel.Unsafe
 {
@@ -12,10 +12,9 @@ namespace Unity.Collections.LowLevel.Unsafe
     /// <typeparam name="T">The type of the elements.</typeparam>
     [DebuggerDisplay("Length = {Length}, Capacity = {Capacity}, IsCreated = {IsCreated}, IsEmpty = {IsEmpty}")]
     [DebuggerTypeProxy(typeof(UnsafeRingQueueDebugView<>))]
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct UnsafeRingQueue<T>
-        : INativeDisposable
+    public unsafe struct UnsafeRingQueue<T> : INativeDisposable
         where T : unmanaged
     {
         /// <summary>
@@ -92,7 +91,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="capacity">The capacity.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public UnsafeRingQueue(int capacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public UnsafeRingQueue(
+            int capacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
         {
             Allocator = allocator;
             m_Capacity = capacity;
@@ -110,7 +113,12 @@ namespace Unity.Collections.LowLevel.Unsafe
 
         internal static UnsafeRingQueue<T>* Alloc(AllocatorManager.AllocatorHandle allocator)
         {
-            UnsafeRingQueue<T>* data = (UnsafeRingQueue<T>*)Memory.Unmanaged.Allocate(sizeof(UnsafeRingQueue<T>), UnsafeUtility.AlignOf<UnsafeRingQueue<T>>(), allocator);
+            UnsafeRingQueue<T>* data = (UnsafeRingQueue<T>*)
+                Memory.Unmanaged.Allocate(
+                    sizeof(UnsafeRingQueue<T>),
+                    UnsafeUtility.AlignOf<UnsafeRingQueue<T>>(),
+                    allocator
+                );
             return data;
         }
 

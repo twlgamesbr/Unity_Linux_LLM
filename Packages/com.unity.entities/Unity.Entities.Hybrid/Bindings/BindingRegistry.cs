@@ -58,8 +58,7 @@ namespace Unity.Entities
         /// <remarks>
         /// A runtime type can be partially bound.
         /// </remarks>
-        static Dictionary<Type, HashSet<string>> s_RuntimeFieldNames =
-            new Dictionary<Type, HashSet<string>>();
+        static Dictionary<Type, HashSet<string>> s_RuntimeFieldNames = new Dictionary<Type, HashSet<string>>();
 
         /// <summary>
         /// Field offset and size associated with the type and name of a runtime ComponentData.
@@ -70,10 +69,10 @@ namespace Unity.Entities
         /// <summary>
         /// Maps an association of runtime property fields with their authoring field name to an Authoring Type to be able to support live properties in the Editor
         /// </summary>
-        internal static Dictionary<Type, List<ReverseBinding>> s_AuthoringToRuntimeBinding = new Dictionary<Type, List<ReverseBinding>>();
+        internal static Dictionary<Type, List<ReverseBinding>> s_AuthoringToRuntimeBinding =
+            new Dictionary<Type, List<ReverseBinding>>();
 
-        static BindingRegistry() =>
-            Initialize();
+        static BindingRegistry() => Initialize();
 
         static void Initialize()
         {
@@ -89,7 +88,6 @@ namespace Unity.Entities
             var registeredFields = TypeCache.GetFieldsWithAttribute<RegisterBindingAttribute>();
             foreach (var field in registeredFields)
             {
-
                 // We need to do that because an authoring field can be bound to several runtime fields.
                 var attrs = field.GetCustomAttributes<RegisterBindingAttribute>();
                 foreach (var attr in attrs)
@@ -98,14 +96,26 @@ namespace Unity.Entities
                     if (!string.IsNullOrEmpty(attr.AuthoringField))
                         authoringField += $".{attr.AuthoringField}";
 
-                    if (!BindingRegistryUtility.TryGetBindingPaths(field.DeclaringType, authoringField, out var authoringPaths))
+                    if (
+                        !BindingRegistryUtility.TryGetBindingPaths(
+                            field.DeclaringType,
+                            authoringField,
+                            out var authoringPaths
+                        )
+                    )
                         continue;
 
                     if (field.IsPrivate && !field.GetCustomAttributes<SerializeField>().Any())
                         continue;
 
                     //fragile: assumption that the only generated support types are bool/int/float 2/3/4
-                    if (!BindingRegistryUtility.TryGetBindingPaths(attr.ComponentType, attr.ComponentField, out var runtimePaths))
+                    if (
+                        !BindingRegistryUtility.TryGetBindingPaths(
+                            attr.ComponentType,
+                            attr.ComponentField,
+                            out var runtimePaths
+                        )
+                    )
                         continue;
 
                     if (attr.Generated)
@@ -119,9 +129,7 @@ namespace Unity.Entities
                         var numberOfBindings = math.min(authoringPaths.Length, runtimePaths.Length);
                         for (int i = 0; i < numberOfBindings; ++i)
                         {
-                            Register(
-                                attr.ComponentType, runtimePaths[i],
-                                field.DeclaringType, authoringPaths[i]);
+                            Register(attr.ComponentType, runtimePaths[i], field.DeclaringType, authoringPaths[i]);
                         }
                     }
                 }
@@ -136,8 +144,12 @@ namespace Unity.Entities
         /// <param name="authoringComponent">Type of the authoring component. Must derive from UnityEngine.Component.</param>
         /// <param name="authoringField">Name of the authoring field.</param>
         /// <exception cref="InvalidOperationException">Thrown if registering the same runtime field more than once.</exception>
-        public static void Register(Type runtimeComponent, string runtimeField, Type authoringComponent,
-            string authoringField)
+        public static void Register(
+            Type runtimeComponent,
+            string runtimeField,
+            Type authoringComponent,
+            string authoringField
+        )
         {
             Assert.IsTrue(typeof(Component).IsAssignableFrom(authoringComponent));
             Assert.IsTrue(typeof(IComponentData).IsAssignableFrom(runtimeComponent));
@@ -158,7 +170,9 @@ namespace Unity.Entities
 
             bool extractedProperties = ExtractFieldProperties(runtimeKey, out var fieldProps);
             if (!extractedProperties) // Should we keep continuing?
-                Debug.LogError($"No compatible binding for {authoringComponent}. ('{runtimeComponent}'.'{runtimeField}' => {authoringField}");
+                Debug.LogError(
+                    $"No compatible binding for {authoringComponent}. ('{runtimeComponent}'.'{runtimeField}' => {authoringField}"
+                );
 
             if (!s_RuntimeFieldProperties.ContainsKey(runtimeKey))
             {
@@ -169,7 +183,8 @@ namespace Unity.Entities
             var isValueType = runtimeKey.Item1.IsValueType;
             if (!isValueType)
                 Debug.LogWarning(
-                    $"Field [{runtimeKey.Item2}] part of runtime component type [{runtimeKey.Item1}] could not be found.");
+                    $"Field [{runtimeKey.Item2}] part of runtime component type [{runtimeKey.Item1}] could not be found."
+                );
             else
             {
                 if (!s_RuntimeToAuthoringFieldMap.TryGetValue(runtimeKey, out var registeredAuthoring))
@@ -180,13 +195,14 @@ namespace Unity.Entities
                 {
                     if (registeredAuthoring != authoringValue)
                         throw new InvalidOperationException(
-                            $"Field [{runtimeKey.Item2}] part of runtime component type [{runtimeKey.Item1}] is already bound to field [{registeredAuthoring.Item2}] of authoring component type [{registeredAuthoring.Item1}] ");
+                            $"Field [{runtimeKey.Item2}] part of runtime component type [{runtimeKey.Item1}] is already bound to field [{registeredAuthoring.Item2}] of authoring component type [{registeredAuthoring.Item1}] "
+                        );
                 }
 
                 if (s_RuntimeFieldNames.TryGetValue(runtimeComponent, out var fieldNames))
                     fieldNames.Add(runtimeField);
                 else
-                    s_RuntimeFieldNames[runtimeComponent] = new HashSet<string>() {runtimeField};
+                    s_RuntimeFieldNames[runtimeComponent] = new HashSet<string>() { runtimeField };
             }
 
             if (!s_AuthoringToRuntimeBinding.TryGetValue(authoringComponent, out var lookup))
@@ -200,11 +216,14 @@ namespace Unity.Entities
 
             if (authoringComponent == typeof(Transform) || !lookup.Any(x => x.AuthoringFieldName == authoringField))
             {
-                lookup.Add(new ReverseBinding() {
-                    AuthoringFieldName = authoringField,
-                    ComponentTypeIndex = typeIndex,
-                    FieldProperties = fieldProps
-                });
+                lookup.Add(
+                    new ReverseBinding()
+                    {
+                        AuthoringFieldName = authoringField,
+                        ComponentTypeIndex = typeIndex,
+                        FieldProperties = fieldProps,
+                    }
+                );
             }
         }
 
@@ -279,7 +298,8 @@ namespace Unity.Entities
                 return fieldData.FieldSize;
 
             throw new InvalidOperationException(
-                $"Field [{fieldName}] from component type [{type}] has not been registered.");
+                $"Field [{fieldName}] from component type [{type}] has not been registered."
+            );
         }
 
         /// <summary>
@@ -297,7 +317,8 @@ namespace Unity.Entities
                 return fieldData.FieldOffset;
 
             throw new InvalidOperationException(
-                $"Field [{fieldName}] from component type [{type}] has not been registered.");
+                $"Field [{fieldName}] from component type [{type}] has not been registered."
+            );
         }
 
         static bool ExtractFieldProperties((Type, string) field, out RuntimeFieldProperties data)
@@ -345,28 +366,28 @@ namespace Unity.Entities
         {
             typeof(int),
             typeof(float),
-            typeof(bool)
+            typeof(bool),
         };
 
         static readonly Dictionary<Type, string[]> k_SupportedVectorTypes = new Dictionary<Type, string[]>()
         {
-            {typeof(float2), k_XYZWComponents2D},
-            {typeof(int2), k_XYZWComponents2D},
-            {typeof(bool2), k_XYZWComponents2D},
-            {typeof(Vector2), k_XYZWComponents2D},
-            {typeof(Vector2Int), k_XYZWComponents2D},
-            {typeof(float3), k_XYZWComponents3D},
-            {typeof(int3), k_XYZWComponents3D},
-            {typeof(bool3), k_XYZWComponents3D},
-            {typeof(Vector3), k_XYZWComponents3D},
-            {typeof(Vector3Int), k_XYZWComponents3D},
-            {typeof(float4), k_XYZWComponents4D},
-            {typeof(int4), k_XYZWComponents4D},
-            {typeof(bool4), k_XYZWComponents4D},
-            {typeof(Vector4), k_XYZWComponents4D},
-            {typeof(quaternion), k_QuaternionComponents},
-            {typeof(Quaternion), k_XYZWComponents4D},
-            {typeof(Color), k_RGBAComponents}
+            { typeof(float2), k_XYZWComponents2D },
+            { typeof(int2), k_XYZWComponents2D },
+            { typeof(bool2), k_XYZWComponents2D },
+            { typeof(Vector2), k_XYZWComponents2D },
+            { typeof(Vector2Int), k_XYZWComponents2D },
+            { typeof(float3), k_XYZWComponents3D },
+            { typeof(int3), k_XYZWComponents3D },
+            { typeof(bool3), k_XYZWComponents3D },
+            { typeof(Vector3), k_XYZWComponents3D },
+            { typeof(Vector3Int), k_XYZWComponents3D },
+            { typeof(float4), k_XYZWComponents4D },
+            { typeof(int4), k_XYZWComponents4D },
+            { typeof(bool4), k_XYZWComponents4D },
+            { typeof(Vector4), k_XYZWComponents4D },
+            { typeof(quaternion), k_QuaternionComponents },
+            { typeof(Quaternion), k_XYZWComponents4D },
+            { typeof(Color), k_RGBAComponents },
         };
 
         /// <summary>
@@ -412,7 +433,7 @@ namespace Unity.Entities
         {
             FieldInfo fieldInfo = null;
 
-            foreach (var fieldName in path.Split ("."))
+            foreach (var fieldName in path.Split("."))
             {
                 // Parse fields and inherited fields.
                 var typeIter = type;

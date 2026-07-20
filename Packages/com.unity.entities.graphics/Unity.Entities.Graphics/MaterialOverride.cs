@@ -13,7 +13,8 @@ interface IHelper
     void AddComponentData(EntityManager dstManager, Entity entity, IComponentData iComponentData);
 }
 
-class Helper<T> : IHelper where T : unmanaged, IComponentData
+class Helper<T> : IHelper
+    where T : unmanaged, IComponentData
 {
     public void AddComponentData(EntityManager dstManager, Entity entity, IComponentData iComponentData)
     {
@@ -63,7 +64,10 @@ public class MaterialOverride : MonoBehaviour
                         {
                             propertyBlock.SetVector(overrideData.name, overrideData.value);
                         }
-                        else if (overrideData.type == ShaderPropertyType.Float || overrideData.type == ShaderPropertyType.Range)
+                        else if (
+                            overrideData.type == ShaderPropertyType.Float
+                            || overrideData.type == ShaderPropertyType.Range
+                        )
                         {
                             propertyBlock.SetFloat(overrideData.name, overrideData.value.x);
                         }
@@ -140,22 +144,42 @@ class MaterialOverrideBaker : Baker<MaterialOverride>
                     var typeInfo = TypeManager.GetTypeInfo(overrideTypeIndex);
                     var entity = GetEntity(authoring, TransformUsageFlags.Renderable);
                     int dataSize = 0;
-                    var componentData = UnsafeUtility.Malloc(typeInfo.TypeSize, typeInfo.AlignmentInBytes, Allocator.Temp);
+                    var componentData = UnsafeUtility.Malloc(
+                        typeInfo.TypeSize,
+                        typeInfo.AlignmentInBytes,
+                        Allocator.Temp
+                    );
 
                     if (overrideData.type == ShaderPropertyType.Vector || overrideData.type == ShaderPropertyType.Color)
                     {
-                        var data = new float4(overrideData.value.x, overrideData.value.y, overrideData.value.z, overrideData.value.w);
+                        var data = new float4(
+                            overrideData.value.x,
+                            overrideData.value.y,
+                            overrideData.value.z,
+                            overrideData.value.w
+                        );
                         dataSize = sizeof(float4);
 
-                        Assert.AreEqual(dataSize, typeInfo.TypeSize, "Material Override components must contain only the exact field it is overriding.");
+                        Assert.AreEqual(
+                            dataSize,
+                            typeInfo.TypeSize,
+                            "Material Override components must contain only the exact field it is overriding."
+                        );
                         UnsafeUtility.MemCpy(componentData, &data, dataSize);
                     }
-                    else if (overrideData.type == ShaderPropertyType.Float || overrideData.type == ShaderPropertyType.Range)
+                    else if (
+                        overrideData.type == ShaderPropertyType.Float
+                        || overrideData.type == ShaderPropertyType.Range
+                    )
                     {
                         float data = overrideData.value.x;
                         dataSize = sizeof(float);
 
-                        Assert.AreEqual(dataSize, typeInfo.TypeSize, "Material Override components must contain only the exact field it is overriding.");
+                        Assert.AreEqual(
+                            dataSize,
+                            typeInfo.TypeSize,
+                            "Material Override components must contain only the exact field it is overriding."
+                        );
                         UnsafeUtility.MemCpy(componentData, &data, dataSize);
                     }
 

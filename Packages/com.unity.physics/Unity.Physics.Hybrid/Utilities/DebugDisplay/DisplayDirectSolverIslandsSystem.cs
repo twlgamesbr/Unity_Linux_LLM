@@ -1,11 +1,11 @@
-using Unity.Jobs;
 using Unity.Burst;
-using Unity.Entities;
-using Unity.Transforms;
-using Unity.Mathematics;
 using Unity.Collections;
 using Unity.DebugDisplay;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Physics.Systems;
+using Unity.Transforms;
 
 namespace Unity.Physics.Authoring
 {
@@ -70,12 +70,16 @@ namespace Unity.Physics.Authoring
     {
         [ReadOnly]
         public DebugDraw DebugDraw;
+
         [ReadOnly]
         public ComponentLookup<LocalToWorld> LocalToWorldLookup;
+
         [ReadOnly]
         public NativeArray<RigidBody>.ReadOnly Bodies;
+
         [ReadOnly]
         public NativeArray<DispatchPairSequencer.DispatchPair> PhasedDispatchPairs;
+
         [ReadOnly]
         public DispatchPairSequencer.SolverSchedulerInfo SolverSchedulerInfo;
         public float NumberSize;
@@ -87,7 +91,11 @@ namespace Unity.Physics.Authoring
         {
             var directSolverSchedulerInfo = SolverSchedulerInfo.DirectPairsDirectScheduling;
             var firstDirectDispatchPairIndex = directSolverSchedulerInfo.FirstDispatchPairIndex.Value;
-            for (int islandIndex = 0; islandIndex < directSolverSchedulerInfo.DispatchPairIslandInfoCounts.Length; ++islandIndex)
+            for (
+                int islandIndex = 0;
+                islandIndex < directSolverSchedulerInfo.DispatchPairIslandInfoCounts.Length;
+                ++islandIndex
+            )
             {
                 var islandColor = new ColorIndex { value = (islandIndex + 1) % ColorIndex.kMaxColors };
                 var islandPairCount = directSolverSchedulerInfo.DispatchPairIslandInfoCounts[islandIndex];
@@ -101,7 +109,8 @@ namespace Unity.Physics.Authoring
                     SafetyChecks.CheckAreEqualAndThrow(islandInfo.IslandIndex, islandIndex);
 
                     var unphasedDispatchPairIndex = islandInfo.UnphasedDispatchPairIndex;
-                    var phasedDispatchPairIndex = firstDirectDispatchPairIndex
+                    var phasedDispatchPairIndex =
+                        firstDirectDispatchPairIndex
                         + directSolverSchedulerInfo.UnphasedToPhasedDispatchPairMap[unphasedDispatchPairIndex];
 
                     var phasedDispatchPair = PhasedDispatchPairs[phasedDispatchPairIndex];
@@ -114,7 +123,6 @@ namespace Unity.Physics.Authoring
                     var bodyEntityB = Bodies[phasedDispatchPair.BodyIndexB].Entity;
                     if (bodyEntityA != Entity.Null && bodyEntityB != Entity.Null)
                     {
-
                         ++validPairCount;
 
                         var pointA = LocalToWorldLookup[bodyEntityA].Position;
@@ -139,7 +147,13 @@ namespace Unity.Physics.Authoring
                     label.Append(':');
 
                     DebugDraw.Text(label, numberPosition, NumberSize, spacing, islandColor);
-                    DebugDraw.Number(islandIndex, numberPosition + (math.right() * 0.5f), NumberSize, spacing, islandColor);
+                    DebugDraw.Number(
+                        islandIndex,
+                        numberPosition + (math.right() * 0.5f),
+                        NumberSize,
+                        spacing,
+                        islandColor
+                    );
                 }
             }
         }

@@ -10,11 +10,17 @@ namespace UnityEngine.InputSystem.Linux
     [Serializable]
     internal class SDLLayoutBuilder
     {
-        [SerializeField] private string m_ParentLayout;
-        [SerializeField] private SDLDeviceDescriptor m_Descriptor;
+        [SerializeField]
+        private string m_ParentLayout;
 
-        internal static string OnFindLayoutForDevice(ref InputDeviceDescription description, string matchedLayout,
-            InputDeviceExecuteCommandDelegate executeCommandDelegate)
+        [SerializeField]
+        private SDLDeviceDescriptor m_Descriptor;
+
+        internal static string OnFindLayoutForDevice(
+            ref InputDeviceDescription description,
+            string matchedLayout,
+            InputDeviceExecuteCommandDelegate executeCommandDelegate
+        )
         {
             if (description.interfaceName != LinuxSupport.kInterfaceName)
                 return null;
@@ -30,7 +36,9 @@ namespace UnityEngine.InputSystem.Linux
             }
             catch (Exception exception)
             {
-                Debug.LogError($"{exception} while trying to parse descriptor for SDL device: {description.capabilities}");
+                Debug.LogError(
+                    $"{exception} while trying to parse descriptor for SDL device: {description.capabilities}"
+                );
                 return null;
             }
 
@@ -69,11 +77,14 @@ namespace UnityEngine.InputSystem.Linux
 
         private static bool IsAxis(SDLFeatureDescriptor feature, SDLAxisUsage axis)
         {
-            return feature.featureType == JoystickFeatureType.Axis
-                && feature.usageHint == (int)axis;
+            return feature.featureType == JoystickFeatureType.Axis && feature.usageHint == (int)axis;
         }
 
-        private static void BuildStickFeature(ref InputControlLayout.Builder builder, SDLFeatureDescriptor xFeature, SDLFeatureDescriptor yFeature)
+        private static void BuildStickFeature(
+            ref InputControlLayout.Builder builder,
+            SDLFeatureDescriptor xFeature,
+            SDLFeatureDescriptor yFeature
+        )
         {
             int byteOffset;
             if (xFeature.offset <= yFeature.offset)
@@ -82,53 +93,64 @@ namespace UnityEngine.InputSystem.Linux
                 byteOffset = yFeature.offset;
 
             const string stickName = "Stick";
-            builder.AddControl(stickName)
+            builder
+                .AddControl(stickName)
                 .WithLayout("Stick")
                 .WithByteOffset((uint)byteOffset)
                 .WithSizeInBits((uint)xFeature.featureSize * 8 + (uint)yFeature.featureSize * 8)
                 .WithUsages(CommonUsages.Primary2DMotion);
 
-            builder.AddControl(stickName + "/x")
+            builder
+                .AddControl(stickName + "/x")
                 .WithFormat(InputStateBlock.FormatInt)
                 .WithByteOffset(0)
                 .WithSizeInBits((uint)xFeature.featureSize * 8)
                 .WithParameters("clamp=1,clampMin=-1,clampMax=1,scale,scaleFactor=65538");
 
-            builder.AddControl(stickName + "/y")
+            builder
+                .AddControl(stickName + "/y")
                 .WithFormat(InputStateBlock.FormatInt)
                 .WithByteOffset(4)
                 .WithSizeInBits((uint)xFeature.featureSize * 8)
                 .WithParameters("clamp=1,clampMin=-1,clampMax=1,scale,scaleFactor=65538,invert");
 
-            builder.AddControl(stickName + "/up")
+            builder
+                .AddControl(stickName + "/up")
                 .WithParameters("clamp=1,clampMin=-1,clampMax=0,scale,scaleFactor=65538,invert");
 
-            builder.AddControl(stickName + "/down")
+            builder
+                .AddControl(stickName + "/down")
                 .WithParameters("clamp=1,clampMin=0,clampMax=1,scale,scaleFactor=65538,invert=false");
 
-            builder.AddControl(stickName + "/left")
+            builder
+                .AddControl(stickName + "/left")
                 .WithParameters("clamp=1,clampMin=-1,clampMax=0,scale,scaleFactor=65538,invert");
 
-            builder.AddControl(stickName + "/right")
+            builder
+                .AddControl(stickName + "/right")
                 .WithParameters("clamp=1,clampMin=0,clampMax=1,scale,scaleFactor=65538");
         }
 
         private static bool IsHatX(SDLFeatureDescriptor feature)
         {
             return feature.featureType == JoystickFeatureType.Hat
-                && (feature.usageHint == (int)SDLAxisUsage.Hat0X
-                    ||  feature.usageHint == (int)SDLAxisUsage.Hat1X
-                    ||  feature.usageHint == (int)SDLAxisUsage.Hat2X
-                    ||  feature.usageHint == (int)SDLAxisUsage.Hat3X);
+                && (
+                    feature.usageHint == (int)SDLAxisUsage.Hat0X
+                    || feature.usageHint == (int)SDLAxisUsage.Hat1X
+                    || feature.usageHint == (int)SDLAxisUsage.Hat2X
+                    || feature.usageHint == (int)SDLAxisUsage.Hat3X
+                );
         }
 
         private static bool IsHatY(SDLFeatureDescriptor feature)
         {
             return feature.featureType == JoystickFeatureType.Hat
-                && (feature.usageHint == (int)SDLAxisUsage.Hat0Y
-                    ||  feature.usageHint == (int)SDLAxisUsage.Hat1Y
-                    ||  feature.usageHint == (int)SDLAxisUsage.Hat2Y
-                    ||  feature.usageHint == (int)SDLAxisUsage.Hat3Y);
+                && (
+                    feature.usageHint == (int)SDLAxisUsage.Hat0Y
+                    || feature.usageHint == (int)SDLAxisUsage.Hat1Y
+                    || feature.usageHint == (int)SDLAxisUsage.Hat2Y
+                    || feature.usageHint == (int)SDLAxisUsage.Hat3Y
+                );
         }
 
         private static int HatNumber(SDLFeatureDescriptor feature)
@@ -137,41 +159,50 @@ namespace UnityEngine.InputSystem.Linux
             return 1 + (feature.usageHint - (int)SDLAxisUsage.Hat0X) / 2;
         }
 
-        private static void BuildHatFeature(ref InputControlLayout.Builder builder, SDLFeatureDescriptor xFeature, SDLFeatureDescriptor yFeature)
+        private static void BuildHatFeature(
+            ref InputControlLayout.Builder builder,
+            SDLFeatureDescriptor xFeature,
+            SDLFeatureDescriptor yFeature
+        )
         {
             Debug.Assert(xFeature.offset < yFeature.offset, "Order of features must be X followed by Y");
 
             var hat = HatNumber(xFeature);
             var hatName = hat > 1 ? $"Hat{hat}" : "Hat";
 
-            builder.AddControl(hatName)
+            builder
+                .AddControl(hatName)
                 .WithLayout("Dpad")
                 .WithByteOffset((uint)xFeature.offset)
                 .WithSizeInBits((uint)xFeature.featureSize * 8 + (uint)yFeature.featureSize * 8)
                 .WithUsages(CommonUsages.Hatswitch);
 
-            builder.AddControl(hatName + "/up")
+            builder
+                .AddControl(hatName + "/up")
                 .WithFormat(InputStateBlock.FormatInt)
                 .WithParameters("scale,scaleFactor=2147483647,clamp,clampMin=-1,clampMax=0,invert")
                 .WithByteOffset(4)
                 .WithBitOffset(0)
                 .WithSizeInBits((uint)yFeature.featureSize * 8);
 
-            builder.AddControl(hatName + "/down")
+            builder
+                .AddControl(hatName + "/down")
                 .WithFormat(InputStateBlock.FormatInt)
                 .WithParameters("scale,scaleFactor=2147483647,clamp,clampMin=0,clampMax=1")
                 .WithByteOffset(4)
                 .WithBitOffset(0)
                 .WithSizeInBits((uint)yFeature.featureSize * 8);
 
-            builder.AddControl(hatName + "/left")
+            builder
+                .AddControl(hatName + "/left")
                 .WithFormat(InputStateBlock.FormatInt)
                 .WithParameters("scale,scaleFactor=2147483647,clamp,clampMin=-1,clampMax=0,invert")
                 .WithByteOffset(0)
                 .WithBitOffset(0)
                 .WithSizeInBits((uint)xFeature.featureSize * 8);
 
-            builder.AddControl(hatName + "/right")
+            builder
+                .AddControl(hatName + "/right")
                 .WithFormat(InputStateBlock.FormatInt)
                 .WithParameters("scale,scaleFactor=2147483647,clamp,clampMin=0,clampMax=1")
                 .WithByteOffset(0)
@@ -184,7 +215,7 @@ namespace UnityEngine.InputSystem.Linux
             var builder = new InputControlLayout.Builder
             {
                 stateFormat = new FourCC('L', 'J', 'O', 'Y'),
-                extendsLayout = m_ParentLayout
+                extendsLayout = m_ParentLayout,
             };
 
             for (var i = 0; i < m_Descriptor.controls.LengthSafe(); i++)
@@ -213,7 +244,8 @@ namespace UnityEngine.InputSystem.Linux
                         if (IsAxis(feature, SDLAxisUsage.Y))
                             parameters += ",invert";
 
-                        var control = builder.AddControl(featureName)
+                        var control = builder
+                            .AddControl(featureName)
                             .WithLayout("Analog")
                             .WithByteOffset((uint)feature.offset)
                             .WithFormat(InputStateBlock.FormatInt)
@@ -236,7 +268,8 @@ namespace UnityEngine.InputSystem.Linux
                         var featureName = LinuxSupport.GetButtonNameFromUsage(usage);
                         if (featureName != null)
                         {
-                            builder.AddControl(featureName)
+                            builder
+                                .AddControl(featureName)
                                 .WithLayout("Button")
                                 .WithByteOffset((uint)feature.offset)
                                 .WithBitOffset((uint)feature.bit)
@@ -265,7 +298,8 @@ namespace UnityEngine.InputSystem.Linux
                         if (IsHatY(feature))
                             parameters += ",invert";
 
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Analog")
                             .WithByteOffset((uint)feature.offset)
                             .WithFormat(InputStateBlock.FormatInt)
@@ -276,7 +310,8 @@ namespace UnityEngine.InputSystem.Linux
                     default:
                     {
                         throw new NotImplementedException(
-                            $"SDLLayoutBuilder.Build: Trying to build an SDL device with an unknown feature of type {feature.featureType}.");
+                            $"SDLLayoutBuilder.Build: Trying to build an SDL device with an unknown feature of type {feature.featureType}."
+                        );
                     }
                 }
             }

@@ -18,7 +18,7 @@ namespace Unity.Entities.Editor
         /// <summary>
         /// The search handler will perform the filtering asynchronously.
         /// </summary>
-        async
+        async,
     }
 
     /// <summary>
@@ -165,7 +165,7 @@ namespace Unity.Entities.Editor
 
             var searchData = m_GetSearchDataFunc();
             var batchSize = Math.Max(SearchDataBatchMaxSize, 1);
-            for (;;)
+            for (; ; )
             {
                 if (null == m_Enumerator)
                 {

@@ -6,7 +6,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
     internal static class CreateSixWayShaderGraph
     {
-        [MenuItem("Assets/Create/Shader Graph/URP/Six Way Shader Graph", priority = CoreUtils.Sections.section6 + CoreUtils.Priorities.assetsCreateShaderMenuPriority)]
+        [MenuItem(
+            "Assets/Create/Shader Graph/URP/Six Way Shader Graph",
+            priority = CoreUtils.Sections.section6 + CoreUtils.Priorities.assetsCreateShaderMenuPriority
+        )]
         public static void CreateLitGraph()
         {
             var target = (UniversalTarget)Activator.CreateInstance(typeof(UniversalTarget));

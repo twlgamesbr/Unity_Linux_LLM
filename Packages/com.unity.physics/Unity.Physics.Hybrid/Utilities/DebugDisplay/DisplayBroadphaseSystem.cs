@@ -21,7 +21,11 @@ namespace Unity.Physics.Authoring
         [ReadOnly]
         public NativeList<BoundingVolumeHierarchy.Node> DynamicNodes;
 
-        void DrawLeavesRecursive(NativeArray<BoundingVolumeHierarchy.Node> nodes, Unity.DebugDisplay.ColorIndex color, int nodeIndex)
+        void DrawLeavesRecursive(
+            NativeArray<BoundingVolumeHierarchy.Node> nodes,
+            Unity.DebugDisplay.ColorIndex color,
+            int nodeIndex
+        )
         {
             if (nodes[nodeIndex].IsLeaf)
             {
@@ -71,7 +75,10 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (!SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay) || debugDisplay.DrawBroadphase == 0)
+            if (
+                !SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay)
+                || debugDisplay.DrawBroadphase == 0
+            )
                 return;
 
             if (!SystemAPI.TryGetSingleton(out DebugDraw draw))
@@ -83,7 +90,7 @@ namespace Unity.Physics.Authoring
             {
                 StaticNodes = broadphase.StaticTree.Nodes,
                 DynamicNodes = broadphase.DynamicTree.Nodes,
-                DebugDraw = draw
+                DebugDraw = draw,
             }.Schedule(state.Dependency);
         }
     }

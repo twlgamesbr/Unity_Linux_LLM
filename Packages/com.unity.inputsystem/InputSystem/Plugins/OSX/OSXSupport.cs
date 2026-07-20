@@ -25,7 +25,8 @@ namespace UnityEngine.InputSystem.OSX
                 matches: new InputDeviceMatcher()
                     .WithProduct("Nimbus+", supportRegex: false)
                     .WithCapability("vendorId", NimbusPlusHIDInputReport.OSXVendorId)
-                    .WithCapability("productId", NimbusPlusHIDInputReport.OSXProductId));
+                    .WithCapability("productId", NimbusPlusHIDInputReport.OSXProductId)
+            );
         }
     }
 }

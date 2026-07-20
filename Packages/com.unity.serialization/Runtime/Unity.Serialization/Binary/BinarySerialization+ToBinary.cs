@@ -12,23 +12,31 @@ namespace Unity.Serialization.Binary
         /// <param name="value">The object to serialize.</param>
         /// <param name="parameters">Parameters to use when writing.</param>
         /// <typeparam name="T">The type to serialize.</typeparam>
-        public static void ToBinary<T>(UnsafeAppendBuffer* stream, T value, BinarySerializationParameters parameters = default)
+        public static void ToBinary<T>(
+            UnsafeAppendBuffer* stream,
+            T value,
+            BinarySerializationParameters parameters = default
+        )
         {
             var container = new PropertyWrapper<T>(value);
 
-            var state = parameters.State ?? (parameters.RequiresThreadSafety ? new BinarySerializationState() : GetSharedState());
+            var state =
+                parameters.State
+                ?? (parameters.RequiresThreadSafety ? new BinarySerializationState() : GetSharedState());
             var visitor = state.GetBinaryPropertyWriter();
-            
+
             visitor.SetStream(stream);
             visitor.SetSerializedType(parameters.SerializedType);
             visitor.SetDisableRootAdapters(parameters.DisableRootAdapters);
             visitor.SetGlobalAdapters(GetGlobalAdapters());
             visitor.SetUserDefinedAdapters(parameters.UserDefinedAdapters);
-            visitor.SetSerializedReferences(parameters.DisableSerializedReferences ? default : state.GetSerializedReferences());
-            
+            visitor.SetSerializedReferences(
+                parameters.DisableSerializedReferences ? default : state.GetSerializedReferences()
+            );
+
             using (visitor.Lock())
                 PropertyContainer.Accept(visitor, ref container);
-            
+
             if (null == parameters.State && !parameters.DisableSerializedReferences)
                 state.GetSerializedReferences().Clear();
         }

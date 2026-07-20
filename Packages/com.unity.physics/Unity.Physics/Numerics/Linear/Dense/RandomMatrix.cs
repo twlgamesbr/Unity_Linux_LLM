@@ -98,7 +98,13 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         /// Generates a random general matrix
         /// </summary>
         /// <param name="M">The matrix to be filled out</param>
-        public static void GenerateRandomGeneralMatrix(this R.Random r, in MemoryManager heap, in Matrix M, float singularMin = 0.1f, float singularMax = 1.0f)
+        public static void GenerateRandomGeneralMatrix(
+            this R.Random r,
+            in MemoryManager heap,
+            in Matrix M,
+            float singularMin = 0.1f,
+            float singularMax = 1.0f
+        )
         {
             // compute U D V^T for a random diagonal D with the specified singular radius,
             // and random orthogonal U, V computed as series of random Householder rotations.
@@ -125,7 +131,11 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             }
         }
 
-        public static void GenerateRandomSymmetricPositiveDefiniteMatrix(this R.Random r, in MemoryManager heap, in Matrix M)
+        public static void GenerateRandomSymmetricPositiveDefiniteMatrix(
+            this R.Random r,
+            in MemoryManager heap,
+            in Matrix M
+        )
         {
             // matrix must be square
             Assert.IsTrue(M.NumRows == M.NumCols);

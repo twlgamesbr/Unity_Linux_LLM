@@ -13,16 +13,19 @@ namespace Unity.Netcode
         /// Will execute locally if the local process is the owner.
         /// </summary>
         Owner,
+
         /// <summary>
         /// Send to everyone but the current owner, filtered to the current observer list.
         /// Will execute locally if the local process is not the owner.
         /// </summary>
         NotOwner,
+
         /// <summary>
         /// Send to the server, regardless of ownership.
         /// Will execute locally if invoked on the server.
         /// </summary>
         Server,
+
         /// <summary>
         /// Send to everyone but the server, filtered to the current observer list.
         /// Will NOT send to a server running in host mode - it is still treated as a server.
@@ -34,6 +37,7 @@ namespace Unity.Netcode
         /// Will NOT execute locally if invoked on a server running in host mode.
         /// </summary>
         NotServer,
+
         /// <summary>
         /// Execute this RPC locally.
         /// <br />
@@ -46,37 +50,43 @@ namespace Unity.Netcode
         /// the network.
         /// </summary>
         Me,
+
         /// <summary>
         /// Send this RPC to everyone but the local machine, filtered to the current observer list.
         /// </summary>
         NotMe,
+
         /// <summary>
         /// Send this RPC to everone, filtered to the current observer list.
         /// Will execute locally.
         /// </summary>
         Everyone,
+
         /// <summary>
         /// Send this RPC to all clients, including the host, if a host exists.
         /// If the server is running in host mode, this is the same as <see cref="Everyone" />.
         /// If the server is running in dedicated server mode, this is the same as <see cref="NotServer" />.
         /// </summary>
         ClientsAndHost,
+
         /// <summary>
         /// Send this RPC to the authority.
         /// In distributed authority mode, this will be the owner of the NetworkObject.
         /// In normal client-server mode, this is basically the exact same thing as a server rpc.
         /// </summary>
         Authority,
+
         /// <summary>
         /// Send this RPC to all non-authority instances.
         /// In distributed authority mode, this will be the non-owners of the NetworkObject.
         /// In normal client-server mode, this is basically the exact same thing as a client rpc.
         /// </summary>
         NotAuthority,
+
         /// <summary>
         /// This RPC cannot be sent without passing in a target in RpcSendParams.
         /// </summary>
-        SpecifiedInParams
+        SpecifiedInParams,
     }
 
     /// <summary>
@@ -98,10 +108,11 @@ namespace Unity.Netcode
         /// Creates a temporary <see cref="BaseRpcTarget"/> used for the frame an <see cref="RpcAttribute"/> decorated method is invoked.
         /// </summary>
         Temp,
+
         /// <summary>
         /// Creates a persisted <see cref="BaseRpcTarget"/> that does not change and will persist until <see cref="BaseRpcTarget.Dispose"/> is called.
         /// </summary>
-        Persistent
+        Persistent,
     }
 
     /// <summary>
@@ -120,6 +131,7 @@ namespace Unity.Netcode
     {
         private NetworkManager m_NetworkManager;
         private NetworkConnectionManager m_ConnectionManager;
+
         internal RpcTarget(NetworkManager manager)
         {
             m_NetworkManager = manager;
@@ -419,7 +431,8 @@ namespace Unity.Netcode
         /// be overwritten in future calls to Not() or Group(). Do not call Dispose() on Temp targets.<br /><br /><see cref="RpcTargetUse.Persistent"/> will
         /// return a new target, which can be stored, but should not be done frequently because it results in a GC allocation. You must call Dispose() on Persistent targets when you are done with them.</param>
         /// <returns>A <see cref="BaseRpcTarget"/> configured to send to all clients except the specified one. The type of target (cached or new instance) depends on the <paramref name="use"/> parameter and whether the caller is the server</returns>
-        public BaseRpcTarget Group<T>(T clientIds, RpcTargetUse use) where T : IEnumerable<ulong>
+        public BaseRpcTarget Group<T>(T clientIds, RpcTargetUse use)
+            where T : IEnumerable<ulong>
         {
             IGroupRpcTarget target;
             if (m_NetworkManager.IsServer)
@@ -558,7 +571,8 @@ namespace Unity.Netcode
         /// be overwritten in future calls to Not() or Group(). Do not call Dispose() on Temp targets.<br /><br /><see cref="RpcTargetUse.Persistent"/> will
         /// return a new target, which can be stored, but should not be done frequently because it results in a GC allocation. You must call Dispose() on Persistent targets when you are done with them.</param>
         /// <returns>A <see cref="BaseRpcTarget"/> configured to send to all clients except the specified one. The type of target (cached or new instance) depends on the <paramref name="use"/> parameter and whether the caller is the server</returns>
-        public BaseRpcTarget Not<T>(T excludedClientIds, RpcTargetUse use) where T : IEnumerable<ulong>
+        public BaseRpcTarget Not<T>(T excludedClientIds, RpcTargetUse use)
+            where T : IEnumerable<ulong>
         {
             IGroupRpcTarget target;
             if (m_NetworkManager.IsServer)

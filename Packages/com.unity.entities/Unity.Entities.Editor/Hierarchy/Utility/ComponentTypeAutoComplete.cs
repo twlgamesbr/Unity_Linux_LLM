@@ -7,19 +7,28 @@ namespace Unity.Entities.Editor
     {
         static ComponentTypeAutoComplete s_Instance;
         static ComponentTypeAutoComplete s_EntityQueryInstance;
-        static string k_FilterToken = $"\\b([{Constants.ComponentSearch.TokenCaseInsensitive}]{Constants.ComponentSearch.Op})(?<componentType>(\\S)*)$";
-        static string k_EntityQueryFilterToken = $"\\b([{Constants.ComponentSearch.TokenCaseInsensitive}]|{Constants.ComponentSearch.Any}|{Constants.ComponentSearch.All}|{Constants.ComponentSearch.None}){Constants.ComponentSearch.Op}(?<componentType>(\\S)*)$";
-        public static ComponentTypeAutoComplete Instance => s_Instance ?? (s_Instance = new ComponentTypeAutoComplete(false));
-        public static ComponentTypeAutoComplete EntityQueryInstance => s_EntityQueryInstance ?? (s_EntityQueryInstance = new ComponentTypeAutoComplete(true));
+        static string k_FilterToken =
+            $"\\b([{Constants.ComponentSearch.TokenCaseInsensitive}]{Constants.ComponentSearch.Op})(?<componentType>(\\S)*)$";
+        static string k_EntityQueryFilterToken =
+            $"\\b([{Constants.ComponentSearch.TokenCaseInsensitive}]|{Constants.ComponentSearch.Any}|{Constants.ComponentSearch.All}|{Constants.ComponentSearch.None}){Constants.ComponentSearch.Op}(?<componentType>(\\S)*)$";
+        public static ComponentTypeAutoComplete Instance =>
+            s_Instance ?? (s_Instance = new ComponentTypeAutoComplete(false));
+        public static ComponentTypeAutoComplete EntityQueryInstance =>
+            s_EntityQueryInstance ?? (s_EntityQueryInstance = new ComponentTypeAutoComplete(true));
 
-        Regex m_Regex = new Regex(k_FilterToken, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+        Regex m_Regex = new Regex(
+            k_FilterToken,
+            RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture
+        );
 
-        static ComponentTypeAutoComplete()
-            => ComponentTypesTrie.Initialize();
+        static ComponentTypeAutoComplete() => ComponentTypesTrie.Initialize();
 
         ComponentTypeAutoComplete(bool supportsEntityQuery)
         {
-            m_Regex = new Regex(supportsEntityQuery ? k_EntityQueryFilterToken : k_FilterToken, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
+            m_Regex = new Regex(
+                supportsEntityQuery ? k_EntityQueryFilterToken : k_FilterToken,
+                RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase
+            );
         }
 
         public bool ShouldStartAutoCompletion(string input, int caretPosition)

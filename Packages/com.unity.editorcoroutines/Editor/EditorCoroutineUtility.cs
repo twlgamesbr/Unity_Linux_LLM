@@ -100,7 +100,7 @@ namespace Unity.EditorCoroutines.Editor
         ///     {
         ///         m_LoggerCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(LogRunning());
         ///     }
-        ///     
+        ///
         ///     void OnDisable()
         ///     {
         ///         EditorCoroutineUtility.StopCoroutine(m_LoggerCoroutine);

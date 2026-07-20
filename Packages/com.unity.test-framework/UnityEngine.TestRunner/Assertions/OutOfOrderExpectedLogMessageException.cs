@@ -7,9 +7,7 @@ namespace UnityEngine.TestTools.TestRunner
     internal class OutOfOrderExpectedLogMessageException : ResultStateException
     {
         public OutOfOrderExpectedLogMessageException(LogEvent log, LogMatch nextExpected)
-            : base(BuildMessage(log, nextExpected))
-        {
-        }
+            : base(BuildMessage(log, nextExpected)) { }
 
         private static string BuildMessage(LogEvent log, LogMatch nextExpected)
         {
@@ -21,6 +19,9 @@ namespace UnityEngine.TestTools.TestRunner
             get { return ResultState.Failure; }
         }
 
-        public override string StackTrace { get { return null; } }
+        public override string StackTrace
+        {
+            get { return null; }
+        }
     }
 }

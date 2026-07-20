@@ -15,9 +15,7 @@ namespace UnityEngine.TestTools
         /// Construct the values attribute with a set of arguments.
         /// </summary>
         /// <param name="args">The set of arguments for the test parameter.</param>
-        public PreservedValuesAttribute(params object[] args) : base(args)
-        {
-
-        }
+        public PreservedValuesAttribute(params object[] args)
+            : base(args) { }
     }
 }

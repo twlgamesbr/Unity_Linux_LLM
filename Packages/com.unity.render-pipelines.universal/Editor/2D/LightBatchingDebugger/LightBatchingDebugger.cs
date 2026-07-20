@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Accessibility;
 using UnityEngine.Rendering.Universal;
@@ -11,7 +11,8 @@ namespace UnityEditor.Rendering.Universal
 {
     internal class LightBatchingDebugger : EditorWindow
     {
-        private const string ResourcePath = "Packages/com.unity.render-pipelines.universal/Editor/2D/LightBatchingDebugger/";
+        private const string ResourcePath =
+            "Packages/com.unity.render-pipelines.universal/Editor/2D/LightBatchingDebugger/";
 
         private class LayerBatch
         {
@@ -51,10 +52,7 @@ namespace UnityEditor.Rendering.Universal
 
         ILight2DCullResult lightCullResult
         {
-            get
-            {
-                return renderer2DData?.lightCullResult;
-            }
+            get { return renderer2DData?.lightCullResult; }
         }
 
         Renderer2DData renderer2DData
@@ -79,10 +77,7 @@ namespace UnityEditor.Rendering.Universal
 
             for (var i = 0; i < batchCount; i++)
             {
-                var batchInfo = new LayerBatch
-                {
-                    batchId = i
-                };
+                var batchInfo = new LayerBatch { batchId = i };
 
                 var batch = batches[i];
 
@@ -233,7 +228,8 @@ namespace UnityEditor.Rendering.Universal
             title.text = $"Comparing <b>Batch {batch1.batchId}</b> and <b>Batch {batch2.batchId}</b>.";
 
             var title2 = root.Query<Label>("InfoTitle2").First();
-            title2.text = $"To batch <b>Batch {batch1.batchId}</b> and <b>Batch {batch2.batchId}</b>, ensure that the Sorting Layers in both batches share the same set of Lights and Shadow Casters.";
+            title2.text =
+                $"To batch <b>Batch {batch1.batchId}</b> and <b>Batch {batch2.batchId}</b>, ensure that the Sorting Layers in both batches share the same set of Lights and Shadow Casters.";
 
             // Light batch comparison
             var lightLabel1 = infoView.Query<Label>("LightLabel1").First();
@@ -303,7 +299,9 @@ namespace UnityEditor.Rendering.Universal
             // Generate color-blind friendly colors
             VisionUtility.GetColorBlindSafePalette(batchColors, 0.51f, 1.0f);
 
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(ResourcePath + "LightBatchingDebugger.uxml");
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                ResourcePath + "LightBatchingDebugger.uxml"
+            );
             var templateRoot = visualTree.Instantiate();
             templateRoot.style.flexGrow = 1;
             templateRoot.Q("ParentElement").StretchToParentSize();
@@ -483,7 +481,9 @@ namespace UnityEditor.Rendering.Universal
                 if (!isDirty)
                 {
                     for (int i = 0; i < totalLightCount; ++i)
-                        isDirty |= !lightCullResult.visibleLights.Exists(x => x != null && x.name == cachedLightNames[i]);
+                        isDirty |= !lightCullResult.visibleLights.Exists(x =>
+                            x != null && x.name == cachedLightNames[i]
+                        );
 
                     for (int i = 0; i < totalShadowCount; ++i)
                         isDirty |= !visibleShadows.Exists(x => x != null && x.name == cachedShadowCasterNames[i]);

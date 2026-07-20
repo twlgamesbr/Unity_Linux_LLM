@@ -11,22 +11,26 @@ namespace UnityEngine.UI
     /// </summary>
     public class Text : MaskableGraphic, ILayoutElement
     {
-        [SerializeField] private FontData m_FontData = FontData.defaultFontData;
+        [SerializeField]
+        private FontData m_FontData = FontData.defaultFontData;
 
 #if UNITY_EDITOR
         // needed to track font changes from the inspector
         private Font m_LastTrackedFont;
 #endif
 
-        [TextArea(3, 10)][SerializeField] protected string m_Text = String.Empty;
+        [TextArea(3, 10)]
+        [SerializeField]
+        protected string m_Text = String.Empty;
 
         private TextGenerator m_TextCache;
         private TextGenerator m_TextCacheForLayout;
 
-        static protected Material s_DefaultText = null;
+        protected static Material s_DefaultText = null;
 
         // We use this flag instead of Unregistering/Registering the callback to avoid allocation.
-        [NonSerialized] protected bool m_DisableFontTextureRebuiltCallback = false;
+        [NonSerialized]
+        protected bool m_DisableFontTextureRebuiltCallback = false;
 
         protected Text()
         {
@@ -36,10 +40,13 @@ namespace UnityEngine.UI
         /// <summary>
         /// The cached TextGenerator used when generating visible Text.
         /// </summary>
-
         public TextGenerator cachedTextGenerator
         {
-            get { return m_TextCache ?? (m_TextCache = (m_Text.Length != 0 ? new TextGenerator(m_Text.Length) : new TextGenerator())); }
+            get
+            {
+                return m_TextCache
+                    ?? (m_TextCache = (m_Text.Length != 0 ? new TextGenerator(m_Text.Length) : new TextGenerator()));
+            }
         }
 
         /// <summary>
@@ -138,10 +145,7 @@ namespace UnityEngine.UI
         /// </example>
         public Font font
         {
-            get
-            {
-                return m_FontData.font;
-            }
+            get { return m_FontData.font; }
             set
             {
                 if (m_FontData.font == value)
@@ -200,10 +204,7 @@ namespace UnityEngine.UI
         /// </example>
         public virtual string text
         {
-            get
-            {
-                return m_Text;
-            }
+            get { return m_Text; }
             set
             {
                 if (String.IsNullOrEmpty(value))
@@ -225,13 +226,9 @@ namespace UnityEngine.UI
         /// <summary>
         /// Whether this Text will support rich text.
         /// </summary>
-
         public bool supportRichText
         {
-            get
-            {
-                return m_FontData.richText;
-            }
+            get { return m_FontData.richText; }
             set
             {
                 if (m_FontData.richText == value)
@@ -245,13 +242,9 @@ namespace UnityEngine.UI
         /// <summary>
         /// Should the text be allowed to auto resized.
         /// </summary>
-
         public bool resizeTextForBestFit
         {
-            get
-            {
-                return m_FontData.bestFit;
-            }
+            get { return m_FontData.bestFit; }
             set
             {
                 if (m_FontData.bestFit == value)
@@ -267,10 +260,7 @@ namespace UnityEngine.UI
         /// </summary>
         public int resizeTextMinSize
         {
-            get
-            {
-                return m_FontData.minSize;
-            }
+            get { return m_FontData.minSize; }
             set
             {
                 if (m_FontData.minSize == value)
@@ -287,10 +277,7 @@ namespace UnityEngine.UI
         /// </summary>
         public int resizeTextMaxSize
         {
-            get
-            {
-                return m_FontData.maxSize;
-            }
+            get { return m_FontData.maxSize; }
             set
             {
                 if (m_FontData.maxSize == value)
@@ -349,10 +336,7 @@ namespace UnityEngine.UI
         /// </example>
         public TextAnchor alignment
         {
-            get
-            {
-                return m_FontData.alignment;
-            }
+            get { return m_FontData.alignment; }
             set
             {
                 if (m_FontData.alignment == value)
@@ -372,10 +356,7 @@ namespace UnityEngine.UI
         /// </remarks>
         public bool alignByGeometry
         {
-            get
-            {
-                return m_FontData.alignByGeometry;
-            }
+            get { return m_FontData.alignByGeometry; }
             set
             {
                 if (m_FontData.alignByGeometry == value)
@@ -439,10 +420,7 @@ namespace UnityEngine.UI
         /// </example>
         public int fontSize
         {
-            get
-            {
-                return m_FontData.fontSize;
-            }
+            get { return m_FontData.fontSize; }
             set
             {
                 if (m_FontData.fontSize == value)
@@ -462,10 +440,7 @@ namespace UnityEngine.UI
         /// </remarks>
         public HorizontalWrapMode horizontalOverflow
         {
-            get
-            {
-                return m_FontData.horizontalOverflow;
-            }
+            get { return m_FontData.horizontalOverflow; }
             set
             {
                 if (m_FontData.horizontalOverflow == value)
@@ -482,10 +457,7 @@ namespace UnityEngine.UI
         /// </summary>
         public VerticalWrapMode verticalOverflow
         {
-            get
-            {
-                return m_FontData.verticalOverflow;
-            }
+            get { return m_FontData.verticalOverflow; }
             set
             {
                 if (m_FontData.verticalOverflow == value)
@@ -502,10 +474,7 @@ namespace UnityEngine.UI
         /// </summary>
         public float lineSpacing
         {
-            get
-            {
-                return m_FontData.lineSpacing;
-            }
+            get { return m_FontData.lineSpacing; }
             set
             {
                 if (m_FontData.lineSpacing == value)
@@ -520,13 +489,9 @@ namespace UnityEngine.UI
         /// <summary>
         /// Font style used by the Text's text.
         /// </summary>
-
         public FontStyle fontStyle
         {
-            get
-            {
-                return m_FontData.fontStyle;
-            }
+            get { return m_FontData.fontStyle; }
             set
             {
                 if (m_FontData.fontStyle == value)
@@ -587,7 +552,6 @@ namespace UnityEngine.UI
         {
             AssignDefaultFontIfNecessary();
         }
-
 #endif
         internal void AssignDefaultFont()
         {
@@ -638,24 +602,35 @@ namespace UnityEngine.UI
         /// <summary>
         /// Convenience function to determine the vector offset of the anchor.
         /// </summary>
-        static public Vector2 GetTextAnchorPivot(TextAnchor anchor)
+        public static Vector2 GetTextAnchorPivot(TextAnchor anchor)
         {
             switch (anchor)
             {
-                case TextAnchor.LowerLeft:    return new Vector2(0, 0);
-                case TextAnchor.LowerCenter:  return new Vector2(0.5f, 0);
-                case TextAnchor.LowerRight:   return new Vector2(1, 0);
-                case TextAnchor.MiddleLeft:   return new Vector2(0, 0.5f);
-                case TextAnchor.MiddleCenter: return new Vector2(0.5f, 0.5f);
-                case TextAnchor.MiddleRight:  return new Vector2(1, 0.5f);
-                case TextAnchor.UpperLeft:    return new Vector2(0, 1);
-                case TextAnchor.UpperCenter:  return new Vector2(0.5f, 1);
-                case TextAnchor.UpperRight:   return new Vector2(1, 1);
-                default: return Vector2.zero;
+                case TextAnchor.LowerLeft:
+                    return new Vector2(0, 0);
+                case TextAnchor.LowerCenter:
+                    return new Vector2(0.5f, 0);
+                case TextAnchor.LowerRight:
+                    return new Vector2(1, 0);
+                case TextAnchor.MiddleLeft:
+                    return new Vector2(0, 0.5f);
+                case TextAnchor.MiddleCenter:
+                    return new Vector2(0.5f, 0.5f);
+                case TextAnchor.MiddleRight:
+                    return new Vector2(1, 0.5f);
+                case TextAnchor.UpperLeft:
+                    return new Vector2(0, 1);
+                case TextAnchor.UpperCenter:
+                    return new Vector2(0.5f, 1);
+                case TextAnchor.UpperRight:
+                    return new Vector2(1, 1);
+                default:
+                    return Vector2.zero;
             }
         }
 
         readonly UIVertex[] m_TempVerts = new UIVertex[4];
+
         protected override void OnPopulateMesh(VertexHelper toFill)
         {
             if (font == null)
@@ -714,8 +689,9 @@ namespace UnityEngine.UI
             m_DisableFontTextureRebuiltCallback = false;
         }
 
-        public virtual void CalculateLayoutInputHorizontal() {}
-        public virtual void CalculateLayoutInputVertical() {}
+        public virtual void CalculateLayoutInputHorizontal() { }
+
+        public virtual void CalculateLayoutInputVertical() { }
 
         public virtual float minWidth
         {
@@ -731,7 +707,10 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual float flexibleWidth { get { return -1; } }
+        public virtual float flexibleWidth
+        {
+            get { return -1; }
+        }
 
         public virtual float minHeight
         {
@@ -747,9 +726,15 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual float flexibleHeight { get { return -1; } }
+        public virtual float flexibleHeight
+        {
+            get { return -1; }
+        }
 
-        public virtual int layoutPriority { get { return 0; } }
+        public virtual int layoutPriority
+        {
+            get { return 0; }
+        }
 
 #if UNITY_EDITOR
         public override void OnRebuildRequested()

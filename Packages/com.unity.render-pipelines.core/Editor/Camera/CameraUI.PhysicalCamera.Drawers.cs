@@ -13,7 +13,8 @@ namespace UnityEditor.Rendering
         {
             // Saves the value of the sensor size when the user switches from "custom" size to a preset per camera.
             // We use a ConditionalWeakTable instead of a Dictionary to avoid keeping alive (with strong references) deleted cameras
-            static ConditionalWeakTable<Camera, object> s_PerCameraSensorSizeHistory = new ConditionalWeakTable<Camera, object>();
+            static ConditionalWeakTable<Camera, object> s_PerCameraSensorSizeHistory =
+                new ConditionalWeakTable<Camera, object>();
 
             /// <summary>Draws Body Sensor related fields on the inspector</summary>
             /// <param name="p"><see cref="ISerializedCamera"/> The serialized camera</param>
@@ -23,26 +24,42 @@ namespace UnityEditor.Rendering
                 var cam = p.baseCameraSettings;
                 EditorGUI.BeginChangeCheck();
 
-                int oldFilmGateIndex = Array.IndexOf(Styles.apertureFormatValues, new Vector2((float)Math.Round(cam.sensorSize.vector2Value.x, 3), (float)Math.Round(cam.sensorSize.vector2Value.y, 3)));
+                int oldFilmGateIndex = Array.IndexOf(
+                    Styles.apertureFormatValues,
+                    new Vector2(
+                        (float)Math.Round(cam.sensorSize.vector2Value.x, 3),
+                        (float)Math.Round(cam.sensorSize.vector2Value.y, 3)
+                    )
+                );
 
                 // If it is not one of the preset sizes, set it to custom
                 oldFilmGateIndex = (oldFilmGateIndex == -1) ? Styles.customPresetIndex : oldFilmGateIndex;
 
                 // Get the new user selection
-                int newFilmGateIndex = EditorGUILayout.Popup(Styles.sensorType, oldFilmGateIndex, Styles.apertureFormatNames);
+                int newFilmGateIndex = EditorGUILayout.Popup(
+                    Styles.sensorType,
+                    oldFilmGateIndex,
+                    Styles.apertureFormatNames
+                );
 
                 if (EditorGUI.EndChangeCheck())
                 {
                     // Retrieve the previous custom size value, if one exists for this camera
                     object previousCustomValue;
-                    s_PerCameraSensorSizeHistory.TryGetValue((Camera)p.serializedObject.targetObject, out previousCustomValue);
+                    s_PerCameraSensorSizeHistory.TryGetValue(
+                        (Camera)p.serializedObject.targetObject,
+                        out previousCustomValue
+                    );
 
                     // When switching from custom to a preset, update the last custom value (to display again, in case the user switches back to custom)
                     if (oldFilmGateIndex == Styles.customPresetIndex)
                     {
                         if (previousCustomValue == null)
                         {
-                            s_PerCameraSensorSizeHistory.Add((Camera)p.serializedObject.targetObject, cam.sensorSize.vector2Value);
+                            s_PerCameraSensorSizeHistory.Add(
+                                (Camera)p.serializedObject.targetObject,
+                                cam.sensorSize.vector2Value
+                            );
                         }
                         else
                         {
@@ -82,7 +99,9 @@ namespace UnityEditor.Rendering
                 using (var propertyScope = new EditorGUI.PropertyScope(horizontal.rect, Styles.gateFit, cam.gateFit))
                 using (var checkScope = new EditorGUI.ChangeCheckScope())
                 {
-                    int gateValue = (int)(Camera.GateFitMode)EditorGUILayout.EnumPopup(propertyScope.content, (Camera.GateFitMode)cam.gateFit.intValue);
+                    int gateValue = (int)
+                        (Camera.GateFitMode)
+                            EditorGUILayout.EnumPopup(propertyScope.content, (Camera.GateFitMode)cam.gateFit.intValue);
                     if (checkScope.changed)
                         cam.gateFit.intValue = gateValue;
                 }
@@ -99,12 +118,16 @@ namespace UnityEditor.Rendering
                 using (new EditorGUI.PropertyScope(horizontal.rect, Styles.focalLength, cam.focalLength))
                 using (var checkScope = new EditorGUI.ChangeCheckScope())
                 {
-                    bool isPhysical = p.projectionMatrixMode.intValue == (int)CameraUI.ProjectionMatrixMode.PhysicalPropertiesBased;
+                    bool isPhysical =
+                        p.projectionMatrixMode.intValue == (int)CameraUI.ProjectionMatrixMode.PhysicalPropertiesBased;
                     // We need to update the focal length if the camera is physical and the FoV has changed.
                     bool focalLengthIsDirty = (s_FovChanged && isPhysical);
 
-                    float sensorLength = cam.fovAxisMode.intValue == 0 ? cam.sensorSize.vector2Value.y : cam.sensorSize.vector2Value.x;
-                    float focalLengthVal = focalLengthIsDirty ? Camera.FieldOfViewToFocalLength(s_FovLastValue, sensorLength) : cam.focalLength.floatValue;
+                    float sensorLength =
+                        cam.fovAxisMode.intValue == 0 ? cam.sensorSize.vector2Value.y : cam.sensorSize.vector2Value.x;
+                    float focalLengthVal = focalLengthIsDirty
+                        ? Camera.FieldOfViewToFocalLength(s_FovLastValue, sensorLength)
+                        : cam.focalLength.floatValue;
                     focalLengthVal = EditorGUILayout.FloatField(Styles.focalLength, focalLengthVal);
                     if (checkScope.changed || focalLengthIsDirty)
                         cam.focalLength.floatValue = focalLengthVal;
@@ -118,7 +141,6 @@ namespace UnityEditor.Rendering
             {
                 EditorGUILayout.PropertyField(p.baseCameraSettings.lensShift, Styles.shift);
             }
-
 
             /// <summary>Draws Focus Distance related fields on the inspector</summary>
             /// <param name="p"><see cref="ISerializedCamera"/> The serialized camera</param>
@@ -138,14 +160,16 @@ namespace UnityEditor.Rendering
                 EditorGUILayout.PropertyField(cam.iso, Styles.ISO);
             }
 
-            static EditorPrefBoolFlags<ShutterSpeedUnit> m_ShutterSpeedState = new EditorPrefBoolFlags<ShutterSpeedUnit>($"HDRP:{nameof(CameraUI)}:ShutterSpeedState");
+            static EditorPrefBoolFlags<ShutterSpeedUnit> m_ShutterSpeedState =
+                new EditorPrefBoolFlags<ShutterSpeedUnit>($"HDRP:{nameof(CameraUI)}:ShutterSpeedState");
 
             enum ShutterSpeedUnit
             {
                 [InspectorName("Second")]
                 Second,
+
                 [InspectorName("1 \u2215 Second")] // Don't use a slash here else Unity will auto-create a submenu...
-                OneOverSecond
+                OneOverSecond,
             }
 
             /// <summary>Draws Shutter Speed related fields on the inspector</summary>
@@ -166,8 +190,18 @@ namespace UnityEditor.Rendering
                 EditorGUI.indentLevel = 0;
 
                 var lineRect = EditorGUILayout.GetControlRect();
-                var fieldRect = new Rect(k_OffsetPerIndent + k_LabelFieldSeparator + k_Offset, lineRect.y, lineRect.width - k_UnitMenuWidth, lineRect.height);
-                var unitMenu = new Rect(fieldRect.xMax + k_LabelFieldSeparator, lineRect.y, k_UnitMenuWidth - k_LabelFieldSeparator, lineRect.height);
+                var fieldRect = new Rect(
+                    k_OffsetPerIndent + k_LabelFieldSeparator + k_Offset,
+                    lineRect.y,
+                    lineRect.width - k_UnitMenuWidth,
+                    lineRect.height
+                );
+                var unitMenu = new Rect(
+                    fieldRect.xMax + k_LabelFieldSeparator,
+                    lineRect.y,
+                    k_UnitMenuWidth - k_LabelFieldSeparator,
+                    lineRect.height
+                );
 
                 // We cannot had the shutterSpeedState as this is not a serialized property but a global edition mode.
                 // This imply that it will never go bold nor can be reverted in prefab overrides
@@ -214,7 +248,12 @@ namespace UnityEditor.Rendering
                     var sliderRect = rect;
                     sliderRect.x += labelRect.width + sliderPaddingLeft;
                     sliderRect.width = rect.width - labelRect.width - sliderPaddingRight;
-                    float newVal = GUI.HorizontalSlider(sliderRect, cam.aperture.floatValue, Camera.kMinAperture, Camera.kMaxAperture);
+                    float newVal = GUI.HorizontalSlider(
+                        sliderRect,
+                        cam.aperture.floatValue,
+                        Camera.kMinAperture,
+                        Camera.kMaxAperture
+                    );
 
                     // keep only 2 digits of precision, like the otehr editor fields
                     newVal = Mathf.Floor(100 * newVal) / 100.0f;
@@ -255,7 +294,9 @@ namespace UnityEditor.Rendering
                 EditorGUILayout.PropertyField(cam.bladeCount, Styles.bladeCount);
 
                 using (var horizontal = new EditorGUILayout.HorizontalScope())
-                using (var propertyScope = new EditorGUI.PropertyScope(horizontal.rect, Styles.curvature, cam.curvature))
+                using (
+                    var propertyScope = new EditorGUI.PropertyScope(horizontal.rect, Styles.curvature, cam.curvature)
+                )
                 {
                     var v = cam.curvature.vector2Value;
 
@@ -266,10 +307,30 @@ namespace UnityEditor.Rendering
                     const int kSeparatorWidth = 5;
                     float indentOffset = EditorGUI.indentLevel * 15f;
                     var lineRect = EditorGUILayout.GetControlRect();
-                    var labelRect = new Rect(lineRect.x, lineRect.y, EditorGUIUtility.labelWidth - indentOffset, lineRect.height);
-                    var floatFieldLeft = new Rect(labelRect.xMax, lineRect.y, kFloatFieldWidth + indentOffset, lineRect.height);
-                    var sliderRect = new Rect(floatFieldLeft.xMax + kSeparatorWidth - indentOffset, lineRect.y, lineRect.width - labelRect.width - kFloatFieldWidth * 2 - kSeparatorWidth * 2, lineRect.height);
-                    var floatFieldRight = new Rect(sliderRect.xMax + kSeparatorWidth - indentOffset, lineRect.y, kFloatFieldWidth + indentOffset, lineRect.height);
+                    var labelRect = new Rect(
+                        lineRect.x,
+                        lineRect.y,
+                        EditorGUIUtility.labelWidth - indentOffset,
+                        lineRect.height
+                    );
+                    var floatFieldLeft = new Rect(
+                        labelRect.xMax,
+                        lineRect.y,
+                        kFloatFieldWidth + indentOffset,
+                        lineRect.height
+                    );
+                    var sliderRect = new Rect(
+                        floatFieldLeft.xMax + kSeparatorWidth - indentOffset,
+                        lineRect.y,
+                        lineRect.width - labelRect.width - kFloatFieldWidth * 2 - kSeparatorWidth * 2,
+                        lineRect.height
+                    );
+                    var floatFieldRight = new Rect(
+                        sliderRect.xMax + kSeparatorWidth - indentOffset,
+                        lineRect.y,
+                        kFloatFieldWidth + indentOffset,
+                        lineRect.height
+                    );
 
                     EditorGUI.PrefixLabel(labelRect, propertyScope.content);
                     v.x = EditorGUI.FloatField(floatFieldLeft, v.x);

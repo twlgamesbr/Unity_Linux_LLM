@@ -19,7 +19,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         internal MetricDispatcher(
             MetricCollection collection,
             IReadOnlyList<IResettable> resettables,
-            IReadOnlyList<IEventMetric> eventMetrics)
+            IReadOnlyList<IEventMetric> eventMetrics
+        )
         {
             m_Collection = collection;
             m_Resettables = resettables;

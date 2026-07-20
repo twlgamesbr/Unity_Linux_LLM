@@ -64,10 +64,14 @@ namespace UnityEditor.Rendering.Universal
                         bool isTemplate = EditorApplication.isCreateFromTemplate;
                         if (!inTestSuite && fileExist && !isTemplate)
                         {
-                            EditorUtility.DisplayDialog("URP Material upgrade", "The Materials in your Project were created using an older version of the Universal Render Pipeline (URP)." +
-                                " Unity must upgrade them to be compatible with your current version of URP. \n" +
-                                " Unity will re-import all of the Materials in your project, save the upgraded Materials to disk, and check them out in source control if needed.\n" +
-                                " Please see the Material upgrade guide in the URP documentation for more information.", "OK");
+                            EditorUtility.DisplayDialog(
+                                "URP Material upgrade",
+                                "The Materials in your Project were created using an older version of the Universal Render Pipeline (URP)."
+                                    + " Unity must upgrade them to be compatible with your current version of URP. \n"
+                                    + " Unity will re-import all of the Materials in your project, save the upgraded Materials to disk, and check them out in source control if needed.\n"
+                                    + " Please see the Material upgrade guide in the URP documentation for more information.",
+                                "OK"
+                            );
                         }
 
                         ReimportAllMaterials();
@@ -86,9 +90,21 @@ namespace UnityEditor.Rendering.Universal
         internal static List<string> s_ImportedAssetThatNeedSaving = new List<string>();
         internal static bool s_NeedsSavingAssets = false;
 
-        internal static readonly Action<Material, ShaderID>[] k_Upgraders = { UpgradeV1, UpgradeV2, UpgradeV3, UpgradeV4, UpgradeV5, UpgradeV6, UpgradeV7, UpgradeV8, UpgradeV9, UpgradeV10 };
+        internal static readonly Action<Material, ShaderID>[] k_Upgraders =
+        {
+            UpgradeV1,
+            UpgradeV2,
+            UpgradeV3,
+            UpgradeV4,
+            UpgradeV5,
+            UpgradeV6,
+            UpgradeV7,
+            UpgradeV8,
+            UpgradeV9,
+            UpgradeV10,
+        };
 
-        static internal void SaveAssetsToDisk()
+        internal static void SaveAssetsToDisk()
         {
             string commandLineOptions = System.Environment.CommandLine;
             bool inTestSuite = commandLineOptions.Contains("-testResults");
@@ -115,7 +131,12 @@ namespace UnityEditor.Rendering.Universal
         }
 
         [RunAfterClass(typeof(UniversalRenderPipelineGlobalSettingsPostprocessor))]
-        static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        static void OnPostprocessAllAssets(
+            string[] importedAssets,
+            string[] deletedAssets,
+            string[] movedAssets,
+            string[] movedFromAssetPaths
+        )
         {
             string upgradeLog = "";
             var upgradeCount = 0;
@@ -172,11 +193,13 @@ namespace UnityEditor.Rendering.Universal
                         else
                         {
                             assetVersion.version = UniversalProjectSettings.materialVersionForUpgrade;
-                            debug += $" assumed to be version {UniversalProjectSettings.materialVersionForUpgrade} due to missing version.";
+                            debug +=
+                                $" assumed to be version {UniversalProjectSettings.materialVersionForUpgrade} due to missing version.";
                         }
                     }
 
-                    assetVersion.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable;
+                    assetVersion.hideFlags =
+                        HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable;
                     AssetDatabase.AddObjectToAsset(assetVersion, asset);
                 }
 
@@ -233,11 +256,19 @@ namespace UnityEditor.Rendering.Universal
                     break;
                 case ShaderID.ParticlesLit:
                     MaterialUpgrader.Upgrade(material, new ParticleUpdaterV1(shaderPath), upgradeFlag);
-                    ParticlesLitShader.SetMaterialKeywords(material, LitGUI.SetMaterialKeywords, ParticleGUI.SetMaterialKeywords);
+                    ParticlesLitShader.SetMaterialKeywords(
+                        material,
+                        LitGUI.SetMaterialKeywords,
+                        ParticleGUI.SetMaterialKeywords
+                    );
                     break;
                 case ShaderID.ParticlesSimpleLit:
                     MaterialUpgrader.Upgrade(material, new ParticleUpdaterV1(shaderPath), upgradeFlag);
-                    ParticlesSimpleLitShader.SetMaterialKeywords(material, SimpleLitGUI.SetMaterialKeywords, ParticleGUI.SetMaterialKeywords);
+                    ParticlesSimpleLitShader.SetMaterialKeywords(
+                        material,
+                        SimpleLitGUI.SetMaterialKeywords,
+                        ParticleGUI.SetMaterialKeywords
+                    );
                     break;
                 case ShaderID.ParticlesUnlit:
                     MaterialUpgrader.Upgrade(material, new ParticleUpdaterV1(shaderPath), upgradeFlag);
@@ -282,8 +313,7 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void UpgradeV4(Material material, ShaderID shaderID)
-        { }
+        static void UpgradeV4(Material material, ShaderID shaderID) { }
 
         static void UpgradeV5(Material material, ShaderID shaderID)
         {
@@ -354,8 +384,8 @@ namespace UnityEditor.Rendering.Universal
                         //    from (as we can then know which version it was being actually used as). If the project is
                         //    at version 6 or higher then we know that if the user had selected Premultiplied it is
                         //    already working based on the new interpretation and should not be changed
-                        bool skipChangingBlendMode = shaderID == ShaderID.ComplexLit &&
-                                          UniversalProjectSettings.materialVersionForUpgrade >= 6;
+                        bool skipChangingBlendMode =
+                            shaderID == ShaderID.ComplexLit && UniversalProjectSettings.materialVersionForUpgrade >= 6;
 
                         var blendModePID = Shader.PropertyToID(Property.BlendMode);
                         var blendMode = (BaseShaderGUI.BlendMode)material.GetFloat(blendModePID);
@@ -381,9 +411,11 @@ namespace UnityEditor.Rendering.Universal
             var surfacePropertyID = Shader.PropertyToID(Property.SurfaceType);
             var alphaClipPropertyID = Shader.PropertyToID(Property.AlphaClip);
             var alphaToMaskPropertyID = Shader.PropertyToID(Property.AlphaToMask);
-            if (material.HasProperty(surfacePropertyID) &&
-                material.HasProperty(alphaClipPropertyID) &&
-                material.HasProperty(alphaToMaskPropertyID))
+            if (
+                material.HasProperty(surfacePropertyID)
+                && material.HasProperty(alphaClipPropertyID)
+                && material.HasProperty(alphaToMaskPropertyID)
+            )
             {
                 bool isOpaque = material.GetFloat(surfacePropertyID) < 1.0f;
                 bool isAlphaClipEnabled = material.GetFloat(alphaClipPropertyID) > 0.0f;
@@ -416,14 +448,17 @@ namespace UnityEditor.Rendering.Universal
         // rendering trees with no motion vector output.
         static void UpgradeV9(Material material, ShaderID shaderID)
         {
-            if(shaderID != ShaderID.SpeedTree8)
+            if (shaderID != ShaderID.SpeedTree8)
                 return;
 
             // Check if the material is a SpeedTree material and whether it has wind turned on or off.
-            if(SpeedTree8MaterialUpgrader.DoesMaterialHaveSpeedTreeWindKeyword(material))
+            if (SpeedTree8MaterialUpgrader.DoesMaterialHaveSpeedTreeWindKeyword(material))
             {
                 bool motionVectorPassEnabled = SpeedTree8MaterialUpgrader.IsWindEnabled(material);
-                material.SetShaderPassEnabled(MotionVectorRenderPass.k_MotionVectorsLightModeTag, motionVectorPassEnabled);
+                material.SetShaderPassEnabled(
+                    MotionVectorRenderPass.k_MotionVectorsLightModeTag,
+                    motionVectorPassEnabled
+                );
             }
         }
 
@@ -436,7 +471,11 @@ namespace UnityEditor.Rendering.Universal
                 material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.BakedEmissive;
                 if (material.HasProperty(Property.EmissionColor))
                     MaterialEditor.FixupEmissiveFlag(material);
-                CoreUtils.SetKeyword(material, ShaderKeywordStrings._EMISSION, (material.globalIlluminationFlags & MaterialGlobalIlluminationFlags.AnyEmissive) != 0);
+                CoreUtils.SetKeyword(
+                    material,
+                    ShaderKeywordStrings._EMISSION,
+                    (material.globalIlluminationFlags & MaterialGlobalIlluminationFlags.AnyEmissive) != 0
+                );
             }
         }
     }
@@ -451,7 +490,11 @@ namespace UnityEditor.Rendering.Universal
             if (material == null)
                 throw new ArgumentNullException("material");
 
-            if (material.GetTexture("_MetallicGlossMap") || material.GetTexture("_SpecGlossMap") || material.GetFloat("_SmoothnessTextureChannel") >= 0.5f)
+            if (
+                material.GetTexture("_MetallicGlossMap")
+                || material.GetTexture("_SpecGlossMap")
+                || material.GetFloat("_SmoothnessTextureChannel") >= 0.5f
+            )
                 material.SetFloat("_Smoothness", material.GetFloat("_GlossMapScale"));
             else
                 material.SetFloat("_Smoothness", material.GetFloat("_Glossiness"));

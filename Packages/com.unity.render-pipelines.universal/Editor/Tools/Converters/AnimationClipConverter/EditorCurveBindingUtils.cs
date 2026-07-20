@@ -6,29 +6,26 @@ namespace UnityEditor.Rendering.Universal
 {
     static class EditorCurveBindingUtils
     {
-        private static readonly HashSet<string> k_ColorAttributeSuffixes = new HashSet<string>
-        {
-            "r", "g", "b", "a"
-        };
+        private static readonly HashSet<string> k_ColorAttributeSuffixes = new HashSet<string> { "r", "g", "b", "a" };
 
-        private static readonly HashSet<string> k_VectorAttributeSuffixes = new HashSet<string>
-        {
-            "x", "y", "z", "w"
-        };
+        private static readonly HashSet<string> k_VectorAttributeSuffixes = new HashSet<string> { "x", "y", "z", "w" };
 
         // All known texture sub-property suffixes
         private static readonly string[] k_TextureSubProperties = new[]
         {
-            "_ST",          // Scale and Tiling (Vector4: x=scaleX, y=scaleY, z=offsetX, w=offsetY)
-            "_TexelSize",   // Texel size (Vector4: x=1/width, y=1/height, z=width, w=height)
-            "_HDR",         // HDR decode values (Vector4)
-            "_Bump"         // Bump map scale (usually Float, but can be part of texture property)
+            "_ST", // Scale and Tiling (Vector4: x=scaleX, y=scaleY, z=offsetX, w=offsetY)
+            "_TexelSize", // Texel size (Vector4: x=1/width, y=1/height, z=width, w=height)
+            "_HDR", // HDR decode values (Vector4)
+            "_Bump", // Bump map scale (usually Float, but can be part of texture property)
         };
 
         // Matches material property names in the format:
         // "material._PropertyName" or "material._PropertyName.component"
         // Examples: "material._Color.r", "material._MainTex_ST.x", "material._Metallic"
-        private static readonly Regex k_MatchMaterialPropertyName = new(@"^material\.([^.]+)(?:\.([rgba]|[xyzw]))?$", RegexOptions.Compiled);
+        private static readonly Regex k_MatchMaterialPropertyName = new(
+            @"^material\.([^.]+)(?:\.([rgba]|[xyzw]))?$",
+            RegexOptions.Compiled
+        );
 
         internal static (string Name, ShaderPropertyType Type) InferShaderProperty(EditorCurveBinding binding)
         {
@@ -56,7 +53,10 @@ namespace UnityEditor.Rendering.Universal
             return (propertyName, ShaderPropertyType.Float);
         }
 
-        private static (bool isTexture, string baseName) CheckForTextureProperty(string propertyName, string componentSuffix)
+        private static (bool isTexture, string baseName) CheckForTextureProperty(
+            string propertyName,
+            string componentSuffix
+        )
         {
             // Check each texture sub-property suffix
             foreach (var subProperty in k_TextureSubProperties)

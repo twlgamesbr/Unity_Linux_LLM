@@ -13,9 +13,9 @@ namespace Unity.Entities.Baking
 {
     internal struct ChangedSceneTransforms
     {
-        public SceneHierarchy                  Hierarchy;
-        public NativeList<TransformAuthoring>  Transforms;
-        public NativeList<EntityId>                 ChangedLocalToWorldIndices;
+        public SceneHierarchy Hierarchy;
+        public NativeList<TransformAuthoring> Transforms;
+        public NativeList<EntityId> ChangedLocalToWorldIndices;
     }
 
     /// <summary>
@@ -58,44 +58,47 @@ namespace Unity.Entities.Baking
         // It may make sense in future to change this to track dependencies at a Baker type AND EntityId level, so that we could reduce the work performed.
 
         // Unity Component (EntityId) -> Dependent Object EntityId
-        UnsafeParallelMultiHashMap<EntityId, EntityId>                        _PropertyChangeDependency;
+        UnsafeParallelMultiHashMap<EntityId, EntityId> _PropertyChangeDependency;
+
         // Dependent Object EntityId ->  Unity Component (EntityId)
-        UnsafeParallelMultiHashMap<EntityId, EntityId>                        _ReversePropertyChangeDependency;
+        UnsafeParallelMultiHashMap<EntityId, EntityId> _ReversePropertyChangeDependency;
+
         // Is _ReversePropertyChangeDependency up to date with _PropertyChangeDependency?
         // For performance reasons we don't immediately add / remove to _ReversePropertyChangeDependency.
         // Instead if any dependencies have changed, we rebuild the _ReversePropertyChangeDependency from scratch.
         // Thus every change to _PropertyChangeDependency must set _IsReversePropertyChangeDependencyUpToDate = 0
         // NOTE: This is an int to make burst happy. (Can't marshal bools via struct in a function pointer)
-        int                                                 _IsReversePropertyChangeDependencyUpToDate;
+        int _IsReversePropertyChangeDependencyUpToDate;
 
         // Baker (EntityId) -> ActiveDependency
-        UnsafeParallelMultiHashMap<EntityId, ActiveDependency>               _ActiveDependencies;
+        UnsafeParallelMultiHashMap<EntityId, ActiveDependency> _ActiveDependencies;
 
         // Baker (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, GetComponentDependency>         _StructuralGetComponentDependency;
+        UnsafeParallelMultiHashMap<EntityId, GetComponentDependency> _StructuralGetComponentDependency;
 
         // Baker (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, GetComponentsDependency>        _StructuralGetComponentsDependency;
+        UnsafeParallelMultiHashMap<EntityId, GetComponentsDependency> _StructuralGetComponentsDependency;
 
         // Baker (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, GetHierarchySingleDependency>   _StructuralGetHierarchySingleDependency;
+        UnsafeParallelMultiHashMap<EntityId, GetHierarchySingleDependency> _StructuralGetHierarchySingleDependency;
 
         // Baker (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, GetHierarchyDependency>         _StructuralGetHierarchyDependency;
+        UnsafeParallelMultiHashMap<EntityId, GetHierarchyDependency> _StructuralGetHierarchyDependency;
 
         // Baker (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency>          _StructuralObjectExistDependency;
+        UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency> _StructuralObjectExistDependency;
 
         // Baker (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency>   _ObjectPropertyDependency;
+        UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency> _ObjectPropertyDependency;
+
         // Dependent Object (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency>   _ReverseObjectPropertyDependency;
+        UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency> _ReverseObjectPropertyDependency;
 
         // Baker (EntityId) -> Dependency data
-        UnsafeParallelMultiHashMap<EntityId, ObjectStaticDependency>     _ObjectStaticDependency;
+        UnsafeParallelMultiHashMap<EntityId, ObjectStaticDependency> _ObjectStaticDependency;
 
         // Baker (EntityId) -> Dependency on Light Baking
-        UnsafeHashSet<EntityId>                                              _LightBakingDependency;
+        UnsafeHashSet<EntityId> _LightBakingDependency;
 
 #if UNITY_EDITOR
         internal struct AssetState
@@ -111,43 +114,50 @@ namespace Unity.Entities.Baking
         }
 
         // GUID -> Last known hash on disk
-        UnsafeParallelHashSet<GUID>                                 _AssetStateKeys;
-        UnsafeList<AssetState>                              _AssetState;
+        UnsafeParallelHashSet<GUID> _AssetStateKeys;
+        UnsafeList<AssetState> _AssetState;
+
         // Unity Component (EntityId) -> GUID
-        UnsafeParallelMultiHashMap<EntityId, GUID>                       _ComponentIdToAssetGUID;
+        UnsafeParallelMultiHashMap<EntityId, GUID> _ComponentIdToAssetGUID;
 #endif
 
-        static readonly string CalculateDependenciesMarkerStr         = "Dependencies.CalculateDependencies";
-        static readonly string AssetDependenciesMarkerStr             = "Dependencies.CalculateAssetDependencies";
-        static readonly string StructuralDependenciesMarkerStr        = "Dependencies.CalculateStructuralDependencies";
-        static readonly string NonStructuralDependenciesMarkerStr     = "Dependencies.CalculateNonStructuralDependencies";
-        static readonly string ObjectExistDependenciesMarkerStr       = "Dependencies.CalculateObjectExistDependencies";
-        static readonly string InstanceIDsToValidArrayMarkerStr       = "InstanceIDsToValidArrayMarkerStr";
+        static readonly string CalculateDependenciesMarkerStr = "Dependencies.CalculateDependencies";
+        static readonly string AssetDependenciesMarkerStr = "Dependencies.CalculateAssetDependencies";
+        static readonly string StructuralDependenciesMarkerStr = "Dependencies.CalculateStructuralDependencies";
+        static readonly string NonStructuralDependenciesMarkerStr = "Dependencies.CalculateNonStructuralDependencies";
+        static readonly string ObjectExistDependenciesMarkerStr = "Dependencies.CalculateObjectExistDependencies";
+        static readonly string InstanceIDsToValidArrayMarkerStr = "InstanceIDsToValidArrayMarkerStr";
 
-        static readonly ProfilerMarker CalculateDependenciesMarker             = new ProfilerMarker(CalculateDependenciesMarkerStr);
-        static readonly ProfilerMarker AssetDependenciesMarker                 = new ProfilerMarker(AssetDependenciesMarkerStr);
-        static readonly ProfilerMarker StructuralDependenciesMarker            = new ProfilerMarker(StructuralDependenciesMarkerStr);
-        static readonly ProfilerMarker NonStructuralDependenciesMarker         = new ProfilerMarker(NonStructuralDependenciesMarkerStr);
-        static readonly ProfilerMarker ObjectExistDependenciesMarker           = new ProfilerMarker(ObjectExistDependenciesMarkerStr);
-        static readonly ProfilerMarker InstanceIDsToValidArrayMarker           = new ProfilerMarker(InstanceIDsToValidArrayMarkerStr);
+        static readonly ProfilerMarker CalculateDependenciesMarker = new ProfilerMarker(CalculateDependenciesMarkerStr);
+        static readonly ProfilerMarker AssetDependenciesMarker = new ProfilerMarker(AssetDependenciesMarkerStr);
+        static readonly ProfilerMarker StructuralDependenciesMarker = new ProfilerMarker(
+            StructuralDependenciesMarkerStr
+        );
+        static readonly ProfilerMarker NonStructuralDependenciesMarker = new ProfilerMarker(
+            NonStructuralDependenciesMarkerStr
+        );
+        static readonly ProfilerMarker ObjectExistDependenciesMarker = new ProfilerMarker(
+            ObjectExistDependenciesMarkerStr
+        );
+        static readonly ProfilerMarker InstanceIDsToValidArrayMarker = new ProfilerMarker(
+            InstanceIDsToValidArrayMarkerStr
+        );
 
         internal static string[] CollectImportantProfilerMarkerStrings()
         {
-            return new string [] {
+            return new string[]
+            {
                 CalculateDependenciesMarkerStr,
-
                 // Structural Dependencies
                 StructuralDependenciesMarkerStr,
                 BurstFunctionName(nameof(CalculateStructuralGetComponentDependencyJob)),
                 BurstFunctionName(nameof(CalculateStructuralGetComponentsDependencyJob)),
                 BurstFunctionName(nameof(CalculateActiveDependenciesJob)),
-
                 // Non Structural Dependencies
                 NonStructuralDependenciesMarkerStr,
                 BurstFunctionName(nameof(CalculateReversePropertyChangeDependencyJob)),
                 BurstFunctionName(nameof(NonStructuralChangedComponentJob)),
                 BurstFunctionName(nameof(NonStructuralChangedAssetsJob)),
-
                 // Asset Dependencies
                 AssetDependenciesMarkerStr,
 #if UNITY_EDITOR
@@ -156,23 +166,23 @@ namespace Unity.Entities.Baking
 #endif
 
                 // Object Exists
-                ObjectExistDependenciesMarkerStr
+                ObjectExistDependenciesMarkerStr,
             };
         }
 
         internal struct RecordedDependencies
         {
-            internal UnsafeList<EntityId>                       ObjectReference;
-            internal UnsafeList<EntityId>                       PersistentAsset;
-            internal UnsafeList<GetComponentDependency>         GetComponent;
-            internal UnsafeList<GetHierarchySingleDependency>   GetHierarchySingle;
-            internal UnsafeList<GetHierarchyDependency>         GetHierarchy;
-            internal UnsafeList<GetComponentsDependency>        GetComponents;
-            internal UnsafeList<ObjectExistDependency>          ObjectExist;
-            internal UnsafeList<ObjectPropertyDependency>       ObjectProperty;
-            internal UnsafeList<ObjectStaticDependency>         ObjectStatic;
-            internal UnsafeList<ActiveDependency>               Active;
-            internal int                                        LightBaking;
+            internal UnsafeList<EntityId> ObjectReference;
+            internal UnsafeList<EntityId> PersistentAsset;
+            internal UnsafeList<GetComponentDependency> GetComponent;
+            internal UnsafeList<GetHierarchySingleDependency> GetHierarchySingle;
+            internal UnsafeList<GetHierarchyDependency> GetHierarchy;
+            internal UnsafeList<GetComponentsDependency> GetComponents;
+            internal UnsafeList<ObjectExistDependency> ObjectExist;
+            internal UnsafeList<ObjectPropertyDependency> ObjectProperty;
+            internal UnsafeList<ObjectStaticDependency> ObjectStatic;
+            internal UnsafeList<ActiveDependency> Active;
+            internal int LightBaking;
 
             public RecordedDependencies(int capacity, Allocator allocator)
             {
@@ -268,14 +278,18 @@ namespace Unity.Entities.Baking
                 // Diff GetHierarchySingle
                 if (GetHierarchySingle.Length != other.GetHierarchySingle.Length)
                 {
-                    Debug.Log($"Change - GetHierarchySingle.Length: {GetHierarchySingle.Length} -> {other.GetHierarchySingle.Length}");
+                    Debug.Log(
+                        $"Change - GetHierarchySingle.Length: {GetHierarchySingle.Length} -> {other.GetHierarchySingle.Length}"
+                    );
                     return;
                 }
                 for (int i = 0; i != GetHierarchySingle.Length; i++)
                 {
                     if (!GetHierarchySingle[i].Equals(other.GetHierarchySingle[i]))
                     {
-                        Debug.Log($"Change - GetHierarchySingle: {GetHierarchySingle[i]} -> {other.GetHierarchySingle[i]}");
+                        Debug.Log(
+                            $"Change - GetHierarchySingle: {GetHierarchySingle[i]} -> {other.GetHierarchySingle[i]}"
+                        );
                         return;
                     }
                 }
@@ -313,7 +327,9 @@ namespace Unity.Entities.Baking
                 // Diff ObjectProperty
                 if (ObjectProperty.Length != other.ObjectProperty.Length)
                 {
-                    Debug.Log($"Change - ObjectProperty.Length: {ObjectProperty.Length} -> {other.ObjectProperty.Length}");
+                    Debug.Log(
+                        $"Change - ObjectProperty.Length: {ObjectProperty.Length} -> {other.ObjectProperty.Length}"
+                    );
                     return;
                 }
                 for (int i = 0; i != ObjectProperty.Length; i++)
@@ -343,7 +359,9 @@ namespace Unity.Entities.Baking
                 // Diff ObjectProperty
                 if (ObjectProperty.Length != other.ObjectProperty.Length)
                 {
-                    Debug.Log($"Change - ObjectProperty.Length: {ObjectProperty.Length} -> {other.ObjectProperty.Length}");
+                    Debug.Log(
+                        $"Change - ObjectProperty.Length: {ObjectProperty.Length} -> {other.ObjectProperty.Length}"
+                    );
                     return;
                 }
                 for (int i = 0; i != ObjectProperty.Length; i++)
@@ -373,7 +391,9 @@ namespace Unity.Entities.Baking
                 // Diff Object reference
                 if (ObjectReference.Length != other.ObjectReference.Length)
                 {
-                    Debug.Log($"Change - ObjectReference.Length: {ObjectReference.Length} -> {other.ObjectReference.Length}");
+                    Debug.Log(
+                        $"Change - ObjectReference.Length: {ObjectReference.Length} -> {other.ObjectReference.Length}"
+                    );
                     return;
                 }
                 for (int i = 0; i != ObjectReference.Length; i++)
@@ -388,7 +408,9 @@ namespace Unity.Entities.Baking
                 // Diff Persistent Asset
                 if (PersistentAsset.Length != other.PersistentAsset.Length)
                 {
-                    Debug.Log($"Change - PersistentAsset.Length: {PersistentAsset.Length} -> {other.PersistentAsset.Length}");
+                    Debug.Log(
+                        $"Change - PersistentAsset.Length: {PersistentAsset.Length} -> {other.PersistentAsset.Length}"
+                    );
                     return;
                 }
                 for (int i = 0; i != PersistentAsset.Length; i++)
@@ -425,21 +447,20 @@ namespace Unity.Entities.Baking
                 Debug.LogError($"no actual changes but early out false...");
             }
 
-
             public bool EqualDependencies(ref RecordedDependencies other)
             {
                 var same =
-                    GetComponent.ArraysEqual(other.GetComponent) &&
-                    GetComponents.ArraysEqual(other.GetComponents) &&
-                    GetHierarchySingle.ArraysEqual(other.GetHierarchySingle) &&
-                    GetHierarchy.ArraysEqual(other.GetHierarchy) &&
-                    ObjectExist.ArraysEqual(other.ObjectExist) &&
-                    ObjectProperty.ArraysEqual(other.ObjectProperty) &&
-                    ObjectStatic.ArraysEqual(other.ObjectStatic) &&
-                    ObjectReference.ArraysEqual(other.ObjectReference) &&
-                    PersistentAsset.ArraysEqual(other.PersistentAsset) &&
-                    Active.ArraysEqual(other.Active) &&
-                    LightBaking.Equals(other.LightBaking);
+                    GetComponent.ArraysEqual(other.GetComponent)
+                    && GetComponents.ArraysEqual(other.GetComponents)
+                    && GetHierarchySingle.ArraysEqual(other.GetHierarchySingle)
+                    && GetHierarchy.ArraysEqual(other.GetHierarchy)
+                    && ObjectExist.ArraysEqual(other.ObjectExist)
+                    && ObjectProperty.ArraysEqual(other.ObjectProperty)
+                    && ObjectStatic.ArraysEqual(other.ObjectStatic)
+                    && ObjectReference.ArraysEqual(other.ObjectReference)
+                    && PersistentAsset.ArraysEqual(other.PersistentAsset)
+                    && Active.ArraysEqual(other.Active)
+                    && LightBaking.Equals(other.LightBaking);
 
                 return same;
             }
@@ -499,14 +520,23 @@ namespace Unity.Entities.Baking
                 //        In that case it will be re-established with the same instanceID and hence we need to have a dependency on when an object
                 //        that previously didn't exist now starts existing at the instanceID that previously mapped to an invalid object.
                 //  - valid (referencedObject != null) (instanceID non-zero)
-                var referencedEntityId = ReferenceEquals(referencedObject, null) ? EntityId.None : referencedObject.GetEntityId();
+                var referencedEntityId = ReferenceEquals(referencedObject, null)
+                    ? EntityId.None
+                    : referencedObject.GetEntityId();
                 if (referencedEntityId != EntityId.None)
                 {
                     AddObjectReference(referencedEntityId);
 
                     var obj = Resources.EntityIdToObject(referencedEntityId);
                     var objTypeId = TypeManager.GetOrCreateTypeIndex(referencedObject.GetType());
-                    AddObjectExist(new ObjectExistDependency { EntityId = referencedEntityId, exists = (obj != null), Type = objTypeId });
+                    AddObjectExist(
+                        new ObjectExistDependency
+                        {
+                            EntityId = referencedEntityId,
+                            exists = (obj != null),
+                            Type = objTypeId,
+                        }
+                    );
 
 #if UNITY_EDITOR
                     //@todo: How do we handle creation / destruction of assets / components?
@@ -523,77 +553,138 @@ namespace Unity.Entities.Baking
 
             public void DependOnActive(EntityId gameObject, EntityId authoringComponent, bool isActive)
             {
-                AddActive(new ActiveDependency {GameObjectId = gameObject, Dependent = authoringComponent, IsActive = isActive});
+                AddActive(
+                    new ActiveDependency
+                    {
+                        GameObjectId = gameObject,
+                        Dependent = authoringComponent,
+                        IsActive = isActive,
+                    }
+                );
             }
 
             public void DependOnStatic(EntityId gameObject, EntityId authoring, bool isStatic)
             {
-                AddStatic(new ObjectStaticDependency()
-                {
-                    EntityId = gameObject,
-                    AuthoringID = authoring,
-                    Value = isStatic
-                });
+                AddStatic(
+                    new ObjectStaticDependency()
+                    {
+                        EntityId = gameObject,
+                        AuthoringID = authoring,
+                        Value = isStatic,
+                    }
+                );
 
                 var obj = Resources.EntityIdToObject(gameObject);
                 var objTypeId = TypeManager.GetTypeIndex<GameObject>();
-                AddObjectExist(new ObjectExistDependency { EntityId = gameObject, exists = (obj != null), Type = objTypeId });
+                AddObjectExist(
+                    new ObjectExistDependency
+                    {
+                        EntityId = gameObject,
+                        exists = (obj != null),
+                        Type = objTypeId,
+                    }
+                );
             }
 
             public void DependOnObjectName(EntityId gameObject, EntityId authoring, string name)
             {
-                AddObjectProperty(new ObjectPropertyDependency()
-                {
-                    EntityId = gameObject,
-                    AuthoringID = authoring,
-                    PropertyType = GameObjectPropertyType.Name,
-                    Value = name.GetHashCode()
-                });
+                AddObjectProperty(
+                    new ObjectPropertyDependency()
+                    {
+                        EntityId = gameObject,
+                        AuthoringID = authoring,
+                        PropertyType = GameObjectPropertyType.Name,
+                        Value = name.GetHashCode(),
+                    }
+                );
 
                 var obj = Resources.EntityIdToObject(gameObject);
                 var objTypeId = TypeManager.GetTypeIndex<GameObject>();
-                AddObjectExist(new ObjectExistDependency { EntityId = gameObject, exists = (obj != null), Type = objTypeId });
+                AddObjectExist(
+                    new ObjectExistDependency
+                    {
+                        EntityId = gameObject,
+                        exists = (obj != null),
+                        Type = objTypeId,
+                    }
+                );
             }
 
             public void DependOnObjectLayer(EntityId gameObject, EntityId authoring, int layer)
             {
-                AddObjectProperty(new ObjectPropertyDependency()
-                {
-                    EntityId = gameObject,
-                    AuthoringID = authoring,
-                    PropertyType = GameObjectPropertyType.Layer,
-                    Value = layer
-                });
+                AddObjectProperty(
+                    new ObjectPropertyDependency()
+                    {
+                        EntityId = gameObject,
+                        AuthoringID = authoring,
+                        PropertyType = GameObjectPropertyType.Layer,
+                        Value = layer,
+                    }
+                );
 
                 var obj = Resources.EntityIdToObject(gameObject);
                 var objTypeId = TypeManager.GetTypeIndex<GameObject>();
-                AddObjectExist(new ObjectExistDependency { EntityId = gameObject, exists = (obj != null), Type = objTypeId });
+                AddObjectExist(
+                    new ObjectExistDependency
+                    {
+                        EntityId = gameObject,
+                        exists = (obj != null),
+                        Type = objTypeId,
+                    }
+                );
             }
 
             public void DependOnObjectTag(EntityId gameObject, EntityId authoring, string tag)
             {
-                AddObjectProperty(new ObjectPropertyDependency()
-                {
-                    EntityId = gameObject,
-                    AuthoringID = authoring,
-                    PropertyType = GameObjectPropertyType.Tag,
-                    Value = tag.GetHashCode()
-                });
+                AddObjectProperty(
+                    new ObjectPropertyDependency()
+                    {
+                        EntityId = gameObject,
+                        AuthoringID = authoring,
+                        PropertyType = GameObjectPropertyType.Tag,
+                        Value = tag.GetHashCode(),
+                    }
+                );
 
                 var obj = Resources.EntityIdToObject(gameObject);
                 var objTypeId = TypeManager.GetTypeIndex<GameObject>();
-                AddObjectExist(new ObjectExistDependency { EntityId = gameObject, exists = (obj != null), Type = objTypeId });
+                AddObjectExist(
+                    new ObjectExistDependency
+                    {
+                        EntityId = gameObject,
+                        exists = (obj != null),
+                        Type = objTypeId,
+                    }
+                );
             }
 
-            public void DependOnGetComponent(EntityId gameObject, TypeIndex type, EntityId returnedComponent, GetComponentDependencyType dependencyType)
+            public void DependOnGetComponent(
+                EntityId gameObject,
+                TypeIndex type,
+                EntityId returnedComponent,
+                GetComponentDependencyType dependencyType
+            )
             {
                 if (returnedComponent != EntityId.None)
                     AddObjectReference(returnedComponent);
 
-                AddGetComponent(new GetComponentDependency {GameObject = gameObject, Type = type, ResultComponent = returnedComponent, DependencyType = dependencyType});
+                AddGetComponent(
+                    new GetComponentDependency
+                    {
+                        GameObject = gameObject,
+                        Type = type,
+                        ResultComponent = returnedComponent,
+                        DependencyType = dependencyType,
+                    }
+                );
             }
 
-            public void DependOnGetComponents(EntityId gameObject, TypeIndex type, IEnumerable<Component> returnedComponents, GetComponentDependencyType dependencyType)
+            public void DependOnGetComponents(
+                EntityId gameObject,
+                TypeIndex type,
+                IEnumerable<Component> returnedComponents,
+                GetComponentDependencyType dependencyType
+            )
             {
                 var hashGenerator = new xxHash3.StreamingState(false);
 
@@ -610,26 +701,72 @@ namespace Unity.Entities.Baking
                 }
 
                 var hash = new Hash128(hashGenerator.DigestHash128());
-                AddGetComponents(new GetComponentsDependency {GameObject = gameObject, Type = type, DependencyType = dependencyType, ComponentHash = hash});
+                AddGetComponents(
+                    new GetComponentsDependency
+                    {
+                        GameObject = gameObject,
+                        Type = type,
+                        DependencyType = dependencyType,
+                        ComponentHash = hash,
+                    }
+                );
             }
 
-            public void DependOnGetHierarchySingle(EntityId gameObject, EntityId result, int queryIndex, GetHierarchySingleDependencyType dependencyType)
+            public void DependOnGetHierarchySingle(
+                EntityId gameObject,
+                EntityId result,
+                int queryIndex,
+                GetHierarchySingleDependencyType dependencyType
+            )
             {
                 if (result != EntityId.None)
                 {
                     var objTypeId = TypeManager.GetTypeIndex<GameObject>();
-                    AddObjectExist(new ObjectExistDependency { EntityId = result, exists = true, Type = objTypeId });
+                    AddObjectExist(
+                        new ObjectExistDependency
+                        {
+                            EntityId = result,
+                            exists = true,
+                            Type = objTypeId,
+                        }
+                    );
                 }
 
-                AddGetHierarchySingle(new GetHierarchySingleDependency {GameObject = gameObject, QueryIndex = queryIndex, Result = result, DependencyType = dependencyType});
+                AddGetHierarchySingle(
+                    new GetHierarchySingleDependency
+                    {
+                        GameObject = gameObject,
+                        QueryIndex = queryIndex,
+                        Result = result,
+                        DependencyType = dependencyType,
+                    }
+                );
             }
 
-            public void DependOnGetHierarchySingle(EntityId gameObject, int childCount, int queryIndex, GetHierarchySingleDependencyType dependencyType)
+            public void DependOnGetHierarchySingle(
+                EntityId gameObject,
+                int childCount,
+                int queryIndex,
+                GetHierarchySingleDependencyType dependencyType
+            )
             {
-                AddGetHierarchySingle(new GetHierarchySingleDependency {GameObject = gameObject, QueryIndex = queryIndex, Result = EntityId.None, ChildCountResult = childCount, DependencyType = dependencyType});
+                AddGetHierarchySingle(
+                    new GetHierarchySingleDependency
+                    {
+                        GameObject = gameObject,
+                        QueryIndex = queryIndex,
+                        Result = EntityId.None,
+                        ChildCountResult = childCount,
+                        DependencyType = dependencyType,
+                    }
+                );
             }
 
-            public void DependOnGetHierarchy(EntityId gameObject, IEnumerable<GameObject> returnGameObjects, GetHierarchyDependencyType dependencyType)
+            public void DependOnGetHierarchy(
+                EntityId gameObject,
+                IEnumerable<GameObject> returnGameObjects,
+                GetHierarchyDependencyType dependencyType
+            )
             {
                 var hashGenerator = new xxHash3.StreamingState(false);
 
@@ -639,14 +776,28 @@ namespace Unity.Entities.Baking
                     EntityId entityId = returnGameObject.GetEntityId();
                     if (entityId != EntityId.None)
                     {
-                        AddObjectExist(new ObjectExistDependency { EntityId = entityId, exists = true, Type = objTypeId });
+                        AddObjectExist(
+                            new ObjectExistDependency
+                            {
+                                EntityId = entityId,
+                                exists = true,
+                                Type = objTypeId,
+                            }
+                        );
                     }
 
                     hashGenerator.Update(entityId);
                 }
 
                 var hash = new Hash128(hashGenerator.DigestHash128());
-                AddGetHierarchy(new GetHierarchyDependency {GameObject = gameObject, Hash = hash, DependencyType = dependencyType});
+                AddGetHierarchy(
+                    new GetHierarchyDependency
+                    {
+                        GameObject = gameObject,
+                        Hash = hash,
+                        DependencyType = dependencyType,
+                    }
+                );
             }
 
             public void DependOnParentTransformHierarchy(Transform transform)
@@ -668,7 +819,14 @@ namespace Unity.Entities.Baking
                     }
 
                     var hash = new Hash128(hashGenerator.DigestHash128());
-                    AddGetHierarchy(new GetHierarchyDependency {GameObject = goEntityId, Hash = hash, DependencyType = GetHierarchyDependencyType.Parent});
+                    AddGetHierarchy(
+                        new GetHierarchyDependency
+                        {
+                            GameObject = goEntityId,
+                            Hash = hash,
+                            DependencyType = GetHierarchyDependencyType.Parent,
+                        }
+                    );
                 }
             }
 
@@ -682,43 +840,55 @@ namespace Unity.Entities.Baking
         {
             GetComponent,
             GetComponentInParent,
-            GetComponentInChildren
+            GetComponentInChildren,
         }
 
         internal struct GetComponentDependency : IEquatable<GetComponentDependency>
         {
-            public EntityId                             GameObject;
-            public TypeIndex                            Type;
-            public GetComponentDependencyType           DependencyType;
-            public EntityId                             ResultComponent;
+            public EntityId GameObject;
+            public TypeIndex Type;
+            public GetComponentDependencyType DependencyType;
+            public EntityId ResultComponent;
 
             public bool IsValid(ref GameObjectComponents components, ref SceneHierarchy hierarchy)
             {
                 switch (DependencyType)
                 {
                     case GetComponentDependencyType.GetComponentInParent:
-                        return GameObjectComponents.GetComponentInParent(ref components, ref hierarchy, GameObject, Type) == ResultComponent;
+                        return GameObjectComponents.GetComponentInParent(
+                                ref components,
+                                ref hierarchy,
+                                GameObject,
+                                Type
+                            ) == ResultComponent;
                     case GetComponentDependencyType.GetComponent:
                         return components.GetComponent(GameObject, Type) == ResultComponent;
                     case GetComponentDependencyType.GetComponentInChildren:
-                        return GameObjectComponents.GetComponentInChildren(ref components, ref hierarchy, GameObject, Type) == ResultComponent;
+                        return GameObjectComponents.GetComponentInChildren(
+                                ref components,
+                                ref hierarchy,
+                                GameObject,
+                                Type
+                            ) == ResultComponent;
                 }
                 return false;
             }
 
             public bool Equals(GetComponentDependency other)
             {
-                return GameObject == other.GameObject && Type.Equals(other.Type) && DependencyType == other.DependencyType && ResultComponent == other.ResultComponent;
+                return GameObject == other.GameObject
+                    && Type.Equals(other.Type)
+                    && DependencyType == other.DependencyType
+                    && ResultComponent == other.ResultComponent;
             }
         }
 
         internal struct GetComponentsDependency : IEquatable<GetComponentsDependency>
         {
-            public EntityId                             GameObject;
-            public TypeIndex                            Type;
-            public GetComponentDependencyType           DependencyType;
-            public Hash128                              ComponentHash;
-
+            public EntityId GameObject;
+            public TypeIndex Type;
+            public GetComponentDependencyType DependencyType;
+            public Hash128 ComponentHash;
 
             public bool IsValid(ref GameObjectComponents components, ref SceneHierarchy hierarchy)
             {
@@ -726,13 +896,23 @@ namespace Unity.Entities.Baking
                 switch (DependencyType)
                 {
                     case GetComponentDependencyType.GetComponentInParent:
-                        hash = GameObjectComponents.GetComponentsInParentHash(ref components, ref hierarchy, GameObject, Type);
+                        hash = GameObjectComponents.GetComponentsInParentHash(
+                            ref components,
+                            ref hierarchy,
+                            GameObject,
+                            Type
+                        );
                         break;
                     case GetComponentDependencyType.GetComponent:
                         hash = components.GetComponentsHash(GameObject, Type);
                         break;
                     case GetComponentDependencyType.GetComponentInChildren:
-                        hash = GameObjectComponents.GetComponentsInChildrenHash(ref components, ref hierarchy, GameObject, Type);
+                        hash = GameObjectComponents.GetComponentsInChildrenHash(
+                            ref components,
+                            ref hierarchy,
+                            GameObject,
+                            Type
+                        );
                         break;
                     default:
                         hash = default;
@@ -743,8 +923,10 @@ namespace Unity.Entities.Baking
 
             public bool Equals(GetComponentsDependency other)
             {
-                return GameObject == other.GameObject && Type.Equals(other.Type) && DependencyType == other.DependencyType
-                       && ComponentHash == other.ComponentHash;
+                return GameObject == other.GameObject
+                    && Type.Equals(other.Type)
+                    && DependencyType == other.DependencyType
+                    && ComponentHash == other.ComponentHash;
             }
         }
 
@@ -752,21 +934,22 @@ namespace Unity.Entities.Baking
         {
             Parent,
             Child,
-            ChildCount
+            ChildCount,
         }
 
         internal struct GetHierarchySingleDependency : IEquatable<GetHierarchySingleDependency>
         {
-            public EntityId                             GameObject;
-            public int                                  QueryIndex;
-            public GetHierarchySingleDependencyType     DependencyType;
-            public EntityId                             Result;
+            public EntityId GameObject;
+            public int QueryIndex;
+            public GetHierarchySingleDependencyType DependencyType;
+            public EntityId Result;
+
             // This dependency is also used to track the child count instead. Previously this hid this in the EntityId value
             // But now that instanceIDs are not just ints, we can't really do that. So an extra value is added specifically for that case
             // It is only a valid value when the type of this dependency is GetHierarchySingleDependencyType.ChildCount
             // Any other time it should be -1, and that doesn't mean it is indicating anything about the child count
             // This should be refactored to be a different dependency type entirely in future
-            public int                                  ChildCountResult;
+            public int ChildCountResult;
 
             public EntityId GetParentInstanceId(ref SceneHierarchy hierarchy, EntityId entityId)
             {
@@ -836,8 +1019,10 @@ namespace Unity.Entities.Baking
 
             public bool Equals(GetHierarchySingleDependency other)
             {
-                return GameObject == other.GameObject && QueryIndex == other.QueryIndex && DependencyType == other.DependencyType
-                       && Result == other.Result;
+                return GameObject == other.GameObject
+                    && QueryIndex == other.QueryIndex
+                    && DependencyType == other.DependencyType
+                    && Result == other.Result;
             }
         }
 
@@ -850,9 +1035,9 @@ namespace Unity.Entities.Baking
 
         internal struct GetHierarchyDependency : IEquatable<GetHierarchyDependency>
         {
-            public EntityId                             GameObject;
-            public GetHierarchyDependencyType           DependencyType;
-            public Hash128                              Hash;
+            public EntityId GameObject;
+            public GetHierarchyDependencyType DependencyType;
+            public Hash128 Hash;
 
             public Hash128 GetParentsHash(ref SceneHierarchy hierarchy, EntityId entityId)
             {
@@ -874,7 +1059,12 @@ namespace Unity.Entities.Baking
                 return new Hash128(hashGenerator.DigestHash128());
             }
 
-            public void GetChildrenHashInternal(ref SceneHierarchy hierarchy, int currentIndex, bool recursive, ref xxHash3.StreamingState hashGenerator)
+            public void GetChildrenHashInternal(
+                ref SceneHierarchy hierarchy,
+                int currentIndex,
+                bool recursive,
+                ref xxHash3.StreamingState hashGenerator
+            )
             {
                 var childIterator = hierarchy.GetChildIndicesForIndex(currentIndex);
                 while (childIterator.MoveNext())
@@ -922,16 +1112,15 @@ namespace Unity.Entities.Baking
 
             public bool Equals(GetHierarchyDependency other)
             {
-                return GameObject == other.GameObject && DependencyType == other.DependencyType
-                       && Hash == other.Hash;
+                return GameObject == other.GameObject && DependencyType == other.DependencyType && Hash == other.Hash;
             }
         }
 
         internal struct ObjectExistDependency : IEquatable<ObjectExistDependency>
         {
-            public EntityId  EntityId;
+            public EntityId EntityId;
             public TypeIndex Type;
-            public bool      exists;
+            public bool exists;
 
             public bool IsValid(ref GameObjectComponents components, ref SceneHierarchy hierarchy)
             {
@@ -950,16 +1139,15 @@ namespace Unity.Entities.Baking
         {
             Name,
             Layer,
-            Tag
+            Tag,
         }
 
         internal struct ObjectPropertyDependency : IEquatable<ObjectPropertyDependency>
         {
-            public EntityId                             EntityId;
-            public EntityId                             AuthoringID;
-            public GameObjectPropertyType               PropertyType;
-            public int                                  Value;
-
+            public EntityId EntityId;
+            public EntityId AuthoringID;
+            public GameObjectPropertyType PropertyType;
+            public int Value;
 
             public bool IsValid(IncrementalBakingData.GameObjectProperties properties)
             {
@@ -984,25 +1172,37 @@ namespace Unity.Entities.Baking
 
             public bool Equals(ObjectPropertyDependency other)
             {
-                return EntityId == other.EntityId && AuthoringID == other.AuthoringID && PropertyType == other.PropertyType && Value == other.Value;
+                return EntityId == other.EntityId
+                    && AuthoringID == other.AuthoringID
+                    && PropertyType == other.PropertyType
+                    && Value == other.Value;
             }
         }
 
         internal struct ObjectStaticDependency : IEquatable<ObjectStaticDependency>
         {
-            public EntityId                             EntityId;
-            public EntityId                             AuthoringID;
-            public bool                                 Value;
+            public EntityId EntityId;
+            public EntityId AuthoringID;
+            public bool Value;
 
-            public bool IsValid(ref GameObjectComponents components, ref SceneHierarchy sceneHierarchy, TypeIndex staticOptimizeTypeIndex)
+            public bool IsValid(
+                ref GameObjectComponents components,
+                ref SceneHierarchy sceneHierarchy,
+                TypeIndex staticOptimizeTypeIndex
+            )
             {
-                if(sceneHierarchy.TryGetIndexForEntityId(EntityId, out var gameObjectIndex))
+                if (sceneHierarchy.TryGetIndexForEntityId(EntityId, out var gameObjectIndex))
                 {
                     bool isStatic = sceneHierarchy.IsStatic(gameObjectIndex);
                     if (!isStatic)
                     {
                         // Check for StaticOptimizeEntity
-                        var containsStaticOptimize = GameObjectComponents.GetComponentInParent(ref components, ref sceneHierarchy, EntityId, staticOptimizeTypeIndex);
+                        var containsStaticOptimize = GameObjectComponents.GetComponentInParent(
+                            ref components,
+                            ref sceneHierarchy,
+                            EntityId,
+                            staticOptimizeTypeIndex
+                        );
                         isStatic = (containsStaticOptimize != EntityId.None);
                     }
                     if (Value == isStatic)
@@ -1019,13 +1219,13 @@ namespace Unity.Entities.Baking
 
         internal struct ActiveDependency : IEquatable<ActiveDependency>
         {
-            public EntityId       GameObjectId;
-            public EntityId       Dependent;
-            public bool           IsActive;
+            public EntityId GameObjectId;
+            public EntityId Dependent;
+            public bool IsActive;
 
             public bool IsValid(ref SceneHierarchy sceneHierarchy)
             {
-                if(sceneHierarchy.TryGetIndexForEntityId(GameObjectId, out var gameObjectIndex))
+                if (sceneHierarchy.TryGetIndexForEntityId(GameObjectId, out var gameObjectIndex))
                 {
                     if (IsActive == sceneHierarchy.IsActive(gameObjectIndex))
                         return true;
@@ -1069,7 +1269,7 @@ namespace Unity.Entities.Baking
             foreach (var dep in dependencies.ObjectStatic)
                 _ObjectStaticDependency.Add(authoringComponent, dep);
 
-            foreach(var dep in dependencies.Active)
+            foreach (var dep in dependencies.Active)
                 _ActiveDependencies.Add(dep.Dependent, dep);
 
             if (dependencies.LightBaking != 0)
@@ -1102,13 +1302,34 @@ namespace Unity.Entities.Baking
             _ReversePropertyChangeDependency = new UnsafeParallelMultiHashMap<EntityId, EntityId>(0, allocator);
             _IsReversePropertyChangeDependencyUpToDate = 0;
 
-            _StructuralGetComponentDependency = new UnsafeParallelMultiHashMap<EntityId, GetComponentDependency>(1024, allocator);
-            _StructuralGetComponentsDependency = new UnsafeParallelMultiHashMap<EntityId, GetComponentsDependency>(1024, allocator);
-            _StructuralGetHierarchySingleDependency = new UnsafeParallelMultiHashMap<EntityId, GetHierarchySingleDependency>(1024, allocator);
-            _StructuralGetHierarchyDependency = new UnsafeParallelMultiHashMap<EntityId, GetHierarchyDependency>(1024, allocator);
-            _StructuralObjectExistDependency = new UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency>(1024, allocator);
-            _ObjectPropertyDependency = new UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency>(1024, allocator);
-            _ReverseObjectPropertyDependency = new UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency>(1024, allocator);
+            _StructuralGetComponentDependency = new UnsafeParallelMultiHashMap<EntityId, GetComponentDependency>(
+                1024,
+                allocator
+            );
+            _StructuralGetComponentsDependency = new UnsafeParallelMultiHashMap<EntityId, GetComponentsDependency>(
+                1024,
+                allocator
+            );
+            _StructuralGetHierarchySingleDependency = new UnsafeParallelMultiHashMap<
+                EntityId,
+                GetHierarchySingleDependency
+            >(1024, allocator);
+            _StructuralGetHierarchyDependency = new UnsafeParallelMultiHashMap<EntityId, GetHierarchyDependency>(
+                1024,
+                allocator
+            );
+            _StructuralObjectExistDependency = new UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency>(
+                1024,
+                allocator
+            );
+            _ObjectPropertyDependency = new UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency>(
+                1024,
+                allocator
+            );
+            _ReverseObjectPropertyDependency = new UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency>(
+                1024,
+                allocator
+            );
             _ObjectStaticDependency = new UnsafeParallelMultiHashMap<EntityId, ObjectStaticDependency>(1024, allocator);
             _ActiveDependencies = new UnsafeParallelMultiHashMap<EntityId, ActiveDependency>(1024, allocator);
             _LightBakingDependency = new UnsafeHashSet<EntityId>(1024, allocator);
@@ -1157,21 +1378,43 @@ namespace Unity.Entities.Baking
 #endif
         }
 
-        static readonly ProfilerMarker s_ResetDependenciesPropertyChange               = new ProfilerMarker("Baking.ResetDependencies.PropertyChange");
-        static readonly ProfilerMarker s_ResetDependenciesHasFlippedChange             = new ProfilerMarker("Baking.ResetDependencies.HasFlippedWindingChange");
-        static readonly ProfilerMarker s_ResetDependenciesActiveChange                 = new ProfilerMarker("Baking.ResetDependencies.ActiveChange");
-        static readonly ProfilerMarker s_ResetDependenciesStructuralGetComponent       = new ProfilerMarker("Baking.ResetDependencies.StructuralGetComponent");
-        static readonly ProfilerMarker s_ResetDependenciesStructuralGetComponents      = new ProfilerMarker("Baking.ResetDependencies.StructuralGetComponents");
-        static readonly ProfilerMarker s_ResetDependenciesStructuralGetHierarchySingle = new ProfilerMarker("Baking.ResetDependencies.StructuralGetHierarchySingle");
-        static readonly ProfilerMarker s_ResetDependenciesStructuralGetHierarchy       = new ProfilerMarker("Baking.ResetDependencies.StructuralGetHierarchy");
-        static readonly ProfilerMarker s_ResetDependenciesStructuralObjectExist        = new ProfilerMarker("Baking.ResetDependencies.StructuralObjectExist");
-        static readonly ProfilerMarker s_ResetDependenciesAuthoringToAssetGUID         = new ProfilerMarker("Baking.ResetDependencies.AuthoringToAssetGUID");
-        static readonly ProfilerMarker s_ResetDependenciesObjectProperty               = new ProfilerMarker("Baking.ResetDependencies.ObjectPropertyChange");
-        static readonly ProfilerMarker s_ResetDependenciesObjectStatic                 = new ProfilerMarker("Baking.ResetDependencies.ObjectStaticChange");
+        static readonly ProfilerMarker s_ResetDependenciesPropertyChange = new ProfilerMarker(
+            "Baking.ResetDependencies.PropertyChange"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesHasFlippedChange = new ProfilerMarker(
+            "Baking.ResetDependencies.HasFlippedWindingChange"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesActiveChange = new ProfilerMarker(
+            "Baking.ResetDependencies.ActiveChange"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesStructuralGetComponent = new ProfilerMarker(
+            "Baking.ResetDependencies.StructuralGetComponent"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesStructuralGetComponents = new ProfilerMarker(
+            "Baking.ResetDependencies.StructuralGetComponents"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesStructuralGetHierarchySingle = new ProfilerMarker(
+            "Baking.ResetDependencies.StructuralGetHierarchySingle"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesStructuralGetHierarchy = new ProfilerMarker(
+            "Baking.ResetDependencies.StructuralGetHierarchy"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesStructuralObjectExist = new ProfilerMarker(
+            "Baking.ResetDependencies.StructuralObjectExist"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesAuthoringToAssetGUID = new ProfilerMarker(
+            "Baking.ResetDependencies.AuthoringToAssetGUID"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesObjectProperty = new ProfilerMarker(
+            "Baking.ResetDependencies.ObjectPropertyChange"
+        );
+        static readonly ProfilerMarker s_ResetDependenciesObjectStatic = new ProfilerMarker(
+            "Baking.ResetDependencies.ObjectStaticChange"
+        );
 
         void _ResetBakerDependencies(EntityId authoringComponent, ref RecordedDependencies dependencies)
         {
-            using(s_ResetDependenciesActiveChange.Auto())
+            using (s_ResetDependenciesActiveChange.Auto())
                 _ActiveDependencies.Remove(authoringComponent);
 
             using (s_ResetDependenciesPropertyChange.Auto())
@@ -1180,16 +1423,16 @@ namespace Unity.Entities.Baking
                     _IsReversePropertyChangeDependencyUpToDate = 0;
             }
 
-            using(s_ResetDependenciesStructuralGetComponent.Auto())
+            using (s_ResetDependenciesStructuralGetComponent.Auto())
                 _StructuralGetComponentDependency.Remove(authoringComponent);
 
             using (s_ResetDependenciesStructuralGetComponents.Auto())
                 _StructuralGetComponentsDependency.Remove(authoringComponent);
 
-            using(s_ResetDependenciesStructuralGetHierarchySingle.Auto())
+            using (s_ResetDependenciesStructuralGetHierarchySingle.Auto())
                 _StructuralGetHierarchySingleDependency.Remove(authoringComponent);
 
-            using(s_ResetDependenciesStructuralGetHierarchy.Auto())
+            using (s_ResetDependenciesStructuralGetHierarchy.Auto())
                 _StructuralGetHierarchyDependency.Remove(authoringComponent);
 
             using (s_ResetDependenciesStructuralObjectExist.Auto())
@@ -1217,19 +1460,32 @@ namespace Unity.Entities.Baking
 #endif
 
         [BurstCompile]
-        public static void ResetBakerDependencies(ref EntityId authoringComponent, ref BakeDependencies bakeDependencies, ref RecordedDependencies dependencies)
+        public static void ResetBakerDependencies(
+            ref EntityId authoringComponent,
+            ref BakeDependencies bakeDependencies,
+            ref RecordedDependencies dependencies
+        )
         {
             bakeDependencies._ResetBakerDependencies(authoringComponent, ref dependencies);
         }
 
         [BurstCompile]
-        public static void AddDependencies(ref BakeDependencies bakeDependencies, ref EntityId authoringComponent, ref RecordedDependencies state)
+        public static void AddDependencies(
+            ref BakeDependencies bakeDependencies,
+            ref EntityId authoringComponent,
+            ref RecordedDependencies state
+        )
         {
             bakeDependencies.AddDependencies(authoringComponent, ref state);
         }
 
         [BurstCompile]
-        public static bool UpdateDependencies(ref BakeDependencies bakeDependencies, ref EntityId authoringComponent, ref RecordedDependencies state, ref RecordedDependencies newDependencies)
+        public static bool UpdateDependencies(
+            ref BakeDependencies bakeDependencies,
+            ref EntityId authoringComponent,
+            ref RecordedDependencies state,
+            ref RecordedDependencies newDependencies
+        )
         {
             if (state.EqualDependencies(ref newDependencies))
                 return false;
@@ -1243,7 +1499,14 @@ namespace Unity.Entities.Baking
             return true;
         }
 
-        public void CalculateDependencies(ref GameObjectComponents components, ref IncrementalBakingData incrementalConversionDataCache, ChangedSceneTransforms changedSceneTransforms, ref UnsafeParallelHashSet<EntityId> outputChangedComponents, JobHandle transformJobHandle, bool assetsChanged)
+        public void CalculateDependencies(
+            ref GameObjectComponents components,
+            ref IncrementalBakingData incrementalConversionDataCache,
+            ChangedSceneTransforms changedSceneTransforms,
+            ref UnsafeParallelHashSet<EntityId> outputChangedComponents,
+            JobHandle transformJobHandle,
+            bool assetsChanged
+        )
         {
             using var marker = CalculateDependenciesMarker.Auto();
 
@@ -1253,20 +1516,36 @@ namespace Unity.Entities.Baking
             //NOTE: All of this code is written so that it should be straightforward to jobified and bursted.
             //      So far we haven't seen it be a bottleneck yet.
 
-            var nonStructuralDependenciesJobHandle = CalculateNonStructuralDependencies(ref components, ref incrementalConversionDataCache, changedSceneTransforms, ref changedComponentsPerThread);
+            var nonStructuralDependenciesJobHandle = CalculateNonStructuralDependencies(
+                ref components,
+                ref incrementalConversionDataCache,
+                changedSceneTransforms,
+                ref changedComponentsPerThread
+            );
 
             bool hasStructuralChange = incrementalConversionDataCache.HasStructuralChanges();
             JobHandle structuralDependenciesJobHandle = default;
             if (hasStructuralChange)
             {
-                structuralDependenciesJobHandle = CalculateStructuralDependencies(ref components, ref changedSceneTransforms.Hierarchy, ref changedComponentsPerThread);
+                structuralDependenciesJobHandle = CalculateStructuralDependencies(
+                    ref components,
+                    ref changedSceneTransforms.Hierarchy,
+                    ref changedComponentsPerThread
+                );
             }
 
-            var calculateDependenciesJobHandle = JobHandle.CombineDependencies(nonStructuralDependenciesJobHandle, structuralDependenciesJobHandle, transformJobHandle);
+            var calculateDependenciesJobHandle = JobHandle.CombineDependencies(
+                nonStructuralDependenciesJobHandle,
+                structuralDependenciesJobHandle,
+                transformJobHandle
+            );
 
 #if UNITY_EDITOR
             var calculateAssetDependenciesJobHandle = CalculateAssetDependencies(ref changedComponentsPerThread);
-            calculateDependenciesJobHandle = JobHandle.CombineDependencies(calculateDependenciesJobHandle, calculateAssetDependenciesJobHandle);
+            calculateDependenciesJobHandle = JobHandle.CombineDependencies(
+                calculateDependenciesJobHandle,
+                calculateAssetDependenciesJobHandle
+            );
 #endif
 
             // ObjectExist
@@ -1277,12 +1556,22 @@ namespace Unity.Entities.Baking
             // Internally we use Resources.EntityIdToObject to check if the object with that referenced EntityId exists
             if (hasStructuralChange || assetsChanged)
             {
-                var objectExistDependencies = CalculateObjectExistDependencies(ref components, ref changedSceneTransforms.Hierarchy, ref changedComponentsPerThread);
-                calculateDependenciesJobHandle = JobHandle.CombineDependencies(calculateDependenciesJobHandle, objectExistDependencies);
+                var objectExistDependencies = CalculateObjectExistDependencies(
+                    ref components,
+                    ref changedSceneTransforms.Hierarchy,
+                    ref changedComponentsPerThread
+                );
+                calculateDependenciesJobHandle = JobHandle.CombineDependencies(
+                    calculateDependenciesJobHandle,
+                    objectExistDependencies
+                );
             }
 
             var endWritingDependency = changedComponentsPerThread.EndWriting(calculateDependenciesJobHandle);
-            var composeHashSetJobHandle = changedComponentsPerThread.CopyTo(outputChangedComponents, endWritingDependency);
+            var composeHashSetJobHandle = changedComponentsPerThread.CopyTo(
+                outputChangedComponents,
+                endWritingDependency
+            );
             composeHashSetJobHandle.Complete();
 
             // Release
@@ -1291,7 +1580,11 @@ namespace Unity.Entities.Baking
 
         // This section is a job/burst version of CalculateObjectExistDependencies, but at the moment it is slower than the non job version. This should be reviewed when Resources.EntityIdToObject is replaced (ticket DOTS-5351).
 
-        JobHandle CalculateObjectExistDependencies(ref GameObjectComponents components, ref SceneHierarchy hierarchy, ref UnsafeDependencyStream<EntityId> changedComponentsPerThread)
+        JobHandle CalculateObjectExistDependencies(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            ref UnsafeDependencyStream<EntityId> changedComponentsPerThread
+        )
         {
             using var marker = ObjectExistDependenciesMarker.Auto();
 
@@ -1302,7 +1595,7 @@ namespace Unity.Entities.Baking
             {
                 objectExistDependencies = _StructuralObjectExistDependency,
                 deduplicatedObjIds = deduplicatedObjIds,
-                objectIds = objectIds
+                objectIds = objectIds,
             };
             var prepareJobHandle = prepareJob.Schedule();
             prepareJobHandle.Complete();
@@ -1320,9 +1613,12 @@ namespace Unity.Entities.Baking
                 objectExistDependencies = _StructuralObjectExistDependency,
                 objectExists = objectExists,
                 deduplicatedObjIds = deduplicatedObjIds,
-                changedComponentsPerThread = changedComponentsPerThread
+                changedComponentsPerThread = changedComponentsPerThread,
             };
-            var diffJobHandle = diffJob.Schedule(DependenciesHashMapHelper.GetBucketSize(_StructuralObjectExistDependency), 64);
+            var diffJobHandle = diffJob.Schedule(
+                DependenciesHashMapHelper.GetBucketSize(_StructuralObjectExistDependency),
+                64
+            );
             objectExists.Dispose(diffJobHandle);
             deduplicatedObjIds.Dispose(diffJobHandle);
             objectIds.Dispose(diffJobHandle);
@@ -1337,6 +1633,7 @@ namespace Unity.Entities.Baking
             public UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency> objectExistDependencies;
             public NativeParallelHashMap<EntityId, int> deduplicatedObjIds;
             public NativeList<EntityId> objectIds;
+
             public void Execute()
             {
                 int nextIndex = 0;
@@ -1353,15 +1650,20 @@ namespace Unity.Entities.Baking
         }
 
         [BurstCompile]
-        struct CalculateObjectExistDiffsJob : IKeyValueJobCallback<EntityId, BakeDependencies.ObjectExistDependency>, IJobParallelFor
+        struct CalculateObjectExistDiffsJob
+            : IKeyValueJobCallback<EntityId, BakeDependencies.ObjectExistDependency>,
+                IJobParallelFor
         {
             [ReadOnly]
             public NativeArray<bool> objectExists;
+
             [ReadOnly]
             public UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency> objectExistDependencies;
+
             [ReadOnly]
             public NativeParallelHashMap<EntityId, int> deduplicatedObjIds;
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1370,14 +1672,24 @@ namespace Unity.Entities.Baking
                 DependenciesHashMapHelper.ExecuteOnEntries(this, objectExistDependencies, m_ThreadIndex, i);
             }
 
-            public void ProcessEntry(int threadIndex, in UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency> hashMap, in EntityId key, in ObjectExistDependency value)
+            public void ProcessEntry(
+                int threadIndex,
+                in UnsafeParallelMultiHashMap<EntityId, ObjectExistDependency> hashMap,
+                in EntityId key,
+                in ObjectExistDependency value
+            )
             {
                 // Add them if the exist state has changed (State has changed)
                 int existsID = deduplicatedObjIds[value.EntityId];
                 if (value.exists != objectExists[existsID])
                 {
                     changedComponentsPerThread.Add(key, m_ThreadIndex);
-                    IncrementalBakingLog.RecordComponentBake(key, ComponentBakeReason.ObjectExistStructuralChange, value.EntityId, value.Type);
+                    IncrementalBakingLog.RecordComponentBake(
+                        key,
+                        ComponentBakeReason.ObjectExistStructuralChange,
+                        value.EntityId,
+                        value.Type
+                    );
                 }
             }
         }
@@ -1392,7 +1704,7 @@ namespace Unity.Entities.Baking
             var prepareAssetDataJob = new PrepareAssetDataJob()
             {
                 authoringToAssetGUID = _ComponentIdToAssetGUID,
-                guidToAuthoring = guidToAuthoring
+                guidToAuthoring = guidToAuthoring,
             };
             var prepareAssetDataJobHandle = prepareAssetDataJob.Schedule();
 
@@ -1409,9 +1721,13 @@ namespace Unity.Entities.Baking
                 assetState = _AssetState,
                 newHashValues = newHashValues,
                 guidToAuthoring = guidToAuthoring,
-                changedComponentsPerThread = changedComponentsPerThread
+                changedComponentsPerThread = changedComponentsPerThread,
             };
-            var assetDependencyJobHandle = assetDependencyJob.Schedule(_AssetState.Length, 64, prepareAssetDataJobHandle);
+            var assetDependencyJobHandle = assetDependencyJob.Schedule(
+                _AssetState.Length,
+                64,
+                prepareAssetDataJobHandle
+            );
 
             guidToAuthoring.Dispose(assetDependencyJobHandle);
             newHashValues.Dispose(assetDependencyJobHandle);
@@ -1429,7 +1745,7 @@ namespace Unity.Entities.Baking
 
             public void Execute()
             {
-                foreach(var dep in authoringToAssetGUID)
+                foreach (var dep in authoringToAssetGUID)
                     guidToAuthoring.Add(dep.Value, dep.Key);
             }
         }
@@ -1439,12 +1755,15 @@ namespace Unity.Entities.Baking
         {
             [ReadOnly]
             public UnsafeList<AssetState> assetState;
+
             [ReadOnly]
             public UnsafeParallelMultiHashMap<GUID, EntityId> guidToAuthoring;
+
             [ReadOnly]
             public NativeArray<Hash128> newHashValues;
 
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1458,7 +1777,12 @@ namespace Unity.Entities.Baking
                     {
                         changedComponentsPerThread.Add(componentId, m_ThreadIndex);
 
-                        IncrementalBakingLog.RecordComponentBake(componentId, ComponentBakeReason.ReferenceChangedOnDisk, asset.GUID, default);
+                        IncrementalBakingLog.RecordComponentBake(
+                            componentId,
+                            ComponentBakeReason.ReferenceChangedOnDisk,
+                            asset.GUID,
+                            default
+                        );
                     }
                     asset.Hash = currentHash;
                 }
@@ -1467,7 +1791,12 @@ namespace Unity.Entities.Baking
             }
         }
 #endif
-        JobHandle CalculateStructuralDependencies(ref GameObjectComponents components, ref SceneHierarchy hierarchy, ref UnsafeDependencyStream<EntityId> changedComponentsPerThread)
+
+        JobHandle CalculateStructuralDependencies(
+            ref GameObjectComponents components,
+            ref SceneHierarchy hierarchy,
+            ref UnsafeDependencyStream<EntityId> changedComponentsPerThread
+        )
         {
             using var marker = StructuralDependenciesMarker.Auto();
 
@@ -1476,43 +1805,63 @@ namespace Unity.Entities.Baking
                 structuralGetComponentDependency = _StructuralGetComponentDependency,
                 hierarchy = hierarchy,
                 components = components,
-                changedComponentsPerThread = changedComponentsPerThread
+                changedComponentsPerThread = changedComponentsPerThread,
             };
-            JobHandle structuralComponentJobHandle = structuralComponentJob.Schedule(DependenciesHashMapHelper.GetBucketSize(_StructuralGetComponentDependency), 64, default);
+            JobHandle structuralComponentJobHandle = structuralComponentJob.Schedule(
+                DependenciesHashMapHelper.GetBucketSize(_StructuralGetComponentDependency),
+                64,
+                default
+            );
 
             var structuralComponentsJob = new CalculateStructuralGetComponentsDependencyJob()
             {
                 structuralGetComponentsDependency = _StructuralGetComponentsDependency,
                 hierarchy = hierarchy,
                 components = components,
-                changedComponentsPerThread = changedComponentsPerThread
+                changedComponentsPerThread = changedComponentsPerThread,
             };
-            JobHandle structuralComponentsJobHandle = structuralComponentsJob.Schedule(DependenciesHashMapHelper.GetBucketSize(_StructuralGetComponentsDependency), 16, default);
+            JobHandle structuralComponentsJobHandle = structuralComponentsJob.Schedule(
+                DependenciesHashMapHelper.GetBucketSize(_StructuralGetComponentsDependency),
+                16,
+                default
+            );
 
             var structuralHierarchySingleJob = new CalculateStructuralGetHierarchySingleDependencyJob()
             {
                 structuralGetHierarchySingleDependency = _StructuralGetHierarchySingleDependency,
                 hierarchy = hierarchy,
-                changedComponentsPerThread = changedComponentsPerThread
+                changedComponentsPerThread = changedComponentsPerThread,
             };
-            JobHandle structuralHierarchySingleJobHandle = structuralHierarchySingleJob.Schedule(DependenciesHashMapHelper.GetBucketSize(_StructuralGetHierarchySingleDependency), 64, default);
+            JobHandle structuralHierarchySingleJobHandle = structuralHierarchySingleJob.Schedule(
+                DependenciesHashMapHelper.GetBucketSize(_StructuralGetHierarchySingleDependency),
+                64,
+                default
+            );
 
             var structuralHierarchyJob = new CalculateStructuralGetHierarchyDependencyJob()
             {
                 structuralGetHierarchyDependency = _StructuralGetHierarchyDependency,
                 hierarchy = hierarchy,
-                changedComponentsPerThread = changedComponentsPerThread
+                changedComponentsPerThread = changedComponentsPerThread,
             };
-            JobHandle structuralHierarchyJobHandle = structuralHierarchyJob.Schedule(DependenciesHashMapHelper.GetBucketSize(_StructuralGetHierarchyDependency), 64, default);
+            JobHandle structuralHierarchyJobHandle = structuralHierarchyJob.Schedule(
+                DependenciesHashMapHelper.GetBucketSize(_StructuralGetHierarchyDependency),
+                64,
+                default
+            );
 
             var activeDependencyJob = new CalculateActiveDependenciesJob
             {
                 hierarchy = hierarchy,
                 unityTypeIndex = TypeManager.GetTypeIndex<GameObject>(),
                 changedComponentsPerThread = changedComponentsPerThread,
-                HashMap = _ActiveDependencies
+                HashMap = _ActiveDependencies,
             };
-            JobHandle activeDependencyJobHandle = activeDependencyJob.Schedule(DependenciesHashMapHelper.GetBucketSize(_ActiveDependencies), 64, default);
+            JobHandle activeDependencyJobHandle = activeDependencyJob.Schedule(
+                DependenciesHashMapHelper.GetBucketSize(_ActiveDependencies),
+                64,
+                default
+            );
 
             var staticDependencyJob = new CalculateIsStaticDependenciesJob
             {
@@ -1520,9 +1869,13 @@ namespace Unity.Entities.Baking
                 components = components,
                 staticOptimizeEntityTypeIndex = TypeManager.GetTypeIndex<StaticOptimizeEntity>(),
                 changedComponentsPerThread = changedComponentsPerThread,
-                HashMap = _ObjectStaticDependency
+                HashMap = _ObjectStaticDependency,
             };
-            JobHandle staticDependecyJobHandle = staticDependencyJob.Schedule(DependenciesHashMapHelper.GetBucketSize(_ObjectStaticDependency), 64, default);
+            JobHandle staticDependecyJobHandle = staticDependencyJob.Schedule(
+                DependenciesHashMapHelper.GetBucketSize(_ObjectStaticDependency),
+                64,
+                default
+            );
 
             // Combine dependencies
             NativeArray<JobHandle> dependencyArray = new NativeArray<JobHandle>(6, Allocator.Temp);
@@ -1539,16 +1892,24 @@ namespace Unity.Entities.Baking
         }
 
         [BurstCompile]
-        internal struct CalculateStructuralGetComponentDependencyJob : IKeyValueJobCallback<EntityId, BakeDependencies.GetComponentDependency>, IJobParallelFor
+        internal struct CalculateStructuralGetComponentDependencyJob
+            : IKeyValueJobCallback<EntityId, BakeDependencies.GetComponentDependency>,
+                IJobParallelFor
         {
             [ReadOnly]
-            public UnsafeParallelMultiHashMap<EntityId, BakeDependencies.GetComponentDependency> structuralGetComponentDependency;
+            public UnsafeParallelMultiHashMap<
+                EntityId,
+                BakeDependencies.GetComponentDependency
+            > structuralGetComponentDependency;
+
             [ReadOnly]
             public SceneHierarchy hierarchy;
+
             [ReadOnly]
             public GameObjectComponents components;
 
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1558,27 +1919,45 @@ namespace Unity.Entities.Baking
                 DependenciesHashMapHelper.ExecuteOnEntries(this, structuralGetComponentDependency, m_ThreadIndex, i);
             }
 
-            public void ProcessEntry(int threadIndex, in UnsafeParallelMultiHashMap<EntityId, GetComponentDependency> hashMap, in EntityId key, in GetComponentDependency value)
+            public void ProcessEntry(
+                int threadIndex,
+                in UnsafeParallelMultiHashMap<EntityId, GetComponentDependency> hashMap,
+                in EntityId key,
+                in GetComponentDependency value
+            )
             {
                 if (!value.IsValid(ref components, ref hierarchy))
                 {
                     changedComponentsPerThread.Add(key, m_ThreadIndex);
-                    IncrementalBakingLog.RecordComponentBake(key, ComponentBakeReason.GetComponentStructuralChange, value.ResultComponent, value.Type);
+                    IncrementalBakingLog.RecordComponentBake(
+                        key,
+                        ComponentBakeReason.GetComponentStructuralChange,
+                        value.ResultComponent,
+                        value.Type
+                    );
                 }
             }
         }
 
         [BurstCompile]
-        internal struct CalculateStructuralGetComponentsDependencyJob : IKeyValueJobCallback<EntityId, BakeDependencies.GetComponentsDependency>, IJobParallelFor
+        internal struct CalculateStructuralGetComponentsDependencyJob
+            : IKeyValueJobCallback<EntityId, BakeDependencies.GetComponentsDependency>,
+                IJobParallelFor
         {
             [ReadOnly]
-            public UnsafeParallelMultiHashMap<EntityId, BakeDependencies.GetComponentsDependency> structuralGetComponentsDependency;
+            public UnsafeParallelMultiHashMap<
+                EntityId,
+                BakeDependencies.GetComponentsDependency
+            > structuralGetComponentsDependency;
+
             [ReadOnly]
             public SceneHierarchy hierarchy;
+
             [ReadOnly]
             public GameObjectComponents components;
 
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1588,53 +1967,92 @@ namespace Unity.Entities.Baking
                 DependenciesHashMapHelper.ExecuteOnEntries(this, structuralGetComponentsDependency, m_ThreadIndex, i);
             }
 
-            public void ProcessEntry(int threadIndex, in UnsafeParallelMultiHashMap<EntityId, GetComponentsDependency> hashMap, in EntityId key, in GetComponentsDependency value)
+            public void ProcessEntry(
+                int threadIndex,
+                in UnsafeParallelMultiHashMap<EntityId, GetComponentsDependency> hashMap,
+                in EntityId key,
+                in GetComponentsDependency value
+            )
             {
                 if (!value.IsValid(ref components, ref hierarchy))
                 {
                     changedComponentsPerThread.Add(key, m_ThreadIndex);
-                    IncrementalBakingLog.RecordComponentBake(key, ComponentBakeReason.GetComponentsStructuralChange, EntityId.None, value.Type);
+                    IncrementalBakingLog.RecordComponentBake(
+                        key,
+                        ComponentBakeReason.GetComponentsStructuralChange,
+                        EntityId.None,
+                        value.Type
+                    );
                 }
             }
         }
 
         [BurstCompile]
-        internal struct CalculateStructuralGetHierarchySingleDependencyJob : IKeyValueJobCallback<EntityId, BakeDependencies.GetHierarchySingleDependency>, IJobParallelFor
+        internal struct CalculateStructuralGetHierarchySingleDependencyJob
+            : IKeyValueJobCallback<EntityId, BakeDependencies.GetHierarchySingleDependency>,
+                IJobParallelFor
         {
             [ReadOnly]
-            public UnsafeParallelMultiHashMap<EntityId, BakeDependencies.GetHierarchySingleDependency> structuralGetHierarchySingleDependency;
+            public UnsafeParallelMultiHashMap<
+                EntityId,
+                BakeDependencies.GetHierarchySingleDependency
+            > structuralGetHierarchySingleDependency;
+
             [ReadOnly]
             public SceneHierarchy hierarchy;
 
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
             public void Execute(int i)
             {
                 // ExecuteOnFirstKey could be used as well, but ExecuteOnEntries seems slightly more performant
-                DependenciesHashMapHelper.ExecuteOnEntries(this, structuralGetHierarchySingleDependency, m_ThreadIndex, i);
+                DependenciesHashMapHelper.ExecuteOnEntries(
+                    this,
+                    structuralGetHierarchySingleDependency,
+                    m_ThreadIndex,
+                    i
+                );
             }
 
-            public void ProcessEntry(int threadIndex, in UnsafeParallelMultiHashMap<EntityId, GetHierarchySingleDependency> hashMap, in EntityId key, in GetHierarchySingleDependency value)
+            public void ProcessEntry(
+                int threadIndex,
+                in UnsafeParallelMultiHashMap<EntityId, GetHierarchySingleDependency> hashMap,
+                in EntityId key,
+                in GetHierarchySingleDependency value
+            )
             {
                 if (!value.IsValid(ref hierarchy))
                 {
                     changedComponentsPerThread.Add(key, m_ThreadIndex);
-                    IncrementalBakingLog.RecordComponentBake(key, ComponentBakeReason.GetHierarchySingleStructuralChange, value.Result, default);
+                    IncrementalBakingLog.RecordComponentBake(
+                        key,
+                        ComponentBakeReason.GetHierarchySingleStructuralChange,
+                        value.Result,
+                        default
+                    );
                 }
             }
         }
 
         [BurstCompile]
-        internal struct CalculateStructuralGetHierarchyDependencyJob : IKeyValueJobCallback<EntityId, BakeDependencies.GetHierarchyDependency>, IJobParallelFor
+        internal struct CalculateStructuralGetHierarchyDependencyJob
+            : IKeyValueJobCallback<EntityId, BakeDependencies.GetHierarchyDependency>,
+                IJobParallelFor
         {
             [ReadOnly]
-            public UnsafeParallelMultiHashMap<EntityId, BakeDependencies.GetHierarchyDependency> structuralGetHierarchyDependency;
+            public UnsafeParallelMultiHashMap<
+                EntityId,
+                BakeDependencies.GetHierarchyDependency
+            > structuralGetHierarchyDependency;
+
             [ReadOnly]
             public SceneHierarchy hierarchy;
 
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1644,25 +2062,39 @@ namespace Unity.Entities.Baking
                 DependenciesHashMapHelper.ExecuteOnEntries(this, structuralGetHierarchyDependency, m_ThreadIndex, i);
             }
 
-            public void ProcessEntry(int threadIndex, in UnsafeParallelMultiHashMap<EntityId, GetHierarchyDependency> hashMap, in EntityId key, in GetHierarchyDependency value)
+            public void ProcessEntry(
+                int threadIndex,
+                in UnsafeParallelMultiHashMap<EntityId, GetHierarchyDependency> hashMap,
+                in EntityId key,
+                in GetHierarchyDependency value
+            )
             {
                 if (!value.IsValid(ref hierarchy))
                 {
                     changedComponentsPerThread.Add(key, m_ThreadIndex);
-                    IncrementalBakingLog.RecordComponentBake(key, ComponentBakeReason.GetHierarchyStructuralChange, EntityId.None, default);
+                    IncrementalBakingLog.RecordComponentBake(
+                        key,
+                        ComponentBakeReason.GetHierarchyStructuralChange,
+                        EntityId.None,
+                        default
+                    );
                 }
             }
         }
 
         [BurstCompile]
-        internal struct CalculateActiveDependenciesJob : IKeyValueJobCallback<EntityId, BakeDependencies.ActiveDependency>, IJobParallelFor
+        internal struct CalculateActiveDependenciesJob
+            : IKeyValueJobCallback<EntityId, BakeDependencies.ActiveDependency>,
+                IJobParallelFor
         {
             [ReadOnly]
             public UnsafeParallelMultiHashMap<EntityId, BakeDependencies.ActiveDependency> HashMap;
+
             [ReadOnly]
             public SceneHierarchy hierarchy;
             public TypeIndex unityTypeIndex;
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1671,27 +2103,42 @@ namespace Unity.Entities.Baking
                 DependenciesHashMapHelper.ExecuteOnEntries(this, HashMap, m_ThreadIndex, index);
             }
 
-            public void ProcessEntry(int threadIndex, in UnsafeParallelMultiHashMap<EntityId, ActiveDependency> hashMap, in EntityId key, in ActiveDependency value)
+            public void ProcessEntry(
+                int threadIndex,
+                in UnsafeParallelMultiHashMap<EntityId, ActiveDependency> hashMap,
+                in EntityId key,
+                in ActiveDependency value
+            )
             {
                 if (!value.IsValid(ref hierarchy))
                 {
                     changedComponentsPerThread.Add(value.Dependent, threadIndex);
-                    IncrementalBakingLog.RecordComponentBake(value.Dependent, ComponentBakeReason.ActiveChanged, value.GameObjectId, unityTypeIndex);
+                    IncrementalBakingLog.RecordComponentBake(
+                        value.Dependent,
+                        ComponentBakeReason.ActiveChanged,
+                        value.GameObjectId,
+                        unityTypeIndex
+                    );
                 }
             }
         }
 
         [BurstCompile]
-        internal struct CalculateIsStaticDependenciesJob : IKeyValueJobCallback<EntityId, BakeDependencies.ObjectStaticDependency>, IJobParallelFor
+        internal struct CalculateIsStaticDependenciesJob
+            : IKeyValueJobCallback<EntityId, BakeDependencies.ObjectStaticDependency>,
+                IJobParallelFor
         {
             [ReadOnly]
             public UnsafeParallelMultiHashMap<EntityId, BakeDependencies.ObjectStaticDependency> HashMap;
+
             [ReadOnly]
             public SceneHierarchy hierarchy;
+
             [ReadOnly]
             public GameObjectComponents components;
             public TypeIndex staticOptimizeEntityTypeIndex;
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1700,17 +2147,32 @@ namespace Unity.Entities.Baking
                 DependenciesHashMapHelper.ExecuteOnEntries(this, HashMap, m_ThreadIndex, index);
             }
 
-            public void ProcessEntry(int threadIndex, in UnsafeParallelMultiHashMap<EntityId, ObjectStaticDependency> hashMap, in EntityId key, in ObjectStaticDependency value)
+            public void ProcessEntry(
+                int threadIndex,
+                in UnsafeParallelMultiHashMap<EntityId, ObjectStaticDependency> hashMap,
+                in EntityId key,
+                in ObjectStaticDependency value
+            )
             {
                 if (!value.IsValid(ref components, ref hierarchy, staticOptimizeEntityTypeIndex))
                 {
                     changedComponentsPerThread.Add(value.AuthoringID, threadIndex);
-                    IncrementalBakingLog.RecordComponentBake(value.AuthoringID, ComponentBakeReason.GameObjectStaticChange, value.EntityId, default);
+                    IncrementalBakingLog.RecordComponentBake(
+                        value.AuthoringID,
+                        ComponentBakeReason.GameObjectStaticChange,
+                        value.EntityId,
+                        default
+                    );
                 }
             }
         }
 
-        JobHandle CalculateNonStructuralDependencies(ref GameObjectComponents components, ref IncrementalBakingData incrementalConversionDataCache, ChangedSceneTransforms changedSceneTransforms, ref UnsafeDependencyStream<EntityId> changedComponentsPerThread)
+        JobHandle CalculateNonStructuralDependencies(
+            ref GameObjectComponents components,
+            ref IncrementalBakingData incrementalConversionDataCache,
+            ChangedSceneTransforms changedSceneTransforms,
+            ref UnsafeDependencyStream<EntityId> changedComponentsPerThread
+        )
         {
             using var marker = NonStructuralDependenciesMarker.Auto();
 
@@ -1724,14 +2186,18 @@ namespace Unity.Entities.Baking
 
             // Make sure reverse property change dependency table is up to date
             JobHandle calculateGlobalReversePropertyJobHandle = default;
-            if (incrementalConversionDataCache.ChangedComponents.Length > 0 || incrementalConversionDataCache.ChangedAssets.Length > 0 || incrementalConversionDataCache.ChangedGameObjectProperties.Length > 0)
+            if (
+                incrementalConversionDataCache.ChangedComponents.Length > 0
+                || incrementalConversionDataCache.ChangedAssets.Length > 0
+                || incrementalConversionDataCache.ChangedGameObjectProperties.Length > 0
+            )
             {
                 if (_IsReversePropertyChangeDependencyUpToDate == 0)
                 {
                     var calculateReversePropertyJob = new CalculateReversePropertyChangeDependencyJob()
                     {
                         propertyChangeDependency = _PropertyChangeDependency,
-                        reversePropertyChangeDependency = _ReversePropertyChangeDependency
+                        reversePropertyChangeDependency = _ReversePropertyChangeDependency,
                     };
                     calculateGlobalReversePropertyJobHandle = calculateReversePropertyJob.Schedule();
 
@@ -1746,7 +2212,7 @@ namespace Unity.Entities.Baking
                 var calculatePropertyReversePropertyJob = new CalculateReverseGameObjectPropertyChangeDependencyJob()
                 {
                     propertyGameObjectChangeDependency = _ObjectPropertyDependency,
-                    reverseGameObjectPropertyChangeDependency = _ReverseObjectPropertyDependency
+                    reverseGameObjectPropertyChangeDependency = _ReverseObjectPropertyDependency,
                 };
                 var PropertyJobHandle = calculatePropertyReversePropertyJob.Schedule();
 
@@ -1760,9 +2226,13 @@ namespace Unity.Entities.Baking
                 {
                     changedComponents = incrementalConversionDataCache.ChangedComponents,
                     reversePropertyChangeDependency = _ReversePropertyChangeDependency,
-                    changedComponentsPerThread = changedComponentsPerThread
+                    changedComponentsPerThread = changedComponentsPerThread,
                 };
-                nonStructuralChangedComponentJobHandle = nonStructuralChangedComponentJob.Schedule(incrementalConversionDataCache.ChangedComponents.Length, 64, calculateGlobalReversePropertyJobHandle);
+                nonStructuralChangedComponentJobHandle = nonStructuralChangedComponentJob.Schedule(
+                    incrementalConversionDataCache.ChangedComponents.Length,
+                    64,
+                    calculateGlobalReversePropertyJobHandle
+                );
             }
 
             JobHandle nonStructuralChangedGameObjectPropertiesJobHandle = default;
@@ -1773,9 +2243,17 @@ namespace Unity.Entities.Baking
                     changedGameObjects = incrementalConversionDataCache.ChangedGameObjectProperties,
                     reversePropertyChangeDependency = _ReversePropertyChangeDependency,
                     reverseGameObjectPropertyChangeDependency = _ReverseObjectPropertyDependency,
-                    changedComponentsPerThread = changedComponentsPerThread
+                    changedComponentsPerThread = changedComponentsPerThread,
                 };
-                nonStructuralChangedGameObjectPropertiesJobHandle = nonStructuralChangedGameObjectPropertiesJob.Schedule(incrementalConversionDataCache.ChangedGameObjectProperties.Length, 64, JobHandle.CombineDependencies(calculateGameObjectPropertyReverseJobHandle, calculateGlobalReversePropertyJobHandle));
+                nonStructuralChangedGameObjectPropertiesJobHandle =
+                    nonStructuralChangedGameObjectPropertiesJob.Schedule(
+                        incrementalConversionDataCache.ChangedGameObjectProperties.Length,
+                        64,
+                        JobHandle.CombineDependencies(
+                            calculateGameObjectPropertyReverseJobHandle,
+                            calculateGlobalReversePropertyJobHandle
+                        )
+                    );
             }
 
             JobHandle nonStructuralChangedAssetsJobHandle = default;
@@ -1786,12 +2264,19 @@ namespace Unity.Entities.Baking
                 {
                     changedAssets = incrementalConversionDataCache.ChangedAssets,
                     reversePropertyChangeDependency = _ReversePropertyChangeDependency,
-                    changedComponentsPerThread = changedComponentsPerThread
+                    changedComponentsPerThread = changedComponentsPerThread,
                 };
-                nonStructuralChangedAssetsJobHandle = nonStructuralChangedAssetsJob.Schedule(incrementalConversionDataCache.ChangedAssets.Length, 64, calculateGlobalReversePropertyJobHandle);
+                nonStructuralChangedAssetsJobHandle = nonStructuralChangedAssetsJob.Schedule(
+                    incrementalConversionDataCache.ChangedAssets.Length,
+                    64,
+                    calculateGlobalReversePropertyJobHandle
+                );
             }
 #endif
-            var changedComponentGoJobHandle = JobHandle.CombineDependencies(nonStructuralChangedComponentJobHandle, nonStructuralChangedGameObjectPropertiesJobHandle);
+            var changedComponentGoJobHandle = JobHandle.CombineDependencies(
+                nonStructuralChangedComponentJobHandle,
+                nonStructuralChangedGameObjectPropertiesJobHandle
+            );
             return JobHandle.CombineDependencies(changedComponentGoJobHandle, nonStructuralChangedAssetsJobHandle);
         }
 
@@ -1814,8 +2299,11 @@ namespace Unity.Entities.Baking
         internal struct CalculateReverseGameObjectPropertyChangeDependencyJob : IJob
         {
             [ReadOnly]
-            public  UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency> propertyGameObjectChangeDependency;
-            public UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency> reverseGameObjectPropertyChangeDependency;
+            public UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency> propertyGameObjectChangeDependency;
+            public UnsafeParallelMultiHashMap<
+                EntityId,
+                ObjectPropertyDependency
+            > reverseGameObjectPropertyChangeDependency;
 
             public void Execute()
             {
@@ -1830,9 +2318,11 @@ namespace Unity.Entities.Baking
         {
             [ReadOnly]
             public NativeList<IncrementalBakingData.ChangedComponentsInfo> changedComponents;
+
             [ReadOnly]
             public UnsafeParallelMultiHashMap<EntityId, EntityId> reversePropertyChangeDependency;
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1841,14 +2331,24 @@ namespace Unity.Entities.Baking
                 var component = changedComponents[i];
                 changedComponentsPerThread.Add(component.instanceID, m_ThreadIndex);
 
-                IncrementalBakingLog.RecordComponentBake(component.instanceID, ComponentBakeReason.ComponentChanged, component.instanceID, component.unityTypeIndex);
+                IncrementalBakingLog.RecordComponentBake(
+                    component.instanceID,
+                    ComponentBakeReason.ComponentChanged,
+                    component.instanceID,
+                    component.unityTypeIndex
+                );
                 IncrementalBakingLog.RecordComponentChanged(component.instanceID);
 
                 foreach (var dep in reversePropertyChangeDependency.GetValuesForKey(component.instanceID))
                 {
                     changedComponentsPerThread.Add(dep, m_ThreadIndex);
 
-                    IncrementalBakingLog.RecordComponentBake(dep, ComponentBakeReason.GetComponentChanged, component.instanceID, component.unityTypeIndex);
+                    IncrementalBakingLog.RecordComponentBake(
+                        dep,
+                        ComponentBakeReason.GetComponentChanged,
+                        component.instanceID,
+                        component.unityTypeIndex
+                    );
                 }
             }
         }
@@ -1858,11 +2358,17 @@ namespace Unity.Entities.Baking
         {
             [ReadOnly]
             public NativeList<IncrementalBakingData.GameObjectProperties> changedGameObjects;
+
             [ReadOnly]
             public UnsafeParallelMultiHashMap<EntityId, EntityId> reversePropertyChangeDependency;
+
             [ReadOnly]
-            public UnsafeParallelMultiHashMap<EntityId, ObjectPropertyDependency> reverseGameObjectPropertyChangeDependency;
+            public UnsafeParallelMultiHashMap<
+                EntityId,
+                ObjectPropertyDependency
+            > reverseGameObjectPropertyChangeDependency;
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 
@@ -1872,7 +2378,12 @@ namespace Unity.Entities.Baking
                 foreach (var dep in reversePropertyChangeDependency.GetValuesForKey(instanceID))
                 {
                     changedComponentsPerThread.Add(dep, m_ThreadIndex);
-                    IncrementalBakingLog.RecordComponentBake(dep, ComponentBakeReason.ReferenceChanged, instanceID, default);
+                    IncrementalBakingLog.RecordComponentBake(
+                        dep,
+                        ComponentBakeReason.ReferenceChanged,
+                        instanceID,
+                        default
+                    );
                 }
 
                 // We check the GameObject properties (Name, Layer, Tag)
@@ -1881,7 +2392,12 @@ namespace Unity.Entities.Baking
                     if (!dep.IsValid(changedGameObjects[i]))
                     {
                         changedComponentsPerThread.Add(dep.AuthoringID, m_ThreadIndex);
-                        IncrementalBakingLog.RecordComponentBake(dep.AuthoringID, ComponentBakeReason.GameObjectPropertyChange, instanceID, default);
+                        IncrementalBakingLog.RecordComponentBake(
+                            dep.AuthoringID,
+                            ComponentBakeReason.GameObjectPropertyChange,
+                            instanceID,
+                            default
+                        );
                     }
                 }
             }
@@ -1892,9 +2408,11 @@ namespace Unity.Entities.Baking
         {
             [ReadOnly]
             public NativeList<EntityId> changedAssets;
+
             [ReadOnly]
             public UnsafeParallelMultiHashMap<EntityId, EntityId> reversePropertyChangeDependency;
             public UnsafeDependencyStream<EntityId> changedComponentsPerThread;
+
             [NativeSetThreadIndex]
             internal int m_ThreadIndex;
 

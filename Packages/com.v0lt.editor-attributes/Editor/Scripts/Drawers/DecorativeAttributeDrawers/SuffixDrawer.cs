@@ -1,6 +1,6 @@
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
@@ -18,28 +18,34 @@ namespace EditorAttributes.Editor
 
             Label suffixLabel = new()
             {
-                style = {
+                style =
+                {
                     fontSize = 12,
                     maxWidth = 200f,
                     marginLeft = suffixAttribute.Offset,
                     unityTextAlign = TextAnchor.MiddleRight,
                     alignSelf = Align.Center,
-                    overflow = Overflow.Hidden
-                }
+                    overflow = Overflow.Hidden,
+                },
             };
 
             root.style.flexDirection = FlexDirection.Row;
             propertyField.style.flexGrow = 1f;
-            suffixLabel.style.color = suffixLabel.style.color = CanApplyGlobalColor ? EditorExtension.GLOBAL_COLOR : Color.gray;
+            suffixLabel.style.color = suffixLabel.style.color = CanApplyGlobalColor
+                ? EditorExtension.GLOBAL_COLOR
+                : Color.gray;
 
             root.Add(propertyField);
             root.Add(suffixLabel);
 
-            UpdateVisualElement(suffixLabel, () =>
-            {
-                suffixLabel.text = GetDynamicString(suffixAttribute.Suffix, property, suffixAttribute, errorBox);
-                DisplayErrorBox(root, errorBox);
-            });
+            UpdateVisualElement(
+                suffixLabel,
+                () =>
+                {
+                    suffixLabel.text = GetDynamicString(suffixAttribute.Suffix, property, suffixAttribute, errorBox);
+                    DisplayErrorBox(root, errorBox);
+                }
+            );
 
             return root;
         }

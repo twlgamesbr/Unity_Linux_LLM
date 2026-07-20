@@ -28,7 +28,9 @@ namespace Unity.Entities.Editor
             void CheckValid()
             {
                 if (m_Hierarchy.ChangeVersion != m_ChangeVersion)
-                    throw new InvalidOperationException("HierarchyPackedNodeStore version has changed. This is likely due to a repacking.");
+                    throw new InvalidOperationException(
+                        "HierarchyPackedNodeStore version has changed. This is likely due to a repacking."
+                    );
             }
 
             /// <summary>
@@ -140,7 +142,12 @@ namespace Unity.Entities.Editor
                 int m_ChildIndex;
                 int m_CurrentIndex;
 
-                public Enumerator(HierarchyNodeStore.Immutable hierarchy, int totalChildrenCount, int changeVersion, int childIndex)
+                public Enumerator(
+                    HierarchyNodeStore.Immutable hierarchy,
+                    int totalChildrenCount,
+                    int changeVersion,
+                    int childIndex
+                )
                 {
                     m_Hierarchy = hierarchy;
                     m_ChildIndex = childIndex;

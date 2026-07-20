@@ -23,10 +23,7 @@ namespace Unity.Physics.Authoring
             if (!initialized)
             {
                 // Note: lazy initialization here rather than directly in OnEnable to avoid nullptr access in EditorStyles after domain reload
-                enabledStyle = new GUIStyle(EditorStyles.label)
-                {
-                    normal = { textColor = Color.green }
-                };
+                enabledStyle = new GUIStyle(EditorStyles.label) { normal = { textColor = Color.green } };
 
                 visibleIcon = EditorGUIUtility.IconContent("VisibilityOn");
                 hiddenIcon = EditorGUIUtility.IconContent("VisibilityOff");
@@ -36,7 +33,7 @@ namespace Unity.Physics.Authoring
 
             serializedObject.Update();
 
-            var drawFlags = new(string property, string label)[]
+            var drawFlags = new (string property, string label)[]
             {
                 ("DrawColliders", "Draw Colliders"),
                 ("DrawColliderEdges", "Draw Collider Edges"),
@@ -51,7 +48,7 @@ namespace Unity.Physics.Authoring
 
             DrawSeparator("Debug Display Options");
 
-            foreach (var(property, label) in drawFlags)
+            foreach (var (property, label) in drawFlags)
             {
                 var prop = serializedObject.FindProperty(property);
                 DrawToggleWithEye(prop, label);
@@ -59,7 +56,7 @@ namespace Unity.Physics.Authoring
 
             DrawSeparator("Constraint Graph");
 
-            drawFlags = new(string property, string label)[]
+            drawFlags = new (string property, string label)[]
             {
                 ("DisplayDirectSolverIslands", "Draw Direct Solver Islands"),
 #if UNITY_PHYSICS_DISPLAY_ADVANCED_SOLVER_DATA
@@ -74,7 +71,7 @@ namespace Unity.Physics.Authoring
             var drawDirectSolverIslandsProp = serializedObject.FindProperty("DisplayDirectSolverIslands");
             var drawIterativeSolverPhasesProp = serializedObject.FindProperty("DrawIterativeSolverPhases");
 
-            foreach (var(property, label) in drawFlags)
+            foreach (var (property, label) in drawFlags)
             {
                 var prop = serializedObject.FindProperty(property);
                 bool enabled = true;
@@ -90,7 +87,6 @@ namespace Unity.Physics.Authoring
                     DrawToggleWithEye(prop, label);
                 }
             }
-
 
             DrawSeparator("Integration Mode");
 
@@ -148,7 +144,10 @@ namespace Unity.Physics.Authoring
         {
             var targetType = typeof(PhysicsDebugDisplayAuthoring);
             var field = targetType.GetField(propertyName);
-            if (field != null && Attribute.GetCustomAttribute(field, typeof(TooltipAttribute)) is TooltipAttribute tooltip)
+            if (
+                field != null
+                && Attribute.GetCustomAttribute(field, typeof(TooltipAttribute)) is TooltipAttribute tooltip
+            )
                 return tooltip.tooltip;
             return string.Empty;
         }

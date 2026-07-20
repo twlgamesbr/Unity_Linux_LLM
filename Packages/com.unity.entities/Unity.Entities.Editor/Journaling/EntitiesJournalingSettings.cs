@@ -10,14 +10,14 @@ namespace Unity.Entities.Editor
         public bool Enabled
         {
 #if !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             get => EntitiesJournaling.Preferences.Enabled;
             set
             {
                 EntitiesJournaling.Preferences.Enabled = value;
                 EntitiesJournaling.Enabled = value;
             }
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #else
             get => false;
             set { }
@@ -28,10 +28,10 @@ namespace Unity.Entities.Editor
         public int TotalMemoryMB
         {
 #if !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             get => EntitiesJournaling.Preferences.TotalMemoryMB;
             set => EntitiesJournaling.Preferences.TotalMemoryMB = value;
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #else
             get => 0;
             set { }
@@ -52,16 +52,13 @@ namespace Unity.Entities.Editor
 #endif
         }
 
-        public void OnSettingChanged(PropertyPath path)
-        {
-        }
+        public void OnSettingChanged(PropertyPath path) { }
 
         public string[] GetSearchKeywords()
         {
             return ISetting.GetSearchKeywordsFromType(GetType());
         }
     }
-
 
 #if DISABLE_ENTITIES_JOURNALING
     class EntitiesJournalingSettingsInspector : Unity.Entities.UI.Inspector<EntitiesJournalingSettings>

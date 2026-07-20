@@ -16,7 +16,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         }
 
         public List<TestRunnerResult> results = new List<TestRunnerResult>();
-        public readonly Dictionary<string, TestTreeViewItem> m_treeFiltered = new Dictionary<string, TestTreeViewItem>();
+        public readonly Dictionary<string, TestTreeViewItem> m_treeFiltered =
+            new Dictionary<string, TestTreeViewItem>();
         private readonly Dictionary<string, TestRunnerResult> m_OldTestResults;
         private readonly TestRunnerUIFilter m_UIFilter;
         private readonly ITestAdaptor[] m_TestListRoots;
@@ -30,7 +31,12 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             get { return m_AvailableCategories.Distinct().OrderBy(a => a).ToArray(); }
         }
 
-        public TestTreeViewBuilder(ITestAdaptor[] tests, Dictionary<string, TestRunnerResult> oldTestResultResults, TestRunnerUIFilter uiFilter, bool runningOnPlatform)
+        public TestTreeViewBuilder(
+            ITestAdaptor[] tests,
+            Dictionary<string, TestRunnerResult> oldTestResultResults,
+            TestRunnerUIFilter uiFilter,
+            bool runningOnPlatform
+        )
         {
             m_AvailableCategories.Add(CategoryFilterExtended.k_DefaultCategory);
             m_OldTestResults = oldTestResultResults;
@@ -56,11 +62,26 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         {
             if (m_UIFilter.PassedHidden && result.resultStatus == TestRunnerResult.ResultStatus.Passed)
                 return true;
-            if (m_UIFilter.FailedHidden && (result.resultStatus == TestRunnerResult.ResultStatus.Failed || result.resultStatus == TestRunnerResult.ResultStatus.Inconclusive))
+            if (
+                m_UIFilter.FailedHidden
+                && (
+                    result.resultStatus == TestRunnerResult.ResultStatus.Failed
+                    || result.resultStatus == TestRunnerResult.ResultStatus.Inconclusive
+                )
+            )
                 return true;
-            if (m_UIFilter.NotRunHidden && (result.resultStatus == TestRunnerResult.ResultStatus.NotRun || result.resultStatus == TestRunnerResult.ResultStatus.Skipped))
+            if (
+                m_UIFilter.NotRunHidden
+                && (
+                    result.resultStatus == TestRunnerResult.ResultStatus.NotRun
+                    || result.resultStatus == TestRunnerResult.ResultStatus.Skipped
+                )
+            )
                 return true;
-            if (!string.IsNullOrEmpty(m_UIFilter.m_SearchString) && result.FullName.IndexOf(m_UIFilter.m_SearchString, StringComparison.InvariantCultureIgnoreCase) < 0)
+            if (
+                !string.IsNullOrEmpty(m_UIFilter.m_SearchString)
+                && result.FullName.IndexOf(m_UIFilter.m_SearchString, StringComparison.InvariantCultureIgnoreCase) < 0
+            )
                 return true;
             if (m_UIFilter.CategoryFilter.Length > 0)
                 return !test.Categories.Any(category => m_UIFilter.CategoryFilter.Contains(category));
@@ -84,12 +105,15 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             {
                 m_OldTestResults.TryGetValue(testElementId, out var result);
 
-                if (result != null && !m_runningOnPlatform &&
-                    (result.ignoredOrSkipped
-                     || result.notRunnable
-                     || testElement.RunState == RunState.NotRunnable
-                     || testElement.RunState == RunState.Ignored
-                     || testElement.RunState == RunState.Skipped
+                if (
+                    result != null
+                    && !m_runningOnPlatform
+                    && (
+                        result.ignoredOrSkipped
+                        || result.notRunnable
+                        || testElement.RunState == RunState.NotRunnable
+                        || testElement.RunState == RunState.Ignored
+                        || testElement.RunState == RunState.Skipped
                     )
                 )
                 {
@@ -126,7 +150,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                     }
                     else
                     {
-                        resultList = new List<TestRunnerResult> {result};
+                        resultList = new List<TestRunnerResult> { result };
                         m_ChildrenResults.Add(testElement.ParentUniqueName, resultList);
                     }
                 }
@@ -147,7 +171,6 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                 testCount.TotalTestCount += childTestCount.TotalTestCount;
                 testCount.TotalFailedTestCount += childTestCount.TotalFailedTestCount;
             }
-
 
             if (testElement.IsTestAssembly && !testElement.HasChildren)
             {

@@ -29,7 +29,7 @@ namespace Unity.Entities
             get
             {
                 if (Exists())
-                    return (BufferHeader*) EntityManager.GetComponentDataRawRO(Entity, TypeIndex);
+                    return (BufferHeader*)EntityManager.GetComponentDataRawRO(Entity, TypeIndex);
                 return null;
             }
         }
@@ -163,7 +163,9 @@ namespace Unity.Entities
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if ((uint)index >= (uint)Count)
-                throw new IndexOutOfRangeException($"Index {index} is out of range in DynamicBufferContainer of '{Count}' Count.");
+                throw new IndexOutOfRangeException(
+                    $"Index {index} is out of range in DynamicBufferContainer of '{Count}' Count."
+                );
 #endif
         }
 

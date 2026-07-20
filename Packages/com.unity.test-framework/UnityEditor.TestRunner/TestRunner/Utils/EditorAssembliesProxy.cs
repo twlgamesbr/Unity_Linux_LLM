@@ -8,7 +8,8 @@ namespace UnityEditor.TestTools.TestRunner
     {
         public IAssemblyWrapper[] loadedAssemblies
         {
-            get {
+            get
+            {
                 var assemblies = new SortedDictionary<string, EditorAssemblyWrapper>();
                 foreach (var assembly in EditorAssemblies.loadedAssemblies)
                 {

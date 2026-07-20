@@ -14,7 +14,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
         /// <param name="flag">The flag whose presence is to be checked.</param>
         /// <typeparam name="T">The flag enum type.</typeparam>
         /// <returns></returns>
-        internal static bool HasFlag<T>(T value, T flag) where T : Enum
+        internal static bool HasFlag<T>(T value, T flag)
+            where T : Enum
         {
             ValidateUnderlyingType<T>();
 
@@ -30,7 +31,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
         /// <param name="flag">The flag to be set.</param>
         /// <typeparam name="T">The flag enum type.</typeparam>
         /// <returns>The input value with the flag set.</returns>
-        internal static T SetFlag<T>(T value, T flag) where T : Enum
+        internal static T SetFlag<T>(T value, T flag)
+            where T : Enum
         {
             ValidateUnderlyingType<T>();
 
@@ -47,7 +49,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
         /// <param name="flag">The flag to be removed.</param>
         /// <typeparam name="T">The flag enum type.</typeparam>
         /// <returns>The input value with the flag removed.</returns>
-        internal static T RemoveFlag<T>(T value, T flag) where T : Enum
+        internal static T RemoveFlag<T>(T value, T flag)
+            where T : Enum
         {
             ValidateUnderlyingType<T>();
 
@@ -62,7 +65,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
         /// </summary>
         /// <typeparam name="T">The enum type.</typeparam>
         /// <exception cref="ArgumentException">Thrown if the underlying type of the enum type parameter is not integer.</exception>
-        private static void ValidateUnderlyingType<T>() where T : Enum
+        private static void ValidateUnderlyingType<T>()
+            where T : Enum
         {
             if (Enum.GetUnderlyingType(typeof(T)) != typeof(int))
             {

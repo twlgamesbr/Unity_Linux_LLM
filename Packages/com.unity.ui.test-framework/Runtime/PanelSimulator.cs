@@ -144,7 +144,9 @@ namespace UnityEngine.UIElements.TestFramework
         internal void SetRootVisualElement(VisualElement root)
         {
             if (root != null && root.panel != panel)
-                throw new System.Exception("RootVisualElement of the panel cannot be set to an element belonging to a different panel.");
+                throw new System.Exception(
+                    "RootVisualElement of the panel cannot be set to an element belonging to a different panel."
+                );
 
             rootVisualElement = root;
         }
@@ -216,6 +218,7 @@ namespace UnityEngine.UIElements.TestFramework
         }
 
         private static List<PanelSimulator> activeSimulators = new List<PanelSimulator>();
+
         /// <summary>
         /// Resets the current simulated time to zero.
         /// </summary>
@@ -225,7 +228,7 @@ namespace UnityEngine.UIElements.TestFramework
 
             s_CurrentTime = 0;
 
-            for(int i = 0; i < activeSimulators.Count; ++i)
+            for (int i = 0; i < activeSimulators.Count; ++i)
                 activeSimulators[i].m_Panel.ApplyTimeAdjustment(previousTime, s_CurrentTime);
         }
 
@@ -314,7 +317,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <remarks>
         /// <para>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </para>
@@ -356,7 +359,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// are therefore not supported in Play mode tests.
         /// </para>
         /// <para>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </para>
@@ -381,7 +384,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// are therefore not supported in Play mode tests.
         /// </para>
         /// <para>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </para>
@@ -406,7 +409,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// are therefore not supported in Play mode tests.
         /// </para>
         /// <para>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </para>
@@ -428,7 +431,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// Defaults to `false`.</param>
         /// <remarks>
         /// <para>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </para>
@@ -458,7 +461,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <remarks>
         /// <para>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </para>
@@ -503,7 +506,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <remarks>
         /// <para>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </para>
@@ -556,11 +559,15 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <remarks>
         /// The position of the click is the center of the <paramref name="ve"/>'s world bound.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </remarks>
-        public void Click(VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void Click(
+            VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -577,12 +584,16 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <remarks>
         /// The position of the click is the center of the <paramref name="ve"/>'s world bound.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
         /// </remarks>
-        public void Click(Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void Click(
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -598,11 +609,15 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <remarks>
         /// The position of the click is the center of the <paramref name="ve"/>'s world bound.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </remarks>
-        public void DoubleClick(VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void DoubleClick(
+            VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -618,12 +633,16 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the events.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <remarks>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
         /// </remarks>
-        public void DoubleClick(Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void DoubleClick(
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -640,12 +659,17 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the events.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <remarks>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
         /// </remarks>
-        public void DragAndDrop(Vector2 positionFrom, Vector2 positionTo, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void DragAndDrop(
+            Vector2 positionFrom,
+            Vector2 positionTo,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -661,16 +685,20 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <remarks>
         /// The position of the event is the center of the <paramref name="ve"/>'s world bound.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </remarks>
-        public void MouseDown(VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void MouseDown(
+            VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
                 var ray = MakeRayForWorldSpacePanel(ve);
-                ve.SimulateMouseDownAt(button, modifiers, ray:ray).ExecuteWithinFrame();
+                ve.SimulateMouseDownAt(button, modifiers, ray: ray).ExecuteWithinFrame();
             }
         }
 
@@ -681,12 +709,16 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <remarks>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
         /// </remarks>
-        public void MouseDown(Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void MouseDown(
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -702,11 +734,15 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <remarks>
         /// The position of the event is the center of the <paramref name="ve"/>'s worldBound.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </remarks>
-        public void MouseUp(VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void MouseUp(
+            VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -722,12 +758,16 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <remarks>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
         /// </remarks>
-        public void MouseUp(Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public void MouseUp(
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
@@ -742,7 +782,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="positionTo">The absolute final position to move the Mouse to.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <remarks>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
@@ -761,7 +801,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="positionTo">The absolute position to move the Mouse to.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <remarks>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
@@ -799,7 +839,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="delta">The delta (scroll amount) for the event.</param>
         /// <param name="position">The absolute position for the event.</param>
         /// <remarks>
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// This method produces unpredictable results if used on a world space panel.
@@ -827,7 +867,7 @@ namespace UnityEngine.UIElements.TestFramework
             using (EventHelpers.SetFrameWaiter(() => IncrementCurrentTime(timePerSimulatedFrame)))
             {
                 var ray = MakeRayForWorldSpacePanel(ve);
-                ve.SimulateScrollWheel(delta, ray:ray).ExecuteWithinFrame();
+                ve.SimulateScrollWheel(delta, ray: ray).ExecuteWithinFrame();
             }
         }
 
@@ -838,7 +878,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <remarks>
         /// `ExecuteCommandEvent` are only officially supported in Editor (not Runtime).
         /// The event is dispatched to the focused element.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </remarks>
@@ -857,7 +897,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <remarks>
         /// `ExecuteCommandEvent` are only officially supported in Editor (not Runtime).
         /// The event will be dispatched to the focused element.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         ///
@@ -874,7 +914,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <remarks>
         /// `ValidateCommandEvent` are only supported in Editor (not Runtime).
         /// The event is dispatched to the focused element.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         /// </remarks>
@@ -893,7 +933,7 @@ namespace UnityEngine.UIElements.TestFramework
         /// <remarks>
         /// `ValidateCommandEvent` are only officially supported in Editor (not Runtime).
         /// The event will be dispatched to the focused element.
-        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/> 
+        /// Increments the current simulated time by <see cref="timePerSimulatedFrame"/>
         /// after dispatching each event.
         /// After all events have been sent, disposes of the events.
         ///

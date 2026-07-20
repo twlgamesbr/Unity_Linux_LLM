@@ -20,7 +20,12 @@ namespace Unity.Entities.Editor
             public readonly int InstanceSize;
             public readonly TypeIndex[] ComponentTypes;
 
-            public MemoryProfilerTreeViewItemData(string worldName, ArchetypeData archetypeData, ArchetypeMemoryData archetypeMemoryData, NativeArray<ArchetypeComponentData> archetypeComponentsData)
+            public MemoryProfilerTreeViewItemData(
+                string worldName,
+                ArchetypeData archetypeData,
+                ArchetypeMemoryData archetypeMemoryData,
+                NativeArray<ArchetypeComponentData> archetypeComponentsData
+            )
             {
                 WorldName = worldName;
                 StableHash = archetypeData.StableHash;
@@ -55,7 +60,7 @@ namespace Unity.Entities.Editor
                 }
             }
         }
-        
+
         class MemoryProfilerTreeViewItem
         {
             public string displayName { get; set; }

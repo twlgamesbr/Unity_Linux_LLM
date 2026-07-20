@@ -20,7 +20,12 @@ namespace Unity.Entities
                 public readonly ulong WorldSequenceNumber;
                 public readonly StructuralChangeType Type;
 
-                public Scope(long timeStamp, StructuralChangeType type, ulong worldSequenceNumber, SystemHandle executingSystem)
+                public Scope(
+                    long timeStamp,
+                    StructuralChangeType type,
+                    ulong worldSequenceNumber,
+                    SystemHandle executingSystem
+                )
                 {
                     StartTimestamp = timeStamp;
                     Type = type;
@@ -93,7 +98,9 @@ namespace Unity.Entities
                         throw new NotImplementedException($"Structural change type {scope.Type} not implemented.");
                 }
 
-                m_Changes.Add(new StructuralChangeData(elapsed, scope.Type, scope.WorldSequenceNumber, scope.ExecutingSystem));
+                m_Changes.Add(
+                    new StructuralChangeData(elapsed, scope.Type, scope.WorldSequenceNumber, scope.ExecutingSystem)
+                );
                 m_ScopeStack.Pop();
             }
 

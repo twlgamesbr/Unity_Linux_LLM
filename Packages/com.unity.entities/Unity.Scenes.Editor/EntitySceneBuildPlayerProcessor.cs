@@ -1,18 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Unity.Entities.Build;
+using Unity.Entities.Content;
 using UnityEditor;
 using UnityEditor.Build;
-using Hash128 = Unity.Entities.Hash128;
-using System.Collections.Generic;
-using UnityEditor.Experimental;
-using System.IO;
-using Unity.Entities.Build;
-using UnityEngine;
-using UnityEditor.SceneManagement;
-using UnityEngine.SceneManagement;
 using UnityEditor.Build.Reporting;
+using UnityEditor.Experimental;
+using UnityEditor.SceneManagement;
 using UnityEditor.UnityLinker;
-using Unity.Entities.Content;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes.Editor
 {
@@ -51,15 +51,22 @@ namespace Unity.Scenes.Editor
 
     internal interface IEntitySceneBuildCustomizer
     {
-        public void RegisterAdditionalFilesToDeploy(Hash128[] rootSceneGUIDs, Hash128[] entitySceneGUIDs, EntitySectionBundlesInBuild additionalImports, Action<string, string> addAdditionalFile);
+        public void RegisterAdditionalFilesToDeploy(
+            Hash128[] rootSceneGUIDs,
+            Hash128[] entitySceneGUIDs,
+            EntitySectionBundlesInBuild additionalImports,
+            Action<string, string> addAdditionalFile
+        );
     }
 
     internal class EntitySceneBuildPlayerProcessor : BuildPlayerProcessor, IUnityLinkerProcessor
     {
         private string m_BuildWorkingDir = $"../Library/BuildWorkingDir/{PlayerSettings.productName}";
         private BuildPlayerContext m_BuildPlayerContext;
+
         // This file is read by unity\Platforms\WebGL\WebGLPlayerBuildProgram\WebGLPlayerBuildProgram.cs when bundling the virtual filesystem
-        private static string k_WebGLStreamingAssetFilesManifest = "Library/PlayerDataCache/WebGLPreloadedStreamingAssets.manifest";
+        private static string k_WebGLStreamingAssetFilesManifest =
+            "Library/PlayerDataCache/WebGLPreloadedStreamingAssets.manifest";
         private bool m_IsWebGLBuild;
 
         void RegisterAdditionalFileToDeploy(string from, string to)
@@ -114,11 +121,12 @@ namespace Unity.Scenes.Editor
         static void LogMissingServerProvider()
         {
             UnityEngine.Debug.LogWarning(
-                $"No available DotsPlayerSettingsProvider for the current platform ({EditorUserBuildSettings.activeBuildTarget}). Using the client settings instead.");
+                $"No available DotsPlayerSettingsProvider for the current platform ({EditorUserBuildSettings.activeBuildTarget}). Using the client settings instead."
+            );
         }
 
         // This method is mostly doing the same as the engine method BuildPlayer::SaveScenesBeforeBuildIfNeeded except that it saves all unsaved opened scenes as content management requires it before building
-        void SaveScenesBeforeBuildIfNeeded(string [] scenesToBuild)
+        void SaveScenesBeforeBuildIfNeeded(string[] scenesToBuild)
         {
             if (Application.isBatchMode || EditorPrefs.GetBool("SaveScenesBeforeBuilding"))
             {
@@ -182,23 +190,25 @@ namespace Unity.Scenes.Editor
             var subSceneGuids = new HashSet<Hash128>();
 
             // If Scenes is empty, the default behaviour is to build the current scene, so we cannot use the GetSubScenes call as it is an importer
-            if (buildPlayerContext.BuildPlayerOptions.scenes == null ||
-                buildPlayerContext.BuildPlayerOptions.scenes.Length == 0)
+            if (
+                buildPlayerContext.BuildPlayerOptions.scenes == null
+                || buildPlayerContext.BuildPlayerOptions.scenes.Length == 0
+            )
             {
                 var subScenes = SubScene.AllSubScenes;
-                subSceneGuids = new HashSet<Hash128>(subScenes.Where(x => x.SceneGUID.IsValid).Select(x => x.SceneGUID).Distinct());
+                subSceneGuids = new HashSet<Hash128>(
+                    subScenes.Where(x => x.SceneGUID.IsValid).Select(x => x.SceneGUID).Distinct()
+                );
 
                 var rootScenePath = EditorSceneManager.GetActiveScene().path;
 
-                if(string.IsNullOrEmpty(rootScenePath))
-                    throw new SystemException("Entities currently cannot build a Scene that has not yet been saved for the first time.");
+                if (string.IsNullOrEmpty(rootScenePath))
+                    throw new SystemException(
+                        "Entities currently cannot build a Scene that has not yet been saved for the first time."
+                    );
 
                 var rootSceneGUID = AssetDatabase.GUIDFromAssetPath(rootScenePath);
-                rootSceneInfos.Add(new RootSceneInfo()
-                {
-                    Path = rootScenePath,
-                    Guid = rootSceneGUID
-                });
+                rootSceneInfos.Add(new RootSceneInfo() { Path = rootScenePath, Guid = rootSceneGUID });
             }
             else
             {
@@ -208,13 +218,11 @@ namespace Unity.Scenes.Editor
                     var rootSceneGUID = AssetDatabase.GUIDFromAssetPath(rootScenePath);
 
                     rootSceneGUIDs.Add(rootSceneGUID);
-                    rootSceneInfos.Add(new RootSceneInfo()
-                    {
-                        Path = rootScenePath,
-                        Guid = rootSceneGUID
-                    });
+                    rootSceneInfos.Add(new RootSceneInfo() { Path = rootScenePath, Guid = rootSceneGUID });
                 }
-                subSceneGuids = new HashSet<Hash128>(rootSceneInfos.SelectMany(rootScene => EditorEntityScenes.GetSubScenes(rootScene.Guid)));
+                subSceneGuids = new HashSet<Hash128>(
+                    rootSceneInfos.SelectMany(rootScene => EditorEntityScenes.GetSubScenes(rootScene.Guid))
+                );
             }
 
             var types = TypeCache.GetTypesDerivedFrom<IEntitySceneBuildAdditions>();
@@ -245,7 +253,7 @@ namespace Unity.Scenes.Editor
                 }
             }
 
-            if(!playerGuid.IsValid)
+            if (!playerGuid.IsValid)
                 throw new BuildFailedException("Invalid Player GUID");
 
             EntitySceneBuildUtility.PrepareEntityBinaryArtifacts(playerGuid, subSceneGuids, artifactKeys);
@@ -260,10 +268,21 @@ namespace Unity.Scenes.Editor
             foreach (var type in types)
             {
                 var buildCustomizer = (IEntitySceneBuildCustomizer)Activator.CreateInstance(type);
-                buildCustomizer.RegisterAdditionalFilesToDeploy(rootSceneGUIDs.ToArray(), entitySceneGUIDs, binaryFiles, RegisterAdditionalFileToDeploy);
+                buildCustomizer.RegisterAdditionalFilesToDeploy(
+                    rootSceneGUIDs.ToArray(),
+                    entitySceneGUIDs,
+                    binaryFiles,
+                    RegisterAdditionalFileToDeploy
+                );
             }
 
-            EntitySceneBuildUtility.PrepareAdditionalFiles(playerGuid, binaryFiles.SceneGUIDs.ToArray(), binaryFiles.ArtifactKeys.ToArray(), target, RegisterAdditionalFileToDeploy);
+            EntitySceneBuildUtility.PrepareAdditionalFiles(
+                playerGuid,
+                binaryFiles.SceneGUIDs.ToArray(),
+                binaryFiles.ArtifactKeys.ToArray(),
+                target,
+                RegisterAdditionalFileToDeploy
+            );
 
             // Create and deploy resource catalog containing data of gameobject scenes that needs to be loaded in SceneSystem.Create
             AddResourceCatalog(rootSceneInfos.ToArray(), RegisterAdditionalFileToDeploy);
@@ -271,14 +290,20 @@ namespace Unity.Scenes.Editor
 
         void AddResourceCatalog(RootSceneInfo[] sceneInfos, Action<string, string> registerAdditionalFileToDeploy)
         {
-            var tempFile = Path.GetFullPath(Path.Combine(Application.dataPath, m_BuildWorkingDir, EntityScenesPaths.RelativePathForSceneInfoFile));
+            var tempFile = Path.GetFullPath(
+                Path.Combine(Application.dataPath, m_BuildWorkingDir, EntityScenesPaths.RelativePathForSceneInfoFile)
+            );
             ResourceCatalogBuildCode.WriteCatalogFile(sceneInfos, tempFile);
             registerAdditionalFileToDeploy(tempFile, EntityScenesPaths.RelativePathForSceneInfoFile);
         }
 
         public string GenerateAdditionalLinkXmlFile(BuildReport report, UnityLinkerBuildPipelineData data)
         {
-            var path = Path.Combine(EntitySceneBuildUtility.WorkingBuildDir, RuntimeContentManager.k_ContentArchiveDirectory, "link.xml");
+            var path = Path.Combine(
+                EntitySceneBuildUtility.WorkingBuildDir,
+                RuntimeContentManager.k_ContentArchiveDirectory,
+                "link.xml"
+            );
             if (File.Exists(path))
                 return path;
 

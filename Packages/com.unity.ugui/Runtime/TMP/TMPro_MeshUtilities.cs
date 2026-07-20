@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System;
-
+﻿using System;
+using UnityEngine;
 
 namespace TMPro
 {
@@ -15,9 +14,8 @@ namespace TMPro
         Uv2 = 0x4,
         Uv4 = 0x8,
         Colors32 = 0x10,
-        All = 0xFF
+        All = 0xFF,
     };
-
 
     /// <summary>
     /// TMP custom data type to represent 32 bit characters.
@@ -57,7 +55,6 @@ namespace TMPro
     //    }
     //}
 
-
     //public struct TMP_VertexInfo
     //{
     //    public TMP_Vertex topLeft;
@@ -65,7 +62,6 @@ namespace TMPro
     //    public TMP_Vertex topRight;
     //    public TMP_Vertex bottomRight;
     //}
-
 
     [Serializable]
     public struct VertexGradient
@@ -75,7 +71,7 @@ namespace TMPro
         public Color bottomLeft;
         public Color bottomRight;
 
-        public VertexGradient (Color color)
+        public VertexGradient(Color color)
         {
             this.topLeft = color;
             this.topRight = color;
@@ -99,7 +95,6 @@ namespace TMPro
         }
     }
 
-
     public struct TMP_PageInfo
     {
         public int firstCharacterIndex;
@@ -109,7 +104,6 @@ namespace TMPro
         public float descender;
         // public float extents;
     }
-
 
     /// <summary>
     /// Structure containing information about individual links contained in the text object.
@@ -126,7 +120,6 @@ namespace TMPro
         public int linkTextLength;
 
         internal char[] linkID;
-
 
         internal void SetLinkID(char[] text, int startIndex, int length)
         {
@@ -178,7 +171,6 @@ namespace TMPro
         }
     }
 
-
     /// <summary>
     /// Structure containing information about the individual words contained in the text object.
     /// </summary>
@@ -191,6 +183,7 @@ namespace TMPro
         public int firstCharacterIndex;
         public int lastCharacterIndex;
         public int characterCount;
+
         //public float length;
 
         /// <summary>
@@ -211,7 +204,6 @@ namespace TMPro
         }
     }
 
-
     public struct TMP_SpriteInfo
     {
         public int spriteIndex; // Index of the sprite in the sprite atlas.
@@ -219,12 +211,10 @@ namespace TMPro
         public int vertexIndex;
     }
 
-
     //public struct SpriteInfo
     //{
     //
     //}
-
 
     public struct Extents
     {
@@ -242,18 +232,25 @@ namespace TMPro
 
         public override string ToString()
         {
-            string s = "Min (" + min.x.ToString("f2") + ", " + min.y.ToString("f2") + ")   Max (" + max.x.ToString("f2") + ", " + max.y.ToString("f2") + ")";
+            string s =
+                "Min ("
+                + min.x.ToString("f2")
+                + ", "
+                + min.y.ToString("f2")
+                + ")   Max ("
+                + max.x.ToString("f2")
+                + ", "
+                + max.y.ToString("f2")
+                + ")";
             return s;
         }
     }
-
 
     [Serializable]
     public struct Mesh_Extents
     {
         public Vector2 min;
         public Vector2 max;
-
 
         public Mesh_Extents(Vector2 min, Vector2 max)
         {
@@ -263,7 +260,16 @@ namespace TMPro
 
         public override string ToString()
         {
-            string s = "Min (" + min.x.ToString("f2") + ", " + min.y.ToString("f2") + ")   Max (" + max.x.ToString("f2") + ", " + max.y.ToString("f2") + ")";
+            string s =
+                "Min ("
+                + min.x.ToString("f2")
+                + ", "
+                + min.y.ToString("f2")
+                + ")   Max ("
+                + max.x.ToString("f2")
+                + ", "
+                + max.y.ToString("f2")
+                + ")";
             //string s = "Center: (" + ")" + "  Extents: (" + ((max.x - min.x) / 2).ToString("f2") + "," + ((max.y - min.y) / 2).ToString("f2") + ").";
             return s;
         }
@@ -348,7 +354,6 @@ namespace TMPro
     //         public TMP_RichTextTagStack<MaterialReference> MaterialReferenceStack;
     //         public TMP_RichTextTagStack<HorizontalAlignmentOptions> LineJustificationStack;
     // }
-
 
     // Structure used for Word Wrapping which tracks the state of execution when the last space or carriage return character was encountered.
     internal struct WordWrapState
@@ -438,7 +443,6 @@ namespace TMPro
         public Vector3 fxScale;
     }
 
-
     /// <summary>
     /// Structure used to store retrieve the name and hashcode of the font and material
     /// </summary>
@@ -460,11 +464,10 @@ namespace TMPro
 
         public static RichTextTagAttribute Default => k_Default;
 
-        static readonly RichTextTagAttribute k_Default = new ()
+        static readonly RichTextTagAttribute k_Default = new()
         {
             valueType = TagValueType.None,
-            unitType = TagUnitType.Pixels
+            unitType = TagUnitType.Pixels,
         };
     }
-
 }

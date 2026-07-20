@@ -6,9 +6,7 @@ namespace Unity.Multiplayer.Tools.NetStats
     class Counter : Metric<long>
     {
         public Counter(MetricId metricId, long defaultValue = default)
-            : base(metricId, defaultValue)
-        {
-        }
+            : base(metricId, defaultValue) { }
 
         public void Increment(long increment = 1)
         {

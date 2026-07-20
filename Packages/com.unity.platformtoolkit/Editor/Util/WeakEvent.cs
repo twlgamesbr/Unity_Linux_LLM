@@ -25,7 +25,6 @@ namespace Unity.PlatformToolkit.Editor
                 foreach (var handler in dispatchQueue)
                 {
                     handler.Invoke();
-
                 }
             }
             finally
@@ -65,7 +64,8 @@ namespace Unity.PlatformToolkit.Editor
     /// A base class for weak events that allows a listener with a poorly defined lifetime or no teardown flow to register itself without concern for leaks.
     /// </summary>
     /// <typeparam name="TDelegateType">The delegate type for the event.</typeparam>
-    internal abstract class WeakEventBase<TDelegateType> where TDelegateType : Delegate
+    internal abstract class WeakEventBase<TDelegateType>
+        where TDelegateType : Delegate
     {
         /// <summary>
         /// This is a type that can be used to attach transient event handlers and actions to a GC-able object.
@@ -167,9 +167,11 @@ namespace Unity.PlatformToolkit.Editor
             var entry = m_Listeners[index];
 
             // Remove the handler from the list for this owner. No need to remove the owner entry itself as ConditionalWeakTable manages this.
-            if (resolvedEntryToRemove != null &&
-                resolvedEntryToRemove.Target != null &&
-                m_HandlersByGcObject.TryGetValue(resolvedEntryToRemove.Target, out var handlerList))
+            if (
+                resolvedEntryToRemove != null
+                && resolvedEntryToRemove.Target != null
+                && m_HandlersByGcObject.TryGetValue(resolvedEntryToRemove.Target, out var handlerList)
+            )
             {
                 handlerList.Remove(resolvedEntryToRemove);
             }

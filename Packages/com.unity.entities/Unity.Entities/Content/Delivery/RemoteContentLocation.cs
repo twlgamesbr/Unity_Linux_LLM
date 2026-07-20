@@ -10,14 +10,14 @@ namespace Unity.Entities.Content
     public struct RemoteContentLocation : IEquatable<RemoteContentLocation>
     {
         /// <summary>
-        /// The type of location.  
+        /// The type of location.
         /// </summary>
         public enum LocationType
         {
-             /// <summary>
+            /// <summary>
             /// Specifies that the Path property is a remote URL.  This enum is intended to be expanded as other download service types are added.
             /// </summary>
-            RemoteURL
+            RemoteURL,
         }
 
         /// <summary>

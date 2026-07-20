@@ -3,11 +3,7 @@ using Unity.Networking.Transport.Utilities;
 
 namespace Unity.Multiplayer.Tools.Adapters.Utp2
 {
-    class Utp2Adapter :
-        INetworkAdapter,
-        INetworkAvailability,
-        ISimulateDisconnectAndReconnect,
-        IHandleNetworkParameters
+    class Utp2Adapter : INetworkAdapter, INetworkAvailability, ISimulateDisconnectAndReconnect, IHandleNetworkParameters
     {
         readonly NetworkDriver m_NetworkDriver;
 
@@ -21,22 +17,24 @@ namespace Unity.Multiplayer.Tools.Adapters.Utp2
             m_CurrentNetworkParameters = new NetworkParameters();
         }
 
-        public AdapterMetadata Metadata { get; } = new AdapterMetadata
-        {
-            PackageInfo = new PackageInfo
+        public AdapterMetadata Metadata { get; } =
+            new AdapterMetadata
             {
-                PackageName = "com.unity.transport",
-                Version = new PackageVersion
+                PackageInfo = new PackageInfo
                 {
-                    Major = 2,
-                    Minor = 0,
-                    Patch = 0,
-                    PreRelease = ""
-                }
-            }
-        };
+                    PackageName = "com.unity.transport",
+                    Version = new PackageVersion
+                    {
+                        Major = 2,
+                        Minor = 0,
+                        Patch = 0,
+                        PreRelease = "",
+                    },
+                },
+            };
 
-        public T GetComponent<T>() where T : class, IAdapterComponent
+        public T GetComponent<T>()
+            where T : class, IAdapterComponent
         {
             return this as T;
         }
@@ -82,22 +80,18 @@ namespace Unity.Multiplayer.Tools.Adapters.Utp2
         {
             m_IsDisabled = true;
 
-            m_NetworkDriver.ModifyNetworkSimulatorParameters(new NetworkSimulatorParameter
-            {
-                ReceivePacketLossPercent = 100.0f,
-                SendPacketLossPercent = 100.0f,
-            });
+            m_NetworkDriver.ModifyNetworkSimulatorParameters(
+                new NetworkSimulatorParameter { ReceivePacketLossPercent = 100.0f, SendPacketLossPercent = 100.0f }
+            );
         }
 
         public void SimulateReconnect()
         {
             m_IsDisabled = false;
 
-            m_NetworkDriver.ModifyNetworkSimulatorParameters(new NetworkSimulatorParameter
-            {
-                ReceivePacketLossPercent = 0.0f,
-                SendPacketLossPercent = 0.0f,
-            });
+            m_NetworkDriver.ModifyNetworkSimulatorParameters(
+                new NetworkSimulatorParameter { ReceivePacketLossPercent = 0.0f, SendPacketLossPercent = 0.0f }
+            );
         }
     }
 }

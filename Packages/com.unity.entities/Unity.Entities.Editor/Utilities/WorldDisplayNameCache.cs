@@ -37,7 +37,9 @@ namespace Unity.Entities.Editor
                 if (m_Filter != null && !m_Filter(world))
                     continue;
 
-                m_WorldDisplayNameBySequenceNumber[world.SequenceNumber] = m_WorldNameDuplicationContainer[world.Name] ? m_DisplayNameProvider(world) : world.Name;
+                m_WorldDisplayNameBySequenceNumber[world.SequenceNumber] = m_WorldNameDuplicationContainer[world.Name]
+                    ? m_DisplayNameProvider(world)
+                    : world.Name;
             }
         }
 
@@ -49,7 +51,9 @@ namespace Unity.Entities.Editor
             if (m_WorldDisplayNameBySequenceNumber.Count == 0)
                 RebuildCache();
 
-            return m_WorldDisplayNameBySequenceNumber.TryGetValue(world.SequenceNumber, out var name) ? name : world.Name;
+            return m_WorldDisplayNameBySequenceNumber.TryGetValue(world.SequenceNumber, out var name)
+                ? name
+                : world.Name;
         }
 
         static string DefaultDisplayNameFormatter(World w) => $"{w.Name} (#{w.SequenceNumber})";

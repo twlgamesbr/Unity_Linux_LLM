@@ -14,9 +14,10 @@ namespace UnityEditor.Rendering
         /// </summary>
         /// <param name="property">The <see cref="SerializedProperty"/> to check </param>
         /// <returns>true, if the property is not null</returns>
-        public static bool IsTargetAlive(this SerializedProperty property)
-            => property != null && property.serializedObject.targetObject != null &&
-            !property.serializedObject.targetObject.Equals(null);
+        public static bool IsTargetAlive(this SerializedProperty property) =>
+            property != null
+            && property.serializedObject.targetObject != null
+            && !property.serializedObject.targetObject.Equals(null);
 
         /// <summary>
         /// Helper to get an enum value from a SerializedProperty.
@@ -49,8 +50,7 @@ namespace UnityEditor.Rendering
         /// </example>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T GetEnumValue<T>(this SerializedProperty property)
-            where T : Enum
-            => GetEnumValue_Internal<T>(property);
+            where T : Enum => GetEnumValue_Internal<T>(property);
 
         /// <summary>
         /// Helper to get an enum name from a SerializedProperty
@@ -60,10 +60,10 @@ namespace UnityEditor.Rendering
         /// <returns>The string containing the name of the enum</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetEnumName<T>(this SerializedProperty property)
-            where T : Enum
-            => property.hasMultipleDifferentValues
-            ? "MultipleDifferentValues"
-            : property.enumNames[property.enumValueIndex];
+            where T : Enum =>
+            property.hasMultipleDifferentValues
+                ? "MultipleDifferentValues"
+                : property.enumNames[property.enumValueIndex];
 
         /// <summary>
         /// Helper to set an enum value to a SerializedProperty
@@ -75,7 +75,8 @@ namespace UnityEditor.Rendering
         public static void SetEnumValue<T>(this SerializedProperty property, T value)
             where T : Enum
             // intValue actually is the value underlying beside the enum
-            => SetEnumValue_Internal(property, value);
+            =>
+            SetEnumValue_Internal(property, value);
 
         /// <summary>
         /// Get the value of a <see cref="SerializedProperty"/>.
@@ -238,13 +239,14 @@ namespace UnityEditor.Rendering
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T GetEnumValue_Internal<T>(SerializedProperty property)
-        // intValue actually is the value underlying beside the enum
-            => (T)(object)property.intValue;
-
+            // intValue actually is the value underlying beside the enum
+            =>
+            (T)(object)property.intValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetEnumValue_Internal<T>(SerializedProperty property, T value)
-        // intValue actually is the value underlying beside the enum
-            => property.intValue = (int)(object)value;
+            // intValue actually is the value underlying beside the enum
+            =>
+            property.intValue = (int)(object)value;
     }
 }

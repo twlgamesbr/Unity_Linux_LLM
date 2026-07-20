@@ -57,12 +57,12 @@ namespace UnityEngine.InputSystem.Users
             return obj is InputUserAccountHandle && Equals((InputUserAccountHandle)obj);
         }
 
-        public static bool operator==(InputUserAccountHandle left, InputUserAccountHandle right)
+        public static bool operator ==(InputUserAccountHandle left, InputUserAccountHandle right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator!=(InputUserAccountHandle left, InputUserAccountHandle right)
+        public static bool operator !=(InputUserAccountHandle left, InputUserAccountHandle right)
         {
             return !left.Equals(right);
         }

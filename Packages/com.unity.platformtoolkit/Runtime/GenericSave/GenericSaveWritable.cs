@@ -29,11 +29,13 @@ namespace Unity.PlatformToolkit
         private readonly ILifetimeToken m_CombinedLifetimeToken;
         private IDisposeListener m_DisposeListener;
 
-        public GenericSaveWritable(IGenericArchive archive,
+        public GenericSaveWritable(
+            IGenericArchive archive,
             string name,
             bool runInBackground = true,
             ILifetimeToken parentLifetimeToken = null,
-            IDisposeListener disposeListener = null)
+            IDisposeListener disposeListener = null
+        )
         {
             m_Name = name;
             m_Archive = archive ?? throw new ArgumentNullException(nameof(archive));

@@ -1,9 +1,9 @@
+using Unity.Assertions;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Collections.LowLevel.Unsafe;
 using static Unity.Physics.BoundingVolumeHierarchy;
 using static Unity.Physics.Math;
-using Unity.Assertions;
 
 namespace Unity.Physics
 {
@@ -16,7 +16,8 @@ namespace Unity.Physics
         /// <summary>   Gets or sets the collider used to cast with. </summary>
         ///
         /// <value> The collider to cast with. </value>
-        [NativeDisableUnsafePtrRestriction] public unsafe Collider* Collider;
+        [NativeDisableUnsafePtrRestriction]
+        public unsafe Collider* Collider;
 
         /// <summary>   Gets or sets the orientation of the collider used to cast with. </summary>
         ///
@@ -34,7 +35,10 @@ namespace Unity.Physics
                 float3 end = Ray.Origin + Ray.Displacement;
                 Ray.Origin = value;
                 Ray.Displacement = end - value;
-                Assert.IsTrue(math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F), "ColliderCast length is very long. This would lead to floating point inaccuracies and invalid results.");
+                Assert.IsTrue(
+                    math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F),
+                    "ColliderCast length is very long. This would lead to floating point inaccuracies and invalid results."
+                );
             }
         }
 
@@ -47,17 +51,23 @@ namespace Unity.Physics
             set
             {
                 Ray.Displacement = value - Ray.Origin;
-                Assert.IsTrue(math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F), "ColliderCast length is very long. This would lead to floating point inaccuracies and invalid results.");
+                Assert.IsTrue(
+                    math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F),
+                    "ColliderCast length is very long. This would lead to floating point inaccuracies and invalid results."
+                );
             }
         }
 
         internal Ray Ray;
         internal QueryContext QueryContext;
-        internal ColliderType ColliderType { get
+        internal ColliderType ColliderType
+        {
+            get
             {
                 unsafe
                 {
-                    return Collider->Type; }
+                    return Collider->Type;
+                }
             }
         }
 
@@ -65,6 +75,7 @@ namespace Unity.Physics
         ///
         /// <value> The query collider scale. </value>
         public float QueryColliderScale { get; set; }
+
         internal void InitScale()
         {
             QueryContext.InitScale();
@@ -76,7 +87,8 @@ namespace Unity.Physics
         /// <param name="collider"> The collider to cast with. </param>
         /// <param name="start">    The starting point. </param>
         /// <param name="end">      The ending point. </param>
-        public ColliderCastInput(BlobAssetReference<Collider> collider, float3 start, float3 end) : this(collider, start, end, quaternion.identity, 1.0f) {}
+        public ColliderCastInput(BlobAssetReference<Collider> collider, float3 start, float3 end)
+            : this(collider, start, end, quaternion.identity, 1.0f) { }
 
         /// <summary>   Constructor. </summary>
         ///
@@ -85,7 +97,13 @@ namespace Unity.Physics
         /// <param name="end">                  The ending point. </param>
         /// <param name="orientation">          The orientation of the collider. </param>
         /// <param name="queryColliderScale">   (Optional) The collider scale. </param>
-        public ColliderCastInput(BlobAssetReference<Collider> collider, float3 start, float3 end, quaternion orientation, float queryColliderScale = 1.0f)
+        public ColliderCastInput(
+            BlobAssetReference<Collider> collider,
+            float3 start,
+            float3 end,
+            quaternion orientation,
+            float queryColliderScale = 1.0f
+        )
         {
             unsafe
             {
@@ -166,12 +184,25 @@ namespace Unity.Physics
     // Collider cast query implementations
     static class ColliderCastQueries
     {
-        private static unsafe void FlipColliderCastQuery<T>(ref ColliderCastInput input, ConvexCollider* target, ref T collector, out FlippedColliderCastQueryCollector<T> flipQueryCollector)
+        private static unsafe void FlipColliderCastQuery<T>(
+            ref ColliderCastInput input,
+            ConvexCollider* target,
+            ref T collector,
+            out FlippedColliderCastQueryCollector<T> flipQueryCollector
+        )
             where T : struct, ICollector<ColliderCastHit>
         {
-            float3 worldFromDirection = math.mul(input.QueryContext.WorldFromLocalTransform.Rotation, input.Ray.Displacement * input.QueryContext.TargetScale);
+            float3 worldFromDirection = math.mul(
+                input.QueryContext.WorldFromLocalTransform.Rotation,
+                input.Ray.Displacement * input.QueryContext.TargetScale
+            );
 
-            flipQueryCollector = new FlippedColliderCastQueryCollector<T>(ref collector, worldFromDirection, input.QueryContext.ColliderKey, target->Material);
+            flipQueryCollector = new FlippedColliderCastQueryCollector<T>(
+                ref collector,
+                worldFromDirection,
+                input.QueryContext.ColliderKey,
+                target->Material
+            );
 
             // Reset the ColliderKey
             input.QueryContext.ColliderKey = ColliderKey.Empty;
@@ -179,13 +210,19 @@ namespace Unity.Physics
 
             input.Collider = (Collider*)target;
 
-            ScaledMTransform targetFromQuery = new ScaledMTransform(new RigidTransform(input.Orientation, input.Ray.Origin), input.QueryContext.InvTargetScale * input.QueryColliderScale);
+            ScaledMTransform targetFromQuery = new ScaledMTransform(
+                new RigidTransform(input.Orientation, input.Ray.Origin),
+                input.QueryContext.InvTargetScale * input.QueryColliderScale
+            );
 
             // Switch the transform, so that it points to the shape that is being cast as a 'target' shape
             var displacement = input.Ray.Displacement;
 
             //Switch displacement from targetFromDisplacement to queryFromDisplacement, and inverse it's direction
-            displacement = math.mul(targetFromQuery.InverseRotation, displacement * input.QueryContext.TargetScale / input.QueryColliderScale);
+            displacement = math.mul(
+                targetFromQuery.InverseRotation,
+                displacement * input.QueryContext.TargetScale / input.QueryColliderScale
+            );
             displacement *= -1.0f;
 
             input.Ray.Displacement = displacement;
@@ -203,7 +240,8 @@ namespace Unity.Physics
             input.QueryContext.IsFlipped = true;
         }
 
-        internal static unsafe bool ConvexCollider<T>(ColliderCastInput input, Collider* target, ref T collector) where T : struct, ICollector<ColliderCastHit>
+        internal static unsafe bool ConvexCollider<T>(ColliderCastInput input, Collider* target, ref T collector)
+            where T : struct, ICollector<ColliderCastHit>
         {
             Assert.IsTrue(input.Collider->CollisionType == CollisionType.Convex);
 
@@ -232,7 +270,11 @@ namespace Unity.Physics
                     }
                     return false;
                 case ColliderType.Compound:
-                    return ColliderCompound<ConvexCompoundDispatcher, T>(input, (CompoundCollider*)target, ref collector);
+                    return ColliderCompound<ConvexCompoundDispatcher, T>(
+                        input,
+                        (CompoundCollider*)target,
+                        ref collector
+                    );
                 case ColliderType.Mesh:
                     return ColliderMesh<ConvexConvexDispatcher, T>(input, (MeshCollider*)target, ref collector);
                 case ColliderType.Terrain:
@@ -243,7 +285,8 @@ namespace Unity.Physics
             }
         }
 
-        public static unsafe bool ColliderCollider<T>(ColliderCastInput input, Collider* target, ref T collector) where T : struct, ICollector<ColliderCastHit>
+        public static unsafe bool ColliderCollider<T>(ColliderCastInput input, Collider* target, ref T collector)
+            where T : struct, ICollector<ColliderCastHit>
         {
             if (!CollisionFilter.IsCollisionEnabled(input.Collider->GetCollisionFilter(), target->GetCollisionFilter()))
             {
@@ -275,11 +318,19 @@ namespace Unity.Physics
                             }
                             return false;
                         case ColliderType.Compound:
-                            return ColliderCompound<DefaultCompoundDispatcher, T>(input, (CompoundCollider*)target, ref collector);
+                            return ColliderCompound<DefaultCompoundDispatcher, T>(
+                                input,
+                                (CompoundCollider*)target,
+                                ref collector
+                            );
                         case ColliderType.Mesh:
                             return ColliderMesh<ConvexConvexDispatcher, T>(input, (MeshCollider*)target, ref collector);
                         case ColliderType.Terrain:
-                            return ColliderTerrain<ConvexConvexDispatcher, T>(input, (TerrainCollider*)target, ref collector);
+                            return ColliderTerrain<ConvexConvexDispatcher, T>(
+                                input,
+                                (TerrainCollider*)target,
+                                ref collector
+                            );
                         default:
                             SafetyChecks.ThrowNotImplementedException();
                             return default;
@@ -299,11 +350,23 @@ namespace Unity.Physics
                                 case ColliderType.Convex:
                                     return CompoundConvex(input, (ConvexCollider*)target, ref collector);
                                 case ColliderType.Compound:
-                                    return ColliderCompound<DefaultCompoundDispatcher, T>(input, (CompoundCollider*)target, ref collector);
+                                    return ColliderCompound<DefaultCompoundDispatcher, T>(
+                                        input,
+                                        (CompoundCollider*)target,
+                                        ref collector
+                                    );
                                 case ColliderType.Mesh:
-                                    return ColliderMesh<CompoundConvexDispatcher, T>(input, (MeshCollider*)target, ref collector);
+                                    return ColliderMesh<CompoundConvexDispatcher, T>(
+                                        input,
+                                        (MeshCollider*)target,
+                                        ref collector
+                                    );
                                 case ColliderType.Terrain:
-                                    return ColliderTerrain<CompoundConvexDispatcher, T>(input, (TerrainCollider*)target, ref collector);
+                                    return ColliderTerrain<CompoundConvexDispatcher, T>(
+                                        input,
+                                        (TerrainCollider*)target,
+                                        ref collector
+                                    );
                                 default:
                                     return default;
                             }
@@ -319,11 +382,23 @@ namespace Unity.Physics
                                 case ColliderType.Convex:
                                     return MeshConvex(input, (ConvexCollider*)target, ref collector);
                                 case ColliderType.Compound:
-                                    return ColliderCompound<DefaultCompoundDispatcher, T>(input, (CompoundCollider*)target, ref collector);
+                                    return ColliderCompound<DefaultCompoundDispatcher, T>(
+                                        input,
+                                        (CompoundCollider*)target,
+                                        ref collector
+                                    );
                                 case ColliderType.Mesh:
-                                    return ColliderMesh<MeshConvexDispatcher, T>(input, (MeshCollider*)target, ref collector);
+                                    return ColliderMesh<MeshConvexDispatcher, T>(
+                                        input,
+                                        (MeshCollider*)target,
+                                        ref collector
+                                    );
                                 case ColliderType.Terrain:
-                                    return ColliderTerrain<MeshConvexDispatcher, T>(input, (TerrainCollider*)target, ref collector);
+                                    return ColliderTerrain<MeshConvexDispatcher, T>(
+                                        input,
+                                        (TerrainCollider*)target,
+                                        ref collector
+                                    );
                                 default:
                                     return default;
                             }
@@ -342,11 +417,23 @@ namespace Unity.Physics
                         case ColliderType.Convex:
                             return TerrainConvex(input, (ConvexCollider*)target, ref collector);
                         case ColliderType.Compound:
-                            return ColliderCompound<DefaultCompoundDispatcher, T>(input, (CompoundCollider*)target, ref collector);
+                            return ColliderCompound<DefaultCompoundDispatcher, T>(
+                                input,
+                                (CompoundCollider*)target,
+                                ref collector
+                            );
                         case ColliderType.Mesh:
-                            return ColliderMesh<TerrainConvexDispatcher, T>(input, (MeshCollider*)target, ref collector);
+                            return ColliderMesh<TerrainConvexDispatcher, T>(
+                                input,
+                                (MeshCollider*)target,
+                                ref collector
+                            );
                         case ColliderType.Terrain:
-                            return ColliderTerrain<TerrainConvexDispatcher, T>(input, (TerrainCollider*)target, ref collector);
+                            return ColliderTerrain<TerrainConvexDispatcher, T>(
+                                input,
+                                (TerrainCollider*)target,
+                                ref collector
+                            );
                         default:
                             return default;
                     }
@@ -356,7 +443,12 @@ namespace Unity.Physics
             }
         }
 
-        private static unsafe bool ConvexConvex(ColliderCastInput input, Collider* target, float maxFraction, out ColliderCastHit hit)
+        private static unsafe bool ConvexConvex(
+            ColliderCastInput input,
+            Collider* target,
+            float maxFraction,
+            out ColliderCastHit hit
+        )
         {
             hit = default;
 
@@ -365,9 +457,9 @@ namespace Unity.Physics
             float queryRelativeScale = input.QueryColliderScale * input.QueryContext.InvTargetScale;
 
             // Conservative advancement
-            const float tolerance = 1e-3f;      // return if this close to a hit
-            const float keepDistance = 1e-4f;   // avoid bad cases for GJK (penetration / exact hit)
-            int iterations = 10;                // return after this many advances, regardless of accuracy
+            const float tolerance = 1e-3f; // return if this close to a hit
+            const float keepDistance = 1e-4f; // avoid bad cases for GJK (penetration / exact hit)
+            int iterations = 10; // return after this many advances, regardless of accuracy
             float fraction = 0.0f;
 
             float keepDistanceScaled = keepDistance * math.abs(input.QueryContext.InvTargetScale);
@@ -382,7 +474,12 @@ namespace Unity.Physics
                 }
 
                 // Find the current distance
-                DistanceQueries.Result distanceResult = DistanceQueries.ConvexConvex(target, input.Collider, targetFromQuery, queryRelativeScale);
+                DistanceQueries.Result distanceResult = DistanceQueries.ConvexConvex(
+                    target,
+                    input.Collider,
+                    targetFromQuery,
+                    queryRelativeScale
+                );
 
                 // Check for a hit
                 if (distanceResult.Distance < toleranceScaled || --iterations == 0)
@@ -398,7 +495,11 @@ namespace Unity.Physics
                         hit.Position = Mul(input.QueryContext.WorldFromLocalTransform, distanceResult.PositionOnBinA);
                     }
 
-                    float3 normal = math.select(-distanceResult.NormalInA, distanceResult.NormalInA, input.QueryContext.TargetScale < 0.0f);
+                    float3 normal = math.select(
+                        -distanceResult.NormalInA,
+                        distanceResult.NormalInA,
+                        input.QueryContext.TargetScale < 0.0f
+                    );
                     hit.SurfaceNormal = math.mul(input.QueryContext.WorldFromLocalTransform.Rotation, normal);
                     hit.Fraction = fraction;
                     hit.RigidBodyIndex = input.QueryContext.RigidBodyIndex;
@@ -432,15 +533,25 @@ namespace Unity.Physics
 
         internal interface IColliderCastDispatcher
         {
-            unsafe bool Dispatch<T>(ColliderCastInput input, ConvexCollider* collider, ref T collector,
-                uint numColliderKeyBits, uint subKey)
+            unsafe bool Dispatch<T>(
+                ColliderCastInput input,
+                ConvexCollider* collider,
+                ref T collector,
+                uint numColliderKeyBits,
+                uint subKey
+            )
                 where T : struct, ICollector<ColliderCastHit>;
         }
 
         internal struct ConvexConvexDispatcher : IColliderCastDispatcher
         {
-            public unsafe bool Dispatch<T>(ColliderCastInput input, ConvexCollider* collider, ref T collector,
-                uint numColliderKeyBits, uint subKey)
+            public unsafe bool Dispatch<T>(
+                ColliderCastInput input,
+                ConvexCollider* collider,
+                ref T collector,
+                uint numColliderKeyBits,
+                uint subKey
+            )
                 where T : struct, ICollector<ColliderCastHit>
             {
                 if (ConvexConvex(input, (Collider*)collider, collector.MaxFraction, out ColliderCastHit hit))
@@ -454,8 +565,13 @@ namespace Unity.Physics
 
         internal struct CompoundConvexDispatcher : IColliderCastDispatcher
         {
-            public unsafe bool Dispatch<T>(ColliderCastInput input, ConvexCollider* collider, ref T collector,
-                uint numColliderKeyBits, uint subKey)
+            public unsafe bool Dispatch<T>(
+                ColliderCastInput input,
+                ConvexCollider* collider,
+                ref T collector,
+                uint numColliderKeyBits,
+                uint subKey
+            )
                 where T : struct, ICollector<ColliderCastHit>
             {
                 input.QueryContext.ColliderKey = input.QueryContext.PushSubKey(numColliderKeyBits, subKey);
@@ -465,8 +581,13 @@ namespace Unity.Physics
 
         internal struct MeshConvexDispatcher : IColliderCastDispatcher
         {
-            public unsafe bool Dispatch<T>(ColliderCastInput input, ConvexCollider* collider, ref T collector,
-                uint numColliderKeyBits, uint subKey)
+            public unsafe bool Dispatch<T>(
+                ColliderCastInput input,
+                ConvexCollider* collider,
+                ref T collector,
+                uint numColliderKeyBits,
+                uint subKey
+            )
                 where T : struct, ICollector<ColliderCastHit>
             {
                 input.QueryContext.ColliderKey = input.QueryContext.PushSubKey(numColliderKeyBits, subKey);
@@ -476,8 +597,13 @@ namespace Unity.Physics
 
         internal struct TerrainConvexDispatcher : IColliderCastDispatcher
         {
-            public unsafe bool Dispatch<T>(ColliderCastInput input, ConvexCollider* collider, ref T collector,
-                uint numColliderKeyBits, uint subKey)
+            public unsafe bool Dispatch<T>(
+                ColliderCastInput input,
+                ConvexCollider* collider,
+                ref T collector,
+                uint numColliderKeyBits,
+                uint subKey
+            )
                 where T : struct, ICollector<ColliderCastHit>
             {
                 input.QueryContext.ColliderKey = input.QueryContext.PushSubKey(numColliderKeyBits, subKey);
@@ -500,7 +626,13 @@ namespace Unity.Physics
             public bool ColliderCastLeaf<T>(ColliderCastInput input, int primitiveKey, ref T collector)
                 where T : struct, ICollector<ColliderCastHit>
             {
-                m_Mesh->GetPrimitive(primitiveKey, out float3x4 vertices, out Mesh.PrimitiveFlags flags, out CollisionFilter filter, out Material material);
+                m_Mesh->GetPrimitive(
+                    primitiveKey,
+                    out float3x4 vertices,
+                    out Mesh.PrimitiveFlags flags,
+                    out CollisionFilter filter,
+                    out Material material
+                );
 
                 if (!CollisionFilter.IsCollisionEnabled(input.Collider->GetCollisionFilter(), filter)) // TODO: could do this check within GetPrimitive()
                 {
@@ -529,14 +661,24 @@ namespace Unity.Physics
                         polygon.SetAsTriangle(vertices[0], vertices[1 + polygonIndex], vertices[2 + polygonIndex]);
                     }
 
-                    acceptHit |= dispatcher.Dispatch(input, (ConvexCollider*)&polygon, ref collector, m_NumColliderKeyBits, (uint)(primitiveKey << 1 | polygonIndex));
+                    acceptHit |= dispatcher.Dispatch(
+                        input,
+                        (ConvexCollider*)&polygon,
+                        ref collector,
+                        m_NumColliderKeyBits,
+                        (uint)(primitiveKey << 1 | polygonIndex)
+                    );
                 }
 
                 return acceptHit;
             }
         }
 
-        private static unsafe bool ColliderMesh<D, T>(ColliderCastInput input, MeshCollider* meshCollider, ref T collector)
+        private static unsafe bool ColliderMesh<D, T>(
+            ColliderCastInput input,
+            MeshCollider* meshCollider,
+            ref T collector
+        )
             where T : struct, ICollector<ColliderCastHit>
             where D : struct, IColliderCastDispatcher
         {
@@ -544,13 +686,26 @@ namespace Unity.Physics
             return meshCollider->Mesh.BoundingVolumeHierarchy.ColliderCast(input, ref leafProcessor, ref collector);
         }
 
-        private static unsafe bool MeshConvex<T>(ColliderCastInput input, ConvexCollider* convexCollider, ref T collector)
+        private static unsafe bool MeshConvex<T>(
+            ColliderCastInput input,
+            ConvexCollider* convexCollider,
+            ref T collector
+        )
             where T : struct, ICollector<ColliderCastHit>
         {
             var meshCollider = (MeshCollider*)input.Collider;
 
-            FlipColliderCastQuery(ref input, convexCollider, ref collector, out FlippedColliderCastQueryCollector<T> flipQueryCollector);
-            return ColliderMesh<ConvexConvexDispatcher, FlippedColliderCastQueryCollector<T>>(input, meshCollider, ref flipQueryCollector);
+            FlipColliderCastQuery(
+                ref input,
+                convexCollider,
+                ref collector,
+                out FlippedColliderCastQueryCollector<T> flipQueryCollector
+            );
+            return ColliderMesh<ConvexConvexDispatcher, FlippedColliderCastQueryCollector<T>>(
+                input,
+                meshCollider,
+                ref flipQueryCollector
+            );
         }
 
         internal unsafe interface IColliderCompoundCastDispatcher
@@ -561,7 +716,8 @@ namespace Unity.Physics
 
         internal unsafe struct DefaultCompoundDispatcher : IColliderCompoundCastDispatcher
         {
-            public bool CastCollider<T>(ColliderCastInput input, ref T collector, Collider* target) where T : struct, ICollector<ColliderCastHit>
+            public bool CastCollider<T>(ColliderCastInput input, ref T collector, Collider* target)
+                where T : struct, ICollector<ColliderCastHit>
             {
                 return target->CastCollider(input, ref collector);
             }
@@ -569,7 +725,8 @@ namespace Unity.Physics
 
         internal unsafe struct ConvexCompoundDispatcher : IColliderCompoundCastDispatcher
         {
-            public bool CastCollider<T>(ColliderCastInput input, ref T collector, Collider* target) where T : struct, ICollector<ColliderCastHit>
+            public bool CastCollider<T>(ColliderCastInput input, ref T collector, Collider* target)
+                where T : struct, ICollector<ColliderCastHit>
             {
                 return ConvexCollider(input, target, ref collector);
             }
@@ -597,7 +754,12 @@ namespace Unity.Physics
             {
                 ref CompoundCollider.Child child = ref m_CompoundCollider->Children[leafData];
 
-                if (!CollisionFilter.IsCollisionEnabled(input.Collider->GetCollisionFilter(), child.Collider->GetCollisionFilter()))
+                if (
+                    !CollisionFilter.IsCollisionEnabled(
+                        input.Collider->GetCollisionFilter(),
+                        child.Collider->GetCollisionFilter()
+                    )
+                )
                 {
                     return false;
                 }
@@ -608,9 +770,15 @@ namespace Unity.Physics
                 inputLs.Ray.Origin = math.transform(childFromCompound, input.Ray.Origin);
                 inputLs.Ray.Displacement = math.mul(childFromCompound.rot, input.Ray.Displacement);
                 inputLs.Orientation = math.mul(childFromCompound.rot, input.Orientation);
-                inputLs.QueryContext.ColliderKey = input.QueryContext.PushSubKey(m_CompoundCollider->NumColliderKeyBits, (uint)leafData);
+                inputLs.QueryContext.ColliderKey = input.QueryContext.PushSubKey(
+                    m_CompoundCollider->NumColliderKeyBits,
+                    (uint)leafData
+                );
                 inputLs.QueryContext.NumColliderKeyBits = input.QueryContext.NumColliderKeyBits;
-                inputLs.QueryContext.WorldFromLocalTransform = ScaledMTransform.Mul(input.QueryContext.WorldFromLocalTransform, new MTransform(child.CompoundFromChild));
+                inputLs.QueryContext.WorldFromLocalTransform = ScaledMTransform.Mul(
+                    input.QueryContext.WorldFromLocalTransform,
+                    new MTransform(child.CompoundFromChild)
+                );
 
                 D dispatcher = new D();
 
@@ -618,7 +786,11 @@ namespace Unity.Physics
             }
         }
 
-        private static unsafe bool ColliderCompound<D, T>(ColliderCastInput input, CompoundCollider* compoundCollider, ref T collector)
+        private static unsafe bool ColliderCompound<D, T>(
+            ColliderCastInput input,
+            CompoundCollider* compoundCollider,
+            ref T collector
+        )
             where D : struct, IColliderCompoundCastDispatcher
             where T : struct, ICollector<ColliderCastHit>
         {
@@ -626,25 +798,55 @@ namespace Unity.Physics
             return compoundCollider->BoundingVolumeHierarchy.ColliderCast(input, ref leafProcessor, ref collector);
         }
 
-        private static unsafe bool CompoundConvex<T>(ColliderCastInput input, ConvexCollider* convexCollider, ref T collector)
+        private static unsafe bool CompoundConvex<T>(
+            ColliderCastInput input,
+            ConvexCollider* convexCollider,
+            ref T collector
+        )
             where T : struct, ICollector<ColliderCastHit>
         {
             var compoundCollider = (CompoundCollider*)input.Collider;
 
-            FlipColliderCastQuery(ref input, convexCollider, ref collector, out FlippedColliderCastQueryCollector<T> flipQueryCollector);
-            return ColliderCompound<ConvexCompoundDispatcher, FlippedColliderCastQueryCollector<T>>(input, compoundCollider, ref flipQueryCollector);
+            FlipColliderCastQuery(
+                ref input,
+                convexCollider,
+                ref collector,
+                out FlippedColliderCastQueryCollector<T> flipQueryCollector
+            );
+            return ColliderCompound<ConvexCompoundDispatcher, FlippedColliderCastQueryCollector<T>>(
+                input,
+                compoundCollider,
+                ref flipQueryCollector
+            );
         }
 
-        private static unsafe bool TerrainConvex<T>(ColliderCastInput input, ConvexCollider* convexCollider, ref T collector)
+        private static unsafe bool TerrainConvex<T>(
+            ColliderCastInput input,
+            ConvexCollider* convexCollider,
+            ref T collector
+        )
             where T : struct, ICollector<ColliderCastHit>
         {
             var terrainCollider = (TerrainCollider*)input.Collider;
 
-            FlipColliderCastQuery(ref input, convexCollider, ref collector, out FlippedColliderCastQueryCollector<T> flipQueryCollector);
-            return ColliderTerrain<ConvexConvexDispatcher, FlippedColliderCastQueryCollector<T>>(input, terrainCollider, ref flipQueryCollector);
+            FlipColliderCastQuery(
+                ref input,
+                convexCollider,
+                ref collector,
+                out FlippedColliderCastQueryCollector<T> flipQueryCollector
+            );
+            return ColliderTerrain<ConvexConvexDispatcher, FlippedColliderCastQueryCollector<T>>(
+                input,
+                terrainCollider,
+                ref flipQueryCollector
+            );
         }
 
-        private static unsafe bool ColliderTerrain<D, T>(ColliderCastInput input, TerrainCollider* terrainCollider, ref T collector)
+        private static unsafe bool ColliderTerrain<D, T>(
+            ColliderCastInput input,
+            TerrainCollider* terrainCollider,
+            ref T collector
+        )
             where D : struct, IColliderCastDispatcher
             where T : struct, ICollector<ColliderCastHit>
         {
@@ -660,25 +862,27 @@ namespace Unity.Physics
             Ray aabbRay;
             Terrain.QuadTreeWalker walker;
             {
-                Aabb aabb = input.Collider->CalculateAabb(new RigidTransform(input.Orientation, input.Start),
-                    input.QueryContext.InvTargetScale * input.QueryColliderScale);
+                Aabb aabb = input.Collider->CalculateAabb(
+                    new RigidTransform(input.Orientation, input.Start),
+                    input.QueryContext.InvTargetScale * input.QueryColliderScale
+                );
                 Aabb aabbInTree = new Aabb
                 {
                     Min = aabb.Min * terrain.InverseScale,
-                    Max = aabb.Max * terrain.InverseScale
+                    Max = aabb.Max * terrain.InverseScale,
                 };
                 aabbExtents = aabbInTree.Extents;
                 aabbRay = new Ray
                 {
                     Origin = aabbInTree.Min,
-                    Displacement = input.Ray.Displacement * terrain.InverseScale
+                    Displacement = input.Ray.Displacement * terrain.InverseScale,
                 };
 
                 float3 maxDisplacement = aabbRay.Displacement * collector.MaxFraction;
                 Aabb queryAabb = new Aabb
                 {
                     Min = aabbInTree.Min + math.min(maxDisplacement, float3.zero),
-                    Max = aabbInTree.Max + math.max(maxDisplacement, float3.zero)
+                    Max = aabbInTree.Max + math.max(maxDisplacement, float3.zero),
                 };
                 walker = new Terrain.QuadTreeWalker(&terrainCollider->Terrain, queryAabb);
             }
@@ -701,7 +905,14 @@ namespace Unity.Physics
                     for (int iHit = 0; iHit < hitCount; iHit++)
                     {
                         // Get the quad vertices
-                        walker.GetQuad(hitIndex[iHit], out int2 quadIndex, out float3 a, out float3 b, out float3 c, out float3 d);
+                        walker.GetQuad(
+                            hitIndex[iHit],
+                            out int2 quadIndex,
+                            out float3 a,
+                            out float3 b,
+                            out float3 c,
+                            out float3 d
+                        );
 
                         // Test each triangle in the quad
                         var polygon = new PolygonCollider();
@@ -712,7 +923,13 @@ namespace Unity.Physics
                             float fraction = collector.MaxFraction;
                             polygon.SetAsTriangle(a, b, c);
 
-                            hadHit |= dispatcher.Dispatch(input, (ConvexCollider*)&polygon, ref collector, terrain.NumColliderKeyBits, terrain.GetSubKey(quadIndex, iTriangle));
+                            hadHit |= dispatcher.Dispatch(
+                                input,
+                                (ConvexCollider*)&polygon,
+                                ref collector,
+                                terrain.NumColliderKeyBits,
+                                terrain.GetSubKey(quadIndex, iTriangle)
+                            );
 
                             // Next triangle
                             a = c;

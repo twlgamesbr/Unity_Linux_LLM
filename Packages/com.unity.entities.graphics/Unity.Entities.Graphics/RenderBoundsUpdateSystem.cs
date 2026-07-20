@@ -77,9 +77,10 @@ namespace Unity.Rendering
         }
     }
 
-
     [UpdateInGroup(typeof(StructuralChangePresentationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor
+    )]
     partial class AddWorldAndChunkRenderBounds : SystemBase
     {
         EntityQuery m_MissingWorldRenderBounds;
@@ -88,32 +89,33 @@ namespace Unity.Rendering
         /// <inheritdoc/>
         protected override void OnCreate()
         {
-            m_MissingWorldRenderBounds = GetEntityQuery
-                (
+            m_MissingWorldRenderBounds = GetEntityQuery(
                 new EntityQueryDesc
                 {
-                    All = new[] {ComponentType.ReadOnly<RenderBounds>(), ComponentType.ReadOnly<LocalToWorld>()},
-                    None = new[] {ComponentType.ReadOnly<WorldRenderBounds>()},
-                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
+                    All = new[] { ComponentType.ReadOnly<RenderBounds>(), ComponentType.ReadOnly<LocalToWorld>() },
+                    None = new[] { ComponentType.ReadOnly<WorldRenderBounds>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
                 }
-                );
+            );
 
-            m_MissingWorldChunkRenderBounds = GetEntityQuery
-                (
+            m_MissingWorldChunkRenderBounds = GetEntityQuery(
                 new EntityQueryDesc
                 {
-                    All = new[] {ComponentType.ReadOnly<RenderBounds>(), ComponentType.ReadOnly<LocalToWorld>()},
+                    All = new[] { ComponentType.ReadOnly<RenderBounds>(), ComponentType.ReadOnly<LocalToWorld>() },
                     None = new[] { ComponentType.ChunkComponentReadOnly<ChunkWorldRenderBounds>() },
-                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
                 }
-                );
+            );
         }
 
         /// <inheritdoc/>
         protected override void OnUpdate()
         {
             EntityManager.AddComponent(m_MissingWorldRenderBounds, ComponentType.ReadWrite<WorldRenderBounds>());
-            EntityManager.AddComponent(m_MissingWorldChunkRenderBounds, ComponentType.ChunkComponent<ChunkWorldRenderBounds>());
+            EntityManager.AddComponent(
+                m_MissingWorldChunkRenderBounds,
+                ComponentType.ChunkComponent<ChunkWorldRenderBounds>()
+            );
         }
     }
 
@@ -125,7 +127,9 @@ namespace Unity.Rendering
     /// </remarks>
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdatePresentationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor
+    )]
     internal partial class RenderBoundsUpdateSystem : SystemBase
     {
         EntityQuery m_WorldRenderBounds;
@@ -133,12 +137,20 @@ namespace Unity.Rendering
         [BurstCompile]
         internal struct BoundsJob : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<RenderBounds> RendererBounds;
-            [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorld;
+            [ReadOnly]
+            public ComponentTypeHandle<RenderBounds> RendererBounds;
+
+            [ReadOnly]
+            public ComponentTypeHandle<LocalToWorld> LocalToWorld;
             public ComponentTypeHandle<WorldRenderBounds> WorldRenderBounds;
             public ComponentTypeHandle<ChunkWorldRenderBounds> ChunkWorldRenderBounds;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 // This job is not written to support queries with enableable component types.
                 Assert.IsFalse(useEnabledMask);
@@ -155,7 +167,10 @@ namespace Unity.Rendering
                     combined.Encapsulate(transformed);
                 }
 
-                chunk.SetChunkComponentData(ref ChunkWorldRenderBounds, new ChunkWorldRenderBounds { Value = combined });
+                chunk.SetChunkComponentData(
+                    ref ChunkWorldRenderBounds,
+                    new ChunkWorldRenderBounds { Value = combined }
+                );
             }
         }
 
@@ -168,15 +183,22 @@ namespace Unity.Rendering
                 return;
             }
 
-            m_WorldRenderBounds = GetEntityQuery
-                (
+            m_WorldRenderBounds = GetEntityQuery(
                 new EntityQueryDesc
                 {
-                    All = new[] { ComponentType.ChunkComponent<ChunkWorldRenderBounds>(), ComponentType.ReadWrite<WorldRenderBounds>(), ComponentType.ReadOnly<RenderBounds>(), ComponentType.ReadOnly<LocalToWorld>() },
-                    None = new[] { ComponentType.ReadOnly<SkipWorldRenderBoundsUpdate>() }
+                    All = new[]
+                    {
+                        ComponentType.ChunkComponent<ChunkWorldRenderBounds>(),
+                        ComponentType.ReadWrite<WorldRenderBounds>(),
+                        ComponentType.ReadOnly<RenderBounds>(),
+                        ComponentType.ReadOnly<LocalToWorld>(),
+                    },
+                    None = new[] { ComponentType.ReadOnly<SkipWorldRenderBoundsUpdate>() },
                 }
-                );
-            m_WorldRenderBounds.SetChangedVersionFilter(new[] { ComponentType.ReadOnly<RenderBounds>(), ComponentType.ReadOnly<LocalToWorld>()});
+            );
+            m_WorldRenderBounds.SetChangedVersionFilter(
+                new[] { ComponentType.ReadOnly<RenderBounds>(), ComponentType.ReadOnly<LocalToWorld>() }
+            );
             m_WorldRenderBounds.AddOrderVersionFilter();
         }
 

@@ -27,8 +27,7 @@ namespace Unity.Jobs
             ConcreteType = type;
         }
     }
-    
+
     [AttributeUsage(AttributeTargets.Class)]
-    internal class DOTSCompilerGeneratedAttribute : Attribute
-    {}
+    internal class DOTSCompilerGeneratedAttribute : Attribute { }
 }

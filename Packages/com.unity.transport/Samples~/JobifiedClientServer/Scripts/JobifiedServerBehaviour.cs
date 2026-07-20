@@ -1,7 +1,7 @@
-using UnityEngine;
-using Unity.Jobs;
 using Unity.Collections;
+using Unity.Jobs;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 namespace Unity.Networking.Transport.Samples
 {
@@ -40,16 +40,12 @@ namespace Unity.Networking.Transport.Samples
         {
             m_ServerJobHandle.Complete();
 
-            var connectionJob = new ServerUpdateConnectionsJob
-            {
-                Driver = m_Driver,
-                Connections = m_Connections
-            };
+            var connectionJob = new ServerUpdateConnectionsJob { Driver = m_Driver, Connections = m_Connections };
 
             var serverUpdateJob = new ServerUpdateJob
             {
                 Driver = m_Driver.ToConcurrent(),
-                Connections = m_Connections.AsDeferredJobArray()
+                Connections = m_Connections.AsDeferredJobArray(),
             };
 
             m_ServerJobHandle = m_Driver.ScheduleUpdate();

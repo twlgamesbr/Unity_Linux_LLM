@@ -27,7 +27,15 @@ namespace Unity.Entities.Serialization
         /// <param name="sectionIndex">The subscene section index.</param>
         public EntitySceneReference(Hash128 guid, int sectionIndex)
         {
-            Id = new UntypedWeakReferenceId(new RuntimeGlobalObjectId { AssetGUID = guid, IdentifierType = 1, SceneObjectIdentifier0 = sectionIndex }, WeakReferenceGenerationType.EntityScene);
+            Id = new UntypedWeakReferenceId(
+                new RuntimeGlobalObjectId
+                {
+                    AssetGUID = guid,
+                    IdentifierType = 1,
+                    SceneObjectIdentifier0 = sectionIndex,
+                },
+                WeakReferenceGenerationType.EntityScene
+            );
         }
 
 #if UNITY_EDITOR
@@ -35,11 +43,10 @@ namespace Unity.Entities.Serialization
         /// Initializes and returns an instance of EntitySceneReference.
         /// </summary>
         /// <param name="sceneAsset">The referenced <see cref="SceneAsset"/>.</param>
-        public EntitySceneReference(SceneAsset sceneAsset) : this(
-            AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(sceneAsset)), 0)
-        {
-        }
+        public EntitySceneReference(SceneAsset sceneAsset)
+            : this(AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(sceneAsset)), 0) { }
 #endif
+
         /// <summary>
         /// Returns true if the reference has a valid id.  In the editor, additional checks for the correct GenerationType and the existence of the referenced asset are performed.
         /// </summary>
@@ -53,7 +60,11 @@ namespace Unity.Entities.Serialization
                 if (Id.GenerationType != WeakReferenceGenerationType.EntityScene)
                     return false;
 
-                if (UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(UnityEditor.AssetDatabase.GUIDToAssetPath(Id.GlobalId.AssetGUID)) != typeof(UnityEditor.SceneAsset))
+                if (
+                    UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(
+                        UnityEditor.AssetDatabase.GUIDToAssetPath(Id.GlobalId.AssetGUID)
+                    ) != typeof(UnityEditor.SceneAsset)
+                )
                     return false;
 #endif
                 return true;
@@ -67,7 +78,7 @@ namespace Unity.Entities.Serialization
         /// <returns>True if the asset GUID of both are equal.</returns>
         public bool Equals(EntitySceneReference other)
         {
-            return Id .Equals(other.Id );
+            return Id.Equals(other.Id);
         }
 
         /// <summary>
@@ -86,7 +97,7 @@ namespace Unity.Entities.Serialization
         /// <returns>The hash code of this EntitySceneReference.</returns>
         public override int GetHashCode()
         {
-            return Id .GetHashCode();
+            return Id.GetHashCode();
         }
     }
 }

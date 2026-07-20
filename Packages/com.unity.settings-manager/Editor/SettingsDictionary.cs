@@ -20,7 +20,8 @@ namespace UnityEditor.SettingsManagement
         List<SettingsKeyValuePair> m_DictionaryValues = new List<SettingsKeyValuePair>();
 #pragma warning restore 0649
 
-        internal Dictionary<Type, Dictionary<string, string>> dictionary = new Dictionary<Type, Dictionary<string, string>>();
+        internal Dictionary<Type, Dictionary<string, string>> dictionary =
+            new Dictionary<Type, Dictionary<string, string>>();
 
         public bool ContainsKey<T>(string key)
         {
@@ -98,12 +99,14 @@ namespace UnityEditor.SettingsManagement
             {
                 foreach (var entry in type.Value)
                 {
-                    m_DictionaryValues.Add(new SettingsKeyValuePair()
-                    {
-                        type = type.Key.AssemblyQualifiedName,
-                        key = entry.Key,
-                        value = entry.Value
-                    });
+                    m_DictionaryValues.Add(
+                        new SettingsKeyValuePair()
+                        {
+                            type = type.Key.AssemblyQualifiedName,
+                            key = entry.Key,
+                            value = entry.Value,
+                        }
+                    );
                 }
             }
         }
@@ -120,7 +123,9 @@ namespace UnityEditor.SettingsManagement
 
                 if (type == null)
                 {
-                    Debug.LogWarning("Could not instantiate type \"" + entry.type + "\". Skipping key: " + entry.key + ".");
+                    Debug.LogWarning(
+                        "Could not instantiate type \"" + entry.type + "\". Skipping key: " + entry.key + "."
+                    );
                     continue;
                 }
 

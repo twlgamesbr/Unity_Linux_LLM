@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using Unity.Entities.SourceGen.Common;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
-
 using static Unity.Entities.SourceGen.Common.SourceGenHelpers;
 
 namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.Query;
@@ -41,12 +40,14 @@ public partial class IfeDescription
 
         // Add all shared component filter types
         foreach (var q in SharedComponentFilterInfos)
-            distinctAll.Add(new Common.Query
-            {
-                IsReadOnly = true,
-                Type = Common.QueryType.All,
-                TypeSymbol = q.TypeSymbol
-            });
+            distinctAll.Add(
+                new Common.Query
+                {
+                    IsReadOnly = true,
+                    Type = Common.QueryType.All,
+                    TypeSymbol = q.TypeSymbol,
+                }
+            );
 
         // Add all SystemAPI.Query<T> types, where T is not enableable
         foreach (var q in IterableNonEnableableTypes)
@@ -55,12 +56,14 @@ public partial class IfeDescription
         // Add all SystemAPI.Query<T> types, where T is enableable *and* not used in `.WithAny<T>`, `.WithNone<T>` and `.WithDisabled<T>`
         foreach (var q in IterableEnableableQueryDatasToBeTreatedAsAllComponents)
         {
-            distinctAll.Add(new Common.Query
-            {
-                IsReadOnly = q.IsReadOnly,
-                Type = Common.QueryType.All,
-                TypeSymbol = q.QueriedTypeSymbol
-            });
+            distinctAll.Add(
+                new Common.Query
+                {
+                    IsReadOnly = q.IsReadOnly,
+                    Type = Common.QueryType.All,
+                    TypeSymbol = q.QueriedTypeSymbol,
+                }
+            );
         }
 
         return distinctAll;
@@ -115,17 +118,28 @@ public partial class IfeDescription
     public readonly List<CandidateSyntax> AdditionalCandidates = new();
     public readonly Dictionary<SyntaxNode, string> CandidateNodesToReplacementCode;
 
-    public string CreateQueryInvocationNodeReplacementCode(string entityQueryFieldName, string ifeTypeHandleFieldName) =>
-        $"{_generatedIfeTypeFullyQualifiedName}.Query({entityQueryFieldName}, __TypeHandle.{ifeTypeHandleFieldName}, ref {_systemStateName}" +
-        $"{string.Join("", SharedComponentFilterInfos.Select(p => $", {p.Argument}"))})";
+    public string CreateQueryInvocationNodeReplacementCode(
+        string entityQueryFieldName,
+        string ifeTypeHandleFieldName
+    ) =>
+        $"{_generatedIfeTypeFullyQualifiedName}.Query({entityQueryFieldName}, __TypeHandle.{ifeTypeHandleFieldName}, ref {_systemStateName}"
+        + $"{string.Join("", SharedComponentFilterInfos.Select(p => $", {p.Argument}"))})";
 
-    public IfeDescription(SystemDescription systemDescription, QueryCandidate queryCandidate, int numForEachsPreviouslySeenInSystem)
+    public IfeDescription(
+        SystemDescription systemDescription,
+        QueryCandidate queryCandidate,
+        int numForEachsPreviouslySeenInSystem
+    )
     {
-        if (systemDescription.SemanticModel.GetOperation(queryCandidate.FullInvocationChainSyntaxNode) is IInvocationOperation invocationOperation
-            && IsSystemApiQueryInvocation(invocationOperation))
+        if (
+            systemDescription.SemanticModel.GetOperation(queryCandidate.FullInvocationChainSyntaxNode)
+                is IInvocationOperation invocationOperation
+            && IsSystemApiQueryInvocation(invocationOperation)
+        )
         {
             QueryCandidate = queryCandidate;
-            var queryCandidateContainingStatement = queryCandidate.FullInvocationChainSyntaxNode.AncestorOfKindOrDefault<StatementSyntax>();
+            var queryCandidateContainingStatement =
+                queryCandidate.FullInvocationChainSyntaxNode.AncestorOfKindOrDefault<StatementSyntax>();
 
             SystemDescription = systemDescription;
             Location = queryCandidate.FullInvocationChainSyntaxNode.GetLocation();
@@ -136,12 +150,15 @@ public partial class IfeDescription
                 return;
             }
 
-            var containingMethod = queryCandidate.FullInvocationChainSyntaxNode.AncestorOfKindOrDefault<MethodDeclarationSyntax>();
+            var containingMethod =
+                queryCandidate.FullInvocationChainSyntaxNode.AncestorOfKindOrDefault<MethodDeclarationSyntax>();
             if (containingMethod != null)
             {
                 var methodSymbol = SystemDescription.SemanticModel.GetDeclaredSymbol(containingMethod);
 
-                var queryExtensionInvocations = queryCandidate.FullInvocationChainSyntaxNode.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>();
+                var queryExtensionInvocations = queryCandidate
+                    .FullInvocationChainSyntaxNode.DescendantNodesAndSelf()
+                    .OfType<InvocationExpressionSyntax>();
                 foreach (var node in queryExtensionInvocations)
                 {
                     switch (node.Expression)
@@ -171,7 +188,12 @@ public partial class IfeDescription
                                         {
                                             foreach (var iterableQueryData in InitialIterableEnableableQueryDatas)
                                             {
-                                                if (SymbolEqualityComparer.Default.Equals(iterableQueryData.QueriedTypeSymbol, typeArgSymbol))
+                                                if (
+                                                    SymbolEqualityComparer.Default.Equals(
+                                                        iterableQueryData.QueriedTypeSymbol,
+                                                        typeArgSymbol
+                                                    )
+                                                )
                                                 {
                                                     // Figure out whether the user wants to iterate through it with readonly access.
                                                     // E.g. The user might write: `SystemAPI.Query<EnabledRefRW<T>, RefRO<T>>().WithDisabled<T>()`
@@ -182,39 +204,52 @@ public partial class IfeDescription
                                                     // All types remaining in `IterableEnableableQueryDatasToBeTreatedAsAllComponents` will be treated as `All` components when creating an EntityQuery.
                                                     // Since the current type must be treated as `Any`, `None`, or `Disabled`, we must remove it from `IterableEnableableQueryDatasToBeTreatedAsAllComponents`.
                                                     IterableEnableableQueryDatasToBeTreatedAsAllComponents.RemoveAll(
-                                                        q => SymbolEqualityComparer.Default.Equals(q.QueriedTypeSymbol, typeArgSymbol));
+                                                        q =>
+                                                            SymbolEqualityComparer.Default.Equals(
+                                                                q.QueriedTypeSymbol,
+                                                                typeArgSymbol
+                                                            )
+                                                    );
                                                 }
                                             }
                                         }
 
                                         if (extensionMethodName == "WithAny")
-                                            _anyQueryTypes.Add(new Common.Query
-                                            {
-                                                TypeSymbol = typeArgSymbol,
-                                                Type = Common.QueryType.Any,
-                                                IsReadOnly = isReadOnly
-                                            });
+                                            _anyQueryTypes.Add(
+                                                new Common.Query
+                                                {
+                                                    TypeSymbol = typeArgSymbol,
+                                                    Type = Common.QueryType.Any,
+                                                    IsReadOnly = isReadOnly,
+                                                }
+                                            );
                                         else if (extensionMethodName == "WithNone")
-                                            _noneQueryTypes.Add(new Common.Query
-                                            {
-                                                TypeSymbol = typeArgSymbol,
-                                                Type = Common.QueryType.None,
-                                                IsReadOnly = isReadOnly
-                                            });
+                                            _noneQueryTypes.Add(
+                                                new Common.Query
+                                                {
+                                                    TypeSymbol = typeArgSymbol,
+                                                    Type = Common.QueryType.None,
+                                                    IsReadOnly = isReadOnly,
+                                                }
+                                            );
                                         else if (extensionMethodName == "WithPresent")
-                                            _presentQueryTypes.Add(new Common.Query
-                                            {
-                                                TypeSymbol = typeArgSymbol,
-                                                Type = Common.QueryType.Present,
-                                                IsReadOnly = isReadOnly
-                                            });
+                                            _presentQueryTypes.Add(
+                                                new Common.Query
+                                                {
+                                                    TypeSymbol = typeArgSymbol,
+                                                    Type = Common.QueryType.Present,
+                                                    IsReadOnly = isReadOnly,
+                                                }
+                                            );
                                         else
-                                            _disabledQueryTypes.Add(new Common.Query
-                                            {
-                                                TypeSymbol = typeArgSymbol,
-                                                Type = Common.QueryType.Disabled,
-                                                IsReadOnly = isReadOnly
-                                            });
+                                            _disabledQueryTypes.Add(
+                                                new Common.Query
+                                                {
+                                                    TypeSymbol = typeArgSymbol,
+                                                    Type = Common.QueryType.Disabled,
+                                                    IsReadOnly = isReadOnly,
+                                                }
+                                            );
                                     }
                                     break;
                                 case "WithAbsent":
@@ -224,14 +259,20 @@ public partial class IfeDescription
 
                                         // E.g. if users write `foreach (var x in SystemAPI.Query<EnabledRefRW<T>>().WithAbsent<T>())`
                                         if (InitialIterableEnableableTypeSymbols.Contains(typeArgSymbol))
-                                            IfeCompilerMessages.SGFE012(SystemDescription, typeArgSymbol.ToFullName(), genericNameSyntax.GetLocation());
+                                            IfeCompilerMessages.SGFE012(
+                                                SystemDescription,
+                                                typeArgSymbol.ToFullName(),
+                                                genericNameSyntax.GetLocation()
+                                            );
                                         else
-                                            _absentQueryTypes.Add(new Common.Query
-                                            {
-                                                TypeSymbol = typeArgSymbol,
-                                                Type = Common.QueryType.Absent,
-                                                IsReadOnly = true
-                                            });
+                                            _absentQueryTypes.Add(
+                                                new Common.Query
+                                                {
+                                                    TypeSymbol = typeArgSymbol,
+                                                    Type = Common.QueryType.Absent,
+                                                    IsReadOnly = true,
+                                                }
+                                            );
                                     }
                                     break;
                                 case "WithAll":
@@ -245,23 +286,25 @@ public partial class IfeDescription
                                         if (InitialIterableEnableableTypeSymbols.Contains(typeArgSymbol))
                                             continue;
 
-                                        _allQueryTypes.Add(new Common.Query
-                                        {
-                                            TypeSymbol = typeArgSymbol,
-                                            Type = Common.QueryType.All,
-                                            IsReadOnly = true
-                                        });
+                                        _allQueryTypes.Add(
+                                            new Common.Query
+                                            {
+                                                TypeSymbol = typeArgSymbol,
+                                                Type = Common.QueryType.All,
+                                                IsReadOnly = true,
+                                            }
+                                        );
                                     }
                                     break;
                                 case "WithChangeFilter":
                                     _changeFilterQueryTypes.AddRange(
-                                        genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg =>
-                                            new Common.Query
-                                            {
-                                                TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
-                                                Type = Common.QueryType.ChangeFilter,
-                                                IsReadOnly = true
-                                            }));
+                                        genericNameSyntax.TypeArgumentList.Arguments.Select(typeArg => new Common.Query
+                                        {
+                                            TypeSymbol = systemDescription.SemanticModel.GetTypeInfo(typeArg).Type,
+                                            Type = Common.QueryType.ChangeFilter,
+                                            IsReadOnly = true,
+                                        })
+                                    );
                                     break;
                                 case "WithSharedComponentFilterManaged":
                                 case "WithSharedComponentFilter":
@@ -277,8 +320,11 @@ public partial class IfeDescription
                                             {
                                                 Argument = arg,
                                                 TypeSymbol = typeSymbol,
-                                                IsManaged = genericNameSyntax.Identifier.ValueText == "WithSharedComponentFilterManaged"
-                                            });
+                                                IsManaged =
+                                                    genericNameSyntax.Identifier.ValueText
+                                                    == "WithSharedComponentFilterManaged",
+                                            }
+                                        );
                                     }
                                     break;
                             }
@@ -293,14 +339,19 @@ public partial class IfeDescription
                                     var args = node.ArgumentList.Arguments;
                                     foreach (var arg in args)
                                     {
-                                        var typeSymbol = systemDescription.SemanticModel.GetTypeInfo(arg.Expression).Type;
+                                        var typeSymbol = systemDescription
+                                            .SemanticModel.GetTypeInfo(arg.Expression)
+                                            .Type;
                                         _sharedComponentFilterInfos.Add(
                                             new SharedComponentFilterInfo
                                             {
                                                 Argument = arg,
                                                 TypeSymbol = typeSymbol,
-                                                IsManaged = identifierNameSyntax.Identifier.ValueText == "WithSharedComponentFilterManaged"
-                                            });
+                                                IsManaged =
+                                                    identifierNameSyntax.Identifier.ValueText
+                                                    == "WithSharedComponentFilterManaged",
+                                            }
+                                        );
                                     }
                                     break;
                                 case "WithOptions":
@@ -338,11 +389,14 @@ public partial class IfeDescription
                     return;
                 }
 
-                var burstCompileAttribute = methodSymbol.GetAttributes().SingleOrDefault(a => a.AttributeClass.ToFullName() == "Unity.Burst.BurstCompileAttribute");
+                var burstCompileAttribute = methodSymbol
+                    .GetAttributes()
+                    .SingleOrDefault(a => a.AttributeClass.ToFullName() == "Unity.Burst.BurstCompileAttribute");
 
                 IsBurstEnabled = burstCompileAttribute != null;
                 BurstCompileAttribute = burstCompileAttribute;
-                string ifeTypeName = $"IFE_{systemDescription.QueriesAndHandles.UniqueId}_{numForEachsPreviouslySeenInSystem}";
+                string ifeTypeName =
+                    $"IFE_{systemDescription.QueriesAndHandles.UniqueId}_{numForEachsPreviouslySeenInSystem}";
 
                 var ifeType = new IfeType
                 {
@@ -351,9 +405,9 @@ public partial class IfeDescription
                     TypeName = ifeTypeName,
                     BurstCompileAttribute = BurstCompileAttribute,
                     FullyQualifiedTypeName = GetIfeTypeFullyQualifiedTypeName(queryCandidate, ifeTypeName),
-                    ReturnedTupleElementsDuringEnumeration =
-                        AllIterableQueryDatas
-                            .Select((queryData, index) =>
+                    ReturnedTupleElementsDuringEnumeration = AllIterableQueryDatas
+                        .Select(
+                            (queryData, index) =>
                             {
                                 string typeArgumentFullName;
                                 switch (queryData.QueryType)
@@ -364,24 +418,30 @@ public partial class IfeDescription
                                             $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRO<{typeArgumentFullName}>",
                                             typeArgumentFullName: typeArgumentFullName,
                                             elementName: $"item{index + 1}",
-                                            type: queryData.QueryType);
+                                            type: queryData.QueryType
+                                        );
                                     case QueryType.RefRW:
                                         typeArgumentFullName = queryData.TypeParameterSymbol.ToFullName();
                                         return new ReturnedTupleElementDuringEnumeration(
                                             $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRW<{typeArgumentFullName}>",
                                             typeArgumentFullName: typeArgumentFullName,
                                             elementName: $"item{index + 1}",
-                                            type: queryData.QueryType);
+                                            type: queryData.QueryType
+                                        );
                                     default:
-                                        typeArgumentFullName = queryData.TypeParameterSymbol is { } symbol ? symbol.ToFullName() : string.Empty;
+                                        typeArgumentFullName = queryData.TypeParameterSymbol is { } symbol
+                                            ? symbol.ToFullName()
+                                            : string.Empty;
                                         return new ReturnedTupleElementDuringEnumeration(
                                             queryData.TypeSymbolFullName,
                                             typeArgumentFullName: typeArgumentFullName,
                                             elementName: $"item{index + 1}",
-                                            type: queryData.QueryType);
+                                            type: queryData.QueryType
+                                        );
                                 }
-                            })
-                            .ToArray()
+                            }
+                        )
+                        .ToArray(),
                 };
 
                 IfeType = ifeType;
@@ -412,10 +472,16 @@ public partial class IfeDescription
                         // Patched code: foreach ((UncheckedRefRW<TypeA> a, UncheckedRefRO<TypeB> b) in generatedIfeEnumerator)
                         for (var index = 0; index < tupleExpressionSyntax.Arguments.Count; index++)
                         {
-                            if (tupleExpressionSyntax.Arguments[index].Expression is DeclarationExpressionSyntax declarationExpressionSyntax)
+                            if (
+                                tupleExpressionSyntax.Arguments[index].Expression
+                                is DeclarationExpressionSyntax declarationExpressionSyntax
+                            )
                             {
                                 var typeSyntax = declarationExpressionSyntax.Type;
-                                if (typeSyntax is GenericNameSyntax genericNameSyntax && genericNameSyntax.Identifier.ValueText != "var")
+                                if (
+                                    typeSyntax is GenericNameSyntax genericNameSyntax
+                                    && genericNameSyntax.Identifier.ValueText != "var"
+                                )
                                 {
                                     var queryData = AllIterableQueryDatas.ElementAt(index);
                                     var typeParamSymbolFullName = queryData.TypeParameterSymbol.ToFullName();
@@ -423,12 +489,30 @@ public partial class IfeDescription
                                     switch (queryData.QueryType)
                                     {
                                         case QueryType.RefRO:
-                                            CandidateNodesToReplacementCode.Add(genericNameSyntax, $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRO<{typeParamSymbolFullName}> ");
-                                            AdditionalCandidates.Add(new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, genericNameSyntax));
+                                            CandidateNodesToReplacementCode.Add(
+                                                genericNameSyntax,
+                                                $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRO<{typeParamSymbolFullName}> "
+                                            );
+                                            AdditionalCandidates.Add(
+                                                new CandidateSyntax(
+                                                    CandidateType.Ife,
+                                                    CandidateFlags.None,
+                                                    genericNameSyntax
+                                                )
+                                            );
                                             break;
                                         case QueryType.RefRW:
-                                            CandidateNodesToReplacementCode.Add(genericNameSyntax, $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRW<{typeParamSymbolFullName}> ");
-                                            AdditionalCandidates.Add(new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, genericNameSyntax));
+                                            CandidateNodesToReplacementCode.Add(
+                                                genericNameSyntax,
+                                                $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRW<{typeParamSymbolFullName}> "
+                                            );
+                                            AdditionalCandidates.Add(
+                                                new CandidateSyntax(
+                                                    CandidateType.Ife,
+                                                    CandidateFlags.None,
+                                                    genericNameSyntax
+                                                )
+                                            );
                                             break;
                                     }
                                 }
@@ -448,7 +532,9 @@ public partial class IfeDescription
                                 if (_entityAccessRequired && tupleTypeSyntax.Elements.Count > 0)
                                 {
                                     var lastElement = tupleTypeSyntax.Elements.Last();
-                                    var lastTypeSymbol = SystemDescription.SemanticModel.GetTypeInfo(lastElement.Type).Type;
+                                    var lastTypeSymbol = SystemDescription
+                                        .SemanticModel.GetTypeInfo(lastElement.Type)
+                                        .Type;
                                     if (lastTypeSymbol?.Name != "Entity")
                                     {
                                         IfeCompilerMessages.SGFE014(SystemDescription, Location);
@@ -468,12 +554,30 @@ public partial class IfeDescription
                                         switch (queryData.QueryType)
                                         {
                                             case QueryType.RefRW:
-                                                CandidateNodesToReplacementCode.Add(genericNameSyntax, $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRW<{typeParamSymbolFullName}> ");
-                                                AdditionalCandidates.Add(new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, genericNameSyntax));
+                                                CandidateNodesToReplacementCode.Add(
+                                                    genericNameSyntax,
+                                                    $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRW<{typeParamSymbolFullName}> "
+                                                );
+                                                AdditionalCandidates.Add(
+                                                    new CandidateSyntax(
+                                                        CandidateType.Ife,
+                                                        CandidateFlags.None,
+                                                        genericNameSyntax
+                                                    )
+                                                );
                                                 break;
                                             case QueryType.RefRO:
-                                                CandidateNodesToReplacementCode.Add(genericNameSyntax, $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRO<{typeParamSymbolFullName}> ");
-                                                AdditionalCandidates.Add(new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, genericNameSyntax));
+                                                CandidateNodesToReplacementCode.Add(
+                                                    genericNameSyntax,
+                                                    $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRO<{typeParamSymbolFullName}> "
+                                                );
+                                                AdditionalCandidates.Add(
+                                                    new CandidateSyntax(
+                                                        CandidateType.Ife,
+                                                        CandidateFlags.None,
+                                                        genericNameSyntax
+                                                    )
+                                                );
                                                 break;
                                         }
                                     }
@@ -493,12 +597,30 @@ public partial class IfeDescription
                                     switch (queryType)
                                     {
                                         case QueryType.RefRO:
-                                            CandidateNodesToReplacementCode.Add(genericNameSyntax, $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRO<{typeParamSymbolFullName}> ");
-                                            AdditionalCandidates.Add(new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, genericNameSyntax));
+                                            CandidateNodesToReplacementCode.Add(
+                                                genericNameSyntax,
+                                                $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRO<{typeParamSymbolFullName}> "
+                                            );
+                                            AdditionalCandidates.Add(
+                                                new CandidateSyntax(
+                                                    CandidateType.Ife,
+                                                    CandidateFlags.None,
+                                                    genericNameSyntax
+                                                )
+                                            );
                                             break;
                                         case QueryType.RefRW:
-                                            CandidateNodesToReplacementCode.Add(genericNameSyntax, $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRW<{typeParamSymbolFullName}> ");
-                                            AdditionalCandidates.Add(new CandidateSyntax(CandidateType.Ife, CandidateFlags.None, genericNameSyntax));
+                                            CandidateNodesToReplacementCode.Add(
+                                                genericNameSyntax,
+                                                $"Unity.Entities.Internal.InternalCompilerInterface.UncheckedRefRW<{typeParamSymbolFullName}> "
+                                            );
+                                            AdditionalCandidates.Add(
+                                                new CandidateSyntax(
+                                                    CandidateType.Ife,
+                                                    CandidateFlags.None,
+                                                    genericNameSyntax
+                                                )
+                                            );
                                             break;
                                     }
                                 }
@@ -511,13 +633,18 @@ public partial class IfeDescription
             }
             else
             {
-                var propertyDeclarationSyntax = queryCandidate.FullInvocationChainSyntaxNode.AncestorOfKind<PropertyDeclarationSyntax>();
-                var propertySymbol = ModelExtensions.GetDeclaredSymbol(systemDescription.SemanticModel, propertyDeclarationSyntax);
+                var propertyDeclarationSyntax =
+                    queryCandidate.FullInvocationChainSyntaxNode.AncestorOfKind<PropertyDeclarationSyntax>();
+                var propertySymbol = ModelExtensions.GetDeclaredSymbol(
+                    systemDescription.SemanticModel,
+                    propertyDeclarationSyntax
+                );
 
                 IfeCompilerMessages.SGFE002(
                     systemDescription,
                     propertySymbol.OriginalDefinition.ToString(),
-                    queryCandidate.FullInvocationChainSyntaxNode.GetLocation());
+                    queryCandidate.FullInvocationChainSyntaxNode.GetLocation()
+                );
                 Success = false;
             }
         }
@@ -543,11 +670,13 @@ public partial class IfeDescription
                 case StructDeclarationSyntax structDeclarationSyntax:
                     return structDeclarationSyntax.Identifier.ValueText;
                 case NamespaceDeclarationSyntax namespaceDeclarationSyntax:
-                    var identifierName = namespaceDeclarationSyntax.ChildNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
-                    return
-                        identifierName != null
-                            ? identifierName.Identifier.ValueText
-                            : namespaceDeclarationSyntax.ChildNodes().OfType<QualifiedNameSyntax>().First().ToString();
+                    var identifierName = namespaceDeclarationSyntax
+                        .ChildNodes()
+                        .OfType<IdentifierNameSyntax>()
+                        .FirstOrDefault();
+                    return identifierName != null
+                        ? identifierName.Identifier.ValueText
+                        : namespaceDeclarationSyntax.ChildNodes().OfType<QualifiedNameSyntax>().First().ToString();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -557,7 +686,11 @@ public partial class IfeDescription
         {
             var stack = new Stack<string>();
 
-            foreach (var parentClassOrNamespace in GetContainingTypesAndNamespacesFromMostToLeastNested(queryCandidate.FullInvocationChainSyntaxNode))
+            foreach (
+                var parentClassOrNamespace in GetContainingTypesAndNamespacesFromMostToLeastNested(
+                    queryCandidate.FullInvocationChainSyntaxNode
+                )
+            )
             {
                 var identifier = GetIdentifier(parentClassOrNamespace);
                 stack.Push(identifier);
@@ -577,10 +710,14 @@ public partial class IfeDescription
             fullyQualifiedNameWriter.Write(unqualifiedTypeName);
             return fullyQualifiedNameWriter.ToString();
 
-            IEnumerable<MemberDeclarationSyntax> GetContainingTypesAndNamespacesFromMostToLeastNested(SyntaxNode syntaxNode)
+            IEnumerable<MemberDeclarationSyntax> GetContainingTypesAndNamespacesFromMostToLeastNested(
+                SyntaxNode syntaxNode
+            )
             {
                 var current = syntaxNode;
-                while (current.Parent is NamespaceDeclarationSyntax or ClassDeclarationSyntax or StructDeclarationSyntax)
+                while (
+                    current.Parent is NamespaceDeclarationSyntax or ClassDeclarationSyntax or StructDeclarationSyntax
+                )
                 {
                     yield return current.Parent as MemberDeclarationSyntax;
                     current = current.Parent;

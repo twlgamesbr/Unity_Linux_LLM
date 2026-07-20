@@ -9,7 +9,8 @@ namespace Unity.Entities.Content
     /// </summary>
     /// <typeparam name="TObject">The type of UnityEngine.Object this reference points to.</typeparam>
     [Serializable]
-    public struct WeakObjectReference<TObject> : IEquatable<WeakObjectReference<TObject>> where TObject : UnityEngine.Object
+    public struct WeakObjectReference<TObject> : IEquatable<WeakObjectReference<TObject>>
+        where TObject : UnityEngine.Object
     {
         /// <summary>
         /// The reference id.
@@ -47,10 +48,7 @@ namespace Unity.Entities.Content
         /// </summary>
         public TObject Result
         {
-            get
-            {
-                return RuntimeContentManager.GetObjectValue<TObject>(Id);
-            }
+            get { return RuntimeContentManager.GetObjectValue<TObject>(Id); }
         }
 
 #if UNITY_EDITOR
@@ -59,6 +57,7 @@ namespace Unity.Entities.Content
             this.Id = UntypedWeakReferenceId.CreateFromObjectInstance(unityObject);
         }
 #endif
+
         /// <summary>
         /// Weak reference to an object.
         /// </summary>

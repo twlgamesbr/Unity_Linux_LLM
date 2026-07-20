@@ -25,7 +25,11 @@ namespace TMPro.EditorUtilities
 
             EditorGUIUtility.labelWidth = 115;
             EditorGUI.BeginChangeCheck();
-            int size = EditorGUI.DelayedIntField(new Rect(rect.x, position.y + 3, 130, rect.height), new GUIContent("Component Glyphs"), prop_ComponentGlyphIDs.arraySize);
+            int size = EditorGUI.DelayedIntField(
+                new Rect(rect.x, position.y + 3, 130, rect.height),
+                new GUIContent("Component Glyphs"),
+                prop_ComponentGlyphIDs.arraySize
+            );
             if (EditorGUI.EndChangeCheck())
             {
                 size = Mathf.Clamp(size, 0, 20);
@@ -46,26 +50,47 @@ namespace TMPro.EditorUtilities
                 DrawGlyph(glyphIndex, componentGlyphPosition, property);
 
                 EditorGUI.BeginChangeCheck();
-                EditorGUI.DelayedIntField(new Rect(componentGlyphPosition.x - 13, componentGlyphPosition.y + 73, 40, EditorGUIUtility.singleLineHeight), prop_ComponentGlyphIDs.GetArrayElementAtIndex(i), GUIContent.none);
-                if (EditorGUI.EndChangeCheck())
-                {
-
-                }
+                EditorGUI.DelayedIntField(
+                    new Rect(
+                        componentGlyphPosition.x - 13,
+                        componentGlyphPosition.y + 73,
+                        40,
+                        EditorGUIUtility.singleLineHeight
+                    ),
+                    prop_ComponentGlyphIDs.GetArrayElementAtIndex(i),
+                    GUIContent.none
+                );
+                if (EditorGUI.EndChangeCheck()) { }
             }
 
             // Draw Ligature glyph
-            Rect ligatureGlyphPosition = new Rect(50 + (glyphSpacing * ComponentGlyphIDCount + 1), position.y + 3, 95, EditorGUIUtility.singleLineHeight);
+            Rect ligatureGlyphPosition = new Rect(
+                50 + (glyphSpacing * ComponentGlyphIDCount + 1),
+                position.y + 3,
+                95,
+                EditorGUIUtility.singleLineHeight
+            );
             ligatureGlyphPosition.x = Mathf.Max(200, ligatureGlyphPosition.x);
             EditorGUI.LabelField(ligatureGlyphPosition, new GUIContent("Ligature Glyph"));
 
-            DrawGlyph((uint)prop_LigatureGlyphID.intValue, new Rect(ligatureGlyphPosition.x + 37, ligatureGlyphPosition.y + 21, 48, 48), property);
+            DrawGlyph(
+                (uint)prop_LigatureGlyphID.intValue,
+                new Rect(ligatureGlyphPosition.x + 37, ligatureGlyphPosition.y + 21, 48, 48),
+                property
+            );
 
             EditorGUI.BeginChangeCheck();
-            EditorGUI.DelayedIntField(new Rect(ligatureGlyphPosition.x + 24, ligatureGlyphPosition.y + 94, 40, EditorGUIUtility.singleLineHeight), prop_LigatureGlyphID, GUIContent.none);
-            if (EditorGUI.EndChangeCheck())
-            {
-
-            }
+            EditorGUI.DelayedIntField(
+                new Rect(
+                    ligatureGlyphPosition.x + 24,
+                    ligatureGlyphPosition.y + 94,
+                    40,
+                    EditorGUIUtility.singleLineHeight
+                ),
+                prop_LigatureGlyphID,
+                GUIContent.none
+            );
+            if (EditorGUI.EndChangeCheck()) { }
         }
 
         void DrawGlyph(uint glyphIndex, Rect glyphDrawPosition, SerializedProperty property)
@@ -83,7 +108,13 @@ namespace TMPro.EditorUtilities
                 return;
 
             Texture2D atlasTexture;
-            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, glyph.atlasIndex, out atlasTexture) == false)
+            if (
+                TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(
+                    so,
+                    glyph.atlasIndex,
+                    out atlasTexture
+                ) == false
+            )
                 return;
 
             Material mat;
@@ -105,7 +136,12 @@ namespace TMPro.EditorUtilities
             float scale = glyphDrawPosition.width / normalizedHeight;
 
             // Compute the normalized texture coordinates
-            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
+            Rect texCoords = new Rect(
+                (float)glyphOriginX / atlasTexture.width,
+                (float)glyphOriginY / atlasTexture.height,
+                (float)glyphWidth / atlasTexture.width,
+                (float)glyphHeight / atlasTexture.height
+            );
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -115,7 +151,17 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.height = glyphHeight * scale;
 
                 // Could switch to using the default material of the font asset which would require passing scale to the shader.
-                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
+                Graphics.DrawTexture(
+                    glyphDrawPosition,
+                    atlasTexture,
+                    texCoords,
+                    0,
+                    0,
+                    0,
+                    0,
+                    new Color(1f, 1f, 1f),
+                    mat
+                );
             }
         }
     }

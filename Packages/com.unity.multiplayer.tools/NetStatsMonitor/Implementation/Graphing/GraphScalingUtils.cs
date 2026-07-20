@@ -47,11 +47,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 nextRoundNumber = 1f;
                 exponentOf10 += 1;
             }
-            return new MantissaAndExponent
-            {
-                Mantissa = sign * nextRoundNumber,
-                Exponent = (int)exponentOf10,
-            };
+            return new MantissaAndExponent { Mantissa = sign * nextRoundNumber, Exponent = (int)exponentOf10 };
         }
     }
 }

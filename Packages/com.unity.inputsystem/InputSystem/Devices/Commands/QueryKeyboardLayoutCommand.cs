@@ -10,7 +10,10 @@ namespace UnityEngine.InputSystem.LowLevel
     [StructLayout(LayoutKind.Explicit, Size = InputDeviceCommand.kBaseCommandSize + kMaxNameLength)]
     public unsafe struct QueryKeyboardLayoutCommand : IInputDeviceCommandInfo
     {
-        public static FourCC Type { get { return new FourCC('K', 'B', 'L', 'T'); } }
+        public static FourCC Type
+        {
+            get { return new FourCC('K', 'B', 'L', 'T'); }
+        }
 
         internal const int kMaxNameLength = 256;
 
@@ -26,8 +29,8 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <returns></returns>
         public string ReadLayoutName()
         {
-            fixed(QueryKeyboardLayoutCommand * thisPtr = &this)
-            return StringHelpers.ReadStringFromBuffer(new IntPtr(thisPtr->nameBuffer), kMaxNameLength);
+            fixed (QueryKeyboardLayoutCommand* thisPtr = &this)
+                return StringHelpers.ReadStringFromBuffer(new IntPtr(thisPtr->nameBuffer), kMaxNameLength);
         }
 
         /// <summary>
@@ -36,8 +39,8 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <param name="name">Keyboard layout name.</param>
         public void WriteLayoutName(string name)
         {
-            fixed(QueryKeyboardLayoutCommand * thisPtr = &this)
-            StringHelpers.WriteStringToBuffer(name, new IntPtr(thisPtr->nameBuffer), kMaxNameLength);
+            fixed (QueryKeyboardLayoutCommand* thisPtr = &this)
+                StringHelpers.WriteStringToBuffer(name, new IntPtr(thisPtr->nameBuffer), kMaxNameLength);
         }
 
         public FourCC typeStatic => Type;
@@ -46,7 +49,7 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             return new QueryKeyboardLayoutCommand
             {
-                baseCommand = new InputDeviceCommand(Type, InputDeviceCommand.kBaseCommandSize + kMaxNameLength)
+                baseCommand = new InputDeviceCommand(Type, InputDeviceCommand.kBaseCommandSize + kMaxNameLength),
             };
         }
     }

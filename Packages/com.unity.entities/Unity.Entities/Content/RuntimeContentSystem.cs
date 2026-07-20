@@ -49,13 +49,14 @@ namespace Unity.Entities.Content
 #else
         [RuntimeInitializeOnLoadMethod]
         static void RuntimeInitialize()
-        { 
+        {
 #if !ENABLE_CONTENT_DELIVERY
             LoadContentCatalog(null, null, null, false);
 #endif
             AddToPlayerLoop();
         }
 #endif
+
         static void RemoveFromPlayerLoop()
         {
             ContentDeliveryGlobalState.Cleanup();
@@ -74,7 +75,7 @@ namespace Unity.Entities.Content
             newSubsystemList[oldListLength] = new PlayerLoopSystem
             {
                 type = typeof(RuntimeContentSystem),
-                updateDelegate = Update
+                updateDelegate = Update,
             };
             playerLoop.subSystemList = newSubsystemList;
             PlayerLoop.SetPlayerLoop(playerLoop);
@@ -88,11 +89,10 @@ namespace Unity.Entities.Content
 #endif
 
 #if !UNITY_EDITOR  //only update RCM in the player if the catalog has been loaded
-            if(RuntimeContentManager.IsReady)
+            if (RuntimeContentManager.IsReady)
 #endif
-            RuntimeContentManager.ProcessQueuedCommands();
+                RuntimeContentManager.ProcessQueuedCommands();
         }
-
 
         /// <summary>
         /// Loads the content catalog data.
@@ -105,7 +105,12 @@ namespace Unity.Entities.Content
         /// <param name="localCachePath">Optional path for the local cache. Set null or leave empty to create a folder named 'ContentCache' in the device's Application.persistentDataPath.</param>
         /// <param name="initialContentSet">Initial content set to download.  'all' is generally used to denote the entire content set.</param>
         /// <param name="allowOverrideArgs">Set to true, to use application command line arguments to override the passed in values.</param>
-        public static void LoadContentCatalog(string remoteUrlRoot, string localCachePath, string initialContentSet, bool allowOverrideArgs = false)
+        public static void LoadContentCatalog(
+            string remoteUrlRoot,
+            string localCachePath,
+            string initialContentSet,
+            bool allowOverrideArgs = false
+        )
         {
 #if ENABLE_CONTENT_DELIVERY
             if (allowOverrideArgs)
@@ -117,22 +122,32 @@ namespace Unity.Entities.Content
                 if (TryGetAppArg("contentSet", ref initialContentSet))
                     ContentDeliveryGlobalState.LogFunc?.Invoke($"Overwrote contentSet '{initialContentSet}'");
             }
-            ContentDeliveryGlobalState.LogFunc?.Invoke($"RuntimeContentSystem.Initialize({remoteUrlRoot}, {localCachePath}, {initialContentSet})");
+            ContentDeliveryGlobalState.LogFunc?.Invoke(
+                $"RuntimeContentSystem.Initialize({remoteUrlRoot}, {localCachePath}, {initialContentSet})"
+            );
 
             if (string.IsNullOrEmpty(remoteUrlRoot))
             {
                 if (!string.IsNullOrEmpty(localCachePath))
                 {
-                    ContentDeliveryGlobalState.Initialize("", localCachePath, null, s =>
-                    {
-                        if (s >= ContentDeliveryGlobalState.ContentUpdateState.ContentReady)
-                            LoadCatalogFunc(ContentDeliveryGlobalState.PathRemapFuncWithFileCheck);
-                    });
+                    ContentDeliveryGlobalState.Initialize(
+                        "",
+                        localCachePath,
+                        null,
+                        s =>
+                        {
+                            if (s >= ContentDeliveryGlobalState.ContentUpdateState.ContentReady)
+                                LoadCatalogFunc(ContentDeliveryGlobalState.PathRemapFuncWithFileCheck);
+                        }
+                    );
                 }
                 else
                 {
                     //even though ENABLE_CONTENT_DELIVERY is enabled, still allow the local catalog to be used without checking for updates.
-                    LoadCatalogFunc(ContentDeliveryGlobalState.PathRemapFuncWithFileCheck = (p,d) => $"{Application.streamingAssetsPath}/{p}");
+                    LoadCatalogFunc(
+                        ContentDeliveryGlobalState.PathRemapFuncWithFileCheck = (p, d) =>
+                            $"{Application.streamingAssetsPath}/{p}"
+                    );
                 }
             }
             else
@@ -141,15 +156,20 @@ namespace Unity.Entities.Content
                 if (string.IsNullOrEmpty(localCachePath))
                     localCachePath = System.IO.Path.Combine(Application.persistentDataPath, "ContentCache");
                 //start content update process
-                ContentDeliveryGlobalState.Initialize(remoteUrlRoot, localCachePath, initialContentSet, s =>
-                {
-                    if (s >= ContentDeliveryGlobalState.ContentUpdateState.ContentReady)
-                        LoadCatalogFunc(ContentDeliveryGlobalState.PathRemapFuncWithFileCheck);
-                });
+                ContentDeliveryGlobalState.Initialize(
+                    remoteUrlRoot,
+                    localCachePath,
+                    initialContentSet,
+                    s =>
+                    {
+                        if (s >= ContentDeliveryGlobalState.ContentUpdateState.ContentReady)
+                            LoadCatalogFunc(ContentDeliveryGlobalState.PathRemapFuncWithFileCheck);
+                    }
+                );
             }
 
 #else
-            LoadCatalogFunc((p,d) => $"{Application.streamingAssetsPath}/{p}");
+            LoadCatalogFunc((p, d) => $"{Application.streamingAssetsPath}/{p}");
 #endif
         }
 
@@ -160,9 +180,11 @@ namespace Unity.Entities.Content
 
             if (ContentDeliveryGlobalState.FileExists(catalogPath))
             {
-                RuntimeContentManager.LoadLocalCatalogData(catalogPath,
+                RuntimeContentManager.LoadLocalCatalogData(
+                    catalogPath,
                     RuntimeContentManager.DefaultContentFileNameFunc,
-                    p => remapFunc(RuntimeContentManager.DefaultArchivePathFunc(p), false));
+                    p => remapFunc(RuntimeContentManager.DefaultArchivePathFunc(p), false)
+                );
             }
             else
             {

@@ -13,11 +13,13 @@ namespace UnityEngine.TestTools
     {
         private int retryCount;
 
-        public EnumerableRetryTestCommand(RetryAttribute.RetryCommand commandToReplace) : base(commandToReplace.GetInnerCommand())
+        public EnumerableRetryTestCommand(RetryAttribute.RetryCommand commandToReplace)
+            : base(commandToReplace.GetInnerCommand())
         {
-            retryCount = (int)typeof(RetryAttribute.RetryCommand)
-                .GetField("_retryCount", BindingFlags.NonPublic | BindingFlags.Instance)
-                .GetValue(commandToReplace);
+            retryCount = (int)
+                typeof(RetryAttribute.RetryCommand)
+                    .GetField("_retryCount", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(commandToReplace);
         }
 
         public override TestResult Execute(ITestExecutionContext context)

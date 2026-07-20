@@ -9,23 +9,35 @@ namespace UnityEditor.Rendering.Universal
     {
         class Styles
         {
-            public static readonly GUIContent overrideStencil =
-                EditorGUIUtility.TrTextContent("Stencil", "Process and override the Stencil buffer values.");
+            public static readonly GUIContent overrideStencil = EditorGUIUtility.TrTextContent(
+                "Stencil",
+                "Process and override the Stencil buffer values."
+            );
 
-            public static readonly GUIContent stencilValue = EditorGUIUtility.TrTextContent("Value",
-                "For each pixel, the Compare function compares this value with the value in the Stencil buffer. The function writes this value to the buffer if the Pass property is set to Replace.");
+            public static readonly GUIContent stencilValue = EditorGUIUtility.TrTextContent(
+                "Value",
+                "For each pixel, the Compare function compares this value with the value in the Stencil buffer. The function writes this value to the buffer if the Pass property is set to Replace."
+            );
 
-            public static readonly GUIContent stencilFunction = EditorGUIUtility.TrTextContent("Compare Function",
-                "For each pixel, Unity uses this function to compare the value in the Value property with the value in the Stencil buffer.");
+            public static readonly GUIContent stencilFunction = EditorGUIUtility.TrTextContent(
+                "Compare Function",
+                "For each pixel, Unity uses this function to compare the value in the Value property with the value in the Stencil buffer."
+            );
 
-            public static readonly GUIContent stencilPass =
-                EditorGUIUtility.TrTextContent("Pass", "What happens to the stencil value when passing.");
+            public static readonly GUIContent stencilPass = EditorGUIUtility.TrTextContent(
+                "Pass",
+                "What happens to the stencil value when passing."
+            );
 
-            public static readonly GUIContent stencilFail =
-                EditorGUIUtility.TrTextContent("Fail", "What happens to the stencil value when failing.");
+            public static readonly GUIContent stencilFail = EditorGUIUtility.TrTextContent(
+                "Fail",
+                "What happens to the stencil value when failing."
+            );
 
-            public static readonly GUIContent stencilZFail =
-                EditorGUIUtility.TrTextContent("Z Fail", "What happens to the stencil value when failing Z testing.");
+            public static readonly GUIContent stencilZFail = EditorGUIUtility.TrTextContent(
+                "Z Fail",
+                "What happens to the stencil value when failing Z testing."
+            );
         }
 
         //Stencil rendering
@@ -41,6 +53,7 @@ namespace UnityEditor.Rendering.Universal
         private SerializedProperty m_StencilFail;
         private SerializedProperty m_StencilZFail;
         private List<SerializedObject> m_properties = new List<SerializedObject>();
+
         void Init(SerializedProperty property)
         {
             //Stencil
@@ -69,7 +82,13 @@ namespace UnityEditor.Rendering.Universal
                 //Stencil value
                 EditorGUI.BeginChangeCheck();
                 var stencilVal = m_StencilIndex.intValue;
-                stencilVal = EditorGUI.IntSlider(rect, Styles.stencilValue, stencilVal, minStencilValue, maxStencilValue);
+                stencilVal = EditorGUI.IntSlider(
+                    rect,
+                    Styles.stencilValue,
+                    stencilVal,
+                    minStencilValue,
+                    maxStencilValue
+                );
                 if (EditorGUI.EndChangeCheck())
                     m_StencilIndex.intValue = stencilVal;
                 rect.y += EditorUtils.Styles.defaultLineSpace;

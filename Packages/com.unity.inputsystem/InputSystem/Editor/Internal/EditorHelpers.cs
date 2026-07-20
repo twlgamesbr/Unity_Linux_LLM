@@ -19,7 +19,8 @@ namespace UnityEngine.InputSystem.Editor
         public static string GetAssetGUID(Object asset)
         {
             return !AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out var assetGuid, out long _)
-                ? null : assetGuid;
+                ? null
+                : assetGuid;
         }
 
         // SerializedProperty.tooltip *should* give us the tooltip as per [Tooltip] attribute. Alas, for some
@@ -54,9 +55,10 @@ namespace UnityEngine.InputSystem.Editor
         {
             // The API here are not public. Use reflection to get to them.
             var editorApplicationType = typeof(EditorApplication);
-            var restartEditorAndRecompileScripts =
-                editorApplicationType.GetMethod("RestartEditorAndRecompileScripts",
-                    BindingFlags.NonPublic | BindingFlags.Static);
+            var restartEditorAndRecompileScripts = editorApplicationType.GetMethod(
+                "RestartEditorAndRecompileScripts",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
             if (!dryRun)
                 restartEditorAndRecompileScripts.Invoke(null, null);
             else if (restartEditorAndRecompileScripts == null)
@@ -71,8 +73,11 @@ namespace UnityEngine.InputSystem.Editor
 
             // Make path relative to project folder.
             var projectPath = Application.dataPath;
-            if (path.StartsWith(projectPath) && path.Length > projectPath.Length &&
-                (path[projectPath.Length] == '/' || path[projectPath.Length] == '\\'))
+            if (
+                path.StartsWith(projectPath)
+                && path.Length > projectPath.Length
+                && (path[projectPath.Length] == '/' || path[projectPath.Length] == '\\')
+            )
                 path = path.Substring(0, projectPath.Length + 1);
 
             return AssetDatabase.MakeEditable(path);
@@ -121,7 +126,9 @@ namespace UnityEngine.InputSystem.Editor
             if (WriteAsset(assetPath, text))
                 return true;
 
-            Debug.LogError($"Unable save asset to \"{assetPath}\" since the asset-path could not be checked-out as editable in the underlying version-control system.");
+            Debug.LogError(
+                $"Unable save asset to \"{assetPath}\" since the asset-path could not be checked-out as editable in the underlying version-control system."
+            );
             return false;
         }
 

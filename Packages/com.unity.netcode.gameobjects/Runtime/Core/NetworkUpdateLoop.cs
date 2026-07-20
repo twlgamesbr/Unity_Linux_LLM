@@ -29,40 +29,48 @@ namespace Unity.Netcode
         /// Default value
         /// </summary>
         Unset = 0,
+
         /// <summary>
         /// Very first initialization update
         /// </summary>
         Initialization = 1,
+
         /// <summary>
         /// Invoked before Fixed update
         /// </summary>
         EarlyUpdate = 2,
+
         /// <summary>
         /// Fixed Update (i.e. state machine, physics, animations, etc)
         /// </summary>
         FixedUpdate = 3,
+
         /// <summary>
         /// Updated before the Monobehaviour.Update for all components is invoked
         /// </summary>
         PreUpdate = 4,
+
         /// <summary>
         /// Updated when the Monobehaviour.Update for all components is invoked
         /// </summary>
         Update = 5,
+
         /// <summary>
         /// Updated before the Monobehaviour.LateUpdate for all components is invoked
         /// </summary>
         PreLateUpdate = 6,
+
         /// <summary>
         /// Updated after Monobehaviour.LateUpdate, but BEFORE rendering
         /// </summary>
         // Yes, these numbers are out of order due to backward compatibility requirements.
         // The enum values are listed in the order they will be called.
         PostScriptLateUpdate = 8,
+
         /// <summary>
         /// Updated after the Monobehaviour.LateUpdate for all components is invoked
         /// </summary>
-        PostLateUpdate = 7
+        PostLateUpdate = 7,
     }
 
     /// <summary>
@@ -103,7 +111,10 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="updateSystem">The <see cref="INetworkUpdateSystem"/> implementation to register for all network updates</param>
         /// <param name="updateStage">The <see cref="NetworkUpdateStage"/> being registered for the <see cref="INetworkUpdateSystem"/> implementation</param>
-        public static void RegisterNetworkUpdate(this INetworkUpdateSystem updateSystem, NetworkUpdateStage updateStage = NetworkUpdateStage.Update)
+        public static void RegisterNetworkUpdate(
+            this INetworkUpdateSystem updateSystem,
+            NetworkUpdateStage updateStage = NetworkUpdateStage.Update
+        )
         {
             var sysSet = s_UpdateSystemSets[updateStage];
             if (!sysSet.Contains(updateSystem))
@@ -147,7 +158,10 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="updateSystem">The <see cref="INetworkUpdateSystem"/> implementation to deregister from all network updates</param>
         /// <param name="updateStage">The <see cref="NetworkUpdateStage"/> to be deregistered from the <see cref="INetworkUpdateSystem"/> implementation</param>
-        public static void UnregisterNetworkUpdate(this INetworkUpdateSystem updateSystem, NetworkUpdateStage updateStage = NetworkUpdateStage.Update)
+        public static void UnregisterNetworkUpdate(
+            this INetworkUpdateSystem updateSystem,
+            NetworkUpdateStage updateStage = NetworkUpdateStage.Update
+        )
         {
             var sysSet = s_UpdateSystemSets[updateStage];
             if (sysSet.Contains(updateSystem))
@@ -199,7 +213,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkInitialization),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.Initialization)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.Initialization),
                 };
             }
         }
@@ -211,7 +225,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkEarlyUpdate),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.EarlyUpdate)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.EarlyUpdate),
                 };
             }
         }
@@ -223,7 +237,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkFixedUpdate),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.FixedUpdate)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.FixedUpdate),
                 };
             }
         }
@@ -235,7 +249,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkPreUpdate),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PreUpdate)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PreUpdate),
                 };
             }
         }
@@ -247,7 +261,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkUpdate),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.Update)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.Update),
                 };
             }
         }
@@ -259,7 +273,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkPreLateUpdate),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PreLateUpdate)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PreLateUpdate),
                 };
             }
         }
@@ -271,7 +285,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkPostScriptLateUpdate),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PostScriptLateUpdate)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PostScriptLateUpdate),
                 };
             }
         }
@@ -283,7 +297,7 @@ namespace Unity.Netcode
                 return new PlayerLoopSystem
                 {
                     type = typeof(NetworkPostLateUpdate),
-                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PostLateUpdate)
+                    updateDelegate = () => RunNetworkUpdateStage(NetworkUpdateStage.PostLateUpdate),
                 };
             }
         }
@@ -309,10 +323,15 @@ namespace Unity.Netcode
         private enum LoopSystemPosition
         {
             After,
-            Before
+            Before,
         }
 
-        private static bool TryAddLoopSystem(ref PlayerLoopSystem parentLoopSystem, PlayerLoopSystem childLoopSystem, Type anchorSystemType, LoopSystemPosition loopSystemPosition)
+        private static bool TryAddLoopSystem(
+            ref PlayerLoopSystem parentLoopSystem,
+            PlayerLoopSystem childLoopSystem,
+            Type anchorSystemType,
+            LoopSystemPosition loopSystemPosition
+        )
         {
             int systemPosition = -1;
             if (anchorSystemType != null)
@@ -329,7 +348,8 @@ namespace Unity.Netcode
             }
             else
             {
-                systemPosition = loopSystemPosition == LoopSystemPosition.After ? parentLoopSystem.subSystemList.Length : 0;
+                systemPosition =
+                    loopSystemPosition == LoopSystemPosition.After ? parentLoopSystem.subSystemList.Length : 0;
             }
 
             if (systemPosition == -1)
@@ -350,7 +370,13 @@ namespace Unity.Netcode
             // + systemsAfter
             if (systemPosition < parentLoopSystem.subSystemList.Length)
             {
-                Array.Copy(parentLoopSystem.subSystemList, systemPosition, newSubsystemList, systemPosition + 1, parentLoopSystem.subSystemList.Length - systemPosition);
+                Array.Copy(
+                    parentLoopSystem.subSystemList,
+                    systemPosition,
+                    newSubsystemList,
+                    systemPosition + 1,
+                    parentLoopSystem.subSystemList.Length - systemPosition
+                );
             }
             // end = systemsBefore + childSystem + systemsAfter
 
@@ -388,7 +414,13 @@ namespace Unity.Netcode
             // + systemsAfter
             if (systemPosition < parentLoopSystem.subSystemList.Length - 1)
             {
-                Array.Copy(parentLoopSystem.subSystemList, systemPosition + 1, newSubsystemList, systemPosition, parentLoopSystem.subSystemList.Length - systemPosition - 1);
+                Array.Copy(
+                    parentLoopSystem.subSystemList,
+                    systemPosition + 1,
+                    newSubsystemList,
+                    systemPosition,
+                    parentLoopSystem.subSystemList.Length - systemPosition - 1
+                );
             }
             // end = systemsBefore + systemsAfter
 
@@ -407,32 +439,72 @@ namespace Unity.Netcode
 
                 if (currentSystem.type == typeof(Initialization))
                 {
-                    TryAddLoopSystem(ref currentSystem, NetworkInitialization.CreateLoopSystem(), null, LoopSystemPosition.After);
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkInitialization.CreateLoopSystem(),
+                        null,
+                        LoopSystemPosition.After
+                    );
                 }
                 else if (currentSystem.type == typeof(EarlyUpdate))
                 {
-                    TryAddLoopSystem(ref currentSystem, NetworkEarlyUpdate.CreateLoopSystem(), typeof(EarlyUpdate.ScriptRunDelayedStartupFrame), LoopSystemPosition.Before);
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkEarlyUpdate.CreateLoopSystem(),
+                        typeof(EarlyUpdate.ScriptRunDelayedStartupFrame),
+                        LoopSystemPosition.Before
+                    );
                 }
                 else if (currentSystem.type == typeof(FixedUpdate))
                 {
-                    TryAddLoopSystem(ref currentSystem, NetworkFixedUpdate.CreateLoopSystem(), typeof(FixedUpdate.ScriptRunBehaviourFixedUpdate), LoopSystemPosition.Before);
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkFixedUpdate.CreateLoopSystem(),
+                        typeof(FixedUpdate.ScriptRunBehaviourFixedUpdate),
+                        LoopSystemPosition.Before
+                    );
                 }
                 else if (currentSystem.type == typeof(PreUpdate))
                 {
-                    TryAddLoopSystem(ref currentSystem, NetworkPreUpdate.CreateLoopSystem(), typeof(PreUpdate.PhysicsUpdate), LoopSystemPosition.Before);
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkPreUpdate.CreateLoopSystem(),
+                        typeof(PreUpdate.PhysicsUpdate),
+                        LoopSystemPosition.Before
+                    );
                 }
                 else if (currentSystem.type == typeof(Update))
                 {
-                    TryAddLoopSystem(ref currentSystem, NetworkUpdate.CreateLoopSystem(), typeof(Update.ScriptRunBehaviourUpdate), LoopSystemPosition.Before);
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkUpdate.CreateLoopSystem(),
+                        typeof(Update.ScriptRunBehaviourUpdate),
+                        LoopSystemPosition.Before
+                    );
                 }
                 else if (currentSystem.type == typeof(PreLateUpdate))
                 {
-                    TryAddLoopSystem(ref currentSystem, NetworkPreLateUpdate.CreateLoopSystem(), typeof(PreLateUpdate.ScriptRunBehaviourLateUpdate), LoopSystemPosition.Before);
-                    TryAddLoopSystem(ref currentSystem, NetworkPostScriptLateUpdate.CreateLoopSystem(), typeof(PreLateUpdate.ScriptRunBehaviourLateUpdate), LoopSystemPosition.After);
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkPreLateUpdate.CreateLoopSystem(),
+                        typeof(PreLateUpdate.ScriptRunBehaviourLateUpdate),
+                        LoopSystemPosition.Before
+                    );
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkPostScriptLateUpdate.CreateLoopSystem(),
+                        typeof(PreLateUpdate.ScriptRunBehaviourLateUpdate),
+                        LoopSystemPosition.After
+                    );
                 }
                 else if (currentSystem.type == typeof(PostLateUpdate))
                 {
-                    TryAddLoopSystem(ref currentSystem, NetworkPostLateUpdate.CreateLoopSystem(), typeof(PostLateUpdate.PlayerSendFrameComplete), LoopSystemPosition.After);
+                    TryAddLoopSystem(
+                        ref currentSystem,
+                        NetworkPostLateUpdate.CreateLoopSystem(),
+                        typeof(PostLateUpdate.PlayerSendFrameComplete),
+                        LoopSystemPosition.After
+                    );
                 }
             }
 

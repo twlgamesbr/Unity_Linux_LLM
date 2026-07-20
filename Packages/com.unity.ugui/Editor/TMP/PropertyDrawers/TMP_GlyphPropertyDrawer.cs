@@ -1,17 +1,21 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.TextCore;
-using UnityEditor;
-
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomPropertyDrawer(typeof(Glyph))]
     public class TMP_GlyphPropertyDrawer : PropertyDrawer
     {
         private static readonly GUIContent k_ScaleLabel = new GUIContent("Scale:", "The scale of this glyph.");
-        private static readonly GUIContent k_AtlasIndexLabel = new GUIContent("Atlas Index:", "The index of the atlas texture that contains this glyph.");
-        private static readonly GUIContent k_ClassTypeLabel = new GUIContent("Class Type:", "The class definition type of this glyph.");
+        private static readonly GUIContent k_AtlasIndexLabel = new GUIContent(
+            "Atlas Index:",
+            "The index of the atlas texture that contains this glyph."
+        );
+        private static readonly GUIContent k_ClassTypeLabel = new GUIContent(
+            "Class Type:",
+            "The class definition type of this glyph."
+        );
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -28,7 +32,11 @@ namespace TMPro.EditorUtilities
             Rect rect = new Rect(position.x + 70, position.y, position.width, 49);
 
             float labelWidth = GUI.skin.label.CalcSize(new GUIContent("ID: " + prop_GlyphIndex.intValue)).x;
-            EditorGUI.LabelField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 85, 64f, 18f), new GUIContent("ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"), style);
+            EditorGUI.LabelField(
+                new Rect(position.x + (64 - labelWidth) / 2, position.y + 85, 64f, 18f),
+                new GUIContent("ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"),
+                style
+            );
 
             // We get Rect since a valid position may not be provided by the caller.
             EditorGUI.PropertyField(new Rect(rect.x, rect.y, position.width, 49), prop_GlyphRect);
@@ -46,7 +54,11 @@ namespace TMPro.EditorUtilities
             {
                 EditorGUIUtility.labelWidth = 70f;
                 float minWidth = Mathf.Max(90, rect.width - 270);
-                EditorGUI.PropertyField(new Rect(rect.x + 190, rect.y + 65, minWidth, 18), prop_ClassDefinitionType, k_ClassTypeLabel);
+                EditorGUI.PropertyField(
+                    new Rect(rect.x + 190, rect.y + 65, minWidth, 18),
+                    prop_ClassDefinitionType,
+                    k_ClassTypeLabel
+                );
             }
 
             DrawGlyph(new Rect(position.x, position.y + 2, 64, 80), property);
@@ -67,7 +79,10 @@ namespace TMPro.EditorUtilities
             Texture2D atlasTexture;
             int atlasIndex = property.FindPropertyRelative("m_AtlasIndex").intValue;
             int padding = so.FindProperty("m_AtlasPadding").intValue;
-            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, atlasIndex, out atlasTexture) == false)
+            if (
+                TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, atlasIndex, out atlasTexture)
+                == false
+            )
                 return;
 
             Material mat;
@@ -88,7 +103,12 @@ namespace TMPro.EditorUtilities
             float scale = glyphDrawPosition.width / normalizedHeight;
 
             // Compute the normalized texture coordinates
-            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
+            Rect texCoords = new Rect(
+                (float)glyphOriginX / atlasTexture.width,
+                (float)glyphOriginY / atlasTexture.height,
+                (float)glyphWidth / atlasTexture.width,
+                (float)glyphHeight / atlasTexture.height
+            );
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -98,7 +118,17 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.height = glyphHeight * scale;
 
                 // Could switch to using the default material of the font asset which would require passing scale to the shader.
-                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
+                Graphics.DrawTexture(
+                    glyphDrawPosition,
+                    atlasTexture,
+                    texCoords,
+                    0,
+                    0,
+                    0,
+                    0,
+                    new Color(1f, 1f, 1f),
+                    mat
+                );
             }
         }
     }

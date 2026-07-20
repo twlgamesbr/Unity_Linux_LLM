@@ -180,7 +180,9 @@ namespace UnityEngine.TestTools.Logging
             ProcessExpectedLogs();
             if (FailingLogs.Any())
             {
-                var failureInWrongOrder = FailingLogs.FirstOrDefault(log => ExpectedLogs.Any(expected => expected.Matches(log)));
+                var failureInWrongOrder = FailingLogs.FirstOrDefault(log =>
+                    ExpectedLogs.Any(expected => expected.Matches(log))
+                );
                 if (failureInWrongOrder != null)
                 {
                     var nextExpected = ExpectedLogs.Peek();

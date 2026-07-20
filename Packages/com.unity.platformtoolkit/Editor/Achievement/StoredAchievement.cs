@@ -28,7 +28,9 @@ namespace Unity.PlatformToolkit.Editor
                 var tempValue = value.Trim();
                 if (tempValue.Length > AchievementEditor.AchievementCharacterLimit)
                 {
-                    Debug.LogWarning($"Character limit exceeded in achievement ID. Limit: {AchievementEditor.AchievementCharacterLimit}.");
+                    Debug.LogWarning(
+                        $"Character limit exceeded in achievement ID. Limit: {AchievementEditor.AchievementCharacterLimit}."
+                    );
                     return;
                 }
                 if (Regex.IsMatch(tempValue, AchievementEditor.CommonIdRegexPattern) || tempValue.Length == 0)
@@ -37,7 +39,9 @@ namespace Unity.PlatformToolkit.Editor
                 }
                 else
                 {
-                    Debug.LogWarning($"Illegal character used in achievement ID. The only allowed characters are: {AchievementEditor.CommonIdRegexPattern}.");
+                    Debug.LogWarning(
+                        $"Illegal character used in achievement ID. The only allowed characters are: {AchievementEditor.CommonIdRegexPattern}."
+                    );
                 }
             }
         }
@@ -73,11 +77,14 @@ namespace Unity.PlatformToolkit.Editor
             var implementationData = new Dictionary<string, ImplementationData>();
             foreach (var keyValuePair in m_ImplementationData)
             {
-                implementationData.Add(keyValuePair.Key, new ImplementationData()
-                {
-                    ConfigurationData = keyValuePair.Value.ConfigurationData,
-                    Ignore = keyValuePair.Value.Ignore,
-                });
+                implementationData.Add(
+                    keyValuePair.Key,
+                    new ImplementationData()
+                    {
+                        ConfigurationData = keyValuePair.Value.ConfigurationData,
+                        Ignore = keyValuePair.Value.Ignore,
+                    }
+                );
             }
             return new StoredAchievement()
             {
@@ -94,7 +101,8 @@ namespace Unity.PlatformToolkit.Editor
         [SerializeField]
         private List<ImplementationData> implementationDataValues;
 
-        private Dictionary<string, ImplementationData> m_ImplementationData = new Dictionary<string, ImplementationData>();
+        private Dictionary<string, ImplementationData> m_ImplementationData =
+            new Dictionary<string, ImplementationData>();
 
         public ImplementationData GetImplementationData(string implementationKey)
         {
@@ -121,7 +129,10 @@ namespace Unity.PlatformToolkit.Editor
 
         public void SetConfigurationData(string implementationKey, string data)
         {
-            if (m_ImplementationData.TryGetValue(implementationKey, out var oldData) && oldData.ConfigurationData == data)
+            if (
+                m_ImplementationData.TryGetValue(implementationKey, out var oldData)
+                && oldData.ConfigurationData == data
+            )
                 return;
 
             m_ImplementationData[implementationKey].ConfigurationData = data;

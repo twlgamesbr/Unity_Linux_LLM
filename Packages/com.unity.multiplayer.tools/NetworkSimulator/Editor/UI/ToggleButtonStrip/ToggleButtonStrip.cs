@@ -16,12 +16,14 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
         IEnumerable<string> labels { get; set; }
         Type enumType { get; set; }
     }
+
 #if UNITY_2023_3_OR_NEWER
     [UxmlElement]
 #endif
     partial class ToggleButtonStrip : BaseField<string>, IToggleButtonStrip
     {
-        static readonly string s_UssPath = "Packages/com.unity.multiplayer.tools/NetworkSimulator/Editor/UI/ToggleButtonStrip/ToggleButtonStrip.uss";
+        static readonly string s_UssPath =
+            "Packages/com.unity.multiplayer.tools/NetworkSimulator/Editor/UI/ToggleButtonStrip/ToggleButtonStrip.uss";
         static readonly string s_UssClassName = "unity-toggle-button-strip";
         ButtonStrip m_ButtonStrip;
 
@@ -31,20 +33,21 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
         int m_PseudoStatesCheckedValue = k_InvalidEnumValue;
         int m_PseudoStatesFocusValue = k_InvalidEnumValue;
         int m_VersionChangeTypeStylesValue = k_InvalidEnumValue;
+
 #if !UNITY_2023_3_OR_NEWER
         new class UxmlFactory : UxmlFactory<ToggleButtonStrip, UxmlTraits> { }
 
         new class UxmlTraits : VisualElement.UxmlTraits
         {
-            public UxmlTraits()
-            {
-            }
+            public UxmlTraits() { }
+
             public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
             {
                 base.Init(ve, bag, cc);
             }
         }
 #endif
+
         public IEnumerable<string> choices
         {
             get { return m_ButtonStrip.choices; }
@@ -65,9 +68,11 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 
         public Type enumType { get; set; }
 
-        public ToggleButtonStrip() : this(null, null) { }
+        public ToggleButtonStrip()
+            : this(null, null) { }
 
-        public ToggleButtonStrip(string label, IList<string> choices) : base(label, null)
+        public ToggleButtonStrip(string label, IList<string> choices)
+            : base(label, null)
         {
             AddToClassList(s_UssClassName);
             styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(s_UssPath));
@@ -76,17 +81,27 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
             Add(m_ButtonStrip);
             this.choices = choices;
 
-            m_IncrementVersionMethod = typeof(VisualElement).GetMethod("IncrementVersion", BindingFlags.Instance | BindingFlags.NonPublic);
-            m_PseudoStatesProperty = typeof(VisualElement).GetProperty("pseudoStates", BindingFlags.Instance | BindingFlags.NonPublic);
+            m_IncrementVersionMethod = typeof(VisualElement).GetMethod(
+                "IncrementVersion",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            m_PseudoStatesProperty = typeof(VisualElement).GetProperty(
+                "pseudoStates",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
             if (m_IncrementVersionMethod != null)
             {
-                m_VersionChangeTypeStylesValue = GetIncrementVersion(m_IncrementVersionMethod.GetParameters()[0].ParameterType.GetEnumValues());
+                m_VersionChangeTypeStylesValue = GetIncrementVersion(
+                    m_IncrementVersionMethod.GetParameters()[0].ParameterType.GetEnumValues()
+                );
             }
 
             if (m_PseudoStatesProperty != null)
             {
-                (m_PseudoStatesCheckedValue, m_PseudoStatesFocusValue) = GetPseudoStatesValues(m_PseudoStatesProperty.PropertyType.GetEnumValues());
+                (m_PseudoStatesCheckedValue, m_PseudoStatesFocusValue) = GetPseudoStatesValues(
+                    m_PseudoStatesProperty.PropertyType.GetEnumValues()
+                );
             }
         }
 
@@ -109,21 +124,27 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 
         void ToggleButtonStates(Button button)
         {
-            if (m_IncrementVersionMethod == null
+            if (
+                m_IncrementVersionMethod == null
                 || m_PseudoStatesProperty == null
                 || m_VersionChangeTypeStylesValue == k_InvalidEnumValue
                 || m_PseudoStatesCheckedValue == k_InvalidEnumValue
-                || m_PseudoStatesFocusValue == k_InvalidEnumValue)
+                || m_PseudoStatesFocusValue == k_InvalidEnumValue
+            )
             {
                 return;
             }
 
-            m_ButtonStrip.Query<Button>().ForEach((b) =>
-            {
-                var pseudoStates = (int)m_PseudoStatesProperty.GetValue(b);
-                pseudoStates &= ~m_PseudoStatesCheckedValue;
-                m_PseudoStatesProperty.SetValue(b, pseudoStates);
-            });
+            m_ButtonStrip
+                .Query<Button>()
+                .ForEach(
+                    (b) =>
+                    {
+                        var pseudoStates = (int)m_PseudoStatesProperty.GetValue(b);
+                        pseudoStates &= ~m_PseudoStatesCheckedValue;
+                        m_PseudoStatesProperty.SetValue(b, pseudoStates);
+                    }
+                );
 
             var pseudoStates = (int)m_PseudoStatesProperty.GetValue(button);
             pseudoStates |= m_PseudoStatesCheckedValue;

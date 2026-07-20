@@ -17,7 +17,8 @@ namespace UnityEngine.Rendering
             out RectInt main,
             out RectInt topRow,
             out RectInt rightCol,
-            out RectInt topRight)
+            out RectInt topRight
+        )
         {
             if (src.width < tileSize || src.height < tileSize)
             {
@@ -45,21 +46,21 @@ namespace UnityEngine.Rendering
                 x = src.x,
                 y = src.y + mainHeight,
                 width = mainWidth,
-                height = src.height - mainHeight
+                height = src.height - mainHeight,
             };
             rightCol = new RectInt
             {
                 x = src.x + mainWidth,
                 y = src.y,
                 width = src.width - mainWidth,
-                height = mainHeight
+                height = mainHeight,
             };
             topRight = new RectInt
             {
                 x = src.x + mainWidth,
                 y = src.y + mainHeight,
                 width = src.width - mainWidth,
-                height = src.height - mainHeight
+                height = src.height - mainHeight,
             };
 
             return true;
@@ -71,11 +72,7 @@ namespace UnityEngine.Rendering
         /// <param name="main">Computed main area</param>
         /// <param name="other">Computed other area</param>
         /// <returns>If true, the tiles decomposition is a success</returns>
-        public static bool TryLayoutByRow(
-            RectInt src,
-            uint tileSize,
-            out RectInt main,
-            out RectInt other)
+        public static bool TryLayoutByRow(RectInt src, uint tileSize, out RectInt main, out RectInt other)
         {
             if (src.height < tileSize)
             {
@@ -99,7 +96,7 @@ namespace UnityEngine.Rendering
                 x = src.x,
                 y = src.y + mainHeight,
                 width = src.width,
-                height = src.height - mainHeight
+                height = src.height - mainHeight,
             };
 
             return true;
@@ -111,11 +108,7 @@ namespace UnityEngine.Rendering
         /// <param name="main">Computed main area</param>
         /// <param name="other">Computed other area</param>
         /// <returns>If true, the tiles decomposition is a success</returns>
-        public static bool TryLayoutByCol(
-            RectInt src,
-            uint tileSize,
-            out RectInt main,
-            out RectInt other)
+        public static bool TryLayoutByCol(RectInt src, uint tileSize, out RectInt main, out RectInt other)
         {
             if (src.width < tileSize)
             {
@@ -139,7 +132,7 @@ namespace UnityEngine.Rendering
                 x = src.x + mainWidth,
                 y = src.y,
                 width = src.width - mainWidth,
-                height = src.height
+                height = src.height,
             };
 
             return true;

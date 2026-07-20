@@ -29,9 +29,10 @@ namespace UnityEditor.TestTools.TestRunner
                 str.AppendLine(string.Concat("Options: ", BuildPlayerWithProfileOptions.options.ToString()));
                 str.AppendLine("assetBundleManifestPath = " + BuildPlayerWithProfileOptions.assetBundleManifestPath);
                 str.Append((buildProfile.overrideGlobalScenes) ? "Profile Scenes: " : "Global Scenes: ");
-                var scenes = (buildProfile.overrideGlobalScenes)
-                    ? buildProfile.scenes
-                    : EditorBuildSettings.GetEditorBuildSettingsSceneIgnoreProfile();
+                var scenes =
+                    (buildProfile.overrideGlobalScenes)
+                        ? buildProfile.scenes
+                        : EditorBuildSettings.GetEditorBuildSettingsSceneIgnoreProfile();
                 for (int i = 0; i < scenes.Length; i++)
                 {
                     str.Append(JsonUtility.ToJson(scenes[i]));
@@ -48,8 +49,13 @@ namespace UnityEditor.TestTools.TestRunner
             str.AppendLine("scenes = " + string.Join(", ", BuildPlayerOptions.scenes));
             str.AppendLine("assetBundleManifestPath = " + BuildPlayerOptions.assetBundleManifestPath);
             str.AppendLine("options.Development = " + ((BuildPlayerOptions.options & BuildOptions.Development) != 0));
-            str.AppendLine("options.AutoRunPlayer = " + ((BuildPlayerOptions.options & BuildOptions.AutoRunPlayer) != 0));
-            str.AppendLine("options.ForceEnableAssertions = " + ((BuildPlayerOptions.options & BuildOptions.ForceEnableAssertions) != 0));
+            str.AppendLine(
+                "options.AutoRunPlayer = " + ((BuildPlayerOptions.options & BuildOptions.AutoRunPlayer) != 0)
+            );
+            str.AppendLine(
+                "options.ForceEnableAssertions = "
+                    + ((BuildPlayerOptions.options & BuildOptions.ForceEnableAssertions) != 0)
+            );
             return str.ToString();
         }
 
@@ -83,11 +89,8 @@ namespace UnityEditor.TestTools.TestRunner
             var profile = BuildPlayerWithProfileOptions.buildProfile;
 
             // Initial test scene must be first entry in scene list.
-            var scenes = new List<EditorBuildSettingsScene>
-            {
-                new EditorBuildSettingsScene(testScenePath, true)
-            };
-            
+            var scenes = new List<EditorBuildSettingsScene> { new EditorBuildSettingsScene(testScenePath, true) };
+
             if (profile.overrideGlobalScenes)
             {
                 originalScenes = profile.scenes;

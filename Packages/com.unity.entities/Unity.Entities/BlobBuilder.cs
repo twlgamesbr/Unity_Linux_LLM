@@ -11,7 +11,8 @@ namespace Unity.Entities
     /// </summary>
     /// <remarks>Use this reference to initialize the data of a newly created <see cref="BlobArray{T}"/>.</remarks>
     /// <typeparam name="T">The data type of the elements in the array.</typeparam>
-    public unsafe ref struct BlobBuilderArray<T> where T : struct
+    public unsafe ref struct BlobBuilderArray<T>
+        where T : struct
     {
         private void* m_data;
         private int m_length;
@@ -31,7 +32,9 @@ namespace Unity.Entities
         private void CheckIndexOutOfRange(int index)
         {
             if (0 > index || index >= m_length)
-                throw new IndexOutOfRangeException(string.Format("Index {0} is out of range of '{1}' Length.", (object)index, (object)this.m_length));
+                throw new IndexOutOfRangeException(
+                    string.Format("Index {0} is out of range of '{1}' Length.", (object)index, (object)this.m_length)
+                );
         }
 
         /// <summary>
@@ -101,7 +104,7 @@ namespace Unity.Entities
     /// <example>
     /// <code source="../DocCodeSamples.Tests/BlobAssetExamples.cs" region="builderclassexample" title="BlobBuilder Example"/>
     /// </example>
-    unsafe public partial struct BlobBuilder : IDisposable
+    public unsafe partial struct BlobBuilder : IDisposable
     {
         AllocatorManager.AllocatorHandle m_allocator;
         NativeList<BlobAllocation> m_allocations;
@@ -155,7 +158,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <typeparam name="T">A struct that defines the structure of the blob asset.</typeparam>
         /// <returns>A reference to the blob data under construction.</returns>
-        public ref T ConstructRoot<T>() where T : struct
+        public ref T ConstructRoot<T>()
+            where T : struct
         {
             var allocation = Allocate(UnsafeUtility.SizeOf<T>(), UnsafeUtility.AlignOf<T>());
             return ref UnsafeUtility.AsRef<T>(AllocationToPointer(allocation));
@@ -168,7 +172,8 @@ namespace Unity.Entities
         /// <param name="data">An array  containing structs of type <typeparamref name="T"/>.</param>
         /// <typeparam name="T">The struct data type.</typeparam>
         /// <returns>A reference to the newly constructed array as a mutable BlobBuilderArray instance.</returns>
-        public BlobBuilderArray<T> Construct<T>(ref BlobArray<T> blobArray, params T[] data) where T : struct
+        public BlobBuilderArray<T> Construct<T>(ref BlobArray<T> blobArray, params T[] data)
+            where T : struct
         {
             var constructBlobArray = Allocate(ref blobArray, data.Length);
             for (int i = 0; i != data.Length; i++)
@@ -183,7 +188,8 @@ namespace Unity.Entities
         /// <param name="length">The number of elements to allocate.</param>
         /// <typeparam name="T">The struct data type.</typeparam>
         /// <returns>A reference to the newly allocated array as a mutable BlobBuilderArray instance.</returns>
-        public BlobBuilderArray<T> Allocate<T>(ref BlobArray<T> ptr, int length) where T : struct
+        public BlobBuilderArray<T> Allocate<T>(ref BlobArray<T> ptr, int length)
+            where T : struct
         {
             return Allocate(ref ptr, length, UnsafeUtility.AlignOf<T>());
         }
@@ -196,7 +202,8 @@ namespace Unity.Entities
         /// <param name="alignment">The alignment of the allocated memory.</param>
         /// <typeparam name="T">The struct data type.</typeparam>
         /// <returns>A reference to the newly allocated array as a mutable BlobBuilderArray instance.</returns>
-        public BlobBuilderArray<T> Allocate<T>(ref BlobArray<T> ptr, int length, int alignment) where T : struct
+        public BlobBuilderArray<T> Allocate<T>(ref BlobArray<T> ptr, int length, int alignment)
+            where T : struct
         {
             if (length <= 0)
                 return new BlobBuilderArray<T>(null, 0);
@@ -217,7 +224,7 @@ namespace Unity.Entities
             {
                 offsetPtr = offsetPtr,
                 target = allocation,
-                length = length
+                length = length,
             };
 
             m_patches.Add(patch);
@@ -230,7 +237,8 @@ namespace Unity.Entities
         /// <param name="ptr">A reference to a blob pointer field in a blob asset.</param>
         /// <typeparam name="T">The struct data type.</typeparam>
         /// <returns>A reference to the newly allocated struct.</returns>
-        public ref T Allocate<T>(ref BlobPtr<T> ptr) where T : struct
+        public ref T Allocate<T>(ref BlobPtr<T> ptr)
+            where T : struct
         {
             var offsetPtr = (int*)UnsafeUtility.AddressOf(ref ptr.m_OffsetPtr);
 
@@ -242,7 +250,7 @@ namespace Unity.Entities
             {
                 offsetPtr = offsetPtr,
                 target = allocation,
-                length = 0
+                length = 0,
             };
 
             m_patches.Add(patch);
@@ -257,7 +265,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of the object stored in the blob.</typeparam>
         /// <returns>A reference to obj.</returns>
         /// <exception cref="ArgumentException">Throws if the object is not part of the blob.</exception>
-        public ref T SetPointer<T>(ref BlobPtr<T> ptr, ref T obj) where T : struct
+        public ref T SetPointer<T>(ref BlobPtr<T> ptr, ref T obj)
+            where T : struct
         {
             var offsetPtr = (int*)UnsafeUtility.AddressOf(ref ptr.m_OffsetPtr);
             var objTargetPtr = UnsafeUtility.AddressOf(ref obj);
@@ -270,24 +279,26 @@ namespace Unity.Entities
                 {
                     offsetPtr = offsetPtr,
                     target = target,
-                    length = 0
+                    length = 0,
                 };
 
                 m_patches.Add(patch);
             }
             else
             {
-                throw new System.ArgumentException("Reference object is not a part of the blob; can only create BlobPtr to objects inside a blob");
+                throw new System.ArgumentException(
+                    "Reference object is not a part of the blob; can only create BlobPtr to objects inside a blob"
+                );
             }
 
             return ref obj;
         }
 
-
         struct SortedIndex : IComparable<SortedIndex>
         {
             public byte* p;
             public int index;
+
             public int CompareTo(SortedIndex other)
             {
                 return ((ulong)p).CompareTo((ulong)other.p);
@@ -305,7 +316,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The data type of the struct used to construct the asset's root. Use the same struct type
         /// that you used when calling <see cref="ConstructRoot{T}"/>.</typeparam>
         /// <returns>Returns a reference to the blob asset in unmanaged memory.</returns>
-        public BlobAssetReference<T> CreateBlobAssetReference<T>(AllocatorManager.AllocatorHandle allocator) where T : unmanaged
+        public BlobAssetReference<T> CreateBlobAssetReference<T>(AllocatorManager.AllocatorHandle allocator)
+            where T : unmanaged
         {
             // Avoid crash when there are no chunks (DOTS-8681)
             if (m_currentChunkIndex != -1)
@@ -321,14 +333,14 @@ namespace Unity.Entities
             for (int i = 0; i < m_allocations.Length; ++i)
             {
                 offsets[i + 1] = offsets[i] + m_allocations[i].size;
-                sortedAllocs[i] = new SortedIndex {p = m_allocations[i].p, index = i};
+                sortedAllocs[i] = new SortedIndex { p = m_allocations[i].p, index = i };
             }
             int dataSize = offsets[m_allocations.Length];
 
             sortedAllocs.Sort();
             var sortedPatches = new NativeArray<SortedIndex>(m_patches.Length, Allocator.Temp);
             for (int i = 0; i < m_patches.Length; ++i)
-                sortedPatches[i] = new SortedIndex {p = (byte*)m_patches[i].offsetPtr, index = i};
+                sortedPatches[i] = new SortedIndex { p = (byte*)m_patches[i].offsetPtr, index = i };
             sortedPatches.Sort();
 
             byte* buffer = (byte*)Memory.Unmanaged.Allocate(sizeof(BlobAssetHeader) + dataSize, 16, allocator);
@@ -413,8 +425,8 @@ namespace Unity.Entities
                 var allocIndex = m_allocations.Length;
                 var mem = (byte*)Memory.Unmanaged.Allocate(size, alignment, m_allocator);
                 UnsafeUtility.MemClear(mem, size);
-                m_allocations.Add(new BlobAllocation {p = mem, size = size});
-                return new BlobDataRef {allocIndex = allocIndex, offset = 0};
+                m_allocations.Add(new BlobAllocation { p = mem, size = size });
+                return new BlobDataRef { allocIndex = allocIndex, offset = 0 };
             }
 
             BlobAllocation alloc = EnsureEnoughRoomInChunk(size, alignment);
@@ -423,7 +435,7 @@ namespace Unity.Entities
             UnsafeUtility.MemClear(alloc.p + alloc.size, size);
             alloc.size += size;
             m_allocations[m_currentChunkIndex] = alloc;
-            return new BlobDataRef {allocIndex = m_currentChunkIndex, offset = offset};
+            return new BlobDataRef { allocIndex = m_currentChunkIndex, offset = offset };
         }
 
         BlobAllocation AllocateNewChunk()
@@ -435,7 +447,11 @@ namespace Unity.Entities
             }
 
             m_currentChunkIndex = m_allocations.Length;
-            var alloc = new BlobAllocation {p = (byte*)Memory.Unmanaged.Allocate(m_chunkSize, 16, m_allocator), size = 0};
+            var alloc = new BlobAllocation
+            {
+                p = (byte*)Memory.Unmanaged.Allocate(m_chunkSize, 16, m_allocator),
+                size = 0,
+            };
             m_allocations.Add(alloc);
             return alloc;
         }
@@ -452,22 +468,20 @@ namespace Unity.Entities
                     return;
             }
 
-            throw new InvalidOperationException("The BlobArray passed to Allocate was not allocated by this BlobBuilder or the struct that embeds it was copied by value instead of by ref.");
+            throw new InvalidOperationException(
+                "The BlobArray passed to Allocate was not allocated by this BlobBuilder or the struct that embeds it was copied by value instead of by ref."
+            );
         }
 
         private bool GetPatchTarget(void* address, out BlobDataRef blobDataRef)
         {
             // Search backwards; most likely to be referring to objects that were most recently added..
-            for (int i = m_allocations.Length-1; i >= 0; i--)
+            for (int i = m_allocations.Length - 1; i >= 0; i--)
             {
                 var allocation = m_allocations[i];
                 if (address >= allocation.p && address < (allocation.p + allocation.size))
                 {
-                    blobDataRef = new BlobDataRef
-                    {
-                        allocIndex = i,
-                        offset = (int)((byte*)address - allocation.p),
-                    };
+                    blobDataRef = new BlobDataRef { allocIndex = i, offset = (int)((byte*)address - allocation.p) };
 
                     return true;
                 }
@@ -480,8 +494,7 @@ namespace Unity.Entities
         /// <summary>
         /// Returns true if this BlobBuilder has been allocated.
         /// </summary>
-        public readonly bool IsCreated
-            => m_allocations.IsCreated;
+        public readonly bool IsCreated => m_allocations.IsCreated;
 
         /// <summary>
         /// Disposes of this BlobBuilder instance and frees its temporary memory allocations.
@@ -501,7 +514,7 @@ namespace Unity.Entities
             var oldSize = chunk.size;
             chunk.size = CollectionHelper.Align(chunk.size, 16);
             m_allocations[chunkIndex] = chunk;
-            UnsafeUtility.MemSet(chunk.p + oldSize, 0, chunk.size-oldSize);
+            UnsafeUtility.MemSet(chunk.p + oldSize, 0, chunk.size - oldSize);
         }
     }
 }

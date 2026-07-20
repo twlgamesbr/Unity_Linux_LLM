@@ -26,9 +26,18 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             m_GeometryPool.Dispose();
         }
 
-        public PersistentGpuArray<RTInstance> instanceBuffer  { get => m_InstanceBuffer; }
-        public IReadOnlyCollection<InstanceEntry> instances { get => m_Instances.Values; }
-        public GeometryPool geometryPool { get => m_GeometryPool; }
+        public PersistentGpuArray<RTInstance> instanceBuffer
+        {
+            get => m_InstanceBuffer;
+        }
+        public IReadOnlyCollection<InstanceEntry> instances
+        {
+            get => m_Instances.Values;
+        }
+        public GeometryPool geometryPool
+        {
+            get => m_GeometryPool;
+        }
 
         public int AddInstance(MeshInstanceDesc meshInstance, uint materialID, uint renderingLayerMask)
         {
@@ -37,7 +46,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return slot.block.offset;
         }
 
-        public int AddInstances(Span<MeshInstanceDesc> meshInstances, Span<uint> materialIDs, Span<uint> renderingLayerMask)
+        public int AddInstances(
+            Span<MeshInstanceDesc> meshInstances,
+            Span<uint> materialIDs,
+            Span<uint> renderingLayerMask
+        )
         {
             Assert.IsTrue(meshInstances.Length == materialIDs.Length);
 
@@ -49,7 +62,12 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return slots[0].block.offset;
         }
 
-        void AddInstance(BlockAllocator.Allocation slotAllocation, in MeshInstanceDesc meshInstance, uint materialID, uint renderingLayerMask)
+        void AddInstance(
+            BlockAllocator.Allocation slotAllocation,
+            in MeshInstanceDesc meshInstance,
+            uint materialID,
+            uint renderingLayerMask
+        )
         {
             Debug.Assert(meshInstance.mesh != null, "targetRenderer.mesh is null");
 
@@ -60,7 +78,8 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             float localToWorldDet = meshInstance.localToWorldMatrix.determinant;
 
-             m_InstanceBuffer.Set(slotAllocation,
+            m_InstanceBuffer.Set(
+                slotAllocation,
                 new RTInstance
                 {
                     localToWorld = ToFloat4x3(meshInstance.localToWorldMatrix),
@@ -71,9 +90,12 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                     userMaterialID = materialID,
                     instanceMask = meshInstance.mask,
                     renderingLayerMask = renderingLayerMask,
-                    geometryIndex = (uint)(m_GeometryPool.GetEntryGeomAllocation(geometryHandle).meshChunkTableAlloc.block.offset + meshInstance.subMeshIndex)
-                });
-
+                    geometryIndex = (uint)(
+                        m_GeometryPool.GetEntryGeomAllocation(geometryHandle).meshChunkTableAlloc.block.offset
+                        + meshInstance.subMeshIndex
+                    ),
+                }
+            );
 
             var allocInfo = m_GeometryPool.GetEntryGeomAllocation(geometryHandle).meshChunks[meshInstance.subMeshIndex];
 
@@ -82,7 +104,8 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 geometryPoolHandle = geometryHandle,
                 indexInInstanceBuffer = slotAllocation,
                 instanceMask = meshInstance.mask,
-                vertexOffset = (uint)(allocInfo.vertexAlloc.block.offset) * ((uint)GeometryPool.GetVertexByteSize() / 4),
+                vertexOffset =
+                    (uint)(allocInfo.vertexAlloc.block.offset) * ((uint)GeometryPool.GetVertexByteSize() / 4),
                 indexOffset = (uint)allocInfo.indexAlloc.block.offset,
             };
             m_Instances.Add(slotAllocation.block.offset, instanceEntry);
@@ -93,8 +116,14 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return m_GeometryPool.GetEntryGeomAllocation(handle).meshChunks[submeshIndex];
         }
 
-        public GraphicsBuffer indexBuffer { get { return m_GeometryPool.globalIndexBuffer; } }
-        public GraphicsBuffer vertexBuffer { get { return m_GeometryPool.globalVertexBuffer; } }
+        public GraphicsBuffer indexBuffer
+        {
+            get { return m_GeometryPool.globalIndexBuffer; }
+        }
+        public GraphicsBuffer vertexBuffer
+        {
+            get { return m_GeometryPool.globalVertexBuffer; }
+        }
 
         public void RemoveInstance(int instanceHandle)
         {
@@ -173,8 +202,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         {
             if ((m_FrameTimestamp - m_TransformTouchedLastTimestamp) <= 1)
             {
-                m_InstanceBuffer.ModifyForEach(
-                instance =>
+                m_InstanceBuffer.ModifyForEach(instance =>
                 {
                     instance.previousLocalToWorld = instance.localToWorld;
                     return instance;
@@ -192,8 +220,16 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             shader.SetBufferParam(cmd, Shader.PropertyToID("g_AccelStructInstanceList"), gpuBuffer);
             shader.SetBufferParam(cmd, Shader.PropertyToID("g_globalIndexBuffer"), m_GeometryPool.globalIndexBuffer);
             shader.SetBufferParam(cmd, Shader.PropertyToID("g_globalVertexBuffer"), m_GeometryPool.globalVertexBuffer);
-            shader.SetIntParam(cmd, Shader.PropertyToID("g_globalVertexBufferStride"), m_GeometryPool.globalVertexBufferStrideBytes/4);
-            shader.SetBufferParam(cmd, Shader.PropertyToID("g_MeshList"), m_GeometryPool.globalMeshChunkTableEntryBuffer);
+            shader.SetIntParam(
+                cmd,
+                Shader.PropertyToID("g_globalVertexBufferStride"),
+                m_GeometryPool.globalVertexBufferStrideBytes / 4
+            );
+            shader.SetBufferParam(
+                cmd,
+                Shader.PropertyToID("g_MeshList"),
+                m_GeometryPool.globalMeshChunkTableEntryBuffer
+            );
         }
 
         public int GetInstanceCount()
@@ -208,9 +244,23 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             return new float4x3(new float4(res.c0, 0.0f), new float4(res.c1, 0.0f), new float4(res.c2, 0.0f));
         }
+
         static float4x3 ToFloat4x3(in float4x4 m)
         {
-            return new float4x3(m.c0.x, m.c0.y, m.c0.z, m.c1.x, m.c1.y, m.c1.z, m.c2.x, m.c2.y, m.c2.z, m.c3.x, m.c3.y, m.c3.z);
+            return new float4x3(
+                m.c0.x,
+                m.c0.y,
+                m.c0.z,
+                m.c1.x,
+                m.c1.y,
+                m.c1.z,
+                m.c2.x,
+                m.c2.y,
+                m.c2.z,
+                m.c3.x,
+                m.c3.y,
+                m.c3.z
+            );
         }
 
         readonly GeometryPool m_GeometryPool;

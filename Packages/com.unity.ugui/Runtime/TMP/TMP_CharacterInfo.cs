@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.TextCore;
 
-
 namespace TMPro
 {
     public struct TMP_Vertex
@@ -10,10 +9,14 @@ namespace TMPro
         public Vector3 position;
         public Vector4 uv;
         public Vector2 uv2;
+
         //public Vector2 uv4;
         public Color32 color;
 
-        public static TMP_Vertex zero { get { return k_Zero; } }
+        public static TMP_Vertex zero
+        {
+            get { return k_Zero; }
+        }
 
         //public Vector3 normal;
         //public Vector4 tangent;
@@ -26,22 +29,44 @@ namespace TMPro
     /// </summary>
     public struct TMP_Offset
     {
-        public float left { get { return m_Left; } set { m_Left = value; } }
+        public float left
+        {
+            get { return m_Left; }
+            set { m_Left = value; }
+        }
 
-        public float right { get { return m_Right; } set { m_Right = value; } }
+        public float right
+        {
+            get { return m_Right; }
+            set { m_Right = value; }
+        }
 
-        public float top { get { return m_Top; } set { m_Top = value; } }
+        public float top
+        {
+            get { return m_Top; }
+            set { m_Top = value; }
+        }
 
-        public float bottom { get { return m_Bottom; } set { m_Bottom = value; } }
+        public float bottom
+        {
+            get { return m_Bottom; }
+            set { m_Bottom = value; }
+        }
 
-        public float horizontal { get { return m_Left; } set
+        public float horizontal
+        {
+            get { return m_Left; }
+            set
             {
                 m_Left = value;
                 m_Right = value;
             }
         }
 
-        public float vertical { get { return m_Top; } set
+        public float vertical
+        {
+            get { return m_Top; }
+            set
             {
                 m_Top = value;
                 m_Bottom = value;
@@ -51,7 +76,10 @@ namespace TMPro
         /// <summary>
         ///
         /// </summary>
-        public static TMP_Offset zero { get { return k_ZeroOffset; } }
+        public static TMP_Offset zero
+        {
+            get { return k_ZeroOffset; }
+        }
 
         // =============================================
         // Private backing fields for public properties.
@@ -94,10 +122,10 @@ namespace TMPro
 
         public static bool operator ==(TMP_Offset lhs, TMP_Offset rhs)
         {
-            return lhs.m_Left == rhs.m_Left &&
-                    lhs.m_Right == rhs.m_Right &&
-                    lhs.m_Top == rhs.m_Top &&
-                    lhs.m_Bottom == rhs.m_Bottom;
+            return lhs.m_Left == rhs.m_Left
+                && lhs.m_Right == rhs.m_Right
+                && lhs.m_Top == rhs.m_Top
+                && lhs.m_Bottom == rhs.m_Bottom;
         }
 
         public static bool operator !=(TMP_Offset lhs, TMP_Offset rhs)
@@ -125,7 +153,6 @@ namespace TMPro
             return base.Equals(other);
         }
     }
-
 
     /// <summary>
     ///
@@ -166,6 +193,7 @@ namespace TMPro
             return base.Equals(other);
         }
     }
+
     /// <summary>
     /// Structure containing information about individual text elements (character or sprites).
     /// </summary>
@@ -193,9 +221,9 @@ namespace TMPro
 
         //public short wordNumber;
         public int lineNumber;
+
         //public short charNumber;
         public int pageNumber;
-
 
         public int vertexIndex;
         public TMP_Vertex vertex_BL;

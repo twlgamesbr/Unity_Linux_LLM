@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Injector;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEditor.Build.Pipeline.Utilities;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline.Tasks
 {
@@ -15,7 +15,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class PreviewSceneDependencyData : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -34,7 +37,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
         IBuildCache m_Cache;
 #pragma warning restore 649
 
-        CachedInfo GetCachedInfo(GUID scene, IEnumerable<ObjectIdentifier> references, SceneDependencyInfo sceneInfo, BuildUsageTagSet usageTags)
+        CachedInfo GetCachedInfo(
+            GUID scene,
+            IEnumerable<ObjectIdentifier> references,
+            SceneDependencyInfo sceneInfo,
+            BuildUsageTagSet usageTags
+        )
         {
             var info = new CachedInfo();
             info.Asset = m_Cache.GetCacheEntry(scene, Version);
@@ -92,8 +100,15 @@ namespace UnityEditor.Build.Pipeline.Tasks
                             continue;
 
                         // TODO: Use Cache to speed this up?
-                        var assetIncludes = ContentBuildInterface.GetPlayerObjectIdentifiersInAsset(assetGuid, m_Parameters.Target);
-                        var assetReferences = ContentBuildInterface.GetPlayerDependenciesForObjects(assetIncludes, m_Parameters.Target, m_Parameters.ScriptInfo);
+                        var assetIncludes = ContentBuildInterface.GetPlayerObjectIdentifiersInAsset(
+                            assetGuid,
+                            m_Parameters.Target
+                        );
+                        var assetReferences = ContentBuildInterface.GetPlayerDependenciesForObjects(
+                            assetIncludes,
+                            m_Parameters.Target,
+                            m_Parameters.ScriptInfo
+                        );
                         references.UnionWith(assetIncludes);
                         references.UnionWith(assetReferences);
                     }

@@ -10,7 +10,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class GenerateLinkXml : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -36,7 +39,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 linker.AddSerializedClass(writeResult.Value.includedSerializeReferenceFQN);
 #else
                 if (writeResult.Value.GetType().GetProperty("includedSerializeReferenceFQN") != null)
-                    linker.AddSerializedClass(writeResult.Value.GetType().GetProperty("includedSerializeReferenceFQN").GetValue(writeResult.Value) as System.Collections.Generic.IEnumerable<string>);
+                    linker.AddSerializedClass(
+                        writeResult
+                            .Value.GetType()
+                            .GetProperty("includedSerializeReferenceFQN")
+                            .GetValue(writeResult.Value) as System.Collections.Generic.IEnumerable<string>
+                    );
 #endif
             }
 

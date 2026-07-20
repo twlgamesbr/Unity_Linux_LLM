@@ -69,16 +69,20 @@ namespace UnityEngine.InputSystem.Editor
 
         private const float k_IndentPerLevel = 20f;
 
-        internal virtual void BeginDraw(EditorWindow window)
-        {
-        }
+        internal virtual void BeginDraw(EditorWindow window) { }
 
-        internal virtual void EndDraw(EditorWindow window)
-        {
-        }
+        internal virtual void EndDraw(EditorWindow window) { }
 
-        internal virtual void DrawItem(AdvancedDropdownItem item, string name, Texture2D icon, bool enabled,
-            bool drawArrow, bool selected, bool hasSearch, bool richText = false)
+        internal virtual void DrawItem(
+            AdvancedDropdownItem item,
+            string name,
+            Texture2D icon,
+            bool enabled,
+            bool drawArrow,
+            bool selected,
+            bool hasSearch,
+            bool richText = false
+        )
         {
             var content = new GUIContent(name, icon);
             var imgTemp = content.image;
@@ -143,9 +147,7 @@ namespace UnityEngine.InputSystem.Editor
             }
         }
 
-        internal virtual void DrawFooter(AdvancedDropdownItem selectedItem)
-        {
-        }
+        internal virtual void DrawFooter(AdvancedDropdownItem selectedItem) { }
 
         internal void DrawSearchField(bool isSearchFieldDisabled, string searchString, Action<string> searchChanged)
         {
@@ -174,7 +176,7 @@ namespace UnityEngine.InputSystem.Editor
             //rect.x += paddingX;
             rect.y += paddingY + 1; // Add one for the border
             rect.height += Styles.toolbarSearchField.fixedHeight + paddingY * 3;
-            rect.width -= paddingX;// * 2;
+            rect.width -= paddingX; // * 2;
             m_SearchRect = rect;
             searchString = m_SearchField.OnToolbarGUI(m_SearchRect, searchString);
             return searchString;
@@ -210,7 +212,9 @@ namespace UnityEngine.InputSystem.Editor
                 }
                 if (child.IsSeparator())
                 {
-                    maxHeight += GUIHelpers.Styles.lineSeparator.CalcHeight(content, maxWidth) + GUIHelpers.Styles.lineSeparator.margin.vertical;
+                    maxHeight +=
+                        GUIHelpers.Styles.lineSeparator.CalcHeight(content, maxWidth)
+                        + GUIHelpers.Styles.lineSeparator.margin.vertical;
                 }
                 else
                 {
@@ -244,7 +248,9 @@ namespace UnityEngine.InputSystem.Editor
                 }
                 if (child.IsSeparator())
                 {
-                    height += GUIHelpers.Styles.lineSeparator.CalcHeight(content, 0) + GUIHelpers.Styles.lineSeparator.margin.vertical;
+                    height +=
+                        GUIHelpers.Styles.lineSeparator.CalcHeight(content, 0)
+                        + GUIHelpers.Styles.lineSeparator.margin.vertical;
                 }
                 else
                 {

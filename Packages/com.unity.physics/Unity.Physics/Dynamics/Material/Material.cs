@@ -11,32 +11,40 @@ namespace Unity.Physics
         /// The collider will collide normally
         /// </summary>
         Collide = 0,
+
         /// <summary>
         /// The collider will collide normally and raise collision events
         /// </summary>
         CollideRaiseCollisionEvents = 1,
+
         /// <summary>
         /// The collider will raise trigger events when it overlaps another collider
         /// </summary>
         RaiseTriggerEvents = 3,
+
         /// <summary>
         /// The collider will skip collision, but can still move and intercept queries
         /// </summary>
-        None = byte.MaxValue - 1
+        None = byte.MaxValue - 1,
     }
 
     /// <summary>   Describes how an object should respond to collisions with other objects. </summary>
     public struct Material : IEquatable<Material>
     {
         internal MaterialFlags Flags;
+
         /// <summary>   The friction combine policy. </summary>
         public CombinePolicy FrictionCombinePolicy;
+
         /// <summary>   The restitution combine policy. </summary>
         public CombinePolicy RestitutionCombinePolicy;
+
         /// <summary>   The custom tags set by the user. </summary>
         public byte CustomTags;
+
         /// <summary>   The friction. </summary>
         public float Friction;
+
         /// <summary>   The restitution. </summary>
         public float Restitution;
 
@@ -63,7 +71,10 @@ namespace Unity.Physics
                         Flags &= ~MaterialFlags.IsTrigger & ~MaterialFlags.DisableCollisions;
                         return;
                     case CollisionResponsePolicy.Collide:
-                        Flags &= ~MaterialFlags.DisableCollisions & ~MaterialFlags.EnableCollisionEvents & ~MaterialFlags.IsTrigger;
+                        Flags &=
+                            ~MaterialFlags.DisableCollisions
+                            & ~MaterialFlags.EnableCollisionEvents
+                            & ~MaterialFlags.IsTrigger;
                         return;
                     default:
                         Assert.IsTrue(false, "Invalid collision response provided!");
@@ -85,7 +96,6 @@ namespace Unity.Physics
         ///
         /// The system prioritizes evaluation from the dynamic collider when it collides with a static collider.
         /// </summary>
-
         public bool EnableDetailedStaticMeshCollision
         {
             get { return (Flags & MaterialFlags.EnableDetailedStaticMeshCollision) != 0; }
@@ -157,12 +167,15 @@ namespace Unity.Physics
         {
             /// <summary>   sqrt(a * b) </summary>
             GeometricMean,
+
             /// <summary>   min(a, b) </summary>
             Minimum,
+
             /// <summary>   max(a, b) </summary>
             Maximum,
+
             /// <summary>   (a + b) / 2. </summary>
-            ArithmeticMean
+            ArithmeticMean,
         }
 
         /// <summary>   (Immutable) A default material. </summary>
@@ -171,7 +184,7 @@ namespace Unity.Physics
             FrictionCombinePolicy = CombinePolicy.GeometricMean,
             RestitutionCombinePolicy = CombinePolicy.GeometricMean,
             Friction = 0.5f,
-            Restitution = 0.0f
+            Restitution = 0.0f,
         };
 
         private static CollisionResponsePolicy FlagsToCollisionResponse(MaterialFlags flags)
@@ -213,7 +226,8 @@ namespace Unity.Physics
         /// <returns>   The combined friction. </returns>
         public static float GetCombinedFriction(Material materialA, Material materialB)
         {
-            var policy = (CombinePolicy)math.max((int)materialA.FrictionCombinePolicy, (int)materialB.FrictionCombinePolicy);
+            var policy = (CombinePolicy)
+                math.max((int)materialA.FrictionCombinePolicy, (int)materialB.FrictionCombinePolicy);
             switch (policy)
             {
                 case CombinePolicy.GeometricMean:
@@ -240,7 +254,8 @@ namespace Unity.Physics
         /// <returns>   The combined restitution. </returns>
         public static float GetCombinedRestitution(Material materialA, Material materialB)
         {
-            var policy = (CombinePolicy)math.max((int)materialA.RestitutionCombinePolicy, (int)materialB.RestitutionCombinePolicy);
+            var policy = (CombinePolicy)
+                math.max((int)materialA.RestitutionCombinePolicy, (int)materialB.RestitutionCombinePolicy);
             switch (policy)
             {
                 case CombinePolicy.GeometricMean:
@@ -280,7 +295,7 @@ namespace Unity.Physics
             Friction,
             Restitution,
             CollisionResponsePolicy,
-            All
+            All,
         }
 
         internal void SetMaterialField(in Material other, MaterialField option)
@@ -321,13 +336,12 @@ namespace Unity.Physics
         /// <returns>   True if the objects are considered equal, false if they are not. </returns>
         public bool Equals(Material other)
         {
-            return
-                Flags == other.Flags &&
-                FrictionCombinePolicy == other.FrictionCombinePolicy &&
-                RestitutionCombinePolicy == other.RestitutionCombinePolicy &&
-                CustomTags == other.CustomTags &&
-                Friction == other.Friction &&
-                Restitution == other.Restitution;
+            return Flags == other.Flags
+                && FrictionCombinePolicy == other.FrictionCombinePolicy
+                && RestitutionCombinePolicy == other.RestitutionCombinePolicy
+                && CustomTags == other.CustomTags
+                && Friction == other.Friction
+                && Restitution == other.Restitution;
         }
 
         /// <summary>   Calculates a hash code for this object. </summary>
@@ -335,15 +349,22 @@ namespace Unity.Physics
         /// <returns>   A hash code for this object. </returns>
         public override int GetHashCode()
         {
-            return unchecked((int)math.hash(new uint2(
-                unchecked((uint)(
-                    (byte)Flags
-                    | ((byte)FrictionCombinePolicy << 4)
-                    | ((byte)RestitutionCombinePolicy << 8)
-                    | (CustomTags << 12))
-                ),
-                math.hash(new float2(Friction, Restitution))
-            )));
+            return unchecked(
+                (int)
+                    math.hash(
+                        new uint2(
+                            unchecked(
+                                (uint)(
+                                    (byte)Flags
+                                    | ((byte)FrictionCombinePolicy << 4)
+                                    | ((byte)RestitutionCombinePolicy << 8)
+                                    | (CustomTags << 12)
+                                )
+                            ),
+                            math.hash(new float2(Friction, Restitution))
+                        )
+                    )
+            );
         }
     }
 }

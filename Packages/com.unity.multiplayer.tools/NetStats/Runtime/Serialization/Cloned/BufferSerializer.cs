@@ -19,7 +19,8 @@ namespace Unity.Multiplayer.Tools.NetStats
     /// things to happen because the struct's lifetime could outlive the Reader/Writer's.)
     /// </summary>
     /// <typeparam name="TReaderWriter">The implementation struct</typeparam>
-    ref struct BufferSerializer<TReaderWriter> where TReaderWriter : IReaderWriter
+    ref struct BufferSerializer<TReaderWriter>
+        where TReaderWriter : IReaderWriter
     {
         private TReaderWriter m_Implementation;
 
@@ -65,7 +66,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// Write buffers will grow up to the maximum allowable message size before throwing OverflowException.
         /// </summary>
         /// <param name="value">Value to serialize</param>
-        public void SerializeNetworkSerializable<T>(ref T value) where T : INetworkSerializable, new()
+        public void SerializeNetworkSerializable<T>(ref T value)
+            where T : INetworkSerializable, new()
         {
             m_Implementation.SerializeNetworkSerializable(ref value);
         }
@@ -103,7 +105,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// Write buffers will grow up to the maximum allowable message size before throwing OverflowException.
         /// </summary>
         /// <param name="array">Value to serialize</param>
-        public void SerializeValue<T>(ref T[] array) where T : unmanaged
+        public void SerializeValue<T>(ref T[] array)
+            where T : unmanaged
         {
             m_Implementation.SerializeValue(ref array);
         }
@@ -128,7 +131,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// Write buffers will grow up to the maximum allowable message size before throwing OverflowException.
         /// </summary>
         /// <param name="value">Value to serialize</param>
-        public void SerializeValue<T>(ref T value) where T : unmanaged
+        public void SerializeValue<T>(ref T value)
+            where T : unmanaged
         {
             m_Implementation.SerializeValue(ref value);
         }
@@ -190,7 +194,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// serialization operations in one function call instead of having to do bounds checking on every call.
         /// </summary>
         /// <param name="array">Value to serialize</param>
-        public void SerializeValuePreChecked<T>(ref T[] array) where T : unmanaged
+        public void SerializeValuePreChecked<T>(ref T[] array)
+            where T : unmanaged
         {
             m_Implementation.SerializeValuePreChecked(ref array);
         }
@@ -217,7 +222,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// serialization operations in one function call instead of having to do bounds checking on every call.
         /// </summary>
         /// <param name="value">Value to serialize</param>
-        public void SerializeValuePreChecked<T>(ref T value) where T : unmanaged
+        public void SerializeValuePreChecked<T>(ref T value)
+            where T : unmanaged
         {
             m_Implementation.SerializeValuePreChecked(ref value);
         }

@@ -56,7 +56,8 @@ namespace UnityEngine.Rendering
             {
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException(
-                        $"Expected a value between 0 and {Count}, but received {index}.");
+                        $"Expected a value between 0 and {Count}, but received {index}."
+                    );
                 return ref m_BufferPtr[index];
             }
         }
@@ -99,8 +100,7 @@ namespace UnityEngine.Rendering
         /// <param name="copyCount">The number of item to copy.</param>
         public unsafe void CopyTo(T* dstBuffer, int startDstIndex, int copyCount)
         {
-            UnsafeUtility.MemCpy(dstBuffer + startDstIndex, m_BufferPtr,
-                UnsafeUtility.SizeOf<T>() * copyCount);
+            UnsafeUtility.MemCpy(dstBuffer + startDstIndex, m_BufferPtr, UnsafeUtility.SizeOf<T>() * copyCount);
         }
 
         /// <summary>

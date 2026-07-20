@@ -15,15 +15,30 @@ namespace UnityEditor.TestTools.TestRunner
 {
     internal interface IUnityTestAssemblyRunnerFactory
     {
-        IUnityTestAssemblyRunner Create(TestPlatform testPlatform, string[] orderedTestNames, int randomOrderSeed, WorkItemFactory factory, UnityTestExecutionContext context);
+        IUnityTestAssemblyRunner Create(
+            TestPlatform testPlatform,
+            string[] orderedTestNames,
+            int randomOrderSeed,
+            WorkItemFactory factory,
+            UnityTestExecutionContext context
+        );
     }
 
     internal class UnityTestAssemblyRunnerFactory : IUnityTestAssemblyRunnerFactory
     {
-        public IUnityTestAssemblyRunner Create(TestPlatform testPlatform, string[] orderedTestNames, int randomOrderSeed,
-            WorkItemFactory factory, UnityTestExecutionContext context)
+        public IUnityTestAssemblyRunner Create(
+            TestPlatform testPlatform,
+            string[] orderedTestNames,
+            int randomOrderSeed,
+            WorkItemFactory factory,
+            UnityTestExecutionContext context
+        )
         {
-            return new UnityTestAssemblyRunner(new UnityTestAssemblyBuilder(orderedTestNames, randomOrderSeed), factory, context);
+            return new UnityTestAssemblyRunner(
+                new UnityTestAssemblyBuilder(orderedTestNames, randomOrderSeed),
+                factory,
+                context
+            );
         }
     }
 
@@ -65,8 +80,17 @@ namespace UnityEditor.TestTools.TestRunner
 
         public IUnityTestAssemblyRunnerFactory UnityTestAssemblyRunnerFactory { get; set; }
 
-        public void Init(ITestFilter filter, bool runningSynchronously, ITest testTree, TestStartedEvent testStartedEvent, TestFinishedEvent testFinishedEvent, UnityTestExecutionContext context,
-            string[] orderedTestNames, int randomOrderSeed, bool disableNestedEnumeratorBugfix)
+        public void Init(
+            ITestFilter filter,
+            bool runningSynchronously,
+            ITest testTree,
+            TestStartedEvent testStartedEvent,
+            TestFinishedEvent testFinishedEvent,
+            UnityTestExecutionContext context,
+            string[] orderedTestNames,
+            int randomOrderSeed,
+            bool disableNestedEnumeratorBugfix
+        )
         {
             TestEnumerator.Reset();
             m_AlreadyStartedTests = new List<string>();
@@ -78,7 +102,13 @@ namespace UnityEditor.TestTools.TestRunner
             Run(testTree, filter, context, testStartedEvent, testFinishedEvent);
         }
 
-        public void Resume(ITestFilter filter, ITest testTree, TestStartedEvent testStartedEvent, TestFinishedEvent testFinishedEvent, UnityTestExecutionContext context)
+        public void Resume(
+            ITestFilter filter,
+            ITest testTree,
+            TestStartedEvent testStartedEvent,
+            TestFinishedEvent testFinishedEvent,
+            UnityTestExecutionContext context
+        )
         {
             if (m_ExecuteOnEnable)
             {
@@ -106,12 +136,24 @@ namespace UnityEditor.TestTools.TestRunner
             m_ExecutedTests.Add(TestResultSerializer.MakeFromTestResult(testResult));
         }
 
-        private void Run(ITest testTree, ITestFilter filter, UnityTestExecutionContext context, TestStartedEvent testStartedEvent, TestFinishedEvent testFinishedEvent)
+        private void Run(
+            ITest testTree,
+            ITestFilter filter,
+            UnityTestExecutionContext context,
+            TestStartedEvent testStartedEvent,
+            TestFinishedEvent testFinishedEvent
+        )
         {
             m_TestStartedEvent = testStartedEvent;
             m_TestFinishedEvent = testFinishedEvent;
 
-            m_Runner = (UnityTestAssemblyRunnerFactory ?? new UnityTestAssemblyRunnerFactory()).Create(TestPlatform.EditMode, m_OrderedTestNames, m_randomOrderSeed, new EditmodeWorkItemFactory(), context);
+            m_Runner = (UnityTestAssemblyRunnerFactory ?? new UnityTestAssemblyRunnerFactory()).Create(
+                TestPlatform.EditMode,
+                m_OrderedTestNames,
+                m_randomOrderSeed,
+                new EditmodeWorkItemFactory(),
+                context
+            );
             m_Runner.LoadTestTree(testTree);
             hideFlags |= HideFlags.DontSave;
             EnumeratorHelper.ActivePcHelper = new EditModePcHelper();
@@ -150,7 +192,9 @@ namespace UnityEditor.TestTools.TestRunner
 
                 if (m_Runner.GetCurrentContext() != null && m_Runner.GetCurrentContext().CurrentResult != null)
                 {
-                    m_Runner.GetCurrentContext().CurrentResult.SetResult(ResultState.Cancelled, "Unexpected assembly reload happened");
+                    m_Runner
+                        .GetCurrentContext()
+                        .CurrentResult.SetResult(ResultState.Cancelled, "Unexpected assembly reload happened");
                 }
                 OnRunCancel();
             }
@@ -168,7 +212,7 @@ namespace UnityEditor.TestTools.TestRunner
             if (result)
             {
                 m_CurrentYieldObject = m_RunStep.Current;
-                while (m_CurrentYieldObject is IEnumerator)    // going deeper
+                while (m_CurrentYieldObject is IEnumerator) // going deeper
                 {
                     var currentEnumerator = (IEnumerator)m_CurrentYieldObject;
 
@@ -187,10 +231,10 @@ namespace UnityEditor.TestTools.TestRunner
                 return true;
             }
 
-            if (StepStack.Count == 0)       // done
+            if (StepStack.Count == 0) // done
                 return false;
 
-            m_RunStep = StepStack.Pop();    // going up
+            m_RunStep = StepStack.Pop(); // going up
             return MoveNextAndUpdateYieldObject();
         }
 
@@ -223,7 +267,9 @@ namespace UnityEditor.TestTools.TestRunner
 
         private void OnRestoringTest()
         {
-            var item = m_ExecutedTests.Find(t => t.fullName == UnityTestExecutionContext.CurrentContext.CurrentTest.FullName);
+            var item = m_ExecutedTests.Find(t =>
+                t.fullName == UnityTestExecutionContext.CurrentContext.CurrentTest.FullName
+            );
             if (item != null)
             {
                 item.RestoreTestResult(UnityTestExecutionContext.CurrentContext.CurrentResult);
@@ -232,7 +278,8 @@ namespace UnityEditor.TestTools.TestRunner
 
         private static bool IsCancelled()
         {
-            return UnityTestExecutionContext.CurrentContext.ExecutionStatus == TestExecutionStatus.AbortRequested || UnityTestExecutionContext.CurrentContext.ExecutionStatus == TestExecutionStatus.StopRequested;
+            return UnityTestExecutionContext.CurrentContext.ExecutionStatus == TestExecutionStatus.AbortRequested
+                || UnityTestExecutionContext.CurrentContext.ExecutionStatus == TestExecutionStatus.StopRequested;
         }
 
         private void InvokeDelegator(TestRunnerStateSerializer testRunnerStateSerializer)
@@ -274,7 +321,6 @@ namespace UnityEditor.TestTools.TestRunner
                 UnityTestExecutionContext.CurrentContext.CurrentResult.RecordException(e);
                 return;
             }
-
         }
 
         private void CompilationFailureWatch()

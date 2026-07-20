@@ -37,7 +37,8 @@ namespace UnityEditor.Rendering
                 m_TargetScrollView = target as ScrollView;
                 if (m_TargetScrollView == null)
                     throw new InvalidOperationException(
-                        $"{nameof(RenderGraphViewer)}.{nameof(PanManipulator)} can only be added to a {nameof(ScrollView)}");
+                        $"{nameof(RenderGraphViewer)}.{nameof(PanManipulator)} can only be added to a {nameof(ScrollView)}"
+                    );
 
                 target.RegisterCallback<MouseDownEvent>(OnMouseDown);
                 target.RegisterCallback<MouseMoveEvent>(OnMouseMove);

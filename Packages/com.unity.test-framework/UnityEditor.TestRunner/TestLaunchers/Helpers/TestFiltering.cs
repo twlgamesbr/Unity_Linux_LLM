@@ -8,24 +8,29 @@ namespace UnityEditor.TestTools.TestRunner
 {
     static class TestFiltering
     {
-        internal static void GetMatchingTests(ITest tests, ITestFilter filter, ref List<ITest> resultList, RuntimePlatform testTargetPlatform)
+        internal static void GetMatchingTests(
+            ITest tests,
+            ITestFilter filter,
+            ref List<ITest> resultList,
+            RuntimePlatform testTargetPlatform
+        )
+        {
+            foreach (var test in tests.Tests)
             {
-                foreach (var test in tests.Tests)
+                if (IsTestEnabledOnPlatform(test, testTargetPlatform))
                 {
-                    if (IsTestEnabledOnPlatform(test, testTargetPlatform))
+                    if (test.IsSuite)
                     {
-                        if (test.IsSuite)
-                        {
-                            GetMatchingTests(test, filter, ref resultList, testTargetPlatform);
-                        }
-                        else
-                        {
-                            if (filter.Pass(test))
-                                resultList.Add(test);
-                        }
+                        GetMatchingTests(test, filter, ref resultList, testTargetPlatform);
+                    }
+                    else
+                    {
+                        if (filter.Pass(test))
+                            resultList.Add(test);
                     }
                 }
             }
+        }
 
         internal static bool IsTestEnabledOnPlatform(ITest test, RuntimePlatform testTargetPlatform)
         {
@@ -54,6 +59,5 @@ namespace UnityEditor.TestTools.TestRunner
 
             return true;
         }
-
     }
 }

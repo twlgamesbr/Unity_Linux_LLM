@@ -7,18 +7,20 @@ using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes.Editor
 {
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation
+    )]
     [UpdateInGroup(typeof(LiveConversionEditorSystemGroup))]
     partial class EditorSubSceneLiveConversionSystem : SystemBase
     {
-        LiveConversionConnection         _EditorLiveConversion;
-        LiveConversionPatcher            _Patcher;
+        LiveConversionConnection _EditorLiveConversion;
+        LiveConversionPatcher _Patcher;
         LiveConversionSceneChangeTracker _SceneChangeTracker;
 
         // Temp data cached to reduce gc allocations
-        List<LiveConversionChangeSet>    _ChangeSets;
-        NativeList<Hash128>        _UnloadScenes;
-        NativeList<Hash128>        _LoadScenes;
+        List<LiveConversionChangeSet> _ChangeSets;
+        NativeList<Hash128> _UnloadScenes;
+        NativeList<Hash128> _LoadScenes;
 
         System.Diagnostics.Stopwatch m_Watch;
         internal double MillisecondsTakenByUpdate { get; set; }
@@ -43,7 +45,11 @@ namespace Unity.Scenes.Editor
             {
                 // We can't initialize live link in OnCreate because other systems might configure BuildConfigurationGUID from OnCreate
                 if (_EditorLiveConversion == null)
-                    _EditorLiveConversion = new LiveConversionConnection(EntityManager.GetComponentData<SceneSystemData>(World.GetExistingSystem<SceneSystem>()).BuildConfigurationGUID);
+                    _EditorLiveConversion = new LiveConversionConnection(
+                        EntityManager
+                            .GetComponentData<SceneSystemData>(World.GetExistingSystem<SceneSystem>())
+                            .BuildConfigurationGUID
+                    );
 
                 try
                 {
@@ -55,7 +61,12 @@ namespace Unity.Scenes.Editor
                         }
                     }
 
-                    _EditorLiveConversion.Update(_ChangeSets, _LoadScenes, _UnloadScenes, LiveConversionEditorSettings.LiveConversionMode);
+                    _EditorLiveConversion.Update(
+                        _ChangeSets,
+                        _LoadScenes,
+                        _UnloadScenes,
+                        LiveConversionEditorSettings.LiveConversionMode
+                    );
 
                     // Unload scenes that are no longer being edited / need to be reloaded etc
                     foreach (var change in _UnloadScenes)
@@ -102,8 +113,10 @@ namespace Unity.Scenes.Editor
 
                         // This is to avoid trying to get the guid of a scene loaded from a content archive during play mode
                         var scenepath = scene.path;
-                        if (!scenepath.StartsWith("Assets/", System.StringComparison.OrdinalIgnoreCase) &&
-                            !scenepath.StartsWith("Packages/", System.StringComparison.OrdinalIgnoreCase))
+                        if (
+                            !scenepath.StartsWith("Assets/", System.StringComparison.OrdinalIgnoreCase)
+                            && !scenepath.StartsWith("Packages/", System.StringComparison.OrdinalIgnoreCase)
+                        )
                             continue;
 
                         var sceneGUID = AssetDatabaseCompatibility.PathToGUID(scenepath);
@@ -113,7 +126,10 @@ namespace Unity.Scenes.Editor
                             {
                                 case LiveConversionMode.SceneViewShowsAuthoring:
                                     // Render gameobjects in SceneView but hide them in GameView
-                                    EditorSceneManager.SetSceneCullingMask(scene, SceneCullingMasks.MainStageSceneViewObjects);
+                                    EditorSceneManager.SetSceneCullingMask(
+                                        scene,
+                                        SceneCullingMasks.MainStageSceneViewObjects
+                                    );
                                     break;
 
                                 case LiveConversionMode.SceneViewShowsRuntime:
@@ -124,11 +140,16 @@ namespace Unity.Scenes.Editor
                                 case LiveConversionMode.Disabled:
                                 case LiveConversionMode.LiveConvertStandalonePlayer:
                                     // Render gameobjects in SceneView and GameView
-                                    EditorSceneManager.SetSceneCullingMask(scene, EditorSceneManager.DefaultSceneCullingMask);
+                                    EditorSceneManager.SetSceneCullingMask(
+                                        scene,
+                                        EditorSceneManager.DefaultSceneCullingMask
+                                    );
                                     break;
 
                                 default:
-                                    Debug.LogError("Missing handling of: " + LiveConversionEditorSettings.LiveConversionMode);
+                                    Debug.LogError(
+                                        "Missing handling of: " + LiveConversionEditorSettings.LiveConversionMode
+                                    );
                                     break;
                             }
                         }

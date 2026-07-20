@@ -39,9 +39,11 @@ namespace UnityEngine.InputSystem
     public class DefaultInputActions : IInputActionCollection2, IDisposable
     {
         public InputActionAsset asset { get; }
+
         public @DefaultInputActions()
         {
-            asset = InputActionAsset.FromJson(@"{
+            asset = InputActionAsset.FromJson(
+                @"{
     ""version"": 1,
     ""name"": ""DefaultInputActions"",
     ""maps"": [
@@ -879,7 +881,8 @@ namespace UnityEngine.InputSystem
             ]
         }
     ]
-}");
+}"
+            );
             // Player
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
@@ -961,18 +964,42 @@ namespace UnityEngine.InputSystem
         private readonly InputAction m_Player_Move;
         private readonly InputAction m_Player_Look;
         private readonly InputAction m_Player_Fire;
+
         public struct PlayerActions
         {
             private @DefaultInputActions m_Wrapper;
-            public PlayerActions(@DefaultInputActions wrapper) { m_Wrapper = wrapper; }
+
+            public PlayerActions(@DefaultInputActions wrapper)
+            {
+                m_Wrapper = wrapper;
+            }
+
             public InputAction @Move => m_Wrapper.m_Player_Move;
             public InputAction @Look => m_Wrapper.m_Player_Look;
             public InputAction @Fire => m_Wrapper.m_Player_Fire;
-            public InputActionMap Get() { return m_Wrapper.m_Player; }
-            public void Enable() { Get().Enable(); }
-            public void Disable() { Get().Disable(); }
+
+            public InputActionMap Get()
+            {
+                return m_Wrapper.m_Player;
+            }
+
+            public void Enable()
+            {
+                Get().Enable();
+            }
+
+            public void Disable()
+            {
+                Get().Disable();
+            }
+
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
+
+            public static implicit operator InputActionMap(PlayerActions set)
+            {
+                return set.Get();
+            }
+
             public void SetCallbacks(IPlayerActions instance)
             {
                 if (m_Wrapper.m_PlayerActionsCallbackInterface != null)
@@ -1002,6 +1029,7 @@ namespace UnityEngine.InputSystem
                 }
             }
         }
+
         public PlayerActions @Player => new PlayerActions(this);
 
         // UI
@@ -1017,10 +1045,16 @@ namespace UnityEngine.InputSystem
         private readonly InputAction m_UI_RightClick;
         private readonly InputAction m_UI_TrackedDevicePosition;
         private readonly InputAction m_UI_TrackedDeviceOrientation;
+
         public struct UIActions
         {
             private @DefaultInputActions m_Wrapper;
-            public UIActions(@DefaultInputActions wrapper) { m_Wrapper = wrapper; }
+
+            public UIActions(@DefaultInputActions wrapper)
+            {
+                m_Wrapper = wrapper;
+            }
+
             public InputAction @Navigate => m_Wrapper.m_UI_Navigate;
             public InputAction @Submit => m_Wrapper.m_UI_Submit;
             public InputAction @Cancel => m_Wrapper.m_UI_Cancel;
@@ -1031,11 +1065,29 @@ namespace UnityEngine.InputSystem
             public InputAction @RightClick => m_Wrapper.m_UI_RightClick;
             public InputAction @TrackedDevicePosition => m_Wrapper.m_UI_TrackedDevicePosition;
             public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
-            public InputActionMap Get() { return m_Wrapper.m_UI; }
-            public void Enable() { Get().Enable(); }
-            public void Disable() { Get().Disable(); }
+
+            public InputActionMap Get()
+            {
+                return m_Wrapper.m_UI;
+            }
+
+            public void Enable()
+            {
+                Get().Enable();
+            }
+
+            public void Disable()
+            {
+                Get().Disable();
+            }
+
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
+
+            public static implicit operator InputActionMap(UIActions set)
+            {
+                return set.Get();
+            }
+
             public void SetCallbacks(IUIActions instance)
             {
                 if (m_Wrapper.m_UIActionsCallbackInterface != null)
@@ -1067,9 +1119,15 @@ namespace UnityEngine.InputSystem
                     @TrackedDevicePosition.started -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDevicePosition;
                     @TrackedDevicePosition.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDevicePosition;
                     @TrackedDevicePosition.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDevicePosition;
-                    @TrackedDeviceOrientation.started -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDeviceOrientation;
-                    @TrackedDeviceOrientation.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDeviceOrientation;
-                    @TrackedDeviceOrientation.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDeviceOrientation;
+                    @TrackedDeviceOrientation.started -= m_Wrapper
+                        .m_UIActionsCallbackInterface
+                        .OnTrackedDeviceOrientation;
+                    @TrackedDeviceOrientation.performed -= m_Wrapper
+                        .m_UIActionsCallbackInterface
+                        .OnTrackedDeviceOrientation;
+                    @TrackedDeviceOrientation.canceled -= m_Wrapper
+                        .m_UIActionsCallbackInterface
+                        .OnTrackedDeviceOrientation;
                 }
                 m_Wrapper.m_UIActionsCallbackInterface = instance;
                 if (instance != null)
@@ -1107,6 +1165,7 @@ namespace UnityEngine.InputSystem
                 }
             }
         }
+
         public UIActions @UI => new UIActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         public InputControlScheme KeyboardMouseScheme
@@ -1158,12 +1217,14 @@ namespace UnityEngine.InputSystem
                 return asset.controlSchemes[m_XRSchemeIndex];
             }
         }
+
         public interface IPlayerActions
         {
             void OnMove(InputAction.CallbackContext context);
             void OnLook(InputAction.CallbackContext context);
             void OnFire(InputAction.CallbackContext context);
         }
+
         public interface IUIActions
         {
             void OnNavigate(InputAction.CallbackContext context);

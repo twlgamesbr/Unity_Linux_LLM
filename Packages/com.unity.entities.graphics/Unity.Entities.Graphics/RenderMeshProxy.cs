@@ -12,7 +12,7 @@ namespace Unity.Rendering
     /// </summary>
     [Serializable]
     [TemporaryBakingType]
-    public struct RenderMeshUnmanaged :IComponentData, IEquatable<RenderMeshUnmanaged>
+    public struct RenderMeshUnmanaged : IComponentData, IEquatable<RenderMeshUnmanaged>
     {
         /// <summary>
         /// A reference to a [UnityEngine.Mesh](https://docs.unity3d.com/ScriptReference/Mesh.html) object.
@@ -42,7 +42,8 @@ namespace Unity.Rendering
         public RenderMeshUnmanaged(
             UnityObjectRef<Mesh> mesh,
             UnityObjectRef<Material> materialForSubMesh = default,
-            int subMeshIndex = default)
+            int subMeshIndex = default
+        )
         {
             Assert.IsTrue(mesh != null, "Must have a non-null Mesh to create RenderMesh.");
 
@@ -60,7 +61,8 @@ namespace Unity.Rendering
         internal RenderMeshUnmanaged(
             UnityObjectRef<Mesh> mesh,
             UnityObjectRef<Material> materialForSubMesh = default,
-            SubMeshIndexInfo32 subMeshInfo = default)
+            SubMeshIndexInfo32 subMeshInfo = default
+        )
         {
             Assert.IsTrue(mesh != null, "Must have a non-null Mesh to create RenderMesh.");
 
@@ -76,10 +78,9 @@ namespace Unity.Rendering
         /// <returns>True, if the properties of both RenderMeshes are equal.</returns>
         public bool Equals(RenderMeshUnmanaged other)
         {
-            return
-                mesh == other.mesh &&
-                materialForSubMesh == other.materialForSubMesh &&
-                subMeshInfo == other.subMeshInfo;
+            return mesh == other.mesh
+                && materialForSubMesh == other.materialForSubMesh
+                && subMeshInfo == other.subMeshInfo;
         }
 
         /// <summary>
@@ -92,8 +93,7 @@ namespace Unity.Rendering
 
             unsafe
             {
-                var buffer = stackalloc[]
-                {
+                var buffer = stackalloc[] {
                     ReferenceEquals(mesh, null) ? 0 : mesh.GetHashCode(),
                     ReferenceEquals(materialForSubMesh, null) ? 0 : materialForSubMesh.GetHashCode(),
                     subMeshInfo.GetHashCode(),
@@ -121,17 +121,17 @@ namespace Unity.Rendering
         /// <summary>
         /// A reference to a [UnityEngine.Mesh](https://docs.unity3d.com/ScriptReference/Mesh.html) object.
         /// </summary>
-        public Mesh                 mesh;
+        public Mesh mesh;
 
         /// <summary>
         /// The material list.
         /// </summary>
-        public List<Material>       materials;
+        public List<Material> materials;
 
         /// <summary>
         /// The submesh index.
         /// </summary>
-        public int                  subMesh;
+        public int subMesh;
 
         /// <summary>
         /// A reference to a [UnityEngine.Material](https://docs.unity3d.com/ScriptReference/Material.html) object.
@@ -140,7 +140,7 @@ namespace Unity.Rendering
         /// For entities converted from GameObjects, this value is derived from the Materials array of the source
         /// Mesh Renderer Component.
         /// </remarks>
-        public Material             material
+        public Material material
         {
             get
             {
@@ -149,12 +149,11 @@ namespace Unity.Rendering
 
                 return materials[subMesh];
             }
-
             set
             {
                 if (materials == null)
                 {
-                    materials = new List<Material>(capacity: 10){value};
+                    materials = new List<Material>(capacity: 10) { value };
                     return;
                 }
                 if (subMesh > materials.Count)
@@ -171,11 +170,7 @@ namespace Unity.Rendering
         /// <param name="mesh">The Mesh to use.</param>
         /// <param name="sharedMaterials">An optional list of Materials to use.</param>
         /// <param name="subMeshIndex">An options sub-mesh index that represents a sub-mesh in the mesh parameter.</param>
-        public RenderMesh(
-            Renderer renderer,
-            Mesh mesh,
-            List<Material> sharedMaterials = null,
-            int subMeshIndex = 0)
+        public RenderMesh(Renderer renderer, Mesh mesh, List<Material> sharedMaterials = null, int subMeshIndex = 0)
         {
             Assert.IsTrue(renderer != null, "Must have a non-null Renderer to create RenderMesh.");
             Assert.IsTrue(mesh != null, "Must have a non-null Mesh to create RenderMesh.");
@@ -186,8 +181,10 @@ namespace Unity.Rendering
             if (sharedMaterials.Count == 0)
                 renderer.GetSharedMaterials(sharedMaterials);
 
-            Assert.IsTrue(subMeshIndex >= 0 && subMeshIndex < sharedMaterials.Count,
-                "Sub-mesh index out of bounds, no matching material.");
+            Assert.IsTrue(
+                subMeshIndex >= 0 && subMeshIndex < sharedMaterials.Count,
+                "Sub-mesh index out of bounds, no matching material."
+            );
 
             this.mesh = mesh;
             materials = sharedMaterials;
@@ -201,10 +198,7 @@ namespace Unity.Rendering
         /// <returns>True, if the properties of both RenderMeshes are equal.</returns>
         public bool Equals(RenderMesh other)
         {
-            return
-                mesh == other.mesh &&
-                material == other.material &&
-                subMesh == other.subMesh;
+            return mesh == other.mesh && material == other.material && subMesh == other.subMesh;
         }
 
         /// <summary>
@@ -217,8 +211,7 @@ namespace Unity.Rendering
 
             unsafe
             {
-                var buffer = stackalloc[]
-                {
+                var buffer = stackalloc[] {
                     ReferenceEquals(mesh, null) ? 0 : mesh.GetHashCode(),
                     ReferenceEquals(material, null) ? 0 : material.GetHashCode(),
                     subMesh.GetHashCode(),

@@ -1,9 +1,9 @@
-using System.Linq;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.Multiplayer.Internal;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEditor.Build.Profile;
+using UnityEditor.Multiplayer.Internal;
 
 namespace Unity.Multiplayer.Editor
 {
@@ -14,7 +14,8 @@ namespace Unity.Multiplayer.Editor
         [InitializeOnLoadMethod]
         private static void Init()
         {
-            s_BuildOptionsSections = TypeCache.GetTypesDerivedFrom<IMultiplayerBuildOptionsSection>()
+            s_BuildOptionsSections = TypeCache
+                .GetTypesDerivedFrom<IMultiplayerBuildOptionsSection>()
                 .Select(t => (IMultiplayerBuildOptionsSection)Activator.CreateInstance(t))
                 .OrderBy(s => s.Order)
                 .ToList();

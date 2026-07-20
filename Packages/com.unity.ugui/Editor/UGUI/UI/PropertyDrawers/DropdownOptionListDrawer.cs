@@ -1,9 +1,9 @@
 using System;
+using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 
 namespace UnityEditor.UI
 {
@@ -27,7 +27,10 @@ namespace UnityEditor.UI
 
         private void Init(SerializedProperty property)
         {
-            if (m_ReorderableList != null && m_ReorderableList.serializedProperty.serializedObject.m_NativeObjectPtr != IntPtr.Zero)
+            if (
+                m_ReorderableList != null
+                && m_ReorderableList.serializedProperty.serializedObject.m_NativeObjectPtr != IntPtr.Zero
+            )
             {
                 return;
             }
@@ -105,9 +108,8 @@ namespace UnityEditor.UI
                 showAlternatingRowBackgrounds = AlternatingRowBackground.None,
                 fixedItemHeight = m_ReorderableList.elementHeight + itemOffset,
                 horizontalScrollingEnabled = false,
-                name = kHeader
+                name = kHeader,
             };
-
 
             var propertyRelative = property.FindPropertyRelative(kOptionsPath);
             listView.bindingPath = propertyRelative.propertyPath;

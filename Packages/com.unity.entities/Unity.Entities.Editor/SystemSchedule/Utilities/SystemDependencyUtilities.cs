@@ -10,7 +10,7 @@ namespace Unity.Entities.Editor
         {
             None,
             Begin,
-            End
+            End,
         }
 
         /// <summary>

@@ -19,88 +19,112 @@ namespace Unity.Entities
             /// Access to read and write to the component type
             /// </summary>
             ReadWrite,
+
             /// <summary>
             /// Access to only read the component type
             /// </summary>
             ReadOnly,
+
             /// <summary>
             /// Excludes the component type when used in a query
             /// </summary>
-            Exclude
+            Exclude,
         }
 
         /// <summary>
         /// A unique index of the component type
         /// </summary>
         public TypeIndex TypeIndex;
+
         /// <summary>
         /// The way the component type will be accessed
         /// </summary>
         public AccessMode AccessModeType;
+
         /// <summary>
         /// True if the component type is a <see cref="IBufferElementData"/>
         /// </summary>
         public bool IsBuffer => TypeIndex.IsBuffer;
+
         /// <summary>
         /// Obsolete. Use <see cref="IsCleanupComponent"/> instead.
         /// </summary>
         /// <remarks> **Obsolete.** Use <see cref="IsCleanupComponent"/> instead.
         ///
         /// True if the component type is a <see cref="ICleanupComponentData"/></remarks>
-        [Obsolete("IsSystemStateComponent has been renamed to IsCleanupComponent. IsSystemStateComponent will be removed in a future package release. (UnityUpgradable) -> IsCleanupComponent", false)]
+        [Obsolete(
+            "IsSystemStateComponent has been renamed to IsCleanupComponent. IsSystemStateComponent will be removed in a future package release. (UnityUpgradable) -> IsCleanupComponent",
+            false
+        )]
         public bool IsSystemStateComponent => TypeIndex.IsCleanupComponent;
+
         /// <summary>
         /// True if the component type is a <see cref="ICleanupComponentData"/>
         /// </summary>
         public bool IsCleanupComponent => TypeIndex.IsCleanupComponent;
+
         /// <summary>
         /// Obsolete. Use <see cref="IsCleanupComponent"/> instead.
         /// </summary>
         /// <remarks> **Obsolete.** Use <see cref="IsCleanupComponent"/> instead.
         ///
         /// True if the component type is a <see cref="ICleanupSharedComponentData"/>.</remarks>
-        [Obsolete("IsSystemStateSharedComponent has been renamed to IsCleanupSharedComponent. IsSystemStateSharedComponent will be removed in a future package release. (UnityUpgradable) -> IsCleanupSharedComponent", false)]
+        [Obsolete(
+            "IsSystemStateSharedComponent has been renamed to IsCleanupSharedComponent. IsSystemStateSharedComponent will be removed in a future package release. (UnityUpgradable) -> IsCleanupSharedComponent",
+            false
+        )]
         public bool IsSystemStateSharedComponent => TypeIndex.IsCleanupSharedComponent;
+
         /// <summary>
         /// True if the component type is a <see cref="ICleanupSharedComponentData"/>
         /// </summary>
         public bool IsCleanupSharedComponent => TypeIndex.IsCleanupSharedComponent;
+
         /// <summary>
         /// Bitflag set for component types inheriting from <seealso cref="ICleanupBufferElementData"/>.
         /// </summary>
         public bool IsCleanupBufferComponent => TypeIndex.IsCleanupBufferComponent;
+
         /// <summary>
         /// True if the component type is a <see cref="IComponentData"/>
         /// </summary>
         public bool IsComponent => TypeIndex.IsComponentType;
+
         /// <summary>
         /// True if the component type is a <see cref="ISharedComponentData"/>
         /// </summary>
         public bool IsSharedComponent => TypeIndex.IsSharedComponentType;
+
         /// <summary>
         /// True if the component type is a managed component
         /// </summary>
         public bool IsManagedComponent => TypeIndex.IsManagedComponent;
+
         /// <summary>
         /// True if the component type does not contain actual fields or data
         /// </summary>
         public bool IsZeroSized => TypeIndex.IsZeroSized;
+
         /// <summary>
         /// True if the component type is flagged as a chunk component type
         /// </summary>
         public bool IsChunkComponent => TypeIndex.IsChunkComponent;
+
         /// <summary>
         /// True if the component type is a <see cref="IEnableableComponent"/>
         /// </summary>
         public bool IsEnableable => TypeIndex.IsEnableable;
+
         /// <summary>
         /// True if any of the fields in the component type are type <see cref="Entity"/>
         /// </summary>
         public bool HasEntityReferences => TypeIndex.HasEntityReferences;
+
         /// <summary>
         /// The component type contains a <seealso cref="NativeContainerAttribute"/> decorated member. NativeContainer members found in nested member types will also cause this property to return true.
         /// </summary>
         public bool HasNativeContainer => TypeIndex.HasNativeContainer;
+
         /// <summary>
         /// True if the component type is appropriate for chunk serialization. Such types are blittable without containing pointer types or have been decorated with <seealso cref="ChunkSerializableAttribute"/>.
         /// </summary>
@@ -334,7 +358,7 @@ namespace Unity.Entities
         /// <param name="lhs">The left-hand side</param>
         /// <param name="rhs">The right-hand side</param>
         /// <returns>True if the left-hand side's <see cref="TypeIndex"/> is less than the right-hand side's. If the type indices match, the <see cref="AccessModeType"/> is used.</returns>
-        public static bool operator<(ComponentType lhs, ComponentType rhs)
+        public static bool operator <(ComponentType lhs, ComponentType rhs)
         {
             if (lhs.TypeIndex == rhs.TypeIndex)
                 return lhs.AccessModeType < rhs.AccessModeType;
@@ -348,7 +372,7 @@ namespace Unity.Entities
         /// <param name="lhs">The left-hand side</param>
         /// <param name="rhs">The right-hand side</param>
         /// <returns>True if the left-hand side's <see cref="TypeIndex"/> is less than the right-hand side's. If the type indices match, the <see cref="AccessModeType"/> fields are compared instead.</returns>
-        public static bool operator>(ComponentType lhs, ComponentType rhs) => rhs < lhs;
+        public static bool operator >(ComponentType lhs, ComponentType rhs) => rhs < lhs;
 
         /// <summary>
         /// Evaluates if two component types are equal based on <see cref="TypeIndex"/> and <see cref="AccessModeType"/>.
@@ -356,7 +380,7 @@ namespace Unity.Entities
         /// <param name="lhs">The left-hand side</param>
         /// <param name="rhs">The right-hand side</param>
         /// <returns>Returns true if both their type indices are equal and their access modes are equal.</returns>
-        public static bool operator==(ComponentType lhs, ComponentType rhs) => lhs.Equals(rhs);
+        public static bool operator ==(ComponentType lhs, ComponentType rhs) => lhs.Equals(rhs);
 
         /// <summary>
         /// Evaluates if two component types are not equal based on <see cref="TypeIndex"/> and <see cref="AccessModeType"/>.
@@ -364,10 +388,14 @@ namespace Unity.Entities
         /// <param name="lhs">The left-hand side</param>
         /// <param name="rhs">The right-hand side</param>
         /// <returns>Returns true if their type indices are not equal or their access modes are not equal.</returns>
-        public static bool operator!=(ComponentType lhs, ComponentType rhs) => !lhs.Equals(rhs);
+        public static bool operator !=(ComponentType lhs, ComponentType rhs) => !lhs.Equals(rhs);
 
-        internal static unsafe bool CompareArray(ComponentType* type1, int typeCount1, ComponentType* type2,
-            int typeCount2)
+        internal static unsafe bool CompareArray(
+            ComponentType* type1,
+            int typeCount1,
+            ComponentType* type2,
+            int typeCount2
+        )
         {
             if (typeCount1 != typeCount2)
                 return false;
@@ -385,7 +413,7 @@ namespace Unity.Entities
         /// <param name="componentTypes"></param>
         /// <returns></returns>
         [ExcludeFromBurstCompatTesting("Takes a managed array")]
-        unsafe public static ComponentType[] Combine(params ComponentType[][] componentTypes)
+        public static unsafe ComponentType[] Combine(params ComponentType[][] componentTypes)
         {
             int count = 0;
             for (int i = 0; i != componentTypes.Length; i++)
@@ -396,7 +424,7 @@ namespace Unity.Entities
             for (int i = 0; i != componentTypes.Length; i++)
             {
                 for (int k = 0; k < componentTypes[i].Length; ++k)
-                    output[o+k] = componentTypes[i][k];
+                    output[o + k] = componentTypes[i][k];
                 o += componentTypes[i].Length;
             }
 
@@ -408,16 +436,21 @@ namespace Unity.Entities
             if (count != 0)
             {
                 o = 0;
-                for (int i = 1; i < count;i++ )
+                for (int i = 1; i < count; i++)
                 {
                     if (output[o].TypeIndex != output[i].TypeIndex)
                     {
                         o++;
                         output[o] = output[i];
                     }
-                    else if (output[i].AccessModeType == AccessMode.Exclude && output[o].AccessModeType != AccessMode.Exclude)
+                    else if (
+                        output[i].AccessModeType == AccessMode.Exclude
+                        && output[o].AccessModeType != AccessMode.Exclude
+                    )
                     {
-                        throw new ArgumentException($"ComponentType.Combine {output[o]} and {output[i]} are conflicting.");
+                        throw new ArgumentException(
+                            $"ComponentType.Combine {output[o]} and {output[i]} are conflicting."
+                        );
                     }
                 }
                 o++;
@@ -425,7 +458,6 @@ namespace Unity.Entities
                 if (o != count)
                     Array.Resize(ref output, o);
             }
-
 
             return output;
         }
@@ -473,14 +505,15 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="other">The other component type to compare to</param>
         /// <returns>True if the <see cref="TypeIndex"/> and <see cref="AccessModeType"/>of both are equal</returns>
-        public bool Equals(ComponentType other) => TypeIndex == other.TypeIndex && AccessModeType == other.AccessModeType;
+        public bool Equals(ComponentType other) =>
+            TypeIndex == other.TypeIndex && AccessModeType == other.AccessModeType;
 
         /// <summary>
         /// Returns the sort order this component type compared to another
         /// </summary>
         /// <param name="other">The other component type</param>
         /// <returns>The sort order</returns>
-		[GenerateTestsForBurstCompatibility]
+        [GenerateTestsForBurstCompatibility]
         public int CompareTo(ComponentType other)
         {
             if (TypeIndex != other.TypeIndex)

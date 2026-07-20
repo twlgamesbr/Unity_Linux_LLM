@@ -16,7 +16,14 @@ namespace UnityEngine.InputSystem.Editor.Lists
     /// </remarks>
     internal abstract class NameAndParameterListView
     {
-        protected NameAndParameterListView(SerializedProperty property, Action applyAction, string expectedControlLayout, TypeTable listOptions, Func<Type, Type> getValueType, string itemName)
+        protected NameAndParameterListView(
+            SerializedProperty property,
+            Action applyAction,
+            string expectedControlLayout,
+            TypeTable listOptions,
+            Func<Type, Type> getValueType,
+            string itemName
+        )
         {
             m_ItemName = itemName;
             m_GetValueType = getValueType;
@@ -63,7 +70,11 @@ namespace UnityEngine.InputSystem.Editor.Lists
         {
             // Add only original names to the menu and not aliases.
             var menu = new GenericMenu();
-            foreach (var name in m_ListOptions.internedNames.Where(x => !m_ListOptions.ShouldHideInUI(x)).OrderBy(x => x.ToString()))
+            foreach (
+                var name in m_ListOptions
+                    .internedNames.Where(x => !m_ListOptions.ShouldHideInUI(x))
+                    .OrderBy(x => x.ToString())
+            )
             {
                 // Skip if not compatible with value type.
                 if (m_ExpectedValueType != null)
@@ -84,15 +95,17 @@ namespace UnityEngine.InputSystem.Editor.Lists
         {
             var name = (string)data;
 
-            ArrayHelpers.Append(ref m_ParametersForEachListItem,
-                new NameAndParameters {name = name});
-            ArrayHelpers.Append(ref m_EditableParametersForEachListItem,
-                new ParameterListView { onChange = OnParametersChanged });
+            ArrayHelpers.Append(ref m_ParametersForEachListItem, new NameAndParameters { name = name });
+            ArrayHelpers.Append(
+                ref m_EditableParametersForEachListItem,
+                new ParameterListView { onChange = OnParametersChanged }
+            );
 
             var index = m_EditableParametersForEachListItem.Length - 1;
             var typeName = m_ParametersForEachListItem[index].name;
             var rowType = m_ListOptions.LookupTypeRegistration(typeName);
-            m_EditableParametersForEachListItem[index].Initialize(rowType, m_ParametersForEachListItem[index].parameters);
+            m_EditableParametersForEachListItem[index]
+                .Initialize(rowType, m_ParametersForEachListItem[index].parameters);
             m_EditableParametersForEachListItem[index].name = ObjectNames.NicifyVariableName(name);
 
             m_Apply();
@@ -115,13 +128,19 @@ namespace UnityEngine.InputSystem.Editor.Lists
         private static class Styles
         {
             public static readonly GUIStyle s_FoldoutStyle = new GUIStyle("foldout").WithFontStyle(FontStyle.Bold);
-            public static readonly GUIStyle s_UpDownButtonStyle = new GUIStyle("label").WithFixedWidth(12).WithFixedHeight(12).WithPadding(new RectOffset());
+            public static readonly GUIStyle s_UpDownButtonStyle = new GUIStyle("label")
+                .WithFixedWidth(12)
+                .WithFixedHeight(12)
+                .WithPadding(new RectOffset());
         }
 
         private void SwapEntry(int oldIndex, int newIndex)
         {
             MemoryHelpers.Swap(ref m_ParametersForEachListItem[oldIndex], ref m_ParametersForEachListItem[newIndex]);
-            MemoryHelpers.Swap(ref m_EditableParametersForEachListItem[oldIndex], ref m_EditableParametersForEachListItem[newIndex]);
+            MemoryHelpers.Swap(
+                ref m_EditableParametersForEachListItem[oldIndex],
+                ref m_EditableParametersForEachListItem[newIndex]
+            );
             m_Apply();
         }
 
@@ -142,7 +161,12 @@ namespace UnityEngine.InputSystem.Editor.Lists
                     var editableParams = m_EditableParametersForEachListItem[i];
                     EditorGUILayout.BeginHorizontal();
                     if (editableParams.hasUIToShow)
-                        editableParams.visible = EditorGUILayout.Foldout(editableParams.visible, editableParams.name, true, Styles.s_FoldoutStyle);
+                        editableParams.visible = EditorGUILayout.Foldout(
+                            editableParams.visible,
+                            editableParams.name,
+                            true,
+                            Styles.s_FoldoutStyle
+                        );
                     else
                     {
                         GUILayout.Space(16);
@@ -185,8 +209,7 @@ namespace UnityEngine.InputSystem.Editor.Lists
             if (m_ParametersForEachListItem == null)
                 return string.Empty;
 
-            return string.Join(NamedValue.Separator,
-                m_ParametersForEachListItem.Select(x => x.ToString()).ToArray());
+            return string.Join(NamedValue.Separator, m_ParametersForEachListItem.Select(x => x.ToString()).ToArray());
         }
 
         private Func<Type, Type> m_GetValueType;
@@ -209,9 +232,14 @@ namespace UnityEngine.InputSystem.Editor.Lists
     internal class ProcessorsListView : NameAndParameterListView
     {
         public ProcessorsListView(SerializedProperty property, Action applyAction, string expectedControlLayout)
-            : base(property, applyAction, expectedControlLayout, InputProcessor.s_Processors, InputProcessor.GetValueTypeFromType, "Processor")
-        {
-        }
+            : base(
+                property,
+                applyAction,
+                expectedControlLayout,
+                InputProcessor.s_Processors,
+                InputProcessor.GetValueTypeFromType,
+                "Processor"
+            ) { }
     }
 
     /// <summary>
@@ -220,9 +248,14 @@ namespace UnityEngine.InputSystem.Editor.Lists
     internal class InteractionsListView : NameAndParameterListView
     {
         public InteractionsListView(SerializedProperty property, Action applyAction, string expectedControlLayout)
-            : base(property, applyAction, expectedControlLayout, InputInteraction.s_Interactions, InputInteraction.GetValueType, "Interaction")
-        {
-        }
+            : base(
+                property,
+                applyAction,
+                expectedControlLayout,
+                InputInteraction.s_Interactions,
+                InputInteraction.GetValueType,
+                "Interaction"
+            ) { }
     }
 }
 #endif // UNITY_EDITOR

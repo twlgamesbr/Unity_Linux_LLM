@@ -70,13 +70,11 @@ namespace Unity.Networking.Transport.Analytics
         }
 
         /// <summary>Percentage of packets that were duplicated on this connection.</summary>
-        public float PacketDuplicationPercent => Reliable.PacketsReceived > 0
-            ? Reliable.PacketsDuplicated * 100.0f / Reliable.PacketsReceived
-            : 0.0f;
+        public float PacketDuplicationPercent =>
+            Reliable.PacketsReceived > 0 ? Reliable.PacketsDuplicated * 100.0f / Reliable.PacketsReceived : 0.0f;
 
         /// <summary>Percentage of packets received out of order on this connection.</summary>
-        public float PacketOutOfOrderPercent => Reliable.PacketsReceived > 0
-            ? Reliable.PacketsOutOfOrder * 100.0f / Reliable.PacketsReceived
-            : 0.0f;
+        public float PacketOutOfOrderPercent =>
+            Reliable.PacketsReceived > 0 ? Reliable.PacketsOutOfOrder * 100.0f / Reliable.PacketsReceived : 0.0f;
     }
 }

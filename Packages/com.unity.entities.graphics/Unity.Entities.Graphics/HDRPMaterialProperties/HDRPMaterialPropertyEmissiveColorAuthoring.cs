@@ -5,7 +5,10 @@ using Unity.Mathematics;
 namespace Unity.Rendering
 {
     [MaterialProperty("_EmissiveColor")]
-    public struct HDRPMaterialPropertyEmissiveColor : IComponentData { public float3 Value; }
+    public struct HDRPMaterialPropertyEmissiveColor : IComponentData
+    {
+        public float3 Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyEmissiveColorAuthoring : UnityEngine.MonoBehaviour

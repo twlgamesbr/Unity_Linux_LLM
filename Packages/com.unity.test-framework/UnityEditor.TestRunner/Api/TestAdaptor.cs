@@ -47,7 +47,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
             UniqueName = test.GetUniqueName();
             ParentUniqueName = test.GetParentUniqueName();
             ChildIndex = childIndex;
-            
+
             var testPlatform = test.Properties.Get("platform");
             if (testPlatform is TestPlatform platform)
             {

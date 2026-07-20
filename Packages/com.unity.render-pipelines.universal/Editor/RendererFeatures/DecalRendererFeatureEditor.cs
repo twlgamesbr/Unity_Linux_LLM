@@ -9,11 +9,26 @@ namespace UnityEditor.Rendering.Universal
     {
         private struct Styles
         {
-            public static GUIContent Technique = EditorGUIUtility.TrTextContent("Technique", "This option determines what method is used for rendering decals.");
-            public static GUIContent MaxDrawDistance = EditorGUIUtility.TrTextContent("Max Draw Distance", "Maximum global draw distance of decals.");
-            public static GUIContent UseRenderingLayers = EditorGUIUtility.TrTextContent("Use Rendering Layers", "When enabled, you can configure specific Decal Projectors to affect only specific objects. The number of Rendering Layers affects the performance.");
-            public static GUIContent SurfaceData = EditorGUIUtility.TrTextContent("Surface Data", "Allows specifying which decals surface data should be blended with surfaces.");
-            public static GUIContent NormalBlend = EditorGUIUtility.TrTextContent("Normal Blend", "Controls the quality of normal reconstruction. The higher the value the more accurate normal reconstruction and the cost on performance.");
+            public static GUIContent Technique = EditorGUIUtility.TrTextContent(
+                "Technique",
+                "This option determines what method is used for rendering decals."
+            );
+            public static GUIContent MaxDrawDistance = EditorGUIUtility.TrTextContent(
+                "Max Draw Distance",
+                "Maximum global draw distance of decals."
+            );
+            public static GUIContent UseRenderingLayers = EditorGUIUtility.TrTextContent(
+                "Use Rendering Layers",
+                "When enabled, you can configure specific Decal Projectors to affect only specific objects. The number of Rendering Layers affects the performance."
+            );
+            public static GUIContent SurfaceData = EditorGUIUtility.TrTextContent(
+                "Surface Data",
+                "Allows specifying which decals surface data should be blended with surfaces."
+            );
+            public static GUIContent NormalBlend = EditorGUIUtility.TrTextContent(
+                "Normal Blend",
+                "Controls the quality of normal reconstruction. The higher the value the more accurate normal reconstruction and the cost on performance."
+            );
         }
 
         private SerializedProperty m_Technique;
@@ -45,7 +60,9 @@ namespace UnityEditor.Rendering.Universal
         {
             Init();
 
-            var isGLDevice = SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3 || SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore;
+            var isGLDevice =
+                SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3
+                || SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore;
 
             EditorGUILayout.PropertyField(m_Technique, Styles.Technique);
 
@@ -55,7 +72,10 @@ namespace UnityEditor.Rendering.Universal
             {
                 if (isGLDevice)
                 {
-                    EditorGUILayout.HelpBox("DBuffer technique is not supported on OpenGL. Decals will not be rendered.", MessageType.Error);
+                    EditorGUILayout.HelpBox(
+                        "DBuffer technique is not supported on OpenGL. Decals will not be rendered.",
+                        MessageType.Error
+                    );
                     EditorGUILayout.Space();
                 }
 

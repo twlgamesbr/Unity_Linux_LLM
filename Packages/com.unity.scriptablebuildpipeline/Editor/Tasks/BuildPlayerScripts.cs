@@ -1,8 +1,8 @@
-using UnityEditor.Build.Pipeline.Injector;
-using UnityEditor.Build.Pipeline.Utilities;
-using UnityEditor.Build.Pipeline.Interfaces;
-using UnityEditor.Build.Player;
 using System.IO;
+using UnityEditor.Build.Pipeline.Injector;
+using UnityEditor.Build.Pipeline.Interfaces;
+using UnityEditor.Build.Pipeline.Utilities;
+using UnityEditor.Build.Player;
 
 namespace UnityEditor.Build.Pipeline.Tasks
 {
@@ -12,7 +12,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class BuildPlayerScripts : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext]
@@ -38,7 +41,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 Directory.CreateDirectory(m_Parameters.ScriptOutputFolder);
             }
 
-            m_Results.ScriptResults = PlayerBuildInterface.CompilePlayerScripts(m_Parameters.GetScriptCompilationSettings(), m_Parameters.ScriptOutputFolder);
+            m_Results.ScriptResults = PlayerBuildInterface.CompilePlayerScripts(
+                m_Parameters.GetScriptCompilationSettings(),
+                m_Parameters.ScriptOutputFolder
+            );
             m_Parameters.ScriptInfo = m_Results.ScriptResults.typeDB;
             BuildCacheUtility.SetTypeDB(m_Parameters.ScriptInfo);
 

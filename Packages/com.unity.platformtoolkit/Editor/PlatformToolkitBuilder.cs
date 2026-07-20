@@ -17,7 +17,10 @@ namespace Unity.PlatformToolkit.Editor
     {
         public int callbackOrder => int.MaxValue;
 
-        private static readonly string s_PtMarkerFilePath = Path.Combine(Application.streamingAssetsPath, "__UnityPlatformToolkit");
+        private static readonly string s_PtMarkerFilePath = Path.Combine(
+            Application.streamingAssetsPath,
+            "__UnityPlatformToolkit"
+        );
         private IPlatformToolkitBuilder m_Builder;
         private Object m_RuntimeConfiguration;
 
@@ -32,18 +35,22 @@ namespace Unity.PlatformToolkit.Editor
                 var buildProfileSettings = buildProfile.GetComponent<BuildProfileSettings>();
                 if (buildProfileSettings != null)
                 {
-                     // Ensure default is set if key is uninitialized
+                    // Ensure default is set if key is uninitialized
                     buildProfileSettings.AssignKeyIfEmpty(buildProfile);
 
                     declarationKey = buildProfileSettings.GetImplementationKey(buildProfile, out bool isKeyValidChoice);
                     if (!isKeyValidChoice)
                     {
-                        throw new Exception($"No valid implementation found for key '{declarationKey}' on {nameof(BuildProfileSettings)} component");
+                        throw new Exception(
+                            $"No valid implementation found for key '{declarationKey}' on {nameof(BuildProfileSettings)} component"
+                        );
                     }
 
                     if (string.IsNullOrEmpty(declarationKey))
                     {
-                        throw new Exception($"An empty key was returned by a {nameof(BuildProfileSettings)} component but this is not a valid choice");
+                        throw new Exception(
+                            $"An empty key was returned by a {nameof(BuildProfileSettings)} component but this is not a valid choice"
+                        );
                     }
                 }
             }
@@ -52,22 +59,35 @@ namespace Unity.PlatformToolkit.Editor
             // If no declaration key was found from a build profile, try to get it from the global settings
             if (string.IsNullOrEmpty(declarationKey))
             {
-                if (!PlatformToolkitSettings.instance.SupportDeclarationTargetsManager.TryGetDeclarationForBuildTarget(report.summary.platform, out declarationKey))
+                if (
+                    !PlatformToolkitSettings.instance.SupportDeclarationTargetsManager.TryGetDeclarationForBuildTarget(
+                        report.summary.platform,
+                        out declarationKey
+                    )
+                )
                 {
                     Debug.LogWarning($"No PT implementation configured for build target {report.summary.platform}");
                     return;
                 }
             }
 
-            Assert.IsTrue(SupportDeclarationManager.TryGetSupportDeclaration(declarationKey, out var supportDeclaration));
+            Assert.IsTrue(
+                SupportDeclarationManager.TryGetSupportDeclaration(declarationKey, out var supportDeclaration)
+            );
 
             IAchievementConfigurationContext achievementContext = null;
             if (supportDeclaration.AchievementsSupported)
-                achievementContext = new AchievementConfigurationContext(supportDeclaration.Key, PlatformToolkitSettings.instance.StoredAchievements);
+                achievementContext = new AchievementConfigurationContext(
+                    supportDeclaration.Key,
+                    PlatformToolkitSettings.instance.StoredAchievements
+                );
 
             ISettingsConfigurationContext settingsContext = null;
             if (supportDeclaration.SettingsProvider != null)
-                settingsContext = new SettingsConfigurationContext(supportDeclaration.Key, PlatformToolkitSettings.instance.StoredSettings);
+                settingsContext = new SettingsConfigurationContext(
+                    supportDeclaration.Key,
+                    PlatformToolkitSettings.instance.StoredSettings
+                );
 
             m_Builder = supportDeclaration.CreateBuilder(achievementContext, settingsContext);
             if (m_Builder == null)

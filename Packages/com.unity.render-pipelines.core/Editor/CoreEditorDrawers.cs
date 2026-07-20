@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor.AnimatedValues;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace UnityEditor.Rendering
@@ -12,14 +12,19 @@ namespace UnityEditor.Rendering
     {
         /// <summary>No Option</summary>
         None = 0,
+
         /// <summary>Foldout will be indented</summary>
         Indent = 1 << 0,
+
         /// <summary>Foldout will be boxed</summary>
         Boxed = 1 << 2,
+
         /// <summary>Foldout will be inside another foldout</summary>
         SubFoldout = 1 << 3,
+
         /// <summary>Remove the space at end of the foldout</summary>
         NoSpaceAtEnd = 1 << 4,
+
         /// <summary>Foldout backgound will use the same as for TitleHeaders</summary>
         TitleHeader = 1 << 5,
     }
@@ -30,8 +35,9 @@ namespace UnityEditor.Rendering
     {
         /// <summary>No Option</summary>
         None = 0,
+
         /// <summary>Group will be indented</summary>
-        Indent = 1 << 0
+        Indent = 1 << 0,
     }
 
     /// <summary>
@@ -150,12 +156,20 @@ namespace UnityEditor.Rendering
             bool IDrawer.Expand(int mask) => DefaultExpand(actionDrawers, mask);
         }
 
-        internal static IDrawer ConditionalWithAdditionalProperties(Enabler enabler, AnimFloat animation, params IDrawer[] contentDrawers)
+        internal static IDrawer ConditionalWithAdditionalProperties(
+            Enabler enabler,
+            AnimFloat animation,
+            params IDrawer[] contentDrawers
+        )
         {
             return new ConditionalDrawerWithAdditionalPropertiesInternal(enabler, animation, contentDrawers.Draw);
         }
 
-        internal static IDrawer ConditionalWithAdditionalProperties(Enabler enabler, AnimFloat animation, params ActionDrawer[] contentDrawers)
+        internal static IDrawer ConditionalWithAdditionalProperties(
+            Enabler enabler,
+            AnimFloat animation,
+            params ActionDrawer[] contentDrawers
+        )
         {
             return new ConditionalDrawerWithAdditionalPropertiesInternal(enabler, animation, contentDrawers);
         }
@@ -166,7 +180,11 @@ namespace UnityEditor.Rendering
             Enabler m_Enabler;
             AnimFloat m_Anim;
 
-            public ConditionalDrawerWithAdditionalPropertiesInternal(Enabler enabler = null, AnimFloat anim = null, params ActionDrawer[] actionDrawers)
+            public ConditionalDrawerWithAdditionalPropertiesInternal(
+                Enabler enabler = null,
+                AnimFloat anim = null,
+                params ActionDrawer[] actionDrawers
+            )
             {
                 m_ActionDrawers = actionDrawers;
                 m_Enabler = enabler;
@@ -196,8 +214,8 @@ namespace UnityEditor.Rendering
         /// <param name="drawIfTrue">This will be draw if the <see cref="switch"/> is true</param>
         /// <param name="drawIfFalse">This will be draw if the <see cref="switch"/> is false</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer TernaryConditional(Enabler @switch, IDrawer drawIfTrue, IDrawer drawIfFalse)
-            => new TernaryConditionalDrawerInternal(@switch, drawIfTrue.Draw, drawIfFalse.Draw);
+        public static IDrawer TernaryConditional(Enabler @switch, IDrawer drawIfTrue, IDrawer drawIfFalse) =>
+            new TernaryConditionalDrawerInternal(@switch, drawIfTrue.Draw, drawIfFalse.Draw);
 
         /// <summary>
         /// Conditioned drawer that will draw something depending of the return of the switch
@@ -206,8 +224,8 @@ namespace UnityEditor.Rendering
         /// <param name="drawIfTrue">This will be draw if the <see cref="switch"/> is true</param>
         /// <param name="drawIfFalse">This will be draw if the <see cref="switch"/> is false</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer TernaryConditional(Enabler @switch, ActionDrawer drawIfTrue, ActionDrawer drawIfFalse)
-            => new TernaryConditionalDrawerInternal(@switch, drawIfTrue, drawIfFalse);
+        public static IDrawer TernaryConditional(Enabler @switch, ActionDrawer drawIfTrue, ActionDrawer drawIfFalse) =>
+            new TernaryConditionalDrawerInternal(@switch, drawIfTrue, drawIfFalse);
 
         class TernaryConditionalDrawerInternal : IDrawer
         {
@@ -362,7 +380,12 @@ namespace UnityEditor.Rendering
             float m_LabelWidth;
             bool isIndented;
 
-            public GroupDrawerInternal(float labelWidth = -1f, GUIContent header = null, GroupOption options = GroupOption.None, params ActionDrawer[] actionDrawers)
+            public GroupDrawerInternal(
+                float labelWidth = -1f,
+                GUIContent header = null,
+                GroupOption options = GroupOption.None,
+                params ActionDrawer[] actionDrawers
+            )
             {
                 this.actionDrawers = actionDrawers;
                 this.header = header;
@@ -418,8 +441,17 @@ namespace UnityEditor.Rendering
 
             Action<GenericMenu, TData> m_customMenuContextAction;
 
-            public FoldoutGroupDrawerInternal(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state,
-                                              Enabler enabler, SwitchEnabler switchEnabler, FoldoutOption options = FoldoutOption.None, Action<GenericMenu, TData> customMenuContextAction = null, string otherDocumentation = null, params ActionDrawer[] actionDrawers)
+            public FoldoutGroupDrawerInternal(
+                GUIContent title,
+                TEnum mask,
+                ExpandedStateBase<TEnum> state,
+                Enabler enabler,
+                SwitchEnabler switchEnabler,
+                FoldoutOption options = FoldoutOption.None,
+                Action<GenericMenu, TData> customMenuContextAction = null,
+                string otherDocumentation = null,
+                params ActionDrawer[] actionDrawers
+            )
             {
                 m_IsBoxed = (options & FoldoutOption.Boxed) != 0;
                 m_IsIndented = (options & FoldoutOption.Indent) != 0;
@@ -459,7 +491,8 @@ namespace UnityEditor.Rendering
                 else
                 {
                     CoreEditorUtils.DrawSplitter(m_IsBoxed);
-                    newExpended = CoreEditorUtils.DrawHeaderFoldout(m_Title,
+                    newExpended = CoreEditorUtils.DrawHeaderFoldout(
+                        m_Title,
                         expended,
                         m_IsBoxed,
                         m_Enabler == null ? null : () => m_Enabler(data, owner),
@@ -467,7 +500,8 @@ namespace UnityEditor.Rendering
                         m_IsTitleHeader,
                         m_HelpUrl,
                         null,
-                        m_customMenuContextAction == null ? null : (menu) => m_customMenuContextAction(menu, data));
+                        m_customMenuContextAction == null ? null : (menu) => m_customMenuContextAction(menu, data)
+                    );
                     if (m_IsTitleHeader)
                         CoreEditorUtils.DrawFoldoutEndSplitter(m_IsBoxed);
                 }
@@ -505,7 +539,8 @@ namespace UnityEditor.Rendering
         /// <returns>A IDrawer object</returns>
         public static IDrawer Select<T2Data>(
             DataSelect<T2Data> dataSelect,
-            params CoreEditorDrawer<T2Data>.IDrawer[] otherDrawers)
+            params CoreEditorDrawer<T2Data>.IDrawer[] otherDrawers
+        )
         {
             return new SelectDrawerInternal<T2Data>(dataSelect, otherDrawers.Draw);
         }
@@ -517,7 +552,8 @@ namespace UnityEditor.Rendering
         /// <returns>A IDrawer object</returns>
         public static IDrawer Select<T2Data>(
             DataSelect<T2Data> dataSelect,
-            params CoreEditorDrawer<T2Data>.ActionDrawer[] otherDrawers)
+            params CoreEditorDrawer<T2Data>.ActionDrawer[] otherDrawers
+        )
         {
             return new SelectDrawerInternal<T2Data>(dataSelect, otherDrawers);
         }
@@ -527,8 +563,10 @@ namespace UnityEditor.Rendering
             DataSelect<T2Data> m_DataSelect;
             CoreEditorDrawer<T2Data>.ActionDrawer[] m_SourceDrawers;
 
-            public SelectDrawerInternal(DataSelect<T2Data> dataSelect,
-                                        params CoreEditorDrawer<T2Data>.ActionDrawer[] otherDrawers)
+            public SelectDrawerInternal(
+                DataSelect<T2Data> dataSelect,
+                params CoreEditorDrawer<T2Data>.ActionDrawer[] otherDrawers
+            )
             {
                 m_SourceDrawers = otherDrawers;
                 m_DataSelect = dataSelect;
@@ -551,7 +589,12 @@ namespace UnityEditor.Rendering
         /// <param name="state">The ExpandedStateBase describing the component</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, contentDrawers.Draw);
@@ -564,7 +607,12 @@ namespace UnityEditor.Rendering
         /// <param name="state">The ExpandedStateBase describing the component</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(EditorGUIUtility.TrTextContent(title), mask, state, contentDrawers);
@@ -578,7 +626,13 @@ namespace UnityEditor.Rendering
         /// <param name="options">Drawing options</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, options, contentDrawers.Draw);
@@ -592,7 +646,13 @@ namespace UnityEditor.Rendering
         /// <param name="options">Drawing options</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(EditorGUIUtility.TrTextContent(title), mask, state, options, contentDrawers);
@@ -607,7 +667,14 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, options, customMenuContextAction, contentDrawers.Draw);
@@ -623,10 +690,26 @@ namespace UnityEditor.Rendering
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, string otherDocumentation, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            string otherDocumentation,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
-            return FoldoutGroup(title, mask, state, options, customMenuContextAction, otherDocumentation, contentDrawers.Draw);
+            return FoldoutGroup(
+                title,
+                mask,
+                state,
+                options,
+                customMenuContextAction,
+                otherDocumentation,
+                contentDrawers.Draw
+            );
         }
 
         /// <summary> Create an IDrawer foldout header using an ExpandedStateBase </summary>
@@ -638,10 +721,24 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
-            return FoldoutGroup(EditorGUIUtility.TrTextContent(title), mask, state, options, customMenuContextAction, contentDrawers);
+            return FoldoutGroup(
+                EditorGUIUtility.TrTextContent(title),
+                mask,
+                state,
+                options,
+                customMenuContextAction,
+                contentDrawers
+            );
         }
 
         /// <summary> Create an IDrawer foldout header using an ExpandedStateBase </summary>
@@ -654,10 +751,26 @@ namespace UnityEditor.Rendering
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(string title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, string otherDocumentation, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            string title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            string otherDocumentation,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
-            return FoldoutGroup(EditorGUIUtility.TrTextContent(title), mask, state, options, customMenuContextAction, otherDocumentation, contentDrawers);
+            return FoldoutGroup(
+                EditorGUIUtility.TrTextContent(title),
+                mask,
+                state,
+                options,
+                customMenuContextAction,
+                otherDocumentation,
+                contentDrawers
+            );
         }
 
         /// <summary> Create an IDrawer foldout header using an ExpandedStateBase </summary>
@@ -667,7 +780,12 @@ namespace UnityEditor.Rendering
         /// <param name="state">The ExpandedStateBase describing the component</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, FoldoutOption.Indent, contentDrawers.Draw);
@@ -680,7 +798,12 @@ namespace UnityEditor.Rendering
         /// <param name="state">The ExpandedStateBase describing the component</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, FoldoutOption.Indent, null, null, null, null, contentDrawers);
@@ -694,7 +817,13 @@ namespace UnityEditor.Rendering
         /// <param name="options">Drawing options</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, options, contentDrawers.Draw);
@@ -708,7 +837,13 @@ namespace UnityEditor.Rendering
         /// <param name="options">Drawing options</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, options, null, null, null, null, contentDrawers);
@@ -723,7 +858,14 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, options, customMenuContextAction, contentDrawers.Draw);
@@ -739,10 +881,26 @@ namespace UnityEditor.Rendering
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, string otherDocumentation, params IDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            string otherDocumentation,
+            params IDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
-            return FoldoutGroup(title, mask, state, options, customMenuContextAction, otherDocumentation, contentDrawers.Draw);
+            return FoldoutGroup(
+                title,
+                mask,
+                state,
+                options,
+                customMenuContextAction,
+                otherDocumentation,
+                contentDrawers.Draw
+            );
         }
 
         /// <summary> Create an IDrawer foldout header using an ExpandedStateBase </summary>
@@ -754,7 +912,14 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
             return FoldoutGroup(title, mask, state, options, customMenuContextAction, null, null, null, contentDrawers);
@@ -770,17 +935,55 @@ namespace UnityEditor.Rendering
         /// <param name="contentDrawers">The content of the foldout header</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, string otherDocumentation, params ActionDrawer[] contentDrawers)
+        public static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            string otherDocumentation,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
-            return FoldoutGroup(title, mask, state, options, customMenuContextAction, null, null, otherDocumentation, contentDrawers);
+            return FoldoutGroup(
+                title,
+                mask,
+                state,
+                options,
+                customMenuContextAction,
+                null,
+                null,
+                otherDocumentation,
+                contentDrawers
+            );
         }
 
         // This one is private as we do not want to have unhandled advanced switch. Change it if necessary.
-        static IDrawer FoldoutGroup<TEnum>(GUIContent title, TEnum mask, ExpandedStateBase<TEnum> state, FoldoutOption options, Action<GenericMenu, TData> customMenuContextAction, Enabler showAdditionalProperties, SwitchEnabler switchAdditionalProperties, string otherDocumentation, params ActionDrawer[] contentDrawers)
+        static IDrawer FoldoutGroup<TEnum>(
+            GUIContent title,
+            TEnum mask,
+            ExpandedStateBase<TEnum> state,
+            FoldoutOption options,
+            Action<GenericMenu, TData> customMenuContextAction,
+            Enabler showAdditionalProperties,
+            SwitchEnabler switchAdditionalProperties,
+            string otherDocumentation,
+            params ActionDrawer[] contentDrawers
+        )
             where TEnum : struct, IConvertible
         {
-            return new FoldoutGroupDrawerInternal<TEnum>(title, mask, state, showAdditionalProperties, switchAdditionalProperties, options, customMenuContextAction, otherDocumentation, contentDrawers);
+            return new FoldoutGroupDrawerInternal<TEnum>(
+                title,
+                mask,
+                state,
+                showAdditionalProperties,
+                switchAdditionalProperties,
+                options,
+                customMenuContextAction,
+                otherDocumentation,
+                contentDrawers
+            );
         }
 
         /// <summary> Helper to draw a foldout with an advanced switch on it. </summary>
@@ -796,46 +999,28 @@ namespace UnityEditor.Rendering
         /// <param name="options">Drawing options</param>
         /// <returns>A IDrawer object</returns>
         [Obsolete("Use AdditionalPropertiesFoldoutGroup instead. #from(2021.2)")]
-        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedState<TEnum, TState> foldoutState, Enabler isAdvanced, SwitchEnabler switchAdvanced, IDrawer normalContent, IDrawer advancedContent, FoldoutOption options = FoldoutOption.Indent) where TEnum : struct, IConvertible
-        {
-            return AdvancedFoldoutGroup(foldoutTitle, foldoutMask, foldoutState, isAdvanced, switchAdvanced, normalContent.Draw, advancedContent.Draw, options);
-        }
-
-        /// <summary> Helper to draw a foldout with an advanced switch on it. </summary>
-        /// <typeparam name="TEnum">Type of the mask used</typeparam>
-        /// <typeparam name="TState">Type of the persistent state</typeparam>
-        /// <param name="foldoutTitle">Title wanted for this foldout header</param>
-        /// <param name="foldoutMask">Bit mask (enum) used to define the boolean saving the state in ExpandedStateBase</param>
-        /// <param name="foldoutState">The ExpandedStateBase describing the component</param>
-        /// <param name="isAdvanced"> Delegate allowing to check if advanced mode is active. </param>
-        /// <param name="switchAdvanced"> Delegate to know what to do when advance is switched. </param>
-        /// <param name="normalContent"> The content of the foldout header always visible if expended. </param>
-        /// <param name="advancedContent"> The content of the foldout header only visible if advanced mode is active and if foldout is expended. </param>
-        /// <param name="options">Drawing options</param>
-        /// <returns>A IDrawer object</returns>
-        [Obsolete("Use AdditionalPropertiesFoldoutGroup instead. #from(2021.2)")]
-        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedState<TEnum, TState> foldoutState, Enabler isAdvanced, SwitchEnabler switchAdvanced, ActionDrawer normalContent, IDrawer advancedContent, FoldoutOption options = FoldoutOption.Indent) where TEnum : struct, IConvertible
-        {
-            return AdvancedFoldoutGroup(foldoutTitle, foldoutMask, foldoutState, isAdvanced, switchAdvanced, normalContent, advancedContent.Draw, options);
-        }
-
-        /// <summary> Helper to draw a foldout with an advanced switch on it. </summary>
-        /// <typeparam name="TEnum">Type of the mask used</typeparam>
-        /// <typeparam name="TState">Type of the persistent state</typeparam>
-        /// <param name="foldoutTitle">Title wanted for this foldout header</param>
-        /// <param name="foldoutMask">Bit mask (enum) used to define the boolean saving the state in ExpandedStateBase</param>
-        /// <param name="foldoutState">The ExpandedStateBase describing the component</param>
-        /// <param name="isAdvanced"> Delegate allowing to check if advanced mode is active. </param>
-        /// <param name="switchAdvanced"> Delegate to know what to do when advance is switched. </param>
-        /// <param name="normalContent"> The content of the foldout header always visible if expended. </param>
-        /// <param name="advancedContent"> The content of the foldout header only visible if advanced mode is active and if foldout is expended. </param>
-        /// <param name="options">Drawing options</param>
-        /// <returns>A IDrawer object</returns>
-        [Obsolete("Use AdditionalPropertiesFoldoutGroup instead. #from(2021.2)")]
-        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedState<TEnum, TState> foldoutState, Enabler isAdvanced, SwitchEnabler switchAdvanced, IDrawer normalContent, ActionDrawer advancedContent, FoldoutOption options = FoldoutOption.Indent)
+        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedState<TEnum, TState> foldoutState,
+            Enabler isAdvanced,
+            SwitchEnabler switchAdvanced,
+            IDrawer normalContent,
+            IDrawer advancedContent,
+            FoldoutOption options = FoldoutOption.Indent
+        )
             where TEnum : struct, IConvertible
         {
-            return AdvancedFoldoutGroup(foldoutTitle, foldoutMask, foldoutState, isAdvanced, switchAdvanced, normalContent.Draw, advancedContent, options);
+            return AdvancedFoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                isAdvanced,
+                switchAdvanced,
+                normalContent.Draw,
+                advancedContent.Draw,
+                options
+            );
         }
 
         /// <summary> Helper to draw a foldout with an advanced switch on it. </summary>
@@ -851,10 +1036,107 @@ namespace UnityEditor.Rendering
         /// <param name="options">Drawing options</param>
         /// <returns>A IDrawer object</returns>
         [Obsolete("Use AdditionalPropertiesFoldoutGroup instead. #from(2021.2)")]
-        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedState<TEnum, TState> foldoutState, Enabler isAdvanced, SwitchEnabler switchAdvanced, ActionDrawer normalContent, ActionDrawer advancedContent, FoldoutOption options = FoldoutOption.Indent) where TEnum : struct, IConvertible
+        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedState<TEnum, TState> foldoutState,
+            Enabler isAdvanced,
+            SwitchEnabler switchAdvanced,
+            ActionDrawer normalContent,
+            IDrawer advancedContent,
+            FoldoutOption options = FoldoutOption.Indent
+        )
+            where TEnum : struct, IConvertible
         {
-            return FoldoutGroup(foldoutTitle, foldoutMask, foldoutState, options, null, isAdvanced, switchAdvanced, null, normalContent,
-                Conditional((serialized, owner) => isAdvanced(serialized, owner) && foldoutState[foldoutMask], advancedContent).Draw);
+            return AdvancedFoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                isAdvanced,
+                switchAdvanced,
+                normalContent,
+                advancedContent.Draw,
+                options
+            );
+        }
+
+        /// <summary> Helper to draw a foldout with an advanced switch on it. </summary>
+        /// <typeparam name="TEnum">Type of the mask used</typeparam>
+        /// <typeparam name="TState">Type of the persistent state</typeparam>
+        /// <param name="foldoutTitle">Title wanted for this foldout header</param>
+        /// <param name="foldoutMask">Bit mask (enum) used to define the boolean saving the state in ExpandedStateBase</param>
+        /// <param name="foldoutState">The ExpandedStateBase describing the component</param>
+        /// <param name="isAdvanced"> Delegate allowing to check if advanced mode is active. </param>
+        /// <param name="switchAdvanced"> Delegate to know what to do when advance is switched. </param>
+        /// <param name="normalContent"> The content of the foldout header always visible if expended. </param>
+        /// <param name="advancedContent"> The content of the foldout header only visible if advanced mode is active and if foldout is expended. </param>
+        /// <param name="options">Drawing options</param>
+        /// <returns>A IDrawer object</returns>
+        [Obsolete("Use AdditionalPropertiesFoldoutGroup instead. #from(2021.2)")]
+        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedState<TEnum, TState> foldoutState,
+            Enabler isAdvanced,
+            SwitchEnabler switchAdvanced,
+            IDrawer normalContent,
+            ActionDrawer advancedContent,
+            FoldoutOption options = FoldoutOption.Indent
+        )
+            where TEnum : struct, IConvertible
+        {
+            return AdvancedFoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                isAdvanced,
+                switchAdvanced,
+                normalContent.Draw,
+                advancedContent,
+                options
+            );
+        }
+
+        /// <summary> Helper to draw a foldout with an advanced switch on it. </summary>
+        /// <typeparam name="TEnum">Type of the mask used</typeparam>
+        /// <typeparam name="TState">Type of the persistent state</typeparam>
+        /// <param name="foldoutTitle">Title wanted for this foldout header</param>
+        /// <param name="foldoutMask">Bit mask (enum) used to define the boolean saving the state in ExpandedStateBase</param>
+        /// <param name="foldoutState">The ExpandedStateBase describing the component</param>
+        /// <param name="isAdvanced"> Delegate allowing to check if advanced mode is active. </param>
+        /// <param name="switchAdvanced"> Delegate to know what to do when advance is switched. </param>
+        /// <param name="normalContent"> The content of the foldout header always visible if expended. </param>
+        /// <param name="advancedContent"> The content of the foldout header only visible if advanced mode is active and if foldout is expended. </param>
+        /// <param name="options">Drawing options</param>
+        /// <returns>A IDrawer object</returns>
+        [Obsolete("Use AdditionalPropertiesFoldoutGroup instead. #from(2021.2)")]
+        public static IDrawer AdvancedFoldoutGroup<TEnum, TState>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedState<TEnum, TState> foldoutState,
+            Enabler isAdvanced,
+            SwitchEnabler switchAdvanced,
+            ActionDrawer normalContent,
+            ActionDrawer advancedContent,
+            FoldoutOption options = FoldoutOption.Indent
+        )
+            where TEnum : struct, IConvertible
+        {
+            return FoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                options,
+                null,
+                isAdvanced,
+                switchAdvanced,
+                null,
+                normalContent,
+                Conditional(
+                    (serialized, owner) => isAdvanced(serialized, owner) && foldoutState[foldoutMask],
+                    advancedContent
+                ).Draw
+            );
         }
 
         /// <summary>
@@ -873,13 +1155,34 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedStateBase<TEnum> foldoutState,
-            TAPEnum additionalPropertiesMask, AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState, IDrawer normalContent, IDrawer additionalContent, FoldoutOption options = FoldoutOption.Indent, Action<GenericMenu, TData> customMenuContextAction = null, string otherDocumentation = null)
+        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedStateBase<TEnum> foldoutState,
+            TAPEnum additionalPropertiesMask,
+            AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState,
+            IDrawer normalContent,
+            IDrawer additionalContent,
+            FoldoutOption options = FoldoutOption.Indent,
+            Action<GenericMenu, TData> customMenuContextAction = null,
+            string otherDocumentation = null
+        )
             where TEnum : struct, IConvertible
             where TAPEnum : struct, IConvertible
         {
             additionalContent ??= Group((s, o) => { });
-            return AdditionalPropertiesFoldoutGroup(foldoutTitle, foldoutMask, foldoutState, additionalPropertiesMask, additionalPropertiesState, normalContent.Draw, additionalContent.Draw, options, customMenuContextAction, otherDocumentation);
+            return AdditionalPropertiesFoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                additionalPropertiesMask,
+                additionalPropertiesState,
+                normalContent.Draw,
+                additionalContent.Draw,
+                options,
+                customMenuContextAction,
+                otherDocumentation
+            );
         }
 
         /// <summary>
@@ -898,12 +1201,33 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedStateBase<TEnum> foldoutState,
-            TAPEnum additionalPropertiesMask, AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState, ActionDrawer normalContent, IDrawer additionalContent, FoldoutOption options = FoldoutOption.Indent, Action<GenericMenu, TData> customMenuContextAction = null, string otherDocumentation = null)
+        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedStateBase<TEnum> foldoutState,
+            TAPEnum additionalPropertiesMask,
+            AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState,
+            ActionDrawer normalContent,
+            IDrawer additionalContent,
+            FoldoutOption options = FoldoutOption.Indent,
+            Action<GenericMenu, TData> customMenuContextAction = null,
+            string otherDocumentation = null
+        )
             where TEnum : struct, IConvertible
             where TAPEnum : struct, IConvertible
         {
-            return AdditionalPropertiesFoldoutGroup(foldoutTitle, foldoutMask, foldoutState, additionalPropertiesMask, additionalPropertiesState, normalContent, additionalContent.Draw, options, customMenuContextAction, otherDocumentation);
+            return AdditionalPropertiesFoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                additionalPropertiesMask,
+                additionalPropertiesState,
+                normalContent,
+                additionalContent.Draw,
+                options,
+                customMenuContextAction,
+                otherDocumentation
+            );
         }
 
         /// <summary>
@@ -922,12 +1246,33 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedStateBase<TEnum> foldoutState,
-            TAPEnum additionalPropertiesMask, AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState, IDrawer normalContent, ActionDrawer additionalContent, FoldoutOption options = FoldoutOption.Indent, Action<GenericMenu, TData> customMenuContextAction = null, string otherDocumentation = null)
+        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedStateBase<TEnum> foldoutState,
+            TAPEnum additionalPropertiesMask,
+            AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState,
+            IDrawer normalContent,
+            ActionDrawer additionalContent,
+            FoldoutOption options = FoldoutOption.Indent,
+            Action<GenericMenu, TData> customMenuContextAction = null,
+            string otherDocumentation = null
+        )
             where TEnum : struct, IConvertible
             where TAPEnum : struct, IConvertible
         {
-            return AdditionalPropertiesFoldoutGroup(foldoutTitle, foldoutMask, foldoutState, additionalPropertiesMask, additionalPropertiesState, normalContent.Draw, additionalContent, options, customMenuContextAction, otherDocumentation);
+            return AdditionalPropertiesFoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                additionalPropertiesMask,
+                additionalPropertiesState,
+                normalContent.Draw,
+                additionalContent,
+                options,
+                customMenuContextAction,
+                otherDocumentation
+            );
         }
 
         /// <summary>
@@ -946,8 +1291,18 @@ namespace UnityEditor.Rendering
         /// <param name="customMenuContextAction">Adds Addtional items to the menu activated from the burger menu.</param>
         /// <param name="otherDocumentation">Custom documentation used for header.</param>
         /// <returns>A IDrawer object</returns>
-        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(GUIContent foldoutTitle, TEnum foldoutMask, ExpandedStateBase<TEnum> foldoutState,
-            TAPEnum additionalPropertiesMask, AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState, ActionDrawer normalContent, ActionDrawer additionalContent, FoldoutOption options = FoldoutOption.Indent, Action<GenericMenu, TData> customMenuContextAction = null, string otherDocumentation = null)
+        public static IDrawer AdditionalPropertiesFoldoutGroup<TEnum, TAPEnum>(
+            GUIContent foldoutTitle,
+            TEnum foldoutMask,
+            ExpandedStateBase<TEnum> foldoutState,
+            TAPEnum additionalPropertiesMask,
+            AdditionalPropertiesStateBase<TAPEnum> additionalPropertiesState,
+            ActionDrawer normalContent,
+            ActionDrawer additionalContent,
+            FoldoutOption options = FoldoutOption.Indent,
+            Action<GenericMenu, TData> customMenuContextAction = null,
+            string otherDocumentation = null
+        )
             where TEnum : struct, IConvertible
             where TAPEnum : struct, IConvertible
         {
@@ -958,15 +1313,27 @@ namespace UnityEditor.Rendering
 
             void SwitchEnabler(TData data, Editor owner)
             {
-                additionalPropertiesState[additionalPropertiesMask] = !additionalPropertiesState[additionalPropertiesMask];
+                additionalPropertiesState[additionalPropertiesMask] = !additionalPropertiesState[
+                    additionalPropertiesMask
+                ];
             }
 
-            return FoldoutGroup(foldoutTitle, foldoutMask, foldoutState, options, customMenuContextAction, Enabler, SwitchEnabler,
-                otherDocumentation, normalContent,
+            return FoldoutGroup(
+                foldoutTitle,
+                foldoutMask,
+                foldoutState,
+                options,
+                customMenuContextAction,
+                Enabler,
+                SwitchEnabler,
+                otherDocumentation,
+                normalContent,
                 ConditionalWithAdditionalProperties(
-                    (serialized, owner) => additionalPropertiesState[additionalPropertiesMask] && foldoutState[foldoutMask],
+                    (serialized, owner) =>
+                        additionalPropertiesState[additionalPropertiesMask] && foldoutState[foldoutMask],
                     AdvancedProperties.s_AnimFloat,
-                    additionalContent).Draw
+                    additionalContent
+                ).Draw
             );
         }
     }
@@ -979,7 +1346,11 @@ namespace UnityEditor.Rendering
         /// <param name="drawers">A collection of IDrawers</param>
         /// <param name="data">The data source for the inner drawers</param>
         /// <param name="owner">The editor drawing</param>
-        public static void Draw<TData>(this IEnumerable<CoreEditorDrawer<TData>.IDrawer> drawers, TData data, Editor owner)
+        public static void Draw<TData>(
+            this IEnumerable<CoreEditorDrawer<TData>.IDrawer> drawers,
+            TData data,
+            Editor owner
+        )
         {
             EditorGUILayout.BeginVertical();
             foreach (var drawer in drawers)

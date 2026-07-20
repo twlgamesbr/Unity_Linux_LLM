@@ -38,7 +38,7 @@ namespace Unity.Networking.Transport
             return true;
         }
 
-        public void Disconnect(ref ConnectionId connectionId) {}
+        public void Disconnect(ref ConnectionId connectionId) { }
 
         public bool TryGetNextIncomingDisconnection(out ConnectionList.IncomingDisconnection disconnection)
         {

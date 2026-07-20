@@ -16,7 +16,8 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         public const int GeoPoolNormalByteOffset = GeoPoolUV1ByteOffset + GeoPoolUV1ByteSize;
 
         public const int GeoPoolIndexByteSize = 4;
-        public const int GeoPoolVertexByteSize = GeoPoolPosByteSize + GeoPoolUV0ByteSize + GeoPoolUV1ByteSize + GeoPoolNormalByteSize;
+        public const int GeoPoolVertexByteSize =
+            GeoPoolPosByteSize + GeoPoolUV0ByteSize + GeoPoolUV1ByteSize + GeoPoolNormalByteSize;
     }
 
     internal struct GeoPoolVertex
@@ -36,5 +37,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
     }
 
     [Flags]
-    internal enum GeoPoolVertexAttribs { Position = 1, Normal = 2, Uv0 = 4, Uv1 = 8 }
+    internal enum GeoPoolVertexAttribs
+    {
+        Position = 1,
+        Normal = 2,
+        Uv0 = 4,
+        Uv1 = 8,
+    }
 }

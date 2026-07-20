@@ -1,20 +1,19 @@
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Network.Core
 {
     /// <summary>
@@ -32,37 +31,30 @@ namespace NPCSystem.Network.Core
             if (UserNetworkVariableSerialization<string>.WriteValue != null)
                 return; // already registered — idempotent guard
 
-            UserNetworkVariableSerialization<string>.WriteValue = (
-                FastBufferWriter writer,
-                in string value
-            ) =>
+            UserNetworkVariableSerialization<string>.WriteValue = (FastBufferWriter writer, in string value) =>
             {
                 writer.WriteValueSafe(value);
             };
 
-            UserNetworkVariableSerialization<string>.ReadValue = (
-                FastBufferReader reader,
-                out string value
-            ) =>
+            UserNetworkVariableSerialization<string>.ReadValue = (FastBufferReader reader, out string value) =>
             {
                 reader.ReadValueSafe(out value);
             };
 
-            UserNetworkVariableSerialization<string>.DuplicateValue = (
-                in string value,
-                ref string duplicatedValue
-            ) =>
+            UserNetworkVariableSerialization<string>.DuplicateValue = (in string value, ref string duplicatedValue) =>
             {
                 duplicatedValue = value;
             };
 
-            NPCFlowLogger.FindOrCreate().Log(
-                NPCFlowStage.SceneBootstrap,
-                NPCFlowStatus.Success,
-                NPCFlowLogLevel.Info,
-                "[NPCNetworkSerialization] Registered NetworkVariable<string> serialization.",
-                source: nameof(NPCNetworkSerialization)
-            );
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "[NPCNetworkSerialization] Registered NetworkVariable<string> serialization.",
+                    source: nameof(NPCNetworkSerialization)
+                );
         }
     }
 }

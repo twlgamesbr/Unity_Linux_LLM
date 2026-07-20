@@ -29,10 +29,11 @@ namespace UnityEditor.Rendering
         /// Retrieves path to old shader.
         /// </summary>
         public string OldShaderPath => m_OldShader;
+
         /// <summary>
         /// Material finalizer.
         /// </summary>
-        public MaterialFinalizer Finalizer { get; private set;}
+        public MaterialFinalizer Finalizer { get; private set; }
 
         Dictionary<string, string> m_TextureRename = new Dictionary<string, string>();
         Dictionary<string, string> m_FloatRename = new Dictionary<string, string>();
@@ -47,8 +48,10 @@ namespace UnityEditor.Rendering
         {
             public string keyword;
             public string property;
-            public float setVal, unsetVal;
+            public float setVal,
+                unsetVal;
         }
+
         List<KeywordFloatRename> m_KeywordFloatRename = new List<KeywordFloatRename>();
         Dictionary<string, (string, System.Func<float, bool>)> m_ConditionalFloatRename;
 
@@ -59,12 +62,15 @@ namespace UnityEditor.Rendering
         {
             /// <summary>Texture reference property.</summary>
             Texture = 0,
+
             /// <summary>Float property.</summary>
             Float = 1,
+
             /// <summary>Color property.</summary>
             Color = 2,
+
             /// <summary>Count property.</summary>
-            Count = 3
+            Count = 3,
         }
 
         /// <summary>
@@ -77,10 +83,14 @@ namespace UnityEditor.Rendering
         {
             switch (type)
             {
-                case MaterialPropertyType.Texture: return m_TextureRename;
-                case MaterialPropertyType.Float: return m_FloatRename;
-                case MaterialPropertyType.Color: return m_ColorRename;
-                default: throw new ArgumentException(nameof(type));
+                case MaterialPropertyType.Texture:
+                    return m_TextureRename;
+                case MaterialPropertyType.Float:
+                    return m_FloatRename;
+                case MaterialPropertyType.Color:
+                    return m_ColorRename;
+                default:
+                    throw new ArgumentException(nameof(type));
             }
         }
 
@@ -92,12 +102,15 @@ namespace UnityEditor.Rendering
         {
             /// <summary>None.</summary>
             None = 0,
+
             /// <summary>LogErrorOnNonExistingProperty.</summary>
             LogErrorOnNonExistingProperty = 1,
+
             /// <summary>CleanupNonUpgradedProperties.</summary>
             CleanupNonUpgradedProperties = 2,
+
             /// <summary>LogMessageWhenNoUpgraderFound.</summary>
-            LogMessageWhenNoUpgraderFound = 4
+            LogMessageWhenNoUpgraderFound = 4,
         }
 
         /// <summary>
@@ -113,7 +126,9 @@ namespace UnityEditor.Rendering
             var shader = Shader.Find(m_NewShader);
             if (shader == null)
             {
-                Debug.LogError($"Unable to find destination shader {m_NewShader} when trying to upgrade {material.name}");
+                Debug.LogError(
+                    $"Unable to find destination shader {m_NewShader} when trying to upgrade {material.name}"
+                );
                 return;
             }
 
@@ -219,9 +234,11 @@ namespace UnityEditor.Rendering
             {
                 foreach (var (oldName, (newName, condition)) in m_ConditionalFloatRename)
                 {
-                    if (srcMaterial.HasProperty(oldName) &&
-                        condition(srcMaterial.GetFloat(oldName)) &&
-                        dstMaterial.HasProperty(newName))
+                    if (
+                        srcMaterial.HasProperty(oldName)
+                        && condition(srcMaterial.GetFloat(oldName))
+                        && dstMaterial.HasProperty(newName)
+                    )
                     {
                         dstMaterial.SetFloat(newName, 1.0f);
                     }
@@ -320,7 +337,15 @@ namespace UnityEditor.Rendering
         /// <param name="unsetVal">Value when unset.</param>
         public void RenameKeywordToFloat(string oldName, string newName, float setVal, float unsetVal)
         {
-            m_KeywordFloatRename.Add(new KeywordFloatRename { keyword = oldName, property = newName, setVal = setVal, unsetVal = unsetVal });
+            m_KeywordFloatRename.Add(
+                new KeywordFloatRename
+                {
+                    keyword = oldName,
+                    property = newName,
+                    setVal = setVal,
+                    unsetVal = unsetVal,
+                }
+            );
         }
 
         /// <summary>
@@ -331,7 +356,10 @@ namespace UnityEditor.Rendering
         /// <param name="condition">Condition function that takes the float value and returns true if renaming should occur</param>
         protected void RenameFloat(string oldName, string newName, System.Func<float, bool> condition)
         {
-            (m_ConditionalFloatRename ??= new Dictionary<string, (string, System.Func<float, bool>)>())[oldName] = (newName, condition);
+            (m_ConditionalFloatRename ??= new Dictionary<string, (string, System.Func<float, bool>)>())[oldName] = (
+                newName,
+                condition
+            );
         }
     }
 }

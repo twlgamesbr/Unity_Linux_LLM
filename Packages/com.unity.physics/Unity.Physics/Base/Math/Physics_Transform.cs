@@ -12,13 +12,15 @@ namespace Unity.Physics
         {
             /// <summary>   The rotation. </summary>
             public float3x3 Rotation;
+
             /// <summary>   The translation. </summary>
             public float3 Translation;
 
             /// <summary>   Gets the identity. </summary>
             ///
             /// <value> The identity. </value>
-            public static MTransform Identity => new MTransform { Rotation = float3x3.identity, Translation = float3.zero };
+            public static MTransform Identity =>
+                new MTransform { Rotation = float3x3.identity, Translation = float3.zero };
 
             /// <summary>   Constructor. </summary>
             ///
@@ -76,7 +78,10 @@ namespace Unity.Physics
             /// <summary>   Gets or sets the scale. </summary>
             ///
             /// <value> The scale. </value>
-            public float Scale { get => m_Scale; set
+            public float Scale
+            {
+                get => m_Scale;
+                set
                 {
                     UnityEngine.Assertions.Assert.IsTrue(value != 0.0f);
                     m_Scale = value;
@@ -91,17 +96,26 @@ namespace Unity.Physics
             /// <summary>   Gets or sets the rotation. </summary>
             ///
             /// <value> The rotation. </value>
-            public float3x3 Rotation { get => Transform.Rotation; set => Transform.Rotation = value; }
+            public float3x3 Rotation
+            {
+                get => Transform.Rotation;
+                set => Transform.Rotation = value;
+            }
 
             /// <summary>   Gets or sets the translation. </summary>
             ///
             /// <value> The translation. </value>
-            public float3 Translation { get => Transform.Translation; set => Transform.Translation = value; }
+            public float3 Translation
+            {
+                get => Transform.Translation;
+                set => Transform.Translation = value;
+            }
 
             /// <summary>   Gets the identity. </summary>
             ///
             /// <value> The identity. </value>
-            public static ScaledMTransform Identity => new ScaledMTransform { Transform = MTransform.Identity, Scale = 1.0f };
+            public static ScaledMTransform Identity =>
+                new ScaledMTransform { Transform = MTransform.Identity, Scale = 1.0f };
 
             /// <summary>   Constructor. </summary>
             ///
@@ -141,7 +155,7 @@ namespace Unity.Physics
                 {
                     Rotation = math.mul(aFromB.Rotation, bFromC.Rotation),
                     Translation = math.mul(aFromB.Rotation, aFromB.Scale * bFromC.Translation) + aFromB.Translation,
-                    Scale = aFromB.Scale
+                    Scale = aFromB.Scale,
                 };
             }
         }
@@ -157,7 +171,7 @@ namespace Unity.Physics
             return new MTransform
             {
                 Rotation = math.mul(cFromB.Rotation, bFromA.Rotation),
-                Translation = math.mul(cFromB.Rotation, bFromA.Translation) + cFromB.Translation
+                Translation = math.mul(cFromB.Rotation, bFromA.Translation) + cFromB.Translation,
             };
         }
 
@@ -172,7 +186,7 @@ namespace Unity.Physics
             return new MTransform
             {
                 Rotation = inverseRotation,
-                Translation = math.mul(inverseRotation, -transform.Translation)
+                Translation = math.mul(inverseRotation, -transform.Translation),
             };
         }
 
@@ -200,9 +214,9 @@ namespace Unity.Physics
                 Transform = new MTransform
                 {
                     Rotation = math.mul(cFromB.Rotation, bFromA.Rotation),
-                    Translation = math.mul(cFromB.Rotation, cFromB.Scale * bFromA.Translation) + cFromB.Translation
+                    Translation = math.mul(cFromB.Rotation, cFromB.Scale * bFromA.Translation) + cFromB.Translation,
                 },
-                Scale = cFromB.Scale * bFromA.Scale
+                Scale = cFromB.Scale * bFromA.Scale,
             };
         }
 
@@ -220,9 +234,9 @@ namespace Unity.Physics
                 Transform = new MTransform
                 {
                     Rotation = invRotation,
-                    Translation = math.mul(invRotation, -transform.Translation * invScale)
+                    Translation = math.mul(invRotation, -transform.Translation * invScale),
                 },
-                Scale = invScale
+                Scale = invScale,
             };
         }
 

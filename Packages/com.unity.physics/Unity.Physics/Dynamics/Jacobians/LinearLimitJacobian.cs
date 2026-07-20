@@ -42,10 +42,16 @@ namespace Unity.Physics
 
         // Build the Jacobian
         public void Build(
-            MTransform aFromConstraint, MTransform bFromConstraint,
-            MotionVelocity velocityA, MotionVelocity velocityB,
-            MotionData motionA, MotionData motionB,
-            Constraint constraint, float tau, float damping)
+            MTransform aFromConstraint,
+            MTransform bFromConstraint,
+            MotionVelocity velocityA,
+            MotionVelocity velocityB,
+            MotionData motionA,
+            MotionData motionB,
+            Constraint constraint,
+            float tau,
+            float damping
+        )
         {
             MinDistance = constraint.Min;
             MaxDistance = constraint.Max;
@@ -66,7 +72,13 @@ namespace Unity.Physics
             Update(in motionA, in motionB);
         }
 
-        private static void ApplyImpulse(in float3 impulse, in float3 ang0, in float3 ang1, in float3 ang2, ref MotionVelocity velocity)
+        private static void ApplyImpulse(
+            in float3 impulse,
+            in float3 ang0,
+            in float3 ang1,
+            in float3 ang2,
+            ref MotionVelocity velocity
+        )
         {
             velocity.ApplyLinearImpulse(impulse);
             velocity.ApplyAngularImpulse(impulse.x * ang0 + impulse.y * ang1 + impulse.z * ang2);
@@ -108,12 +120,18 @@ namespace Unity.Physics
             InitialError = CalculateError(
                 new MTransform(WorldFromA.rot, WorldFromA.pos),
                 new MTransform(WorldFromB.rot, WorldFromB.pos),
-                out float3 directionUnused);
+                out float3 directionUnused
+            );
         }
 
         // Solve the Jacobian
-        public void Solve(ref JacobianHeader jacHeader, ref MotionVelocity velocityA, ref MotionVelocity velocityB,
-            Solver.StepInput stepInput, ref NativeStream.Writer impulseEventsWriter)
+        public void Solve(
+            ref JacobianHeader jacHeader,
+            ref MotionVelocity velocityA,
+            ref MotionVelocity velocityB,
+            Solver.StepInput stepInput,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             // Predict the motions' transforms at the end of the step
             MTransform futureWorldFromA;
@@ -123,55 +141,122 @@ namespace Unity.Physics
                 quaternion dqB = Integrator.IntegrateAngularVelocity(velocityB.AngularVelocity, stepInput.Timestep);
                 quaternion futureOrientationA = math.normalize(math.mul(WorldFromA.rot, dqA));
                 quaternion futureOrientationB = math.normalize(math.mul(WorldFromB.rot, dqB));
-                futureWorldFromA = new MTransform(futureOrientationA, WorldFromA.pos + velocityA.LinearVelocity * stepInput.Timestep);
-                futureWorldFromB = new MTransform(futureOrientationB, WorldFromB.pos + velocityB.LinearVelocity * stepInput.Timestep);
+                futureWorldFromA = new MTransform(
+                    futureOrientationA,
+                    WorldFromA.pos + velocityA.LinearVelocity * stepInput.Timestep
+                );
+                futureWorldFromB = new MTransform(
+                    futureOrientationB,
+                    WorldFromB.pos + velocityB.LinearVelocity * stepInput.Timestep
+                );
             }
 
             // Calculate the angulars
-            CalculateAngulars(BodyFromConstraintA.Translation, futureWorldFromA.Rotation, out float3 angA0, out float3 angA1, out float3 angA2);
-            CalculateAngulars(BodyFromConstraintB.Translation, futureWorldFromB.Rotation, out float3 angB0, out float3 angB1, out float3 angB2);
+            CalculateAngulars(
+                BodyFromConstraintA.Translation,
+                futureWorldFromA.Rotation,
+                out float3 angA0,
+                out float3 angA1,
+                out float3 angA2
+            );
+            CalculateAngulars(
+                BodyFromConstraintB.Translation,
+                futureWorldFromB.Rotation,
+                out float3 angB0,
+                out float3 angB1,
+                out float3 angB2
+            );
 
             // Calculate effective mass
-            float3 effectiveMassDiag, effectiveMassOffDiag;
+            float3 effectiveMassDiag,
+                effectiveMassOffDiag;
             {
                 // Calculate the inverse effective mass matrix
                 float3 invEffectiveMassDiag = new float3(
                     JacobianUtilities.CalculateInvEffectiveMassDiag(
-                        angA0, velocityA.InverseInertia, velocityA.InverseMass,
-                        angB0, velocityB.InverseInertia, velocityB.InverseMass),
+                        angA0,
+                        velocityA.InverseInertia,
+                        velocityA.InverseMass,
+                        angB0,
+                        velocityB.InverseInertia,
+                        velocityB.InverseMass
+                    ),
                     JacobianUtilities.CalculateInvEffectiveMassDiag(
-                        angA1, velocityA.InverseInertia, velocityA.InverseMass,
-                        angB1, velocityB.InverseInertia, velocityB.InverseMass),
+                        angA1,
+                        velocityA.InverseInertia,
+                        velocityA.InverseMass,
+                        angB1,
+                        velocityB.InverseInertia,
+                        velocityB.InverseMass
+                    ),
                     JacobianUtilities.CalculateInvEffectiveMassDiag(
-                        angA2, velocityA.InverseInertia, velocityA.InverseMass,
-                        angB2, velocityB.InverseInertia, velocityB.InverseMass));
+                        angA2,
+                        velocityA.InverseInertia,
+                        velocityA.InverseMass,
+                        angB2,
+                        velocityB.InverseInertia,
+                        velocityB.InverseMass
+                    )
+                );
 
                 float3 invEffectiveMassOffDiag = new float3(
                     JacobianUtilities.CalculateInvEffectiveMassOffDiag(
-                        angA0, angA1, velocityA.InverseInertia,
-                        angB0, angB1, velocityB.InverseInertia),
+                        angA0,
+                        angA1,
+                        velocityA.InverseInertia,
+                        angB0,
+                        angB1,
+                        velocityB.InverseInertia
+                    ),
                     JacobianUtilities.CalculateInvEffectiveMassOffDiag(
-                        angA0, angA2, velocityA.InverseInertia,
-                        angB0, angB2, velocityB.InverseInertia),
+                        angA0,
+                        angA2,
+                        velocityA.InverseInertia,
+                        angB0,
+                        angB2,
+                        velocityB.InverseInertia
+                    ),
                     JacobianUtilities.CalculateInvEffectiveMassOffDiag(
-                        angA1, angA2, velocityA.InverseInertia,
-                        angB1, angB2, velocityB.InverseInertia));
+                        angA1,
+                        angA2,
+                        velocityA.InverseInertia,
+                        angB1,
+                        angB2,
+                        velocityB.InverseInertia
+                    )
+                );
 
                 // Invert to get the effective mass matrix
-                JacobianUtilities.InvertSymmetricMatrix(invEffectiveMassDiag, invEffectiveMassOffDiag,
-                    out effectiveMassDiag, out effectiveMassOffDiag);
+                JacobianUtilities.InvertSymmetricMatrix(
+                    invEffectiveMassDiag,
+                    invEffectiveMassOffDiag,
+                    out effectiveMassDiag,
+                    out effectiveMassOffDiag
+                );
             }
 
             // Predict error at the end of the step and calculate the impulse to correct it
             float3 impulse;
             {
                 // Find the difference between the future distance and the limit range, then apply tau and damping
-                float futureDistanceError = CalculateError(futureWorldFromA, futureWorldFromB, out float3 futureDirection);
-                float solveDistanceError = JacobianUtilities.CalculateCorrection(futureDistanceError, InitialError, Tau, Damping);
+                float futureDistanceError = CalculateError(
+                    futureWorldFromA,
+                    futureWorldFromB,
+                    out float3 futureDirection
+                );
+                float solveDistanceError = JacobianUtilities.CalculateCorrection(
+                    futureDistanceError,
+                    InitialError,
+                    Tau,
+                    Damping
+                );
 
                 // Calculate the impulse to correct the error
                 float3 solveError = solveDistanceError * futureDirection;
-                float3x3 effectiveMass = JacobianUtilities.BuildSymmetricMatrix(effectiveMassDiag, effectiveMassOffDiag);
+                float3x3 effectiveMass = JacobianUtilities.BuildSymmetricMatrix(
+                    effectiveMassDiag,
+                    effectiveMassOffDiag
+                );
                 impulse = math.mul(effectiveMass, solveError) * Solver.CalculateInvTimestep(stepInput.Timestep);
             }
 
@@ -181,13 +266,24 @@ namespace Unity.Physics
 
             if ((jacHeader.Flags & JacobianFlags.EnableImpulseEvents) != 0)
             {
-                HandleImpulseEvent(ref jacHeader, impulse, stepInput.ExportEventsInThisIteration, ref impulseEventsWriter);
+                HandleImpulseEvent(
+                    ref jacHeader,
+                    impulse,
+                    stepInput.ExportEventsInThisIteration,
+                    ref impulseEventsWriter
+                );
             }
         }
 
         #region Helpers
 
-        private static void CalculateAngulars(in float3 pivotInMotion, in float3x3 worldFromMotionRotation, out float3 ang0, out float3 ang1, out float3 ang2)
+        private static void CalculateAngulars(
+            in float3 pivotInMotion,
+            in float3x3 worldFromMotionRotation,
+            out float3 ang0,
+            out float3 ang1,
+            out float3 ang2
+        )
         {
             // Jacobian directions are i, j, k
             // Angulars are pivotInMotion x (motionFromWorld * direction)
@@ -228,7 +324,12 @@ namespace Unity.Physics
             return JacobianUtilities.CalculateError(distance, MinDistance, MaxDistance);
         }
 
-        private void HandleImpulseEvent(ref JacobianHeader jacHeader, in float3 appliedImpulse, bool exportEvent, ref NativeStream.Writer impulseEventsWriter)
+        private void HandleImpulseEvent(
+            ref JacobianHeader jacHeader,
+            in float3 appliedImpulse,
+            bool exportEvent,
+            ref NativeStream.Writer impulseEventsWriter
+        )
         {
             ref ImpulseEventSolverData impulseEventData = ref jacHeader.AccessImpulseEventSolverData();
             impulseEventData.AccumulatedImpulse += appliedImpulse;
@@ -236,20 +337,26 @@ namespace Unity.Physics
             if (exportEvent && math.any(math.abs(impulseEventData.AccumulatedImpulse) > impulseEventData.MaxImpulse))
             {
                 // Calculate constraint B in World-space
-                var constraintBinWorld = math.mul(WorldFromB,
-                    new RigidTransform(BodyFromConstraintB.Rotation, BodyFromConstraintB.Translation));
+                var constraintBinWorld = math.mul(
+                    WorldFromB,
+                    new RigidTransform(BodyFromConstraintB.Rotation, BodyFromConstraintB.Translation)
+                );
 
                 // Move accumulated impulse (which is in world space) into constraint space
-                var constraintSpaceImpulse =
-                    math.rotate(math.inverse(constraintBinWorld), impulseEventData.AccumulatedImpulse);
+                var constraintSpaceImpulse = math.rotate(
+                    math.inverse(constraintBinWorld),
+                    impulseEventData.AccumulatedImpulse
+                );
 
-                impulseEventsWriter.Write(new ImpulseEventData
-                {
-                    Type = ConstraintType.Linear,
-                    Impulse = constraintSpaceImpulse,
-                    JointEntity = impulseEventData.JointEntity,
-                    BodyIndices = jacHeader.BodyPair
-                });
+                impulseEventsWriter.Write(
+                    new ImpulseEventData
+                    {
+                        Type = ConstraintType.Linear,
+                        Impulse = constraintSpaceImpulse,
+                        JointEntity = impulseEventData.JointEntity,
+                        BodyIndices = jacHeader.BodyPair,
+                    }
+                );
             }
         }
 

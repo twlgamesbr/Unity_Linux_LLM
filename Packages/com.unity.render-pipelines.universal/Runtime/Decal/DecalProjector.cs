@@ -8,6 +8,7 @@ namespace UnityEngine.Rendering.Universal
     {
         /// <summary>Ignores the transformation hierarchy and uses the scale values in the Decal Projector component directly.</summary>
         ScaleInvariant,
+
         /// <summary>Multiplies the lossy scale of the Transform with the Decal Projector's own scale then applies this to the decal.</summary>
         [InspectorName("Inherit from Hierarchy")]
         InheritFromHierarchy,
@@ -38,15 +39,13 @@ namespace UnityEngine.Rendering.Universal
 
         [SerializeField]
         private Material m_Material = null;
+
         /// <summary>
         /// The material used by the decal.
         /// </summary>
         public Material material
         {
-            get
-            {
-                return m_Material;
-            }
+            get { return m_Material; }
             set
             {
                 m_Material = value;
@@ -56,15 +55,13 @@ namespace UnityEngine.Rendering.Universal
 
         [SerializeField]
         private float m_DrawDistance = 1000.0f;
+
         /// <summary>
         /// Distance from camera at which the Decal is not rendered anymore.
         /// </summary>
         public float drawDistance
         {
-            get
-            {
-                return m_DrawDistance;
-            }
+            get { return m_DrawDistance; }
             set
             {
                 m_DrawDistance = Mathf.Max(0f, value);
@@ -75,15 +72,13 @@ namespace UnityEngine.Rendering.Universal
         [SerializeField]
         [Range(0, 1)]
         private float m_FadeScale = 0.9f;
+
         /// <summary>
         /// Percent of the distance from the camera at which this Decal start to fade off.
         /// </summary>
         public float fadeScale
         {
-            get
-            {
-                return m_FadeScale;
-            }
+            get { return m_FadeScale; }
             set
             {
                 m_FadeScale = Mathf.Clamp01(value);
@@ -94,15 +89,13 @@ namespace UnityEngine.Rendering.Universal
         [SerializeField]
         [Range(0, 180)]
         private float m_StartAngleFade = 180.0f;
+
         /// <summary>
         /// Angle between decal backward orientation and vertex normal of receiving surface at which the Decal start to fade off.
         /// </summary>
         public float startAngleFade
         {
-            get
-            {
-                return m_StartAngleFade;
-            }
+            get { return m_StartAngleFade; }
             set
             {
                 m_StartAngleFade = Mathf.Clamp(value, 0.0f, 180.0f);
@@ -113,15 +106,13 @@ namespace UnityEngine.Rendering.Universal
         [SerializeField]
         [Range(0, 180)]
         private float m_EndAngleFade = 180.0f;
+
         /// <summary>
         /// Angle between decal backward orientation and vertex normal of receiving surface at which the Decal end to fade off.
         /// </summary>
         public float endAngleFade
         {
-            get
-            {
-                return m_EndAngleFade;
-            }
+            get { return m_EndAngleFade; }
             set
             {
                 m_EndAngleFade = Mathf.Clamp(value, m_StartAngleFade, 180.0f);
@@ -131,15 +122,13 @@ namespace UnityEngine.Rendering.Universal
 
         [SerializeField]
         private Vector2 m_UVScale = new Vector2(1, 1);
+
         /// <summary>
         /// Tilling of the UV of the projected texture.
         /// </summary>
         public Vector2 uvScale
         {
-            get
-            {
-                return m_UVScale;
-            }
+            get { return m_UVScale; }
             set
             {
                 m_UVScale = value;
@@ -149,15 +138,13 @@ namespace UnityEngine.Rendering.Universal
 
         [SerializeField]
         private Vector2 m_UVBias = new Vector2(0, 0);
+
         /// <summary>
         /// Offset of the UV of the projected texture.
         /// </summary>
         public Vector2 uvBias
         {
-            get
-            {
-                return m_UVBias;
-            }
+            get { return m_UVBias; }
             set
             {
                 m_UVBias = value;
@@ -165,7 +152,8 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        [SerializeField] RenderingLayerMask m_RenderingLayerMask = RenderingLayerMask.defaultRenderingLayerMask;
+        [SerializeField]
+        RenderingLayerMask m_RenderingLayerMask = RenderingLayerMask.defaultRenderingLayerMask;
 
         /// <summary>
         /// The layer of the decal.
@@ -178,6 +166,7 @@ namespace UnityEngine.Rendering.Universal
 
         [SerializeField]
         private DecalScaleMode m_ScaleMode = DecalScaleMode.ScaleInvariant;
+
         /// <summary>
         /// The scaling mode to apply to decals that use this Decal Projector.
         /// </summary>
@@ -193,16 +182,14 @@ namespace UnityEngine.Rendering.Universal
 
         [SerializeField]
         internal Vector3 m_Offset = new Vector3(0, 0, 0.5f);
+
         /// <summary>
         /// Change the offset position.
         /// Do not expose: Could be changed by the inspector when manipulating the gizmo.
         /// </summary>
         public Vector3 pivot
         {
-            get
-            {
-                return m_Offset;
-            }
+            get { return m_Offset; }
             set
             {
                 m_Offset = value;
@@ -212,15 +199,13 @@ namespace UnityEngine.Rendering.Universal
 
         [SerializeField]
         internal Vector3 m_Size = new Vector3(1, 1, 1);
+
         /// <summary>
         /// The size of the projection volume.
         /// </summary>
         public Vector3 size
         {
-            get
-            {
-                return m_Size;
-            }
+            get { return m_Size; }
             set
             {
                 m_Size = value;
@@ -231,15 +216,13 @@ namespace UnityEngine.Rendering.Universal
         [SerializeField]
         [Range(0, 1)]
         private float m_FadeFactor = 1.0f;
+
         /// <summary>
         /// Controls the transparency of the decal.
         /// </summary>
         public float fadeFactor
         {
-            get
-            {
-                return m_FadeFactor;
-            }
+            get { return m_FadeFactor; }
             set
             {
                 m_FadeFactor = Mathf.Clamp01(value);
@@ -252,12 +235,9 @@ namespace UnityEngine.Rendering.Universal
         private bool m_VisibleInScene = true;
         public bool visibleInScene
         {
-            get 
-            { 
-                return m_VisibleInScene; 
-            }
-            set 
-            { 
+            get { return m_VisibleInScene; }
+            set
+            {
                 m_VisibleInScene = value;
                 OnValidate();
             }
@@ -277,11 +257,15 @@ namespace UnityEngine.Rendering.Universal
         private float m_OldFadeFactor = 1.0f;
 
         /// <summary>A scale that should be used for rendering and handles.</summary>
-        internal Vector3 effectiveScale => m_ScaleMode == DecalScaleMode.InheritFromHierarchy ? transform.lossyScale : Vector3.one;
+        internal Vector3 effectiveScale =>
+            m_ScaleMode == DecalScaleMode.InheritFromHierarchy ? transform.lossyScale : Vector3.one;
+
         /// <summary>current size in a way the DecalSystem will be able to use it</summary>
         internal Vector3 decalSize => new Vector3(m_Size.x, m_Size.z, m_Size.y);
+
         /// <summary>current size in a way the DecalSystem will be able to use it</summary>
         internal Vector3 decalOffset => new Vector3(m_Offset.x, -m_Offset.z, m_Offset.y);
+
         /// <summary>current uv parameters in a way the DecalSystem will be able to use it</summary>
         internal Vector4 uvScaleBias => new Vector4(m_UVScale.x, m_UVScale.y, m_UVBias.x, m_UVBias.y);
 
@@ -316,7 +300,7 @@ namespace UnityEngine.Rendering.Universal
             visibleInScene = !UnityEditor.SceneVisibilityManager.instance.IsHidden(gameObject);
 
             // Force proeprty update that will look at visibleInScene to adjust scene culling mask
-            onDecalPropertyChange?.Invoke(this); 
+            onDecalPropertyChange?.Invoke(this);
         }
 #endif
 
@@ -357,17 +341,19 @@ namespace UnityEngine.Rendering.Universal
         void OnDidApplyAnimationProperties()
         {
             // Needed to be able to update state properly for animated serialized-properties.
-            if (m_OldMaterial != m_Material ||
-                Mathf.Abs(m_OldDrawDistance - m_DrawDistance) > Mathf.Epsilon ||
-                Mathf.Abs(m_OldFadeScale - m_FadeScale) > Mathf.Epsilon ||
-                Mathf.Abs(m_OldStartAngleFade - m_StartAngleFade) > Mathf.Epsilon ||
-                Mathf.Abs(m_OldEndAngleFade - m_EndAngleFade) > Mathf.Epsilon ||
-                m_OldUVScale != m_UVScale ||
-                m_OldUVBias != m_UVBias ||
-                m_OldScaleMode != m_ScaleMode ||
-                m_OldOffset != m_Offset ||
-                m_OldSize != m_Size ||
-                Mathf.Abs(m_OldFadeFactor - m_FadeFactor) > Mathf.Epsilon)
+            if (
+                m_OldMaterial != m_Material
+                || Mathf.Abs(m_OldDrawDistance - m_DrawDistance) > Mathf.Epsilon
+                || Mathf.Abs(m_OldFadeScale - m_FadeScale) > Mathf.Epsilon
+                || Mathf.Abs(m_OldStartAngleFade - m_StartAngleFade) > Mathf.Epsilon
+                || Mathf.Abs(m_OldEndAngleFade - m_EndAngleFade) > Mathf.Epsilon
+                || m_OldUVScale != m_UVScale
+                || m_OldUVBias != m_UVBias
+                || m_OldScaleMode != m_ScaleMode
+                || m_OldOffset != m_Offset
+                || m_OldSize != m_Size
+                || Mathf.Abs(m_OldFadeFactor - m_FadeFactor) > Mathf.Epsilon
+            )
             {
                 OnValidate();
             }
@@ -401,17 +387,18 @@ namespace UnityEngine.Rendering.Universal
         {
             onAllDecalPropertyChange?.Invoke();
         }
-        
+
         enum Version
         {
             Initial,
             RenderingLayerMask,
 
-            Count
+            Count,
         }
-        
-        [SerializeField] Version version = Version.Count;
-        
+
+        [SerializeField]
+        Version version = Version.Count;
+
         // This piece of code is needed because some objects could have been created before existence of Version enum
         /// <summary>OnBeforeSerialize needed to handle migration before the versioning system was in place.</summary>
         void ISerializationCallbackReceiver.OnBeforeSerialize()
@@ -425,7 +412,7 @@ namespace UnityEngine.Rendering.Universal
         {
             if (version == Version.Count) // deserializing and object without version
                 version = Version.Initial; // reset to run the migration
-            
+
             if (version < Version.RenderingLayerMask)
             {
 #pragma warning disable 618 // Obsolete warning

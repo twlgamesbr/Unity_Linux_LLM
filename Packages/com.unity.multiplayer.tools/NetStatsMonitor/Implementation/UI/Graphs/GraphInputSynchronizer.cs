@@ -18,8 +18,9 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         /// </summary>
         /// <param name="timeStamps"></param>
         /// <returns> Returns the lastReadSampleIndex and the unreadTimeStampCount </returns>
-        (int lastReadSampleIndex, int unreadTimeStampCount)
-            ComputeLastReadSampleIndexAndUnreadSampleCount(RingBuffer<double> timeStamps)
+        (int lastReadSampleIndex, int unreadTimeStampCount) ComputeLastReadSampleIndexAndUnreadSampleCount(
+            RingBuffer<double> timeStamps
+        )
         {
             var timeStampCount = timeStamps.Length;
             var lastTimeStampIndex = timeStampCount - 1;
@@ -40,9 +41,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         /// <param name="timeStamps"></param>
         /// <param name="samplesPerPoint"> The number of samples used to compute each point. </param>
         /// <returns> The number of points to advance. </returns>
-        public int ComputeNumberOfPointsToAdvance(
-            RingBuffer<double> timeStamps,
-            float samplesPerPoint)
+        public int ComputeNumberOfPointsToAdvance(RingBuffer<double> timeStamps, float samplesPerPoint)
         {
             var (lastReadSampleIndex, unreadSampleCount) = ComputeLastReadSampleIndexAndUnreadSampleCount(timeStamps);
 

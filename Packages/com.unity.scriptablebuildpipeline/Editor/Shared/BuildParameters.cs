@@ -21,6 +21,7 @@ namespace UnityEditor.Build.Pipeline
     {
         /// <inheritdoc />
         public BuildTarget Target { get; set; }
+
         /// <inheritdoc />
         public BuildTargetGroup Group { get; set; }
 
@@ -29,6 +30,7 @@ namespace UnityEditor.Build.Pipeline
 
         /// <inheritdoc />
         public TypeDB ScriptInfo { get; set; }
+
         /// <inheritdoc />
         public ScriptCompilationOptions ScriptOptions { get; set; }
 
@@ -43,6 +45,7 @@ namespace UnityEditor.Build.Pipeline
         public string OutputFolder { get; set; }
 
         string m_TempOutputFolder;
+
         /// <inheritdoc />
         public string TempOutputFolder
         {
@@ -56,6 +59,7 @@ namespace UnityEditor.Build.Pipeline
         }
 
         string m_ScriptOutputFolder;
+
         /// <inheritdoc />
         public string ScriptOutputFolder
         {
@@ -70,18 +74,22 @@ namespace UnityEditor.Build.Pipeline
 
         /// <inheritdoc />
         public bool UseCache { get; set; }
+
         /// <inheritdoc />
         public string CacheServerHost { get; set; }
+
         /// <inheritdoc />
         public int CacheServerPort { get; set; }
+
         /// <inheritdoc />
         public bool WriteLinkXML { get; set; }
+
 #if NONRECURSIVE_DEPENDENCY_DATA
         /// <inheritdoc />
         public bool NonRecursiveDependencies { get; set; }
 #endif
 
-        internal BuildParameters() {}
+        internal BuildParameters() { }
 
         /// <summary>
         /// Default constructor, requires the target, group and output parameters at minimum for a successful build.
@@ -131,7 +139,7 @@ namespace UnityEditor.Build.Pipeline
                 group = Group,
                 target = Target,
                 typeDB = ScriptInfo,
-                buildFlags = ContentBuildFlags
+                buildFlags = ContentBuildFlags,
             };
         }
 
@@ -142,7 +150,7 @@ namespace UnityEditor.Build.Pipeline
             {
                 group = Group,
                 target = Target,
-                options = ScriptOptions
+                options = ScriptOptions,
             };
         }
 
@@ -177,7 +185,7 @@ namespace UnityEditor.Build.Pipeline
     [Serializable]
     public class BundleBuildParameters : BuildParameters, IBundleBuildParameters
     {
-        internal BundleBuildParameters() {}
+        internal BundleBuildParameters() { }
 
         /// <inheritdoc />
         public BundleBuildParameters(BuildTarget target, BuildTargetGroup group, string outputFolder)

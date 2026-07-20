@@ -61,7 +61,10 @@ namespace UnityEngine.Rendering
                     DebugUI.Panel panel = DebugManager.instance.GetPanel(
                         displayName: disposableSettingsPanel.PanelName,
                         createIfNull: true,
-                        groupIndex: (disposableSettingsPanel is DebugDisplaySettingsPanel debugDisplaySettingsPanel) ? debugDisplaySettingsPanel.Order : 0);
+                        groupIndex: (disposableSettingsPanel is DebugDisplaySettingsPanel debugDisplaySettingsPanel)
+                            ? debugDisplaySettingsPanel.Order
+                            : 0
+                    );
 #if UNITY_EDITOR
                     if (DocumentationUtils.TryGetHelpURL(disposableSettingsPanel.GetType(), out var documentationUrl))
                         panel.documentationUrl = documentationUrl;

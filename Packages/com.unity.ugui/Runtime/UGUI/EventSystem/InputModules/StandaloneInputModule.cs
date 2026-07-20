@@ -28,18 +28,22 @@ namespace UnityEngine.EventSystems
 
         private const float doubleClickTime = 0.3f;
 
-        protected StandaloneInputModule()
-        {
-        }
+        protected StandaloneInputModule() { }
 
-        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", false)]
+        [Obsolete(
+            "Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.",
+            false
+        )]
         public enum InputMode
         {
             Mouse,
-            Buttons
+            Buttons,
         }
 
-        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", false)]
+        [Obsolete(
+            "Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.",
+            false
+        )]
         public InputMode inputMode
         {
             get { return InputMode.Mouse; }
@@ -77,7 +81,9 @@ namespace UnityEngine.EventSystems
         [HideInInspector]
         private bool m_ForceModuleActive;
 
-        [Obsolete("allowActivationOnMobileDevice has been deprecated. Use forceModuleActive instead (UnityUpgradable) -> forceModuleActive")]
+        [Obsolete(
+            "allowActivationOnMobileDevice has been deprecated. Use forceModuleActive instead (UnityUpgradable) -> forceModuleActive"
+        )]
         public bool allowActivationOnMobileDevice
         {
             get { return m_ForceModuleActive; }
@@ -90,8 +96,9 @@ namespace UnityEngine.EventSystems
         /// <remarks>
         /// If there is no module active with higher priority (ordered in the inspector) this module will be forced active even if valid enabling conditions are not met.
         /// </remarks>
-
-        [Obsolete("forceModuleActive has been deprecated. There is no need to force the module awake as StandaloneInputModule works for all platforms")]
+        [Obsolete(
+            "forceModuleActive has been deprecated. There is no need to force the module awake as StandaloneInputModule works for all platforms"
+        )]
         public bool forceModuleActive
         {
             get { return m_ForceModuleActive; }
@@ -194,7 +201,11 @@ namespace UnityEngine.EventSystems
                     if (!m_InputPointerEvents.TryGetValue(pointerId, out var inputPointerEvent))
                         continue;
 
-                    if (inputPointerEvent != null && inputPointerEvent.pointerDrag != null && inputPointerEvent.dragging)
+                    if (
+                        inputPointerEvent != null
+                        && inputPointerEvent.pointerDrag != null
+                        && inputPointerEvent.dragging
+                    )
                     {
                         ReleaseMouse(inputPointerEvent, inputPointerEvent.pointerCurrentRaycast.gameObject);
                     }
@@ -382,7 +393,11 @@ namespace UnityEngine.EventSystems
                 // search for the control that will receive the press
                 // if we can't find a press handler set the press
                 // handler to be what would receive a click.
-                var newPressed = ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
+                var newPressed = ExecuteEvents.ExecuteHierarchy(
+                    currentOverGo,
+                    pointerEvent,
+                    ExecuteEvents.pointerDownHandler
+                );
 
                 var newClick = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
 
@@ -419,7 +434,11 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
 
                 if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    ExecuteEvents.Execute(
+                        pointerEvent.pointerDrag,
+                        pointerEvent,
+                        ExecuteEvents.initializePotentialDrag
+                    );
             }
 
             // PointerUp notification
@@ -456,7 +475,11 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = null;
 
                 // send exit events as we need to simulate this on touch up on touch device
-                ExecuteEvents.ExecuteHierarchy(pointerEvent.pointerEnter, pointerEvent, ExecuteEvents.pointerExitHandler);
+                ExecuteEvents.ExecuteHierarchy(
+                    pointerEvent.pointerEnter,
+                    pointerEvent,
+                    ExecuteEvents.pointerExitHandler
+                );
                 pointerEvent.pointerEnter = null;
             }
 
@@ -587,7 +610,9 @@ namespace UnityEngine.EventSystems
 
             if (!Mathf.Approximately(leftButtonData.buttonData.scrollDelta.sqrMagnitude, 0.0f))
             {
-                var scrollHandler = ExecuteEvents.GetEventHandler<IScrollHandler>(leftButtonData.buttonData.pointerCurrentRaycast.gameObject);
+                var scrollHandler = ExecuteEvents.GetEventHandler<IScrollHandler>(
+                    leftButtonData.buttonData.pointerCurrentRaycast.gameObject
+                );
                 ExecuteEvents.ExecuteHierarchy(scrollHandler, leftButtonData.buttonData, ExecuteEvents.scrollHandler);
             }
         }
@@ -631,7 +656,11 @@ namespace UnityEngine.EventSystems
                 // search for the control that will receive the press
                 // if we can't find a press handler set the press
                 // handler to be what would receive a click.
-                var newPressed = ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
+                var newPressed = ExecuteEvents.ExecuteHierarchy(
+                    currentOverGo,
+                    pointerEvent,
+                    ExecuteEvents.pointerDownHandler
+                );
                 var newClick = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
 
                 // didnt find a press handler... search for a click handler
@@ -667,7 +696,11 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
 
                 if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    ExecuteEvents.Execute(
+                        pointerEvent.pointerDrag,
+                        pointerEvent,
+                        ExecuteEvents.initializePotentialDrag
+                    );
 
                 m_InputPointerEvents[pointerEvent.pointerId] = pointerEvent;
             }

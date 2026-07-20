@@ -21,17 +21,25 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             public static readonly RenderStateCollection Sort3DAs2DCompatible = new RenderStateCollection()
             {
-                { RenderState.Blend(Blend.SrcAlpha, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha), new FieldCondition(Fields.BlendAlpha, true)},
+                {
+                    RenderState.Blend(Blend.SrcAlpha, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha),
+                    new FieldCondition(Fields.BlendAlpha, true)
+                },
                 { RenderState.ZWrite(ZWrite.On) },
                 { RenderState.ZTest(ZTest.LEqual) },
                 { RenderState.Cull(Cull.Back) },
-                { RenderState.Stencil(new StencilDescriptor() {
-                    Ref  = "128",
-                    ReadMask = "127",
-                    WriteMask = "128",
-                    Comp = "Always",
-                    Pass = "Replace",
-                })},
+                {
+                    RenderState.Stencil(
+                        new StencilDescriptor()
+                        {
+                            Ref = "128",
+                            ReadMask = "127",
+                            WriteMask = "128",
+                            Comp = "Always",
+                            Pass = "Replace",
+                        }
+                    )
+                },
             };
         }
     }

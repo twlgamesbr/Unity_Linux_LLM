@@ -1,5 +1,5 @@
-using Unity.Collections;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.Assertions;
 
@@ -8,7 +8,11 @@ namespace UnityEngine.Rendering
     [BurstCompile]
     internal static class CPUDrawInstanceDataBurst
     {
-        private static void RemoveDrawRange(in RangeKey key, ref NativeParallelHashMap<RangeKey, int> rangeHash, ref NativeList<DrawRange> drawRanges)
+        private static void RemoveDrawRange(
+            in RangeKey key,
+            ref NativeParallelHashMap<RangeKey, int> rangeHash,
+            ref NativeList<DrawRange> drawRanges
+        )
         {
             int drawRangeIndex = rangeHash[key];
 
@@ -19,8 +23,13 @@ namespace UnityEngine.Rendering
             drawRanges.RemoveAtSwapBack(drawRangeIndex);
         }
 
-        private static void RemoveDrawBatch(in DrawKey key, ref NativeParallelHashMap<RangeKey, int> rangeHash, ref NativeParallelHashMap<DrawKey, int> batchHash,
-            ref NativeList<DrawRange> drawRanges, ref NativeList<DrawBatch> drawBatches)
+        private static void RemoveDrawBatch(
+            in DrawKey key,
+            ref NativeParallelHashMap<RangeKey, int> rangeHash,
+            ref NativeParallelHashMap<DrawKey, int> batchHash,
+            ref NativeList<DrawRange> drawRanges,
+            ref NativeList<DrawBatch> drawBatches
+        )
         {
             int drawBatchIndex = batchHash[key];
 
@@ -42,8 +51,14 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static unsafe void RemoveDrawInstanceIndices(in NativeArray<int> drawInstanceIndicesSorted, ref NativeList<DrawInstance> drawInstances, ref NativeParallelHashMap<RangeKey, int> rangeHash,
-            ref NativeParallelHashMap<DrawKey, int> batchHash, ref NativeList<DrawRange> drawRanges, ref NativeList<DrawBatch> drawBatches)
+        public static unsafe void RemoveDrawInstanceIndices(
+            in NativeArray<int> drawInstanceIndicesSorted,
+            ref NativeList<DrawInstance> drawInstances,
+            ref NativeParallelHashMap<RangeKey, int> rangeHash,
+            ref NativeParallelHashMap<DrawKey, int> batchHash,
+            ref NativeList<DrawRange> drawRanges,
+            ref NativeList<DrawBatch> drawBatches
+        )
         {
             var drawInstancesPtr = (DrawInstance*)drawInstances.GetUnsafePtr();
             var drawInstancesNewBack = drawInstances.Length - 1;

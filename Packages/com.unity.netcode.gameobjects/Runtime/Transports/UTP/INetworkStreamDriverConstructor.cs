@@ -75,6 +75,7 @@ namespace Unity.Netcode.Transports.UTP
             out NetworkDriver driver,
             out NetworkPipeline unreliableFragmentedPipeline,
             out NetworkPipeline unreliableSequencedFragmentedPipeline,
-            out NetworkPipeline reliableSequencedPipeline);
+            out NetworkPipeline reliableSequencedPipeline
+        );
     }
 }

@@ -7,8 +7,12 @@ namespace UnityEngine.InputSystem.Editor
     /// Analytics for tracking Player Input component user engagement in the editor.
     /// </summary>
 #if UNITY_2023_2_OR_NEWER
-    [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-        maxNumberOfElements: kMaxNumberOfElements, vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey)]
+    [UnityEngine.Analytics.AnalyticInfo(
+        eventName: kEventName,
+        maxEventsPerHour: kMaxEventsPerHour,
+        maxNumberOfElements: kMaxNumberOfElements,
+        vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey
+    )]
 #endif // UNITY_2023_2_OR_NEWER
     internal class PlayerInputEditorAnalytic : UnityEngine.InputSystem.InputAnalytics.IInputAnalytic
     {

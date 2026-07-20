@@ -34,9 +34,9 @@ namespace Unity.Multiplayer.Tools.DependencyInjection
         {
             dependency = default;
 
-            var singletonDefinitionCandidate = m_Container.DependencyDefinitions
-                .LastOrDefault(x => x.DependencyType == type &&
-                                     x.Lifetime == Lifetime.Singleton);
+            var singletonDefinitionCandidate = m_Container.DependencyDefinitions.LastOrDefault(x =>
+                x.DependencyType == type && x.Lifetime == Lifetime.Singleton
+            );
             if (singletonDefinitionCandidate != default)
             {
                 if (m_SingletonInstances.TryGetValue(type, out var singletonInstance))
@@ -52,9 +52,9 @@ namespace Unity.Multiplayer.Tools.DependencyInjection
                 return true;
             }
 
-            var transientDefinitionCandidate = m_Container.DependencyDefinitions
-                .LastOrDefault(x => x.DependencyType == type &&
-                                    x.Lifetime == Lifetime.Transient);
+            var transientDefinitionCandidate = m_Container.DependencyDefinitions.LastOrDefault(x =>
+                x.DependencyType == type && x.Lifetime == Lifetime.Transient
+            );
             if (transientDefinitionCandidate != default)
             {
                 dependency = Instantiate(transientDefinitionCandidate);
@@ -88,18 +88,13 @@ namespace Unity.Multiplayer.Tools.DependencyInjection
         class MissingDependencyException : Exception
         {
             public MissingDependencyException(Type type)
-                : base($"Could not resolve dependency for type '{type.AssemblyQualifiedName}'.")
-            {
-            }
+                : base($"Could not resolve dependency for type '{type.AssemblyQualifiedName}'.") { }
         }
 
         class DependencyInstantiationException : Exception
         {
             public DependencyInstantiationException(Type type)
-                : base($"Could not instantiate dependency of type '{type.AssemblyQualifiedName}'.")
-            {
-
-            }
+                : base($"Could not instantiate dependency of type '{type.AssemblyQualifiedName}'.") { }
         }
     }
 }

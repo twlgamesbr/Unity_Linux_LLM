@@ -28,7 +28,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
         public override void DrawSurfaceOptions(Material material)
         {
             base.DrawSurfaceOptions(material);
-            DoPopup(ParticleGUI.Styles.colorMode, particleProps.colorMode, Enum.GetNames(typeof(ParticleGUI.ColorMode)));
+            DoPopup(
+                ParticleGUI.Styles.colorMode,
+                particleProps.colorMode,
+                Enum.GetNames(typeof(ParticleGUI.ColorMode))
+            );
         }
 
         public override void DrawSurfaceInputs(Material material)
@@ -59,8 +63,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
         {
             m_RenderersUsingThisMaterial.Clear();
 
-            #pragma warning disable CS0618 // Type or member is obsolete
-            ParticleSystemRenderer[] renderers = UnityEngine.Object.FindObjectsByType<ParticleSystemRenderer>(FindObjectsSortMode.InstanceID);
+#pragma warning disable CS0618 // Type or member is obsolete
+            ParticleSystemRenderer[] renderers = UnityEngine.Object.FindObjectsByType<ParticleSystemRenderer>(
+                FindObjectsSortMode.InstanceID
+            );
 #pragma warning restore CS0618 // Type or member is obsolete
             foreach (ParticleSystemRenderer renderer in renderers)
             {

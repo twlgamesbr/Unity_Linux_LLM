@@ -44,8 +44,14 @@ namespace Unity.Entities
             /// </remarks>
             public static int TotalMemoryMB
             {
-                get => math.clamp(PlayerPrefs.GetInt(k_TotalMemoryMBKey, k_TotalMemoryMBDefault), k_TotalMemoryMBMin, k_TotalMemoryMBMax);
-                set => PlayerPrefs.SetInt(k_TotalMemoryMBKey, math.clamp(value, k_TotalMemoryMBMin, k_TotalMemoryMBMax));
+                get =>
+                    math.clamp(
+                        PlayerPrefs.GetInt(k_TotalMemoryMBKey, k_TotalMemoryMBDefault),
+                        k_TotalMemoryMBMin,
+                        k_TotalMemoryMBMax
+                    );
+                set =>
+                    PlayerPrefs.SetInt(k_TotalMemoryMBKey, math.clamp(value, k_TotalMemoryMBMin, k_TotalMemoryMBMax));
             }
 
             /// <summary>

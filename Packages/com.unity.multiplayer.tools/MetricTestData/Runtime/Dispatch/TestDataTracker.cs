@@ -14,26 +14,61 @@ namespace Unity.Multiplayer.Tools.MetricTestData
             ShouldResetOnDispatch = true,
         };
 
-        readonly EventMetric<NetworkMessageEvent> m_NetworkMessageSentEvent = new EventMetric<NetworkMessageEvent>(DirectedMetricType.NetworkMessageSent.GetId());
-        readonly EventMetric<NetworkMessageEvent> m_NetworkMessageReceivedEvent = new EventMetric<NetworkMessageEvent>(DirectedMetricType.NetworkMessageReceived.GetId());
-        readonly EventMetric<NamedMessageEvent> m_NamedMessageSentEvent = new EventMetric<NamedMessageEvent>(DirectedMetricType.NamedMessageSent.GetId());
-        readonly EventMetric<NamedMessageEvent> m_NamedMessageReceivedEvent = new EventMetric<NamedMessageEvent>(DirectedMetricType.NamedMessageReceived.GetId());
-        readonly EventMetric<UnnamedMessageEvent> m_UnnamedMessageSentEvent = new EventMetric<UnnamedMessageEvent>(DirectedMetricType.UnnamedMessageSent.GetId());
-        readonly EventMetric<UnnamedMessageEvent> m_UnnamedMessageReceivedEvent = new EventMetric<UnnamedMessageEvent>(DirectedMetricType.UnnamedMessageReceived.GetId());
-        readonly EventMetric<NetworkVariableEvent> m_NetworkVariableDeltaSentEvent = new EventMetric<NetworkVariableEvent>(DirectedMetricType.NetworkVariableDeltaSent.GetId());
-        readonly EventMetric<NetworkVariableEvent> m_NetworkVariableDeltaReceivedEvent = new EventMetric<NetworkVariableEvent>(DirectedMetricType.NetworkVariableDeltaReceived.GetId());
-        readonly EventMetric<OwnershipChangeEvent> m_OwnershipChangeSentEvent = new EventMetric<OwnershipChangeEvent>(DirectedMetricType.OwnershipChangeSent.GetId());
-        readonly EventMetric<OwnershipChangeEvent> m_OwnershipChangeReceivedEvent = new EventMetric<OwnershipChangeEvent>(DirectedMetricType.OwnershipChangeReceived.GetId());
-        readonly EventMetric<ObjectSpawnedEvent> m_ObjectSpawnSentEvent = new EventMetric<ObjectSpawnedEvent>(DirectedMetricType.ObjectSpawnedSent.GetId());
-        readonly EventMetric<ObjectSpawnedEvent> m_ObjectSpawnReceivedEvent = new EventMetric<ObjectSpawnedEvent>(DirectedMetricType.ObjectSpawnedReceived.GetId());
-        readonly EventMetric<ObjectDestroyedEvent> m_ObjectDestroySentEvent = new EventMetric<ObjectDestroyedEvent>(DirectedMetricType.ObjectDestroyedSent.GetId());
-        readonly EventMetric<ObjectDestroyedEvent> m_ObjectDestroyReceivedEvent = new EventMetric<ObjectDestroyedEvent>(DirectedMetricType.ObjectDestroyedReceived.GetId());
+        readonly EventMetric<NetworkMessageEvent> m_NetworkMessageSentEvent = new EventMetric<NetworkMessageEvent>(
+            DirectedMetricType.NetworkMessageSent.GetId()
+        );
+        readonly EventMetric<NetworkMessageEvent> m_NetworkMessageReceivedEvent = new EventMetric<NetworkMessageEvent>(
+            DirectedMetricType.NetworkMessageReceived.GetId()
+        );
+        readonly EventMetric<NamedMessageEvent> m_NamedMessageSentEvent = new EventMetric<NamedMessageEvent>(
+            DirectedMetricType.NamedMessageSent.GetId()
+        );
+        readonly EventMetric<NamedMessageEvent> m_NamedMessageReceivedEvent = new EventMetric<NamedMessageEvent>(
+            DirectedMetricType.NamedMessageReceived.GetId()
+        );
+        readonly EventMetric<UnnamedMessageEvent> m_UnnamedMessageSentEvent = new EventMetric<UnnamedMessageEvent>(
+            DirectedMetricType.UnnamedMessageSent.GetId()
+        );
+        readonly EventMetric<UnnamedMessageEvent> m_UnnamedMessageReceivedEvent = new EventMetric<UnnamedMessageEvent>(
+            DirectedMetricType.UnnamedMessageReceived.GetId()
+        );
+        readonly EventMetric<NetworkVariableEvent> m_NetworkVariableDeltaSentEvent =
+            new EventMetric<NetworkVariableEvent>(DirectedMetricType.NetworkVariableDeltaSent.GetId());
+        readonly EventMetric<NetworkVariableEvent> m_NetworkVariableDeltaReceivedEvent =
+            new EventMetric<NetworkVariableEvent>(DirectedMetricType.NetworkVariableDeltaReceived.GetId());
+        readonly EventMetric<OwnershipChangeEvent> m_OwnershipChangeSentEvent = new EventMetric<OwnershipChangeEvent>(
+            DirectedMetricType.OwnershipChangeSent.GetId()
+        );
+        readonly EventMetric<OwnershipChangeEvent> m_OwnershipChangeReceivedEvent =
+            new EventMetric<OwnershipChangeEvent>(DirectedMetricType.OwnershipChangeReceived.GetId());
+        readonly EventMetric<ObjectSpawnedEvent> m_ObjectSpawnSentEvent = new EventMetric<ObjectSpawnedEvent>(
+            DirectedMetricType.ObjectSpawnedSent.GetId()
+        );
+        readonly EventMetric<ObjectSpawnedEvent> m_ObjectSpawnReceivedEvent = new EventMetric<ObjectSpawnedEvent>(
+            DirectedMetricType.ObjectSpawnedReceived.GetId()
+        );
+        readonly EventMetric<ObjectDestroyedEvent> m_ObjectDestroySentEvent = new EventMetric<ObjectDestroyedEvent>(
+            DirectedMetricType.ObjectDestroyedSent.GetId()
+        );
+        readonly EventMetric<ObjectDestroyedEvent> m_ObjectDestroyReceivedEvent = new EventMetric<ObjectDestroyedEvent>(
+            DirectedMetricType.ObjectDestroyedReceived.GetId()
+        );
         readonly EventMetric<RpcEvent> m_RpcSentEvent = new EventMetric<RpcEvent>(DirectedMetricType.RpcSent.GetId());
-        readonly EventMetric<RpcEvent> m_RpcReceivedEvent = new EventMetric<RpcEvent>(DirectedMetricType.RpcReceived.GetId());
-        readonly EventMetric<ServerLogEvent> m_ServerLogSentEvent = new EventMetric<ServerLogEvent>(DirectedMetricType.ServerLogSent.GetId());
-        readonly EventMetric<ServerLogEvent> m_ServerLogReceivedEvent = new EventMetric<ServerLogEvent>(DirectedMetricType.ServerLogReceived.GetId());
-        readonly EventMetric<SceneEventMetric> m_SceneEventSentEvent = new EventMetric<SceneEventMetric>(DirectedMetricType.SceneEventSent.GetId());
-        readonly EventMetric<SceneEventMetric> m_SceneEventReceivedEvent = new EventMetric<SceneEventMetric>(DirectedMetricType.SceneEventReceived.GetId());
+        readonly EventMetric<RpcEvent> m_RpcReceivedEvent = new EventMetric<RpcEvent>(
+            DirectedMetricType.RpcReceived.GetId()
+        );
+        readonly EventMetric<ServerLogEvent> m_ServerLogSentEvent = new EventMetric<ServerLogEvent>(
+            DirectedMetricType.ServerLogSent.GetId()
+        );
+        readonly EventMetric<ServerLogEvent> m_ServerLogReceivedEvent = new EventMetric<ServerLogEvent>(
+            DirectedMetricType.ServerLogReceived.GetId()
+        );
+        readonly EventMetric<SceneEventMetric> m_SceneEventSentEvent = new EventMetric<SceneEventMetric>(
+            DirectedMetricType.SceneEventSent.GetId()
+        );
+        readonly EventMetric<SceneEventMetric> m_SceneEventReceivedEvent = new EventMetric<SceneEventMetric>(
+            DirectedMetricType.SceneEventReceived.GetId()
+        );
 
         private readonly Counter m_PacketSentCounter = new Counter(NetworkMetricTypes.PacketsSent.Id)
         {
@@ -55,10 +90,7 @@ namespace Unity.Multiplayer.Tools.MetricTestData
         {
             ShouldResetOnDispatch = true,
         };
-        readonly Gauge m_PacketLoss = new Gauge(NetworkMetricTypes.PacketLoss.Id)
-        {
-            ShouldResetOnDispatch = true,
-        };
+        readonly Gauge m_PacketLoss = new Gauge(NetworkMetricTypes.PacketLoss.Id) { ShouldResetOnDispatch = true };
 
         public TestDataTracker()
         {

@@ -25,11 +25,14 @@ namespace EditorAttributes.Editor
             if (helpBoxAttribute.DrawAbove)
                 helpBox.PlaceBehind(propertyField);
 
-            UpdateVisualElement(helpBox, () =>
-            {
-                helpBox.text = GetDynamicString(helpBoxAttribute.Message, property, helpBoxAttribute, errorBox);
-                DisplayErrorBox(root, errorBox);
-            });
+            UpdateVisualElement(
+                helpBox,
+                () =>
+                {
+                    helpBox.text = GetDynamicString(helpBoxAttribute.Message, property, helpBoxAttribute, errorBox);
+                    DisplayErrorBox(root, errorBox);
+                }
+            );
 
             return root;
         }

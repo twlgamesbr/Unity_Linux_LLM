@@ -15,7 +15,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 position = Position.Absolute,
                 bottom = 0,
                 left = 0,
-            }
+            },
         };
 
         internal ListViewNetwork(IReadOnlyCollection<IRowData> connections)
@@ -42,7 +42,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 rootItems,
                 20,
                 () => new DetailsViewRow(),
-                (element, item) => (element as DetailsViewRow)?.BindItem(item));
+                (element, item) => (element as DetailsViewRow)?.BindItem(item)
+            );
 #if !UNITY_2022_1_OR_NEWER
             var mostRecentlySelectedItem = DetailsViewPersistentState.s_mostRecentlySelectedItem;
 #endif
@@ -50,7 +51,10 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             {
                 SetSelectedState(inlineTreeView, item);
 #if !UNITY_2022_1_OR_NEWER
-                if (item.data.TreeViewPath == mostRecentlySelectedItem.path && item.data.Id == mostRecentlySelectedItem.id)
+                if (
+                    item.data.TreeViewPath == mostRecentlySelectedItem.path
+                    && item.data.Id == mostRecentlySelectedItem.id
+                )
                 {
                     UpdateSelectionPath(item);
                 }
@@ -92,7 +96,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             var treeViewIDs = treeViewItems.Select(t => t.data.Id).ToList();
             var locators = treeViewItems.Select(t => t.data.TreeViewPath).ToList();
 
-            // Here we need both the path and ID because Server and Client might share the same ID for the same shared items 
+            // Here we need both the path and ID because Server and Client might share the same ID for the same shared items
             DetailsViewPersistentState.SetSelected(locators, treeViewIDs);
 
             if (treeViewItems.Count > 0)

@@ -160,9 +160,7 @@ namespace UnityEngine.Rendering.Universal
         public bool IsActive()
         {
             var defaultState = new Vector4(1f, 1f, 1f, 0f);
-            return shadows != defaultState
-                || midtones != defaultState
-                || highlights != defaultState;
+            return shadows != defaultState || midtones != defaultState || highlights != defaultState;
         }
 
         /// <summary>

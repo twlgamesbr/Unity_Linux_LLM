@@ -8,20 +8,52 @@ namespace Unity.Editor.Bridge
 {
     static class SearchBridge
     {
-        public static IQueryEngineFilter SetFilter<TFilter, TData>(QueryEngine<TData> queryEngine, string token, Func<TData, TFilter> getDataFunc, string[] supportedOperatorType = null)
+        public static IQueryEngineFilter SetFilter<TFilter, TData>(
+            QueryEngine<TData> queryEngine,
+            string token,
+            Func<TData, TFilter> getDataFunc,
+            string[] supportedOperatorType = null
+        )
         {
             return queryEngine.SetFilter(token, getDataFunc, supportedOperatorType);
         }
 
-        public static void AddFilter<TFilter, TData>(QueryEngine<TData> queryEngine, string token, Func<TData, QueryFilterOperator, TFilter, bool> filterResolver, string[] supportedOperatorType = null)
+        public static void AddFilter<TFilter, TData>(
+            QueryEngine<TData> queryEngine,
+            string token,
+            Func<TData, QueryFilterOperator, TFilter, bool> filterResolver,
+            string[] supportedOperatorType = null
+        )
         {
             queryEngine.AddFilter(token, filterResolver, supportedOperatorType);
         }
 
-        public static IQueryEngineFilter AddOrUpdateProposition(this IQueryEngineFilter filter, string label, string category = null, string replacement = null, string help = null, string data = null,
-                                       int priority = 0, Texture2D icon = null, System.Type type = null, Color color = default, TextCursorPlacement moveCursor = TextCursorPlacement.MoveAutoComplete)
+        public static IQueryEngineFilter AddOrUpdateProposition(
+            this IQueryEngineFilter filter,
+            string label,
+            string category = null,
+            string replacement = null,
+            string help = null,
+            string data = null,
+            int priority = 0,
+            Texture2D icon = null,
+            System.Type type = null,
+            Color color = default,
+            TextCursorPlacement moveCursor = TextCursorPlacement.MoveAutoComplete
+        )
         {
-            return filter.AddOrUpdatePropositionData(label, category, replacement, help, data, priority, icon, type, color, moveCursor);
+            return filter.AddOrUpdatePropositionData(
+                label,
+                category,
+                replacement,
+                help,
+                data,
+                priority,
+                icon,
+                type,
+                color,
+                moveCursor
+            );
         }
 
         public static IEnumerable<SearchProposition> GetPropositionsFromListBlockType(Type t)
@@ -49,16 +81,28 @@ namespace Unity.Editor.Bridge
             p.tableConfig = tableConfig;
         }
 
-        public static bool CompareWords(QueryFilterOperator op, string value, IEnumerable<string> words, StringComparison comp = StringComparison.CurrentCultureIgnoreCase)
+        public static bool CompareWords(
+            QueryFilterOperator op,
+            string value,
+            IEnumerable<string> words,
+            StringComparison comp = StringComparison.CurrentCultureIgnoreCase
+        )
         {
             if (words == null || string.IsNullOrEmpty(value))
                 return false;
 
             value = value.ToLowerInvariant();
-            return op.type == FilterOperatorType.Equal ? words.Any(r => r.Equals(value, comp)) : words.Any(t => t.IndexOf(value, comp) != -1);
+            return op.type == FilterOperatorType.Equal
+                ? words.Any(r => r.Equals(value, comp))
+                : words.Any(t => t.IndexOf(value, comp) != -1);
         }
-        
-        public static bool CompareWords(QueryFilterOperator op, string value, string word, StringComparison comp = StringComparison.CurrentCultureIgnoreCase)
+
+        public static bool CompareWords(
+            QueryFilterOperator op,
+            string value,
+            string word,
+            StringComparison comp = StringComparison.CurrentCultureIgnoreCase
+        )
         {
             if (string.IsNullOrEmpty(word) || string.IsNullOrEmpty(value))
                 return false;
@@ -67,12 +111,21 @@ namespace Unity.Editor.Bridge
             return op.type == FilterOperatorType.Equal ? word.Equals(value, comp) : word.IndexOf(value, comp) != -1;
         }
 
-        public static ISearchView OpenContextual(string providerId, string searchText, Action<SearchViewState> setup = null)
+        public static ISearchView OpenContextual(
+            string providerId,
+            string searchText,
+            Action<SearchViewState> setup = null
+        )
         {
             return OpenContextualTable(providerId, searchText, null, setup);
         }
 
-        public static ISearchView OpenContextualTable(string providerId, string searchText, SearchTable table, Action<SearchViewState> setup = null)
+        public static ISearchView OpenContextualTable(
+            string providerId,
+            string searchText,
+            SearchTable table,
+            Action<SearchViewState> setup = null
+        )
         {
             var win = FindWindowWithSingleProvider(providerId);
             if (win != null)
@@ -81,7 +134,6 @@ namespace Unity.Editor.Bridge
                 win.SetSearchText(searchText);
                 return win;
             }
-
 
             var searchContext = SearchService.CreateContext(providerId, searchText, SearchFlags.Default);
             var viewState = SearchViewState.LoadDefaults();
@@ -106,18 +158,30 @@ namespace Unity.Editor.Bridge
             return b.GetBackgroundColor();
         }
 
-        public static IEnumerable<SearchProposition> GetEnumToggle<T>(string category, string help, params T[] enumValues) where T : Enum
+        public static IEnumerable<SearchProposition> GetEnumToggle<T>(
+            string category,
+            string help,
+            params T[] enumValues
+        )
+            where T : Enum
         {
             foreach (var e in enumValues)
             {
                 var enumName = Enum.GetName(typeof(T), e);
-                yield return new SearchProposition(category: category, enumName, $"+{e}",
-                    help, priority: 0, moveCursor: TextCursorPlacement.MoveAutoComplete,
-                    color: QueryColors.toggle);
+                yield return new SearchProposition(
+                    category: category,
+                    enumName,
+                    $"+{e}",
+                    help,
+                    priority: 0,
+                    moveCursor: TextCursorPlacement.MoveAutoComplete,
+                    color: QueryColors.toggle
+                );
             }
         }
 
-        public static IEnumerable<SearchProposition> GetEnumToggle<T>(string category, string help) where T : Enum
+        public static IEnumerable<SearchProposition> GetEnumToggle<T>(string category, string help)
+            where T : Enum
         {
             return GetEnumToggle(category, help, Enum.GetValues(typeof(T)) as T[]);
         }

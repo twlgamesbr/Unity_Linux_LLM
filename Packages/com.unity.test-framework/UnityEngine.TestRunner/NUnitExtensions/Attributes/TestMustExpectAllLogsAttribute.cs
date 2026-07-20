@@ -25,8 +25,8 @@ namespace UnityEngine.TestTools
         /// <param name="mustExpect">
         /// A value indicating whether the test must expect all logs.
         /// </param>
-        public TestMustExpectAllLogsAttribute(bool mustExpect = true)
-            => MustExpect = mustExpect;
+        public TestMustExpectAllLogsAttribute(bool mustExpect = true) => MustExpect = mustExpect;
+
         /// <summary>
         /// Returns the flag of whether the test must expect all logs.
         /// </summary>

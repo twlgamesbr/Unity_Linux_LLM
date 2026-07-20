@@ -20,6 +20,7 @@ namespace UnityEngine.Rendering
                 return b.y.CompareTo(a.y);
             }
         }
+
         struct ActiveComparer : IComparer<Vector2>
         {
             public int Compare(Vector2 a, Vector2 b)
@@ -154,8 +155,7 @@ namespace UnityEngine.Rendering
                     }
 
                     i++;
-                }
-                while (i < eventCount && Mathf.Approximately(eventsBuffer[i].x, x));
+                } while (i < eventCount && Mathf.Approximately(eventsBuffer[i].x, x));
             }
 
             return area;

@@ -1,12 +1,12 @@
 using System;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
-using Unity.Entities;
-using Unity.Jobs;
-using Unity.Mathematics;
-using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Jobs.LowLevel.Unsafe;
+using Unity.Mathematics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 
@@ -19,11 +19,18 @@ namespace Unity.Physics
     [NoAlias]
     public struct CollisionWorld : ICollidable, IDisposable
     {
-        [NoAlias] private NativeArray<RigidBody> m_Bodies;    // storage for all the rigid bodies
-        [NoAlias] internal Broadphase Broadphase;             // bounding volume hierarchies around subsets of the rigid bodies
-        [NoAlias] internal NativeParallelHashMap<Entity, int> EntityBodyIndexMap;
+        [NoAlias]
+        private NativeArray<RigidBody> m_Bodies; // storage for all the rigid bodies
+
+        [NoAlias]
+        internal Broadphase Broadphase; // bounding volume hierarchies around subsets of the rigid bodies
+
+        [NoAlias]
+        internal NativeParallelHashMap<Entity, int> EntityBodyIndexMap;
+
         [NativeDisableContainerSafetyRestriction]
-        [NoAlias] private NativeList<BlobAssetReference<Collider>> m_ColliderDeepCopies;
+        [NoAlias]
+        private NativeList<BlobAssetReference<Collider>> m_ColliderDeepCopies;
 
         /// <summary>   Gets the number of bodies. </summary>
         ///
@@ -77,7 +84,11 @@ namespace Unity.Physics
         /// <param name="numDynamicBodies"> Number of dynamic bodies. </param>
         public CollisionWorld(int numStaticBodies, int numDynamicBodies)
         {
-            m_Bodies = new NativeArray<RigidBody>(numStaticBodies + numDynamicBodies, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_Bodies = new NativeArray<RigidBody>(
+                numStaticBodies + numDynamicBodies,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             Broadphase = new Broadphase(numStaticBodies, numDynamicBodies);
             EntityBodyIndexMap = new NativeParallelHashMap<Entity, int>(m_Bodies.Length, Allocator.Persistent);
             m_ColliderDeepCopies = new NativeList<BlobAssetReference<Collider>>();
@@ -104,7 +115,11 @@ namespace Unity.Physics
             if (m_Bodies.Length < numBodies)
             {
                 m_Bodies.Dispose();
-                m_Bodies = new NativeArray<RigidBody>(numBodies, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                m_Bodies = new NativeArray<RigidBody>(
+                    numBodies,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 EntityBodyIndexMap.Capacity = m_Bodies.Length;
             }
         }
@@ -148,7 +163,7 @@ namespace Unity.Physics
                 m_Bodies = new NativeArray<RigidBody>(m_Bodies, Allocator.Persistent),
                 Broadphase = Broadphase.Clone(),
                 EntityBodyIndexMap = new NativeParallelHashMap<Entity, int>(m_Bodies.Length, Allocator.Persistent),
-                m_ColliderDeepCopies = default
+                m_ColliderDeepCopies = default,
             };
             clone.UpdateBodyIndexMap();
             return clone;
@@ -172,16 +187,25 @@ namespace Unity.Physics
         ///                                             <paramref name="deepCopyDynamicColliders"/> and
         ///                                             <paramref name="deepCopyStaticColliders"/> parameters.</param>
         /// <returns>   A copy of this object. </returns>
-        public CollisionWorld Clone(bool deepCopyDynamicColliders, bool deepCopyStaticColliders = false, NativeList<int> deepCopyRigidBodyList = default)
+        public CollisionWorld Clone(
+            bool deepCopyDynamicColliders,
+            bool deepCopyStaticColliders = false,
+            NativeList<int> deepCopyRigidBodyList = default
+        )
         {
-            SafetyChecks.CheckValidCloneRequestAndThrow(this, deepCopyDynamicColliders, deepCopyStaticColliders, deepCopyRigidBodyList);
+            SafetyChecks.CheckValidCloneRequestAndThrow(
+                this,
+                deepCopyDynamicColliders,
+                deepCopyStaticColliders,
+                deepCopyRigidBodyList
+            );
 
             var clone = new CollisionWorld
             {
                 m_Bodies = new NativeArray<RigidBody>(m_Bodies, Allocator.Persistent),
                 Broadphase = Broadphase.Clone(),
                 EntityBodyIndexMap = new NativeParallelHashMap<Entity, int>(m_Bodies.Length, Allocator.Persistent),
-                m_ColliderDeepCopies = default
+                m_ColliderDeepCopies = default,
             };
             clone.UpdateBodyIndexMap();
 
@@ -196,7 +220,8 @@ namespace Unity.Physics
 
             // Compute required number of deep copies, assuming there are no overlaps between the requested static / dynamic collider deep copies
             // and the provided rigid body indices.
-            var numDeepCopies = (deepCopyDynamicColliders ? NumDynamicBodies : 0)
+            var numDeepCopies =
+                (deepCopyDynamicColliders ? NumDynamicBodies : 0)
                 + (deepCopyStaticColliders ? NumStaticBodies : 0)
                 + (deepCopyRigidBodyList.IsEmpty ? 0 : deepCopyRigidBodyList.Length);
 
@@ -206,7 +231,10 @@ namespace Unity.Physics
             }
             // else:
 
-            clone.m_ColliderDeepCopies = new NativeList<BlobAssetReference<Collider>>(numDeepCopies, Allocator.Persistent);
+            clone.m_ColliderDeepCopies = new NativeList<BlobAssetReference<Collider>>(
+                numDeepCopies,
+                Allocator.Persistent
+            );
 
             // Deep copy dynamic colliders
             if (deepCopyDynamicColliders)
@@ -239,7 +267,10 @@ namespace Unity.Physics
             return clone;
         }
 
-        static void CloneColliders(NativeArray<RigidBody> bodies, NativeList<BlobAssetReference<Collider>> colliderClones)
+        static void CloneColliders(
+            NativeArray<RigidBody> bodies,
+            NativeList<BlobAssetReference<Collider>> colliderClones
+        )
         {
             var numBodies = bodies.Length;
             for (int i = 0; i < numBodies; ++i)
@@ -284,8 +315,16 @@ namespace Unity.Physics
         /// <param name="buildStaticTree">  (Optional) True to build static tree. </param>
         public void BuildBroadphase(ref PhysicsWorld world, float timeStep, float3 gravity, bool buildStaticTree = true)
         {
-            Broadphase.Build(world.StaticBodies, world.DynamicBodies, world.MotionVelocities,
-                world.CollisionWorld.CollisionTolerance, timeStep, gravity, buildStaticTree, reset: true);
+            Broadphase.Build(
+                world.StaticBodies,
+                world.DynamicBodies,
+                world.MotionVelocities,
+                world.CollisionWorld.CollisionTolerance,
+                timeStep,
+                gravity,
+                buildStaticTree,
+                reset: true
+            );
         }
 
         /// <summary>   Schedule a set of jobs to build the broadphase based on the given world. </summary>
@@ -298,23 +337,58 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public JobHandle ScheduleBuildBroadphaseJobs(ref PhysicsWorld world, float timeStep, float3 gravity, NativeReference<int>.ReadOnly buildStaticTree, JobHandle inputDeps, bool multiThreaded = true)
+        public JobHandle ScheduleBuildBroadphaseJobs(
+            ref PhysicsWorld world,
+            float timeStep,
+            float3 gravity,
+            NativeReference<int>.ReadOnly buildStaticTree,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
-            return Broadphase.ScheduleBuildJobs(ref world, timeStep, gravity, buildStaticTree, inputDeps, multiThreaded, reset: true);
+            return Broadphase.ScheduleBuildJobs(
+                ref world,
+                timeStep,
+                gravity,
+                buildStaticTree,
+                inputDeps,
+                multiThreaded,
+                reset: true
+            );
         }
 
         static NativeArray<T> CreateArrayCopy<T>(NativeArray<T> array, Allocator allocator)
             where T : unmanaged
         {
-            var arrayCopy = CollectionHelper.CreateNativeArray<T>(array.Length, allocator, NativeArrayOptions.UninitializedMemory);
+            var arrayCopy = CollectionHelper.CreateNativeArray<T>(
+                array.Length,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
             arrayCopy.CopyFrom(array);
             return arrayCopy;
         }
 
-        internal JobHandle ScheduleBuildBroadphaseJobs(ref PhysicsWorld world, float timeStep, float3 gravity, int numDynamicBodies, int numStaticBodies, NativeReference<int>.ReadOnly buildStaticTree,
-            EntityQuery dynamicEntityQuery, EntityQuery staticEntityQuery, EntityQuery invalidatedTemporalCoherenceInfoQuery, NativeArray<int> dynamicBodyChunkBaseEntityIndices, NativeArray<int> staticBodyChunkBaseEntityIndices,
-            JobHandle inputDeps, Allocator worldUpdateAllocator, in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles, uint lastSystemVersion,
-            bool multiThreaded, bool incrementalDynamicBroadphase, bool incrementalStaticBroadphase)
+        internal JobHandle ScheduleBuildBroadphaseJobs(
+            ref PhysicsWorld world,
+            float timeStep,
+            float3 gravity,
+            int numDynamicBodies,
+            int numStaticBodies,
+            NativeReference<int>.ReadOnly buildStaticTree,
+            EntityQuery dynamicEntityQuery,
+            EntityQuery staticEntityQuery,
+            EntityQuery invalidatedTemporalCoherenceInfoQuery,
+            NativeArray<int> dynamicBodyChunkBaseEntityIndices,
+            NativeArray<int> staticBodyChunkBaseEntityIndices,
+            JobHandle inputDeps,
+            Allocator worldUpdateAllocator,
+            in PhysicsWorldData.PhysicsWorldComponentHandles componentHandles,
+            uint lastSystemVersion,
+            bool multiThreaded,
+            bool incrementalDynamicBroadphase,
+            bool incrementalStaticBroadphase
+        )
         {
             using var jobHandles = new NativeList<JobHandle>(16, Allocator.Temp);
             jobHandles.Add(inputDeps);
@@ -336,8 +410,16 @@ namespace Unity.Physics
 
             if (incrementalDynamicBroadphase || incrementalStaticBroadphase)
             {
-                numDynamicBodyRemovalChunksArray = CollectionHelper.CreateNativeArray<int>(1, worldUpdateAllocator, NativeArrayOptions.UninitializedMemory);
-                numStaticBodyRemovalChunksArray = CollectionHelper.CreateNativeArray<int>(1, worldUpdateAllocator, NativeArrayOptions.UninitializedMemory);
+                numDynamicBodyRemovalChunksArray = CollectionHelper.CreateNativeArray<int>(
+                    1,
+                    worldUpdateAllocator,
+                    NativeArrayOptions.UninitializedMemory
+                );
+                numStaticBodyRemovalChunksArray = CollectionHelper.CreateNativeArray<int>(
+                    1,
+                    worldUpdateAllocator,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 numInvalidatedTemporalCoherenceInfoChunks = invalidatedTemporalCoherenceInfoQuery.CalculateChunkCount();
                 numDynamicBodyRemovalChunksArray[0] = numInvalidatedTemporalCoherenceInfoChunks;
                 numStaticBodyRemovalChunksArray[0] = numInvalidatedTemporalCoherenceInfoChunks;
@@ -363,50 +445,81 @@ namespace Unity.Physics
                 //    any dynamic or static bodies currently available (numDynamicBodies > 0, numStaticBodies > 0).
                 if (numDynamicBodyRemovalChunksArray[0] > 0)
                 {
-                    removeDynamicBodyStreamHandle = NativeStream.ScheduleConstruct(out removeDynamicBodyDataStream,
-                        numDynamicBodyRemovalChunksArray, inputDeps, worldUpdateAllocator);
+                    removeDynamicBodyStreamHandle = NativeStream.ScheduleConstruct(
+                        out removeDynamicBodyDataStream,
+                        numDynamicBodyRemovalChunksArray,
+                        inputDeps,
+                        worldUpdateAllocator
+                    );
                     jobHandles.Add(removeDynamicBodyStreamHandle);
                 }
 
                 if (numStaticBodyRemovalChunksArray[0] > 0)
                 {
-                    removeStaticBodyStreamHandle = NativeStream.ScheduleConstruct(out removeStaticBodyDataStream,
-                        numStaticBodyRemovalChunksArray, inputDeps, worldUpdateAllocator);
+                    removeStaticBodyStreamHandle = NativeStream.ScheduleConstruct(
+                        out removeStaticBodyDataStream,
+                        numStaticBodyRemovalChunksArray,
+                        inputDeps,
+                        worldUpdateAllocator
+                    );
                     jobHandles.Add(removeStaticBodyStreamHandle);
                 }
             }
 
             if (numDynamicBodies > 0 && incrementalDynamicBroadphase)
             {
-                var numChunksArray = CollectionHelper.CreateNativeArray<int>(1, worldUpdateAllocator,
-                    NativeArrayOptions.UninitializedMemory);
+                var numChunksArray = CollectionHelper.CreateNativeArray<int>(
+                    1,
+                    worldUpdateAllocator,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 numChunksArray[0] = numDynamicEntityChunks;
 
                 var insertDynamicBodyStreamHandle = NativeStream.ScheduleConstruct(
                     out insertDynamicBodyDataStream,
-                    numChunksArray, inputDeps, worldUpdateAllocator);
+                    numChunksArray,
+                    inputDeps,
+                    worldUpdateAllocator
+                );
 
                 var updateDynamicBodyStreamHandle = NativeStream.ScheduleConstruct(
                     out updateDynamicBodyDataStream,
-                    numChunksArray, inputDeps, worldUpdateAllocator);
+                    numChunksArray,
+                    inputDeps,
+                    worldUpdateAllocator
+                );
 
-                jobHandles.Add(JobHandle.CombineDependencies(insertDynamicBodyStreamHandle, updateDynamicBodyStreamHandle));
+                jobHandles.Add(
+                    JobHandle.CombineDependencies(insertDynamicBodyStreamHandle, updateDynamicBodyStreamHandle)
+                );
             }
 
             if (numStaticBodies > 0 && incrementalStaticBroadphase)
             {
-                var numChunksArray = CollectionHelper.CreateNativeArray<int>(1, worldUpdateAllocator, NativeArrayOptions.UninitializedMemory);
+                var numChunksArray = CollectionHelper.CreateNativeArray<int>(
+                    1,
+                    worldUpdateAllocator,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 numChunksArray[0] = numStaticEntityChunks;
 
                 var insertStaticBodyStreamHandle = NativeStream.ScheduleConstruct(
                     out insertStaticBodyDataStream,
-                    numChunksArray, inputDeps, worldUpdateAllocator);
+                    numChunksArray,
+                    inputDeps,
+                    worldUpdateAllocator
+                );
 
                 var updateStaticBodyStreamHandle = NativeStream.ScheduleConstruct(
                     out updateStaticBodyDataStream,
-                    numChunksArray, inputDeps, worldUpdateAllocator);
+                    numChunksArray,
+                    inputDeps,
+                    worldUpdateAllocator
+                );
 
-                jobHandles.Add(JobHandle.CombineDependencies(insertStaticBodyStreamHandle, updateStaticBodyStreamHandle));
+                jobHandles.Add(
+                    JobHandle.CombineDependencies(insertStaticBodyStreamHandle, updateStaticBodyStreamHandle)
+                );
             }
 
             if (numInvalidatedTemporalCoherenceInfoChunks > 0)
@@ -414,21 +527,34 @@ namespace Unity.Physics
                 // fallback creation in case the removal streams have not yet been created
                 if (!removeDynamicBodyDataStream.IsCreated)
                 {
-                    removeDynamicBodyStreamHandle = NativeStream.ScheduleConstruct(out removeDynamicBodyDataStream, numDynamicBodyRemovalChunksArray, inputDeps, worldUpdateAllocator);
+                    removeDynamicBodyStreamHandle = NativeStream.ScheduleConstruct(
+                        out removeDynamicBodyDataStream,
+                        numDynamicBodyRemovalChunksArray,
+                        inputDeps,
+                        worldUpdateAllocator
+                    );
                 }
                 if (!removeStaticBodyDataStream.IsCreated)
                 {
-                    removeStaticBodyStreamHandle = NativeStream.ScheduleConstruct(out removeStaticBodyDataStream, numStaticBodyRemovalChunksArray, inputDeps, worldUpdateAllocator);
+                    removeStaticBodyStreamHandle = NativeStream.ScheduleConstruct(
+                        out removeStaticBodyDataStream,
+                        numStaticBodyRemovalChunksArray,
+                        inputDeps,
+                        worldUpdateAllocator
+                    );
                 }
 
-                var removeBodyStreamDependency = JobHandle.CombineDependencies(removeDynamicBodyStreamHandle, removeStaticBodyStreamHandle);
+                var removeBodyStreamDependency = JobHandle.CombineDependencies(
+                    removeDynamicBodyStreamHandle,
+                    removeStaticBodyStreamHandle
+                );
                 var collectInvalidatedCoherenceInfoJob = new CollectInvalidatedTemporalCoherenceInfoJob
                 {
                     PhysicsTemporalCoherenceInfoTypeRW = componentHandles.PhysicsTemporalCoherenceInfoTypeRW,
                     RemoveDynamicBodyDataWriter = removeDynamicBodyDataStream.AsWriter(),
                     RemoveStaticBodyDataWriter = removeStaticBodyDataStream.AsWriter(),
                     DynamicStreamBufferOffset = numDynamicOrStaticEntityChunks,
-                    StaticStreamBufferOffset = numDynamicOrStaticEntityChunks
+                    StaticStreamBufferOffset = numDynamicOrStaticEntityChunks,
                 }.ScheduleParallel(invalidatedTemporalCoherenceInfoQuery, removeBodyStreamDependency);
 
                 jobHandles.Add(collectInvalidatedCoherenceInfoJob);
@@ -457,7 +583,8 @@ namespace Unity.Physics
                     if (numDynamicBodies > 0)
                     {
                         var bodyFilters = world.CollisionWorld.Broadphase.DynamicTree.BodyFilters.AsArray();
-                        var respondsToCollision = world.CollisionWorld.Broadphase.DynamicTree.RespondsToCollision.AsArray();
+                        var respondsToCollision =
+                            world.CollisionWorld.Broadphase.DynamicTree.RespondsToCollision.AsArray();
                         var bodySolverTypes = world.CollisionWorld.Broadphase.DynamicTree.BodySolverTypes.AsArray();
 
                         collectDynamicCoherenceInfoHandle = new CollectTemporalCoherenceInfoJob
@@ -496,9 +623,12 @@ namespace Unity.Physics
                         // @todo: this could go into the tree itself, which could have a reset function with an "is incremental" flag, or just always allocate a small amount
                         // and clear each time we reset.
                         var updatedElementLocationDataList =
-                            new NativeList<BoundingVolumeHierarchy.ElementLocationData>(numDynamicBodies,
-                                worldUpdateAllocator);
-                        world.CollisionWorld.Broadphase.DynamicTree.UpdatedElementLocationDataList = updatedElementLocationDataList;
+                            new NativeList<BoundingVolumeHierarchy.ElementLocationData>(
+                                numDynamicBodies,
+                                worldUpdateAllocator
+                            );
+                        world.CollisionWorld.Broadphase.DynamicTree.UpdatedElementLocationDataList =
+                            updatedElementLocationDataList;
 
                         world.CollisionWorld.Broadphase.DynamicTree.InsertBodyDataStream = insertDynamicBodyDataStream;
                         world.CollisionWorld.Broadphase.DynamicTree.UpdateBodyDataStream = updateDynamicBodyDataStream;
@@ -514,10 +644,13 @@ namespace Unity.Physics
                             PhysicsTemporalCoherenceInfoTypeRW = componentHandles.PhysicsTemporalCoherenceInfoTypeRW,
                             RemoveBodyDataWriter = removeDynamicBodyDataStream.AsWriter(),
                             BufferOffset = numDynamicEntityChunks,
-                            Static = true
+                            Static = true,
                         }.ScheduleParallel(staticEntityQuery, inputDeps);
 
-                        collectDynamicCoherenceInfoHandle = JobHandle.CombineDependencies(collectDynamicCoherenceInfoHandle, collectSwappedCoherenceInfoHandle);
+                        collectDynamicCoherenceInfoHandle = JobHandle.CombineDependencies(
+                            collectDynamicCoherenceInfoHandle,
+                            collectSwappedCoherenceInfoHandle
+                        );
                     }
                 }
 
@@ -526,7 +659,8 @@ namespace Unity.Physics
                     if (numStaticBodies > 0)
                     {
                         var bodyFilters = world.CollisionWorld.Broadphase.StaticTree.BodyFilters.AsArray();
-                        var respondsToCollision = world.CollisionWorld.Broadphase.StaticTree.RespondsToCollision.AsArray();
+                        var respondsToCollision =
+                            world.CollisionWorld.Broadphase.StaticTree.RespondsToCollision.AsArray();
                         var bodySolverTypes = world.CollisionWorld.Broadphase.StaticTree.BodySolverTypes.AsArray();
 
                         collectStaticCoherenceInfoHandle = new CollectTemporalCoherenceInfoJob
@@ -556,15 +690,18 @@ namespace Unity.Physics
                             RigidBodies = world.CollisionWorld.StaticBodies,
                             Static = true,
 
-                            LastSystemVersion = lastSystemVersion
+                            LastSystemVersion = lastSystemVersion,
                         }.ScheduleParallel(staticEntityQuery, inputDeps);
 
                         // @todo: this could go into the tree itself, which could have a reset function with an "is incremental" flag, or just always allocate a small amount
                         // and clear each time we reset.
                         var updatedElementLocationDataList =
-                            new NativeList<BoundingVolumeHierarchy.ElementLocationData>(numStaticBodies,
-                                worldUpdateAllocator);
-                        world.CollisionWorld.Broadphase.StaticTree.UpdatedElementLocationDataList = updatedElementLocationDataList;
+                            new NativeList<BoundingVolumeHierarchy.ElementLocationData>(
+                                numStaticBodies,
+                                worldUpdateAllocator
+                            );
+                        world.CollisionWorld.Broadphase.StaticTree.UpdatedElementLocationDataList =
+                            updatedElementLocationDataList;
 
                         world.CollisionWorld.Broadphase.StaticTree.InsertBodyDataStream = insertStaticBodyDataStream;
                         world.CollisionWorld.Broadphase.StaticTree.UpdateBodyDataStream = updateStaticBodyDataStream;
@@ -580,20 +717,34 @@ namespace Unity.Physics
                             PhysicsTemporalCoherenceInfoTypeRW = componentHandles.PhysicsTemporalCoherenceInfoTypeRW,
                             RemoveBodyDataWriter = removeStaticBodyDataStream.AsWriter(),
                             BufferOffset = numStaticEntityChunks,
-                            Static = false
+                            Static = false,
                         }.ScheduleParallel(dynamicEntityQuery, inputDeps);
 
-                        collectDynamicCoherenceInfoHandle = JobHandle.CombineDependencies(collectDynamicCoherenceInfoHandle, collectSwappedCoherenceInfoHandle);
+                        collectDynamicCoherenceInfoHandle = JobHandle.CombineDependencies(
+                            collectDynamicCoherenceInfoHandle,
+                            collectSwappedCoherenceInfoHandle
+                        );
                     }
                 }
 
-                inputDeps =
-                    JobHandle.CombineDependencies(collectDynamicCoherenceInfoHandle, collectStaticCoherenceInfoHandle);
+                inputDeps = JobHandle.CombineDependencies(
+                    collectDynamicCoherenceInfoHandle,
+                    collectStaticCoherenceInfoHandle
+                );
             }
 
             // Note: we do not reset the broadphase here since this is done from within the system that calls this method. This is needed to support incremental broadphase updates.
-            var buildBroadphaseHandle = Broadphase.ScheduleBuildJobs(ref world, timeStep, gravity, buildStaticTree, inputDeps,
-                multiThreaded, reset: false, incrementalDynamicBroadphase, incrementalStaticBroadphase);
+            var buildBroadphaseHandle = Broadphase.ScheduleBuildJobs(
+                ref world,
+                timeStep,
+                gravity,
+                buildStaticTree,
+                inputDeps,
+                multiThreaded,
+                reset: false,
+                incrementalDynamicBroadphase,
+                incrementalStaticBroadphase
+            );
 
             if (incrementalDynamicBroadphase || incrementalStaticBroadphase)
             {
@@ -605,15 +756,20 @@ namespace Unity.Physics
                     var updateCoherenceInfoJob = new UpdateTemporalCoherenceInfoJob
                     {
                         PhysicsTemporalCoherenceInfoLookupRW = componentHandles.PhysicsTemporalCoherenceInfoLookupRW,
-                        TemporalCoherenceDataList =
-                            world.CollisionWorld.Broadphase.DynamicTree.UpdatedElementLocationDataList,
+                        TemporalCoherenceDataList = world
+                            .CollisionWorld
+                            .Broadphase
+                            .DynamicTree
+                            .UpdatedElementLocationDataList,
                         RigidBodies = world.CollisionWorld.DynamicBodies,
-                        Static = false
+                        Static = false,
                     };
 
                     updateDynamicCoherenceInfoHandle = updateCoherenceInfoJob.ScheduleByRef(
-                        world.CollisionWorld.Broadphase.DynamicTree.UpdatedElementLocationDataList, 16,
-                        buildBroadphaseHandle);
+                        world.CollisionWorld.Broadphase.DynamicTree.UpdatedElementLocationDataList,
+                        16,
+                        buildBroadphaseHandle
+                    );
                 }
 
                 if (numStaticBodies > 0 && incrementalStaticBroadphase)
@@ -621,18 +777,25 @@ namespace Unity.Physics
                     var updateCoherenceInfoJob = new UpdateTemporalCoherenceInfoJob
                     {
                         PhysicsTemporalCoherenceInfoLookupRW = componentHandles.PhysicsTemporalCoherenceInfoLookupRW,
-                        TemporalCoherenceDataList =
-                            world.CollisionWorld.Broadphase.StaticTree.UpdatedElementLocationDataList,
+                        TemporalCoherenceDataList = world
+                            .CollisionWorld
+                            .Broadphase
+                            .StaticTree
+                            .UpdatedElementLocationDataList,
                         RigidBodies = world.CollisionWorld.StaticBodies,
-                        Static = true
+                        Static = true,
                     };
                     updateStaticCoherenceInfoHandle = updateCoherenceInfoJob.ScheduleByRef(
-                        world.CollisionWorld.Broadphase.StaticTree.UpdatedElementLocationDataList, 16,
-                        buildBroadphaseHandle);
+                        world.CollisionWorld.Broadphase.StaticTree.UpdatedElementLocationDataList,
+                        16,
+                        buildBroadphaseHandle
+                    );
                 }
 
-                buildBroadphaseHandle = JobHandle.CombineDependencies(updateDynamicCoherenceInfoHandle,
-                    updateStaticCoherenceInfoHandle);
+                buildBroadphaseHandle = JobHandle.CombineDependencies(
+                    updateDynamicCoherenceInfoHandle,
+                    updateStaticCoherenceInfoHandle
+                );
             }
 
             return buildBroadphaseHandle;
@@ -645,7 +808,10 @@ namespace Unity.Physics
         ///
         /// <param name="dynamicVsDynamicPairsWriter"> [in,out] The dynamic vs dynamic pairs writer. </param>
         /// <param name="staticVsDynamicPairsWriter">  [in,out] The static vs dynamic pairs writer. </param>
-        public void FindOverlaps(ref NativeStream.Writer dynamicVsDynamicPairsWriter, ref NativeStream.Writer staticVsDynamicPairsWriter)
+        public void FindOverlaps(
+            ref NativeStream.Writer dynamicVsDynamicPairsWriter,
+            ref NativeStream.Writer staticVsDynamicPairsWriter
+        )
         {
             Broadphase.FindOverlaps(ref dynamicVsDynamicPairsWriter, ref staticVsDynamicPairsWriter);
         }
@@ -661,16 +827,38 @@ namespace Unity.Physics
         /// <param name="multiThreaded">                (Optional) True if multi threaded. </param>
         ///
         /// <returns>   The SimulationJobHandles. </returns>
-        public SimulationJobHandles ScheduleFindOverlapsJobs(out NativeStream dynamicVsDynamicPairsStream, out NativeStream staticVsDynamicPairsStream,
-            JobHandle inputDeps, bool multiThreaded = true)
+        public SimulationJobHandles ScheduleFindOverlapsJobs(
+            out NativeStream dynamicVsDynamicPairsStream,
+            out NativeStream staticVsDynamicPairsStream,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
-            return Broadphase.ScheduleFindOverlapsJobs(out dynamicVsDynamicPairsStream, out staticVsDynamicPairsStream, inputDeps, multiThreaded);
+            return Broadphase.ScheduleFindOverlapsJobs(
+                out dynamicVsDynamicPairsStream,
+                out staticVsDynamicPairsStream,
+                inputDeps,
+                multiThreaded
+            );
         }
 
-        internal SimulationJobHandles ScheduleFindOverlapsJobsInternal(out NativeStream dynamicVsDynamicPairsStream, out NativeStream staticVsDynamicPairsStream,
-            JobHandle inputDeps, bool multiThreaded, bool incrementalDynamicBroadphase, bool incrementalStaticBroadphase)
+        internal SimulationJobHandles ScheduleFindOverlapsJobsInternal(
+            out NativeStream dynamicVsDynamicPairsStream,
+            out NativeStream staticVsDynamicPairsStream,
+            JobHandle inputDeps,
+            bool multiThreaded,
+            bool incrementalDynamicBroadphase,
+            bool incrementalStaticBroadphase
+        )
         {
-            return Broadphase.ScheduleFindOverlapsJobs(out dynamicVsDynamicPairsStream, out staticVsDynamicPairsStream, inputDeps, multiThreaded, incrementalDynamicBroadphase, incrementalStaticBroadphase);
+            return Broadphase.ScheduleFindOverlapsJobs(
+                out dynamicVsDynamicPairsStream,
+                out staticVsDynamicPairsStream,
+                inputDeps,
+                multiThreaded,
+                incrementalDynamicBroadphase,
+                incrementalStaticBroadphase
+            );
         }
 
         /// <summary>   Synchronize the collision world with the dynamics world. </summary>
@@ -710,21 +898,26 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public JobHandle ScheduleUpdateStaticTree(ref PhysicsWorld world,
-            NativeReference<int>.ReadOnly buildStaticTree, JobHandle inputDeps, bool multiThreaded = true)
+        public JobHandle ScheduleUpdateStaticTree(
+            ref PhysicsWorld world,
+            NativeReference<int>.ReadOnly buildStaticTree,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
             if (!multiThreaded)
             {
-                return new UpdateStaticTreeJob
-                {
-                    World = world,
-                    BuildStaticTree = buildStaticTree
-                }.Schedule(inputDeps);
+                return new UpdateStaticTreeJob { World = world, BuildStaticTree = buildStaticTree }.Schedule(inputDeps);
             }
             else
             {
                 // Thread count is +1 for main thread
-                return Broadphase.ScheduleStaticTreeBuildJobs(ref world, JobsUtility.JobWorkerCount + 1, buildStaticTree, inputDeps);
+                return Broadphase.ScheduleStaticTreeBuildJobs(
+                    ref world,
+                    JobsUtility.JobWorkerCount + 1,
+                    buildStaticTree,
+                    inputDeps
+                );
             }
         }
 
@@ -739,7 +932,13 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public JobHandle ScheduleUpdateDynamicTree(ref PhysicsWorld world, float timeStep, float3 gravity, JobHandle inputDeps, bool multiThreaded = true)
+        public JobHandle ScheduleUpdateDynamicTree(
+            ref PhysicsWorld world,
+            float timeStep,
+            float3 gravity,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
             if (!multiThreaded)
             {
@@ -747,7 +946,7 @@ namespace Unity.Physics
                 {
                     World = world,
                     TimeStep = timeStep,
-                    Gravity = gravity
+                    Gravity = gravity,
                 }.Schedule(inputDeps);
             }
             else
@@ -756,12 +955,18 @@ namespace Unity.Physics
                 JobHandle handle = new UpdateRigidBodyTransformsJob
                 {
                     MotionDatas = world.MotionDatas,
-                    RigidBodies = m_Bodies
+                    RigidBodies = m_Bodies,
                 }.Schedule(world.MotionDatas.Length, 32, inputDeps);
 
                 // Update broadphase
                 // Thread count is +1 for main thread
-                return Broadphase.ScheduleDynamicTreeBuildJobs(ref world, timeStep, gravity, JobsUtility.JobWorkerCount + 1, handle);
+                return Broadphase.ScheduleDynamicTreeBuildJobs(
+                    ref world,
+                    timeStep,
+                    gravity,
+                    JobsUtility.JobWorkerCount + 1,
+                    handle
+                );
             }
         }
 
@@ -770,7 +975,8 @@ namespace Unity.Physics
         [BurstCompile]
         private struct UpdateRigidBodyTransformsJob : IJobParallelFor
         {
-            [ReadOnly] public NativeArray<MotionData> MotionDatas;
+            [ReadOnly]
+            public NativeArray<MotionData> MotionDatas;
             public NativeArray<RigidBody> RigidBodies;
 
             public void Execute(int i)
@@ -778,10 +984,17 @@ namespace Unity.Physics
                 ExecuteImpl(i, MotionDatas, RigidBodies);
             }
 
-            internal static void ExecuteImpl(int i, NativeArray<MotionData> motionDatas, NativeArray<RigidBody> rigidBodies)
+            internal static void ExecuteImpl(
+                int i,
+                NativeArray<MotionData> motionDatas,
+                NativeArray<RigidBody> rigidBodies
+            )
             {
                 RigidBody rb = rigidBodies[i];
-                rb.WorldFromBody = math.mul(motionDatas[i].WorldFromMotion, math.inverse(motionDatas[i].BodyFromMotion));
+                rb.WorldFromBody = math.mul(
+                    motionDatas[i].WorldFromMotion,
+                    math.inverse(motionDatas[i].BodyFromMotion)
+                );
                 rigidBodies[i] = rb;
             }
         }
@@ -798,11 +1011,13 @@ namespace Unity.Physics
                 World.CollisionWorld.UpdateDynamicTree(ref World, TimeStep, Gravity);
             }
         }
+
         [BurstCompile]
         struct UpdateStaticTreeJob : IJob
         {
             public PhysicsWorld World;
             public NativeReference<int>.ReadOnly BuildStaticTree;
+
             public void Execute()
             {
                 if (BuildStaticTree.Value != 0)
@@ -829,26 +1044,32 @@ namespace Unity.Physics
             public NativeStream.Writer RemoveBodyDataWriter;
             public int BufferOffset;
 
-            [ReadOnly] public bool Static;
+            [ReadOnly]
+            public bool Static;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
-                in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 if (!chunk.Has(ref PhysicsTemporalCoherenceInfoTypeRW))
                 {
                     SafetyChecks.ThrowArgumentException(
-                        "PhysicsTemporalCoherenceInfo component not found on rigid body. This component is required on " +
-                        "all rigid bodies when incremental broadphase is enabled.");
+                        "PhysicsTemporalCoherenceInfo component not found on rigid body. This component is required on "
+                            + "all rigid bodies when incremental broadphase is enabled."
+                    );
                     return;
                 }
 
                 RemoveBodyDataWriter.BeginForEachIndex(unfilteredChunkIndex + BufferOffset);
 
-                NativeArray<PhysicsTemporalCoherenceInfo> chunkCoherenceInfos =
-                    chunk.GetNativeArray(ref PhysicsTemporalCoherenceInfoTypeRW);
+                NativeArray<PhysicsTemporalCoherenceInfo> chunkCoherenceInfos = chunk.GetNativeArray(
+                    ref PhysicsTemporalCoherenceInfoTypeRW
+                );
 
-                var entityEnumerator =
-                    new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                var entityEnumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
 
                 while (entityEnumerator.NextEntityIndex(out int i))
                 {
@@ -858,11 +1079,13 @@ namespace Unity.Physics
                     {
                         SafetyChecks.CheckAreEqualAndThrow(true, coherenceInfo.StaticBvh != Static);
                         // remove the body from the other tree
-                        RemoveBodyDataWriter.Write(new BoundingVolumeHierarchy.RemovalData
-                        {
-                            NodeIndex = coherenceInfo.LastBvhNodeIndex,
-                            LeafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex
-                        });
+                        RemoveBodyDataWriter.Write(
+                            new BoundingVolumeHierarchy.RemovalData
+                            {
+                                NodeIndex = coherenceInfo.LastBvhNodeIndex,
+                                LeafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex,
+                            }
+                        );
 
                         // invalidate temporal coherence info for clean re-insert next time
                         chunkCoherenceInfos[i] = PhysicsTemporalCoherenceInfo.Default;
@@ -891,19 +1114,30 @@ namespace Unity.Physics
         {
             [NativeDisableContainerSafetyRestriction]
             public ComponentTypeHandle<PhysicsTemporalCoherenceInfo> PhysicsTemporalCoherenceInfoTypeRW;
-            [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorldType;
-            [ReadOnly] public ComponentTypeHandle<LocalTransform> LocalTransformType;
-            [ReadOnly] public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
-            [ReadOnly] public ComponentTypeHandle<PhysicsSolverType> PhysicsSolverTypeType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<LocalToWorld> LocalToWorldType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<LocalTransform> LocalTransformType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsSolverType> PhysicsSolverTypeType;
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !UNITY_PHYSICS_DISABLE_INTEGRITY_CHECKS
-            [ReadOnly] public SharedComponentTypeHandle<PhysicsWorldIndex> PhysicsWorldIndexType;
+            [ReadOnly]
+            public SharedComponentTypeHandle<PhysicsWorldIndex> PhysicsWorldIndexType;
 #endif
 
-            [ReadOnly] public NativeArray<int> ChunkBaseEntityIndices;
+            [ReadOnly]
+            public NativeArray<int> ChunkBaseEntityIndices;
 
             [NativeDisableContainerSafetyRestriction]
             public NativeStream.Writer RemoveBodyDataWriter;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeStream.Writer RemoveBodyDataWriterOtherTree;
             public NativeStream.Writer UpdateBodyDataWriter;
@@ -912,35 +1146,56 @@ namespace Unity.Physics
 
             [NativeDisableContainerSafetyRestriction]
             public NativeList<BoundingVolumeHierarchy.Node> Nodes;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<CollisionFilter> BodyFilters;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<bool> RespondsToCollision;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<SolverType> BodySolverTypes;
 
             [ReadOnly]
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<CollisionFilter> BodyFiltersLastFrame;
+
             [ReadOnly]
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<bool> RespondsToCollisionLastFrame;
+
             [ReadOnly]
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<SolverType> BodySolverTypesLastFrame;
 
-            [ReadOnly] public NativeArray<RigidBody> RigidBodies;
+            [ReadOnly]
+            public NativeArray<RigidBody> RigidBodies;
+
             [NativeDisableContainerSafetyRestriction]
-            [ReadOnly] public NativeArray<MotionVelocity> MotionVelocities;
-            [ReadOnly] public float CollisionTolerance;
-            [ReadOnly] public float TimeStep;
-            [ReadOnly] public float3 Gravity;
-            [ReadOnly] public bool Static;
+            [ReadOnly]
+            public NativeArray<MotionVelocity> MotionVelocities;
 
-            [ReadOnly] public uint LastSystemVersion;
+            [ReadOnly]
+            public float CollisionTolerance;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
-                in v128 chunkEnabledMask)
+            [ReadOnly]
+            public float TimeStep;
+
+            [ReadOnly]
+            public float3 Gravity;
+
+            [ReadOnly]
+            public bool Static;
+
+            [ReadOnly]
+            public uint LastSystemVersion;
+
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 // Note: for fast chunk data change checks and fast data migrations,
                 // enabled masks are not supported, analogous to the assumption in the CheckStaticBodyChangesJob.
@@ -949,8 +1204,10 @@ namespace Unity.Physics
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 if (!chunk.Has(ref PhysicsTemporalCoherenceInfoTypeRW))
                 {
-                    SafetyChecks.ThrowArgumentException("PhysicsTemporalCoherenceInfo component not found on rigid body. This component is required on " +
-                        "all rigid bodies when incremental broadphase is enabled.");
+                    SafetyChecks.ThrowArgumentException(
+                        "PhysicsTemporalCoherenceInfo component not found on rigid body. This component is required on "
+                            + "all rigid bodies when incremental broadphase is enabled."
+                    );
                     return;
                 }
 #endif
@@ -964,13 +1221,15 @@ namespace Unity.Physics
 #endif
 
                 var transformChangedInChunk =
-                    chunk.DidChange(ref LocalToWorldType, LastSystemVersion) ||
-                    chunk.DidChange(ref LocalTransformType, LastSystemVersion);
+                    chunk.DidChange(ref LocalToWorldType, LastSystemVersion)
+                    || chunk.DidChange(ref LocalTransformType, LastSystemVersion);
                 var colliderChangedInChunk = chunk.DidChange(ref PhysicsColliderType, LastSystemVersion);
                 var solverTypeChangedInChunk = chunk.DidChange(ref PhysicsSolverTypeType, LastSystemVersion);
-                var temporalCoherenceDataChanged = chunk.DidChange(ref PhysicsTemporalCoherenceInfoTypeRW, LastSystemVersion);
+                var temporalCoherenceDataChanged = chunk.DidChange(
+                    ref PhysicsTemporalCoherenceInfoTypeRW,
+                    LastSystemVersion
+                );
                 var chunkOrderChanged = chunk.DidOrderChange(LastSystemVersion);
-
 
                 var firstEntityIndexInQuery = ChunkBaseEntityIndices[unfilteredChunkIndex];
 
@@ -980,11 +1239,18 @@ namespace Unity.Physics
                     // data array in the leaf node entries in parallel. If we were to use the array's API and read the node
                     // out, modify the data and then assign it back (see below) we will cause a race condition.
                     var nodes = Nodes.GetUnsafePtr();
-                    var chunkCoherenceInfos =
-                        chunk.GetComponentDataPtrRW(ref PhysicsTemporalCoherenceInfoTypeRW);
+                    var chunkCoherenceInfos = chunk.GetComponentDataPtrRW(ref PhysicsTemporalCoherenceInfoTypeRW);
 
                     // early out in case nothing of relevance for incremental broadphase changed in this chunk
-                    if (!(transformChangedInChunk || colliderChangedInChunk || solverTypeChangedInChunk || temporalCoherenceDataChanged || chunkOrderChanged))
+                    if (
+                        !(
+                            transformChangedInChunk
+                            || colliderChangedInChunk
+                            || solverTypeChangedInChunk
+                            || temporalCoherenceDataChanged
+                            || chunkOrderChanged
+                        )
+                    )
                     {
                         var entityIter = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
 
@@ -1028,8 +1294,10 @@ namespace Unity.Physics
                                 // index of the leaf slot the body is located in within its node
                                 var leafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex;
                                 // confirm that we are looking at the leaf slot of the right body
-                                SafetyChecks.CheckAreEqualAndThrow(coherenceInfo.LastRigidBodyIndex,
-                                    node->Data[leafSlotIndex]);
+                                SafetyChecks.CheckAreEqualAndThrow(
+                                    coherenceInfo.LastRigidBodyIndex,
+                                    node->Data[leafSlotIndex]
+                                );
 
                                 // update body index in node
                                 node->Data[leafSlotIndex] = bodyIndex;
@@ -1040,8 +1308,7 @@ namespace Unity.Physics
 
                                 // write out updated coherence info
                                 chunkCoherenceInfos[i] = coherenceInfo;
-                            }
-                            while (entityIter.NextEntityIndex(out i));
+                            } while (entityIter.NextEntityIndex(out i));
 
                             // 2:
 
@@ -1051,17 +1318,20 @@ namespace Unity.Physics
                             UnsafeUtility.MemCpy(
                                 (CollisionFilter*)BodyFilters.GetUnsafePtr() + firstBodyIndex,
                                 (CollisionFilter*)BodyFiltersLastFrame.GetUnsafePtr() + firstBodyIndexLastFrame,
-                                sizeof(CollisionFilter) * chunk.Count);
+                                sizeof(CollisionFilter) * chunk.Count
+                            );
 
                             UnsafeUtility.MemCpy(
                                 (bool*)RespondsToCollision.GetUnsafePtr() + firstBodyIndex,
                                 (bool*)RespondsToCollisionLastFrame.GetUnsafePtr() + firstBodyIndexLastFrame,
-                                sizeof(bool) * chunk.Count);
+                                sizeof(bool) * chunk.Count
+                            );
 
                             UnsafeUtility.MemCpy(
                                 (SolverType*)BodySolverTypes.GetUnsafePtr() + firstBodyIndex,
                                 (SolverType*)BodySolverTypesLastFrame.GetUnsafePtr() + firstBodyIndexLastFrame,
-                                sizeof(SolverType) * chunk.Count);
+                                sizeof(SolverType) * chunk.Count
+                            );
                         }
 
                         return;
@@ -1078,8 +1348,7 @@ namespace Unity.Physics
                         RemoveBodyDataWriterOtherTree.BeginForEachIndex(unfilteredChunkIndex + OtherTreeBufferOffset);
                     }
 
-                    var entityEnumerator =
-                        new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                    var entityEnumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
 
                     var aabbMargin = CollisionTolerance * 0.5f;
 
@@ -1088,12 +1357,15 @@ namespace Unity.Physics
                         var bodyIndex = firstEntityIndexInQuery + i;
                         var coherenceInfo = chunkCoherenceInfos[i];
                         var bodyIndexChanged = !coherenceInfo.Valid || bodyIndex != coherenceInfo.LastRigidBodyIndex;
-                        var anythingChanged = bodyIndexChanged || transformChangedInChunk || colliderChangedInChunk || chunkOrderChanged;
+                        var anythingChanged =
+                            bodyIndexChanged || transformChangedInChunk || colliderChangedInChunk || chunkOrderChanged;
 
                         if (anythingChanged)
                         {
-                            bool previouslyInTree = coherenceInfo.Valid &&              // body was previously in some tree
-                                coherenceInfo.StaticBvh == Static;                      // body was previously in this tree
+                            bool previouslyInTree =
+                                coherenceInfo.Valid
+                                && // body was previously in some tree
+                                coherenceInfo.StaticBvh == Static; // body was previously in this tree
 
                             // Check if the body was previously present in this tree. Update its data if required.
                             // If not, we need to insert it for the first time.
@@ -1109,7 +1381,10 @@ namespace Unity.Physics
                                 // index of the leaf slot the body is located in within its node
                                 var leafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex;
                                 // confirm that we are looking at the leaf slot of the right body
-                                SafetyChecks.CheckAreEqualAndThrow(coherenceInfo.LastRigidBodyIndex, node->Data[leafSlotIndex]);
+                                SafetyChecks.CheckAreEqualAndThrow(
+                                    coherenceInfo.LastRigidBodyIndex,
+                                    node->Data[leafSlotIndex]
+                                );
 
                                 // update body index if required
                                 if (bodyIndexChanged)
@@ -1174,10 +1449,15 @@ namespace Unity.Physics
                                 if (transformChangedInChunk || colliderChanged)
                                 {
                                     // Recompute AABB:
-                                    var aabb = Static ?
-                                        Broadphase.PrepareStaticBodyDataJob.CalculateAabb(ref body, aabbMargin) :
-                                        Broadphase.PrepareDynamicBodyDataJob.CalculateAabb(ref body, aabbMargin, Gravity,
-                                        TimeStep, MotionVelocities[bodyIndex]);
+                                    var aabb = Static
+                                        ? Broadphase.PrepareStaticBodyDataJob.CalculateAabb(ref body, aabbMargin)
+                                        : Broadphase.PrepareDynamicBodyDataJob.CalculateAabb(
+                                            ref body,
+                                            aabbMargin,
+                                            Gravity,
+                                            TimeStep,
+                                            MotionVelocities[bodyIndex]
+                                        );
 
                                     var previousAabb = node->Bounds.GetAabb(leafSlotIndex);
                                     var previousExtents = previousAabb.Extents;
@@ -1188,9 +1468,7 @@ namespace Unity.Physics
                                     var deltaCenterSq = math.distancesq(newCenter, previousCenter);
 
                                     const float kEpsilonSq = math.EPSILON;
-                                    var aabbChanged =
-                                        deltaExtentsSq > kEpsilonSq ||
-                                        deltaCenterSq > kEpsilonSq;
+                                    var aabbChanged = deltaExtentsSq > kEpsilonSq || deltaCenterSq > kEpsilonSq;
 
                                     var reinsertRequired = aabbChanged;
 
@@ -1207,7 +1485,9 @@ namespace Unity.Physics
 
                                         const float kMaxSweptSurfaceAreaGrowthFactor = 1.2f;
                                         const float kMinSurfaceAreaGrowthFactor = 0.5f;
-                                        var refit = sweptSurfaceGrowthRatio<kMaxSweptSurfaceAreaGrowthFactor && surfaceChangeRatio> kMinSurfaceAreaGrowthFactor;
+                                        var refit =
+                                            sweptSurfaceGrowthRatio < kMaxSweptSurfaceAreaGrowthFactor
+                                            && surfaceChangeRatio > kMinSurfaceAreaGrowthFactor;
 
                                         if (refit)
                                         {
@@ -1219,13 +1499,15 @@ namespace Unity.Physics
                                                 Aabb = aabb,
                                                 NodeIndex = nodeIndex,
                                                 LeafSlotIndex = leafSlotIndex,
-                                                UpdateCommandFlags = (byte)BoundingVolumeHierarchy.UpdateData.CommandFlags.UpdateAabb
+                                                UpdateCommandFlags = (byte)
+                                                    BoundingVolumeHierarchy.UpdateData.CommandFlags.UpdateAabb,
                                             };
 
                                             // also update collision filter if required
                                             if (collisionFilterChanged)
                                             {
-                                                updateData.UpdateCommandFlags |= (byte)BoundingVolumeHierarchy.UpdateData.CommandFlags.UpdateFilter;
+                                                updateData.UpdateCommandFlags |= (byte)
+                                                    BoundingVolumeHierarchy.UpdateData.CommandFlags.UpdateFilter;
                                             }
 
                                             UpdateBodyDataWriter.Write(updateData);
@@ -1236,26 +1518,31 @@ namespace Unity.Physics
                                         // if the AABB didn't change but the collision filter did, we can just update the filter.
                                         // @todo: We could decide not to update the filter when the new filter is less permissive than before.
 
-                                        UpdateBodyDataWriter.Write(new BoundingVolumeHierarchy.UpdateData
-                                        {
-                                            NodeIndex = nodeIndex,
-                                            LeafSlotIndex = leafSlotIndex,
-                                            UpdateCommandFlags = (byte)BoundingVolumeHierarchy.UpdateData.CommandFlags.UpdateFilter
-                                        });
+                                        UpdateBodyDataWriter.Write(
+                                            new BoundingVolumeHierarchy.UpdateData
+                                            {
+                                                NodeIndex = nodeIndex,
+                                                LeafSlotIndex = leafSlotIndex,
+                                                UpdateCommandFlags = (byte)
+                                                    BoundingVolumeHierarchy.UpdateData.CommandFlags.UpdateFilter,
+                                            }
+                                        );
                                     }
 
                                     if (reinsertRequired)
                                     {
-                                        RemoveBodyDataWriter.Write(new BoundingVolumeHierarchy.RemovalData
-                                        {
-                                            NodeIndex = nodeIndex,
-                                            LeafSlotIndex = leafSlotIndex
-                                        });
+                                        RemoveBodyDataWriter.Write(
+                                            new BoundingVolumeHierarchy.RemovalData
+                                            {
+                                                NodeIndex = nodeIndex,
+                                                LeafSlotIndex = leafSlotIndex,
+                                            }
+                                        );
 
                                         var point = new BoundingVolumeHierarchy.PointAndIndex
                                         {
                                             Index = bodyIndex,
-                                            Position = aabb.Center
+                                            Position = aabb.Center,
                                         };
 
                                         if (!needFilterOrResponseUpdate && body.Collider.IsCreated)
@@ -1263,10 +1550,14 @@ namespace Unity.Physics
                                             collisionFilter = body.Collider.Value.GetCollisionFilter();
                                         }
 
-                                        InsertBodyDataWriter.Write(new Broadphase.InsertionData
-                                        {
-                                            Aabb = aabb, PointAndIndex = point, Filter = collisionFilter
-                                        });
+                                        InsertBodyDataWriter.Write(
+                                            new Broadphase.InsertionData
+                                            {
+                                                Aabb = aabb,
+                                                PointAndIndex = point,
+                                                Filter = collisionFilter,
+                                            }
+                                        );
                                     }
                                 }
                             }
@@ -1277,23 +1568,30 @@ namespace Unity.Physics
                                 {
                                     SafetyChecks.CheckAreEqualAndThrow(true, coherenceInfo.StaticBvh != Static);
                                     // remove the body from the other tree
-                                    RemoveBodyDataWriterOtherTree.Write(new BoundingVolumeHierarchy.RemovalData
-                                    {
-                                        NodeIndex = coherenceInfo.LastBvhNodeIndex,
-                                        LeafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex
-                                    });
+                                    RemoveBodyDataWriterOtherTree.Write(
+                                        new BoundingVolumeHierarchy.RemovalData
+                                        {
+                                            NodeIndex = coherenceInfo.LastBvhNodeIndex,
+                                            LeafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex,
+                                        }
+                                    );
                                 }
 
                                 // Compute AABB:
                                 var body = RigidBodies[bodyIndex];
-                                var aabb = Static ?
-                                    Broadphase.PrepareStaticBodyDataJob.CalculateAabb(ref body, aabbMargin) :
-                                    Broadphase.PrepareDynamicBodyDataJob.CalculateAabb(ref body, aabbMargin, Gravity,
-                                    TimeStep, MotionVelocities[bodyIndex]);
+                                var aabb = Static
+                                    ? Broadphase.PrepareStaticBodyDataJob.CalculateAabb(ref body, aabbMargin)
+                                    : Broadphase.PrepareDynamicBodyDataJob.CalculateAabb(
+                                        ref body,
+                                        aabbMargin,
+                                        Gravity,
+                                        TimeStep,
+                                        MotionVelocities[bodyIndex]
+                                    );
                                 var point = new BoundingVolumeHierarchy.PointAndIndex
                                 {
                                     Index = bodyIndex,
-                                    Position = aabb.Center
+                                    Position = aabb.Center,
                                 };
 
                                 var collisionFilter = CollisionFilter.Zero;
@@ -1308,10 +1606,14 @@ namespace Unity.Physics
                                 RespondsToCollision[bodyIndex] = respondsToCollision;
                                 BodySolverTypes[bodyIndex] = body.SolverType;
 
-                                InsertBodyDataWriter.Write(new Broadphase.InsertionData
-                                {
-                                    Aabb = aabb, PointAndIndex = point, Filter = collisionFilter
-                                });
+                                InsertBodyDataWriter.Write(
+                                    new Broadphase.InsertionData
+                                    {
+                                        Aabb = aabb,
+                                        PointAndIndex = point,
+                                        Filter = collisionFilter,
+                                    }
+                                );
                             }
                         }
                     }
@@ -1336,9 +1638,15 @@ namespace Unity.Physics
         {
             [NativeDisableContainerSafetyRestriction]
             public ComponentLookup<PhysicsTemporalCoherenceInfo> PhysicsTemporalCoherenceInfoLookupRW;
-            [ReadOnly] public NativeList<BoundingVolumeHierarchy.ElementLocationData> TemporalCoherenceDataList;
-            [ReadOnly] public NativeArray<RigidBody> RigidBodies;
-            [ReadOnly] public bool Static;
+
+            [ReadOnly]
+            public NativeList<BoundingVolumeHierarchy.ElementLocationData> TemporalCoherenceDataList;
+
+            [ReadOnly]
+            public NativeArray<RigidBody> RigidBodies;
+
+            [ReadOnly]
+            public bool Static;
 
             public void Execute(int index)
             {
@@ -1351,7 +1659,7 @@ namespace Unity.Physics
                     LastBvhNodeIndex = data.NodeIndex,
                     LastBvhLeafSlotIndex = data.LeafSlotIndex,
                     LastColliderVersion = colliderVersion,
-                    StaticBvh = Static
+                    StaticBvh = Static,
                 };
             }
         }
@@ -1372,21 +1680,31 @@ namespace Unity.Physics
 
             [NativeDisableContainerSafetyRestriction]
             public NativeStream.Writer RemoveDynamicBodyDataWriter;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeStream.Writer RemoveStaticBodyDataWriter;
 
-            [ReadOnly] public int DynamicStreamBufferOffset;
-            [ReadOnly] public int StaticStreamBufferOffset;
+            [ReadOnly]
+            public int DynamicStreamBufferOffset;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            [ReadOnly]
+            public int StaticStreamBufferOffset;
+
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 SafetyChecks.CheckAreEqualAndThrow(true, chunk.Has(ref PhysicsTemporalCoherenceInfoTypeRW));
 
                 RemoveDynamicBodyDataWriter.BeginForEachIndex(unfilteredChunkIndex + DynamicStreamBufferOffset);
                 RemoveStaticBodyDataWriter.BeginForEachIndex(unfilteredChunkIndex + StaticStreamBufferOffset);
 
-                NativeArray<PhysicsTemporalCoherenceInfo> chunkCoherenceInfos =
-                    chunk.GetNativeArray(ref PhysicsTemporalCoherenceInfoTypeRW);
+                NativeArray<PhysicsTemporalCoherenceInfo> chunkCoherenceInfos = chunk.GetNativeArray(
+                    ref PhysicsTemporalCoherenceInfoTypeRW
+                );
 
                 var entityEnumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (entityEnumerator.NextEntityIndex(out int i))
@@ -1394,14 +1712,17 @@ namespace Unity.Physics
                     var coherenceInfo = chunkCoherenceInfos[i];
                     if (coherenceInfo.Valid)
                     {
-                        ref var writer = ref coherenceInfo.StaticBvh ?
-                            ref RemoveStaticBodyDataWriter : ref RemoveDynamicBodyDataWriter;
+                        ref var writer = ref coherenceInfo.StaticBvh
+                            ? ref RemoveStaticBodyDataWriter
+                            : ref RemoveDynamicBodyDataWriter;
 
-                        writer.Write(new BoundingVolumeHierarchy.RemovalData
-                        {
-                            NodeIndex = coherenceInfo.LastBvhNodeIndex,
-                            LeafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex
-                        });
+                        writer.Write(
+                            new BoundingVolumeHierarchy.RemovalData
+                            {
+                                NodeIndex = coherenceInfo.LastBvhNodeIndex,
+                                LeafSlotIndex = coherenceInfo.LastBvhLeafSlotIndex,
+                            }
+                        );
                     }
 
                     // overwrite coherence info with default values which invalidates the data
@@ -1438,7 +1759,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastRay(RaycastInput input, out RaycastHit closestHit) => QueryWrappers.RayCast(in this, input, out closestHit);
+        public bool CastRay(RaycastInput input, out RaycastHit closestHit) =>
+            QueryWrappers.RayCast(in this, input, out closestHit);
 
         /// <summary>   Cast ray. </summary>
         ///
@@ -1446,7 +1768,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastRay(RaycastInput input, ref NativeList<RaycastHit> allHits) => QueryWrappers.RayCast(in this, input, ref allHits);
+        public bool CastRay(RaycastInput input, ref NativeList<RaycastHit> allHits) =>
+            QueryWrappers.RayCast(in this, input, ref allHits);
 
         /// <summary>   Cast ray. </summary>
         ///
@@ -1455,7 +1778,8 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastRay<T>(RaycastInput input, ref T collector) where T : struct, ICollector<RaycastHit>
+        public bool CastRay<T>(RaycastInput input, ref T collector)
+            where T : struct, ICollector<RaycastHit>
         {
             input.QueryContext.InitScale();
             return Broadphase.CastRay(input, m_Bodies, ref collector);
@@ -1474,7 +1798,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastCollider(ColliderCastInput input, out ColliderCastHit closestHit) => QueryWrappers.ColliderCast(in this, input, out closestHit);
+        public bool CastCollider(ColliderCastInput input, out ColliderCastHit closestHit) =>
+            QueryWrappers.ColliderCast(in this, input, out closestHit);
 
         /// <summary>   Cast collider. </summary>
         ///
@@ -1482,7 +1807,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastCollider(ColliderCastInput input, ref NativeList<ColliderCastHit> allHits) => QueryWrappers.ColliderCast(in this, input, ref allHits);
+        public bool CastCollider(ColliderCastInput input, ref NativeList<ColliderCastHit> allHits) =>
+            QueryWrappers.ColliderCast(in this, input, ref allHits);
 
         /// <summary>   Cast collider. </summary>
         ///
@@ -1491,7 +1817,8 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CastCollider<T>(ColliderCastInput input, ref T collector) where T : struct, ICollector<ColliderCastHit>
+        public bool CastCollider<T>(ColliderCastInput input, ref T collector)
+            where T : struct, ICollector<ColliderCastHit>
         {
             input.InitScale();
             return Broadphase.CastCollider(input, m_Bodies, ref collector);
@@ -1510,7 +1837,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(PointDistanceInput input, out DistanceHit closestHit) => QueryWrappers.CalculateDistance(in this, input, out closestHit);
+        public bool CalculateDistance(PointDistanceInput input, out DistanceHit closestHit) =>
+            QueryWrappers.CalculateDistance(in this, input, out closestHit);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -1518,7 +1846,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(PointDistanceInput input, ref NativeList<DistanceHit> allHits) => QueryWrappers.CalculateDistance(in this, input, ref allHits);
+        public bool CalculateDistance(PointDistanceInput input, ref NativeList<DistanceHit> allHits) =>
+            QueryWrappers.CalculateDistance(in this, input, ref allHits);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -1527,7 +1856,8 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance<T>(PointDistanceInput input, ref T collector) where T : struct, ICollector<DistanceHit>
+        public bool CalculateDistance<T>(PointDistanceInput input, ref T collector)
+            where T : struct, ICollector<DistanceHit>
         {
             input.QueryContext.InitScale();
             return Broadphase.CalculateDistance(input, m_Bodies, ref collector);
@@ -1546,7 +1876,8 @@ namespace Unity.Physics
         /// <param name="closestHit">   [out] The closest hit. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(ColliderDistanceInput input, out DistanceHit closestHit) => QueryWrappers.CalculateDistance(in this, input, out closestHit);
+        public bool CalculateDistance(ColliderDistanceInput input, out DistanceHit closestHit) =>
+            QueryWrappers.CalculateDistance(in this, input, out closestHit);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -1554,7 +1885,8 @@ namespace Unity.Physics
         /// <param name="allHits">  [in,out] all hits. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance(ColliderDistanceInput input, ref NativeList<DistanceHit> allHits) => QueryWrappers.CalculateDistance(in this, input, ref allHits);
+        public bool CalculateDistance(ColliderDistanceInput input, ref NativeList<DistanceHit> allHits) =>
+            QueryWrappers.CalculateDistance(in this, input, ref allHits);
 
         /// <summary>   Calculates the distance. </summary>
         ///
@@ -1563,12 +1895,13 @@ namespace Unity.Physics
         /// <param name="collector">    [in,out] The collector. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CalculateDistance<T>(ColliderDistanceInput input, ref T collector) where T : struct, ICollector<DistanceHit>
+        public bool CalculateDistance<T>(ColliderDistanceInput input, ref T collector)
+            where T : struct, ICollector<DistanceHit>
         {
             input.InitScale();
             return Broadphase.CalculateDistance(input, m_Bodies, ref collector);
         }
-        
+
         #region GO API Queries
 
         /// <summary>   Interfaces that represent queries that exist in the GameObjects world. </summary>
@@ -1579,8 +1912,12 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CheckSphere(float3 position, float radius, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CheckSphere(in this, position, radius, filter, queryInteraction);
+        public bool CheckSphere(
+            float3 position,
+            float radius,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.CheckSphere(in this, position, radius, filter, queryInteraction);
 
         /// <summary>   Overlap sphere. </summary>
         ///
@@ -1591,8 +1928,13 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapSphere(float3 position, float radius, ref NativeList<DistanceHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.OverlapSphere(in this, position, radius, ref outHits, filter, queryInteraction);
+        public bool OverlapSphere(
+            float3 position,
+            float radius,
+            ref NativeList<DistanceHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.OverlapSphere(in this, position, radius, ref outHits, filter, queryInteraction);
 
         /// <summary>   Overlap sphere custom. </summary>
         ///
@@ -1604,8 +1946,15 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapSphereCustom<T>(float3 position, float radius, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<DistanceHit>
-            => QueryWrappers.OverlapSphereCustom(in this, position, radius, ref collector, filter, queryInteraction);
+        public bool OverlapSphereCustom<T>(
+            float3 position,
+            float radius,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<DistanceHit> =>
+            QueryWrappers.OverlapSphereCustom(in this, position, radius, ref collector, filter, queryInteraction);
 
         /// <summary>   Check capsule. </summary>
         ///
@@ -1616,8 +1965,13 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CheckCapsule(float3 point1, float3 point2, float radius, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CheckCapsule(in this, point1, point2, radius, filter, queryInteraction);
+        public bool CheckCapsule(
+            float3 point1,
+            float3 point2,
+            float radius,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.CheckCapsule(in this, point1, point2, radius, filter, queryInteraction);
 
         /// <summary>   Overlap capsule. </summary>
         ///
@@ -1629,8 +1983,14 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapCapsule(float3 point1, float3 point2, float radius, ref NativeList<DistanceHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.OverlapCapsule(in this, point1, point2, radius, ref outHits, filter, queryInteraction);
+        public bool OverlapCapsule(
+            float3 point1,
+            float3 point2,
+            float radius,
+            ref NativeList<DistanceHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.OverlapCapsule(in this, point1, point2, radius, ref outHits, filter, queryInteraction);
 
         /// <summary>   Overlap capsule custom. </summary>
         ///
@@ -1643,8 +2003,24 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapCapsuleCustom<T>(float3 point1, float3 point2, float radius, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<DistanceHit>
-            => QueryWrappers.OverlapCapsuleCustom(in this, point1, point2, radius, ref collector, filter, queryInteraction);
+        public bool OverlapCapsuleCustom<T>(
+            float3 point1,
+            float3 point2,
+            float radius,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<DistanceHit> =>
+            QueryWrappers.OverlapCapsuleCustom(
+                in this,
+                point1,
+                point2,
+                radius,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Check box. </summary>
         ///
@@ -1655,8 +2031,13 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CheckBox(float3 center, quaternion orientation, float3 halfExtents, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CheckBox(in this, center, orientation, halfExtents, filter, queryInteraction);
+        public bool CheckBox(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.CheckBox(in this, center, orientation, halfExtents, filter, queryInteraction);
 
         /// <summary>   Overlap box. </summary>
         ///
@@ -1668,8 +2049,14 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapBox(float3 center, quaternion orientation, float3 halfExtents, ref NativeList<DistanceHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.OverlapBox(in this, center, orientation, halfExtents, ref outHits, filter, queryInteraction);
+        public bool OverlapBox(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            ref NativeList<DistanceHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.OverlapBox(in this, center, orientation, halfExtents, ref outHits, filter, queryInteraction);
 
         /// <summary>   Overlap box custom. </summary>
         ///
@@ -1682,8 +2069,24 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool OverlapBoxCustom<T>(float3 center, quaternion orientation, float3 halfExtents, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<DistanceHit>
-            => QueryWrappers.OverlapBoxCustom(in this, center, orientation, halfExtents, ref collector, filter, queryInteraction);
+        public bool OverlapBoxCustom<T>(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<DistanceHit> =>
+            QueryWrappers.OverlapBoxCustom(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Sphere cast. </summary>
         ///
@@ -1695,8 +2098,14 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCast(float3 origin, float radius, float3 direction, float maxDistance, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.SphereCast(in this, origin, radius, direction, maxDistance, filter, queryInteraction);
+        public bool SphereCast(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) => QueryWrappers.SphereCast(in this, origin, radius, direction, maxDistance, filter, queryInteraction);
 
         /// <summary>   Sphere cast. </summary>
         ///
@@ -1709,8 +2118,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCast(float3 origin, float radius, float3 direction, float maxDistance, out ColliderCastHit hitInfo, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.SphereCast(in this, origin, radius, direction, maxDistance, out hitInfo, filter, queryInteraction);
+        public bool SphereCast(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            out ColliderCastHit hitInfo,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.SphereCast(
+                in this,
+                origin,
+                radius,
+                direction,
+                maxDistance,
+                out hitInfo,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Sphere cast all. </summary>
         ///
@@ -1723,8 +2149,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCastAll(float3 origin, float radius, float3 direction, float maxDistance, ref NativeList<ColliderCastHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.SphereCastAll(in this, origin, radius, direction, maxDistance, ref outHits, filter, queryInteraction);
+        public bool SphereCastAll(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref NativeList<ColliderCastHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.SphereCastAll(
+                in this,
+                origin,
+                radius,
+                direction,
+                maxDistance,
+                ref outHits,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Sphere cast custom. </summary>
         ///
@@ -1738,8 +2181,26 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool SphereCastCustom<T>(float3 origin, float radius, float3 direction, float maxDistance, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<ColliderCastHit>
-            => QueryWrappers.SphereCastCustom(in this, origin, radius, direction, maxDistance, ref collector, filter, queryInteraction);
+        public bool SphereCastCustom<T>(
+            float3 origin,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<ColliderCastHit> =>
+            QueryWrappers.SphereCastCustom(
+                in this,
+                origin,
+                radius,
+                direction,
+                maxDistance,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast. </summary>
         ///
@@ -1752,8 +2213,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCast(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.BoxCast(in this, center, orientation, halfExtents, direction, maxDistance, filter, queryInteraction);
+        public bool BoxCast(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.BoxCast(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast. </summary>
         ///
@@ -1767,8 +2245,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCast(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, out ColliderCastHit hitInfo, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.BoxCast(in this, center, orientation, halfExtents, direction, maxDistance, out hitInfo, filter, queryInteraction);
+        public bool BoxCast(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            out ColliderCastHit hitInfo,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.BoxCast(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                out hitInfo,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast all. </summary>
         ///
@@ -1782,8 +2279,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCastAll(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, ref NativeList<ColliderCastHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.BoxCastAll(in this, center, orientation, halfExtents, direction, maxDistance, ref outHits, filter, queryInteraction);
+        public bool BoxCastAll(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            ref NativeList<ColliderCastHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.BoxCastAll(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                ref outHits,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Box cast custom. </summary>
         ///
@@ -1798,8 +2314,28 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool BoxCastCustom<T>(float3 center, quaternion orientation, float3 halfExtents, float3 direction, float maxDistance, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<ColliderCastHit>
-            => QueryWrappers.BoxCastCustom(in this, center, orientation, halfExtents, direction, maxDistance, ref collector, filter, queryInteraction);
+        public bool BoxCastCustom<T>(
+            float3 center,
+            quaternion orientation,
+            float3 halfExtents,
+            float3 direction,
+            float maxDistance,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<ColliderCastHit> =>
+            QueryWrappers.BoxCastCustom(
+                in this,
+                center,
+                orientation,
+                halfExtents,
+                direction,
+                maxDistance,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast. </summary>
         ///
@@ -1812,8 +2348,25 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCast(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CapsuleCast(in this, point1, point2, radius, direction, maxDistance, filter, queryInteraction);
+        public bool CapsuleCast(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.CapsuleCast(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast. </summary>
         ///
@@ -1827,8 +2380,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCast(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, out ColliderCastHit hitInfo, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CapsuleCast(in this, point1, point2, radius, direction, maxDistance, out hitInfo, filter, queryInteraction);
+        public bool CapsuleCast(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            out ColliderCastHit hitInfo,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.CapsuleCast(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                out hitInfo,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast all. </summary>
         ///
@@ -1842,8 +2414,27 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCastAll(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, ref NativeList<ColliderCastHit> outHits, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default)
-            => QueryWrappers.CapsuleCastAll(in this, point1, point2, radius, direction, maxDistance, ref outHits, filter, queryInteraction);
+        public bool CapsuleCastAll(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref NativeList<ColliderCastHit> outHits,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        ) =>
+            QueryWrappers.CapsuleCastAll(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                ref outHits,
+                filter,
+                queryInteraction
+            );
 
         /// <summary>   Capsule cast custom. </summary>
         ///
@@ -1858,8 +2449,28 @@ namespace Unity.Physics
         /// <param name="queryInteraction"> (Optional) The query interaction. </param>
         ///
         /// <returns>   True if there is a hit, false otherwise. </returns>
-        public bool CapsuleCastCustom<T>(float3 point1, float3 point2, float radius, float3 direction, float maxDistance, ref T collector, CollisionFilter filter, QueryInteraction queryInteraction = QueryInteraction.Default) where T : struct, ICollector<ColliderCastHit>
-            => QueryWrappers.CapsuleCastCustom(in this, point1, point2, radius, direction, maxDistance, ref collector, filter, queryInteraction);
+        public bool CapsuleCastCustom<T>(
+            float3 point1,
+            float3 point2,
+            float radius,
+            float3 direction,
+            float maxDistance,
+            ref T collector,
+            CollisionFilter filter,
+            QueryInteraction queryInteraction = QueryInteraction.Default
+        )
+            where T : struct, ICollector<ColliderCastHit> =>
+            QueryWrappers.CapsuleCastCustom(
+                in this,
+                point1,
+                point2,
+                radius,
+                direction,
+                maxDistance,
+                ref collector,
+                filter,
+                queryInteraction
+            );
 
         #endregion
 

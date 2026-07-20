@@ -29,7 +29,7 @@
         /// Reliable only last packet. Packets can be dropped (except the last one), won't be duplicated, will arrive in order.
         /// Cannot be fragmented
         /// </summary>
-        ReliableSequenced = 3
+        ReliableSequenced = 3,
     }
 
     /// <summary>
@@ -57,12 +57,12 @@
         internal static readonly int[] PossibleMtu =
         {
             //576  - MaxUdpHeaderSize minimal (RFC 1191)
-            1024,                    //most games standard
+            1024, //most games standard
             1232 - MaxUdpHeaderSize,
             1460 - MaxUdpHeaderSize, //google cloud
             1472 - MaxUdpHeaderSize, //VPN
             1492 - MaxUdpHeaderSize, //Ethernet with LLC and SNAP, PPPoE (RFC 1042)
-            1500 - MaxUdpHeaderSize  //Ethernet II (RFC 1191)
+            1500 - MaxUdpHeaderSize, //Ethernet II (RFC 1191)
         };
 
         //Max possible single packet size

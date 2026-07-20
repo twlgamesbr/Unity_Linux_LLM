@@ -6,7 +6,7 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
     // Level 3 BLAS equivalents
     //
     [GenerateTestsForBurstCompatibility]
-    internal unsafe static partial class DenseMatrixExtensions
+    internal static unsafe partial class DenseMatrixExtensions
     {
         /// <summary>
         /// Given a matrix C, computes
@@ -21,7 +21,15 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
         /// <param name="B">The second matrix in the product.</param>
         /// <param name="beta">The value used to scale this matrix.</param>
         /// <remarks>BLAS equivalent: SGEMM</remarks>
-        public static void ScaleAndAddProduct(this Dense.Primitives.Matrix C, Op opA, Op opB, float alpha, ref Matrix A, ref Dense.Primitives.Matrix B, float beta)
+        public static void ScaleAndAddProduct(
+            this Dense.Primitives.Matrix C,
+            Op opA,
+            Op opB,
+            float alpha,
+            ref Matrix A,
+            ref Dense.Primitives.Matrix B,
+            float beta
+        )
         {
             // Validate input
             if (opA != Op.None && opA != Op.Transpose)
@@ -55,7 +63,6 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
             {
                 UnityEngine.Debug.LogError("Mismatched matrix dimensions for A and B in Matrix.ScaleAndAddProduct()");
             }
-
 
             if (M == 0 || N == 0)
             {

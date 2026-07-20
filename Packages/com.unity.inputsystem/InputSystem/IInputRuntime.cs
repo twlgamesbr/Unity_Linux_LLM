@@ -1,7 +1,6 @@
 using System;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Layouts;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -89,12 +88,12 @@ namespace UnityEngine.InputSystem.LowLevel
 
         Func<InputUpdateType, bool> onShouldRunUpdate { get; set; }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         /// <summary>
         /// Set delegate to be called during player loop initialization callbacks.
         /// </summary>
         Action onPlayerLoopInitialization { get; set; }
-        #endif
+#endif
 
         /// <summary>
         /// Set delegate to be called when a new device is discovered.
@@ -182,21 +181,21 @@ namespace UnityEngine.InputSystem.LowLevel
 
         // If analytics are enabled, the runtime receives analytics events from the input manager.
         // See InputAnalytics.
-        #if UNITY_ANALYTICS || UNITY_EDITOR
+#if UNITY_ANALYTICS || UNITY_EDITOR
         void SendAnalytic(InputAnalytics.IInputAnalytic analytic);
-        #endif // UNITY_ANALYTICS || UNITY_EDITOR
+#endif // UNITY_ANALYTICS || UNITY_EDITOR
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         Action<PlayModeStateChange> onPlayModeChanged { get; set; }
         Action onProjectChange { get; set; }
-        bool isInPlayMode { get;  }
+        bool isInPlayMode { get; }
         bool isEditorActive { get; }
 
         // Functionality related to the Unity Remote.
         Func<IntPtr, bool> onUnityRemoteMessage { set; }
         void SetUnityRemoteGyroEnabled(bool value);
         void SetUnityRemoteGyroUpdateInterval(float interval);
-        #endif
+#endif
     }
 
     internal static class InputRuntime
@@ -207,7 +206,11 @@ namespace UnityEngine.InputSystem.LowLevel
 
     internal static class InputRuntimeExtensions
     {
-        public static unsafe long DeviceCommand<TCommand>(this IInputRuntime runtime, int deviceId, ref TCommand command)
+        public static unsafe long DeviceCommand<TCommand>(
+            this IInputRuntime runtime,
+            int deviceId,
+            ref TCommand command
+        )
             where TCommand : struct, IInputDeviceCommandInfo
         {
             if (runtime == null)

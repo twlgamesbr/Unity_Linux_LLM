@@ -9,7 +9,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
     /// </summary>
     /// <typeparam name="DataType">The type of data to store in the array.</typeparam>
     [StructLayout(LayoutKind.Sequential)]
-    public struct FixedAttachmentArray<DataType> where DataType : unmanaged
+    public struct FixedAttachmentArray<DataType>
+        where DataType : unmanaged
     {
         /// <summary>
         /// Returns an empty array.
@@ -23,7 +24,14 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
 
         /// This is a fixed size struct that emulates itself as an array
         /// similar to how Unity.Math emulates fixed size arrays
-        private DataType a0, a1, a2, a3, a4, a5, a6, a7;
+        private DataType a0,
+            a1,
+            a2,
+            a3,
+            a4,
+            a5,
+            a6,
+            a7;
         private int activeAttachments;
 
         /// <summary>
@@ -36,7 +44,9 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             if (numAttachments < 0 || numAttachments > MaxAttachments)
             {
-                throw new ArgumentException($"FixedAttachmentArray - numAttachments must be in range of [0, {MaxAttachments}[");
+                throw new ArgumentException(
+                    $"FixedAttachmentArray - numAttachments must be in range of [0, {MaxAttachments}["
+                );
             }
 #endif
             a0 = a1 = a2 = a3 = a4 = a5 = a6 = a7 = new DataType();
@@ -47,7 +57,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         /// Intialize the FixedAttachmentArray by copying data from the passed in c# array.
         /// </summary>
         /// <param name="attachments">The C# array from which to copy the elements.</param>
-        public FixedAttachmentArray(DataType[] attachments) : this(attachments.Length)
+        public FixedAttachmentArray(DataType[] attachments)
+            : this(attachments.Length)
         {
             for (int i = 0; i < activeAttachments; ++i)
             {
@@ -59,7 +70,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         /// Intialize the FixedAttachmentArray by copying data from the passed in native array.
         /// </summary>
         /// <param name="attachments">The native array from which to copy the elements.</param>
-        public FixedAttachmentArray(NativeArray<DataType> attachments) : this(attachments.Length)
+        public FixedAttachmentArray(NativeArray<DataType> attachments)
+            : this(attachments.Length)
         {
             for (int i = 0; i < activeAttachments; ++i)
             {
@@ -72,10 +84,7 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         /// </summary>
         public int size
         {
-            get
-            {
-                return activeAttachments;
-            }
+            get { return activeAttachments; }
         }
 
         /// <summary>
@@ -123,9 +132,13 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             {
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                 if ((uint)index >= MaxAttachments)
-                    throw new IndexOutOfRangeException($"FixedAttachmentArray - index must be in range of [0, {MaxAttachments}[");
+                    throw new IndexOutOfRangeException(
+                        $"FixedAttachmentArray - index must be in range of [0, {MaxAttachments}["
+                    );
                 if ((uint)index >= activeAttachments)
-                    throw new IndexOutOfRangeException($"FixedAttachmentArray - index must be in range of [0, {activeAttachments}[");
+                    throw new IndexOutOfRangeException(
+                        $"FixedAttachmentArray - index must be in range of [0, {activeAttachments}["
+                    );
 #endif
                 unsafe
                 {

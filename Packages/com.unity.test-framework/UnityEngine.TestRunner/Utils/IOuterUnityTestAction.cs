@@ -9,7 +9,7 @@ namespace UnityEngine.TestTools
     /// <example>
     /// <para>## IOuterUnityTestAction Example</para>
     /// <code>
-    /// // 
+    /// //
     /// <![CDATA[
     /// using System.Collections;
     /// using NUnit.Framework;

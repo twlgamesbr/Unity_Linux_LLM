@@ -19,14 +19,17 @@ namespace UnityEditor.Build.Pipeline
             /// Use to indicate that the pipeline only executes player scripts.
             /// </summary>
             PlayerScriptsOnly,
+
             /// <summary>
             /// Use to indicate that the pipeline should create asset bundles.
             /// </summary>
             AssetBundleCompatible,
+
             /// <summary>
             /// Use to indicate that the pipeline should create asset bundles and the built-in shader bundle.
             /// </summary>
             AssetBundleBuiltInShaderExtraction,
+
             /// <summary>
             /// Use to indicate that the pipeline should create asset bundles, the built-in shader bundle, and MonoScript bundle.
             /// </summary>

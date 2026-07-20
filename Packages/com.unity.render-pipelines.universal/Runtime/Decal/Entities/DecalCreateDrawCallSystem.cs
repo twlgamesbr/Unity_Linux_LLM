@@ -8,7 +8,10 @@ namespace UnityEngine.Rendering.Universal
     {
         public int start;
         public int end;
-        public int count { get => end - start; }
+        public int count
+        {
+            get => end - start;
+        }
     }
 
     /// <summary>
@@ -22,7 +25,11 @@ namespace UnityEngine.Rendering.Universal
         public NativeArray<DecalSubDrawCall> subCalls;
         public NativeArray<int> subCallCounts;
 
-        public int subCallCount { set { subCallCounts[0] = value; } get => subCallCounts[0]; }
+        public int subCallCount
+        {
+            set { subCallCounts[0] = value; }
+            get => subCallCounts[0];
+        }
 
         public override void RemoveAtSwapBack(int entityIndex)
         {
@@ -88,11 +95,21 @@ namespace UnityEngine.Rendering.Universal
             using (new ProfilingScope(m_Sampler))
             {
                 for (int i = 0; i < m_EntityManager.chunkCount; ++i)
-                    Execute(m_EntityManager.cachedChunks[i], m_EntityManager.culledChunks[i], m_EntityManager.drawCallChunks[i], m_EntityManager.cachedChunks[i].count);
+                    Execute(
+                        m_EntityManager.cachedChunks[i],
+                        m_EntityManager.culledChunks[i],
+                        m_EntityManager.drawCallChunks[i],
+                        m_EntityManager.cachedChunks[i].count
+                    );
             }
         }
 
-        private void Execute(DecalCachedChunk cachedChunk, DecalCulledChunk culledChunk, DecalDrawCallChunk drawCallChunk, int count)
+        private void Execute(
+            DecalCachedChunk cachedChunk,
+            DecalCulledChunk culledChunk,
+            DecalDrawCallChunk drawCallChunk,
+            int count
+        )
         {
             if (count == 0)
                 return;
@@ -135,30 +152,62 @@ namespace UnityEngine.Rendering.Universal
 #endif
         struct DrawCallJob : IJob
         {
-            [ReadOnly] public NativeArray<float4x4> decalToWorlds;
-            [ReadOnly] public NativeArray<float4x4> normalToWorlds;
-            [ReadOnly] public NativeArray<float4x4> sizeOffsets;
-            [ReadOnly] public NativeArray<float2> drawDistances;
-            [ReadOnly] public NativeArray<float2> angleFades;
-            [ReadOnly] public NativeArray<float4> uvScaleBiases;
-            [ReadOnly] public NativeArray<int> layerMasks;
-            [ReadOnly] public NativeArray<ulong> sceneLayerMasks;
-            [ReadOnly] public NativeArray<float> fadeFactors;
-            [ReadOnly] public NativeArray<BoundingSphere> boundingSpheres;
-            [ReadOnly] public NativeArray<uint> renderingLayerMasks;
+            [ReadOnly]
+            public NativeArray<float4x4> decalToWorlds;
+
+            [ReadOnly]
+            public NativeArray<float4x4> normalToWorlds;
+
+            [ReadOnly]
+            public NativeArray<float4x4> sizeOffsets;
+
+            [ReadOnly]
+            public NativeArray<float2> drawDistances;
+
+            [ReadOnly]
+            public NativeArray<float2> angleFades;
+
+            [ReadOnly]
+            public NativeArray<float4> uvScaleBiases;
+
+            [ReadOnly]
+            public NativeArray<int> layerMasks;
+
+            [ReadOnly]
+            public NativeArray<ulong> sceneLayerMasks;
+
+            [ReadOnly]
+            public NativeArray<float> fadeFactors;
+
+            [ReadOnly]
+            public NativeArray<BoundingSphere> boundingSpheres;
+
+            [ReadOnly]
+            public NativeArray<uint> renderingLayerMasks;
 
             public Vector3 cameraPosition;
             public ulong sceneCullingMask;
             public int cullingMask;
-            [ReadOnly] public NativeArray<int> visibleDecalIndices;
+
+            [ReadOnly]
+            public NativeArray<int> visibleDecalIndices;
             public int visibleDecalCount;
             public float maxDrawDistance;
 
-            [WriteOnly] public NativeArray<float4x4> decalToWorldsDraw;
-            [WriteOnly] public NativeArray<float4x4> normalToDecalsDraw;
-            [WriteOnly] public NativeArray<float> renderingLayerMasksDraw;
-            [WriteOnly] public NativeArray<DecalSubDrawCall> subCalls;
-            [WriteOnly] public NativeArray<int> subCallCount;
+            [WriteOnly]
+            public NativeArray<float4x4> decalToWorldsDraw;
+
+            [WriteOnly]
+            public NativeArray<float4x4> normalToDecalsDraw;
+
+            [WriteOnly]
+            public NativeArray<float> renderingLayerMasksDraw;
+
+            [WriteOnly]
+            public NativeArray<DecalSubDrawCall> subCalls;
+
+            [WriteOnly]
+            public NativeArray<int> subCallCount;
 
             public void Execute()
             {
@@ -195,7 +244,13 @@ namespace UnityEngine.Rendering.Universal
 
                     float4x4 normalToDecals = normalToWorlds[decalIndex];
                     // NormalToWorldBatchis a Matrix4x4x but is a Rotation matrix so bottom row and last column can be used for other data to save space
-                    float fadeFactor = fadeFactorScaler * math.clamp((cullDistance - distanceToDecal) / (cullDistance * (1.0f - drawDistance.y)), 0.0f, 1.0f);
+                    float fadeFactor =
+                        fadeFactorScaler
+                        * math.clamp(
+                            (cullDistance - distanceToDecal) / (cullDistance * (1.0f - drawDistance.y)),
+                            0.0f,
+                            1.0f
+                        );
                     normalToDecals.c0.w = uvScaleBias.x;
                     normalToDecals.c1.w = uvScaleBias.y;
                     normalToDecals.c2.w = uvScaleBias.z;
@@ -222,11 +277,7 @@ namespace UnityEngine.Rendering.Universal
                 int remainingInstanceCount = instanceIndex - instanceStart;
                 if (remainingInstanceCount != 0)
                 {
-                    subCalls[subCallIndex++] = new DecalSubDrawCall()
-                    {
-                        start = instanceStart,
-                        end = instanceIndex,
-                    };
+                    subCalls[subCallIndex++] = new DecalSubDrawCall() { start = instanceStart, end = instanceIndex };
                 }
 
                 subCallCount[0] = subCallIndex;

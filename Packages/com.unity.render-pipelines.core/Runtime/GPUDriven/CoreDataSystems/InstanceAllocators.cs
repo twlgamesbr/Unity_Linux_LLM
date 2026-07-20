@@ -12,11 +12,25 @@ namespace UnityEngine.Rendering
     {
         public int index { get; private set; }
         public bool isValid => index >= 0;
-        public static InstanceHandle Create(int index) { return new InstanceHandle { index = index }; }
+
+        public static InstanceHandle Create(int index)
+        {
+            return new InstanceHandle { index = index };
+        }
+
         public static readonly InstanceHandle Invalid = new InstanceHandle { index = -1 };
+
         public bool Equals(InstanceHandle other) => index == other.index;
-        public int CompareTo(InstanceHandle other) { return index.CompareTo(other.index); }
-        public override int GetHashCode() { return index; }
+
+        public int CompareTo(InstanceHandle other)
+        {
+            return index.CompareTo(other.index);
+        }
+
+        public override int GetHashCode()
+        {
+            return index;
+        }
     }
 
     // This is used to uniquely define an instance within its archetype on the GPU side. (Instance data is sorted by archetype on the GPU).
@@ -24,21 +38,33 @@ namespace UnityEngine.Rendering
     {
         private int m_Data;
         public bool isValid => m_Data >= 0;
-        public GPUArchetypeHandle archetype => GPUArchetypeHandle.Create((short)(m_Data & GPUArchetypeManager.kGPUArchetypeBitsMask));
+        public GPUArchetypeHandle archetype =>
+            GPUArchetypeHandle.Create((short)(m_Data & GPUArchetypeManager.kGPUArchetypeBitsMask));
         public int archetypeInstanceIndex => m_Data >> GPUArchetypeManager.kGPUArchetypeBits;
+
         public static InstanceGPUHandle Create(GPUArchetypeHandle gpuArchetype, int gpuPerArchetypeIndex)
         {
             Assert.IsTrue(gpuArchetype.index < GPUArchetypeManager.kMaxGPUArchetypesCount);
 
             return new InstanceGPUHandle
             {
-                m_Data = ((gpuPerArchetypeIndex << GPUArchetypeManager.kGPUArchetypeBits) | (int)gpuArchetype.index)
+                m_Data = ((gpuPerArchetypeIndex << GPUArchetypeManager.kGPUArchetypeBits) | (int)gpuArchetype.index),
             };
         }
+
         public static readonly InstanceGPUHandle Invalid = new InstanceGPUHandle { m_Data = -1 };
+
         public bool Equals(InstanceGPUHandle other) => m_Data == other.m_Data;
-        public int CompareTo(InstanceGPUHandle other) { return m_Data.CompareTo(other.m_Data); }
-        public override int GetHashCode() { return m_Data; }
+
+        public int CompareTo(InstanceGPUHandle other)
+        {
+            return m_Data.CompareTo(other.m_Data);
+        }
+
+        public override int GetHashCode()
+        {
+            return m_Data;
+        }
     }
 
     internal unsafe struct InstanceAllocators
@@ -51,23 +77,33 @@ namespace UnityEngine.Rendering
             m_InstanceCPUHandleAllocator = new NativeHandleAllocator();
             m_InstanceCPUHandleAllocator.Initialize();
 
-            m_InstanceGPUHandleAllocators = new NativeArray<NativeHandleAllocator>(GPUArchetypeManager.kMaxGPUArchetypesCount, Allocator.Persistent);
-            for(int i = 0; i < m_InstanceGPUHandleAllocators.Length; ++i)
-                UnsafeUtility.ArrayElementAsRef<NativeHandleAllocator>(m_InstanceGPUHandleAllocators.GetUnsafePtr(), i).Initialize();
+            m_InstanceGPUHandleAllocators = new NativeArray<NativeHandleAllocator>(
+                GPUArchetypeManager.kMaxGPUArchetypesCount,
+                Allocator.Persistent
+            );
+            for (int i = 0; i < m_InstanceGPUHandleAllocators.Length; ++i)
+                UnsafeUtility
+                    .ArrayElementAsRef<NativeHandleAllocator>(m_InstanceGPUHandleAllocators.GetUnsafePtr(), i)
+                    .Initialize();
         }
 
         public unsafe void Dispose()
         {
             m_InstanceCPUHandleAllocator.Dispose();
             for (int i = 0; i < m_InstanceGPUHandleAllocators.Length; ++i)
-                UnsafeUtility.ArrayElementAsRef<NativeHandleAllocator>(m_InstanceGPUHandleAllocators.GetUnsafePtr(), i).Dispose();
+                UnsafeUtility
+                    .ArrayElementAsRef<NativeHandleAllocator>(m_InstanceGPUHandleAllocators.GetUnsafePtr(), i)
+                    .Dispose();
             m_InstanceGPUHandleAllocators.Dispose();
         }
 
         private ref NativeHandleAllocator GetInstanceGPUHandleAllocator(GPUArchetypeHandle archetype)
         {
             Assert.IsTrue(archetype.valid);
-            return ref UnsafeUtility.ArrayElementAsRef<NativeHandleAllocator>(m_InstanceGPUHandleAllocators.GetUnsafePtr(), archetype.index);
+            return ref UnsafeUtility.ArrayElementAsRef<NativeHandleAllocator>(
+                m_InstanceGPUHandleAllocators.GetUnsafePtr(),
+                archetype.index
+            );
         }
 
         public int TrimGPUAllocatorLength(GPUArchetypeHandle archetype)

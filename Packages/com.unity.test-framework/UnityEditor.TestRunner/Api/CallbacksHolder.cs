@@ -7,6 +7,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
     internal class CallbacksHolder : ScriptableSingleton<CallbacksHolder>, ICallbacksHolder
     {
         private List<CallbackWithPriority> m_Callbacks = new List<CallbackWithPriority>();
+
         public void Add(ICallbacks callback, int priority)
         {
             m_Callbacks.Add(new CallbackWithPriority(callback, priority));
@@ -19,7 +20,10 @@ namespace UnityEditor.TestTools.TestRunner.Api
 
         public ICallbacks[] GetAll()
         {
-            return m_Callbacks.OrderByDescending(callback => callback.Priority).Select(callback => callback.Callback).ToArray();
+            return m_Callbacks
+                .OrderByDescending(callback => callback.Priority)
+                .Select(callback => callback.Callback)
+                .ToArray();
         }
 
         public void Clear()
@@ -31,6 +35,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         {
             public ICallbacks Callback;
             public int Priority;
+
             public CallbackWithPriority(ICallbacks callback, int priority)
             {
                 Callback = callback;

@@ -16,10 +16,10 @@ namespace Unity.Entities
             //AddTransformUsageFlags(TransformUsageFlags.None);
 
             if (IsStatic())
-                AddComponent(GetEntityWithoutDependency(),new Static());
+                AddComponent(GetEntityWithoutDependency(), new Static());
 
             if (!IsActive())
-                AddComponent(GetEntityWithoutDependency(),new Disabled());
+                AddComponent(GetEntityWithoutDependency(), new Disabled());
         }
     }
 }

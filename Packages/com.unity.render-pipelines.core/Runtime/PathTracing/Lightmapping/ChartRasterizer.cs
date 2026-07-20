@@ -43,9 +43,11 @@ namespace UnityEngine.PathTracing.Lightmapping
         public static void LoadShaders(out Shader softwareRasterizationShader, out Shader hardwareRasterizationShader)
         {
             softwareRasterizationShader = UnityEditor.AssetDatabase.LoadAssetAtPath<Shader>(
-                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/Lightmapping/ChartRasterizerSoftware.shader");
+                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/Lightmapping/ChartRasterizerSoftware.shader"
+            );
             hardwareRasterizationShader = UnityEditor.AssetDatabase.LoadAssetAtPath<Shader>(
-                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/Lightmapping/ChartRasterizerHardware.shader");
+                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/Lightmapping/ChartRasterizerHardware.shader"
+            );
         }
 #endif
 
@@ -58,7 +60,12 @@ namespace UnityEngine.PathTracing.Lightmapping
                 return from.uv;
         }
 
-        public static void PrepareRasterizeSoftware(CommandBuffer cmd, Mesh from, GraphicsBuffer vertexBuffer, GraphicsBuffer vertexToOriginalVertexBuffer)
+        public static void PrepareRasterizeSoftware(
+            CommandBuffer cmd,
+            Mesh from,
+            GraphicsBuffer vertexBuffer,
+            GraphicsBuffer vertexToOriginalVertexBuffer
+        )
         {
             var originalUVs = from.vertices;
             var originalIndices = from.triangles;
@@ -76,7 +83,16 @@ namespace UnityEngine.PathTracing.Lightmapping
             cmd.SetBufferData(vertexToOriginalVertexBuffer, vertexIds);
         }
 
-        public void RasterizeSoftware(CommandBuffer cmd, GraphicsBuffer vertexBuffer, GraphicsBuffer vertexToOriginalVertexBuffer, GraphicsBuffer vertexToChartIdBuffer, uint indexCount, Vector4 scaleAndOffset, uint chartIndexOffset, RenderTexture destination)
+        public void RasterizeSoftware(
+            CommandBuffer cmd,
+            GraphicsBuffer vertexBuffer,
+            GraphicsBuffer vertexToOriginalVertexBuffer,
+            GraphicsBuffer vertexToChartIdBuffer,
+            uint indexCount,
+            Vector4 scaleAndOffset,
+            uint chartIndexOffset,
+            RenderTexture destination
+        )
         {
             cmd.SetGlobalBuffer(ShaderProperties.VertexBuffer, vertexBuffer);
             cmd.SetGlobalBuffer(ShaderProperties.VertexToOriginalVertex, vertexToOriginalVertexBuffer);
@@ -87,12 +103,28 @@ namespace UnityEngine.PathTracing.Lightmapping
             cmd.SetGlobalInteger(ShaderProperties.Height, destination.height);
 
             cmd.SetRenderTarget(destination);
-            cmd.DrawProcedural(Matrix4x4.identity, _softwareRasterizationMaterial, 0, MeshTopology.Triangles, (int)indexCount);
+            cmd.DrawProcedural(
+                Matrix4x4.identity,
+                _softwareRasterizationMaterial,
+                0,
+                MeshTopology.Triangles,
+                (int)indexCount
+            );
         }
 
-        public void RasterizeHardware(CommandBuffer cmd, Mesh mesh, GraphicsBuffer vertexToChartIdBuffer, Vector4 scaleAndOffset, uint chartIndexOffset, RenderTexture destination)
+        public void RasterizeHardware(
+            CommandBuffer cmd,
+            Mesh mesh,
+            GraphicsBuffer vertexToChartIdBuffer,
+            Vector4 scaleAndOffset,
+            uint chartIndexOffset,
+            RenderTexture destination
+        )
         {
-            Debug.Assert(SystemInfo.supportsConservativeRaster, "Conservative rasterization is not supported on the current platform.");
+            Debug.Assert(
+                SystemInfo.supportsConservativeRaster,
+                "Conservative rasterization is not supported on the current platform."
+            );
 
             cmd.SetGlobalBuffer(ShaderProperties.VertexToChartID, vertexToChartIdBuffer);
             cmd.SetGlobalVector(ShaderProperties.ScaleAndOffset, scaleAndOffset);

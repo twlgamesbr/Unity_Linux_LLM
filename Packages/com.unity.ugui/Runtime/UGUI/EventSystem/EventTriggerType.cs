@@ -5,7 +5,6 @@ namespace UnityEngine.EventSystems
     /// Usage: Attach it to an object with a collider, or to a GUI Graphic of your choice.
     /// NOTE: Doing this will make this object intercept ALL events, and no event bubbling will occur from this object!
     /// </summary>
-
     public enum EventTriggerType
     {
         /// <summary>
@@ -91,6 +90,6 @@ namespace UnityEngine.EventSystems
         /// <summary>
         /// Intercepts ICancelHandler.OnCancel.
         /// </summary>
-        Cancel = 16
+        Cancel = 16,
     }
 }

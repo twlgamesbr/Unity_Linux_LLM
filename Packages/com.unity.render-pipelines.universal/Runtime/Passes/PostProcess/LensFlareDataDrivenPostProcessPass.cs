@@ -1,5 +1,5 @@
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -65,12 +65,31 @@ namespace UnityEngine.Rendering.Universal
             if (LensFlareCommonSRP.IsOcclusionRTCompatible())
                 LensFlareDataDrivenComputeOcclusion(renderGraph, resourceData, cameraData, in desc, paniniProjection);
 
-            RenderLensFlareDataDriven(renderGraph, resourceData, cameraData, destinationTexture, in desc, paniniProjection);
+            RenderLensFlareDataDriven(
+                renderGraph,
+                resourceData,
+                cameraData,
+                destinationTexture,
+                in desc,
+                paniniProjection
+            );
         }
 
-        void LensFlareDataDrivenComputeOcclusion(RenderGraph renderGraph, UniversalResourceData resourceData, UniversalCameraData cameraData, in TextureDesc dstDesc, PaniniProjection paniniProjection)
+        void LensFlareDataDrivenComputeOcclusion(
+            RenderGraph renderGraph,
+            UniversalResourceData resourceData,
+            UniversalCameraData cameraData,
+            in TextureDesc dstDesc,
+            PaniniProjection paniniProjection
+        )
         {
-            using (var builder = renderGraph.AddUnsafePass<LensFlarePassData>(k_passNameOcclusion, out var passData, m_ProfilingSamplerOcclusion))
+            using (
+                var builder = renderGraph.AddUnsafePass<LensFlarePassData>(
+                    k_passNameOcclusion,
+                    out var passData,
+                    m_ProfilingSamplerOcclusion
+                )
+            )
             {
                 TextureHandle occlusionHandle = renderGraph.ImportTexture(LensFlareCommonSRP.occlusionRT);
                 passData.destinationTexture = occlusionHandle;
@@ -109,7 +128,9 @@ namespace UnityEngine.Rendering.Universal
                         {
                             if (xr.singlePassEnabled)
                             {
-                                nonJitteredViewProjMatrix0 = GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(0), true) * data.cameraData.GetViewMatrix(0);
+                                nonJitteredViewProjMatrix0 =
+                                    GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(0), true)
+                                    * data.cameraData.GetViewMatrix(0);
                                 xrId0 = 0;
                             }
                             else
@@ -121,7 +142,9 @@ namespace UnityEngine.Rendering.Universal
                         }
                         else
                         {
-                            nonJitteredViewProjMatrix0 = GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(0), true) * data.cameraData.GetViewMatrix(0);
+                            nonJitteredViewProjMatrix0 =
+                                GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(0), true)
+                                * data.cameraData.GetViewMatrix(0);
                             xrId0 = 0;
                         }
 #else
@@ -131,41 +154,74 @@ namespace UnityEngine.Rendering.Universal
 #endif
 
                         LensFlareCommonSRP.ComputeOcclusion(
-                            data.material, camera, xr, xr.multipassId,
-                            data.width, data.height,
-                            data.usePanini, data.paniniDistance, data.paniniCropToFit, true,
+                            data.material,
+                            camera,
+                            xr,
+                            xr.multipassId,
+                            data.width,
+                            data.height,
+                            data.usePanini,
+                            data.paniniDistance,
+                            data.paniniCropToFit,
+                            true,
                             camera.transform.position,
                             nonJitteredViewProjMatrix0,
                             ctx.cmd,
-                            false, false, null, null);
-
+                            false,
+                            false,
+                            null,
+                            null
+                        );
 
 #if ENABLE_VR && ENABLE_XR_MODULE
                         if (xr.enabled && xr.singlePassEnabled)
                         {
                             for (int xrIdx = 1; xrIdx < xr.viewCount; ++xrIdx)
                             {
-                                Matrix4x4 gpuVPXR = GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(xrIdx), true) * data.cameraData.GetViewMatrix(xrIdx);
+                                Matrix4x4 gpuVPXR =
+                                    GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(xrIdx), true)
+                                    * data.cameraData.GetViewMatrix(xrIdx);
 
                                 // Bypass single pass version
                                 LensFlareCommonSRP.ComputeOcclusion(
-                                    data.material, camera, xr, xrIdx,
-                                    data.width, data.height,
-                                    data.usePanini, data.paniniDistance, data.paniniCropToFit, true,
+                                    data.material,
+                                    camera,
+                                    xr,
+                                    xrIdx,
+                                    data.width,
+                                    data.height,
+                                    data.usePanini,
+                                    data.paniniDistance,
+                                    data.paniniCropToFit,
+                                    true,
                                     camera.transform.position,
                                     gpuVPXR,
                                     ctx.cmd,
-                                    false, false, null, null);
+                                    false,
+                                    false,
+                                    null,
+                                    null
+                                );
                             }
                         }
 #endif
-                    });
+                    }
+                );
             }
         }
 
-        void RenderLensFlareDataDriven(RenderGraph renderGraph, UniversalResourceData resourceData, UniversalCameraData cameraData, in TextureHandle destination, in TextureDesc srcDesc, PaniniProjection paniniProjection)
+        void RenderLensFlareDataDriven(
+            RenderGraph renderGraph,
+            UniversalResourceData resourceData,
+            UniversalCameraData cameraData,
+            in TextureHandle destination,
+            in TextureDesc srcDesc,
+            PaniniProjection paniniProjection
+        )
         {
-            using (var builder = renderGraph.AddUnsafePass<LensFlarePassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddUnsafePass<LensFlarePassData>(passName, out var passData, profilingSampler)
+            )
             {
                 // Use WriteTexture here because DoLensFlareDataDrivenCommon will call SetRenderTarget internally.
                 // TODO RENDERGRAPH: convert SRP core lens flare to be rendergraph friendly
@@ -201,56 +257,87 @@ namespace UnityEngine.Rendering.Universal
                     builder.UseTexture(resourceData.cameraDepthTexture, AccessFlags.Read);
                 }
 
-                builder.SetRenderFunc(static (LensFlarePassData data, UnsafeGraphContext ctx) =>
-                {
-                    Camera camera = data.cameraData.camera;
-                    Experimental.Rendering.XRPass xr = data.cameraData.xr;
+                builder.SetRenderFunc(
+                    static (LensFlarePassData data, UnsafeGraphContext ctx) =>
+                    {
+                        Camera camera = data.cameraData.camera;
+                        Experimental.Rendering.XRPass xr = data.cameraData.xr;
 
 #if ENABLE_VR && ENABLE_XR_MODULE
-                    // Not VR or Multi-Pass
-                    if (!xr.enabled ||
-                        (xr.enabled && !xr.singlePassEnabled))
+                        // Not VR or Multi-Pass
+                        if (!xr.enabled || (xr.enabled && !xr.singlePassEnabled))
 #endif
-                    {
-                        var gpuNonJitteredProj = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true);
-                        Matrix4x4 nonJitteredViewProjMatrix0 = gpuNonJitteredProj * camera.worldToCameraMatrix;
-
-                        LensFlareCommonSRP.DoLensFlareDataDrivenCommon(
-                            data.material, data.cameraData.camera, data.viewport, xr, data.cameraData.xr.multipassId,
-                            data.width, data.height,
-                            data.usePanini, data.paniniDistance, data.paniniCropToFit,
-                            true,
-                            camera.transform.position,
-                            nonJitteredViewProjMatrix0,
-                            ctx.cmd,
-                            false, false, null, null,
-                            data.destinationTexture,
-                            (Light light, Camera cam, Vector3 wo) => { return GetLensFlareLightAttenuation(light, cam, wo); },
-                            false);
-                    }
-#if ENABLE_VR && ENABLE_XR_MODULE
-                    else
-                    {
-                        for (int xrIdx = 0; xrIdx < xr.viewCount; ++xrIdx)
                         {
-                            Matrix4x4 nonJitteredViewProjMatrix_k = GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(xrIdx), true) * data.cameraData.GetViewMatrix(xrIdx);
+                            var gpuNonJitteredProj = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true);
+                            Matrix4x4 nonJitteredViewProjMatrix0 = gpuNonJitteredProj * camera.worldToCameraMatrix;
 
                             LensFlareCommonSRP.DoLensFlareDataDrivenCommon(
-                                data.material, data.cameraData.camera, data.viewport, xr, data.cameraData.xr.multipassId,
-                                data.width, data.height,
-                                data.usePanini, data.paniniDistance, data.paniniCropToFit,
+                                data.material,
+                                data.cameraData.camera,
+                                data.viewport,
+                                xr,
+                                data.cameraData.xr.multipassId,
+                                data.width,
+                                data.height,
+                                data.usePanini,
+                                data.paniniDistance,
+                                data.paniniCropToFit,
                                 true,
                                 camera.transform.position,
-                                nonJitteredViewProjMatrix_k,
+                                nonJitteredViewProjMatrix0,
                                 ctx.cmd,
-                                false, false, null, null,
+                                false,
+                                false,
+                                null,
+                                null,
                                 data.destinationTexture,
-                                (Light light, Camera cam, Vector3 wo) => { return GetLensFlareLightAttenuation(light, cam, wo); },
-                                false);
+                                (Light light, Camera cam, Vector3 wo) =>
+                                {
+                                    return GetLensFlareLightAttenuation(light, cam, wo);
+                                },
+                                false
+                            );
                         }
-                    }
+#if ENABLE_VR && ENABLE_XR_MODULE
+                        else
+                        {
+                            for (int xrIdx = 0; xrIdx < xr.viewCount; ++xrIdx)
+                            {
+                                Matrix4x4 nonJitteredViewProjMatrix_k =
+                                    GL.GetGPUProjectionMatrix(data.cameraData.GetProjectionMatrixNoJitter(xrIdx), true)
+                                    * data.cameraData.GetViewMatrix(xrIdx);
+
+                                LensFlareCommonSRP.DoLensFlareDataDrivenCommon(
+                                    data.material,
+                                    data.cameraData.camera,
+                                    data.viewport,
+                                    xr,
+                                    data.cameraData.xr.multipassId,
+                                    data.width,
+                                    data.height,
+                                    data.usePanini,
+                                    data.paniniDistance,
+                                    data.paniniCropToFit,
+                                    true,
+                                    camera.transform.position,
+                                    nonJitteredViewProjMatrix_k,
+                                    ctx.cmd,
+                                    false,
+                                    false,
+                                    null,
+                                    null,
+                                    data.destinationTexture,
+                                    (Light light, Camera cam, Vector3 wo) =>
+                                    {
+                                        return GetLensFlareLightAttenuation(light, cam, wo);
+                                    },
+                                    false
+                                );
+                            }
+                        }
 #endif
-                });
+                    }
+                );
             }
         }
 
@@ -263,11 +350,19 @@ namespace UnityEngine.Rendering.Universal
                 switch (light.type)
                 {
                     case LightType.Directional:
-                        return LensFlareCommonSRP.ShapeAttenuationDirLight(light.transform.forward, cam.transform.forward);
+                        return LensFlareCommonSRP.ShapeAttenuationDirLight(
+                            light.transform.forward,
+                            cam.transform.forward
+                        );
                     case LightType.Point:
                         return LensFlareCommonSRP.ShapeAttenuationPointLight();
                     case LightType.Spot:
-                        return LensFlareCommonSRP.ShapeAttenuationSpotConeLight(light.transform.forward, wo, light.spotAngle, light.innerSpotAngle / 180.0f);
+                        return LensFlareCommonSRP.ShapeAttenuationSpotConeLight(
+                            light.transform.forward,
+                            wo,
+                            light.spotAngle,
+                            light.innerSpotAngle / 180.0f
+                        );
                     default:
                         return 1.0f;
                 }
@@ -275,6 +370,5 @@ namespace UnityEngine.Rendering.Universal
 
             return 1.0f;
         }
-
     }
 }

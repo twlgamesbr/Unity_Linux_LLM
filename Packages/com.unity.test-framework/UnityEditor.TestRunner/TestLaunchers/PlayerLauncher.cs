@@ -21,8 +21,10 @@ namespace UnityEditor.TestTools.TestRunner
 {
     internal class TestLaunchFailedException : Exception
     {
-        public TestLaunchFailedException() {}
-        public TestLaunchFailedException(string message) : base(message) {}
+        public TestLaunchFailedException() { }
+
+        public TestLaunchFailedException(string message)
+            : base(message) { }
     }
 
     [Serializable]
@@ -38,7 +40,17 @@ namespace UnityEditor.TestTools.TestRunner
 
         internal PlayerLauncherBuildOptions playerBuildOptions { get; private set; }
 
-        public PlayerLauncher(PlaymodeTestsControllerSettings settings, BuildTarget? targetPlatform, ITestRunSettings overloadTestRunSettings, int heartbeatTimeout, string playerWithTestsPath, string scenePath, Scene scene, PlaymodeTestsController runner) : base(settings)
+        public PlayerLauncher(
+            PlaymodeTestsControllerSettings settings,
+            BuildTarget? targetPlatform,
+            ITestRunSettings overloadTestRunSettings,
+            int heartbeatTimeout,
+            string playerWithTestsPath,
+            string scenePath,
+            Scene scene,
+            PlaymodeTestsController runner
+        )
+            : base(settings)
         {
             m_TargetPlatform = targetPlatform ?? EditorUserBuildSettings.activeBuildTarget;
             m_OverloadTestRunSettings = overloadTestRunSettings;
@@ -49,7 +61,8 @@ namespace UnityEditor.TestTools.TestRunner
             m_Runner = runner;
         }
 
-        protected override RuntimePlatform TestTargetPlatform => BuildTargetConverter.TryConvertToRuntimePlatform(m_TargetPlatform);
+        protected override RuntimePlatform TestTargetPlatform =>
+            BuildTargetConverter.TryConvertToRuntimePlatform(m_TargetPlatform);
 
         public override void Run()
         {
@@ -66,11 +79,15 @@ namespace UnityEditor.TestTools.TestRunner
 
                 var filter = m_Settings.BuildNUnitFilter();
                 var runner = LoadTests(filter);
-                var exceptionThrown = ExecutePrebuildSetupWithTestDataMethods(runner.LoadedTest, filter) || ExecutePreBuildSetupMethods(runner.LoadedTest, filter);
+                var exceptionThrown =
+                    ExecutePrebuildSetupWithTestDataMethods(runner.LoadedTest, filter)
+                    || ExecutePreBuildSetupMethods(runner.LoadedTest, filter);
                 if (exceptionThrown)
                 {
                     ReopenOriginalScene(m_Settings.originalScene);
-                    CallbacksDelegator.instance.RunFailed("Run Failed: One or more errors in a prebuild setup. See the editor log for details.");
+                    CallbacksDelegator.instance.RunFailed(
+                        "Run Failed: One or more errors in a prebuild setup. See the editor log for details."
+                    );
                     return;
                 }
 
@@ -130,18 +147,25 @@ namespace UnityEditor.TestTools.TestRunner
             {
                 playerBuildOptions.OnBeforeBuildProfileBuild(m_Scene.path);
                 Debug.LogFormat(
-                    LogType.Log, LogOption.NoStacktrace, null,
-                    "Building player with build profile options:\n{0}", playerBuildOptions);
+                    LogType.Log,
+                    LogOption.NoStacktrace,
+                    null,
+                    "Building player with build profile options:\n{0}",
+                    playerBuildOptions
+                );
                 success = BuildAndRunPlayer(playerBuildOptions.BuildPlayerWithProfileOptions);
                 playerBuildOptions.OnAfterBuildProfileBuild();
-
             }
             else
 #endif
             {
                 Debug.LogFormat(
-                    LogType.Log, LogOption.NoStacktrace, null,
-                    "Building player with following options:\n{0}", playerBuildOptions);
+                    LogType.Log,
+                    LogOption.NoStacktrace,
+                    null,
+                    "Building player with following options:\n{0}",
+                    playerBuildOptions
+                );
                 success = BuildAndRunPlayer(playerBuildOptions.BuildPlayerOptions);
             }
 
@@ -150,11 +174,17 @@ namespace UnityEditor.TestTools.TestRunner
 
         private static bool BuildAndRunPlayer(BuildPlayerOptions buildOptions)
         {
-            Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "Building player with following options:\n{0}", buildOptions);
+            Debug.LogFormat(
+                LogType.Log,
+                LogOption.NoStacktrace,
+                null,
+                "Building player with following options:\n{0}",
+                buildOptions
+            );
 
 #if !UNITY_2021_2_OR_NEWER
             // Android has to be in listen mode to establish player connection
-		    // Only flip connect to host if we are older than Unity 2021.2
+            // Only flip connect to host if we are older than Unity 2021.2
             if (buildOptions.BuildPlayerOptions.target == BuildTarget.Android)
             {
                 buildOptions.BuildPlayerOptions.options &= ~BuildOptions.ConnectToHost;
@@ -196,12 +226,25 @@ namespace UnityEditor.TestTools.TestRunner
         {
             if (buildOptions.buildProfile == null)
             {
-                throw new TestLaunchFailedException("Player build failed, profile was null but BuildPlayerWithProfileOptions was used.");
+                throw new TestLaunchFailedException(
+                    "Player build failed, profile was null but BuildPlayerWithProfileOptions was used."
+                );
             }
 
-            Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "Building player with profile options:\n{0}", buildOptions);
-            Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "Building with profile at path:\n{0}",
-                AssetDatabase.GetAssetPath(buildOptions.buildProfile));
+            Debug.LogFormat(
+                LogType.Log,
+                LogOption.NoStacktrace,
+                null,
+                "Building player with profile options:\n{0}",
+                buildOptions
+            );
+            Debug.LogFormat(
+                LogType.Log,
+                LogOption.NoStacktrace,
+                null,
+                "Building with profile at path:\n{0}",
+                AssetDatabase.GetAssetPath(buildOptions.buildProfile)
+            );
 
             // WebGL has to be in close on quit mode to ensure that the browser tab is closed when the player finishes running tests
             if (buildOptions.buildProfile.buildTarget == BuildTarget.WebGL)
@@ -223,7 +266,6 @@ namespace UnityEditor.TestTools.TestRunner
         }
 #endif
 
-
         internal PlayerLauncherBuildOptions GetBuildOptions(string scenePath)
         {
             var buildOnly = false;
@@ -239,14 +281,21 @@ namespace UnityEditor.TestTools.TestRunner
             scenes.AddRange(EditorBuildSettings.scenes.Select(x => x.path));
             buildOptions.scenes = scenes.ToArray();
 
-            buildOptions.options |= BuildOptions.Development | BuildOptions.ConnectToHost | BuildOptions.IncludeTestAssemblies | BuildOptions.StrictMode;
+            buildOptions.options |=
+                BuildOptions.Development
+                | BuildOptions.ConnectToHost
+                | BuildOptions.IncludeTestAssemblies
+                | BuildOptions.StrictMode;
             buildOptions.target = m_TargetPlatform;
 
 #if UNITY_2021_2_OR_NEWER
             buildOptions.subtarget = EditorUserBuildSettings.GetActiveSubtargetFor(m_TargetPlatform);
 #endif
 
-            if (EditorUserBuildSettings.buildWithCodeCoverage && BuildProfileModuleUtil.IsBuildTargetSupportedByCoverage(m_TargetPlatform))
+            if (
+                EditorUserBuildSettings.buildWithCodeCoverage
+                && BuildProfileModuleUtil.IsBuildTargetSupportedByCoverage(m_TargetPlatform)
+            )
                 buildOptions.options |= BuildOptions.EnableCodeCoverage;
 
             if (EditorUserBuildSettings.waitForPlayerConnection)
@@ -285,11 +334,13 @@ namespace UnityEditor.TestTools.TestRunner
                 var reduceBuildLocationPathLength = false;
 
                 //Some platforms hit MAX_PATH limits during the build process, in these cases minimize the path length
-                if ((m_TargetPlatform == BuildTarget.WSAPlayer)
+                if (
+                    (m_TargetPlatform == BuildTarget.WSAPlayer)
 #if !UNITY_2021_1_OR_NEWER
-                || (m_TargetPlatform == BuildTarget.XboxOne)
+                    || (m_TargetPlatform == BuildTarget.XboxOne)
 #endif
-                || (m_TargetPlatform == BuildTarget.GameCoreXboxSeries) || (m_TargetPlatform == BuildTarget.GameCoreXboxOne)
+                    || (m_TargetPlatform == BuildTarget.GameCoreXboxSeries)
+                    || (m_TargetPlatform == BuildTarget.GameCoreXboxOne)
                 )
                 {
                     reduceBuildLocationPathLength = true;
@@ -307,7 +358,12 @@ namespace UnityEditor.TestTools.TestRunner
                     Directory.CreateDirectory(uniqueTempPathInProject);
                 }
 
-                buildLocation = Path.Combine(string.IsNullOrEmpty(m_PlayerWithTestsPath) ? Path.GetFullPath(uniqueTempPathInProject) : m_PlayerWithTestsPath, playerDirectoryName);
+                buildLocation = Path.Combine(
+                    string.IsNullOrEmpty(m_PlayerWithTestsPath)
+                        ? Path.GetFullPath(uniqueTempPathInProject)
+                        : m_PlayerWithTestsPath,
+                    playerDirectoryName
+                );
 
                 // iOS builds create a folder with Xcode project instead of an executable, therefore no executable name is added
                 if (m_TargetPlatform == BuildTarget.iOS)
@@ -316,13 +372,17 @@ namespace UnityEditor.TestTools.TestRunner
                 }
                 else
                 {
-                    string extensionForBuildTarget =
-                        PostprocessBuildPlayer.GetExtensionForBuildTarget(buildTargetGroup, buildOptions.target,
-                            buildOptions.options);
+                    string extensionForBuildTarget = PostprocessBuildPlayer.GetExtensionForBuildTarget(
+                        buildTargetGroup,
+                        buildOptions.target,
+                        buildOptions.options
+                    );
                     var playerExecutableName = "PlayerWithTests";
 
-                    if (m_TargetPlatform == BuildTarget.GameCoreXboxSeries ||
-                        m_TargetPlatform == BuildTarget.GameCoreXboxOne)
+                    if (
+                        m_TargetPlatform == BuildTarget.GameCoreXboxSeries
+                        || m_TargetPlatform == BuildTarget.GameCoreXboxOne
+                    )
                         PlayerSettings.productName = playerExecutableName;
 
                     if (!string.IsNullOrEmpty(extensionForBuildTarget))
@@ -353,19 +413,30 @@ namespace UnityEditor.TestTools.TestRunner
         private PlayerLauncherBuildOptions ModifyBuildOptions(PlayerLauncherBuildOptions playerOptions)
         {
 #if UNITY_6000_5_OR_NEWER
-            var allAssemblies = CurrentAssemblies.GetLoadedAssemblies()
+            var allAssemblies = CurrentAssemblies
+                .GetLoadedAssemblies()
 #else
-            var allAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+            var allAssemblies = AppDomain
+                .CurrentDomain.GetAssemblies()
 #endif
-                .Where(x => x.GetReferencedAssemblies().Any(z => z.Name == "UnityEditor.TestRunner")).ToArray();
-            var attributes = allAssemblies.SelectMany(assembly => assembly.GetCustomAttributes(typeof(TestPlayerBuildModifierAttribute), true).OfType<TestPlayerBuildModifierAttribute>()).ToArray();
+                .Where(x => x.GetReferencedAssemblies().Any(z => z.Name == "UnityEditor.TestRunner"))
+                .ToArray();
+            var attributes = allAssemblies
+                .SelectMany(assembly =>
+                    assembly
+                        .GetCustomAttributes(typeof(TestPlayerBuildModifierAttribute), true)
+                        .OfType<TestPlayerBuildModifierAttribute>()
+                )
+                .ToArray();
             var modifiers = attributes.Select(attribute => attribute.ConstructModifier()).ToArray();
 
             foreach (var modifier in modifiers)
             {
                 playerOptions.BuildPlayerOptions = modifier.ModifyOptions(playerOptions.BuildPlayerOptions);
 #if UNITY_6000_1_OR_NEWER
-                playerOptions.BuildPlayerWithProfileOptions = modifier.ModifyOptions(playerOptions.BuildPlayerWithProfileOptions);
+                playerOptions.BuildPlayerWithProfileOptions = modifier.ModifyOptions(
+                    playerOptions.BuildPlayerWithProfileOptions
+                );
 #endif
             }
 

@@ -5,6 +5,7 @@ using UnityEditor.Rendering.Converter;
 
 [assembly: InternalsVisibleTo("PPv2URPConverters")]
 [assembly: InternalsVisibleTo("Unity.2D.PixelPerfect.Editor")]
+
 namespace UnityEditor.Rendering.Universal
 {
     // Might need to change this name before making it public
@@ -26,7 +27,11 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// A check if the converter is enabled or not. Can be used to do a check if prerequisites are met to have it enabled or disabled.
         /// </summary>
-        public virtual bool isEnabled { get => m_Enabled; set => m_Enabled = value; }
+        public virtual bool isEnabled
+        {
+            get => m_Enabled;
+            set => m_Enabled = value;
+        }
 
         /// <summary>
         /// The message if the converter is disabled. This will be shown in the UI when hovering over the disabled converter.
@@ -48,9 +53,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// This method getting triggered when clicking the listview item in the UI.
         /// </summary>
-        public virtual void OnClicked(int index)
-        {
-        }
+        public virtual void OnClicked(int index) { }
 
         // This is so that we can have different segment in our UI, example Unity converters, your custom converters etc..
         // This is not implemented yet
@@ -59,7 +62,6 @@ namespace UnityEditor.Rendering.Universal
         // This is in which drop down item the converter belongs to.
         // Not properly implemented yet
         public virtual Type container { get; }
-        
 
         /// <summary>
         /// This runs when initializing the converter. To gather data for the UI and also for the converter if needed.
@@ -70,9 +72,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// The method that will be run before Run method if needed.
         /// </summary>
-        public virtual void OnPreRun()
-        {
-        }
+        public virtual void OnPreRun() { }
 
         /// <summary>
         /// The method that will be run when converting the assets.
@@ -83,9 +83,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// The method that will be run after the converters are done if needed.
         /// </summary>
-        public virtual void OnPostRun()
-        {
-        }
+        public virtual void OnPostRun() { }
 
         // Temporary solution until all converters are moved to new API
         class RenderPipelineConverterItem : IRenderPipelineConverterItem
@@ -123,7 +121,7 @@ namespace UnityEditor.Rendering.Universal
                         descriptor = i,
                         isEnabled = string.IsNullOrEmpty(i.warningMessage),
                         isDisabledMessage = i.warningMessage,
-                        onClicked = () => OnClicked(ctx.items.IndexOf(i))
+                        onClicked = () => OnClicked(ctx.items.IndexOf(i)),
                     };
 
                     listItems.Add(item);
@@ -143,11 +141,7 @@ namespace UnityEditor.Rendering.Universal
         {
             // Temporary solution until all converters are moved to new API
             RenderPipelineConverterItem rpItem = item as RenderPipelineConverterItem;
-            var itemToConvertInfo = new ConverterItemInfo()
-            {
-                index = rpItem.index,
-                descriptor = rpItem.descriptor,
-            };
+            var itemToConvertInfo = new ConverterItemInfo() { index = rpItem.index, descriptor = rpItem.descriptor };
             var ctx = new RunItemContext(itemToConvertInfo);
             OnRun(ref ctx);
 

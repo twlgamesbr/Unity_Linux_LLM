@@ -28,7 +28,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             var hwAccelStruct = accelStruct as HardwareRayTracingAccelStruct;
             Debug.Assert(hwAccelStruct != null);
 
-            cmd.SetRayTracingAccelerationStructure(m_Shader, Shader.PropertyToID(name+"accelStruct"), hwAccelStruct.accelStruct);
+            cmd.SetRayTracingAccelerationStructure(
+                m_Shader,
+                Shader.PropertyToID(name + "accelStruct"),
+                hwAccelStruct.accelStruct
+            );
         }
 
         public void SetIntParam(CommandBuffer cmd, int nameID, int val)
@@ -109,17 +113,19 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         {
             Utils.CheckArgIsNotNull(cmd, nameof(cmd));
             Utils.CheckArgIsNotNull(argsBuffer, nameof(argsBuffer));
-            GraphicsBuffer.Target requiredFlags = GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured;
-            Utils.CheckArg((argsBuffer.target & requiredFlags) == requiredFlags, "argsBuffer.target must have both Target.IndirectArguments and Target.Structured set");
+            GraphicsBuffer.Target requiredFlags =
+                GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured;
+            Utils.CheckArg(
+                (argsBuffer.target & requiredFlags) == requiredFlags,
+                "argsBuffer.target must have both Target.IndirectArguments and Target.Structured set"
+            );
 
             cmd.DispatchRays(m_Shader, m_ShaderDispatchFuncName, argsBuffer, 0);
         }
+
         public ulong GetTraceScratchBufferRequiredSizeInBytes(uint width, uint height, uint depth)
         {
             return 0;
         }
-
     }
 }
-
-

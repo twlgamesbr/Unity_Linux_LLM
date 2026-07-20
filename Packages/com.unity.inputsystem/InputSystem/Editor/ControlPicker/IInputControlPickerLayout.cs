@@ -5,9 +5,15 @@ namespace UnityEngine.InputSystem.Editor
 {
     internal interface IInputControlPickerLayout
     {
-        void AddControlItem(InputControlPickerDropdown dropdown, DeviceDropdownItem parent,
+        void AddControlItem(
+            InputControlPickerDropdown dropdown,
+            DeviceDropdownItem parent,
             ControlDropdownItem parentControl,
-            InputControlLayout.ControlItem control, string device, string usage, bool searchable);
+            InputControlLayout.ControlItem control,
+            string device,
+            string usage,
+            bool searchable
+        );
     }
 }
 #endif // UNITY_EDITOR

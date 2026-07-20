@@ -1,6 +1,6 @@
 using System;
-using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.RenderGraphModule.Util;
 
 namespace UnityEngine.Rendering.Universal.Internal
@@ -28,10 +28,17 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <param name="customPassName">An optional custom profiling name to disambiguate multiple copy passes.</param>
         /// <seealso cref="RenderPassEvent"/>
         /// <seealso cref="Downsampling"/>
-        public CopyColorPass(RenderPassEvent evt, Material samplingMaterial, Material copyColorMaterial = null, string customPassName = null)
+        public CopyColorPass(
+            RenderPassEvent evt,
+            Material samplingMaterial,
+            Material copyColorMaterial = null,
+            string customPassName = null
+        )
         {
-            profilingSampler = customPassName != null ? new ProfilingSampler(customPassName) : ProfilingSampler.Get(URPProfileId.CopyColor);
-
+            profilingSampler =
+                customPassName != null
+                    ? new ProfilingSampler(customPassName)
+                    : ProfilingSampler.Get(URPProfileId.CopyColor);
 
             m_SamplingMaterial = samplingMaterial;
             m_CopyColorMaterial = copyColorMaterial;
@@ -49,7 +56,11 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <seealso cref="Downsampling"/>
         /// <seealso cref="RenderTextureDescriptor"/>
         /// <seealso cref="FilterMode"/>
-        public static void ConfigureDescriptor(Downsampling downsamplingMethod, ref RenderTextureDescriptor descriptor, out FilterMode filterMode)
+        public static void ConfigureDescriptor(
+            Downsampling downsamplingMethod,
+            ref RenderTextureDescriptor descriptor,
+            out FilterMode filterMode
+        )
         {
             descriptor.msaaSamples = 1;
             descriptor.depthStencilFormat = GraphicsFormat.None;
@@ -67,7 +78,11 @@ namespace UnityEngine.Rendering.Universal.Internal
             filterMode = downsamplingMethod == Downsampling.None ? FilterMode.Point : FilterMode.Bilinear;
         }
 
-        internal static void ConfigureDescriptor(Downsampling downsamplingMethod, ref TextureDesc descriptor, out FilterMode filterMode)
+        internal static void ConfigureDescriptor(
+            Downsampling downsamplingMethod,
+            ref TextureDesc descriptor,
+            out FilterMode filterMode
+        )
         {
             descriptor.msaaSamples = MSAASamples.None;
             if (downsamplingMethod == Downsampling._2xBilinear)
@@ -93,7 +108,9 @@ namespace UnityEngine.Rendering.Universal.Internal
         [Obsolete("Use RTHandles for source and destination #from(2022.1) #breakingFrom(2023.1).", true)]
         public void Setup(RenderTargetIdentifier source, RenderTargetHandle destination, Downsampling downsampling)
         {
-            throw new NotSupportedException("Setup with RenderTargetIdentifier has been deprecated. Use it with RTHandles instead.");
+            throw new NotSupportedException(
+                "Setup with RenderTargetIdentifier has been deprecated. Use it with RTHandles instead."
+            );
         }
 
         /// <summary>
@@ -107,7 +124,12 @@ namespace UnityEngine.Rendering.Universal.Internal
             m_DownsamplingMethod = downsampling;
         }
 
-        private static void ExecutePass(RasterCommandBuffer cmd, PassData passData, RTHandle source, bool useDrawProceduralBlit)
+        private static void ExecutePass(
+            RasterCommandBuffer cmd,
+            PassData passData,
+            RTHandle source,
+            bool useDrawProceduralBlit
+        )
         {
             var samplingMaterial = passData.samplingMaterial;
             var copyColorMaterial = passData.copyColorMaterial;
@@ -118,11 +140,14 @@ namespace UnityEngine.Rendering.Universal.Internal
             {
                 Debug.LogErrorFormat(
                     "Missing {0}. Copy Color render pass will not execute. Check for missing reference in the renderer resources.",
-                    samplingMaterial);
+                    samplingMaterial
+                );
                 return;
             }
-          
-            Vector2 viewportScale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+
+            Vector2 viewportScale = source.useScaling
+                ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                : Vector2.one;
 
             switch (downsamplingMethod)
             {
@@ -139,7 +164,7 @@ namespace UnityEngine.Rendering.Universal.Internal
                 case Downsampling._4xBilinear:
                     Blitter.BlitTexture(cmd, source, viewportScale, copyColorMaterial, 1);
                     break;
-            }            
+            }
         }
 
         private class PassData
@@ -153,7 +178,13 @@ namespace UnityEngine.Rendering.Universal.Internal
             internal int sampleOffsetShaderHandle;
         }
 
-        internal TextureHandle Render(RenderGraph renderGraph, ContextContainer frameData, out TextureHandle destination, in TextureHandle source, Downsampling downsampling)
+        internal TextureHandle Render(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            out TextureHandle destination,
+            in TextureHandle source,
+            Downsampling downsampling
+        )
         {
             m_DownsamplingMethod = downsampling;
 
@@ -162,9 +193,16 @@ namespace UnityEngine.Rendering.Universal.Internal
 
             ConfigureDescriptor(downsampling, ref srcDesc, out var filterMode);
 
-            destination = UniversalRenderer.CreateRenderGraphTexture(renderGraph, srcDesc, "_CameraOpaqueTexture", true, srcDesc.clearColor, filterMode);
-            
-            RenderInternal(renderGraph, destination, source, cameraData.xr.enabled);   
+            destination = UniversalRenderer.CreateRenderGraphTexture(
+                renderGraph,
+                srcDesc,
+                "_CameraOpaqueTexture",
+                true,
+                srcDesc.clearColor,
+                filterMode
+            );
+
+            RenderInternal(renderGraph, destination, source, cameraData.xr.enabled);
 
             return destination;
         }
@@ -173,7 +211,13 @@ namespace UnityEngine.Rendering.Universal.Internal
         // Typical use case is a persistent texture imported to the render graph. For example history textures.
         // Note that the amount of downsampling is determined by the destination size.
         // Therefore, the downsampling param controls only the algorithm (shader) used for the downsampling, not size.
-        internal void RenderToExistingTexture(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle destination, in TextureHandle source, Downsampling downsampling = Downsampling.None)
+        internal void RenderToExistingTexture(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle destination,
+            in TextureHandle source,
+            Downsampling downsampling = Downsampling.None
+        )
         {
             m_DownsamplingMethod = downsampling;
 
@@ -184,24 +228,52 @@ namespace UnityEngine.Rendering.Universal.Internal
         static readonly string k_CopyColorPassName = "Copy Color";
         static readonly string k_DownsampleAndCopyPassName = "Downsample Color";
 
-        private void RenderInternal(RenderGraph renderGraph, in TextureHandle destination, in TextureHandle source, bool useProceduralBlit)
+        private void RenderInternal(
+            RenderGraph renderGraph,
+            in TextureHandle destination,
+            in TextureHandle source,
+            bool useProceduralBlit
+        )
         {
             if (m_DownsamplingMethod != Downsampling.None)
             {
-                AddDownsampleAndCopyColorRenderPass(renderGraph, destination, source, useProceduralBlit, k_DownsampleAndCopyPassName);
+                AddDownsampleAndCopyColorRenderPass(
+                    renderGraph,
+                    destination,
+                    source,
+                    useProceduralBlit,
+                    k_DownsampleAndCopyPassName
+                );
             }
             else
             {
-                using (var builder = renderGraph.AddBlitPass(source, destination, Vector2.one, Vector2.zero, returnBuilder: true, passName: k_CopyColorPassName))
+                using (
+                    var builder = renderGraph.AddBlitPass(
+                        source,
+                        destination,
+                        Vector2.one,
+                        Vector2.zero,
+                        returnBuilder: true,
+                        passName: k_CopyColorPassName
+                    )
+                )
                 {
                     builder.SetGlobalTextureAfterPass(destination, Shader.PropertyToID("_CameraOpaqueTexture"));
                 }
             }
         }
 
-        private void AddDownsampleAndCopyColorRenderPass(RenderGraph renderGraph, in TextureHandle destination, in TextureHandle source, bool useProceduralBlit, string passName)
+        private void AddDownsampleAndCopyColorRenderPass(
+            RenderGraph renderGraph,
+            in TextureHandle destination,
+            in TextureHandle source,
+            bool useProceduralBlit,
+            string passName
+        )
         {
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 builder.SetRenderAttachment(destination, 0, AccessFlags.WriteAll);
                 passData.source = source;
@@ -214,10 +286,12 @@ namespace UnityEngine.Rendering.Universal.Internal
 
                 builder.SetGlobalTextureAfterPass(destination, Shader.PropertyToID("_CameraOpaqueTexture"));
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    ExecutePass(context.cmd, data, data.source, data.useProceduralBlit);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        ExecutePass(context.cmd, data, data.source, data.useProceduralBlit);
+                    }
+                );
             }
         }
     }

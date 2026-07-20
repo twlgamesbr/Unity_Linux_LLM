@@ -10,9 +10,9 @@ namespace Unity.Netcode
     /// Partially solves for message loss. Unclamped lerping helps hide this, but not completely
     /// </summary>
     /// <typeparam name="T">The type of interpolated value</typeparam>
-
     [Serializable]
-    public abstract class BufferedLinearInterpolator<T> where T : struct
+    public abstract class BufferedLinearInterpolator<T>
+        where T : struct
     {
         // Constant absolute value for max buffer count instead of dynamic time based value. This is in case we have very low tick rates, so
         // that we don't have a very small buffer because of this.
@@ -93,14 +93,17 @@ namespace Unity.Netcode
             /// The transform parent for this specific value measurement.
             /// </summary>
             internal Transform MeasurementParent;
+
             /// <summary>
             /// The item identifier
             /// </summary>
             public int ItemId;
+
             /// <summary>
             /// The item value
             /// </summary>
             public T Item;
+
             /// <summary>
             /// The time the item was sent.
             /// </summary>
@@ -242,6 +245,7 @@ namespace Unity.Netcode
         private int m_BufferCount;
         private int m_NbItemsReceivedThisFrame;
         private BufferedItem m_LastBufferedItemReceived;
+
         /// <summary>
         /// Represents the rate of change for the value being interpolated when smooth dampening is enabled.
         /// </summary>
@@ -282,9 +286,17 @@ namespace Unity.Netcode
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ConvertInterpolateStateValues(Transform parent, bool inLocalSpace)
         {
-            InterpolateState.CurrentValue = OnConvertTransformSpace(parent, InterpolateState.CurrentValue, inLocalSpace);
+            InterpolateState.CurrentValue = OnConvertTransformSpace(
+                parent,
+                InterpolateState.CurrentValue,
+                inLocalSpace
+            );
             InterpolateState.NextValue = OnConvertTransformSpace(parent, InterpolateState.NextValue, inLocalSpace);
-            InterpolateState.PreviousValue = OnConvertTransformSpace(parent, InterpolateState.PreviousValue, inLocalSpace);
+            InterpolateState.PreviousValue = OnConvertTransformSpace(
+                parent,
+                InterpolateState.PreviousValue,
+                inLocalSpace
+            );
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -345,7 +357,11 @@ namespace Unity.Netcode
             // In the event there is nothing left in the queue (i.e. motion/change stopped), we still need to determine if the target has been reached.
             if (!noStateSet && !InterpolateState.TargetReached)
             {
-                InterpolateState.TargetReached = IsApproximately(InterpolateState.CurrentValue, InterpolateState.Target.Value.Item, GetPrecision());
+                InterpolateState.TargetReached = IsApproximately(
+                    InterpolateState.CurrentValue,
+                    InterpolateState.Target.Value.Item,
+                    GetPrecision()
+                );
             }
 
             // Continue to process any remaining state updates in the queue (if any)
@@ -360,7 +376,10 @@ namespace Unity.Netcode
 
                 if (!noStateSet)
                 {
-                    potentialItemNeedsProcessing = ((potentialItem.TimeSent <= renderTime) && potentialItem.TimeSent > InterpolateState.Target.Value.TimeSent);
+                    potentialItemNeedsProcessing = (
+                        (potentialItem.TimeSent <= renderTime)
+                        && potentialItem.TimeSent > InterpolateState.Target.Value.TimeSent
+                    );
                 }
 
                 // If we haven't set a target or we have another item that needs processing.
@@ -433,7 +452,13 @@ namespace Unity.Netcode
         /// <param name="maxDeltaTime">The maximum time delta between the current and target value.</param>
         /// <param name="lerp">Determines whether to use smooth dampening or lerp interpolation type.</param>
         /// <returns>The newly interpolated value of type 'T'</returns>
-        internal T Update(float deltaTime, double tickLatencyAsTime, double minDeltaTime, double maxDeltaTime, bool lerp)
+        internal T Update(
+            float deltaTime,
+            double tickLatencyAsTime,
+            double minDeltaTime,
+            double maxDeltaTime,
+            bool lerp
+        )
         {
             TryConsumeFromBuffer(tickLatencyAsTime, minDeltaTime, maxDeltaTime);
             // Only begin interpolation when there is a start and end point
@@ -448,18 +473,32 @@ namespace Unity.Netcode
                     // SmoothDampen
                     if (!lerp)
                     {
-                        InterpolateState.NextValue = SmoothDamp(InterpolateState.NextValue, InterpolateState.Target.Value.Item, ref m_RateOfChange, (float)InterpolateState.TimeToTargetValue * InterpolateState.LerpT, deltaTime);
+                        InterpolateState.NextValue = SmoothDamp(
+                            InterpolateState.NextValue,
+                            InterpolateState.Target.Value.Item,
+                            ref m_RateOfChange,
+                            (float)InterpolateState.TimeToTargetValue * InterpolateState.LerpT,
+                            deltaTime
+                        );
                     }
-                    else// Lerp
+                    else // Lerp
                     {
-                        InterpolateState.NextValue = Interpolate(InterpolateState.PreviousValue, InterpolateState.Target.Value.Item, InterpolateState.LerpT);
+                        InterpolateState.NextValue = Interpolate(
+                            InterpolateState.PreviousValue,
+                            InterpolateState.Target.Value.Item,
+                            InterpolateState.LerpT
+                        );
                     }
 
                     // If lerp smoothing is enabled, then smooth current value towards the target value
                     if (LerpSmoothEnabled)
                     {
                         // Apply the smooth lerp to the target to help smooth the final value.
-                        InterpolateState.CurrentValue = Interpolate(InterpolateState.CurrentValue, InterpolateState.NextValue, Mathf.Clamp(1.0f - MaximumInterpolationTime, 0.0f, 1.0f));
+                        InterpolateState.CurrentValue = Interpolate(
+                            InterpolateState.CurrentValue,
+                            InterpolateState.NextValue,
+                            Mathf.Clamp(1.0f - MaximumInterpolationTime, 0.0f, 1.0f)
+                        );
                     }
                     else
                     {
@@ -476,7 +515,10 @@ namespace Unity.Netcode
                     // time to be calculated against the last calculated time which if there is an extended period of time between the two
                     // it would cause a large delta time period between the two states (i.e. it stops moving for a second or two and then
                     // starts moving again).
-                    if ((tickLatencyAsTime - InterpolateState.Target.Value.TimeSent) > InterpolateState.MaxDeltaTime + minDeltaTime)
+                    if (
+                        (tickLatencyAsTime - InterpolateState.Target.Value.TimeSent)
+                        > InterpolateState.MaxDeltaTime + minDeltaTime
+                    )
                     {
                         InterpolateState.Reset(InterpolateState.CurrentValue);
                     }
@@ -513,8 +555,14 @@ namespace Unity.Netcode
                     }
 
                     // Continue to processing until we reach the most current state
-                    if ((potentialItem.TimeSent <= serverTime) && // Inverted logic (below) from original since we have to go from past to present
-                        (!InterpolateState.Target.HasValue || potentialItem.TimeSent > InterpolateState.Target.Value.TimeSent))
+                    if (
+                        (potentialItem.TimeSent <= serverTime)
+                        && // Inverted logic (below) from original since we have to go from past to present
+                        (
+                            !InterpolateState.Target.HasValue
+                            || potentialItem.TimeSent > InterpolateState.Target.Value.TimeSent
+                        )
+                    )
                     {
                         if (m_BufferQueue.TryDequeue(out BufferedItem target))
                         {
@@ -538,7 +586,8 @@ namespace Unity.Netcode
                                     InterpolateState.TargetReached = false;
                                 }
                                 InterpolateState.EndTime = target.TimeSent;
-                                InterpolateState.TimeToTargetValue = InterpolateState.EndTime - InterpolateState.StartTime;
+                                InterpolateState.TimeToTargetValue =
+                                    InterpolateState.EndTime - InterpolateState.StartTime;
                                 InterpolateState.Target = target;
                             }
                             InterpolateState.TargetParent = target.MeasurementParent;
@@ -575,15 +624,27 @@ namespace Unity.Netcode
                 InterpolateState.LerpT = 1.0f;
                 if (InterpolateState.TimeToTargetValue > k_SmallValue)
                 {
-                    InterpolateState.LerpT = Math.Clamp((float)((renderTime - InterpolateState.StartTime) / InterpolateState.TimeToTargetValue), 0.0f, 1.0f);
+                    InterpolateState.LerpT = Math.Clamp(
+                        (float)((renderTime - InterpolateState.StartTime) / InterpolateState.TimeToTargetValue),
+                        0.0f,
+                        1.0f
+                    );
                 }
 
-                InterpolateState.NextValue = Interpolate(InterpolateState.PreviousValue, InterpolateState.Target.Value.Item, InterpolateState.LerpT);
+                InterpolateState.NextValue = Interpolate(
+                    InterpolateState.PreviousValue,
+                    InterpolateState.Target.Value.Item,
+                    InterpolateState.LerpT
+                );
 
                 if (LerpSmoothEnabled)
                 {
                     // Assure our MaximumInterpolationTime is valid and that the second lerp time ranges between deltaTime and 1.0f.
-                    InterpolateState.CurrentValue = Interpolate(InterpolateState.CurrentValue, InterpolateState.NextValue, deltaTime / MaximumInterpolationTime);
+                    InterpolateState.CurrentValue = Interpolate(
+                        InterpolateState.CurrentValue,
+                        InterpolateState.NextValue,
+                        deltaTime / MaximumInterpolationTime
+                    );
                 }
                 else
                 {
@@ -591,7 +652,11 @@ namespace Unity.Netcode
                 }
 
                 // Determine if we have reached our target
-                InterpolateState.TargetReached = IsApproximately(InterpolateState.CurrentValue, InterpolateState.Target.Value.Item, GetPrecision());
+                InterpolateState.TargetReached = IsApproximately(
+                    InterpolateState.CurrentValue,
+                    InterpolateState.Target.Value.Item,
+                    GetPrecision()
+                );
             }
             else // If the target is reached and we have no more state updates, we want to check to see if we need to reset.
             if (InterpolateState.TargetReached && m_BufferQueue.Count == 0)
@@ -747,7 +812,6 @@ namespace Unity.Netcode
         /// <returns>The interpolated value</returns>
         protected abstract T InterpolateUnclamped(T start, T end, float time);
 
-
         /// <summary>
         /// An alternate smoothing method to Lerp.
         /// </summary>
@@ -762,7 +826,14 @@ namespace Unity.Netcode
         /// <param name="maxSpeed">Maximum rate of change per pass.</param>
         /// <returns>The smoothed <see cref="T"/> value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private protected virtual T SmoothDamp(T current, T target, ref T rateOfChange, float duration, float deltaTime, float maxSpeed = Mathf.Infinity)
+        private protected virtual T SmoothDamp(
+            T current,
+            T target,
+            ref T rateOfChange,
+            float duration,
+            float deltaTime,
+            float maxSpeed = Mathf.Infinity
+        )
         {
             return target;
         }
@@ -811,7 +882,11 @@ namespace Unity.Netcode
                 entry.Item = OnConvertTransformSpace(transform, entry.Item, inLocalSpace);
                 m_BufferQueue.Enqueue(entry);
             }
-            InterpolateState.CurrentValue = OnConvertTransformSpace(transform, InterpolateState.CurrentValue, inLocalSpace);
+            InterpolateState.CurrentValue = OnConvertTransformSpace(
+                transform,
+                InterpolateState.CurrentValue,
+                inLocalSpace
+            );
             if (InterpolateState.Target.HasValue)
             {
                 var end = InterpolateState.Target.Value;

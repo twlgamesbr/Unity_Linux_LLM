@@ -15,6 +15,6 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Input events will be processed for state updates and input action interaction updates but interaction
         /// event notifications will be suppressed.
         /// </summary>
-        SuppressActionEventNotifications
+        SuppressActionEventNotifications,
     }
 }

@@ -18,16 +18,16 @@ namespace Unity.Multiplayer.Tools.NetStats
     /// default implementation on the interface.
     static class IEventMetricExtensions
     {
-        public static bool WentOverLimit(this IEventMetric metric)
-            => metric.NumberOfValuesReceived > metric.MaxNumberOfValues;
+        public static bool WentOverLimit(this IEventMetric metric) =>
+            metric.NumberOfValuesReceived > metric.MaxNumberOfValues;
 
-        public static int NumberOfValuesIgnored(this IEventMetric metric)
-            => metric.NumberOfValuesReceived - metric.Count;
+        public static int NumberOfValuesIgnored(this IEventMetric metric) =>
+            metric.NumberOfValuesReceived - metric.Count;
 
         public static string WentOverLimitMessage(this IEventMetric metric) =>
-            $"Multiplayer Tools: Metric {metric.Name} received {metric.NumberOfValuesReceived} values, " +
-            $"which exceeds the limit of {metric.MaxNumberOfValues}. " +
-            $"{metric.NumberOfValuesIgnored()} values were ignored.";
+            $"Multiplayer Tools: Metric {metric.Name} received {metric.NumberOfValuesReceived} values, "
+            + $"which exceeds the limit of {metric.MaxNumberOfValues}. "
+            + $"{metric.NumberOfValuesIgnored()} values were ignored.";
     }
 
     interface IEventMetric<TValue> : IEventMetric

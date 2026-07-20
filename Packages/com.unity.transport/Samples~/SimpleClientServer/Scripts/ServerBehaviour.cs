@@ -1,6 +1,6 @@
-using UnityEngine;
 using Unity.Collections;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 namespace Unity.Networking.Transport.Samples
 {

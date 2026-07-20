@@ -141,7 +141,7 @@ namespace UnityEngine.InputSystem.XInput
         /// </remarks>
         internal enum DeviceType
         {
-            Gamepad = 0x00
+            Gamepad = 0x00,
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace UnityEngine.InputSystem.XInput
             /// <see cref="Gamepad.leftStick"/>, <see cref="Gamepad.rightStick"/>,
             /// <see cref="Gamepad.leftStickButton"/> and <see cref="Gamepad.rightStickButton"/> are optional.
             /// </remarks>
-            ArcadePad = 0x13
+            ArcadePad = 0x13,
         }
 
         /// <summary>

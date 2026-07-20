@@ -14,7 +14,7 @@ namespace Unity.Rendering
         /// <summary>
         /// The LOD parent group.
         /// </summary>
-        public Entity    ParentGroup;
+        public Entity ParentGroup;
 
         /// <summary>
         /// The LOD mask.
@@ -22,22 +22,22 @@ namespace Unity.Rendering
         /// <remarks>
         /// Each bit matches with one of the 8 possible LOD levels.
         /// </remarks>
-        public int       ParentMask;
+        public int ParentMask;
 
         /// <summary>
         /// The LOD distances for the four closest LODS.
         /// </summary>
-        public float4    LODDistances0;
+        public float4 LODDistances0;
 
         /// <summary>
         /// The LOD distances for the four furthest LODS.
         /// </summary>
-        public float4    LODDistances1;
+        public float4 LODDistances1;
 
         /// <summary>
         /// The local reference point which Entities Graphics uses to calculate the distance from the camera to the LOD group.
         /// </summary>
-        public float3    LocalReferencePoint;
+        public float3 LocalReferencePoint;
     }
 
     /// <summary>
@@ -51,10 +51,7 @@ namespace Unity.Rendering
         public float3 Value;
     }
 
-    internal struct SkipLODGroupWorldReferencePointUpdate : IComponentData
-    {
-
-    }
+    internal struct SkipLODGroupWorldReferencePointUpdate : IComponentData { }
 
     /// <summary>
     /// A component that stores data for managing Level of Detail (LOD) for LODGroups.
@@ -65,17 +62,17 @@ namespace Unity.Rendering
         /// <summary>
         /// The LOD group entity.
         /// </summary>
-        public Entity   Group;
+        public Entity Group;
 
         /// <summary>
         /// The LOD parent group. This is used internally to optimize the LOD system.
         /// </summary>
-        public Entity   ParentGroup;
+        public Entity ParentGroup;
 
         /// <summary>
         /// The LOD mask.
         /// </summary>
-        public int      LODMask;
+        public int LODMask;
     }
 
     internal struct MeshLodInfoComponent : IComponentData

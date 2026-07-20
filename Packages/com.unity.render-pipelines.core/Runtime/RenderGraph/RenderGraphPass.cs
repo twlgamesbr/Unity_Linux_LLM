@@ -1,6 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace UnityEngine.Rendering.RenderGraphModule
@@ -39,7 +39,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
         public ShadingRateCombiner fragmentShadingRateCombiner { get; protected set; }
 
         // Used by native pass compiler only
-        public TextureAccess[] fragmentInputAccess { get; protected set; } = new TextureAccess[RenderGraph.kMaxMRTCount];
+        public TextureAccess[] fragmentInputAccess { get; protected set; } =
+            new TextureAccess[RenderGraph.kMaxMRTCount];
         public int fragmentInputMaxIndex { get; protected set; } = -1;
 
         public struct RandomWriteResourceInfo
@@ -49,7 +50,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
         }
 
         // This list can contain both texture and buffer resources based on their binding index.
-        public RandomWriteResourceInfo[] randomAccessResource { get; protected set; } = new RandomWriteResourceInfo[RenderGraph.kMaxMRTCount];
+        public RandomWriteResourceInfo[] randomAccessResource { get; protected set; } =
+            new RandomWriteResourceInfo[RenderGraph.kMaxMRTCount];
         public int randomAccessResourceMaxIndex { get; protected set; } = -1;
 
         public bool generateDebugData { get; protected set; }
@@ -58,7 +60,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         public List<ResourceHandle>[] resourceReadLists = new List<ResourceHandle>[(int)RenderGraphResourceType.Count];
         public List<ResourceHandle>[] resourceWriteLists = new List<ResourceHandle>[(int)RenderGraphResourceType.Count];
-        public List<ResourceHandle>[] transientResourceList = new List<ResourceHandle>[(int)RenderGraphResourceType.Count];
+        public List<ResourceHandle>[] transientResourceList = new List<ResourceHandle>[
+            (int)RenderGraphResourceType.Count
+        ];
 
         public List<RendererListHandle> usedRendererListList = new List<RendererListHandle>();
 
@@ -128,7 +132,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasRenderAttachments()
         {
-            return depthAccess.textureHandle.IsValid() || colorBufferAccess[0].textureHandle.IsValid() || colorBufferMaxIndex > 0;
+            return depthAccess.textureHandle.IsValid()
+                || colorBufferAccess[0].textureHandle.IsValid()
+                || colorBufferMaxIndex > 0;
         }
 
         // Checks if the resource is involved in this pass
@@ -192,13 +198,15 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 return true;
             for (int i = 0; i < colorBufferAccess.Length; i++)
             {
-                if (colorBufferAccess[i].textureHandle.IsValid() && colorBufferAccess[i].textureHandle.handle.index == res.handle.index)
+                if (
+                    colorBufferAccess[i].textureHandle.IsValid()
+                    && colorBufferAccess[i].textureHandle.handle.index == res.handle.index
+                )
                     return true;
             }
 
             return false;
         }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddResourceWrite(in ResourceHandle res)
@@ -271,10 +279,19 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         // Sets up the color buffer for this pass but not any resource Read/Writes for it
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetColorBufferRaw(in TextureHandle resource, int index, AccessFlags accessFlags, int mipLevel, int depthSlice)
+        public void SetColorBufferRaw(
+            in TextureHandle resource,
+            int index,
+            AccessFlags accessFlags,
+            int mipLevel,
+            int depthSlice
+        )
         {
             Debug.Assert(index < RenderGraph.kMaxMRTCount && index >= 0);
-            if (colorBufferAccess[index].textureHandle.handle.Equals(resource.handle) || !colorBufferAccess[index].textureHandle.IsValid())
+            if (
+                colorBufferAccess[index].textureHandle.handle.Equals(resource.handle)
+                || !colorBufferAccess[index].textureHandle.IsValid()
+            )
             {
                 colorBufferMaxIndex = Math.Max(colorBufferMaxIndex, index);
                 colorBufferAccess[index] = new TextureAccess(resource, accessFlags, mipLevel, depthSlice);
@@ -284,18 +301,28 @@ namespace UnityEngine.Rendering.RenderGraphModule
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                 // You tried to do SetRenderAttachment(tex1, 1, ..); SetRenderAttachment(tex2, 1, ..); that is not valid for different textures on the same index
                 throw new InvalidOperationException(
-                    $"In pass '{name}' when trying to call SetRenderAttachment with resource of type {resource.handle.type} at index {index} - " +
-                    RenderGraph.RenderGraphExceptionMessages.k_MoreThanOneResourceForMRTIndex);
+                    $"In pass '{name}' when trying to call SetRenderAttachment with resource of type {resource.handle.type} at index {index} - "
+                        + RenderGraph.RenderGraphExceptionMessages.k_MoreThanOneResourceForMRTIndex
+                );
 #endif
             }
         }
 
         // Sets up the color buffer for this pass but not any resource Read/Writes for it
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetFragmentInputRaw(in TextureHandle resource, int index, AccessFlags accessFlags, int mipLevel, int depthSlice)
+        public void SetFragmentInputRaw(
+            in TextureHandle resource,
+            int index,
+            AccessFlags accessFlags,
+            int mipLevel,
+            int depthSlice
+        )
         {
             Debug.Assert(index < RenderGraph.kMaxMRTCount && index >= 0);
-            if (fragmentInputAccess[index].textureHandle.handle.Equals(resource.handle) || !fragmentInputAccess[index].textureHandle.IsValid())
+            if (
+                fragmentInputAccess[index].textureHandle.handle.Equals(resource.handle)
+                || !fragmentInputAccess[index].textureHandle.IsValid()
+            )
             {
                 fragmentInputMaxIndex = Math.Max(fragmentInputMaxIndex, index);
                 fragmentInputAccess[index] = new TextureAccess(resource, accessFlags, mipLevel, depthSlice);
@@ -305,15 +332,21 @@ namespace UnityEngine.Rendering.RenderGraphModule
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                 // You tried to do SetRenderAttachment(tex1, 1, ..); SetRenderAttachment(tex2, 1, ..); that is not valid for different textures on the same index
                 throw new InvalidOperationException(
-                    $"In pass '{name}' when trying to call SetInputAttachment with resource of type {resource.handle.type} at index {index} - " +
-                    RenderGraph.RenderGraphExceptionMessages.k_MoreThanOneTextureForFragInputIndex);
+                    $"In pass '{name}' when trying to call SetInputAttachment with resource of type {resource.handle.type} at index {index} - "
+                        + RenderGraph.RenderGraphExceptionMessages.k_MoreThanOneTextureForFragInputIndex
+                );
 #endif
             }
         }
 
         // Sets up the color buffer for this pass but not any resource Read/Writes for it
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRandomWriteResourceRaw(in ResourceHandle resource, int index, bool preserveCounterValue, AccessFlags accessFlags)
+        public void SetRandomWriteResourceRaw(
+            in ResourceHandle resource,
+            int index,
+            bool preserveCounterValue,
+            AccessFlags accessFlags
+        )
         {
             Debug.Assert(index < RenderGraph.kMaxMRTCount && index >= 0);
             if (randomAccessResource[index].h.Equals(resource) || !randomAccessResource[index].h.IsValid())
@@ -327,11 +360,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
             {
                 // You tried to do SetRenderAttachment(tex1, 1, ..); SetRenderAttachment(tex2, 1, ..); that is not valid for different textures on the same index
                 throw new InvalidOperationException(
-                    $"In pass '{name}' when trying to call SetRandomAccessAttachment/UseBufferRandomAccess with resource of type {resource.type} at index {index} - " +
-                    RenderGraph.RenderGraphExceptionMessages.k_MoreThanOneTextureRandomWriteInputIndex);
+                    $"In pass '{name}' when trying to call SetRandomAccessAttachment/UseBufferRandomAccess with resource of type {resource.type} at index {index} - "
+                        + RenderGraph.RenderGraphExceptionMessages.k_MoreThanOneTextureRandomWriteInputIndex
+                );
             }
         }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetDepthBuffer(in TextureHandle resource, DepthAccess flags)
@@ -356,15 +389,20 @@ namespace UnityEngine.Rendering.RenderGraphModule
             else
             {
                 throw new InvalidOperationException(
-                    $"In pass '{name}' when trying to call SetRenderAttachmentDepth with resource of type {resource.handle.type} at index {index} - " +
-                    RenderGraph.RenderGraphExceptionMessages.k_MultipleDepthTextures);
+                    $"In pass '{name}' when trying to call SetRenderAttachmentDepth with resource of type {resource.handle.type} at index {index} - "
+                        + RenderGraph.RenderGraphExceptionMessages.k_MultipleDepthTextures
+                );
             }
 #endif
         }
 
         // Here we want to keep computation to a minimum and only hash what will influence NRP compiler: Pass merging, load/store actions etc.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ComputeTextureHash(ref HashFNV1A32 generator, in ResourceHandle handle, RenderGraphResourceRegistry resources)
+        void ComputeTextureHash(
+            ref HashFNV1A32 generator,
+            in ResourceHandle handle,
+            RenderGraphResourceRegistry resources
+        )
         {
             if (handle.index == 0)
                 return;
@@ -378,8 +416,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 var externalTexture = graphicsResource.externalTexture;
                 if (externalTexture != null) // External texture
                 {
-                    generator.Append((int) externalTexture.graphicsFormat);
-                    generator.Append((int) externalTexture.dimension);
+                    generator.Append((int)externalTexture.graphicsFormat);
+                    generator.Append((int)externalTexture.dimension);
                     generator.Append(externalTexture.width);
                     generator.Append(externalTexture.height);
                     if (externalTexture is RenderTexture externalRT)
@@ -388,8 +426,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 else if (graphicsResource.rt != null) // Regular RTHandle
                 {
                     var rt = graphicsResource.rt;
-                    generator.Append((int) rt.graphicsFormat);
-                    generator.Append((int) rt.dimension);
+                    generator.Append((int)rt.graphicsFormat);
+                    generator.Append((int)rt.dimension);
                     generator.Append(rt.antiAliasing);
                     if (graphicsResource.useScaling)
                         if (graphicsResource.scaleFunc != null)
@@ -405,9 +443,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 else if (graphicsResource.nameID != default) // External RTI
                 {
                     // The only info we have is from the provided desc upon importing.
-                    generator.Append((int) desc.format);
-                    generator.Append((int) desc.dimension);
-                    generator.Append((int) desc.msaaSamples);
+                    generator.Append((int)desc.format);
+                    generator.Append((int)desc.dimension);
+                    generator.Append((int)desc.msaaSamples);
                     generator.Append(desc.width);
                     generator.Append(desc.height);
                 }
@@ -419,9 +457,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
             else
             {
                 ref readonly var desc = ref resources.GetTextureResourceDesc(handle);
-                generator.Append((int) desc.format);
-                generator.Append((int) desc.dimension);
-                generator.Append((int) desc.msaaSamples);
+                generator.Append((int)desc.format);
+                generator.Append((int)desc.dimension);
+                generator.Append((int)desc.msaaSamples);
                 generator.Append(desc.clearBuffer);
                 generator.Append(desc.discardBuffer);
                 switch (desc.sizeMode)
@@ -441,10 +479,14 @@ namespace UnityEngine.Rendering.RenderGraphModule
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void ComputeHashForTextureAccess(ref HashFNV1A32 generator, in ResourceHandle handle, in TextureAccess textureAccess)
+        static void ComputeHashForTextureAccess(
+            ref HashFNV1A32 generator,
+            in ResourceHandle handle,
+            in TextureAccess textureAccess
+        )
         {
             generator.Append(handle.index);
-            generator.Append((int) textureAccess.flags);
+            generator.Append((int)textureAccess.flags);
             generator.Append(textureAccess.mipLevel);
             generator.Append(textureAccess.depthSlice);
         }
@@ -453,7 +495,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         // Avoid mass function calls to get the hashCode and compute locally instead.
         public void ComputeHash(ref HashFNV1A32 generator, RenderGraphResourceRegistry resources)
         {
-            generator.Append((int) type);
+            generator.Append((int)type);
             generator.Append(enableAsyncCompute);
             generator.Append(allowPassCulling);
             generator.Append(allowGlobalState);
@@ -569,7 +611,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
             }
         }
 
-        public void SetShadingRateImage(in TextureHandle shadingRateImage, AccessFlags accessFlags, int mipLevel, int depthSlice)
+        public void SetShadingRateImage(
+            in TextureHandle shadingRateImage,
+            AccessFlags accessFlags,
+            int mipLevel,
+            int depthSlice
+        )
         {
             if (ShadingRateInfo.supportsPerImageTile)
             {
@@ -624,7 +671,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
         internal BaseRenderFunc<PassData, TRenderGraphContext> renderFunc;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Initialize(int passIndex, PassData passData, string passName, RenderGraphPassType passType, ProfilingSampler sampler)
+        public void Initialize(
+            int passIndex,
+            PassData passData,
+            string passName,
+            RenderGraphPassType passType,
+            ProfilingSampler sampler
+        )
         {
             Clear();
             index = passIndex;
@@ -656,7 +709,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
     }
 
     [DebuggerDisplay("RenderPass: {name} (Index:{index} Async:{enableAsyncCompute})")]
-    [Obsolete("RenderGraphPass is deprecated, use RasterRenderGraphPass/ComputeRenderGraphPass/UnsafeRenderGraphPass instead.")]
+    [Obsolete(
+        "RenderGraphPass is deprecated, use RasterRenderGraphPass/ComputeRenderGraphPass/UnsafeRenderGraphPass instead."
+    )]
     internal sealed class RenderGraphPass<PassData> : BaseRenderGraphPass<PassData, RenderGraphContext>
         where PassData : class, new()
     {
@@ -681,7 +736,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
     [DebuggerDisplay("RenderPass: {name} (Index:{index} Async:{enableAsyncCompute})")]
     internal sealed class ComputeRenderGraphPass<PassData> : BaseRenderGraphPass<PassData, ComputeGraphContext>
-    where PassData : class, new()
+        where PassData : class, new()
     {
         internal static ComputeGraphContext c = new ComputeGraphContext();
 
@@ -704,7 +759,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
     [DebuggerDisplay("RenderPass: {name} (Index:{index} Async:{enableAsyncCompute})")]
     internal sealed class RasterRenderGraphPass<PassData> : BaseRenderGraphPass<PassData, RasterGraphContext>
-    where PassData : class, new()
+        where PassData : class, new()
     {
         internal static RasterGraphContext c = new RasterGraphContext();
 

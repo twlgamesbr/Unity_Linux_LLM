@@ -23,6 +23,6 @@ namespace UnityEditor.Rendering.Universal
         /// A positive value shifts pixels closer to the Camera, so that Unity draws the decal GameObject on top of the overlapping mesh, which prevents z-fighting.
         /// Decal projectors ignore this property.
         /// </summary>
-        ViewBias = 1
+        ViewBias = 1,
     }
 }

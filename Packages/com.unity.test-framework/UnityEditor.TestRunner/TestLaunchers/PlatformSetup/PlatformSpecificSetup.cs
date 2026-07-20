@@ -9,8 +9,10 @@ namespace UnityEditor.TestTools.TestRunner
     {
         [SerializeField]
         private ApplePlatformSetup m_AppleiOSPlatformSetup = new ApplePlatformSetup(BuildTarget.iOS);
+
         [SerializeField]
         private ApplePlatformSetup m_AppleTvOSPlatformSetup = new ApplePlatformSetup(BuildTarget.tvOS);
+
 #if !UNITY_2021_1_OR_NEWER
         [SerializeField]
         private XboxOnePlatformSetup m_XboxOnePlatformSetup = new XboxOnePlatformSetup();
@@ -26,9 +28,7 @@ namespace UnityEditor.TestTools.TestRunner
         [SerializeField]
         private BuildTarget m_Target;
 
-        public PlatformSpecificSetup()
-        {
-        }
+        public PlatformSpecificSetup() { }
 
         public PlatformSpecificSetup(BuildTarget target)
         {
@@ -99,23 +99,23 @@ namespace UnityEditor.TestTools.TestRunner
         {
             m_SetupTypes = new Dictionary<BuildTarget, IPlatformSetup>
             {
-                {BuildTarget.iOS, m_AppleiOSPlatformSetup},
-                {BuildTarget.tvOS, m_AppleTvOSPlatformSetup},
+                { BuildTarget.iOS, m_AppleiOSPlatformSetup },
+                { BuildTarget.tvOS, m_AppleTvOSPlatformSetup },
 #if !UNITY_2021_1_OR_NEWER
-                {BuildTarget.XboxOne, m_XboxOnePlatformSetup},
+                { BuildTarget.XboxOne, m_XboxOnePlatformSetup },
 #endif
-                {BuildTarget.GameCoreXboxOne, m_GameCorePlatformSetup},
-                {BuildTarget.GameCoreXboxSeries, m_GameCorePlatformSetup},
-                {BuildTarget.Android, m_AndroidPlatformSetup},
-                {BuildTarget.WSAPlayer, m_UwpPlatformSetup},
+                { BuildTarget.GameCoreXboxOne, m_GameCorePlatformSetup },
+                { BuildTarget.GameCoreXboxSeries, m_GameCorePlatformSetup },
+                { BuildTarget.Android, m_AndroidPlatformSetup },
+                { BuildTarget.WSAPlayer, m_UwpPlatformSetup },
 #if !UNITY_2022_2_OR_NEWER
-                {BuildTarget.Lumin, m_LuminPlatformSetup},
+                { BuildTarget.Lumin, m_LuminPlatformSetup },
 #endif
 #if !UNITY_2023_1_OR_NEWER
-                {BuildTarget.Stadia, m_StadiaPlatformSetup},
+                { BuildTarget.Stadia, m_StadiaPlatformSetup },
 #endif
-                {BuildTarget.Switch, m_SwitchPlatformSetup},
-                {BuildTarget.Switch2, m_Switch2PlatformSetup}
+                { BuildTarget.Switch, m_SwitchPlatformSetup },
+                { BuildTarget.Switch2, m_Switch2PlatformSetup },
             };
             return m_SetupTypes;
         }

@@ -60,12 +60,13 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
                 s_OwnershipInActiveIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(k_NonOwnerLightIconPath);
             }
         }
+
 #if UNITY_6000_4_OR_NEWER
         static void EntityDecoratorHandler(EntityId entityId, Rect rect)
         {
             if (!s_Enabled)
                 return;
-            s_TextStyle ??= new GUIStyle(EditorStyles.label) {padding = new RectOffset(0, 0, 0, 0)};
+            s_TextStyle ??= new GUIStyle(EditorStyles.label) { padding = new RectOffset(0, 0, 0, 0) };
 
             var gameObject = EditorUtility.EntityIdToObject(entityId) as GameObject;
             if (gameObject == null)
@@ -76,8 +77,9 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 #else
         static void InstanceDecoratorHandler(int instanceID, Rect rect)
         {
-            if (!s_Enabled) return;
-            s_TextStyle ??= new GUIStyle(EditorStyles.label) {padding = new RectOffset(0, 0, 0, 0)};
+            if (!s_Enabled)
+                return;
+            s_TextStyle ??= new GUIStyle(EditorStyles.label) { padding = new RectOffset(0, 0, 0, 0) };
 
             var gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
             if (gameObject == null)
@@ -86,6 +88,7 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
             RenderNetworkObjectIcon(rect, gameObject);
         }
 #endif
+
         static void RenderNetworkObjectIcon(Rect rect, GameObject go)
         {
             if (!go.TryGetComponent<NetworkObject>(out var no))

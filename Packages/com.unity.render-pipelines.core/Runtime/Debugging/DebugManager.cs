@@ -77,6 +77,7 @@ namespace UnityEngine.Rendering
     public sealed partial class DebugManager
     {
         static readonly Lazy<DebugManager> s_Instance = new Lazy<DebugManager>(() => new DebugManager());
+
         /// <summary>
         /// Global instance of the DebugManager.
         /// </summary>
@@ -122,8 +123,8 @@ namespace UnityEngine.Rendering
         internal void ForEachWidget(Action<DebugUI.Widget> action)
         {
             foreach (var panel in m_Panels)
-                foreach (var widget in panel.children)
-                    ForEachWidgetInContainer(widget, action);
+            foreach (var widget in panel.children)
+                ForEachWidgetInContainer(widget, action);
         }
 
         /// <summary>
@@ -159,15 +160,11 @@ namespace UnityEngine.Rendering
         /// </summary>
         public bool isAnyDebugUIActive
         {
-            get
-            {
-                return
-                    displayRuntimeUI || displayPersistentRuntimeUI
+            get { return displayRuntimeUI || displayPersistentRuntimeUI
 #if UNITY_EDITOR
                     || displayEditorUI
 #endif
-                    ;
-            }
+                ; }
         }
 
         DebugManager()
@@ -246,7 +243,6 @@ namespace UnityEngine.Rendering
 
             displayPersistentRuntimeUI = true;
 
-
             switch (widget)
             {
                 case DebugUI.Value value:
@@ -297,13 +293,15 @@ namespace UnityEngine.Rendering
             return -1;
         }
 
-
         /// <summary>
         /// Returns the panel display name
         /// </summary>
         /// <param name="panelIndex">The panelIndex for the panel to get the name</param>
         /// <returns>The display name of the panel, or empty string otherwise</returns>
-        [Obsolete("Method is obsolete. Use PanelDisplayName instead. #from(6000.4) (UnityUpgradable) -> PanelDisplayName", true)]
+        [Obsolete(
+            "Method is obsolete. Use PanelDisplayName instead. #from(6000.4) (UnityUpgradable) -> PanelDisplayName",
+            true
+        )]
         public string PanelDiplayName(int panelIndex)
         {
             return PanelDisplayName(panelIndex);
@@ -366,7 +364,12 @@ namespace UnityEngine.Rendering
         /// <param name="groupIndex">Group index.</param>
         /// <param name="overrideIfExist">Replace an existing panel.</param>
         /// <returns>The requested debug panel or null if it does not exist and createIfNull is set to false</returns>
-        public DebugUI.Panel GetPanel(string displayName, bool createIfNull = false, int groupIndex = 0, bool overrideIfExist = false)
+        public DebugUI.Panel GetPanel(
+            string displayName,
+            bool createIfNull = false,
+            int groupIndex = 0,
+            bool overrideIfExist = false
+        )
         {
             int panelIndex = PanelIndex(displayName);
             DebugUI.Panel p = panelIndex >= 0 ? m_Panels[panelIndex] : null;
@@ -399,8 +402,7 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <param name="displayName">The display name of the panel to find.</param>
         /// <returns>The index of the panel in the list. -1 if not found.</returns>
-        public int FindPanelIndex(string displayName)
-            => m_Panels.FindIndex(p => p.displayName == displayName);
+        public int FindPanelIndex(string displayName) => m_Panels.FindIndex(p => p.displayName == displayName);
 
         // TODO: Use a query path here as well instead of a display name
         /// <summary>

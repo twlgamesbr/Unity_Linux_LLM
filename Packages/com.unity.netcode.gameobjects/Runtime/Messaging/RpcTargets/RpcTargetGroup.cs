@@ -26,7 +26,12 @@ namespace Unity.Netcode
             m_LocalSendRpcTarget.Dispose();
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             foreach (var target in Targets)
             {
@@ -72,7 +77,8 @@ namespace Unity.Netcode
             Targets.Clear();
         }
 
-        internal RpcTargetGroup(NetworkManager manager) : base(manager)
+        internal RpcTargetGroup(NetworkManager manager)
+            : base(manager)
         {
             m_LocalSendRpcTarget = new LocalSendRpcTarget(manager);
         }

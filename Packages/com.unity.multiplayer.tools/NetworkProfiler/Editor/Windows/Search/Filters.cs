@@ -12,7 +12,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
     {
         public static List<IRowData> PartialMatchGameObjectFilter(
             IEnumerable<IRowData> searchListEntries,
-            string queryString)
+            string queryString
+        )
         {
             var parsedFilters = new ParsedFilters(queryString);
             return searchListEntries.Where(parsedFilters.Match).ToList();
@@ -42,13 +43,15 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         }
 
         delegate Filter ArgumentParser(string argument);
+
         class FilterType
         {
             public FilterType(
                 string keyword,
                 string @operator,
                 ArgumentParser argumentParser,
-                string additionalOperator = null)
+                string additionalOperator = null
+            )
             {
                 Keyword = keyword;
 
@@ -85,78 +88,108 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
         static ParsedFilters()
         {
-            k_FilterTypes = new ReadOnlyCollection<FilterType>(new[]
-            {
-                new FilterType("dir", ":", argument =>
+            k_FilterTypes = new ReadOnlyCollection<FilterType>(
+                new[]
                 {
-                    return argument switch
-                    {
-                        "in" => row => row.Bytes.Received > 0,
-                        "out" => row => row.Bytes.Sent > 0,
-                        _ => null
-                    };
-                }),
-                new FilterType("t", ":", argument =>
-                {
-                    return row => row.TypeName.Contains(argument);
-                }),
-                new FilterType("b", "<", argument =>
-                {
-                    return long.TryParse(argument, out var value)
-                        ? row => row.Bytes.Total < value
-                        : (Filter)null;
-                }),
-                new FilterType("b", ">", argument =>
-                {
-                    return long.TryParse(argument, out var value)
-                        ? row => row.Bytes.Total > value
-                        : (Filter)null;
-                }),
-                new FilterType("b", "<=", argument =>
-                {
-                    return long.TryParse(argument, out var value)
-                        ? row => row.Bytes.Total <= value
-                        : (Filter)null;
-                }),
-                new FilterType("b", ">=", argument =>
-                {
-                    return long.TryParse(argument, out var value)
-                        ? row => row.Bytes.Total >= value
-                        : (Filter)null;
-                }),
-                new FilterType("b", "==", additionalOperator: "=", argumentParser: argument =>
-                {
-                    return long.TryParse(argument, out var value)
-                        ? row => row.Bytes.Total == value
-                        : (Filter)null;
-                }),
-                new FilterType("b", "!=", argument =>
-                {
-                    return long.TryParse(argument, out var value)
-                        ? row => row.Bytes.Total != value
-                        : (Filter)null;
-                }),
-            });
+                    new FilterType(
+                        "dir",
+                        ":",
+                        argument =>
+                        {
+                            return argument switch
+                            {
+                                "in" => row => row.Bytes.Received > 0,
+                                "out" => row => row.Bytes.Sent > 0,
+                                _ => null,
+                            };
+                        }
+                    ),
+                    new FilterType(
+                        "t",
+                        ":",
+                        argument =>
+                        {
+                            return row => row.TypeName.Contains(argument);
+                        }
+                    ),
+                    new FilterType(
+                        "b",
+                        "<",
+                        argument =>
+                        {
+                            return long.TryParse(argument, out var value)
+                                ? row => row.Bytes.Total < value
+                                : (Filter)null;
+                        }
+                    ),
+                    new FilterType(
+                        "b",
+                        ">",
+                        argument =>
+                        {
+                            return long.TryParse(argument, out var value)
+                                ? row => row.Bytes.Total > value
+                                : (Filter)null;
+                        }
+                    ),
+                    new FilterType(
+                        "b",
+                        "<=",
+                        argument =>
+                        {
+                            return long.TryParse(argument, out var value)
+                                ? row => row.Bytes.Total <= value
+                                : (Filter)null;
+                        }
+                    ),
+                    new FilterType(
+                        "b",
+                        ">=",
+                        argument =>
+                        {
+                            return long.TryParse(argument, out var value)
+                                ? row => row.Bytes.Total >= value
+                                : (Filter)null;
+                        }
+                    ),
+                    new FilterType(
+                        "b",
+                        "==",
+                        additionalOperator: "=",
+                        argumentParser: argument =>
+                        {
+                            return long.TryParse(argument, out var value)
+                                ? row => row.Bytes.Total == value
+                                : (Filter)null;
+                        }
+                    ),
+                    new FilterType(
+                        "b",
+                        "!=",
+                        argument =>
+                        {
+                            return long.TryParse(argument, out var value)
+                                ? row => row.Bytes.Total != value
+                                : (Filter)null;
+                        }
+                    ),
+                }
+            );
 
-            k_Keywords = new ReadOnlyCollection<string>(
-                k_FilterTypes
-                    .Select(t => t.Keyword)
-                    .Distinct()
-                    .ToList());
+            k_Keywords = new ReadOnlyCollection<string>(k_FilterTypes.Select(t => t.Keyword).Distinct().ToList());
 
             k_Operators = new ReadOnlyCollection<string>(
-                k_FilterTypes
-                    .SelectMany(t => t.Operators)
-                    .Distinct()
-                    .OrderByDescending(s => s.Length)
-                    .ToList());
+                k_FilterTypes.SelectMany(t => t.Operators).Distinct().OrderByDescending(s => s.Length).ToList()
+            );
 
-            k_ParseTable =
-                k_FilterTypes
-                    .SelectMany(t =>
-                        t.Operators.Select(@operator =>
-                            new Tuple<string, ArgumentParser>(t.Keyword + @operator, t.ArgumentParser)))
-                    .ToDictionary(t => t.Item1, t => t.Item2);
+            k_ParseTable = k_FilterTypes
+                .SelectMany(t =>
+                    t.Operators.Select(@operator => new Tuple<string, ArgumentParser>(
+                        t.Keyword + @operator,
+                        t.ArgumentParser
+                    ))
+                )
+                .ToDictionary(t => t.Item1, t => t.Item2);
         }
 
         /// All commands are composed of a keyword, an operator, and an argument, so any potential command
@@ -192,6 +225,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         }
 
         static bool IsNotWhiteSpace(string s) => !string.IsNullOrWhiteSpace(s);
+
         static bool IsNonEmpty(string s) => !string.IsNullOrEmpty(s);
 
         public ParsedFilters(string queryString)
@@ -272,7 +306,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
             return new PotentialCommandAndLastTokenIndex(
                 new PotentialCommand(keyword, opString, argument),
-                argumentIndex);
+                argumentIndex
+            );
         }
 
         bool TryParsePotentialCommand(PotentialCommand command)

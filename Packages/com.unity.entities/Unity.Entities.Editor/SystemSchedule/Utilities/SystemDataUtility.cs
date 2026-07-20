@@ -84,7 +84,7 @@ namespace Unity.Entities.Editor
         public bool IsRunning
         {
             get => (Flags & SystemStateFlags.IsRunning) != 0;
-            set => Flags = value ? Flags | SystemStateFlags.IsRunning :Flags & ~SystemStateFlags.IsRunning;
+            set => Flags = value ? Flags | SystemStateFlags.IsRunning : Flags & ~SystemStateFlags.IsRunning;
         }
     }
 }

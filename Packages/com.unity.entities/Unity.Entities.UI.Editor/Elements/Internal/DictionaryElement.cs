@@ -35,12 +35,14 @@ namespace Unity.Entities.UI
                 m_Reload = reload;
                 (this as IBindable).binding = this;
                 Resources.Templates.AddCollectionItem.Clone(this);
-                m_ShowAddKeyContainerButton = this.Q<Button>(className: UssClasses.AddKeyDictionaryElement.ShowContainerButton);
+                m_ShowAddKeyContainerButton = this.Q<Button>(
+                    className: UssClasses.AddKeyDictionaryElement.ShowContainerButton
+                );
                 m_ShowAddKeyContainerButton.clickable.clicked += ShowContainer;
                 m_AddKeyContainer = this.Q<VisualElement>(className: UssClasses.AddKeyDictionaryElement.Container);
                 m_AddKeyContainer.Hide();
                 m_PropertyElement = this.Q<PropertyElement>(className: UssClasses.AddKeyDictionaryElement.Key);
-                this.Q<Button>(className:UssClasses.AddKeyDictionaryElement.Cancel).clickable.clicked += OnCancel;
+                this.Q<Button>(className: UssClasses.AddKeyDictionaryElement.Cancel).clickable.clicked += OnCancel;
                 m_AddKeyToDictionaryButton = this.Q<Button>(className: UssClasses.AddKeyDictionaryElement.Add);
                 m_AddKeyToDictionaryButton.clickable.clicked += OnAdd;
                 m_ErrorIcon = this.Q(className: UssClasses.AddKeyDictionaryElement.Error);
@@ -73,9 +75,7 @@ namespace Unity.Entities.UI
                 m_AddKeyContainer.Hide();
             }
 
-            void IBinding.PreUpdate()
-            {
-            }
+            void IBinding.PreUpdate() { }
 
             void IBinding.Update()
             {
@@ -101,28 +101,32 @@ namespace Unity.Entities.UI
                 }
             }
 
-            void IBinding.Release()
-            {
-            }
+            void IBinding.Release() { }
         }
 
         class DictionaryAdapter : IInspectorVisit<KeyValuePair<TKey, TValue>>
         {
             DictionaryElement<TDictionary, TKey, TValue> DictionaryElement;
 
-            public DictionaryAdapter(DictionaryElement<TDictionary, TKey, TValue>  dictionaryElement)
+            public DictionaryAdapter(DictionaryElement<TDictionary, TKey, TValue> dictionaryElement)
             {
                 DictionaryElement = dictionaryElement;
             }
 
-            public bool Visit<TContainer>(InspectorVisitor.InspectorContext inspectorContext, IProperty<TContainer> property, ref KeyValuePair<TKey, TValue> value, PropertyPath path)
+            public bool Visit<TContainer>(
+                InspectorVisitor.InspectorContext inspectorContext,
+                IProperty<TContainer> property,
+                ref KeyValuePair<TKey, TValue> value,
+                PropertyPath path
+            )
             {
                 var visitor = DictionaryElement.GetVisitor();
                 var inspector =
-                    (IInspector<KeyValuePair<TKey, TValue>>) new KeyValuePairPropertyInspector<TDictionary, TKey, TValue>
-                    {
-                        DictionaryElement = DictionaryElement
-                    };
+                    (IInspector<KeyValuePair<TKey, TValue>>)
+                        new KeyValuePairPropertyInspector<TDictionary, TKey, TValue>
+                        {
+                            DictionaryElement = DictionaryElement,
+                        };
 
                 inspector.Context = new InspectorContext<KeyValuePair<TKey, TValue>>(
                     visitor.Context.Root,
@@ -130,10 +134,7 @@ namespace Unity.Entities.UI
                     property
                 );
 
-                var customInspector = new CustomInspectorElement(
-                    path,
-                    inspector,
-                    visitor.Context.Root);
+                var customInspector = new CustomInspectorElement(path, inspector, visitor.Context.Root);
                 visitor.Context.Parent.contentContainer.Add(customInspector);
                 return true;
             }
@@ -172,12 +173,16 @@ namespace Unity.Entities.UI
                 var list = ListPool<PropertyElement>.Get();
                 try
                 {
-                    this.Query<PropertyElement>(className: UssClasses.KeyValuePairElement.Key)
-                        .ToList(list);
+                    this.Query<PropertyElement>(className: UssClasses.KeyValuePairElement.Key).ToList(list);
                     foreach (var keyElement in list)
                     {
-                        if (ContainsKey(keyElement
-                            .GetTarget<KeyValuePairPropertyInspector<TDictionary, TKey, TValue>.KeyContainer>().Key))
+                        if (
+                            ContainsKey(
+                                keyElement
+                                    .GetTarget<KeyValuePairPropertyInspector<TDictionary, TKey, TValue>.KeyContainer>()
+                                    .Key
+                            )
+                        )
                             continue;
 
                         Reload();
@@ -186,10 +191,12 @@ namespace Unity.Entities.UI
 
                     return;
                 }
-                finally{
+                finally
                 {
-                    ListPool<PropertyElement>.Release(list);
-                }}
+                    {
+                        ListPool<PropertyElement>.Release(list);
+                    }
+                }
             }
 
             Reload();

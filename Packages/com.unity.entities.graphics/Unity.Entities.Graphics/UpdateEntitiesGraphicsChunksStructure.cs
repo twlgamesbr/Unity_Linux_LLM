@@ -22,45 +22,48 @@ namespace Unity.Rendering
         /// </summary>
         protected override void OnCreate()
         {
-            m_MissingHybridChunkInfo = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[]
+            m_MissingHybridChunkInfo = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ChunkComponentReadOnly<ChunkWorldRenderBounds>(),
-                    ComponentType.ReadOnly<WorldRenderBounds>(),
-                    ComponentType.ReadOnly<LocalToWorld>(),
-                    ComponentType.ReadOnly<MaterialMeshInfo>(),
-                },
-                None = new[]
-                {
-                    ComponentType.ChunkComponentReadOnly<EntitiesGraphicsChunkInfo>(),
-                    ComponentType.ReadOnly<DisableRendering>(),
-                },
+                    All = new[]
+                    {
+                        ComponentType.ChunkComponentReadOnly<ChunkWorldRenderBounds>(),
+                        ComponentType.ReadOnly<WorldRenderBounds>(),
+                        ComponentType.ReadOnly<LocalToWorld>(),
+                        ComponentType.ReadOnly<MaterialMeshInfo>(),
+                    },
+                    None = new[]
+                    {
+                        ComponentType.ChunkComponentReadOnly<EntitiesGraphicsChunkInfo>(),
+                        ComponentType.ReadOnly<DisableRendering>(),
+                    },
 
-                // TODO: Add chunk component to disabled entities and prefab entities to work around
-                // the fragmentation issue where entities are not added to existing chunks with chunk
-                // components. Remove this once chunk components don't affect archetype matching
-                // on entity creation.
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
-            });
+                    // TODO: Add chunk component to disabled entities and prefab entities to work around
+                    // the fragmentation issue where entities are not added to existing chunks with chunk
+                    // components. Remove this once chunk components don't affect archetype matching
+                    // on entity creation.
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_DisabledRenderingQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[]
+            m_DisabledRenderingQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ChunkComponentReadOnly<EntitiesGraphicsChunkInfo>(),
-                    ComponentType.ReadOnly<DisableRendering>(),
-                },
-            });
+                    All = new[]
+                    {
+                        ComponentType.ChunkComponentReadOnly<EntitiesGraphicsChunkInfo>(),
+                        ComponentType.ReadOnly<DisableRendering>(),
+                    },
+                }
+            );
 
 #if UNITY_EDITOR
-            m_HasHybridChunkInfo = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[]
+            m_HasHybridChunkInfo = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ChunkComponentReadOnly<EntitiesGraphicsChunkInfo>(),
-                },
-            });
+                    All = new[] { ComponentType.ChunkComponentReadOnly<EntitiesGraphicsChunkInfo>() },
+                }
+            );
 #endif
         }
 
@@ -79,7 +82,10 @@ namespace Unity.Rendering
                 }
 #endif
 
-                EntityManager.AddComponent(m_MissingHybridChunkInfo, ComponentType.ChunkComponent<EntitiesGraphicsChunkInfo>());
+                EntityManager.AddComponent(
+                    m_MissingHybridChunkInfo,
+                    ComponentType.ChunkComponent<EntitiesGraphicsChunkInfo>()
+                );
                 EntityManager.RemoveChunkComponentData<EntitiesGraphicsChunkInfo>(m_DisabledRenderingQuery);
             }
             UnityEngine.Profiling.Profiler.EndSample();

@@ -73,9 +73,11 @@ namespace UnityEngine.InputSystem.Editor
                             continue;
 
                         // Grab <TValue> parameter from InputParameterEditor<>.
-                        var objectType =
-                            TypeHelpers.GetGenericTypeArgumentFromHierarchy(definedType, typeof(InputParameterEditor<>),
-                                0);
+                        var objectType = TypeHelpers.GetGenericTypeArgumentFromHierarchy(
+                            definedType,
+                            typeof(InputParameterEditor<>),
+                            0
+                        );
                         if (objectType == null)
                             continue;
 
@@ -166,9 +168,7 @@ namespace UnityEngine.InputSystem.Editor
         /// <summary>
         /// Called after the parameter editor has been initialized.
         /// </summary>
-        protected virtual void OnEnable()
-        {
-        }
+        protected virtual void OnEnable() { }
 
         internal override void SetTarget(object target)
         {
@@ -178,7 +178,8 @@ namespace UnityEngine.InputSystem.Editor
             if (!(target is TObject targetOfType))
                 throw new ArgumentException(
                     $"Expecting object of type '{typeof(TObject).Name}' but got object of type '{target.GetType().Name}' instead",
-                    nameof(target));
+                    nameof(target)
+                );
 
             this.target = targetOfType;
             base.target = targetOfType;
@@ -190,9 +191,7 @@ namespace UnityEngine.InputSystem.Editor
         /// Default stub implementation of <see cref="InputParameterEditor.OnDrawVisualElements"/>.
         /// Should be overridden to create the desired UI.
         /// </summary>
-        public override void OnDrawVisualElements(VisualElement root, Action onChangedCallback)
-        {
-        }
+        public override void OnDrawVisualElements(VisualElement root, Action onChangedCallback) { }
 
         /// <summary>
         /// Helper for parameters that have defaults (usually from <see cref="InputSettings"/>).
@@ -202,26 +201,35 @@ namespace UnityEngine.InputSystem.Editor
         /// </remarks>
         internal class CustomOrDefaultSetting
         {
-            public void Initialize(string label, string tooltip, string defaultName, Func<float> getValue,
-                Action<float> setValue, Func<float> getDefaultValue, bool defaultComesFromInputSettings = true,
-                float defaultInitializedValue = default)
+            public void Initialize(
+                string label,
+                string tooltip,
+                string defaultName,
+                Func<float> getValue,
+                Action<float> setValue,
+                Func<float> getDefaultValue,
+                bool defaultComesFromInputSettings = true,
+                float defaultInitializedValue = default
+            )
             {
                 m_GetValue = getValue;
                 m_SetValue = setValue;
                 m_GetDefaultValue = getDefaultValue;
-                m_ToggleLabel = EditorGUIUtility.TrTextContent("Default",
+                m_ToggleLabel = EditorGUIUtility.TrTextContent(
+                    "Default",
                     defaultComesFromInputSettings
-                    ? $"If enabled, the default {label.ToLowerInvariant()} configured globally in the input settings is used. See Edit >> Project Settings... >> Input (NEW)."
-                    : "If enabled, the default value is used.");
+                        ? $"If enabled, the default {label.ToLowerInvariant()} configured globally in the input settings is used. See Edit >> Project Settings... >> Input (NEW)."
+                        : "If enabled, the default value is used."
+                );
                 m_ValueLabel = EditorGUIUtility.TrTextContent(label, tooltip);
                 if (defaultComesFromInputSettings)
                     m_OpenInputSettingsLabel = EditorGUIUtility.TrTextContent("Open Input Settings");
                 m_DefaultInitializedValue = defaultInitializedValue;
                 m_UseDefaultValue = Mathf.Approximately(getValue(), defaultInitializedValue);
                 m_DefaultComesFromInputSettings = defaultComesFromInputSettings;
-                m_HelpBoxText =
-                    EditorGUIUtility.TrTextContent(
-                        $"Uses \"{defaultName}\" set in project-wide input settings.");
+                m_HelpBoxText = EditorGUIUtility.TrTextContent(
+                    $"Uses \"{defaultName}\" set in project-wide input settings."
+                );
             }
 
             public void OnDrawVisualElements(VisualElement root, Action onChangedCallback)
@@ -254,22 +262,16 @@ namespace UnityEngine.InputSystem.Editor
                 m_DefaultToggle = new Toggle("Default")
                 {
                     value = m_UseDefaultValue,
-                    style =
-                    {
-                        flexDirection = FlexDirection.RowReverse
-                    }
+                    style = { flexDirection = FlexDirection.RowReverse },
                 };
                 m_DefaultToggle.RegisterValueChangedCallback(evt => ToggleUseDefaultValue(evt, onChangedCallback));
                 m_DefaultToggle.Q<Label>().style.minWidth = new StyleLength(StyleKeyword.Auto);
 
-                var buttonContainer = new VisualElement
+                var buttonContainer = new VisualElement { style = { flexDirection = FlexDirection.RowReverse } };
+                m_OpenInputSettingsButton = new Button(InputSettingsProvider.Open)
                 {
-                    style =
-                    {
-                        flexDirection = FlexDirection.RowReverse
-                    }
+                    text = m_OpenInputSettingsLabel.text,
                 };
-                m_OpenInputSettingsButton = new Button(InputSettingsProvider.Open){text = m_OpenInputSettingsLabel.text};
                 m_OpenInputSettingsButton.AddToClassList("open-settings-button");
 
                 settingsContainer.Add(m_FloatField);
@@ -288,12 +290,12 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             private void OnAttachToPanel(AttachToPanelEvent evt)
-            {   // Monitor changes to settings for as long as the panel is attached to a visual tree
+            { // Monitor changes to settings for as long as the panel is attached to a visual tree
                 InputSystem.onSettingsChange += InputSystemOnSettingsChange;
             }
 
             private void OnDetachFromPanel(DetachFromPanelEvent evt)
-            {   // Stop monitoring changes to settings when panel is no longer part of a visual tree
+            { // Stop monitoring changes to settings when panel is no longer part of a visual tree
                 InputSystem.onSettingsChange -= InputSystemOnSettingsChange;
             }
 

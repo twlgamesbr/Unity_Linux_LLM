@@ -13,12 +13,14 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// IMPORTANT: Make sure you do not write to the value! There are no checks for this!
         /// </summary>
-        public static unsafe ref T UnsafeElementAt<T>(this NativeArray<T> array, int index) where T : struct
+        public static unsafe ref T UnsafeElementAt<T>(this NativeArray<T> array, int index)
+            where T : struct
         {
             return ref UnsafeUtility.ArrayElementAsRef<T>(array.GetUnsafeReadOnlyPtr(), index);
         }
 
-        public static unsafe ref T UnsafeElementAtMutable<T>(this NativeArray<T> array, int index) where T : struct
+        public static unsafe ref T UnsafeElementAtMutable<T>(this NativeArray<T> array, int index)
+            where T : struct
         {
             return ref UnsafeUtility.ArrayElementAsRef<T>(array.GetUnsafePtr(), index);
         }
@@ -57,13 +59,13 @@ namespace UnityEngine.Rendering.Universal
         Upscaling,
 
         /// Downscaling to a smaller image
-        Downscaling
+        Downscaling,
     }
 
     /// <summary>
     /// Enumeration that indicates what kind of upscaling filter is being used
     /// </summary>
-    /// 
+    ///
 #if ENABLE_UPSCALER_FRAMEWORK
     [Obsolete("ImageUpscalingFilter is no longer used #from(6000.3)")]
 #endif
@@ -142,7 +144,10 @@ namespace UnityEngine.Rendering.Universal
         /// True if the pipeline supports dynamic batching.
         /// This settings doesn't apply when drawing shadow casters. Dynamic batching is always disabled when drawing shadow casters.
         /// </summary>
-        [Obsolete("supportsDynamicBatching is deprecated and will be removed in a future release. #from(6000.5)", false)]
+        [Obsolete(
+            "supportsDynamicBatching is deprecated and will be removed in a future release. #from(6000.5)",
+            false
+        )]
         public ref bool supportsDynamicBatching => ref frameData.Get<UniversalRenderingData>().supportsDynamicBatching;
 
         /// <summary>
@@ -186,7 +191,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Maximum amount of lights that can be shaded per-object. This value only affects forward rendering.
         /// </summary>
-        public ref int maxPerObjectAdditionalLightsCount => ref frameData.Get<UniversalLightData>().maxPerObjectAdditionalLightsCount;
+        public ref int maxPerObjectAdditionalLightsCount =>
+            ref frameData.Get<UniversalLightData>().maxPerObjectAdditionalLightsCount;
 
         /// <summary>
         /// List of visible lights returned by culling.
@@ -196,7 +202,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// True if additional lights should be shaded in vertex shader, otherwise additional lights will be shaded per pixel.
         /// </summary>
-        public ref bool shadeAdditionalLightsPerVertex => ref frameData.Get<UniversalLightData>().shadeAdditionalLightsPerVertex;
+        public ref bool shadeAdditionalLightsPerVertex =>
+            ref frameData.Get<UniversalLightData>().shadeAdditionalLightsPerVertex;
 
         /// <summary>
         /// True if mixed lighting is supported.
@@ -206,7 +213,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// True if box projection is enabled for reflection probes.
         /// </summary>
-        public ref bool reflectionProbeBoxProjection => ref frameData.Get<UniversalLightData>().reflectionProbeBoxProjection;
+        public ref bool reflectionProbeBoxProjection =>
+            ref frameData.Get<UniversalLightData>().reflectionProbeBoxProjection;
 
         /// <summary>
         /// True if blending is enabled for reflection probes.
@@ -229,7 +237,6 @@ namespace UnityEngine.Rendering.Universal
         public ref bool supportsAdditionalLights => ref frameData.Get<UniversalLightData>().supportsAdditionalLights;
     }
 
-
     /// <summary>
     /// Struct that holds settings related to camera.
     /// </summary>
@@ -249,10 +256,17 @@ namespace UnityEngine.Rendering.Universal
             frameData.Get<UniversalCameraData>().SetViewAndProjectionMatrix(viewMatrix, projectionMatrix);
         }
 
-        internal void SetViewProjectionAndJitterMatrix(Matrix4x4 viewMatrix, Matrix4x4 projectionMatrix, Matrix4x4 jitterMatrix)
+        internal void SetViewProjectionAndJitterMatrix(
+            Matrix4x4 viewMatrix,
+            Matrix4x4 projectionMatrix,
+            Matrix4x4 jitterMatrix
+        )
         {
-            frameData.Get<UniversalCameraData>().SetViewProjectionAndJitterMatrix(viewMatrix, projectionMatrix, jitterMatrix);
+            frameData
+                .Get<UniversalCameraData>()
+                .SetViewProjectionAndJitterMatrix(viewMatrix, projectionMatrix, jitterMatrix);
         }
+
         // Helper function to populate builtin stereo matricies as well as URP stereo matricies
         internal void PushBuiltinShaderConstantsXR(RasterCommandBuffer cmd, bool renderIntoTexture)
         {
@@ -314,7 +328,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Render texture settings used to create intermediate camera textures for rendering.
         /// </summary>
-        public ref RenderTextureDescriptor cameraTargetDescriptor => ref frameData.Get<UniversalCameraData>().cameraTargetDescriptor;
+        public ref RenderTextureDescriptor cameraTargetDescriptor =>
+            ref frameData.Get<UniversalCameraData>().cameraTargetDescriptor;
         internal ref Rect pixelRect => ref frameData.Get<UniversalCameraData>().pixelRect;
         internal ref bool useScreenCoordOverride => ref frameData.Get<UniversalCameraData>().useScreenCoordOverride;
         internal ref Vector4 screenSizeOverride => ref frameData.Get<UniversalCameraData>().screenSizeOverride;
@@ -328,13 +343,15 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public ref float renderScale => ref frameData.Get<UniversalCameraData>().renderScale;
         internal ref ImageScalingMode imageScalingMode => ref frameData.Get<UniversalCameraData>().imageScalingMode;
+
 #if ENABLE_UPSCALER_FRAMEWORK
         [Obsolete("upscalingFilter is no longer used #from(6000.3)")]
 #endif
         internal ref ImageUpscalingFilter upscalingFilter => ref frameData.Get<UniversalCameraData>().upscalingFilter;
         internal ref bool fsrOverrideSharpness => ref frameData.Get<UniversalCameraData>().fsrOverrideSharpness;
         internal ref float fsrSharpness => ref frameData.Get<UniversalCameraData>().fsrSharpness;
-        internal ref HDRColorBufferPrecision hdrColorBufferPrecision => ref frameData.Get<UniversalCameraData>().hdrColorBufferPrecision;
+        internal ref HDRColorBufferPrecision hdrColorBufferPrecision =>
+            ref frameData.Get<UniversalCameraData>().hdrColorBufferPrecision;
 
         /// <summary>
         /// True if this camera should clear depth buffer. This setting only applies to cameras of type <c>CameraRenderType.Overlay</c>
@@ -381,7 +398,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Returns true if post processing passes require depth texture.
         /// </summary>
-        public ref bool postProcessingRequiresDepthTexture => ref frameData.Get<UniversalCameraData>().postProcessingRequiresDepthTexture;
+        public ref bool postProcessingRequiresDepthTexture =>
+            ref frameData.Get<UniversalCameraData>().postProcessingRequiresDepthTexture;
 
         /// <summary>
         /// Returns true if XR rendering is enabled.
@@ -412,7 +430,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// HDR Display information about the current display this camera is rendering to.
         /// </summary>
-        public HDROutputUtils.HDRDisplayInformation hdrDisplayInformation => frameData.Get<UniversalCameraData>().hdrDisplayInformation;
+        public HDROutputUtils.HDRDisplayInformation hdrDisplayInformation =>
+            frameData.Get<UniversalCameraData>().hdrDisplayInformation;
 
         /// <summary>
         /// HDR Display Color Gamut
@@ -465,7 +484,8 @@ namespace UnityEngine.Rendering.Universal
         /// benefit for more optimal static batching.
         /// </summary>
         /// <seealso cref="SortingCriteria"/>
-        public ref SortingCriteria defaultOpaqueSortFlags => ref frameData.Get<UniversalCameraData>().defaultOpaqueSortFlags;
+        public ref SortingCriteria defaultOpaqueSortFlags =>
+            ref frameData.Get<UniversalCameraData>().defaultOpaqueSortFlags;
 
         /// <summary>
         /// XRPass holds the render target information and a list of XRView.
@@ -492,7 +512,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Provides set actions to the renderer to be triggered at the end of the render loop for camera capture.
         /// </summary>
-        public ref IEnumerator<Action<RenderTargetIdentifier, CommandBuffer>> captureActions => ref frameData.Get<UniversalCameraData>().captureActions;
+        public ref IEnumerator<Action<RenderTargetIdentifier, CommandBuffer>> captureActions =>
+            ref frameData.Get<UniversalCameraData>().captureActions;
 
         /// <summary>
         /// The camera volume layer mask.
@@ -531,7 +552,8 @@ namespace UnityEngine.Rendering.Universal
         /// <see cref="antialiasingQuality"/>
         /// <seealso cref="AntialiasingMode"/>
         /// </summary>
-        public ref AntialiasingQuality antialiasingQuality => ref frameData.Get<UniversalCameraData>().antialiasingQuality;
+        public ref AntialiasingQuality antialiasingQuality =>
+            ref frameData.Get<UniversalCameraData>().antialiasingQuality;
 
         /// <summary>
         /// Returns the current renderer used by this camera.
@@ -609,39 +631,46 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// The number of shadow cascades.
         /// </summary>
-        public ref int mainLightShadowCascadesCount => ref frameData.Get<UniversalShadowData>().mainLightShadowCascadesCount;
+        public ref int mainLightShadowCascadesCount =>
+            ref frameData.Get<UniversalShadowData>().mainLightShadowCascadesCount;
 
         /// <summary>
         /// The split between cascades.
         /// </summary>
-        public ref Vector3 mainLightShadowCascadesSplit => ref frameData.Get<UniversalShadowData>().mainLightShadowCascadesSplit;
+        public ref Vector3 mainLightShadowCascadesSplit =>
+            ref frameData.Get<UniversalShadowData>().mainLightShadowCascadesSplit;
 
         /// <summary>
         /// Main light last cascade shadow fade border.
         /// Value represents the width of shadow fade that ranges from 0 to 1.
         /// Where value 0 is used for no shadow fade.
         /// </summary>
-        public ref float mainLightShadowCascadeBorder => ref frameData.Get<UniversalShadowData>().mainLightShadowCascadeBorder;
+        public ref float mainLightShadowCascadeBorder =>
+            ref frameData.Get<UniversalShadowData>().mainLightShadowCascadeBorder;
 
         /// <summary>
         /// True if additional lights shadows are enabled.
         /// </summary>
-        public ref bool supportsAdditionalLightShadows => ref frameData.Get<UniversalShadowData>().supportsAdditionalLightShadows;
+        public ref bool supportsAdditionalLightShadows =>
+            ref frameData.Get<UniversalShadowData>().supportsAdditionalLightShadows;
 
         /// <summary>
         /// True if additional lights shadows are enabled in the URP Asset
         /// </summary>
-        internal ref bool additionalLightShadowsEnabled => ref frameData.Get<UniversalShadowData>().additionalLightShadowsEnabled;
+        internal ref bool additionalLightShadowsEnabled =>
+            ref frameData.Get<UniversalShadowData>().additionalLightShadowsEnabled;
 
         /// <summary>
         /// The width of the additional light shadow map.
         /// </summary>
-        public ref int additionalLightsShadowmapWidth => ref frameData.Get<UniversalShadowData>().additionalLightsShadowmapWidth;
+        public ref int additionalLightsShadowmapWidth =>
+            ref frameData.Get<UniversalShadowData>().additionalLightsShadowmapWidth;
 
         /// <summary>
         /// The height of the additional light shadow map.
         /// </summary>
-        public ref int additionalLightsShadowmapHeight => ref frameData.Get<UniversalShadowData>().additionalLightsShadowmapHeight;
+        public ref int additionalLightsShadowmapHeight =>
+            ref frameData.Get<UniversalShadowData>().additionalLightsShadowmapHeight;
 
         /// <summary>
         /// True if soft shadows are enabled.
@@ -663,14 +692,21 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public ref List<int> resolution => ref frameData.Get<UniversalShadowData>().resolution;
 
-        internal ref bool isKeywordAdditionalLightShadowsEnabled => ref frameData.Get<UniversalShadowData>().isKeywordAdditionalLightShadowsEnabled;
-        internal ref bool isKeywordSoftShadowsEnabled => ref frameData.Get<UniversalShadowData>().isKeywordSoftShadowsEnabled;
-        internal ref int mainLightShadowResolution => ref frameData.Get<UniversalShadowData>().mainLightShadowResolution;
-        internal ref int mainLightRenderTargetWidth => ref frameData.Get<UniversalShadowData>().mainLightRenderTargetWidth;
-        internal ref int mainLightRenderTargetHeight => ref frameData.Get<UniversalShadowData>().mainLightRenderTargetHeight;
+        internal ref bool isKeywordAdditionalLightShadowsEnabled =>
+            ref frameData.Get<UniversalShadowData>().isKeywordAdditionalLightShadowsEnabled;
+        internal ref bool isKeywordSoftShadowsEnabled =>
+            ref frameData.Get<UniversalShadowData>().isKeywordSoftShadowsEnabled;
+        internal ref int mainLightShadowResolution =>
+            ref frameData.Get<UniversalShadowData>().mainLightShadowResolution;
+        internal ref int mainLightRenderTargetWidth =>
+            ref frameData.Get<UniversalShadowData>().mainLightRenderTargetWidth;
+        internal ref int mainLightRenderTargetHeight =>
+            ref frameData.Get<UniversalShadowData>().mainLightRenderTargetHeight;
 
-        internal ref NativeArray<URPLightShadowCullingInfos> visibleLightsShadowCullingInfos => ref frameData.Get<UniversalShadowData>().visibleLightsShadowCullingInfos;
-        internal ref AdditionalLightsShadowAtlasLayout shadowAtlasLayout => ref frameData.Get<UniversalShadowData>().shadowAtlasLayout;
+        internal ref NativeArray<URPLightShadowCullingInfos> visibleLightsShadowCullingInfos =>
+            ref frameData.Get<UniversalShadowData>().visibleLightsShadowCullingInfos;
+        internal ref AdditionalLightsShadowAtlasLayout shadowAtlasLayout =>
+            ref frameData.Get<UniversalShadowData>().shadowAtlasLayout;
     }
 
     /// <summary>
@@ -709,12 +745,12 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// The tile ID.
         /// </summary>
-        public uint tileID;         // 2x 16 bits
+        public uint tileID; // 2x 16 bits
 
         /// <summary>
         /// The list bit mask.
         /// </summary>
-        public uint listBitMask;    // 32 bits
+        public uint listBitMask; // 32 bits
 
         /// <summary>
         /// The relative light offset.
@@ -755,7 +791,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// The direction for spot lights.
         /// </summary>
-        public Vector3 spotDirection;   // for spotLights
+        public Vector3 spotDirection; // for spotLights
 
         /// <summary>
         /// The flags used.
@@ -831,8 +867,12 @@ namespace UnityEngine.Rendering.Universal
         public static readonly int previousViewProjectionNoJitter = Shader.PropertyToID("_PrevViewProjMatrix");
         public static readonly int viewProjectionNoJitter = Shader.PropertyToID("_NonJitteredViewProjMatrix");
 #if ENABLE_VR && ENABLE_XR_MODULE
-        public static readonly int previousViewProjectionNoJitterStereo = Shader.PropertyToID("_PrevViewProjMatrixStereo");
-        public static readonly int viewProjectionNoJitterStereo = Shader.PropertyToID("_NonJitteredViewProjMatrixStereo");
+        public static readonly int previousViewProjectionNoJitterStereo = Shader.PropertyToID(
+            "_PrevViewProjMatrixStereo"
+        );
+        public static readonly int viewProjectionNoJitterStereo = Shader.PropertyToID(
+            "_NonJitteredViewProjMatrixStereo"
+        );
 #endif
 
         public static readonly int blitTexture = Shader.PropertyToID("_BlitTexture");
@@ -871,7 +911,8 @@ namespace UnityEngine.Rendering.Universal
             this.frameData = frameData;
         }
 
-        internal UniversalPostProcessingData universalPostProcessingData => frameData.Get<UniversalPostProcessingData>();
+        internal UniversalPostProcessingData universalPostProcessingData =>
+            frameData.Get<UniversalPostProcessingData>();
 
         /// <summary>
         /// The <c>ColorGradingMode</c> to use.
@@ -887,17 +928,20 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// True if fast approximation functions are used when converting between the sRGB and Linear color spaces, false otherwise.
         /// </summary>
-        public ref bool useFastSRGBLinearConversion => ref frameData.Get<UniversalPostProcessingData>().useFastSRGBLinearConversion;
+        public ref bool useFastSRGBLinearConversion =>
+            ref frameData.Get<UniversalPostProcessingData>().useFastSRGBLinearConversion;
 
         /// <summary>
         /// Returns true if Screen Space Lens Flare are supported by this asset, false otherwise.
         /// </summary>
-        public ref bool supportScreenSpaceLensFlare => ref frameData.Get<UniversalPostProcessingData>().supportScreenSpaceLensFlare;
+        public ref bool supportScreenSpaceLensFlare =>
+            ref frameData.Get<UniversalPostProcessingData>().supportScreenSpaceLensFlare;
 
         /// <summary>
         /// Returns true if Data Driven Lens Flare are supported by this asset, false otherwise.
         /// </summary>
-        public ref bool supportDataDrivenLensFlare => ref frameData.Get<UniversalPostProcessingData>().supportDataDrivenLensFlare;
+        public ref bool supportDataDrivenLensFlare =>
+            ref frameData.Get<UniversalPostProcessingData>().supportDataDrivenLensFlare;
     }
 
     internal static class ShaderGlobalKeywords
@@ -1023,27 +1067,49 @@ namespace UnityEngine.Rendering.Universal
         {
             // Init all keywords upfront
             ShaderGlobalKeywords.MainLightShadows = GlobalKeyword.Create(ShaderKeywordStrings.MainLightShadows);
-            ShaderGlobalKeywords.MainLightShadowCascades = GlobalKeyword.Create(ShaderKeywordStrings.MainLightShadowCascades);
-            ShaderGlobalKeywords.MainLightShadowScreen = GlobalKeyword.Create(ShaderKeywordStrings.MainLightShadowScreen);
-            ShaderGlobalKeywords.CastingPunctualLightShadow = GlobalKeyword.Create(ShaderKeywordStrings.CastingPunctualLightShadow);
-            ShaderGlobalKeywords.AdditionalLightsVertex = GlobalKeyword.Create(ShaderKeywordStrings.AdditionalLightsVertex);
-            ShaderGlobalKeywords.AdditionalLightsPixel = GlobalKeyword.Create(ShaderKeywordStrings.AdditionalLightsPixel);
+            ShaderGlobalKeywords.MainLightShadowCascades = GlobalKeyword.Create(
+                ShaderKeywordStrings.MainLightShadowCascades
+            );
+            ShaderGlobalKeywords.MainLightShadowScreen = GlobalKeyword.Create(
+                ShaderKeywordStrings.MainLightShadowScreen
+            );
+            ShaderGlobalKeywords.CastingPunctualLightShadow = GlobalKeyword.Create(
+                ShaderKeywordStrings.CastingPunctualLightShadow
+            );
+            ShaderGlobalKeywords.AdditionalLightsVertex = GlobalKeyword.Create(
+                ShaderKeywordStrings.AdditionalLightsVertex
+            );
+            ShaderGlobalKeywords.AdditionalLightsPixel = GlobalKeyword.Create(
+                ShaderKeywordStrings.AdditionalLightsPixel
+            );
             ShaderGlobalKeywords.ClusterLightLoop = GlobalKeyword.Create(ShaderKeywordStrings.ClusterLightLoop);
-            ShaderGlobalKeywords.AdditionalLightShadows = GlobalKeyword.Create(ShaderKeywordStrings.AdditionalLightShadows);
-            ShaderGlobalKeywords.ReflectionProbeBoxProjection = GlobalKeyword.Create(ShaderKeywordStrings.ReflectionProbeBoxProjection);
-            ShaderGlobalKeywords.ReflectionProbeBlending = GlobalKeyword.Create(ShaderKeywordStrings.ReflectionProbeBlending);
+            ShaderGlobalKeywords.AdditionalLightShadows = GlobalKeyword.Create(
+                ShaderKeywordStrings.AdditionalLightShadows
+            );
+            ShaderGlobalKeywords.ReflectionProbeBoxProjection = GlobalKeyword.Create(
+                ShaderKeywordStrings.ReflectionProbeBoxProjection
+            );
+            ShaderGlobalKeywords.ReflectionProbeBlending = GlobalKeyword.Create(
+                ShaderKeywordStrings.ReflectionProbeBlending
+            );
             ShaderGlobalKeywords.ReflectionProbeAtlas = GlobalKeyword.Create(ShaderKeywordStrings.ReflectionProbeAtlas);
-            ShaderGlobalKeywords.ReflectionProbeRotation = GlobalKeyword.Create(ShaderKeywordStrings.ReflectionProbeRotation);
+            ShaderGlobalKeywords.ReflectionProbeRotation = GlobalKeyword.Create(
+                ShaderKeywordStrings.ReflectionProbeRotation
+            );
             ShaderGlobalKeywords.SoftShadows = GlobalKeyword.Create(ShaderKeywordStrings.SoftShadows);
             ShaderGlobalKeywords.SoftShadowsLow = GlobalKeyword.Create(ShaderKeywordStrings.SoftShadowsLow);
             ShaderGlobalKeywords.SoftShadowsMedium = GlobalKeyword.Create(ShaderKeywordStrings.SoftShadowsMedium);
             ShaderGlobalKeywords.SoftShadowsHigh = GlobalKeyword.Create(ShaderKeywordStrings.SoftShadowsHigh);
-            ShaderGlobalKeywords.MixedLightingSubtractive = GlobalKeyword.Create(ShaderKeywordStrings.MixedLightingSubtractive);
+            ShaderGlobalKeywords.MixedLightingSubtractive = GlobalKeyword.Create(
+                ShaderKeywordStrings.MixedLightingSubtractive
+            );
             ShaderGlobalKeywords.LightmapShadowMixing = GlobalKeyword.Create(ShaderKeywordStrings.LightmapShadowMixing);
             ShaderGlobalKeywords.ShadowsShadowMask = GlobalKeyword.Create(ShaderKeywordStrings.ShadowsShadowMask);
             ShaderGlobalKeywords.LightLayers = GlobalKeyword.Create(ShaderKeywordStrings.LightLayers);
             ShaderGlobalKeywords.RenderPassEnabled = GlobalKeyword.Create(ShaderKeywordStrings.RenderPassEnabled);
-            ShaderGlobalKeywords.BillboardFaceCameraPos = GlobalKeyword.Create(ShaderKeywordStrings.BillboardFaceCameraPos);
+            ShaderGlobalKeywords.BillboardFaceCameraPos = GlobalKeyword.Create(
+                ShaderKeywordStrings.BillboardFaceCameraPos
+            );
             ShaderGlobalKeywords.LightCookies = GlobalKeyword.Create(ShaderKeywordStrings.LightCookies);
             ShaderGlobalKeywords.DepthNoMsaa = GlobalKeyword.Create(ShaderKeywordStrings.DepthNoMsaa);
             ShaderGlobalKeywords.DepthMsaa2 = GlobalKeyword.Create(ShaderKeywordStrings.DepthMsaa2);
@@ -1053,20 +1119,28 @@ namespace UnityEngine.Rendering.Universal
             ShaderGlobalKeywords.DBufferMRT2 = GlobalKeyword.Create(ShaderKeywordStrings.DBufferMRT2);
             ShaderGlobalKeywords.DBufferMRT3 = GlobalKeyword.Create(ShaderKeywordStrings.DBufferMRT3);
             ShaderGlobalKeywords.DecalNormalBlendLow = GlobalKeyword.Create(ShaderKeywordStrings.DecalNormalBlendLow);
-            ShaderGlobalKeywords.DecalNormalBlendMedium = GlobalKeyword.Create(ShaderKeywordStrings.DecalNormalBlendMedium);
+            ShaderGlobalKeywords.DecalNormalBlendMedium = GlobalKeyword.Create(
+                ShaderKeywordStrings.DecalNormalBlendMedium
+            );
             ShaderGlobalKeywords.DecalNormalBlendHigh = GlobalKeyword.Create(ShaderKeywordStrings.DecalNormalBlendHigh);
             ShaderGlobalKeywords.DecalLayers = GlobalKeyword.Create(ShaderKeywordStrings.DecalLayers);
             ShaderGlobalKeywords.WriteRenderingLayers = GlobalKeyword.Create(ShaderKeywordStrings.WriteRenderingLayers);
             ShaderGlobalKeywords.ScreenSpaceOcclusion = GlobalKeyword.Create(ShaderKeywordStrings.ScreenSpaceOcclusion);
-            ShaderGlobalKeywords.ScreenSpaceIrradiance = GlobalKeyword.Create(ShaderKeywordStrings.ScreenSpaceIrradiance);
+            ShaderGlobalKeywords.ScreenSpaceIrradiance = GlobalKeyword.Create(
+                ShaderKeywordStrings.ScreenSpaceIrradiance
+            );
             ShaderGlobalKeywords._SPOT = GlobalKeyword.Create(ShaderKeywordStrings._SPOT);
             ShaderGlobalKeywords._DIRECTIONAL = GlobalKeyword.Create(ShaderKeywordStrings._DIRECTIONAL);
             ShaderGlobalKeywords._POINT = GlobalKeyword.Create(ShaderKeywordStrings._POINT);
             ShaderGlobalKeywords._DEFERRED_STENCIL = GlobalKeyword.Create(ShaderKeywordStrings._DEFERRED_STENCIL);
-            ShaderGlobalKeywords._DEFERRED_FIRST_LIGHT = GlobalKeyword.Create(ShaderKeywordStrings._DEFERRED_FIRST_LIGHT);
+            ShaderGlobalKeywords._DEFERRED_FIRST_LIGHT = GlobalKeyword.Create(
+                ShaderKeywordStrings._DEFERRED_FIRST_LIGHT
+            );
             ShaderGlobalKeywords._DEFERRED_MAIN_LIGHT = GlobalKeyword.Create(ShaderKeywordStrings._DEFERRED_MAIN_LIGHT);
             ShaderGlobalKeywords._GBUFFER_NORMALS_OCT = GlobalKeyword.Create(ShaderKeywordStrings._GBUFFER_NORMALS_OCT);
-            ShaderGlobalKeywords._DEFERRED_MIXED_LIGHTING = GlobalKeyword.Create(ShaderKeywordStrings._DEFERRED_MIXED_LIGHTING);
+            ShaderGlobalKeywords._DEFERRED_MIXED_LIGHTING = GlobalKeyword.Create(
+                ShaderKeywordStrings._DEFERRED_MIXED_LIGHTING
+            );
             ShaderGlobalKeywords.LIGHTMAP_ON = GlobalKeyword.Create(ShaderKeywordStrings.LIGHTMAP_ON);
             ShaderGlobalKeywords.DYNAMICLIGHTMAP_ON = GlobalKeyword.Create(ShaderKeywordStrings.DYNAMICLIGHTMAP_ON);
             ShaderGlobalKeywords._ALPHATEST_ON = GlobalKeyword.Create(ShaderKeywordStrings._ALPHATEST_ON);
@@ -1080,17 +1154,29 @@ namespace UnityEngine.Rendering.Universal
             ShaderGlobalKeywords.USE_UNITY_CROSSFADE = GlobalKeyword.Create(ShaderKeywordStrings.USE_UNITY_CROSSFADE);
             ShaderGlobalKeywords._EMISSION = GlobalKeyword.Create(ShaderKeywordStrings._EMISSION);
             ShaderGlobalKeywords._RECEIVE_SHADOWS_OFF = GlobalKeyword.Create(ShaderKeywordStrings._RECEIVE_SHADOWS_OFF);
-            ShaderGlobalKeywords._SURFACE_TYPE_TRANSPARENT = GlobalKeyword.Create(ShaderKeywordStrings._SURFACE_TYPE_TRANSPARENT);
+            ShaderGlobalKeywords._SURFACE_TYPE_TRANSPARENT = GlobalKeyword.Create(
+                ShaderKeywordStrings._SURFACE_TYPE_TRANSPARENT
+            );
             ShaderGlobalKeywords._ALPHAPREMULTIPLY_ON = GlobalKeyword.Create(ShaderKeywordStrings._ALPHAPREMULTIPLY_ON);
             ShaderGlobalKeywords._ALPHAMODULATE_ON = GlobalKeyword.Create(ShaderKeywordStrings._ALPHAMODULATE_ON);
             ShaderGlobalKeywords._NORMALMAP = GlobalKeyword.Create(ShaderKeywordStrings._NORMALMAP);
-            ShaderGlobalKeywords._ADD_PRECOMPUTED_VELOCITY = GlobalKeyword.Create(ShaderKeywordStrings._ADD_PRECOMPUTED_VELOCITY);
+            ShaderGlobalKeywords._ADD_PRECOMPUTED_VELOCITY = GlobalKeyword.Create(
+                ShaderKeywordStrings._ADD_PRECOMPUTED_VELOCITY
+            );
             ShaderGlobalKeywords.EDITOR_VISUALIZATION = GlobalKeyword.Create(ShaderKeywordStrings.EDITOR_VISUALIZATION);
-            ShaderGlobalKeywords.FoveatedRenderingNonUniformRaster = GlobalKeyword.Create(ShaderKeywordStrings.FoveatedRenderingNonUniformRaster);
-            ShaderGlobalKeywords.DisableTexture2DXArray = GlobalKeyword.Create(ShaderKeywordStrings.DisableTexture2DXArray);
+            ShaderGlobalKeywords.FoveatedRenderingNonUniformRaster = GlobalKeyword.Create(
+                ShaderKeywordStrings.FoveatedRenderingNonUniformRaster
+            );
+            ShaderGlobalKeywords.DisableTexture2DXArray = GlobalKeyword.Create(
+                ShaderKeywordStrings.DisableTexture2DXArray
+            );
             ShaderGlobalKeywords.BlitSingleSlice = GlobalKeyword.Create(ShaderKeywordStrings.BlitSingleSlice);
-            ShaderGlobalKeywords.XROcclusionMeshCombined = GlobalKeyword.Create(ShaderKeywordStrings.XROcclusionMeshCombined);
-            ShaderGlobalKeywords.SCREEN_COORD_OVERRIDE = GlobalKeyword.Create(ShaderKeywordStrings.SCREEN_COORD_OVERRIDE);
+            ShaderGlobalKeywords.XROcclusionMeshCombined = GlobalKeyword.Create(
+                ShaderKeywordStrings.XROcclusionMeshCombined
+            );
+            ShaderGlobalKeywords.SCREEN_COORD_OVERRIDE = GlobalKeyword.Create(
+                ShaderKeywordStrings.SCREEN_COORD_OVERRIDE
+            );
             ShaderGlobalKeywords.DOWNSAMPLING_SIZE_2 = GlobalKeyword.Create(ShaderKeywordStrings.DOWNSAMPLING_SIZE_2);
             ShaderGlobalKeywords.DOWNSAMPLING_SIZE_4 = GlobalKeyword.Create(ShaderKeywordStrings.DOWNSAMPLING_SIZE_4);
             ShaderGlobalKeywords.DOWNSAMPLING_SIZE_8 = GlobalKeyword.Create(ShaderKeywordStrings.DOWNSAMPLING_SIZE_8);
@@ -1099,18 +1185,29 @@ namespace UnityEngine.Rendering.Universal
             ShaderGlobalKeywords.EVALUATE_SH_VERTEX = GlobalKeyword.Create(ShaderKeywordStrings.EVALUATE_SH_VERTEX);
             ShaderGlobalKeywords.ProbeVolumeL1 = GlobalKeyword.Create(ShaderKeywordStrings.ProbeVolumeL1);
             ShaderGlobalKeywords.ProbeVolumeL2 = GlobalKeyword.Create(ShaderKeywordStrings.ProbeVolumeL2);
-            ShaderGlobalKeywords.LIGHTMAP_BICUBIC_SAMPLING = GlobalKeyword.Create(ShaderKeywordStrings.LIGHTMAP_BICUBIC_SAMPLING);
+            ShaderGlobalKeywords.LIGHTMAP_BICUBIC_SAMPLING = GlobalKeyword.Create(
+                ShaderKeywordStrings.LIGHTMAP_BICUBIC_SAMPLING
+            );
             ShaderGlobalKeywords._OUTPUT_DEPTH = GlobalKeyword.Create(ShaderKeywordStrings._OUTPUT_DEPTH);
-            ShaderGlobalKeywords.LinearToSRGBConversion = GlobalKeyword.Create(ShaderKeywordStrings.LinearToSRGBConversion);
+            ShaderGlobalKeywords.LinearToSRGBConversion = GlobalKeyword.Create(
+                ShaderKeywordStrings.LinearToSRGBConversion
+            );
             ShaderGlobalKeywords._ENABLE_ALPHA_OUTPUT = GlobalKeyword.Create(ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT);
             ShaderGlobalKeywords.ForwardPlus = GlobalKeyword.Create(ShaderKeywordStrings.ForwardPlus); // Backward compatibility. Deprecated in 6.1.
 #if (UNITY_META_QUEST)
-            ShaderGlobalKeywords.META_QUEST_ORTHO_PROJ = GlobalKeyword.Create(ShaderKeywordStrings.META_QUEST_ORTHO_PROJ);
-            ShaderGlobalKeywords.META_QUEST_LIGHTUNROLL = GlobalKeyword.Create(ShaderKeywordStrings.META_QUEST_LIGHTUNROLL);
-            ShaderGlobalKeywords.META_QUEST_NO_SPOTLIGHTS_LIGHT_LOOP = GlobalKeyword.Create(ShaderKeywordStrings.META_QUEST_NO_SPOTLIGHTS_LIGHT_LOOP);            
+            ShaderGlobalKeywords.META_QUEST_ORTHO_PROJ = GlobalKeyword.Create(
+                ShaderKeywordStrings.META_QUEST_ORTHO_PROJ
+            );
+            ShaderGlobalKeywords.META_QUEST_LIGHTUNROLL = GlobalKeyword.Create(
+                ShaderKeywordStrings.META_QUEST_LIGHTUNROLL
+            );
+            ShaderGlobalKeywords.META_QUEST_NO_SPOTLIGHTS_LIGHT_LOOP = GlobalKeyword.Create(
+                ShaderKeywordStrings.META_QUEST_NO_SPOTLIGHTS_LIGHT_LOOP
+            );
 #endif
-            ShaderGlobalKeywords.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT = GlobalKeyword.Create(ShaderKeywordStrings.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT);
-
+            ShaderGlobalKeywords.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT = GlobalKeyword.Create(
+                ShaderKeywordStrings.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT
+            );
         }
     }
 
@@ -1442,7 +1539,6 @@ namespace UnityEngine.Rendering.Universal
 
         /// <summary> Deprecated keyword. Use ClusterLightLoop instead. </summary>
         internal const string ForwardPlus = "_FORWARD_PLUS"; // Backward compatibility. Deprecated in 6.1.
-
 #if (UNITY_META_QUEST)
         /// <summary> Used to statically branch when checking for projection type on Meta Quest device. </summary>
         internal const string META_QUEST_ORTHO_PROJ = "META_QUEST_ORTHO_PROJ";
@@ -1502,21 +1598,23 @@ namespace UnityEngine.Rendering.Universal
             get => GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
         }
 
-        Comparison<Camera> cameraComparison = (camera1, camera2) => { return (int)camera1.depth - (int)camera2.depth; };
+        Comparison<Camera> cameraComparison = (camera1, camera2) =>
+        {
+            return (int)camera1.depth - (int)camera2.depth;
+        };
+
 #if UNITY_2021_1_OR_NEWER
         void SortCameras(List<Camera> cameras)
         {
             if (cameras.Count > 1)
                 cameras.Sort(cameraComparison);
         }
-
 #else
         void SortCameras(Camera[] cameras)
         {
             if (cameras.Length > 1)
                 Array.Sort(cameras, cameraComparison);
         }
-
 #endif
 
         /// <summary>
@@ -1535,14 +1633,22 @@ namespace UnityEngine.Rendering.Universal
             return lastBaseCameraIndex;
         }
 
-        internal static GraphicsFormat MakeRenderTextureGraphicsFormat(bool isHdrEnabled, HDRColorBufferPrecision requestHDRColorBufferPrecision, bool needsAlpha)
+        internal static GraphicsFormat MakeRenderTextureGraphicsFormat(
+            bool isHdrEnabled,
+            HDRColorBufferPrecision requestHDRColorBufferPrecision,
+            bool needsAlpha
+        )
         {
             if (isHdrEnabled)
             {
                 // TODO: we need a proper format scoring system. Score formats, sort, pick first or pick first supported (if not in score).
                 // UUM-41070: We require `Linear | Render` but with the deprecated FormatUsage this was checking `Blend`
                 // For now, we keep checking for `Blend` until the performance hit of doing the correct checks is evaluated
-                if (!needsAlpha && requestHDRColorBufferPrecision != HDRColorBufferPrecision._64Bits && SystemInfo.IsFormatSupported(GraphicsFormat.B10G11R11_UFloatPack32, GraphicsFormatUsage.Blend))
+                if (
+                    !needsAlpha
+                    && requestHDRColorBufferPrecision != HDRColorBufferPrecision._64Bits
+                    && SystemInfo.IsFormatSupported(GraphicsFormat.B10G11R11_UFloatPack32, GraphicsFormatUsage.Blend)
+                )
                     return GraphicsFormat.B10G11R11_UFloatPack32;
                 if (SystemInfo.IsFormatSupported(GraphicsFormat.R16G16B16A16_SFloat, GraphicsFormatUsage.Blend))
                     return GraphicsFormat.R16G16B16A16_SFloat;
@@ -1565,15 +1671,25 @@ namespace UnityEngine.Rendering.Universal
                 return GraphicsFormat.R8G8B8A8_UNorm;
         }
 
-        internal static RenderTextureDescriptor CreateRenderTextureDescriptor(Camera camera, UniversalCameraData cameraData,
-            bool isHdrEnabled, HDRColorBufferPrecision requestHDRColorBufferPrecision, int msaaSamples, bool needsAlpha)
+        internal static RenderTextureDescriptor CreateRenderTextureDescriptor(
+            Camera camera,
+            UniversalCameraData cameraData,
+            bool isHdrEnabled,
+            HDRColorBufferPrecision requestHDRColorBufferPrecision,
+            int msaaSamples,
+            bool needsAlpha
+        )
         {
             RenderTextureDescriptor desc;
 
             if (camera.targetTexture == null)
             {
                 desc = new RenderTextureDescriptor(cameraData.scaledWidth, cameraData.scaledHeight);
-                desc.graphicsFormat = MakeRenderTextureGraphicsFormat(isHdrEnabled, requestHDRColorBufferPrecision, needsAlpha);
+                desc.graphicsFormat = MakeRenderTextureGraphicsFormat(
+                    isHdrEnabled,
+                    requestHDRColorBufferPrecision,
+                    needsAlpha
+                );
                 desc.depthBufferBits = (int)CoreUtils.GetDefaultDepthBufferBits();
                 desc.depthStencilFormat = SystemInfo.GetGraphicsFormat(DefaultFormat.DepthStencil);
                 desc.msaaSamples = msaaSamples;
@@ -1621,7 +1737,10 @@ namespace UnityEngine.Rendering.Universal
             return desc;
         }
 
-        private static Lightmapping.RequestLightsDelegate lightsDelegate = (Light[] requests, NativeArray<LightDataGI> lightsOutput) =>
+        private static Lightmapping.RequestLightsDelegate lightsDelegate = (
+            Light[] requests,
+            NativeArray<LightDataGI> lightsOutput
+        ) =>
         {
             LightDataGI lightData = new LightDataGI();
 
@@ -1702,7 +1821,10 @@ namespace UnityEngine.Rendering.Universal
             }
 #else
             // If Enlighten realtime GI isn't active, we don't extract lights.
-            if (SupportedRenderingFeatures.active.enlighten == false || ((int)SupportedRenderingFeatures.active.lightmapBakeTypes | (int)LightmapBakeType.Realtime) == 0)
+            if (
+                SupportedRenderingFeatures.active.enlighten == false
+                || ((int)SupportedRenderingFeatures.active.lightmapBakeTypes | (int)LightmapBakeType.Realtime) == 0
+            )
             {
                 for (int i = 0; i < requests.Length; i++)
                 {
@@ -1772,9 +1894,14 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="lightAttenuation">The light attenuation.</param>
         /// <param name="lightSpotDir">The spot light direction.</param>
         public static void GetLightAttenuationAndSpotDirection(
-            LightType lightType, float lightRange, Matrix4x4 lightLocalToWorldMatrix,
-            float spotAngle, float? innerSpotAngle,
-            out Vector4 lightAttenuation, out Vector4 lightSpotDir)
+            LightType lightType,
+            float lightRange,
+            Matrix4x4 lightLocalToWorldMatrix,
+            float spotAngle,
+            float? innerSpotAngle,
+            out Vector4 lightAttenuation,
+            out Vector4 lightSpotDir
+        )
         {
             // Default is directional
             lightAttenuation = k_DefaultLightAttenuation;
@@ -1813,8 +1940,10 @@ namespace UnityEngine.Rendering.Universal
         }
 
         internal static void GetSpotAngleAttenuation(
-            float spotAngle, float? innerSpotAngle,
-            ref Vector4 lightAttenuation)
+            float spotAngle,
+            float? innerSpotAngle,
+            ref Vector4 lightAttenuation
+        )
         {
             // UUM-104997: AngleAttenuation() function isn't precise enough for small spot angles on platforms using float16 registers
             if (spotAngle < 2.6)
@@ -1838,7 +1967,9 @@ namespace UnityEngine.Rendering.Universal
             if (innerSpotAngle.HasValue)
                 cosInnerAngle = Mathf.Cos(innerSpotAngle.Value * Mathf.Deg2Rad * 0.5f);
             else
-                cosInnerAngle = Mathf.Cos((2.0f * Mathf.Atan(Mathf.Tan(spotAngle * 0.5f * Mathf.Deg2Rad) * (64.0f - 18.0f) / 64.0f)) * 0.5f);
+                cosInnerAngle = Mathf.Cos(
+                    (2.0f * Mathf.Atan(Mathf.Tan(spotAngle * 0.5f * Mathf.Deg2Rad) * (64.0f - 18.0f) / 64.0f)) * 0.5f
+                );
             float smoothAngleRange = Mathf.Max(0.001f, cosInnerAngle - cosOuterAngle);
             float invAngleRange = 1.0f / smoothAngleRange;
             float add = -cosOuterAngle * invAngleRange;
@@ -1863,12 +1994,20 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="lightAttenuation">The attenuation of the light.</param>
         /// <param name="lightSpotDir">The direction of the light.</param>
         /// <param name="lightOcclusionProbeChannel">The occlusion probe channel for the light.</param>
-        public static void InitializeLightConstants_Common(NativeArray<VisibleLight> lights, int lightIndex, out Vector4 lightPos, out Vector4 lightColor, out Vector4 lightAttenuation, out Vector4 lightSpotDir, out Vector4 lightOcclusionProbeChannel)
+        public static void InitializeLightConstants_Common(
+            NativeArray<VisibleLight> lights,
+            int lightIndex,
+            out Vector4 lightPos,
+            out Vector4 lightColor,
+            out Vector4 lightAttenuation,
+            out Vector4 lightSpotDir,
+            out Vector4 lightOcclusionProbeChannel
+        )
         {
             lightPos = k_DefaultLightPosition;
             lightColor = k_DefaultLightColor;
             lightOcclusionProbeChannel = k_DefaultLightsProbeChannel;
-            lightAttenuation = k_DefaultLightAttenuation;  // Directional by default.
+            lightAttenuation = k_DefaultLightAttenuation; // Directional by default.
             lightSpotDir = k_DefaultLightSpotDirection;
 
             // When no lights are visible, main light will be set to -1.
@@ -1904,9 +2043,12 @@ namespace UnityEngine.Rendering.Universal
             // VisibleLight.finalColor already returns color in active color space
             lightColor = lightData.finalColor;
 
-            if (light != null && light.bakingOutput.lightmapBakeType == LightmapBakeType.Mixed &&
-                0 <= light.bakingOutput.occlusionMaskChannel &&
-                light.bakingOutput.occlusionMaskChannel < 4)
+            if (
+                light != null
+                && light.bakingOutput.lightmapBakeType == LightmapBakeType.Mixed
+                && 0 <= light.bakingOutput.occlusionMaskChannel
+                && light.bakingOutput.occlusionMaskChannel < 4
+            )
             {
                 lightOcclusionProbeChannel[light.bakingOutput.occlusionMaskChannel] = 1.0f;
             }
@@ -1966,35 +2108,86 @@ namespace UnityEngine.Rendering.Universal
         DrawFullscreen,
 
         // PostProcessPass RenderGraph
-        [HideInDebugUI] RG_SetupPostFX,
-        [HideInDebugUI] RG_StopNaNs,
-        [HideInDebugUI] RG_SMAAMaterialSetup,
-        [HideInDebugUI] RG_SMAAEdgeDetection,
-        [HideInDebugUI] RG_SMAABlendWeight,
-        [HideInDebugUI] RG_SMAANeighborhoodBlend,
-        [HideInDebugUI] RG_SetupDoF,
-        [HideInDebugUI] RG_DOFComputeCOC,
-        [HideInDebugUI] RG_DOFDownscalePrefilter,
-        [HideInDebugUI] RG_DOFBlurH,
-        [HideInDebugUI] RG_DOFBlurV,
-        [HideInDebugUI] RG_DOFBlurBokeh,
-        [HideInDebugUI] RG_DOFPostFilter,
-        [HideInDebugUI] RG_DOFComposite,
-        [HideInDebugUI] RG_TAA,
-        [HideInDebugUI] RG_TAACopyHistory,
-        [HideInDebugUI] RG_MotionBlur,
-        [HideInDebugUI] RG_BloomSetup,
-        [HideInDebugUI] RG_BloomPrefilter,
-        [HideInDebugUI] RG_BloomDownsample,
-        [HideInDebugUI] RG_BloomUpsample,
-        [HideInDebugUI] RG_UberPostSetupBloomPass,
-        [HideInDebugUI] RG_UberPost,
-        [HideInDebugUI] RG_FinalSetup,
-        [HideInDebugUI] RG_FinalFSRScale,
-        [HideInDebugUI] RG_FinalBlit,
+        [HideInDebugUI]
+        RG_SetupPostFX,
+
+        [HideInDebugUI]
+        RG_StopNaNs,
+
+        [HideInDebugUI]
+        RG_SMAAMaterialSetup,
+
+        [HideInDebugUI]
+        RG_SMAAEdgeDetection,
+
+        [HideInDebugUI]
+        RG_SMAABlendWeight,
+
+        [HideInDebugUI]
+        RG_SMAANeighborhoodBlend,
+
+        [HideInDebugUI]
+        RG_SetupDoF,
+
+        [HideInDebugUI]
+        RG_DOFComputeCOC,
+
+        [HideInDebugUI]
+        RG_DOFDownscalePrefilter,
+
+        [HideInDebugUI]
+        RG_DOFBlurH,
+
+        [HideInDebugUI]
+        RG_DOFBlurV,
+
+        [HideInDebugUI]
+        RG_DOFBlurBokeh,
+
+        [HideInDebugUI]
+        RG_DOFPostFilter,
+
+        [HideInDebugUI]
+        RG_DOFComposite,
+
+        [HideInDebugUI]
+        RG_TAA,
+
+        [HideInDebugUI]
+        RG_TAACopyHistory,
+
+        [HideInDebugUI]
+        RG_MotionBlur,
+
+        [HideInDebugUI]
+        RG_BloomSetup,
+
+        [HideInDebugUI]
+        RG_BloomPrefilter,
+
+        [HideInDebugUI]
+        RG_BloomDownsample,
+
+        [HideInDebugUI]
+        RG_BloomUpsample,
+
+        [HideInDebugUI]
+        RG_UberPostSetupBloomPass,
+
+        [HideInDebugUI]
+        RG_UberPost,
+
+        [HideInDebugUI]
+        RG_FinalSetup,
+
+        [HideInDebugUI]
+        RG_FinalFSRScale,
+
+        [HideInDebugUI]
+        RG_FinalBlit,
 
         BlitFinalToBackBuffer,
-        DrawSkybox
+        DrawSkybox,
     }
 
     // Internal class to detect and cache runtime platform information.
@@ -2019,11 +2212,11 @@ namespace UnityEngine.Rendering.Universal
             public PlatformDetectionCache()
             {
                 bool isRunningMobile = false;
-                #if ENABLE_VR && ENABLE_XR_MODULE
-                    #if PLATFORM_WINRT || PLATFORM_ANDROID
-                        isRunningMobile = IsRunningXRMobile();
-                    #endif
-                #endif
+#if ENABLE_VR && ENABLE_XR_MODULE
+#if PLATFORM_WINRT || PLATFORM_ANDROID
+                isRunningMobile = IsRunningXRMobile();
+#endif
+#endif
 
                 isXRMobile = isRunningMobile;
                 isShaderAPIMobileDefined = GraphicsSettings.HasShaderDefine(BuiltinShaderDefine.SHADER_API_MOBILE);
@@ -2034,7 +2227,10 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        private static readonly Lazy<PlatformDetectionCache> platformCache = new(() => new PlatformDetectionCache(), true);
+        private static readonly Lazy<PlatformDetectionCache> platformCache = new(
+            () => new PlatformDetectionCache(),
+            true
+        );
 
         internal static void Initialize()
         {
@@ -2042,13 +2238,19 @@ namespace UnityEngine.Rendering.Universal
         }
 
 #if ENABLE_VR && ENABLE_XR_MODULE
-    #if PLATFORM_WINRT || PLATFORM_ANDROID
+#if PLATFORM_WINRT || PLATFORM_ANDROID
         // XR mobile platforms are not treated as dedicated mobile platforms in Core. Handle them specially here. (Quest and HL).
         private static List<XR.XRDisplaySubsystem> displaySubsystemList = new List<XR.XRDisplaySubsystem>();
+
         private static bool IsRunningXRMobile()
         {
             var platform = Application.platform;
-            if (platform == RuntimePlatform.WSAPlayerX86 || platform == RuntimePlatform.WSAPlayerARM || platform == RuntimePlatform.WSAPlayerX64 || platform == RuntimePlatform.Android)
+            if (
+                platform == RuntimePlatform.WSAPlayerX86
+                || platform == RuntimePlatform.WSAPlayerARM
+                || platform == RuntimePlatform.WSAPlayerX64
+                || platform == RuntimePlatform.Android
+            )
             {
                 XR.XRDisplaySubsystem display = null;
                 SubsystemManager.GetSubsystems(displaySubsystemList);
@@ -2061,7 +2263,7 @@ namespace UnityEngine.Rendering.Universal
             }
             return false;
         }
-    #endif
+#endif
 #endif
 
         /// <summary>

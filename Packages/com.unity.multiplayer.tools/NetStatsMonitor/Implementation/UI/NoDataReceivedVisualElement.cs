@@ -5,6 +5,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
     internal class NoDataReceivedVisualElement : VisualElement
     {
         Label m_Label = new();
+
         internal NoDataReceivedVisualElement()
         {
             AddToClassList(UssClassNames.k_DisplayElement);

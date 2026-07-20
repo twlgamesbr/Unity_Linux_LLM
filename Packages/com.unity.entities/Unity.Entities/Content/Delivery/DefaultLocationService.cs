@@ -12,14 +12,22 @@ namespace Unity.Entities.Content
 
         public override int LocationCount => contentLocations.Count;
 
-        public DefaultContentLocationService(string name, int priority, string catalogPath, Func<string, string> remotePathFunc)
+        public DefaultContentLocationService(
+            string name,
+            int priority,
+            string catalogPath,
+            Func<string, string> remotePathFunc
+        )
         {
             Priority = priority;
             Name = name;
             if (BlobAssetReference<RemoteContentCatalogData>.TryRead(catalogPath, 1, out var catalog))
             {
                 int count = catalog.Value.RemoteContentLocations.Length;
-                contentLocations = new UnsafeHashMap<RemoteContentId, RemoteContentLocation>(count, Allocator.Persistent);
+                contentLocations = new UnsafeHashMap<RemoteContentId, RemoteContentLocation>(
+                    count,
+                    Allocator.Persistent
+                );
                 for (int ti = 0; ti < count; ti++)
                 {
                     var data = catalog.Value.RemoteContentLocations[ti];
@@ -28,10 +36,16 @@ namespace Unity.Entities.Content
                     contentLocations.Add(data.identifier, data.location);
                 }
 
-                contentSets = new UnsafeHashMap<FixedString512Bytes, UnsafeList<RemoteContentId>>(catalog.Value.ContentSets.Length, Allocator.Persistent);
+                contentSets = new UnsafeHashMap<FixedString512Bytes, UnsafeList<RemoteContentId>>(
+                    catalog.Value.ContentSets.Length,
+                    Allocator.Persistent
+                );
                 for (int i = 0; i < catalog.Value.ContentSets.Length; i++)
                 {
-                    var ids = new UnsafeList<RemoteContentId>(catalog.Value.ContentSets[i].Ids.Length, Allocator.Persistent);
+                    var ids = new UnsafeList<RemoteContentId>(
+                        catalog.Value.ContentSets[i].Ids.Length,
+                        Allocator.Persistent
+                    );
                     ref var blobIds = ref catalog.Value.ContentSets[i].Ids;
                     for (int j = 0; j < blobIds.Length; j++)
                         ids.Add(catalog.Value.RemoteContentLocations[blobIds[j]].identifier);
@@ -41,7 +55,14 @@ namespace Unity.Entities.Content
             }
         }
 
-        internal DefaultContentLocationService(string name, int priority, int count, Func<int, (RemoteContentId, RemoteContentLocation)> indexer, Func<string, string> remotePathFunc, Func<string, IEnumerable<string>> contentSetFunc)
+        internal DefaultContentLocationService(
+            string name,
+            int priority,
+            int count,
+            Func<int, (RemoteContentId, RemoteContentLocation)> indexer,
+            Func<string, string> remotePathFunc,
+            Func<string, IEnumerable<string>> contentSetFunc
+        )
         {
             Priority = priority;
             Name = name;
@@ -64,7 +85,10 @@ namespace Unity.Entities.Content
                     }
                 }
             }
-            contentSets = new UnsafeHashMap<FixedString512Bytes, UnsafeList<RemoteContentId>>(newContentSets.Count, Allocator.Persistent);
+            contentSets = new UnsafeHashMap<FixedString512Bytes, UnsafeList<RemoteContentId>>(
+                newContentSets.Count,
+                Allocator.Persistent
+            );
             foreach (var k in newContentSets)
             {
                 var ids = new UnsafeList<RemoteContentId>(k.Value.Count, Allocator.Persistent);
@@ -74,7 +98,11 @@ namespace Unity.Entities.Content
             }
         }
 
-        unsafe public override bool TryGetLocationSet(in FixedString512Bytes setName, out RemoteContentId* idPtr, out int count)
+        public override unsafe bool TryGetLocationSet(
+            in FixedString512Bytes setName,
+            out RemoteContentId* idPtr,
+            out int count
+        )
         {
             if (contentSets.TryGetValue(setName, out var ids))
             {
@@ -112,7 +140,6 @@ namespace Unity.Entities.Content
             return GetLocationStatus(id);
         }
 
-
         public override bool GetResolvedContentIds(ref UnsafeList<RemoteContentId> ids)
         {
             var e = contentLocations.GetEnumerator();
@@ -120,7 +147,6 @@ namespace Unity.Entities.Content
                 ids.Add(e.Current.Key);
             return true;
         }
-
 
         public override bool GetResolvedRemoteContentLocations(ref NativeHashSet<RemoteContentLocation> locs)
         {

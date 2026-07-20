@@ -38,7 +38,8 @@ namespace UnityEngine.InputSystem.Interactions
 
         ////REVIEW: this seems stupid; shouldn't a slow tap just be anything that takes longer than TapTime?
         private float durationOrDefault => duration > 0.0f ? duration : InputSystem.settings.defaultSlowTapTime;
-        private float pressPointOrDefault => pressPoint > 0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
+        private float pressPointOrDefault =>
+            pressPoint > 0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
 
         private double m_SlowTapStartTime;
 
@@ -67,22 +68,29 @@ namespace UnityEngine.InputSystem.Interactions
         }
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     internal class SlowTapInteractionEditor : InputParameterEditor<SlowTapInteraction>
     {
         protected override void OnEnable()
         {
-            m_DurationSetting.Initialize("Min Tap Duration",
+            m_DurationSetting.Initialize(
+                "Min Tap Duration",
                 "Minimum time (in seconds) that a control has to be held for it to register as a slow tap. If the control is released "
-                + "before this time, the slow tap is canceled.",
+                    + "before this time, the slow tap is canceled.",
                 "Default Slow Tap Time",
-                () => target.duration, x => target.duration = x, () => InputSystem.settings.defaultSlowTapTime);
-            m_PressPointSetting.Initialize("Press Point",
+                () => target.duration,
+                x => target.duration = x,
+                () => InputSystem.settings.defaultSlowTapTime
+            );
+            m_PressPointSetting.Initialize(
+                "Press Point",
                 "The amount of actuation a control requires before being considered pressed. If not set, default to "
-                + "'Default Button Press Point' in the global input settings.",
+                    + "'Default Button Press Point' in the global input settings.",
                 "Default Button Press Point",
-                () => target.pressPoint, v => target.pressPoint = v,
-                () => InputSystem.settings.defaultButtonPressPoint);
+                () => target.pressPoint,
+                v => target.pressPoint = v,
+                () => InputSystem.settings.defaultButtonPressPoint
+            );
         }
 
         public override void OnGUI()
@@ -103,5 +111,5 @@ namespace UnityEngine.InputSystem.Interactions
         private CustomOrDefaultSetting m_DurationSetting;
         private CustomOrDefaultSetting m_PressPointSetting;
     }
-    #endif
+#endif
 }

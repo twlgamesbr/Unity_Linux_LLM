@@ -118,7 +118,12 @@ namespace Unity.Netcode
         /// <param name="serverBufferSec">The amount of the time in seconds the client should buffer incoming messages from the server.</param>
         /// <param name="hardResetThresholdSec">The threshold, in seconds, used to force a hard catchup of network time.</param>
         /// <param name="adjustmentRatio">The ratio at which the NetworkTimeSystem speeds up or slows down time.</param>
-        public NetworkTimeSystem(double localBufferSec, double serverBufferSec = k_DefaultBufferSizeSec, double hardResetThresholdSec = k_HardResetThresholdSeconds, double adjustmentRatio = k_DefaultAdjustmentRatio)
+        public NetworkTimeSystem(
+            double localBufferSec,
+            double serverBufferSec = k_DefaultBufferSizeSec,
+            double hardResetThresholdSec = k_HardResetThresholdSeconds,
+            double adjustmentRatio = k_DefaultAdjustmentRatio
+        )
         {
             LocalBufferSec = localBufferSec;
             ServerBufferSec = serverBufferSec;
@@ -168,7 +173,10 @@ namespace Unity.Netcode
 
             if (!m_ConnectionManager.LocalClient.IsServer)
             {
-                Sync(LastSyncedServerTimeSec + m_NetworkManager.RealTimeProvider.UnscaledDeltaTime, m_NetworkTransport.GetCurrentRtt(NetworkManager.ServerClientId) / 1000d);
+                Sync(
+                    LastSyncedServerTimeSec + m_NetworkManager.RealTimeProvider.UnscaledDeltaTime,
+                    m_NetworkTransport.GetCurrentRtt(NetworkManager.ServerClientId) / 1000d
+                );
             }
         }
 
@@ -187,12 +195,12 @@ namespace Unity.Netcode
 #endif
 
             // Check if we need to send a time synchronization message, and if so send it
-            if (m_ConnectionManager.LocalClient.IsServer && m_NetworkTickSystem.ServerTime.Tick % m_TimeSyncFrequencyTicks == 0)
+            if (
+                m_ConnectionManager.LocalClient.IsServer
+                && m_NetworkTickSystem.ServerTime.Tick % m_TimeSyncFrequencyTicks == 0
+            )
             {
-                var message = new TimeSyncMessage
-                {
-                    Tick = m_NetworkTickSystem.ServerTime.Tick
-                };
+                var message = new TimeSyncMessage { Tick = m_NetworkTickSystem.ServerTime.Tick };
                 m_ConnectionManager.SendMessage(ref message, m_NetworkDelivery, m_ConnectionManager.ConnectedClientIds);
             }
 
@@ -234,11 +242,18 @@ namespace Unity.Netcode
             // TODO: For client-server, we need a latency message sent by clients to tell us their tick latency
             if (LastSyncedRttSec > 0.0f)
             {
-                m_TickLatencyAverage = Mathf.Lerp(m_TickLatencyAverage, (float)((LastSyncedRttSec + deltaTimeSec) / m_TickFrequency), (float)deltaTimeSec);
+                m_TickLatencyAverage = Mathf.Lerp(
+                    m_TickLatencyAverage,
+                    (float)((LastSyncedRttSec + deltaTimeSec) / m_TickFrequency),
+                    (float)deltaTimeSec
+                );
                 TickLatency = (int)Mathf.Max(2.0f, Mathf.Round(m_TickLatencyAverage));
             }
 
-            if (Math.Abs(m_DesiredLocalTimeOffset - m_CurrentLocalTimeOffset) > HardResetThresholdSec || Math.Abs(m_DesiredServerTimeOffset - m_CurrentServerTimeOffset) > HardResetThresholdSec)
+            if (
+                Math.Abs(m_DesiredLocalTimeOffset - m_CurrentLocalTimeOffset) > HardResetThresholdSec
+                || Math.Abs(m_DesiredServerTimeOffset - m_CurrentServerTimeOffset) > HardResetThresholdSec
+            )
             {
                 m_TimeSec += m_DesiredServerTimeOffset;
 
@@ -251,8 +266,12 @@ namespace Unity.Netcode
                 return true;
             }
 
-            m_CurrentLocalTimeOffset += deltaTimeSec * (m_DesiredLocalTimeOffset > m_CurrentLocalTimeOffset ? AdjustmentRatio : -AdjustmentRatio);
-            m_CurrentServerTimeOffset += deltaTimeSec * (m_DesiredServerTimeOffset > m_CurrentServerTimeOffset ? AdjustmentRatio : -AdjustmentRatio);
+            m_CurrentLocalTimeOffset +=
+                deltaTimeSec
+                * (m_DesiredLocalTimeOffset > m_CurrentLocalTimeOffset ? AdjustmentRatio : -AdjustmentRatio);
+            m_CurrentServerTimeOffset +=
+                deltaTimeSec
+                * (m_DesiredServerTimeOffset > m_CurrentServerTimeOffset ? AdjustmentRatio : -AdjustmentRatio);
 
             return false;
         }
@@ -267,7 +286,9 @@ namespace Unity.Netcode
             Sync(serverTimeSec, rttSec);
             Advance(0);
         }
+
         internal int SyncCount;
+
         /// <summary>
         /// Synchronizes the time system with up-to-date network statistics but does not change any time values or advance the time.
         /// </summary>

@@ -66,8 +66,9 @@ namespace FlyingWormConsole3.LiteNetLib
             Broadcast,
             ConnectionRequest,
             MessageDelivered,
-            PeerAddressChanged
+            PeerAddressChanged,
         }
+
         public EType Type;
 
         public NetPeer Peer;
@@ -103,10 +104,7 @@ namespace FlyingWormConsole3.LiteNetLib
                 _p = null;
             }
 
-            public void Dispose()
-            {
-
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {
@@ -129,6 +127,7 @@ namespace FlyingWormConsole3.LiteNetLib
             public IPEndPoint EndPoint;
             public DateTime TimeWhenGet;
         }
+
         private readonly List<IncomingData> _pingSimulationList = new List<IncomingData>();
         private readonly Random _randomGenerator = new Random();
         private const int MinLatencyThreshold = 5;
@@ -146,8 +145,10 @@ namespace FlyingWormConsole3.LiteNetLib
         private readonly INtpEventListener _ntpEventListener;
         private readonly IPeerAddressChangedListener _peerAddressChangedListener;
 
-        private readonly Dictionary<IPEndPoint, ConnectionRequest> _requestsDict = new Dictionary<IPEndPoint, ConnectionRequest>();
-        private readonly ConcurrentDictionary<IPEndPoint, NtpRequest> _ntpRequests = new ConcurrentDictionary<IPEndPoint, NtpRequest>();
+        private readonly Dictionary<IPEndPoint, ConnectionRequest> _requestsDict =
+            new Dictionary<IPEndPoint, ConnectionRequest>();
+        private readonly ConcurrentDictionary<IPEndPoint, NtpRequest> _ntpRequests =
+            new ConcurrentDictionary<IPEndPoint, NtpRequest>();
         private long _connectedPeersCount;
         private readonly List<NetPeer> _connectedPeerListCache = new List<NetPeer>();
         private readonly PacketLayerBase _extraPacketLayer;
@@ -390,10 +391,12 @@ namespace FlyingWormConsole3.LiteNetLib
                 CreateEvent(NetEvent.EType.MessageDelivered, fromPeer, userData: userData);
         }
 
-        internal void DisconnectPeerForce(NetPeer peer,
+        internal void DisconnectPeerForce(
+            NetPeer peer,
             DisconnectReason reason,
             SocketError socketErrorCode,
-            NetPacket eventData)
+            NetPacket eventData
+        )
         {
             DisconnectPeer(peer, reason, socketErrorCode, true, null, 0, 0, eventData);
         }
@@ -406,7 +409,8 @@ namespace FlyingWormConsole3.LiteNetLib
             byte[] data,
             int start,
             int count,
-            NetPacket eventData)
+            NetPacket eventData
+        )
         {
             var shutdownResult = peer.Shutdown(data, start, count, force);
             if (shutdownResult == ShutdownResult.None)
@@ -418,7 +422,8 @@ namespace FlyingWormConsole3.LiteNetLib
                 peer,
                 errorCode: socketErrorCode,
                 disconnectReason: reason,
-                readerSource: eventData);
+                readerSource: eventData
+            );
         }
 
         private void CreateEvent(
@@ -432,7 +437,8 @@ namespace FlyingWormConsole3.LiteNetLib
             DeliveryMethod deliveryMethod = DeliveryMethod.Unreliable,
             byte channelNumber = 0,
             NetPacket readerSource = null,
-            object userData = null)
+            object userData = null
+        )
         {
             NetEvent evt;
             bool unsyncEvent = UnsyncedEvents;
@@ -495,7 +501,7 @@ namespace FlyingWormConsole3.LiteNetLib
                     {
                         Reason = evt.DisconnectReason,
                         AdditionalData = evt.DataReader,
-                        SocketErrorCode = evt.ErrorCode
+                        SocketErrorCode = evt.ErrorCode,
                     };
                     _netEventListener.OnPeerDisconnected(evt.Peer, info);
                     break;
@@ -503,10 +509,18 @@ namespace FlyingWormConsole3.LiteNetLib
                     _netEventListener.OnNetworkReceive(evt.Peer, evt.DataReader, evt.ChannelNumber, evt.DeliveryMethod);
                     break;
                 case NetEvent.EType.ReceiveUnconnected:
-                    _netEventListener.OnNetworkReceiveUnconnected(evt.RemoteEndPoint, evt.DataReader, UnconnectedMessageType.BasicMessage);
+                    _netEventListener.OnNetworkReceiveUnconnected(
+                        evt.RemoteEndPoint,
+                        evt.DataReader,
+                        UnconnectedMessageType.BasicMessage
+                    );
                     break;
                 case NetEvent.EType.Broadcast:
-                    _netEventListener.OnNetworkReceiveUnconnected(evt.RemoteEndPoint, evt.DataReader, UnconnectedMessageType.Broadcast);
+                    _netEventListener.OnNetworkReceiveUnconnected(
+                        evt.RemoteEndPoint,
+                        evt.DataReader,
+                        UnconnectedMessageType.Broadcast
+                    );
                     break;
                 case NetEvent.EType.Error:
                     _netEventListener.OnNetworkError(evt.RemoteEndPoint, evt.ErrorCode);
@@ -575,8 +589,10 @@ namespace FlyingWormConsole3.LiteNetLib
 
                     for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
                     {
-                        if (netPeer.ConnectionState == ConnectionState.Disconnected &&
-                            netPeer.TimeSinceLastPacket > DisconnectTimeout)
+                        if (
+                            netPeer.ConnectionState == ConnectionState.Disconnected
+                            && netPeer.TimeSinceLastPacket > DisconnectTimeout
+                        )
                         {
                             peersToRemove.Add(netPeer);
                         }
@@ -669,7 +685,10 @@ namespace FlyingWormConsole3.LiteNetLib
 
             for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
             {
-                if (netPeer.ConnectionState == ConnectionState.Disconnected && netPeer.TimeSinceLastPacket > DisconnectTimeout)
+                if (
+                    netPeer.ConnectionState == ConnectionState.Disconnected
+                    && netPeer.TimeSinceLastPacket > DisconnectTimeout
+                )
                 {
                     RemovePeer(netPeer, false);
                 }
@@ -704,27 +723,30 @@ namespace FlyingWormConsole3.LiteNetLib
             }
             else
                 lock (_requestsDict)
-            {
-                if (TryGetPeer(request.RemoteEndPoint, out netPeer))
                 {
-                    //already have peer
+                    if (TryGetPeer(request.RemoteEndPoint, out netPeer))
+                    {
+                        //already have peer
+                    }
+                    else if (request.Result == ConnectionRequestResult.Reject)
+                    {
+                        netPeer = new NetPeer(this, request.RemoteEndPoint, GetNextPeerId());
+                        netPeer.Reject(request.InternalPacket, rejectData, start, length);
+                        AddPeer(netPeer);
+                        NetDebug.Write(NetLogLevel.Trace, "[NM] Peer connect reject.");
+                    }
+                    else //Accept
+                    {
+                        netPeer = new NetPeer(this, request, GetNextPeerId());
+                        AddPeer(netPeer);
+                        CreateEvent(NetEvent.EType.Connect, netPeer);
+                        NetDebug.Write(
+                            NetLogLevel.Trace,
+                            $"[NM] Received peer connection Id: {netPeer.ConnectTime}, EP: {netPeer}"
+                        );
+                    }
+                    _requestsDict.Remove(request.RemoteEndPoint);
                 }
-                else if (request.Result == ConnectionRequestResult.Reject)
-                {
-                    netPeer = new NetPeer(this, request.RemoteEndPoint, GetNextPeerId());
-                    netPeer.Reject(request.InternalPacket, rejectData, start, length);
-                    AddPeer(netPeer);
-                    NetDebug.Write(NetLogLevel.Trace, "[NM] Peer connect reject.");
-                }
-                else //Accept
-                {
-                    netPeer = new NetPeer(this, request, GetNextPeerId());
-                    AddPeer(netPeer);
-                    CreateEvent(NetEvent.EType.Connect, netPeer);
-                    NetDebug.Write(NetLogLevel.Trace, $"[NM] Received peer connection Id: {netPeer.ConnectTime}, EP: {netPeer}");
-                }
-                _requestsDict.Remove(request.RemoteEndPoint);
-            }
 
             return netPeer;
         }
@@ -737,13 +759,16 @@ namespace FlyingWormConsole3.LiteNetLib
         private void ProcessConnectRequest(
             IPEndPoint remoteEndPoint,
             NetPeer netPeer,
-            NetConnectRequestPacket connRequest)
+            NetConnectRequestPacket connRequest
+        )
         {
             //if we have peer
             if (netPeer != null)
             {
                 var processResult = netPeer.ProcessConnectRequest(connRequest);
-                NetDebug.Write($"ConnectRequest LastId: {netPeer.ConnectTime}, NewId: {connRequest.ConnectionTime}, EP: {remoteEndPoint}, Result: {processResult}");
+                NetDebug.Write(
+                    $"ConnectRequest LastId: {netPeer.ConnectTime}, NewId: {connRequest.ConnectionTime}, EP: {remoteEndPoint}, Result: {processResult}"
+                );
 
                 switch (processResult)
                 {
@@ -768,7 +793,9 @@ namespace FlyingWormConsole3.LiteNetLib
                 //ConnectRequestResult.NewConnection
                 //Set next connection number
                 if (processResult != ConnectRequestResult.P2PLose)
-                    connRequest.ConnectionNumber = (byte)((netPeer.ConnectionNum + 1) % NetConstants.MaxConnectionNumber);
+                    connRequest.ConnectionNumber = (byte)(
+                        (netPeer.ConnectionNum + 1) % NetConstants.MaxConnectionNumber
+                    );
                 //To reconnect peer
             }
             else
@@ -824,12 +851,14 @@ namespace FlyingWormConsole3.LiteNetLib
             {
                 lock (_pingSimulationList)
                 {
-                    _pingSimulationList.Add(new IncomingData
-                    {
-                        Data = packet,
-                        EndPoint = remoteEndPoint,
-                        TimeWhenGet = DateTime.UtcNow.AddMilliseconds(latency)
-                    });
+                    _pingSimulationList.Add(
+                        new IncomingData
+                        {
+                            Data = packet,
+                            EndPoint = remoteEndPoint,
+                            TimeWhenGet = DateTime.UtcNow.AddMilliseconds(latency),
+                        }
+                    );
                 }
                 // hold packet
                 _dropPacket = true;
@@ -916,7 +945,11 @@ namespace FlyingWormConsole3.LiteNetLib
                 case PacketProperty.UnconnectedMessage:
                     if (!UnconnectedMessagesEnabled)
                         return;
-                    CreateEvent(NetEvent.EType.ReceiveUnconnected, remoteEndPoint: remoteEndPoint, readerSource: packet);
+                    CreateEvent(
+                        NetEvent.EType.ReceiveUnconnected,
+                        remoteEndPoint: remoteEndPoint,
+                        readerSource: packet
+                    );
                     return;
                 case PacketProperty.NatMessage:
                     if (NatPunchEnabled)
@@ -968,16 +1001,20 @@ namespace FlyingWormConsole3.LiteNetLib
                         {
                             NetDebug.Write($"[NM] Looks like address change: {packet.Size}");
                             var remoteData = NetConnectAcceptPacket.FromData(packet);
-                            if (remoteData != null &&
-                                remoteData.PeerNetworkChanged &&
-                                remoteData.PeerId < _peersArray.Length)
+                            if (
+                                remoteData != null
+                                && remoteData.PeerNetworkChanged
+                                && remoteData.PeerId < _peersArray.Length
+                            )
                             {
                                 _peersLock.EnterUpgradeableReadLock();
                                 var peer = _peersArray[remoteData.PeerId];
                                 _peersLock.ExitUpgradeableReadLock();
-                                if (peer != null &&
-                                    peer.ConnectTime == remoteData.ConnectionTime &&
-                                    peer.ConnectionNum == remoteData.ConnectionNumber)
+                                if (
+                                    peer != null
+                                    && peer.ConnectTime == remoteData.ConnectionTime
+                                    && peer.ConnectionNum == remoteData.ConnectionNumber
+                                )
                                 {
                                     if (peer.ConnectionState == ConnectionState.Connected)
                                     {
@@ -1017,9 +1054,11 @@ namespace FlyingWormConsole3.LiteNetLib
                         DisconnectPeerForce(
                             netPeer,
                             disconnectResult == DisconnectResult.Disconnect
-                            ? DisconnectReason.RemoteConnectionClose
-                            : DisconnectReason.ConnectionRejected,
-                            0, packet);
+                                ? DisconnectReason.RemoteConnectionClose
+                                : DisconnectReason.ConnectionRejected,
+                            0,
+                            packet
+                        );
                     }
                     else
                     {
@@ -1044,7 +1083,13 @@ namespace FlyingWormConsole3.LiteNetLib
             }
         }
 
-        internal void CreateReceiveEvent(NetPacket packet, DeliveryMethod method, byte channelNumber, int headerSize, NetPeer fromPeer)
+        internal void CreateReceiveEvent(
+            NetPacket packet,
+            DeliveryMethod method,
+            byte channelNumber,
+            int headerSize,
+            NetPeer fromPeer
+        )
         {
             NetEvent evt;
 
@@ -1236,7 +1281,14 @@ namespace FlyingWormConsole3.LiteNetLib
         /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
         /// <param name="options">Send options (reliable, unreliable, etc.)</param>
         /// <param name="excludePeer">Excluded peer</param>
-        public void SendToAll(byte[] data, int start, int length, byte channelNumber, DeliveryMethod options, NetPeer excludePeer)
+        public void SendToAll(
+            byte[] data,
+            int start,
+            int length,
+            byte channelNumber,
+            DeliveryMethod options,
+            NetPeer excludePeer
+        )
         {
             try
             {
@@ -1610,7 +1662,7 @@ namespace FlyingWormConsole3.LiteNetLib
 
             //Stop
             CloseSocket();
-            
+
 #if UNITY_SOCKET_FIX
             if (_useSocketFix)
             {
@@ -1618,7 +1670,6 @@ namespace FlyingWormConsole3.LiteNetLib
                 _pausedSocketFix = null;
             }
 #endif
-            
             _updateTriggerEvent.Set();
             if (!_manualMode)
             {
@@ -1700,15 +1751,7 @@ namespace FlyingWormConsole3.LiteNetLib
             _peersLock.EnterReadLock();
             for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
             {
-                DisconnectPeer(
-                    netPeer,
-                    DisconnectReason.DisconnectPeerCalled,
-                    0,
-                    false,
-                    data,
-                    start,
-                    count,
-                    null);
+                DisconnectPeer(netPeer, DisconnectReason.DisconnectPeerCalled, 0, false, data, start, count, null);
             }
             _peersLock.ExitReadLock();
         }
@@ -1760,15 +1803,7 @@ namespace FlyingWormConsole3.LiteNetLib
         /// <param name="count">data length</param>
         public void DisconnectPeer(NetPeer peer, byte[] data, int start, int count)
         {
-            DisconnectPeer(
-                peer,
-                DisconnectReason.DisconnectPeerCalled,
-                0,
-                false,
-                data,
-                start,
-                count,
-                null);
+            DisconnectPeer(peer, DisconnectReason.DisconnectPeerCalled, 0, false, data, start, count, null);
         }
 
         /// <summary>

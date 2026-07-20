@@ -16,8 +16,10 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
     {
         public static TestCommand BuildTestCommand(TestMethod test, ITestFilter filter)
         {
-            if (test.RunState != RunState.Runnable &&
-                !(test.RunState == RunState.Explicit && filter.IsExplicitMatch(test)))
+            if (
+                test.RunState != RunState.Runnable
+                && !(test.RunState == RunState.Explicit && filter.IsExplicitMatch(test))
+            )
             {
                 return new SkipCommand(test);
             }
@@ -45,8 +47,10 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                 command = wrapper.Wrap(command);
                 if (command == null)
                 {
-                    var message = String.Format("IWrapTestMethod implementation '{0}' returned null as command.",
-                        wrapper.GetType().FullName);
+                    var message = String.Format(
+                        "IWrapTestMethod implementation '{0}' returned null as command.",
+                        wrapper.GetType().FullName
+                    );
                     return new FailCommand(test, ResultState.Failure, message);
                 }
 
@@ -58,9 +62,11 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                         continue;
                     }
 
-                    var message = String.Format("'{0}' is not supported on {1} as it does not handle returning IEnumerator.",
+                    var message = String.Format(
+                        "'{0}' is not supported on {1} as it does not handle returning IEnumerator.",
                         wrapper.GetType().FullName,
-                        GetTestBuilderName(test));
+                        GetTestBuilderName(test)
+                    );
                     return new FailCommand(test, ResultState.Failure, message);
                 }
             }
@@ -71,9 +77,9 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             {
                 command = new ImmediateEnumerableCommand(command);
             }
-            
+
             command = new SetUpTearDownCommand(command);
-            
+
             foreach (var wrapper in test.Method.GetCustomAttributes<IWrapSetUpTearDown>(true))
             {
                 if (command is SetUpTearDownCommand && !testReturnsIEnumerator && !testReturnsTask)
@@ -85,8 +91,10 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                 command = wrapper.Wrap(command);
                 if (command == null)
                 {
-                    var message = String.Format("IWrapSetUpTearDown implementation '{0}' returned null as command.",
-                        wrapper.GetType().FullName);
+                    var message = String.Format(
+                        "IWrapSetUpTearDown implementation '{0}' returned null as command.",
+                        wrapper.GetType().FullName
+                    );
                     return new FailCommand(test, ResultState.Failure, message);
                 }
 
@@ -98,9 +106,11 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                         continue;
                     }
 
-                    var message = String.Format("'{0}' is not supported on {1} as it does not handle returning IEnumerator.",
+                    var message = String.Format(
+                        "'{0}' is not supported on {1} as it does not handle returning IEnumerator.",
                         wrapper.GetType().FullName,
-                        GetTestBuilderName(test));
+                        GetTestBuilderName(test)
+                    );
                     return new FailCommand(test, ResultState.Failure, message);
                 }
             }
@@ -109,7 +119,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             command = new OuterUnityTestActionCommand(command);
             command = new RetryCommand(command);
             command = new RepeatCommand(command);
-            
+
             IApplyToContext[] changes = test.Method.GetCustomAttributes<IApplyToContext>(true);
             if (changes.Length > 0)
             {
@@ -126,8 +136,12 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             return new[]
             {
                 testMethod.Method.GetCustomAttributes<ITestBuilder>(true).Select(attribute => attribute.GetType().Name),
-                testMethod.Method.GetCustomAttributes<ISimpleTestBuilder>(true).Select(attribute => attribute.GetType().Name)
-            }.SelectMany(v => v).FirstOrDefault();
+                testMethod
+                    .Method.GetCustomAttributes<ISimpleTestBuilder>(true)
+                    .Select(attribute => attribute.GetType().Name),
+            }
+                .SelectMany(v => v)
+                .FirstOrDefault();
         }
 
         private static TestCommand TryReplaceWithEnumerableCommand(TestCommand command)

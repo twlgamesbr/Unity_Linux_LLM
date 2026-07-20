@@ -38,14 +38,8 @@ namespace UnityEngine.UIElements.TestFramework
         /// </summary>
         internal static Func<IEnumerator> FrameWaiterFunction
         {
-            get
-            {
-                return frameWaiterFunction;
-            }
-            set
-            {
-                frameWaiterFunction = value;
-            }
+            get { return frameWaiterFunction; }
+            set { frameWaiterFunction = value; }
         }
 
         /// <summary>
@@ -173,9 +167,20 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="character">The character for the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>An initialized `KeyDownEvent` or `KeyUpEvent`.</returns>
-        public static EventBase MakeKeyEvent(EventType type, KeyCode code = KeyCode.None, char character = '\0', EventModifiers modifiers = EventModifiers.None)
+        public static EventBase MakeKeyEvent(
+            EventType type,
+            KeyCode code = KeyCode.None,
+            char character = '\0',
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
-            var evt = new Event() { type = type, keyCode = code, character = character, modifiers = modifiers };
+            var evt = new Event()
+            {
+                type = type,
+                keyCode = code,
+                character = character,
+                modifiers = modifiers,
+            };
             return CreateEvent(evt);
         }
 
@@ -187,7 +192,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <returns>An initialized `KeyDownEvent`.</returns>
         public static EventBase MakeKeyDown(KeyCode code, EventModifiers modifiers = EventModifiers.None)
         {
-            var evt = new Event() { type = EventType.KeyDown, keyCode = code, character = '\0', modifiers = modifiers };
+            var evt = new Event()
+            {
+                type = EventType.KeyDown,
+                keyCode = code,
+                character = '\0',
+                modifiers = modifiers,
+            };
             return CreateEvent(evt);
         }
 
@@ -199,7 +210,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <returns>An initialized `KeyDownEvent`.</returns>
         public static EventBase MakeKeyDown(char character, EventModifiers modifiers = EventModifiers.None)
         {
-            var evt = new Event() { type = EventType.KeyDown, keyCode = KeyCode.None, character = character, modifiers = modifiers };
+            var evt = new Event()
+            {
+                type = EventType.KeyDown,
+                keyCode = KeyCode.None,
+                character = character,
+                modifiers = modifiers,
+            };
             return CreateEvent(evt);
         }
 
@@ -211,7 +228,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <returns>An initialized `KeyUpEvent`.</returns>
         public static EventBase MakeKeyUp(KeyCode code, EventModifiers modifiers = EventModifiers.None)
         {
-            var evt = new Event() { type = EventType.KeyUp, keyCode = code, character = '\0', modifiers = modifiers };
+            var evt = new Event()
+            {
+                type = EventType.KeyUp,
+                keyCode = code,
+                character = '\0',
+                modifiers = modifiers,
+            };
             return CreateEvent(evt);
         }
 
@@ -223,9 +246,21 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <param name="clickCount">The number of clicks corresponding to the event.</param>
         /// <returns>An initialized `PointerMoveEvent`.</returns>
-        public static EventBase MakeMouseMoveBy(Vector2 deltaMove, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, int clickCount = 1)
+        public static EventBase MakeMouseMoveBy(
+            Vector2 deltaMove,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            int clickCount = 1
+        )
         {
-            var evt = new Event() { type = EventType.MouseMove, delta = deltaMove, button = (int)button, modifiers = modifiers, clickCount = clickCount };
+            var evt = new Event()
+            {
+                type = EventType.MouseMove,
+                delta = deltaMove,
+                button = (int)button,
+                modifiers = modifiers,
+                clickCount = clickCount,
+            };
             return CreateEvent(evt);
         }
 
@@ -238,7 +273,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="clickCount">The number of clicks corresponding to the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>An initialized `PointerMoveEvent`.</returns>
-        public static EventBase MakeMouseMoveTo(Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, int clickCount = 1, Ray? ray = null)
+        public static EventBase MakeMouseMoveTo(
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            int clickCount = 1,
+            Ray? ray = null
+        )
         {
             return MakeMouseEvent(EventType.MouseMove, position, button, modifiers, clickCount, ray);
         }
@@ -255,10 +296,22 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>An initialized `PointerMoveEvent`.</returns>
         /// <remarks>This method produces unpredictable results if used on a world space panel.</remarks>
-        public static EventBase MakeMouseMoveEvent(Vector2 position, Vector2 delta, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public static EventBase MakeMouseMoveEvent(
+            Vector2 position,
+            Vector2 delta,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             // No support for world-space in this method. The concept of delta needs to be done differently in that case.
-            var evt = new Event() { type = EventType.MouseMove, mousePosition = position, delta = delta, button = (int)button, modifiers = modifiers };
+            var evt = new Event()
+            {
+                type = EventType.MouseMove,
+                mousePosition = position,
+                delta = delta,
+                button = (int)button,
+                modifiers = modifiers,
+            };
             return CreateEvent(evt);
         }
 
@@ -271,7 +324,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="clickCount">The number of clicks corresponding to the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>An initialized `PointerDownEvent`.</returns>
-        public static EventBase MakeMouseDownAt(Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, int clickCount = 1, Ray? ray = null)
+        public static EventBase MakeMouseDownAt(
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            int clickCount = 1,
+            Ray? ray = null
+        )
         {
             return MakeMouseEvent(EventType.MouseDown, position, button, modifiers, clickCount, ray);
         }
@@ -285,7 +344,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="clickCount">The number of clicks corresponding to the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>An initialized `PointerUpEvent`.</returns>
-        public static EventBase MakeMouseUpAt(Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, int clickCount = 1, Ray? ray = null)
+        public static EventBase MakeMouseUpAt(
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            int clickCount = 1,
+            Ray? ray = null
+        )
         {
             return MakeMouseEvent(EventType.MouseUp, position, button, modifiers, clickCount, ray);
         }
@@ -300,11 +365,25 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="clickCount">The number of clicks corresponding to the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>An initialized Pointer event.</returns>
-        public static EventBase MakeMouseEvent(EventType type, Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, int clickCount = 1, Ray? ray = null)
+        public static EventBase MakeMouseEvent(
+            EventType type,
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            int clickCount = 1,
+            Ray? ray = null
+        )
         {
             // This needs to be refactored to use a better entry point than IMGUI events.
             // PointerEventBase supports 3D positions, which are currently completely ignored.
-            var evt = new Event() { type = type, mousePosition = position, button = (int)button, modifiers = modifiers, clickCount = clickCount };
+            var evt = new Event()
+            {
+                type = type,
+                mousePosition = position,
+                button = (int)button,
+                modifiers = modifiers,
+                clickCount = clickCount,
+            };
             var result = CreateEvent(evt);
             ((IPointerOrMouseEvent)result).panelRay = ray;
             return result;
@@ -323,7 +402,12 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="fingerId">The finger for the event. Default is `0`.</param>
         /// <returns>An initialized `PointerDownEvent`, `PointerUpEvent`, or `PointerMoveEvent`.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Throws if the `TouchPhase` is not within the acceptable values.</exception>
-        public static EventBase MakePointerEvent(TouchPhase phase, Vector2 position, EventModifiers modifiers = EventModifiers.None, int fingerId = 0)
+        public static EventBase MakePointerEvent(
+            TouchPhase phase,
+            Vector2 position,
+            EventModifiers modifiers = EventModifiers.None,
+            int fingerId = 0
+        )
         {
             var touch = MakeDefaultTouch();
             touch.fingerId = fingerId;
@@ -355,7 +439,11 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>An initialized `PointerDownEvent`, `PointerUpEvent`, or `PointerMoveEvent`.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Throws if the `PenEventType` is not within the acceptable values.</exception>
-        public static EventBase MakePenEvent(PenEventType contactType, Vector2 position, EventModifiers modifiers = EventModifiers.None)
+        public static EventBase MakePenEvent(
+            PenEventType contactType,
+            Vector2 position,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             var penData = new PenData();
             penData.contactType = contactType;
@@ -390,7 +478,7 @@ namespace UnityEngine.UIElements.TestFramework
             {
                 type = EventType.ScrollWheel,
                 delta = delta,
-                mousePosition = position
+                mousePosition = position,
             };
 
             var result = CreateEvent(evt);
@@ -407,235 +495,263 @@ namespace UnityEngine.UIElements.TestFramework
             /// Cut Command.
             /// </summary>
             Cut,
+
             /// <summary>
             /// Copy Command.
             /// </summary>
             Copy,
+
             /// <summary>
             /// Paste Command.
             /// </summary>
             Paste,
+
             /// <summary>
             /// SelectAll Command.
             /// </summary>
             SelectAll,
+
             /// <summary>
             /// DeselectAll Command.
             /// </summary>
             DeselectAll,
+
             /// <summary>
             /// InvertSelection Command.
             /// </summary>
             InvertSelection,
+
             /// <summary>
             /// Duplicate Command.
             /// </summary>
             Duplicate,
+
             /// <summary>
             /// Rename Command.
             /// </summary>
             Rename,
+
             /// <summary>
             /// Delete Command.
             /// </summary>
             Delete,
+
             /// <summary>
             /// SoftDelete Command.
             /// </summary>
             SoftDelete,
+
             /// <summary>
             /// Find Command.
             /// </summary>
             Find,
+
             /// <summary>
             /// SelectChildren Command.
             /// </summary>
             SelectChildren,
+
             /// <summary>
             /// SelectPrefabRoot Command.
             /// </summary>
             SelectPrefabRoot,
+
             /// <summary>
             /// UndoRedoPerformed Command.
             /// </summary>
             UndoRedoPerformed,
+
             /// <summary>
             /// OnLostFocus Command.
             /// </summary>
             OnLostFocus,
+
             /// <summary>
             /// NewKeyboardFocus Command.
             /// </summary>
             NewKeyboardFocus,
+
             /// <summary>
             /// ModifierKeysChanged Command.
             /// </summary>
             ModifierKeysChanged,
+
             /// <summary>
             /// EyeDropperUpdate Command.
             /// </summary>
             EyeDropperUpdate,
+
             /// <summary>
             /// EyeDropperClicked Command.
             /// </summary>
             EyeDropperClicked,
+
             /// <summary>
             /// EyeDroppedCancelled Command.
             /// </summary>
             EyeDropperCancelled,
+
             /// <summary>
             /// ColorPickerChanged Command.
             /// </summary>
             ColorPickerChanged,
+
             /// <summary>
             /// FrameSelected Command.
             /// </summary>
             FrameSelected,
+
             /// <summary>
             /// FrameSelectedWithLock Command.
             /// </summary>
-            FrameSelectedWithLock
+            FrameSelectedWithLock,
         }
 
         #region Mappings from character to KeyCode and EventModifier
-        private static KeyValuePair<char, (KeyCode, EventModifiers)> KeyCodeModifiersMapping(char character, (KeyCode, EventModifiers) mapping)
+        private static KeyValuePair<char, (KeyCode, EventModifiers)> KeyCodeModifiersMapping(
+            char character,
+            (KeyCode, EventModifiers) mapping
+        )
         {
             return new KeyValuePair<char, (KeyCode, EventModifiers)>(character, mapping);
         }
 
-        internal static Dictionary<char, (KeyCode, EventModifiers)> charKeyCodeModifiersMapping = new Dictionary<char, (KeyCode, EventModifiers)>(new[]
-        {
-            // Lowercase Letters.
-            KeyCodeModifiersMapping('a', (KeyCode.A, EventModifiers.None)),
-            KeyCodeModifiersMapping('b', (KeyCode.B, EventModifiers.None)),
-            KeyCodeModifiersMapping('c', (KeyCode.C, EventModifiers.None)),
-            KeyCodeModifiersMapping('d', (KeyCode.D, EventModifiers.None)),
-            KeyCodeModifiersMapping('e', (KeyCode.E, EventModifiers.None)),
-            KeyCodeModifiersMapping('f', (KeyCode.F, EventModifiers.None)),
-            KeyCodeModifiersMapping('g', (KeyCode.G, EventModifiers.None)),
-            KeyCodeModifiersMapping('h', (KeyCode.H, EventModifiers.None)),
-            KeyCodeModifiersMapping('i', (KeyCode.I, EventModifiers.None)),
-            KeyCodeModifiersMapping('j', (KeyCode.J, EventModifiers.None)),
-            KeyCodeModifiersMapping('k', (KeyCode.K, EventModifiers.None)),
-            KeyCodeModifiersMapping('l', (KeyCode.L, EventModifiers.None)),
-            KeyCodeModifiersMapping('m', (KeyCode.M, EventModifiers.None)),
-            KeyCodeModifiersMapping('n', (KeyCode.N, EventModifiers.None)),
-            KeyCodeModifiersMapping('o', (KeyCode.O, EventModifiers.None)),
-            KeyCodeModifiersMapping('p', (KeyCode.P, EventModifiers.None)),
-            KeyCodeModifiersMapping('q', (KeyCode.Q, EventModifiers.None)),
-            KeyCodeModifiersMapping('r', (KeyCode.R, EventModifiers.None)),
-            KeyCodeModifiersMapping('s', (KeyCode.S, EventModifiers.None)),
-            KeyCodeModifiersMapping('t', (KeyCode.T, EventModifiers.None)),
-            KeyCodeModifiersMapping('u', (KeyCode.U, EventModifiers.None)),
-            KeyCodeModifiersMapping('v', (KeyCode.V, EventModifiers.None)),
-            KeyCodeModifiersMapping('w', (KeyCode.W, EventModifiers.None)),
-            KeyCodeModifiersMapping('x', (KeyCode.X, EventModifiers.None)),
-            KeyCodeModifiersMapping('y', (KeyCode.Y, EventModifiers.None)),
-            KeyCodeModifiersMapping('z', (KeyCode.Z, EventModifiers.None)),
-
-            // Uppercase Letters.
-            KeyCodeModifiersMapping('A', (KeyCode.A, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('B', (KeyCode.B, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('C', (KeyCode.C, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('D', (KeyCode.D, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('E', (KeyCode.E, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('F', (KeyCode.F, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('G', (KeyCode.G, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('H', (KeyCode.H, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('I', (KeyCode.I, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('J', (KeyCode.J, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('K', (KeyCode.K, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('L', (KeyCode.L, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('M', (KeyCode.M, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('N', (KeyCode.N, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('O', (KeyCode.O, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('P', (KeyCode.P, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('Q', (KeyCode.Q, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('R', (KeyCode.R, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('S', (KeyCode.S, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('T', (KeyCode.T, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('U', (KeyCode.U, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('V', (KeyCode.V, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('W', (KeyCode.W, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('X', (KeyCode.X, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('Y', (KeyCode.Y, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('Z', (KeyCode.Z, EventModifiers.Shift)),
-
-            // Numbers.
-            KeyCodeModifiersMapping('1', (KeyCode.Alpha1, EventModifiers.None)),
-            KeyCodeModifiersMapping('2', (KeyCode.Alpha2, EventModifiers.None)),
-            KeyCodeModifiersMapping('3', (KeyCode.Alpha3, EventModifiers.None)),
-            KeyCodeModifiersMapping('4', (KeyCode.Alpha4, EventModifiers.None)),
-            KeyCodeModifiersMapping('5', (KeyCode.Alpha5, EventModifiers.None)),
-            KeyCodeModifiersMapping('6', (KeyCode.Alpha6, EventModifiers.None)),
-            KeyCodeModifiersMapping('7', (KeyCode.Alpha7, EventModifiers.None)),
-            KeyCodeModifiersMapping('8', (KeyCode.Alpha8, EventModifiers.None)),
-            KeyCodeModifiersMapping('9', (KeyCode.Alpha9, EventModifiers.None)),
-            KeyCodeModifiersMapping('0', (KeyCode.Alpha0, EventModifiers.None)),
-
-            // Non-Shift Symbols.
-            KeyCodeModifiersMapping('`', (KeyCode.BackQuote, EventModifiers.None)),
-            KeyCodeModifiersMapping('-', (KeyCode.Minus, EventModifiers.None)),
-            KeyCodeModifiersMapping('=', (KeyCode.Equals, EventModifiers.None)),
-            KeyCodeModifiersMapping('[', (KeyCode.LeftBracket, EventModifiers.None)),
-            KeyCodeModifiersMapping(']', (KeyCode.RightBracket, EventModifiers.None)),
-            KeyCodeModifiersMapping('\\', (KeyCode.Backslash, EventModifiers.None)),
-            KeyCodeModifiersMapping(';', (KeyCode.Semicolon, EventModifiers.None)),
-            KeyCodeModifiersMapping('\'', (KeyCode.Quote, EventModifiers.None)),
-            KeyCodeModifiersMapping(',', (KeyCode.Comma, EventModifiers.None)),
-            KeyCodeModifiersMapping('.', (KeyCode.Period, EventModifiers.None)),
-            KeyCodeModifiersMapping('/', (KeyCode.Slash, EventModifiers.None)),
-
-            // Shift Symbols.
-            KeyCodeModifiersMapping('~', (KeyCode.BackQuote, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('!', (KeyCode.Alpha1, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('@', (KeyCode.Alpha2, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('#', (KeyCode.Alpha3, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('$', (KeyCode.Alpha4, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('%', (KeyCode.Alpha5, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('^', (KeyCode.Alpha6, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('&', (KeyCode.Alpha7, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('*', (KeyCode.Alpha8, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('(', (KeyCode.Alpha9, EventModifiers.Shift)),
-            KeyCodeModifiersMapping(')', (KeyCode.Alpha0, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('_', (KeyCode.Minus, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('+', (KeyCode.Equals, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('{', (KeyCode.LeftBracket, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('}', (KeyCode.RightBracket, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('|', (KeyCode.Backslash, EventModifiers.Shift)),
-            KeyCodeModifiersMapping(':', (KeyCode.Semicolon, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('"', (KeyCode.Quote, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('<', (KeyCode.Comma, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('>', (KeyCode.Period, EventModifiers.Shift)),
-            KeyCodeModifiersMapping('?', (KeyCode.Slash, EventModifiers.Shift)),
-
-            // Other.
-            KeyCodeModifiersMapping(' ', (KeyCode.Space, EventModifiers.None))
-        });
-
-        internal static Dictionary<char, (KeyCode, EventModifiers)> charKeyCodeModifiersMappingKeyPad = charKeyCodeModifiersMapping.CopyAndReplace(
-            // Keypad alternates for numbers.
-            KeyCodeModifiersMapping('1', (KeyCode.Keypad1, EventModifiers.None)),
-            KeyCodeModifiersMapping('2', (KeyCode.Keypad2, EventModifiers.None)),
-            KeyCodeModifiersMapping('3', (KeyCode.Keypad3, EventModifiers.None)),
-            KeyCodeModifiersMapping('4', (KeyCode.Keypad4, EventModifiers.None)),
-            KeyCodeModifiersMapping('5', (KeyCode.Keypad5, EventModifiers.None)),
-            KeyCodeModifiersMapping('6', (KeyCode.Keypad6, EventModifiers.None)),
-            KeyCodeModifiersMapping('7', (KeyCode.Keypad7, EventModifiers.None)),
-            KeyCodeModifiersMapping('8', (KeyCode.Keypad8, EventModifiers.None)),
-            KeyCodeModifiersMapping('9', (KeyCode.Keypad9, EventModifiers.None)),
-            KeyCodeModifiersMapping('0', (KeyCode.Keypad0, EventModifiers.None)),
-
-            // Keypad alternates for symbols.
-            KeyCodeModifiersMapping('-', (KeyCode.KeypadMinus, EventModifiers.None)),
-            KeyCodeModifiersMapping('=', (KeyCode.KeypadEquals, EventModifiers.None)),
-            KeyCodeModifiersMapping('.', (KeyCode.KeypadPeriod, EventModifiers.None)),
-            KeyCodeModifiersMapping('/', (KeyCode.KeypadDivide, EventModifiers.None)),
-            KeyCodeModifiersMapping('*', (KeyCode.KeypadMultiply, EventModifiers.None)),
-            KeyCodeModifiersMapping('+', (KeyCode.KeypadPlus, EventModifiers.None))
+        internal static Dictionary<char, (KeyCode, EventModifiers)> charKeyCodeModifiersMapping = new Dictionary<
+            char,
+            (KeyCode, EventModifiers)
+        >(
+            new[]
+            {
+                // Lowercase Letters.
+                KeyCodeModifiersMapping('a', (KeyCode.A, EventModifiers.None)),
+                KeyCodeModifiersMapping('b', (KeyCode.B, EventModifiers.None)),
+                KeyCodeModifiersMapping('c', (KeyCode.C, EventModifiers.None)),
+                KeyCodeModifiersMapping('d', (KeyCode.D, EventModifiers.None)),
+                KeyCodeModifiersMapping('e', (KeyCode.E, EventModifiers.None)),
+                KeyCodeModifiersMapping('f', (KeyCode.F, EventModifiers.None)),
+                KeyCodeModifiersMapping('g', (KeyCode.G, EventModifiers.None)),
+                KeyCodeModifiersMapping('h', (KeyCode.H, EventModifiers.None)),
+                KeyCodeModifiersMapping('i', (KeyCode.I, EventModifiers.None)),
+                KeyCodeModifiersMapping('j', (KeyCode.J, EventModifiers.None)),
+                KeyCodeModifiersMapping('k', (KeyCode.K, EventModifiers.None)),
+                KeyCodeModifiersMapping('l', (KeyCode.L, EventModifiers.None)),
+                KeyCodeModifiersMapping('m', (KeyCode.M, EventModifiers.None)),
+                KeyCodeModifiersMapping('n', (KeyCode.N, EventModifiers.None)),
+                KeyCodeModifiersMapping('o', (KeyCode.O, EventModifiers.None)),
+                KeyCodeModifiersMapping('p', (KeyCode.P, EventModifiers.None)),
+                KeyCodeModifiersMapping('q', (KeyCode.Q, EventModifiers.None)),
+                KeyCodeModifiersMapping('r', (KeyCode.R, EventModifiers.None)),
+                KeyCodeModifiersMapping('s', (KeyCode.S, EventModifiers.None)),
+                KeyCodeModifiersMapping('t', (KeyCode.T, EventModifiers.None)),
+                KeyCodeModifiersMapping('u', (KeyCode.U, EventModifiers.None)),
+                KeyCodeModifiersMapping('v', (KeyCode.V, EventModifiers.None)),
+                KeyCodeModifiersMapping('w', (KeyCode.W, EventModifiers.None)),
+                KeyCodeModifiersMapping('x', (KeyCode.X, EventModifiers.None)),
+                KeyCodeModifiersMapping('y', (KeyCode.Y, EventModifiers.None)),
+                KeyCodeModifiersMapping('z', (KeyCode.Z, EventModifiers.None)),
+                // Uppercase Letters.
+                KeyCodeModifiersMapping('A', (KeyCode.A, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('B', (KeyCode.B, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('C', (KeyCode.C, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('D', (KeyCode.D, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('E', (KeyCode.E, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('F', (KeyCode.F, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('G', (KeyCode.G, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('H', (KeyCode.H, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('I', (KeyCode.I, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('J', (KeyCode.J, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('K', (KeyCode.K, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('L', (KeyCode.L, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('M', (KeyCode.M, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('N', (KeyCode.N, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('O', (KeyCode.O, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('P', (KeyCode.P, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('Q', (KeyCode.Q, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('R', (KeyCode.R, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('S', (KeyCode.S, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('T', (KeyCode.T, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('U', (KeyCode.U, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('V', (KeyCode.V, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('W', (KeyCode.W, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('X', (KeyCode.X, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('Y', (KeyCode.Y, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('Z', (KeyCode.Z, EventModifiers.Shift)),
+                // Numbers.
+                KeyCodeModifiersMapping('1', (KeyCode.Alpha1, EventModifiers.None)),
+                KeyCodeModifiersMapping('2', (KeyCode.Alpha2, EventModifiers.None)),
+                KeyCodeModifiersMapping('3', (KeyCode.Alpha3, EventModifiers.None)),
+                KeyCodeModifiersMapping('4', (KeyCode.Alpha4, EventModifiers.None)),
+                KeyCodeModifiersMapping('5', (KeyCode.Alpha5, EventModifiers.None)),
+                KeyCodeModifiersMapping('6', (KeyCode.Alpha6, EventModifiers.None)),
+                KeyCodeModifiersMapping('7', (KeyCode.Alpha7, EventModifiers.None)),
+                KeyCodeModifiersMapping('8', (KeyCode.Alpha8, EventModifiers.None)),
+                KeyCodeModifiersMapping('9', (KeyCode.Alpha9, EventModifiers.None)),
+                KeyCodeModifiersMapping('0', (KeyCode.Alpha0, EventModifiers.None)),
+                // Non-Shift Symbols.
+                KeyCodeModifiersMapping('`', (KeyCode.BackQuote, EventModifiers.None)),
+                KeyCodeModifiersMapping('-', (KeyCode.Minus, EventModifiers.None)),
+                KeyCodeModifiersMapping('=', (KeyCode.Equals, EventModifiers.None)),
+                KeyCodeModifiersMapping('[', (KeyCode.LeftBracket, EventModifiers.None)),
+                KeyCodeModifiersMapping(']', (KeyCode.RightBracket, EventModifiers.None)),
+                KeyCodeModifiersMapping('\\', (KeyCode.Backslash, EventModifiers.None)),
+                KeyCodeModifiersMapping(';', (KeyCode.Semicolon, EventModifiers.None)),
+                KeyCodeModifiersMapping('\'', (KeyCode.Quote, EventModifiers.None)),
+                KeyCodeModifiersMapping(',', (KeyCode.Comma, EventModifiers.None)),
+                KeyCodeModifiersMapping('.', (KeyCode.Period, EventModifiers.None)),
+                KeyCodeModifiersMapping('/', (KeyCode.Slash, EventModifiers.None)),
+                // Shift Symbols.
+                KeyCodeModifiersMapping('~', (KeyCode.BackQuote, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('!', (KeyCode.Alpha1, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('@', (KeyCode.Alpha2, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('#', (KeyCode.Alpha3, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('$', (KeyCode.Alpha4, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('%', (KeyCode.Alpha5, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('^', (KeyCode.Alpha6, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('&', (KeyCode.Alpha7, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('*', (KeyCode.Alpha8, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('(', (KeyCode.Alpha9, EventModifiers.Shift)),
+                KeyCodeModifiersMapping(')', (KeyCode.Alpha0, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('_', (KeyCode.Minus, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('+', (KeyCode.Equals, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('{', (KeyCode.LeftBracket, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('}', (KeyCode.RightBracket, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('|', (KeyCode.Backslash, EventModifiers.Shift)),
+                KeyCodeModifiersMapping(':', (KeyCode.Semicolon, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('"', (KeyCode.Quote, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('<', (KeyCode.Comma, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('>', (KeyCode.Period, EventModifiers.Shift)),
+                KeyCodeModifiersMapping('?', (KeyCode.Slash, EventModifiers.Shift)),
+                // Other.
+                KeyCodeModifiersMapping(' ', (KeyCode.Space, EventModifiers.None)),
+            }
         );
 
-        private static Dictionary<char, (KeyCode, EventModifiers)> CopyAndReplace(this Dictionary<char, (KeyCode, EventModifiers)> baseDictionary, params KeyValuePair<char, (KeyCode, EventModifiers)>[] replacementValues)
+        internal static Dictionary<char, (KeyCode, EventModifiers)> charKeyCodeModifiersMappingKeyPad =
+            charKeyCodeModifiersMapping.CopyAndReplace(
+                // Keypad alternates for numbers.
+                KeyCodeModifiersMapping('1', (KeyCode.Keypad1, EventModifiers.None)),
+                KeyCodeModifiersMapping('2', (KeyCode.Keypad2, EventModifiers.None)),
+                KeyCodeModifiersMapping('3', (KeyCode.Keypad3, EventModifiers.None)),
+                KeyCodeModifiersMapping('4', (KeyCode.Keypad4, EventModifiers.None)),
+                KeyCodeModifiersMapping('5', (KeyCode.Keypad5, EventModifiers.None)),
+                KeyCodeModifiersMapping('6', (KeyCode.Keypad6, EventModifiers.None)),
+                KeyCodeModifiersMapping('7', (KeyCode.Keypad7, EventModifiers.None)),
+                KeyCodeModifiersMapping('8', (KeyCode.Keypad8, EventModifiers.None)),
+                KeyCodeModifiersMapping('9', (KeyCode.Keypad9, EventModifiers.None)),
+                KeyCodeModifiersMapping('0', (KeyCode.Keypad0, EventModifiers.None)),
+                // Keypad alternates for symbols.
+                KeyCodeModifiersMapping('-', (KeyCode.KeypadMinus, EventModifiers.None)),
+                KeyCodeModifiersMapping('=', (KeyCode.KeypadEquals, EventModifiers.None)),
+                KeyCodeModifiersMapping('.', (KeyCode.KeypadPeriod, EventModifiers.None)),
+                KeyCodeModifiersMapping('/', (KeyCode.KeypadDivide, EventModifiers.None)),
+                KeyCodeModifiersMapping('*', (KeyCode.KeypadMultiply, EventModifiers.None)),
+                KeyCodeModifiersMapping('+', (KeyCode.KeypadPlus, EventModifiers.None))
+            );
+
+        private static Dictionary<char, (KeyCode, EventModifiers)> CopyAndReplace(
+            this Dictionary<char, (KeyCode, EventModifiers)> baseDictionary,
+            params KeyValuePair<char, (KeyCode, EventModifiers)>[] replacementValues
+        )
         {
             var dict = new Dictionary<char, (KeyCode, EventModifiers)>(baseDictionary);
             foreach (var (character, mapping) in replacementValues)
@@ -756,13 +872,21 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateClick(this VisualElement ve, Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateClick(
+            this VisualElement ve,
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(new EventBase[]
-            {
-                EventHelpers.MakeMouseDownAt(position, button, modifiers, clickCount:1, ray),
-                EventHelpers.MakeMouseUpAt(position, button, modifiers, clickCount:1, ray)
-            });
+            yield return ve.DispatchAndWaitForNextFrame(
+                new EventBase[]
+                {
+                    EventHelpers.MakeMouseDownAt(position, button, modifiers, clickCount: 1, ray),
+                    EventHelpers.MakeMouseUpAt(position, button, modifiers, clickCount: 1, ray),
+                }
+            );
         }
 
         /// <summary>
@@ -776,7 +900,12 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateClick(this VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateClick(
+            this VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
             yield return ve.SimulateClick(GetAbsoluteElementCenter(ve), button, modifiers, ray);
         }
@@ -792,15 +921,23 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateDoubleClick(this VisualElement ve, Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateDoubleClick(
+            this VisualElement ve,
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(new EventBase[]
-            {
-                EventHelpers.MakeMouseDownAt(position, button, modifiers, clickCount:1, ray),
-                EventHelpers.MakeMouseUpAt(position, button, modifiers, clickCount:1, ray),
-                EventHelpers.MakeMouseDownAt(position, button, modifiers, clickCount:2, ray),
-                EventHelpers.MakeMouseUpAt(position, button, modifiers, clickCount:1, ray)
-            });
+            yield return ve.DispatchAndWaitForNextFrame(
+                new EventBase[]
+                {
+                    EventHelpers.MakeMouseDownAt(position, button, modifiers, clickCount: 1, ray),
+                    EventHelpers.MakeMouseUpAt(position, button, modifiers, clickCount: 1, ray),
+                    EventHelpers.MakeMouseDownAt(position, button, modifiers, clickCount: 2, ray),
+                    EventHelpers.MakeMouseUpAt(position, button, modifiers, clickCount: 1, ray),
+                }
+            );
         }
 
         /// <summary>
@@ -814,7 +951,12 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateDoubleClick(this VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateDoubleClick(
+            this VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
             yield return ve.SimulateDoubleClick(GetAbsoluteElementCenter(ve), button, modifiers, ray);
         }
@@ -830,9 +972,17 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseDownAt(this VisualElement ve, Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateMouseDownAt(
+            this VisualElement ve,
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseDownAt(position, button, modifiers, ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseDownAt(position, button, modifiers, ray: ray)
+            );
         }
 
         /// <summary>
@@ -846,9 +996,16 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseDownAt(this VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateMouseDownAt(
+            this VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseDownAt(GetAbsoluteElementCenter(ve), button, modifiers, ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseDownAt(GetAbsoluteElementCenter(ve), button, modifiers, ray: ray)
+            );
         }
 
         /// <summary>
@@ -862,9 +1019,17 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseUpAt(this VisualElement ve, Vector3 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateMouseUpAt(
+            this VisualElement ve,
+            Vector3 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseUpAt(position, button, modifiers, ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseUpAt(position, button, modifiers, ray: ray)
+            );
         }
 
         /// <summary>
@@ -878,9 +1043,16 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseUpAt(this VisualElement ve, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateMouseUpAt(
+            this VisualElement ve,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseUpAt(GetAbsoluteElementCenter(ve), button, modifiers, ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseUpAt(GetAbsoluteElementCenter(ve), button, modifiers, ray: ray)
+            );
         }
 
         /// <summary>
@@ -894,12 +1066,19 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <returns>`IEnumerator` iterator.</returns>
         /// <remarks>This method produces unpredictable results if used on a world space panel.</remarks>
-        public static IEnumerator SimulateMouseMove(this VisualElement ve, Vector2 positionFrom, Vector2 positionTo, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateMouseMove(
+            this VisualElement ve,
+            Vector2 positionFrom,
+            Vector2 positionTo,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             const float steps = 9f;
 
             // Set the initial mouse position to the starting position.
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseMoveEvent(positionFrom, Vector2.zero, modifiers: modifiers));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseMoveEvent(positionFrom, Vector2.zero, modifiers: modifiers)
+            );
 
             var dragDistance = Vector2.Distance(positionFrom, positionTo);
             var dragSpeed = Mathf.Max(1f, dragDistance / steps);
@@ -910,13 +1089,17 @@ namespace UnityEngine.UIElements.TestFramework
             for (int i = 1; i < steps; i++)
             {
                 nextMousePosition += delta;
-                yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseMoveEvent(nextMousePosition, delta, modifiers: modifiers));
+                yield return ve.DispatchAndWaitForNextFrame(
+                    EventHelpers.MakeMouseMoveEvent(nextMousePosition, delta, modifiers: modifiers)
+                );
             }
 
             // To account for rounding errors, the last increment will be slightly bigger than the previous ones.
             delta = positionTo - nextMousePosition;
             nextMousePosition += delta;
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseMoveEvent(nextMousePosition, delta, modifiers: modifiers));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseMoveEvent(nextMousePosition, delta, modifiers: modifiers)
+            );
         }
 
         /// <summary>
@@ -929,9 +1112,16 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseMoveTo(this VisualElement ve, Vector3 position, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateMouseMoveTo(
+            this VisualElement ve,
+            Vector3 position,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseMoveTo(position, modifiers: modifiers, ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseMoveTo(position, modifiers: modifiers, ray: ray)
+            );
         }
 
         /// <summary>
@@ -944,9 +1134,15 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseMoveTo(this VisualElement ve, EventModifiers modifiers = EventModifiers.None, Ray? ray = null)
+        public static IEnumerator SimulateMouseMoveTo(
+            this VisualElement ve,
+            EventModifiers modifiers = EventModifiers.None,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeMouseMoveTo(GetAbsoluteElementCenter(ve), modifiers: modifiers, ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeMouseMoveTo(GetAbsoluteElementCenter(ve), modifiers: modifiers, ray: ray)
+            );
         }
 
         /// <summary>
@@ -962,7 +1158,13 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <returns>`IEnumerator` iterator.</returns>
         /// <remarks>This method produces unpredictable results if used on a world space panel.</remarks>
-        public static IEnumerator SimulateDragAndDrop(this VisualElement ve, Vector2 positionFrom, Vector2 positionTo, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateDragAndDrop(
+            this VisualElement ve,
+            Vector2 positionFrom,
+            Vector2 positionTo,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return ve.SimulateMouseDownAt(positionFrom, button, modifiers);
             yield return ve.SimulateMouseMove(positionFrom, positionTo, modifiers);
@@ -979,9 +1181,14 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="position">The Absolute position for the event.</param>
         /// <param name="ray">A ray for world-space interactions, expressed in the Absolute panel coordinate system.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateScrollWheel(this VisualElement ve, Vector2 delta, Vector3 position, Ray? ray = null)
+        public static IEnumerator SimulateScrollWheel(
+            this VisualElement ve,
+            Vector2 delta,
+            Vector3 position,
+            Ray? ray = null
+        )
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeScrollWheelEvent(delta, position, ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeScrollWheelEvent(delta, position, ray: ray));
         }
 
         /// <summary>
@@ -996,7 +1203,9 @@ namespace UnityEngine.UIElements.TestFramework
         /// <returns>`IEnumerator` iterator.</returns>
         public static IEnumerator SimulateScrollWheel(this VisualElement ve, Vector2 delta, Ray? ray = null)
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeScrollWheelEvent(delta, GetAbsoluteElementCenter(ve), ray:ray));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeScrollWheelEvent(delta, GetAbsoluteElementCenter(ve), ray: ray)
+            );
         }
 
         private static Vector3 GetAbsoluteElementCenter(VisualElement ve)
@@ -1069,8 +1278,7 @@ namespace UnityEngine.UIElements.TestFramework
                 // TouchScreenTextEditorEventHandler polls for updates every few milliseconds.
                 // Wait until the next frame after the last character has been sent.
                 float time = Time.realtimeSinceStartup + 1f;
-                while (Time.realtimeSinceStartup < time &&
-                    TouchScreenTextEditorEventHandler.Frame <= frame)
+                while (Time.realtimeSinceStartup < time && TouchScreenTextEditorEventHandler.Frame <= frame)
                 {
                     yield return EventHelpers.FrameWaiterFunction?.Invoke();
                 }
@@ -1086,7 +1294,9 @@ namespace UnityEngine.UIElements.TestFramework
         private static IEnumerator DispatchKeyboardEvents(this VisualElement ve, string text, bool useKeypad)
         {
             // Fetch the dictionary to use in this case.
-            var dict = useKeypad ? EventHelpers.charKeyCodeModifiersMappingKeyPad : EventHelpers.charKeyCodeModifiersMapping;
+            var dict = useKeypad
+                ? EventHelpers.charKeyCodeModifiersMappingKeyPad
+                : EventHelpers.charKeyCodeModifiersMapping;
 
             foreach (var character in text)
             {
@@ -1110,7 +1320,8 @@ namespace UnityEngine.UIElements.TestFramework
                 ve.Dispatch(EventHelpers.MakeKeyDown(keyCode, modifiers));
                 yield return ve.DispatchAndWaitForNextFrame(
                     EventHelpers.MakeKeyDown(character, modifiers),
-                    EventHelpers.MakeKeyUp(keyCode, modifiers));
+                    EventHelpers.MakeKeyUp(keyCode, modifiers)
+                );
             }
         }
 
@@ -1127,7 +1338,11 @@ namespace UnityEngine.UIElements.TestFramework
         /// <para>To send `Tab`, use <see cref="SimulateTabKey(VisualElement, EventModifiers)"/>.</para>
         /// </remarks>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateKey(this VisualElement ve, KeyCode code, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateKey(
+            this VisualElement ve,
+            KeyCode code,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             // Some keys send the FunctionKey modifier even if it isn't specified, so the helper also sends it.
             if (EventHelpers.ShouldSendFunctionModifier(code))
@@ -1137,7 +1352,8 @@ namespace UnityEngine.UIElements.TestFramework
 
             yield return ve.DispatchAndWaitForNextFrame(
                 EventHelpers.MakeKeyDown(code, modifiers),
-                EventHelpers.MakeKeyUp(code, modifiers));
+                EventHelpers.MakeKeyUp(code, modifiers)
+            );
         }
 
         /// <summary>
@@ -1146,14 +1362,18 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="ve">`VisualElement` whose panel should receive the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateReturnKey(this VisualElement ve, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateReturnKey(
+            this VisualElement ve,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             // In real life, both KeyDown events are sent in the same frame,
             // so that's what's done here as well.
             ve.Dispatch(EventHelpers.MakeKeyDown(KeyCode.Return, modifiers));
             yield return ve.DispatchAndWaitForNextFrame(
                 EventHelpers.MakeKeyDown('\n', modifiers),
-                EventHelpers.MakeKeyUp(KeyCode.Return, modifiers));
+                EventHelpers.MakeKeyUp(KeyCode.Return, modifiers)
+            );
         }
 
         /// <summary>
@@ -1162,14 +1382,18 @@ namespace UnityEngine.UIElements.TestFramework
         /// <param name="ve">`VisualElement` whose panel should receive the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateKeypadEnterKey(this VisualElement ve, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateKeypadEnterKey(
+            this VisualElement ve,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             // In real life, both KeyDown events are sent in the same frame,
             // so that's what's done here as well.
             ve.Dispatch(EventHelpers.MakeKeyDown(KeyCode.KeypadEnter, modifiers));
             yield return ve.DispatchAndWaitForNextFrame(
                 EventHelpers.MakeKeyDown('\n', modifiers),
-                EventHelpers.MakeKeyUp(KeyCode.KeypadEnter, modifiers));
+                EventHelpers.MakeKeyUp(KeyCode.KeypadEnter, modifiers)
+            );
         }
 
         /// <summary>
@@ -1193,7 +1417,8 @@ namespace UnityEngine.UIElements.TestFramework
             ve.Dispatch(EventHelpers.MakeKeyDown(KeyCode.Tab, modifiers));
             yield return ve.DispatchAndWaitForNextFrame(
                 EventHelpers.MakeKeyDown(tabChar, modifiers),
-                EventHelpers.MakeKeyUp(KeyCode.Tab, modifiers));
+                EventHelpers.MakeKeyUp(KeyCode.Tab, modifiers)
+            );
         }
 
         /// <summary>
@@ -1207,7 +1432,9 @@ namespace UnityEngine.UIElements.TestFramework
         /// <returns>`IEnumerator` iterator.</returns>
         public static IEnumerator SimulateExecuteCommand(this VisualElement ve, string commandName)
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeCommandEvent(EventType.ExecuteCommand, commandName));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeCommandEvent(EventType.ExecuteCommand, commandName)
+            );
         }
 
         /// <summary>
@@ -1235,7 +1462,9 @@ namespace UnityEngine.UIElements.TestFramework
         /// <returns>`IEnumerator` iterator.</returns>
         public static IEnumerator SimulateValidateCommand(this VisualElement ve, string commandName)
         {
-            yield return ve.DispatchAndWaitForNextFrame(EventHelpers.MakeCommandEvent(EventType.ValidateCommand, commandName));
+            yield return ve.DispatchAndWaitForNextFrame(
+                EventHelpers.MakeCommandEvent(EventType.ValidateCommand, commandName)
+            );
         }
 
         /// <summary>
@@ -1309,7 +1538,10 @@ namespace UnityEngine.UIElements.TestFramework
             internal FrameWaiter(Action func)
             {
                 previousWaiterFunction = EventHelpers.FrameWaiterFunction;
-                EventHelpers.FrameWaiterFunction = new Func<IEnumerator>(() => { return CreateFrameWaiter(func); });
+                EventHelpers.FrameWaiterFunction = new Func<IEnumerator>(() =>
+                {
+                    return CreateFrameWaiter(func);
+                });
             }
         }
 
@@ -1437,7 +1669,9 @@ namespace UnityEngine.UIElements.TestFramework
         {
             if (enumerator == null)
             {
-                throw new NotSupportedException("Cannot disable frame yielding if Enumerator expects a frame to be yielded.");
+                throw new NotSupportedException(
+                    "Cannot disable frame yielding if Enumerator expects a frame to be yielded."
+                );
             }
 
             while (enumerator.MoveNext())
@@ -1452,7 +1686,9 @@ namespace UnityEngine.UIElements.TestFramework
                 }
                 else
                 {
-                    throw new NotSupportedException("Cannot disable frame yielding if Enumerator expects a frame to be yielded.");
+                    throw new NotSupportedException(
+                        "Cannot disable frame yielding if Enumerator expects a frame to be yielded."
+                    );
                 }
             }
         }
@@ -1523,8 +1759,7 @@ namespace UnityEngine.UIElements.TestFramework
                 {
                     break;
                 }
-            }
-            while (Time.realtimeSinceStartup < endTime);
+            } while (Time.realtimeSinceStartup < endTime);
 
             // If no frame was incremented during this time, throw an exception.
             if (!wasFullLoopExecutedForFrame)

@@ -152,10 +152,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         ///   the texture to the specified MRT slot (index). In HLSL, write to the slot using
         ///   `float4 outColor : SV_Target{index} = value;`.
         ///   To use random-access writes, use `SetRandomAccessAttachment` (UAV).
-        ///   Don't write to this target with UAV-style indexed access (`operator[]`). 
+        ///   Don't write to this target with UAV-style indexed access (`operator[]`).
         /// - Read: This pass might read the current contents of the render target implicitly, depending
         ///   on rasterization state (for example, blending operations that read before writing).
-        ///   
+        ///
         /// The render graph can't determine how much of the target you overwrite. By default, it
         /// assumes partial updates and preserves existing content. If you fully overwrite the target
         /// (for example, in a fullscreen pass), use `AccessFlags.WriteAll` for better performance.
@@ -179,10 +179,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         ///   the texture to the specified MRT slot (index). In HLSL, write to the slot using
         ///   `float4 outColor : SV_Target{index} = value;`.
         ///   To use random-access writes, use `SetRandomAccessAttachment` (UAV).
-        ///   Don't write to this target with UAV-style indexed access (`operator[]`). 
+        ///   Don't write to this target with UAV-style indexed access (`operator[]`).
         /// - Read: This pass might read the current contents of the render target implicitly, depending
         ///   on rasterization state (for example, blending operations that read before writing).
-        ///   
+        ///
         /// The render graph can't determine how much of the target you overwrite. By default, it
         /// assumes partial updates and preserves existing content. If you fully overwrite the target
         /// (for example, in a fullscreen pass), use `AccessFlags.WriteAll` for better performance.
@@ -201,7 +201,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// Potential access flags:
         /// - Write: The pass writes fragment depth to the bound depth buffer (required if `ZWrite` is enabled in shader code).
         /// - Read: The pass reads from the bound depth buffer for depth testing (required if `ZTest` is set to an operation other than `Disabled`, `Never`, or `Always` in shader code).
-        /// 
+        ///
         /// Only one depth buffer can be tested against or written to in a single pass.
         /// To output depth to multiple textures, register the additional texture as a color
         /// attachment using `SetRenderAttachment()`, then compute and write the depth value in the shader.
@@ -222,13 +222,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <remarks>
         /// Potential access flags:
         /// - Write: The pass writes fragment depth to the bound depth buffer (required if `ZWrite` is enabled in shader code).
-	/// - Read: The pass reads from the bound depth buffer for depth testing (required if `ZTest` is set to an operation other than `Disabled`, `Never`, or `Always` in shader code).
-        /// 
+        /// - Read: The pass reads from the bound depth buffer for depth testing (required if `ZTest` is set to an operation other than `Disabled`, `Never`, or `Always` in shader code).
+        ///
         /// Only one depth texture can be read from or written to in a single pass.
         /// To output depth to multiple textures, register the additional texture as a color
         /// attachment using `SetRenderAttachment()`, then compute and write the depth value in the shader.
         /// If you call `SetRenderAttachmentDepth()` more than once on the same builder, it results in an error.
-        /// 
+        ///
         /// Using the same texture handle with different depth slices at different render target indices is not supported.
         /// </remarks>
         void SetRenderAttachmentDepth(TextureHandle tex, AccessFlags flags, int mipLevel, int depthSlice);
@@ -252,7 +252,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// render targets and input attachments. Refer to `CommandBuffer.SetRandomWriteTarget`
         /// for platform-specific details and constraints.
         /// </remarks>
-        TextureHandle SetRandomAccessAttachment(TextureHandle tex, int index, AccessFlags flags = AccessFlags.ReadWrite);
+        TextureHandle SetRandomAccessAttachment(
+            TextureHandle tex,
+            int index,
+            AccessFlags flags = AccessFlags.ReadWrite
+        );
 
         /// <summary>
         /// Binds the buffer as a random-access attachment for this pass
@@ -268,7 +272,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// This declares that shaders in the pass will access the buffer via
         /// `RWStructuredBuffer`, `RWByteAddressBuffer`, etc., enabling read/write,
         /// atomics, and other UAV-style operations using standard HLSL.
-        /// 
+        ///
         /// Random-access (UAV) buffers share index-based binding slots with
         /// render targets and input attachments. Refer to `CommandBuffer.SetRandomWriteTarget`
         /// for platform-specific details and constraints.
@@ -290,12 +294,17 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// This declares that shaders in the pass will access the buffer via
         /// `RWStructuredBuffer`, `RWByteAddressBuffer`, etc., enabling read/write,
         /// atomics, and other UAV-style operations using standard HLSL.
-        /// 
+        ///
         /// Random-access (UAV) buffers share index-based binding slots with
         /// render targets and input attachments. Refer to `CommandBuffer.SetRandomWriteTarget`
         /// for platform-specific details and constraints.
         /// </remarks>
-        BufferHandle UseBufferRandomAccess(BufferHandle tex, int index, bool preserveCounterValue, AccessFlags flags = AccessFlags.Read);
+        BufferHandle UseBufferRandomAccess(
+            BufferHandle tex,
+            int index,
+            bool preserveCounterValue,
+            AccessFlags flags = AccessFlags.Read
+        );
     }
 
     /// <summary>
@@ -341,7 +350,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         /// <summary>
         /// Binds the texture as an input attachment for this pass.
-        /// 
+        ///
         /// Shaders might read this texture at the current fragment using
         /// `LOAD_FRAMEBUFFER_INPUT(idx)` or `LOAD_FRAMEBUFFER_INPUT_MS(idx, sampleIdx)`.
         /// The `idx` used in the shader must match the `index` provided to `SetInputAttachment`.
@@ -361,7 +370,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         /// <summary>
         /// Binds the texture as an input attachment for this pass.
-        /// 
+        ///
         /// Shaders might read this texture at the current fragment using
         /// `LOAD_FRAMEBUFFER_INPUT(idx)` or `LOAD_FRAMEBUFFER_INPUT_MS(idx, sampleIdx)`.
         /// The `idx` used in the shader must match the `index` provided in `SetInputAttachment`.

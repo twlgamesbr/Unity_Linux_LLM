@@ -13,14 +13,16 @@ namespace UnityEngine.Rendering.Universal
     /// </summary>
     [Serializable, ReloadGroup, ExcludeFromPreset]
     [MovedFrom(true, "UnityEngine.Experimental.Rendering.Universal", "Unity.RenderPipelines.Universal.Runtime")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest/index.html?subfolder=/manual/2DRendererData-overview.html")]
+    [HelpURL(
+        "https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest/index.html?subfolder=/manual/2DRendererData-overview.html"
+    )]
     public partial class Renderer2DData : ScriptableRendererData
     {
         internal enum Renderer2DDefaultMaterialType
         {
             Lit,
             Unlit,
-            Custom
+            Custom,
         }
 
         [SerializeField]
@@ -68,12 +70,17 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public float hdrEmulationScale => m_HDREmulationScale;
         internal float lightRenderTextureScale => m_LightRenderTextureScale;
+
         /// <summary>
         /// Returns a list Light2DBlendStyle
         /// </summary>
         public Light2DBlendStyle[] lightBlendStyles => m_LightBlendStyles;
         internal bool useDepthStencilBuffer => m_UseDepthStencilBuffer;
-        internal PostProcessData postProcessData { get => m_PostProcessData; set { m_PostProcessData = value; } }
+        internal PostProcessData postProcessData
+        {
+            get => m_PostProcessData;
+            set { m_PostProcessData = value; }
+        }
         internal TransparencySortMode transparencySortMode => m_TransparencySortMode;
         internal Vector3 transparencySortAxis => m_TransparencySortAxis;
         internal uint lightRenderTextureMemoryBudget => m_MaxLightRenderTextureCount;
@@ -103,7 +110,7 @@ namespace UnityEngine.Rendering.Universal
         {
             UnityEngine.RenderAs2DUtil.DisposeCanRenderAs2D();
 
-            foreach(var mat in lightMaterials)
+            foreach (var mat in lightMaterials)
                 CoreUtils.Destroy(mat.Value);
 
             lightMaterials.Clear();

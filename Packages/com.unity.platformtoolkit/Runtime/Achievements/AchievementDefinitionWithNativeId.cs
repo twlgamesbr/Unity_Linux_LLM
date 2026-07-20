@@ -11,7 +11,13 @@ namespace Unity.PlatformToolkit
         [SerializeField]
         private T m_NativeId;
 
-        public AchievementDefinitionWithNativeId(string id, T nativeId, bool progressive = false, int progressTarget = 1) : base(id, progressive, progressTarget)
+        public AchievementDefinitionWithNativeId(
+            string id,
+            T nativeId,
+            bool progressive = false,
+            int progressTarget = 1
+        )
+            : base(id, progressive, progressTarget)
         {
             m_NativeId = nativeId;
         }

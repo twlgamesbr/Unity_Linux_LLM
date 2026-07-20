@@ -6,6 +6,7 @@ using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Utilities;
 
 [assembly: InternalsVisibleTo("Unity.Addressables.Editor.Tests")]
+
 namespace UnityEditor.Build.Pipeline.Interfaces
 {
     /// <summary>
@@ -17,18 +18,21 @@ namespace UnityEditor.Build.Pipeline.Interfaces
         /// The entry is reporting an error.
         /// </summary>
         Error,
+
         /// <summary>
         /// The entry is reporting an warning.
         /// </summary>
         Warning,
+
         /// <summary>
         /// The entry is reporting general information.
         /// </summary>
         Info,
+
         /// <summary>
         /// The entry is reporting verbose information.
         /// </summary>
-        Verbose
+        Verbose,
     }
 
     /// <summary>
@@ -57,11 +61,12 @@ namespace UnityEditor.Build.Pipeline.Interfaces
         /// </summary>
         void EndBuildStep();
     }
+
     internal enum DeferredEventType
     {
         Begin,
         End,
-        Info
+        Info,
     }
 
     internal struct DeferredEvent
@@ -84,7 +89,14 @@ namespace UnityEditor.Build.Pipeline.Interfaces
     public struct ScopedBuildStep : IDisposable
     {
         IBuildLogger m_Logger;
-        internal ScopedBuildStep(LogLevel level, string stepName, IBuildLogger logger, bool multiThreaded, string context)
+
+        internal ScopedBuildStep(
+            LogLevel level,
+            string stepName,
+            IBuildLogger logger,
+            bool multiThreaded,
+            string context
+        )
         {
             m_Logger = logger;
             m_Logger?.BeginBuildStep(level, stepName, multiThreaded);
@@ -103,6 +115,7 @@ namespace UnityEditor.Build.Pipeline.Interfaces
     internal struct ProfileCaptureScope : IDisposable
     {
         IBuildLogger m_Logger;
+
         public ProfileCaptureScope(IBuildLogger logger, ProfileCaptureOptions options)
         {
             m_Logger = ScriptableBuildPipeline.useDetailedBuildLog ? logger : null;
@@ -158,7 +171,12 @@ namespace UnityEditor.Build.Pipeline.Interfaces
         /// <param name="stepName">A name associated with the step.</param>
         /// <param name="multiThreaded">True if within this build step the IBuildLogger will be used on multiple threads.</param>
         /// <returns>Returns a ScopedBuildStep that will end the build step when it is disposed.</returns>
-        public static ScopedBuildStep ScopedStep(this IBuildLogger log, LogLevel level, string stepName, bool multiThreaded = false)
+        public static ScopedBuildStep ScopedStep(
+            this IBuildLogger log,
+            LogLevel level,
+            string stepName,
+            bool multiThreaded = false
+        )
         {
             return new ScopedBuildStep(level, stepName, log, multiThreaded, null);
         }

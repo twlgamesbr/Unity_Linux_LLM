@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 
-
 namespace TMPro
 {
     /// <summary>
@@ -14,12 +13,20 @@ namespace TMPro
         /// <summary>
         /// The x coordinate of the anchor point relative to the glyph.
         /// </summary>
-        public float xCoordinate { get { return m_XCoordinate; } set { m_XCoordinate = value; } }
+        public float xCoordinate
+        {
+            get { return m_XCoordinate; }
+            set { m_XCoordinate = value; }
+        }
 
         /// <summary>
         /// The y coordinate of the anchor point relative to the glyph.
         /// </summary>
-        public float yCoordinate { get { return m_YCoordinate; } set { m_YCoordinate = value; } }
+        public float yCoordinate
+        {
+            get { return m_YCoordinate; }
+            set { m_YCoordinate = value; }
+        }
 
         // =============================================
         // Private backing fields for public properties.
@@ -42,12 +49,20 @@ namespace TMPro
         /// <summary>
         /// The horizontal positional adjustment of the glyph relative to the anchor point of its parent base glyph.
         /// </summary>
-        public float xPositionAdjustment { get { return m_XPositionAdjustment; } set { m_XPositionAdjustment = value; } }
+        public float xPositionAdjustment
+        {
+            get { return m_XPositionAdjustment; }
+            set { m_XPositionAdjustment = value; }
+        }
 
         /// <summary>
         /// The vertical positional adjustment of the glyph relative to the anchor point of its parent base glyph.
         /// </summary>
-        public float yPositionAdjustment { get { return m_YPositionAdjustment; } set { m_YPositionAdjustment = value; } }
+        public float yPositionAdjustment
+        {
+            get { return m_YPositionAdjustment; }
+            set { m_YPositionAdjustment = value; }
+        }
 
         /// <summary>
         /// Initializes and returns an instance of MarkPositionAdjustment
@@ -80,22 +95,38 @@ namespace TMPro
         /// <summary>
         /// The index of the base glyph.
         /// </summary>
-        public uint baseGlyphID { get { return m_BaseGlyphID; } set { m_BaseGlyphID = value; } }
+        public uint baseGlyphID
+        {
+            get { return m_BaseGlyphID; }
+            set { m_BaseGlyphID = value; }
+        }
 
         /// <summary>
         /// The position of the anchor point of the base glyph.
         /// </summary>
-        public GlyphAnchorPoint baseGlyphAnchorPoint { get { return m_BaseGlyphAnchorPoint; } set { m_BaseGlyphAnchorPoint = value; } }
+        public GlyphAnchorPoint baseGlyphAnchorPoint
+        {
+            get { return m_BaseGlyphAnchorPoint; }
+            set { m_BaseGlyphAnchorPoint = value; }
+        }
 
         /// <summary>
         /// The index of the mark glyph.
         /// </summary>
-        public uint markGlyphID { get { return m_MarkGlyphID; } set { m_MarkGlyphID = value; } }
+        public uint markGlyphID
+        {
+            get { return m_MarkGlyphID; }
+            set { m_MarkGlyphID = value; }
+        }
 
         /// <summary>
         /// The positional adjustment of the mark glyph relative to the anchor point of the base glyph.
         /// </summary>
-        public MarkPositionAdjustment markPositionAdjustment { get { return m_MarkPositionAdjustment; } set { m_MarkPositionAdjustment = value; } }
+        public MarkPositionAdjustment markPositionAdjustment
+        {
+            get { return m_MarkPositionAdjustment; }
+            set { m_MarkPositionAdjustment = value; }
+        }
 
         // =============================================
         // Private backing fields for public properties.
@@ -123,22 +154,38 @@ namespace TMPro
         /// <summary>
         /// The index of the base glyph.
         /// </summary>
-        public uint baseMarkGlyphID { get { return m_BaseMarkGlyphID; } set { m_BaseMarkGlyphID = value; } }
+        public uint baseMarkGlyphID
+        {
+            get { return m_BaseMarkGlyphID; }
+            set { m_BaseMarkGlyphID = value; }
+        }
 
         /// <summary>
         /// The position of the anchor point of the base mark glyph.
         /// </summary>
-        public GlyphAnchorPoint baseMarkGlyphAnchorPoint { get { return m_BaseMarkGlyphAnchorPoint; } set { m_BaseMarkGlyphAnchorPoint = value; } }
+        public GlyphAnchorPoint baseMarkGlyphAnchorPoint
+        {
+            get { return m_BaseMarkGlyphAnchorPoint; }
+            set { m_BaseMarkGlyphAnchorPoint = value; }
+        }
 
         /// <summary>
         /// The index of the mark glyph.
         /// </summary>
-        public uint combiningMarkGlyphID { get { return m_CombiningMarkGlyphID; } set { m_CombiningMarkGlyphID = value; } }
+        public uint combiningMarkGlyphID
+        {
+            get { return m_CombiningMarkGlyphID; }
+            set { m_CombiningMarkGlyphID = value; }
+        }
 
         /// <summary>
         /// The positional adjustment of the combining mark glyph relative to the anchor point of the base mark glyph.
         /// </summary>
-        public MarkPositionAdjustment combiningMarkPositionAdjustment { get { return m_CombiningMarkPositionAdjustment; } set { m_CombiningMarkPositionAdjustment = value; } }
+        public MarkPositionAdjustment combiningMarkPositionAdjustment
+        {
+            get { return m_CombiningMarkPositionAdjustment; }
+            set { m_CombiningMarkPositionAdjustment = value; }
+        }
 
         // =============================================
         // Private backing fields for public properties.

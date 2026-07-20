@@ -35,7 +35,9 @@ namespace UnityEngine.InputSystem.Editor
 
         private void OnDragPerformEvent(DragPerformEvent evt)
         {
-            var mapsViewItem = target.panel.Pick(evt.mousePosition)?.GetFirstAncestorOfType<InputActionMapsTreeViewItem>();
+            var mapsViewItem = target
+                .panel.Pick(evt.mousePosition)
+                ?.GetFirstAncestorOfType<InputActionMapsTreeViewItem>();
             if (mapsViewItem == null)
                 return;
             var index = treeView.selectedIndices.First();
@@ -50,9 +52,12 @@ namespace UnityEngine.InputSystem.Editor
         }
 
         private int m_InitialIndex = -1;
+
         private void OnDragUpdatedEvent(DragUpdatedEvent evt)
         {
-            var mapsViewItem = target.panel.Pick(evt.mousePosition)?.GetFirstAncestorOfType<InputActionMapsTreeViewItem>();
+            var mapsViewItem = target
+                .panel.Pick(evt.mousePosition)
+                ?.GetFirstAncestorOfType<InputActionMapsTreeViewItem>();
             if (mapsViewItem != null)
             {
                 if (m_InitialIndex < 0 && listView != null)
@@ -69,7 +74,7 @@ namespace UnityEngine.InputSystem.Editor
         private void Reset()
         {
             if (m_InitialIndex >= 0)
-                listView?.SetSelectionWithoutNotify(new[] {m_InitialIndex}); //select the initial action map again
+                listView?.SetSelectionWithoutNotify(new[] { m_InitialIndex }); //select the initial action map again
             m_InitialIndex = -1;
         }
     }

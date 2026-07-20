@@ -64,7 +64,6 @@ namespace UnityEditor.Rendering.Universal
                     }
                 }
 
-
                 public List<Mapping> mappings = new List<Mapping>((int)MaterialUpgrader.MaterialPropertyType.Count);
 
                 Array m_EnumValues;
@@ -90,14 +89,22 @@ namespace UnityEditor.Rendering.Universal
                     {
                         m_Enumerator.MoveNext();
                         var mapping = mappings[(int)m];
-                        foreach (var propertyRename in upgrader.GetPropertyRenameMap((MaterialUpgrader.MaterialPropertyType)m_Enumerator.Current))
+                        foreach (
+                            var propertyRename in upgrader.GetPropertyRenameMap(
+                                (MaterialUpgrader.MaterialPropertyType)m_Enumerator.Current
+                            )
+                        )
                         {
                             mapping.Add(propertyRename.Key, propertyRename.Value);
                         }
                     }
                 }
 
-                public ShaderPropertyUsage Get(MaterialUpgrader.MaterialPropertyType type, string propertyName, out string newPropertyName)
+                public ShaderPropertyUsage Get(
+                    MaterialUpgrader.MaterialPropertyType type,
+                    string propertyName,
+                    out string newPropertyName
+                )
                 {
                     var mapping = mappings[(int)type];
                     return mapping.Get(propertyName, out newPropertyName);
@@ -132,7 +139,7 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        Cache m_Cache = new ();
+        Cache m_Cache = new();
 
         public AnimationClipUpgradePathsCache(List<MaterialUpgrader> upgraders)
         {
@@ -147,7 +154,12 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        public ShaderPropertyUsage GetShaderPropertyUsage(string shaderName, MaterialUpgrader.MaterialPropertyType propertyType, string propertyName, out string newPropertyName)
+        public ShaderPropertyUsage GetShaderPropertyUsage(
+            string shaderName,
+            MaterialUpgrader.MaterialPropertyType propertyType,
+            string propertyName,
+            out string newPropertyName
+        )
         {
             newPropertyName = propertyName;
 

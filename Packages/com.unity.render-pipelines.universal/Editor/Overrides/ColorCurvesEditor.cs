@@ -46,7 +46,7 @@ namespace UnityEditor.Rendering.Universal
             "Hue Vs Hue",
             "Hue Vs Sat",
             "Sat Vs Sat",
-            "Lum Vs Sat"
+            "Lum Vs Sat",
         };
 
         SavedInt m_SelectedCurve;
@@ -124,7 +124,11 @@ namespace UnityEditor.Rendering.Universal
 
         void CurveOverrideToggle(SerializedProperty overrideProp)
         {
-            overrideProp.boolValue = GUILayout.Toggle(overrideProp.boolValue, EditorGUIUtility.TrTextContent("Override"), EditorStyles.toolbarButton);
+            overrideProp.boolValue = GUILayout.Toggle(
+                overrideProp.boolValue,
+                EditorGUIUtility.TrTextContent("Override"),
+                EditorStyles.toolbarButton
+            );
         }
 
         string MakeCurveSelectionPopupLabel(int id)
@@ -133,22 +137,38 @@ namespace UnityEditor.Rendering.Universal
             const string overrideSuffix = " (Overriding)";
             switch (id)
             {
-                case 0: if (m_Master.overrideState.boolValue)
-                        label += overrideSuffix; break;
-                case 1: if (m_Red.overrideState.boolValue)
-                        label += overrideSuffix; break;
-                case 2: if (m_Green.overrideState.boolValue)
-                        label += overrideSuffix; break;
-                case 3: if (m_Blue.overrideState.boolValue)
-                        label += overrideSuffix; break;
-                case 4: if (m_HueVsHue.overrideState.boolValue)
-                        label += overrideSuffix; break;
-                case 5: if (m_HueVsSat.overrideState.boolValue)
-                        label += overrideSuffix; break;
-                case 6: if (m_SatVsSat.overrideState.boolValue)
-                        label += overrideSuffix; break;
-                case 7: if (m_LumVsSat.overrideState.boolValue)
-                        label += overrideSuffix; break;
+                case 0:
+                    if (m_Master.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
+                case 1:
+                    if (m_Red.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
+                case 2:
+                    if (m_Green.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
+                case 3:
+                    if (m_Blue.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
+                case 4:
+                    if (m_HueVsHue.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
+                case 5:
+                    if (m_HueVsSat.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
+                case 6:
+                    if (m_SatVsSat.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
+                case 7:
+                    if (m_LumVsSat.overrideState.boolValue)
+                        label += overrideSuffix;
+                    break;
             }
             return label;
         }
@@ -173,11 +193,15 @@ namespace UnityEditor.Rendering.Universal
                     int current = i; // Capture local for closure
 
                     var menuLabel = MakeCurveSelectionPopupLabel(i);
-                    menu.AddItem(new GUIContent(menuLabel), current == id, () =>
-                    {
-                        m_SelectedCurve.value = current;
-                        serializedObject.ApplyModifiedProperties();
-                    });
+                    menu.AddItem(
+                        new GUIContent(menuLabel),
+                        current == id,
+                        () =>
+                        {
+                            m_SelectedCurve.value = current;
+                            serializedObject.ApplyModifiedProperties();
+                        }
+                    );
                 }
 
                 menu.DropDown(new Rect(lastRect.xMin, lastRect.yMax, 1f, 1f));
@@ -189,12 +213,21 @@ namespace UnityEditor.Rendering.Universal
         void DrawBackgroundTexture(Rect rect, int pass)
         {
             if (s_MaterialGrid == null)
-                s_MaterialGrid = new Material(Shader.Find("Hidden/Universal Render Pipeline/Editor/CurveBackground")) { hideFlags = HideFlags.HideAndDontSave };
+                s_MaterialGrid = new Material(Shader.Find("Hidden/Universal Render Pipeline/Editor/CurveBackground"))
+                {
+                    hideFlags = HideFlags.HideAndDontSave,
+                };
 
             float scale = EditorGUIUtility.pixelsPerPoint;
 
             var oldRt = RenderTexture.active;
-            var rt = RenderTexture.GetTemporary(Mathf.CeilToInt(rect.width * scale), Mathf.CeilToInt(rect.height * scale), 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            var rt = RenderTexture.GetTemporary(
+                Mathf.CeilToInt(rect.width * scale),
+                Mathf.CeilToInt(rect.height * scale),
+                0,
+                RenderTextureFormat.ARGB32,
+                RenderTextureReadWrite.sRGB
+            );
             s_MaterialGrid.SetFloat("_DisabledState", GUI.enabled ? 1f : 0.5f);
 
             Graphics.Blit(null, rt, s_MaterialGrid, pass);
@@ -213,14 +246,30 @@ namespace UnityEditor.Rendering.Universal
 
             switch (curveId)
             {
-                case 0: t.master.value.SetDirty(); break;
-                case 1: t.red.value.SetDirty(); break;
-                case 2: t.green.value.SetDirty(); break;
-                case 3: t.blue.value.SetDirty(); break;
-                case 4: t.hueVsHue.value.SetDirty(); break;
-                case 5: t.hueVsSat.value.SetDirty(); break;
-                case 6: t.satVsSat.value.SetDirty(); break;
-                case 7: t.lumVsSat.value.SetDirty(); break;
+                case 0:
+                    t.master.value.SetDirty();
+                    break;
+                case 1:
+                    t.red.value.SetDirty();
+                    break;
+                case 2:
+                    t.green.value.SetDirty();
+                    break;
+                case 3:
+                    t.blue.value.SetDirty();
+                    break;
+                case 4:
+                    t.hueVsHue.value.SetDirty();
+                    break;
+                case 5:
+                    t.hueVsSat.value.SetDirty();
+                    break;
+                case 6:
+                    t.satVsSat.value.SetDirty();
+                    break;
+                case 7:
+                    t.lumVsSat.value.SetDirty();
+                    break;
             }
         }
 
@@ -294,14 +343,30 @@ namespace UnityEditor.Rendering.Universal
 
                         switch (curveEditingId)
                         {
-                            case 0: m_RawMaster.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f); break;
-                            case 1: m_RawRed.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f); break;
-                            case 2: m_RawGreen.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f); break;
-                            case 3: m_RawBlue.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f); break;
-                            case 4: m_RawHueVsHue.animationCurveValue = new AnimationCurve(); break;
-                            case 5: m_RawHueVsSat.animationCurveValue = new AnimationCurve(); break;
-                            case 6: m_RawSatVsSat.animationCurveValue = new AnimationCurve(); break;
-                            case 7: m_RawLumVsSat.animationCurveValue = new AnimationCurve(); break;
+                            case 0:
+                                m_RawMaster.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+                                break;
+                            case 1:
+                                m_RawRed.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+                                break;
+                            case 2:
+                                m_RawGreen.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+                                break;
+                            case 3:
+                                m_RawBlue.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+                                break;
+                            case 4:
+                                m_RawHueVsHue.animationCurveValue = new AnimationCurve();
+                                break;
+                            case 5:
+                                m_RawHueVsSat.animationCurveValue = new AnimationCurve();
+                                break;
+                            case 6:
+                                m_RawSatVsSat.animationCurveValue = new AnimationCurve();
+                                break;
+                            case 7:
+                                m_RawLumVsSat.animationCurveValue = new AnimationCurve();
+                                break;
                         }
                     }
 
@@ -339,7 +404,10 @@ namespace UnityEditor.Rendering.Universal
                     {
                         var offset = i * Vector2.right * gridOffset;
                         offset.x += gridPadding;
-                        Handles.DrawLine(innerRect.position + offset, new Vector2(innerRect.x, innerRect.yMax - 1) + offset);
+                        Handles.DrawLine(
+                            innerRect.position + offset,
+                            new Vector2(innerRect.x, innerRect.yMax - 1) + offset
+                        );
                     }
 
                     // Horizontal grid
@@ -350,7 +418,10 @@ namespace UnityEditor.Rendering.Universal
                     {
                         var offset = i * Vector2.up * gridOffset;
                         offset.y += gridPadding;
-                        Handles.DrawLine(innerRect.position + offset, new Vector2(innerRect.xMax - 1, innerRect.y) + offset);
+                        Handles.DrawLine(
+                            innerRect.position + offset,
+                            new Vector2(innerRect.xMax - 1, innerRect.y) + offset
+                        );
                     }
                 }
 

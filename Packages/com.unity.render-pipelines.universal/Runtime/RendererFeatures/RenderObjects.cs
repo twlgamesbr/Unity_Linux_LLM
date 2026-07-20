@@ -24,7 +24,9 @@ namespace UnityEngine.Rendering.Universal
     /// </summary>
     [ExcludeFromPreset]
     [MovedFrom(true, "UnityEngine.Experimental.Rendering.Universal")]
-    [Tooltip("Render Objects simplifies the injection of additional render passes by exposing a selection of commonly used settings.")]
+    [Tooltip(
+        "Render Objects simplifies the injection of additional render passes by exposing a selection of commonly used settings."
+    )]
     [URPHelpURL("renderer-features/renderer-feature-render-objects")]
     public class RenderObjects : ScriptableRendererFeature
     {
@@ -87,7 +89,7 @@ namespace UnityEngine.Rendering.Universal
                 /// <summary>
                 /// Use this to use an override shader.
                 /// </summary>
-                Shader
+                Shader,
             };
 
             /// <summary>
@@ -201,8 +203,14 @@ namespace UnityEngine.Rendering.Universal
             if (settings.Event < RenderPassEvent.BeforeRenderingPrePasses)
                 settings.Event = RenderPassEvent.BeforeRenderingPrePasses;
 
-            renderObjectsPass = new RenderObjectsPass(settings.passTag, settings.Event, filter.PassNames,
-                filter.RenderQueueType, filter.LayerMask, settings.cameraSettings);
+            renderObjectsPass = new RenderObjectsPass(
+                settings.passTag,
+                settings.Event,
+                filter.PassNames,
+                filter.RenderQueueType,
+                filter.LayerMask,
+                settings.cameraSettings
+            );
 
             switch (settings.overrideMode)
             {
@@ -226,16 +234,22 @@ namespace UnityEngine.Rendering.Universal
                 renderObjectsPass.SetDepthState(settings.enableWrite, settings.depthCompareFunction);
 
             if (settings.stencilSettings.overrideStencilState)
-                renderObjectsPass.SetStencilState(settings.stencilSettings.stencilReference,
-                    settings.stencilSettings.stencilCompareFunction, settings.stencilSettings.passOperation,
-                    settings.stencilSettings.failOperation, settings.stencilSettings.zFailOperation);
+                renderObjectsPass.SetStencilState(
+                    settings.stencilSettings.stencilReference,
+                    settings.stencilSettings.stencilCompareFunction,
+                    settings.stencilSettings.passOperation,
+                    settings.stencilSettings.failOperation,
+                    settings.stencilSettings.zFailOperation
+                );
         }
 
         /// <inheritdoc/>
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            if (renderingData.cameraData.cameraType == CameraType.Preview
-                || UniversalRenderer.IsOffscreenDepthTexture(ref renderingData.cameraData))
+            if (
+                renderingData.cameraData.cameraType == CameraType.Preview
+                || UniversalRenderer.IsOffscreenDepthTexture(ref renderingData.cameraData)
+            )
                 return;
             renderer.EnqueuePass(renderObjectsPass);
         }

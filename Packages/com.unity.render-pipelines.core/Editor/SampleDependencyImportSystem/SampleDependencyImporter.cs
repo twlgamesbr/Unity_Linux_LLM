@@ -14,7 +14,7 @@ using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 ///     "displayName": "Sample name",
 ///     "description": "Sample description",
 ///     "path": "Samples~/Stuff",
-///     "dependencies": 
+///     "dependencies":
 ///         [
 ///             "com.unity.render-pipelines.core/Samples~/CommonMeshes",
 ///             "com.unity.render-pipelines.core/Samples~/CommonTextures",
@@ -24,7 +24,6 @@ using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 /// },
 /// {
 /// </remarks>
-
 [InitializeOnLoad]
 internal class SampleDependencyImporter : IPackageManagerExtension
 {
@@ -61,12 +60,15 @@ internal class SampleDependencyImporter : IPackageManagerExtension
         injectingElement = new VisualElement();
         injectingElement.style.display = DisplayStyle.None;
 
-        injectingElement.RegisterCallback<AttachToPanelEvent>((callback) => {
-            // Clear cached elements when panel is attached
-            _panelRoot = null;
-            samplesButton = null;
-            RefreshSampleButtons();
-        });
+        injectingElement.RegisterCallback<AttachToPanelEvent>(
+            (callback) =>
+            {
+                // Clear cached elements when panel is attached
+                _panelRoot = null;
+                samplesButton = null;
+                RefreshSampleButtons();
+            }
+        );
 
         return injectingElement;
     }
@@ -82,182 +84,188 @@ internal class SampleDependencyImporter : IPackageManagerExtension
 
     internal void RefreshSampleButtons()
     {
-		if (m_IsOnAllSamplesTab)
-		{
-			RefreshSampleButtonInDetailsView();
-		}
-		else
-		{
-			RefreshSampleButtonInListView();
-		}
+        if (m_IsOnAllSamplesTab)
+        {
+            RefreshSampleButtonInDetailsView();
+        }
+        else
+        {
+            RefreshSampleButtonInListView();
+        }
     }
-	
-	internal void RefreshSampleButtonInListView()
-	{
-		if (injectingElement == null || m_PackageInfo == null || m_SampleList == null || panelRoot == null)
-			return;
 
-		// Hook up to the "Samples" tab button click event
-		if (samplesButton == null)
-		{
-			samplesButton = panelRoot.Q<Button>(name: samplesButtonName);
-			if (samplesButton != null)
-				samplesButton.clicked += RefreshSampleButtons;
-		}
-
-		// Delay injection to allow UI to populate sample containers
-		EditorApplication.delayCall += () =>
-		{
-			if (panelRoot == null || m_SampleList == null)
-				return;
-
-			var sampleContainers = panelRoot.Query(className: samplesListContainerClassName).ToList();
-			var bound = Mathf.Min(sampleContainers.Count, m_SampleList.samples.Length);
-
-			// Iterate through each sample in the list
-			for (int i = 0; i < bound; i++)
-			{
-				var sampleInfo = m_SampleList.samples[i];
-				var actionButtonsContainer = sampleContainers[i].Q(name: importButtonClassName);
-
-				if (sampleInfo.dependencies == null || sampleInfo.dependencies.Length == 0)
-				{
-					RestoreOriginalImportButton(actionButtonsContainer);
-					continue;
-				}
-
-				SwapImportButtonToImportDependencies(actionButtonsContainer, sampleInfo);
-			}
-		};
-	}
-
-	internal void RefreshSampleButtonInDetailsView()
+    internal void RefreshSampleButtonInListView()
     {
-		var root = GetPackageManagerWindowRoot();
-		if (root == null)
-			return;
+        if (injectingElement == null || m_PackageInfo == null || m_SampleList == null || panelRoot == null)
+            return;
 
-		string selectedSampleName = GetSelectedSampleNameFromUI();
-		if (string.IsNullOrEmpty(selectedSampleName))
-			return;
+        // Hook up to the "Samples" tab button click event
+        if (samplesButton == null)
+        {
+            samplesButton = panelRoot.Q<Button>(name: samplesButtonName);
+            if (samplesButton != null)
+                samplesButton.clicked += RefreshSampleButtons;
+        }
 
-		// Find the matching sample in m_SampleList
-		SampleInformation matchingSample = null;
-		if (m_SampleList != null && m_SampleList.samples != null)
-		{
-			foreach (var sample in m_SampleList.samples)
-			{
-				if (sample.displayName == selectedSampleName)
-				{
-					matchingSample = sample;
-					break;
-				}
-			}
-		}
+        // Delay injection to allow UI to populate sample containers
+        EditorApplication.delayCall += () =>
+        {
+            if (panelRoot == null || m_SampleList == null)
+                return;
 
-		var actionButtonsContainer = root.Q(name: importButtonClassName);
+            var sampleContainers = panelRoot.Query(className: samplesListContainerClassName).ToList();
+            var bound = Mathf.Min(sampleContainers.Count, m_SampleList.samples.Length);
 
-		if (matchingSample == null || matchingSample.dependencies == null || matchingSample.dependencies.Length == 0)
-		{
-			RestoreOriginalImportButton(actionButtonsContainer);
-			return;
-		}
+            // Iterate through each sample in the list
+            for (int i = 0; i < bound; i++)
+            {
+                var sampleInfo = m_SampleList.samples[i];
+                var actionButtonsContainer = sampleContainers[i].Q(name: importButtonClassName);
 
-		SwapImportButtonToImportDependencies(actionButtonsContainer, matchingSample);
+                if (sampleInfo.dependencies == null || sampleInfo.dependencies.Length == 0)
+                {
+                    RestoreOriginalImportButton(actionButtonsContainer);
+                    continue;
+                }
+
+                SwapImportButtonToImportDependencies(actionButtonsContainer, sampleInfo);
+            }
+        };
     }
-	
-	internal void SwapImportButtonToImportDependencies(VisualElement actionButtonsContainer, SampleInformation sampleToImport)
-	{
-		if (actionButtonsContainer == null)
-			return;
 
-		// Find the original import button (not our injected one)
-		Button originalImportButton = null;
-		var buttons = actionButtonsContainer.Query<Button>().ToList();
+    internal void RefreshSampleButtonInDetailsView()
+    {
+        var root = GetPackageManagerWindowRoot();
+        if (root == null)
+            return;
 
-		foreach (var button in buttons)
-		{
-			bool isInjected = false;
-			foreach (var className in button.GetClasses())
-			{
-				if (className == injectedButtonClassName)
-				{
-					isInjected = true;
-					break;
-				}
-			}
+        string selectedSampleName = GetSelectedSampleNameFromUI();
+        if (string.IsNullOrEmpty(selectedSampleName))
+            return;
 
-			if (!isInjected)
-			{
-				originalImportButton = button;
-				break;
-			}
-		}
+        // Find the matching sample in m_SampleList
+        SampleInformation matchingSample = null;
+        if (m_SampleList != null && m_SampleList.samples != null)
+        {
+            foreach (var sample in m_SampleList.samples)
+            {
+                if (sample.displayName == selectedSampleName)
+                {
+                    matchingSample = sample;
+                    break;
+                }
+            }
+        }
 
-		if (originalImportButton == null)
-			return;
+        var actionButtonsContainer = root.Q(name: importButtonClassName);
 
-		// Hide the original button
-		originalImportButton.style.display = DisplayStyle.None;
+        if (matchingSample == null || matchingSample.dependencies == null || matchingSample.dependencies.Length == 0)
+        {
+            RestoreOriginalImportButton(actionButtonsContainer);
+            return;
+        }
 
-		// Remove any existing injected button - we need to create a fresh one
-		// so the click handler captures the correct sampleToImport
-		originalImportButton.parent.Q<Button>(className: injectedButtonClassName)?.RemoveFromHierarchy();
+        SwapImportButtonToImportDependencies(actionButtonsContainer, matchingSample);
+    }
 
-		// Create a new injected button
-		Button newInjectedButton = new Button();
-		foreach (var className in originalImportButton.GetClasses())
-			newInjectedButton.AddToClassList(className);
-		newInjectedButton.AddToClassList(injectedButtonClassName);
-		newInjectedButton.text = originalImportButton.text;
+    internal void SwapImportButtonToImportDependencies(
+        VisualElement actionButtonsContainer,
+        SampleInformation sampleToImport
+    )
+    {
+        if (actionButtonsContainer == null)
+            return;
 
-		// Insert button at the same position as the original
-		originalImportButton.parent.Insert(originalImportButton.parent.IndexOf(originalImportButton), newInjectedButton);
+        // Find the original import button (not our injected one)
+        Button originalImportButton = null;
+        var buttons = actionButtonsContainer.Query<Button>().ToList();
 
-		// Capture package info at button creation time (not by reference)
-		var capturedPackageInfo = m_PackageInfo;
+        foreach (var button in buttons)
+        {
+            bool isInjected = false;
+            foreach (var className in button.GetClasses())
+            {
+                if (className == injectedButtonClassName)
+                {
+                    isInjected = true;
+                    break;
+                }
+            }
 
-		// Set up click handler
-		newInjectedButton.clicked += () =>
-		{
-			if (capturedPackageInfo == null)
-				return;
+            if (!isInjected)
+            {
+                originalImportButton = button;
+                break;
+            }
+        }
 
-			ImportSampleDependencies(sampleToImport);
-			foreach (Sample sample in Sample.FindByPackage(capturedPackageInfo.name, capturedPackageInfo.version))
-			{
-				if (sample.displayName == sampleToImport.displayName)
-					sample.Import(Sample.ImportOptions.HideImportWindow | Sample.ImportOptions.OverridePreviousImports);
-			}
-		};
+        if (originalImportButton == null)
+            return;
 
-		// Track button only in details view
-		if (m_IsOnAllSamplesTab)
-			m_InjectedDetailsButton = newInjectedButton;
-	}
+        // Hide the original button
+        originalImportButton.style.display = DisplayStyle.None;
 
-	/// <summary>
-	/// Removes any injected button and restores the original import button visibility.
-	/// Called when switching to a sample without dependencies.
-	/// </summary>
-	void RestoreOriginalImportButton(VisualElement actionButtonsContainer)
-	{
-		if (actionButtonsContainer == null)
-			return;
+        // Remove any existing injected button - we need to create a fresh one
+        // so the click handler captures the correct sampleToImport
+        originalImportButton.parent.Q<Button>(className: injectedButtonClassName)?.RemoveFromHierarchy();
 
-		// Remove injected button
-		actionButtonsContainer.Q<Button>(className: injectedButtonClassName)?.RemoveFromHierarchy();
+        // Create a new injected button
+        Button newInjectedButton = new Button();
+        foreach (var className in originalImportButton.GetClasses())
+            newInjectedButton.AddToClassList(className);
+        newInjectedButton.AddToClassList(injectedButtonClassName);
+        newInjectedButton.text = originalImportButton.text;
 
-		// Restore original button visibility
-		var originalButton = actionButtonsContainer.Q<Button>();
-		if (originalButton != null)
-			originalButton.style.display = DisplayStyle.Flex;
+        // Insert button at the same position as the original
+        originalImportButton.parent.Insert(
+            originalImportButton.parent.IndexOf(originalImportButton),
+            newInjectedButton
+        );
 
-		if (m_IsOnAllSamplesTab)
-			m_InjectedDetailsButton = null;
-	}
+        // Capture package info at button creation time (not by reference)
+        var capturedPackageInfo = m_PackageInfo;
 
-	/// <summary>
+        // Set up click handler
+        newInjectedButton.clicked += () =>
+        {
+            if (capturedPackageInfo == null)
+                return;
+
+            ImportSampleDependencies(sampleToImport);
+            foreach (Sample sample in Sample.FindByPackage(capturedPackageInfo.name, capturedPackageInfo.version))
+            {
+                if (sample.displayName == sampleToImport.displayName)
+                    sample.Import(Sample.ImportOptions.HideImportWindow | Sample.ImportOptions.OverridePreviousImports);
+            }
+        };
+
+        // Track button only in details view
+        if (m_IsOnAllSamplesTab)
+            m_InjectedDetailsButton = newInjectedButton;
+    }
+
+    /// <summary>
+    /// Removes any injected button and restores the original import button visibility.
+    /// Called when switching to a sample without dependencies.
+    /// </summary>
+    void RestoreOriginalImportButton(VisualElement actionButtonsContainer)
+    {
+        if (actionButtonsContainer == null)
+            return;
+
+        // Remove injected button
+        actionButtonsContainer.Q<Button>(className: injectedButtonClassName)?.RemoveFromHierarchy();
+
+        // Restore original button visibility
+        var originalButton = actionButtonsContainer.Q<Button>();
+        if (originalButton != null)
+            originalButton.style.display = DisplayStyle.Flex;
+
+        if (m_IsOnAllSamplesTab)
+            m_InjectedDetailsButton = null;
+    }
+
+    /// <summary>
     /// Attempts to retrieve PackageInfo from the currently selected sample.
     /// This is needed when on "All Samples" tab where packageInfo parameter is null.
     /// </summary>
@@ -296,26 +304,26 @@ internal class SampleDependencyImporter : IPackageManagerExtension
         }
     }
 
-	/// <summary>
+    /// <summary>
     /// Gets the Package Manager window's root visual element.
     /// </summary>
-	private VisualElement GetPackageManagerWindowRoot()
-	{
-		try
-		{
-			var windows = Resources.FindObjectsOfTypeAll<EditorWindow>();
-			foreach (var window in windows)
-			{
-				if (window.GetType().Name == "PackageManagerWindow")
-					return window.rootVisualElement;
-			}
-		}
-		catch { }
+    private VisualElement GetPackageManagerWindowRoot()
+    {
+        try
+        {
+            var windows = Resources.FindObjectsOfTypeAll<EditorWindow>();
+            foreach (var window in windows)
+            {
+                if (window.GetType().Name == "PackageManagerWindow")
+                    return window.rootVisualElement;
+            }
+        }
+        catch { }
 
-		return null;
-	}
-	
-	/// <summary>
+        return null;
+    }
+
+    /// <summary>
     /// Extracts the selected sample's display name from the Package Manager UI.
     /// </summary>
     private string GetSelectedSampleNameFromUI()
@@ -367,15 +375,16 @@ internal class SampleDependencyImporter : IPackageManagerExtension
         return null;
     }
 
-    public void OnPackageAddedOrUpdated(PackageInfo packageInfo) {}
-    public void OnPackageRemoved(PackageInfo packageInfo) {}
+    public void OnPackageAddedOrUpdated(PackageInfo packageInfo) { }
+
+    public void OnPackageRemoved(PackageInfo packageInfo) { }
 
     /// <summary>
     /// Called when the package selection changes in the Package Manager window.
     /// </summary>
     void IPackageManagerExtension.OnPackageSelectionChange(PackageInfo packageInfo)
     {
-		// This will be null if we come from the "all samples" tab
+        // This will be null if we come from the "all samples" tab
         if (packageInfo == null)
         {
             m_IsOnAllSamplesTab = true;
@@ -400,21 +409,21 @@ internal class SampleDependencyImporter : IPackageManagerExtension
         m_IsOnAllSamplesTab = false;
         ProcessPackageInfo(packageInfo);
     }
-	
-	/// <summary>
+
+    /// <summary>
     /// Processes the package info and loads sample configuration.
     /// </summary>
     private void ProcessPackageInfo(PackageInfo packageInfo)
     {
         m_PackageInfo = packageInfo;
-		
-		int sampleCount = new List<Sample>(Sample.FindByPackage(packageInfo.name, packageInfo.version)).Count;
+
+        int sampleCount = new List<Sample>(Sample.FindByPackage(packageInfo.name, packageInfo.version)).Count;
 
         if (sampleCount > 0)
-		{
+        {
             TryLoadSampleConfiguration(m_PackageInfo, out m_SampleList);
-		}
-		else
+        }
+        else
         {
             m_PackageInfo = null;
             m_SampleList = null;
@@ -492,7 +501,10 @@ internal class SampleDependencyImporter : IPackageManagerExtension
         if (Directory.Exists(packageFullPath) && !importingTextMeshProEssentialResources && !essentialResourcesImported)
         {
             importingTextMeshProEssentialResources = true;
-            AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage", interactive: false);
+            AssetDatabase.ImportPackage(
+                packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage",
+                interactive: false
+            );
         }
     }
 
@@ -514,7 +526,10 @@ internal class SampleDependencyImporter : IPackageManagerExtension
                 string[] folders = path.Split('/');
                 string folderName = folders[Mathf.Max(folders.Length - 1, 0)];
 
-                CopyDirectory(dependencyPath, $"{Application.dataPath}/Samples/{packageInfo.displayName}/{packageInfo.version}/{folderName}");
+                CopyDirectory(
+                    dependencyPath,
+                    $"{Application.dataPath}/Samples/{packageInfo.displayName}/{packageInfo.version}/{folderName}"
+                );
                 assetsImported = true;
             }
             else
@@ -551,9 +566,13 @@ internal class SampleDependencyImporter : IPackageManagerExtension
 
 internal class SampleDependencyImporterPostProcessor : AssetPostprocessor
 {
-    private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+    private static void OnPostprocessAllAssets(
+        string[] importedAssets,
+        string[] deletedAssets,
+        string[] movedAssets,
+        string[] movedFromAssetPaths
+    )
     {
         SampleDependencyImporter.instance?.RefreshSampleButtons();
     }
 }
-

@@ -18,14 +18,21 @@ namespace Unity.Entities.UI
         public static ContentWindow Create(ContentProvider provider, ContentWindowParameters options)
         {
             var window = CreateInstance<ContentWindow>();
-            window.SetContent(new SerializableContent {Provider = provider}, options);
+            window.SetContent(new SerializableContent { Provider = provider }, options);
             return window;
         }
 
-        [SerializeField] SerializableContent m_Content;
-        [NonSerialized] DisplayContent m_DisplayContent;
-        [SerializeField] Vector2 m_ScrollPosition;
-        [SerializeField] ContentWindowParameters m_Options;
+        [SerializeField]
+        SerializableContent m_Content;
+
+        [NonSerialized]
+        DisplayContent m_DisplayContent;
+
+        [SerializeField]
+        Vector2 m_ScrollPosition;
+
+        [SerializeField]
+        ContentWindowParameters m_Options;
 
         ScrollView m_ScrollView;
 
@@ -34,7 +41,7 @@ namespace Unity.Entities.UI
             m_Content = content;
             m_DisplayContent = new DisplayContent(content)
             {
-                InspectionContext = {ApplyInspectorStyling = options.ApplyInspectorStyling}
+                InspectionContext = { ApplyInspectorStyling = options.ApplyInspectorStyling },
             };
 
             m_Options = options;
@@ -63,7 +70,7 @@ namespace Unity.Entities.UI
         // Invoked by the Unity update loop
         void OnEnable()
         {
-            m_ScrollView = new ScrollView {scrollOffset = m_ScrollPosition};
+            m_ScrollView = new ScrollView { scrollOffset = m_ScrollPosition };
         }
 
         // Invoked by the Unity update loop

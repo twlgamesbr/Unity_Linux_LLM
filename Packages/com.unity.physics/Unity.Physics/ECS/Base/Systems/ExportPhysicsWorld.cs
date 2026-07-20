@@ -50,7 +50,13 @@ namespace Unity.Physics.Systems
             }
             handle = CheckIntegrity(ref state, handle, ref buildPhysicsData, physicsStep);
 #endif
-            handle = PhysicsWorldExporter.SchedulePhysicsWorldExport(ref state, ref m_ComponentTypeHandles, buildPhysicsData.PhysicsData.PhysicsWorld, handle, buildPhysicsData.PhysicsData.DynamicEntityGroup);
+            handle = PhysicsWorldExporter.SchedulePhysicsWorldExport(
+                ref state,
+                ref m_ComponentTypeHandles,
+                buildPhysicsData.PhysicsData.PhysicsWorld,
+                handle,
+                buildPhysicsData.PhysicsData.DynamicEntityGroup
+            );
 
             // Combine implicit output dependency with user one
             state.Dependency = JobHandle.CombineDependencies(state.Dependency, handle);
@@ -90,6 +96,7 @@ namespace Unity.Physics.Systems
         {
             [WriteOnly]
             public NativeReference<int> NodeCount;
+
             [ReadOnly]
             public Broadphase.Tree Tree;
 
@@ -99,19 +106,23 @@ namespace Unity.Physics.Systems
             }
         }
 
-        JobHandle CheckBroadphaseIntegrity(bool staticTree, in BuildPhysicsWorldData buildPhysicsWorldData, JobHandle inputDeps)
+        JobHandle CheckBroadphaseIntegrity(
+            bool staticTree,
+            in BuildPhysicsWorldData buildPhysicsWorldData,
+            JobHandle inputDeps
+        )
         {
-            var tree = staticTree ? buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld.Broadphase.StaticTree : buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld.Broadphase.DynamicTree;
+            var tree = staticTree
+                ? buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld.Broadphase.StaticTree
+                : buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld.Broadphase.DynamicTree;
             var nodeCount = new NativeReference<int>(1, Allocator.TempJob);
-            inputDeps = new DetermineTreeNodeCountJob
-            {
-                NodeCount = nodeCount,
-                Tree = tree
-            }.Schedule(inputDeps);
+            inputDeps = new DetermineTreeNodeCountJob { NodeCount = nodeCount, Tree = tree }.Schedule(inputDeps);
 
             inputDeps = new CheckIncrementalBroadphaseIntegrity
             {
-                RigidBodies = staticTree ? buildPhysicsWorldData.PhysicsData.PhysicsWorld.StaticBodies : buildPhysicsWorldData.PhysicsData.PhysicsWorld.DynamicBodies,
+                RigidBodies = staticTree
+                    ? buildPhysicsWorldData.PhysicsData.PhysicsWorld.StaticBodies
+                    : buildPhysicsWorldData.PhysicsData.PhysicsWorld.DynamicBodies,
                 PhysicsTemporalCoherenceInfoLookup = m_IntegrityCheckHandles.PhysicsTemporalCoherenceInfoLookup,
                 Tree = tree,
                 Static = staticTree,
@@ -121,7 +132,12 @@ namespace Unity.Physics.Systems
             return inputDeps;
         }
 
-        JobHandle CheckIntegrity(ref SystemState state, JobHandle inputDeps, ref BuildPhysicsWorldData buildPhysicsData, in PhysicsStep physicsStep)
+        JobHandle CheckIntegrity(
+            ref SystemState state,
+            JobHandle inputDeps,
+            ref BuildPhysicsWorldData buildPhysicsData,
+            in PhysicsStep physicsStep
+        )
         {
             m_IntegrityCheckHandles.Update(ref state);
 
@@ -141,18 +157,18 @@ namespace Unity.Physics.Systems
                     IntegrityCheckMap = buildPhysicsData.IntegrityCheckMap,
                     LocalTransformType = localTransformType,
                     PhysicsVelocityType = physicsVelocityType,
-                    PhysicsColliderType = physicsColliderType
+                    PhysicsColliderType = physicsColliderType,
                 }.Schedule(buildPhysicsData.DynamicEntityGroup, inputDeps);
 
                 bodyColliderIntegrityHandle = new CheckColliderIntegrity
                 {
                     IntegrityCheckMap = buildPhysicsData.IntegrityCheckMap,
-                    PhysicsColliderType = physicsColliderType
+                    PhysicsColliderType = physicsColliderType,
                 }.Schedule(buildPhysicsData.StaticEntityGroup, bodyColliderIntegrityHandle);
 
                 bodyColliderIntegrityHandle = new CheckTotalBodyAndColliderIntegrity
                 {
-                    IntegrityCheckMap = buildPhysicsData.IntegrityCheckMap
+                    IntegrityCheckMap = buildPhysicsData.IntegrityCheckMap,
                 }.Schedule(bodyColliderIntegrityHandle);
             }
 
@@ -168,7 +184,10 @@ namespace Unity.Physics.Systems
             {
                 broadphaseIntegrityHandleStatic = CheckBroadphaseIntegrity(true, buildPhysicsData, inputDeps);
             }
-            var broadphaseIntegrityHandle = JobHandle.CombineDependencies(broadphaseIntegrityHandleDynamic, broadphaseIntegrityHandleStatic);
+            var broadphaseIntegrityHandle = JobHandle.CombineDependencies(
+                broadphaseIntegrityHandleDynamic,
+                broadphaseIntegrityHandleStatic
+            );
 
             return JobHandle.CombineDependencies(broadphaseIntegrityHandle, bodyColliderIntegrityHandle);
         }
@@ -176,12 +195,20 @@ namespace Unity.Physics.Systems
         [BurstCompile]
         struct CheckDynamicBodyIntegrity : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<LocalTransform> LocalTransformType;
-            [ReadOnly] public ComponentTypeHandle<PhysicsVelocity> PhysicsVelocityType;
-            [ReadOnly] public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
+            [ReadOnly]
+            public ComponentTypeHandle<LocalTransform> LocalTransformType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsVelocity> PhysicsVelocityType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
             public NativeParallelHashMap<uint, long> IntegrityCheckMap;
 
-            internal static void DecrementIfExists(NativeParallelHashMap<uint, long> integrityCheckMap, uint systemVersion)
+            internal static void DecrementIfExists(
+                NativeParallelHashMap<uint, long> integrityCheckMap,
+                uint systemVersion
+            )
             {
                 if (integrityCheckMap.TryGetValue(systemVersion, out long occurrences))
                 {
@@ -190,7 +217,12 @@ namespace Unity.Physics.Systems
                 }
             }
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
                 DecrementIfExists(IntegrityCheckMap, chunk.GetOrderVersion());
@@ -214,15 +246,24 @@ namespace Unity.Physics.Systems
         [BurstCompile]
         struct CheckColliderIntegrity : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsCollider> PhysicsColliderType;
             public NativeParallelHashMap<uint, long> IntegrityCheckMap;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
                 if (chunk.Has(ref PhysicsColliderType))
                 {
-                    CheckDynamicBodyIntegrity.DecrementIfExists(IntegrityCheckMap, chunk.GetChangeVersion(ref PhysicsColliderType));
+                    CheckDynamicBodyIntegrity.DecrementIfExists(
+                        IntegrityCheckMap,
+                        chunk.GetChangeVersion(ref PhysicsColliderType)
+                    );
 
                     var colliders = chunk.GetNativeArray(ref PhysicsColliderType);
                     CheckColliderFilterIntegrity(colliders);
@@ -234,6 +275,7 @@ namespace Unity.Physics.Systems
         struct CheckTotalBodyAndColliderIntegrity : IJob
         {
             public NativeParallelHashMap<uint, long> IntegrityCheckMap;
+
             public void Execute()
             {
                 var values = IntegrityCheckMap.GetValueArray(Allocator.Temp);
@@ -248,8 +290,10 @@ namespace Unity.Physics.Systems
                 }
                 if (!validIntegrity)
                 {
-                    SafetyChecks.ThrowInvalidOperationException("Adding/removing components or changing position/rotation/velocity/collider ECS data" +
-                        " on dynamic entities during physics step");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Adding/removing components or changing position/rotation/velocity/collider ECS data"
+                            + " on dynamic entities during physics step"
+                    );
                 }
             }
         }
@@ -272,7 +316,12 @@ namespace Unity.Physics.Systems
 
                         for (int childIndex = 0; childIndex < compoundCollider->NumChildren; childIndex++)
                         {
-                            combinedFilter = CollisionFilter.CreateUnion(combinedFilter, compoundCollider->GetCollisionFilter(compoundCollider->ConvertChildIndexToColliderKey(childIndex)));
+                            combinedFilter = CollisionFilter.CreateUnion(
+                                combinedFilter,
+                                compoundCollider->GetCollisionFilter(
+                                    compoundCollider->ConvertChildIndexToColliderKey(childIndex)
+                                )
+                            );
                         }
 
                         // GroupIndex has no concept of union. Creating one from children has no guarantees
@@ -284,8 +333,10 @@ namespace Unity.Physics.Systems
                         // If not, it means user has forgotten to call RefreshCollisionFilter() on the CompoundCollider.
                         if (!rootFilter.Equals(combinedFilter))
                         {
-                            SafetyChecks.ThrowInvalidOperationException("CollisionFilter of a compound collider is not a union of its children. " +
-                                "You must call CompoundCollider.RefreshCollisionFilter() to update the root filter after changing child filters.");
+                            SafetyChecks.ThrowInvalidOperationException(
+                                "CollisionFilter of a compound collider is not a union of its children. "
+                                    + "You must call CompoundCollider.RefreshCollisionFilter() to update the root filter after changing child filters."
+                            );
                         }
                     }
                 }
@@ -297,8 +348,10 @@ namespace Unity.Physics.Systems
         {
             [ReadOnly]
             public NativeArray<RigidBody> RigidBodies;
+
             [ReadOnly]
             public Broadphase.Tree Tree;
+
             [ReadOnly]
             public ComponentLookup<PhysicsTemporalCoherenceInfo> PhysicsTemporalCoherenceInfoLookup;
             public bool Static;
@@ -319,7 +372,9 @@ namespace Unity.Physics.Systems
                             var bodyIndex = node.Data[i];
                             if (bodyIndex < 0 && bodyIndex > RigidBodies.Length)
                             {
-                                SafetyChecks.ThrowInvalidOperationException($"Incremental broadphase integrity check failed for this tree (static={Static}, number of bodies={RigidBodies.Length}). Body index {bodyIndex} out of bounds. Did you modify or remove a PhysicsTemporalCoherenceInfo component?");
+                                SafetyChecks.ThrowInvalidOperationException(
+                                    $"Incremental broadphase integrity check failed for this tree (static={Static}, number of bodies={RigidBodies.Length}). Body index {bodyIndex} out of bounds. Did you modify or remove a PhysicsTemporalCoherenceInfo component?"
+                                );
                             }
 
                             var entity = RigidBodies[bodyIndex].Entity;
@@ -327,13 +382,17 @@ namespace Unity.Physics.Systems
                             // make sure we have an entity for each rigid body in the tree
                             if (entity == Entity.Null)
                             {
-                                SafetyChecks.ThrowInvalidOperationException($"Incremental broadphase integrity check failed for this tree (static={Static}). Rigid body with index {bodyIndex} does not have a valid entity.");
+                                SafetyChecks.ThrowInvalidOperationException(
+                                    $"Incremental broadphase integrity check failed for this tree (static={Static}). Rigid body with index {bodyIndex} does not have a valid entity."
+                                );
                             }
 
                             // check if we have temporal coherence info
                             if (!PhysicsTemporalCoherenceInfoLookup.HasComponent(entity))
                             {
-                                SafetyChecks.ThrowInvalidOperationException($"Incremental broadphase integrity check failed for this tree (static={Static}). Entity {entity.ToFixedString()} does not have PhysicsTemporalCoherenceInfo component. Did you remove a PhysicsTemporalCoherenceInfo component?");
+                                SafetyChecks.ThrowInvalidOperationException(
+                                    $"Incremental broadphase integrity check failed for this tree (static={Static}). Entity {entity.ToFixedString()} does not have PhysicsTemporalCoherenceInfo component. Did you remove a PhysicsTemporalCoherenceInfo component?"
+                                );
                             }
 
                             // check if temporal coherence info is valid:
@@ -342,22 +401,30 @@ namespace Unity.Physics.Systems
 
                             if (temporalCoherenceInfo.LastRigidBodyIndex != bodyIndex)
                             {
-                                SafetyChecks.ThrowInvalidOperationException($"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? Temporal coherence info of Entity {entity.ToFixedString()} contains invalid rigid body index {temporalCoherenceInfo.LastRigidBodyIndex} (expected: {bodyIndex}).");
+                                SafetyChecks.ThrowInvalidOperationException(
+                                    $"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? Temporal coherence info of Entity {entity.ToFixedString()} contains invalid rigid body index {temporalCoherenceInfo.LastRigidBodyIndex} (expected: {bodyIndex})."
+                                );
                             }
 
                             if (temporalCoherenceInfo.LastBvhNodeIndex != index)
                             {
-                                SafetyChecks.ThrowInvalidOperationException($"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? PhysicsTemporalCoherenceInfo of Entity {entity.ToFixedString()} contains invalid node index {temporalCoherenceInfo.LastBvhNodeIndex} (expected: {index}).");
+                                SafetyChecks.ThrowInvalidOperationException(
+                                    $"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? PhysicsTemporalCoherenceInfo of Entity {entity.ToFixedString()} contains invalid node index {temporalCoherenceInfo.LastBvhNodeIndex} (expected: {index})."
+                                );
                             }
 
                             if (temporalCoherenceInfo.LastBvhLeafSlotIndex != i)
                             {
-                                SafetyChecks.ThrowInvalidOperationException($"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? PhysicsTemporalCoherenceInfo of Entity {entity.ToFixedString()} contains invalid leaf slot index {temporalCoherenceInfo.LastBvhLeafSlotIndex} (expected: {i}).");
+                                SafetyChecks.ThrowInvalidOperationException(
+                                    $"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? PhysicsTemporalCoherenceInfo of Entity {entity.ToFixedString()} contains invalid leaf slot index {temporalCoherenceInfo.LastBvhLeafSlotIndex} (expected: {i})."
+                                );
                             }
 
                             if (temporalCoherenceInfo.StaticBvh != Static)
                             {
-                                SafetyChecks.ThrowInvalidOperationException($"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? PhysicsTemporalCoherenceInfo of Entity {entity.ToFixedString()} is for a different tree (static={temporalCoherenceInfo.StaticBvh}).");
+                                SafetyChecks.ThrowInvalidOperationException(
+                                    $"Incremental broadphase integrity check failed for this tree (static={Static}). Did you modify a PhysicsTemporalCoherenceInfo component? PhysicsTemporalCoherenceInfo of Entity {entity.ToFixedString()} is for a different tree (static={temporalCoherenceInfo.StaticBvh})."
+                                );
                             }
                         }
                     }

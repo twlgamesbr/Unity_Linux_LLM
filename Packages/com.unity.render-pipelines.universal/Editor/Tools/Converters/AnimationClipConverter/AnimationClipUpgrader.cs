@@ -77,14 +77,23 @@ namespace UnityEditor.Rendering
         /// </returns>
         internal static IDictionary<
             IAnimationClip,
-            (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string> PropertyRenames)
-        > GetAssetDataForClipsFiltered(
-            IEnumerable<ClipPath> clipPaths
-        )
+            (
+                ClipPath Path,
+                EditorCurveBinding[] Bindings,
+                ShaderPropertyUsage Usage,
+                IDictionary<EditorCurveBinding, string> PropertyRenames
+            )
+        > GetAssetDataForClipsFiltered(IEnumerable<ClipPath> clipPaths)
         {
-            var result = new Dictionary<
-                IAnimationClip,
-                (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string> PropertyRenames)
+            var result =
+                new Dictionary<
+                    IAnimationClip,
+                    (
+                        ClipPath Path,
+                        EditorCurveBinding[] Bindings,
+                        ShaderPropertyUsage Usage,
+                        IDictionary<EditorCurveBinding, string> PropertyRenames
+                    )
                 >();
             foreach (var clipPath in clipPaths)
             {
@@ -107,7 +116,12 @@ namespace UnityEditor.Rendering
 
                         if (tmp.Count != 0)
                         {
-                            result[(AnimationClipProxy)clip] = (clipPath, tmp.ToArray(), ShaderPropertyUsage.None, new Dictionary<EditorCurveBinding, string>());
+                            result[(AnimationClipProxy)clip] = (
+                                clipPath,
+                                tmp.ToArray(),
+                                ShaderPropertyUsage.None,
+                                new Dictionary<EditorCurveBinding, string>()
+                            );
                         }
                     }
                 }
@@ -129,7 +143,8 @@ namespace UnityEditor.Rendering
             IEnumerable<T> assets,
             out IReadOnlyDictionary<ClipPath, IReadOnlyCollection<T>> clipToDependentAssets,
             out IReadOnlyDictionary<T, IReadOnlyCollection<ClipPath>> assetToClipDependencies
-        ) where T : struct, IAssetPath
+        )
+            where T : struct, IAssetPath
         {
             // ensure there are no duplicate keys
             clips = new HashSet<ClipPath>(clips);
@@ -155,10 +170,14 @@ namespace UnityEditor.Rendering
             }
 
             // return readonly results
-            clipToDependentAssets =
-                clipsDependentsBuilder.ToDictionary(kv => kv.Key, kv => kv.Value as IReadOnlyCollection<T>);
-            assetToClipDependencies =
-                assetsBuilder.ToDictionary(kv => kv.Key, kv => kv.Value as IReadOnlyCollection<ClipPath>);
+            clipToDependentAssets = clipsDependentsBuilder.ToDictionary(
+                kv => kv.Key,
+                kv => kv.Value as IReadOnlyCollection<T>
+            );
+            assetToClipDependencies = assetsBuilder.ToDictionary(
+                kv => kv.Key,
+                kv => kv.Value as IReadOnlyCollection<ClipPath>
+            );
         }
 
         // reusable buffers
@@ -197,7 +216,12 @@ namespace UnityEditor.Rendering
             IReadOnlyDictionary<PrefabPath, IReadOnlyCollection<ClipPath>> assetDependencies,
             IDictionary<
                 IAnimationClip,
-                (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string> PropertyRenames)
+                (
+                    ClipPath Path,
+                    EditorCurveBinding[] Bindings,
+                    ShaderPropertyUsage Usage,
+                    IDictionary<EditorCurveBinding, string> PropertyRenames
+                )
             > clipData,
             AnimationClipUpgradePathsCache allUpgradePathsToNewShaders,
             IReadOnlyDictionary<UID, MaterialUpgrader> upgradePathsUsedByMaterials = default,
@@ -211,13 +235,21 @@ namespace UnityEditor.Rendering
             foreach (var kv in clipDependents)
             {
                 float currentProgress = (float)++clipIndex / totalNumberOfClips;
-                if (progressFunctor != null && progressFunctor($"({clipIndex} of {totalNumberOfClips}) {kv.Key.Path}", currentProgress))
+                if (
+                    progressFunctor != null
+                    && progressFunctor($"({clipIndex} of {totalNumberOfClips}) {kv.Key.Path}", currentProgress)
+                )
                     break;
 
                 foreach (var prefabPath in kv.Value)
                 {
                     var go = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-                    GatherClipsUsageForGameObject(go, clipData, allUpgradePathsToNewShaders, upgradePathsUsedByMaterials);
+                    GatherClipsUsageForGameObject(
+                        go,
+                        clipData,
+                        allUpgradePathsToNewShaders,
+                        upgradePathsUsedByMaterials
+                    );
                 }
             }
         }
@@ -257,8 +289,12 @@ namespace UnityEditor.Rendering
             IReadOnlyDictionary<ScenePath, IReadOnlyCollection<ClipPath>> assetDependencies,
             IDictionary<
                 IAnimationClip,
-                (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string>
-                    PropertyRenames)
+                (
+                    ClipPath Path,
+                    EditorCurveBinding[] Bindings,
+                    ShaderPropertyUsage Usage,
+                    IDictionary<EditorCurveBinding, string> PropertyRenames
+                )
             > clipData,
             AnimationClipUpgradePathsCache allUpgradePathsToNewShaders,
             IReadOnlyDictionary<UID, MaterialUpgrader> upgradePathsUsedByMaterials = default,
@@ -272,14 +308,22 @@ namespace UnityEditor.Rendering
             foreach (var kv in clipDependents)
             {
                 float currentProgress = (float)++clipIndex / totalNumberOfClips;
-                if (progressFunctor != null && progressFunctor($"({clipIndex} of {totalNumberOfClips}) {kv.Key.Path}", currentProgress))
+                if (
+                    progressFunctor != null
+                    && progressFunctor($"({clipIndex} of {totalNumberOfClips}) {kv.Key.Path}", currentProgress)
+                )
                     break;
 
                 foreach (var scenePath in kv.Value)
                 {
                     var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
                     foreach (var go in scene.GetRootGameObjects())
-                        GatherClipsUsageForGameObject(go, clipData, allUpgradePathsToNewShaders, upgradePathsUsedByMaterials);
+                        GatherClipsUsageForGameObject(
+                            go,
+                            clipData,
+                            allUpgradePathsToNewShaders,
+                            upgradePathsUsedByMaterials
+                        );
                 }
             }
         }
@@ -302,7 +346,12 @@ namespace UnityEditor.Rendering
             GameObject go,
             IDictionary<
                 IAnimationClip,
-                (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string> PropertyRenames)
+                (
+                    ClipPath Path,
+                    EditorCurveBinding[] Bindings,
+                    ShaderPropertyUsage Usage,
+                    IDictionary<EditorCurveBinding, string> PropertyRenames
+                )
             > clipData,
             AnimationClipUpgradePathsCache allUpgradePathsToNewShaders,
             IReadOnlyDictionary<UID, MaterialUpgrader> upgradePathsUsedByMaterials = default
@@ -313,16 +362,25 @@ namespace UnityEditor.Rendering
             go.GetComponentsInChildren(true, s_CustomAnimationBuffer);
 
             // first check clip usage among GameObjects with legacy Animation
-            var gameObjects = new HashSet<GameObject>(s_AnimationBuffer.Select(a => a.gameObject)
-                .Union(s_AnimatorBuffer.Select(a => a.gameObject))
-                .Union(s_CustomAnimationBuffer.Where(a => a is Component).Select(a => ((Component)a).gameObject)));
+            var gameObjects = new HashSet<GameObject>(
+                s_AnimationBuffer
+                    .Select(a => a.gameObject)
+                    .Union(s_AnimatorBuffer.Select(a => a.gameObject))
+                    .Union(s_CustomAnimationBuffer.Where(a => a is Component).Select(a => ((Component)a).gameObject))
+            );
 
             foreach (var gameObject in gameObjects)
             {
-                var clips = AnimationUtility.GetAnimationClips(gameObject).Select(clip => (IAnimationClip)(AnimationClipProxy)clip);
+                var clips = AnimationUtility
+                    .GetAnimationClips(gameObject)
+                    .Select(clip => (IAnimationClip)(AnimationClipProxy)clip);
 
                 GatherClipsUsageForAnimatedHierarchy(
-                    gameObject.transform, clips, clipData, allUpgradePathsToNewShaders, upgradePathsUsedByMaterials
+                    gameObject.transform,
+                    clips,
+                    clipData,
+                    allUpgradePathsToNewShaders,
+                    upgradePathsUsedByMaterials
                 );
             }
 
@@ -338,17 +396,21 @@ namespace UnityEditor.Rendering
 
                 // get all clip sub-assets
                 var clips = new HashSet<IAnimationClip>(
-                    AssetDatabase.LoadAllAssetsAtPath(assetPath)
+                    AssetDatabase
+                        .LoadAllAssetsAtPath(assetPath)
                         .Where(asset => asset is AnimationClip)
                         .Select(asset => (IAnimationClip)(AnimationClipProxy)(asset as AnimationClip))
                 );
 
                 // get all clip dependency-assets
                 // this will not handle nested clips in FBX like assets, but these are less likely to be editable
-                clips.UnionWith(AssetDatabase.GetDependencies(assetPath)
-                    .Select(AssetDatabase.LoadAssetAtPath<AnimationClip>)
-                    .Where(asset => asset is AnimationClip)
-                    .Select(asset => (IAnimationClip)(AnimationClipProxy)asset));
+                clips.UnionWith(
+                    AssetDatabase
+                        .GetDependencies(assetPath)
+                        .Select(AssetDatabase.LoadAssetAtPath<AnimationClip>)
+                        .Where(asset => asset is AnimationClip)
+                        .Select(asset => (IAnimationClip)(AnimationClipProxy)asset)
+                );
 
                 // check if the value of a binding is an animator, and examines clip usage relative to it
                 // this is imprecise, but is suitable to catch the majority of cases (i.e., a single animator binding)
@@ -362,7 +424,11 @@ namespace UnityEditor.Rendering
                         if (value.objectReferenceValue is Animator animator)
                         {
                             GatherClipsUsageForAnimatedHierarchy(
-                                animator.transform, clips, clipData, allUpgradePathsToNewShaders, upgradePathsUsedByMaterials
+                                animator.transform,
+                                clips,
+                                clipData,
+                                allUpgradePathsToNewShaders,
+                                upgradePathsUsedByMaterials
                             );
                         }
                     }
@@ -402,7 +468,12 @@ namespace UnityEditor.Rendering
             IEnumerable<IAnimationClip> clips,
             IDictionary<
                 IAnimationClip,
-                (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string> PropertyRenames)
+                (
+                    ClipPath Path,
+                    EditorCurveBinding[] Bindings,
+                    ShaderPropertyUsage Usage,
+                    IDictionary<EditorCurveBinding, string> PropertyRenames
+                )
             > clipData,
             AnimationClipUpgradePathsCache allUpgradePathsToNewShaders,
             IReadOnlyDictionary<UID, MaterialUpgrader> upgradePathsUsedByMaterials
@@ -425,7 +496,13 @@ namespace UnityEditor.Rendering
             if (s_RendererBuffer.Count > 0)
             {
                 foreach (var clip in clips)
-                    GatherClipUsage(clip, clipData, s_RenderersByPath, allUpgradePathsToNewShaders, upgradePathsUsedByMaterials);
+                    GatherClipUsage(
+                        clip,
+                        clipData,
+                        s_RenderersByPath,
+                        allUpgradePathsToNewShaders,
+                        upgradePathsUsedByMaterials
+                    );
             }
 
             // release UnityObject references
@@ -461,7 +538,12 @@ namespace UnityEditor.Rendering
             IAnimationClip clip,
             IDictionary<
                 IAnimationClip,
-                (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string> PropertyRenames)
+                (
+                    ClipPath Path,
+                    EditorCurveBinding[] Bindings,
+                    ShaderPropertyUsage Usage,
+                    IDictionary<EditorCurveBinding, string> PropertyRenames
+                )
             > clipData,
             IReadOnlyDictionary<string, (IRenderer Renderer, List<IMaterial> Materials)> renderersByPath,
             AnimationClipUpgradePathsCache allUpgradePathsToNewShaders,
@@ -482,7 +564,9 @@ namespace UnityEditor.Rendering
                 // determine the shader property name and type from the binding
                 (string shaderProperty, ShaderPropertyType type) = EditorCurveBindingUtils.InferShaderProperty(binding);
 
-                MaterialUpgrader.MaterialPropertyType materialPropertyType = MaterialUpgrader.MaterialPropertyType.Float;
+                MaterialUpgrader.MaterialPropertyType materialPropertyType = MaterialUpgrader
+                    .MaterialPropertyType
+                    .Float;
                 if (type == ShaderPropertyType.Color)
                     materialPropertyType = MaterialUpgrader.MaterialPropertyType.Color;
                 else if (type == ShaderPropertyType.Texture)
@@ -491,10 +575,19 @@ namespace UnityEditor.Rendering
                 // material property animations apply to all materials, so check shader usage in all of them
                 foreach (var material in rendererData.Materials)
                 {
-                    var usage = allUpgradePathsToNewShaders.GetShaderPropertyUsage(material.ShaderName, materialPropertyType, shaderProperty, out var newPropertyName);
+                    var usage = allUpgradePathsToNewShaders.GetShaderPropertyUsage(
+                        material.ShaderName,
+                        materialPropertyType,
+                        shaderProperty,
+                        out var newPropertyName
+                    );
 
                     // if the property has already been upgraded with a different name, mark the upgrade as ambiguous
-                    if ( usage == ShaderPropertyUsage.ValidForUpgrade && data.PropertyRenames.TryGetValue(binding, out var propertyRename) && propertyRename != newPropertyName)
+                    if (
+                        usage == ShaderPropertyUsage.ValidForUpgrade
+                        && data.PropertyRenames.TryGetValue(binding, out var propertyRename)
+                        && propertyRename != newPropertyName
+                    )
                         usage |= ShaderPropertyUsage.MultipleUpgradePaths;
 
                     data.Usage |= usage;
@@ -516,7 +609,15 @@ namespace UnityEditor.Rendering
         /// <param name="notUpgraded">Collector for all clips that are not upgraded.</param>
         /// <param name="progressFunctor">Optional functor to display a progress bar.</param>
         internal static void UpgradeClips(
-            IDictionary<IAnimationClip, (ClipPath Path, EditorCurveBinding[] Bindings, ShaderPropertyUsage Usage, IDictionary<EditorCurveBinding, string> PropertyRenames)> clipsToUpgrade,
+            IDictionary<
+                IAnimationClip,
+                (
+                    ClipPath Path,
+                    EditorCurveBinding[] Bindings,
+                    ShaderPropertyUsage Usage,
+                    IDictionary<EditorCurveBinding, string> PropertyRenames
+                )
+            > clipsToUpgrade,
             HashSet<(IAnimationClip Clip, ClipPath Path, ShaderPropertyUsage Usage)> upgraded,
             HashSet<(IAnimationClip Clip, ClipPath Path, ShaderPropertyUsage Usage)> notUpgraded,
             Func<string, float, bool> progressFunctor = null
@@ -531,7 +632,10 @@ namespace UnityEditor.Rendering
             foreach (var kv in clipsToUpgrade)
             {
                 float currentProgress = (float)++clipIndex / totalNumberOfClips;
-                if (progressFunctor != null && progressFunctor($"({clipIndex} of {totalNumberOfClips}) {kv.Value.Path.Path}", currentProgress))
+                if (
+                    progressFunctor != null
+                    && progressFunctor($"({clipIndex} of {totalNumberOfClips}) {kv.Value.Path.Path}", currentProgress)
+                )
                     break;
 
                 if (kv.Value.Usage == ShaderPropertyUsage.None || (kv.Value.Usage & ShaderPropertyUsage.HasIssues) != 0)

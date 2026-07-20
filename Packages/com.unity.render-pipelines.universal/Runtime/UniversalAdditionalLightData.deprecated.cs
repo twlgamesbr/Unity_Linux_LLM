@@ -41,9 +41,9 @@ namespace UnityEngine.Rendering.Universal
     public partial class UniversalAdditionalLightData
     {
         // The layer(s) this light belongs too.
-        [Obsolete("This is obsolete, please use m_RenderingLayerMask instead. #from(2023.1)")] [SerializeField]
+        [Obsolete("This is obsolete, please use m_RenderingLayerMask instead. #from(2023.1)")]
+        [SerializeField]
         LightLayerEnum m_LightLayerMask = LightLayerEnum.LightLayerDefault;
-
 
         /// <summary>
         /// The layer(s) this light belongs to.
@@ -56,24 +56,28 @@ namespace UnityEngine.Rendering.Universal
         }
 
         // The layer(s) used for shadow casting.
-        [Obsolete("This is obsolete, please use m_RenderingLayerMask instead. #from(2023.1)")] [SerializeField]
+        [Obsolete("This is obsolete, please use m_RenderingLayerMask instead. #from(2023.1)")]
+        [SerializeField]
         LightLayerEnum m_ShadowLayerMask = LightLayerEnum.LightLayerDefault;
 
         /// <summary>
         /// The layer(s) for shadow.
         /// </summary>
-        [Obsolete("This is obsolete, please use shadowRenderingLayerMask instead. #from(2023.1) #breakingFrom(2023.1)", true)]
+        [Obsolete(
+            "This is obsolete, please use shadowRenderingLayerMask instead. #from(2023.1) #breakingFrom(2023.1)",
+            true
+        )]
         public LightLayerEnum shadowLayerMask
         {
             get { return m_ShadowLayerMask; }
             set { m_ShadowLayerMask = value; }
         }
-        
+
         [SerializeField]
         [Obsolete("This is obsolete, please use m_RenderingLayersMask instead. #from(6000.2)")]
         uint m_RenderingLayers = 1;
-        
-        [SerializeField] 
+
+        [SerializeField]
         [Obsolete("This is obsolete, please use renderingLayersMask instead. #from(6000.2)")]
         uint m_ShadowRenderingLayers = 1;
     }

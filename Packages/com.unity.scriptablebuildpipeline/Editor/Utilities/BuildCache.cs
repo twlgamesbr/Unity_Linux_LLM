@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,7 +12,6 @@ using UnityEditor.Build.Pipeline.Utilities.USerialize;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Build.Pipeline;
-using System.Collections.Concurrent;
 
 namespace UnityEditor.Build.Pipeline.Utilities
 {
@@ -24,8 +24,14 @@ namespace UnityEditor.Build.Pipeline.Utilities
         internal class USerializeCustom_BuildUsageTagSet : ICustomSerializer
         {
 #if !UNITY_2019_4_OR_NEWER
-            static MethodInfo m_SerializeToBinary = typeof(BuildUsageTagSet).GetMethod("SerializeToBinary", BindingFlags.Instance | BindingFlags.NonPublic);
-            static MethodInfo m_DeserializeFromBinary = typeof(BuildUsageTagSet).GetMethod("DeserializeFromBinary", BindingFlags.Instance | BindingFlags.NonPublic);
+            static MethodInfo m_SerializeToBinary = typeof(BuildUsageTagSet).GetMethod(
+                "SerializeToBinary",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            static MethodInfo m_DeserializeFromBinary = typeof(BuildUsageTagSet).GetMethod(
+                "DeserializeFromBinary",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 #endif
 
             // Return the type that this custom serializer deals with
@@ -65,29 +71,131 @@ namespace UnityEditor.Build.Pipeline.Utilities
         // Object factories used to create instances of types involved in build cache serialization more quickly than the generic Activator.CreateInstance()
         internal static (Type, DeSerializer.ObjectFactory)[] ObjectFactories = new (Type, DeSerializer.ObjectFactory)[]
         {
-            (typeof(AssetLoadInfo), () => { return new AssetLoadInfo(); }),
-            (typeof(BuildUsageTagGlobal), () => { return new BuildUsageTagGlobal(); }),
-            (typeof(BundleDetails), () => { return new BundleDetails(); }),
-            (typeof(CachedInfo), () => { return new CachedInfo(); }),
-            (typeof(CacheEntry), () => { return new CacheEntry(); }),
-            (typeof(ExtendedAssetData), () => { return new ExtendedAssetData(); }),
-            (typeof(ObjectIdentifier), () => { return new ObjectIdentifier(); }),
-            (typeof(ObjectSerializedInfo), () => { return new ObjectSerializedInfo(); }),
-            (typeof(ResourceFile), () => { return new ResourceFile(); }),
-            (typeof(SceneDependencyInfo), () => { return new SceneDependencyInfo(); }),
-            (typeof(SerializedFileMetaData), () => { return new SerializedFileMetaData(); }),
-            (typeof(SerializedLocation), () => { return new SerializedLocation(); }),
-            (typeof(SpriteImporterData), () => { return new SpriteImporterData(); }),
-            (typeof(WriteResult), () => { return new WriteResult(); }),
-            (typeof(KeyValuePair<ObjectIdentifier, Type[]>), () => { return new KeyValuePair<ObjectIdentifier, Type[]>(); }),
-            (typeof(List<KeyValuePair<ObjectIdentifier, Type[]>>), () => { return new List<KeyValuePair<ObjectIdentifier, Type[]>>(); }),
-            (typeof(Hash128), () => { return new Hash128(); }),
+            (
+                typeof(AssetLoadInfo),
+                () =>
+                {
+                    return new AssetLoadInfo();
+                }
+            ),
+            (
+                typeof(BuildUsageTagGlobal),
+                () =>
+                {
+                    return new BuildUsageTagGlobal();
+                }
+            ),
+            (
+                typeof(BundleDetails),
+                () =>
+                {
+                    return new BundleDetails();
+                }
+            ),
+            (
+                typeof(CachedInfo),
+                () =>
+                {
+                    return new CachedInfo();
+                }
+            ),
+            (
+                typeof(CacheEntry),
+                () =>
+                {
+                    return new CacheEntry();
+                }
+            ),
+            (
+                typeof(ExtendedAssetData),
+                () =>
+                {
+                    return new ExtendedAssetData();
+                }
+            ),
+            (
+                typeof(ObjectIdentifier),
+                () =>
+                {
+                    return new ObjectIdentifier();
+                }
+            ),
+            (
+                typeof(ObjectSerializedInfo),
+                () =>
+                {
+                    return new ObjectSerializedInfo();
+                }
+            ),
+            (
+                typeof(ResourceFile),
+                () =>
+                {
+                    return new ResourceFile();
+                }
+            ),
+            (
+                typeof(SceneDependencyInfo),
+                () =>
+                {
+                    return new SceneDependencyInfo();
+                }
+            ),
+            (
+                typeof(SerializedFileMetaData),
+                () =>
+                {
+                    return new SerializedFileMetaData();
+                }
+            ),
+            (
+                typeof(SerializedLocation),
+                () =>
+                {
+                    return new SerializedLocation();
+                }
+            ),
+            (
+                typeof(SpriteImporterData),
+                () =>
+                {
+                    return new SpriteImporterData();
+                }
+            ),
+            (
+                typeof(WriteResult),
+                () =>
+                {
+                    return new WriteResult();
+                }
+            ),
+            (
+                typeof(KeyValuePair<ObjectIdentifier, Type[]>),
+                () =>
+                {
+                    return new KeyValuePair<ObjectIdentifier, Type[]>();
+                }
+            ),
+            (
+                typeof(List<KeyValuePair<ObjectIdentifier, Type[]>>),
+                () =>
+                {
+                    return new List<KeyValuePair<ObjectIdentifier, Type[]>>();
+                }
+            ),
+            (
+                typeof(Hash128),
+                () =>
+                {
+                    return new Hash128();
+                }
+            ),
         };
 
         // Custom serializers we use for build cache serialization of types that cannot be correctly serialized using the built in reflection based serialization code
         internal static ICustomSerializer[] CustomSerializers = new ICustomSerializer[]
         {
-            new USerializeCustom_BuildUsageTagSet()
+            new USerializeCustom_BuildUsageTagSet(),
         };
         const string k_CachePath = "Library/BuildCache";
         const int k_Version = 5;
@@ -205,20 +313,28 @@ namespace UnityEditor.Build.Pipeline.Utilities
             {
                 if (!dependency.IsValid())
                 {
-                    if (!LogCacheMiss($"[Cache Miss]: Dependency is no longer valid. Asset: {info.Asset} Dependency: {dependency}"))
+                    if (
+                        !LogCacheMiss(
+                            $"[Cache Miss]: Dependency is no longer valid. Asset: {info.Asset} Dependency: {dependency}"
+                        )
+                    )
                         return true;
                     result = true;
                 }
 
                 updatedEntry = GetUpdatedCacheEntry(dependency);
 #if VALIDATE_CACHED_DEPENDENCIES
-                     if (!updatedEntry.IsValid())
-                         return result;
+                if (!updatedEntry.IsValid())
+                    return result;
 #endif
 
                 if (dependency != GetUpdatedCacheEntry(updatedEntry))
                 {
-                    if (!LogCacheMiss($"[Cache Miss]: Dependency changed. Asset: {info.Asset} Old: {dependency} New: {updatedEntry}"))
+                    if (
+                        !LogCacheMiss(
+                            $"[Cache Miss]: Dependency changed. Asset: {info.Asset} Old: {dependency} New: {updatedEntry}"
+                        )
+                    )
                         return true;
                     result = true;
                 }
@@ -284,7 +400,6 @@ namespace UnityEditor.Build.Pipeline.Utilities
             }
         }
 
-
 #if UNITY_2019_4_OR_NEWER
         // Newer Parallel.For concurrent method for 2019.4 and newer.  ~3x faster than the old two-thread read/deserialize method when using four threads
         public void LoadCachedData(IList<CacheEntry> entries, out IList<CachedInfo> cachedInfos)
@@ -311,40 +426,51 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 {
                     CachedInfo[] cachedInfoArray = new CachedInfo[entries.Count];
                     deserializeTimer = Stopwatch.StartNew();
-                    int workerThreadCount = Math.Min(Environment.ProcessorCount, 4);    // Testing of the USerialize code has shown increasing concurrency beyond four threads produces worse performance (the suspicion is due to GC contention but that's TBC)
-                    ParallelOptions parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = workerThreadCount };
+                    int workerThreadCount = Math.Min(Environment.ProcessorCount, 4); // Testing of the USerialize code has shown increasing concurrency beyond four threads produces worse performance (the suspicion is due to GC contention but that's TBC)
+                    ParallelOptions parallelOptions = new ParallelOptions()
+                    {
+                        MaxDegreeOfParallelism = workerThreadCount,
+                    };
                     ConcurrentStack<DeSerializer> deserializers = new ConcurrentStack<DeSerializer>();
                     for (int serializerNum = 0; serializerNum < workerThreadCount; serializerNum++)
                         deserializers.Push(new DeSerializer(CustomSerializers, ObjectFactories));
-                    Parallel.For(0, entries.Count, parallelOptions, index =>
-                    {
-                        try
+                    Parallel.For(
+                        0,
+                        entries.Count,
+                        parallelOptions,
+                        index =>
                         {
-                            string file = GetCachedInfoFile(entries[index]);
-                            byte[] bytes = File.ReadAllBytes(file);
-                            if ((bytes != null) && (bytes.Length > 0))
+                            try
                             {
-                                using (MemoryStream memoryStream = new MemoryStream(bytes, false))
+                                string file = GetCachedInfoFile(entries[index]);
+                                byte[] bytes = File.ReadAllBytes(file);
+                                if ((bytes != null) && (bytes.Length > 0))
                                 {
-                                    deserializers.TryPop(out DeSerializer deserializer);
-                                    cachedInfoArray[index] = deserializer.DeSerialize<CachedInfo>(memoryStream);
-                                    deserializers.Push(deserializer);
-                                    Interlocked.Increment(ref cachedCount);
+                                    using (MemoryStream memoryStream = new MemoryStream(bytes, false))
+                                    {
+                                        deserializers.TryPop(out DeSerializer deserializer);
+                                        cachedInfoArray[index] = deserializer.DeSerialize<CachedInfo>(memoryStream);
+                                        deserializers.Push(deserializer);
+                                        Interlocked.Increment(ref cachedCount);
+                                    }
                                 }
+                                else
+                                    LogCacheMiss($"[Cache Miss]: Missing cache entry. Entry: {entries[index]}");
                             }
-                            else
-                                LogCacheMiss($"[Cache Miss]: Missing cache entry. Entry: {entries[index]}");
+                            catch (Exception)
+                            {
+                                LogCacheMiss($"[Cache Miss]: Invalid cache entry. Entry: {entries[index]}");
+                            }
                         }
-                        catch (Exception)
-                        {
-                            LogCacheMiss($"[Cache Miss]: Invalid cache entry. Entry: {entries[index]}");
-                        }
-                    });
+                    );
                     deserializeTimer.Stop();
                     cachedInfos = cachedInfoArray.ToList();
                 }
 
-                m_Logger.AddEntrySafe(LogLevel.Info, $"Time spent deserializing: {deserializeTimer.ElapsedMilliseconds}ms");
+                m_Logger.AddEntrySafe(
+                    LogLevel.Info,
+                    $"Time spent deserializing: {deserializeTimer.ElapsedMilliseconds}ms"
+                );
                 m_Logger.AddEntrySafe(LogLevel.Info, $"Local Cache hit count: {cachedCount}");
             }
 
@@ -442,7 +568,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
                     ((IDisposable)ops.waitLock).Dispose();
 
                     deserializeTimer.Stop();
-                    m_Logger.AddEntrySafe(LogLevel.Info, $"Time spent deserializing: {deserializeTimer.ElapsedMilliseconds}ms");
+                    m_Logger.AddEntrySafe(
+                        LogLevel.Info,
+                        $"Time spent deserializing: {deserializeTimer.ElapsedMilliseconds}ms"
+                    );
                     m_Logger.AddEntrySafe(LogLevel.Info, $"Local Cache hit count: {cachedCount}");
                 }
 
@@ -466,7 +595,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
                     }
                 }
 
-                m_Logger.AddEntrySafe(LogLevel.Info, $"Local Cache hit count: {cachedCount}, Cache Server hit count: {downloadedCount}");
+                m_Logger.AddEntrySafe(
+                    LogLevel.Info,
+                    $"Local Cache hit count: {cachedCount}, Cache Server hit count: {downloadedCount}"
+                );
 
                 Assert.AreEqual(entries.Count, cachedInfos.Count);
             }
@@ -510,46 +642,54 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
                 using (m_Logger.ScopedStep(LogLevel.Info, "SerializingCacheInfos[" + infos.Count + "]"))
                 {
-                    int workerThreadCount = Math.Min(Environment.ProcessorCount, 4);    // Testing of the USerialize code has shown increasing concurrency beyond four threads produces worse performance (the suspicion is due to GC contention but that's TBC)
-                    ParallelOptions parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = workerThreadCount };
+                    int workerThreadCount = Math.Min(Environment.ProcessorCount, 4); // Testing of the USerialize code has shown increasing concurrency beyond four threads produces worse performance (the suspicion is due to GC contention but that's TBC)
+                    ParallelOptions parallelOptions = new ParallelOptions()
+                    {
+                        MaxDegreeOfParallelism = workerThreadCount,
+                    };
                     ConcurrentStack<Serializer> serializers = new ConcurrentStack<Serializer>();
                     for (int serializerNum = 0; serializerNum < workerThreadCount; serializerNum++)
                         serializers.Push(new Serializer(CustomSerializers));
-                    Parallel.For(0, infos.Count, parallelOptions, index =>
-
-                    {
-                        try
+                    Parallel.For(
+                        0,
+                        infos.Count,
+                        parallelOptions,
+                        index =>
                         {
-                            using (var stream = new MemoryStream())
+                            try
                             {
-                                serializers.TryPop(out Serializer serializer);
-                                serializer.Serialize(stream, infos[index], 1);
-                                serializers.Push(serializer);
-
-                                if (stream.Length > 0)
+                                using (var stream = new MemoryStream())
                                 {
-                                    string cachedInfoFilepath = GetCachedInfoFile(infos[index].Asset);
-                                    Directory.CreateDirectory(Path.GetDirectoryName(cachedInfoFilepath));
+                                    serializers.TryPop(out Serializer serializer);
+                                    serializer.Serialize(stream, infos[index], 1);
+                                    serializers.Push(serializer);
 
-                                    using (FileStream fileStream = new FileStream(cachedInfoFilepath, FileMode.Create))
+                                    if (stream.Length > 0)
                                     {
-                                        fileStream.Write(stream.GetBuffer(), 0, (int)stream.Length);
+                                        string cachedInfoFilepath = GetCachedInfoFile(infos[index].Asset);
+                                        Directory.CreateDirectory(Path.GetDirectoryName(cachedInfoFilepath));
+
+                                        using (
+                                            FileStream fileStream = new FileStream(cachedInfoFilepath, FileMode.Create)
+                                        )
+                                        {
+                                            fileStream.Write(stream.GetBuffer(), 0, (int)stream.Length);
+                                        }
                                     }
                                 }
                             }
+                            catch (Exception e)
+                            {
+                                BuildLogger.LogException(e);
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            BuildLogger.LogException(e);
-                        }
-                    });
+                    );
                 }
 
                 // Signal the Save task's SaveCachedDataTask() function that we are done so it can exit.  This will allow prune tasks to proceed once again
                 taskData.m_DoneLock.Release();
             }
         }
-
 #else   // !UNITY_2019_4_OR_NEWER
         // Old two-thread serialize/write method for 2018.4 support.
         // 2018.4 does not support us running serialization on threads other than the main thread due to functions being called in Unity that are not marked as thread safe in that version (GUIDToHexInternal() and SerializeToBinary() at least)
@@ -623,7 +763,11 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
                                 // If we have a cache server connection, upload the cached data
                                 if (m_Uploader != null)
-                                    m_Uploader.QueueUpload(infos[index].Asset, GetCachedArtifactsDirectory(infos[index].Asset), new MemoryStream(stream.GetBuffer(), false));
+                                    m_Uploader.QueueUpload(
+                                        infos[index].Asset,
+                                        GetCachedArtifactsDirectory(infos[index].Asset),
+                                        new MemoryStream(stream.GetBuffer(), false)
+                                    );
                             }
                         }
                         catch (Exception e)
@@ -646,7 +790,9 @@ namespace UnityEditor.Build.Pipeline.Utilities
         {
             public DirectoryInfo directory;
             public long Length { get; set; }
+
             public void Delete() => directory.Delete(true);
+
             public DateTime LastAccessTimeUtc
             {
                 get => directory.LastAccessTimeUtc;
@@ -671,10 +817,21 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
             if (prompt)
             {
-                if (!EditorUtility.DisplayDialog("Purge Build Cache", "Do you really want to purge your entire build cache?", "Yes", "No"))
+                if (
+                    !EditorUtility.DisplayDialog(
+                        "Purge Build Cache",
+                        "Do you really want to purge your entire build cache?",
+                        "Yes",
+                        "No"
+                    )
+                )
                     return;
 
-                EditorUtility.DisplayProgressBar(ScriptableBuildPipeline.Properties.purgeCache.text, ScriptableBuildPipeline.Properties.pleaseWait.text, 0.0F);
+                EditorUtility.DisplayProgressBar(
+                    ScriptableBuildPipeline.Properties.purgeCache.text,
+                    ScriptableBuildPipeline.Properties.pleaseWait.text,
+                    0.0F
+                );
                 Directory.Delete(k_CachePath, true);
                 EditorUtility.ClearProgressBar();
             }
@@ -696,14 +853,33 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
             if (currentCacheSize < maximumCacheSize)
             {
-                UnityEngine.Debug.LogFormat("Current build cache currentCacheSize {0}, prune threshold {1} GB. No prune performed. You can change this value in the \"Edit/Preferences...\" window.", EditorUtility.FormatBytes(currentCacheSize), maximumSize);
+                UnityEngine.Debug.LogFormat(
+                    "Current build cache currentCacheSize {0}, prune threshold {1} GB. No prune performed. You can change this value in the \"Edit/Preferences...\" window.",
+                    EditorUtility.FormatBytes(currentCacheSize),
+                    maximumSize
+                );
                 return;
             }
 
-            if (!EditorUtility.DisplayDialog("Prune Build Cache", string.Format("Current build cache currentCacheSize is {0}, which is over the prune threshold of {1}. Do you want to prune your build cache now?", EditorUtility.FormatBytes(currentCacheSize), EditorUtility.FormatBytes(maximumCacheSize)), "Yes", "No"))
+            if (
+                !EditorUtility.DisplayDialog(
+                    "Prune Build Cache",
+                    string.Format(
+                        "Current build cache currentCacheSize is {0}, which is over the prune threshold of {1}. Do you want to prune your build cache now?",
+                        EditorUtility.FormatBytes(currentCacheSize),
+                        EditorUtility.FormatBytes(maximumCacheSize)
+                    ),
+                    "Yes",
+                    "No"
+                )
+            )
                 return;
 
-            EditorUtility.DisplayProgressBar(ScriptableBuildPipeline.Properties.pruneCache.text, ScriptableBuildPipeline.Properties.pleaseWait.text, 0.0F);
+            EditorUtility.DisplayProgressBar(
+                ScriptableBuildPipeline.Properties.pruneCache.text,
+                ScriptableBuildPipeline.Properties.pleaseWait.text,
+                0.0F
+            );
 
             PruneCacheFolders(maximumCacheSize, currentCacheSize, cacheFolders);
 
@@ -716,7 +892,11 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <param name="maximumCacheSize">The maximum cache size.</param>
         public static void PruneCache_Background(long maximumCacheSize)
         {
-            ThreadingManager.QueueTask(ThreadingManager.ThreadQueues.PruneQueue, PruneCache_Background_Internal, maximumCacheSize);
+            ThreadingManager.QueueTask(
+                ThreadingManager.ThreadQueues.PruneQueue,
+                PruneCache_Background_Internal,
+                maximumCacheSize
+            );
         }
 
         internal static void PruneCache_Background_Internal(object maximumCacheSize)
@@ -754,7 +934,11 @@ namespace UnityEditor.Build.Pipeline.Utilities
             }
         }
 
-        internal static void PruneCacheFolders(long maximumCacheSize, long currentCacheSize, List<CacheFolder> cacheFolders)
+        internal static void PruneCacheFolders(
+            long maximumCacheSize,
+            long currentCacheSize,
+            List<CacheFolder> cacheFolders
+        )
         {
             cacheFolders.Sort((a, b) => a.LastAccessTimeUtc.CompareTo(b.LastAccessTimeUtc));
             // Need to delete sets of files as the .info might reference a specific file artifact
@@ -770,7 +954,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
         // TODO: Add to IBuildCache interface when IBuildLogger becomes public
         internal void SetBuildLogger(IBuildLogger profiler)
         {
-            if(m_Logger == null)
+            if (m_Logger == null)
                 m_Logger = profiler;
         }
     }

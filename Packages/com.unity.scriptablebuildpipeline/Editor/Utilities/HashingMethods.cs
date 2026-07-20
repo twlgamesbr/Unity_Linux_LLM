@@ -46,8 +46,12 @@ namespace UnityEditor.Build.Pipeline.Utilities
             if (m_Hash == null || m_Hash.Length != 16)
                 return new Hash128();
 
-            return new Hash128(BitConverter.ToUInt32(m_Hash, 0), BitConverter.ToUInt32(m_Hash, 4),
-                BitConverter.ToUInt32(m_Hash, 8), BitConverter.ToUInt32(m_Hash, 12));
+            return new Hash128(
+                BitConverter.ToUInt32(m_Hash, 0),
+                BitConverter.ToUInt32(m_Hash, 4),
+                BitConverter.ToUInt32(m_Hash, 8),
+                BitConverter.ToUInt32(m_Hash, 12)
+            );
         }
 
         /// <summary>
@@ -111,7 +115,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <param name="left">The hash to compare against.</param>
         /// <param name="right">The hash to compare to.</param>
         /// <returns>Returns true if the hashes are equivalent. Returns false otherwise.</returns>
-        public static bool operator==(RawHash left, RawHash right)
+        public static bool operator ==(RawHash left, RawHash right)
         {
             return left.Equals(right);
         }
@@ -122,7 +126,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <param name="left">The hash to compare against.</param>
         /// <param name="right">The hash to compare to.</param>
         /// <returns>Returns true if the hashes are not equivalent. Returns false otherwise.</returns>
-        public static bool operator!=(RawHash left, RawHash right)
+        public static bool operator !=(RawHash left, RawHash right)
         {
             return !(left == right);
         }
@@ -172,7 +176,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 var bytes = BitConverter.GetBytes((int)currObj);
                 stream.Write(bytes, 0, bytes.Length);
             }
-            else if(currObj is IntPtr)
+            else if (currObj is IntPtr)
             {
                 var ptr = (IntPtr)currObj;
                 var bytes = BitConverter.GetBytes((int)ptr.ToInt64());
@@ -262,7 +266,9 @@ namespace UnityEditor.Build.Pipeline.Utilities
             else
             {
                 // Use reflection for remainder
-                var fields = currObj.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var fields = currObj
+                    .GetType()
+                    .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 for (var index = fields.Length - 1; index >= 0; index--)
                 {
                     var field = fields[index];
@@ -302,7 +308,9 @@ namespace UnityEditor.Build.Pipeline.Utilities
 #if UNITY_2020_1_OR_NEWER
             // New projects on 2021.1 will default useSpookyHash to true
             // Upgraded projects will remain false until they choose to switch
-            return ScriptableBuildPipeline.useV2Hasher ? (HashAlgorithm)SpookyHash.Create() : new MD5CryptoServiceProvider();
+            return ScriptableBuildPipeline.useV2Hasher
+                ? (HashAlgorithm)SpookyHash.Create()
+                : new MD5CryptoServiceProvider();
 #else
             return new MD5CryptoServiceProvider();
 #endif
@@ -358,7 +366,8 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <typeparam name="T">The hash algorithm type.</typeparam>
         /// <param name="stream">The stream of data.</param>
         /// <returns>Returns the hash of the stream.</returns>
-        public static RawHash CalculateStream<T>(Stream stream) where T : HashAlgorithm
+        public static RawHash CalculateStream<T>(Stream stream)
+            where T : HashAlgorithm
         {
             if (stream == null)
                 return RawHash.Zero();
@@ -445,7 +454,9 @@ namespace UnityEditor.Build.Pipeline.Utilities
         static void PassBytesToStreamInBlocks(Stream stream, byte[] bytesToWrite, int blockSizeBytes)
         {
             if ((bytesToWrite.Length % blockSizeBytes) != 0)
-                throw new InvalidOperationException($"PassBytesToStreamInBlocks() byte array size of {bytesToWrite.Length} is required to be a multiple of {blockSizeBytes} which it's not");
+                throw new InvalidOperationException(
+                    $"PassBytesToStreamInBlocks() byte array size of {bytesToWrite.Length} is required to be a multiple of {blockSizeBytes} which it's not"
+                );
 
             for (int offset = 0; offset < bytesToWrite.Length; offset += blockSizeBytes)
             {
@@ -459,7 +470,8 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <typeparam name="T">The hash algorithm type.</typeparam>
         /// <param name="obj">The object.</param>
         /// <returns>Returns the hash of the object.</returns>
-        public static RawHash Calculate<T>(object obj) where T : HashAlgorithm
+        public static RawHash Calculate<T>(object obj)
+            where T : HashAlgorithm
         {
             RawHash rawHash;
             using (var stream = new HashStream(GetHashAlgorithm(typeof(T))))
@@ -476,7 +488,8 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <typeparam name="T">The hash algorithm type.</typeparam>
         /// <param name="objects">The objects.</param>
         /// <returns>Returns the hash of the set of objects.</returns>
-        public static RawHash Calculate<T>(params object[] objects) where T : HashAlgorithm
+        public static RawHash Calculate<T>(params object[] objects)
+            where T : HashAlgorithm
         {
             if (objects == null)
                 return RawHash.Zero();
@@ -491,7 +504,9 @@ namespace UnityEditor.Build.Pipeline.Utilities
         }
 
         static Dictionary<string, RawHash> fileHashCache = null;
-        static int requests, hits;
+        static int requests,
+            hits;
+
         internal static void CreateNewFileHashCache(int capacity)
         {
             requests = hits = 0;
@@ -567,7 +582,8 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <typeparam name="T">The hash algorithm type.</typeparam>
         /// <param name="filePath">The file path.</param>
         /// <returns>Returns the hash of the file.</returns>
-        public static RawHash CalculateFile<T>(string filePath) where T : HashAlgorithm
+        public static RawHash CalculateFile<T>(string filePath)
+            where T : HashAlgorithm
         {
             if (IsNonHostFileHashPath(filePath))
                 return Calculate<T>(filePath);

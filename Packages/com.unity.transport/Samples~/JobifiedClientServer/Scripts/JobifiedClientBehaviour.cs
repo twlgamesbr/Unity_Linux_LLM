@@ -1,7 +1,7 @@
-using UnityEngine;
-using Unity.Jobs;
 using Unity.Collections;
+using Unity.Jobs;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 namespace Unity.Networking.Transport.Samples
 {
@@ -32,11 +32,7 @@ namespace Unity.Networking.Transport.Samples
         {
             m_ClientJobHandle.Complete();
 
-            var job = new ClientUpdateJob
-            {
-                Driver = m_Driver,
-                Connection = m_Connection,
-            };
+            var job = new ClientUpdateJob { Driver = m_Driver, Connection = m_Connection };
             m_ClientJobHandle = m_Driver.ScheduleUpdate();
             m_ClientJobHandle = job.Schedule(m_ClientJobHandle);
         }

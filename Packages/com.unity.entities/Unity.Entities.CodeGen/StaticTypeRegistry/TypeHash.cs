@@ -29,8 +29,8 @@ namespace Unity.Entities.CodeGen
             ulong result = kFNV1A64OffsetBasis;
             unchecked
             {
-                result = (((ulong)(val & 0x000000FF) >>  0) ^ result) * kFNV1A64Prime;
-                result = (((ulong)(val & 0x0000FF00) >>  8) ^ result) * kFNV1A64Prime;
+                result = (((ulong)(val & 0x000000FF) >> 0) ^ result) * kFNV1A64Prime;
+                result = (((ulong)(val & 0x0000FF00) >> 8) ^ result) * kFNV1A64Prime;
                 result = (((ulong)(val & 0x00FF0000) >> 16) ^ result) * kFNV1A64Prime;
                 result = (((ulong)(val & 0xFF000000) >> 24) ^ result) * kFNV1A64Prime;
             }
@@ -60,13 +60,15 @@ namespace Unity.Entities.CodeGen
 
             // UnityEngine objects have their own serialization mechanism so exclude hashing the type's
             // internals and just hash its name which is stable and important to how Entities will serialize
-            if (typeRef.IsArray
+            if (
+                typeRef.IsArray
                 || typeRef.IsGenericParameter
                 || typeRef.IsPointer
                 || typeDef.IsPrimitive
                 || typeDef.IsEnum
                 || typeDef.IsUnityEngineObject()
-                || WorkaroundTypeNames.Contains(typeRef.FullName))
+                || WorkaroundTypeNames.Contains(typeRef.FullName)
+            )
                 return hash;
 
             foreach (var field in typeDef.Fields)
@@ -86,9 +88,8 @@ namespace Unity.Entities.CodeGen
                         // we make all future occurence of fieldType resolve to the hash of its field type name
                         cache.Add(fieldTypeRef, HashTypeName(fieldTypeRef));
                         fieldTypeHash = HashType(fieldTypeRef, cache);
-                        cache[fieldTypeRef] =  fieldTypeHash;
+                        cache[fieldTypeRef] = fieldTypeHash;
                     }
-
 
                     if (field.HasLayoutInfo)
                     {
@@ -125,12 +126,15 @@ namespace Unity.Entities.CodeGen
             var typeDef = typeRef.Resolve();
             if (typeDef.CustomAttributes.Count > 0)
             {
-                var versionAttribute = typeDef.CustomAttributes.FirstOrDefault(ca => ca.Constructor.DeclaringType.Name == "TypeVersionAttribute");
+                var versionAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
+                    ca.Constructor.DeclaringType.Name == "TypeVersionAttribute"
+                );
                 if (versionAttribute != null)
                 {
-                    version = (int)versionAttribute.ConstructorArguments
-                        .First(arg => arg.Type.MetadataType == MetadataType.Int32)
-                        .Value;
+                    version = (int)
+                        versionAttribute
+                            .ConstructorArguments.First(arg => arg.Type.MetadataType == MetadataType.Int32)
+                            .Value;
                 }
             }
 
@@ -164,7 +168,9 @@ namespace Unity.Entities.CodeGen
                 foreach (var ga in gi.GenericArguments)
                 {
                     if (ga.IsGenericParameter)
-                        throw new ArgumentException($"Found GenericParameter in {typeRef.FullName}. This is not supported. Please correct your type to fully qualify its GenericArguments");
+                        throw new ArgumentException(
+                            $"Found GenericParameter in {typeRef.FullName}. This is not supported. Please correct your type to fully qualify its GenericArguments"
+                        );
                     hash = CombineFNV1A64(hash, HashTypeName(ga));
                 }
             }
@@ -213,7 +219,10 @@ namespace Unity.Entities.CodeGen
         public static ulong CalculateStableTypeHash(TypeReference typeRef)
         {
             ulong versionHash = HashVersionAttribute(typeRef);
-            ulong typeHash = HashType(typeRef, new Dictionary<TypeReference, ulong>(new Unity.Cecil.Awesome.Comparers.TypeReferenceEqualityComparer()));
+            ulong typeHash = HashType(
+                typeRef,
+                new Dictionary<TypeReference, ulong>(new Unity.Cecil.Awesome.Comparers.TypeReferenceEqualityComparer())
+            );
 
             return CombineFNV1A64(versionHash, typeHash);
         }
@@ -229,13 +238,16 @@ namespace Unity.Entities.CodeGen
             var typeDef = typeRef.Resolve();
             if (typeDef.CustomAttributes.Count > 0)
             {
-                var forcedMemoryOrderAttribute = typeDef.CustomAttributes.FirstOrDefault(ca => ca.Constructor.DeclaringType.Name == "ForcedMemoryOrderingAttribute");
+                var forcedMemoryOrderAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
+                    ca.Constructor.DeclaringType.Name == "ForcedMemoryOrderingAttribute"
+                );
                 if (forcedMemoryOrderAttribute != null)
                 {
                     HasCustomMemoryOrdering = true;
-                    ulong memoryOrder = (ulong)forcedMemoryOrderAttribute.ConstructorArguments
-                        .First(arg => arg.Type.MetadataType == MetadataType.UInt64)
-                        .Value;
+                    ulong memoryOrder = (ulong)
+                        forcedMemoryOrderAttribute
+                            .ConstructorArguments.First(arg => arg.Type.MetadataType == MetadataType.UInt64)
+                            .Value;
 
                     return memoryOrder;
                 }

@@ -142,7 +142,11 @@ namespace UnityEngine.InputSystem.Layouts
         /// <seealso cref="InputControl.usages"/>
         /// <seealso cref="InputControlLayout.ControlItem.usages"/>
         /// <seealso cref="CommonUsages"/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "According to MSDN, this message can be ignored for attribute parameters, as there are no better alternatives.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Performance",
+            "CA1819:PropertiesShouldNotReturnArrays",
+            Justification = "According to MSDN, this message can be ignored for attribute parameters, as there are no better alternatives."
+        )]
         public string[] usages { get; set; }
 
         /// <summary>
@@ -218,7 +222,11 @@ namespace UnityEngine.InputSystem.Layouts
         /// </remarks>
         /// <seealso cref="InputControl.aliases"/>
         /// <seealso cref="InputControlLayout.ControlItem.aliases"/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "According to MSDN, this message can be ignored for attribute parameters, as there are no better alternatives.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Performance",
+            "CA1819:PropertiesShouldNotReturnArrays",
+            Justification = "According to MSDN, this message can be ignored for attribute parameters, as there are no better alternatives."
+        )]
         public string[] aliases { get; set; }
 
         public string useStateFrom { get; set; }

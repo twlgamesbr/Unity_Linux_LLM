@@ -11,7 +11,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
     //
     class ButtonStrip : VisualElement
     {
-        static readonly string s_UssPathNoExt = "Packages/com.unity.multiplayer.tools/NetworkSimulator/Editor/UI/ButtonStrip/ButtonStrip";
+        static readonly string s_UssPathNoExt =
+            "Packages/com.unity.multiplayer.tools/NetworkSimulator/Editor/UI/ButtonStrip/ButtonStrip";
         static readonly string s_UssPath = s_UssPathNoExt + ".uss";
         static readonly string s_UssDarkPath = s_UssPathNoExt + "Dark.uss";
         static readonly string s_UssLightPath = s_UssPathNoExt + "Light.uss";
@@ -38,9 +39,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 
         public Action<EventBase> onButtonClick;
 
-        public ButtonStrip() : this(null)
-        {
-        }
+        public ButtonStrip()
+            : this(null) { }
 
         public ButtonStrip(IList<string> choices)
         {
@@ -56,6 +56,7 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
             }
             this.choices = choices;
         }
+
         void RecreateButtons()
         {
             this.Clear();
@@ -96,7 +97,6 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
                     button.text = choice;
                 }
             }
-
         }
     }
 }

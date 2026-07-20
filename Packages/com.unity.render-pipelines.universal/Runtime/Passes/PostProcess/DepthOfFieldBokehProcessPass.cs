@@ -1,5 +1,5 @@
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -40,13 +40,16 @@ namespace UnityEngine.Rendering.Universal
             // Inputs
             internal TextureHandle sourceTexture;
             internal TextureHandle depthTexture;
+
             // Pass textures
             internal TextureHandle halfCoCTexture;
             internal TextureHandle fullCoCTexture;
             internal TextureHandle pingTexture;
             internal TextureHandle pongTexture;
+
             // Output texture
             internal TextureHandle destinationTexture;
+
             // Setup
             internal Vector4[] bokehKernel;
             internal Vector4 cocParams;
@@ -73,21 +76,62 @@ namespace UnityEngine.Rendering.Universal
             var resourceData = frameData.Get<UniversalResourceData>();
 
             var sourceTexture = resourceData.cameraColor;
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, sourceTexture, k_TargetName, true, FilterMode.Bilinear);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                sourceTexture,
+                k_TargetName,
+                true,
+                FilterMode.Bilinear
+            );
             var srcDesc = sourceTexture.GetDescriptor(renderGraph);
 
             int wh = srcDesc.width / k_DownSample;
             int hh = srcDesc.height / k_DownSample;
 
             // Pass Textures
-            var fullCoCTextureDesc = PostProcessUtils.GetCompatibleDescriptor(srcDesc, srcDesc.width, srcDesc.height, Experimental.Rendering.GraphicsFormat.R8_UNorm);
-            var fullCoCTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, fullCoCTextureDesc, "_FullCoCTexture", true, FilterMode.Bilinear);
-            var pingTextureDesc = PostProcessUtils.GetCompatibleDescriptor(srcDesc, wh, hh, Experimental.Rendering.GraphicsFormat.R16G16B16A16_SFloat);
-            var pingTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, pingTextureDesc, "_PingTexture", true, FilterMode.Bilinear);
-            var pongTextureDesc = PostProcessUtils.GetCompatibleDescriptor(srcDesc, wh, hh, Experimental.Rendering.GraphicsFormat.R16G16B16A16_SFloat);
-            var pongTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, pongTextureDesc, "_PongTexture", true, FilterMode.Bilinear);
+            var fullCoCTextureDesc = PostProcessUtils.GetCompatibleDescriptor(
+                srcDesc,
+                srcDesc.width,
+                srcDesc.height,
+                Experimental.Rendering.GraphicsFormat.R8_UNorm
+            );
+            var fullCoCTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                fullCoCTextureDesc,
+                "_FullCoCTexture",
+                true,
+                FilterMode.Bilinear
+            );
+            var pingTextureDesc = PostProcessUtils.GetCompatibleDescriptor(
+                srcDesc,
+                wh,
+                hh,
+                Experimental.Rendering.GraphicsFormat.R16G16B16A16_SFloat
+            );
+            var pingTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                pingTextureDesc,
+                "_PingTexture",
+                true,
+                FilterMode.Bilinear
+            );
+            var pongTextureDesc = PostProcessUtils.GetCompatibleDescriptor(
+                srcDesc,
+                wh,
+                hh,
+                Experimental.Rendering.GraphicsFormat.R16G16B16A16_SFloat
+            );
+            var pongTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                pongTextureDesc,
+                "_PongTexture",
+                true,
+                FilterMode.Bilinear
+            );
 
-            using (var builder = renderGraph.AddUnsafePass<DoFBokehPassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddUnsafePass<DoFBokehPassData>(passName, out var passData, profilingSampler)
+            )
             {
                 // Setup
                 // "A Lens and Aperture Camera Model for Synthetic Image Generation" [Potmesil81]
@@ -105,11 +149,14 @@ namespace UnityEngine.Rendering.Universal
                     m_BokehHash = hash;
                     m_BokehMaxRadius = maxRadius;
                     m_BokehRcpAspect = rcpAspect;
-                    PrepareBokehKernel( ref m_BokehKernel,
-                                        depthOfField.bladeCount.value,
-                                        depthOfField.bladeCurvature.value,
-                                        depthOfField.bladeRotation.value,
-                                        maxRadius, rcpAspect);
+                    PrepareBokehKernel(
+                        ref m_BokehKernel,
+                        depthOfField.bladeCount.value,
+                        depthOfField.bladeCurvature.value,
+                        depthOfField.bladeRotation.value,
+                        maxRadius,
+                        rcpAspect
+                    );
                 }
                 float uvMargin = (1.0f / srcDesc.height) * k_DownSample;
 
@@ -142,67 +189,119 @@ namespace UnityEngine.Rendering.Universal
                 builder.UseTexture(destinationTexture, AccessFlags.Write);
 
                 // TODO RENDERGRAPH: properly setup dependencies between passes
-                builder.SetRenderFunc(static (DoFBokehPassData data, UnsafeGraphContext context) =>
-                {
-                    var dofMat = data.material;
-                    var cmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
-                    RTHandle sourceTextureHdl = data.sourceTexture;
-                    RTHandle dst = data.destinationTexture;
-
-                    // Setup
-                    using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_SetupDoF)))
+                builder.SetRenderFunc(
+                    static (DoFBokehPassData data, UnsafeGraphContext context) =>
                     {
-                        Vector4 sourceSize = PostProcessUtils.CalcShaderSourceSize(data.sourceTexture);
+                        var dofMat = data.material;
+                        var cmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
+                        RTHandle sourceTextureHdl = data.sourceTexture;
+                        RTHandle dst = data.destinationTexture;
 
-                        dofMat.SetVector(ShaderConstants._CoCParams, data.cocParams);
-                        dofMat.SetVectorArray(ShaderConstants._BokehKernel, data.bokehKernel);
-                        dofMat.SetVector(ShaderConstants._DownSampleScaleFactor, new Vector4(1.0f / data.downSample, 1.0f / data.downSample, data.downSample,data.downSample));
-                        dofMat.SetVector(ShaderConstants._BokehConstants, new Vector4(data.uvMargin, data.uvMargin * 2.0f));
-                        dofMat.SetVector(ShaderConstants._SourceSize, sourceSize);
+                        // Setup
+                        using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_SetupDoF)))
+                        {
+                            Vector4 sourceSize = PostProcessUtils.CalcShaderSourceSize(data.sourceTexture);
 
-                        CoreUtils.SetKeyword(dofMat, ShaderKeywordStrings.UseFastSRGBLinearConversion, data.useFastSRGBLinearConversion);
-                        CoreUtils.SetKeyword(dofMat, ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT, data.enableAlphaOutput);
+                            dofMat.SetVector(ShaderConstants._CoCParams, data.cocParams);
+                            dofMat.SetVectorArray(ShaderConstants._BokehKernel, data.bokehKernel);
+                            dofMat.SetVector(
+                                ShaderConstants._DownSampleScaleFactor,
+                                new Vector4(
+                                    1.0f / data.downSample,
+                                    1.0f / data.downSample,
+                                    data.downSample,
+                                    data.downSample
+                                )
+                            );
+                            dofMat.SetVector(
+                                ShaderConstants._BokehConstants,
+                                new Vector4(data.uvMargin, data.uvMargin * 2.0f)
+                            );
+                            dofMat.SetVector(ShaderConstants._SourceSize, sourceSize);
+
+                            CoreUtils.SetKeyword(
+                                dofMat,
+                                ShaderKeywordStrings.UseFastSRGBLinearConversion,
+                                data.useFastSRGBLinearConversion
+                            );
+                            CoreUtils.SetKeyword(
+                                dofMat,
+                                ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT,
+                                data.enableAlphaOutput
+                            );
+                        }
+
+                        // Compute CoC
+                        using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFComputeCOC)))
+                        {
+                            dofMat.SetTexture(ShaderConstants._CameraDepthTextureID, data.depthTexture);
+                            Blitter.BlitCameraTexture(
+                                cmd,
+                                sourceTextureHdl,
+                                data.fullCoCTexture,
+                                dofMat,
+                                ShaderPass.k_ComputeCoc
+                            );
+                        }
+
+                        // Downscale and Prefilter Color + CoC
+                        using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFDownscalePrefilter)))
+                        {
+                            dofMat.SetTexture(ShaderConstants._FullCoCTexture, data.fullCoCTexture);
+                            Blitter.BlitCameraTexture(
+                                cmd,
+                                sourceTextureHdl,
+                                data.pingTexture,
+                                dofMat,
+                                ShaderPass.k_DownscalePrefilter
+                            );
+                        }
+
+                        // Blur
+                        using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFBlurBokeh)))
+                        {
+                            Blitter.BlitCameraTexture(
+                                cmd,
+                                data.pingTexture,
+                                data.pongTexture,
+                                dofMat,
+                                ShaderPass.k_Blur
+                            );
+                        }
+
+                        // Post Filtering
+                        using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFPostFilter)))
+                        {
+                            Blitter.BlitCameraTexture(
+                                cmd,
+                                data.pongTexture,
+                                data.pingTexture,
+                                dofMat,
+                                ShaderPass.k_PostFilter
+                            );
+                        }
+
+                        // Composite
+                        using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFComposite)))
+                        {
+                            dofMat.SetTexture(ShaderConstants._DofTexture, data.pingTexture);
+                            Blitter.BlitCameraTexture(cmd, sourceTextureHdl, dst, dofMat, ShaderPass.k_Composite);
+                        }
                     }
-
-                    // Compute CoC
-                    using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFComputeCOC)))
-                    {
-                        dofMat.SetTexture(ShaderConstants._CameraDepthTextureID, data.depthTexture);
-                        Blitter.BlitCameraTexture(cmd, sourceTextureHdl, data.fullCoCTexture, dofMat, ShaderPass.k_ComputeCoc);
-                    }
-
-                    // Downscale and Prefilter Color + CoC
-                    using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFDownscalePrefilter)))
-                    {
-                        dofMat.SetTexture(ShaderConstants._FullCoCTexture, data.fullCoCTexture);
-                        Blitter.BlitCameraTexture(cmd, sourceTextureHdl, data.pingTexture, dofMat, ShaderPass.k_DownscalePrefilter);
-                    }
-
-                    // Blur
-                    using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFBlurBokeh)))
-                    {
-                        Blitter.BlitCameraTexture(cmd, data.pingTexture, data.pongTexture, dofMat, ShaderPass.k_Blur);
-                    }
-
-                    // Post Filtering
-                    using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFPostFilter)))
-                    {
-                        Blitter.BlitCameraTexture(cmd, data.pongTexture, data.pingTexture, dofMat, ShaderPass.k_PostFilter);
-                    }
-
-                    // Composite
-                    using (new ProfilingScope(ProfilingSampler.Get(URPProfileId.RG_DOFComposite)))
-                    {
-                        dofMat.SetTexture(ShaderConstants._DofTexture, data.pingTexture);
-                        Blitter.BlitCameraTexture(cmd, sourceTextureHdl, dst, dofMat, ShaderPass.k_Composite);
-                    }
-                });
+                );
             }
 
             resourceData.cameraColor = destinationTexture;
         }
 
-        static void PrepareBokehKernel(ref Vector4[] bokehKernel, int bladeCount, float bladeCurvature, float bladeRotation, float maxRadius, float rcpAspect)
+        static void PrepareBokehKernel(
+            ref Vector4[] bokehKernel,
+            int bladeCount,
+            float bladeCurvature,
+            float bladeRotation,
+            float maxRadius,
+            float rcpAspect
+        )
         {
             const int kRings = 4;
             const int kPointsPerRing = 7;
@@ -233,7 +332,9 @@ namespace UnityEngine.Rendering.Universal
                     // Transform to rotated N-Gon
                     // Adapted from "CryEngine 3 Graphics Gems" [Sousa13]
                     float nt = Mathf.Cos(PI / bladeCountf);
-                    float dt = Mathf.Cos(phi - (TWO_PI / bladeCountf) * Mathf.Floor((bladeCountf * phi + Mathf.PI) / TWO_PI));
+                    float dt = Mathf.Cos(
+                        phi - (TWO_PI / bladeCountf) * Mathf.Floor((bladeCountf * phi + Mathf.PI) / TWO_PI)
+                    );
                     float r = radius * Mathf.Pow(nt / dt, curvature);
                     float u = r * Mathf.Cos(phi - rotation);
                     float v = r * Mathf.Sin(phi - rotation);

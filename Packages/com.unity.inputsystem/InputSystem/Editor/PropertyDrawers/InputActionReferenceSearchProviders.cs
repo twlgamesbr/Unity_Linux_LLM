@@ -15,7 +15,8 @@ namespace UnityEngine.InputSystem.Editor
         internal static readonly SearchFlags PickerSearchFlags = SearchFlags.OpenPicker;
 
         // Search.SearchViewFlags : these flags are used to customize the appearance of the PickerWindow.
-        internal static readonly Search.SearchViewFlags PickerViewFlags = SearchViewFlags.DisableBuilderModeToggle
+        internal static readonly Search.SearchViewFlags PickerViewFlags =
+            SearchViewFlags.DisableBuilderModeToggle
             | SearchViewFlags.DisableInspectorPreview
             | SearchViewFlags.ListView
             | SearchViewFlags.DisableSavedSearchQuery;
@@ -29,17 +30,20 @@ namespace UnityEngine.InputSystem.Editor
         // Search provider for InputActionReferences for all assets in the project, without project-wide actions.
         internal static SearchProvider CreateInputActionReferenceSearchProviderForAssets()
         {
-            return CreateInputActionReferenceSearchProvider(k_AssetFolderSearchProviderId,
+            return CreateInputActionReferenceSearchProvider(
+                k_AssetFolderSearchProviderId,
                 "Asset Input Actions",
                 // Show the asset path in the description.
                 (obj) => AssetDatabase.GetAssetPath((obj as InputActionReference).asset),
-                () => InputActionImporter.LoadInputActionReferencesFromAssetDatabase(skipProjectWide: true));
+                () => InputActionImporter.LoadInputActionReferencesFromAssetDatabase(skipProjectWide: true)
+            );
         }
 
         // Search provider for InputActionReferences for project-wide actions
         internal static SearchProvider CreateInputActionReferenceSearchProviderForProjectWideActions()
         {
-            return CreateInputActionReferenceSearchProvider(k_ProjectWideActionsSearchProviderId,
+            return CreateInputActionReferenceSearchProvider(
+                k_ProjectWideActionsSearchProviderId,
                 "Project-Wide Input Actions",
                 (obj) => "(Project-Wide Input Actions)",
                 () =>
@@ -49,11 +53,16 @@ namespace UnityEngine.InputSystem.Editor
                         return Array.Empty<Object>();
                     var assetPath = AssetDatabase.GetAssetPath(asset);
                     return InputActionImporter.LoadInputActionReferencesFromAsset(assetPath);
-                });
+                }
+            );
         }
 
-        private static SearchProvider CreateInputActionReferenceSearchProvider(string id, string displayName,
-            Func<Object, string> createItemFetchDescription, Func<IEnumerable<Object>> fetchAssets)
+        private static SearchProvider CreateInputActionReferenceSearchProvider(
+            string id,
+            string displayName,
+            Func<Object, string> createItemFetchDescription,
+            Func<IEnumerable<Object>> fetchAssets
+        )
         {
             // Match icon used for sub-assets from importer for InputActionReferences.
             // We assign description+label in FilteredSearch but also provide a fetchDescription+fetchLabel below.
@@ -66,8 +75,15 @@ namespace UnityEngine.InputSystem.Editor
             {
                 priority = 25,
                 fetchDescription = FetchLabel,
-                fetchItems = (context, items, provider) => FilteredSearch(context, provider, FetchLabel, createItemFetchDescription,
-                    fetchAssets, "(Project-Wide Input Actions)"),
+                fetchItems = (context, items, provider) =>
+                    FilteredSearch(
+                        context,
+                        provider,
+                        FetchLabel,
+                        createItemFetchDescription,
+                        fetchAssets,
+                        "(Project-Wide Input Actions)"
+                    ),
                 fetchLabel = FetchLabel,
                 fetchPreview = (item, context, size, options) => inputActionReferenceIcon,
                 fetchThumbnail = (item, context) => inputActionReferenceIcon,
@@ -76,8 +92,14 @@ namespace UnityEngine.InputSystem.Editor
         }
 
         // Custom search function with label matching filtering.
-        private static IEnumerable<SearchItem> FilteredSearch(SearchContext context, SearchProvider provider,
-            Func<Object, string> fetchObjectLabel, Func<Object, string> createItemFetchDescription, Func<IEnumerable<Object>> fetchAssets, string description)
+        private static IEnumerable<SearchItem> FilteredSearch(
+            SearchContext context,
+            SearchProvider provider,
+            Func<Object, string> fetchObjectLabel,
+            Func<Object, string> createItemFetchDescription,
+            Func<IEnumerable<Object>> fetchAssets,
+            string description
+        )
         {
             foreach (var asset in fetchAssets())
             {
@@ -88,14 +110,20 @@ namespace UnityEngine.InputSystem.Editor
                 string itemId;
 
                 // 6.4 deprecated instance ids in favour of entity ids
-                #if UNITY_6000_4_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                 itemId = asset.GetEntityId().ToString();
-                #else
+#else
                 itemId = asset.GetInstanceID().ToString();
-                #endif
+#endif
 
-                yield return provider.CreateItem(context, itemId, label, createItemFetchDescription(asset),
-                    null, asset);
+                yield return provider.CreateItem(
+                    context,
+                    itemId,
+                    label,
+                    createItemFetchDescription(asset),
+                    null,
+                    asset
+                );
             }
         }
 
@@ -108,7 +136,7 @@ namespace UnityEngine.InputSystem.Editor
 
         private static string FetchLabel(SearchItem item, SearchContext context)
         {
-            return FetchLabel((item.data as Object) !);
+            return FetchLabel((item.data as Object)!);
         }
     }
 }

@@ -30,7 +30,10 @@ namespace UnityEngine.Rendering
         ///   - 1 hasChange: True if something have been reloaded.
         ///   - 2 assetDatabaseNotReady: True if the issue preventing loading is due to state of AssetDatabase
         /// </returns>
-        public static (bool hasChange, bool assetDatabaseNotReady) TryReloadAllNullIn(System.Object container, string basePath)
+        public static (bool hasChange, bool assetDatabaseNotReady) TryReloadAllNullIn(
+            System.Object container,
+            string basePath
+        )
         {
             try
             {
@@ -60,8 +63,13 @@ namespace UnityEngine.Rendering
                 return false;
 
             var changed = false;
-            foreach (var fieldInfo in container.GetType()
-                .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            foreach (
+                var fieldInfo in container
+                    .GetType()
+                    .GetFields(
+                        BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static
+                    )
+            )
             {
                 //Recurse on sub-containers
                 if (IsReloadGroup(fieldInfo))
@@ -76,8 +84,12 @@ namespace UnityEngine.Rendering
                 {
                     if (attribute.paths.Length == 1)
                     {
-                        changed |= SetAndLoadIfNull(container, fieldInfo, GetFullPath(basePath, attribute),
-                            attribute.package);
+                        changed |= SetAndLoadIfNull(
+                            container,
+                            fieldInfo,
+                            GetFullPath(basePath, attribute),
+                            attribute.package
+                        );
                     }
                     else if (attribute.paths.Length > 1)
                     {
@@ -97,8 +109,12 @@ namespace UnityEngine.Rendering
                         {
                             //Find each null element and reload them
                             for (int index = 0; index < attribute.paths.Length; ++index)
-                                changed |= SetAndLoadIfNull(array, index, GetFullPath(basePath, attribute, index),
-                                    attribute.package);
+                                changed |= SetAndLoadIfNull(
+                                    array,
+                                    index,
+                                    GetFullPath(basePath, attribute, index),
+                                    attribute.package
+                                );
                         }
                     }
                 }
@@ -112,8 +128,10 @@ namespace UnityEngine.Rendering
         static void CheckReloadGroupSupportedType(Type type)
         {
             if (type.IsSubclassOf(typeof(ScriptableObject)))
-                throw new Exception(@$"ReloadGroup attribute must not be used on {nameof(ScriptableObject)}.
-If {nameof(ResourceReloader)} create an instance of it, it will be not saved as a file, resulting in corrupted ID when building.");
+                throw new Exception(
+                    @$"ReloadGroup attribute must not be used on {nameof(ScriptableObject)}.
+If {nameof(ResourceReloader)} create an instance of it, it will be not saved as a file, resulting in corrupted ID when building."
+                );
         }
 
         static bool FixGroupIfNeeded(System.Object container, FieldInfo info)
@@ -125,10 +143,7 @@ If {nameof(ResourceReloader)} create an instance of it, it will be not saved as 
             {
                 var value = Activator.CreateInstance(type);
 
-                info.SetValue(
-                    container,
-                    value
-                );
+                info.SetValue(container, value);
                 return true;
             }
 
@@ -168,26 +183,21 @@ If {nameof(ResourceReloader)} create an instance of it, it will be not saved as 
 
         static ReloadAttribute GetReloadAttribute(FieldInfo fieldInfo)
         {
-            var attributes = (ReloadAttribute[])fieldInfo
-                .GetCustomAttributes(typeof(ReloadAttribute), false);
+            var attributes = (ReloadAttribute[])fieldInfo.GetCustomAttributes(typeof(ReloadAttribute), false);
             if (attributes.Length == 0)
                 return null;
             return attributes[0];
         }
 
-        static bool IsReloadGroup(FieldInfo info)
-            => info.FieldType
-            .GetCustomAttributes(typeof(ReloadGroupAttribute), false).Length > 0;
+        static bool IsReloadGroup(FieldInfo info) =>
+            info.FieldType.GetCustomAttributes(typeof(ReloadGroupAttribute), false).Length > 0;
 
-        static bool IsReloadGroup(Array field)
-            => field.GetType().GetElementType()
-            .GetCustomAttributes(typeof(ReloadGroupAttribute), false).Length > 0;
+        static bool IsReloadGroup(Array field) =>
+            field.GetType().GetElementType().GetCustomAttributes(typeof(ReloadGroupAttribute), false).Length > 0;
 
-        static bool IsNull(System.Object container, FieldInfo info)
-            => IsNull(info.GetValue(container));
+        static bool IsNull(System.Object container, FieldInfo info) => IsNull(info.GetValue(container));
 
-        static bool IsNull(System.Object field)
-            => field == null || field.Equals(null);
+        static bool IsNull(System.Object field) => field == null || field.Equals(null);
 
         static UnityEngine.Object Load(string path, Type type, ReloadAttribute.Package location)
         {
@@ -222,13 +232,19 @@ If {nameof(ResourceReloader)} create an instance of it, it will be not saved as 
 
             if (IsNull(result))
             {
-                throw new InvalidImportException($"Cannot load. Path {path} is correct but AssetDatabase cannot load now.");
+                throw new InvalidImportException(
+                    $"Cannot load. Path {path} is correct but AssetDatabase cannot load now."
+                );
             }
             return result;
         }
 
-        static bool SetAndLoadIfNull(System.Object container, FieldInfo info,
-            string path, ReloadAttribute.Package location)
+        static bool SetAndLoadIfNull(
+            System.Object container,
+            FieldInfo info,
+            string path,
+            ReloadAttribute.Package location
+        )
         {
             if (IsNull(container, info))
             {
@@ -288,8 +304,15 @@ If {nameof(ResourceReloader)} create an instance of it, it will be not saved as 
         /// <param name="resourcePath">The asset path to load the resource container from</param>
         /// <param name="checker">Function to test if the resource container is present in a RenderPipelineGlobalSettings</param>
         /// <param name="settings">RenderPipelineGlobalSettings to be passed to checker to test of the resource container is already loaded</param>
-        public static void EnsureResources<T, S>(bool forceReload, ref T resources, string resourcePath, Func<S, bool> checker, S settings)
-            where T : RenderPipelineResources where S : RenderPipelineGlobalSettings
+        public static void EnsureResources<T, S>(
+            bool forceReload,
+            ref T resources,
+            string resourcePath,
+            Func<S, bool> checker,
+            S settings
+        )
+            where T : RenderPipelineResources
+            where S : RenderPipelineGlobalSettings
         {
             T resourceChecked = null;
 
@@ -330,7 +353,8 @@ If {nameof(ResourceReloader)} create an instance of it, it will be not saved as 
                             InternalEditorUtility.SaveToSerializedFileAndForget(
                                 new Object[] { resources },
                                 resourcePath,
-                                true);
+                                true
+                            );
                         }
                     }
                     catch (System.Exception e)

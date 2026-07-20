@@ -18,7 +18,7 @@ namespace Unity.Numerics.Memory
             Nothing = 0,
             Free = 0x1,
             Available = 0x2,
-            Allocatable = Free | Available
+            Allocatable = Free | Available,
         }
 
         [BurstCompile]
@@ -29,12 +29,14 @@ namespace Unity.Numerics.Memory
             /// <summary>
             /// Packed size and flags
             /// </summary>
-            [FieldOffset(0)] public long content;
+            [FieldOffset(0)]
+            public long content;
 
             /// <summary>
             /// The "this" pointer
             /// </summary>
-            [FieldOffset(8)] private Block* self;
+            [FieldOffset(8)]
+            private Block* self;
 
             public static Block* Construct(void* ptr)
             {
@@ -74,11 +76,20 @@ namespace Unity.Numerics.Memory
                 get => content != 0;
             }
 
-            public bool IsFree { get => (content & (long)Usage.Free) != 0; }
+            public bool IsFree
+            {
+                get => (content & (long)Usage.Free) != 0;
+            }
 
-            public bool IsLocked { get => (content & (long)Usage.Available) == 0; }
+            public bool IsLocked
+            {
+                get => (content & (long)Usage.Available) == 0;
+            }
 
-            public bool IsAllocatable { get => (content & (long)Usage.Allocatable) == (long)Usage.Allocatable; }
+            public bool IsAllocatable
+            {
+                get => (content & (long)Usage.Allocatable) == (long)Usage.Allocatable;
+            }
 
             public long Size
             {
@@ -111,7 +122,7 @@ namespace Unity.Numerics.Memory
                 }
             }
 
-            [return : AssumeRange(0, long.MaxValue)]
+            [return: AssumeRange(0, long.MaxValue)]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private long GetSize()
             {

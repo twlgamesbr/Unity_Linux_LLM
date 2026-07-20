@@ -14,7 +14,11 @@ namespace Unity.Transforms
     [BurstCompile]
     static unsafe class ParentingHelpers
     {
-        internal static void AddEntityToChildListDuringStructuralChange(EntityDataAccess* eda, Entity child, Entity newParent)
+        internal static void AddEntityToChildListDuringStructuralChange(
+            EntityDataAccess* eda,
+            Entity child,
+            Entity newParent
+        )
         {
             // Add Child buffer to newParent, if it doesn't already exist
             eda->AddComponentDuringStructuralChange(newParent, ComponentType.ReadWrite<Child>());
@@ -22,20 +26,34 @@ namespace Unity.Transforms
             var typeIndex = TypeManager.GetTypeIndex<Child>();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandles = &eda->DependencyManager->Safety;
-            var childBuf = eda->GetBuffer<Child>(newParent, safetyHandles->GetSafetyHandle(typeIndex, false), safetyHandles->GetBufferSafetyHandle(typeIndex), false);
+            var childBuf = eda->GetBuffer<Child>(
+                newParent,
+                safetyHandles->GetSafetyHandle(typeIndex, false),
+                safetyHandles->GetBufferSafetyHandle(typeIndex),
+                false
+            );
 #else
             var childBuf = eda->GetBuffer<Child>(newParent, false);
 #endif
             childBuf.Add(new Child { Value = child });
         }
 
-        internal static void RemoveEntityFromChildListDuringStructuralChange(EntityDataAccess* eda, Entity child, Entity currentParent)
+        internal static void RemoveEntityFromChildListDuringStructuralChange(
+            EntityDataAccess* eda,
+            Entity child,
+            Entity currentParent
+        )
         {
             var childComponentType = ComponentType.ReadWrite<Child>();
             var typeIndex = TypeManager.GetTypeIndex<Child>();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandles = &eda->DependencyManager->Safety;
-            var childBuf = eda->GetBuffer<Child>(currentParent, safetyHandles->GetSafetyHandle(typeIndex, false), safetyHandles->GetBufferSafetyHandle(typeIndex), false);
+            var childBuf = eda->GetBuffer<Child>(
+                currentParent,
+                safetyHandles->GetSafetyHandle(typeIndex, false),
+                safetyHandles->GetBufferSafetyHandle(typeIndex),
+                false
+            );
 #else
             var childBuf = eda->GetBuffer<Child>(currentParent, false);
 #endif
@@ -53,7 +71,8 @@ namespace Unity.Transforms
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(!foundChild))
                 throw new InvalidOperationException(
-                    $"entity {child} not found in Child buffer of current parent {currentParent}");
+                    $"entity {child} not found in Child buffer of current parent {currentParent}"
+                );
 #endif
             // If we removed the last child, remove the now-empty Child buffer.
             if (foundChild && childBuf.Length == 0)
@@ -64,12 +83,16 @@ namespace Unity.Transforms
 
         static bool IsUniformScale(in float3 scale, float tolerance = 0.0001f)
         {
-            return math.abs(scale.x - scale.y) <= tolerance &&
-                   math.abs(scale.x - scale.z) <= tolerance &&
-                   math.abs(scale.y - scale.z) <= tolerance;
+            return math.abs(scale.x - scale.y) <= tolerance
+                && math.abs(scale.x - scale.z) <= tolerance
+                && math.abs(scale.y - scale.z) <= tolerance;
         }
 
-        internal static void DetachChildrenDuringStructuralChange(EntityDataAccess* eda, Entity parent, bool preserveWorldTransform)
+        internal static void DetachChildrenDuringStructuralChange(
+            EntityDataAccess* eda,
+            Entity parent,
+            bool preserveWorldTransform
+        )
         {
             eda->EntityComponentStore->AssertEntitiesExist(&parent, 1);
             var childComponentType = ComponentType.ReadWrite<Child>();
@@ -81,7 +104,13 @@ namespace Unity.Transforms
             var typeIndex = TypeManager.GetTypeIndex<Child>();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandles = &eda->DependencyManager->Safety;
-            var children = eda->GetBuffer<Child>(parent, safetyHandles->GetSafetyHandle(typeIndex, true), safetyHandles->GetBufferSafetyHandle(typeIndex), true).ToNativeArray(Allocator.Temp);
+            var children = eda->GetBuffer<Child>(
+                    parent,
+                    safetyHandles->GetSafetyHandle(typeIndex, true),
+                    safetyHandles->GetBufferSafetyHandle(typeIndex),
+                    true
+                )
+                .ToNativeArray(Allocator.Temp);
 #else
             var children = eda->GetBuffer<Child>(parent, true).ToNativeArray(Allocator.Temp);
 #endif
@@ -94,20 +123,34 @@ namespace Unity.Transforms
                 // remove-from-parent step, in which case we'll need to manually remove the Child component after this loop.
                 SetParentDuringStructuralChange(eda, child, Entity.Null, preserveWorldTransform);
             }
-            Assert.IsFalse(eda->HasComponent(parent, childComponentType), "Entity should no longer have Child buffer after removing all children");
+            Assert.IsFalse(
+                eda->HasComponent(parent, childComponentType),
+                "Entity should no longer have Child buffer after removing all children"
+            );
         }
 
 #if ENABLE_TRANSFORMREF
-        internal static void SetParentTransformRefInternal(EntityDataAccess* eda, Entity childEntity, Entity parentEntity, bool preserveWorldTransform)
+        internal static void SetParentTransformRefInternal(
+            EntityDataAccess* eda,
+            Entity childEntity,
+            Entity parentEntity,
+            bool preserveWorldTransform
+        )
         {
             TransformRef childRef = eda->GetTransformRef(childEntity);
-            TransformRef parentRef = parentEntity == Entity.Null ? default(TransformRef) : eda->GetTransformRef(parentEntity);
+            TransformRef parentRef =
+                parentEntity == Entity.Null ? default(TransformRef) : eda->GetTransformRef(parentEntity);
             childRef.SetParent(eda->EntityComponentStore, parentRef, parentEntity, childEntity, preserveWorldTransform);
         }
 #endif
 
         [BurstCompile]
-        internal static void SetParentInternal(EntityDataAccess* eda, in Entity child, in Entity newParent, bool preserveWorldTransform)
+        internal static void SetParentInternal(
+            EntityDataAccess* eda,
+            in Entity child,
+            in Entity newParent,
+            bool preserveWorldTransform
+        )
         {
             eda->EntityComponentStore->AssertEntityExists(child);
             var parentComponentType = ComponentType.ReadWrite<Parent>();
@@ -136,7 +179,9 @@ namespace Unity.Transforms
                     // no error, but operation is no-op
                     if (e == child)
                         return;
-                    e = eda->HasComponent(e, parentComponentType) ? eda->GetComponentData<Parent>(e).Value : Entity.Null;
+                    e = eda->HasComponent(e, parentComponentType)
+                        ? eda->GetComponentData<Parent>(e).Value
+                        : Entity.Null;
                 }
             }
             float4x4 currentLocalToWorld = default;
@@ -146,13 +191,27 @@ namespace Unity.Transforms
             if (Hint.Likely(preserveWorldTransform))
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                localTransformLookup = new ComponentLookup<LocalTransform>(TypeManager.GetTypeIndex<LocalTransform>(), eda, true);
+                localTransformLookup = new ComponentLookup<LocalTransform>(
+                    TypeManager.GetTypeIndex<LocalTransform>(),
+                    eda,
+                    true
+                );
                 parentLookup = new ComponentLookup<Parent>(TypeManager.GetTypeIndex<Parent>(), eda, true);
-                postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(TypeManager.GetTypeIndex<PostTransformMatrix>(), eda, true);
+                postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(
+                    TypeManager.GetTypeIndex<PostTransformMatrix>(),
+                    eda,
+                    true
+                );
 #else
-                localTransformLookup = new ComponentLookup<LocalTransform>(TypeManager.GetTypeIndex<LocalTransform>(), eda);
+                localTransformLookup = new ComponentLookup<LocalTransform>(
+                    TypeManager.GetTypeIndex<LocalTransform>(),
+                    eda
+                );
                 parentLookup = new ComponentLookup<Parent>(TypeManager.GetTypeIndex<Parent>(), eda);
-                postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(TypeManager.GetTypeIndex<PostTransformMatrix>(), eda);
+                postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(
+                    TypeManager.GetTypeIndex<PostTransformMatrix>(),
+                    eda
+                );
 #endif
 
                 if (currentParent == Entity.Null)
@@ -161,12 +220,18 @@ namespace Unity.Transforms
                         currentLocalToWorld = childLocalTransform.ToMatrix();
                     else
                         throw new InvalidOperationException(
-                            $"Entity {child} does not have the required LocalTransform component");
+                            $"Entity {child} does not have the required LocalTransform component"
+                        );
                 }
                 else
                 {
-                    TransformHelpers.ComputeWorldTransformMatrix(child, out currentLocalToWorld,
-                        ref localTransformLookup, ref parentLookup, ref postTransformMatrixLookup);
+                    TransformHelpers.ComputeWorldTransformMatrix(
+                        child,
+                        out currentLocalToWorld,
+                        ref localTransformLookup,
+                        ref parentLookup,
+                        ref postTransformMatrixLookup
+                    );
                 }
             }
 
@@ -206,16 +271,35 @@ namespace Unity.Transforms
                 else
                 {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    localTransformLookup = new ComponentLookup<LocalTransform>(TypeManager.GetTypeIndex<LocalTransform>(), eda, true);
+                    localTransformLookup = new ComponentLookup<LocalTransform>(
+                        TypeManager.GetTypeIndex<LocalTransform>(),
+                        eda,
+                        true
+                    );
                     parentLookup = new ComponentLookup<Parent>(TypeManager.GetTypeIndex<Parent>(), eda, true);
-                    postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(TypeManager.GetTypeIndex<PostTransformMatrix>(), eda, true);
+                    postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(
+                        TypeManager.GetTypeIndex<PostTransformMatrix>(),
+                        eda,
+                        true
+                    );
 #else
-                    localTransformLookup = new ComponentLookup<LocalTransform>(TypeManager.GetTypeIndex<LocalTransform>(), eda);
+                    localTransformLookup = new ComponentLookup<LocalTransform>(
+                        TypeManager.GetTypeIndex<LocalTransform>(),
+                        eda
+                    );
                     parentLookup = new ComponentLookup<Parent>(TypeManager.GetTypeIndex<Parent>(), eda);
-                    postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(TypeManager.GetTypeIndex<PostTransformMatrix>(), eda);
+                    postTransformMatrixLookup = new ComponentLookup<PostTransformMatrix>(
+                        TypeManager.GetTypeIndex<PostTransformMatrix>(),
+                        eda
+                    );
 #endif
-                    TransformHelpers.ComputeWorldTransformMatrix(newParent, out float4x4 newParentToWorld,
-                        ref localTransformLookup, ref parentLookup, ref postTransformMatrixLookup);
+                    TransformHelpers.ComputeWorldTransformMatrix(
+                        newParent,
+                        out float4x4 newParentToWorld,
+                        ref localTransformLookup,
+                        ref parentLookup,
+                        ref postTransformMatrixLookup
+                    );
                     newLocalToParent = math.mul(math.inverse(newParentToWorld), currentLocalToWorld);
                 }
                 // Convert to LocalTransform (and optional PostTransformMatrix)
@@ -238,13 +322,19 @@ namespace Unity.Transforms
             }
         }
 
-        internal static void SetParentDuringStructuralChange(EntityDataAccess* eda, Entity child, Entity newParent, bool preserveWorldTransform)
+        internal static void SetParentDuringStructuralChange(
+            EntityDataAccess* eda,
+            Entity child,
+            Entity newParent,
+            bool preserveWorldTransform
+        )
         {
 #if ENABLE_TRANSFORMREF
             var transformRefType = ComponentType.ReadWrite<TransformRef>();
-            if (eda->HasComponent(child, transformRefType) &&
-                (newParent == Entity.Null ||
-                 eda->HasComponent(newParent, transformRefType)))
+            if (
+                eda->HasComponent(child, transformRefType)
+                && (newParent == Entity.Null || eda->HasComponent(newParent, transformRefType))
+            )
             {
                 SetParentTransformRefInternal(eda, child, newParent, preserveWorldTransform);
                 // Allow SetParentInternal to update Parent/Child components, but do not modify localTransform
@@ -300,22 +390,42 @@ namespace Unity.Entities
         /// <exception cref="System.InvalidOperationException">Thrown if <paramref name="preserveWorldTransform"/> is true,
         /// but <paramref name="child"/> or <paramref name="newParent"/> (or their ancestors) do not have the required
         /// <see cref="Unity.Transforms.LocalTransform"/> component.</exception>
-        public static void SetParent(this EntityManager em, Entity child, Entity newParent, bool preserveWorldTransform = true)
+        public static void SetParent(
+            this EntityManager em,
+            Entity child,
+            Entity newParent,
+            bool preserveWorldTransform = true
+        )
         {
             var access = em.GetCheckedEntityDataAccess();
             access->AssertMainThread();
             var changes = access->BeginStructuralChanges();
-            Unity.Transforms.ParentingHelpers.SetParentDuringStructuralChange(access, child, newParent, preserveWorldTransform);
+            Unity.Transforms.ParentingHelpers.SetParentDuringStructuralChange(
+                access,
+                child,
+                newParent,
+                preserveWorldTransform
+            );
             access->EndStructuralChanges(ref changes);
         }
 
 #if ENABLE_TRANSFORMREF
         // TODO DOTS-10284 Keeping this around for speed-of-light testing without all the migration overhead (LocalTransform, Parent, Child updates)
-        internal static void SetParentTransformRef(this EntityManager em, Entity childEntity, Entity parentEntity, bool preserveWorldTransform = true)
+        internal static void SetParentTransformRef(
+            this EntityManager em,
+            Entity childEntity,
+            Entity parentEntity,
+            bool preserveWorldTransform = true
+        )
         {
             var access = em.GetCheckedEntityDataAccess();
             access->AssertMainThread();
-            Unity.Transforms.ParentingHelpers.SetParentTransformRefInternal(access, childEntity, parentEntity, preserveWorldTransform);
+            Unity.Transforms.ParentingHelpers.SetParentTransformRefInternal(
+                access,
+                childEntity,
+                parentEntity,
+                preserveWorldTransform
+            );
         }
 #endif
 
@@ -350,7 +460,11 @@ namespace Unity.Entities
             var access = em.GetCheckedEntityDataAccess();
             access->AssertMainThread();
             var changes = access->BeginStructuralChanges();
-            Unity.Transforms.ParentingHelpers.DetachChildrenDuringStructuralChange(access, parent, preserveWorldTransform);
+            Unity.Transforms.ParentingHelpers.DetachChildrenDuringStructuralChange(
+                access,
+                parent,
+                preserveWorldTransform
+            );
             access->EndStructuralChanges(ref changes);
         }
     }

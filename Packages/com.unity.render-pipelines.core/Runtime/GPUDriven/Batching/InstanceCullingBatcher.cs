@@ -6,7 +6,11 @@ using UnityEngine.Profiling;
 
 namespace UnityEngine.Rendering
 {
-    internal delegate void OnCullingCompleteCallback(JobHandle jobHandle, in BatchCullingContext cullingContext, in BatchCullingOutput cullingOutput);
+    internal delegate void OnCullingCompleteCallback(
+        JobHandle jobHandle,
+        in BatchCullingContext cullingContext,
+        in BatchCullingOutput cullingOutput
+    );
 
     internal struct MeshInfo
     {
@@ -62,10 +66,12 @@ namespace UnityEngine.Rendering
         public NativeParallelHashMap<EntityId, GPUDrivenMaterial> materialMap => m_MaterialMap;
         public NativeParallelHashMap<EntityId, MeshInfo> meshMap => m_MeshMap;
 
-        public void Initialize(GPUResidentContext grdContext,
+        public void Initialize(
+            GPUResidentContext grdContext,
             in GPUResidentDrawerSettings settings,
             BatchRendererGroup.OnFinishedCulling onFinishedCulling,
-            OnCullingCompleteCallback onCompleteCallback = null)
+            OnCullingCompleteCallback onCompleteCallback = null
+        )
         {
             m_GRDContext = grdContext;
             m_InstanceDataSystem = grdContext.instanceDataSystem;
@@ -73,12 +79,14 @@ namespace UnityEngine.Rendering
             m_DrawInstanceData = new CPUDrawInstanceData();
             m_DrawInstanceData.Initialize();
 
-            m_BRG = new BatchRendererGroup(new BatchRendererGroupCreateInfo
-            {
-                cullingCallback = OnPerformCulling,
-                finishedCullingCallback = onFinishedCulling,
-                userContext = IntPtr.Zero
-            });
+            m_BRG = new BatchRendererGroup(
+                new BatchRendererGroupCreateInfo
+                {
+                    cullingCallback = OnPerformCulling,
+                    finishedCullingCallback = onFinishedCulling,
+                    userContext = IntPtr.Zero,
+                }
+            );
 
 #if UNITY_EDITOR
             if (settings.pickingShader != null)
@@ -99,14 +107,16 @@ namespace UnityEngine.Rendering
                 mat.hideFlags = HideFlags.HideAndDontSave;
                 m_BRG.SetErrorMaterial(mat);
             }
-            m_BRG.SetEnabledViewTypes(new BatchCullingViewType[]
-            {
-                BatchCullingViewType.Light,
-                BatchCullingViewType.Camera,
-                BatchCullingViewType.Picking,
-                BatchCullingViewType.SelectionOutline,
-                BatchCullingViewType.Filtering
-            });
+            m_BRG.SetEnabledViewTypes(
+                new BatchCullingViewType[]
+                {
+                    BatchCullingViewType.Light,
+                    BatchCullingViewType.Camera,
+                    BatchCullingViewType.Picking,
+                    BatchCullingViewType.SelectionOutline,
+                    BatchCullingViewType.Filtering,
+                }
+            );
 #endif
 
             m_CachedInstanceDataBufferLayoutVersion = -1;
@@ -189,10 +199,12 @@ namespace UnityEngine.Rendering
             }
         }
 
-        private void OnFetchMeshesDataForRegistration(NativeArray<EntityId> meshIDs,
+        private void OnFetchMeshesDataForRegistration(
+            NativeArray<EntityId> meshIDs,
             NativeArray<GPUDrivenMeshData> meshDatas,
             NativeArray<int> subMeshOffsets,
-            NativeArray<GPUDrivenSubMesh> subMeshes)
+            NativeArray<GPUDrivenSubMesh> subMeshes
+        )
         {
             Assert.IsTrue(meshIDs.Length == meshDatas.Length);
             Assert.IsTrue(m_TempBatchMeshIDs.Length == meshIDs.Length);
@@ -205,14 +217,17 @@ namespace UnityEngine.Rendering
                 meshDatas = meshDatas,
                 subMeshOffsets = subMeshOffsets,
                 subMeshBuffer = subMeshes,
-            }
-            .RunParallel(meshIDs.Length, 128);
+            }.RunParallel(meshIDs.Length, 128);
         }
 
         private void RegisterMeshes(JaggedSpan<EntityId> meshIDs)
         {
             Profiler.BeginSample("RegisterMeshes");
-            var jobRanges = JaggedJobRange.FromSpanWithMaxBatchSize(meshIDs, FindNonRegisteredInstanceIDsJob<MeshInfo>.MaxBatchSize, Allocator.TempJob);
+            var jobRanges = JaggedJobRange.FromSpanWithMaxBatchSize(
+                meshIDs,
+                FindNonRegisteredInstanceIDsJob<MeshInfo>.MaxBatchSize,
+                Allocator.TempJob
+            );
             var newMeshSet = new NativeParallelHashSet<EntityId>(meshIDs.totalLength, Allocator.TempJob);
 
             new FindNonRegisteredInstanceIDsJob<MeshInfo>
@@ -220,9 +235,8 @@ namespace UnityEngine.Rendering
                 jobRanges = jobRanges.AsArray(),
                 jaggedInstanceIDs = meshIDs,
                 hashMap = m_MeshMap,
-                outInstanceIDWriter = newMeshSet.AsParallelWriter()
-            }
-            .RunParallel(jobRanges);
+                outInstanceIDWriter = newMeshSet.AsParallelWriter(),
+            }.RunParallel(jobRanges);
 
             if (!newMeshSet.IsEmpty)
             {
@@ -250,7 +264,11 @@ namespace UnityEngine.Rendering
         private void RegisterMaterials(JaggedSpan<EntityId> materials)
         {
             Profiler.BeginSample("RegisterMaterials");
-            var jobRanges = JaggedJobRange.FromSpanWithMaxBatchSize(materials, FindNonRegisteredInstanceIDsJob<GPUDrivenMaterial>.MaxBatchSize, Allocator.TempJob);
+            var jobRanges = JaggedJobRange.FromSpanWithMaxBatchSize(
+                materials,
+                FindNonRegisteredInstanceIDsJob<GPUDrivenMaterial>.MaxBatchSize,
+                Allocator.TempJob
+            );
             var newMaterialIDSet = new NativeParallelHashSet<EntityId>(materials.totalLength, Allocator.TempJob);
 
             new FindNonRegisteredInstanceIDsJob<GPUDrivenMaterial>
@@ -258,9 +276,8 @@ namespace UnityEngine.Rendering
                 jobRanges = jobRanges.AsArray(),
                 jaggedInstanceIDs = materials,
                 hashMap = m_MaterialMap,
-                outInstanceIDWriter = newMaterialIDSet.AsParallelWriter()
-            }
-            .RunParallel(jobRanges);
+                outInstanceIDWriter = newMaterialIDSet.AsParallelWriter(),
+            }.RunParallel(jobRanges);
 
             if (!newMaterialIDSet.IsEmpty)
             {
@@ -270,15 +287,17 @@ namespace UnityEngine.Rendering
                 GPUDrivenProcessor.RegisterMaterials(m_BRG, newMaterialIDs, newMaterials);
 
                 int totalMaterialsNum = m_MaterialMap.Count() + newMaterialIDs.Length;
-                m_MaterialMap.Capacity = Math.Max(m_MaterialMap.Capacity, Mathf.CeilToInt(totalMaterialsNum / 1023.0f) * 1024);
+                m_MaterialMap.Capacity = Math.Max(
+                    m_MaterialMap.Capacity,
+                    Mathf.CeilToInt(totalMaterialsNum / 1023.0f) * 1024
+                );
 
                 new RegisterNewMaterialsJob
                 {
                     instanceIDs = newMaterialIDs,
                     materials = newMaterials,
-                    materialMap = m_MaterialMap.AsParallelWriter()
-                }
-                .RunParallel(newMaterialIDs.Length, 128);
+                    materialMap = m_MaterialMap.AsParallelWriter(),
+                }.RunParallel(newMaterialIDs.Length, 128);
 
                 newMaterialIDs.Dispose();
                 newMaterials.Dispose();
@@ -289,15 +308,24 @@ namespace UnityEngine.Rendering
             Profiler.EndSample();
         }
 
-        private void OnFetchMeshesDataForUpdate(NativeArray<EntityId> meshIDs,
+        private void OnFetchMeshesDataForUpdate(
+            NativeArray<EntityId> meshIDs,
             NativeArray<GPUDrivenMeshData> meshDatas,
             NativeArray<int> subMeshOffsets,
-            NativeArray<GPUDrivenSubMesh> subMeshBuffer)
+            NativeArray<GPUDrivenSubMesh> subMeshBuffer
+        )
         {
             Assert.IsTrue(meshIDs.Length == meshDatas.Length);
             Assert.IsTrue(m_TempChangedMeshIDs.IsCreated);
 
-            InstanceCullingBatcherBurst.UpdateMeshData(meshIDs, meshDatas, subMeshOffsets, subMeshBuffer, ref m_MeshMap, ref m_TempChangedMeshIDs);
+            InstanceCullingBatcherBurst.UpdateMeshData(
+                meshIDs,
+                meshDatas,
+                subMeshOffsets,
+                subMeshBuffer,
+                ref m_MeshMap,
+                ref m_TempChangedMeshIDs
+            );
         }
 
         public NativeHashSet<EntityId> UpdateMeshData(NativeArray<EntityId> meshIDs, Allocator allocator)
@@ -311,10 +339,19 @@ namespace UnityEngine.Rendering
             return changeMeshIDs;
         }
 
-        public NativeHashSet<EntityId> UpdateMaterialData(NativeArray<EntityId> materials, NativeArray<GPUDrivenMaterialData> materialDatas, Allocator allocator)
+        public NativeHashSet<EntityId> UpdateMaterialData(
+            NativeArray<EntityId> materials,
+            NativeArray<GPUDrivenMaterialData> materialDatas,
+            Allocator allocator
+        )
         {
             NativeHashSet<EntityId> changeMaterialIDs = new NativeHashSet<EntityId>(materials.Length, allocator);
-            InstanceCullingBatcherBurst.UpdateMaterialData(materials, materialDatas, ref m_MaterialMap, ref changeMaterialIDs);
+            InstanceCullingBatcherBurst.UpdateMaterialData(
+                materials,
+                materialDatas,
+                ref m_MaterialMap,
+                ref changeMaterialIDs
+            );
             return changeMaterialIDs;
         }
 
@@ -323,7 +360,12 @@ namespace UnityEngine.Rendering
             return m_DrawInstanceData;
         }
 
-        public unsafe JobHandle OnPerformCulling(BatchRendererGroup rendererGroup, BatchCullingContext context, BatchCullingOutput cullingOutput, IntPtr userContext)
+        public unsafe JobHandle OnPerformCulling(
+            BatchRendererGroup rendererGroup,
+            BatchCullingContext context,
+            BatchCullingOutput cullingOutput,
+            IntPtr userContext
+        )
         {
             foreach (var batchID in m_BatchIDs)
             {
@@ -343,7 +385,10 @@ namespace UnityEngine.Rendering
 
 #if UNITY_EDITOR
 
-            includeExcludeListFilter = IncludeExcludeListFilter.GetFilterForCurrentCullingCallback(context, Allocator.TempJob);
+            includeExcludeListFilter = IncludeExcludeListFilter.GetFilterForCurrentCullingCallback(
+                context,
+                Allocator.TempJob
+            );
 
             // If inclusive filtering is enabled and we know there are no included entities,
             // we can skip all the work because we know that the result will be nothing.
@@ -368,7 +413,8 @@ namespace UnityEngine.Rendering
                 m_BatchIDs,
                 m_GRDContext.smallMeshScreenPercentage,
                 allowOcclusionCulling ? m_GRDContext.occlusionCullingCommon : null,
-                includeExcludeListFilter);
+                includeExcludeListFilter
+            );
 
             if (m_OnCompleteCallback != null)
                 m_OnCompleteCallback(jobHandle, context, cullingOutput);
@@ -441,7 +487,8 @@ namespace UnityEngine.Rendering
             var drawBatches = m_DrawInstanceData.drawBatches;
             var drawInstances = m_DrawInstanceData.drawInstances;
 
-            InstanceCullingBatcherBurst.CreateDrawBatches(instances,
+            InstanceCullingBatcherBurst.CreateDrawBatches(
+                instances,
                 ref m_InstanceDataSystem.renderWorld,
                 m_MeshMap,
                 m_MaterialMap,
@@ -449,14 +496,18 @@ namespace UnityEngine.Rendering
                 ref drawRanges,
                 ref batchHash,
                 ref drawBatches,
-                ref drawInstances);
+                ref drawInstances
+            );
 
             m_DrawInstanceData.NeedsRebuild();
 
             Profiler.EndSample();
         }
 
-        public void RegisterAndBuildBatches(NativeArray<InstanceHandle> instances, in MeshRendererUpdateBatch updateBatch)
+        public void RegisterAndBuildBatches(
+            NativeArray<InstanceHandle> instances,
+            in MeshRendererUpdateBatch updateBatch
+        )
         {
             Profiler.BeginSample("RegisterAndBuildBatches");
 

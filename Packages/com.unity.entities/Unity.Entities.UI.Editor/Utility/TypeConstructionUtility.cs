@@ -70,7 +70,9 @@ namespace Unity.Entities.UI
                 yield return typeof(TType);
             }
 
-            foreach (var type in UnityEditor.TypeCache.GetTypesDerivedFrom<TType>().Where(TypeUtility.CanBeInstantiated))
+            foreach (
+                var type in UnityEditor.TypeCache.GetTypesDerivedFrom<TType>().Where(TypeUtility.CanBeInstantiated)
+            )
             {
                 yield return type;
             }

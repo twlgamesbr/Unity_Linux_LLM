@@ -1,7 +1,6 @@
 #if !UNITY_WEBGL || UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-
 using Unity.Baselib.LowLevel;
 using Unity.Burst;
 using Unity.Collections;
@@ -39,7 +38,7 @@ namespace Unity.Networking.Transport
         /// </summary>
         class AllSockets
         {
-            private AllSockets() {}
+            private AllSockets() { }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
 
@@ -49,7 +48,9 @@ namespace Unity.Networking.Transport
             }
 
             public static void Add(NetworkSocket socket) => instance.sockets.Add(new Socket { NetworkSocket = socket });
-            public static void Remove(NetworkSocket socket) => instance.sockets.Remove(new Socket { NetworkSocket  = socket });
+
+            public static void Remove(NetworkSocket socket) =>
+                instance.sockets.Remove(new Socket { NetworkSocket = socket });
 
             private static readonly AllSockets instance = new();
             private readonly List<Socket> sockets = new();
@@ -61,8 +62,9 @@ namespace Unity.Networking.Transport
             }
 
 #else
-            public static void Add(NetworkSocket socket) {}
-            public static void Remove(NetworkSocket socket) {}
+            public static void Add(NetworkSocket socket) { }
+
+            public static void Remove(NetworkSocket socket) { }
 #endif
         }
 
@@ -73,10 +75,19 @@ namespace Unity.Networking.Transport
                 var error = default(ErrorState);
                 var endpoint = localEndpoint;
                 var address = endpoint.BaselibAddressPtr;
-                var socket = Binding.Baselib_Socket_Create((Binding.Baselib_NetworkAddress_Family)address->family, Binding.Baselib_Socket_Protocol.TCP, &error);
+                var socket = Binding.Baselib_Socket_Create(
+                    (Binding.Baselib_NetworkAddress_Family)address->family,
+                    Binding.Baselib_Socket_Protocol.TCP,
+                    &error
+                );
                 if (error.code == ErrorCode.Success)
                 {
-                    Binding.Baselib_Socket_Bind(socket, address, Binding.Baselib_NetworkAddress_AddressReuse.Allow, &error);
+                    Binding.Baselib_Socket_Bind(
+                        socket,
+                        address,
+                        Binding.Baselib_NetworkAddress_AddressReuse.Allow,
+                        &error
+                    );
                     if (error.code == ErrorCode.Success)
                     {
                         // Get the end point bound not so much for the address (a wildcard address should remain unchanged) but
@@ -108,7 +119,9 @@ namespace Unity.Networking.Transport
                     Binding.Baselib_Socket_GetAddress(acceptedSocket, &address, &error);
                     if (error.code != ErrorCode.Success)
                     {
-                        Debug.LogError($"Baselib operation failed. Failed to get local endpoint. (error {(int)error.code}: {UDPNetworkInterface.GetBaselibErrorMessage(error)})");
+                        Debug.LogError(
+                            $"Baselib operation failed. Failed to get local endpoint. (error {(int)error.code}: {UDPNetworkInterface.GetBaselibErrorMessage(error)})"
+                        );
                         Binding.Baselib_Socket_Close(acceptedSocket);
                         acceptedSocket = InvalidSocket;
                     }
@@ -124,10 +137,19 @@ namespace Unity.Networking.Transport
             {
                 var address = remoteEndoint.BaselibAddressPtr;
                 var error = default(ErrorState);
-                var socket = Binding.Baselib_Socket_Create((Binding.Baselib_NetworkAddress_Family)address->family, Binding.Baselib_Socket_Protocol.TCP, &error);
+                var socket = Binding.Baselib_Socket_Create(
+                    (Binding.Baselib_NetworkAddress_Family)address->family,
+                    Binding.Baselib_Socket_Protocol.TCP,
+                    &error
+                );
                 if (error.code == ErrorCode.Success)
                 {
-                    Binding.Baselib_Socket_TCP_Connect(socket, address, Binding.Baselib_NetworkAddress_AddressReuse.Allow, &error);
+                    Binding.Baselib_Socket_TCP_Connect(
+                        socket,
+                        address,
+                        Binding.Baselib_NetworkAddress_AddressReuse.Allow,
+                        &error
+                    );
                 }
 
                 if (error.code != ErrorCode.Success)
@@ -147,7 +169,7 @@ namespace Unity.Networking.Transport
                 {
                     handle = socket,
                     requestedEvents = Binding.Baselib_Socket_PollEvents.Connected,
-                    errorState = &sockError
+                    errorState = &sockError,
                 };
 
                 Binding.Baselib_Socket_Poll(&sockFd, 1, 0, &error);
@@ -198,19 +220,19 @@ namespace Unity.Networking.Transport
 
         unsafe struct InternalData
         {
-            public NetworkSocket ListenSocket;      // the listen socket for servers (not used by clients)
-            public NetworkEndpoint ListenEndpoint;  // endpoint bound by the listen socket
-            public int ConnectTimeoutMS;            // maximum time to wait for a connection to complete
-            public int MaxConnectAttempts;          // maximum number of connect retries
+            public NetworkSocket ListenSocket; // the listen socket for servers (not used by clients)
+            public NetworkEndpoint ListenEndpoint; // endpoint bound by the listen socket
+            public int ConnectTimeoutMS; // maximum time to wait for a connection to complete
+            public int MaxConnectAttempts; // maximum number of connect retries
         }
 
         unsafe struct ConnectionData
         {
             public NetworkSocket Socket;
 
-            public long ConnectTime;                // Connect start time
-            public long LastConnectAttemptTime;     // Time of the last attempt
-            public int LastConnectAttempt;          // Number of attempts so far
+            public long ConnectTime; // Connect start time
+            public long LastConnectAttemptTime; // Time of the last attempt
+            public int LastConnectAttempt; // Number of attempts so far
 
             // Whether this connection must wait for previous data to be sent (e.g. because the OS
             // buffers for the TCP connection are full).
@@ -318,9 +340,13 @@ namespace Unity.Networking.Transport
             if (error.code != ErrorCode.Success)
             {
                 if (error.code == Binding.Baselib_ErrorCode.AddressInUse)
-                    Debug.LogError($"Failed to listen on TCP socket because the address is already in use. Likely because there is another process listening on port {state.ListenEndpoint.Port}.");
+                    Debug.LogError(
+                        $"Failed to listen on TCP socket because the address is already in use. Likely because there is another process listening on port {state.ListenEndpoint.Port}."
+                    );
                 else
-                    Debug.LogError($"Baselib operation failed. Failed to listen on TCP socket. (error {(int)error.code}: {UDPNetworkInterface.GetBaselibErrorMessage(error)})");
+                    Debug.LogError(
+                        $"Baselib operation failed. Failed to listen on TCP socket. (error {(int)error.code}: {UDPNetworkInterface.GetBaselibErrorMessage(error)})"
+                    );
                 return (int)Error.StatusCode.NetworkSocketError;
             }
 
@@ -348,7 +374,6 @@ namespace Unity.Networking.Transport
 
                 AllSockets.Remove(socket);
             }
-
 
             m_ConnectionMap.Dispose();
             m_ConnectionList.Dispose();
@@ -402,10 +427,7 @@ namespace Unity.Networking.Transport
                     {
                         var connectionId = ConnectionList.StartConnecting(ref localEndpoint);
                         ConnectionList.FinishConnectingFromRemote(ref connectionId);
-                        ConnectionMap[connectionId] = new ConnectionData
-                        {
-                            Socket = acceptedSocket
-                        };
+                        ConnectionMap[connectionId] = new ConnectionData { Socket = acceptedSocket };
                     }
                 }
 
@@ -430,13 +452,19 @@ namespace Unity.Networking.Transport
                         if (connectionData.ConnectTime == 0)
                         {
                             connectionData.ConnectTime = Time;
-                            connectionData.LastConnectAttemptTime = Math.Max(0, Time - InternalData.Value.ConnectTimeoutMS);
+                            connectionData.LastConnectAttemptTime = Math.Max(
+                                0,
+                                Time - InternalData.Value.ConnectTimeoutMS
+                            );
                         }
 
                         // Disconnect if maximum connection attempts reached
                         if (connectionData.LastConnectAttempt >= InternalData.Value.MaxConnectAttempts)
                         {
-                            ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.MaxConnectionAttempts);
+                            ConnectionList.StartDisconnecting(
+                                ref connectionId,
+                                Error.DisconnectReason.MaxConnectionAttempts
+                            );
                             Abort(ref connectionId, ref connectionData);
                             continue;
                         }
@@ -510,7 +538,12 @@ namespace Unity.Networking.Transport
 
                         packetProcessor.ConnectionRef = connectionId;
                         packetProcessor.EndpointRef = endpoint;
-                        var nbytes = TCPSocket.Receive(connectionData.Socket, (byte*)packetProcessor.GetUnsafePayloadPtr(), packetProcessor.BytesAvailableAtEnd, out error);
+                        var nbytes = TCPSocket.Receive(
+                            connectionData.Socket,
+                            (byte*)packetProcessor.GetUnsafePayloadPtr(),
+                            packetProcessor.BytesAvailableAtEnd,
+                            out error
+                        );
                         if (error.code != ErrorCode.Success || nbytes <= 0)
                         {
                             packetProcessor.Drop();
@@ -602,7 +635,12 @@ namespace Unity.Networking.Transport
                     }
 
                     var payloadPtr = (byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset;
-                    var bytesSent = TCPSocket.Send(connectionData.Socket, payloadPtr, packetProcessor.Length, out var error);
+                    var bytesSent = TCPSocket.Send(
+                        connectionData.Socket,
+                        payloadPtr,
+                        packetProcessor.Length,
+                        out var error
+                    );
                     if (bytesSent != packetProcessor.Length)
                     {
                         // Socket can't take any more. Keep aside for later.
@@ -618,8 +656,10 @@ namespace Unity.Networking.Transport
                     else if (error.code != ErrorCode.Success)
                     {
                         // Socket error. Need to close connection. Error will determine reason.
-                        var reason = error.code == ErrorCode.Disconnected
-                            ? Error.DisconnectReason.ClosedByRemote : Error.DisconnectReason.ProtocolError;
+                        var reason =
+                            error.code == ErrorCode.Disconnected
+                                ? Error.DisconnectReason.ClosedByRemote
+                                : Error.DisconnectReason.ProtocolError;
                         Abort(connectionId, reason);
                     }
                     else
@@ -666,7 +706,12 @@ namespace Unity.Networking.Transport
                     }
 
                     var payloadPtr = (byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset;
-                    var bytesSent = TCPSocket.Send(connectionData.Socket, payloadPtr, packetProcessor.Length, out var error);
+                    var bytesSent = TCPSocket.Send(
+                        connectionData.Socket,
+                        payloadPtr,
+                        packetProcessor.Length,
+                        out var error
+                    );
                     if (bytesSent != packetProcessor.Length)
                     {
                         // Socket can't take any more. Keep aside for later.
@@ -683,8 +728,10 @@ namespace Unity.Networking.Transport
                     else if (error.code != ErrorCode.Success)
                     {
                         // Socket error. Need to close connection. Error will determine reason.
-                        var reason = error.code == ErrorCode.Disconnected
-                            ? Error.DisconnectReason.ClosedByRemote : Error.DisconnectReason.ProtocolError;
+                        var reason =
+                            error.code == ErrorCode.Disconnected
+                                ? Error.DisconnectReason.ClosedByRemote
+                                : Error.DisconnectReason.ProtocolError;
                         Abort(connectionId, reason);
                     }
                 }

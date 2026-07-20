@@ -12,8 +12,8 @@ namespace Unity.Entities.UI
         {
             var element = base.Build();
             // GradientField.hdr is not yet supported.
-//            var usage = GetAttribute<GradientUsageAttribute>();
-//            m_Field.hdr = usage.hdr;
+            //            var usage = GetAttribute<GradientUsageAttribute>();
+            //            m_Field.hdr = usage.hdr;
             return element;
         }
     }

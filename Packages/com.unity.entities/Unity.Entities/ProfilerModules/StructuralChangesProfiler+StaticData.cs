@@ -31,9 +31,7 @@ namespace Unity.Entities
                 SetSharedComponentCounter = new TimeCounter(k_SetSharedComponentCounterName);
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
     }
 }

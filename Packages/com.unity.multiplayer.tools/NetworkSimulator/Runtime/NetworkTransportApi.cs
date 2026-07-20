@@ -9,8 +9,10 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
     class NetworkTransportApi : INetworkTransportApi, IDisposable
     {
         readonly IList<INetworkAvailability> m_NetworkAvailabilityComponents = new List<INetworkAvailability>();
-        readonly IList<ISimulateDisconnectAndReconnect> m_DisconnectAndReconnectComponents = new List<ISimulateDisconnectAndReconnect>();
-        readonly IList<IHandleNetworkParameters> m_HandleNetworkParametersComponents = new List<IHandleNetworkParameters>();
+        readonly IList<ISimulateDisconnectAndReconnect> m_DisconnectAndReconnectComponents =
+            new List<ISimulateDisconnectAndReconnect>();
+        readonly IList<IHandleNetworkParameters> m_HandleNetworkParametersComponents =
+            new List<IHandleNetworkParameters>();
 
         public NetworkTransportApi()
         {
@@ -37,9 +39,10 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
             UnsubscribeFromAllAdapters();
         }
 
-        public bool IsAvailable => m_NetworkAvailabilityComponents.Any() &&
-                                   m_DisconnectAndReconnectComponents.Any() &&
-                                   m_HandleNetworkParametersComponents.Any();
+        public bool IsAvailable =>
+            m_NetworkAvailabilityComponents.Any()
+            && m_DisconnectAndReconnectComponents.Any()
+            && m_HandleNetworkParametersComponents.Any();
 
         public bool IsConnected => IsAvailable && m_NetworkAvailabilityComponents.All(x => x.IsConnected);
 

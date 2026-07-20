@@ -163,7 +163,10 @@ namespace UnityEngine.UI
                     clippable.gameObject.GetComponentsInParent(false, canvasComponents);
                     for (int i = canvasComponents.Count - 1; i >= 0; i--)
                     {
-                        if (!IsDescendantOrSelf(canvasComponents[i].transform, componentToReturn.transform) && canvasComponents[i].overrideSorting)
+                        if (
+                            !IsDescendantOrSelf(canvasComponents[i].transform, componentToReturn.transform)
+                            && canvasComponents[i].overrideSorting
+                        )
                         {
                             componentToReturn = null;
                             break;
@@ -202,7 +205,10 @@ namespace UnityEngine.UI
                     bool shouldAdd = true;
                     for (int j = canvasComponents.Count - 1; j >= 0; j--)
                     {
-                        if (!IsDescendantOrSelf(canvasComponents[j].transform, rectMaskComponents[i].transform) && canvasComponents[j].overrideSorting)
+                        if (
+                            !IsDescendantOrSelf(canvasComponents[j].transform, rectMaskComponents[i].transform)
+                            && canvasComponents[j].overrideSorting
+                        )
                         {
                             shouldAdd = false;
                             break;

@@ -24,8 +24,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class ArchiveAndCompressBundles : IBuildTask
     {
         private const int kVersion = 2;
+
         /// <inheritdoc />
-        public int Version { get { return kVersion; } }
+        public int Version
+        {
+            get { return kVersion; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -83,7 +87,13 @@ namespace UnityEditor.Build.Pipeline.Tasks
             }
         }
 
-        static CacheEntry GetCacheEntry(IBuildCache cache, string bundleName, IEnumerable<ResourceFile> resources, BuildCompression compression, List<SerializedFileMetaData> hashes)
+        static CacheEntry GetCacheEntry(
+            IBuildCache cache,
+            string bundleName,
+            IEnumerable<ResourceFile> resources,
+            BuildCompression compression,
+            List<SerializedFileMetaData> hashes
+        )
         {
             var entry = new CacheEntry();
             entry.Type = CacheEntry.EntryType.Data;
@@ -100,7 +110,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return entry;
         }
 
-        static CachedInfo GetCachedInfo(IBuildCache cache, CacheEntry entry, IEnumerable<ResourceFile> resources, BundleDetails details)
+        static CachedInfo GetCachedInfo(
+            IBuildCache cache,
+            CacheEntry entry,
+            IEnumerable<ResourceFile> resources,
+            BundleDetails details
+        )
         {
             var info = new CachedInfo();
             info.Asset = entry;
@@ -168,9 +183,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
             input.AssetToFilesDependencies = m_WriteData.AssetToFiles;
             input.InternalFilenameToWriteMetaData = m_Results.WriteResultsMetaData;
             input.Log = m_Log;
-            input.StripUnityVersion = (m_Parameters.GetContentBuildSettings().buildFlags & ContentBuildFlags.StripUnityVersion) != 0;
+            input.StripUnityVersion =
+                (m_Parameters.GetContentBuildSettings().buildFlags & ContentBuildFlags.StripUnityVersion) != 0;
 
-            input.Threaded = ReflectionExtensions.SupportsMultiThreadedArchiving && ScriptableBuildPipeline.threadedArchiving;
+            input.Threaded =
+                ReflectionExtensions.SupportsMultiThreadedArchiving && ScriptableBuildPipeline.threadedArchiving;
 
             TaskOutput output;
             ReturnCode code = Run(input, out output);
@@ -191,7 +208,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
         /// <param name="filenameToBundleName">asset file to bundle names</param>
         /// <param name="directDependencies">a map of bundle names to only the direct dependencies, used primarily for bundle hash calculation</param>
         /// <returns></returns>
-        internal static Dictionary<string, string[]> CalculateBundleDependencies(List<List<string>> assetFileList, Dictionary<string, string> filenameToBundleName)
+        internal static Dictionary<string, string[]> CalculateBundleDependencies(
+            List<List<string>> assetFileList,
+            Dictionary<string, string> filenameToBundleName
+        )
         {
             var bundleDependencies = new Dictionary<string, string[]>();
             Dictionary<string, HashSet<string>> bundleDependenciesHash = new Dictionary<string, HashSet<string>>();
@@ -237,21 +257,35 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return bundleDependencies;
         }
 
-        static void PostArchiveProcessing(List<ArchiveWorkItem> items, List<List<string>> assetFileList, Dictionary<string, string> filenameToBundleName, IBuildLogger log)
+        static void PostArchiveProcessing(
+            List<ArchiveWorkItem> items,
+            List<List<string>> assetFileList,
+            Dictionary<string, string> filenameToBundleName,
+            IBuildLogger log
+        )
         {
             using (log.ScopedStep(LogLevel.Info, "PostArchiveProcessing"))
             {
-                Dictionary<string, string[]> bundleDependencies = CalculateBundleDependencies(assetFileList, filenameToBundleName);
+                Dictionary<string, string[]> bundleDependencies = CalculateBundleDependencies(
+                    assetFileList,
+                    filenameToBundleName
+                );
                 foreach (ArchiveWorkItem item in items)
                 {
                     // apply bundle dependencies
-                    item.ResultDetails.Dependencies = bundleDependencies.ContainsKey(item.BundleName) ? bundleDependencies[item.BundleName] : new string[0];
+                    item.ResultDetails.Dependencies = bundleDependencies.ContainsKey(item.BundleName)
+                        ? bundleDependencies[item.BundleName]
+                        : new string[0];
                     item.ResultDetails.Hash = CalculateHashVersion(item);
                 }
             }
         }
 
-        static ArchiveWorkItem GetOrCreateWorkItem(TaskInput input, string bundleName, Dictionary<string, ArchiveWorkItem> bundleToWorkItem)
+        static ArchiveWorkItem GetOrCreateWorkItem(
+            TaskInput input,
+            string bundleName,
+            Dictionary<string, ArchiveWorkItem> bundleToWorkItem
+        )
         {
             if (!bundleToWorkItem.TryGetValue(bundleName, out ArchiveWorkItem item))
             {
@@ -285,28 +319,45 @@ namespace UnityEditor.Build.Pipeline.Tasks
                     if (input.InternalFilenameToWriteMetaData.TryGetValue(pair.Key, out SerializedFileMetaData md))
                         item.SeriliazedFileMetaDatas.Add(md);
                     else
-                        throw new Exception($"Archive {bundleName} with internal name {internalName} does not have associated SerializedFileMetaData");
+                        throw new Exception(
+                            $"Archive {bundleName} with internal name {internalName} does not have associated SerializedFileMetaData"
+                        );
 
                     item.ResourceFiles.AddRange(pair.Value.resourceFiles);
 
-                    if (input.BundleNameToAdditionalFiles.TryGetValue(bundleName, out List<ResourceFile> additionalFiles))
+                    if (
+                        input.BundleNameToAdditionalFiles.TryGetValue(
+                            bundleName,
+                            out List<ResourceFile> additionalFiles
+                        )
+                    )
                     {
                         RawHash hash = HashResourceFiles(additionalFiles);
-                        item.SeriliazedFileMetaDatas.Add(new SerializedFileMetaData() { ContentHash = hash.ToHash128(), RawFileHash = hash.ToHash128() });
+                        item.SeriliazedFileMetaDatas.Add(
+                            new SerializedFileMetaData()
+                            {
+                                ContentHash = hash.ToHash128(),
+                                RawFileHash = hash.ToHash128(),
+                            }
+                        );
                         item.ResourceFiles.AddRange(additionalFiles);
                     }
                 }
 
-                List<ArchiveWorkItem> allItems = bundleNameToWorkItem.Select((x, index) =>
-                {
-                    x.Value.Index = index;
-                    return x.Value;
-                }).ToList();
+                List<ArchiveWorkItem> allItems = bundleNameToWorkItem
+                    .Select(
+                        (x, index) =>
+                        {
+                            x.Value.Index = index;
+                            return x.Value;
+                        }
+                    )
+                    .ToList();
                 return allItems;
             }
         }
 
-        static internal ReturnCode Run(TaskInput input, out TaskOutput output)
+        internal static ReturnCode Run(TaskInput input, out TaskOutput output)
         {
             output = new TaskOutput();
             output.BundleDetails = new Dictionary<string, BundleDetails>();
@@ -320,7 +371,17 @@ namespace UnityEditor.Build.Pipeline.Tasks
             if (input.BuildCache != null)
             {
                 using (input.Log.ScopedStep(LogLevel.Info, "Creating Cache Entries"))
-                    cacheEntries = allItems.Select(x => GetCacheEntry(input.BuildCache, x.BundleName, x.ResourceFiles, x.Compression, x.SeriliazedFileMetaDatas)).ToList();
+                    cacheEntries = allItems
+                        .Select(x =>
+                            GetCacheEntry(
+                                input.BuildCache,
+                                x.BundleName,
+                                x.ResourceFiles,
+                                x.Compression,
+                                x.SeriliazedFileMetaDatas
+                            )
+                        )
+                        .ToList();
 
                 using (input.Log.ScopedStep(LogLevel.Info, "Load Cached Data"))
                     input.BuildCache.LoadCachedData(cacheEntries, out cachedInfo);
@@ -328,7 +389,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 cachedItems = allItems.Where(x => cachedInfo[x.Index] != null).ToList();
                 nonCachedItems = allItems.Where(x => cachedInfo[x.Index] == null).ToList();
                 foreach (ArchiveWorkItem i in allItems)
-                    i.CachedArtifactPath = string.Format("{0}/{1}", input.BuildCache.GetCachedArtifactsDirectory(cacheEntries[i.Index]), HashingMethods.Calculate(i.BundleName));
+                    i.CachedArtifactPath = string.Format(
+                        "{0}/{1}",
+                        input.BuildCache.GetCachedArtifactsDirectory(cacheEntries[i.Index]),
+                        HashingMethods.Calculate(i.BundleName)
+                    );
             }
 
             using (input.Log.ScopedStep(LogLevel.Info, "CopyingCachedFiles"))
@@ -345,17 +410,35 @@ namespace UnityEditor.Build.Pipeline.Tasks
             }
 
             // Write all the files that aren't cached
-            if (!ArchiveItems(nonCachedItems, input.TempOutputFolder, input.ProgressTracker, input.Threaded, input.Log, input.StripUnityVersion))
+            if (
+                !ArchiveItems(
+                    nonCachedItems,
+                    input.TempOutputFolder,
+                    input.ProgressTracker,
+                    input.Threaded,
+                    input.Log,
+                    input.StripUnityVersion
+                )
+            )
                 return ReturnCode.Canceled;
 
-            PostArchiveProcessing(allItems, input.AssetToFilesDependencies.Values.ToList(), input.InternalFilenameToBundleName, input.Log);
+            PostArchiveProcessing(
+                allItems,
+                input.AssetToFilesDependencies.Values.ToList(),
+                input.InternalFilenameToBundleName,
+                input.Log
+            );
 
             // Put everything into the cache
             if (input.BuildCache != null)
             {
                 using (input.Log.ScopedStep(LogLevel.Info, "Copying To Cache"))
                 {
-                    List<CachedInfo> uncachedInfo = nonCachedItems.Select(x => GetCachedInfo(input.BuildCache, cacheEntries[x.Index], x.ResourceFiles, x.ResultDetails)).ToList();
+                    List<CachedInfo> uncachedInfo = nonCachedItems
+                        .Select(x =>
+                            GetCachedInfo(input.BuildCache, cacheEntries[x.Index], x.ResourceFiles, x.ResultDetails)
+                        )
+                        .ToList();
                     input.BuildCache.SaveCachedData(uncachedInfo);
                 }
             }
@@ -368,7 +451,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
             return ReturnCode.Success;
         }
 
-        static private void ArchiveSingleItem(ArchiveWorkItem item, string tempOutputFolder, IBuildLogger log, bool stripUnityVersion)
+        private static void ArchiveSingleItem(
+            ArchiveWorkItem item,
+            string tempOutputFolder,
+            IBuildLogger log,
+            bool stripUnityVersion
+        )
         {
             using (log.ScopedStep(LogLevel.Info, "ArchiveSingleItem", item.BundleName))
             {
@@ -379,13 +467,25 @@ namespace UnityEditor.Build.Pipeline.Tasks
 
                 Directory.CreateDirectory(Path.GetDirectoryName(writePath));
                 item.ResultDetails.FileName = item.OutputFilePath;
-                item.ResultDetails.Crc = ContentBuildInterface.ArchiveAndCompress(item.ResourceFiles.ToArray(), writePath, item.Compression, stripUnityVersion);
+                item.ResultDetails.Crc = ContentBuildInterface.ArchiveAndCompress(
+                    item.ResourceFiles.ToArray(),
+                    writePath,
+                    item.Compression,
+                    stripUnityVersion
+                );
 
                 CopyFileWithTimestampIfDifferent(writePath, item.ResultDetails.FileName, log);
             }
         }
 
-        static private bool ArchiveItems(List<ArchiveWorkItem> items, string tempOutputFolder, IProgressTracker tracker, bool threaded, IBuildLogger log, bool stripUnityVersion)
+        private static bool ArchiveItems(
+            List<ArchiveWorkItem> items,
+            string tempOutputFolder,
+            IProgressTracker tracker,
+            bool threaded,
+            IBuildLogger log,
+            bool stripUnityVersion
+        )
         {
             using (log.ScopedStep(LogLevel.Info, "ArchiveItems", threaded))
             {
@@ -404,7 +504,13 @@ namespace UnityEditor.Build.Pipeline.Tasks
             }
         }
 
-        static private bool ArchiveItemsThreaded(List<ArchiveWorkItem> items, string tempOutputFolder, IProgressTracker tracker, IBuildLogger log, bool stripUnityVersion)
+        private static bool ArchiveItemsThreaded(
+            List<ArchiveWorkItem> items,
+            string tempOutputFolder,
+            IProgressTracker tracker,
+            IBuildLogger log,
+            bool stripUnityVersion
+        )
         {
             CancellationTokenSource srcToken = new CancellationTokenSource();
 
@@ -412,17 +518,22 @@ namespace UnityEditor.Build.Pipeline.Tasks
             List<Task> tasks = new List<Task>(items.Count);
             foreach (ArchiveWorkItem item in items)
             {
-                tasks.Add(Task.Run(() =>
-                {
-                    try
-                    {
-                        ArchiveSingleItem(item, tempOutputFolder, log, stripUnityVersion);
-                    }
-                    finally
-                    {
-                        semaphore.Release();
-                    }
-                }, srcToken.Token));
+                tasks.Add(
+                    Task.Run(
+                        () =>
+                        {
+                            try
+                            {
+                                ArchiveSingleItem(item, tempOutputFolder, log, stripUnityVersion);
+                            }
+                            finally
+                            {
+                                semaphore.Release();
+                            }
+                        },
+                        srcToken.Token
+                    )
+                );
             }
 
             for (int i = 0; i < items.Count; i++)
@@ -444,7 +555,9 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 count++;
             }
             if (count > 0)
-                throw new BuildFailedException($"ArchiveAndCompressBundles encountered {count} exception(s). See console for logged exceptions.");
+                throw new BuildFailedException(
+                    $"ArchiveAndCompressBundles encountered {count} exception(s). See console for logged exceptions."
+                );
 
             return !srcToken.Token.IsCancellationRequested;
         }

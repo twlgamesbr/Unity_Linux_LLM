@@ -82,18 +82,26 @@ namespace Unity.Networking.Transport
         }
 
         // Interface for receiving data from a pipeline
-        internal unsafe void PushDataEvent(NetworkConnection con, int pipelineId, byte* dataPtr, int dataLength, ref NetworkEventQueue eventQueue)
+        internal unsafe void PushDataEvent(
+            NetworkConnection con,
+            int pipelineId,
+            byte* dataPtr,
+            int dataLength,
+            ref NetworkEventQueue eventQueue
+        )
         {
             var sliceOffset = AppendToStream(dataPtr, dataLength);
 
-            eventQueue.PushEvent(new NetworkEvent
-            {
-                pipelineId = (short)pipelineId,
-                connectionId = con.InternalId,
-                type = NetworkEvent.Type.Data,
-                offset = sliceOffset,
-                size = dataLength
-            });
+            eventQueue.PushEvent(
+                new NetworkEvent
+                {
+                    pipelineId = (short)pipelineId,
+                    connectionId = con.InternalId,
+                    type = NetworkEvent.Type.Data,
+                    offset = sliceOffset,
+                    size = dataLength,
+                }
+            );
         }
     }
 }

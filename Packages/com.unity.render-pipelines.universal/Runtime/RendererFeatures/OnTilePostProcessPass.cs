@@ -1,8 +1,8 @@
 using UnityEngine;
-using UnityEngine.Rendering.RenderGraphModule;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>
 /// Renders the on-tile post-processing stack.
@@ -14,7 +14,7 @@ public class OnTilePostProcessPass : ScriptableRenderPass
     /// </summary>
     internal readonly bool k_SupportsMultisampleShaderResolve = false;
     internal bool m_UseTextureReadFallback = false;
-    
+
     RTHandle m_UserLut;
     Material m_OnTileUberMaterial;
     static readonly int s_BlitScaleBias = Shader.PropertyToID("_BlitScaleBias");
@@ -28,13 +28,18 @@ public class OnTilePostProcessPass : ScriptableRenderPass
     const string m_PassName = "On Tile Post Processing";
     const string m_FallbackPassName = "On Tile Post Processing (sampling fallback) ";
 
-    int m_PassOnTile, m_PassOnTileMsaa, m_PassTextureSample, m_PassOnTileVis, m_PassOnTileMsaaVis, m_PassTexureSampleVis;
+    int m_PassOnTile,
+        m_PassOnTileMsaa,
+        m_PassTextureSample,
+        m_PassOnTileVis,
+        m_PassOnTileMsaaVis,
+        m_PassTexureSampleVis;
 
     internal OnTilePostProcessPass(PostProcessData postProcessData)
     {
         m_PostProcessData = postProcessData;
 
-#if ENABLE_VR && ENABLE_XR_MODULE        
+#if ENABLE_VR && ENABLE_XR_MODULE
         k_SupportsMultisampleShaderResolve = SystemInfo.supportsMultisampledShaderResolve;
 #endif
     }
@@ -47,7 +52,7 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         {
             m_OnTileUberMaterial = onTileUberMaterial;
 
-            // We just do this once, assuming the shader never changes. 
+            // We just do this once, assuming the shader never changes.
             m_PassOnTile = onTileUberMaterial.FindPass("OnTileUberPost");
             m_PassOnTileMsaa = onTileUberMaterial.FindPass("OnTileUberPostMSSoftware");
             m_PassTextureSample = onTileUberMaterial.FindPass("OnTileUberPostTextureSample");
@@ -56,7 +61,7 @@ public class OnTilePostProcessPass : ScriptableRenderPass
             m_PassTexureSampleVis = onTileUberMaterial.FindPass("OnTileUberPostTextureSampleVisMesh");
         }
 
-        m_OnTileUberMaterial = onTileUberMaterial;                
+        m_OnTileUberMaterial = onTileUberMaterial;
     }
 
     /// <summary>
@@ -71,7 +76,7 @@ public class OnTilePostProcessPass : ScriptableRenderPass
     /// <inheritdoc cref="IRenderGraphRecorder.RecordRenderGraph"/>
     public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
     {
-        Debug.Assert(m_OnTileUberMaterial != null, "The material set in OnTilePostProcessPass can't be null.");     
+        Debug.Assert(m_OnTileUberMaterial != null, "The material set in OnTilePostProcessPass can't be null.");
 
         var resourceData = frameData.Get<UniversalResourceData>();
         var renderingData = frameData.Get<UniversalRenderingData>();
@@ -80,7 +85,9 @@ public class OnTilePostProcessPass : ScriptableRenderPass
 
         if (SystemInfo.graphicsShaderLevel < 30)
         {
-            Debug.LogError("DrawProcedural is required for the On-Tile post processing feature but it is not supported by the platform. Pass will not execute.");
+            Debug.LogError(
+                "DrawProcedural is required for the On-Tile post processing feature but it is not supported by the platform. Pass will not execute."
+            );
             return;
         }
 
@@ -102,7 +109,6 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         TextureHandle source = resourceData.activeColorTexture;
         TextureDesc srcDesc = renderGraph.GetTextureDesc(source);
 
-
         TextureHandle destination = resourceData.backBufferColor;
         var destInfo = renderGraph.GetRenderTargetInfo(destination);
 
@@ -112,13 +118,29 @@ public class OnTilePostProcessPass : ScriptableRenderPass
 
         SetupVignette(m_OnTileUberMaterial, cameraData.xr, srcDesc.width, srcDesc.height, vignette);
         SetupLut(m_OnTileUberMaterial, colorLookup, colorAdjustments, lutSize);
-        SetupTonemapping(m_OnTileUberMaterial, tonemapping, isHdrGrading: postProcessingData.gradingMode == ColorGradingMode.HighDynamicRange);
+        SetupTonemapping(
+            m_OnTileUberMaterial,
+            tonemapping,
+            isHdrGrading: postProcessingData.gradingMode == ColorGradingMode.HighDynamicRange
+        );
         SetupGrain(m_OnTileUberMaterial, cameraData, filmgrain, m_PostProcessData);
         SetupDithering(m_OnTileUberMaterial, cameraData, m_PostProcessData);
 
-        CoreUtils.SetKeyword(m_OnTileUberMaterial, ShaderKeywordStrings.LinearToSRGBConversion, cameraData.requireSrgbConversion);
-        CoreUtils.SetKeyword(m_OnTileUberMaterial, ShaderKeywordStrings.UseFastSRGBLinearConversion, postProcessingData.useFastSRGBLinearConversion);
-        CoreUtils.SetKeyword(m_OnTileUberMaterial, ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT, cameraData.isAlphaOutputEnabled);
+        CoreUtils.SetKeyword(
+            m_OnTileUberMaterial,
+            ShaderKeywordStrings.LinearToSRGBConversion,
+            cameraData.requireSrgbConversion
+        );
+        CoreUtils.SetKeyword(
+            m_OnTileUberMaterial,
+            ShaderKeywordStrings.UseFastSRGBLinearConversion,
+            postProcessingData.useFastSRGBLinearConversion
+        );
+        CoreUtils.SetKeyword(
+            m_OnTileUberMaterial,
+            ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT,
+            cameraData.isAlphaOutputEnabled
+        );
 
 #if ENABLE_VR && ENABLE_XR_MODULE
         // Setup XR UV remapping for Quad View (used by all screen-space effects)
@@ -134,10 +156,14 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         {
             shaderPass = useVisibilityMesh ? m_PassTexureSampleVis : m_PassTextureSample;
         }
-        else 
+        else
         {
-            Debug.Assert(srcDesc.width == destInfo.width && srcDesc.height == destInfo.height && srcDesc.slices == destInfo.volumeDepth
-                , "On Tile Post Processing expects the source and destination to have the same dimensions.");
+            Debug.Assert(
+                srcDesc.width == destInfo.width
+                    && srcDesc.height == destInfo.height
+                    && srcDesc.slices == destInfo.volumeDepth,
+                "On Tile Post Processing expects the source and destination to have the same dimensions."
+            );
 
             switch (srcDesc.msaaSamples)
             {
@@ -145,10 +171,12 @@ public class OnTilePostProcessPass : ScriptableRenderPass
                     shaderPass = useVisibilityMesh ? m_PassOnTileVis : m_PassOnTile;
                     break;
                 case MSAASamples.MSAA8x:
-                    Debug.LogError("MSAA8x is enabled in Universal Render Pipeline Asset but it is not supported by the on-tile post-processing feature yet. Please use MSAA4x or MSAA2x instead.");
+                    Debug.LogError(
+                        "MSAA8x is enabled in Universal Render Pipeline Asset but it is not supported by the on-tile post-processing feature yet. Please use MSAA4x or MSAA2x instead."
+                    );
                     return;
                 default:
-                    shaderPass = useVisibilityMesh ? m_PassOnTileMsaaVis: m_PassOnTileMsaa;
+                    shaderPass = useVisibilityMesh ? m_PassOnTileMsaaVis : m_PassOnTileMsaa;
                     break;
             }
         }
@@ -156,7 +184,7 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         var lutTexture = resourceData.internalColorLut;
         var passName = m_UseTextureReadFallback ? m_FallbackPassName : m_PassName;
         using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData))
-        {            
+        {
             passData.material = m_OnTileUberMaterial;
             passData.shaderPass = shaderPass;
             passData.useTextureReadFallback = m_UseTextureReadFallback;
@@ -183,21 +211,24 @@ public class OnTilePostProcessPass : ScriptableRenderPass
             }
 
             builder.SetRenderAttachment(passData.destination = destination, 0, AccessFlags.WriteAll);
-            builder.SetRenderFunc(static (PassData data, RasterGraphContext context) => ExecuteFBFetchPass(data, context));
+            builder.SetRenderFunc(
+                static (PassData data, RasterGraphContext context) => ExecuteFBFetchPass(data, context)
+            );
 
             passData.useXRVisibilityMesh = useVisibilityMesh;
             passData.msaaSamples = (int)srcDesc.msaaSamples;
 
             // When rendering into the backbuffer, we could enable the shader resolve extension to resolve into the msaa1x surface directly on platforms that support auto resolve.
             // For platforms that don't support auto resolve, the backbuffer is a multisampled surface and we don't need to enable the extension. This is to maximize the pass merging because shader resolve enabled pass has to be the last subpass.
-            bool useMultisampledShaderResolve = (int)srcDesc.msaaSamples > destInfo.msaaSamples && k_SupportsMultisampleShaderResolve;
+            bool useMultisampledShaderResolve =
+                (int)srcDesc.msaaSamples > destInfo.msaaSamples && k_SupportsMultisampleShaderResolve;
 
             ExtendedFeatureFlags featureFlags = ExtendedFeatureFlags.None;
 
             if (useMultisampledShaderResolve)
             {
-                featureFlags |= ExtendedFeatureFlags.MultisampledShaderResolve;                
-            }            
+                featureFlags |= ExtendedFeatureFlags.MultisampledShaderResolve;
+            }
 
 #if ENABLE_VR && ENABLE_XR_MODULE
             if (cameraData.xr.enabled)
@@ -205,15 +236,14 @@ public class OnTilePostProcessPass : ScriptableRenderPass
                 featureFlags |= ExtendedFeatureFlags.MultiviewRenderRegionsCompatible;
 
                 // We want our foveation logic to match other geometry passes(eg. Opaque, Transparent, Skybox) because we want to merge with previous passes.
-                bool passSupportsFoveation = cameraData.xrUniversal.canFoveateIntermediatePasses || resourceData.isActiveTargetBackBuffer;
-                builder.EnableFoveatedRasterization(
-                    cameraData.xr.supportsFoveatedRendering && passSupportsFoveation);
+                bool passSupportsFoveation =
+                    cameraData.xrUniversal.canFoveateIntermediatePasses || resourceData.isActiveTargetBackBuffer;
+                builder.EnableFoveatedRasterization(cameraData.xr.supportsFoveatedRendering && passSupportsFoveation);
 
                 passData.xr = cameraData.xr; // Need to pass this down for the method call RenderVisibleMeshCustomMaterial()
             }
 #endif
             builder.SetExtendedFeatureFlags(featureFlags);
-
         }
     }
 
@@ -235,7 +265,7 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         {
             data.material.SetTexture(s_BlitTexture, data.source);
         }
-        else 
+        else
         {
             // Setup MSAA samples
             switch (data.msaaSamples)
@@ -262,13 +292,19 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         if (data.useXRVisibilityMesh)
         {
             MaterialPropertyBlock xrPropertyBlock = XRSystemUniversal.GetMaterialPropertyBlock();
-            data.xr.RenderVisibleMeshCustomMaterial(cmd, data.xr.occlusionMeshScale, data.material, xrPropertyBlock, (int)(data.shaderPass), false);
+            data.xr.RenderVisibleMeshCustomMaterial(
+                cmd,
+                data.xr.occlusionMeshScale,
+                data.material,
+                xrPropertyBlock,
+                (int)(data.shaderPass),
+                false
+            );
         }
         else
 #endif
         {
-            cmd.DrawProcedural(Matrix4x4.identity, data.material, (int)(data.shaderPass),
-                MeshTopology.Triangles, 3, 1);
+            cmd.DrawProcedural(Matrix4x4.identity, data.material, (int)(data.shaderPass), MeshTopology.Triangles, 3, 1);
         }
     }
 
@@ -295,7 +331,7 @@ public class OnTilePostProcessPass : ScriptableRenderPass
             {
                 m_UserLut.Release();
                 m_UserLut = null;
-            } 
+            }
         }
         else
         {
@@ -318,16 +354,18 @@ public class OnTilePostProcessPass : ScriptableRenderPass
 
         Vector4 userLutParams = !colorLookup.IsActive()
             ? Vector4.zero
-            : new Vector4(1f / colorLookup.texture.value.width,
+            : new Vector4(
+                1f / colorLookup.texture.value.width,
                 1f / colorLookup.texture.value.height,
                 colorLookup.texture.value.height - 1f,
-                colorLookup.contribution.value);
+                colorLookup.contribution.value
+            );
 
         material.SetVector(ShaderConstants._Lut_Params, lutParams);
         material.SetVector(ShaderConstants._UserLut_Params, userLutParams);
     }
 
-#region Vignette
+    #region Vignette
 
 
     //these methods should be publicly available for user features
@@ -371,21 +409,14 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         }
 #endif
 
-        var v1 = new Vector4(
-            color.r, color.g, color.b,
-            vignette.rounded.value ? aspectRatio : 1f
-        );
-        var v2 = new Vector4(
-            center.x, center.y,
-            vignette.intensity.value * 3f,
-            vignette.smoothness.value * 5f
-        );
+        var v1 = new Vector4(color.r, color.g, color.b, vignette.rounded.value ? aspectRatio : 1f);
+        var v2 = new Vector4(center.x, center.y, vignette.intensity.value * 3f, vignette.smoothness.value * 5f);
 
         material.SetVector(ShaderConstants._Vignette_Params1, v1);
         material.SetVector(ShaderConstants._Vignette_Params2, v2);
     }
 
-#endregion
+    #endregion
 
     private void SetupTonemapping(Material onTileUberMaterial, Tonemapping tonemapping, bool isHdrGrading)
     {
@@ -393,10 +424,16 @@ public class OnTilePostProcessPass : ScriptableRenderPass
 
         if (!isHdrGrading)
         {
-            CoreUtils.SetKeyword(m_OnTileUberMaterial, ShaderKeywordStrings.TonemapNeutral,
-                tonemapping.mode.value == TonemappingMode.Neutral);
-            CoreUtils.SetKeyword(m_OnTileUberMaterial, ShaderKeywordStrings.TonemapACES,
-                tonemapping.mode.value == TonemappingMode.ACES);
+            CoreUtils.SetKeyword(
+                m_OnTileUberMaterial,
+                ShaderKeywordStrings.TonemapNeutral,
+                tonemapping.mode.value == TonemappingMode.Neutral
+            );
+            CoreUtils.SetKeyword(
+                m_OnTileUberMaterial,
+                ShaderKeywordStrings.TonemapACES,
+                tonemapping.mode.value == TonemappingMode.ACES
+            );
         }
         else
         {
@@ -405,7 +442,12 @@ public class OnTilePostProcessPass : ScriptableRenderPass
         }
     }
 
-    void SetupGrain(Material onTileUberMaterial, UniversalCameraData cameraData, FilmGrain filmgrain, PostProcessData data)
+    void SetupGrain(
+        Material onTileUberMaterial,
+        UniversalCameraData cameraData,
+        FilmGrain filmgrain,
+        PostProcessData data
+    )
     {
         bool isActive = filmgrain.IsActive();
         CoreUtils.SetKeyword(onTileUberMaterial, ShaderKeywordStrings.FilmGrain, isActive);
@@ -415,7 +457,8 @@ public class OnTilePostProcessPass : ScriptableRenderPass
             PostProcessUtils.ConfigureFilmGrain(
                 data,
                 filmgrain,
-                cameraData.pixelWidth, cameraData.pixelHeight,
+                cameraData.pixelWidth,
+                cameraData.pixelHeight,
                 onTileUberMaterial
             );
         }
@@ -430,7 +473,8 @@ public class OnTilePostProcessPass : ScriptableRenderPass
             m_DitheringTextureIndex = PostProcessUtils.ConfigureDithering(
                 data,
                 m_DitheringTextureIndex,
-                cameraData.pixelWidth, cameraData.pixelHeight,
+                cameraData.pixelWidth,
+                cameraData.pixelHeight,
                 onTileUberMaterial
             );
         }

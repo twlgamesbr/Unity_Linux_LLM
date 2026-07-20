@@ -13,7 +13,12 @@ namespace UnityEditor.Rendering
         const string k_VendorKey = "unity.srp";
         const string k_EventName = "uRenderPipelineGraphicsSettingsUsage";
 
-        [AnalyticInfo(eventName: k_EventName, vendorKey: k_VendorKey, maxEventsPerHour: k_MaxEventsPerHour, maxNumberOfElements: k_MaxNumberOfElements)]
+        [AnalyticInfo(
+            eventName: k_EventName,
+            vendorKey: k_VendorKey,
+            maxEventsPerHour: k_MaxEventsPerHour,
+            maxNumberOfElements: k_MaxNumberOfElements
+        )]
         public class Analytic : IAnalytic
         {
             [Serializable]
@@ -39,7 +44,7 @@ namespace UnityEditor.Rendering
                         var settingsType = settings.GetType();
                         var usage = settings.ToNestedColumn(Activator.CreateInstance(settingsType));
                         if (usage.Length != 0)
-                            tmp.Add(new AnalyticsData() { settings = settingsType.FullName, usage = usage  });
+                            tmp.Add(new AnalyticsData() { settings = settingsType.FullName, usage = usage });
                     });
 
                     return new IAnalytic.DataList<AnalyticsData>(tmp.ToArray());
@@ -59,6 +64,7 @@ namespace UnityEditor.Rendering
         }
 
         public int callbackOrder { get; }
+
         public void OnPostprocessBuild(BuildReport report)
         {
             SendUniversalEvent();

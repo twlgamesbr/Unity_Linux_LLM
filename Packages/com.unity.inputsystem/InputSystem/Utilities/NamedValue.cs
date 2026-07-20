@@ -25,21 +25,13 @@ namespace UnityEngine.InputSystem.Utilities
 
         public NamedValue ConvertTo(TypeCode type)
         {
-            return new NamedValue
-            {
-                name = name,
-                value = value.ConvertTo(type)
-            };
+            return new NamedValue { name = name, value = value.ConvertTo(type) };
         }
 
         public static NamedValue From<TValue>(string name, TValue value)
             where TValue : struct
         {
-            return new NamedValue
-            {
-                name = name,
-                value = PrimitiveValue.From(value)
-            };
+            return new NamedValue { name = name, value = PrimitiveValue.From(value) };
         }
 
         public override string ToString()
@@ -49,8 +41,7 @@ namespace UnityEngine.InputSystem.Utilities
 
         public bool Equals(NamedValue other)
         {
-            return string.Equals(name, other.name, StringComparison.InvariantCultureIgnoreCase)
-                && value == other.value;
+            return string.Equals(name, other.name, StringComparison.InvariantCultureIgnoreCase) && value == other.value;
         }
 
         public override bool Equals(object obj)
@@ -70,12 +61,12 @@ namespace UnityEngine.InputSystem.Utilities
             }
         }
 
-        public static bool operator==(NamedValue left, NamedValue right)
+        public static bool operator ==(NamedValue left, NamedValue right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator!=(NamedValue left, NamedValue right)
+        public static bool operator !=(NamedValue left, NamedValue right)
         {
             return !left.Equals(right);
         }
@@ -147,8 +138,10 @@ namespace UnityEngine.InputSystem.Utilities
 
                 // Parse value.
                 var valueStart = index;
-                while (index < parameterStringLength &&
-                       !(parameterString[index] == Separator[0] || char.IsWhiteSpace(parameterString[index])))
+                while (
+                    index < parameterStringLength
+                    && !(parameterString[index] == Separator[0] || char.IsWhiteSpace(parameterString[index]))
+                )
                     ++index;
 
                 ////TODO: use Substring struct here so that we don't allocate lots of useless strings
@@ -171,11 +164,15 @@ namespace UnityEngine.InputSystem.Utilities
             var instanceType = instance.GetType();
 
             ////REVIEW: what about properties?
-            var field = instanceType.GetField(name,
-                BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var field = instanceType.GetField(
+                name,
+                BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            );
             if (field == null)
                 throw new ArgumentException(
-                    $"Cannot find public field '{name}' in '{instanceType.Name}' (while trying to apply parameter)", nameof(instance));
+                    $"Cannot find public field '{name}' in '{instanceType.Name}' (while trying to apply parameter)",
+                    nameof(instance)
+                );
 
             ////REVIEW: would be awesome to be able to do this without boxing
             var fieldTypeCode = Type.GetTypeCode(field.FieldType);

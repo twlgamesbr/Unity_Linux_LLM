@@ -100,8 +100,12 @@ namespace UnityEngine.Rendering
             }
 
             bool hasDebugItems = activePanels.Count > 0;
-            m_RootVisualElement.Q<HelpBox>(name: "no-debug-items-message").style.display = hasDebugItems ? DisplayStyle.None : DisplayStyle.Flex;
-            m_RootVisualElement.Q<VisualElement>(name: "content-container").style.display = hasDebugItems ? DisplayStyle.Flex : DisplayStyle.None;
+            m_RootVisualElement.Q<HelpBox>(name: "no-debug-items-message").style.display = hasDebugItems
+                ? DisplayStyle.None
+                : DisplayStyle.Flex;
+            m_RootVisualElement.Q<VisualElement>(name: "content-container").style.display = hasDebugItems
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
 
             if (!hasDebugItems)
                 return;
@@ -125,12 +129,19 @@ namespace UnityEngine.Rendering
 
             // We want to treat Up/Down NavigationMoveEvents as Next/Previous instead to get correct focus ring behavior, i.e. make
             // up/down arrows behave as tab/shift+tab. To do this we intercept the Up/Down events and send Next/Previous instead.
-            m_PanelRootElement.UnregisterCallback<NavigationMoveEvent>(ConvertNavigationMoveEvents, TrickleDown.TrickleDown);
-            m_PanelRootElement.RegisterCallback<NavigationMoveEvent>(ConvertNavigationMoveEvents, TrickleDown.TrickleDown);
+            m_PanelRootElement.UnregisterCallback<NavigationMoveEvent>(
+                ConvertNavigationMoveEvents,
+                TrickleDown.TrickleDown
+            );
+            m_PanelRootElement.RegisterCallback<NavigationMoveEvent>(
+                ConvertNavigationMoveEvents,
+                TrickleDown.TrickleDown
+            );
 
             string selectedPanelName;
             if (m_SelectedPanel == null || !activePanels.Contains(m_SelectedPanel))
-                selectedPanelName = DebugManager.instance.panels.Count > 0 ? DebugManager.instance.panels[0].displayName : null;
+                selectedPanelName =
+                    DebugManager.instance.panels.Count > 0 ? DebugManager.instance.panels[0].displayName : null;
             else
                 selectedPanelName = m_SelectedPanel.displayName;
 
@@ -148,7 +159,10 @@ namespace UnityEngine.Rendering
 
                 // Need to unregister here as well because when the UI is closed and reopened, it is a different object so the member
                 // function will be a different object and the Unregister call in RecreateGUI does nothing.
-                m_PanelRootElement?.UnregisterCallback<NavigationMoveEvent>(ConvertNavigationMoveEvents, TrickleDown.TrickleDown);
+                m_PanelRootElement?.UnregisterCallback<NavigationMoveEvent>(
+                    ConvertNavigationMoveEvents,
+                    TrickleDown.TrickleDown
+                );
             }
 
             DebugManager.instance.displayRuntimeUI = false;
@@ -163,16 +177,19 @@ namespace UnityEngine.Rendering
             if (IsPopupOpen())
                 return; // Popup navigation uses up/down normally
 
-            if (evt.direction != NavigationMoveEvent.Direction.Up &&
-                evt.direction != NavigationMoveEvent.Direction.Down)
+            if (
+                evt.direction != NavigationMoveEvent.Direction.Up
+                && evt.direction != NavigationMoveEvent.Direction.Down
+            )
                 return;
 
             evt.StopPropagation();
             m_PanelRootElement.focusController.IgnoreEvent(evt);
 
-            var newDirection = evt.direction == NavigationMoveEvent.Direction.Down
-                ? NavigationMoveEvent.Direction.Next
-                : NavigationMoveEvent.Direction.Previous;
+            var newDirection =
+                evt.direction == NavigationMoveEvent.Direction.Down
+                    ? NavigationMoveEvent.Direction.Next
+                    : NavigationMoveEvent.Direction.Previous;
 
             using (var newEvt = NavigationMoveEvent.GetPooled(newDirection))
             {
@@ -246,7 +263,11 @@ namespace UnityEngine.Rendering
             {
                 var previousPanel = DebugManager.instance.GetPanel(m_SelectedPanel.displayName);
                 if (previousPanel != null)
-                    DebugManager.instance.schedulerTracker.SetHierarchyEnabled(DebugUI.Context.Runtime, previousPanel, false);
+                    DebugManager.instance.schedulerTracker.SetHierarchyEnabled(
+                        DebugUI.Context.Runtime,
+                        previousPanel,
+                        false
+                    );
             }
 
             m_SelectedPanel = DebugManager.instance.GetPanel(panelName);
@@ -257,7 +278,11 @@ namespace UnityEngine.Rendering
                 if (newSelectedTab != null)
                     m_TabViewElement.activeTab = newSelectedTab;
 
-                DebugManager.instance.schedulerTracker.SetHierarchyEnabled(DebugUI.Context.Runtime, m_SelectedPanel, true);
+                DebugManager.instance.schedulerTracker.SetHierarchyEnabled(
+                    DebugUI.Context.Runtime,
+                    m_SelectedPanel,
+                    true
+                );
 
                 // Focus first focusable child in the panel
                 foreach (var widget in m_SelectedPanel.children)

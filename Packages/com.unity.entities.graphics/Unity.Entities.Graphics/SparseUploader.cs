@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Unity.Collections;
-using Unity.Mathematics;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -50,7 +50,13 @@ namespace Unity.Rendering
             dataOffset = (marker >> 32) & 0xFFFFFFFF;
         }
 
-        public bool TryAlloc(int operationSize, int dataSize, out byte* ptr, out int operationOffset, out int dataOffset)
+        public bool TryAlloc(
+            int operationSize,
+            int dataSize,
+            out byte* ptr,
+            out int operationOffset,
+            out int dataOffset
+        )
         {
             long originalMarker;
             long newMarker;
@@ -95,7 +101,8 @@ namespace Unity.Rendering
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe struct ThreadedSparseUploaderData
     {
-        [NativeDisableUnsafePtrRestriction] public MappedBuffer* m_Buffers;
+        [NativeDisableUnsafePtrRestriction]
+        public MappedBuffer* m_Buffers;
         public int m_NumBuffers;
         public int m_CurrBuffer;
     }
@@ -110,14 +117,21 @@ namespace Unity.Rendering
     public unsafe struct ThreadedSparseUploader
     {
         // TODO: safety handle?
-        [NativeDisableUnsafePtrRestriction] internal ThreadedSparseUploaderData* m_Data;
+        [NativeDisableUnsafePtrRestriction]
+        internal ThreadedSparseUploaderData* m_Data;
 
         /// <summary>
         /// Indicates whether the SparseUploader is valid and can be used.
         /// </summary>
         public bool IsValid => m_Data != null;
 
-        private bool TryAlloc(int operationSize, int dataSize, out byte* ptr, out int operationOffset, out int dataOffset)
+        private bool TryAlloc(
+            int operationSize,
+            int dataSize,
+            out byte* ptr,
+            out int operationOffset,
+            out int dataOffset
+        )
         {
             // Fetch current buffer and ensure we are not already out of GPU buffers to allocate from;
             var numBuffers = m_Data->m_NumBuffers;
@@ -183,7 +197,7 @@ namespace Unity.Rendering
                 dstOffset = (uint)offsetInBytes,
                 dstOffsetExtra = 0,
                 size = (uint)size,
-                count = (uint)repeatCount
+                count = (uint)repeatCount,
             };
             UnsafeUtility.MemCpy(dst + operationOffset, &op, opsize);
         }
@@ -198,7 +212,8 @@ namespace Unity.Rendering
         /// <param name="offsetInBytes">The destination offset of the data in the GPU buffer.</param>
         /// <param name="repeatCount">The number of times to repeat the source data in the destination buffer when uploading.</param>
         /// <typeparam name="T">Any unmanaged simple type.</typeparam>
-        public void AddUpload<T>(T val, int offsetInBytes, int repeatCount = 1) where T : unmanaged
+        public void AddUpload<T>(T val, int offsetInBytes, int repeatCount = 1)
+            where T : unmanaged
         {
             var size = UnsafeUtility.SizeOf<T>();
             AddUpload(&val, size, offsetInBytes, repeatCount);
@@ -214,7 +229,8 @@ namespace Unity.Rendering
         /// <param name="offsetInBytes">The destination offset of the data in the GPU buffer.</param>
         /// <param name="repeatCount">The number of times to repeat the source data in the destination buffer when uploading.</param>
         /// <typeparam name="T">Any unmanaged simple type.</typeparam>
-        public void AddUpload<T>(NativeArray<T> array, int offsetInBytes, int repeatCount = 1) where T : unmanaged
+        public void AddUpload<T>(NativeArray<T> array, int offsetInBytes, int repeatCount = 1)
+            where T : unmanaged
         {
             var size = UnsafeUtility.SizeOf<T>() * array.Length;
             AddUpload(array.GetUnsafeReadOnlyPtr(), size, offsetInBytes, repeatCount);
@@ -236,7 +252,14 @@ namespace Unity.Rendering
             MatrixType3x4,
         }
 
-        private void MatrixUploadHelper(void* src, int numMatrices, int offset, int offsetInverse, MatrixType srcType, MatrixType dstType)
+        private void MatrixUploadHelper(
+            void* src,
+            int numMatrices,
+            int offset,
+            int offsetInverse,
+            MatrixType srcType,
+            MatrixType dstType
+        )
         {
             var size = numMatrices * sizeof(float3x4);
             var opsize = UnsafeUtility.SizeOf<Operation>();
@@ -268,7 +291,8 @@ namespace Unity.Rendering
                 UnsafeUtility.MemCpy(dst + dataOffset, src, size);
             }
 
-            var uploadType = (offsetInverse == -1) ? (uint)OperationType.Matrix_4x4 : (uint)OperationType.Matrix_Inverse_4x4;
+            var uploadType =
+                (offsetInverse == -1) ? (uint)OperationType.Matrix_4x4 : (uint)OperationType.Matrix_Inverse_4x4;
             uploadType += (dstType == MatrixType.MatrixType3x4) ? 2u : 0u;
 
             var op = new Operation
@@ -314,7 +338,14 @@ namespace Unity.Rendering
         /// <param name="offsetInverse">The destination offset of the inverse part of the upload operation.</param>
         /// <param name="srcType">The source matrix format.</param>
         /// <param name="dstType">The destination matrix format.</param>
-        public void AddMatrixUploadAndInverse(void* src, int numMatrices, int offset, int offsetInverse, MatrixType srcType, MatrixType dstType)
+        public void AddMatrixUploadAndInverse(
+            void* src,
+            int numMatrices,
+            int offset,
+            int offsetInverse,
+            MatrixType srcType,
+            MatrixType dstType
+        )
         {
             MatrixUploadHelper(src, numMatrices, offset, offsetInverse, srcType, dstType);
         }
@@ -333,12 +364,25 @@ namespace Unity.Rendering
         /// <param name="count">The number of data elements to upload.</param>
         /// <param name="dstOffset">The destination offset</param>
         /// <param name="dstStride">The destination stride</param>
-        public void AddStridedUpload(void* src, uint elemSize, uint srcStride, uint count, uint dstOffset, int dstStride)
+        public void AddStridedUpload(
+            void* src,
+            uint elemSize,
+            uint srcStride,
+            uint count,
+            uint dstOffset,
+            int dstStride
+        )
         {
             int opSize = UnsafeUtility.SizeOf<Operation>();
             uint dataSize = count * srcStride;
 
-            var allocSucceeded = TryAlloc(opSize, (int)dataSize, out var dst, out var operationOffset, out var dataOffset);
+            var allocSucceeded = TryAlloc(
+                opSize,
+                (int)dataSize,
+                out var dst,
+                out var operationOffset,
+                out var dataOffset
+            );
 
             if (!allocSucceeded)
             {
@@ -372,7 +416,6 @@ namespace Unity.Rendering
         private int m_Stride;
         private GraphicsBuffer.Target m_Target;
         private GraphicsBuffer.UsageFlags m_UsageFlags;
-
 
         public BufferPool(int count, int stride, GraphicsBuffer.Target target, GraphicsBuffer.UsageFlags usageFlags)
         {
@@ -542,13 +585,22 @@ namespace Unity.Rendering
 
             m_DestinationBuffer = destinationBuffer;
 
-            m_UploadBufferPool = new BufferPool(m_BufferChunkSize / 4, 4, GraphicsBuffer.Target.Raw, GraphicsBuffer.UsageFlags.LockBufferForWrite);
+            m_UploadBufferPool = new BufferPool(
+                m_BufferChunkSize / 4,
+                4,
+                GraphicsBuffer.Target.Raw,
+                GraphicsBuffer.UsageFlags.LockBufferForWrite
+            );
             m_MappedBuffers = new NativeArray<MappedBuffer>();
             m_FreeFrameData = new Stack<FrameData>();
             m_FrameData = new List<FrameData>();
 
-            m_ThreadData = (ThreadedSparseUploaderData*)Memory.Unmanaged.Allocate(sizeof(ThreadedSparseUploaderData),
-                UnsafeUtility.AlignOf<ThreadedSparseUploaderData>(), Allocator.Persistent);
+            m_ThreadData = (ThreadedSparseUploaderData*)
+                Memory.Unmanaged.Allocate(
+                    sizeof(ThreadedSparseUploaderData),
+                    UnsafeUtility.AlignOf<ThreadedSparseUploaderData>(),
+                    Allocator.Persistent
+                );
             m_ThreadData->m_Buffers = null;
             m_ThreadData->m_NumBuffers = 0;
             m_ThreadData->m_CurrBuffer = 0;
@@ -715,9 +767,13 @@ namespace Unity.Rendering
             if (m_CurrentFrameUploadSize > m_MaxUploadSize)
                 m_MaxUploadSize = m_CurrentFrameUploadSize;
 
-            m_MappedBuffers = new NativeArray<MappedBuffer>(numBuffersNeeded, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            m_MappedBuffers = new NativeArray<MappedBuffer>(
+                numBuffersNeeded,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
-            for(int i = 0; i < numBuffersNeeded; ++i)
+            for (int i = 0; i < numBuffersNeeded; ++i)
             {
                 var id = m_UploadBufferPool.GetBufferId();
                 var cb = m_UploadBufferPool.GetBufferFromId(id);
@@ -735,10 +791,7 @@ namespace Unity.Rendering
             m_ThreadData->m_NumBuffers = numBuffersNeeded;
 
             // TODO: set safety handle on thread data
-            return new ThreadedSparseUploader
-            {
-                m_Data = m_ThreadData
-            };
+            return new ThreadedSparseUploader { m_Data = m_ThreadData };
         }
 
         private void DispatchUploads(int numOps, GraphicsBuffer graphicsBuffer)
@@ -789,7 +842,7 @@ namespace Unity.Rendering
             {
                 var mappedBuffer = m_MappedBuffers[iBuf];
                 MappedBuffer.UnpackMarker(mappedBuffer.m_Marker, out var operationOffset, out var dataOffset);
-                var numOps = (int) (operationOffset / UnsafeUtility.SizeOf<Operation>());
+                var numOps = (int)(operationOffset / UnsafeUtility.SizeOf<Operation>());
                 var graphicsBufferID = mappedBuffer.m_BufferID;
                 var graphicsBuffer = m_UploadBufferPool.GetBufferFromId(graphicsBufferID);
 

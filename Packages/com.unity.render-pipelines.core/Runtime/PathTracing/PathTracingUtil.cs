@@ -27,10 +27,18 @@ namespace UnityEngine.PathTracing.Core
             public static readonly int EmissionTextures = Shader.PropertyToID("g_EmissionTextures");
             public static readonly int TransmissionTextures = Shader.PropertyToID("g_TransmissionTextures");
             public static readonly int AtlasTexelSize = Shader.PropertyToID("g_AtlasTexelSize");
-            public static readonly int EnvironmentCdfConditionalResolution = Shader.PropertyToID("_EnvironmentCdfConditionalResolution");
-            public static readonly int EnvironmentCdfMarginalResolution = Shader.PropertyToID("_EnvironmentCdfMarginalResolution");
-            public static readonly int EnvironmentCdfConditionalBuffer = Shader.PropertyToID("_EnvironmentCdfConditionalBuffer");
-            public static readonly int EnvironmentCdfMarginalBuffer = Shader.PropertyToID("_EnvironmentCdfMarginalBuffer");
+            public static readonly int EnvironmentCdfConditionalResolution = Shader.PropertyToID(
+                "_EnvironmentCdfConditionalResolution"
+            );
+            public static readonly int EnvironmentCdfMarginalResolution = Shader.PropertyToID(
+                "_EnvironmentCdfMarginalResolution"
+            );
+            public static readonly int EnvironmentCdfConditionalBuffer = Shader.PropertyToID(
+                "_EnvironmentCdfConditionalBuffer"
+            );
+            public static readonly int EnvironmentCdfMarginalBuffer = Shader.PropertyToID(
+                "_EnvironmentCdfMarginalBuffer"
+            );
             public static readonly int SceneAccelStruct = Shader.PropertyToID("g_SceneAccelStruct");
             public static readonly int EnvTex = Shader.PropertyToID("g_EnvTex");
             public static readonly int LightEvaluations = Shader.PropertyToID("g_LightEvaluations");
@@ -41,7 +49,7 @@ namespace UnityEngine.PathTracing.Core
             public static readonly int BounceCount = Shader.PropertyToID("g_BounceCount");
             public static readonly int MaxIntensity = Shader.PropertyToID("g_MaxIntensity");
             public static readonly int ExposureScale = Shader.PropertyToID("g_ExposureScale");
-            public static readonly int LightPickingMethod  = Shader.PropertyToID("g_LightPickingMethod");
+            public static readonly int LightPickingMethod = Shader.PropertyToID("g_LightPickingMethod");
             public static readonly int IndirectScale = Shader.PropertyToID("g_IndirectScale");
             public static readonly int FrameIndex = Shader.PropertyToID("g_FrameIndex");
             public static readonly int EnableSubPixelJittering = Shader.PropertyToID("g_EnableSubPixelJittering");
@@ -85,9 +93,15 @@ namespace UnityEngine.PathTracing.Core
             if (albedoAtlas != null)
                 Debug.Assert(albedoAtlas.width == albedoAtlas.height, "Atlas expected to be square");
             if (emissionAtlas != null)
-                Debug.Assert(emissionAtlas.width == albedoAtlas.width && emissionAtlas.height == albedoAtlas.height, "Atlases expected to have same size");
+                Debug.Assert(
+                    emissionAtlas.width == albedoAtlas.width && emissionAtlas.height == albedoAtlas.height,
+                    "Atlases expected to have same size"
+                );
             if (transmissionAtlas != null)
-                Debug.Assert(transmissionAtlas.width == albedoAtlas.width && transmissionAtlas.height == albedoAtlas.height, "Atlases expected to have same size");
+                Debug.Assert(
+                    transmissionAtlas.width == albedoAtlas.width && transmissionAtlas.height == albedoAtlas.height,
+                    "Atlases expected to have same size"
+                );
 
             int atlasSize = albedoAtlas?.width ?? 1;
             float atlasTexelSize = 1.0f / atlasSize;
@@ -101,7 +115,11 @@ namespace UnityEngine.PathTracing.Core
         }
 
         // Helper function to set the skybox CDF resources
-        internal static void SetEnvSamplingShaderParams(CommandBuffer cmd, IRayTracingShader shader, EnvironmentCDF envCDF)
+        internal static void SetEnvSamplingShaderParams(
+            CommandBuffer cmd,
+            IRayTracingShader shader,
+            EnvironmentCDF envCDF
+        )
         {
             shader.SetIntParam(cmd, ShaderProperties.EnvironmentCdfConditionalResolution, envCDF.ConditionalResolution);
             shader.SetIntParam(cmd, ShaderProperties.EnvironmentCdfMarginalResolution, envCDF.MarginalResolution);
@@ -109,7 +127,11 @@ namespace UnityEngine.PathTracing.Core
             shader.SetBufferParam(cmd, ShaderProperties.EnvironmentCdfMarginalBuffer, envCDF.MarginalBuffer);
         }
 
-        internal static void BindAccelerationStructure(CommandBuffer cmd, IRayTracingShader shader, AccelStructAdapter accel)
+        internal static void BindAccelerationStructure(
+            CommandBuffer cmd,
+            IRayTracingShader shader,
+            AccelStructAdapter accel
+        )
         {
             accel.Bind(cmd, "g_SceneAccelStruct", shader);
         }
@@ -125,7 +147,7 @@ namespace UnityEngine.PathTracing.Core
             SetEnvSamplingShaderParams(cmd, shader, envCDF);
         }
 
-        static internal void BindPathTracingInputs(
+        internal static void BindPathTracingInputs(
             CommandBuffer cmd,
             IRayTracingShader shader,
             bool countNEERayAsPathSegment,
@@ -135,7 +157,8 @@ namespace UnityEngine.PathTracing.Core
             float environmentIntensityMultiplier,
             RenderedGameObjectsFilter renderedGameObjectsFilter,
             SamplingResources samplingResources,
-            RTHandle emptyTexture)
+            RTHandle emptyTexture
+        )
         {
             shader.SetIntParam(cmd, ShaderProperties.LightEvaluations, (int)risCandidateCount);
             shader.SetIntParam(cmd, ShaderProperties.PathtracerAsGiPreviewMode, 0);
@@ -158,7 +181,6 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-
         internal static RayTracingResources LoadOrCreateRayTracingResources()
         {
             RayTracingResources resources = new RayTracingResources();
@@ -167,7 +189,6 @@ namespace UnityEngine.PathTracing.Core
 #endif
             return resources;
         }
-
 
         internal static bool IsStatic(GameObject obj)
         {
@@ -187,12 +208,18 @@ namespace UnityEngine.PathTracing.Core
 
         internal static bool IsPunctualLightType(LightType lightType)
         {
-            return lightType == LightType.Directional || lightType == LightType.Spot || lightType == LightType.Point || lightType == LightType.Box;
+            return lightType == LightType.Directional
+                || lightType == LightType.Spot
+                || lightType == LightType.Point
+                || lightType == LightType.Box;
         }
 
         // Our old baker, LightBaker, multiplied intensities of punctual lights by PI. This isn't quite correct, but it was never changed as it would be breaking.
         // The 'multiplyPunctualLightIntensityByPI' can be used to mimic that old behavior.
-        internal static LightDescriptor[] ConvertUnityLightsToLightDescriptors(Light[] lights, bool multiplyPunctualLightIntensityByPI)
+        internal static LightDescriptor[] ConvertUnityLightsToLightDescriptors(
+            Light[] lights,
+            bool multiplyPunctualLightIntensityByPI
+        )
         {
             LightDescriptor[] lightDescriptors = new LightDescriptor[lights.Length];
             for (int i = 0; i < lights.Length; i++)
@@ -235,8 +262,13 @@ namespace UnityEngine.PathTracing.Core
 
         internal static Vector3 GetLinearLightColor(Light light)
         {
-            Color lightColor = (GraphicsSettings.lightsUseLinearIntensity) ? RGBMultiplied(light.color.linear, light.intensity) : RGBMultiplied(light.color, light.intensity).linear;
-            lightColor *= light.useColorTemperature ? Mathf.CorrelatedColorTemperatureToRGB(light.colorTemperature) : Color.white;
+            Color lightColor =
+                (GraphicsSettings.lightsUseLinearIntensity)
+                    ? RGBMultiplied(light.color.linear, light.intensity)
+                    : RGBMultiplied(light.color, light.intensity).linear;
+            lightColor *= light.useColorTemperature
+                ? Mathf.CorrelatedColorTemperatureToRGB(light.colorTemperature)
+                : Color.white;
             return new Vector3(lightColor.r, lightColor.g, lightColor.b) * lightColor.a;
         }
 

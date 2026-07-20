@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.TextCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 #pragma warning disable 0649 // Disabled warnings related to serialized fields not assigned in this script but used in the editor.
 
@@ -18,7 +18,8 @@ namespace TMPro
     //    RelativeToCurrent   = 0x2,
     //}
 
-    [System.Serializable][ExcludeFromPresetAttribute]
+    [System.Serializable]
+    [ExcludeFromPresetAttribute]
     [HelpURL("https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/TextMeshPro/Settings.html")]
     public class TMP_Settings : ScriptableObject
     {
@@ -49,6 +50,7 @@ namespace TMPro
         {
             get { return instance.m_TextWrappingMode; }
         }
+
         [FormerlySerializedAs("m_enableWordWrapping")]
         [SerializeField]
         private TextWrappingModes m_TextWrappingMode;
@@ -56,7 +58,9 @@ namespace TMPro
         /// <summary>
         /// Controls if Kerning is enabled on newly created text objects by default.
         /// </summary>
-        [System.Obsolete("The \"enableKerning\" property has been deprecated. Use the \"fontFeatures\" property to control what features are enabled by default on newly created text components.")]
+        [System.Obsolete(
+            "The \"enableKerning\" property has been deprecated. Use the \"fontFeatures\" property to control what features are enabled by default on newly created text components."
+        )]
         public static bool enableKerning
         {
             get
@@ -67,6 +71,7 @@ namespace TMPro
                 return instance.m_enableKerning;
             }
         }
+
         [SerializeField]
         private bool m_enableKerning;
 
@@ -77,6 +82,7 @@ namespace TMPro
         {
             get { return instance.m_ActiveFontFeatures; }
         }
+
         [SerializeField]
         private List<OTL_FeatureTag> m_ActiveFontFeatures = new List<OTL_FeatureTag> { 0 };
 
@@ -87,6 +93,7 @@ namespace TMPro
         {
             get { return instance.m_enableExtraPadding; }
         }
+
         [SerializeField]
         private bool m_enableExtraPadding;
 
@@ -97,6 +104,7 @@ namespace TMPro
         {
             get { return instance.m_enableTintAllSprites; }
         }
+
         [SerializeField]
         private bool m_enableTintAllSprites;
 
@@ -107,6 +115,7 @@ namespace TMPro
         {
             get { return instance.m_enableParseEscapeCharacters; }
         }
+
         [SerializeField]
         private bool m_enableParseEscapeCharacters;
 
@@ -117,6 +126,7 @@ namespace TMPro
         {
             get { return instance.m_EnableRaycastTarget; }
         }
+
         [SerializeField]
         private bool m_EnableRaycastTarget = true;
 
@@ -127,6 +137,7 @@ namespace TMPro
         {
             get { return instance.m_GetFontFeaturesAtRuntime; }
         }
+
         [SerializeField]
         private bool m_GetFontFeaturesAtRuntime = true;
 
@@ -138,6 +149,7 @@ namespace TMPro
             get { return instance.m_missingGlyphCharacter; }
             set { instance.m_missingGlyphCharacter = value; }
         }
+
         [SerializeField]
         private int m_missingGlyphCharacter;
 
@@ -149,7 +161,8 @@ namespace TMPro
             get { return instance.m_ClearDynamicDataOnBuild; }
         }
 
-        [SerializeField] private bool m_ClearDynamicDataOnBuild = true;
+        [SerializeField]
+        private bool m_ClearDynamicDataOnBuild = true;
 
         /// <summary>
         /// Controls the display of warning message in the console.
@@ -158,6 +171,7 @@ namespace TMPro
         {
             get { return instance.m_warningsDisabled; }
         }
+
         [SerializeField]
         private bool m_warningsDisabled;
 
@@ -169,6 +183,7 @@ namespace TMPro
             get { return instance.m_defaultFontAsset; }
             set { instance.m_defaultFontAsset = value; }
         }
+
         [SerializeField]
         private TMP_FontAsset m_defaultFontAsset;
 
@@ -179,6 +194,7 @@ namespace TMPro
         {
             get { return instance.m_defaultFontAssetPath; }
         }
+
         [SerializeField]
         private string m_defaultFontAssetPath;
 
@@ -189,6 +205,7 @@ namespace TMPro
         {
             get { return instance.m_defaultFontSize; }
         }
+
         [SerializeField]
         private float m_defaultFontSize;
 
@@ -199,6 +216,7 @@ namespace TMPro
         {
             get { return instance.m_defaultAutoSizeMinRatio; }
         }
+
         [SerializeField]
         private float m_defaultAutoSizeMinRatio;
 
@@ -209,6 +227,7 @@ namespace TMPro
         {
             get { return instance.m_defaultAutoSizeMaxRatio; }
         }
+
         [SerializeField]
         private float m_defaultAutoSizeMaxRatio;
 
@@ -219,6 +238,7 @@ namespace TMPro
         {
             get { return instance.m_defaultTextMeshProTextContainerSize; }
         }
+
         [SerializeField]
         private Vector2 m_defaultTextMeshProTextContainerSize;
 
@@ -229,6 +249,7 @@ namespace TMPro
         {
             get { return instance.m_defaultTextMeshProUITextContainerSize; }
         }
+
         [SerializeField]
         private Vector2 m_defaultTextMeshProUITextContainerSize;
 
@@ -239,6 +260,7 @@ namespace TMPro
         {
             get { return instance.m_autoSizeTextContainer; }
         }
+
         [SerializeField]
         private bool m_autoSizeTextContainer;
 
@@ -250,9 +272,9 @@ namespace TMPro
             get { return instance.m_IsTextObjectScaleStatic; }
             set { instance.m_IsTextObjectScaleStatic = value; }
         }
+
         [SerializeField]
         private bool m_IsTextObjectScaleStatic;
-
 
         /// <summary>
         /// Returns the list of Fallback Fonts defined in the TMP Settings file.
@@ -262,6 +284,7 @@ namespace TMPro
             get { return instance.m_fallbackFontAssets; }
             set { instance.m_fallbackFontAssets = value; }
         }
+
         [SerializeField]
         private List<TMP_FontAsset> m_fallbackFontAssets;
 
@@ -272,6 +295,7 @@ namespace TMPro
         {
             get { return instance.m_matchMaterialPreset; }
         }
+
         [SerializeField]
         private bool m_matchMaterialPreset;
 
@@ -282,7 +306,9 @@ namespace TMPro
         {
             get { return instance.m_HideSubTextObjects; }
         }
-        [SerializeField] private bool m_HideSubTextObjects = true;
+
+        [SerializeField]
+        private bool m_HideSubTextObjects = true;
 
         /// <summary>
         /// The Default Sprite Asset to be used by default.
@@ -292,6 +318,7 @@ namespace TMPro
             get { return instance.m_defaultSpriteAsset; }
             set { instance.m_defaultSpriteAsset = value; }
         }
+
         [SerializeField]
         private TMP_SpriteAsset m_defaultSpriteAsset;
 
@@ -302,6 +329,7 @@ namespace TMPro
         {
             get { return instance.m_defaultSpriteAssetPath; }
         }
+
         [SerializeField]
         private string m_defaultSpriteAssetPath;
 
@@ -313,6 +341,7 @@ namespace TMPro
             get { return instance.m_enableEmojiSupport; }
             set { instance.m_enableEmojiSupport = value; }
         }
+
         [SerializeField]
         private bool m_enableEmojiSupport;
 
@@ -324,6 +353,7 @@ namespace TMPro
             get { return instance.m_MissingCharacterSpriteUnicode; }
             set { instance.m_MissingCharacterSpriteUnicode = value; }
         }
+
         [SerializeField]
         private uint m_MissingCharacterSpriteUnicode;
 
@@ -335,6 +365,7 @@ namespace TMPro
             get => instance.m_EmojiFallbackTextAssets;
             set => instance.m_EmojiFallbackTextAssets = value;
         }
+
         [SerializeField]
         private List<TMP_Asset> m_EmojiFallbackTextAssets;
 
@@ -356,6 +387,7 @@ namespace TMPro
         {
             get { return instance.m_defaultColorGradientPresetsPath; }
         }
+
         [SerializeField]
         private string m_defaultColorGradientPresetsPath;
 
@@ -367,6 +399,7 @@ namespace TMPro
             get { return instance.m_defaultStyleSheet; }
             set { instance.m_defaultStyleSheet = value; }
         }
+
         [SerializeField]
         private TMP_StyleSheet m_defaultStyleSheet;
 
@@ -377,6 +410,7 @@ namespace TMPro
         {
             get { return instance.m_StyleSheetsResourcePath; }
         }
+
         [SerializeField]
         private string m_StyleSheetsResourcePath;
 
@@ -387,6 +421,7 @@ namespace TMPro
         {
             get { return instance.m_leadingCharacters; }
         }
+
         [SerializeField]
         private TextAsset m_leadingCharacters;
 
@@ -397,6 +432,7 @@ namespace TMPro
         {
             get { return instance.m_followingCharacters; }
         }
+
         [SerializeField]
         private TextAsset m_followingCharacters;
 
@@ -440,6 +476,7 @@ namespace TMPro
             get { return instance.m_UseModernHangulLineBreakingRules; }
             set { instance.m_UseModernHangulLineBreakingRules = value; }
         }
+
         [SerializeField]
         private bool m_UseModernHangulLineBreakingRules;
 
@@ -454,17 +491,24 @@ namespace TMPro
                 {
                     s_Instance = Resources.Load<TMP_Settings>("TMP Settings");
 
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     // Make sure TextMesh Pro UPM packages resources have been added to the user project
-                    if (isTMPSettingsNull && Time.frameCount != 0 || (!isTMPSettingsNull && s_Instance.assetVersion != s_CurrentAssetVersion))
+                    if (
+                        isTMPSettingsNull && Time.frameCount != 0
+                        || (!isTMPSettingsNull && s_Instance.assetVersion != s_CurrentAssetVersion)
+                    )
                     {
-						// It needs to open after loading the default Editor layout
+                        // It needs to open after loading the default Editor layout
                         DelayShowPackageImporterWindow();
                     }
-                    #endif
+#endif
 
                     // Convert use of the "enableKerning" property to the new "fontFeature" property.
-                    if (!isTMPSettingsNull && s_Instance.m_ActiveFontFeatures.Count == 1 && s_Instance.m_ActiveFontFeatures[0] == 0)
+                    if (
+                        !isTMPSettingsNull
+                        && s_Instance.m_ActiveFontFeatures.Count == 1
+                        && s_Instance.m_ActiveFontFeatures[0] == 0
+                    )
                     {
                         s_Instance.m_ActiveFontFeatures.Clear();
 
@@ -490,7 +534,6 @@ namespace TMPro
         }
 #endif
 
-
         /// <summary>
         /// Static Function to load the TMP Settings file.
         /// </summary>
@@ -508,7 +551,6 @@ namespace TMPro
             return s_Instance;
         }
 
-
         /// <summary>
         /// Returns the Sprite Asset defined in the TMP Settings file.
         /// </summary>
@@ -520,7 +562,6 @@ namespace TMPro
 
             return TMP_Settings.instance;
         }
-
 
         /// <summary>
         /// Returns the Font Asset defined in the TMP Settings file.
@@ -534,7 +575,6 @@ namespace TMPro
             return TMP_Settings.instance.m_defaultFontAsset;
         }
 
-
         /// <summary>
         /// Returns the Sprite Asset defined in the TMP Settings file.
         /// </summary>
@@ -547,7 +587,6 @@ namespace TMPro
             return TMP_Settings.instance.m_defaultSpriteAsset;
         }
 
-
         /// <summary>
         /// Returns the Style Sheet defined in the TMP Settings file.
         /// </summary>
@@ -559,7 +598,6 @@ namespace TMPro
 
             return TMP_Settings.instance.m_defaultStyleSheet;
         }
-
 
         public static void LoadLinebreakingRules()
         {
@@ -574,7 +612,6 @@ namespace TMPro
             s_Instance.m_linebreakingRules.leadingCharacters = GetCharacters(s_Instance.m_leadingCharacters);
             s_Instance.m_linebreakingRules.followingCharacters = GetCharacters(s_Instance.m_followingCharacters);
         }
-
 
         /// <summary>
         ///  Get the characters from the line breaking files
@@ -593,7 +630,6 @@ namespace TMPro
 
             return dict;
         }
-
 
         public class LineBreakingTable
         {

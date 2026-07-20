@@ -42,13 +42,11 @@ namespace Unity.PlatformToolkit.PlayMode
         [SerializeField, HideInInspector]
         private bool m_SetupPrior;
 
-
         private CapabilitySelector m_CapabilitySelector;
         public ICapabilitySelector CapabilitySelector => m_CapabilitySelector;
 
         private PlayModeControlsRuntime m_Runtime;
         public PlayModeControlsRuntime Runtime => m_Runtime;
-
 
         // Used by the custom inspector / editor for this class to identify the case when an inspector is created for
         // an object before OnEnable has been called.
@@ -71,9 +69,9 @@ namespace Unity.PlatformToolkit.PlayMode
         {
             m_Environment ??= new PlayModeEnvironmentData();
             m_Accounts ??= new PlayModeUserData();
-            #if INPUT_SYSTEM_AVAILABLE
+#if INPUT_SYSTEM_AVAILABLE
             m_InputSystem ??= new PlayModeInputSystemData();
-            #endif
+#endif
             m_LocalSaveData ??= new PlayModeSaveData();
             m_AttributeDefinitions ??= new PlayModeControlsAttributeDefinitions();
         }
@@ -158,7 +156,7 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public void Dispose()
         {
-             DisposeRuntime();
+            DisposeRuntime();
 
             /// Unbind the ViewModel to prevent any UI accessing data
             ViewModel.Dispose();

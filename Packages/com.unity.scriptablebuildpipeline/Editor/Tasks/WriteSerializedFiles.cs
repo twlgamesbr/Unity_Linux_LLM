@@ -17,7 +17,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class WriteSerializedFiles : IBuildTask, IRunCachedCallbacks<WriteSerializedFiles.Item>
     {
         /// <inheritdoc />
-        public int Version { get { return 4; } }
+        public int Version
+        {
+            get { return 4; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -44,23 +47,35 @@ namespace UnityEditor.Build.Pipeline.Tasks
 
         static Hash128 GetPlayerSettingsHash128(BuildTarget target)
         {
-            return HashingMethods.Calculate(
-                PlayerSettings.stripUnusedMeshComponents,
-                PlayerSettings.bakeCollisionMeshes
+            return HashingMethods
+                .Calculate(
+                    PlayerSettings.stripUnusedMeshComponents,
+                    PlayerSettings.bakeCollisionMeshes
 #if UNITY_2020_1_OR_NEWER
-                , PlayerSettings.mipStripping ? PlayerSettingsApi.GetNumberOfMipsStripped() : 0
+                    ,
+                    PlayerSettings.mipStripping ? PlayerSettingsApi.GetNumberOfMipsStripped() : 0
 #endif
-                , PlayerSettings.GetGraphicsAPIs(target)
-                ).ToHash128();
+                    ,
+                    PlayerSettings.GetGraphicsAPIs(target)
+                )
+                .ToHash128();
         }
 
-        CacheEntry GetCacheEntry(IWriteOperation operation, BuildSettings settings, BuildUsageTagGlobal globalUsage, bool onlySaveFirstSerializedObject)
+        CacheEntry GetCacheEntry(
+            IWriteOperation operation,
+            BuildSettings settings,
+            BuildUsageTagGlobal globalUsage,
+            bool onlySaveFirstSerializedObject
+        )
         {
             using (m_Log.ScopedStep(LogLevel.Verbose, "GetCacheEntry", operation.Command.fileName))
             {
                 //this section is to address global changes in URP that are not modifying shaders, which cause the cache to think the previous entries are still valid.
                 Hash128 renderPipelineHash = default;
-                var firstShader = operation.Command.serializeObjects?.FirstOrDefault(o => !o.serializationObject.guid.Empty() && AssetDatabase.GetMainAssetTypeFromGUID(o.serializationObject.guid) == typeof(Shader));
+                var firstShader = operation.Command.serializeObjects?.FirstOrDefault(o =>
+                    !o.serializationObject.guid.Empty()
+                    && AssetDatabase.GetMainAssetTypeFromGUID(o.serializationObject.guid) == typeof(Shader)
+                );
                 if (firstShader != null)
                 {
                     var renderAsset = GraphicsSettings.defaultRenderPipeline;
@@ -78,7 +93,17 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 var entry = new CacheEntry();
                 entry.Type = CacheEntry.EntryType.Data;
                 entry.Guid = HashingMethods.Calculate("WriteSerializedFiles", operation.Command.fileName).ToGUID();
-                entry.Hash = HashingMethods.Calculate(Version, operation.GetHash128(m_Log), settings.GetHash128(), globalUsage, onlySaveFirstSerializedObject, GetPlayerSettingsHash128(settings.target), renderPipelineHash).ToHash128();
+                entry.Hash = HashingMethods
+                    .Calculate(
+                        Version,
+                        operation.GetHash128(m_Log),
+                        settings.GetHash128(),
+                        globalUsage,
+                        onlySaveFirstSerializedObject,
+                        GetPlayerSettingsHash128(settings.target),
+                        renderPipelineHash
+                    )
+                    .ToHash128();
                 entry.Version = Version;
                 return entry;
             }
@@ -131,16 +156,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
         {
             SetupTaskContext();
 
-            List<WorkItem<Item>> workItems = m_WriteData.WriteOperations.Select(
-                i => new WorkItem<Item>(new Item(), i.Command.internalName)
-                ).ToList();
+            List<WorkItem<Item>> workItems = m_WriteData
+                .WriteOperations.Select(i => new WorkItem<Item>(new Item(), i.Command.internalName))
+                .ToList();
 
-            return TaskCachingUtility.RunCachedOperation<Item>(
-                m_UseCache,
-                m_Log,
-                m_Tracker,
-                workItems,
-                this);
+            return TaskCachingUtility.RunCachedOperation<Item>(m_UseCache, m_Log, m_Tracker, workItems, this);
         }
 
         internal static SerializedFileMetaData CalculateFileMetadata(ref WriteResult result)
@@ -154,7 +174,9 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 fullHashObjects.Add(fileHash);
                 if (file.serializedFile && result.serializedObjects.Count > 0)
                 {
-                    ObjectSerializedInfo firstObj = result.serializedObjects.First(x => x.header.fileName == file.fileAlias);
+                    ObjectSerializedInfo firstObj = result.serializedObjects.First(x =>
+                        x.header.fileName == file.fileAlias
+                    );
                     using (var stream = new FileStream(file.fileName, FileMode.Open, FileAccess.Read))
                     {
                         stream.Position = (long)firstObj.header.offset;
@@ -172,7 +194,12 @@ namespace UnityEditor.Build.Pipeline.Tasks
         /// <inheritdoc/>
         CacheEntry IRunCachedCallbacks<Item>.CreateCacheEntry(WorkItem<Item> item)
         {
-            return GetCacheEntry(m_WriteData.WriteOperations[item.Index], m_BuildSettings, m_GlobalUsage, ScriptableBuildPipeline.slimWriteResults);
+            return GetCacheEntry(
+                m_WriteData.WriteOperations[item.Index],
+                m_BuildSettings,
+                m_GlobalUsage,
+                ScriptableBuildPipeline.slimWriteResults
+            );
         }
 
         /// <inheritdoc/>
@@ -180,7 +207,8 @@ namespace UnityEditor.Build.Pipeline.Tasks
         {
             IWriteOperation op = m_WriteData.WriteOperations[item.Index];
 
-            string targetDir = m_UseCache != null ? m_UseCache.GetCachedArtifactsDirectory(item.entry) : m_Parameters.TempOutputFolder;
+            string targetDir =
+                m_UseCache != null ? m_UseCache.GetCachedArtifactsDirectory(item.entry) : m_Parameters.TempOutputFolder;
             Directory.CreateDirectory(targetDir);
 
             using (m_Log.ScopedStep(LogLevel.Info, $"Writing {op.GetType().Name}", op.Command.fileName))

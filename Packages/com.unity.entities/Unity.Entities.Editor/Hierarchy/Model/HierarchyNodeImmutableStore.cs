@@ -7,9 +7,9 @@ namespace Unity.Entities.Editor
     {
         const int k_ReadBuffer = 0;
         const int k_WriteBuffer = 1;
-            
+
         int m_ImmutableBufferIndex;
-            
+
         HierarchyNodeStore.Immutable m_Buffer0;
         HierarchyNodeStore.Immutable m_Buffer1;
 
@@ -25,17 +25,14 @@ namespace Unity.Entities.Editor
             m_Buffer1.Dispose();
         }
 
-        public HierarchyNodeStore.Immutable GetReadBuffer()
-            => GetBuffer(k_ReadBuffer);
-            
-        public HierarchyNodeStore.Immutable GetWriteBuffer()
-            => GetBuffer(k_WriteBuffer);
+        public HierarchyNodeStore.Immutable GetReadBuffer() => GetBuffer(k_ReadBuffer);
 
-        HierarchyNodeStore.Immutable GetBuffer(int offset)
-            => (m_ImmutableBufferIndex + offset) % 2 == 0 ? m_Buffer0 : m_Buffer1;
+        public HierarchyNodeStore.Immutable GetWriteBuffer() => GetBuffer(k_WriteBuffer);
 
-        public void SwapBuffers()
-            => ++m_ImmutableBufferIndex;
+        HierarchyNodeStore.Immutable GetBuffer(int offset) =>
+            (m_ImmutableBufferIndex + offset) % 2 == 0 ? m_Buffer0 : m_Buffer1;
+
+        public void SwapBuffers() => ++m_ImmutableBufferIndex;
 
         public void Clear()
         {

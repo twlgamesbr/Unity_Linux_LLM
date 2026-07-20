@@ -10,8 +10,8 @@ namespace Unity.Rendering
     /// or even crashing the application.
     /// </remarks>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor)]
-    public partial class StructuralChangePresentationSystemGroup : ComponentSystemGroup
-    {
-    }
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor
+    )]
+    public partial class StructuralChangePresentationSystemGroup : ComponentSystemGroup { }
 }

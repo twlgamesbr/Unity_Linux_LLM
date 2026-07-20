@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
-using Unity.Collections.LowLevel.Unsafe;
 using static Unity.Physics.Math;
-using Unity.Burst;
 
 namespace Unity.Physics
 {
@@ -20,6 +20,7 @@ namespace Unity.Physics
         // Mesh representation of the hull
         [NoAlias]
         private ElementPoolBase m_Vertices;
+
         [NoAlias]
         private ElementPoolBase m_Triangles;
 
@@ -27,7 +28,7 @@ namespace Unity.Physics
         {
             get
             {
-                fixed(ElementPoolBase* vertices = &m_Vertices)
+                fixed (ElementPoolBase* vertices = &m_Vertices)
                 {
                     return new ElementPool<Vertex> { ElementPoolBase = vertices };
                 }
@@ -38,7 +39,7 @@ namespace Unity.Physics
         {
             get
             {
-                fixed(ElementPoolBase* triangles = &m_Triangles)
+                fixed (ElementPoolBase* triangles = &m_Triangles)
                 {
                     return new ElementPool<Triangle> { ElementPoolBase = triangles };
                 }
@@ -49,7 +50,7 @@ namespace Unity.Physics
         public enum IntResolution
         {
             Low, // 16 bit, sufficient for ConvexConvexDistanceQueries
-            High // 30 bit, required to build hulls larger than ~1m without nearly parallel faces
+            High, // 30 bit, required to build hulls larger than ~1m without nearly parallel faces
         }
 
         // Array of faces' planes, length = NumFaces, updated when BuildFaceIndices() is called
@@ -79,7 +80,7 @@ namespace Unity.Physics
         private Aabb m_IntegerSpaceAabb;
         private uint m_NextUid;
 
-        private const float k_PlaneEps = 1e-4f;  // Maximum distance any vertex in a face can be from the plane
+        private const float k_PlaneEps = 1e-4f; // Maximum distance any vertex in a face can be from the plane
 
         /// <summary>
         /// Convex hull vertex.
@@ -91,7 +92,11 @@ namespace Unity.Physics
             public int3 IntPosition;
             public int Cardinality;
             public uint UserData;
-            public int NextFree { get { return (int)UserData; } set { UserData = (uint)value; } }
+            public int NextFree
+            {
+                get { return (int)UserData; }
+                set { UserData = (uint)value; }
+            }
 
             public bool IsAllocated => Cardinality != -1;
 
@@ -116,11 +121,19 @@ namespace Unity.Physics
         [DebuggerDisplay("#{FaceIndex}[{Vertex0}, {Vertex1}, {Vertex2}]")]
         public struct Triangle : IPoolElement
         {
-            public int Vertex0, Vertex1, Vertex2;
-            public Edge Link0, Link1, Link2;
+            public int Vertex0,
+                Vertex1,
+                Vertex2;
+            public Edge Link0,
+                Link1,
+                Link2;
             public int FaceIndex;
             public uint Uid { get; private set; }
-            public int NextFree { get { return (int)Uid; } set { Uid = (uint)value; } }
+            public int NextFree
+            {
+                get { return (int)Uid; }
+                set { Uid = (uint)value; }
+            }
 
             public bool IsAllocated => FaceIndex != -2;
 
@@ -140,26 +153,32 @@ namespace Unity.Physics
             {
                 fixed (int* p = &Vertex0)
                 {
-                    return p[index]; }
+                    return p[index];
+                }
             }
+
             public void SetVertex(int index, int value)
             {
                 fixed (int* p = &Vertex0)
                 {
-                    p[index] = value; }
+                    p[index] = value;
+                }
             }
 
             public Edge GetLink(int index)
             {
                 fixed (Edge* p = &Link0)
                 {
-                    return p[index]; }
+                    return p[index];
+                }
             }
+
             public void SetLink(int index, Edge handle)
             {
                 fixed (Edge* p = &Link0)
                 {
-                    p[index] = handle; }
+                    p[index] = handle;
+                }
             }
 
             void IPoolElement.MarkFree(int nextFree)
@@ -183,8 +202,15 @@ namespace Unity.Physics
 
             public static readonly Edge Invalid = new Edge(0x7fffffff);
 
-            public Edge(int value) { Value = value; }
-            public Edge(int triangleIndex, int edgeIndex) { Value = triangleIndex << 2 | edgeIndex; }
+            public Edge(int value)
+            {
+                Value = value;
+            }
+
+            public Edge(int triangleIndex, int edgeIndex)
+            {
+                Value = triangleIndex << 2 | edgeIndex;
+            }
 
             public Edge Next => IsValid ? new Edge(TriangleIndex, (EdgeIndex + 1) % 3) : Invalid;
             public Edge Prev => IsValid ? new Edge(TriangleIndex, (EdgeIndex + 2) % 3) : Invalid;
@@ -197,8 +223,8 @@ namespace Unity.Physics
         /// </summary>
         public struct FaceEdge
         {
-            public Edge Start;      // the first edge of the face
-            public Edge Current;    // the current edge of the face
+            public Edge Start; // the first edge of the face
+            public Edge Current; // the current edge of the face
 
             public bool IsValid => Current.IsValid;
 
@@ -247,8 +273,15 @@ namespace Unity.Physics
         // vertices must be at least large enough to hold verticesCapacity elements, triangles and planes must be large enough to hold 2 * verticesCapacity elements
         // domain is the AABB of all points that will be added to the hull
         // simplificationTolerance is the sum of tolerances that will be passed to SimplifyVertices() and SimplifyFacesAndShrink()
-        public ConvexHullBuilder(int verticesCapacity, Vertex* vertices, Triangle* triangles, Plane* planes,
-                                 Aabb domain, float simplificationTolerance, IntResolution intResolution)
+        public ConvexHullBuilder(
+            int verticesCapacity,
+            Vertex* vertices,
+            Triangle* triangles,
+            Plane* planes,
+            Aabb domain,
+            float simplificationTolerance,
+            IntResolution intResolution
+        )
         {
             m_Vertices = new ElementPoolBase(vertices, verticesCapacity);
             m_Triangles = new ElementPoolBase(triangles, 2 * verticesCapacity);
@@ -280,8 +313,13 @@ namespace Unity.Physics
         /// <summary>
         /// Copy the content of another convex hull into this one.
         /// </summary>
-        public ConvexHullBuilder(int verticesCapacity, Vertex* vertices, Triangle* triangles, Plane* planes,
-                                 ConvexHullBuilder other)
+        public ConvexHullBuilder(
+            int verticesCapacity,
+            Vertex* vertices,
+            Triangle* triangles,
+            Plane* planes,
+            ConvexHullBuilder other
+        )
         {
             m_Vertices = new ElementPoolBase(vertices, verticesCapacity);
             m_Triangles = new ElementPoolBase(triangles, 2 * verticesCapacity);
@@ -326,11 +364,19 @@ namespace Unity.Physics
         public void Compact()
         {
             // Compact the vertices array
-            NativeArray<int> vertexRemap = new NativeArray<int>(Vertices.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<int> vertexRemap = new NativeArray<int>(
+                Vertices.PeakCount,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             bool verticesRemapped = Vertices.Compact((int*)vertexRemap.GetUnsafePtr());
 
             // Compact the triangles array
-            NativeArray<int> triangleRemap = new NativeArray<int>(Triangles.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<int> triangleRemap = new NativeArray<int>(
+                Triangles.PeakCount,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             bool trianglesRemapped = Triangles.Compact((int*)triangleRemap.GetUnsafePtr());
 
             // Fixup triangles
@@ -392,154 +438,176 @@ namespace Unity.Physics
             {
                 // Empty hull, just add a vertex.
                 case -1:
-                {
-                    AllocateVertex(point, userData);
-                    Dimension = 0;
-                }
-                break;
+                    {
+                        AllocateVertex(point, userData);
+                        Dimension = 0;
+                    }
+                    break;
 
                 // 0 dimensional hull, make a line.
                 case 0:
-                {
-                    const float minDistanceFromPoint = 1e-5f;
-                    if (math.lengthsq(Vertices[0].Position - point) <= minDistanceFromPoint * minDistanceFromPoint)
+                    {
+                        const float minDistanceFromPoint = 1e-5f;
+                        if (math.lengthsq(Vertices[0].Position - point) <= minDistanceFromPoint * minDistanceFromPoint)
                             return false;
-                    AllocateVertex(point, userData);
-                    Dimension = 1;
+                        AllocateVertex(point, userData);
+                        Dimension = 1;
                     }
                     break;
 
                 // 1 dimensional hull, make a triangle.
                 case 1:
-                {
-                    IntCross(Vertices[0].IntPosition - intPoint, Vertices[1].IntPosition - intPoint, out long normalDirectionX, out long normalDirectionY, out long normalDirectionZ);
-                    if (normalDirectionX == 0 && normalDirectionY == 0 && normalDirectionZ == 0)
                     {
-                        // Still 1D, keep whichever two vertices are farthest apart
-                        float3x3 edgesTransposed = math.transpose(new float3x3(Vertices[1].Position - Vertices[0].Position, point - Vertices[1].Position, Vertices[0].Position - point));
-                        float3 edgesLengthSq = edgesTransposed.c0 * edgesTransposed.c0 + edgesTransposed.c1 * edgesTransposed.c1 + edgesTransposed.c2 * edgesTransposed.c2;
-                        bool3 isLongestEdge = edgesLengthSq == math.cmax(edgesLengthSq);
-                        if (isLongestEdge.y)
+                        IntCross(
+                            Vertices[0].IntPosition - intPoint,
+                            Vertices[1].IntPosition - intPoint,
+                            out long normalDirectionX,
+                            out long normalDirectionY,
+                            out long normalDirectionZ
+                        );
+                        if (normalDirectionX == 0 && normalDirectionY == 0 && normalDirectionZ == 0)
                         {
-                            Vertex newVertex = Vertices[0];
-                            newVertex.Position = point;
-                            newVertex.IntPosition = m_IntegerSpace.ToIntegerSpace(point);
-                            newVertex.UserData = userData;
-                            Vertices.Set(0, newVertex);
+                            // Still 1D, keep whichever two vertices are farthest apart
+                            float3x3 edgesTransposed = math.transpose(
+                                new float3x3(
+                                    Vertices[1].Position - Vertices[0].Position,
+                                    point - Vertices[1].Position,
+                                    Vertices[0].Position - point
+                                )
+                            );
+                            float3 edgesLengthSq =
+                                edgesTransposed.c0 * edgesTransposed.c0
+                                + edgesTransposed.c1 * edgesTransposed.c1
+                                + edgesTransposed.c2 * edgesTransposed.c2;
+                            bool3 isLongestEdge = edgesLengthSq == math.cmax(edgesLengthSq);
+                            if (isLongestEdge.y)
+                            {
+                                Vertex newVertex = Vertices[0];
+                                newVertex.Position = point;
+                                newVertex.IntPosition = m_IntegerSpace.ToIntegerSpace(point);
+                                newVertex.UserData = userData;
+                                Vertices.Set(0, newVertex);
+                            }
+                            else if (isLongestEdge.z)
+                            {
+                                Vertex newVertex = Vertices[1];
+                                newVertex.Position = point;
+                                newVertex.IntPosition = m_IntegerSpace.ToIntegerSpace(point);
+                                newVertex.UserData = userData;
+                                Vertices.Set(1, newVertex);
+                            } // else, point is on the edge between Vertices[0] and Vertices[1]
                         }
-                        else if (isLongestEdge.z)
+                        else
                         {
-                            Vertex newVertex = Vertices[1];
-                            newVertex.Position = point;
-                            newVertex.IntPosition = m_IntegerSpace.ToIntegerSpace(point);
-                            newVertex.UserData = userData;
-                            Vertices.Set(1, newVertex);
-                        } // else, point is on the edge between Vertices[0] and Vertices[1]
+                            // Extend dimension.
+                            AllocateVertex(point, userData);
+                            Dimension = 2;
+                            ProjectionPlane = ComputePlane(0, 1, 2, true);
+                            m_IntNormalDirectionX = normalDirectionX;
+                            m_IntNormalDirectionY = normalDirectionY;
+                            m_IntNormalDirectionZ = normalDirectionZ;
+                        }
                     }
-                    else
-                    {
-                        // Extend dimension.
-                        AllocateVertex(point, userData);
-                        Dimension = 2;
-                        ProjectionPlane = ComputePlane(0, 1, 2, true);
-                        m_IntNormalDirectionX = normalDirectionX;
-                        m_IntNormalDirectionY = normalDirectionY;
-                        m_IntNormalDirectionZ = normalDirectionZ;
-                    }
-                }
-                break;
+                    break;
 
                 // 2 dimensional hull, make a volume or expand face.
                 case 2:
-                {
-                    long det = 0;
-                    if (!force2D)
                     {
-                        // Try to expand to a 3D hull
-                        for (int i = Vertices.PeakCount - 2, j = Vertices.PeakCount - 1, k = 0; k < Vertices.PeakCount - 2; i = j, j = k, k++)
+                        long det = 0;
+                        if (!force2D)
                         {
-                            det = IntDet(i, j, k, intPoint);
-                            if (det != 0)
+                            // Try to expand to a 3D hull
+                            for (
+                                int i = Vertices.PeakCount - 2, j = Vertices.PeakCount - 1, k = 0;
+                                k < Vertices.PeakCount - 2;
+                                i = j, j = k, k++
+                            )
                             {
-                                // Extend dimension.
-                                ProjectionPlane = new Plane(new float3(0), 0);
-
-                                // Orient tetrahedron.
-                                if (det > 0)
+                                det = IntDet(i, j, k, intPoint);
+                                if (det != 0)
                                 {
-                                    Vertex t = Vertices[k];
-                                    Vertices.Set(k, Vertices[j]);
-                                    Vertices.Set(j, t);
-                                }
+                                    // Extend dimension.
+                                    ProjectionPlane = new Plane(new float3(0), 0);
 
-                                // Allocate vertex.
-                                int nv = Vertices.PeakCount;
-                                int vertexIndex = AllocateVertex(point, userData);
+                                    // Orient tetrahedron.
+                                    if (det > 0)
+                                    {
+                                        Vertex t = Vertices[k];
+                                        Vertices.Set(k, Vertices[j]);
+                                        Vertices.Set(j, t);
+                                    }
 
-                                // Build tetrahedron.
-                                Dimension = 3;
-                                Edge nt0 = AllocateTriangle(i, j, k);
-                                Edge nt1 = AllocateTriangle(j, i, vertexIndex);
-                                Edge nt2 = AllocateTriangle(k, j, vertexIndex);
-                                Edge nt3 = AllocateTriangle(i, k, vertexIndex);
-                                BindEdges(nt0, nt1);
+                                    // Allocate vertex.
+                                    int nv = Vertices.PeakCount;
+                                    int vertexIndex = AllocateVertex(point, userData);
+
+                                    // Build tetrahedron.
+                                    Dimension = 3;
+                                    Edge nt0 = AllocateTriangle(i, j, k);
+                                    Edge nt1 = AllocateTriangle(j, i, vertexIndex);
+                                    Edge nt2 = AllocateTriangle(k, j, vertexIndex);
+                                    Edge nt3 = AllocateTriangle(i, k, vertexIndex);
+                                    BindEdges(nt0, nt1);
                                     BindEdges(nt0.Next, nt2);
                                     BindEdges(nt0.Prev, nt3);
-                                BindEdges(nt1.Prev, nt2.Next);
+                                    BindEdges(nt1.Prev, nt2.Next);
                                     BindEdges(nt2.Prev, nt3.Next);
                                     BindEdges(nt3.Prev, nt1.Next);
 
-                                // Re-insert other vertices.
-                                bool success = true;
-                                for (int v = 0; v < nv; v++)
-                                {
-                                    if (v == i || v == j || v == k)
+                                    // Re-insert other vertices.
+                                    bool success = true;
+                                    for (int v = 0; v < nv; v++)
                                     {
-                                        continue;
+                                        if (v == i || v == j || v == k)
+                                        {
+                                            continue;
+                                        }
+                                        Vertex vertex = Vertices[v];
+                                        Vertices.Release(v);
+                                        success = success & AddPoint(vertex.Position, vertex.UserData);
                                     }
-                                    Vertex vertex = Vertices[v];
-                                    Vertices.Release(v);
-                                    success = success & AddPoint(vertex.Position, vertex.UserData);
-                                }
-                                return success;
+                                    return success;
                                 }
                             }
                         }
                         if (det == 0)
-                    {
-                        // Hull is still 2D
-                        bool* isOutside = stackalloc bool[Vertices.PeakCount];
-                        bool isOutsideAny = false;
-                        for (int i = Vertices.PeakCount - 1, j = 0; j < Vertices.PeakCount; i = j++)
                         {
-                            // Test if the point is inside the edge
-                            // Note, even with 16 bit quantized coordinates, we cannot fit this calculation in 64 bit integers
-                            int3 edge = Vertices[j].IntPosition - Vertices[i].IntPosition;
-                            int3 delta = intPoint - Vertices[i].IntPosition;
-                            IntCross(edge, delta, out long cx, out long cy, out long cz);
-                            Int128 dot = Int128.Mul(m_IntNormalDirectionX, cx) + Int128.Mul(m_IntNormalDirectionY, cy) + Int128.Mul(m_IntNormalDirectionZ, cz);
-                            isOutside[i] = dot.IsNegative;
-                            isOutsideAny |= isOutside[i];
-                        }
-
-                        // If the point is outside the hull, insert it and remove any points that it was outside of
-                        if (isOutsideAny)
-                        {
-                            Vertex* newVertices = stackalloc Vertex[Vertices.PeakCount + 1];
-                            int numNewVertices = 1;
-                            newVertices[0] = new Vertex(point, userData);
-                            newVertices[0].IntPosition = intPoint;
+                            // Hull is still 2D
+                            bool* isOutside = stackalloc bool[Vertices.PeakCount];
+                            bool isOutsideAny = false;
                             for (int i = Vertices.PeakCount - 1, j = 0; j < Vertices.PeakCount; i = j++)
                             {
-                                if (isOutside[i] && isOutside[i] != isOutside[j])
+                                // Test if the point is inside the edge
+                                // Note, even with 16 bit quantized coordinates, we cannot fit this calculation in 64 bit integers
+                                int3 edge = Vertices[j].IntPosition - Vertices[i].IntPosition;
+                                int3 delta = intPoint - Vertices[i].IntPosition;
+                                IntCross(edge, delta, out long cx, out long cy, out long cz);
+                                Int128 dot =
+                                    Int128.Mul(m_IntNormalDirectionX, cx)
+                                    + Int128.Mul(m_IntNormalDirectionY, cy)
+                                    + Int128.Mul(m_IntNormalDirectionZ, cz);
+                                isOutside[i] = dot.IsNegative;
+                                isOutsideAny |= isOutside[i];
+                            }
+
+                            // If the point is outside the hull, insert it and remove any points that it was outside of
+                            if (isOutsideAny)
+                            {
+                                Vertex* newVertices = stackalloc Vertex[Vertices.PeakCount + 1];
+                                int numNewVertices = 1;
+                                newVertices[0] = new Vertex(point, userData);
+                                newVertices[0].IntPosition = intPoint;
+                                for (int i = Vertices.PeakCount - 1, j = 0; j < Vertices.PeakCount; i = j++)
                                 {
-                                    newVertices[numNewVertices++] = Vertices[j];
-                                    for (;;)
+                                    if (isOutside[i] && isOutside[i] != isOutside[j])
                                     {
-                                        if (isOutside[j])
-                                                break;
-                                        j = (j + 1) % Vertices.PeakCount;
                                         newVertices[numNewVertices++] = Vertices[j];
+                                        for (; ; )
+                                        {
+                                            if (isOutside[j])
+                                                break;
+                                            j = (j + 1) % Vertices.PeakCount;
+                                            newVertices[numNewVertices++] = Vertices[j];
                                         }
                                         break;
                                     }
@@ -553,129 +621,135 @@ namespace Unity.Physics
 
                 // 3 dimensional hull, add vertex.
                 case 3:
-                {
-                    int* nextTriangles = stackalloc int[Triangles.PeakCount];
-                    for (int i = 0; i < Triangles.PeakCount; i++)
                     {
-                        nextTriangles[i] = -1;
-                    }
-
-                    Edge* newEdges = stackalloc Edge[Vertices.PeakCount];
-                    for (int i = 0; i < Vertices.PeakCount; i++)
-                    {
-                        newEdges[i] = Edge.Invalid;
-                    }
-
-                    // Classify all triangles as either front(faceIndex = 1) or back(faceIndex = -1).
-                    int firstFrontTriangleIndex = -1, numFrontTriangles = 0, numBackTriangles = 0;
-                    int lastFrontTriangleIndex = -1;
-                    float3 floatPoint = m_IntegerSpace.ToFloatSpace(intPoint);
-                    float maxDistance = 0.0f;
-                    foreach (int triangleIndex in Triangles.Indices)
-                    {
-                        Triangle triangle = Triangles[triangleIndex];
-                        long det = IntDet(triangle.Vertex0, triangle.Vertex1, triangle.Vertex2, intPoint);
-                        if (det == 0)
+                        int* nextTriangles = stackalloc int[Triangles.PeakCount];
+                        for (int i = 0; i < Triangles.PeakCount; i++)
                         {
-                            // Check for duplicated vertex.
-                            if (math.all(Vertices[triangle.Vertex0].IntPosition == intPoint))
+                            nextTriangles[i] = -1;
+                        }
+
+                        Edge* newEdges = stackalloc Edge[Vertices.PeakCount];
+                        for (int i = 0; i < Vertices.PeakCount; i++)
+                        {
+                            newEdges[i] = Edge.Invalid;
+                        }
+
+                        // Classify all triangles as either front(faceIndex = 1) or back(faceIndex = -1).
+                        int firstFrontTriangleIndex = -1,
+                            numFrontTriangles = 0,
+                            numBackTriangles = 0;
+                        int lastFrontTriangleIndex = -1;
+                        float3 floatPoint = m_IntegerSpace.ToFloatSpace(intPoint);
+                        float maxDistance = 0.0f;
+                        foreach (int triangleIndex in Triangles.Indices)
+                        {
+                            Triangle triangle = Triangles[triangleIndex];
+                            long det = IntDet(triangle.Vertex0, triangle.Vertex1, triangle.Vertex2, intPoint);
+                            if (det == 0)
+                            {
+                                // Check for duplicated vertex.
+                                if (math.all(Vertices[triangle.Vertex0].IntPosition == intPoint))
                                     return false;
-                            if (math.all(Vertices[triangle.Vertex1].IntPosition == intPoint))
+                                if (math.all(Vertices[triangle.Vertex1].IntPosition == intPoint))
                                     return false;
-                            if (math.all(Vertices[triangle.Vertex2].IntPosition == intPoint))
+                                if (math.all(Vertices[triangle.Vertex2].IntPosition == intPoint))
                                     return false;
                             }
                             if (det > 0)
-                        {
-                            nextTriangles[triangleIndex] = firstFrontTriangleIndex;
-                            firstFrontTriangleIndex = triangleIndex;
-                            if (lastFrontTriangleIndex == -1)
                             {
-                                lastFrontTriangleIndex = triangleIndex;
+                                nextTriangles[triangleIndex] = firstFrontTriangleIndex;
+                                firstFrontTriangleIndex = triangleIndex;
+                                if (lastFrontTriangleIndex == -1)
+                                {
+                                    lastFrontTriangleIndex = triangleIndex;
+                                }
+
+                                triangle.FaceIndex = 1;
+                                numFrontTriangles++;
+
+                                Plane plane = ComputePlane(triangleIndex, true);
+                                float distance = math.dot(plane.Normal, floatPoint) + plane.Distance;
+                                maxDistance = math.max(distance, maxDistance);
                             }
-
-                            triangle.FaceIndex = 1;
-                            numFrontTriangles++;
-
-                            Plane plane = ComputePlane(triangleIndex, true);
-                            float distance = math.dot(plane.Normal, floatPoint) + plane.Distance;
-                            maxDistance = math.max(distance, maxDistance);
-                        }
-                        else
-                        {
-                            triangle.FaceIndex = -1;
-                            numBackTriangles++;
-                        }
-                        Triangles.Set(triangleIndex, triangle);
+                            else
+                            {
+                                triangle.FaceIndex = -1;
+                                numBackTriangles++;
+                            }
+                            Triangles.Set(triangleIndex, triangle);
                         }
 
                         // Return false if the vertex is inside the hull
                         if (numFrontTriangles == 0 || numBackTriangles == 0)
-                    {
-                        return false;
-                    }
-
-                    // Link boundary loop.
-                    Edge loopEdge = Edge.Invalid;
-                    int loopCount = 0;
-                    for (int frontTriangle = firstFrontTriangleIndex; frontTriangle != -1; frontTriangle = nextTriangles[frontTriangle])
-                    {
-                        for (int j = 0; j < 3; ++j)
                         {
-                            var edge = new Edge(frontTriangle, j);
-                            Edge linkEdge = GetLinkedEdge(edge);
-                            if (Triangles[linkEdge.TriangleIndex].FaceIndex == -1)
+                            return false;
+                        }
+
+                        // Link boundary loop.
+                        Edge loopEdge = Edge.Invalid;
+                        int loopCount = 0;
+                        for (
+                            int frontTriangle = firstFrontTriangleIndex;
+                            frontTriangle != -1;
+                            frontTriangle = nextTriangles[frontTriangle]
+                        )
+                        {
+                            for (int j = 0; j < 3; ++j)
                             {
-                                int vertexIndex = StartVertex(linkEdge);
+                                var edge = new Edge(frontTriangle, j);
+                                Edge linkEdge = GetLinkedEdge(edge);
+                                if (Triangles[linkEdge.TriangleIndex].FaceIndex == -1)
+                                {
+                                    int vertexIndex = StartVertex(linkEdge);
 
-                                // Vertex already bound.
-                                Assert.IsTrue(newEdges[vertexIndex].Equals(Edge.Invalid));
+                                    // Vertex already bound.
+                                    Assert.IsTrue(newEdges[vertexIndex].Equals(Edge.Invalid));
 
-                                // Link.
-                                newEdges[vertexIndex] = linkEdge;
-                                loopEdge = linkEdge;
-                                loopCount++;
+                                    // Link.
+                                    newEdges[vertexIndex] = linkEdge;
+                                    loopEdge = linkEdge;
+                                    loopCount++;
+                                }
                             }
                         }
-                    }
 
-                    // Return false if there is not enough room to allocate new triangles.
-                    if ((Triangles.PeakCount + loopCount - numFrontTriangles) > Triangles.Capacity)
-                    {
-                        return false;
-                    }
-
-                    // Release front triangles.
-                    do
-                    {
-                        int next = nextTriangles[firstFrontTriangleIndex];
-                        ReleaseTriangle(firstFrontTriangleIndex);
-                        firstFrontTriangleIndex = next;
-                    }
-                    while (firstFrontTriangleIndex != -1);
-
-                    // Add vertex.
-                    int newVertex = AllocateVertex(point, userData);
-
-                    // Add fan of triangles.
-                    {
-                        Edge firstFanEdge = Edge.Invalid, lastFanEdge = Edge.Invalid;
-                        for (int i = 0; i < loopCount; ++i)
+                        // Return false if there is not enough room to allocate new triangles.
+                        if ((Triangles.PeakCount + loopCount - numFrontTriangles) > Triangles.Capacity)
                         {
-                            int v0 = StartVertex(loopEdge);
-                            int v1 = EndVertex(loopEdge);
-                            Edge t = AllocateTriangle(v1, v0, newVertex);
-                            BindEdges(loopEdge, t);
-                            if (lastFanEdge.IsValid)
-                                BindEdges(t.Next, lastFanEdge.Prev);
-                            else
-                                firstFanEdge = t;
-
-                            lastFanEdge = t;
-                            loopEdge = newEdges[v1];
+                            return false;
                         }
-                        BindEdges(lastFanEdge.Prev, firstFanEdge.Next);
-                    }
+
+                        // Release front triangles.
+                        do
+                        {
+                            int next = nextTriangles[firstFrontTriangleIndex];
+                            ReleaseTriangle(firstFrontTriangleIndex);
+                            firstFrontTriangleIndex = next;
+                        } while (firstFrontTriangleIndex != -1);
+
+                        // Add vertex.
+                        int newVertex = AllocateVertex(point, userData);
+
+                        // Add fan of triangles.
+                        {
+                            Edge firstFanEdge = Edge.Invalid,
+                                lastFanEdge = Edge.Invalid;
+                            for (int i = 0; i < loopCount; ++i)
+                            {
+                                int v0 = StartVertex(loopEdge);
+                                int v1 = EndVertex(loopEdge);
+                                Edge t = AllocateTriangle(v1, v0, newVertex);
+                                BindEdges(loopEdge, t);
+                                if (lastFanEdge.IsValid)
+                                    BindEdges(t.Next, lastFanEdge.Prev);
+                                else
+                                    firstFanEdge = t;
+
+                                lastFanEdge = t;
+                                loopEdge = newEdges[v1];
+                            }
+                            BindEdges(lastFanEdge.Prev, firstFanEdge.Next);
+                        }
                     }
                     break;
             }
@@ -725,7 +799,12 @@ namespace Unity.Physics
         struct CompareAreaDescending : IComparer<int>
         {
             public NativeArray<float> Areas;
-            public CompareAreaDescending(NativeArray<float> areas) { Areas = areas; }
+
+            public CompareAreaDescending(NativeArray<float> areas)
+            {
+                Areas = areas;
+            }
+
             public int Compare(int x, int y)
             {
                 return Areas[y].CompareTo(Areas[x]);
@@ -754,178 +833,204 @@ namespace Unity.Physics
                     break;
 
                 case 3:
-                {
-                    // Make a compact list of triangles and their areas
-                    NativeArray<int> triangleIndices = new NativeArray<int>(Triangles.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                    NativeArray<float> triangleAreas = new NativeArray<float>(Triangles.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                    int numTriangles = 0;
-                    foreach (int triangleIndex in Triangles.Indices)
                     {
-                        Triangle t = Triangles[triangleIndex];
-                        float3 o = Vertices[t.Vertex0].Position;
-                        float3 a = Vertices[t.Vertex1].Position - o;
-                        float3 b = Vertices[t.Vertex2].Position - o;
-                        triangleAreas[triangleIndex] = math.lengthsq(math.cross(a, b));
-                        triangleIndices[numTriangles++] = triangleIndex;
-                    }
+                        // Make a compact list of triangles and their areas
+                        NativeArray<int> triangleIndices = new NativeArray<int>(
+                            Triangles.PeakCount,
+                            Allocator.Temp,
+                            NativeArrayOptions.UninitializedMemory
+                        );
+                        NativeArray<float> triangleAreas = new NativeArray<float>(
+                            Triangles.PeakCount,
+                            Allocator.Temp,
+                            NativeArrayOptions.UninitializedMemory
+                        );
+                        int numTriangles = 0;
+                        foreach (int triangleIndex in Triangles.Indices)
+                        {
+                            Triangle t = Triangles[triangleIndex];
+                            float3 o = Vertices[t.Vertex0].Position;
+                            float3 a = Vertices[t.Vertex1].Position - o;
+                            float3 b = Vertices[t.Vertex2].Position - o;
+                            triangleAreas[triangleIndex] = math.lengthsq(math.cross(a, b));
+                            triangleIndices[numTriangles++] = triangleIndex;
+                        }
 
-                    // Sort the triangles by descending area. It is best to choose the face plane from the largest triangle
-                    // because 1) it minimizes the distance to other triangles and therefore the plane error, and 2) it avoids numerical
-                    // problems computing degenerate triangle normals
-                    triangleIndices.GetSubArray(0, numTriangles).Sort(new CompareAreaDescending(triangleAreas));
+                        // Sort the triangles by descending area. It is best to choose the face plane from the largest triangle
+                        // because 1) it minimizes the distance to other triangles and therefore the plane error, and 2) it avoids numerical
+                        // problems computing degenerate triangle normals
+                        triangleIndices.GetSubArray(0, numTriangles).Sort(new CompareAreaDescending(triangleAreas));
 
-                    // Clear faces
-                    NativeArray<Edge> boundaryEdges = new NativeArray<Edge>(Triangles.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                    for (int iTriangle = 0; iTriangle < numTriangles; iTriangle++)
-                    {
-                        int triangleIndex = triangleIndices[iTriangle];
-                        Triangle t = Triangles[triangleIndex];
+                        // Clear faces
+                        NativeArray<Edge> boundaryEdges = new NativeArray<Edge>(
+                            Triangles.PeakCount,
+                            Allocator.Temp,
+                            NativeArrayOptions.UninitializedMemory
+                        );
+                        for (int iTriangle = 0; iTriangle < numTriangles; iTriangle++)
+                        {
+                            int triangleIndex = triangleIndices[iTriangle];
+                            Triangle t = Triangles[triangleIndex];
                             t.FaceIndex = -1;
                             Triangles.Set(triangleIndex, t);
                         }
 
                         // Merge triangles into faces
                         for (int iTriangle = 0; iTriangle < numTriangles; iTriangle++)
-                    {
-                        // Check if the triangle is already part of a face
-                        int triangleIndex = triangleIndices[iTriangle];
-                        if (Triangles[triangleIndex].FaceIndex != -1)
                         {
-                            continue;
-                        }
+                            // Check if the triangle is already part of a face
+                            int triangleIndex = triangleIndices[iTriangle];
+                            if (Triangles[triangleIndex].FaceIndex != -1)
+                            {
+                                continue;
+                            }
 
-                        // Create a new face
-                        int newFaceIndex = NumFaces++;
-                        Triangle t = Triangles[triangleIndex];
+                            // Create a new face
+                            int newFaceIndex = NumFaces++;
+                            Triangle t = Triangles[triangleIndex];
                             t.FaceIndex = newFaceIndex;
                             Triangles.Set(triangleIndex, t);
 
-                        // Search for the plane that best fits the triangle
-                        int bestPlane = -1;
-                        if (planes != null)
-                        {
-                            float bestError = k_PlaneEps;
-                            float3 a = Vertices[t.Vertex0].Position;
-                            float3 b = Vertices[t.Vertex1].Position;
-                            float3 c = Vertices[t.Vertex2].Position;
-                            for (int i = 0; i < planes.Length; i++)
+                            // Search for the plane that best fits the triangle
+                            int bestPlane = -1;
+                            if (planes != null)
                             {
-                                if (planesUsed[i])
-                                        continue;
-                                Plane currentPlane = planes[i];
-                                float3 errors = new float3(currentPlane.SignedDistanceToPoint(a), currentPlane.SignedDistanceToPoint(b), currentPlane.SignedDistanceToPoint(c));
-                                float error = math.cmax(math.abs(errors));
-                                if (error < bestError)
+                                float bestError = k_PlaneEps;
+                                float3 a = Vertices[t.Vertex0].Position;
+                                float3 b = Vertices[t.Vertex1].Position;
+                                float3 c = Vertices[t.Vertex2].Position;
+                                for (int i = 0; i < planes.Length; i++)
                                 {
-                                    bestError = error;
-                                    bestPlane = i;
-                                }
+                                    if (planesUsed[i])
+                                        continue;
+                                    Plane currentPlane = planes[i];
+                                    float3 errors = new float3(
+                                        currentPlane.SignedDistanceToPoint(a),
+                                        currentPlane.SignedDistanceToPoint(b),
+                                        currentPlane.SignedDistanceToPoint(c)
+                                    );
+                                    float error = math.cmax(math.abs(errors));
+                                    if (error < bestError)
+                                    {
+                                        bestError = error;
+                                        bestPlane = i;
+                                    }
                                 }
                             }
 
                             // If a plane that fits the triangle was found, use it.  Otherwise compute one from the triangle vertices
                             Plane plane;
-                        if (bestPlane < 0)
-                        {
-                            plane = ComputePlane(triangleIndex);
-                        }
-                        else
-                        {
-                            planesUsed[bestPlane] = true;
-                            plane = planes[bestPlane];
-                        }
-                        Planes[newFaceIndex] = plane;
-
-                        // Search for neighboring triangles that can be added to the face
-                        boundaryEdges[0] = new Edge(triangleIndex, 0);
-                        boundaryEdges[1] = new Edge(triangleIndex, 1);
-                        boundaryEdges[2] = new Edge(triangleIndex, 2);
-                        int numBoundaryEdges = 3;
-                        while (true)
-                        {
-                            int openBoundaryEdgeIndex = -1;
-                            float maxArea = -1;
-
-                            for (int i = 0; i < numBoundaryEdges; ++i)
+                            if (bestPlane < 0)
                             {
-                                Edge edge = boundaryEdges[i];
-                                Edge linkedEdge = GetLinkedEdge(edge);
-
-                                int linkedTriangleIndex = linkedEdge.TriangleIndex;
-
-                                if (Triangles[linkedTriangleIndex].FaceIndex != -1)
-                                        continue;
-                                if (triangleAreas[linkedTriangleIndex] <= maxArea)
-                                        continue;
-
-                                int apex = ApexVertex(linkedEdge);
-                                float3 newVertex = Vertices[apex].Position;
-                                if (math.abs(plane.SignedDistanceToPoint(newVertex)) > k_PlaneEps)
-                                {
-                                    continue;
-                                }
-
-                                float3 linkedNormal = ComputePlane(linkedTriangleIndex).Normal;
-                                if (math.dot(plane.Normal, linkedNormal) < 0.0f)
-                                {
-                                    continue;
-                                }
-
-                                Plane p0 = PlaneFromTwoEdges(newVertex, newVertex - Vertices[StartVertex(edge)].Position, plane.Normal);
-                                Plane p1 = PlaneFromTwoEdges(newVertex, Vertices[EndVertex(edge)].Position - newVertex, plane.Normal);
-
-                                var accept = true;
-                                for (int j = 1; accept && j < (numBoundaryEdges - 1); ++j)
-                                {
-                                    float3 x = Vertices[EndVertex(boundaryEdges[(i + j) % numBoundaryEdges])].Position;
-                                    float d = math.max(Dotxyz1(p0, x), Dotxyz1(p1, x));
-                                    accept &= d < convexEps;
-                                }
-
-                                if (accept)
-                                {
-                                    openBoundaryEdgeIndex = i;
-                                    maxArea = triangleAreas[linkedTriangleIndex];
-                                }
-                                }
-
-                                if (openBoundaryEdgeIndex != -1)
-                            {
-                                Edge linkedEdge = GetLinkedEdge(boundaryEdges[openBoundaryEdgeIndex]);
-
-                                // Check if merge has made the shape 2D, if so then quit
-                                if (numBoundaryEdges >= boundaryEdges.Length)
-                                {
-                                    NumFaces = 3; // force 2D rebuild
-                                    break;
-                                }
-
-                                // Insert two edges in place of the open boundary edge
-                                for (int i = numBoundaryEdges; i > openBoundaryEdgeIndex; i--)
-                                {
-                                    boundaryEdges[i] = boundaryEdges[i - 1];
-                                }
-                                numBoundaryEdges++;
-                                boundaryEdges[openBoundaryEdgeIndex] = linkedEdge.Next;
-                                boundaryEdges[openBoundaryEdgeIndex + 1] = linkedEdge.Prev;
-
-                                Triangle tri = Triangles[linkedEdge.TriangleIndex];
-                                tri.FaceIndex = newFaceIndex;
-                                Triangles.Set(linkedEdge.TriangleIndex, tri);
+                                plane = ComputePlane(triangleIndex);
                             }
                             else
                             {
-                                break;
+                                planesUsed[bestPlane] = true;
+                                plane = planes[bestPlane];
                             }
+                            Planes[newFaceIndex] = plane;
+
+                            // Search for neighboring triangles that can be added to the face
+                            boundaryEdges[0] = new Edge(triangleIndex, 0);
+                            boundaryEdges[1] = new Edge(triangleIndex, 1);
+                            boundaryEdges[2] = new Edge(triangleIndex, 2);
+                            int numBoundaryEdges = 3;
+                            while (true)
+                            {
+                                int openBoundaryEdgeIndex = -1;
+                                float maxArea = -1;
+
+                                for (int i = 0; i < numBoundaryEdges; ++i)
+                                {
+                                    Edge edge = boundaryEdges[i];
+                                    Edge linkedEdge = GetLinkedEdge(edge);
+
+                                    int linkedTriangleIndex = linkedEdge.TriangleIndex;
+
+                                    if (Triangles[linkedTriangleIndex].FaceIndex != -1)
+                                        continue;
+                                    if (triangleAreas[linkedTriangleIndex] <= maxArea)
+                                        continue;
+
+                                    int apex = ApexVertex(linkedEdge);
+                                    float3 newVertex = Vertices[apex].Position;
+                                    if (math.abs(plane.SignedDistanceToPoint(newVertex)) > k_PlaneEps)
+                                    {
+                                        continue;
+                                    }
+
+                                    float3 linkedNormal = ComputePlane(linkedTriangleIndex).Normal;
+                                    if (math.dot(plane.Normal, linkedNormal) < 0.0f)
+                                    {
+                                        continue;
+                                    }
+
+                                    Plane p0 = PlaneFromTwoEdges(
+                                        newVertex,
+                                        newVertex - Vertices[StartVertex(edge)].Position,
+                                        plane.Normal
+                                    );
+                                    Plane p1 = PlaneFromTwoEdges(
+                                        newVertex,
+                                        Vertices[EndVertex(edge)].Position - newVertex,
+                                        plane.Normal
+                                    );
+
+                                    var accept = true;
+                                    for (int j = 1; accept && j < (numBoundaryEdges - 1); ++j)
+                                    {
+                                        float3 x = Vertices[
+                                            EndVertex(boundaryEdges[(i + j) % numBoundaryEdges])
+                                        ].Position;
+                                        float d = math.max(Dotxyz1(p0, x), Dotxyz1(p1, x));
+                                        accept &= d < convexEps;
+                                    }
+
+                                    if (accept)
+                                    {
+                                        openBoundaryEdgeIndex = i;
+                                        maxArea = triangleAreas[linkedTriangleIndex];
+                                    }
+                                }
+
+                                if (openBoundaryEdgeIndex != -1)
+                                {
+                                    Edge linkedEdge = GetLinkedEdge(boundaryEdges[openBoundaryEdgeIndex]);
+
+                                    // Check if merge has made the shape 2D, if so then quit
+                                    if (numBoundaryEdges >= boundaryEdges.Length)
+                                    {
+                                        NumFaces = 3; // force 2D rebuild
+                                        break;
+                                    }
+
+                                    // Insert two edges in place of the open boundary edge
+                                    for (int i = numBoundaryEdges; i > openBoundaryEdgeIndex; i--)
+                                    {
+                                        boundaryEdges[i] = boundaryEdges[i - 1];
+                                    }
+                                    numBoundaryEdges++;
+                                    boundaryEdges[openBoundaryEdgeIndex] = linkedEdge.Next;
+                                    boundaryEdges[openBoundaryEdgeIndex + 1] = linkedEdge.Prev;
+
+                                    Triangle tri = Triangles[linkedEdge.TriangleIndex];
+                                    tri.FaceIndex = newFaceIndex;
+                                    Triangles.Set(linkedEdge.TriangleIndex, tri);
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
                             NumFaceVertices += numBoundaryEdges;
                         }
 
                         // Triangle merging may turn 3D shapes into 2D, check for that case and reduce the dimension
                         if (NumFaces < 4)
-                    {
-                        Rebuild2D();
-                    }
+                        {
+                            Rebuild2D();
+                        }
                     }
                     break;
             }
@@ -996,8 +1101,16 @@ namespace Unity.Physics
         {
             const float toleranceSq = 1e-10f;
 
-            NativeArray<Vertex> newVertices = new NativeArray<Vertex>(Vertices.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            NativeArray<bool> removed = new NativeArray<bool>(Vertices.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<Vertex> newVertices = new NativeArray<Vertex>(
+                Vertices.PeakCount,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
+            NativeArray<bool> removed = new NativeArray<bool>(
+                Vertices.PeakCount,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             while (true)
             {
                 bool remove = false;
@@ -1038,9 +1151,15 @@ namespace Unity.Physics
                             // have nearly opposite face normals, so all of the points may be nearly coplanar but the vertex is not safe to remove
                             {
                                 Triangle triangle1 = Triangles[edge1.TriangleIndex];
-                                float3 v00 = Vertices[triangle0.Vertex0].Position, v01 = Vertices[triangle0.Vertex1].Position, v02 = Vertices[triangle0.Vertex2].Position;
-                                float3 v10 = Vertices[triangle1.Vertex0].Position, v11 = Vertices[triangle1.Vertex1].Position, v12 = Vertices[triangle1.Vertex2].Position;
-                                coplanar &= (math.dot(math.cross(v01 - v00, v02 - v00), math.cross(v11 - v10, v12 - v10)) >= 0);
+                                float3 v00 = Vertices[triangle0.Vertex0].Position,
+                                    v01 = Vertices[triangle0.Vertex1].Position,
+                                    v02 = Vertices[triangle0.Vertex2].Position;
+                                float3 v10 = Vertices[triangle1.Vertex0].Position,
+                                    v11 = Vertices[triangle1.Vertex1].Position,
+                                    v12 = Vertices[triangle1.Vertex2].Position;
+                                coplanar &= (
+                                    math.dot(math.cross(v01 - v00, v02 - v00), math.cross(v11 - v10, v12 - v10)) >= 0
+                                );
                             }
 
                             while (edge1.Value != firstEdge.Value && keep)
@@ -1058,12 +1177,13 @@ namespace Unity.Physics
                                     double dot = math.dot(edge0Vec, lineVec);
                                     double diffSq = edge0LengthSq * lineVecLengthSq - dot * dot;
                                     double scaledTolSq = toleranceSq * lineVecLengthSq;
-                                    keep &= (dot<0 || dot> lineVecLengthSq || diffSq > scaledTolSq);
+                                    keep &= (dot < 0 || dot > lineVecLengthSq || diffSq > scaledTolSq);
 
                                     Edge edge2 = GetLinkedEdge(edge1.Prev);
                                     if (edge2.Value != firstEdge.Value)
                                     {
-                                        int index2 = Triangles[edge2.TriangleIndex].GetVertex((edge2.EdgeIndex + 1) % 3);
+                                        int index2 = Triangles[edge2.TriangleIndex]
+                                            .GetVertex((edge2.EdgeIndex + 1) % 3);
                                         if (!removed[index2])
                                         {
                                             double3 v2 = Vertices[index2].Position;
@@ -1077,8 +1197,7 @@ namespace Unity.Physics
                             }
                         }
                         edge0 = GetLinkedEdge(edge0.Prev);
-                    }
-                    while (edge0.Value != firstEdge.Value && keep);
+                    } while (edge0.Value != firstEdge.Value && keep);
                     keep &= (!coplanar || anyRemoved);
 
                     removed[v] = !keep;
@@ -1207,7 +1326,8 @@ namespace Unity.Physics
                         new double4(matrix.c0.xyz, 0),
                         new double4(matrix.c1.xyz, 0),
                         new double4(matrix.c2.xyz, 0),
-                        new double4(matrix.c3.xyz, 1));
+                        new double4(matrix.c3.xyz, 1)
+                    );
                     double det = math.determinant(solveMatrix);
                     if (det < 1e-6f) // determinant should be positive, small values indicate fewer than three planes that are significantly distinct from each other
                     {
@@ -1226,7 +1346,7 @@ namespace Unity.Physics
                 VertexA = a,
                 VertexB = b,
                 Target = x.xyz,
-                Cost = cost
+                Cost = cost,
             };
         }
 
@@ -1257,12 +1377,20 @@ namespace Unity.Physics
 
             // Calculate initial error matrices
             NativeArray<Collapse> collapses = new NativeArray<Collapse>();
-            NativeArray<double4x4> matrices = new NativeArray<double4x4>(Vertices.PeakCount, Allocator.Temp, NativeArrayOptions.ClearMemory);
+            NativeArray<double4x4> matrices = new NativeArray<double4x4>(
+                Vertices.PeakCount,
+                Allocator.Temp,
+                NativeArrayOptions.ClearMemory
+            );
             int numVertices = 0;
             if (Dimension == 3)
             {
                 // Get an edge from each face
-                NativeArray<Edge> firstEdges = new NativeArray<Edge>(NumFaces, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                NativeArray<Edge> firstEdges = new NativeArray<Edge>(
+                    NumFaces,
+                    Allocator.Temp,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 for (FaceEdge faceEdge = GetFirstFace(); faceEdge.IsValid; faceEdge = GetNextFace(faceEdge))
                 {
                     int triangleIndex = faceEdge.Current.TriangleIndex;
@@ -1278,7 +1406,11 @@ namespace Unity.Physics
                     double4x4 faceMatrix = GetPlaneDistSqMatrix(plane);
 
                     // Add it to the error matrix of each vertex on the face
-                    for (FaceEdge edge = new FaceEdge { Start = firstEdges[i], Current = firstEdges[i] }; edge.IsValid; edge = GetNextFaceEdge(edge)) // For each edge of the current face
+                    for (
+                        FaceEdge edge = new FaceEdge { Start = firstEdges[i], Current = firstEdges[i] };
+                        edge.IsValid;
+                        edge = GetNextFaceEdge(edge)
+                    ) // For each edge of the current face
                     {
                         // Add the error matrix
                         int vertex0 = Triangles[edge.Current.TriangleIndex].GetVertex(edge.Current.EdgeIndex);
@@ -1304,21 +1436,33 @@ namespace Unity.Physics
                 }
 
                 // Allocate space for QEM
-                collapses = new NativeArray<Collapse>(Triangles.PeakCount * 3 / 2, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                collapses = new NativeArray<Collapse>(
+                    Triangles.PeakCount * 3 / 2,
+                    Allocator.Temp,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
             else
             {
                 // In 2D, the vertices are sorted and each one has two edge planes
                 for (int i = Vertices.PeakCount - 1, j = 0; j < Vertices.PeakCount; i = j, j++)
                 {
-                    float4 edgePlane = PlaneFromTwoEdges(Vertices[i].Position, Vertices[j].Position - Vertices[i].Position, ProjectionPlane.Normal);
+                    float4 edgePlane = PlaneFromTwoEdges(
+                        Vertices[i].Position,
+                        Vertices[j].Position - Vertices[i].Position,
+                        ProjectionPlane.Normal
+                    );
                     double4x4 edgeMatrix = GetPlaneDistSqMatrix(edgePlane);
                     matrices[i] += edgeMatrix;
                     matrices[j] += edgeMatrix;
                 }
 
                 numVertices = Vertices.PeakCount;
-                collapses = new NativeArray<Collapse>(Vertices.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                collapses = new NativeArray<Collapse>(
+                    Vertices.PeakCount,
+                    Allocator.Temp,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             // Write the original index of each vertex to its user data so that we can maintain its error matrix across rebuilds
@@ -1329,7 +1473,11 @@ namespace Unity.Physics
             }
 
             // Repeatedly simplify the hull until the count is less than maxVertices and there are no further changes that satisfy maxError
-            NativeArray<Vertex> newVertices = new NativeArray<Vertex>(numVertices, Allocator.Temp, NativeArrayOptions.UninitializedMemory); // Note, only Position and UserData are used
+            NativeArray<Vertex> newVertices = new NativeArray<Vertex>(
+                numVertices,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            ); // Note, only Position and UserData are used
             bool enforceMaxVertices = false;
             float maxCost = maxError * maxError;
             while (true)
@@ -1403,11 +1551,7 @@ namespace Unity.Physics
                     double4x4 combined = matrices[(int)matrixA] + matrices[(int)matrixB];
                     matrices[(int)matrixA] = combined;
 
-                    newVertices[numNewVertices++] = new Vertex
-                    {
-                        Position = collapse.Target,
-                        UserData = matrixA
-                    };
+                    newVertices[numNewVertices++] = new Vertex { Position = collapse.Target, UserData = matrixA };
                 }
 
                 // If nothing was collapsed, we're done
@@ -1549,10 +1693,23 @@ namespace Unity.Physics
                 else
                 {
                     float4x4 errorMatrix = new float4x4(
-                        m_SquareSums.x, m_ProductSums.x, m_ProductSums.z, m_Sums.x,
-                        m_ProductSums.x, m_SquareSums.y, m_ProductSums.y, m_Sums.y,
-                        m_ProductSums.z, m_ProductSums.y, m_SquareSums.z, m_Sums.z,
-                        m_Sums.x, m_Sums.y, m_Sums.z, m_Count);
+                        m_SquareSums.x,
+                        m_ProductSums.x,
+                        m_ProductSums.z,
+                        m_Sums.x,
+                        m_ProductSums.x,
+                        m_SquareSums.y,
+                        m_ProductSums.y,
+                        m_Sums.y,
+                        m_ProductSums.z,
+                        m_ProductSums.y,
+                        m_SquareSums.z,
+                        m_Sums.z,
+                        m_Sums.x,
+                        m_Sums.y,
+                        m_Sums.z,
+                        m_Count
+                    );
                     Cost = math.dot(math.mul(errorMatrix, Plane), Plane) * m_Weight;
                 }
 
@@ -1569,9 +1726,16 @@ namespace Unity.Physics
             {
                 // Calculate the plane with minimum sum of squares of distances to points in the set
                 double3x3 gram = new double3x3(
-                    count, sums.x, sums.y,
-                    sums.x, squareSums.x, productSums.x,
-                    sums.y, productSums.x, squareSums.y);
+                    count,
+                    sums.x,
+                    sums.y,
+                    sums.x,
+                    squareSums.x,
+                    productSums.x,
+                    sums.y,
+                    productSums.x,
+                    squareSums.y
+                );
                 if (math.determinant(gram) == 0) // check for singular gram matrix (unexpected, points should be from nondegenerate tris and so span at least 2 dimensions)
                 {
                     plane = new Plane(new float3(1, 0, 0), 0);
@@ -1601,7 +1765,13 @@ namespace Unity.Physics
         // Returns - the distance that the faces were moved in by shrinking
         // Merging and shrinking are combined into a single operation because both work on the planes of the hull and require vertices to be rebuilt
         // afterwards.  Rebuilding vertices is the slowest part of hull generation, so best to do it only once.
-        public float SimplifyFacesAndShrink(float simplificationTolerance, float minAngleBetweenFaces, float shrinkDistance, int maxFaces, int maxVertices)
+        public float SimplifyFacesAndShrink(
+            float simplificationTolerance,
+            float minAngleBetweenFaces,
+            float shrinkDistance,
+            int maxFaces,
+            int maxVertices
+        )
         {
             // Return if merging is not allowed and shrinking is off
             if (simplificationTolerance <= 0.0f && minAngleBetweenFaces <= 0.0f && shrinkDistance <= 0.0f)
@@ -1622,16 +1792,32 @@ namespace Unity.Physics
             // Make a copy of the planes that we can edit
             int numPlanes = NumFaces;
             int maxNumPlanes = numPlanes + Triangles.PeakCount;
-            NativeArray<Plane> planes = new NativeArray<Plane>(maxNumPlanes, Allocator.Temp, NativeArrayOptions.UninitializedMemory); // +Triangles.PeakCount to make room for edge planes
+            NativeArray<Plane> planes = new NativeArray<Plane>(
+                maxNumPlanes,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            ); // +Triangles.PeakCount to make room for edge planes
             for (int i = 0; i < numPlanes; i++)
             {
                 planes[i] = Planes[i];
             }
 
             // Find the boundary edges of each face
-            NativeArray<int> firstFaceEdgeIndex = new NativeArray<int>(numPlanes, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            NativeArray<int> numFaceEdges = new NativeArray<int>(numPlanes, Allocator.Temp, NativeArrayOptions.ClearMemory);
-            NativeArray<Edge> faceEdges = new NativeArray<Edge>(Triangles.PeakCount * 3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<int> firstFaceEdgeIndex = new NativeArray<int>(
+                numPlanes,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
+            NativeArray<int> numFaceEdges = new NativeArray<int>(
+                numPlanes,
+                Allocator.Temp,
+                NativeArrayOptions.ClearMemory
+            );
+            NativeArray<Edge> faceEdges = new NativeArray<Edge>(
+                Triangles.PeakCount * 3,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             int totalNumEdges = 0;
             foreach (int t in Triangles.Indices)
             {
@@ -1652,7 +1838,11 @@ namespace Unity.Physics
                     {
                         // Save all edges of the face
                         Edge edge = new Edge(t, i);
-                        for (FaceEdge faceEdge = new FaceEdge { Start = edge, Current = edge }; faceEdge.IsValid; faceEdge = GetNextFaceEdge(faceEdge))
+                        for (
+                            FaceEdge faceEdge = new FaceEdge { Start = edge, Current = edge };
+                            faceEdge.IsValid;
+                            faceEdge = GetNextFaceEdge(faceEdge)
+                        )
                         {
                             faceEdges[totalNumEdges++] = faceEdge.Current;
                         }
@@ -1663,7 +1853,11 @@ namespace Unity.Physics
             }
 
             // Build OLS data for each face, and calculate the minimum span of the hull among its plane normal directions
-            NativeArray<OLSData> olsData = new NativeArray<OLSData>(maxNumPlanes, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<OLSData> olsData = new NativeArray<OLSData>(
+                maxNumPlanes,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             float minSpan = float.MaxValue;
             for (int i = 0; i < numPlanes; i++)
             {
@@ -1718,8 +1912,16 @@ namespace Unity.Physics
             // could move a long distance).
             // Note -- no merges are built for edge planes, which means that they could introduce faces with an angle below minAngleBetweenFaces.
             // This should be rare and edge faces should be extremely thin, which makes it very unlikely for a body to come to rest on one and jitter.
-            NativeArray<FaceMerge> merges = new NativeArray<FaceMerge>(numPlanes * (numPlanes - 1), Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            NativeArray<Edge> edgePlanes = new NativeArray<Edge>(Triangles.PeakCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<FaceMerge> merges = new NativeArray<FaceMerge>(
+                numPlanes * (numPlanes - 1),
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
+            NativeArray<Edge> edgePlanes = new NativeArray<Edge>(
+                Triangles.PeakCount,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             int numMerges = 0;
             int numEdgePlanes = 0;
             for (int i = 0; i < numPlanes; i++)
@@ -1782,7 +1984,7 @@ namespace Unity.Physics
                             Face1 = neighborFaceIndex,
                             Cost = combined.Cost,
                             Plane = combined.Plane,
-                            SmallAngle = smallAngle
+                            SmallAngle = smallAngle,
                         };
                     }
                 }
@@ -1804,7 +2006,11 @@ namespace Unity.Physics
 
                 // Calculates the square of the distance that each vertex moves if all of its incident planes' are moved unit distance along their normals
                 float maxShiftSq = 1.0f;
-                NativeArray<int> planeIndices = new NativeArray<int>(numPlanes, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                NativeArray<int> planeIndices = new NativeArray<int>(
+                    numPlanes,
+                    Allocator.Temp,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 foreach (int iVertex in Vertices.Indices)
                 {
                     Edge vertexEdge = vertexEdges[iVertex];
@@ -1822,8 +2028,7 @@ namespace Unity.Physics
                             lastFaceIndex = faceIndex;
                         }
                         edge = GetLinkedEdge(edge).Next;
-                    }
-                    while (edge.Value != vertexEdge.Value);
+                    } while (edge.Value != vertexEdge.Value);
                     while (planeIndices[numPlaneIndices - 1] == planeIndices[0])
                     {
                         numPlaneIndices--; // first and last edge could be on different triangles on the same face
@@ -1847,7 +2052,8 @@ namespace Unity.Physics
                                 float3 dots = new float3(
                                     math.dot(iNormal, jNormal),
                                     math.dot(jNormal, kNormal),
-                                    math.dot(kNormal, iNormal));
+                                    math.dot(kNormal, iNormal)
+                                );
                                 if (math.any(dots < k_cosWideAngle))
                                 {
                                     // Calculate the movement of the planes' intersection with respect to the planes' shift
@@ -1876,7 +2082,11 @@ namespace Unity.Physics
             int numMerged = 0;
             int numOriginalPlanes = numPlanes;
             numPlanes += numEdgePlanes;
-            NativeArray<bool> removed = new NativeArray<bool>(numPlanes, Allocator.Temp, NativeArrayOptions.ClearMemory);
+            NativeArray<bool> removed = new NativeArray<bool>(
+                numPlanes,
+                Allocator.Temp,
+                NativeArrayOptions.ClearMemory
+            );
             while (true)
             {
                 while (numMerges > 0 && numPlanes > 4)
@@ -1971,7 +2181,12 @@ namespace Unity.Physics
                         }
 
                         // Calculate the new plane and cost
-                        float weight = 1.0f / math.max(float.Epsilon, SinAngleSq(planes[updateMerge.Face0].Normal, planes[updateMerge.Face1].Normal));
+                        float weight =
+                            1.0f
+                            / math.max(
+                                float.Epsilon,
+                                SinAngleSq(planes[updateMerge.Face0].Normal, planes[updateMerge.Face1].Normal)
+                            );
                         OLSData combined = olsData[updateMerge.Face0];
                         combined.Include(olsData[updateMerge.Face1], weight);
                         combined.Solve(planes[updateMerge.Face0].Normal, planes[updateMerge.Face1].Normal);
@@ -2019,7 +2234,7 @@ namespace Unity.Physics
                                 Face1 = j,
                                 Cost = combined.Cost,
                                 Plane = combined.Plane,
-                                SmallAngle = true
+                                SmallAngle = true,
                             };
                         }
                     }
@@ -2044,7 +2259,11 @@ namespace Unity.Physics
             }
 
             // Calculate cross products of all face pairs
-            NativeArray<float3> crosses = new NativeArray<float3>(numPlanes * (numPlanes - 1) / 2, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<float3> crosses = new NativeArray<float3>(
+                numPlanes * (numPlanes - 1) / 2,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             int crossIndex = 0;
             for (int i = 0; i < numPlanes - 1; i++)
             {
@@ -2058,7 +2277,8 @@ namespace Unity.Physics
                     // Get the line through the two planes and check if it intersects the domain.
                     // If not, then it has no intersections that will be kept and we can skip it in the n^4 loop.
                     float3 tangent0 = math.cross(plane0.Normal, cross);
-                    float3 point01 = point0 - tangent0 * plane1.SignedDistanceToPoint(point0) / math.dot(plane1.Normal, tangent0); // point on both plane0 and plane1
+                    float3 point01 =
+                        point0 - tangent0 * plane1.SignedDistanceToPoint(point0) / math.dot(plane1.Normal, tangent0); // point on both plane0 and plane1
                     float3 invCross = math.select(math.rcp(cross), math.sqrt(float.MaxValue), cross == float3.zero);
                     float3 tMin = (m_IntegerSpaceAabb.Min - point01) * invCross;
                     float3 tMax = (m_IntegerSpaceAabb.Max - point01) * invCross;
@@ -2080,7 +2300,11 @@ namespace Unity.Physics
             // Find all intersections of three planes.  Note, this is a very slow O(numPlanes^4) operation.
             // Intersections are calculated with double precision, otherwise points more than a couple meters from the origin can have error
             // above the tolerance for the inner loop.
-            NativeArray<float3> newVertices = new NativeArray<float3>(Vertices.PeakCount * 100, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<float3> newVertices = new NativeArray<float3>(
+                Vertices.PeakCount * 100,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
             int numNewVertices = 0;
             int indexMultiplier = 2 * numPlanes - 3;
             for (int i = 0; i < numPlanes - 2; i++)
@@ -2115,7 +2339,13 @@ namespace Unity.Physics
                                 continue;
                             }
                             double invDet = 1.0f / det;
-                            x = (float3)((planes[i].Distance * jkCross - planes[j].Distance * ikCross + planes[k].Distance * ijCross) * -invDet);
+                            x = (float3)(
+                                (
+                                    planes[i].Distance * jkCross
+                                    - planes[j].Distance * ikCross
+                                    + planes[k].Distance * ijCross
+                                ) * -invDet
+                            );
                         }
 
                         // Test if the point is inside of all of the other planes
@@ -2226,7 +2456,8 @@ namespace Unity.Physics
         /// Returns an edge's linked edge on the neighboring triangle.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Edge GetLinkedEdge(Edge edge) => edge.IsValid ? Triangles[edge.TriangleIndex].GetLink(edge.EdgeIndex) : edge;
+        public Edge GetLinkedEdge(Edge edge) =>
+            edge.IsValid ? Triangles[edge.TriangleIndex].GetLink(edge.EdgeIndex) : edge;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int StartVertex(Edge edge) => Triangles[edge.TriangleIndex].GetVertex(edge.EdgeIndex);
@@ -2341,62 +2572,71 @@ namespace Unity.Physics
                     mp.CenterOfMass = (Vertices[0].Position + Vertices[1].Position) * 0.5f;
                     break;
                 case 2:
-                {
-                    float3 offset = ComputeCentroid();
-                    for (int n = Vertices.PeakCount, i = n - 1, j = 0; j < n; i = j++)
                     {
-                        float w = math.length(math.cross(Vertices[i].Position - offset, Vertices[j].Position - offset));
-                        mp.CenterOfMass += (Vertices[i].Position + Vertices[j].Position + offset) * w;
-                        mp.SurfaceArea += w;
+                        float3 offset = ComputeCentroid();
+                        for (int n = Vertices.PeakCount, i = n - 1, j = 0; j < n; i = j++)
+                        {
+                            float w = math.length(
+                                math.cross(Vertices[i].Position - offset, Vertices[j].Position - offset)
+                            );
+                            mp.CenterOfMass += (Vertices[i].Position + Vertices[j].Position + offset) * w;
+                            mp.SurfaceArea += w;
+                        }
+                        mp.CenterOfMass /= mp.SurfaceArea * 3;
+                        mp.InertiaTensor = float3x3.identity; // <todo>
+                        mp.SurfaceArea *= 0.5f;
                     }
-                    mp.CenterOfMass /= mp.SurfaceArea * 3;
-                    mp.InertiaTensor = float3x3.identity; // <todo>
-                    mp.SurfaceArea *= 0.5f;
-                }
-                break;
+                    break;
                 case 3:
-                {
-                    float3 offset = ComputeCentroid();
-                    float* dets = stackalloc float[Triangles.Capacity];
-                    foreach (int i in Triangles.Indices)
                     {
-                        float3 v0 = Vertices[Triangles[i].Vertex0].Position - offset;
-                        float3 v1 = Vertices[Triangles[i].Vertex1].Position - offset;
-                        float3 v2 = Vertices[Triangles[i].Vertex2].Position - offset;
-                        float w = math.determinant(new float3x3(v0, v1, v2));
-                        mp.CenterOfMass += (v0 + v1 + v2) * w;
-                        mp.Volume += w;
-                        mp.SurfaceArea += math.length(math.cross(v1 - v0, v2 - v0));
-                        dets[i] = w;
+                        float3 offset = ComputeCentroid();
+                        float* dets = stackalloc float[Triangles.Capacity];
+                        foreach (int i in Triangles.Indices)
+                        {
+                            float3 v0 = Vertices[Triangles[i].Vertex0].Position - offset;
+                            float3 v1 = Vertices[Triangles[i].Vertex1].Position - offset;
+                            float3 v2 = Vertices[Triangles[i].Vertex2].Position - offset;
+                            float w = math.determinant(new float3x3(v0, v1, v2));
+                            mp.CenterOfMass += (v0 + v1 + v2) * w;
+                            mp.Volume += w;
+                            mp.SurfaceArea += math.length(math.cross(v1 - v0, v2 - v0));
+                            dets[i] = w;
+                        }
+
+                        mp.CenterOfMass = mp.CenterOfMass / (mp.Volume * 4) + offset;
+
+                        var diag = new float3(0);
+                        var offd = new float3(0);
+
+                        foreach (int i in Triangles.Indices)
+                        {
+                            float3 v0 = Vertices[Triangles[i].Vertex0].Position - mp.CenterOfMass;
+                            float3 v1 = Vertices[Triangles[i].Vertex1].Position - mp.CenterOfMass;
+                            float3 v2 = Vertices[Triangles[i].Vertex2].Position - mp.CenterOfMass;
+                            diag += (v0 * v1 + v1 * v2 + v2 * v0 + v0 * v0 + v1 * v1 + v2 * v2) * dets[i];
+                            offd +=
+                                (
+                                    v0.yzx * v1.zxy
+                                    + v1.yzx * v2.zxy
+                                    + v2.yzx * v0.zxy
+                                    + v0.yzx * v2.zxy
+                                    + v1.yzx * v0.zxy
+                                    + v2.yzx * v1.zxy
+                                    + (v0.yzx * v0.zxy + v1.yzx * v1.zxy + v2.yzx * v2.zxy) * 2
+                                ) * dets[i];
+                        }
+
+                        diag /= mp.Volume * 10f; /* (60 / 6)  */
+                        offd /= mp.Volume * 20f; /* (120 / 6) */
+
+                        mp.InertiaTensor.c0 = new float3(diag.y + diag.z, -offd.z, -offd.y);
+                        mp.InertiaTensor.c1 = new float3(-offd.z, diag.x + diag.z, -offd.x);
+                        mp.InertiaTensor.c2 = new float3(-offd.y, -offd.x, diag.x + diag.y);
+
+                        mp.SurfaceArea /= 2;
+                        mp.Volume /= 6;
                     }
-
-                    mp.CenterOfMass = mp.CenterOfMass / (mp.Volume * 4) + offset;
-
-                    var diag = new float3(0);
-                    var offd = new float3(0);
-
-                    foreach (int i in Triangles.Indices)
-                    {
-                        float3 v0 = Vertices[Triangles[i].Vertex0].Position - mp.CenterOfMass;
-                        float3 v1 = Vertices[Triangles[i].Vertex1].Position - mp.CenterOfMass;
-                        float3 v2 = Vertices[Triangles[i].Vertex2].Position - mp.CenterOfMass;
-                        diag += (v0 * v1 + v1 * v2 + v2 * v0 + v0 * v0 + v1 * v1 + v2 * v2) * dets[i];
-                        offd += (v0.yzx * v1.zxy + v1.yzx * v2.zxy + v2.yzx * v0.zxy +
-                            v0.yzx * v2.zxy + v1.yzx * v0.zxy + v2.yzx * v1.zxy +
-                            (v0.yzx * v0.zxy + v1.yzx * v1.zxy + v2.yzx * v2.zxy) * 2) * dets[i];
-                    }
-
-                    diag /= mp.Volume * 10f; /* (60 / 6)  */
-                    offd /= mp.Volume * 20f; /* (120 / 6) */
-
-                    mp.InertiaTensor.c0 = new float3(diag.y + diag.z, -offd.z, -offd.y);
-                    mp.InertiaTensor.c1 = new float3(-offd.z, diag.x + diag.z, -offd.x);
-                    mp.InertiaTensor.c2 = new float3(-offd.y, -offd.x, diag.x + diag.y);
-
-                    mp.SurfaceArea /= 2;
-                    mp.Volume /= 6;
-                }
-                break;
+                    break;
             }
 
             HullMassProperties = mp;
@@ -2431,7 +2671,12 @@ namespace Unity.Physics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Plane ComputePlane(int triangleIndex, bool fromIntCoordinates = true)
         {
-            return ComputePlane(Triangles[triangleIndex].Vertex0, Triangles[triangleIndex].Vertex1, Triangles[triangleIndex].Vertex2, fromIntCoordinates);
+            return ComputePlane(
+                Triangles[triangleIndex].Vertex0,
+                Triangles[triangleIndex].Vertex1,
+                Triangles[triangleIndex].Vertex2,
+                fromIntCoordinates
+            );
         }
 
         #endregion
@@ -2450,7 +2695,9 @@ namespace Unity.Physics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private long IntDet(int3 a, int3 b, int3 c, int3 d)
         {
-            int3 ab = b - a, ac = c - a, ad = d - a;
+            int3 ab = b - a,
+                ac = c - a,
+                ad = d - a;
             IntCross(ab, ac, out long kx, out long ky, out long kz);
             if (m_IntResolution == IntResolution.Low)
             {
@@ -2467,7 +2714,12 @@ namespace Unity.Physics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private long IntDet(int a, int b, int c, int d)
         {
-            return IntDet(Vertices[a].IntPosition, Vertices[b].IntPosition, Vertices[c].IntPosition, Vertices[d].IntPosition);
+            return IntDet(
+                Vertices[a].IntPosition,
+                Vertices[b].IntPosition,
+                Vertices[c].IntPosition,
+                Vertices[d].IntPosition
+            );
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2481,14 +2733,28 @@ namespace Unity.Physics
         public ConvexHullBuilder(
             NativeArray<float3> points,
             ConvexHullGenerationParameters generationParameters,
-            int maxVertices, int maxFaces, int maxFaceVertices,
+            int maxVertices,
+            int maxFaces,
+            int maxFaceVertices,
             out float convexRadius
         )
         {
             int verticesCapacity = math.max(maxVertices, points.Length);
-            var vertices = new NativeArray<Vertex>(verticesCapacity, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            var triangles = new NativeArray<Triangle>(verticesCapacity * 2, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            var planes = new NativeArray<Plane>(verticesCapacity * 2, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var vertices = new NativeArray<Vertex>(
+                verticesCapacity,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
+            var triangles = new NativeArray<Triangle>(
+                verticesCapacity * 2,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
+            var planes = new NativeArray<Plane>(
+                verticesCapacity * 2,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             var simplificationTolerance = generationParameters.SimplificationTolerance;
             var shrinkDistance = generationParameters.BevelRadius;
@@ -2502,9 +2768,15 @@ namespace Unity.Physics
             }
 
             // Build the initial hull
-            ConvexHullBuilder builder = new ConvexHullBuilder(vertices.Length, (Vertex*)vertices.GetUnsafePtr(),
-                (Triangle*)triangles.GetUnsafePtr(), (Plane*)planes.GetUnsafePtr(),
-                domain, simplificationTolerance, IntResolution.High);
+            ConvexHullBuilder builder = new ConvexHullBuilder(
+                vertices.Length,
+                (Vertex*)vertices.GetUnsafePtr(),
+                (Triangle*)triangles.GetUnsafePtr(),
+                (Plane*)planes.GetUnsafePtr(),
+                domain,
+                simplificationTolerance,
+                IntResolution.High
+            );
             for (int iPoint = 0; iPoint < points.Length; iPoint++)
             {
                 builder.AddPoint(points[iPoint]);
@@ -2537,17 +2809,39 @@ namespace Unity.Physics
                 allocateTempBuilder = true; // TEMP TESTING maxNumVertices > Vertices.Length;
                 if (allocateTempBuilder)
                 {
-                    tempVertices = new NativeArray<Vertex>(maxNumVertices, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                    tempTriangles = new NativeArray<Triangle>(maxNumVertices * 2, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                    tempPlanes = new NativeArray<Plane>(maxNumVertices * 2, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                    ConvexHullBuilder tempBuilder = new ConvexHullBuilder(maxNumVertices,
+                    tempVertices = new NativeArray<Vertex>(
+                        maxNumVertices,
+                        Allocator.Temp,
+                        NativeArrayOptions.UninitializedMemory
+                    );
+                    tempTriangles = new NativeArray<Triangle>(
+                        maxNumVertices * 2,
+                        Allocator.Temp,
+                        NativeArrayOptions.UninitializedMemory
+                    );
+                    tempPlanes = new NativeArray<Plane>(
+                        maxNumVertices * 2,
+                        Allocator.Temp,
+                        NativeArrayOptions.UninitializedMemory
+                    );
+                    ConvexHullBuilder tempBuilder = new ConvexHullBuilder(
+                        maxNumVertices,
                         (Vertex*)tempVertices.GetUnsafePtr(),
-                        (Triangle*)tempTriangles.GetUnsafePtr(), (Plane*)tempPlanes.GetUnsafePtr(), builder);
+                        (Triangle*)tempTriangles.GetUnsafePtr(),
+                        (Plane*)tempPlanes.GetUnsafePtr(),
+                        builder
+                    );
                     builder = tempBuilder;
                 }
 
                 // Merge faces
-                convexRadius = builder.SimplifyFacesAndShrink(simplificationTolerance / 2, minAngle, shrinkDistance, maxFaces, maxVertices);
+                convexRadius = builder.SimplifyFacesAndShrink(
+                    simplificationTolerance / 2,
+                    minAngle,
+                    shrinkDistance,
+                    maxFaces,
+                    maxVertices
+                );
             }
             else
             {
@@ -2561,11 +2855,18 @@ namespace Unity.Physics
             while (true)
             {
                 // Check if the face count is low enough, and in the 2D case, if the vertices per face is low enough
-                if (builder.NumFaces <= maxFaces && (builder.Dimension == 3 || builder.Vertices.PeakCount < maxFaceVertices))
+                if (
+                    builder.NumFaces <= maxFaces
+                    && (builder.Dimension == 3 || builder.Vertices.PeakCount < maxFaceVertices)
+                )
                 {
                     // Iterate over all faces to check if any have too many vertices
                     bool simplify = false;
-                    for (FaceEdge hullFace = builder.GetFirstFace(); hullFace.IsValid; hullFace = builder.GetNextFace(hullFace))
+                    for (
+                        FaceEdge hullFace = builder.GetFirstFace();
+                        hullFace.IsValid;
+                        hullFace = builder.GetNextFace(hullFace)
+                    )
                     {
                         int numFaceVertices = 0;
                         for (FaceEdge edge = hullFace; edge.IsValid; edge = builder.GetNextFaceEdge(edge))
@@ -2601,8 +2902,13 @@ namespace Unity.Physics
             {
                 // The vertex, triangle and face counts should now be within limits, so we can copy back to the original storage
                 builder.Compact();
-                ConvexHullBuilder tempBuilder = new ConvexHullBuilder(vertices.Length, (Vertex*)vertices.GetUnsafePtr(),
-                    (Triangle*)triangles.GetUnsafePtr(), (Plane*)planes.GetUnsafePtr(), builder);
+                ConvexHullBuilder tempBuilder = new ConvexHullBuilder(
+                    vertices.Length,
+                    (Vertex*)vertices.GetUnsafePtr(),
+                    (Triangle*)triangles.GetUnsafePtr(),
+                    (Plane*)planes.GetUnsafePtr(),
+                    builder
+                );
                 builder = tempBuilder;
             }
 
@@ -2620,15 +2926,27 @@ namespace Unity.Physics
         private NativeArray<Plane> m_Planes;
         public ConvexHullBuilder Builder;
 
-        public unsafe ConvexHullBuilderStorage(int verticesCapacity, Allocator allocator, Aabb domain, float simplificationTolerance, ConvexHullBuilder.IntResolution resolution)
+        public unsafe ConvexHullBuilderStorage(
+            int verticesCapacity,
+            Allocator allocator,
+            Aabb domain,
+            float simplificationTolerance,
+            ConvexHullBuilder.IntResolution resolution
+        )
         {
             int trianglesCapacity = 2 * verticesCapacity;
             m_Vertices = new NativeArray<ConvexHullBuilder.Vertex>(verticesCapacity, allocator);
             m_Triangles = new NativeArray<ConvexHullBuilder.Triangle>(trianglesCapacity, allocator);
             m_Planes = new NativeArray<Plane>(trianglesCapacity, allocator);
-            Builder = new ConvexHullBuilder(verticesCapacity, (ConvexHullBuilder.Vertex*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Vertices),
-                (ConvexHullBuilder.Triangle*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Triangles), (Plane*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Planes),
-                domain, simplificationTolerance, resolution);
+            Builder = new ConvexHullBuilder(
+                verticesCapacity,
+                (ConvexHullBuilder.Vertex*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Vertices),
+                (ConvexHullBuilder.Triangle*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Triangles),
+                (Plane*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Planes),
+                domain,
+                simplificationTolerance,
+                resolution
+            );
         }
 
         public unsafe ConvexHullBuilderStorage(int verticesCapacity, Allocator allocator, ref ConvexHullBuilder builder)
@@ -2636,8 +2954,13 @@ namespace Unity.Physics
             m_Vertices = new NativeArray<ConvexHullBuilder.Vertex>(verticesCapacity, allocator);
             m_Triangles = new NativeArray<ConvexHullBuilder.Triangle>(verticesCapacity * 2, allocator);
             m_Planes = new NativeArray<Plane>(verticesCapacity * 2, allocator);
-            Builder = new ConvexHullBuilder(verticesCapacity,  (ConvexHullBuilder.Vertex*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Vertices),
-                (ConvexHullBuilder.Triangle*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Triangles), (Plane*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Planes), builder);
+            Builder = new ConvexHullBuilder(
+                verticesCapacity,
+                (ConvexHullBuilder.Vertex*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Vertices),
+                (ConvexHullBuilder.Triangle*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Triangles),
+                (Plane*)NativeArrayUnsafeUtility.GetUnsafePtr(m_Planes),
+                builder
+            );
         }
 
         public void Dispose()
@@ -2672,35 +2995,27 @@ namespace Unity.Physics
 
         public static Int128 Zero => new Int128 { High = 0, Low = 0 };
 
-        public static Int128 operator+(Int128 a, Int128 b)
+        public static Int128 operator +(Int128 a, Int128 b)
         {
             ulong low = a.Low + b.Low;
             ulong high = a.High + b.High;
             if (low < a.Low)
                 high++;
-            return new Int128
-            {
-                Low = low,
-                High = high
-            };
+            return new Int128 { Low = low, High = high };
         }
 
-        public static Int128 operator-(Int128 a, Int128 b)
+        public static Int128 operator -(Int128 a, Int128 b)
         {
             return a + (-b);
         }
 
-        public static Int128 operator-(Int128 a)
+        public static Int128 operator -(Int128 a)
         {
             ulong low = ~a.Low + 1;
             ulong high = ~a.High;
             if (a.Low == 0)
                 high++;
-            return new Int128
-            {
-                Low = low,
-                High = high
-            };
+            return new Int128 { Low = low, High = high };
         }
 
         public static Int128 Mul(long x, int y)
@@ -2712,11 +3027,7 @@ namespace Unity.Physics
             ulong low = (highProduct << 32) + lowProduct;
             ulong carry = ((highProduct & k_Low32) + (lowProduct >> 32)) >> 32;
             ulong high = ((highProduct >> 32) & k_Low32) + carry;
-            Int128 product = new Int128
-            {
-                Low = low,
-                High = high
-            };
+            Int128 product = new Int128 { Low = low, High = high };
             if (x < 0 ^ y < 0)
             {
                 product = -product;
@@ -2743,11 +3054,7 @@ namespace Unity.Physics
             ulong carry = ((lolo >> 32) + (lohi & k_Low32) + (hilo & k_Low32)) >> 32;
             ulong high = hihi + (lohi >> 32) + (hilo >> 32) + carry;
 
-            Int128 product = new Int128
-            {
-                Low = low,
-                High = high
-            };
+            Int128 product = new Int128 { Low = low, High = high };
             if (x < 0 ^ y < 0)
             {
                 product = -product;

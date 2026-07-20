@@ -6,7 +6,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
     static class CreateCanvasShaderGraph
     {
-        [MenuItem("Assets/Create/Shader Graph/URP/Canvas Shader Graph", priority = CoreUtils.Sections.section5 + CoreUtils.Priorities.assetsCreateShaderMenuPriority)]
+        [MenuItem(
+            "Assets/Create/Shader Graph/URP/Canvas Shader Graph",
+            priority = CoreUtils.Sections.section5 + CoreUtils.Priorities.assetsCreateShaderMenuPriority
+        )]
         public static void CreateCanvasGraph()
         {
             var target = (UniversalTarget)Activator.CreateInstance(typeof(UniversalTarget));

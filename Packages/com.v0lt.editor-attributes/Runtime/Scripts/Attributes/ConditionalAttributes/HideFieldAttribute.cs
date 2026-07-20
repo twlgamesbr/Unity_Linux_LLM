@@ -14,13 +14,15 @@ namespace EditorAttributes
         /// Attribute to hide a field based on a condition
         /// </summary>
         /// <param name="conditionName">The name of the condition to evaluate</param>
-        public HideFieldAttribute(string conditionName) : base(true) => ConditionName = conditionName;
+        public HideFieldAttribute(string conditionName)
+            : base(true) => ConditionName = conditionName;
 
         /// <summary>
         /// Attribute to hide a field based on a condition
         /// </summary>
         /// <param name="conditionName">The name of the condition to evaluate</param>
         /// <param name="enumValue">The value of the enum</param>
-        public HideFieldAttribute(string conditionName, object enumValue) : this(conditionName) => EnumValue = (int)enumValue;
+        public HideFieldAttribute(string conditionName, object enumValue)
+            : this(conditionName) => EnumValue = (int)enumValue;
     }
 }

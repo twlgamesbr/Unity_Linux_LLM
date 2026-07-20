@@ -15,7 +15,7 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 #if UTP_TRANSPORT_2_0_ABOVE && UNITY_NETCODE_GAMEOBJECTS_1_1_ABOVE
         public bool IsAvailable => true;
         public string AvailabilityMessage => "Available";
-        
+
         public void Open()
         {
             InteractedAnalyticHelper.Send(Name);
@@ -26,7 +26,9 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
         }
 #else
         public bool IsAvailable => false;
-        public string AvailabilityMessage => "Network Simulator is only available with Unity 2022.2+, Unity Transport 2.0+ and with Netcode for GameObjects 1.1+";
+        public string AvailabilityMessage =>
+            "Network Simulator is only available with Unity 2022.2+, Unity Transport 2.0+ and with Netcode for GameObjects 1.1+";
+
         public void Open() => throw new NotImplementedException();
 #endif
     }

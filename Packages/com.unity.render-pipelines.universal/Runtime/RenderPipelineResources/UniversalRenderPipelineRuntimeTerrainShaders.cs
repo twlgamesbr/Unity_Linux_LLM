@@ -38,7 +38,9 @@ namespace UnityEngine.Rendering.Universal
     [Categorization.CategoryInfo(Name = "R: Runtime Shaders", Order = 1000), HideInInspector]
     public class UniversalRenderPipelineRuntimeTerrainShaders : IRenderPipelineResources
     {
-        [SerializeField][HideInInspector] private int m_Version = 0;
+        [SerializeField]
+        [HideInInspector]
+        private int m_Version = 0;
 
         /// <summary>The current version of the resource container. Used only for upgrading a project.</summary>
         public int version => m_Version;

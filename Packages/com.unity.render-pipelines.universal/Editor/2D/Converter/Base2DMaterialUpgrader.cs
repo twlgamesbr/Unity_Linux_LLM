@@ -15,9 +15,9 @@ namespace UnityEditor.Rendering.Universal
 
         public struct MaterialConversionInfo
         {
-            private Material  m_OldMaterial;
-            private Material  m_NewMaterial;
-            private string    m_OldMaterialId;
+            private Material m_OldMaterial;
+            private Material m_NewMaterial;
+            private string m_OldMaterialId;
 
             public Material oldMaterial => m_OldMaterial;
             public Material newMaterial => m_NewMaterial;
@@ -36,9 +36,10 @@ namespace UnityEditor.Rendering.Universal
             public Shader oldShader;
             public Shader newShader;
         }
+
         List<string> m_AssetsToConvert = new List<string>();
 
-        MaterialConversionInfo[] m_MaterialConversionInfo;        
+        MaterialConversionInfo[] m_MaterialConversionInfo;
 
         public Material GetSpriteDefaultMaterial()
         {
@@ -52,10 +53,9 @@ namespace UnityEditor.Rendering.Universal
 
         public abstract MaterialConversionInfo[] InitializeMaterialConversionInfo();
 
-
         Material ReplaceMaterial(Material currentMaterial)
         {
-            foreach(MaterialConversionInfo info in m_MaterialConversionInfo)
+            foreach (MaterialConversionInfo info in m_MaterialConversionInfo)
             {
                 if (currentMaterial == info.oldMaterial)
                     return info.newMaterial;
@@ -126,14 +126,18 @@ namespace UnityEditor.Rendering.Universal
 
             foreach (string path in allAssetPaths)
             {
-                if (URP2DConverterUtility.IsPSB(path) ||  URP2DConverterUtility.IsMaterialPath(path, allShaderConversionIds) || URP2DConverterUtility.IsPrefabOrScenePath(path, allMaterialConversionIds))
+                if (
+                    URP2DConverterUtility.IsPSB(path)
+                    || URP2DConverterUtility.IsMaterialPath(path, allShaderConversionIds)
+                    || URP2DConverterUtility.IsPrefabOrScenePath(path, allMaterialConversionIds)
+                )
                 {
                     ConverterItemDescriptor desc = new ConverterItemDescriptor()
                     {
                         name = Path.GetFileNameWithoutExtension(path),
                         info = path,
                         warningMessage = String.Empty,
-                        helpLink = String.Empty
+                        helpLink = String.Empty,
                     };
 
                     // Each converter needs to add this info using this API.

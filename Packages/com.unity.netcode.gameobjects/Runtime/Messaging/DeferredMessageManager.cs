@@ -13,6 +13,7 @@ namespace Unity.Netcode
             public float Timestamp;
             public int SerializedHeaderSize;
         }
+
         protected struct TriggerInfo
         {
             public string MessageType;
@@ -20,7 +21,10 @@ namespace Unity.Netcode
             public NativeList<TriggerData> TriggerData;
         }
 
-        protected readonly Dictionary<IDeferredNetworkMessageManager.TriggerType, Dictionary<ulong, TriggerInfo>> m_Triggers = new Dictionary<IDeferredNetworkMessageManager.TriggerType, Dictionary<ulong, TriggerInfo>>();
+        protected readonly Dictionary<
+            IDeferredNetworkMessageManager.TriggerType,
+            Dictionary<ulong, TriggerInfo>
+        > m_Triggers = new Dictionary<IDeferredNetworkMessageManager.TriggerType, Dictionary<ulong, TriggerInfo>>();
 
         private readonly NetworkManager m_NetworkManager;
 
@@ -37,7 +41,13 @@ namespace Unity.Netcode
         /// There is a one second maximum lifetime of triggers to avoid memory leaks. After one second has passed
         /// without the requested object ID being spawned, the triggers for it are automatically deleted.
         /// </summary>
-        public virtual unsafe void DeferMessage(IDeferredNetworkMessageManager.TriggerType trigger, ulong key, FastBufferReader reader, ref NetworkContext context, string messageType)
+        public virtual unsafe void DeferMessage(
+            IDeferredNetworkMessageManager.TriggerType trigger,
+            ulong key,
+            FastBufferReader reader,
+            ref NetworkContext context,
+            string messageType
+        )
         {
             if (!m_Triggers.TryGetValue(trigger, out var triggers))
             {
@@ -50,20 +60,24 @@ namespace Unity.Netcode
                 triggerInfo = new TriggerInfo
                 {
                     MessageType = messageType,
-                    Expiry = m_NetworkManager.RealTimeProvider.RealTimeSinceStartup + m_NetworkManager.NetworkConfig.SpawnTimeout,
-                    TriggerData = new NativeList<TriggerData>(Allocator.Persistent)
+                    Expiry =
+                        m_NetworkManager.RealTimeProvider.RealTimeSinceStartup
+                        + m_NetworkManager.NetworkConfig.SpawnTimeout,
+                    TriggerData = new NativeList<TriggerData>(Allocator.Persistent),
                 };
                 triggers[key] = triggerInfo;
             }
 
-            triggerInfo.TriggerData.Add(new TriggerData
-            {
-                Reader = new FastBufferReader(reader.GetUnsafePtr(), Allocator.Persistent, reader.Length),
-                Header = context.Header,
-                Timestamp = context.Timestamp,
-                SenderId = context.SenderId,
-                SerializedHeaderSize = context.SerializedHeaderSize
-            });
+            triggerInfo.TriggerData.Add(
+                new TriggerData
+                {
+                    Reader = new FastBufferReader(reader.GetUnsafePtr(), Allocator.Persistent, reader.Length),
+                    Header = context.Header,
+                    Timestamp = context.Timestamp,
+                    SenderId = context.SenderId,
+                    SerializedHeaderSize = context.SerializedHeaderSize,
+                }
+            );
         }
 
         /// <summary>
@@ -96,12 +110,18 @@ namespace Unity.Netcode
         /// Used for testing purposes
         /// </summary>
         internal static bool IncludeMessageType = true;
+
 #if UNITY_EDITOR
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStaticsOnLoad() => IncludeMessageType = true;
 #endif
 
-        private string GetWarningMessage(IDeferredNetworkMessageManager.TriggerType triggerType, ulong key, TriggerInfo triggerInfo, float spawnTimeout)
+        private string GetWarningMessage(
+            IDeferredNetworkMessageManager.TriggerType triggerType,
+            ulong key,
+            TriggerInfo triggerInfo,
+            float spawnTimeout
+        )
         {
             if (IncludeMessageType)
             {
@@ -113,12 +133,18 @@ namespace Unity.Netcode
             }
         }
 
-        protected virtual void PurgeTrigger(IDeferredNetworkMessageManager.TriggerType triggerType, ulong key, TriggerInfo triggerInfo)
+        protected virtual void PurgeTrigger(
+            IDeferredNetworkMessageManager.TriggerType triggerType,
+            ulong key,
+            TriggerInfo triggerInfo
+        )
         {
             var logLevel = m_NetworkManager.DistributedAuthorityMode ? LogLevel.Developer : LogLevel.Normal;
             if (NetworkLog.CurrentLogLevel <= logLevel)
             {
-                NetworkLog.LogWarning(GetWarningMessage(triggerType, key, triggerInfo, m_NetworkManager.NetworkConfig.SpawnTimeout));
+                NetworkLog.LogWarning(
+                    GetWarningMessage(triggerType, key, triggerInfo, m_NetworkManager.NetworkConfig.SpawnTimeout)
+                );
             }
 
             foreach (var data in triggerInfo.TriggerData)
@@ -141,7 +167,13 @@ namespace Unity.Netcode
                     foreach (var deferredMessage in triggerInfo.TriggerData)
                     {
                         // Reader will be disposed within HandleMessage
-                        m_NetworkManager.ConnectionManager.MessageManager.HandleMessage(deferredMessage.Header, deferredMessage.Reader, deferredMessage.SenderId, deferredMessage.Timestamp, deferredMessage.SerializedHeaderSize);
+                        m_NetworkManager.ConnectionManager.MessageManager.HandleMessage(
+                            deferredMessage.Header,
+                            deferredMessage.Reader,
+                            deferredMessage.SenderId,
+                            deferredMessage.Timestamp,
+                            deferredMessage.SerializedHeaderSize
+                        );
                     }
 
                     triggerInfo.TriggerData.Dispose();

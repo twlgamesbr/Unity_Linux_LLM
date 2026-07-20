@@ -39,7 +39,10 @@ namespace UnityEngine.Rendering.Universal
         internal bool Update(UniversalCameraData cameraData)
         {
             STP.HistoryUpdateInfo info;
-            info.preUpscaleSize = new Vector2Int(cameraData.cameraTargetDescriptor.width, cameraData.cameraTargetDescriptor.height);
+            info.preUpscaleSize = new Vector2Int(
+                cameraData.cameraTargetDescriptor.width,
+                cameraData.cameraTargetDescriptor.height
+            );
             info.postUpscaleSize = new Vector2Int(cameraData.pixelWidth, cameraData.pixelHeight);
             info.useHwDrs = false;
             info.useTexArray = cameraData.xr.enabled && cameraData.xr.singlePassEnabled;

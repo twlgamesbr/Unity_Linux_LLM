@@ -32,7 +32,14 @@ namespace Unity.Netcode
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private protected override float SmoothDamp(float current, float target, ref float rateOfChange, float duration, float deltaTime, float maxSpeed = float.PositiveInfinity)
+        private protected override float SmoothDamp(
+            float current,
+            float target,
+            ref float rateOfChange,
+            float duration,
+            float deltaTime,
+            float maxSpeed = float.PositiveInfinity
+        )
         {
             return Mathf.SmoothDamp(current, target, ref rateOfChange, duration, maxSpeed, deltaTime);
         }

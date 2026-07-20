@@ -1,14 +1,14 @@
 using System;
 using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Unity.Collections
 {
@@ -157,7 +157,7 @@ namespace Unity.Collections
 
             var ptrAsNuint = (nuint)ptr;
             var alignmentAsNuint = (nuint)alignmentPowerOfTwo;
-            return (void*)( (ptrAsNuint + alignmentAsNuint - 1) & ~(alignmentAsNuint - 1) );
+            return (void*)((ptrAsNuint + alignmentAsNuint - 1) & ~(alignmentAsNuint - 1));
         }
 
         /// <summary>
@@ -225,10 +225,11 @@ namespace Unity.Collections
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var field in fields)
             {
-                Console.WriteLine("   {0, 6} | {1, 6} | {2}"
-                    , Marshal.OffsetOf(type, field.Name)
-                    , Marshal.SizeOf(field.FieldType)
-                    , field.Name
+                Console.WriteLine(
+                    "   {0, 6} | {1, 6} | {2}",
+                    Marshal.OffsetOf(type, field.Name),
+                    Marshal.SizeOf(field.FieldType),
+                    field.Name
                 );
             }
         }
@@ -253,7 +254,10 @@ namespace Unity.Collections
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", GenericTypeArguments = new[] { typeof(NativeArray<int>) })]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            GenericTypeArguments = new[] { typeof(NativeArray<int>) }
+        )]
         internal static void CheckIsUnmanaged<T>()
         {
             if (!UnsafeUtility.IsUnmanaged<T>())
@@ -263,7 +267,10 @@ namespace Unity.Collections
         }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", GenericTypeArguments = new[] { typeof(NativeArray<int>) })]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            GenericTypeArguments = new[] { typeof(NativeArray<int>) }
+        )]
         internal static void InitNativeContainer<T>(AtomicSafetyHandle handle)
         {
             if (UnsafeUtility.IsNativeContainerType<T>())
@@ -310,7 +317,9 @@ namespace Unity.Collections
                 throw new ArgumentException($"Capacity {capacity} value too large. Maximum capacity is {maxCapacity}.");
 
             if (capacity < length)
-                throw new ArgumentOutOfRangeException($"Capacity {capacity} is out of range in container of '{length}' Length.");
+                throw new ArgumentOutOfRangeException(
+                    $"Capacity {capacity} is out of range in container of '{length}' Length."
+                );
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
@@ -328,8 +337,14 @@ namespace Unity.Collections
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Options for allocation, such as whether to clear the memory.</param>
         /// <returns>Returns the NativeArray that was created.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(AllocatorManager.AllocatorHandle) })]
-        public static NativeArray<T> CreateNativeArray<T, U>(int length, ref U allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(int), typeof(AllocatorManager.AllocatorHandle) }
+        )]
+        public static NativeArray<T> CreateNativeArray<T, U>(
+            int length,
+            ref U allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
             where T : unmanaged
             where U : unmanaged, AllocatorManager.IAllocator
         {
@@ -355,11 +370,15 @@ namespace Unity.Collections
         /// <param name="options">Options for allocation, such as whether to clear the memory.</param>
         /// <returns>Returns the NativeArray that was created.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public static NativeArray<T> CreateNativeArray<T>(int length, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public static NativeArray<T> CreateNativeArray<T>(
+            int length,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
             where T : unmanaged
         {
             NativeArray<T> nativeArray;
-            if(!AllocatorManager.IsCustomAllocator(allocator))
+            if (!AllocatorManager.IsCustomAllocator(allocator))
             {
                 nativeArray = new NativeArray<T>(length, allocator.ToAllocator, options);
             }
@@ -379,7 +398,10 @@ namespace Unity.Collections
         /// <param name="allocator">The AllocatorHandle to use.</param>
         /// <returns>Returns the NativeArray that was created.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public static NativeArray<T> CreateNativeArray<T>(NativeArray<T> array, AllocatorManager.AllocatorHandle allocator)
+        public static NativeArray<T> CreateNativeArray<T>(
+            NativeArray<T> array,
+            AllocatorManager.AllocatorHandle allocator
+        )
             where T : unmanaged
         {
             NativeArray<T> nativeArray;
@@ -474,7 +496,8 @@ namespace Unity.Collections
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        static void CheckConvertArguments<T>(int length) where T : unmanaged
+        static void CheckConvertArguments<T>(int length)
+            where T : unmanaged
         {
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length), "Length must be >= 0");
@@ -482,7 +505,8 @@ namespace Unity.Collections
             if (!UnsafeUtility.IsUnmanaged<T>())
             {
                 throw new InvalidOperationException(
-                    $"{typeof(T)} used in NativeArray<{typeof(T)}> must be unmanaged (contain no managed types).");
+                    $"{typeof(T)} used in NativeArray<{typeof(T)}> must be unmanaged (contain no managed types)."
+                );
             }
         }
 
@@ -509,7 +533,12 @@ namespace Unity.Collections
         /// <returns>Returns the NativeArray that was created.</returns>
         /// <remarks>The caller is still the owner of the data.</remarks>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public static unsafe NativeArray<T> ConvertExistingDataToNativeArray<T>(void* dataPointer, int length, AllocatorManager.AllocatorHandle allocator, bool setTempMemoryHandle = false)
+        public static unsafe NativeArray<T> ConvertExistingDataToNativeArray<T>(
+            void* dataPointer,
+            int length,
+            AllocatorManager.AllocatorHandle allocator,
+            bool setTempMemoryHandle = false
+        )
             where T : unmanaged
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
@@ -533,7 +562,10 @@ namespace Unity.Collections
             nativeArray.m_MaxIndex = length - 1;
             if (setTempMemoryHandle)
             {
-                NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref nativeArray, AtomicSafetyHandle.GetTempMemoryHandle());
+                NativeArrayUnsafeUtility.SetAtomicSafetyHandle(
+                    ref nativeArray,
+                    AtomicSafetyHandle.GetTempMemoryHandle()
+                );
             }
 #endif
             return nativeArray;
@@ -553,10 +585,18 @@ namespace Unity.Collections
         /// Users need to manually free the list header to avoid memory leaks, for example after convertion call,
         /// AllocatorManager.Free(allocator, nativeList.m_ListData); </remarks>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public static unsafe NativeArray<T> ConvertExistingNativeListToNativeArray<T>(ref NativeList<T> nativeList, int length, AllocatorManager.AllocatorHandle allocator)
+        public static unsafe NativeArray<T> ConvertExistingNativeListToNativeArray<T>(
+            ref NativeList<T> nativeList,
+            int length,
+            AllocatorManager.AllocatorHandle allocator
+        )
             where T : unmanaged
         {
-            NativeArray<T> nativeArray = ConvertExistingDataToNativeArray<T>(nativeList.GetUnsafePtr(), length, allocator);
+            NativeArray<T> nativeArray = ConvertExistingDataToNativeArray<T>(
+                nativeList.GetUnsafePtr(),
+                length,
+                allocator
+            );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandle = NativeListUnsafeUtility.GetAtomicSafetyHandle(ref nativeList);
@@ -567,7 +607,11 @@ namespace Unity.Collections
         }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) }, RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(int) },
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+        )]
         internal static AtomicSafetyHandle GetNativeArraySafetyHandle<T>(ref NativeArray<T> nativeArray)
             where T : unmanaged
         {
@@ -584,8 +628,13 @@ namespace Unity.Collections
         /// <param name="length">The desired capacity of the NativeParallelMultiHashMap.</param>
         /// <param name="allocator">The Allocator to use.</param>
         /// <returns>Returns the NativeParallelMultiHashMap that was created.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int), typeof(AllocatorManager.AllocatorHandle) })]
-        public static NativeParallelMultiHashMap<TKey, TValue> CreateNativeParallelMultiHashMap<TKey, TValue, U>(int length, ref U allocator)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(int), typeof(int), typeof(AllocatorManager.AllocatorHandle) }
+        )]
+        public static NativeParallelMultiHashMap<TKey, TValue> CreateNativeParallelMultiHashMap<TKey, TValue, U>(
+            int length,
+            ref U allocator
+        )
             where TKey : unmanaged, IEquatable<TKey>
             where TValue : unmanaged
             where U : unmanaged, AllocatorManager.IAllocator
@@ -604,9 +653,7 @@ namespace Unity.Collections
             /// <summary>
             /// Empty job execute function used for Burst compilation testing
             /// </summary>
-            public void Execute()
-            {
-            }
+            public void Execute() { }
         }
 
         /// <summary>
@@ -615,8 +662,10 @@ namespace Unity.Collections
         /// <remarks>This should be called before instantiating JobsUtility.JobScheduleParameters in order to report to the user if they need to take action.</remarks>
         /// <param name="reflectionData">The reflection data pointer.</param>
         /// <typeparam name="T">Job type</typeparam>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
-            GenericTypeArguments = new[] { typeof(DummyJob) })]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            GenericTypeArguments = new[] { typeof(DummyJob) }
+        )]
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         public static void CheckReflectionDataCorrect<T>(IntPtr reflectionData)
         {
@@ -624,7 +673,9 @@ namespace Unity.Collections
             bool burstCompiled = true;
             CheckReflectionDataCorrectInternal<T>(reflectionData, ref burstCompiled);
             if (burstCompiled && reflectionData == IntPtr.Zero)
-                throw new InvalidOperationException("Reflection data was not set up by an Initialize() call. For generic job types, please include [assembly: RegisterGenericJobType(typeof(MyJob<MyJobSpecialization>))] in your source file.");
+                throw new InvalidOperationException(
+                    "Reflection data was not set up by an Initialize() call. For generic job types, please include [assembly: RegisterGenericJobType(typeof(MyJob<MyJobSpecialization>))] in your source file."
+                );
 #endif
         }
 
@@ -642,7 +693,9 @@ namespace Unity.Collections
                 return AtomicSafetyHandle.Create();
             }
 
-            return (allocator.ToAllocator == Allocator.Temp) ? AtomicSafetyHandle.GetTempMemoryHandle() : AtomicSafetyHandle.Create();
+            return (allocator.ToAllocator == Allocator.Temp)
+                ? AtomicSafetyHandle.GetTempMemoryHandle()
+                : AtomicSafetyHandle.Create();
         }
 
         /// <summary>
@@ -682,7 +735,10 @@ namespace Unity.Collections
         /// <typeparam name="T">Type of container safety handle refers to.</typeparam>
         /// <param name="handle">Safety handle.</param>
         /// <param name="sharedStaticId">The static safety ID to associate with the provided handle. This ID must have been allocated with ::ref::NewStaticSafetyId.</param>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", GenericTypeArguments = new[] { typeof(NativeArray<int>) })]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            GenericTypeArguments = new[] { typeof(NativeArray<int>) }
+        )]
         public static void SetStaticSafetyId<T>(ref AtomicSafetyHandle handle, ref int sharedStaticId)
         {
             if (sharedStaticId == 0)
@@ -705,7 +761,11 @@ namespace Unity.Collections
         /// <param name="sharedStaticId">The static safety ID to associate with the provided handle. This ID must have been allocated with ::ref::NewStaticSafetyId.</param>
         /// <param name="name">The name of the resource type.</param>
         [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS")]
-        public static unsafe void SetStaticSafetyId(ref AtomicSafetyHandle handle, ref int sharedStaticId, FixedString512Bytes name)
+        public static unsafe void SetStaticSafetyId(
+            ref AtomicSafetyHandle handle,
+            ref int sharedStaticId,
+            FixedString512Bytes name
+        )
         {
             if (sharedStaticId == 0)
             {
@@ -715,12 +775,15 @@ namespace Unity.Collections
             AtomicSafetyHandle.SetStaticSafetyId(ref handle, sharedStaticId);
         }
 #endif
+
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         [BurstDiscard]
         static void CheckReflectionDataCorrectInternal<T>(IntPtr reflectionData, ref bool burstCompiled)
         {
             if (reflectionData == IntPtr.Zero)
-                throw new InvalidOperationException($"Reflection data was not set up by an Initialize() call. For generic job types, please include [assembly: RegisterGenericJobType(typeof({typeof(T)}))] in your source file.");
+                throw new InvalidOperationException(
+                    $"Reflection data was not set up by an Initialize() call. For generic job types, please include [assembly: RegisterGenericJobType(typeof({typeof(T)}))] in your source file."
+                );
             burstCompiled = false;
         }
     }

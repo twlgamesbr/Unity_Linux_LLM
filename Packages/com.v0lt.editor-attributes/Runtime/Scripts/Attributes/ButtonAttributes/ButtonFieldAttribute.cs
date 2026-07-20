@@ -24,7 +24,12 @@ namespace EditorAttributes
         /// <param name="buttonLabel">The label displayed on the button</param>
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonFieldAttribute(string functionName, string buttonLabel = "", float buttonHeight = 18f, bool makeDirty = true)
+        public ButtonFieldAttribute(
+            string functionName,
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool makeDirty = true
+        )
         {
             FunctionName = functionName;
             ButtonLabel = buttonLabel;
@@ -42,7 +47,16 @@ namespace EditorAttributes
         /// <param name="buttonLabel">The label displayed on the button</param>
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonFieldAttribute(string functionName, bool isRepetable, long pressDelay = 60, long repetitionInterval = 100, string buttonLabel = "", float buttonHeight = 18f, bool makeDirty = true) : this(functionName, buttonLabel, buttonHeight, makeDirty)
+        public ButtonFieldAttribute(
+            string functionName,
+            bool isRepetable,
+            long pressDelay = 60,
+            long repetitionInterval = 100,
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool makeDirty = true
+        )
+            : this(functionName, buttonLabel, buttonHeight, makeDirty)
         {
             IsRepetable = isRepetable;
             PressDelay = pressDelay;

@@ -46,7 +46,8 @@ namespace NPCSystem.Monitoring
             long durationMs,
             DateTime timestamp,
             IReadOnlyDictionary<string, object> tags,
-            string message)
+            string message
+        )
         {
             SchemaVersion = schemaVersion;
             RequestId = requestId ?? string.Empty;
@@ -67,7 +68,8 @@ namespace NPCSystem.Monitoring
             string category,
             string status,
             string message = null,
-            Dictionary<string, object> tags = null)
+            Dictionary<string, object> tags = null
+        )
         {
             return new TelemetryEvent(
                 schemaVersion: 1,
@@ -89,7 +91,8 @@ namespace NPCSystem.Monitoring
             string status,
             long durationMs,
             string message = null,
-            Dictionary<string, object> tags = null)
+            Dictionary<string, object> tags = null
+        )
         {
             return new TelemetryEvent(
                 schemaVersion: 1,

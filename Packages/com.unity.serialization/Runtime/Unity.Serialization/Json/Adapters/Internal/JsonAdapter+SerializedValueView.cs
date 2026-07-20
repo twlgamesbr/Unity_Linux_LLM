@@ -2,7 +2,10 @@
 {
     partial class JsonAdapter : IJsonAdapter<SerializedValueView>
     {
-        void IJsonAdapter<SerializedValueView>.Serialize(in JsonSerializationContext<SerializedValueView> context, SerializedValueView value)
+        void IJsonAdapter<SerializedValueView>.Serialize(
+            in JsonSerializationContext<SerializedValueView> context,
+            SerializedValueView value
+        )
         {
             switch (value.Type)
             {
@@ -24,7 +27,7 @@
                 case TokenType.Primitive:
                 {
                     var p = value.AsPrimitiveView();
-                    
+
                     if (p.IsIntegral())
                     {
                         if (p.IsSigned())
@@ -58,7 +61,9 @@
             }
         }
 
-        SerializedValueView IJsonAdapter<SerializedValueView>.Deserialize(in JsonDeserializationContext<SerializedValueView> context)
+        SerializedValueView IJsonAdapter<SerializedValueView>.Deserialize(
+            in JsonDeserializationContext<SerializedValueView> context
+        )
         {
             throw new System.InvalidOperationException();
         }

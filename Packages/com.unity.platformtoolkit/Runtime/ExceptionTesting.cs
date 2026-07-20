@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
 #if PT_ENABLE_EXCEPTION_TESTING
 using NUnit.Framework;
 #endif
@@ -18,11 +17,11 @@ namespace Unity.PlatformToolkit
         /// Thrown in file write or file delete operations. Place after data is changed, but before the internal commit is completed.
         /// </summary>
         PreCommit,
+
         /// <summary>
         /// Thrown after modifying a file fails, to simulate deletion of an empty save in case of an exception. Place after a commit has failed
         /// </summary>
         NewSaveCommitFailureCleanup,
-
 
         /// <summary>
         ///
@@ -93,7 +92,9 @@ namespace Unity.PlatformToolkit
         public static IDisposable ArmExceptionPoint(ExceptionPoint exceptionPoint)
         {
             if (!m_EnabledExceptionPoints.Contains(exceptionPoint))
-                Assert.Fail("Attempting to arm an exception point, that is not supported by the platform. Call IgnoreIfExceptionPointDisabled prior to ignore the test.");
+                Assert.Fail(
+                    "Attempting to arm an exception point, that is not supported by the platform. Call IgnoreIfExceptionPointDisabled prior to ignore the test."
+                );
 
             m_ArmedExceptionPoints.Add(exceptionPoint);
             return new ArmExceptionPointCleanUp(exceptionPoint);
@@ -117,7 +118,9 @@ namespace Unity.PlatformToolkit
             try
             {
                 if (!m_TriggerredExceptionPoints.Contains(exceptionPoint))
-                    Assert.Fail("Exception was not triggered. This is almost certainly a bug. Make sure that TriggerException is called at an expected point.");
+                    Assert.Fail(
+                        "Exception was not triggered. This is almost certainly a bug. Make sure that TriggerException is called at an expected point."
+                    );
             }
             finally
             {

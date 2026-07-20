@@ -1,7 +1,7 @@
 using System;
-using UnityEngine;
 using Unity.Entities;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace Unity.Physics.Authoring
 {
@@ -13,7 +13,8 @@ namespace Unity.Physics.Authoring
     [HelpURL(HelpURLs.CustomPhysicsProxyAuthoring)]
     public sealed class CustomPhysicsProxyAuthoring : MonoBehaviour
     {
-        const string k_IconPath = "Packages/com.unity.physics/Unity.Physics.Editor/Editor Default Resources/Icons/d_Rigidbody@64.png";
+        const string k_IconPath =
+            "Packages/com.unity.physics/Unity.Physics.Editor/Editor Default Resources/Icons/d_Rigidbody@64.png";
 
         /// <summary>
         /// <para>First Order Gain.</para>
@@ -23,7 +24,9 @@ namespace Unity.Physics.Authoring
         /// </para>
         /// </summary>
         [Range(0f, 1f)]
-        [Tooltip("Coefficient in range [0,1] denoting how much the client body will be driven by position (teleported), while the rest of the position diff will be velocity-driven.")]
+        [Tooltip(
+            "Coefficient in range [0,1] denoting how much the client body will be driven by position (teleported), while the rest of the position diff will be velocity-driven."
+        )]
         public float FirstOrderGain = 0.0f;
 
         /// <summary>
@@ -34,19 +37,22 @@ namespace Unity.Physics.Authoring
         {
             /// <summary> World with index 0 (default)</summary>
             DefaultWorld = 1,
+
             /// <summary> World with index 1 </summary>
             World1 = 2,
+
             /// <summary> World with index 2 </summary>
             World2 = 4,
+
             /// <summary> World with index 3 </summary>
-            World3 = 8
+            World3 = 8,
         }
+
         /// <summary>
         /// A mask of physics world indices in which proxy entities should be created.
         /// </summary>
         public TargetWorld TargetPhysicsWorld = TargetWorld.World1;
     }
-
 
     class CustomPhysicsProxyBaker : Baker<CustomPhysicsProxyAuthoring>
     {
@@ -57,7 +63,14 @@ namespace Unity.Physics.Authoring
                 if (((int)authoring.TargetPhysicsWorld & (1 << i)) == 0)
                     continue;
                 var proxyEnt = CreateAdditionalEntity(TransformUsageFlags.Dynamic | TransformUsageFlags.WorldSpace);
-                AddComponent(proxyEnt, new CustomPhysicsProxyDriver {rootEntity = GetEntity(TransformUsageFlags.Dynamic), FirstOrderGain = authoring.FirstOrderGain});
+                AddComponent(
+                    proxyEnt,
+                    new CustomPhysicsProxyDriver
+                    {
+                        rootEntity = GetEntity(TransformUsageFlags.Dynamic),
+                        FirstOrderGain = authoring.FirstOrderGain,
+                    }
+                );
 
                 AddComponent(proxyEnt, default(LocalTransform));
 

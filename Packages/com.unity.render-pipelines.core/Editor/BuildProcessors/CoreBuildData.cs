@@ -61,15 +61,17 @@ namespace UnityEditor.Rendering
             CheckGPUResidentDrawerUsage();
         }
 
-        private static CoreBuildData CreateInstance()
-            => new(EditorUserBuildSettings.activeBuildTarget, EditorUserBuildSettings.development);
+        private static CoreBuildData CreateInstance() =>
+            new(EditorUserBuildSettings.activeBuildTarget, EditorUserBuildSettings.development);
 
         private void CheckGPUResidentDrawerUsage()
         {
             foreach (var renderPipelineAsset in renderPipelineAssets)
             {
-                if (renderPipelineAsset is IGPUResidentRenderPipeline gpuResidentPipelineAsset
-                    && gpuResidentPipelineAsset.IsGPUResidentDrawerSupportedBySRP())
+                if (
+                    renderPipelineAsset is IGPUResidentRenderPipeline gpuResidentPipelineAsset
+                    && gpuResidentPipelineAsset.IsGPUResidentDrawerSupportedBySRP()
+                )
                 {
                     // Record if any pipeline supports the GPU resident drawer
                     pipelineSupportGPUResidentDrawer = true;
@@ -86,10 +88,13 @@ namespace UnityEditor.Rendering
             if (!playerNeedGPUResidentDrawer)
                 return;
 
-            #pragma warning disable 618 // Todo(@daniel.andersen): Remove deprecated API usage
-            GraphicsSettings.GetRenderPipelineSettings<GPUResidentDrawerResources>()
-                .ForEachFieldOfType<ComputeShader>(computeShader => computeShaderCache.Add(computeShader.GetEntityId(), computeShader));
-            #pragma warning restore 618
+#pragma warning disable 618 // Todo(@daniel.andersen): Remove deprecated API usage
+            GraphicsSettings
+                .GetRenderPipelineSettings<GPUResidentDrawerResources>()
+                .ForEachFieldOfType<ComputeShader>(computeShader =>
+                    computeShaderCache.Add(computeShader.GetEntityId(), computeShader)
+                );
+#pragma warning restore 618
         }
 
         /// <summary>

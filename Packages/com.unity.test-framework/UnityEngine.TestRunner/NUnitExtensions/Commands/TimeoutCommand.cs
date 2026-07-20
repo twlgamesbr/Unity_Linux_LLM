@@ -13,9 +13,8 @@ namespace UnityEngine.TestTools
     {
         internal const int k_DefaultTimeout = 1000 * 180;
 
-        public TimeoutCommand(TestCommand innerCommand) : base(innerCommand)
-        {
-        }
+        public TimeoutCommand(TestCommand innerCommand)
+            : base(innerCommand) { }
 
         public override TestResult Execute(ITestExecutionContext context)
         {
@@ -28,13 +27,16 @@ namespace UnityEngine.TestTools
             {
                 context.TestCaseTimeout = k_DefaultTimeout;
             }
-            
+
             var executeEnumerable = ((IEnumerableTestMethodCommand)innerCommand).ExecuteEnumerable(context);
             foreach (var iterator in executeEnumerable)
             {
                 if (HasTimedOut(context))
                 {
-                    context.CurrentResult.SetResult(ResultState.Error, new UnityTestTimeoutException(context.TestCaseTimeout).Message);
+                    context.CurrentResult.SetResult(
+                        ResultState.Error,
+                        new UnityTestTimeoutException(context.TestCaseTimeout).Message
+                    );
                     yield return new RestoreTestContextAfterDomainReload(); // If this is right after a domain reload, give the editor a chance to restore.
                     yield break;
                 }
@@ -43,15 +45,17 @@ namespace UnityEngine.TestTools
 
             if (HasTimedOut(context))
             {
-                context.CurrentResult.SetResult(ResultState.Error,
-                    new UnityTestTimeoutException(context.TestCaseTimeout).Message);
+                context.CurrentResult.SetResult(
+                    ResultState.Error,
+                    new UnityTestTimeoutException(context.TestCaseTimeout).Message
+                );
             }
         }
 
         private static bool HasTimedOut(ITestExecutionContext context)
         {
-            return Stopwatch.GetTimestamp() - context.StartTicks >
-                   context.TestCaseTimeout * (Stopwatch.Frequency / 1000f);
+            return Stopwatch.GetTimestamp() - context.StartTicks
+                > context.TestCaseTimeout * (Stopwatch.Frequency / 1000f);
         }
     }
 }

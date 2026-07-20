@@ -35,7 +35,12 @@ namespace UnityEngine.TestTools.Utils
         public static bool AreFloatsEqual(float expected, float actual, float epsilon)
         {
             // special case for infinity
-            if (expected == Mathf.Infinity || actual == Mathf.Infinity || expected == Mathf.NegativeInfinity || actual == Mathf.NegativeInfinity)
+            if (
+                expected == Mathf.Infinity
+                || actual == Mathf.Infinity
+                || expected == Mathf.NegativeInfinity
+                || actual == Mathf.NegativeInfinity
+            )
                 return expected == actual;
 
             // we cover both relative and absolute tolerance with this check
@@ -43,7 +48,8 @@ namespace UnityEngine.TestTools.Utils
             // please note that "usually" approximation is used [i.e. abs(x)+abs(y)+1]
             // but we speak about test code so we dont care that much about performance
             // but we do care about checks being more precise
-            return Math.Abs(actual - expected) <= epsilon * Mathf.Max(Mathf.Max(Mathf.Abs(actual), Mathf.Abs(expected)), 1.0f);
+            return Math.Abs(actual - expected)
+                <= epsilon * Mathf.Max(Mathf.Max(Mathf.Abs(actual), Mathf.Abs(expected)), 1.0f);
         }
 
         /// <summary>

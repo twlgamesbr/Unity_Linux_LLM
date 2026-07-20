@@ -24,7 +24,11 @@ namespace Unity.Entities.Editor
             }
             else
             {
-                EditorGUI.LabelField(position, label.text, $"LayerFieldAttribute is only meant for ints. You used it on a {property.propertyType}.");
+                EditorGUI.LabelField(
+                    position,
+                    label.text,
+                    $"LayerFieldAttribute is only meant for ints. You used it on a {property.propertyType}."
+                );
             }
 
             EditorGUI.EndProperty();

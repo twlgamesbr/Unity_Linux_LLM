@@ -66,24 +66,45 @@ namespace Unity.Entities.SourceGen.Common
                 // emit Entities exceptions as info but don't block compilation or generate error to fail tests
                 LogInfoToSourceGenLog(
                     @$"Error trying to write generated source for file {generatedSourceFilePath}
-                    {ioException.ToUnityPrintableString()}...");
+                    {ioException.ToUnityPrintableString()}..."
+                );
             }
         }
 
-        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, SyntaxNode node)
-            => GetGeneratedSourceFileName(syntaxTree, generatorName, node.GetLocation().GetLineSpan().StartLinePosition.Line);
+        public static string GetGeneratedSourceFileName(
+            this SyntaxTree syntaxTree,
+            string generatorName,
+            SyntaxNode node
+        ) =>
+            GetGeneratedSourceFileName(
+                syntaxTree,
+                generatorName,
+                node.GetLocation().GetLineSpan().StartLinePosition.Line
+            );
 
-        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, int salting = 0)
+        public static string GetGeneratedSourceFileName(
+            this SyntaxTree syntaxTree,
+            string generatorName,
+            int salting = 0
+        )
         {
             var (isSuccess, fileName) = TryGetFileNameWithoutExtension(syntaxTree);
             var stableHashCode = SourceGenHelpers.GetStableHashCode(syntaxTree.FilePath) & 0x7fffffff;
             var postfix = generatorName.Length > 0 ? $"__{generatorName}" : String.Empty;
 
-            fileName = isSuccess ? $"{fileName}{postfix}_{stableHashCode}{salting}.g.cs" : Path.Combine($"{Path.GetRandomFileName()}{postfix}", ".g.cs");
+            fileName = isSuccess
+                ? $"{fileName}{postfix}_{stableHashCode}{salting}.g.cs"
+                : Path.Combine($"{Path.GetRandomFileName()}{postfix}", ".g.cs");
 
             return fileName;
         }
-        public static (string FullFilePath, string FileNameOnly) GetGeneratedSourceFilePath(this SyntaxTree syntaxTree, string assemblyName, string generatorName, int salting = 0)
+
+        public static (string FullFilePath, string FileNameOnly) GetGeneratedSourceFilePath(
+            this SyntaxTree syntaxTree,
+            string assemblyName,
+            string generatorName,
+            int salting = 0
+        )
         {
             var fileName = GetGeneratedSourceFileName(syntaxTree, generatorName, salting);
 

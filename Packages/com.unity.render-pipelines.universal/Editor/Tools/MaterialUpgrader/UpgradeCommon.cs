@@ -13,7 +13,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// Use this for transparent surfaces.
         /// </summary>
-        Transparent
+        Transparent,
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// Use this for multiply blend mode.
         /// </summary>
-        Multiply
+        Multiply,
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// Use this when not using specular.
         /// </summary>
-        NoSpecular
+        NoSpecular,
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// Use this when the source comes from a reflection probe.
         /// </summary>
-        ReflectionProbe
+        ReflectionProbe,
     }
 
     /// <summary>

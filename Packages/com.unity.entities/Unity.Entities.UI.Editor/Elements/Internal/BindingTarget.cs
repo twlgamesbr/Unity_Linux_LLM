@@ -18,7 +18,11 @@ namespace Unity.Entities.UI
                 Element = null;
             }
 
-            protected override void VisitPath<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value)
+            protected override void VisitPath<TContainer, TValue>(
+                Property<TContainer, TValue> property,
+                ref TContainer container,
+                ref TValue value
+            )
             {
                 Binding.SwapWithInstance(Path, Element, value);
             }

@@ -44,7 +44,8 @@ namespace Unity.Netcode
         /// Registeres an unmanaged type that will be serialized by a direct memcpy into a buffer
         /// </summary>
         /// <typeparam name="T">The unmanaged type to be registered for serialization</typeparam>
-        public static void InitializeSerializer_UnmanagedByMemcpy<T>() where T : unmanaged
+        public static void InitializeSerializer_UnmanagedByMemcpy<T>()
+            where T : unmanaged
         {
             NetworkVariableSerialization<T>.Serializer = new UnmanagedTypeSerializer<T>();
         }
@@ -53,7 +54,8 @@ namespace Unity.Netcode
         /// Registeres an unmanaged type that will be serialized by a direct memcpy into a buffer
         /// </summary>
         /// <typeparam name="T">The unmanaged element type of the array to be registered for serialization</typeparam>
-        public static void InitializeSerializer_UnmanagedByMemcpyArray<T>() where T : unmanaged
+        public static void InitializeSerializer_UnmanagedByMemcpyArray<T>()
+            where T : unmanaged
         {
             NetworkVariableSerialization<NativeArray<T>>.Serializer = new UnmanagedArraySerializer<T>();
         }
@@ -63,7 +65,8 @@ namespace Unity.Netcode
         /// Registeres an unmanaged type that will be serialized by a direct memcpy into a buffer
         /// </summary>
         /// <typeparam name="T">The unmanaged element type contained in the NativeList</typeparam>
-        public static void InitializeSerializer_UnmanagedByMemcpyList<T>() where T : unmanaged
+        public static void InitializeSerializer_UnmanagedByMemcpyList<T>()
+            where T : unmanaged
         {
             NetworkVariableSerialization<NativeList<T>>.Serializer = new UnmanagedListSerializer<T>();
         }
@@ -72,7 +75,8 @@ namespace Unity.Netcode
         /// Registeres a native hash set (this generic implementation works with all types)
         /// </summary>
         /// <typeparam name="T">The unmanaged element type contained in the NativeHashSet, must implement IEquatable</typeparam>
-        public static void InitializeSerializer_NativeHashSet<T>() where T : unmanaged, IEquatable<T>
+        public static void InitializeSerializer_NativeHashSet<T>()
+            where T : unmanaged, IEquatable<T>
         {
             NetworkVariableSerialization<NativeHashSet<T>>.Serializer = new NativeHashSetSerializer<T>();
         }
@@ -86,7 +90,8 @@ namespace Unity.Netcode
             where TKey : unmanaged, IEquatable<TKey>
             where TVal : unmanaged
         {
-            NetworkVariableSerialization<NativeHashMap<TKey, TVal>>.Serializer = new NativeHashMapSerializer<TKey, TVal>();
+            NetworkVariableSerialization<NativeHashMap<TKey, TVal>>.Serializer =
+                new NativeHashMapSerializer<TKey, TVal>();
         }
 #endif
 
@@ -113,7 +118,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <typeparam name="TKey">The type of keys in the Dictionary, must implement IEquatable</typeparam>
         /// <typeparam name="TVal">The type of values stored in the Dictionary</typeparam>
-        public static void InitializeSerializer_Dictionary<TKey, TVal>() where TKey : IEquatable<TKey>
+        public static void InitializeSerializer_Dictionary<TKey, TVal>()
+            where TKey : IEquatable<TKey>
         {
             NetworkVariableSerialization<Dictionary<TKey, TVal>>.Serializer = new DictionarySerializer<TKey, TVal>();
         }
@@ -123,7 +129,8 @@ namespace Unity.Netcode
         /// NetworkSerialize
         /// </summary>
         /// <typeparam name="T">The unmanaged type that implements INetworkSerializable</typeparam>
-        public static void InitializeSerializer_UnmanagedINetworkSerializable<T>() where T : unmanaged, INetworkSerializable
+        public static void InitializeSerializer_UnmanagedINetworkSerializable<T>()
+            where T : unmanaged, INetworkSerializable
         {
             NetworkVariableSerialization<T>.Serializer = new UnmanagedNetworkSerializableSerializer<T>();
         }
@@ -133,9 +140,11 @@ namespace Unity.Netcode
         /// NetworkSerialize
         /// </summary>
         /// <typeparam name="T">The unmanaged element type that implements INetworkSerializable</typeparam>
-        public static void InitializeSerializer_UnmanagedINetworkSerializableArray<T>() where T : unmanaged, INetworkSerializable
+        public static void InitializeSerializer_UnmanagedINetworkSerializableArray<T>()
+            where T : unmanaged, INetworkSerializable
         {
-            NetworkVariableSerialization<NativeArray<T>>.Serializer = new UnmanagedNetworkSerializableArraySerializer<T>();
+            NetworkVariableSerialization<NativeArray<T>>.Serializer =
+                new UnmanagedNetworkSerializableArraySerializer<T>();
         }
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
@@ -144,9 +153,11 @@ namespace Unity.Netcode
         /// NetworkSerialize
         /// </summary>
         /// <typeparam name="T">The unmanaged element type that implements INetworkSerializable</typeparam>
-        public static void InitializeSerializer_UnmanagedINetworkSerializableList<T>() where T : unmanaged, INetworkSerializable
+        public static void InitializeSerializer_UnmanagedINetworkSerializableList<T>()
+            where T : unmanaged, INetworkSerializable
         {
-            NetworkVariableSerialization<NativeList<T>>.Serializer = new UnmanagedNetworkSerializableListSerializer<T>();
+            NetworkVariableSerialization<NativeList<T>>.Serializer =
+                new UnmanagedNetworkSerializableListSerializer<T>();
         }
 #endif
 
@@ -155,7 +166,8 @@ namespace Unity.Netcode
         /// NetworkSerialize
         /// </summary>
         /// <typeparam name="T">The managed type that implements INetworkSerializable and has a parameterless constructor</typeparam>
-        public static void InitializeSerializer_ManagedINetworkSerializable<T>() where T : class, INetworkSerializable, new()
+        public static void InitializeSerializer_ManagedINetworkSerializable<T>()
+            where T : class, INetworkSerializable, new()
         {
             NetworkVariableSerialization<T>.Serializer = new ManagedNetworkSerializableSerializer<T>();
         }
@@ -165,7 +177,8 @@ namespace Unity.Netcode
         /// serializers
         /// </summary>
         /// <typeparam name="T">The FixedString type that implements INativeList{byte} and IUTF8Bytes</typeparam>
-        public static void InitializeSerializer_FixedString<T>() where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public static void InitializeSerializer_FixedString<T>()
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             NetworkVariableSerialization<T>.Serializer = new FixedStringSerializer<T>();
         }
@@ -175,7 +188,8 @@ namespace Unity.Netcode
         /// serializers
         /// </summary>
         /// <typeparam name="T">The FixedString type that implements INativeList{byte} and IUTF8Bytes</typeparam>
-        public static void InitializeSerializer_FixedStringArray<T>() where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public static void InitializeSerializer_FixedStringArray<T>()
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             NetworkVariableSerialization<NativeArray<T>>.Serializer = new FixedStringArraySerializer<T>();
         }
@@ -186,7 +200,8 @@ namespace Unity.Netcode
         /// serializers
         /// </summary>
         /// <typeparam name="T">The FixedString type that implements INativeList{byte} and IUTF8Bytes</typeparam>
-        public static void InitializeSerializer_FixedStringList<T>() where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public static void InitializeSerializer_FixedStringList<T>()
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             NetworkVariableSerialization<NativeList<T>>.Serializer = new FixedStringListSerializer<T>();
         }
@@ -196,7 +211,8 @@ namespace Unity.Netcode
         /// Registers a managed type that will be checked for equality using T.Equals()
         /// </summary>
         /// <typeparam name="T">The managed type that implements IEquatable</typeparam>
-        public static void InitializeEqualityChecker_ManagedIEquatable<T>() where T : class, IEquatable<T>
+        public static void InitializeEqualityChecker_ManagedIEquatable<T>()
+            where T : class, IEquatable<T>
         {
             NetworkVariableSerialization<T>.AreEqual = NetworkVariableEquality<T>.EqualityEqualsObject;
         }
@@ -205,7 +221,8 @@ namespace Unity.Netcode
         /// Registers an unmanaged type that will be checked for equality using T.Equals()
         /// </summary>
         /// <typeparam name="T">The unmanaged type to register</typeparam>
-        public static void InitializeEqualityChecker_UnmanagedIEquatable<T>() where T : unmanaged, IEquatable<T>
+        public static void InitializeEqualityChecker_UnmanagedIEquatable<T>()
+            where T : unmanaged, IEquatable<T>
         {
             NetworkVariableSerialization<T>.AreEqual = NetworkVariableEquality<T>.EqualityEquals;
         }
@@ -214,7 +231,8 @@ namespace Unity.Netcode
         /// Registers an unmanaged type that will be checked for equality using T.Equals()
         /// </summary>
         /// <typeparam name="T">The unmanaged element type that implements IEquatable</typeparam>
-        public static void InitializeEqualityChecker_UnmanagedIEquatableArray<T>() where T : unmanaged, IEquatable<T>
+        public static void InitializeEqualityChecker_UnmanagedIEquatableArray<T>()
+            where T : unmanaged, IEquatable<T>
         {
             NetworkVariableSerialization<NativeArray<T>>.AreEqual = NetworkVariableEquality<T>.EqualityEqualsArray;
         }
@@ -227,14 +245,17 @@ namespace Unity.Netcode
         {
             NetworkVariableSerialization<List<T>>.AreEqual = NetworkVariableEquality<T>.EqualityEqualsList;
         }
+
         /// <summary>
         /// Registers an unmanaged type that will be checked for equality using T.Equals()
         /// </summary>
         /// <typeparam name="T">The type of elements in the HashSet</typeparam>
-        public static void InitializeEqualityChecker_HashSet<T>() where T : IEquatable<T>
+        public static void InitializeEqualityChecker_HashSet<T>()
+            where T : IEquatable<T>
         {
             NetworkVariableSerialization<HashSet<T>>.AreEqual = NetworkVariableEquality<T>.EqualityEqualsHashSet;
         }
+
         /// <summary>
         /// Registers an unmanaged type that will be checked for equality using T.Equals()
         /// </summary>
@@ -243,7 +264,10 @@ namespace Unity.Netcode
         public static void InitializeEqualityChecker_Dictionary<TKey, TVal>()
             where TKey : IEquatable<TKey>
         {
-            NetworkVariableSerialization<Dictionary<TKey, TVal>>.AreEqual = NetworkVariableDictionarySerialization<TKey, TVal>.GenericEqualsDictionary;
+            NetworkVariableSerialization<Dictionary<TKey, TVal>>.AreEqual = NetworkVariableDictionarySerialization<
+                TKey,
+                TVal
+            >.GenericEqualsDictionary;
         }
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
@@ -251,18 +275,23 @@ namespace Unity.Netcode
         /// Registers an unmanaged type that will be checked for equality using T.Equals()
         /// </summary>
         /// <typeparam name="T">The unmanaged element type that implements IEquatable</typeparam>
-        public static void InitializeEqualityChecker_UnmanagedIEquatableList<T>() where T : unmanaged, IEquatable<T>
+        public static void InitializeEqualityChecker_UnmanagedIEquatableList<T>()
+            where T : unmanaged, IEquatable<T>
         {
             NetworkVariableSerialization<NativeList<T>>.AreEqual = NetworkVariableEquality<T>.EqualityEqualsNativeList;
         }
+
         /// <summary>
         /// Registers an unmanaged type that will be checked for equality using T.Equals()
         /// </summary>
         /// <typeparam name="T">The unmanaged element type that implements IEquatable</typeparam>
-        public static void InitializeEqualityChecker_NativeHashSet<T>() where T : unmanaged, IEquatable<T>
+        public static void InitializeEqualityChecker_NativeHashSet<T>()
+            where T : unmanaged, IEquatable<T>
         {
-            NetworkVariableSerialization<NativeHashSet<T>>.AreEqual = NetworkVariableEquality<T>.EqualityEqualsNativeHashSet;
+            NetworkVariableSerialization<NativeHashSet<T>>.AreEqual =
+                NetworkVariableEquality<T>.EqualityEqualsNativeHashSet;
         }
+
         /// <summary>
         /// Registers an unmanaged type that will be checked for equality using T.Equals()
         /// </summary>
@@ -272,7 +301,10 @@ namespace Unity.Netcode
             where TKey : unmanaged, IEquatable<TKey>
             where TVal : unmanaged
         {
-            NetworkVariableSerialization<NativeHashMap<TKey, TVal>>.AreEqual = NetworkVariableMapSerialization<TKey, TVal>.GenericEqualsNativeHashMap;
+            NetworkVariableSerialization<NativeHashMap<TKey, TVal>>.AreEqual = NetworkVariableMapSerialization<
+                TKey,
+                TVal
+            >.GenericEqualsNativeHashMap;
         }
 #endif
 
@@ -281,7 +313,8 @@ namespace Unity.Netcode
         /// equal if they are bitwise equivalent in memory
         /// </summary>
         /// <typeparam name="T">The unmanaged type to register for equality checking</typeparam>
-        public static void InitializeEqualityChecker_UnmanagedValueEquals<T>() where T : unmanaged
+        public static void InitializeEqualityChecker_UnmanagedValueEquals<T>()
+            where T : unmanaged
         {
             NetworkVariableSerialization<T>.AreEqual = NetworkVariableEquality<T>.ValueEquals;
         }
@@ -291,7 +324,8 @@ namespace Unity.Netcode
         /// equal if they are bitwise equivalent in memory
         /// </summary>
         /// <typeparam name="T">The unmanaged element type to register for equality checking</typeparam>
-        public static void InitializeEqualityChecker_UnmanagedValueEqualsArray<T>() where T : unmanaged
+        public static void InitializeEqualityChecker_UnmanagedValueEqualsArray<T>()
+            where T : unmanaged
         {
             NetworkVariableSerialization<NativeArray<T>>.AreEqual = NetworkVariableEquality<T>.ValueEqualsArray;
         }
@@ -302,7 +336,8 @@ namespace Unity.Netcode
         /// equal if they are bitwise equivalent in memory
         /// </summary>
         /// <typeparam name="T">The unmanaged element type to register for equality checking</typeparam>
-        public static void InitializeEqualityChecker_UnmanagedValueEqualsList<T>() where T : unmanaged
+        public static void InitializeEqualityChecker_UnmanagedValueEqualsList<T>()
+            where T : unmanaged
         {
             NetworkVariableSerialization<NativeList<T>>.AreEqual = NetworkVariableEquality<T>.ValueEqualsList;
         }
@@ -312,7 +347,8 @@ namespace Unity.Netcode
         /// Registers a managed type that will be checked for equality using the == operator
         /// </summary>
         /// <typeparam name="T">The class type to register for equality checking</typeparam>
-        public static void InitializeEqualityChecker_ManagedClassEquals<T>() where T : class
+        public static void InitializeEqualityChecker_ManagedClassEquals<T>()
+            where T : class
         {
             NetworkVariableSerialization<T>.AreEqual = NetworkVariableEquality<T>.ClassEquals;
         }

@@ -53,10 +53,10 @@ namespace FlyingWormConsole3.LiteNetLib
             }
         }
 
-        private readonly NetPacket _outgoingAcks;            //for send acks
-        private readonly PendingPacket[] _pendingPackets;    //for unacked packets and duplicates
-        private readonly NetPacket[] _receivedPackets;       //for order
-        private readonly bool[] _earlyReceived;              //for unordered
+        private readonly NetPacket _outgoingAcks; //for send acks
+        private readonly PendingPacket[] _pendingPackets; //for unacked packets and duplicates
+        private readonly NetPacket[] _receivedPackets; //for order
+        private readonly bool[] _earlyReceived; //for unordered
 
         private int _localSeqence;
         private int _remoteSequence;
@@ -71,7 +71,8 @@ namespace FlyingWormConsole3.LiteNetLib
         private const int BitsInByte = 8;
         private readonly byte _id;
 
-        public ReliableChannel(NetPeer peer, bool ordered, byte id) : base(peer)
+        public ReliableChannel(NetPeer peer, bool ordered, byte id)
+            : base(peer)
         {
             _id = id;
             _windowSize = NetConstants.DefaultWindowSize;
@@ -95,7 +96,7 @@ namespace FlyingWormConsole3.LiteNetLib
             _localSeqence = 0;
             _remoteSequence = 0;
             _remoteWindowStart = 0;
-            _outgoingAcks = new NetPacket(PacketProperty.Ack, (_windowSize - 1) / BitsInByte + 2) {ChannelId = id};
+            _outgoingAcks = new NetPacket(PacketProperty.Ack, (_windowSize - 1) / BitsInByte + 2) { ChannelId = id };
         }
 
         //ProcessAck in packet
@@ -125,9 +126,11 @@ namespace FlyingWormConsole3.LiteNetLib
             byte[] acksData = packet.RawData;
             lock (_pendingPackets)
             {
-                for (int pendingSeq = _localWindowStart;
+                for (
+                    int pendingSeq = _localWindowStart;
                     pendingSeq != _localSeqence;
-                    pendingSeq = (pendingSeq + 1) % NetConstants.MaxSequence)
+                    pendingSeq = (pendingSeq + 1) % NetConstants.MaxSequence
+                )
                 {
                     int rel = NetUtils.RelativeSequenceNumber(pendingSeq, ackWindowStart);
                     if (rel >= _windowSize)
@@ -171,7 +174,7 @@ namespace FlyingWormConsole3.LiteNetLib
             {
                 _mustSendAcks = false;
                 NetDebug.Write("[RR]SendAcks");
-                lock(_outgoingAcks)
+                lock (_outgoingAcks)
                     Peer.SendUserData(_outgoingAcks);
             }
 
@@ -190,7 +193,7 @@ namespace FlyingWormConsole3.LiteNetLib
                             break;
 
                         var netPacket = OutgoingQueue.Dequeue();
-                        netPacket.Sequence = (ushort) _localSeqence;
+                        netPacket.Sequence = (ushort)_localSeqence;
                         netPacket.ChannelId = _id;
                         _pendingPackets[_localSeqence % _windowSize].Init(netPacket);
                         _localSeqence = (_localSeqence + 1) % NetConstants.MaxSequence;
@@ -198,7 +201,11 @@ namespace FlyingWormConsole3.LiteNetLib
                 }
 
                 //send
-                for (int pendingSeq = _localWindowStart; pendingSeq != _localSeqence; pendingSeq = (pendingSeq + 1) % NetConstants.MaxSequence)
+                for (
+                    int pendingSeq = _localWindowStart;
+                    pendingSeq != _localSeqence;
+                    pendingSeq = (pendingSeq + 1) % NetConstants.MaxSequence
+                )
                 {
                     // Please note: TrySend is invoked on a mutable struct, it's important to not extract it into a variable here
                     if (_pendingPackets[pendingSeq % _windowSize].TrySend(currentTime, Peer))
@@ -257,7 +264,7 @@ namespace FlyingWormConsole3.LiteNetLib
                 {
                     //New window position
                     int newWindowStart = (_remoteWindowStart + relate - _windowSize + 1) % NetConstants.MaxSequence;
-                    _outgoingAcks.Sequence = (ushort) newWindowStart;
+                    _outgoingAcks.Sequence = (ushort)newWindowStart;
 
                     //Clean old data
                     while (_remoteWindowStart != newWindowStart)
@@ -265,7 +272,7 @@ namespace FlyingWormConsole3.LiteNetLib
                         ackIdx = _remoteWindowStart % _windowSize;
                         ackByte = NetConstants.ChanneledHeaderSize + ackIdx / BitsInByte;
                         ackBit = ackIdx % BitsInByte;
-                        _outgoingAcks.RawData[ackByte] &= (byte) ~(1 << ackBit);
+                        _outgoingAcks.RawData[ackByte] &= (byte)~(1 << ackBit);
                         _remoteWindowStart = (_remoteWindowStart + 1) % NetConstants.MaxSequence;
                     }
                 }
@@ -286,7 +293,7 @@ namespace FlyingWormConsole3.LiteNetLib
                 }
 
                 //save ack
-                _outgoingAcks.RawData[ackByte] |= (byte) (1 << ackBit);
+                _outgoingAcks.RawData[ackByte] |= (byte)(1 << ackBit);
             }
 
             AddToPeerChannelSendQueue();

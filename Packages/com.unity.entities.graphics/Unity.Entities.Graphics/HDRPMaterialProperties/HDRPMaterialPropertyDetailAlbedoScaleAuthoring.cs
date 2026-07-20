@@ -3,13 +3,19 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_DetailAlbedoScale"    )]
-    public struct HDRPMaterialPropertyDetailAlbedoScale : IComponentData { public float  Value; }
+    [MaterialProperty("_DetailAlbedoScale")]
+    public struct HDRPMaterialPropertyDetailAlbedoScale : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyDetailAlbedoScaleAuthoring : UnityEngine.MonoBehaviour
     {
-        [RegisterBinding(typeof(HDRPMaterialPropertyDetailAlbedoScale), nameof(HDRPMaterialPropertyDetailAlbedoScale.Value))]
+        [RegisterBinding(
+            typeof(HDRPMaterialPropertyDetailAlbedoScale),
+            nameof(HDRPMaterialPropertyDetailAlbedoScale.Value)
+        )]
         public float Value;
 
         class HDRPMaterialPropertyDetailAlbedoScaleBaker : Baker<HDRPMaterialPropertyDetailAlbedoScaleAuthoring>

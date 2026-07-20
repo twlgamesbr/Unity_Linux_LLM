@@ -9,7 +9,8 @@ namespace Unity.Multiplayer.Editor
     // A ScriptableSingleton that syncs its data to and from a file on disk.
     // This is specially necessary for virtual projects where the main Editor serializes the data to a file
     // and the other instances of the Editor needs to reload the data from that file when changed.
-    internal class SyncedSingleton<T> : ScriptableSingleton<T> where T : ScriptableObject
+    internal class SyncedSingleton<T> : ScriptableSingleton<T>
+        where T : ScriptableObject
     {
         private static bool s_NeedsRegeneration;
 

@@ -13,8 +13,10 @@ namespace Unity.PlatformToolkit
 
         [SerializeField]
         private string m_Id;
+
         [SerializeField]
         private bool m_Progressive;
+
         [SerializeField]
         private int m_ProgressTarget;
 

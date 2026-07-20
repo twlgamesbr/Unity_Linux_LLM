@@ -10,7 +10,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class SwitchToBuildPlatform : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]

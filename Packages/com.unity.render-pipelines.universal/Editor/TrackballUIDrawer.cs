@@ -17,7 +17,12 @@ namespace UnityEditor.Rendering.Universal
         Vector2 m_CursorPos;
         const string k_ShaderName = "Hidden/Universal Render Pipeline/Editor/Trackball";
 
-        public void OnGUI(SerializedProperty property, [CanBeNull] SerializedProperty overrideState, GUIContent title, Func<Vector4, Vector3> computeFunc)
+        public void OnGUI(
+            SerializedProperty property,
+            [CanBeNull] SerializedProperty overrideState,
+            GUIContent title,
+            Func<Vector4, Vector3> computeFunc
+        )
         {
             if (!CheckMaterialAndShader())
             {
@@ -77,8 +82,12 @@ namespace UnityEditor.Rendering.Universal
                 {
                     s_WheelThumb = new GUIStyle("ColorPicker2DThumb");
                     s_WheelThumbSize = new Vector2(
-                        !Mathf.Approximately(s_WheelThumb.fixedWidth, 0f) ? s_WheelThumb.fixedWidth : s_WheelThumb.padding.horizontal,
-                        !Mathf.Approximately(s_WheelThumb.fixedHeight, 0f) ? s_WheelThumb.fixedHeight : s_WheelThumb.padding.vertical
+                        !Mathf.Approximately(s_WheelThumb.fixedWidth, 0f)
+                            ? s_WheelThumb.fixedWidth
+                            : s_WheelThumb.padding.horizontal,
+                        !Mathf.Approximately(s_WheelThumb.fixedHeight, 0f)
+                            ? s_WheelThumb.fixedHeight
+                            : s_WheelThumb.padding.vertical
                     );
                 }
 
@@ -87,7 +96,13 @@ namespace UnityEditor.Rendering.Universal
 
                 // Wheel texture
                 var oldRT = RenderTexture.active;
-                var rt = RenderTexture.GetTemporary((int)(size * scale), (int)(size * scale), 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+                var rt = RenderTexture.GetTemporary(
+                    (int)(size * scale),
+                    (int)(size * scale),
+                    0,
+                    RenderTextureFormat.ARGB32,
+                    RenderTextureReadWrite.sRGB
+                );
                 s_Material.SetFloat("_Offset", offset);
                 s_Material.SetFloat("_DisabledState", overrideState && GUI.enabled ? 1f : 0.5f);
                 s_Material.SetVector("_Resolution", new Vector2(size * scale, size * scale / 2f));
@@ -99,7 +114,18 @@ namespace UnityEditor.Rendering.Universal
 
                 var thumbSize = s_WheelThumbSize;
                 var thumbSizeH = thumbSize / 2f;
-                s_WheelThumb.Draw(new Rect(wheelRect.x + hsize + thumbPos.x - thumbSizeH.x, wheelRect.y + hsize + thumbPos.y - thumbSizeH.y, thumbSize.x, thumbSize.y), false, false, false, false);
+                s_WheelThumb.Draw(
+                    new Rect(
+                        wheelRect.x + hsize + thumbPos.x - thumbSizeH.x,
+                        wheelRect.y + hsize + thumbPos.y - thumbSizeH.y,
+                        thumbSize.x,
+                        thumbSize.y
+                    ),
+                    false,
+                    false,
+                    false,
+                    false
+                );
             }
 
             // Input
@@ -142,16 +168,24 @@ namespace UnityEditor.Rendering.Universal
             // Title
             var areaRect = GUILayoutUtility.GetRect(1f, 17f);
             var labelSize = EditorStyles.miniLabel.CalcSize(title);
-            var labelRect = new Rect(areaRect.x + areaRect.width / 2 - labelSize.x / 2, areaRect.y, labelSize.x, labelSize.y);
+            var labelRect = new Rect(
+                areaRect.x + areaRect.width / 2 - labelSize.x / 2,
+                areaRect.y,
+                labelSize.x,
+                labelSize.y
+            );
             GUI.Label(labelRect, title, EditorStyles.miniLabel);
 
             // Override checkbox
             if (overrideState != null)
             {
                 var overrideRect = new Rect(labelRect.x - 17, labelRect.y + 3, 17f, 17f);
-                overrideState.boolValue = GUI.Toggle(overrideRect, overrideState.boolValue,
+                overrideState.boolValue = GUI.Toggle(
+                    overrideRect,
+                    overrideState.boolValue,
                     EditorGUIUtility.TrTextContent("", "Override this setting for this volume."),
-                    CoreEditorStyles.smallTickbox);
+                    CoreEditorStyles.smallTickbox
+                );
             }
         }
 

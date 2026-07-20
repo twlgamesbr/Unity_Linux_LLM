@@ -11,10 +11,14 @@ namespace Unity.Netcode
     /// <typeparam name="T">The type for the list</typeparam>
     [GenerateSerializationForGenericParameter(0)]
     [Serializable]
-    public class NetworkList<T> : NetworkVariableBase where T : unmanaged, IEquatable<T>
+    public class NetworkList<T> : NetworkVariableBase
+        where T : unmanaged, IEquatable<T>
     {
         private NativeList<T> m_List = new NativeList<T>(64, Allocator.Persistent);
-        private NativeList<NetworkListEvent<T>> m_DirtyEvents = new NativeList<NetworkListEvent<T>>(64, Allocator.Persistent);
+        private NativeList<NetworkListEvent<T>> m_DirtyEvents = new NativeList<NetworkListEvent<T>>(
+            64,
+            Allocator.Persistent
+        );
 
         /// <summary>
         /// Delegate type for list changed event
@@ -36,9 +40,11 @@ namespace Unity.Netcode
         /// <param name="values">An optional collection of initial values to populate the list. If null, the list will start empty.</param>
         /// <param name="readPerm">The read permission level for the network list. Determines who can read the list (e.g., server-only or everyone). Default is defined by DefaultReadPerm</param>
         /// <param name="writePerm">The write permission level for the network list. Determines who can modify the list (e.g., server-only or specific clients). Default is defined by DefaultWritePerm.</param>
-        public NetworkList(IEnumerable<T> values = default,
+        public NetworkList(
+            IEnumerable<T> values = default,
             NetworkVariableReadPermission readPerm = DefaultReadPerm,
-            NetworkVariableWritePermission writePerm = DefaultWritePerm)
+            NetworkVariableWritePermission writePerm = DefaultWritePerm
+        )
             : base(readPerm, writePerm)
         {
             // allow null IEnumerable<T> to mean "no values"
@@ -84,7 +90,6 @@ namespace Unity.Netcode
         /// <inheritdoc cref="NetworkVariable{T}.WriteDelta"/>
         public override void WriteDelta(FastBufferWriter writer)
         {
-
             if (base.IsDirty())
             {
                 writer.WriteValueSafe((ushort)1);
@@ -184,22 +189,26 @@ namespace Unity.Netcode
 
                             if (OnListChanged != null)
                             {
-                                OnListChanged(new NetworkListEvent<T>
-                                {
-                                    Type = eventType,
-                                    Index = m_List.Length - 1,
-                                    Value = m_List[m_List.Length - 1]
-                                });
+                                OnListChanged(
+                                    new NetworkListEvent<T>
+                                    {
+                                        Type = eventType,
+                                        Index = m_List.Length - 1,
+                                        Value = m_List[m_List.Length - 1],
+                                    }
+                                );
                             }
 
                             if (isServer)
                             {
-                                m_DirtyEvents.Add(new NetworkListEvent<T>()
-                                {
-                                    Type = eventType,
-                                    Index = m_List.Length - 1,
-                                    Value = m_List[m_List.Length - 1]
-                                });
+                                m_DirtyEvents.Add(
+                                    new NetworkListEvent<T>()
+                                    {
+                                        Type = eventType,
+                                        Index = m_List.Length - 1,
+                                        Value = m_List[m_List.Length - 1],
+                                    }
+                                );
                                 // Preserve the legacy way of handling this
                                 if (keepDirtyDelta)
                                 {
@@ -226,22 +235,26 @@ namespace Unity.Netcode
 
                             if (OnListChanged != null)
                             {
-                                OnListChanged(new NetworkListEvent<T>
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = m_List[index]
-                                });
+                                OnListChanged(
+                                    new NetworkListEvent<T>
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = m_List[index],
+                                    }
+                                );
                             }
 
                             if (isServer)
                             {
-                                m_DirtyEvents.Add(new NetworkListEvent<T>()
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = m_List[index]
-                                });
+                                m_DirtyEvents.Add(
+                                    new NetworkListEvent<T>()
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = m_List[index],
+                                    }
+                                );
                                 // Preserve the legacy way of handling this
                                 if (keepDirtyDelta)
                                 {
@@ -264,22 +277,26 @@ namespace Unity.Netcode
 
                             if (OnListChanged != null)
                             {
-                                OnListChanged(new NetworkListEvent<T>
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = value
-                                });
+                                OnListChanged(
+                                    new NetworkListEvent<T>
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = value,
+                                    }
+                                );
                             }
 
                             if (isServer)
                             {
-                                m_DirtyEvents.Add(new NetworkListEvent<T>()
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = value
-                                });
+                                m_DirtyEvents.Add(
+                                    new NetworkListEvent<T>()
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = value,
+                                    }
+                                );
                                 // Preserve the legacy way of handling this
                                 if (keepDirtyDelta)
                                 {
@@ -296,22 +313,26 @@ namespace Unity.Netcode
 
                             if (OnListChanged != null)
                             {
-                                OnListChanged(new NetworkListEvent<T>
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = value
-                                });
+                                OnListChanged(
+                                    new NetworkListEvent<T>
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = value,
+                                    }
+                                );
                             }
 
                             if (isServer)
                             {
-                                m_DirtyEvents.Add(new NetworkListEvent<T>()
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = value
-                                });
+                                m_DirtyEvents.Add(
+                                    new NetworkListEvent<T>()
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = value,
+                                    }
+                                );
                                 // Preserve the legacy way of handling this
                                 if (keepDirtyDelta)
                                 {
@@ -335,24 +356,28 @@ namespace Unity.Netcode
 
                             if (OnListChanged != null)
                             {
-                                OnListChanged(new NetworkListEvent<T>
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = value,
-                                    PreviousValue = previousValue
-                                });
+                                OnListChanged(
+                                    new NetworkListEvent<T>
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = value,
+                                        PreviousValue = previousValue,
+                                    }
+                                );
                             }
 
                             if (isServer)
                             {
-                                m_DirtyEvents.Add(new NetworkListEvent<T>()
-                                {
-                                    Type = eventType,
-                                    Index = index,
-                                    Value = value,
-                                    PreviousValue = previousValue
-                                });
+                                m_DirtyEvents.Add(
+                                    new NetworkListEvent<T>()
+                                    {
+                                        Type = eventType,
+                                        Index = index,
+                                        Value = value,
+                                        PreviousValue = previousValue,
+                                    }
+                                );
                                 // Preserve the legacy way of handling this
                                 if (keepDirtyDelta)
                                 {
@@ -368,18 +393,12 @@ namespace Unity.Netcode
 
                             if (OnListChanged != null)
                             {
-                                OnListChanged(new NetworkListEvent<T>
-                                {
-                                    Type = eventType,
-                                });
+                                OnListChanged(new NetworkListEvent<T> { Type = eventType });
                             }
 
                             if (isServer)
                             {
-                                m_DirtyEvents.Add(new NetworkListEvent<T>()
-                                {
-                                    Type = eventType
-                                });
+                                m_DirtyEvents.Add(new NetworkListEvent<T>() { Type = eventType });
 
                                 // Preserve the legacy way of handling this
                                 if (keepDirtyDelta)
@@ -442,7 +461,7 @@ namespace Unity.Netcode
             {
                 Type = NetworkListEvent<T>.EventType.Add,
                 Value = item,
-                Index = m_List.Length - 1
+                Index = m_List.Length - 1,
             };
 
             HandleAddListEvent(listEvent);
@@ -465,10 +484,7 @@ namespace Unity.Netcode
 
             m_List.Clear();
 
-            var listEvent = new NetworkListEvent<T>()
-            {
-                Type = NetworkListEvent<T>.EventType.Clear
-            };
+            var listEvent = new NetworkListEvent<T>() { Type = NetworkListEvent<T>.EventType.Clear };
 
             HandleAddListEvent(listEvent);
         }
@@ -508,11 +524,7 @@ namespace Unity.Netcode
             }
 
             m_List.RemoveAt(index);
-            var listEvent = new NetworkListEvent<T>()
-            {
-                Type = NetworkListEvent<T>.EventType.Remove,
-                Value = item
-            };
+            var listEvent = new NetworkListEvent<T>() { Type = NetworkListEvent<T>.EventType.Remove, Value = item };
 
             HandleAddListEvent(listEvent);
             return true;
@@ -564,7 +576,7 @@ namespace Unity.Netcode
             {
                 Type = NetworkListEvent<T>.EventType.Insert,
                 Index = index,
-                Value = item
+                Value = item,
             };
 
             HandleAddListEvent(listEvent);
@@ -592,7 +604,7 @@ namespace Unity.Netcode
             {
                 Type = NetworkListEvent<T>.EventType.RemoveAt,
                 Index = index,
-                Value = value
+                Value = value,
             };
 
             HandleAddListEvent(listEvent);
@@ -635,7 +647,7 @@ namespace Unity.Netcode
                 Type = NetworkListEvent<T>.EventType.Value,
                 Index = index,
                 Value = value,
-                PreviousValue = previousValue
+                PreviousValue = previousValue,
             };
 
             HandleAddListEvent(listEvent);
@@ -751,7 +763,7 @@ namespace Unity.Netcode
             /// <summary>
             /// Full list refresh
             /// </summary>
-            Full
+            Full,
         }
 
         /// <summary>

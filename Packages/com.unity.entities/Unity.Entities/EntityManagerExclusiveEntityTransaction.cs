@@ -17,22 +17,18 @@ namespace Unity.Entities
         /// </summary>
         public JobHandle ExclusiveEntityTransactionDependency
         {
-            get
-            {
+            get {
                 // Note this can't use read/write checking
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckExistsAndThrow(m_Safety);
 #endif
-                return m_EntityDataAccess->DependencyManager->ExclusiveTransactionDependency;
-            }
-            set
-            {
+                return m_EntityDataAccess->DependencyManager->ExclusiveTransactionDependency; }
+            set {
                 // Note this can't use read/write checking
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckExistsAndThrow(m_Safety);
 #endif
-                m_EntityDataAccess->DependencyManager->ExclusiveTransactionDependency = value;
-            }
+                m_EntityDataAccess->DependencyManager->ExclusiveTransactionDependency = value; }
         }
 
         /// <summary>
@@ -76,20 +72,20 @@ namespace Unity.Entities
         {
             var access = GetCheckedEntityDataAccess();
 
-        #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
+#if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (IsInExclusiveTransaction)
                 throw new InvalidOperationException("An exclusive transaction is already in process.");
             if (access->DependencyManager->IsInTransaction)
                 throw new InvalidOperationException("An exclusive transaction is already in process.");
-        #endif
+#endif
 
             access->DependencyManager->BeginExclusiveTransaction();
 
             var copy = this;
 
-        #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
+#if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             copy.m_IsInExclusiveTransaction = 1;
-        #endif
+#endif
             return new ExclusiveEntityTransaction(copy);
         }
 
@@ -101,19 +97,19 @@ namespace Unity.Entities
         /// <seealso cref="BeginExclusiveEntityTransaction()"/>
         public void EndExclusiveEntityTransaction()
         {
-        #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
+#if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (m_IsInExclusiveTransaction == 1)
                 throw new InvalidOperationException("Transactions can only be ended from the main thread");
-        #endif
+#endif
 
-        #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckExistsAndThrow(m_Safety);
-        #endif
+#endif
 
             m_EntityDataAccess->DependencyManager->PreEndExclusiveTransaction();
-        #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-        #endif
+#endif
             m_EntityDataAccess->DependencyManager->EndExclusiveTransaction();
         }
 
@@ -141,15 +137,25 @@ namespace Unity.Entities
 #if ENABLE_PROFILER
             if (StructuralChangesProfiler.Enabled)
             {
-                m_EntityDataAccess->StructuralChangesRecorder.Begin(StructuralChangesProfiler.StructuralChangeType.AddComponent, in m_EntityDataAccess->m_WorldUnmanaged);
-                m_EntityDataAccess->StructuralChangesRecorder.Begin(StructuralChangesProfiler.StructuralChangeType.SetSharedComponent, in m_EntityDataAccess->m_WorldUnmanaged);
+                m_EntityDataAccess->StructuralChangesRecorder.Begin(
+                    StructuralChangesProfiler.StructuralChangeType.AddComponent,
+                    in m_EntityDataAccess->m_WorldUnmanaged
+                );
+                m_EntityDataAccess->StructuralChangesRecorder.Begin(
+                    StructuralChangesProfiler.StructuralChangeType.SetSharedComponent,
+                    in m_EntityDataAccess->m_WorldUnmanaged
+                );
             }
 #endif
 
             var componentType = ComponentType.ReadWrite<T>();
             var archetypeChanges = m_EntityDataAccess->BeginStructuralChanges();
             int sharedComponentIndex = m_EntityDataAccess->InsertSharedComponent(componentData);
-            m_EntityDataAccess->AddSharedComponentDataDuringStructuralChange(chunks, sharedComponentIndex, componentType);
+            m_EntityDataAccess->AddSharedComponentDataDuringStructuralChange(
+                chunks,
+                sharedComponentIndex,
+                componentType
+            );
             m_EntityDataAccess->EndStructuralChanges(ref archetypeChanges);
 
 #if ENABLE_PROFILER
@@ -170,22 +176,34 @@ namespace Unity.Entities
 #endif
         }
 
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleSharedComponentData) })]
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleSharedComponentData) }
+        )]
         internal void AddSharedComponent<T>(NativeArray<ArchetypeChunk> chunks, T componentData)
             where T : unmanaged, ISharedComponentData
         {
 #if ENABLE_PROFILER
             if (StructuralChangesProfiler.Enabled)
             {
-                m_EntityDataAccess->StructuralChangesRecorder.Begin(StructuralChangesProfiler.StructuralChangeType.AddComponent, in m_EntityDataAccess->m_WorldUnmanaged);
-                m_EntityDataAccess->StructuralChangesRecorder.Begin(StructuralChangesProfiler.StructuralChangeType.SetSharedComponent, in m_EntityDataAccess->m_WorldUnmanaged);
+                m_EntityDataAccess->StructuralChangesRecorder.Begin(
+                    StructuralChangesProfiler.StructuralChangeType.AddComponent,
+                    in m_EntityDataAccess->m_WorldUnmanaged
+                );
+                m_EntityDataAccess->StructuralChangesRecorder.Begin(
+                    StructuralChangesProfiler.StructuralChangeType.SetSharedComponent,
+                    in m_EntityDataAccess->m_WorldUnmanaged
+                );
             }
 #endif
 
             var componentType = ComponentType.ReadWrite<T>();
             var archetypeChanges = m_EntityDataAccess->BeginStructuralChanges();
             int sharedComponentIndex = m_EntityDataAccess->InsertSharedComponent_Unmanaged(componentData);
-            m_EntityDataAccess->AddSharedComponentDataDuringStructuralChange(chunks, sharedComponentIndex, componentType);
+            m_EntityDataAccess->AddSharedComponentDataDuringStructuralChange(
+                chunks,
+                sharedComponentIndex,
+                componentType
+            );
             m_EntityDataAccess->EndStructuralChanges(ref archetypeChanges);
 
 #if ENABLE_PROFILER
@@ -201,7 +219,13 @@ namespace Unity.Entities
             {
                 var typeIndex = componentType.TypeIndex;
                 m_EntityDataAccess->JournalAddRecord_AddComponent(default, in chunks, &typeIndex, 1);
-                m_EntityDataAccess->JournalAddRecord_SetSharedComponent(default, in chunks, typeIndex, &componentData, TypeManager.GetTypeInfo(typeIndex).TypeSize);
+                m_EntityDataAccess->JournalAddRecord_SetSharedComponent(
+                    default,
+                    in chunks,
+                    typeIndex,
+                    &componentData,
+                    TypeManager.GetTypeInfo(typeIndex).TypeSize
+                );
             }
 #endif
         }

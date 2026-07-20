@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Injector;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEditor.Build.Pipeline.Utilities;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline.Tasks
 {
@@ -14,7 +14,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class GenerateBundleMaps : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -92,7 +95,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
                             if (!objectDependencies.Contains(serializedObject.serializationObject))
                                 continue;
 
-                            referenceMap.AddMapping(file, serializedObject.serializationIndex, serializedObject.serializationObject);
+                            referenceMap.AddMapping(
+                                file,
+                                serializedObject.serializationIndex,
+                                serializedObject.serializationObject
+                            );
                         }
                     }
                 }

@@ -1,6 +1,6 @@
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEditorInternal;
 
 namespace UnityEditor.Rendering
 {
@@ -160,7 +160,8 @@ namespace UnityEditor.Rendering
             var lineRect = EditorGUILayout.GetControlRect();
             EditorGUI.BeginProperty(lineRect, title, value);
             value.intValue = FieldToLayerMask(
-                EditorGUI.MaskField(lineRect, title, LayerMaskToField(value.intValue), InternalEditorUtility.layers));
+                EditorGUI.MaskField(lineRect, title, LayerMaskToField(value.intValue), InternalEditorUtility.layers)
+            );
             EditorGUI.EndProperty();
             return true;
         }
@@ -181,7 +182,7 @@ namespace UnityEditor.Rendering
             var lineRect = EditorGUILayout.GetControlRect();
             EditorGUI.BeginProperty(lineRect, title, value);
             EditorGUI.BeginChangeCheck();
-            var newVal= EditorGUI.RenderingLayerMaskField(lineRect, title, value.uintValue);
+            var newVal = EditorGUI.RenderingLayerMaskField(lineRect, title, value.uintValue);
             if (EditorGUI.EndChangeCheck())
                 value.uintValue = newVal;
             EditorGUI.EndProperty();

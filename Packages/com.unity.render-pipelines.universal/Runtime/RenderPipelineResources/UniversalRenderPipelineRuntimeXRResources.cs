@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     /// <remarks>
     /// You cannot edit these resources through the editor's UI; use the API for advanced changes.
     /// Changing this through the API is only allowed in the Editor. In the Player, this raises an error.
-    /// 
+    ///
     /// This container is removed for non-XR builds.
     /// </remarks>
     /// <seealso cref="IRenderPipelineResources"/>
@@ -17,7 +17,7 @@ namespace UnityEngine.Rendering.Universal
     /// <code>
     /// using UnityEngine.Rendering;
     /// using UnityEngine.Rendering.Universal;
-    /// 
+    ///
     /// public static class URPUniversalRendererRuntimeXRResourcesHelper
     /// {
     ///     public static Shader motionVector

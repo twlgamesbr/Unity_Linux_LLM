@@ -13,9 +13,7 @@ namespace Unity.Entities.Editor
         class SpinnerElementFactory : UxmlFactory<SpinnerElement, SpinnerElementTraits> { }
 
         [UsedImplicitly]
-        class SpinnerElementTraits : UxmlTraits
-        {
-        }
+        class SpinnerElementTraits : UxmlTraits { }
 #endif
 
         static readonly VisualElementTemplate k_Template = new(Resources.PackageId, "Spinner/spinner");
@@ -34,8 +32,7 @@ namespace Unity.Entities.Editor
             m_ScheduledItem = schedule.Execute(UpdateSpinner).Every(Convert.ToInt64(1000.0f / 12.0f));
         }
 
-        static string GetSpinnerClass(int index)
-            => $"spinner-background-image-{index}";
+        static string GetSpinnerClass(int index) => $"spinner-background-image-{index}";
 
         void UpdateSpinner(TimerState obj)
         {

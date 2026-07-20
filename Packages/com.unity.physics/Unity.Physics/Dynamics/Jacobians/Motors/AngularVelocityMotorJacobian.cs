@@ -11,7 +11,7 @@ namespace Unity.Physics
     {
         // Rotation axis in motion A space
         public float3 AxisInMotionA;
-        public float Target;   // in rad/s
+        public float Target; // in rad/s
 
         public RigidTransform WorldFromA;
 
@@ -35,9 +35,14 @@ namespace Unity.Physics
 
         // Build the Jacobian
         public void Build(
-            MTransform aFromConstraint, MTransform bFromConstraint,
-            MotionData motionA, MotionData motionB,
-            Constraint constraint, float tau, float damping)
+            MTransform aFromConstraint,
+            MTransform bFromConstraint,
+            MotionData motionA,
+            MotionData motionB,
+            Constraint constraint,
+            float tau,
+            float damping
+        )
         {
             AxisIndex = constraint.ConstrainedAxis1D;
             AxisInMotionA = aFromConstraint.Rotation[AxisIndex];
@@ -57,25 +62,35 @@ namespace Unity.Physics
         }
 
         // Solve the Jacobian
-        public void Solve(ref JacobianHeader jacHeader, ref MotionVelocity velocityA, ref MotionVelocity velocityB,
-            Solver.StepInput stepInput)
+        public void Solve(
+            ref JacobianHeader jacHeader,
+            ref MotionVelocity velocityA,
+            ref MotionVelocity velocityB,
+            Solver.StepInput stepInput
+        )
         {
             // Predict the relative orientation at the end of the step
-            quaternion futureMotionBFromA = JacobianUtilities.IntegrateOrientationBFromA(MotionBFromA,
-                velocityA.AngularVelocity, velocityB.AngularVelocity, stepInput.Timestep);
+            quaternion futureMotionBFromA = JacobianUtilities.IntegrateOrientationBFromA(
+                MotionBFromA,
+                velocityA.AngularVelocity,
+                velocityB.AngularVelocity,
+                stepInput.Timestep
+            );
 
             // Calculate the effective mass
             float3 axisInMotionB = math.mul(futureMotionBFromA, AxisInMotionA);
             float effectiveMass;
             {
-                float invEffectiveMass = math.csum(AxisInMotionA * AxisInMotionA * velocityA.InverseInertia +
-                    axisInMotionB * axisInMotionB * velocityB.InverseInertia);
+                float invEffectiveMass = math.csum(
+                    AxisInMotionA * AxisInMotionA * velocityA.InverseInertia
+                        + axisInMotionB * axisInMotionB * velocityB.InverseInertia
+                );
                 effectiveMass = math.select(1.0f / invEffectiveMass, 0.0f, invEffectiveMass == 0.0f);
             }
 
             // Compute the current relative angular velocity between the two bodies about the rotation axis
-            var relativeVelocity = math.dot(velocityA.AngularVelocity, AxisInMotionA) -
-                math.dot(velocityB.AngularVelocity, axisInMotionB);
+            var relativeVelocity =
+                math.dot(velocityA.AngularVelocity, AxisInMotionA) - math.dot(velocityB.AngularVelocity, axisInMotionB);
 
             // Compute the error between the target relative velocity and the current relative velocity
             VelocityError = Target - relativeVelocity;

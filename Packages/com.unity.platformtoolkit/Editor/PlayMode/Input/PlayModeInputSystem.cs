@@ -17,9 +17,7 @@ namespace Unity.PlatformToolkit.PlayMode
         // Per documentation on SerializableDictionary, we create a subclass in order to serialize its contents.
         //TODO: Find a way to serialize the reference rather than the entire play mode account data object so we do not serialize twice or more
         [Serializable]
-        internal class AccountByControllerId : SerializableDictionary<int, PlayModeAccountData>
-        {
-        }
+        internal class AccountByControllerId : SerializableDictionary<int, PlayModeAccountData> { }
 
         [SerializeField]
         // The keys in this dictionary == the IDs of currently connected gamepads.
@@ -40,7 +38,11 @@ namespace Unity.PlatformToolkit.PlayMode
         public ScriptableObjectDataChangePersistor Persistor { private get; set; }
         public PlayModeUserManager UserManager { private get; set; }
 
-        public PlayModeInputSystem(PlayModeInputSystemData serializedData, ScriptableObjectDataChangePersistor persistor, PlayModeUserManager userManager)
+        public PlayModeInputSystem(
+            PlayModeInputSystemData serializedData,
+            ScriptableObjectDataChangePersistor persistor,
+            PlayModeUserManager userManager
+        )
         {
             m_SerializedData = serializedData ?? throw new ArgumentNullException(nameof(serializedData));
             Persistor = persistor ?? throw new ArgumentNullException(nameof(persistor));
@@ -176,7 +178,7 @@ namespace Unity.PlatformToolkit.PlayMode
             {
                 var accountByControllerId = m_SerializedData.m_AccountByControllerId;
 
-                foreach(var device in accountByControllerId.Keys.ToArray())
+                foreach (var device in accountByControllerId.Keys.ToArray())
                 {
                     var pairedAccount = accountByControllerId[device];
                     //We don't return after this because one account can be assigned to multiple devices
@@ -197,7 +199,7 @@ namespace Unity.PlatformToolkit.PlayMode
         public IReadOnlyDictionary<InputDevice, PlayModeAccountData> GetAccountDevicePairs()
         {
             var accountByInputDevice = new Dictionary<InputDevice, PlayModeAccountData>();
-            foreach (var(deviceId, account) in m_SerializedData.m_AccountByControllerId)
+            foreach (var (deviceId, account) in m_SerializedData.m_AccountByControllerId)
             {
                 var device = Gamepad.all.FirstOrDefault(g => g.deviceId == deviceId);
                 if (device == null)

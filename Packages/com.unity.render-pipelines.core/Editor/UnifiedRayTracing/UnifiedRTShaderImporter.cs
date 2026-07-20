@@ -1,5 +1,5 @@
-using UnityEditor.AssetImporters;
 using System.IO;
+using UnityEditor.AssetImporters;
 
 namespace UnityEditor.Rendering.UnifiedRayTracing
 {
@@ -11,8 +11,10 @@ namespace UnityEditor.Rendering.UnifiedRayTracing
             string source = File.ReadAllText(FileUtil.PathToAbsolutePath(ctx.assetPath));
 
             var com = ShaderUtil.CreateComputeShaderAsset(ctx, computeShaderTemplate.Replace("SHADERCODE", source));
-            var rt = ShaderUtil.CreateRayTracingShaderAsset(ctx,
-                raytracingShaderTemplate.Replace("SHADERCODE", source));
+            var rt = ShaderUtil.CreateRayTracingShaderAsset(
+                ctx,
+                raytracingShaderTemplate.Replace("SHADERCODE", source)
+            );
 
             ctx.AddObjectToAsset("ComputeShader", com);
             ctx.AddObjectToAsset("RayTracingShader", rt);
@@ -20,13 +22,13 @@ namespace UnityEditor.Rendering.UnifiedRayTracing
         }
 
         const string computeShaderTemplate =
-            "#define UNIFIED_RT_BACKEND_COMPUTE\n" +
-            "SHADERCODE\n" +
-            "#include_with_pragmas \"Packages/com.unity.render-pipelines.core/Runtime/UnifiedRayTracing/Compute/ComputeRaygenShader.hlsl\"\n";
+            "#define UNIFIED_RT_BACKEND_COMPUTE\n"
+            + "SHADERCODE\n"
+            + "#include_with_pragmas \"Packages/com.unity.render-pipelines.core/Runtime/UnifiedRayTracing/Compute/ComputeRaygenShader.hlsl\"\n";
 
         const string raytracingShaderTemplate =
-            "#define UNIFIED_RT_BACKEND_HARDWARE\n" +
-            "SHADERCODE\n" +
-            "#include_with_pragmas \"Packages/com.unity.render-pipelines.core/Runtime/UnifiedRayTracing/Hardware/HardwareRaygenShader.hlsl\"\n";
+            "#define UNIFIED_RT_BACKEND_HARDWARE\n"
+            + "SHADERCODE\n"
+            + "#include_with_pragmas \"Packages/com.unity.render-pipelines.core/Runtime/UnifiedRayTracing/Hardware/HardwareRaygenShader.hlsl\"\n";
     }
 }

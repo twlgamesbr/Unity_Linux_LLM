@@ -60,18 +60,26 @@ namespace Unity.Netcode
 #endif
         }
 
-        private static unsafe ReaderHandle* CreateHandle(byte* buffer, int length, int offset, Allocator copyAllocator, Allocator internalAllocator)
+        private static unsafe ReaderHandle* CreateHandle(
+            byte* buffer,
+            int length,
+            int offset,
+            Allocator copyAllocator,
+            Allocator internalAllocator
+        )
         {
             ReaderHandle* readerHandle;
             if (copyAllocator == Allocator.None)
             {
-                readerHandle = (ReaderHandle*)UnsafeUtility.Malloc(sizeof(ReaderHandle), UnsafeUtility.AlignOf<byte>(), internalAllocator);
+                readerHandle = (ReaderHandle*)
+                    UnsafeUtility.Malloc(sizeof(ReaderHandle), UnsafeUtility.AlignOf<byte>(), internalAllocator);
                 readerHandle->BufferPointer = buffer;
                 readerHandle->Position = offset;
             }
             else
             {
-                readerHandle = (ReaderHandle*)UnsafeUtility.Malloc(sizeof(ReaderHandle) + length, UnsafeUtility.AlignOf<byte>(), copyAllocator);
+                readerHandle = (ReaderHandle*)
+                    UnsafeUtility.Malloc(sizeof(ReaderHandle) + length, UnsafeUtility.AlignOf<byte>(), copyAllocator);
                 UnsafeUtility.MemCpy(readerHandle + 1, buffer + offset, length);
                 readerHandle->BufferPointer = (byte*)(readerHandle + 1);
                 readerHandle->Position = 0;
@@ -110,9 +118,21 @@ namespace Unity.Netcode
         /// <param name="length">The number of bytes to read from the buffer. If set to -1, the entire buffer length will be used</param>
         /// <param name="offset">The offset into the buffer to start reading from</param>
         /// <param name="internalAllocator">The allocator type used for internal data when this reader points directly at a buffer owned by someone else</param>
-        public unsafe FastBufferReader(NativeArray<byte> buffer, Allocator copyAllocator, int length = -1, int offset = 0, Allocator internalAllocator = Allocator.Temp)
+        public unsafe FastBufferReader(
+            NativeArray<byte> buffer,
+            Allocator copyAllocator,
+            int length = -1,
+            int offset = 0,
+            Allocator internalAllocator = Allocator.Temp
+        )
         {
-            Handle = CreateHandle((byte*)buffer.GetUnsafePtr(), length == -1 ? buffer.Length : length, offset, copyAllocator, internalAllocator);
+            Handle = CreateHandle(
+                (byte*)buffer.GetUnsafePtr(),
+                length == -1 ? buffer.Length : length,
+                offset,
+                copyAllocator,
+                internalAllocator
+            );
         }
 
         /// <summary>
@@ -128,7 +148,12 @@ namespace Unity.Netcode
         /// <param name="copyAllocator">The allocator type used for internal data when copying an existing buffer if other than Allocator.None is specified, that memory will be owned by this FastBufferReader instance</param>
         /// <param name="length">The number of bytes to copy (all if this is -1)</param>
         /// <param name="offset">The offset of the buffer to start copying from</param>
-        public unsafe FastBufferReader(ArraySegment<byte> buffer, Allocator copyAllocator, int length = -1, int offset = 0)
+        public unsafe FastBufferReader(
+            ArraySegment<byte> buffer,
+            Allocator copyAllocator,
+            int length = -1,
+            int offset = 0
+        )
         {
             if (copyAllocator == Allocator.None)
             {
@@ -136,7 +161,13 @@ namespace Unity.Netcode
             }
             fixed (byte* data = buffer.Array)
             {
-                Handle = CreateHandle(data, length == -1 ? buffer.Count : length, offset, copyAllocator, Allocator.Temp);
+                Handle = CreateHandle(
+                    data,
+                    length == -1 ? buffer.Count : length,
+                    offset,
+                    copyAllocator,
+                    Allocator.Temp
+                );
             }
         }
 
@@ -160,8 +191,13 @@ namespace Unity.Netcode
             }
             fixed (byte* data = buffer.Array)
             {
-
-                Handle = CreateHandle(data, length == -1 ? buffer.Count : length, buffer.Offset, copyAllocator, Allocator.Temp);
+                Handle = CreateHandle(
+                    data,
+                    length == -1 ? buffer.Count : length,
+                    buffer.Offset,
+                    copyAllocator,
+                    Allocator.Temp
+                );
             }
         }
 
@@ -209,7 +245,13 @@ namespace Unity.Netcode
             }
             fixed (byte* data = buffer)
             {
-                Handle = CreateHandle(data, length == -1 ? buffer.Length : length, offset, copyAllocator, Allocator.Temp);
+                Handle = CreateHandle(
+                    data,
+                    length == -1 ? buffer.Length : length,
+                    offset,
+                    copyAllocator,
+                    Allocator.Temp
+                );
             }
         }
 
@@ -233,7 +275,13 @@ namespace Unity.Netcode
         /// <param name="length">The number of bytes to copy</param>
         /// <param name="offset">The offset of the buffer to start copying from</param>
         /// <param name="internalAllocator">The allocator type used for internal data when this reader points directly at a buffer owned by someone else</param>
-        public unsafe FastBufferReader(byte* buffer, Allocator copyAllocator, int length, int offset = 0, Allocator internalAllocator = Allocator.Temp)
+        public unsafe FastBufferReader(
+            byte* buffer,
+            Allocator copyAllocator,
+            int length,
+            int offset = 0,
+            Allocator internalAllocator = Allocator.Temp
+        )
         {
             Handle = CreateHandle(buffer, length, offset, copyAllocator, internalAllocator);
         }
@@ -258,9 +306,21 @@ namespace Unity.Netcode
         /// <param name="length">The number of bytes to copy (all if this is -1)</param>
         /// <param name="offset">The offset of the buffer to start copying from</param>
         /// <param name="internalAllocator">The allocator type used for internal data when this reader points directly at a buffer owned by someone else</param>
-        public unsafe FastBufferReader(FastBufferWriter writer, Allocator copyAllocator, int length = -1, int offset = 0, Allocator internalAllocator = Allocator.Temp)
+        public unsafe FastBufferReader(
+            FastBufferWriter writer,
+            Allocator copyAllocator,
+            int length = -1,
+            int offset = 0,
+            Allocator internalAllocator = Allocator.Temp
+        )
         {
-            Handle = CreateHandle(writer.GetUnsafePtr(), length == -1 ? writer.Length : length, offset, copyAllocator, internalAllocator);
+            Handle = CreateHandle(
+                writer.GetUnsafePtr(),
+                length == -1 ? writer.Length : length,
+                offset,
+                copyAllocator,
+                internalAllocator
+            );
         }
 
         /// <summary>
@@ -283,9 +343,21 @@ namespace Unity.Netcode
         /// <param name="length">The number of bytes to copy (all if this is -1)</param>
         /// <param name="offset">The offset of the buffer to start copying from</param>
         /// <param name="internalAllocator">The allocator type used for internal data when this reader points directly at a buffer owned by someone else</param>
-        public unsafe FastBufferReader(FastBufferReader reader, Allocator copyAllocator, int length = -1, int offset = 0, Allocator internalAllocator = Allocator.Temp)
+        public unsafe FastBufferReader(
+            FastBufferReader reader,
+            Allocator copyAllocator,
+            int length = -1,
+            int offset = 0,
+            Allocator internalAllocator = Allocator.Temp
+        )
         {
-            Handle = CreateHandle(reader.GetUnsafePtr(), length == -1 ? reader.Length : length, offset, copyAllocator, internalAllocator);
+            Handle = CreateHandle(
+                reader.GetUnsafePtr(),
+                length == -1 ? reader.Length : length,
+                offset,
+                copyAllocator,
+                internalAllocator
+            );
         }
 
         /// <summary>
@@ -325,7 +397,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + amount > Handle->AllowedReadMark)
             {
@@ -370,7 +443,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             if (Handle->Position + bytes > Handle->Length)
@@ -399,13 +473,15 @@ namespace Unity.Netcode
         /// <returns>True if the read is allowed, false otherwise</returns>
         /// <exception cref="InvalidOperationException">If called while in a bitwise context</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe bool TryBeginReadValue<T>(in T value) where T : unmanaged
+        public unsafe bool TryBeginReadValue<T>(in T value)
+            where T : unmanaged
         {
 #if DEBUG
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             int len = sizeof(T);
@@ -433,7 +509,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
             if (Handle->Position + bytes > Handle->Length)
@@ -491,7 +568,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type that implements INetworkSerializable and can be deserialized</typeparam>
         /// <param name="value">INetworkSerializable instance</param>
         /// <exception cref="NotImplementedException">Thrown if the type T does not properly implement NetworkSerialize</exception>
-        public void ReadNetworkSerializable<T>(out T value) where T : INetworkSerializable, new()
+        public void ReadNetworkSerializable<T>(out T value)
+            where T : INetworkSerializable, new()
         {
             value = new T();
             var bufferSerializer = new BufferSerializer<BufferSerializerReader>(new BufferSerializerReader(this));
@@ -504,7 +582,8 @@ namespace Unity.Netcode
         /// <param name="value">INetworkSerializable instance</param>
         /// <typeparam name="T">the array to read the values of type `T` from</typeparam>
         /// <exception cref="NotImplementedException">Thrown if the type T does not properly implement NetworkSerialize</exception>
-        public void ReadNetworkSerializable<T>(out T[] value) where T : INetworkSerializable, new()
+        public void ReadNetworkSerializable<T>(out T[] value)
+            where T : INetworkSerializable, new()
         {
             ReadValueSafe(out int size);
             value = new T[size];
@@ -521,7 +600,8 @@ namespace Unity.Netcode
         /// <param name="allocator">The allocator to use to construct the resulting NativeArray</param>
         /// <typeparam name="T">the array to read the values of type `T` from</typeparam>
         /// <exception cref="NotImplementedException">Thrown if the type T does not properly implement NetworkSerialize</exception>
-        public void ReadNetworkSerializable<T>(out NativeArray<T> value, Allocator allocator) where T : unmanaged, INetworkSerializable
+        public void ReadNetworkSerializable<T>(out NativeArray<T> value, Allocator allocator)
+            where T : unmanaged, INetworkSerializable
         {
             ReadValueSafe(out int size);
             value = new NativeArray<T>(size, allocator);
@@ -539,7 +619,8 @@ namespace Unity.Netcode
         /// <param name="value">INetworkSerializable instance</param>
         /// <typeparam name="T">the array to read the values of type `T` from</typeparam>
         /// <exception cref="NotImplementedException">Thrown if the type T does not properly implement NetworkSerialize</exception>
-        public void ReadNetworkSerializableInPlace<T>(ref NativeList<T> value) where T : unmanaged, INetworkSerializable
+        public void ReadNetworkSerializableInPlace<T>(ref NativeList<T> value)
+            where T : unmanaged, INetworkSerializable
         {
             ReadValueSafe(out int size);
             value.Resize(size, NativeArrayOptions.UninitializedMemory);
@@ -557,7 +638,8 @@ namespace Unity.Netcode
         /// <typeparam name="T">The type that implements INetworkSerializable and can be deserialized</typeparam>
         /// <param name="value">INetworkSerializable instance</param>
         /// <exception cref="NotImplementedException">hrown if the type T does not properly implement NetworkSerialize</exception>
-        public void ReadNetworkSerializableInPlace<T>(ref T value) where T : INetworkSerializable
+        public void ReadNetworkSerializableInPlace<T>(ref T value)
+            where T : INetworkSerializable
         {
             var bufferSerializer = new BufferSerializer<BufferSerializerReader>(new BufferSerializerReader(this));
             value.NetworkSerialize(bufferSerializer);
@@ -606,7 +688,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -677,13 +760,15 @@ namespace Unity.Netcode
         /// <exception cref="InvalidOperationException">Thrown when attempting to use BufferReader in bytewise mode while in a bitwise context</exception>
         /// <exception cref="OverflowException">Thrown when attempting to read without first calling TryBeginRead() or when reading beyond the allowed read mark</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void ReadPartialValue<T>(out T value, int bytesToRead, int offsetBytes = 0) where T : unmanaged
+        public unsafe void ReadPartialValue<T>(out T value, int bytesToRead, int offsetBytes = 0)
+            where T : unmanaged
         {
 #if DEBUG
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + bytesToRead > Handle->AllowedReadMark)
             {
@@ -711,7 +796,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + 1 > Handle->AllowedReadMark)
             {
@@ -735,7 +821,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -759,7 +846,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
             if (Handle->Position + size > Handle->AllowedReadMark)
             {
@@ -786,7 +874,8 @@ namespace Unity.Netcode
             if (Handle->InBitwiseContext)
             {
                 throw new InvalidOperationException(
-                    "Cannot use BufferReader in bytewise mode while in a bitwise context.");
+                    "Cannot use BufferReader in bytewise mode while in a bitwise context."
+                );
             }
 #endif
 
@@ -832,7 +921,8 @@ namespace Unity.Netcode
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanaged<T>(out T value) where T : unmanaged
+        internal unsafe void ReadUnmanaged<T>(out T value)
+            where T : unmanaged
         {
             fixed (T* ptr = &value)
             {
@@ -840,8 +930,10 @@ namespace Unity.Netcode
                 ReadBytes(bytes, sizeof(T));
             }
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanagedSafe<T>(out T value) where T : unmanaged
+        internal unsafe void ReadUnmanagedSafe<T>(out T value)
+            where T : unmanaged
         {
             fixed (T* ptr = &value)
             {
@@ -849,8 +941,10 @@ namespace Unity.Netcode
                 ReadBytesSafe(bytes, sizeof(T));
             }
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanaged<T>(out T[] value) where T : unmanaged
+        internal unsafe void ReadUnmanaged<T>(out T[] value)
+            where T : unmanaged
         {
             ReadLength(out int sizeInTs);
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -861,8 +955,10 @@ namespace Unity.Netcode
                 ReadBytes(bytes, sizeInBytes);
             }
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanagedSafe<T>(out T[] value) where T : unmanaged
+        internal unsafe void ReadUnmanagedSafe<T>(out T[] value)
+            where T : unmanaged
         {
             ReadLengthSafe(out int sizeInTs);
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -873,8 +969,10 @@ namespace Unity.Netcode
                 ReadBytesSafe(bytes, sizeInBytes);
             }
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanaged<T>(out NativeArray<T> value, Allocator allocator) where T : unmanaged
+        internal unsafe void ReadUnmanaged<T>(out NativeArray<T> value, Allocator allocator)
+            where T : unmanaged
         {
             ReadLength(out int sizeInTs);
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -882,8 +980,10 @@ namespace Unity.Netcode
             byte* bytes = (byte*)value.GetUnsafePtr();
             ReadBytes(bytes, sizeInBytes);
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanagedSafe<T>(out NativeArray<T> value, Allocator allocator) where T : unmanaged
+        internal unsafe void ReadUnmanagedSafe<T>(out NativeArray<T> value, Allocator allocator)
+            where T : unmanaged
         {
             ReadLengthSafe(out int sizeInTs);
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -891,9 +991,11 @@ namespace Unity.Netcode
             byte* bytes = (byte*)value.GetUnsafePtr();
             ReadBytesSafe(bytes, sizeInBytes);
         }
+
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanagedInPlace<T>(ref NativeList<T> value) where T : unmanaged
+        internal unsafe void ReadUnmanagedInPlace<T>(ref NativeList<T> value)
+            where T : unmanaged
         {
             ReadLength(out int sizeInTs);
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -901,8 +1003,10 @@ namespace Unity.Netcode
             byte* bytes = (byte*)value.GetUnsafePtr();
             ReadBytes(bytes, sizeInBytes);
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal unsafe void ReadUnmanagedSafeInPlace<T>(ref NativeList<T> value) where T : unmanaged
+        internal unsafe void ReadUnmanagedSafeInPlace<T>(ref NativeList<T> value)
+            where T : unmanaged
         {
             ReadLengthSafe(out int sizeInTs);
             int sizeInBytes = sizeInTs * sizeof(T);
@@ -919,7 +1023,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T value, FastBufferWriter.ForNetworkSerializable unused = default) where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
+        public void ReadValue<T>(out T value, FastBufferWriter.ForNetworkSerializable unused = default)
+            where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
 
         /// <summary>
         /// Read a NetworkSerializable array
@@ -928,7 +1033,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T[] value, FastBufferWriter.ForNetworkSerializable unused = default) where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
+        public void ReadValue<T>(out T[] value, FastBufferWriter.ForNetworkSerializable unused = default)
+            where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
 
         /// <summary>
         /// Read a NetworkSerializable value
@@ -940,7 +1046,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForNetworkSerializable unused = default) where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
+        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForNetworkSerializable unused = default)
+            where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
 
         /// <summary>
         /// Read a NetworkSerializable array
@@ -952,7 +1059,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForNetworkSerializable unused = default) where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
+        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForNetworkSerializable unused = default)
+            where T : INetworkSerializable, new() => ReadNetworkSerializable(out value);
 
         /// <summary>
         /// Read a NetworkSerializable NativeArray
@@ -965,8 +1073,12 @@ namespace Unity.Netcode
         /// <param name="allocator">The allocator to use to construct the resulting NativeArray</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out NativeArray<T> value, Allocator allocator, FastBufferWriter.ForNetworkSerializable unused = default) where T : unmanaged, INetworkSerializable => ReadNetworkSerializable(out value, allocator);
-
+        public void ReadValueSafe<T>(
+            out NativeArray<T> value,
+            Allocator allocator,
+            FastBufferWriter.ForNetworkSerializable unused = default
+        )
+            where T : unmanaged, INetworkSerializable => ReadNetworkSerializable(out value, allocator);
 
         /// <summary>
         /// Read a struct
@@ -975,7 +1087,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanaged(out value);
+        public void ReadValue<T>(out T value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanaged(out value);
 
         /// <summary>
         /// Read a struct array
@@ -984,7 +1097,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T[] value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanaged(out value);
+        public void ReadValue<T>(out T[] value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanaged(out value);
 
         /// <summary>
         /// Read a struct NativeArray
@@ -994,7 +1108,12 @@ namespace Unity.Netcode
         /// <param name="allocator">The allocator to use to construct the resulting NativeArray</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out NativeArray<T> value, Allocator allocator, FastBufferWriter.ForGeneric unused = default) where T : unmanaged
+        public void ReadValue<T>(
+            out NativeArray<T> value,
+            Allocator allocator,
+            FastBufferWriter.ForGeneric unused = default
+        )
+            where T : unmanaged
         {
             if (typeof(INetworkSerializable).IsAssignableFrom(typeof(T)))
             {
@@ -1015,13 +1134,18 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueTemp<T>(out NativeArray<T> value, FastBufferWriter.ForGeneric unused = default) where T : unmanaged
+        public void ReadValueTemp<T>(out NativeArray<T> value, FastBufferWriter.ForGeneric unused = default)
+            where T : unmanaged
         {
             if (typeof(INetworkSerializable).IsAssignableFrom(typeof(T)))
             {
                 // This calls WriteNetworkSerializable in a way that doesn't require
                 // any boxing.
-                NetworkVariableSerialization<NativeArray<T>>.Serializer.ReadWithAllocator(this, out value, Allocator.Temp);
+                NetworkVariableSerialization<NativeArray<T>>.Serializer.ReadWithAllocator(
+                    this,
+                    out value,
+                    Allocator.Temp
+                );
             }
             else
             {
@@ -1037,7 +1161,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueInPlace<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default) where T : unmanaged
+        public void ReadValueInPlace<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default)
+            where T : unmanaged
         {
             if (typeof(INetworkSerializable).IsAssignableFrom(typeof(T)))
             {
@@ -1062,7 +1187,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanagedSafe(out value);
+        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanagedSafe(out value);
 
         /// <summary>
         /// Read a struct array
@@ -1074,7 +1200,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForStructs unused = default) where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanagedSafe(out value);
+        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForStructs unused = default)
+            where T : unmanaged, INetworkSerializeByMemcpy => ReadUnmanagedSafe(out value);
 
         /// <summary>
         /// Read a struct NativeArray
@@ -1087,7 +1214,12 @@ namespace Unity.Netcode
         /// <param name="allocator">The allocator to use to construct the resulting NativeArray</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out NativeArray<T> value, Allocator allocator, FastBufferWriter.ForGeneric unused = default) where T : unmanaged
+        public void ReadValueSafe<T>(
+            out NativeArray<T> value,
+            Allocator allocator,
+            FastBufferWriter.ForGeneric unused = default
+        )
+            where T : unmanaged
         {
             if (typeof(INetworkSerializable).IsAssignableFrom(typeof(T)))
             {
@@ -1111,13 +1243,18 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafeTemp<T>(out NativeArray<T> value, FastBufferWriter.ForGeneric unused = default) where T : unmanaged
+        public void ReadValueSafeTemp<T>(out NativeArray<T> value, FastBufferWriter.ForGeneric unused = default)
+            where T : unmanaged
         {
             if (typeof(INetworkSerializable).IsAssignableFrom(typeof(T)))
             {
                 // This calls WriteNetworkSerializable in a way that doesn't require
                 // any boxing.
-                NetworkVariableSerialization<NativeArray<T>>.Serializer.ReadWithAllocator(this, out value, Allocator.Temp);
+                NetworkVariableSerialization<NativeArray<T>>.Serializer.ReadWithAllocator(
+                    this,
+                    out value,
+                    Allocator.Temp
+                );
             }
             else
             {
@@ -1136,7 +1273,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafeInPlace<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default) where T : unmanaged
+        public void ReadValueSafeInPlace<T>(ref NativeList<T> value, FastBufferWriter.ForGeneric unused = default)
+            where T : unmanaged
         {
             if (typeof(INetworkSerializable).IsAssignableFrom(typeof(T)))
             {
@@ -1151,7 +1289,8 @@ namespace Unity.Netcode
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void ReadValueSafeInPlace<T>(ref NativeHashSet<T> value) where T : unmanaged, IEquatable<T>
+        internal void ReadValueSafeInPlace<T>(ref NativeHashSet<T> value)
+            where T : unmanaged, IEquatable<T>
         {
             ReadLengthSafe(out int length);
             value.Clear();
@@ -1190,7 +1329,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> => ReadUnmanaged(out value);
+        public void ReadValue<T>(out T value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> => ReadUnmanaged(out value);
 
         /// <summary>
         /// Read a primitive value array (int, bool, etc)
@@ -1201,7 +1341,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T[] value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> => ReadUnmanaged(out value);
+        public void ReadValue<T>(out T[] value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> => ReadUnmanaged(out value);
 
         /// <summary>
         /// Read a primitive value (int, bool, etc)
@@ -1215,7 +1356,9 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> => ReadUnmanagedSafe(out value);
+        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> =>
+            ReadUnmanagedSafe(out value);
 
         /// <summary>
         /// Read a primitive value (int, bool, etc) array
@@ -1229,7 +1372,9 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForPrimitives unused = default) where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> => ReadUnmanagedSafe(out value);
+        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForPrimitives unused = default)
+            where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T> =>
+            ReadUnmanagedSafe(out value);
 
         /// <summary>
         /// Read an enum value
@@ -1238,7 +1383,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum => ReadUnmanaged(out value);
+        public void ReadValue<T>(out T value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum => ReadUnmanaged(out value);
 
         /// <summary>
         /// Read an enum array
@@ -1247,8 +1393,8 @@ namespace Unity.Netcode
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         /// <typeparam name="T">The type being serialized</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValue<T>(out T[] value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum => ReadUnmanaged(out value);
-
+        public void ReadValue<T>(out T[] value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum => ReadUnmanaged(out value);
 
         /// <summary>
         /// Read an enum value
@@ -1260,7 +1406,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum => ReadUnmanagedSafe(out value);
+        public void ReadValueSafe<T>(out T value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum => ReadUnmanagedSafe(out value);
 
         /// <summary>
         /// Read an enum array
@@ -1272,8 +1419,8 @@ namespace Unity.Netcode
         /// <param name="value">The values to read</param>
         /// <param name="unused">An unused parameter used for enabling overload resolution based on generic constraints</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForEnums unused = default) where T : unmanaged, Enum => ReadUnmanagedSafe(out value);
-
+        public void ReadValueSafe<T>(out T[] value, FastBufferWriter.ForEnums unused = default)
+            where T : unmanaged, Enum => ReadUnmanagedSafe(out value);
 
         /// <summary>
         /// Read a Vector2
@@ -1428,7 +1575,6 @@ namespace Unity.Netcode
         /// <param name="value">the values to read</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ReadValue(out Ray2D[] value) => ReadUnmanaged(out value);
-
 
         /// <summary>
         /// Read a Vector2
@@ -1672,13 +1818,9 @@ namespace Unity.Netcode
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             ReadLength(out int length);
-            value = new T
-            {
-                Length = length
-            };
+            value = new T { Length = length };
             ReadBytes(value.GetUnsafePtr(), length);
         }
-
 
         /// <summary>
         /// Read a FixedString value.
@@ -1694,13 +1836,9 @@ namespace Unity.Netcode
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             ReadLengthSafe(out int length);
-            value = new T
-            {
-                Length = length
-            };
+            value = new T { Length = length };
             ReadBytesSafe(value.GetUnsafePtr(), length);
         }
-
 
         /// <summary>
         /// Read a FixedString value.

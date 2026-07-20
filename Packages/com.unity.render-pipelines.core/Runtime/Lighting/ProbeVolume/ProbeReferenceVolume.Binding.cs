@@ -20,7 +20,9 @@ namespace UnityEngine.Rendering
 
             public static readonly int _APVResValidity = Shader.PropertyToID("_APVResValidity");
             public static readonly int _SkyOcclusionTexL0L1 = Shader.PropertyToID("_SkyOcclusionTexL0L1");
-            public static readonly int _SkyShadingDirectionIndicesTex = Shader.PropertyToID("_SkyShadingDirectionIndicesTex");
+            public static readonly int _SkyShadingDirectionIndicesTex = Shader.PropertyToID(
+                "_SkyShadingDirectionIndicesTex"
+            );
             public static readonly int _SkyPrecomputedDirections = Shader.PropertyToID("_SkyPrecomputedDirections");
             public static readonly int _AntiLeakData = Shader.PropertyToID("_AntiLeakData");
         }
@@ -42,8 +44,11 @@ namespace UnityEngine.Rendering
             {
                 ProbeReferenceVolume.RuntimeResources rr = refVolume.GetRuntimeResources();
 
-                bool validResources = rr.index != null && rr.L0_L1rx != null && rr.L1_G_ry != null && rr.L1_B_rz != null;
-                validResources &= (refVolume.shBands == ProbeVolumeSHBands.SphericalHarmonicsL2 && rr.L2_0 != null) || refVolume.shBands == ProbeVolumeSHBands.SphericalHarmonicsL1;
+                bool validResources =
+                    rr.index != null && rr.L0_L1rx != null && rr.L1_G_ry != null && rr.L1_B_rz != null;
+                validResources &=
+                    (refVolume.shBands == ProbeVolumeSHBands.SphericalHarmonicsL2 && rr.L2_0 != null)
+                    || refVolume.shBands == ProbeVolumeSHBands.SphericalHarmonicsL1;
 
                 if (validResources)
                 {
@@ -55,8 +60,14 @@ namespace UnityEngine.Rendering
                     cmdBuffer.SetGlobalTexture(ShaderIDs._APVResL1B_L1Rz, rr.L1_B_rz);
                     cmdBuffer.SetGlobalTexture(ShaderIDs._APVResValidity, rr.Validity);
 
-                    cmdBuffer.SetGlobalTexture(ShaderIDs._SkyOcclusionTexL0L1, rr.SkyOcclusionL0L1 ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture);
-                    cmdBuffer.SetGlobalTexture(ShaderIDs._SkyShadingDirectionIndicesTex, rr.SkyShadingDirectionIndices ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture);
+                    cmdBuffer.SetGlobalTexture(
+                        ShaderIDs._SkyOcclusionTexL0L1,
+                        rr.SkyOcclusionL0L1 ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture
+                    );
+                    cmdBuffer.SetGlobalTexture(
+                        ShaderIDs._SkyShadingDirectionIndicesTex,
+                        rr.SkyShadingDirectionIndices ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture
+                    );
                     cmdBuffer.SetGlobalBuffer(ShaderIDs._SkyPrecomputedDirections, rr.SkyPrecomputedDirections);
                     cmdBuffer.SetGlobalBuffer(ShaderIDs._AntiLeakData, rr.QualityLeakReductionData);
 
@@ -68,7 +79,10 @@ namespace UnityEngine.Rendering
                         cmdBuffer.SetGlobalTexture(ShaderIDs._APVResL2_3, rr.L2_3);
                     }
 
-                    cmdBuffer.SetGlobalTexture(ShaderIDs._APVProbeOcclusion, rr.ProbeOcclusion ?? (RenderTargetIdentifier)CoreUtils.whiteVolumeTexture);
+                    cmdBuffer.SetGlobalTexture(
+                        ShaderIDs._APVProbeOcclusion,
+                        rr.ProbeOcclusion ?? (RenderTargetIdentifier)CoreUtils.whiteVolumeTexture
+                    );
 
                     needToBindNeutral = false;
                 }
@@ -115,7 +129,12 @@ namespace UnityEngine.Rendering
         /// <param name="taaFrameIndex">TAA frame index</param>
         /// <param name="supportRenderingLayers">Are rendering layers supported</param>
         /// <returns>True if successful</returns>
-        public bool UpdateShaderVariablesProbeVolumes(CommandBuffer cmd, ProbeVolumesOptions probeVolumeOptions, int taaFrameIndex, bool supportRenderingLayers = false)
+        public bool UpdateShaderVariablesProbeVolumes(
+            CommandBuffer cmd,
+            ProbeVolumesOptions probeVolumeOptions,
+            int taaFrameIndex,
+            bool supportRenderingLayers = false
+        )
         {
             bool enableProbeVolumes = DataHasBeenLoaded();
 
@@ -130,12 +149,19 @@ namespace UnityEngine.Rendering
                 parameters.leakReductionMode = probeVolumeOptions.leakReductionMode.value;
                 parameters.frameIndexForNoise = taaFrameIndex * (probeVolumeOptions.animateSamplingNoise.value ? 1 : 0);
                 parameters.reflNormalizationLowerClamp = 0.005f;
-                parameters.reflNormalizationUpperClamp = probeVolumeOptions.occlusionOnlyReflectionNormalization.value ? 1.0f : 7.0f;
+                parameters.reflNormalizationUpperClamp = probeVolumeOptions.occlusionOnlyReflectionNormalization.value
+                    ? 1.0f
+                    : 7.0f;
 
-                parameters.skyOcclusionIntensity = skyOcclusion ? probeVolumeOptions.skyOcclusionIntensityMultiplier.value : 0.0f;
+                parameters.skyOcclusionIntensity = skyOcclusion
+                    ? probeVolumeOptions.skyOcclusionIntensityMultiplier.value
+                    : 0.0f;
                 parameters.skyOcclusionShadingDirection = skyOcclusion && skyOcclusionShadingDirection;
                 parameters.regionCount = m_CurrentBakingSet != null ? m_CurrentBakingSet.bakedMaskCount : 0;
-                parameters.regionLayerMasks = (supportRenderingLayers && m_CurrentBakingSet != null) ? m_CurrentBakingSet.bakedLayerMasks : 0xFFFFFFFF;
+                parameters.regionLayerMasks =
+                    (supportRenderingLayers && m_CurrentBakingSet != null)
+                        ? m_CurrentBakingSet.bakedLayerMasks
+                        : 0xFFFFFFFF;
                 parameters.worldOffset = probeVolumeOptions.worldOffset.value;
                 UpdateConstantBuffer(cmd, parameters);
             }

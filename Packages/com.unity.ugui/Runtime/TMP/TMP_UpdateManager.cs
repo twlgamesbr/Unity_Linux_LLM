@@ -1,12 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using Unity.Profiling;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-
 
 namespace TMPro
 {
-
     public class TMP_UpdateManager
     {
         private static TMP_UpdateManager s_Instance;
@@ -24,11 +22,21 @@ namespace TMPro
         private readonly List<TMP_Text> m_CullingUpdateQueue = new List<TMP_Text>();
 
         // Profiler Marker declarations
-        private static ProfilerMarker k_RegisterTextObjectForUpdateMarker = new ProfilerMarker("TMP.RegisterTextObjectForUpdate");
-        private static ProfilerMarker k_RegisterTextElementForGraphicRebuildMarker = new ProfilerMarker("TMP.RegisterTextElementForGraphicRebuild");
-        private static ProfilerMarker k_RegisterTextElementForCullingUpdateMarker = new ProfilerMarker("TMP.RegisterTextElementForCullingUpdate");
-        private static ProfilerMarker k_UnregisterTextObjectForUpdateMarker = new ProfilerMarker("TMP.UnregisterTextObjectForUpdate");
-        private static ProfilerMarker k_UnregisterTextElementForGraphicRebuildMarker = new ProfilerMarker("TMP.UnregisterTextElementForGraphicRebuild");
+        private static ProfilerMarker k_RegisterTextObjectForUpdateMarker = new ProfilerMarker(
+            "TMP.RegisterTextObjectForUpdate"
+        );
+        private static ProfilerMarker k_RegisterTextElementForGraphicRebuildMarker = new ProfilerMarker(
+            "TMP.RegisterTextElementForGraphicRebuild"
+        );
+        private static ProfilerMarker k_RegisterTextElementForCullingUpdateMarker = new ProfilerMarker(
+            "TMP.RegisterTextElementForCullingUpdate"
+        );
+        private static ProfilerMarker k_UnregisterTextObjectForUpdateMarker = new ProfilerMarker(
+            "TMP.UnregisterTextObjectForUpdate"
+        );
+        private static ProfilerMarker k_UnregisterTextElementForGraphicRebuildMarker = new ProfilerMarker(
+            "TMP.UnregisterTextElementForGraphicRebuild"
+        );
 
         /// <summary>
         /// Get a singleton instance of the registry

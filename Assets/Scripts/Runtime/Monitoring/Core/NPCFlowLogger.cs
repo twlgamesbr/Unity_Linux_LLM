@@ -160,12 +160,10 @@ namespace NPCSystem.Monitoring
 
         // ── Inspector preview helpers (not serialised) ──
         [ShowInInspector]
-        string InspectorSessionId =>
-            string.IsNullOrWhiteSpace(_sessionId) ? "not initialized" : _sessionId;
+        string InspectorSessionId => string.IsNullOrWhiteSpace(_sessionId) ? "not initialized" : _sessionId;
 
         [ShowInInspector]
-        string InspectorLogFilePath =>
-            string.IsNullOrWhiteSpace(_currentLogPath) ? "not set" : _currentLogPath;
+        string InspectorLogFilePath => string.IsNullOrWhiteSpace(_currentLogPath) ? "not set" : _currentLogPath;
 
         [ShowInInspector]
         string InspectorConversationId =>
@@ -260,9 +258,7 @@ namespace NPCSystem.Monitoring
                 if (_instance != null)
                     return _instance;
 
-                NPCFlowLogger[] sceneLoggers = FindObjectsByType<NPCFlowLogger>(
-                    FindObjectsInactive.Include
-                );
+                NPCFlowLogger[] sceneLoggers = FindObjectsByType<NPCFlowLogger>(FindObjectsInactive.Include);
                 if (sceneLoggers.Length > 0)
                 {
                     _instance = sceneLoggers[0];
@@ -424,12 +420,8 @@ namespace NPCSystem.Monitoring
                 level: NPCFlowLogLevel.Info,
                 message: issues.Count == 0
                     ? "All logger settings valid. Log path: "
-                        + Path.Combine(path1: directory, path2: "npc-flow-*.jsonl")
-                            .Replace(oldChar: '\\', newChar: '/')
-                    : "Logger settings have "
-                        + issues.Count
-                        + " issue(s): "
-                        + string.Join("; ", issues),
+                        + Path.Combine(path1: directory, path2: "npc-flow-*.jsonl").Replace(oldChar: '\\', newChar: '/')
+                    : "Logger settings have " + issues.Count + " issue(s): " + string.Join("; ", issues),
                 source: nameof(NPCFlowLogger),
                 data: new Dictionary<string, object>
                 {
@@ -477,9 +469,8 @@ namespace NPCSystem.Monitoring
                 or NPCFlowStage.ConfigurationValidation
                 or NPCFlowStage.ProfileIndexBuild => NPCFlowCategory.Infrastructure,
 
-                NPCFlowStage.HistoryLoad
-                or NPCFlowStage.HistoryRestore
-                or NPCFlowStage.HistoryPersist => NPCFlowCategory.Memory,
+                NPCFlowStage.HistoryLoad or NPCFlowStage.HistoryRestore or NPCFlowStage.HistoryPersist =>
+                    NPCFlowCategory.Memory,
 
                 NPCFlowStage.NPCSwitch or NPCFlowStage.UIInput => NPCFlowCategory.UI,
 
@@ -513,8 +504,7 @@ namespace NPCSystem.Monitoring
                 or NPCFlowStage.RpcTraffic
                 or NPCFlowStage.OwnershipAuthority => NPCFlowCategory.Network,
 
-                NPCFlowStage.EditorWorkflow or NPCFlowStage.SmokeValidation =>
-                    NPCFlowCategory.EditorWorkflow,
+                NPCFlowStage.EditorWorkflow or NPCFlowStage.SmokeValidation => NPCFlowCategory.EditorWorkflow,
 
                 _ => NPCFlowCategory.Infrastructure,
             };
@@ -554,10 +544,7 @@ namespace NPCSystem.Monitoring
                 && !string.IsNullOrWhiteSpace(_currentConversationId)
             )
                 flowEvent.ConversationId = _currentConversationId;
-            if (
-                flowEvent.Category == NPCFlowCategory.Infrastructure
-                && flowEvent.Stage != NPCFlowStage.SceneBootstrap
-            )
+            if (flowEvent.Category == NPCFlowCategory.Infrastructure && flowEvent.Stage != NPCFlowStage.SceneBootstrap)
                 flowEvent.Category = StageToCategory(flowEvent.Stage);
             flowEvent.Source = flowEvent.Source ?? string.Empty;
             flowEvent.RequestId = flowEvent.RequestId ?? string.Empty;
@@ -575,15 +562,11 @@ namespace NPCSystem.Monitoring
                 return false;
 
             // Only suppress Warning and Error levels in retry loops
-            if (
-                flowEvent.Level != NPCFlowLogLevel.Warning
-                && flowEvent.Level != NPCFlowLogLevel.Error
-            )
+            if (flowEvent.Level != NPCFlowLogLevel.Warning && flowEvent.Level != NPCFlowLogLevel.Error)
                 return false;
 
             // Build a suppression key from source + stage + truncated message
-            string key =
-                $"{flowEvent.Source}|{flowEvent.Stage}|{TruncateHash(flowEvent.Message, 60)}";
+            string key = $"{flowEvent.Source}|{flowEvent.Stage}|{TruncateHash(flowEvent.Message, 60)}";
 
             long nowTicks = DateTime.UtcNow.Ticks;
             long windowTicks = TimeSpan.TicksPerMinute;
@@ -703,19 +686,13 @@ namespace NPCSystem.Monitoring
             switch (flowEvent.Level)
             {
                 case NPCFlowLogLevel.Error:
-                    UnityEngine.Debug.LogError(
-                        $"{tagged}\nCPAPI:{{\"cmd\":\"LogType\",\"name\":\"Error\"}}"
-                    );
+                    UnityEngine.Debug.LogError($"{tagged}\nCPAPI:{{\"cmd\":\"LogType\",\"name\":\"Error\"}}");
                     break;
                 case NPCFlowLogLevel.Warning:
-                    UnityEngine.Debug.LogWarning(
-                        $"{tagged}\nCPAPI:{{\"cmd\":\"LogType\",\"name\":\"Warning\"}}"
-                    );
+                    UnityEngine.Debug.LogWarning($"{tagged}\nCPAPI:{{\"cmd\":\"LogType\",\"name\":\"Warning\"}}");
                     break;
                 default:
-                    UnityEngine.Debug.Log(
-                        $"{tagged}\nCPAPI:{{\"cmd\":\"Filter\",\"name\":\"npc/{category}\"}}"
-                    );
+                    UnityEngine.Debug.Log($"{tagged}\nCPAPI:{{\"cmd\":\"Filter\",\"name\":\"npc/{category}\"}}");
                     break;
             }
         }
@@ -752,9 +729,7 @@ namespace NPCSystem.Monitoring
                 if (!_fileFailureWarned)
                 {
                     _fileFailureWarned = true;
-                    UnityEngine.Debug.LogWarning(
-                        $"[NPCFlow] Failed to write JSONL log: {ex.Message}"
-                    );
+                    UnityEngine.Debug.LogWarning($"[NPCFlow] Failed to write JSONL log: {ex.Message}");
                 }
             }
         }
@@ -768,13 +743,10 @@ namespace NPCSystem.Monitoring
                 ? OverrideAbsoluteLogDirectory.Trim()
                 : Path.Combine(
                     Application.persistentDataPath,
-                    string.IsNullOrWhiteSpace(RelativeLogDirectory)
-                        ? "NPCDialogue/Logs"
-                        : RelativeLogDirectory.Trim()
+                    string.IsNullOrWhiteSpace(RelativeLogDirectory) ? "NPCDialogue/Logs" : RelativeLogDirectory.Trim()
                 );
 
-            _currentLogPath = Path.Combine(directory, $"npc-flow-{SessionId}.jsonl")
-                .Replace('\\', '/');
+            _currentLogPath = Path.Combine(directory, $"npc-flow-{SessionId}.jsonl").Replace('\\', '/');
 
             if (!string.IsNullOrWhiteSpace(directory))
                 Directory.CreateDirectory(directory);
@@ -904,14 +876,10 @@ namespace NPCSystem.Monitoring
 
             try
             {
-                string projectRoot =
-                    Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
+                string projectRoot = Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
                 string directory = Path.Combine(projectRoot, ".hermes", "runtime-logs");
                 Directory.CreateDirectory(directory);
-                string path = Path.Combine(
-                    directory,
-                    $"npc-flow-editor-{DateTime.UtcNow:yyyyMMdd}.jsonl"
-                );
+                string path = Path.Combine(directory, $"npc-flow-editor-{DateTime.UtcNow:yyyyMMdd}.jsonl");
                 File.AppendAllText(path, flowEvent.ToJson() + Environment.NewLine);
 
                 string line = FormatConsoleLine(flowEvent);
@@ -924,17 +892,13 @@ namespace NPCSystem.Monitoring
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogWarning(
-                    $"[NPCFlow] Failed to write editor workflow log: {ex.Message}"
-                );
+                UnityEngine.Debug.LogWarning($"[NPCFlow] Failed to write editor workflow log: {ex.Message}");
             }
         }
 
         static string FormatConsoleLine(NPCFlowEvent flowEvent)
         {
-            string request = string.IsNullOrWhiteSpace(flowEvent.RequestId)
-                ? "-"
-                : flowEvent.RequestId;
+            string request = string.IsNullOrWhiteSpace(flowEvent.RequestId) ? "-" : flowEvent.RequestId;
             string npc = string.IsNullOrWhiteSpace(flowEvent.NpcSlug) ? "-" : flowEvent.NpcSlug;
             string source = string.IsNullOrWhiteSpace(flowEvent.Source) ? "-" : flowEvent.Source;
             string conv = string.IsNullOrWhiteSpace(flowEvent.ConversationId)

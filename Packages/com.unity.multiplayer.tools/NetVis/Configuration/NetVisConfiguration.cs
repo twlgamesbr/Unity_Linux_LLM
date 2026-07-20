@@ -19,19 +19,21 @@ namespace Unity.Multiplayer.Tools.NetVis.Configuration
         /// </summary>
         public NetVisMetric Metric { get; set; }
 
-        public bool MeshShadingEnabled => Metric switch
-        {
-            NetVisMetric.Bandwidth => Settings.Bandwidth.MeshShadingEnabled,
-            NetVisMetric.Ownership => Settings.Ownership.MeshShadingEnabled,
-            _ => false,
-        };
+        public bool MeshShadingEnabled =>
+            Metric switch
+            {
+                NetVisMetric.Bandwidth => Settings.Bandwidth.MeshShadingEnabled,
+                NetVisMetric.Ownership => Settings.Ownership.MeshShadingEnabled,
+                _ => false,
+            };
 
-        public bool TextOverlayEnabled => Metric switch
-        {
-            NetVisMetric.Bandwidth => Settings.Bandwidth.TextOverlayEnabled,
-            NetVisMetric.Ownership => Settings.Ownership.TextOverlayEnabled,
-            _ => false,
-        };
+        public bool TextOverlayEnabled =>
+            Metric switch
+            {
+                NetVisMetric.Bandwidth => Settings.Bandwidth.TextOverlayEnabled,
+                NetVisMetric.Ownership => Settings.Ownership.TextOverlayEnabled,
+                _ => false,
+            };
 
         /// <summary>
         /// The <see cref="NetVisSettings"/> to be applied to the chosen <see cref="NetVisMetric"/>

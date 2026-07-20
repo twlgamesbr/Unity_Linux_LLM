@@ -28,9 +28,10 @@ namespace UnityEngine.InputSystem.Editor
         public InputActionMapsTreeViewItem()
         {
             var template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                InputActionsEditorConstants.PackagePath +
-                InputActionsEditorConstants.ResourcesPath +
-                InputActionsEditorConstants.InputActionMapsTreeViewItemUxml);
+                InputActionsEditorConstants.PackagePath
+                    + InputActionsEditorConstants.ResourcesPath
+                    + InputActionsEditorConstants.InputActionMapsTreeViewItemUxml
+            );
             template.CloneTree(this);
 
             focusable = true;
@@ -50,12 +51,13 @@ namespace UnityEngine.InputSystem.Editor
             {
                 OnContextualMenuPopulateEvent?.Invoke(menuBuilder);
             })
-            { target = this };
+            {
+                target = this,
+            };
         }
 
         public Label label => this.Q<Label>();
         private TextField renameTextfield => this.Q<TextField>(kRenameTextField);
-
 
         public void UnregisterInputField()
         {

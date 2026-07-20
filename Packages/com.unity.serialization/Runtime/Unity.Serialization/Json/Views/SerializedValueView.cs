@@ -13,8 +13,10 @@ namespace Unity.Serialization.Json
     public readonly unsafe struct SerializedValueView : ISerializedView
     {
         // ReSharper disable InconsistentNaming
-        [NativeDisableUnsafePtrRestriction] internal readonly UnsafePackedBinaryStream* m_Stream;
+        [NativeDisableUnsafePtrRestriction]
+        internal readonly UnsafePackedBinaryStream* m_Stream;
         internal readonly Handle m_Handle;
+
         // ReSharper restore InconsistentNaming
 
         internal SerializedValueView(UnsafePackedBinaryStream* stream, Handle handle)
@@ -44,7 +46,7 @@ namespace Unity.Serialization.Json
         /// <exception cref="InvalidOperationException">The view does not represent an object type.</exception>
         /// <exception cref="KeyNotFoundException">The key does not exist in the collection.</exception>
         public SerializedValueView this[in FixedString32Bytes name] => GetValue(name);
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
@@ -52,7 +54,7 @@ namespace Unity.Serialization.Json
         /// <exception cref="InvalidOperationException">The view does not represent an object type.</exception>
         /// <exception cref="KeyNotFoundException">The key does not exist in the collection.</exception>
         public SerializedValueView this[in FixedString64Bytes name] => GetValue(name);
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
@@ -60,7 +62,7 @@ namespace Unity.Serialization.Json
         /// <exception cref="InvalidOperationException">The view does not represent an object type.</exception>
         /// <exception cref="KeyNotFoundException">The key does not exist in the collection.</exception>
         public SerializedValueView this[in FixedString128Bytes name] => GetValue(name);
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
@@ -70,7 +72,7 @@ namespace Unity.Serialization.Json
         {
             if (!TryGetValue(name, out var value))
                 throw new KeyNotFoundException(name);
-            
+
             return value;
         }
 
@@ -82,24 +84,25 @@ namespace Unity.Serialization.Json
         /// <returns>true if the <see cref="SerializedObjectView"/> contains an element with the specified key; otherwise, false.</returns>
         public bool TryGetValue(in string name, out SerializedValueView value)
         {
-            if (Type == TokenType.Object) 
+            if (Type == TokenType.Object)
                 return AsObjectView().TryGetValue(name, out value);
-            
+
             value = default;
             return false;
         }
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
         /// <param name="name">The key of the value to get.</param>
         /// <typeparam name="T">The fixed string type.</typeparam>
         /// <returns>Returns the value associated with the specified key.</returns>
-        public SerializedValueView GetValue<T>(in T name) where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public SerializedValueView GetValue<T>(in T name)
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             if (!TryGetValue(name, out var value))
                 throw new KeyNotFoundException();
-            
+
             return value;
         }
 
@@ -110,15 +113,16 @@ namespace Unity.Serialization.Json
         /// <param name="value">When this method returns, contains the value associated with the specified key, if the key is found; otherwise, the default value.</param>
         /// <typeparam name="T">The fixed string type.</typeparam>
         /// <returns>true if the <see cref="SerializedObjectView"/> contains an element with the specified key; otherwise, false.</returns>
-        public bool TryGetValue<T>(in T name, out SerializedValueView value) where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public bool TryGetValue<T>(in T name, out SerializedValueView value)
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
-            if (Type == TokenType.Object) 
+            if (Type == TokenType.Object)
                 return AsObjectView().TryGetValue(name, out value);
-            
+
             value = default;
             return false;
         }
-        
+
         /// <summary>
         /// Returns true if the value represents a member.
         /// </summary>
@@ -177,7 +181,9 @@ namespace Unity.Serialization.Json
             var token = m_Stream->GetToken(m_Handle);
 
             if (token.Type != TokenType.String && token.Type != TokenType.Primitive)
-                throw new InvalidOperationException($"Failed to read value RequestedType=[{TokenType.String}|{TokenType.Primitive}] ActualType=[{token.Type}]");
+                throw new InvalidOperationException(
+                    $"Failed to read value RequestedType=[{TokenType.String}|{TokenType.Primitive}] ActualType=[{token.Type}]"
+                );
 
             return new SerializedStringView(m_Stream, m_Handle);
         }
@@ -215,14 +221,14 @@ namespace Unity.Serialization.Json
         {
             return AsPrimitiveView().AsInt64();
         }
-        
+
         /// <summary>
         /// Reinterprets the value as a int.
         /// </summary>
         /// <returns>The value as an int.</returns>
         public int AsInt32()
         {
-            return (int) AsPrimitiveView().AsInt64();
+            return (int)AsPrimitiveView().AsInt64();
         }
 
         /// <summary>
@@ -251,7 +257,7 @@ namespace Unity.Serialization.Json
         {
             return AsPrimitiveView().AsDouble();
         }
-        
+
         /// <summary>
         /// Reinterprets the value as a bool.
         /// </summary>
@@ -266,7 +272,9 @@ namespace Unity.Serialization.Json
             var token = m_Stream->GetToken(m_Handle);
 
             if (token.Type != type)
-                throw new InvalidOperationException($"Failed to read value RequestedType=[{type}] ActualType=[{token.Type}]");
+                throw new InvalidOperationException(
+                    $"Failed to read value RequestedType=[{type}] ActualType=[{token.Type}]"
+                );
         }
 
         /// <summary>
@@ -277,17 +285,18 @@ namespace Unity.Serialization.Json
         {
             return AsStringView().ToString();
         }
-        
+
         /// <summary>
         /// Returns the value as a string.
         /// </summary>
         /// <typeparam name="T">The fixed string type.</typeparam>
         /// <returns>The value as a string.</returns>
-        public T AsFixedString<T>() where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public T AsFixedString<T>()
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             return AsStringView().AsFixedString<T>();
         }
-        
+
         /// <summary>
         /// Returns the value as a string.
         /// </summary>
@@ -297,7 +306,7 @@ namespace Unity.Serialization.Json
         {
             return AsStringView().AsNativeText(allocator);
         }
-        
+
         /// <summary>
         /// Returns the value as a string.
         /// </summary>
@@ -307,7 +316,7 @@ namespace Unity.Serialization.Json
         {
             return AsStringView().AsUnsafeText(allocator);
         }
-        
+
         internal UnsafeValueView AsUnsafe() => new UnsafeValueView(m_Stream, m_Stream->GetTokenIndex(m_Handle));
     }
 }

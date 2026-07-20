@@ -22,12 +22,26 @@ namespace UnityEditor.TestTools.TestRunner
 
         protected UnityTestAssemblyRunner LoadTests(ITestFilter filter)
         {
-            var editorLoadedTestAssemblyProvider = new EditorLoadedTestAssemblyProvider(new EditorCompilationInterfaceProxy(), new EditorAssembliesProxy());
-            var assembliesWithTests = editorLoadedTestAssemblyProvider.GetAssembliesGroupedByType(TestPlatform.PlayMode).Select(x => x.Assembly.GetName().Name).ToList();
+            var editorLoadedTestAssemblyProvider = new EditorLoadedTestAssemblyProvider(
+                new EditorCompilationInterfaceProxy(),
+                new EditorAssembliesProxy()
+            );
+            var assembliesWithTests = editorLoadedTestAssemblyProvider
+                .GetAssembliesGroupedByType(TestPlatform.PlayMode)
+                .Select(x => x.Assembly.GetName().Name)
+                .ToList();
 
-            var nUnitTestAssemblyRunner = new UnityTestAssemblyRunner(new UnityTestAssemblyBuilder(m_Settings.orderedTestNames, m_Settings.randomOrderSeed), null, UnityTestExecutionContext.CurrentContext);
+            var nUnitTestAssemblyRunner = new UnityTestAssemblyRunner(
+                new UnityTestAssemblyBuilder(m_Settings.orderedTestNames, m_Settings.randomOrderSeed),
+                null,
+                UnityTestExecutionContext.CurrentContext
+            );
             var assemblyProvider = new PlayerTestAssemblyProvider(new AssemblyLoadProxy(), assembliesWithTests);
-            nUnitTestAssemblyRunner.Load(assemblyProvider.GetUserAssemblies().Select(a => a.Assembly).ToArray(), TestPlatform.PlayMode, UnityTestAssemblyBuilder.GetNUnitTestBuilderSettings(TestPlatform.PlayMode));
+            nUnitTestAssemblyRunner.Load(
+                assemblyProvider.GetUserAssemblies().Select(a => a.Assembly).ToArray(),
+                TestPlatform.PlayMode,
+                UnityTestAssemblyBuilder.GetNUnitTestBuilderSettings(TestPlatform.PlayMode)
+            );
             return nUnitTestAssemblyRunner;
         }
 
@@ -43,21 +57,26 @@ namespace UnityEditor.TestTools.TestRunner
 
     internal static class PlaymodeTestsControllerExtensions
     {
-        internal static T AddEventHandlerMonoBehaviour<T>(this PlaymodeTestsController controller) where T : MonoBehaviour, ITestRunnerListener
+        internal static T AddEventHandlerMonoBehaviour<T>(this PlaymodeTestsController controller)
+            where T : MonoBehaviour, ITestRunnerListener
         {
             var eventHandler = controller.gameObject.AddComponent<T>();
             SetListeners(controller, eventHandler);
             return eventHandler;
         }
 
-        internal static T AddEventHandlerScriptableObject<T>(this PlaymodeTestsController controller) where T : ScriptableObject, ITestRunnerListener
+        internal static T AddEventHandlerScriptableObject<T>(this PlaymodeTestsController controller)
+            where T : ScriptableObject, ITestRunnerListener
         {
             var eventListener = ScriptableObject.CreateInstance<T>();
             AddEventHandlerScriptableObject(controller, eventListener);
             return eventListener;
         }
 
-        internal static void AddEventHandlerScriptableObject(this PlaymodeTestsController controller, ITestRunnerListener obj)
+        internal static void AddEventHandlerScriptableObject(
+            this PlaymodeTestsController controller,
+            ITestRunnerListener obj
+        )
         {
             SetListeners(controller, obj);
         }

@@ -12,6 +12,7 @@ namespace UnityEngine.Rendering.Universal
 
         [ReadOnly]
         public NativeArray<VisibleReflectionProbe> reflectionProbes;
+
         [ReadOnly]
         public bool reflectionProbeRotation;
         public NativeArray<float2> minMaxZs;

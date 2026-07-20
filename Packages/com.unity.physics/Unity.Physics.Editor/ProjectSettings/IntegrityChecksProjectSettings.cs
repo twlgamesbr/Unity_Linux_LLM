@@ -36,7 +36,11 @@ namespace Unity.Physics.Editor.ProjectSettings
         /// </summary>
         public static bool DebugDisplayRuntimeEnabled
         {
-            get => DefineExists(k_EnableDebugDisplayAtRuntime, BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget));
+            get =>
+                DefineExists(
+                    k_EnableDebugDisplayAtRuntime,
+                    BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget)
+                );
             set => UpdateDefine(k_EnableDebugDisplayAtRuntime, value);
         }
 
@@ -123,7 +127,12 @@ namespace Unity.Physics.Editor.ProjectSettings
 
     class ProjectSettingsEcsExtension : IPhysicsProjectSettingsECSInspectorExtension
     {
-        public void SetupMainPageItems(DropdownField dropDown, HelpBox infoBox, HelpBox warningBox, SerializedObject physicsManager)
+        public void SetupMainPageItems(
+            DropdownField dropDown,
+            HelpBox infoBox,
+            HelpBox warningBox,
+            SerializedObject physicsManager
+        )
         {
             dropDown.visible = false;
             infoBox.visible = false;
@@ -160,19 +169,23 @@ namespace Unity.Physics.Editor.ProjectSettings
         {
             var ecsContent = ecsTab.Q(name: "tab-content__ecs");
 
-            ecsContent.Add(CreateAlignedToggle(
-                "Enable Integrity Checks",
-                "Integrity checks should be disabled when measuring performance. Integrity checks should be enabled when checking simulation quality and behaviour.",
-                !Preferences.IntegrityChecksDisabled,
-                value => Preferences.IntegrityChecksDisabled = !value
-            ));
+            ecsContent.Add(
+                CreateAlignedToggle(
+                    "Enable Integrity Checks",
+                    "Integrity checks should be disabled when measuring performance. Integrity checks should be enabled when checking simulation quality and behaviour.",
+                    !Preferences.IntegrityChecksDisabled,
+                    value => Preferences.IntegrityChecksDisabled = !value
+                )
+            );
 
-            ecsContent.Add(CreateAlignedToggle(
-                "Enable Player Debug Display",
-                "Allows debugging physics directly in the Player build. Enable to inspect behavior in-game. Disable for better performance.",
-                Preferences.DebugDisplayRuntimeEnabled,
-                value => Preferences.DebugDisplayRuntimeEnabled = value
-            ));
+            ecsContent.Add(
+                CreateAlignedToggle(
+                    "Enable Player Debug Display",
+                    "Allows debugging physics directly in the Player build. Enable to inspect behavior in-game. Disable for better performance.",
+                    Preferences.DebugDisplayRuntimeEnabled,
+                    value => Preferences.DebugDisplayRuntimeEnabled = value
+                )
+            );
         }
     }
 }

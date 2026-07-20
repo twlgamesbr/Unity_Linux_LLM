@@ -135,7 +135,8 @@ namespace UnityEditor.Rendering
     /// </summary>
     [Obsolete("This class is no longer used. #from(6000.5)")]
     [DebugUIDrawer(typeof(DebugUI.HistoryBoolField))]
-    public sealed class DebugUIDrawerHistoryBoolField : DebugUIFieldDrawer<bool, DebugUI.HistoryBoolField, DebugStateBool>
+    public sealed class DebugUIDrawerHistoryBoolField
+        : DebugUIFieldDrawer<bool, DebugUI.HistoryBoolField, DebugStateBool>
     {
         /// <summary>
         /// Does the field of the given type
@@ -212,9 +213,16 @@ namespace UnityEditor.Rendering
         protected override uint DoGUI(Rect rect, GUIContent label, DebugUI.UIntField field, DebugStateUInt state)
         {
             // No UIntField so we need to max to 0 ourselves or the value will wrap around
-            int tmp = field.min != null && field.max != null
-                ? EditorGUI.IntSlider(rect, label, Mathf.Max(0, (int)field.GetValue()), Mathf.Max(0, (int)field.min()), Mathf.Max(0, (int)field.max()))
-                : EditorGUI.IntField(rect, label, Mathf.Max(0, (int)field.GetValue()));
+            int tmp =
+                field.min != null && field.max != null
+                    ? EditorGUI.IntSlider(
+                        rect,
+                        label,
+                        Mathf.Max(0, (int)field.GetValue()),
+                        Mathf.Max(0, (int)field.min()),
+                        Mathf.Max(0, (int)field.max())
+                    )
+                    : EditorGUI.IntField(rect, label, Mathf.Max(0, (int)field.GetValue()));
 
             return (uint)Mathf.Max(0, tmp);
         }
@@ -286,7 +294,8 @@ namespace UnityEditor.Rendering
     /// </summary>
     [Obsolete("This class is no longer used. #from(6000.5)")]
     [DebugUIDrawer(typeof(DebugUI.ObjectPopupField))]
-    public sealed class DebugUIDrawerObjectPopupField : DebugUIFieldDrawer<UnityEngine.Object, DebugUI.ObjectPopupField, DebugStateObject>
+    public sealed class DebugUIDrawerObjectPopupField
+        : DebugUIFieldDrawer<UnityEngine.Object, DebugUI.ObjectPopupField, DebugStateObject>
     {
         /// <summary>
         /// Does the field of the given type
@@ -296,7 +305,12 @@ namespace UnityEditor.Rendering
         /// <param name="field">The field</param>
         /// <param name="state">The state</param>
         /// <returns>The current value from the UI</returns>
-        protected override UnityEngine.Object DoGUI(Rect rect, GUIContent label, DebugUI.ObjectPopupField field, DebugStateObject state)
+        protected override UnityEngine.Object DoGUI(
+            Rect rect,
+            GUIContent label,
+            DebugUI.ObjectPopupField field,
+            DebugStateObject state
+        )
         {
             var selectedValue = field.GetValue();
 
@@ -307,8 +321,8 @@ namespace UnityEditor.Rendering
             if (count > 0) // Check if elements are not null and have any items
             {
                 // Initialize arrays for names and indices, with +1 for the "None" option
-                string[] elementsArrayNames = new string[count + 1];  // +1 for the "None" option
-                int[] elementsArrayIndices = new int[elementsArrayNames.Length];  // Same size as elementsArrayNames
+                string[] elementsArrayNames = new string[count + 1]; // +1 for the "None" option
+                int[] elementsArrayIndices = new int[elementsArrayNames.Length]; // Same size as elementsArrayNames
 
                 // Add the "None" option at the beginning
                 elementsArrayNames[0] = "None";
@@ -319,17 +333,20 @@ namespace UnityEditor.Rendering
                 foreach (var element in elements)
                 {
                     elementsArrayNames[index] = element.name;
-                    elementsArrayIndices[index] = index;  // Set the index to match the element's position
+                    elementsArrayIndices[index] = index; // Set the index to match the element's position
                     index++;
                 }
 
                 // Determine the selected index
-                int selectedIndex = selectedValue != null
-                    ? Array.IndexOf(elementsArrayNames, selectedValue.name)
-                    : 0;
+                int selectedIndex = selectedValue != null ? Array.IndexOf(elementsArrayNames, selectedValue.name) : 0;
 
                 // Show the dropdown and get the new selected index
-                int newSelectedIndex = EditorGUI.IntPopup(rect, selectedIndex, elementsArrayNames, elementsArrayIndices);
+                int newSelectedIndex = EditorGUI.IntPopup(
+                    rect,
+                    selectedIndex,
+                    elementsArrayNames,
+                    elementsArrayIndices
+                );
 
                 // If the selected index changed, update selectedValue
                 if (selectedIndex != newSelectedIndex)
@@ -352,7 +369,8 @@ namespace UnityEditor.Rendering
     /// </summary>
     [Obsolete("This class is no longer used. #from(6000.5)")]
     [DebugUIDrawer(typeof(DebugUI.HistoryEnumField))]
-    public sealed class DebugUIDrawerHistoryEnumField : DebugUIFieldDrawer<int, DebugUI.HistoryEnumField, DebugStateEnum>
+    public sealed class DebugUIDrawerHistoryEnumField
+        : DebugUIFieldDrawer<int, DebugUI.HistoryEnumField, DebugStateEnum>
     {
         /// <summary>
         /// Does the field of the given type
@@ -442,7 +460,8 @@ namespace UnityEditor.Rendering
     /// </summary>
     [Obsolete("This class is no longer used. #from(6000.5)")]
     [DebugUIDrawer(typeof(DebugUI.RenderingLayerField))]
-    public sealed class DebugUIDrawerRenderingLayerField : DebugUIFieldDrawer<RenderingLayerMask, DebugUI.RenderingLayerField, DebugStateRenderingLayer>
+    public sealed class DebugUIDrawerRenderingLayerField
+        : DebugUIFieldDrawer<RenderingLayerMask, DebugUI.RenderingLayerField, DebugStateRenderingLayer>
     {
         /// <summary>
         /// Does the field of the given type
@@ -452,7 +471,12 @@ namespace UnityEditor.Rendering
         /// <param name="field">The field</param>
         /// <param name="state">The state</param>
         /// <returns>The current value from the UI</returns>
-        protected override RenderingLayerMask DoGUI(Rect rect, GUIContent label, DebugUI.RenderingLayerField field, DebugStateRenderingLayer state)
+        protected override RenderingLayerMask DoGUI(
+            Rect rect,
+            GUIContent label,
+            DebugUI.RenderingLayerField field,
+            DebugStateRenderingLayer state
+        )
         {
             uint value = field.GetValue();
             var mask = EditorGUI.MaskField(rect, label, (int)value, field.renderingLayersNames);
@@ -468,6 +492,7 @@ namespace UnityEditor.Rendering
     public sealed class DebugUIDrawerFoldout : DebugUIDrawer
     {
         const int k_HeaderVerticalMargin = 2;
+
         static void DisplayColumns(Rect drawRect, List<GUIContent> rowContents)
         {
             drawRect.x += EditorGUIUtility.labelWidth;
@@ -507,13 +532,23 @@ namespace UnityEditor.Rendering
                 {
                     foreach (var item in w.contextMenuItems)
                     {
-                        menu.AddItem(EditorGUIUtility.TrTextContent(item.displayName), false, () => item.action.Invoke());
+                        menu.AddItem(
+                            EditorGUIUtility.TrTextContent(item.displayName),
+                            false,
+                            () => item.action.Invoke()
+                        );
                     }
                 };
             }
 
             bool previousValue = w.GetValue();
-            bool value = CoreEditorUtils.DrawHeaderFoldout(title, previousValue, isTitleHeader: w.isHeader, customMenuContextAction: fillContextMenuAction, documentationURL: w.documentationUrl);
+            bool value = CoreEditorUtils.DrawHeaderFoldout(
+                title,
+                previousValue,
+                isTitleHeader: w.isHeader,
+                customMenuContextAction: fillContextMenuAction,
+                documentationURL: w.documentationUrl
+            );
             if (previousValue != value)
                 Apply(w, s, value);
 
@@ -588,7 +623,12 @@ namespace UnityEditor.Rendering
         /// <param name="field">The field</param>
         /// <param name="state">The state</param>
         /// <returns>The current value from the UI</returns>
-        protected override Vector2 DoGUI(Rect rect, GUIContent label, DebugUI.Vector2Field field, DebugStateVector2 state)
+        protected override Vector2 DoGUI(
+            Rect rect,
+            GUIContent label,
+            DebugUI.Vector2Field field,
+            DebugStateVector2 state
+        )
         {
             return EditorGUILayout.Vector2Field(label, field.GetValue());
         }
@@ -609,7 +649,12 @@ namespace UnityEditor.Rendering
         /// <param name="field">The field</param>
         /// <param name="state">The state</param>
         /// <returns>The current value from the UI</returns>
-        protected override Vector3 DoGUI(Rect rect, GUIContent label, DebugUI.Vector3Field field, DebugStateVector3 state)
+        protected override Vector3 DoGUI(
+            Rect rect,
+            GUIContent label,
+            DebugUI.Vector3Field field,
+            DebugStateVector3 state
+        )
         {
             return EditorGUILayout.Vector3Field(label, field.GetValue());
         }
@@ -630,7 +675,12 @@ namespace UnityEditor.Rendering
         /// <param name="field">The field</param>
         /// <param name="state">The state</param>
         /// <returns>The current value from the UI</returns>
-        protected override Vector4 DoGUI(Rect rect, GUIContent label, DebugUI.Vector4Field field, DebugStateVector4 state)
+        protected override Vector4 DoGUI(
+            Rect rect,
+            GUIContent label,
+            DebugUI.Vector4Field field,
+            DebugStateVector4 state
+        )
         {
             return EditorGUILayout.Vector4Field(label, field.GetValue());
         }
@@ -641,7 +691,8 @@ namespace UnityEditor.Rendering
     /// </summary>
     [Obsolete("This class is no longer used. #from(6000.5)")]
     [DebugUIDrawer(typeof(DebugUI.ObjectField))]
-    public sealed class DebugUIDrawerObjectField : DebugUIFieldDrawer<UnityEngine.Object, DebugUI.ObjectField, DebugStateObject>
+    public sealed class DebugUIDrawerObjectField
+        : DebugUIFieldDrawer<UnityEngine.Object, DebugUI.ObjectField, DebugStateObject>
     {
         /// <summary>
         /// Does the field of the given type
@@ -651,7 +702,12 @@ namespace UnityEditor.Rendering
         /// <param name="field">The field</param>
         /// <param name="state">The state</param>
         /// <returns>The current value from the UI</returns>
-        protected override UnityEngine.Object DoGUI(Rect rect, GUIContent label, DebugUI.ObjectField field, DebugStateObject state)
+        protected override UnityEngine.Object DoGUI(
+            Rect rect,
+            GUIContent label,
+            DebugUI.ObjectField field,
+            DebugStateObject state
+        )
         {
             return EditorGUI.ObjectField(rect, label, field.GetValue(), field.type, true);
         }
@@ -727,7 +783,7 @@ namespace UnityEditor.Rendering
                 DebugUI.MessageBox.Style.Info => MessageType.Info,
                 DebugUI.MessageBox.Style.Warning => MessageType.Warning,
                 DebugUI.MessageBox.Style.Error => MessageType.Error,
-                _ => MessageType.None
+                _ => MessageType.None,
             };
 
             EditorGUILayout.HelpBox(w.message, type);
@@ -752,7 +808,10 @@ namespace UnityEditor.Rendering
         {
             var w = Cast<DebugUI.Container>(widget);
             if (!w.hideDisplayName)
-                EditorGUILayout.LabelField(EditorGUIUtility.TrTextContent(widget.displayName, widget.tooltip), EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(
+                    EditorGUIUtility.TrTextContent(widget.displayName, widget.tooltip),
+                    EditorStyles.boldLabel
+                );
 
             EditorGUI.indentLevel++;
         }
@@ -784,6 +843,7 @@ namespace UnityEditor.Rendering
         {
             EditorGUILayout.BeginHorizontal();
         }
+
         /// <summary>
         /// Implement this to execute processing after UI rendering.
         /// </summary>
@@ -858,7 +918,12 @@ namespace UnityEditor.Rendering
             // Compute rects
             var headerRect = new Rect(rect.x, rect.y, rect.width, header.height);
             var contentRect = new Rect(rect.x, headerRect.yMax, rect.width, rect.height - headerRect.height);
-            var viewRect = new Rect(contentRect.x, contentRect.y, header.state.widthOfAllVisibleColumns, contentRect.height);
+            var viewRect = new Rect(
+                contentRect.x,
+                contentRect.y,
+                header.state.widthOfAllVisibleColumns,
+                contentRect.height
+            );
             var rowRect = contentRect;
             viewRect.height -= k_ScrollBarHeight;
 
@@ -874,14 +939,22 @@ namespace UnityEditor.Rendering
                     var row = Cast<DebugUI.Container>(w.children[r]);
                     rowRect.x = contentRect.x;
                     rowRect.width = columns[0].width;
-                    rowRect.height = (row is DebugUI.Table.Row tableRow) ? GetRowHeight(tableRow, visible) : EditorGUIUtility.singleLineHeight;
+                    rowRect.height =
+                        (row is DebugUI.Table.Row tableRow)
+                            ? GetRowHeight(tableRow, visible)
+                            : EditorGUIUtility.singleLineHeight;
 
                     rowRect.xMin += 2;
                     rowRect.xMax -= 2;
 
                     bool isAlternate = r % 2 == 0;
 
-                    EditorGUI.LabelField(rowRect, GUIContent.none, EditorGUIUtility.TrTextContent(row.displayName), isAlternate ? LegacyStyles.centeredLeft : LegacyStyles.centeredLeftAlternate);
+                    EditorGUI.LabelField(
+                        rowRect,
+                        GUIContent.none,
+                        EditorGUIUtility.TrTextContent(row.displayName),
+                        isAlternate ? LegacyStyles.centeredLeft : LegacyStyles.centeredLeftAlternate
+                    );
                     rowRect.xMin -= 2;
                     rowRect.xMax += 2;
 
@@ -922,14 +995,19 @@ namespace UnityEditor.Rendering
                 return rect;
 
             float size = 1.0f;
-            var color = EditorGUIUtility.isProSkin ? new Color(0.12f, 0.12f, 0.12f, 1.333f) : new Color(0.6f, 0.6f, 0.6f, 1.333f);
+            var color = EditorGUIUtility.isProSkin
+                ? new Color(0.12f, 0.12f, 0.12f, 1.333f)
+                : new Color(0.6f, 0.6f, 0.6f, 1.333f);
 
             Color orgColor = GUI.color;
             GUI.color = GUI.color * color;
             GUI.DrawTexture(new Rect(rect.x, rect.y, rect.width, size), EditorGUIUtility.whiteTexture);
             GUI.DrawTexture(new Rect(rect.x, rect.yMax - size, rect.width, size), EditorGUIUtility.whiteTexture);
             GUI.DrawTexture(new Rect(rect.x, rect.y + 1, size, rect.height - 2 * size), EditorGUIUtility.whiteTexture);
-            GUI.DrawTexture(new Rect(rect.xMax - size, rect.y + 1, size, rect.height - 2 * size), EditorGUIUtility.whiteTexture);
+            GUI.DrawTexture(
+                new Rect(rect.xMax - size, rect.y + 1, size, rect.height - 2 * size),
+                EditorGUIUtility.whiteTexture
+            );
 
             GUI.color = orgColor;
             return new Rect(rect.x + size, rect.y + size, rect.width - 2 * size, rect.height - 2 * size);
@@ -949,7 +1027,12 @@ namespace UnityEditor.Rendering
                 if (child.GetType() == typeof(DebugUI.Value))
                 {
                     var widget = Cast<DebugUI.Value>(child);
-                    EditorGUI.LabelField(rect, GUIContent.none, EditorGUIUtility.TrTextContent(widget.GetValue().ToString()), isAlternate ? LegacyStyles.centeredLeft : LegacyStyles.centeredLeftAlternate);
+                    EditorGUI.LabelField(
+                        rect,
+                        GUIContent.none,
+                        EditorGUIUtility.TrTextContent(widget.GetValue().ToString()),
+                        isAlternate ? LegacyStyles.centeredLeft : LegacyStyles.centeredLeftAlternate
+                    );
                 }
                 else if (child.GetType() == typeof(DebugUI.ColorField))
                 {
@@ -983,8 +1066,12 @@ namespace UnityEditor.Rendering
         public readonly GUIStyle sectionElement = new GUIStyle("PreferencesSection");
 
         public static GUIStyle centeredLeft = new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleLeft };
-        public static GUIStyle centeredLeftAlternate = new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleLeft };
-        public static float singleRowHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        public static GUIStyle centeredLeftAlternate = new GUIStyle(EditorStyles.label)
+        {
+            alignment = TextAnchor.MiddleLeft,
+        };
+        public static float singleRowHeight =
+            EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
         public static int foldoutColumnWidth = 70;
 

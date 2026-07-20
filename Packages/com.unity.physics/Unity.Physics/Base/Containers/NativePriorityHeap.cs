@@ -7,22 +7,25 @@ namespace Unity.Physics
     internal enum HeapType
     {
         Min,
-        Max
+        Max,
     };
 
     [NativeContainerSupportsDeallocateOnJobCompletion]
     [NativeContainer]
-    internal unsafe struct NativePriorityHeap<T> : IDisposable where T : unmanaged, IComparable<T>
+    internal unsafe struct NativePriorityHeap<T> : IDisposable
+        where T : unmanaged, IComparable<T>
     {
         [NativeDisableUnsafePtrRestriction]
         T* m_Buffer;
         int m_Capacity;
         Allocator m_AllocatorLabel;
 
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
         AtomicSafetyHandle m_Safety;
-        [NativeSetClassTypeToNullOnSchedule] DisposeSentinel m_DisposeSentinel;
-    #endif
+
+        [NativeSetClassTypeToNullOnSchedule]
+        DisposeSentinel m_DisposeSentinel;
+#endif
 
         int m_NumEntries;
         int m_CompareMultiplier;
@@ -31,13 +34,13 @@ namespace Unity.Physics
         {
             long totalSize = UnsafeUtility.SizeOf<T>() * capacity;
 
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             // Native allocation is only valid for Temp, Job and Persistent
             if (allocator <= Allocator.None)
                 throw new ArgumentException("Allocator must be Temp, TempJob or Persistent", "allocator");
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException("capacity", "Capacity must be >= 0");
-    #endif
+#endif
 
             m_Buffer = (T*)UnsafeUtility.Malloc(totalSize, UnsafeUtility.AlignOf<T>(), allocator);
 
@@ -47,9 +50,9 @@ namespace Unity.Physics
 
             m_CompareMultiplier = type == HeapType.Min ? 1 : -1;
 
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, 0, allocator);
-    #endif
+#endif
         }
 
         NativePriorityHeap(in NativeArray<T> array, int count, HeapType type = HeapType.Min)
@@ -62,9 +65,9 @@ namespace Unity.Physics
 
             m_CompareMultiplier = type == HeapType.Min ? 1 : -1;
 
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, 0, Allocator.Temp);
-    #endif
+#endif
         }
 
         public static NativePriorityHeap<T> FromArray(in NativeArray<T> array, int count, HeapType type = HeapType.Min)
@@ -76,9 +79,9 @@ namespace Unity.Physics
 
         public void Dispose()
         {
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
-    #endif
+#endif
 
             UnsafeUtility.Free(m_Buffer, m_AllocatorLabel);
             m_Buffer = null;
@@ -103,20 +106,27 @@ namespace Unity.Physics
                 }
                 // else:
 
-                throw new IndexOutOfRangeException(string.Format("index {0} for NativePriorityHeap out of range for {1}", index, m_NumEntries));
+                throw new IndexOutOfRangeException(
+                    string.Format("index {0} for NativePriorityHeap out of range for {1}", index, m_NumEntries)
+                );
             }
         }
 
         public void Push(T item)
         {
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-    #endif
+#endif
 
             if (m_NumEntries >= m_Capacity)
             {
-                throw new InvalidOperationException(string.Format(
-                    "Not enough capacity {0} for NativePriorityHeap of size {1}", m_Capacity, m_NumEntries));
+                throw new InvalidOperationException(
+                    string.Format(
+                        "Not enough capacity {0} for NativePriorityHeap of size {1}",
+                        m_Capacity,
+                        m_NumEntries
+                    )
+                );
             }
 
             // add new entry to bottom
@@ -128,16 +138,20 @@ namespace Unity.Physics
 
         public NativeArray<T> AsArray()
         {
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(m_Safety);
             var arraySafety = m_Safety;
             AtomicSafetyHandle.UseSecondaryVersion(ref arraySafety);
-    #endif
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(m_Buffer, m_Capacity, Allocator.None);
+#endif
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                m_Buffer,
+                m_Capacity,
+                Allocator.None
+            );
 
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, arraySafety);
-    #endif
+#endif
             return array;
         }
 
@@ -155,9 +169,9 @@ namespace Unity.Physics
 
         public T Pop()
         {
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-    #endif
+#endif
 
             if (m_NumEntries == 0)
             {
@@ -181,8 +195,7 @@ namespace Unity.Physics
             T* entryPtr = m_Buffer + i;
             int parentIndex = GetParentIndex(i);
 
-            while (entryPtr > m_Buffer
-                   && (m_Buffer + parentIndex)->CompareTo(*entryPtr) * m_CompareMultiplier > 0)
+            while (entryPtr > m_Buffer && (m_Buffer + parentIndex)->CompareTo(*entryPtr) * m_CompareMultiplier > 0)
             {
                 // swap
                 T parentEntry = *(m_Buffer + parentIndex);
@@ -233,8 +246,19 @@ namespace Unity.Physics
             }
         }
 
-        int GetParentIndex(int i) { return (i - 1) / 2; }
-        int GetLeftChildIndex(int i) { return 2 * i + 1; }
-        int GetRightChildIndex(int i) { return 2 * i + 2; }
+        int GetParentIndex(int i)
+        {
+            return (i - 1) / 2;
+        }
+
+        int GetLeftChildIndex(int i)
+        {
+            return 2 * i + 1;
+        }
+
+        int GetRightChildIndex(int i)
+        {
+            return 2 * i + 2;
+        }
     }
 }

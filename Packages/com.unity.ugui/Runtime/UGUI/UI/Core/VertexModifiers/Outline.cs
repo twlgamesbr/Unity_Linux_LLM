@@ -9,8 +9,7 @@ namespace UnityEngine.UI
     /// </summary>
     public class Outline : Shadow
     {
-        protected Outline()
-        {}
+        protected Outline() { }
 
         public override void ModifyMesh(VertexHelper vh)
         {

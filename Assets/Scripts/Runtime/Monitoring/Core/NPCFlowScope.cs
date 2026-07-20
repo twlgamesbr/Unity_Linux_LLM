@@ -21,15 +21,17 @@ namespace NPCSystem.Monitoring
         // External consumers (e.g. DatadogTracer) can subscribe to this callback
         // to automatically create APM spans when flow scopes complete.
         // Args: stage, status, source, durationMs, npcSlug, requestId, data
-        public static Action<NPCFlowStage, NPCFlowStatus, string, long, string, string, Dictionary<string, object>> OnScopeComplete;
+        public static Action<
+            NPCFlowStage,
+            NPCFlowStatus,
+            string,
+            long,
+            string,
+            string,
+            Dictionary<string, object>
+        > OnScopeComplete;
 
-        NPCFlowScope(
-            NPCFlowLogger logger,
-            NPCFlowStage stage,
-            string source,
-            string requestId,
-            string npcSlug
-        )
+        NPCFlowScope(NPCFlowLogger logger, NPCFlowStage stage, string source, string requestId, string npcSlug)
         {
             _logger = logger;
             _stage = stage;
@@ -66,49 +68,25 @@ namespace NPCSystem.Monitoring
 
         public void Success(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(
-                NPCFlowStatus.Success,
-                NPCFlowLogLevel.Info,
-                message ?? $"{_stage} completed.",
-                data
-            );
+            Complete(NPCFlowStatus.Success, NPCFlowLogLevel.Info, message ?? $"{_stage} completed.", data);
         }
 
         public void Fallback(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(
-                NPCFlowStatus.Fallback,
-                NPCFlowLogLevel.Warning,
-                message ?? $"{_stage} fell back.",
-                data
-            );
+            Complete(NPCFlowStatus.Fallback, NPCFlowLogLevel.Warning, message ?? $"{_stage} fell back.", data);
         }
 
         public void Skipped(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(
-                NPCFlowStatus.Skipped,
-                NPCFlowLogLevel.Info,
-                message ?? $"{_stage} skipped.",
-                data
-            );
+            Complete(NPCFlowStatus.Skipped, NPCFlowLogLevel.Info, message ?? $"{_stage} skipped.", data);
         }
 
         public void Warning(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(
-                NPCFlowStatus.Warning,
-                NPCFlowLogLevel.Warning,
-                message ?? $"{_stage} warning.",
-                data
-            );
+            Complete(NPCFlowStatus.Warning, NPCFlowLogLevel.Warning, message ?? $"{_stage} warning.", data);
         }
 
-        public void Error(
-            Exception exception,
-            string message = null,
-            Dictionary<string, object> data = null
-        )
+        public void Error(Exception exception, string message = null, Dictionary<string, object> data = null)
         {
             data ??= new Dictionary<string, object>();
             if (exception != null)
@@ -116,12 +94,7 @@ namespace NPCSystem.Monitoring
                 data["exceptionType"] = exception.GetType().Name;
                 data["exceptionMessage"] = exception.Message;
             }
-            Complete(
-                NPCFlowStatus.Error,
-                NPCFlowLogLevel.Error,
-                message ?? $"{_stage} failed.",
-                data
-            );
+            Complete(NPCFlowStatus.Error, NPCFlowLogLevel.Error, message ?? $"{_stage} failed.", data);
         }
 
         public void Dispose()
@@ -129,12 +102,7 @@ namespace NPCSystem.Monitoring
             _stopwatch.Stop();
         }
 
-        void Complete(
-            NPCFlowStatus status,
-            NPCFlowLogLevel level,
-            string message,
-            Dictionary<string, object> data
-        )
+        void Complete(NPCFlowStatus status, NPCFlowLogLevel level, string message, Dictionary<string, object> data)
         {
             if (_completed)
                 return;
@@ -142,30 +110,12 @@ namespace NPCSystem.Monitoring
             _stopwatch.Stop();
 
             long elapsedMs = _stopwatch.ElapsedMilliseconds;
-            _logger?.Log(
-                _stage,
-                status,
-                level,
-                message,
-                _source,
-                _requestId,
-                _npcSlug,
-                elapsedMs,
-                data
-            );
+            _logger?.Log(_stage, status, level, message, _source, _requestId, _npcSlug, elapsedMs, data);
 
             // Fire Datadog bridge callback if subscribed
             try
             {
-                OnScopeComplete?.Invoke(
-                    _stage,
-                    status,
-                    _source,
-                    elapsedMs,
-                    _npcSlug,
-                    _requestId,
-                    data
-                );
+                OnScopeComplete?.Invoke(_stage, status, _source, elapsedMs, _npcSlug, _requestId, data);
             }
             catch
             {

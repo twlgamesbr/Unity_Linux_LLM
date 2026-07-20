@@ -17,18 +17,25 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI.PropertyDrawers
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            s_Presets ??= NetworkSimulatorPresets.Values
-                .Select(preset => preset.Name)
+            s_Presets ??= NetworkSimulatorPresets
+                .Values.Select(preset => preset.Name)
                 .Concat(new[] { "Custom" })
                 .ToArray();
 
             var connectionType = property.FindPropertyRelative(nameof(ConnectionsCycle.Configuration.m_ClassPreset));
-            var customPresetProperty = property.FindPropertyRelative(nameof(ConnectionsCycle.Configuration.m_ScriptableObjectPreset));
-            var changeIntervalProperty = property.FindPropertyRelative(nameof(ConnectionsCycle.Configuration.ChangeIntervalMilliseconds));
+            var customPresetProperty = property.FindPropertyRelative(
+                nameof(ConnectionsCycle.Configuration.m_ScriptableObjectPreset)
+            );
+            var changeIntervalProperty = property.FindPropertyRelative(
+                nameof(ConnectionsCycle.Configuration.ChangeIntervalMilliseconds)
+            );
             var customPresetIndex = s_Presets.Length - 1;
             var dropdownIndex = customPresetIndex;
 
-            if (connectionType.managedReferenceValue is NetworkSimulatorPreset classPreset && !string.IsNullOrWhiteSpace(classPreset.Name))
+            if (
+                connectionType.managedReferenceValue is NetworkSimulatorPreset classPreset
+                && !string.IsNullOrWhiteSpace(classPreset.Name)
+            )
             {
                 dropdownIndex = Array.IndexOf(s_Presets, classPreset.Name);
             }
@@ -55,7 +62,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI.PropertyDrawers
             EditorGUI.ObjectField(position, customPresetProperty);
 
             position.y += EditorGUIUtility.singleLineHeight;
-            labelName = ObjectNames.NicifyVariableName(nameof(ConnectionsCycle.Configuration.ChangeIntervalMilliseconds));
+            labelName = ObjectNames.NicifyVariableName(
+                nameof(ConnectionsCycle.Configuration.ChangeIntervalMilliseconds)
+            );
             var guiContent = new GUIContent(labelName);
             EditorGUI.PropertyField(position, changeIntervalProperty, guiContent);
 

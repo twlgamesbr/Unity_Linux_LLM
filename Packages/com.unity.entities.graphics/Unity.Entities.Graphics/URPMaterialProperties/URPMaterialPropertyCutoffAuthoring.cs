@@ -13,14 +13,15 @@ namespace Unity.Rendering
     public class URPMaterialPropertyCutoffAuthoring : UnityEngine.MonoBehaviour
     {
         [Unity.Entities.RegisterBinding(typeof(URPMaterialPropertyCutoff), nameof(URPMaterialPropertyCutoff.Value))]
-        [UnityEngine.Range(0,1)]
+        [UnityEngine.Range(0, 1)]
         public float Value;
 
         class URPMaterialPropertyCutoffBaker : Unity.Entities.Baker<URPMaterialPropertyCutoffAuthoring>
         {
             public override void Bake(URPMaterialPropertyCutoffAuthoring authoring)
             {
-                Unity.Rendering.URPMaterialPropertyCutoff component = default(Unity.Rendering.URPMaterialPropertyCutoff);
+                Unity.Rendering.URPMaterialPropertyCutoff component =
+                    default(Unity.Rendering.URPMaterialPropertyCutoff);
                 component.Value = authoring.Value;
                 var entity = GetEntity(TransformUsageFlags.Renderable);
                 AddComponent(entity, component);

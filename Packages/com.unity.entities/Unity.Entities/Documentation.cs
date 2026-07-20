@@ -24,9 +24,7 @@ namespace Unity.Entities
         /// <param name="pageName">The documentation page name (without .html extension).</param>
         /// <param name="pageHash">Optional section anchor on the page.</param>
         public EntitiesHelpURLAttribute(string pageName, string pageHash = "")
-            : base(EntitiesDocumentation.GetPageLink(pageName, pageHash))
-        {
-        }
+            : base(EntitiesDocumentation.GetPageLink(pageName, pageHash)) { }
     }
 
     /// <summary>
@@ -36,7 +34,8 @@ namespace Unity.Entities
     {
         const string k_PackageName = "com.unity.entities";
         const string k_VersionedUrlFormat = "https://docs.unity3d.com/Packages/{0}@{1}/manual/{2}.html{3}";
-        const string k_LatestUrlFormat = "https://docs.unity3d.com/Packages/{0}@latest/index.html?subfolder=/manual/{1}.html{2}";
+        const string k_LatestUrlFormat =
+            "https://docs.unity3d.com/Packages/{0}@latest/index.html?subfolder=/manual/{1}.html{2}";
         static string k_Version = string.Empty;
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace Unity.Entities
                         k_Version = version.Substring(0, lastDot);
                 }
             }
-            
+
             if (k_Version != string.Empty)
                 return string.Format(k_VersionedUrlFormat, k_PackageName, k_Version, pageName, pageHash);
 #endif

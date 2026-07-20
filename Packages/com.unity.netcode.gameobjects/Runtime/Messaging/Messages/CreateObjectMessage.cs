@@ -131,7 +131,13 @@ namespace Unity.Netcode
 
             if (!networkManager.NetworkConfig.ForceSamePrefabs && !networkManager.SpawnManager.HasPrefab(ObjectInfo))
             {
-                networkManager.DeferredMessageManager.DeferMessage(IDeferredNetworkMessageManager.TriggerType.OnAddPrefab, ObjectInfo.Hash, reader, ref context, k_Name);
+                networkManager.DeferredMessageManager.DeferMessage(
+                    IDeferredNetworkMessageManager.TriggerType.OnAddPrefab,
+                    ObjectInfo.Hash,
+                    reader,
+                    ref context,
+                    k_Name
+                );
                 return false;
             }
             m_ReceivedNetworkVariableData = reader;
@@ -145,23 +151,38 @@ namespace Unity.Netcode
             // If a client receives a create object message and it is still synchronizing, then defer the object creation until it has finished synchronizing
             if (networkManager.SceneManager.ShouldDeferCreateObject())
             {
-                networkManager.SceneManager.DeferCreateObject(context.SenderId, context.MessageSize, ObjectInfo, m_ReceivedNetworkVariableData, ObserverIds, NewObserverIds);
+                networkManager.SceneManager.DeferCreateObject(
+                    context.SenderId,
+                    context.MessageSize,
+                    ObjectInfo,
+                    m_ReceivedNetworkVariableData,
+                    ObserverIds,
+                    NewObserverIds
+                );
             }
             else
             {
                 if (networkManager.DistributedAuthorityMode && !IncludesSerializedObject && UpdateObservers)
                 {
-                    ObjectInfo = new NetworkObject.SerializedObject()
-                    {
-                        NetworkObjectId = NetworkObjectId,
-                    };
+                    ObjectInfo = new NetworkObject.SerializedObject() { NetworkObjectId = NetworkObjectId };
                 }
-                CreateObject(ref networkManager, context.SenderId, context.MessageSize, ObjectInfo, m_ReceivedNetworkVariableData, ObserverIds, NewObserverIds);
+                CreateObject(
+                    ref networkManager,
+                    context.SenderId,
+                    context.MessageSize,
+                    ObjectInfo,
+                    m_ReceivedNetworkVariableData,
+                    ObserverIds,
+                    NewObserverIds
+                );
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void CreateObject(ref NetworkManager networkManager, ref NetworkSceneManager.DeferredObjectCreation deferredObjectCreation)
+        internal static void CreateObject(
+            ref NetworkManager networkManager,
+            ref NetworkSceneManager.DeferredObjectCreation deferredObjectCreation
+        )
         {
             var senderId = deferredObjectCreation.SenderId;
             var observerIds = deferredObjectCreation.ObserverIds;
@@ -169,11 +190,27 @@ namespace Unity.Netcode
             var messageSize = deferredObjectCreation.MessageSize;
             var sceneObject = deferredObjectCreation.SerializedObject;
             var networkVariableData = deferredObjectCreation.FastBufferReader;
-            CreateObject(ref networkManager, senderId, messageSize, sceneObject, networkVariableData, observerIds, newObserverIds);
+            CreateObject(
+                ref networkManager,
+                senderId,
+                messageSize,
+                sceneObject,
+                networkVariableData,
+                observerIds,
+                newObserverIds
+            );
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void CreateObject(ref NetworkManager networkManager, ulong senderId, uint messageSize, NetworkObject.SerializedObject serializedObject, FastBufferReader networkVariableData, ulong[] observerIds, ulong[] newObserverIds)
+        internal static void CreateObject(
+            ref NetworkManager networkManager,
+            ulong senderId,
+            uint messageSize,
+            NetworkObject.SerializedObject serializedObject,
+            FastBufferReader networkVariableData,
+            ulong[] observerIds,
+            ulong[] newObserverIds
+        )
         {
             var networkObject = (NetworkObject)null;
             try
@@ -196,23 +233,38 @@ namespace Unity.Netcode
                         // This should not happen, logging error just in case
                         if (hasNewObserverIdList && newObserverIds.Contains(networkManager.LocalClientId))
                         {
-                            NetworkLog.LogErrorServer($"[{nameof(CreateObjectMessage)}][Duplicate-Broadcast] Detected duplicated object creation for {serializedObject.NetworkObjectId}!");
+                            NetworkLog.LogErrorServer(
+                                $"[{nameof(CreateObjectMessage)}][Duplicate-Broadcast] Detected duplicated object creation for {serializedObject.NetworkObjectId}!"
+                            );
                         }
                         else // Trap to make sure the owner is not receiving any messages it sent
-                        if (networkManager.CMBServiceConnection && networkManager.LocalClientId == networkObject.OwnerClientId)
+                        if (
+                            networkManager.CMBServiceConnection
+                            && networkManager.LocalClientId == networkObject.OwnerClientId
+                        )
                         {
-                            NetworkLog.LogWarning($"[{nameof(CreateObjectMessage)}][Client-{networkManager.LocalClientId}][Duplicate-CreateObjectMessage][Client Is Owner] Detected duplicated object creation for {networkObject.name}-{serializedObject.NetworkObjectId}!");
+                            NetworkLog.LogWarning(
+                                $"[{nameof(CreateObjectMessage)}][Client-{networkManager.LocalClientId}][Duplicate-CreateObjectMessage][Client Is Owner] Detected duplicated object creation for {networkObject.name}-{serializedObject.NetworkObjectId}!"
+                            );
                         }
                     }
                     else
                     {
-                        networkObject = NetworkObject.Deserialize(serializedObject, networkVariableData, networkManager, true);
+                        networkObject = NetworkObject.Deserialize(
+                            serializedObject,
+                            networkVariableData,
+                            networkManager,
+                            true
+                        );
                     }
 
                     // DA - NGO CMB SERVICE NOTES:
                     // It is possible for two clients to connect at the exact same time which, due to client-side spawning, can cause each client
                     // to miss their spawns. For now, all player NetworkObject spawns will always be visible to all known connected clients
-                    var clientList = hasObserverIdList && !networkObject.IsPlayerObject ? observerIds : networkManager.ConnectedClientsIds;
+                    var clientList =
+                        hasObserverIdList && !networkObject.IsPlayerObject
+                            ? observerIds
+                            : networkManager.ConnectedClientsIds;
 
                     // Update the observers for this instance
                     for (int i = 0; i < clientList.Count; i++)
@@ -229,7 +281,11 @@ namespace Unity.Netcode
                         // the same frame), then we need to check the observers list to make sure all players are visible upon first spawning. At a later date,
                         // for area of interest we will need to have some form of follow up "observer update" message to cull out players not within each
                         // player's AOI.
-                        if (networkObject.IsPlayerObject && hasNewObserverIdList && clientList.Count != observerIds.Length)
+                        if (
+                            networkObject.IsPlayerObject
+                            && hasNewObserverIdList
+                            && clientList.Count != observerIds.Length
+                        )
                         {
                             // For same-frame newly spawned players that might not be aware of all other players, update the player's observer
                             // list.
@@ -249,8 +305,13 @@ namespace Unity.Netcode
                             // DA - NGO CMB SERVICE NOTES:
                             // If the authority did not specify the list of clients and the client is not an observer or we are the owner/originator
                             // or we are the DAHost, then we skip sending the message.
-                            if ((!hasObserverIdList && (!networkObject.Observers.Contains(clientId)) ||
-                                clientId == networkObject.OwnerClientId || clientId == NetworkManager.ServerClientId))
+                            if (
+                                (
+                                    !hasObserverIdList && (!networkObject.Observers.Contains(clientId))
+                                    || clientId == networkObject.OwnerClientId
+                                    || clientId == NetworkManager.ServerClientId
+                                )
+                            )
                             {
                                 continue;
                             }
@@ -259,7 +320,8 @@ namespace Unity.Netcode
                             // If this included a list of new observers and the targeted clientId is one of the observers, then send the serialized data.
                             // Otherwise, the targeted clientId has already has visibility (i.e. it is already spawned) and so just send the updated
                             // observers list to that client's instance.
-                            createObjectMessage.IncludesSerializedObject = hasNewObserverIdList && newObserverIds.Contains(clientId);
+                            createObjectMessage.IncludesSerializedObject =
+                                hasNewObserverIdList && newObserverIds.Contains(clientId);
 
                             networkManager.SpawnManager.SendSpawnCallForObject(clientId, networkObject);
                         }

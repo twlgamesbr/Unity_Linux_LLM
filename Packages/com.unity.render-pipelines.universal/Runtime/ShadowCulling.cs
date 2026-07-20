@@ -12,35 +12,56 @@ namespace UnityEngine.Rendering.Universal
 
     internal static class ShadowCulling
     {
-        static readonly ProfilingSampler computeShadowCasterCullingInfosMarker = new ProfilingSampler($"{nameof(UniversalRenderPipeline)}.{nameof(ComputeShadowCasterCullingInfos)}");
+        static readonly ProfilingSampler computeShadowCasterCullingInfosMarker = new ProfilingSampler(
+            $"{nameof(UniversalRenderPipeline)}.{nameof(ComputeShadowCasterCullingInfos)}"
+        );
 
-        public static NativeArray<URPLightShadowCullingInfos> CullShadowCasters(ref ScriptableRenderContext context,
+        public static NativeArray<URPLightShadowCullingInfos> CullShadowCasters(
+            ref ScriptableRenderContext context,
             UniversalShadowData shadowData,
             ref AdditionalLightsShadowAtlasLayout shadowAtlasLayout,
-            ref CullingResults cullResults)
+            ref CullingResults cullResults
+        )
         {
             ShadowCastersCullingInfos shadowCullingInfos;
             NativeArray<URPLightShadowCullingInfos> urpVisibleLightsShadowCullingInfos;
-            ComputeShadowCasterCullingInfos(shadowData, ref shadowAtlasLayout, ref cullResults, out shadowCullingInfos, out urpVisibleLightsShadowCullingInfos);
+            ComputeShadowCasterCullingInfos(
+                shadowData,
+                ref shadowAtlasLayout,
+                ref cullResults,
+                out shadowCullingInfos,
+                out urpVisibleLightsShadowCullingInfos
+            );
 
             context.CullShadowCasters(cullResults, shadowCullingInfos);
 
             return urpVisibleLightsShadowCullingInfos;
         }
 
-        static void ComputeShadowCasterCullingInfos(UniversalShadowData shadowData,
+        static void ComputeShadowCasterCullingInfos(
+            UniversalShadowData shadowData,
             ref AdditionalLightsShadowAtlasLayout shadowAtlasLayout,
             ref CullingResults cullingResults,
             out ShadowCastersCullingInfos shadowCullingInfos,
-            out NativeArray<URPLightShadowCullingInfos> urpVisibleLightsShadowCullingInfos)
+            out NativeArray<URPLightShadowCullingInfos> urpVisibleLightsShadowCullingInfos
+        )
         {
             const int MaxShadowSplitCount = 6;
             using var profScope = new ProfilingScope(computeShadowCasterCullingInfosMarker);
 
             NativeArray<VisibleLight> visibleLights = cullingResults.visibleLights;
-            NativeArray<ShadowSplitData> splitBuffer = new NativeArray<ShadowSplitData>(visibleLights.Length * MaxShadowSplitCount, Allocator.Temp);
-            NativeArray<LightShadowCasterCullingInfo> perLightInfos = new NativeArray<LightShadowCasterCullingInfo>(visibleLights.Length, Allocator.Temp);
-            urpVisibleLightsShadowCullingInfos = new NativeArray<URPLightShadowCullingInfos>(visibleLights.Length, Allocator.Temp);
+            NativeArray<ShadowSplitData> splitBuffer = new NativeArray<ShadowSplitData>(
+                visibleLights.Length * MaxShadowSplitCount,
+                Allocator.Temp
+            );
+            NativeArray<LightShadowCasterCullingInfo> perLightInfos = new NativeArray<LightShadowCasterCullingInfo>(
+                visibleLights.Length,
+                Allocator.Temp
+            );
+            urpVisibleLightsShadowCullingInfos = new NativeArray<URPLightShadowCullingInfos>(
+                visibleLights.Length,
+                Allocator.Temp
+            );
 
             int totalSplitCount = 0;
             int splitBufferOffset = 0;
@@ -69,10 +90,18 @@ namespace UnityEngine.Rendering.Universal
                     for (int i = 0; i < splitCount; ++i)
                     {
                         ShadowSliceData slice = default;
-                        bool isValid = ShadowUtils.ExtractDirectionalLightMatrix(ref cullingResults, shadowData,
-                            lightIndex, i, renderTargetWidth, renderTargetHeight, shadowResolution, visibleLight.light.shadowNearPlane,
+                        bool isValid = ShadowUtils.ExtractDirectionalLightMatrix(
+                            ref cullingResults,
+                            shadowData,
+                            lightIndex,
+                            i,
+                            renderTargetWidth,
+                            renderTargetHeight,
+                            shadowResolution,
+                            visibleLight.light.shadowNearPlane,
                             out _, // Vector4 cascadeSplitDistance. This is basically just the culling sphere which is already present in ShadowSplitData
-                            out slice);
+                            out slice
+                        );
 
                         if (isValid)
                             slicesValidMask |= 1u << i;
@@ -87,11 +116,17 @@ namespace UnityEngine.Rendering.Universal
                         continue;
 
                     int splitCount = ShadowUtils.GetPunctualLightShadowSlicesCount(lightType);
-                    int sliceResolution = shadowAtlasLayout.GetSliceShadowResolutionRequest(lightIndex, 0).allocatedResolution;
+                    int sliceResolution = shadowAtlasLayout
+                        .GetSliceShadowResolutionRequest(lightIndex, 0)
+                        .allocatedResolution;
                     bool shadowFiltering = visibleLight.light.shadows == LightShadows.Soft;
 
                     // Note: the same fovBias will also be used to compute ShadowUtils.GetShadowBias
-                    float fovBias = Internal.AdditionalLightsShadowCasterPass.GetPointLightShadowFrustumFovBiasInDegrees(sliceResolution, shadowFiltering);
+                    float fovBias =
+                        Internal.AdditionalLightsShadowCasterPass.GetPointLightShadowFrustumFovBiasInDegrees(
+                            sliceResolution,
+                            shadowFiltering
+                        );
 
                     slices = new NativeArray<ShadowSliceData>(splitCount, Allocator.Temp);
                     slicesValidMask = 0;
@@ -99,7 +134,8 @@ namespace UnityEngine.Rendering.Universal
                     for (int i = 0; i < splitCount; ++i)
                     {
                         ShadowSliceData slice = default;
-                        bool isValid = ShadowUtils.ExtractPointLightMatrix(ref cullingResults,
+                        bool isValid = ShadowUtils.ExtractPointLightMatrix(
+                            ref cullingResults,
                             shadowData,
                             lightIndex,
                             (CubemapFace)i,
@@ -107,7 +143,8 @@ namespace UnityEngine.Rendering.Universal
                             out slice.shadowTransform,
                             out slice.viewMatrix,
                             out slice.projectionMatrix,
-                            out slice.splitData);
+                            out slice.splitData
+                        );
 
                         if (isValid)
                             slicesValidMask |= 1u << i;
@@ -125,13 +162,15 @@ namespace UnityEngine.Rendering.Universal
                     slicesValidMask = 0;
 
                     ShadowSliceData slice = default;
-                    bool isValid = ShadowUtils.ExtractSpotLightMatrix(ref cullingResults,
+                    bool isValid = ShadowUtils.ExtractSpotLightMatrix(
+                        ref cullingResults,
                         shadowData,
                         lightIndex,
                         out slice.shadowTransform,
                         out slice.viewMatrix,
                         out slice.projectionMatrix,
-                        out slice.splitData);
+                        out slice.splitData
+                    );
 
                     if (isValid)
                         slicesValidMask |= 1u << 0;
@@ -163,9 +202,12 @@ namespace UnityEngine.Rendering.Universal
         {
             switch (type)
             {
-                case LightType.Point: return BatchCullingProjectionType.Perspective;
-                case LightType.Spot: return BatchCullingProjectionType.Perspective;
-                case LightType.Directional: return BatchCullingProjectionType.Orthographic;
+                case LightType.Point:
+                    return BatchCullingProjectionType.Perspective;
+                case LightType.Spot:
+                    return BatchCullingProjectionType.Perspective;
+                case LightType.Directional:
+                    return BatchCullingProjectionType.Orthographic;
             }
 
             return BatchCullingProjectionType.Unknown;

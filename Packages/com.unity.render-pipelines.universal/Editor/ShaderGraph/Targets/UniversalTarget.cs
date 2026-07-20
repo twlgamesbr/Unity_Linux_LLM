@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Rendering.UITK.ShaderGraph;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
@@ -68,16 +68,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
     {
         Auto = 0,
         ForceEnabled = 1,
-        ForceDisabled = 2
+        ForceDisabled = 2,
     }
 
-    enum ZTestMode  // the values here match UnityEngine.Rendering.CompareFunction
+    enum ZTestMode // the values here match UnityEngine.Rendering.CompareFunction
     {
         Disabled = 0,
         Never = 1,
         Less = 2,
         Equal = 3,
-        LEqual = 4,     // default for most rendering
+        LEqual = 4, // default for most rendering
         Greater = 5,
         NotEqual = 6,
         GEqual = 7,
@@ -94,21 +94,21 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
     internal enum RenderFace
     {
-        Front = 2,      // = CullMode.Back -- render front face only
-        Back = 1,       // = CullMode.Front -- render back face only
-        Both = 0        // = CullMode.Off -- render both faces
+        Front = 2, // = CullMode.Back -- render front face only
+        Back = 1, // = CullMode.Front -- render back face only
+        Both = 0, // = CullMode.Off -- render both faces
     }
 
     internal enum AdditionalMotionVectorMode
     {
         None,
         TimeBased,
-        Custom
+        Custom,
     }
 
     sealed class UniversalTarget : Target, IHasMetadata, ILegacyTarget, IMaySupportVFX
 #if HAS_VFX_GRAPH
-        , IRequireVFXContext
+            , IRequireVFXContext
 #endif
     {
         public override int latestVersion => 1;
@@ -122,14 +122,21 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         public const string kUnlitMaterialTypeTag = "\"UniversalMaterialType\" = \"Unlit\"";
         public const string kTerrainMaterialTypeTag = "\"TerrainCompatible\" = \"True\"";
         public const string kAlwaysRenderMotionVectorsTag = "\"AlwaysRenderMotionVectors\" = \"true\"";
-        public static readonly string[] kSharedTemplateDirectories = GenerationUtils.GetDefaultSharedTemplateDirectories().Union(new string[]
-        {
-            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Templates"
+        public static readonly string[] kSharedTemplateDirectories = GenerationUtils
+            .GetDefaultSharedTemplateDirectories()
+            .Union(
+                new string[]
+                {
+                    "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Templates"
 #if HAS_VFX_GRAPH
-            , "Packages/com.unity.visualeffectgraph/Editor/ShaderGraph/Templates"
+                    ,
+                    "Packages/com.unity.visualeffectgraph/Editor/ShaderGraph/Templates"
 #endif
-        }).ToArray();
-        public const string kUberTemplatePath = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Templates/ShaderPass.template";
+                }
+            )
+            .ToArray();
+        public const string kUberTemplatePath =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Templates/ShaderPass.template";
 
         // SubTarget
         List<SubTarget> m_SubTargets;
@@ -202,8 +209,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         internal override bool ignoreCustomInterpolators => m_ActiveSubTarget.value is UniversalCanvasSubTarget;
         internal override int padCustomInterpolatorLimit => 4;
         internal override bool prefersSpritePreview =>
-            activeSubTarget is UniversalSpriteUnlitSubTarget or UniversalSpriteLitSubTarget or
-                               UniversalSpriteCustomLitSubTarget or UniversalCanvasSubTarget;
+            activeSubTarget
+                is UniversalSpriteUnlitSubTarget
+                    or UniversalSpriteLitSubTarget
+                    or UniversalSpriteCustomLitSubTarget
+                    or UniversalCanvasSubTarget;
 
         public UniversalTarget()
         {
@@ -387,7 +397,9 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             SRPFilterAttribute srpFilter = NodeClassCache.GetAttributeOnNodeType<SRPFilterAttribute>(nodeType);
             bool worksWithThisSrp = srpFilter == null || srpFilter.srpTypes.Contains(typeof(UniversalRenderPipeline));
 
-            SubTargetFilterAttribute subTargetFilter = NodeClassCache.GetAttributeOnNodeType<SubTargetFilterAttribute>(nodeType);
+            SubTargetFilterAttribute subTargetFilter = NodeClassCache.GetAttributeOnNodeType<SubTargetFilterAttribute>(
+                nodeType
+            );
             var activeSubTargetType = activeSubTarget.GetType();
             var worksWithThisSubTarget = subTargetFilter == null;
             if (subTargetFilter != null)
@@ -438,9 +450,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             var descs = context.blocks.Select(x => x.descriptor);
             // Core fields
-            context.AddField(Fields.GraphVertex, descs.Contains(BlockFields.VertexDescription.Position) ||
-                descs.Contains(BlockFields.VertexDescription.Normal) ||
-                descs.Contains(BlockFields.VertexDescription.Tangent));
+            context.AddField(
+                Fields.GraphVertex,
+                descs.Contains(BlockFields.VertexDescription.Position)
+                    || descs.Contains(BlockFields.VertexDescription.Normal)
+                    || descs.Contains(BlockFields.VertexDescription.Tangent)
+            );
             context.AddField(Fields.GraphPixel);
 
             // SubTarget fields
@@ -450,9 +465,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         public override void GetActiveBlocks(ref TargetActiveBlockContext context)
         {
             // Core blocks
-            bool useCoreBlocks = !(m_ActiveSubTarget.value is UnityEditor.Rendering.Fullscreen.ShaderGraph.FullscreenSubTarget<UniversalTarget>
+            bool useCoreBlocks = !(
+                m_ActiveSubTarget.value
+                    is UnityEditor.Rendering.Fullscreen.ShaderGraph.FullscreenSubTarget<UniversalTarget>
                 | m_ActiveSubTarget.value is UnityEditor.Rendering.Canvas.ShaderGraph.CanvasSubTarget<UniversalTarget>
-                | m_ActiveSubTarget.value is UnityEditor.Rendering.UITK.ShaderGraph.UISubTarget<UniversalTarget>);
+                | m_ActiveSubTarget.value is UnityEditor.Rendering.UITK.ShaderGraph.UISubTarget<UniversalTarget>
+            );
 
             // Core blocks
             if (useCoreBlocks)
@@ -491,22 +509,30 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             m_ActiveSubTarget.value.CollectShaderProperties(collector, generationMode);
         }
 
-        public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public override void GetPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
             // Core properties
             m_SubTargetField = new PopupField<string>(m_SubTargetNames, activeSubTargetIndex);
             var validationAction = context.graphValidation;
-            context.AddProperty("Material", m_SubTargetField, (evt) =>
-            {
-                if (Equals(activeSubTargetIndex, m_SubTargetField.index))
-                    return;
+            context.AddProperty(
+                "Material",
+                m_SubTargetField,
+                (evt) =>
+                {
+                    if (Equals(activeSubTargetIndex, m_SubTargetField.index))
+                        return;
 
-                registerUndo("Change Material");
-                m_ActiveSubTarget = m_SubTargets[m_SubTargetField.index];
-                ProcessSubTargetDatas(m_ActiveSubTarget.value);
-                onChange();
-                validationAction();
-            });
+                    registerUndo("Change Material");
+                    m_ActiveSubTarget = m_SubTargets[m_SubTargetField.index];
+                    ProcessSubTargetDatas(m_ActiveSubTarget.value);
+                    onChange();
+                    validationAction();
+                }
+            );
 
             // SubTarget properties
             m_ActiveSubTarget.value.GetPropertiesGUI(ref context, onChange, registerUndo);
@@ -526,18 +552,28 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             context.AddProperty("Custom Editor GUI", m_CustomGUIField, (evt) => { });
 
 #if HAS_VFX_GRAPH
-            if (m_ActiveSubTarget.value is UniversalSubTarget universalSubTarget && universalSubTarget.target.CanSupportVFX())
+            if (
+                m_ActiveSubTarget.value is UniversalSubTarget universalSubTarget
+                && universalSubTarget.target.CanSupportVFX()
+            )
             {
                 m_SupportVFXToggle = new Toggle("") { value = m_SupportVFX };
-                context.AddProperty("Support VFX Graph", m_SupportVFXToggle, (evt) =>
-                {
-					registerUndo("Change Support VFX Graph");
-                    m_SupportVFX = m_SupportVFXToggle.value;
-                });
+                context.AddProperty(
+                    "Support VFX Graph",
+                    m_SupportVFXToggle,
+                    (evt) =>
+                    {
+                        registerUndo("Change Support VFX Graph");
+                        m_SupportVFX = m_SupportVFXToggle.value;
+                    }
+                );
             }
             else
             {
-                context.AddHelpBox(MessageType.Info, $"The {m_ActiveSubTarget.value.displayName} target does not support VFX Graph.");
+                context.AddHelpBox(
+                    MessageType.Info,
+                    $"The {m_ActiveSubTarget.value.displayName} target does not support VFX Graph."
+                );
             }
 #endif
         }
@@ -548,140 +584,204 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             Never = 1,
             Less = 2,
             Equal = 3,
-            LEqual = 4,     // default for most rendering
+            LEqual = 4, // default for most rendering
             Greater = 5,
             NotEqual = 6,
             GEqual = 7,
             Always = 8,
         };
 
-        public void AddDefaultMaterialOverrideGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public void AddDefaultMaterialOverrideGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
             // At some point we may want to convert this to be a per-property control
             // or Unify the UX with the upcoming "lock" feature of the Material Variant properties
-            context.AddProperty("Allow Material Override", new Toggle() { value = allowMaterialOverride }, (evt) =>
-            {
-                if (Equals(allowMaterialOverride, evt.newValue))
-                    return;
-
-                registerUndo("Change Allow Material Override");
-                allowMaterialOverride = evt.newValue;
-                onChange();
-            });
-        }
-
-        public void AddDefaultSurfacePropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo, bool showReceiveShadows)
-        {
-            context.AddProperty("Surface Type", new EnumField(SurfaceType.Opaque) { value = surfaceType }, (evt) =>
-            {
-                if (Equals(surfaceType, evt.newValue))
-                    return;
-
-                registerUndo("Change Surface");
-                surfaceType = (SurfaceType)evt.newValue;
-                onChange();
-            });
-
-            context.AddProperty("Blending Mode", new EnumField(AlphaMode.Alpha) { value = alphaMode }, surfaceType == SurfaceType.Transparent, (evt) =>
-            {
-                if (Equals(alphaMode, evt.newValue))
-                    return;
-
-                registerUndo("Change Blend");
-                alphaMode = (AlphaMode)evt.newValue;
-                onChange();
-            });
-
-            context.AddProperty("Render Face", new EnumField(RenderFace.Front) { value = renderFace }, (evt) =>
-            {
-                if (Equals(renderFace, evt.newValue))
-                    return;
-
-                registerUndo("Change Render Face");
-                renderFace = (RenderFace)evt.newValue;
-                onChange();
-            });
-
-            context.AddProperty("Depth Write", new EnumField(ZWriteControl.Auto) { value = zWriteControl }, (evt) =>
-            {
-                if (Equals(zWriteControl, evt.newValue))
-                    return;
-
-                registerUndo("Change Depth Write Control");
-                zWriteControl = (ZWriteControl)evt.newValue;
-                onChange();
-            });
-
-            context.AddProperty("Depth Test", new EnumField(ZTestModeForUI.LEqual) { value = (ZTestModeForUI)zTestMode }, (evt) =>
-            {
-                if (Equals(zTestMode, evt.newValue))
-                    return;
-
-                registerUndo("Change Depth Test");
-                zTestMode = (ZTestMode)evt.newValue;
-                onChange();
-            });
-
-            context.AddProperty("Alpha Clipping", "Avoid using when Alpha and AlphaThreshold are constant for the entire material as enabling in this case could introduce visual artifacts and will add an unnecessary performance cost when used with MSAA (due to AlphaToMask)", 0, new Toggle() { value = alphaClip }, (evt) =>
-            {
-                if (Equals(alphaClip, evt.newValue))
-                    return;
-
-                registerUndo("Change Alpha Clip");
-                alphaClip = evt.newValue;
-                onChange();
-            });
-
-            context.AddProperty("Cast Shadows", new Toggle() { value = castShadows }, (evt) =>
-            {
-                if (Equals(castShadows, evt.newValue))
-                    return;
-
-                registerUndo("Change Cast Shadows");
-                castShadows = evt.newValue;
-                onChange();
-            });
-
-            if (showReceiveShadows)
-                context.AddProperty("Receive Shadows", new Toggle() { value = receiveShadows }, (evt) =>
+            context.AddProperty(
+                "Allow Material Override",
+                new Toggle() { value = allowMaterialOverride },
+                (evt) =>
                 {
-                    if (Equals(receiveShadows, evt.newValue))
+                    if (Equals(allowMaterialOverride, evt.newValue))
                         return;
 
-                    registerUndo("Change Receive Shadows");
-                    receiveShadows = evt.newValue;
+                    registerUndo("Change Allow Material Override");
+                    allowMaterialOverride = evt.newValue;
                     onChange();
-                });
+                }
+            );
+        }
 
-            context.AddProperty("Supports LOD Cross Fade", new Toggle() { value = supportsLodCrossFade }, (evt) =>
-            {
-                if (Equals(supportsLodCrossFade, evt.newValue))
-                    return;
+        public void AddDefaultSurfacePropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo,
+            bool showReceiveShadows
+        )
+        {
+            context.AddProperty(
+                "Surface Type",
+                new EnumField(SurfaceType.Opaque) { value = surfaceType },
+                (evt) =>
+                {
+                    if (Equals(surfaceType, evt.newValue))
+                        return;
 
-                registerUndo("Change Supports LOD Cross Fade");
-                supportsLodCrossFade = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Surface");
+                    surfaceType = (SurfaceType)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Additional Motion Vectors", "Specifies how motion vectors for local Shader Graph position modifications are handled (on top of camera, transform, skeletal and Alembic motion vectors).", 0, new EnumField(AdditionalMotionVectorMode.None) { value = additionalMotionVectorMode }, (evt) =>
-            {
-                if (Equals(additionalMotionVectorMode, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Blending Mode",
+                new EnumField(AlphaMode.Alpha) { value = alphaMode },
+                surfaceType == SurfaceType.Transparent,
+                (evt) =>
+                {
+                    if (Equals(alphaMode, evt.newValue))
+                        return;
 
-                registerUndo("Change Additional Motion Vectors");
-                additionalMotionVectorMode = (AdditionalMotionVectorMode)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Blend");
+                    alphaMode = (AlphaMode)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty(EditorUtils.Styles.alembicMotionVectors.text, EditorUtils.Styles.alembicMotionVectors.tooltip, 0, new Toggle() {value = alembicMotionVectors}, (evt) =>
-            {
-                if (Equals(alembicMotionVectors, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Render Face",
+                new EnumField(RenderFace.Front) { value = renderFace },
+                (evt) =>
+                {
+                    if (Equals(renderFace, evt.newValue))
+                        return;
 
-                registerUndo("Change Alembic Motion Vectors");
-                alembicMotionVectors = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Render Face");
+                    renderFace = (RenderFace)evt.newValue;
+                    onChange();
+                }
+            );
+
+            context.AddProperty(
+                "Depth Write",
+                new EnumField(ZWriteControl.Auto) { value = zWriteControl },
+                (evt) =>
+                {
+                    if (Equals(zWriteControl, evt.newValue))
+                        return;
+
+                    registerUndo("Change Depth Write Control");
+                    zWriteControl = (ZWriteControl)evt.newValue;
+                    onChange();
+                }
+            );
+
+            context.AddProperty(
+                "Depth Test",
+                new EnumField(ZTestModeForUI.LEqual) { value = (ZTestModeForUI)zTestMode },
+                (evt) =>
+                {
+                    if (Equals(zTestMode, evt.newValue))
+                        return;
+
+                    registerUndo("Change Depth Test");
+                    zTestMode = (ZTestMode)evt.newValue;
+                    onChange();
+                }
+            );
+
+            context.AddProperty(
+                "Alpha Clipping",
+                "Avoid using when Alpha and AlphaThreshold are constant for the entire material as enabling in this case could introduce visual artifacts and will add an unnecessary performance cost when used with MSAA (due to AlphaToMask)",
+                0,
+                new Toggle() { value = alphaClip },
+                (evt) =>
+                {
+                    if (Equals(alphaClip, evt.newValue))
+                        return;
+
+                    registerUndo("Change Alpha Clip");
+                    alphaClip = evt.newValue;
+                    onChange();
+                }
+            );
+
+            context.AddProperty(
+                "Cast Shadows",
+                new Toggle() { value = castShadows },
+                (evt) =>
+                {
+                    if (Equals(castShadows, evt.newValue))
+                        return;
+
+                    registerUndo("Change Cast Shadows");
+                    castShadows = evt.newValue;
+                    onChange();
+                }
+            );
+
+            if (showReceiveShadows)
+                context.AddProperty(
+                    "Receive Shadows",
+                    new Toggle() { value = receiveShadows },
+                    (evt) =>
+                    {
+                        if (Equals(receiveShadows, evt.newValue))
+                            return;
+
+                        registerUndo("Change Receive Shadows");
+                        receiveShadows = evt.newValue;
+                        onChange();
+                    }
+                );
+
+            context.AddProperty(
+                "Supports LOD Cross Fade",
+                new Toggle() { value = supportsLodCrossFade },
+                (evt) =>
+                {
+                    if (Equals(supportsLodCrossFade, evt.newValue))
+                        return;
+
+                    registerUndo("Change Supports LOD Cross Fade");
+                    supportsLodCrossFade = evt.newValue;
+                    onChange();
+                }
+            );
+
+            context.AddProperty(
+                "Additional Motion Vectors",
+                "Specifies how motion vectors for local Shader Graph position modifications are handled (on top of camera, transform, skeletal and Alembic motion vectors).",
+                0,
+                new EnumField(AdditionalMotionVectorMode.None) { value = additionalMotionVectorMode },
+                (evt) =>
+                {
+                    if (Equals(additionalMotionVectorMode, evt.newValue))
+                        return;
+
+                    registerUndo("Change Additional Motion Vectors");
+                    additionalMotionVectorMode = (AdditionalMotionVectorMode)evt.newValue;
+                    onChange();
+                }
+            );
+
+            context.AddProperty(
+                EditorUtils.Styles.alembicMotionVectors.text,
+                EditorUtils.Styles.alembicMotionVectors.tooltip,
+                0,
+                new Toggle() { value = alembicMotionVectors },
+                (evt) =>
+                {
+                    if (Equals(alembicMotionVectors, evt.newValue))
+                        return;
+
+                    registerUndo("Change Alembic Motion Vectors");
+                    alembicMotionVectors = evt.newValue;
+                    onChange();
+                }
+            );
         }
 
         public bool TrySetActiveSubTarget(Type subTargetType)
@@ -736,7 +836,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             }
         }
 
-        public void SetDataOnSubTarget<T>(SubTarget subTarget) where T : JsonObject
+        public void SetDataOnSubTarget<T>(SubTarget subTarget)
+            where T : JsonObject
         {
             if (!(subTarget is IRequiresData<T> requiresData))
                 return;
@@ -763,7 +864,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             requiresData.data = data;
         }
 
-        public void ValidateDataForSubTarget<T>(SubTarget subTarget, T data) where T : JsonObject
+        public void ValidateDataForSubTarget<T>(SubTarget subTarget, T data)
+            where T : JsonObject
         {
             if (!(subTarget is IRequiresData<T> requiresData))
             {
@@ -776,7 +878,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             ClearUnusedData();
         }
 
-        public bool TryUpgradeFromMasterNode(IMasterNode1 masterNode, out Dictionary<BlockFieldDescriptor, int> blockMap)
+        public bool TryUpgradeFromMasterNode(
+            IMasterNode1 masterNode,
+            out Dictionary<BlockFieldDescriptor, int> blockMap
+        )
         {
             void UpgradeAlphaClip()
             {
@@ -812,10 +917,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     m_CustomEditorGUI = unlitMasterNode.m_OverrideEnabled ? unlitMasterNode.m_ShaderGUIOverride : "";
                     break;
                 case SpriteLitMasterNode1 spriteLitMasterNode:
-                    m_CustomEditorGUI = spriteLitMasterNode.m_OverrideEnabled ? spriteLitMasterNode.m_ShaderGUIOverride : "";
+                    m_CustomEditorGUI = spriteLitMasterNode.m_OverrideEnabled
+                        ? spriteLitMasterNode.m_ShaderGUIOverride
+                        : "";
                     break;
                 case SpriteUnlitMasterNode1 spriteUnlitMasterNode:
-                    m_CustomEditorGUI = spriteUnlitMasterNode.m_OverrideEnabled ? spriteUnlitMasterNode.m_ShaderGUIOverride : "";
+                    m_CustomEditorGUI = spriteUnlitMasterNode.m_OverrideEnabled
+                        ? spriteUnlitMasterNode.m_ShaderGUIOverride
+                        : "";
                     break;
             }
 
@@ -849,7 +958,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
             vfxSubtarget.ConfigureContextData(context, data);
         }
-
 #endif
 
         public bool CanSupportVFX()
@@ -951,7 +1059,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             }
         }
 
-        internal static void AddTargetSurfaceControlsToPass(ref PassDescriptor pass, UniversalTarget target, bool blendModePreserveSpecular = false)
+        internal static void AddTargetSurfaceControlsToPass(
+            ref PassDescriptor pass,
+            UniversalTarget target,
+            bool blendModePreserveSpecular = false
+        )
         {
             // the surface settings can either be material controlled or target controlled
             if (target.allowMaterialOverride)
@@ -969,7 +1081,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     pass.defines.Add(CoreKeywordDescriptors.SurfaceTypeTransparent, 1);
 
                     // alpha premultiply in shader only needed when alpha is different for diffuse & specular
-                    if ((target.alphaMode == AlphaMode.Alpha || target.alphaMode == AlphaMode.Additive) && blendModePreserveSpecular)
+                    if (
+                        (target.alphaMode == AlphaMode.Alpha || target.alphaMode == AlphaMode.Additive)
+                        && blendModePreserveSpecular
+                    )
                         pass.defines.Add(CoreKeywordDescriptors.AlphaPremultiplyOn, 1);
                     else if (target.alphaMode == AlphaMode.Multiply)
                         pass.defines.Add(CoreKeywordDescriptors.AlphaModulateOn, 1);
@@ -1010,7 +1125,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = new IncludeCollection { CoreIncludes.DepthOnly },
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1051,7 +1166,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = new IncludeCollection { CoreIncludes.DepthNormalsOnly },
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1092,7 +1207,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = new IncludeCollection { CoreIncludes.DepthNormalsOnly },
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1132,7 +1247,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = new IncludeCollection { CoreIncludes.ShadowCaster },
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1156,7 +1271,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 sharedTemplateDirectories = UniversalTarget.kSharedTemplateDirectories,
 
                 // Port Mask
-                validVertexBlocks = target.additionalMotionVectorMode == AdditionalMotionVectorMode.Custom ? CoreBlockMasks.CustomMotionVectorVertex : CoreBlockMasks.MotionVectorVertex,
+                validVertexBlocks =
+                    target.additionalMotionVectorMode == AdditionalMotionVectorMode.Custom
+                        ? CoreBlockMasks.CustomMotionVectorVertex
+                        : CoreBlockMasks.MotionVectorVertex,
                 validPixelBlocks = CoreBlockMasks.FragmentAlphaOnly,
 
                 // Fields
@@ -1172,7 +1290,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = CoreIncludes.MotionVectors,
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             if (target.additionalMotionVectorMode == AdditionalMotionVectorMode.TimeBased)
@@ -1218,7 +1336,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 includes = CoreIncludes.XRMotionVectors,
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             result.defines.Add(CoreKeywordDescriptors.XRMotionVectors, 1);
@@ -1254,12 +1372,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 // Conditional State
                 renderStates = CoreRenderStates.SceneSelection(target),
                 pragmas = CorePragmas.Instanced,
-                defines = new DefineCollection { CoreDefines.SceneSelection, { CoreKeywordDescriptors.AlphaClipThreshold, 1 } },
+                defines = new DefineCollection
+                {
+                    CoreDefines.SceneSelection,
+                    { CoreKeywordDescriptors.AlphaClipThreshold, 1 },
+                },
                 keywords = new KeywordCollection(),
                 includes = CoreIncludes.SceneSelection,
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1294,12 +1416,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 // Conditional State
                 renderStates = CoreRenderStates.ScenePicking(target),
                 pragmas = CorePragmas.Instanced,
-                defines = new DefineCollection { CoreDefines.ScenePicking, { CoreKeywordDescriptors.AlphaClipThreshold, 1 } },
+                defines = new DefineCollection
+                {
+                    CoreDefines.ScenePicking,
+                    { CoreKeywordDescriptors.AlphaClipThreshold, 1 },
+                },
                 keywords = new KeywordCollection(),
                 includes = CoreIncludes.ScenePicking,
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1332,12 +1458,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 // Conditional State
                 renderStates = CoreRenderStates.SceneSelection(target),
                 pragmas = CorePragmas._2DDefault,
-                defines = new DefineCollection { CoreDefines.SceneSelection, { CoreKeywordDescriptors.AlphaClipThreshold, 0 } },
+                defines = new DefineCollection
+                {
+                    CoreDefines.SceneSelection,
+                    { CoreKeywordDescriptors.AlphaClipThreshold, 0 },
+                },
                 keywords = new KeywordCollection(),
                 includes = CoreIncludes.ScenePicking,
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1370,12 +1500,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 // Conditional State
                 renderStates = CoreRenderStates.ScenePicking2D,
                 pragmas = CorePragmas._2DDefault,
-                defines = new DefineCollection { CoreDefines.ScenePicking, { CoreKeywordDescriptors.AlphaClipThreshold, 0 } },
+                defines = new DefineCollection
+                {
+                    CoreDefines.ScenePicking,
+                    { CoreKeywordDescriptors.AlphaClipThreshold, 0 },
+                },
                 keywords = new KeywordCollection(),
                 includes = CoreIncludes.SceneSelection,
 
                 // Custom Interpolator Support
-                customInterpolators = CoreCustomInterpDescriptors.Common
+                customInterpolators = CoreCustomInterpDescriptors.Common,
             };
 
             AddAlphaClipControlToPass(ref result, target);
@@ -1446,16 +1580,13 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
     #region RequiredFields
     static class CoreRequiredFields
     {
-        public static readonly FieldCollection ShadowCaster = new FieldCollection()
-        {
-            StructFields.Varyings.normalWS,
-        };
+        public static readonly FieldCollection ShadowCaster = new FieldCollection() { StructFields.Varyings.normalWS };
 
         public static readonly FieldCollection DepthNormals = new FieldCollection()
         {
-            StructFields.Attributes.uv1,                            // needed for meta vertex position
+            StructFields.Attributes.uv1, // needed for meta vertex position
             StructFields.Varyings.normalWS,
-            StructFields.Varyings.tangentWS,                        // needed for vertex lighting
+            StructFields.Varyings.tangentWS, // needed for vertex lighting
         };
     }
     #endregion
@@ -1466,8 +1597,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         public static readonly DependencyCollection Default = new DependencyCollection()
         {
             { FieldDependencies.Default },
-            new FieldDependency(UniversalStructFields.Varyings.stereoTargetEyeIndexAsRTArrayIdx,    StructFields.Attributes.instanceID),
-            new FieldDependency(UniversalStructFields.Varyings.stereoTargetEyeIndexAsBlendIdx0,     StructFields.Attributes.instanceID),
+            new FieldDependency(
+                UniversalStructFields.Varyings.stereoTargetEyeIndexAsRTArrayIdx,
+                StructFields.Attributes.instanceID
+            ),
+            new FieldDependency(
+                UniversalStructFields.Varyings.stereoTargetEyeIndexAsBlendIdx0,
+                StructFields.Attributes.instanceID
+            ),
         };
     }
     #endregion
@@ -1492,9 +1629,18 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { RenderState.Cull(Cull.Back), new FieldCondition(Fields.DoubleSided, false) },
             { RenderState.Cull(Cull.Off), new FieldCondition(Fields.DoubleSided, true) },
             { RenderState.Blend(Blend.One, Blend.Zero), new FieldCondition(UniversalFields.SurfaceOpaque, true) },
-            { RenderState.Blend(Blend.SrcAlpha, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha), new FieldCondition(Fields.BlendAlpha, true) },
-            { RenderState.Blend(Blend.One, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha), new FieldCondition(UniversalFields.BlendPremultiply, true) },
-            { RenderState.Blend(Blend.SrcAlpha, Blend.One, Blend.One, Blend.One), new FieldCondition(UniversalFields.BlendAdd, true) },
+            {
+                RenderState.Blend(Blend.SrcAlpha, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha),
+                new FieldCondition(Fields.BlendAlpha, true)
+            },
+            {
+                RenderState.Blend(Blend.One, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha),
+                new FieldCondition(UniversalFields.BlendPremultiply, true)
+            },
+            {
+                RenderState.Blend(Blend.SrcAlpha, Blend.One, Blend.One, Blend.One),
+                new FieldCondition(UniversalFields.BlendAdd, true)
+            },
             { RenderState.Blend(Blend.DstColor, Blend.Zero), new FieldCondition(UniversalFields.BlendMultiply, true) },
         };
 
@@ -1513,7 +1659,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         }
 
         // used by lit/unlit subtargets
-        public static RenderStateCollection UberSwitchedRenderState(UniversalTarget target, bool blendModePreserveSpecular = false)
+        public static RenderStateCollection UberSwitchedRenderState(
+            UniversalTarget target,
+            bool blendModePreserveSpecular = false
+        )
         {
             if (target.allowMaterialOverride)
             {
@@ -1522,7 +1671,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     RenderState.ZTest(Uniforms.zTest),
                     RenderState.ZWrite(Uniforms.zWrite),
                     RenderState.Cull(Uniforms.cullMode),
-                    RenderState.Blend(Uniforms.srcBlend, Uniforms.dstBlend, Uniforms.srcBlendAlpha, Uniforms.dstBlendAlpha),
+                    RenderState.Blend(
+                        Uniforms.srcBlend,
+                        Uniforms.dstBlend,
+                        Uniforms.srcBlendAlpha,
+                        Uniforms.dstBlendAlpha
+                    ),
                 };
             }
             else
@@ -1557,10 +1711,19 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     switch (target.alphaMode)
                     {
                         case AlphaMode.Alpha:
-                            result.Add(RenderState.Blend(blendSrcRGB, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha));
+                            result.Add(
+                                RenderState.Blend(
+                                    blendSrcRGB,
+                                    Blend.OneMinusSrcAlpha,
+                                    Blend.One,
+                                    Blend.OneMinusSrcAlpha
+                                )
+                            );
                             break;
                         case AlphaMode.Premultiply:
-                            result.Add(RenderState.Blend(Blend.One, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha));
+                            result.Add(
+                                RenderState.Blend(Blend.One, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha)
+                            );
                             break;
                         case AlphaMode.Additive:
                             result.Add(RenderState.Blend(blendSrcRGB, Blend.One, Blend.One, Blend.One));
@@ -1570,7 +1733,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                             break;
                     }
                 }
-
 
                 return result;
             }
@@ -1601,19 +1763,23 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             };
             return result;
         }
+
         public static RenderStateCollection XRMotionVector(UniversalTarget target)
         {
             var result = new RenderStateCollection
             {
                 { RenderState.ColorMask("ColorMask RGBA") },
-                { RenderState.Stencil(new StencilDescriptor()
-                    {
-                        WriteMask = "1",
-                        Ref = "1",
-                        Comp = "Always",
-                        Pass = "Replace",
-                    })
-                }
+                {
+                    RenderState.Stencil(
+                        new StencilDescriptor()
+                        {
+                            WriteMask = "1",
+                            Ref = "1",
+                            Comp = "Always",
+                            Pass = "Replace",
+                        }
+                    )
+                },
             };
             return result;
         }
@@ -1652,7 +1818,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             {
                 { RenderState.ZTest(ZTest.LEqual) },
                 { RenderState.ZWrite(ZWrite.On) },
-                { UberSwitchedCullRenderState(target) }
+                { UberSwitchedCullRenderState(target) },
             };
 
             return result;
@@ -1661,20 +1827,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         // Used by all targets
         public static RenderStateCollection SceneSelection(UniversalTarget target)
         {
-            var result = new RenderStateCollection
-            {
-                { RenderState.Cull(Cull.Off) },
-            };
+            var result = new RenderStateCollection { { RenderState.Cull(Cull.Off) } };
 
             return result;
         }
 
         public static RenderStateCollection ScenePicking(UniversalTarget target)
         {
-            var result = new RenderStateCollection
-            {
-                { UberSwitchedCullRenderState(target) }
-            };
+            var result = new RenderStateCollection { { UberSwitchedCullRenderState(target) } };
 
             return result;
         }
@@ -1690,7 +1850,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
     #region Pragmas
     static class CorePragmas
     {
-        public static PragmaDescriptor MultiCompileAppSpacewarpTransparent => new PragmaDescriptor { value = "multi_compile _ APPLICATION_SPACE_WARP_MOTION_TRANSPARENT" };
+        public static PragmaDescriptor MultiCompileAppSpacewarpTransparent =>
+            new PragmaDescriptor { value = "multi_compile _ APPLICATION_SPACE_WARP_MOTION_TRANSPARENT" };
 
         public static readonly PragmaCollection Default = new PragmaCollection
         {
@@ -1762,27 +1923,41 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         const string kCore = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl";
         const string kInput = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl";
         const string kLighting = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl";
-        const string kGraphFunctions = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl";
-        const string kVaryings = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Varyings.hlsl";
-        const string kShaderPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl";
-        const string kDepthOnlyPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/DepthOnlyPass.hlsl";
-        const string kDepthNormalsOnlyPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/DepthNormalsOnlyPass.hlsl";
-        const string kShadowCasterPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShadowCasterPass.hlsl";
-        const string kMotionVectorPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/MotionVectorPass.hlsl";
+        const string kGraphFunctions =
+            "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl";
+        const string kVaryings =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Varyings.hlsl";
+        const string kShaderPass =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl";
+        const string kDepthOnlyPass =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/DepthOnlyPass.hlsl";
+        const string kDepthNormalsOnlyPass =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/DepthNormalsOnlyPass.hlsl";
+        const string kShadowCasterPass =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShadowCasterPass.hlsl";
+        const string kMotionVectorPass =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/MotionVectorPass.hlsl";
         const string kTextureStack = "Packages/com.unity.render-pipelines.core/ShaderLibrary/TextureStack.hlsl";
         const string kDBuffer = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DBuffer.hlsl";
-        const string kSelectionPickingPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/SelectionPickingPass.hlsl";
+        const string kSelectionPickingPass =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/SelectionPickingPass.hlsl";
         const string kLODCrossFade = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/LODCrossFade.hlsl";
-        const string kFoveatedRenderingKeywords = "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl";
-        const string kFoveatedRendering = "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRendering.hlsl";
-        const string kMipmapDebugMacros = "Packages/com.unity.render-pipelines.core/ShaderLibrary/DebugMipmapStreamingMacros.hlsl";
+        const string kFoveatedRenderingKeywords =
+            "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl";
+        const string kFoveatedRendering =
+            "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRendering.hlsl";
+        const string kMipmapDebugMacros =
+            "Packages/com.unity.render-pipelines.core/ShaderLibrary/DebugMipmapStreamingMacros.hlsl";
 
         // Files that are included with #include_with_pragmas
         const string kDOTS = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl";
         const string kFog = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Fog.hlsl";
-        const string kRenderingLayers = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl";
-        const string kProbeVolumes = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl";
-        const string kGbufferOutputFormat = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutputFormat.hlsl";
+        const string kRenderingLayers =
+            "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl";
+        const string kProbeVolumes =
+            "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl";
+        const string kGbufferOutputFormat =
+            "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutputFormat.hlsl";
 
         public static readonly IncludeCollection CorePregraph = new IncludeCollection
         {
@@ -1793,8 +1968,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { kFoveatedRendering, IncludeLocation.Pregraph },
             { kLighting, IncludeLocation.Pregraph },
             { kInput, IncludeLocation.Pregraph },
-            { kTextureStack, IncludeLocation.Pregraph },        // TODO: put this on a conditional
-            { kMipmapDebugMacros, IncludeLocation.Pregraph}
+            { kTextureStack, IncludeLocation.Pregraph }, // TODO: put this on a conditional
+            { kMipmapDebugMacros, IncludeLocation.Pregraph },
         };
 
         public static readonly IncludeCollection DOTSPregraph = new IncludeCollection
@@ -1834,7 +2009,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { DOTSPregraph },
             { CorePregraph },
             { ShaderGraphPregraph },
-
             // Post-graph
             { CorePostgraph },
             { kDepthOnlyPass, IncludeLocation.Postgraph },
@@ -1847,7 +2021,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { WriteRenderLayersPregraph },
             { CorePregraph },
             { ShaderGraphPregraph },
-
             // Post-graph
             { CorePostgraph },
             { kDepthNormalsOnlyPass, IncludeLocation.Postgraph },
@@ -1860,7 +2033,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { WriteRenderLayersPregraph },
             { CorePregraph },
             { ShaderGraphPregraph },
-
             //Post-graph
             { CorePostgraph },
             { kMotionVectorPass, IncludeLocation.Postgraph },
@@ -1872,7 +2044,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { DOTSPregraph },
             { CorePregraph },
             { ShaderGraphPregraph },
-
             //Post-graph
             { CorePostgraph },
             { kMotionVectorPass, IncludeLocation.Postgraph },
@@ -1884,7 +2055,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { DOTSPregraph },
             { CorePregraph },
             { ShaderGraphPregraph },
-
             // Post-graph
             { CorePostgraph },
             { kShadowCasterPass, IncludeLocation.Postgraph },
@@ -1901,7 +2071,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { CorePregraph },
             { ShaderGraphPregraph },
             { DOTSPregraph },
-
             // Post-graph
             { CorePostgraph },
             { kSelectionPickingPass, IncludeLocation.Postgraph },
@@ -1913,7 +2082,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             { CorePregraph },
             { ShaderGraphPregraph },
             { DOTSPregraph },
-
             // Post-graph
             { CorePostgraph },
             { kSelectionPickingPass, IncludeLocation.Postgraph },
@@ -1921,12 +2089,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
         public static readonly IncludeCollection LODCrossFade = new IncludeCollection
         {
-            { kLODCrossFade, IncludeLocation.Pregraph }
+            { kLODCrossFade, IncludeLocation.Pregraph },
         };
 
         public static readonly IncludeCollection GBufferOutputFormat = new IncludeCollection
         {
-            { kGbufferOutputFormat, IncludeLocation.Postgraph, true }
+            { kGbufferOutputFormat, IncludeLocation.Postgraph, true },
         };
     }
     #endregion
@@ -1936,12 +2104,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
     {
         public static readonly DefineCollection UseLegacySpriteBlocks = new DefineCollection
         {
-            { CoreKeywordDescriptors.UseLegacySpriteBlocks, 1, new FieldCondition(CoreFields.UseLegacySpriteBlocks, true) },
+            {
+                CoreKeywordDescriptors.UseLegacySpriteBlocks,
+                1,
+                new FieldCondition(CoreFields.UseLegacySpriteBlocks, true)
+            },
         };
 
         public static readonly DefineCollection UseFragmentFog = new DefineCollection()
         {
-            {CoreKeywordDescriptors.UseFragmentFog, 1},
+            { CoreKeywordDescriptors.UseFragmentFog, 1 },
         };
 
         public static readonly DefineCollection SceneSelection = new DefineCollection
@@ -2047,7 +2219,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 new KeywordEntry() { displayName = "Off", referenceName = "" },
                 new KeywordEntry() { displayName = "Evaluate SH Mixed", referenceName = "MIXED" },
                 new KeywordEntry() { displayName = "Evaluate SH Vertex", referenceName = "VERTEX" },
-            }
+            },
         };
 
         public static readonly KeywordDescriptor MainLightShadows = new KeywordDescriptor()
@@ -2063,7 +2235,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 new KeywordEntry() { displayName = "No Cascade", referenceName = "MAIN_LIGHT_SHADOWS" },
                 new KeywordEntry() { displayName = "Cascade", referenceName = "MAIN_LIGHT_SHADOWS_CASCADE" },
                 new KeywordEntry() { displayName = "Screen", referenceName = "MAIN_LIGHT_SHADOWS_SCREEN" },
-            }
+            },
         };
 
         public static readonly KeywordDescriptor CastingPunctualLightShadow = new KeywordDescriptor()
@@ -2108,7 +2280,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 new KeywordEntry() { displayName = "Off", referenceName = "" },
                 new KeywordEntry() { displayName = "Vertex", referenceName = "ADDITIONAL_LIGHTS_VERTEX" },
                 new KeywordEntry() { displayName = "Fragment", referenceName = "ADDITIONAL_LIGHTS" },
-            }
+            },
         };
 
         public static readonly KeywordDescriptor AdditionalLightShadows = new KeywordDescriptor()
@@ -2166,7 +2338,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 new KeywordEntry() { displayName = "Soft Shadows Low", referenceName = "SHADOWS_SOFT_LOW" },
                 new KeywordEntry() { displayName = "Soft Shadows Medium", referenceName = "SHADOWS_SOFT_MEDIUM" },
                 new KeywordEntry() { displayName = "Soft Shadows High", referenceName = "SHADOWS_SOFT_HIGH" },
-            }
+            },
         };
 
         public static readonly KeywordDescriptor MixedLightingSubtractive = new KeywordDescriptor()
@@ -2377,7 +2549,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             // Note: DOTS instancing uses a different instance index encoding
             //       when crossfade is active, so all stages are affected by the
             //       LOD_FADE_CROSSFADE keyword.
-            scope = KeywordScope.Global
+            scope = KeywordScope.Global,
         };
 
         public static readonly KeywordDescriptor UseUnityCrossFade = new KeywordDescriptor()
@@ -2416,7 +2588,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             referenceName = ShaderKeywordStrings.USE_LEGACY_LIGHTMAPS,
             type = KeywordType.Boolean,
             definition = KeywordDefinition.MultiCompile,
-            scope = KeywordScope.Global
+            scope = KeywordScope.Global,
         };
 
         public static readonly KeywordDescriptor XRMotionVectors = new KeywordDescriptor()
@@ -2434,7 +2606,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             referenceName = ShaderKeywordStrings.LIGHTMAP_BICUBIC_SAMPLING,
             type = KeywordType.Boolean,
             definition = KeywordDefinition.MultiCompile,
-            scope = KeywordScope.Global
+            scope = KeywordScope.Global,
         };
 
         public static readonly KeywordDescriptor ReflectionProbeRotation = new KeywordDescriptor()
@@ -2443,7 +2615,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             referenceName = ShaderKeywordStrings.ReflectionProbeRotation,
             type = KeywordType.Boolean,
             definition = KeywordDefinition.MultiCompile,
-            scope = KeywordScope.Global
+            scope = KeywordScope.Global,
         };
     }
     #endregion
@@ -2461,7 +2633,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
     #region FieldDescriptors
     static class CoreFields
     {
-        public static readonly FieldDescriptor UseLegacySpriteBlocks = new FieldDescriptor("Universal", "UseLegacySpriteBlocks", "UNIVERSAL_USELEGACYSPRITEBLOCKS");
+        public static readonly FieldDescriptor UseLegacySpriteBlocks = new FieldDescriptor(
+            "Universal",
+            "UseLegacySpriteBlocks",
+            "UNIVERSAL_USELEGACYSPRITEBLOCKS"
+        );
     }
     #endregion
 
@@ -2473,10 +2649,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             // Custom interpolators are not explicitly defined in the SurfaceDescriptionInputs template.
             // This entry point will let us generate a block of pass-through assignments for each field.
             CustomInterpSubGen.Descriptor.MakeBlock(CustomInterpSubGen.Splice.k_spliceCopyToSDI, "output", "input"),
-
             // sgci_PassThroughFunc is called from BuildVaryings in Varyings.hlsl to copy custom interpolators from vertex descriptions.
             // this entry point allows for the function to be defined before it is used.
-            CustomInterpSubGen.Descriptor.MakeFunc(CustomInterpSubGen.Splice.k_splicePreSurface, "CustomInterpolatorPassThroughFunc", "Varyings", "VertexDescription", "CUSTOMINTERPOLATOR_VARYPASSTHROUGH_FUNC", "FEATURES_GRAPH_VERTEX")
+            CustomInterpSubGen.Descriptor.MakeFunc(
+                CustomInterpSubGen.Splice.k_splicePreSurface,
+                "CustomInterpolatorPassThroughFunc",
+                "Varyings",
+                "VertexDescription",
+                "CUSTOMINTERPOLATOR_VARYPASSTHROUGH_FUNC",
+                "FEATURES_GRAPH_VERTEX"
+            ),
         };
     }
     #endregion

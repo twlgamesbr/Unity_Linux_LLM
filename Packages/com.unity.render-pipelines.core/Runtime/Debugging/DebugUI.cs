@@ -17,13 +17,9 @@ namespace UnityEngine.Rendering
         public static List<(Label, VisualElement)> CreatePanels(List<DebugUI.Panel> panels, DebugUI.Context context)
         {
             List<(Label, VisualElement)> returnList = new();
-            foreach (var p  in panels)
+            foreach (var p in panels)
             {
-                var tab = new Label(p.displayName)
-                {
-                    name = p.displayName + "_Tab",
-                    focusable = true
-                };
+                var tab = new Label(p.displayName) { name = p.displayName + "_Tab", focusable = true };
                 tab.AddToClassList("debug-window-tab-item");
 
                 var panel = p.Create(context);
@@ -39,7 +35,11 @@ namespace UnityEngine.Rendering
         /// <param name="widget">Widget that contains the scheduler</param>
         /// <param name="element">VisualElement whose scheduler is used to create the ScheduledItem</param>
         /// <param name="scheduledItemCreator">Callback that creates the ScheduledItem.</param>
-        internal static void ScheduleTracked(this DebugUI.Widget widget, VisualElement element,  Func<IVisualElementScheduledItem> scheduledItemCreator)
+        internal static void ScheduleTracked(
+            this DebugUI.Widget widget,
+            VisualElement element,
+            Func<IVisualElementScheduledItem> scheduledItemCreator
+        )
         {
             ScheduleTracked(widget, element, widget.m_Context, scheduledItemCreator);
         }
@@ -50,7 +50,12 @@ namespace UnityEngine.Rendering
         /// rendered into multiple panels (which mutates m_Context), and you want this scheduled item
         /// tracked under a specific context.
         /// </summary>
-        internal static void ScheduleTracked(this DebugUI.Widget widget, VisualElement element, DebugUI.Context context, Func<IVisualElementScheduledItem> scheduledItemCreator)
+        internal static void ScheduleTracked(
+            this DebugUI.Widget widget,
+            VisualElement element,
+            DebugUI.Context context,
+            Func<IVisualElementScheduledItem> scheduledItemCreator
+        )
         {
             element.RegisterCallback<AttachToPanelEvent>(_ =>
             {
@@ -67,8 +72,7 @@ namespace UnityEngine.Rendering
 
         public static bool IsAnyRuntimeContext(this DebugUI.Context context)
         {
-            return (context == DebugUI.Context.Runtime) ||
-                   (context == DebugUI.Context.RuntimePersistent);
+            return (context == DebugUI.Context.Runtime) || (context == DebugUI.Context.RuntimePersistent);
         }
     }
 #endif
@@ -149,24 +153,28 @@ namespace UnityEngine.Rendering
             /// None.
             /// </summary>
             None = 0,
+
             /// <summary>
             /// This widget is Editor only.
             /// </summary>
             EditorOnly = 1 << 1,
+
             /// <summary>
             /// This widget is Runtime only.
             /// </summary>
             RuntimeOnly = 1 << 2,
+
             /// <summary>
             /// This widget will force the Debug Editor Window refresh.
             /// </summary>
             [Obsolete("This is no longer used. #from(6000.5)")]
             EditorForceUpdate = 1 << 3,
+
             /// <summary>
             /// This widget will appear in the section "Frequently Used"
             /// </summary>
             [Obsolete("This is no longer used. #from(6000.5)")]
-            FrequentlyUsed = 1 << 4
+            FrequentlyUsed = 1 << 4,
         }
 
         /// <summary>
@@ -176,15 +184,18 @@ namespace UnityEngine.Rendering
         {
             /// <summary>Invalid context</summary>
             Invalid = -1,
+
             /// <summary>Editor context</summary>
             Editor = 0,
+
             /// <summary>Runtime context</summary>
             Runtime = 1,
+
             /// <summary>Runtime persistent context</summary>
             RuntimePersistent = 2,
 
             /// <summary>Count</summary>
-            Count
+            Count,
         }
 
         /// <summary>
@@ -272,7 +283,9 @@ namespace UnityEngine.Rendering
                     label.RegisterCallbackOnce<AttachToPanelEvent>(panelEvt =>
                     {
                         // Use the tab container element (we want to exclude tabs)
-                        var contentPanel = panelEvt.destinationPanel.visualTree.Q<VisualElement>("debug-window-tab-container");
+                        var contentPanel = panelEvt.destinationPanel.visualTree.Q<VisualElement>(
+                            "debug-window-tab-container"
+                        );
                         contentPanel.RegisterCallback<GeometryChangedEvent>(geometryEvt =>
                         {
                             CustomAlignBaseFieldLabel(label, geometryEvt.newRect.width);
@@ -295,7 +308,7 @@ namespace UnityEngine.Rendering
                         // NOTE: In the runtime we don't care about the window width, just use a fixed label width.
                         const float kLabelBaseWidth = 330f;
                         const float kIndentSize = 8f; // Should match .debug-window-container-content margin-left
-                        float totalPadding = indentationLevel*kIndentSize;
+                        float totalPadding = indentationLevel * kIndentSize;
                         label.style.minWidth = kLabelBaseWidth - totalPadding;
                     }
                     else
@@ -305,7 +318,7 @@ namespace UnityEngine.Rendering
                         const float kLabelWidthRatio = 0.45f; // Should match UIElements.BaseField m_LabelWidthRatio
                         const float kLabelExtraPadding = 37.0f; // Should match UIElements.BaseField m_LabelExtraPadding
                         const float kIndentSize = 8f;
-                        float totalPadding = indentationLevel*kIndentSize + kLabelExtraPadding;
+                        float totalPadding = indentationLevel * kIndentSize + kLabelExtraPadding;
                         label.style.minWidth = Mathf.Ceil(width * kLabelWidthRatio) - totalPadding;
                     }
                 }
@@ -333,7 +346,10 @@ namespace UnityEngine.Rendering
 #endif
 
                 UpdateElementVisibility();
-                this.ScheduleTracked(m_VisualElement, () => m_VisualElement.schedule.Execute(UpdateElementVisibility).Every(100));
+                this.ScheduleTracked(
+                    m_VisualElement,
+                    () => m_VisualElement.schedule.Execute(UpdateElementVisibility).Every(100)
+                );
 
                 // In runtime window, figure out indentation level to ensure field alignment
                 if (context == Context.Runtime)
@@ -353,30 +369,33 @@ namespace UnityEngine.Rendering
                         focusTarget = m_VisualElement.Q<Toggle>();
                     }
 
-                    focusTarget?.RegisterCallback<FocusInEvent>(evt =>
-                    {
-                        var targetElement = evt.target as VisualElement;
-                        if (DebugManager.instance.m_RuntimeDebugWindow?.IsPopupOpen() ?? false)
+                    focusTarget?.RegisterCallback<FocusInEvent>(
+                        evt =>
                         {
-                            if (targetElement != null)
+                            var targetElement = evt.target as VisualElement;
+                            if (DebugManager.instance.m_RuntimeDebugWindow?.IsPopupOpen() ?? false)
                             {
-                                var elementThatGetFocus = evt.target as VisualElement;
-                                var focusController = targetElement.panel?.focusController;
-                                if (focusController != null)
+                                if (targetElement != null)
                                 {
-                                    // Blur the entering focus to restore it to the previous one.
-                                    elementThatGetFocus.Blur();
+                                    var elementThatGetFocus = evt.target as VisualElement;
+                                    var focusController = targetElement.panel?.focusController;
+                                    if (focusController != null)
+                                    {
+                                        // Blur the entering focus to restore it to the previous one.
+                                        elementThatGetFocus.Blur();
+                                    }
                                 }
+                                evt.StopImmediatePropagation();
                             }
-                            evt.StopImmediatePropagation();
-                        }
-                        else if (targetElement != null)
-                        {
-                            // Ensure focused element is visible in the scroll view
-                            var scrollView = targetElement.GetFirstAncestorOfType<ScrollView>();
-                            scrollView.ScrollTo(targetElement);
-                        }
-                    }, TrickleDown.TrickleDown);
+                            else if (targetElement != null)
+                            {
+                                // Ensure focused element is visible in the scroll view
+                                var scrollView = targetElement.GetFirstAncestorOfType<ScrollView>();
+                                scrollView.ScrollTo(targetElement);
+                            }
+                        },
+                        TrickleDown.TrickleDown
+                    );
 
                     focusTarget?.RegisterCallback<FocusEvent>(_ =>
                     {
@@ -482,6 +501,7 @@ namespace UnityEngine.Rendering
                 /// The name
                 /// </summary>
                 public string name;
+
                 /// <summary>
                 /// The tooltip
                 /// </summary>
@@ -561,10 +581,7 @@ namespace UnityEngine.Rendering
             /// <inheritdoc/>
             protected override VisualElement Create()
             {
-                var button = new UIElements.Button
-                {
-                    text = displayName
-                };
+                var button = new UIElements.Button { text = displayName };
                 button.AddToClassList("debug-window-button");
                 button.AddToClassList("debug-window-search-filter-target");
                 button.clicked += () => action();
@@ -608,10 +625,16 @@ namespace UnityEngine.Rendering
                     valueLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
                 }
 
-                this.ScheduleTracked(valueLabel, () => valueLabel.schedule.Execute(() =>
-                {
-                    valueLabel.text = FormatString(GetValue());
-                }).Every((long)(refreshRate * 1000.0f)));
+                this.ScheduleTracked(
+                    valueLabel,
+                    () =>
+                        valueLabel
+                            .schedule.Execute(() =>
+                            {
+                                valueLabel.text = FormatString(GetValue());
+                            })
+                            .Every((long)(refreshRate * 1000.0f))
+                );
 
                 CustomAlignBaseFieldLabelWhenResized(nameLabel);
 
@@ -678,6 +701,7 @@ namespace UnityEngine.Rendering
             /// Minimum value.
             /// </summary>
             public float min = 0f;
+
             /// <summary>
             /// Maximum value.
             /// </summary>
@@ -709,25 +733,23 @@ namespace UnityEngine.Rendering
                 label.text = displayName;
                 container.Add(label);
 
-                var progressBar = new UIElements.ProgressBar()
-                {
-                    lowValue = min,
-                    highValue = max
-                };
+                var progressBar = new UIElements.ProgressBar() { lowValue = min, highValue = max };
                 progressBar.style.flexGrow = 1;
 
-                progressBar.schedule.Execute(() =>
-                {
-                    progressBar.title = FormatString(GetValue());
-                    progressBar.value = (float)GetValue();
-                }).Every((long)(refreshRate * 1000.0f));
+                progressBar
+                    .schedule.Execute(() =>
+                    {
+                        progressBar.title = FormatString(GetValue());
+                        progressBar.value = (float)GetValue();
+                    })
+                    .Every((long)(refreshRate * 1000.0f));
 
                 CustomAlignBaseFieldLabelWhenResized(label);
 
                 container.AddToClassList(UIElements.BaseField<float>.alignedFieldUssClassName);
                 container.Add(progressBar);
 
-                 return container;
+                return container;
             }
 #endif
         }
@@ -740,7 +762,8 @@ namespace UnityEngine.Rendering
             internal const int k_LabelWidthEditor = 280;
             internal const int k_LabelWidthRuntime = 340;
 
-            internal static int GetLabelWidth(Context ctx) => ctx == Context.Editor ? k_LabelWidthEditor : k_LabelWidthRuntime;
+            internal static int GetLabelWidth(Context ctx) =>
+                ctx == Context.Editor ? k_LabelWidthEditor : k_LabelWidthRuntime;
 
             /// <summary>
             /// If is a header, and it should be displayed with bold font
@@ -754,7 +777,7 @@ namespace UnityEngine.Rendering
                 var valueContainer = new UIElements.VisualElement();
                 valueContainer.AddToClassList("debug-window-valuetuple");
 
-                var label = new Label(displayName) { style = { minWidth = ValueTuple.GetLabelWidth(m_Context) }, };
+                var label = new Label(displayName) { style = { minWidth = ValueTuple.GetLabelWidth(m_Context) } };
                 label.AddToClassList("debug-window-search-filter-target");
 
                 if (isHeader)

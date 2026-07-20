@@ -107,14 +107,16 @@ namespace Unity.Entities
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.AddBuffer{T}(Entity)"/>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleBufferElement) })]
-        public DynamicBuffer<T> AddBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData
+        public DynamicBuffer<T> AddBuffer<T>(Entity entity)
+            where T : unmanaged, IBufferElementData
         {
             return m_Manager.AddBuffer<T>(entity);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.HasBuffer{T}(Entity)"/>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleBufferElement) })]
-        public bool HasBuffer<T>(Entity entity) where T : struct, IBufferElementData
+        public bool HasBuffer<T>(Entity entity)
+            where T : struct, IBufferElementData
         {
             return m_Manager.HasBuffer<T>(entity);
         }
@@ -138,7 +140,8 @@ namespace Unity.Entities
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.GetComponentData{T}(Entity)"/>
-        public T GetComponentData<T>(Entity entity) where T : unmanaged, IComponentData
+        public T GetComponentData<T>(Entity entity)
+            where T : unmanaged, IComponentData
         {
             return m_Manager.GetComponentData<T>(entity);
         }
@@ -156,7 +159,8 @@ namespace Unity.Entities
         /// <param name="componentData">The value to assign to <paramref name="entity"/>'s <typeparamref name="T"/> component.</param>
         /// <typeparam name="T">The component type.</typeparam>
         /// <exception cref="ArgumentException">Thrown if the component type has no fields.</exception>
-        public void SetComponentData<T>(Entity entity, T componentData) where T : unmanaged, IComponentData
+        public void SetComponentData<T>(Entity entity, T componentData)
+            where T : unmanaged, IComponentData
         {
             m_Manager.SetComponentData(entity, componentData);
         }
@@ -166,19 +170,22 @@ namespace Unity.Entities
         /// <typeparam name="T">The type of entity</typeparam>
         /// <returns></returns>
         [Obsolete("Use GetSharedComponentManaged<T> (UnityUpgradable) -> GetSharedComponentManaged<T>(*)", true)]
-        public T GetSharedComponentData<T>(Entity entity) where T : struct, ISharedComponentData
+        public T GetSharedComponentData<T>(Entity entity)
+            where T : struct, ISharedComponentData
         {
             return default;
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.GetSharedComponentManaged{T}(Entity)"/>
-        public T GetSharedComponentManaged<T>(Entity entity) where T : struct, ISharedComponentData
+        public T GetSharedComponentManaged<T>(Entity entity)
+            where T : struct, ISharedComponentData
         {
             return m_Manager.GetSharedComponentManaged<T>(entity);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.GetSharedComponent{T}(Entity)"/>
-        public T GetSharedComponent<T>(Entity entity) where T : unmanaged, ISharedComponentData
+        public T GetSharedComponent<T>(Entity entity)
+            where T : unmanaged, ISharedComponentData
         {
             return m_Manager.GetSharedComponent<T>(entity);
         }
@@ -188,30 +195,33 @@ namespace Unity.Entities
         /// <param name="componentData">The data to set.</param>
         /// <typeparam name="T">The component type.</typeparam>
         [Obsolete("Use SetSharedComponentManaged<T> (UnityUpgradable) -> SetSharedComponentManaged<T>(*)", true)]
-        public void SetSharedComponentData<T>(Entity entity, T componentData) where T : struct, ISharedComponentData
-        {
-        }
+        public void SetSharedComponentData<T>(Entity entity, T componentData)
+            where T : struct, ISharedComponentData { }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.SetSharedComponentManaged{T}(Entity,T)"/>
-        public void SetSharedComponentManaged<T>(Entity entity, T componentData) where T : struct, ISharedComponentData
+        public void SetSharedComponentManaged<T>(Entity entity, T componentData)
+            where T : struct, ISharedComponentData
         {
             m_Manager.SetSharedComponentManaged(entity, componentData);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.SetSharedComponentManaged{T}(NativeArray{Entity},T)"/>
-        public void SetSharedComponentManaged<T>(NativeArray<Entity> entities, T componentData) where T : struct, ISharedComponentData
+        public void SetSharedComponentManaged<T>(NativeArray<Entity> entities, T componentData)
+            where T : struct, ISharedComponentData
         {
             m_Manager.SetSharedComponentManaged(entities, componentData);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.SetSharedComponent{T}(Entity,T)"/>
-        public void SetSharedComponent<T>(Entity entity, T componentData) where T : unmanaged, ISharedComponentData
+        public void SetSharedComponent<T>(Entity entity, T componentData)
+            where T : unmanaged, ISharedComponentData
         {
             m_Manager.SetSharedComponent(entity, componentData);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.SetSharedComponent{T}(NativeArray{Entity},T)"/>
-        public void SetSharedComponent<T>(NativeArray<Entity> entities, T componentData) where T : unmanaged, ISharedComponentData
+        public void SetSharedComponent<T>(NativeArray<Entity> entities, T componentData)
+            where T : unmanaged, ISharedComponentData
         {
             m_Manager.SetSharedComponent(entities, componentData);
         }
@@ -236,37 +246,43 @@ namespace Unity.Entities
         /// <typeparam name="T">The shared component type.</typeparam>
         /// <returns>Returns false</returns>
         [Obsolete("Use AddSharedComponentManaged<T> (UnityUpgradable) -> AddSharedComponentManaged<T>(*)", true)]
-        public bool AddSharedComponentData<T>(Entity entity, T componentData) where T : struct, ISharedComponentData
+        public bool AddSharedComponentData<T>(Entity entity, T componentData)
+            where T : struct, ISharedComponentData
         {
             return false;
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.AddSharedComponentManaged{T}(Entity,T)"/>
-        public bool AddSharedComponentManaged<T>(Entity entity, T componentData)  where T : struct, ISharedComponentData
+        public bool AddSharedComponentManaged<T>(Entity entity, T componentData)
+            where T : struct, ISharedComponentData
         {
             return m_Manager.AddSharedComponentManaged(entity, componentData);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.AddSharedComponentManaged{T}(NativeArray{Entity},T)"/>
-        public void AddSharedComponentManaged<T>(NativeArray<Entity> entities, T componentData)  where T : struct, ISharedComponentData
+        public void AddSharedComponentManaged<T>(NativeArray<Entity> entities, T componentData)
+            where T : struct, ISharedComponentData
         {
             m_Manager.AddSharedComponentManaged(entities, componentData);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.AddSharedComponent{T}(Entity,T)"/>
-        public bool AddSharedComponent<T>(Entity entity, T componentData)  where T : unmanaged, ISharedComponentData
+        public bool AddSharedComponent<T>(Entity entity, T componentData)
+            where T : unmanaged, ISharedComponentData
         {
             return m_Manager.AddSharedComponent(entity, componentData);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.AddSharedComponent{T}(NativeArray{Entity},T)"/>
-        public void AddSharedComponent<T>(NativeArray<Entity> entities, T componentData)  where T : unmanaged, ISharedComponentData
+        public void AddSharedComponent<T>(NativeArray<Entity> entities, T componentData)
+            where T : unmanaged, ISharedComponentData
         {
             m_Manager.AddSharedComponent(entities, componentData);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.GetBuffer{T}(Entity,bool)"/>
-        public DynamicBuffer<T> GetBuffer<T>(Entity entity, bool isReadOnly = false) where T : unmanaged, IBufferElementData
+        public DynamicBuffer<T> GetBuffer<T>(Entity entity, bool isReadOnly = false)
+            where T : unmanaged, IBufferElementData
         {
             return m_Manager.GetBuffer<T>(entity, isReadOnly);
         }
@@ -284,29 +300,35 @@ namespace Unity.Entities
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.SetComponentEnabled{T}(Entity,bool)"/>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) })]
-        public void SetComponentEnabled<T>(Entity entity, bool value)  where T:
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) }
+        )]
+        public void SetComponentEnabled<T>(Entity entity, bool value)
+            where T :
 #if UNITY_DISABLE_MANAGED_COMPONENTS
-            unmanaged,
+                unmanaged,
 #endif
-            IEnableableComponent
+                IEnableableComponent
         {
-            m_Manager.SetComponentEnabled<T>(entity,value);
+            m_Manager.SetComponentEnabled<T>(entity, value);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.IsComponentEnabled(Entity,ComponentType)"/>
         public bool IsComponentEnabled(Entity entity, ComponentType componentType)
         {
-           return  m_Manager.IsComponentEnabled(entity, componentType);
+            return m_Manager.IsComponentEnabled(entity, componentType);
         }
 
         /// <inheritdoc cref="Unity.Entities.EntityManager.IsComponentEnabled{T}(Entity)"/>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) })]
-        public bool IsComponentEnabled<T>(Entity entity)where T:
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleEnableableComponent) }
+        )]
+        public bool IsComponentEnabled<T>(Entity entity)
+            where T :
 #if UNITY_DISABLE_MANAGED_COMPONENTS
-            unmanaged,
+                unmanaged,
 #endif
-            IEnableableComponent
+                IEnableableComponent
         {
             return m_Manager.IsComponentEnabled<T>(entity);
         }

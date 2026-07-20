@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Entities.Serialization;
 using Unity.Entities.Build;
+using Unity.Entities.Serialization;
 using UnityEditor;
+using UnityEditor.AssetImporters;
 using UnityEditor.Build.Content;
 using UnityEditor.SceneManagement;
-using UnityEditor.AssetImporters;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Hash128 = Unity.Entities.Hash128;
@@ -23,7 +23,10 @@ namespace Unity.Scenes.Editor
             EntityScenesPaths.SubSceneImporterType = typeof(SubSceneImporter);
         }
 
-        static unsafe NativeList<Hash128> ReferencedUnityObjectsToGUIDs(ReferencedUnityObjects referencedUnityObjects, AssetImportContext ctx)
+        static unsafe NativeList<Hash128> ReferencedUnityObjectsToGUIDs(
+            ReferencedUnityObjects referencedUnityObjects,
+            AssetImportContext ctx
+        )
         {
             var globalObjectIds = new GlobalObjectId[referencedUnityObjects.Array.Length];
             var guids = new NativeList<Hash128>(globalObjectIds.Length, Allocator.Temp);
@@ -38,12 +41,18 @@ namespace Unity.Scenes.Editor
                 {
                     if (GUIDHelper.IsBuiltinExtraResources(assetGUID))
                     {
-                        var objectIdentifiers = ContentBuildInterface.GetPlayerObjectIdentifiersInAsset(assetGUID, ctx.selectedBuildTarget);
+                        var objectIdentifiers = ContentBuildInterface.GetPlayerObjectIdentifiersInAsset(
+                            assetGUID,
+                            ctx.selectedBuildTarget
+                        );
 
                         foreach (var objectIdentifier in objectIdentifiers)
                         {
                             var packedGUID = assetGUID;
-                            GUIDHelper.PackBuiltinExtraWithFileIdent(ref packedGUID, objectIdentifier.localIdentifierInFile);
+                            GUIDHelper.PackBuiltinExtraWithFileIdent(
+                                ref packedGUID,
+                                objectIdentifier.localIdentifierInFile
+                            );
 
                             guids.Add(packedGUID);
                         }
@@ -53,7 +62,7 @@ namespace Unity.Scenes.Editor
                         guids.Add(assetGUID);
                     }
                 }
-                else if(!assetGUID.Empty())
+                else if (!assetGUID.Empty())
                 {
                     guids.Add(assetGUID);
                 }
@@ -62,7 +71,11 @@ namespace Unity.Scenes.Editor
             return guids;
         }
 
-        static void WriteAssetDependencyGUIDs(List<ReferencedUnityObjects> referencedUnityObjects, SceneSectionData[] sectionData, AssetImportContext ctx)
+        static void WriteAssetDependencyGUIDs(
+            List<ReferencedUnityObjects> referencedUnityObjects,
+            SceneSectionData[] sectionData,
+            AssetImportContext ctx
+        )
         {
             for (var index = 0; index < referencedUnityObjects.Count; index++)
             {
@@ -72,7 +85,8 @@ namespace Unity.Scenes.Editor
                 if (objRefs == null)
                     continue;
 
-                var artifactExtension = $"{sectionIndex}.{EntityScenesPaths.GetExtension(EntityScenesPaths.PathType.EntitiesAssetDependencyGUIDs)}";
+                var artifactExtension =
+                    $"{sectionIndex}.{EntityScenesPaths.GetExtension(EntityScenesPaths.PathType.EntitiesAssetDependencyGUIDs)}";
                 var assetDependencyGUIDs = ReferencedUnityObjectsToGUIDs(objRefs, ctx);
 
                 using (var writer = new MemoryBinaryWriter())
@@ -95,23 +109,27 @@ namespace Unity.Scenes.Editor
             var artifactExtension = EntityScenesPaths.GetExtension(EntityScenesPaths.PathType.EntitiesGlobalUsage);
             using var writer = new MemoryBinaryWriter();
 #if UNITY_DOTS_IMHEX
-                writer.ImHexPattern.WriteTypeWithPosition<BuildUsageTagGlobal>("globalUsage", writer.Position);
+            writer.ImHexPattern.WriteTypeWithPosition<BuildUsageTagGlobal>("globalUsage", writer.Position);
 #endif
             writer.WriteBytes(&globalUsage, sizeof(BuildUsageTagGlobal));
             ctx.SetOutputArtifactData(artifactExtension, writer.GetContentAsNativeArray());
         }
 
-        void ImportBaking(AssetImportContext ctx, Scene scene, SceneWithBuildConfigurationGUIDs sceneWithBuildConfiguration, IEntitiesPlayerSettings settingsAsset, GameObject prefab)
+        void ImportBaking(
+            AssetImportContext ctx,
+            Scene scene,
+            SceneWithBuildConfigurationGUIDs sceneWithBuildConfiguration,
+            IEntitiesPlayerSettings settingsAsset,
+            GameObject prefab
+        )
         {
             // Grab the used lighting and fog values from the scenes lighting & render settings.
             // If autobake is enabled, this function will iterate through objects to predict the outcome.
-            #pragma warning disable 0618
+#pragma warning disable 0618
             var globalUsage = ContentBuildInterface.GetGlobalUsageFromActiveScene(ctx.selectedBuildTarget);
-            #pragma warning restore 0618
+#pragma warning restore 0618
 
-
-            var flags = BakingUtility.BakingFlags.AddEntityGUID |
-                        BakingUtility.BakingFlags.AssignName;
+            var flags = BakingUtility.BakingFlags.AddEntityGUID | BakingUtility.BakingFlags.AssignName;
 
             var settings = new BakingSettings(flags, default)
             {
@@ -129,7 +147,12 @@ namespace Unity.Scenes.Editor
             WriteEntitySceneSettings writeEntitySettings = new WriteEntitySceneSettings();
 
             var sectionRefObjs = new List<ReferencedUnityObjects>();
-            var sectionData = EditorEntityScenes.BakeAndWriteEntityScene(scene, settings, sectionRefObjs, writeEntitySettings);
+            var sectionData = EditorEntityScenes.BakeAndWriteEntityScene(
+                scene,
+                settings,
+                sectionRefObjs,
+                writeEntitySettings
+            );
 
             WriteAssetDependencyGUIDs(sectionRefObjs, sectionData, ctx);
             WriteGlobalUsageArtifact(globalUsage, ctx);
@@ -138,7 +161,10 @@ namespace Unity.Scenes.Editor
                 DestroyImmediate(objRefs);
         }
 
-        void GetBuildConfigurationOrDotsSettings(SceneWithBuildConfigurationGUIDs sceneWithBuildConfiguration, out IEntitiesPlayerSettings settingsAsset)
+        void GetBuildConfigurationOrDotsSettings(
+            SceneWithBuildConfigurationGUIDs sceneWithBuildConfiguration,
+            out IEntitiesPlayerSettings settingsAsset
+        )
         {
             settingsAsset = null;
             // ensure the settings objects are updated and contain the latest changes from the editor
@@ -146,7 +172,9 @@ namespace Unity.Scenes.Editor
 
             if (sceneWithBuildConfiguration.BuildConfiguration.IsValid)
             {
-                settingsAsset = DotsGlobalSettings.Instance.GetSettingsAsset(sceneWithBuildConfiguration.BuildConfiguration);
+                settingsAsset = DotsGlobalSettings.Instance.GetSettingsAsset(
+                    sceneWithBuildConfiguration.BuildConfiguration
+                );
                 if (settingsAsset == null)
                 {
                     // the build configuration ID is not a default configuration stored in the ProjectSettings
@@ -182,7 +210,7 @@ namespace Unity.Scenes.Editor
                 EditorEntityScenes.DependOnSceneGameObjects(sceneWithBuildConfiguration.SceneGUID, ctx);
 
                 GetBuildConfigurationOrDotsSettings(sceneWithBuildConfiguration, out var settingsAsset);
-                if(settingsAsset != null)
+                if (settingsAsset != null)
                     ctx.DependsOnCustomDependency(settingsAsset.CustomDependency);
 
                 var scenePath = AssetDatabaseCompatibility.GuidToPath(sceneWithBuildConfiguration.SceneGUID);
@@ -195,7 +223,9 @@ namespace Unity.Scenes.Editor
                     var prefabGUID = sceneWithBuildConfiguration.SceneGUID;
                     scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
                     scene.name = prefabGUID.ToString();
-                    prefab = AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(AssetDatabase.GUIDToAssetPath(prefabGUID.ToString()));
+                    prefab = AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(
+                        AssetDatabase.GUIDToAssetPath(prefabGUID.ToString())
+                    );
                 }
                 else
                 {

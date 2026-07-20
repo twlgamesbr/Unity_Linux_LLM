@@ -14,9 +14,18 @@ namespace UnityEngine.Rendering
     {
         internal Object parentAsset = null;
 
-        [SerializeField, FormerlySerializedAs("sceneBounds"), Obsolete("This data is now serialized directly in the baking set asset. #from(2023.3)")]
+        [
+            SerializeField,
+            FormerlySerializedAs("sceneBounds"),
+            Obsolete("This data is now serialized directly in the baking set asset. #from(2023.3)")
+        ]
         internal SerializedDictionary<string, Bounds> obsoleteSceneBounds;
-        [SerializeField, FormerlySerializedAs("hasProbeVolumes"), Obsolete("This data is now serialized directly in the baking set asset. #from(2023.3)")]
+
+        [
+            SerializeField,
+            FormerlySerializedAs("hasProbeVolumes"),
+            Obsolete("This data is now serialized directly in the baking set asset. #from(2023.3)")
+        ]
         internal SerializedDictionary<string, bool> obsoleteHasProbeVolumes;
 
         /// <summary>

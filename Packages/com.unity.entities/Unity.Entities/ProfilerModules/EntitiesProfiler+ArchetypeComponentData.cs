@@ -26,7 +26,12 @@ namespace Unity.Entities
             [FieldOffset(20)] // 4 bytes - Order of component in archetype
             public readonly int IndexInArchetype;
 
-            public ArchetypeComponentData(ulong archetypeStableHash, ulong componentStableTypeHash, ComponentTypeFlags flags, int indexInArchetype)
+            public ArchetypeComponentData(
+                ulong archetypeStableHash,
+                ulong componentStableTypeHash,
+                ComponentTypeFlags flags,
+                int indexInArchetype
+            )
             {
                 ArchetypeStableHash = archetypeStableHash;
                 ComponentStableTypeHash = componentStableTypeHash;

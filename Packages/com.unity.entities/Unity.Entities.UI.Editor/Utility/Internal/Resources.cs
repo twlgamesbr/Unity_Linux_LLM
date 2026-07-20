@@ -49,7 +49,9 @@ namespace Unity.Entities.UI
 
             public static class Explorer
             {
-                public static readonly UITemplate PropertyBagExplorer = new UITemplate("Explorer/property-bag-explorer");
+                public static readonly UITemplate PropertyBagExplorer = new UITemplate(
+                    "Explorer/property-bag-explorer"
+                );
                 public static readonly UITemplate PropertyBagList = new UITemplate("Explorer/property-bag-list");
                 public static readonly UITemplate TypeName = new UITemplate("Explorer/type-name-element");
                 public static readonly UITemplate PropertyBag = new UITemplate("Explorer/property-bag");

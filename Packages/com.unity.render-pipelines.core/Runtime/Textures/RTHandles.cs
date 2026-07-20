@@ -15,15 +15,26 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Maximum allocated width of the default RTHandle System
         /// </summary>
-        public static int maxWidth { get { return s_DefaultInstance.GetMaxWidth(); } }
+        public static int maxWidth
+        {
+            get { return s_DefaultInstance.GetMaxWidth(); }
+        }
+
         /// <summary>
         /// Maximum allocated height of the default RTHandle System
         /// </summary>
-        public static int maxHeight { get { return s_DefaultInstance.GetMaxHeight(); } }
+        public static int maxHeight
+        {
+            get { return s_DefaultInstance.GetMaxHeight(); }
+        }
+
         /// <summary>
         /// Current properties of the default RTHandle System
         /// </summary>
-        public static RTHandleProperties rtHandleProperties { get { return s_DefaultInstance.rtHandleProperties; } }
+        public static RTHandleProperties rtHandleProperties
+        {
+            get { return s_DefaultInstance.rtHandleProperties; }
+        }
 
         /// <summary>
         /// Calculate the dimensions (in pixels) of the RTHandles given the scale factor.
@@ -303,14 +314,17 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            return s_DefaultInstance.Alloc(descriptor.width, descriptor.height,
-                GetRTHandleAllocInfo(descriptor, filterMode, wrapMode, anisoLevel, mipMapBias, name));
+            return s_DefaultInstance.Alloc(
+                descriptor.width,
+                descriptor.height,
+                GetRTHandleAllocInfo(descriptor, filterMode, wrapMode, anisoLevel, mipMapBias, name)
+            );
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static internal GraphicsFormat GetFormat(GraphicsFormat colorFormat, GraphicsFormat depthStencilFormat)
+        internal static GraphicsFormat GetFormat(GraphicsFormat colorFormat, GraphicsFormat depthStencilFormat)
         {
-            return (depthStencilFormat==GraphicsFormat.None) ? colorFormat : depthStencilFormat;
+            return (depthStencilFormat == GraphicsFormat.None) ? colorFormat : depthStencilFormat;
         }
 
         // Internal RtDesc to RtAllocInfo conversion utility function.
@@ -319,7 +333,14 @@ namespace UnityEngine.Rendering
         // NOTE: It has no default values to avoid param ambiguity of the flat RtHandleAlloc API.
         // NOTE: There isn't 100% field to field mapping, so some fields might need manual adjustment afterwards.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static RTHandleAllocInfo GetRTHandleAllocInfo(in RenderTextureDescriptor desc, FilterMode filterMode, TextureWrapMode wrapMode, int anisoLevel, float mipMapBias, string name)
+        internal static RTHandleAllocInfo GetRTHandleAllocInfo(
+            in RenderTextureDescriptor desc,
+            FilterMode filterMode,
+            TextureWrapMode wrapMode,
+            int anisoLevel,
+            float mipMapBias,
+            string name
+        )
         {
             return new RTHandleAllocInfo(name)
             {
@@ -508,8 +529,10 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            return s_DefaultInstance.Alloc(scaleFactor,
-                GetRTHandleAllocInfo(descriptor, filterMode, wrapMode, anisoLevel, mipMapBias, name));
+            return s_DefaultInstance.Alloc(
+                scaleFactor,
+                GetRTHandleAllocInfo(descriptor, filterMode, wrapMode, anisoLevel, mipMapBias, name)
+            );
         }
 
         /// <summary>
@@ -685,11 +708,18 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            Assert.IsFalse(descriptor.graphicsFormat != GraphicsFormat.None && descriptor.depthStencilFormat != GraphicsFormat.None,
-                "The RenderTextureDescriptor used to create RTHandle " + name + " contains both graphicsFormat and depthStencilFormat which is not allowed.");
+            Assert.IsFalse(
+                descriptor.graphicsFormat != GraphicsFormat.None
+                    && descriptor.depthStencilFormat != GraphicsFormat.None,
+                "The RenderTextureDescriptor used to create RTHandle "
+                    + name
+                    + " contains both graphicsFormat and depthStencilFormat which is not allowed."
+            );
 
-            return s_DefaultInstance.Alloc(scaleFunc,
-                GetRTHandleAllocInfo(descriptor, filterMode, wrapMode, anisoLevel, mipMapBias, name));
+            return s_DefaultInstance.Alloc(
+                scaleFunc,
+                GetRTHandleAllocInfo(descriptor, filterMode, wrapMode, anisoLevel, mipMapBias, name)
+            );
         }
 
         /// <summary>
@@ -767,7 +797,9 @@ namespace UnityEngine.Rendering
         /// <param name="width">Initial reference rendering width.</param>
         /// <param name="height">Initial reference rendering height.</param>
         /// <param name="useLegacyDynamicResControl">Use legacy hardware DynamicResolution control in the default RTHandle system.</param>
-        [Obsolete("useLegacyDynamicResControl is deprecated. Please use SetHardwareDynamicResolutionState() instead. #from(2023.3)")]
+        [Obsolete(
+            "useLegacyDynamicResControl is deprecated. Please use SetHardwareDynamicResolutionState() instead. #from(2023.3)"
+        )]
         public static void Initialize(int width, int height, bool useLegacyDynamicResControl = false)
         {
             s_DefaultInstance.Initialize(width, height, useLegacyDynamicResControl);

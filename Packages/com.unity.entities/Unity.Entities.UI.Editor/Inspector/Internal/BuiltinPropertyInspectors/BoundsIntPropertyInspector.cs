@@ -1,12 +1,9 @@
 using JetBrains.Annotations;
-using UnityEngine.UIElements;
-
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Unity.Entities.UI
 {
     [UsedImplicitly]
-    class BoundsIntPropertyInspector : BaseFieldPropertyInspector<BoundsIntField, BoundsInt>
-    {
-    }
+    class BoundsIntPropertyInspector : BaseFieldPropertyInspector<BoundsIntField, BoundsInt> { }
 }

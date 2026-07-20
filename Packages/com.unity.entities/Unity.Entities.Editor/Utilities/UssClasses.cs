@@ -289,7 +289,6 @@ namespace Unity.Entities.Editor
                     public const string PrefabEntityIcon = k_RootIcon + "--prefab-entity";
                     public const string Button = k_RootClass + "__button";
                 }
-
             }
         }
 
@@ -310,7 +309,6 @@ namespace Unity.Entities.Editor
 
                     public const string SystemQuery = "system-query";
                     public const string ComponentQuery = "component-query";
-
                 }
 
                 public static class EntityInfo

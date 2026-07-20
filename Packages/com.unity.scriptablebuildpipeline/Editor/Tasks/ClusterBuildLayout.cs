@@ -23,8 +23,14 @@ namespace UnityEditor.Build.Pipeline.Tasks
     {
         private Dictionary<ObjectIdentifier, Hash128> m_ObjectToCluster = new Dictionary<ObjectIdentifier, Hash128>();
         private Dictionary<ObjectIdentifier, long> m_ObjectToLocalID = new Dictionary<ObjectIdentifier, long>();
-        public Dictionary<ObjectIdentifier, Hash128> ObjectToCluster { get { return m_ObjectToCluster; } }
-        public Dictionary<ObjectIdentifier, long> ObjectToLocalID { get { return m_ObjectToLocalID; } }
+        public Dictionary<ObjectIdentifier, Hash128> ObjectToCluster
+        {
+            get { return m_ObjectToCluster; }
+        }
+        public Dictionary<ObjectIdentifier, long> ObjectToLocalID
+        {
+            get { return m_ObjectToLocalID; }
+        }
     }
 
     /// <summary>
@@ -32,7 +38,8 @@ namespace UnityEditor.Build.Pipeline.Tasks
     /// </summary>
     public class ClusterBuildLayout : IBuildTask
     {
-        private static void GetOrAdd<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key, out TValue value) where TValue : new()
+        private static void GetOrAdd<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key, out TValue value)
+            where TValue : new()
         {
             if (dictionary.TryGetValue(key, out value))
                 return;
@@ -54,7 +61,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
         bool m_useContentIdsForClusterName;
 
         /// <inheritdoc />
-        public int Version { get { return 2; } }
+        public int Version
+        {
+            get { return 2; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -79,10 +89,24 @@ namespace UnityEditor.Build.Pipeline.Tasks
         /// <inheritdoc />
         public ReturnCode Run()
         {
-            return Run(m_Parameters, m_DependencyData, m_WriteData, m_PackingMethod, m_ClusterResult, m_useContentIdsForClusterName);
+            return Run(
+                m_Parameters,
+                m_DependencyData,
+                m_WriteData,
+                m_PackingMethod,
+                m_ClusterResult,
+                m_useContentIdsForClusterName
+            );
         }
 
-        internal static ReturnCode Run(IBundleBuildParameters buildParams, IDependencyData dependencyData, IBundleWriteData writeData, IDeterministicIdentifiers packingMethod, IClusterOutput clusterResult, bool useContentIdsForClusterName)
+        internal static ReturnCode Run(
+            IBundleBuildParameters buildParams,
+            IDependencyData dependencyData,
+            IBundleWriteData writeData,
+            IDeterministicIdentifiers packingMethod,
+            IClusterOutput clusterResult,
+            bool useContentIdsForClusterName
+        )
         {
             // Create mapping of objects to all assets that depend on them
             var objectToAssets = new Dictionary<ObjectIdentifier, HashSet<GUID>>();
@@ -132,7 +156,6 @@ namespace UnityEditor.Build.Pipeline.Tasks
 
             var builtInResourcesGUID = new GUID("0000000000000000e000000000000000");
 
-
             // Generates Content Archive Files from Clusters
             foreach (var pair in finalClusterToObjects)
             {
@@ -151,17 +174,28 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 foreach (var objectId in objectsInCluster)
                 {
                     var lfid = packingMethod.SerializationIndexFromObjectIdentifier(objectId);
-                    op.Command.serializeObjects.Add(new SerializationInfo { serializationObject = objectId, serializationIndex = lfid });
+                    op.Command.serializeObjects.Add(
+                        new SerializationInfo { serializationObject = objectId, serializationIndex = lfid }
+                    );
                     op.ReferenceMap.AddMapping(clusterName, lfid, objectId);
                     clusterResult.ObjectToLocalID.Add(objectId, lfid);
                 }
-                var deps = ContentBuildInterface.GetPlayerDependenciesForObjects(objectsInCluster.ToArray(), buildParams.Target, buildParams.ScriptInfo, DependencyType.ValidReferences);
+                var deps = ContentBuildInterface.GetPlayerDependenciesForObjects(
+                    objectsInCluster.ToArray(),
+                    buildParams.Target,
+                    buildParams.ScriptInfo,
+                    DependencyType.ValidReferences
+                );
                 foreach (var d in deps)
                 {
                     if (d.m_GUID != builtInResourcesGUID)
                     {
                         var depCluster = clusterResult.ObjectToCluster[d].ToString();
-                        op.ReferenceMap.AddMapping(depCluster, packingMethod.SerializationIndexFromObjectIdentifier(d), d);
+                        op.ReferenceMap.AddMapping(
+                            depCluster,
+                            packingMethod.SerializationIndexFromObjectIdentifier(d),
+                            d
+                        );
                     }
                 }
 
@@ -183,13 +217,16 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 op.Command.internalName = pair.Key.ToString();
                 op.Command.serializeObjects = new List<SerializationInfo>();
 
-
                 foreach (var d in pair.Value.m_ReferencedObjects)
                 {
                     if (d.m_GUID != builtInResourcesGUID)
                     {
                         var depCluster = clusterResult.ObjectToCluster[d].ToString();
-                        op.ReferenceMap.AddMapping(depCluster, packingMethod.SerializationIndexFromObjectIdentifier(d), d);
+                        op.ReferenceMap.AddMapping(
+                            depCluster,
+                            packingMethod.SerializationIndexFromObjectIdentifier(d),
+                            d
+                        );
                     }
                 }
 
@@ -216,17 +253,31 @@ namespace UnityEditor.Build.Pipeline.Tasks
             var seqObjectIdBuffer = new ObjectIdBufferData[objIds.Count];
             for (int i = 0; i < seqObjectIdBuffer.Length; i++)
             {
-                var pathHash = !string.IsNullOrEmpty(objIds[i].filePath) ? Hash128.Compute(objIds[i].filePath) : default;
-                seqObjectIdBuffer[i] = new ObjectIdBufferData { guid = objIds[i].guid, fileType = objIds[i].fileType, lfid = objIds[i].localIdentifierInFile, pathHash = pathHash };
+                var pathHash = !string.IsNullOrEmpty(objIds[i].filePath)
+                    ? Hash128.Compute(objIds[i].filePath)
+                    : default;
+                seqObjectIdBuffer[i] = new ObjectIdBufferData
+                {
+                    guid = objIds[i].guid,
+                    fileType = objIds[i].fileType,
+                    lfid = objIds[i].localIdentifierInFile,
+                    pathHash = pathHash,
+                };
             }
             return Hash128.Compute(seqObjectIdBuffer);
         }
 
-        private static void ExtractAssets(Dictionary<ObjectIdentifier, HashSet<GUID>> objectToAssets, GUID asset, IEnumerable<ObjectIdentifier> objectIds)
+        private static void ExtractAssets(
+            Dictionary<ObjectIdentifier, HashSet<GUID>> objectToAssets,
+            GUID asset,
+            IEnumerable<ObjectIdentifier> objectIds
+        )
         {
             foreach (var objectId in objectIds)
             {
-                if (objectId.filePath.Equals(CommonStrings.UnityDefaultResourcePath, StringComparison.OrdinalIgnoreCase))
+                if (
+                    objectId.filePath.Equals(CommonStrings.UnityDefaultResourcePath, StringComparison.OrdinalIgnoreCase)
+                )
                     continue;
                 GetOrAdd(objectToAssets, objectId, out var assets);
                 assets.Add(asset);

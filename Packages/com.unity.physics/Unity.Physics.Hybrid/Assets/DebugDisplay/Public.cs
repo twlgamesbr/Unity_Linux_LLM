@@ -9,6 +9,7 @@ namespace Unity.DebugDisplay
     internal struct Arrows : IDisposable
     {
         private Lines m_Lines;
+
         internal unsafe Arrows(int count, DrawData drawData)
         {
             m_Lines = new Lines(count * 5, drawData);
@@ -23,7 +24,8 @@ namespace Unity.DebugDisplay
 
             float3 dir;
             float length = Physics.Math.NormalizeWithLength(v, out dir);
-            float3 perp, perp2;
+            float3 perp,
+                perp2;
             Physics.Math.CalculatePerpendicularNormalized(dir, out perp, out perp2);
             float3 scale = length * 0.2f;
 
@@ -57,7 +59,8 @@ namespace Unity.DebugDisplay
 
             float3 dir;
             float length = Physics.Math.NormalizeWithLength(v, out dir);
-            float3 perp, perp2;
+            float3 perp,
+                perp2;
             Physics.Math.CalculatePerpendicularNormalized(dir, out perp, out perp2);
             float3 scale = length * 0.2f;
 
@@ -173,7 +176,8 @@ namespace Unity.DebugDisplay
             float scale = Physics.Math.NormalizeWithLength(axis, out dir);
             float3 arm;
             {
-                float3 perp1, perp2;
+                float3 perp1,
+                    perp2;
                 Physics.Math.CalculatePerpendicularNormalized(dir, out perp1, out perp2);
                 arm = math.mul(quaternion.AxisAngle(perp1, angle), dir) * scale;
             }
@@ -232,12 +236,17 @@ namespace Unity.DebugDisplay
             m_DrawData = drawData;
         }
 
-        internal void Draw(float3 vertex0, float3 vertex1, float3 vertex2, float3 normal, Unity.DebugDisplay.ColorIndex color)
+        internal void Draw(
+            float3 vertex0,
+            float3 vertex1,
+            float3 vertex2,
+            float3 normal,
+            Unity.DebugDisplay.ColorIndex color
+        )
         {
             if (m_Unit.m_Next < m_Unit.m_End)
             {
-                m_DrawData.m_TriangleBuffer.SetTriangle(vertex0, vertex1, vertex2, normal, color,
-                    m_Unit.m_Next++);
+                m_DrawData.m_TriangleBuffer.SetTriangle(vertex0, vertex1, vertex2, normal, color, m_Unit.m_Next++);
             }
         }
 
@@ -255,6 +264,7 @@ namespace Unity.DebugDisplay
         DrawData m_DrawData;
 
         const int k_MaxSegments = 7;
+
         static unsafe void GetDigitSegments(in int digit, int* segments, out int segmentCount)
         {
             var s = segments;
@@ -263,102 +273,102 @@ namespace Unity.DebugDisplay
                 case 0:
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 4;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 4;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 1:
                 {
                     s[0] = 2;
-                        s[1] = 5;
+                    s[1] = 5;
                     segmentCount = 2;
                     break;
-                    }
+                }
                 case 2:
                 {
                     s[0] = 0;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 6;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 3:
                 {
                     s[0] = 0;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 5;
-                        s[4] = 6;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 5;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 4:
                 {
                     s[0] = 1;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 5;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 5;
                     segmentCount = 4;
                     break;
-                    }
+                }
                 case 5:
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 3;
-                        s[3] = 5;
-                        s[4] = 6;
+                    s[1] = 1;
+                    s[2] = 3;
+                    s[3] = 5;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 6:
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 7:
                 {
                     s[0] = 0;
-                        s[1] = 2;
-                        s[2] = 5;
+                    s[1] = 2;
+                    s[2] = 5;
                     segmentCount = 3;
                     break;
-                    }
+                }
                 case 8:
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 3;
-                        s[4] = 4;
-                        s[5] = 5;
-                        s[6] = 6;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 3;
+                    s[4] = 4;
+                    s[5] = 5;
+                    s[6] = 6;
                     segmentCount = 7;
                     break;
-                    }
+                }
                 case 9:
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 3;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 3;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 default:
                 {
                     segmentCount = 0;
@@ -369,13 +379,48 @@ namespace Unity.DebugDisplay
 
         static readonly float[] s_SegmentPoints =
         {
-            0, 1, 0,        1, 1, 0,    // Segment 0 (top)
-            0, 1, 0,        0, 0.5f, 0, // Segment 1 (top-left)
-            1, 1, 0,        1, 0.5f, 0, // Segment 2 (top-right)
-            0, 0.5f, 0,     1, 0.5f, 0, // Segment 3 (middle)
-            0, 0.5f, 0,     0, 0, 0,    // Segment 4 (bottom-left)
-            1, 0.5f, 0,     1, 0, 0,    // Segment 5 (bottom-right)
-            0, 0, 0,        1, 0, 0,    // Segment 6 (bottom)
+            0,
+            1,
+            0,
+            1,
+            1,
+            0, // Segment 0 (top)
+            0,
+            1,
+            0,
+            0,
+            0.5f,
+            0, // Segment 1 (top-left)
+            1,
+            1,
+            0,
+            1,
+            0.5f,
+            0, // Segment 2 (top-right)
+            0,
+            0.5f,
+            0,
+            1,
+            0.5f,
+            0, // Segment 3 (middle)
+            0,
+            0.5f,
+            0,
+            0,
+            0,
+            0, // Segment 4 (bottom-left)
+            1,
+            0.5f,
+            0,
+            1,
+            0,
+            0, // Segment 5 (bottom-right)
+            0,
+            0,
+            0,
+            1,
+            0,
+            0, // Segment 6 (bottom)
         };
 
         internal DrawNumbers(int maxDigits, DrawData drawData)
@@ -437,8 +482,20 @@ namespace Unity.DebugDisplay
                 for (int i = 0; i < segmentCount; i++)
                 {
                     int idx = segments[i];
-                    float3 a = basePos + new float3(s_SegmentPoints[idx * 6], s_SegmentPoints[idx * 6 + 1], s_SegmentPoints[idx * 6 + 2]) * scale;
-                    float3 b = basePos + new float3(s_SegmentPoints[idx * 6 + 3], s_SegmentPoints[idx * 6 + 4], s_SegmentPoints[idx * 6 + 5]) * scale;
+                    float3 a =
+                        basePos
+                        + new float3(
+                            s_SegmentPoints[idx * 6],
+                            s_SegmentPoints[idx * 6 + 1],
+                            s_SegmentPoints[idx * 6 + 2]
+                        ) * scale;
+                    float3 b =
+                        basePos
+                        + new float3(
+                            s_SegmentPoints[idx * 6 + 3],
+                            s_SegmentPoints[idx * 6 + 4],
+                            s_SegmentPoints[idx * 6 + 5]
+                        ) * scale;
                     DrawLine(a, b, color);
                 }
             }
@@ -467,12 +524,34 @@ namespace Unity.DebugDisplay
 
         static readonly FixedList32Bytes<byte> s_Alphabet = new FixedList32Bytes<byte>
         {
-            (byte)'A', (byte)'B', (byte)'C', (byte)'D', (byte)'E', (byte)'F', (byte)'G',
-            (byte)'H', (byte)'I', (byte)'J', (byte)'K', (byte)'L', (byte)'M', (byte)'N',
-            (byte)'O', (byte)'P', (byte)'Q', (byte)'R', (byte)'S', (byte)'T', (byte)'U',
-            (byte)'V', (byte)'W', (byte)'X', (byte)'Y', (byte)'Z',
+            (byte)'A',
+            (byte)'B',
+            (byte)'C',
+            (byte)'D',
+            (byte)'E',
+            (byte)'F',
+            (byte)'G',
+            (byte)'H',
+            (byte)'I',
+            (byte)'J',
+            (byte)'K',
+            (byte)'L',
+            (byte)'M',
+            (byte)'N',
+            (byte)'O',
+            (byte)'P',
+            (byte)'Q',
+            (byte)'R',
+            (byte)'S',
+            (byte)'T',
+            (byte)'U',
+            (byte)'V',
+            (byte)'W',
+            (byte)'X',
+            (byte)'Y',
+            (byte)'Z',
             (byte)':', // index 26
-            (byte)' ' // index 27
+            (byte)' ', // index 27
         };
 
         const int k_MaxSegmentCount = 6;
@@ -498,263 +577,263 @@ namespace Unity.DebugDisplay
                 case 0: // A
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 3;
-                        s[4] = 4;
-                        s[5] = 5;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 3;
+                    s[4] = 4;
+                    s[5] = 5;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 1: // B
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 2: // C
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 4;
-                        s[3] = 6;
+                    s[1] = 1;
+                    s[2] = 4;
+                    s[3] = 6;
                     segmentCount = 4;
                     break;
-                    }
+                }
                 case 3: // D
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 4;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 4;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 4: // E
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 6;
+                    s[1] = 1;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 5: // F
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 3;
-                        s[3] = 4;
+                    s[1] = 1;
+                    s[2] = 3;
+                    s[3] = 4;
                     segmentCount = 4;
                     break;
-                    }
+                }
                 case 6: // G
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 4;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 4;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 7: // H
                 {
                     s[0] = 1;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 5;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 5;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 8: // I
                 {
                     s[0] = 2;
-                        s[1] = 5;
+                    s[1] = 5;
                     segmentCount = 2;
                     break;
-                    }
+                }
                 case 9: // J
                 {
                     s[0] = 2;
-                        s[1] = 4;
-                        s[2] = 5;
-                        s[3] = 6;
+                    s[1] = 4;
+                    s[2] = 5;
+                    s[3] = 6;
                     segmentCount = 4;
                     break;
-                    }
+                }
                 case 10: // K (kind of approximate)
                 {
                     s[0] = 1;
-                        s[1] = 3;
-                        s[2] = 4;
-                        s[3] = 5;
+                    s[1] = 3;
+                    s[2] = 4;
+                    s[3] = 5;
                     segmentCount = 4;
                     break;
-                    }
+                }
                 case 11: // L
                 {
                     s[0] = 1;
-                        s[1] = 4;
-                        s[2] = 6;
+                    s[1] = 4;
+                    s[2] = 6;
                     segmentCount = 3;
                     break;
-                    }
+                }
                 case 12: // M (kind of approximate)
                 {
                     s[0] = 0;
-                        s[1] = 2;
-                        s[2] = 4;
-                        s[3] = 5;
+                    s[1] = 2;
+                    s[2] = 4;
+                    s[3] = 5;
                     segmentCount = 4;
                     break;
-                    }
+                }
                 case 13: // N
                 {
                     s[0] = 0;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 5;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 5;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 14: // O
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 4;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 4;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 15: // P
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 3;
-                        s[4] = 4;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 3;
+                    s[4] = 4;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 16: // Q
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 3;
-                        s[4] = 5;
-                        s[5] = 6;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 3;
+                    s[4] = 5;
+                    s[5] = 6;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 17: // R
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 2;
-                        s[3] = 3;
-                        s[4] = 4;
-                        s[5] = 5;
+                    s[1] = 1;
+                    s[2] = 2;
+                    s[3] = 3;
+                    s[4] = 4;
+                    s[5] = 5;
                     segmentCount = 6;
                     break;
-                    }
+                }
                 case 18: // S
                 {
                     s[0] = 0;
-                        s[1] = 1;
-                        s[2] = 3;
-                        s[3] = 5;
-                        s[4] = 6;
+                    s[1] = 1;
+                    s[2] = 3;
+                    s[3] = 5;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 19: // T
                 {
                     s[0] = 1;
-                        s[1] = 3;
-                        s[2] = 6;
+                    s[1] = 3;
+                    s[2] = 6;
                     segmentCount = 3;
                     break;
-                    }
+                }
                 case 20: // U
                 {
                     s[0] = 1;
-                        s[1] = 2;
-                        s[2] = 4;
-                        s[3] = 5;
-                        s[4] = 6;
+                    s[1] = 2;
+                    s[2] = 4;
+                    s[3] = 5;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 21: // V (kind of approximate)
                 {
                     s[0] = 1;
-                        s[1] = 4;
-                        s[2] = 6;
+                    s[1] = 4;
+                    s[2] = 6;
                     segmentCount = 3;
                     break;
-                    }
+                }
                 case 22: // W (kind of approximate)
                 {
                     s[0] = 1;
-                        s[1] = 2;
-                        s[2] = 4;
-                        s[3] = 5;
-                        s[4] = 6;
+                    s[1] = 2;
+                    s[2] = 4;
+                    s[3] = 5;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 23: // X
                 {
                     s[0] = 1;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 5;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 5;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 24: // Y
                 {
                     s[0] = 1;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 5;
-                        s[4] = 6;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 5;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 25: // Z
                 {
                     s[0] = 0;
-                        s[1] = 2;
-                        s[2] = 3;
-                        s[3] = 4;
-                        s[4] = 6;
+                    s[1] = 2;
+                    s[2] = 3;
+                    s[3] = 4;
+                    s[4] = 6;
                     segmentCount = 5;
                     break;
-                    }
+                }
                 case 26: // ':' -> 2 short center dots
                 {
                     s[0] = 7;
-                        s[1] = 8;
+                    s[1] = 8;
                     segmentCount = 2;
                     break;
-                    }
+                }
                 case 27: // ' ' -> no segments
                 default:
                 {
@@ -766,15 +845,60 @@ namespace Unity.DebugDisplay
 
         static readonly float[] s_SegmentPoints =
         {
-            0, 1, 0,        1, 1, 0,        // Segment 0
-            0, 1, 0,        0, 0.5f, 0,     // Segment 1
-            1, 1, 0,        1, 0.5f, 0,     // Segment 2
-            0, 0.5f, 0,     1, 0.5f, 0,     // Segment 3
-            0, 0.5f, 0,     0, 0, 0,        // Segment 4
-            1, 0.5f, 0,     1, 0, 0,        // Segment 5
-            0, 0, 0,        1, 0, 0,        // Segment 6
-            0.4f, 0.75f, 0, 0.6f, 0.75f, 0, // Segment 7 - upper dot
-            0.4f, 0.25f, 0, 0.6f, 0.25f, 0, // Segment 8 - lower dot
+            0,
+            1,
+            0,
+            1,
+            1,
+            0, // Segment 0
+            0,
+            1,
+            0,
+            0,
+            0.5f,
+            0, // Segment 1
+            1,
+            1,
+            0,
+            1,
+            0.5f,
+            0, // Segment 2
+            0,
+            0.5f,
+            0,
+            1,
+            0.5f,
+            0, // Segment 3
+            0,
+            0.5f,
+            0,
+            0,
+            0,
+            0, // Segment 4
+            1,
+            0.5f,
+            0,
+            1,
+            0,
+            0, // Segment 5
+            0,
+            0,
+            0,
+            1,
+            0,
+            0, // Segment 6
+            0.4f,
+            0.75f,
+            0,
+            0.6f,
+            0.75f,
+            0, // Segment 7 - upper dot
+            0.4f,
+            0.25f,
+            0,
+            0.6f,
+            0.25f,
+            0, // Segment 8 - lower dot
         };
 
         internal DrawLetters(int maxChars, DrawData drawData)
@@ -784,7 +908,13 @@ namespace Unity.DebugDisplay
             m_DrawData = drawData;
         }
 
-        internal void DrawText(in FixedString32Bytes text, float3 position, float spacing, float scale, ColorIndex color)
+        internal void DrawText(
+            in FixedString32Bytes text,
+            float3 position,
+            float spacing,
+            float scale,
+            ColorIndex color
+        )
         {
             for (int i = 0; i < text.Length; i++)
             {
@@ -807,8 +937,20 @@ namespace Unity.DebugDisplay
                 for (int i = 0; i < segmentCount; i++)
                 {
                     int idx = segments[i];
-                    float3 a = basePos + new float3(s_SegmentPoints[idx * 6], s_SegmentPoints[idx * 6 + 1], s_SegmentPoints[idx * 6 + 2]) * scale;
-                    float3 b = basePos + new float3(s_SegmentPoints[idx * 6 + 3], s_SegmentPoints[idx * 6 + 4], s_SegmentPoints[idx * 6 + 5]) * scale;
+                    float3 a =
+                        basePos
+                        + new float3(
+                            s_SegmentPoints[idx * 6],
+                            s_SegmentPoints[idx * 6 + 1],
+                            s_SegmentPoints[idx * 6 + 2]
+                        ) * scale;
+                    float3 b =
+                        basePos
+                        + new float3(
+                            s_SegmentPoints[idx * 6 + 3],
+                            s_SegmentPoints[idx * 6 + 4],
+                            s_SegmentPoints[idx * 6 + 5]
+                        ) * scale;
                     DrawLine(a, b, color);
                 }
             }

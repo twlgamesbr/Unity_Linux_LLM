@@ -13,10 +13,12 @@ namespace UnityEngine.TestTools
         /// Gets the value of ExpectDomainReload
         /// </summary>
         public bool ExpectDomainReload { get; }
+
         /// <summary>
         /// Gets the value of ExpectedPlaymodeState
         /// </summary>
         public bool ExpectedPlaymodeState { get; private set; }
+
         /// <summary>
         /// Sets ExpectDomainReload and ExpectedPlaymodeState to false.
         /// </summary>

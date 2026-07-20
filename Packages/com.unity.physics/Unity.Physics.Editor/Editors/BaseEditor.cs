@@ -87,7 +87,9 @@ namespace Unity.Physics.Editor
                         {
                             var element = list.serializedProperty.GetArrayElementAtIndex(index);
                             EditorGUI.PropertyField(
-                                new Rect(rect) { height = EditorGUI.GetPropertyHeight(element) }, element, true
+                                new Rect(rect) { height = EditorGUI.GetPropertyHeight(element) },
+                                element,
+                                true
                             );
                         };
                     }

@@ -6,7 +6,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
     internal static class CreateTerrainShaderGraph
     {
-        [MenuItem("Assets/Create/Shader Graph/URP/Terrain Lit Shader Graph", priority = CoreUtils.Sections.section4 + CoreUtils.Priorities.assetsCreateShaderMenuPriority + 2)]
+        [MenuItem(
+            "Assets/Create/Shader Graph/URP/Terrain Lit Shader Graph",
+            priority = CoreUtils.Sections.section4 + CoreUtils.Priorities.assetsCreateShaderMenuPriority + 2
+        )]
         public static void CreateTerrainGraph()
         {
             var target = (UniversalTarget)Activator.CreateInstance(typeof(UniversalTarget));
@@ -23,7 +26,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 BlockFields.SurfaceDescription.Occlusion,
             };
 
-            GraphUtil.CreateNewGraphWithOutputs(new[] {target}, blockDescriptors);
+            GraphUtil.CreateNewGraphWithOutputs(new[] { target }, blockDescriptors);
         }
     }
 }

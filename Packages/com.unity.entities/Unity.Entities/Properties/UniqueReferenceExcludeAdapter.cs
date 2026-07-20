@@ -19,7 +19,9 @@ namespace Unity.Entities
         sealed class ReferenceEqualityComparer : IEqualityComparer<object>
         {
             internal static readonly ReferenceEqualityComparer Instance = new ReferenceEqualityComparer();
+
             bool IEqualityComparer<object>.Equals(object x, object y) => ReferenceEquals(x, y);
+
             int IEqualityComparer<object>.GetHashCode(object obj) => RuntimeHelpers.GetHashCode(obj);
         }
 
@@ -28,7 +30,11 @@ namespace Unity.Entities
         // Null out instead of Clear() to release capacity from large traversals.
         public void PrepareForNewRootVisit() => m_VisitedReferences = null;
 
-        public bool IsExcluded<TContainer, TValue>(in ExcludeContext<TContainer, TValue> context, ref TContainer container, ref TValue value)
+        public bool IsExcluded<TContainer, TValue>(
+            in ExcludeContext<TContainer, TValue> context,
+            ref TContainer container,
+            ref TValue value
+        )
         {
             if (typeof(TValue).IsValueType)
                 return false;

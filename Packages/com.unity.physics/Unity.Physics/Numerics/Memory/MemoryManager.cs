@@ -15,9 +15,7 @@ namespace Unity.Numerics.Memory
     internal unsafe partial struct MemoryManager : IDisposable
     {
         public MemoryManager(Collections.Allocator allocator)
-            : this(0, allocator, useMemoryPool: false)
-        {
-        }
+            : this(0, allocator, useMemoryPool: false) { }
 
         public MemoryManager(long size, Collections.Allocator allocator, bool useMemoryPool = true)
         {
@@ -42,13 +40,14 @@ namespace Unity.Numerics.Memory
             return new MemoryManager(size, alloc);
         }
 
-        [return : NoAlias]
-        public T* Allocate<T>(long count) where T : unmanaged
+        [return: NoAlias]
+        public T* Allocate<T>(long count)
+            where T : unmanaged
         {
             return (T*)Allocate(UnsafeUtility.SizeOf<T>() * count);
         }
 
-        [return : NoAlias]
+        [return: NoAlias]
         private void* Allocate(long size)
         {
             if (size == 0)
@@ -99,8 +98,9 @@ namespace Unity.Numerics.Memory
             // else:
 
 #if REPORT_STATS
-            string statsLog = $"Blocks remaining: {info->heap->UnsafeCount}\n" +
-                $"Memory committed: {(long)info->HeapTop - (long)info->heap}";
+            string statsLog =
+                $"Blocks remaining: {info->heap->UnsafeCount}\n"
+                + $"Memory committed: {(long)info->HeapTop - (long)info->heap}";
             UnityEngine.Debug.Log(statsLog);
 #endif
             if (info->activeAllocations != 0)
@@ -108,7 +108,8 @@ namespace Unity.Numerics.Memory
                 UnsafeUtility.Free(info->memory, info->allocator);
                 UnsafeUtility.Free(info, info->allocator);
 
-                string msg = $"Leak detected: Unity.Numerics.MemoryPool disposed with {info->activeAllocations} objects still allocated!";
+                string msg =
+                    $"Leak detected: Unity.Numerics.MemoryPool disposed with {info->activeAllocations} objects still allocated!";
 #if TRACKED_ALLOCATIONS
                 var it = LeakTrace.s_StackTrace.Values.GetEnumerator();
                 it.MoveNext();
@@ -123,9 +124,7 @@ namespace Unity.Numerics.Memory
         }
 
         [DebuggerTypeProxy(typeof(MemoryManagerDebugView))]
-        public partial struct Allocator
-        {
-        }
+        public partial struct Allocator { }
 
         [NativeDisableUnsafePtrRestriction]
         public readonly Allocator* info;
@@ -140,6 +139,7 @@ namespace Unity.Numerics.Memory
         public struct LeakTrace
         {
             public static Dictionary<IntPtr, StackTrace> s_StackTrace = new Dictionary<IntPtr, StackTrace>();
+
             public static void AddTrace(IntPtr ptr)
             {
                 s_StackTrace[ptr] = new StackTrace(2, true);
@@ -197,18 +197,12 @@ namespace Unity.Numerics.Memory
 
         public MemoryManager.Block[] Free
         {
-            get
-            {
-                return GetBlocksOfType(true);
-            }
+            get { return GetBlocksOfType(true); }
         }
 
         public MemoryManager.Block[] Allocated
         {
-            get
-            {
-                return GetBlocksOfType(false);
-            }
+            get { return GetBlocksOfType(false); }
         }
 
         public MemoryManager.Block[] Locked
@@ -229,7 +223,6 @@ namespace Unity.Numerics.Memory
                 return blocks.ToArray();
             }
         }
-
 
         private MemoryManager.Block[] GetBlocksOfType(bool free)
         {

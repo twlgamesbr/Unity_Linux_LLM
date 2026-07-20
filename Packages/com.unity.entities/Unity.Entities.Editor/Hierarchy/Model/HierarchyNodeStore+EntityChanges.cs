@@ -28,7 +28,7 @@ namespace Unity.Entities.Editor
                 AddedParents,
 
                 // Used to compute array lengths.
-                Count
+                Count,
             }
 
             readonly struct Range
@@ -48,21 +48,39 @@ namespace Unity.Entities.Editor
             readonly int m_BatchCount;
 
 #pragma warning disable 649
-            fixed int m_Offset[(int) ChangeType.Count];
-            fixed int m_Length[(int) ChangeType.Count];
+            fixed int m_Offset[(int)ChangeType.Count];
+            fixed int m_Length[(int)ChangeType.Count];
 #pragma warning restore 649
 
-            public NativeArray<Entity> CreatedEntities => SubArray(m_Changes.CreatedEntities, GetRange(ChangeType.CreatedEntities));
-            public NativeArray<Entity> DestroyedEntities => SubArray(m_Changes.DestroyedEntities, GetRange(ChangeType.DestroyedEntities));
+            public NativeArray<Entity> CreatedEntities =>
+                SubArray(m_Changes.CreatedEntities, GetRange(ChangeType.CreatedEntities));
+            public NativeArray<Entity> DestroyedEntities =>
+                SubArray(m_Changes.DestroyedEntities, GetRange(ChangeType.DestroyedEntities));
 
-            public NativeArray<Entity> AddedParentEntities=> SubArray(m_Changes.AddedParentEntities, GetRange(ChangeType.AddedParents));
-            public NativeArray<Entity> RemovedParentEntities=> SubArray(m_Changes.RemovedParentEntities, GetRange(ChangeType.RemovedParents));
-            public NativeArray<Parent> AddedParentComponents=> SubArray(m_Changes.AddedParentComponents, GetRange(ChangeType.AddedParents));
-            public NativeArray<SceneTag> AddedParentSceneTagForNullParentComponents => SubArray(m_Changes.AddedParentSceneTagForNullParentComponents, GetRange(ChangeType.AddedParents));
+            public NativeArray<Entity> AddedParentEntities =>
+                SubArray(m_Changes.AddedParentEntities, GetRange(ChangeType.AddedParents));
+            public NativeArray<Entity> RemovedParentEntities =>
+                SubArray(m_Changes.RemovedParentEntities, GetRange(ChangeType.RemovedParents));
+            public NativeArray<Parent> AddedParentComponents =>
+                SubArray(m_Changes.AddedParentComponents, GetRange(ChangeType.AddedParents));
+            public NativeArray<SceneTag> AddedParentSceneTagForNullParentComponents =>
+                SubArray(m_Changes.AddedParentSceneTagForNullParentComponents, GetRange(ChangeType.AddedParents));
 
-            public NativeArray<Entity> AddedSceneTagWithoutParentEntities=> SubArray(m_Changes.AddedSceneTagWithoutParentEntities, GetRange(ChangeType.AddedSceneTagWithoutParents));
-            public NativeArray<Entity> RemovedSceneTagWithoutParentEntities=> SubArray(m_Changes.RemovedSceneTagWithoutParentEntities, GetRange(ChangeType.RemovedSceneTagsWithoutParents));
-            public NativeArray<SceneTag> AddedSceneTagWithoutParentComponents => SubArray(m_Changes.AddedSceneTagWithoutParentComponents, GetRange(ChangeType.AddedSceneTagWithoutParents));
+            public NativeArray<Entity> AddedSceneTagWithoutParentEntities =>
+                SubArray(
+                    m_Changes.AddedSceneTagWithoutParentEntities,
+                    GetRange(ChangeType.AddedSceneTagWithoutParents)
+                );
+            public NativeArray<Entity> RemovedSceneTagWithoutParentEntities =>
+                SubArray(
+                    m_Changes.RemovedSceneTagWithoutParentEntities,
+                    GetRange(ChangeType.RemovedSceneTagsWithoutParents)
+                );
+            public NativeArray<SceneTag> AddedSceneTagWithoutParentComponents =>
+                SubArray(
+                    m_Changes.AddedSceneTagWithoutParentComponents,
+                    GetRange(ChangeType.AddedSceneTagWithoutParents)
+                );
 
             public HierarchyEntityChangesBatch(HierarchyEntityChanges changes, int batchStart, int batchCount)
             {
@@ -70,15 +88,19 @@ namespace Unity.Entities.Editor
                 m_BatchStart = batchStart;
                 m_BatchCount = batchCount;
 
-                m_Length[(int) ChangeType.RemovedSceneTagsWithoutParents] = m_Changes.RemovedSceneTagWithoutParentEntities.Length;
-                m_Length[(int) ChangeType.RemovedParents] = m_Changes.RemovedParentEntities.Length;
-                m_Length[(int) ChangeType.DestroyedEntities] = m_Changes.DestroyedEntities.Length;
-                m_Length[(int) ChangeType.CreatedEntities] = m_Changes.CreatedEntities.Length;
-                m_Length[(int) ChangeType.AddedSceneTagWithoutParents] = m_Changes.AddedSceneTagWithoutParentEntities.Length;
-                m_Length[(int) ChangeType.AddedParents] = m_Changes.AddedParentEntities.Length;
+                m_Length[(int)ChangeType.RemovedSceneTagsWithoutParents] = m_Changes
+                    .RemovedSceneTagWithoutParentEntities
+                    .Length;
+                m_Length[(int)ChangeType.RemovedParents] = m_Changes.RemovedParentEntities.Length;
+                m_Length[(int)ChangeType.DestroyedEntities] = m_Changes.DestroyedEntities.Length;
+                m_Length[(int)ChangeType.CreatedEntities] = m_Changes.CreatedEntities.Length;
+                m_Length[(int)ChangeType.AddedSceneTagWithoutParents] = m_Changes
+                    .AddedSceneTagWithoutParentEntities
+                    .Length;
+                m_Length[(int)ChangeType.AddedParents] = m_Changes.AddedParentEntities.Length;
 
                 var offset = 0;
-                for (var i = 0; i < (int) ChangeType.Count; i++)
+                for (var i = 0; i < (int)ChangeType.Count; i++)
                 {
                     m_Offset[i] = offset;
                     offset += m_Length[i];
@@ -87,14 +109,15 @@ namespace Unity.Entities.Editor
 
             Range GetRange(ChangeType type)
             {
-                var offset = m_Offset[(int) type];
-                var length = m_Length[(int) type];
+                var offset = m_Offset[(int)type];
+                var length = m_Length[(int)type];
                 var start = math.clamp(m_BatchStart - offset, 0, length);
                 var count = math.clamp(m_BatchStart - offset + m_BatchCount - start, 0, length - start);
                 return new Range(start, count);
             }
 
-            static NativeArray<T> SubArray<T>(NativeList<T> list, Range range) where T : unmanaged
+            static NativeArray<T> SubArray<T>(NativeList<T> list, Range range)
+                where T : unmanaged
             {
                 if (range.Count == 0)
                     return default;
@@ -108,7 +131,7 @@ namespace Unity.Entities.Editor
             {
                 IntegrateChanges,
                 UpdateVersion,
-                Complete
+                Complete,
             }
 
             readonly HierarchyNodeStore m_Hierarchy;
@@ -124,11 +147,20 @@ namespace Unity.Entities.Editor
 
             public object Current => null;
 
-            public void Reset() => throw new InvalidOperationException($"{nameof(IntegrateEntityChangesEnumerator)} can not be reset. Instead a new instance should be used with a new change set.");
+            public void Reset() =>
+                throw new InvalidOperationException(
+                    $"{nameof(IntegrateEntityChangesEnumerator)} can not be reset. Instead a new instance should be used with a new change set."
+                );
 
-            public float Progress => m_TotalCount > 0 ? m_BatchStart / (float) m_TotalCount : 0;
+            public float Progress => m_TotalCount > 0 ? m_BatchStart / (float)m_TotalCount : 0;
 
-            public IntegrateEntityChangesEnumerator(HierarchyNodeStore hierarchy, World world, HierarchyEntityChanges changes, int batchSize, NativeParallelHashMap<SceneTag, HierarchyNodeHandle> sceneTagToSubSceneNodeHandle)
+            public IntegrateEntityChangesEnumerator(
+                HierarchyNodeStore hierarchy,
+                World world,
+                HierarchyEntityChanges changes,
+                int batchSize,
+                NativeParallelHashMap<SceneTag, HierarchyNodeHandle> sceneTagToSubSceneNodeHandle
+            )
             {
                 m_Hierarchy = hierarchy;
                 m_World = world;
@@ -161,7 +193,7 @@ namespace Unity.Entities.Editor
                         {
                             SceneTagToSubSceneNodeHandle = m_SceneTagToSubSceneNodeHandle,
                             Batch = new HierarchyEntityChangesBatch(m_Changes, m_BatchStart, m_BatchCount),
-                            Hierarchy = m_Hierarchy
+                            Hierarchy = m_Hierarchy,
                         }.Run();
 
                         m_BatchStart += m_BatchCount;
@@ -188,14 +220,20 @@ namespace Unity.Entities.Editor
             }
         }
 
-
         // For perf tests only
-        public void IntegrateEntityChanges(World world, HierarchyEntityChanges changes, NativeParallelHashMap<SceneTag, HierarchyNodeHandle> sceneTagToSubSceneNodeHandle)
+        public void IntegrateEntityChanges(
+            World world,
+            HierarchyEntityChanges changes,
+            NativeParallelHashMap<SceneTag, HierarchyNodeHandle> sceneTagToSubSceneNodeHandle
+        )
         {
-            var enumerator = CreateIntegrateEntityChangesEnumerator(world, changes, changes.GetChangeCount(), sceneTagToSubSceneNodeHandle);
-            while (enumerator.MoveNext())
-            {
-            }
+            var enumerator = CreateIntegrateEntityChangesEnumerator(
+                world,
+                changes,
+                changes.GetChangeCount(),
+                sceneTagToSubSceneNodeHandle
+            );
+            while (enumerator.MoveNext()) { }
         }
 
         /// <summary>
@@ -205,7 +243,12 @@ namespace Unity.Entities.Editor
         /// <param name="changes">The entity changes to apply.</param>
         /// <param name="batchSize">The number of changes to integrate per tick.</param>
         /// <returns>An enumerator which can be ticked.</returns>
-        public IntegrateEntityChangesEnumerator CreateIntegrateEntityChangesEnumerator(World world, HierarchyEntityChanges changes, int batchSize, NativeParallelHashMap<SceneTag, HierarchyNodeHandle> sceneTagToSubSceneNodeHandle)
+        public IntegrateEntityChangesEnumerator CreateIntegrateEntityChangesEnumerator(
+            World world,
+            HierarchyEntityChanges changes,
+            int batchSize,
+            NativeParallelHashMap<SceneTag, HierarchyNodeHandle> sceneTagToSubSceneNodeHandle
+        )
         {
             return new IntegrateEntityChangesEnumerator(this, world, changes, batchSize, sceneTagToSubSceneNodeHandle);
         }
@@ -262,12 +305,18 @@ namespace Unity.Entities.Editor
                     if (addedSceneTagWithoutParentComponents[i].SceneEntity == Entity.Null)
                     {
                         // Something unexpected with the ECS data model. Just drop this node at the root.
-                        Hierarchy.SetParent(HierarchyNodeHandle.FromEntity(addedSceneTagWithoutParentEntities[i]), HierarchyNodeHandle.Root);
+                        Hierarchy.SetParent(
+                            HierarchyNodeHandle.FromEntity(addedSceneTagWithoutParentEntities[i]),
+                            HierarchyNodeHandle.Root
+                        );
                         continue;
                     }
 
                     var subSceneNode = SceneTagToSubSceneNodeHandle[addedSceneTagWithoutParentComponents[i]];
-                    Hierarchy.SetParent(HierarchyNodeHandle.FromEntity(addedSceneTagWithoutParentEntities[i]), Hierarchy.Exists(subSceneNode) ? subSceneNode : HierarchyNodeHandle.Root);
+                    Hierarchy.SetParent(
+                        HierarchyNodeHandle.FromEntity(addedSceneTagWithoutParentEntities[i]),
+                        Hierarchy.Exists(subSceneNode) ? subSceneNode : HierarchyNodeHandle.Root
+                    );
                 }
 
                 for (var i = 0; i < addedParentEntities.Length; i++)
@@ -278,7 +327,10 @@ namespace Unity.Entities.Editor
                         if (addedParentSceneTagForNullParentComponents[i].SceneEntity == Entity.Null)
                         {
                             // The sub-scene is also missing. Drop this node at the root.
-                            Hierarchy.SetParent(HierarchyNodeHandle.FromEntity(addedParentEntities[i]), HierarchyNodeHandle.Root);
+                            Hierarchy.SetParent(
+                                HierarchyNodeHandle.FromEntity(addedParentEntities[i]),
+                                HierarchyNodeHandle.Root
+                            );
                             continue;
                         }
 
@@ -287,7 +339,10 @@ namespace Unity.Entities.Editor
                         continue;
                     }
 
-                    Hierarchy.SetParent(HierarchyNodeHandle.FromEntity(addedParentEntities[i]), HierarchyNodeHandle.FromEntity(addedParentComponents[i].Value));
+                    Hierarchy.SetParent(
+                        HierarchyNodeHandle.FromEntity(addedParentEntities[i]),
+                        HierarchyNodeHandle.FromEntity(addedParentComponents[i].Value)
+                    );
                 }
             }
         }

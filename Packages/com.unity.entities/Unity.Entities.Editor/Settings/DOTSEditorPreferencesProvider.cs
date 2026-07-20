@@ -8,14 +8,10 @@ namespace Unity.Entities.Editor
         [SettingsProvider]
         public static SettingsProvider GetPreferences()
         {
-            return HasAnySettings
-                ? new DOTSEditorPreferencesProvider()
-                : null;
+            return HasAnySettings ? new DOTSEditorPreferencesProvider() : null;
         }
 
         DOTSEditorPreferencesProvider(IEnumerable<string> keywords = null)
-            : base(Constants.Settings.EditorSettingsRoot, SettingsScope.User, keywords)
-        {
-        }
+            : base(Constants.Settings.EditorSettingsRoot, SettingsScope.User, keywords) { }
     }
 }

@@ -7,6 +7,8 @@ namespace UnityEditor.TestTools.TestRunner
     internal interface IEditorLoadedTestAssemblyProvider
     {
         List<IAssemblyWrapper> GetAssembliesGroupedByType(TestPlatform mode);
-        IEnumerator<IDictionary<TestPlatform, List<IAssemblyWrapper>>> GetAssembliesGroupedByTypeAsync(TestPlatform mode);
+        IEnumerator<IDictionary<TestPlatform, List<IAssemblyWrapper>>> GetAssembliesGroupedByTypeAsync(
+            TestPlatform mode
+        );
     }
 }

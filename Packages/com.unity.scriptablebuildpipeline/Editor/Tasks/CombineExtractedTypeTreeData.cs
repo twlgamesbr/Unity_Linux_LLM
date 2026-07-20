@@ -13,7 +13,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class CombineExtractedTypeTreeData : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
+
         /// <summary>
         /// The output path for the combined TypeTree data file.
         /// </summary>
@@ -38,10 +42,15 @@ namespace UnityEditor.Build.Pipeline.Tasks
                     Directory.CreateDirectory(dir);
                 if (File.Exists(OutputPath))
                     File.Delete(OutputPath);
-                var paths = m_Results.WriteResults.Select(r => r.Value.extractedTypeTreeDataPath).Where(p => !string.IsNullOrEmpty(p)).ToArray();
+                var paths = m_Results
+                    .WriteResults.Select(r => r.Value.extractedTypeTreeDataPath)
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .ToArray();
                 Array.Sort(paths);
                 if (!ContentBuildInterface.CombineExtractedTypeTreeDataFiles(paths, OutputPath))
-                    throw new Exception($"{nameof(CombineExtractedTypeTreeData)} - failed to create TypeTree data file at path {OutputPath}.");
+                    throw new Exception(
+                        $"{nameof(CombineExtractedTypeTreeData)} - failed to create TypeTree data file at path {OutputPath}."
+                    );
             }
 #endif
             return ReturnCode.Success;

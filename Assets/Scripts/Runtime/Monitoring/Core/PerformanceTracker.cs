@@ -31,9 +31,8 @@ namespace NPCSystem.Monitoring
             _source = source ?? string.Empty;
             _category = category ?? string.Empty;
             _stopwatch = Stopwatch.StartNew();
-            _tags = initialTags != null
-                ? new Dictionary<string, object>(initialTags)
-                : new Dictionary<string, object>();
+            _tags =
+                initialTags != null ? new Dictionary<string, object>(initialTags) : new Dictionary<string, object>();
 
             TelemetryRouter.Point(requestId, source, category, "start", $"{source} started.", _tags);
         }
@@ -45,7 +44,8 @@ namespace NPCSystem.Monitoring
             string source,
             string requestId = null,
             string category = "General",
-            Dictionary<string, object> tags = null)
+            Dictionary<string, object> tags = null
+        )
         {
             return new PerformanceTracker(requestId, source, category, tags);
         }
@@ -106,8 +106,12 @@ namespace NPCSystem.Monitoring
                 _stopwatch.Stop();
 
                 TelemetryRouter.Timed(
-                    _requestId, _source, _category, status,
-                    _stopwatch.ElapsedMilliseconds, message,
+                    _requestId,
+                    _source,
+                    _category,
+                    status,
+                    _stopwatch.ElapsedMilliseconds,
+                    message,
                     new Dictionary<string, object>(_tags)
                 );
             }

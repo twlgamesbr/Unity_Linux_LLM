@@ -2,28 +2,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.Animation;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
+using NPCSystem.Network.Bridges;
+using NPCSystem.Network.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Monitoring.Datadog;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Network.Bridges;
-using NPCSystem.Character.Animation;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Dialogue.UI
 {
     [DefaultExecutionOrder(-400)]
@@ -59,13 +58,7 @@ namespace NPCSystem.Dialogue.UI
         [SerializeField, HideProperty]
         public Behaviour LegacyKnowledgeBaseController;
 
-        [FoldoutGroup(
-            "Dialogue UI",
-            true,
-            nameof(PlayerInput),
-            nameof(AiText),
-            nameof(StopButton)
-        )]
+        [FoldoutGroup("Dialogue UI", true, nameof(PlayerInput), nameof(AiText), nameof(StopButton))]
         [SerializeField]
         EditorAttributes.Void dialogueUiGroup;
 
@@ -99,9 +92,7 @@ namespace NPCSystem.Dialogue.UI
         bool HasDialogueManager => DialogueManager != null;
 
         [ShowInInspector, ReadOnly]
-        bool IsInitialized =>
-            _onDemandInitTask != null
-            && (_onDemandInitTask.IsCompletedSuccessfully || _managerBound);
+        bool IsInitialized => _onDemandInitTask != null && (_onDemandInitTask.IsCompletedSuccessfully || _managerBound);
 
         Task _onDemandInitTask;
         bool _listenersBound;
@@ -239,7 +230,8 @@ namespace NPCSystem.Dialogue.UI
         /// Finds a component of type <typeparamref name="T"/> on this object or its children,
         /// logging a warning if not found.
         /// </summary>
-        static T FindComponent<T>(Component host, string label) where T : Component
+        static T FindComponent<T>(Component host, string label)
+            where T : Component
         {
             var component = host.GetComponentInChildren<T>(includeInactive: true);
             if (component == null)
@@ -323,10 +315,7 @@ namespace NPCSystem.Dialogue.UI
 
             DatadogMetricsService.Increment(
                 "dialogue.ui.initialized",
-                tags: new[]
-                {
-                    NetworkBridge != null ? "mode:network_bridge" : "mode:direct",
-                }
+                tags: new[] { NetworkBridge != null ? "mode:network_bridge" : "mode:direct" }
             );
 
             NPCFlowLogger
@@ -452,7 +441,6 @@ namespace NPCSystem.Dialogue.UI
             DialogueDisplayHelper.SetAIText(AiText, partialResponse);
         }
 
-
         async Task SelectProfileAsync(int selection)
         {
             if (selection < 0 || selection >= _profiles.Count)
@@ -480,7 +468,6 @@ namespace NPCSystem.Dialogue.UI
             else
                 await DialogueManager.SwitchToNPCAsync(npcSlug);
         }
-
 
         void OnInputFieldSubmit(string text)
         {
@@ -552,9 +539,7 @@ namespace NPCSystem.Dialogue.UI
                 DialogueManager = GetComponent<NPCDialogueManager>();
                 if (DialogueManager == null)
                 {
-                    DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
-                        FindObjectsInactive.Include
-                    );
+                    DialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
                 }
             }
 
@@ -563,30 +548,21 @@ namespace NPCSystem.Dialogue.UI
                 NetworkBridge = GetComponent<NPCDialogueNetworkBridge>();
                 if (NetworkBridge == null)
                 {
-                    NetworkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(
-                        FindObjectsInactive.Include
-                    );
+                    NetworkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
                 }
             }
 
             if (LegacyKnowledgeBaseController == null)
             {
-                LegacyKnowledgeBaseController = FindObjectsByType<Behaviour>(
-                        FindObjectsInactive.Include
-                    )
+                LegacyKnowledgeBaseController = FindObjectsByType<Behaviour>(FindObjectsInactive.Include)
                     .FirstOrDefault(behaviour =>
-                        behaviour != null
-                        && behaviour.GetType().FullName == "LLMUnitySamples.KnowledgeBaseGame"
+                        behaviour != null && behaviour.GetType().FullName == "LLMUnitySamples.KnowledgeBaseGame"
                     );
             }
 
-            PlayerInput =
-                PlayerInput != null
-                    ? PlayerInput
-                    : FindComponent<TMP_InputField>(this, "Canvas/PlayerInput");
+            PlayerInput = PlayerInput != null ? PlayerInput : FindComponent<TMP_InputField>(this, "Canvas/PlayerInput");
             AiText = AiText != null ? AiText : FindComponent<TMP_Text>(this, "Canvas/AIImage/AIText");
-            StopButton =
-                StopButton != null ? StopButton : FindComponent<Button>(this, "Canvas/StopButton");
+            StopButton = StopButton != null ? StopButton : FindComponent<Button>(this, "Canvas/StopButton");
         }
     }
 }

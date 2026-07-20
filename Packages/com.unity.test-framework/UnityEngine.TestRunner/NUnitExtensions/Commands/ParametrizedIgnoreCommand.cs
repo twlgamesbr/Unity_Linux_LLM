@@ -1,8 +1,8 @@
 using System.Collections;
+using System.Linq;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Commands;
-using System.Linq;
 using UnityEngine.TestRunner.NUnitExtensions.Runner;
 
 namespace UnityEngine.TestTools
@@ -14,7 +14,8 @@ namespace UnityEngine.TestTools
         public object[] Arguments { get; }
         public string Reason { get; }
 
-        public ParametrizedIgnoreCommand(TestCommand command, object[] arguments, string reason = "") : base(command)
+        public ParametrizedIgnoreCommand(TestCommand command, object[] arguments, string reason = "")
+            : base(command)
         {
             m_Command = command;
             Arguments = arguments;
@@ -37,7 +38,7 @@ namespace UnityEngine.TestTools
         }
 
         public IEnumerable ExecuteEnumerable(ITestExecutionContext context)
-        { 
+        {
             if (context.CurrentTest is TestMethod testMethod)
             {
                 var isIgnored = testMethod.parms.Arguments.SequenceEqual(Arguments);
@@ -47,7 +48,7 @@ namespace UnityEngine.TestTools
                     yield break;
                 }
             }
-            
+
             if (innerCommand is IEnumerableTestMethodCommand)
             {
                 var executeEnumerable = ((IEnumerableTestMethodCommand)innerCommand).ExecuteEnumerable(context);

@@ -12,17 +12,26 @@ namespace UnityEngine.Rendering.Universal
         /// Returns the display name shown in the Light Type dropdown of the Light2D component.
         /// </summary>
         /// <returns>The GUIContent used in the Light2D Light Type dropdown.</returns>
-        public virtual GUIContent ProviderName() { return new GUIContent("Custom Light Provider", "Implemented by " + this.GetType().Name); }
+        public virtual GUIContent ProviderName()
+        {
+            return new GUIContent("Custom Light Provider", "Implemented by " + this.GetType().Name);
+        }
 
         /// <summary>
         /// Returns the mesh used to render the Light2D.
         /// </summary>
         /// <returns>The mesh used for rendering.</returns>
-        public virtual Mesh GetMesh() { return null; }
+        public virtual Mesh GetMesh()
+        {
+            return null;
+        }
 
         /// <summary>
         /// Internal entry point used by the rendering pipeline to retrieve the provider name.
         /// </summary>
-        internal override GUIContent Internal_ProviderName(string componentName) { return ProviderName(); }
+        internal override GUIContent Internal_ProviderName(string componentName)
+        {
+            return ProviderName();
+        }
     }
 }

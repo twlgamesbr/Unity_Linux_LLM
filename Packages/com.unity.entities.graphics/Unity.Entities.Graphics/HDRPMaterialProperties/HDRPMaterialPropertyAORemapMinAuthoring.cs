@@ -3,8 +3,11 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_AORemapMin"           )]
-    public struct HDRPMaterialPropertyAORemapMin : IComponentData { public float  Value; }
+    [MaterialProperty("_AORemapMin")]
+    public struct HDRPMaterialPropertyAORemapMin : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyAORemapMinAuthoring : UnityEngine.MonoBehaviour

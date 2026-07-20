@@ -10,23 +10,30 @@ namespace Unity.Entities.Editor.UIElements
 #if !UNITY_2023_3_OR_NEWER
         internal new class UxmlFactory : UxmlFactory<SearchField, UxmlTraits> { }
 #endif
-        static VisualElementTemplate s_SearchFieldTemplate = PackageResources.LoadTemplate("ActiveBuildConfiguration/search-field");
+
+        static VisualElementTemplate s_SearchFieldTemplate = PackageResources.LoadTemplate(
+            "ActiveBuildConfiguration/search-field"
+        );
 
         public SearchField()
         {
             LoadLayout();
         }
 
-        public SearchField(string label) : base(label)
+        public SearchField(string label)
+            : base(label)
         {
             LoadLayout();
         }
 
-        public SearchField(int maxLength, bool multiline, bool isPasswordField, char maskChar) : base(maxLength, multiline, isPasswordField, maskChar)
+        public SearchField(int maxLength, bool multiline, bool isPasswordField, char maskChar)
+            : base(maxLength, multiline, isPasswordField, maskChar)
         {
             LoadLayout();
         }
-        public SearchField(string label, int maxLength, bool multiline, bool isPasswordField, char maskChar) : base(label, maxLength, multiline, isPasswordField, maskChar)
+
+        public SearchField(string label, int maxLength, bool multiline, bool isPasswordField, char maskChar)
+            : base(label, maxLength, multiline, isPasswordField, maskChar)
         {
             LoadLayout();
         }

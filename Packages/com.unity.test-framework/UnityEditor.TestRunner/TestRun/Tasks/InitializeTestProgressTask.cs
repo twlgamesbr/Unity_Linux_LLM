@@ -27,8 +27,10 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                 throw new RequiredTestRunDataMissingException(nameof(testJobData.testTree));
             }
 
-            var allTests =
-                GetTestsExpectedToRun(testJobData.testTree, testJobData.executionSettings.BuildNUnitFilter());
+            var allTests = GetTestsExpectedToRun(
+                testJobData.testTree,
+                testJobData.executionSettings.BuildNUnitFilter()
+            );
             testJobData.testProgress = new TestProgress(allTests.ToArray());
             var numTasks = testJobData.Tasks.Count();
             var numTests = testJobData.testProgress.AllTestsToRun.Length;

@@ -15,8 +15,10 @@ namespace Unity.Netcode.Editor.CodeGen
         public override ILPPInterface GetInstance() => this;
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly) =>
-            compiledAssembly.Name == CodeGenHelpers.RuntimeAssemblyName ||
-            compiledAssembly.References.Any(filePath => Path.GetFileNameWithoutExtension(filePath) == CodeGenHelpers.RuntimeAssemblyName);
+            compiledAssembly.Name == CodeGenHelpers.RuntimeAssemblyName
+            || compiledAssembly.References.Any(filePath =>
+                Path.GetFileNameWithoutExtension(filePath) == CodeGenHelpers.RuntimeAssemblyName
+            );
 
         private readonly List<DiagnosticMessage> m_Diagnostics = new List<DiagnosticMessage>();
 
@@ -67,8 +69,14 @@ namespace Unity.Netcode.Editor.CodeGen
             {
                 try
                 {
-                    var structTypes = mainModule.GetTypes()
-                        .Where(t => t.Resolve().HasInterface(CodeGenHelpers.INetworkSerializeByMemcpy_FullName) && !t.Resolve().IsAbstract && !t.Resolve().HasGenericParameters && t.Resolve().IsValueType)
+                    var structTypes = mainModule
+                        .GetTypes()
+                        .Where(t =>
+                            t.Resolve().HasInterface(CodeGenHelpers.INetworkSerializeByMemcpy_FullName)
+                            && !t.Resolve().IsAbstract
+                            && !t.Resolve().HasGenericParameters
+                            && t.Resolve().IsValueType
+                        )
                         .ToList();
 
                     foreach (var type in structTypes)
@@ -80,11 +88,15 @@ namespace Unity.Netcode.Editor.CodeGen
                         {
                             if (type.HasInterface(CodeGenHelpers.INetworkSerializable_FullName))
                             {
-                                m_Diagnostics.AddError($"{nameof(INetworkSerializeByMemcpy)} types may not implement {nameof(INetworkSerializable)} - choose one or the other.");
+                                m_Diagnostics.AddError(
+                                    $"{nameof(INetworkSerializeByMemcpy)} types may not implement {nameof(INetworkSerializable)} - choose one or the other."
+                                );
                             }
                             if (!type.IsValueType)
                             {
-                                m_Diagnostics.AddError($"{nameof(INetworkSerializeByMemcpy)} types must be unmanaged types.");
+                                m_Diagnostics.AddError(
+                                    $"{nameof(INetworkSerializeByMemcpy)} types must be unmanaged types."
+                                );
                             }
                         }
                     }
@@ -109,7 +121,7 @@ namespace Unity.Netcode.Editor.CodeGen
             {
                 SymbolWriterProvider = new PortablePdbWriterProvider(),
                 SymbolStream = pdb,
-                WriteSymbols = true
+                WriteSymbols = true,
             };
 
             assemblyDefinition.Write(pe, writerParameters);

@@ -1,6 +1,6 @@
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Unity.PlatformToolkit
@@ -17,11 +17,13 @@ namespace Unity.PlatformToolkit
         private readonly ILifetimeToken m_CombinedLifetimeToken;
         private IDisposeListener m_DisposeListener;
 
-        public GenericSaveReadable(IGenericArchive archive,
+        public GenericSaveReadable(
+            IGenericArchive archive,
             string name,
             bool runInBackground = true,
             ILifetimeToken parentLifetimeToken = null,
-            IDisposeListener disposeListener = null)
+            IDisposeListener disposeListener = null
+        )
         {
             m_Name = name;
             m_Archive = archive ?? throw new ArgumentNullException(nameof(archive));

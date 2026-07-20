@@ -1,7 +1,7 @@
 using System;
+using System.Runtime.CompilerServices; // AggressiveInlining
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
-using System.Runtime.CompilerServices;  // AggressiveInlining
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -31,7 +31,7 @@ namespace UnityEngine.Rendering.Universal
 
         PostProcessData m_Resources;
 
-        int m_DitheringTextureIndex;    // 8-bit dithering
+        int m_DitheringTextureIndex; // 8-bit dithering
 
         /// <summary>
         /// Creates a new <c>PostProcessPass</c> instance.
@@ -47,26 +47,41 @@ namespace UnityEngine.Rendering.Universal
             Assertions.Assert.IsNotNull(postProcessResourceAssetData, "PostProcessData and resources cannot be null.");
             m_Resources = postProcessResourceAssetData;
 
-            m_StopNanPostProcessPass   = new StopNanPostProcessPass(m_Resources.shaders.stopNanPS);
-            m_SmaaPostProcessPass      = new SmaaPostProcessPass(m_Resources.shaders.subpixelMorphologicalAntialiasingPS, m_Resources.textures.smaaAreaTex, m_Resources.textures.smaaSearchTex);
-            m_DepthOfFieldGaussianPass = new DepthOfFieldGaussianPostProcessPass(m_Resources.shaders.gaussianDepthOfFieldPS);
-            m_DepthOfFieldBokehPass    = new DepthOfFieldBokehPostProcessPass(m_Resources.shaders.bokehDepthOfFieldPS);
-            m_UpscalerPostProcessPass  = new UpscalerPostProcessPass(m_Resources.textures.blueNoise16LTex);
+            m_StopNanPostProcessPass = new StopNanPostProcessPass(m_Resources.shaders.stopNanPS);
+            m_SmaaPostProcessPass = new SmaaPostProcessPass(
+                m_Resources.shaders.subpixelMorphologicalAntialiasingPS,
+                m_Resources.textures.smaaAreaTex,
+                m_Resources.textures.smaaSearchTex
+            );
+            m_DepthOfFieldGaussianPass = new DepthOfFieldGaussianPostProcessPass(
+                m_Resources.shaders.gaussianDepthOfFieldPS
+            );
+            m_DepthOfFieldBokehPass = new DepthOfFieldBokehPostProcessPass(m_Resources.shaders.bokehDepthOfFieldPS);
+            m_UpscalerPostProcessPass = new UpscalerPostProcessPass(m_Resources.textures.blueNoise16LTex);
 #if !ENABLE_UPSCALER_FRAMEWORK
-            m_StpPostProcessPass       = new StpPostProcessPass(m_Resources.textures.blueNoise16LTex);
+            m_StpPostProcessPass = new StpPostProcessPass(m_Resources.textures.blueNoise16LTex);
 #endif
-            m_TemporalAntiAliasingPass = new TemporalAntiAliasingPostProcessPass(m_Resources.shaders.temporalAntialiasingPS);
-            m_MotionBlurPass           = new MotionBlurPostProcessPass(m_Resources.shaders.cameraMotionBlurPS);
-            m_PaniniProjectionPass     = new PaniniProjectionPostProcessPass(m_Resources.shaders.paniniProjectionPS);
-            m_BloomPass                = new BloomPostProcessPass(m_Resources.shaders.bloomPS);
-            m_LensFlareScreenSpacePass = new LensFlareScreenSpacePostProcessPass(m_Resources.shaders.LensFlareScreenSpacePS);
-            m_LensFlareDataDrivenPass  = new LensFlareDataDrivenPostProcessPass(m_Resources.shaders.LensFlareDataDrivenPS);
-            m_UberPass                 = new UberPostProcessPass(m_Resources.shaders.uberPostPS, m_Resources.textures.filmGrainTex);
+            m_TemporalAntiAliasingPass = new TemporalAntiAliasingPostProcessPass(
+                m_Resources.shaders.temporalAntialiasingPS
+            );
+            m_MotionBlurPass = new MotionBlurPostProcessPass(m_Resources.shaders.cameraMotionBlurPS);
+            m_PaniniProjectionPass = new PaniniProjectionPostProcessPass(m_Resources.shaders.paniniProjectionPS);
+            m_BloomPass = new BloomPostProcessPass(m_Resources.shaders.bloomPS);
+            m_LensFlareScreenSpacePass = new LensFlareScreenSpacePostProcessPass(
+                m_Resources.shaders.LensFlareScreenSpacePS
+            );
+            m_LensFlareDataDrivenPass = new LensFlareDataDrivenPostProcessPass(
+                m_Resources.shaders.LensFlareDataDrivenPS
+            );
+            m_UberPass = new UberPostProcessPass(m_Resources.shaders.uberPostPS, m_Resources.textures.filmGrainTex);
 
             // Final post processing.
             m_ScalingSetupFinalPostProcessPass = new ScalingSetupPostProcessPass(m_Resources.shaders.scalingSetupPS);
             m_Fsr1UpscaleFinalPostProcessPass = new Fsr1UpscalePostProcessPass(m_Resources.shaders.easuPS);
-            m_FinalPostProcessPass             = new FinalPostProcessPass(m_Resources.shaders.finalPostPassPS, m_Resources.textures.filmGrainTex);
+            m_FinalPostProcessPass = new FinalPostProcessPass(
+                m_Resources.shaders.finalPostPassPS,
+                m_Resources.textures.filmGrainTex
+            );
         }
 
         /// <summary>
@@ -99,7 +114,10 @@ namespace UnityEngine.Rendering.Universal
         // We need to do the conversion manually on those
         // Also if HDR output is active
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static bool RequireSRGBConversionBlitToBackBuffer(UniversalCameraData cameraData, bool enableColorEncodingIfNeeded)
+        static bool RequireSRGBConversionBlitToBackBuffer(
+            UniversalCameraData cameraData,
+            bool enableColorEncodingIfNeeded
+        )
         {
             return cameraData.requireSrgbConversion && enableColorEncodingIfNeeded;
         }
@@ -122,16 +140,30 @@ namespace UnityEngine.Rendering.Universal
             return m_Resources.textures.blueNoise16LTex[GetNextDitherIndex()];
         }
 
-        static void UpdateGlobalDebugHandlerPass(RenderGraph renderGraph, UniversalCameraData cameraData, bool isFinalPass)
+        static void UpdateGlobalDebugHandlerPass(
+            RenderGraph renderGraph,
+            UniversalCameraData cameraData,
+            bool isFinalPass
+        )
         {
             // NOTE: Debug handling injects a global state render pass.
             DebugHandler debugHandler = ScriptableRenderPass.GetActiveDebugHandler(cameraData);
-            bool resolveToDebugScreen = debugHandler != null && debugHandler.WriteToDebugScreenTexture(cameraData.resolveFinalTarget);
-            debugHandler?.UpdateShaderGlobalPropertiesForFinalValidationPass(renderGraph, cameraData, isFinalPass && !resolveToDebugScreen);
+            bool resolveToDebugScreen =
+                debugHandler != null && debugHandler.WriteToDebugScreenTexture(cameraData.resolveFinalTarget);
+            debugHandler?.UpdateShaderGlobalPropertiesForFinalValidationPass(
+                renderGraph,
+                cameraData,
+                isFinalPass && !resolveToDebugScreen
+            );
         }
 
         // If hasFinalPass == true, Film Grain and Dithering are setup in the final pass, otherwise they are setup in this pass.
-        public void RenderPostProcessing(RenderGraph renderGraph, ContextContainer frameData, bool hasFinalPass, bool enableColorEncodingIfNeeded)
+        public void RenderPostProcessing(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            bool hasFinalPass,
+            bool enableColorEncodingIfNeeded
+        )
         {
             var resourceData = frameData.Get<UniversalResourceData>();
             var cameraData = frameData.Get<UniversalCameraData>();
@@ -159,7 +191,8 @@ namespace UnityEngine.Rendering.Universal
             // Temporal Anti Aliasing / Upscaling
 #if ENABLE_UPSCALER_FRAMEWORK
             UniversalPostProcessingData postProcessingData = frameData.Get<UniversalPostProcessingData>();
-            bool temporalUpscalerActive = postProcessingData.activeUpscaler != null && postProcessingData.activeUpscaler.isTemporal;
+            bool temporalUpscalerActive =
+                postProcessingData.activeUpscaler != null && postProcessingData.activeUpscaler.isTemporal;
             if (temporalUpscalerActive)
                 m_UpscalerPostProcessPass.RecordRenderGraph(renderGraph, frameData);
 #else
@@ -178,7 +211,7 @@ namespace UnityEngine.Rendering.Universal
 
                 // NOTE: Even if bloom is not active we might need to run it for the texture if the lensFlareScreenSpace pass is active.
                 if (!bloom.IsActive() && LensFlareScreenSpacePostProcessPass.IsActive(volumeStack, frameData))
-                    bloom.intensity = lensFlareScreenSpace.intensity;   // Set Bloom Active to true.
+                    bloom.intensity = lensFlareScreenSpace.intensity; // Set Bloom Active to true.
 
                 m_BloomPass.RecordRenderGraph(renderGraph, frameData);
 
@@ -211,7 +244,10 @@ namespace UnityEngine.Rendering.Universal
             {
                 // Color space conversion is already applied through color grading, do encoding if uber post is the last pass
                 // Otherwise encoding will happen in the final post process pass or the final blit pass
-                hdrOperations = !hasFinalPass && enableColorEncodingIfNeeded ? HDROutputUtils.Operation.ColorEncoding : HDROutputUtils.Operation.None;
+                hdrOperations =
+                    !hasFinalPass && enableColorEncodingIfNeeded
+                        ? HDROutputUtils.Operation.ColorEncoding
+                        : HDROutputUtils.Operation.None;
             }
 
             UberPostProcessPass.FilteringOperation filteringOperation = UberPostProcessPass.FilteringOperation.Linear;
@@ -233,12 +269,23 @@ namespace UnityEngine.Rendering.Universal
             }
 
             bool renderOverlayUI = requireHDROutput && enableColorEncodingIfNeeded;
-            m_UberPass.Setup(ditherTexture, filteringOperation, hdrOperations, applySrgbEncoding, !hasFinalPass, renderOverlayUI);
+            m_UberPass.Setup(
+                ditherTexture,
+                filteringOperation,
+                hdrOperations,
+                applySrgbEncoding,
+                !hasFinalPass,
+                renderOverlayUI
+            );
             m_UberPass.RecordRenderGraph(renderGraph, frameData);
         }
 
         #region FinalPass
-        public void RenderFinalPostProcessing(RenderGraph renderGraph, ContextContainer frameData, bool enableColorEncodingIfNeeded)
+        public void RenderFinalPostProcessing(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            bool enableColorEncodingIfNeeded
+        )
         {
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalPostProcessingData postProcessingData = frameData.Get<UniversalPostProcessingData>();
@@ -254,7 +301,9 @@ namespace UnityEngine.Rendering.Universal
             if (requireHDROutput)
             {
                 // Final post process pass always does color encoding
-                hdrOperations = enableColorEncodingIfNeeded ? HDROutputUtils.Operation.ColorEncoding : HDROutputUtils.Operation.None;
+                hdrOperations = enableColorEncodingIfNeeded
+                    ? HDROutputUtils.Operation.ColorEncoding
+                    : HDROutputUtils.Operation.None;
                 // If the color space conversion wasn't applied by the uber pass, do it here
                 if (!cameraData.postProcessEnabled)
                     hdrOperations |= HDROutputUtils.Operation.ColorConversion;
@@ -264,19 +313,21 @@ namespace UnityEngine.Rendering.Universal
 
             bool isFsr1Enabled = PostProcessUtils.IsFsrEnabled(cameraData);
 #if ENABLE_UPSCALER_FRAMEWORK
-            bool upscalerSupportsSharpening = postProcessingData.activeUpscaler != null && postProcessingData.activeUpscaler.supportsSharpening;
+            bool upscalerSupportsSharpening =
+                postProcessingData.activeUpscaler != null && postProcessingData.activeUpscaler.supportsSharpening;
 #endif
 
             // Reuse RCAS pass as an optional standalone post sharpening pass for TAA.
             // This avoids the cost of EASU and is available for other upscaling options.
             // If FSR is enabled then FSR settings override the TAA settings and we perform RCAS only once.
             // If STP is enabled, then TAA sharpening has already been performed inside STP.
-            bool isTaaSharpeningEnabled = (cameraData.IsTemporalAAEnabled() && cameraData.taaSettings.contrastAdaptiveSharpening > 0.0f)
+            bool isTaaSharpeningEnabled =
+                (cameraData.IsTemporalAAEnabled() && cameraData.taaSettings.contrastAdaptiveSharpening > 0.0f)
 #if ENABLE_UPSCALER_FRAMEWORK
                 // TODO-Volkan: update the comment above w.r.t Upscaling framework support (upscalers with sharpening / avoiding double sharpen).
                 && !upscalerSupportsSharpening;
 #else
-                && !isFsr1Enabled 
+                && !isFsr1Enabled
                 && !cameraData.IsSTPEnabled();
 #endif
 
@@ -320,7 +371,8 @@ namespace UnityEngine.Rendering.Universal
                     case ImageScalingMode.Upscaling:
                     {
 #if ENABLE_UPSCALER_FRAMEWORK
-                        bool spatialUpscalerActive = postProcessingData.activeUpscaler != null && !postProcessingData.activeUpscaler.isTemporal;
+                        bool spatialUpscalerActive =
+                            postProcessingData.activeUpscaler != null && !postProcessingData.activeUpscaler.isTemporal;
                         if (cameraData.resolvedUpscalerHash == UniversalRenderPipeline.k_UpscalerHash_Point)
                         {
                             // TAA post sharpening is an RCAS pass, avoid overriding it with point sampling.
@@ -384,9 +436,16 @@ namespace UnityEngine.Rendering.Universal
             var ditherTexture = cameraData.isDitheringEnabled ? GetNextDitherTexture() : null;
             bool applySrgbEncoding = RequireSRGBConversionBlitToBackBuffer(cameraData, enableColorEncodingIfNeeded);
             bool renderOverlayUI = requireHDROutput && enableColorEncodingIfNeeded && cameraData.rendersOverlayUI;
-            m_FinalPostProcessPass.Setup(ditherTexture, filteringOperation, hdrOperations, applySrgbEncoding, applyFxaa, renderOverlayUI);
+            m_FinalPostProcessPass.Setup(
+                ditherTexture,
+                filteringOperation,
+                hdrOperations,
+                applySrgbEncoding,
+                applyFxaa,
+                renderOverlayUI
+            );
             m_FinalPostProcessPass.RecordRenderGraph(renderGraph, frameData);
         }
-#endregion
+        #endregion
     }
 }

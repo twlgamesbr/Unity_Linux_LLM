@@ -268,7 +268,7 @@ namespace UnityEditor.Rendering
         /// <param name="provider">The provider of items for the filter window.</param>
         /// <returns>Returns true if the window is shown, false otherwise.</returns>
         public static bool Show(Vector2 position, IProvider provider) =>
-            Show(new Rect( position.x - DefaultWidth / 2f, position.y - 18f - 17f, DefaultWidth, 17f), provider);
+            Show(new Rect(position.x - DefaultWidth / 2f, position.y - 18f - 17f, DefaultWidth, 17f), provider);
 
         /// <summary>
         /// Shows the filter window using the given provider.

@@ -36,7 +36,7 @@ namespace Unity.Physics
         {
             BelongsTo = 0xffffffff,
             CollidesWith = 0xffffffff,
-            GroupIndex = 0
+            GroupIndex = 0,
         };
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Unity.Physics
         {
             BelongsTo = 0,
             CollidesWith = 0,
-            GroupIndex = 0
+            GroupIndex = 0,
         };
 
         /// <summary>   Return true if the given pair of filters want to collide with each other. </summary>
@@ -66,9 +66,7 @@ namespace Unity.Physics
             {
                 return false;
             }
-            return
-                (filterA.BelongsTo & filterB.CollidesWith) != 0 &&
-                (filterB.BelongsTo & filterA.CollidesWith) != 0;
+            return (filterA.BelongsTo & filterB.CollidesWith) != 0 && (filterB.BelongsTo & filterA.CollidesWith) != 0;
         }
 
         /// <summary>   Return a union of two filters. </summary>
@@ -84,7 +82,7 @@ namespace Unity.Physics
             {
                 BelongsTo = filterA.BelongsTo | filterB.BelongsTo,
                 CollidesWith = filterA.CollidesWith | filterB.CollidesWith,
-                GroupIndex = (filterA.GroupIndex == filterB.GroupIndex) ? filterA.GroupIndex : 0
+                GroupIndex = (filterA.GroupIndex == filterB.GroupIndex) ? filterA.GroupIndex : 0,
             };
         }
 
@@ -93,11 +91,7 @@ namespace Unity.Physics
         /// <returns>   A hash code for this object. </returns>
         public override int GetHashCode()
         {
-            return unchecked((int)math.hash(new uint3(
-                BelongsTo,
-                CollidesWith,
-                unchecked((uint)GroupIndex)
-            )));
+            return unchecked((int)math.hash(new uint3(BelongsTo, CollidesWith, unchecked((uint)GroupIndex))));
         }
 
         /// <summary>   Tests if this CollisionFilter is considered equal to another. </summary>

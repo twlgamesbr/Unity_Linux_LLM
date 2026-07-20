@@ -56,13 +56,23 @@ namespace UnityEngine.Rendering
         public ComputeShader punctualLightSamplingComputeShader
         {
             get => m_PunctualLightSamplingComputeShader;
-            set => this.SetValueAndNotify(ref m_PunctualLightSamplingComputeShader, value, nameof(m_PunctualLightSamplingComputeShader));
+            set =>
+                this.SetValueAndNotify(
+                    ref m_PunctualLightSamplingComputeShader,
+                    value,
+                    nameof(m_PunctualLightSamplingComputeShader)
+                );
         }
 
         public RayTracingShader punctualLightSamplingRayTracingShader
         {
             get => m_PunctualLightSamplingRayTracingShader;
-            set => this.SetValueAndNotify(ref m_PunctualLightSamplingRayTracingShader, value, nameof(m_PunctualLightSamplingRayTracingShader));
+            set =>
+                this.SetValueAndNotify(
+                    ref m_PunctualLightSamplingRayTracingShader,
+                    value,
+                    nameof(m_PunctualLightSamplingRayTracingShader)
+                );
         }
 
         public ComputeShader estimationComputeShader
@@ -74,7 +84,8 @@ namespace UnityEngine.Rendering
         public RayTracingShader estimationRayTracingShader
         {
             get => m_EstimationRayTracingShader;
-            set => this.SetValueAndNotify(ref m_EstimationRayTracingShader, value, nameof(m_EstimationRayTracingShader));
+            set =>
+                this.SetValueAndNotify(ref m_EstimationRayTracingShader, value, nameof(m_EstimationRayTracingShader));
         }
 
         public ComputeShader defragShader

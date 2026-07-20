@@ -28,10 +28,17 @@ namespace Unity.PlatformToolkit.Editor
                 return default;
             }
 
-            return new BindingResult(BindingStatus.Failure, $"Failed to set null value for path '{sourcePath.ToString()}' {returnCode}");
+            return new BindingResult(
+                BindingStatus.Failure,
+                $"Failed to set null value for path '{sourcePath.ToString()}' {returnCode}"
+            );
         }
 
-        private bool ProcessNullValue<TContainer>(ref TContainer container, in PropertyPath path, out VisitReturnCode returnCode)
+        private bool ProcessNullValue<TContainer>(
+            ref TContainer container,
+            in PropertyPath path,
+            out VisitReturnCode returnCode
+        )
         {
             if (path.IsEmpty)
             {
@@ -59,7 +66,11 @@ namespace Unity.PlatformToolkit.Editor
 
         private class DefaultValuePathVisitor : PathVisitor
         {
-            protected override void VisitPath<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value)
+            protected override void VisitPath<TContainer, TValue>(
+                Property<TContainer, TValue> property,
+                ref TContainer container,
+                ref TValue value
+            )
             {
                 property.SetValue(ref container, default);
             }

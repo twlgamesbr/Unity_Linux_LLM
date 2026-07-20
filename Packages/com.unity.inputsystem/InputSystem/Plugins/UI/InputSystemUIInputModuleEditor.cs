@@ -16,18 +16,26 @@ namespace UnityEngine.InputSystem.UI.Editor
         static InputSystemUIInputModuleEditor()
         {
 #if UNITY_6000_0_OR_NEWER && ENABLE_INPUT_SYSTEM
-            InputModuleComponentFactory.SetInputModuleComponentOverride(
-                go => ObjectFactory.AddComponent<InputSystemUIInputModule>(go));
+            InputModuleComponentFactory.SetInputModuleComponentOverride(go =>
+                ObjectFactory.AddComponent<InputSystemUIInputModule>(go)
+            );
 #endif
         }
 
-        private static InputActionReference GetActionReferenceFromAssets(InputActionReference[] actions, params string[] actionNames)
+        private static InputActionReference GetActionReferenceFromAssets(
+            InputActionReference[] actions,
+            params string[] actionNames
+        )
         {
             foreach (var actionName in actionNames)
             {
                 foreach (var action in actions)
                 {
-                    if (action.action != null && string.Compare(action.action.name, actionName, StringComparison.InvariantCultureIgnoreCase) == 0)
+                    if (
+                        action.action != null
+                        && string.Compare(action.action.name, actionName, StringComparison.InvariantCultureIgnoreCase)
+                            == 0
+                    )
                         return action;
                 }
             }
@@ -41,7 +49,8 @@ namespace UnityEngine.InputSystem.UI.Editor
 
             var path = AssetDatabase.GetAssetPath(actions);
             var assets = AssetDatabase.LoadAllAssetsAtPath(path);
-            return assets.Where(asset => asset is InputActionReference)
+            return assets
+                .Where(asset => asset is InputActionReference)
                 .Cast<InputActionReference>()
                 .OrderBy(x => x.name)
                 .ToArray();
@@ -58,7 +67,7 @@ namespace UnityEngine.InputSystem.UI.Editor
             "Submit",
             "Cancel",
             "TrackedDevicePosition",
-            "TrackedDeviceOrientation"
+            "TrackedDeviceOrientation",
         };
 
         private static readonly string[] s_ActionNiceNames =
@@ -72,7 +81,7 @@ namespace UnityEngine.InputSystem.UI.Editor
             "Submit",
             "Cancel",
             "Tracked Position",
-            "Tracked Orientation"
+            "Tracked Orientation",
         };
 
         private SerializedProperty[] m_ReferenceProperties;
@@ -95,9 +104,17 @@ namespace UnityEngine.InputSystem.UI.Editor
                 m_ReferenceProperties[i] = serializedObject.FindProperty($"m_{s_ActionNames[i]}Action");
 
             m_ActionsAsset = serializedObject.FindProperty("m_ActionsAsset");
-            m_AvailableActionReferencesInAssetDatabase = GetAllAssetReferencesFromAssetDatabase(m_ActionsAsset.objectReferenceValue as InputActionAsset);
+            m_AvailableActionReferencesInAssetDatabase = GetAllAssetReferencesFromAssetDatabase(
+                m_ActionsAsset.objectReferenceValue as InputActionAsset
+            );
             m_AvailableActionsInAssetNames = new[] { "None" }
-                .Concat(m_AvailableActionReferencesInAssetDatabase?.Select(x => MakeActionReferenceNameUsableInGenericMenu(x.name)) ?? new string[0]).ToArray();
+                .Concat(
+                    m_AvailableActionReferencesInAssetDatabase?.Select(x =>
+                        MakeActionReferenceNameUsableInGenericMenu(x.name)
+                    )
+                        ?? new string[0]
+                )
+                .ToArray();
         }
 
         public void OnDisable()
@@ -111,16 +128,65 @@ namespace UnityEngine.InputSystem.UI.Editor
             var assets = GetAllAssetReferencesFromAssetDatabase(action);
             if (assets != null)
             {
-                module.point = GetActionReferenceFromAssets(assets, module.point?.action?.name, "Point", "MousePosition", "Mouse Position");
-                module.leftClick = GetActionReferenceFromAssets(assets, module.leftClick?.action?.name, "Click", "LeftClick", "Left Click");
-                module.rightClick = GetActionReferenceFromAssets(assets, module.rightClick?.action?.name, "RightClick", "Right Click", "ContextClick", "Context Click", "ContextMenu", "Context Menu");
-                module.middleClick = GetActionReferenceFromAssets(assets, module.middleClick?.action?.name, "MiddleClick", "Middle Click");
-                module.scrollWheel = GetActionReferenceFromAssets(assets, module.scrollWheel?.action?.name, "ScrollWheel", "Scroll Wheel", "Scroll", "Wheel");
+                module.point = GetActionReferenceFromAssets(
+                    assets,
+                    module.point?.action?.name,
+                    "Point",
+                    "MousePosition",
+                    "Mouse Position"
+                );
+                module.leftClick = GetActionReferenceFromAssets(
+                    assets,
+                    module.leftClick?.action?.name,
+                    "Click",
+                    "LeftClick",
+                    "Left Click"
+                );
+                module.rightClick = GetActionReferenceFromAssets(
+                    assets,
+                    module.rightClick?.action?.name,
+                    "RightClick",
+                    "Right Click",
+                    "ContextClick",
+                    "Context Click",
+                    "ContextMenu",
+                    "Context Menu"
+                );
+                module.middleClick = GetActionReferenceFromAssets(
+                    assets,
+                    module.middleClick?.action?.name,
+                    "MiddleClick",
+                    "Middle Click"
+                );
+                module.scrollWheel = GetActionReferenceFromAssets(
+                    assets,
+                    module.scrollWheel?.action?.name,
+                    "ScrollWheel",
+                    "Scroll Wheel",
+                    "Scroll",
+                    "Wheel"
+                );
                 module.move = GetActionReferenceFromAssets(assets, module.move?.action?.name, "Navigate", "Move");
                 module.submit = GetActionReferenceFromAssets(assets, module.submit?.action?.name, "Submit");
-                module.cancel = GetActionReferenceFromAssets(assets, module.cancel?.action?.name, "Cancel", "Esc", "Escape");
-                module.trackedDevicePosition = GetActionReferenceFromAssets(assets, module.trackedDevicePosition?.action?.name, "TrackedDevicePosition", "Position");
-                module.trackedDeviceOrientation = GetActionReferenceFromAssets(assets, module.trackedDeviceOrientation?.action?.name, "TrackedDeviceOrientation", "Orientation");
+                module.cancel = GetActionReferenceFromAssets(
+                    assets,
+                    module.cancel?.action?.name,
+                    "Cancel",
+                    "Esc",
+                    "Escape"
+                );
+                module.trackedDevicePosition = GetActionReferenceFromAssets(
+                    assets,
+                    module.trackedDevicePosition?.action?.name,
+                    "TrackedDevicePosition",
+                    "Position"
+                );
+                module.trackedDeviceOrientation = GetActionReferenceFromAssets(
+                    assets,
+                    module.trackedDeviceOrientation?.action?.name,
+                    "TrackedDeviceOrientation",
+                    "Orientation"
+                );
             }
         }
 
@@ -147,7 +213,13 @@ namespace UnityEngine.InputSystem.UI.Editor
             }
 
             var numActions = s_ActionNames.Length;
-            if ((m_AvailableActionReferencesInAssetDatabase != null && m_AvailableActionReferencesInAssetDatabase.Length > 0) || m_ActionsAsset.objectReferenceValue == null)
+            if (
+                (
+                    m_AvailableActionReferencesInAssetDatabase != null
+                    && m_AvailableActionReferencesInAssetDatabase.Length > 0
+                )
+                || m_ActionsAsset.objectReferenceValue == null
+            )
             {
                 for (var i = 0; i < numActions; i++)
                 {
@@ -156,7 +228,8 @@ namespace UnityEngine.InputSystem.UI.Editor
                     // two InputActionReference objects here because in ReassignActions above, we create new instances
                     // every time it runs.
                     var index = IndexOfInputActionInAsset(
-                        ((InputActionReference)m_ReferenceProperties[i]?.objectReferenceValue)?.action);
+                        ((InputActionReference)m_ReferenceProperties[i]?.objectReferenceValue)?.action
+                    );
 
                     EditorGUI.BeginChangeCheck();
                     index = EditorGUILayout.Popup(s_ActionNiceNames[i], index, m_AvailableActionsInAssetNames);
@@ -169,28 +242,37 @@ namespace UnityEngine.InputSystem.UI.Editor
             else
             {
                 // Somehow we have an asset but no asset references from the database, pull out references manually and show them in read only UI
-                EditorGUILayout.HelpBox("Showing fields as read-only because current action asset seems to be created by a script and assigned programmatically.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "Showing fields as read-only because current action asset seems to be created by a script and assigned programmatically.",
+                    MessageType.Info
+                );
 
                 EditorGUI.BeginDisabledGroup(true);
                 for (var i = 0; i < numActions; i++)
                 {
                     var retrievedName = "None";
-                    if (m_ReferenceProperties[i].objectReferenceValue != null &&
-                        (m_ReferenceProperties[i].objectReferenceValue is InputActionReference reference))
+                    if (
+                        m_ReferenceProperties[i].objectReferenceValue != null
+                        && (m_ReferenceProperties[i].objectReferenceValue is InputActionReference reference)
+                    )
                         retrievedName = MakeActionReferenceNameUsableInGenericMenu(reference.ToDisplayName());
 
-                    EditorGUILayout.Popup(s_ActionNiceNames[i], 0, new[] {retrievedName});
+                    EditorGUILayout.Popup(s_ActionNiceNames[i], 0, new[] { retrievedName });
                 }
                 EditorGUI.EndDisabledGroup();
             }
 
             m_AdvancedFoldoutState = EditorGUILayout.Foldout(m_AdvancedFoldoutState, new GUIContent("Advanced"), true);
             if (m_AdvancedFoldoutState)
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_CursorLockBehavior"),
-                    EditorGUIUtility.TrTextContent("Cursor Lock Behavior",
-                        $"Controls the origin point of UI raycasts when the cursor is locked. {InputSystemUIInputModule.CursorLockBehavior.OutsideScreen} " +
-                        $"is the default behavior and will force the raycast to miss all objects. {InputSystemUIInputModule.CursorLockBehavior.ScreenCenter} " +
-                        $"will cast the ray from the center of the screen."));
+                EditorGUILayout.PropertyField(
+                    serializedObject.FindProperty("m_CursorLockBehavior"),
+                    EditorGUIUtility.TrTextContent(
+                        "Cursor Lock Behavior",
+                        $"Controls the origin point of UI raycasts when the cursor is locked. {InputSystemUIInputModule.CursorLockBehavior.OutsideScreen} "
+                            + $"is the default behavior and will force the raycast to miss all objects. {InputSystemUIInputModule.CursorLockBehavior.ScreenCenter} "
+                            + $"will cast the ray from the center of the screen."
+                    )
+                );
 
             if (GUI.changed)
                 serializedObject.ApplyModifiedProperties();
@@ -207,8 +289,10 @@ namespace UnityEngine.InputSystem.UI.Editor
             var index = 0;
             for (var j = 0; j < m_AvailableActionReferencesInAssetDatabase.Length; j++)
             {
-                if (m_AvailableActionReferencesInAssetDatabase[j].action != null &&
-                    m_AvailableActionReferencesInAssetDatabase[j].action == inputAction)
+                if (
+                    m_AvailableActionReferencesInAssetDatabase[j].action != null
+                    && m_AvailableActionReferencesInAssetDatabase[j].action == inputAction
+                )
                 {
                     index = j + 1;
                     break;

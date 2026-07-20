@@ -17,15 +17,14 @@ namespace UnityEngine.UI
         /// <summary>
         /// Function definition for a button click event.
         /// </summary>
-        public class ButtonClickedEvent : UnityEvent {}
+        public class ButtonClickedEvent : UnityEvent { }
 
         // Event delegates triggered on click.
         [FormerlySerializedAs("onClick")]
         [SerializeField]
         private ButtonClickedEvent m_OnClick = new ButtonClickedEvent();
 
-        protected Button()
-        {}
+        protected Button() { }
 
         /// <summary>
         /// UnityEvent that is triggered when the button is pressed.
@@ -106,7 +105,6 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-
         public virtual void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button != PointerEventData.InputButton.Left)
@@ -145,7 +143,6 @@ namespace UnityEngine.UI
         ///
         /// 5. Expand the new section and name it the same as the name you inserted in the Submit Button field in the EventSystem. Set the Positive Button field to the key you want (e.g. space)
         /// </remarks>
-
         public virtual void OnSubmit(BaseEventData eventData)
         {
             Press();

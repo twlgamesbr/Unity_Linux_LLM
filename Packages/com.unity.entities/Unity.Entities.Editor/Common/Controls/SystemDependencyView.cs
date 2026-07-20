@@ -11,10 +11,14 @@ namespace Unity.Entities.Editor
         {
             Resources.Templates.SystemDependencyView.Clone(this);
             m_SystemName = this.Q<Label>(className: UssClasses.SystemDependencyView.Name);
-            this.Q(className: UssClasses.SystemDependencyView.GotoButtonContainer).RegisterCallback<MouseDownEvent, SystemDependencyView>((evt, @this) =>
-            {
-                SystemScheduleWindow.HighlightSystem(@this.m_Data.SystemProxy);
-            }, this);
+            this.Q(className: UssClasses.SystemDependencyView.GotoButtonContainer)
+                .RegisterCallback<MouseDownEvent, SystemDependencyView>(
+                    (evt, @this) =>
+                    {
+                        SystemScheduleWindow.HighlightSystem(@this.m_Data.SystemProxy);
+                    },
+                    this
+                );
 
             Update(data);
         }

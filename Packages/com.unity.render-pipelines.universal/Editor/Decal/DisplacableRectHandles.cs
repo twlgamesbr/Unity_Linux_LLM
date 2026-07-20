@@ -9,7 +9,14 @@ namespace UnityEditor.Rendering.Universal
     {
         const float k_HandleSizeCoef = 0.05f;
 
-        enum NamedEdge { Right, Top, Left, Bottom, None }
+        enum NamedEdge
+        {
+            Right,
+            Top,
+            Left,
+            Bottom,
+            None,
+        }
 
         int[] m_ControlIDs = new int[4] { 0, 0, 0, 0 };
         Color m_MonochromeHandleColor;
@@ -25,25 +32,38 @@ namespace UnityEditor.Rendering.Universal
         //Note: Handles.Slider not allow to use a specific ControlID.
         //Thus Slider1D is used (with reflection)
         static Type k_Slider1D = Type.GetType("UnityEditorInternal.Slider1D, UnityEditor");
-        static MethodInfo k_Slider1D_Do = k_Slider1D
-            .GetMethod(
+        static MethodInfo k_Slider1D_Do = k_Slider1D.GetMethod(
             "Do",
             BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
             null,
             CallingConventions.Any,
-            new[] { typeof(int), typeof(Vector3), typeof(Vector3), typeof(float), typeof(Handles.CapFunction), typeof(float) },
-            null);
+            new[]
+            {
+                typeof(int),
+                typeof(Vector3),
+                typeof(Vector3),
+                typeof(float),
+                typeof(Handles.CapFunction),
+                typeof(float),
+            },
+            null
+        );
+
         static void Slider1D(int controlID, ref Vector3 handlePosition, Vector3 handleOrientation, float snapScale)
         {
-            handlePosition = (Vector3)k_Slider1D_Do.Invoke(null, new object[]
-            {
-                controlID,
-                handlePosition,
-                handleOrientation,
-                HandleUtility.GetHandleSize(handlePosition) * k_HandleSizeCoef,
-                new Handles.CapFunction(Handles.DotHandleCap),
-                snapScale
-            });
+            handlePosition = (Vector3)
+                k_Slider1D_Do.Invoke(
+                    null,
+                    new object[]
+                    {
+                        controlID,
+                        handlePosition,
+                        handleOrientation,
+                        HandleUtility.GetHandleSize(handlePosition) * k_HandleSizeCoef,
+                        new Handles.CapFunction(Handles.DotHandleCap),
+                        snapScale,
+                    }
+                );
         }
 
         /// <summary>The baseColor used to draw the rect.</summary>
@@ -72,14 +92,18 @@ namespace UnityEditor.Rendering.Universal
                 start,
                 start + size * Vector2.right,
                 start + size,
-                start + size * Vector2.up
+                start + size * Vector2.up,
             };
             Vector3[] edges = new Vector3[]
             {
-                positions[0], positions[1],
-                positions[1], positions[2],
-                positions[2], positions[3],
-                positions[3], positions[0],
+                positions[0],
+                positions[1],
+                positions[1],
+                positions[2],
+                positions[2],
+                positions[3],
+                positions[3],
+                positions[0],
             };
 
             void Draw()
@@ -106,7 +130,12 @@ namespace UnityEditor.Rendering.Universal
             Handles.color = previousColor;
         }
 
-        NamedEdge DrawSliders(ref Vector3 leftPosition, ref Vector3 rightPosition, ref Vector3 topPosition, ref Vector3 bottomPosition)
+        NamedEdge DrawSliders(
+            ref Vector3 leftPosition,
+            ref Vector3 rightPosition,
+            ref Vector3 topPosition,
+            ref Vector3 bottomPosition
+        )
         {
             NamedEdge theChangedEdge = NamedEdge.None;
 
@@ -118,7 +147,12 @@ namespace UnityEditor.Rendering.Universal
                     theChangedEdge = NamedEdge.Left;
 
                 EditorGUI.BeginChangeCheck();
-                Slider1D(m_ControlIDs[(int)NamedEdge.Right], ref rightPosition, Vector3.right, EditorSnapSettings.scale);
+                Slider1D(
+                    m_ControlIDs[(int)NamedEdge.Right],
+                    ref rightPosition,
+                    Vector3.right,
+                    EditorSnapSettings.scale
+                );
                 if (EditorGUI.EndChangeCheck())
                     theChangedEdge = NamedEdge.Right;
 
@@ -128,7 +162,12 @@ namespace UnityEditor.Rendering.Universal
                     theChangedEdge = NamedEdge.Top;
 
                 EditorGUI.BeginChangeCheck();
-                Slider1D(m_ControlIDs[(int)NamedEdge.Bottom], ref bottomPosition, Vector3.down, EditorSnapSettings.scale);
+                Slider1D(
+                    m_ControlIDs[(int)NamedEdge.Bottom],
+                    ref bottomPosition,
+                    Vector3.down,
+                    EditorSnapSettings.scale
+                );
                 if (EditorGUI.EndChangeCheck())
                     theChangedEdge = NamedEdge.Bottom;
             }
@@ -136,7 +175,13 @@ namespace UnityEditor.Rendering.Universal
             return theChangedEdge;
         }
 
-        void EnsureEdgeFacesOutsideForHomothety(NamedEdge theChangedEdge, ref Vector3 leftPosition, ref Vector3 rightPosition, ref Vector3 topPosition, ref Vector3 bottomPosition)
+        void EnsureEdgeFacesOutsideForHomothety(
+            NamedEdge theChangedEdge,
+            ref Vector3 leftPosition,
+            ref Vector3 rightPosition,
+            ref Vector3 topPosition,
+            ref Vector3 bottomPosition
+        )
         {
             switch (theChangedEdge)
             {
@@ -167,7 +212,13 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        void EnsureEdgeFacesOutsideForSymetry(NamedEdge theChangedEdge, ref Vector3 leftPosition, ref Vector3 rightPosition, ref Vector3 topPosition, ref Vector3 bottomPosition)
+        void EnsureEdgeFacesOutsideForSymetry(
+            NamedEdge theChangedEdge,
+            ref Vector3 leftPosition,
+            ref Vector3 rightPosition,
+            ref Vector3 topPosition,
+            ref Vector3 bottomPosition
+        )
         {
             switch (theChangedEdge)
             {
@@ -208,7 +259,10 @@ namespace UnityEditor.Rendering.Universal
             // Note: snapping is handled natively on ctrl for each Slider1D
 
             for (int i = 0, count = m_ControlIDs.Length; i < count; ++i)
-                m_ControlIDs[i] = GUIUtility.GetControlID("DisplacableRectHandles".GetHashCode() + i, FocusType.Passive);
+                m_ControlIDs[i] = GUIUtility.GetControlID(
+                    "DisplacableRectHandles".GetHashCode() + i,
+                    FocusType.Passive
+                );
 
             Vector3 leftPosition = center + size.x * .5f * Vector2.left;
             Vector3 rightPosition = center + size.x * .5f * Vector2.right;
@@ -224,10 +278,18 @@ namespace UnityEditor.Rendering.Universal
                 float delta = 0f;
                 switch (theChangedEdge)
                 {
-                    case NamedEdge.Left: delta = ((Vector2)leftPosition - center - size.x * .5f * Vector2.left).x; break;
-                    case NamedEdge.Right: delta = -((Vector2)rightPosition - center - size.x * .5f * Vector2.right).x; break;
-                    case NamedEdge.Top: delta = -((Vector2)topPosition - center - size.y * .5f * Vector2.up).y; break;
-                    case NamedEdge.Bottom: delta = ((Vector2)bottomPosition - center - size.y * .5f * Vector2.down).y; break;
+                    case NamedEdge.Left:
+                        delta = ((Vector2)leftPosition - center - size.x * .5f * Vector2.left).x;
+                        break;
+                    case NamedEdge.Right:
+                        delta = -((Vector2)rightPosition - center - size.x * .5f * Vector2.right).x;
+                        break;
+                    case NamedEdge.Top:
+                        delta = -((Vector2)topPosition - center - size.y * .5f * Vector2.up).y;
+                        break;
+                    case NamedEdge.Bottom:
+                        delta = ((Vector2)bottomPosition - center - size.y * .5f * Vector2.down).y;
+                        break;
                 }
 
                 if (useHomothety && useSymetry)
@@ -252,13 +314,27 @@ namespace UnityEditor.Rendering.Universal
                     {
                         switch (theChangedEdge)
                         {
-                            case NamedEdge.Left: rightPosition.x -= delta; break;
-                            case NamedEdge.Right: leftPosition.x += delta; break;
-                            case NamedEdge.Top: bottomPosition.y += delta; break;
-                            case NamedEdge.Bottom: topPosition.y -= delta; break;
+                            case NamedEdge.Left:
+                                rightPosition.x -= delta;
+                                break;
+                            case NamedEdge.Right:
+                                leftPosition.x += delta;
+                                break;
+                            case NamedEdge.Top:
+                                bottomPosition.y += delta;
+                                break;
+                            case NamedEdge.Bottom:
+                                topPosition.y -= delta;
+                                break;
                         }
 
-                        EnsureEdgeFacesOutsideForSymetry(theChangedEdge, ref leftPosition, ref rightPosition, ref topPosition, ref bottomPosition);
+                        EnsureEdgeFacesOutsideForSymetry(
+                            theChangedEdge,
+                            ref leftPosition,
+                            ref rightPosition,
+                            ref topPosition,
+                            ref bottomPosition
+                        );
                     }
 
                     if (useHomothety)
@@ -278,7 +354,13 @@ namespace UnityEditor.Rendering.Universal
                                 break;
                         }
 
-                        EnsureEdgeFacesOutsideForHomothety(theChangedEdge, ref leftPosition, ref rightPosition, ref topPosition, ref bottomPosition);
+                        EnsureEdgeFacesOutsideForHomothety(
+                            theChangedEdge,
+                            ref leftPosition,
+                            ref rightPosition,
+                            ref topPosition,
+                            ref bottomPosition
+                        );
                     }
 
                     var max = new Vector2(rightPosition.x, topPosition.y);

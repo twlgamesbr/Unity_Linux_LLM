@@ -1,10 +1,10 @@
-using UnityEditor.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
+using UnityEditor.Search;
 
 namespace Unity.Entities.Editor
 {
@@ -41,7 +41,10 @@ namespace Unity.Entities.Editor
                 public QueryEngine<TData> QueryEngine;
                 public string Token;
 
-                void ICollectionPropertyBagVisitor.Visit<TCollection, TElement>(ICollectionPropertyBag<TCollection, TElement> properties, ref TCollection container)
+                void ICollectionPropertyBagVisitor.Visit<TCollection, TElement>(
+                    ICollectionPropertyBag<TCollection, TElement> properties,
+                    ref TCollection container
+                )
                 {
                     var path = Path;
 
@@ -54,20 +57,35 @@ namespace Unity.Entities.Editor
                     //                       transformed input. The function then applies the filter and returns true or false. In this particular case
                     //                       we want to test equality with each collection element and return true if ANY match.
                     //
-                    QueryEngine.AddFilter<TElement, TElement>(Token, (data, _, token, transformedInput) =>
-                    {
-                        if (!PropertyContainer.TryGetValue<TData, TCollection>(ref data, path, out var collection))
-                            return false;
+                    QueryEngine.AddFilter<TElement, TElement>(
+                        Token,
+                        (data, _, token, transformedInput) =>
+                        {
+                            if (!PropertyContainer.TryGetValue<TData, TCollection>(ref data, path, out var collection))
+                                return false;
 
-                        if (TypeTraits<TCollection>.CanBeNull && null == collection)
-                            return false;
+                            if (TypeTraits<TCollection>.CanBeNull && null == collection)
+                                return false;
 
-                        return collection.Any(e => FilterOperator.ApplyOperator(token, e, transformedInput, QueryEngine.globalStringComparison));
-                    }, s => TypeConversion.Convert<string, TElement>(ref s), FilterOperator.GetSupportedOperators<TElement>());
+                            return collection.Any(e =>
+                                FilterOperator.ApplyOperator(
+                                    token,
+                                    e,
+                                    transformedInput,
+                                    QueryEngine.globalStringComparison
+                                )
+                            );
+                        },
+                        s => TypeConversion.Convert<string, TElement>(ref s),
+                        FilterOperator.GetSupportedOperators<TElement>()
+                    );
                 }
             }
 
-            static readonly MethodInfo s_AddEnumerableFilterMethod = typeof(FilterVisitor).GetMethod(nameof(AddEnumerableFilter), BindingFlags.NonPublic | BindingFlags.Static);
+            static readonly MethodInfo s_AddEnumerableFilterMethod = typeof(FilterVisitor).GetMethod(
+                nameof(AddEnumerableFilter),
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
 
             readonly CollectionFilterVisitor m_CollectionFilterVisitor = new CollectionFilterVisitor();
 
@@ -87,30 +105,39 @@ namespace Unity.Entities.Editor
                 switch (part.Kind)
                 {
                     case PropertyPathPartKind.Name:
-                    {
-                        if (properties is INamedProperties<TContainer> keyable && keyable.TryGetProperty(ref container, part.Name, out property))
-                            property.Accept(this, ref container);
-                        else
-                            ReturnCode = VisitReturnCode.InvalidPath;
-                    }
-                    break;
+                        {
+                            if (
+                                properties is INamedProperties<TContainer> keyable
+                                && keyable.TryGetProperty(ref container, part.Name, out property)
+                            )
+                                property.Accept(this, ref container);
+                            else
+                                ReturnCode = VisitReturnCode.InvalidPath;
+                        }
+                        break;
 
                     case PropertyPathPartKind.Index:
-                    {
-                        if (properties is IIndexedProperties<TContainer> indexable && indexable.TryGetProperty(ref container, part.Index, out property))
-                            property.Accept(this, ref container);
-                        else
-                            ReturnCode = VisitReturnCode.InvalidPath;
-                    }
+                        {
+                            if (
+                                properties is IIndexedProperties<TContainer> indexable
+                                && indexable.TryGetProperty(ref container, part.Index, out property)
+                            )
+                                property.Accept(this, ref container);
+                            else
+                                ReturnCode = VisitReturnCode.InvalidPath;
+                        }
                         break;
 
                     case PropertyPathPartKind.Key:
-                    {
-                        if (properties is IKeyedProperties<TContainer, object> keyable && keyable.TryGetProperty(ref container, part.Key, out property))
-                            property.Accept(this, ref container);
-                        else
-                            ReturnCode = VisitReturnCode.InvalidPath;
-                    }
+                        {
+                            if (
+                                properties is IKeyedProperties<TContainer, object> keyable
+                                && keyable.TryGetProperty(ref container, part.Key, out property)
+                            )
+                                property.Accept(this, ref container);
+                            else
+                                ReturnCode = VisitReturnCode.InvalidPath;
+                        }
                         break;
 
                     default:
@@ -119,13 +146,19 @@ namespace Unity.Entities.Editor
                 }
             }
 
-            void IPropertyVisitor.Visit<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container)
+            void IPropertyVisitor.Visit<TContainer, TValue>(
+                Property<TContainer, TValue> property,
+                ref TContainer container
+            )
             {
                 var value = default(TValue);
 
                 if (PathIndex >= Path.Length)
                 {
-                    if (PropertyBag.GetPropertyBag<TValue>() is ICollectionPropertyBagAccept<TValue> collectionPropertyBagAccept)
+                    if (
+                        PropertyBag.GetPropertyBag<TValue>()
+                        is ICollectionPropertyBagAccept<TValue> collectionPropertyBagAccept
+                    )
                     {
                         m_CollectionFilterVisitor.Path = Path;
                         m_CollectionFilterVisitor.QueryEngine = QueryEngine;
@@ -139,17 +172,15 @@ namespace Unity.Entities.Editor
                     }
 
                     // Explicit support for `IEnumerable<T>`
-                    if (typeof(TValue).IsGenericType && typeof(TValue).GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    if (
+                        typeof(TValue).IsGenericType
+                        && typeof(TValue).GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                    )
                     {
                         var elementType = typeof(TValue).GetGenericArguments()[0];
                         var genericMethod = s_AddEnumerableFilterMethod.MakeGenericMethod(elementType);
 
-                        genericMethod.Invoke(this, new object[]
-                        {
-                            QueryEngine,
-                            Token,
-                            Path
-                        });
+                        genericMethod.Invoke(this, new object[] { QueryEngine, Token, Path });
 
                         return;
                     }
@@ -160,11 +191,22 @@ namespace Unity.Entities.Editor
 
                     if (Options.StringComparison.HasValue)
                     {
-                        QueryEngine.AddFilter(token, data => PropertyContainer.TryGetValue<TData, TValue>(ref data, path, out var v) ? v : default, Options.StringComparison.Value, supportedOperatorTypes);
+                        QueryEngine.AddFilter(
+                            token,
+                            data =>
+                                PropertyContainer.TryGetValue<TData, TValue>(ref data, path, out var v) ? v : default,
+                            Options.StringComparison.Value,
+                            supportedOperatorTypes
+                        );
                     }
                     else
                     {
-                        QueryEngine.AddFilter(token, data => PropertyContainer.TryGetValue<TData, TValue>(ref data, path, out var v) ? v : default, supportedOperatorTypes);
+                        QueryEngine.AddFilter(
+                            token,
+                            data =>
+                                PropertyContainer.TryGetValue<TData, TValue>(ref data, path, out var v) ? v : default,
+                            supportedOperatorTypes
+                        );
                     }
 
                     return;
@@ -172,7 +214,9 @@ namespace Unity.Entities.Editor
 
                 if (TypeTraits<TValue>.IsAbstractOrInterface || typeof(TValue) == typeof(object))
                 {
-                    throw new InvalidOperationException($"Failed to register filter with Token=[{Token}] at Path=[{Path}]. Unable to bind to polymorphic fields.");
+                    throw new InvalidOperationException(
+                        $"Failed to register filter with Token=[{Token}] at Path=[{Path}]. Unable to bind to polymorphic fields."
+                    );
                 }
 
                 var propertyBag = PropertyBag.GetPropertyBag<TValue>();
@@ -190,13 +234,27 @@ namespace Unity.Entities.Editor
             {
                 var p = path;
 
-                queryEngine.AddFilter<TElement, TElement>(token, (data, _, t, transformedInput) =>
-                {
-                    if (!PropertyContainer.TryGetValue<TData, IEnumerable<TElement>>(ref data, p, out var collection))
-                        return false;
+                queryEngine.AddFilter<TElement, TElement>(
+                    token,
+                    (data, _, t, transformedInput) =>
+                    {
+                        if (
+                            !PropertyContainer.TryGetValue<TData, IEnumerable<TElement>>(
+                                ref data,
+                                p,
+                                out var collection
+                            )
+                        )
+                            return false;
 
-                    return null != collection && collection.Any(e => FilterOperator.ApplyOperator(t, e, transformedInput, queryEngine.globalStringComparison));
-                }, s => TypeConversion.Convert<string, TElement>(ref s), FilterOperator.GetSupportedOperators<TElement>());
+                        return null != collection
+                            && collection.Any(e =>
+                                FilterOperator.ApplyOperator(t, e, transformedInput, queryEngine.globalStringComparison)
+                            );
+                    },
+                    s => TypeConversion.Convert<string, TElement>(ref s),
+                    FilterOperator.GetSupportedOperators<TElement>()
+                );
             }
         }
 
@@ -219,9 +277,7 @@ namespace Unity.Entities.Editor
         public override ISearchQuery<TData> Parse(string text)
         {
             m_QueryEngine.SetGlobalStringComparisonOptions(GlobalStringComparison);
-            return new SearchQuery(text, !string.IsNullOrWhiteSpace(text)
-                ? m_QueryEngine.ParseQuery(text)
-                : null);
+            return new SearchQuery(text, !string.IsNullOrWhiteSpace(text) ? m_QueryEngine.ParseQuery(text) : null);
         }
 
         public override void AddSearchFilterProperty(string token, PropertyPath path, SearchFilterOptions options)
@@ -249,26 +305,45 @@ namespace Unity.Entities.Editor
                 case VisitReturnCode.Ok:
                     break;
                 case VisitReturnCode.InvalidPath:
-                    throw new InvalidPathException($"SearchElement Failed to AddSearchFilter for Type=[{typeof(TData)}] Token=[{token}] could not resolve Path=[{path}]");
+                    throw new InvalidPathException(
+                        $"SearchElement Failed to AddSearchFilter for Type=[{typeof(TData)}] Token=[{token}] could not resolve Path=[{path}]"
+                    );
                 default:
-                    throw new InvalidBindingException($"SearchElement Failed to AddSearchFilter for Type=[{typeof(TData)}] Token=[{token}] Path=[{path}] VisitErrorCode=[{m_FilterVisitor.ReturnCode}]");
+                    throw new InvalidBindingException(
+                        $"SearchElement Failed to AddSearchFilter for Type=[{typeof(TData)}] Token=[{token}] Path=[{path}] VisitErrorCode=[{m_FilterVisitor.ReturnCode}]"
+                    );
             }
         }
 
-        public override void AddSearchFilterCallback<TFilter>(string token, Func<TData, TFilter> getFilterDataFunc, SearchFilterOptions options)
+        public override void AddSearchFilterCallback<TFilter>(
+            string token,
+            Func<TData, TFilter> getFilterDataFunc,
+            SearchFilterOptions options
+        )
         {
             if (options.StringComparison.HasValue)
-                m_QueryEngine.AddFilter(token, getFilterDataFunc, options.StringComparison.Value, options.SupportedOperatorTypes);
+                m_QueryEngine.AddFilter(
+                    token,
+                    getFilterDataFunc,
+                    options.StringComparison.Value,
+                    options.SupportedOperatorTypes
+                );
             else
                 m_QueryEngine.AddFilter(token, getFilterDataFunc, options.SupportedOperatorTypes);
         }
 
-        public override void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, bool> handler)
+        public override void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, bool> handler
+        )
         {
             m_QueryEngine.AddOperatorHandler(op, handler);
         }
 
-        public override void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler)
+        public override void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler
+        )
         {
             m_QueryEngine.AddOperatorHandler(op, handler);
         }

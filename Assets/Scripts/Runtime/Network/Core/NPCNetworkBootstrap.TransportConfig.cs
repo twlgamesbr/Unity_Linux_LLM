@@ -1,23 +1,22 @@
 using System.Collections.Generic;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Monitoring.Datadog;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Network.Core
 {
     /// <content>Transport configuration and CLI argument parsing extracted from NPCNetworkBootstrap.</content>
@@ -195,9 +194,7 @@ namespace NPCSystem.Network.Core
                         ["listenAddress"] = connectionData.ServerListenAddress,
                         ["clientBindPort"] = connectionData.ClientBindPort,
                         ["autoStartMode"] = TransportConfig.AutoStartMode.ToString(),
-                        ["player"] = NPCPlayModeInstanceResolver.TryGetPlayerName(
-                            out string playerName
-                        )
+                        ["player"] = NPCPlayModeInstanceResolver.TryGetPlayerName(out string playerName)
                             ? playerName
                             : "unknown",
                     }
@@ -206,11 +203,7 @@ namespace NPCSystem.Network.Core
 
         ushort ResolveClientBindPort()
         {
-            if (
-                NPCPlayModeInstanceResolver.TryGetCommandLineClientBindPort(
-                    out ushort commandLineBindPort
-                )
-            )
+            if (NPCPlayModeInstanceResolver.TryGetCommandLineClientBindPort(out ushort commandLineBindPort))
             {
                 return commandLineBindPort;
             }

@@ -12,13 +12,18 @@ namespace Unity.Entities
         /// <summary>
         /// Entity view into journal buffer.
         /// </summary>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [DebuggerDisplay("{Name}")]
         [StructLayout(LayoutKind.Sequential)]
-        public unsafe readonly struct EntityView : IEquatable<EntityView>
+        public readonly unsafe struct EntityView : IEquatable<EntityView>
         {
-            [NativeDisableUnsafePtrRestriction] internal readonly Entity* m_EntityPtr;
-            [NativeDisableUnsafePtrRestriction] readonly ulong* m_WorldSequencePtr;
+            [NativeDisableUnsafePtrRestriction]
+            internal readonly Entity* m_EntityPtr;
+
+            [NativeDisableUnsafePtrRestriction]
+            readonly ulong* m_WorldSequencePtr;
 
             /// <summary>
             /// The entity index.
@@ -73,8 +78,12 @@ namespace Unity.Entities
                 m_WorldSequencePtr = worldSequencePtr;
             }
 
-            public bool Equals(EntityView other) => Index == other.Index && Version == other.Version && WorldSequenceNumber == other.WorldSequenceNumber;
-            [ExcludeFromBurstCompatTesting("Takes managed object")] public override bool Equals(object obj) => obj is EntityView entity ? Equals(entity) : false;
+            public bool Equals(EntityView other) =>
+                Index == other.Index && Version == other.Version && WorldSequenceNumber == other.WorldSequenceNumber;
+
+            [ExcludeFromBurstCompatTesting("Takes managed object")]
+            public override bool Equals(object obj) => obj is EntityView entity ? Equals(entity) : false;
+
             public override int GetHashCode()
             {
                 var hash = 5381;
@@ -83,9 +92,16 @@ namespace Unity.Entities
                 hash = hash * 31 + WorldSequenceNumber.GetHashCode();
                 return hash;
             }
-            public static bool operator ==(EntityView lhs, EntityView rhs) => lhs.Index == rhs.Index && lhs.Version == rhs.Version && lhs.WorldSequenceNumber == rhs.WorldSequenceNumber;
+
+            public static bool operator ==(EntityView lhs, EntityView rhs) =>
+                lhs.Index == rhs.Index
+                && lhs.Version == rhs.Version
+                && lhs.WorldSequenceNumber == rhs.WorldSequenceNumber;
+
             public static bool operator !=(EntityView lhs, EntityView rhs) => !(lhs == rhs);
-            [ExcludeFromBurstCompatTesting("Returns managed object")] public override string ToString() => Name;
+
+            [ExcludeFromBurstCompatTesting("Returns managed object")]
+            public override string ToString() => Name;
         }
     }
 }

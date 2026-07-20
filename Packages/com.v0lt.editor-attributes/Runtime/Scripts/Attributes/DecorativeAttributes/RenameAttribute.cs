@@ -11,7 +11,7 @@ namespace EditorAttributes
         Snake,
         Kebab,
         Upper,
-        Lower
+        Lower,
     }
 
     /// <summary>
@@ -29,7 +29,12 @@ namespace EditorAttributes
         /// <param name="name">The new name of the field</param>
         /// <param name="caseType">In what case to rename the field</param>
         /// <param name="stringInputMode">Set if the string input is set trough a constant or dynamically trough another member</param>
-        public RenameAttribute(string name, CaseType caseType = CaseType.Unity, StringInputMode stringInputMode = StringInputMode.Constant) : base(true)
+        public RenameAttribute(
+            string name,
+            CaseType caseType = CaseType.Unity,
+            StringInputMode stringInputMode = StringInputMode.Constant
+        )
+            : base(true)
         {
             Name = name;
             CaseType = caseType;

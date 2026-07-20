@@ -63,7 +63,10 @@ namespace UnityEngine.InputSystem.Utilities
         /// </remarks>
         /// <seealso cref="InputEventListener"/>
         /// <seealso cref="InputSystem.onEvent"/>
-        public static IObservable<TResult> Select<TSource, TResult>(this IObservable<TSource> source, Func<TSource, TResult> filter)
+        public static IObservable<TResult> Select<TSource, TResult>(
+            this IObservable<TSource> source,
+            Func<TSource, TResult> filter
+        )
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -94,7 +97,10 @@ namespace UnityEngine.InputSystem.Utilities
         /// </remarks>
         /// <seealso cref="InputEventListener"/>
         /// <seealso cref="InputSystem.onEvent"/>
-        public static IObservable<TResult> SelectMany<TSource, TResult>(this IObservable<TSource> source, Func<TSource, IEnumerable<TResult>> filter)
+        public static IObservable<TResult> SelectMany<TSource, TResult>(
+            this IObservable<TSource> source,
+            Func<TSource, IEnumerable<TResult>> filter
+        )
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));

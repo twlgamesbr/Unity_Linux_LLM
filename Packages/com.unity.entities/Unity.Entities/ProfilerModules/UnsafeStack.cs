@@ -5,7 +5,8 @@ using Unity.Jobs;
 namespace Unity.Entities.LowLevel
 {
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-    internal struct UnsafeStack<T> : INativeDisposable where T : unmanaged
+    internal struct UnsafeStack<T> : INativeDisposable
+        where T : unmanaged
     {
         UnsafeList<T> m_List;
 
@@ -30,7 +31,11 @@ namespace Unity.Entities.LowLevel
         /// <param name="initialCapacity">The initial capacity of the stack.</param>
         /// <param name="allocator">The allocator for the stack container.</param>
         /// <param name="options">Initialization options for the stack allocation.</param>
-        public UnsafeStack(int initialCapacity, Allocator allocator, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory)
+        public UnsafeStack(
+            int initialCapacity,
+            Allocator allocator,
+            NativeArrayOptions options = NativeArrayOptions.UninitializedMemory
+        )
         {
             m_List = new UnsafeList<T>(initialCapacity, allocator, options);
         }

@@ -1,29 +1,25 @@
-﻿using UnityEngine;
+﻿using System.IO;
 using UnityEditor;
-using System.IO;
+using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
 using UnityEngine.TextCore.Text;
 
 namespace TMPro.EditorUtilities
 {
-
     public class TMP_ContextMenus : Editor
     {
-
         private static Texture m_copiedTexture;
 
         private static Material m_copiedProperties;
         private static Material m_copiedAtlasProperties;
 
-
         // Add a Context Menu to the Texture Editor Panel to allow Copy / Paste of Texture.
-        #if !TEXTCORE_1_0_OR_NEWER
+#if !TEXTCORE_1_0_OR_NEWER
         [MenuItem("CONTEXT/Texture/Copy", false, 2000)]
         static void CopyTexture(MenuCommand command)
         {
             m_copiedTexture = command.context as Texture;
         }
-
 
         // Select the currently assigned material or material preset.
         [MenuItem("CONTEXT/Material/Select Material", false, 500)]
@@ -35,8 +31,7 @@ namespace TMPro.EditorUtilities
             EditorUtility.FocusProjectWindow();
             EditorGUIUtility.PingObject(mat);
         }
-        #endif
-
+#endif
 
         // Add a Context Menu to allow easy duplication of the Material.
         [MenuItem("CONTEXT/Material/Create Material Preset", false)]
@@ -56,7 +51,9 @@ namespace TMPro.EditorUtilities
 
             if (assetPath.IndexOf("Assets/", System.StringComparison.InvariantCultureIgnoreCase) == -1)
             {
-                Debug.LogWarning("Material Preset cannot be created from a material that is located outside the project.");
+                Debug.LogWarning(
+                    "Material Preset cannot be created from a material that is located outside the project."
+                );
                 return;
             }
 
@@ -99,9 +96,8 @@ namespace TMPro.EditorUtilities
             EditorGUIUtility.PingObject(duplicate);
         }
 
-
         // COPY MATERIAL PROPERTIES
-        #if !TEXTCORE_1_0_OR_NEWER
+#if !TEXTCORE_1_0_OR_NEWER
         [MenuItem("CONTEXT/Material/Copy Material Properties", false)]
         static void CopyMaterialProperties(MenuCommand command)
         {
@@ -119,7 +115,6 @@ namespace TMPro.EditorUtilities
 
             m_copiedProperties.hideFlags = HideFlags.DontSave;
         }
-
 
         // PASTE MATERIAL PROPERTIES
         [MenuItem("CONTEXT/Material/Paste Material Properties", true)]
@@ -155,9 +150,18 @@ namespace TMPro.EditorUtilities
             {
                 // Preserve unique SDF properties from destination material.
                 m_copiedProperties.SetTexture(ShaderUtilities.ID_MainTex, mat.GetTexture(ShaderUtilities.ID_MainTex));
-                m_copiedProperties.SetFloat(ShaderUtilities.ID_GradientScale, mat.GetFloat(ShaderUtilities.ID_GradientScale));
-                m_copiedProperties.SetFloat(ShaderUtilities.ID_TextureWidth, mat.GetFloat(ShaderUtilities.ID_TextureWidth));
-                m_copiedProperties.SetFloat(ShaderUtilities.ID_TextureHeight, mat.GetFloat(ShaderUtilities.ID_TextureHeight));
+                m_copiedProperties.SetFloat(
+                    ShaderUtilities.ID_GradientScale,
+                    mat.GetFloat(ShaderUtilities.ID_GradientScale)
+                );
+                m_copiedProperties.SetFloat(
+                    ShaderUtilities.ID_TextureWidth,
+                    mat.GetFloat(ShaderUtilities.ID_TextureWidth)
+                );
+                m_copiedProperties.SetFloat(
+                    ShaderUtilities.ID_TextureHeight,
+                    mat.GetFloat(ShaderUtilities.ID_TextureHeight)
+                );
             }
 
             EditorShaderUtilities.CopyMaterialProperties(m_copiedProperties, mat);
@@ -168,7 +172,6 @@ namespace TMPro.EditorUtilities
             // Let TextMeshPro Objects that this mat has changed.
             TMPro_EventManager.ON_MATERIAL_PROPERTY_CHANGED(true, mat);
         }
-
 
         // Enable Resetting of Material properties without losing unique properties of the font atlas.
         [MenuItem("CONTEXT/Material/Reset", true, 2100)]
@@ -199,8 +202,10 @@ namespace TMPro.EditorUtilities
                 var texture = mat.GetTexture(ShaderUtilities.ID_MainTex);
                 var gradientScale = mat.GetFloat(ShaderUtilities.ID_GradientScale);
 
-                float texWidth = 0, texHeight = 0;
-                float normalWeight = 0, boldWeight = 0;
+                float texWidth = 0,
+                    texHeight = 0;
+                float normalWeight = 0,
+                    boldWeight = 0;
 
                 if (!isSRPShader)
                 {
@@ -251,7 +256,6 @@ namespace TMPro.EditorUtilities
             TMPro_EventManager.ON_MATERIAL_PROPERTY_CHANGED(true, mat);
         }
 
-
         //This function is used for debugging and fixing potentially broken font atlas links.
         [MenuItem("CONTEXT/Material/Copy Atlas", false, 2000)]
         static void CopyAtlas(MenuCommand command)
@@ -261,7 +265,6 @@ namespace TMPro.EditorUtilities
             m_copiedAtlasProperties = new Material(mat);
             m_copiedAtlasProperties.hideFlags = HideFlags.DontSave;
         }
-
 
         // This function is used for debugging and fixing potentially broken font atlas links
         [MenuItem("CONTEXT/Material/Paste Atlas", true, 2001)]
@@ -288,13 +291,25 @@ namespace TMPro.EditorUtilities
                 ShaderUtilities.GetShaderPropertyIDs(); // Make sure we have valid Property IDs
 
                 if (m_copiedAtlasProperties.HasProperty(ShaderUtilities.ID_MainTex))
-                    mat.SetTexture(ShaderUtilities.ID_MainTex, m_copiedAtlasProperties.GetTexture(ShaderUtilities.ID_MainTex));
+                    mat.SetTexture(
+                        ShaderUtilities.ID_MainTex,
+                        m_copiedAtlasProperties.GetTexture(ShaderUtilities.ID_MainTex)
+                    );
 
                 if (m_copiedAtlasProperties.HasProperty(ShaderUtilities.ID_GradientScale))
                 {
-                    mat.SetFloat(ShaderUtilities.ID_GradientScale, m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_GradientScale));
-                    mat.SetFloat(ShaderUtilities.ID_TextureWidth, m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_TextureWidth));
-                    mat.SetFloat(ShaderUtilities.ID_TextureHeight, m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_TextureHeight));
+                    mat.SetFloat(
+                        ShaderUtilities.ID_GradientScale,
+                        m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_GradientScale)
+                    );
+                    mat.SetFloat(
+                        ShaderUtilities.ID_TextureWidth,
+                        m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_TextureWidth)
+                    );
+                    mat.SetFloat(
+                        ShaderUtilities.ID_TextureHeight,
+                        m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_TextureHeight)
+                    );
                 }
             }
             else if (m_copiedTexture != null)
@@ -304,8 +319,7 @@ namespace TMPro.EditorUtilities
                 mat.SetTexture(ShaderUtilities.ID_MainTex, m_copiedTexture);
             }
         }
-        #endif
-
+#endif
 
         // Context Menus for TMPro Font Assets
         //This function is used for debugging and fixing potentially broken font atlas links.
@@ -315,7 +329,8 @@ namespace TMPro.EditorUtilities
             TMP_FontAsset font = command.context as TMP_FontAsset;
 
             string fontPath = AssetDatabase.GetAssetPath(font);
-            string texPath = Path.GetDirectoryName(fontPath) + "/" + Path.GetFileNameWithoutExtension(fontPath) + " Atlas.png";
+            string texPath =
+                Path.GetDirectoryName(fontPath) + "/" + Path.GetFileNameWithoutExtension(fontPath) + " Atlas.png";
 
             // Create a Serialized Object of the texture to allow us to make it readable.
             SerializedObject texprop = new SerializedObject(font.material.GetTexture(ShaderUtilities.ID_MainTex));
@@ -364,7 +379,6 @@ namespace TMPro.EditorUtilities
                 TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, fontAsset);
             }
         }*/
-
 
         /// <summary>
         /// Clear Dynamic Font Asset data such as glyph, character and font features.
@@ -447,7 +461,7 @@ namespace TMPro.EditorUtilities
         /// Import all font features
         /// </summary>
         /// <param name="command"></param>
-        #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+#if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
         [MenuItem("CONTEXT/TMP_FontAsset/Import Font Features", true, 2110)]
         static bool ReimportFontFeaturesValidate(MenuCommand command)
         {
@@ -469,7 +483,7 @@ namespace TMPro.EditorUtilities
 
             TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, fontAsset);
         }
-        #endif
+#endif
 
         /// <summary>
         ///

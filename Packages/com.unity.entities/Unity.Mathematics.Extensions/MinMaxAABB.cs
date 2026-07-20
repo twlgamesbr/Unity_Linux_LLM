@@ -44,7 +44,10 @@ namespace Unity.Mathematics
         /// </summary>
         public static MinMaxAABB Empty
         {
-            get { return new MinMaxAABB { Min = float3(float.PositiveInfinity), Max = float3(float.NegativeInfinity) }; }
+            get
+            {
+                return new MinMaxAABB { Min = float3(float.PositiveInfinity), Max = float3(float.NegativeInfinity) };
+            }
         }
 
         /// <summary>
@@ -78,7 +81,7 @@ namespace Unity.Mathematics
         /// <returns>Returns the new AABB.</returns>
         public static implicit operator MinMaxAABB(AABB aabb)
         {
-            return new MinMaxAABB {Min = aabb.Center - aabb.Extents, Max = aabb.Center + aabb.Extents};
+            return new MinMaxAABB { Min = aabb.Center - aabb.Extents, Max = aabb.Center + aabb.Extents };
         }
 
         /// <summary>
@@ -88,7 +91,7 @@ namespace Unity.Mathematics
         /// <returns>Returns the new AABB.</returns>
         public static implicit operator AABB(MinMaxAABB aabb)
         {
-            return new AABB { Center = (aabb.Min + aabb.Max) * 0.5F, Extents = (aabb.Max - aabb.Min) * 0.5F};
+            return new AABB { Center = (aabb.Min + aabb.Max) * 0.5F, Extents = (aabb.Max - aabb.Min) * 0.5F };
         }
 
         /// <summary>

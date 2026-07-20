@@ -51,36 +51,35 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 switch (type)
                 {
                     case DisplayElementType.Counter:
+                    {
+                        while (countersUsed >= m_Counters.Count)
                         {
-                            while (countersUsed >= m_Counters.Count)
-                            {
-                                m_Counters.Add(new CounterVisualElement());
-                            }
-                            var counter = m_Counters[countersUsed];
-                            counter.UpdateConfiguration(displayElementConfig);
-
-                            m_DisplayElementsContainer.Add(counter);
-                            countersUsed++;
-                            break;
+                            m_Counters.Add(new CounterVisualElement());
                         }
+                        var counter = m_Counters[countersUsed];
+                        counter.UpdateConfiguration(displayElementConfig);
+
+                        m_DisplayElementsContainer.Add(counter);
+                        countersUsed++;
+                        break;
+                    }
                     case DisplayElementType.LineGraph:
                     case DisplayElementType.StackedAreaGraph:
+                    {
+                        while (graphsUsed >= m_Graphs.Count)
                         {
-                            while (graphsUsed >= m_Graphs.Count)
-                            {
-                                m_Graphs.Add(new GraphVisualElement());
-                            }
-                            var graph = m_Graphs[graphsUsed];
-
-                            graph.UpdateConfiguration(displayElementConfig);
-
-                            m_DisplayElementsContainer.Add(graph);
-                            graphsUsed++;
-                            break;
+                            m_Graphs.Add(new GraphVisualElement());
                         }
+                        var graph = m_Graphs[graphsUsed];
+
+                        graph.UpdateConfiguration(displayElementConfig);
+
+                        m_DisplayElementsContainer.Add(graph);
+                        graphsUsed++;
+                        break;
+                    }
                     default:
-                        throw new NotSupportedException(
-                            $"Unhandled {nameof(DisplayElementType)} {type}");
+                        throw new NotSupportedException($"Unhandled {nameof(DisplayElementType)} {type}");
                 }
             }
             // Remove unused counters and graphs
@@ -142,8 +141,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
                 m_OnGeoChange = evt =>
                 {
-                    if (MathF.Abs(evt.newRect.width - evt.oldRect.width) > k_EpsilonPixels ||
-                        MathF.Abs(evt.newRect.height - evt.oldRect.height) > k_EpsilonPixels)
+                    if (
+                        MathF.Abs(evt.newRect.width - evt.oldRect.width) > k_EpsilonPixels
+                        || MathF.Abs(evt.newRect.height - evt.oldRect.height) > k_EpsilonPixels
+                    )
                     {
                         ChangePosition(positionConfiguration);
                     }

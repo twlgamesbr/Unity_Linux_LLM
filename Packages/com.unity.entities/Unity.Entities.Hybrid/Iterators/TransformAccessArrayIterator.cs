@@ -33,7 +33,9 @@ namespace Unity.Entities
             if (state == null)
                 state = new TransformAccessArrayState();
 
-            var orderVersion = query._GetImpl()->_Access->EntityComponentStore->GetComponentTypeOrderVersion(TypeManager.GetTypeIndex<Transform>());
+            var orderVersion = query
+                ._GetImpl()
+                ->_Access->EntityComponentStore->GetComponentTypeOrderVersion(TypeManager.GetTypeIndex<Transform>());
 
             if (state.Data.isCreated && orderVersion == state.OrderVersion)
                 return state.Data;

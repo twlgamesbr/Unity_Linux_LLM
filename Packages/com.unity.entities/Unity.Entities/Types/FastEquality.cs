@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Unity.Collections.LowLevel.Unsafe;
-using System.Collections.Generic;
 using Unity.Assertions;
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities.Serialization;
 using Unity.Profiling;
 using UnityEngine;
@@ -78,7 +78,7 @@ namespace Unity.Entities
 
             public void Dispose()
             {
-                if(LayoutInfo.IsCreated)
+                if (LayoutInfo.IsCreated)
                     LayoutInfo.Dispose();
             }
         }
@@ -96,20 +96,23 @@ namespace Unity.Entities
             return s_ComponentDelegates[index];
         }
 
-        static internal void Initialize()
+        internal static void Initialize()
         {
             s_ComponentDelegates = new List<Delegate>();
             AddDelegate(null); // reserve index 0 as null element
         }
 
-        static internal void Shutdown()
+        internal static void Shutdown()
         {
             s_ComponentDelegates.Clear();
         }
 
-        static readonly ProfilerMarker ManagedEqualsMarker = new ProfilerMarker("FastEquality.ManagedEquals with IPropertyVisitor fallback (Missing IEquatable interface)");
+        static readonly ProfilerMarker ManagedEqualsMarker = new ProfilerMarker(
+            "FastEquality.ManagedEquals with IPropertyVisitor fallback (Missing IEquatable interface)"
+        );
 
-        internal static TypeInfo CreateTypeInfo<T>(Dictionary<Type, List<LayoutInfo>> cache = null) where T : struct
+        internal static TypeInfo CreateTypeInfo<T>(Dictionary<Type, List<LayoutInfo>> cache = null)
+            where T : struct
         {
             if (TypeUsesDelegates(typeof(T)))
                 return CreateManagedTypeInfo(typeof(T));
@@ -138,7 +141,8 @@ namespace Unity.Entities
             }
         }
 
-        private struct CompareImpl<T> where T : struct, IEquatable<T>
+        private struct CompareImpl<T>
+            where T : struct, IEquatable<T>
         {
             public static unsafe bool CompareFunc(void* lhs, void* rhs)
             {
@@ -146,7 +150,8 @@ namespace Unity.Entities
             }
         }
 
-        private struct GetHashCodeImpl<T> where T : struct, IEquatable<T>
+        private struct GetHashCodeImpl<T>
+            where T : struct, IEquatable<T>
         {
             public static unsafe int GetHashCodeFunc(void* lhs)
             {
@@ -154,7 +159,8 @@ namespace Unity.Entities
             }
         }
 
-        private struct ManagedCompareImpl<T> where T : IEquatable<T>
+        private struct ManagedCompareImpl<T>
+            where T : IEquatable<T>
         {
             public static unsafe bool CompareFunc(object lhs, object rhs)
             {
@@ -170,21 +176,31 @@ namespace Unity.Entities
             }
         }
 
-        private unsafe static TypeInfo CreateManagedTypeInfo(Type t)
+        private static unsafe TypeInfo CreateManagedTypeInfo(Type t)
         {
             // ISharedComponentData Type must implement IEquatable<T>
             if (typeof(ISharedComponentData).IsAssignableFrom(t))
             {
                 if (!typeof(IEquatable<>).MakeGenericType(t).IsAssignableFrom(t))
                 {
-                    throw new ArgumentException($"type {t} is a ISharedComponentData and has managed references, you must implement IEquatable<T>");
+                    throw new ArgumentException(
+                        $"type {t} is a ISharedComponentData and has managed references, you must implement IEquatable<T>"
+                    );
                 }
 
                 // Type must override GetHashCode()
-                var ghcMethod = t.GetMethod(nameof(GetHashCode), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly, null, Array.Empty<Type>(), null);
+                var ghcMethod = t.GetMethod(
+                    nameof(GetHashCode),
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly,
+                    null,
+                    Array.Empty<Type>(),
+                    null
+                );
                 if (ghcMethod == null || ghcMethod.DeclaringType != t)
                 {
-                    throw new ArgumentException($"type {t} is a/has managed references or implements IEquatable<T>, you must also override GetHashCode()");
+                    throw new ArgumentException(
+                        $"type {t} is a/has managed references or implements IEquatable<T>, you must also override GetHashCode()"
+                    );
                 }
             }
 
@@ -195,42 +211,64 @@ namespace Unity.Entities
             {
                 if (typeof(IEquatable<>).MakeGenericType(t).IsAssignableFrom(t))
                 {
-                    var equalsFn = typeof(ManagedCompareImpl<>).MakeGenericType(t).GetMethod(nameof(ManagedCompareImpl<Dummy>.CompareFunc));
-                    equalsDelegateIndex = AddDelegate(Delegate.CreateDelegate(typeof(TypeInfo.ManagedCompareEqualDelegate), equalsFn));
+                    var equalsFn = typeof(ManagedCompareImpl<>)
+                        .MakeGenericType(t)
+                        .GetMethod(nameof(ManagedCompareImpl<Dummy>.CompareFunc));
+                    equalsDelegateIndex = AddDelegate(
+                        Delegate.CreateDelegate(typeof(TypeInfo.ManagedCompareEqualDelegate), equalsFn)
+                    );
                 }
 
-                var ghcMethod = t.GetMethod(nameof(GetHashCode), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly, null, Array.Empty<Type>(), null);
+                var ghcMethod = t.GetMethod(
+                    nameof(GetHashCode),
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly,
+                    null,
+                    Array.Empty<Type>(),
+                    null
+                );
                 if (ghcMethod != null && ghcMethod.DeclaringType == t)
                 {
-                    var getHashFn = typeof(ManagedGetHashCodeImpl<>).MakeGenericType(t).GetMethod(nameof(ManagedGetHashCodeImpl<Dummy>.GetHashCodeFunc));
-                    getHashCodeDelegateIndex = AddDelegate(Delegate.CreateDelegate(typeof(TypeInfo.ManagedGetHashCodeDelegate), getHashFn));
+                    var getHashFn = typeof(ManagedGetHashCodeImpl<>)
+                        .MakeGenericType(t)
+                        .GetMethod(nameof(ManagedGetHashCodeImpl<Dummy>.GetHashCodeFunc));
+                    getHashCodeDelegateIndex = AddDelegate(
+                        Delegate.CreateDelegate(typeof(TypeInfo.ManagedGetHashCodeDelegate), getHashFn)
+                    );
                 }
             }
             else
             {
-                var equalsFn = typeof(CompareImpl<>).MakeGenericType(t).GetMethod(nameof(CompareImpl<Dummy>.CompareFunc));
-                equalsDelegateIndex = AddDelegate(Delegate.CreateDelegate(typeof(TypeInfo.CompareEqualDelegate), equalsFn));
+                var equalsFn = typeof(CompareImpl<>)
+                    .MakeGenericType(t)
+                    .GetMethod(nameof(CompareImpl<Dummy>.CompareFunc));
+                equalsDelegateIndex = AddDelegate(
+                    Delegate.CreateDelegate(typeof(TypeInfo.CompareEqualDelegate), equalsFn)
+                );
 
-                var getHashFn = typeof(GetHashCodeImpl<>).MakeGenericType(t).GetMethod(nameof(GetHashCodeImpl<Dummy>.GetHashCodeFunc));
-                getHashCodeDelegateIndex = AddDelegate(Delegate.CreateDelegate(typeof(TypeInfo.GetHashCodeDelegate), getHashFn));
+                var getHashFn = typeof(GetHashCodeImpl<>)
+                    .MakeGenericType(t)
+                    .GetMethod(nameof(GetHashCodeImpl<Dummy>.GetHashCodeFunc));
+                getHashCodeDelegateIndex = AddDelegate(
+                    Delegate.CreateDelegate(typeof(TypeInfo.GetHashCodeDelegate), getHashFn)
+                );
             }
 
             return new TypeInfo
             {
                 EqualsDelegateIndex = equalsDelegateIndex,
-                GetHashCodeDelegateIndex = getHashCodeDelegateIndex
+                GetHashCodeDelegateIndex = getHashCodeDelegateIndex,
             };
         }
 
         private static TypeInfo CreateTypeInfoBlittable(Type type, Dictionary<Type, List<LayoutInfo>> cache = null)
         {
-            return new TypeInfo
-            {
-                LayoutInfo = CreateDescriptor(type, cache)
-            };
+            return new TypeInfo { LayoutInfo = CreateDescriptor(type, cache) };
         }
 
-        internal static NativeArray<LayoutInfo> CreateDescriptor(Type type, Dictionary<Type, List<LayoutInfo>> cache = null)
+        internal static NativeArray<LayoutInfo> CreateDescriptor(
+            Type type,
+            Dictionary<Type, List<LayoutInfo>> cache = null
+        )
         {
             if (cache == null)
                 cache = new Dictionary<Type, List<LayoutInfo>>();
@@ -240,7 +278,11 @@ namespace Unity.Entities
             return new NativeArray<LayoutInfo>(layoutInfo.ToArray(), Allocator.Persistent);
         }
 
-        private static List<LayoutInfo> FindFields(Type type, Dictionary<Type, List<LayoutInfo>> cache,int fixedSizeArrayLength = 1)
+        private static List<LayoutInfo> FindFields(
+            Type type,
+            Dictionary<Type, List<LayoutInfo>> cache,
+            int fixedSizeArrayLength = 1
+        )
         {
             if (cache.TryGetValue(type, out var cachedInfo))
                 return cachedInfo;
@@ -301,7 +343,7 @@ namespace Unity.Entities
                         for (int i = 1; i < structInfos.Count; i++)
                         {
                             var structInfo = structInfos[i];
-                            structInfo.Offset += (ushort) fieldOffset;
+                            structInfo.Offset += (ushort)fieldOffset;
                             result.Add(structInfo);
                         }
                     }
@@ -323,7 +365,7 @@ namespace Unity.Entities
         {
             if (typeInfo.GetHashCodeDelegateIndex != TypeInfo.Null.GetHashCodeDelegateIndex)
             {
-                var fn = (TypeInfo.ManagedGetHashCodeDelegate) GetDelegate(typeInfo.GetHashCodeDelegateIndex);
+                var fn = (TypeInfo.ManagedGetHashCodeDelegate)GetDelegate(typeInfo.GetHashCodeDelegateIndex);
                 return fn(lhs);
             }
 
@@ -356,7 +398,7 @@ namespace Unity.Entities
         {
             if (typeInfo.GetHashCodeDelegateIndex != TypeInfo.Null.GetHashCodeDelegateIndex)
             {
-                var fn = (TypeInfo.GetHashCodeDelegate) GetDelegate(typeInfo.GetHashCodeDelegateIndex);
+                var fn = (TypeInfo.GetHashCodeDelegate)GetDelegate(typeInfo.GetHashCodeDelegateIndex);
                 hash = fn(dataPtr);
                 didWork = true;
             }
@@ -368,7 +410,7 @@ namespace Unity.Entities
             int hash = 0;
             bool didWork = false;
             GetHashCodeUsingDelegate(dataPtr, typeInfo, ref didWork, ref hash);
-            if(didWork)
+            if (didWork)
                 return hash;
 
             return GetHashCodeBlittable(dataPtr, in typeInfo);
@@ -413,7 +455,7 @@ namespace Unity.Entities
         {
             if (typeInfo.EqualsDelegateIndex != TypeInfo.Null.EqualsDelegateIndex)
             {
-                var fn = (TypeInfo.ManagedCompareEqualDelegate) GetDelegate(typeInfo.EqualsDelegateIndex);
+                var fn = (TypeInfo.ManagedCompareEqualDelegate)GetDelegate(typeInfo.EqualsDelegateIndex);
                 return fn(lhs, rhs);
             }
 
@@ -424,11 +466,17 @@ namespace Unity.Entities
         }
 
         [BurstDiscard]
-        static unsafe void EqualsUsingDelegate(void* lhsPtr, void* rhsPtr, TypeInfo typeInfo, ref bool didWork, ref int result)
+        static unsafe void EqualsUsingDelegate(
+            void* lhsPtr,
+            void* rhsPtr,
+            TypeInfo typeInfo,
+            ref bool didWork,
+            ref int result
+        )
         {
             if (typeInfo.EqualsDelegateIndex != TypeInfo.Null.EqualsDelegateIndex)
             {
-                var fn = (TypeInfo.CompareEqualDelegate) GetDelegate(typeInfo.EqualsDelegateIndex);
+                var fn = (TypeInfo.CompareEqualDelegate)GetDelegate(typeInfo.EqualsDelegateIndex);
                 // Note, a match returns 0 to mirror the Equals code below for the unmanaged case where we memcmp
                 result = fn(lhsPtr, rhsPtr) ? 0 : 1;
                 didWork = true;
@@ -468,7 +516,6 @@ namespace Unity.Entities
             }
 
             return result == 0;
-
         }
 
         private static bool TypeUsesDelegates(Type t)
@@ -484,7 +531,8 @@ namespace Unity.Entities
                 return true;
 
             // If an unmanaged shared component but custom equality methods have been provided then use them
-            return typeof(ISharedComponentData).IsAssignableFrom(t) && typeof(IEquatable<>).MakeGenericType(t).IsAssignableFrom(t);
+            return typeof(ISharedComponentData).IsAssignableFrom(t)
+                && typeof(IEquatable<>).MakeGenericType(t).IsAssignableFrom(t);
         }
 
         /// <summary>
@@ -503,7 +551,13 @@ namespace Unity.Entities
                 if (typeof(IEquatable<>).MakeGenericType(type).IsAssignableFrom(type))
                     output.Add(typeof(ManagedCompareImpl<>).MakeGenericType(type).ToString());
 
-                var ghcMethod = type.GetMethod(nameof(GetHashCode), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly, null, Array.Empty<Type>(), null);
+                var ghcMethod = type.GetMethod(
+                    nameof(GetHashCode),
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly,
+                    null,
+                    Array.Empty<Type>(),
+                    null
+                );
                 if (ghcMethod != null && ghcMethod.DeclaringType == type)
                     output.Add(typeof(ManagedGetHashCodeImpl<>).MakeGenericType(type).ToString());
             }

@@ -14,14 +14,18 @@ namespace Unity.Entities.Content
         /// The value of the id.
         /// </summary>
         public Hash128 Value;
+
         /// <summary>
         /// True if the id has a non default value.
         /// </summary>
         public bool IsValid => Value.IsValid;
+
         /// <inheritdoc/>
         public bool Equals(ContentArchiveId other) => Value.Equals(other.Value);
+
         /// <inheritdoc/>
         public override int GetHashCode() => Value.GetHashCode();
+
         /// <inheritdoc/>
         public override string ToString() => Value.ToString();
     }
@@ -35,14 +39,18 @@ namespace Unity.Entities.Content
         /// The value of the id.
         /// </summary>
         public Hash128 Value;
+
         /// <summary>
         /// True if the id has a non default value.
         /// </summary>
         public bool IsValid => Value.IsValid;
+
         /// <inheritdoc/>
         public bool Equals(ContentFileId other) => Value.Equals(other.Value);
+
         /// <inheritdoc/>
         public override int GetHashCode() => Value.GetHashCode();
+
         /// <inheritdoc/>
         public override string ToString() => Value.ToString();
     }
@@ -56,14 +64,18 @@ namespace Unity.Entities.Content
         /// The value of the id.
         /// </summary>
         public Hash128 Value;
+
         /// <summary>
         /// True if the id has a non default value.
         /// </summary>
         public bool IsValid => Value.IsValid;
+
         /// <inheritdoc/>
         public bool Equals(ContentSceneId other) => Value.Equals(other.Value);
+
         /// <inheritdoc/>
         public override int GetHashCode() => Value.GetHashCode();
+
         /// <inheritdoc/>
         public override string ToString() => Value.ToString();
     }
@@ -90,10 +102,12 @@ namespace Unity.Entities.Content
         /// The id of the file, this is transformed into the file path at runtime.
         /// </summary>
         public ContentFileId FileId;
+
         /// <summary>
         /// The index of the archive that contains this file.  This indexes into the ContentCatalogData.Archives array.
         /// </summary>
         public int ArchiveIndex;
+
         /// <summary>
         /// Index of content file dependencies.
         /// </summary>
@@ -110,10 +124,12 @@ namespace Unity.Entities.Content
         /// The object reference id.
         /// </summary>
         public UnsafeUntypedWeakReferenceId ObjectId;
+
         /// <summary>
         /// The index of the content file to load this object from.  This indexes into the ContentCatalogData.Files array.
         /// </summary>
         public int FileIndex;
+
         /// <summary>
         /// The local file id of this object in the content file. (NOTE: this is not the same local file id as the WeakObjectReferenceId.ObjectId).
         /// </summary>
@@ -130,10 +146,12 @@ namespace Unity.Entities.Content
         /// The object reference id.
         /// </summary>
         public UnsafeUntypedWeakReferenceId SceneId;
+
         /// <summary>
         /// The index of the content file to load this object from.  This indexes into the ContentCatalogData.Files array.
         /// </summary>
         public int FileIndex;
+
         /// <summary>
         /// The name of the scene.
         /// </summary>
@@ -150,20 +168,22 @@ namespace Unity.Entities.Content
         /// The blob reference id.
         /// </summary>
         public UnsafeUntypedWeakReferenceId ObjectId;
+
         /// <summary>
         /// The index of the content file to load this object from.  This indexes into the ContentCatalogData.Files array.
         /// </summary>
         public int FileIndex;
+
         /// <summary>
         /// The data offset.
         /// </summary>
         public long Offset;
+
         /// <summary>
         /// The length of the blob data.
         /// </summary>
         public long Length;
     }
-
 
     /// <summary>
     /// Serialized catalog data.
@@ -175,22 +195,27 @@ namespace Unity.Entities.Content
         /// The collection of content archives.
         /// </summary>
         public BlobArray<ContentArchiveLocation> Archives;
+
         /// <summary>
         /// The collection of files that are contained in the archives.
         /// </summary>
         public BlobArray<ContentFileLocation> Files;
+
         /// <summary>
         /// The collection of objects that are contained in the content files and we're directly referenced by a WeakObjectReferenceId.
         /// </summary>
         public BlobArray<ContentObjectLocation> Objects;
+
         /// <summary>
         /// The collection of scene that are contained in the content files and we're directly referenced by a WeakObjectReferenceId.
         /// </summary>
         public BlobArray<ContentSceneLocation> Scenes;
+
         /// <summary>
         /// List of dependency sets for content files.  Many files will potentially share the same set of dependencies so this is separate to allow for that.
         /// </summary>
         public BlobArray<BlobArray<int>> Dependencies;
+
         /// <summary>
         /// The collection of blob data that are contained in the content files and we're directly referenced by a WeakObjectReferenceId.
         /// </summary>

@@ -21,7 +21,8 @@ namespace UnityEngine.InputSystem.Editor
         public InputControlPickerDropdown(
             InputControlPickerState state,
             Action<string> onPickCallback,
-            InputControlPicker.Mode mode = InputControlPicker.Mode.PickControl)
+            InputControlPicker.Mode mode = InputControlPicker.Mode.PickControl
+        )
             : base(state.advancedDropdownState)
         {
             m_Gui = new InputControlPickerGUI(this);
@@ -96,15 +97,19 @@ namespace UnityEngine.InputSystem.Editor
             return root;
         }
 
-        protected override AdvancedDropdownItem BuildCustomSearch(string searchString,
-            IEnumerable<AdvancedDropdownItem> elements)
+        protected override AdvancedDropdownItem BuildCustomSearch(
+            string searchString,
+            IEnumerable<AdvancedDropdownItem> elements
+        )
         {
             if (!isListening)
                 return null;
 
-            var root = new AdvancedDropdownItem(!string.IsNullOrEmpty(m_ExpectedControlLayout)
-                ? $"Listening for {m_ExpectedControlLayout}..."
-                : "Listening for input...");
+            var root = new AdvancedDropdownItem(
+                !string.IsNullOrEmpty(m_ExpectedControlLayout)
+                    ? $"Listening for {m_ExpectedControlLayout}..."
+                    : "Listening for input..."
+            );
 
             if (searchString == "\u0017")
                 return root;
@@ -112,7 +117,10 @@ namespace UnityEngine.InputSystem.Editor
             var paths = searchString.Substring(1).Split('\u0017');
             foreach (var element in elements)
             {
-                if (element is ControlDropdownItem controlItem && paths.Any(x => controlItem.controlPathWithDevice == x))
+                if (
+                    element is ControlDropdownItem controlItem
+                    && paths.Any(x => controlItem.controlPathWithDevice == x)
+                )
                     root.AddChild(element);
             }
 
@@ -144,9 +152,11 @@ namespace UnityEngine.InputSystem.Editor
         {
             // Add devices that are marked as generic types of devices directly to the parent.
             // E.g. adds "Gamepad" and then underneath all the more specific types of gamepads.
-            foreach (var deviceLayout in EditorInputControlLayoutCache.allLayouts
-                     .Where(x => x.isDeviceLayout && !x.isOverride && x.isGenericTypeOfDevice && !x.hideInUI)
-                     .OrderBy(a => a.displayName))
+            foreach (
+                var deviceLayout in EditorInputControlLayoutCache
+                    .allLayouts.Where(x => x.isDeviceLayout && !x.isOverride && x.isGenericTypeOfDevice && !x.hideInUI)
+                    .OrderBy(a => a.displayName)
+            )
             {
                 AddDeviceTreeItemRecursive(deviceLayout, parent);
             }
@@ -155,10 +165,18 @@ namespace UnityEngine.InputSystem.Editor
             // of devices (e.g. Vive Lighthouses). We do not want them to clutter the list at the root so we
             // put all of them in a group called "Other" at the end of the list.
             var otherGroup = new AdvancedDropdownItem("Other");
-            foreach (var deviceLayout in EditorInputControlLayoutCache.allLayouts
-                     .Where(x => x.isDeviceLayout && !x.isOverride && !x.isGenericTypeOfDevice &&
-                         (x.type.BaseType == typeof(InputDevice) || x.type == typeof(InputDevice)) &&
-                         !x.hideInUI && !x.baseLayouts.Any()).OrderBy(a => a.displayName))
+            foreach (
+                var deviceLayout in EditorInputControlLayoutCache
+                    .allLayouts.Where(x =>
+                        x.isDeviceLayout
+                        && !x.isOverride
+                        && !x.isGenericTypeOfDevice
+                        && (x.type.BaseType == typeof(InputDevice) || x.type == typeof(InputDevice))
+                        && !x.hideInUI
+                        && !x.baseLayouts.Any()
+                    )
+                    .OrderBy(a => a.displayName)
+            )
             {
                 AddDeviceTreeItemRecursive(deviceLayout, otherGroup);
             }
@@ -167,11 +185,18 @@ namespace UnityEngine.InputSystem.Editor
                 parent.AddChild(otherGroup);
         }
 
-        private void AddDeviceTreeItemRecursive(InputControlLayout layout, AdvancedDropdownItem parent, bool searchable = true)
+        private void AddDeviceTreeItemRecursive(
+            InputControlLayout layout,
+            AdvancedDropdownItem parent,
+            bool searchable = true
+        )
         {
             // Find all layouts directly based on this one (ignoring overrides).
-            var childLayouts = EditorInputControlLayoutCache.allLayouts
-                .Where(x => x.isDeviceLayout && !x.isOverride && !x.hideInUI && x.baseLayouts.Contains(layout.name)).OrderBy(x => x.displayName);
+            var childLayouts = EditorInputControlLayoutCache
+                .allLayouts.Where(x =>
+                    x.isDeviceLayout && !x.isOverride && !x.hideInUI && x.baseLayouts.Contains(layout.name)
+                )
+                .OrderBy(x => x.displayName);
 
             // See if the entire tree should be excluded.
             var shouldIncludeDeviceLayout = ShouldIncludeDeviceLayout(layout);
@@ -201,7 +226,14 @@ namespace UnityEngine.InputSystem.Editor
                     }
 
                     if (m_Mode == InputControlPicker.Mode.PickControl)
-                        AddControlTreeItemsRecursive(defaultControlPickerLayout, layout, usageItem, layout.name, usage, searchable);
+                        AddControlTreeItemsRecursive(
+                            defaultControlPickerLayout,
+                            layout,
+                            usageItem,
+                            layout.name,
+                            usage,
+                            searchable
+                        );
                     deviceItem.AddChild(usageItem);
                 }
                 deviceItem.AddSeparator();
@@ -239,16 +271,37 @@ namespace UnityEngine.InputSystem.Editor
                     AddPhysicalKeyBindingsTo(byLocationGroup, keyboard, searchable);
 
                     // AnyKey won't appear in either group. Add it explicitly.
-                    AddControlItem(defaultControlPickerLayout, deviceItem, null,
-                        layout.FindControl(new InternedString("anyKey")).Value, layout.name, null, searchable);
+                    AddControlItem(
+                        defaultControlPickerLayout,
+                        deviceItem,
+                        null,
+                        layout.FindControl(new InternedString("anyKey")).Value,
+                        layout.name,
+                        null,
+                        searchable
+                    );
                 }
                 else if (layout.type == typeof(Touchscreen))
                 {
-                    AddControlTreeItemsRecursive(new TouchscreenControlPickerLayout(), layout, deviceItem, layout.name, null, searchable);
+                    AddControlTreeItemsRecursive(
+                        new TouchscreenControlPickerLayout(),
+                        layout,
+                        deviceItem,
+                        layout.name,
+                        null,
+                        searchable
+                    );
                 }
                 else
                 {
-                    AddControlTreeItemsRecursive(defaultControlPickerLayout, layout, deviceItem, layout.name, null, searchable);
+                    AddControlTreeItemsRecursive(
+                        defaultControlPickerLayout,
+                        layout,
+                        deviceItem,
+                        layout.name,
+                        null,
+                        searchable
+                    );
                 }
             }
 
@@ -280,8 +333,15 @@ namespace UnityEngine.InputSystem.Editor
                 parent.AddChild(deviceItem);
         }
 
-        private void AddControlTreeItemsRecursive(IInputControlPickerLayout controlPickerLayout, InputControlLayout layout,
-            DeviceDropdownItem parent, string device, string usage, bool searchable, ControlDropdownItem parentControl = null)
+        private void AddControlTreeItemsRecursive(
+            IInputControlPickerLayout controlPickerLayout,
+            InputControlLayout layout,
+            DeviceDropdownItem parent,
+            string device,
+            string usage,
+            bool searchable,
+            ControlDropdownItem parentControl = null
+        )
         {
             foreach (var control in layout.controls.OrderBy(a => a.name))
             {
@@ -289,8 +349,14 @@ namespace UnityEngine.InputSystem.Editor
                     continue;
 
                 // Skip variants except the default variant and variants dictated by the layout itself.
-                if (!control.variants.IsEmpty() && control.variants != InputControlLayout.DefaultVariant
-                    && (layout.variants.IsEmpty() || !InputControlLayout.VariantsMatch(layout.variants, control.variants)))
+                if (
+                    !control.variants.IsEmpty()
+                    && control.variants != InputControlLayout.DefaultVariant
+                    && (
+                        layout.variants.IsEmpty()
+                        || !InputControlLayout.VariantsMatch(layout.variants, control.variants)
+                    )
+                )
                 {
                     continue;
                 }
@@ -317,18 +383,25 @@ namespace UnityEngine.InputSystem.Editor
 
                 if (optionalGroup.children.Any())
                 {
-                    var deviceName = EditorInputControlLayoutCache.TryGetLayout(device).m_DisplayName ??
-                        ObjectNames.NicifyVariableName(device);
+                    var deviceName =
+                        EditorInputControlLayoutCache.TryGetLayout(device).m_DisplayName
+                        ?? ObjectNames.NicifyVariableName(device);
                     parent.AddSeparator("Controls Present on More Specific " + deviceName.GetPlural());
                     parent.AddChild(optionalGroup);
                 }
             }
         }
 
-        internal void AddControlItem(IInputControlPickerLayout controlPickerLayout,
-            DeviceDropdownItem parent, ControlDropdownItem parentControl,
-            InputControlLayout.ControlItem control, string device, string usage, bool searchable,
-            string controlNameOverride = default)
+        internal void AddControlItem(
+            IInputControlPickerLayout controlPickerLayout,
+            DeviceDropdownItem parent,
+            ControlDropdownItem parentControl,
+            InputControlLayout.ControlItem control,
+            string device,
+            string usage,
+            bool searchable,
+            string controlNameOverride = default
+        )
         {
             var controlName = controlNameOverride ?? control.name;
 
@@ -340,8 +413,7 @@ namespace UnityEngine.InputSystem.Editor
                     ? (control.isArray ? $"{control.displayName} #{i}" : control.displayName)
                     : name;
 
-                var child = new ControlDropdownItem(parentControl, name, displayName,
-                    device, usage, searchable);
+                var child = new ControlDropdownItem(parentControl, name, displayName, device, usage, searchable);
                 child.icon = EditorInputControlLayoutCache.GetIconForLayout(control.layout);
                 var controlLayout = EditorInputControlLayoutCache.TryGetLayout(control.layout);
 
@@ -354,8 +426,15 @@ namespace UnityEngine.InputSystem.Editor
                 }
                 // Add children.
                 if (controlLayout != null)
-                    AddControlTreeItemsRecursive(controlPickerLayout, controlLayout, parent, device, usage,
-                        searchable, child);
+                    AddControlTreeItemsRecursive(
+                        controlPickerLayout,
+                        controlLayout,
+                        parent,
+                        device,
+                        usage,
+                        searchable,
+                        child
+                    );
             }
         }
 
@@ -366,8 +445,10 @@ namespace UnityEngine.InputSystem.Editor
                 // If the key has a display name that differs from the key name, show it in the UI.
                 var displayName = key.m_DisplayNameFromLayout;
                 var keyDisplayName = key.displayName;
-                if (keyDisplayName.All(x => x.IsPrintable()) && string.Compare(keyDisplayName, displayName,
-                    StringComparison.InvariantCultureIgnoreCase) != 0)
+                if (
+                    keyDisplayName.All(x => x.IsPrintable())
+                    && string.Compare(keyDisplayName, displayName, StringComparison.InvariantCultureIgnoreCase) != 0
+                )
                     displayName = $"{displayName} (Current Layout: {key.displayName})";
 
                 // For left/right modifier keys, prepend artificial combined version.
@@ -379,11 +460,18 @@ namespace UnityEngine.InputSystem.Editor
                 else if (key == keyboard.leftCtrlKey)
                     combinedVersion = keyboard.ctrlKey;
                 if (combinedVersion != null)
-                    parent.AddChild(new ControlDropdownItem(null, combinedVersion.name, combinedVersion.displayName, keyboard.layout,
-                        "", searchable));
+                    parent.AddChild(
+                        new ControlDropdownItem(
+                            null,
+                            combinedVersion.name,
+                            combinedVersion.displayName,
+                            keyboard.layout,
+                            "",
+                            searchable
+                        )
+                    );
 
-                var item = new ControlDropdownItem(null, key.name, displayName,
-                    keyboard.layout, "", searchable);
+                var item = new ControlDropdownItem(null, key.name, displayName, keyboard.layout, "", searchable);
 
                 parent.AddChild(item);
             }
@@ -428,8 +516,11 @@ namespace UnityEngine.InputSystem.Editor
 
             // By default, if a device has no (usable) controls, we don't want it listed in the control picker
             // except if we're picking devices.
-            if (!layout.controls.Any(x => LayoutMatchesExpectedControlLayoutFilter(x.layout)) && layout.controls.Any(x => true) &&
-                m_Mode != InputControlPicker.Mode.PickDevice)
+            if (
+                !layout.controls.Any(x => LayoutMatchesExpectedControlLayoutFilter(x.layout))
+                && layout.controls.Any(x => true)
+                && m_Mode != InputControlPicker.Mode.PickDevice
+            )
                 return false;
 
             // If we have a device filter, see if we should ignore the device.
@@ -441,10 +532,14 @@ namespace UnityEngine.InputSystem.Editor
                     // Include the layout if it's in the inheritance hierarchy of the layout we expect (either below
                     // or above it or, well, just right on it).
                     var expectedLayout = InputControlPath.TryGetDeviceLayout(entry);
-                    if (!string.IsNullOrEmpty(expectedLayout) &&
-                        (expectedLayout == layout.name ||
-                         InputControlLayout.s_Layouts.IsBasedOn(layout.name, new InternedString(expectedLayout)) ||
-                         InputControlLayout.s_Layouts.IsBasedOn(new InternedString(expectedLayout), layout.name)))
+                    if (
+                        !string.IsNullOrEmpty(expectedLayout)
+                        && (
+                            expectedLayout == layout.name
+                            || InputControlLayout.s_Layouts.IsBasedOn(layout.name, new InternedString(expectedLayout))
+                            || InputControlLayout.s_Layouts.IsBasedOn(new InternedString(expectedLayout), layout.name)
+                        )
+                    )
                     {
                         matchesAnyInDeviceFilter = true;
                         break;
@@ -480,25 +575,23 @@ namespace UnityEngine.InputSystem.Editor
                 .WithControlsExcluding("<Pointer>/clickCount")
                 .WithControlsExcluding("<Pointer>/{PrimaryAction}")
                 .WithControlsExcluding("<Mouse>/scroll")
-                .OnPotentialMatch(
-                    operation =>
-                    {
-                        // We never really complete the pick but keep listening for as long as the "Interactive"
-                        // button is toggled on.
+                .OnPotentialMatch(operation =>
+                {
+                    // We never really complete the pick but keep listening for as long as the "Interactive"
+                    // button is toggled on.
 
-                        Repaint();
-                    })
-                .OnCancel(
-                    operation =>
-                    {
-                        Repaint();
-                    })
+                    Repaint();
+                })
+                .OnCancel(operation =>
+                {
+                    Repaint();
+                })
                 .OnApplyBinding(
-                    (operation, newPath) =>
-                    {
+                    (operation, newPath) => {
                         // This is never invoked (because we don't complete the pick) but we need it nevertheless
                         // as RebindingOperation requires the callback if we don't supply an action to apply the binding to.
-                    });
+                    }
+                );
 
             // If we have control paths to match, pass them on.
             if (m_ControlPathsToMatch.LengthSafe() > 0)
@@ -527,8 +620,7 @@ namespace UnityEngine.InputSystem.Editor
 
                 builder.Length = 0;
                 yield return control.BuildPath(deviceLayoutName, builder);
-            }
-            while (InputControlLayout.s_Layouts.baseLayoutTable.TryGetValue(deviceLayoutName, out deviceLayoutName));
+            } while (InputControlLayout.s_Layouts.baseLayoutTable.TryGetValue(deviceLayoutName, out deviceLayoutName));
         }
 
         private Action<string> m_OnPickCallback;
@@ -579,8 +671,12 @@ namespace UnityEngine.InputSystem.Editor
                         {
                             GUILayout.Space(4);
                             var isListeningOld = m_Owner.isListening;
-                            var isListeningNew = GUILayout.Toggle(isListeningOld, "Listen",
-                                EditorStyles.miniButton, GUILayout.MaxWidth(50));
+                            var isListeningNew = GUILayout.Toggle(
+                                isListeningOld,
+                                "Listen",
+                                EditorStyles.miniButton,
+                                GUILayout.MaxWidth(50)
+                            );
 
                             if (isListeningOld != isListeningNew)
                             {
@@ -607,16 +703,27 @@ namespace UnityEngine.InputSystem.Editor
                     if (isListening)
                     {
                         var rebind = m_Owner.m_RebindingOperation;
-                        return "\u0017" + string.Join("\u0017",
-                            rebind.candidates.SelectMany(x => GeneratePossiblePathsForControl(x).Reverse()));
+                        return "\u0017"
+                            + string.Join(
+                                "\u0017",
+                                rebind.candidates.SelectMany(x => GeneratePossiblePathsForControl(x).Reverse())
+                            );
                     }
 
                     return newSearchString;
                 }
             }
 
-            internal override void DrawItem(AdvancedDropdownItem item, string name, Texture2D icon, bool enabled,
-                bool drawArrow, bool selected, bool hasSearch, bool richText = false)
+            internal override void DrawItem(
+                AdvancedDropdownItem item,
+                string name,
+                Texture2D icon,
+                bool enabled,
+                bool drawArrow,
+                bool selected,
+                bool hasSearch,
+                bool richText = false
+            )
             {
                 if (hasSearch && item is InputControlDropdownItem viewItem)
                     name = viewItem.searchableName;

@@ -21,7 +21,13 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public AccountState State { get; set; }
 
-        public PlayModeAccount(IEnvironment environment, IPlayModeUserManager userManager, PlayModeAccountData associatedData, ICapabilities capabilities, PlatformToolkitMetrics metrics)
+        public PlayModeAccount(
+            IEnvironment environment,
+            IPlayModeUserManager userManager,
+            PlayModeAccountData associatedData,
+            ICapabilities capabilities,
+            PlatformToolkitMetrics metrics
+        )
         {
             AccountId = MakeAccountId(userManager, associatedData);
             Assert.AreNotEqual(-1, AccountId, "Account data not found in the user manager when it should exist there.");
@@ -31,7 +37,9 @@ namespace Unity.PlatformToolkit.PlayMode
             m_UserManager = userManager;
             m_Environment = environment;
             m_SavingSystem = new PlayModeSavingSystem(m_Environment, AccountId, associatedData.Saves, metrics);
-            m_AchievementSystem = capabilities.AccountAchievements ? new PlayModeAchievementSystem(m_Environment, associatedData.Achievements) : null;
+            m_AchievementSystem = capabilities.AccountAchievements
+                ? new PlayModeAchievementSystem(m_Environment, associatedData.Achievements)
+                : null;
         }
 
         private static int MakeAccountId(IPlayModeUserManager userManager, PlayModeAccountData accountData)

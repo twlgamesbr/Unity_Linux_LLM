@@ -16,10 +16,16 @@ namespace UnityEditor.Rendering.Universal
         const string k_VendorKey = "unity.universal";
 
         const string k_EventName = "uURPPostProcessAsset";
+
         // SCHEMA: com.unity3d.data.schemas.editor.analytics.uURPPostProcessAsset_v1
         // TAXONOMY : editor.analytics.uURPPostProcessAsset.v1
 
-        [AnalyticInfo(eventName: k_EventName, vendorKey: k_VendorKey, maxEventsPerHour: k_MaxEventsPerHour, maxNumberOfElements: k_MaxNumberOfElements)]
+        [AnalyticInfo(
+            eventName: k_EventName,
+            vendorKey: k_VendorKey,
+            maxEventsPerHour: k_MaxEventsPerHour,
+            maxNumberOfElements: k_MaxNumberOfElements
+        )]
         public class Analytic : IAnalytic
         {
             [Serializable]
@@ -61,7 +67,7 @@ namespace UnityEditor.Rendering.Universal
                         {
                             Renderer2DData renderer2DData => renderer2DData.postProcessData,
                             UniversalRendererData universalRendererData => universalRendererData.postProcessData,
-                            _ => null
+                            _ => null,
                         };
 
                         if (postProcessData != null)
@@ -94,15 +100,22 @@ namespace UnityEditor.Rendering.Universal
 
             private static Dictionary<string, PropertyToGUIDs> CreateDictionaryWithDefaults()
             {
-                var defaultShaderResources = GraphicsSettings.GetRenderPipelineSettings<PostProcessData.ShaderResources>();
-                var defaultTextureResources = GraphicsSettings.GetRenderPipelineSettings<PostProcessData.TextureResources>();
+                var defaultShaderResources =
+                    GraphicsSettings.GetRenderPipelineSettings<PostProcessData.ShaderResources>();
+                var defaultTextureResources =
+                    GraphicsSettings.GetRenderPipelineSettings<PostProcessData.TextureResources>();
                 Dictionary<string, PropertyToGUIDs> output = new();
 
-                void AddDefaultsToDictionary(Dictionary<string, PropertyToGUIDs> dictionary,
-                    List<(string property, string guid)> list)
+                void AddDefaultsToDictionary(
+                    Dictionary<string, PropertyToGUIDs> dictionary,
+                    List<(string property, string guid)> list
+                )
                 {
                     foreach (var item in list)
-                        dictionary.Add(item.property, new PropertyToGUIDs { propertyName = item.property, defaultGUID = item.guid });
+                        dictionary.Add(
+                            item.property,
+                            new PropertyToGUIDs { propertyName = item.property, defaultGUID = item.guid }
+                        );
                 }
 
                 AddDefaultsToDictionary(output, GetPropertyGUIDs(defaultShaderResources));
@@ -110,9 +123,15 @@ namespace UnityEditor.Rendering.Universal
                 return output;
             }
 
-            private static void AddUsages(List<PostProcessData> postProcessDatas, Dictionary<string, PropertyToGUIDs> output)
+            private static void AddUsages(
+                List<PostProcessData> postProcessDatas,
+                Dictionary<string, PropertyToGUIDs> output
+            )
             {
-                void AddUsageToDictionary(Dictionary<string, PropertyToGUIDs> dictionary, List<(string property, string guid)> list)
+                void AddUsageToDictionary(
+                    Dictionary<string, PropertyToGUIDs> dictionary,
+                    List<(string property, string guid)> list
+                )
                 {
                     foreach (var item in list)
                         dictionary[item.property].usedGUIDs.Add(item.guid);
@@ -157,20 +176,24 @@ namespace UnityEditor.Rendering.Universal
                             case 1:
                                 if (!uniques.Contains(i.defaultGUID))
                                 {
-                                    tmp.Add(new AnalyticsData()
-                                    {
-                                        property = i.propertyName,
-                                        usage = Usage.ModifiedForTheProject.ToString()
-                                    });
+                                    tmp.Add(
+                                        new AnalyticsData()
+                                        {
+                                            property = i.propertyName,
+                                            usage = Usage.ModifiedForTheProject.ToString(),
+                                        }
+                                    );
                                 }
 
                                 break;
                             default:
-                                tmp.Add(new AnalyticsData()
-                                {
-                                    property = i.propertyName,
-                                    usage = Usage.ModifiedForEachQualityLevel.ToString()
-                                });
+                                tmp.Add(
+                                    new AnalyticsData()
+                                    {
+                                        property = i.propertyName,
+                                        usage = Usage.ModifiedForEachQualityLevel.ToString(),
+                                    }
+                                );
                                 break;
                         }
 

@@ -11,12 +11,15 @@ namespace UnityEditor.Rendering
         /// <param name="mask">The filtering mask</param>
         /// <returns>True: All flagged area are expended</returns>
         public abstract bool GetExpandedAreas(TState mask);
+
         /// <summary>Setter to the expended state.</summary>
         /// <param name="mask">The filtering mask</param>
         /// <param name="value">The expended state to set</param>
         public abstract void SetExpandedAreas(TState mask, bool value);
+
         /// <summary> Utility to set all states to true </summary>
         public abstract void ExpandAll();
+
         /// <summary> Utility to set all states to false </summary>
         public abstract void CollapseAll();
 
@@ -29,7 +32,6 @@ namespace UnityEditor.Rendering
             set => SetExpandedAreas(mask, value);
         }
     }
-
 
     /// <summary>Used in editor drawer part to store the state of expandable areas using EditorPrefBoolFlags.</summary>
     /// <typeparam name="TState">An enum to use to describe the state.</typeparam>
@@ -125,16 +127,16 @@ namespace UnityEditor.Rendering
         /// <param name="value">Value to make the operations on.</param>
         /// <returns>The right shift value after the given index.</returns>
         internal static uint RightShiftOnceFromIndexToMSB(int index, uint value)
-        {                                                               // Example of each operation:
-                                                                        // 1011 1001 - Value
-            uint indexBit = 1u << index;                                // 0000 1000 - Index bit
-            uint remainArea = indexBit - 1u;                            // 0000 0111
-            uint remainBits = remainArea & value;                       // 0000 0001
-            uint movedBits = (~remainArea - indexBit & value) >> 1;     // 1111 1000
-                                                                        // 1111 0000
-                                                                        // 1011 0000
-                                                                        // 0101 1000
-            return movedBits | remainBits;                              // 0101 1001 - Result
+        { // Example of each operation:
+            // 1011 1001 - Value
+            uint indexBit = 1u << index; // 0000 1000 - Index bit
+            uint remainArea = indexBit - 1u; // 0000 0111
+            uint remainBits = remainArea & value; // 0000 0001
+            uint movedBits = (~remainArea - indexBit & value) >> 1; // 1111 1000
+            // 1111 0000
+            // 1011 0000
+            // 0101 1000
+            return movedBits | remainBits; // 0101 1001 - Result
         }
     }
 }

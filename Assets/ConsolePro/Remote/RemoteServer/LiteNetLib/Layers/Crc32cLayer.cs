@@ -1,15 +1,13 @@
-﻿using FlyingWormConsole3.LiteNetLib.Utils;
-using System;
+﻿using System;
 using System.Net;
+using FlyingWormConsole3.LiteNetLib.Utils;
 
 namespace FlyingWormConsole3.LiteNetLib.Layers
 {
     public sealed class Crc32cLayer : PacketLayerBase
     {
-        public Crc32cLayer() : base(CRC32C.ChecksumSize)
-        {
-
-        }
+        public Crc32cLayer()
+            : base(CRC32C.ChecksumSize) { }
 
         public override void ProcessInboundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int length)
         {
@@ -32,7 +30,12 @@ namespace FlyingWormConsole3.LiteNetLib.Layers
             length -= CRC32C.ChecksumSize;
         }
 
-        public override void ProcessOutBoundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int offset, ref int length)
+        public override void ProcessOutBoundPacket(
+            ref IPEndPoint endPoint,
+            ref byte[] data,
+            ref int offset,
+            ref int length
+        )
         {
             FastBitConverter.GetBytes(data, length, CRC32C.Compute(data, offset, length));
             length += CRC32C.ChecksumSize;

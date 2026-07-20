@@ -29,7 +29,7 @@ namespace Unity.Entities.UI
             void IBinding.Release() { }
         }
 
-        internal InspectorContent Target => (InspectorContent) target;
+        internal InspectorContent Target => (InspectorContent)target;
         internal DisplayContent DisplayContent;
         internal BindableElement m_Root;
 
@@ -50,8 +50,8 @@ namespace Unity.Entities.UI
                 InspectionContext =
                 {
                     ApplyInspectorStyling = Target.Parameters.ApplyInspectorStyling,
-                    UseDefaultMargins = Target.Parameters.UseDefaultMargins
-                }
+                    UseDefaultMargins = Target.Parameters.UseDefaultMargins,
+                },
             };
 
             var content = DisplayContent.CreateGUI();
@@ -60,11 +60,7 @@ namespace Unity.Entities.UI
 
             m_Root = new BindableElement();
             m_Root.Add(content);
-            m_Root.binding = new UpdateBinding
-            {
-                DisplayContent = DisplayContent,
-                Editor = this
-            };
+            m_Root.binding = new UpdateBinding { DisplayContent = DisplayContent, Editor = this };
             return m_Root;
         }
     }

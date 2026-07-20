@@ -13,19 +13,25 @@ namespace UnityEditor
         {
             Default,
             SortAtRoot,
-            Sort3DAs2D
+            Sort3DAs2D,
         }
 
         private static class GUIStyles
         {
-            public static GUIContent Default = EditorGUIUtility.TrTextContent("Sorting Type",
-               "Default sorting based on sorting layer and sorting order.");
+            public static GUIContent Default = EditorGUIUtility.TrTextContent(
+                "Sorting Type",
+                "Default sorting based on sorting layer and sorting order."
+            );
 
-            public static GUIContent sortAtRootStyle = EditorGUIUtility.TrTextContent("Sorting Type",
-                "Ignores all parent Sorting Groups and sorts at the root level against other Sorting Groups and Renderers");
+            public static GUIContent sortAtRootStyle = EditorGUIUtility.TrTextContent(
+                "Sorting Type",
+                "Ignores all parent Sorting Groups and sorts at the root level against other Sorting Groups and Renderers"
+            );
 
-            public static GUIContent sort3DAs2D = EditorGUIUtility.TrTextContent("Sorting Type",
-                "Clears z values on 3D meshes affected by a Sorting Group allowing them to sort with other 2D objects and Sort 3D as 2D sorting groups. This option also enables Sort At Root");
+            public static GUIContent sort3DAs2D = EditorGUIUtility.TrTextContent(
+                "Sorting Type",
+                "Clears z values on 3D meshes affected by a Sorting Group allowing them to sort with other 2D objects and Sort 3D as 2D sorting groups. This option also enables Sort At Root"
+            );
         }
 
         private SerializedProperty m_Sort3DAs2D;
@@ -38,7 +44,10 @@ namespace UnityEditor
             m_Sort3DAs2D = serializedObject.FindProperty("m_Sort3DAs2D");
 
             // Initialize m_SortType
-            m_SortType = m_Sort3DAs2D.boolValue ? SortType.Sort3DAs2D : m_SortAtRoot.boolValue ? SortType.SortAtRoot : SortType.Default;
+            m_SortType =
+                m_Sort3DAs2D.boolValue ? SortType.Sort3DAs2D
+                : m_SortAtRoot.boolValue ? SortType.SortAtRoot
+                : SortType.Default;
         }
 
         void OnInspectorGUIFor2D()
@@ -48,7 +57,10 @@ namespace UnityEditor
             SortingLayerEditorUtility.RenderSortingLayerFields(m_SortingOrder, m_SortingLayerID);
 
             var prevSortType = m_SortType;
-            var label = m_Sort3DAs2D.boolValue ? GUIStyles.sort3DAs2D : m_SortAtRoot.boolValue ? GUIStyles.sortAtRootStyle : GUIStyles.Default;
+            var label =
+                m_Sort3DAs2D.boolValue ? GUIStyles.sort3DAs2D
+                : m_SortAtRoot.boolValue ? GUIStyles.sortAtRootStyle
+                : GUIStyles.Default;
             m_SortType = (SortType)EditorGUILayout.EnumPopup(label, m_SortType);
 
             if (prevSortType != m_SortType)
@@ -88,7 +100,9 @@ namespace UnityEditor
 
                     if (renderAs2D == null)
                     {
-                        Material mat = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/RenderAs2D-Flattening.mat");
+                        Material mat = AssetDatabase.LoadAssetAtPath<Material>(
+                            "Packages/com.unity.render-pipelines.universal/Runtime/Materials/RenderAs2D-Flattening.mat"
+                        );
                         renderAs2D = go.AddComponent<RenderAs2D>();
                         renderAs2D.Init(sortingGroup);
                         renderAs2D.material = mat;

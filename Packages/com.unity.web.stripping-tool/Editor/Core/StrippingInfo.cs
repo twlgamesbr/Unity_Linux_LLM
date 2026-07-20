@@ -70,18 +70,18 @@ namespace Unity.Web.Stripping.Editor
         /// <summary>
         /// Optional: Size reduction of code section.
         /// </summary>
-        public long? strippedCodeSize  { get; set; } = null;
+        public long? strippedCodeSize { get; set; } = null;
 
         /// <summary>
         /// Optional: Size reduction of custom "name" section. Used by Emscripten to store function names.
         /// </summary>
-        public long? strippedNameSize  { get; set; } = null;
+        public long? strippedNameSize { get; set; } = null;
 
         /// <summary>
         /// Optional: Size reduction of custom section with DWARF debug information.
         /// This includes the sections .debug_loc, .debug_line, .debug_ranges, .debug_str, .debug_abbrev, .debug_info
         /// </summary>
-        public long? strippedDwarfSize  { get; set; } = null;
+        public long? strippedDwarfSize { get; set; } = null;
     }
 
     /// <summary>
@@ -164,7 +164,6 @@ namespace Unity.Web.Stripping.Editor
         /// </summary>
         public WasmSectionSizes? WasmFileSectionSizeInformation = null;
 
-
         /// <summary>
         /// Error log output. Default: System.Console.Error
         /// </summary>
@@ -194,15 +193,18 @@ namespace Unity.Web.Stripping.Editor
                 strippedSize = (originalFileSize - strippedFileSize),
                 optimizeCodeAfterStripping = OptimizeCodeAfterStripping,
                 removeDebugInformation = RemoveDebugInformation,
-                missingSubmoduleErrorHandling = MissingSubmoduleErrorHandling
+                missingSubmoduleErrorHandling = MissingSubmoduleErrorHandling,
             };
 
             // Add information on the individual sections
             if (OriginalWasmFileSectionSizeInformation != null && WasmFileSectionSizeInformation != null)
             {
-                strippingInfo.strippedCodeSize = OriginalWasmFileSectionSizeInformation.Code - WasmFileSectionSizeInformation.Code;
-                strippingInfo.strippedNameSize = OriginalWasmFileSectionSizeInformation.Name - WasmFileSectionSizeInformation.Name;
-                strippingInfo.strippedDwarfSize = OriginalWasmFileSectionSizeInformation.Dwarf - WasmFileSectionSizeInformation.Dwarf;
+                strippingInfo.strippedCodeSize =
+                    OriginalWasmFileSectionSizeInformation.Code - WasmFileSectionSizeInformation.Code;
+                strippingInfo.strippedNameSize =
+                    OriginalWasmFileSectionSizeInformation.Name - WasmFileSectionSizeInformation.Name;
+                strippingInfo.strippedDwarfSize =
+                    OriginalWasmFileSectionSizeInformation.Dwarf - WasmFileSectionSizeInformation.Dwarf;
             }
             File.WriteAllText(path, strippingInfo.ToJson());
         }
@@ -243,7 +245,10 @@ namespace Unity.Web.Stripping.Editor
                 // Skip this check if submodule was already found to be stripped
                 if (!submoduleWasStripped && MethodMap != null && submoduleDefinition.csharpMethodFilters != null)
                 {
-                    var csharpFunctions = FilterEvaluator.FindMethods(MethodMap, submoduleDefinition.csharpMethodFilters);
+                    var csharpFunctions = FilterEvaluator.FindMethods(
+                        MethodMap,
+                        submoduleDefinition.csharpMethodFilters
+                    );
                     foreach (var function in csharpFunctions)
                     {
                         if (strippedFunctions.Contains(function))
@@ -253,7 +258,6 @@ namespace Unity.Web.Stripping.Editor
                         }
                     }
                 }
-
 
                 if (submoduleWasStripped)
                 {

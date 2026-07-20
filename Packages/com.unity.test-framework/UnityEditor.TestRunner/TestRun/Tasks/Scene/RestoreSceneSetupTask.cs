@@ -7,7 +7,8 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks.Scene
     internal class RestoreSceneSetupTask : TestTaskBase
     {
         internal Action<SceneSetup[]> RestoreSceneManagerSetup = EditorSceneManager.RestoreSceneManagerSetup;
-        internal Func<NewSceneSetup, NewSceneMode, ISceneWrapper> NewScene = (setup, mode) => new SceneWrapper(EditorSceneManager.NewScene(setup, mode));
+        internal Func<NewSceneSetup, NewSceneMode, ISceneWrapper> NewScene = (setup, mode) =>
+            new SceneWrapper(EditorSceneManager.NewScene(setup, mode));
 
         public RestoreSceneSetupTask()
         {

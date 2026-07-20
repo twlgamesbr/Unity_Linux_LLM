@@ -48,7 +48,8 @@ namespace UnityEngine.PathTracing.Integration
             int height,
             float widthScale,
             float heightScale,
-            Mesh uvMesh)
+            Mesh uvMesh
+        )
         {
             cmd.BeginSample("Build UVFallbackBuffer");
 
@@ -73,7 +74,11 @@ namespace UnityEngine.PathTracing.Integration
             if (_vertexBuffer == null || _vertexBuffer.count < vertices.Length)
             {
                 _vertexBuffer?.Dispose();
-                _vertexBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, vertices.Length, 2 * sizeof(float));
+                _vertexBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    vertices.Length,
+                    2 * sizeof(float)
+                );
             }
             cmd.SetBufferData(_vertexBuffer, vertices);
 
@@ -83,7 +88,13 @@ namespace UnityEngine.PathTracing.Integration
             cmd.SetGlobalInteger(UVFallbackBufferBuilderShaderIDs.Height, height);
             cmd.SetGlobalFloat(UVFallbackBufferBuilderShaderIDs.WidthScale, widthScale);
             cmd.SetGlobalFloat(UVFallbackBufferBuilderShaderIDs.HeightScale, heightScale);
-            cmd.DrawProcedural(Matrix4x4.identity, _uvFallbackBufferMaterial, 0, MeshTopology.Triangles, (int)uvMesh.GetTotalIndexCount());
+            cmd.DrawProcedural(
+                Matrix4x4.identity,
+                _uvFallbackBufferMaterial,
+                0,
+                MeshTopology.Triangles,
+                (int)uvMesh.GetTotalIndexCount()
+            );
 
             cmd.EndSample("Build UVFallbackBuffer");
 
@@ -112,7 +123,8 @@ namespace UnityEngine.PathTracing.Integration
             UVFallbackBufferBuilder builder,
             int width,
             int height,
-            UVMesh uvMesh)
+            UVMesh uvMesh
+        )
         {
             if (width == 0 || height == 0)
                 return false;
@@ -145,7 +157,13 @@ namespace UnityEngine.PathTracing.Integration
                 WidthScale = 1.0f;
             }
 
-            UVFallbackRT = new RenderTexture(width, height, 24, RenderTextureFormat.RGFloat, RenderTextureReadWrite.Linear)
+            UVFallbackRT = new RenderTexture(
+                width,
+                height,
+                24,
+                RenderTextureFormat.RGFloat,
+                RenderTextureReadWrite.Linear
+            )
             {
                 name = "UVFallbackRT",
                 hideFlags = HideFlags.HideAndDontSave,
@@ -170,7 +188,13 @@ namespace UnityEngine.PathTracing.Integration
             shader.SetFloatParam(cmd, UVFallbackBufferBuilderShaderIDs.InstanceHeightScale, HeightScale);
         }
 
-        public void BindChunked(CommandBuffer cmd, IRayTracingShader shader, Vector2Int instanceOffset, uint2 chunkOffset, uint chunkSize)
+        public void BindChunked(
+            CommandBuffer cmd,
+            IRayTracingShader shader,
+            Vector2Int instanceOffset,
+            uint2 chunkOffset,
+            uint chunkSize
+        )
         {
             Bind(cmd, shader, instanceOffset);
             shader.SetIntParam(cmd, UVFallbackBufferBuilderShaderIDs.ChunkOffsetX, (int)chunkOffset.x);

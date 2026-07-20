@@ -22,8 +22,10 @@ namespace Unity.Web.Stripping.Editor
         public bool Development { get; set; } = false;
         public string CodeOptimization { get; set; } = "";
         public bool EnableLoggingOfMissingSubmodule { get; set; } = false;
-        public string LogFunctionCode { get; set; } = "var wasmImports = {\n  \"log_execution\": function(funcId, labelId) { },";
-        public string MinifiedLogFunctionCode { get; set; } = "var wasmImports={\"log_execution\":function(funcId, labelId){},";
+        public string LogFunctionCode { get; set; } =
+            "var wasmImports = {\n  \"log_execution\": function(funcId, labelId) { },";
+        public string MinifiedLogFunctionCode { get; set; } =
+            "var wasmImports={\"log_execution\":function(funcId, labelId){},";
         public string EmscriptenSdkPath { get; set; } = "";
         public string BrotliPath { get; set; } = "";
         public string SevenZipPath { get; set; } = "";
@@ -42,7 +44,7 @@ namespace Unity.Web.Stripping.Editor
         /// <summary>
         /// Name of the stripping tool.
         /// </summary>
-        public string? ToolName  { get; set; } = null;
+        public string? ToolName { get; set; } = null;
 
         /// <summary>
         /// Product version to be written into the stripping info file.
@@ -77,12 +79,27 @@ namespace Unity.Web.Stripping.Editor
         /// </summary>
         public ProgressCallback? OnProgress;
 
-        private string TempUncompressedWasmFile = Path.Combine(Path.GetTempPath(), $"tmp_uncompressed_{Path.GetRandomFileName()}.wasm");
-        private string TempUncompressedSymbolFile = Path.Combine(Path.GetTempPath(), $"tmp_symbols_{Path.GetRandomFileName()}.symbols.json");
-        private string TempFunctionIdsFile = Path.Combine(Path.GetTempPath(), $"tmp_functions_{Path.GetRandomFileName()}.txt");
+        private string TempUncompressedWasmFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_uncompressed_{Path.GetRandomFileName()}.wasm"
+        );
+        private string TempUncompressedSymbolFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_symbols_{Path.GetRandomFileName()}.symbols.json"
+        );
+        private string TempFunctionIdsFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_functions_{Path.GetRandomFileName()}.txt"
+        );
         private string TempWasmFile = Path.Combine(Path.GetTempPath(), $"tmp_stripped_{Path.GetRandomFileName()}.wasm");
-        private string TempLoggingWasmFile = Path.Combine(Path.GetTempPath(), $"tmp_logging_{Path.GetRandomFileName()}.wasm");
-        private string TempOptimizedWasmFile = Path.Combine(Path.GetTempPath(), $"tmp_optimized_{Path.GetRandomFileName()}.wasm");
+        private string TempLoggingWasmFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_logging_{Path.GetRandomFileName()}.wasm"
+        );
+        private string TempOptimizedWasmFile = Path.Combine(
+            Path.GetTempPath(),
+            $"tmp_optimized_{Path.GetRandomFileName()}.wasm"
+        );
         private int m_CurrentStep = 0;
         private int m_TotalSteps = 0;
         private string m_LastDescription = "";
@@ -94,8 +111,7 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="outputWasmFile">The output WASM file.</param>
         /// <param name="frameworkFile">Optional: The input JavaScript framework file.</param>
         /// <param name="outputFrameworkFile">Optional: The output JavaScript framework file with missing submodule logging code.</param>
-        public void StripSubmodules
-        (
+        public void StripSubmodules(
             string wasmFile,
             string outputWasmFile,
             string frameworkFile = "",
@@ -137,7 +153,7 @@ namespace Unity.Web.Stripping.Editor
                     // Code optimization can be skipped during remove-functions pass if code is optimized later
                     CodeOptimization = (EnableLoggingOfMissingSubmodule || Optimize) ? "" : CodeOptimization,
                     Log = Log,
-                    ErrorLog = ErrorLog
+                    ErrorLog = ErrorLog,
                 };
 
                 // Uncompress wasm if necessary
@@ -210,15 +226,16 @@ namespace Unity.Web.Stripping.Editor
                     SubmodulesToStrip = SubmodulesToStrip,
                     Verbose = Verbose,
                     Log = Log,
-                    ErrorLog = ErrorLog
+                    ErrorLog = ErrorLog,
                 };
                 bool hasFunctionsToStrip = functionListWriter.Write(TempFunctionIdsFile);
 
                 // Run wasm opt to remove all "not executed" functions
                 UpdateProgress("Removing submodules.");
                 WriteLog("Stripping submodules with wasm-opt.");
-                var strippedWasmFile = (EnableLoggingOfMissingSubmodule || Optimize) ? TempWasmFile : outputWasmFilePath;
-                HashSet<string> strippedFunctions = new ();
+                var strippedWasmFile =
+                    (EnableLoggingOfMissingSubmodule || Optimize) ? TempWasmFile : outputWasmFilePath;
+                HashSet<string> strippedFunctions = new();
                 if (hasFunctionsToStrip)
                 {
                     // Strip functions
@@ -264,7 +281,7 @@ namespace Unity.Web.Stripping.Editor
                         LogFunctionCode = LogFunctionCode,
                         MinifiedLogFunctionCode = MinifiedLogFunctionCode,
                         Log = Log,
-                        ErrorLog = ErrorLog
+                        ErrorLog = ErrorLog,
                     };
                     submoduleProfiler.InstrumentBuild(
                         strippedWasmFile,
@@ -333,7 +350,7 @@ namespace Unity.Web.Stripping.Editor
                     MissingSubmoduleErrorHandling = MissingSubmoduleErrorHandling,
                     OriginalWasmFileSectionSizeInformation = originalWasmFileSizeInformation,
                     WasmFileSectionSizeInformation = wasmFileSizeInformation,
-                    ErrorLog = ErrorLog
+                    ErrorLog = ErrorLog,
                 };
                 if (!string.IsNullOrEmpty(ToolName))
                     strippingInfoWriter.ToolName = ToolName!;
@@ -370,7 +387,6 @@ namespace Unity.Web.Stripping.Editor
         {
             m_CurrentStep = 0;
             m_LastDescription = "";
-
 
             m_TotalSteps = 6;
             if (SymbolFile != "")

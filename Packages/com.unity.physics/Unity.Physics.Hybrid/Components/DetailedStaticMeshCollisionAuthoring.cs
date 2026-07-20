@@ -14,9 +14,9 @@ namespace Unity.Physics.Authoring
     [DisallowMultipleComponent]
     public class DetailedStaticMeshCollisionAuthoring : MonoBehaviour
     {
-        const string k_IconPath = "Packages/com.unity.physics/Unity.Physics.Editor/Editor Default Resources/Icons/d_BoxCollider@64.png";
-        private void Start()
-        {
-        }
+        const string k_IconPath =
+            "Packages/com.unity.physics/Unity.Physics.Editor/Editor Default Resources/Icons/d_BoxCollider@64.png";
+
+        private void Start() { }
     }
 }

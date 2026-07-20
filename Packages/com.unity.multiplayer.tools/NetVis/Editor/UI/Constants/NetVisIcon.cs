@@ -29,15 +29,15 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
         /// <returns> The path without a file extension </returns>
         public static string GetPath(this NetVisIcon icon, EditorTheme theme, bool selected = false)
         {
-            return NetVisEditorPaths.k_IconsRoot +
-                   (theme == EditorTheme.Dark ? k_DarkIconPrefix : "") +
-                   icon +
-                   (selected ? k_SelectedIconSuffix : "");
+            return NetVisEditorPaths.k_IconsRoot
+                + (theme == EditorTheme.Dark ? k_DarkIconPrefix : "")
+                + icon
+                + (selected ? k_SelectedIconSuffix : "");
         }
 
         /// <returns> The path with a file extension </returns>
-        public static string GetPathWithExtension(this NetVisIcon icon, EditorTheme theme, bool selected = false)
-            => GetPath(icon, theme, selected) + ".png";
+        public static string GetPathWithExtension(this NetVisIcon icon, EditorTheme theme, bool selected = false) =>
+            GetPath(icon, theme, selected) + ".png";
 
         public static Texture2D LoadIcon(this NetVisIcon icon, EditorTheme theme, bool selected = false)
         {
@@ -47,7 +47,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             {
                 return null;
             }
-            
+
             var iconTexture = EditorGUIUtility.IconContent(iconPath).image;
 #if UNITY_MP_TOOLS_DEV
             if (iconTexture == null)

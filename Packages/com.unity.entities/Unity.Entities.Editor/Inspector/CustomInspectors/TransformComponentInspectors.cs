@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
+using Unity.Entities.UI;
 using Unity.Mathematics;
 using Unity.Properties;
-using Unity.Entities.UI;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,16 +12,13 @@ namespace Unity.Entities.Editor.Inspectors
     {
         static Float4x4ValueInspector()
         {
-            TypeConversion.Register((ref float4 v) => (Vector4) v);
-            TypeConversion.Register((ref Vector4 v) => (float4) v);
+            TypeConversion.Register((ref float4 v) => (Vector4)v);
+            TypeConversion.Register((ref Vector4 v) => (float4)v);
         }
 
         public override VisualElement Build()
         {
-            var root = new BindableElement
-            {
-                bindingPath = "Value"
-            };
+            var root = new BindableElement { bindingPath = "Value" };
 
             for (var i = 0; i < 4; ++i)
             {
@@ -36,16 +33,14 @@ namespace Unity.Entities.Editor.Inspectors
     }
 
     [UsedImplicitly]
-    sealed class LocalToWorldInspector : Float4x4ValueInspector<LocalToWorld>
-    {
-    }
+    sealed class LocalToWorldInspector : Float4x4ValueInspector<LocalToWorld> { }
 
     abstract class Float3ValueInspector<T> : PropertyInspector<T>
     {
         static Float3ValueInspector()
         {
-            TypeConversion.Register((ref float3 v) => (Vector3) v);
-            TypeConversion.Register((ref Vector3 v) => (float3) v);
+            TypeConversion.Register((ref float3 v) => (Vector3)v);
+            TypeConversion.Register((ref Vector3 v) => (float3)v);
         }
 
         public override VisualElement Build()
@@ -60,7 +55,7 @@ namespace Unity.Entities.Editor.Inspectors
     {
         static QuaternionValueInspector()
         {
-            TypeConversion.Register((ref quaternion v) => (Vector4) v.value);
+            TypeConversion.Register((ref quaternion v) => (Vector4)v.value);
             TypeConversion.Register((ref Vector4 v) => new quaternion { value = v });
         }
 
@@ -83,17 +78,11 @@ namespace Unity.Entities.Editor.Inspectors
     }
 
     [UsedImplicitly]
-    class ParentInspector : DefaultValueInspector<Parent>
-    {
-    }
+    class ParentInspector : DefaultValueInspector<Parent> { }
 
     [UsedImplicitly]
-    class PreviousParentInspector : DefaultValueInspector<PreviousParent>
-    {
-    }
+    class PreviousParentInspector : DefaultValueInspector<PreviousParent> { }
 
     [UsedImplicitly]
-    class ChildInspector : DefaultValueInspector<Child>
-    {
-    }
+    class ChildInspector : DefaultValueInspector<Child> { }
 }

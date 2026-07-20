@@ -26,7 +26,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
         internal VisualizationSystem(
             NetVisConfigurationWithEvents configurationWithEvents,
             NetVisDataStore netVisDataStore,
-            IRuntimeUpdater runtimeUpdater)
+            IRuntimeUpdater runtimeUpdater
+        )
         {
             DebugUtil.TraceMethodName();
 

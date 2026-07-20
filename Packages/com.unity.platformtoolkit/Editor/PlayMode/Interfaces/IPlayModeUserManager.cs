@@ -9,7 +9,7 @@ namespace Unity.PlatformToolkit.PlayMode
         Allowed,
         CannotSignIn,
         NotSupported,
-        NotSupportedInPlaymode
+        NotSupportedInPlaymode,
     }
 
     internal enum SignInStatus
@@ -18,15 +18,16 @@ namespace Unity.PlatformToolkit.PlayMode
         AlreadySignedIn,
         AdditionalAccountsNotSupported,
         MaximumAccountsReached,
-        OnlyAllowedWithRequests
+        OnlyAllowedWithRequests,
     }
 
     internal enum SignOutStatus
     {
         Allowed,
         NotSignedIn,
-        CannotSignOutPrimaryInPlayMode
+        CannotSignOutPrimaryInPlayMode,
     }
+
     /// <summary>
     /// Unifies account management for the play mode controls system by tracking <see cref="PlayModeAccountData"/> and signed
     /// in accounts.

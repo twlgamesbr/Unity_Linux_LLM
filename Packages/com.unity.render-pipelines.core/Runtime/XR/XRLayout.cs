@@ -109,13 +109,15 @@ namespace UnityEngine.Experimental.Rendering
                 for (int viewIndex = 0; viewIndex < pass.viewCount; viewIndex++)
                 {
                     var viewport = pass.GetViewport(viewIndex);
-                    sb.AppendFormat("XR Pass {0} Cull {1} View {2} Slice {3} : {4} x {5}",
+                    sb.AppendFormat(
+                        "XR Pass {0} Cull {1} View {2} Slice {3} : {4} x {5}",
                         pass.multipassId,
                         pass.cullingPassId,
                         viewIndex,
                         pass.GetTextureArraySlice(viewIndex),
                         viewport.width,
-                        viewport.height);
+                        viewport.height
+                    );
                     sb.AppendLine();
                 }
             }

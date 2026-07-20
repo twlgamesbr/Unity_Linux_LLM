@@ -13,7 +13,13 @@ namespace Unity.Entities.UI
 
         IProperty GetProperty() => m_Root.TryGetProperty(m_Path, out var property) ? property : default;
 
-        public CircularReferenceElement(BindingContextElement root, IProperty property, T value, PropertyPath path, PropertyPath pathToReference)
+        public CircularReferenceElement(
+            BindingContextElement root,
+            IProperty property,
+            T value,
+            PropertyPath path,
+            PropertyPath pathToReference
+        )
         {
             binding = this;
             m_Root = root;
@@ -26,7 +32,7 @@ namespace Unity.Entities.UI
 
             var label = this.Q<Label>(className: UssClasses.CircularReferenceElement.Label);
             label.text = GuiFactory.GetDisplayName(property);
-                label.AddManipulator(
+            label.AddManipulator(
                 new ContextualMenuManipulator(evt =>
                 {
                     var prop = GetProperty();
@@ -43,13 +49,18 @@ namespace Unity.Entities.UI
                     evt.menu.AppendAction(
                         "Reset to default",
                         p => ReloadWithInstance(default),
-                        p => prop.HasAttribute<CreateInstanceOnInspectionAttribute>()
-                            ? DropdownMenuAction.Status.Disabled
-                            : DropdownMenuAction.Status.Normal);
-                }));
+                        p =>
+                            prop.HasAttribute<CreateInstanceOnInspectionAttribute>()
+                                ? DropdownMenuAction.Status.Disabled
+                                : DropdownMenuAction.Status.Normal
+                    );
+                })
+            );
 
-            this.Q<Button>(className: UssClasses.CircularReferenceElement.Path).text = "ref: " + pathToReference + $" ({TypeUtility.GetTypeDisplayName(value.GetType())})";
-            this.Q(className: UssClasses.CircularReferenceElement.Icon).tooltip = $"Circular reference found for path: `{pathToReference}`";
+            this.Q<Button>(className: UssClasses.CircularReferenceElement.Path).text =
+                "ref: " + pathToReference + $" ({TypeUtility.GetTypeDisplayName(value.GetType())})";
+            this.Q(className: UssClasses.CircularReferenceElement.Icon).tooltip =
+                $"Circular reference found for path: `{pathToReference}`";
 
             RegisterCallback<MouseEnterEvent>(OnEnter);
             RegisterCallback<MouseLeaveEvent>(OnLeave);
@@ -65,9 +76,7 @@ namespace Unity.Entities.UI
             m_Root.StopHighlightAtPath(m_PathToReference);
         }
 
-        public void PreUpdate()
-        {
-        }
+        public void PreUpdate() { }
 
         public void Update()
         {
@@ -83,15 +92,10 @@ namespace Unity.Entities.UI
 
                 ReloadWithInstance(value);
             }
-            catch (Exception )
-            {
-
-            }
+            catch (Exception) { }
         }
 
-        public void Release()
-        {
-        }
+        public void Release() { }
 
         void ReloadWithInstance(T value)
         {

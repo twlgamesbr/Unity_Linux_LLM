@@ -226,7 +226,14 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             Assertions.AssertCompatibleDimensions(this, v);
 
             int step = UnsafeUtility.SizeOf<float>();
-            UnsafeUtility.MemCpyStride(v.data, v.Stride * step, data, Stride * step, UnsafeUtility.SizeOf<float>(), (int)Dimension);
+            UnsafeUtility.MemCpyStride(
+                v.data,
+                v.Stride * step,
+                data,
+                Stride * step,
+                UnsafeUtility.SizeOf<float>(),
+                (int)Dimension
+            );
         }
 
         /// <summary>
@@ -309,9 +316,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             Assertions.AssertCompatibleDimensions(x, y);
 
             var size = x.Dimension;
-            if (size <= 0)
-            {
-            }
+            if (size <= 0) { }
             else if (x.Stride == 1 && y.Stride == 1)
             {
                 for (int i = 0; i < size; i++)

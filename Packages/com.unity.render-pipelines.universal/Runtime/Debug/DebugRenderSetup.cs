@@ -9,7 +9,8 @@ namespace UnityEngine.Rendering.Universal
         private readonly FilteringSettings m_FilteringSettings;
         private readonly int m_Index;
         private DebugDisplaySettingsMaterial MaterialSettings => m_DebugHandler.DebugDisplaySettings.materialSettings;
-        private DebugDisplaySettingsRendering RenderingSettings => m_DebugHandler.DebugDisplaySettings.renderingSettings;
+        private DebugDisplaySettingsRendering RenderingSettings =>
+            m_DebugHandler.DebugDisplaySettings.renderingSettings;
         private DebugDisplaySettingsLighting LightingSettings => m_DebugHandler.DebugDisplaySettings.lightingSettings;
 
         internal void Begin(RasterCommandBuffer cmd)
@@ -62,9 +63,7 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        internal DebugRenderSetup(DebugHandler debugHandler,
-            int index,
-            FilteringSettings filteringSettings)
+        internal DebugRenderSetup(DebugHandler debugHandler, int index, FilteringSettings filteringSettings)
         {
             m_DebugHandler = debugHandler;
             m_FilteringSettings = filteringSettings;
@@ -77,14 +76,22 @@ namespace UnityEngine.Rendering.Universal
             ref DrawingSettings drawingSettings,
             ref FilteringSettings filteringSettings,
             ref RenderStateBlock renderStateBlock,
-            ref RendererListHandle rendererListHdl)
+            ref RendererListHandle rendererListHdl
+        )
         {
-            RenderingUtils.CreateRendererListWithRenderStateBlock(renderGraph, ref cullResults, drawingSettings, filteringSettings, renderStateBlock, ref rendererListHdl);
+            RenderingUtils.CreateRendererListWithRenderStateBlock(
+                renderGraph,
+                ref cullResults,
+                drawingSettings,
+                filteringSettings,
+                renderStateBlock,
+                ref rendererListHdl
+            );
         }
 
         internal void DrawWithRendererList(RasterCommandBuffer cmd, ref RendererList rendererList)
         {
-            if(rendererList.isValid)
+            if (rendererList.isValid)
                 cmd.DrawRendererList(rendererList);
         }
 
@@ -115,19 +122,27 @@ namespace UnityEngine.Rendering.Universal
             {
                 case DebugSceneOverrideMode.Overdraw:
                 {
-                    var isOpaque = m_FilteringSettings.renderQueueRange == RenderQueueRange.opaque || m_FilteringSettings.renderQueueRange == RenderQueueRange.all;
-                    var isTransparent = m_FilteringSettings.renderQueueRange == RenderQueueRange.transparent || m_FilteringSettings.renderQueueRange == RenderQueueRange.all;
+                    var isOpaque =
+                        m_FilteringSettings.renderQueueRange == RenderQueueRange.opaque
+                        || m_FilteringSettings.renderQueueRange == RenderQueueRange.all;
+                    var isTransparent =
+                        m_FilteringSettings.renderQueueRange == RenderQueueRange.transparent
+                        || m_FilteringSettings.renderQueueRange == RenderQueueRange.all;
                     var overdrawOpaque =
                         m_DebugHandler.DebugDisplaySettings.renderingSettings.overdrawMode == DebugOverdrawMode.Opaque
                         || m_DebugHandler.DebugDisplaySettings.renderingSettings.overdrawMode == DebugOverdrawMode.All;
                     var overdrawTransparent =
-                        m_DebugHandler.DebugDisplaySettings.renderingSettings.overdrawMode == DebugOverdrawMode.Transparent
+                        m_DebugHandler.DebugDisplaySettings.renderingSettings.overdrawMode
+                            == DebugOverdrawMode.Transparent
                         || m_DebugHandler.DebugDisplaySettings.renderingSettings.overdrawMode == DebugOverdrawMode.All;
 
                     var blendOverdraw = isOpaque && overdrawOpaque || isTransparent && overdrawTransparent;
                     var destination = blendOverdraw ? BlendMode.One : BlendMode.Zero;
 
-                    RenderTargetBlendState additiveBlend = new RenderTargetBlendState(sourceColorBlendMode: BlendMode.One, destinationColorBlendMode: destination);
+                    RenderTargetBlendState additiveBlend = new RenderTargetBlendState(
+                        sourceColorBlendMode: BlendMode.One,
+                        destinationColorBlendMode: destination
+                    );
 
                     // Additive-blend but leave z-write and culling as they are when we draw normally
                     renderStateBlock.blendState = new BlendState { blendState0 = additiveBlend };
@@ -138,9 +153,7 @@ namespace UnityEngine.Rendering.Universal
                 case DebugSceneOverrideMode.Wireframe:
                 {
                     // Disable culling to see all lines
-                    renderStateBlock.rasterState = new RasterState(
-                        cullingMode: CullMode.Off        
-                    );
+                    renderStateBlock.rasterState = new RasterState(cullingMode: CullMode.Off);
 
                     renderStateBlock.mask = RenderStateMask.Raster;
                     break;
@@ -161,10 +174,11 @@ namespace UnityEngine.Rendering.Universal
             return renderStateBlock;
         }
 
-        internal int GetIndex() { return m_Index; }
-
-        public void Dispose()
+        internal int GetIndex()
         {
+            return m_Index;
         }
+
+        public void Dispose() { }
     }
 }

@@ -14,31 +14,33 @@ namespace Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder
         public SyntaxNode Node => BuildNode;
         public string CandidateTypeName => "SystemAPI.QueryBuilder";
 
-        public static (bool Success, QueryCandidate Result) TryCreateFrom(InvocationExpressionSyntax systemAPIQueryBuilderNode)
+        public static (bool Success, QueryCandidate Result) TryCreateFrom(
+            InvocationExpressionSyntax systemAPIQueryBuilderNode
+        )
         {
-            var buildNode =
-                systemAPIQueryBuilderNode
-                    .Ancestors()
-                    .OfType<InvocationExpressionSyntax>()
-                    .LastOrDefault(IsBuildNode);
+            var buildNode = systemAPIQueryBuilderNode
+                .Ancestors()
+                .OfType<InvocationExpressionSyntax>()
+                .LastOrDefault(IsBuildNode);
 
             var hasValidInvocationChain = buildNode != null;
 
             if (!hasValidInvocationChain)
                 return (false, default);
 
-            return (true, new QueryCandidate
-            {
-                SystemAPIQueryBuilderNode = systemAPIQueryBuilderNode,
-                BuildNode = buildNode,
-                ContainingTypeNode = systemAPIQueryBuilderNode.Ancestors().OfType<TypeDeclarationSyntax>().First()
-            });
+            return (
+                true,
+                new QueryCandidate
+                {
+                    SystemAPIQueryBuilderNode = systemAPIQueryBuilderNode,
+                    BuildNode = buildNode,
+                    ContainingTypeNode = systemAPIQueryBuilderNode.Ancestors().OfType<TypeDeclarationSyntax>().First(),
+                }
+            );
 
             bool IsBuildNode(InvocationExpressionSyntax invocationExpressionSyntax) =>
-                invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax { Name: { Identifier:
-                {
-                    ValueText: "Build"
-                } } };
+                invocationExpressionSyntax.Expression
+                    is MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "Build" } } };
         }
     }
 }

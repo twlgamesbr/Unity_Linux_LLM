@@ -1,6 +1,6 @@
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Globalization;
 
 namespace UnityEditor.Events
 {
@@ -93,17 +93,71 @@ namespace UnityEditor.Events
 
             // Show properties
 
-            ShowProp(ref labelRect, ref valueRect, ref sourceRect, "Min Width", LayoutUtility.GetLayoutProperty(rect, e => e.minWidth, 0, out source).ToString(CultureInfo.InvariantCulture.NumberFormat), source);
-            ShowProp(ref labelRect, ref valueRect, ref sourceRect, "Min Height", LayoutUtility.GetLayoutProperty(rect, e => e.minHeight, 0, out source).ToString(CultureInfo.InvariantCulture.NumberFormat), source);
-            ShowProp(ref labelRect, ref valueRect, ref sourceRect, "Preferred Width", LayoutUtility.GetLayoutProperty(rect, e => e.preferredWidth, 0, out source).ToString(CultureInfo.InvariantCulture.NumberFormat), source);
-            ShowProp(ref labelRect, ref valueRect, ref sourceRect, "Preferred Height", LayoutUtility.GetLayoutProperty(rect, e => e.preferredHeight, 0, out source).ToString(CultureInfo.InvariantCulture.NumberFormat), source);
+            ShowProp(
+                ref labelRect,
+                ref valueRect,
+                ref sourceRect,
+                "Min Width",
+                LayoutUtility
+                    .GetLayoutProperty(rect, e => e.minWidth, 0, out source)
+                    .ToString(CultureInfo.InvariantCulture.NumberFormat),
+                source
+            );
+            ShowProp(
+                ref labelRect,
+                ref valueRect,
+                ref sourceRect,
+                "Min Height",
+                LayoutUtility
+                    .GetLayoutProperty(rect, e => e.minHeight, 0, out source)
+                    .ToString(CultureInfo.InvariantCulture.NumberFormat),
+                source
+            );
+            ShowProp(
+                ref labelRect,
+                ref valueRect,
+                ref sourceRect,
+                "Preferred Width",
+                LayoutUtility
+                    .GetLayoutProperty(rect, e => e.preferredWidth, 0, out source)
+                    .ToString(CultureInfo.InvariantCulture.NumberFormat),
+                source
+            );
+            ShowProp(
+                ref labelRect,
+                ref valueRect,
+                ref sourceRect,
+                "Preferred Height",
+                LayoutUtility
+                    .GetLayoutProperty(rect, e => e.preferredHeight, 0, out source)
+                    .ToString(CultureInfo.InvariantCulture.NumberFormat),
+                source
+            );
 
             float flexible = 0;
 
             flexible = LayoutUtility.GetLayoutProperty(rect, e => e.flexibleWidth, 0, out source);
-            ShowProp(ref labelRect, ref valueRect, ref sourceRect, "Flexible Width", flexible > 0 ? ("enabled (" + flexible.ToString(CultureInfo.InvariantCulture.NumberFormat) + ")") : "disabled", source);
+            ShowProp(
+                ref labelRect,
+                ref valueRect,
+                ref sourceRect,
+                "Flexible Width",
+                flexible > 0
+                    ? ("enabled (" + flexible.ToString(CultureInfo.InvariantCulture.NumberFormat) + ")")
+                    : "disabled",
+                source
+            );
             flexible = LayoutUtility.GetLayoutProperty(rect, e => e.flexibleHeight, 0, out source);
-            ShowProp(ref labelRect, ref valueRect, ref sourceRect, "Flexible Height", flexible > 0 ? ("enabled (" + flexible.ToString(CultureInfo.InvariantCulture.NumberFormat) + ")") : "disabled", source);
+            ShowProp(
+                ref labelRect,
+                ref valueRect,
+                ref sourceRect,
+                "Flexible Height",
+                flexible > 0
+                    ? ("enabled (" + flexible.ToString(CultureInfo.InvariantCulture.NumberFormat) + ")")
+                    : "disabled",
+                source
+            );
 
             if (!rect.GetComponent<LayoutElement>())
             {
@@ -112,7 +166,14 @@ namespace UnityEditor.Events
             }
         }
 
-        private void ShowProp(ref Rect labelRect, ref Rect valueRect, ref Rect sourceRect, string label, string value, ILayoutElement source)
+        private void ShowProp(
+            ref Rect labelRect,
+            ref Rect valueRect,
+            ref Rect sourceRect,
+            string label,
+            string value,
+            ILayoutElement source
+        )
         {
             GUI.Label(labelRect, label, m_Styles.labelStyle);
             GUI.Label(valueRect, value, m_Styles.labelStyle);

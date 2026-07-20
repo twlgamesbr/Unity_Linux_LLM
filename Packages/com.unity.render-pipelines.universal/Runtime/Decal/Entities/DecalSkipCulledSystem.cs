@@ -11,7 +11,6 @@ namespace UnityEngine.Rendering.Universal
         private ProfilingSampler m_Sampler;
         private Camera m_Camera;
 
-
         public DecalSkipCulledSystem(DecalEntityManager entityManager)
         {
             m_EntityManager = entityManager;

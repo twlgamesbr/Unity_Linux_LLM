@@ -42,14 +42,16 @@ namespace Unity.Physics.GraphicsIntegration
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var bpwd = state.EntityManager.GetComponentData<BuildPhysicsWorldData>(state.WorldUnmanaged.GetExistingUnmanagedSystem<BuildPhysicsWorld>());
+            var bpwd = state.EntityManager.GetComponentData<BuildPhysicsWorldData>(
+                state.WorldUnmanaged.GetExistingUnmanagedSystem<BuildPhysicsWorld>()
+            );
             SmoothedDynamicBodiesQuery.SetSharedComponentFilter(bpwd.WorldFilter);
             m_ComponentTypeHandle.Update(ref state);
             m_PhysicsGraphicalSmoothingType.Update(ref state);
             state.Dependency = new CopyPhysicsVelocityJob
             {
                 PhysicsVelocityType = m_ComponentTypeHandle,
-                PhysicsGraphicalSmoothingType = m_PhysicsGraphicalSmoothingType
+                PhysicsGraphicalSmoothingType = m_PhysicsGraphicalSmoothingType,
             }.ScheduleParallel(SmoothedDynamicBodiesQuery, state.Dependency);
         }
 
@@ -58,20 +60,31 @@ namespace Unity.Physics.GraphicsIntegration
         public struct CopyPhysicsVelocityJob : IJobChunk
         {
             /// <summary>   <see cref="PhysicsVelocity"/> component type handle. </summary>
-            [ReadOnly] public ComponentTypeHandle<PhysicsVelocity> PhysicsVelocityType;
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsVelocity> PhysicsVelocityType;
+
             /// <summary>   <see cref="PhysicsGraphicalSmoothing"/> component type handle. </summary>
             public ComponentTypeHandle<PhysicsGraphicalSmoothing> PhysicsGraphicalSmoothingType;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
                 NativeArray<PhysicsVelocity> physicsVelocities = chunk.GetNativeArray(ref PhysicsVelocityType);
-                NativeArray<PhysicsGraphicalSmoothing> physicsGraphicalSmoothings = chunk.GetNativeArray(ref PhysicsGraphicalSmoothingType);
+                NativeArray<PhysicsGraphicalSmoothing> physicsGraphicalSmoothings = chunk.GetNativeArray(
+                    ref PhysicsGraphicalSmoothingType
+                );
                 unsafe
                 {
                     UnsafeUtility.MemCpyStride(
-                        physicsGraphicalSmoothings.GetUnsafePtr(), UnsafeUtility.SizeOf<PhysicsGraphicalSmoothing>(),
-                        physicsVelocities.GetUnsafeReadOnlyPtr(), UnsafeUtility.SizeOf<PhysicsVelocity>(),
+                        physicsGraphicalSmoothings.GetUnsafePtr(),
+                        UnsafeUtility.SizeOf<PhysicsGraphicalSmoothing>(),
+                        physicsVelocities.GetUnsafeReadOnlyPtr(),
+                        UnsafeUtility.SizeOf<PhysicsVelocity>(),
                         UnsafeUtility.SizeOf<PhysicsVelocity>(),
                         physicsVelocities.Length
                     );

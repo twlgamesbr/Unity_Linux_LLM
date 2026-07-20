@@ -15,7 +15,12 @@ namespace Unity.Netcode
             base.Dispose();
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             if (behaviour.NetworkManager.DistributedAuthorityMode)
             {
@@ -61,8 +66,7 @@ namespace Unity.Netcode
             }
         }
 
-        internal AuthorityRpcTarget(NetworkManager manager) : base(manager)
-        {
-        }
+        internal AuthorityRpcTarget(NetworkManager manager)
+            : base(manager) { }
     }
 }

@@ -17,8 +17,8 @@ namespace Unity.Entities.Editor
         {
             Selection.selectionChanged += () =>
             {
-                var entitySelectionProxy = Selection.activeObject as EntitySelectionProxy ??
-                                           Selection.activeContext as EntitySelectionProxy;
+                var entitySelectionProxy =
+                    Selection.activeObject as EntitySelectionProxy ?? Selection.activeContext as EntitySelectionProxy;
 
                 if (s_LastSelected != null && s_LastSelected != entitySelectionProxy)
                     s_LastSelected.Release();
@@ -49,14 +49,15 @@ namespace Unity.Entities.Editor
                 entity = Entity.Null;
 
             var proxy = CreateInstance<EntitySelectionProxy>();
-            proxy.hideFlags = HideFlags.DontSaveInBuild |
-                              HideFlags.DontSaveInEditor |
-                              HideFlags.NotEditable;
+            proxy.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.NotEditable;
 
             proxy.Initialize(world, entity);
 
             var undoGroup = Undo.GetCurrentGroup();
-            Undo.RegisterCreatedObjectUndo(proxy, $"Create {nameof(EntitySelectionProxy)}({entity.Index}, {entity.Version})");
+            Undo.RegisterCreatedObjectUndo(
+                proxy,
+                $"Create {nameof(EntitySelectionProxy)}({entity.Index}, {entity.Version})"
+            );
             Undo.CollapseUndoOperations(undoGroup);
 
             return proxy;
@@ -89,18 +90,22 @@ namespace Unity.Entities.Editor
         static bool EntityExistsAndIsValid(World world, Entity entity)
         {
             return world is { IsCreated: true }
-                   && entity.Index >= 0
+                && entity.Index >= 0
 #if ENTITY_STORE_V1
-                   && (uint)entity.Index < (uint)world.EntityManager.EntityCapacity
+                && (uint)entity.Index < (uint)world.EntityManager.EntityCapacity
 #endif
-                   && world.EntityManager.Exists(entity);
+                && world.EntityManager.Exists(entity);
         }
 
-        [SerializeField] int entityIndex;
-        [SerializeField] int entityVersion;
+        [SerializeField]
+        int entityIndex;
+
+        [SerializeField]
+        int entityVersion;
 
         // Try to remember the world when performing Undo/Redo
-        [SerializeField] string worldName;
+        [SerializeField]
+        string worldName;
 
         int m_RefCount;
 
@@ -141,7 +146,11 @@ namespace Unity.Entities.Editor
                 return;
 
             // Don't reselect the same entity
-            if (Selection.activeObject is EntitySelectionProxy selectionProxy && selectionProxy.World == World && selectionProxy.Entity == Entity)
+            if (
+                Selection.activeObject is EntitySelectionProxy selectionProxy
+                && selectionProxy.World == World
+                && selectionProxy.Entity == Entity
+            )
                 return;
 
             // Can only be Runtime if directly selected
@@ -162,7 +171,12 @@ namespace Unity.Entities.Editor
             }
         }
 
-        internal static bool FindPrimaryEntity(GameObject obj, EntitySelectionProxy proxy, out World world, out Entity entity)
+        internal static bool FindPrimaryEntity(
+            GameObject obj,
+            EntitySelectionProxy proxy,
+            out World world,
+            out Entity entity
+        )
         {
             if (proxy != null && proxy.World != null && proxy.World.IsCreated)
             {

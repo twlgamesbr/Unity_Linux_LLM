@@ -53,8 +53,11 @@ namespace Unity.PlatformToolkit
         /// When this token becomes invalid, this object also will become invalid and all calls to it except dispose will throw.
         /// This object needs to be disposed even if the token is invalidated.
         /// </param>
-        public GenericSavingSystem(IGenericStorageSystem storage, bool runInBackground = true,
-            ILifetimeToken parentLifetimeToken = null)
+        public GenericSavingSystem(
+            IGenericStorageSystem storage,
+            bool runInBackground = true,
+            ILifetimeToken parentLifetimeToken = null
+        )
         {
             m_Storage = storage;
             m_RunInBackground = runInBackground;

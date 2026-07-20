@@ -1,8 +1,8 @@
+using System.Reflection;
+using EditorAttributes.Editor.Utility;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using EditorAttributes.Editor.Utility;
-using System.Reflection;
 
 namespace EditorAttributes.Editor
 {
@@ -24,11 +24,13 @@ namespace EditorAttributes.Editor
                 return propertyField;
             }
 
-            propertyField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var field = propertyField.Q(className: PropertyField.ussClassName) as PropertyField;
-                field.RegisterValueChangeCallback((callback) => function.Invoke(target, null));
-            });
+            propertyField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    var field = propertyField.Q(className: PropertyField.ussClassName) as PropertyField;
+                    field.RegisterValueChangeCallback((callback) => function.Invoke(target, null));
+                }
+            );
 
             return propertyField;
         }

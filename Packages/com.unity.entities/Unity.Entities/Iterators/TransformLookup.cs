@@ -40,21 +40,24 @@ namespace Unity.Entities
         internal AtomicSafetyHandle m_HierarchySafety;
         private int m_SafetyReadOnlyCount;
         private int m_SafetyReadWriteCount;
-
 #endif
-        [NativeDisableUnsafePtrRestriction] private readonly EntityDataAccess* m_Access;
+        [NativeDisableUnsafePtrRestriction]
+        private readonly EntityDataAccess* m_Access;
         LookupCache m_Cache;
 
         uint m_GlobalSystemVersion;
-        private readonly byte  m_IsReadOnly;
+        private readonly byte m_IsReadOnly;
         private TypeIndex m_TransformTypeIndex;
 
         internal uint GlobalSystemVersion => m_GlobalSystemVersion;
 
-
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal TransformLookup(EntityDataAccess* access, bool isReadOnly,
-                                  AtomicSafetyHandle safety, AtomicSafetyHandle hierarchySafety)
+        internal TransformLookup(
+            EntityDataAccess* access,
+            bool isReadOnly,
+            AtomicSafetyHandle safety,
+            AtomicSafetyHandle hierarchySafety
+        )
 #else
         internal TransformLookup(EntityDataAccess* access, bool isReadOnly)
 #endif
@@ -80,7 +83,8 @@ namespace Unity.Entities
         /// <param name="transform">The transform component of type T for the given entity, if it exists.</param>
         /// <returns>True if the entity has a <see cref="TransformRef"/> component, and false if it does not. Also returns false if
         /// the Entity instance refers to an entity that has been destroyed (or never existed).</returns>
-        public bool TryGetTransform(Entity entity, out TransformRef transform) => TryGetTransform(entity, out transform, out _);
+        public bool TryGetTransform(Entity entity, out TransformRef transform) =>
+            TryGetTransform(entity, out transform, out _);
 
         /// <summary>
         /// Retrieves the transform components associated with the specified <see cref="Entity"/>, if it exists.
@@ -101,17 +105,25 @@ namespace Unity.Entities
             entityExists = Hint.Likely(ecs->Exists(entity));
             if (entityExists)
             {
-                var transformUnion = (m_IsReadOnly != 0)?
-                    (TransformUnion*)ecs->GetOptionalComponentDataWithTypeRO(entity, m_TransformTypeIndex, ref m_Cache) :
-                    (TransformUnion*)ecs->GetOptionalComponentDataWithTypeRW(entity, m_TransformTypeIndex, m_GlobalSystemVersion, ref m_Cache);
+                var transformUnion =
+                    (m_IsReadOnly != 0)
+                        ? (TransformUnion*)
+                            ecs->GetOptionalComponentDataWithTypeRO(entity, m_TransformTypeIndex, ref m_Cache)
+                        : (TransformUnion*)
+                            ecs->GetOptionalComponentDataWithTypeRW(
+                                entity,
+                                m_TransformTypeIndex,
+                                m_GlobalSystemVersion,
+                                ref m_Cache
+                            );
 
                 if (transformUnion != null)
                 {
                     transform =
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        new TransformRef(transformUnion, m_IsReadOnly != 0, m_Safety0, m_HierarchySafety);
+                    new TransformRef(transformUnion, m_IsReadOnly != 0, m_Safety0, m_HierarchySafety);
 #else
-                        new TransformRef(transformUnion, m_IsReadOnly != 0);
+                    new TransformRef(transformUnion, m_IsReadOnly != 0);
 #endif
                     return true;
                 }
@@ -187,7 +199,8 @@ namespace Unity.Entities
             if (Hint.Unlikely(archetype != m_Cache.Archetype))
                 m_Cache.Update(archetype, m_TransformTypeIndex);
             var typeIndexInArchetype = m_Cache.IndexInArchetype;
-            if (typeIndexInArchetype == -1) return false;
+            if (typeIndexInArchetype == -1)
+                return false;
             var chunkVersion = archetype->Chunks.GetChangeVersion(typeIndexInArchetype, chunk.ListIndex);
 
             return ChangeVersionUtility.DidChange(chunkVersion, version);
@@ -222,9 +235,17 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 ecs->AssertEntityHasComponent(entity, m_TransformTypeIndex, ref m_Cache);
 #endif
-                var transformUnion = (m_IsReadOnly != 0)?
-                    (TransformUnion*)ecs->GetOptionalComponentDataWithTypeRO(entity, m_TransformTypeIndex, ref m_Cache) :
-                    (TransformUnion*)ecs->GetOptionalComponentDataWithTypeRW(entity, m_TransformTypeIndex, m_GlobalSystemVersion, ref m_Cache);
+                var transformUnion =
+                    (m_IsReadOnly != 0)
+                        ? (TransformUnion*)
+                            ecs->GetOptionalComponentDataWithTypeRO(entity, m_TransformTypeIndex, ref m_Cache)
+                        : (TransformUnion*)
+                            ecs->GetOptionalComponentDataWithTypeRW(
+                                entity,
+                                m_TransformTypeIndex,
+                                m_GlobalSystemVersion,
+                                ref m_Cache
+                            );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 return new TransformRef(transformUnion, m_IsReadOnly != 0, m_Safety0, m_HierarchySafety);

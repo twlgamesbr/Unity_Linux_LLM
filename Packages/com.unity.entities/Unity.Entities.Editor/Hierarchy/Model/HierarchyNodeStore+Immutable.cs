@@ -48,12 +48,14 @@ namespace Unity.Entities.Editor
 
             readonly Allocator m_Allocator;
 
-            [NativeDisableUnsafePtrRestriction] Data* m_Data;
+            [NativeDisableUnsafePtrRestriction]
+            Data* m_Data;
 
             /// <summary>
             /// The depth first packed hierarchy data.
             /// </summary>
-            [NativeDisableUnsafePtrRestriction] internal UnsafeList<HierarchyImmutableNodeData>* m_HandleNodes;
+            [NativeDisableUnsafePtrRestriction]
+            internal UnsafeList<HierarchyImmutableNodeData>* m_HandleNodes;
 
             /// <summary>
             /// A set of custom root entities. This is to handle a high volume of root entities (something common in dots).
@@ -61,15 +63,18 @@ namespace Unity.Entities.Editor
             /// <remarks>
             /// This array has a padding at the front since it uses negative indexing.
             /// </remarks>
-            [NativeDisableUnsafePtrRestriction] internal UnsafeList<Entity>* m_EntityNodes;
+            [NativeDisableUnsafePtrRestriction]
+            internal UnsafeList<Entity>* m_EntityNodes;
 
             /// <summary>
             /// The packed index per entity which maps to the packed sets <see cref="m_HandleNodes"/> and <see cref="m_EntityNodes"/>.
             /// </summary>
 #if ENTITY_STORE_V1
-            [NativeDisableUnsafePtrRestriction] internal UnsafeList<int>* m_IndexByEntity;
+            [NativeDisableUnsafePtrRestriction]
+            internal UnsafeList<int>* m_IndexByEntity;
 #else
-            [NativeDisableUnsafePtrRestriction] internal UnsafeHashMap<int, int>* m_IndexByEntity;
+            [NativeDisableUnsafePtrRestriction]
+            internal UnsafeHashMap<int, int>* m_IndexByEntity;
 #endif
 
             /// <summary>
@@ -80,27 +85,23 @@ namespace Unity.Entities.Editor
             /// <summary>
             /// Gets a value indicating if the packed hierarchy has been initialized or not.
             /// </summary>
-            public bool IsCreated
-                => null != m_Data;
+            public bool IsCreated => null != m_Data;
 
             /// <summary>
             /// Gets the current change version for the packed hierarchy.
             /// </summary>
-            public int ChangeVersion
-                => m_Data->ChangeVersion;
+            public int ChangeVersion => m_Data->ChangeVersion;
 
             /// <summary>
             /// Returns the number of valid nodes that exist in the hierarchy.
             /// </summary>
             /// <returns>The number of nodes that exist in the hierarchy.</returns>
-            public int Count
-                => m_HandleNodes->Length + m_EntityNodes->Length;
+            public int Count => m_HandleNodes->Length + m_EntityNodes->Length;
 
             /// <summary>
             /// Returns the number of 'hierarchical' nodes. i.e. nodes which have some parent, child relationships.
             /// </summary>
-            internal int CountHierarchicalNodes
-                => m_HandleNodes->Length;
+            internal int CountHierarchicalNodes => m_HandleNodes->Length;
 
             internal HierarchyImmutableNodeData this[int index]
             {
@@ -119,18 +120,18 @@ namespace Unity.Entities.Editor
                         Handle = HierarchyNodeHandle.FromEntity(entity),
                         ParentOffset = -index,
                         Depth = 0,
-                        NextSiblingOffset = index + 1
+                        NextSiblingOffset = index + 1,
                     };
                 }
             }
 
-            internal void SetChangeVersion(int changeVersion)
-                => m_Data->ChangeVersion = changeVersion;
+            internal void SetChangeVersion(int changeVersion) => m_Data->ChangeVersion = changeVersion;
 
             public Immutable(Allocator allocator)
             {
                 m_Allocator = allocator;
-                m_Data = (Data*)Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), allocator);
+                m_Data = (Data*)
+                    Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), allocator);
                 m_Data->ChangeVersion = 0;
                 m_HandleNodes = UnsafeList<HierarchyImmutableNodeData>.Create(16, allocator);
                 m_EntityNodes = UnsafeList<Entity>.Create(16, allocator);
@@ -179,14 +180,16 @@ namespace Unity.Entities.Editor
 
                 m_IndexByHandle.Clear();
 
-                m_HandleNodes->Add(new HierarchyImmutableNodeData
-                {
-                    ChildCount = 0,
-                    Depth = -1,
-                    Handle = HierarchyNodeHandle.Root,
-                    NextSiblingOffset = 1,
-                    ParentOffset = 0
-                });
+                m_HandleNodes->Add(
+                    new HierarchyImmutableNodeData
+                    {
+                        ChildCount = 0,
+                        Depth = -1,
+                        Handle = HierarchyNodeHandle.Root,
+                        NextSiblingOffset = 1,
+                        ParentOffset = 0,
+                    }
+                );
             }
 
             /// <summary>
@@ -206,7 +209,8 @@ namespace Unity.Entities.Editor
                             return false;
 
                         if (index < m_HandleNodes->Length)
-                            return m_HandleNodes->ElementAt(index).Handle.ToEntity().Version == handle.ToEntity().Version;
+                            return m_HandleNodes->ElementAt(index).Handle.ToEntity().Version
+                                == handle.ToEntity().Version;
 
                         index -= m_HandleNodes->Length;
                         return m_EntityNodes->ElementAt(index).Version == handle.ToEntity().Version;
@@ -220,20 +224,19 @@ namespace Unity.Entities.Editor
             /// <summary>
             /// Gets the root node for the <see cref="HierarchyNodeStore"/>.
             /// </summary>
-            public HierarchyNode.Immutable GetRoot()
-                => new HierarchyNode.Immutable(this, 0, ChangeVersion);
+            public HierarchyNode.Immutable GetRoot() => new HierarchyNode.Immutable(this, 0, ChangeVersion);
 
             /// <summary>
             /// Gets the <see cref="HierarchyNode"/> for the given handle.
             /// </summary>
-            public HierarchyNode.Immutable GetNode(HierarchyNodeHandle handle)
-                => new HierarchyNode.Immutable(this, IndexOf(handle), ChangeVersion);
+            public HierarchyNode.Immutable GetNode(HierarchyNodeHandle handle) =>
+                new HierarchyNode.Immutable(this, IndexOf(handle), ChangeVersion);
 
             /// <summary>
             /// Gets the <see cref="HierarchyNode"/> for the given handle.
             /// </summary>
-            public HierarchyNode.Immutable GetNode(int index)
-                => new HierarchyNode.Immutable(this, index, ChangeVersion);
+            public HierarchyNode.Immutable GetNode(int index) =>
+                new HierarchyNode.Immutable(this, index, ChangeVersion);
 
             /// <summary>
             /// Returns the packed index for the given <see cref="HierarchyNodeHandle"/>.
@@ -301,18 +304,16 @@ namespace Unity.Entities.Editor
                 }
             }
 
-            public bool Equals(Immutable other)
-                => m_Data == other.m_Data;
+            public bool Equals(Immutable other) => m_Data == other.m_Data;
 
-            public override bool Equals(object obj)
-                => obj is Immutable other && Equals(other);
+            public override bool Equals(object obj) => obj is Immutable other && Equals(other);
 
             public override int GetHashCode()
             {
                 unchecked
                 {
-                    var hashCode = (int) m_Allocator;
-                    hashCode = (hashCode * 397) ^ unchecked((int) (long) m_Data);
+                    var hashCode = (int)m_Allocator;
+                    hashCode = (hashCode * 397) ^ unchecked((int)(long)m_Data);
                     hashCode = (hashCode * 397) ^ m_HandleNodes->GetHashCode();
                     hashCode = (hashCode * 397) ^ m_IndexByEntity->GetHashCode();
                     hashCode = (hashCode * 397) ^ m_IndexByHandle.GetHashCode();
@@ -343,7 +344,8 @@ namespace Unity.Entities.Editor
 
             readonly Allocator m_Allocator;
 
-            [NativeDisableUnsafePtrRestriction] ExportImmutableStateData* m_ExportImmutableStateData;
+            [NativeDisableUnsafePtrRestriction]
+            ExportImmutableStateData* m_ExportImmutableStateData;
 
             public NativeList<HierarchyNodeHandle> ChildrenBuffer;
             public NativeList<ChildrenStackData> ChildrenStack;
@@ -371,7 +373,12 @@ namespace Unity.Entities.Editor
             public ExportImmutableState(Allocator allocator)
             {
                 m_Allocator = allocator;
-                m_ExportImmutableStateData = (ExportImmutableStateData*) UnsafeUtility.Malloc(UnsafeUtility.SizeOf<ExportImmutableStateData>(), UnsafeUtility.AlignOf<ExportImmutableStateData>(), allocator);
+                m_ExportImmutableStateData = (ExportImmutableStateData*)
+                    UnsafeUtility.Malloc(
+                        UnsafeUtility.SizeOf<ExportImmutableStateData>(),
+                        UnsafeUtility.AlignOf<ExportImmutableStateData>(),
+                        allocator
+                    );
                 m_ExportImmutableStateData->PackingIndex = 0;
                 m_ExportImmutableStateData->Depth = -1;
                 ChildrenStack = new NativeList<ChildrenStackData>(allocator);
@@ -400,7 +407,7 @@ namespace Unity.Entities.Editor
             enum Step
             {
                 HierarchyNodes,
-                EntityNodes
+                EntityNodes,
             }
 
             readonly HierarchyNodeStore m_Hierarchy;
@@ -419,13 +426,23 @@ namespace Unity.Entities.Editor
             /// <summary>
             /// Returns the enumerator progress. This is an estimate and should not be relied upon for any logic.
             /// </summary>
-            public float Progress => m_TotalCount > 0 ? m_State.PackingIndex / (float) m_TotalCount : 0;
+            public float Progress => m_TotalCount > 0 ? m_State.PackingIndex / (float)m_TotalCount : 0;
 
             public object Current => null;
 
-            public void Reset() => throw new InvalidOperationException($"{nameof(ExportImmutableEnumerator)} can not be reset. Instead a new instance should be created.");
+            public void Reset() =>
+                throw new InvalidOperationException(
+                    $"{nameof(ExportImmutableEnumerator)} can not be reset. Instead a new instance should be created."
+                );
 
-            public ExportImmutableEnumerator(HierarchyNodeStore hierarchy, World world, ExportImmutableState state, Immutable write, Immutable read, int batchSize)
+            public ExportImmutableEnumerator(
+                HierarchyNodeStore hierarchy,
+                World world,
+                ExportImmutableState state,
+                Immutable write,
+                Immutable read,
+                int batchSize
+            )
             {
                 if (write.Equals(read))
                     throw new InvalidOperationException("Can not read and write from the same immutable buffer.");
@@ -475,7 +492,7 @@ namespace Unity.Entities.Editor
                                 ReadNodes = m_Read,
                                 WriteNodes = m_Write,
                                 State = m_State,
-                                BatchSize = m_BatchCount
+                                BatchSize = m_BatchCount,
                             };
                             job.Run();
 
@@ -517,9 +534,7 @@ namespace Unity.Entities.Editor
             using var state = new ExportImmutableState(Allocator.TempJob);
 
             var enumerator = CreateBuildImmutableEnumerator(world, state, dstBuffer, srcBuffer, 0);
-            while (enumerator.MoveNext())
-            {
-            }
+            while (enumerator.MoveNext()) { }
         }
 
         public void ExportImmutable(World world, Immutable dstBuffer, Immutable srcBuffer)
@@ -527,9 +542,7 @@ namespace Unity.Entities.Editor
             using var state = new ExportImmutableState(Allocator.TempJob);
 
             var enumerator = CreateBuildImmutableEnumerator(world, state, dstBuffer, srcBuffer, 0);
-            while (enumerator.MoveNext())
-            {
-            }
+            while (enumerator.MoveNext()) { }
         }
 
         /// <summary>
@@ -541,7 +554,13 @@ namespace Unity.Entities.Editor
         /// <param name="srcBuffer">The buffer to read from; this accelerates performance by allowing re-use of previously baked data.</param>
         /// <param name="batchSize">The amount of nodes to process per tick.</param>
         /// <returns>An enumerator which can be ticked.</returns>
-        public ExportImmutableEnumerator CreateBuildImmutableEnumerator(World world, ExportImmutableState state, Immutable dstBuffer, Immutable srcBuffer, int batchSize)
+        public ExportImmutableEnumerator CreateBuildImmutableEnumerator(
+            World world,
+            ExportImmutableState state,
+            Immutable dstBuffer,
+            Immutable srcBuffer,
+            int batchSize
+        )
         {
             return new ExportImmutableEnumerator(this, world, state, dstBuffer, srcBuffer, batchSize);
         }
@@ -552,15 +571,21 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct ExportImmutableHierarchyNodesBatchJob : IJob
         {
-            [NativeDisableUnsafePtrRestriction] public int* ExceptionThrown;
+            [NativeDisableUnsafePtrRestriction]
+            public int* ExceptionThrown;
 
 #if ENTITY_STORE_V1
             public int EntityCapacity;
 #endif
 
-            [ReadOnly] public HierarchyNodeMap<HierarchyNodeData> Nodes;
-            [ReadOnly] public UnsafeParallelMultiHashMap<HierarchyNodeHandle, HierarchyNodeHandle> Children;
-            [ReadOnly] public int ReadChangeVersion;
+            [ReadOnly]
+            public HierarchyNodeMap<HierarchyNodeData> Nodes;
+
+            [ReadOnly]
+            public UnsafeParallelMultiHashMap<HierarchyNodeHandle, HierarchyNodeHandle> Children;
+
+            [ReadOnly]
+            public int ReadChangeVersion;
 
             public ExportImmutableState State;
             public int BatchSize;
@@ -570,8 +595,7 @@ namespace Unity.Entities.Editor
 
             int m_PackingIndex;
 
-            bool HasFlag(HierarchyNodeHandle handle, HierarchyNodeFlags flag)
-                => (Nodes[handle].Flags & flag) != 0;
+            bool HasFlag(HierarchyNodeHandle handle, HierarchyNodeFlags flag) => (Nodes[handle].Flags & flag) != 0;
 
             /// <summary>
             /// Copy state values to local members to avoid pointer lookups in hot paths.
@@ -617,7 +641,7 @@ namespace Unity.Entities.Editor
                     PushNode(HierarchyNodeHandle.Root, -1);
                 }
 
-                for (;; batchIndex++)
+                for (; ; batchIndex++)
                 {
                     if (State.ChildrenStack.Length == 0)
                     {
@@ -642,7 +666,10 @@ namespace Unity.Entities.Editor
                     // If this node still has children to process push them on to the stack.
                     if (children.ChildrenBufferStartIndex < children.ChildrenBufferEndIndex)
                     {
-                        PushNode(State.ChildrenBuffer[children.ChildrenBufferStartIndex++], parentIndex: children.ParentIndex);
+                        PushNode(
+                            State.ChildrenBuffer[children.ChildrenBufferStartIndex++],
+                            parentIndex: children.ParentIndex
+                        );
                     }
                     else
                     {
@@ -697,7 +724,13 @@ namespace Unity.Entities.Editor
                     UnsafeUtility.MemCpy(dst, src, len);
 
                     // The mapping must be updated.
-                    for (int readIndex = readNodeIndex, writeIndex = m_PackingIndex, end = readNodeIndex + nextSiblingOffset; readIndex < end; readIndex++, writeIndex++)
+                    for (
+                        int readIndex = readNodeIndex,
+                            writeIndex = m_PackingIndex,
+                            end = readNodeIndex + nextSiblingOffset;
+                        readIndex < end;
+                        readIndex++, writeIndex++
+                    )
                     {
                         WriteNodes.SetPackedIndex(ReadNodes[readIndex].Handle, writeIndex);
                     }
@@ -705,7 +738,13 @@ namespace Unity.Entities.Editor
                     if (diffDepth != 0)
                     {
                         // Depth must be updated.
-                        for (int readIndex = readNodeIndex, writeIndex = m_PackingIndex, end = readNodeIndex + nextSiblingOffset; readIndex < end; readIndex++, writeIndex++)
+                        for (
+                            int readIndex = readNodeIndex,
+                                writeIndex = m_PackingIndex,
+                                end = readNodeIndex + nextSiblingOffset;
+                            readIndex < end;
+                            readIndex++, writeIndex++
+                        )
                         {
                             WriteNodes.m_HandleNodes->ElementAt(writeIndex).Depth += diffDepth;
                         }
@@ -747,10 +786,7 @@ namespace Unity.Entities.Editor
                 {
                     var children = State.ChildrenBuffer.AsArray().GetSubArray(childrenBufferStartIndex, childCount);
 
-                    children.Sort(new HierarchyNodeHandleComparer
-                    {
-                        Nodes = Nodes
-                    });
+                    children.Sort(new HierarchyNodeHandleComparer { Nodes = Nodes });
                 }
 
                 var index = m_PackingIndex++;
@@ -763,26 +799,29 @@ namespace Unity.Entities.Editor
                     NextSiblingOffset = 1, // default the next sibling to be the next node. If we have children this value is patched when popping off the stack.
                     ChildCount = childCount,
                     Depth = State.Depth,
-                    Flags = Nodes[handle].Flags
+                    Flags = Nodes[handle].Flags,
                 };
 
                 if (childCount <= 0)
                     return;
 
                 State.Depth++;
-                State.ChildrenStack.Add(new ExportImmutableState.ChildrenStackData
-                {
-                    ParentIndex = index,
-                    ChildrenBufferStartIndex = childrenBufferStartIndex,
-                    ChildrenBufferEndIndex = childrenBufferStartIndex + childCount
-                });
+                State.ChildrenStack.Add(
+                    new ExportImmutableState.ChildrenStackData
+                    {
+                        ParentIndex = index,
+                        ChildrenBufferStartIndex = childrenBufferStartIndex,
+                        ChildrenBufferEndIndex = childrenBufferStartIndex + childCount,
+                    }
+                );
             }
         }
 
         [BurstCompile]
         unsafe struct ExportImmutableEntitiesNodesBatchJob : IJob
         {
-            [ReadOnly] public HierarchyNodeMap<HierarchyNodeData> Nodes;
+            [ReadOnly]
+            public HierarchyNodeMap<HierarchyNodeData> Nodes;
 
             public ExportImmutableState State;
 

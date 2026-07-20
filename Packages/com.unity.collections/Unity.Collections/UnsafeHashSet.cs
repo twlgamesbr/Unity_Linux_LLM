@@ -15,9 +15,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     [StructLayout(LayoutKind.Sequential)]
     [DebuggerTypeProxy(typeof(UnsafeHashSetDebuggerTypeProxy<>))]
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-    public unsafe struct UnsafeHashSet<T>
-        : INativeDisposable
-        , IEnumerable<T> // Used by collection initializers.
+    public unsafe struct UnsafeHashSet<T> : INativeDisposable, IEnumerable<T> // Used by collection initializers.
         where T : unmanaged, IEquatable<T>
     {
         internal HashMapHelper<T> m_Data;
@@ -270,8 +268,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// A read-only alias for the value of a UnsafeHashSet. Does not have its own allocated storage.
         /// </summary>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public struct ReadOnly
-            : IEnumerable<T>
+        public struct ReadOnly : IEnumerable<T>
         {
             internal HashMapHelper<T> m_Data;
 
@@ -374,7 +371,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         }
     }
 
-    sealed internal class UnsafeHashSetDebuggerTypeProxy<T>
+    internal sealed class UnsafeHashSetDebuggerTypeProxy<T>
         where T : unmanaged, IEquatable<T>
     {
         HashMapHelper<T> Data;

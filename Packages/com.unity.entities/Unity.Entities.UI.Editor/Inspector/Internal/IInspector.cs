@@ -89,5 +89,5 @@ namespace Unity.Entities.UI
         InspectorContext<T> Context { get; set; }
     }
 
-    interface IExperimentalInspector{}
+    interface IExperimentalInspector { }
 }

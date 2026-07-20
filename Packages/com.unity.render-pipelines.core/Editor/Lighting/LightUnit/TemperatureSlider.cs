@@ -42,8 +42,11 @@ namespace UnityEditor.Rendering
             m_ExponentialConstraints.z = 1.48240556f;
         }
 
-        protected float ValueToSlider(float x) => Mathf.Log((x - m_ExponentialConstraints.x) / m_ExponentialConstraints.y) / m_ExponentialConstraints.z;
-        protected float SliderToValue(float x) => m_ExponentialConstraints.x + m_ExponentialConstraints.y * Mathf.Exp(m_ExponentialConstraints.z * x);
+        protected float ValueToSlider(float x) =>
+            Mathf.Log((x - m_ExponentialConstraints.x) / m_ExponentialConstraints.y) / m_ExponentialConstraints.z;
+
+        protected float SliderToValue(float x) =>
+            m_ExponentialConstraints.x + m_ExponentialConstraints.y * Mathf.Exp(m_ExponentialConstraints.z * x);
 
         protected override float GetPositionOnSlider(float value, Vector2 valueRange)
         {
@@ -54,10 +57,21 @@ namespace UnityEditor.Rendering
         {
             if (s_KelvinGradientTexture == null)
             {
-                var kelvinTexture = (Texture2D)typeof(LightEditor.Settings).GetField("m_KelvinGradientTexture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(settings);
+                var kelvinTexture = (Texture2D)
+                    typeof(LightEditor.Settings)
+                        .GetField(
+                            "m_KelvinGradientTexture",
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
+                        )
+                        .GetValue(settings);
 
                 // This seems to be the only way to gamma-correct the internal gradient tex (aside from drawing it manually).
-                var kelvinTextureLinear = new Texture2D(kelvinTexture.width, kelvinTexture.height, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.MipChain);
+                var kelvinTextureLinear = new Texture2D(
+                    kelvinTexture.width,
+                    kelvinTexture.height,
+                    GraphicsFormat.R8G8B8A8_SRGB,
+                    TextureCreationFlags.MipChain
+                );
                 kelvinTextureLinear.SetPixels(kelvinTexture.GetPixels());
                 kelvinTextureLinear.Apply();
 
@@ -71,7 +85,8 @@ namespace UnityEditor.Rendering
         /// Constructs the temperature slider
         /// </summary>
         /// <param name="descriptor">The descriptor</param>
-        public TemperatureSlider(LightUnitSliderUIDescriptor descriptor) : base(descriptor)
+        public TemperatureSlider(LightUnitSliderUIDescriptor descriptor)
+            : base(descriptor)
         {
             var halfValue = 6500;
             PrepareExponentialConstraints(m_Descriptor.sliderRange.x, halfValue, m_Descriptor.sliderRange.y);
@@ -119,7 +134,14 @@ namespace UnityEditor.Rendering
             EditorGUI.BeginChangeCheck();
 
             // Draw the exponential slider that fits 6500K to the white point on the gradient texture.
-            var internalValue = GUI.HorizontalSlider(rect, ValueToSlider(value), 0f, 1f, SliderStyles.k_TemperatureBorder, SliderStyles.k_TemperatureThumb);
+            var internalValue = GUI.HorizontalSlider(
+                rect,
+                ValueToSlider(value),
+                0f,
+                1f,
+                SliderStyles.k_TemperatureBorder,
+                SliderStyles.k_TemperatureThumb
+            );
 
             // Round to nearest since so much precision is not necessary for kelvin while sliding.
             if (EditorGUI.EndChangeCheck())
@@ -152,7 +174,12 @@ namespace UnityEditor.Rendering
         /// <param name="serializedObject">The serialized object</param>
         /// <param name="value">The serialized property</param>
         /// <param name="rect">The rect where the slider will be drawn</param>
-        public static void Draw(LightEditor.Settings settings, SerializedObject serializedObject, SerializedProperty value, Rect rect)
+        public static void Draw(
+            LightEditor.Settings settings,
+            SerializedObject serializedObject,
+            SerializedProperty value,
+            Rect rect
+        )
         {
             k_TemperatureSlider.SetSerializedObject(serializedObject);
             using (new EditorGUI.IndentLevelScope(-EditorGUI.indentLevel))

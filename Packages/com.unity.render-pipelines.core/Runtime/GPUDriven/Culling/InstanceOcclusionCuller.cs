@@ -11,16 +11,20 @@ namespace UnityEngine.Rendering
     {
         /// <summary></summary>
         public Matrix4x4 viewProjMatrix; // from view-centered world space
+
         /// <summary></summary>
         public Vector4 viewOriginWorldSpace;
+
         /// <summary></summary>
         public Vector4 radialDirWorldSpace;
+
         /// <summary></summary>
         public Vector4 facingDirWorldSpace;
 
         public static OccluderDerivedData FromParameters(in OccluderSubviewUpdate occluderSubviewUpdate)
         {
-            var origin = occluderSubviewUpdate.viewOffsetWorldSpace + (Vector3)occluderSubviewUpdate.invViewMatrix.GetColumn(3); // view origin in world space
+            var origin =
+                occluderSubviewUpdate.viewOffsetWorldSpace + (Vector3)occluderSubviewUpdate.invViewMatrix.GetColumn(3); // view origin in world space
             var xViewVec = (Vector3)occluderSubviewUpdate.invViewMatrix.GetColumn(0); // positive x axis in world space
             var yViewVec = (Vector3)occluderSubviewUpdate.invViewMatrix.GetColumn(1); // positive y axis in world space
             var towardsVec = (Vector3)occluderSubviewUpdate.invViewMatrix.GetColumn(2); // positive z axis in world space
@@ -76,7 +80,7 @@ namespace UnityEngine.Rendering
     [GenerateHLSL(needAccessors = false)]
     internal struct IndirectInstanceInfo
     {
-        public int drawOffsetAndSplitMask;    // [31:8]=draw_offset, [7:0]=split_mask
+        public int drawOffsetAndSplitMask; // [31:8]=draw_offset, [7:0]=split_mask
         public int instanceIndexAndCrossFade; // DOTS instance index
     }
 
@@ -120,11 +124,11 @@ namespace UnityEngine.Rendering
 
         public enum BufferState
         {
-            Pending,                        // Not synced with culling output yet
-            Zeroed,                         // All draws have zero instances
-            NoOcclusionTest,                // Copy the results of CPU frustum/LOD culling
-            AllInstancesOcclusionTested,    // Occlusion test the results of CPU frustum/LOD culling
-            OccludedInstancesReTested,      // Re-test previously occluded instances (against updated occluders)
+            Pending, // Not synced with culling output yet
+            Zeroed, // All draws have zero instances
+            NoOcclusionTest, // Copy the results of CPU frustum/LOD culling
+            AllInstancesOcclusionTested, // Occlusion test the results of CPU frustum/LOD culling
+            OccludedInstancesReTested, // Re-test previously occluded instances (against updated occluders)
         }
 
         public BufferState bufferState;
@@ -159,7 +163,9 @@ namespace UnityEngine.Rendering
         {
             public static readonly int _SrcDepth = Shader.PropertyToID("_SrcDepth");
             public static readonly int _DstDepth = Shader.PropertyToID("_DstDepth");
-            public static readonly int OccluderDepthPyramidConstants = Shader.PropertyToID("OccluderDepthPyramidConstants");
+            public static readonly int OccluderDepthPyramidConstants = Shader.PropertyToID(
+                "OccluderDepthPyramidConstants"
+            );
         }
 
         public const int k_FirstDepthMipIndex = 3; // 8x8 tiles
@@ -171,7 +177,10 @@ namespace UnityEngine.Rendering
         public Vector2Int depthBufferSize;
 
         public NativeArray<OccluderDerivedData> subviewData;
-        public int subviewCount { get { return subviewData.Length; } }
+        public int subviewCount
+        {
+            get { return subviewData.Length; }
+        }
         public int subviewValidMask;
 
         public bool IsSubviewValid(int subviewIndex)
@@ -189,13 +198,15 @@ namespace UnityEngine.Rendering
         public ComputeBuffer constantBuffer;
         public NativeArray<OccluderDepthPyramidConstants> constantBufferData;
 
-        public Vector2 depthBufferSizeInOccluderPixels {
+        public Vector2 depthBufferSizeInOccluderPixels
+        {
             get
             {
                 int occluderPixelSize = 1 << k_FirstDepthMipIndex;
                 return new Vector2(
                     (float)depthBufferSize.x / (float)occluderPixelSize,
-                    (float)depthBufferSize.y / (float)occluderPixelSize);
+                    (float)depthBufferSize.y / (float)occluderPixelSize
+                );
             }
         }
 
@@ -264,21 +275,29 @@ namespace UnityEngine.Rendering
 
         private void AllocateTexturesIfNecessary(bool debugOverlayEnabled)
         {
-            Vector2Int minDepthPyramidSize = new Vector2Int(occluderMipLayoutSize.x, occluderMipLayoutSize.y * subviewCount);
-            if (occluderDepthPyramidSize.x < minDepthPyramidSize.x || occluderDepthPyramidSize.y < minDepthPyramidSize.y)
+            Vector2Int minDepthPyramidSize = new Vector2Int(
+                occluderMipLayoutSize.x,
+                occluderMipLayoutSize.y * subviewCount
+            );
+            if (
+                occluderDepthPyramidSize.x < minDepthPyramidSize.x
+                || occluderDepthPyramidSize.y < minDepthPyramidSize.y
+            )
             {
                 if (occluderDepthPyramid != null)
                     occluderDepthPyramid.Release();
 
                 occluderDepthPyramidSize = minDepthPyramidSize;
                 occluderDepthPyramid = RTHandles.Alloc(
-                    occluderDepthPyramidSize.x, occluderDepthPyramidSize.y,
+                    occluderDepthPyramidSize.x,
+                    occluderDepthPyramidSize.y,
                     dimension: TextureDimension.Tex2D,
                     format: GraphicsFormat.R32_SFloat,
                     filterMode: FilterMode.Point,
                     wrapMode: TextureWrapMode.Clamp,
                     enableRandomWrite: true,
-                    name: "Occluder Depths");
+                    name: "Occluder Depths"
+                );
             }
 
             int newDebugOverlaySize = debugOverlayEnabled ? (minDepthPyramidSize.x * minDepthPyramidSize.y) : 0;
@@ -291,8 +310,12 @@ namespace UnityEngine.Rendering
                 debugNeedsClear = true;
 
                 // We use buffer instead of texture, because some platforms don't support atmoic operations for Texture2D<uint>
-                occlusionDebugOverlay = new GraphicsBuffer(GraphicsBuffer.Target.Structured, GraphicsBuffer.UsageFlags.None,
-                    occlusionDebugOverlaySize + (int)OcclusionCullingCommonConfig.DebugPyramidOffset, sizeof(uint));
+                occlusionDebugOverlay = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    GraphicsBuffer.UsageFlags.None,
+                    occlusionDebugOverlaySize + (int)OcclusionCullingCommonConfig.DebugPyramidOffset,
+                    sizeof(uint)
+                );
             }
             if (newDebugOverlaySize == 0)
             {
@@ -306,7 +329,11 @@ namespace UnityEngine.Rendering
             }
 
             if (constantBuffer == null)
-                constantBuffer = new ComputeBuffer(1, UnsafeUtility.SizeOf<OccluderDepthPyramidConstants>(), ComputeBufferType.Constant);
+                constantBuffer = new ComputeBuffer(
+                    1,
+                    UnsafeUtility.SizeOf<OccluderDepthPyramidConstants>(),
+                    ComputeBufferType.Constant
+                );
 
             if (!constantBufferData.IsCreated)
                 constantBufferData = new NativeArray<OccluderDepthPyramidConstants>(1, Allocator.Persistent);
@@ -320,7 +347,10 @@ namespace UnityEngine.Rendering
                 cmd.DisableKeyword(cs, keyword);
         }
 
-        private OccluderDepthPyramidConstants SetupFarDepthPyramidConstants(ReadOnlySpan<OccluderSubviewUpdate> occluderSubviewUpdates, NativeArray<Plane> silhouettePlanes)
+        private OccluderDepthPyramidConstants SetupFarDepthPyramidConstants(
+            ReadOnlySpan<OccluderSubviewUpdate> occluderSubviewUpdates,
+            NativeArray<Plane> silhouettePlanes
+        )
         {
             OccluderDepthPyramidConstants cb = new OccluderDepthPyramidConstants();
 
@@ -338,10 +368,8 @@ namespace UnityEngine.Rendering
                 subviewData[subviewIndex] = OccluderDerivedData.FromParameters(update);
                 subviewValidMask |= 1 << update.subviewIndex;
 
-                Matrix4x4 viewProjMatrix
-                    = update.gpuProjMatrix
-                    * update.viewMatrix
-                    * Matrix4x4.Translate(-update.viewOffsetWorldSpace);
+                Matrix4x4 viewProjMatrix =
+                    update.gpuProjMatrix * update.viewMatrix * Matrix4x4.Translate(-update.viewOffsetWorldSpace);
                 Matrix4x4 invViewProjMatrix = viewProjMatrix.inverse;
 
                 unsafe
@@ -378,7 +406,15 @@ namespace UnityEngine.Rendering
             return cb;
         }
 
-        public void CreateFarDepthPyramid(ComputeCommandBuffer cmd, in OccluderParameters occluderParams, ReadOnlySpan<OccluderSubviewUpdate> occluderSubviewUpdates, in OccluderHandles occluderHandles, NativeArray<Plane> silhouettePlanes, ComputeShader occluderDepthPyramidCS, int occluderDepthDownscaleKernel)
+        public void CreateFarDepthPyramid(
+            ComputeCommandBuffer cmd,
+            in OccluderParameters occluderParams,
+            ReadOnlySpan<OccluderSubviewUpdate> occluderSubviewUpdates,
+            in OccluderHandles occluderHandles,
+            NativeArray<Plane> silhouettePlanes,
+            ComputeShader occluderDepthPyramidCS,
+            int occluderDepthDownscaleKernel
+        )
         {
             OccluderDepthPyramidConstants cb = SetupFarDepthPyramidConstants(occluderSubviewUpdates, silhouettePlanes);
 
@@ -440,9 +476,21 @@ namespace UnityEngine.Rendering
 
                 constantBufferData[0] = cb;
                 cmd.SetBufferData(constantBuffer, constantBufferData);
-                cmd.SetComputeConstantBufferParam(cs, ShaderIDs.OccluderDepthPyramidConstants, constantBuffer, 0, constantBuffer.stride);
+                cmd.SetComputeConstantBufferParam(
+                    cs,
+                    ShaderIDs.OccluderDepthPyramidConstants,
+                    constantBuffer,
+                    0,
+                    constantBuffer.stride
+                );
 
-                cmd.DispatchCompute(cs, kernel, (srcSize.x + 15) / 16, (srcSize.y + 15) / 16, occluderSubviewUpdates.Length);
+                cmd.DispatchCompute(
+                    cs,
+                    kernel,
+                    (srcSize.x + 15) / 16,
+                    (srcSize.y + 15) / 16,
+                    occluderSubviewUpdates.Length
+                );
             }
         }
 
@@ -459,7 +507,7 @@ namespace UnityEngine.Rendering
             };
             OccluderHandles occluderHandles = new OccluderHandles()
             {
-                occluderDepthPyramid = renderGraph.ImportTexture(occluderDepthPyramid, rtInfo)
+                occluderDepthPyramid = renderGraph.ImportTexture(occluderDepthPyramid, rtInfo),
             };
             if (occlusionDebugOverlay != null)
                 occluderHandles.occlusionDebugOverlay = renderGraph.ImportBuffer(occlusionDebugOverlay);
@@ -515,7 +563,7 @@ namespace UnityEngine.Rendering
     {
         NextInstanceIndex,
         NextDrawIndex,
-        Count // keep last
+        Count, // keep last
     }
 
     internal struct IndirectBufferLimits
@@ -532,7 +580,9 @@ namespace UnityEngine.Rendering
         public int cullingSplitIndices;
         public int cullingSplitMask;
 
-        public static InstanceOcclusionTestSubviewSettings FromSpan(ReadOnlySpan<SubviewOcclusionTest> subviewOcclusionTests)
+        public static InstanceOcclusionTestSubviewSettings FromSpan(
+            ReadOnlySpan<SubviewOcclusionTest> subviewOcclusionTests
+        )
         {
             InstanceOcclusionTestSubviewSettings settings = new InstanceOcclusionTestSubviewSettings();
             for (int testIndex = 0; testIndex < subviewOcclusionTests.Length; ++testIndex)
@@ -569,7 +619,7 @@ namespace UnityEngine.Rendering
     internal struct IndirectBufferContextStorage : IDisposable
     {
         private const int kAllocatorCount = (int)IndirectAllocator.Count;
-        internal const int kInstanceInfoGpuOffsetMultiplier = 2;    // GPU side allocates storage for extra copy of instance list
+        internal const int kInstanceInfoGpuOffsetMultiplier = 2; // GPU side allocates storage for extra copy of instance list
 
         private IndirectBufferLimits m_BufferLimits;
 
@@ -588,14 +638,35 @@ namespace UnityEngine.Rendering
         private NativeArray<IndirectBufferAllocInfo> m_ContextAllocInfo;
         private NativeArray<int> m_AllocationCounters;
 
-        public GraphicsBuffer instanceBuffer { get { return m_InstanceBuffer; } }
-        public GraphicsBuffer instanceInfoBuffer { get { return m_InstanceInfoBuffer; } }
-        public GraphicsBuffer dispatchArgsBuffer { get { return m_DispatchArgsBuffer; } }
-        public GraphicsBuffer drawArgsBuffer { get { return m_DrawArgsBuffer; } }
-        public GraphicsBuffer drawInfoBuffer { get { return m_DrawInfoBuffer; } }
+        public GraphicsBuffer instanceBuffer
+        {
+            get { return m_InstanceBuffer; }
+        }
+        public GraphicsBuffer instanceInfoBuffer
+        {
+            get { return m_InstanceInfoBuffer; }
+        }
+        public GraphicsBuffer dispatchArgsBuffer
+        {
+            get { return m_DispatchArgsBuffer; }
+        }
+        public GraphicsBuffer drawArgsBuffer
+        {
+            get { return m_DrawArgsBuffer; }
+        }
+        public GraphicsBuffer drawInfoBuffer
+        {
+            get { return m_DrawInfoBuffer; }
+        }
 
-        public GraphicsBufferHandle visibleInstanceBufferHandle { get { return m_InstanceBuffer.bufferHandle; } }
-        public GraphicsBufferHandle indirectDrawArgsBufferHandle { get { return m_DrawArgsBuffer.bufferHandle; } }
+        public GraphicsBufferHandle visibleInstanceBufferHandle
+        {
+            get { return m_InstanceBuffer.bufferHandle; }
+        }
+        public GraphicsBufferHandle indirectDrawArgsBufferHandle
+        {
+            get { return m_DrawArgsBuffer.bufferHandle; }
+        }
 
         public IndirectBufferContextHandles ImportBuffers(RenderGraph renderGraph)
         {
@@ -609,9 +680,18 @@ namespace UnityEngine.Rendering
             };
         }
 
-        public NativeArray<IndirectInstanceInfo> instanceInfoGlobalArray { get { return m_InstanceInfoStaging;  } }
-        public NativeArray<IndirectDrawInfo> drawInfoGlobalArray { get { return m_DrawInfoStaging; } }
-        public NativeArray<int> allocationCounters { get { return m_AllocationCounters; } }
+        public NativeArray<IndirectInstanceInfo> instanceInfoGlobalArray
+        {
+            get { return m_InstanceInfoStaging; }
+        }
+        public NativeArray<IndirectDrawInfo> drawInfoGlobalArray
+        {
+            get { return m_DrawInfoStaging; }
+        }
+        public NativeArray<int> allocationCounters
+        {
+            get { return m_AllocationCounters; }
+        }
 
         public void Init()
         {
@@ -624,9 +704,17 @@ namespace UnityEngine.Rendering
 
             m_ContextIndexFromViewID = new NativeHashMap<EntityId, int>(initialContextCount, Allocator.Persistent);
             m_Contexts = new NativeList<IndirectBufferContext>(initialContextCount, Allocator.Persistent);
-            m_ContextAllocInfo = new NativeArray<IndirectBufferAllocInfo>(initialContextCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_ContextAllocInfo = new NativeArray<IndirectBufferAllocInfo>(
+                initialContextCount,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
 
-            m_AllocationCounters = new NativeArray<int>(kAllocatorCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_AllocationCounters = new NativeArray<int>(
+                kAllocatorCount,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             ResetAllocators();
         }
@@ -634,8 +722,16 @@ namespace UnityEngine.Rendering
         void AllocateInstanceBuffers(int maxInstanceCount)
         {
             m_InstanceBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, maxInstanceCount, sizeof(int));
-            m_InstanceInfoBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, kInstanceInfoGpuOffsetMultiplier * maxInstanceCount, System.Runtime.InteropServices.Marshal.SizeOf<IndirectInstanceInfo>());
-            m_InstanceInfoStaging = new NativeArray<IndirectInstanceInfo>(maxInstanceCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_InstanceInfoBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                kInstanceInfoGpuOffsetMultiplier * maxInstanceCount,
+                System.Runtime.InteropServices.Marshal.SizeOf<IndirectInstanceInfo>()
+            );
+            m_InstanceInfoStaging = new NativeArray<IndirectInstanceInfo>(
+                maxInstanceCount,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_BufferLimits.maxInstanceCount = maxInstanceCount;
         }
 
@@ -650,10 +746,26 @@ namespace UnityEngine.Rendering
         void AllocateDrawBuffers(int maxDrawCount)
         {
             // Compute dispatch arguments are number of thread groups in X,Y and Z dimensions, hence 3 integers for the size.
-            m_DispatchArgsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.IndirectArguments, 3, sizeof(int));
-            m_DrawArgsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.IndirectArguments, maxDrawCount * (GraphicsBuffer.IndirectDrawIndexedArgs.size / sizeof(int)), sizeof(int));
-            m_DrawInfoBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, maxDrawCount, System.Runtime.InteropServices.Marshal.SizeOf<IndirectDrawInfo>());
-            m_DrawInfoStaging = new NativeArray<IndirectDrawInfo>(maxDrawCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_DispatchArgsBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.IndirectArguments,
+                3,
+                sizeof(int)
+            );
+            m_DrawArgsBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.IndirectArguments,
+                maxDrawCount * (GraphicsBuffer.IndirectDrawIndexedArgs.size / sizeof(int)),
+                sizeof(int)
+            );
+            m_DrawInfoBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                maxDrawCount,
+                System.Runtime.InteropServices.Marshal.SizeOf<IndirectDrawInfo>()
+            );
+            m_DrawInfoStaging = new NativeArray<IndirectDrawInfo>(
+                maxDrawCount,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_BufferLimits.maxDrawCount = maxDrawCount;
         }
 
@@ -702,7 +814,11 @@ namespace UnityEngine.Rendering
                 m_Contexts.Clear();
                 m_Contexts.SetCapacity(newContextCount);
                 m_ContextAllocInfo.Dispose();
-                m_ContextAllocInfo = new NativeArray<IndirectBufferAllocInfo>(newContextCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                m_ContextAllocInfo = new NativeArray<IndirectBufferAllocInfo>(
+                    newContextCount,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 //Debug.Log("Raised indirect context count to " + newContextCount);
             }
             int instanceAllocCounter = m_AllocationCounters[(int)IndirectAllocator.NextInstanceIndex];
@@ -780,14 +896,16 @@ namespace UnityEngine.Rendering
                     m_DrawInfoStaging,
                     allocInfo.drawAllocIndex,
                     allocInfo.drawAllocIndex,
-                    allocInfo.drawCount);
+                    allocInfo.drawCount
+                );
 
                 cmd.SetBufferData(
                     m_InstanceInfoBuffer,
                     m_InstanceInfoStaging,
                     allocInfo.instanceAllocIndex,
                     kInstanceInfoGpuOffsetMultiplier * allocInfo.instanceAllocIndex,
-                    allocInfo.instanceCount);
+                    allocInfo.instanceCount
+                );
             }
         }
 

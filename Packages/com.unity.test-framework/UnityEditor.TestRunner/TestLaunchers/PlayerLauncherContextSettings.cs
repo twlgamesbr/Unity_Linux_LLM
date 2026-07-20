@@ -83,7 +83,10 @@ namespace UnityEditor.TestTools.TestRunner
             PlayerSettings.SplashScreen.showUnityLogo = false;
 
             m_OldproductName = PlayerSettings.productName;
-            PlayerSettings.productName = string.Join("_", Application.productName.Split(Path.GetInvalidFileNameChars()));
+            PlayerSettings.productName = string.Join(
+                "_",
+                Application.productName.Split(Path.GetInvalidFileNameChars())
+            );
 
 #pragma warning disable 618
             m_OldLightmapping = Lightmapping.giWorkflowMode;

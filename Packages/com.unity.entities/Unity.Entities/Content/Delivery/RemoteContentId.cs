@@ -17,17 +17,13 @@ namespace Unity.Entities.Content
         /// <summary>
         /// The hash, used to compare ids.  This is either set as the has of the name or to a custom hash.
         /// </summary>
-        public Hash128 Hash
-        {
-            private set;
-            get;
-        }
+        public Hash128 Hash { private set; get; }
 
         /// <summary>
         /// Construct an id with only the path.  The Hash is computed from the name.
         /// </summary>
         /// <param name="name">The name of the content.</param>
-        unsafe public RemoteContentId(in FixedString512Bytes name)
+        public unsafe RemoteContentId(in FixedString512Bytes name)
         {
             Name = name;
             Hash = UnityEngine.Hash128.Compute(Name.GetUnsafePtr(), Name.utf8LengthInBytes);
@@ -38,12 +34,13 @@ namespace Unity.Entities.Content
         /// </summary>
         /// <param name="name">The name of the content.</param>
         /// <param name="hash">The hash for the id.</param>
-        unsafe public RemoteContentId(in FixedString512Bytes name, Hash128 hash)
+        public unsafe RemoteContentId(in FixedString512Bytes name, Hash128 hash)
         {
             Assertions.Assert.IsTrue(hash.IsValid, "Cannot create a RemoteContentId with an invalid hash.");
             Name = name;
             Hash = hash;
         }
+
         /// <summary>
         /// True if the id is valid.
         /// </summary>
@@ -59,7 +56,7 @@ namespace Unity.Entities.Content
         public override int GetHashCode() => Hash.GetHashCode();
 
         /// <summary>
-        /// Convert this id to a string.  
+        /// Convert this id to a string.
         /// </summary>
         /// <returns>The string valud of the id in the format of {Name}:{Hash}.</returns>
         public override string ToString()

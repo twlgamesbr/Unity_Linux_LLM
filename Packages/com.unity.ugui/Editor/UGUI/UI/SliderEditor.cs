@@ -63,7 +63,11 @@ namespace UnityEditor.UI
                 float newMin = EditorGUILayout.FloatField("Min Value", m_MinValue.floatValue);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    if (m_WholeNumbers.boolValue ? Mathf.Round(newMin) < m_MaxValue.floatValue : newMin < m_MaxValue.floatValue)
+                    if (
+                        m_WholeNumbers.boolValue
+                            ? Mathf.Round(newMin) < m_MaxValue.floatValue
+                            : newMin < m_MaxValue.floatValue
+                    )
                     {
                         m_MinValue.floatValue = newMin;
                         if (m_Value.floatValue < newMin)
@@ -75,7 +79,11 @@ namespace UnityEditor.UI
                 float newMax = EditorGUILayout.FloatField("Max Value", m_MaxValue.floatValue);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    if (m_WholeNumbers.boolValue ? Mathf.Round(newMax) > m_MinValue.floatValue : newMax > m_MinValue.floatValue)
+                    if (
+                        m_WholeNumbers.boolValue
+                            ? Mathf.Round(newMax) > m_MinValue.floatValue
+                            : newMax > m_MinValue.floatValue
+                    )
                     {
                         m_MaxValue.floatValue = newMax;
                         if (m_Value.floatValue > newMax)
@@ -117,13 +125,22 @@ namespace UnityEditor.UI
                     Slider slider = obj as Slider;
                     Slider.Direction dir = slider.direction;
                     if (dir == Slider.Direction.LeftToRight || dir == Slider.Direction.RightToLeft)
-                        warning = (slider.navigation.mode != Navigation.Mode.Automatic && (slider.FindSelectableOnLeft() != null || slider.FindSelectableOnRight() != null));
+                        warning = (
+                            slider.navigation.mode != Navigation.Mode.Automatic
+                            && (slider.FindSelectableOnLeft() != null || slider.FindSelectableOnRight() != null)
+                        );
                     else
-                        warning = (slider.navigation.mode != Navigation.Mode.Automatic && (slider.FindSelectableOnDown() != null || slider.FindSelectableOnUp() != null));
+                        warning = (
+                            slider.navigation.mode != Navigation.Mode.Automatic
+                            && (slider.FindSelectableOnDown() != null || slider.FindSelectableOnUp() != null)
+                        );
                 }
 
                 if (warning)
-                    EditorGUILayout.HelpBox("The selected slider direction conflicts with navigation. Not all navigation options may work.", MessageType.Warning);
+                    EditorGUILayout.HelpBox(
+                        "The selected slider direction conflicts with navigation. Not all navigation options may work.",
+                        MessageType.Warning
+                    );
 
                 // Draw the event notification options
                 EditorGUILayout.Space();
@@ -131,7 +148,10 @@ namespace UnityEditor.UI
             }
             else
             {
-                EditorGUILayout.HelpBox("Specify a RectTransform for the slider fill or the slider handle or both. Each must have a parent RectTransform that it can slide within.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "Specify a RectTransform for the slider fill or the slider handle or both. Each must have a parent RectTransform that it can slide within.",
+                    MessageType.Info
+                );
             }
 
             serializedObject.ApplyModifiedProperties();

@@ -5,7 +5,7 @@ namespace UnityEngine.UIElements.TestFramework
 {
     /// <summary>
     /// Tracks and cleans up objects that require disposal or destruction after tests.
-    /// When added to a test fixture, `CleanupUtil` automatically cleans up all registered 
+    /// When added to a test fixture, `CleanupUtil` automatically cleans up all registered
     /// objects after the test execution.
     /// </summary>
     /// <remarks>

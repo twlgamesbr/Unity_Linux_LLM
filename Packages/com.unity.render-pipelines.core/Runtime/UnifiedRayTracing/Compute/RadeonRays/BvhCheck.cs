@@ -4,7 +4,6 @@ using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering.RadeonRays
 {
-
     internal class AABB
     {
         public float3 Min;
@@ -36,8 +35,12 @@ namespace UnityEngine.Rendering.RadeonRays
 
         public bool Contains(AABB rhs)
         {
-            return rhs.Min.x >= Min.x && rhs.Min.y >= Min.y && rhs.Min.z >= Min.z &&
-                   rhs.Max.x <= Max.x && rhs.Max.y <= Max.y && rhs.Max.z <= Max.z;
+            return rhs.Min.x >= Min.x
+                && rhs.Min.y >= Min.y
+                && rhs.Min.z >= Min.z
+                && rhs.Max.x <= Max.x
+                && rhs.Max.y <= Max.y
+                && rhs.Max.z <= Max.z;
         }
 
         public bool IsValid()
@@ -45,7 +48,6 @@ namespace UnityEngine.Rendering.RadeonRays
             return Min.x <= Max.x && Min.y <= Max.y && Min.z <= Max.z;
         }
     }
-
 
     internal class BvhCheck
     {
@@ -61,7 +63,6 @@ namespace UnityEngine.Rendering.RadeonRays
             public uint indexBufferOffset = 0;
             public IndexFormat indexFormat = IndexFormat.Int32;
             public uint indexCount;
-
         };
 
         public static VertexBuffers Convert(MeshBuildInfo info)
@@ -75,7 +76,7 @@ namespace UnityEngine.Rendering.RadeonRays
                 vertexStride = info.vertexStride,
                 indexBufferOffset = (uint)info.indicesStartOffset,
                 indexCount = info.triangleCount * 3,
-                indexFormat = info.indexFormat
+                indexFormat = info.indexFormat,
             };
 
             return res;
@@ -92,12 +93,23 @@ namespace UnityEngine.Rendering.RadeonRays
             double cost = IsLeafNode(nodeAddr) ? GetLeafNodePrimCount(nodeAddr) : 1.2f;
             var a = SurfaceArea(nodeAabb);
             var b = SurfaceArea(parentAabb);
-            return cost *  a/ b;
+            return cost * a / b;
         }
 
-        public static double CheckConsistency(VertexBuffers bvhVertexBuffers, BottomLevelLevelAccelStruct bvh, uint primitiveCount)
+        public static double CheckConsistency(
+            VertexBuffers bvhVertexBuffers,
+            BottomLevelLevelAccelStruct bvh,
+            uint primitiveCount
+        )
         {
-            return CheckConsistency(bvhVertexBuffers, bvh.bvh, bvh.bvhOffset, bvh.bvhLeaves, bvh.bvhLeavesOffset, primitiveCount);
+            return CheckConsistency(
+                bvhVertexBuffers,
+                bvh.bvh,
+                bvh.bvhOffset,
+                bvh.bvhLeaves,
+                bvh.bvhLeavesOffset,
+                primitiveCount
+            );
         }
 
         public static double CheckConsistency(GraphicsBuffer bvhBuffer, uint bvhBufferOffset, uint primitiveCount)
@@ -107,13 +119,25 @@ namespace UnityEngine.Rendering.RadeonRays
 
         static double CheckConsistency(
             VertexBuffers bvhVertexBuffers,
-            GraphicsBuffer bvhBuffer, uint bvhBufferOffset, GraphicsBuffer bvhLeavesBuffer, uint bvhLeavesBufferOffset,
-            uint primitiveCount)
+            GraphicsBuffer bvhBuffer,
+            uint bvhBufferOffset,
+            GraphicsBuffer bvhLeavesBuffer,
+            uint bvhLeavesBufferOffset,
+            uint primitiveCount
+        )
         {
             var header = new BvhHeader[1];
             bvhBuffer.GetData(header, 0, (int)bvhBufferOffset, 1);
 
-            return CheckConsistency(bvhVertexBuffers, bvhBuffer, bvhBufferOffset + 1, bvhLeavesBuffer, bvhLeavesBufferOffset, header[0], primitiveCount);
+            return CheckConsistency(
+                bvhVertexBuffers,
+                bvhBuffer,
+                bvhBufferOffset + 1,
+                bvhLeavesBuffer,
+                bvhLeavesBufferOffset,
+                header[0],
+                primitiveCount
+            );
         }
 
         public static int ExtractBits(uint value, int startBit, int count)
@@ -139,8 +163,13 @@ namespace UnityEngine.Rendering.RadeonRays
 
         static double CheckConsistency(
             VertexBuffers bvhVertexBuffers,
-            GraphicsBuffer bvhBuffer, uint bvhBufferOffset, GraphicsBuffer bvhLeavesBuffer, uint bvhLeavesBufferOffset,
-            BvhHeader header, uint primitiveCount)
+            GraphicsBuffer bvhBuffer,
+            uint bvhBufferOffset,
+            GraphicsBuffer bvhLeavesBuffer,
+            uint bvhLeavesBufferOffset,
+            BvhHeader header,
+            uint primitiveCount
+        )
         {
             uint leafCount = header.leafNodeCount;
             uint rootAddr = header.root;
@@ -212,22 +241,15 @@ namespace UnityEngine.Rendering.RadeonRays
             public uint vertexStride;
         };
 
-
         static uint3 GetFaceIndices(uint[] indices, uint triangleIdx)
         {
-            return new uint3(
-                indices[3 * triangleIdx],
-                indices[3 * triangleIdx + 1],
-                indices[3 * triangleIdx + 2]);
+            return new uint3(indices[3 * triangleIdx], indices[3 * triangleIdx + 1], indices[3 * triangleIdx + 2]);
         }
 
         static float3 GetVertex(float[] vertices, uint stride, uint idx)
         {
             uint indexInFloats = idx * stride;
-            return new float3(
-                vertices[indexInFloats],
-                vertices[indexInFloats + 1],
-                vertices[indexInFloats + 2]);
+            return new float3(vertices[indexInFloats], vertices[indexInFloats + 1], vertices[indexInFloats + 2]);
         }
 
         struct Triangle
@@ -255,22 +277,43 @@ namespace UnityEngine.Rendering.RadeonRays
 
             if (vertexBuffers.indexFormat == IndexFormat.Int32)
             {
-                vertexBuffers.indices.GetData(result.indices, 0, (int)vertexBuffers.indexBufferOffset, (int)vertexBuffers.indexCount);
+                vertexBuffers.indices.GetData(
+                    result.indices,
+                    0,
+                    (int)vertexBuffers.indexBufferOffset,
+                    (int)vertexBuffers.indexCount
+                );
             }
             else
             {
                 var tmp = new ushort[vertexBuffers.indexCount];
-                vertexBuffers.indices.GetData(tmp, 0, (int)vertexBuffers.indexBufferOffset, (int)vertexBuffers.indexCount);
+                vertexBuffers.indices.GetData(
+                    tmp,
+                    0,
+                    (int)vertexBuffers.indexBufferOffset,
+                    (int)vertexBuffers.indexCount
+                );
                 for (int i = 0; i < vertexBuffers.indexCount; ++i)
                     result.indices[i] = tmp[i];
             }
 
-            vertexBuffers.vertices.GetData(result.vertices, 0, (int)vertexBuffers.vertexBufferOffset, (int)(vertexBuffers.vertexCount * vertexBuffers.vertexStride));
+            vertexBuffers.vertices.GetData(
+                result.vertices,
+                0,
+                (int)vertexBuffers.vertexBufferOffset,
+                (int)(vertexBuffers.vertexCount * vertexBuffers.vertexStride)
+            );
 
             return result;
         }
 
-        static AABB GetAabb(VertexBuffersCPU bvhVertexBuffers, BvhNode[] bvhNodes, uint4[] bvhLeafNodes, uint nodeAddr, bool isTopLevel)
+        static AABB GetAabb(
+            VertexBuffersCPU bvhVertexBuffers,
+            BvhNode[] bvhNodes,
+            uint4[] bvhLeafNodes,
+            uint nodeAddr,
+            bool isTopLevel
+        )
         {
             var aabb = new AABB();
 
@@ -295,7 +338,11 @@ namespace UnityEngine.Rendering.RadeonRays
 
                     Assert.AreEqual(meshTriangleindices, triangleIndices);
 
-                    var triangle = GetTriangle(bvhVertexBuffers.vertices, bvhVertexBuffers.vertexStride, triangleIndices);
+                    var triangle = GetTriangle(
+                        bvhVertexBuffers.vertices,
+                        bvhVertexBuffers.vertexStride,
+                        triangleIndices
+                    );
 
                     aabb.Encapsulate(triangle.v0);
                     aabb.Encapsulate(triangle.v1);
@@ -307,4 +354,3 @@ namespace UnityEngine.Rendering.RadeonRays
         }
     }
 }
-

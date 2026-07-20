@@ -34,7 +34,6 @@ namespace Unity.PlatformToolkit.PlayMode
             }
         }
 
-
         private PlayModeUserManager m_UserManager;
         public IPlayModeUserManager UserManager
         {
@@ -62,13 +61,24 @@ namespace Unity.PlatformToolkit.PlayMode
 
         GenericLifetimeToken m_LifetimeToken = new GenericLifetimeToken();
 
-        public PlayModeControlsRuntime(PlayModeControlsSettings settings, IPlayModeCapability capability, ScriptableObjectDataChangePersistor persistor)
+        public PlayModeControlsRuntime(
+            PlayModeControlsSettings settings,
+            IPlayModeCapability capability,
+            ScriptableObjectDataChangePersistor persistor
+        )
         {
             Capability = capability;
             m_PlayModeAccessor = settings.PlayModeAccessor;
 
             m_Environment = new PlayModeEnvironment(settings.m_Environment);
-            m_UserManager = new PlayModeUserManager(settings.m_Accounts, settings.AttributeDefinitions.Definitions, persistor, m_Environment, capability,  m_PlayModeAccessor.IsPlaying);
+            m_UserManager = new PlayModeUserManager(
+                settings.m_Accounts,
+                settings.AttributeDefinitions.Definitions,
+                persistor,
+                m_Environment,
+                capability,
+                m_PlayModeAccessor.IsPlaying
+            );
 
 #if INPUT_SYSTEM_AVAILABLE
             m_InputSystem = new PlayModeInputSystem(settings.m_InputSystem, persistor, m_UserManager);

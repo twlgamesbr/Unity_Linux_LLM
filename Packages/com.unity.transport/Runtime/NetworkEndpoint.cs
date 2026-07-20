@@ -1,11 +1,11 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Unity.Baselib;
+using Unity.Baselib.LowLevel;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
-using Unity.Baselib;
-using Unity.Baselib.LowLevel;
 using Unity.Networking.Transport.Utilities;
 using UnityEngine;
 
@@ -109,7 +109,7 @@ namespace Unity.Networking.Transport
         // Helper to construct from the baselib structure.
         internal NetworkEndpoint(Binding.Baselib_NetworkAddress baselibAddress)
         {
-            Transferrable = default; 
+            Transferrable = default;
 #if UNITY_WEBGL && !UNITY_EDITOR
             m_AddressAsString = default;
 #endif
@@ -268,14 +268,14 @@ namespace Unity.Networking.Transport
         /// <summary>Whether the endpoint is for a wildcard address.</summary>
         /// <value>True if the address is 0.0.0.0 or ::.</value>
         public bool IsAny =>
-            (Family == NetworkFamily.Ipv4 || Family == NetworkFamily.Ipv6) &&
-            (this == AnyIpv4.WithPort(Port) || this == AnyIpv6.WithPort(Port));
+            (Family == NetworkFamily.Ipv4 || Family == NetworkFamily.Ipv6)
+            && (this == AnyIpv4.WithPort(Port) || this == AnyIpv6.WithPort(Port));
 
         /// <summary>Whether the endpoint is for a loopback address.</summary>
         /// <value>True if the address is 127.0.0.1 or ::1.</value>
         public bool IsLoopback =>
-            (Family == NetworkFamily.Ipv4 || Family == NetworkFamily.Ipv6) &&
-            (this == LoopbackIpv4.WithPort(Port) || this == LoopbackIpv6.WithPort(Port));
+            (Family == NetworkFamily.Ipv4 || Family == NetworkFamily.Ipv6)
+            && (this == LoopbackIpv4.WithPort(Port) || this == LoopbackIpv6.WithPort(Port));
 
         /// <summary>
         /// Attempt to parse the provided IP address and port. Prefer this method when parsing IP
@@ -286,7 +286,12 @@ namespace Unity.Networking.Transport
         /// <param name="endpoint">Return value for the endpoint if successfully parsed.</param>
         /// <param name="family">Address family of the provided address.</param>
         /// <returns>True if endpoint could be parsed successfully, false otherwise.</returns>
-        public static bool TryParse(FixedString128Bytes address, ushort port, out NetworkEndpoint endpoint, NetworkFamily family = NetworkFamily.Invalid)
+        public static bool TryParse(
+            FixedString128Bytes address,
+            ushort port,
+            out NetworkEndpoint endpoint,
+            NetworkFamily family = NetworkFamily.Invalid
+        )
         {
             if (family == NetworkFamily.Invalid)
             {
@@ -294,7 +299,7 @@ namespace Unity.Networking.Transport
 #if !(UNITY_SWITCH || UNITY_PS4 || UNITY_PS5)
                     || TryParse(address, port, out endpoint, NetworkFamily.Ipv6)
 #endif
-                    ;
+                ;
             }
 
             endpoint = default;
@@ -317,10 +322,19 @@ namespace Unity.Networking.Transport
 
             endpoint.Family = family;
 
-            var baselibFamily = family == NetworkFamily.Ipv4 ? Binding.Baselib_NetworkAddress_Family.IPv4 : Binding.Baselib_NetworkAddress_Family.IPv6;
+            var baselibFamily =
+                family == NetworkFamily.Ipv4
+                    ? Binding.Baselib_NetworkAddress_Family.IPv4
+                    : Binding.Baselib_NetworkAddress_Family.IPv6;
             var errorState = default(Binding.Baselib_ErrorState);
 
-            Binding.Baselib_NetworkAddress_Encode(endpoint.BaselibAddressPtr, baselibFamily, (byte*)address.GetUnsafePtr(), port, &errorState);
+            Binding.Baselib_NetworkAddress_Encode(
+                endpoint.BaselibAddressPtr,
+                baselibFamily,
+                (byte*)address.GetUnsafePtr(),
+                port,
+                &errorState
+            );
 
             if (errorState.code != Binding.Baselib_ErrorCode.Success)
             {
@@ -332,7 +346,12 @@ namespace Unity.Networking.Transport
         }
 
         /// <inheritdoc cref="TryParse(FixedString128Bytes, ushort, out NetworkEndpoint, NetworkFamily)"/>
-        public static bool TryParse(string address, ushort port, out NetworkEndpoint endpoint, NetworkFamily family = NetworkFamily.Invalid)
+        public static bool TryParse(
+            string address,
+            ushort port,
+            out NetworkEndpoint endpoint,
+            NetworkFamily family = NetworkFamily.Invalid
+        )
         {
             if (string.IsNullOrWhiteSpace(address))
             {
@@ -352,7 +371,11 @@ namespace Unity.Networking.Transport
         /// <param name="port">Port number to parse.</param>
         /// <param name="family">Address family of the provided address.</param>
         /// <returns>Parsed endpoint, or a default value if couldn't parse successfully.</returns>
-        public static NetworkEndpoint Parse(FixedString128Bytes address, ushort port, NetworkFamily family = NetworkFamily.Invalid)
+        public static NetworkEndpoint Parse(
+            FixedString128Bytes address,
+            ushort port,
+            NetworkFamily family = NetworkFamily.Invalid
+        )
         {
             return TryParse(address, port, out var endpoint, family) ? endpoint : default;
         }
@@ -381,14 +404,14 @@ namespace Unity.Networking.Transport
 
             return new FixedString128Bytes(result);
         }
-        
+
         /// <summary>
         /// Get a fixed string representation of the endpoint. Useful for contexts where managed
         /// types (like <see cref="string"/>) can't be used (e.g. Burst-compiled code).
         /// </summary>
         /// <returns>Fixed string representation of the endpoint.</returns>
         public FixedString512Bytes ToFixedString512Bytes()
-        { 
+        {
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (m_AddressAsString != default)
             {
@@ -409,7 +432,7 @@ namespace Unity.Networking.Transport
                     str.Append('[');
                     for (int i = 0; i < k_Ipv6Length; i += 2)
                     {
-                        temp = $"{ptr[i]:x2}{ptr[i+1]:x2}:";
+                        temp = $"{ptr[i]:x2}{ptr[i + 1]:x2}:";
                         str.Append(temp);
                     }
                     str.Length -= 1;
@@ -436,14 +459,14 @@ namespace Unity.Networking.Transport
 
             return str;
         }
-        
+
         /// <summary>
         /// Get a fixed string representation of the endpoint. Useful for contexts where managed
         /// types (like <see cref="string"/>) can't be used (e.g. Burst-compiled code).
         /// </summary>
         /// <returns>Fixed string representation of the endpoint.</returns>
         public FixedString512Bytes ToFixedStringNoPort()
-        { 
+        {
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (Family == NetworkFamily.Custom)
             {
@@ -464,7 +487,7 @@ namespace Unity.Networking.Transport
                     str.Append('[');
                     for (int i = 0; i < k_Ipv6Length; i += 2)
                     {
-                        temp = $"{ptr[i]:x2}{ptr[i+1]:x2}:";
+                        temp = $"{ptr[i]:x2}{ptr[i + 1]:x2}:";
                         str.Append(temp);
                     }
                     str.Length -= 1;
@@ -517,13 +540,13 @@ namespace Unity.Networking.Transport
         }
 
         /// <inheritdoc/>
-        public static bool operator==(NetworkEndpoint lhs, NetworkEndpoint rhs)
+        public static bool operator ==(NetworkEndpoint lhs, NetworkEndpoint rhs)
         {
             return lhs.Equals(rhs);
         }
 
         /// <inheritdoc/>
-        public static bool operator!=(NetworkEndpoint lhs, NetworkEndpoint rhs)
+        public static bool operator !=(NetworkEndpoint lhs, NetworkEndpoint rhs)
         {
             return !lhs.Equals(rhs);
         }
@@ -532,7 +555,9 @@ namespace Unity.Networking.Transport
         private void CheckFamilyIsIPv4OrIPv6()
         {
             if (Family != NetworkFamily.Ipv4 && Family != NetworkFamily.Ipv6)
-                throw new InvalidOperationException($"Trying to access endpoint as IPv4 or IPv6, but family is {Family}.");
+                throw new InvalidOperationException(
+                    $"Trying to access endpoint as IPv4 or IPv6, but family is {Family}."
+                );
         }
 
         [System.Diagnostics.Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
@@ -545,7 +570,9 @@ namespace Unity.Networking.Transport
                 throw new ArgumentException($"Raw IPv6 addresses must be {k_Ipv4Length} bytes long (got {length}).");
 
             if (family == NetworkFamily.Custom && length > k_CustomLength)
-                throw new ArgumentException($"Raw custom addresses must be no greater than {k_CustomLength} bytes long (got {length}).");
+                throw new ArgumentException(
+                    $"Raw custom addresses must be no greater than {k_CustomLength} bytes long (got {length})."
+                );
 
             if (family == NetworkFamily.Invalid)
                 throw new ArgumentException("Can't set raw address if family is invalid.");

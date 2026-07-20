@@ -2,7 +2,6 @@
 using UnityEngine.AMD;
 #endif
 
-
 #if UNITY_EDITOR
 #endif
 
@@ -23,7 +22,7 @@ public class FSR2IUpscaler : AbstractUpscaler
 {
     public static readonly string upscalerName = "FidelityFX Super Resolution 2";
 
-#region FSR2_UTILITIES
+    #region FSR2_UTILITIES
     static bool CheckFSR2FeatureAvailable()
     {
         // check plugin availability
@@ -32,7 +31,7 @@ public class FSR2IUpscaler : AbstractUpscaler
             Debug.LogWarning("AMDUnityPlugin not loaded.");
             return false;
         }
-    
+
         // check plugin version
         // if (s_ExpectedDeviceVersion != UnityEngine.AMD.GraphicsDevice.version)
         // {
@@ -50,30 +49,39 @@ public class FSR2IUpscaler : AbstractUpscaler
 
         return true;
     }
+
     static void DestroyContext(ref FSR2Context ctx, CommandBuffer cmd)
     {
         GraphicsDevice.device.DestroyFeature(cmd, ctx);
         ctx = null;
     }
+
     static void CreateContext(ref FSR2Context ctx, CommandBuffer cmd, ref FSR2GraphData data)
     {
-        bool displayResolutionMotionVectors = data.motionVectorSizeX == data.colorOutputSizeX && data.motionVectorSizeY == data.colorOutputSizeY;
+        bool displayResolutionMotionVectors =
+            data.motionVectorSizeX == data.colorOutputSizeX && data.motionVectorSizeY == data.colorOutputSizeY;
 
         FSR2CommandInitializationData settings = new();
         settings.SetFlag(FfxFsr2InitializationFlags.EnableHighDynamicRange, data.inputIsHDR);
-        settings.SetFlag(FfxFsr2InitializationFlags.EnableDisplayResolutionMotionVectors, displayResolutionMotionVectors);
+        settings.SetFlag(
+            FfxFsr2InitializationFlags.EnableDisplayResolutionMotionVectors,
+            displayResolutionMotionVectors
+        );
         settings.SetFlag(FfxFsr2InitializationFlags.DepthInverted, data.invertedDepthBuffer);
-        settings.SetFlag(FfxFsr2InitializationFlags.EnableMotionVectorsJitterCancellation, data.motionVectorsAreJittered);
+        settings.SetFlag(
+            FfxFsr2InitializationFlags.EnableMotionVectorsJitterCancellation,
+            data.motionVectorsAreJittered
+        );
         settings.maxRenderSizeWidth = data.colorInputSizeX;
         settings.maxRenderSizeHeight = data.colorInputSizeY;
         settings.displaySizeWidth = data.colorOutputSizeX;
         settings.displaySizeHeight = data.colorOutputSizeY;
         ctx = GraphicsDevice.device.CreateFeature(cmd, settings);
     }
-#endregion // FSR2_UTILITIES
-    
+    #endregion // FSR2_UTILITIES
 
-#region RENDERGRAPH_INTERFACE_DATA
+
+    #region RENDERGRAPH_INTERFACE_DATA
     class FSR2GraphData
     {
         public bool shouldReinitializeContext;
@@ -94,12 +102,12 @@ public class FSR2IUpscaler : AbstractUpscaler
         public TextureHandle motionVectors;
         public TextureHandle colorOutput;
     };
-#endregion
+    #endregion
 
-#region IUPSCALER_INTERFACE
+    #region IUPSCALER_INTERFACE
     public FSR2IUpscaler(FSR2Options o)
     {
-        if(!CheckFSR2FeatureAvailable())
+        if (!CheckFSR2FeatureAvailable())
         {
             m_FSR2Ready = false;
             return;
@@ -148,14 +156,18 @@ public class FSR2IUpscaler : AbstractUpscaler
         return nullContext || outputResolutionChanged;
     }
 
-    public override void NegotiatePreUpscaleResolution(ref Vector2Int preUpscaleResolution, Vector2Int postUpscaleResolution)
+    public override void NegotiatePreUpscaleResolution(
+        ref Vector2Int preUpscaleResolution,
+        Vector2Int postUpscaleResolution
+    )
     {
         if (m_Options.fixedResolutionMode)
         {
             Debug.Assert(GraphicsDevice.device != null);
 
             FSR2Quality qualityMode = (FSR2Quality)m_Options.fsr2QualityMode;
-            GraphicsDevice.device.GetRenderResolutionFromQualityMode(qualityMode,
+            GraphicsDevice.device.GetRenderResolutionFromQualityMode(
+                qualityMode,
                 (uint)postUpscaleResolution.x,
                 (uint)postUpscaleResolution.y,
                 out uint renderResoolutionX,
@@ -168,7 +180,7 @@ public class FSR2IUpscaler : AbstractUpscaler
 
     public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
     {
-        if(!m_FSR2Ready)
+        if (!m_FSR2Ready)
             return;
 
         Debug.Assert(GraphicsDevice.device != null);
@@ -200,11 +212,22 @@ public class FSR2IUpscaler : AbstractUpscaler
             outputColor = renderGraph.CreateTexture(outputDesc);
         }
 
-        using (var builder = renderGraph.AddUnsafePass<FSR2GraphData>("FidelityFX Super Resolution 2", out FSR2GraphData passData, new ProfilingSampler("FSR2")))
+        using (
+            var builder = renderGraph.AddUnsafePass<FSR2GraphData>(
+                "FidelityFX Super Resolution 2",
+                out FSR2GraphData passData,
+                new ProfilingSampler("FSR2")
+            )
+        )
         {
-            float motionVectorSign = io.motionVectorDirection == UpscalingIO.MotionVectorDirection.PreviousFrameToCurrentFrame ? -1.0f : 1.0f;
-            float motionVectorScaleX = io.motionVectorDomain == UpscalingIO.MotionVectorDomain.NDC ? io.motionVectorTextureSize.x : 1.0f;
-            float motionVectorScaleY = io.motionVectorDomain == UpscalingIO.MotionVectorDomain.NDC ? io.motionVectorTextureSize.y : 1.0f;
+            float motionVectorSign =
+                io.motionVectorDirection == UpscalingIO.MotionVectorDirection.PreviousFrameToCurrentFrame
+                    ? -1.0f
+                    : 1.0f;
+            float motionVectorScaleX =
+                io.motionVectorDomain == UpscalingIO.MotionVectorDomain.NDC ? io.motionVectorTextureSize.x : 1.0f;
+            float motionVectorScaleY =
+                io.motionVectorDomain == UpscalingIO.MotionVectorDomain.NDC ? io.motionVectorTextureSize.y : 1.0f;
 
             // setup pass data (UpscalingIO --> FSR2GraphData)
             passData.shouldReinitializeContext = ShouldResetFSR2Context(io);
@@ -244,41 +267,43 @@ public class FSR2IUpscaler : AbstractUpscaler
             passData.motionVectorsAreJittered = io.jitteredMotionVectors;
 
             // set render function
-            builder.SetRenderFunc((FSR2GraphData data, UnsafeGraphContext ctx) =>
-            {
-                CommandBuffer cmd = CommandBufferHelpers.GetNativeCommandBuffer(ctx.cmd);
-                if (data.shouldReinitializeContext)
+            builder.SetRenderFunc(
+                (FSR2GraphData data, UnsafeGraphContext ctx) =>
                 {
-                    if (m_FSR2Context != null)
+                    CommandBuffer cmd = CommandBufferHelpers.GetNativeCommandBuffer(ctx.cmd);
+                    if (data.shouldReinitializeContext)
                     {
-                        DestroyContext(ref m_FSR2Context, cmd);
+                        if (m_FSR2Context != null)
+                        {
+                            DestroyContext(ref m_FSR2Context, cmd);
+                        }
+                        CreateContext(ref m_FSR2Context, cmd, ref data);
                     }
-                    CreateContext(ref m_FSR2Context, cmd, ref data);
+
+                    Debug.Assert(m_FSR2Context != null);
+
+                    m_FSR2Context.executeData = data.execData;
+                    FSR2TextureTable textureTable = new()
+                    {
+                        colorInput = data.colorInput,
+                        depth = data.depth,
+                        motionVectors = data.motionVectors,
+                        colorOutput = data.colorOutput,
+                    };
+
+                    GraphicsDevice.device.ExecuteFSR2(cmd, m_FSR2Context, textureTable);
                 }
-                
-                Debug.Assert(m_FSR2Context != null);
-
-                m_FSR2Context.executeData = data.execData;
-                FSR2TextureTable textureTable = new()
-                {
-                    colorInput = data.colorInput,
-                    depth = data.depth,
-                    motionVectors = data.motionVectors,
-                    colorOutput = data.colorOutput,
-                };
-
-                GraphicsDevice.device.ExecuteFSR2(cmd, m_FSR2Context, textureTable);
-            });
+            );
         }
 
         io.cameraColor = outputColor;
 
         m_OutputResolutionPrevious = io.postUpscaleResolution;
     }
-#endregion
+    #endregion
 
 
-#region DATA
+    #region DATA
     // static data
     private bool m_FSR2Ready = false;
 

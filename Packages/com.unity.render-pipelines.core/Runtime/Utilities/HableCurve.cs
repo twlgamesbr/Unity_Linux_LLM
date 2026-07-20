@@ -97,7 +97,6 @@ namespace UnityEngine.Rendering
         /// </summary>
         public float x1 { get; private set; }
 
-
         /// <summary>
         /// The three segments of the curve.
         /// </summary>
@@ -137,7 +136,14 @@ namespace UnityEngine.Rendering
         /// <param name="shoulderLength">The amount of f-stops to add to the dynamic range of the curve. This is how much of the highlights that the curve takes into account.</param>
         /// <param name="shoulderAngle">How much overshoot to add to the curve's shoulder.</param>
         /// <param name="gamma">A gamma correction to the entire curve.</param>
-        public void Init(float toeStrength, float toeLength, float shoulderStrength, float shoulderLength, float shoulderAngle, float gamma)
+        public void Init(
+            float toeStrength,
+            float toeLength,
+            float shoulderStrength,
+            float shoulderLength,
+            float shoulderAngle,
+            float gamma
+        )
         {
             var dstParams = new DirectParams();
 
@@ -206,7 +212,8 @@ namespace UnityEngine.Rendering
             float toeM = 0f;
             float shoulderM = 0f;
             {
-                float m, b;
+                float m,
+                    b;
                 AsSlopeIntercept(out m, out b, paramsCopy.x0, paramsCopy.x1, paramsCopy.y0, paramsCopy.y1);
 
                 float g = srcParams.gamma;
@@ -253,7 +260,8 @@ namespace UnityEngine.Rendering
                 toeSegment.scaleX = 1f;
                 toeSegment.scaleY = 1f;
 
-                float lnA, B;
+                float lnA,
+                    B;
                 SolveAB(out lnA, out B, paramsCopy.x0, paramsCopy.y0, toeM);
                 toeSegment.lnA = lnA;
                 toeSegment.B = B;
@@ -267,7 +275,8 @@ namespace UnityEngine.Rendering
                 float x0 = (1f + paramsCopy.overshootX) - paramsCopy.x1;
                 float y0 = (1f + paramsCopy.overshootY) - paramsCopy.y1;
 
-                float lnA, B;
+                float lnA,
+                    B;
                 SolveAB(out lnA, out B, x0, y0, shoulderM);
 
                 shoulderSegment.offsetX = (1f + paramsCopy.overshootX);
@@ -350,7 +359,13 @@ namespace UnityEngine.Rendering
             /// <summary>
             /// Toe segment settings, stored as <c>(offsetX, offsetY, scaleX, scaleY)</c>.
             /// </summary>
-            public Vector4 toeSegmentA => new Vector4(parent.segments[0].offsetX, parent.segments[0].offsetY, parent.segments[0].scaleX, parent.segments[0].scaleY);
+            public Vector4 toeSegmentA =>
+                new Vector4(
+                    parent.segments[0].offsetX,
+                    parent.segments[0].offsetY,
+                    parent.segments[0].scaleX,
+                    parent.segments[0].scaleY
+                );
 
             /// <summary>
             /// Toe segment settings, stored as <c>(ln1, B, 0, 0)</c>.
@@ -360,7 +375,13 @@ namespace UnityEngine.Rendering
             /// <summary>
             /// Mid segment settings, stored as <c>(offsetX, offsetY, scaleX, scaleY)</c>.
             /// </summary>
-            public Vector4 midSegmentA => new Vector4(parent.segments[1].offsetX, parent.segments[1].offsetY, parent.segments[1].scaleX, parent.segments[1].scaleY);
+            public Vector4 midSegmentA =>
+                new Vector4(
+                    parent.segments[1].offsetX,
+                    parent.segments[1].offsetY,
+                    parent.segments[1].scaleX,
+                    parent.segments[1].scaleY
+                );
 
             /// <summary>
             /// Mid segment settings, stored as <c>(ln1, B, 0, 0)</c>.
@@ -370,7 +391,13 @@ namespace UnityEngine.Rendering
             /// <summary>
             /// Shoulder segment settings, stored as <c>(offsetX, offsetY, scaleX, scaleY)</c>.
             /// </summary>
-            public Vector4 shoSegmentA => new Vector4(parent.segments[2].offsetX, parent.segments[2].offsetY, parent.segments[2].scaleX, parent.segments[2].scaleY);
+            public Vector4 shoSegmentA =>
+                new Vector4(
+                    parent.segments[2].offsetX,
+                    parent.segments[2].offsetY,
+                    parent.segments[2].scaleX,
+                    parent.segments[2].scaleY
+                );
 
             /// <summary>
             /// Shoulder segment settings, stored as <c>(ln1, B, 0, 0)</c>.

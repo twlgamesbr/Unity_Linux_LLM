@@ -43,12 +43,13 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
 
         float m_MaxBandwidth = k_InvalidBandwidth;
 
-        public bool IsBandwidthCacheEmpty => m_GetBandwidth is null || m_GetBandwidth.IsCacheEmpty ||
-                            m_BandwidthSmoothingCache is null || m_BandwidthSmoothingCache.NeedsResetToImmediateValue;
+        public bool IsBandwidthCacheEmpty =>
+            m_GetBandwidth is null
+            || m_GetBandwidth.IsCacheEmpty
+            || m_BandwidthSmoothingCache is null
+            || m_BandwidthSmoothingCache.NeedsResetToImmediateValue;
 
-        public NetVisDataStore(
-            NetVisConfiguration configuration,
-            BandwidthStats bandwidthStats)
+        public NetVisDataStore(NetVisConfiguration configuration, BandwidthStats bandwidthStats)
         {
             m_Configuration = configuration;
             m_BandwidthStats = bandwidthStats;
@@ -287,7 +288,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             return m_GetBandwidth.GetBandwidthBytes(
                 objectId,
                 BandwidthSettings.BandwidthType,
-                BandwidthSettings.NetworkDirection);
+                BandwidthSettings.NetworkDirection
+            );
         }
 
         public int GetMinBandwidth()
@@ -321,7 +323,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
                 var bandwidth = m_GetBandwidth.GetBandwidthBytes(
                     objectId,
                     BandwidthSettings.BandwidthType,
-                    BandwidthSettings.NetworkDirection);
+                    BandwidthSettings.NetworkDirection
+                );
                 m_MaxBandwidth = MathF.Max(m_MaxBandwidth, bandwidth);
             }
             m_BandwidthStats.MaxBandwidth = m_MaxBandwidth;
@@ -333,7 +336,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
         /// </summary>
         void UpdateNoDataState()
         {
-            m_Configuration.Settings.Bandwidth.HasNoData = EditorApplication.isPaused && m_BandwidthSmoothingCache == null;
+            m_Configuration.Settings.Bandwidth.HasNoData =
+                EditorApplication.isPaused && m_BandwidthSmoothingCache == null;
         }
 
         public event Action<ClientId> ClientConnectionEvent;

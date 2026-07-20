@@ -18,9 +18,17 @@ namespace UnityEngine.Rendering
         private UnsafeList<FreeBitsChunk> m_FreeBitChunksDense;
         private UnsafeList<int> m_FreeChunkIndicesSparse;
 
-        public int length { get => m_StructData[0]; private set => m_StructData[0] = value; }
+        public int length
+        {
+            get => m_StructData[0];
+            private set => m_StructData[0] = value;
+        }
 
-        public int freeCount { get => m_StructData[1]; private set => m_StructData[1] = value; }
+        public int freeCount
+        {
+            get => m_StructData[1];
+            private set => m_StructData[1] = value;
+        }
 
         public int allocatedCount => isValid ? length - freeCount : 0;
 
@@ -53,7 +61,10 @@ namespace UnityEngine.Rendering
 
             if (freeCount == 0)
             {
-                Assert.IsTrue(m_FreeBitChunksDense.Length == 0, "Found non empty handles chunks while freeHandles is zero.");
+                Assert.IsTrue(
+                    m_FreeBitChunksDense.Length == 0,
+                    "Found non empty handles chunks while freeHandles is zero."
+                );
                 return length++;
             }
 
@@ -136,7 +147,7 @@ namespace UnityEngine.Rendering
 
             while (lastChunk >= 0)
             {
-               int lastChunkIndex = m_FreeChunkIndicesSparse[lastChunk]; 
+                int lastChunkIndex = m_FreeChunkIndicesSparse[lastChunk];
 
                 if (lastChunkIndex == InvalidChunkIndex)
                     return;
@@ -144,7 +155,7 @@ namespace UnityEngine.Rendering
                 FreeBitsChunk lastBitsChunk = m_FreeBitChunksDense[lastChunkIndex];
                 Assert.IsTrue(lastBitsChunk.chunk == lastChunk, "Chunk index mismatch.");
 
-                int freeLeadBits = math.lzcnt(~lastBitsChunk.freeBits & usedBitsMask) - nonUsedBitsInChunk; 
+                int freeLeadBits = math.lzcnt(~lastBitsChunk.freeBits & usedBitsMask) - nonUsedBitsInChunk;
                 lastBitsChunk.freeBits &= (uint)((ulong)usedBitsMask >> freeLeadBits);
 
                 if (lastBitsChunk.freeBits == 0)

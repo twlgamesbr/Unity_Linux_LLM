@@ -7,7 +7,9 @@ namespace Unity.PlatformToolkit.Editor
     {
         public SupportDeclarationTargetField(SupportDeclarationTarget supportDeclarationTarget)
         {
-            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/EditorResources/UI/SupportDeclarationTargetField.uxml");
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/EditorResources/UI/SupportDeclarationTargetField.uxml"
+            );
             uxml.CloneTree(this);
 
             var buttonGroup = this.Q<ToggleButtonGroup>("target-build-selector");
@@ -35,7 +37,7 @@ namespace Unity.PlatformToolkit.Editor
                 BuildTarget.GameCoreXboxOne => "Xbox One",
                 BuildTarget.PS4 => "PlayStation®4",
                 BuildTarget.PS5 => "PlayStation®5",
-                _ => target.ToString()
+                _ => target.ToString(),
             };
         }
     }

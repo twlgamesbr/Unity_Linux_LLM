@@ -13,7 +13,8 @@ namespace Unity.Entities.Editor
 
         ComponentViewData[] m_CachedComponents;
 
-        public ComponentViewData[] Components => m_CachedComponents ??= Context.Query.GetComponentDataFromQuery().ToArray();
+        public ComponentViewData[] Components =>
+            m_CachedComponents ??= Context.Query.GetComponentDataFromQuery().ToArray();
 
         public readonly string QueryName => $"{k_Query} #{QueryId}";
 

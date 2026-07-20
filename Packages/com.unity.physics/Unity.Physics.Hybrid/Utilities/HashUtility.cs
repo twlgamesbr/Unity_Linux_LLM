@@ -24,13 +24,15 @@ namespace Unity.Physics.Authoring
             s_Initialized = true;
         }
 
-        public static unsafe void Append<T>(ref this NativeList<byte> bytes, ref T value) where T : unmanaged
+        public static unsafe void Append<T>(ref this NativeList<byte> bytes, ref T value)
+            where T : unmanaged
         {
             var size = UnsafeUtility.SizeOf<T>();
             bytes.AddRange(UnsafeUtility.AddressOf(ref value), size);
         }
 
-        public static void Append<T>(ref this NativeList<byte> bytes, in NativeArray<T> data) where T : unmanaged
+        public static void Append<T>(ref this NativeList<byte> bytes, in NativeArray<T> data)
+            where T : unmanaged
         {
             if (data.Length != 0)
                 bytes.AddRange(data.Reinterpret<T, byte>());
@@ -58,6 +60,7 @@ namespace Unity.Physics.Authoring
         {
             [FieldOffset(0)]
             public UnityEngine.Hash128 UnityEngine_Hash;
+
             [FieldOffset(0)]
             public uint4 Entities_Hash;
         }

@@ -31,12 +31,15 @@ namespace UnityEngine.Rendering.Universal
         public override void RegisterDebugUI(List<DebugUI.Widget> list)
         {
 #if UNITY_ANDROID || UNITY_IPHONE || UNITY_TVOS
-            list.Add(new DebugUI.MessageBox
-            {
-                displayName = "Warning: GPU timings may not be accurate on mobile devices that have tile-based architectures.",
-                style = DebugUI.MessageBox.Style.Warning,
-                flags = DebugUI.Flags.RuntimeOnly
-            });
+            list.Add(
+                new DebugUI.MessageBox
+                {
+                    displayName =
+                        "Warning: GPU timings may not be accurate on mobile devices that have tile-based architectures.",
+                    style = DebugUI.MessageBox.Style.Warning,
+                    flags = DebugUI.Flags.RuntimeOnly,
+                }
+            );
 #endif
 
             m_DebugFrameTiming.RegisterDebugUI(list);
@@ -51,16 +54,16 @@ namespace UnityEngine.Rendering.Universal
                     {
                         displayName = "Update every second with average",
                         getter = () => averageProfilerTimingsOverASecond,
-                        setter = value => averageProfilerTimingsOverASecond = value
+                        setter = value => averageProfilerTimingsOverASecond = value,
                     },
                     new DebugUI.BoolField
                     {
                         displayName = "Hide empty scopes",
                         tooltip = "Hide profiling scopes where elapsed time in each category is zero",
                         getter = () => hideEmptyScopes,
-                        setter = value => hideEmptyScopes = value
-                    }
-                }
+                        setter = value => hideEmptyScopes = value,
+                    },
+                },
             };
             detailedStatsFoldout.children.Add(BuildDetailedStatsList("Profiling Scopes", m_RecordedSamplers));
             list.Add(detailedStatsFoldout);

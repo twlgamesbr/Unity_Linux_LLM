@@ -48,7 +48,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float renderBoundsXMax,
             float renderBoundsYMin,
             float renderBoundsYMax,
-            Vertex[] vertices);
+            Vertex[] vertices
+        );
 
         float MaxPointsPerPixel { get; }
 

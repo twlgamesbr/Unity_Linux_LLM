@@ -11,7 +11,11 @@ namespace Unity.Entities.Editor
             TypeManager.Initialize();
         }
 
-        public static unsafe void GetBakingData(List<GameObject> gameObjects, World world, List<EntityBakingData> result)
+        public static unsafe void GetBakingData(
+            List<GameObject> gameObjects,
+            World world,
+            List<EntityBakingData> result
+        )
         {
             result.Clear();
             if (world == null)
@@ -43,12 +47,14 @@ namespace Unity.Entities.Editor
                 if (cachedEntities.Count == 0)
                     continue;
 
-                result.Add(new EntityBakingData
-                {
-                    PrimaryEntity = cachedEntities[0],
-                    AdditionalEntities = cachedEntities.ToArray(),
-                    EntityManager = world.EntityManager,
-                });
+                result.Add(
+                    new EntityBakingData
+                    {
+                        PrimaryEntity = cachedEntities[0],
+                        AdditionalEntities = cachedEntities.ToArray(),
+                        EntityManager = world.EntityManager,
+                    }
+                );
             }
         }
 
@@ -84,7 +90,7 @@ namespace Unity.Entities.Editor
             };
         }
 
-        public static bool IsGameObjectBaked(GameObject gameObject)
-            => GameObjectBakingEditorUtility.GetGameObjectBakingResultStatus(gameObject).IsBaked();
+        public static bool IsGameObjectBaked(GameObject gameObject) =>
+            GameObjectBakingEditorUtility.GetGameObjectBakingResultStatus(gameObject).IsBaked();
     }
 }

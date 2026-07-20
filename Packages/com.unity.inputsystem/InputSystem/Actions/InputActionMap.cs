@@ -69,7 +69,11 @@ namespace UnityEngine.InputSystem
     /// <seealso cref="InputActionAsset"/>
     /// <seealso cref="InputAction"/>
     [Serializable]
-    public sealed class InputActionMap : ICloneable, ISerializationCallbackReceiver, IInputActionCollection2, IDisposable
+    public sealed class InputActionMap
+        : ICloneable,
+            ISerializationCallbackReceiver,
+            IInputActionCollection2,
+            IDisposable
     {
         /// <summary>
         /// Name of the action map.
@@ -316,7 +320,9 @@ namespace UnityEngine.InputSystem
         /// <summary>
         /// ProfilerMarker to measure how long it takes to resolve bindings.
         /// </summary>
-        static readonly ProfilerMarker k_ResolveBindingsProfilerMarker = new ProfilerMarker("InputActionMap.ResolveBindings");
+        static readonly ProfilerMarker k_ResolveBindingsProfilerMarker = new ProfilerMarker(
+            "InputActionMap.ResolveBindings"
+        );
 
         /// <summary>
         /// Construct an action map with default values.
@@ -387,7 +393,10 @@ namespace UnityEngine.InputSystem
             for (var i = 0; i < actionCount; ++i)
             {
                 var action = m_Actions[i];
-                if (action.m_Id == nameOrId || string.Compare(m_Actions[i].m_Name, nameOrId, StringComparison.InvariantCultureIgnoreCase) == 0)
+                if (
+                    action.m_Id == nameOrId
+                    || string.Compare(m_Actions[i].m_Name, nameOrId, StringComparison.InvariantCultureIgnoreCase) == 0
+                )
                     return i;
             }
 
@@ -579,12 +588,12 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         public InputActionMap Clone()
         {
-            Debug.Assert(m_SingletonAction == null, "Internal (hidden) action maps of singleton actions should not be cloned");
+            Debug.Assert(
+                m_SingletonAction == null,
+                "Internal (hidden) action maps of singleton actions should not be cloned"
+            );
 
-            var clone = new InputActionMap
-            {
-                m_Name = m_Name
-            };
+            var clone = new InputActionMap { m_Name = m_Name };
 
             // Clone actions.
             if (m_Actions != null)
@@ -687,14 +696,20 @@ namespace UnityEngine.InputSystem
         // The state we persist is pretty much just a name, a flat list of actions, and a flat
         // list of bindings. The rest is state we keep at runtime when a map is in use.
 
-        [SerializeField] internal string m_Name;
-        [SerializeField] internal string m_Id; // Can't serialize System.Guid and Unity's GUID is editor only.
-        [SerializeField] internal InputActionAsset m_Asset;
+        [SerializeField]
+        internal string m_Name;
+
+        [SerializeField]
+        internal string m_Id; // Can't serialize System.Guid and Unity's GUID is editor only.
+
+        [SerializeField]
+        internal InputActionAsset m_Asset;
 
         /// <summary>
         /// List of actions in this map.
         /// </summary>
-        [SerializeField] internal InputAction[] m_Actions;
+        [SerializeField]
+        internal InputAction[] m_Actions;
 
         /// <summary>
         /// List of bindings in this map.
@@ -702,7 +717,8 @@ namespace UnityEngine.InputSystem
         /// <remarks>
         /// For singleton actions, we ensure this is always the same as <see cref="InputAction.m_SingletonActionBindings"/>.
         /// </remarks>
-        [SerializeField] internal InputBinding[] m_Bindings;
+        [SerializeField]
+        internal InputBinding[] m_Bindings;
 
         // These fields are caches. If m_Bindings is modified, these are thrown away
         // and re-computed only if needed.
@@ -721,9 +737,11 @@ namespace UnityEngine.InputSystem
         /// a slice through <see cref="InputAction.m_BindingsStartIndex"/> and <see cref="InputAction.m_BindingsCount"/>.
         /// </remarks>
         /// <seealso cref="SetUpPerActionControlAndBindingArrays"/>
-        [NonSerialized] private InputBinding[] m_BindingsForEachAction;
+        [NonSerialized]
+        private InputBinding[] m_BindingsForEachAction;
 
-        [NonSerialized] private InputControl[] m_ControlsForEachAction;
+        [NonSerialized]
+        private InputControl[] m_ControlsForEachAction;
 
         /// <summary>
         /// Number of actions currently enabled in the map.
@@ -731,14 +749,17 @@ namespace UnityEngine.InputSystem
         /// <remarks>
         /// This should only be written to by <see cref="InputActionState"/>.
         /// </remarks>
-        [NonSerialized] internal int m_EnabledActionsCount;
+        [NonSerialized]
+        internal int m_EnabledActionsCount;
 
         // Action maps that are created internally by singleton actions to hold their data
         // are never exposed and never serialized so there is no point allocating an m_Actions
         // array.
-        [NonSerialized] internal InputAction m_SingletonAction;
+        [NonSerialized]
+        internal InputAction m_SingletonAction;
 
-        [NonSerialized] internal int m_MapIndexInState = InputActionState.kInvalidIndex;
+        [NonSerialized]
+        internal int m_MapIndexInState = InputActionState.kInvalidIndex;
 
         /// <summary>
         /// Current execution state.
@@ -746,17 +767,29 @@ namespace UnityEngine.InputSystem
         /// <remarks>
         /// Initialized when map (or any action in it) is first enabled.
         /// </remarks>
-        [NonSerialized] internal InputActionState m_State;
-        [NonSerialized] internal InputBinding? m_BindingMask;
-        [NonSerialized] private Flags m_Flags;
-        [NonSerialized] internal int m_ParameterOverridesCount;
-        [NonSerialized] internal InputActionRebindingExtensions.ParameterOverride[] m_ParameterOverrides;
+        [NonSerialized]
+        internal InputActionState m_State;
 
-        [NonSerialized] internal DeviceArray m_Devices;
+        [NonSerialized]
+        internal InputBinding? m_BindingMask;
 
-        [NonSerialized] internal CallbackArray<Action<InputAction.CallbackContext>> m_ActionCallbacks;
+        [NonSerialized]
+        private Flags m_Flags;
 
-        [NonSerialized] internal Dictionary<string, int> m_ActionIndexByNameOrId;
+        [NonSerialized]
+        internal int m_ParameterOverridesCount;
+
+        [NonSerialized]
+        internal InputActionRebindingExtensions.ParameterOverride[] m_ParameterOverrides;
+
+        [NonSerialized]
+        internal DeviceArray m_Devices;
+
+        [NonSerialized]
+        internal CallbackArray<Action<InputAction.CallbackContext>> m_ActionCallbacks;
+
+        [NonSerialized]
+        internal Dictionary<string, int> m_ActionIndexByNameOrId;
 
         private bool needToResolveBindings
         {
@@ -861,7 +894,11 @@ namespace UnityEngine.InputSystem
                     // See if the array actually changes content. Avoids re-resolving when there
                     // is no need to.
                     var array = devices.Value;
-                    if (m_HaveValue && array.Count == m_DeviceCount && array.HaveEqualReferences(m_DeviceArray, m_DeviceCount))
+                    if (
+                        m_HaveValue
+                        && array.Count == m_DeviceCount
+                        && array.HaveEqualReferences(m_DeviceArray, m_DeviceCount)
+                    )
                         return false;
 
                     if (m_DeviceCount > 0)
@@ -903,8 +940,11 @@ namespace UnityEngine.InputSystem
             if (!bindingsForEachActionInitialized)
                 SetUpPerActionControlAndBindingArrays();
 
-            return new ReadOnlyArray<InputBinding>(m_BindingsForEachAction, action.m_BindingsStartIndex,
-                action.m_BindingsCount);
+            return new ReadOnlyArray<InputBinding>(
+                m_BindingsForEachAction,
+                action.m_BindingsStartIndex,
+                action.m_BindingsCount
+            );
         }
 
         internal ReadOnlyArray<InputControl> GetControlsForSingleAction(InputAction action)
@@ -919,8 +959,11 @@ namespace UnityEngine.InputSystem
             if (!controlsForEachActionInitialized)
                 SetUpPerActionControlAndBindingArrays();
 
-            return new ReadOnlyArray<InputControl>(m_ControlsForEachAction, action.m_ControlStartIndex,
-                action.m_ControlCount);
+            return new ReadOnlyArray<InputControl>(
+                m_ControlsForEachAction,
+                action.m_ControlStartIndex,
+                action.m_ControlCount
+            );
         }
 
         /// <summary>
@@ -952,8 +995,10 @@ namespace UnityEngine.InputSystem
                 // Dead simple case: map is internally owned by action. The entire
                 // list of bindings is specific to the action.
 
-                Debug.Assert(m_Bindings == m_SingletonAction.m_SingletonActionBindings,
-                    "For singleton action, bindings array must match that of the action");
+                Debug.Assert(
+                    m_Bindings == m_SingletonAction.m_SingletonActionBindings,
+                    "For singleton action, bindings array must match that of the action"
+                );
 
                 m_BindingsForEachAction = m_Bindings;
                 m_ControlsForEachAction = m_State?.controls;
@@ -988,7 +1033,10 @@ namespace UnityEngine.InputSystem
 
                 // Go through all bindings and slice them out to individual actions.
 
-                Debug.Assert(m_Actions != null, "Action map is associated with action but action map has no array of actions"); // Action isn't a singleton so this has to be true.
+                Debug.Assert(
+                    m_Actions != null,
+                    "Action map is associated with action but action map has no array of actions"
+                ); // Action isn't a singleton so this has to be true.
                 var mapIndices = m_State?.FetchMapIndices(this) ?? new InputActionState.ActionMapIndices();
 
                 // Reset state on each action. Important if we have actions that are no longer
@@ -1016,7 +1064,10 @@ namespace UnityEngine.InputSystem
 
                 // Collect the bindings and controls and bundle them into chunks.
                 var newBindingsArrayIndex = 0;
-                if (m_State != null && (m_ControlsForEachAction == null || m_ControlsForEachAction.Length != mapIndices.controlCount))
+                if (
+                    m_State != null
+                    && (m_ControlsForEachAction == null || m_ControlsForEachAction.Length != mapIndices.controlCount)
+                )
                 {
                     if (mapIndices.controlCount == 0)
                         m_ControlsForEachAction = null;
@@ -1025,7 +1076,7 @@ namespace UnityEngine.InputSystem
                 }
                 InputBinding[] newBindingsArray = null;
                 var currentControlIndex = 0;
-                for (var currentBindingIndex = 0; currentBindingIndex < m_Bindings.Length;)
+                for (var currentBindingIndex = 0; currentBindingIndex < m_Bindings.Length; )
                 {
                     var currentAction = FindAction(m_Bindings[currentBindingIndex].action);
                     if (currentAction == null || currentAction.m_BindingsStartIndex != -1)
@@ -1038,9 +1089,8 @@ namespace UnityEngine.InputSystem
                     }
 
                     // Bindings for current action start at current index.
-                    currentAction.m_BindingsStartIndex = newBindingsArray != null
-                        ? newBindingsArrayIndex
-                        : currentBindingIndex;
+                    currentAction.m_BindingsStartIndex =
+                        newBindingsArray != null ? newBindingsArrayIndex : currentBindingIndex;
                     currentAction.m_ControlStartIndex = currentControlIndex;
 
                     // Collect all bindings for the action. As part of that, also copy the controls
@@ -1073,8 +1123,7 @@ namespace UnityEngine.InputSystem
                             {
                                 ++sourceBindingToCopy;
                                 Debug.Assert(sourceBindingToCopy < m_Bindings.Length);
-                            }
-                            while (FindAction(m_Bindings[sourceBindingToCopy].action) != currentAction);
+                            } while (FindAction(m_Bindings[sourceBindingToCopy].action) != currentAction);
                         }
                         else if (currentBindingIndex == sourceBindingToCopy)
                             ++currentBindingIndex;
@@ -1088,7 +1137,9 @@ namespace UnityEngine.InputSystem
                         // but do not really resolve to controls themselves).
                         if (m_State != null && !m_Bindings[sourceBindingToCopy].isComposite)
                         {
-                            ref var bindingState = ref m_State.bindingStates[mapIndices.bindingStartIndex + sourceBindingToCopy];
+                            ref var bindingState = ref m_State.bindingStates[
+                                mapIndices.bindingStartIndex + sourceBindingToCopy
+                            ];
 
                             var controlCountForBinding = bindingState.controlCount;
                             if (controlCountForBinding > 0)
@@ -1101,8 +1152,13 @@ namespace UnityEngine.InputSystem
                                 for (var n = 0; n < controlCountForBinding; ++n)
                                 {
                                     var control = m_State.controls[controlStartIndexForBinding + n];
-                                    if (!m_ControlsForEachAction.ContainsReference(currentAction.m_ControlStartIndex,
-                                        currentAction.m_ControlCount, control))
+                                    if (
+                                        !m_ControlsForEachAction.ContainsReference(
+                                            currentAction.m_ControlStartIndex,
+                                            currentAction.m_ControlCount,
+                                            control
+                                        )
+                                    )
                                     {
                                         m_ControlsForEachAction[currentControlIndex] = control;
                                         ++currentControlIndex;
@@ -1141,12 +1197,14 @@ namespace UnityEngine.InputSystem
                 foreach (var assetMap in asset.actionMaps)
                     if (assetMap.enabled)
                         throw new InvalidOperationException(
-                            $"Cannot add, remove, or change elements of InputActionAsset {asset} while one or more of its actions are enabled");
+                            $"Cannot add, remove, or change elements of InputActionAsset {asset} while one or more of its actions are enabled"
+                        );
             }
             else if (enabled)
             {
                 throw new InvalidOperationException(
-                    $"Cannot add, remove, or change elements of InputActionMap {this} while one or more of its actions are enabled");
+                    $"Cannot add, remove, or change elements of InputActionMap {this} while one or more of its actions are enabled"
+                );
             }
         }
 
@@ -1236,7 +1294,10 @@ namespace UnityEngine.InputSystem
             {
                 if (m_State != null && m_State.isProcessingControlStateChange)
                 {
-                    Debug.Assert(s_DeferBindingResolution > 0, "While processing control state changes, binding resolution should be suppressed");
+                    Debug.Assert(
+                        s_DeferBindingResolution > 0,
+                        "While processing control state changes, binding resolution should be suppressed"
+                    );
                     return false;
                 }
 
@@ -1328,7 +1389,10 @@ namespace UnityEngine.InputSystem
                         if (m_Asset != null)
                         {
                             actionMaps = m_Asset.actionMaps;
-                            Debug.Assert(actionMaps.Count > 0, "Asset referred to by action map does not have action maps");
+                            Debug.Assert(
+                                actionMaps.Count > 0,
+                                "Asset referred to by action map does not have action maps"
+                            );
 
                             // If there's a binding mask set on the asset, apply it.
                             resolver.bindingMask = m_Asset.m_BindingMask;
@@ -1366,7 +1430,11 @@ namespace UnityEngine.InputSystem
                             // touching it.
                             oldMemory = m_State.memory.Clone();
 
-                            m_State.PrepareForBindingReResolution(needFullResolve, ref activeControls, ref hasEnabledActions);
+                            m_State.PrepareForBindingReResolution(
+                                needFullResolve,
+                                ref activeControls,
+                                ref hasEnabledActions
+                            );
 
                             // Reuse the arrays we have so that we can avoid managed memory allocations, if possible.
                             resolver.StartWithPreviousResolve(m_State, isFullResolve: needFullResolve);
@@ -1397,7 +1465,12 @@ namespace UnityEngine.InputSystem
                             m_Asset.m_SharedStateForAllMaps = m_State;
                         }
 
-                        m_State.FinishBindingResolution(hasEnabledActions, oldMemory, activeControls, isFullResolve: needFullResolve);
+                        m_State.FinishBindingResolution(
+                            hasEnabledActions,
+                            oldMemory,
+                            activeControls,
+                            isFullResolve: needFullResolve
+                        );
                     }
                     finally
                     {
@@ -1484,10 +1557,10 @@ namespace UnityEngine.InputSystem
                 return new BindingOverrideJson
                 {
                     action = actionName,
-                    id = binding.id.ToString() ,
+                    id = binding.id.ToString(),
                     path = binding.overridePath ?? "null",
                     interactions = binding.overrideInteractions ?? "null",
-                    processors = binding.overrideProcessors ?? "null"
+                    processors = binding.overrideProcessors ?? "null",
                 };
             }
 
@@ -1595,17 +1668,17 @@ namespace UnityEngine.InputSystem
                         actionType = InputActionType.PassThrough;
                     else if (initialStateCheck)
                         actionType = InputActionType.Value;
-                    else if (!string.IsNullOrEmpty(expectedControlType) &&
-                             (expectedControlType == "Button" || expectedControlType == "Key"))
+                    else if (
+                        !string.IsNullOrEmpty(expectedControlType)
+                        && (expectedControlType == "Button" || expectedControlType == "Key")
+                    )
                         actionType = InputActionType.Button;
                 }
 
                 return new InputAction(actionName ?? name, actionType)
                 {
                     m_Id = string.IsNullOrEmpty(id) ? null : id,
-                    m_ExpectedControlType = !string.IsNullOrEmpty(expectedControlType)
-                        ? expectedControlType
-                        : null,
+                    m_ExpectedControlType = !string.IsNullOrEmpty(expectedControlType) ? expectedControlType : null,
                     m_Processors = processors,
                     m_Interactions = interactions,
                     wantsInitialStateCheck = initialStateCheck,
@@ -1702,10 +1775,7 @@ namespace UnityEngine.InputSystem
 
             public static WriteFileJson FromMap(InputActionMap map)
             {
-                return new WriteFileJson
-                {
-                    maps = new[] {WriteMapJson.FromMap(map)}
-                };
+                return new WriteFileJson { maps = new[] { WriteMapJson.FromMap(map) } };
             }
 
             public static WriteFileJson FromMaps(IEnumerable<InputActionMap> maps)
@@ -1719,7 +1789,7 @@ namespace UnityEngine.InputSystem
                 foreach (var map in maps)
                     mapsJson[index++] = WriteMapJson.FromMap(map);
 
-                return new WriteFileJson {maps = mapsJson};
+                return new WriteFileJson { maps = mapsJson };
             }
         }
 
@@ -1760,7 +1830,8 @@ namespace UnityEngine.InputSystem
 
                         if (string.IsNullOrEmpty(actionName))
                             throw new InvalidOperationException(
-                                $"Invalid action name '{jsonAction.name}' (missing action name after '/')");
+                                $"Invalid action name '{jsonAction.name}' (missing action name after '/')"
+                            );
                     }
 
                     // Try to find existing map.
@@ -1768,7 +1839,10 @@ namespace UnityEngine.InputSystem
                     var mapIndex = 0;
                     for (; mapIndex < mapList.Count; ++mapIndex)
                     {
-                        if (string.Compare(mapList[mapIndex].name, mapName, StringComparison.InvariantCultureIgnoreCase) == 0)
+                        if (
+                            string.Compare(mapList[mapIndex].name, mapName, StringComparison.InvariantCultureIgnoreCase)
+                            == 0
+                        )
                         {
                             map = mapList[mapIndex];
                             break;
@@ -1819,7 +1893,10 @@ namespace UnityEngine.InputSystem
                     var mapIndex = 0;
                     for (; mapIndex < mapList.Count; ++mapIndex)
                     {
-                        if (string.Compare(mapList[mapIndex].name, mapName, StringComparison.InvariantCultureIgnoreCase) == 0)
+                        if (
+                            string.Compare(mapList[mapIndex].name, mapName, StringComparison.InvariantCultureIgnoreCase)
+                            == 0
+                        )
                         {
                             map = mapList[mapIndex];
                             break;
@@ -1831,7 +1908,7 @@ namespace UnityEngine.InputSystem
                     {
                         map = new InputActionMap(mapName)
                         {
-                            m_Id = string.IsNullOrEmpty(jsonMap.id) ? null : jsonMap.id
+                            m_Id = string.IsNullOrEmpty(jsonMap.id) ? null : jsonMap.id,
                         };
                         mapIndex = mapList.Count;
                         mapList.Add(map);
@@ -1846,7 +1923,9 @@ namespace UnityEngine.InputSystem
                         var jsonAction = jsonMap.actions[n];
 
                         if (string.IsNullOrEmpty(jsonAction.name))
-                            throw new InvalidOperationException($"Action number {i + 1} in map '{mapName}' has no name");
+                            throw new InvalidOperationException(
+                                $"Action number {i + 1} in map '{mapName}' has no name"
+                            );
 
                         // Create action.
                         var action = jsonAction.ToAction();
@@ -1987,9 +2066,7 @@ namespace UnityEngine.InputSystem
         /// Called by Unity before the action map is serialized using Unity's
         /// serialization system.
         /// </summary>
-        public void OnBeforeSerialize()
-        {
-        }
+        public void OnBeforeSerialize() { }
 
         /// <summary>
         /// Called by Unity after the action map has been deserialized using Unity's

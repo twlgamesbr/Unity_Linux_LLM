@@ -7,20 +7,37 @@ using UnityEngine.Rendering.UnifiedRayTracing;
 
 namespace UnityEngine.PathTracing.Core
 {
-
     // Interface for many light sampling
     internal interface IManyLightSampling : IDisposable
     {
-        void Build(CommandBuffer cmd, World.LightState lightState, Bounds sceneBounds, SamplingResources samplingResources);
+        void Build(
+            CommandBuffer cmd,
+            World.LightState lightState,
+            Bounds sceneBounds,
+            SamplingResources samplingResources
+        );
         void Bind(CommandBuffer cmd, IRayTracingShader shader);
     }
 
-    internal enum GridMemLayout { Sparse, Dense };
-    internal enum GridSizingStrategy { Uniform, FitToSceneBounds };
+    internal enum GridMemLayout
+    {
+        Sparse,
+        Dense,
+    };
+
+    internal enum GridSizingStrategy
+    {
+        Uniform,
+        FitToSceneBounds,
+    };
 
     internal static class LightGridUtils
     {
-        public static Vector3Int ComputeLightGridDims(Vector3 sceneBounds, int maxLightGridCellCount, GridSizingStrategy lightGridSizingStrategy)
+        public static Vector3Int ComputeLightGridDims(
+            Vector3 sceneBounds,
+            int maxLightGridCellCount,
+            GridSizingStrategy lightGridSizingStrategy
+        )
         {
             if (lightGridSizingStrategy == GridSizingStrategy.Uniform)
             {
@@ -44,13 +61,17 @@ namespace UnityEngine.PathTracing.Core
                 sceneBounds.z = maxSceneDim / Mathf.Sqrt(maxLightGridCellCount);
 
             // Compute ideal cell width (we aim for for cells having the same width along all 3 axes)
-            float idealCellWidth = Mathf.Pow(sceneBounds.x * sceneBounds.y * sceneBounds.z / ((float)maxLightGridCellCount), 1.0f / 3.0f);
+            float idealCellWidth = Mathf.Pow(
+                sceneBounds.x * sceneBounds.y * sceneBounds.z / ((float)maxLightGridCellCount),
+                1.0f / 3.0f
+            );
 
             // Use ideal cell width to compute grid dims
             Vector3Int gridDims = new Vector3Int(
                 Math.Max((int)(sceneBounds.x / idealCellWidth), 1),
                 Math.Max((int)(sceneBounds.y / idealCellWidth), 1),
-                Math.Max((int)(sceneBounds.z / idealCellWidth), 1));
+                Math.Max((int)(sceneBounds.z / idealCellWidth), 1)
+            );
 
             Debug.Assert(gridDims.x * gridDims.y * gridDims.z <= maxLightGridCellCount);
             return gridDims;
@@ -67,7 +88,6 @@ namespace UnityEngine.PathTracing.Core
             return maxLightsInAnyCell;
         }
     }
-
 
     internal class ConservativeLightGrid : IManyLightSampling
     {
@@ -86,7 +106,10 @@ namespace UnityEngine.PathTracing.Core
 
         public void Init()
         {
-            if (GridMemLayout == GridMemLayout.Dense && (_lightGridCellsDataBuffer == null || _lightGridCellsDataBuffer.count <= 1))
+            if (
+                GridMemLayout == GridMemLayout.Dense
+                && (_lightGridCellsDataBuffer == null || _lightGridCellsDataBuffer.count <= 1)
+            )
             {
                 int count = LightGridCellCount * MaxLightsPerCell;
                 int stride = Marshal.SizeOf<World.ThinReservoir>();
@@ -108,7 +131,12 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-        protected void BindComputeResources(CommandBuffer cmd, World.LightState lightState, Bounds sceneBounds, SamplingResources samplingResources)
+        protected void BindComputeResources(
+            CommandBuffer cmd,
+            World.LightState lightState,
+            Bounds sceneBounds,
+            SamplingResources samplingResources
+        )
         {
             SamplingResources.Bind(cmd, samplingResources);
 
@@ -124,14 +152,29 @@ namespace UnityEngine.PathTracing.Core
             cmd.SetComputeVectorParam(_shader, ShaderProperties.CellSize, _cellSize);
             cmd.SetComputeVectorParam(_shader, ShaderProperties.InvCellSize, _invCellSize);
 
-            cmd.SetComputeBufferParam(_shader, _buildLightGridlKernel, ShaderProperties.LightList, lightState.LightListBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _buildLightGridlKernel,
+                ShaderProperties.LightList,
+                lightState.LightListBuffer
+            );
 
             // Set the output buffer
             cmd.SetComputeBufferParam(_shader, _buildLightGridlKernel, ShaderProperties.LightGrid, _lightGridBuffer);
-            cmd.SetComputeBufferParam(_shader, _buildLightGridlKernel, ShaderProperties.TotalReservoirCount, _totalLightsInGridCountBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _buildLightGridlKernel,
+                ShaderProperties.TotalReservoirCount,
+                _totalLightsInGridCountBuffer
+            );
         }
 
-        public void Build(CommandBuffer cmd, World.LightState lightState, Bounds sceneBounds, SamplingResources samplingResources)
+        public void Build(
+            CommandBuffer cmd,
+            World.LightState lightState,
+            Bounds sceneBounds,
+            SamplingResources samplingResources
+        )
         {
             if (lightState.LightListBuffer == null)
                 return;
@@ -140,7 +183,11 @@ namespace UnityEngine.PathTracing.Core
 
             _sceneBounds = sceneBounds;
 
-            _lightGridDims = LightGridUtils.ComputeLightGridDims(sceneBounds.size, LightGridCellCount, LightGridSizingStrategy);
+            _lightGridDims = LightGridUtils.ComputeLightGridDims(
+                sceneBounds.size,
+                LightGridCellCount,
+                LightGridSizingStrategy
+            );
             Vector3 div = new Vector3(1.0f / _lightGridDims.x, 1.0f / _lightGridDims.y, 1.0f / _lightGridDims.z);
             Vector3 cellSize = Vector3.Scale(sceneBounds.size, div);
             _cellSize = cellSize;
@@ -155,7 +202,12 @@ namespace UnityEngine.PathTracing.Core
             if (GridMemLayout == GridMemLayout.Sparse)
             {
                 _shader.EnableKeyword("SPARSE_GRID");
-                cmd.SetComputeBufferParam(_shader, _buildLightGridlKernel, ShaderProperties.LightGridCellsData, _lightGridBuffer); // dummy bind
+                cmd.SetComputeBufferParam(
+                    _shader,
+                    _buildLightGridlKernel,
+                    ShaderProperties.LightGridCellsData,
+                    _lightGridBuffer
+                ); // dummy bind
                 DispatchBuild(cmd, 0);
 
                 GraphicsHelpers.Flush(cmd);
@@ -164,7 +216,10 @@ namespace UnityEngine.PathTracing.Core
                 if (_lightGridCellsDataBuffer == null || _lightGridCellsDataBuffer.count < requiredLightCount[0])
                 {
                     _lightGridCellsDataBuffer?.Dispose();
-                    _lightGridCellsDataBuffer = new ComputeBuffer(math.max(requiredLightCount[0], 1), Marshal.SizeOf<World.ThinReservoir>());
+                    _lightGridCellsDataBuffer = new ComputeBuffer(
+                        math.max(requiredLightCount[0], 1),
+                        Marshal.SizeOf<World.ThinReservoir>()
+                    );
                 }
 
                 // Need to re-bind everything after flush
@@ -176,7 +231,12 @@ namespace UnityEngine.PathTracing.Core
             }
 
             // Build the grid
-            cmd.SetComputeBufferParam(_shader, _buildLightGridlKernel, ShaderProperties.LightGridCellsData, _lightGridCellsDataBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _buildLightGridlKernel,
+                ShaderProperties.LightGridCellsData,
+                _lightGridCellsDataBuffer
+            );
             DispatchBuild(cmd, 1);
 
             GraphicsHelpers.Flush(cmd);
@@ -226,10 +286,13 @@ namespace UnityEngine.PathTracing.Core
             const int groupDim = 4;
             cmd.SetComputeIntParam(_shader, ShaderProperties.BuildPass, buildPass);
             cmd.SetBufferData(_totalLightsInGridCountBuffer, new uint[] { 0 });
-            cmd.DispatchCompute(_shader, _buildLightGridlKernel,
+            cmd.DispatchCompute(
+                _shader,
+                _buildLightGridlKernel,
                 GraphicsHelpers.DivUp(_lightGridDims.x, groupDim),
                 GraphicsHelpers.DivUp(_lightGridDims.y, groupDim),
-                GraphicsHelpers.DivUp(_lightGridDims.z, groupDim));
+                GraphicsHelpers.DivUp(_lightGridDims.z, groupDim)
+            );
         }
 
         readonly ComputeShader _shader;
@@ -278,7 +341,12 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-        public void Build(CommandBuffer cmd, World.LightState lightState, Bounds sceneBounds, SamplingResources samplingResources)
+        public void Build(
+            CommandBuffer cmd,
+            World.LightState lightState,
+            Bounds sceneBounds,
+            SamplingResources samplingResources
+        )
         {
             if (lightState.LightListBuffer == null)
                 return;
@@ -288,9 +356,14 @@ namespace UnityEngine.PathTracing.Core
             _sceneBounds = sceneBounds;
 
             // The number of RIS candidates cannot exceed the number of light sources
-            int activeCandidates = NumCandidates == -1 ? lightState.LightCount : Mathf.Min(NumCandidates, lightState.LightCount);
+            int activeCandidates =
+                NumCandidates == -1 ? lightState.LightCount : Mathf.Min(NumCandidates, lightState.LightCount);
 
-            _lightGridDims = LightGridUtils.ComputeLightGridDims(sceneBounds.size, LightGridCellCount, LightGridSizingStrategy);
+            _lightGridDims = LightGridUtils.ComputeLightGridDims(
+                sceneBounds.size,
+                LightGridCellCount,
+                LightGridSizingStrategy
+            );
             Vector3 div = new Vector3(1.0f / _lightGridDims.x, 1.0f / _lightGridDims.y, 1.0f / _lightGridDims.z);
             Vector3 cellSize = Vector3.Scale(sceneBounds.size, div);
             _cellSize = cellSize;
@@ -313,18 +386,36 @@ namespace UnityEngine.PathTracing.Core
             cmd.SetComputeVectorParam(_shader, ShaderProperties.CellSize, _cellSize);
             cmd.SetComputeVectorParam(_shader, ShaderProperties.InvCellSize, _invCellSize);
 
-            cmd.SetComputeBufferParam(_shader, _buildRegirLightGridlKernel, ShaderProperties.LightList, lightState.LightListBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _buildRegirLightGridlKernel,
+                ShaderProperties.LightList,
+                lightState.LightListBuffer
+            );
 
             // Set the output buffer
-            cmd.SetComputeBufferParam(_shader, _buildRegirLightGridlKernel, ShaderProperties.LightGrid, _lightGridBuffer);
-            cmd.SetComputeBufferParam(_shader, _buildRegirLightGridlKernel, ShaderProperties.LightGridCellsData, _lightGridCellsDataBuffer);
+            cmd.SetComputeBufferParam(
+                _shader,
+                _buildRegirLightGridlKernel,
+                ShaderProperties.LightGrid,
+                _lightGridBuffer
+            );
+            cmd.SetComputeBufferParam(
+                _shader,
+                _buildRegirLightGridlKernel,
+                ShaderProperties.LightGridCellsData,
+                _lightGridCellsDataBuffer
+            );
 
             // Build the grid
             const int groupDim = 4;
-            cmd.DispatchCompute(_shader, _buildRegirLightGridlKernel,
+            cmd.DispatchCompute(
+                _shader,
+                _buildRegirLightGridlKernel,
                 GraphicsHelpers.DivUp(_lightGridDims.x, groupDim),
                 GraphicsHelpers.DivUp(_lightGridDims.y, groupDim),
-                GraphicsHelpers.DivUp(_lightGridDims.z, groupDim));
+                GraphicsHelpers.DivUp(_lightGridDims.z, groupDim)
+            );
 
             GraphicsHelpers.Flush(cmd);
             int2[] grid = new int2[_lightGridBuffer.count];
@@ -366,7 +457,6 @@ namespace UnityEngine.PathTracing.Core
             _lightGridCellsDataBuffer?.Dispose();
             _lightGridBuffer?.Dispose();
         }
-
 
         readonly ComputeShader _shader;
         readonly int _buildRegirLightGridlKernel;

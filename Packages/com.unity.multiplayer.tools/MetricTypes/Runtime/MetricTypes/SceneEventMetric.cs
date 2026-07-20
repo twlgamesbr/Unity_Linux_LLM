@@ -8,9 +8,19 @@ namespace Unity.Multiplayer.Tools.MetricTypes
     {
         /// String overload maintained for backwards compatibility
         public SceneEventMetric(ConnectionInfo connection, string sceneEventType, string sceneName, long bytesCount)
-            : this(connection, StringConversionUtility.ConvertToFixedString(sceneEventType), StringConversionUtility.ConvertToFixedString(sceneName), bytesCount) { }
+            : this(
+                connection,
+                StringConversionUtility.ConvertToFixedString(sceneEventType),
+                StringConversionUtility.ConvertToFixedString(sceneName),
+                bytesCount
+            ) { }
 
-        public SceneEventMetric(ConnectionInfo connection, FixedString64Bytes sceneEventType, FixedString64Bytes sceneName, long bytesCount)
+        public SceneEventMetric(
+            ConnectionInfo connection,
+            FixedString64Bytes sceneEventType,
+            FixedString64Bytes sceneName,
+            long bytesCount
+        )
         {
             Connection = connection;
             SceneEventType = sceneEventType;
@@ -33,11 +43,11 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         {
             get
             {
-                return (ulong)Connection.GetHashCode() + (ulong)SceneEventType.GetHashCode()
-                    + (ulong)SceneName.GetHashCode() + (ulong)BytesCount.GetHashCode();
-
+                return (ulong)Connection.GetHashCode()
+                    + (ulong)SceneEventType.GetHashCode()
+                    + (ulong)SceneName.GetHashCode()
+                    + (ulong)BytesCount.GetHashCode();
             }
         }
-
     }
 }

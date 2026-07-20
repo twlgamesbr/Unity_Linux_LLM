@@ -22,52 +22,57 @@ namespace Unity.Entities
         /// <summary>
         /// Local position as found in the Transform Component.
         /// </summary>
-        public float3                LocalPosition;
+        public float3 LocalPosition;
+
         /// <summary>
         /// Local rotation as found in the Transform Component.
         /// </summary>
-        public quaternion            LocalRotation;
+        public quaternion LocalRotation;
+
         /// <summary>
         /// Local scale as found in the Transform Component.
         /// </summary>
-        public float3                LocalScale;
+        public float3 LocalScale;
 
         // World space TRS values.
         /// <summary>
         /// World space position as found in the Transform Component.
         /// </summary>
-        public float3                Position;
+        public float3 Position;
+
         /// <summary>
         /// World space rotation as found in the Transform Component.
         /// </summary>
-        public quaternion            Rotation;
+        public quaternion Rotation;
+
         /// <summary>
         /// Local to world matrix as found in the Transform Component.
         /// </summary>
-        public float4x4              LocalToWorld;
+        public float4x4 LocalToWorld;
 
         // The authoring transform parent.
         /// <summary>
         /// Authoring parent entity.
         /// </summary>
-        public Entity                AuthoringParent;
+        public Entity AuthoringParent;
 
         // The recommended RuntimeParent & transform usage based on resolved hierarchical transform usage.
         /// <summary>
         /// Runtime parent entity.
         /// </summary>
         /// <remarks>The RuntimeParent entity doesn't always match with the AuthoringParent entity, because it depends on the value of RuntimeTransformUsage.</remarks>
-        public Entity                RuntimeParent;
+        public Entity RuntimeParent;
+
         /// <summary>
         /// <see cref="TransformUsageFlags"/> value applied to this entity.
         /// </summary>
-        internal RuntimeTransformComponentFlags   RuntimeTransformUsage;
+        internal RuntimeTransformComponentFlags RuntimeTransformUsage;
 
         /// <summary>
         /// Version number to detect changes to this component.
         /// </summary>
         /// <remarks>The version number is increased any time there is a change to this component.</remarks>
-        public uint                  ChangeVersion;
+        public uint ChangeVersion;
 
         /// <summary>
         /// Compares two TransformAuthoring instances to determine if they are equal.
@@ -76,7 +81,15 @@ namespace Unity.Entities
         /// <returns>True if all the fields from the current instance and <paramref name="other"/> are equal.</returns>
         public bool Equals(TransformAuthoring other)
         {
-            return LocalPosition.Equals(other.LocalPosition) && LocalRotation.Equals(other.LocalRotation) && LocalScale.Equals(other.LocalScale) && Position.Equals(other.Position) && Rotation.Equals(other.Rotation) && LocalToWorld.Equals(other.LocalToWorld) && AuthoringParent == other.AuthoringParent && RuntimeParent == other.RuntimeParent && RuntimeTransformUsage == other.RuntimeTransformUsage;
+            return LocalPosition.Equals(other.LocalPosition)
+                && LocalRotation.Equals(other.LocalRotation)
+                && LocalScale.Equals(other.LocalScale)
+                && Position.Equals(other.Position)
+                && Rotation.Equals(other.Rotation)
+                && LocalToWorld.Equals(other.LocalToWorld)
+                && AuthoringParent == other.AuthoringParent
+                && RuntimeParent == other.RuntimeParent
+                && RuntimeTransformUsage == other.RuntimeTransformUsage;
         }
     }
 
@@ -91,9 +104,10 @@ namespace Unity.Entities
         /// Represents a primary entity that matches the GameObject that created the additional entity.
         /// </summary>
         public Entity Parent;
+
         /// <summary>
         /// Represents a unique entityId of the GameObject that created the additional entity.
         /// </summary>
-        public EntityId    ParentEntityId;
+        public EntityId ParentEntityId;
     }
 }

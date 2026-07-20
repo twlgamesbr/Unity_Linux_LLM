@@ -11,15 +11,23 @@ namespace UnityEngine.Rendering.Universal.Internal
             public string name;
             public int msaa;
         }
-        SwapBuffer m_A, m_B;
+
+        SwapBuffer m_A,
+            m_B;
         static bool m_AisBackBuffer = true;
 
         static RenderTextureDescriptor m_Desc;
         FilterMode m_FilterMode;
         bool m_AllowMSAA = true;
 
-        ref SwapBuffer backBuffer { get { return ref m_AisBackBuffer ? ref m_A : ref m_B; } }
-        ref SwapBuffer frontBuffer { get { return ref m_AisBackBuffer ? ref m_B : ref m_A; } }
+        ref SwapBuffer backBuffer
+        {
+            get { return ref m_AisBackBuffer ? ref m_A : ref m_B; }
+        }
+        ref SwapBuffer frontBuffer
+        {
+            get { return ref m_AisBackBuffer ? ref m_B : ref m_A; }
+        }
 
         public RenderTargetBufferSystem(string name)
         {
@@ -67,15 +75,39 @@ namespace UnityEngine.Rendering.Universal.Internal
 
             desc.msaaSamples = m_A.msaa;
             if (desc.msaaSamples > 1)
-                RenderingUtils.ReAllocateHandleIfNeeded(ref m_A.rtMSAA, desc, m_FilterMode, TextureWrapMode.Clamp, name: m_A.name);
+                RenderingUtils.ReAllocateHandleIfNeeded(
+                    ref m_A.rtMSAA,
+                    desc,
+                    m_FilterMode,
+                    TextureWrapMode.Clamp,
+                    name: m_A.name
+                );
 
             desc.msaaSamples = m_B.msaa;
             if (desc.msaaSamples > 1)
-                RenderingUtils.ReAllocateHandleIfNeeded(ref m_B.rtMSAA, desc, m_FilterMode, TextureWrapMode.Clamp, name: m_B.name);
+                RenderingUtils.ReAllocateHandleIfNeeded(
+                    ref m_B.rtMSAA,
+                    desc,
+                    m_FilterMode,
+                    TextureWrapMode.Clamp,
+                    name: m_B.name
+                );
 
             desc.msaaSamples = 1;
-            RenderingUtils.ReAllocateHandleIfNeeded(ref m_A.rtResolve, desc, m_FilterMode, TextureWrapMode.Clamp, name: m_A.name);
-            RenderingUtils.ReAllocateHandleIfNeeded(ref m_B.rtResolve, desc, m_FilterMode, TextureWrapMode.Clamp, name: m_B.name);
+            RenderingUtils.ReAllocateHandleIfNeeded(
+                ref m_A.rtResolve,
+                desc,
+                m_FilterMode,
+                TextureWrapMode.Clamp,
+                name: m_A.name
+            );
+            RenderingUtils.ReAllocateHandleIfNeeded(
+                ref m_B.rtResolve,
+                desc,
+                m_FilterMode,
+                TextureWrapMode.Clamp,
+                name: m_B.name
+            );
             cmd.SetGlobalTexture(m_A.name, m_A.rtResolve);
             cmd.SetGlobalTexture(m_B.name, m_B.rtResolve);
         }

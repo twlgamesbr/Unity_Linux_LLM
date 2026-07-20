@@ -44,6 +44,7 @@ namespace UnityEngine.UI
 
         [NonSerialized]
         private Rect m_LastClipRectCanvasSpace;
+
         [NonSerialized]
         private bool m_ForceClip;
 
@@ -75,7 +76,7 @@ namespace UnityEngine.UI
         /// </summary>
         public Vector2Int softness
         {
-            get { return m_Softness;  }
+            get { return m_Softness; }
             set
             {
                 m_Softness.x = Mathf.Max(0, value.x);
@@ -87,7 +88,8 @@ namespace UnityEngine.UI
         /// <remarks>
         /// Returns a non-destroyed instance or a null reference.
         /// </remarks>
-        [NonSerialized] private Canvas m_Canvas;
+        [NonSerialized]
+        private Canvas m_Canvas;
         internal Canvas Canvas
         {
             get
@@ -112,10 +114,7 @@ namespace UnityEngine.UI
         /// </summary>
         public Rect canvasRect
         {
-            get
-            {
-                return m_VertexClipper.GetCanvasRect(rectTransform, Canvas);
-            }
+            get { return m_VertexClipper.GetCanvasRect(rectTransform, Canvas); }
         }
 
         /// <summary>
@@ -126,8 +125,7 @@ namespace UnityEngine.UI
             get { return m_RectTransform ?? (m_RectTransform = GetComponent<RectTransform>()); }
         }
 
-        protected RectMask2D()
-        {}
+        protected RectMask2D() { }
 
         protected override void OnEnable()
         {
@@ -172,7 +170,6 @@ namespace UnityEngine.UI
 
             MaskUtilities.Notify2DMaskStateChanged(this);
         }
-
 #endif
 
         public virtual bool IsRaycastLocationValid(Vector2 sp, Camera eventCamera)
@@ -198,7 +195,12 @@ namespace UnityEngine.UI
                         m_Corners[i] = rootCanvas.transform.InverseTransformPoint(m_Corners[i]);
                 }
 
-                return new Rect(m_Corners[0].x, m_Corners[0].y, m_Corners[2].x - m_Corners[0].x, m_Corners[2].y - m_Corners[0].y);
+                return new Rect(
+                    m_Corners[0].x,
+                    m_Corners[0].y,
+                    m_Corners[2].x - m_Corners[0].x,
+                    m_Corners[2].y - m_Corners[0].y
+                );
             }
         }
 
@@ -229,8 +231,8 @@ namespace UnityEngine.UI
             // overlaps that of the root canvas.
             RenderMode renderMode = Canvas.rootCanvas.renderMode;
             bool maskIsCulled =
-                (renderMode == RenderMode.ScreenSpaceCamera || renderMode == RenderMode.ScreenSpaceOverlay) &&
-                !clipRect.Overlaps(rootCanvasRect, true);
+                (renderMode == RenderMode.ScreenSpaceCamera || renderMode == RenderMode.ScreenSpaceOverlay)
+                && !clipRect.Overlaps(rootCanvasRect, true);
 
             if (maskIsCulled)
             {

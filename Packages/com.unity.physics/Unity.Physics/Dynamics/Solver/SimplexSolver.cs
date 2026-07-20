@@ -11,24 +11,30 @@ namespace Unity.Physics
 
         /// <summary>   The Plane. </summary>
         public Plane Plane;
+
         /// <summary>   The velocity. </summary>
         public float3 Velocity;
 
         // Hit body info
         /// <summary>   The rigid body index. </summary>
         public int RigidBodyIndex;
+
         /// <summary>   The collider key. </summary>
         public ColliderKey ColliderKey;
+
         /// <summary>   The hit position. </summary>
         public float3 HitPosition;
 
         // Internal state
         /// <summary>   The priority. </summary>
         public int Priority;
+
         /// <summary>   True if touched. </summary>
         public bool Touched;
+
         /// <summary>   True if is too steep, false if not. </summary>
         public bool IsTooSteep;
+
         /// <summary>   True if is maximum slope, false if not. </summary>
         public bool IsMaxSlope;
     }
@@ -50,8 +56,15 @@ namespace Unity.Physics
         /// <param name="integratedTime">           [out] The integrated time. </param>
         /// <param name="useConstraintVelocities">  (Optional) True to use constraint velocities. </param>
         public static unsafe void Solve(
-            float deltaTime, float minDeltaTime, float3 up, float maxVelocity,
-            NativeList<SurfaceConstraintInfo> constraints, ref float3 position, ref float3 velocity, out float integratedTime, bool useConstraintVelocities = true
+            float deltaTime,
+            float minDeltaTime,
+            float3 up,
+            float maxVelocity,
+            NativeList<SurfaceConstraintInfo> constraints,
+            ref float3 position,
+            ref float3 velocity,
+            out float integratedTime,
+            bool useConstraintVelocities = true
         )
         {
             // List of planes to solve against (up to 4)
@@ -142,7 +155,12 @@ namespace Unity.Physics
         /// <param name="supportPlanes">    The support planes. </param>
         /// <param name="numSupportPlanes"> [in,out] Number of support planes. </param>
         /// <param name="velocity">         [in,out] The velocity. </param>
-        public static unsafe void ExamineActivePlanes(float3 up, SurfaceConstraintInfo* supportPlanes, ref int numSupportPlanes, ref float3 velocity)
+        public static unsafe void ExamineActivePlanes(
+            float3 up,
+            SurfaceConstraintInfo* supportPlanes,
+            ref int numSupportPlanes,
+            ref float3 velocity
+        )
         {
             switch (numSupportPlanes)
             {
@@ -219,7 +237,13 @@ namespace Unity.Physics
                     for (int i = 0; i < 3; i++)
                     {
                         float3 tempVelocity = velocity;
-                        Solve3d(up, supportPlanes[(i + 1) % 3], supportPlanes[(i + 2) % 3], supportPlanes[3], ref tempVelocity);
+                        Solve3d(
+                            up,
+                            supportPlanes[(i + 1) % 3],
+                            supportPlanes[(i + 2) % 3],
+                            supportPlanes[3],
+                            ref tempVelocity
+                        );
                         bool planeUsed = Test1d(supportPlanes[i], tempVelocity);
                         if (!planeUsed)
                         {
@@ -288,7 +312,12 @@ namespace Unity.Physics
         /// <param name="constraint0">  The first constraint. </param>
         /// <param name="constraint1">  The second constraint. </param>
         /// <param name="velocity">     [in,out] The velocity. </param>
-        public static void Solve2d(float3 up, SurfaceConstraintInfo constraint0, SurfaceConstraintInfo constraint1, ref float3 velocity)
+        public static void Solve2d(
+            float3 up,
+            SurfaceConstraintInfo constraint0,
+            SurfaceConstraintInfo constraint1,
+            ref float3 velocity
+        )
         {
             float3 plane0 = constraint0.Plane.Normal;
             float3 plane1 = constraint1.Plane.Normal;
@@ -327,7 +356,8 @@ namespace Unity.Physics
                 float3 t = new float3(
                     math.dot(axis, sVel) * 0.5f,
                     math.dot(plane0, constraint0.Velocity),
-                    math.dot(plane1, constraint1.Velocity));
+                    math.dot(plane1, constraint1.Velocity)
+                );
 
                 axisVel = math.rotate(m, t);
                 axisVel *= invAxisLen;
@@ -350,7 +380,13 @@ namespace Unity.Physics
         /// <param name="constraint1">  The second constraint. </param>
         /// <param name="constraint2">  The third constraint. </param>
         /// <param name="velocity">     [in,out] The velocity. </param>
-        public static void Solve3d(float3 up, SurfaceConstraintInfo constraint0, SurfaceConstraintInfo constraint1, SurfaceConstraintInfo constraint2, ref float3 velocity)
+        public static void Solve3d(
+            float3 up,
+            SurfaceConstraintInfo constraint0,
+            SurfaceConstraintInfo constraint1,
+            SurfaceConstraintInfo constraint2,
+            ref float3 velocity
+        )
         {
             float3 plane0 = constraint0.Plane.Normal;
             float3 plane1 = constraint1.Plane.Normal;
@@ -380,7 +416,8 @@ namespace Unity.Physics
             float3 t = new float3(
                 math.dot(plane0, constraint0.Velocity),
                 math.dot(plane1, constraint1.Velocity),
-                math.dot(plane2, constraint2.Velocity));
+                math.dot(plane2, constraint2.Velocity)
+            );
 
             float3 pointVel = math.rotate(m, t);
             pointVel /= det;
@@ -407,7 +444,11 @@ namespace Unity.Physics
         /// <param name="plane0">   The first plane. </param>
         /// <param name="plane1">   The second plane. </param>
         /// <param name="plane2">   The third plane. </param>
-        public static void Sort3d(ref SurfaceConstraintInfo plane0, ref SurfaceConstraintInfo plane1, ref SurfaceConstraintInfo plane2)
+        public static void Sort3d(
+            ref SurfaceConstraintInfo plane0,
+            ref SurfaceConstraintInfo plane1,
+            ref SurfaceConstraintInfo plane2
+        )
         {
             int priority0 = plane0.Priority;
             int priority1 = plane1.Priority;

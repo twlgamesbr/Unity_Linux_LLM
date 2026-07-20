@@ -1,6 +1,6 @@
 using System;
-using UnityEditor;
 using Unity.Collections;
+using UnityEditor;
 using UnityEngine;
 
 class CLILeakDetectionSwitcher
@@ -23,7 +23,9 @@ class CLILeakDetectionSwitcher
                     NativeLeakDetection.Mode = NativeLeakDetectionMode.EnabledWithStackTrace;
                     break;
                 default:
-                    Debug.LogWarning("The environment variable UNITY_JOBS_NATIVE_LEAK_DETECTION_MODE has an invalid value. Please use: 0 = Disabled, 1 = Enabled, 2 = EnabledWithStackTrace.");
+                    Debug.LogWarning(
+                        "The environment variable UNITY_JOBS_NATIVE_LEAK_DETECTION_MODE has an invalid value. Please use: 0 = Disabled, 1 = Enabled, 2 = EnabledWithStackTrace."
+                    );
                     break;
             }
             Debug.Log("Native leak detection mode: " + NativeLeakDetection.Mode);

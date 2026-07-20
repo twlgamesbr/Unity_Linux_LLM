@@ -38,7 +38,7 @@ namespace UnityEngine.InputSystem.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Approximately(double a, double b)
         {
-            return Math.Abs(b - a) <  Math.Max(1E-06 * Math.Max(Math.Abs(a), Math.Abs(b)), double.Epsilon * 8);
+            return Math.Abs(b - a) < Math.Max(1E-06 * Math.Max(Math.Abs(a), Math.Abs(b)), double.Epsilon * 8);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

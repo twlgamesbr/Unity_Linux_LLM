@@ -17,7 +17,9 @@ namespace UnityEditor.Rendering
     {
         public uint inputVariants;
         public uint outputVariants;
-        public override string ToString() => $"Total={outputVariants}/{inputVariants}({outputVariants / (float)inputVariants * 100f:0.00}%)";
+
+        public override string ToString() =>
+            $"Total={outputVariants}/{inputVariants}({outputVariants / (float)inputVariants * 100f:0.00}%)";
     }
 
     [Serializable]
@@ -25,6 +27,7 @@ namespace UnityEditor.Rendering
     {
         public string variantName;
         public double stripTimeMs;
+
         public override string ToString() => $"{variantName} - {base.ToString()} - Time={stripTimeMs}ms";
     }
 
@@ -33,7 +36,8 @@ namespace UnityEditor.Rendering
     {
         public string name;
 
-        private Dictionary<string, (VariantCounter count, List<ShaderVariantInfo> variantInfos)> m_VariantsByPipeline = new();
+        private Dictionary<string, (VariantCounter count, List<ShaderVariantInfo> variantInfos)> m_VariantsByPipeline =
+            new();
 
         public void AddVariant(string pipeline, ShaderVariantInfo variant)
         {
@@ -94,7 +98,9 @@ namespace UnityEditor.Rendering
             public ShaderVariantInfo[] variants;
         }
 
-        [SerializeField] private PipelineVariants[] pipelines;
+        [SerializeField]
+        private PipelineVariants[] pipelines;
+
         public void OnBeforeSerialize()
         {
             pipelines = m_VariantsByPipeline
@@ -141,9 +147,16 @@ namespace UnityEditor.Rendering
     /// </summary>
     class ShaderStrippingReportEmpty : IShaderStrippingReport
     {
-        public void OnShaderProcessed<TShader, TShaderVariant>([DisallowNull] TShader shader, TShaderVariant shaderVariant, string pipeline, uint variantsIn, uint variantsOut, double stripTimeMs)
-            where TShader : UnityEngine.Object
-        { }
+        public void OnShaderProcessed<TShader, TShaderVariant>(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            string pipeline,
+            uint variantsIn,
+            uint variantsOut,
+            double stripTimeMs
+        )
+            where TShader : UnityEngine.Object { }
+
         public void DumpReport() { }
     }
 
@@ -163,7 +176,14 @@ namespace UnityEditor.Rendering
             }
         }
 
-        public void OnShaderProcessed<TShader, TShaderVariant>([DisallowNull] TShader shader, TShaderVariant shaderVariant, string pipeline, uint variantsIn, uint variantsOut, double stripTimeMs)
+        public void OnShaderProcessed<TShader, TShaderVariant>(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            string pipeline,
+            uint variantsIn,
+            uint variantsOut,
+            double stripTimeMs
+        )
             where TShader : UnityEngine.Object
         {
             if (!m_IsLogEnabled)
@@ -172,7 +192,9 @@ namespace UnityEditor.Rendering
             if (!ShaderStrippingReport.TryGetVariantName(shader, shaderVariant, out string variantName))
                 return;
 
-            Debug.Log($"Shader={shader.name}{variantName} Pipeline={pipeline} Total={variantsIn}/{variantsOut}({variantsOut / (float)variantsIn * 100f:0.00}%) Time={stripTimeMs}ms");
+            Debug.Log(
+                $"Shader={shader.name}{variantName} Pipeline={pipeline} Total={variantsIn}/{variantsOut}({variantsOut / (float)variantsIn * 100f:0.00}%) Time={stripTimeMs}ms"
+            );
         }
 
         public void DumpReport()
@@ -203,11 +225,20 @@ namespace UnityEditor.Rendering
             m_ExportStrippedVariants = export;
         }
 
-        public void OnShaderProcessed<TShader, TShaderVariant>([DisallowNull] TShader shader, TShaderVariant shaderVariant, string pipeline, uint variantsIn, uint variantsOut, double stripTimeMs)
+        public void OnShaderProcessed<TShader, TShaderVariant>(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            string pipeline,
+            uint variantsIn,
+            uint variantsOut,
+            double stripTimeMs
+        )
             where TShader : UnityEngine.Object
         {
             if (!TryGetVariantName(shader, shaderVariant, out string variantName))
-                throw new NotImplementedException($"Report is not enabled for {typeof(TShader)} and {typeof(TShaderVariant)}");
+                throw new NotImplementedException(
+                    $"Report is not enabled for {typeof(TShader)} and {typeof(TShaderVariant)}"
+                );
 
             var lastShaderStrippingInfo = FindLastShaderStrippingInfo(shader);
             if (typeof(TShader) == typeof(Shader))
@@ -221,13 +252,16 @@ namespace UnityEditor.Rendering
                 m_ComputeShaderVariantCounter.outputVariants += variantsOut;
             }
 
-            lastShaderStrippingInfo.AddVariant(pipeline, new ShaderVariantInfo()
-            {
-                inputVariants = variantsIn,
-                outputVariants = variantsOut,
-                stripTimeMs = stripTimeMs,
-                variantName = variantName
-            });
+            lastShaderStrippingInfo.AddVariant(
+                pipeline,
+                new ShaderVariantInfo()
+                {
+                    inputVariants = variantsIn,
+                    outputVariants = variantsOut,
+                    stripTimeMs = stripTimeMs,
+                    variantName = variantName,
+                }
+            );
         }
 
         internal static string k_ShaderOutputPath = "Temp/shader-stripping.json";
@@ -253,11 +287,16 @@ namespace UnityEditor.Rendering
             if (m_ExportStrippedVariants)
             {
                 ExportShaderStrippingInfo(k_ShaderOutputPath, m_ShaderVariantCounter, m_ShaderInfos);
-                ExportShaderStrippingInfo(k_ComputeShaderOutputPath, m_ComputeShaderVariantCounter, m_ComputeShaderInfos);
+                ExportShaderStrippingInfo(
+                    k_ComputeShaderOutputPath,
+                    m_ComputeShaderVariantCounter,
+                    m_ComputeShaderInfos
+                );
             }
         }
 
-        [CanBeNull] private ShaderStrippingInfo m_LastShaderStrippingInfo = null;
+        [CanBeNull]
+        private ShaderStrippingInfo m_LastShaderStrippingInfo = null;
 
         private ShaderStrippingInfo FindLastShaderStrippingInfo<TShader>([DisallowNull] TShader shader)
             where TShader : UnityEngine.Object
@@ -266,10 +305,7 @@ namespace UnityEditor.Rendering
                 return m_LastShaderStrippingInfo;
 
             // We are reporting a new shader variant, need to create a new one
-            m_LastShaderStrippingInfo = new ShaderStrippingInfo()
-            {
-                name = shader.name
-            };
+            m_LastShaderStrippingInfo = new ShaderStrippingInfo() { name = shader.name };
 
             // The compiler will strip the branch that we are not using
             if (typeof(TShader) == typeof(Shader))
@@ -285,7 +321,11 @@ namespace UnityEditor.Rendering
         }
 
         [MustUseReturnValue]
-        internal static bool TryGetVariantName<TShader, TShaderVariant>([DisallowNull] TShader shader, TShaderVariant shaderVariant, out string variantName)
+        internal static bool TryGetVariantName<TShader, TShaderVariant>(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            out string variantName
+        )
             where TShader : UnityEngine.Object
         {
             variantName = string.Empty;
@@ -293,8 +333,11 @@ namespace UnityEditor.Rendering
             if (typeof(TShader) == typeof(Shader) && typeof(TShaderVariant) == typeof(ShaderSnippetData))
             {
                 var snippetData = (ShaderSnippetData)Convert.ChangeType(shaderVariant, typeof(ShaderSnippetData));
-                string passName = string.IsNullOrEmpty(snippetData.passName) ? $"Pass {snippetData.pass.PassIndex}" : snippetData.passName;
-                variantName = $"{passName} ({snippetData.passType}) (SubShader: {snippetData.pass.SubshaderIndex}) (ShaderType: {snippetData.shaderType.ToString()})";
+                string passName = string.IsNullOrEmpty(snippetData.passName)
+                    ? $"Pass {snippetData.pass.PassIndex}"
+                    : snippetData.passName;
+                variantName =
+                    $"{passName} ({snippetData.passType}) (SubShader: {snippetData.pass.SubshaderIndex}) (ShaderType: {snippetData.shaderType.ToString()})";
             }
             else if (typeof(TShader) == typeof(ComputeShader) && typeof(TShaderVariant) == typeof(string))
             {
@@ -324,7 +367,7 @@ namespace UnityEditor.Rendering
                 {
                     totalVariantsIn = variantCounter.inputVariants,
                     totalVariantsOut = variantCounter.outputVariants,
-                    shaders = shaders.ToArray()
+                    shaders = shaders.ToArray(),
                 };
 
                 File.WriteAllText(path, JsonUtility.ToJson(export, true));
@@ -338,8 +381,14 @@ namespace UnityEditor.Rendering
 
     interface IShaderStrippingReport
     {
-        void OnShaderProcessed<TShader, TShaderVariant>([DisallowNull] TShader shader,
-            TShaderVariant shaderVariant, string pipeline, uint variantsIn, uint variantsOut, double stripTimeMs)
+        void OnShaderProcessed<TShader, TShaderVariant>(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            string pipeline,
+            uint variantsIn,
+            uint variantsOut,
+            double stripTimeMs
+        )
             where TShader : UnityEngine.Object;
 
         void DumpReport();
@@ -367,8 +416,10 @@ namespace UnityEditor.Rendering
                 s_ShowWarningDebugShaders = shaderVariantSettings.stripRuntimeDebugShaders && isDevelopmentBuild;
             }
 
-            m_Reporter = (logStrippedVariants == ShaderVariantLogLevel.Disabled && exportStrippedVariants == false) ?
-                new ShaderStrippingReportEmpty() : new ShaderStrippingReport(logStrippedVariants, exportStrippedVariants);
+            m_Reporter =
+                (logStrippedVariants == ShaderVariantLogLevel.Disabled && exportStrippedVariants == false)
+                    ? new ShaderStrippingReportEmpty()
+                    : new ShaderStrippingReport(logStrippedVariants, exportStrippedVariants);
         }
 
         public static void ReportEnd()
@@ -376,7 +427,9 @@ namespace UnityEditor.Rendering
             m_Reporter.DumpReport();
 
             if (s_ShowWarningDebugShaders)
-                Debug.Log("Stripping Runtime Debug Shader Variants, you won't be able to use some features of Rendering Debugger in the Player Build.");
+                Debug.Log(
+                    "Stripping Runtime Debug Shader Variants, you won't be able to use some features of Rendering Debugger in the Player Build."
+                );
 
             m_Reporter = null;
             s_ShowWarningDebugShaders = false;

@@ -4,45 +4,45 @@
  *--------------------------------------------------------------------------------------------*/
 namespace Microsoft.Unity.VisualStudio.Editor.Messaging
 {
-	internal enum MessageType
-	{
-		None = 0,
+    internal enum MessageType
+    {
+        None = 0,
 
-		Ping,
-		Pong,
+        Ping,
+        Pong,
 
-		Play,
-		Stop,
-		Pause,
-		Unpause,
+        Play,
+        Stop,
+        Pause,
+        Unpause,
 
-		Build,
-		Refresh,
+        Build,
+        Refresh,
 
-		Info,
-		Error,
-		Warning,
+        Info,
+        Error,
+        Warning,
 
-		Open,
-		Opened,
+        Open,
+        Opened,
 
-		Version,
-		UpdatePackage,
+        Version,
+        UpdatePackage,
 
-		ProjectPath,
+        ProjectPath,
 
-		// This message is a technical one for big messages, not intended to be used directly
-		Tcp,
+        // This message is a technical one for big messages, not intended to be used directly
+        Tcp,
 
-		RunStarted,
-		RunFinished,
-		TestStarted,
-		TestFinished,
-		TestListRetrieved,
+        RunStarted,
+        RunFinished,
+        TestStarted,
+        TestFinished,
+        TestListRetrieved,
 
-		RetrieveTestList,
-		ExecuteTests,
+        RetrieveTestList,
+        ExecuteTests,
 
-		ShowUsage
-	}
+        ShowUsage,
+    }
 }

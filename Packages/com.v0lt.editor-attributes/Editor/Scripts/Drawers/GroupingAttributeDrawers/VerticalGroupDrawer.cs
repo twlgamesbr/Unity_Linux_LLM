@@ -1,5 +1,5 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
@@ -21,16 +21,18 @@ namespace EditorAttributes.Editor
                 groupBox.Add(groupProperty);
             }
 
-            groupBox.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var groupLabel = groupBox.Q<Label>(className: GroupBox.labelUssClassName);
+            groupBox.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    var groupLabel = groupBox.Q<Label>(className: GroupBox.labelUssClassName);
 
-                if (groupLabel == null)
-                    return;
+                    if (groupLabel == null)
+                        return;
 
-                groupLabel.style.marginTop = 0f;
-                groupLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            });
+                    groupLabel.style.marginTop = 0f;
+                    groupLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                }
+            );
 
             return groupBox;
         }

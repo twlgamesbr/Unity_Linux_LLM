@@ -30,9 +30,11 @@ namespace Unity.Web.Stripping.Editor
 
             const string assemblyName = "UnityEditor.WebGL.Extensions";
             const string className = "UnityEditor.WebGL.Browser";
-            var assembly = Assembly.Load(assemblyName)
+            var assembly =
+                Assembly.Load(assemblyName)
                 ?? throw new TargetException($"Type '{assemblyName}' not found in assembly.");
-            var classType = assembly.GetType(className)
+            var classType =
+                assembly.GetType(className)
                 ?? throw new TargetException($"Type '{className}' not found in assembly '{assemblyName}'.");
             s_CreateMethod = GetMethod(classType, "Create", BindingFlags.Static | BindingFlags.Public);
             s_LaunchMethod = GetMethod(classType, "Launch");
@@ -46,7 +48,6 @@ namespace Unity.Web.Stripping.Editor
 
             // if configurable browser is not worth of the reflection shenanigans, could simply do
             //Application.OpenURL(ClientUrl);
-
 
             // Append search params to client url
             var url = ClientUrl;
@@ -65,7 +66,7 @@ namespace Unity.Web.Stripping.Editor
                     EditorUserBuildSettings.webGLClientBrowserType,
                     EditorUserBuildSettings.webGLClientBrowserPath,
                     url,
-                    null // WebProxy
+                    null, // WebProxy
                 }
             );
             s_LaunchMethod.Invoke(m_Browser, null);
@@ -112,9 +113,10 @@ namespace Unity.Web.Stripping.Editor
 
         static MethodInfo GetMethod(Type classType, string methodName, BindingFlags? bindingFlags = null)
         {
-            var methodInfo = (bindingFlags.HasValue)
-                ? classType.GetMethod(methodName, bindingFlags.Value)
-                : classType.GetMethod(methodName);
+            var methodInfo =
+                (bindingFlags.HasValue)
+                    ? classType.GetMethod(methodName, bindingFlags.Value)
+                    : classType.GetMethod(methodName);
 
             if (methodInfo == null)
                 throw new TargetException($"Method '{methodName}' not found in '{classType.FullName}'.");

@@ -15,13 +15,16 @@ public partial class IfeDescription
         public ITypeSymbol TypeSymbol { get; set; }
         public ITypeSymbol TypeParameterSymbol { get; set; }
         public QueryType QueryType { get; set; }
-        public bool IsReadOnly => QueryType is QueryType.RefRO
-            or QueryType.EnabledRefRO_ComponentData
-            or QueryType.EnabledRefRO_BufferElementData
-            or QueryType.ValueTypeComponent
-            or QueryType.UnmanagedSharedComponent
-            or QueryType.ManagedSharedComponent;
-        public ITypeSymbol QueriedTypeSymbol => QueryType.DoesRequireTypeParameter() ? TypeParameterSymbol ?? TypeSymbol : TypeSymbol;
+        public bool IsReadOnly =>
+            QueryType
+                is QueryType.RefRO
+                    or QueryType.EnabledRefRO_ComponentData
+                    or QueryType.EnabledRefRO_BufferElementData
+                    or QueryType.ValueTypeComponent
+                    or QueryType.UnmanagedSharedComponent
+                    or QueryType.ManagedSharedComponent;
+        public ITypeSymbol QueriedTypeSymbol =>
+            QueryType.DoesRequireTypeParameter() ? TypeParameterSymbol ?? TypeSymbol : TypeSymbol;
     }
 
     private bool TryGetQueryDatas()
@@ -87,12 +90,14 @@ public partial class IfeDescription
             {
                 AllIterableQueryDatas.Add(queryData);
 
-                _iterableNonEnableableTypes.Add(new Common.Query()
-                {
-                    IsReadOnly = queryData.IsReadOnly,
-                    TypeSymbol = queryData.QueriedTypeSymbol,
-                    Type = Common.QueryType.All
-                });
+                _iterableNonEnableableTypes.Add(
+                    new Common.Query()
+                    {
+                        IsReadOnly = queryData.IsReadOnly,
+                        TypeSymbol = queryData.QueriedTypeSymbol,
+                        Type = Common.QueryType.All,
+                    }
+                );
             }
         }
         return true;
@@ -103,16 +108,22 @@ public partial class IfeDescription
         {
             // `MyResult` is a shared component
             if (typeSymbol.IsSharedComponent())
-                return (typeSymbol.IsUnmanagedType ? QueryType.UnmanagedSharedComponent : QueryType.ManagedSharedComponent, false);
+                return (
+                    typeSymbol.IsUnmanagedType ? QueryType.UnmanagedSharedComponent : QueryType.ManagedSharedComponent,
+                    false
+                );
 
             // `MyResult` implements `IComponentData`
             if (typeSymbol.IsComponent())
             {
                 // `MyResult` is a struct
                 if (typeSymbol.InheritsFromType("System.ValueType"))
-                    return (typeSymbol.IsZeroSizedComponent() ? QueryType.TagComponent : QueryType.ValueTypeComponent, typeSymbol.IsEnableableComponent());
+                    return (
+                        typeSymbol.IsZeroSizedComponent() ? QueryType.TagComponent : QueryType.ValueTypeComponent,
+                        typeSymbol.IsEnableableComponent()
+                    );
                 // `MyResult` is a class
-                return(QueryType.ManagedComponent, false);
+                return (QueryType.ManagedComponent, false);
             }
 
             bool isQueryTypeEnableable = false;
@@ -132,7 +143,7 @@ public partial class IfeDescription
 
                 // `MyResult` is `RefRO<T>`, `RefRW<T>`, `EnabledRefRW<T>`, `EnabledRefRO<T>` or `DynamicBuffer<T>`
                 case INamedTypeSymbol namedTypeSymbol:
-                    if(namedTypeSymbol.TypeArguments.IsEmpty)
+                    if (namedTypeSymbol.TypeArguments.IsEmpty)
                         return (QueryType.Invalid, false);
 
                     // `typeArgument` refers to `T` in `RefRO<T>`, `RefRW<T>`, `EnabledRefRW<T>`, `EnabledRefRO<T>` or `DynamicBuffer<T>`
@@ -156,13 +167,17 @@ public partial class IfeDescription
                             }
                             // If `typeArgument` is a fully valid type
                             isQueryTypeEnableable = typeArgument.IsEnableableComponent();
-                            enableableType = typeArgument.IsComponent() ? EnableableType.ComponentData : EnableableType.BufferElementData;
+                            enableableType = typeArgument.IsComponent()
+                                ? EnableableType.ComponentData
+                                : EnableableType.BufferElementData;
                             break;
                         }
                         case INamedTypeSymbol { Arity: 0 }:
                         {
                             isQueryTypeEnableable = typeArgument.IsEnableableComponent();
-                            enableableType = typeArgument.IsComponent() ? EnableableType.ComponentData : EnableableType.BufferElementData;
+                            enableableType = typeArgument.IsComponent()
+                                ? EnableableType.ComponentData
+                                : EnableableType.BufferElementData;
                             break;
                         }
                         default:
@@ -178,13 +193,17 @@ public partial class IfeDescription
                 "EnabledRefRW" => (
                     enableableType == EnableableType.ComponentData
                         ? QueryType.EnabledRefRW_ComponentData
-                        : QueryType.EnabledRefRW_BufferElementData, true),
+                        : QueryType.EnabledRefRW_BufferElementData,
+                    true
+                ),
                 "EnabledRefRO" => (
                     enableableType == EnableableType.ComponentData
                         ? QueryType.EnabledRefRO_ComponentData
-                        : QueryType.EnabledRefRO_BufferElementData, true),
+                        : QueryType.EnabledRefRO_BufferElementData,
+                    true
+                ),
                 "UnityEngineComponent" => (QueryType.UnityEngineComponent, false),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
 
             static bool HasTypeParameter(INamedTypeSymbol typeArgument)
@@ -202,6 +221,6 @@ public partial class IfeDescription
     {
         ComponentData,
         BufferElementData,
-        NotApplicable
+        NotApplicable,
     }
 }

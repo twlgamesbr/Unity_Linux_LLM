@@ -1,4 +1,3 @@
-
 namespace Unity.Netcode
 {
     /// <summary>
@@ -25,7 +24,9 @@ namespace Unity.Netcode
             {
                 if (m_ConnectionManager.NetworkManager.LogLevel <= LogLevel.Error)
                 {
-                    NetworkLog.LogWarning("Trying to send a message to a client who doesn't have a transport connection");
+                    NetworkLog.LogWarning(
+                        "Trying to send a message to a client who doesn't have a transport connection"
+                    );
                 }
 
                 return;

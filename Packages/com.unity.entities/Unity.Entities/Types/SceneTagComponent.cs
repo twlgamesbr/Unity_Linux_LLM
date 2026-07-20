@@ -13,22 +13,30 @@ namespace Unity.Entities
     {
         [FieldOffset(0)]
         internal long m_BlobAssetRefStorage;
-        public ref DotsSerialization.BlobHeader Value => ref UnsafeUtility.As<long, BlobAssetReference<DotsSerialization.BlobHeader>>(ref m_BlobAssetRefStorage).Value;
+        public ref DotsSerialization.BlobHeader Value =>
+            ref UnsafeUtility
+                .As<long, BlobAssetReference<DotsSerialization.BlobHeader>>(ref m_BlobAssetRefStorage)
+                .Value;
+
         public static implicit operator RuntimeBlobHeaderRef(BlobAssetReference<DotsSerialization.BlobHeader> assetRef)
         {
             RuntimeBlobHeaderRef ret = default;
-            UnsafeUtility.As<long, BlobAssetReference<DotsSerialization.BlobHeader>>(ref ret.m_BlobAssetRefStorage) = assetRef;
+            UnsafeUtility.As<long, BlobAssetReference<DotsSerialization.BlobHeader>>(ref ret.m_BlobAssetRefStorage) =
+                assetRef;
             return ret;
         }
+
         public static implicit operator BlobAssetReference<DotsSerialization.BlobHeader>(RuntimeBlobHeaderRef clip)
         {
-            return UnsafeUtility.As<long, BlobAssetReference<DotsSerialization.BlobHeader>>(ref clip.m_BlobAssetRefStorage);
+            return UnsafeUtility.As<long, BlobAssetReference<DotsSerialization.BlobHeader>>(
+                ref clip.m_BlobAssetRefStorage
+            );
         }
 
         public unsafe RuntimeBlobHeaderRef Resolve(BlobAssetOwner blobAssetOwner)
         {
             var blobAssetRef = new BlobAssetReference<DotsSerialization.BlobHeader>();
-            blobAssetRef.m_data.m_Ptr = (byte*) blobAssetOwner.BlobAssetBatchPtr + m_BlobAssetRefStorage;
+            blobAssetRef.m_data.m_Ptr = (byte*)blobAssetOwner.BlobAssetBatchPtr + m_BlobAssetRefStorage;
             return blobAssetRef;
         }
     }
@@ -45,35 +53,41 @@ namespace Unity.Entities
         /// Represents the unique GUID to identify the scene where the section is.
         /// </summary>
         [FieldOffset(0)]
-        public Hash128          SceneGUID;
+        public Hash128 SceneGUID;
+
         /// <summary>
         /// Represents the scene section index inside the scene.
         /// </summary>
         [FieldOffset(16)]
-        public int              SubSectionIndex;
+        public int SubSectionIndex;
+
         /// <summary>
         /// Represents the file size for the compressed section.
         /// </summary>
         [FieldOffset(20)]
-        public int              FileSize;
+        public int FileSize;
+
         /// <summary>
         /// Represents the number of Unity Objects referenced in the section.
         /// </summary>
         [FieldOffset(24)]
-        public int              ObjectReferenceCount;
+        public int ObjectReferenceCount;
+
         /// <summary>
         /// Represents the scene section bounding volume.
         /// </summary>
         [FieldOffset(28)]
-        public MinMaxAABB       BoundingVolume;
+        public MinMaxAABB BoundingVolume;
+
         [FieldOffset(52)]
-        internal Codec          Codec;
+        internal Codec Codec;
+
         [FieldOffset(56)]
-        internal int            DecompressedFileSize;
+        internal int DecompressedFileSize;
 
         // For sections above section 0, this is the count of entities in section 0.
         [FieldOffset(60)]
-        internal int            ExternalEntitiesRefRange;
+        internal int ExternalEntitiesRefRange;
 
         [FieldOffset(64)]
         internal RuntimeBlobHeaderRef BlobHeader;
@@ -113,7 +127,7 @@ namespace Unity.Entities
         /// <param name="sceneReference">The <see cref="EntitySceneReference"/> to reference.</param>
         public SceneReference(EntitySceneReference sceneReference)
         {
-            SceneGUID = sceneReference.Id .GlobalId.AssetGUID;
+            SceneGUID = sceneReference.Id.GlobalId.AssetGUID;
         }
 
         /// <summary>
@@ -156,11 +170,12 @@ namespace Unity.Entities
         /// <summary>
         /// Unique GUID that identifies the scene where the section is.
         /// </summary>
-        public Hash128        SceneGUID;
+        public Hash128 SceneGUID;
+
         /// <summary>
         /// Scene section index inside the scene.
         /// </summary>
-        public int            Section;
+        public int Section;
 
         /// <summary>
         /// Compares two <see cref="SceneSection"/> instances to determine if they are equal.
@@ -235,6 +250,7 @@ namespace Unity.Entities
         /// Prevents adding a RequestSceneLoaded to the SubScene section entities when it gets created. If loading a GameObject scene, setting this flag is equivalent to setting activateOnLoad to false.
         /// </summary>
         DisableAutoLoad = 1,
+
         /// <summary>
         /// Disable asynchronous importing, and wait for the SubScene to be fully converted (only relevant in-Editor) and its header loaded.
         /// </summary>
@@ -242,6 +258,7 @@ namespace Unity.Entities
         /// For fully synchronous scene loading, both <see cref="BlockOnImport"/> and <see cref="BlockOnStreamIn"/> must be set.
         /// </remarks>
         BlockOnImport = 2,
+
         /// <summary>
         /// Disable asynchronous streaming, SubScene section will be fully loaded during the next update of the streaming system
         /// </summary>
@@ -249,12 +266,14 @@ namespace Unity.Entities
         /// For fully synchronous scene loading, both <see cref="BlockOnImport"/> and <see cref="BlockOnStreamIn"/> must be set.
         /// </remarks>
         BlockOnStreamIn = 4,
+
         // TODO: Remove this RemovedAfter 2021-02-05 (DOTS-3380)
         // SceneLoadFlags.LoadAdditive is deprecated. Scenes loaded through the SceneSystem are always loaded Additively. This previously was only used when using LiveLink with GameObjects.
         /// <summary>
         /// [DEPRECATED] Set whether to load additive or not. This only applies to GameObject based scenes, not subscenes.
         /// </summary>
         LoadAdditive = 8,
+
         /// <summary>
         /// Loads a new instance of the subscene
         /// </summary>

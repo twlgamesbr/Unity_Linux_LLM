@@ -6,19 +6,23 @@ using UnityEngine.Pool;
 namespace Unity.Entities.Editor
 {
     using TreeViewItemData = UnityEngine.UIElements.TreeViewItemData<SystemTreeViewItemData>;
+
     class SystemTreeViewItemData
     {
-        internal static readonly ObjectPool<SystemTreeViewItemData> Pool = new ObjectPool<SystemTreeViewItemData>(() => new SystemTreeViewItemData());
+        internal static readonly ObjectPool<SystemTreeViewItemData> Pool = new ObjectPool<SystemTreeViewItemData>(() =>
+            new SystemTreeViewItemData()
+        );
 
         public IPlayerLoopNode Node;
         public WorldProxy WorldProxy;
         SystemGraph Graph;
         readonly List<TreeViewItemData> m_CachedChildren = new List<TreeViewItemData>();
+
         public enum SystemToggleState
         {
             AllEnabled,
             Mixed,
-            Disabled
+            Disabled,
         }
 
         SystemTreeViewItemData() { }
@@ -96,18 +100,20 @@ namespace Unity.Entities.Editor
 
             // any children is in mixed state.
             if (HasMixedState())
-               return SystemToggleState.Mixed;
+                return SystemToggleState.Mixed;
 
             return SystemToggleState.AllEnabled;
         }
 
         bool HasMixedState()
         {
-            return children.Select(child => child.data).Any(childItem =>
-            {
-                var toggleState = childItem?.GetSystemToggleState();
-                return toggleState == SystemToggleState.Mixed || toggleState == SystemToggleState.Disabled;
-            });
+            return children
+                .Select(child => child.data)
+                .Any(childItem =>
+                {
+                    var toggleState = childItem?.GetSystemToggleState();
+                    return toggleState == SystemToggleState.Mixed || toggleState == SystemToggleState.Disabled;
+                });
         }
 
         public string GetEntityMatches()
@@ -150,8 +156,8 @@ namespace Unity.Entities.Editor
             // if it has any children, it's the sum of all of its children that are SystemHandleNodes
             if (children.Any())
             {
-                var sum = Node.Children
-                    .OfType<ISystemHandleNode>()
+                var sum = Node
+                    .Children.OfType<ISystemHandleNode>()
                     .Sum(child => GetAverageRunningTime(child.SystemProxy));
 
                 return AdjustPrecision(sum);

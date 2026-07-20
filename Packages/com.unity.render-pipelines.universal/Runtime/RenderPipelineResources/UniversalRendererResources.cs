@@ -15,7 +15,7 @@ namespace UnityEngine.Rendering.Universal
     /// <code>
     /// using UnityEngine.Rendering;
     /// using UnityEngine.Rendering.Universal;
-    /// 
+    ///
     /// public static class URPUniversalRendererResourcesHelper
     /// {
     ///     public static Shader motionVector
@@ -36,8 +36,10 @@ namespace UnityEngine.Rendering.Universal
     [Categorization.CategoryInfo(Name = "R: Universal Renderer Shaders", Order = 1000), HideInInspector]
     public class UniversalRendererResources : IRenderPipelineResources
     {
-        [SerializeField][HideInInspector] private int m_Version = 0;
-        
+        [SerializeField]
+        [HideInInspector]
+        private int m_Version = 0;
+
         /// <summary>
         /// Current version of the resource container. Used only for upgrading a project.
         /// </summary>

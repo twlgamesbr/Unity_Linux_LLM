@@ -57,9 +57,8 @@ namespace UnityEditor.Rendering
                 m_PreviousSearch.Pause();
 
             m_PreviousSearch = m_RootElement
-                .schedule
-                .Execute(() => m_PerformSearchCallback(searchString))
-                .StartingIn(5);  // Avoid spamming multiple search if the user types really fast
+                .schedule.Execute(() => m_PerformSearchCallback(searchString))
+                .StartingIn(5); // Avoid spamming multiple search if the user types really fast
         }
 
         static bool IsInsideTag(string input, int index)
@@ -78,7 +77,7 @@ namespace UnityEditor.Rendering
                 return true;
 
             int searchStartIndex = 0;
-            for (;;)
+            for (; ; )
             {
                 startIndex = str.IndexOf(searchString, searchStartIndex, StringComparison.CurrentCultureIgnoreCase);
 

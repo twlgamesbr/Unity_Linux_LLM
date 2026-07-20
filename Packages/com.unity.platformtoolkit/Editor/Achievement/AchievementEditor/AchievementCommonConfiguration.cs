@@ -20,13 +20,15 @@ namespace Unity.PlatformToolkit.Editor
         public HeaderViewModel m_HeaderViewModel { get; private set; }
 
         private readonly Texture2D m_WarningIcon = EditorGUIUtility.Load("icons/console.warnicon.png") as Texture2D;
+
         // We need this empty view to eliminate UI Toolkit warnings when re-ordering achievements in the Achievements Editor
         private CommonCellViewModel m_DummyCommonCellViewModel;
 
         public AchievementCommonConfiguration(ObservableSerializableList<StoredAchievement> achievements)
         {
             m_CellVisualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorCommonCell.uxml");
+                "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorCommonCell.uxml"
+            );
             m_StoredAchievements = achievements;
 
             m_HeaderViewModel = new HeaderViewModel();
@@ -98,8 +100,10 @@ namespace Unity.PlatformToolkit.Editor
 
         public VisualElement MakeHeader()
         {
-            var container = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorCommonHeader.uxml")
+            var container = AssetDatabase
+                .LoadAssetAtPath<VisualTreeAsset>(
+                    "Packages/com.unity.platformtoolkit/Editor/Achievement/UI/AchievementEditorCommonHeader.uxml"
+                )
                 .Instantiate();
             container.dataSource = m_HeaderViewModel;
             var iconVisualElement = container.Q<VisualElement>("warning-icon");
@@ -133,7 +137,9 @@ namespace Unity.PlatformToolkit.Editor
                 m_DummyCommonCellViewModel = new CommonCellViewModel();
                 var storedAchievement = new StoredAchievement()
                 {
-                    Id = string.Empty, ProgressTarget = 0, UnlockType = UnlockType.Single
+                    Id = string.Empty,
+                    ProgressTarget = 0,
+                    UnlockType = UnlockType.Single,
                 };
                 m_DummyCommonCellViewModel.StoredAchievement = storedAchievement;
                 m_DummyCommonCellViewModel.Warnings = Array.Empty<string>();

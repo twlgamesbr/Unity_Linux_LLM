@@ -11,8 +11,10 @@ namespace UnityEngine.InputSystem.Controls
     {
         [InputControl(offset = 0, displayName = "X")]
         public AxisControl x { get; set; }
+
         [InputControl(offset = 4, displayName = "Y")]
         public AxisControl y { get; set; }
+
         [InputControl(offset = 8, displayName = "Z")]
         public AxisControl z { get; set; }
 
@@ -40,7 +42,8 @@ namespace UnityEngine.InputSystem.Controls
                     return new Vector3(
                         x.ReadUnprocessedValueFromStateWithCaching(statePtr),
                         y.ReadUnprocessedValueFromStateWithCaching(statePtr),
-                        z.ReadUnprocessedValueFromStateWithCaching(statePtr));
+                        z.ReadUnprocessedValueFromStateWithCaching(statePtr)
+                    );
             }
         }
 
@@ -68,13 +71,13 @@ namespace UnityEngine.InputSystem.Controls
         protected override FourCC CalculateOptimizedControlDataType()
         {
             if (
-                m_StateBlock.sizeInBits == sizeof(float) * 3 * 8 &&
-                m_StateBlock.bitOffset == 0 &&
-                x.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                y.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                z.optimizedControlDataType == InputStateBlock.FormatFloat &&
-                y.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 4 &&
-                z.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 8
+                m_StateBlock.sizeInBits == sizeof(float) * 3 * 8
+                && m_StateBlock.bitOffset == 0
+                && x.optimizedControlDataType == InputStateBlock.FormatFloat
+                && y.optimizedControlDataType == InputStateBlock.FormatFloat
+                && z.optimizedControlDataType == InputStateBlock.FormatFloat
+                && y.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 4
+                && z.m_StateBlock.byteOffset == x.m_StateBlock.byteOffset + 8
             )
                 return InputStateBlock.FormatVector3;
 

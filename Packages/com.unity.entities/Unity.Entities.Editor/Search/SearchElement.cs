@@ -1,9 +1,9 @@
-using UnityEditor.Search;
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
@@ -123,15 +123,27 @@ namespace Unity.Entities.Editor
             public PropertyPath SourceDataPath;
             public ISearchHandler SearchHandler;
 
-            protected override void VisitProperty<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value)
+            protected override void VisitProperty<TContainer, TValue>(
+                Property<TContainer, TValue> property,
+                ref TContainer container,
+                ref TValue value
+            )
             {
-                throw new InvalidBindingException($"SearchElement has invalid data bindings. SourceDataPath=[{SourceDataPath}] SourceDataType=[{typeof(TValue)}] is not a collection type");
+                throw new InvalidBindingException(
+                    $"SearchElement has invalid data bindings. SourceDataPath=[{SourceDataPath}] SourceDataType=[{typeof(TValue)}] is not a collection type"
+                );
             }
 
-            protected override void VisitCollection<TContainer, TCollection, TElement>(Property<TContainer, TCollection> property, ref TContainer container, ref TCollection value)
+            protected override void VisitCollection<TContainer, TCollection, TElement>(
+                Property<TContainer, TCollection> property,
+                ref TContainer container,
+                ref TCollection value
+            )
             {
                 if (TypeTraits<TCollection>.CanBeNull && null == value)
-                    throw new InvalidBindingException($"SearchElement has invalid data bindings. SourceDataPath=[{SourceDataPath}] is null.");
+                    throw new InvalidBindingException(
+                        $"SearchElement has invalid data bindings. SourceDataPath=[{SourceDataPath}] is null."
+                    );
 
                 var handler = new SearchHandler<TElement>(SearchElement);
 
@@ -143,7 +155,9 @@ namespace Unity.Entities.Editor
                     var filtered = root.GetValue<TCollection>(path);
 
                     if (TypeTraits<TCollection>.CanBeNull && null == filtered)
-                        throw new InvalidBindingException($"SearchElement has invalid data bindings. SourceDataPath=[{path}] is null.");
+                        throw new InvalidBindingException(
+                            $"SearchElement has invalid data bindings. SourceDataPath=[{path}] is null."
+                        );
 
                     return filtered;
                 });
@@ -162,25 +176,44 @@ namespace Unity.Entities.Editor
             public PropertyPath FilterDataPath;
             public ISearchHandler SearchHandler;
 
-            protected override void VisitProperty<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value)
+            protected override void VisitProperty<TContainer, TValue>(
+                Property<TContainer, TValue> property,
+                ref TContainer container,
+                ref TValue value
+            )
             {
-                throw new InvalidBindingException($"SearchElement has invalid data bindings. FilterDataPath=[{FilterDataPath}] FilterDataType=[{typeof(TValue)}] is not a collection type");
+                throw new InvalidBindingException(
+                    $"SearchElement has invalid data bindings. FilterDataPath=[{FilterDataPath}] FilterDataType=[{typeof(TValue)}] is not a collection type"
+                );
             }
 
-            protected override void VisitCollection<TContainer, TCollection, TElement>(Property<TContainer, TCollection> property, ref TContainer container, ref TCollection value)
+            protected override void VisitCollection<TContainer, TCollection, TElement>(
+                Property<TContainer, TCollection> property,
+                ref TContainer container,
+                ref TCollection value
+            )
             {
-                UnityEngine.Assertions.Assert.IsNotNull(SearchHandler, $"{nameof(SourceDataBindingVisitor)} failed to construct the {nameof(SearchHandler<TElement>)}");
+                UnityEngine.Assertions.Assert.IsNotNull(
+                    SearchHandler,
+                    $"{nameof(SourceDataBindingVisitor)} failed to construct the {nameof(SearchHandler<TElement>)}"
+                );
 
                 if (TypeTraits<TCollection>.CanBeNull && null == value)
-                    throw new InvalidBindingException($"SearchElement has invalid data bindings. FilterDataPath=[{FilterDataPath}] is null.");
+                    throw new InvalidBindingException(
+                        $"SearchElement has invalid data bindings. FilterDataPath=[{FilterDataPath}] is null."
+                    );
 
                 if (!(SearchHandler is SearchHandler<TElement> typed))
-                    throw new InvalidBindingException($"SearchElement has invalid data bindings. SourceDataPath=[{SourceDataPath}] SourceDataType=[{SearchHandler.SearchDataType}] and FilterDataPath=[{FilterDataPath}] FilterDataType=[{typeof(TElement)}] types do not match.");
+                    throw new InvalidBindingException(
+                        $"SearchElement has invalid data bindings. SourceDataPath=[{SourceDataPath}] SourceDataType=[{SearchHandler.SearchDataType}] and FilterDataPath=[{FilterDataPath}] FilterDataType=[{typeof(TElement)}] types do not match."
+                    );
 
                 // @NOTE We can possibly add some magic here to handle `readonly` collection types (i.e. Array) by re-creating an instance and assigning each search.
                 //       but for now we will just error out.
                 if (value.IsReadOnly)
-                    throw new InvalidBindingException($"SearchElement has invalid data bindings. FilterDataPath=[{FilterDataPath}] is ReadOnly.");
+                    throw new InvalidBindingException(
+                        $"SearchElement has invalid data bindings. FilterDataPath=[{FilterDataPath}] is ReadOnly."
+                    );
 
                 var root = PropertyElement;
                 var path = FilterDataPath;
@@ -190,7 +223,9 @@ namespace Unity.Entities.Editor
                     var filtered = root.GetValue<TCollection>(path);
 
                     if (TypeTraits<TCollection>.CanBeNull && null == filtered)
-                        throw new InvalidBindingException($"SearchElement has invalid data bindings. FilterDataPath=[{path}] is null.");
+                        throw new InvalidBindingException(
+                            $"SearchElement has invalid data bindings. FilterDataPath=[{path}] is null."
+                        );
 
                     filtered.Clear();
                 };
@@ -200,7 +235,9 @@ namespace Unity.Entities.Editor
                     var filtered = root.GetValue<TCollection>(path);
 
                     if (TypeTraits<TCollection>.CanBeNull && null == filtered)
-                        throw new InvalidBindingException($"SearchElement has invalid data bindings. FilterDataPath=[{path}] is null.");
+                        throw new InvalidBindingException(
+                            $"SearchElement has invalid data bindings. FilterDataPath=[{path}] is null."
+                        );
 
                     foreach (var element in elements)
                         filtered.Add(element);
@@ -231,7 +268,8 @@ namespace Unity.Entities.Editor
 
             int m_ElementCount;
 
-            protected override Vector2 GetSize() => new Vector2(m_Width, k_HeaderHeight + k_ElementHeight * m_ElementCount);
+            protected override Vector2 GetSize() =>
+                new Vector2(m_Width, k_HeaderHeight + k_ElementHeight * m_ElementCount);
 
             /// <summary>
             /// Constructs a new instance of the <see cref="SearchElement"/> control.
@@ -251,7 +289,13 @@ namespace Unity.Entities.Editor
             }
 
             // ReSharper disable once ParameterHidesMember
-            public void AddPopupItem(string token, string filterText, string filterTooltip = "", string defaultOperator = ":", bool isCompleteFilter = false)
+            public void AddPopupItem(
+                string token,
+                string filterText,
+                string filterTooltip = "",
+                string defaultOperator = ":",
+                bool isCompleteFilter = false
+            )
             {
                 m_ElementCount++;
 
@@ -465,11 +509,14 @@ namespace Unity.Entities.Editor
                 UpdateControls();
             });
 
-            m_SearchStringTextField.RegisterCallback<KeyUpEvent, SearchElement>((evt, element) =>
-            {
-                if (evt.keyCode == KeyCode.Escape)
-                    element.Search();
-            }, this);
+            m_SearchStringTextField.RegisterCallback<KeyUpEvent, SearchElement>(
+                (evt, element) =>
+                {
+                    if (evt.keyCode == KeyCode.Escape)
+                        element.Search();
+                },
+                this
+            );
 
             m_AddFilterButton.clickable.clicked += () =>
             {
@@ -479,7 +526,13 @@ namespace Unity.Entities.Editor
                 var filterDropdown = new FilterPopupElement(this, FilterPopupWidth);
 
                 foreach (var item in m_FilterPopupElementItems)
-                    filterDropdown.AddPopupItem(item.Token, item.Text, item.Tooltip, item.DefaultOperator, item.isCompleteFilter);
+                    filterDropdown.AddPopupItem(
+                        item.Token,
+                        item.Text,
+                        item.Tooltip,
+                        item.DefaultOperator,
+                        item.isCompleteFilter
+                    );
 
                 filterDropdown.ShowAtPosition(m_AddFilterButton.worldBound);
             };
@@ -509,7 +562,11 @@ namespace Unity.Entities.Editor
             try
             {
                 var propertyElement = GetFirstAncestorOfType<BindingContextElement>();
-                handler = RegisterSearchQueryHandler(propertyElement, m_UxmlSearchHandlerBinding.SourceDataPath, m_UxmlSearchHandlerBinding.FilteredDataPath);
+                handler = RegisterSearchQueryHandler(
+                    propertyElement,
+                    m_UxmlSearchHandlerBinding.SourceDataPath,
+                    m_UxmlSearchHandlerBinding.FilteredDataPath
+                );
             }
             catch (InvalidBindingException e)
             {
@@ -529,13 +586,26 @@ namespace Unity.Entities.Editor
         }
 
 #if UNITY_2023_3_OR_NEWER
-        [UxmlAttribute("search-data")] private string SearchData { get; set; } = string.Empty;
-        [UxmlAttribute("search-filters")] private string SearchFilters { get; set; } = string.Empty;
-        [UxmlAttribute("source-data")] private string SourceData { get; set; } = string.Empty;
-        [UxmlAttribute("filtered-data")] private string FilteredData { get; set; } = string.Empty;
-        [UxmlAttribute("handler-type")] private string HandlerType { get; set; } = "sync";
-        [UxmlAttribute("max-frame-time")] private int MaxFrameTime { get; set; } = 33;
-        [UxmlAttribute("global-string-comparison")] private string UxmlGlobalStringComparison { get; set; } = DefaultGlobalStringComparison.ToString();
+        [UxmlAttribute("search-data")]
+        private string SearchData { get; set; } = string.Empty;
+
+        [UxmlAttribute("search-filters")]
+        private string SearchFilters { get; set; } = string.Empty;
+
+        [UxmlAttribute("source-data")]
+        private string SourceData { get; set; } = string.Empty;
+
+        [UxmlAttribute("filtered-data")]
+        private string FilteredData { get; set; } = string.Empty;
+
+        [UxmlAttribute("handler-type")]
+        private string HandlerType { get; set; } = "sync";
+
+        [UxmlAttribute("max-frame-time")]
+        private int MaxFrameTime { get; set; } = 33;
+
+        [UxmlAttribute("global-string-comparison")]
+        private string UxmlGlobalStringComparison { get; set; } = DefaultGlobalStringComparison.ToString();
 
         void InitAttributes()
         {
@@ -575,7 +645,8 @@ namespace Unity.Entities.Editor
             if (!Enum.TryParse(HandlerType, out SearchHandlerType handlerType))
             {
                 Debug.LogWarning(
-                    $"SearchElement has invalid HandlerType=[{HandlerType}]. Expected values are [{string.Join(",", Enum.GetNames(typeof(SearchHandlerType)))}]. Defaulting to {nameof(SearchHandlerType.sync)}");
+                    $"SearchElement has invalid HandlerType=[{HandlerType}]. Expected values are [{string.Join(",", Enum.GetNames(typeof(SearchHandlerType)))}]. Defaulting to {nameof(SearchHandlerType.sync)}"
+                );
                 handlerType = SearchHandlerType.sync;
             }
 
@@ -595,18 +666,21 @@ namespace Unity.Entities.Editor
                 else
                 {
                     Debug.LogWarning(
-                        $"SearchElement has invalid data bindings. SourceData=[{sourceData}] FilteredData=[{filteredData}]. Can not read and write to the same property.");
+                        $"SearchElement has invalid data bindings. SourceData=[{sourceData}] FilteredData=[{filteredData}]. Can not read and write to the same property."
+                    );
                 }
             }
             else if (!string.IsNullOrEmpty(sourceData))
             {
                 Debug.LogWarning(
-                    "SearchElement has invalid data bindings. The 'source-data' attribute requires the 'filtered-data' to also be set.");
+                    "SearchElement has invalid data bindings. The 'source-data' attribute requires the 'filtered-data' to also be set."
+                );
             }
             else if (!string.IsNullOrEmpty(filteredData))
             {
                 Debug.LogWarning(
-                    "SearchElement has invalid data bindings. The 'filtered-data' attribute requires the 'source-data' to also be set.");
+                    "SearchElement has invalid data bindings. The 'filtered-data' attribute requires the 'source-data' to also be set."
+                );
             }
 
             if (Enum.TryParse(UxmlGlobalStringComparison, out StringComparison stringComparison))
@@ -615,7 +689,9 @@ namespace Unity.Entities.Editor
             }
             else
             {
-                Debug.LogWarning($"SearchElement has invalid StringComparison=[{UxmlGlobalStringComparison}]. Expected values are {string.Join(",", Enum.GetNames(typeof(StringComparison)))}.");
+                Debug.LogWarning(
+                    $"SearchElement has invalid StringComparison=[{UxmlGlobalStringComparison}]. Expected values are {string.Join(",", Enum.GetNames(typeof(StringComparison)))}."
+                );
             }
         }
 #endif
@@ -721,7 +797,11 @@ namespace Unity.Entities.Editor
         /// <param name="options">The set of filter options.</param>
         /// <typeparam name="TData">The data type being searched.</typeparam>
         /// <typeparam name="TFilter">The return type for the filter.</typeparam>
-        public void AddSearchFilterCallback<TData, TFilter>(string token, Func<TData, TFilter> getSearchDataFunc, SearchFilterOptions options = default)
+        public void AddSearchFilterCallback<TData, TFilter>(
+            string token,
+            Func<TData, TFilter> getSearchDataFunc,
+            SearchFilterOptions options = default
+        )
         {
             m_SearchEngine.AddSearchFilterCallback(token, getSearchDataFunc, options);
 
@@ -735,16 +815,24 @@ namespace Unity.Entities.Editor
         /// <param name="token">The token for the filter. This should NOT include the operator.</param>
         /// <param name="filterText">The text or name to display to the user.</param>
         /// <param name="filterTooltip">An optional tooltip.</param>
-        public void AddSearchFilterPopupItem(string token, string filterText, string filterTooltip = "", string defaultOperator = ":", bool isCompleteFilter = false)
+        public void AddSearchFilterPopupItem(
+            string token,
+            string filterText,
+            string filterTooltip = "",
+            string defaultOperator = ":",
+            bool isCompleteFilter = false
+        )
         {
-            m_FilterPopupElementItems.Add(new FilterPopupElementChoice
-            {
-                Token = token,
-                Text = filterText,
-                Tooltip = filterTooltip,
-                DefaultOperator = defaultOperator,
-                isCompleteFilter = isCompleteFilter
-            });
+            m_FilterPopupElementItems.Add(
+                new FilterPopupElementChoice
+                {
+                    Token = token,
+                    Text = filterText,
+                    Tooltip = filterTooltip,
+                    DefaultOperator = defaultOperator,
+                    isCompleteFilter = isCompleteFilter,
+                }
+            );
 
             UpdateControls();
         }
@@ -765,7 +853,10 @@ namespace Unity.Entities.Editor
         /// <typeparam name="TFilterConstant">The operator's right hand side type.</typeparam>
         /// <param name="op">The filter operator.</param>
         /// <param name="handler">Callback to handle the operation. Takes a TFilterVariable (value returned by the filter handler, will vary for each element) and a TFilterConstant (right hand side value of the operator, which is constant), and returns a boolean indicating if the filter passes or not.</param>
-        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, bool> handler)
+        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, bool> handler
+        )
         {
             m_SearchEngine.AddSearchOperatorHandler(op, handler);
         }
@@ -777,7 +868,10 @@ namespace Unity.Entities.Editor
         /// <typeparam name="TFilterConstant">The operator's right hand side type.</typeparam>
         /// <param name="op">The filter operator.</param>
         /// <param name="handler">Callback to handle the operation. Takes a TFilterVariable (value returned by the filter handler, will vary for each element), a TFilterConstant (right hand side value of the operator, which is constant), a StringComparison option and returns a boolean indicating if the filter passes or not.</param>
-        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler)
+        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler
+        )
         {
             m_SearchEngine.AddSearchOperatorHandler(op, handler);
         }
@@ -843,12 +937,18 @@ namespace Unity.Entities.Editor
         /// <param name="sourceDataPath">The source data path to read from.</param>
         /// <param name="filterDataPath">The filter data path to write to.</param>
         /// <returns>The search handler which can be used to customize the search or unregister the bindings.</returns>
-        public ISearchHandler RegisterSearchQueryHandler(BindingContextElement propertyElement, PropertyPath sourceDataPath, PropertyPath filterDataPath)
+        public ISearchHandler RegisterSearchQueryHandler(
+            BindingContextElement propertyElement,
+            PropertyPath sourceDataPath,
+            PropertyPath filterDataPath
+        )
         {
             if (null != m_UxmlSearchHandlerBinding?.SearchHandler)
             {
                 if (m_UxmlSearchHandlerBinding?.FilteredDataPath.Equals(filterDataPath) ?? false)
-                    throw new InvalidOperationException($"SearchElement has invalid data bindings. The specified FilterDataPath=[{filterDataPath}] is already being written to by another search handler.");
+                    throw new InvalidOperationException(
+                        $"SearchElement has invalid data bindings. The specified FilterDataPath=[{filterDataPath}] is already being written to by another search handler."
+                    );
             }
 
             var sourceDataBindingVisitor = new SourceDataBindingVisitor
@@ -856,7 +956,7 @@ namespace Unity.Entities.Editor
                 SearchElement = this,
                 PropertyElement = propertyElement,
                 SourceDataPath = sourceDataPath,
-                SearchHandler = null
+                SearchHandler = null,
             };
 
             try
@@ -865,7 +965,10 @@ namespace Unity.Entities.Editor
             }
             catch (InvalidPathException e)
             {
-                throw new InvalidBindingException($"SearchElement has invalid data bindings. Invalid path SourceDataPath=[{sourceDataPath}]", e);
+                throw new InvalidBindingException(
+                    $"SearchElement has invalid data bindings. Invalid path SourceDataPath=[{sourceDataPath}]",
+                    e
+                );
             }
 
             if (null == sourceDataBindingVisitor.SearchHandler)
@@ -876,7 +979,7 @@ namespace Unity.Entities.Editor
                 PropertyElement = propertyElement,
                 SourceDataPath = sourceDataPath,
                 FilterDataPath = filterDataPath,
-                SearchHandler = sourceDataBindingVisitor.SearchHandler
+                SearchHandler = sourceDataBindingVisitor.SearchHandler,
             };
 
             try
@@ -888,7 +991,10 @@ namespace Unity.Entities.Editor
                 if (null != sourceDataBindingVisitor.SearchHandler)
                     UnregisterSearchQueryHandler(sourceDataBindingVisitor.SearchHandler);
 
-                throw new InvalidBindingException($"SearchElement has invalid data bindings. Invalid path FilterDataPath=[{filterDataPath}]", e);
+                throw new InvalidBindingException(
+                    $"SearchElement has invalid data bindings. Invalid path FilterDataPath=[{filterDataPath}]",
+                    e
+                );
             }
             catch (Exception)
             {
@@ -911,7 +1017,13 @@ namespace Unity.Entities.Editor
         {
             foreach (var target in m_SearchTargets)
             {
-                if (target is SearchTarget<TData> typed && (typed.SearchQueryHandler == searchQueryHandler || typed.SearchQueryCallback == searchQueryHandler.HandleSearchQuery))
+                if (
+                    target is SearchTarget<TData> typed
+                    && (
+                        typed.SearchQueryHandler == searchQueryHandler
+                        || typed.SearchQueryCallback == searchQueryHandler.HandleSearchQuery
+                    )
+                )
                     throw new InvalidOperationException("The given searchQueryHandler has already been registered.");
             }
 
@@ -962,7 +1074,13 @@ namespace Unity.Entities.Editor
         {
             for (var i = 0; i < m_SearchTargets.Count; i++)
             {
-                if (m_SearchTargets[i] is SearchTarget<TData> typed && (typed.SearchQueryHandler == searchQueryHandler || typed.SearchQueryCallback == searchQueryHandler.HandleSearchQuery))
+                if (
+                    m_SearchTargets[i] is SearchTarget<TData> typed
+                    && (
+                        typed.SearchQueryHandler == searchQueryHandler
+                        || typed.SearchQueryCallback == searchQueryHandler.HandleSearchQuery
+                    )
+                )
                 {
                     m_SearchTargets.RemoveAt(i);
                     return;
@@ -999,7 +1117,10 @@ namespace Unity.Entities.Editor
 
         void FocusSearchString()
         {
-            m_SearchStringTextField.SelectRangeDelayed(m_SearchStringTextField.text.Length, m_SearchStringTextField.text.Length);
+            m_SearchStringTextField.SelectRangeDelayed(
+                m_SearchStringTextField.text.Length,
+                m_SearchStringTextField.text.Length
+            );
         }
 
         void UpdateControls()

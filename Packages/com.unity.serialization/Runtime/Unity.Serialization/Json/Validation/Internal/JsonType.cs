@@ -23,6 +23,6 @@ namespace Unity.Serialization.Json
         EOF = 1 << 15,
 
         // Any value type
-        Value = BeginObject | BeginArray | String | Number | Negative | NaN | Infinity | True | False | Null
+        Value = BeginObject | BeginArray | String | Number | Negative | NaN | Infinity | True | False | Null,
     }
 }

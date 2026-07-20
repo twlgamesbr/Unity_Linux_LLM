@@ -26,16 +26,20 @@ namespace UnityEngine.Rendering.Universal
 
             if (material == null)
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorMaterials>(out var defaultMaterials))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineEditorMaterials>(
+                        out var defaultMaterials
+                    )
+                )
                 {
                     return materialType switch
                     {
-                      DefaultMaterialType.Default => defaultMaterials.defaultMaterial,
-                      DefaultMaterialType.Particle => defaultMaterials.defaultParticleUnlitMaterial,
-                      DefaultMaterialType.Terrain => defaultMaterials.defaultTerrainLitMaterial,
-                      DefaultMaterialType.Decal => defaultMaterials.defaultDecalMaterial,
-                      DefaultMaterialType.Sprite => defaultMaterials.defaultSpriteMaterial,
-                      _ => null
+                        DefaultMaterialType.Default => defaultMaterials.defaultMaterial,
+                        DefaultMaterialType.Particle => defaultMaterials.defaultParticleUnlitMaterial,
+                        DefaultMaterialType.Terrain => defaultMaterials.defaultTerrainLitMaterial,
+                        DefaultMaterialType.Decal => defaultMaterials.defaultDecalMaterial,
+                        DefaultMaterialType.Sprite => defaultMaterials.defaultSpriteMaterial,
+                        _ => null,
                     };
                 }
             }
@@ -143,8 +147,11 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                        out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     return shadersResources.terrainDetailLitShader;
                 }
@@ -160,8 +167,11 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                        out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     return shadersResources.terrainDetailGrassShader;
                 }
@@ -177,8 +187,11 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                if (GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
-                        out var shadersResources))
+                if (
+                    GraphicsSettings.TryGetRenderPipelineSettings<UniversalRenderPipelineRuntimeTerrainShaders>(
+                        out var shadersResources
+                    )
+                )
                 {
                     return shadersResources.terrainDetailGrassBillboardShader;
                 }
@@ -203,7 +216,8 @@ namespace UnityEngine.Rendering.Universal
         /// Returns the Autodesk Interactive transparent shader that this asset uses.
         /// </summary>
         /// <returns>Returns the Autodesk Interactive transparent shader that this asset uses.</returns>
-        public override Shader autodeskInteractiveTransparentShader => defaultShaders?.autodeskInteractiveTransparentShader;
+        public override Shader autodeskInteractiveTransparentShader =>
+            defaultShaders?.autodeskInteractiveTransparentShader;
 
         /// <summary>
         /// Returns the Autodesk Interactive mask shader that this asset uses.

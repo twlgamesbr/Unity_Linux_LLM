@@ -8,7 +8,8 @@ namespace Unity.Scenes
     internal static class EntitiesCacheUtility
     {
         internal const string globalEntitiesDependencyDir = "Assets/GlobalEntitiesDependencies/";
-        internal const string globalEntitySceneDependencyPath = globalEntitiesDependencyDir + "GlobalEntitySceneDependency.asset";
+        internal const string globalEntitySceneDependencyPath =
+            globalEntitiesDependencyDir + "GlobalEntitySceneDependency.asset";
 
         internal static GlobalEntitiesDependency entitySceneDependency;
 
@@ -24,7 +25,9 @@ namespace Unity.Scenes
 
         static void LoadOrCreateGlobalEntitySceneDependency()
         {
-            entitySceneDependency = AssetDatabase.LoadAssetAtPath<GlobalEntitiesDependency>(globalEntitySceneDependencyPath);
+            entitySceneDependency = AssetDatabase.LoadAssetAtPath<GlobalEntitiesDependency>(
+                globalEntitySceneDependencyPath
+            );
 
             if (entitySceneDependency == null)
             {
@@ -34,5 +37,5 @@ namespace Unity.Scenes
             }
         }
     }
-    #endif
+#endif
 }

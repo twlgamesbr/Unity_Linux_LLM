@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Unity.PlatformToolkit
 {
-    abstract internal class AbstractStorageSystem : IGenericStorageSystem
+    internal abstract class AbstractStorageSystem : IGenericStorageSystem
     {
         public abstract Task<IReadOnlyList<string>> EnumerateArchives();
         public abstract Task<IGenericArchive> GetReadOnlyArchive(string name);

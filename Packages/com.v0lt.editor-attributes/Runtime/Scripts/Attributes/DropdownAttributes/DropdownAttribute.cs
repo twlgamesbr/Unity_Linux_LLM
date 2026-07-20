@@ -21,6 +21,7 @@ namespace EditorAttributes
         /// </summary>
         /// <param name="collectionName">The name of the collection for the values set by the dropdown</param>
         /// <param name="displayNames">Change the display name for each item inside the dropdown</param>
-        public DropdownAttribute(string collectionName, string[] displayNames) : this(collectionName) => DisplayNames = displayNames;
+        public DropdownAttribute(string collectionName, string[] displayNames)
+            : this(collectionName) => DisplayNames = displayNames;
     }
 }

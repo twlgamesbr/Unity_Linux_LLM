@@ -10,11 +10,7 @@ namespace Unity.Entities.UI
 
         public override VisualElement Build()
         {
-            m_Field = new TextField
-            {
-                label = DisplayName,
-                tooltip = Tooltip
-            };
+            m_Field = new TextField { label = DisplayName, tooltip = Tooltip };
             m_Field.SetValueWithoutNotify(Target.ToString());
             m_Field.SetEnabled(false);
             return m_Field;

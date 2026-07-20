@@ -15,7 +15,7 @@ namespace Unity.Entities.Editor
         {
             Resources.Templates.FoldoutWithActionButton.AddStyles(this);
 
-            var toggleHeader = this.Q<Toggle>(className:"unity-foldout__toggle");
+            var toggleHeader = this.Q<Toggle>(className: "unity-foldout__toggle");
             toggleHeader.AddToClassList(UssClasses.FoldoutWithActionButton.Toggle);
             this.Q(className: "unity-toggle__input").AddToClassList(UssClasses.FoldoutWithActionButton.ToggleInput);
 

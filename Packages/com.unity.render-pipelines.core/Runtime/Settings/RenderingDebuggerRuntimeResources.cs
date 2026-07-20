@@ -20,8 +20,9 @@ namespace UnityEngine.Rendering
             Initial,
 
             Count,
-            Last = Count - 1
+            Last = Count - 1,
         }
+
         [SerializeField, HideInInspector]
         private Version m_version = Version.Last;
         int IRenderPipelineGraphicsSettings.version => (int)m_version;
@@ -39,11 +40,16 @@ namespace UnityEngine.Rendering
             set => this.SetValueAndNotify(ref m_PanelSettings, value, nameof(m_PanelSettings));
         }
 
-        [SerializeField, ResourcePaths(new []
-        {
-            "Runtime/Debugging/Runtime UI Resources/DebugWindowCommon.uss",
-            "Runtime/Debugging/Runtime UI Resources/RuntimeDebugWindow.uss"
-        })]
+        [
+            SerializeField,
+            ResourcePaths(
+                new[]
+                {
+                    "Runtime/Debugging/Runtime UI Resources/DebugWindowCommon.uss",
+                    "Runtime/Debugging/Runtime UI Resources/RuntimeDebugWindow.uss",
+                }
+            )
+        ]
         private StyleSheet[] m_StyleSheets;
 
         /// <summary>StyleSheets for the Rendering Debugger Runtime UI</summary>

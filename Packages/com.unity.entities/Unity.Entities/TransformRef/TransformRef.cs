@@ -9,24 +9,27 @@ namespace Unity.Entities
 {
     [StructLayout(LayoutKind.Sequential)]
     [NativeContainer] // Needed for safety handles to be patched if TransformRef is used in a job struct
-    public unsafe readonly struct TransformRef : IQueryTypeParameter
+    public readonly unsafe struct TransformRef : IQueryTypeParameter
     {
-        readonly internal TransformUnion* m_TransformUnion;
+        internal readonly TransformUnion* m_TransformUnion;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         readonly internal AtomicSafetyHandle m_Safety0;
-        readonly internal AtomicSafetyHandle m_HierarchySafety;
-        readonly internal int m_SafetyReadOnlyCount;
-        readonly internal int m_SafetyReadWriteCount;
+        internal readonly AtomicSafetyHandle m_HierarchySafety;
+        internal readonly int m_SafetyReadOnlyCount;
+        internal readonly int m_SafetyReadWriteCount;
 #endif
         readonly internal byte m_IsReadOnly;
 
         public bool IsValid => m_TransformUnion != null;
 
-
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal TransformRef(TransformUnion* transformUnion, bool isReadOnly,
-            AtomicSafetyHandle safety, AtomicSafetyHandle hierarchySafety)
+        internal TransformRef(
+            TransformUnion* transformUnion,
+            bool isReadOnly,
+            AtomicSafetyHandle safety,
+            AtomicSafetyHandle hierarchySafety
+        )
 #else
         internal TransformRef(TransformUnion* transformUnion, bool isReadOnly)
 #endif
@@ -223,12 +226,24 @@ namespace Unity.Entities
             m_TransformUnion->SetWorldPositionAndRotation(position, rotation);
         }
 
-        internal void SetParent(EntityComponentStore* componentStore, TransformRef newParent, Entity parentEntity, Entity childEntity, bool preserveWorldTransform = true)
+        internal void SetParent(
+            EntityComponentStore* componentStore,
+            TransformRef newParent,
+            Entity parentEntity,
+            Entity childEntity,
+            bool preserveWorldTransform = true
+        )
         {
             CheckWriteAccess();
             if (parentEntity != Entity.Null)
                 newParent.CheckWriteAccess();
-            m_TransformUnion->SetParent(componentStore, newParent.m_TransformUnion, parentEntity, childEntity, preserveWorldTransform);
+            m_TransformUnion->SetParent(
+                componentStore,
+                newParent.m_TransformUnion,
+                parentEntity,
+                childEntity,
+                preserveWorldTransform
+            );
         }
 
         // Do not use. This is only for testing. Implementation will be replaced with access through TransformUnion.

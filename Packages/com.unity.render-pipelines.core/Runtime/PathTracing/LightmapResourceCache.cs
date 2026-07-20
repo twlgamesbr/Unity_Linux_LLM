@@ -28,9 +28,13 @@ namespace UnityEngine.PathTracing.Lightmapping
 
             public bool Equals(UVFallbackBufferKey other) =>
                 width == other.width && height == other.height && meshInstanceID == other.meshInstanceID;
+
             public override bool Equals(object obj) => obj is UVFallbackBufferKey other && Equals(other);
+
             public override int GetHashCode() => HashCode.Combine(width, height, meshInstanceID);
+
             public static bool operator ==(UVFallbackBufferKey left, UVFallbackBufferKey right) => left.Equals(right);
+
             public static bool operator !=(UVFallbackBufferKey left, UVFallbackBufferKey right) => !left.Equals(right);
         }
 
@@ -64,7 +68,11 @@ namespace UnityEngine.PathTracing.Lightmapping
                     return false;
 
                 // UVFallbackBuffer
-                var uvFBKey = new UVFallbackBufferKey(instance.TexelSize.x, instance.TexelSize.y, uvMesh.Mesh.GetEntityId());
+                var uvFBKey = new UVFallbackBufferKey(
+                    instance.TexelSize.x,
+                    instance.TexelSize.y,
+                    uvMesh.Mesh.GetEntityId()
+                );
                 if (!_meshToUVFallbackBuffer.TryGetValue(uvFBKey, out UVFallbackBuffer uvFB))
                     return false;
             }
@@ -75,7 +83,8 @@ namespace UnityEngine.PathTracing.Lightmapping
             BakeInstance[] instances,
             RayTracingContext context,
             CommandBuffer cmd,
-            UVFallbackBufferBuilder uvFallbackBufferBuilder)
+            UVFallbackBufferBuilder uvFallbackBufferBuilder
+        )
         {
             foreach (BakeInstance instance in instances)
             {
@@ -104,16 +113,17 @@ namespace UnityEngine.PathTracing.Lightmapping
                     cmd.EndSample("Build UVAccelerationStructure");
                 }
                 // UVFallbackBuffer
-                var uvFBKey = new UVFallbackBufferKey(instance.TexelSize.x, instance.TexelSize.y, uvMesh.Mesh.GetEntityId());
+                var uvFBKey = new UVFallbackBufferKey(
+                    instance.TexelSize.x,
+                    instance.TexelSize.y,
+                    uvMesh.Mesh.GetEntityId()
+                );
                 if (!_meshToUVFallbackBuffer.TryGetValue(uvFBKey, out UVFallbackBuffer uvFB))
                 {
                     UVFallbackBuffer newUVFB = new();
-                    if (!newUVFB.Build(
-                        cmd,
-                        uvFallbackBufferBuilder,
-                        instance.TexelSize.x,
-                        instance.TexelSize.y,
-                        uvMesh))
+                    if (
+                        !newUVFB.Build(cmd, uvFallbackBufferBuilder, instance.TexelSize.x, instance.TexelSize.y, uvMesh)
+                    )
                     {
                         newUVFB?.Dispose();
                         return false;
@@ -143,7 +153,11 @@ namespace UnityEngine.PathTracing.Lightmapping
                     {
                         uvASToKeep.Add(uvASHash, uvAS);
                         _meshToUVAccelerationStructure.Remove(uvASHash);
-                        var uvFBKey = new UVFallbackBufferKey(instance.TexelSize.x, instance.TexelSize.y, uvMesh.Mesh.GetEntityId());
+                        var uvFBKey = new UVFallbackBufferKey(
+                            instance.TexelSize.x,
+                            instance.TexelSize.y,
+                            uvMesh.Mesh.GetEntityId()
+                        );
                         if (_meshToUVFallbackBuffer.TryGetValue(uvFBKey, out UVFallbackBuffer uvFB))
                         {
                             uvFBToKeep.Add(uvFBKey, uvFB);
@@ -166,7 +180,8 @@ namespace UnityEngine.PathTracing.Lightmapping
             BakeInstance[] instances,
             out UVMesh[] uvMeshes,
             out UVAccelerationStructure[] uvAccelerationStructures,
-            out UVFallbackBuffer[] uvFallbackBuffers)
+            out UVFallbackBuffer[] uvFallbackBuffers
+        )
         {
             List<UVMesh> uvMeshList = new();
             List<UVAccelerationStructure> uvAccelerationStructureList = new();
@@ -184,7 +199,11 @@ namespace UnityEngine.PathTracing.Lightmapping
                 if (!_meshToUVAccelerationStructure.TryGetValue(uvASHash, out UVAccelerationStructure uvAS))
                     return false;
                 uvAccelerationStructureList.Add(uvAS);
-                var uvFBKey = new UVFallbackBufferKey(instance.TexelSize.x, instance.TexelSize.y, uvMesh.Mesh.GetEntityId());
+                var uvFBKey = new UVFallbackBufferKey(
+                    instance.TexelSize.x,
+                    instance.TexelSize.y,
+                    uvMesh.Mesh.GetEntityId()
+                );
                 if (!_meshToUVFallbackBuffer.TryGetValue(uvFBKey, out UVFallbackBuffer uvFB))
                     return false;
                 uvFallbackBufferList.Add(uvFB);

@@ -7,18 +7,21 @@ using Unity.Profiling;
 
 namespace Unity.Entities
 {
-    [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+    [GenerateTestsForBurstCompatibility(
+        RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+        CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+    )]
     // internal for BurstCompatible test support
-    unsafe internal struct ComponentSafetyHandles
+    internal unsafe struct ComponentSafetyHandles
     {
-        const int                   kMaxTypes = TypeManager.MaximumTypesCount;
+        const int kMaxTypes = TypeManager.MaximumTypesCount;
 
-        ComponentSafetyHandle*      m_ComponentSafetyHandles;
-        ushort                      m_ComponentSafetyHandlesCount;
-        TypeIndex                   EntityTypeIndex;
+        ComponentSafetyHandle* m_ComponentSafetyHandles;
+        ushort m_ComponentSafetyHandlesCount;
+        TypeIndex EntityTypeIndex;
 
-        ushort*                     m_TypeArrayIndices;
-        const ushort                NullTypeIndex = 0xFFFF;
+        ushort* m_TypeArrayIndices;
+        const ushort NullTypeIndex = 0xFFFF;
 
         unsafe struct StaticSafetyIdData
         {
@@ -29,22 +32,46 @@ namespace Unity.Entities
             public int m_StaticSafetyIdForDynamicComponentTypeHandle;
             public int m_StaticSafetyIdForEntityTypeHandle;
         }
-        static readonly SharedStatic<StaticSafetyIdData> m_StaticSafetyIdData = SharedStatic<StaticSafetyIdData>.GetOrCreate<StaticSafetyIdData>();
 
-        static readonly FixedString128Bytes m_CustomDeallocatedErrorMessageBytes = "Attempted to access {5} which has been invalidated by a structural change.";
-        static readonly FixedString128Bytes m_CustomDeallocatedFromJobErrorMessageBytes = "Attempted to access the {5} {3} which has been invalidated by a structural change.";
+        static readonly SharedStatic<StaticSafetyIdData> m_StaticSafetyIdData =
+            SharedStatic<StaticSafetyIdData>.GetOrCreate<StaticSafetyIdData>();
 
-        public void SetCustomErrorMessage(int staticSafetyId, AtomicSafetyErrorType errorType, FixedString128Bytes messageBytes)
+        static readonly FixedString128Bytes m_CustomDeallocatedErrorMessageBytes =
+            "Attempted to access {5} which has been invalidated by a structural change.";
+        static readonly FixedString128Bytes m_CustomDeallocatedFromJobErrorMessageBytes =
+            "Attempted to access the {5} {3} which has been invalidated by a structural change.";
+
+        public void SetCustomErrorMessage(
+            int staticSafetyId,
+            AtomicSafetyErrorType errorType,
+            FixedString128Bytes messageBytes
+        )
         {
-            AtomicSafetyHandle.SetCustomErrorMessage(staticSafetyId, errorType, messageBytes.GetUnsafePtr(), messageBytes.Length);
+            AtomicSafetyHandle.SetCustomErrorMessage(
+                staticSafetyId,
+                errorType,
+                messageBytes.GetUnsafePtr(),
+                messageBytes.Length
+            );
         }
 
         int CreateStaticSafetyId(FixedString512Bytes ownerTypeName)
         {
-            int staticSafetyId = AtomicSafetyHandle.NewStaticSafetyId(ownerTypeName.GetUnsafePtr(), ownerTypeName.Length);
+            int staticSafetyId = AtomicSafetyHandle.NewStaticSafetyId(
+                ownerTypeName.GetUnsafePtr(),
+                ownerTypeName.Length
+            );
 
-            SetCustomErrorMessage(staticSafetyId, AtomicSafetyErrorType.Deallocated, m_CustomDeallocatedErrorMessageBytes);
-            SetCustomErrorMessage(staticSafetyId, AtomicSafetyErrorType.DeallocatedFromJob, m_CustomDeallocatedFromJobErrorMessageBytes);
+            SetCustomErrorMessage(
+                staticSafetyId,
+                AtomicSafetyErrorType.Deallocated,
+                m_CustomDeallocatedErrorMessageBytes
+            );
+            SetCustomErrorMessage(
+                staticSafetyId,
+                AtomicSafetyErrorType.DeallocatedFromJob,
+                m_CustomDeallocatedFromJobErrorMessageBytes
+            );
 
             return staticSafetyId;
         }
@@ -57,8 +84,7 @@ namespace Unity.Entities
                 if (typeIndex.IsBuffer)
                 {
                     m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup[typeIndexWithoutFlags] =
-                        CreateStaticSafetyId(
-                            $"BufferLookup<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
+                        CreateStaticSafetyId($"BufferLookup<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
                 }
                 else if (typeIndex.IsTransform)
                 {
@@ -68,8 +94,7 @@ namespace Unity.Entities
                 else
                 {
                     m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup[typeIndexWithoutFlags] =
-                        CreateStaticSafetyId(
-                            $"ComponentLookup<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
+                        CreateStaticSafetyId($"ComponentLookup<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
                 }
             }
             if (m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays[typeIndexWithoutFlags] == 0)
@@ -77,8 +102,7 @@ namespace Unity.Entities
                 if (typeIndex.IsBuffer)
                 {
                     m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays[typeIndexWithoutFlags] =
-                        CreateStaticSafetyId(
-                            $"BufferTypeHandle<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
+                        CreateStaticSafetyId($"BufferTypeHandle<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
                 }
                 else if (typeIndex.IsTransform)
                 {
@@ -89,18 +113,24 @@ namespace Unity.Entities
                 {
                     m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays[typeIndexWithoutFlags] =
                         CreateStaticSafetyId(
-                            $"SharedComponentTypeHandle<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
+                            $"SharedComponentTypeHandle<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>"
+                        );
                 }
                 else
                 {
                     m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays[typeIndexWithoutFlags] =
                         CreateStaticSafetyId(
-                            $"ComponentTypeHandle<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>");
+                            $"ComponentTypeHandle<{TypeManager.GetTypeInfo(typeIndex).DebugTypeName}>"
+                        );
                 }
             }
         }
 
-        private void SetStaticSafetyIdForHandle_ArchetypeChunk(ref AtomicSafetyHandle handle, TypeIndex typeIndex, DynamicComponentTypeHandleType dynamicType)
+        private void SetStaticSafetyIdForHandle_ArchetypeChunk(
+            ref AtomicSafetyHandle handle,
+            TypeIndex typeIndex,
+            DynamicComponentTypeHandleType dynamicType
+        )
         {
             // Configure safety handle static safety ID for ArchetypeChunk*Type by default
             int staticSafetyId = 0;
@@ -134,17 +164,37 @@ namespace Unity.Entities
             m_ComponentSafetyHandles[arrayIndex].TypeIndex = typeIndex;
 
             m_ComponentSafetyHandles[arrayIndex].SafetyHandle = AtomicSafetyHandle.Create();
-            AtomicSafetyHandle.SetAllowSecondaryVersionWriting(m_ComponentSafetyHandles[arrayIndex].SafetyHandle, false);
-            AtomicSafetyHandle.SetNestedContainer(m_ComponentSafetyHandles[arrayIndex].SafetyHandle, typeIndex.HasNativeContainer);
+            AtomicSafetyHandle.SetAllowSecondaryVersionWriting(
+                m_ComponentSafetyHandles[arrayIndex].SafetyHandle,
+                false
+            );
+            AtomicSafetyHandle.SetNestedContainer(
+                m_ComponentSafetyHandles[arrayIndex].SafetyHandle,
+                typeIndex.HasNativeContainer
+            );
             m_ComponentSafetyHandles[arrayIndex].BufferHandle = AtomicSafetyHandle.Create();
-            AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_ComponentSafetyHandles[arrayIndex].BufferHandle, true);
-            AtomicSafetyHandle.SetNestedContainer(m_ComponentSafetyHandles[arrayIndex].BufferHandle, typeIndex.HasNativeContainer);
+            AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(
+                m_ComponentSafetyHandles[arrayIndex].BufferHandle,
+                true
+            );
+            AtomicSafetyHandle.SetNestedContainer(
+                m_ComponentSafetyHandles[arrayIndex].BufferHandle,
+                typeIndex.HasNativeContainer
+            );
 
             // Create static safety IDs for this type if they don't already exist.
             CreateStaticSafetyIdsForType(typeIndex);
             // Set default static safety IDs for handles
-            SetStaticSafetyIdForHandle_ArchetypeChunk(ref m_ComponentSafetyHandles[arrayIndex].SafetyHandle, typeIndex, DynamicComponentTypeHandleType.None);
-            SetStaticSafetyIdForHandle_ArchetypeChunk(ref m_ComponentSafetyHandles[arrayIndex].BufferHandle, typeIndex, DynamicComponentTypeHandleType.None);
+            SetStaticSafetyIdForHandle_ArchetypeChunk(
+                ref m_ComponentSafetyHandles[arrayIndex].SafetyHandle,
+                typeIndex,
+                DynamicComponentTypeHandleType.None
+            );
+            SetStaticSafetyIdForHandle_ArchetypeChunk(
+                ref m_ComponentSafetyHandles[arrayIndex].BufferHandle,
+                typeIndex,
+                DynamicComponentTypeHandleType.None
+            );
             return arrayIndex;
         }
 
@@ -157,10 +207,12 @@ namespace Unity.Entities
 
         public void OnCreate()
         {
-            m_TypeArrayIndices = (ushort*)Memory.Unmanaged.Allocate(sizeof(ushort) * kMaxTypes, 16, Allocator.Persistent);
+            m_TypeArrayIndices = (ushort*)
+                Memory.Unmanaged.Allocate(sizeof(ushort) * kMaxTypes, 16, Allocator.Persistent);
             UnsafeUtility.MemSet(m_TypeArrayIndices, 0xFF, sizeof(ushort) * kMaxTypes);
 
-            m_ComponentSafetyHandles = (ComponentSafetyHandle*)Memory.Unmanaged.Allocate(sizeof(ComponentSafetyHandle) * kMaxTypes, 16, Allocator.Persistent);
+            m_ComponentSafetyHandles = (ComponentSafetyHandle*)
+                Memory.Unmanaged.Allocate(sizeof(ComponentSafetyHandle) * kMaxTypes, 16, Allocator.Persistent);
             UnsafeUtility.MemClear(m_ComponentSafetyHandles, sizeof(ComponentSafetyHandle) * kMaxTypes);
 
             m_TempSafety = AtomicSafetyHandle.Create();
@@ -169,34 +221,53 @@ namespace Unity.Entities
 
             m_InvalidateArraysMarker = new ProfilerMarker("InvalidateArrays");
 
-            m_StaticSafetyIdData.Data.m_StaticSafetyIdForDynamicComponentTypeHandle = CreateStaticSafetyId("Unity.Entities.DynamicComponentTypeHandle");
-            m_StaticSafetyIdData.Data.m_StaticSafetyIdForDynamicSharedComponentTypeHandle = CreateStaticSafetyId("Unity.Entities.DynamicSharedComponentTypeHandle");
-            m_StaticSafetyIdData.Data.m_StaticSafetyIdForEntityTypeHandle = CreateStaticSafetyId("Unity.Entities.EntityTypeHandle");
+            m_StaticSafetyIdData.Data.m_StaticSafetyIdForDynamicComponentTypeHandle = CreateStaticSafetyId(
+                "Unity.Entities.DynamicComponentTypeHandle"
+            );
+            m_StaticSafetyIdData.Data.m_StaticSafetyIdForDynamicSharedComponentTypeHandle = CreateStaticSafetyId(
+                "Unity.Entities.DynamicSharedComponentTypeHandle"
+            );
+            m_StaticSafetyIdData.Data.m_StaticSafetyIdForEntityTypeHandle = CreateStaticSafetyId(
+                "Unity.Entities.EntityTypeHandle"
+            );
         }
 
         static bool s_Initialized;
         private static bool s_AppDomainUnloadRegistered;
+
         [ExcludeFromBurstCompatTesting("Uses managed delegates")]
         public static void Initialize()
         {
             if (s_Initialized)
                 return;
             s_Initialized = true;
-            m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup =
-                (int*)Memory.Unmanaged.Allocate(sizeof(int) * kMaxTypes, 16, Allocator.Persistent);
-            UnsafeUtility.MemClear(m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup, sizeof(int) * kMaxTypes);
-            m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays =
-                (int*)Memory.Unmanaged.Allocate(sizeof(int) * kMaxTypes, 16, Allocator.Persistent);
-            UnsafeUtility.MemClear(m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays, sizeof(int) * kMaxTypes);
+            m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup = (int*)
+                Memory.Unmanaged.Allocate(sizeof(int) * kMaxTypes, 16, Allocator.Persistent);
+            UnsafeUtility.MemClear(
+                m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup,
+                sizeof(int) * kMaxTypes
+            );
+            m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays = (int*)
+                Memory.Unmanaged.Allocate(sizeof(int) * kMaxTypes, 16, Allocator.Persistent);
+            UnsafeUtility.MemClear(
+                m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays,
+                sizeof(int) * kMaxTypes
+            );
 
             if (!s_AppDomainUnloadRegistered)
             {
                 // important: this will always be called from a special unload thread (main thread will be blocking on this)
 #pragma warning disable UAC0006
-                System.AppDomain.CurrentDomain.DomainUnload += (_, __) => { Shutdown(); };
+                System.AppDomain.CurrentDomain.DomainUnload += (_, __) =>
+                {
+                    Shutdown();
+                };
 
                 // There is no domain unload in player builds, so we must be sure to shutdown when the process exits.
-                System.AppDomain.CurrentDomain.ProcessExit += (_, __) => { Shutdown(); };
+                System.AppDomain.CurrentDomain.ProcessExit += (_, __) =>
+                {
+                    Shutdown();
+                };
 #pragma warning restore UAC0006
                 s_AppDomainUnloadRegistered = true;
             }
@@ -206,8 +277,14 @@ namespace Unity.Entities
         {
             if (s_Initialized)
             {
-                Memory.Unmanaged.Free(m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup, Allocator.Persistent);
-                Memory.Unmanaged.Free(m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays, Allocator.Persistent);
+                Memory.Unmanaged.Free(
+                    m_StaticSafetyIdData.Data.m_StaticSafetyIdsForComponentLookup,
+                    Allocator.Persistent
+                );
+                Memory.Unmanaged.Free(
+                    m_StaticSafetyIdData.Data.m_StaticSafetyIdsForArchetypeChunkArrays,
+                    Allocator.Persistent
+                );
                 s_Initialized = false;
             }
         }
@@ -250,12 +327,17 @@ namespace Unity.Entities
         {
             for (var i = 0; i < m_ComponentSafetyHandlesCount; i++)
             {
-                var res0 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompletedAndRelease(m_ComponentSafetyHandles[i].SafetyHandle);
-                var res1 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompletedAndRelease(m_ComponentSafetyHandles[i].BufferHandle);
+                var res0 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompletedAndRelease(
+                    m_ComponentSafetyHandles[i].SafetyHandle
+                );
+                var res1 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompletedAndRelease(
+                    m_ComponentSafetyHandles[i].BufferHandle
+                );
 
                 if (res0 == EnforceJobResult.DidSyncRunningJobs || res1 == EnforceJobResult.DidSyncRunningJobs)
                     Debug.LogError(
-                        "Disposing EntityManager but a job is still running against the ComponentData. It appears the job has not been registered with SystemBase.AddDependency.");
+                        "Disposing EntityManager but a job is still running against the ComponentData. It appears the job has not been registered with SystemBase.AddDependency."
+                    );
             }
 
             AtomicSafetyHandle.Release(m_TempSafety);
@@ -269,8 +351,12 @@ namespace Unity.Entities
         {
             for (var i = 0; i < m_ComponentSafetyHandlesCount; i++)
             {
-                var res0 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(m_ComponentSafetyHandles[i].SafetyHandle);
-                var res1 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(m_ComponentSafetyHandles[i].BufferHandle);
+                var res0 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(
+                    m_ComponentSafetyHandles[i].SafetyHandle
+                );
+                var res1 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(
+                    m_ComponentSafetyHandles[i].BufferHandle
+                );
             }
         }
 
@@ -278,11 +364,16 @@ namespace Unity.Entities
         {
             for (var i = 0; i < m_ComponentSafetyHandlesCount; i++)
             {
-                var res0 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(m_ComponentSafetyHandles[i].SafetyHandle);
-                var res1 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(m_ComponentSafetyHandles[i].BufferHandle);
+                var res0 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(
+                    m_ComponentSafetyHandles[i].SafetyHandle
+                );
+                var res1 = AtomicSafetyHandle.EnforceAllBufferJobsHaveCompleted(
+                    m_ComponentSafetyHandles[i].BufferHandle
+                );
                 if (res0 == EnforceJobResult.DidSyncRunningJobs || res1 == EnforceJobResult.DidSyncRunningJobs)
                     Debug.LogError(
-                        "Disposing EntityManager but a job is still running against the ComponentData. It appears the job has not been registered with SystemBase.AddDependency.");
+                        "Disposing EntityManager but a job is still running against the ComponentData. It appears the job has not been registered with SystemBase.AddDependency."
+                    );
             }
         }
 
@@ -341,7 +432,7 @@ namespace Unity.Entities
         {
             None,
             Dynamic,
-            DynamicShared
+            DynamicShared,
         }
 
         public AtomicSafetyHandle GetSafetyHandleForDynamicComponentTypeHandle(TypeIndex type, bool isReadOnly)
@@ -438,7 +529,7 @@ namespace Unity.Entities
         {
             public AtomicSafetyHandle SafetyHandle;
             public AtomicSafetyHandle BufferHandle;
-            public TypeIndex          TypeIndex;
+            public TypeIndex TypeIndex;
         }
 
         AtomicSafetyHandle m_TempSafety;

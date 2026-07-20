@@ -15,7 +15,8 @@ namespace Unity.Netcode
         // Only gets deserialized but should never be used unless testing
         public int RemoteClientSessionVersion;
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             // Clients always write
             if (serializer.IsWriter)
@@ -37,7 +38,8 @@ namespace Unity.Netcode
 
     internal struct ConnectionRequestMessage : INetworkMessage
     {
-        internal const string InvalidSessionVersionMessage = "The client version is not compatible with the session version.";
+        internal const string InvalidSessionVersionMessage =
+            "The client version is not compatible with the session version.";
 
         // This version update is unidirectional (client to service) and version
         // handling occurs on the service side. This serialized data is never sent
@@ -105,11 +107,17 @@ namespace Unity.Netcode
             {
                 var messageVersion = new MessageVersionData();
                 messageVersion.Deserialize(reader);
-                networkManager.ConnectionManager.MessageManager.SetVersion(context.SenderId, messageVersion.Hash, messageVersion.Version);
+                networkManager.ConnectionManager.MessageManager.SetVersion(
+                    context.SenderId,
+                    messageVersion.Hash,
+                    messageVersion.Version
+                );
 
                 // Update the received version since this message will always be passed version 0, due to the map not
                 // being initialized until just now.
-                var messageType = networkManager.ConnectionManager.MessageManager.GetMessageForHash(messageVersion.Hash);
+                var messageType = networkManager.ConnectionManager.MessageManager.GetMessageForHash(
+                    messageVersion.Hash
+                );
                 if (messageType == typeof(ConnectionRequestMessage))
                 {
                     receivedMessageVersion = messageVersion.Version;
@@ -126,11 +134,17 @@ namespace Unity.Netcode
 
             if (networkManager.NetworkConfig.ConnectionApproval)
             {
-                if (!reader.TryBeginRead(FastBufferWriter.GetWriteSize(ConfigHash) + FastBufferWriter.GetWriteSize<int>()))
+                if (
+                    !reader.TryBeginRead(
+                        FastBufferWriter.GetWriteSize(ConfigHash) + FastBufferWriter.GetWriteSize<int>()
+                    )
+                )
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"Incomplete connection request message given config - possible {nameof(NetworkConfig)} mismatch.");
+                        NetworkLog.LogWarning(
+                            $"Incomplete connection request message given config - possible {nameof(NetworkConfig)} mismatch."
+                        );
                     }
 
                     networkManager.DisconnectClient(context.SenderId);
@@ -143,7 +157,9 @@ namespace Unity.Netcode
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"{nameof(NetworkConfig)} mismatch. The configuration between the server and client does not match");
+                        NetworkLog.LogWarning(
+                            $"{nameof(NetworkConfig)} mismatch. The configuration between the server and client does not match"
+                        );
                     }
 
                     networkManager.DisconnectClient(context.SenderId);
@@ -170,7 +186,9 @@ namespace Unity.Netcode
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"{nameof(NetworkConfig)} mismatch. The configuration between the server and client does not match");
+                        NetworkLog.LogWarning(
+                            $"{nameof(NetworkConfig)} mismatch. The configuration between the server and client does not match"
+                        );
                     }
 
                     networkManager.DisconnectClient(context.SenderId);

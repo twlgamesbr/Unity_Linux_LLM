@@ -21,7 +21,7 @@ namespace UnityEngine.TestTools
 
         public IEnumerable ExecuteEnumerable(ITestExecutionContext context)
         {
-            var unityContext = (UnityTestExecutionContext) context;
+            var unityContext = (UnityTestExecutionContext)context;
             yield return null;
 
             IEnumerator currentExecutingTestEnumerator;
@@ -43,7 +43,11 @@ namespace UnityEngine.TestTools
 
                 var enumerator = testEnumeraterYieldInstruction.Execute();
 
-                var executingEnumerator = ExecuteEnumerableAndRecordExceptions(enumerator, new EnumeratorContext(context), unityContext);
+                var executingEnumerator = ExecuteEnumerableAndRecordExceptions(
+                    enumerator,
+                    new EnumeratorContext(context),
+                    unityContext
+                );
                 while (AdvanceEnumerator(executingEnumerator))
                 {
                     yield return executingEnumerator.Current;
@@ -64,7 +68,11 @@ namespace UnityEngine.TestTools
                 return enumerator.MoveNext();
         }
 
-        private IEnumerator ExecuteEnumerableAndRecordExceptions(IEnumerator enumerator, EnumeratorContext context, UnityTestExecutionContext unityContext)
+        private IEnumerator ExecuteEnumerableAndRecordExceptions(
+            IEnumerator enumerator,
+            EnumeratorContext context,
+            UnityTestExecutionContext unityContext
+        )
         {
             while (true)
             {
@@ -83,9 +91,14 @@ namespace UnityEngine.TestTools
                 try
                 {
                     executionDone = !enumerator.MoveNext();
-                    if (unityContext.TestMode == TestPlatform.PlayMode && enumerator.Current is IEditModeTestYieldInstruction)
+                    if (
+                        unityContext.TestMode == TestPlatform.PlayMode
+                        && enumerator.Current is IEditModeTestYieldInstruction
+                    )
                     {
-                        throw new Exception($"PlayMode test are not allowed to yield {enumerator.Current.GetType().Name}");
+                        throw new Exception(
+                            $"PlayMode test are not allowed to yield {enumerator.Current.GetType().Name}"
+                        );
                     }
                 }
                 catch (Exception ex)
@@ -96,7 +109,9 @@ namespace UnityEngine.TestTools
 
                 if (unityContext.HasTimedOut())
                 {
-                    unityContext.CurrentResult.RecordException(new UnityTestTimeoutException(unityContext.TestCaseTimeout));
+                    unityContext.CurrentResult.RecordException(
+                        new UnityTestTimeoutException(unityContext.TestCaseTimeout)
+                    );
                     yield return new RestoreTestContextAfterDomainReload(); // If this is right after a domain reload, give the editor a chance to restore.
                     yield break;
                 }
@@ -125,11 +140,7 @@ namespace UnityEngine.TestTools
                 m_Context = context;
             }
 
-            public bool ExceptionWasRecorded
-            {
-                get;
-                private set;
-            }
+            public bool ExceptionWasRecorded { get; private set; }
 
             public void RecordExceptionWithHint(Exception ex)
             {

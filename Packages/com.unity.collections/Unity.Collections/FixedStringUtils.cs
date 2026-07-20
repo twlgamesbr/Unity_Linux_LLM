@@ -31,13 +31,14 @@ namespace Unity.Collections
     }
 
     [GenerateTestsForBurstCompatibility]
-    internal unsafe static class FixedStringUtils
+    internal static unsafe class FixedStringUtils
     {
         [StructLayout(LayoutKind.Explicit)]
         internal struct UintFloatUnion
         {
             [FieldOffset(0)]
             public uint uintValue;
+
             [FieldOffset(0)]
             public float floatValue;
         }

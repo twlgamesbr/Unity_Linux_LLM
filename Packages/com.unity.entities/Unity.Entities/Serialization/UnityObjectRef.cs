@@ -68,11 +68,11 @@ namespace Unity.Entities
         }
 #endif
 
-        unsafe class ManagedUnityObjectRefCollector:
-            Properties.IPropertyBagVisitor,
-            Properties.IPropertyVisitor,
-            ITypedVisit<UntypedUnityObjectRef>,
-            IDisposable
+        unsafe class ManagedUnityObjectRefCollector
+            : Properties.IPropertyBagVisitor,
+                Properties.IPropertyVisitor,
+                ITypedVisit<UntypedUnityObjectRef>,
+                IDisposable
         {
             UnsafeHashSet<EntityId>* m_EntityIdRefs;
 
@@ -92,14 +92,19 @@ namespace Unity.Entities
                 GetPropertyBag(obj).Accept(this, ref obj);
             }
 
-            void Properties.IPropertyBagVisitor.Visit<TContainer>(Properties.IPropertyBag<TContainer> properties, ref TContainer container)
+            void Properties.IPropertyBagVisitor.Visit<TContainer>(
+                Properties.IPropertyBag<TContainer> properties,
+                ref TContainer container
+            )
             {
                 foreach (var property in properties.GetProperties(ref container))
                     ((Properties.IPropertyAccept<TContainer>)property).Accept(this, ref container);
             }
 
-            void Properties.IPropertyVisitor.Visit<TContainer, TValue>(Properties.Property<TContainer, TValue> property,
-                ref TContainer container)
+            void Properties.IPropertyVisitor.Visit<TContainer, TValue>(
+                Properties.Property<TContainer, TValue> property,
+                ref TContainer container
+            )
             {
                 if (Properties.TypeTraits<TValue>.CanBeNull || !Properties.TypeTraits<TValue>.IsValueType)
                     return;
@@ -115,7 +120,11 @@ namespace Unity.Entities
                 Properties.PropertyContainer.Accept(this, ref value);
             }
 
-            void ITypedVisit<UntypedUnityObjectRef>.Visit<TContainer>(Properties.Property<TContainer, UntypedUnityObjectRef> property, ref TContainer container, ref UntypedUnityObjectRef value)
+            void ITypedVisit<UntypedUnityObjectRef>.Visit<TContainer>(
+                Properties.Property<TContainer, UntypedUnityObjectRef> property,
+                ref TContainer container,
+                ref UntypedUnityObjectRef value
+            )
             {
                 m_EntityIdRefs->Add(value.entityId);
             }
@@ -123,7 +132,12 @@ namespace Unity.Entities
             public void Dispose() { }
         }
 
-        private static unsafe void AddInstanceIDRefsFromComponent(byte* componentData, TypeManager.EntityOffsetInfo* unityObjectRefOffsets, int unityObjectRefCount, UnsafeHashSet<EntityId>* entityIdRefs)
+        private static unsafe void AddInstanceIDRefsFromComponent(
+            byte* componentData,
+            TypeManager.EntityOffsetInfo* unityObjectRefOffsets,
+            int unityObjectRefCount,
+            UnsafeHashSet<EntityId>* entityIdRefs
+        )
         {
             for (int i = 0; i < unityObjectRefCount; ++i)
             {
@@ -133,15 +147,23 @@ namespace Unity.Entities
             }
         }
 
-        static unsafe void AddInstanceIDRefsFromChunk(Archetype* archetype, int entityCount, byte* chunkBuffer, UnsafeHashSet<EntityId>* entityIdRefs)
+        static unsafe void AddInstanceIDRefsFromChunk(
+            Archetype* archetype,
+            int entityCount,
+            byte* chunkBuffer,
+            UnsafeHashSet<EntityId>* entityIdRefs
+        )
         {
             var typeCount = archetype->TypesCount;
 
             // This loop only cares about non-zero-sized unmanaged components and buffer components.
-            for(int ti=1,tiEnd=archetype->BufferComponentsEnd; ti<tiEnd; ++ti)
+            for (int ti = 1, tiEnd = archetype->BufferComponentsEnd; ti < tiEnd; ++ti)
             {
                 var type = archetype->Types[ti];
-                if (type.TypeIndex == ManagedComponentStore.CompanionLinkTypeIndex || type.TypeIndex == ManagedComponentStore.CompanionLinkTransformTypeIndex)
+                if (
+                    type.TypeIndex == ManagedComponentStore.CompanionLinkTypeIndex
+                    || type.TypeIndex == ManagedComponentStore.CompanionLinkTransformTypeIndex
+                )
                     continue;
 
                 ref readonly var ct = ref TypeManager.GetTypeInfo(type.TypeIndex);
@@ -166,7 +188,12 @@ namespace Unity.Entities
                         var bufferEnd = bufferStart + header->Length * elementSize;
                         for (var componentData = bufferStart; componentData < bufferEnd; componentData += elementSize)
                         {
-                            AddInstanceIDRefsFromComponent(componentData, unityObjectRefOffsets,unityObjectRefCount, entityIdRefs);
+                            AddInstanceIDRefsFromComponent(
+                                componentData,
+                                unityObjectRefOffsets,
+                                unityObjectRefCount,
+                                entityIdRefs
+                            );
                         }
 
                         header = (BufferHeader*)((byte*)header + strideSize);
@@ -178,7 +205,12 @@ namespace Unity.Entities
                     byte* end = componentArrayStart + size * entityCount;
                     for (var componentData = componentArrayStart; componentData < end; componentData += size)
                     {
-                        AddInstanceIDRefsFromComponent(componentData, unityObjectRefOffsets, unityObjectRefCount, entityIdRefs);
+                        AddInstanceIDRefsFromComponent(
+                            componentData,
+                            unityObjectRefOffsets,
+                            unityObjectRefCount,
+                            entityIdRefs
+                        );
                     }
                 }
             }
@@ -196,7 +228,11 @@ namespace Unity.Entities
             }
         }
 
-        static unsafe void AddInstanceIDRefsFromUnmanagedSharedComponents(EntityDataAccess* access, Archetype* archetype, UnsafeHashSet<EntityId>* entityIdRefs)
+        static unsafe void AddInstanceIDRefsFromUnmanagedSharedComponents(
+            EntityDataAccess* access,
+            Archetype* archetype,
+            UnsafeHashSet<EntityId>* entityIdRefs
+        )
         {
             int numSharedComponents = archetype->NumSharedComponents;
             for (int iType = 0; iType < numSharedComponents; iType++)
@@ -209,7 +245,9 @@ namespace Unity.Entities
 
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                     {
-                        var typeIndex = EntityComponentStore.GetComponentTypeFromSharedComponentIndex(sharedComponentIndex);
+                        var typeIndex = EntityComponentStore.GetComponentTypeFromSharedComponentIndex(
+                            sharedComponentIndex
+                        );
                         ref readonly var typeInfo = ref TypeManager.GetTypeInfo(typeIndex);
 
                         var unityObjectRefCount = typeInfo.UnityObjectRefOffsetCount;
@@ -217,15 +255,27 @@ namespace Unity.Entities
                             continue;
 
                         var unityObjectRefOffsets = TypeManager.GetUnityObjectRefOffsets(typeInfo);
-                        var dataPtr = (byte*)access->EntityComponentStore->GetSharedComponentDataAddr_Unmanaged(sharedComponentIndex, typeIndex);
-                        AddInstanceIDRefsFromComponent(dataPtr, unityObjectRefOffsets, unityObjectRefCount, entityIdRefs);
+                        var dataPtr = (byte*)
+                            access->EntityComponentStore->GetSharedComponentDataAddr_Unmanaged(
+                                sharedComponentIndex,
+                                typeIndex
+                            );
+                        AddInstanceIDRefsFromComponent(
+                            dataPtr,
+                            unityObjectRefOffsets,
+                            unityObjectRefCount,
+                            entityIdRefs
+                        );
                     }
                 }
             }
         }
 
 #if !UNITY_DISABLE_MANAGED_COMPONENTS
-        static unsafe void AddInstanceIDRefsFromManagedComponents(EntityDataAccess* access, UnsafeHashSet<EntityId>* entityIdRefs)
+        static unsafe void AddInstanceIDRefsFromManagedComponents(
+            EntityDataAccess* access,
+            UnsafeHashSet<EntityId>* entityIdRefs
+        )
         {
             using var managedObjectRefWalker = new ManagedUnityObjectRefCollector(entityIdRefs);
 
@@ -237,9 +287,14 @@ namespace Unity.Entities
                 if (managedComponent == null)
                     continue;
 
-                ref readonly var typeInfo = ref TypeManager.GetTypeInfo(TypeManager.GetTypeIndex(managedComponent.GetType()));
+                ref readonly var typeInfo = ref TypeManager.GetTypeInfo(
+                    TypeManager.GetTypeIndex(managedComponent.GetType())
+                );
 
-                if (!typeInfo.HasUnityObjectRefs || typeInfo.TypeIndex == ManagedComponentStore.CompanionReferenceTypeIndex )
+                if (
+                    !typeInfo.HasUnityObjectRefs
+                    || typeInfo.TypeIndex == ManagedComponentStore.CompanionReferenceTypeIndex
+                )
                     continue;
 
                 managedObjectRefWalker.CollectReferences(ref managedComponent);
@@ -255,7 +310,9 @@ namespace Unity.Entities
                 if (managedSharedComponent == null)
                     continue;
 
-                ref readonly var typeInfo = ref TypeManager.GetTypeInfo(TypeManager.GetTypeIndex(managedSharedComponent.GetType()));
+                ref readonly var typeInfo = ref TypeManager.GetTypeInfo(
+                    TypeManager.GetTypeIndex(managedSharedComponent.GetType())
+                );
 
                 if (!typeInfo.HasUnityObjectRefs)
                     continue;
@@ -267,11 +324,16 @@ namespace Unity.Entities
 #endif
 
         private static ProfilerMarker s_AddFromChunks = new ProfilerMarker("AddFromChunks");
-        private static ProfilerMarker s_AddFromUnmanagedSharedComponents = new ProfilerMarker("AddFromUnmanagaedSharedComponents");
+        private static ProfilerMarker s_AddFromUnmanagedSharedComponents = new ProfilerMarker(
+            "AddFromUnmanagaedSharedComponents"
+        );
         private static ProfilerMarker s_AddFromManagedComponents = new ProfilerMarker("AddFromManagedComponents");
-        private static ProfilerMarker s_AddFromManagedSharedComponents = new ProfilerMarker("AddFromManagedSharedComponents");
+        private static ProfilerMarker s_AddFromManagedSharedComponents = new ProfilerMarker(
+            "AddFromManagedSharedComponents"
+        );
 
-        private static List<ResourcesAPIInternal.EntitiesAssetGC.AdditionalRootsHandlerDelegate> s_AdditionalRootsHandlerDelegates = new List<ResourcesAPIInternal.EntitiesAssetGC.AdditionalRootsHandlerDelegate>();
+        private static List<ResourcesAPIInternal.EntitiesAssetGC.AdditionalRootsHandlerDelegate> s_AdditionalRootsHandlerDelegates =
+            new List<ResourcesAPIInternal.EntitiesAssetGC.AdditionalRootsHandlerDelegate>();
 
         static unsafe void RootsHandlerDelegate(IntPtr state)
         {
@@ -298,9 +360,9 @@ namespace Unity.Entities
                     s_AddFromUnmanagedSharedComponents.Begin();
                     AddInstanceIDRefsFromUnmanagedSharedComponents(access, archetype, &entityIdRefs);
                     s_AddFromUnmanagedSharedComponents.End();
-                    #if !UNITY_DISABLE_MANAGED_COMPONENTS
+#if !UNITY_DISABLE_MANAGED_COMPONENTS
                     AddInstanceIDRefsFromManagedComponents(access, &entityIdRefs);
-                    #endif
+#endif
                 }
             }
 
@@ -309,7 +371,11 @@ namespace Unity.Entities
 
             using var instanceIDs = entityIdRefs.ToNativeArray(Allocator.Temp);
 #if (UNITY_2022_3 && UNITY_2022_3_43F1_OR_NEWER) || (UNITY_6000 && UNITY_6000_0_16F1_OR_NEWER)
-            ResourcesAPIInternal.EntitiesAssetGC.MarkInstanceIDsAsRoot((IntPtr)instanceIDs.GetUnsafePtr(), instanceIDs.Length, state);
+            ResourcesAPIInternal.EntitiesAssetGC.MarkInstanceIDsAsRoot(
+                (IntPtr)instanceIDs.GetUnsafePtr(),
+                instanceIDs.Length,
+                state
+            );
 #endif
         }
 
@@ -318,9 +384,9 @@ namespace Unity.Entities
 #endif
         static void EditorInitializeOnLoadMethod()
         {
-            #if (UNITY_2022_3 && UNITY_2022_3_43F1_OR_NEWER) || (UNITY_6000 && UNITY_6000_0_16F1_OR_NEWER)
+#if (UNITY_2022_3 && UNITY_2022_3_43F1_OR_NEWER) || (UNITY_6000 && UNITY_6000_0_16F1_OR_NEWER)
             ResourcesAPIInternal.EntitiesAssetGC.RegisterAdditionalRootsHandler(RootsHandlerDelegate);
-            #endif
+#endif
         }
 
         public static void MarkInstanceIDsAsRootForEntitiesAssetGC(IntPtr instanceIDs, int count, IntPtr state)
@@ -330,7 +396,9 @@ namespace Unity.Entities
 #endif
         }
 
-        public static void RegisterAdditionalRootsHandlerForEntitiesAssetGC(ResourcesAPIInternal.EntitiesAssetGC.AdditionalRootsHandlerDelegate additionalRootsHandlerDelegate)
+        public static void RegisterAdditionalRootsHandlerForEntitiesAssetGC(
+            ResourcesAPIInternal.EntitiesAssetGC.AdditionalRootsHandlerDelegate additionalRootsHandlerDelegate
+        )
         {
             if (additionalRootsHandlerDelegate != null)
                 s_AdditionalRootsHandlerDelegates.Add(additionalRootsHandlerDelegate);
@@ -338,7 +406,11 @@ namespace Unity.Entities
 
         internal static unsafe void MarkInstanceIDsAsRoot(NativeArray<EntityId> unityObjects, IntPtr state)
         {
-            ResourcesAPIInternal.EntitiesAssetGC.MarkInstanceIDsAsRoot((IntPtr)unityObjects.GetUnsafePtr(), unityObjects.Length, state);
+            ResourcesAPIInternal.EntitiesAssetGC.MarkInstanceIDsAsRoot(
+                (IntPtr)unityObjects.GetUnsafePtr(),
+                unityObjects.Length,
+                state
+            );
         }
     }
 
@@ -387,6 +459,7 @@ namespace Unity.Entities
     {
         [SerializeField]
         internal UntypedUnityObjectRef Id;
+
         /// <summary>
         /// Implicitly converts an <see cref="UnityEngine.Object"/> to an <see cref="UnityObjectRef{T}"/>.
         /// </summary>
@@ -401,7 +474,7 @@ namespace Unity.Entities
 
         internal static UnityObjectRef<T> FromInstanceID(EntityId entityId)
         {
-            var result = new UnityObjectRef<T>{Id = new UntypedUnityObjectRef{ entityId = entityId }};
+            var result = new UnityObjectRef<T> { Id = new UntypedUnityObjectRef { entityId = entityId } };
             return result;
         }
 
@@ -414,7 +487,7 @@ namespace Unity.Entities
         {
             if (unityObjectRef.Id.entityId == EntityId.None)
                 return null;
-            return (T) Resources.EntityIdToObject(unityObjectRef.Id.entityId);
+            return (T)Resources.EntityIdToObject(unityObjectRef.Id.entityId);
         }
 
         /// <summary>
@@ -448,7 +521,6 @@ namespace Unity.Entities
         {
             return obj is UnityObjectRef<T> other && Equals(other);
         }
-
 
         /// <summary>
         /// Overload of the 'bool' operator to check for the validity of the instance ID.

@@ -133,7 +133,6 @@ namespace UnityEngine.Rendering
             EditorUtility.SetDirty(this);
         }
 
-
         /// <summary>
         /// Tries to add a lighting scenario to the baking set.
         /// </summary>
@@ -207,7 +206,8 @@ namespace UnityEngine.Rendering
             newSet.skyOcclusionBackFaceCulling = skyOcclusionBackFaceCulling;
             newSet.skyOcclusionShadingDirection = skyOcclusionShadingDirection;
             newSet.useRenderingLayers = useRenderingLayers;
-            newSet.renderingLayerMasks = renderingLayerMasks != null ? (ProbeLayerMask[])renderingLayerMasks.Clone() : null;
+            newSet.renderingLayerMasks =
+                renderingLayerMasks != null ? (ProbeLayerMask[])renderingLayerMasks.Clone() : null;
             newSet.useRenderingLayers = useRenderingLayers;
             newSet.useRenderingLayers = useRenderingLayers;
             newSet.useRenderingLayers = useRenderingLayers;
@@ -222,10 +222,10 @@ namespace UnityEngine.Rendering
         /// <returns>Whether the Probe Reference Volume Profile is equivalent to another one.</returns>
         public bool IsEquivalent(ProbeVolumeBakingSet otherProfile)
         {
-            return minDistanceBetweenProbes == otherProfile.minDistanceBetweenProbes &&
-                cellSizeInMeters == otherProfile.cellSizeInMeters &&
-                simplificationLevels == otherProfile.simplificationLevels &&
-                renderersLayerMask == otherProfile.renderersLayerMask;
+            return minDistanceBetweenProbes == otherProfile.minDistanceBetweenProbes
+                && cellSizeInMeters == otherProfile.cellSizeInMeters
+                && simplificationLevels == otherProfile.simplificationLevels
+                && renderersLayerMask == otherProfile.renderersLayerMask;
         }
 
         internal void Clear()
@@ -299,7 +299,13 @@ namespace UnityEngine.Rendering
                     }
                 }
 
-                GetCellDataFileNames(name, newName, out string cellDataFileName, out string cellOptionalDataFileName, out string cellProbeOcclusionDataFileName);
+                GetCellDataFileNames(
+                    name,
+                    newName,
+                    out string cellDataFileName,
+                    out string cellOptionalDataFileName,
+                    out string cellProbeOcclusionDataFileName
+                );
                 data.cellDataAsset.RenameAsset(cellDataFileName);
                 data.cellOptionalDataAsset.RenameAsset(cellOptionalDataFileName);
                 data.cellProbeOcclusionDataAsset.RenameAsset(cellProbeOcclusionDataFileName);
@@ -310,7 +316,8 @@ namespace UnityEngine.Rendering
 
         internal static Dictionary<string, ProbeVolumeBakingSetWeakReference> SyncBakingSets()
         {
-            Dictionary<string, ProbeVolumeBakingSetWeakReference> sceneToBakingSet = new Dictionary<string, ProbeVolumeBakingSetWeakReference>();
+            Dictionary<string, ProbeVolumeBakingSetWeakReference> sceneToBakingSet =
+                new Dictionary<string, ProbeVolumeBakingSetWeakReference>();
 
             var setGUIDs = AssetDatabase.FindAssets("t:" + nameof(ProbeVolumeBakingSet));
 
@@ -339,8 +346,19 @@ namespace UnityEngine.Rendering
             return sceneToBakingSet;
         }
 
-        internal static ProbeVolumeBakingSet GetBakingSetForScene(Dictionary<string, ProbeVolumeBakingSetWeakReference> mapping, string sceneGUID) { return mapping.GetValueOrDefault(sceneGUID, null)?.Get(); }
-        internal static ProbeVolumeBakingSet GetBakingSetForScene(string sceneGUID) { return SceneToBakingSet.Instance.GetValueOrDefault(sceneGUID, null)?.Get(); }
+        internal static ProbeVolumeBakingSet GetBakingSetForScene(
+            Dictionary<string, ProbeVolumeBakingSetWeakReference> mapping,
+            string sceneGUID
+        )
+        {
+            return mapping.GetValueOrDefault(sceneGUID, null)?.Get();
+        }
+
+        internal static ProbeVolumeBakingSet GetBakingSetForScene(string sceneGUID)
+        {
+            return SceneToBakingSet.Instance.GetValueOrDefault(sceneGUID, null)?.Get();
+        }
+
         internal static ProbeVolumeBakingSet GetBakingSetForScene(Scene scene) => GetBakingSetForScene(scene.GetGUID());
 
         internal void SetDefaults()
@@ -350,7 +368,6 @@ namespace UnityEngine.Rendering
 
             // We have to initialize that to not trigger a warning on new baking sets
             chunkSizeInBricks = ProbeBrickPool.GetChunkSizeInBrickCount();
-
         }
 
         string GetOrCreateFileName(ProbeVolumeStreamableAsset asset, string filePath)
@@ -370,7 +387,13 @@ namespace UnityEngine.Rendering
                 var scenarioName = scenario.Key;
                 var scenarioData = scenario.Value;
 
-                GetCellDataFileNames(name, scenarioName, out string cellDataFileName, out string cellOptionalDataFileName, out string cellProbeOcclusionDataFileName);
+                GetCellDataFileNames(
+                    name,
+                    scenarioName,
+                    out string cellDataFileName,
+                    out string cellOptionalDataFileName,
+                    out string cellProbeOcclusionDataFileName
+                );
 
                 if (!scenarioData.cellDataAsset.GetAssetPath().Contains(cellDataFileName))
                 {
@@ -381,24 +404,47 @@ namespace UnityEngine.Rendering
             }
         }
 
-        internal void GetCellDataFileNames(string basePath, string scenario, out string cellDataFileName, out string cellOptionalDataFileName, out string cellProbeOcclusionDataFileName)
+        internal void GetCellDataFileNames(
+            string basePath,
+            string scenario,
+            out string cellDataFileName,
+            out string cellOptionalDataFileName,
+            out string cellProbeOcclusionDataFileName
+        )
         {
             cellDataFileName = $"{basePath}-{scenario}.CellData.bytes";
             cellOptionalDataFileName = $"{basePath}-{scenario}.CellOptionalData.bytes";
             cellProbeOcclusionDataFileName = $"{basePath}-{scenario}.CellProbeOcclusionData.bytes";
         }
 
-        internal void GetBlobFileNames(string scenario, out string cellDataFilename, out string cellBricksDataFilename, out string cellOptionalDataFilename, out string cellProbeOcclusionDataFilename, out string cellSharedDataFilename, out string cellSupportDataFilename)
+        internal void GetBlobFileNames(
+            string scenario,
+            out string cellDataFilename,
+            out string cellBricksDataFilename,
+            out string cellOptionalDataFilename,
+            out string cellProbeOcclusionDataFilename,
+            out string cellSharedDataFilename,
+            out string cellSupportDataFilename
+        )
         {
             string baseDir = Path.GetDirectoryName(AssetDatabase.GetAssetPath(this));
 
             string basePath = Path.Combine(baseDir, name);
 
-            GetCellDataFileNames(basePath, scenario, out string dataFile, out string optionalDataFile, out string probeOcclusionDataFile);
+            GetCellDataFileNames(
+                basePath,
+                scenario,
+                out string dataFile,
+                out string optionalDataFile,
+                out string probeOcclusionDataFile
+            );
 
             cellDataFilename = GetOrCreateFileName(scenarios[scenario].cellDataAsset, dataFile);
             cellOptionalDataFilename = GetOrCreateFileName(scenarios[scenario].cellOptionalDataAsset, optionalDataFile);
-            cellProbeOcclusionDataFilename = GetOrCreateFileName(scenarios[scenario].cellProbeOcclusionDataAsset, probeOcclusionDataFile);
+            cellProbeOcclusionDataFilename = GetOrCreateFileName(
+                scenarios[scenario].cellProbeOcclusionDataAsset,
+                probeOcclusionDataFile
+            );
             cellBricksDataFilename = GetOrCreateFileName(cellBricksDataAsset, basePath + ".CellBricksData.bytes");
             cellSharedDataFilename = GetOrCreateFileName(cellSharedDataAsset, basePath + ".CellSharedData.bytes");
             cellSupportDataFilename = GetOrCreateFileName(cellSupportDataAsset, basePath + ".CellSupportData.bytes");
@@ -412,7 +458,9 @@ namespace UnityEngine.Rendering
             if (cellSharedDataAsset == null || !cellSharedDataAsset.IsValid())
                 return 0;
 
-            return GetFileSize(cellBricksDataAsset.GetAssetPath()) + GetFileSize(cellSharedDataAsset.GetAssetPath()) + GetFileSize(cellSupportDataAsset.GetAssetPath());
+            return GetFileSize(cellBricksDataAsset.GetAssetPath())
+                + GetFileSize(cellSharedDataAsset.GetAssetPath())
+                + GetFileSize(cellSupportDataAsset.GetAssetPath());
         }
 
         internal long GetDiskSizeOfScenarioData(string scenario)
@@ -420,7 +468,9 @@ namespace UnityEngine.Rendering
             if (scenario == null || !scenarios.TryGetValue(scenario, out var data) || !data.IsValid())
                 return 0;
 
-            return GetFileSize(data.cellDataAsset.GetAssetPath()) + GetFileSize(data.cellOptionalDataAsset.GetAssetPath()) + GetFileSize(data.cellProbeOcclusionDataAsset.GetAssetPath());
+            return GetFileSize(data.cellDataAsset.GetAssetPath())
+                + GetFileSize(data.cellOptionalDataAsset.GetAssetPath())
+                + GetFileSize(data.cellProbeOcclusionDataAsset.GetAssetPath());
         }
 
         internal void SanitizeScenes()
@@ -472,7 +522,7 @@ namespace UnityEngine.Rendering
             }
         }
 
-        static internal int MaxSubdivLevelInProbeVolume(Vector3 volumeSize, int maxSubdiv)
+        internal static int MaxSubdivLevelInProbeVolume(Vector3 volumeSize, int maxSubdiv)
         {
             float maxSizedDim = Mathf.Max(volumeSize.x, Mathf.Max(volumeSize.y, volumeSize.z));
             float maxSideInBricks = maxSizedDim / ProbeReferenceVolume.instance.MinDistanceBetweenProbes();
@@ -496,32 +546,74 @@ namespace UnityEngine.Rendering
             var cellSizeVector = new Vector3(cellSize, cellSize, cellSize);
             var minPadding = (bounds.min - originalBounds.min);
             var maxPadding = (bounds.max - originalBounds.max);
-            minPadding = cellSizeVector - new Vector3(Mathf.Abs(minPadding.x), Mathf.Abs(minPadding.y), Mathf.Abs(minPadding.z));
-            maxPadding = cellSizeVector - new Vector3(Mathf.Abs(maxPadding.x), Mathf.Abs(maxPadding.y), Mathf.Abs(maxPadding.z));
+            minPadding =
+                cellSizeVector - new Vector3(Mathf.Abs(minPadding.x), Mathf.Abs(minPadding.y), Mathf.Abs(minPadding.z));
+            maxPadding =
+                cellSizeVector - new Vector3(Mathf.Abs(maxPadding.x), Mathf.Abs(maxPadding.y), Mathf.Abs(maxPadding.z));
 
             // Find the size of the brick we can put for every axis given the padding size
             int maxSubdiv = ProbeReferenceVolume.instance.GetMaxSubdivision() - 1;
             if (pv.overridesSubdivLevels)
                 maxSubdiv = Mathf.Min(pv.highestSubdivLevelOverride, maxSubdiv);
 
-            float rightPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(maxPadding.x, originalBounds.size.y, originalBounds.size.z), maxSubdiv));
-            float leftPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(minPadding.x, originalBounds.size.y, originalBounds.size.z), maxSubdiv));
-            float topPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(originalBounds.size.x, maxPadding.y, originalBounds.size.z), maxSubdiv));
-            float bottomPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(originalBounds.size.x, minPadding.y, originalBounds.size.z), maxSubdiv));
-            float forwardPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(originalBounds.size.x, originalBounds.size.y, maxPadding.z), maxSubdiv));
-            float backPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(originalBounds.size.x, originalBounds.size.y, minPadding.z), maxSubdiv));
+            float rightPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(
+                MaxSubdivLevelInProbeVolume(
+                    new Vector3(maxPadding.x, originalBounds.size.y, originalBounds.size.z),
+                    maxSubdiv
+                )
+            );
+            float leftPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(
+                MaxSubdivLevelInProbeVolume(
+                    new Vector3(minPadding.x, originalBounds.size.y, originalBounds.size.z),
+                    maxSubdiv
+                )
+            );
+            float topPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(
+                MaxSubdivLevelInProbeVolume(
+                    new Vector3(originalBounds.size.x, maxPadding.y, originalBounds.size.z),
+                    maxSubdiv
+                )
+            );
+            float bottomPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(
+                MaxSubdivLevelInProbeVolume(
+                    new Vector3(originalBounds.size.x, minPadding.y, originalBounds.size.z),
+                    maxSubdiv
+                )
+            );
+            float forwardPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(
+                MaxSubdivLevelInProbeVolume(
+                    new Vector3(originalBounds.size.x, originalBounds.size.y, maxPadding.z),
+                    maxSubdiv
+                )
+            );
+            float backPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(
+                MaxSubdivLevelInProbeVolume(
+                    new Vector3(originalBounds.size.x, originalBounds.size.y, minPadding.z),
+                    maxSubdiv
+                )
+            );
 
             // Remove the extra padding caused by cell rounding
-            bounds.min = bounds.min + new Vector3(
-                leftPaddingSubdivLevel * Mathf.Floor(Mathf.Abs(bounds.min.x - originalBounds.min.x) / (float)leftPaddingSubdivLevel),
-                bottomPaddingSubdivLevel * Mathf.Floor(Mathf.Abs(bounds.min.y - originalBounds.min.y) / (float)bottomPaddingSubdivLevel),
-                backPaddingSubdivLevel * Mathf.Floor(Mathf.Abs(bounds.min.z - originalBounds.min.z) / (float)backPaddingSubdivLevel)
-            );
-            bounds.max = bounds.max - new Vector3(
-                rightPaddingSubdivLevel * Mathf.Floor(Mathf.Abs(bounds.max.x - originalBounds.max.x) / (float)rightPaddingSubdivLevel),
-                topPaddingSubdivLevel * Mathf.Floor(Mathf.Abs(bounds.max.y - originalBounds.max.y) / (float)topPaddingSubdivLevel),
-                forwardPaddingSubdivLevel * Mathf.Floor(Mathf.Abs(bounds.max.z - originalBounds.max.z) / (float)forwardPaddingSubdivLevel)
-            );
+            bounds.min =
+                bounds.min
+                + new Vector3(
+                    leftPaddingSubdivLevel
+                        * Mathf.Floor(Mathf.Abs(bounds.min.x - originalBounds.min.x) / (float)leftPaddingSubdivLevel),
+                    bottomPaddingSubdivLevel
+                        * Mathf.Floor(Mathf.Abs(bounds.min.y - originalBounds.min.y) / (float)bottomPaddingSubdivLevel),
+                    backPaddingSubdivLevel
+                        * Mathf.Floor(Mathf.Abs(bounds.min.z - originalBounds.min.z) / (float)backPaddingSubdivLevel)
+                );
+            bounds.max =
+                bounds.max
+                - new Vector3(
+                    rightPaddingSubdivLevel
+                        * Mathf.Floor(Mathf.Abs(bounds.max.x - originalBounds.max.x) / (float)rightPaddingSubdivLevel),
+                    topPaddingSubdivLevel
+                        * Mathf.Floor(Mathf.Abs(bounds.max.y - originalBounds.max.y) / (float)topPaddingSubdivLevel),
+                    forwardPaddingSubdivLevel
+                        * Mathf.Floor(Mathf.Abs(bounds.max.z - originalBounds.max.z) / (float)forwardPaddingSubdivLevel)
+                );
         }
 
         internal void UpdateSceneBounds(Scene scene, string sceneGUID, bool onSceneSave)
@@ -534,7 +626,11 @@ namespace UnityEngine.Rendering
             if (onSceneSave) // Use baked values
                 ProbeReferenceVolume.instance.SetSubdivisionDimensions(minBrickSize, maxSubdivision, bakedProbeOffset);
             else // Use displayed values
-                ProbeReferenceVolume.instance.SetSubdivisionDimensions(GetMinBrickSize(minDistanceBetweenProbes), GetMaxSubdivision(simplificationLevels), probeOffset);
+                ProbeReferenceVolume.instance.SetSubdivisionDimensions(
+                    GetMinBrickSize(minDistanceBetweenProbes),
+                    GetMaxSubdivision(simplificationLevels),
+                    probeOffset
+                );
 
             bool boundFound = false;
             Bounds newBound = new Bounds();
@@ -545,7 +641,11 @@ namespace UnityEngine.Rendering
                     continue;
 
                 if (volume.mode != ProbeVolume.Mode.Local)
-                    volume.UpdateGlobalVolume(volume.mode == ProbeVolume.Mode.Global ? GIContributors.ContributorFilter.All : GIContributors.ContributorFilter.Scene);
+                    volume.UpdateGlobalVolume(
+                        volume.mode == ProbeVolume.Mode.Global
+                            ? GIContributors.ContributorFilter.All
+                            : GIContributors.ContributorFilter.Scene
+                    );
 
                 var obb = new ProbeReferenceVolume.Volume(volume.GetVolume(), 0, 0);
                 Bounds localBounds = obb.CalculateAABB();
@@ -564,7 +664,10 @@ namespace UnityEngine.Rendering
             }
 
             bool bakeDataExist = m_SceneBakeData.TryGetValue(sceneGUID, out var bakeData);
-            Debug.Assert(bakeDataExist, "Scene should have been added to the baking set with default bake data instance.");
+            Debug.Assert(
+                bakeDataExist,
+                "Scene should have been added to the baking set with default bake data instance."
+            );
             bakeData.hasProbeVolume = boundFound;
             if (boundFound)
                 bakeData.bounds = newBound;
@@ -577,7 +680,10 @@ namespace UnityEngine.Rendering
         internal void EnsurePerSceneData(Scene scene, string sceneGUID)
         {
             bool bakeDataExist = m_SceneBakeData.TryGetValue(sceneGUID, out var bakeData);
-            Debug.Assert(bakeDataExist, "Scene should have been added to the baking set with default bake data instance.");
+            Debug.Assert(
+                bakeDataExist,
+                "Scene should have been added to the baking set with default bake data instance."
+            );
 
             if (bakeData.hasProbeVolume)
             {

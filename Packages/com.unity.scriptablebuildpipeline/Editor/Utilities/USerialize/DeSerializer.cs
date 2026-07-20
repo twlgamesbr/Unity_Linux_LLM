@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Linq.Expressions;
-
+using System.Reflection;
 using UnityEngine;
 
 namespace UnityEditor.Build.Pipeline.Utilities.USerialize
@@ -60,7 +59,10 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
 
         // Version of the object that was deserialized.  This is the value supplied by the client code when Serializer.Serialize() was originally called
         int m_ObjectVersion;
-        internal int ObjectVersion { get { return m_ObjectVersion; } }
+        internal int ObjectVersion
+        {
+            get { return m_ObjectVersion; }
+        }
 
         // Reader we are using to read bytes from the stream
         BinaryReader m_Reader;
@@ -82,9 +84,7 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         // LUT to get a Type instance from a type name index for this object.
         Type[] m_TypeByTypeNameIndex;
 
-        internal DeSerializer()
-        {
-        }
+        internal DeSerializer() { }
 
         internal DeSerializer(ICustomSerializer[] customSerializers, (Type, ObjectFactory)[] objectFactories)
         {
@@ -136,13 +136,16 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         }
 
         // Main deserialize function.  Creates and reads an instance of the specified type from the stream
-        internal ClassType DeSerialize<ClassType>(Stream stream) where ClassType : new()
+        internal ClassType DeSerialize<ClassType>(Stream stream)
+            where ClassType : new()
         {
             m_Reader = new BinaryReader(stream);
 
             m_SerializationVersion = m_Reader.ReadByte();
             if (m_SerializationVersion != Serializer.SerializationVersion)
-                throw new InvalidDataException($"Data stream is using an incompatible serialization format.  Stream is version {m_SerializationVersion} but code requires version {Serializer.SerializationVersion}.  The stream should be re-created with the current code");
+                throw new InvalidDataException(
+                    $"Data stream is using an incompatible serialization format.  Stream is version {m_SerializationVersion} but code requires version {Serializer.SerializationVersion}.  The stream should be re-created with the current code"
+                );
 
             m_ObjectVersion = m_Reader.ReadInt32();
 
@@ -153,7 +156,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             ClassType instance = (ClassType)ReadObject(0);
 
             if (m_Reader.BaseStream.Position != m_TypeStringTableBytePos)
-                throw new InvalidDataException($"Did not read entire stream in DeSerialize.  Read to +{m_Reader.BaseStream.Position} but expected +{m_TypeStringTableBytePos}");
+                throw new InvalidDataException(
+                    $"Did not read entire stream in DeSerialize.  Read to +{m_Reader.BaseStream.Position} but expected +{m_TypeStringTableBytePos}"
+                );
 
             // NOTE: The reader is deliberately not disposed here as doing so would also close the stream but we rely on the outer code to manage the lifetime of the stream
 
@@ -172,7 +177,7 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         {
             long startPos = m_Reader.BaseStream.Position;
 
-            m_Reader.ReadByte();        // Serialization version
+            m_Reader.ReadByte(); // Serialization version
             int objectVersion = m_Reader.ReadInt32();
 
             m_Reader.BaseStream.Position = startPos;
@@ -205,7 +210,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
 
                 m_ObjectFactories.TryGetValue(typeData.m_Type, out typeData.m_ObjectFactory);
 
-                FieldInfo[] fieldArray = typeData.m_Type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                FieldInfo[] fieldArray = typeData.m_Type.GetFields(
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                );
                 for (int fieldNum = 0; fieldNum < fieldArray.Length; fieldNum++)
                 {
                     FieldData fieldData = new FieldData();
@@ -254,7 +261,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                     }
                     else if (fieldData.m_FieldInfo.FieldType.IsEnum)
                         fieldData.m_Setter = CreateObjectSetter<int>(typeData.m_Type, fieldData.m_FieldInfo);
-                    else if (fieldData.m_FieldInfo.FieldType.IsValueType && (!fieldData.m_FieldInfo.FieldType.IsPrimitive))
+                    else if (
+                        fieldData.m_FieldInfo.FieldType.IsValueType && (!fieldData.m_FieldInfo.FieldType.IsPrimitive)
+                    )
                         fieldData.m_Setter = CreateObjectSetter<object>(typeData.m_Type, fieldData.m_FieldInfo);
                     else if (typeof(Array).IsAssignableFrom(fieldData.m_FieldInfo.FieldType))
                     {
@@ -274,8 +283,17 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         {
             ParameterExpression valueExp = Expression.Parameter(field.FieldType, "value");
             ParameterExpression targetExp = Expression.Parameter(typeof(object), "target");
-            MemberExpression fieldExp = (type.IsValueType && (!type.IsPrimitive)) ? Expression.Field(Expression.Unbox(targetExp, type), field) : Expression.Field(Expression.Convert(targetExp, type), field);
-            return Expression.Lambda<Func<object, SetterType, SetterType>>(Expression.Assign(fieldExp, valueExp), targetExp, valueExp).Compile();
+            MemberExpression fieldExp =
+                (type.IsValueType && (!type.IsPrimitive))
+                    ? Expression.Field(Expression.Unbox(targetExp, type), field)
+                    : Expression.Field(Expression.Convert(targetExp, type), field);
+            return Expression
+                .Lambda<Func<object, SetterType, SetterType>>(
+                    Expression.Assign(fieldExp, valueExp),
+                    targetExp,
+                    valueExp
+                )
+                .Compile();
         }
 
         // Create a function object to set the value of a field of generic object type that is stored in the stream with type 'StorageType'.  Calling this compiled function object is much faster than using the reflection API
@@ -283,16 +301,30 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         {
             ParameterExpression valueExp = Expression.Parameter(typeof(StorageType), "value");
             ParameterExpression targetExp = Expression.Parameter(typeof(object), "target");
-            MemberExpression fieldExp = (type.IsValueType && (!type.IsPrimitive)) ? Expression.Field(Expression.Unbox(targetExp, type), field) : Expression.Field(Expression.Convert(targetExp, type), field);
+            MemberExpression fieldExp =
+                (type.IsValueType && (!type.IsPrimitive))
+                    ? Expression.Field(Expression.Unbox(targetExp, type), field)
+                    : Expression.Field(Expression.Convert(targetExp, type), field);
             BinaryExpression assignExp = Expression.Assign(fieldExp, Expression.Convert(valueExp, field.FieldType));
-            return Expression.Lambda<Func<object, StorageType, StorageType>>(Expression.Convert(assignExp, typeof(StorageType)), targetExp, valueExp).Compile();
+            return Expression
+                .Lambda<Func<object, StorageType, StorageType>>(
+                    Expression.Convert(assignExp, typeof(StorageType)),
+                    targetExp,
+                    valueExp
+                )
+                .Compile();
         }
 
         // Create a function object to get the value from a field as a generic object.  It is much faster to call this compiled function object than to use the reflection API
         static Func<object, object> CreateObjectGetter(Type type, FieldInfo field)
         {
             ParameterExpression valueExp = Expression.Parameter(typeof(object), "value");
-            return Expression.Lambda<Func<object, object>>(Expression.Convert(Expression.Field(Expression.Convert(valueExp, type), field), typeof(object)), valueExp).Compile();
+            return Expression
+                .Lambda<Func<object, object>>(
+                    Expression.Convert(Expression.Field(Expression.Convert(valueExp, type), field), typeof(object)),
+                    valueExp
+                )
+                .Compile();
         }
 
         // Return the TypeData for a type from the index of it's type name in the type/field stringtable
@@ -323,7 +355,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                 objectRead = Activator.CreateInstance(typeData.m_Type);
 
             if (EmitVerboseLog)
-                Debug.Log($"{new String(' ', (depth * 2) - ((depth > 0) ? 1 : 0))}ReadObject({typeData.m_Type.Name}) +{m_Reader.BaseStream.Position}");
+                Debug.Log(
+                    $"{new String(' ', (depth * 2) - ((depth > 0) ? 1 : 0))}ReadObject({typeData.m_Type.Name}) +{m_Reader.BaseStream.Position}"
+                );
 
             Dictionary<string, FieldData> fields = typeData.m_Fields;
 
@@ -351,242 +385,263 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                     DataType fieldDataType = (DataType)m_Reader.ReadByte();
 
                     if (EmitVerboseLog)
-                        Debug.Log($"{new String(' ', depth * 2)}Field {fieldName} -> {field?.m_FieldInfo.Name} ({fieldDataType}) +{m_Reader.BaseStream.Position}");
+                        Debug.Log(
+                            $"{new String(' ', depth * 2)}Field {fieldName} -> {field?.m_FieldInfo.Name} ({fieldDataType}) +{m_Reader.BaseStream.Position}"
+                        );
 
                     FieldInfo fieldInfo = field.m_FieldInfo;
 
                     switch (fieldDataType)
                     {
-                    case DataType.Byte:
-                        ((Func<object, byte, byte>)field.m_Setter)(objectRead, m_Reader.ReadByte());
-                        break;
+                        case DataType.Byte:
+                            ((Func<object, byte, byte>)field.m_Setter)(objectRead, m_Reader.ReadByte());
+                            break;
 
-                    case DataType.Bool:
-                        ((Func<object, bool, bool>)field.m_Setter)(objectRead, m_Reader.ReadBoolean());
-                        break;
+                        case DataType.Bool:
+                            ((Func<object, bool, bool>)field.m_Setter)(objectRead, m_Reader.ReadBoolean());
+                            break;
 
-                    case DataType.Int:
-                        ((Func<object, int, int>)field.m_Setter)(objectRead, m_Reader.ReadInt32());
-                        break;
+                        case DataType.Int:
+                            ((Func<object, int, int>)field.m_Setter)(objectRead, m_Reader.ReadInt32());
+                            break;
 
-                    case DataType.UInt:
-                        ((Func<object, uint, uint>)field.m_Setter)(objectRead, m_Reader.ReadUInt32());
-                        break;
+                        case DataType.UInt:
+                            ((Func<object, uint, uint>)field.m_Setter)(objectRead, m_Reader.ReadUInt32());
+                            break;
 
-                    case DataType.Long:
-                        ((Func<object, long, long>)field.m_Setter)(objectRead, m_Reader.ReadInt64());
-                        break;
+                        case DataType.Long:
+                            ((Func<object, long, long>)field.m_Setter)(objectRead, m_Reader.ReadInt64());
+                            break;
 
-                    case DataType.ULong:
-                        ((Func<object, ulong, ulong>)field.m_Setter)(objectRead, m_Reader.ReadUInt64());
-                        break;
+                        case DataType.ULong:
+                            ((Func<object, ulong, ulong>)field.m_Setter)(objectRead, m_Reader.ReadUInt64());
+                            break;
 
-                    case DataType.Enum:
-                        ((Func<object, int, int>)field.m_Setter)(objectRead, m_Reader.ReadInt32());
-                        break;
+                        case DataType.Enum:
+                            ((Func<object, int, int>)field.m_Setter)(objectRead, m_Reader.ReadInt32());
+                            break;
 
-                    case DataType.String:
-                        ((Func<object, string, string>)field.m_Setter)(objectRead, ReadString());
-                        break;
+                        case DataType.String:
+                            ((Func<object, string, string>)field.m_Setter)(objectRead, ReadString());
+                            break;
 
-                    case DataType.Type:
-                        ((Func<object, Type, Type>)field.m_Setter)(objectRead, GetTypeFromCache(ReadStringIndex()));
-                        break;
+                        case DataType.Type:
+                            ((Func<object, Type, Type>)field.m_Setter)(objectRead, GetTypeFromCache(ReadStringIndex()));
+                            break;
 
-                    case DataType.Class:
-                        fieldInfo.SetValue(objectRead, ReadObject(depth + 1));
-                        break;
+                        case DataType.Class:
+                            fieldInfo.SetValue(objectRead, ReadObject(depth + 1));
+                            break;
 
-                    case DataType.Struct:
-                    {
-                        object structObject = ReadObject(depth + 1);
-                        ((Func<object, object, object>)field.m_Setter)(objectRead, structObject);
-                        break;
-                    }
-
-                    case DataType.Array:
-                        if (ReadNullFlag())
+                        case DataType.Struct:
                         {
-                            Array fieldArray;
-                            if (field.m_Getter != null)
-                                fieldArray = (Array)((Func<object, object>)field.m_Getter)(objectRead);
-                            else
-                                fieldArray = (Array)fieldInfo.GetValue(objectRead);
+                            object structObject = ReadObject(depth + 1);
+                            ((Func<object, object, object>)field.m_Setter)(objectRead, structObject);
+                            break;
+                        }
 
-                            int rank = m_Reader.ReadInt32();
-                            if (rank != 1)
-                                throw new InvalidDataException($"USerialize currently doesn't support arrays with ranks other than one - data for field {fieldInfo.Name} of type {fieldInfo.FieldType.Name} has rank {rank}");
-                            int length = m_Reader.ReadInt32();
-
-                            DataType elementDataType = (DataType)m_Reader.ReadByte();
-
-                            if (EmitVerboseLog)
-                                Debug.Log($"{new String(' ', (depth + 1) * 2)}Array {elementDataType} [{length}] +{m_Reader.BaseStream.Position}");
-
-                            switch (elementDataType)
+                        case DataType.Array:
+                            if (ReadNullFlag())
                             {
-                            case DataType.Byte:
-                            {
-                                byte[] byteArray = (byte[])Array.CreateInstance(typeof(byte), length);
-                                ((Func<object, byte[], byte[]>)field.m_Setter)(objectRead, byteArray);
-                                m_Reader.Read(byteArray, 0, length);
-                                break;
-                            }
+                                Array fieldArray;
+                                if (field.m_Getter != null)
+                                    fieldArray = (Array)((Func<object, object>)field.m_Getter)(objectRead);
+                                else
+                                    fieldArray = (Array)fieldInfo.GetValue(objectRead);
 
-                            // Per customer request
-                            case DataType.ULong:
-                            {
-                                ulong[] ulongArray = (ulong[])Array.CreateInstance(typeof(ulong), length);
-                                ((Func<object, ulong[], ulong[]>)field.m_Setter)(objectRead, ulongArray);
-                                for (int elementNum = 0; elementNum < length; elementNum++)
+                                int rank = m_Reader.ReadInt32();
+                                if (rank != 1)
+                                    throw new InvalidDataException(
+                                        $"USerialize currently doesn't support arrays with ranks other than one - data for field {fieldInfo.Name} of type {fieldInfo.FieldType.Name} has rank {rank}"
+                                    );
+                                int length = m_Reader.ReadInt32();
+
+                                DataType elementDataType = (DataType)m_Reader.ReadByte();
+
+                                if (EmitVerboseLog)
+                                    Debug.Log(
+                                        $"{new String(' ', (depth + 1) * 2)}Array {elementDataType} [{length}] +{m_Reader.BaseStream.Position}"
+                                    );
+
+                                switch (elementDataType)
                                 {
-                                    ulongArray[elementNum] = m_Reader.ReadUInt64();
-                                }
-                                break;
-                            }
-
-                            case DataType.String:
-                            {
-                                string[] stringArray = (string[])Array.CreateInstance(typeof(string), length);
-                                ((Func<object, string[], string[]>)field.m_Setter)(objectRead, stringArray);
-                                for (int elementNum = 0; elementNum < length; elementNum++)
-                                {
-                                    stringArray[elementNum] = ReadString();
-                                }
-                                break;
-                            }
-
-                            case DataType.Type:
-                            {
-                                Type[] typeArray = new Type[length];
-                                ((Func<object, Type[], Type[]>)field.m_Setter)(objectRead, typeArray);
-                                for (int elementNum = 0; elementNum < length; elementNum++)
-                                {
-                                    int elementTypeNameIndex = ReadStringIndex();
-                                    if (elementTypeNameIndex != USerialize.InvalidStringIndex)
+                                    case DataType.Byte:
                                     {
-                                        typeArray[elementNum] = GetTypeFromCache(elementTypeNameIndex);
-                                        if (typeArray[elementNum] == null)
-                                            throw new InvalidDataException($"Could not create Type for '{m_TypeStringTable[elementTypeNameIndex]}'");
+                                        byte[] byteArray = (byte[])Array.CreateInstance(typeof(byte), length);
+                                        ((Func<object, byte[], byte[]>)field.m_Setter)(objectRead, byteArray);
+                                        m_Reader.Read(byteArray, 0, length);
+                                        break;
                                     }
 
-                                    if (EmitVerboseLog)
-                                        Debug.Log($"{new String(' ', (depth + 2) * 2)}Type[{elementNum}] = '{m_TypeStringTable[elementTypeNameIndex]}' +{m_Reader.BaseStream.Position}");
-                                }
-                                break;
-                            }
-
-                            case DataType.Class:
-                            {
-                                Type arrayElementType = GetTypeFromCache(ReadStringIndex());
-                                Array classArray = Array.CreateInstance(arrayElementType, length);
-                                fieldInfo.SetValue(objectRead, classArray);
-                                for (int elementNum = 0; elementNum < length; elementNum++)
-                                {
-                                    DataType objectDataType = (DataType)m_Reader.ReadByte();
-                                    object elementObject = null;
-                                    switch (objectDataType)
+                                    // Per customer request
+                                    case DataType.ULong:
                                     {
-                                    case DataType.Class:
-                                        elementObject = ReadObject(depth + 2);
+                                        ulong[] ulongArray = (ulong[])Array.CreateInstance(typeof(ulong), length);
+                                        ((Func<object, ulong[], ulong[]>)field.m_Setter)(objectRead, ulongArray);
+                                        for (int elementNum = 0; elementNum < length; elementNum++)
+                                        {
+                                            ulongArray[elementNum] = m_Reader.ReadUInt64();
+                                        }
                                         break;
+                                    }
 
                                     case DataType.String:
-                                        elementObject = ReadString();
+                                    {
+                                        string[] stringArray = (string[])Array.CreateInstance(typeof(string), length);
+                                        ((Func<object, string[], string[]>)field.m_Setter)(objectRead, stringArray);
+                                        for (int elementNum = 0; elementNum < length; elementNum++)
+                                        {
+                                            stringArray[elementNum] = ReadString();
+                                        }
                                         break;
+                                    }
 
-                                    case DataType.Int:
-                                        elementObject = m_Reader.ReadInt32();
-                                        break;
+                                    case DataType.Type:
+                                    {
+                                        Type[] typeArray = new Type[length];
+                                        ((Func<object, Type[], Type[]>)field.m_Setter)(objectRead, typeArray);
+                                        for (int elementNum = 0; elementNum < length; elementNum++)
+                                        {
+                                            int elementTypeNameIndex = ReadStringIndex();
+                                            if (elementTypeNameIndex != USerialize.InvalidStringIndex)
+                                            {
+                                                typeArray[elementNum] = GetTypeFromCache(elementTypeNameIndex);
+                                                if (typeArray[elementNum] == null)
+                                                    throw new InvalidDataException(
+                                                        $"Could not create Type for '{m_TypeStringTable[elementTypeNameIndex]}'"
+                                                    );
+                                            }
 
-                                    case DataType.Custom:
-                                        elementObject = ReadCustomObject();
+                                            if (EmitVerboseLog)
+                                                Debug.Log(
+                                                    $"{new String(' ', (depth + 2) * 2)}Type[{elementNum}] = '{m_TypeStringTable[elementTypeNameIndex]}' +{m_Reader.BaseStream.Position}"
+                                                );
+                                        }
                                         break;
+                                    }
+
+                                    case DataType.Class:
+                                    {
+                                        Type arrayElementType = GetTypeFromCache(ReadStringIndex());
+                                        Array classArray = Array.CreateInstance(arrayElementType, length);
+                                        fieldInfo.SetValue(objectRead, classArray);
+                                        for (int elementNum = 0; elementNum < length; elementNum++)
+                                        {
+                                            DataType objectDataType = (DataType)m_Reader.ReadByte();
+                                            object elementObject = null;
+                                            switch (objectDataType)
+                                            {
+                                                case DataType.Class:
+                                                    elementObject = ReadObject(depth + 2);
+                                                    break;
+
+                                                case DataType.String:
+                                                    elementObject = ReadString();
+                                                    break;
+
+                                                case DataType.Int:
+                                                    elementObject = m_Reader.ReadInt32();
+                                                    break;
+
+                                                case DataType.Custom:
+                                                    elementObject = ReadCustomObject();
+                                                    break;
+
+                                                default:
+                                                    throw new InvalidDataException(
+                                                        $"Found unsupported data type '{objectDataType}' in class array '{typeData.m_Type.Name}.{fieldName}'"
+                                                    );
+                                            }
+                                            classArray.SetValue(elementObject, elementNum);
+                                        }
+                                        break;
+                                    }
+
+                                    case DataType.Struct:
+                                    {
+                                        Type elementType = GetTypeFromCache(ReadStringIndex());
+                                        Array array = Array.CreateInstance(elementType, length);
+                                        fieldInfo.SetValue(objectRead, array);
+                                        for (int elementNum = 0; elementNum < length; elementNum++)
+                                        {
+                                            array.SetValue(ReadObject(depth + 2), elementNum);
+                                        }
+                                        break;
+                                    }
 
                                     default:
-                                        throw new InvalidDataException($"Found unsupported data type '{objectDataType}' in class array '{typeData.m_Type.Name}.{fieldName}'");
-                                    }
-                                    classArray.SetValue(elementObject, elementNum);
+                                        throw new InvalidDataException(
+                                            $"Unknown array element type {elementDataType} for field {fieldInfo.FieldType.Name}.{fieldInfo.Name}"
+                                        );
                                 }
-                                break;
                             }
+                            break;
 
-                            case DataType.Struct:
+                        case DataType.List:
+                            if (ReadNullFlag())
                             {
-                                Type elementType = GetTypeFromCache(ReadStringIndex());
-                                Array array = Array.CreateInstance(elementType, length);
-                                fieldInfo.SetValue(objectRead, array);
-                                for (int elementNum = 0; elementNum < length; elementNum++)
+                                int count = m_Reader.ReadInt32();
+                                Type listType = GetTypeFromCache(ReadStringIndex());
+
+                                if (EmitVerboseLog)
+                                    Debug.Log(
+                                        $"{new String(' ', (depth + 1) * 2)}List {listType.Name} [{count}] +{m_Reader.BaseStream.Position}"
+                                    );
+
+                                System.Collections.IList list = (System.Collections.IList)
+                                    Activator.CreateInstance(typeof(List<>).MakeGenericType(listType), count);
+                                for (int itemIndex = 0; itemIndex < count; itemIndex++)
                                 {
-                                    array.SetValue(ReadObject(depth + 2), elementNum);
+                                    object item = ReadObject(depth + 2);
+                                    if (item != null)
+                                        list.Add(item);
                                 }
-                                break;
+                                fieldInfo.SetValue(objectRead, list);
                             }
+                            break;
 
-                            default:
-                                throw new InvalidDataException($"Unknown array element type {elementDataType} for field {fieldInfo.FieldType.Name}.{fieldInfo.Name}");
-                            }
-                        }
-                        break;
+                        case DataType.Custom:
+                            fieldInfo.SetValue(objectRead, ReadCustomObject());
+                            break;
 
-                    case DataType.List:
-                        if (ReadNullFlag())
+                        case DataType.Guid:
                         {
-                            int count = m_Reader.ReadInt32();
-                            Type listType = GetTypeFromCache(ReadStringIndex());
-
-                            if (EmitVerboseLog)
-                                Debug.Log($"{new String(' ', (depth + 1) * 2)}List {listType.Name} [{count}] +{m_Reader.BaseStream.Position}");
-
-                            System.Collections.IList list = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType), count);
-                            for (int itemIndex = 0; itemIndex < count; itemIndex++)
+                            GUID guid;
+                            unsafe
                             {
-                                object item = ReadObject(depth + 2);
-                                if (item != null)
-                                    list.Add(item);
+                                UInt64* guidPtr = (UInt64*)&guid;
+                                guidPtr[0] = m_Reader.ReadUInt64();
+                                guidPtr[1] = m_Reader.ReadUInt64();
                             }
-                            fieldInfo.SetValue(objectRead, list);
+                            ((Func<object, GUID, GUID>)field.m_Setter)(objectRead, guid);
+                            break;
                         }
-                        break;
 
-                    case DataType.Custom:
-                        fieldInfo.SetValue(objectRead, ReadCustomObject());
-                        break;
-
-                    case DataType.Guid:
-                    {
-                        GUID guid;
-                        unsafe
+                        case DataType.Hash128:
                         {
-                            UInt64* guidPtr = (UInt64*)&guid;
-                            guidPtr[0] = m_Reader.ReadUInt64();
-                            guidPtr[1] = m_Reader.ReadUInt64();
+                            Hash128 hash;
+                            unsafe
+                            {
+                                UInt64* hashPtr = (UInt64*)&hash;
+                                hashPtr[0] = m_Reader.ReadUInt64();
+                                hashPtr[1] = m_Reader.ReadUInt64();
+                            }
+                            ((Func<object, Hash128, Hash128>)field.m_Setter)(objectRead, hash);
+                            break;
                         }
-                        ((Func<object, GUID, GUID>)field.m_Setter)(objectRead, guid);
-                        break;
-                    }
 
-                    case DataType.Hash128:
-                    {
-                        Hash128 hash;
-                        unsafe
-                        {
-                            UInt64* hashPtr = (UInt64*)&hash;
-                            hashPtr[0] = m_Reader.ReadUInt64();
-                            hashPtr[1] = m_Reader.ReadUInt64();
-                        }
-                        ((Func<object, Hash128, Hash128>)field.m_Setter)(objectRead, hash);
-                        break;
-                    }
-
-                    default:
-                        throw new InvalidDataException($"USerialize found unknown field data type '{fieldDataType}' on field '{typeData.m_Type.Name}.{fieldName}' in stream at +{m_Reader.BaseStream.Position}");
+                        default:
+                            throw new InvalidDataException(
+                                $"USerialize found unknown field data type '{fieldDataType}' on field '{typeData.m_Type.Name}.{fieldName}' in stream at +{m_Reader.BaseStream.Position}"
+                            );
                     }
                 }
                 else
                 {
                     // Didn't find a matching field in the object
-                    throw new InvalidDataException($"USerialize found unknown field '{fieldName}' for type '{typeData.m_Type.Name}' in stream at +{m_Reader.BaseStream.Position}");
+                    throw new InvalidDataException(
+                        $"USerialize found unknown field '{fieldName}' for type '{typeData.m_Type.Name}' in stream at +{m_Reader.BaseStream.Position}"
+                    );
                 }
             }
 
@@ -602,7 +657,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                 return customSerializer.UDeSerializer(this);
             }
             else
-                throw new InvalidDataException($"Could not find custom deserializer for type {objectType.Name}, custom deserializers can be added prior to deserialization with AddCustomDeserializer()");
+                throw new InvalidDataException(
+                    $"Could not find custom deserializer for type {objectType.Name}, custom deserializers can be added prior to deserialization with AddCustomDeserializer()"
+                );
         }
 
         // Read a byte from the stream and return true if it has value NotNull (1)

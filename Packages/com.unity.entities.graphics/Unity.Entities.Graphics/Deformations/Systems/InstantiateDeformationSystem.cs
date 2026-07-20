@@ -8,7 +8,9 @@ namespace Unity.Rendering
     [RequireMatchingQueriesForUpdate]
     partial class InstantiateDeformationSystem : SystemBase
     {
-        static readonly ProfilerMarker k_InstantiateDeformationMarker = new ProfilerMarker("InstantiateDeformationSystem");
+        static readonly ProfilerMarker k_InstantiateDeformationMarker = new ProfilerMarker(
+            "InstantiateDeformationSystem"
+        );
 
         static readonly int k_VertexCount = Shader.PropertyToID("g_VertexCount");
         static readonly int k_DeformedMeshStartIndex = Shader.PropertyToID("g_DeformedMeshStartIndex");
@@ -30,12 +32,17 @@ namespace Unity.Rendering
 #endif
             {
                 Enabled = false;
-                UnityEngine.Debug.Log("No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.");
+                UnityEngine.Debug.Log(
+                    "No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled."
+                );
                 return;
             }
 
             m_ComputeShader = Resources.Load<ComputeShader>("InstantiateDeformationData");
-            Assert.IsNotNull(m_ComputeShader, $"Compute shader for {typeof(InstantiateDeformationSystem)} was not found!");
+            Assert.IsNotNull(
+                m_ComputeShader,
+                $"Compute shader for {typeof(InstantiateDeformationSystem)} was not found!"
+            );
 
             m_PushMeshDataSystem = World.GetOrCreateSystemManaged<PushMeshDataSystem>();
             Assert.IsNotNull(m_PushMeshDataSystem, $"{nameof(PushMeshDataSystem)} was not found!");

@@ -29,7 +29,7 @@ namespace Unity.Entities
             var chunk = GetChunk(entity);
             var archetype = GetArchetype(chunk);
             var newArchetype = GetArchetypeWithAddedComponents(archetype, componentTypeSet);
-            if (newArchetype == archetype)  // none were added
+            if (newArchetype == archetype) // none were added
                 return;
             var archetypeChunkFilter = GetArchetypeChunkFilterWithAddedComponents(chunk, newArchetype);
             Move(entity, ref archetypeChunkFilter);
@@ -52,16 +52,27 @@ namespace Unity.Entities
             var chunk = GetChunk(entity);
             var archetype = GetArchetype(chunk);
             var newArchetype = GetArchetypeWithRemovedComponents(archetype, componentTypeSet);
-            if (newArchetype == archetype)  // none were removed
+            if (newArchetype == archetype) // none were removed
                 return;
             var archetypeChunkFilter = GetArchetypeChunkFilterWithRemovedComponents(chunk, newArchetype);
             Move(entity, ref archetypeChunkFilter);
         }
 
-        bool AddComponent(EntityBatchInChunk entityBatchInChunk, ComponentType componentType, int sharedComponentIndex = 0)
+        bool AddComponent(
+            EntityBatchInChunk entityBatchInChunk,
+            ComponentType componentType,
+            int sharedComponentIndex = 0
+        )
         {
             var srcChunk = entityBatchInChunk.Chunk;
-            if (!GetArchetypeChunkFilterWithAddedComponent(srcChunk, componentType, sharedComponentIndex, out var archetypeChunkFilter))
+            if (
+                !GetArchetypeChunkFilterWithAddedComponent(
+                    srcChunk,
+                    componentType,
+                    sharedComponentIndex,
+                    out var archetypeChunkFilter
+                )
+            )
                 return false;
 
             Move(entityBatchInChunk, ref archetypeChunkFilter);
@@ -73,7 +84,7 @@ namespace Unity.Entities
             var srcChunk = entityBatchInChunk.Chunk;
             var srcArchetype = GetArchetype(srcChunk);
             var dstArchetype = GetArchetypeWithAddedComponents(srcArchetype, componentTypeSet);
-            if (dstArchetype == srcArchetype)  // none were added
+            if (dstArchetype == srcArchetype) // none were added
                 return false;
 
             var archetypeChunkFilter = GetArchetypeChunkFilterWithAddedComponents(srcChunk, dstArchetype);
@@ -100,7 +111,7 @@ namespace Unity.Entities
             var srcArchetype = GetArchetype(srcChunk);
 
             var dstArchetype = GetArchetypeWithRemovedComponents(srcArchetype, componentTypeSet);
-            if (dstArchetype == srcArchetype)  // none were removed
+            if (dstArchetype == srcArchetype) // none were removed
                 return false;
 
             var archetypeChunkFilter = GetArchetypeChunkFilterWithRemovedComponents(srcChunk, dstArchetype);
@@ -111,7 +122,12 @@ namespace Unity.Entities
             return true;
         }
 
-        public void AddComponent(ArchetypeChunk* chunks, int chunkCount, ComponentType componentType, int sharedComponentIndex = 0)
+        public void AddComponent(
+            ArchetypeChunk* chunks,
+            int chunkCount,
+            ComponentType componentType,
+            int sharedComponentIndex = 0
+        )
         {
             Archetype* prevArchetype = null;
             Archetype* dstArchetype = null;
@@ -130,7 +146,14 @@ namespace Unity.Entities
                 if (dstArchetype == null)
                     continue;
 
-                var archetypeChunkFilter = GetArchetypeChunkFilterWithAddedComponent(srcArchetype, chunk.ListIndex, dstArchetype, indexInTypeArray, componentType, sharedComponentIndex);
+                var archetypeChunkFilter = GetArchetypeChunkFilterWithAddedComponent(
+                    srcArchetype,
+                    chunk.ListIndex,
+                    dstArchetype,
+                    indexInTypeArray,
+                    componentType,
+                    sharedComponentIndex
+                );
 
                 Move(chunk, ref archetypeChunkFilter);
             }
@@ -142,37 +165,50 @@ namespace Unity.Entities
             public ChunkIndex Chunk;
             public int ChunkEntityCount;
             public byte UseEnabledMask;
+
             public int CompareTo(ChunkAndEnabledMask other) => Chunk.CompareTo(other.Chunk);
         }
 
-        public void AddComponent(EntityQueryImpl *queryImpl, ComponentType componentType, int sharedComponentIndex = 0)
+        public void AddComponent(EntityQueryImpl* queryImpl, ComponentType componentType, int sharedComponentIndex = 0)
         {
-            var chunkCacheIterator = new UnsafeChunkCacheIterator(queryImpl->_Filter,
+            var chunkCacheIterator = new UnsafeChunkCacheIterator(
+                queryImpl->_Filter,
                 queryImpl->_QueryData->HasEnableableComponents != 0,
-                queryImpl->GetMatchingChunkCache(), queryImpl->_QueryData->MatchingArchetypes.Ptr);
+                queryImpl->GetMatchingChunkCache(),
+                queryImpl->_QueryData->MatchingArchetypes.Ptr
+            );
             int chunkIndex = -1;
             v128 chunkEnabledMask = default;
             int maxChunkCount = chunkCacheIterator.Length;
             using var chunksToProcess = new UnsafeList<ChunkAndEnabledMask>(maxChunkCount, Allocator.TempJob);
-            while (chunkCacheIterator.MoveNextChunk(ref chunkIndex, out var archetypeChunk, out int chunkEntityCount,
-                       out byte useEnabledMask, ref chunkEnabledMask))
+            while (
+                chunkCacheIterator.MoveNextChunk(
+                    ref chunkIndex,
+                    out var archetypeChunk,
+                    out int chunkEntityCount,
+                    out byte useEnabledMask,
+                    ref chunkEnabledMask
+                )
+            )
             {
                 // Structural changes are not allowed while using an UnsafeChunkCacheIterator, so we just track
                 // the chunks & metadata to process outside the loop.
-                chunksToProcess.AddNoResize(new ChunkAndEnabledMask
-                {
-                    Chunk = archetypeChunk.m_Chunk,
-                    EnabledMask = chunkEnabledMask,
-                    ChunkEntityCount = chunkEntityCount,
-                    UseEnabledMask = useEnabledMask,
-                });
+                chunksToProcess.AddNoResize(
+                    new ChunkAndEnabledMask
+                    {
+                        Chunk = archetypeChunk.m_Chunk,
+                        EnabledMask = chunkEnabledMask,
+                        ChunkEntityCount = chunkEntityCount,
+                        UseEnabledMask = useEnabledMask,
+                    }
+                );
             }
             // Apply the structural change to all chunks
             Archetype* srcArchetype = null;
             Archetype* dstArchetype = null;
             int indexInTypeArray = 0;
             var chunkBatches = stackalloc EntityBatchInChunk[TypeManager.MaximumChunkCapacity];
-            for(int iChunk=0,chunkCount=chunksToProcess.Length; iChunk<chunkCount; ++iChunk)
+            for (int iChunk = 0, chunkCount = chunksToProcess.Length; iChunk < chunkCount; ++iChunk)
             {
                 var chunk = chunksToProcess[iChunk].Chunk;
                 var chunkArchetype = GetArchetype(chunk);
@@ -187,13 +223,26 @@ namespace Unity.Entities
                     // assign the new component value. Otherwise, there's nothing to do for this chunk.
                     if (Hint.Unlikely(componentType.IsSharedComponent))
                     {
-                        SetSharedComponentDataIndexForChunk(chunk, chunkArchetype, componentType, sharedComponentIndex,
-                            chunksToProcess[iChunk].UseEnabledMask, chunksToProcess[iChunk].EnabledMask, chunkBatches);
+                        SetSharedComponentDataIndexForChunk(
+                            chunk,
+                            chunkArchetype,
+                            componentType,
+                            sharedComponentIndex,
+                            chunksToProcess[iChunk].UseEnabledMask,
+                            chunksToProcess[iChunk].EnabledMask,
+                            chunkBatches
+                        );
                     }
                     continue;
                 }
-                var archetypeChunkFilter = GetArchetypeChunkFilterWithAddedComponent(srcArchetype, chunk.ListIndex, dstArchetype,
-                    indexInTypeArray, componentType, sharedComponentIndex);
+                var archetypeChunkFilter = GetArchetypeChunkFilterWithAddedComponent(
+                    srcArchetype,
+                    chunk.ListIndex,
+                    dstArchetype,
+                    indexInTypeArray,
+                    componentType,
+                    sharedComponentIndex
+                );
                 if (chunksToProcess[iChunk].UseEnabledMask == 0)
                 {
                     // All entities in the chunk are enabled; move it en masse
@@ -207,12 +256,20 @@ namespace Unity.Entities
                     int batchCount = 0;
                     int batchEndIndex = 0;
                     chunkEnabledMask = chunksToProcess[iChunk].EnabledMask;
-                    while (EnabledBitUtility.TryGetNextRange(chunkEnabledMask, batchEndIndex,
-                               out int batchStartIndex, out batchEndIndex))
+                    while (
+                        EnabledBitUtility.TryGetNextRange(
+                            chunkEnabledMask,
+                            batchEndIndex,
+                            out int batchStartIndex,
+                            out batchEndIndex
+                        )
+                    )
                     {
                         chunkBatches[batchCount++] = new EntityBatchInChunk
                         {
-                            Chunk = chunk, Count = batchEndIndex - batchStartIndex, StartIndex = batchStartIndex
+                            Chunk = chunk,
+                            Count = batchEndIndex - batchStartIndex,
+                            StartIndex = batchStartIndex,
                         };
                     }
 
@@ -228,29 +285,62 @@ namespace Unity.Entities
 
         // This variant sets the shared component value for all entities in a chunk. If only a subset of entities should
         // take the new value, use a different variant.
-        public void SetSharedComponentDataIndexForChunk(ChunkIndex chunk, Archetype* chunkArchetype, ComponentType componentType, int dstSharedComponentDataIndex)
+        public void SetSharedComponentDataIndexForChunk(
+            ChunkIndex chunk,
+            Archetype* chunkArchetype,
+            ComponentType componentType,
+            int dstSharedComponentDataIndex
+        )
         {
-            if (!GetArchetypeChunkFilterWithChangedSharedComponent(chunk, componentType, dstSharedComponentDataIndex, out var archetypeChunkFilter))
+            if (
+                !GetArchetypeChunkFilterWithChangedSharedComponent(
+                    chunk,
+                    componentType,
+                    dstSharedComponentDataIndex,
+                    out var archetypeChunkFilter
+                )
+            )
                 return; // this chunk already has the desired shared component value
             // All entities in the chunk are enabled; set the value en masse
-            ChunkDataUtility.SetSharedComponentDataIndex(chunk, chunkArchetype,
-                archetypeChunkFilter.SharedComponentValues, componentType.TypeIndex);
+            ChunkDataUtility.SetSharedComponentDataIndex(
+                chunk,
+                chunkArchetype,
+                archetypeChunkFilter.SharedComponentValues,
+                componentType.TypeIndex
+            );
         }
-
 
         // Shared codepath for SetSharedComponent(query) and AddComponent(query). This variant handles changing the value
         // for multiple entities in a chunk, according to the provided enabledMask. The caller is responsible for allocating the
         // chunkBatches array (generally with a stackalloc).
-        void SetSharedComponentDataIndexForChunk(ChunkIndex chunk, Archetype* chunkArchetype,
-            ComponentType componentType, int sharedComponentIndex, byte useEnabledMask, v128 chunkEnabledMask, EntityBatchInChunk* chunkBatches)
+        void SetSharedComponentDataIndexForChunk(
+            ChunkIndex chunk,
+            Archetype* chunkArchetype,
+            ComponentType componentType,
+            int sharedComponentIndex,
+            byte useEnabledMask,
+            v128 chunkEnabledMask,
+            EntityBatchInChunk* chunkBatches
+        )
         {
-            if (!GetArchetypeChunkFilterWithChangedSharedComponent(chunk, componentType, sharedComponentIndex, out var archetypeChunkFilter))
+            if (
+                !GetArchetypeChunkFilterWithChangedSharedComponent(
+                    chunk,
+                    componentType,
+                    sharedComponentIndex,
+                    out var archetypeChunkFilter
+                )
+            )
                 return; // this chunk already has the desired shared component value
             if (useEnabledMask == 0)
             {
                 // All entities in the chunk are enabled; set the value en masse
-                ChunkDataUtility.SetSharedComponentDataIndex(chunk, chunkArchetype,
-                    archetypeChunkFilter.SharedComponentValues, componentType.TypeIndex);
+                ChunkDataUtility.SetSharedComponentDataIndex(
+                    chunk,
+                    chunkArchetype,
+                    archetypeChunkFilter.SharedComponentValues,
+                    componentType.TypeIndex
+                );
             }
             else
             {
@@ -259,12 +349,20 @@ namespace Unity.Entities
                 // for both branches here is fine.
                 int batchCount = 0;
                 int batchEndIndex = 0;
-                while (EnabledBitUtility.TryGetNextRange(chunkEnabledMask, batchEndIndex, out int batchStartIndex,
-                           out batchEndIndex))
+                while (
+                    EnabledBitUtility.TryGetNextRange(
+                        chunkEnabledMask,
+                        batchEndIndex,
+                        out int batchStartIndex,
+                        out batchEndIndex
+                    )
+                )
                 {
                     chunkBatches[batchCount++] = new EntityBatchInChunk
                     {
-                        Chunk = chunk, Count = batchEndIndex - batchStartIndex, StartIndex = batchStartIndex
+                        Chunk = chunk,
+                        Count = batchEndIndex - batchStartIndex,
+                        StartIndex = batchStartIndex,
                     };
                 }
 
@@ -272,40 +370,56 @@ namespace Unity.Entities
                 // Iterate batches backwards, to avoid mutating entities we haven't processed yet
                 for (int i = batchCount - 1; i >= 0; i--)
                 {
-                    ChunkDataUtility.SetSharedComponentDataIndex(chunkBatches[i], chunkArchetype,
-                        archetypeChunkFilter.SharedComponentValues, componentType.TypeIndex);
+                    ChunkDataUtility.SetSharedComponentDataIndex(
+                        chunkBatches[i],
+                        chunkArchetype,
+                        archetypeChunkFilter.SharedComponentValues,
+                        componentType.TypeIndex
+                    );
                 }
             }
         }
 
         public void AddComponents(EntityQueryImpl* queryImpl, in ComponentTypeSet componentTypeSet)
         {
-            var chunkCacheIterator = new UnsafeChunkCacheIterator(queryImpl->_Filter,
+            var chunkCacheIterator = new UnsafeChunkCacheIterator(
+                queryImpl->_Filter,
                 queryImpl->_QueryData->HasEnableableComponents != 0,
-                queryImpl->GetMatchingChunkCache(), queryImpl->_QueryData->MatchingArchetypes.Ptr);
+                queryImpl->GetMatchingChunkCache(),
+                queryImpl->_QueryData->MatchingArchetypes.Ptr
+            );
 
             int chunkIndex = -1;
             v128 chunkEnabledMask = default;
             int maxChunkCount = chunkCacheIterator.Length;
             using var chunksToProcess = new UnsafeList<ChunkAndEnabledMask>(maxChunkCount, Allocator.TempJob);
-            while (chunkCacheIterator.MoveNextChunk(ref chunkIndex, out var archetypeChunk, out int chunkEntityCount,
-                       out byte useEnabledMask, ref chunkEnabledMask))
+            while (
+                chunkCacheIterator.MoveNextChunk(
+                    ref chunkIndex,
+                    out var archetypeChunk,
+                    out int chunkEntityCount,
+                    out byte useEnabledMask,
+                    ref chunkEnabledMask
+                )
+            )
             {
                 // Structural changes are not allowed while using an UnsafeChunkCacheIterator, so we just track
                 // the chunks & metadata to process outside the loop.
-                chunksToProcess.AddNoResize(new ChunkAndEnabledMask
-                {
-                    Chunk = archetypeChunk.m_Chunk,
-                    EnabledMask = chunkEnabledMask,
-                    ChunkEntityCount = chunkEntityCount,
-                    UseEnabledMask = useEnabledMask,
-                });
+                chunksToProcess.AddNoResize(
+                    new ChunkAndEnabledMask
+                    {
+                        Chunk = archetypeChunk.m_Chunk,
+                        EnabledMask = chunkEnabledMask,
+                        ChunkEntityCount = chunkEntityCount,
+                        UseEnabledMask = useEnabledMask,
+                    }
+                );
             }
             // Apply the structural change to all chunks
             Archetype* srcArchetype = null;
             Archetype* dstArchetype = null;
             var chunkBatches = stackalloc EntityBatchInChunk[TypeManager.MaximumChunkCapacity];
-            for(int iChunk=0,chunkCount=chunksToProcess.Length; iChunk<chunkCount; ++iChunk)
+            for (int iChunk = 0, chunkCount = chunksToProcess.Length; iChunk < chunkCount; ++iChunk)
             {
                 var chunk = chunksToProcess[iChunk].Chunk;
                 var chunkArchetype = GetArchetype(chunk);
@@ -330,11 +444,20 @@ namespace Unity.Entities
                     int batchCount = 0;
                     int batchEndIndex = 0;
                     chunkEnabledMask = chunksToProcess[iChunk].EnabledMask;
-                    while (EnabledBitUtility.TryGetNextRange(chunkEnabledMask, batchEndIndex, out int batchStartIndex, out batchEndIndex))
+                    while (
+                        EnabledBitUtility.TryGetNextRange(
+                            chunkEnabledMask,
+                            batchEndIndex,
+                            out int batchStartIndex,
+                            out batchEndIndex
+                        )
+                    )
                     {
                         chunkBatches[batchCount++] = new EntityBatchInChunk
                         {
-                            Chunk = chunk, Count = batchEndIndex - batchStartIndex, StartIndex = batchStartIndex
+                            Chunk = chunk,
+                            Count = batchEndIndex - batchStartIndex,
+                            StartIndex = batchStartIndex,
                         };
                     }
                     Assert.IsTrue(batchCount <= TypeManager.MaximumChunkCapacity);
@@ -367,7 +490,12 @@ namespace Unity.Entities
                 if (dstArchetype == srcArchetype)
                     continue;
 
-                var archetypeChunkFilter = GetArchetypeChunkFilterWithRemovedComponent(chunk, dstArchetype, indexInTypeArray, componentType);
+                var archetypeChunkFilter = GetArchetypeChunkFilterWithRemovedComponent(
+                    chunk,
+                    dstArchetype,
+                    indexInTypeArray,
+                    componentType
+                );
 
                 Move(chunk, ref archetypeChunkFilter);
             }
@@ -375,32 +503,44 @@ namespace Unity.Entities
 
         public void RemoveComponent(EntityQueryImpl* queryImpl, ComponentType componentType)
         {
-            var chunkCacheIterator = new UnsafeChunkCacheIterator(queryImpl->_Filter,
+            var chunkCacheIterator = new UnsafeChunkCacheIterator(
+                queryImpl->_Filter,
                 queryImpl->_QueryData->HasEnableableComponents != 0,
-                queryImpl->GetMatchingChunkCache(), queryImpl->_QueryData->MatchingArchetypes.Ptr);
+                queryImpl->GetMatchingChunkCache(),
+                queryImpl->_QueryData->MatchingArchetypes.Ptr
+            );
             int chunkIndex = -1;
             v128 chunkEnabledMask = default;
             int maxChunkCount = chunkCacheIterator.Length;
             using var chunksToProcess = new UnsafeList<ChunkAndEnabledMask>(maxChunkCount, Allocator.TempJob);
-            while (chunkCacheIterator.MoveNextChunk(ref chunkIndex, out var archetypeChunk, out int chunkEntityCount,
-                       out byte useEnabledMask, ref chunkEnabledMask))
+            while (
+                chunkCacheIterator.MoveNextChunk(
+                    ref chunkIndex,
+                    out var archetypeChunk,
+                    out int chunkEntityCount,
+                    out byte useEnabledMask,
+                    ref chunkEnabledMask
+                )
+            )
             {
                 // Structural changes are not allowed while using an UnsafeChunkCacheIterator, so we just track
                 // the chunks & metadata to process outside the loop.
-                chunksToProcess.AddNoResize(new ChunkAndEnabledMask
-                {
-                    Chunk = archetypeChunk.m_Chunk,
-                    EnabledMask = chunkEnabledMask,
-                    ChunkEntityCount = chunkEntityCount,
-                    UseEnabledMask = useEnabledMask,
-                });
+                chunksToProcess.AddNoResize(
+                    new ChunkAndEnabledMask
+                    {
+                        Chunk = archetypeChunk.m_Chunk,
+                        EnabledMask = chunkEnabledMask,
+                        ChunkEntityCount = chunkEntityCount,
+                        UseEnabledMask = useEnabledMask,
+                    }
+                );
             }
             // Apply the structural change to all chunks
             Archetype* srcArchetype = null;
             Archetype* dstArchetype = null;
             int indexInTypeArray = 0;
             var chunkBatches = stackalloc EntityBatchInChunk[TypeManager.MaximumChunkCapacity];
-            for(int iChunk=0,chunkCount=chunksToProcess.Length; iChunk<chunkCount; ++iChunk)
+            for (int iChunk = 0, chunkCount = chunksToProcess.Length; iChunk < chunkCount; ++iChunk)
             {
                 var chunk = chunksToProcess[iChunk].Chunk;
                 var chunkArchetype = GetArchetype(chunk);
@@ -411,7 +551,12 @@ namespace Unity.Entities
                 }
                 if (Hint.Unlikely(dstArchetype == srcArchetype))
                     continue;
-                var archetypeChunkFilter = GetArchetypeChunkFilterWithRemovedComponent(chunk, dstArchetype, indexInTypeArray, componentType);
+                var archetypeChunkFilter = GetArchetypeChunkFilterWithRemovedComponent(
+                    chunk,
+                    dstArchetype,
+                    indexInTypeArray,
+                    componentType
+                );
                 if (chunksToProcess[iChunk].UseEnabledMask == 0)
                 {
                     // All entities in the chunk are enabled; move it en masse
@@ -425,11 +570,20 @@ namespace Unity.Entities
                     int batchCount = 0;
                     int batchEndIndex = 0;
                     chunkEnabledMask = chunksToProcess[iChunk].EnabledMask;
-                    while (EnabledBitUtility.TryGetNextRange(chunkEnabledMask, batchEndIndex, out int batchStartIndex, out batchEndIndex))
+                    while (
+                        EnabledBitUtility.TryGetNextRange(
+                            chunkEnabledMask,
+                            batchEndIndex,
+                            out int batchStartIndex,
+                            out batchEndIndex
+                        )
+                    )
                     {
                         chunkBatches[batchCount++] = new EntityBatchInChunk
                         {
-                            Chunk = chunk, Count = batchEndIndex - batchStartIndex, StartIndex = batchStartIndex
+                            Chunk = chunk,
+                            Count = batchEndIndex - batchStartIndex,
+                            StartIndex = batchStartIndex,
                         };
                     }
                     Assert.IsTrue(batchCount <= TypeManager.MaximumChunkCapacity);
@@ -444,32 +598,44 @@ namespace Unity.Entities
 
         public void RemoveComponents(EntityQueryImpl* queryImpl, in ComponentTypeSet componentTypeSet)
         {
-            var chunkCacheIterator = new UnsafeChunkCacheIterator(queryImpl->_Filter,
+            var chunkCacheIterator = new UnsafeChunkCacheIterator(
+                queryImpl->_Filter,
                 queryImpl->_QueryData->HasEnableableComponents != 0,
-                queryImpl->GetMatchingChunkCache(), queryImpl->_QueryData->MatchingArchetypes.Ptr);
+                queryImpl->GetMatchingChunkCache(),
+                queryImpl->_QueryData->MatchingArchetypes.Ptr
+            );
 
             int chunkIndex = -1;
             v128 chunkEnabledMask = default;
             int maxChunkCount = chunkCacheIterator.Length;
             using var chunksToProcess = new UnsafeList<ChunkAndEnabledMask>(maxChunkCount, Allocator.TempJob);
-            while (chunkCacheIterator.MoveNextChunk(ref chunkIndex, out var archetypeChunk, out int chunkEntityCount,
-                       out byte useEnabledMask, ref chunkEnabledMask))
+            while (
+                chunkCacheIterator.MoveNextChunk(
+                    ref chunkIndex,
+                    out var archetypeChunk,
+                    out int chunkEntityCount,
+                    out byte useEnabledMask,
+                    ref chunkEnabledMask
+                )
+            )
             {
                 // Structural changes are not allowed while using an UnsafeChunkCacheIterator, so we just track
                 // the chunks & metadata to process outside the loop.
-                chunksToProcess.AddNoResize(new ChunkAndEnabledMask
-                {
-                    Chunk = archetypeChunk.m_Chunk,
-                    EnabledMask = chunkEnabledMask,
-                    ChunkEntityCount = chunkEntityCount,
-                    UseEnabledMask = useEnabledMask,
-                });
+                chunksToProcess.AddNoResize(
+                    new ChunkAndEnabledMask
+                    {
+                        Chunk = archetypeChunk.m_Chunk,
+                        EnabledMask = chunkEnabledMask,
+                        ChunkEntityCount = chunkEntityCount,
+                        UseEnabledMask = useEnabledMask,
+                    }
+                );
             }
             // Apply the structural change to all chunks
             Archetype* srcArchetype = null;
             Archetype* dstArchetype = null;
             var chunkBatches = stackalloc EntityBatchInChunk[TypeManager.MaximumChunkCapacity];
-            for(int iChunk=0,chunkCount=chunksToProcess.Length; iChunk<chunkCount; ++iChunk)
+            for (int iChunk = 0, chunkCount = chunksToProcess.Length; iChunk < chunkCount; ++iChunk)
             {
                 var chunk = chunksToProcess[iChunk].Chunk;
                 var chunkArchetype = GetArchetype(chunk);
@@ -494,11 +660,20 @@ namespace Unity.Entities
                     int batchCount = 0;
                     int batchEndIndex = 0;
                     chunkEnabledMask = chunksToProcess[iChunk].EnabledMask;
-                    while (EnabledBitUtility.TryGetNextRange(chunkEnabledMask, batchEndIndex, out int batchStartIndex, out batchEndIndex))
+                    while (
+                        EnabledBitUtility.TryGetNextRange(
+                            chunkEnabledMask,
+                            batchEndIndex,
+                            out int batchStartIndex,
+                            out batchEndIndex
+                        )
+                    )
                     {
                         chunkBatches[batchCount++] = new EntityBatchInChunk
                         {
-                            Chunk = chunk, Count = batchEndIndex - batchStartIndex, StartIndex = batchStartIndex
+                            Chunk = chunk,
+                            Count = batchEndIndex - batchStartIndex,
+                            StartIndex = batchStartIndex,
                         };
                     }
                     Assert.IsTrue(batchCount <= TypeManager.MaximumChunkCapacity);
@@ -511,7 +686,11 @@ namespace Unity.Entities
             }
         }
 
-        public void AddComponent(UnsafeList<EntityBatchInChunk>* sortedEntityBatchList, ComponentType type, int existingSharedComponentIndex)
+        public void AddComponent(
+            UnsafeList<EntityBatchInChunk>* sortedEntityBatchList,
+            ComponentType type,
+            int existingSharedComponentIndex
+        )
         {
             Assert.IsFalse(type.IsChunkComponent);
 
@@ -547,44 +726,83 @@ namespace Unity.Entities
                 RemoveComponent(sortedEntityBatchList->Ptr[i], type);
         }
 
-        public void SetSharedComponentDataIndex(Entity entity, ComponentType componentType, int dstSharedComponentDataIndex)
+        public void SetSharedComponentDataIndex(
+            Entity entity,
+            ComponentType componentType,
+            int dstSharedComponentDataIndex
+        )
         {
-            if (!GetArchetypeChunkFilterWithChangedSharedComponent(GetChunk(entity), componentType, dstSharedComponentDataIndex, out var archetypeChunkFilter))
+            if (
+                !GetArchetypeChunkFilterWithChangedSharedComponent(
+                    GetChunk(entity),
+                    componentType,
+                    dstSharedComponentDataIndex,
+                    out var archetypeChunkFilter
+                )
+            )
                 return; // The chunk already has the requested shared component value
 
-            ChunkDataUtility.SetSharedComponentDataIndex(entity, archetypeChunkFilter.Archetype, archetypeChunkFilter.SharedComponentValues, componentType.TypeIndex);
+            ChunkDataUtility.SetSharedComponentDataIndex(
+                entity,
+                archetypeChunkFilter.Archetype,
+                archetypeChunkFilter.SharedComponentValues,
+                componentType.TypeIndex
+            );
         }
 
-        public void SetSharedComponentDataIndex(EntityQueryImpl* queryImpl, ComponentType componentType, int dstSharedComponentDataIndex)
+        public void SetSharedComponentDataIndex(
+            EntityQueryImpl* queryImpl,
+            ComponentType componentType,
+            int dstSharedComponentDataIndex
+        )
         {
-            var chunkCacheIterator = new UnsafeChunkCacheIterator(queryImpl->_Filter,
+            var chunkCacheIterator = new UnsafeChunkCacheIterator(
+                queryImpl->_Filter,
                 queryImpl->_QueryData->HasEnableableComponents != 0,
-                queryImpl->GetMatchingChunkCache(), queryImpl->_QueryData->MatchingArchetypes.Ptr);
+                queryImpl->GetMatchingChunkCache(),
+                queryImpl->_QueryData->MatchingArchetypes.Ptr
+            );
             int chunkIndex = -1;
             v128 chunkEnabledMask = default;
             int maxChunkCount = chunkCacheIterator.Length;
             using var chunksToProcess = new UnsafeList<ChunkAndEnabledMask>(maxChunkCount, Allocator.TempJob);
-            while (chunkCacheIterator.MoveNextChunk(ref chunkIndex, out var archetypeChunk, out int chunkEntityCount,
-                       out byte useEnabledMask, ref chunkEnabledMask))
+            while (
+                chunkCacheIterator.MoveNextChunk(
+                    ref chunkIndex,
+                    out var archetypeChunk,
+                    out int chunkEntityCount,
+                    out byte useEnabledMask,
+                    ref chunkEnabledMask
+                )
+            )
             {
                 // Structural changes are not allowed while using an UnsafeChunkCacheIterator, so we just track
                 // the chunks & metadata to process outside the loop.
-                chunksToProcess.AddNoResize(new ChunkAndEnabledMask
-                {
-                    Chunk = archetypeChunk.m_Chunk,
-                    EnabledMask = chunkEnabledMask,
-                    ChunkEntityCount = chunkEntityCount,
-                    UseEnabledMask = useEnabledMask,
-                });
+                chunksToProcess.AddNoResize(
+                    new ChunkAndEnabledMask
+                    {
+                        Chunk = archetypeChunk.m_Chunk,
+                        EnabledMask = chunkEnabledMask,
+                        ChunkEntityCount = chunkEntityCount,
+                        UseEnabledMask = useEnabledMask,
+                    }
+                );
             }
             // Apply the structural change to all chunks
             var chunkBatches = stackalloc EntityBatchInChunk[TypeManager.MaximumChunkCapacity];
-            for(int iChunk=0,chunkCount=chunksToProcess.Length; iChunk<chunkCount; ++iChunk)
+            for (int iChunk = 0, chunkCount = chunksToProcess.Length; iChunk < chunkCount; ++iChunk)
             {
                 var chunk = chunksToProcess[iChunk].Chunk;
                 var chunkArchetype = GetArchetype(chunk);
-                SetSharedComponentDataIndexForChunk(chunk, chunkArchetype, componentType, dstSharedComponentDataIndex,
-                    chunksToProcess[iChunk].UseEnabledMask, chunksToProcess[iChunk].EnabledMask, chunkBatches);
+                SetSharedComponentDataIndexForChunk(
+                    chunk,
+                    chunkArchetype,
+                    componentType,
+                    dstSharedComponentDataIndex,
+                    chunksToProcess[iChunk].UseEnabledMask,
+                    chunksToProcess[iChunk].EnabledMask,
+                    chunkBatches
+                );
             }
         }
 
@@ -611,7 +829,12 @@ namespace Unity.Entities
             Move(srcChunk, ref archetypeChunkFilter);
         }
 
-        public void MoveAndSetChangeVersion(EntityBatchInChunk batch, Archetype* archetype, SharedComponentValues sharedComponentValues, TypeIndex typeIndex)
+        public void MoveAndSetChangeVersion(
+            EntityBatchInChunk batch,
+            Archetype* archetype,
+            SharedComponentValues sharedComponentValues,
+            TypeIndex typeIndex
+        )
         {
             var archetypeChunkFilter = new ArchetypeChunkFilter(archetype, sharedComponentValues);
             MoveAndSetChangeVersion(batch, ref archetypeChunkFilter, typeIndex);
@@ -626,7 +849,12 @@ namespace Unity.Entities
             var srcEntityInChunk = GetEntityInChunk(entity);
             var srcChunk = srcEntityInChunk.Chunk;
             var srcChunkIndex = srcEntityInChunk.IndexInChunk;
-            var entityBatch = new EntityBatchInChunk { Chunk = srcChunk, Count = 1, StartIndex = srcChunkIndex };
+            var entityBatch = new EntityBatchInChunk
+            {
+                Chunk = srcChunk,
+                Count = 1,
+                StartIndex = srcChunkIndex,
+            };
 
             Move(entityBatch, dstChunk);
         }
@@ -635,7 +863,11 @@ namespace Unity.Entities
         {
             var srcEntityInChunk = GetEntityInChunk(entity);
             var entityBatch = new EntityBatchInChunk
-                {Chunk = srcEntityInChunk.Chunk, Count = 1, StartIndex = srcEntityInChunk.IndexInChunk};
+            {
+                Chunk = srcEntityInChunk.Chunk,
+                Count = 1,
+                StartIndex = srcEntityInChunk.IndexInChunk,
+            };
 
             Move(entityBatch, ref archetypeChunkFilter);
         }
@@ -651,14 +883,24 @@ namespace Unity.Entities
 
             if (ChunkDataUtility.AreLayoutCompatible(srcArchetype, archetypeChunkFilter.Archetype))
             {
-                fixed(int* sharedComponentValues = archetypeChunkFilter.SharedComponentValues)
+                fixed (int* sharedComponentValues = archetypeChunkFilter.SharedComponentValues)
                 {
-                    ChunkDataUtility.ChangeArchetypeInPlace(srcArchetype, srcChunk, archetypeChunkFilter.Archetype, sharedComponentValues);
+                    ChunkDataUtility.ChangeArchetypeInPlace(
+                        srcArchetype,
+                        srcChunk,
+                        archetypeChunkFilter.Archetype,
+                        sharedComponentValues
+                    );
                 }
                 return;
             }
 
-            var entityBatch = new EntityBatchInChunk { Chunk = srcChunk, Count = srcChunk.Count, StartIndex = 0 };
+            var entityBatch = new EntityBatchInChunk
+            {
+                Chunk = srcChunk,
+                Count = srcChunk.Count,
+                StartIndex = 0,
+            };
             Move(entityBatch, ref archetypeChunkFilter);
         }
 
@@ -680,14 +922,26 @@ namespace Unity.Entities
             while (srcRemainingCount > 0)
             {
                 var dstChunk = GetChunkWithEmptySlots(ref archetypeChunkFilter);
-                var dstCount = Move(new EntityBatchInChunk { Chunk = srcChunk, Count = srcRemainingCount, StartIndex = startIndex }, dstChunk);
+                var dstCount = Move(
+                    new EntityBatchInChunk
+                    {
+                        Chunk = srcChunk,
+                        Count = srcRemainingCount,
+                        StartIndex = startIndex,
+                    },
+                    dstChunk
+                );
                 srcRemainingCount -= dstCount;
             }
         }
 
         // This variant is to implement SetSharedComponent(EntityBatchInChunk), where we need to update the shared component's change version
         // for all chunks that entities in the batch are moved into.
-        void MoveAndSetChangeVersion(EntityBatchInChunk entityBatchInChunk, ref ArchetypeChunkFilter archetypeChunkFilter, TypeIndex typeIndex)
+        void MoveAndSetChangeVersion(
+            EntityBatchInChunk entityBatchInChunk,
+            ref ArchetypeChunkFilter archetypeChunkFilter,
+            TypeIndex typeIndex
+        )
         {
             var cleanupComplete = archetypeChunkFilter.Archetype->CleanupComplete;
 
@@ -708,10 +962,17 @@ namespace Unity.Entities
             while (srcRemainingCount > 0)
             {
                 var dstChunk = GetChunkWithEmptySlots(ref archetypeChunkFilter);
-                var dstCount = Move(new EntityBatchInChunk { Chunk = srcChunk, Count = srcRemainingCount, StartIndex = startIndex }, dstChunk);
+                var dstCount = Move(
+                    new EntityBatchInChunk
+                    {
+                        Chunk = srcChunk,
+                        Count = srcRemainingCount,
+                        StartIndex = startIndex,
+                    },
+                    dstChunk
+                );
                 srcRemainingCount -= dstCount;
-                dstArchetype->Chunks.SetChangeVersion(typeIndexInDstArchetype, dstChunk.ListIndex,
-                    GlobalSystemVersion);
+                dstArchetype->Chunks.SetChangeVersion(typeIndexInDstArchetype, dstChunk.ListIndex, GlobalSystemVersion);
             }
         }
 
@@ -740,7 +1001,7 @@ namespace Unity.Entities
             {
                 Chunk = srcChunk,
                 StartIndex = srcStartIndex,
-                Count = srcCount
+                Count = srcCount,
             };
 
             ChunkDataUtility.Clone(srcArchetype, partialSrcBatch, dstArchetype, dstChunk);

@@ -27,7 +27,8 @@ namespace UnityEngine.Rendering
                     m_ScheduledItems[i] = new ScheduledItemsDictionary();
             }
 
-            internal ScheduledItemsDictionary GetScheduledItemsDictionary(DebugUI.Context context) => m_ScheduledItems[(int)context];
+            internal ScheduledItemsDictionary GetScheduledItemsDictionary(DebugUI.Context context) =>
+                m_ScheduledItems[(int)context];
 
             public void SetEnabled(DebugUI.Context context, DebugUI.Widget widget, bool enabled)
             {

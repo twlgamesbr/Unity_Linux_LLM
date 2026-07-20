@@ -21,7 +21,9 @@ namespace UnityEngine.InputSystem.Editor
             propertyPath = wrappedProperty.propertyPath;
             initialStateCheck = ReadInitialStateCheck(serializedProperty);
             actionTypeTooltip = serializedProperty.FindPropertyRelative(nameof(InputAction.m_Type)).GetTooltip();
-            expectedControlTypeTooltip = serializedProperty.FindPropertyRelative(nameof(InputAction.m_ExpectedControlType)).GetTooltip();
+            expectedControlTypeTooltip = serializedProperty
+                .FindPropertyRelative(nameof(InputAction.m_ExpectedControlType))
+                .GetTooltip();
         }
 
         public string id { get; }
@@ -38,7 +40,9 @@ namespace UnityEngine.InputSystem.Editor
 
         private static string ReadExpectedControlType(SerializedProperty serializedProperty)
         {
-            var controlType = serializedProperty.FindPropertyRelative(nameof(InputAction.m_ExpectedControlType)).stringValue;
+            var controlType = serializedProperty
+                .FindPropertyRelative(nameof(InputAction.m_ExpectedControlType))
+                .stringValue;
             if (!string.IsNullOrEmpty(controlType))
                 return controlType;
 

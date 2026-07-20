@@ -15,10 +15,13 @@ namespace UnityEditor.Build.Pipeline.WriteTypes
     {
         /// <inheritdoc />
         public WriteCommand Command { get; set; }
+
         /// <inheritdoc />
         public BuildUsageTagSet UsageSet { get; set; }
+
         /// <inheritdoc />
         public BuildReferenceMap ReferenceMap { get; set; }
+
         /// <inheritdoc />
         public Hash128 DependencyHash { get; set; }
 
@@ -31,15 +34,18 @@ namespace UnityEditor.Build.Pipeline.WriteTypes
         /// <inheritdoc />
         public WriteResult Write(string outputFolder, BuildSettings settings, BuildUsageTagGlobal globalUsage)
         {
-            return ContentBuildInterface.WriteSerializedFile(outputFolder, new WriteParameters
-            {
-                writeCommand = Command,
-                settings = settings,
-                globalUsage = globalUsage,
-                usageSet = UsageSet,
-                referenceMap = ReferenceMap,
-                bundleInfo = Info
-            });
+            return ContentBuildInterface.WriteSerializedFile(
+                outputFolder,
+                new WriteParameters
+                {
+                    writeCommand = Command,
+                    settings = settings,
+                    globalUsage = globalUsage,
+                    usageSet = UsageSet,
+                    referenceMap = ReferenceMap,
+                    bundleInfo = Info,
+                }
+            );
         }
 
         /// <inheritdoc />

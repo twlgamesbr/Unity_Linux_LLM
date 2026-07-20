@@ -204,20 +204,23 @@ namespace Unity.Entities.UI
                 }
                 else
                 {
-                    Debug.LogError($"{nameof(InspectorContext)}.{nameof(MakeParentScope)} was not properly disposed for parent: {parent?.name}");
+                    Debug.LogError(
+                        $"{nameof(InspectorContext)}.{nameof(MakeParentScope)} was not properly disposed for parent: {parent?.name}"
+                    );
                 }
             }
 
-            public VisitedReferencesScope<TValue> MakeVisitedReferencesScope<TValue>(ref TValue value, PropertyPath path)
+            public VisitedReferencesScope<TValue> MakeVisitedReferencesScope<TValue>(
+                ref TValue value,
+                PropertyPath path
+            )
             {
                 return new VisitedReferencesScope<TValue>(this, ref value, path);
             }
 
-            bool PushReference(object obj, PropertyPath path)
-                => m_References.PushReference(obj, path);
+            bool PushReference(object obj, PropertyPath path) => m_References.PushReference(obj, path);
 
-            void PopReference(object obj)
-                => m_References.PopReference(obj);
+            void PopReference(object obj) => m_References.PopReference(obj);
 
             public void Reset()
             {

@@ -16,9 +16,11 @@ namespace Unity.Netcode.Transports.UTP
     public unsafe struct NetworkMetricsPipelineStage : INetworkPipelineStage
     {
         /// <inheritdoc/>
-        public NetworkPipelineStage StaticInitialize(byte* staticInstanceBuffer,
+        public NetworkPipelineStage StaticInitialize(
+            byte* staticInstanceBuffer,
             int staticInstanceBufferLength,
-            NetworkSettings settings)
+            NetworkSettings settings
+        )
         {
             return new NetworkPipelineStage(
                 new TransportFunctionPointer<NetworkPipelineStage.ReceiveDelegate>(Receive),
@@ -27,7 +29,8 @@ namespace Unity.Netcode.Transports.UTP
                 ReceiveCapacity: 0,
                 SendCapacity: 0,
                 HeaderCapacity: 0,
-                SharedStateCapacity: UnsafeUtility.SizeOf<NetworkMetricsContext>());
+                SharedStateCapacity: UnsafeUtility.SizeOf<NetworkMetricsContext>()
+            );
         }
 
         /// <inheritdoc/>
@@ -35,10 +38,12 @@ namespace Unity.Netcode.Transports.UTP
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.ReceiveDelegate))]
-        private static void Receive(ref NetworkPipelineContext networkPipelineContext,
+        private static void Receive(
+            ref NetworkPipelineContext networkPipelineContext,
             ref InboundRecvBuffer inboundReceiveBuffer,
             ref NetworkPipelineStage.Requests requests,
-            int systemHeaderSize)
+            int systemHeaderSize
+        )
         {
             var networkMetricContext = (NetworkMetricsContext*)networkPipelineContext.internalSharedProcessBuffer;
             networkMetricContext->PacketReceivedCount++;
@@ -46,10 +51,12 @@ namespace Unity.Netcode.Transports.UTP
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.SendDelegate))]
-        private static int Send(ref NetworkPipelineContext networkPipelineContext,
+        private static int Send(
+            ref NetworkPipelineContext networkPipelineContext,
             ref InboundSendBuffer inboundSendBuffer,
             ref NetworkPipelineStage.Requests requests,
-            int systemHeaderSize)
+            int systemHeaderSize
+        )
         {
             var networkMetricContext = (NetworkMetricsContext*)networkPipelineContext.internalSharedProcessBuffer;
             networkMetricContext->PacketSentCount++;
@@ -58,9 +65,16 @@ namespace Unity.Netcode.Transports.UTP
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.InitializeConnectionDelegate))]
-        private static void InitializeConnection(byte* staticInstanceBuffer, int staticInstanceBufferLength,
-            byte* sendProcessBuffer, int sendProcessBufferLength, byte* receiveProcessBuffer, int receiveProcessBufferLength,
-            byte* sharedProcessBuffer, int sharedProcessBufferLength)
+        private static void InitializeConnection(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            byte* sendProcessBuffer,
+            int sendProcessBufferLength,
+            byte* receiveProcessBuffer,
+            int receiveProcessBufferLength,
+            byte* sharedProcessBuffer,
+            int sharedProcessBufferLength
+        )
         {
             var networkMetricContext = (NetworkMetricsContext*)sharedProcessBuffer;
             networkMetricContext->PacketSentCount = 0;

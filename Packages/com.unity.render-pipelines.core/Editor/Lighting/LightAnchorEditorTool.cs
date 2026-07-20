@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor.EditorTools;
-
+using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
 namespace UnityEditor
@@ -14,7 +13,8 @@ namespace UnityEditor
     {
         GUIContent m_IconContent;
         Dictionary<UnityObject, SerializedObject> m_SerializedObjects = new Dictionary<UnityObject, SerializedObject>();
-        Dictionary<UnityObject, LightAnchorHandles> m_LightAnchorHandles = new Dictionary<UnityObject, LightAnchorHandles>();
+        Dictionary<UnityObject, LightAnchorHandles> m_LightAnchorHandles =
+            new Dictionary<UnityObject, LightAnchorHandles>();
 
         /// <summary>
         /// Icon for LightAnchor Tool
@@ -23,6 +23,7 @@ namespace UnityEditor
         {
             get { return m_IconContent; }
         }
+
         /// <summary>
         /// Checks whether the custom editor tool is available based on the state of the editor.
         /// </summary>
@@ -51,7 +52,14 @@ namespace UnityEditor
 
         void OnEnable()
         {
-            m_IconContent = new GUIContent(UnityEditor.Rendering.CoreEditorUtils.LoadIcon(@"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/", "LightAnchor_Icon", ".png", false));
+            m_IconContent = new GUIContent(
+                UnityEditor.Rendering.CoreEditorUtils.LoadIcon(
+                    @"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/",
+                    "LightAnchor_Icon",
+                    ".png",
+                    false
+                )
+            );
         }
 
         void DoTargetGUI(UnityObject target)

@@ -1,13 +1,13 @@
 namespace EditorAttributes
 {
-	public enum StringInputMode
-	{
-		Constant,
-		Dynamic
-	}
-
-	public interface IDynamicStringAttribute
+    public enum StringInputMode
     {
-		public StringInputMode StringInputMode { get; }
+        Constant,
+        Dynamic,
+    }
+
+    public interface IDynamicStringAttribute
+    {
+        public StringInputMode StringInputMode { get; }
     }
 }

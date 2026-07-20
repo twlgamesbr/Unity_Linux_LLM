@@ -19,10 +19,12 @@ namespace UnityEngine.Rendering.Universal
             m_StencilDitherMaskSeedMaterials = new Material[3];
             m_ProfilingSampler = new ProfilingSampler("StencilDitherMaskSeed");
 
-            int[] stencilRefs = {
-                    (int)UniversalRendererStencilRef.CrossFadeStencilRef_0,
-                    (int)UniversalRendererStencilRef.CrossFadeStencilRef_1,
-                    (int)UniversalRendererStencilRef.CrossFadeStencilRef_All };
+            int[] stencilRefs =
+            {
+                (int)UniversalRendererStencilRef.CrossFadeStencilRef_0,
+                (int)UniversalRendererStencilRef.CrossFadeStencilRef_1,
+                (int)UniversalRendererStencilRef.CrossFadeStencilRef_All,
+            };
             int writeMask = (int)UniversalRendererStencilRef.CrossFadeStencilRef_All;
             Debug.Assert(writeMask < 0x100); // 8 bits for stencil
 
@@ -34,6 +36,7 @@ namespace UnityEngine.Rendering.Universal
                 m_StencilDitherMaskSeedMaterials[i].SetFloat(_StencilRefDitherMask, (float)stencilRefs[i]);
             }
         }
+
         public void Dispose()
         {
             foreach (var m in m_StencilDitherMaskSeedMaterials)
@@ -55,29 +58,50 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public void Render(RenderGraph renderGraph, ScriptableRenderContext context, in TextureHandle depthTarget)
         {
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Prepare Cross Fade Stencil", out var passData, m_ProfilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(
+                    "Prepare Cross Fade Stencil",
+                    out var passData,
+                    m_ProfilingSampler
+                )
+            )
             {
                 builder.SetRenderAttachmentDepth(depthTarget, AccessFlags.Write);
                 passData.stencilDitherMaskSeedMaterials = m_StencilDitherMaskSeedMaterials;
                 passData.depthTarget = depthTarget;
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    ExecutePass(context.cmd, data.depthTarget, data.stencilDitherMaskSeedMaterials);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        ExecutePass(context.cmd, data.depthTarget, data.stencilDitherMaskSeedMaterials);
+                    }
+                );
             }
         }
 
-        private static void ExecutePass(RasterCommandBuffer cmd, RTHandle depthTarget, Material[] stencilDitherMaskSeedMaterials)
+        private static void ExecutePass(
+            RasterCommandBuffer cmd,
+            RTHandle depthTarget,
+            Material[] stencilDitherMaskSeedMaterials
+        )
         {
-            Vector2Int scaledViewportSize = depthTarget.GetScaledSize(depthTarget.rtHandleProperties.currentViewportSize);
+            Vector2Int scaledViewportSize = depthTarget.GetScaledSize(
+                depthTarget.rtHandleProperties.currentViewportSize
+            );
             Rect viewport = new Rect(0.0f, 0.0f, scaledViewportSize.x, scaledViewportSize.y);
             cmd.SetViewport(viewport);
 
             // render one stencil value in each pass because SV_StencilRef is not fully supported.
             for (int i = 0; i < stencilDitherMaskSeedMaterials.Length; ++i)
             {
-                cmd.DrawProcedural(Matrix4x4.identity, stencilDitherMaskSeedMaterials[i], 0, MeshTopology.Triangles, 3, 1);
+                cmd.DrawProcedural(
+                    Matrix4x4.identity,
+                    stencilDitherMaskSeedMaterials[i],
+                    0,
+                    MeshTopology.Triangles,
+                    3,
+                    1
+                );
             }
         }
     }

@@ -26,7 +26,8 @@ namespace UnityEngine.InputSystem.Utilities
     /// it must be disposed to not leak resources.
     /// </summary>
     /// <typeparam name="T">The value-type representing the state to be stored.</typeparam>
-    internal sealed class SavedStructState<T> : ISavedState where T : struct
+    internal sealed class SavedStructState<T> : ISavedState
+        where T : struct
     {
         public delegate void TypedRestore(ref T state);
 
@@ -56,8 +57,10 @@ namespace UnityEngine.InputSystem.Utilities
 
         public void RestoreSavedState()
         {
-            Debug.Assert(m_StaticDisposeCurrentState == null,
-                $"Should have been disposed via {nameof(StaticDisposeCurrentState)} before invoking {nameof(RestoreSavedState)}");
+            Debug.Assert(
+                m_StaticDisposeCurrentState == null,
+                $"Should have been disposed via {nameof(StaticDisposeCurrentState)} before invoking {nameof(RestoreSavedState)}"
+            );
             Debug.Assert(m_RestoreAction != null, $"Only invoke {nameof(RestoreSavedState)} once ");
             m_RestoreAction(ref m_State);
             m_RestoreAction = null;

@@ -38,10 +38,12 @@ namespace UnityEngine.TestTools
         /// Whether or not the instruction expects a domain reload to occur.
         /// </summary>
         bool ExpectDomainReload { get; }
+
         /// <summary>
         /// Whether or not the instruction expects the Unity Editor to be in **Play Mode**.
         /// </summary>
         bool ExpectedPlaymodeState { get; }
+
         /// <summary>
         ///  Used to define multi-frame operations performed when instantiating a yield instruction.
         /// </summary>

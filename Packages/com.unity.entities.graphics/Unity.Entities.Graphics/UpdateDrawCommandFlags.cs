@@ -3,8 +3,8 @@ using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Entities.Graphics;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -14,14 +14,23 @@ namespace Unity.Rendering
     [BurstCompile]
     internal unsafe struct UpdateDrawCommandFlagsJob : IJobChunk
     {
-        [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorld;
-        [ReadOnly] public SharedComponentTypeHandle<RenderFilterSettings> RenderFilterSettings;
+        [ReadOnly]
+        public ComponentTypeHandle<LocalToWorld> LocalToWorld;
+
+        [ReadOnly]
+        public SharedComponentTypeHandle<RenderFilterSettings> RenderFilterSettings;
         public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
 
-        [ReadOnly] public NativeParallelHashMap<int, BatchFilterSettings> FilterSettings;
+        [ReadOnly]
+        public NativeParallelHashMap<int, BatchFilterSettings> FilterSettings;
         public BatchFilterSettings DefaultFilterSettings;
 
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        public void Execute(
+            in ArchetypeChunk chunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMask
+        )
         {
             // This job is not written to support queries with enableable component types.
             Assert.IsFalse(useEnabledMask);

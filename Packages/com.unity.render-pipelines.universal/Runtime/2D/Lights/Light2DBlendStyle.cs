@@ -20,7 +20,7 @@ namespace UnityEngine.Rendering.Universal
             OneMinusR = 5,
             OneMinusG = 6,
             OneMinusB = 7,
-            OneMinusA = 8
+            OneMinusA = 8,
         }
 
         internal struct MaskChannelFilter
@@ -39,7 +39,7 @@ namespace UnityEngine.Rendering.Universal
         {
             Additive = 0,
             Multiply = 1,
-            Subtractive = 2
+            Subtractive = 2,
         }
 
         [Serializable]

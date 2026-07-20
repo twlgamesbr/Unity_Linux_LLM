@@ -14,9 +14,7 @@ namespace Unity.Entities.Editor
             var maximum = entityManager.EntityCapacity;
 #endif
 
-            return entity.Index >= 0
-                && (uint)entity.Index < (uint)maximum
-                && entityManager.Exists(entity);
+            return entity.Index >= 0 && (uint)entity.Index < (uint)maximum && entityManager.Exists(entity);
         }
     }
 }

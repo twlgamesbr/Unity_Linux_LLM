@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Unity.Rendering.Universal;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Legacy;
-using Unity.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
@@ -49,12 +49,19 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             context.AddBlock(BlockFields.SurfaceDescription.NormalTS);
         }
 
-        public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public override void GetPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
             SpriteSubTargetUtility.AddDefaultPropertiesGUI(ref context, onChange, registerUndo, target);
         }
 
-        public bool TryUpgradeFromMasterNode(IMasterNode1 masterNode, out Dictionary<BlockFieldDescriptor, int> blockMap)
+        public bool TryUpgradeFromMasterNode(
+            IMasterNode1 masterNode,
+            out Dictionary<BlockFieldDescriptor, int> blockMap
+        )
         {
             blockMap = null;
             if (!(masterNode is SpriteLitMasterNode1 spriteLitMasterNode))
@@ -137,14 +144,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
                     // Conditional State
 
-                    renderStates = target.sort3DAs2DCompatible ? Universal2DSubTargetDescriptors.RenderStateCollections.Sort3DAs2DCompatible : SpriteSubTargetUtility.GetDefaultRenderState(target),
+                    renderStates = target.sort3DAs2DCompatible
+                        ? Universal2DSubTargetDescriptors.RenderStateCollections.Sort3DAs2DCompatible
+                        : SpriteSubTargetUtility.GetDefaultRenderState(target),
                     pragmas = CorePragmas._2DDefault,
                     defines = new DefineCollection(),
                     keywords = SpriteLitKeywords.Lit,
                     includes = target.sort3DAs2DCompatible ? UniversalMeshLitInfo.Includes.Lit : SpriteLitIncludes.Lit,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 if (target.disableTint)
@@ -179,14 +188,18 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     fieldDependencies = CoreFieldDependencies.Default,
 
                     // Conditional State
-                    renderStates = target.sort3DAs2DCompatible ? Universal2DSubTargetDescriptors.RenderStateCollections.Sort3DAs2DCompatible : CoreRenderStates.Default,
+                    renderStates = target.sort3DAs2DCompatible
+                        ? Universal2DSubTargetDescriptors.RenderStateCollections.Sort3DAs2DCompatible
+                        : CoreRenderStates.Default,
                     pragmas = CorePragmas._2DDefault,
                     defines = new DefineCollection(),
                     keywords = SpriteLitKeywords.Normal,
-                    includes = target.sort3DAs2DCompatible ? UniversalMeshLitInfo.Includes.Normal : SpriteLitIncludes.Normal,
+                    includes = target.sort3DAs2DCompatible
+                        ? UniversalMeshLitInfo.Includes.Normal
+                        : SpriteLitIncludes.Normal,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 if (target.disableTint)
@@ -228,7 +241,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = SpriteLitIncludes.Forward,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 if (target.disableTint)
@@ -322,10 +335,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         static class SpriteLitIncludes
         {
             const string kSpriteCore2D = "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/Core2D.hlsl";
-            const string k2DNormal = "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/NormalsRenderingShared.hlsl";
-            const string kSpriteLitPass = "Packages/com.unity.render-pipelines.universal/Editor/2D/ShaderGraph/Includes/SpriteLitPass.hlsl";
-            const string kSpriteNormalPass = "Packages/com.unity.render-pipelines.universal/Editor/2D/ShaderGraph/Includes/SpriteNormalPass.hlsl";
-            const string kSpriteForwardPass = "Packages/com.unity.render-pipelines.universal/Editor/2D/ShaderGraph/Includes/SpriteForwardPass.hlsl";
+            const string k2DNormal =
+                "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/NormalsRenderingShared.hlsl";
+            const string kSpriteLitPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/2D/ShaderGraph/Includes/SpriteLitPass.hlsl";
+            const string kSpriteNormalPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/2D/ShaderGraph/Includes/SpriteNormalPass.hlsl";
+            const string kSpriteForwardPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/2D/ShaderGraph/Includes/SpriteForwardPass.hlsl";
 
             public static IncludeCollection Lit = new IncludeCollection
             {
@@ -334,7 +351,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.CorePregraph },
                 { CoreIncludes.ShaderGraphPregraph },
                 { kSpriteCore2D, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { CoreIncludes.CorePostgraph },
                 { kSpriteLitPass, IncludeLocation.Postgraph },
@@ -347,11 +363,9 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { k2DNormal, IncludeLocation.Pregraph },
                 { kSpriteCore2D, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { CoreIncludes.CorePostgraph },
                 { kSpriteNormalPass, IncludeLocation.Postgraph },
-
             };
 
             public static IncludeCollection Forward = new IncludeCollection
@@ -361,7 +375,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.CorePregraph },
                 { CoreIncludes.ShaderGraphPregraph },
                 { kSpriteCore2D, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { CoreIncludes.CorePostgraph },
                 { kSpriteForwardPass, IncludeLocation.Postgraph },

@@ -6,10 +6,12 @@ namespace Unity.Entities
 {
     /// <summary> Obsolete. Use <see cref="ComponentLookup{T}"/> instead.</summary>
     /// <typeparam name="T">The type of <see cref="IComponentData"/> to access.</typeparam>
-    [Obsolete("This type has been renamed to ComponentLookup<T>. (RemovedAfter Entities 1.0) (UnityUpgradable) -> ComponentLookup<T>", true)]
-    public struct ComponentDataFromEntity<T> where T : unmanaged, IComponentData
-    {
-    }
+    [Obsolete(
+        "This type has been renamed to ComponentLookup<T>. (RemovedAfter Entities 1.0) (UnityUpgradable) -> ComponentLookup<T>",
+        true
+    )]
+    public struct ComponentDataFromEntity<T>
+        where T : unmanaged, IComponentData { }
 
     /// <summary>
     /// A [NativeContainer] that provides access to all instances of components of type T, indexed by <see cref="Entity"/>.
@@ -39,19 +41,20 @@ namespace Unity.Entities
     /// [NativeDisableParallelForRestrictionAttribute]: https://docs.unity3d.com/ScriptReference/Unity.Collections.NativeDisableParallelForRestrictionAttribute.html
     /// </remarks>
     [NativeContainer]
-    public unsafe struct ComponentLookup<T> where T : unmanaged, IComponentData
+    public unsafe struct ComponentLookup<T>
+        where T : unmanaged, IComponentData
     {
         [NativeDisableUnsafePtrRestriction]
-        readonly EntityDataAccess*       m_Access;
-        LookupCache                      m_Cache;
+        readonly EntityDataAccess* m_Access;
+        LookupCache m_Cache;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal AtomicSafetyHandle               m_Safety;
+        internal AtomicSafetyHandle m_Safety;
 #endif
-        readonly TypeIndex               m_TypeIndex;
-        uint                             m_GlobalSystemVersion;
-        readonly byte                    m_IsZeroSized;          // cache of whether T is zero-sized
+        readonly TypeIndex m_TypeIndex;
+        uint m_GlobalSystemVersion;
+        readonly byte m_IsZeroSized; // cache of whether T is zero-sized
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        readonly byte                    m_IsReadOnly;
+        readonly byte m_IsReadOnly;
 #endif
 
         internal uint GlobalSystemVersion => m_GlobalSystemVersion;
@@ -68,7 +71,6 @@ namespace Unity.Entities
             m_GlobalSystemVersion = access->EntityComponentStore->GlobalSystemVersion;
             m_IsZeroSized = ComponentType.FromTypeIndex(typeIndex).IsZeroSized ? (byte)1 : (byte)0;
         }
-
 #else
         internal ComponentLookup(int typeIndex, EntityDataAccess* access)
         {
@@ -78,7 +80,6 @@ namespace Unity.Entities
             m_GlobalSystemVersion = access->EntityComponentStore->GlobalSystemVersion;
             m_IsZeroSized = ComponentType.FromTypeIndex(typeIndex).IsZeroSized ? (byte)1 : (byte)0;
         }
-
 #endif
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace Unity.Entities
             // NOTE: We could in theory fetch all this data from m_Access.EntityComponentStore and void the SystemState from being passed in.
             //       That would unfortunately allow this API to be called from a job. So we use the required system parameter as a way of signifying to the user that this can only be invoked from main thread system code.
             //       Additionally this makes the API symmetric to ComponentTypeHandle.
-            m_GlobalSystemVersion =  systemState.m_EntityComponentStore->GlobalSystemVersion;
+            m_GlobalSystemVersion = systemState.m_EntityComponentStore->GlobalSystemVersion;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandles = &m_Access->DependencyManager->Safety;
@@ -215,7 +216,8 @@ namespace Unity.Entities
         /// <param name="entity">The entity.</param>
         /// <param name="componentData">The component of type T for the given entity, if it exists.</param>
         /// <returns>True if the entity has a component of type T, and false if it does not.</returns>
-        public bool TryGetComponent(Entity entity, out T componentData) => TryGetComponent(entity, out componentData, out _);
+        public bool TryGetComponent(Entity entity, out T componentData) =>
+            TryGetComponent(entity, out componentData, out _);
 
         /// <summary>
         /// Reports whether any of IComponentData components of the type T, in the chunk containing the
@@ -402,12 +404,17 @@ namespace Unity.Entities
             if (m_IsZeroSized != 0)
                 return default;
 
-            void* ptr = ecs->GetComponentDataWithTypeRW(system.m_Entity, m_TypeIndex, m_GlobalSystemVersion, ref m_Cache);
+            void* ptr = ecs->GetComponentDataWithTypeRW(
+                system.m_Entity,
+                m_TypeIndex,
+                m_GlobalSystemVersion,
+                ref m_Cache
+            );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             return new RefRW<T>(ptr, m_Safety);
 #else
-            return new RefRW<T> (ptr);
+            return new RefRW<T>(ptr);
 #endif
         }
 
@@ -431,9 +438,9 @@ namespace Unity.Entities
             void* ptr = ecs->GetComponentDataWithTypeRW(entity, m_TypeIndex, m_GlobalSystemVersion, ref m_Cache);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            return new RefRW<T> (ptr, m_Safety);
+            return new RefRW<T>(ptr, m_Safety);
 #else
-            return new RefRW<T> (ptr);
+            return new RefRW<T>(ptr);
 #endif
         }
 
@@ -456,9 +463,9 @@ namespace Unity.Entities
 
             void* ptr = ecs->GetComponentDataWithTypeRO(entity, m_TypeIndex, ref m_Cache);
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            return new RefRO<T> (ptr, m_Safety);
+            return new RefRO<T>(ptr, m_Safety);
 #else
-            return new RefRO<T> (ptr);
+            return new RefRO<T>(ptr);
 #endif
         }
 
@@ -484,7 +491,7 @@ namespace Unity.Entities
                 outRef = default;
                 return false;
             }
-            void *ptr = ecs->GetOptionalComponentDataWithTypeRO(entity, m_TypeIndex, ref m_Cache);
+            void* ptr = ecs->GetOptionalComponentDataWithTypeRO(entity, m_TypeIndex, ref m_Cache);
             if (ptr == null)
             {
                 outRef = default;
@@ -528,7 +535,12 @@ namespace Unity.Entities
                 outRef = default;
                 return false;
             }
-            void *ptr = ecs->GetOptionalComponentDataWithTypeRW(entity, m_TypeIndex, m_GlobalSystemVersion, ref m_Cache);
+            void* ptr = ecs->GetOptionalComponentDataWithTypeRW(
+                entity,
+                m_TypeIndex,
+                m_GlobalSystemVersion,
+                ref m_Cache
+            );
             if (ptr == null)
             {
                 outRef = default;
@@ -550,7 +562,6 @@ namespace Unity.Entities
             return true;
         }
 
-
         /// <summary>
         /// Obsolete. Use <see cref="TryGetRefRW"/> instead.
         /// /// </summary>
@@ -570,7 +581,9 @@ namespace Unity.Entities
         /// <param name="entity">The referenced entity</param>
         /// <returns>Returns a safe reference to the component data, or an invalid reference if <paramref name="entity"/>
         /// does not have component <typeparamref name="T"/>.</returns>
-        [Obsolete("This function was not intended to be in the public API, and it will be removed in a future release.")]
+        [Obsolete(
+            "This function was not intended to be in the public API, and it will be removed in a future release."
+        )]
         public RefRO<T> GetRefROOptional(Entity entity)
         {
             bool _ = TryGetRefRO(entity, out var outRef);
@@ -583,6 +596,7 @@ namespace Unity.Entities
 #else
             => new SafeBitRef(ptr, offsetInBits);
 #endif
+
         /// <summary>
         /// Gets a safe reference to the component enabled state.
         /// </summary>
@@ -590,7 +604,8 @@ namespace Unity.Entities
         /// <param name="entity">The referenced entity</param>
         /// <returns>Returns a safe reference to the component enabled state.
         /// Throws an exception if the component doesn't exist.</returns>
-        public EnabledRefRW<T2> GetEnabledRefRW<T2>(Entity entity) where T2 : unmanaged, IEnableableComponent, IComponentData
+        public EnabledRefRW<T2> GetEnabledRefRW<T2>(Entity entity)
+            where T2 : unmanaged, IEnableableComponent, IComponentData
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
@@ -600,8 +615,14 @@ namespace Unity.Entities
 
             int indexInBitField;
             int* ptrChunkDisabledCount;
-            var ptr = ecs->GetEnabledRawRW(entity, m_TypeIndex, ref m_Cache, m_GlobalSystemVersion,
-                out indexInBitField, out ptrChunkDisabledCount);
+            var ptr = ecs->GetEnabledRawRW(
+                entity,
+                m_TypeIndex,
+                ref m_Cache,
+                m_GlobalSystemVersion,
+                out indexInBitField,
+                out ptrChunkDisabledCount
+            );
 
             return new EnabledRefRW<T2>(MakeSafeBitRef(ptr, indexInBitField), ptrChunkDisabledCount);
         }
@@ -625,11 +646,18 @@ namespace Unity.Entities
             var ecs = m_Access->EntityComponentStore;
             ecs->AssertEntityHasComponent(entity, m_TypeIndex, ref m_Cache);
 
-            var ptr = ecs->GetEnabledRawRW(entity, m_TypeIndex, ref m_Cache, m_GlobalSystemVersion,
-                out var indexInBitField, out var ptrChunkDisabledCount);
+            var ptr = ecs->GetEnabledRawRW(
+                entity,
+                m_TypeIndex,
+                ref m_Cache,
+                m_GlobalSystemVersion,
+                out var indexInBitField,
+                out var ptrChunkDisabledCount
+            );
 
             return new EnabledRefRW<T2>(MakeSafeBitRef(ptr, indexInBitField), ptrChunkDisabledCount);
         }
+
         /// <summary> Obsolete. Use <see cref="GetEnabledRefRWOptional{T}"/> instead.</summary>
         /// <typeparam name="T2">The component type</typeparam>
         /// <param name="entity">The referenced entity</param>
@@ -649,7 +677,8 @@ namespace Unity.Entities
         /// <param name="entity">The referenced entity</param>
         /// <returns>Returns a safe reference to the component enabled state.
         /// Throws an exception if the component doesn't exist.</returns>
-        public EnabledRefRO<T2> GetEnabledRefRO<T2>(Entity entity) where T2 : unmanaged, IEnableableComponent, IComponentData
+        public EnabledRefRO<T2> GetEnabledRefRO<T2>(Entity entity)
+            where T2 : unmanaged, IEnableableComponent, IComponentData
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
@@ -683,6 +712,7 @@ namespace Unity.Entities
             var ptr = ecs->GetEnabledRawRO(entity, m_TypeIndex, ref m_Cache, out indexInBitField, out _);
             return new EnabledRefRO<T2>(MakeSafeBitRef(ptr, indexInBitField));
         }
+
         /// <summary> Obsolete. Use <see cref="GetEnabledRefROOptional{T}"/> instead.</summary>
         /// <typeparam name="T2">The component type</typeparam>
         /// <param name="entity">The referenced entity</param>

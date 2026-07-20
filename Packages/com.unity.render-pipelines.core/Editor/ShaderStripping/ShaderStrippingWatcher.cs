@@ -17,7 +17,12 @@ namespace UnityEditor.Rendering
         /// <param name="stripTimeMs">The total amount of time to strip the variants</param>
         /// <typeparam name="TShader">The shader</typeparam>
         /// <typeparam name="TShaderVariant">The variant</typeparam>
-        public delegate void OnShaderStrippedCallbackHandler<TShader, TShaderVariant>(TShader shader, TShaderVariant shaderVariant, uint variantsOut, double stripTimeMs)
+        public delegate void OnShaderStrippedCallbackHandler<TShader, TShaderVariant>(
+            TShader shader,
+            TShaderVariant shaderVariant,
+            uint variantsOut,
+            double stripTimeMs
+        )
             where TShader : UnityEngine.Object;
 
         /// <summary>
@@ -30,16 +35,31 @@ namespace UnityEditor.Rendering
         /// </summary>
         public static event OnShaderStrippedCallbackHandler<ComputeShader, string> computeShaderProcessed;
 
-        internal static void OnShaderProcessed<TShader, TShaderVariant>(TShader shader, TShaderVariant shaderVariant, uint variantsOut, double stripTimeMs)
+        internal static void OnShaderProcessed<TShader, TShaderVariant>(
+            TShader shader,
+            TShaderVariant shaderVariant,
+            uint variantsOut,
+            double stripTimeMs
+        )
             where TShader : UnityEngine.Object
         {
             if (typeof(TShader) == typeof(Shader))
             {
-                shaderProcessed?.Invoke((Shader)Convert.ChangeType(shader, typeof(Shader)), (ShaderSnippetData)Convert.ChangeType(shaderVariant, typeof(ShaderSnippetData)), variantsOut, stripTimeMs);
+                shaderProcessed?.Invoke(
+                    (Shader)Convert.ChangeType(shader, typeof(Shader)),
+                    (ShaderSnippetData)Convert.ChangeType(shaderVariant, typeof(ShaderSnippetData)),
+                    variantsOut,
+                    stripTimeMs
+                );
             }
             else if (typeof(TShader) == typeof(ComputeShader))
             {
-                computeShaderProcessed?.Invoke((ComputeShader)Convert.ChangeType(shader, typeof(ComputeShader)), shaderVariant.ToString(), variantsOut, stripTimeMs);
+                computeShaderProcessed?.Invoke(
+                    (ComputeShader)Convert.ChangeType(shader, typeof(ComputeShader)),
+                    shaderVariant.ToString(),
+                    variantsOut,
+                    stripTimeMs
+                );
             }
         }
     }

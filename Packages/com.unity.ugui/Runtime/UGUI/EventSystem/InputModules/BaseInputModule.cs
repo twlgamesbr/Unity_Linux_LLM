@@ -42,13 +42,18 @@ namespace UnityEngine.EventSystems
         /// <summary>
         /// True if pointer hover events will be sent to the parent
         /// </summary>
-        [SerializeField] private bool m_SendPointerHoverToParent = true;
+        [SerializeField]
+        private bool m_SendPointerHoverToParent = true;
 
         //This is needed for testing
         /// <summary>
         /// True if pointer hover events will be sent to the parent
         /// </summary>
-        protected internal bool sendPointerHoverToParent { get { return m_SendPointerHoverToParent; } set { m_SendPointerHoverToParent = value; } }
+        protected internal bool sendPointerHoverToParent
+        {
+            get { return m_SendPointerHoverToParent; }
+            set { m_SendPointerHoverToParent = value; }
+        }
 
         private AxisEventData m_AxisEventData;
 
@@ -211,8 +216,16 @@ namespace UnityEngine.EventSystems
                 for (var i = 0; i < hoveredCount; ++i)
                 {
                     currentPointerData.fullyExited = true;
-                    ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData, ExecuteEvents.pointerMoveHandler);
-                    ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData, ExecuteEvents.pointerExitHandler);
+                    ExecuteEvents.Execute(
+                        currentPointerData.hovered[i],
+                        currentPointerData,
+                        ExecuteEvents.pointerMoveHandler
+                    );
+                    ExecuteEvents.Execute(
+                        currentPointerData.hovered[i],
+                        currentPointerData,
+                        ExecuteEvents.pointerExitHandler
+                    );
                 }
 
                 currentPointerData.hovered.Clear();
@@ -231,13 +244,19 @@ namespace UnityEngine.EventSystems
                 {
                     var hoveredCount = currentPointerData.hovered.Count;
                     for (var i = 0; i < hoveredCount; ++i)
-                        ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData, ExecuteEvents.pointerMoveHandler);
+                        ExecuteEvents.Execute(
+                            currentPointerData.hovered[i],
+                            currentPointerData,
+                            ExecuteEvents.pointerMoveHandler
+                        );
                 }
                 return;
             }
 
             GameObject commonRoot = FindCommonRoot(currentPointerData.pointerEnter, newEnterTarget);
-            GameObject pointerParent = ((Component)newEnterTarget.GetComponentInParent<IPointerExitHandler>())?.gameObject;
+            GameObject pointerParent = (
+                (Component)newEnterTarget.GetComponentInParent<IPointerExitHandler>()
+            )?.gameObject;
 
             // and we already an entered object from last time
             if (currentPointerData.pointerEnter != null)
@@ -257,7 +276,8 @@ namespace UnityEngine.EventSystems
                     if (!m_SendPointerHoverToParent && pointerParent == t.gameObject)
                         break;
 
-                    currentPointerData.fullyExited = t.gameObject != commonRoot && currentPointerData.pointerEnter != newEnterTarget;
+                    currentPointerData.fullyExited =
+                        t.gameObject != commonRoot && currentPointerData.pointerEnter != newEnterTarget;
                     ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerMoveHandler);
                     ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerExitHandler);
                     currentPointerData.hovered.Remove(t.gameObject);
@@ -359,20 +379,17 @@ namespace UnityEngine.EventSystems
         /// <summary>
         /// Called when the module is deactivated. Override this if you want custom code to execute when you deactivate your module.
         /// </summary>
-        public virtual void DeactivateModule()
-        {}
+        public virtual void DeactivateModule() { }
 
         /// <summary>
         /// Called when the module is activated. Override this if you want custom code to execute when you activate your module.
         /// </summary>
-        public virtual void ActivateModule()
-        {}
+        public virtual void ActivateModule() { }
 
         /// <summary>
         /// Update the internal state of the Module.
         /// </summary>
-        public virtual void UpdateModule()
-        {}
+        public virtual void UpdateModule() { }
 
         /// <summary>
         /// Check to see if the module is supported. Override this if you have a platform specific module (eg. TouchInputModule that you do not want to activate on standalone.)
@@ -391,9 +408,9 @@ namespace UnityEngine.EventSystems
         public virtual int ConvertUIToolkitPointerId(PointerEventData sourcePointerData)
         {
 #if PACKAGE_UITOOLKIT
-            return sourcePointerData.pointerId < 0 ?
-                UIElements.PointerId.mousePointerId :
-                UIElements.PointerId.touchPointerIdBase + sourcePointerData.pointerId;
+            return sourcePointerData.pointerId < 0
+                ? UIElements.PointerId.mousePointerId
+                : UIElements.PointerId.touchPointerIdBase + sourcePointerData.pointerId;
 #else
             return -1;
 #endif
@@ -450,6 +467,7 @@ namespace UnityEngine.EventSystems
         /// a control could assume that the device type is a keyboard and conservatively block the navigation event.
         /// </remarks>
         Unknown = 0,
+
         /// <summary>
         /// Indicates that this device is known to be a keyboard.
         /// </summary>
@@ -457,12 +475,13 @@ namespace UnityEngine.EventSystems
         /// This device sends keyboard events along with any navigation event it generates.
         /// </remarks>
         Keyboard,
+
         /// <summary>
         /// Indicates that this device is anything else than a keyboard (it could be a Gamepad, for example).
         /// </summary>
         /// <remarks>
         /// This device never sends keyboard events along with any navigation event it generates.
         /// </remarks>
-        NonKeyboard
+        NonKeyboard,
     }
 }

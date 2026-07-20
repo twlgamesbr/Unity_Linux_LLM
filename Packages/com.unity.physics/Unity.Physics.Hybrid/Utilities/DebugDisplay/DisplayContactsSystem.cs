@@ -34,17 +34,20 @@ namespace Unity.Physics.Authoring
                 return;
 
             var world = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld;
-            state.Dependency = new DisplayContactsJob
-            {
-                Draw = draw
-            }.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), ref world, state.Dependency);
+            state.Dependency = new DisplayContactsJob { Draw = draw }.Schedule(
+                SystemAPI.GetSingleton<SimulationSingleton>(),
+                ref world,
+                state.Dependency
+            );
         }
 
         // Job which iterates over contacts from narrowphase and writes to display.
         [BurstCompile]
         private struct DisplayContactsJob : IContactsJob
         {
-            [ReadOnly][NativeDisableUnsafePtrRestriction] public DebugDraw Draw;
+            [ReadOnly]
+            [NativeDisableUnsafePtrRestriction]
+            public DebugDraw Draw;
 
             public void Execute(ref ModifiableContactHeader header, ref ModifiableContactPoint point)
             {

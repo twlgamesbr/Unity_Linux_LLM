@@ -32,7 +32,8 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </summary>
         public static uint updateCount => InputUpdate.s_UpdateStepCount;
 
-        public static double currentTime => InputRuntime.s_Instance.currentTime - InputRuntime.s_CurrentTimeOffsetToRealtimeSinceStartup;
+        public static double currentTime =>
+            InputRuntime.s_Instance.currentTime - InputRuntime.s_CurrentTimeOffsetToRealtimeSinceStartup;
 
         /// <summary>
         /// Callback that is triggered when the state of an input device changes.
@@ -48,7 +49,11 @@ namespace UnityEngine.InputSystem.LowLevel
             remove => InputSystem.s_Manager.onDeviceStateChange -= value;
         }
 
-        public static unsafe void Change(InputDevice device, InputEventPtr eventPtr, InputUpdateType updateType = default)
+        public static unsafe void Change(
+            InputDevice device,
+            InputEventPtr eventPtr,
+            InputUpdateType updateType = default
+        )
         {
             if (device == null)
                 throw new ArgumentNullException(nameof(device));
@@ -64,19 +69,23 @@ namespace UnityEngine.InputSystem.LowLevel
                 stateFormat = DeltaStateEvent.FromUnchecked(eventPtr)->stateFormat;
             else
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 InputSystem.s_Manager.m_Diagnostics?.OnEventFormatMismatch(eventPtr, device);
-                #endif
+#endif
                 return;
             }
 
             if (stateFormat != device.stateBlock.format)
                 throw new ArgumentException(
                     $"State format {stateFormat} from event does not match state format {device.stateBlock.format} of device {device}",
-                    nameof(eventPtr));
+                    nameof(eventPtr)
+                );
 
-            InputSystem.s_Manager.UpdateState(device, eventPtr,
-                updateType != default ? updateType : InputSystem.s_Manager.defaultUpdateType);
+            InputSystem.s_Manager.UpdateState(
+                device,
+                eventPtr,
+                updateType != default ? updateType : InputSystem.s_Manager.defaultUpdateType
+            );
         }
 
         /// <summary>
@@ -90,8 +99,12 @@ namespace UnityEngine.InputSystem.LowLevel
         /// also performs related tasks such as checking state change monitors, flipping buffers, or making the respective
         /// device current.
         /// </remarks>
-        public static void Change<TState>(InputControl control, TState state, InputUpdateType updateType = default,
-            InputEventPtr eventPtr = default)
+        public static void Change<TState>(
+            InputControl control,
+            TState state,
+            InputUpdateType updateType = default,
+            InputEventPtr eventPtr = default
+        )
             where TState : struct
         {
             Change(control, ref state, updateType, eventPtr);
@@ -108,40 +121,49 @@ namespace UnityEngine.InputSystem.LowLevel
         /// also performs related tasks such as checking state change monitors, flipping buffers, or making the respective
         /// device current.
         /// </remarks>
-        public static unsafe void Change<TState>(InputControl control, ref TState state, InputUpdateType updateType = default,
-            InputEventPtr eventPtr = default)
+        public static unsafe void Change<TState>(
+            InputControl control,
+            ref TState state,
+            InputUpdateType updateType = default,
+            InputEventPtr eventPtr = default
+        )
             where TState : struct
         {
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
             if (control.stateBlock.bitOffset != 0 || control.stateBlock.sizeInBits % 8 != 0)
-                throw new ArgumentException($"Cannot change state of bitfield control '{control}' using this method", nameof(control));
+                throw new ArgumentException(
+                    $"Cannot change state of bitfield control '{control}' using this method",
+                    nameof(control)
+                );
 
             var device = control.device;
             var stateSize = Math.Min(UnsafeUtility.SizeOf<TState>(), control.m_StateBlock.alignedSizeInBytes);
             var statePtr = UnsafeUtility.AddressOf(ref state);
             var stateOffset = control.stateBlock.byteOffset - device.stateBlock.byteOffset;
 
-            InputSystem.s_Manager.UpdateState(device,
-                updateType != default ? updateType : InputSystem.s_Manager.defaultUpdateType, statePtr, stateOffset,
+            InputSystem.s_Manager.UpdateState(
+                device,
+                updateType != default ? updateType : InputSystem.s_Manager.defaultUpdateType,
+                statePtr,
+                stateOffset,
                 (uint)stateSize,
-                eventPtr.valid
-                ? eventPtr.internalTime
-                : InputRuntime.s_Instance.currentTime,
-                eventPtr: eventPtr);
+                eventPtr.valid ? eventPtr.internalTime : InputRuntime.s_Instance.currentTime,
+                eventPtr: eventPtr
+            );
         }
 
         public static bool IsIntegerFormat(this FourCC format)
         {
-            return format == InputStateBlock.FormatBit ||
-                format == InputStateBlock.FormatInt ||
-                format == InputStateBlock.FormatByte ||
-                format == InputStateBlock.FormatShort ||
-                format == InputStateBlock.FormatSBit ||
-                format == InputStateBlock.FormatUInt ||
-                format == InputStateBlock.FormatUShort ||
-                format == InputStateBlock.FormatLong ||
-                format == InputStateBlock.FormatULong;
+            return format == InputStateBlock.FormatBit
+                || format == InputStateBlock.FormatInt
+                || format == InputStateBlock.FormatByte
+                || format == InputStateBlock.FormatShort
+                || format == InputStateBlock.FormatSBit
+                || format == InputStateBlock.FormatUInt
+                || format == InputStateBlock.FormatUShort
+                || format == InputStateBlock.FormatLong
+                || format == InputStateBlock.FormatULong;
         }
 
         /// <summary>
@@ -198,7 +220,12 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </code>
         /// </example>
         /// </remarks>
-        public static void AddChangeMonitor(InputControl control, IInputStateChangeMonitor monitor, long monitorIndex = -1, uint groupIndex = default)
+        public static void AddChangeMonitor(
+            InputControl control,
+            IInputStateChangeMonitor monitor,
+            long monitorIndex = -1,
+            uint groupIndex = default
+        )
         {
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
@@ -210,22 +237,29 @@ namespace UnityEngine.InputSystem.LowLevel
             InputSystem.s_Manager.AddStateChangeMonitor(control, monitor, monitorIndex, groupIndex);
         }
 
-        public static IInputStateChangeMonitor AddChangeMonitor(InputControl control,
-            NotifyControlValueChangeAction valueChangeCallback, int monitorIndex = -1,
-            NotifyTimerExpiredAction timerExpiredCallback = null)
+        public static IInputStateChangeMonitor AddChangeMonitor(
+            InputControl control,
+            NotifyControlValueChangeAction valueChangeCallback,
+            int monitorIndex = -1,
+            NotifyTimerExpiredAction timerExpiredCallback = null
+        )
         {
             if (valueChangeCallback == null)
                 throw new ArgumentNullException(nameof(valueChangeCallback));
             var monitor = new StateChangeMonitorDelegate
             {
                 valueChangeCallback = valueChangeCallback,
-                timerExpiredCallback = timerExpiredCallback
+                timerExpiredCallback = timerExpiredCallback,
             };
             AddChangeMonitor(control, monitor, monitorIndex);
             return monitor;
         }
 
-        public static void RemoveChangeMonitor(InputControl control, IInputStateChangeMonitor monitor, long monitorIndex = -1)
+        public static void RemoveChangeMonitor(
+            InputControl control,
+            IInputStateChangeMonitor monitor,
+            long monitorIndex = -1
+        )
         {
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
@@ -248,7 +282,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// by the given <paramref name="monitor">state change monitor</paramref>, <see cref="IInputStateChangeMonitor.NotifyTimerExpired"/>
         /// will be called on <paramref name="monitor"/>.
         /// </remarks>
-        public static void AddChangeMonitorTimeout(InputControl control, IInputStateChangeMonitor monitor, double time, long monitorIndex = -1, int timerIndex = -1)
+        public static void AddChangeMonitorTimeout(
+            InputControl control,
+            IInputStateChangeMonitor monitor,
+            double time,
+            long monitorIndex = -1,
+            int timerIndex = -1
+        )
         {
             if (monitor == null)
                 throw new ArgumentNullException(nameof(monitor));
@@ -256,7 +296,11 @@ namespace UnityEngine.InputSystem.LowLevel
             InputSystem.s_Manager.AddStateChangeMonitorTimeout(control, monitor, time, monitorIndex, timerIndex);
         }
 
-        public static void RemoveChangeMonitorTimeout(IInputStateChangeMonitor monitor, long monitorIndex = -1, int timerIndex = -1)
+        public static void RemoveChangeMonitorTimeout(
+            IInputStateChangeMonitor monitor,
+            long monitorIndex = -1,
+            int timerIndex = -1
+        )
         {
             if (monitor == null)
                 throw new ArgumentNullException(nameof(monitor));
@@ -269,7 +313,12 @@ namespace UnityEngine.InputSystem.LowLevel
             public NotifyControlValueChangeAction valueChangeCallback;
             public NotifyTimerExpiredAction timerExpiredCallback;
 
-            public void NotifyControlStateChanged(InputControl control, double time, InputEventPtr eventPtr, long monitorIndex)
+            public void NotifyControlStateChanged(
+                InputControl control,
+                double time,
+                InputEventPtr eventPtr,
+                long monitorIndex
+            )
             {
                 valueChangeCallback(control, time, eventPtr, monitorIndex);
             }

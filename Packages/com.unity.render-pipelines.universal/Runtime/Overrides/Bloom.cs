@@ -39,7 +39,7 @@ namespace UnityEngine.Rendering.Universal
         /// Kawase blur uses a fixed size texture. It can be faster at lower resolutions while saving small amount of memory.
         /// </summary>
         [Tooltip("Lowest quality. Fastest at low resolutions. Saves memory.")]
-        Kawase
+        Kawase,
     }
 
     /// <summary>
@@ -191,7 +191,9 @@ namespace UnityEngine.Rendering.Universal
         /// Set the maximum intensity that Unity uses to calculate Bloom.
         /// If pixels in your Scene are more intense than this, URP renders them at their current intensity, but uses this intensity value for the purposes of Bloom calculations.
         /// </summary>
-        [Tooltip("Set the maximum intensity that Unity uses to calculate Bloom. If pixels in your Scene are more intense than this, URP renders them at their current intensity, but uses this intensity value for the purposes of Bloom calculations.")]
+        [Tooltip(
+            "Set the maximum intensity that Unity uses to calculate Bloom. If pixels in your Scene are more intense than this, URP renders them at their current intensity, but uses this intensity value for the purposes of Bloom calculations."
+        )]
         public MinFloatParameter clamp = new MinFloatParameter(65472f, 0f);
 
         /// <summary>
@@ -204,7 +206,9 @@ namespace UnityEngine.Rendering.Universal
         /// Controls whether to use bicubic sampling instead of bilinear sampling for the upsampling passes.
         /// This is slightly more expensive but helps getting smoother visuals.
         /// </summary>
-        [Tooltip("Use bicubic sampling instead of bilinear sampling for the upsampling passes. This is slightly more expensive but helps getting smoother visuals.")]
+        [Tooltip(
+            "Use bicubic sampling instead of bilinear sampling for the upsampling passes. This is slightly more expensive but helps getting smoother visuals."
+        )]
         public BoolParameter highQualityFiltering = new BoolParameter(false);
 
         /// <summary>
@@ -263,7 +267,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <param name="value">The initial value to store in the parameter.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public DownscaleParameter(BloomDownscaleMode value, bool overrideState = false) : base(value, overrideState) { }
+        public DownscaleParameter(BloomDownscaleMode value, bool overrideState = false)
+            : base(value, overrideState) { }
     }
 
     /// <summary>
@@ -277,6 +282,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <param name="value">The initial value to store in the parameter.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public BloomFilterModeParameter(BloomFilterMode value, bool overrideState = false) : base(value, overrideState) { }
+        public BloomFilterModeParameter(BloomFilterMode value, bool overrideState = false)
+            : base(value, overrideState) { }
     }
 }

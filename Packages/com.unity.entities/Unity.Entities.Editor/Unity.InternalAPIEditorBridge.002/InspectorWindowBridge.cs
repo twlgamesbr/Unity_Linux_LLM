@@ -8,6 +8,7 @@ namespace Unity.Editor.Bridge
     static class InspectorWindowBridge
     {
         static Func<PropertyEditor, bool> s_GetHasPreviewCachedAccessor;
+
         static Func<PropertyEditor, bool> GetHasPreviewAccessor()
         {
             if (s_GetHasPreviewCachedAccessor == null)
@@ -22,6 +23,7 @@ namespace Unity.Editor.Bridge
         }
 
         static Func<PropertyEditor, IPreviewable> s_GetSelectedPreviewCachedAccessor;
+
         static Func<PropertyEditor, IPreviewable> GetSelectedPreviewAccessor()
         {
             if (s_GetSelectedPreviewCachedAccessor == null)
@@ -36,6 +38,7 @@ namespace Unity.Editor.Bridge
         }
 
         static Func<PropertyEditor, List<IPreviewable>> s_GetAllPreviewsCachedAccessor;
+
         static Func<PropertyEditor, List<IPreviewable>> GetAllPreviewsAccessor()
         {
             if (s_GetAllPreviewsCachedAccessor == null)

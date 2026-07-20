@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering;
 
 namespace UnityEditor.Rendering.Universal
 {
@@ -9,19 +9,39 @@ namespace UnityEditor.Rendering.Universal
     {
         private class StylesLayer
         {
-            public readonly GUIContent warningHeightBasedBlending = new GUIContent("Height-based blending is disabled if you have more than four TerrainLayer materials!");
+            public readonly GUIContent warningHeightBasedBlending = new GUIContent(
+                "Height-based blending is disabled if you have more than four TerrainLayer materials!"
+            );
 
-            public readonly GUIContent enableHeightBlend = new GUIContent("Enable Height-based Blend", "Blend terrain layers based on height values.");
-            public readonly GUIContent heightTransition = new GUIContent("Height Transition", "Size in world units of the smooth transition between layers.");
-            public readonly GUIContent enableInstancedPerPixelNormal = new GUIContent("Enable Per-pixel Normal", "Enable per-pixel normal when the terrain uses instanced rendering.");
+            public readonly GUIContent enableHeightBlend = new GUIContent(
+                "Enable Height-based Blend",
+                "Blend terrain layers based on height values."
+            );
+            public readonly GUIContent heightTransition = new GUIContent(
+                "Height Transition",
+                "Size in world units of the smooth transition between layers."
+            );
+            public readonly GUIContent enableInstancedPerPixelNormal = new GUIContent(
+                "Enable Per-pixel Normal",
+                "Enable per-pixel normal when the terrain uses instanced rendering."
+            );
 
             public readonly GUIContent diffuseTexture = new GUIContent("Diffuse");
             public readonly GUIContent colorTint = new GUIContent("Color Tint");
-            public readonly GUIContent opacityAsDensity = new GUIContent("Opacity as Density", "Enable Density Blend (if unchecked, opacity is used as Smoothness)");
+            public readonly GUIContent opacityAsDensity = new GUIContent(
+                "Opacity as Density",
+                "Enable Density Blend (if unchecked, opacity is used as Smoothness)"
+            );
             public readonly GUIContent normalMapTexture = new GUIContent("Normal Map");
             public readonly GUIContent normalScale = new GUIContent("Normal Scale");
-            public readonly GUIContent maskMapTexture = new GUIContent("Mask", "R: Metallic\nG: AO\nB: Height\nA: Smoothness");
-            public readonly GUIContent maskMapTextureWithoutHeight = new GUIContent("Mask Map", "R: Metallic\nG: AO\nA: Smoothness");
+            public readonly GUIContent maskMapTexture = new GUIContent(
+                "Mask",
+                "R: Metallic\nG: AO\nB: Height\nA: Smoothness"
+            );
+            public readonly GUIContent maskMapTextureWithoutHeight = new GUIContent(
+                "Mask Map",
+                "R: Metallic\nG: AO\nA: Smoothness"
+            );
             public readonly GUIContent channelRemapping = new GUIContent("Channel Remapping");
             public readonly GUIContent defaultValues = new GUIContent("Channel Default Values");
             public readonly GUIContent metallic = new GUIContent("R: Metallic");
@@ -37,7 +57,9 @@ namespace UnityEditor.Rendering.Universal
         }
 
         static StylesLayer s_Styles = null;
-        private static StylesLayer styles { get
+        private static StylesLayer styles
+        {
+            get
             {
                 if (s_Styles == null)
                     s_Styles = new StylesLayer();
@@ -47,10 +69,7 @@ namespace UnityEditor.Rendering.Universal
 
         protected override uint materialFilter => (uint)Expandable.SurfaceOptions;
 
-        public TerrainLitShaderGUI()
-        {
-
-        }
+        public TerrainLitShaderGUI() { }
 
         // Height blend params
         MaterialProperty enableHeightBlend = null;
@@ -64,11 +83,13 @@ namespace UnityEditor.Rendering.Universal
         const string kEnableInstancedPerPixelNormal = "_EnableInstancedPerPixelNormal";
 
         private bool m_ShowChannelRemapping = false;
+
         enum HeightParametrization
         {
             Amplitude,
-            MinMax
+            MinMax,
         };
+
         private HeightParametrization m_HeightParametrization = HeightParametrization.Amplitude;
 
         private static bool DoesTerrainUseMaskMaps(TerrainLayer[] terrainLayers)
@@ -88,20 +109,24 @@ namespace UnityEditor.Rendering.Universal
             enableInstancedPerPixelNormal = FindProperty(kEnableInstancedPerPixelNormal, props, false);
         }
 
-        static public void SetupMaterialKeywords(Material material)
+        public static void SetupMaterialKeywords(Material material)
         {
-            bool enableHeightBlend = (material.HasProperty(kEnableHeightBlend) && material.GetFloat(kEnableHeightBlend) > 0);
+            bool enableHeightBlend = (
+                material.HasProperty(kEnableHeightBlend) && material.GetFloat(kEnableHeightBlend) > 0
+            );
             CoreUtils.SetKeyword(material, "_TERRAIN_BLEND_HEIGHT", enableHeightBlend);
 
             bool enableInstancedPerPixelNormal = material.GetFloat(kEnableInstancedPerPixelNormal) > 0.0f;
             CoreUtils.SetKeyword(material, "_TERRAIN_INSTANCED_PERPIXEL_NORMAL", enableInstancedPerPixelNormal);
         }
 
-        static public bool TextureHasAlpha(Texture2D inTex)
+        public static bool TextureHasAlpha(Texture2D inTex)
         {
             if (inTex != null)
             {
-                return GraphicsFormatUtility.HasAlphaChannel(GraphicsFormatUtility.GetGraphicsFormat(inTex.format, true));
+                return GraphicsFormatUtility.HasAlphaChannel(
+                    GraphicsFormatUtility.GetGraphicsFormat(inTex.format, true)
+                );
             }
             return false;
         }
@@ -171,9 +196,18 @@ namespace UnityEditor.Rendering.Universal
             // Don't use the member field enableHeightBlend as ShaderGUI.OnGUI might not be called if the material UI is folded.
             // heightblend shouldn't be available if we are in multi-pass mode, because it is guaranteed to be broken.
             bool heightBlendAvailable = (terrainLayers.Length <= 4);
-            bool heightBlend = heightBlendAvailable && terrain.materialTemplate.HasProperty(kEnableHeightBlend) && (terrain.materialTemplate.GetFloat(kEnableHeightBlend) > 0);
+            bool heightBlend =
+                heightBlendAvailable
+                && terrain.materialTemplate.HasProperty(kEnableHeightBlend)
+                && (terrain.materialTemplate.GetFloat(kEnableHeightBlend) > 0);
 
-            terrainLayer.diffuseTexture = EditorGUILayout.ObjectField(styles.diffuseTexture, terrainLayer.diffuseTexture, typeof(Texture2D), false) as Texture2D;
+            terrainLayer.diffuseTexture =
+                EditorGUILayout.ObjectField(
+                    styles.diffuseTexture,
+                    terrainLayer.diffuseTexture,
+                    typeof(Texture2D),
+                    false
+                ) as Texture2D;
             TerrainLayerUtility.ValidateDiffuseTextureUI(terrainLayer.diffuseTexture);
 
             var diffuseRemapMin = terrainLayer.diffuseRemapMin;
@@ -215,8 +249,17 @@ namespace UnityEditor.Rendering.Universal
             }
 
             // Display normal map UI
-            terrainLayer.normalMapTexture = EditorGUILayout.ObjectField(styles.normalMapTexture, terrainLayer.normalMapTexture, typeof(Texture2D), false) as Texture2D;
-            TerrainLayerUtility.ValidateNormalMapTextureUI(terrainLayer.normalMapTexture, TerrainLayerUtility.CheckNormalMapTextureType(terrainLayer.normalMapTexture));
+            terrainLayer.normalMapTexture =
+                EditorGUILayout.ObjectField(
+                    styles.normalMapTexture,
+                    terrainLayer.normalMapTexture,
+                    typeof(Texture2D),
+                    false
+                ) as Texture2D;
+            TerrainLayerUtility.ValidateNormalMapTextureUI(
+                terrainLayer.normalMapTexture,
+                TerrainLayerUtility.CheckNormalMapTextureType(terrainLayer.normalMapTexture)
+            );
 
             if (terrainLayer.normalMapTexture != null)
             {
@@ -231,7 +274,13 @@ namespace UnityEditor.Rendering.Universal
             }
 
             // Display the mask map UI and the remap controls
-            terrainLayer.maskMapTexture = EditorGUILayout.ObjectField(heightBlend ? styles.maskMapTexture : styles.maskMapTextureWithoutHeight, terrainLayer.maskMapTexture, typeof(Texture2D), false) as Texture2D;
+            terrainLayer.maskMapTexture =
+                EditorGUILayout.ObjectField(
+                    heightBlend ? styles.maskMapTexture : styles.maskMapTextureWithoutHeight,
+                    terrainLayer.maskMapTexture,
+                    typeof(Texture2D),
+                    false
+                ) as Texture2D;
             TerrainLayerUtility.ValidateMaskMapTextureUI(terrainLayer.maskMapTexture);
 
             var maskMapRemapMin = terrainLayer.maskMapRemapMin;
@@ -242,13 +291,17 @@ namespace UnityEditor.Rendering.Universal
             ++EditorGUI.indentLevel;
             EditorGUI.BeginChangeCheck();
 
-            m_ShowChannelRemapping = EditorGUILayout.Foldout(m_ShowChannelRemapping, terrainLayer.maskMapTexture != null ? s_Styles.channelRemapping : s_Styles.defaultValues);
+            m_ShowChannelRemapping = EditorGUILayout.Foldout(
+                m_ShowChannelRemapping,
+                terrainLayer.maskMapTexture != null ? s_Styles.channelRemapping : s_Styles.defaultValues
+            );
 
             if (m_ShowChannelRemapping)
             {
                 if (terrainLayer.maskMapTexture != null)
                 {
-                    float min, max;
+                    float min,
+                        max;
                     min = maskMapRemapMin.x;
                     max = maskMapRemapMax.x;
                     EditorGUILayout.MinMaxSlider(s_Styles.metallic, ref min, ref max, 0, 1);
@@ -265,7 +318,8 @@ namespace UnityEditor.Rendering.Universal
                     {
                         EditorGUILayout.LabelField(styles.height);
                         ++EditorGUI.indentLevel;
-                        m_HeightParametrization = (HeightParametrization)EditorGUILayout.EnumPopup(styles.heightParametrization, m_HeightParametrization);
+                        m_HeightParametrization = (HeightParametrization)
+                            EditorGUILayout.EnumPopup(styles.heightParametrization, m_HeightParametrization);
                         if (m_HeightParametrization == HeightParametrization.Amplitude)
                         {
                             // (height - heightBase) * amplitude
@@ -278,8 +332,10 @@ namespace UnityEditor.Rendering.Universal
                         }
                         else
                         {
-                            maskMapRemapMin.z = EditorGUILayout.FloatField(styles.heightMin, maskMapRemapMin.z * 100) / 100;
-                            maskMapRemapMax.z = EditorGUILayout.FloatField(styles.heightMax, maskMapRemapMax.z * 100) / 100;
+                            maskMapRemapMin.z =
+                                EditorGUILayout.FloatField(styles.heightMin, maskMapRemapMin.z * 100) / 100;
+                            maskMapRemapMax.z =
+                                EditorGUILayout.FloatField(styles.heightMax, maskMapRemapMax.z * 100) / 100;
                         }
                         --EditorGUI.indentLevel;
                     }
@@ -298,7 +354,8 @@ namespace UnityEditor.Rendering.Universal
                     maskMapRemapMax.y = EditorGUILayout.Slider(s_Styles.ao, maskMapRemapMax.y, 0, 1);
                     if (heightBlend)
                     {
-                        maskMapRemapMax.z = EditorGUILayout.FloatField(s_Styles.heightCm, maskMapRemapMax.z * 100) / 100;
+                        maskMapRemapMax.z =
+                            EditorGUILayout.FloatField(s_Styles.heightCm, maskMapRemapMax.z * 100) / 100;
                     }
 
                     // There's a possibility that someone could slide max below the existing min value
@@ -314,8 +371,11 @@ namespace UnityEditor.Rendering.Universal
                     // See also: TerrainLitGUI, TerrainLayerInspector.
                     if (TextureHasAlpha(terrainLayer.diffuseTexture))
                     {
-                        terrainLayer.smoothnessSource = (UnityEngine.TerrainLayerSmoothnessSource)EditorGUILayout.EnumPopup(
-                            EditorGUIUtility.TrTextContent("Smoothness Source"), terrainLayer.smoothnessSource);
+                        terrainLayer.smoothnessSource = (UnityEngine.TerrainLayerSmoothnessSource)
+                            EditorGUILayout.EnumPopup(
+                                EditorGUIUtility.TrTextContent("Smoothness Source"),
+                                terrainLayer.smoothnessSource
+                            );
 
                         if (terrainLayer.smoothnessSource == TerrainLayerSmoothnessSource.DiffuseAlphaChannel)
                         {

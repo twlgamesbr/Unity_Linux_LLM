@@ -25,7 +25,7 @@ namespace Unity.Netcode
         /// <summary>
         /// Executes the RPC immediately on the local client without waiting for network synchronization
         /// </summary>
-        SendImmediate
+        SendImmediate,
     }
 
     /// <summary>
@@ -55,7 +55,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="deferMode">The defer mode to convert</param>
         /// <returns>A new RpcSendParams instance with the specified defer mode</returns>
-        public static implicit operator RpcSendParams(LocalDeferMode deferMode) => new RpcSendParams { LocalDeferMode = deferMode };
+        public static implicit operator RpcSendParams(LocalDeferMode deferMode) =>
+            new RpcSendParams { LocalDeferMode = deferMode };
     }
 
     /// <summary>
@@ -97,14 +98,16 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="target">The RPC target to convert</param>
         /// <returns>A new RpcParams instance with the specified target in its send parameters</returns>
-        public static implicit operator RpcParams(BaseRpcTarget target) => new RpcParams { Send = new RpcSendParams { Target = target } };
+        public static implicit operator RpcParams(BaseRpcTarget target) =>
+            new RpcParams { Send = new RpcSendParams { Target = target } };
 
         /// <summary>
         /// Implicitly converts a LocalDeferMode to RpcParams
         /// </summary>
         /// <param name="deferMode">The defer mode to convert</param>
         /// <returns>A new RpcParams instance with the specified defer mode in its send parameters</returns>
-        public static implicit operator RpcParams(LocalDeferMode deferMode) => new RpcParams { Send = new RpcSendParams { LocalDeferMode = deferMode } };
+        public static implicit operator RpcParams(LocalDeferMode deferMode) =>
+            new RpcParams { Send = new RpcSendParams { LocalDeferMode = deferMode } };
 
         /// <summary>
         /// Implicitly converts RpcReceiveParams to RpcParams
@@ -120,9 +123,7 @@ namespace Unity.Netcode
     /// Note: Clients always send to one destination when sending RPCs to the server
     /// so this structure is a place holder
     /// </summary>
-    public struct ServerRpcSendParams
-    {
-    }
+    public struct ServerRpcSendParams { }
 
     /// <summary>
     /// The receive parameters for server-side remote procedure calls
@@ -181,9 +182,7 @@ namespace Unity.Netcode
     /// Place holder.  <see cref="ServerRpcParams"/>
     /// Note: Server will always be the sender, so this structure is a place holder
     /// </summary>
-    public struct ClientRpcReceiveParams
-    {
-    }
+    public struct ClientRpcReceiveParams { }
 
     /// <summary>
     /// Client-Side RPC

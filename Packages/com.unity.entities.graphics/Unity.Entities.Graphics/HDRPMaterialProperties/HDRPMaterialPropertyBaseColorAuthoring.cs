@@ -4,8 +4,11 @@ using Unity.Mathematics;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_BaseColor"            )]
-    public struct HDRPMaterialPropertyBaseColor : IComponentData { public float4 Value; }
+    [MaterialProperty("_BaseColor")]
+    public struct HDRPMaterialPropertyBaseColor : IComponentData
+    {
+        public float4 Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyBaseColorAuthoring : UnityEngine.MonoBehaviour

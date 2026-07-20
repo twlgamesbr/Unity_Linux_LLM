@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEditorInternal;
-
 using RuntimeSRPPreferences = UnityEngine.Rendering.CoreRenderPipelinePreferences;
 
 namespace UnityEditor.Rendering
@@ -17,9 +16,11 @@ namespace UnityEditor.Rendering
 
         static ProbeAdjustmentColorPreferences()
         {
-            GetColorPrefProbeVolumeGizmoColor = RuntimeSRPPreferences.RegisterPreferenceColor("Adaptive Probe Volumes/Probe Adjustment Volume Gizmo", s_ProbeAdjustmentVolumeGizmoColorDefault);
+            GetColorPrefProbeVolumeGizmoColor = RuntimeSRPPreferences.RegisterPreferenceColor(
+                "Adaptive Probe Volumes/Probe Adjustment Volume Gizmo",
+                s_ProbeAdjustmentVolumeGizmoColorDefault
+            );
         }
-
     }
 
     [CanEditMultipleObjects]
@@ -28,29 +29,69 @@ namespace UnityEditor.Rendering
     {
         internal static class Styles
         {
-            internal static readonly GUIContent s_VORotateTool = EditorGUIUtility.TrIconContent("RotateTool", "The virtual offset direction for probes falling in this volume.");
-            internal static readonly GUIContent s_SORotateTool = EditorGUIUtility.TrIconContent("RotateTool", "The direction used to sample the ambient probe for probes falling in this volume.");
+            internal static readonly GUIContent s_VORotateTool = EditorGUIUtility.TrIconContent(
+                "RotateTool",
+                "The virtual offset direction for probes falling in this volume."
+            );
+            internal static readonly GUIContent s_SORotateTool = EditorGUIUtility.TrIconContent(
+                "RotateTool",
+                "The direction used to sample the ambient probe for probes falling in this volume."
+            );
             internal static readonly GUIContent s_VolumeHeader = EditorGUIUtility.TrTextContent("Influence Volume");
-            internal static readonly GUIContent s_AdjustmentHeader = EditorGUIUtility.TrTextContent("Probe Volume Overrides");
+            internal static readonly GUIContent s_AdjustmentHeader = EditorGUIUtility.TrTextContent(
+                "Probe Volume Overrides"
+            );
 
-            internal static readonly GUIContent s_Mode = new GUIContent("Mode", "Choose which type of adjustment to apply to probes covered by this volume.");
-            internal static readonly GUIContent s_DilationThreshold = new GUIContent("Dilation Validity Threshold", "Override the Dilation Validity Threshold for probes covered by this Probe Adjustment Volume. Higher values increase the chance of probes being considered invalid.");
-            internal static readonly GUIContent virtualOffsetThreshold = new GUIContent("Validity Threshold", "Override the Virtual Offset Validity Threshold for probes covered by this Probe Adjustment Volume. Higher values increase the chance of probes being considered invalid.");
-            internal static readonly GUIContent s_VODirection = new GUIContent("Rotation", "Rotate the axis along which probes will be pushed when applying Virtual Offset.");
-            internal static readonly GUIContent s_VODistance = new GUIContent("Distance", "Determines how far probes are pushed in the direction of the Virtual Offset.");
-            internal static readonly GUIContent renderingLayerMaskOperation = new GUIContent("Operation", "The operation to combine the Rendering Layer Mask set by this adjustment volume with the Rendering Layer Mask of the probes covered by this volume.");
-            internal static readonly GUIContent renderingLayerMask = new GUIContent("Rendering Layer Mask", "Sets the Rendering Layer Mask to be combined with the Rendering Layer Mask of the probes covered by this volume.");
-            internal static readonly GUIContent s_PreviewLighting = new GUIContent("Preview Probe Adjustments", "Quickly preview the effect of adjustments on probes covered by this volume.");
+            internal static readonly GUIContent s_Mode = new GUIContent(
+                "Mode",
+                "Choose which type of adjustment to apply to probes covered by this volume."
+            );
+            internal static readonly GUIContent s_DilationThreshold = new GUIContent(
+                "Dilation Validity Threshold",
+                "Override the Dilation Validity Threshold for probes covered by this Probe Adjustment Volume. Higher values increase the chance of probes being considered invalid."
+            );
+            internal static readonly GUIContent virtualOffsetThreshold = new GUIContent(
+                "Validity Threshold",
+                "Override the Virtual Offset Validity Threshold for probes covered by this Probe Adjustment Volume. Higher values increase the chance of probes being considered invalid."
+            );
+            internal static readonly GUIContent s_VODirection = new GUIContent(
+                "Rotation",
+                "Rotate the axis along which probes will be pushed when applying Virtual Offset."
+            );
+            internal static readonly GUIContent s_VODistance = new GUIContent(
+                "Distance",
+                "Determines how far probes are pushed in the direction of the Virtual Offset."
+            );
+            internal static readonly GUIContent renderingLayerMaskOperation = new GUIContent(
+                "Operation",
+                "The operation to combine the Rendering Layer Mask set by this adjustment volume with the Rendering Layer Mask of the probes covered by this volume."
+            );
+            internal static readonly GUIContent renderingLayerMask = new GUIContent(
+                "Rendering Layer Mask",
+                "Sets the Rendering Layer Mask to be combined with the Rendering Layer Mask of the probes covered by this volume."
+            );
+            internal static readonly GUIContent s_PreviewLighting = new GUIContent(
+                "Preview Probe Adjustments",
+                "Quickly preview the effect of adjustments on probes covered by this volume."
+            );
 
-            internal static readonly GUIContent skyOcclusionSampleCount = new GUIContent("Sample Count", "Controls the number of samples per probe for sky occlusion baking.");
-            internal static readonly GUIContent skyOcclusionMaxBounces = new GUIContent("Max Bounces", "Controls the number of bounces per light path for sky occlusion baking.");
+            internal static readonly GUIContent skyOcclusionSampleCount = new GUIContent(
+                "Sample Count",
+                "Controls the number of samples per probe for sky occlusion baking."
+            );
+            internal static readonly GUIContent skyOcclusionMaxBounces = new GUIContent(
+                "Max Bounces",
+                "Controls the number of bounces per light path for sky occlusion baking."
+            );
 
-            internal static readonly string s_AdjustmentVolumeChangedMessage = "This Adjustment Volume has never been baked, or has changed since the last bake. Re-bake Probe Volumes to ensure lighting data is valid.";
+            internal static readonly string s_AdjustmentVolumeChangedMessage =
+                "This Adjustment Volume has never been baked, or has changed since the last bake. Re-bake Probe Volumes to ensure lighting data is valid.";
 
             internal static readonly EditMode.SceneViewEditMode VirtualOffsetEditMode = (EditMode.SceneViewEditMode)110;
             internal static readonly EditMode.SceneViewEditMode SkyDirectionEditMode = (EditMode.SceneViewEditMode)110;
 
-            internal static readonly Color k_GizmoColorBase = ProbeAdjustmentColorPreferences.s_ProbeAdjustmentVolumeGizmoColorDefault;
+            internal static readonly Color k_GizmoColorBase =
+                ProbeAdjustmentColorPreferences.s_ProbeAdjustmentVolumeGizmoColorDefault;
 
             internal static readonly Color[] k_BaseHandlesColor = new Color[]
             {
@@ -59,7 +100,7 @@ namespace UnityEditor.Rendering
                 ProbeAdjustmentColorPreferences.s_ProbeAdjustmentVolumeGizmoColorDefault,
                 ProbeAdjustmentColorPreferences.s_ProbeAdjustmentVolumeGizmoColorDefault,
                 ProbeAdjustmentColorPreferences.s_ProbeAdjustmentVolumeGizmoColorDefault,
-                ProbeAdjustmentColorPreferences.s_ProbeAdjustmentVolumeGizmoColorDefault
+                ProbeAdjustmentColorPreferences.s_ProbeAdjustmentVolumeGizmoColorDefault,
             };
         }
 
@@ -71,20 +112,28 @@ namespace UnityEditor.Rendering
             {
                 Adjustments = 1 << 0,
             }
+
             enum Expandable
             {
                 Volume = 1 << 0,
                 Adjustments = 1 << 1,
             }
 
-            readonly static ExpandedState<Expandable, ProbeAdjustmentVolume> k_ExpandedState = new ExpandedState<Expandable, ProbeAdjustmentVolume>(Expandable.Volume | Expandable.Adjustments);
-            readonly static AdditionalPropertiesState<AdditionalProperties, ProbeAdjustmentVolume> k_AdditionalPropertiesState = new AdditionalPropertiesState<AdditionalProperties, ProbeAdjustmentVolume>(0);
+            static readonly ExpandedState<Expandable, ProbeAdjustmentVolume> k_ExpandedState = new ExpandedState<
+                Expandable,
+                ProbeAdjustmentVolume
+            >(Expandable.Volume | Expandable.Adjustments);
+            static readonly AdditionalPropertiesState<
+                AdditionalProperties,
+                ProbeAdjustmentVolume
+            > k_AdditionalPropertiesState = new AdditionalPropertiesState<AdditionalProperties, ProbeAdjustmentVolume>(
+                0
+            );
 
             public static void DrawVolumeContent(SerializedProbeAdjustmentVolume serialized, Editor owner)
             {
                 EditorGUILayout.PropertyField(serialized.shape);
                 EditorGUILayout.PropertyField(serialized.shape.intValue == 0 ? serialized.size : serialized.radius);
-
             }
 
             static T[] RemoveAt<T>(T[] values, int index)
@@ -93,6 +142,7 @@ namespace UnityEditor.Rendering
                 list.RemoveAt(index);
                 return list.ToArray();
             }
+
             static GUIContent[] CastArray(string[] values)
             {
                 var result = new GUIContent[values.Length];
@@ -106,13 +156,17 @@ namespace UnityEditor.Rendering
                 ProbeAdjustmentVolume ptv = (owner.target as ProbeAdjustmentVolume);
 
                 var bakingSet = ProbeVolumeBakingSet.GetBakingSetForScene(ptv.gameObject.scene);
-                bool useVirtualOffset = bakingSet != null ? bakingSet.settings.virtualOffsetSettings.useVirtualOffset : false;
+                bool useVirtualOffset =
+                    bakingSet != null ? bakingSet.settings.virtualOffsetSettings.useVirtualOffset : false;
                 bool useSkyOcclusion = bakingSet != null ? bakingSet.skyOcclusion : false;
 
                 var hiddenMode = (int)ProbeAdjustmentVolume.Mode.IntensityScale;
                 var availableValues = (int[])Enum.GetValues(typeof(ProbeAdjustmentVolume.Mode));
                 var availableModes = CastArray(Enum.GetNames(typeof(ProbeAdjustmentVolume.Mode)));
-                if (!k_AdditionalPropertiesState[AdditionalProperties.Adjustments] && serialized.mode.intValue != hiddenMode)
+                if (
+                    !k_AdditionalPropertiesState[AdditionalProperties.Adjustments]
+                    && serialized.mode.intValue != hiddenMode
+                )
                 {
                     int idx = Array.IndexOf(availableValues, hiddenMode);
                     availableValues = RemoveAt(availableValues, idx);
@@ -120,7 +174,12 @@ namespace UnityEditor.Rendering
                 }
 
                 EditorGUI.BeginChangeCheck();
-                int newValue = EditorGUILayout.IntPopup(Styles.s_Mode, serialized.mode.intValue, availableModes, availableValues);
+                int newValue = EditorGUILayout.IntPopup(
+                    Styles.s_Mode,
+                    serialized.mode.intValue,
+                    availableModes,
+                    availableValues
+                );
                 if (EditorGUI.EndChangeCheck())
                     serialized.mode.intValue = newValue;
 
@@ -137,10 +196,16 @@ namespace UnityEditor.Rendering
 
                     var editMode = Styles.VirtualOffsetEditMode;
                     EditorGUI.BeginChangeCheck();
-                    GUILayout.Toggle(editMode == EditMode.editMode, Styles.s_VORotateTool, EditorStyles.miniButton, GUILayout.Width(28f));
+                    GUILayout.Toggle(
+                        editMode == EditMode.editMode,
+                        Styles.s_VORotateTool,
+                        EditorStyles.miniButton,
+                        GUILayout.Width(28f)
+                    );
                     if (EditorGUI.EndChangeCheck())
                     {
-                        EditMode.SceneViewEditMode targetMode = EditMode.editMode == editMode ? EditMode.SceneViewEditMode.None : editMode;
+                        EditMode.SceneViewEditMode targetMode =
+                            EditMode.editMode == editMode ? EditMode.SceneViewEditMode.None : editMode;
                         EditMode.ChangeEditMode(targetMode, GetBounds(serialized, owner), owner);
                     }
                     EditorGUILayout.EndHorizontal();
@@ -150,10 +215,15 @@ namespace UnityEditor.Rendering
 
                     if (!useVirtualOffset)
                     {
-                        CoreEditorUtils.DrawFixMeBox("Apply Virtual Offset can be used only if Virtual Offset is enabled for the Baking Set.", MessageType.Warning, "Open", () =>
-                        {
-                            ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
-                        });
+                        CoreEditorUtils.DrawFixMeBox(
+                            "Apply Virtual Offset can be used only if Virtual Offset is enabled for the Baking Set.",
+                            MessageType.Warning,
+                            "Open",
+                            () =>
+                            {
+                                ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
+                            }
+                        );
                     }
                 }
                 else if (serialized.mode.intValue == (int)ProbeAdjustmentVolume.Mode.OverrideVirtualOffsetSettings)
@@ -166,10 +236,15 @@ namespace UnityEditor.Rendering
 
                     if (!useVirtualOffset)
                     {
-                        CoreEditorUtils.DrawFixMeBox("Override Virtual Offset can be used only if Virtual Offset is enabled for the Baking Set.", MessageType.Warning, "Open", () =>
-                        {
-                            ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
-                        });
+                        CoreEditorUtils.DrawFixMeBox(
+                            "Override Virtual Offset can be used only if Virtual Offset is enabled for the Baking Set.",
+                            MessageType.Warning,
+                            "Open",
+                            () =>
+                            {
+                                ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
+                            }
+                        );
                     }
                 }
                 else if (serialized.mode.intValue == (int)ProbeAdjustmentVolume.Mode.OverrideSampleCount)
@@ -188,20 +263,30 @@ namespace UnityEditor.Rendering
                     using (new EditorGUI.DisabledGroupScope(bakingSet != null && !bakingSet.skyOcclusion))
                     using (new EditorGUI.IndentLevelScope())
                     {
-                        EditorGUILayout.PropertyField(serialized.skyOcclusionSampleCount, Styles.skyOcclusionSampleCount);
+                        EditorGUILayout.PropertyField(
+                            serialized.skyOcclusionSampleCount,
+                            Styles.skyOcclusionSampleCount
+                        );
                         EditorGUILayout.PropertyField(serialized.skyOcclusionMaxBounces, Styles.skyOcclusionMaxBounces);
                     }
                 }
                 else if (serialized.mode.intValue == (int)ProbeAdjustmentVolume.Mode.IntensityScale)
                 {
                     EditorGUILayout.PropertyField(serialized.intensityScale);
-                    EditorGUILayout.HelpBox("Overriding the intensity of probes can break the physical plausibility of lighting. This may result in unwanted visual inconsistencies.", MessageType.Info, wide: true);
+                    EditorGUILayout.HelpBox(
+                        "Overriding the intensity of probes can break the physical plausibility of lighting. This may result in unwanted visual inconsistencies.",
+                        MessageType.Info,
+                        wide: true
+                    );
                 }
-				else if (serialized.mode.intValue == (int)ProbeAdjustmentVolume.Mode.OverrideSkyDirection)
+                else if (serialized.mode.intValue == (int)ProbeAdjustmentVolume.Mode.OverrideSkyDirection)
                 {
                     if (!SupportedRenderingFeatures.active.skyOcclusion)
                     {
-                        EditorGUILayout.HelpBox("Sky Occlusion is not supported by this Render Pipeline.", MessageType.Warning);
+                        EditorGUILayout.HelpBox(
+                            "Sky Occlusion is not supported by this Render Pipeline.",
+                            MessageType.Warning
+                        );
                         return;
                     }
 
@@ -214,10 +299,16 @@ namespace UnityEditor.Rendering
                             EditorGUILayout.PropertyField(serialized.skyDirection);
 
                         EditorGUI.BeginChangeCheck();
-                        GUILayout.Toggle(editMode == EditMode.editMode, Styles.s_SORotateTool, EditorStyles.miniButton, GUILayout.Width(28f));
+                        GUILayout.Toggle(
+                            editMode == EditMode.editMode,
+                            Styles.s_SORotateTool,
+                            EditorStyles.miniButton,
+                            GUILayout.Width(28f)
+                        );
                         if (EditorGUI.EndChangeCheck())
                         {
-                            EditMode.SceneViewEditMode targetMode = EditMode.editMode == editMode ? EditMode.SceneViewEditMode.None : editMode;
+                            EditMode.SceneViewEditMode targetMode =
+                                EditMode.editMode == editMode ? EditMode.SceneViewEditMode.None : editMode;
                             EditMode.ChangeEditMode(targetMode, GetBounds(serialized, owner), owner);
                         }
                     }
@@ -225,24 +316,37 @@ namespace UnityEditor.Rendering
 
                     if (!useSkyOcclusion)
                     {
-                        CoreEditorUtils.DrawFixMeBox("Overriding Sky Direction can be used only if Sky Occlusion is enabled for the Baking Set.", MessageType.Warning, "Open", () =>
-                        {
-                            ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
-                        });
+                        CoreEditorUtils.DrawFixMeBox(
+                            "Overriding Sky Direction can be used only if Sky Occlusion is enabled for the Baking Set.",
+                            MessageType.Warning,
+                            "Open",
+                            () =>
+                            {
+                                ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
+                            }
+                        );
                     }
                 }
                 else if (serialized.mode.intValue == (int)ProbeAdjustmentVolume.Mode.OverrideRenderingLayerMask)
                 {
                     if (bakingSet != null && !bakingSet.useRenderingLayers)
                     {
-                        CoreEditorUtils.DrawFixMeBox("Override Rendering Layer can be used only if Rendering Layers are enabled for the Baking Set.", MessageType.Warning, "Open", () =>
-                        {
-                            ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
-                        });
+                        CoreEditorUtils.DrawFixMeBox(
+                            "Override Rendering Layer can be used only if Rendering Layers are enabled for the Baking Set.",
+                            MessageType.Warning,
+                            "Open",
+                            () =>
+                            {
+                                ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
+                            }
+                        );
                     }
                     else
                     {
-                        EditorGUILayout.PropertyField(serialized.renderingLayerMaskOperation, Styles.renderingLayerMaskOperation);
+                        EditorGUILayout.PropertyField(
+                            serialized.renderingLayerMaskOperation,
+                            Styles.renderingLayerMaskOperation
+                        );
 
                         string[] options;
                         if (bakingSet != null)
@@ -266,7 +370,11 @@ namespace UnityEditor.Rendering
                         else
                         {
                             EditorGUI.BeginChangeCheck();
-                            int newMask = EditorGUILayout.MaskField(Styles.renderingLayerMask, serialized.renderingLayerMask.intValue, options);
+                            int newMask = EditorGUILayout.MaskField(
+                                Styles.renderingLayerMask,
+                                serialized.renderingLayerMask.intValue,
+                                options
+                            );
                             if (EditorGUI.EndChangeCheck())
                                 serialized.renderingLayerMask.uintValue = (uint)newMask;
                         }
@@ -309,22 +417,30 @@ namespace UnityEditor.Rendering
                 return default;
             }
 
-            public static void DrawAdditionalContent(SerializedProbeAdjustmentVolume serialized, Editor owner)
-            {
-            }
+            public static void DrawAdditionalContent(SerializedProbeAdjustmentVolume serialized, Editor owner) { }
 
             static ProbeAdjustmentVolumeUI()
             {
                 Inspector = CED.Group(
-                    CED.FoldoutGroup(Styles.s_VolumeHeader, Expandable.Volume, k_ExpandedState,
-                        (serialized, owner) => DrawVolumeContent(serialized, owner)),
-                    CED.AdditionalPropertiesFoldoutGroup(Styles.s_AdjustmentHeader, Expandable.Adjustments, k_ExpandedState, AdditionalProperties.Adjustments, k_AdditionalPropertiesState,
-                        CED.Group((serialized, owner) => DrawAdjustmentContent(serialized, owner)), DrawAdditionalContent),
+                    CED.FoldoutGroup(
+                        Styles.s_VolumeHeader,
+                        Expandable.Volume,
+                        k_ExpandedState,
+                        (serialized, owner) => DrawVolumeContent(serialized, owner)
+                    ),
+                    CED.AdditionalPropertiesFoldoutGroup(
+                        Styles.s_AdjustmentHeader,
+                        Expandable.Adjustments,
+                        k_ExpandedState,
+                        AdditionalProperties.Adjustments,
+                        k_AdditionalPropertiesState,
+                        CED.Group((serialized, owner) => DrawAdjustmentContent(serialized, owner)),
+                        DrawAdditionalContent
+                    ),
                     CED.Group(null, GroupOption.None, DrawBakingHelpers)
                 );
             }
         }
-
 
         SerializedProbeAdjustmentVolume m_SerializedAdjustmentVolume;
         internal const EditMode.SceneViewEditMode k_EditShape = EditMode.SceneViewEditMode.ReflectionProbeBox;
@@ -380,7 +496,11 @@ namespace UnityEditor.Rendering
         [DrawGizmo(GizmoType.InSelectionHierarchy)]
         static void DrawGizmosSelected(ProbeAdjustmentVolume adjustmentVolume, GizmoType gizmoType)
         {
-            using (new Handles.DrawingScope(Matrix4x4.TRS(adjustmentVolume.transform.position, adjustmentVolume.transform.rotation, Vector3.one)))
+            using (
+                new Handles.DrawingScope(
+                    Matrix4x4.TRS(adjustmentVolume.transform.position, adjustmentVolume.transform.rotation, Vector3.one)
+                )
+            )
             {
                 if (adjustmentVolume.shape == ProbeAdjustmentVolume.Shape.Box)
                 {
@@ -398,11 +518,18 @@ namespace UnityEditor.Rendering
 
                 if (adjustmentVolume.mode == ProbeAdjustmentVolume.Mode.ApplyVirtualOffset)
                 {
-                    ArrowHandle(0, Quaternion.Euler(adjustmentVolume.virtualOffsetRotation), adjustmentVolume.virtualOffsetDistance);
+                    ArrowHandle(
+                        0,
+                        Quaternion.Euler(adjustmentVolume.virtualOffsetRotation),
+                        adjustmentVolume.virtualOffsetDistance
+                    );
                 }
-
             }
-            using (new Handles.DrawingScope(Matrix4x4.TRS(adjustmentVolume.transform.position, Quaternion.identity, Vector3.one)))
+            using (
+                new Handles.DrawingScope(
+                    Matrix4x4.TRS(adjustmentVolume.transform.position, Quaternion.identity, Vector3.one)
+                )
+            )
             {
                 if (adjustmentVolume.mode == ProbeAdjustmentVolume.Mode.OverrideSkyDirection)
                 {
@@ -442,11 +569,14 @@ namespace UnityEditor.Rendering
         {
             ProbeAdjustmentVolume adjustmentVolume = target as ProbeAdjustmentVolume;
 
-            var position = Quaternion.Inverse(adjustmentVolume.transform.rotation) * adjustmentVolume.transform.position;
+            var position =
+                Quaternion.Inverse(adjustmentVolume.transform.rotation) * adjustmentVolume.transform.position;
 
             //important: if the origin of the handle's space move along the handle,
             //handles displacement will appears as moving two time faster.
-            using (new Handles.DrawingScope(Matrix4x4.TRS(Vector3.zero, adjustmentVolume.transform.rotation, Vector3.one)))
+            using (
+                new Handles.DrawingScope(Matrix4x4.TRS(Vector3.zero, adjustmentVolume.transform.rotation, Vector3.one))
+            )
             {
                 if (adjustmentVolume.shape == ProbeAdjustmentVolume.Shape.Box)
                 {
@@ -459,10 +589,15 @@ namespace UnityEditor.Rendering
                     s_ShapeBox.DrawHandle();
                     if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObjects(new UnityEngine.Object[] { adjustmentVolume, adjustmentVolume.transform }, "Change Adjustment Volume Bounding Box");
+                        Undo.RecordObjects(
+                            new UnityEngine.Object[] { adjustmentVolume, adjustmentVolume.transform },
+                            "Change Adjustment Volume Bounding Box"
+                        );
 
                         adjustmentVolume.size = s_ShapeBox.size;
-                        Vector3 delta = adjustmentVolume.transform.rotation * s_ShapeBox.center - adjustmentVolume.transform.position;
+                        Vector3 delta =
+                            adjustmentVolume.transform.rotation * s_ShapeBox.center
+                            - adjustmentVolume.transform.position;
                         adjustmentVolume.transform.position += delta;
                         ;
                     }
@@ -481,10 +616,16 @@ namespace UnityEditor.Rendering
                     }
                 }
 
-                if (adjustmentVolume.mode == ProbeAdjustmentVolume.Mode.ApplyVirtualOffset && EditMode.editMode == Styles.VirtualOffsetEditMode)
+                if (
+                    adjustmentVolume.mode == ProbeAdjustmentVolume.Mode.ApplyVirtualOffset
+                    && EditMode.editMode == Styles.VirtualOffsetEditMode
+                )
                 {
                     EditorGUI.BeginChangeCheck();
-                    Quaternion rotation = Handles.RotationHandle(Quaternion.Euler(adjustmentVolume.virtualOffsetRotation), position);
+                    Quaternion rotation = Handles.RotationHandle(
+                        Quaternion.Euler(adjustmentVolume.virtualOffsetRotation),
+                        position
+                    );
                     if (EditorGUI.EndChangeCheck())
                     {
                         Undo.RecordObject(adjustmentVolume, "Change Virtual Offset Direction");
@@ -492,11 +633,17 @@ namespace UnityEditor.Rendering
                     }
                 }
             }
-            if (adjustmentVolume.mode == ProbeAdjustmentVolume.Mode.OverrideSkyDirection && EditMode.editMode == Styles.SkyDirectionEditMode)
+            if (
+                adjustmentVolume.mode == ProbeAdjustmentVolume.Mode.OverrideSkyDirection
+                && EditMode.editMode == Styles.SkyDirectionEditMode
+            )
             {
                 EditorGUI.BeginChangeCheck();
 
-                Quaternion rotation = Handles.RotationHandle(Quaternion.Euler(adjustmentVolume.skyShadingDirectionRotation), adjustmentVolume.transform.position);
+                Quaternion rotation = Handles.RotationHandle(
+                    Quaternion.Euler(adjustmentVolume.skyShadingDirectionRotation),
+                    adjustmentVolume.transform.position
+                );
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RecordObject(adjustmentVolume, "Change Sky Shading Direction");

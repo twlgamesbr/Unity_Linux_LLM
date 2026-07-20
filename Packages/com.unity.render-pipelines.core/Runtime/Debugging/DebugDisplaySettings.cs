@@ -38,7 +38,9 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// The set of <see cref="IDebugDisplaySettingsData"/> containing the settings for this debug display
         /// </summary>
-        protected readonly HashSet<IDebugDisplaySettingsData> m_Settings = new HashSet<IDebugDisplaySettingsData>(new IDebugDisplaySettingsDataComparer());
+        protected readonly HashSet<IDebugDisplaySettingsData> m_Settings = new HashSet<IDebugDisplaySettingsData>(
+            new IDebugDisplaySettingsDataComparer()
+        );
 
         private static readonly Lazy<T> s_Instance = new Lazy<T>(() =>
         {

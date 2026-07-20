@@ -43,7 +43,10 @@ namespace UnityEditor.Rendering.Universal
             int hdrTonemapMode = m_Mode.value.intValue;
             if (asset != null && !asset.supportsHDR && hdrTonemapMode != (int)TonemappingMode.None)
             {
-                EditorGUILayout.HelpBox("Tonemapping should only be used when working with High Dynamic Range (HDR). Please enable HDR through the active Render Pipeline Asset.", MessageType.Warning);
+                EditorGUILayout.HelpBox(
+                    "Tonemapping should only be used when working with High Dynamic Range (HDR). Please enable HDR through the active Render Pipeline Asset.",
+                    MessageType.Warning
+                );
                 return;
             }
 

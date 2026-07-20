@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
-using Unity.Collections;
 using Unity.Burst;
+using Unity.Collections;
 using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering
@@ -10,24 +10,26 @@ namespace UnityEngine.Rendering
         Null,
         AllocOnly,
         GPUReallocOnly,
-        AllocOrGPURealloc
+        AllocOrGPURealloc,
     }
 
     [BurstCompile]
     internal static class InstanceDataSystemBurst
     {
-
         // Length == 1 means the archetype is shared over all the instances
-        private static GPUArchetypeHandle FetchArchetype(in NativeArray<GPUArchetypeHandle> archetypes, int index) => archetypes.Length == 1 ? archetypes[0] : archetypes[index];
+        private static GPUArchetypeHandle FetchArchetype(in NativeArray<GPUArchetypeHandle> archetypes, int index) =>
+            archetypes.Length == 1 ? archetypes[0] : archetypes[index];
 
-        private static unsafe void AllocOnlyIteration(NativeArray<EntityId> instanceIDSection,
+        private static unsafe void AllocOnlyIteration(
+            NativeArray<EntityId> instanceIDSection,
             int absoluteIndex,
             int localIndex,
             in NativeArray<GPUArchetypeHandle> archetypes,
             InstanceAllocators* instanceAllocators,
             ref RenderWorld renderWorld,
             ref NativeArray<InstanceHandle> instances,
-            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap)
+            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap
+        )
         {
             EntityId instanceID = instanceIDSection[localIndex];
             GPUArchetypeHandle archetype = FetchArchetype(archetypes, absoluteIndex);
@@ -41,12 +43,14 @@ namespace UnityEngine.Rendering
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static unsafe void AllocOnly(in JaggedSpan<EntityId> jaggedInstanceIDs,
+        private static unsafe void AllocOnly(
+            in JaggedSpan<EntityId> jaggedInstanceIDs,
             in NativeArray<GPUArchetypeHandle> archetypes,
             InstanceAllocators* instanceAllocators,
             ref RenderWorld renderWorld,
             ref NativeArray<InstanceHandle> instances,
-            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap)
+            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap
+        )
         {
             int absoluteIndex = 0;
 
@@ -56,15 +60,26 @@ namespace UnityEngine.Rendering
 
                 for (int localIndex = 0; localIndex < instanceIDs.Length; localIndex++, absoluteIndex++)
                 {
-                    AllocOnlyIteration(instanceIDs, absoluteIndex, localIndex, archetypes, instanceAllocators, ref renderWorld, ref instances, ref rendererToInstanceMap);
+                    AllocOnlyIteration(
+                        instanceIDs,
+                        absoluteIndex,
+                        localIndex,
+                        archetypes,
+                        instanceAllocators,
+                        ref renderWorld,
+                        ref instances,
+                        ref rendererToInstanceMap
+                    );
                 }
             }
         }
 
-        private static unsafe void GPUReallocOnlyIteration(InstanceHandle instance,
+        private static unsafe void GPUReallocOnlyIteration(
+            InstanceHandle instance,
             GPUArchetypeHandle archetype,
             InstanceAllocators* instanceAllocators,
-            ref RenderWorld renderWorld)
+            ref RenderWorld renderWorld
+        )
         {
             int instanceIndex = renderWorld.HandleToIndex(instance);
             InstanceGPUHandle gpuHandle = renderWorld.gpuHandles[instanceIndex];
@@ -74,14 +89,18 @@ namespace UnityEngine.Rendering
                 return;
 
             instanceAllocators->FreeInstanceGPUHandle(gpuHandle);
-            renderWorld.gpuHandles.ElementAtRW(instanceIndex) = instanceAllocators->AllocateInstanceGPUHandle(archetype);
+            renderWorld.gpuHandles.ElementAtRW(instanceIndex) = instanceAllocators->AllocateInstanceGPUHandle(
+                archetype
+            );
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static unsafe void GPUReallocOnly(in NativeArray<GPUArchetypeHandle> archetypes,
+        private static unsafe void GPUReallocOnly(
+            in NativeArray<GPUArchetypeHandle> archetypes,
             InstanceAllocators* instanceAllocators,
             ref RenderWorld renderWorld,
-            ref NativeArray<InstanceHandle> instances)
+            ref NativeArray<InstanceHandle> instances
+        )
         {
             for (int i = 0; i < instances.Length; i++)
             {
@@ -95,14 +114,15 @@ namespace UnityEngine.Rendering
             }
         }
 
-
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static unsafe void AllocOrGPURealloc(in JaggedSpan<EntityId> jaggedInstanceIDs,
+        private static unsafe void AllocOrGPURealloc(
+            in JaggedSpan<EntityId> jaggedInstanceIDs,
             in NativeArray<GPUArchetypeHandle> archetypes,
             InstanceAllocators* instanceAllocators,
             ref RenderWorld renderWorld,
             ref NativeArray<InstanceHandle> instances,
-            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap)
+            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap
+        )
         {
             int absoluteIndex = 0;
 
@@ -121,7 +141,16 @@ namespace UnityEngine.Rendering
                     }
                     else
                     {
-                        AllocOnlyIteration(instanceIDs, absoluteIndex, localIndex, archetypes, instanceAllocators, ref renderWorld, ref instances, ref rendererToInstanceMap);
+                        AllocOnlyIteration(
+                            instanceIDs,
+                            absoluteIndex,
+                            localIndex,
+                            archetypes,
+                            instanceAllocators,
+                            ref renderWorld,
+                            ref instances,
+                            ref rendererToInstanceMap
+                        );
                     }
                 }
             }
@@ -129,18 +158,27 @@ namespace UnityEngine.Rendering
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
         // Without using InstanceAllocators as a pointer there is a crash inside native containers allocator. Same everywhere.
-        public static unsafe void AllocateInstances(InstanceAllocatorVariant allocVariant,
+        public static unsafe void AllocateInstances(
+            InstanceAllocatorVariant allocVariant,
             in JaggedSpan<EntityId> jaggedInstanceIDs,
             in NativeArray<GPUArchetypeHandle> archetypes,
             InstanceAllocators* instanceAllocators,
             ref RenderWorld renderWorld,
             ref NativeArray<InstanceHandle> instances,
-            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap)
+            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap
+        )
         {
             switch (allocVariant)
             {
                 case InstanceAllocatorVariant.AllocOnly:
-                    AllocOnly(jaggedInstanceIDs, archetypes, instanceAllocators, ref renderWorld, ref instances, ref rendererToInstanceMap);
+                    AllocOnly(
+                        jaggedInstanceIDs,
+                        archetypes,
+                        instanceAllocators,
+                        ref renderWorld,
+                        ref instances,
+                        ref rendererToInstanceMap
+                    );
                     break;
 
                 case InstanceAllocatorVariant.GPUReallocOnly:
@@ -148,7 +186,14 @@ namespace UnityEngine.Rendering
                     break;
 
                 case InstanceAllocatorVariant.AllocOrGPURealloc:
-                    AllocOrGPURealloc(jaggedInstanceIDs, archetypes, instanceAllocators, ref renderWorld, ref instances, ref rendererToInstanceMap);
+                    AllocOrGPURealloc(
+                        jaggedInstanceIDs,
+                        archetypes,
+                        instanceAllocators,
+                        ref renderWorld,
+                        ref instances,
+                        ref rendererToInstanceMap
+                    );
                     break;
 
                 default:
@@ -158,10 +203,12 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static unsafe void FreeInstances(in NativeArray<InstanceHandle> instances,
+        public static unsafe void FreeInstances(
+            in NativeArray<InstanceHandle> instances,
             InstanceAllocators* instanceAllocators,
             ref RenderWorld renderWorld,
-            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap)
+            ref NativeParallelHashMap<EntityId, InstanceHandle> rendererToInstanceMap
+        )
         {
             foreach (var instance in instances)
             {

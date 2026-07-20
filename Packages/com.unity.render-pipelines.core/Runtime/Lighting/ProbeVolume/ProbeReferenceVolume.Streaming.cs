@@ -1,8 +1,8 @@
-using System.Diagnostics;
 using System.Collections.Generic;
-using Unity.IO.LowLevel.Unsafe;
+using System.Diagnostics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.IO.LowLevel.Unsafe;
 
 namespace UnityEngine.Rendering
 {
@@ -20,7 +20,7 @@ namespace UnityEngine.Rendering
                 m_ReadCommandBuffer = new NativeArray<ReadCommand>(maxRequestCount, Allocator.Persistent);
             }
 
-            unsafe public void AddReadCommand(int offset, int size, byte* dest)
+            public unsafe void AddReadCommand(int offset, int size, byte* dest)
             {
                 Debug.Assert(m_ReadCommandArray.CommandCount < m_ReadCommandBuffer.Length);
 
@@ -28,13 +28,13 @@ namespace UnityEngine.Rendering
                 {
                     Buffer = dest,
                     Offset = offset,
-                    Size = size
+                    Size = size,
                 };
 
                 m_BytesWritten += size;
             }
 
-            unsafe public int RunCommands(FileHandle file)
+            public unsafe int RunCommands(FileHandle file)
             {
                 m_ReadCommandArray.ReadCommands = (ReadCommand*)m_ReadCommandBuffer.GetUnsafePtr();
                 m_ReadHandle = AsyncReadManager.Read(file, m_ReadCommandArray);
@@ -127,7 +127,12 @@ namespace UnityEngine.Rendering
                 if (allocateGraphicsBuffers)
                 {
                     for (int i = 0; i < 2; i++)
-                        m_GraphicsBuffers[i] = new GraphicsBuffer(GraphicsBuffer.Target.Raw, GraphicsBuffer.UsageFlags.LockBufferForWrite, bufferSize, sizeof(uint));
+                        m_GraphicsBuffers[i] = new GraphicsBuffer(
+                            GraphicsBuffer.Target.Raw,
+                            GraphicsBuffer.UsageFlags.LockBufferForWrite,
+                            bufferSize,
+                            sizeof(uint)
+                        );
                 }
 
                 m_CurrentBuffer = 0;
@@ -137,7 +142,7 @@ namespace UnityEngine.Rendering
 
             public void Swap()
             {
-                m_CurrentBuffer = (m_CurrentBuffer + 1 ) % 2;
+                m_CurrentBuffer = (m_CurrentBuffer + 1) % 2;
             }
 
             public void Dispose()
@@ -328,6 +333,7 @@ namespace UnityEngine.Rendering
         int numberOfCellsLoadedPerFrame => m_LoadMaxCellsPerFrame ? cells.Count : m_NumberOfCellsLoadedPerFrame;
 
         int m_NumberOfCellsBlendedPerFrame = 10000;
+
         /// <summary>Maximum number of cells that are blended per frame.</summary>
         public int numberOfCellsBlendedPerFrame
         {
@@ -336,6 +342,7 @@ namespace UnityEngine.Rendering
         }
 
         float m_TurnoverRate = 0.1f;
+
         /// <summary>Percentage of cells loaded in the blending pool that can be replaced by out of date cells.</summary>
         public float turnoverRate
         {
@@ -370,9 +377,13 @@ namespace UnityEngine.Rendering
 
         // Requests waiting to be run. Needed to preserve order of requests.
         Queue<CellStreamingRequest> m_StreamingQueue = new Queue<CellStreamingRequest>();
+
         // List of active requests. Needed to query the result every frame.
         List<CellStreamingRequest> m_ActiveStreamingRequests = new List<CellStreamingRequest>();
-        ObjectPool<CellStreamingRequest> m_StreamingRequestsPool = new ObjectPool<CellStreamingRequest>(null, (val) => val.Clear());
+        ObjectPool<CellStreamingRequest> m_StreamingRequestsPool = new ObjectPool<CellStreamingRequest>(
+            null,
+            (val) => val.Clear()
+        );
         bool m_DiskStreamingUseCompute = false;
         ProbeVolumeScratchBufferPool m_ScratchBufferPool;
 
@@ -479,7 +490,7 @@ namespace UnityEngine.Rendering
 
             int requiredSHChunks = 0;
             int requiredIndexChunks = 0;
-            foreach(var cell in m_BestToBeLoadedCells)
+            foreach (var cell in m_BestToBeLoadedCells)
             {
                 requiredSHChunks += cell.desc.shChunkCount;
                 requiredIndexChunks += cell.desc.indexChunkCount;
@@ -589,13 +600,19 @@ namespace UnityEngine.Rendering
             if (m_ToBeLoadedCells.size != 0)
             {
                 minStreamingScore = Mathf.Min(minStreamingScore, m_ToBeLoadedCells[0].streamingInfo.streamingScore);
-                maxStreamingScore = Mathf.Max(maxStreamingScore, m_ToBeLoadedCells[m_ToBeLoadedCells.size - 1].streamingInfo.streamingScore);
+                maxStreamingScore = Mathf.Max(
+                    maxStreamingScore,
+                    m_ToBeLoadedCells[m_ToBeLoadedCells.size - 1].streamingInfo.streamingScore
+                );
             }
 
             if (m_LoadedCells.size != 0)
             {
                 minStreamingScore = Mathf.Min(minStreamingScore, m_LoadedCells[0].streamingInfo.streamingScore);
-                maxStreamingScore = Mathf.Max(maxStreamingScore, m_LoadedCells[m_LoadedCells.size - 1].streamingInfo.streamingScore);
+                maxStreamingScore = Mathf.Max(
+                    maxStreamingScore,
+                    m_LoadedCells[m_LoadedCells.size - 1].streamingInfo.streamingScore
+                );
             }
         }
 
@@ -695,7 +712,10 @@ namespace UnityEngine.Rendering
                             }
                             else
                             {
-                                ComputeStreamingScoreAndWorseLoadedCells(cameraPositionCellSpace, m_FrozenCameraDirection);
+                                ComputeStreamingScoreAndWorseLoadedCells(
+                                    cameraPositionCellSpace,
+                                    m_FrozenCameraDirection
+                                );
                                 worseLoadedCells = m_WorseLoadedCells;
                             }
                             didRecomputeScoresForLoadedCells = true;
@@ -709,16 +729,29 @@ namespace UnityEngine.Rendering
 
                                 // List are stored in reverse order depending on the mode.
                                 // TODO make the full List be sorted the same way as partial list.
-                                int worseCellIndex = m_LoadMaxCellsPerFrame ? worseLoadedCells.size - pendingUnloadCount - 1 : pendingUnloadCount;
+                                int worseCellIndex = m_LoadMaxCellsPerFrame
+                                    ? worseLoadedCells.size - pendingUnloadCount - 1
+                                    : pendingUnloadCount;
                                 var worseLoadedCell = worseLoadedCells[worseCellIndex];
                                 var bestUnloadedCell = bestUnloadedCells[m_TempCellToLoadList.size];
 
                                 // We are in a "stable" state, all the closest cells are loaded within the budget.
-                                if (worseLoadedCell.streamingInfo.streamingScore <= bestUnloadedCell.streamingInfo.streamingScore)
+                                if (
+                                    worseLoadedCell.streamingInfo.streamingScore
+                                    <= bestUnloadedCell.streamingInfo.streamingScore
+                                )
                                     break;
 
                                 // The worse loaded cell is further than the best unloaded cell, we can unload it.
-                                while (pendingUnloadCount < worseLoadedCells.size && worseLoadedCell.streamingInfo.streamingScore > bestUnloadedCell.streamingInfo.streamingScore && (shChunkBudget < bestUnloadedCell.desc.shChunkCount || indexChunkBudget < bestUnloadedCell.desc.indexChunkCount))
+                                while (
+                                    pendingUnloadCount < worseLoadedCells.size
+                                    && worseLoadedCell.streamingInfo.streamingScore
+                                        > bestUnloadedCell.streamingInfo.streamingScore
+                                    && (
+                                        shChunkBudget < bestUnloadedCell.desc.shChunkCount
+                                        || indexChunkBudget < bestUnloadedCell.desc.indexChunkCount
+                                    )
+                                )
                                 {
                                     if (probeVolumeDebug.verboseStreamingLog)
                                         LogStreaming($"Unloading cell {worseLoadedCell.desc.index}");
@@ -730,15 +763,27 @@ namespace UnityEngine.Rendering
 
                                     m_TempCellToUnloadList.Add(worseLoadedCell);
 
-                                    worseCellIndex = m_LoadMaxCellsPerFrame ? worseLoadedCells.size - pendingUnloadCount - 1 : pendingUnloadCount;
+                                    worseCellIndex = m_LoadMaxCellsPerFrame
+                                        ? worseLoadedCells.size - pendingUnloadCount - 1
+                                        : pendingUnloadCount;
                                     if (pendingUnloadCount < worseLoadedCells.size)
                                         worseLoadedCell = worseLoadedCells[worseCellIndex];
                                 }
 
                                 // We unloaded enough space (not taking fragmentation into account)
-                                if (shChunkBudget >= bestUnloadedCell.desc.shChunkCount && indexChunkBudget >= bestUnloadedCell.desc.indexChunkCount)
+                                if (
+                                    shChunkBudget >= bestUnloadedCell.desc.shChunkCount
+                                    && indexChunkBudget >= bestUnloadedCell.desc.indexChunkCount
+                                )
                                 {
-                                    if (!TryLoadCell(bestUnloadedCell, ref shChunkBudget, ref indexChunkBudget, m_TempCellToLoadList))
+                                    if (
+                                        !TryLoadCell(
+                                            bestUnloadedCell,
+                                            ref shChunkBudget,
+                                            ref indexChunkBudget,
+                                            m_TempCellToLoadList
+                                        )
+                                    )
                                     {
                                         needComputeFragmentation = true;
                                         break; // Alloc failed because of fragmentation, stop trying to load cells.
@@ -763,7 +808,9 @@ namespace UnityEngine.Rendering
                         {
                             if (i > 0) // Only warn once
                             {
-                                Debug.LogWarning("Max Memory Budget for Adaptive Probe Volumes has been reached, but there is still more data to load. Consider either increasing the Memory Budget, enabling GPU Streaming, or reducing the probe count.");
+                                Debug.LogWarning(
+                                    "Max Memory Budget for Adaptive Probe Volumes has been reached, but there is still more data to load. Consider either increasing the Memory Budget, enabling GPU Streaming, or reducing the probe count."
+                                );
                             }
                             break;
                         }
@@ -845,8 +892,12 @@ namespace UnityEngine.Rendering
         void UpdateBlendingCellStreaming(CommandBuffer cmd)
         {
             // Compute the worst score to offset score of cells to prioritize
-            float worstLoaded = m_LoadedCells.size != 0 ? m_LoadedCells[m_LoadedCells.size - 1].streamingInfo.streamingScore : 0.0f;
-            float worstToBeLoaded = m_ToBeLoadedCells.size != 0 ? m_ToBeLoadedCells[m_ToBeLoadedCells.size - 1].streamingInfo.streamingScore : 0.0f;
+            float worstLoaded =
+                m_LoadedCells.size != 0 ? m_LoadedCells[m_LoadedCells.size - 1].streamingInfo.streamingScore : 0.0f;
+            float worstToBeLoaded =
+                m_ToBeLoadedCells.size != 0
+                    ? m_ToBeLoadedCells[m_ToBeLoadedCells.size - 1].streamingInfo.streamingScore
+                    : 0.0f;
             float worstScore = Mathf.Max(worstLoaded, worstToBeLoaded);
 
             ComputeBlendingScore(m_ToBeLoadedBlendingCells, worstScore);
@@ -877,12 +928,17 @@ namespace UnityEngine.Rendering
                     if (m_LoadedBlendingCells.size - m_TempBlendingCellToUnloadList.size == 0) // We unloaded everything
                         break;
 
-                    var worstCellLoaded = m_LoadedBlendingCells[m_LoadedBlendingCells.size - m_TempBlendingCellToUnloadList.size - 1];
+                    var worstCellLoaded = m_LoadedBlendingCells[
+                        m_LoadedBlendingCells.size - m_TempBlendingCellToUnloadList.size - 1
+                    ];
                     var bestCellToBeLoaded = m_ToBeLoadedBlendingCells[m_TempBlendingCellToLoadList.size];
 
                     // The best cell to be loaded has WORSE score than the worst cell already loaded.
                     // This means all cells waiting to be loaded are worse than the ones we already have - we are in a "stable" state.
-                    if (bestCellToBeLoaded.blendingInfo.blendingScore >= (worstNoTurnover ?? worstCellLoaded).blendingInfo.blendingScore)
+                    if (
+                        bestCellToBeLoaded.blendingInfo.blendingScore
+                        >= (worstNoTurnover ?? worstCellLoaded).blendingInfo.blendingScore
+                    )
                     {
                         if (worstNoTurnover == null) // Disable turnover
                             break;
@@ -914,14 +970,19 @@ namespace UnityEngine.Rendering
                     if (loadOk && turnoverOffset != -1)
                     {
                         // swap to ensure loaded cells are at the start of m_ToBeLoadedBlendingCells
-                        m_ToBeLoadedBlendingCells[turnoverOffset] = m_ToBeLoadedBlendingCells[m_TempBlendingCellToLoadList.size-1];
-                        m_ToBeLoadedBlendingCells[m_TempBlendingCellToLoadList.size-1] = bestCellToBeLoaded;
+                        m_ToBeLoadedBlendingCells[turnoverOffset] = m_ToBeLoadedBlendingCells[
+                            m_TempBlendingCellToLoadList.size - 1
+                        ];
+                        m_ToBeLoadedBlendingCells[m_TempBlendingCellToLoadList.size - 1] = bestCellToBeLoaded;
                         if (++turnoverOffset >= m_ToBeLoadedBlendingCells.size)
                             turnoverOffset = m_TempBlendingCellToLoadList.size;
                     }
                 }
 
-                m_LoadedBlendingCells.RemoveRange(m_LoadedBlendingCells.size - m_TempBlendingCellToUnloadList.size, m_TempBlendingCellToUnloadList.size);
+                m_LoadedBlendingCells.RemoveRange(
+                    m_LoadedBlendingCells.size - m_TempBlendingCellToUnloadList.size,
+                    m_TempBlendingCellToUnloadList.size
+                );
             }
 
             m_ToBeLoadedBlendingCells.RemoveRange(0, m_TempBlendingCellToLoadList.size);
@@ -937,7 +998,10 @@ namespace UnityEngine.Rendering
 
                 int loadedBlendingCellIndex = 0;
                 int blendedCellCount = 0;
-                while (blendedCellCount < numberOfCellsBlendedPerFrame && loadedBlendingCellIndex < m_LoadedBlendingCells.size)
+                while (
+                    blendedCellCount < numberOfCellsBlendedPerFrame
+                    && loadedBlendingCellIndex < m_LoadedBlendingCells.size
+                )
                 {
                     var blendingCell = m_LoadedBlendingCells[loadedBlendingCellIndex++];
                     if (!blendingCell.streamingInfo.IsBlendingStreaming() && !blendingCell.blendingInfo.IsUpToDate())
@@ -994,7 +1058,7 @@ namespace UnityEngine.Rendering
                 int numberOfCellsToProcess = Mathf.Min(m_IndexDefragCells.size, numberOfCellsLoadedPerFrame);
                 int i = 0;
                 int processedCells = 0;
-                while(i < m_IndexDefragCells.size && processedCells < numberOfCellsToProcess)
+                while (i < m_IndexDefragCells.size && processedCells < numberOfCellsToProcess)
                 {
                     var cell = m_IndexDefragCells[m_IndexDefragCells.size - i - 1];
 
@@ -1005,7 +1069,14 @@ namespace UnityEngine.Rendering
                     if (!(cell.streamingInfo.IsStreaming() || cell.streamingInfo.IsBlendingStreaming()))
                     {
                         // Update index and indirection
-                        m_DefragIndex.AddBricks(cell.indexInfo, cell.data.bricks, cell.poolInfo.chunkList, ProbeBrickPool.GetChunkSizeInBrickCount(), m_Pool.GetPoolWidth(), m_Pool.GetPoolHeight());
+                        m_DefragIndex.AddBricks(
+                            cell.indexInfo,
+                            cell.data.bricks,
+                            cell.poolInfo.chunkList,
+                            ProbeBrickPool.GetChunkSizeInBrickCount(),
+                            m_Pool.GetPoolWidth(),
+                            m_Pool.GetPoolHeight()
+                        );
                         m_DefragCellIndices.UpdateCell(cell.indexInfo);
                         processedCells++;
                     }
@@ -1042,12 +1113,24 @@ namespace UnityEngine.Rendering
         void OnStreamingComplete(CellStreamingRequest request, CommandBuffer cmd)
         {
             request.cell.streamingInfo.request = null;
-            UpdatePoolAndIndex(request.cell, request.scratchBuffer, request.scratchBufferLayout, request.poolIndex, cmd);
+            UpdatePoolAndIndex(
+                request.cell,
+                request.scratchBuffer,
+                request.scratchBufferLayout,
+                request.poolIndex,
+                cmd
+            );
         }
 
         void OnBlendingStreamingComplete(CellStreamingRequest request, CommandBuffer cmd)
         {
-            UpdatePool(cmd, request.cell.blendingInfo.chunkList, request.scratchBuffer, request.scratchBufferLayout, request.poolIndex);
+            UpdatePool(
+                cmd,
+                request.cell.blendingInfo.chunkList,
+                request.scratchBuffer,
+                request.scratchBufferLayout,
+                request.poolIndex
+            );
 
             if (request.poolIndex == 0)
                 request.cell.streamingInfo.blendingRequest0 = null;
@@ -1055,11 +1138,20 @@ namespace UnityEngine.Rendering
                 request.cell.streamingInfo.blendingRequest1 = null;
 
             // Streaming of both scenario is over, we can update the index and start blending.
-            if (request.cell.streamingInfo.blendingRequest0 == null && request.cell.streamingInfo.blendingRequest1 == null && !request.cell.indexInfo.indexUpdated)
+            if (
+                request.cell.streamingInfo.blendingRequest0 == null
+                && request.cell.streamingInfo.blendingRequest1 == null
+                && !request.cell.indexInfo.indexUpdated
+            )
                 UpdateCellIndex(request.cell);
         }
 
-        void PushDiskStreamingRequest(Cell cell, string scenario, int poolIndex, CellStreamingRequest.OnStreamingCompleteDelegate onStreamingComplete)
+        void PushDiskStreamingRequest(
+            Cell cell,
+            string scenario,
+            int poolIndex,
+            CellStreamingRequest.OnStreamingCompleteDelegate onStreamingComplete
+        )
         {
             var streamingRequest = m_StreamingRequestsPool.Get();
             streamingRequest.cell = cell;
@@ -1122,27 +1214,42 @@ namespace UnityEngine.Rendering
             var cellDesc = cell.desc;
             var cellData = cell.data;
 
-            if (!m_ScratchBufferPool.AllocateScratchBuffer(cellDesc.shChunkCount, out var cellStreamingScratchBuffer, out var layout, m_DiskStreamingUseCompute))
+            if (
+                !m_ScratchBufferPool.AllocateScratchBuffer(
+                    cellDesc.shChunkCount,
+                    out var cellStreamingScratchBuffer,
+                    out var layout,
+                    m_DiskStreamingUseCompute
+                )
+            )
                 return false;
 
             if (!m_CurrentBakingSet.HasValidSharedData())
             {
-                Debug.LogError($"One or more data file missing for baking set {m_CurrentBakingSet.name}. Cannot load shared data.");
+                Debug.LogError(
+                    $"One or more data file missing for baking set {m_CurrentBakingSet.name}. Cannot load shared data."
+                );
                 return false;
             }
 
             if (!request.scenarioData.HasValidData(m_SHBands))
             {
-                Debug.LogError($"One or more data file missing for baking set {m_CurrentBakingSet.name} scenario {lightingScenario}. Cannot load scenario data.");
+                Debug.LogError(
+                    $"One or more data file missing for baking set {m_CurrentBakingSet.name} scenario {lightingScenario}. Cannot load scenario data."
+                );
                 return false;
             }
 
             if (probeVolumeDebug.verboseStreamingLog)
             {
                 if (request.poolIndex == -1)
-                    LogStreaming($"Running disk streaming request for cell {cellDesc.index} ({cellDesc.shChunkCount} chunks)");
+                    LogStreaming(
+                        $"Running disk streaming request for cell {cellDesc.index} ({cellDesc.shChunkCount} chunks)"
+                    );
                 else
-                    LogStreaming($"Running disk streaming request for cell {cellDesc.index} ({cellDesc.shChunkCount} chunks) for scenario {request.poolIndex}");
+                    LogStreaming(
+                        $"Running disk streaming request for cell {cellDesc.index} ({cellDesc.shChunkCount} chunks) for scenario {request.poolIndex}"
+                    );
             }
 
             // Note: We allocate new NativeArrays here.
@@ -1162,9 +1269,10 @@ namespace UnityEngine.Rendering
             // Write destination chunk coordinates for SH data
             var destChunkAddr = (uint*)mappedBufferAddr;
             // Pool -1 is regular pool and 0/1 are blending pools.
-            var destChunks = request.poolIndex == -1 ? request.cell.poolInfo.chunkList : request.cell.blendingInfo.chunkList;
+            var destChunks =
+                request.poolIndex == -1 ? request.cell.poolInfo.chunkList : request.cell.blendingInfo.chunkList;
             var destChunkCount = destChunks.Count;
-            for (int i = 0; i < destChunkCount ; ++i)
+            for (int i = 0; i < destChunkCount; ++i)
             {
                 var destChunk = destChunks[i];
                 destChunkAddr[i * 4] = (uint)destChunk.x;
@@ -1205,7 +1313,11 @@ namespace UnityEngine.Rendering
                 cellStreamingDesc = sharedDataAsset.streamableCellDescs[cellIndex];
                 var sharedChunkSize = m_CurrentBakingSet.sharedDataChunkSize;
 
-                request.cellSharedDataStreamingRequest.AddReadCommand(cellStreamingDesc.offset, sharedChunkSize * chunkCount, mappedBufferAddr);
+                request.cellSharedDataStreamingRequest.AddReadCommand(
+                    cellStreamingDesc.offset,
+                    sharedChunkSize * chunkCount,
+                    mappedBufferAddr
+                );
                 mappedBufferAddr += (sharedChunkSize * chunkCount);
                 request.bytesWritten += request.cellSharedDataStreamingRequest.RunCommands(sharedDataAsset.OpenFile());
             }
@@ -1215,9 +1327,15 @@ namespace UnityEngine.Rendering
                 var optionalDataAsset = request.scenarioData.cellOptionalDataAsset;
                 cellStreamingDesc = optionalDataAsset.streamableCellDescs[cellIndex];
                 var L2ReadSize = m_CurrentBakingSet.L2TextureChunkSize * chunkCount * 4; // 4 textures
-                request.cellOptionalDataStreamingRequest.AddReadCommand(cellStreamingDesc.offset, L2ReadSize, mappedBufferAddr);
+                request.cellOptionalDataStreamingRequest.AddReadCommand(
+                    cellStreamingDesc.offset,
+                    L2ReadSize,
+                    mappedBufferAddr
+                );
                 mappedBufferAddr += L2ReadSize;
-                request.bytesWritten += request.cellOptionalDataStreamingRequest.RunCommands(optionalDataAsset.OpenFile());
+                request.bytesWritten += request.cellOptionalDataStreamingRequest.RunCommands(
+                    optionalDataAsset.OpenFile()
+                );
             }
 
             if (m_CurrentBakingSet.bakedProbeOcclusion)
@@ -1225,17 +1343,31 @@ namespace UnityEngine.Rendering
                 var probeOcclusionDataAsset = request.scenarioData.cellProbeOcclusionDataAsset;
                 cellStreamingDesc = probeOcclusionDataAsset.streamableCellDescs[cellIndex];
                 var probeOcclusionReadSize = m_CurrentBakingSet.ProbeOcclusionChunkSize * chunkCount;
-                request.cellProbeOcclusionDataStreamingRequest.AddReadCommand(cellStreamingDesc.offset, probeOcclusionReadSize, mappedBufferAddr);
+                request.cellProbeOcclusionDataStreamingRequest.AddReadCommand(
+                    cellStreamingDesc.offset,
+                    probeOcclusionReadSize,
+                    mappedBufferAddr
+                );
                 mappedBufferAddr += probeOcclusionReadSize;
-                request.bytesWritten += request.cellProbeOcclusionDataStreamingRequest.RunCommands(probeOcclusionDataAsset.OpenFile());
+                request.bytesWritten += request.cellProbeOcclusionDataStreamingRequest.RunCommands(
+                    probeOcclusionDataAsset.OpenFile()
+                );
             }
 
             // Bricks Data
-            cellData.bricks = new NativeArray<ProbeBrickIndex.Brick>(cellDesc.bricksCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            cellData.bricks = new NativeArray<ProbeBrickIndex.Brick>(
+                cellDesc.bricksCount,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             var brickDataAsset = m_CurrentBakingSet.cellBricksDataAsset;
             cellStreamingDesc = brickDataAsset.streamableCellDescs[cellIndex];
-            request.brickStreamingRequest.AddReadCommand(cellStreamingDesc.offset, brickDataAsset.elementSize * Mathf.Min(cellStreamingDesc.elementCount, cellDesc.bricksCount), (byte*)cellData.bricks.GetUnsafePtr());
+            request.brickStreamingRequest.AddReadCommand(
+                cellStreamingDesc.offset,
+                brickDataAsset.elementSize * Mathf.Min(cellStreamingDesc.elementCount, cellDesc.bricksCount),
+                (byte*)cellData.bricks.GetUnsafePtr()
+            );
             request.brickStreamingRequest.RunCommands(brickDataAsset.OpenFile());
 
             // Support Data
@@ -1251,21 +1383,51 @@ namespace UnityEngine.Rendering
                 var layerSize = cellStreamingDesc.elementCount * m_CurrentBakingSet.supportLayerMaskChunkSize;
                 var validitySize = cellStreamingDesc.elementCount * m_CurrentBakingSet.supportValidityChunkSize;
 
-                cellData.probePositions = (new NativeArray<byte>(positionSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)).Reinterpret<Vector3>(1);
-                cellData.validity = (new NativeArray<byte>(validitySize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)).Reinterpret<float>(1);
-                cellData.layer = (new NativeArray<byte>(layerSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)).Reinterpret<byte>(1);
-                cellData.touchupVolumeInteraction = (new NativeArray<byte>(touchupSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)).Reinterpret<float>(1);
-                cellData.offsetVectors = (new NativeArray<byte>(offsetsSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)).Reinterpret<Vector3>(1);
+                cellData.probePositions = (
+                    new NativeArray<byte>(positionSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)
+                ).Reinterpret<Vector3>(1);
+                cellData.validity = (
+                    new NativeArray<byte>(validitySize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)
+                ).Reinterpret<float>(1);
+                cellData.layer = (
+                    new NativeArray<byte>(layerSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)
+                ).Reinterpret<byte>(1);
+                cellData.touchupVolumeInteraction = (
+                    new NativeArray<byte>(touchupSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)
+                ).Reinterpret<float>(1);
+                cellData.offsetVectors = (
+                    new NativeArray<byte>(offsetsSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)
+                ).Reinterpret<Vector3>(1);
 
-                request.supportStreamingRequest.AddReadCommand(supportOffset, positionSize, (byte*)cellData.probePositions.GetUnsafePtr());
+                request.supportStreamingRequest.AddReadCommand(
+                    supportOffset,
+                    positionSize,
+                    (byte*)cellData.probePositions.GetUnsafePtr()
+                );
                 supportOffset += positionSize;
-                request.supportStreamingRequest.AddReadCommand(supportOffset, validitySize, (byte*)cellData.validity.GetUnsafePtr());
+                request.supportStreamingRequest.AddReadCommand(
+                    supportOffset,
+                    validitySize,
+                    (byte*)cellData.validity.GetUnsafePtr()
+                );
                 supportOffset += validitySize;
-                request.supportStreamingRequest.AddReadCommand(supportOffset, touchupSize, (byte*)cellData.touchupVolumeInteraction.GetUnsafePtr());
+                request.supportStreamingRequest.AddReadCommand(
+                    supportOffset,
+                    touchupSize,
+                    (byte*)cellData.touchupVolumeInteraction.GetUnsafePtr()
+                );
                 supportOffset += touchupSize;
-                request.supportStreamingRequest.AddReadCommand(supportOffset, layerSize, (byte*)cellData.layer.GetUnsafePtr());
+                request.supportStreamingRequest.AddReadCommand(
+                    supportOffset,
+                    layerSize,
+                    (byte*)cellData.layer.GetUnsafePtr()
+                );
                 supportOffset += layerSize;
-                request.supportStreamingRequest.AddReadCommand(supportOffset, offsetsSize, (byte*)cellData.offsetVectors.GetUnsafePtr());
+                request.supportStreamingRequest.AddReadCommand(
+                    supportOffset,
+                    offsetsSize,
+                    (byte*)cellData.offsetVectors.GetUnsafePtr()
+                );
                 request.supportStreamingRequest.RunCommands(supportDataAsset.OpenFile());
             }
 
@@ -1285,10 +1447,16 @@ namespace UnityEngine.Rendering
                 Debug.Assert(shChunkSize % 4 == 0);
 
                 // Recreate if chunk size or max count is different.
-                if (m_ScratchBufferPool == null || m_ScratchBufferPool.chunkSize != shChunkSize || m_ScratchBufferPool.maxChunkCount != maxSHChunkCount)
+                if (
+                    m_ScratchBufferPool == null
+                    || m_ScratchBufferPool.chunkSize != shChunkSize
+                    || m_ScratchBufferPool.maxChunkCount != maxSHChunkCount
+                )
                 {
                     if (probeVolumeDebug.verboseStreamingLog)
-                        LogStreaming($"Allocating new Scratch Buffer Pool. Chunk size: {shChunkSize}, max SH Chunks: {maxSHChunkCount}");
+                        LogStreaming(
+                            $"Allocating new Scratch Buffer Pool. Chunk size: {shChunkSize}, max SH Chunks: {maxSHChunkCount}"
+                        );
 
                     if (m_ScratchBufferPool != null)
                         m_ScratchBufferPool.Cleanup();
@@ -1330,9 +1498,13 @@ namespace UnityEngine.Rendering
                             if (probeVolumeDebug.verboseStreamingLog)
                             {
                                 if (request.poolIndex == -1)
-                                    LogStreaming($"Completed disk streaming request for cell {request.cell.desc.index}");
+                                    LogStreaming(
+                                        $"Completed disk streaming request for cell {request.cell.desc.index}"
+                                    );
                                 else
-                                    LogStreaming($"Completed disk streaming request for blending cell {request.cell.desc.index} for scenario {request.poolIndex}");
+                                    LogStreaming(
+                                        $"Completed disk streaming request for blending cell {request.cell.desc.index} for scenario {request.poolIndex}"
+                                    );
                             }
 
                             // Because of limitation of low level device implementation of Lock/Unlock on Graphics Buffers
@@ -1342,9 +1514,14 @@ namespace UnityEngine.Rendering
                             // directly in the graphics buffer.
                             if (request.scratchBuffer.buffer != null)
                             {
-                                var mappedBuffer = request.scratchBuffer.buffer.LockBufferForWrite<byte>(0, request.scratchBuffer.stagingBuffer.Length);
+                                var mappedBuffer = request.scratchBuffer.buffer.LockBufferForWrite<byte>(
+                                    0,
+                                    request.scratchBuffer.stagingBuffer.Length
+                                );
                                 mappedBuffer.CopyFrom(request.scratchBuffer.stagingBuffer);
-                                request.scratchBuffer.buffer.UnlockBufferAfterWrite<byte>(request.scratchBuffer.stagingBuffer.Length);
+                                request.scratchBuffer.buffer.UnlockBufferAfterWrite<byte>(
+                                    request.scratchBuffer.stagingBuffer.Length
+                                );
                             }
                             request.onStreamingComplete(request, cmd);
 
@@ -1386,7 +1563,9 @@ namespace UnityEngine.Rendering
                         if (request.poolIndex == -1)
                             LogStreaming($"Discarding request for cell {request.cell.desc.index}");
                         else
-                            LogStreaming($"Discarding request for blending cell {request.cell.desc.index} for scenario {request.poolIndex}");
+                            LogStreaming(
+                                $"Discarding request for blending cell {request.cell.desc.index} for scenario {request.poolIndex}"
+                            );
                     }
 
                     Debug.Assert(request.scratchBuffer == null);
@@ -1425,7 +1604,12 @@ namespace UnityEngine.Rendering
 
                 // Close file handles if not needed anymore.
                 // Checking cellBricksDataAsset here just to know if any of the files is open. If one if open, all of them should be.
-                if (m_ActiveStreamingRequests.Count == 0 && m_StreamingQueue.Count == 0 && m_CurrentBakingSet.cellBricksDataAsset != null && m_CurrentBakingSet.cellBricksDataAsset.IsOpen())
+                if (
+                    m_ActiveStreamingRequests.Count == 0
+                    && m_StreamingQueue.Count == 0
+                    && m_CurrentBakingSet.cellBricksDataAsset != null
+                    && m_CurrentBakingSet.cellBricksDataAsset.IsOpen()
+                )
                 {
                     if (probeVolumeDebug.verboseStreamingLog)
                         LogStreaming("Closing files open for APV disk streaming.");
@@ -1441,7 +1625,10 @@ namespace UnityEngine.Rendering
                         scenarioData.cellProbeOcclusionDataAsset.CloseFile();
                     }
 
-                    if (!string.IsNullOrEmpty(otherScenario) && m_CurrentBakingSet.scenarios.TryGetValue(lightingScenario, out var otherScenarioData))
+                    if (
+                        !string.IsNullOrEmpty(otherScenario)
+                        && m_CurrentBakingSet.scenarios.TryGetValue(lightingScenario, out var otherScenarioData)
+                    )
                     {
                         otherScenarioData.cellDataAsset.CloseFile();
                         otherScenarioData.cellOptionalDataAsset.CloseFile();

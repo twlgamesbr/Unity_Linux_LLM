@@ -10,8 +10,9 @@ namespace Unity.Physics
     {
         /// <summary>   A dummy implementation which does nothing. </summary>
         NoPhysics,
+
         /// <summary>   Default C# implementation. </summary>
-        UnityPhysics
+        UnityPhysics,
     }
 
     internal enum SimulationScheduleStage
@@ -29,14 +30,22 @@ namespace Unity.Physics
 
         /// <summary>   Physics world to be stepped. </summary>
         public PhysicsWorld World;
+
         /// <summary>   Portion of time to step the physics world for. This is the frame timestep. </summary>
         public float TimeStep;
+
         /// <summary>   Gravity in the physics world, a vector in m/s^2. </summary>
         public float3 Gravity;
+
         /// <summary>   Enables gyroscopic torque, which will be added to dynamic bodies in every simulation step. </summary>
         public bool EnableGyroscopicTorque;
+
         /// <summary>   Number of substep iterations to perform while solving constraints. No substepping will occur when set to 1. </summary>
-        public int NumSubsteps { get => m_NumSubsteps; set => m_NumSubsteps = value <= 0 ? 1 : value; }
+        public int NumSubsteps
+        {
+            get => m_NumSubsteps;
+            set => m_NumSubsteps = value <= 0 ? 1 : value;
+        }
 
         /// <summary>   Number of Gauss-Seidel iterations to perform while solving constraints. </summary>
         public int NumSolverIterations;
@@ -64,8 +73,10 @@ namespace Unity.Physics
         /// Whether to update the collision world after the step for more precise queries.
         /// </summary>
         public bool SynchronizeCollisionWorld;
+
         /// <summary>   Settings for solver stabilization heuristic in Unity.Physics. </summary>
         public Solver.StabilizationHeuristicSettings SolverStabilizationHeuristicSettings;
+
         /// <summary>   Used for optimization of static body synchronization. </summary>
         public NativeReference<int>.ReadOnly HaveStaticBodiesChanged;
 
@@ -78,6 +89,7 @@ namespace Unity.Physics
     {
         /// <summary>   Final execution handle. Does not include dispose jobs. </summary>
         public JobHandle FinalExecutionHandle;
+
         /// <summary>   Final handle. Includes dispose jobs </summary>
         public JobHandle FinalDisposeHandle;
 
@@ -111,7 +123,11 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   The SimulationJobHandles. </returns>
-        SimulationJobHandles ScheduleStepJobs(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded = true);
+        SimulationJobHandles ScheduleStepJobs(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        );
 
         /// <summary>
         /// The final scheduled simulation job. Jobs which use the simulation results should depend on
@@ -135,10 +151,15 @@ namespace Unity.Physics
     {
         public SimulationType Type => SimulationType.NoPhysics;
 
-        public void Dispose() {}
-        public void Step(SimulationStepInput input) {}
-        public SimulationJobHandles ScheduleStepJobs(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded = true) =>
-            new SimulationJobHandles(inputDeps);
+        public void Dispose() { }
+
+        public void Step(SimulationStepInput input) { }
+
+        public SimulationJobHandles ScheduleStepJobs(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        ) => new SimulationJobHandles(inputDeps);
 
         public JobHandle FinalSimulationJobHandle => new JobHandle();
         public JobHandle FinalJobHandle => new JobHandle();

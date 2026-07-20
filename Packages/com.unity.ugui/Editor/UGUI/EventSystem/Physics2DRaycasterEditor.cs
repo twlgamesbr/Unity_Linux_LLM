@@ -13,7 +13,10 @@ namespace UnityEditor.EventSystems
         {
             base.OnInspectorGUI();
 #if !PACKAGE_PHYSICS2D
-            EditorGUILayout.HelpBox("Physics2D module is not present. This Raycaster will have no effect", MessageType.Warning);
+            EditorGUILayout.HelpBox(
+                "Physics2D module is not present. This Raycaster will have no effect",
+                MessageType.Warning
+            );
 #endif
         }
     }

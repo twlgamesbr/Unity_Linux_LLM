@@ -47,28 +47,38 @@ namespace Unity.Entities.Editor
             tabView.Tabs = tabs;
             tabView.value = state.TabIndex;
 
-            tabView.RegisterCallback((ChangeEvent<int> evt, (TabViewAttribute attribute, ITabContent[] tabs, TabContent[] tabContents, BitArray initializedTabs) args) =>
-            {
-                if (evt.target.GetType() != typeof(TabView))
-                    return;
-
-                var tabIndex = evt.newValue;
-                SessionState<State>.GetOrCreate(args.attribute.Id).TabIndex = tabIndex;
-
-                if (!args.initializedTabs[tabIndex])
+            tabView.RegisterCallback(
+                (
+                    ChangeEvent<int> evt,
+                    (
+                        TabViewAttribute attribute,
+                        ITabContent[] tabs,
+                        TabContent[] tabContents,
+                        BitArray initializedTabs
+                    ) args
+                ) =>
                 {
-                    var element = new PropertyElement();
-                    element.SetTarget(args.tabs[tabIndex]);
-                    args.tabContents[tabIndex].Add(element);
-                    args.initializedTabs[tabIndex] = true;
-                }
+                    if (evt.target.GetType() != typeof(TabView))
+                        return;
 
-                for (var i = 0; i < args.tabs.Length; i++)
-                {
-                    args.tabs[i].OnTabVisibilityChanged(i == tabIndex);
-                }
+                    var tabIndex = evt.newValue;
+                    SessionState<State>.GetOrCreate(args.attribute.Id).TabIndex = tabIndex;
 
-            }, (DrawerAttribute, Target, tabs, initializedTabs));
+                    if (!args.initializedTabs[tabIndex])
+                    {
+                        var element = new PropertyElement();
+                        element.SetTarget(args.tabs[tabIndex]);
+                        args.tabContents[tabIndex].Add(element);
+                        args.initializedTabs[tabIndex] = true;
+                    }
+
+                    for (var i = 0; i < args.tabs.Length; i++)
+                    {
+                        args.tabs[i].OnTabVisibilityChanged(i == tabIndex);
+                    }
+                },
+                (DrawerAttribute, Target, tabs, initializedTabs)
+            );
 
             return tabView;
         }

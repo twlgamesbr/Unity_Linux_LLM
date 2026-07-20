@@ -30,12 +30,14 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                 Automated = UnityTestProtocolStarter.IsEnabled(),
                 RetryCount = testJobData.executionSettings.retryCount,
                 RepeatCount = testJobData.executionSettings.repeatCount,
-                RetryRepeatState = testJobData.RetryRepeatState
+                RetryRepeatState = testJobData.RetryRepeatState,
             };
 
             if (testJobData.executionSettings.ignoreTests != null)
             {
-                testJobData.Context.IgnoreTests = testJobData.executionSettings.ignoreTests.Select(ignoreTest => ignoreTest.ParseToEngine()).ToArray();
+                testJobData.Context.IgnoreTests = testJobData
+                    .executionSettings.ignoreTests.Select(ignoreTest => ignoreTest.ParseToEngine())
+                    .ToArray();
             }
 
             testJobData.Context.FeatureFlags = testJobData.executionSettings.featureFlags;

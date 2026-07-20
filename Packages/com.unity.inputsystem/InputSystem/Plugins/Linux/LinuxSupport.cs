@@ -14,7 +14,7 @@ namespace UnityEngine.InputSystem.Linux
         Button,
         Hat,
 
-        Max
+        Max,
     }
 
     internal enum SDLAxisUsage
@@ -40,7 +40,7 @@ namespace UnityEngine.InputSystem.Linux
         Hat3X,
         Hat3Y,
 
-        Count
+        Count,
     }
 
     internal enum SDLButtonUsage
@@ -75,7 +75,7 @@ namespace UnityEngine.InputSystem.Linux
         ThumbLeft,
         ThumbRight,
 
-        Count
+        Count,
     }
 
     // JSON must match JoystickFeatureDefinition in native.

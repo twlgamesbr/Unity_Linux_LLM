@@ -13,35 +13,35 @@ using Unity.Transforms;
 [BurstCompile]
 internal partial struct TransformBakingSystem : ISystem
 {
-    EntityQuery               _Query;
+    EntityQuery _Query;
     BakedRuntimeTransformsJob _Job;
 
-    ProfilerMarker            _Playback;
+    ProfilerMarker _Playback;
 
     [BurstCompile]
     struct BakedRuntimeTransformsJob : IJobChunk
     {
         [ReadOnly]
         public ComponentTypeHandle<TransformAuthoring> Transform;
-        public EntityTypeHandle                        Entities;
+        public EntityTypeHandle Entities;
 
-        public ComponentTypeHandle<LocalToWorld>       LocalToWorld;
-        public ComponentTypeHandle<LocalTransform>      LocalTransform;
-        public ComponentTypeHandle<PostTransformMatrix>  PostTransformMatrix;
-        public ComponentTypeHandle<Parent>             Parent;
+        public ComponentTypeHandle<LocalToWorld> LocalToWorld;
+        public ComponentTypeHandle<LocalTransform> LocalTransform;
+        public ComponentTypeHandle<PostTransformMatrix> PostTransformMatrix;
+        public ComponentTypeHandle<Parent> Parent;
 
-        public EntityQueryMask                         Static;
-        public EntityQueryMask                         HasTransform;
-        public EntityQueryMask                         HasPostTransformMatrix;
-        public EntityQueryMask                         HasParent;
-        public EntityQueryMask                         HasLocalToWorld;
+        public EntityQueryMask Static;
+        public EntityQueryMask HasTransform;
+        public EntityQueryMask HasPostTransformMatrix;
+        public EntityQueryMask HasParent;
+        public EntityQueryMask HasLocalToWorld;
 
-        public EntityCommandBuffer.ParallelWriter      Commands;
-        public uint                                    ChangeVersion;
+        public EntityCommandBuffer.ParallelWriter Commands;
+        public uint ChangeVersion;
 
         public static bool HasFlag(RuntimeTransformComponentFlags category, RuntimeTransformComponentFlags field)
         {
-            return (((uint) category & (uint) field) != 0);
+            return (((uint)category & (uint)field) != 0);
         }
 
         public RuntimeTransformComponentFlags GetChunkCategory(ArchetypeChunk batchInChunk)
@@ -95,24 +95,35 @@ internal partial struct TransformBakingSystem : ISystem
         [BurstCompile]
         static bool IsUniformScale(in float3 scale)
         {
-            return math.abs(scale.x - scale.y) <= k_Tolerance &&
-                   math.abs(scale.x - scale.z) <= k_Tolerance &&
-                   math.abs(scale.y - scale.z) <= k_Tolerance &&
-                   math.sign(scale.x) == math.sign(scale.y) &&
-                   math.sign(scale.x) == math.sign(scale.z);
+            return math.abs(scale.x - scale.y) <= k_Tolerance
+                && math.abs(scale.x - scale.z) <= k_Tolerance
+                && math.abs(scale.y - scale.z) <= k_Tolerance
+                && math.sign(scale.x) == math.sign(scale.y)
+                && math.sign(scale.x) == math.sign(scale.z);
         }
 
         static float3 CalculateLossyScale(float4x4 matrix, quaternion rotation)
         {
             float4x4 m4x4 = matrix;
             float3x3 invR = new float3x3(math.conjugate(rotation));
-            float3x3 gsm = new float3x3 { c0 = m4x4.c0.xyz, c1 = m4x4.c1.xyz, c2 = m4x4.c2.xyz };
+            float3x3 gsm = new float3x3
+            {
+                c0 = m4x4.c0.xyz,
+                c1 = m4x4.c1.xyz,
+                c2 = m4x4.c2.xyz,
+            };
             float3x3 scale = math.mul(invR, gsm);
             float3 globalScale = new float3(scale.c0.x, scale.c1.y, scale.c2.z);
             return globalScale;
         }
 
-        static void CalculateLocalTransform(in TransformAuthoring transform, bool requestedPostTransformMatrix, out LocalTransform localTransform, out float3 scale, out bool needsNonUniformScale)
+        static void CalculateLocalTransform(
+            in TransformAuthoring transform,
+            bool requestedPostTransformMatrix,
+            out LocalTransform localTransform,
+            out float3 scale,
+            out bool needsNonUniformScale
+        )
         {
             float3 position;
             quaternion rotation;
@@ -146,11 +157,20 @@ internal partial struct TransformBakingSystem : ISystem
             }
 
             // Calculate the transform
-            localTransform = Unity.Transforms.LocalTransform.FromPositionRotationScale(position, rotation, uniformScale);
+            localTransform = Unity.Transforms.LocalTransform.FromPositionRotationScale(
+                position,
+                rotation,
+                uniformScale
+            );
         }
 
         [BurstCompile]
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        public void Execute(
+            in ArchetypeChunk chunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMask
+        )
         {
             Assert.IsFalse(useEnabledMask);
             var transforms = chunk.GetNativeArray(ref Transform);
@@ -194,7 +214,11 @@ internal partial struct TransformBakingSystem : ISystem
                 }
                 else if (requestedHasFlagLocalToWorld)
                 {
-                    Commands.AddComponent(unfilteredChunkIndex, entity, new LocalToWorld { Value = transforms[i].LocalToWorld });
+                    Commands.AddComponent(
+                        unfilteredChunkIndex,
+                        entity,
+                        new LocalToWorld { Value = transforms[i].LocalToWorld }
+                    );
                 }
                 else if (chunkHasFlagLocalToWorld)
                 {
@@ -203,16 +227,28 @@ internal partial struct TransformBakingSystem : ISystem
 
                 // Transform
                 var chunkHasLocalTransform = HasFlag(chunkCategory, RuntimeTransformComponentFlags.LocalTransform);
-                var chunkHasPostTransformMatrix = HasFlag(chunkCategory, RuntimeTransformComponentFlags.PostTransformMatrix);
+                var chunkHasPostTransformMatrix = HasFlag(
+                    chunkCategory,
+                    RuntimeTransformComponentFlags.PostTransformMatrix
+                );
                 var requestedHasLocalTransform = HasFlag(requestedMode, RuntimeTransformComponentFlags.LocalTransform);
-                var requestedHasPostTransformMatrix = HasFlag(requestedMode, RuntimeTransformComponentFlags.PostTransformMatrix);
+                var requestedHasPostTransformMatrix = HasFlag(
+                    requestedMode,
+                    RuntimeTransformComponentFlags.PostTransformMatrix
+                );
 
                 // Calculate LocalTransform and non uniform scale if any of them are needed
                 float3 scale = default;
                 LocalTransform localTransform = default;
                 if (requestedHasLocalTransform || requestedHasPostTransformMatrix)
                 {
-                    CalculateLocalTransform(transforms[i], requestedHasPostTransformMatrix, out localTransform, out scale, out bool needsNonUniformScale);
+                    CalculateLocalTransform(
+                        transforms[i],
+                        requestedHasPostTransformMatrix,
+                        out localTransform,
+                        out scale,
+                        out bool needsNonUniformScale
+                    );
                     // We will need PostTransformMatrix if the scale is non uniform, even if we didn't requested
                     requestedHasPostTransformMatrix |= needsNonUniformScale;
                 }
@@ -236,7 +272,11 @@ internal partial struct TransformBakingSystem : ISystem
                 }
                 else if (requestedHasPostTransformMatrix)
                 {
-                    Commands.AddComponent(unfilteredChunkIndex, entity, new PostTransformMatrix { Value = float4x4.Scale(scale) });
+                    Commands.AddComponent(
+                        unfilteredChunkIndex,
+                        entity,
+                        new PostTransformMatrix { Value = float4x4.Scale(scale) }
+                    );
                 }
                 else if (chunkHasPostTransformMatrix)
                 {
@@ -252,7 +292,11 @@ internal partial struct TransformBakingSystem : ISystem
                 }
                 else if (requestedHasFlagParent)
                 {
-                    Commands.AddComponent(unfilteredChunkIndex, entity, new Parent { Value = transforms[i].RuntimeParent });
+                    Commands.AddComponent(
+                        unfilteredChunkIndex,
+                        entity,
+                        new Parent { Value = transforms[i].RuntimeParent }
+                    );
                 }
                 else if (chunkHasFlagParent)
                 {
@@ -279,27 +323,32 @@ internal partial struct TransformBakingSystem : ISystem
             .WithAll<Static>()
             // Intentionally leaving static prefabs out of this query, so we don't strip the hierarchy or transform components based on this
             .WithOptions(EntityQueryOptions.IncludeDisabledEntities)
-            .Build(ref state).GetEntityQueryMask();
+            .Build(ref state)
+            .GetEntityQueryMask();
 
         _Job.HasTransform = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<LocalTransform>()
             .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
-            .Build(ref state).GetEntityQueryMask();
+            .Build(ref state)
+            .GetEntityQueryMask();
 
         _Job.HasPostTransformMatrix = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<PostTransformMatrix>()
             .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
-            .Build(ref state).GetEntityQueryMask();
+            .Build(ref state)
+            .GetEntityQueryMask();
 
         _Job.HasParent = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<Parent>()
             .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
-            .Build(ref state).GetEntityQueryMask();
+            .Build(ref state)
+            .GetEntityQueryMask();
 
         _Job.HasLocalToWorld = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<LocalToWorld>()
             .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
-            .Build(ref state).GetEntityQueryMask();
+            .Build(ref state)
+            .GetEntityQueryMask();
     }
 
     [BurstCompile]

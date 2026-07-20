@@ -6,7 +6,8 @@ namespace Unity.Multiplayer.Editor
     [Serializable]
     internal struct SerializedType : ISerializationCallbackReceiver, IComparable<SerializedType>
     {
-        [SerializeField] private string m_TypeName;
+        [SerializeField]
+        private string m_TypeName;
         private Type m_Type;
 
         public Type Value => m_Type;

@@ -22,7 +22,11 @@ namespace UnityEngine.Rendering
         public MeshRendererProcessor meshRendererProcessor => m_MeshRendererProcessor;
         public LODGroupProcessor lodDGroupProcessor => m_LODGroupProcessor;
 
-        public void Initialize(GPUDrivenProcessor gpuDrivenProcessor, ObjectDispatcher objectDispatcher, GPUResidentContext context)
+        public void Initialize(
+            GPUDrivenProcessor gpuDrivenProcessor,
+            ObjectDispatcher objectDispatcher,
+            GPUResidentContext context
+        )
         {
             m_GPUDrivenProcessor = gpuDrivenProcessor;
             m_ObjectDispatcher = objectDispatcher;
@@ -54,13 +58,35 @@ namespace UnityEngine.Rendering
             Profiler.BeginSample("WorldProcessor.Update");
 
             Profiler.BeginSample("FetchAllChanges");
-            var meshDataSorted = m_ObjectDispatcher.GetTypeChangesAndClear<Mesh>(Allocator.TempJob, sortByInstanceID: true, noScriptingArray: true);
-            var materialData = m_ObjectDispatcher.GetTypeChangesAndClear<Material>(Allocator.TempJob, noScriptingArray: true);
-            var cameraData = m_ObjectDispatcher.GetTypeChangesAndClear<Camera>(Allocator.TempJob, noScriptingArray: true);
-            var lodGroupData = m_ObjectDispatcher.GetTypeChangesAndClear<LODGroup>(Allocator.TempJob, noScriptingArray: true);
-            var lodGroupTransformData = m_ObjectDispatcher.GetTransformChangesAndClear<LODGroup>(ObjectDispatcher.TransformTrackingType.GlobalTRS, Allocator.TempJob);
-            var rendererData = m_ObjectDispatcher.GetTypeChangesAndClear<MeshRenderer>(Allocator.TempJob, noScriptingArray: true);
-            var transformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<MeshRenderer>(ObjectDispatcher.TransformTrackingType.GlobalTRS, Allocator.TempJob);
+            var meshDataSorted = m_ObjectDispatcher.GetTypeChangesAndClear<Mesh>(
+                Allocator.TempJob,
+                sortByInstanceID: true,
+                noScriptingArray: true
+            );
+            var materialData = m_ObjectDispatcher.GetTypeChangesAndClear<Material>(
+                Allocator.TempJob,
+                noScriptingArray: true
+            );
+            var cameraData = m_ObjectDispatcher.GetTypeChangesAndClear<Camera>(
+                Allocator.TempJob,
+                noScriptingArray: true
+            );
+            var lodGroupData = m_ObjectDispatcher.GetTypeChangesAndClear<LODGroup>(
+                Allocator.TempJob,
+                noScriptingArray: true
+            );
+            var lodGroupTransformData = m_ObjectDispatcher.GetTransformChangesAndClear<LODGroup>(
+                ObjectDispatcher.TransformTrackingType.GlobalTRS,
+                Allocator.TempJob
+            );
+            var rendererData = m_ObjectDispatcher.GetTypeChangesAndClear<MeshRenderer>(
+                Allocator.TempJob,
+                noScriptingArray: true
+            );
+            var transformChanges = m_ObjectDispatcher.GetTransformChangesAndClear<MeshRenderer>(
+                ObjectDispatcher.TransformTrackingType.GlobalTRS,
+                Allocator.TempJob
+            );
             Profiler.EndSample();
 
             if (cameraData.changedID.Length > 0)
@@ -71,17 +97,22 @@ namespace UnityEngine.Rendering
                 Profiler.EndSample();
             }
 
-            ClassifyMaterials(materialData.changedID,
+            ClassifyMaterials(
+                materialData.changedID,
                 materialData.destroyedID,
                 out NativeList<EntityId> unsupportedMaterials,
                 out NativeList<EntityId> changedMaterials,
                 out NativeList<EntityId> destroyedMaterials,
                 out NativeList<GPUDrivenMaterialData> changedMaterialDatas,
-                Allocator.TempJob);
+                Allocator.TempJob
+            );
 
             NativeList<EntityId> changedMeshes = FindOnlyUsedMeshes(meshDataSorted.changedID, Allocator.TempJob);
 
-            NativeList<EntityId> unsupportedRenderers = FindUnsupportedRenderers(unsupportedMaterials.AsArray(), Allocator.TempJob);
+            NativeList<EntityId> unsupportedRenderers = FindUnsupportedRenderers(
+                unsupportedMaterials.AsArray(),
+                Allocator.TempJob
+            );
 
             if (unsupportedRenderers.Length > 0)
             {
@@ -98,7 +129,9 @@ namespace UnityEngine.Rendering
             {
                 Profiler.BeginSample("DestroyMeshes");
                 var destroyedMeshInstances = new NativeList<InstanceHandle>(Allocator.TempJob);
-                m_InstanceDataSystem.ScheduleQuerySortedMeshInstancesJob(meshDataSorted.destroyedID, destroyedMeshInstances).Complete();
+                m_InstanceDataSystem
+                    .ScheduleQuerySortedMeshInstancesJob(meshDataSorted.destroyedID, destroyedMeshInstances)
+                    .Complete();
                 m_Batcher.DestroyDrawInstances(destroyedMeshInstances.AsArray());
                 //@ Check if we need to update instance bounds and light probe sampling positions after mesh is destroyed.
                 m_Batcher.DestroyMeshes(meshDataSorted.destroyedID);
@@ -141,10 +174,12 @@ namespace UnityEngine.Rendering
                 m_MeshRendererProcessor.DestroyInstances(rendererData.destroyedID);
 
             Profiler.BeginSample("ProcessRendererMaterialAndMeshChanges");
-            m_MeshRendererProcessor.ProcessRendererMaterialAndMeshChanges(rendererData.changedID,
+            m_MeshRendererProcessor.ProcessRendererMaterialAndMeshChanges(
+                rendererData.changedID,
                 changedMaterials.AsArray(),
                 changedMaterialDatas.AsArray(),
-                changedMeshes.AsArray());
+                changedMeshes.AsArray()
+            );
             Profiler.EndSample();
 
             try
@@ -245,24 +280,28 @@ namespace UnityEngine.Rendering
             m_LODGroupUpdateBatches.Clear();
         }
 
-        public void ClassifyMaterials(NativeArray<EntityId> allChangedMaterials,
+        public void ClassifyMaterials(
+            NativeArray<EntityId> allChangedMaterials,
             NativeArray<EntityId> allDestroyedMaterials,
             out NativeList<EntityId> unsupportedMaterials,
             out NativeList<EntityId> changedMaterials,
             out NativeList<EntityId> destroyedMaterials,
             out NativeList<GPUDrivenMaterialData> changedMaterialDatas,
-            Allocator allocator)
+            Allocator allocator
+        )
         {
             Profiler.BeginSample("ClassifyMaterials");
 
-            WorldProcessorBurst.ClassifyMaterials(m_Batcher.materialMap,
+            WorldProcessorBurst.ClassifyMaterials(
+                m_Batcher.materialMap,
                 allChangedMaterials,
                 allDestroyedMaterials,
                 out changedMaterials,
                 out unsupportedMaterials,
                 out destroyedMaterials,
                 out changedMaterialDatas,
-                allocator);
+                allocator
+            );
 
             Profiler.EndSample();
         }
@@ -278,7 +317,10 @@ namespace UnityEngine.Rendering
             return usedMeshes;
         }
 
-        private NativeList<EntityId> FindUnsupportedRenderers(NativeArray<EntityId> unsupportedMaterials, Allocator allocator)
+        private NativeList<EntityId> FindUnsupportedRenderers(
+            NativeArray<EntityId> unsupportedMaterials,
+            Allocator allocator
+        )
         {
             Profiler.BeginSample("FindUnsupportedRenderers");
 
@@ -288,7 +330,12 @@ namespace UnityEngine.Rendering
             {
                 ref RenderWorld renderWorld = ref m_InstanceDataSystem.renderWorld;
 
-                WorldProcessorBurst.FindUnsupportedRenderers(unsupportedMaterials, renderWorld.materialIDArrays, renderWorld.instanceIDs, ref unsupportedRenderers);
+                WorldProcessorBurst.FindUnsupportedRenderers(
+                    unsupportedMaterials,
+                    renderWorld.materialIDArrays,
+                    renderWorld.instanceIDs,
+                    ref unsupportedRenderers
+                );
             }
 
             Profiler.EndSample();

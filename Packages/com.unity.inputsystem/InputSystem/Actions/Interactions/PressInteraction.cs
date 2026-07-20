@@ -41,8 +41,10 @@ namespace UnityEngine.InputSystem.Interactions
         /// <remarks>
         /// If zero (default), defaults to <see cref="InputSettings.defaultButtonPressPoint"/>.
         /// </remarks>
-        [Tooltip("The amount of actuation a control requires before being considered pressed. If not set, default to "
-            + "'Default Press Point' in the global input settings.")]
+        [Tooltip(
+            "The amount of actuation a control requires before being considered pressed. If not set, default to "
+                + "'Default Press Point' in the global input settings."
+        )]
         public float pressPoint;
 
         ////REVIEW: this should really be named "pressBehavior"
@@ -54,12 +56,16 @@ namespace UnityEngine.InputSystem.Interactions
         /// With ReleaseOnly, the action is performed on release. With PressAndRelease, the action is
         /// performed on press and on release.
         /// </remarks>
-        [Tooltip("Determines how button presses trigger the action. By default (PressOnly), the action is performed on press. "
-            + "With ReleaseOnly, the action is performed on release. With PressAndRelease, the action is performed on press and release.")]
+        [Tooltip(
+            "Determines how button presses trigger the action. By default (PressOnly), the action is performed on press. "
+                + "With ReleaseOnly, the action is performed on release. With PressAndRelease, the action is performed on press and release."
+        )]
         public PressBehavior behavior;
 
-        private float pressPointOrDefault => pressPoint > 0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
-        private float releasePointOrDefault => pressPointOrDefault * ButtonControl.s_GlobalDefaultButtonReleaseThreshold;
+        private float pressPointOrDefault =>
+            pressPoint > 0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
+        private float releasePointOrDefault =>
+            pressPointOrDefault * ButtonControl.s_GlobalDefaultButtonReleaseThreshold;
         private bool m_WaitingForRelease;
 
         public void Process(ref InputInteractionContext context)
@@ -192,7 +198,7 @@ namespace UnityEngine.InputSystem.Interactions
         PressAndRelease = 2,
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     /// <summary>
     /// UI that is displayed when editing <see cref="PressInteraction"/> in the editor.
     /// </summary>
@@ -201,12 +207,15 @@ namespace UnityEngine.InputSystem.Interactions
     {
         protected override void OnEnable()
         {
-            m_PressPointSetting.Initialize("Press Point",
+            m_PressPointSetting.Initialize(
+                "Press Point",
                 "The amount of actuation a control requires before being considered pressed. If not set, default to "
-                + "'Default Button Press Point' in the global input settings.",
+                    + "'Default Button Press Point' in the global input settings.",
                 "Default Button Press Point",
-                () => target.pressPoint, v => target.pressPoint = v,
-                () => InputSystem.settings.defaultButtonPressPoint);
+                () => target.pressPoint,
+                v => target.pressPoint = v,
+                () => InputSystem.settings.defaultButtonPressPoint
+            );
         }
 
         public override void OnGUI()
@@ -225,7 +234,7 @@ namespace UnityEngine.InputSystem.Interactions
 
             var behaviourDropdown = new EnumField(s_PressBehaviorLabel.text, target.behavior)
             {
-                tooltip = s_PressBehaviorLabel.tooltip
+                tooltip = s_PressBehaviorLabel.tooltip,
             };
             behaviourDropdown.RegisterValueChangedCallback(evt =>
             {
@@ -239,14 +248,18 @@ namespace UnityEngine.InputSystem.Interactions
 
         private CustomOrDefaultSetting m_PressPointSetting;
 
-        private static readonly GUIContent s_HelpBoxText = EditorGUIUtility.TrTextContent("Note that the 'Press' interaction is only "
-            + "necessary when wanting to customize button press behavior. For default press behavior, simply set the action type to 'Button' "
-            + "and use the action without interactions added to it.");
+        private static readonly GUIContent s_HelpBoxText = EditorGUIUtility.TrTextContent(
+            "Note that the 'Press' interaction is only "
+                + "necessary when wanting to customize button press behavior. For default press behavior, simply set the action type to 'Button' "
+                + "and use the action without interactions added to it."
+        );
 
-        private static readonly GUIContent s_PressBehaviorLabel = EditorGUIUtility.TrTextContent("Trigger Behavior",
+        private static readonly GUIContent s_PressBehaviorLabel = EditorGUIUtility.TrTextContent(
+            "Trigger Behavior",
             "Determines how button presses trigger the action. By default (PressOnly), the action is performed on press. "
-            + "With ReleaseOnly, the action is performed on release. With PressAndRelease, the action is performed on press and "
-            + "canceled on release.");
+                + "With ReleaseOnly, the action is performed on release. With PressAndRelease, the action is performed on press and "
+                + "canceled on release."
+        );
     }
-    #endif
+#endif
 }

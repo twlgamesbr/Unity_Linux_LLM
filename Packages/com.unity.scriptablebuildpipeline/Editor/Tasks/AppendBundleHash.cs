@@ -11,7 +11,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class AppendBundleHash : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
@@ -34,7 +37,15 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 var oldFileName = details.FileName;
                 var directoryName = Path.GetDirectoryName(oldFileName);
                 var filenameWithoutExtension = Path.GetFileNameWithoutExtension(oldFileName);
-                var newFileName = Path.Combine(directoryName, string.Format("{0}_{1}{2}", filenameWithoutExtension, details.Hash.ToString(), Path.GetExtension(oldFileName)));
+                var newFileName = Path.Combine(
+                    directoryName,
+                    string.Format(
+                        "{0}_{1}{2}",
+                        filenameWithoutExtension,
+                        details.Hash.ToString(),
+                        Path.GetExtension(oldFileName)
+                    )
+                );
                 details.FileName = newFileName;
                 m_Results.BundleInfos[bundle] = details;
 

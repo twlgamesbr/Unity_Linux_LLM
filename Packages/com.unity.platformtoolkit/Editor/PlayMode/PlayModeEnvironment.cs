@@ -50,7 +50,6 @@ namespace Unity.PlatformToolkit.PlayMode
             set { m_SerializedData.FullStorage = value; }
         }
 
-
         public TimeSpan CallsPausingTime
         {
             get { return m_SerializedData.CallsPausingTime; }
@@ -67,7 +66,6 @@ namespace Unity.PlatformToolkit.PlayMode
             m_WarningSettings = new PlayModeWarningSettings(m_SerializedData.Warnings);
             Delayer = new PlayModeDelayer(m_WaitCancellationSource);
         }
-
 
         public async Task WaitIfPaused()
         {

@@ -12,8 +12,8 @@ namespace Unity.PlatformToolkit.PlayMode
         private CancellationTokenSource m_NotificationCancelTokenSource;
 
         private const float k_UserEstablishNoficationFadeoutSeconds = 2.0f;
-        private const int k_UserEstablishNoficationIntervalMs = (int)(k_UserEstablishNoficationFadeoutSeconds + 4.0f) * 1000;
-
+        private const int k_UserEstablishNoficationIntervalMs =
+            (int)(k_UserEstablishNoficationFadeoutSeconds + 4.0f) * 1000;
 
         public void AchievementUnlockedNotification(PlayModeAchievementData achievementData)
         {
@@ -57,7 +57,12 @@ namespace Unity.PlatformToolkit.PlayMode
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                gameView.ShowNotification(new GUIContent($"Awaiting user selection.{Environment.NewLine}{Environment.NewLine}See Play Mode Controls to select a user!"), k_UserEstablishNoficationFadeoutSeconds);
+                gameView.ShowNotification(
+                    new GUIContent(
+                        $"Awaiting user selection.{Environment.NewLine}{Environment.NewLine}See Play Mode Controls to select a user!"
+                    ),
+                    k_UserEstablishNoficationFadeoutSeconds
+                );
                 await Task.Delay(k_UserEstablishNoficationIntervalMs, cancellationToken);
             }
         }

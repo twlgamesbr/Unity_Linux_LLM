@@ -9,25 +9,25 @@ using Unity.Entities.Serialization;
 
 namespace Unity.Entities.Tests
 {
-    public struct EcsTestBufferElementEnableable : IBufferElementData, IEnableableComponent {}
-    public struct EcsTestDataEnableable : IComponentData, IEnableableComponent {}
-    public struct EcsTestDataEnableable1 : IComponentData, IEnableableComponent {}
-    public struct EcsTestDataEnableable2 : IComponentData, IEnableableComponent {}
-    public struct EcsTestDataEnableable3 : IComponentData, IEnableableComponent {}
+    public struct EcsTestBufferElementEnableable : IBufferElementData, IEnableableComponent { }
+
+    public struct EcsTestDataEnableable : IComponentData, IEnableableComponent { }
+
+    public struct EcsTestDataEnableable1 : IComponentData, IEnableableComponent { }
+
+    public struct EcsTestDataEnableable2 : IComponentData, IEnableableComponent { }
+
+    public struct EcsTestDataEnableable3 : IComponentData, IEnableableComponent { }
 
     public struct EcsIntElementEnableable : IBufferElementData, IEnableableComponent
     {
         public int Value;
     }
 
-    public struct GenericComponentData<T> : IComponentData where T : unmanaged
-    {
+    public struct GenericComponentData<T> : IComponentData
+        where T : unmanaged { }
 
-    }
-
-    public struct EcsTestTag : IComponentData
-    {
-    }
+    public struct EcsTestTag : IComponentData { }
 
     public struct EcsTestData : IComponentData
     {
@@ -67,15 +67,19 @@ namespace Unity.Entities.Tests
     public struct EcsIntElement : IBufferElementData
     {
         public int Value;
+
         public static implicit operator int(EcsIntElement a) => a.Value;
-        public static implicit operator EcsIntElement(int val) => new() {Value = val};
+
+        public static implicit operator EcsIntElement(int val) => new() { Value = val };
     }
 
     public struct EcsFloatElement : IBufferElementData
     {
         public float Value;
+
         public static implicit operator float(EcsFloatElement a) => a.Value;
-        public static implicit operator EcsFloatElement(float val) => new() {Value = val};
+
+        public static implicit operator EcsFloatElement(float val) => new() { Value = val };
     }
 
     public struct EcsTestSharedComp : ISharedComponentData
@@ -134,9 +138,10 @@ namespace Unity.Entities.Tests
         UntypedWeakReferenceId PrefabId;
     }
 
-    public struct BoidInAnotherAssembly : IComponentData
-    {
-    }
+    public struct BoidInAnotherAssembly : IComponentData { }
 }
 
-public struct Translation : IComponentData { public float Value; }
+public struct Translation : IComponentData
+{
+    public float Value;
+}

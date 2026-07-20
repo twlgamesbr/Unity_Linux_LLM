@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine.InputSystem.Utilities;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
 #endif
@@ -28,8 +27,10 @@ namespace UnityEngine.InputSystem.Editor
 
         // For some operations (like copy-paste), we want to include information that we have filtered out.
         internal List<ActionTreeItemBase> m_HiddenChildren;
-        public bool hasChildrenIncludingHidden => hasChildren || (m_HiddenChildren != null && m_HiddenChildren.Count > 0);
-        public IEnumerable<ActionTreeItemBase> hiddenChildren => m_HiddenChildren ?? Enumerable.Empty<ActionTreeItemBase>();
+        public bool hasChildrenIncludingHidden =>
+            hasChildren || (m_HiddenChildren != null && m_HiddenChildren.Count > 0);
+        public IEnumerable<ActionTreeItemBase> hiddenChildren =>
+            m_HiddenChildren ?? Enumerable.Empty<ActionTreeItemBase>();
         public IEnumerable<ActionTreeItemBase> childrenIncludingHidden
         {
             get
@@ -102,13 +103,20 @@ namespace UnityEngine.InputSystem.Editor
         /// <summary>
         /// Get information about where to drop an item of the given type and (optionally) the given index.
         /// </summary>
-        public abstract bool GetDropLocation(Type itemType, int? childIndex, ref SerializedProperty array, ref int arrayIndex);
+        public abstract bool GetDropLocation(
+            Type itemType,
+            int? childIndex,
+            ref SerializedProperty array,
+            ref int arrayIndex
+        );
 
         protected static class Styles
         {
             private static GUIStyle StyleWithBackground(string fileName)
             {
-                return new GUIStyle("Label").WithNormalBackground(AssetDatabase.LoadAssetAtPath<Texture2D>($"{InputActionTreeView.SharedResourcesPath}{fileName}.png"));
+                return new GUIStyle("Label").WithNormalBackground(
+                    AssetDatabase.LoadAssetAtPath<Texture2D>($"{InputActionTreeView.SharedResourcesPath}{fileName}.png")
+                );
             }
 
             public static readonly GUIStyle yellowRect = StyleWithBackground("yellow");
@@ -125,9 +133,7 @@ namespace UnityEngine.InputSystem.Editor
     internal class ActionMapTreeItem : ActionTreeItemBase
     {
         public ActionMapTreeItem(SerializedProperty actionMapProperty)
-            : base(actionMapProperty)
-        {
-        }
+            : base(actionMapProperty) { }
 
         public override GUIStyle colorTagStyle => Styles.yellowRect;
         public SerializedProperty bindingsArrayProperty => property.FindPropertyRelative("m_Bindings");
@@ -144,7 +150,8 @@ namespace UnityEngine.InputSystem.Editor
             var assetObject = property.serializedObject;
             if (!(assetObject.targetObject is InputActionAsset))
                 throw new InvalidOperationException(
-                    $"Action map must be part of InputActionAsset but is in {assetObject.targetObject} instead");
+                    $"Action map must be part of InputActionAsset but is in {assetObject.targetObject} instead"
+                );
 
             InputActionSerializationHelpers.DeleteActionMap(assetObject, guid);
         }
@@ -154,7 +161,12 @@ namespace UnityEngine.InputSystem.Editor
             return item is ActionTreeItem;
         }
 
-        public override bool GetDropLocation(Type itemType, int? childIndex, ref SerializedProperty array, ref int arrayIndex)
+        public override bool GetDropLocation(
+            Type itemType,
+            int? childIndex,
+            ref SerializedProperty array,
+            ref int arrayIndex
+        )
         {
             // Drop actions into action array.
             if (itemType == typeof(ActionTreeItem))
@@ -260,9 +272,10 @@ namespace UnityEngine.InputSystem.Editor
             }
         }
 
-        public SerializedProperty bindingsArrayProperty => isSingletonAction
-        ? property.FindPropertyRelative("m_SingletonActionBindings")
-            : actionMapProperty.FindPropertyRelative("m_Bindings");
+        public SerializedProperty bindingsArrayProperty =>
+            isSingletonAction
+                ? property.FindPropertyRelative("m_SingletonActionBindings")
+                : actionMapProperty.FindPropertyRelative("m_Bindings");
 
         // If we're a singleton action (no associated action map property), we include all our bindings in the
         // serialized data.
@@ -283,7 +296,12 @@ namespace UnityEngine.InputSystem.Editor
             return item is BindingTreeItem && !(item is PartOfCompositeBindingTreeItem);
         }
 
-        public override bool GetDropLocation(Type itemType, int? childIndex, ref SerializedProperty array, ref int arrayIndex)
+        public override bool GetDropLocation(
+            Type itemType,
+            int? childIndex,
+            ref SerializedProperty array,
+            ref int arrayIndex
+        )
         {
             // Drop bindings into binding array.
             if (typeof(BindingTreeItem).IsAssignableFrom(itemType))
@@ -294,9 +312,11 @@ namespace UnityEngine.InputSystem.Editor
                 // binding array is global for all actions in a map. Adjust index accordingly.
                 // NOTE: Bindings for any one action need not be stored contiguously in the binding array
                 //       so we can't just add something to the index of the first binding to the action.
-                arrayIndex =
-                    InputActionSerializationHelpers.ConvertBindingIndexOnActionToBindingIndexInArray(
-                        array, name, childIndex ?? -1);
+                arrayIndex = InputActionSerializationHelpers.ConvertBindingIndexOnActionToBindingIndexInArray(
+                    array,
+                    name,
+                    childIndex ?? -1
+                );
 
                 return true;
             }
@@ -312,7 +332,11 @@ namespace UnityEngine.InputSystem.Editor
             return false;
         }
 
-        public static ActionTreeItem AddTo(TreeViewItem parent, SerializedProperty actionMapProperty, SerializedProperty actionProperty)
+        public static ActionTreeItem AddTo(
+            TreeViewItem parent,
+            SerializedProperty actionMapProperty,
+            SerializedProperty actionProperty
+        )
         {
             var item = new ActionTreeItem(actionMapProperty, actionProperty);
 
@@ -428,7 +452,12 @@ namespace UnityEngine.InputSystem.Editor
             return false;
         }
 
-        public override bool GetDropLocation(Type itemType, int? childIndex, ref SerializedProperty array, ref int arrayIndex)
+        public override bool GetDropLocation(
+            Type itemType,
+            int? childIndex,
+            ref SerializedProperty array,
+            ref int arrayIndex
+        )
         {
             // Drop bindings next to us.
             if (typeof(BindingTreeItem).IsAssignableFrom(itemType))
@@ -460,9 +489,7 @@ namespace UnityEngine.InputSystem.Editor
     internal class CompositeBindingTreeItem : BindingTreeItem
     {
         public CompositeBindingTreeItem(SerializedProperty bindingProperty)
-            : base(bindingProperty)
-        {
-        }
+            : base(bindingProperty) { }
 
         public override GUIStyle colorTagStyle => Styles.blueRect;
         public override bool canRename => true;
@@ -479,7 +506,12 @@ namespace UnityEngine.InputSystem.Editor
             return item is PartOfCompositeBindingTreeItem;
         }
 
-        public override bool GetDropLocation(Type itemType, int? childIndex, ref SerializedProperty array, ref int arrayIndex)
+        public override bool GetDropLocation(
+            Type itemType,
+            int? childIndex,
+            ref SerializedProperty array,
+            ref int arrayIndex
+        )
         {
             // Drop part binding into composite.
             if (itemType == typeof(PartOfCompositeBindingTreeItem))
@@ -487,9 +519,12 @@ namespace UnityEngine.InputSystem.Editor
                 array = arrayProperty;
 
                 // Adjust child index by index of composite item itself.
-                arrayIndex = childIndex != null
-                    ? this.arrayIndex + 1 + childIndex.Value // Dropping at #0 should put as our index plus one.
-                    : this.arrayIndex + 1 + InputActionSerializationHelpers.GetCompositePartCount(array, this.arrayIndex);
+                arrayIndex =
+                    childIndex != null
+                        ? this.arrayIndex + 1 + childIndex.Value // Dropping at #0 should put as our index plus one.
+                        : this.arrayIndex
+                            + 1
+                            + InputActionSerializationHelpers.GetCompositePartCount(array, this.arrayIndex);
 
                 return true;
             }
@@ -498,15 +533,15 @@ namespace UnityEngine.InputSystem.Editor
             if (typeof(BindingTreeItem).IsAssignableFrom(itemType))
             {
                 array = arrayProperty;
-                arrayIndex = this.arrayIndex + 1 +
-                    InputActionSerializationHelpers.GetCompositePartCount(array, this.arrayIndex);
+                arrayIndex =
+                    this.arrayIndex + 1 + InputActionSerializationHelpers.GetCompositePartCount(array, this.arrayIndex);
                 return true;
             }
 
             return false;
         }
 
-        public new static CompositeBindingTreeItem AddTo(TreeViewItem parent, SerializedProperty bindingProperty)
+        public static new CompositeBindingTreeItem AddTo(TreeViewItem parent, SerializedProperty bindingProperty)
         {
             var item = new CompositeBindingTreeItem(bindingProperty);
 
@@ -528,9 +563,7 @@ namespace UnityEngine.InputSystem.Editor
     internal class PartOfCompositeBindingTreeItem : BindingTreeItem
     {
         public PartOfCompositeBindingTreeItem(SerializedProperty bindingProperty)
-            : base(bindingProperty)
-        {
-        }
+            : base(bindingProperty) { }
 
         public override GUIStyle colorTagStyle => Styles.pinkRect;
         public override bool canRename => false;
@@ -553,7 +586,7 @@ namespace UnityEngine.InputSystem.Editor
 
         private string m_ExpectedControlLayout;
 
-        public new static PartOfCompositeBindingTreeItem AddTo(TreeViewItem parent, SerializedProperty bindingProperty)
+        public static new PartOfCompositeBindingTreeItem AddTo(TreeViewItem parent, SerializedProperty bindingProperty)
         {
             var item = new PartOfCompositeBindingTreeItem(bindingProperty);
 

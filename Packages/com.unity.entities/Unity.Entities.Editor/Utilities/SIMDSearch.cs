@@ -20,35 +20,35 @@ namespace Unity.Entities.Editor
         // This exists as a workaround to see the job in the Burst Inspector.
         // See ticket: BUR-1059
         // ReSharper disable once UnusedMember.Local
-        static FindMatchesJob<FixedString64Bytes, FixedString64Bytes> __GetReferenceImplementation() => new FindMatchesJob<FixedString64Bytes,FixedString64Bytes>();
+        static FindMatchesJob<FixedString64Bytes, FixedString64Bytes> __GetReferenceImplementation() =>
+            new FindMatchesJob<FixedString64Bytes, FixedString64Bytes>();
 
         public static NativeBitArray GetFilteredMatches<TSource, TPattern>(
             NativeList<TSource> namesSource,
             NativeList<TPattern> searchPatterns,
-            Allocator allocator = Allocator.TempJob)
-        where TSource: unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TSource>
-        where TPattern: unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
+            Allocator allocator = Allocator.TempJob
+        )
+            where TSource : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TSource>
+            where TPattern : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
         {
             var matches = new NativeBitArray(namesSource.Length, allocator, NativeArrayOptions.UninitializedMemory);
             var filterJob = new FindMatchesJob<TSource, TPattern>
             {
                 MatchesMask = matches,
                 Entries = namesSource,
-                Patterns = searchPatterns
+                Patterns = searchPatterns,
             };
 
             // Using batches of size: `CacheLineSize` to avoid false sharing
-            filterJob
-                .Schedule(namesSource.Length, JobsUtility.CacheLineSize)
-                .Complete();
+            filterJob.Schedule(namesSource.Length, JobsUtility.CacheLineSize).Complete();
 
             return matches;
         }
 
         [BurstCompile(DisableSafetyChecks = true)]
         public struct FindMatchesJob<TSource, TPattern> : IJobParallelFor
-            where TSource: unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TSource>
-            where TPattern: unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
+            where TSource : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TSource>
+            where TPattern : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
         {
             [WriteOnly, NativeDisableParallelForRestriction]
             public NativeBitArray MatchesMask;
@@ -91,7 +91,7 @@ namespace Unity.Entities.Editor
 
                     // Amount of bytes to mem compare
                     // -2 because the first and last characters are already confirmed to match if we get there
-                    var comparisonLength = (long) math.max(patternLength - 2, 0);
+                    var comparisonLength = (long)math.max(patternLength - 2, 0);
 
                     var sourcePtr = source.GetUnsafePtr();
                     var patternPtr = pattern.GetUnsafePtr();
@@ -105,10 +105,18 @@ namespace Unity.Entities.Editor
                     for (var i = 0; i < sourceLength; i += charactersPerBatch)
                     {
                         var firstCharacterComparisonBuffer = X86.Avx.mm256_loadu_si256(sourcePtr + i);
-                        var lastCharacterComparisonBuffer = X86.Avx.mm256_loadu_si256(sourcePtr + i + patternLength - 1);
+                        var lastCharacterComparisonBuffer = X86.Avx.mm256_loadu_si256(
+                            sourcePtr + i + patternLength - 1
+                        );
 
-                        var firstCharacterMatches = X86.Avx2.mm256_cmpeq_epi8(firstCharacter, firstCharacterComparisonBuffer);
-                        var lastCharacterMatches = X86.Avx2.mm256_cmpeq_epi8(lastCharacter, lastCharacterComparisonBuffer);
+                        var firstCharacterMatches = X86.Avx2.mm256_cmpeq_epi8(
+                            firstCharacter,
+                            firstCharacterComparisonBuffer
+                        );
+                        var lastCharacterMatches = X86.Avx2.mm256_cmpeq_epi8(
+                            lastCharacter,
+                            lastCharacterComparisonBuffer
+                        );
 
                         var union = X86.Avx2.mm256_and_si256(firstCharacterMatches, lastCharacterMatches);
 
@@ -138,16 +146,16 @@ namespace Unity.Entities.Editor
                 // Fallback
                 // NOTE: FixedStringXX returns true when comparing against a `default` pattern, but should return false
                 // Sorted the checks in order of likeliness to fail to waste as few cycles as possible
-                return source.IndexOf(pattern) != -1
-                       && !pattern.Equals(default)
-                       && !source.Equals(default);
+                return source.IndexOf(pattern) != -1 && !pattern.Equals(default) && !source.Equals(default);
             }
         }
-        
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString64Bytes), typeof(FixedString64Bytes) })]
+
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString64Bytes), typeof(FixedString64Bytes) }
+        )]
         internal static bool Contains<TSource, TPattern>(TSource source, TPattern pattern)
-            where TSource: unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TSource>
-            where TPattern: unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
+            where TSource : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TSource>
+            where TPattern : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
         {
             // Burst crashes when compiling `if (!X86.Avx2.IsAvx2Supported)` so we have to keep the if as-is
             // ReSharper disable once InvertIf
@@ -166,7 +174,7 @@ namespace Unity.Entities.Editor
 
                 // Amount of bytes to mem compare
                 // -2 because the first and last characters are already confirmed to match if we get there
-                var comparisonLength = (long) math.max(patternLength - 2, 0);
+                var comparisonLength = (long)math.max(patternLength - 2, 0);
 
                 var sourcePtr = source.GetUnsafePtr();
                 var patternPtr = pattern.GetUnsafePtr();
@@ -182,7 +190,10 @@ namespace Unity.Entities.Editor
                     var firstCharacterComparisonBuffer = X86.Avx.mm256_loadu_si256(sourcePtr + i);
                     var lastCharacterComparisonBuffer = X86.Avx.mm256_loadu_si256(sourcePtr + i + patternLength - 1);
 
-                    var firstCharacterMatches = X86.Avx2.mm256_cmpeq_epi8(firstCharacter, firstCharacterComparisonBuffer);
+                    var firstCharacterMatches = X86.Avx2.mm256_cmpeq_epi8(
+                        firstCharacter,
+                        firstCharacterComparisonBuffer
+                    );
                     var lastCharacterMatches = X86.Avx2.mm256_cmpeq_epi8(lastCharacter, lastCharacterComparisonBuffer);
 
                     var union = X86.Avx2.mm256_and_si256(firstCharacterMatches, lastCharacterMatches);
@@ -213,9 +224,7 @@ namespace Unity.Entities.Editor
             // Fallback
             // NOTE: FixedStringXX returns true when comparing against a `default` pattern, but should return false
             // Sorted the checks in order of likeliness to fail to waste as few cycles as possible
-            return source.IndexOf(pattern) != -1
-                   && !pattern.Equals(default)
-                   && !source.Equals(default);
+            return source.IndexOf(pattern) != -1 && !pattern.Equals(default) && !source.Equals(default);
         }
     }
 }

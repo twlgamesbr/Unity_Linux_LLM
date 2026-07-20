@@ -20,6 +20,7 @@ namespace UnityEngine.UI
     {
         [Obsolete("use IMeshModifier.ModifyMesh (VertexHelper verts) instead", false)]
         void ModifyMesh(Mesh mesh);
+
         /// <summary>
         /// Call used to modify mesh.
         /// Place any custom mesh processing in this function.

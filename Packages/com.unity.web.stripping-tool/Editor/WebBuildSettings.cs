@@ -1,6 +1,6 @@
-using UnityEditor;
-using System.Diagnostics.CodeAnalysis;
 using System;
+using System.Diagnostics.CodeAnalysis;
+using UnityEditor;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -17,9 +17,7 @@ namespace Unity.Web.Stripping.Editor
         /// <summary>
         /// Constructs with default-initialized values.
         /// </summary>
-        public WebBuildSettings()
-        {
-        }
+        public WebBuildSettings() { }
 
         /// <summary>
         /// Constructs a new `WebBuildSettings` with values read from current build settings.
@@ -60,19 +58,23 @@ namespace Unity.Web.Stripping.Editor
         /// Refer to [`EditorUserBuildSettings.development`](xref:UnityEditor.EditorUserBuildSettings.development).
         /// </summary>
         public bool development;
+
         /// <summary>
         /// Refer to [`EditorUserBuildSettings.buildWithDeepProfilingSupport`](xref:UnityEditor.EditorUserBuildSettings.buildWithDeepProfilingSupport).
         /// </summary>
         public bool buildWithDeepProfilingSupport;
+
         /// <summary>
         /// Refer to [`EditorUserBuildSettings.connectProfiler`](xref:UnityEditor.EditorUserBuildSettings.connectProfiler).
         /// </summary>
         public bool connectProfiler;
+
         /// <summary>
         /// Texture compression override.
         /// Refer to [`EditorUserBuildSettings.webGLBuildSubtarget`](xref:UnityEditor.EditorUserBuildSettings.webGLBuildSubtarget).
         /// </summary>
         public WebGLTextureSubtarget webGLBuildSubtarget;
+
         /// <summary>
         /// Refer to the description of **Code Optimization** in [Web Build Settings](xref:web-build-settings).
         /// The values used here are the `UnityEditor.WebGL.WasmCodeOptimization` values as strings, not the UI strings visible to the user.
@@ -80,8 +82,10 @@ namespace Unity.Web.Stripping.Editor
         public string codeOptimization;
 
         internal static readonly string k_PlatformName = BuildPipeline.GetBuildTargetName(BuildTarget.WebGL);
+
         internal static string GetCodeOptimization() =>
             EditorUserBuildSettings.GetPlatformSettings(k_PlatformName, "CodeOptimization");
+
         internal static void SetCodeOptimization(string value) =>
             EditorUserBuildSettings.SetPlatformSettings(k_PlatformName, "CodeOptimization", value);
     }

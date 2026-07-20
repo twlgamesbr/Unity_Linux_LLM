@@ -63,7 +63,12 @@ namespace UnityEngine.Rendering.Universal
         public ComputeShader screenResolveUpsamplingShader
         {
             get => m_ScreenResolveUpsamplingShader;
-            set => this.SetValueAndNotify(ref m_ScreenResolveUpsamplingShader, value, nameof(m_ScreenResolveUpsamplingShader));
+            set =>
+                this.SetValueAndNotify(
+                    ref m_ScreenResolveUpsamplingShader,
+                    value,
+                    nameof(m_ScreenResolveUpsamplingShader)
+                );
         }
 
         public ComputeShader debugShader
@@ -75,7 +80,8 @@ namespace UnityEngine.Rendering.Universal
         public ComputeShader flatNormalResolutionShader
         {
             get => m_FlatNormalResolutionShader;
-            set => this.SetValueAndNotify(ref m_FlatNormalResolutionShader, value, nameof(m_FlatNormalResolutionShader));
+            set =>
+                this.SetValueAndNotify(ref m_FlatNormalResolutionShader, value, nameof(m_FlatNormalResolutionShader));
         }
     }
 
@@ -91,7 +97,7 @@ namespace UnityEngine.Rendering.Universal
             Drift,
             StdDev,
             UpdateCount,
-            FlatNormal
+            FlatNormal,
         }
 
         // URP currently cannot render motion vectors properly in Scene View, so we disable it.
@@ -126,25 +132,43 @@ namespace UnityEngine.Rendering.Universal
             public static readonly int _ScreenDepths = Shader.PropertyToID("_ScreenDepths");
             public static readonly int _ScreenFlatNormals = Shader.PropertyToID("_ScreenFlatNormals");
             public static readonly int _CurrentFullResScreenDepths = Shader.PropertyToID("_CurrentFullResScreenDepths");
-            public static readonly int _CurrentFullResScreenFlatNormals = Shader.PropertyToID("_CurrentFullResScreenFlatNormals");
-            public static readonly int _CurrentFullResScreenMotionVectors = Shader.PropertyToID("_CurrentFullResScreenMotionVectors");
+            public static readonly int _CurrentFullResScreenFlatNormals = Shader.PropertyToID(
+                "_CurrentFullResScreenFlatNormals"
+            );
+            public static readonly int _CurrentFullResScreenMotionVectors = Shader.PropertyToID(
+                "_CurrentFullResScreenMotionVectors"
+            );
             public static readonly int _ScreenShadedNormals = Shader.PropertyToID("_ScreenShadedNormals");
             public static readonly int _LowResIrradiancesL0 = Shader.PropertyToID("_LowResIrradiancesL0");
             public static readonly int _LowResIrradiancesL10 = Shader.PropertyToID("_LowResIrradiancesL10");
             public static readonly int _LowResIrradiancesL11 = Shader.PropertyToID("_LowResIrradiancesL11");
             public static readonly int _LowResIrradiancesL12 = Shader.PropertyToID("_LowResIrradiancesL12");
-            public static readonly int _PreviousLowResScreenIrradiancesL0 = Shader.PropertyToID("_PreviousLowResScreenIrradiancesL0");
-            public static readonly int _PreviousLowResScreenIrradiancesL10 = Shader.PropertyToID("_PreviousLowResScreenIrradiancesL10");
-            public static readonly int _PreviousLowResScreenIrradiancesL11 = Shader.PropertyToID("_PreviousLowResScreenIrradiancesL11");
-            public static readonly int _PreviousLowResScreenIrradiancesL12 = Shader.PropertyToID("_PreviousLowResScreenIrradiancesL12");
-            public static readonly int _PreviousLowResScreenNdcDepths = Shader.PropertyToID("_PreviousLowResScreenNdcDepths");
+            public static readonly int _PreviousLowResScreenIrradiancesL0 = Shader.PropertyToID(
+                "_PreviousLowResScreenIrradiancesL0"
+            );
+            public static readonly int _PreviousLowResScreenIrradiancesL10 = Shader.PropertyToID(
+                "_PreviousLowResScreenIrradiancesL10"
+            );
+            public static readonly int _PreviousLowResScreenIrradiancesL11 = Shader.PropertyToID(
+                "_PreviousLowResScreenIrradiancesL11"
+            );
+            public static readonly int _PreviousLowResScreenIrradiancesL12 = Shader.PropertyToID(
+                "_PreviousLowResScreenIrradiancesL12"
+            );
+            public static readonly int _PreviousLowResScreenNdcDepths = Shader.PropertyToID(
+                "_PreviousLowResScreenNdcDepths"
+            );
             public static readonly int _FilterRadius = Shader.PropertyToID("_FilterRadius");
             public static readonly int _ViewMode = Shader.PropertyToID("_ViewMode");
             public static readonly int _ShowSamplePosition = Shader.PropertyToID("_ShowSamplePosition");
             public static readonly int _SampleCount = Shader.PropertyToID("_SampleCount");
             public static readonly int _ClipToWorldTransform = Shader.PropertyToID("_ClipToWorldTransform");
-            public static readonly int _CurrentClipToWorldTransform = Shader.PropertyToID("_CurrentClipToWorldTransform");
-            public static readonly int _PreviousClipToWorldTransform = Shader.PropertyToID("_PreviousClipToWorldTransform");
+            public static readonly int _CurrentClipToWorldTransform = Shader.PropertyToID(
+                "_CurrentClipToWorldTransform"
+            );
+            public static readonly int _PreviousClipToWorldTransform = Shader.PropertyToID(
+                "_PreviousClipToWorldTransform"
+            );
             public static readonly int _FrameIdx = Shader.PropertyToID("_FrameIdx");
             public static readonly int _VolumeSpatialResolution = Shader.PropertyToID("_VolumeSpatialResolution");
             public static readonly int _RingConfigOffset = Shader.PropertyToID("_RingConfigOffset");
@@ -337,7 +361,7 @@ namespace UnityEngine.Rendering.Universal
 
             private Matrix4x4 _prevClipToWorldTransform = Matrix4x4.identity;
 
-            readonly private uint _environmentCubemapResolution = 32;
+            private readonly uint _environmentCubemapResolution = 32;
 
             public SurfaceCachePass(
                 RayTracingContext rtContext,
@@ -359,7 +383,8 @@ namespace UnityEngine.Rendering.Universal
                 SurfaceCacheVolumeParameterSet volParams,
                 SurfaceCacheEstimationParameterSet estimationParams,
                 SurfaceCachePatchFilteringParameterSet patchFilteringParams,
-                bool cascadeMovement)
+                bool cascadeMovement
+            )
             {
                 Debug.Assert(volParams.CascadeCount != 0);
                 Debug.Assert(volParams.CascadeCount <= SurfaceCache.CascadeMax);
@@ -379,11 +404,36 @@ namespace UnityEngine.Rendering.Universal
 
                 _cascadeMovement = cascadeMovement;
 
-                _screenResolveLookupShader.GetKernelThreadGroupSizes(_screenResolveLookupKernel, out _screenResolveLookupKernelGroupSize.x, out _screenResolveLookupKernelGroupSize.y, out _screenResolveLookupKernelGroupSize.z);
-                _screenResolveUpsamplingShader.GetKernelThreadGroupSizes(_screenResolveUpsamplingKernel, out _screenResolveUpsamplingKernelGroupSize.x, out _screenResolveUpsamplingKernelGroupSize.y, out _screenResolveUpsamplingKernelGroupSize.z);
-                _patchAllocationShader.GetKernelThreadGroupSizes(_patchAllocationKernel, out _patchAllocationKernelGroupSize.x, out _patchAllocationKernelGroupSize.y, out _patchAllocationKernelGroupSize.z);
-                _debugShader.GetKernelThreadGroupSizes(_debugKernel, out _debugKernelGroupSize.x, out _debugKernelGroupSize.y, out _debugKernelGroupSize.z);
-                _flatNormalResolutionShader.GetKernelThreadGroupSizes(_flatNormalResolutionKernel, out _flatNormalResolutionKernelGroupSize.x, out _flatNormalResolutionKernelGroupSize.y, out _flatNormalResolutionKernelGroupSize.z);
+                _screenResolveLookupShader.GetKernelThreadGroupSizes(
+                    _screenResolveLookupKernel,
+                    out _screenResolveLookupKernelGroupSize.x,
+                    out _screenResolveLookupKernelGroupSize.y,
+                    out _screenResolveLookupKernelGroupSize.z
+                );
+                _screenResolveUpsamplingShader.GetKernelThreadGroupSizes(
+                    _screenResolveUpsamplingKernel,
+                    out _screenResolveUpsamplingKernelGroupSize.x,
+                    out _screenResolveUpsamplingKernelGroupSize.y,
+                    out _screenResolveUpsamplingKernelGroupSize.z
+                );
+                _patchAllocationShader.GetKernelThreadGroupSizes(
+                    _patchAllocationKernel,
+                    out _patchAllocationKernelGroupSize.x,
+                    out _patchAllocationKernelGroupSize.y,
+                    out _patchAllocationKernelGroupSize.z
+                );
+                _debugShader.GetKernelThreadGroupSizes(
+                    _debugKernel,
+                    out _debugKernelGroupSize.x,
+                    out _debugKernelGroupSize.y,
+                    out _debugKernelGroupSize.z
+                );
+                _flatNormalResolutionShader.GetKernelThreadGroupSizes(
+                    _flatNormalResolutionKernel,
+                    out _flatNormalResolutionKernelGroupSize.x,
+                    out _flatNormalResolutionKernelGroupSize.y,
+                    out _flatNormalResolutionKernelGroupSize.z
+                );
 
                 _frameIdx = 0;
 
@@ -444,29 +494,110 @@ namespace UnityEngine.Rendering.Universal
 
                 bool useMotionVectorPatchSeeding = UseMotionVectorPatchSeeding(cameraData.cameraType);
 
-                if (_fullResScreenIrradiances == null || _fullResScreenIrradiances.GetScaledSize() != new Vector2Int(screenResolution.x, screenResolution.y))
+                if (
+                    _fullResScreenIrradiances == null
+                    || _fullResScreenIrradiances.GetScaledSize()
+                        != new Vector2Int(screenResolution.x, screenResolution.y)
+                )
                 {
                     int lowResWidth = (screenResolution.x + k_UpscaleFactor - 1) / k_UpscaleFactor;
                     int lowResHeight = (screenResolution.y + k_UpscaleFactor - 1) / k_UpscaleFactor;
 
                     _fullResScreenIrradiances?.Release();
-                    _fullResScreenIrradiances = RTHandles.Alloc((int)screenResolution.x, (int)screenResolution.y, 1, DepthBits.None, GraphicsFormat.R16G16B16A16_SFloat, FilterMode.Point, TextureWrapMode.Clamp, TextureDimension.Tex2D, true, name: "_fullResScreenIrradiances");
+                    _fullResScreenIrradiances = RTHandles.Alloc(
+                        (int)screenResolution.x,
+                        (int)screenResolution.y,
+                        1,
+                        DepthBits.None,
+                        GraphicsFormat.R16G16B16A16_SFloat,
+                        FilterMode.Point,
+                        TextureWrapMode.Clamp,
+                        TextureDimension.Tex2D,
+                        true,
+                        name: "_fullResScreenIrradiances"
+                    );
 
                     _fullResScreenFlatNormals?.Release();
-                    _fullResScreenFlatNormals = RTHandles.Alloc((int)screenResolution.x, (int)screenResolution.y, 1, DepthBits.None, GraphicsFormat.R8G8B8A8_SNorm, FilterMode.Point, TextureWrapMode.Clamp, TextureDimension.Tex2D, true, name: "_fullResScreenFlatNormals");
+                    _fullResScreenFlatNormals = RTHandles.Alloc(
+                        (int)screenResolution.x,
+                        (int)screenResolution.y,
+                        1,
+                        DepthBits.None,
+                        GraphicsFormat.R8G8B8A8_SNorm,
+                        FilterMode.Point,
+                        TextureWrapMode.Clamp,
+                        TextureDimension.Tex2D,
+                        true,
+                        name: "_fullResScreenFlatNormals"
+                    );
 
                     var l0Format = GraphicsFormat.R16G16B16A16_SFloat;
                     var l1Format = GraphicsFormat.R8G8B8A8_UNorm;
                     _lowResScreenIrradiancesL0?.Release();
-                    _lowResScreenIrradiancesL0 = RTHandles.Alloc(lowResWidth, lowResHeight, 1, DepthBits.None, l0Format, FilterMode.Point, TextureWrapMode.Clamp, TextureDimension.Tex2D, true, name: "_lowResScreenIrradiancesL0");
+                    _lowResScreenIrradiancesL0 = RTHandles.Alloc(
+                        lowResWidth,
+                        lowResHeight,
+                        1,
+                        DepthBits.None,
+                        l0Format,
+                        FilterMode.Point,
+                        TextureWrapMode.Clamp,
+                        TextureDimension.Tex2D,
+                        true,
+                        name: "_lowResScreenIrradiancesL0"
+                    );
                     _lowResScreenIrradiancesL10?.Release();
-                    _lowResScreenIrradiancesL10 = RTHandles.Alloc(lowResWidth, lowResHeight, 1, DepthBits.None, l1Format, FilterMode.Point, TextureWrapMode.Clamp, TextureDimension.Tex2D, true, name: "_lowResScreenIrradiancesL10");
+                    _lowResScreenIrradiancesL10 = RTHandles.Alloc(
+                        lowResWidth,
+                        lowResHeight,
+                        1,
+                        DepthBits.None,
+                        l1Format,
+                        FilterMode.Point,
+                        TextureWrapMode.Clamp,
+                        TextureDimension.Tex2D,
+                        true,
+                        name: "_lowResScreenIrradiancesL10"
+                    );
                     _lowResScreenIrradiancesL11?.Release();
-                    _lowResScreenIrradiancesL11 = RTHandles.Alloc(lowResWidth, lowResHeight, 1, DepthBits.None, l1Format, FilterMode.Point, TextureWrapMode.Clamp, TextureDimension.Tex2D, true, name: "_lowResScreenIrradiancesL11");
+                    _lowResScreenIrradiancesL11 = RTHandles.Alloc(
+                        lowResWidth,
+                        lowResHeight,
+                        1,
+                        DepthBits.None,
+                        l1Format,
+                        FilterMode.Point,
+                        TextureWrapMode.Clamp,
+                        TextureDimension.Tex2D,
+                        true,
+                        name: "_lowResScreenIrradiancesL11"
+                    );
                     _lowResScreenIrradiancesL12?.Release();
-                    _lowResScreenIrradiancesL12 = RTHandles.Alloc(lowResWidth, lowResHeight, 1, DepthBits.None, l1Format, FilterMode.Point, TextureWrapMode.Clamp, TextureDimension.Tex2D, true, name: "_lowResScreenIrradiancesL12");
+                    _lowResScreenIrradiancesL12 = RTHandles.Alloc(
+                        lowResWidth,
+                        lowResHeight,
+                        1,
+                        DepthBits.None,
+                        l1Format,
+                        FilterMode.Point,
+                        TextureWrapMode.Clamp,
+                        TextureDimension.Tex2D,
+                        true,
+                        name: "_lowResScreenIrradiancesL12"
+                    );
                     _lowResScreenNdcDepths?.Release();
-                    _lowResScreenNdcDepths = RTHandles.Alloc(lowResWidth, lowResHeight, 1, DepthBits.None, GraphicsFormat.R16_UNorm, FilterMode.Point, TextureWrapMode.Clamp, TextureDimension.Tex2D, true, name: "_lowResScreenNdcDepths");
+                    _lowResScreenNdcDepths = RTHandles.Alloc(
+                        lowResWidth,
+                        lowResHeight,
+                        1,
+                        DepthBits.None,
+                        GraphicsFormat.R16_UNorm,
+                        FilterMode.Point,
+                        TextureWrapMode.Clamp,
+                        TextureDimension.Tex2D,
+                        true,
+                        name: "_lowResScreenNdcDepths"
+                    );
                 }
 
                 if (_cascadeMovement || _frameIdx == 0)
@@ -485,7 +616,12 @@ namespace UnityEngine.Rendering.Universal
                 var lowResScreenNdcDepthsHandle = renderGraph.ImportTexture(_lowResScreenNdcDepths);
                 var cellAllocationMarkHandle = renderGraph.ImportBuffer(_cache.Volume.CellAllocationMarks);
 
-                using (var builder = renderGraph.AddComputePass("Surface Cache Flat Normal Resolution", out FlatNormalResolutionPassData passData))
+                using (
+                    var builder = renderGraph.AddComputePass(
+                        "Surface Cache Flat Normal Resolution",
+                        out FlatNormalResolutionPassData passData
+                    )
+                )
                 {
                     passData.ThreadCount = new uint3((uint)screenResolution.x, (uint)screenResolution.y, 1);
                     passData.Shader = _flatNormalResolutionShader;
@@ -497,10 +633,18 @@ namespace UnityEngine.Rendering.Universal
 
                     builder.UseTexture(resourceData.cameraDepthTexture, AccessFlags.Read);
                     builder.UseTexture(fullResScreenFlatNormalsHandle, AccessFlags.Write);
-                    builder.SetRenderFunc((FlatNormalResolutionPassData data, ComputeGraphContext cgContext) => ResolveFlatNormals(data, cgContext));
+                    builder.SetRenderFunc(
+                        (FlatNormalResolutionPassData data, ComputeGraphContext cgContext) =>
+                            ResolveFlatNormals(data, cgContext)
+                    );
                 }
 
-                using (var builder = renderGraph.AddComputePass("Surface Cache Patch Allocation", out PatchAllocationPassData passData))
+                using (
+                    var builder = renderGraph.AddComputePass(
+                        "Surface Cache Patch Allocation",
+                        out PatchAllocationPassData passData
+                    )
+                )
                 {
                     uint2 fullResScreenSize = new uint2((uint)screenResolution.x, (uint)screenResolution.y);
                     uint2 lowResScreenSize = DivUp(fullResScreenSize, new uint2(k_UpscaleFactor, k_UpscaleFactor));
@@ -555,30 +699,51 @@ namespace UnityEngine.Rendering.Universal
                     builder.UseTexture(lowResScreenIrradiancesL12Handle, AccessFlags.Read);
                     builder.UseTexture(lowResScreenNdcDepthsHandle, AccessFlags.Read);
 
-                    builder.SetRenderFunc((PatchAllocationPassData data, ComputeGraphContext cgContext) => AllocatePatches(data, cgContext));
+                    builder.SetRenderFunc(
+                        (PatchAllocationPassData data, ComputeGraphContext cgContext) =>
+                            AllocatePatches(data, cgContext)
+                    );
                 }
 
-                using (var builder = renderGraph.AddUnsafePass("Surface Cache World Update", out WorldUpdatePassData passData))
+                using (
+                    var builder = renderGraph.AddUnsafePass(
+                        "Surface Cache World Update",
+                        out WorldUpdatePassData passData
+                    )
+                )
                 {
                     const bool filterBakedLights = true;
                     var changes = _sceneTracker.GetChanges(filterBakedLights);
 
-                    _worldAdapter.UpdateMaterials(_world, changes.addedMaterials, changes.removedMaterials, changes.changedMaterials);
+                    _worldAdapter.UpdateMaterials(
+                        _world,
+                        changes.addedMaterials,
+                        changes.removedMaterials,
+                        changes.changedMaterials
+                    );
                     _worldAdapter.UpdateMeshRenderers(
                         _world,
                         changes.addedMeshRenderers,
                         changes.changedMeshRenderers,
                         changes.removedMeshRenderers,
-                        _fallbackMaterial);
+                        _fallbackMaterial
+                    );
                     _worldAdapter.UpdateTerrains(
                         _world,
                         changes.addedTerrains,
                         changes.changedTerrains,
                         changes.removedTerrains,
-                        _fallbackMaterial);
+                        _fallbackMaterial
+                    );
 
                     const bool multiplyPunctualLightIntensityByPI = false;
-                    _worldAdapter.UpdateLights(_world, changes.addedLights, changes.removedLights, changes.changedLights, multiplyPunctualLightIntensityByPI);
+                    _worldAdapter.UpdateLights(
+                        _world,
+                        changes.addedLights,
+                        changes.removedLights,
+                        changes.changedLights,
+                        multiplyPunctualLightIntensityByPI
+                    );
 
                     if (RenderSettings.ambientMode == AmbientMode.Skybox)
                     {
@@ -595,19 +760,29 @@ namespace UnityEngine.Rendering.Universal
                     passData.EnvCubemapResolution = _environmentCubemapResolution;
                     passData.Sun = RenderSettings.sun;
 
-
-
                     builder.AllowGlobalStateModification(true);
-                    builder.SetRenderFunc((WorldUpdatePassData data, UnsafeGraphContext graphCtx) => UpdateWorld(data, graphCtx, ref _worldUpdateScratch));
+                    builder.SetRenderFunc(
+                        (WorldUpdatePassData data, UnsafeGraphContext graphCtx) =>
+                            UpdateWorld(data, graphCtx, ref _worldUpdateScratch)
+                    );
                 }
 
                 uint outputIrradianceBufferIdx = _cache.RecordPatchUpdate(renderGraph, _frameIdx, _world);
 
-                using (var builder = renderGraph.AddComputePass("Surface Cache Screen Lookup", out ScreenIrradianceLookupPassData data))
+                using (
+                    var builder = renderGraph.AddComputePass(
+                        "Surface Cache Screen Lookup",
+                        out ScreenIrradianceLookupPassData data
+                    )
+                )
                 {
                     data.VolumeTargetPos = _cache.Volume.TargetPos;
                     data.ClipToWorldTransform = clipToWorldTransform;
-                    data.ThreadCount = new uint3((uint)_lowResScreenIrradiancesL0.rt.width, (uint)_lowResScreenIrradiancesL0.rt.height, 1);
+                    data.ThreadCount = new uint3(
+                        (uint)_lowResScreenIrradiancesL0.rt.width,
+                        (uint)_lowResScreenIrradiancesL0.rt.height,
+                        1
+                    );
                     data.Shader = _screenResolveLookupShader;
                     data.KernelIndex = _screenResolveLookupKernel;
                     data.ThreadGroupSize = _screenResolveLookupKernelGroupSize;
@@ -638,7 +813,10 @@ namespace UnityEngine.Rendering.Universal
                     builder.UseTexture(data.LowResScreenIrradiancesL12, AccessFlags.Write);
                     builder.UseTexture(data.LowResScreenNdcDepths, AccessFlags.Write);
 
-                    builder.SetRenderFunc((ScreenIrradianceLookupPassData data, ComputeGraphContext cgContext) => LookupScreenIrradiance(data, cgContext));
+                    builder.SetRenderFunc(
+                        (ScreenIrradianceLookupPassData data, ComputeGraphContext cgContext) =>
+                            LookupScreenIrradiance(data, cgContext)
+                    );
                 }
 
                 if (_debugEnabled)
@@ -675,12 +853,19 @@ namespace UnityEngine.Rendering.Universal
                         builder.UseTexture(fullResScreenFlatNormalsHandle, AccessFlags.Read);
                         builder.UseTexture(passData.ScreenIrradiances, AccessFlags.Write);
 
-                        builder.SetRenderFunc((DebugPassData data, ComputeGraphContext cgContext) => RenderDebug(data, cgContext));
+                        builder.SetRenderFunc(
+                            (DebugPassData data, ComputeGraphContext cgContext) => RenderDebug(data, cgContext)
+                        );
                     }
                 }
                 else
                 {
-                    using (var builder = renderGraph.AddComputePass("Surface Cache Screen Upsampling", out ScreenIrradianceUpsamplingPassData data))
+                    using (
+                        var builder = renderGraph.AddComputePass(
+                            "Surface Cache Screen Upsampling",
+                            out ScreenIrradianceUpsamplingPassData data
+                        )
+                    )
                     {
                         data.ClipToWorldTransform = clipToWorldTransform;
                         data.FullResThreadCount = new uint3((uint)screenResolution.x, (uint)screenResolution.y, 1);
@@ -709,7 +894,10 @@ namespace UnityEngine.Rendering.Universal
                         builder.UseTexture(data.LowResScreenIrradiancesL12, AccessFlags.Read);
                         builder.UseBuffer(cellAllocationMarkHandle, AccessFlags.Read);
 
-                        builder.SetRenderFunc((ScreenIrradianceUpsamplingPassData data, ComputeGraphContext cgContext) => UpsampleScreenIrradiance(data, cgContext));
+                        builder.SetRenderFunc(
+                            (ScreenIrradianceUpsamplingPassData data, ComputeGraphContext cgContext) =>
+                                UpsampleScreenIrradiance(data, cgContext)
+                        );
                     }
                 }
 
@@ -752,20 +940,58 @@ namespace UnityEngine.Rendering.Universal
                 cmd.DispatchCompute(shader, kernelIndex, (int)groupCount.x, (int)groupCount.y, 1);
             }
 
-            static void UpsampleScreenIrradiance(ScreenIrradianceUpsamplingPassData passData, ComputeGraphContext cgContext)
+            static void UpsampleScreenIrradiance(
+                ScreenIrradianceUpsamplingPassData passData,
+                ComputeGraphContext cgContext
+            )
             {
                 var cmd = cgContext.cmd;
 
                 var shader = passData.Shader;
                 var kernelIndex = passData.KernelIndex;
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._FullResIrradiances, passData.FullResIrradiances);
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._FullResIrradiances,
+                    passData.FullResIrradiances
+                );
                 cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._FullResDepths, passData.FullResDepths);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._FullResFlatNormals, passData.FullResFlatNormals);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._FullResShadedNormals, passData.FullResShadedNormals);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._LowResIrradiancesL0, passData.LowResScreenIrradiancesL0);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._LowResIrradiancesL10, passData.LowResScreenIrradiancesL10);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._LowResIrradiancesL11, passData.LowResScreenIrradiancesL11);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._LowResIrradiancesL12, passData.LowResScreenIrradiancesL12);
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._FullResFlatNormals,
+                    passData.FullResFlatNormals
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._FullResShadedNormals,
+                    passData.FullResShadedNormals
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._LowResIrradiancesL0,
+                    passData.LowResScreenIrradiancesL0
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._LowResIrradiancesL10,
+                    passData.LowResScreenIrradiancesL10
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._LowResIrradiancesL11,
+                    passData.LowResScreenIrradiancesL11
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._LowResIrradiancesL12,
+                    passData.LowResScreenIrradiancesL12
+                );
                 cmd.SetComputeFloatParam(shader, ShaderIDs._FilterRadius, passData.FilterRadius);
                 cmd.SetComputeIntParam(shader, ShaderIDs._SampleCount, (int)passData.SampleCount);
                 cmd.SetComputeMatrixParam(shader, ShaderIDs._ClipToWorldTransform, passData.ClipToWorldTransform);
@@ -792,15 +1018,60 @@ namespace UnityEngine.Rendering.Universal
                 var cmd = cgContext.cmd;
                 var shader = data.Shader;
                 var kernelIndex = data.KernelIndex;
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._CurrentFullResScreenDepths, data.ScreenDepths);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._CurrentFullResScreenFlatNormals, data.ScreenFlatNormals);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._CurrentFullResScreenMotionVectors, data.ScreenMotionVectors);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._PreviousLowResScreenIrradiancesL0, data.LowResScreenIrradiancesL0);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._PreviousLowResScreenIrradiancesL10, data.LowResScreenIrradiancesL10);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._PreviousLowResScreenIrradiancesL11, data.LowResScreenIrradiancesL11);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._PreviousLowResScreenIrradiancesL12, data.LowResScreenIrradiancesL12);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._PreviousLowResScreenNdcDepths, data.LowResScreenNdcDepths);
-                cmd.SetComputeBufferParam(shader, kernelIndex, ShaderIDs._CellAllocationMarks, data.CellAllocationMarks);
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._CurrentFullResScreenDepths,
+                    data.ScreenDepths
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._CurrentFullResScreenFlatNormals,
+                    data.ScreenFlatNormals
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._CurrentFullResScreenMotionVectors,
+                    data.ScreenMotionVectors
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._PreviousLowResScreenIrradiancesL0,
+                    data.LowResScreenIrradiancesL0
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._PreviousLowResScreenIrradiancesL10,
+                    data.LowResScreenIrradiancesL10
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._PreviousLowResScreenIrradiancesL11,
+                    data.LowResScreenIrradiancesL11
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._PreviousLowResScreenIrradiancesL12,
+                    data.LowResScreenIrradiancesL12
+                );
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._PreviousLowResScreenNdcDepths,
+                    data.LowResScreenNdcDepths
+                );
+                cmd.SetComputeBufferParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._CellAllocationMarks,
+                    data.CellAllocationMarks
+                );
                 cmd.SetComputeBufferParam(shader, kernelIndex, ShaderIDs._CellPatchIndices, data.CellPatchIndices);
                 cmd.SetComputeBufferParam(shader, kernelIndex, ShaderIDs._RingConfigBuffer, data.RingConfigBuffer);
                 cmd.SetComputeBufferParam(shader, kernelIndex, ShaderIDs._PatchIrradiances0, data.PatchIrradiances0);
@@ -813,12 +1084,30 @@ namespace UnityEngine.Rendering.Universal
                 cmd.SetComputeIntParam(shader, ShaderIDs._VolumeSpatialResolution, (int)data.VolumeSpatialResolution);
                 cmd.SetComputeIntParam(shader, ShaderIDs._CascadeCount, (int)data.VolumeCascadeCount);
                 cmd.SetComputeIntParam(shader, ShaderIDs._RingConfigOffset, (int)data.RingConfigOffset);
-                cmd.SetComputeIntParams(shader, ShaderIDs._FullResPixelOffset, (int)data.FullResPixelOffset.x, (int)data.FullResPixelOffset.y);
-                cmd.SetComputeIntParams(shader, ShaderIDs._LowResScreenSize, (int)data.LowResScreenSize.x, (int)data.LowResScreenSize.y);
+                cmd.SetComputeIntParams(
+                    shader,
+                    ShaderIDs._FullResPixelOffset,
+                    (int)data.FullResPixelOffset.x,
+                    (int)data.FullResPixelOffset.y
+                );
+                cmd.SetComputeIntParams(
+                    shader,
+                    ShaderIDs._LowResScreenSize,
+                    (int)data.LowResScreenSize.x,
+                    (int)data.LowResScreenSize.y
+                );
                 cmd.SetComputeIntParam(shader, ShaderIDs._UseMotionVectorSeeding, data.UseMotionVectorSeeding ? 1 : 0);
                 cmd.SetComputeFloatParam(shader, ShaderIDs._VolumeVoxelMinSize, data.VoxelMinSize);
-                cmd.SetComputeMatrixParam(shader, ShaderIDs._CurrentClipToWorldTransform, data.CurrentClipToWorldTransform);
-                cmd.SetComputeMatrixParam(shader, ShaderIDs._PreviousClipToWorldTransform, data.PreviousClipToWorldTransform);
+                cmd.SetComputeMatrixParam(
+                    shader,
+                    ShaderIDs._CurrentClipToWorldTransform,
+                    data.CurrentClipToWorldTransform
+                );
+                cmd.SetComputeMatrixParam(
+                    shader,
+                    ShaderIDs._PreviousClipToWorldTransform,
+                    data.PreviousClipToWorldTransform
+                );
                 cmd.SetComputeVectorParam(shader, ShaderIDs._VolumeTargetPos, data.VolumeTargetPos);
 
                 uint3 groupCount = DivUp(data.ThreadCount, data.ThreadGroupSize);
@@ -832,7 +1121,12 @@ namespace UnityEngine.Rendering.Universal
                 var kernelIndex = data.KernelIndex;
                 cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._Result, data.ScreenIrradiances);
                 cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._ScreenDepths, data.ScreenDepths);
-                cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._ScreenShadedNormals, data.ScreenShadedNormals);
+                cmd.SetComputeTextureParam(
+                    shader,
+                    kernelIndex,
+                    ShaderIDs._ScreenShadedNormals,
+                    data.ScreenShadedNormals
+                );
                 cmd.SetComputeTextureParam(shader, kernelIndex, ShaderIDs._ScreenFlatNormals, data.ScreenFlatNormals);
                 cmd.SetComputeBufferParam(shader, kernelIndex, ShaderIDs._CellPatchIndices, data.CellPatchIndices);
                 cmd.SetComputeBufferParam(shader, kernelIndex, ShaderIDs._RingConfigBuffer, data.RingConfigBuffer);
@@ -886,12 +1180,31 @@ namespace UnityEngine.Rendering.Universal
                 _entityIDToWorldMaterialDescriptors.Add(fallbackMaterial.GetEntityId(), _fallbackMaterialDescriptor);
             }
 
-            public void UpdateMaterials(SurfaceCacheWorld world, List<Material> addedMaterials, List<EntityId> removedMaterials, List<Material> changedMaterials)
+            public void UpdateMaterials(
+                SurfaceCacheWorld world,
+                List<Material> addedMaterials,
+                List<EntityId> removedMaterials,
+                List<Material> changedMaterials
+            )
             {
-                UpdateMaterials(world, _entityIDToWorldMaterialHandles, _entityIDToWorldMaterialDescriptors, addedMaterials, removedMaterials, changedMaterials);
+                UpdateMaterials(
+                    world,
+                    _entityIDToWorldMaterialHandles,
+                    _entityIDToWorldMaterialDescriptors,
+                    addedMaterials,
+                    removedMaterials,
+                    changedMaterials
+                );
             }
 
-            private static void UpdateMaterials(SurfaceCacheWorld world, Dictionary<EntityId, MaterialHandle> entityIDToHandle, Dictionary<EntityId, MaterialPool.MaterialDescriptor> entityIDToDescriptor, List<Material> addedMaterials, List<EntityId> removedMaterials, List<Material> changedMaterials)
+            private static void UpdateMaterials(
+                SurfaceCacheWorld world,
+                Dictionary<EntityId, MaterialHandle> entityIDToHandle,
+                Dictionary<EntityId, MaterialPool.MaterialDescriptor> entityIDToDescriptor,
+                List<Material> addedMaterials,
+                List<EntityId> removedMaterials,
+                List<Material> changedMaterials
+            )
             {
                 static void DeleteTemporaryTextures(ref MaterialPool.MaterialDescriptor desc)
                 {
@@ -940,17 +1253,32 @@ namespace UnityEngine.Rendering.Universal
                 }
             }
 
-            internal void UpdateLights(SurfaceCacheWorld world, List<Light> addedLights, List<EntityId> removedLights,
-                List<Light> changedLights, bool multiplyPunctualLightIntensityByPI)
+            internal void UpdateLights(
+                SurfaceCacheWorld world,
+                List<Light> addedLights,
+                List<EntityId> removedLights,
+                List<Light> changedLights,
+                bool multiplyPunctualLightIntensityByPI
+            )
             {
-                UpdateLights(world, _entityIDToWorldLightHandles, addedLights, removedLights, changedLights, multiplyPunctualLightIntensityByPI);
+                UpdateLights(
+                    world,
+                    _entityIDToWorldLightHandles,
+                    addedLights,
+                    removedLights,
+                    changedLights,
+                    multiplyPunctualLightIntensityByPI
+                );
             }
 
             private static void UpdateLights(
                 SurfaceCacheWorld world,
-                Dictionary<EntityId, LightHandle> entityIDToHandle, List<Light> addedLights, List<EntityId> removedLights,
+                Dictionary<EntityId, LightHandle> entityIDToHandle,
+                List<Light> addedLights,
+                List<EntityId> removedLights,
                 List<Light> changedLights,
-                bool multiplyPunctualLightIntensityByPI)
+                bool multiplyPunctualLightIntensityByPI
+            )
             {
                 // Remove deleted lights
                 LightHandle[] handlesToRemove = new LightHandle[removedLights.Count];
@@ -963,7 +1291,10 @@ namespace UnityEngine.Rendering.Universal
                 world.RemoveLights(handlesToRemove);
 
                 // Add new lights
-                var lightDescriptors = ConvertUnityLightsToLightDescriptors(addedLights.ToArray(), multiplyPunctualLightIntensityByPI);
+                var lightDescriptors = ConvertUnityLightsToLightDescriptors(
+                    addedLights.ToArray(),
+                    multiplyPunctualLightIntensityByPI
+                );
                 LightHandle[] addedHandles = world.AddLights(lightDescriptors);
                 for (int i = 0; i < addedLights.Count; ++i)
                     entityIDToHandle.Add(addedLights[i].GetEntityId(), addedHandles[i]);
@@ -973,7 +1304,10 @@ namespace UnityEngine.Rendering.Universal
                 for (int i = 0; i < changedLights.Count; i++)
                     handlesToUpdate[i] = entityIDToHandle[changedLights[i].GetEntityId()];
 
-                world.UpdateLights(handlesToUpdate, ConvertUnityLightsToLightDescriptors(changedLights.ToArray(), multiplyPunctualLightIntensityByPI));
+                world.UpdateLights(
+                    handlesToUpdate,
+                    ConvertUnityLightsToLightDescriptors(changedLights.ToArray(), multiplyPunctualLightIntensityByPI)
+                );
             }
 
             internal void UpdateMeshRenderers(
@@ -981,9 +1315,18 @@ namespace UnityEngine.Rendering.Universal
                 List<MeshRenderer> addedMeshRenderers,
                 List<MeshRendererInstanceChanges> changedMeshRenderers,
                 List<EntityId> removedMeshRenderers,
-                Material fallbackMaterial)
+                Material fallbackMaterial
+            )
             {
-                UpdateMeshRenderers(world, _entityIDToWorldInstanceHandles, _entityIDToWorldMaterialHandles, addedMeshRenderers, changedMeshRenderers, removedMeshRenderers, fallbackMaterial);
+                UpdateMeshRenderers(
+                    world,
+                    _entityIDToWorldInstanceHandles,
+                    _entityIDToWorldMaterialHandles,
+                    addedMeshRenderers,
+                    changedMeshRenderers,
+                    removedMeshRenderers,
+                    fallbackMaterial
+                );
             }
 
             internal void UpdateTerrains(
@@ -991,9 +1334,18 @@ namespace UnityEngine.Rendering.Universal
                 List<Terrain> addedTerrains,
                 List<TerrainInstanceChanges> changedTerrains,
                 List<EntityId> removedTerrains,
-                Material fallbackMaterial)
+                Material fallbackMaterial
+            )
             {
-                UpdateTerrains(world, _entityIDToWorldInstanceHandles, _entityIDToWorldMaterialHandles, addedTerrains, changedTerrains, removedTerrains, fallbackMaterial);
+                UpdateTerrains(
+                    world,
+                    _entityIDToWorldInstanceHandles,
+                    _entityIDToWorldMaterialHandles,
+                    addedTerrains,
+                    changedTerrains,
+                    removedTerrains,
+                    fallbackMaterial
+                );
             }
 
             private static void UpdateMeshRenderers(
@@ -1003,7 +1355,8 @@ namespace UnityEngine.Rendering.Universal
                 List<MeshRenderer> addedMeshRenderers,
                 List<MeshRendererInstanceChanges> changedMeshRenderers,
                 List<EntityId> removedMeshRenderers,
-                Material fallbackMaterial)
+                Material fallbackMaterial
+            )
             {
                 foreach (var meshRendererEntityID in removedMeshRenderers)
                 {
@@ -1029,7 +1382,8 @@ namespace UnityEngine.Rendering.Universal
                     var materialHandles = new MaterialHandle[materials.Length];
                     for (int i = 0; i < materials.Length; i++)
                     {
-                        var matEntityId = materials[i] == null ? fallbackMaterial.GetEntityId() : materials[i].GetEntityId();
+                        var matEntityId =
+                            materials[i] == null ? fallbackMaterial.GetEntityId() : materials[i].GetEntityId();
                         materialHandles[i] = entityIDToMaterialHandle[matEntityId];
                     }
                     uint[] masks = new uint[materials.Length];
@@ -1063,7 +1417,8 @@ namespace UnityEngine.Rendering.Universal
                         var materialHandles = new MaterialHandle[materials.Length];
                         for (int i = 0; i < materials.Length; i++)
                         {
-                            var matEntityId = materials[i] == null ? fallbackMaterial.GetEntityId() : materials[i].GetEntityId();
+                            var matEntityId =
+                                materials[i] == null ? fallbackMaterial.GetEntityId() : materials[i].GetEntityId();
                             materialHandles[i] = entityIDToMaterialHandle[matEntityId];
                         }
 
@@ -1087,7 +1442,8 @@ namespace UnityEngine.Rendering.Universal
                 List<Terrain> addedTerrains,
                 List<TerrainInstanceChanges> changedTerrains,
                 List<EntityId> removedTerrains,
-                Material fallbackMaterial)
+                Material fallbackMaterial
+            )
             {
                 foreach (var terrainEntityID in removedTerrains)
                 {
@@ -1105,7 +1461,7 @@ namespace UnityEngine.Rendering.Universal
                     var material = terrain.splatBaseMaterial;
                     var matEntityId = material == null ? fallbackMaterial.GetEntityId() : material.GetEntityId();
                     var materialHandle = entityIDToMaterialHandle[matEntityId];
-                    uint mask =  1u;
+                    uint mask = 1u;
 
                     InstanceHandle instance = world.AddInstance(terrain, materialHandle, mask, in localToWorldMatrix);
                     var entityID = terrain.GetEntityId();
@@ -1137,7 +1493,7 @@ namespace UnityEngine.Rendering.Universal
 
                         var mask = material != null ? 1u : 0u;
 
-                        world.UpdateInstanceMask(instanceHandle, new uint[] { mask } );
+                        world.UpdateInstanceMask(instanceHandle, new uint[] { mask });
                     }
                 }
             }
@@ -1149,7 +1505,10 @@ namespace UnityEngine.Rendering.Universal
                 CoreUtils.Destroy(_fallbackMaterialDescriptor.Transmission);
             }
 
-            internal static SurfaceCacheWorld.LightDescriptor[] ConvertUnityLightsToLightDescriptors(Light[] lights, bool multiplyPunctualLightIntensityByPI)
+            internal static SurfaceCacheWorld.LightDescriptor[] ConvertUnityLightsToLightDescriptors(
+                Light[] lights,
+                bool multiplyPunctualLightIntensityByPI
+            )
             {
                 var descriptors = new SurfaceCacheWorld.LightDescriptor[lights.Length];
                 for (int i = 0; i < lights.Length; i++)
@@ -1172,7 +1531,9 @@ namespace UnityEngine.Rendering.Universal
 
         private SurfaceCachePass _pass;
         private RayTracingContext _rtContext;
-        [SerializeField] private ParameterSet _parameterSet = new ParameterSet();
+
+        [SerializeField]
+        private ParameterSet _parameterSet = new ParameterSet();
 
         [Serializable]
         class EstimationParameterSet
@@ -1255,7 +1616,8 @@ namespace UnityEngine.Rendering.Universal
                     _rtContext = new RayTracingContext(rtBackend, resources);
                 }
 
-                var universalRenderPipelineResources = GraphicsSettings.GetRenderPipelineSettings<SurfaceCacheRenderPipelineResourceSet>();
+                var universalRenderPipelineResources =
+                    GraphicsSettings.GetRenderPipelineSettings<SurfaceCacheRenderPipelineResourceSet>();
                 Debug.Assert(universalRenderPipelineResources != null);
 
                 var worldResources = new WorldResourceSet();
@@ -1270,7 +1632,7 @@ namespace UnityEngine.Rendering.Universal
                 {
                     Resolution = _parameterSet.VolumeParams.Resolution,
                     Size = _parameterSet.VolumeParams.Size,
-                    CascadeCount = _parameterSet.VolumeParams.CascadeCount
+                    CascadeCount = _parameterSet.VolumeParams.CascadeCount,
                 };
 
                 var estimationParams = new SurfaceCacheEstimationParameterSet
@@ -1285,7 +1647,7 @@ namespace UnityEngine.Rendering.Universal
                     SpatialFilterEnabled = _parameterSet.PatchFilteringParams.SpatialFilterEnabled,
                     SpatialFilterSampleCount = _parameterSet.PatchFilteringParams.SpatialFilterSampleCount,
                     SpatialFilterRadius = _parameterSet.PatchFilteringParams.SpatialFilterRadius,
-                    TemporalPostFilterEnabled = _parameterSet.PatchFilteringParams.TemporalPostFilterEnabled
+                    TemporalPostFilterEnabled = _parameterSet.PatchFilteringParams.TemporalPostFilterEnabled,
                 };
 
                 _pass = new SurfaceCachePass(
@@ -1308,7 +1670,8 @@ namespace UnityEngine.Rendering.Universal
                     volParams,
                     estimationParams,
                     patchFilteringParams,
-                    _parameterSet.VolumeParams.Movement);
+                    _parameterSet.VolumeParams.Movement
+                );
 
                 _pass.renderPassEvent = RenderPassEvent.AfterRenderingPrePasses + 1;
             }

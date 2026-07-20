@@ -5,11 +5,19 @@ namespace UnityEngine.Rendering.Universal
 {
     public sealed partial class UniversalRenderPipeline
     {
-        static void RecordAndExecuteRenderGraph(RenderGraph renderGraph, ScriptableRenderContext context, ScriptableRenderer renderer, CommandBuffer cmd, Camera camera)
+        static void RecordAndExecuteRenderGraph(
+            RenderGraph renderGraph,
+            ScriptableRenderContext context,
+            ScriptableRenderer renderer,
+            CommandBuffer cmd,
+            Camera camera
+        )
         {
             var universalRenderer = renderer as UniversalRenderer;
-            var renderTextureUVOriginStrategy = (universalRenderer != null && universalRenderer.useTileOnlyMode) ?
-                RenderTextureUVOriginStrategy.PropagateAttachmentOrientation : RenderTextureUVOriginStrategy.BottomLeft;
+            var renderTextureUVOriginStrategy =
+                (universalRenderer != null && universalRenderer.useTileOnlyMode)
+                    ? RenderTextureUVOriginStrategy.PropagateAttachmentOrientation
+                    : RenderTextureUVOriginStrategy.BottomLeft;
 
             RenderGraphParameters rgParams = new RenderGraphParameters
             {

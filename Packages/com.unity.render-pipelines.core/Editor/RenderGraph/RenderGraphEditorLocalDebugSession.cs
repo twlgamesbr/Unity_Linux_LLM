@@ -6,14 +6,18 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         public override bool isActive => true;
 
-        public RenderGraphEditorLocalDebugSession() : base()
+        public RenderGraphEditorLocalDebugSession()
+            : base()
         {
             connectionName = "Editor";
 
             RegisterAllLocallyKnownGraphsAndExecutions();
 
             var analyticsPayload = new DebugMessageHandler.AnalyticsPayload();
-            RenderGraphViewerSessionCreatedAnalytic.Send(RenderGraphViewerSessionCreatedAnalytic.SessionType.Local, analyticsPayload);
+            RenderGraphViewerSessionCreatedAnalytic.Send(
+                RenderGraphViewerSessionCreatedAnalytic.SessionType.Local,
+                analyticsPayload
+            );
         }
     }
 }

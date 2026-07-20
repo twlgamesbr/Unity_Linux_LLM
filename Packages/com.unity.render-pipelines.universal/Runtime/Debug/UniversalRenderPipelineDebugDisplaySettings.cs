@@ -5,7 +5,8 @@ namespace UnityEngine.Rendering.Universal
     /// <summary>
     /// Class for the rendering debugger settings.
     /// </summary>
-    public class UniversalRenderPipelineDebugDisplaySettings : DebugDisplaySettings<UniversalRenderPipelineDebugDisplaySettings>
+    public class UniversalRenderPipelineDebugDisplaySettings
+        : DebugDisplaySettings<UniversalRenderPipelineDebugDisplaySettings>
     {
         DebugDisplaySettingsCommon commonSettings { get; set; }
 
@@ -73,7 +74,10 @@ namespace UnityEngine.Rendering.Universal
 
                     default:
                     {
-                        throw new ArgumentOutOfRangeException(nameof(debugPostProcessingMode), $"Invalid post-processing state {debugPostProcessingMode}");
+                        throw new ArgumentOutOfRangeException(
+                            nameof(debugPostProcessingMode),
+                            $"Invalid post-processing state {debugPostProcessingMode}"
+                        );
                     }
                 }
             }
@@ -83,16 +87,16 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Creates a new <c>UniversalRenderPipelineDebugDisplaySettings</c> instance.
         /// </summary>
-        public UniversalRenderPipelineDebugDisplaySettings()
-        {
-        }
+        public UniversalRenderPipelineDebugDisplaySettings() { }
 
         /// <inheritdoc/>
         public override void Reset()
         {
             base.Reset();
 
-            displayStats = Add(new DebugDisplaySettingsStats<URPProfileId>(new UniversalRenderPipelineDebugDisplayStats()));
+            displayStats = Add(
+                new DebugDisplaySettingsStats<URPProfileId>(new UniversalRenderPipelineDebugDisplayStats())
+            );
             materialSettings = Add(DebugDisplaySerializer.GetOrCreate<DebugDisplaySettingsMaterial>());
             lightingSettings = Add(DebugDisplaySerializer.GetOrCreate<DebugDisplaySettingsLighting>());
             renderingSettings = Add(DebugDisplaySerializer.GetOrCreate<DebugDisplaySettingsRendering>());
@@ -116,9 +120,10 @@ namespace UnityEngine.Rendering.Universal
         {
             if (renderingSettings.mipInfoMode != DebugMipInfoMode.None)
             {
-                int textureSlotImpl = (renderingSettings.canAggregateData && renderingSettings.showInfoForAllSlots)
-                    ? -1
-                    : renderingSettings.mipDebugMaterialTextureSlot;
+                int textureSlotImpl =
+                    (renderingSettings.canAggregateData && renderingSettings.showInfoForAllSlots)
+                        ? -1
+                        : renderingSettings.mipDebugMaterialTextureSlot;
                 Texture.SetStreamingTextureMaterialDebugProperties(textureSlotImpl);
             }
         }

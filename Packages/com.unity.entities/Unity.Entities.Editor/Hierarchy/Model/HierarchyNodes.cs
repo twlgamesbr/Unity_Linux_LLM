@@ -15,7 +15,8 @@ namespace Unity.Entities.Editor
     [GeneratePropertyBag]
     class HierarchyNodesState
     {
-        [CreateProperty] internal HashSet<HierarchyNodeHandle> Expanded = new HashSet<HierarchyNodeHandle>();
+        [CreateProperty]
+        internal HashSet<HierarchyNodeHandle> Expanded = new HashSet<HierarchyNodeHandle>();
     }
 
     /// <summary>
@@ -95,15 +96,13 @@ namespace Unity.Entities.Editor
         /// Returns the immutable node data for the given <see cref="HierarchyNodeHandle"/>.
         /// </summary>
         /// <param name="handle">The handle to get the data for.</param>
-        public HierarchyNode.Immutable this[HierarchyNodeHandle handle]
-            => GetBuffer().GetNode(handle);
+        public HierarchyNode.Immutable this[HierarchyNodeHandle handle] => GetBuffer().GetNode(handle);
 
         /// <summary>
         /// Returns the immutable node data for the given index.
         /// </summary>
         /// <param name="index">The index to get the data for.</param>
-        public HierarchyNode.Immutable this[int index]
-            => GetBuffer().GetNode(m_Nodes[index]);
+        public HierarchyNode.Immutable this[int index] => GetBuffer().GetNode(m_Nodes[index]);
 
         /// <summary>
         /// Gets the immutable node buffer storing the node data.
@@ -111,10 +110,14 @@ namespace Unity.Entities.Editor
         HierarchyNodeStore.Immutable GetBuffer()
         {
             if (!m_ImmutableNodes.IsCreated)
-                throw new InvalidOperationException($"The packed node buffer has not been initialized. {nameof(HierarchyNodes)}.{nameof(Refresh)} must be called to update the internal state.");
+                throw new InvalidOperationException(
+                    $"The packed node buffer has not been initialized. {nameof(HierarchyNodes)}.{nameof(Refresh)} must be called to update the internal state."
+                );
 
             if (m_ImmutableNodes.ChangeVersion != m_ImmutableNodeChangeVersion)
-                throw new InvalidOperationException($"The packed node buffer has been changed. {nameof(HierarchyNodes)}.{nameof(Refresh)} must be called to update the internal state.");
+                throw new InvalidOperationException(
+                    $"The packed node buffer has been changed. {nameof(HierarchyNodes)}.{nameof(Refresh)} must be called to update the internal state."
+                );
 
             return m_ImmutableNodes;
         }
@@ -165,8 +168,7 @@ namespace Unity.Entities.Editor
             m_Rebuild = true;
         }
 
-        public bool Exists(HierarchyNodeHandle handle)
-            => m_ImmutableNodes.Exists(handle);
+        public bool Exists(HierarchyNodeHandle handle) => m_ImmutableNodes.Exists(handle);
 
         /// <summary>
         /// Returns <see langword="true"/> if the given <see cref="HierarchyNodeHandle"/> is expanded in the hierarchy.
@@ -232,7 +234,11 @@ namespace Unity.Entities.Editor
         /// <param name="handle">The node for which all ancestors will be expanded.</param>
         public void SetAncestorsExpanded(HierarchyNodeHandle handle)
         {
-            if (handle.Kind == NodeKind.Root || !m_ImmutableNodes.IsCreated || m_ImmutableNodes.ChangeVersion != m_ImmutableNodeChangeVersion)
+            if (
+                handle.Kind == NodeKind.Root
+                || !m_ImmutableNodes.IsCreated
+                || m_ImmutableNodes.ChangeVersion != m_ImmutableNodeChangeVersion
+            )
                 return;
 
             var index = m_ImmutableNodes.IndexOf(handle);
@@ -244,7 +250,7 @@ namespace Unity.Entities.Editor
 
             var rebuild = false;
 
-            for (;;)
+            for (; ; )
             {
                 index += node.ParentOffset;
 
@@ -270,7 +276,11 @@ namespace Unity.Entities.Editor
         /// <returns>The packed index.</returns>
         public int IndexOf(HierarchyNodeHandle handle)
         {
-            if (handle.Kind == NodeKind.Root || !m_ImmutableNodes.IsCreated || m_ImmutableNodes.ChangeVersion != m_ImmutableNodeChangeVersion)
+            if (
+                handle.Kind == NodeKind.Root
+                || !m_ImmutableNodes.IsCreated
+                || m_ImmutableNodes.ChangeVersion != m_ImmutableNodeChangeVersion
+            )
                 return -1;
 
             var immutableIndex = m_ImmutableNodes.IndexOf(handle);
@@ -302,7 +312,11 @@ namespace Unity.Entities.Editor
         /// <remarks>
         /// @TODO convert this to an enumerator which can be time-sliced.
         /// </remarks>
-        internal unsafe void Refresh(HierarchyNodeStore.Immutable immutable, World world, NativeParallelHashMap<HierarchyNodeHandle, bool> subSceneStateMap)
+        internal unsafe void Refresh(
+            HierarchyNodeStore.Immutable immutable,
+            World world,
+            NativeParallelHashMap<HierarchyNodeHandle, bool> subSceneStateMap
+        )
         {
             if (immutable.ChangeVersion == 0)
                 return;
@@ -330,7 +344,7 @@ namespace Unity.Entities.Editor
                         Hierarchy = m_ImmutableNodes,
                         Filter = mask,
                         Nodes = m_Nodes,
-                        IndexByNode = m_IndexByNode
+                        IndexByNode = m_IndexByNode,
                     }.Run();
                 }
             }
@@ -362,7 +376,7 @@ namespace Unity.Entities.Editor
                         IsPrefabStage = PrefabStageUtility.GetCurrentPrefabStage() != null,
                         EntityGuid = typeof(EntityGuid),
                         Prefab = typeof(Prefab),
-                        DataAccess = world != null ? world.EntityManager.GetCheckedEntityDataAccess() : null
+                        DataAccess = world != null ? world.EntityManager.GetCheckedEntityDataAccess() : null,
                     }.Run();
                 }
             }
@@ -371,9 +385,14 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         internal unsafe struct BuildExpandedNodes : IJob
         {
-            [ReadOnly] public HierarchyNodeStore.Immutable Hierarchy;
-            [ReadOnly] public NativeParallelHashSet<HierarchyNodeHandle> Expanded;
-            [ReadOnly] public NativeParallelHashMap<HierarchyNodeHandle,bool> SubSceneStateMap;
+            [ReadOnly]
+            public HierarchyNodeStore.Immutable Hierarchy;
+
+            [ReadOnly]
+            public NativeParallelHashSet<HierarchyNodeHandle> Expanded;
+
+            [ReadOnly]
+            public NativeParallelHashMap<HierarchyNodeHandle, bool> SubSceneStateMap;
 
             public DataMode DataMode;
             public bool IsPlayMode;
@@ -383,14 +402,19 @@ namespace Unity.Entities.Editor
             public NativeList<int> IndexByNode;
             public ComponentType EntityGuid;
             public ComponentType Prefab;
-            [NativeDisableUnsafePtrRestriction] public EntityDataAccess* DataAccess;
+
+            [NativeDisableUnsafePtrRestriction]
+            public EntityDataAccess* DataAccess;
 
             public void Execute()
             {
                 var inSubScene = false;
                 SubSceneInfo currentSubScene = default;
 
-                UnsafeParallelHashMap<EntityId, bool> rootGameObjectsInSubScene = DataMode is DataMode.Mixed ? new UnsafeParallelHashMap<EntityId, bool>(32, AllocatorManager.Temp) : default;
+                UnsafeParallelHashMap<EntityId, bool> rootGameObjectsInSubScene =
+                    DataMode is DataMode.Mixed
+                        ? new UnsafeParallelHashMap<EntityId, bool>(32, AllocatorManager.Temp)
+                        : default;
 
                 // Skip the root.
                 var count = Hierarchy.Count;
@@ -403,7 +427,7 @@ namespace Unity.Entities.Editor
                 for (var i = 0; i < IndexByNode.Length; i++)
                     IndexByNode[i] = -1;
 
-                for (; readIndex < count;)
+                for (; readIndex < count; )
                 {
                     var node = Hierarchy[readIndex];
 
@@ -418,7 +442,12 @@ namespace Unity.Entities.Editor
                         inSubScene = true;
 
                         SubSceneStateMap.TryGetValue(node.Handle, out var isLoaded);
-                        currentSubScene = new SubSceneInfo { SubSceneEndIndex = readIndex + node.NextSiblingOffset - 1, IsOpened = isLoaded, SubSceneNodeDepth = node.Depth };
+                        currentSubScene = new SubSceneInfo
+                        {
+                            SubSceneEndIndex = readIndex + node.NextSiblingOffset - 1,
+                            IsOpened = isLoaded,
+                            SubSceneNodeDepth = node.Depth,
+                        };
                         if (DataMode is DataMode.Mixed && currentSubScene.IsOpened)
                             CreateSubSceneGameObjectCache(readIndex, currentSubScene, ref rootGameObjectsInSubScene);
                     }
@@ -447,10 +476,14 @@ namespace Unity.Entities.Editor
                     rootGameObjectsInSubScene.Dispose();
             }
 
-            void CreateSubSceneGameObjectCache(int currentReadIndex, SubSceneInfo subSceneInfo, ref UnsafeParallelHashMap<EntityId,bool> rootGameObjectsInSubScene)
+            void CreateSubSceneGameObjectCache(
+                int currentReadIndex,
+                SubSceneInfo subSceneInfo,
+                ref UnsafeParallelHashMap<EntityId, bool> rootGameObjectsInSubScene
+            )
             {
                 rootGameObjectsInSubScene.Clear();
-                for (var readIndex = currentReadIndex+1; readIndex <= subSceneInfo.SubSceneEndIndex; )
+                for (var readIndex = currentReadIndex + 1; readIndex <= subSceneInfo.SubSceneEndIndex; )
                 {
                     var node = Hierarchy[readIndex];
                     if (node.Handle.Kind is NodeKind.GameObject)
@@ -471,19 +504,27 @@ namespace Unity.Entities.Editor
                 public int SubSceneNodeDepth;
             }
 
-            bool ShouldIncludeNode(HierarchyImmutableNodeData node, bool inSubScene, SubSceneInfo subSceneInfo, UnsafeParallelHashMap<EntityId, bool> rootGameObjectCache)
+            bool ShouldIncludeNode(
+                HierarchyImmutableNodeData node,
+                bool inSubScene,
+                SubSceneInfo subSceneInfo,
+                UnsafeParallelHashMap<EntityId, bool> rootGameObjectCache
+            )
             {
                 if (IsPrefabStage && (node.Flags & HierarchyNodeFlags.IsPrefabStage) == 0)
                     return false;
 
                 // Hide dynamically loaded subscenes in authoring mode
-                if (DataMode is DataMode.Authoring && node.Handle.Kind is NodeKind.SubScene && subSceneInfo.SubSceneNodeDepth == 0)
+                if (
+                    DataMode is DataMode.Authoring
+                    && node.Handle.Kind is NodeKind.SubScene
+                    && subSceneInfo.SubSceneNodeDepth == 0
+                )
                     return false;
 
                 // Include any node that's under a visible node in a subScene
                 // Include any node outside of a subScene that's under a visible node
-                if (!inSubScene && node.Depth > 1
-                    || inSubScene && node.Depth > subSceneInfo.SubSceneNodeDepth + 1)
+                if (!inSubScene && node.Depth > 1 || inSubScene && node.Depth > subSceneInfo.SubSceneNodeDepth + 1)
                     return true;
 
                 // Specific case for subScene content in mixed mode
@@ -505,7 +546,8 @@ namespace Unity.Entities.Editor
                         if (!DataAccess->HasComponent(entity, EntityGuid))
                             return true;
 
-                        var entityGuid = *(EntityGuid*)DataAccess->EntityComponentStore->GetComponentDataWithTypeRO(entity, EntityGuid.TypeIndex);
+                        var entityGuid = *(EntityGuid*)
+                            DataAccess->EntityComponentStore->GetComponentDataWithTypeRO(entity, EntityGuid.TypeIndex);
                         return !rootGameObjectCache.ContainsKey(entityGuid.OriginatingEntityId);
                     }
                 }
@@ -516,7 +558,8 @@ namespace Unity.Entities.Editor
                 if (node.Handle.Kind is NodeKind.GameObject)
                     // show root GO always except in Playmode + Authoring
                     // show GO in subScenes except in Runtime
-                    return node.Depth <= 1 && (!IsPlayMode || DataMode is not DataMode.Authoring) || inSubScene && DataMode is not DataMode.Runtime;
+                    return node.Depth <= 1 && (!IsPlayMode || DataMode is not DataMode.Authoring)
+                        || inSubScene && DataMode is not DataMode.Runtime;
 
                 return true;
             }
@@ -537,8 +580,11 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         struct BuildFilteredNodes : IJob
         {
-            [ReadOnly] public HierarchyNodeStore.Immutable Hierarchy;
-            [ReadOnly] public NativeBitArray Filter;
+            [ReadOnly]
+            public HierarchyNodeStore.Immutable Hierarchy;
+
+            [ReadOnly]
+            public NativeBitArray Filter;
 
             public NativeList<int> Nodes;
             public NativeList<int> IndexByNode;
@@ -574,13 +620,21 @@ namespace Unity.Entities.Editor
         bool IList.IsFixedSize => throw new NotImplementedException();
         bool IList.IsReadOnly => throw new NotImplementedException();
         object ICollection.SyncRoot => throw new NotImplementedException();
+
         IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+
         void ICollection.CopyTo(Array array, int index) => throw new NotImplementedException();
+
         int IList.Add(object value) => throw new NotImplementedException();
+
         bool IList.Contains(object value) => throw new NotImplementedException();
+
         int IList.IndexOf(object value) => throw new NotImplementedException();
+
         void IList.Insert(int index, object value) => throw new NotImplementedException();
+
         void IList.Remove(object value) => throw new NotImplementedException();
+
         void IList.RemoveAt(int index) => throw new NotImplementedException();
     }
 }

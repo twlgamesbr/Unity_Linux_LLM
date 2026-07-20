@@ -10,6 +10,7 @@ namespace EditorAttributes
         /// <summary>
         /// Attribute to hide a field when outside of play mode
         /// </summary>
-        public HideInEditModeAttribute() : base(true) { }
+        public HideInEditModeAttribute()
+            : base(true) { }
     }
 }

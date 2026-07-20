@@ -1,10 +1,10 @@
-using UnityEngine;
-using UnityEditor;
-using System.Reflection;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using System.Collections.Generic;
+using System.Reflection;
 using EditorAttributes.Editor.Utility;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -23,38 +23,56 @@ namespace EditorAttributes.Editor
             HelpBox errorBox = new();
 
             collectionInfo = ReflectionUtils.GetValidMemberInfo(DropdownAttribute.CollectionName, property);
-            propertyValues = ConvertCollectionValuesToStrings(DropdownAttribute.CollectionName, property, collectionInfo, errorBox);
+            propertyValues = ConvertCollectionValuesToStrings(
+                DropdownAttribute.CollectionName,
+                property,
+                collectionInfo,
+                errorBox
+            );
             displayValues = GetDisplayValues(collectionInfo, DropdownAttribute, property, propertyValues);
 
             DropdownField dropdownField = CreateDropdownField(displayValues, property);
 
             root.Add(dropdownField);
 
-            UpdateVisualElement(dropdownField, () =>
-            {
-                List<string> currentPropertyValues = ConvertCollectionValuesToStrings(DropdownAttribute.CollectionName, property, collectionInfo, errorBox);
-                List<string> currentDisplayValues = GetDisplayValues(collectionInfo, DropdownAttribute, property, currentPropertyValues);
-
-                if (IsCollectionValid(currentPropertyValues))
+            UpdateVisualElement(
+                dropdownField,
+                () =>
                 {
-                    errorBox.text = string.Empty;
-                    dropdownField.choices = currentDisplayValues;
+                    List<string> currentPropertyValues = ConvertCollectionValuesToStrings(
+                        DropdownAttribute.CollectionName,
+                        property,
+                        collectionInfo,
+                        errorBox
+                    );
+                    List<string> currentDisplayValues = GetDisplayValues(
+                        collectionInfo,
+                        DropdownAttribute,
+                        property,
+                        currentPropertyValues
+                    );
 
-                    displayValues = currentDisplayValues;
-                    propertyValues = currentPropertyValues;
+                    if (IsCollectionValid(currentPropertyValues))
+                    {
+                        errorBox.text = string.Empty;
+                        dropdownField.choices = currentDisplayValues;
+
+                        displayValues = currentDisplayValues;
+                        propertyValues = currentPropertyValues;
+                    }
+                    else
+                    {
+                        dropdownField.choices = nullList;
+                        propertyValues = nullList;
+                        displayValues = nullList;
+                    }
+
+                    if (HasMismatchedDisplayCollectionCounts(currentPropertyValues, currentDisplayValues))
+                        errorBox.text = "The value collection item count and display names count do not match";
+
+                    DisplayErrorBox(root, errorBox);
                 }
-                else
-                {
-                    dropdownField.choices = nullList;
-                    propertyValues = nullList;
-                    displayValues = nullList;
-                }
-
-                if (HasMismatchedDisplayCollectionCounts(currentPropertyValues, currentDisplayValues))
-                    errorBox.text = "The value collection item count and display names count do not match";
-
-                DisplayErrorBox(root, errorBox);
-            });
+            );
 
             return root;
         }
@@ -84,13 +102,17 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"Could not paste value <b>{clipboardValue}</b> since is not availiable as an option in the dropdown");
+                Debug.LogWarning(
+                    $"Could not paste value <b>{clipboardValue}</b> since is not availiable as an option in the dropdown"
+                );
             }
         }
 
         protected override DropdownField CreateDropdownField(List<string> choices, SerializedProperty property)
         {
-            DropdownField dropdownField = IsCollectionValid(choices) ? new(property.displayName, choices, GetDefaultValueIndex(propertyValues, property)) : new(property.displayName, nullList, 0);
+            DropdownField dropdownField = IsCollectionValid(choices)
+                ? new(property.displayName, choices, GetDefaultValueIndex(propertyValues, property))
+                : new(property.displayName, nullList, 0);
 
             dropdownField.tooltip = property.tooltip;
             dropdownField.showMixedValue = property.hasMultipleDifferentValues;
@@ -101,9 +123,18 @@ namespace EditorAttributes.Editor
             if (dropdownField.value != "NULL" && !HasMismatchedDisplayCollectionCounts(propertyValues, displayValues))
                 SetPropertyValueFromDropdown(property, dropdownField);
 
-            dropdownField.TrackPropertyValue(property, (trackedProperty) => SetDropdownValueFromProperty(trackedProperty, dropdownField));
-            dropdownField.RegisterValueChangedCallback((callback) => SetPropertyValueFromDropdown(property, dropdownField));
-            dropdownField.RegisterCallbackOnce<GeometryChangedEvent>((callback) => dropdownField.Q(className: DropdownField.inputUssClassName).style.backgroundColor = EditorExtension.GLOBAL_COLOR / 2f);
+            dropdownField.TrackPropertyValue(
+                property,
+                (trackedProperty) => SetDropdownValueFromProperty(trackedProperty, dropdownField)
+            );
+            dropdownField.RegisterValueChangedCallback(
+                (callback) => SetPropertyValueFromDropdown(property, dropdownField)
+            );
+            dropdownField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                    dropdownField.Q(className: DropdownField.inputUssClassName).style.backgroundColor =
+                        EditorExtension.GLOBAL_COLOR / 2f
+            );
 
             return dropdownField;
         }
@@ -123,7 +154,10 @@ namespace EditorAttributes.Editor
             }
         }
 
-        protected override void SetDropdownValueFromProperty(SerializedProperty trackedProperty, DropdownField dropdownField)
+        protected override void SetDropdownValueFromProperty(
+            SerializedProperty trackedProperty,
+            DropdownField dropdownField
+        )
         {
             string propertyStringValue = GetPropertyValueAsString(trackedProperty);
 
@@ -133,7 +167,10 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"The value <b>{propertyStringValue}</b> set to the <b>{trackedProperty.name}</b> variable is not a value available in the dropdown", trackedProperty.serializedObject.targetObject);
+                Debug.LogWarning(
+                    $"The value <b>{propertyStringValue}</b> set to the <b>{trackedProperty.name}</b> variable is not a value available in the dropdown",
+                    trackedProperty.serializedObject.targetObject
+                );
             }
         }
 
@@ -143,6 +180,7 @@ namespace EditorAttributes.Editor
             return collectionValues.Contains(propertyStringValue) ? collectionValues.IndexOf(propertyStringValue) : 0;
         }
 
-        private bool HasMismatchedDisplayCollectionCounts(List<string> propertyValues, List<string> collectionValues) => DropdownAttribute.DisplayNames != null && propertyValues.Count != collectionValues.Count;
+        private bool HasMismatchedDisplayCollectionCounts(List<string> propertyValues, List<string> collectionValues) =>
+            DropdownAttribute.DisplayNames != null && propertyValues.Count != collectionValues.Count;
     }
 }

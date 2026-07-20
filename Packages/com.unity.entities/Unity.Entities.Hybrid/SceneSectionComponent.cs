@@ -11,7 +11,8 @@ namespace Unity.Entities
         /// <summary>
         /// Index of the scene section where the GameObject and its children belong to.
         /// </summary>
-        [FormerlySerializedAs("SectionId")] public int SectionIndex;
+        [FormerlySerializedAs("SectionId")]
+        public int SectionIndex;
 
         class SceneSectionComponentBaker : Baker<SceneSectionComponent>
         {
@@ -19,7 +20,10 @@ namespace Unity.Entities
             {
                 // Adding a section doesn't require any transform usage flags
                 var entity = GetEntity(TransformUsageFlags.None);
-                AddSharedComponent(entity, new SceneSection { SceneGUID = GetSceneGUID(), Section = authoring.SectionIndex });
+                AddSharedComponent(
+                    entity,
+                    new SceneSection { SceneGUID = GetSceneGUID(), Section = authoring.SectionIndex }
+                );
             }
         }
     }

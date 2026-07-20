@@ -77,7 +77,6 @@ namespace Unity.PlatformToolkit
             return data;
         }
 
-
         protected override Task WriteDataToStorage(string name, byte[] data)
         {
             var existingEntry = m_Archive.GetEntry(name);
@@ -104,7 +103,10 @@ namespace Unity.PlatformToolkit
             }
         }
 
-        protected override async Task CommitDataToStorage(IReadOnlyCollection<(string name, byte[] data)> writtenFiles, IReadOnlyCollection<string> deletedFiles)
+        protected override async Task CommitDataToStorage(
+            IReadOnlyCollection<(string name, byte[] data)> writtenFiles,
+            IReadOnlyCollection<string> deletedFiles
+        )
         {
             if (m_Archive.Count == 0)
                 throw new InvalidOperationException("Cannot commit empty save");
@@ -165,6 +167,7 @@ namespace Unity.PlatformToolkit
         private class MemoryDataSource : IStaticDataSource
         {
             private Stream m_Stream;
+
             public Stream GetSource()
             {
                 return m_Stream;

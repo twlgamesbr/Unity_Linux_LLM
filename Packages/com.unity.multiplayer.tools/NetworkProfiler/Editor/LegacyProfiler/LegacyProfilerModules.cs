@@ -59,9 +59,11 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
             cleanedSome |= 0 < modules.RemoveAll(module => k_LegacyModuleNames.Contains(module.m_Name));
 
-            cleanedSome |= 0 < modules.RemoveAll(
-                legacyModule => ProfilerModuleDefinitions.Modules.Any(
-                    module => module.Name.Equals(legacyModule.m_Name)));
+            cleanedSome |=
+                0
+                < modules.RemoveAll(legacyModule =>
+                    ProfilerModuleDefinitions.Modules.Any(module => module.Name.Equals(legacyModule.m_Name))
+                );
 
             if (cleanedSome)
             {

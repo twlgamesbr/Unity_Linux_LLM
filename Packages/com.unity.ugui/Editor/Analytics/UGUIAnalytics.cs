@@ -4,7 +4,7 @@ namespace UnityEditor.UI.Analytics
 {
     internal static class UGUIAnalytics
     {
-        public static void Send (IAnalytic analytic)
+        public static void Send(IAnalytic analytic)
         {
             if (!EditorAnalytics.enabled)
                 return;

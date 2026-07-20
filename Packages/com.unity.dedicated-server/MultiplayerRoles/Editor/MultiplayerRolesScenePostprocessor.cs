@@ -9,12 +9,18 @@ namespace Unity.Multiplayer.Editor
     {
         public int callbackOrder => 0;
 
-        private static readonly ProfilerMarker s_OnProcessSceneMarker = new ProfilerMarker("MultiplayerRolesScenePostprocessor.OnProcessScene");
+        private static readonly ProfilerMarker s_OnProcessSceneMarker = new ProfilerMarker(
+            "MultiplayerRolesScenePostprocessor.OnProcessScene"
+        );
+
         public void OnProcessScene(Scene scene, BuildReport report)
         {
             using var marker = s_OnProcessSceneMarker.Auto();
 
-            if (!EditorMultiplayerRolesManager.EnableMultiplayerRoles || !EditorMultiplayerRolesManager.EnableSafetyChecks)
+            if (
+                !EditorMultiplayerRolesManager.EnableMultiplayerRoles
+                || !EditorMultiplayerRolesManager.EnableSafetyChecks
+            )
                 return;
 
             var referenceTracker = new ReferenceTracker(EditorMultiplayerRolesManager.ActiveMultiplayerRoleMask, scene);

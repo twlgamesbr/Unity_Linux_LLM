@@ -1,7 +1,7 @@
-using Unity.Collections;
-using Unity.Jobs;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace UnityEngine.Rendering
@@ -9,16 +9,32 @@ namespace UnityEngine.Rendering
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
     internal struct UpdateLODGroupTransformJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<JaggedJobRange> jobRanges;
-        [ReadOnly] public NativeParallelHashMap<EntityId, GPUInstanceIndex> lodGroupDataHash;
-        [ReadOnly] public JaggedSpan<EntityId> jaggedLODGroups;
-        [ReadOnly] public JaggedSpan<float> jaggedWorldSpaceSizes;
-        [ReadOnly] public JaggedSpan<float3> jaggedWorldSpaceReferencePoints;
-        [ReadOnly] public bool requiresGPUUpload;
-        [ReadOnly] public bool supportDitheringCrossFade;
+        [ReadOnly]
+        public NativeArray<JaggedJobRange> jobRanges;
 
-        [NativeDisableContainerSafetyRestriction, NoAlias, ReadOnly] public NativeList<LODGroupData> lodGroupDatas;
-        [NativeDisableContainerSafetyRestriction, NoAlias, WriteOnly] public NativeList<LODGroupCullingData> lodGroupCullingDatas;
+        [ReadOnly]
+        public NativeParallelHashMap<EntityId, GPUInstanceIndex> lodGroupDataHash;
+
+        [ReadOnly]
+        public JaggedSpan<EntityId> jaggedLODGroups;
+
+        [ReadOnly]
+        public JaggedSpan<float> jaggedWorldSpaceSizes;
+
+        [ReadOnly]
+        public JaggedSpan<float3> jaggedWorldSpaceReferencePoints;
+
+        [ReadOnly]
+        public bool requiresGPUUpload;
+
+        [ReadOnly]
+        public bool supportDitheringCrossFade;
+
+        [NativeDisableContainerSafetyRestriction, NoAlias, ReadOnly]
+        public NativeList<LODGroupData> lodGroupDatas;
+
+        [NativeDisableContainerSafetyRestriction, NoAlias, WriteOnly]
+        public NativeList<LODGroupCullingData> lodGroupCullingDatas;
 
         public unsafe void Execute(int jobIndex)
         {
@@ -26,7 +42,9 @@ namespace UnityEngine.Rendering
 
             NativeArray<EntityId> lodGroupSection = jaggedLODGroups[jobRange.sectionIndex];
             NativeArray<float> worldSpaceSizesSection = jaggedWorldSpaceSizes[jobRange.sectionIndex];
-            NativeArray<float3> worldSpaceReferencePointSection = jaggedWorldSpaceReferencePoints[jobRange.sectionIndex];
+            NativeArray<float3> worldSpaceReferencePointSection = jaggedWorldSpaceReferencePoints[
+                jobRange.sectionIndex
+            ];
 
             for (int indexInRange = 0; indexInRange < jobRange.length; indexInRange++)
             {
@@ -38,7 +56,9 @@ namespace UnityEngine.Rendering
                     float worldSpaceSize = worldSpaceSizesSection[localIndex];
 
                     ref LODGroupData lodGroupData = ref lodGroupDatas.ElementAt(lodGroupInstance.index);
-                    ref LODGroupCullingData lodGroupTransformResult = ref lodGroupCullingDatas.ElementAt(lodGroupInstance.index);
+                    ref LODGroupCullingData lodGroupTransformResult = ref lodGroupCullingDatas.ElementAt(
+                        lodGroupInstance.index
+                    );
                     lodGroupTransformResult.worldSpaceSize = worldSpaceSize;
                     lodGroupTransformResult.worldSpaceReferencePoint = worldSpaceReferencePointSection[localIndex];
 
@@ -52,8 +72,10 @@ namespace UnityEngine.Rendering
                         if (supportDitheringCrossFade && !lodGroupTransformResult.percentageFlags[i])
                         {
                             float prevLODHeight = i != 0 ? lodGroupData.screenRelativeTransitionHeights[i - 1] : 1.0f;
-                            float transitionHeight = lodHeight + lodGroupData.fadeTransitionWidth[i] * (prevLODHeight - lodHeight);
-                            float transitionDistance = lodDist - LODRenderingUtils.CalculateLODDistance(transitionHeight, worldSpaceSize);
+                            float transitionHeight =
+                                lodHeight + lodGroupData.fadeTransitionWidth[i] * (prevLODHeight - lodHeight);
+                            float transitionDistance =
+                                lodDist - LODRenderingUtils.CalculateLODDistance(transitionHeight, worldSpaceSize);
                             transitionDistance = Mathf.Max(0.0f, transitionDistance);
                             lodGroupTransformResult.transitionDistances[i] = transitionDistance;
                         }
@@ -70,27 +92,40 @@ namespace UnityEngine.Rendering
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
     internal unsafe struct UpdateLODGroupDataJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<JaggedJobRange> jobRanges;
-        [ReadOnly] public NativeArray<GPUInstanceIndex> lodGroupInstances;
-        [ReadOnly] public LODGroupUpdateBatch updateBatch;
-        [ReadOnly] public bool supportDitheringCrossFade;
+        [ReadOnly]
+        public NativeArray<JaggedJobRange> jobRanges;
+
+        [ReadOnly]
+        public NativeArray<GPUInstanceIndex> lodGroupInstances;
+
+        [ReadOnly]
+        public LODGroupUpdateBatch updateBatch;
+
+        [ReadOnly]
+        public bool supportDitheringCrossFade;
 
         public NativeArray<LODGroupData> lodGroupsData;
         public NativeArray<LODGroupCullingData> lodGroupsCullingData;
 
-        [NativeDisableUnsafePtrRestriction] public UnsafeAtomicCounter32 rendererCount;
+        [NativeDisableUnsafePtrRestriction]
+        public UnsafeAtomicCounter32 rendererCount;
 
         public void Execute(int jobIndex)
         {
             JaggedJobRange jobRange = jobRanges[jobIndex];
 
-            NativeArray<float3> worldReferencePointSection = updateBatch.worldSpaceReferencePoints[jobRange.sectionIndex];
+            NativeArray<float3> worldReferencePointSection = updateBatch.worldSpaceReferencePoints[
+                jobRange.sectionIndex
+            ];
             NativeArray<float> worldSpaceSizeSection = updateBatch.worldSpaceSizes[jobRange.sectionIndex];
-            NativeArray<InternalLODGroupSettings> lodGroupSettingsSection = updateBatch.lodGroupSettings[jobRange.sectionIndex];
+            NativeArray<InternalLODGroupSettings> lodGroupSettingsSection = updateBatch.lodGroupSettings[
+                jobRange.sectionIndex
+            ];
             var hasForceLOD = updateBatch.HasAnyComponent(LODGroupComponentMask.ForceLOD);
-            NativeArray<byte> forceLODMaskSection = hasForceLOD ? updateBatch.forceLODMask[jobRange.sectionIndex] : default;
+            NativeArray<byte> forceLODMaskSection = hasForceLOD
+                ? updateBatch.forceLODMask[jobRange.sectionIndex]
+                : default;
             NativeArray<EmbeddedLODBuffer> lodBufferSection = updateBatch.lodBuffers[jobRange.sectionIndex];
-
 
             for (int indexInRange = 0; indexInRange < jobRange.length; indexInRange++)
             {
@@ -117,7 +152,9 @@ namespace UnityEngine.Rendering
                 }
 
                 ref LODGroupData lodGroupData = ref lodGroupsData.ElementAtRW(lodGroupInstance.index);
-                ref LODGroupCullingData lodGroupCullingData = ref lodGroupsCullingData.ElementAtRW(lodGroupInstance.index);
+                ref LODGroupCullingData lodGroupCullingData = ref lodGroupsCullingData.ElementAtRW(
+                    lodGroupInstance.index
+                );
 
                 lodGroupData.valid = true;
                 lodGroupData.lodCount = lodCount;
@@ -134,7 +171,10 @@ namespace UnityEngine.Rendering
                 if (useSpeedTreeCrossFade)
                 {
                     int lastLODIndex = lodCount - 1;
-                    bool hasBillboardLOD = lodCount > 0 && lodBuffer.GetRendererCount(lastLODIndex) == 1 && lodGroupSettings.lastLODIsBillboard;
+                    bool hasBillboardLOD =
+                        lodCount > 0
+                        && lodBuffer.GetRendererCount(lastLODIndex) == 1
+                        && lodGroupSettings.lastLODIsBillboard;
 
                     if (lodCount == 0)
                         crossFadeLODBegin = 0;
@@ -164,7 +204,8 @@ namespace UnityEngine.Rendering
                         float fadeTransitionWidth = lodBuffer.GetFadeTransitionWidth(i);
                         float prevLODHeight = i != 0 ? lodBuffer.GetScreenRelativeTransitionHeight(i - 1) : 1.0f;
                         float transitionHeight = lodHeight + fadeTransitionWidth * (prevLODHeight - lodHeight);
-                        float transitionDistance = lodDist - LODRenderingUtils.CalculateLODDistance(transitionHeight, worldSpaceSize);
+                        float transitionDistance =
+                            lodDist - LODRenderingUtils.CalculateLODDistance(transitionHeight, worldSpaceSize);
                         transitionDistance = Mathf.Max(0.0f, transitionDistance);
 
                         lodGroupData.fadeTransitionWidth[i] = fadeTransitionWidth;

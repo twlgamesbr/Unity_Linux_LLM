@@ -47,7 +47,8 @@ namespace Unity.Multiplayer.Tools.NetStats
                 new ReadOnlyDictionary<MetricId, IMetric<long>>(m_Counters.ToDictionary(x => x.Id, x => x)),
                 new ReadOnlyDictionary<MetricId, IMetric<double>>(m_Gauges.ToDictionary(x => x.Id, x => x)),
                 new ReadOnlyDictionary<MetricId, IMetric<TimeSpan>>(m_Timers.ToDictionary(x => x.Id, x => x)),
-                new ReadOnlyDictionary<MetricId, IEventMetric>(m_PayloadEvents.ToDictionary(x => x.Id, x => x)));
+                new ReadOnlyDictionary<MetricId, IEventMetric>(m_PayloadEvents.ToDictionary(x => x.Id, x => x))
+            );
         }
     }
 }

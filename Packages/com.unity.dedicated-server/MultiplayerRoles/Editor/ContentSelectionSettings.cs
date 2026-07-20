@@ -5,13 +5,15 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
-
 using InternalManager = UnityEditor.Multiplayer.Internal.EditorMultiplayerManager;
 using InternalMultiplayerRole = UnityEngine.Multiplayer.Internal.MultiplayerRole;
 
 namespace Unity.Multiplayer.Editor
 {
-    [FilePath("ProjectSettings/Packages/com.unity.dedicated-server/ContentSelectionSettings.asset", FilePathAttribute.Location.ProjectFolder)]
+    [FilePath(
+        "ProjectSettings/Packages/com.unity.dedicated-server/ContentSelectionSettings.asset",
+        FilePathAttribute.Location.ProjectFolder
+    )]
     internal class ContentSelectionSettings : SyncedSingleton<ContentSelectionSettings>
     {
         private class SaveAssetsProcessor : AssetModificationProcessor
@@ -77,8 +79,11 @@ namespace Unity.Multiplayer.Editor
                 AutomaticSelection.SetCustomComponents(customList);
         }
 
-        [SerializeField] private bool m_EnableSafetyChecks = true;
-        [SerializeField] private AutomaticSelectionOptions m_AutomaticSelectionOptions;
+        [SerializeField]
+        private bool m_EnableSafetyChecks = true;
+
+        [SerializeField]
+        private AutomaticSelectionOptions m_AutomaticSelectionOptions;
 
         public static bool EnableSafetyChecks
         {
@@ -86,7 +91,8 @@ namespace Unity.Multiplayer.Editor
             set => instance.m_EnableSafetyChecks = value;
         }
 
-        public static ref AutomaticSelectionOptions AutomaticSelection => ref ContentSelectionSettings.instance.m_AutomaticSelectionOptions;
+        public static ref AutomaticSelectionOptions AutomaticSelection =>
+            ref ContentSelectionSettings.instance.m_AutomaticSelectionOptions;
 
         internal void SaveIfDirty()
         {
@@ -115,7 +121,10 @@ namespace Unity.Multiplayer.Editor
 
             foreach (MultiplayerRole role in roleValues)
             {
-                InternalManager.SetStrippingTypesForRole((InternalMultiplayerRole)role, strippingComponentsPerRole[role].ToArray());
+                InternalManager.SetStrippingTypesForRole(
+                    (InternalMultiplayerRole)role,
+                    strippingComponentsPerRole[role].ToArray()
+                );
             }
         }
     }

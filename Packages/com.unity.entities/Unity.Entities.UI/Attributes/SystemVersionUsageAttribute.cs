@@ -1,4 +1,3 @@
-
 namespace Unity.Entities.UI
 {
     /// <summary>
@@ -10,14 +9,16 @@ namespace Unity.Entities.UI
         /// The inspector should only show the major and minor version numbers.
         /// </summary>
         MajorMinor = 0,
+
         /// <summary>
         /// The inspector should only show the major, minor and build version numbers.
         /// </summary>
         MajorMinorBuild = 1,
+
         /// <summary>
         /// The inspector should show the major, minor, build and revision version numbers.
         /// </summary>
-        MajorMinorBuildRevision = 2
+        MajorMinorBuildRevision = 2,
     }
 
     /// <summary>
@@ -40,8 +41,7 @@ namespace Unity.Entities.UI
         /// <summary>
         /// Return <see langword="true"/> if the <see cref="System.Version.Revision"/> property should be displayed.
         /// </summary>
-        public bool IncludeRevision =>
-            Usage == SystemVersionUsage.MajorMinorBuildRevision;
+        public bool IncludeRevision => Usage == SystemVersionUsage.MajorMinorBuildRevision;
 
         /// <summary>
         /// Constructs a new instance of <see cref="SystemVersionUsageAttribute"/> with the provided usage.

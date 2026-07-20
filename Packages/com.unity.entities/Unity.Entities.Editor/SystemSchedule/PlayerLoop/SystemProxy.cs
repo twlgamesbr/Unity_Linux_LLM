@@ -65,7 +65,8 @@ namespace Unity.Entities.Editor
 
         public bool Valid => WorldProxy != null;
 
-        public SystemProxy Parent => ScheduledSystemData.ParentIndex == -1 ? default : WorldProxy.AllSystems[ScheduledSystemData.ParentIndex];
+        public SystemProxy Parent =>
+            ScheduledSystemData.ParentIndex == -1 ? default : WorldProxy.AllSystems[ScheduledSystemData.ParentIndex];
 
         public int ChildCount => ScheduledSystemData.ChildCount;
         public int FirstChildIndexInWorld => ScheduledSystemData.ChildIndex;
@@ -130,7 +131,8 @@ namespace Unity.Entities.Editor
             if (!other.Valid)
                 return false;
 
-            return WorldProxy.SequenceNumber.Equals(other.WorldProxy.SequenceNumber) && SystemIndex == other.SystemIndex;
+            return WorldProxy.SequenceNumber.Equals(other.WorldProxy.SequenceNumber)
+                && SystemIndex == other.SystemIndex;
         }
 
         public override int GetHashCode()
@@ -154,7 +156,14 @@ namespace Unity.Entities.Editor
                     var componentType = ComponentType.FromTypeIndex(jobDependencies[i]);
                     var type = componentType.GetManagedType();
                     var name = TypeUtility.GetTypeDisplayName(type);
-                    dependencies.Add(new ComponentViewData(type, name, ComponentType.AccessMode.ReadOnly, ComponentsUtility.GetComponentKind(componentType)));
+                    dependencies.Add(
+                        new ComponentViewData(
+                            type,
+                            name,
+                            ComponentType.AccessMode.ReadOnly,
+                            ComponentsUtility.GetComponentKind(componentType)
+                        )
+                    );
                 }
             }
         }
@@ -173,7 +182,14 @@ namespace Unity.Entities.Editor
                     var componentType = ComponentType.FromTypeIndex(jobDependencies[i]);
                     var type = componentType.GetManagedType();
                     var name = TypeUtility.GetTypeDisplayName(type);
-                    dependencies.Add(new ComponentViewData(type, name, ComponentType.AccessMode.ReadWrite, ComponentsUtility.GetComponentKind(componentType)));
+                    dependencies.Add(
+                        new ComponentViewData(
+                            type,
+                            name,
+                            ComponentType.AccessMode.ReadWrite,
+                            ComponentsUtility.GetComponentKind(componentType)
+                        )
+                    );
                 }
             }
         }
@@ -225,7 +241,10 @@ namespace Unity.Entities.Editor
             }
         }
 
-        internal static void BuildSystemDependencyMap(SystemProxy systemProxy, Dictionary<string, string[]> dependencyMap)
+        internal static void BuildSystemDependencyMap(
+            SystemProxy systemProxy,
+            Dictionary<string, string[]> dependencyMap
+        )
         {
             var keyString = systemProxy.TypeName;
 
@@ -252,4 +271,3 @@ namespace Unity.Entities.Editor
         }
     }
 }
-

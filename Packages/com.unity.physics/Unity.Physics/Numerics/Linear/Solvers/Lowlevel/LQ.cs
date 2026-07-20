@@ -89,7 +89,9 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         public static void QROrthogonalProduct(in Matrix C, Side side, Op op, Matrix A, Vector tau)
         {
             // TODO:  FIXME
-            int start, end, step;
+            int start,
+                end,
+                step;
             if (side == Side.Left && op == Op.None)
             {
                 start = 0;
@@ -103,8 +105,10 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                 step = -1;
             }
 
-            int rowIdx = 0, colIdx = 0;
-            int rows, cols;
+            int rowIdx = 0,
+                colIdx = 0;
+            int rows,
+                cols;
             if (side == Side.Left)
             {
                 cols = C.NumCols;
@@ -210,8 +214,13 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         public struct Job : IJob
         {
             public MemoryManager heap;
-            [ReadOnly] public Matrix M;
-            [WriteOnly] public Vector tau;
+
+            [ReadOnly]
+            public Matrix M;
+
+            [WriteOnly]
+            public Vector tau;
+
             public void Execute()
             {
                 var dim = math.min(M.NumRows, M.NumCols);

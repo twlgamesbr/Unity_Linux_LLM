@@ -1,11 +1,11 @@
 using System;
-using UnityEditor;
-using UnityEngine;
-using System.Reflection;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using System.Collections.Generic;
+using System.Reflection;
 using EditorAttributes.Editor.Utility;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -17,48 +17,75 @@ namespace EditorAttributes.Editor
             var valueButtonsAttribute = attribute as ValueButtonsAttribute;
 
             HelpBox errorBox = new();
-            MemberInfo collectionInfo = ReflectionUtils.GetValidMemberInfo(valueButtonsAttribute.CollectionName, property);
+            MemberInfo collectionInfo = ReflectionUtils.GetValidMemberInfo(
+                valueButtonsAttribute.CollectionName,
+                property
+            );
 
-            List<string> propertyValues = ConvertCollectionValuesToStrings(valueButtonsAttribute.CollectionName, property, collectionInfo, errorBox);
-            List<string> displayValues = GetDisplayValues(collectionInfo, valueButtonsAttribute, property, propertyValues);
+            List<string> propertyValues = ConvertCollectionValuesToStrings(
+                valueButtonsAttribute.CollectionName,
+                property,
+                collectionInfo,
+                errorBox
+            );
+            List<string> displayValues = GetDisplayValues(
+                collectionInfo,
+                valueButtonsAttribute,
+                property,
+                propertyValues
+            );
 
             if (!IsCollectionValid(displayValues))
                 return new HelpBox("The provided collection is empty", HelpBoxMessageType.Error);
 
             int buttonsValueIndex = propertyValues.IndexOf(GetPropertyValueAsString(property));
 
-            ToggleButtonGroup valueButtons = DrawButtons(buttonsValueIndex, displayValues, valueButtonsAttribute, (value) =>
-            {
-                if (valueButtonsAttribute.DisplayNames != null || IsCollectionDictionary(collectionInfo, property, out _))
+            ToggleButtonGroup valueButtons = DrawButtons(
+                buttonsValueIndex,
+                displayValues,
+                valueButtonsAttribute,
+                (value) =>
                 {
-                    if (value >= 0 && value < propertyValues.Count)
-                        SetPropertyValueFromString(propertyValues[value], property);
+                    if (
+                        valueButtonsAttribute.DisplayNames != null
+                        || IsCollectionDictionary(collectionInfo, property, out _)
+                    )
+                    {
+                        if (value >= 0 && value < propertyValues.Count)
+                            SetPropertyValueFromString(propertyValues[value], property);
+                    }
+                    else
+                    {
+                        if (value >= 0 && value < propertyValues.Count)
+                            SetPropertyValueFromString(propertyValues[value], property);
+                    }
                 }
-                else
+            );
+
+            valueButtons.TrackPropertyValue(
+                property,
+                (trackedProperty) =>
                 {
-                    if (value >= 0 && value < propertyValues.Count)
-                        SetPropertyValueFromString(propertyValues[value], property);
+                    string propertyStringValue = GetPropertyValueAsString(trackedProperty);
+
+                    if (propertyValues.Contains(propertyStringValue))
+                    {
+                        int propertyValueIndex = propertyValues.IndexOf(propertyStringValue);
+                        bool[] selectionValues = new bool[propertyValues.Count];
+
+                        selectionValues[propertyValueIndex] = true;
+
+                        valueButtons.SetValueWithoutNotify(ToggleButtonGroupState.CreateFromOptions(selectionValues));
+                    }
+                    else
+                    {
+                        Debug.LogWarning(
+                            $"The value <b>{propertyStringValue}</b> set to the <b>{trackedProperty.name}</b> variable is not a value available in the button selection",
+                            trackedProperty.serializedObject.targetObject
+                        );
+                    }
                 }
-            });
-
-            valueButtons.TrackPropertyValue(property, (trackedProperty) =>
-            {
-                string propertyStringValue = GetPropertyValueAsString(trackedProperty);
-
-                if (propertyValues.Contains(propertyStringValue))
-                {
-                    int propertyValueIndex = propertyValues.IndexOf(propertyStringValue);
-                    bool[] selectionValues = new bool[propertyValues.Count];
-
-                    selectionValues[propertyValueIndex] = true;
-
-                    valueButtons.SetValueWithoutNotify(ToggleButtonGroupState.CreateFromOptions(selectionValues));
-                }
-                else
-                {
-                    Debug.LogWarning($"The value <b>{propertyStringValue}</b> set to the <b>{trackedProperty.name}</b> variable is not a value available in the button selection", trackedProperty.serializedObject.targetObject);
-                }
-            });
+            );
 
             AddPropertyContextMenu(valueButtons, property);
             DisplayErrorBox(valueButtons, errorBox);
@@ -66,18 +93,19 @@ namespace EditorAttributes.Editor
             return valueButtons;
         }
 
-        private ToggleButtonGroup DrawButtons(int buttonsValue, List<string> valueLabels, ValueButtonsAttribute selectionButtonsAttribute, Action<int> onValueChanged)
+        private ToggleButtonGroup DrawButtons(
+            int buttonsValue,
+            List<string> valueLabels,
+            ValueButtonsAttribute selectionButtonsAttribute,
+            Action<int> onValueChanged
+        )
         {
             List<bool> activeButtonList = new();
             ToggleButtonGroup buttonGroup = new(selectionButtonsAttribute.ShowLabel ? preferredLabel : string.Empty);
 
             foreach (string label in valueLabels)
             {
-                Button toggle = new()
-                {
-                    text = label,
-                    style = { height = selectionButtonsAttribute.ButtonsHeight }
-                };
+                Button toggle = new() { text = label, style = { height = selectionButtonsAttribute.ButtonsHeight } };
 
                 activeButtonList.Add(false);
                 buttonGroup.Add(toggle);
@@ -86,7 +114,10 @@ namespace EditorAttributes.Editor
             activeButtonList[buttonsValue == -1 ? 0 : buttonsValue] = true;
 
             buttonGroup.SetValueWithoutNotify(ToggleButtonGroupState.CreateFromOptions(activeButtonList));
-            buttonGroup.RegisterValueChangedCallback((value) => onValueChanged.Invoke(value.newValue.GetActiveOptions(ConvertBoolsToSpan(activeButtonList))[0]));
+            buttonGroup.RegisterValueChangedCallback(
+                (value) =>
+                    onValueChanged.Invoke(value.newValue.GetActiveOptions(ConvertBoolsToSpan(activeButtonList))[0])
+            );
 
             return buttonGroup;
         }

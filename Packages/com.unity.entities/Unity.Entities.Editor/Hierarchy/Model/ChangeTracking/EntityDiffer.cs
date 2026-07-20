@@ -55,7 +55,8 @@ namespace Unity.Entities.Editor
             public ChunkShadow(Allocator allocator)
             {
                 m_Allocator = allocator;
-                Ptr = (Data*) Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
+                Ptr = (Data*)
+                    Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<Data>(), UnsafeUtility.AlignOf<Data>(), m_Allocator);
                 UnsafeUtility.MemClear(Ptr, UnsafeUtility.SizeOf<Data>());
             }
 
@@ -124,7 +125,11 @@ namespace Unity.Entities.Editor
             m_RemovedEntities.Dispose();
         }
 
-        public unsafe JobHandle GetEntityQueryMatchDiffAsync(EntityQuery query, NativeList<Entity> newEntities, NativeList<Entity> missingEntities)
+        public unsafe JobHandle GetEntityQueryMatchDiffAsync(
+            EntityQuery query,
+            NativeList<Entity> newEntities,
+            NativeList<Entity> missingEntities
+        )
         {
             newEntities.Clear();
             missingEntities.Clear();
@@ -150,20 +155,23 @@ namespace Unity.Entities.Editor
             }.Schedule(chunksJobHandle);
 
             m_ChunkSequenceNumbers.Capacity = math.max(m_ChunkSequenceNumbers.Capacity, maxChunkCount);
-            m_ChunkShadowBySequenceNumber.Capacity = math.max(m_ChunkShadowBySequenceNumber.Capacity, maxChunkCount * 2);
+            m_ChunkShadowBySequenceNumber.Capacity = math.max(
+                m_ChunkShadowBySequenceNumber.Capacity,
+                maxChunkCount * 2
+            );
             m_RemovedChunks.Capacity = math.max(m_RemovedChunks.Capacity, m_ChunkShadowBySequenceNumberKeys.Length);
 
             var gatherEntityChangesJobHandle = new GatherEntityChangesJob
             {
                 Chunks = chunks,
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
-                ChangesByChunk = m_ChangesByChunk.GetUnsafeList()->Ptr
+                ChangesByChunk = m_ChangesByChunk.GetUnsafeList()->Ptr,
             }.Schedule(chunks, 1, resizeAndClearJobHandle);
 
             var gatherExistingChunksJobHandle = new GatherExistingChunksJob
             {
                 Chunks = chunks,
-                ChunkSequenceNumbers = m_ChunkSequenceNumbers.AsParallelWriter()
+                ChunkSequenceNumbers = m_ChunkSequenceNumbers.AsParallelWriter(),
             }.Schedule(chunks, 1, chunksJobHandle);
 
             var gatherRemovedChunksJobHandle = new GatherRemovedChunks
@@ -171,20 +179,20 @@ namespace Unity.Entities.Editor
                 ChunkShadowBySequenceNumberKeys = m_ChunkShadowBySequenceNumberKeys,
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
                 ChunkSequenceNumbers = m_ChunkSequenceNumbers,
-                RemovedChunks = m_RemovedChunks.AsParallelWriter()
+                RemovedChunks = m_RemovedChunks.AsParallelWriter(),
             }.Schedule(m_ChunkShadowBySequenceNumberKeys, 1, gatherExistingChunksJobHandle);
 
             var gatherRemovedEntitiesJobHandle = new GatherRemovedEntitiesJob
             {
                 RemovedChunks = m_RemovedChunks.AsDeferredJobArray(),
-                RemovedEntities = m_RemovedEntities
+                RemovedEntities = m_RemovedEntities,
             }.Schedule(gatherRemovedChunksJobHandle);
 
             var allocateNewShadowChunksJobHandle = new AllocateChunkShadowsJob
             {
                 Chunks = chunks,
                 ShadowChunksBySequenceNumber = m_ChunkShadowBySequenceNumber,
-                AllocatedShadowChunks = m_AllocatedChunkShadowByChunk.GetUnsafeList()->Ptr
+                AllocatedShadowChunks = m_AllocatedChunkShadowByChunk.GetUnsafeList()->Ptr,
             }.Schedule(chunks, 1, resizeAndClearJobHandle);
 
             var buildChangeSetJobHandle = new BuildChangeSetJob
@@ -192,8 +200,14 @@ namespace Unity.Entities.Editor
                 ChangesByChunk = m_ChangesByChunk.AsDeferredJobArray(),
                 RemovedChunkEntities = m_RemovedEntities,
                 AddedEntities = newEntities,
-                RemovedEntities = missingEntities
-            }.Schedule(JobHandle.CombineDependencies(gatherEntityChangesJobHandle, gatherRemovedEntitiesJobHandle, allocateNewShadowChunksJobHandle));
+                RemovedEntities = missingEntities,
+            }.Schedule(
+                JobHandle.CombineDependencies(
+                    gatherEntityChangesJobHandle,
+                    gatherRemovedEntitiesJobHandle,
+                    allocateNewShadowChunksJobHandle
+                )
+            );
 
             var updateShadowChunksJobHandle = new UpdateShadowChunksJob
             {
@@ -201,8 +215,16 @@ namespace Unity.Entities.Editor
                 Chunks = chunks,
                 ChangesByChunk = m_ChangesByChunk.AsDeferredJobArray(),
                 AllocatedChunkShadowsByChunk = m_AllocatedChunkShadowByChunk.AsDeferredJobArray(),
-                ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber.AsParallelWriter()
-            }.Schedule(chunks, 1, JobHandle.CombineDependencies(gatherEntityChangesJobHandle, gatherRemovedEntitiesJobHandle, allocateNewShadowChunksJobHandle));
+                ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber.AsParallelWriter(),
+            }.Schedule(
+                chunks,
+                1,
+                JobHandle.CombineDependencies(
+                    gatherEntityChangesJobHandle,
+                    gatherRemovedEntitiesJobHandle,
+                    allocateNewShadowChunksJobHandle
+                )
+            );
 
             var removeShadowChunksJobHande = new RemoveChunkShadowsJob
             {
@@ -210,25 +232,33 @@ namespace Unity.Entities.Editor
                 RemovedChunks = m_RemovedChunks.AsDeferredJobArray(),
                 ChunkShadowBySequenceNumber = m_ChunkShadowBySequenceNumber,
                 ChunkShadowBySequenceNumberKeys = m_ChunkShadowBySequenceNumberKeys,
-                ChunkShadowBySequenceNumberKeysFreeList = m_ChunkShadowBySequenceNumberKeysFreeList
+                ChunkShadowBySequenceNumberKeysFreeList = m_ChunkShadowBySequenceNumberKeysFreeList,
             }.Schedule(updateShadowChunksJobHandle);
 
-            var disposeChunksJobHandle = chunks.Dispose(JobHandle.CombineDependencies(buildChangeSetJobHandle, removeShadowChunksJobHande));
+            var disposeChunksJobHandle = chunks.Dispose(
+                JobHandle.CombineDependencies(buildChangeSetJobHandle, removeShadowChunksJobHande)
+            );
 
             var disposeGatheredChangesJobHandle = new DisposeGatheredChangesJob
             {
-                GatheredChanges = m_ChangesByChunk
+                GatheredChanges = m_ChangesByChunk,
             }.Schedule(m_ChangesByChunk, 1, buildChangeSetJobHandle);
 
-            return JobHandle.CombineDependencies(gatherRemovedChunksJobHandle, disposeChunksJobHandle, disposeGatheredChangesJobHandle);
+            return JobHandle.CombineDependencies(
+                gatherRemovedChunksJobHandle,
+                disposeChunksJobHandle,
+                disposeGatheredChangesJobHandle
+            );
         }
 
         [BurstCompile]
         unsafe struct ResizeAndClearChunkListsJob : IJob
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
             public NativeList<ChunkShadow> AllocatedChunkShadowByChunk;
             public NativeList<ChunkChanges> GatheredChanges;
+
             public void Execute()
             {
                 AllocatedChunkShadowByChunk.Resize(Chunks.Length, NativeArrayOptions.UninitializedMemory);
@@ -241,9 +271,14 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct GatherEntityChangesJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
-            [NativeDisableUnsafePtrRestriction] public ChunkChanges* ChangesByChunk;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
+
+            [NativeDisableUnsafePtrRestriction]
+            public ChunkChanges* ChangesByChunk;
 
             public void Execute(int index)
             {
@@ -307,8 +342,11 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct GatherExistingChunksJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [WriteOnly] public NativeParallelHashSet<ulong>.ParallelWriter ChunkSequenceNumbers;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [WriteOnly]
+            public NativeParallelHashSet<ulong>.ParallelWriter ChunkSequenceNumbers;
 
             public void Execute(int index)
             {
@@ -319,10 +357,17 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         struct GatherRemovedChunks : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
-            [ReadOnly] public NativeParallelHashSet<ulong> ChunkSequenceNumbers;
-            [WriteOnly] public NativeList<ChunkShadow>.ParallelWriter RemovedChunks;
+            [ReadOnly]
+            public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
+
+            [ReadOnly]
+            public NativeParallelHashSet<ulong> ChunkSequenceNumbers;
+
+            [WriteOnly]
+            public NativeList<ChunkShadow>.ParallelWriter RemovedChunks;
 
             public void Execute(int index)
             {
@@ -337,8 +382,11 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct GatherRemovedEntitiesJob : IJob
         {
-            [ReadOnly] public NativeArray<ChunkShadow> RemovedChunks;
-            [WriteOnly] public NativeList<Entity> RemovedEntities;
+            [ReadOnly]
+            public NativeArray<ChunkShadow> RemovedChunks;
+
+            [WriteOnly]
+            public NativeList<Entity> RemovedEntities;
 
             public void Execute()
             {
@@ -350,9 +398,14 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct AllocateChunkShadowsJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeParallelHashMap<ulong, ChunkShadow> ShadowChunksBySequenceNumber;
-            [NativeDisableUnsafePtrRestriction] public ChunkShadow* AllocatedShadowChunks;
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow> ShadowChunksBySequenceNumber;
+
+            [NativeDisableUnsafePtrRestriction]
+            public ChunkShadow* AllocatedShadowChunks;
 
             public void Execute(int index)
             {
@@ -369,7 +422,8 @@ namespace Unity.Entities.Editor
                 shadow = new ChunkShadow(Allocator.Persistent);
                 shadow.Ptr->Count = chunkCount;
                 shadow.Ptr->Version = archetype->Chunks.GetChangeVersion(0, chunk.ListIndex);
-                shadow.Ptr->Entities = (Entity*)Memory.Unmanaged.Allocate(sizeof(Entity) * archetype->ChunkCapacity, 4, Allocator.Persistent);
+                shadow.Ptr->Entities = (Entity*)
+                    Memory.Unmanaged.Allocate(sizeof(Entity) * archetype->ChunkCapacity, 4, Allocator.Persistent);
                 shadow.Ptr->SequenceNumber = sequenceNumber;
 
                 UnsafeUtility.MemCpy(shadow.Ptr->Entities, entities, chunkCount * sizeof(Entity));
@@ -381,8 +435,11 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct BuildChangeSetJob : IJob
         {
-            [ReadOnly] public NativeArray<ChunkChanges> ChangesByChunk;
-            [ReadOnly] public NativeList<Entity> RemovedChunkEntities;
+            [ReadOnly]
+            public NativeArray<ChunkChanges> ChangesByChunk;
+
+            [ReadOnly]
+            public NativeList<Entity> RemovedChunkEntities;
 
             public NativeList<Entity> AddedEntities;
             public NativeList<Entity> RemovedEntities;
@@ -414,27 +471,46 @@ namespace Unity.Entities.Editor
 
                     if (changesForChunk.AddedEntities.IsCreated)
                     {
-                        AddedEntities.AddRangeNoResize(changesForChunk.AddedEntities.Ptr, changesForChunk.AddedEntities.Length);
+                        AddedEntities.AddRangeNoResize(
+                            changesForChunk.AddedEntities.Ptr,
+                            changesForChunk.AddedEntities.Length
+                        );
                     }
 
                     if (changesForChunk.RemovedEntities.IsCreated)
                     {
-                        RemovedEntities.AddRangeNoResize(changesForChunk.RemovedEntities.Ptr, changesForChunk.RemovedEntities.Length);
+                        RemovedEntities.AddRangeNoResize(
+                            changesForChunk.RemovedEntities.Ptr,
+                            changesForChunk.RemovedEntities.Length
+                        );
                     }
                 }
 
-                RemovedEntities.AddRangeNoResize(RemovedChunkEntities.GetUnsafeReadOnlyPtr(), RemovedChunkEntities.Length);
+                RemovedEntities.AddRangeNoResize(
+                    RemovedChunkEntities.GetUnsafeReadOnlyPtr(),
+                    RemovedChunkEntities.Length
+                );
             }
         }
 
         [BurstCompile]
         unsafe struct UpdateShadowChunksJob : IJobParallelForDefer
         {
-            [NativeDisableUnsafePtrRestriction][ReadOnly] public EntityComponentStore* EntityComponentStore;
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks; // not used, but required to be here for IJobParallelForDefer
-            [ReadOnly] public NativeArray<ChunkChanges> ChangesByChunk;
-            [ReadOnly] public NativeArray<ChunkShadow> AllocatedChunkShadowsByChunk;
-            [WriteOnly] public NativeParallelHashMap<ulong, ChunkShadow>.ParallelWriter ChunkShadowBySequenceNumber;
+            [NativeDisableUnsafePtrRestriction]
+            [ReadOnly]
+            public EntityComponentStore* EntityComponentStore;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks; // not used, but required to be here for IJobParallelForDefer
+
+            [ReadOnly]
+            public NativeArray<ChunkChanges> ChangesByChunk;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> AllocatedChunkShadowsByChunk;
+
+            [WriteOnly]
+            public NativeParallelHashMap<ulong, ChunkShadow>.ParallelWriter ChunkShadowBySequenceNumber;
 
             public void Execute(int index)
             {
@@ -466,15 +542,18 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct RemoveChunkShadowsJob : IJob
         {
-            [ReadOnly] public NativeArray<ChunkShadow> AllocatedChunkShadowByChunk;
-            [ReadOnly] public NativeArray<ChunkShadow> RemovedChunks;
+            [ReadOnly]
+            public NativeArray<ChunkShadow> AllocatedChunkShadowByChunk;
+
+            [ReadOnly]
+            public NativeArray<ChunkShadow> RemovedChunks;
             public NativeParallelHashMap<ulong, ChunkShadow> ChunkShadowBySequenceNumber;
             public NativeList<ulong> ChunkShadowBySequenceNumberKeys;
             public NativeList<int> ChunkShadowBySequenceNumberKeysFreeList;
 
             public void Execute()
             {
-                for (var i=0; i<AllocatedChunkShadowByChunk.Length; i++)
+                for (var i = 0; i < AllocatedChunkShadowByChunk.Length; i++)
                 {
                     var shadow = AllocatedChunkShadowByChunk[i];
 
@@ -507,7 +586,8 @@ namespace Unity.Entities.Editor
         [BurstCompile]
         unsafe struct DisposeGatheredChangesJob : IJobParallelForDefer
         {
-            [ReadOnly] public NativeList<ChunkChanges> GatheredChanges;
+            [ReadOnly]
+            public NativeList<ChunkChanges> GatheredChanges;
 
             public void Execute(int index)
             {

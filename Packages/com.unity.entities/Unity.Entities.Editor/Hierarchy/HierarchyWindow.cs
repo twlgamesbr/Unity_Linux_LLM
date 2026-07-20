@@ -12,16 +12,24 @@ namespace Unity.Entities.Editor
 {
     partial class HierarchyWindow : DOTSEditorWindow
     {
-        static readonly ProfilerMarker k_OnUpdateMarker = new ProfilerMarker($"{nameof(HierarchyWindow)}.{nameof(OnUpdate)}");
+        static readonly ProfilerMarker k_OnUpdateMarker = new ProfilerMarker(
+            $"{nameof(HierarchyWindow)}.{nameof(OnUpdate)}"
+        );
 
         static readonly string k_FilterComponentType = L10n.Tr("All Components");
-        static readonly string k_FilterComponentTypeTooltip = L10n.Tr("Filter entities that have all the specified component types");
+        static readonly string k_FilterComponentTypeTooltip = L10n.Tr(
+            "Filter entities that have all the specified component types"
+        );
 
         static readonly string k_FilterAnyComponentType = L10n.Tr("Any Component");
-        static readonly string k_FilterAnyComponentTypeTooltip = L10n.Tr("Filter entities that have any of the specified component types");
+        static readonly string k_FilterAnyComponentTypeTooltip = L10n.Tr(
+            "Filter entities that have any of the specified component types"
+        );
 
         static readonly string k_FilterNoneComponentType = L10n.Tr("No Component");
-        static readonly string k_FilterNoneComponentTypeTooltip = L10n.Tr("Filter entities that have none of the specified component types");
+        static readonly string k_FilterNoneComponentTypeTooltip = L10n.Tr(
+            "Filter entities that have none of the specified component types"
+        );
 
         static readonly string k_FilterIndexToken = L10n.Tr("Entity Index");
         static readonly string k_FilterIndexTokenTooltip = L10n.Tr("Filter entities that have the specified index");
@@ -30,29 +38,34 @@ namespace Unity.Entities.Editor
         static readonly string k_FilterKindTokenTooltip = L10n.Tr("Filter entities that have the specified Node type.");
 
         static readonly string k_FilterSharedComponentType = L10n.Tr("Shared Component");
-        static readonly string k_FilterSharedComponentTypeTooltip = L10n.Tr("Filter entities that have a specific SharedComponent");
+        static readonly string k_FilterSharedComponentTypeTooltip = L10n.Tr(
+            "Filter entities that have a specific SharedComponent"
+        );
 
         static readonly string k_WindowName = L10n.Tr("Entities Hierarchy");
         static readonly Vector2 k_MinWindowSize = Constants.MinWindowSize;
 
-        static readonly EntityQueryOptions[] k_EntityQueryOptions = new[] {
+        static readonly EntityQueryOptions[] k_EntityQueryOptions = new[]
+        {
             EntityQueryOptions.FilterWriteGroup,
             EntityQueryOptions.IgnoreComponentEnabledState,
             EntityQueryOptions.IncludeDisabledEntities,
             EntityQueryOptions.IncludePrefab,
-            EntityQueryOptions.IncludeSystems
+            EntityQueryOptions.IncludeSystems,
         };
 
-        static readonly NodeKind[] k_NodeKinds = new[] {
+        static readonly NodeKind[] k_NodeKinds = new[]
+        {
             NodeKind.Entity,
             NodeKind.GameObject,
             NodeKind.Scene,
-            NodeKind.SubScene
+            NodeKind.SubScene,
         };
 
         static readonly HierarchyDecoratorCollection s_Decorators = new HierarchyDecoratorCollection();
 
         internal static void AddDecorator(IHierarchyItemDecorator decorator) => s_Decorators.Add(decorator);
+
         internal static void RemoveDecorator(IHierarchyItemDecorator decorator) => s_Decorators.Remove(decorator);
 
         readonly Cooldown m_BackgroundUpdateCooldown = new Cooldown(TimeSpan.FromMilliseconds(250));
@@ -85,8 +98,8 @@ namespace Unity.Entities.Editor
             win.SetSearchQuery(query);
         }
 
-        public HierarchyWindow() : base(Analytics.Window.Hierarchy)
-        { }
+        public HierarchyWindow()
+            : base(Analytics.Window.Hierarchy) { }
 
         public void SetSearchQuery(string searchQuery)
         {
@@ -108,7 +121,7 @@ namespace Unity.Entities.Editor
             m_Hierarchy = new Hierarchy(Allocator.Persistent, dataModeController.dataMode)
             {
                 Configuration = m_HierarchySettings.Configuration,
-                State = SessionState<HierarchyState>.GetOrCreate($"{GetType().Name}.{nameof(HierarchyState)}")
+                State = SessionState<HierarchyState>.GetOrCreate($"{GetType().Name}.{nameof(HierarchyState)}"),
             };
 
             m_HierarchySettings.UseAdvanceSearchSettingChanged += OnUseAdvanceSearchSettingChanged;
@@ -195,7 +208,10 @@ namespace Unity.Entities.Editor
             leftSide.Add(CreateWorldSelector());
 
             AddSearchIcon(rightSide, UssClasses.DotsEditorCommon.SearchIcon);
-            m_SearchElement = AddSearchElement<HierarchyNodeHandle>(toolbar, UssClasses.DotsEditorCommon.SearchFieldContainer);
+            m_SearchElement = AddSearchElement<HierarchyNodeHandle>(
+                toolbar,
+                UssClasses.DotsEditorCommon.SearchFieldContainer
+            );
             m_SearchElement.RegisterSearchQueryHandler<HierarchyNodeHandle>(query =>
             {
                 if (hierarchy.Configuration.AdvancedSearch)
@@ -212,7 +228,11 @@ namespace Unity.Entities.Editor
                     {
                         Debug.LogError(desc.parsingErrors);
                     }
-                    var filter = HierarchySearchProvider.CreateHierarchyFilter(hierarchy.HierarchySearch, desc, hierarchy.Allocator);
+                    var filter = HierarchySearchProvider.CreateHierarchyFilter(
+                        hierarchy.HierarchySearch,
+                        desc,
+                        hierarchy.Allocator
+                    );
                     hierarchy.SetFilter(filter);
                 }
                 else
@@ -222,10 +242,12 @@ namespace Unity.Entities.Editor
             });
 
             SetupSearchOptions();
-            m_SearchElement.parent.Add(SearchUtils.CreateJumpButton(() =>
-            {
-                HierarchySearchProvider.OpenProvider(m_SearchElement.value, SelectedWorld);
-            }));
+            m_SearchElement.parent.Add(
+                SearchUtils.CreateJumpButton(() =>
+                {
+                    HierarchySearchProvider.OpenProvider(m_SearchElement.value, SelectedWorld);
+                })
+            );
 
             root.Add(toolbar);
 
@@ -240,31 +262,81 @@ namespace Unity.Entities.Editor
                 // Advanced supported Filters:
                 // all, none, any, EntityQueryOptions
                 // kind, ei
-                m_SearchElement.AddSearchFilterPopupItem(Constants.ComponentSearch.All, k_FilterComponentType, k_FilterComponentTypeTooltip, Constants.ComponentSearch.Op);
-                m_SearchElement.AddSearchFilterPopupItem(Constants.ComponentSearch.None, k_FilterNoneComponentType, k_FilterNoneComponentType, Constants.ComponentSearch.Op);
-                m_SearchElement.AddSearchFilterPopupItem(Constants.ComponentSearch.Any, k_FilterAnyComponentType, k_FilterAnyComponentType, Constants.ComponentSearch.Op);
-                m_SearchElement.AddSearchFilterPopupItem(Constants.ComponentSearch.SharedComponentPrefix, k_FilterSharedComponentType, k_FilterSharedComponentTypeTooltip, "");
-                m_SearchElement.AddSearchFilterPopupItem(Constants.Hierarchy.EntityIndexToken, k_FilterIndexToken, k_FilterIndexTokenTooltip, "=");
+                m_SearchElement.AddSearchFilterPopupItem(
+                    Constants.ComponentSearch.All,
+                    k_FilterComponentType,
+                    k_FilterComponentTypeTooltip,
+                    Constants.ComponentSearch.Op
+                );
+                m_SearchElement.AddSearchFilterPopupItem(
+                    Constants.ComponentSearch.None,
+                    k_FilterNoneComponentType,
+                    k_FilterNoneComponentType,
+                    Constants.ComponentSearch.Op
+                );
+                m_SearchElement.AddSearchFilterPopupItem(
+                    Constants.ComponentSearch.Any,
+                    k_FilterAnyComponentType,
+                    k_FilterAnyComponentType,
+                    Constants.ComponentSearch.Op
+                );
+                m_SearchElement.AddSearchFilterPopupItem(
+                    Constants.ComponentSearch.SharedComponentPrefix,
+                    k_FilterSharedComponentType,
+                    k_FilterSharedComponentTypeTooltip,
+                    ""
+                );
+                m_SearchElement.AddSearchFilterPopupItem(
+                    Constants.Hierarchy.EntityIndexToken,
+                    k_FilterIndexToken,
+                    k_FilterIndexTokenTooltip,
+                    "="
+                );
 
                 foreach (var opt in k_EntityQueryOptions)
                 {
-                    m_SearchElement.AddSearchFilterPopupItem($"+{opt}", "Option", k_FilterIndexTokenTooltip, " ", isCompleteFilter: true);
+                    m_SearchElement.AddSearchFilterPopupItem(
+                        $"+{opt}",
+                        "Option",
+                        k_FilterIndexTokenTooltip,
+                        " ",
+                        isCompleteFilter: true
+                    );
                 }
 
                 foreach (var k in k_NodeKinds)
                 {
-                    m_SearchElement.AddSearchFilterPopupItem($"{Constants.Hierarchy.KindToken}={k}", k_FilterKindToken, k_FilterKindTokenTooltip, " ", isCompleteFilter: true);
+                    m_SearchElement.AddSearchFilterPopupItem(
+                        $"{Constants.Hierarchy.KindToken}={k}",
+                        k_FilterKindToken,
+                        k_FilterKindTokenTooltip,
+                        " ",
+                        isCompleteFilter: true
+                    );
                 }
 
                 m_SearchAutocomplete?.Dispose();
                 m_SharedComponentAutocomplete?.Dispose();
                 m_SearchAutocomplete = new AutoComplete(m_SearchElement, ComponentTypeAutoComplete.EntityQueryInstance);
-                m_SharedComponentAutocomplete = new AutoComplete(m_SearchElement, SharedComponentTypeAutoComplete.Instance);
+                m_SharedComponentAutocomplete = new AutoComplete(
+                    m_SearchElement,
+                    SharedComponentTypeAutoComplete.Instance
+                );
             }
             else
             {
-                m_SearchElement.AddSearchFilterPopupItem(Constants.ComponentSearch.Token, k_FilterComponentType, k_FilterComponentTypeTooltip, Constants.ComponentSearch.Op);
-                m_SearchElement.AddSearchFilterPopupItem(Constants.Hierarchy.EntityIndexToken, k_FilterIndexToken, k_FilterIndexTokenTooltip, "=");
+                m_SearchElement.AddSearchFilterPopupItem(
+                    Constants.ComponentSearch.Token,
+                    k_FilterComponentType,
+                    k_FilterComponentTypeTooltip,
+                    Constants.ComponentSearch.Op
+                );
+                m_SearchElement.AddSearchFilterPopupItem(
+                    Constants.Hierarchy.EntityIndexToken,
+                    k_FilterIndexToken,
+                    k_FilterIndexTokenTooltip,
+                    "="
+                );
                 m_SearchAutocomplete?.Dispose();
                 m_SharedComponentAutocomplete?.Dispose();
                 m_SharedComponentAutocomplete = null;
@@ -320,7 +392,12 @@ namespace Unity.Entities.Editor
             }
             else if (obj is GameObject gameObject)
             {
-                if (m_Hierarchy.World != null && gameObject.TryGetComponent<SubScene>(out var subScene) && subScene.SceneGUID != default && m_Hierarchy.SubSceneMap.TryGetSubSceneNodeHandle(subScene, out var handle))
+                if (
+                    m_Hierarchy.World != null
+                    && gameObject.TryGetComponent<SubScene>(out var subScene)
+                    && subScene.SceneGUID != default
+                    && m_Hierarchy.SubSceneMap.TryGetSubSceneNodeHandle(subScene, out var handle)
+                )
                     m_HierarchyElement.SetSelection(handle);
                 else
                     m_HierarchyElement.SetSelection(HierarchyNodeHandle.FromGameObject(gameObject));
@@ -360,7 +437,9 @@ namespace Unity.Entities.Editor
                             var context = EntitySelectionProxy.CreateInstance(world, entity);
                             // Selected entities should always try to show up in Runtime mode
                             SelectionBridge.SetSelection(authoringObject, context, DataMode.Runtime);
-                            Undo.SetCurrentGroupName($"Select {authoringObject.name} ({authoringObject.GetType().Name})");
+                            Undo.SetCurrentGroupName(
+                                $"Select {authoringObject.name} ({authoringObject.GetType().Name})"
+                            );
                         }
                     }
 
@@ -370,7 +449,11 @@ namespace Unity.Entities.Editor
                 case NodeKind.SubScene:
                 {
                     var subScene = hierarchy.SubSceneMap.GetSubSceneMonobehaviourFromHandle(handle);
-                    SelectionBridge.SetSelection(subScene ? subScene.gameObject : null, HierarchySelectionContext.CreateInstance(handle), DataMode.Disabled);
+                    SelectionBridge.SetSelection(
+                        subScene ? subScene.gameObject : null,
+                        HierarchySelectionContext.CreateInstance(handle),
+                        DataMode.Disabled
+                    );
                     if (subScene)
                         Undo.SetCurrentGroupName($"Select {subScene.name} ({subScene.GetType().Name})");
 
@@ -379,7 +462,11 @@ namespace Unity.Entities.Editor
 
                 case NodeKind.Scene:
                 {
-                    SelectionBridge.SetSelection(null, HierarchySelectionContext.CreateInstance(handle), DataMode.Disabled);
+                    SelectionBridge.SetSelection(
+                        null,
+                        HierarchySelectionContext.CreateInstance(handle),
+                        DataMode.Disabled
+                    );
                     break;
                 }
 
@@ -402,9 +489,10 @@ namespace Unity.Entities.Editor
                     {
                         var primaryEntity = world.EntityManager.Debug.GetPrimaryEntityForAuthoringObject(gameObject);
 
-                        context = primaryEntity != Entity.Null && world.EntityManager.SafeExists(primaryEntity)
-                                    ? EntitySelectionProxy.CreateInstance(world, primaryEntity)
-                                    : null;
+                        context =
+                            primaryEntity != Entity.Null && world.EntityManager.SafeExists(primaryEntity)
+                                ? EntitySelectionProxy.CreateInstance(world, primaryEntity)
+                                : null;
                     }
 
                     // Selected GameObjects should use whatever the current DataMode for the hierarchy is.

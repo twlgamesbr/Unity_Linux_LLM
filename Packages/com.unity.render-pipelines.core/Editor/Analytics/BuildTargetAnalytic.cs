@@ -1,6 +1,6 @@
-using JetBrains.Annotations;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -13,33 +13,47 @@ namespace UnityEditor.Rendering.Analytics
     {
         public int callbackOrder => int.MaxValue;
 
-        [AnalyticInfo(eventName: "uBuildTargetAnalytic", vendorKey: "unity.srp", maxEventsPerHour: 10, maxNumberOfElements: 1000)]
+        [AnalyticInfo(
+            eventName: "uBuildTargetAnalytic",
+            vendorKey: "unity.srp",
+            maxEventsPerHour: 10,
+            maxNumberOfElements: 1000
+        )]
         internal class Analytic : IAnalytic
         {
-
             [MustUseReturnValue]
-            public bool TryGatherData([NotNullWhen(true)] out IAnalytic.IData data, [NotNullWhen(false)] out Exception error)
+            public bool TryGatherData(
+                [NotNullWhen(true)] out IAnalytic.IData data,
+                [NotNullWhen(false)] out Exception error
+            )
             {
                 var activeBuildTarget = EditorUserBuildSettings.activeBuildTarget;
                 var activeBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(activeBuildTarget);
-                var activeBuildTargetGroupName = NamedBuildTarget.FromBuildTargetGroup(activeBuildTargetGroup).TargetName;
+                var activeBuildTargetGroupName = NamedBuildTarget
+                    .FromBuildTargetGroup(activeBuildTargetGroup)
+                    .TargetName;
 
                 error = null;
 
-                var assetType = GraphicsSettings.currentRenderPipeline == null ? "Built-In Render Pipeline" : GraphicsSettings.currentRenderPipeline.GetType().ToString();
+                var assetType =
+                    GraphicsSettings.currentRenderPipeline == null
+                        ? "Built-In Render Pipeline"
+                        : GraphicsSettings.currentRenderPipeline.GetType().ToString();
 
                 data = new BuildTargetAnalyticData()
                 {
                     build_target = activeBuildTarget.ToString(),
                     quality_levels = QualitySettings.GetActiveQualityLevelsForPlatformCount(activeBuildTargetGroupName),
                     render_pipeline_asset_type = assetType,
-                    total_quality_levels_on_project = QualitySettings.count
+                    total_quality_levels_on_project = QualitySettings.count,
                 };
                 return true;
             }
         };
 
-        [System.Diagnostics.DebuggerDisplay("{render_pipeline_asset_type} - {quality_levels}/{total_quality_levels_on_project}")]
+        [System.Diagnostics.DebuggerDisplay(
+            "{render_pipeline_asset_type} - {quality_levels}/{total_quality_levels_on_project}"
+        )]
         [Serializable]
         internal struct BuildTargetAnalyticData : IAnalytic.IData
         {
@@ -62,5 +76,4 @@ namespace UnityEditor.Rendering.Analytics
             EditorAnalytics.SendAnalytic(analytic);
         }
     }
-
 }

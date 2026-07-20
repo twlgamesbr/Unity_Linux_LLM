@@ -9,6 +9,7 @@ namespace UnityEngine.PathTracing.Integration
     {
         internal IRayTracingAccelStruct _uvAS;
         private GraphicsBuffer _buildScratchBuffer;
+
         public void Dispose()
         {
             _uvAS?.Dispose();
@@ -17,7 +18,12 @@ namespace UnityEngine.PathTracing.Integration
             _buildScratchBuffer = null;
         }
 
-        public void Build(CommandBuffer commandBuffer, RayTracingContext rayTracingContext, UVMesh uvMesh, BuildFlags buildFlags)
+        public void Build(
+            CommandBuffer commandBuffer,
+            RayTracingContext rayTracingContext,
+            UVMesh uvMesh,
+            BuildFlags buildFlags
+        )
         {
             var options = new AccelerationStructureOptions() { buildFlags = buildFlags };
             _uvAS = rayTracingContext.CreateAccelerationStructure(options);
@@ -25,11 +31,7 @@ namespace UnityEngine.PathTracing.Integration
 
             for (int i = 0; i < uvMesh.Mesh.subMeshCount; ++i)
             {
-                var instanceDesc = new MeshInstanceDesc(uvMesh.Mesh, i)
-                {
-                    mask = 0xFFFFFFFF,
-                    instanceID = (uint)i
-                };
+                var instanceDesc = new MeshInstanceDesc(uvMesh.Mesh, i) { mask = 0xFFFFFFFF, instanceID = (uint)i };
                 _uvAS.AddInstance(instanceDesc);
             }
 

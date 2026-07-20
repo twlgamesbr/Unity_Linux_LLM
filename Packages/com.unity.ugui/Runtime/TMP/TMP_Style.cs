@@ -25,7 +25,9 @@ namespace TMPro
         /// The name identifying this style. ex. <style="name">.
         /// </summary>
         public string name
-        { get { return m_Name; } set
+        {
+            get { return m_Name; }
+            set
             {
                 if (value != m_Name)
                     m_Name = value;
@@ -36,7 +38,9 @@ namespace TMPro
         /// The hash code corresponding to the name of this style.
         /// </summary>
         public int hashCode
-        { get { return m_HashCode; } set
+        {
+            get { return m_HashCode; }
+            set
             {
                 if (value != m_HashCode)
                     m_HashCode = value;
@@ -47,22 +51,27 @@ namespace TMPro
         /// The initial definition of the style. ex. <b> <u>.
         /// </summary>
         public string styleOpeningDefinition
-        { get { return m_OpeningDefinition; } }
+        {
+            get { return m_OpeningDefinition; }
+        }
 
         /// <summary>
         /// The closing definition of the style. ex. </b> </u>.
         /// </summary>
         public string styleClosingDefinition
-        { get { return m_ClosingDefinition; } }
-
+        {
+            get { return m_ClosingDefinition; }
+        }
 
         public uint[] styleOpeningTagArray
-        { get { return m_OpeningTagArray; } }
-
+        {
+            get { return m_OpeningTagArray; }
+        }
 
         public uint[] styleClosingTagArray
-        { get { return m_ClosingTagArray; } }
-
+        {
+            get { return m_ClosingTagArray; }
+        }
 
         // PRIVATE FIELDS
         [SerializeField]
@@ -99,7 +108,6 @@ namespace TMPro
             RefreshStyle();
         }
 
-
         /// <summary>
         /// Function to update the content of the int[] resulting from changes to OpeningDefinition & ClosingDefinition.
         /// </summary>
@@ -123,6 +131,5 @@ namespace TMPro
                 m_ClosingTagArray[i] = m_ClosingDefinition[i];
             }
         }
-
     }
 }

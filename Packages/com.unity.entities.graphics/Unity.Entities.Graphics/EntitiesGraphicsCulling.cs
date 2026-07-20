@@ -63,30 +63,50 @@ namespace Unity.Rendering
     [BurstCompile]
     internal unsafe struct SelectLodEnabled : IJobChunk
     {
-        [ReadOnly] public LODGroupExtensions.LODParams LODParams;
-        [ReadOnly] public NativeList<byte> ForceLowLOD;
-        [ReadOnly] public ComponentTypeHandle<RootLODRange> RootLODRanges;
-        [ReadOnly] public ComponentTypeHandle<RootLODWorldReferencePoint> RootLODReferencePoints;
-        [ReadOnly] public ComponentTypeHandle<LODRange> LODRanges;
-        [ReadOnly] public ComponentTypeHandle<LODWorldReferencePoint> LODReferencePoints;
+        [ReadOnly]
+        public LODGroupExtensions.LODParams LODParams;
+
+        [ReadOnly]
+        public NativeList<byte> ForceLowLOD;
+
+        [ReadOnly]
+        public ComponentTypeHandle<RootLODRange> RootLODRanges;
+
+        [ReadOnly]
+        public ComponentTypeHandle<RootLODWorldReferencePoint> RootLODReferencePoints;
+
+        [ReadOnly]
+        public ComponentTypeHandle<LODRange> LODRanges;
+
+        [ReadOnly]
+        public ComponentTypeHandle<LODWorldReferencePoint> LODReferencePoints;
         public ushort CameraMoveDistanceFixed16;
         public float DistanceScale;
         public bool DistanceScaleChanged;
         public int MaximumLODLevelMask;
 
         public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
-        [ReadOnly] public ComponentTypeHandle<ChunkHeader> ChunkHeader;
+
+        [ReadOnly]
+        public ComponentTypeHandle<ChunkHeader> ChunkHeader;
 
 #if UNITY_EDITOR
-        [NativeDisableUnsafePtrRestriction] public EntitiesGraphicsPerThreadStats* Stats;
+        [NativeDisableUnsafePtrRestriction]
+        public EntitiesGraphicsPerThreadStats* Stats;
 
 #pragma warning disable 649
-        [NativeSetThreadIndex] public int ThreadIndex;
+        [NativeSetThreadIndex]
+        public int ThreadIndex;
 #pragma warning restore 649
 
 #endif
 
-        public void Execute(in ArchetypeChunk archetypeChunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        public void Execute(
+            in ArchetypeChunk archetypeChunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMask
+        )
         {
             // This job is not written to support queries with enableable component types.
             Assert.IsFalse(useEnabledMask);
@@ -98,7 +118,11 @@ namespace Unity.Rendering
             ref var stats = ref Stats[ThreadIndex];
 #endif
 
-            for (int entityIndex = 0, chunkEntityCount = archetypeChunk.Count; entityIndex < chunkEntityCount; entityIndex++)
+            for (
+                int entityIndex = 0, chunkEntityCount = archetypeChunk.Count;
+                entityIndex < chunkEntityCount;
+                entityIndex++
+            )
             {
                 var entitiesGraphicsChunkInfo = entitiesGraphicsChunkInfoArray[entityIndex];
                 if (!entitiesGraphicsChunkInfo.Valid)
@@ -162,11 +186,11 @@ namespace Unity.Rendering
                         var rootLODRange = rootLODRanges[i];
                         var rootLODReferencePoint = rootLODReferencePoints[i];
 
-                        var rootLodDistance =
-                            math.select(
-                                DistanceScale *
-                                math.length(LODParams.cameraPos - rootLODReferencePoint.Value),
-                                DistanceScale, isOrtho);
+                        var rootLodDistance = math.select(
+                            DistanceScale * math.length(LODParams.cameraPos - rootLODReferencePoint.Value),
+                            DistanceScale,
+                            isOrtho
+                        );
 
                         float rootMinDist = math.select(rootLODRange.LOD.MinDist, 0.0f, forceLowLOD == 1);
                         float rootMaxDist = rootLODRange.LOD.MaxDist;
@@ -185,25 +209,22 @@ namespace Unity.Rendering
                             }
                             if (lodRange.LODMask == MaximumLODLevelMask)
                             {
-                                    // Expand maximum LOD range to cover all higher LODs
+                                // Expand maximum LOD range to cover all higher LODs
                                 lodRange.MinDist = 0.0f;
                             }
                             var lodReferencePoint = lodReferencePoints[i];
 
-                            var instanceDistance =
-                                math.select(
-                                    DistanceScale *
-                                    math.length(LODParams.cameraPos - lodReferencePoint.Value), DistanceScale,
-                                        isOrtho);
+                            var instanceDistance = math.select(
+                                DistanceScale * math.length(LODParams.cameraPos - lodReferencePoint.Value),
+                                DistanceScale,
+                                isOrtho
+                            );
 
                             var instanceLodIntersect =
-                                (instanceDistance < lodRange.MaxDist) &&
-                                (instanceDistance >= lodRange.MinDist);
+                                (instanceDistance < lodRange.MaxDist) && (instanceDistance >= lodRange.MinDist);
 
-                            graceDistance = math.min(math.abs(instanceDistance - lodRange.MinDist),
-                                graceDistance);
-                            graceDistance = math.min(math.abs(instanceDistance - lodRange.MaxDist),
-                                graceDistance);
+                            graceDistance = math.min(math.abs(instanceDistance - lodRange.MinDist), graceDistance);
+                            graceDistance = math.min(math.abs(instanceDistance - lodRange.MaxDist), graceDistance);
 
                             if (instanceLodIntersect)
                             {
@@ -220,13 +241,13 @@ namespace Unity.Rendering
 
                     chunkCullingData.MovementGraceFixed16 = Fixed16CamDistance.FromFloatFloor(graceDistance);
                     chunkCullingData.ForceLowLODPrevious = forceLowLOD;
-
                 }
 
-
 #if UNITY_EDITOR
-                if (oldEntityLodEnabled.Enabled[0] != chunkEntityLodEnabled.Enabled[0] ||
-                    oldEntityLodEnabled.Enabled[1] != chunkEntityLodEnabled.Enabled[1])
+                if (
+                    oldEntityLodEnabled.Enabled[0] != chunkEntityLodEnabled.Enabled[0]
+                    || oldEntityLodEnabled.Enabled[1] != chunkEntityLodEnabled.Enabled[1]
+                )
                 {
                     stats.LodChanged++;
                 }
@@ -255,9 +276,14 @@ namespace Unity.Rendering
     internal static class CullingExtensions
     {
         // We want to use UnsafeList to use RewindableAllocator, but PlanePacket APIs want NativeArrays
-        internal static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list) where T : unmanaged
+        internal static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list)
+            where T : unmanaged
         {
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list.Ptr, list.Length, Allocator.None);
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                list.Ptr,
+                list.Length,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, AtomicSafetyHandle.GetTempMemoryHandle());
 #endif
@@ -265,8 +291,7 @@ namespace Unity.Rendering
         }
 
         internal static NativeArray<T> GetSubNativeArray<T>(this UnsafeList<T> list, int start, int length)
-            where T : unmanaged =>
-            list.AsNativeArray().GetSubArray(start, length);
+            where T : unmanaged => list.AsNativeArray().GetSubArray(start, length);
     }
 
     internal unsafe struct CullingSplits
@@ -279,7 +304,11 @@ namespace Unity.Rendering
         public ReceiverSphereCuller ReceiverSphereCuller;
         public bool SphereTestEnabled;
 
-        public static CullingSplits Create(BatchCullingContext* cullingContext, ShadowProjection shadowProjection, AllocatorManager.AllocatorHandle allocator)
+        public static CullingSplits Create(
+            BatchCullingContext* cullingContext,
+            ShadowProjection shadowProjection,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             CullingSplits cullingSplits = default;
 
@@ -288,7 +317,7 @@ namespace Unity.Rendering
                 cullingContext = cullingContext,
                 shadowProjection = shadowProjection,
                 allocator = allocator,
-                Splits = &cullingSplits
+                Splits = &cullingSplits,
             };
             createJob.Run();
 
@@ -299,9 +328,14 @@ namespace Unity.Rendering
         private struct CreateJob : IJob
         {
             [NativeDisableUnsafePtrRestriction]
-            [ReadOnly] public BatchCullingContext* cullingContext;
-            [ReadOnly] public ShadowProjection shadowProjection;
-            [ReadOnly] public AllocatorManager.AllocatorHandle allocator;
+            [ReadOnly]
+            public BatchCullingContext* cullingContext;
+
+            [ReadOnly]
+            public ShadowProjection shadowProjection;
+
+            [ReadOnly]
+            public AllocatorManager.AllocatorHandle allocator;
 
             [NativeDisableUnsafePtrRestriction]
             public CullingSplits* Splits;
@@ -312,9 +346,11 @@ namespace Unity.Rendering
             }
         }
 
-        private CullingSplits(ref BatchCullingContext cullingContext,
+        private CullingSplits(
+            ref BatchCullingContext cullingContext,
             ShadowProjection shadowProjection,
-            AllocatorManager.AllocatorHandle allocator)
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             BackfacingReceiverPlanes = default;
             SplitPlanePackets = default;
@@ -331,7 +367,10 @@ namespace Unity.Rendering
             InitializeSphereTest(ref cullingContext, shadowProjection);
         }
 
-        private void InitializeReceiverPlanes(ref BatchCullingContext cullingContext, AllocatorManager.AllocatorHandle allocator)
+        private void InitializeReceiverPlanes(
+            ref BatchCullingContext cullingContext,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
 #if DISABLE_HYBRID_RECEIVER_CULLING
             bool disableReceiverCulling = true;
@@ -339,9 +378,11 @@ namespace Unity.Rendering
             bool disableReceiverCulling = false;
 #endif
             // Receiver culling is only used for shadow maps
-            if ((cullingContext.viewType != BatchCullingViewType.Light) ||
-                (cullingContext.receiverPlaneCount == 0) ||
-                disableReceiverCulling)
+            if (
+                (cullingContext.viewType != BatchCullingViewType.Light)
+                || (cullingContext.receiverPlaneCount == 0)
+                || disableReceiverCulling
+            )
             {
                 // Make an empty array so job system doesn't complain.
                 ReceiverPlanePackets = new UnsafeList<FrustumPlanes.PlanePacket4>(0, allocator);
@@ -353,7 +394,8 @@ namespace Unity.Rendering
 
             var planes = cullingContext.cullingPlanes.GetSubArray(
                 cullingContext.receiverPlaneOffset,
-                cullingContext.receiverPlaneCount);
+                cullingContext.receiverPlaneCount
+            );
             BackfacingReceiverPlanes = new UnsafeList<Plane>(planes.Length, allocator);
             BackfacingReceiverPlanes.Resize(planes.Length);
 
@@ -369,9 +411,7 @@ namespace Unity.Rendering
 
                 // Compare with epsilon so that perpendicular planes are not counted
                 // as back facing
-                bool isBackfacing = isOrthographic
-                    ? math.dot(n, lightDir) < -kEpsilon
-                    : p.GetSide(lightPos);
+                bool isBackfacing = isOrthographic ? math.dot(n, lightDir) < -kEpsilon : p.GetSide(lightPos);
 
                 if (isBackfacing)
                 {
@@ -382,7 +422,8 @@ namespace Unity.Rendering
 
             ReceiverPlanePackets = FrustumPlanes.BuildSOAPlanePackets(
                 BackfacingReceiverPlanes.GetSubNativeArray(0, numPlanes),
-                allocator);
+                allocator
+            );
             BackfacingReceiverPlanes.Resize(numPlanes);
         }
 
@@ -390,7 +431,10 @@ namespace Unity.Rendering
         private static int s_DebugExtraSplitsCounter = 0;
 #endif
 
-        private void InitializeSplits(ref BatchCullingContext cullingContext, AllocatorManager.AllocatorHandle allocator)
+        private void InitializeSplits(
+            ref BatchCullingContext cullingContext,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             var cullingPlanes = cullingContext.cullingPlanes;
             var cullingSplits = cullingContext.cullingSplits;
@@ -425,7 +469,10 @@ namespace Unity.Rendering
             }
 
             SplitPlanePackets = new UnsafeList<FrustumPlanes.PlanePacket4>(planePacketCount, allocator);
-            CombinedSplitAndReceiverPlanePackets = new UnsafeList<FrustumPlanes.PlanePacket4>(combinedPlanePacketCount, allocator);
+            CombinedSplitAndReceiverPlanePackets = new UnsafeList<FrustumPlanes.PlanePacket4>(
+                combinedPlanePacketCount,
+                allocator
+            );
             Splits = new UnsafeList<CullingSplitData>(numSplits, allocator);
 
             var combinedPlanes = new UnsafeList<Plane>(combinedPlanePacketCount * 4, allocator);
@@ -449,9 +496,7 @@ namespace Unity.Rendering
 
                 var splitCullingPlanes = cullingPlanes.GetSubArray(s.cullingPlaneOffset, s.cullingPlaneCount);
 
-                var planePackets = FrustumPlanes.BuildSOAPlanePackets(
-                    splitCullingPlanes,
-                    allocator);
+                var planePackets = FrustumPlanes.BuildSOAPlanePackets(splitCullingPlanes, allocator);
 
                 foreach (var pp in planePackets)
                     SplitPlanePackets.Add(pp);
@@ -463,29 +508,31 @@ namespace Unity.Rendering
                 UnsafeUtility.MemCpy(
                     combinedPlanes.Ptr,
                     splitCullingPlanes.GetUnsafeReadOnlyPtr(),
-                    splitCullingPlanes.Length * UnsafeUtility.SizeOf<Plane>());
+                    splitCullingPlanes.Length * UnsafeUtility.SizeOf<Plane>()
+                );
                 UnsafeUtility.MemCpy(
                     combinedPlanes.Ptr + splitCullingPlanes.Length,
                     BackfacingReceiverPlanes.Ptr,
-                    BackfacingReceiverPlanes.Length * UnsafeUtility.SizeOf<Plane>());
+                    BackfacingReceiverPlanes.Length * UnsafeUtility.SizeOf<Plane>()
+                );
 
-                var combined = FrustumPlanes.BuildSOAPlanePackets(
-                    combinedPlanes.AsNativeArray(),
-                    allocator);
+                var combined = FrustumPlanes.BuildSOAPlanePackets(combinedPlanes.AsNativeArray(), allocator);
 
                 foreach (var pp in combined)
                     CombinedSplitAndReceiverPlanePackets.Add(pp);
 
-                Splits.Add(new CullingSplitData
-                {
-                    CullingSphereCenter = p,
-                    CullingSphereRadius = r,
-                    ShadowCascadeBlendCullingFactor = s.cascadeBlendCullingFactor,
-                    PlanePacketOffset = planeIndex,
-                    PlanePacketCount = planePackets.Length,
-                    CombinedPlanePacketOffset = combinedPlaneIndex,
-                    CombinedPlanePacketCount = combined.Length,
-                });
+                Splits.Add(
+                    new CullingSplitData
+                    {
+                        CullingSphereCenter = p,
+                        CullingSphereRadius = r,
+                        ShadowCascadeBlendCullingFactor = s.cascadeBlendCullingFactor,
+                        PlanePacketOffset = planeIndex,
+                        PlanePacketCount = planePackets.Length,
+                        CombinedPlanePacketOffset = combinedPlaneIndex,
+                        CombinedPlanePacketCount = combined.Length,
+                    }
+                );
 
                 planeIndex += planePackets.Length;
                 combinedPlaneIndex += combined.Length;
@@ -533,8 +580,10 @@ namespace Unity.Rendering
 #if !DISABLE_INCLUDE_EXCLUDE_LIST_FILTERING
         public NativeParallelHashSet<EntityId> IncludeEntityIndices;
         public NativeParallelHashSet<EntityId> ExcludeEntityIndices;
+
         [MarshalAs(UnmanagedType.U1)]
         public bool IsIncludeEnabled;
+
         [MarshalAs(UnmanagedType.U1)]
         public bool IsExcludeEnabled;
 
@@ -546,7 +595,8 @@ namespace Unity.Rendering
             EntityManager entityManager,
             NativeArray<EntityId> includeEntityIndices,
             NativeArray<EntityId> excludeEntityIndices,
-            Allocator allocator)
+            Allocator allocator
+        )
         {
             IncludeEntityIndices = default;
             ExcludeEntityIndices = default;
@@ -591,8 +641,12 @@ namespace Unity.Rendering
 
         public JobHandle Dispose(JobHandle dependencies)
         {
-            JobHandle disposeInclude = IncludeEntityIndices.IsCreated ? IncludeEntityIndices.Dispose(dependencies) : default;
-            JobHandle disposeExclude = ExcludeEntityIndices.IsCreated ? ExcludeEntityIndices.Dispose(dependencies) : default;
+            JobHandle disposeInclude = IncludeEntityIndices.IsCreated
+                ? IncludeEntityIndices.Dispose(dependencies)
+                : default;
+            JobHandle disposeExclude = ExcludeEntityIndices.IsCreated
+                ? ExcludeEntityIndices.Dispose(dependencies)
+                : default;
             return JobHandle.CombineDependencies(disposeInclude, disposeExclude);
         }
 
@@ -618,8 +672,11 @@ namespace Unity.Rendering
         public bool IsEnabled => false;
         public bool IsIncludeEmpty => true;
         public bool IsExcludeEmpty => true;
+
         public bool EntityPassesFilter(int entityIndex) => true;
+
         public void Dispose() { }
+
         public JobHandle Dispose(JobHandle dependencies) => new JobHandle();
 #endif
     }
@@ -630,29 +687,47 @@ namespace Unity.Rendering
         public IndirectList<ChunkVisibilityItem> VisibilityItems;
         public ThreadLocalAllocator ThreadLocalAllocator;
 
-        [ReadOnly] public CullingSplits Splits;
+        [ReadOnly]
+        public CullingSplits Splits;
 
-        [ReadOnly] public ComponentTypeHandle<WorldRenderBounds> BoundsComponent;
-        [ReadOnly] public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
-        [ReadOnly] public ComponentTypeHandle<ChunkWorldRenderBounds> ChunkWorldRenderBounds;
+        [ReadOnly]
+        public ComponentTypeHandle<WorldRenderBounds> BoundsComponent;
 
-        [ReadOnly] public IncludeExcludeListFilter IncludeExcludeListFilter;
-        [ReadOnly] public EntityTypeHandle EntityHandle;
+        [ReadOnly]
+        public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
+
+        [ReadOnly]
+        public ComponentTypeHandle<ChunkWorldRenderBounds> ChunkWorldRenderBounds;
+
+        [ReadOnly]
+        public IncludeExcludeListFilter IncludeExcludeListFilter;
+
+        [ReadOnly]
+        public EntityTypeHandle EntityHandle;
 
         public BatchCullingViewType CullingViewType;
 
         public bool CullLightmapShadowCasters;
-        [ReadOnly] public SharedComponentTypeHandle<LightMaps> LightMaps;
+
+        [ReadOnly]
+        public SharedComponentTypeHandle<LightMaps> LightMaps;
 
 #pragma warning disable 649
-        [NativeSetThreadIndex] public int ThreadIndex;
+        [NativeSetThreadIndex]
+        public int ThreadIndex;
 #pragma warning restore 649
 
 #if UNITY_EDITOR
-        [NativeDisableUnsafePtrRestriction] public EntitiesGraphicsPerThreadStats* Stats;
+        [NativeDisableUnsafePtrRestriction]
+        public EntitiesGraphicsPerThreadStats* Stats;
 #endif
 
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 enabledMaskIn)
+        public void Execute(
+            in ArchetypeChunk chunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 enabledMaskIn
+        )
         {
             var enabledMask = useEnabledMask ? enabledMaskIn : EntitiesGraphicsUtils.ComputeBitmask(chunk.Count);
 
@@ -672,7 +747,7 @@ namespace Unity.Rendering
             ref var stats = ref Stats[ThreadIndex];
             stats.ChunkTotal++;
 #else
-            var stats = new EntitiesGraphicsPerThreadStats{};
+            var stats = new EntitiesGraphicsPerThreadStats { };
 #endif
 
             ref var chunkCullingData = ref entitiesGraphicsChunkInfo.CullingData;
@@ -698,12 +773,27 @@ namespace Unity.Rendering
 #if DISABLE_HYBRID_SPHERE_CULLING
                     useSphereTest = false;
 #endif
-                    FrustumCullWithReceiverAndSphereCulling(chunkBounds, chunk, enabledMask, chunkEntityLodEnabled,
-                        perInstanceCull, &chunkVisibility, ref stats,
-                        useSphereTest: useSphereTest);
+                    FrustumCullWithReceiverAndSphereCulling(
+                        chunkBounds,
+                        chunk,
+                        enabledMask,
+                        chunkEntityLodEnabled,
+                        perInstanceCull,
+                        &chunkVisibility,
+                        ref stats,
+                        useSphereTest: useSphereTest
+                    );
                 }
                 else
-                    FrustumCull(chunkBounds, chunk, enabledMask, chunkEntityLodEnabled, perInstanceCull, &chunkVisibility, ref stats);
+                    FrustumCull(
+                        chunkBounds,
+                        chunk,
+                        enabledMask,
+                        chunkEntityLodEnabled,
+                        perInstanceCull,
+                        &chunkVisibility,
+                        ref stats
+                    );
 
                 if (chunkVisibility.AnyVisible)
                 {
@@ -712,19 +802,25 @@ namespace Unity.Rendering
                         Chunk = chunk,
                         Visibility = allocator->Allocate(chunkVisibility, 1),
                     };
-                    UnsafeUtility.MemCpy(visibilityItem.Visibility, &chunkVisibility, UnsafeUtility.SizeOf<ChunkVisibility>());
+                    UnsafeUtility.MemCpy(
+                        visibilityItem.Visibility,
+                        &chunkVisibility,
+                        UnsafeUtility.SizeOf<ChunkVisibility>()
+                    );
                     visibilityItemWriter.AddNoResize(visibilityItem);
                 }
             }
         }
 
-        private void FrustumCull(ChunkWorldRenderBounds chunkBounds,
+        private void FrustumCull(
+            ChunkWorldRenderBounds chunkBounds,
             ArchetypeChunk chunk,
             v128 enabledMask128,
             ChunkInstanceLodEnabled chunkEntityLodEnabled,
             bool perInstanceCull,
             ChunkVisibility* chunkVisibility,
-            ref EntitiesGraphicsPerThreadStats stats)
+            ref EntitiesGraphicsPerThreadStats stats
+        )
         {
             Assert.IsTrue(Splits.Splits.Length == 1);
 
@@ -755,10 +851,13 @@ namespace Unity.Rendering
                         var bitIndex = math.tzcnt(lodWord);
                         var finalIndex = (j << 6) + bitIndex;
 
-                        int visible = FrustumPlanes.Intersect2NoPartial(Splits.SplitPlanePackets.AsNativeArray(), chunkInstanceBounds[finalIndex].Value) !=
-                                      FrustumPlanes.IntersectResult.Out
-                            ? 1
-                            : 0;
+                        int visible =
+                            FrustumPlanes.Intersect2NoPartial(
+                                Splits.SplitPlanePackets.AsNativeArray(),
+                                chunkInstanceBounds[finalIndex].Value
+                            ) != FrustumPlanes.IntersectResult.Out
+                                ? 1
+                                : 0;
 
                         if (IncludeExcludeListFilter.IsEnabled && visible != 0)
                         {
@@ -808,7 +907,8 @@ namespace Unity.Rendering
             bool perInstanceCull,
             ChunkVisibility* chunkVisibility,
             ref EntitiesGraphicsPerThreadStats stats,
-            bool useSphereTest)
+            bool useSphereTest
+        )
         {
             int numEntities = chunk.Count;
 
@@ -818,8 +918,10 @@ namespace Unity.Rendering
             // Do chunk receiver test first, since it doesn't consider splits
             if (haveReceiverPlanes)
             {
-                if (FrustumPlanes.Intersect2NoPartial(receiverPlanes.AsNativeArray(), chunkBounds.Value) ==
-                    FrustumPlanes.IntersectResult.Out)
+                if (
+                    FrustumPlanes.Intersect2NoPartial(receiverPlanes.AsNativeArray(), chunkBounds.Value)
+                    == FrustumPlanes.IntersectResult.Out
+                )
                     return;
             }
 
@@ -841,12 +943,11 @@ namespace Unity.Rendering
 
                 byte splitMask = (byte)(1 << splitIndex);
 
-                var splitPlanes = Splits.SplitPlanePackets.GetSubNativeArray(
-                    s.PlanePacketOffset,
-                    s.PlanePacketCount);
+                var splitPlanes = Splits.SplitPlanePackets.GetSubNativeArray(s.PlanePacketOffset, s.PlanePacketCount);
                 var combinedSplitPlanes = Splits.CombinedSplitAndReceiverPlanePackets.GetSubNativeArray(
                     s.CombinedPlanePacketOffset,
-                    s.CombinedPlanePacketCount);
+                    s.CombinedPlanePacketCount
+                );
 
                 if ((visibleSplitMask & (1 << splitIndex)) == 0)
                     continue;
@@ -872,17 +973,24 @@ namespace Unity.Rendering
                             var bounds = worldRenderBounds[entityIndex].Value;
 
                             int visible =
-                                FrustumPlanes.Intersect2NoPartial(combinedSplitPlanes, bounds) != FrustumPlanes.IntersectResult.Out
+                                FrustumPlanes.Intersect2NoPartial(combinedSplitPlanes, bounds)
+                                != FrustumPlanes.IntersectResult.Out
                                     ? 1
                                     : 0;
 
 #if DEBUG_VALIDATE_COMBINED_SPLIT_RECEIVER_CULLING
-                            bool visibleFrustum = FrustumPlanes.Intersect2NoPartial(splitPlanes, bounds) != FrustumPlanes.IntersectResult.Out;
-                            bool visibleReceiver = FrustumPlanes.Intersect2NoPartial(receiverPlanes.AsNativeArray(), bounds) != FrustumPlanes.IntersectResult.Out;
+                            bool visibleFrustum =
+                                FrustumPlanes.Intersect2NoPartial(splitPlanes, bounds)
+                                != FrustumPlanes.IntersectResult.Out;
+                            bool visibleReceiver =
+                                FrustumPlanes.Intersect2NoPartial(receiverPlanes.AsNativeArray(), bounds)
+                                != FrustumPlanes.IntersectResult.Out;
                             int visibleReference = (visibleFrustum && visibleReceiver) ? 1 : 0;
                             // Use Debug.Log instead of Debug.Assert so that Burst does not remove it
                             if (visible != visibleReference)
-                                Debug.Log($"Combined Split+Receiver ({visible}) plane culling mismatch with separate Split ({visibleFrustum}) and Receiver ({visibleReceiver})");
+                                Debug.Log(
+                                    $"Combined Split+Receiver ({visible}) plane culling mismatch with separate Split ({visibleFrustum}) and Receiver ({visibleReceiver})"
+                                );
 #endif
 
                             lodWord ^= mask;
@@ -984,15 +1092,22 @@ namespace Unity.Rendering
             LightAxisZ = new float4(cullingContext.localToWorldMatrix.GetColumn(2)).xyz;
             NumSplits = numSplits;
 
-            ShadowFrustumPlanes = GetUnsafeListView(cullingContext.cullingPlanes,
+            ShadowFrustumPlanes = GetUnsafeListView(
+                cullingContext.cullingPlanes,
                 cullingContext.receiverPlaneOffset,
-                cullingContext.receiverPlaneCount);
+                cullingContext.receiverPlaneCount
+            );
 
             for (int i = 0; i < numSplits; ++i)
             {
                 int elementIndex = i & 3;
                 ref CullingSplitData split = ref splits.Splits.ElementAt(i);
-                float3 lsReceiverSphereCenter = TransformToLightSpace(split.CullingSphereCenter, LightAxisX, LightAxisY, LightAxisZ);
+                float3 lsReceiverSphereCenter = TransformToLightSpace(
+                    split.CullingSphereCenter,
+                    LightAxisX,
+                    LightAxisY,
+                    LightAxisZ
+                );
 
                 ReceiverSphereCenterX4[elementIndex] = split.CullingSphereCenter.x;
                 ReceiverSphereCenterY4[elementIndex] = split.CullingSphereCenter.y;
@@ -1016,7 +1131,9 @@ namespace Unity.Rendering
 
             // Use Debug.Log instead of Debug.Assert so that Burst does not remove it
             if (visibleSplitMask != referenceSplitMask)
-                Debug.Log($"Vectorized culling test ({visibleSplitMask:x2}) disagrees with reference test ({referenceSplitMask:x2})");
+                Debug.Log(
+                    $"Vectorized culling test ({visibleSplitMask:x2}) disagrees with reference test ({referenceSplitMask:x2})"
+                );
 #endif
 
             return visibleSplitMask;
@@ -1041,7 +1158,9 @@ namespace Unity.Rendering
             float4 lsCasterToReceiverSphereDistanceSq4 = lsCasterToReceiverSphereSqX4 + lsCasterToReceiverSphereSqY4;
             bool4 doCirclesOverlap4 = lsCasterToReceiverSphereDistanceSq4 <= combinedRadiusSq4;
 
-            float4 lsZMaxAccountingForCasterRadius4 = LSReceiverSphereCenterZ4 + math.sqrt(combinedRadiusSq4 - lsCasterToReceiverSphereSqX4 - lsCasterToReceiverSphereSqY4);
+            float4 lsZMaxAccountingForCasterRadius4 =
+                LSReceiverSphereCenterZ4
+                + math.sqrt(combinedRadiusSq4 - lsCasterToReceiverSphereSqX4 - lsCasterToReceiverSphereSqY4);
             bool4 isBehindCascade4 = lsCasterCenterZ4 <= lsZMaxAccountingForCasterRadius4;
 
             int isFullyCoveredByCascadeMask = 0b1111;
@@ -1050,11 +1169,25 @@ namespace Unity.Rendering
             float3 shadowCapsuleBegin;
             float3 shadowCapsuleEnd;
             float shadowCapsuleRadius;
-            ComputeShadowCapsule(LightAxisZ, aabb.Center, casterRadius4.x, ShadowFrustumPlanes,
-                out shadowCapsuleBegin, out shadowCapsuleEnd, out shadowCapsuleRadius);
+            ComputeShadowCapsule(
+                LightAxisZ,
+                aabb.Center,
+                casterRadius4.x,
+                ShadowFrustumPlanes,
+                out shadowCapsuleBegin,
+                out shadowCapsuleEnd,
+                out shadowCapsuleRadius
+            );
 
-            bool4 isFullyCoveredByCascade4 = IsCapsuleInsideSphereSIMD(shadowCapsuleBegin, shadowCapsuleEnd, shadowCapsuleRadius,
-                ReceiverSphereCenterX4, ReceiverSphereCenterY4, ReceiverSphereCenterZ4, CoreSphereRadius4);
+            bool4 isFullyCoveredByCascade4 = IsCapsuleInsideSphereSIMD(
+                shadowCapsuleBegin,
+                shadowCapsuleEnd,
+                shadowCapsuleRadius,
+                ReceiverSphereCenterX4,
+                ReceiverSphereCenterY4,
+                ReceiverSphereCenterZ4,
+                CoreSphereRadius4
+            );
 
             if (math.any(isFullyCoveredByCascade4))
             {
@@ -1089,8 +1222,15 @@ namespace Unity.Rendering
             float3 shadowCapsuleBegin;
             float3 shadowCapsuleEnd;
             float shadowCapsuleRadius;
-            ComputeShadowCapsule(LightAxisZ, aabb.Center, casterRadius, ShadowFrustumPlanes,
-                out shadowCapsuleBegin, out shadowCapsuleEnd, out shadowCapsuleRadius);
+            ComputeShadowCapsule(
+                LightAxisZ,
+                aabb.Center,
+                casterRadius,
+                ShadowFrustumPlanes,
+                out shadowCapsuleBegin,
+                out shadowCapsuleEnd,
+                out shadowCapsuleRadius
+            );
 #endif
 
             int visibleSplitMask = 0;
@@ -1098,7 +1238,11 @@ namespace Unity.Rendering
             for (int i = 0; i < NumSplits; i++)
             {
                 float receiverSphereRadius = ReceiverSphereRadius4[i];
-                float3 lsReceiverSphereCenter = new float3(LSReceiverSphereCenterX4[i], LSReceiverSphereCenterY4[i], LSReceiverSphereCenterZ4[i]);
+                float3 lsReceiverSphereCenter = new float3(
+                    LSReceiverSphereCenterX4[i],
+                    LSReceiverSphereCenterY4[i],
+                    LSReceiverSphereCenterZ4[i]
+                );
                 float2 lsReceiverSphereCenterXY = new float2(lsReceiverSphereCenter.x, lsReceiverSphereCenter.y);
 
                 // A spherical caster casts a cylindrical shadow volume. In XY in light space this ends up being a circle/circle intersection test.
@@ -1121,7 +1265,9 @@ namespace Unity.Rendering
                     // If in light space the shadow caster is behind the current cascade sphere then it can't cast a shadow on it and we can skip it.
                     // sphere equation is (x - x0)^2 + (y - y0)^2 + (z - z0)^2 = R^2 and we are looking for the farthest away z position
                     // thus zMaxInLightSpace = z0 + Sqrt(R^2 - (x - x0)^2 - (y - y0)^2 )). R being Cascade + caster radius.
-                    float lsZMaxAccountingForCasterRadius = lsReceiverSphereCenter.z + math.sqrt(combinedRadiusSq - lsCasterToReceiverSphereSqXY.x - lsCasterToReceiverSphereSqXY.y);
+                    float lsZMaxAccountingForCasterRadius =
+                        lsReceiverSphereCenter.z
+                        + math.sqrt(combinedRadiusSq - lsCasterToReceiverSphereSqXY.x - lsCasterToReceiverSphereSqXY.y);
                     if (lsCasterCenter.z > lsZMaxAccountingForCasterRadius)
                     {
                         // This is equivalent (but cheaper) than : if (!IntersectCapsuleSphere(shadowVolume, cascades[cascadeIndex].outerSphere))
@@ -1133,12 +1279,24 @@ namespace Unity.Rendering
                     visibleSplitMask |= 1 << i;
 
 #if !DISABLE_SHADOW_CULLING_CAPSULE_TEST
-                    float3 receiverSphereCenter = new float3(ReceiverSphereCenterX4[i], ReceiverSphereCenterY4[i], ReceiverSphereCenterZ4[i]);
+                    float3 receiverSphereCenter = new float3(
+                        ReceiverSphereCenterX4[i],
+                        ReceiverSphereCenterY4[i],
+                        ReceiverSphereCenterZ4[i]
+                    );
                     float coreSphereRadius = CoreSphereRadius4[i];
 
                     // Next step is to detect if the shadow volume is fully covered by the cascade. If so we can avoid rendering all other cascades
                     // as we know that in the case of cascade overlap, the smallest cascade index will always prevail. This help as cascade overlap is usually huge.
-                    if (IsCapsuleInsideSphere(shadowCapsuleBegin, shadowCapsuleEnd, shadowCapsuleRadius, receiverSphereCenter, coreSphereRadius))
+                    if (
+                        IsCapsuleInsideSphere(
+                            shadowCapsuleBegin,
+                            shadowCapsuleEnd,
+                            shadowCapsuleRadius,
+                            receiverSphereCenter,
+                            coreSphereRadius
+                        )
+                    )
                     {
                         // Ideally we should test against the union of all cascades up to this one, however in a lot of cases (cascade configuration + light orientation)
                         // the overlap of current and previous cascades is a super set of the union of these cascades. Thus testing only the previous cascade does
@@ -1152,26 +1310,44 @@ namespace Unity.Rendering
             return visibleSplitMask;
         }
 
-        static void ComputeShadowCapsule(float3 lightDirection, float3 casterPosition, float casterRadius, UnsafeList<Plane> shadowFrustumPlanes,
-            out float3 shadowCapsuleBegin, out float3 shadowCapsuleEnd, out float shadowCapsuleRadius)
+        static void ComputeShadowCapsule(
+            float3 lightDirection,
+            float3 casterPosition,
+            float casterRadius,
+            UnsafeList<Plane> shadowFrustumPlanes,
+            out float3 shadowCapsuleBegin,
+            out float3 shadowCapsuleEnd,
+            out float shadowCapsuleRadius
+        )
         {
-            float shadowCapsuleLength = GetShadowVolumeLengthFromCasterAndFrustumAndLightDir(lightDirection,
+            float shadowCapsuleLength = GetShadowVolumeLengthFromCasterAndFrustumAndLightDir(
+                lightDirection,
                 casterPosition,
                 casterRadius,
-                shadowFrustumPlanes);
+                shadowFrustumPlanes
+            );
 
             shadowCapsuleBegin = casterPosition;
             shadowCapsuleEnd = casterPosition + shadowCapsuleLength * lightDirection;
             shadowCapsuleRadius = casterRadius;
         }
 
-        static float GetShadowVolumeLengthFromCasterAndFrustumAndLightDir(float3 lightDir, float3 casterPosition, float casterRadius, UnsafeList<Plane> planes)
+        static float GetShadowVolumeLengthFromCasterAndFrustumAndLightDir(
+            float3 lightDir,
+            float3 casterPosition,
+            float casterRadius,
+            UnsafeList<Plane> planes
+        )
         {
             // The idea here is to find the capsule that goes from the caster and cover all possible shadow receiver in the frustum.
             // First we find the distance from the caster center to the frustum
             var casterRay = new Ray(casterPosition, lightDir);
             int planeIndex;
-            float distFromCasterToFrustumInLightDirection = RayDistanceToFrustumOriented(casterRay, planes, out planeIndex);
+            float distFromCasterToFrustumInLightDirection = RayDistanceToFrustumOriented(
+                casterRay,
+                planes,
+                out planeIndex
+            );
             if (planeIndex == -1)
             {
                 // Shadow caster center is outside of frustum and ray do not intersect it.
@@ -1249,8 +1425,16 @@ namespace Unity.Rendering
             return squaredDistance < squaredRadiusDelta;
         }
 
-        static bool4 IsInsideSphereSIMD(float4 sphereCenterX, float4 sphereCenterY, float4 sphereCenterZ, float4 sphereRadius,
-            float4 containingSphereCenterX, float4 containingSphereCenterY, float4 containingSphereCenterZ, float4 containingSphereRadius)
+        static bool4 IsInsideSphereSIMD(
+            float4 sphereCenterX,
+            float4 sphereCenterY,
+            float4 sphereCenterZ,
+            float4 sphereRadius,
+            float4 containingSphereCenterX,
+            float4 containingSphereCenterY,
+            float4 containingSphereCenterZ,
+            float4 containingSphereRadius
+        )
         {
             float4 dx = containingSphereCenterX - sphereCenterX;
             float4 dy = containingSphereCenterY - sphereCenterY;
@@ -1266,7 +1450,13 @@ namespace Unity.Rendering
             return canSphereFit & distanceTest;
         }
 
-        static bool IsCapsuleInsideSphere(float3 capsuleBegin, float3 capsuleEnd, float capsuleRadius, float3 sphereCenter, float sphereRadius)
+        static bool IsCapsuleInsideSphere(
+            float3 capsuleBegin,
+            float3 capsuleEnd,
+            float capsuleRadius,
+            float3 sphereCenter,
+            float sphereRadius
+        )
         {
             var sphere = new BoundingSphere(sphereCenter, sphereRadius);
             var beginPoint = new BoundingSphere(capsuleBegin, capsuleRadius);
@@ -1275,8 +1465,15 @@ namespace Unity.Rendering
             return IsInsideSphere(beginPoint, sphere) && IsInsideSphere(endPoint, sphere);
         }
 
-        static bool4 IsCapsuleInsideSphereSIMD(float3 capsuleBegin, float3 capsuleEnd, float capsuleRadius,
-            float4 sphereCenterX, float4 sphereCenterY, float4 sphereCenterZ, float4 sphereRadius)
+        static bool4 IsCapsuleInsideSphereSIMD(
+            float3 capsuleBegin,
+            float3 capsuleEnd,
+            float capsuleRadius,
+            float4 sphereCenterX,
+            float4 sphereCenterY,
+            float4 sphereCenterZ,
+            float4 sphereRadius
+        )
         {
             float4 beginSphereX = capsuleBegin.xxxx;
             float4 beginSphereY = capsuleBegin.yyyy;
@@ -1288,19 +1485,42 @@ namespace Unity.Rendering
 
             float4 capsuleRadius4 = new float4(capsuleRadius);
 
-            bool4 isInsideBeginSphere = IsInsideSphereSIMD(beginSphereX, beginSphereY, beginSphereZ, capsuleRadius4,
-                sphereCenterX, sphereCenterY, sphereCenterZ, sphereRadius);
+            bool4 isInsideBeginSphere = IsInsideSphereSIMD(
+                beginSphereX,
+                beginSphereY,
+                beginSphereZ,
+                capsuleRadius4,
+                sphereCenterX,
+                sphereCenterY,
+                sphereCenterZ,
+                sphereRadius
+            );
 
-            bool4 isInsideEndSphere = IsInsideSphereSIMD(endSphereX, endSphereY, endSphereZ, capsuleRadius4,
-                sphereCenterX, sphereCenterY, sphereCenterZ, sphereRadius);
+            bool4 isInsideEndSphere = IsInsideSphereSIMD(
+                endSphereX,
+                endSphereY,
+                endSphereZ,
+                capsuleRadius4,
+                sphereCenterX,
+                sphereCenterY,
+                sphereCenterZ,
+                sphereRadius
+            );
 
             return isInsideBeginSphere & isInsideEndSphere;
         }
 
-        static float3 TransformToLightSpace(float3 positionWS, float3 lightAxisX, float3 lightAxisY, float3 lightAxisZ) => new float3(
-            math.dot(positionWS, lightAxisX),
-            math.dot(positionWS, lightAxisY),
-            math.dot(positionWS, lightAxisZ));
+        static float3 TransformToLightSpace(
+            float3 positionWS,
+            float3 lightAxisX,
+            float3 lightAxisY,
+            float3 lightAxisZ
+        ) =>
+            new float3(
+                math.dot(positionWS, lightAxisX),
+                math.dot(positionWS, lightAxisY),
+                math.dot(positionWS, lightAxisZ)
+            );
 
         static unsafe UnsafeList<Plane> GetUnsafeListView(NativeArray<Plane> array, int start, int length)
         {

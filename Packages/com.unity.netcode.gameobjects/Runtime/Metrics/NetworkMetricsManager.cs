@@ -17,7 +17,9 @@ namespace Unity.Netcode
         public void UpdateMetrics()
         {
             NetworkMetrics.UpdateNetworkObjectsCount(m_NetworkManager.SpawnManager.SpawnedObjects.Count);
-            NetworkMetrics.UpdateConnectionsCount((m_NetworkManager.IsServer) ? m_NetworkManager.ConnectionManager.ConnectedClients.Count : 1);
+            NetworkMetrics.UpdateConnectionsCount(
+                (m_NetworkManager.IsServer) ? m_NetworkManager.ConnectionManager.ConnectedClients.Count : 1
+            );
             NetworkMetrics.DispatchFrame();
         }
 
@@ -34,10 +36,12 @@ namespace Unity.Netcode
             }
 
 #if MULTIPLAYER_TOOLS
-            NetworkSolutionInterface.SetInterface(new NetworkSolutionInterfaceParameters
-            {
-                NetworkObjectProvider = new NetworkObjectProvider(networkManager),
-            });
+            NetworkSolutionInterface.SetInterface(
+                new NetworkSolutionInterfaceParameters
+                {
+                    NetworkObjectProvider = new NetworkObjectProvider(networkManager),
+                }
+            );
 #endif
         }
     }

@@ -92,9 +92,11 @@ namespace Unity.Networking.Transport.Analytics
             // https://math.stackexchange.com/a/2971563
             var newMeanDelta = m_Mean - newMean;
             var newMeanDeltaOther = other.m_Mean - newMean;
-            var newMeanDist2 = m_Count * newMeanDelta * newMeanDelta +
-                other.m_Count * newMeanDeltaOther * newMeanDeltaOther +
-                (m_Count - 1) * Variance + (other.m_Count - 1) * other.Variance;
+            var newMeanDist2 =
+                m_Count * newMeanDelta * newMeanDelta
+                + other.m_Count * newMeanDeltaOther * newMeanDeltaOther
+                + (m_Count - 1) * Variance
+                + (other.m_Count - 1) * other.Variance;
 
             m_Count = newCount;
             m_Mean = newMean;

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine.Scripting.APIUpdating;
+
 // Typedef for the in-engine RendererList API (to avoid conflicts with the experimental version)
 
 namespace UnityEngine.Rendering.RenderGraphModule
@@ -12,7 +13,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
     /// in favor of more specific contexts that have more specific command buffer types.
     /// </summary>
     [MovedFrom(true, "UnityEngine.Experimental.Rendering.RenderGraphModule", "UnityEngine.Rendering.RenderGraphModule")]
-    [Obsolete("RenderGraphContext is deprecated, use RasterGraphContext/ComputeGraphContext/UnsafeGraphContext instead.", true)]
+    [Obsolete(
+        "RenderGraphContext is deprecated, use RasterGraphContext/ComputeGraphContext/UnsafeGraphContext instead.",
+        true
+    )]
     public struct RenderGraphContext : IDerivedRendergraphContext
     {
         private InternalRenderGraphContext wrappedContext;
@@ -24,16 +28,34 @@ namespace UnityEngine.Rendering.RenderGraphModule
         }
 
         /// <inheritdoc />
-        public readonly TextureUVOrigin GetTextureUVOrigin(in TextureHandle textureHandle) { return TextureUVOrigin.BottomLeft;  }
+        public readonly TextureUVOrigin GetTextureUVOrigin(in TextureHandle textureHandle)
+        {
+            return TextureUVOrigin.BottomLeft;
+        }
 
         ///<summary>Scriptable Render Context used for rendering.</summary>
-        public ScriptableRenderContext renderContext { get => wrappedContext.renderContext; }
+        public ScriptableRenderContext renderContext
+        {
+            get => wrappedContext.renderContext;
+        }
+
         ///<summary>Command Buffer used for rendering.</summary>
-        public CommandBuffer cmd { get => wrappedContext.cmd; }
+        public CommandBuffer cmd
+        {
+            get => wrappedContext.cmd;
+        }
+
         ///<summary>Render Graph pool used for temporary data.</summary>
-        public RenderGraphObjectPool renderGraphPool { get => wrappedContext.renderGraphPool; }
+        public RenderGraphObjectPool renderGraphPool
+        {
+            get => wrappedContext.renderGraphPool;
+        }
+
         ///<summary>Render Graph default resources.</summary>
-        public RenderGraphDefaultResources defaultResources { get => wrappedContext.defaultResources; }
+        public RenderGraphDefaultResources defaultResources
+        {
+            get => wrappedContext.defaultResources;
+        }
     }
 
     public partial class RenderGraph
@@ -47,7 +69,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </remarks>
         /// <param name="rt">Backbuffer render target identifier.</param>
         /// <returns>A new TextureHandle that represents the imported texture in the context of this rendergraph.</returns>
-        [Obsolete("This overload is deprecated, use ImportBackbuffer(RenderTargetIdentifier, RenderTargetInfo, ImportResourceParams) instead.", true)]
+        [Obsolete(
+            "This overload is deprecated, use ImportBackbuffer(RenderTargetIdentifier, RenderTargetInfo, ImportResourceParams) instead.",
+            true
+        )]
         public TextureHandle ImportBackbuffer(RenderTargetIdentifier rt)
         {
             return new TextureHandle();
@@ -63,7 +88,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="desc">Creation descriptor of the texture.</param>
         /// <param name="explicitRelease">Set to true if you want to manage the lifetime of the resource yourself. Otherwise the resource will be released automatically if unused for a time.</param>
         /// <returns>A new TextureHandle.</returns>
-        [Obsolete("CreateSharedTexture() and shared texture workflow are deprecated, use ImportTexture() workflow instead.", true)]
+        [Obsolete(
+            "CreateSharedTexture() and shared texture workflow are deprecated, use ImportTexture() workflow instead.",
+            true
+        )]
         public TextureHandle CreateSharedTexture(in TextureDesc desc, bool explicitRelease = false)
         {
             return new TextureHandle();
@@ -77,8 +105,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </remarks>
         /// <param name="handle">Shared texture that needs to be updated.</param>
         /// <param name="desc">New Descriptor for the texture.</param>
-        [Obsolete("RefreshSharedTextureDesc() and shared texture workflow are deprecated, use ImportTexture() workflow instead.", true)]
-        public void RefreshSharedTextureDesc(TextureHandle handle, in TextureDesc desc) {}
+        [Obsolete(
+            "RefreshSharedTextureDesc() and shared texture workflow are deprecated, use ImportTexture() workflow instead.",
+            true
+        )]
+        public void RefreshSharedTextureDesc(TextureHandle handle, in TextureDesc desc) { }
 
         /// <summary>
         /// Release a Render Graph shared texture resource.
@@ -87,8 +118,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// This API should not be used with URP NRP Render Graph. This API cannot be called when Render Graph is active, please call it outside of RecordRenderGraph().
         /// </remarks>
         /// <param name="texture">The handle to the texture that needs to be release.</param>
-        [Obsolete("ReleaseSharedTexture() and shared texture workflow are deprecated, use ImportTexture() workflow instead.", true)]
-        public void ReleaseSharedTexture(TextureHandle texture) {}
+        [Obsolete(
+            "ReleaseSharedTexture() and shared texture workflow are deprecated, use ImportTexture() workflow instead.",
+            true
+        )]
+        public void ReleaseSharedTexture(TextureHandle texture) { }
 
         /// <summary>
         /// Import an external Graphics Buffer to the Render Graph.
@@ -100,7 +134,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="graphicsBuffer">External Graphics Buffer that needs to be imported.</param>
         /// <param name="forceRelease">The imported graphics buffer will be released after usage.</param>
         /// <returns>A new GraphicsBufferHandle.</returns>
-        [Obsolete("ImportBuffer with forceRelease parameter is deprecated. Use ImportBuffer without it instead. #from(6000.3)", true)]
+        [Obsolete(
+            "ImportBuffer with forceRelease parameter is deprecated. Use ImportBuffer without it instead. #from(6000.3)",
+            true
+        )]
         public BufferHandle ImportBuffer(GraphicsBuffer graphicsBuffer, bool forceRelease = false)
         {
             return new BufferHandle();
@@ -116,11 +153,20 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a RenderGraphBuilder used to setup the new Render Pass.</returns>
-        [Obsolete("AddRenderPass() is deprecated, use AddRasterRenderPass/AddComputePass/AddUnsafePass() instead.", true)]
-        public RenderGraphBuilder AddRenderPass<PassData>(string passName, out PassData passData, ProfilingSampler sampler
+        [Obsolete(
+            "AddRenderPass() is deprecated, use AddRasterRenderPass/AddComputePass/AddUnsafePass() instead.",
+            true
+        )]
+        public RenderGraphBuilder AddRenderPass<PassData>(
+            string passName,
+            out PassData passData,
+            ProfilingSampler sampler
 #if !CORE_PACKAGE_DOCTOOLS
-            ,[CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             passData = null;
@@ -139,11 +185,19 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <param name="file">File name of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of a RenderGraphBuilder used to setup the new Render Pass.</returns>
-        [Obsolete("AddRenderPass() is deprecated, use AddRasterRenderPass/AddComputePass/AddUnsafePass() instead.", true)]
-        public RenderGraphBuilder AddRenderPass<PassData>(string passName, out PassData passData
+        [Obsolete(
+            "AddRenderPass() is deprecated, use AddRasterRenderPass/AddComputePass/AddUnsafePass() instead.",
+            true
+        )]
+        public RenderGraphBuilder AddRenderPass<PassData>(
+            string passName,
+            out PassData passData
 #if !CORE_PACKAGE_DOCTOOLS
-            ,[CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0) where PassData : class, new()
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
+            where PassData : class, new()
 #endif
         {
             return AddRenderPass(passName, out passData, GetDefaultProfilingSampler(passName), file, line);
@@ -154,7 +208,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
     /// Use this struct to set up a new Render Pass.
     /// </summary>
     [MovedFrom(true, "UnityEngine.Experimental.Rendering.RenderGraphModule", "UnityEngine.Rendering.RenderGraphModule")]
-    [Obsolete("RenderGraphBuilder is deprecated, use IComputeRenderGraphBuilder/IRasterRenderGraphBuilder/IUnsafeRenderGraphBuilder instead.", true)]
+    [Obsolete(
+        "RenderGraphBuilder is deprecated, use IComputeRenderGraphBuilder/IRasterRenderGraphBuilder/IUnsafeRenderGraphBuilder instead.",
+        true
+    )]
     public struct RenderGraphBuilder : IDisposable
     {
         RenderGraphPass m_RenderPass;
@@ -289,7 +346,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </summary>
         /// <param name="input">The RayTracingAccelerationStructure resource to build during the pass.</param>
         /// <returns>An updated resource handle to the input resource.</returns>
-        public RayTracingAccelerationStructureHandle WriteRayTracingAccelerationStructure(in RayTracingAccelerationStructureHandle input)
+        public RayTracingAccelerationStructureHandle WriteRayTracingAccelerationStructure(
+            in RayTracingAccelerationStructureHandle input
+        )
         {
             CheckResource(input.handle);
             m_Resources.IncrementWriteCount(input.handle);
@@ -302,7 +361,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </summary>
         /// <param name="input">The RayTracingAccelerationStructure resource to use during the pass.</param>
         /// <returns>An updated resource handle to the input resource.</returns>
-        public RayTracingAccelerationStructureHandle ReadRayTracingAccelerationStructure(in RayTracingAccelerationStructureHandle input)
+        public RayTracingAccelerationStructureHandle ReadRayTracingAccelerationStructure(
+            in RayTracingAccelerationStructureHandle input
+        )
         {
             CheckResource(input.handle);
             m_RenderPass.AddResourceRead(input.handle);
@@ -316,7 +377,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// <returns>An updated resource handle to the input resource.</returns>
         public RendererListHandle UseRendererList(in RendererListHandle input)
         {
-            if(input.IsValid())
+            if (input.IsValid())
                 m_RenderPass.UseRendererList(input);
             return input;
         }
@@ -449,7 +510,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
         #endregion
 
         #region Internal Interface
-        internal RenderGraphBuilder(RenderGraphPass renderPass, RenderGraphResourceRegistry resources, RenderGraph renderGraph)
+        internal RenderGraphBuilder(
+            RenderGraphPass renderPass,
+            RenderGraphResourceRegistry resources,
+            RenderGraph renderGraph
+        )
         {
             m_RenderPass = renderPass;
             m_Resources = resources;
@@ -469,7 +534,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         void CheckResource(in ResourceHandle res, bool checkTransientReadWrite = true)
         {
-            if(RenderGraph.enableValidityChecks)
+            if (RenderGraph.enableValidityChecks)
             {
                 if (res.IsValid())
                 {
@@ -477,12 +542,16 @@ namespace UnityEngine.Rendering.RenderGraphModule
                     // We have dontCheckTransientReadWrite here because users may want to use UseColorBuffer/UseDepthBuffer API to benefit from render target auto binding. In this case we don't want to raise the error.
                     if (transientIndex == m_RenderPass.index && checkTransientReadWrite)
                     {
-                        Debug.LogError($"Trying to read or write a transient resource at pass {m_RenderPass.name}.Transient resource are always assumed to be both read and written.");
+                        Debug.LogError(
+                            $"Trying to read or write a transient resource at pass {m_RenderPass.name}.Transient resource are always assumed to be both read and written."
+                        );
                     }
 
                     if (transientIndex != -1 && transientIndex != m_RenderPass.index)
                     {
-                        throw new ArgumentException($"Trying to use a transient texture (pass index {transientIndex}) in a different pass (pass index {m_RenderPass.index}).");
+                        throw new ArgumentException(
+                            $"Trying to use a transient texture (pass index {transientIndex}) in a different pass (pass index {m_RenderPass.index})."
+                        );
                     }
                 }
                 else

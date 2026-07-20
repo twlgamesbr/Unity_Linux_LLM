@@ -210,8 +210,16 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="control"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="inputEvent"/> is not a <see cref="StateEvent"/> or <see cref="DeltaStateEvent"/>.</exception>
         /// <seealso cref="ReadUnprocessedValueFromEvent{TValue}(InputControl{TValue},InputEventPtr)"/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
-        public static unsafe bool ReadValueFromEvent<TValue>(this InputControl<TValue> control, InputEventPtr inputEvent, out TValue value)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1021:AvoidOutParameters",
+            MessageId = "2#"
+        )]
+        public static unsafe bool ReadValueFromEvent<TValue>(
+            this InputControl<TValue> control,
+            InputEventPtr inputEvent,
+            out TValue value
+        )
             where TValue : struct
         {
             if (control == null)
@@ -249,7 +257,10 @@ namespace UnityEngine.InputSystem
             return control.ReadValueFromStateAsObject(statePtr);
         }
 
-        public static TValue ReadUnprocessedValueFromEvent<TValue>(this InputControl<TValue> control, InputEventPtr eventPtr)
+        public static TValue ReadUnprocessedValueFromEvent<TValue>(
+            this InputControl<TValue> control,
+            InputEventPtr eventPtr
+        )
             where TValue : struct
         {
             if (control == null)
@@ -260,8 +271,16 @@ namespace UnityEngine.InputSystem
             return result;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
-        public static unsafe bool ReadUnprocessedValueFromEvent<TValue>(this InputControl<TValue> control, InputEventPtr inputEvent, out TValue value)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1021:AvoidOutParameters",
+            MessageId = "2#"
+        )]
+        public static unsafe bool ReadUnprocessedValueFromEvent<TValue>(
+            this InputControl<TValue> control,
+            InputEventPtr inputEvent,
+            out TValue value
+        )
             where TValue : struct
         {
             if (control == null)
@@ -279,7 +298,11 @@ namespace UnityEngine.InputSystem
         }
 
         ////REVIEW: this has the opposite argument order of WriteValueFromObjectIntoState; fix!
-        public static unsafe void WriteValueFromObjectIntoEvent(this InputControl control, InputEventPtr eventPtr, object value)
+        public static unsafe void WriteValueFromObjectIntoEvent(
+            this InputControl control,
+            InputEventPtr eventPtr,
+            object value
+        )
         {
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
@@ -332,12 +355,17 @@ namespace UnityEngine.InputSystem
 
             if (!(control is InputControl<TValue> controlOfType))
                 throw new ArgumentException(
-                    $"Expecting control of type '{typeof(TValue).Name}' but got '{control.GetType().Name}'");
+                    $"Expecting control of type '{typeof(TValue).Name}' but got '{control.GetType().Name}'"
+                );
 
             controlOfType.WriteValueIntoState(value, statePtr);
         }
 
-        public static unsafe void WriteValueIntoState<TValue>(this InputControl<TValue> control, TValue value, void* statePtr)
+        public static unsafe void WriteValueIntoState<TValue>(
+            this InputControl<TValue> control,
+            TValue value,
+            void* statePtr
+        )
             where TValue : struct
         {
             if (control == null)
@@ -369,7 +397,11 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="control"/> is null.</exception>
         /// <exception cref="ArgumentException">Control's value does not fit within the memory of <paramref name="state"/>.</exception>
         /// <exception cref="NotSupportedException"><paramref name="control"/> does not support writing.</exception>
-        public static unsafe void WriteValueIntoState<TValue, TState>(this InputControl<TValue> control, TValue value, ref TState state)
+        public static unsafe void WriteValueIntoState<TValue, TState>(
+            this InputControl<TValue> control,
+            TValue value,
+            ref TState state
+        )
             where TValue : struct
             where TState : struct, IInputStateTypeInfo
         {
@@ -381,7 +413,8 @@ namespace UnityEngine.InputSystem
             if (control.stateOffsetRelativeToDeviceRoot + control.m_StateBlock.alignedSizeInBytes >= sizeOfState)
                 throw new ArgumentException(
                     $"Control {control.path} with offset {control.stateOffsetRelativeToDeviceRoot} and size of {control.m_StateBlock.sizeInBits} bits is out of bounds for state of type {typeof(TState).Name} with size {sizeOfState}",
-                    nameof(state));
+                    nameof(state)
+                );
 
             // Write value.
             var statePtr = (byte*)UnsafeUtility.AddressOf(ref state);
@@ -398,12 +431,17 @@ namespace UnityEngine.InputSystem
 
             if (!(control is InputControl<TValue> controlOfType))
                 throw new ArgumentException(
-                    $"Expecting control of type '{typeof(TValue).Name}' but got '{control.GetType().Name}'");
+                    $"Expecting control of type '{typeof(TValue).Name}' but got '{control.GetType().Name}'"
+                );
 
             controlOfType.WriteValueIntoEvent(value, eventPtr);
         }
 
-        public static unsafe void WriteValueIntoEvent<TValue>(this InputControl<TValue> control, TValue value, InputEventPtr eventPtr)
+        public static unsafe void WriteValueIntoEvent<TValue>(
+            this InputControl<TValue> control,
+            TValue value,
+            InputEventPtr eventPtr
+        )
             where TValue : struct
         {
             if (control == null)
@@ -468,7 +506,8 @@ namespace UnityEngine.InputSystem
             if (device.stateBlock.format != state.format)
                 throw new ArgumentException(
                     $"Struct '{typeof(TState).Name}' has state format '{state.format}' which doesn't match device '{device}' with state format '{device.stateBlock.format}'",
-                    nameof(TState));
+                    nameof(TState)
+                );
 
             var stateSize = UnsafeUtility.SizeOf<TState>();
             var statePtr = UnsafeUtility.AddressOf(ref state);
@@ -595,7 +634,12 @@ namespace UnityEngine.InputSystem
         /// (e.g. if both stick values fall below the deadzone).
         /// </remarks>
         /// <seealso cref="InputControl.CompareValue"/>
-        public static unsafe bool CompareState(this InputControl control, void* firstStatePtr, void* secondStatePtr, void* maskPtr = null)
+        public static unsafe bool CompareState(
+            this InputControl control,
+            void* firstStatePtr,
+            void* secondStatePtr,
+            void* maskPtr = null
+        )
         {
             ////REVIEW: for compound controls, do we want to go check leaves so as to not pick up on non-control noise in the state?
             ////        e.g. from HID input reports; or should we just leave that to maskPtr?
@@ -611,12 +655,17 @@ namespace UnityEngine.InputSystem
                 if (mask != null && MemoryHelpers.ReadSingleBit(mask, control.m_StateBlock.bitOffset))
                     return true;
 
-                return MemoryHelpers.ReadSingleBit(secondPtr, control.m_StateBlock.bitOffset) ==
-                    MemoryHelpers.ReadSingleBit(firstPtr, control.m_StateBlock.bitOffset);
+                return MemoryHelpers.ReadSingleBit(secondPtr, control.m_StateBlock.bitOffset)
+                    == MemoryHelpers.ReadSingleBit(firstPtr, control.m_StateBlock.bitOffset);
             }
 
-            return MemoryHelpers.MemCmpBitRegion(firstPtr, secondPtr,
-                control.m_StateBlock.bitOffset, control.m_StateBlock.sizeInBits, mask);
+            return MemoryHelpers.MemCmpBitRegion(
+                firstPtr,
+                secondPtr,
+                control.m_StateBlock.bitOffset,
+                control.m_StateBlock.sizeInBits,
+                mask
+            );
         }
 
         public static unsafe bool CompareState(this InputControl control, void* statePtr, void* maskPtr = null)
@@ -704,7 +753,11 @@ namespace UnityEngine.InputSystem
             return GetStatePtrFromStateEventUnchecked(control, eventPtr, eventPtr.type);
         }
 
-        internal static unsafe void* GetStatePtrFromStateEventUnchecked(this InputControl control, InputEventPtr eventPtr, FourCC eventType)
+        internal static unsafe void* GetStatePtrFromStateEventUnchecked(
+            this InputControl control,
+            InputEventPtr eventPtr,
+            FourCC eventType
+        )
         {
             uint stateOffset;
             FourCC stateFormat;
@@ -732,8 +785,10 @@ namespace UnityEngine.InputSystem
             }
             else
             {
-                throw new ArgumentException($"Event must be a StateEvent or DeltaStateEvent but is a {eventType} instead",
-                    nameof(eventPtr));
+                throw new ArgumentException(
+                    $"Event must be a StateEvent or DeltaStateEvent but is a {eventType} instead",
+                    nameof(eventPtr)
+                );
             }
 
             // Make sure we have a state event compatible with our device. The event doesn't
@@ -745,8 +800,10 @@ namespace UnityEngine.InputSystem
             {
                 // If the device is an IInputStateCallbackReceiver, there's a chance it actually recognizes
                 // the state format in the event and can correlate it to the state as found on the device.
-                if (!device.hasStateCallbacks ||
-                    !((IInputStateCallbackReceiver)device).GetStateOffsetForEvent(control, eventPtr, ref stateOffset))
+                if (
+                    !device.hasStateCallbacks
+                    || !((IInputStateCallbackReceiver)device).GetStateOffsetForEvent(control, eventPtr, ref stateOffset)
+                )
                     return null;
             }
 
@@ -811,7 +868,12 @@ namespace UnityEngine.InputSystem
             ref var stateBlock = ref control.m_StateBlock;
             var offset = stateBlock.byteOffset;
 
-            MemoryHelpers.MemCpyBitRegion(statePtr + offset, defaultStatePtr + offset, stateBlock.bitOffset, stateBlock.sizeInBits);
+            MemoryHelpers.MemCpyBitRegion(
+                statePtr + offset,
+                defaultStatePtr + offset,
+                stateBlock.bitOffset,
+                stateBlock.sizeInBits
+            );
             return true;
         }
 
@@ -861,7 +923,11 @@ namespace UnityEngine.InputSystem
         /// This can be the case, for example, for <see cref="DeltaStateEvent"/>s.
         /// </remarks>
         /// <seealso cref="Pointer.delta"/>
-        public static unsafe void AccumulateValueInEvent(this InputControl<float> control, void* currentStatePtr, InputEventPtr newState)
+        public static unsafe void AccumulateValueInEvent(
+            this InputControl<float> control,
+            void* currentStatePtr,
+            InputEventPtr newState
+        )
         {
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
@@ -873,7 +939,11 @@ namespace UnityEngine.InputSystem
             control.WriteValueIntoEvent(oldValue + newValue, newState);
         }
 
-        internal static unsafe void AccumulateValueInEvent(this InputControl<Vector2> control, void* currentStatePtr, InputEventPtr newState)
+        internal static unsafe void AccumulateValueInEvent(
+            this InputControl<Vector2> control,
+            void* currentStatePtr,
+            InputEventPtr newState
+        )
         {
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
@@ -885,7 +955,11 @@ namespace UnityEngine.InputSystem
             control.WriteValueIntoEvent(oldDelta + newValue, newState);
         }
 
-        public static void FindControlsRecursive<TControl>(this InputControl parent, IList<TControl> controls, Func<TControl, bool> predicate)
+        public static void FindControlsRecursive<TControl>(
+            this InputControl parent,
+            IList<TControl> controls,
+            Func<TControl, bool> predicate
+        )
             where TControl : InputControl
         {
             if (parent == null)
@@ -945,7 +1019,11 @@ namespace UnityEngine.InputSystem
         /// <summary>
         /// Flags that control which controls are returned by <see cref="InputControlExtensions.EnumerateControls"/>.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1714:Flags enums should have plural names", Justification = "False positive: `IgnoreControlsInDefaultState` is a plural form.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Naming",
+            "CA1714:Flags enums should have plural names",
+            Justification = "False positive: `IgnoreControlsInDefaultState` is a plural form."
+        )]
         [Flags]
         public enum Enumerate
         {
@@ -1003,14 +1081,22 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="StateEvent"/>
         /// <seealso cref="DeltaStateEvent"/>
         /// <seealso cref="EnumerateChangedControls"/>
-        public static InputEventControlCollection EnumerateControls(this InputEventPtr eventPtr, Enumerate flags, InputDevice device = null, float magnitudeThreshold = 0)
+        public static InputEventControlCollection EnumerateControls(
+            this InputEventPtr eventPtr,
+            Enumerate flags,
+            InputDevice device = null,
+            float magnitudeThreshold = 0
+        )
         {
             if (!eventPtr.valid)
                 throw new ArgumentNullException(nameof(eventPtr), "Given event pointer must not be null");
 
             var eventType = eventPtr.type;
             if (eventType != StateEvent.Type && eventType != DeltaStateEvent.Type)
-                throw new ArgumentException($"Event must be a StateEvent or DeltaStateEvent but is a {eventType} instead", nameof(eventPtr));
+                throw new ArgumentException(
+                    $"Event must be a StateEvent or DeltaStateEvent but is a {eventType} instead",
+                    nameof(eventPtr)
+                );
 
             // Look up device from event, if no device was supplied.
             if (device == null)
@@ -1018,10 +1104,19 @@ namespace UnityEngine.InputSystem
                 var deviceId = eventPtr.deviceId;
                 device = InputSystem.GetDeviceById(deviceId);
                 if (device == null)
-                    throw new ArgumentException($"Cannot find device with ID {deviceId} referenced by event", nameof(eventPtr));
+                    throw new ArgumentException(
+                        $"Cannot find device with ID {deviceId} referenced by event",
+                        nameof(eventPtr)
+                    );
             }
 
-            return new InputEventControlCollection { m_Device = device, m_EventPtr = eventPtr, m_Flags = flags, m_MagnitudeThreshold = magnitudeThreshold };
+            return new InputEventControlCollection
+            {
+                m_Device = device,
+                m_EventPtr = eventPtr,
+                m_Flags = flags,
+                m_MagnitudeThreshold = magnitudeThreshold,
+            };
         }
 
         /// <summary>
@@ -1060,10 +1155,13 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputSystem.onEvent"/>
         /// <seealso cref="EnumerateControls"/>
         /// <seealso cref="InputEventControlEnumerator"/>
-        public static InputEventControlCollection EnumerateChangedControls(this InputEventPtr eventPtr, InputDevice device = null, float magnitudeThreshold = 0)
+        public static InputEventControlCollection EnumerateChangedControls(
+            this InputEventPtr eventPtr,
+            InputDevice device = null,
+            float magnitudeThreshold = 0
+        )
         {
-            return eventPtr.EnumerateControls
-                    (Enumerate.IgnoreControlsInCurrentState, device, magnitudeThreshold);
+            return eventPtr.EnumerateControls(Enumerate.IgnoreControlsInCurrentState, device, magnitudeThreshold);
         }
 
         /// <summary>
@@ -1078,7 +1176,11 @@ namespace UnityEngine.InputSystem
         /// the <see cref="InputDevice"/> referenced by the <see cref="InputEvent.deviceId"/> in the event cannot be found.</exception>
         /// <seealso cref="EnumerateChangedControls"/>
         /// <seealso cref="ButtonControl.isPressed"/>
-        public static bool HasButtonPress(this InputEventPtr eventPtr, float magnitude = -1, bool buttonControlsOnly = true)
+        public static bool HasButtonPress(
+            this InputEventPtr eventPtr,
+            float magnitude = -1,
+            bool buttonControlsOnly = true
+        )
         {
             return eventPtr.GetFirstButtonPressOrNull(magnitude, buttonControlsOnly) != null;
         }
@@ -1104,7 +1206,11 @@ namespace UnityEngine.InputSystem
         /// in the devices state memory. For example, in the gamepad state, button north (bit position 4) will be evaluated before button
         /// east (bit position 5), so if both buttons were pressed in the given event, button north would be returned.
         /// Note that the function returns null if the <paramref name="eventPtr"/> is not a StateEvent or DeltaStateEvent.</remarks>
-        public static InputControl GetFirstButtonPressOrNull(this InputEventPtr eventPtr, float magnitude = -1, bool buttonControlsOnly = true)
+        public static InputControl GetFirstButtonPressOrNull(
+            this InputEventPtr eventPtr,
+            float magnitude = -1,
+            bool buttonControlsOnly = true
+        )
         {
             if (eventPtr.type != StateEvent.Type && eventPtr.type != DeltaStateEvent.Type)
                 return null;
@@ -1112,7 +1218,12 @@ namespace UnityEngine.InputSystem
             if (magnitude < 0)
                 magnitude = InputSystem.settings.defaultButtonPressPoint;
 
-            foreach (var control in eventPtr.EnumerateControls(Enumerate.IgnoreControlsInDefaultState, magnitudeThreshold: magnitude))
+            foreach (
+                var control in eventPtr.EnumerateControls(
+                    Enumerate.IgnoreControlsInDefaultState,
+                    magnitudeThreshold: magnitude
+                )
+            )
             {
                 if (!control.HasValueChangeInEvent(eventPtr))
                     continue;
@@ -1135,7 +1246,11 @@ namespace UnityEngine.InputSystem
         /// <remarks>Returns an empty enumerable if the <paramref name="eventPtr"/> is not a <see cref="StateEvent"/> or <see cref="DeltaStateEvent"/>.</remarks>
         /// <seealso cref="EnumerateChangedControls"/>
         /// <seealso cref="ButtonControl.isPressed"/>
-        public static IEnumerable<InputControl> GetAllButtonPresses(this InputEventPtr eventPtr, float magnitude = -1, bool buttonControlsOnly = true)
+        public static IEnumerable<InputControl> GetAllButtonPresses(
+            this InputEventPtr eventPtr,
+            float magnitude = -1,
+            bool buttonControlsOnly = true
+        )
         {
             if (eventPtr.type != StateEvent.Type && eventPtr.type != DeltaStateEvent.Type)
                 yield break;
@@ -1143,7 +1258,12 @@ namespace UnityEngine.InputSystem
             if (magnitude < 0)
                 magnitude = InputSystem.settings.defaultButtonPressPoint;
 
-            foreach (var control in eventPtr.EnumerateControls(Enumerate.IgnoreControlsInDefaultState, magnitudeThreshold: magnitude))
+            foreach (
+                var control in eventPtr.EnumerateControls(
+                    Enumerate.IgnoreControlsInDefaultState,
+                    magnitudeThreshold: magnitude
+                )
+            )
             {
                 if (buttonControlsOnly && !control.isButton)
                     continue;
@@ -1257,7 +1377,12 @@ namespace UnityEngine.InputSystem
             private uint m_EndBitOffset;
             private float m_MagnitudeThreshold;
 
-            internal InputEventControlEnumerator(InputEventPtr eventPtr, InputDevice device, Enumerate flags, float magnitudeThreshold = 0)
+            internal InputEventControlEnumerator(
+                InputEventPtr eventPtr,
+                InputDevice device,
+                Enumerate flags,
+                float magnitudeThreshold = 0
+            )
             {
                 Debug.Assert(eventPtr.valid, "eventPtr should be valid at this point");
                 Debug.Assert(device != null, "Need to have valid device at this point");
@@ -1296,12 +1421,24 @@ namespace UnityEngine.InputSystem
 
             private bool CheckDefault(uint numBits)
             {
-                return MemoryHelpers.MemCmpBitRegion(m_EventState, m_DefaultState, m_CurrentBitOffset, numBits, m_NoiseMask);
+                return MemoryHelpers.MemCmpBitRegion(
+                    m_EventState,
+                    m_DefaultState,
+                    m_CurrentBitOffset,
+                    numBits,
+                    m_NoiseMask
+                );
             }
 
             private bool CheckCurrent(uint numBits)
             {
-                return MemoryHelpers.MemCmpBitRegion(m_EventState, m_CurrentState, m_CurrentBitOffset, numBits, m_NoiseMask);
+                return MemoryHelpers.MemCmpBitRegion(
+                    m_EventState,
+                    m_CurrentState,
+                    m_CurrentBitOffset,
+                    numBits,
+                    m_NoiseMask
+                );
             }
 
             public bool MoveNext()
@@ -1336,8 +1473,10 @@ namespace UnityEngine.InputSystem
                         if ((m_CurrentBitOffset & 0x7) != 0)
                         {
                             var bitsLeftInByte = (m_CurrentBitOffset + 8) & 0x7;
-                            if ((ignoreCurrent && CheckCurrent(bitsLeftInByte))
-                                || (ignoreDefault && CheckDefault(bitsLeftInByte)))
+                            if (
+                                (ignoreCurrent && CheckCurrent(bitsLeftInByte))
+                                || (ignoreDefault && CheckDefault(bitsLeftInByte))
+                            )
                                 m_CurrentBitOffset += bitsLeftInByte;
                         }
 
@@ -1373,25 +1512,33 @@ namespace UnityEngine.InputSystem
                     }
 
                     // See if we've reached the end.
-                    if (m_CurrentBitOffset >= m_EndBitOffset
-                        || m_CurrentIndexInStateOffsetToControlIndexMap >= m_StateOffsetToControlIndexLength) // No more controls.
+                    if (
+                        m_CurrentBitOffset >= m_EndBitOffset
+                        || m_CurrentIndexInStateOffsetToControlIndexMap >= m_StateOffsetToControlIndexLength
+                    ) // No more controls.
                         return false;
 
                     // No, so find the control at the current bit offset.
-                    for (;
-                         m_CurrentIndexInStateOffsetToControlIndexMap < m_StateOffsetToControlIndexLength;
-                         ++m_CurrentIndexInStateOffsetToControlIndexMap)
+                    for (
+                        ;
+                        m_CurrentIndexInStateOffsetToControlIndexMap < m_StateOffsetToControlIndexLength;
+                        ++m_CurrentIndexInStateOffsetToControlIndexMap
+                    )
                     {
                         InputDevice.DecodeStateOffsetToControlMapEntry(
                             m_StateOffsetToControlIndex[m_CurrentIndexInStateOffsetToControlIndexMap],
                             out var controlIndex,
                             out var controlBitOffset,
-                            out var controlBitSize);
+                            out var controlBitSize
+                        );
 
                         // If the control's bit region lies *before* the memory we're looking at,
                         // skip it.
-                        if (controlBitOffset < m_CurrentControlStateBitOffset ||
-                            m_CurrentBitOffset >= (controlBitOffset + controlBitSize - m_CurrentControlStateBitOffset))
+                        if (
+                            controlBitOffset < m_CurrentControlStateBitOffset
+                            || m_CurrentBitOffset
+                                >= (controlBitOffset + controlBitSize - m_CurrentControlStateBitOffset)
+                        )
                             continue;
 
                         // If the bit region we're looking at lies *before* the current control,
@@ -1417,8 +1564,28 @@ namespace UnityEngine.InputSystem
                         else
                         {
                             // Otherwise, we may need to check the bit region specifically for the control.
-                            if ((ignoreCurrent && MemoryHelpers.MemCmpBitRegion(m_EventState, m_CurrentState, controlBitOffset - m_CurrentControlStateBitOffset, controlBitSize, m_NoiseMask))
-                                || (ignoreDefault && MemoryHelpers.MemCmpBitRegion(m_EventState, m_DefaultState, controlBitOffset - m_CurrentControlStateBitOffset, controlBitSize, m_NoiseMask)))
+                            if (
+                                (
+                                    ignoreCurrent
+                                    && MemoryHelpers.MemCmpBitRegion(
+                                        m_EventState,
+                                        m_CurrentState,
+                                        controlBitOffset - m_CurrentControlStateBitOffset,
+                                        controlBitSize,
+                                        m_NoiseMask
+                                    )
+                                )
+                                || (
+                                    ignoreDefault
+                                    && MemoryHelpers.MemCmpBitRegion(
+                                        m_EventState,
+                                        m_DefaultState,
+                                        controlBitOffset - m_CurrentControlStateBitOffset,
+                                        controlBitSize,
+                                        m_NoiseMask
+                                    )
+                                )
+                            )
                                 continue;
 
                             m_CurrentControl = m_AllControls[controlIndex];
@@ -1432,9 +1599,14 @@ namespace UnityEngine.InputSystem
 
                         if ((m_Flags & Enumerate.IncludeSyntheticControls) == 0)
                         {
-                            var controlHasSharedState = (m_CurrentControl.m_ControlFlags &
-                                (InputControl.ControlFlags.UsesStateFromOtherControl |
-                                    InputControl.ControlFlags.IsSynthetic)) != 0;
+                            var controlHasSharedState =
+                                (
+                                    m_CurrentControl.m_ControlFlags
+                                    & (
+                                        InputControl.ControlFlags.UsesStateFromOtherControl
+                                        | InputControl.ControlFlags.IsSynthetic
+                                    )
+                                ) != 0;
 
                             // Filter out synthetic and useStateFrom controls.
                             if (controlHasSharedState)
@@ -1454,7 +1626,8 @@ namespace UnityEngine.InputSystem
                         // its magnitude based on the data in the event and if it's too low, keep searching.
                         if (m_MagnitudeThreshold != 0)
                         {
-                            var statePtr = m_EventState - (m_CurrentControlStateBitOffset >> 3) - m_Device.m_StateBlock.byteOffset;
+                            var statePtr =
+                                m_EventState - (m_CurrentControlStateBitOffset >> 3) - m_Device.m_StateBlock.byteOffset;
                             var magnitude = m_CurrentControl.EvaluateMagnitude(statePtr);
                             if (magnitude >= 0 && magnitude < m_MagnitudeThreshold)
                                 continue;
@@ -1502,8 +1675,14 @@ namespace UnityEngine.InputSystem
                 if (stateFormat != m_Device.m_StateBlock.format)
                 {
                     var stateOffset = 0u;
-                    if (m_Device.hasStateCallbacks &&
-                        ((IInputStateCallbackReceiver)m_Device).GetStateOffsetForEvent(null, m_EventPtr, ref stateOffset))
+                    if (
+                        m_Device.hasStateCallbacks
+                        && ((IInputStateCallbackReceiver)m_Device).GetStateOffsetForEvent(
+                            null,
+                            m_EventPtr,
+                            ref stateOffset
+                        )
+                    )
                     {
                         m_CurrentControlStateBitOffset = stateOffset * 8;
                         if (m_CurrentState != null)
@@ -1516,15 +1695,19 @@ namespace UnityEngine.InputSystem
                     else
                     {
                         // https://fogbugz.unity3d.com/f/cases/1395648/
-                        if (m_Device is Touchscreen && m_EventPtr.IsA<StateEvent>() &&
-                            StateEvent.FromUnchecked(m_EventPtr)->stateFormat == TouchState.Format)
+                        if (
+                            m_Device is Touchscreen
+                            && m_EventPtr.IsA<StateEvent>()
+                            && StateEvent.FromUnchecked(m_EventPtr)->stateFormat == TouchState.Format
+                        )
                         {
                             // if GetStateOffsetForEvent(null, ...) return false on touchscreen it means that
                             // we don't have a free slot for incoming touch, so ignore it for now
                         }
                         else
                             throw new InvalidOperationException(
-                                $"{eventType} event with state format {stateFormat} cannot be used with device '{m_Device}'");
+                                $"{eventType} event with state format {stateFormat} cannot be used with device '{m_Device}'"
+                            );
                     }
                 }
 
@@ -1563,7 +1746,9 @@ namespace UnityEngine.InputSystem
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
             if (control.isSetupFinished)
-                throw new InvalidOperationException($"The setup of {control} cannot be modified; control is already in use");
+                throw new InvalidOperationException(
+                    $"The setup of {control} cannot be modified; control is already in use"
+                );
 
             return new ControlBuilder { control = control };
         }
@@ -1573,7 +1758,9 @@ namespace UnityEngine.InputSystem
             if (device == null)
                 throw new ArgumentNullException(nameof(device));
             if (device.isSetupFinished)
-                throw new InvalidOperationException($"The setup of {device} cannot be modified; control is already in use");
+                throw new InvalidOperationException(
+                    $"The setup of {device} cannot be modified; control is already in use"
+                );
             if (controlCount < 1)
                 throw new ArgumentOutOfRangeException(nameof(controlCount));
             if (usageCount < 0)
@@ -1603,12 +1790,12 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder At(InputDevice device, int index)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (device == null)
                     throw new ArgumentNullException(nameof(device));
                 if (index < 0 || index >= device.m_ChildrenForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(index));
-                #endif
+#endif
                 device.m_ChildrenForEachControl[index] = control;
                 control.m_Device = device;
                 return this;
@@ -1617,12 +1804,12 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithParent(InputControl parent)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (parent == null)
                     throw new ArgumentNullException(nameof(parent));
                 if (parent == control)
                     throw new ArgumentException("Control cannot be its own parent", nameof(parent));
-                #endif
+#endif
                 control.m_Parent = parent;
                 return this;
             }
@@ -1630,10 +1817,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithName(string name)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (string.IsNullOrEmpty(name))
                     throw new ArgumentNullException(nameof(name));
-                #endif
+#endif
                 control.m_Name = new InternedString(name);
                 return this;
             }
@@ -1641,10 +1828,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithDisplayName(string displayName)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (string.IsNullOrEmpty(displayName))
                     throw new ArgumentNullException(nameof(displayName));
-                #endif
+#endif
                 control.m_DisplayNameFromLayout = new InternedString(displayName);
                 return this;
             }
@@ -1652,10 +1839,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithShortDisplayName(string shortDisplayName)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (string.IsNullOrEmpty(shortDisplayName))
                     throw new ArgumentNullException(nameof(shortDisplayName));
-                #endif
+#endif
                 control.m_ShortDisplayNameFromLayout = new InternedString(shortDisplayName);
                 return this;
             }
@@ -1663,10 +1850,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithLayout(InternedString layout)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (layout.IsEmpty())
                     throw new ArgumentException("Layout name cannot be empty", nameof(layout));
-                #endif
+#endif
                 control.m_Layout = layout;
                 return this;
             }
@@ -1674,12 +1861,12 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithUsages(int startIndex, int count)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (startIndex < 0 || startIndex >= control.device.m_UsagesForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(startIndex));
                 if (count < 0 || startIndex + count > control.device.m_UsagesForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(count));
-                #endif
+#endif
                 control.m_UsageStartIndex = startIndex;
                 control.m_UsageCount = count;
                 return this;
@@ -1688,12 +1875,12 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithAliases(int startIndex, int count)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (startIndex < 0 || startIndex >= control.device.m_AliasesForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(startIndex));
                 if (count < 0 || startIndex + count > control.device.m_AliasesForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(count));
-                #endif
+#endif
                 control.m_AliasStartIndex = startIndex;
                 control.m_AliasCount = count;
                 return this;
@@ -1702,12 +1889,12 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ControlBuilder WithChildren(int startIndex, int count)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (startIndex < 0 || startIndex >= control.device.m_ChildrenForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(startIndex));
                 if (count < 0 || startIndex + count > control.device.m_ChildrenForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(count));
-                #endif
+#endif
                 control.m_ChildStartIndex = startIndex;
                 control.m_ChildCount = count;
                 return this;
@@ -1741,10 +1928,10 @@ namespace UnityEngine.InputSystem
                 where TValue : struct
                 where TProcessor : InputProcessor<TValue>
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (processor == null)
                     throw new ArgumentNullException(nameof(processor));
-                #endif
+#endif
                 ////REVIEW: have a parameterized version of ControlBuilder<TValue> so we don't need the cast?
                 ////TODO: size array to exact needed size before-hand
                 ((InputControl<TValue>)control).m_ProcessorStack.Append(processor);
@@ -1795,10 +1982,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public DeviceBuilder WithName(string name)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (string.IsNullOrEmpty(name))
                     throw new ArgumentNullException(nameof(name));
-                #endif
+#endif
                 device.m_Name = new InternedString(name);
                 return this;
             }
@@ -1806,10 +1993,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public DeviceBuilder WithDisplayName(string displayName)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (string.IsNullOrEmpty(displayName))
                     throw new ArgumentNullException(nameof(displayName));
-                #endif
+#endif
                 device.m_DisplayNameFromLayout = new InternedString(displayName);
                 return this;
             }
@@ -1817,10 +2004,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public DeviceBuilder WithShortDisplayName(string shortDisplayName)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (string.IsNullOrEmpty(shortDisplayName))
                     throw new ArgumentNullException(nameof(shortDisplayName));
-                #endif
+#endif
                 device.m_ShortDisplayNameFromLayout = new InternedString(shortDisplayName);
                 return this;
             }
@@ -1828,10 +2015,10 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public DeviceBuilder WithLayout(InternedString layout)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (layout.IsEmpty())
                     throw new ArgumentException("Layout name cannot be empty", nameof(layout));
-                #endif
+#endif
                 device.m_Layout = layout;
                 return this;
             }
@@ -1839,12 +2026,12 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public DeviceBuilder WithChildren(int startIndex, int count)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (startIndex < 0 || startIndex >= device.device.m_ChildrenForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(startIndex));
                 if (count < 0 || startIndex + count > device.device.m_ChildrenForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(count));
-                #endif
+#endif
                 device.m_ChildStartIndex = startIndex;
                 device.m_ChildCount = count;
                 return this;
@@ -1867,14 +2054,14 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public DeviceBuilder WithControlUsage(int controlIndex, InternedString usage, InputControl control)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (controlIndex < 0 || controlIndex >= device.m_UsagesForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(controlIndex));
                 if (usage.IsEmpty())
                     throw new ArgumentException(nameof(usage));
                 if (control == null)
                     throw new ArgumentNullException(nameof(control));
-                #endif
+#endif
                 device.m_UsagesForEachControl[controlIndex] = usage;
                 device.m_UsageToControl[controlIndex] = control;
                 return this;
@@ -1883,12 +2070,12 @@ namespace UnityEngine.InputSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public DeviceBuilder WithControlAlias(int controlIndex, InternedString alias)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (controlIndex < 0 || controlIndex >= device.m_AliasesForEachControl.Length)
                     throw new ArgumentOutOfRangeException(nameof(controlIndex));
                 if (alias.IsEmpty())
                     throw new ArgumentException(nameof(alias));
-                #endif
+#endif
                 device.m_AliasesForEachControl[controlIndex] = alias;
                 return this;
             }
@@ -1906,7 +2093,7 @@ namespace UnityEngine.InputSystem
                 var sizeOfNode = UnsafeUtility.SizeOf<InputDevice.ControlBitRangeNode>();
                 var numNodes = controlTreeNodes.Length / sizeOfNode;
                 device.m_ControlTreeNodes = new InputDevice.ControlBitRangeNode[numNodes];
-                fixed(byte* nodePtr = controlTreeNodes)
+                fixed (byte* nodePtr = controlTreeNodes)
                 {
                     for (var i = 0; i < numNodes; i++)
                     {

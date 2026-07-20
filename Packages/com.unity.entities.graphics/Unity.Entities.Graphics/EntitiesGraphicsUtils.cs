@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [assembly: InternalsVisibleTo("Unity.Entities.Graphics.Tests")]
+
 namespace Unity.Rendering
 {
     internal static class EntitiesGraphicsUtils
@@ -72,12 +73,13 @@ namespace Unity.Rendering
 
             var deviceType = SystemInfo.graphicsDeviceType;
 
-            bool isOpenGL = deviceType == GraphicsDeviceType.OpenGLCore ||
-                            deviceType == GraphicsDeviceType.OpenGLES3;
+            bool isOpenGL = deviceType == GraphicsDeviceType.OpenGLCore || deviceType == GraphicsDeviceType.OpenGLES3;
 
-            if (deviceType == GraphicsDeviceType.Null ||
-                !SystemInfo.supportsComputeShaders ||
-                (isOpenGL && !CheckGLVersion()))
+            if (
+                deviceType == GraphicsDeviceType.Null
+                || !SystemInfo.supportsComputeShaders
+                || (isOpenGL && !CheckGLVersion())
+            )
                 return false;
 
             return true;
@@ -149,7 +151,7 @@ namespace Unity.Rendering
 
         public static v128 ComputeBitmask(int entityCount)
         {
-            Assert.IsTrue(entityCount<=128);
+            Assert.IsTrue(entityCount <= 128);
             return EnabledBitUtility.ShiftRight(new v128(ulong.MaxValue), 128 - entityCount);
         }
     }
@@ -178,15 +180,18 @@ namespace Unity.Rendering
 #else
             // TODO: Replace this with atomic AND once it is available
             long currentValue = System.Threading.Interlocked.Read(ref qwords[index]);
-            for (;;)
+            for (; ; )
             {
                 // If the AND wouldn't change any bits, no need to issue the atomic
                 if ((currentValue & value) == currentValue)
                     return;
 
                 long newValue = currentValue & value;
-                long prevValue =
-                    System.Threading.Interlocked.CompareExchange(ref qwords[index], newValue, currentValue);
+                long prevValue = System.Threading.Interlocked.CompareExchange(
+                    ref qwords[index],
+                    newValue,
+                    currentValue
+                );
 
                 // If the value was equal to the expected value, we know that our atomic went through
                 if (prevValue == currentValue)
@@ -205,15 +210,18 @@ namespace Unity.Rendering
 #else
             // TODO: Replace this with atomic OR once it is available
             long currentValue = System.Threading.Interlocked.Read(ref qwords[index]);
-            for (;;)
+            for (; ; )
             {
                 // If the OR wouldn't change any bits, no need to issue the atomic
                 if ((currentValue | value) == currentValue)
                     return;
 
                 long newValue = currentValue | value;
-                long prevValue =
-                    System.Threading.Interlocked.CompareExchange(ref qwords[index], newValue, currentValue);
+                long prevValue = System.Threading.Interlocked.CompareExchange(
+                    ref qwords[index],
+                    newValue,
+                    currentValue
+                );
 
                 // If the value was equal to the expected value, we know that our atomic went through
                 if (prevValue == currentValue)
@@ -232,11 +240,11 @@ namespace Unity.Rendering
             if (float.IsNaN(value))
                 return currentValue;
 
-            int* floatsAsInts = (int*) floats;
+            int* floatsAsInts = (int*)floats;
             int valueAsInt = math.asint(value);
 
             // Do the CAS operations as ints to avoid problems with NaNs
-            for (;;)
+            for (; ; )
             {
                 // If currentValue is NaN, this comparison will fail
                 if (currentValue <= value)
@@ -245,7 +253,11 @@ namespace Unity.Rendering
                 int currentValueAsInt = math.asint(currentValue);
 
                 int newValue = valueAsInt;
-                int prevValue = System.Threading.Interlocked.CompareExchange(ref floatsAsInts[index], newValue, currentValueAsInt);
+                int prevValue = System.Threading.Interlocked.CompareExchange(
+                    ref floatsAsInts[index],
+                    newValue,
+                    currentValueAsInt
+                );
                 float prevValueAsFloat = math.asfloat(prevValue);
 
                 // If the value was equal to the expected value, we know that our atomic went through
@@ -266,11 +278,11 @@ namespace Unity.Rendering
             if (float.IsNaN(value))
                 return currentValue;
 
-            int* floatsAsInts = (int*) floats;
+            int* floatsAsInts = (int*)floats;
             int valueAsInt = math.asint(value);
 
             // Do the CAS operations as ints to avoid problems with NaNs
-            for (;;)
+            for (; ; )
             {
                 // If currentValue is NaN, this comparison will fail
                 if (currentValue >= value)
@@ -279,7 +291,11 @@ namespace Unity.Rendering
                 int currentValueAsInt = math.asint(currentValue);
 
                 int newValue = valueAsInt;
-                int prevValue = System.Threading.Interlocked.CompareExchange(ref floatsAsInts[index], newValue, currentValueAsInt);
+                int prevValue = System.Threading.Interlocked.CompareExchange(
+                    ref floatsAsInts[index],
+                    newValue,
+                    currentValueAsInt
+                );
                 float prevValueAsFloat = math.asfloat(prevValue);
 
                 // If the value was equal to the expected value, we know that our atomic went through

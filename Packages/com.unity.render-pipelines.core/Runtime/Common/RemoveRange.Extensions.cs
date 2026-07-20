@@ -21,7 +21,12 @@ namespace UnityEngine.Rendering
         /// <returns>True if succeed, false otherwise</returns>
         [CollectionAccess(CollectionAccessType.ModifyExistingContent)]
         [MustUseReturnValue]
-        public static bool TryRemoveElementsInRange<TValue>([DisallowNull] this IList<TValue> list, int index, int count, [NotNullWhen(false)] out Exception error)
+        public static bool TryRemoveElementsInRange<TValue>(
+            [DisallowNull] this IList<TValue> list,
+            int index,
+            int count,
+            [NotNullWhen(false)] out Exception error
+        )
         {
             try
             {
@@ -37,7 +42,9 @@ namespace UnityEngine.Rendering
                     if (count < 0)
                         throw new ArgumentOutOfRangeException(nameof(count));
                     if (list.Count - index < count)
-                        throw new ArgumentException("index and count do not denote a valid range of elements in the list");
+                        throw new ArgumentException(
+                            "index and count do not denote a valid range of elements in the list"
+                        );
 #endif
 
                     for (var i = count; i > 0; --i)

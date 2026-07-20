@@ -16,24 +16,40 @@ namespace Unity.Multiplayer.Editor
 
             if (InternalUtility.IsClassicProfile(profile))
             {
-                InternalUtility.GetBuildProfileInternalData(profile, out var buildSubtarget, out var buildTarget, out _);
+                InternalUtility.GetBuildProfileInternalData(
+                    profile,
+                    out var buildSubtarget,
+                    out var buildTarget,
+                    out _
+                );
 
                 EditorGUI.BeginChangeCheck();
-                var target = (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)EditorGUILayout.EnumPopup(
-                    "Multiplayer Role",
-                    MultiplayerRolesSettings.instance.GetMultiplayerRoleForClassicTarget(buildTarget, buildSubtarget));
+                var target = (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)
+                    EditorGUILayout.EnumPopup(
+                        "Multiplayer Role",
+                        MultiplayerRolesSettings.instance.GetMultiplayerRoleForClassicTarget(
+                            buildTarget,
+                            buildSubtarget
+                        )
+                    );
 
                 if (EditorGUI.EndChangeCheck())
-                    MultiplayerRolesSettings.instance.SetMultiplayerRoleForClassicTarget(buildTarget, buildSubtarget, target);
+                    MultiplayerRolesSettings.instance.SetMultiplayerRoleForClassicTarget(
+                        buildTarget,
+                        buildSubtarget,
+                        target
+                    );
 
                 return;
             }
             else
             {
                 EditorGUI.BeginChangeCheck();
-                var target = (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)EditorGUILayout.EnumPopup(
-                    "Multiplayer Role",
-                    MultiplayerRolesSettings.instance.GetMultiplayerRoleForBuildProfile(profile));
+                var target = (UnityEngine.Multiplayer.Internal.MultiplayerRoleFlags)
+                    EditorGUILayout.EnumPopup(
+                        "Multiplayer Role",
+                        MultiplayerRolesSettings.instance.GetMultiplayerRoleForBuildProfile(profile)
+                    );
 
                 if (EditorGUI.EndChangeCheck())
                     MultiplayerRolesSettings.instance.SetMultiplayerRoleForBuildProfile(profile, target);

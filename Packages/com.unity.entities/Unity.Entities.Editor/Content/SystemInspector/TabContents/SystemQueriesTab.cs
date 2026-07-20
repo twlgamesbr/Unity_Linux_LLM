@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using Unity.Serialization;
 using UnityEditor;
 using UnityEngine;
@@ -70,8 +70,12 @@ namespace Unity.Entities.Editor
                 var queryView = new QueryView(new QueryViewData(i + 1, queries[i], Target.SystemProxy, Target.World));
                 queryView.Header.AddToClassList(UssClasses.QueryView.HeaderBold);
                 queryView.Q<Toggle>().AddToClassList(UssClasses.QueryView.Toggle);
-                queryView.Q(className: "foldout-with-action-button__icon").AddToClassList(UssClasses.QueryView.HideActionIcon);
-                queryView.Q(className: "unity-foldout__content").AddToClassList(UssClasses.QueryView.FoldoutContentPadding);
+                queryView
+                    .Q(className: "foldout-with-action-button__icon")
+                    .AddToClassList(UssClasses.QueryView.HideActionIcon);
+                queryView
+                    .Q(className: "unity-foldout__content")
+                    .AddToClassList(UssClasses.QueryView.FoldoutContentPadding);
                 root.Add(queryView);
             }
 

@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     /// <remarks>
     /// To change those settings, go to Editor > Project Settings in the Graphics tab (URP).
     /// Changing this through the API is only allowed in the Editor. In the Player, this raises an error.
-    /// 
+    ///
     /// This container is removed from all build Players.
     /// </remarks>
     /// <seealso cref="IRenderPipelineGraphicsSettings"/>
@@ -17,7 +17,7 @@ namespace UnityEngine.Rendering.Universal
     /// <code>
     /// using UnityEngine.Rendering;
     /// using UnityEngine.Rendering.Universal;
-    /// 
+    ///
     /// public static class URPShaderStrippingHelper
     /// {
     ///     public static bool enabled
@@ -45,7 +45,8 @@ namespace UnityEngine.Rendering.Universal
             Initial = 0,
         }
 
-        [SerializeField][HideInInspector]
+        [SerializeField]
+        [HideInInspector]
         private Version m_Version;
 
         /// <summary>Indicates the current version of this settings container. Used exclusively for project upgrades.</summary>
@@ -54,7 +55,9 @@ namespace UnityEngine.Rendering.Universal
 
         #region SerializeFields
         [SerializeField]
-        [Tooltip("Controls whether to automatically strip post processing shader variants based on VolumeProfile components. Stripping is done based on VolumeProfiles in project, their usage in scenes is not considered.")]
+        [Tooltip(
+            "Controls whether to automatically strip post processing shader variants based on VolumeProfile components. Stripping is done based on VolumeProfiles in project, their usage in scenes is not considered."
+        )]
         bool m_StripUnusedPostProcessingVariants = false;
 
         [SerializeField]

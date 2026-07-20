@@ -32,7 +32,8 @@ public readonly struct SystemDescription : ISourceGeneratorDiagnosable
         SemanticModel semanticModel,
         SyntaxTreeInfo syntaxTreeInfo,
         Dictionary<SyntaxNode, CandidateSyntax> candidateNodes,
-        PreprocessorInfo preprocessorInfo)
+        PreprocessorInfo preprocessorInfo
+    )
     {
         SystemTypeSyntax = systemTypeSyntax;
         SemanticModel = semanticModel;
@@ -72,7 +73,10 @@ public readonly struct SystemDescription : ISourceGeneratorDiagnosable
 
     public string OriginalFilePath => SyntaxTreeInfo.Tree.FilePath.Replace('\\', '/');
 
-    public (HashSet<StatementSyntax>, HashSet<StatementSyntax>) GetStatementsRequiringLineDirectivesAndHiddenDirectives()
+    public (
+        HashSet<StatementSyntax>,
+        HashSet<StatementSyntax>
+    ) GetStatementsRequiringLineDirectivesAndHiddenDirectives()
     {
         var lineDirectiveStatements = new HashSet<StatementSyntax>();
         var hiddenDirectiveStatements = new HashSet<StatementSyntax>();
@@ -97,11 +101,15 @@ public readonly struct SystemDescription : ISourceGeneratorDiagnosable
         return (lineDirectiveStatements, hiddenDirectiveStatements);
     }
 
-    public Dictionary<MemberDeclarationSyntax, Dictionary<SyntaxNode, CandidateSyntax>> CandidateNodesGroupedByMethodOrProperty
+    public Dictionary<
+        MemberDeclarationSyntax,
+        Dictionary<SyntaxNode, CandidateSyntax>
+    > CandidateNodesGroupedByMethodOrProperty
     {
         get
         {
-            var candidateNodesGroupedByContainingMember = new Dictionary<MemberDeclarationSyntax, Dictionary<SyntaxNode, CandidateSyntax>>();
+            var candidateNodesGroupedByContainingMember =
+                new Dictionary<MemberDeclarationSyntax, Dictionary<SyntaxNode, CandidateSyntax>>();
             foreach (var kvp in CandidateNodes)
             {
                 var node = kvp.Key;
@@ -112,10 +120,7 @@ public readonly struct SystemDescription : ISourceGeneratorDiagnosable
                 if (candidateNodesGroupedByContainingMember.TryGetValue(containingMember, out var candidateNodes))
                     candidateNodes.Add(node, candidate);
                 else
-                    candidateNodesGroupedByContainingMember.Add(containingMember, new()
-                    {
-                        { node, candidate }
-                    });
+                    candidateNodesGroupedByContainingMember.Add(containingMember, new() { { node, candidate } });
             }
 
             return candidateNodesGroupedByContainingMember;
@@ -129,15 +134,19 @@ public readonly struct SystemDescription : ISourceGeneratorDiagnosable
             case SystemType.ISystem:
             {
                 var methodDeclarationSyntax = candidate.Node.AncestorOfKindOrDefault<MethodDeclarationSyntax>();
-                if (methodDeclarationSyntax == null) {
+                if (methodDeclarationSyntax == null)
+                {
                     SystemGeneratorErrors.SGSG0001(this, candidate);
                     systemStateExpression = null;
                     return false;
                 }
 
-                var containingMethodSymbol = (IMethodSymbol)ModelExtensions.GetDeclaredSymbol(SemanticModel, methodDeclarationSyntax);
+                var containingMethodSymbol = (IMethodSymbol)
+                    ModelExtensions.GetDeclaredSymbol(SemanticModel, methodDeclarationSyntax);
 
-                var systemStateParameterName = containingMethodSymbol?.Parameters.FirstOrDefault(p => p.Type.Is("Unity.Entities.SystemState"))?.Name;
+                var systemStateParameterName = containingMethodSymbol
+                    ?.Parameters.FirstOrDefault(p => p.Type.Is("Unity.Entities.SystemState"))
+                    ?.Name;
                 if (systemStateParameterName != null)
                 {
                     systemStateExpression = SyntaxFactory.IdentifierName(systemStateParameterName);
@@ -154,7 +163,11 @@ public readonly struct SystemDescription : ISourceGeneratorDiagnosable
         }
 
         // this.CheckedStateRef
-        systemStateExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName("CheckedStateRef"));
+        systemStateExpression = SyntaxFactory.MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            SyntaxFactory.ThisExpression(),
+            SyntaxFactory.IdentifierName("CheckedStateRef")
+        );
         return true;
     }
 }

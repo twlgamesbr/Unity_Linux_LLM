@@ -9,12 +9,15 @@ namespace Unity.Physics.Extensions
     {
         /// <summary>Apply a continuous force to the rigid body, using its mass.</summary>
         Force = 0,
+
         /// <summary>Apply a continuous acceleration to the rigid body, ignoring its mass.</summary>
         Impulse = 1,
+
         /// <summary>Apply an instant force impulse to the rigid body, using its mass.</summary>
         VelocityChange = 2,
+
         /// <summary>Apply an instant velocity change to the rigid body, ignoring its mass.</summary>
-        Acceleration = 5
+        Acceleration = 5,
     }
 
     /// <summary>   Utility functions acting on physics components. </summary>
@@ -67,7 +70,12 @@ namespace Unity.Physics.Extensions
         /// <param name="ecbParallelWriter">An entity command buffer's parallel writer, required for this operation.</param>
         /// <param name="sortKey">  A unique index required for adding a component through the provided <paramref name="ecbParallelWriter"/>.
         ///                         See <see cref="EntityCommandBuffer.ParallelWriter.AddComponent{T}(int, Entity, T)"/> for details. </param>
-        public static void MakeUnique(ref this PhysicsCollider collider, in Entity entity, EntityCommandBuffer.ParallelWriter ecbParallelWriter, int sortKey)
+        public static void MakeUnique(
+            ref this PhysicsCollider collider,
+            in Entity entity,
+            EntityCommandBuffer.ParallelWriter ecbParallelWriter,
+            int sortKey
+        )
         {
             if (CloneAndCreateCleanupDataIfRequired(ref collider, out var data))
             {
@@ -88,10 +96,7 @@ namespace Unity.Physics.Extensions
 
             var blobClone = collider.Value.Value.Clone();
             collider.Value = blobClone;
-            data = new ColliderBlobCleanupData
-            {
-                Value = blobClone
-            };
+            data = new ColliderBlobCleanupData { Value = blobClone };
 
             return true;
         }
@@ -139,8 +144,19 @@ namespace Unity.Physics.Extensions
         /// <param name="point">            The point. </param>
         ///
         /// <returns>   A body's effective mass with respect to the specified point and impulse. </returns>
-        public static float GetEffectiveMass(in this PhysicsMass bodyMass, in float3 bodyPosition, in quaternion bodyOrientation, float3 impulse, float3 point) =>
-            PhysicsWorldExtensions.GetEffectiveMassImpl(GetCenterOfMassWorldSpace(bodyMass, bodyPosition, bodyOrientation), bodyMass.InverseInertia, impulse, point);
+        public static float GetEffectiveMass(
+            in this PhysicsMass bodyMass,
+            in float3 bodyPosition,
+            in quaternion bodyOrientation,
+            float3 impulse,
+            float3 point
+        ) =>
+            PhysicsWorldExtensions.GetEffectiveMassImpl(
+                GetCenterOfMassWorldSpace(bodyMass, bodyPosition, bodyOrientation),
+                bodyMass.InverseInertia,
+                impulse,
+                point
+            );
 
         /// <summary>
         /// Get a body's effective mass in a given direction and from a particular point in world space.
@@ -154,7 +170,14 @@ namespace Unity.Physics.Extensions
         /// <param name="point">            A point in world space. </param>
         ///
         /// <returns>   A body's effective mass with respect to the specified point and impulse. </returns>
-        public static float GetEffectiveMass(in this PhysicsMass bodyMass, in float3 bodyPosition, in quaternion bodyOrientation, in float bodyScale, float3 impulse, float3 point)
+        public static float GetEffectiveMass(
+            in this PhysicsMass bodyMass,
+            in float3 bodyPosition,
+            in quaternion bodyOrientation,
+            in float bodyScale,
+            float3 impulse,
+            float3 point
+        )
         {
             float3 com = GetCenterOfMassWorldSpace(bodyMass, bodyScale, bodyPosition, bodyOrientation);
             var scaledMass = bodyMass.ApplyScale(bodyScale);
@@ -169,8 +192,12 @@ namespace Unity.Physics.Extensions
         /// <param name="bodyOrientation">  The body's world-space rotation. </param>
         ///
         /// <returns>   The center of mass in world space. </returns>
-        public static float3 GetCenterOfMassWorldSpace(in this PhysicsMass bodyMass, float bodyScale, in float3 bodyPosition, in quaternion bodyOrientation) =>
-            math.rotate(bodyOrientation, bodyMass.CenterOfMass * bodyScale) + bodyPosition;
+        public static float3 GetCenterOfMassWorldSpace(
+            in this PhysicsMass bodyMass,
+            float bodyScale,
+            in float3 bodyPosition,
+            in quaternion bodyOrientation
+        ) => math.rotate(bodyOrientation, bodyMass.CenterOfMass * bodyScale) + bodyPosition;
 
         /// <summary>
         /// Get the center of mass in world space. Assumes that the body's scale is 1.
@@ -182,8 +209,11 @@ namespace Unity.Physics.Extensions
         /// <param name="bodyOrientation">  The body orientation. </param>
         ///
         /// <returns>   The center of mass in world space. </returns>
-        public static float3 GetCenterOfMassWorldSpace(in this PhysicsMass bodyMass, in float3 bodyPosition, in quaternion bodyOrientation) =>
-            bodyMass.GetCenterOfMassWorldSpace(1.0f, bodyPosition, bodyOrientation);
+        public static float3 GetCenterOfMassWorldSpace(
+            in this PhysicsMass bodyMass,
+            in float3 bodyPosition,
+            in quaternion bodyOrientation
+        ) => bodyMass.GetCenterOfMassWorldSpace(1.0f, bodyPosition, bodyOrientation);
 
         /// <summary>   Set the center of mass in world space. </summary>
         ///
@@ -191,7 +221,12 @@ namespace Unity.Physics.Extensions
         /// <param name="bodyPosition">     The body's world-space position. </param>
         /// <param name="bodyOrientation">  The body's world-space rotation. </param>
         /// <param name="com">              A position in world space for the new center of mass. </param>
-        public static void SetCenterOfMassWorldSpace(ref this PhysicsMass bodyMass, in float3 bodyPosition, in quaternion bodyOrientation, float3 com)
+        public static void SetCenterOfMassWorldSpace(
+            ref this PhysicsMass bodyMass,
+            in float3 bodyPosition,
+            in quaternion bodyOrientation,
+            float3 com
+        )
         {
             com -= bodyPosition;
             math.rotate(math.inverse(bodyOrientation), com);
@@ -207,12 +242,23 @@ namespace Unity.Physics.Extensions
         /// <param name="point">            A reference position in world space. </param>
         ///
         /// <returns>   The linear velocity of a rigid body at a given point (in world space) </returns>
-        public static float3 GetLinearVelocity(in this PhysicsVelocity bodyVelocity, PhysicsMass bodyMass, float3 bodyPosition, quaternion bodyOrientation, float3 point)
+        public static float3 GetLinearVelocity(
+            in this PhysicsVelocity bodyVelocity,
+            PhysicsMass bodyMass,
+            float3 bodyPosition,
+            quaternion bodyOrientation,
+            float3 point
+        )
         {
             var worldFromEntity = new RigidTransform(bodyOrientation, bodyPosition);
             var worldFromMotion = math.mul(worldFromEntity, bodyMass.Transform);
 
-            return PhysicsWorldExtensions.GetLinearVelocityImpl(worldFromMotion, bodyVelocity.Angular, bodyVelocity.Linear, point);
+            return PhysicsWorldExtensions.GetLinearVelocityImpl(
+                worldFromMotion,
+                bodyVelocity.Angular,
+                bodyVelocity.Linear,
+                point
+            );
         }
 
         /// <summary>   Get the world-space angular velocity of a rigid body. </summary>
@@ -222,7 +268,11 @@ namespace Unity.Physics.Extensions
         /// <param name="bodyOrientation">  The body's world-space rotation. </param>
         ///
         /// <returns>   The angular velocity of a rigid body in world space. </returns>
-        public static float3 GetAngularVelocityWorldSpace(in this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass, in quaternion bodyOrientation)
+        public static float3 GetAngularVelocityWorldSpace(
+            in this PhysicsVelocity bodyVelocity,
+            in PhysicsMass bodyMass,
+            in quaternion bodyOrientation
+        )
         {
             quaternion worldFromMotion = math.mul(bodyOrientation, bodyMass.InertiaOrientation);
             return math.rotate(worldFromMotion, bodyVelocity.Angular);
@@ -235,10 +285,18 @@ namespace Unity.Physics.Extensions
         /// <param name="bodyOrientation">  The body's world-space rotation. </param>
         /// <param name="angularVelocity"> An angular velocity in world space specifying radians per
         /// second about each axis. </param>
-        public static void SetAngularVelocityWorldSpace(ref this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass, in quaternion bodyOrientation, in float3 angularVelocity)
+        public static void SetAngularVelocityWorldSpace(
+            ref this PhysicsVelocity bodyVelocity,
+            in PhysicsMass bodyMass,
+            in quaternion bodyOrientation,
+            in float3 angularVelocity
+        )
         {
             quaternion inertiaOrientationInWorldSpace = math.mul(bodyOrientation, bodyMass.InertiaOrientation);
-            float3 angularVelocityInertiaSpace = math.rotate(math.inverse(inertiaOrientationInWorldSpace), angularVelocity);
+            float3 angularVelocityInertiaSpace = math.rotate(
+                math.inverse(inertiaOrientationInWorldSpace),
+                angularVelocity
+            );
             bodyVelocity.Angular = angularVelocityInertiaSpace;
         }
 
@@ -247,18 +305,24 @@ namespace Unity.Physics.Extensions
         /// <param name="bodyVelocity">    [in,out] The body's <see cref="PhysicsVelocity"/> component. </param>
         /// <param name="bodyMass">     The body's <see cref="PhysicsMass"/> component. </param>
         /// <returns> The linear kinetic energy. </returns>
-        public static float GetLinearKineticEnergy(in this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass)
-            => math.select(0.5f * math.rcp(bodyMass.InverseMass) * math.dot(bodyVelocity.Linear, bodyVelocity.Linear),
-                math.select(0.0f, float.PositiveInfinity, math.any(bodyVelocity.Linear)), bodyMass.InverseMass == 0.0f);
+        public static float GetLinearKineticEnergy(in this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass) =>
+            math.select(
+                0.5f * math.rcp(bodyMass.InverseMass) * math.dot(bodyVelocity.Linear, bodyVelocity.Linear),
+                math.select(0.0f, float.PositiveInfinity, math.any(bodyVelocity.Linear)),
+                bodyMass.InverseMass == 0.0f
+            );
 
         /// <summary>   Gets angular kinetic energy of a rigid body. </summary>
         ///
         /// <param name="bodyVelocity">    [in,out] The body's <see cref="PhysicsVelocity"/> component. </param>
         /// <param name="bodyMass">     The body's <see cref="PhysicsMass"/> component. </param>
         /// <returns> The angular kinetic energy. </returns>
-        public static float GetAngularKineticEnergy(in this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass)
-            => math.select(0.5f * math.dot(bodyVelocity.Angular, math.rcp(bodyMass.InverseInertia) * bodyVelocity.Angular),
-                math.select(0.0f, float.PositiveInfinity, math.any(bodyVelocity.Angular)), bodyMass.HasInfiniteInertia);
+        public static float GetAngularKineticEnergy(in this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass) =>
+            math.select(
+                0.5f * math.dot(bodyVelocity.Angular, math.rcp(bodyMass.InverseInertia) * bodyVelocity.Angular),
+                math.select(0.0f, float.PositiveInfinity, math.any(bodyVelocity.Angular)),
+                bodyMass.HasInfiniteInertia
+            );
 
         /// <summary>
         /// Converts a force into an impulse based on the force mode and the body's mass and inertia
@@ -274,7 +338,15 @@ namespace Unity.Physics.Extensions
         /// based on the supplied 'mode'. </param>
         /// <param name="impulseMass"> [out] A returned PhysicsMass component to be passed to an Apply
         /// function. </param>
-        public static void GetImpulseFromForce(in this PhysicsMass bodyMass, float bodyScale, in float3 force, in ForceMode mode, in float timestep, out float3 impulse, out PhysicsMass impulseMass)
+        public static void GetImpulseFromForce(
+            in this PhysicsMass bodyMass,
+            float bodyScale,
+            in float3 force,
+            in ForceMode mode,
+            in float timestep,
+            out float3 impulse,
+            out PhysicsMass impulseMass
+        )
         {
             var scaledBodyMass = bodyMass;
             if (!Math.IsApproximatelyEqual(bodyScale, 1.0f))
@@ -296,9 +368,21 @@ namespace Unity.Physics.Extensions
         /// <param name="timestep">     The timestep. </param>
         /// <param name="impulse">      [out] The impulse. </param>
         /// <param name="impulseMass">  [out] The impulse mass. </param>
-        public static void GetImpulseFromForce(in this PhysicsMass bodyMass, in float3 force, in ForceMode mode, in float timestep, out float3 impulse, out PhysicsMass impulseMass)
+        public static void GetImpulseFromForce(
+            in this PhysicsMass bodyMass,
+            in float3 force,
+            in ForceMode mode,
+            in float timestep,
+            out float3 impulse,
+            out PhysicsMass impulseMass
+        )
         {
-            var unitMass = new PhysicsMass { InverseInertia = new float3(1.0f), InverseMass = 1.0f, Transform = bodyMass.Transform };
+            var unitMass = new PhysicsMass
+            {
+                InverseInertia = new float3(1.0f),
+                InverseMass = 1.0f,
+                Transform = bodyMass.Transform,
+            };
             switch (mode)
             {
                 case ForceMode.Force:
@@ -354,11 +438,21 @@ namespace Unity.Physics.Extensions
         /// explosion to make it seem to lift objects. </param>
         /// <param name="mode">              (Optional) The method used to apply the force to its targets. </param>
         public static void ApplyExplosionForce(
-            ref this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass, in PhysicsCollider bodyCollider,
-            in float3 bodyPosition, in quaternion bodyOrientation, in float bodyScale,
-            float explosionForce, in float3 explosionPosition, in float explosionRadius,
-            in float timestep, in float3 up, in CollisionFilter explosionFilter,
-            in float upwardsModifier = 0, ForceMode mode = ForceMode.Force)
+            ref this PhysicsVelocity bodyVelocity,
+            in PhysicsMass bodyMass,
+            in PhysicsCollider bodyCollider,
+            in float3 bodyPosition,
+            in quaternion bodyOrientation,
+            in float bodyScale,
+            float explosionForce,
+            in float3 explosionPosition,
+            in float explosionRadius,
+            in float timestep,
+            in float3 up,
+            in CollisionFilter explosionFilter,
+            in float upwardsModifier = 0,
+            ForceMode mode = ForceMode.Force
+        )
         {
             // var worldFromBody = new RigidTransform(bodyOrientation.Value, bodyPosition.Value);
             //  The explosion is modelled as a sphere with a certain centre position and radius in world
@@ -370,14 +464,21 @@ namespace Unity.Physics.Extensions
             //  regardless of how far the centre is from the rigidbody.
             bool bExplosionProportionalToDistance = explosionRadius != 0.0f;
 
-            Math.ScaledMTransform worldFromBody = new Math.ScaledMTransform(new RigidTransform(bodyOrientation, bodyPosition), bodyScale);
+            Math.ScaledMTransform worldFromBody = new Math.ScaledMTransform(
+                new RigidTransform(bodyOrientation, bodyPosition),
+                bodyScale
+            );
             var bodyFromWorld = Math.Inverse(worldFromBody);
 
             var pointDistanceInput = new PointDistanceInput()
             {
                 Position = Math.Mul(bodyFromWorld, explosionPosition),
-                MaxDistance = math.select(float.MaxValue, math.abs(bodyFromWorld.Scale) * explosionRadius, bExplosionProportionalToDistance),
-                Filter = explosionFilter
+                MaxDistance = math.select(
+                    float.MaxValue,
+                    math.abs(bodyFromWorld.Scale) * explosionRadius,
+                    bExplosionProportionalToDistance
+                ),
+                Filter = explosionFilter,
             };
 
             // This function applies a force to the object at the point on the surface of the rigidbody
@@ -385,7 +486,10 @@ namespace Unity.Physics.Extensions
             // explosionPosition to the surface point on the rigidbody. If explosionPosition is inside the
             // rigidbody, or the rigidbody has no active colliders, then the center of mass is used instead
             // of the closest point on the surface.
-            if (!bodyCollider.IsValid || !bodyCollider.Value.Value.CalculateDistance(pointDistanceInput, out DistanceHit closestHit))
+            if (
+                !bodyCollider.IsValid
+                || !bodyCollider.Value.Value.CalculateDistance(pointDistanceInput, out DistanceHit closestHit)
+            )
             {
                 // Return now if the collider is invalid or out of range.
                 return;
@@ -415,7 +519,14 @@ namespace Unity.Physics.Extensions
                 closestHitPositionWorld -= up * upwardsModifier;
             }
 
-            bodyMass.GetImpulseFromForce(bodyScale, force, mode, timestep, out float3 impulse, out PhysicsMass impulseMass);
+            bodyMass.GetImpulseFromForce(
+                bodyScale,
+                force,
+                mode,
+                timestep,
+                out float3 impulse,
+                out PhysicsMass impulseMass
+            );
 
             // Use the option with default scale, since the mass is already scaled
             bodyVelocity.ApplyImpulse(impulseMass, bodyPosition, bodyOrientation, impulse, closestHitPositionWorld);
@@ -441,14 +552,35 @@ namespace Unity.Physics.Extensions
         /// <param name="upwardsModifier">      (Optional) The upwards modifier. </param>
         /// <param name="mode">                 (Optional) The mode. </param>
         public static void ApplyExplosionForce(
-            ref this PhysicsVelocity bodyVelocity, in PhysicsMass bodyMass, in PhysicsCollider bodyCollider,
-            in float3 bodyPosition, in quaternion bodyOrientation,
-            float explosionForce, in float3 explosionPosition, in float explosionRadius,
-            in float timestep, in float3 up,
-            in float upwardsModifier = 0, ForceMode mode = ForceMode.Force)
+            ref this PhysicsVelocity bodyVelocity,
+            in PhysicsMass bodyMass,
+            in PhysicsCollider bodyCollider,
+            in float3 bodyPosition,
+            in quaternion bodyOrientation,
+            float explosionForce,
+            in float3 explosionPosition,
+            in float explosionRadius,
+            in float timestep,
+            in float3 up,
+            in float upwardsModifier = 0,
+            ForceMode mode = ForceMode.Force
+        )
         {
-            bodyVelocity.ApplyExplosionForce(bodyMass, bodyCollider, bodyPosition, bodyOrientation, 1.0f, explosionForce,
-                explosionPosition, explosionRadius, timestep, up, CollisionFilter.Default, upwardsModifier, mode);
+            bodyVelocity.ApplyExplosionForce(
+                bodyMass,
+                bodyCollider,
+                bodyPosition,
+                bodyOrientation,
+                1.0f,
+                explosionForce,
+                explosionPosition,
+                explosionRadius,
+                timestep,
+                up,
+                CollisionFilter.Default,
+                upwardsModifier,
+                mode
+            );
         }
 
         /// <summary>   Applies a world space linear impulse at a world space point. </summary>
@@ -459,7 +591,14 @@ namespace Unity.Physics.Extensions
         /// <param name="r">        The body rotation. </param>
         /// <param name="impulse">  The linear impulse in world space. </param>
         /// <param name="point">    The point in world space. </param>
-        public static void ApplyImpulse(ref this PhysicsVelocity pv, in PhysicsMass pm, in float3 t, in quaternion r, in float3 impulse, in float3 point)
+        public static void ApplyImpulse(
+            ref this PhysicsVelocity pv,
+            in PhysicsMass pm,
+            in float3 t,
+            in quaternion r,
+            in float3 impulse,
+            in float3 point
+        )
         {
             pv.ApplyImpulse(pm, t, r, 1.0f, impulse, point);
         }
@@ -473,8 +612,15 @@ namespace Unity.Physics.Extensions
         /// <param name="bodyScale">    The body scale. </param>
         /// <param name="impulse">      The linear impulse in world space. </param>
         /// <param name="point">        The point in world space. </param>
-        public static void ApplyImpulse(ref this PhysicsVelocity pv, in PhysicsMass pm, in float3 t, in quaternion r,
-            float bodyScale, in float3 impulse, in float3 point)
+        public static void ApplyImpulse(
+            ref this PhysicsVelocity pv,
+            in PhysicsMass pm,
+            in float3 t,
+            in quaternion r,
+            float bodyScale,
+            in float3 impulse,
+            in float3 point
+        )
         {
             var mass = pm.ApplyScale(bodyScale);
             // Linear
@@ -486,7 +632,10 @@ namespace Unity.Physics.Extensions
                 var worldFromEntity = new RigidTransform(r, t);
                 var worldFromMotion = math.mul(worldFromEntity, mass.Transform);
                 float3 angularImpulseWorldSpace = math.cross(point - worldFromMotion.pos, impulse);
-                float3 angularImpulseInertiaSpace = math.rotate(math.inverse(worldFromMotion.rot), angularImpulseWorldSpace);
+                float3 angularImpulseInertiaSpace = math.rotate(
+                    math.inverse(worldFromMotion.rot),
+                    angularImpulseWorldSpace
+                );
 
                 pv.ApplyAngularImpulse(mass, angularImpulseInertiaSpace);
             }
@@ -497,7 +646,11 @@ namespace Unity.Physics.Extensions
         /// <param name="velocityData"> [in,out] Information describing the velocity. </param>
         /// <param name="massData">     Information describing the mass. </param>
         /// <param name="impulse">      The linear impulse in world space. </param>
-        public static void ApplyLinearImpulse(ref this PhysicsVelocity velocityData, in PhysicsMass massData, in float3 impulse)
+        public static void ApplyLinearImpulse(
+            ref this PhysicsVelocity velocityData,
+            in PhysicsMass massData,
+            in float3 impulse
+        )
         {
             velocityData.Linear += impulse * massData.InverseMass;
         }
@@ -508,7 +661,12 @@ namespace Unity.Physics.Extensions
         /// <param name="massData">     Information describing the mass. </param>
         /// <param name="bodyScale">    The body scale. </param>
         /// <param name="impulse">      The linear impulse in world space. </param>
-        public static void ApplyLinearImpulse(ref this PhysicsVelocity velocityData, in PhysicsMass massData, float bodyScale, in float3 impulse)
+        public static void ApplyLinearImpulse(
+            ref this PhysicsVelocity velocityData,
+            in PhysicsMass massData,
+            float bodyScale,
+            in float3 impulse
+        )
         {
             var scaledMass = massData.ApplyScale(bodyScale);
             velocityData.ApplyLinearImpulse(scaledMass, impulse);
@@ -521,8 +679,13 @@ namespace Unity.Physics.Extensions
         /// <param name="t">            The body position. </param>
         /// <param name="r">            The body rotation. </param>
         /// <param name="impulse">      The angular impulse in world space. </param>
-        public static void ApplyAngularImpulseWorldSpace(ref this PhysicsVelocity velocityData, in PhysicsMass massData,
-            in float3 t, in quaternion r, in float3 impulse)
+        public static void ApplyAngularImpulseWorldSpace(
+            ref this PhysicsVelocity velocityData,
+            in PhysicsMass massData,
+            in float3 t,
+            in quaternion r,
+            in float3 impulse
+        )
         {
             var worldFromEntity = new RigidTransform(r, t);
             var worldFromMotion = math.mul(worldFromEntity, massData.Transform);
@@ -539,8 +702,14 @@ namespace Unity.Physics.Extensions
         /// <param name="r">            The body rotation. </param>
         /// <param name="bodyScale">    The body scale. </param>
         /// <param name="impulse">      The angular impulse in world space. </param>
-        public static void ApplyAngularImpulseWorldSpace(ref this PhysicsVelocity velocityData, in PhysicsMass massData,
-            in float3 t, in quaternion r, float bodyScale, in float3 impulse)
+        public static void ApplyAngularImpulseWorldSpace(
+            ref this PhysicsVelocity velocityData,
+            in PhysicsMass massData,
+            in float3 t,
+            in quaternion r,
+            float bodyScale,
+            in float3 impulse
+        )
         {
             var worldFromEntity = new RigidTransform(r, t);
             var worldFromMotion = math.mul(worldFromEntity, massData.Transform);
@@ -555,7 +724,11 @@ namespace Unity.Physics.Extensions
         /// <param name="velocityData"> [in,out] Information describing the velocity. </param>
         /// <param name="massData">     Information describing the mass. </param>
         /// <param name="impulse">      The angular impulse in inertia space of the body. </param>
-        public static void ApplyAngularImpulse(ref this PhysicsVelocity velocityData, in PhysicsMass massData, in float3 impulse)
+        public static void ApplyAngularImpulse(
+            ref this PhysicsVelocity velocityData,
+            in PhysicsMass massData,
+            in float3 impulse
+        )
         {
             velocityData.Angular += impulse * massData.InverseInertia;
         }
@@ -566,7 +739,12 @@ namespace Unity.Physics.Extensions
         /// <param name="massData">     Information describing the mass. </param>
         /// <param name="bodyScale">    The body scale. </param>
         /// <param name="impulse">      The angular impulse in inertia space of the body. </param>
-        public static void ApplyAngularImpulse(ref this PhysicsVelocity velocityData, in PhysicsMass massData, float bodyScale, in float3 impulse)
+        public static void ApplyAngularImpulse(
+            ref this PhysicsVelocity velocityData,
+            in PhysicsMass massData,
+            float bodyScale,
+            in float3 impulse
+        )
         {
             var scaledMass = massData.ApplyScale(bodyScale);
             velocityData.ApplyAngularImpulse(scaledMass, impulse);
@@ -583,11 +761,14 @@ namespace Unity.Physics.Extensions
         /// <param name="position">         [in,out] The future position of the body. </param>
         /// <param name="orientation">      [in,out] The future orientation of the body. </param>
         public static void Integrate(
-            this in PhysicsVelocity physicsVelocity, in PhysicsMass physicsMass, float timestep,
-            ref float3 position, ref quaternion orientation)
+            this in PhysicsVelocity physicsVelocity,
+            in PhysicsMass physicsMass,
+            float timestep,
+            ref float3 position,
+            ref quaternion orientation
+        )
         {
-            var angularVelocityWS =
-                physicsVelocity.GetAngularVelocityWorldSpace(physicsMass, orientation);
+            var angularVelocityWS = physicsVelocity.GetAngularVelocityWorldSpace(physicsMass, orientation);
             Integrator.IntegratePosition(ref position, physicsVelocity.Linear, timestep);
             Integrator.IntegrateOrientation(ref orientation, angularVelocityWS, timestep);
         }

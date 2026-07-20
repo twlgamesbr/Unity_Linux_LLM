@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -13,8 +13,11 @@ namespace Unity.Entities.Editor
     {
         public string TabName { get; } = L10n.Tr("Relationships");
 
-        [CreateProperty] readonly SystemEntities m_Entities;
-        [CreateProperty, UsedImplicitly] readonly SystemDependencies m_SystemDependencies;
+        [CreateProperty]
+        readonly SystemEntities m_Entities;
+
+        [CreateProperty, UsedImplicitly]
+        readonly SystemDependencies m_SystemDependencies;
         bool m_IsVisible;
 
         public void OnTabVisibilityChanged(bool isVisible) => m_IsVisible = isVisible;
@@ -56,17 +59,16 @@ namespace Unity.Entities.Editor
 
             void UpdateVisibility()
             {
-                var hasContentToShow = m_SystemConstraintsCount > 0 || Target.m_Entities.EntitiesFromQueries.Sum(v => v.TotalEntityCount) > 0;
+                var hasContentToShow =
+                    m_SystemConstraintsCount > 0
+                    || Target.m_Entities.EntitiesFromQueries.Sum(v => v.TotalEntityCount) > 0;
                 m_EmptyMessage.SetVisibility(!hasContentToShow);
                 m_SectionContainer.SetVisibility(hasContentToShow);
             }
 
             VisualElement BuildQueriesView()
             {
-                var section = new FoldoutWithoutActionButton
-                {
-                    HeaderName = {text = L10n.Tr("Entities")}
-                };
+                var section = new FoldoutWithoutActionButton { HeaderName = { text = L10n.Tr("Entities") } };
 
                 foreach (var queryEntities in Target.m_Entities.EntitiesFromQueries)
                 {
@@ -87,18 +89,18 @@ namespace Unity.Entities.Editor
                 var sectionElement = new FoldoutWithoutActionButton
                 {
                     HeaderName = { text = k_SystemDependenciesSection },
-                    MatchingCount = { text = m_SystemConstraintsCount.ToString() }
+                    MatchingCount = { text = m_SystemConstraintsCount.ToString() },
                 };
                 var updateBeforeSection = new FoldoutWithoutActionButton
                 {
                     HeaderName = { text = $"Update {currentSystemName} Before" },
-                    MatchingCount = { text = updateAfterSystemViewDataList.Count.ToString() }
+                    MatchingCount = { text = updateAfterSystemViewDataList.Count.ToString() },
                 };
                 updateBeforeSection.Q<Toggle>().AddToClassList(UssClasses.FoldoutWithoutActionButton.ToggleNoBorder);
                 var updateAfterSection = new FoldoutWithoutActionButton
                 {
                     HeaderName = { text = $"Update {currentSystemName} After" },
-                    MatchingCount = { text = updateBeforeSystemViewDataList.Count.ToString() }
+                    MatchingCount = { text = updateBeforeSystemViewDataList.Count.ToString() },
                 };
                 updateAfterSection.Q<Toggle>().AddToClassList(UssClasses.FoldoutWithoutActionButton.ToggleNoBorder);
                 sectionElement.Add(updateBeforeSection);

@@ -238,19 +238,25 @@ namespace UnityEngine.InputSystem.Utilities
         {
             var to = (byte*)destination;
             var pos = 0;
-
             unchecked
             {
                 // 64bit blocks.
-                #if UNITY_64
+#if UNITY_64
                 while (numBytes >= 8)
                 {
-                    *(ulong*)&to[pos] = ((ulong)value << 56) | ((ulong)value << 48) | ((ulong)value << 40) | ((ulong)value << 32)
-                        | ((ulong)value << 24) | ((ulong)value << 16) | ((ulong)value << 8) | value;
+                    *(ulong*)&to[pos] =
+                        ((ulong)value << 56)
+                        | ((ulong)value << 48)
+                        | ((ulong)value << 40)
+                        | ((ulong)value << 32)
+                        | ((ulong)value << 24)
+                        | ((ulong)value << 16)
+                        | ((ulong)value << 8)
+                        | value;
                     numBytes -= 8;
                     pos += 8;
                 }
-                #endif
+#endif
 
                 // 32bit blocks.
                 while (numBytes >= 4)
@@ -284,11 +290,10 @@ namespace UnityEngine.InputSystem.Utilities
             var to = (byte*)destination;
             var bits = (byte*)mask;
             var pos = 0;
-
             unchecked
             {
                 // Copy 64bit blocks.
-                #if UNITY_64
+#if UNITY_64
                 while (numBytes >= 8)
                 {
                     *(ulong*)(to + pos) &= ~*(ulong*)(bits + pos); // Preserve unmasked bits.
@@ -296,7 +301,7 @@ namespace UnityEngine.InputSystem.Utilities
                     numBytes -= 8;
                     pos += 8;
                 }
-                #endif
+#endif
 
                 // Copy 32bit blocks.
                 while (numBytes >= 4)
@@ -574,8 +579,10 @@ namespace UnityEngine.InputSystem.Utilities
                     *bytePos &= (byte)~mask;
             }
 
-            Debug.Assert(bytePos <= (byte*)buffer +
-                ComputeFollowingByteOffset((uint)byteOffset, (uint)bitOffset + (uint)sizeInBits));
+            Debug.Assert(
+                bytePos
+                    <= (byte*)buffer + ComputeFollowingByteOffset((uint)byteOffset, (uint)bitOffset + (uint)sizeInBits)
+            );
         }
 
         public static void Swap<TValue>(ref TValue a, ref TValue b)

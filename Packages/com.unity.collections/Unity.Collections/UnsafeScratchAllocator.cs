@@ -31,7 +31,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         void CheckAllocationDoesNotExceedCapacity(ulong requestedSize)
         {
             if (requestedSize > (ulong)m_CapacityInBytes)
-                throw new ArgumentException($"Cannot allocate more than provided size in UnsafeScratchAllocator. Requested: {requestedSize} Size: {m_LengthInBytes} Capacity: {m_CapacityInBytes}");
+                throw new ArgumentException(
+                    $"Cannot allocate more than provided size in UnsafeScratchAllocator. Requested: {requestedSize} Size: {m_LengthInBytes} Capacity: {m_CapacityInBytes}"
+                );
         }
 
         /// <summary>
@@ -63,8 +65,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="count">The number of elements to allocate space for. Defaults to 1.</param>
         /// <returns>A pointer to the new allocation.</returns>
         /// <exception cref="ArgumentException">Thrown if the new allocation would exceed the capacity of the allocator.</exception>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public void* Allocate<T>(int count = 1) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public void* Allocate<T>(int count = 1)
+            where T : unmanaged
         {
             return Allocate(sizeof(T) * count, UnsafeUtility.AlignOf<T>());
         }

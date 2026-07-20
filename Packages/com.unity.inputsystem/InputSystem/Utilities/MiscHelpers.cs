@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 namespace UnityEngine.InputSystem.Utilities
 {
     internal static class MiscHelpers

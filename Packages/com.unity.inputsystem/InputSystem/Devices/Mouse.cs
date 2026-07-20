@@ -57,8 +57,19 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <value>Scroll wheel delta.</value>
         /// <seealso cref="Mouse.scroll"/>
         [InputControl(displayName = "Scroll", layout = "Delta")]
-        [InputControl(name = "scroll/x", aliases = new[] { "horizontal" }, usage = "ScrollHorizontal", displayName = "Left/Right")]
-        [InputControl(name = "scroll/y", aliases = new[] { "vertical" }, usage = "ScrollVertical", displayName = "Up/Down", shortDisplayName = "Wheel")]
+        [InputControl(
+            name = "scroll/x",
+            aliases = new[] { "horizontal" },
+            usage = "ScrollHorizontal",
+            displayName = "Left/Right"
+        )]
+        [InputControl(
+            name = "scroll/y",
+            aliases = new[] { "vertical" },
+            usage = "ScrollVertical",
+            displayName = "Up/Down",
+            shortDisplayName = "Wheel"
+        )]
         [FieldOffset(16)]
         public Vector2 scroll;
 
@@ -73,20 +84,72 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <seealso cref="Mouse.forwardButton"/>
         /// <seealso cref="Mouse.backButton"/>
         [InputControl(name = "press", useStateFrom = "leftButton", synthetic = true, usages = new string[0])]
-        [InputControl(name = "leftButton", layout = "Button", bit = (int)MouseButton.Left, usage = "PrimaryAction", displayName = "Left Button", shortDisplayName = "LMB")]
-        [InputControl(name = "rightButton", layout = "Button", bit = (int)MouseButton.Right, usage = "SecondaryAction", displayName = "Right Button", shortDisplayName = "RMB")]
-        [InputControl(name = "middleButton", layout = "Button", bit = (int)MouseButton.Middle, displayName = "Middle Button", shortDisplayName = "MMB")]
-        [InputControl(name = "forwardButton", layout = "Button", bit = (int)MouseButton.Forward, usage = "Forward", displayName = "Forward")]
-        [InputControl(name = "backButton", layout = "Button", bit = (int)MouseButton.Back, usage = "Back", displayName = "Back")]
+        [InputControl(
+            name = "leftButton",
+            layout = "Button",
+            bit = (int)MouseButton.Left,
+            usage = "PrimaryAction",
+            displayName = "Left Button",
+            shortDisplayName = "LMB"
+        )]
+        [InputControl(
+            name = "rightButton",
+            layout = "Button",
+            bit = (int)MouseButton.Right,
+            usage = "SecondaryAction",
+            displayName = "Right Button",
+            shortDisplayName = "RMB"
+        )]
+        [InputControl(
+            name = "middleButton",
+            layout = "Button",
+            bit = (int)MouseButton.Middle,
+            displayName = "Middle Button",
+            shortDisplayName = "MMB"
+        )]
+        [InputControl(
+            name = "forwardButton",
+            layout = "Button",
+            bit = (int)MouseButton.Forward,
+            usage = "Forward",
+            displayName = "Forward"
+        )]
+        [InputControl(
+            name = "backButton",
+            layout = "Button",
+            bit = (int)MouseButton.Back,
+            usage = "Back",
+            displayName = "Back"
+        )]
         [FieldOffset(24)]
         // "Park" all the controls that are common to pointers but aren't use for mice such that they get
         // appended to the end of device state where they will always have default values.
         ////FIXME: InputDeviceBuilder will get fooled and set up an incorrect state layout if we don't force this to VEC2; InputControlLayout will
         ////       "infer" USHT as the format which will then end up with a layout where two 4 byte float controls are "packed" into a 16bit sized parent;
         ////       in other words, setting VEC2 here manually should *not* be necessary
-        [InputControl(name = "pressure", layout = "Axis", usage = "Pressure", offset = InputStateBlock.AutomaticOffset, format = "FLT", sizeInBits = 32)]
-        [InputControl(name = "radius", layout = "Vector2", usage = "Radius", offset = InputStateBlock.AutomaticOffset, format = "VEC2", sizeInBits = 64)]
-        [InputControl(name = "pointerId", layout = "Digital", format = "BIT", sizeInBits = 1, offset = InputStateBlock.AutomaticOffset)] // Will stay at 0.
+        [InputControl(
+            name = "pressure",
+            layout = "Axis",
+            usage = "Pressure",
+            offset = InputStateBlock.AutomaticOffset,
+            format = "FLT",
+            sizeInBits = 32
+        )]
+        [InputControl(
+            name = "radius",
+            layout = "Vector2",
+            usage = "Radius",
+            offset = InputStateBlock.AutomaticOffset,
+            format = "VEC2",
+            sizeInBits = 64
+        )]
+        [InputControl(
+            name = "pointerId",
+            layout = "Digital",
+            format = "BIT",
+            sizeInBits = 1,
+            offset = InputStateBlock.AutomaticOffset
+        )] // Will stay at 0.
         public ushort buttons;
 
         /// <summary>
@@ -163,7 +226,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// First side button.
         /// </summary>
         /// <seealso cref="Mouse.backButton"/>
-        Back
+        Back,
     }
 }
 
@@ -246,7 +309,7 @@ namespace UnityEngine.InputSystem
         /// Control representing the number of times any of the mouse buttons has been clicked in succession within
         /// the system-defined click time threshold.
         /// </summary>
-        public IntegerControl clickCount { get; protected set;  }
+        public IntegerControl clickCount { get; protected set; }
 
         /// <summary>
         /// The mouse that was added or updated last or null if there is no mouse
@@ -255,7 +318,7 @@ namespace UnityEngine.InputSystem
         /// <remarks>
         /// To set a mouse device as current, use <see cref="Mouse.MakeCurrent"/>.
         /// </remarks>
-        public new static Mouse current { get; private set; }
+        public static new Mouse current { get; private set; }
 
         /// <summary>
         /// Called when the mouse becomes the current mouse.

@@ -8,7 +8,5 @@ namespace Unity.Entities.UI
     /// When this attribute is used, the numeric or text field will not return a new value until the user has pressed enter or focus is moved away from the field.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public class DelayedValueAttribute : InspectorAttribute
-    {
-    }
+    public class DelayedValueAttribute : InspectorAttribute { }
 }

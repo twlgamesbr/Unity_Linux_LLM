@@ -9,7 +9,13 @@ namespace Unity.Physics.Authoring
     {
         unsafe class DrawWithGizmos : MonoBehaviour
         {
-            static void GetEdge(ref ConvexHull hullIn, ConvexHull.Face faceIn, int edgeIndex, out float3 from, out float3 to)
+            static void GetEdge(
+                ref ConvexHull hullIn,
+                ConvexHull.Face faceIn,
+                int edgeIndex,
+                out float3 from,
+                out float3 to
+            )
             {
                 byte fromIndex = hullIn.FaceVertexIndices[faceIn.FirstIndex + edgeIndex];
                 byte toIndex = hullIn.FaceVertexIndices[faceIn.FirstIndex + (edgeIndex + 1) % faceIn.NumVertices];
@@ -17,7 +23,11 @@ namespace Unity.Physics.Authoring
                 to = hullIn.Vertices[toIndex];
             }
 
-            static void DrawColliderEdges(ConvexCollider* collider, RigidTransform worldFromConvex, bool drawVertices = false)
+            static void DrawColliderEdges(
+                ConvexCollider* collider,
+                RigidTransform worldFromConvex,
+                bool drawVertices = false
+            )
             {
                 Matrix4x4 originalMatrix = Gizmos.matrix;
                 Color originalColor = Gizmos.color;
@@ -114,7 +124,11 @@ namespace Unity.Physics.Authoring
                 for (int sectionIndex = 0; sectionIndex < mesh.Sections.Length; sectionIndex++)
                 {
                     ref Mesh.Section section = ref mesh.Sections[sectionIndex];
-                    for (int primitiveIndex = 0; primitiveIndex < section.PrimitiveVertexIndices.Length; primitiveIndex++)
+                    for (
+                        int primitiveIndex = 0;
+                        primitiveIndex < section.PrimitiveVertexIndices.Length;
+                        primitiveIndex++
+                    )
                     {
                         Mesh.PrimitiveVertexIndices vertexIndices = section.PrimitiveVertexIndices[primitiveIndex];
                         Mesh.PrimitiveFlags flags = section.PrimitiveFlags[primitiveIndex];
@@ -125,7 +139,8 @@ namespace Unity.Physics.Authoring
                             section.Vertices[vertexIndices.A],
                             section.Vertices[vertexIndices.B],
                             section.Vertices[vertexIndices.C],
-                            section.Vertices[vertexIndices.D]);
+                            section.Vertices[vertexIndices.D]
+                        );
 
                         if (isQuad)
                         {
@@ -172,7 +187,11 @@ namespace Unity.Physics.Authoring
                 Gizmos.matrix = originalMatrix;
             }
 
-            static void DrawColliderEdges(CompoundCollider* compoundCollider, RigidTransform worldFromCompound, bool drawVertices = false)
+            static void DrawColliderEdges(
+                CompoundCollider* compoundCollider,
+                RigidTransform worldFromCompound,
+                bool drawVertices = false
+            )
             {
                 for (int i = 0; i < compoundCollider->NumChildren; i++)
                 {
@@ -183,7 +202,11 @@ namespace Unity.Physics.Authoring
                 }
             }
 
-            static void DrawColliderEdges(Collider* collider, RigidTransform worldFromCollider, bool drawVertices = false)
+            static void DrawColliderEdges(
+                Collider* collider,
+                RigidTransform worldFromCollider,
+                bool drawVertices = false
+            )
             {
                 switch (collider->CollisionType)
                 {
@@ -204,7 +227,11 @@ namespace Unity.Physics.Authoring
                 }
             }
 
-            static void DrawColliderEdges(BlobAssetReference<Collider> collider, RigidTransform worldFromCollider, bool drawVertices)
+            static void DrawColliderEdges(
+                BlobAssetReference<Collider> collider,
+                RigidTransform worldFromCollider,
+                bool drawVertices
+            )
             {
                 // Note: this is an internal utility function used for drawing collider edges through blobs assets.
                 // It can be used for drawing colliders in MonoBehavior.OnDrawGizmos() functions.

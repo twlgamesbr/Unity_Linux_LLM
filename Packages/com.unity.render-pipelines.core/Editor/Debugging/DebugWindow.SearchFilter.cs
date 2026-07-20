@@ -45,9 +45,10 @@ namespace UnityEditor.Rendering
                 if (widget.m_VisualElement == null)
                     return;
 
-                List<TextElement> textElements = widget.m_VisualElement.Query()
-                        .Descendents<TextElement>(classname: "debug-window-search-filter-target")
-                        .ToList();
+                List<TextElement> textElements = widget
+                    .m_VisualElement.Query()
+                    .Descendents<TextElement>(classname: "debug-window-search-filter-target")
+                    .ToList();
 
                 string aggregatedText = CollectAggregatedAdditionalSearchText(widget);
                 m_WidgetSearchElementCache[widget] = new WidgetSearchData(textElements, aggregatedText);
@@ -60,7 +61,11 @@ namespace UnityEditor.Rendering
                 rootVisualElement,
                 searchString =>
                 {
-                    var visiblePanels = PerformSearch(m_WidgetSearchElementCache, searchString, hideRootElementIfNoMatch: true);
+                    var visiblePanels = PerformSearch(
+                        m_WidgetSearchElementCache,
+                        searchString,
+                        hideRootElementIfNoMatch: true
+                    );
 
                     foreach (var headerLabel in m_PanelHeaderTextElements)
                         UIElementSearchFilter.ApplySearchAndHighlight(headerLabel, searchString, out _);
@@ -70,7 +75,8 @@ namespace UnityEditor.Rendering
                         var tab = m_LeftPaneElement.Q<VisualElement>(name: panel.displayName + "_Tab");
                         if (tab != null)
                         {
-                            bool shouldShow = string.IsNullOrEmpty(searchString) || visiblePanels.Contains(panel.displayName);
+                            bool shouldShow =
+                                string.IsNullOrEmpty(searchString) || visiblePanels.Contains(panel.displayName);
                             tab.style.display = shouldShow ? DisplayStyle.Flex : DisplayStyle.None;
                         }
                     }
@@ -99,7 +105,11 @@ namespace UnityEditor.Rendering
             return parts.Count > 0 ? string.Join(",", parts) : string.Empty;
         }
 
-        internal static HashSet<string> PerformSearch(Dictionary<DebugUI.Widget, WidgetSearchData> elementCache, string searchString, bool hideRootElementIfNoMatch = false)
+        internal static HashSet<string> PerformSearch(
+            Dictionary<DebugUI.Widget, WidgetSearchData> elementCache,
+            string searchString,
+            bool hideRootElementIfNoMatch = false
+        )
         {
             var panelsWithVisibleWidgets = new HashSet<string>();
 
@@ -115,7 +125,12 @@ namespace UnityEditor.Rendering
 
                 if (!string.IsNullOrEmpty(searchData.aggregatedAdditionalSearchText))
                 {
-                    if (searchData.aggregatedAdditionalSearchText.Contains(searchString, StringComparison.CurrentCultureIgnoreCase))
+                    if (
+                        searchData.aggregatedAdditionalSearchText.Contains(
+                            searchString,
+                            StringComparison.CurrentCultureIgnoreCase
+                        )
+                    )
                         anyDescendantMatchesSearch = true;
                 }
 

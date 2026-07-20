@@ -11,7 +11,9 @@ namespace Unity.Rendering
     partial class BlendShapeDeformationSystem : SystemBase
     {
         static readonly ProfilerMarker k_FinalizePushBlendShapeWeight = new ProfilerMarker("FinalizeBlendWeightForGPU");
-        static readonly ProfilerMarker k_BlendShapeDeformationMarker = new ProfilerMarker("BlendShapeDeformationDispatch");
+        static readonly ProfilerMarker k_BlendShapeDeformationMarker = new ProfilerMarker(
+            "BlendShapeDeformationDispatch"
+        );
 
         static readonly int k_VertexCount = Shader.PropertyToID("g_VertexCount");
         static readonly int k_DeformedMeshStartIndex = Shader.PropertyToID("g_DeformedMeshStartIndex");
@@ -35,7 +37,9 @@ namespace Unity.Rendering
 #endif
             {
                 Enabled = false;
-                UnityEngine.Debug.Log("No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.");
+                UnityEngine.Debug.Log(
+                    "No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled."
+                );
                 return;
             }
 
@@ -43,16 +47,17 @@ namespace Unity.Rendering
             Assert.IsNotNull(m_PushMeshDataSystem, $"{nameof(PushMeshDataSystem)} was not found!");
 
             m_ComputeShader = Resources.Load<ComputeShader>("BlendShapeComputeShader");
-            Assert.IsNotNull(m_ComputeShader, $"Compute shader for {typeof(BlendShapeDeformationSystem)} was not found!");
+            Assert.IsNotNull(
+                m_ComputeShader,
+                $"Compute shader for {typeof(BlendShapeDeformationSystem)} was not found!"
+            );
 
             m_RendererSystem = World.GetOrCreateSystemManaged<EntitiesGraphicsSystem>();
             Assert.IsNotNull(m_RendererSystem, $"{nameof(EntitiesGraphicsSystem)} was not found!");
 
             m_Kernel = m_ComputeShader.FindKernel("BlendShapeComputeKernel");
 
-            m_BlendWeightQuery = GetEntityQuery(
-                ComponentType.ReadWrite<BlendShapeWeight>()
-            );
+            m_BlendWeightQuery = GetEntityQuery(ComponentType.ReadWrite<BlendShapeWeight>());
         }
 
         protected override void OnUpdate()
@@ -66,7 +71,9 @@ namespace Unity.Rendering
             // This guarantees that the data has been written to GPU
             // Assuming that PushBlendWeightSystem has executed before this system.
             m_BlendWeightQuery.CompleteDependency();
-            m_PushMeshDataSystem.BlendShapeBufferManager.UnlockBlendWeightBufferForWrite(m_PushMeshDataSystem.BlendShapeWeightCount);
+            m_PushMeshDataSystem.BlendShapeBufferManager.UnlockBlendWeightBufferForWrite(
+                m_PushMeshDataSystem.BlendShapeWeightCount
+            );
 
             k_FinalizePushBlendShapeWeight.End();
             k_BlendShapeDeformationMarker.Begin();

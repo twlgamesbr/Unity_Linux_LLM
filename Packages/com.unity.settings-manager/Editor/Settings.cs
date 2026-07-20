@@ -22,9 +22,7 @@ namespace UnityEditor.SettingsManagement
         /// </summary>
         public event Action afterSettingsSaved;
 
-        Settings()
-        {
-        }
+        Settings() { }
 
         /// <summary>
         /// Creates a new Settings instance with a <see cref="UserSettingsRepository"/> and <see cref="PackageSettingsRepository"/>.
@@ -36,7 +34,7 @@ namespace UnityEditor.SettingsManagement
             m_SettingsRepositories = new ISettingsRepository[]
             {
                 new PackageSettingsRepository(package, settingsFileName),
-                new UserSettingsRepository()
+                new UserSettingsRepository(),
             };
         }
 
@@ -134,7 +132,8 @@ namespace UnityEditor.SettingsManagement
         /// <param name="repositoryName">Optional. The name of the repository to set this value in.</param>
         /// <typeparam name="T">The type of value that this key points to.</typeparam>
         /// <typeparam name="K">The type of repository to search for matching keys.</typeparam>
-        public void Set<T, K>(string key, T value, string repositoryName = null) where K : ISettingsRepository
+        public void Set<T, K>(string key, T value, string repositoryName = null)
+            where K : ISettingsRepository
         {
             bool foundScopeRepository = false;
 
@@ -175,7 +174,12 @@ namespace UnityEditor.SettingsManagement
         /// <param name="fallback">Specify the value of type `T` to return if the entry can't be found.</param>
         /// <typeparam name="T">The type of value that this key points to.</typeparam>
         /// <returns>The value from a matching settings entry; or the default value if not found.</returns>
-        public T Get<T>(string key, string repositoryName, SettingsScope scope = SettingsScope.Project, T fallback = default(T))
+        public T Get<T>(
+            string key,
+            string repositoryName,
+            SettingsScope scope = SettingsScope.Project,
+            T fallback = default(T)
+        )
         {
             if (scope == SettingsScope.Project)
                 return Get<T, PackageSettingsRepository>(key, fallback, repositoryName);
@@ -191,7 +195,8 @@ namespace UnityEditor.SettingsManagement
         /// <typeparam name="T">The type of value that this key points to.</typeparam>
         /// <typeparam name="K">The type of repository to search for matching keys.</typeparam>
         /// <returns>The value from a matching settings entry; or the default value if not found.</returns>
-        public T Get<T, K>(string key, T fallback = default(T), string repositoryName = null) where K : ISettingsRepository
+        public T Get<T, K>(string key, T fallback = default(T), string repositoryName = null)
+            where K : ISettingsRepository
         {
             foreach (var repo in m_SettingsRepositories)
             {
@@ -241,7 +246,8 @@ namespace UnityEditor.SettingsManagement
         /// <typeparam name="T">The type of value that this key points to.</typeparam>
         /// <typeparam name="K">The type of repository to search for matching keys.</typeparam>
         /// <returns>True if a setting matching both key and type is found; false if no entry is found.</returns>
-        public bool ContainsKey<T, K>(string key, string repositoryName = null) where K : ISettingsRepository
+        public bool ContainsKey<T, K>(string key, string repositoryName = null)
+            where K : ISettingsRepository
         {
             foreach (var repo in m_SettingsRepositories)
             {
@@ -291,7 +297,8 @@ namespace UnityEditor.SettingsManagement
         /// <param name="repositoryName">The repository name to match.</param>
         /// <typeparam name="T">The type of value that this key points to.</typeparam>
         /// <typeparam name="K">The type of repository to search for matching keys.</typeparam>
-        public void DeleteKey<T, K>(string key, string repositoryName = null) where K : ISettingsRepository
+        public void DeleteKey<T, K>(string key, string repositoryName = null)
+            where K : ISettingsRepository
         {
             bool foundScopeRepository = false;
 

@@ -4,5 +4,5 @@ public enum SystemType
 {
     Unknown,
     SystemBase,
-    ISystem
+    ISystem,
 }

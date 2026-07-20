@@ -1,25 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+using UnityEngine.Networking;
+
 namespace NPCSystem.Auth
 {
     /// <summary>
@@ -40,9 +39,7 @@ namespace NPCSystem.Auth
             string url = ResolveWebGLProxyUrl(supabaseUrl, "/auth/signup");
 
             using var req = new UnityWebRequest(url, "POST");
-            byte[] body = System.Text.Encoding.UTF8.GetBytes(
-                JsonConvert.SerializeObject(new { email, password })
-            );
+            byte[] body = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { email, password }));
             req.uploadHandler = new UploadHandlerRaw(body);
             req.downloadHandler = new DownloadHandlerBuffer();
             req.SetRequestHeader("Content-Type", "application/json");
@@ -59,7 +56,9 @@ namespace NPCSystem.Auth
             {
                 userId = userJObj.Value<string>("id");
             }
-            userId = userId ?? result?.GetValueOrDefault("id")?.ToString()
+            userId =
+                userId
+                ?? result?.GetValueOrDefault("id")?.ToString()
                 ?? throw new InvalidOperationException("Signup returned no user ID.");
 
             string refreshToken = result?.GetValueOrDefault("refresh_token")?.ToString() ?? string.Empty;
@@ -89,9 +88,7 @@ namespace NPCSystem.Auth
             string url = ResolveWebGLProxyUrl(supabaseUrl, "/auth/token?grant_type=password");
 
             using var req = new UnityWebRequest(url, "POST");
-            byte[] body = System.Text.Encoding.UTF8.GetBytes(
-                JsonConvert.SerializeObject(new { email, password })
-            );
+            byte[] body = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { email, password }));
             req.uploadHandler = new UploadHandlerRaw(body);
             req.downloadHandler = new DownloadHandlerBuffer();
             req.SetRequestHeader("Content-Type", "application/json");
@@ -102,7 +99,8 @@ namespace NPCSystem.Auth
             string json = req.downloadHandler.text;
             var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
-            string accessToken = result?.GetValueOrDefault("access_token")?.ToString()
+            string accessToken =
+                result?.GetValueOrDefault("access_token")?.ToString()
                 ?? throw new InvalidOperationException("Login returned no access token.");
             string refreshToken = result?.GetValueOrDefault("refresh_token")?.ToString() ?? string.Empty;
             long expiresIn = 3600L;
@@ -256,9 +254,7 @@ namespace NPCSystem.Auth
             }
             catch (Exception ex)
             {
-                Debug.LogWarning(
-                    $"[SupabaseAuthClient] Failed to dynamically resolve WebGL URLs: {ex.Message}"
-                );
+                Debug.LogWarning($"[SupabaseAuthClient] Failed to dynamically resolve WebGL URLs: {ex.Message}");
             }
         }
 
@@ -270,8 +266,10 @@ namespace NPCSystem.Auth
             var op = req.SendWebRequest();
             op.completed += _ =>
             {
-                if (req.result == UnityWebRequest.Result.ConnectionError
-                    || req.result == UnityWebRequest.Result.ProtocolError)
+                if (
+                    req.result == UnityWebRequest.Result.ConnectionError
+                    || req.result == UnityWebRequest.Result.ProtocolError
+                )
                 {
                     string errorBody = req.downloadHandler?.text ?? string.Empty;
                     string msg = $"[{req.method}] {req.url} \u2192 {req.responseCode}: {req.error}";

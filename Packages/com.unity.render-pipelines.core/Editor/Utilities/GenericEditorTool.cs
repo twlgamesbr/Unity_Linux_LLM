@@ -1,21 +1,17 @@
-
 using System.Collections.Generic;
-
-using UnityEditorInternal;
-
-using UnityEditor.EditorTools;
-
-using UnityEngine;
-
-using Object = UnityEngine.Object;
 using System.Runtime.CompilerServices;
+using UnityEditor.EditorTools;
+using UnityEditorInternal;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 [assembly: InternalsVisibleTo("Unity.RenderPipelines.Universal.Editor")]
 [assembly: InternalsVisibleTo("Unity.RenderPipelines.HighDefinition.Editor")]
 
 namespace UnityEditor.Rendering.Utilities
 {
-    class GenericEditorTool<T> : EditorTool where T : Component
+    class GenericEditorTool<T> : EditorTool
+        where T : Component
     {
         readonly string m_Description;
         readonly EditMode.SceneViewEditMode m_Mode;
@@ -30,7 +26,9 @@ namespace UnityEditor.Rendering.Utilities
         }
 
         public override GUIContent toolbarIcon => m_IconContent;
+
         public override void OnWillBeDeactivated() => EditMode.SetEditModeToNone();
+
         public override void OnToolGUI(EditorWindow window)
         {
             if (EditMode.editMode == m_Mode)

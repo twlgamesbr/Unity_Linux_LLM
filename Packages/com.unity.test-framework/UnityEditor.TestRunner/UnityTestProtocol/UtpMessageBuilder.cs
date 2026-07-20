@@ -1,8 +1,8 @@
+using UnityEditor.Build;
+using UnityEngine;
 #if UNITY_2022_2_OR_NEWER
 using System;
 #endif
-using UnityEditor.Build;
-using UnityEngine;
 
 namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
 {
@@ -19,7 +19,12 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
 
             var screenSettingsMessage = new ScreenSettingsMessage()
             {
-                ScreenSettings = new ScreenSettings(Screen.currentResolution.width, Screen.currentResolution.height, screenRefreshRate, Screen.fullScreen)
+                ScreenSettings = new ScreenSettings(
+                    Screen.currentResolution.width,
+                    Screen.currentResolution.height,
+                    screenRefreshRate,
+                    Screen.fullScreen
+                ),
             };
 
             return screenSettingsMessage;
@@ -70,10 +75,15 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
         {
             var scriptingBackend = string.Empty;
 #if UNITY_2021_2_OR_NEWER
-            scriptingBackend =
-                UnityEditor.PlayerSettings.GetScriptingBackend(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup)).ToString();
+            scriptingBackend = UnityEditor
+                .PlayerSettings.GetScriptingBackend(
+                    NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup)
+                )
+                .ToString();
 #else
-            scriptingBackend = UnityEditor.PlayerSettings.GetScriptingBackend(EditorUserBuildSettings.selectedBuildTargetGroup).ToString();
+            scriptingBackend = UnityEditor
+                .PlayerSettings.GetScriptingBackend(EditorUserBuildSettings.selectedBuildTargetGroup)
+                .ToString();
 #endif
 
             var playerSettingsMessage = new PlayerSettingsMessage()
@@ -84,7 +94,9 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
                     string.Empty,
                     UnityEditorInternal.InternalEditorUtility.inBatchMode.ToString(),
                     UnityEditor.PlayerSettings.stereoRenderingPath.ToString(),
-                    UnityEditor.PlayerSettings.graphicsJobs ? "GraphicsJobs" : UnityEditor.PlayerSettings.MTRendering ? "MultiThreaded" : "SingleThreaded",
+                    UnityEditor.PlayerSettings.graphicsJobs ? "GraphicsJobs"
+                        : UnityEditor.PlayerSettings.MTRendering ? "MultiThreaded"
+                        : "SingleThreaded",
                     UnityEditor.PlayerSettings.Android.targetSdkVersion.ToString(),
                     UnityEditor.PlayerSettings.Android.minSdkVersion.ToString(),
                     UnityEditor.PlayerSettings.graphicsJobs,
@@ -104,7 +116,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
                     EditorUserBuildSettings.activeBuildTarget.ToString(),
                     EditorUserBuildSettings.development,
                     EditorUserBuildSettings.androidBuildSystem.ToString()
-                )
+                ),
             };
 
             return buildSettingsMessage;

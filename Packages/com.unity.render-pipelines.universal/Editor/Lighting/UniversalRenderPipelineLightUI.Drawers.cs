@@ -23,7 +23,7 @@ namespace UnityEditor.Rendering.Universal
             Emission = 1 << 2,
             Rendering = 1 << 3,
             Shadows = 1 << 4,
-            LightCookie = 1 << 5
+            LightCookie = 1 << 5,
         }
 
         static readonly ExpandedState<Expandable, Light> k_ExpandedState = new(~-1, "URP");
@@ -42,14 +42,15 @@ namespace UnityEditor.Rendering.Universal
 #endif
                     return !sceneLighting;
                 },
-                (_, __) => EditorGUILayout.HelpBox(Styles.DisabledLightWarning.text, MessageType.Warning)),
-            CED.FoldoutGroup(LightUI.Styles.generalHeader,
-                Expandable.General,
-                k_ExpandedState,
-                DrawGeneralContent),
+                (_, __) => EditorGUILayout.HelpBox(Styles.DisabledLightWarning.text, MessageType.Warning)
+            ),
+            CED.FoldoutGroup(LightUI.Styles.generalHeader, Expandable.General, k_ExpandedState, DrawGeneralContent),
             CED.Conditional(
-                (serializedLight, editor) => !serializedLight.settings.lightType.hasMultipleDifferentValues && serializedLight.settings.light.type == LightType.Spot,
-                CED.FoldoutGroup(LightUI.Styles.shapeHeader, Expandable.Shape, k_ExpandedState, DrawSpotShapeContent)),
+                (serializedLight, editor) =>
+                    !serializedLight.settings.lightType.hasMultipleDifferentValues
+                    && serializedLight.settings.light.type == LightType.Spot,
+                CED.FoldoutGroup(LightUI.Styles.shapeHeader, Expandable.Shape, k_ExpandedState, DrawSpotShapeContent)
+            ),
             CED.Conditional(
                 (serializedLight, editor) =>
                 {
@@ -58,24 +59,25 @@ namespace UnityEditor.Rendering.Universal
                     var lightType = serializedLight.settings.light.type;
                     return lightType == LightType.Rectangle || lightType == LightType.Disc;
                 },
-                CED.FoldoutGroup(LightUI.Styles.shapeHeader, Expandable.Shape, k_ExpandedState, DrawAreaShapeContent)),
-            CED.FoldoutGroup(LightUI.Styles.emissionHeader,
+                CED.FoldoutGroup(LightUI.Styles.shapeHeader, Expandable.Shape, k_ExpandedState, DrawAreaShapeContent)
+            ),
+            CED.FoldoutGroup(
+                LightUI.Styles.emissionHeader,
                 Expandable.Emission,
                 k_ExpandedState,
-                CED.Group(
-                    LightUI.DrawColor,
-                    DrawEmissionContent)),
-            CED.FoldoutGroup(LightUI.Styles.renderingHeader,
+                CED.Group(LightUI.DrawColor, DrawEmissionContent)
+            ),
+            CED.FoldoutGroup(
+                LightUI.Styles.renderingHeader,
                 Expandable.Rendering,
                 k_ExpandedState,
-                DrawRenderingContent),
-            CED.FoldoutGroup(LightUI.Styles.shadowHeader,
-                Expandable.Shadows,
-                k_ExpandedState,
-                DrawShadowsContent)
+                DrawRenderingContent
+            ),
+            CED.FoldoutGroup(LightUI.Styles.shadowHeader, Expandable.Shadows, k_ExpandedState, DrawShadowsContent)
         );
 
         static Func<int> s_SetGizmosDirty = SetGizmosDirty();
+
         static Func<int> SetGizmosDirty()
         {
             var type = Type.GetType("UnityEditor.AnnotationUtility,UnityEditor");
@@ -84,31 +86,78 @@ namespace UnityEditor.Rendering.Universal
             return lambda.Compile();
         }
 
-        static Action<GUIContent, SerializedProperty, LightEditor.Settings> k_SliderWithTexture = GetSliderWithTexture();
+        static Action<GUIContent, SerializedProperty, LightEditor.Settings> k_SliderWithTexture =
+            GetSliderWithTexture();
+
         static Action<GUIContent, SerializedProperty, LightEditor.Settings> GetSliderWithTexture()
         {
             //quicker than standard reflection as it is compiled
             var paramLabel = Expression.Parameter(typeof(GUIContent), "label");
             var paramProperty = Expression.Parameter(typeof(SerializedProperty), "property");
             var paramSettings = Expression.Parameter(typeof(LightEditor.Settings), "settings");
-            System.Reflection.MethodInfo sliderWithTextureInfo = typeof(EditorGUILayout)
-                .GetMethod(
+            System.Reflection.MethodInfo sliderWithTextureInfo = typeof(EditorGUILayout).GetMethod(
                 "SliderWithTexture",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static,
                 null,
                 System.Reflection.CallingConventions.Any,
-                new[] { typeof(GUIContent), typeof(SerializedProperty), typeof(float), typeof(float), typeof(float), typeof(Texture2D), typeof(GUILayoutOption[]) },
-                null);
+                new[]
+                {
+                    typeof(GUIContent),
+                    typeof(SerializedProperty),
+                    typeof(float),
+                    typeof(float),
+                    typeof(float),
+                    typeof(Texture2D),
+                    typeof(GUILayoutOption[]),
+                },
+                null
+            );
             var sliderWithTextureCall = Expression.Call(
                 sliderWithTextureInfo,
                 paramLabel,
                 paramProperty,
-                Expression.Constant((float)typeof(LightEditor.Settings).GetField("kMinKelvin", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).GetRawConstantValue()),
-                Expression.Constant((float)typeof(LightEditor.Settings).GetField("kMaxKelvin", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).GetRawConstantValue()),
-                Expression.Constant((float)typeof(LightEditor.Settings).GetField("kSliderPower", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).GetRawConstantValue()),
-                Expression.Field(paramSettings, typeof(LightEditor.Settings).GetField("m_KelvinGradientTexture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)),
-                Expression.Constant(null, typeof(GUILayoutOption[])));
-            var lambda = Expression.Lambda<System.Action<GUIContent, SerializedProperty, LightEditor.Settings>>(sliderWithTextureCall, paramLabel, paramProperty, paramSettings);
+                Expression.Constant(
+                    (float)
+                        typeof(LightEditor.Settings)
+                            .GetField(
+                                "kMinKelvin",
+                                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic
+                            )
+                            .GetRawConstantValue()
+                ),
+                Expression.Constant(
+                    (float)
+                        typeof(LightEditor.Settings)
+                            .GetField(
+                                "kMaxKelvin",
+                                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic
+                            )
+                            .GetRawConstantValue()
+                ),
+                Expression.Constant(
+                    (float)
+                        typeof(LightEditor.Settings)
+                            .GetField(
+                                "kSliderPower",
+                                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic
+                            )
+                            .GetRawConstantValue()
+                ),
+                Expression.Field(
+                    paramSettings,
+                    typeof(LightEditor.Settings).GetField(
+                        "m_KelvinGradientTexture",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
+                    )
+                ),
+                Expression.Constant(null, typeof(GUILayoutOption[]))
+            );
+            var lambda = Expression.Lambda<System.Action<GUIContent, SerializedProperty, LightEditor.Settings>>(
+                sliderWithTextureCall,
+                paramLabel,
+                paramProperty,
+                paramSettings
+            );
             return lambda.Compile();
         }
 
@@ -122,7 +171,11 @@ namespace UnityEditor.Rendering.Universal
             DrawGeneralContentInternal(serializedLight, owner, isInPreset: true);
         }
 
-        static void DrawGeneralContentInternal(UniversalRenderPipelineSerializedLight serializedLight, Editor owner, bool isInPreset)
+        static void DrawGeneralContentInternal(
+            UniversalRenderPipelineSerializedLight serializedLight,
+            Editor owner,
+            bool isInPreset
+        )
         {
             // To the user, we will only display it as a area light, but under the hood, we have Rectangle and Disc. This is not to confuse people
             // who still use our legacy light inspector.
@@ -146,7 +199,13 @@ namespace UnityEditor.Rendering.Universal
             {
                 // ^ The currently selected light type is supported in the
                 // current pipeline.
-                type = EditorGUI.IntPopup(rect, Styles.Type, selectedLightType, Styles.LightTypeTitles, Styles.LightTypeValues);
+                type = EditorGUI.IntPopup(
+                    rect,
+                    Styles.Type,
+                    selectedLightType,
+                    Styles.LightTypeTitles,
+                    Styles.LightTypeValues
+                );
             }
             else
             {
@@ -154,7 +213,9 @@ namespace UnityEditor.Rendering.Universal
                 // the current pipeline. Add it to the dropdown, since it
                 // would show up as a blank entry.
                 string currentTitle = ((LightType)selectedLightType).ToString();
-                GUIContent[] titles = Styles.LightTypeTitles.Append(EditorGUIUtility.TrTextContent(currentTitle)).ToArray();
+                GUIContent[] titles = Styles
+                    .LightTypeTitles.Append(EditorGUIUtility.TrTextContent(currentTitle))
+                    .ToArray();
                 int[] values = Styles.LightTypeValues.Append(selectedLightType).ToArray();
                 type = EditorGUI.IntPopup(rect, Styles.Type, selectedLightType, titles, values);
             }
@@ -186,7 +247,10 @@ namespace UnityEditor.Rendering.Universal
                 using (new EditorGUI.DisabledScope(serializedLight.settings.isAreaLightType))
                     serializedLight.settings.DrawLightmapping();
 
-                if (serializedLight.settings.isAreaLightType && serializedLight.settings.lightmapping.intValue != (int)LightmapBakeType.Baked)
+                if (
+                    serializedLight.settings.isAreaLightType
+                    && serializedLight.settings.lightmapping.intValue != (int)LightmapBakeType.Baked
+                )
                 {
                     serializedLight.settings.lightmapping.intValue = (int)LightmapBakeType.Baked;
                     serializedLight.Apply();
@@ -194,7 +258,10 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        internal static void SyncLightAndShadowLayers(UniversalRenderPipelineSerializedLight serializedLight, SerializedProperty serialized)
+        internal static void SyncLightAndShadowLayers(
+            UniversalRenderPipelineSerializedLight serializedLight,
+            SerializedProperty serialized
+        )
         {
             // If we're not in decoupled mode for light layers, we sync light with shadow layers.
             // In mixed state, it makes sense to do it only on Light that links the mode.
@@ -217,7 +284,9 @@ namespace UnityEditor.Rendering.Universal
 
         static void DrawAreaShapeContent(UniversalRenderPipelineSerializedLight serializedLight, Editor owner)
         {
-            int selectedShape = serializedLight.settings.isAreaLightType ? serializedLight.settings.lightType.intValue : 0;
+            int selectedShape = serializedLight.settings.isAreaLightType
+                ? serializedLight.settings.lightType.intValue
+                : 0;
 
             // Handle all lights that are not in the default set
             if (!Styles.LightTypeValues.Contains(serializedLight.settings.lightType.intValue))
@@ -231,7 +300,13 @@ namespace UnityEditor.Rendering.Universal
             var rect = EditorGUILayout.GetControlRect();
             EditorGUI.BeginProperty(rect, Styles.AreaLightShapeContent, serializedLight.settings.lightType);
             EditorGUI.BeginChangeCheck();
-            int shape = EditorGUI.IntPopup(rect, Styles.AreaLightShapeContent, selectedShape, Styles.AreaLightShapeTitles, Styles.AreaLightShapeValues);
+            int shape = EditorGUI.IntPopup(
+                rect,
+                Styles.AreaLightShapeContent,
+                selectedShape,
+                Styles.AreaLightShapeTitles,
+                Styles.AreaLightShapeValues
+            );
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -267,12 +342,19 @@ namespace UnityEditor.Rendering.Universal
 
         static void DrawRenderingContent(UniversalRenderPipelineSerializedLight serializedLight, Editor owner)
         {
-            if (serializedLight.settings.light.type != LightType.Rectangle &&
-                !serializedLight.settings.isCompletelyBaked)
+            if (
+                serializedLight.settings.light.type != LightType.Rectangle
+                && !serializedLight.settings.isCompletelyBaked
+            )
             {
                 EditorGUI.BeginChangeCheck();
                 GUI.enabled = UniversalRenderPipeline.asset.useRenderingLayers;
-                EditorGUILayout.PropertyField(serializedLight.renderingLayers, UniversalRenderPipeline.asset.useRenderingLayers ? Styles.RenderingLayers : Styles.RenderingLayersDisabled);
+                EditorGUILayout.PropertyField(
+                    serializedLight.renderingLayers,
+                    UniversalRenderPipeline.asset.useRenderingLayers
+                        ? Styles.RenderingLayers
+                        : Styles.RenderingLayersDisabled
+                );
                 GUI.enabled = true;
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -342,12 +424,25 @@ namespace UnityEditor.Rendering.Universal
 
                         // this min bound should match the calculation in SharedLightData::GetNearPlaneMinBound()
                         float nearPlaneMinBound = Mathf.Min(0.01f * serializedLight.settings.range.floatValue, 0.1f);
-                        EditorGUILayout.Slider(serializedLight.settings.shadowsNearPlane, nearPlaneMinBound, 10.0f, Styles.ShadowNearPlane);
+                        EditorGUILayout.Slider(
+                            serializedLight.settings.shadowsNearPlane,
+                            nearPlaneMinBound,
+                            10.0f,
+                            Styles.ShadowNearPlane
+                        );
                         var isQuest = false;
 #if XR_MANAGEMENT_4_0_1_OR_NEWER
-                        var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget);
-                        var buildTargetSettings = XRGeneralSettingsPerBuildTarget.XRGeneralSettingsForBuildTarget(buildTargetGroup);
-                        if (buildTargetSettings != null && buildTargetSettings.AssignedSettings != null && buildTargetSettings.AssignedSettings.activeLoaders.Count > 0)
+                        var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(
+                            EditorUserBuildSettings.activeBuildTarget
+                        );
+                        var buildTargetSettings = XRGeneralSettingsPerBuildTarget.XRGeneralSettingsForBuildTarget(
+                            buildTargetGroup
+                        );
+                        if (
+                            buildTargetSettings != null
+                            && buildTargetSettings.AssignedSettings != null
+                            && buildTargetSettings.AssignedSettings.activeLoaders.Count > 0
+                        )
                         {
                             isQuest = buildTargetGroup == BuildTargetGroup.Android;
                         }
@@ -355,7 +450,10 @@ namespace UnityEditor.Rendering.Universal
 #endif
                         // Soft Shadow Quality
                         if (serializedLight.settings.light.shadows == LightShadows.Soft)
-                            EditorGUILayout.PropertyField(serializedLight.softShadowQualityProp, Styles.SoftShadowQuality);
+                            EditorGUILayout.PropertyField(
+                                serializedLight.softShadowQualityProp,
+                                Styles.SoftShadowQuality
+                            );
 
                         if (isQuest)
                         {
@@ -364,7 +462,6 @@ namespace UnityEditor.Rendering.Universal
                                 MessageType.Warning
                             );
                         }
-
                     }
 
                     if (UniversalRenderPipeline.asset.useRenderingLayers)
@@ -374,14 +471,19 @@ namespace UnityEditor.Rendering.Universal
                         if (serializedLight.customShadowLayers.boolValue)
                         {
                             using (new EditorGUI.IndentLevelScope())
-                                EditorGUILayout.PropertyField(serializedLight.shadowRenderingLayers, Styles.ShadowLayer);
+                                EditorGUILayout.PropertyField(
+                                    serializedLight.shadowRenderingLayers,
+                                    Styles.ShadowLayer
+                                );
                         }
                         // Undo the changes in the light component because the SyncLightAndShadowLayers will change the value automatically when link is ticked
                         if (EditorGUI.EndChangeCheck())
                         {
                             if (serializedLight.customShadowLayers.boolValue)
                             {
-                                serializedLight.settings.light.renderingLayerMask = serializedLight.shadowRenderingLayers.intValue;
+                                serializedLight.settings.light.renderingLayerMask = serializedLight
+                                    .shadowRenderingLayers
+                                    .intValue;
                             }
                             else
                             {
@@ -393,7 +495,11 @@ namespace UnityEditor.Rendering.Universal
                 }
             }
 
-            if (!UnityEditor.Lightmapping.bakedGI && !serializedLight.settings.lightmapping.hasMultipleDifferentValues && serializedLight.settings.isBakedOrMixed)
+            if (
+                !UnityEditor.Lightmapping.bakedGI
+                && !serializedLight.settings.lightmapping.hasMultipleDifferentValues
+                && serializedLight.settings.isBakedOrMixed
+            )
                 EditorGUILayout.HelpBox(Styles.BakingWarning.text, MessageType.Warning);
         }
 
@@ -406,7 +512,13 @@ namespace UnityEditor.Rendering.Universal
             {
                 using (var checkScope = new EditorGUI.ChangeCheckScope())
                 {
-                    selectedUseAdditionalData = EditorGUI.IntPopup(r, Styles.shadowBias, selectedUseAdditionalData, Styles.displayedDefaultOptions, Styles.optionDefaultValues);
+                    selectedUseAdditionalData = EditorGUI.IntPopup(
+                        r,
+                        Styles.shadowBias,
+                        selectedUseAdditionalData,
+                        Styles.displayedDefaultOptions,
+                        Styles.optionDefaultValues
+                    );
                     if (checkScope.changed)
                     {
                         Undo.RecordObjects(serializedLight.lightsAdditionalData, "Modified light additional data");
@@ -428,8 +540,18 @@ namespace UnityEditor.Rendering.Universal
                     {
                         using (var checkScope = new EditorGUI.ChangeCheckScope())
                         {
-                            EditorGUILayout.Slider(serializedLight.settings.shadowsBias, 0f, 10f, Styles.ShadowDepthBias);
-                            EditorGUILayout.Slider(serializedLight.settings.shadowsNormalBias, 0f, 10f, Styles.ShadowNormalBias);
+                            EditorGUILayout.Slider(
+                                serializedLight.settings.shadowsBias,
+                                0f,
+                                10f,
+                                Styles.ShadowDepthBias
+                            );
+                            EditorGUILayout.Slider(
+                                serializedLight.settings.shadowsNormalBias,
+                                0f,
+                                10f,
+                                Styles.ShadowNormalBias
+                            );
                             if (checkScope.changed)
                                 serializedLight.Apply();
                         }
@@ -449,17 +571,32 @@ namespace UnityEditor.Rendering.Universal
                     Rect r = EditorGUILayout.GetControlRect(true);
                     r.width += 30;
 
-                    shadowResolutionTier = EditorGUI.IntPopup(r, Styles.ShadowResolution, shadowResolutionTier, Styles.ShadowResolutionDefaultOptions, Styles.ShadowResolutionDefaultValues);
+                    shadowResolutionTier = EditorGUI.IntPopup(
+                        r,
+                        Styles.ShadowResolution,
+                        shadowResolutionTier,
+                        Styles.ShadowResolutionDefaultOptions,
+                        Styles.ShadowResolutionDefaultValues
+                    );
                     if (shadowResolutionTier == UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierCustom)
                     {
                         // show the custom value field GUI.
-                        var newResolution = EditorGUILayout.IntField(serializedLight.settings.shadowsResolution.intValue, GUILayout.ExpandWidth(false));
-                        serializedLight.settings.shadowsResolution.intValue = Mathf.Max(UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution, Mathf.NextPowerOfTwo(newResolution));
+                        var newResolution = EditorGUILayout.IntField(
+                            serializedLight.settings.shadowsResolution.intValue,
+                            GUILayout.ExpandWidth(false)
+                        );
+                        serializedLight.settings.shadowsResolution.intValue = Mathf.Max(
+                            UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution,
+                            Mathf.NextPowerOfTwo(newResolution)
+                        );
                     }
                     else
                     {
                         if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urpAsset)
-                            EditorGUILayout.LabelField($"{urpAsset.GetAdditionalLightsShadowResolution(shadowResolutionTier)} ({urpAsset.name})", GUILayout.ExpandWidth(false));
+                            EditorGUILayout.LabelField(
+                                $"{urpAsset.GetAdditionalLightsShadowResolution(shadowResolutionTier)} ({urpAsset.name})",
+                                GUILayout.ExpandWidth(false)
+                            );
                     }
                     if (checkScope.changed)
                     {
@@ -477,7 +614,10 @@ namespace UnityEditor.Rendering.Universal
             var settings = serializedLight.settings;
             if (settings.lightType.hasMultipleDifferentValues)
             {
-                EditorGUILayout.HelpBox("Cannot multi edit light cookies from different light types.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "Cannot multi edit light cookies from different light types.",
+                    MessageType.Info
+                );
                 return;
             }
 
@@ -493,7 +633,9 @@ namespace UnityEditor.Rendering.Universal
                     EditorGUILayout.PropertyField(serializedLight.lightCookieSizeProp, Styles.LightCookieSize);
                     EditorGUILayout.PropertyField(serializedLight.lightCookieOffsetProp, Styles.LightCookieOffset);
                     if (EditorGUI.EndChangeCheck())
-                        Experimental.Lightmapping.SetLightDirty((UnityEngine.Light)serializedLight.serializedObject.targetObject);
+                        Experimental.Lightmapping.SetLightDirty(
+                            (UnityEngine.Light)serializedLight.serializedObject.targetObject
+                        );
                 }
             }
         }

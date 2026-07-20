@@ -38,8 +38,7 @@ namespace UnityEngine.EventSystems
         RaycastHit[] m_Hits;
 #endif
 
-        protected PhysicsRaycaster()
-        {}
+        protected PhysicsRaycaster() { }
 
         public override Camera eventCamera
         {
@@ -51,10 +50,9 @@ namespace UnityEngine.EventSystems
                 if (m_EventCamera == null)
                     return Camera.main;
 
-                return m_EventCamera ;
+                return m_EventCamera;
             }
         }
-
 
         /// <summary>
         /// Depth used to determine the order of event processing.
@@ -101,12 +99,20 @@ namespace UnityEngine.EventSystems
         /// <param name="eventDisplayIndex">The display index used.</param>
         /// <param name="distanceToClipPlane">The distance between the near and far clipping planes along the ray.</param>
         /// <returns>True if the operation was successful. false if it was not possible to compute, such as the eventPosition being outside of the view.</returns>
-        protected bool ComputeRayAndDistance(PointerEventData eventData, ref Ray ray, ref int eventDisplayIndex, ref float distanceToClipPlane)
+        protected bool ComputeRayAndDistance(
+            PointerEventData eventData,
+            ref Ray ray,
+            ref int eventDisplayIndex,
+            ref float distanceToClipPlane
+        )
         {
             if (eventCamera == null)
                 return false;
 
-            var eventPosition = MultipleDisplayUtilities.RelativeMouseAtScaled(eventData.position, eventData.displayIndex);
+            var eventPosition = MultipleDisplayUtilities.RelativeMouseAtScaled(
+                eventData.position,
+                eventData.displayIndex
+            );
             if (eventPosition != Vector3.zero)
             {
                 // We support multiple display and display identification based on event position.
@@ -165,7 +171,12 @@ namespace UnityEngine.EventSystems
                     m_LastMaxRayIntersections = m_MaxRayIntersections;
                 }
 
-                hitCount = ReflectionMethodsCache.Singleton.getRaycastNonAlloc(ray, m_Hits, distanceToClipPlane, finalEventMask);
+                hitCount = ReflectionMethodsCache.Singleton.getRaycastNonAlloc(
+                    ray,
+                    m_Hits,
+                    distanceToClipPlane,
+                    finalEventMask
+                );
             }
 
             if (hitCount != 0)
@@ -186,7 +197,7 @@ namespace UnityEngine.EventSystems
                         displayIndex = displayIndex,
                         index = resultAppendList.Count,
                         sortingLayer = 0,
-                        sortingOrder = 0
+                        sortingOrder = 0,
                     };
                     resultAppendList.Add(result);
                 }
@@ -198,6 +209,7 @@ namespace UnityEngine.EventSystems
         private class RaycastHitComparer : IComparer<RaycastHit>
         {
             public static RaycastHitComparer instance = new RaycastHitComparer();
+
             public int Compare(RaycastHit x, RaycastHit y)
             {
                 return x.distance.CompareTo(y.distance);

@@ -10,7 +10,10 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The ProgressBar Attribute can only be attached to an int or float", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The ProgressBar Attribute can only be attached to an int or float",
+                    HelpBoxMessageType.Error
+                );
 
             var progressBarAttribute = attribute as ProgressBarAttribute;
 
@@ -24,11 +27,14 @@ namespace EditorAttributes.Editor
 
             SetProgressBarValue(property);
 
-            progressBar.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                if (CanApplyGlobalColor)
-                    progressBar.Q(className: AbstractProgressBar.progressUssClassName).style.backgroundColor = EditorExtension.GLOBAL_COLOR / 2f;
-            });
+            progressBar.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    if (CanApplyGlobalColor)
+                        progressBar.Q(className: AbstractProgressBar.progressUssClassName).style.backgroundColor =
+                            EditorExtension.GLOBAL_COLOR / 2f;
+                }
+            );
 
             progressBar.TrackPropertyValue(property, SetProgressBarValue);
 
@@ -43,7 +49,8 @@ namespace EditorAttributes.Editor
             }
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType is SerializedPropertyType.Integer or SerializedPropertyType.Float;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType is SerializedPropertyType.Integer or SerializedPropertyType.Float;
 
         private float GetPropertyValue(SerializedProperty property)
         {
@@ -51,7 +58,7 @@ namespace EditorAttributes.Editor
             {
                 SerializedPropertyType.Integer => property.intValue,
                 SerializedPropertyType.Float => property.floatValue,
-                _ => 0f
+                _ => 0f,
             };
         }
     }

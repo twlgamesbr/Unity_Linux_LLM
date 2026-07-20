@@ -13,8 +13,7 @@ namespace Unity.Web.Stripping.Editor
     class BuildToolsLocator
     {
         // Same as IsWebBuildTargetSupported() but a bit more "user-friendly" language + can be altered for testing purposes
-        public static bool IsWebBuildSupportInstalled { get; internal set; } =
-            IsWebBuildTargetSupported();
+        public static bool IsWebBuildSupportInstalled { get; internal set; } = IsWebBuildTargetSupported();
 
         internal static bool IsWebBuildTargetSupported() =>
             BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, BuildTarget.WebGL);
@@ -87,11 +86,7 @@ namespace Unity.Web.Stripping.Editor
             {
                 if (string.IsNullOrEmpty(s_EmscriptenVersion))
                 {
-                    var emscriptenVersionFile = Path.Combine(
-                        EmscriptenSdkPath,
-                        "emscripten",
-                        "emscripten-version.txt"
-                    );
+                    var emscriptenVersionFile = Path.Combine(EmscriptenSdkPath, "emscripten", "emscripten-version.txt");
                     if (File.Exists(emscriptenVersionFile))
                         s_EmscriptenVersion = File.ReadAllText(emscriptenVersionFile).TrimEnd();
                 }
@@ -127,10 +122,7 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="useMultithreading">Set to true if multithreading support is enabled.</param>
         /// <param name="useWasm2023">Set to true if Wasm2023 features are enabled.</param>
         /// <returns>Paths to submodules definition files</returns>
-        public static List<string> GetSubmoduleDefinitionFilePaths(
-            bool useMultithreading,
-            bool useWasm2023
-        )
+        public static List<string> GetSubmoduleDefinitionFilePaths(bool useMultithreading, bool useWasm2023)
         {
             var paths = new List<string>();
             paths.Add(GetSubmoduleDefinitionFilePath(useMultithreading, useWasm2023));
@@ -145,10 +137,7 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="useMultithreading">Set to true if multithreading support is enabled.</param>
         /// <param name="useWasm2023">Set to true if Wasm2023 features are enabled.</param>
         /// <returns>Path to submodules definition file</returns>
-        public static string GetSubmoduleDefinitionFilePath(
-            bool useMultithreading,
-            bool useWasm2023
-        )
+        public static string GetSubmoduleDefinitionFilePath(bool useMultithreading, bool useWasm2023)
         {
             var moduleFolderName = "modules";
             if (useMultithreading)
@@ -168,11 +157,7 @@ namespace Unity.Web.Stripping.Editor
         {
             var submoduleDefinitionPaths = new List<string>();
 
-            foreach (
-                var path in Directory.GetFiles(
-                    Path.Combine(Utils.PackagePath, "SubmoduleDefinitions")
-                )
-            )
+            foreach (var path in Directory.GetFiles(Path.Combine(Utils.PackagePath, "SubmoduleDefinitions")))
             {
                 // Only add .json files and skip .meta files
                 if (path.EndsWith(".json"))

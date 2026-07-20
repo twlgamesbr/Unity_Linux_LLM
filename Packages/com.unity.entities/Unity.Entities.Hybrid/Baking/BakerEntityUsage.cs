@@ -13,7 +13,7 @@ namespace Unity.Entities
     {
         internal struct ReferencedEntityUsage : IEquatable<ReferencedEntityUsage>
         {
-            public Entity              Entity;
+            public Entity Entity;
             public TransformUsageFlags Usage;
 
             public ReferencedEntityUsage(Entity e, TransformUsageFlags flags)
@@ -28,9 +28,9 @@ namespace Unity.Entities
             }
         }
 
-        internal Entity                                PrimaryEntity;
-        internal TransformUsageFlagCounters            PrimaryEntityFlags;
-        internal UnsafeList<ReferencedEntityUsage>     ReferencedEntityUsages;
+        internal Entity PrimaryEntity;
+        internal TransformUsageFlagCounters PrimaryEntityFlags;
+        internal UnsafeList<ReferencedEntityUsage> ReferencedEntityUsages;
 
         public BakerEntityUsage(Entity primaryEntity, int capacity, Allocator allocator)
         {
@@ -51,7 +51,11 @@ namespace Unity.Entities
             ReferencedEntityUsages.Clear();
         }
 
-        public void AddTransformUsage(ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> bakedEntityData, ref bool usageDirty, EntityId component)
+        public void AddTransformUsage(
+            ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> bakedEntityData,
+            ref bool usageDirty,
+            EntityId component
+        )
         {
             // Revert primary entity transform usage flags
             if (!PrimaryEntityFlags.IsUnused)
@@ -79,7 +83,11 @@ namespace Unity.Entities
             usageDirty = true;
         }
 
-        public void Revert(Entity newPrimaryEntity, ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> entityUsage, ref bool usageDirty)
+        public void Revert(
+            Entity newPrimaryEntity,
+            ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> entityUsage,
+            ref bool usageDirty
+        )
         {
             // Revert primary entity transform usage flags
             if (entityUsage.TryGetValue(PrimaryEntity, out var oldFlags))
@@ -115,7 +123,9 @@ namespace Unity.Entities
 
         public bool Equals(BakerEntityUsage other)
         {
-            return PrimaryEntity.Equals(other.PrimaryEntity) && PrimaryEntityFlags.Equals(other.PrimaryEntityFlags) && ReferencedEntityUsages.ArraysEqual(other.ReferencedEntityUsages);
+            return PrimaryEntity.Equals(other.PrimaryEntity)
+                && PrimaryEntityFlags.Equals(other.PrimaryEntityFlags)
+                && ReferencedEntityUsages.ArraysEqual(other.ReferencedEntityUsages);
         }
 
         void CopyFrom(in BakerEntityUsage input)
@@ -125,7 +135,14 @@ namespace Unity.Entities
             ReferencedEntityUsages.CopyFrom(input.ReferencedEntityUsages);
         }
 
-        public static bool Update(ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> referencedEntities, ref bool dirtyUsage, ref BakerEntityUsage bakerStateUsage, ref BakerEntityUsage tempUsage, EntityId component, out bool revertTransformComponents)
+        public static bool Update(
+            ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> referencedEntities,
+            ref bool dirtyUsage,
+            ref BakerEntityUsage bakerStateUsage,
+            ref BakerEntityUsage tempUsage,
+            EntityId component,
+            out bool revertTransformComponents
+        )
         {
             if (bakerStateUsage.Equals(tempUsage))
             {
@@ -134,8 +151,10 @@ namespace Unity.Entities
             }
 
             // Check if we moved from something else to ManualOverride as we will need to revert previous components
-            revertTransformComponents = (tempUsage.PrimaryEntityFlags.HasManualOverrideFlag() &&
-                                         !bakerStateUsage.PrimaryEntityFlags.HasManualOverrideFlag());
+            revertTransformComponents = (
+                tempUsage.PrimaryEntityFlags.HasManualOverrideFlag()
+                && !bakerStateUsage.PrimaryEntityFlags.HasManualOverrideFlag()
+            );
 
             bakerStateUsage.Revert(bakerStateUsage.PrimaryEntity, ref referencedEntities, ref dirtyUsage);
             bakerStateUsage.CopyFrom(tempUsage);

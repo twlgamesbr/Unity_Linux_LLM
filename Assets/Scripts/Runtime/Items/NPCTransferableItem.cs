@@ -1,24 +1,23 @@
 using System.Collections.Generic;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Items
 {
     [DisallowMultipleComponent]
@@ -62,30 +61,30 @@ namespace NPCSystem.Items
         [FormerlySerializedAs("PlayerHoldOffset")]
         [SerializeField]
         Vector3 _playerHoldOffset = new Vector3(0f, 1.1f, 0.8f);
+
         [FormerlySerializedAs("npcHoldOffset")]
         [FormerlySerializedAs("NpcHoldOffset")]
         [SerializeField]
         Vector3 _npcHoldOffset = new Vector3(0.65f, 1.1f, 0f);
+
         [FormerlySerializedAs("followSharpness")]
         [FormerlySerializedAs("FollowSharpness")]
         [SerializeField]
         float _followSharpness = 20f;
 
         [HideInInspector]
-        public readonly NetworkVariable<FixedString64Bytes> itemIdValue =
-            new NetworkVariable<FixedString64Bytes>(
-                default,
-                NetworkVariableReadPermission.Everyone,
-                NetworkVariableWritePermission.Server
-            );
+        public readonly NetworkVariable<FixedString64Bytes> itemIdValue = new NetworkVariable<FixedString64Bytes>(
+            default,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
 
         [HideInInspector]
-        public readonly NetworkVariable<FixedString64Bytes> displayNameValue =
-            new NetworkVariable<FixedString64Bytes>(
-                default,
-                NetworkVariableReadPermission.Everyone,
-                NetworkVariableWritePermission.Server
-            );
+        public readonly NetworkVariable<FixedString64Bytes> displayNameValue = new NetworkVariable<FixedString64Bytes>(
+            default,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
 
         readonly NetworkVariable<int> _holderType = new NetworkVariable<int>(
             (int)HolderType.World,
@@ -93,12 +92,11 @@ namespace NPCSystem.Items
             NetworkVariableWritePermission.Server
         );
 
-        readonly NetworkVariable<FixedString64Bytes> _npcHolderSlug =
-            new NetworkVariable<FixedString64Bytes>(
-                default,
-                NetworkVariableReadPermission.Everyone,
-                NetworkVariableWritePermission.Server
-            );
+        readonly NetworkVariable<FixedString64Bytes> _npcHolderSlug = new NetworkVariable<FixedString64Bytes>(
+            default,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
 
         public bool IsHeldByPlayer => _holderType.Value == (int)HolderType.Player;
         public bool IsHeldByNpc => _holderType.Value == (int)HolderType.Npc;
@@ -106,9 +104,7 @@ namespace NPCSystem.Items
         void Awake()
         {
             ItemId = NormalizeId(ItemId, "");
-            DisplayName = string.IsNullOrWhiteSpace(DisplayName)
-                ? "Code Item"
-                : DisplayName.Trim();
+            DisplayName = string.IsNullOrWhiteSpace(DisplayName) ? "Code Item" : DisplayName.Trim();
             _initialNpcHolderSlug = NormalizeId(_initialNpcHolderSlug, "game-developer");
         }
 
@@ -230,9 +226,7 @@ namespace NPCSystem.Items
             if (IsHeldByNpc)
             {
                 string npcSlug = _npcHolderSlug.Value.ToString();
-                NPCServerCharacter[] npcCharacters = FindObjectsByType<NPCServerCharacter>(
-                    FindObjectsInactive.Include
-                );
+                NPCServerCharacter[] npcCharacters = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
                 foreach (NPCServerCharacter npcCharacter in npcCharacters)
                 {
                     if (npcCharacter != null && npcCharacter.Slug == npcSlug)
@@ -282,12 +276,7 @@ namespace NPCSystem.Items
             gameObject.name = $"NPCTransferableItem_{ItemId}_{holder}";
         }
 
-        void LogOwnershipEvent(
-            NPCFlowStatus status,
-            string message,
-            ulong ownerClientId,
-            string npcSlug
-        )
+        void LogOwnershipEvent(NPCFlowStatus status, string message, ulong ownerClientId, string npcSlug)
         {
             NPCFlowLogger
                 .FindOrCreate()

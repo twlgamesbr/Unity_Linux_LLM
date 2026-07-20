@@ -25,11 +25,11 @@ namespace Unity.Rendering
             // Explicitly store the LightBakingOutput using a component, so we can restore it
             // at runtime.
             var bakingOutput = authoring.bakingOutput;
-            AddComponent(entity, new LightBakingOutputData {Value = bakingOutput});
+            AddComponent(entity, new LightBakingOutputData { Value = bakingOutput });
 #endif // UNITY_EDITOR
         }
     }
-    
+
 #pragma warning disable CS0618 // Type or member is obsolete
     class LightProbeProxyVolumeCompanionBaker : Baker<LightProbeProxyVolume>
     {
@@ -41,7 +41,7 @@ namespace Unity.Rendering
         }
     }
 #pragma warning restore CS0618
-    
+
     class ReflectionProbeCompanionBaker : Baker<ReflectionProbe>
     {
         public override void Bake(ReflectionProbe authoring)
@@ -120,16 +120,16 @@ namespace Unity.Rendering
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponentObject(entity, authoring);
 
-            if(sphereCollider != null)
+            if (sphereCollider != null)
                 AddComponentObject(entity, sphereCollider);
 
-            if(boxCollider != null)
+            if (boxCollider != null)
                 AddComponentObject(entity, boxCollider);
 
-            if(capsuleCollider != null)
+            if (capsuleCollider != null)
                 AddComponentObject(entity, capsuleCollider);
 
-            if(meshCollider != null)
+            if (meshCollider != null)
                 AddComponentObject(entity, meshCollider);
         }
     }
@@ -150,7 +150,7 @@ namespace Unity.Rendering
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
 #if UNITY_EDITOR
                 var isBaking = light.lightmapBakeType == LightmapBakeType.Baked;
-                if(!isBaking)
+                if (!isBaking)
                     AddComponentObject(entity, authoring);
 #else
                 AddComponentObject(entity, authoring);
@@ -208,7 +208,7 @@ namespace Unity.Rendering
                 if (!isBaking)
                     AddComponentObject(entity, authoring);
 #else
-            AddComponentObject(entity, authoring);
+                AddComponentObject(entity, authoring);
 #endif // UNITY_EDITOR
             }
         }

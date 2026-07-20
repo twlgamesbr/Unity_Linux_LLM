@@ -1,9 +1,9 @@
 using System.Linq;
-using UnityEngine;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
-using System.Threading.Tasks;
 
 namespace EditorAttributes.Editor
 {
@@ -13,7 +13,10 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The AssetPreview Attribute can only be attached on to <b>UnityEngine.Object</b> types", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The AssetPreview Attribute can only be attached on to <b>UnityEngine.Object</b> types",
+                    HelpBoxMessageType.Error
+                );
 
             var assetPreviewAttribute = attribute as AssetPreviewAttribute;
 
@@ -21,7 +24,9 @@ namespace EditorAttributes.Editor
             Image image = new();
             PropertyField propertyField = CreatePropertyField(property);
 
-            propertyField.RegisterValueChangeCallback((changeEvent) => GetAssetPreview(property, assetPreviewAttribute, root, image));
+            propertyField.RegisterValueChangeCallback(
+                (changeEvent) => GetAssetPreview(property, assetPreviewAttribute, root, image)
+            );
 
             root.Add(propertyField);
             root.Add(image);
@@ -31,9 +36,15 @@ namespace EditorAttributes.Editor
             return root;
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.ObjectReference;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.ObjectReference;
 
-        private async void GetAssetPreview(SerializedProperty property, AssetPreviewAttribute assetPreviewAttribute, VisualElement root, Image image)
+        private async void GetAssetPreview(
+            SerializedProperty property,
+            AssetPreviewAttribute assetPreviewAttribute,
+            VisualElement root,
+            Image image
+        )
         {
             if (property.objectReferenceValue == null)
             {
@@ -53,7 +64,8 @@ namespace EditorAttributes.Editor
 
                 if (textureImporter.spriteImportMode == SpriteImportMode.Multiple)
                 {
-                    var selectedSprite = sprites.First((importedTexture) => importedTexture == property.objectReferenceValue) as Sprite;
+                    var selectedSprite =
+                        sprites.First((importedTexture) => importedTexture == property.objectReferenceValue) as Sprite;
 
                     texture = selectedSprite.texture;
                     image.sprite = selectedSprite;
@@ -84,8 +96,10 @@ namespace EditorAttributes.Editor
                 previewSize = new Vector2(texture.width, texture.height);
             }
 
-            float imageWidth = assetPreviewAttribute.PreviewWidth == 0f ? previewSize.x : assetPreviewAttribute.PreviewWidth;
-            float imageHeight = assetPreviewAttribute.PreviewHeight == 0f ? previewSize.y : assetPreviewAttribute.PreviewHeight;
+            float imageWidth =
+                assetPreviewAttribute.PreviewWidth == 0f ? previewSize.x : assetPreviewAttribute.PreviewWidth;
+            float imageHeight =
+                assetPreviewAttribute.PreviewHeight == 0f ? previewSize.y : assetPreviewAttribute.PreviewHeight;
 
             image.style.width = imageWidth;
             image.style.height = imageHeight;

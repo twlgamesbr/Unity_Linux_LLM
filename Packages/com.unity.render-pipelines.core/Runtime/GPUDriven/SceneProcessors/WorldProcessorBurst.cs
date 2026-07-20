@@ -1,5 +1,5 @@
-using Unity.Collections;
 using Unity.Burst;
+using Unity.Collections;
 
 namespace UnityEngine.Rendering
 {
@@ -7,14 +7,16 @@ namespace UnityEngine.Rendering
     internal static class WorldProcessorBurst
     {
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static void ClassifyMaterials(in NativeParallelHashMap<EntityId, GPUDrivenMaterial> materialMap,
+        public static void ClassifyMaterials(
+            in NativeParallelHashMap<EntityId, GPUDrivenMaterial> materialMap,
             in NativeArray<EntityId> allChangedMaterials,
             in NativeArray<EntityId> allDestroyedMaterials,
             out NativeList<EntityId> supportedChangedMaterials,
             out NativeList<EntityId> unsupportedChangedMaterials,
             out NativeList<EntityId> destroyedMaterials,
             out NativeList<GPUDrivenMaterialData> supportedChangedMaterialDatas,
-            Allocator allocator)
+            Allocator allocator
+        )
         {
             var usedChangedMaterials = new NativeList<EntityId>(16, Allocator.Temp);
 
@@ -26,21 +28,32 @@ namespace UnityEngine.Rendering
 
             supportedChangedMaterials = new NativeList<EntityId>(allChangedMaterials.Length, allocator);
             unsupportedChangedMaterials = new NativeList<EntityId>(allChangedMaterials.Length, allocator);
-            supportedChangedMaterialDatas = new NativeList<GPUDrivenMaterialData>(allChangedMaterials.Length, allocator);
+            supportedChangedMaterialDatas = new NativeList<GPUDrivenMaterialData>(
+                allChangedMaterials.Length,
+                allocator
+            );
 
             if (!usedChangedMaterials.IsEmpty)
             {
                 unsupportedChangedMaterials.Resize(usedChangedMaterials.Length, NativeArrayOptions.UninitializedMemory);
                 supportedChangedMaterials.Resize(usedChangedMaterials.Length, NativeArrayOptions.UninitializedMemory);
-                supportedChangedMaterialDatas.Resize(usedChangedMaterials.Length, NativeArrayOptions.UninitializedMemory);
+                supportedChangedMaterialDatas.Resize(
+                    usedChangedMaterials.Length,
+                    NativeArrayOptions.UninitializedMemory
+                );
 
-                int unsupportedMaterialCount = GPUDrivenProcessor.ClassifyMaterials(usedChangedMaterials.AsArray(),
+                int unsupportedMaterialCount = GPUDrivenProcessor.ClassifyMaterials(
+                    usedChangedMaterials.AsArray(),
                     unsupportedChangedMaterials.AsArray(),
                     supportedChangedMaterials.AsArray(),
-                    supportedChangedMaterialDatas.AsArray());
+                    supportedChangedMaterialDatas.AsArray()
+                );
 
                 unsupportedChangedMaterials.Resize(unsupportedMaterialCount, NativeArrayOptions.ClearMemory);
-                supportedChangedMaterials.Resize(usedChangedMaterials.Length - unsupportedMaterialCount, NativeArrayOptions.ClearMemory);
+                supportedChangedMaterials.Resize(
+                    usedChangedMaterials.Length - unsupportedMaterialCount,
+                    NativeArrayOptions.ClearMemory
+                );
                 supportedChangedMaterialDatas.Resize(supportedChangedMaterials.Length, NativeArrayOptions.ClearMemory);
             }
 
@@ -67,10 +80,12 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static void FindOnlyUsedMeshes(in NativeParallelHashMap<EntityId, MeshInfo> meshMap,
+        public static void FindOnlyUsedMeshes(
+            in NativeParallelHashMap<EntityId, MeshInfo> meshMap,
             in NativeArray<EntityId> changedMeshes,
             Allocator allocator,
-            out NativeList<EntityId> usedMeshes)
+            out NativeList<EntityId> usedMeshes
+        )
         {
             usedMeshes = new NativeList<EntityId>(16, allocator);
 
@@ -82,10 +97,12 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static void FindUnsupportedRenderers(in NativeArray<EntityId> unsupportedMaterials,
+        public static void FindUnsupportedRenderers(
+            in NativeArray<EntityId> unsupportedMaterials,
             in NativeArray<EmbeddedArray32<EntityId>> materialArrays,
             in NativeArray<EntityId> renderers,
-            ref NativeList<EntityId> unsupportedRenderers)
+            ref NativeList<EntityId> unsupportedRenderers
+        )
         {
             for (int arrayIndex = 0; arrayIndex < materialArrays.Length; arrayIndex++)
             {

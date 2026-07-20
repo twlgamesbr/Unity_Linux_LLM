@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
 
-
 namespace TMPro.EditorUtilities
 {
     internal struct GlyphProxy
@@ -18,7 +17,8 @@ namespace TMPro.EditorUtilities
     internal static class TMP_PropertyDrawerUtilities
     {
         internal static bool s_RefreshGlyphProxyLookup;
-        private static Dictionary<SerializedObject, Dictionary<uint, GlyphProxy>> s_GlyphProxyLookups = new Dictionary<SerializedObject, Dictionary<uint, GlyphProxy>>();
+        private static Dictionary<SerializedObject, Dictionary<uint, GlyphProxy>> s_GlyphProxyLookups =
+            new Dictionary<SerializedObject, Dictionary<uint, GlyphProxy>>();
 
         internal static void ClearGlyphProxyLookups()
         {
@@ -55,7 +55,10 @@ namespace TMPro.EditorUtilities
         /// </summary>
         /// <param name="so"></param>
         /// <param name="lookupDictionary"></param>
-        static void PopulateGlyphProxyLookupDictionary(SerializedObject so, Dictionary<uint, GlyphProxy> lookupDictionary)
+        static void PopulateGlyphProxyLookupDictionary(
+            SerializedObject so,
+            Dictionary<uint, GlyphProxy> lookupDictionary
+        )
         {
             if (lookupDictionary == null)
                 return;
@@ -90,9 +93,15 @@ namespace TMPro.EditorUtilities
             SerializedProperty glyphMetricsProperty = property.FindPropertyRelative("m_Metrics");
 
             GlyphMetrics glyphMetrics = new GlyphMetrics();
-            glyphMetrics.horizontalBearingX = glyphMetricsProperty.FindPropertyRelative("m_HorizontalBearingX").floatValue;
-            glyphMetrics.horizontalBearingY = glyphMetricsProperty.FindPropertyRelative("m_HorizontalBearingY").floatValue;
-            glyphMetrics.horizontalAdvance = glyphMetricsProperty.FindPropertyRelative("m_HorizontalAdvance").floatValue;
+            glyphMetrics.horizontalBearingX = glyphMetricsProperty
+                .FindPropertyRelative("m_HorizontalBearingX")
+                .floatValue;
+            glyphMetrics.horizontalBearingY = glyphMetricsProperty
+                .FindPropertyRelative("m_HorizontalBearingY")
+                .floatValue;
+            glyphMetrics.horizontalAdvance = glyphMetricsProperty
+                .FindPropertyRelative("m_HorizontalAdvance")
+                .floatValue;
             glyphMetrics.width = glyphMetricsProperty.FindPropertyRelative("m_Width").floatValue;
             glyphMetrics.height = glyphMetricsProperty.FindPropertyRelative("m_Height").floatValue;
 
@@ -122,7 +131,11 @@ namespace TMPro.EditorUtilities
         /// <param name="glyphIndex"></param>
         /// <param name="texture"></param>
         /// <returns></returns>
-        internal static bool TryGetAtlasTextureFromSerializedObject(SerializedObject serializedObject, int glyphIndex, out Texture2D texture)
+        internal static bool TryGetAtlasTextureFromSerializedObject(
+            SerializedObject serializedObject,
+            int glyphIndex,
+            out Texture2D texture
+        )
         {
             SerializedProperty atlasTextureProperty = serializedObject.FindProperty("m_AtlasTextures");
 
@@ -143,18 +156,22 @@ namespace TMPro.EditorUtilities
         /// <returns></returns>
         internal static bool TryGetMaterial(SerializedObject serializedObject, Texture2D texture, out Material mat)
         {
-            GlyphRenderMode atlasRenderMode = (GlyphRenderMode)serializedObject.FindProperty("m_AtlasRenderMode").intValue;
+            GlyphRenderMode atlasRenderMode = (GlyphRenderMode)
+                serializedObject.FindProperty("m_AtlasRenderMode").intValue;
 
-            if (((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP)
+            if (
+                ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP)
+                == GlyphRasterModes.RASTER_MODE_BITMAP
+            )
             {
-                #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+#if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
                 if (atlasRenderMode == GlyphRenderMode.COLOR || atlasRenderMode == GlyphRenderMode.COLOR_HINTED)
                     mat = TMP_FontAssetEditor.internalRGBABitmapMaterial;
                 else
                     mat = TMP_FontAssetEditor.internalBitmapMaterial;
-                #else
+#else
                 mat = TMP_FontAssetEditor.internalBitmapMaterial;
-                #endif
+#endif
 
                 if (mat == null)
                     return false;

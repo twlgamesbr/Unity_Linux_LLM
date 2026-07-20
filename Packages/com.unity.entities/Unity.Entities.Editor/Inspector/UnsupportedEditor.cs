@@ -3,7 +3,6 @@ using Unity.Editor.Bridge;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities.Editor
@@ -55,9 +54,7 @@ namespace Unity.Entities.Editor
         protected override string ItemIconClass => UssClasses.Inspector.UnsupportedInspector.Classes.EntityIcon;
 
         protected override string ItemName =>
-            CachedProxy is { Exists : true } proxy
-                ? proxy.World.EntityManager.GetName(proxy.Entity)
-                : k_InvalidEntity;
+            CachedProxy is { Exists: true } proxy ? proxy.World.EntityManager.GetName(proxy.Entity) : k_InvalidEntity;
 
         protected override string BodyText => k_BodyText;
 
@@ -68,9 +65,8 @@ namespace Unity.Entities.Editor
             {
                 if (m_CachedProxy == null)
                 {
-                    m_CachedProxy = target is EntitySelectionProxy
-                        ? target as EntitySelectionProxy
-                        : m_SelectionContext;
+                    m_CachedProxy =
+                        target is EntitySelectionProxy ? target as EntitySelectionProxy : m_SelectionContext;
                 }
 
                 return m_CachedProxy;
@@ -87,22 +83,21 @@ namespace Unity.Entities.Editor
     class UnsupportedPrefabEntityEditor : UnsupportedEntityEditor
     {
         static readonly string k_RootBodyText = L10n.Tr("This Entity is a Prefab instance and only exists at runtime.");
-        static readonly string k_PartBodyText = L10n.Tr("This Entity is part of a Prefab instance hierarchy that only exists at runtime.");
+        static readonly string k_PartBodyText = L10n.Tr(
+            "This Entity is part of a Prefab instance hierarchy that only exists at runtime."
+        );
         static readonly string k_CallToActionLabel = L10n.Tr("Edit Prefab Asset");
 
         string m_AssetPath;
         bool m_IsRoot;
         bool m_ValuesInitialized;
 
-        protected override string ItemIconClass
-            => m_IsRoot
+        protected override string ItemIconClass =>
+            m_IsRoot
                 ? UssClasses.Inspector.UnsupportedInspector.Classes.PrefabEntityIcon
                 : UssClasses.Inspector.UnsupportedInspector.Classes.EntityIcon;
 
-        protected override string BodyText
-            => m_IsRoot
-                ? k_RootBodyText
-                : k_PartBodyText;
+        protected override string BodyText => m_IsRoot ? k_RootBodyText : k_PartBodyText;
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -111,7 +106,7 @@ namespace Unity.Entities.Editor
 
             var hasValidTarget = false;
 
-            if (CachedProxy is { Exists : true } proxy)
+            if (CachedProxy is { Exists: true } proxy)
             {
                 var authoringObject = proxy.World.EntityManager.Debug.GetAuthoringObjectForEntity(proxy.Entity);
 
@@ -129,7 +124,10 @@ namespace Unity.Entities.Editor
                 var button = new Button(() =>
                 {
                     SelectionBridge.SetSelection(AssetDatabase.LoadAssetAtPath<UnityObject>(m_AssetPath));
-                }) { text = k_CallToActionLabel };
+                })
+                {
+                    text = k_CallToActionLabel,
+                };
 
                 button.AddToClassList(UssClasses.Inspector.UnsupportedInspector.Classes.Button);
 
@@ -152,9 +150,7 @@ namespace Unity.Entities.Editor
             get
             {
                 var go = target as GameObject;
-                return go == null
-                    ? k_InvalidGameObject
-                    : go.name;
+                return go == null ? k_InvalidGameObject : go.name;
             }
         }
 
@@ -172,7 +168,9 @@ namespace Unity.Entities.Editor
 
     class InvalidEntityEditor : UnsupportedEditor
     {
-        static readonly string k_BodyText = L10n.Tr("The entity does not exist anymore, please unlock inspector if it is locked or re-select.");
+        static readonly string k_BodyText = L10n.Tr(
+            "The entity does not exist anymore, please unlock inspector if it is locked or re-select."
+        );
         static readonly string k_InvalidSelection = L10n.Tr("Invalid Entity");
         protected override string ItemIconClass => UssClasses.Inspector.UnsupportedInspector.Classes.EntityIcon;
         protected override string ItemName => k_InvalidSelection;

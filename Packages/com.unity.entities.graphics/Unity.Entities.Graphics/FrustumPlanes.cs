@@ -29,7 +29,7 @@ namespace Unity.Rendering
             /// <summary>
             /// The object is partially intersecting the planes.
             /// </summary>
-            Partial
+            Partial,
         };
 
         /// <summary>
@@ -63,8 +63,12 @@ namespace Unity.Rendering
 
             for (int i = 0; i < 6; ++i)
             {
-                planes[i] = new float4(sourcePlanes[i].normal.x, sourcePlanes[i].normal.y, sourcePlanes[i].normal.z,
-                    sourcePlanes[i].distance);
+                planes[i] = new float4(
+                    sourcePlanes[i].normal.x,
+                    sourcePlanes[i].normal.y,
+                    sourcePlanes[i].normal.z,
+                    sourcePlanes[i].distance
+                );
             }
         }
 
@@ -121,7 +125,10 @@ namespace Unity.Rendering
             public float4 Distances;
         }
 
-        private static void InitializeSOAPlanePackets(NativeArray<PlanePacket4> planes, NativeArray<Plane> cullingPlanes)
+        private static void InitializeSOAPlanePackets(
+            NativeArray<PlanePacket4> planes,
+            NativeArray<Plane> cullingPlanes
+        )
         {
             int cullingPlaneCount = cullingPlanes.Length;
             int packetCount = planes.Length;
@@ -153,7 +160,10 @@ namespace Unity.Rendering
             }
         }
 
-        internal static UnsafeList<PlanePacket4> BuildSOAPlanePackets(NativeArray<Plane> cullingPlanes, AllocatorManager.AllocatorHandle allocator)
+        internal static UnsafeList<PlanePacket4> BuildSOAPlanePackets(
+            NativeArray<Plane> cullingPlanes,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             int cullingPlaneCount = cullingPlanes.Length;
             int packetCount = (cullingPlaneCount + 3) >> 2;
@@ -165,7 +175,10 @@ namespace Unity.Rendering
             return planes;
         }
 
-        internal static NativeArray<PlanePacket4> BuildSOAPlanePackets(NativeArray<Plane> cullingPlanes, Allocator allocator)
+        internal static NativeArray<PlanePacket4> BuildSOAPlanePackets(
+            NativeArray<Plane> cullingPlanes,
+            Allocator allocator
+        )
         {
             int cullingPlaneCount = cullingPlanes.Length;
             int packetCount = (cullingPlaneCount + 3) >> 2;

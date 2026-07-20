@@ -11,9 +11,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation.Analytics
         public bool isUsingSettingsOverride;
         public bool isUsingPositionOverride;
     }
+
     // Schema: com.unity3d.data.schemas.editor.analytics.multiplayerToolsNetworkStatsMonitorConfigUpdated_v1
     // Taxonomy: editor.analytics.mpToolsNetStatsMonitorConfigUpdated.v1
-    [AnalyticInfo(eventName: "mpToolsNetStatsMonitorConfigUpdated", vendorKey: "unity.multiplayer.tools", version:1, maxEventsPerHour: 100)]
+    [AnalyticInfo(
+        eventName: "mpToolsNetStatsMonitorConfigUpdated",
+        vendorKey: "unity.multiplayer.tools",
+        version: 1,
+        maxEventsPerHour: 100
+    )]
     internal class ConfigUpdatedAnalytic : IAnalytic, IEquatable<ConfigUpdatedAnalytic>
     {
         public ConfigUpdatedAnalytic(bool isUsingCSS, bool isUsingSettingsOverride, bool isUsingPositionOverride)
@@ -30,11 +36,11 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation.Analytics
             {
                 isUsingCSS = m_IsUsingCSS,
                 isUsingSettingsOverride = m_IsUsingSettingsOverride,
-                isUsingPositionOverride = m_IsUsingPositionOverride
+                isUsingPositionOverride = m_IsUsingPositionOverride,
             };
             return true;
         }
-        
+
         public bool Equals(ConfigUpdatedAnalytic other)
         {
             if (other == null)
@@ -42,11 +48,11 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation.Analytics
                 return false;
             }
 
-            return m_IsUsingCSS == other.m_IsUsingCSS &&
-                   m_IsUsingSettingsOverride == other.m_IsUsingSettingsOverride &&
-                   m_IsUsingPositionOverride == other.m_IsUsingPositionOverride;
+            return m_IsUsingCSS == other.m_IsUsingCSS
+                && m_IsUsingSettingsOverride == other.m_IsUsingSettingsOverride
+                && m_IsUsingPositionOverride == other.m_IsUsingPositionOverride;
         }
-        
+
         private readonly bool m_IsUsingCSS;
         private readonly bool m_IsUsingSettingsOverride;
         private readonly bool m_IsUsingPositionOverride;

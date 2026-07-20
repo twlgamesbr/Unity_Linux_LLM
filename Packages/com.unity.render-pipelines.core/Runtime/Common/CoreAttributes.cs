@@ -10,6 +10,7 @@ namespace UnityEngine.Rendering
     {
         /// <summary>Display name used in UI.</summary>
         public string name;
+
         /// <summary>Display order used in UI.</summary>
         public int order;
     }
@@ -18,15 +19,11 @@ namespace UnityEngine.Rendering
     /// Attribute used to customize UI display to allow properties only be visible when "Show Additional Properties" is selected
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class AdditionalPropertyAttribute : Attribute
-    {
-    }
+    public class AdditionalPropertyAttribute : Attribute { }
 
     /// <summary>
     /// Attribute used to hide enum values from Rendering Debugger UI
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class HideInDebugUIAttribute : Attribute
-    {
-    }
+    public class HideInDebugUIAttribute : Attribute { }
 }

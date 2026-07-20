@@ -67,8 +67,12 @@ namespace UnityEngine.Rendering
         /// <param name="cmd">The CommandBuffer to push commands to (can be null).</param>
         /// <param name="camXRSettings">The XR settings that the Visual Effect Graph uses to process the Camera commands.</param>
         /// <param name="results">The culling results to use.</param>
-        public static void VFXManager_ProcessCameraCommand(Camera cam, UnsafeCommandBuffer cmd,
-            VFXCameraXRSettings camXRSettings, CullingResults results)
+        public static void VFXManager_ProcessCameraCommand(
+            Camera cam,
+            UnsafeCommandBuffer cmd,
+            VFXCameraXRSettings camXRSettings,
+            CullingResults results
+        )
         {
             VFXManager.ProcessCameraCommand(cam, cmd.m_WrappedCommandBuffer, camXRSettings, results);
         }

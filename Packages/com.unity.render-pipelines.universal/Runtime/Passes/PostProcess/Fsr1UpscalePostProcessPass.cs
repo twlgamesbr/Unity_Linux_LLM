@@ -1,5 +1,5 @@
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -22,9 +22,9 @@ namespace UnityEngine.Rendering.Universal
 
             // Default
             PostProcessUtils.MakeCompatible(ref m_UpscaledDesc);
-            m_UpscaledDesc.width = 1;   // Unknown at pipe/pass construction time. Safe default. Avoid division by zero.
+            m_UpscaledDesc.width = 1; // Unknown at pipe/pass construction time. Safe default. Avoid division by zero.
             m_UpscaledDesc.height = 1;
-            m_UpscaledDesc.format = Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;  // URP default.
+            m_UpscaledDesc.format = Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32; // URP default.
         }
 
         public override void Dispose()
@@ -59,11 +59,23 @@ namespace UnityEngine.Rendering.Universal
             var sourceTexture = resourceData.cameraColor;
             var srcDesc = renderGraph.GetTextureDesc(sourceTexture);
 
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, m_UpscaledDesc, k_TargetName, true, FilterMode.Point);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                m_UpscaledDesc,
+                k_TargetName,
+                true,
+                FilterMode.Point
+            );
             var dstDesc = renderGraph.GetTextureDesc(destinationTexture);
 
             // FSR upscale
-            using (var builder = renderGraph.AddRasterRenderPass<PostProcessingFinalFSRScalePassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PostProcessingFinalFSRScalePassData>(
+                    passName,
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 builder.AllowGlobalStateModification(true);
                 builder.SetRenderAttachment(destinationTexture, 0, AccessFlags.Write);
@@ -74,29 +86,42 @@ namespace UnityEngine.Rendering.Universal
                 passData.fsrOutputSize = new Vector2(dstDesc.width, dstDesc.height);
                 passData.enableAlphaOutput = cameraData.isAlphaOutputEnabled;
 
-                builder.SetRenderFunc(static (PostProcessingFinalFSRScalePassData data, RasterGraphContext context) =>
-                {
-                    var material = data.material;
-                    RTHandle sourceHdl = (RTHandle)data.sourceTexture;
+                builder.SetRenderFunc(
+                    static (PostProcessingFinalFSRScalePassData data, RasterGraphContext context) =>
+                    {
+                        var material = data.material;
+                        RTHandle sourceHdl = (RTHandle)data.sourceTexture;
 
-                    // TODO: Fsr uses global state constants.
-                    FSRUtils.SetEasuConstants(context.cmd, data.fsrInputSize, data.fsrInputSize, data.fsrOutputSize);
+                        // TODO: Fsr uses global state constants.
+                        FSRUtils.SetEasuConstants(
+                            context.cmd,
+                            data.fsrInputSize,
+                            data.fsrInputSize,
+                            data.fsrOutputSize
+                        );
 
-                    material.shaderKeywords = null;
-                    CoreUtils.SetKeyword(material, ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT, data.enableAlphaOutput);
+                        material.shaderKeywords = null;
+                        CoreUtils.SetKeyword(
+                            material,
+                            ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT,
+                            data.enableAlphaOutput
+                        );
 
-                    Vector2 viewportScale = sourceHdl.useScaling ? new Vector2(sourceHdl.rtHandleProperties.rtHandleScale.x, sourceHdl.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(context.cmd, data.sourceTexture, viewportScale, material, 0);
-                });
+                        Vector2 viewportScale = sourceHdl.useScaling
+                            ? new Vector2(
+                                sourceHdl.rtHandleProperties.rtHandleScale.x,
+                                sourceHdl.rtHandleProperties.rtHandleScale.y
+                            )
+                            : Vector2.one;
+                        Blitter.BlitTexture(context.cmd, data.sourceTexture, viewportScale, material, 0);
+                    }
+                );
             }
 
             resourceData.cameraColor = destinationTexture;
         }
 
-
         // Precomputed shader ids to same some CPU cycles (mostly affects mobile)
-        public static class ShaderConstants
-        {
-        }
+        public static class ShaderConstants { }
     }
 }

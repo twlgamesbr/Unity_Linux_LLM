@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using UnityEngine.Experimental.Rendering;
@@ -113,11 +112,25 @@ namespace UnityEngine.PathTracing.Core
 
             Vector2 textureScale = new Vector2(
                 node.Size / (float)Mathf.Min(texture.width, node.Size),
-                node.Size / (float)Mathf.Min(texture.height, node.Size));
+                node.Size / (float)Mathf.Min(texture.height, node.Size)
+            );
 
             _cmd.GetTemporaryRT(_tempTextureID, new RenderTextureDescriptor(node.Size, node.Size, _format, 0));
             _cmd.Blit(texture, _tempTextureID, textureScale * scale, offset);
-            _cmd.CopyTexture(_tempTextureID, 0, 0, 0, 0, node.Size, node.Size, _atlases, atlasIndex, 0, node.PosX, node.PosY);
+            _cmd.CopyTexture(
+                _tempTextureID,
+                0,
+                0,
+                0,
+                0,
+                node.Size,
+                node.Size,
+                _atlases,
+                atlasIndex,
+                0,
+                node.PosX,
+                node.PosY
+            );
             _cmd.ReleaseTemporaryRT(_tempTextureID);
             Graphics.ExecuteCommandBuffer(_cmd);
             _cmd.Clear();
@@ -146,7 +159,8 @@ namespace UnityEngine.PathTracing.Core
         {
             return new Vector2Int(
                 Mathf.Min(_textureSizes[location].x, location.TextureNode.Size),
-                Mathf.Min(_textureSizes[location].y, location.TextureNode.Size));
+                Mathf.Min(_textureSizes[location].y, location.TextureNode.Size)
+            );
         }
 
         public void GetScaleAndOffset(in TextureLocation location, out Vector2 scale, out Vector2 offset)
@@ -161,16 +175,18 @@ namespace UnityEngine.PathTracing.Core
         private void ResizeAtlas(int sliceCount)
         {
             // Create new atlas array
-            var texture = new RenderTexture(new RenderTextureDescriptor(_size, _size)
-            {
-                dimension = TextureDimension.Tex2DArray,
-                depthBufferBits = 0,
-                volumeDepth = sliceCount,
-                msaaSamples = 1,
-                vrUsage = VRTextureUsage.OneEye,
-                graphicsFormat = _format,
-                enableRandomWrite = true,
-            })
+            var texture = new RenderTexture(
+                new RenderTextureDescriptor(_size, _size)
+                {
+                    dimension = TextureDimension.Tex2DArray,
+                    depthBufferBits = 0,
+                    volumeDepth = sliceCount,
+                    msaaSamples = 1,
+                    vrUsage = VRTextureUsage.OneEye,
+                    graphicsFormat = _format,
+                    enableRandomWrite = true,
+                }
+            )
             {
                 name = $"Texture Atlas (Format = {_format})",
                 hideFlags = HideFlags.DontSaveInEditor,

@@ -17,6 +17,7 @@ namespace Unity.Netcode.Components
     public struct HalfVector4 : INetworkSerializable
     {
         internal const int Length = 4;
+
         /// <summary>
         /// The half float precision value of the x-axis as a <see cref="half"/>.
         /// </summary>
@@ -61,7 +62,8 @@ namespace Unity.Netcode.Components
         }
 
         /// <inheritdoc />
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             if (serializer.IsReader)
             {
@@ -110,7 +112,12 @@ namespace Unity.Netcode.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UpdateFrom(ref Quaternion quaternion)
         {
-            Axis = math.half4(math.half(quaternion.x), math.half(quaternion.y), math.half(quaternion.z), math.half(quaternion.w));
+            Axis = math.half4(
+                math.half(quaternion.x),
+                math.half(quaternion.y),
+                math.half(quaternion.z),
+                math.half(quaternion.w)
+            );
         }
 
         /// <summary>
@@ -130,8 +137,7 @@ namespace Unity.Netcode.Components
         /// <param name="y">The initial y axis (converted to half float) value when instantiated.</param>
         /// <param name="z">The initial z axis (converted to half float) value when instantiated.</param>
         /// <param name="w">The initial w axis (converted to half float) value when instantiated.</param>
-        public HalfVector4(float x, float y, float z, float w) : this(new Vector4(x, y, z, w))
-        {
-        }
+        public HalfVector4(float x, float y, float z, float w)
+            : this(new Vector4(x, y, z, w)) { }
     }
 }

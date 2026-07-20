@@ -13,14 +13,20 @@ namespace UnityEngine.UI
     /// </summary>
     public abstract class LayoutGroup : UIBehaviour, ILayoutElement, ILayoutGroup
     {
-        [SerializeField] protected RectOffset m_Padding = new RectOffset();
+        [SerializeField]
+        protected RectOffset m_Padding = new RectOffset();
 
         /// <summary>
         /// The padding to add around the child layout elements.
         /// </summary>
-        public RectOffset padding { get { return m_Padding; } set { SetProperty(ref m_Padding, value); } }
+        public RectOffset padding
+        {
+            get { return m_Padding; }
+            set { SetProperty(ref m_Padding, value); }
+        }
 
-        [SerializeField] protected TextAnchor m_ChildAlignment = TextAnchor.UpperLeft;
+        [SerializeField]
+        protected TextAnchor m_ChildAlignment = TextAnchor.UpperLeft;
 
         /// <summary>
         /// The alignment to use for the child layout elements in the layout group.
@@ -28,9 +34,14 @@ namespace UnityEngine.UI
         /// <remarks>
         /// If a layout element does not specify a flexible width or height, its child elements many not use the available space within the layout group. In this case, use the alignment settings to specify how to align child elements within their layout group.
         /// </remarks>
-        public TextAnchor childAlignment { get { return m_ChildAlignment; } set { SetProperty(ref m_ChildAlignment, value); } }
+        public TextAnchor childAlignment
+        {
+            get { return m_ChildAlignment; }
+            set { SetProperty(ref m_ChildAlignment, value); }
+        }
 
-        [System.NonSerialized] private RectTransform m_Rect;
+        [System.NonSerialized]
+        private RectTransform m_Rect;
         protected RectTransform rectTransform
         {
             get
@@ -46,8 +57,12 @@ namespace UnityEngine.UI
         private Vector2 m_TotalPreferredSize = Vector2.zero;
         private Vector2 m_TotalFlexibleSize = Vector2.zero;
 
-        [System.NonSerialized] private List<RectTransform> m_RectChildren = new List<RectTransform>();
-        protected List<RectTransform> rectChildren { get { return m_RectChildren; } }
+        [System.NonSerialized]
+        private List<RectTransform> m_RectChildren = new List<RectTransform>();
+        protected List<RectTransform> rectChildren
+        {
+            get { return m_RectChildren; }
+        }
 
         public virtual void CalculateLayoutInputHorizontal()
         {
@@ -86,37 +101,58 @@ namespace UnityEngine.UI
         /// <summary>
         /// See LayoutElement.minWidth
         /// </summary>
-        public virtual float minWidth { get { return GetTotalMinSize(0); } }
+        public virtual float minWidth
+        {
+            get { return GetTotalMinSize(0); }
+        }
 
         /// <summary>
         /// See LayoutElement.preferredWidth
         /// </summary>
-        public virtual float preferredWidth { get { return GetTotalPreferredSize(0); } }
+        public virtual float preferredWidth
+        {
+            get { return GetTotalPreferredSize(0); }
+        }
 
         /// <summary>
         /// See LayoutElement.flexibleWidth
         /// </summary>
-        public virtual float flexibleWidth { get { return GetTotalFlexibleSize(0); } }
+        public virtual float flexibleWidth
+        {
+            get { return GetTotalFlexibleSize(0); }
+        }
 
         /// <summary>
         /// See LayoutElement.minHeight
         /// </summary>
-        public virtual float minHeight { get { return GetTotalMinSize(1); } }
+        public virtual float minHeight
+        {
+            get { return GetTotalMinSize(1); }
+        }
 
         /// <summary>
         /// See LayoutElement.preferredHeight
         /// </summary>
-        public virtual float preferredHeight { get { return GetTotalPreferredSize(1); } }
+        public virtual float preferredHeight
+        {
+            get { return GetTotalPreferredSize(1); }
+        }
 
         /// <summary>
         /// See LayoutElement.flexibleHeight
         /// </summary>
-        public virtual float flexibleHeight { get { return GetTotalFlexibleSize(1); } }
+        public virtual float flexibleHeight
+        {
+            get { return GetTotalFlexibleSize(1); }
+        }
 
         /// <summary>
         /// See LayoutElement.layoutPriority
         /// </summary>
-        public virtual int layoutPriority { get { return 0; } }
+        public virtual int layoutPriority
+        {
+            get { return 0; }
+        }
 
         // ILayoutController Interface
 
@@ -251,9 +287,16 @@ namespace UnityEngine.UI
             if (rect == null)
                 return;
 
-            m_Tracker.Add(this, rect,
-                DrivenTransformProperties.Anchors |
-                (axis == 0 ? DrivenTransformProperties.AnchoredPositionX : DrivenTransformProperties.AnchoredPositionY));
+            m_Tracker.Add(
+                this,
+                rect,
+                DrivenTransformProperties.Anchors
+                    | (
+                        axis == 0
+                            ? DrivenTransformProperties.AnchoredPositionX
+                            : DrivenTransformProperties.AnchoredPositionY
+                    )
+            );
 
             // Inlined rect.SetInsetAndSizeFromParentEdge(...) and refactored code in order to multiply desired size by scaleFactor.
             // sizeDelta must stay the same but the size used in the calculation of the position must be scaled by the scaleFactor.
@@ -262,7 +305,10 @@ namespace UnityEngine.UI
             rect.anchorMax = Vector2.up;
 
             Vector2 anchoredPosition = rect.anchoredPosition;
-            anchoredPosition[axis] = (axis == 0) ? (pos + rect.sizeDelta[axis] * rect.pivot[axis] * scaleFactor) : (-pos - rect.sizeDelta[axis] * (1f - rect.pivot[axis]) * scaleFactor);
+            anchoredPosition[axis] =
+                (axis == 0)
+                    ? (pos + rect.sizeDelta[axis] * rect.pivot[axis] * scaleFactor)
+                    : (-pos - rect.sizeDelta[axis] * (1f - rect.pivot[axis]) * scaleFactor);
             rect.anchoredPosition = anchoredPosition;
         }
 
@@ -288,17 +334,26 @@ namespace UnityEngine.UI
         /// <param name="axis">The axis to set the position and size along. 0 is horizontal and 1 is vertical.</param>
         /// <param name="pos">The position from the left side or top.</param>
         /// <param name="size">The size.</param>
-        protected void SetChildAlongAxisWithScale(RectTransform rect, int axis, float pos, float size, float scaleFactor)
+        protected void SetChildAlongAxisWithScale(
+            RectTransform rect,
+            int axis,
+            float pos,
+            float size,
+            float scaleFactor
+        )
         {
             if (rect == null)
                 return;
 
-            m_Tracker.Add(this, rect,
-                DrivenTransformProperties.Anchors |
-                (axis == 0 ?
-                    (DrivenTransformProperties.AnchoredPositionX | DrivenTransformProperties.SizeDeltaX) :
-                    (DrivenTransformProperties.AnchoredPositionY | DrivenTransformProperties.SizeDeltaY)
-                )
+            m_Tracker.Add(
+                this,
+                rect,
+                DrivenTransformProperties.Anchors
+                    | (
+                        axis == 0
+                            ? (DrivenTransformProperties.AnchoredPositionX | DrivenTransformProperties.SizeDeltaX)
+                            : (DrivenTransformProperties.AnchoredPositionY | DrivenTransformProperties.SizeDeltaY)
+                    )
             );
 
             // Inlined rect.SetInsetAndSizeFromParentEdge(...) and refactored code in order to multiply desired size by scaleFactor.
@@ -312,7 +367,10 @@ namespace UnityEngine.UI
             rect.sizeDelta = sizeDelta;
 
             Vector2 anchoredPosition = rect.anchoredPosition;
-            anchoredPosition[axis] = (axis == 0) ? (pos + size * rect.pivot[axis] * scaleFactor) : (-pos - size * (1f - rect.pivot[axis]) * scaleFactor);
+            anchoredPosition[axis] =
+                (axis == 0)
+                    ? (pos + size * rect.pivot[axis] * scaleFactor)
+                    : (-pos - size * (1f - rect.pivot[axis]) * scaleFactor);
             rect.anchoredPosition = anchoredPosition;
         }
 
@@ -381,12 +439,12 @@ namespace UnityEngine.UI
             LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
         }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             SetDirty();
         }
 
-    #endif
+#endif
     }
 }

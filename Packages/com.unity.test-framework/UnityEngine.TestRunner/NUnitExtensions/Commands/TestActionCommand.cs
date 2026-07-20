@@ -10,7 +10,8 @@ namespace UnityEngine.TestTools
 {
     internal class TestActionCommand : BeforeAfterTestCommandBase<ITestAction>
     {
-        private static readonly Dictionary<MethodInfo, List<ITestAction>> m_TestActionsCache = new Dictionary<MethodInfo, List<ITestAction>>();
+        private static readonly Dictionary<MethodInfo, List<ITestAction>> m_TestActionsCache =
+            new Dictionary<MethodInfo, List<ITestAction>>();
 
         public TestActionCommand(TestCommand innerCommand)
             : base(innerCommand, "BeforeTest", "AfterTest")

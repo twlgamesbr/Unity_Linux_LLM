@@ -8,11 +8,13 @@ namespace Unity.Entities.Editor
 {
     class SystemContentProvider : ContentProvider
     {
-        [CreateProperty, HideInInspector] string m_TypeName;
+        [CreateProperty, HideInInspector]
+        string m_TypeName;
 
         // Unity.Entities.World is not serializable by default, so we use the world's name to find it again. This is
         // clearly not enough to guarantee that we can survive domain reload, but it should cover most cases.
-        [CreateProperty, HideInInspector] string m_WorldName;
+        [CreateProperty, HideInInspector]
+        string m_WorldName;
 
         SystemProxy m_SystemProxy;
         World m_World;
@@ -28,9 +30,7 @@ namespace Unity.Entities.Editor
 
                 m_SystemProxy = value;
 
-                m_TypeName = m_SystemProxy != default
-                    ? m_SystemProxy.TypeName
-                    : default;
+                m_TypeName = m_SystemProxy != default ? m_SystemProxy.TypeName : default;
             }
         }
 
@@ -43,9 +43,7 @@ namespace Unity.Entities.Editor
                     return;
 
                 m_World = value;
-                m_WorldName = null != m_World
-                    ? m_World.Name
-                    : string.Empty;
+                m_WorldName = null != m_World ? m_World.Name : string.Empty;
             }
         }
 
@@ -79,12 +77,11 @@ namespace Unity.Entities.Editor
             // Worlds are lazily created, so we'll spin until we can find it again.
             World = ContentUtilities.FindLastWorld(m_WorldName);
 
-            return null != World
-                ? ContentStatus.ContentReady
-                : ContentStatus.ContentNotReady;
+            return null != World ? ContentStatus.ContentReady : ContentStatus.ContentNotReady;
         }
 
         public override string Name { get; } = "System";
+
         public override object GetContent()
         {
             return this;

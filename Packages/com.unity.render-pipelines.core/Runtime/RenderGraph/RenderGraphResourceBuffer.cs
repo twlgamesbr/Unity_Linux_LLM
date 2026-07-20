@@ -19,20 +19,30 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// Returns a null graphics buffer handle
         /// </summary>
         /// <value>A null graphics buffer handle.</value>
-        public static BufferHandle nullHandle { get { return s_NullHandle; } }
+        public static BufferHandle nullHandle
+        {
+            get { return s_NullHandle; }
+        }
 
         internal readonly ResourceHandle handle;
 
-        internal BufferHandle(in ResourceHandle h) { handle = h; }
+        internal BufferHandle(in ResourceHandle h)
+        {
+            handle = h;
+        }
 
-        internal BufferHandle(int handle, bool shared = false) { this.handle = new ResourceHandle(handle, RenderGraphResourceType.Buffer, shared); }
+        internal BufferHandle(int handle, bool shared = false)
+        {
+            this.handle = new ResourceHandle(handle, RenderGraphResourceType.Buffer, shared);
+        }
 
         /// <summary>
         /// Cast to GraphicsBuffer
         /// </summary>
         /// <param name="buffer">Input BufferHandle</param>
         /// <returns>Resource as a Graphics Buffer.</returns>
-        public static implicit operator GraphicsBuffer(BufferHandle buffer) => buffer.IsValid() ? RenderGraphResourceRegistry.current.GetBuffer(buffer) : null;
+        public static implicit operator GraphicsBuffer(BufferHandle buffer) =>
+            buffer.IsValid() ? RenderGraphResourceRegistry.current.GetBuffer(buffer) : null;
 
         /// <summary>
         /// Return true if the handle is valid.
@@ -48,12 +58,16 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         ///<summary>Number of elements in the buffer..</summary>
         public int count;
+
         ///<summary>Size of one element in the buffer. Has to match size of buffer type in the shader.</summary>
         public int stride;
+
         /// <summary>Graphics Buffer name.</summary>
         public string name;
+
         /// <summary>The intended usage of a GraphicsBuffer.</summary>
         public GraphicsBuffer.Target target;
+
         /// <summary>The intended update mode of a GraphicsBuffer.</summary>
         public GraphicsBuffer.UsageFlags usageFlags;
 
@@ -95,12 +109,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
             var hashCode = HashFNV1A32.Create();
             hashCode.Append(count);
             hashCode.Append(stride);
-            hashCode.Append((int) target);
-            hashCode.Append((int) usageFlags);
+            hashCode.Append((int)target);
+            hashCode.Append((int)usageFlags);
             return hashCode.value;
         }
     }
-
 
     [DebuggerDisplay("BufferResource ({desc.name})")]
     class BufferResource : RenderGraphResource<BufferDesc, GraphicsBuffer>
@@ -113,7 +126,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 return desc.name;
         }
 
-        public override int GetDescHashCode() { return desc.GetHashCode(); }
+        public override int GetDescHashCode()
+        {
+            return desc.GetHashCode();
+        }
 
         public override void CreateGraphicsResource()
         {
@@ -155,12 +171,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
             return res.count * res.stride;
         }
 
-        override protected string GetResourceTypeName()
+        protected override string GetResourceTypeName()
         {
             return "GraphicsBuffer";
         }
 
-        override protected ulong GetSortIndex(GraphicsBuffer res)
+        protected override ulong GetSortIndex(GraphicsBuffer res)
         {
             return (ulong)res.GetHashCode();
         }

@@ -45,7 +45,10 @@ namespace Unity.Entities.UI
         {
             if (null == content || !content)
                 throw new ArgumentNullException(nameof(content));
-            InspectorContent.Show(new UnityObjectContentProvider{ Object = content }, new InspectorContentParameters());
+            InspectorContent.Show(
+                new UnityObjectContentProvider { Object = content },
+                new InspectorContentParameters()
+            );
         }
 
         /// <summary>
@@ -107,7 +110,7 @@ namespace Unity.Entities.UI
         {
             if (null == content || !content)
                 throw new ArgumentNullException(nameof(content));
-            return ContentWindow.Show(new UnityObjectContentProvider{ Object = content }, options);
+            return ContentWindow.Show(new UnityObjectContentProvider { Object = content }, options);
         }
     }
 }

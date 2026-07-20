@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Unity.Entities;
-using UnityEditor;
-using UnityEngine;
-using UnityEditor.AssetImporters;
 using System.Reflection;
+using Unity.Entities;
 using Unity.Entities.Serialization;
 using Unity.Profiling;
+using UnityEditor;
+using UnityEditor.AssetImporters;
+using UnityEngine;
 
 namespace Unity.Scenes.Editor
 {
@@ -19,9 +19,9 @@ namespace Unity.Scenes.Editor
         {
             public string FullName;
             public string UserName;
-            public int    Version;
-            public bool   Excluded;
-            public Type   Type;
+            public int Version;
+            public bool Excluded;
+            public Type Type;
             public string AssemblyName;
 
             public void Init(BakingVersionAttribute bakingVersionAttribute, Type type, string fullName)
@@ -35,18 +35,28 @@ namespace Unity.Scenes.Editor
             }
         }
 
-        static ProfilerMarker kRegisterComponentTypes = new ProfilerMarker("TypeDependencyCache.RegisterComponentTypes");
-        static ProfilerMarker kRegisterBakingAssemblies = new ProfilerMarker("TypeDependencyCache.RegisterBakingAssemblies");
+        static ProfilerMarker kRegisterComponentTypes = new ProfilerMarker(
+            "TypeDependencyCache.RegisterComponentTypes"
+        );
+        static ProfilerMarker kRegisterBakingAssemblies = new ProfilerMarker(
+            "TypeDependencyCache.RegisterBakingAssemblies"
+        );
 
         static string ComponentTypeString(Type type) => $"DOTSType/{type.FullName}";
+
         static string ManagedTypeString(Type type) => $"DOTSManagedType/{type.FullName}";
 
         static unsafe TypeDependencyCache()
         {
             //TODO: Find a better way to enforce Version 2 compatibility
-            bool v2Enabled = (bool)typeof(AssetDatabase).GetMethod("IsV2Enabled", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+            bool v2Enabled = (bool)
+                typeof(AssetDatabase)
+                    .GetMethod("IsV2Enabled", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, null);
             if (!v2Enabled)
-                throw new System.InvalidOperationException("com.unity.entities requires Asset Pipeline Version 2. Please enable Version 2 in Project Settings / Editor / Asset Pipeline / Mode");
+                throw new System.InvalidOperationException(
+                    "com.unity.entities requires Asset Pipeline Version 2. Please enable Version 2 in Project Settings / Editor / Asset Pipeline / Mode"
+                );
 
             // Custom dependencies are transmitted to the import worker so dont spent time on registering them
             if (AssetDatabaseCompatibility.IsAssetImportWorkerProcess())
@@ -55,7 +65,7 @@ namespace Unity.Scenes.Editor
             using (kRegisterComponentTypes.Auto())
                 RegisterComponentTypes();
 
-            using(kRegisterBakingAssemblies.Auto())
+            using (kRegisterBakingAssemblies.Auto())
                 RegisterBakingAssemblies();
 
             int fileFormatVersion = SerializeUtility.CurrentFileFormatVersion;
@@ -78,10 +88,12 @@ namespace Unity.Scenes.Editor
 
             for (int i = 1; i < typeCount; ++i)
             {
-                ref readonly var typeInfo = ref TypeManager.GetTypeInfo(new TypeIndex{ Value = i });
+                ref readonly var typeInfo = ref TypeManager.GetTypeInfo(new TypeIndex { Value = i });
                 var hash = typeInfo.StableTypeHash;
-                AssetDatabaseCompatibility.RegisterCustomDependency(ComponentTypeString(typeInfo.Type),
-                    new UnityEngine.Hash128(hash, hash));
+                AssetDatabaseCompatibility.RegisterCustomDependency(
+                    ComponentTypeString(typeInfo.Type),
+                    new UnityEngine.Hash128(hash, hash)
+                );
             }
         }
 
@@ -99,7 +111,9 @@ namespace Unity.Scenes.Editor
         static unsafe void RegisterBakingAssemblies()
         {
             var bakersTypeCollection = TypeCache.GetTypesDerivedFrom<IBaker>();
-            var systemsReadOnlyList = DefaultWorldInitialization.GetAllSystems(WorldSystemFilterFlags.BakingSystem | WorldSystemFilterFlags.EntitySceneOptimizations);
+            var systemsReadOnlyList = DefaultWorldInitialization.GetAllSystems(
+                WorldSystemFilterFlags.BakingSystem | WorldSystemFilterFlags.EntitySceneOptimizations
+            );
             int bakersCount = bakersTypeCollection.Count;
             int systemsCount = systemsReadOnlyList.Count;
             BakingNameAndVersion[] versionedAssemblies = new BakingNameAndVersion[bakersCount + systemsCount];
@@ -142,7 +156,7 @@ namespace Unity.Scenes.Editor
                     continue;
 
                 var bakingVersionAttribute = bakers[i].Type.GetCustomAttribute<BakingVersionAttribute>();
-                if ( bakingVersionAttribute != null)
+                if (bakingVersionAttribute != null)
                 {
                     versionedAssemblies[count++].Init(bakingVersionAttribute, bakers[i].Type, fullName);
                 }
@@ -156,7 +170,7 @@ namespace Unity.Scenes.Editor
                     continue;
 
                 var bakingVersionAttribute = systems[i].Type.GetCustomAttribute<BakingVersionAttribute>();
-                if ( bakingVersionAttribute != null)
+                if (bakingVersionAttribute != null)
                 {
                     versionedAssemblies[count++].Init(bakingVersionAttribute, systems[i].Type, fullName);
                 }
@@ -164,7 +178,8 @@ namespace Unity.Scenes.Editor
 
             List<string> assemblies = new List<string>();
             UnityEngine.Hash128 hash = default;
-            Dictionary<string, List<Type>> missingBakingVersionAttributePerAssembly = new Dictionary<string, List<Type>>();
+            Dictionary<string, List<Type>> missingBakingVersionAttributePerAssembly =
+                new Dictionary<string, List<Type>>();
 
             for (int i = 0; i != bakersCount; i++)
             {
@@ -178,11 +193,17 @@ namespace Unity.Scenes.Editor
                 var assembly = bakerType.Assembly;
                 var assemblyName = assembly.GetName().Name;
                 //If there is at least one baker marked with BakingVersion attribute, we don't register the dependency with the assembly but the value of the attribute
-                var bakingVersionAttributes = Array.FindAll(versionedAssemblies, x => !x.Excluded && x.AssemblyName == assemblyName);
+                var bakingVersionAttributes = Array.FindAll(
+                    versionedAssemblies,
+                    x => !x.Excluded && x.AssemblyName == assemblyName
+                );
                 if (bakingVersionAttributes.Length > 0)
                 {
                     //If the bakerType doesn't have a baking version attribute, but is part of an assembly that have some. We need to warn the user to add the attribute on it
-                    var missingBakingVersion = Array.FindAll(versionedAssemblies, x => !x.Excluded && x.Type == bakerType);
+                    var missingBakingVersion = Array.FindAll(
+                        versionedAssemblies,
+                        x => !x.Excluded && x.Type == bakerType
+                    );
                     if (missingBakingVersion.Length == 0)
                     {
                         if (!missingBakingVersionAttributePerAssembly.TryGetValue(assemblyName, out var missingAttrib))
@@ -196,12 +217,12 @@ namespace Unity.Scenes.Editor
                         var fullName = value.FullName;
                         fixed (char* str = fullName)
                         {
-                            HashUnsafeUtilities.ComputeHash128(str, (ulong) (sizeof(char) * fullName.Length), &hash);
+                            HashUnsafeUtilities.ComputeHash128(str, (ulong)(sizeof(char) * fullName.Length), &hash);
                         }
                         var userName = value.UserName;
                         if (userName != null)
                         {
-                            fixed(char* str = userName)
+                            fixed (char* str = userName)
                             {
                                 HashUnsafeUtilities.ComputeHash128(str, (ulong)(sizeof(char) * userName.Length), &hash);
                             }
@@ -211,13 +232,20 @@ namespace Unity.Scenes.Editor
                         HashUnsafeUtilities.ComputeHash128(&version, sizeof(int), &hash);
                     }
                 }
-                else if (!assemblies.Contains(assemblyName) && !Array.Exists(versionedAssemblies, x => x.Excluded && x.Type == bakerType))
+                else if (
+                    !assemblies.Contains(assemblyName)
+                    && !Array.Exists(versionedAssemblies, x => x.Excluded && x.Type == bakerType)
+                )
                 {
                     assemblies.Add(assemblyName);
                     var moduleVersionId = assembly.ManifestModule.ModuleVersionId;
-                    fixed(char* str = moduleVersionId.ToString())
+                    fixed (char* str = moduleVersionId.ToString())
                     {
-                        HashUnsafeUtilities.ComputeHash128(str, (ulong)(sizeof(char) * moduleVersionId.ToString().Length), &hash);
+                        HashUnsafeUtilities.ComputeHash128(
+                            str,
+                            (ulong)(sizeof(char) * moduleVersionId.ToString().Length),
+                            &hash
+                        );
                     }
                 }
             }
@@ -234,11 +262,17 @@ namespace Unity.Scenes.Editor
                 var assembly = systemType.Assembly;
                 var assemblyName = assembly.GetName().Name;
                 //If there is at least one baking system or entity scene optimization system marked with BakingVersion attribute, we don't register the dependency with the assembly but the value of the attribute
-                var bakingVersionAttributes = Array.FindAll(versionedAssemblies, x => !x.Excluded && x.AssemblyName == assemblyName);
+                var bakingVersionAttributes = Array.FindAll(
+                    versionedAssemblies,
+                    x => !x.Excluded && x.AssemblyName == assemblyName
+                );
                 if (bakingVersionAttributes.Length > 0)
                 {
                     //If the bakerType doesn't have a baking version attribute, but is part of an assembly that have some. We need to warn the user to add the attribute on it
-                    var missingBakingVersion = Array.FindAll(versionedAssemblies, x => !x.Excluded && x.Type == systemType);
+                    var missingBakingVersion = Array.FindAll(
+                        versionedAssemblies,
+                        x => !x.Excluded && x.Type == systemType
+                    );
                     if (missingBakingVersion.Length == 0)
                     {
                         if (!missingBakingVersionAttributePerAssembly.TryGetValue(assemblyName, out var missingAttrib))
@@ -257,7 +291,7 @@ namespace Unity.Scenes.Editor
                         var userName = value.UserName;
                         if (userName != null)
                         {
-                            fixed(char* str = userName)
+                            fixed (char* str = userName)
                             {
                                 HashUnsafeUtilities.ComputeHash128(str, (ulong)(sizeof(char) * userName.Length), &hash);
                             }
@@ -267,13 +301,20 @@ namespace Unity.Scenes.Editor
                         HashUnsafeUtilities.ComputeHash128(&version, sizeof(int), &hash);
                     }
                 }
-                else if (!assemblies.Contains(assemblyName) && !Array.Exists(versionedAssemblies, x => x.Excluded && x.Type == systemType))
+                else if (
+                    !assemblies.Contains(assemblyName)
+                    && !Array.Exists(versionedAssemblies, x => x.Excluded && x.Type == systemType)
+                )
                 {
                     assemblies.Add(assemblyName);
                     var moduleVersionId = assembly.ManifestModule.ModuleVersionId;
-                    fixed(char* str = moduleVersionId.ToString())
+                    fixed (char* str = moduleVersionId.ToString())
                     {
-                        HashUnsafeUtilities.ComputeHash128(str, (ulong)(sizeof(char) * moduleVersionId.ToString().Length), &hash);
+                        HashUnsafeUtilities.ComputeHash128(
+                            str,
+                            (ulong)(sizeof(char) * moduleVersionId.ToString().Length),
+                            &hash
+                        );
                     }
                 }
             }
@@ -298,10 +339,13 @@ namespace Unity.Scenes.Editor
                             listOfTypes += ", ";
                     }
 
-                    str += $"The assembly {pair.Key} is using the BakingVersion attribute. But the following Baker/Baking systems/EntitySceneOptimizations systems are missing the attribute:\n{listOfTypes}.\n\n";
+                    str +=
+                        $"The assembly {pair.Key} is using the BakingVersion attribute. But the following Baker/Baking systems/EntitySceneOptimizations systems are missing the attribute:\n{listOfTypes}.\n\n";
                 }
-                Debug.LogWarning($"{str}Updating these bakers/systems won't trigger a scene import automatically. Please add a BakingVersion attribute on them and update their version number everytime you want them to be rerun before an import. " +
-                                 $"\nOr don't use the attribute at all in their assembly to trigger scene import automatically after each changes in the assembly.");
+                Debug.LogWarning(
+                    $"{str}Updating these bakers/systems won't trigger a scene import automatically. Please add a BakingVersion attribute on them and update their version number everytime you want them to be rerun before an import. "
+                        + $"\nOr don't use the attribute at all in their assembly to trigger scene import automatically after each changes in the assembly."
+                );
             }
         }
 

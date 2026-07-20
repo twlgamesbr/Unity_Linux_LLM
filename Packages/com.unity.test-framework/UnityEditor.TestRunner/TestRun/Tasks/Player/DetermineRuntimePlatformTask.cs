@@ -9,7 +9,9 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks.Player
             var targetPlatform = testJobData.executionSettings.targetPlatform;
             if (targetPlatform.HasValue)
             {
-                testJobData.TargetRuntimePlatform = BuildTargetConverter.TryConvertToRuntimePlatform(targetPlatform.Value);
+                testJobData.TargetRuntimePlatform = BuildTargetConverter.TryConvertToRuntimePlatform(
+                    targetPlatform.Value
+                );
             }
 
             yield return null;

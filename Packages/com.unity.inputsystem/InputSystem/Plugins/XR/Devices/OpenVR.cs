@@ -12,18 +12,25 @@ namespace Unity.XR.OpenVR
     {
         [InputControl(noisy = true)]
         public Vector3Control deviceVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control deviceAngularVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control leftEyeVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control leftEyeAngularVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control rightEyeVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control rightEyeAngularVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control centerEyeVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control centerEyeAngularVelocity { get; protected set; }
 
@@ -42,32 +49,43 @@ namespace Unity.XR.OpenVR
         }
     }
 
-    [InputControlLayout(displayName = "Windows MR Controller (OpenVR)", commonUsages = new[] { "LeftHand", "RightHand" }, hideInUI = true)]
+    [InputControlLayout(
+        displayName = "Windows MR Controller (OpenVR)",
+        commonUsages = new[] { "LeftHand", "RightHand" },
+        hideInUI = true
+    )]
     public class OpenVRControllerWMR : XRController
     {
         [InputControl(noisy = true)]
         public Vector3Control deviceVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control deviceAngularVelocity { get; protected set; }
 
         [InputControl(aliases = new[] { "primary2DAxisClick", "joystickOrPadPressed" })]
         public ButtonControl touchpadClick { get; protected set; }
+
         [InputControl(aliases = new[] { "primary2DAxisTouch", "joystickOrPadTouched" })]
         public ButtonControl touchpadTouch { get; protected set; }
+
         [InputControl]
         public ButtonControl gripPressed { get; protected set; }
+
         [InputControl]
         public ButtonControl triggerPressed { get; protected set; }
+
         [InputControl(aliases = new[] { "primary" })]
         public ButtonControl menu { get; protected set; }
 
         [InputControl]
         public AxisControl trigger { get; protected set; }
+
         [InputControl]
         public AxisControl grip { get; protected set; }
 
         [InputControl(aliases = new[] { "secondary2DAxis" })]
         public Vector2Control touchpad { get; protected set; }
+
         [InputControl(aliases = new[] { "primary2DAxis" })]
         public Vector2Control joystick { get; protected set; }
 
@@ -100,23 +118,31 @@ namespace Unity.XR.OpenVR
     {
         [InputControl]
         public AxisControl grip { get; protected set; }
+
         [InputControl]
         public ButtonControl gripPressed { get; protected set; }
+
         [InputControl]
         public ButtonControl primary { get; protected set; }
+
         [InputControl(aliases = new[] { "primary2DAxisClick", "joystickOrPadPressed" })]
         public ButtonControl trackpadPressed { get; protected set; }
+
         [InputControl(aliases = new[] { "primary2DAxisTouch", "joystickOrPadTouched" })]
         public ButtonControl trackpadTouched { get; protected set; }
+
         [InputControl(aliases = new[] { "Primary2DAxis" })]
         public Vector2Control trackpad { get; protected set; }
+
         [InputControl]
         public AxisControl trigger { get; protected set; }
+
         [InputControl]
         public ButtonControl triggerPressed { get; protected set; }
 
         [InputControl(noisy = true)]
         public Vector3Control deviceVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control deviceAngularVelocity { get; protected set; }
 
@@ -142,9 +168,7 @@ namespace Unity.XR.OpenVR
     /// An HTC Vive lighthouse.
     /// </summary>
     [InputControlLayout(displayName = "Vive Lighthouse", hideInUI = true)]
-    public class ViveLighthouse : TrackedDevice
-    {
-    }
+    public class ViveLighthouse : TrackedDevice { }
 
     /// <summary>
     /// An HTC Vive tracker.
@@ -154,6 +178,7 @@ namespace Unity.XR.OpenVR
     {
         [InputControl(noisy = true)]
         public Vector3Control deviceVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control deviceAngularVelocity { get; protected set; }
 
@@ -166,17 +191,25 @@ namespace Unity.XR.OpenVR
         }
     }
 
-    [InputControlLayout(displayName = "Handed Vive Tracker", commonUsages = new[] { "LeftHand", "RightHand" }, hideInUI = true)]
+    [InputControlLayout(
+        displayName = "Handed Vive Tracker",
+        commonUsages = new[] { "LeftHand", "RightHand" },
+        hideInUI = true
+    )]
     public class HandedViveTracker : ViveTracker
     {
         [InputControl]
         public AxisControl grip { get; protected set; }
+
         [InputControl]
         public ButtonControl gripPressed { get; protected set; }
+
         [InputControl]
         public ButtonControl primary { get; protected set; }
+
         [InputControl(aliases = new[] { "JoystickOrPadPressed" })]
         public ButtonControl trackpadPressed { get; protected set; }
+
         [InputControl]
         public ButtonControl triggerPressed { get; protected set; }
 
@@ -195,7 +228,11 @@ namespace Unity.XR.OpenVR
     /// <summary>
     /// An Oculus Touch controller.
     /// </summary>
-    [InputControlLayout(displayName = "Oculus Touch Controller (OpenVR)", commonUsages = new[] { "LeftHand", "RightHand" }, hideInUI = true)]
+    [InputControlLayout(
+        displayName = "Oculus Touch Controller (OpenVR)",
+        commonUsages = new[] { "LeftHand", "RightHand" },
+        hideInUI = true
+    )]
     public class OpenVROculusTouchController : XRControllerWithRumble
     {
         [InputControl]
@@ -203,26 +240,32 @@ namespace Unity.XR.OpenVR
 
         [InputControl]
         public AxisControl trigger { get; protected set; }
+
         [InputControl]
         public AxisControl grip { get; protected set; }
 
         // Primary & Secondary are switched in order to retain consistency with the Oculus SDK
         [InputControl(aliases = new[] { "Alternate" })]
         public ButtonControl primaryButton { get; protected set; }
+
         [InputControl(aliases = new[] { "Primary" })]
         public ButtonControl secondaryButton { get; protected set; }
 
         [InputControl]
         public ButtonControl gripPressed { get; protected set; }
+
         [InputControl]
         public ButtonControl triggerPressed { get; protected set; }
+
         [InputControl(aliases = new[] { "primary2DAxisClicked" })]
         public ButtonControl thumbstickClicked { get; protected set; }
+
         [InputControl(aliases = new[] { "primary2DAxisTouch" })]
         public ButtonControl thumbstickTouched { get; protected set; }
 
         [InputControl(noisy = true)]
         public Vector3Control deviceVelocity { get; protected set; }
+
         [InputControl(noisy = true)]
         public Vector3Control deviceAngularVelocity { get; protected set; }
 

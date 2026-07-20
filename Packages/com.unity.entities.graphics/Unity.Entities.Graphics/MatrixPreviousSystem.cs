@@ -18,10 +18,16 @@ namespace Unity.Rendering
         [BurstCompile]
         struct UpdateMatrixPrevious : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorldTypeHandle;
+            [ReadOnly]
+            public ComponentTypeHandle<LocalToWorld> LocalToWorldTypeHandle;
             public ComponentTypeHandle<BuiltinMaterialPropertyUnity_MatrixPreviousM> MatrixPreviousTypeHandle;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 // This job is not written to support queries with enableable component types.
                 Assert.IsFalse(useEnabledMask);
@@ -31,7 +37,7 @@ namespace Unity.Rendering
                 for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++)
                 {
                     var localToWorld = chunkLocalToWorld[i].Value;
-                    chunkMatrixPrevious[i] = new BuiltinMaterialPropertyUnity_MatrixPreviousM {Value = localToWorld};
+                    chunkMatrixPrevious[i] = new BuiltinMaterialPropertyUnity_MatrixPreviousM { Value = localToWorld };
                 }
             }
         }
@@ -45,24 +51,25 @@ namespace Unity.Rendering
                 return;
             }
 
-            m_GroupPrev = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[]
+            m_GroupPrev = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<LocalToWorld>(),
+                        ComponentType.ReadWrite<BuiltinMaterialPropertyUnity_MatrixPreviousM>(),
+                    },
+                    None = new[] { ComponentType.ReadOnly<SkipBuiltinMaterialPropertyUnity_MatrixPreviousMUpdate>() },
+                    Options = EntityQueryOptions.FilterWriteGroup,
+                }
+            );
+            m_GroupPrev.SetChangedVersionFilter(
+                new[]
                 {
                     ComponentType.ReadOnly<LocalToWorld>(),
-                    ComponentType.ReadWrite<BuiltinMaterialPropertyUnity_MatrixPreviousM>(),
-                },
-                None = new []
-                {
-                    ComponentType.ReadOnly<SkipBuiltinMaterialPropertyUnity_MatrixPreviousMUpdate>()
-                },
-                Options = EntityQueryOptions.FilterWriteGroup
-            });
-            m_GroupPrev.SetChangedVersionFilter(new[]
-            {
-                ComponentType.ReadOnly<LocalToWorld>(),
-                ComponentType.ReadOnly<BuiltinMaterialPropertyUnity_MatrixPreviousM>()
-            });
+                    ComponentType.ReadOnly<BuiltinMaterialPropertyUnity_MatrixPreviousM>(),
+                }
+            );
         }
 
         /// <inheritdoc/>

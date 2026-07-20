@@ -6,7 +6,11 @@ namespace Unity.Editor.Bridge
 {
     class EditorStyleUSSBridge
     {
-        public static GUIStyle FromUSS(string ussStyleRuleName, string ussInPlaceStyleOverride = null, GUISkin srcSkin = null)
+        public static GUIStyle FromUSS(
+            string ussStyleRuleName,
+            string ussInPlaceStyleOverride = null,
+            GUISkin srcSkin = null
+        )
         {
             return EditorStyles.FromUSS(ussStyleRuleName);
         }

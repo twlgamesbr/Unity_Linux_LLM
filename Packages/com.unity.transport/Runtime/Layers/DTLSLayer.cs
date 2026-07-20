@@ -3,8 +3,8 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using Unity.Networking.Transport.TLS;
 using Unity.Networking.Transport.Relay;
+using Unity.Networking.Transport.TLS;
 using Unity.TLS.LowLevel;
 using UnityEngine;
 
@@ -58,8 +58,15 @@ namespace Unity.Networking.Transport
             var mtu = (ushort)(netConfig.maxMessageSize - packetPadding);
 
             connectionList = m_ConnectionList = ConnectionList.Create();
-            m_ConnectionsData = new ConnectionDataMap<DTLSConnectionData>(1, default(DTLSConnectionData), Allocator.Persistent);
-            m_EndpointToConnectionMap = new NativeParallelHashMap<NetworkEndpoint, ConnectionId>(1, Allocator.Persistent);
+            m_ConnectionsData = new ConnectionDataMap<DTLSConnectionData>(
+                1,
+                default(DTLSConnectionData),
+                Allocator.Persistent
+            );
+            m_EndpointToConnectionMap = new NativeParallelHashMap<NetworkEndpoint, ConnectionId>(
+                1,
+                Allocator.Persistent
+            );
             m_UnityTLSConfiguration = new UnityTLSConfiguration(ref settings, SecureTransportProtocol.DTLS, mtu);
             m_DeferredSends = new PacketsQueue(k_DeferredSendsQueueSize, netConfig.maxMessageSize);
 
@@ -70,7 +77,9 @@ namespace Unity.Networking.Transport
             m_HalfOpenDisconnectTimeout = (netConfig.maxConnectAttempts + 1) * netConfig.connectTimeoutMS;
             m_ReconnectionTimeout = netConfig.reconnectionTimeoutMS;
 
-            m_DTLSPadding = settings.TryGet<RelayNetworkParameter>(out _) ? k_DTLSPaddingWithRelay : k_DTLSPaddingWithoutRelay;
+            m_DTLSPadding = settings.TryGet<RelayNetworkParameter>(out _)
+                ? k_DTLSPaddingWithRelay
+                : k_DTLSPaddingWithoutRelay;
 
             packetPadding += m_DTLSPadding;
 
@@ -107,8 +116,10 @@ namespace Unity.Networking.Transport
             public long Time;
             public long HalfOpenDisconnectTimeout;
             public long ReconnectionTimeout;
+
             [NativeDisableUnsafePtrRestriction]
             public Binding.unitytls_client_config* UnityTLSConfig;
+
             [NativeDisableUnsafePtrRestriction]
             public UnityTLSCallbacks.CallbackContext* UnityTLSCallbackContext;
 
@@ -163,7 +174,10 @@ namespace Unity.Networking.Transport
 
                     // If in initial or handshake state, process everything as a handshake message.
                     var clientState = Binding.unitytls_client_get_state(clientPtr);
-                    if (clientState == Binding.UnityTLSClientState_Init || clientState == Binding.UnityTLSClientState_Handshake)
+                    if (
+                        clientState == Binding.UnityTLSClientState_Init
+                        || clientState == Binding.UnityTLSClientState_Handshake
+                    )
                     {
                         ProcessHandshakeMessage(ref packetProcessor);
                         packetProcessor.Drop();
@@ -226,8 +240,12 @@ namespace Unity.Networking.Transport
                 var tempBuffer = new NativeArray<byte>(ReceiveQueue.PayloadCapacity, Allocator.Temp);
 
                 var decryptedLength = new UIntPtr();
-                var result = Binding.unitytls_client_read_data(ConnectionsData[connectionId].UnityTLSClientPtr,
-                    (byte*)tempBuffer.GetUnsafePtr(), new UIntPtr((uint)tempBuffer.Length), &decryptedLength);
+                var result = Binding.unitytls_client_read_data(
+                    ConnectionsData[connectionId].UnityTLSClientPtr,
+                    (byte*)tempBuffer.GetUnsafePtr(),
+                    new UIntPtr((uint)tempBuffer.Length),
+                    &decryptedLength
+                );
 
                 if (result == Binding.UNITYTLS_SUCCESS)
                 {
@@ -264,7 +282,10 @@ namespace Unity.Networking.Transport
                 // the connection. If we get anything else, then this is likely traffic from the
                 // existing session and we know we don't have to reconnect.
 
-                if (DTLSUtilities.IsServerHello(ref packetProcessor) || DTLSUtilities.IsHelloVerifyRequest(ref packetProcessor))
+                if (
+                    DTLSUtilities.IsServerHello(ref packetProcessor)
+                    || DTLSUtilities.IsHelloVerifyRequest(ref packetProcessor)
+                )
                 {
                     // Switch to the new session.
                     Binding.unitytls_client_destroy(data.UnityTLSClientPtr);
@@ -316,7 +337,7 @@ namespace Unity.Networking.Transport
                             ConnectionsData[connection] = new DTLSConnectionData
                             {
                                 UnityTLSClientPtr = clientPtr,
-                                LastHandshakeUpdate = Time
+                                LastHandshakeUpdate = Time,
                             };
                         }
 
@@ -349,7 +370,9 @@ namespace Unity.Networking.Transport
                     if (clientState == Binding.UnityTLSClientState_Fail)
                     {
                         var step = Binding.unitytls_client_get_handshake_state(clientPtr);
-                        Debug.LogError($"DTLS handshake failed at step {step} ({DTLSUtilities.DescribeHandshakeStep(step)}). Closing connection.");
+                        Debug.LogError(
+                            $"DTLS handshake failed at step {step} ({DTLSUtilities.DescribeHandshakeStep(step)}). Closing connection."
+                        );
                     }
 
                     Connections.StartDisconnecting(ref connection, Error.DisconnectReason.AuthenticationFailure);
@@ -365,7 +388,10 @@ namespace Unity.Networking.Transport
 
                 // Check client state; Init and Handshake state means a half-open connection.
                 var clientState = Binding.unitytls_client_get_state(clientPtr);
-                if (clientState != Binding.UnityTLSClientState_Init && clientState != Binding.UnityTLSClientState_Handshake)
+                if (
+                    clientState != Binding.UnityTLSClientState_Init
+                    && clientState != Binding.UnityTLSClientState_Handshake
+                )
                     return;
 
                 // Check if connection has been half-open for too long.
@@ -399,7 +425,10 @@ namespace Unity.Networking.Transport
                 // Check if we have not received anything for too long and we have to reconnect.
                 if (data.LastReceive > 0 && ReconnectionTimeout > 0 && Time - data.LastReceive > ReconnectionTimeout)
                 {
-                    data.ReconnectionClientPtr = Binding.unitytls_client_create(Binding.UnityTLSRole_Client, UnityTLSConfig);
+                    data.ReconnectionClientPtr = Binding.unitytls_client_create(
+                        Binding.UnityTLSRole_Client,
+                        UnityTLSConfig
+                    );
                     Binding.unitytls_client_init(data.ReconnectionClientPtr);
 
                     UnityTLSCallbackContext->NewPacketsEndpoint = Connections.GetConnectionEndpoint(connection);
@@ -411,7 +440,8 @@ namespace Unity.Networking.Transport
 
             private void AdvanceHandshake(Binding.unitytls_client* clientPtr)
             {
-                while (Binding.unitytls_client_handshake(clientPtr) == Binding.UNITYTLS_HANDSHAKE_STEP) ;
+                while (Binding.unitytls_client_handshake(clientPtr) == Binding.UNITYTLS_HANDSHAKE_STEP)
+                    ;
             }
 
             private void UpdateLastReceiveTime(ConnectionId connection)
@@ -461,6 +491,7 @@ namespace Unity.Networking.Transport
             public PacketsQueue SendQueue;
             public PacketsQueue DeferredSends;
             public int DTLSPadding;
+
             [NativeDisableUnsafePtrRestriction]
             public UnityTLSCallbacks.CallbackContext* UnityTLSCallbackContext;
 
@@ -496,10 +527,16 @@ namespace Unity.Networking.Transport
                         continue;
                     }
 
-                    var result = Binding.unitytls_client_send_data(clientPtr, packetPtr, new UIntPtr((uint)packetProcessor.Length));
+                    var result = Binding.unitytls_client_send_data(
+                        clientPtr,
+                        packetPtr,
+                        new UIntPtr((uint)packetProcessor.Length)
+                    );
                     if (result != Binding.UNITYTLS_SUCCESS)
                     {
-                        Debug.LogError($"Failed to encrypt packet (error: {result}). Likely internal DTLS failure. Closing connection.");
+                        Debug.LogError(
+                            $"Failed to encrypt packet (error: {result}). Likely internal DTLS failure. Closing connection."
+                        );
                         packetProcessor.Drop();
                     }
                 }

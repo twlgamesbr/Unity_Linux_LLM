@@ -17,42 +17,35 @@ namespace Unity.Networking.Transport
             private ManagedCallWrapper m_NetworkInterface_Listen_FPtr;
             private ManagedCallWrapper m_NetworkInterface_GetLocalEndpoint_FPtr;
 
-            internal static NetworkInterfaceFunctions Create<N>() where N : unmanaged, INetworkInterface
+            internal static NetworkInterfaceFunctions Create<N>()
+                where N : unmanaged, INetworkInterface
             {
                 var functions = new NetworkInterfaceFunctions();
                 functions.m_NetworkInterface_Bind_FPtr = new ManagedCallWrapper(&BindWrapper<N>);
                 functions.m_NetworkInterface_Listen_FPtr = new ManagedCallWrapper(&ListenWrapper<N>);
-                functions.m_NetworkInterface_GetLocalEndpoint_FPtr = new ManagedCallWrapper(&GetLocalEndpointWrapper<N>);
+                functions.m_NetworkInterface_GetLocalEndpoint_FPtr = new ManagedCallWrapper(
+                    &GetLocalEndpointWrapper<N>
+                );
                 return functions;
             }
 
             internal int Bind(ref NetworkStack stack, ref NetworkEndpoint endpoint)
             {
-                var arguments = new BindArguments
-                {
-                    Stack = stack,
-                    Endpoint = endpoint,
-                };
+                var arguments = new BindArguments { Stack = stack, Endpoint = endpoint };
                 m_NetworkInterface_Bind_FPtr.Invoke(ref arguments);
                 return arguments.Return;
             }
 
             internal int Listen(ref NetworkStack stack)
             {
-                var arguments = new ListenArguments
-                {
-                    Stack = stack,
-                };
+                var arguments = new ListenArguments { Stack = stack };
                 m_NetworkInterface_Listen_FPtr.Invoke(ref arguments);
                 return arguments.Return;
             }
 
             internal NetworkEndpoint GetLocalEndpoint(ref NetworkStack stack)
             {
-                var arguments = new GetLocalEndpointArguments
-                {
-                    Stack = stack,
-                };
+                var arguments = new GetLocalEndpointArguments { Stack = stack };
                 m_NetworkInterface_GetLocalEndpoint_FPtr.Invoke(ref arguments);
                 return arguments.Return;
             }
@@ -63,7 +56,9 @@ namespace Unity.Networking.Transport
                 public NetworkEndpoint Endpoint;
                 public int Return;
             }
-            static private void BindWrapper<N>(void* argumentsPtr, int size) where N : unmanaged, INetworkInterface
+
+            private static void BindWrapper<N>(void* argumentsPtr, int size)
+                where N : unmanaged, INetworkInterface
             {
                 ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<BindArguments>(argumentsPtr, size);
 
@@ -81,9 +76,14 @@ namespace Unity.Networking.Transport
                 public NetworkStack Stack;
                 public NetworkEndpoint Return;
             }
-            static private void GetLocalEndpointWrapper<N>(void* argumentsPtr, int size) where N : unmanaged, INetworkInterface
+
+            private static void GetLocalEndpointWrapper<N>(void* argumentsPtr, int size)
+                where N : unmanaged, INetworkInterface
             {
-                ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<GetLocalEndpointArguments>(argumentsPtr, size);
+                ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<GetLocalEndpointArguments>(
+                    argumentsPtr,
+                    size
+                );
 
                 if (arguments.Stack.TryGetLayer<NetworkInterfaceLayer<N>>(out var layer))
                 {
@@ -99,7 +99,9 @@ namespace Unity.Networking.Transport
                 public NetworkStack Stack;
                 public int Return;
             }
-            static private void ListenWrapper<N>(void* argumentsPtr, int size) where N : unmanaged, INetworkInterface
+
+            private static void ListenWrapper<N>(void* argumentsPtr, int size)
+                where N : unmanaged, INetworkInterface
             {
                 ref var arguments = ref ManagedCallWrapper.ArgumentsFromPtr<ListenArguments>(argumentsPtr, size);
 
@@ -119,6 +121,7 @@ namespace Unity.Networking.Transport
         // allow us to fix it.
         [NativeDisableContainerSafetyRestriction]
         private NativeList<NetworkLayerWrapper> m_Layers;
+
         [NativeDisableContainerSafetyRestriction]
         private NativeList<int> m_AccumulatedPacketPadding;
 
@@ -126,7 +129,6 @@ namespace Unity.Networking.Transport
         private ConnectionList m_Connections;
 
         private NetworkInterfaceFunctions m_NetworkInterfaceFunctions;
-
 
         // TODO: for now we add an extra byte for pipeline id, should move to its own layer
         internal int PacketPadding => m_TotalPacketPadding + 1;
@@ -140,9 +142,14 @@ namespace Unity.Networking.Transport
             stack.m_AccumulatedPacketPadding = new NativeList<int>(0, Allocator.Persistent);
         }
 
-        internal static void InitializeForSettings<N>
-            (out NetworkStack stack, ref N networkInterface, ref NetworkSettings networkSettings,
-            out PacketsQueue sendQueue, out PacketsQueue receiveQueue) where N : unmanaged, INetworkInterface
+        internal static void InitializeForSettings<N>(
+            out NetworkStack stack,
+            ref N networkInterface,
+            ref NetworkSettings networkSettings,
+            out PacketsQueue sendQueue,
+            out PacketsQueue receiveQueue
+        )
+            where N : unmanaged, INetworkInterface
         {
             Initialize(out stack);
 
@@ -152,7 +159,10 @@ namespace Unity.Networking.Transport
             stack.AddLayer(new NetworkInterfaceLayer<N>(networkInterface), ref networkSettings);
 
             // We get again the interface as ref so the CreateQueues method is applied to the actual layer interface copy
-            ref var interfaceRef = ref stack.m_Layers.ElementAt(stack.m_Layers.Length - 1).CastRef<NetworkInterfaceLayer<N>>().m_NetworkInterface;
+            ref var interfaceRef = ref stack
+                .m_Layers.ElementAt(stack.m_Layers.Length - 1)
+                .CastRef<NetworkInterfaceLayer<N>>()
+                .m_NetworkInterface;
             CreateQueues(ref interfaceRef, ref networkSettings, out sendQueue, out receiveQueue);
             // assign it so the new values are copied back
             networkInterface = interfaceRef;
@@ -224,10 +234,11 @@ namespace Unity.Networking.Transport
             m_AccumulatedPacketPadding.Dispose();
         }
 
-        internal void AddLayer<T>(T layer, ref NetworkSettings settings) where T : unmanaged, INetworkLayer
-            => AddLayer(ref layer, ref settings);
+        internal void AddLayer<T>(T layer, ref NetworkSettings settings)
+            where T : unmanaged, INetworkLayer => AddLayer(ref layer, ref settings);
 
-        internal void AddLayer<T>(ref T layer, ref NetworkSettings settings) where T : unmanaged, INetworkLayer
+        internal void AddLayer<T>(ref T layer, ref NetworkSettings settings)
+            where T : unmanaged, INetworkLayer
         {
             var oldConnections = m_Connections;
 
@@ -236,20 +247,25 @@ namespace Unity.Networking.Transport
             var result = layer.Initialize(ref settings, ref m_Connections, ref m_TotalPacketPadding);
             if (m_TotalPacketPadding < oldPadding)
             {
-                throw new InvalidOperationException($"Layer {typeof(T).ToString()} has decreased total padding. Negative packet paddings are invalid.");
+                throw new InvalidOperationException(
+                    $"Layer {typeof(T).ToString()} has decreased total padding. Negative packet paddings are invalid."
+                );
             }
 #else
             var result = layer.Initialize(ref settings, ref m_Connections, ref m_TotalPacketPadding);
 #endif
 
             if (result != 0)
-                Debug.LogError($"Failed to initialize the NetworkStack. Layer {typeof(T).ToString()} with error code: {result}.");
+                Debug.LogError(
+                    $"Failed to initialize the NetworkStack. Layer {typeof(T).ToString()} with error code: {result}."
+                );
 
             m_Layers.Add(NetworkLayerWrapper.Create(ref layer));
             m_AccumulatedPacketPadding.Add(m_TotalPacketPadding);
         }
 
-        internal bool TryGetLayer<T>(out T layer) where T : unmanaged, INetworkLayer
+        internal bool TryGetLayer<T>(out T layer)
+            where T : unmanaged, INetworkLayer
         {
             foreach (var layerWrapper in m_Layers)
             {
@@ -263,7 +279,12 @@ namespace Unity.Networking.Transport
             return false;
         }
 
-        internal static unsafe void CreateQueues<N>(ref N networkInterface, ref NetworkSettings settings, out PacketsQueue sendQueue, out PacketsQueue receiveQueue)
+        internal static unsafe void CreateQueues<N>(
+            ref N networkInterface,
+            ref NetworkSettings settings,
+            out PacketsQueue sendQueue,
+            out PacketsQueue receiveQueue
+        )
             where N : unmanaged, INetworkInterface
         {
             var networkConfig = settings.GetNetworkConfigParameters();
@@ -274,10 +295,16 @@ namespace Unity.Networking.Transport
 #if !UNITY_WEBGL || UNITY_EDITOR
             if (BurstRuntime.GetHashCode64<N>() == BurstRuntime.GetHashCode64<UDPNetworkInterface>())
             {
-                fixed(void* interfacePtr = &networkInterface)
+                fixed (void* interfacePtr = &networkInterface)
                 {
                     ref var udpInterface = ref *(UDPNetworkInterface*)interfacePtr;
-                    udpInterface.CreateQueues(sendQueueCapacity, receiveQueueCapacity, payloadSize, out sendQueue, out receiveQueue);
+                    udpInterface.CreateQueues(
+                        sendQueueCapacity,
+                        receiveQueueCapacity,
+                        payloadSize,
+                        out sendQueue,
+                        out receiveQueue
+                    );
                 }
             }
             else
@@ -292,12 +319,17 @@ namespace Unity.Networking.Transport
                 sendQueue.Dispose();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException(string.Format(
-                    "The provided buffers count ({0}) must be equal to the sendQueueCapacity ({1})",
-                    sendQueue.Capacity,
-                    networkConfig.sendQueueCapacity));
+                throw new InvalidOperationException(
+                    string.Format(
+                        "The provided buffers count ({0}) must be equal to the sendQueueCapacity ({1})",
+                        sendQueue.Capacity,
+                        networkConfig.sendQueueCapacity
+                    )
+                );
 #else
-                Debug.LogError($"The provided buffers count ({sendQueue.Capacity}) must be equal to the sendQueueCapacity ({networkConfig.sendQueueCapacity})");
+                Debug.LogError(
+                    $"The provided buffers count ({sendQueue.Capacity}) must be equal to the sendQueueCapacity ({networkConfig.sendQueueCapacity})"
+                );
 #endif
             }
 
@@ -306,12 +338,17 @@ namespace Unity.Networking.Transport
                 receiveQueue.Dispose();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException(string.Format(
-                    "The provided buffers count ({0}) must be equal to the receiveQueueCapacity ({1})",
-                    receiveQueue.Capacity,
-                    networkConfig.receiveQueueCapacity));
+                throw new InvalidOperationException(
+                    string.Format(
+                        "The provided buffers count ({0}) must be equal to the receiveQueueCapacity ({1})",
+                        receiveQueue.Capacity,
+                        networkConfig.receiveQueueCapacity
+                    )
+                );
 #else
-                Debug.LogError($"The provided buffers count ({receiveQueue.Capacity}) must be equal to the receiveQueueCapacity ({networkConfig.receiveQueueCapacity})");
+                Debug.LogError(
+                    $"The provided buffers count ({receiveQueue.Capacity}) must be equal to the receiveQueueCapacity ({networkConfig.receiveQueueCapacity})"
+                );
 #endif
             }
         }
@@ -322,9 +359,15 @@ namespace Unity.Networking.Transport
 
         internal NetworkEndpoint GetLocalEndpoint() => m_NetworkInterfaceFunctions.GetLocalEndpoint(ref this);
 
-        internal JobHandle ScheduleReceive(ref NetworkDriverReceiver driverReceiver, ref ConnectionList connectionList,
-            ref NetworkEventQueue eventQueue, ref NetworkPipelineProcessor pipelineProcessor,
-            ref NativeHashMap<ConnectionId, ConnectionPayload> connectionPayloads, long time, JobHandle dependency)
+        internal JobHandle ScheduleReceive(
+            ref NetworkDriverReceiver driverReceiver,
+            ref ConnectionList connectionList,
+            ref NetworkEventQueue eventQueue,
+            ref NetworkPipelineProcessor pipelineProcessor,
+            ref NativeHashMap<ConnectionId, ConnectionPayload> connectionPayloads,
+            long time,
+            JobHandle dependency
+        )
         {
             var jobArguments = new ReceiveJobArguments
             {
@@ -346,11 +389,7 @@ namespace Unity.Networking.Transport
 
         internal JobHandle ScheduleSend(ref NetworkDriverSender driverSender, long time, JobHandle dependency)
         {
-            var jobArguments = new SendJobArguments
-            {
-                SendQueue = driverSender.SendQueue,
-                Time = time,
-            };
+            var jobArguments = new SendJobArguments { SendQueue = driverSender.SendQueue, Time = time };
 
             dependency = driverSender.FlushPackets(dependency);
 

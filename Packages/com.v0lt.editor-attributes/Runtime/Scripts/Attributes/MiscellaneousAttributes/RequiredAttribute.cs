@@ -10,7 +10,7 @@ namespace EditorAttributes
         Children,
         Parents,
         Scene,
-        Custom
+        Custom,
     }
 
     /// <summary>
@@ -31,7 +31,11 @@ namespace EditorAttributes
         /// <param name="throwValidationError">Throws an error in the console if validation fails</param>
         /// <param name="buildKiller">Throws an error during build time and cancels it if validation fails (unless build validation is disabled in the project settings)</param>
         /// <param name="fixMode">Specifies how the field should be auto-referenced by the Fix button</param>
-        public RequiredAttribute(bool throwValidationError = false, bool buildKiller = false, ReferenceFixMode fixMode = ReferenceFixMode.None)
+        public RequiredAttribute(
+            bool throwValidationError = false,
+            bool buildKiller = false,
+            ReferenceFixMode fixMode = ReferenceFixMode.None
+        )
         {
             FixMode = fixMode;
             BuildKiller = buildKiller;
@@ -44,6 +48,12 @@ namespace EditorAttributes
         /// <param name="customFixFunctionName">The name of the custom function to run by the Fix button</param>
         /// <param name="throwValidationError">Throws an error in the console if validation fails</param>
         /// <param name="buildKiller">Throws an error during build time and cancels it if validation fails (unless build validation is disabled in the project settings)</param>
-        public RequiredAttribute(string customFixFunctionName, bool throwValidationError = false, bool buildKiller = false) : this(throwValidationError, buildKiller, ReferenceFixMode.Custom) => CustomFixFunctionName = customFixFunctionName;
+        public RequiredAttribute(
+            string customFixFunctionName,
+            bool throwValidationError = false,
+            bool buildKiller = false
+        )
+            : this(throwValidationError, buildKiller, ReferenceFixMode.Custom) =>
+            CustomFixFunctionName = customFixFunctionName;
     }
 }

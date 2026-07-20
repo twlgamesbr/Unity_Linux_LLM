@@ -24,10 +24,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static RequestResetCommand Create()
         {
-            return new RequestResetCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize)
-            };
+            return new RequestResetCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

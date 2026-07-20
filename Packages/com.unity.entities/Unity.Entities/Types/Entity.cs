@@ -17,12 +17,12 @@ namespace Unity.Entities
     ///
     /// The <see cref="EntityManager"/> class manages entities and they exist within a <see cref="World"/>. An
     /// Entity struct refers to an entity, but isn't a reference. Rather, the Entity struct contains an
-    /// <see cref="Index"/> that you can use to access entity data, and a <see cref="Version"/> that you can 
-    /// use to check whether the Index is still valid. Note that you must pass the Index or Version values to  
+    /// <see cref="Index"/> that you can use to access entity data, and a <see cref="Version"/> that you can
+    /// use to check whether the Index is still valid. Note that you must pass the Index or Version values to
     /// relevant API methods, rather than accessing them directly.
     ///
-    /// To add or remove components, access components, or to destroy the entity, pass an Entity struct to methods of 
-    /// the <see cref="EntityManager"/>, the <see cref="EntityCommandBuffer"/>, or the <see cref="ComponentSystemBase"/>. 
+    /// To add or remove components, access components, or to destroy the entity, pass an Entity struct to methods of
+    /// the <see cref="EntityManager"/>, the <see cref="EntityCommandBuffer"/>, or the <see cref="ComponentSystemBase"/>.
     /// </remarks>
     [DebuggerTypeProxy(typeof(EntityDebugProxy))]
     [DebuggerDisplay("{EntityDebugProxy.GetDebugName(Index, Version)}")]
@@ -39,6 +39,7 @@ namespace Unity.Entities
         /// then the entity has been recycled.
         /// </remarks>
         public int Index;
+
         /// <summary>
         /// The generational version of the entity.
         /// </summary>
@@ -54,7 +55,7 @@ namespace Unity.Entities
         /// <param name="lhs">An Entity object.</param>
         /// <param name="rhs">Another Entity object.</param>
         /// <returns>True, if both Index and Version are identical.</returns>
-        public static bool operator==(Entity lhs, Entity rhs)
+        public static bool operator ==(Entity lhs, Entity rhs)
         {
             return lhs.Index == rhs.Index && lhs.Version == rhs.Version;
         }
@@ -65,7 +66,7 @@ namespace Unity.Entities
         /// <param name="lhs">An Entity object.</param>
         /// <param name="rhs">Another Entity object.</param>
         /// <returns>True, if either Index or Version are different.</returns>
-        public static bool operator!=(Entity lhs, Entity rhs)
+        public static bool operator !=(Entity lhs, Entity rhs)
         {
             return !(lhs == rhs);
         }
@@ -114,7 +115,6 @@ namespace Unity.Entities
         {
             return entity.Index == Index && entity.Version == Version;
         }
-
 
         public static implicit operator EntityId(Entity entity)
         {

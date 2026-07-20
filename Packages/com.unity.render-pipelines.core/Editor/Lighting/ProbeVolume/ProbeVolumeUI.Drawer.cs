@@ -23,11 +23,35 @@ namespace UnityEditor.Rendering
 
             GIContributors.ContributorFilter? filter = null;
 
-            if (GUILayout.Button(EditorGUIUtility.TrTextContent("Fit to All Scenes", "Fit this Adaptive Probe Volume to cover all loaded Scenes. "), EditorStyles.miniButton))
+            if (
+                GUILayout.Button(
+                    EditorGUIUtility.TrTextContent(
+                        "Fit to All Scenes",
+                        "Fit this Adaptive Probe Volume to cover all loaded Scenes. "
+                    ),
+                    EditorStyles.miniButton
+                )
+            )
                 filter = GIContributors.ContributorFilter.All;
-            if (GUILayout.Button(EditorGUIUtility.TrTextContent("Fit to Scene", "Fit this Adaptive Probe Volume to the renderers in the same Scene."), EditorStyles.miniButton))
+            if (
+                GUILayout.Button(
+                    EditorGUIUtility.TrTextContent(
+                        "Fit to Scene",
+                        "Fit this Adaptive Probe Volume to the renderers in the same Scene."
+                    ),
+                    EditorStyles.miniButton
+                )
+            )
                 filter = GIContributors.ContributorFilter.Scene;
-            if (GUILayout.Button(EditorGUIUtility.TrTextContent("Fit to Selection", "Fits this Adaptive Probe Volume to the selected renderer(s). Lock the Inspector to make additional selections."), EditorStyles.miniButton))
+            if (
+                GUILayout.Button(
+                    EditorGUIUtility.TrTextContent(
+                        "Fit to Selection",
+                        "Fits this Adaptive Probe Volume to the selected renderer(s). Lock the Inspector to make additional selections."
+                    ),
+                    EditorStyles.miniButton
+                )
+            )
                 filter = GIContributors.ContributorFilter.Selection;
 
             if (filter.HasValue)
@@ -36,11 +60,15 @@ namespace UnityEditor.Rendering
 
                 // Get minBrickSize from scene baking set if available
                 var bakingSet = ProbeVolumeLightingTab.GetSceneBakingSetForUI(pv.gameObject.scene);
-                float minBrickSize = bakingSet != null ? bakingSet.minBrickSize : ProbeReferenceVolume.instance.MinBrickSize();
+                float minBrickSize =
+                    bakingSet != null ? bakingSet.minBrickSize : ProbeReferenceVolume.instance.MinBrickSize();
 
                 var bounds = pv.ComputeBounds(filter.Value, pv.gameObject.scene);
                 pv.transform.position = bounds.center;
-                serialized.size.vector3Value = Vector3.Max(bounds.size + new Vector3(minBrickSize, minBrickSize, minBrickSize), Vector3.zero);
+                serialized.size.vector3Value = Vector3.Max(
+                    bounds.size + new Vector3(minBrickSize, minBrickSize, minBrickSize),
+                    Vector3.zero
+                );
             }
         }
 
@@ -54,7 +82,10 @@ namespace UnityEditor.Rendering
             EditorGUI.BeginProperty(rect, Styles.s_DistanceBetweenProbes, serialized.overridesSubdivision);
 
             var checkbox = new Rect(rect) { width = 14 + 9, x = rect.x + 2 };
-            serialized.overridesSubdivision.boolValue = EditorGUI.Toggle(checkbox, serialized.overridesSubdivision.boolValue);
+            serialized.overridesSubdivision.boolValue = EditorGUI.Toggle(
+                checkbox,
+                serialized.overridesSubdivision.boolValue
+            );
 
             using (new EditorGUI.DisabledScope(!serialized.overridesSubdivision.boolValue))
             {
@@ -78,8 +109,14 @@ namespace UnityEditor.Rendering
                     serialized.maxSubdivisionLevel.intValue = Mathf.RoundToInt(maxLevelOverride);
                 }
 
-                ProbeVolumeLightingTab.DrawSimplificationLevelsMarkers(rect, minDistance, 0, maxSimplicationLevel,
-                    serialized.minSubdivisionLevel.intValue, serialized.maxSubdivisionLevel.intValue);
+                ProbeVolumeLightingTab.DrawSimplificationLevelsMarkers(
+                    rect,
+                    minDistance,
+                    0,
+                    maxSimplicationLevel,
+                    serialized.minSubdivisionLevel.intValue,
+                    serialized.maxSubdivisionLevel.intValue
+                );
             }
 
             EditorGUI.EndProperty();
@@ -106,7 +143,8 @@ namespace UnityEditor.Rendering
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Subdivision Override", EditorStyles.boldLabel);
-            bool isFreezingPlacement = bakingSet != null && bakingSet.freezePlacement && AdaptiveProbeVolumes.CanFreezePlacement();
+            bool isFreezingPlacement =
+                bakingSet != null && bakingSet.freezePlacement && AdaptiveProbeVolumes.CanFreezePlacement();
             using (new EditorGUI.DisabledScope(isFreezingPlacement))
             {
                 // Get settings from scene profile if available
@@ -128,10 +166,15 @@ namespace UnityEditor.Rendering
 
             if (isFreezingPlacement)
             {
-                CoreEditorUtils.DrawFixMeBox("The placement is frozen in the baking settings. To change these values uncheck the Freeze Placement in the Adaptive Probe Volumes tab of the Lighting Window.", MessageType.Info, "Open", () =>
-                {
-                    ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
-                });
+                CoreEditorUtils.DrawFixMeBox(
+                    "The placement is frozen in the baking settings. To change these values uncheck the Freeze Placement in the Adaptive Probe Volumes tab of the Lighting Window.",
+                    MessageType.Info,
+                    "Open",
+                    () =>
+                    {
+                        ProbeVolumeLightingTab.OpenBakingSet(bakingSet);
+                    }
+                );
             }
 
             EditorGUILayout.LabelField("Geometry Settings", EditorStyles.boldLabel);
@@ -150,7 +193,10 @@ namespace UnityEditor.Rendering
             if (bakingSet == null)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.HelpBox("The scene this Adaptive Probe Volume is part of does not belong to any Baking Set.", MessageType.Warning);
+                EditorGUILayout.HelpBox(
+                    "The scene this Adaptive Probe Volume is part of does not belong to any Baking Set.",
+                    MessageType.Warning
+                );
             }
 
             EditorGUILayout.Space();
@@ -167,7 +213,13 @@ namespace UnityEditor.Rendering
             if (pv.mightNeedRebaking)
             {
                 EditorGUILayout.Space();
-                var helpBoxRect = GUILayoutUtility.GetRect(new GUIContent(Styles.s_ProbeVolumeChangedMessage, EditorGUIUtility.IconContent("Warning@2x").image), EditorStyles.helpBox);
+                var helpBoxRect = GUILayoutUtility.GetRect(
+                    new GUIContent(
+                        Styles.s_ProbeVolumeChangedMessage,
+                        EditorGUIUtility.IconContent("Warning@2x").image
+                    ),
+                    EditorStyles.helpBox
+                );
                 EditorGUI.HelpBox(helpBoxRect, Styles.s_ProbeVolumeChangedMessage, MessageType.Warning);
             }
         }

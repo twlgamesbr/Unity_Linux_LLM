@@ -6,15 +6,21 @@ using UnityEditor;
 namespace UnityEngine.Rendering.Universal
 {
     [Serializable]
-    internal class Provider2DSources<T, U> : IProvider2DSources where T : Provider2D where U : Provider2DSource
+    internal class Provider2DSources<T, U> : IProvider2DSources
+        where T : Provider2D
+        where U : Provider2DSource
     {
+        //Editor
+        [SerializeField]
+        int m_SelectedHashCode;
 
-        //Editor 
-        [SerializeField] int                    m_SelectedHashCode;
-        [SerializeReference] SelectionSource    m_SelectedSource;
-        [SerializeReference] IProvider2DCache   m_Provider2DCache;
-        List<SelectionSource>                   m_Sources = new List<SelectionSource>();
-        List<SelectionSource>                   m_AdditionalSources = new List<SelectionSource>();
+        [SerializeReference]
+        SelectionSource m_SelectedSource;
+
+        [SerializeReference]
+        IProvider2DCache m_Provider2DCache;
+        List<SelectionSource> m_Sources = new List<SelectionSource>();
+        List<SelectionSource> m_AdditionalSources = new List<SelectionSource>();
 
         private static int GetSelectedSourceIndexFromId(Provider2DSources<T, U> provider2DSources)
         {
@@ -31,10 +37,10 @@ namespace UnityEngine.Rendering.Universal
             return -1;
         }
 
-
         static void DeconflictNames(List<SelectionSource> selectionSources)
         {
-            Dictionary<string, List<SelectionSource>> selectionSourcesByName = new Dictionary<string, List<SelectionSource>>();
+            Dictionary<string, List<SelectionSource>> selectionSourcesByName =
+                new Dictionary<string, List<SelectionSource>>();
 
             // Add all the names to the dictionary
             foreach (var selection in selectionSources)
@@ -43,7 +49,7 @@ namespace UnityEngine.Rendering.Universal
                 ;
 
                 List<SelectionSource> sourceList;
-                if(selectionSourcesByName.ContainsKey(name))
+                if (selectionSourcesByName.ContainsKey(name))
                 {
                     sourceList = selectionSourcesByName[name];
                 }
@@ -56,22 +62,20 @@ namespace UnityEngine.Rendering.Universal
                 sourceList.Add(selection);
             }
 
-
             // Look for any repeats
             foreach (var sourceList in selectionSourcesByName.Values)
             {
                 // If there is more than one source with the same name renumber it
-                if(sourceList.Count > 1)
+                if (sourceList.Count > 1)
                 {
-                    for(int i=0;i<sourceList.Count;i++)
+                    for (int i = 0; i < sourceList.Count; i++)
                     {
-                        if(i > 0)
+                        if (i > 0)
                             sourceList[i].m_MenuName.text = sourceList[i].m_MenuName.text + " (" + i + ")";
                     }
                 }
             }
         }
-
 
         static void AddAddtionalSources(Provider2DSources<T, U> provider2DSources)
         {
@@ -97,7 +101,7 @@ namespace UnityEngine.Rendering.Universal
                 provider2DSources.m_Provider2DCache = new Provider2DCache<T>();
 
             provider2DSources.m_Provider2DCache.UpdateCache(gameObj);
-                
+
             // Combine additional sources with ones from the cache.
             foreach (var kvp in provider2DSources.m_Provider2DCache.Cache)
             {
@@ -139,7 +143,7 @@ namespace UnityEngine.Rendering.Universal
         public GUIContent[] GetSourceNames()
         {
             GUIContent[] content = new GUIContent[m_Sources.Count];
-            for(int i = 0; i < content.Length; i++)
+            for (int i = 0; i < content.Length; i++)
             {
                 content[i] = m_Sources[i].GetSourceName();
             }
@@ -151,13 +155,13 @@ namespace UnityEngine.Rendering.Universal
             return m_AdditionalSources;
         }
 
-         public int selectedHashCode
+        public int selectedHashCode
         {
             get { return m_SelectedHashCode; }
             set { m_SelectedHashCode = value; }
         }
 
-        static public void SetAdditionalSources(SerializedProperty property, List<SelectionSource> additionalSources)
+        public static void SetAdditionalSources(SerializedProperty property, List<SelectionSource> additionalSources)
         {
             Provider2DSources<T, U> sources = property.boxedValue as Provider2DSources<T, U>;
             if (sources.m_Sources != null)
@@ -171,7 +175,7 @@ namespace UnityEngine.Rendering.Universal
             property.serializedObject.ApplyModifiedProperties();
         }
 
-        static public void SetSourceType(SerializedProperty property)
+        public static void SetSourceType(SerializedProperty property)
         {
             property.serializedObject.Update();
 
@@ -181,13 +185,18 @@ namespace UnityEngine.Rendering.Universal
 
             property.serializedObject.ApplyModifiedProperties();
         }
+
         public static void DrawSelectedSourceUI(SerializedProperty property)
         {
             property.serializedObject.Update();
 
             Provider2DSources<T, U> sources = property.boxedValue as Provider2DSources<T, U>;
             if (sources.m_SelectedSource != null)
-                sources.m_SelectedSource.DrawUI(property, property.serializedObject, property.serializedObject.targetObjects);
+                sources.m_SelectedSource.DrawUI(
+                    property,
+                    property.serializedObject,
+                    property.serializedObject.targetObjects
+                );
 
             property.serializedObject.ApplyModifiedProperties();
         }

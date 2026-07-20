@@ -12,14 +12,22 @@ namespace UnityEngine.InputSystem.Editor
     internal sealed class InputActionReferencePropertyDrawer : PropertyDrawer
     {
         // Custom search providers for asset-based, and project-wide actions input action reference sub-assets.
-        private readonly SearchContext m_Context = UnityEditor.Search.SearchService.CreateContext(new[]
-        {
-            InputActionReferenceSearchProviders.CreateInputActionReferenceSearchProviderForAssets(),
-            InputActionReferenceSearchProviders.CreateInputActionReferenceSearchProviderForProjectWideActions(),
-        }, string.Empty, SearchConstants.PickerSearchFlags);
+        private readonly SearchContext m_Context = UnityEditor.Search.SearchService.CreateContext(
+            new[]
+            {
+                InputActionReferenceSearchProviders.CreateInputActionReferenceSearchProviderForAssets(),
+                InputActionReferenceSearchProviders.CreateInputActionReferenceSearchProviderForProjectWideActions(),
+            },
+            string.Empty,
+            SearchConstants.PickerSearchFlags
+        );
 
-        public void OnGUI(Rect position, SerializedProperty property, GUIContent label,
-            System.Func<Rect, Object, System.Type, GUIContent, Object> doField = null)
+        public void OnGUI(
+            Rect position,
+            SerializedProperty property,
+            GUIContent label,
+            System.Func<Rect, Object, System.Type, GUIContent, Object> doField = null
+        )
         {
             EditorGUI.BeginProperty(position, label, property);
             EditorGUI.BeginChangeCheck();
@@ -40,9 +48,17 @@ namespace UnityEngine.InputSystem.Editor
             // Pick an InputActionReference using custom picker. We need to use this overload taking an object
             // in order to be in control of the actual assignment to the serialized property so we can substitute.
             // We allow substituting the object field here to at least enable some test coverage.
-            var candidate = doField != null ? doField(position, obj, typeof(InputActionReference), label)
-                : ObjectField.DoObjectField(position, obj, typeof(InputActionReference),
-                label, m_Context, SearchConstants.PickerViewFlags);
+            var candidate =
+                doField != null
+                    ? doField(position, obj, typeof(InputActionReference), label)
+                    : ObjectField.DoObjectField(
+                        position,
+                        obj,
+                        typeof(InputActionReference),
+                        label,
+                        m_Context,
+                        SearchConstants.PickerViewFlags
+                    );
 
             // Only assign the value was actually changed by the user.
             if (EditorGUI.EndChangeCheck() && !Equals(candidate, current))

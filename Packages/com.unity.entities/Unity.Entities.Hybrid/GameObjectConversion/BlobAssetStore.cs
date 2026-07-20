@@ -20,15 +20,15 @@ namespace Unity.Entities
     /// </remarks>
     public struct BlobAssetStore : IDisposable
     {
-        NativeParallelHashMap<Hash128, BlobAssetReferenceData>  m_BlobAssets;
-        NativeList<int>                                         m_CacheStats;
+        NativeParallelHashMap<Hash128, BlobAssetReferenceData> m_BlobAssets;
+        NativeList<int> m_CacheStats;
 
-        AllocatorManager.AllocatorHandle                        m_Allocator;
+        AllocatorManager.AllocatorHandle m_Allocator;
 
         enum CacheStats
         {
             Hit = 0,
-            Miss
+            Miss,
         }
 
         internal unsafe void GarbageCollection(EntityManager entityManager)
@@ -38,7 +38,9 @@ namespace Unity.Entities
             var uniqueBlobs = EntityDiffer.GetBlobAssetsWithDistinctHash(
                 entityDataAccess->EntityComponentStore,
                 entityDataAccess->ManagedComponentStore,
-                chunks, Allocator.TempJob);
+                chunks,
+                Allocator.TempJob
+            );
 
             var remove = new NativeList<Hash128>(m_BlobAssets.Capacity, Allocator.Temp);
 
@@ -126,7 +128,8 @@ namespace Unity.Entities
         /// <param name="blobAssetReference">The corresponding BlobAssetReference or default if none was found</param>
         /// <typeparam name="T">The type of BlobAsset</typeparam>
         /// <returns>True if the BlobAsset was found and returned, false if it wasn't</returns>
-        public bool TryGet<T>(Hash128 hash, out BlobAssetReference<T> blobAssetReference) where T : unmanaged
+        public bool TryGet<T>(Hash128 hash, out BlobAssetReference<T> blobAssetReference)
+            where T : unmanaged
         {
             var typedHash = ComputeKeyAndTypeHash<T>(hash);
 
@@ -141,7 +144,8 @@ namespace Unity.Entities
         /// <param name="typeHash">Hash calculated with ComputeTypeHash for the type of BlobAsset</param>
         /// <typeparam name="T">The type of BlobAsset</typeparam>
         /// <returns>True if the BlobAsset was found and returned, false if it wasn't</returns>
-        internal bool TryGet<T>(Hash128 hash, uint typeHash, out BlobAssetReference<T> blobAssetReference) where T : unmanaged
+        internal bool TryGet<T>(Hash128 hash, uint typeHash, out BlobAssetReference<T> blobAssetReference)
+            where T : unmanaged
         {
             var typedHash = ComputeKeyAndTypeHash(hash, typeHash);
 
@@ -155,14 +159,16 @@ namespace Unity.Entities
         /// <param name="blobAssetReference">The corresponding BlobAssetReference or default if none was found</param>
         /// <typeparam name="T">The type of BlobAsset</typeparam>
         /// <returns>True if the BlobAsset was found and returned, false if it wasn't</returns>
-        internal bool TryGetTest<T>(Hash128 hash, out BlobAssetReference<T> blobAssetReference) where T : unmanaged
+        internal bool TryGetTest<T>(Hash128 hash, out BlobAssetReference<T> blobAssetReference)
+            where T : unmanaged
         {
-            var result =  TryGet(hash, out blobAssetReference);
+            var result = TryGet(hash, out blobAssetReference);
 
             if (result)
             {
                 ++m_CacheStats[(int)CacheStats.Hit];
-            } else
+            }
+            else
             {
                 ++m_CacheStats[(int)CacheStats.Miss];
             }
@@ -178,7 +184,12 @@ namespace Unity.Entities
         /// <param name="updateRefCount">If the refCounter of this BlobAsset needs to be increased based on the result (temporary until refactor)</param>
         /// <typeparam name="T">The type of BlobAsset</typeparam>
         /// <returns>True if the BlobAsset was found and returned, false if it wasn't</returns>
-        internal bool TryGetWithFullHash<T>(Hash128 fullHash, out BlobAssetReference<T> blobAssetReference, bool updateRefCount = true) where T : unmanaged
+        internal bool TryGetWithFullHash<T>(
+            Hash128 fullHash,
+            out BlobAssetReference<T> blobAssetReference,
+            bool updateRefCount = true
+        )
+            where T : unmanaged
         {
             if (m_BlobAssets.TryGetValue(fullHash, out var blobData))
             {
@@ -237,7 +248,8 @@ namespace Unity.Entities
         /// <param name="blobAsset">The blob asset that will be inserted or replaced</param>
         /// <typeparam name="T">The type of BlobAsset.</typeparam>
         /// <returns>Returns true if the blob asset was added, returns false if the blob asset was disposed and replaced with the previous blob.</returns>
-        unsafe public bool TryAdd<T>(ref BlobAssetReference<T> blobAsset) where T : unmanaged
+        public unsafe bool TryAdd<T>(ref BlobAssetReference<T> blobAsset)
+            where T : unmanaged
         {
             return TryAdd<T>(ref blobAsset, out _);
         }
@@ -249,7 +261,8 @@ namespace Unity.Entities
         /// <param name="customHash">The key to be associated with the BlobAssetReference</param>
         /// <typeparam name="T">The type of BlobAsset</typeparam>
         /// <returns>true if the BlobAssetReference was found, false if not found</returns>
-        public bool TryAdd<T>(Hash128 customHash, ref BlobAssetReference<T> blobAsset) where T : unmanaged
+        public bool TryAdd<T>(Hash128 customHash, ref BlobAssetReference<T> blobAsset)
+            where T : unmanaged
         {
             ValidateBlob(blobAsset.m_data);
 
@@ -266,7 +279,8 @@ namespace Unity.Entities
         /// <param name="typeHash">Hash calculated with ComputeTypeHash for the type of BlobAsset</param>
         /// <typeparam name="T">The type of BlobAsset</typeparam>
         /// <returns>true if the BlobAssetReference was found, false if not found</returns>
-        internal bool TryAdd<T>(Hash128 customHash, uint typeHash, ref BlobAssetReference<T> blobAsset) where T : unmanaged
+        internal bool TryAdd<T>(Hash128 customHash, uint typeHash, ref BlobAssetReference<T> blobAsset)
+            where T : unmanaged
         {
             ValidateBlob(blobAsset.m_data);
 
@@ -283,7 +297,8 @@ namespace Unity.Entities
         /// <param name="objectHash">The hash that is based on the content of the BlobAsset</param>
         /// <typeparam name="T">The type of BlobAsset.</typeparam>
         /// <returns>Returns true if the blob asset was added, returns false if the blob asset was disposed and replaced with the previous blob.</returns>
-        unsafe public bool TryAdd<T>(ref BlobAssetReference<T> blobAsset, out Hash128 objectHash) where T : unmanaged
+        public unsafe bool TryAdd<T>(ref BlobAssetReference<T> blobAsset, out Hash128 objectHash)
+            where T : unmanaged
         {
             ValidateBlob(blobAsset.m_data);
 
@@ -304,7 +319,8 @@ namespace Unity.Entities
         /// <param name="typeHash">Hash calculated with ComputeTypeHash for the type of BlobAsset</param>
         /// <typeparam name="T">The type of BlobAsset.</typeparam>
         /// <returns>Returns true if the blob asset was added, returns false if the blob asset was disposed and replaced with the previous blob.</returns>
-        unsafe internal bool TryAdd<T>(ref BlobAssetReference<T> blobAsset, uint typeHash) where T : unmanaged
+        internal unsafe bool TryAdd<T>(ref BlobAssetReference<T> blobAsset, uint typeHash)
+            where T : unmanaged
         {
             ValidateBlob(blobAsset.m_data);
 
@@ -324,12 +340,17 @@ namespace Unity.Entities
         /// <param name="updateRefCount">If the refCounter of this BlobAsset needs to be increased based on the result (temporary until refactor)</param>
         /// <typeparam name="T">The type of BlobAsset.</typeparam>
         /// <returns>Returns true if the blob asset was added, returns false if the blob asset was disposed and replaced with the previous blob.</returns>
-        private bool TryAddWithFullHash<T>(ref BlobAssetReference<T> blobAssetReference, Hash128 fullHash, bool updateRefCount = true) where T : unmanaged
+        private bool TryAddWithFullHash<T>(
+            ref BlobAssetReference<T> blobAssetReference,
+            Hash128 fullHash,
+            bool updateRefCount = true
+        )
+            where T : unmanaged
         {
             if (m_BlobAssets.TryGetValue(fullHash, out var existingBlob))
             {
                 var existingBlobReference = BlobAssetReference<T>.Create(existingBlob);
-                if(existingBlobReference != blobAssetReference)
+                if (existingBlobReference != blobAssetReference)
                     blobAssetReference.Dispose();
                 blobAssetReference = existingBlobReference;
                 return false;
@@ -350,8 +371,9 @@ namespace Unity.Entities
         {
             referenceData.ValidateNotNull();
             if (referenceData.Header->Allocator != m_Allocator)
-                throw new ArgumentException($"The Allocator for the blob asset must be {m_Allocator} but was {referenceData.Header->Allocator}");
-
+                throw new ArgumentException(
+                    $"The Allocator for the blob asset must be {m_Allocator} but was {referenceData.Header->Allocator}"
+                );
         }
 
         /// <summary>Obsolete. BlobAssetStore uses garbage collection and doesn't allow removing references anymore.</summary>
@@ -392,7 +414,7 @@ namespace Unity.Entities
         /// <returns>Calculated hash value</returns>
         internal static Hash128 ComputeKeyAndTypeHash<T>(Hash128 key)
         {
-            return new Hash128(math.hashwide(new uint4x2 { c0 = key.Value, c1 = new uint4(ComputeTypeHash<T>())}));
+            return new Hash128(math.hashwide(new uint4x2 { c0 = key.Value, c1 = new uint4(ComputeTypeHash<T>()) }));
         }
 
         /// <summary>
@@ -403,7 +425,7 @@ namespace Unity.Entities
         /// <returns>Returns the calculated hash value as a 128-bit hash value.</returns>
         static Hash128 ComputeKeyAndTypeHash(Hash128 key, uint typeHash)
         {
-            return new Hash128(math.hashwide(new uint4x2 { c0 = key.Value, c1 = new uint4(typeHash)}));
+            return new Hash128(math.hashwide(new uint4x2 { c0 = key.Value, c1 = new uint4(typeHash) }));
         }
     }
 }

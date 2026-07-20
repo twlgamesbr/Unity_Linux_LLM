@@ -30,12 +30,14 @@ namespace Unity.Entities.UI
             // Dig in to find invalid pagination sizes
             if (Sizes.Length != sizes.Length)
             {
-                Debug.LogWarning($"{nameof(PaginationAttribute)}: Invalid pagination sizes [{string.Join(", ", sizes.Except(Sizes))}]. Pagination sizes need to be greater than 0.");
+                Debug.LogWarning(
+                    $"{nameof(PaginationAttribute)}: Invalid pagination sizes [{string.Join(", ", sizes.Except(Sizes))}]. Pagination sizes need to be greater than 0."
+                );
             }
 
             if (Sizes.Length == 0)
             {
-                Sizes = new[] {5, 10, 20};
+                Sizes = new[] { 5, 10, 20 };
             }
         }
     }

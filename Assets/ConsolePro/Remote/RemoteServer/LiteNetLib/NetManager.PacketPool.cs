@@ -14,7 +14,7 @@ namespace FlyingWormConsole3.LiteNetLib
         public int PacketPoolSize = 1000;
 
         public int PoolCount => _poolCount;
-        
+
         private NetPacket PoolGetWithData(PacketProperty property, byte[] data, int start, int length)
         {
             int headerSize = NetPacket.GetHeaderSize(property);
@@ -50,11 +50,11 @@ namespace FlyingWormConsole3.LiteNetLib
                 packet = _poolHead;
                 if (packet == null)
                     return new NetPacket(size);
-                
+
                 _poolHead = _poolHead.Next;
                 _poolCount--;
             }
-            
+
             packet.Size = size;
             if (packet.RawData.Length < size)
                 packet.RawData = new byte[size];
@@ -68,7 +68,7 @@ namespace FlyingWormConsole3.LiteNetLib
                 //Don't pool big packets. Save memory
                 return;
             }
-            
+
             //Clean fragmented flag
             packet.RawData[0] = 0;
             lock (_poolLock)

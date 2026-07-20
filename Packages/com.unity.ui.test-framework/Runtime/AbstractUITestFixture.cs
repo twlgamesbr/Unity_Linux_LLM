@@ -30,9 +30,12 @@ namespace UnityEngine.UIElements.TestFramework
         /// <summary>
         /// The test fixture to which the `UITestComponent` is attached.
         /// </summary>
-        protected internal AbstractUITestFixture fixture { get;
+        protected internal AbstractUITestFixture fixture
+        {
+            get;
             [System.Obsolete("For Internal Use Only.")]
-            internal set; }
+            internal set;
+        }
 
         /// <summary>
         /// Invoked when the
@@ -65,10 +68,13 @@ namespace UnityEngine.UIElements.TestFramework
 
         [System.Obsolete("For Internal Use Only.")]
         internal void DoInitialize(AbstractUITestFixture testFixture) => Initialize(testFixture);
+
         [System.Obsolete("For Internal Use Only.")]
         internal void DoShutdown() => Shutdown();
+
         [System.Obsolete("For Internal Use Only.")]
         internal void DoBeforeTest() => BeforeTest();
+
         [System.Obsolete("For Internal Use Only.")]
         internal void DoAfterTest() => AfterTest();
     }
@@ -140,12 +146,14 @@ namespace UnityEngine.UIElements.TestFramework
         /// </summary>
         /// <typeparam name="T">The type of `UITestComponent` to attach to the test fixture.</typeparam>
         /// <returns>The added test component.</returns>
-        public T AddTestComponent<T>() where T : UITestComponent, new()
+        public T AddTestComponent<T>()
+            where T : UITestComponent, new()
         {
             var component = new T();
             AddTestComponent(component);
             return component;
         }
+
         /// <summary>
         /// Finds and removes the first component of type <typeparamref name="T"/> from the test fixture.
         /// </summary>
@@ -153,7 +161,8 @@ namespace UnityEngine.UIElements.TestFramework
         /// <remarks>
         /// Does nothing if a test component of the specified type <typeparamref name="T"/> is not found.
         /// </remarks>
-        public void RemoveTestComponent<T>() where T : UITestComponent
+        public void RemoveTestComponent<T>()
+            where T : UITestComponent
         {
             var component = FindTestComponent<T>();
             if (component != null)

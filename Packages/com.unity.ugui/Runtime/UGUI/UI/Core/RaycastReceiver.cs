@@ -1,4 +1,3 @@
-
 namespace UnityEngine.UI
 {
     /// <summary>
@@ -41,6 +40,9 @@ namespace UnityEngine.UI
         /// RaycastReceiver clears this object's vertex buffer.
         /// This object will not be drawn as a result of this overridden function.
         /// </remarks>
-        protected override void OnPopulateMesh(VertexHelper vh) { vh.Clear(); }
+        protected override void OnPopulateMesh(VertexHelper vh)
+        {
+            vh.Clear();
+        }
     }
 }

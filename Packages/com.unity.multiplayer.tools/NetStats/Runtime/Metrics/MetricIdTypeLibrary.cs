@@ -51,26 +51,26 @@ namespace Unity.Multiplayer.Tools.NetStats
 
         internal static void TypeRegistrationPostProcess()
         {
-            k_Types.Sort((a, b) =>
-            {
-                var aSortPriorityAttr =
-                    a.GetCustomAttribute<MetricTypeSortPriorityAttribute>();
-                var aSortPriority = aSortPriorityAttr?.SortPriority ?? SortPriority.Neutral;
-
-                var bSortPriorityAttr =
-                    b.GetCustomAttribute<MetricTypeSortPriorityAttribute>();
-                var bSortPriority = bSortPriorityAttr?.SortPriority ?? SortPriority.Neutral;
-
-                // Order first by the sort priority
-                var sortPriorityComparison = aSortPriority.CompareTo(bSortPriority);
-                if (sortPriorityComparison != 0)
+            k_Types.Sort(
+                (a, b) =>
                 {
-                    return sortPriorityComparison;
-                }
+                    var aSortPriorityAttr = a.GetCustomAttribute<MetricTypeSortPriorityAttribute>();
+                    var aSortPriority = aSortPriorityAttr?.SortPriority ?? SortPriority.Neutral;
 
-                // Then by name
-                return StringComparer.InvariantCulture.Compare(a.FullName, b.FullName);
-            });
+                    var bSortPriorityAttr = b.GetCustomAttribute<MetricTypeSortPriorityAttribute>();
+                    var bSortPriority = bSortPriorityAttr?.SortPriority ?? SortPriority.Neutral;
+
+                    // Order first by the sort priority
+                    var sortPriorityComparison = aSortPriority.CompareTo(bSortPriority);
+                    if (sortPriorityComparison != 0)
+                    {
+                        return sortPriorityComparison;
+                    }
+
+                    // Then by name
+                    return StringComparer.InvariantCulture.Compare(a.FullName, b.FullName);
+                }
+            );
 
             foreach (var type in k_Types)
             {
@@ -107,8 +107,7 @@ namespace Unity.Multiplayer.Tools.NetStats
                     if (kinds[i] == MetricKind.Counter)
                     {
                         var existingUnit = units[i];
-                        units[i] = existingUnit.WithSeconds(
-                            (sbyte)(existingUnit.SecondsExponent - 1));
+                        units[i] = existingUnit.WithSeconds((sbyte)(existingUnit.SecondsExponent - 1));
                     }
                 }
 

@@ -23,10 +23,7 @@ namespace Unity.Entities
         {
             var currentElapsedTime = SystemAPI.Time.ElapsedTime;
             var deltaTime = math.min(UnityEngine.Time.deltaTime, World.MaximumDeltaTime);
-            World.SetTime(new TimeData(
-                elapsedTime: currentElapsedTime-deltaTime,
-                deltaTime: deltaTime
-            ));
+            World.SetTime(new TimeData(elapsedTime: currentElapsedTime - deltaTime, deltaTime: deltaTime));
         }
 
         /// <summary>
@@ -36,10 +33,7 @@ namespace Unity.Entities
         {
             var currentElapsedTime = SystemAPI.Time.ElapsedTime;
             var deltaTime = math.min(UnityEngine.Time.deltaTime, World.MaximumDeltaTime);
-            World.SetTime(new TimeData(
-                elapsedTime: currentElapsedTime + deltaTime,
-                deltaTime: deltaTime
-            ));
+            World.SetTime(new TimeData(elapsedTime: currentElapsedTime + deltaTime, deltaTime: deltaTime));
         }
     }
 }

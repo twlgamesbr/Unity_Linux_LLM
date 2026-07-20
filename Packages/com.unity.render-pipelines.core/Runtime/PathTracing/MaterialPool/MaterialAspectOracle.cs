@@ -4,7 +4,12 @@ using UnityEngine.Rendering;
 
 namespace UnityEngine.PathTracing.Core
 {
-    internal enum MaterialPropertyType { None = 0, Color, Texture }
+    internal enum MaterialPropertyType
+    {
+        None = 0,
+        Color,
+        Texture,
+    }
 
     internal struct MaterialPropertyDesc
     {
@@ -12,7 +17,12 @@ namespace UnityEngine.PathTracing.Core
         public float3 Color; // Unused if type == Textured
     }
 
-    internal enum TransmissionChannels { None = 0, RGB, Alpha }
+    internal enum TransmissionChannels
+    {
+        None = 0,
+        RGB,
+        Alpha,
+    }
 
     internal struct TransmissionDesc
     {
@@ -52,7 +62,11 @@ namespace UnityEngine.PathTracing.Core
             // Otherwise, if the material only has an emissive color, we use that
             if (mat.HasProperty(SID.EmissionColor))
             {
-                return new MaterialPropertyDesc { Type = MaterialPropertyType.Color, Color = ToFloat3(mat.GetColor(SID.EmissionColor)) };
+                return new MaterialPropertyDesc
+                {
+                    Type = MaterialPropertyType.Color,
+                    Color = ToFloat3(mat.GetColor(SID.EmissionColor)),
+                };
             }
 
             // If we found neither property, we assume that the material has an unusual meta pass implementation,
@@ -91,7 +105,8 @@ namespace UnityEngine.PathTracing.Core
         public static TransmissionDesc GetTransmission(Material mat)
         {
             // Full RGB transmission
-            bool hasRGBTransparencyTexture = mat.HasProperty(SID.TransparencyLm) && mat.GetTexture(SID.TransparencyLm) != null;
+            bool hasRGBTransparencyTexture =
+                mat.HasProperty(SID.TransparencyLm) && mat.GetTexture(SID.TransparencyLm) != null;
             if (hasRGBTransparencyTexture)
             {
                 return new TransmissionDesc
@@ -99,13 +114,16 @@ namespace UnityEngine.PathTracing.Core
                     Channels = TransmissionChannels.RGB,
                     SourceTexture = mat.GetTexture(SID.TransparencyLm),
                     Scale = mat.GetTextureScale(SID.TransparencyLm),
-                    Offset = mat.GetTextureOffset(SID.TransparencyLm)
+                    Offset = mat.GetTextureOffset(SID.TransparencyLm),
                 };
             }
 
             // Alpha-only transmission, alpha from main texture (if exists)
-            bool isOnTransparentQueue = mat.renderQueue >= (int)RenderQueue.AlphaTestRenderQueue && mat.renderQueue < (int)RenderQueue.OverlayRenderQueue;
-            bool hasMainTexture = MaterialHasPropertyWithFlag(mat, ShaderPropertyFlags.MainTexture) || mat.HasProperty(SID.MainTex);
+            bool isOnTransparentQueue =
+                mat.renderQueue >= (int)RenderQueue.AlphaTestRenderQueue
+                && mat.renderQueue < (int)RenderQueue.OverlayRenderQueue;
+            bool hasMainTexture =
+                MaterialHasPropertyWithFlag(mat, ShaderPropertyFlags.MainTexture) || mat.HasProperty(SID.MainTex);
             if (isOnTransparentQueue && hasMainTexture)
             {
                 return new TransmissionDesc
@@ -113,7 +131,7 @@ namespace UnityEngine.PathTracing.Core
                     Channels = TransmissionChannels.Alpha,
                     SourceTexture = mat.mainTexture,
                     Scale = mat.mainTextureScale,
-                    Offset = mat.mainTextureOffset
+                    Offset = mat.mainTextureOffset,
                 };
             }
 
@@ -151,14 +169,16 @@ namespace UnityEngine.PathTracing.Core
                         return mat.GetColor(mat.shader.GetPropertyNameId(i)).a;
                     }
                 }
-                
+
                 return 1.0f;
             }
         }
 
         public static bool UsesAlphaCutoff(Material mat)
         {
-            bool alphaTestQueue = mat.renderQueue >= (int)RenderQueue.AlphaTestRenderQueue && mat.renderQueue < (int)RenderQueue.TransparentRenderQueue;
+            bool alphaTestQueue =
+                mat.renderQueue >= (int)RenderQueue.AlphaTestRenderQueue
+                && mat.renderQueue < (int)RenderQueue.TransparentRenderQueue;
             if (!alphaTestQueue)
                 return false;
 

@@ -19,7 +19,11 @@ namespace UnityEditor.Rendering
         /// <param name="mask">The mask identifying the area to check the state</param>
         /// <param name="defaultExpandedState">Default value if is key is not present</param>
         /// <returns>true if the area is expanded</returns>
-        internal static bool IsAreaExpanded(this MaterialEditor editor, uint mask, uint defaultExpandedState = uint.MaxValue)
+        internal static bool IsAreaExpanded(
+            this MaterialEditor editor,
+            uint mask,
+            uint defaultExpandedState = uint.MaxValue
+        )
         {
             string key = editor.GetEditorPrefsKey();
 
@@ -67,7 +71,11 @@ namespace UnityEditor.Rendering
 
         static Rect GetRect(MaterialProperty prop)
         {
-            return EditorGUILayout.GetControlRect(true, MaterialEditor.GetDefaultPropertyHeight(prop), EditorStyles.layerMaskField);
+            return EditorGUILayout.GetControlRect(
+                true,
+                MaterialEditor.GetDefaultPropertyHeight(prop),
+                EditorStyles.layerMaskField
+            );
         }
 
         /// <summary>
@@ -77,7 +85,12 @@ namespace UnityEditor.Rendering
         /// <param name="prop">The MaterialProperty to make a field for</param>
         /// <param name="label">Label for the property</param>
         /// <param name="transform">Optional function to apply on the new value</param>
-        public static void IntShaderProperty(this MaterialEditor editor, MaterialProperty prop, GUIContent label, System.Func<int, int> transform = null)
+        public static void IntShaderProperty(
+            this MaterialEditor editor,
+            MaterialProperty prop,
+            GUIContent label,
+            System.Func<int, int> transform = null
+        )
         {
             MaterialEditor.BeginProperty(prop);
             editor.BeginAnimatedCheck(prop);
@@ -117,7 +130,13 @@ namespace UnityEditor.Rendering
         /// <param name="min">The value at the left end of the slider</param>
         /// <param name="max">The value at the right end of the slider</param>
         /// <param name="label">Label for the property</param>
-        public static void IntSliderShaderProperty(this MaterialEditor editor, MaterialProperty prop, int min, int max, GUIContent label)
+        public static void IntSliderShaderProperty(
+            this MaterialEditor editor,
+            MaterialProperty prop,
+            int min,
+            int max,
+            GUIContent label
+        )
         {
             MaterialEditor.BeginProperty(prop);
             editor.BeginAnimatedCheck(prop);
@@ -143,7 +162,12 @@ namespace UnityEditor.Rendering
         /// <param name="prop">The MaterialProperty to make a field for</param>
         /// <param name="label">Label for the property</param>
         /// <param name="min">The minimum value the user can specify</param>
-        public static void MinFloatShaderProperty(this MaterialEditor editor, MaterialProperty prop, GUIContent label, float min)
+        public static void MinFloatShaderProperty(
+            this MaterialEditor editor,
+            MaterialProperty prop,
+            GUIContent label,
+            float min
+        )
         {
             MaterialEditor.BeginProperty(prop);
             editor.BeginAnimatedCheck(prop);
@@ -190,7 +214,12 @@ namespace UnityEditor.Rendering
         /// <param name="label">Label for the property</param>
         /// <param name="displayedOptions">An array with the options shown in the popup</param>
         /// <returns>The index of the option that has been selected by the user</returns>
-        public static int PopupShaderProperty(this MaterialEditor editor, MaterialProperty prop, GUIContent label, string[] displayedOptions)
+        public static int PopupShaderProperty(
+            this MaterialEditor editor,
+            MaterialProperty prop,
+            GUIContent label,
+            string[] displayedOptions
+        )
         {
             MaterialEditor.BeginProperty(prop);
             editor.BeginAnimatedCheck(prop);
@@ -222,7 +251,13 @@ namespace UnityEditor.Rendering
         /// <param name="displayedOptions">An array with the options shown in the popup</param>
         /// <param name="optionValues">An array with the values for each option</param>
         /// <returns>The value of the option that has been selected by the user</returns>
-        public static int IntPopupShaderProperty(this MaterialEditor editor, MaterialProperty prop, string label, string[] displayedOptions, int[] optionValues)
+        public static int IntPopupShaderProperty(
+            this MaterialEditor editor,
+            MaterialProperty prop,
+            string label,
+            string[] displayedOptions,
+            int[] optionValues
+        )
         {
             MaterialEditor.BeginProperty(prop);
             editor.BeginAnimatedCheck(prop);
@@ -254,7 +289,14 @@ namespace UnityEditor.Rendering
         /// <param name="minLimit">The limit at the left end of the slider</param>
         /// <param name="maxLimit">The limit at the right end of the slider</param>
         /// <param name="label">Label for the property</param>
-        public static void MinMaxShaderProperty(this MaterialEditor editor, MaterialProperty min, MaterialProperty max, float minLimit, float maxLimit, GUIContent label)
+        public static void MinMaxShaderProperty(
+            this MaterialEditor editor,
+            MaterialProperty min,
+            MaterialProperty max,
+            float minLimit,
+            float maxLimit,
+            GUIContent label
+        )
         {
             MaterialEditor.BeginProperty(min);
             MaterialEditor.BeginProperty(max);
@@ -285,7 +327,13 @@ namespace UnityEditor.Rendering
         /// <param name="minLimit">The limit at the left end of the slider</param>
         /// <param name="maxLimit">The limit at the right end of the slider</param>
         /// <param name="label">Label for the property</param>
-        public static void MinMaxShaderProperty(this MaterialEditor editor, MaterialProperty remapProp, float minLimit, float maxLimit, GUIContent label)
+        public static void MinMaxShaderProperty(
+            this MaterialEditor editor,
+            MaterialProperty remapProp,
+            float minLimit,
+            float maxLimit,
+            GUIContent label
+        )
         {
             MaterialEditor.BeginProperty(remapProp);
             editor.BeginAnimatedCheck(remapProp);

@@ -28,6 +28,6 @@ namespace Unity.Netcode
         /// <summary>
         /// A reliable message with guaranteed order with fragmentation support
         /// </summary>
-        ReliableFragmentedSequenced
+        ReliableFragmentedSequenced,
     }
 }

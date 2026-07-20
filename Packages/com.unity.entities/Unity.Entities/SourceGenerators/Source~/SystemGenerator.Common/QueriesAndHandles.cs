@@ -15,17 +15,23 @@ public readonly struct QueriesAndHandles
     public readonly Dictionary<IQueryFieldDescription, string> QueryFieldsToFieldNames;
     public readonly int UniqueId;
 
-    QueriesAndHandles(HashSet<IMemberDescription> typeHandleStructNestedFields, Dictionary<IQueryFieldDescription, string> queryFieldsToFieldNames, SyntaxNode owningType)
+    QueriesAndHandles(
+        HashSet<IMemberDescription> typeHandleStructNestedFields,
+        Dictionary<IQueryFieldDescription, string> queryFieldsToFieldNames,
+        SyntaxNode owningType
+    )
     {
         TypeHandleStructNestedFields = typeHandleStructNestedFields;
         QueryFieldsToFieldNames = queryFieldsToFieldNames;
 
         var systemLineSpan = owningType.GetLocation().GetLineSpan();
-        UniqueId = (systemLineSpan.Span.Start.Line + SourceGenHelpers.GetStableHashCode(Path.GetFileName(systemLineSpan.Path))) & 0x7fffffff;
+        UniqueId =
+            (systemLineSpan.Span.Start.Line + SourceGenHelpers.GetStableHashCode(Path.GetFileName(systemLineSpan.Path)))
+            & 0x7fffffff;
     }
 
-    public static QueriesAndHandles Create(TypeDeclarationSyntax owningType)
-        => new(new HashSet<IMemberDescription>(),new Dictionary<IQueryFieldDescription, string>(), owningType);
+    public static QueriesAndHandles Create(TypeDeclarationSyntax owningType) =>
+        new(new HashSet<IMemberDescription>(), new Dictionary<IQueryFieldDescription, string>(), owningType);
 
     public string GetOrCreateQueryField(IQueryFieldDescription queryFieldDescription, string generatedName = null)
     {
@@ -54,7 +60,12 @@ public readonly struct QueriesAndHandles
         return entityTypeHandleFieldDescription.GeneratedFieldName;
     }
 
-    public string GetOrCreateTypeHandleField(ITypeSymbol typeSymbol, bool isReadOnly, TypeHandleFieldDescription.TypeHandleSource forcedTypeHandleSource = TypeHandleFieldDescription.TypeHandleSource.None)
+    public string GetOrCreateTypeHandleField(
+        ITypeSymbol typeSymbol,
+        bool isReadOnly,
+        TypeHandleFieldDescription.TypeHandleSource forcedTypeHandleSource =
+            TypeHandleFieldDescription.TypeHandleSource.None
+    )
     {
         var typeHandleFieldDescription = new TypeHandleFieldDescription(typeSymbol, isReadOnly, forcedTypeHandleSource);
         TypeHandleStructNestedFields.Add(typeHandleFieldDescription);
@@ -69,6 +80,7 @@ public readonly struct QueriesAndHandles
 
         return lookupField.GeneratedFieldName;
     }
+
     public string GetOrCreateJobEntityHandle(ITypeSymbol typeSymbol, bool assignDefaultQuery)
     {
         var lookupField = new JobEntityQueryAndHandleDescription(typeSymbol, assignDefaultQuery);
@@ -92,7 +104,10 @@ public readonly struct QueriesAndHandles
         return storageLookupField.GeneratedFieldName;
     }
 
-    public static void WriteTypeHandleStructAndAssignQueriesMethod(IndentedTextWriter writer, params QueriesAndHandles[] handleDescriptions)
+    public static void WriteTypeHandleStructAndAssignQueriesMethod(
+        IndentedTextWriter writer,
+        params QueriesAndHandles[] handleDescriptions
+    )
     {
         if (handleDescriptions.Length == 0)
             throw new InvalidOperationException("Didn't pass in any handle Descriptions");
@@ -120,7 +135,9 @@ public readonly struct QueriesAndHandles
         foreach (var memberDescription in nonQueryFields)
             memberDescription.AppendMemberDeclaration(writer, forcePublic: true);
 
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
         writer.WriteLine("public void __AssignHandles(ref global::Unity.Entities.SystemState state)");
         writer.WriteLine("{");
         writer.Indent++;
@@ -132,12 +149,16 @@ public readonly struct QueriesAndHandles
         writer.Indent--;
         writer.WriteLine("}");
 
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
         writer.WriteLine("void __AssignQueries(ref global::Unity.Entities.SystemState state)");
         writer.WriteLine("{");
         writer.Indent++;
 
-        writer.WriteLine("var entityQueryBuilder = new global::Unity.Entities.EntityQueryBuilder(global::Unity.Collections.Allocator.Temp);");
+        writer.WriteLine(
+            "var entityQueryBuilder = new global::Unity.Entities.EntityQueryBuilder(global::Unity.Collections.Allocator.Temp);"
+        );
         foreach (var kvp in allQueryFieldsToGenerate)
             kvp.Key.WriteEntityQueryFieldAssignment(writer, kvp.Value);
 
@@ -155,12 +176,15 @@ public readonly struct QueriesAndHandles
         bool shouldHaveUpdate,
         bool fieldsArePublic,
         Action<IndentedTextWriter> writeAdditionalSyntaxInInternalCompilerQueryAndHandleData,
-        params QueriesAndHandles[] handlesAndQueries)
+        params QueriesAndHandles[] handlesAndQueries
+    )
     {
         if (handlesAndQueries.Length == 0)
             throw new InvalidOperationException("Didn't pass in any handle Descriptions");
 
-        writer.WriteLine("/// <summary> Used internally by the compiler, we won't promise this exists in the future </summary>");
+        writer.WriteLine(
+            "/// <summary> Used internally by the compiler, we won't promise this exists in the future </summary>"
+        );
         writer.WriteLine("public struct InternalCompilerQueryAndHandleData");
         writer.WriteLine("{");
         writer.Indent++;
@@ -189,7 +213,9 @@ public readonly struct QueriesAndHandles
         foreach (var nonQueryField in nonQueryFields)
             nonQueryField.AppendMemberDeclaration(writer, fieldsArePublic);
 
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
         writer.WriteLine("public void __AssignHandles(ref global::Unity.Entities.SystemState state)");
         writer.WriteLine("{");
         writer.Indent++;
@@ -214,12 +240,16 @@ public readonly struct QueriesAndHandles
         writer.Indent--;
         writer.WriteLine("}");
 
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
         writer.WriteLine("void __AssignQueries(ref global::Unity.Entities.SystemState state)");
         writer.WriteLine("{");
         writer.Indent++;
 
-        writer.WriteLine("var entityQueryBuilder = new global::Unity.Entities.EntityQueryBuilder(global::Unity.Collections.Allocator.Temp);");
+        writer.WriteLine(
+            "var entityQueryBuilder = new global::Unity.Entities.EntityQueryBuilder(global::Unity.Collections.Allocator.Temp);"
+        );
         foreach (var kvp in allQueryFieldsToGenerate)
             kvp.Key.WriteEntityQueryFieldAssignment(writer, kvp.Value);
 

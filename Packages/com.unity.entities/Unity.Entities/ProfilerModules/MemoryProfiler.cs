@@ -14,9 +14,14 @@ namespace Unity.Entities
         [BurstCompile]
         unsafe struct MemoryProfilerJob : IJob
         {
-            [ReadOnly] public Guid Guid;
-            [ReadOnly] public ulong WorldSequenceNumber;
-            [ReadOnly] public UnsafePtrList<Archetype> Archetypes;
+            [ReadOnly]
+            public Guid Guid;
+
+            [ReadOnly]
+            public ulong WorldSequenceNumber;
+
+            [ReadOnly]
+            public UnsafePtrList<Archetype> Archetypes;
             public BytesCounter AllocatedBytesCounter;
             public BytesCounter UnusedBytesCounter;
             public UnsafeList<ArchetypeMemoryData> ArchetypeMemoryData;
@@ -120,13 +125,18 @@ namespace Unity.Entities
                 Archetypes = archetypes,
                 AllocatedBytesCounter = AllocatedBytesCounter,
                 UnusedBytesCounter = UnusedBytesCounter,
-                ArchetypeMemoryData = s_ArchetypeMemoryData
+                ArchetypeMemoryData = s_ArchetypeMemoryData,
             }.Run();
         }
 
-        static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list) where T : unmanaged
+        static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list)
+            where T : unmanaged
         {
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list.Ptr, list.Length, Allocator.None);
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                list.Ptr,
+                list.Length,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, AtomicSafetyHandle.GetTempMemoryHandle());
 #endif

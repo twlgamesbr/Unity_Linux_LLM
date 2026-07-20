@@ -7,7 +7,8 @@ namespace UnityEditor.Rendering
     [UxmlElement]
     internal partial class ToggleDropdown : VisualElement
     {
-        const string k_StylesheetPathFormat = "Packages/com.unity.render-pipelines.core/Editor/Controls/ToggleDropdown.uss";
+        const string k_StylesheetPathFormat =
+            "Packages/com.unity.render-pipelines.core/Editor/Controls/ToggleDropdown.uss";
         const string k_MainClass = "toggle-dropdown";
         const string k_ToggleButtonClass = k_MainClass + "__toggle-button";
         const string k_DropdownButtonClass = k_MainClass + "__dropdown-button";
@@ -280,9 +281,14 @@ namespace UnityEditor.Rendering
                 string optionName = m_Options[i];
                 bool isSelected = m_SelectedIndices.Contains(index);
 
-                menu.AddItem(new GUIContent(optionName), isSelected, () => {
-                    ToggleSelection(index);
-                });
+                menu.AddItem(
+                    new GUIContent(optionName),
+                    isSelected,
+                    () =>
+                    {
+                        ToggleSelection(index);
+                    }
+                );
             }
 
             var rect = this.worldBound;

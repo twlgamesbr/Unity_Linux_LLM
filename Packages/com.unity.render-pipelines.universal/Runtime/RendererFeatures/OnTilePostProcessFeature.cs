@@ -16,7 +16,7 @@ public partial class OnTilePostProcessFeature : ScriptableRendererFeature
     /// <summary>
     /// Specifies at which injection point the pass will be rendered.
     /// </summary>
-    RenderPassEvent postProcessingEvent = RenderPassEvent.AfterRenderingPostProcessing-1;
+    RenderPassEvent postProcessingEvent = RenderPassEvent.AfterRenderingPostProcessing - 1;
 
     Material m_OnTilePostProcessMaterial;
     ColorGradingLutPass m_ColorGradingLutPass;
@@ -29,7 +29,8 @@ public partial class OnTilePostProcessFeature : ScriptableRendererFeature
             if (!GraphicsSettings.TryGetRenderPipelineSettings<OnTilePostProcessResource>(out var resources))
             {
                 Debug.LogErrorFormat(
-                    $"Couldn't find the required resources for the {nameof(OnTilePostProcessFeature)} render feature.");
+                    $"Couldn't find the required resources for the {nameof(OnTilePostProcessFeature)} render feature."
+                );
                 return false;
             }
 
@@ -38,13 +39,14 @@ public partial class OnTilePostProcessFeature : ScriptableRendererFeature
             if (uberPostShader == null || !uberPostShader.isSupported)
             {
                 Debug.LogErrorFormat(
-                    $"Couldn't not create a supported shader for {nameof(OnTilePostProcessFeature)} render feature.");
+                    $"Couldn't not create a supported shader for {nameof(OnTilePostProcessFeature)} render feature."
+                );
                 return false;
             }
 
             m_OnTilePostProcessMaterial = new Material(uberPostShader);
         }
-        
+
         return true;
     }
 
@@ -58,16 +60,16 @@ public partial class OnTilePostProcessFeature : ScriptableRendererFeature
 #endif
         }
 
-        if (m_PostProcessData == null)        
-        {            
+        if (m_PostProcessData == null)
+        {
             Debug.LogError($"{nameof(OnTilePostProcessFeature)} does not have a valid postProcessData instance.");
             return;
-        }        
-        
+        }
+
         m_ColorGradingLutPass = new ColorGradingLutPass(RenderPassEvent.BeforeRenderingPrePasses, m_PostProcessData);
         m_OnTilePostProcessPass = new OnTilePostProcessPass(m_PostProcessData);
         // On-tile PP requires memoryless intermediate texture to work. In case intermediate texture is not memoryless, on-tile PP will falls back to off-tile rendering.
-        m_OnTilePostProcessPass.requiresIntermediateTexture = true;       
+        m_OnTilePostProcessPass.requiresIntermediateTexture = true;
 
         supportedRenderingFeatures.supportsHDR = true;
         supportedRenderingFeatures.postProcessing = true;
@@ -85,7 +87,9 @@ public partial class OnTilePostProcessFeature : ScriptableRendererFeature
         var universalRenderer = renderer as UniversalRenderer;
         if (universalRenderer.postProcessEnabled)
         {
-            Debug.LogError("URP renderer(Universal Renderer Data) has post processing enabled, which conflicts with the On-Tile post processing feature. Only one of the post processing should be enabled. On-Tile post processing feature will not be added.");
+            Debug.LogError(
+                "URP renderer(Universal Renderer Data) has post processing enabled, which conflicts with the On-Tile post processing feature. Only one of the post processing should be enabled. On-Tile post processing feature will not be added."
+            );
             return;
         }
 

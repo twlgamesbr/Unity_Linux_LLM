@@ -20,20 +20,23 @@ namespace UnityEngine.InputSystem.XInput
             ////FIXME: layouts should always be available in the editor (mac/win/linux)
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || UNITY_WSA
             InputSystem.RegisterLayout<XInputControllerWindows>(
-                matches: new InputDeviceMatcher().WithInterface("XInput"));
+                matches: new InputDeviceMatcher().WithInterface("XInput")
+            );
 #endif
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             // Legacy support when a user is using the 360Controller driver on macOS <= 10.15
             InputSystem.RegisterLayout<XboxGamepadMacOS>(
-                matches: new InputDeviceMatcher().WithInterface("HID")
-                    .WithProduct("Xbox.*Wired Controller"));
-
+                matches: new InputDeviceMatcher().WithInterface("HID").WithProduct("Xbox.*Wired Controller")
+            );
 
             // Matches macOS native support for Xbox Controllers
             // macOS reports all Xbox controllers as "Controller" with manufacter Microsoft
             InputSystem.RegisterLayout<XboxGamepadMacOSNative>(
-                matches: new InputDeviceMatcher().WithInterface("HID")
-                    .WithProduct("Controller").WithManufacturer("Microsoft"));
+                matches: new InputDeviceMatcher()
+                    .WithInterface("HID")
+                    .WithProduct("Controller")
+                    .WithManufacturer("Microsoft")
+            );
 
             // Matching older Xbox One controllers that have different View and Share buttons than the newer Xbox Series
             // controllers.
@@ -52,16 +55,18 @@ namespace UnityEngine.InputSystem.XInput
             // This layout is for all the other Xbox One or Series controllers that have the same View and Share buttons.
             // Reported in https://issuetracker.unity3d.com/product/unity/issues/guid/ISXB-385
             InputSystem.RegisterLayout<XboxGamepadMacOSWireless>(
-                matches: new InputDeviceMatcher().WithInterface("HID")
-                    .WithProduct("Xbox.*Wireless Controller"));
+                matches: new InputDeviceMatcher().WithInterface("HID").WithProduct("Xbox.*Wireless Controller")
+            );
 
             void RegisterXboxOneWirelessFromProductAndVendorID(int vendorId, int productId)
             {
                 InputSystem.RegisterLayout<XboxOneGampadMacOSWireless>(
-                    matches: new InputDeviceMatcher().WithInterface("HID")
+                    matches: new InputDeviceMatcher()
+                        .WithInterface("HID")
                         .WithProduct("Xbox.*Wireless Controller")
                         .WithCapability("vendorId", vendorId)
-                        .WithCapability("productId", productId));
+                        .WithCapability("productId", productId)
+                );
             }
 
 #endif

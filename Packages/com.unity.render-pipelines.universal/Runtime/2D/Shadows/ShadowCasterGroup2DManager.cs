@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,8 +12,10 @@ namespace UnityEngine.Rendering.Universal
     {
         static List<ShadowCasterGroup2D> s_ShadowCasterGroups = null;
 
-        public static List<ShadowCasterGroup2D> shadowCasterGroups { get { return s_ShadowCasterGroups; } }
-
+        public static List<ShadowCasterGroup2D> shadowCasterGroups
+        {
+            get { return s_ShadowCasterGroups; }
+        }
 
 #if UNITY_EDITOR
         static ShadowCasterGroup2DManager()
@@ -24,10 +25,12 @@ namespace UnityEngine.Rendering.Universal
 
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            if (s_ShadowCasterGroups != null && (state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.ExitingPlayMode))
+            if (
+                s_ShadowCasterGroups != null
+                && (state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.ExitingPlayMode)
+            )
                 s_ShadowCasterGroups.Clear();
         }
-
 #endif
 
         public static void CacheValues()
@@ -57,7 +60,10 @@ namespace UnityEngine.Rendering.Universal
             list.Insert(positionToInsert, shadowCaster);
         }
 
-        public static void RemoveShadowCasterGroupFromList(ShadowCasterGroup2D shadowCaster, List<ShadowCasterGroup2D> list)
+        public static void RemoveShadowCasterGroupFromList(
+            ShadowCasterGroup2D shadowCaster,
+            List<ShadowCasterGroup2D> list
+        )
         {
             list.Remove(shadowCaster);
         }
@@ -79,7 +85,6 @@ namespace UnityEngine.Rendering.Universal
             return retGroup;
         }
 
-
         public static int GetRendereringPriority(ShadowCaster2D shadowCaster)
         {
             int sortingOrder = 0;
@@ -91,9 +96,14 @@ namespace UnityEngine.Rendering.Universal
             return sortingOrder;
         }
 
-        public static bool AddToShadowCasterGroup(ShadowCaster2D shadowCaster, ref ShadowCasterGroup2D shadowCasterGroup, ref int priority)
+        public static bool AddToShadowCasterGroup(
+            ShadowCaster2D shadowCaster,
+            ref ShadowCasterGroup2D shadowCasterGroup,
+            ref int priority
+        )
         {
-            ShadowCasterGroup2D newShadowCasterGroup = FindTopMostCompositeShadowCaster(shadowCaster) as ShadowCasterGroup2D;
+            ShadowCasterGroup2D newShadowCasterGroup =
+                FindTopMostCompositeShadowCaster(shadowCaster) as ShadowCasterGroup2D;
             int newPriority = 0;
             if (newShadowCasterGroup == null)
             {
@@ -112,7 +122,10 @@ namespace UnityEngine.Rendering.Universal
             return false;
         }
 
-        public static void RemoveFromShadowCasterGroup(ShadowCaster2D shadowCaster, ShadowCasterGroup2D shadowCasterGroup)
+        public static void RemoveFromShadowCasterGroup(
+            ShadowCaster2D shadowCaster,
+            ShadowCasterGroup2D shadowCasterGroup
+        )
         {
             if (shadowCasterGroup != null)
                 shadowCasterGroup.UnregisterShadowCaster2D(shadowCaster);

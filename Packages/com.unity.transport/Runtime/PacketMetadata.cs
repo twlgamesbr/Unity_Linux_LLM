@@ -24,23 +24,28 @@ namespace Unity.Networking.Transport
 
         public override string ToString()
         {
-            return string.Format("PacketMetadata(offset: {0}, length: {1}, capacity: {2})", DataOffset, DataLength, DataCapacity);
+            return string.Format(
+                "PacketMetadata(offset: {0}, length: {1}, capacity: {2})",
+                DataOffset,
+                DataLength,
+                DataCapacity
+            );
         }
 
-        public static bool operator==(PacketMetadata lhs, PacketMetadata rhs)
+        public static bool operator ==(PacketMetadata lhs, PacketMetadata rhs)
         {
-            return lhs.DataLength == rhs.DataLength &&
-                lhs.DataOffset == rhs.DataOffset &&
-                lhs.DataCapacity == rhs.DataCapacity &&
-                lhs.Connection == rhs.Connection;
+            return lhs.DataLength == rhs.DataLength
+                && lhs.DataOffset == rhs.DataOffset
+                && lhs.DataCapacity == rhs.DataCapacity
+                && lhs.Connection == rhs.Connection;
         }
 
-        public static bool operator!=(PacketMetadata lhs, PacketMetadata rhs)
+        public static bool operator !=(PacketMetadata lhs, PacketMetadata rhs)
         {
-            return lhs.DataLength != rhs.DataLength ||
-                lhs.DataOffset != rhs.DataOffset ||
-                lhs.DataCapacity != rhs.DataCapacity ||
-                lhs.Connection != rhs.Connection;
+            return lhs.DataLength != rhs.DataLength
+                || lhs.DataOffset != rhs.DataOffset
+                || lhs.DataCapacity != rhs.DataCapacity
+                || lhs.Connection != rhs.Connection;
         }
     }
 }

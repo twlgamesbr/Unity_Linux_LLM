@@ -47,7 +47,12 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the events.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateClick(this EditorWindow window, Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateClick(
+            this EditorWindow window,
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateClick(position, button, modifiers);
         }
@@ -62,7 +67,12 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the events.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateDoubleClick(this EditorWindow window, Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateDoubleClick(
+            this EditorWindow window,
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateDoubleClick(position, button, modifiers);
         }
@@ -77,7 +87,12 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseDownAt(this EditorWindow window, Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateMouseDownAt(
+            this EditorWindow window,
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateMouseDownAt(position, button, modifiers);
         }
@@ -92,7 +107,12 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseUpAt(this EditorWindow window, Vector2 position, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateMouseUpAt(
+            this EditorWindow window,
+            Vector2 position,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateMouseUpAt(position, button, modifiers);
         }
@@ -107,7 +127,12 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="positionTo">The Absolute final position to move the Mouse to.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseMove(this EditorWindow window, Vector2 positionFrom, Vector2 positionTo, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateMouseMove(
+            this EditorWindow window,
+            Vector2 positionFrom,
+            Vector2 positionTo,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateMouseMove(positionFrom, positionTo, modifiers);
         }
@@ -121,7 +146,11 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="position">The Absolute position for the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateMouseMoveTo(this EditorWindow window, Vector2 position, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateMouseMoveTo(
+            this EditorWindow window,
+            Vector2 position,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateMouseMoveTo(position, modifiers);
         }
@@ -138,7 +167,13 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="button">The `MouseButton` for the events.</param>
         /// <param name="modifiers">The `EventModifiers` for the events.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateDragAndDrop(this EditorWindow window, Vector2 positionFrom, Vector2 positionTo, MouseButton button = MouseButton.LeftMouse, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateDragAndDrop(
+            this EditorWindow window,
+            Vector2 positionFrom,
+            Vector2 positionTo,
+            MouseButton button = MouseButton.LeftMouse,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateDragAndDrop(positionFrom, positionTo, button, modifiers);
         }
@@ -184,11 +219,14 @@ namespace UnityEditor.UIElements.TestFramework
         /// <para>For sending Tab, use the SimulateTabKey function.</para>
         /// </remarks>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateKey(this EditorWindow window, KeyCode code, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateKey(
+            this EditorWindow window,
+            KeyCode code,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateKey(code, modifiers);
         }
-
 
         /// <summary>
         /// Sends key events to the window's rootVisualElement's panel to simulate pressing the Return key.
@@ -196,11 +234,13 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="window">`EditorWindow` whose rootVisualElement's panel should receive the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateReturnKey(this EditorWindow window, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateReturnKey(
+            this EditorWindow window,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateReturnKey(modifiers);
         }
-
 
         /// <summary>
         /// Sends key events to the window's rootVisualElement's panel to simulate pressing the KeypadEnter key.
@@ -208,7 +248,10 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="window">`EditorWindow` whose rootVisualElement's panel should receive the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateKeypadEnterKey(this EditorWindow window, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateKeypadEnterKey(
+            this EditorWindow window,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateKeypadEnterKey(modifiers);
         }
@@ -219,7 +262,10 @@ namespace UnityEditor.UIElements.TestFramework
         /// <param name="window">`EditorWindow` whose rootVisualElement's panel should receive the event.</param>
         /// <param name="modifiers">The `EventModifiers` for the event.</param>
         /// <returns>`IEnumerator` iterator.</returns>
-        public static IEnumerator SimulateTabKey(this EditorWindow window, EventModifiers modifiers = EventModifiers.None)
+        public static IEnumerator SimulateTabKey(
+            this EditorWindow window,
+            EventModifiers modifiers = EventModifiers.None
+        )
         {
             yield return window.rootVisualElement.SimulateTabKey(modifiers);
         }

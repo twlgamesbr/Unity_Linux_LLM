@@ -1,12 +1,12 @@
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Entities;
-using Unity.Mathematics;
 using Unity.DebugDisplay;
+using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Transforms;
-using static Unity.Physics.Math;
 using UnityEngine;
+using static Unity.Physics.Math;
 
 namespace Unity.Physics.Authoring
 {
@@ -15,18 +15,30 @@ namespace Unity.Physics.Authoring
     public struct DisplayColliderEdgesJob : IJobParallelFor
     {
         private DebugDraw DebugDraw;
-        [ReadOnly] private NativeArray<RigidBody> RigidBodies;
-        [ReadOnly] private PrimitiveColliderGeometries Geometries;
-        [ReadOnly] private float CollidersEdgesScale;
 
-        internal static JobHandle ScheduleJob(in DebugDraw debugDraw, in NativeArray<RigidBody> rigidBodies, float collidersEdgesScales, in PrimitiveColliderGeometries geometries, JobHandle inputDeps)
+        [ReadOnly]
+        private NativeArray<RigidBody> RigidBodies;
+
+        [ReadOnly]
+        private PrimitiveColliderGeometries Geometries;
+
+        [ReadOnly]
+        private float CollidersEdgesScale;
+
+        internal static JobHandle ScheduleJob(
+            in DebugDraw debugDraw,
+            in NativeArray<RigidBody> rigidBodies,
+            float collidersEdgesScales,
+            in PrimitiveColliderGeometries geometries,
+            JobHandle inputDeps
+        )
         {
             return new DisplayColliderEdgesJob
             {
                 DebugDraw = debugDraw,
                 RigidBodies = rigidBodies,
                 Geometries = geometries,
-                CollidersEdgesScale = collidersEdgesScales
+                CollidersEdgesScale = collidersEdgesScales,
             }.Schedule(rigidBodies.Length, 1, inputDeps);
         }
 
@@ -35,34 +47,79 @@ namespace Unity.Physics.Authoring
             var rigidBody = RigidBodies[i];
             if (rigidBody.Collider.IsCreated)
             {
-                DrawColliderEdges(DebugDraw, rigidBody.Collider, rigidBody.WorldFromBody, rigidBody.Scale * CollidersEdgesScale, ref Geometries);
+                DrawColliderEdges(
+                    DebugDraw,
+                    rigidBody.Collider,
+                    rigidBody.WorldFromBody,
+                    rigidBody.Scale * CollidersEdgesScale,
+                    ref Geometries
+                );
             }
         }
 
-        static unsafe void DrawColliderEdges(DebugDraw debugDraw, BlobAssetReference<Collider> collider, RigidTransform worldFromCollider, float uniformScale, ref PrimitiveColliderGeometries geometries,
-            bool drawVertices = false)
+        static unsafe void DrawColliderEdges(
+            DebugDraw debugDraw,
+            BlobAssetReference<Collider> collider,
+            RigidTransform worldFromCollider,
+            float uniformScale,
+            ref PrimitiveColliderGeometries geometries,
+            bool drawVertices = false
+        )
         {
-            DrawColliderEdges(debugDraw, (Collider*)collider.GetUnsafePtr(), worldFromCollider, uniformScale, ref geometries, drawVertices);
+            DrawColliderEdges(
+                debugDraw,
+                (Collider*)collider.GetUnsafePtr(),
+                worldFromCollider,
+                uniformScale,
+                ref geometries,
+                drawVertices
+            );
         }
 
-        static unsafe void DrawColliderEdges(DebugDraw debugDraw, Collider* collider, RigidTransform worldFromCollider, float uniformScale, ref PrimitiveColliderGeometries geometries, bool drawVertices = false)
+        static unsafe void DrawColliderEdges(
+            DebugDraw debugDraw,
+            Collider* collider,
+            RigidTransform worldFromCollider,
+            float uniformScale,
+            ref PrimitiveColliderGeometries geometries,
+            bool drawVertices = false
+        )
         {
             switch (collider->CollisionType)
             {
                 case CollisionType.Convex:
-                    DrawConvexColliderEdges(debugDraw, (ConvexCollider*)collider, worldFromCollider, uniformScale, ref geometries, drawVertices);
+                    DrawConvexColliderEdges(
+                        debugDraw,
+                        (ConvexCollider*)collider,
+                        worldFromCollider,
+                        uniformScale,
+                        ref geometries,
+                        drawVertices
+                    );
                     break;
                 case CollisionType.Composite:
                     switch (collider->Type)
                     {
                         case ColliderType.Compound:
-                            DrawCompoundColliderEdges(debugDraw, (CompoundCollider*)collider, worldFromCollider, uniformScale, ref geometries, drawVertices);
+                            DrawCompoundColliderEdges(
+                                debugDraw,
+                                (CompoundCollider*)collider,
+                                worldFromCollider,
+                                uniformScale,
+                                ref geometries,
+                                drawVertices
+                            );
                             break;
                         case ColliderType.Mesh:
                             DrawMeshColliderEdges(debugDraw, (MeshCollider*)collider, worldFromCollider, uniformScale);
                             break;
                         case ColliderType.Terrain:
-                            DrawTerrainColliderEdges(debugDraw, (TerrainCollider*)collider, worldFromCollider, uniformScale);
+                            DrawTerrainColliderEdges(
+                                debugDraw,
+                                (TerrainCollider*)collider,
+                                worldFromCollider,
+                                uniformScale
+                            );
                             break;
                     }
 
@@ -73,8 +130,13 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        static void GetDebugDrawEdge(ref ConvexHull hullIn, ConvexHull.Face faceIn, int edgeIndex, out float3 from,
-            out float3 to)
+        static void GetDebugDrawEdge(
+            ref ConvexHull hullIn,
+            ConvexHull.Face faceIn,
+            int edgeIndex,
+            out float3 from,
+            out float3 to
+        )
         {
             byte fromIndex = hullIn.FaceVertexIndices[faceIn.FirstIndex + edgeIndex];
             byte toIndex = hullIn.FaceVertexIndices[faceIn.FirstIndex + (edgeIndex + 1) % faceIn.NumVertices];
@@ -82,7 +144,14 @@ namespace Unity.Physics.Authoring
             to = hullIn.Vertices[toIndex];
         }
 
-        static unsafe void DrawConvexColliderEdges(DebugDraw debugDraw, ConvexCollider* collider, RigidTransform worldFromConvex, float uniformScale, ref PrimitiveColliderGeometries geometries, bool drawVertices = false)
+        static unsafe void DrawConvexColliderEdges(
+            DebugDraw debugDraw,
+            ConvexCollider* collider,
+            RigidTransform worldFromConvex,
+            float uniformScale,
+            ref PrimitiveColliderGeometries geometries,
+            bool drawVertices = false
+        )
         {
             var worldMatrix = math.mul(new float4x4(worldFromConvex), float4x4.Scale(uniformScale));
 
@@ -152,21 +221,47 @@ namespace Unity.Physics.Authoring
                         var axis = vertex1 - vertex0; //axis in wfc-space
                         var colliderOrientation = Quaternion.FromToRotation(Vector3.up, -axis);
                         height = math.length(axis) + 2 * radius;
-                        DrawColliderUtility.DrawPrimitiveCapsuleEdges(debugDraw, radius, height, center, colliderOrientation, worldFromConvex, uniformScale);
+                        DrawColliderUtility.DrawPrimitiveCapsuleEdges(
+                            debugDraw,
+                            radius,
+                            height,
+                            center,
+                            colliderOrientation,
+                            worldFromConvex,
+                            uniformScale
+                        );
                         break;
 
                     case ColliderType.Cylinder:
                         radius = ((CylinderCollider*)collider)->Radius;
                         height = ((CylinderCollider*)collider)->Height;
                         var colliderPosition = ((CylinderCollider*)collider)->Center;
-                        colliderOrientation = ((CylinderCollider*)collider)->Orientation * Quaternion.FromToRotation(Vector3.up, Vector3.back);
-                        DrawColliderUtility.DrawPrimitiveCylinderEdges(debugDraw, radius, height, colliderPosition, colliderOrientation, worldFromConvex, ref geometries.CylinderGeometry, uniformScale);
+                        colliderOrientation =
+                            ((CylinderCollider*)collider)->Orientation
+                            * Quaternion.FromToRotation(Vector3.up, Vector3.back);
+                        DrawColliderUtility.DrawPrimitiveCylinderEdges(
+                            debugDraw,
+                            radius,
+                            height,
+                            colliderPosition,
+                            colliderOrientation,
+                            worldFromConvex,
+                            ref geometries.CylinderGeometry,
+                            uniformScale
+                        );
                         break;
 
                     case ColliderType.Sphere:
                         radius = ((SphereCollider*)collider)->Radius;
                         center = ((SphereCollider*)collider)->Center;
-                        DrawColliderUtility.DrawPrimitiveSphereEdges(debugDraw, radius, center, worldFromConvex, ref geometries.SphereGeometry, uniformScale);
+                        DrawColliderUtility.DrawPrimitiveSphereEdges(
+                            debugDraw,
+                            radius,
+                            center,
+                            worldFromConvex,
+                            ref geometries.SphereGeometry,
+                            uniformScale
+                        );
                         break;
                 }
             }
@@ -177,7 +272,10 @@ namespace Unity.Physics.Authoring
             if (drawVertices && hull.VertexEdges.Length > 0)
             {
                 const int kNumLinesPerVertex = 8;
-                var lineVertices = new NativeArray<float3>(hull.VertexEdges.Length * kNumLinesPerVertex, Allocator.Temp);
+                var lineVertices = new NativeArray<float3>(
+                    hull.VertexEdges.Length * kNumLinesPerVertex,
+                    Allocator.Temp
+                );
                 try
                 {
                     float3* vertexBuffer = stackalloc float3[kNumLinesPerVertex];
@@ -225,7 +323,12 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        static unsafe void DrawMeshColliderEdges(DebugDraw debugDraw, MeshCollider* meshCollider, RigidTransform worldFromCollider, float uniformScale)
+        static unsafe void DrawMeshColliderEdges(
+            DebugDraw debugDraw,
+            MeshCollider* meshCollider,
+            RigidTransform worldFromCollider,
+            float uniformScale
+        )
         {
             ref Mesh mesh = ref meshCollider->Mesh;
 
@@ -253,9 +356,11 @@ namespace Unity.Physics.Authoring
                 for (int sectionIndex = 0; sectionIndex < mesh.Sections.Length; sectionIndex++)
                 {
                     ref Mesh.Section section = ref mesh.Sections[sectionIndex];
-                    for (int primitiveIndex = 0;
-                         primitiveIndex < section.PrimitiveVertexIndices.Length;
-                         primitiveIndex++)
+                    for (
+                        int primitiveIndex = 0;
+                        primitiveIndex < section.PrimitiveVertexIndices.Length;
+                        primitiveIndex++
+                    )
                     {
                         Mesh.PrimitiveVertexIndices vertexIndices = section.PrimitiveVertexIndices[primitiveIndex];
                         Mesh.PrimitiveFlags flags = section.PrimitiveFlags[primitiveIndex];
@@ -332,7 +437,12 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        static unsafe void DrawTerrainColliderEdges(DebugDraw debugDraw, TerrainCollider* terrainCollider, RigidTransform worldFromCollider, float uniformScale)
+        static unsafe void DrawTerrainColliderEdges(
+            DebugDraw debugDraw,
+            TerrainCollider* terrainCollider,
+            RigidTransform worldFromCollider,
+            float uniformScale
+        )
         {
             ref Terrain terrain = ref terrainCollider->Terrain;
 
@@ -359,12 +469,18 @@ namespace Unity.Physics.Authoring
                         int i1 = i + 1;
                         int j0 = j;
                         int j1 = j + 1;
-                        float3 v0 = math.transform(worldMatrix,
-                            new float3(i0, terrain.Heights[i0 + terrain.Size.x * j0], j0) * terrain.Scale);
-                        float3 v1 = math.transform(worldMatrix,
-                            new float3(i1, terrain.Heights[i1 + terrain.Size.x * j0], j0) * terrain.Scale);
-                        float3 v2 = math.transform(worldMatrix,
-                            new float3(i0, terrain.Heights[i0 + terrain.Size.x * j1], j1) * terrain.Scale);
+                        float3 v0 = math.transform(
+                            worldMatrix,
+                            new float3(i0, terrain.Heights[i0 + terrain.Size.x * j0], j0) * terrain.Scale
+                        );
+                        float3 v1 = math.transform(
+                            worldMatrix,
+                            new float3(i1, terrain.Heights[i1 + terrain.Size.x * j0], j0) * terrain.Scale
+                        );
+                        float3 v2 = math.transform(
+                            worldMatrix,
+                            new float3(i0, terrain.Heights[i0 + terrain.Size.x * j1], j1) * terrain.Scale
+                        );
 
                         // edges originating at the lower corner of the cell:
                         // edge 1
@@ -384,8 +500,10 @@ namespace Unity.Physics.Authoring
                         bool maxY = j == numCellsY - 1;
                         if (maxX || maxY)
                         {
-                            float3 v3 = math.transform(worldMatrix,
-                                new float3(i1, terrain.Heights[i1 + terrain.Size.x * j1], j1) * terrain.Scale);
+                            float3 v3 = math.transform(
+                                worldMatrix,
+                                new float3(i1, terrain.Heights[i1 + terrain.Size.x * j1], j1) * terrain.Scale
+                            );
 
                             if (maxY)
                             {
@@ -412,16 +530,28 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        static unsafe void DrawCompoundColliderEdges(DebugDraw debugDraw, CompoundCollider* compoundCollider, RigidTransform worldFromCompound, float uniformScale, ref PrimitiveColliderGeometries geometries,
-            bool drawVertices = false)
+        static unsafe void DrawCompoundColliderEdges(
+            DebugDraw debugDraw,
+            CompoundCollider* compoundCollider,
+            RigidTransform worldFromCompound,
+            float uniformScale,
+            ref PrimitiveColliderGeometries geometries,
+            bool drawVertices = false
+        )
         {
             for (int i = 0; i < compoundCollider->NumChildren; i++)
             {
                 ref CompoundCollider.Child child = ref compoundCollider->Children[i];
 
                 ScaledMTransform mWorldFromCompound = new ScaledMTransform(worldFromCompound, uniformScale);
-                ScaledMTransform mWorldFromChild = ScaledMTransform.Mul(mWorldFromCompound, new MTransform(child.CompoundFromChild));
-                RigidTransform worldFromChild = new RigidTransform(mWorldFromChild.Rotation, mWorldFromChild.Translation);
+                ScaledMTransform mWorldFromChild = ScaledMTransform.Mul(
+                    mWorldFromCompound,
+                    new MTransform(child.CompoundFromChild)
+                );
+                RigidTransform worldFromChild = new RigidTransform(
+                    mWorldFromChild.Rotation,
+                    mWorldFromChild.Translation
+                );
 
                 var childCollider = child.Collider;
                 DrawColliderEdges(debugDraw, childCollider, worldFromChild, uniformScale, ref geometries, drawVertices);
@@ -439,8 +569,10 @@ namespace Unity.Physics.Authoring
 
         public void OnCreate(ref SystemState state)
         {
-            ColliderQuery = state.GetEntityQuery(ComponentType.ReadOnly<PhysicsCollider>(),
-                ComponentType.ReadOnly<LocalToWorld>());
+            ColliderQuery = state.GetEntityQuery(
+                ComponentType.ReadOnly<PhysicsCollider>(),
+                ComponentType.ReadOnly<LocalToWorld>()
+            );
 
             state.RequireForUpdate(ColliderQuery);
             state.RequireForUpdate<PhysicsWorldSingleton>();
@@ -457,7 +589,10 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (!SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay) || debugDisplay.DrawColliderEdges == 0)
+            if (
+                !SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay)
+                || debugDisplay.DrawColliderEdges == 0
+            )
                 return;
 
             if (!SystemAPI.TryGetSingleton(out DebugDraw draw))
@@ -469,8 +604,13 @@ namespace Unity.Physics.Authoring
                 {
                     if (SystemAPI.TryGetSingleton(out PhysicsWorldSingleton physicsWorldSingleton))
                     {
-                        state.Dependency = DisplayColliderEdgesJob.ScheduleJob(draw,
-                            physicsWorldSingleton.PhysicsWorld.Bodies, 1.0f, DefaultGeometries, state.Dependency);
+                        state.Dependency = DisplayColliderEdgesJob.ScheduleJob(
+                            draw,
+                            physicsWorldSingleton.PhysicsWorld.Bodies,
+                            1.0f,
+                            DefaultGeometries,
+                            state.Dependency
+                        );
                     }
                     break;
                 }
@@ -485,7 +625,13 @@ namespace Unity.Physics.Authoring
                         return;
                     }
 
-                    var displayHandle = DisplayColliderEdgesJob.ScheduleJob(draw, rigidBodiesList.AsArray(), 1.0f, DefaultGeometries, state.Dependency);
+                    var displayHandle = DisplayColliderEdgesJob.ScheduleJob(
+                        draw,
+                        rigidBodiesList.AsArray(),
+                        1.0f,
+                        DefaultGeometries,
+                        state.Dependency
+                    );
                     var disposeHandle = rigidBodiesList.Dispose(displayHandle);
 
                     state.Dependency = disposeHandle;
@@ -510,8 +656,10 @@ namespace Unity.Physics.Authoring
 
         public void OnCreate(ref SystemState state)
         {
-            ColliderQuery = state.GetEntityQuery(ComponentType.ReadOnly<PhysicsCollider>(),
-                ComponentType.ReadOnly<LocalToWorld>());
+            ColliderQuery = state.GetEntityQuery(
+                ComponentType.ReadOnly<PhysicsCollider>(),
+                ComponentType.ReadOnly<LocalToWorld>()
+            );
             state.RequireForUpdate<PhysicsDebugDisplayData>();
             state.RequireForUpdate(ColliderQuery);
 
@@ -526,7 +674,10 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (!SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay) || debugDisplay.DrawColliderEdges == 0)
+            if (
+                !SystemAPI.TryGetSingleton(out PhysicsDebugDisplayData debugDisplay)
+                || debugDisplay.DrawColliderEdges == 0
+            )
                 return;
 
             if (!SystemAPI.TryGetSingleton(out DebugDraw draw))
@@ -541,7 +692,13 @@ namespace Unity.Physics.Authoring
                 return;
             }
 
-            var displayHandle = DisplayColliderEdgesJob.ScheduleJob(draw, rigidBodiesList.AsArray(), 1.0f, DefaultGeometries, state.Dependency);
+            var displayHandle = DisplayColliderEdgesJob.ScheduleJob(
+                draw,
+                rigidBodiesList.AsArray(),
+                1.0f,
+                DefaultGeometries,
+                state.Dependency
+            );
             var disposeHandle = rigidBodiesList.Dispose(displayHandle);
 
             state.Dependency = disposeHandle;

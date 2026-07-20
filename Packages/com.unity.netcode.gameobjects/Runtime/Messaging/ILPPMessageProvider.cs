@@ -48,11 +48,13 @@ namespace Unity.Netcode
     {
 #pragma warning disable IDE1006 // disable naming rule violation check
         // This is NOT modified by RuntimeAccessModifiersILPP right now, but is populated by ILPP.
-        internal static readonly List<NetworkMessageManager.MessageWithHandler> __network_message_types = new List<NetworkMessageManager.MessageWithHandler>();
+        internal static readonly List<NetworkMessageManager.MessageWithHandler> __network_message_types =
+            new List<NetworkMessageManager.MessageWithHandler>();
 #pragma warning restore IDE1006 // restore naming rule violation check
 
         // Enable this for integration tests that need no message types defined
         internal static bool IntegrationTestNoMessages;
+
 #if UNITY_EDITOR
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStaticsOnLoad() => IntegrationTestNoMessages = false;
@@ -93,8 +95,8 @@ namespace Unity.Netcode
                 { typeof(TimeSyncMessage), NetworkMessageTypes.TimeSync },
                 { typeof(UnnamedMessage), NetworkMessageTypes.Unnamed },
                 { typeof(SessionOwnerMessage), NetworkMessageTypes.SessionOwner },
-                { typeof(AnticipationCounterSyncPingMessage), NetworkMessageTypes.AnticipationCounterSyncPingMessage},
-                { typeof(AnticipationCounterSyncPongMessage), NetworkMessageTypes.AnticipationCounterSyncPongMessage},
+                { typeof(AnticipationCounterSyncPingMessage), NetworkMessageTypes.AnticipationCounterSyncPingMessage },
+                { typeof(AnticipationCounterSyncPongMessage), NetworkMessageTypes.AnticipationCounterSyncPongMessage },
             };
             return messageTypes;
         }
@@ -110,7 +112,9 @@ namespace Unity.Netcode
             // Assure the allowed types count is the same as our NetworkMessageType enum count
             if (__network_message_types.Count != messageTypeCount)
             {
-                throw new Exception($"Allowed types is not equal to the number of message type indices! Allowed Count: {__network_message_types.Count} | Index Count: {messageTypeCount}");
+                throw new Exception(
+                    $"Allowed types is not equal to the number of message type indices! Allowed Count: {__network_message_types.Count} | Index Count: {messageTypeCount}"
+                );
             }
 
             // Populate with blanks to be replaced later
@@ -127,7 +131,9 @@ namespace Unity.Netcode
             // Assure the type to lookup table count and NetworkMessageType enum count matches (i.e. to catch human error when adding new messages)
             if (messageTypes.Count != messageTypeCount)
             {
-                throw new Exception($"Message type to Message type index count mistmatch! Table Count: {messageTypes.Count} | Index Count: {messageTypeCount}");
+                throw new Exception(
+                    $"Message type to Message type index count mistmatch! Table Count: {messageTypes.Count} | Index Count: {messageTypeCount}"
+                );
             }
 
             // Now order the allowed types list based on the order of the NetworkMessageType enum

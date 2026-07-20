@@ -69,7 +69,6 @@ namespace UnityEngine.Rendering
         /// <inheritdoc cref="IUpscaler.supportsSharpening"/>
         public abstract bool supportsSharpening { get; }
 
-
         /// <inheritdoc cref="IUpscaler.options"/>
         public virtual UpscalerOptions options => null;
 
@@ -77,7 +76,10 @@ namespace UnityEngine.Rendering
         public virtual bool supportsXR => false;
 
         /// <inheritdoc cref="IUpscaler.NegotiatePreUpscaleResolution(ref Vector2Int, Vector2Int)"/>
-        public virtual void NegotiatePreUpscaleResolution(ref Vector2Int preUpscaleResolution, Vector2Int postUpscaleResolution) {}
+        public virtual void NegotiatePreUpscaleResolution(
+            ref Vector2Int preUpscaleResolution,
+            Vector2Int postUpscaleResolution
+        ) { }
 
         /// <inheritdoc cref="IUpscaler.CalculateJitter(int, out Vector2, out bool)" />
         public virtual void CalculateJitter(int frameIndex, out Vector2 jitter, out bool allowScaling)
@@ -127,7 +129,7 @@ namespace UnityEngine.Rendering
             /// <summary>
             /// Motion points from the current frame to the previous frame.
             /// </summary>
-            CurrentFrameToPreviousFrame
+            CurrentFrameToPreviousFrame,
         }
         #endregion
 

@@ -21,18 +21,24 @@ namespace Unity.Entities.Editor
             MatchingCount.text = "0";
 
             ActionButton.AddToClassList(UssClasses.QueryWithEntities.OpenQueryWindowButton);
-            ActionButton.RegisterCallback<MouseDownEvent, QueryWithEntitiesView>((evt, @this) =>
-            {
-                evt.StopPropagation();
-                OpenQueryWindow(@this.m_Data, EntityQueryContentTab.Entities);
-            }, this);
+            ActionButton.RegisterCallback<MouseDownEvent, QueryWithEntitiesView>(
+                (evt, @this) =>
+                {
+                    evt.StopPropagation();
+                    OpenQueryWindow(@this.m_Data, EntityQueryContentTab.Entities);
+                },
+                this
+            );
 
             m_EntitiesContainer = new VisualElement();
             Add(m_EntitiesContainer);
 
             m_SeeAll = new VisualElement();
             m_SeeAll.AddToClassList(UssClasses.QueryWithEntities.SeeAllContainer);
-            var btn = new Button(() => OpenQueryWindow(m_Data, EntityQueryContentTab.Entities)) { text = L10n.Tr("See All...") };
+            var btn = new Button(() => OpenQueryWindow(m_Data, EntityQueryContentTab.Entities))
+            {
+                text = L10n.Tr("See All..."),
+            };
             btn.AddToClassList(UssClasses.QueryWithEntities.SeeAllButton);
             m_SeeAll.Add(btn);
             m_SeeAll.Hide();

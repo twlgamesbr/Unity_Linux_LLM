@@ -6,7 +6,7 @@ namespace Unity.PlatformToolkit.Editor
 {
     internal class ConfigurationAchievement : IAchievement
     {
-       [CreateProperty]
+        [CreateProperty]
         public string Id => m_StoredAchievement.Id;
 
         [CreateProperty]

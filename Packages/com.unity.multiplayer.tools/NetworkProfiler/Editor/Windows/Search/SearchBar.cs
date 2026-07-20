@@ -10,7 +10,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
     {
         const string ToolbarSearchFieldName = "ToolbarSearchField";
         const string SearchAssetPath =
-                "Packages/com.unity.multiplayer.tools/NetworkProfiler/Editor/Windows/Search/search.uxml";
+            "Packages/com.unity.multiplayer.tools/NetworkProfiler/Editor/Windows/Search/search.uxml";
 
         static SearchListFilter Filter => Filters.PartialMatchGameObjectFilter;
 
@@ -20,9 +20,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         readonly ToolbarSearchField m_ToolbarSearchField;
         List<IRowData> m_Entries = new List<IRowData>();
 
-        public SearchBar(
-            Action<IReadOnlyCollection<IRowData>> onSearchResultsChanged,
-            Action onSearchStringCleared)
+        public SearchBar(Action<IReadOnlyCollection<IRowData>> onSearchResultsChanged, Action onSearchStringCleared)
         {
             m_OnSearchResultsChanged = onSearchResultsChanged;
             m_OnSearchStringCleared = onSearchStringCleared;

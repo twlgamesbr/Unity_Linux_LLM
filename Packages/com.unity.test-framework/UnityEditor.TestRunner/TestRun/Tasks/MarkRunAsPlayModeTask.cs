@@ -8,6 +8,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
         {
             RerunAfterResume = true;
         }
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             // This is a workaround to raise the signal that Playmode Launcher is running.

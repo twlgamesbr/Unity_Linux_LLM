@@ -9,19 +9,19 @@ namespace Unity.Networking.Transport.Analytics
     internal enum ConnectionMedium
     {
         /// <summary>For connections on which the medium can't be determined.</summary>
-        Unknown     = 1 << 0,
+        Unknown = 1 << 0,
 
         /// <summary>Connection is established over a loopback interface.</summary>
-        Loopback    = 1 << 1,
+        Loopback = 1 << 1,
 
         /// <summary>Connection is established over a wired network (e.g. Ethernet).</summary>
-        Wired       = 1 << 2,
+        Wired = 1 << 2,
 
         /// <summary>Connection is established over a Wi-Fi network.</summary>
-        Wifi        = 1 << 3,
+        Wifi = 1 << 3,
 
         /// <summary>Connection is established over a cellular network (e.g. 4G, 5G).</summary>
-        Cellular    = 1 << 4,
+        Cellular = 1 << 4,
     }
 
     /// <summary>Utility methods related to <see cref="ConnectionMedium"/>.</summary>

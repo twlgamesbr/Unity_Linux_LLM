@@ -60,10 +60,7 @@ namespace NPCSystem.Monitoring.Datadog
         /// Subscribes to NPCFlowScope.OnScopeComplete to auto-create spans
         /// from flow scopes, eliminating manual dual-instrumentation.
         /// </summary>
-        public static void Initialize(
-            string agentHost = DefaultAgentHost,
-            int tracePort = DefaultTracePort
-        )
+        public static void Initialize(string agentHost = DefaultAgentHost, int tracePort = DefaultTracePort)
         {
             if (_initialized)
                 return;
@@ -76,8 +73,7 @@ namespace NPCSystem.Monitoring.Datadog
 
                 // Seed trace ID from process start ticks for uniqueness
                 _nextTraceId =
-                    (Stopwatch.GetTimestamp() & 0x7FFFFFFFFFFFFFFF)
-                    ^ DateTime.UtcNow.Ticks & 0x7FFFFFFFFFFFFFFF;
+                    (Stopwatch.GetTimestamp() & 0x7FFFFFFFFFFFFFFF) ^ DateTime.UtcNow.Ticks & 0x7FFFFFFFFFFFFFFF;
 
                 _flushTimer = new Timer(
                     async _ =>
@@ -88,13 +84,15 @@ namespace NPCSystem.Monitoring.Datadog
                         }
                         catch (Exception ex)
                         {
-                            NPCFlowLogger.FindOrCreate().Log(
-                                NPCFlowStage.SceneBootstrap,
-                                NPCFlowStatus.Warning,
-                                NPCFlowLogLevel.Warning,
-                                $"[DatadogTracer] Flush error: {ex.Message}",
-                                source: nameof(DatadogTracer)
-                            );
+                            NPCFlowLogger
+                                .FindOrCreate()
+                                .Log(
+                                    NPCFlowStage.SceneBootstrap,
+                                    NPCFlowStatus.Warning,
+                                    NPCFlowLogLevel.Warning,
+                                    $"[DatadogTracer] Flush error: {ex.Message}",
+                                    source: nameof(DatadogTracer)
+                                );
                         }
                     },
                     null,
@@ -108,28 +106,28 @@ namespace NPCSystem.Monitoring.Datadog
                 // for every flow scope completion, eliminating dual-instrumentation.
                 NPCFlowScope.OnScopeComplete += OnFlowScopeComplete;
 
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Success,
-                    NPCFlowLogLevel.Info,
-                    $"[DatadogTracer] Initialized — sending to {agentHost}:{tracePort}",
-                    source: nameof(DatadogTracer),
-                    data: new Dictionary<string, object>
-                    {
-                        ["agentHost"] = agentHost,
-                        ["tracePort"] = tracePort,
-                    }
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Success,
+                        NPCFlowLogLevel.Info,
+                        $"[DatadogTracer] Initialized — sending to {agentHost}:{tracePort}",
+                        source: nameof(DatadogTracer),
+                        data: new Dictionary<string, object> { ["agentHost"] = agentHost, ["tracePort"] = tracePort }
+                    );
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Error,
-                    $"[DatadogTracer] Failed to initialize: {ex.Message}",
-                    source: nameof(DatadogTracer)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"[DatadogTracer] Failed to initialize: {ex.Message}",
+                        source: nameof(DatadogTracer)
+                    );
             }
         }
 
@@ -175,7 +173,8 @@ namespace NPCSystem.Monitoring.Datadog
             // Logger may already be destroyed during scene teardown — skip safely
             try
             {
-                NPCFlowLogger.FindOrCreate()
+                NPCFlowLogger
+                    .FindOrCreate()
                     ?.Log(
                         NPCFlowStage.SceneBootstrap,
                         NPCFlowStatus.Success,
@@ -279,26 +278,30 @@ namespace NPCSystem.Monitoring.Datadog
             if (!_initialized)
                 return;
 
-            string operationName = NPCFlowLogger.StageToCategory(stage).ToString().ToLowerInvariant()
-                + "." + stage.ToString();
+            string operationName =
+                NPCFlowLogger.StageToCategory(stage).ToString().ToLowerInvariant() + "." + stage.ToString();
 
-            using (var span = StartSpan(
-                operationName,
-                resource: string.IsNullOrWhiteSpace(source) ? stage.ToString() : source,
-                tags: new[]
-                {
-                    $"npc_slug:{npcSlug ?? "none"}",
-                    $"request_id:{requestId ?? "none"}",
-                    $"status:{status}",
-                    $"stage:{stage}",
-                }
-            ))
+            using (
+                var span = StartSpan(
+                    operationName,
+                    resource: string.IsNullOrWhiteSpace(source) ? stage.ToString() : source,
+                    tags: new[]
+                    {
+                        $"npc_slug:{npcSlug ?? "none"}",
+                        $"request_id:{requestId ?? "none"}",
+                        $"status:{status}",
+                        $"stage:{stage}",
+                    }
+                )
+            )
             {
                 if (status == NPCFlowStatus.Error)
                 {
-                    span.SetError(data != null && data.TryGetValue("exceptionMessage", out var msg)
-                        ? msg?.ToString()
-                        : $"{stage} failed");
+                    span.SetError(
+                        data != null && data.TryGetValue("exceptionMessage", out var msg)
+                            ? msg?.ToString()
+                            : $"{stage} failed"
+                    );
                 }
 
                 span.SetTag("duration_ms", durationMs.ToString("F0"));
@@ -330,24 +333,24 @@ namespace NPCSystem.Monitoring.Datadog
                 {
                     Content = new ByteArrayContent(data),
                 };
-                request.Content.Headers.ContentType =
-                    new System.Net.Http.Headers.MediaTypeHeaderValue("application/msgpack");
+                request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                    "application/msgpack"
+                );
 
-                var response = _httpClient
-                    .SendAsync(request)
-                    .GetAwaiter()
-                    .GetResult();
+                var response = _httpClient.SendAsync(request).GetAwaiter().GetResult();
                 _ = response.StatusCode; // swallow — we just care it was sent
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Warning,
-                    $"[DatadogTracer] Send error: {ex.Message}",
-                    source: nameof(DatadogTracer)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        $"[DatadogTracer] Send error: {ex.Message}",
+                        source: nameof(DatadogTracer)
+                    );
             }
         }
 
@@ -361,21 +364,24 @@ namespace NPCSystem.Monitoring.Datadog
                 {
                     Content = new ByteArrayContent(data),
                 };
-                request.Content.Headers.ContentType =
-                    new System.Net.Http.Headers.MediaTypeHeaderValue("application/msgpack");
+                request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                    "application/msgpack"
+                );
 
                 var response = await _httpClient.SendAsync(request);
                 _ = response.StatusCode;
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Warning,
-                    $"[DatadogTracer] SendTracesAsync error: {ex.Message}",
-                    source: nameof(DatadogTracer)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        $"[DatadogTracer] SendTracesAsync error: {ex.Message}",
+                        source: nameof(DatadogTracer)
+                    );
             }
         }
 

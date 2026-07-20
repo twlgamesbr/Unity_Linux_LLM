@@ -62,24 +62,32 @@ namespace UnityEngine.Rendering
 
         public void ProcessGameObjectChanges(NativeArray<EntityId> changedRenderers)
         {
-            m_GPUDrivenProcessor.EnableGPUDrivenRenderingAndDispatchRendererData(changedRenderers, m_ProcessGameObjectUpdateBatchCallback);
+            m_GPUDrivenProcessor.EnableGPUDrivenRenderingAndDispatchRendererData(
+                changedRenderers,
+                m_ProcessGameObjectUpdateBatchCallback
+            );
         }
 
         public void ProcessGameObjectTransformChanges(in TransformDispatchData transformChanges)
         {
-            var updateBatch = new MeshRendererUpdateBatch(MeshRendererComponentMask.LocalToWorld,
+            var updateBatch = new MeshRendererUpdateBatch(
+                MeshRendererComponentMask.LocalToWorld,
                 default,
                 MeshRendererUpdateType.NoStructuralChanges,
                 MeshRendererUpdateBatch.LightmapUsage.Unknown,
                 MeshRendererUpdateBatch.BlendProbesUsage.Unknown,
                 useSharedSceneCullingMask: false,
-                1, Allocator.TempJob);
+                1,
+                Allocator.TempJob
+            );
 
-            updateBatch.AddSection(new MeshRendererUpdateSection
-            {
-                instanceIDs = transformChanges.transformedID,
-                localToWorlds = transformChanges.localToWorldMatrices.Reinterpret<float4x4>()
-            });
+            updateBatch.AddSection(
+                new MeshRendererUpdateSection
+                {
+                    instanceIDs = transformChanges.transformedID,
+                    localToWorlds = transformChanges.localToWorldMatrices.Reinterpret<float4x4>(),
+                }
+            );
 
             updateBatch.Validate();
             ProcessUpdateBatch(ref updateBatch);
@@ -87,18 +95,27 @@ namespace UnityEngine.Rendering
             updateBatch.Dispose();
         }
 
-        public void ProcessRendererMaterialAndMeshChanges(NativeArray<EntityId> excludedRenderers,
+        public void ProcessRendererMaterialAndMeshChanges(
+            NativeArray<EntityId> excludedRenderers,
             NativeArray<EntityId> changedMaterials,
             NativeArray<GPUDrivenMaterialData> changedMaterialDatas,
-            NativeArray<EntityId> changedMeshes)
+            NativeArray<EntityId> changedMeshes
+        )
         {
             if (changedMaterials.Length == 0 && changedMeshes.Length == 0)
                 return;
 
             // Update the material/mesh maps and retrieve the IDs of the materials/meshes for which the data actually changed.
             Profiler.BeginSample("GetMaterialsAndMeshesWithChangedData");
-            NativeHashSet<EntityId> materialsWithChangedData = m_CullingBatcher.UpdateMaterialData(changedMaterials, changedMaterialDatas, Allocator.TempJob);
-            NativeHashSet<EntityId> meshesWithChangedData = m_CullingBatcher.UpdateMeshData(changedMeshes, Allocator.TempJob);
+            NativeHashSet<EntityId> materialsWithChangedData = m_CullingBatcher.UpdateMaterialData(
+                changedMaterials,
+                changedMaterialDatas,
+                Allocator.TempJob
+            );
+            NativeHashSet<EntityId> meshesWithChangedData = m_CullingBatcher.UpdateMeshData(
+                changedMeshes,
+                Allocator.TempJob
+            );
             Profiler.EndSample();
 
             if (materialsWithChangedData.Count == 0 && meshesWithChangedData.Count == 0)
@@ -117,10 +134,12 @@ namespace UnityEngine.Rendering
             }
 
             Profiler.BeginSample("FindRenderersFromMaterialsOrMeshes");
-            var (renderersWithChangedMaterials, renderersWithChangeMeshes) = FindRenderersFromMaterialsOrMeshes(sortedExcludedRenderers,
+            var (renderersWithChangedMaterials, renderersWithChangeMeshes) = FindRenderersFromMaterialsOrMeshes(
+                sortedExcludedRenderers,
                 materialsWithChangedData,
                 meshesWithChangedData,
-                Allocator.TempJob);
+                Allocator.TempJob
+            );
             Profiler.EndSample();
 
             materialsWithChangedData.Dispose();
@@ -139,13 +158,29 @@ namespace UnityEngine.Rendering
             var changedMeshesCount = renderersWithChangeMeshes.Length;
             var totalCount = changedMaterialsCount + changedMeshesCount;
 
-            var changedRenderers = new NativeArray<EntityId>(totalCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            NativeArray<EntityId>.Copy(renderersWithChangedMaterials.AsArray(), changedRenderers, changedMaterialsCount);
-            NativeArray<EntityId>.Copy(renderersWithChangeMeshes.AsArray(), changedRenderers.GetSubArray(changedMaterialsCount, changedMeshesCount), changedMeshesCount);
+            var changedRenderers = new NativeArray<EntityId>(
+                totalCount,
+                Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory
+            );
+            NativeArray<EntityId>.Copy(
+                renderersWithChangedMaterials.AsArray(),
+                changedRenderers,
+                changedMaterialsCount
+            );
+            NativeArray<EntityId>.Copy(
+                renderersWithChangeMeshes.AsArray(),
+                changedRenderers.GetSubArray(changedMaterialsCount, changedMeshesCount),
+                changedMeshesCount
+            );
 
-            var changedInstances = new NativeArray<InstanceHandle>(totalCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var changedInstances = new NativeArray<InstanceHandle>(
+                totalCount,
+                Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_InstanceDataSystem.QueryRendererInstances(changedRenderers, changedInstances);
-            
+
             m_CullingBatcher.BuildBatches(changedInstances);
 
             changedRenderers.Dispose();
@@ -155,11 +190,15 @@ namespace UnityEngine.Rendering
             Profiler.EndSample();
         }
 
-        private (NativeList<EntityId> renderersWithMaterials, NativeList<EntityId> renderersWithMeshes)
-            FindRenderersFromMaterialsOrMeshes(NativeArray<EntityId> sortedExcludeRenderers,
-                NativeHashSet<EntityId> materials,
-                NativeHashSet<EntityId> meshes,
-                Allocator rendererListAllocator)
+        private (
+            NativeList<EntityId> renderersWithMaterials,
+            NativeList<EntityId> renderersWithMeshes
+        ) FindRenderersFromMaterialsOrMeshes(
+            NativeArray<EntityId> sortedExcludeRenderers,
+            NativeHashSet<EntityId> materials,
+            NativeHashSet<EntityId> meshes,
+            Allocator rendererListAllocator
+        )
         {
             ref RenderWorld renderWorld = ref m_InstanceDataSystem.renderWorld;
             var renderersWithMaterials = new NativeList<EntityId>(renderWorld.instanceCount, rendererListAllocator);
@@ -172,10 +211,10 @@ namespace UnityEngine.Rendering
                 meshIDs = meshes,
                 sortedExcludeRendererIDs = sortedExcludeRenderers,
                 selectedRenderIDsForMaterials = renderersWithMaterials.AsParallelWriter(),
-                selectedRenderIDsForMeshes = renderersWithMeshes.AsParallelWriter()
+                selectedRenderIDsForMeshes = renderersWithMeshes.AsParallelWriter(),
             }
-            .ScheduleBatch(renderWorld.instanceIDs.Length, FindRenderersFromMaterialOrMeshJob.k_BatchSize)
-            .Complete();
+                .ScheduleBatch(renderWorld.instanceIDs.Length, FindRenderersFromMaterialOrMeshJob.k_BatchSize)
+                .Complete();
 
             return (renderersWithMaterials, renderersWithMeshes);
         }
@@ -188,12 +227,15 @@ namespace UnityEngine.Rendering
             Profiler.BeginSample("ProcessMeshRendererUpdateBatch");
 
             MeshRendererUpdateType updateType = updateBatch.updateType;
-            bool anyInstanceUseBlendProbes = updateBatch.blendProbesUsage != MeshRendererUpdateBatch.BlendProbesUsage.AllDisabled;
+            bool anyInstanceUseBlendProbes =
+                updateBatch.blendProbesUsage != MeshRendererUpdateBatch.BlendProbesUsage.AllDisabled;
             bool updateArchetype = updateType != MeshRendererUpdateType.NoStructuralChanges;
-            bool hasOnlyKnowInstances = updateType == MeshRendererUpdateType.NoStructuralChanges
+            bool hasOnlyKnowInstances =
+                updateType == MeshRendererUpdateType.NoStructuralChanges
                 || updateType == MeshRendererUpdateType.RecreateOnlyKnownInstances;
 
-            const MeshRendererComponentMask UpdateInstanceDataMask = MeshRendererComponentMask.Mesh
+            const MeshRendererComponentMask UpdateInstanceDataMask =
+                MeshRendererComponentMask.Mesh
                 | MeshRendererComponentMask.Material
                 | MeshRendererComponentMask.SubMeshStartIndex
                 | MeshRendererComponentMask.LocalBounds
@@ -206,36 +248,63 @@ namespace UnityEngine.Rendering
                 | MeshRendererComponentMask.SceneCullingMask
                 | MeshRendererComponentMask.RenderingEnabled;
 
-            bool updateInstanceData = updateType != MeshRendererUpdateType.NoStructuralChanges || updateBatch.HasAnyComponent(UpdateInstanceDataMask);
+            bool updateInstanceData =
+                updateType != MeshRendererUpdateType.NoStructuralChanges
+                || updateBatch.HasAnyComponent(UpdateInstanceDataMask);
 
-            const MeshRendererComponentMask UpdateDrawBatchesMask = MeshRendererComponentMask.Mesh
+            const MeshRendererComponentMask UpdateDrawBatchesMask =
+                MeshRendererComponentMask.Mesh
                 | MeshRendererComponentMask.Material
                 | MeshRendererComponentMask.SubMeshStartIndex
                 | MeshRendererComponentMask.RendererSettings
                 | MeshRendererComponentMask.Lightmap
                 | MeshRendererComponentMask.RendererPriority;
 
-            bool updateDrawBatches = updateType != MeshRendererUpdateType.NoStructuralChanges || updateBatch.HasAnyComponent(UpdateDrawBatchesMask);
+            bool updateDrawBatches =
+                updateType != MeshRendererUpdateType.NoStructuralChanges
+                || updateBatch.HasAnyComponent(UpdateDrawBatchesMask);
 
             GPUComponentSet overrideComponentSet = default;
             NativeArray<GPUComponentUploadSource> componentUploadSources = default;
             if (updateBatch.HasAnyComponent(MeshRendererComponentMask.GPUComponent))
-                componentUploadSources = BuildGPUComponentOverrideUploadSources(updateBatch, Allocator.TempJob, out overrideComponentSet);
+                componentUploadSources = BuildGPUComponentOverrideUploadSources(
+                    updateBatch,
+                    Allocator.TempJob,
+                    out overrideComponentSet
+                );
 
             NativeArray<GPUArchetypeHandle> archetypes = default;
             if (updateArchetype)
                 archetypes = ComputeInstanceGPUArchetypes(ref updateBatch, overrideComponentSet, Allocator.TempJob);
 
-            var instances = new NativeArray<InstanceHandle>(updateBatch.TotalLength, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var instances = new NativeArray<InstanceHandle>(
+                updateBatch.TotalLength,
+                Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory
+            );
             if (updateType == MeshRendererUpdateType.OnlyNewInstances)
             {
-                m_InstanceDataSystem.AllocateNewInstances(updateBatch.instanceIDs, instances, archetypes, instances.Length);
+                m_InstanceDataSystem.AllocateNewInstances(
+                    updateBatch.instanceIDs,
+                    instances,
+                    archetypes,
+                    instances.Length
+                );
             }
             else if (updateType == MeshRendererUpdateType.MightIncludeNewInstances)
             {
                 int newInstanceCount = 0;
-                m_InstanceDataSystem.QueryRendererInstances(updateBatch.instanceIDs, instances, new UnsafeAtomicCounter32(&newInstanceCount));
-                m_InstanceDataSystem.AllocOrGPUReallocInstances(updateBatch.instanceIDs, instances, archetypes, newInstanceCount);
+                m_InstanceDataSystem.QueryRendererInstances(
+                    updateBatch.instanceIDs,
+                    instances,
+                    new UnsafeAtomicCounter32(&newInstanceCount)
+                );
+                m_InstanceDataSystem.AllocOrGPUReallocInstances(
+                    updateBatch.instanceIDs,
+                    instances,
+                    archetypes,
+                    newInstanceCount
+                );
             }
             else if (hasOnlyKnowInstances)
             {
@@ -260,15 +329,26 @@ namespace UnityEngine.Rendering
             if (hasOnlyKnowInstances)
             {
                 if (updateBatch.HasAnyComponent(MeshRendererComponentMask.LocalToWorld))
-                    m_InstanceDataSystem.UpdateInstanceTransforms(instances, updateBatch.localToWorlds, anyInstanceUseBlendProbes);
+                    m_InstanceDataSystem.UpdateInstanceTransforms(
+                        instances,
+                        updateBatch.localToWorlds,
+                        anyInstanceUseBlendProbes
+                    );
             }
             else
             {
-                JaggedSpan<float4x4> prevLocalToWorlds = updateBatch.HasAnyComponent(MeshRendererComponentMask.PrevLocalToWorld)
+                JaggedSpan<float4x4> prevLocalToWorlds = updateBatch.HasAnyComponent(
+                    MeshRendererComponentMask.PrevLocalToWorld
+                )
                     ? updateBatch.prevLocalToWorlds
                     : updateBatch.localToWorlds;
 
-                m_InstanceDataSystem.InitializeInstanceTransforms(instances, updateBatch.localToWorlds, prevLocalToWorlds, anyInstanceUseBlendProbes);
+                m_InstanceDataSystem.InitializeInstanceTransforms(
+                    instances,
+                    updateBatch.localToWorlds,
+                    prevLocalToWorlds,
+                    anyInstanceUseBlendProbes
+                );
             }
 
             if (updateDrawBatches)
@@ -280,34 +360,46 @@ namespace UnityEngine.Rendering
             Profiler.EndSample();
         }
 
-        unsafe NativeArray<GPUArchetypeHandle> ComputeInstanceGPUArchetypes(ref MeshRendererUpdateBatch updateBatch, GPUComponentSet overrideComponentSet, Allocator allocator)
+        unsafe NativeArray<GPUArchetypeHandle> ComputeInstanceGPUArchetypes(
+            ref MeshRendererUpdateBatch updateBatch,
+            GPUComponentSet overrideComponentSet,
+            Allocator allocator
+        )
         {
             using (new ProfilerMarker("ComputeInstanceGPUArchetypes").Auto())
             {
-                bool useSharedGPUArchetype = updateBatch.blendProbesUsage != MeshRendererUpdateBatch.BlendProbesUsage.Unknown
+                bool useSharedGPUArchetype =
+                    updateBatch.blendProbesUsage != MeshRendererUpdateBatch.BlendProbesUsage.Unknown
                     && updateBatch.lightmapUsage != MeshRendererUpdateBatch.LightmapUsage.Unknown
                     && !updateBatch.mightIncludeTrees;
 
                 int archetypeCount = useSharedGPUArchetype ? 1 : updateBatch.TotalLength;
-                NativeArray<GPUArchetypeHandle> archetypes = new NativeArray<GPUArchetypeHandle>(archetypeCount, allocator);
+                NativeArray<GPUArchetypeHandle> archetypes = new NativeArray<GPUArchetypeHandle>(
+                    archetypeCount,
+                    allocator
+                );
 
                 fixed (MeshRendererUpdateBatch* updateBatchPtr = &updateBatch)
                 {
-                    MeshRendererProcessorBurst.ComputeInstanceGPUArchetypes(m_ArchetypeManager,
+                    MeshRendererProcessorBurst.ComputeInstanceGPUArchetypes(
+                        m_ArchetypeManager,
                         m_InstanceDataSystem.defaultGPUComponents,
                         updateBatchPtr,
                         overrideComponentSet,
                         useSharedGPUArchetype,
-                        ref archetypes);
+                        ref archetypes
+                    );
                 }
 
                 return archetypes;
             }
         }
 
-        unsafe NativeArray<GPUComponentUploadSource> BuildGPUComponentOverrideUploadSources(in MeshRendererUpdateBatch updateBatch,
+        unsafe NativeArray<GPUComponentUploadSource> BuildGPUComponentOverrideUploadSources(
+            in MeshRendererUpdateBatch updateBatch,
             Allocator allocator,
-            out GPUComponentSet overrideComponentSet)
+            out GPUComponentSet overrideComponentSet
+        )
         {
             NativeArray<GPUComponentJaggedUpdate> componentUpdates = updateBatch.gpuComponentUpdates;
             if (componentUpdates.Length == 0)
@@ -318,24 +410,40 @@ namespace UnityEngine.Rendering
 
             using (new ProfilerMarker("BuildGPUComponentOverrideUploadSources").Auto())
             {
-                NativeArray<GPUComponentUploadSource> uploadSources = new NativeArray<GPUComponentUploadSource>(componentUpdates.Length, allocator);
+                NativeArray<GPUComponentUploadSource> uploadSources = new NativeArray<GPUComponentUploadSource>(
+                    componentUpdates.Length,
+                    allocator
+                );
                 GPUComponentSet componentSet = default;
 
-                MeshRendererProcessorBurst.BuildGPUComponentOverrideUploadSources(m_ArchetypeManager, componentUpdates, ref uploadSources, &componentSet);
+                MeshRendererProcessorBurst.BuildGPUComponentOverrideUploadSources(
+                    m_ArchetypeManager,
+                    componentUpdates,
+                    ref uploadSources,
+                    &componentSet
+                );
 
                 overrideComponentSet = componentSet;
                 return uploadSources;
             }
         }
 
-        void UploadGPUComponentOverrides(GPUComponentSet componentSet, NativeArray<GPUComponentUploadSource> uploadSources, NativeArray<InstanceHandle> instances)
+        void UploadGPUComponentOverrides(
+            GPUComponentSet componentSet,
+            NativeArray<GPUComponentUploadSource> uploadSources,
+            NativeArray<InstanceHandle> instances
+        )
         {
             Assert.IsTrue(!componentSet.isEmpty);
             Assert.IsTrue(uploadSources.Length > 0);
 
             Profiler.BeginSample("UploadGPUComponentOverrides");
 
-            GPUInstanceUploadData uploadData = m_InstanceDataSystem.CreateInstanceUploadData(componentSet, instances.Length, Allocator.TempJob);
+            GPUInstanceUploadData uploadData = m_InstanceDataSystem.CreateInstanceUploadData(
+                componentSet,
+                instances.Length,
+                Allocator.TempJob
+            );
 
             EnsureUploadBufferUintCount(uploadData.uploadDataUIntSize);
 
@@ -346,7 +454,12 @@ namespace UnityEngine.Rendering
             for (int i = 0; i < uploadSources.Length; i++)
             {
                 ref readonly GPUComponentUploadSource source = ref uploadSources.ElementAt(i);
-                JobHandle jobHandle = uploadData.ScheduleWriteComponentsJob(source.data, source.component, source.componentSize, writeBuffer);
+                JobHandle jobHandle = uploadData.ScheduleWriteComponentsJob(
+                    source.data,
+                    source.component,
+                    source.componentSize,
+                    writeBuffer
+                );
                 allWritesJobHandle = JobHandle.CombineDependencies(jobHandle, allWritesJobHandle);
             }
 
@@ -398,14 +511,21 @@ namespace UnityEngine.Rendering
                 return;
 
             var gpuComponents = new NativeArray<GPUComponent>(2, Allocator.Temp);
-            gpuComponents[0] = new GPUComponent(DefaultShaderPropertyID.unity_LightmapST, UnsafeUtility.SizeOf<Vector4>());
-            gpuComponents[1] = new GPUComponent(DefaultShaderPropertyID.unity_RendererUserValuesPropertyEntry, UnsafeUtility.SizeOf<uint>());
+            gpuComponents[0] = new GPUComponent(
+                DefaultShaderPropertyID.unity_LightmapST,
+                UnsafeUtility.SizeOf<Vector4>()
+            );
+            gpuComponents[1] = new GPUComponent(
+                DefaultShaderPropertyID.unity_RendererUserValuesPropertyEntry,
+                UnsafeUtility.SizeOf<uint>()
+            );
 
             var gpuComponentUpdates = new NativeArray<GPUComponentUpdate>(2, Allocator.Temp);
             gpuComponentUpdates[0] = GPUComponentUpdate.FromArray(gpuComponents[0], rendererData.lightmapScaleOffset);
             gpuComponentUpdates[1] = GPUComponentUpdate.FromArray(gpuComponents[1], rendererData.rendererUserValues);
 
-            const MeshRendererComponentMask UpdateMask = MeshRendererComponentMask.LocalToWorld
+            const MeshRendererComponentMask UpdateMask =
+                MeshRendererComponentMask.LocalToWorld
                 | MeshRendererComponentMask.PrevLocalToWorld
                 | MeshRendererComponentMask.Mesh
                 | MeshRendererComponentMask.Material
@@ -420,35 +540,40 @@ namespace UnityEngine.Rendering
                 | MeshRendererComponentMask.GPUComponent
                 | MeshRendererComponentMask.SceneCullingMask;
 
-            var updateBatch = new MeshRendererUpdateBatch(UpdateMask,
+            var updateBatch = new MeshRendererUpdateBatch(
+                UpdateMask,
                 gpuComponents,
                 MeshRendererUpdateType.MightIncludeNewInstances,
                 MeshRendererUpdateBatch.LightmapUsage.Unknown,
                 MeshRendererUpdateBatch.BlendProbesUsage.Unknown,
                 useSharedSceneCullingMask: false,
-                1, Allocator.TempJob);
+                1,
+                Allocator.TempJob
+            );
 
             updateBatch.mightIncludeTrees = true;
 
-            updateBatch.AddSection(new MeshRendererUpdateSection
-            {
-                instanceIDs = rendererData.renderer,
-                localToWorlds = rendererData.localToWorldMatrix.Reinterpret<float4x4>(),
-                prevLocalToWorlds = rendererData.prevLocalToWorldMatrix.Reinterpret<float4x4>(),
-                meshIDs = rendererData.mesh,
-                materialIDs = rendererData.material,
-                subMaterialRanges = rendererData.subMaterialRange,
-                subMeshStartIndices = rendererData.subMeshStartIndex,
-                localBounds = rendererData.localBounds.Reinterpret<AABB>(),
-                rendererSettings = rendererData.rendererSettings,
-                parentLODGroupIDs = rendererData.lodGroup,
-                lodMasks = rendererData.lodMask,
-                meshLodSettings = rendererData.meshLodSettings,
-                lightmapIndices = rendererData.lightmapIndex,
-                rendererPriorities = rendererData.rendererPriority,
-                sceneCullingMasks = rendererData.sceneCullingMask,
-                gpuComponentUpdates = gpuComponentUpdates,
-            });
+            updateBatch.AddSection(
+                new MeshRendererUpdateSection
+                {
+                    instanceIDs = rendererData.renderer,
+                    localToWorlds = rendererData.localToWorldMatrix.Reinterpret<float4x4>(),
+                    prevLocalToWorlds = rendererData.prevLocalToWorldMatrix.Reinterpret<float4x4>(),
+                    meshIDs = rendererData.mesh,
+                    materialIDs = rendererData.material,
+                    subMaterialRanges = rendererData.subMaterialRange,
+                    subMeshStartIndices = rendererData.subMeshStartIndex,
+                    localBounds = rendererData.localBounds.Reinterpret<AABB>(),
+                    rendererSettings = rendererData.rendererSettings,
+                    parentLODGroupIDs = rendererData.lodGroup,
+                    lodMasks = rendererData.lodMask,
+                    meshLodSettings = rendererData.meshLodSettings,
+                    lightmapIndices = rendererData.lightmapIndex,
+                    rendererPriorities = rendererData.rendererPriority,
+                    sceneCullingMasks = rendererData.sceneCullingMask,
+                    gpuComponentUpdates = gpuComponentUpdates,
+                }
+            );
 
             updateBatch.Validate();
             ProcessUpdateBatch(ref updateBatch);
@@ -456,9 +581,11 @@ namespace UnityEngine.Rendering
             updateBatch.Dispose();
         }
 
-        internal static GPUComponentSet ComputeComponentSet(in DefaultGPUComponents defaultGPUComponents,
+        internal static GPUComponentSet ComputeComponentSet(
+            in DefaultGPUComponents defaultGPUComponents,
             MeshRendererUpdateBatch.LightmapUsage lightmapUsage,
-            MeshRendererUpdateBatch.BlendProbesUsage blendProbesUsage)
+            MeshRendererUpdateBatch.BlendProbesUsage blendProbesUsage
+        )
         {
             Assert.IsTrue(lightmapUsage != MeshRendererUpdateBatch.LightmapUsage.Unknown);
             Assert.IsTrue(blendProbesUsage != MeshRendererUpdateBatch.BlendProbesUsage.Unknown);
@@ -467,27 +594,28 @@ namespace UnityEngine.Rendering
             bool blendProbes = blendProbesUsage == MeshRendererUpdateBatch.BlendProbesUsage.AllEnabled;
             bool hasTree = false;
 
-            return ComputeComponentSet(defaultGPUComponents,
-                useLightmaps,
-                blendProbes,
-                hasTree);
+            return ComputeComponentSet(defaultGPUComponents, useLightmaps, blendProbes, hasTree);
         }
 
-        internal static GPUComponentSet ComputeComponentSet(in DefaultGPUComponents defaultGPUComponents,
+        internal static GPUComponentSet ComputeComponentSet(
+            in DefaultGPUComponents defaultGPUComponents,
             InternalMeshRendererSettings rendererSettings,
-            int lightmapIndex)
+            int lightmapIndex
+        )
         {
             bool useLightmaps = LightmapUtils.UsesLightmaps(lightmapIndex);
             bool blendProbes = rendererSettings.LightProbeUsage == LightProbeUsage.BlendProbes;
             bool hasTree = rendererSettings.HasTree;
 
-            return ComputeComponentSet(defaultGPUComponents,
-                useLightmaps,
-                blendProbes,
-                hasTree);
+            return ComputeComponentSet(defaultGPUComponents, useLightmaps, blendProbes, hasTree);
         }
 
-        internal static GPUComponentSet ComputeComponentSet(in DefaultGPUComponents defaultGPUComponents, bool useLightmaps, bool blendProbes, bool hasTree)
+        internal static GPUComponentSet ComputeComponentSet(
+            in DefaultGPUComponents defaultGPUComponents,
+            bool useLightmaps,
+            bool blendProbes,
+            bool hasTree
+        )
         {
             GPUComponentSet componentSet = defaultGPUComponents.requiredComponentSet;
 
@@ -519,26 +647,39 @@ namespace UnityEngine.Rendering
             using (new ProfilerMarker("DeepValidation.NoInstanceUsesBlendProbes").Auto())
             {
                 if (AnyInstanceUseBlendProbes(instances))
-                    Debug.LogError("One instance has LightProbeUsage == LightProbeUsage.BlendProbes whereas it wasn't expected.");
+                    Debug.LogError(
+                        "One instance has LightProbeUsage == LightProbeUsage.BlendProbes whereas it wasn't expected."
+                    );
             }
 
 #pragma warning restore CS0162
         }
 
-        bool AnyInstanceUseBlendProbes(NativeArray<InstanceHandle> instances) => MeshRendererProcessorBurst.AnyInstanceUseBlendProbes(instances, ref m_InstanceDataSystem.renderWorld);
+        bool AnyInstanceUseBlendProbes(NativeArray<InstanceHandle> instances) =>
+            MeshRendererProcessorBurst.AnyInstanceUseBlendProbes(instances, ref m_InstanceDataSystem.renderWorld);
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
         private unsafe struct FindRenderersFromMaterialOrMeshJob : IJobParallelForBatch
         {
             public const int k_BatchSize = 128;
 
-            [ReadOnly] public RenderWorld renderWorld;
-            [ReadOnly] public NativeHashSet<EntityId> materialIDs;
-            [ReadOnly] public NativeHashSet<EntityId> meshIDs;
-            [ReadOnly] public NativeArray<EntityId> sortedExcludeRendererIDs;
+            [ReadOnly]
+            public RenderWorld renderWorld;
 
-            [WriteOnly] public NativeList<EntityId>.ParallelWriter selectedRenderIDsForMaterials;
-            [WriteOnly] public NativeList<EntityId>.ParallelWriter selectedRenderIDsForMeshes;
+            [ReadOnly]
+            public NativeHashSet<EntityId> materialIDs;
+
+            [ReadOnly]
+            public NativeHashSet<EntityId> meshIDs;
+
+            [ReadOnly]
+            public NativeArray<EntityId> sortedExcludeRendererIDs;
+
+            [WriteOnly]
+            public NativeList<EntityId>.ParallelWriter selectedRenderIDsForMaterials;
+
+            [WriteOnly]
+            public NativeList<EntityId>.ParallelWriter selectedRenderIDsForMeshes;
 
             public void Execute(int startIndex, int count)
             {
@@ -580,14 +721,19 @@ namespace UnityEngine.Rendering
                     }
                 }
 
-                selectedRenderIDsForMaterials.AddRangeNoResize(renderersToAddForMaterialsPtr, renderersToAddForMaterials.Length);
+                selectedRenderIDsForMaterials.AddRangeNoResize(
+                    renderersToAddForMaterialsPtr,
+                    renderersToAddForMaterials.Length
+                );
                 selectedRenderIDsForMeshes.AddRangeNoResize(renderersToAddForMeshesPtr, renderersToAddForMeshes.Length);
             }
         }
 
-        void ValidateGPUArchetypesDidNotChange(NativeArray<InstanceHandle> instances,
-           in MeshRendererUpdateBatch updateBatch,
-           GPUComponentSet overrideComponentSet)
+        void ValidateGPUArchetypesDidNotChange(
+            NativeArray<InstanceHandle> instances,
+            in MeshRendererUpdateBatch updateBatch,
+            GPUComponentSet overrideComponentSet
+        )
         {
             // Disable "Unreachable code detected" warning
 #pragma warning disable CS0162
@@ -596,9 +742,11 @@ namespace UnityEngine.Rendering
 
             using (new ProfilerMarker("DeepValidation.GPUArchetypesDidNotChange").Auto())
             {
-                bool archetypeMightHaveChanged = updateBatch.HasAnyComponent(MeshRendererComponentMask.RendererSettings
-                    | MeshRendererComponentMask.Lightmap
-                    | MeshRendererComponentMask.GPUComponent);
+                bool archetypeMightHaveChanged = updateBatch.HasAnyComponent(
+                    MeshRendererComponentMask.RendererSettings
+                        | MeshRendererComponentMask.Lightmap
+                        | MeshRendererComponentMask.GPUComponent
+                );
 
                 if (!archetypeMightHaveChanged)
                     return;
@@ -610,16 +758,22 @@ namespace UnityEngine.Rendering
 #pragma warning restore CS0162
         }
 
-        unsafe bool DidGPUArchetypesChange(NativeArray<InstanceHandle> instances, in MeshRendererUpdateBatch updateBatch, GPUComponentSet overrideComponentSet)
+        unsafe bool DidGPUArchetypesChange(
+            NativeArray<InstanceHandle> instances,
+            in MeshRendererUpdateBatch updateBatch,
+            GPUComponentSet overrideComponentSet
+        )
         {
             fixed (MeshRendererUpdateBatch* updateBatchPtr = &updateBatch)
             {
-                return MeshRendererProcessorBurst.DidGPUArchetypeChange(m_ArchetypeManager,
+                return MeshRendererProcessorBurst.DidGPUArchetypeChange(
+                    m_ArchetypeManager,
                     m_InstanceDataSystem.defaultGPUComponents,
                     instances,
                     updateBatchPtr,
                     ref m_InstanceDataSystem.renderWorld,
-                    overrideComponentSet);
+                    overrideComponentSet
+                );
             }
         }
     }

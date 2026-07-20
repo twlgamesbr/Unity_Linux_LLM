@@ -24,8 +24,10 @@ namespace UnityEngine.InputSystem.Editor
             }
         }
 
-        public static IEnumerable<SerializedProperty> Where(this SerializedProperty property,
-            Func<SerializedProperty, bool> predicate)
+        public static IEnumerable<SerializedProperty> Where(
+            this SerializedProperty property,
+            Func<SerializedProperty, bool> predicate
+        )
         {
             if (property == null)
                 throw new ArgumentNullException(nameof(property));
@@ -44,7 +46,10 @@ namespace UnityEngine.InputSystem.Editor
             }
         }
 
-        public static SerializedProperty FindLast(this SerializedProperty property, Func<SerializedProperty, bool> predicate)
+        public static SerializedProperty FindLast(
+            this SerializedProperty property,
+            Func<SerializedProperty, bool> predicate
+        )
         {
             Debug.Assert(predicate != null, "Missing predicate for FindLast function.");
             Debug.Assert(property != null, "SerializedProperty missing for FindLast function.");
@@ -72,8 +77,10 @@ namespace UnityEngine.InputSystem.Editor
             return property.GetArrayElementAtIndex(0);
         }
 
-        public static SerializedProperty FirstOrDefault(this SerializedProperty property,
-            Func<SerializedProperty, bool> predicate)
+        public static SerializedProperty FirstOrDefault(
+            this SerializedProperty property,
+            Func<SerializedProperty, bool> predicate
+        )
         {
             if (property == null)
                 throw new ArgumentNullException(nameof(property));

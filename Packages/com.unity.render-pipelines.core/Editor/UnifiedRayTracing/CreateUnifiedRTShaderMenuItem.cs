@@ -1,18 +1,25 @@
 using System.IO;
-using UnityEngine;
 using UnityEditor.ProjectWindowCallback;
+using UnityEngine;
 
 namespace UnityEditor.Rendering.UnifiedRayTracing
 {
     internal class ShaderTemplates
     {
-        internal static readonly Texture2D shaderIcon = EditorGUIUtility.IconContent("d_TextAsset Icon").image as Texture2D;
+        internal static readonly Texture2D shaderIcon =
+            EditorGUIUtility.IconContent("d_TextAsset Icon").image as Texture2D;
 
         [MenuItem("Assets/Create/Shader/Unified Ray Tracing Shader", false, 1)]
         internal static void CreateNewUnifiedRayTracingShader()
         {
             var action = ScriptableObject.CreateInstance<DoCreateUnifiedRayTracingShader>();
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None, action, "NewUnifiedRayTracingShader.urtshader", shaderIcon, null);
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
+                EntityId.None,
+                action,
+                "NewUnifiedRayTracingShader.urtshader",
+                shaderIcon,
+                null
+            );
         }
 
         internal class DoCreateUnifiedRayTracingShader : AssetCreationEndAction
@@ -29,8 +36,8 @@ namespace UnityEditor.Rendering.UnifiedRayTracing
             }
         }
 
-const string shaderContent =
-@"#include ""Packages/com.unity.render-pipelines.core/Runtime/UnifiedRayTracing/TraceRayAndQueryHit.hlsl""
+        const string shaderContent =
+            @"#include ""Packages/com.unity.render-pipelines.core/Runtime/UnifiedRayTracing/TraceRayAndQueryHit.hlsl""
 
 UNIFIED_RT_DECLARE_ACCEL_STRUCT(_AccelStruct);
 
@@ -53,5 +60,3 @@ void RayGenExecute(UnifiedRT::DispatchInfo dispatchInfo)
 ";
     }
 }
-
-

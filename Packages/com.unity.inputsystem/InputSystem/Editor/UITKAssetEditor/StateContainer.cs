@@ -60,10 +60,13 @@ namespace UnityEngine.InputSystem.Editor
             m_RootVisualElement = rootVisualElement;
 
             m_RootVisualElement.Unbind();
-            m_RootVisualElement.TrackSerializedObjectValue(m_State.serializedObject, so =>
-            {
-                StateChanged?.Invoke(m_State, UIRebuildMode.Rebuild);
-            });
+            m_RootVisualElement.TrackSerializedObjectValue(
+                m_State.serializedObject,
+                so =>
+                {
+                    StateChanged?.Invoke(m_State, UIRebuildMode.Rebuild);
+                }
+            );
             StateChanged?.Invoke(m_State, UIRebuildMode.Rebuild);
             rootVisualElement.Bind(m_State.serializedObject);
         }
@@ -81,22 +84,28 @@ namespace UnityEngine.InputSystem.Editor
             return m_State;
         }
 
-        public void Bind<TValue>(Expression<Func<InputActionsEditorState, ReactiveProperty<TValue>>> expr,
-            Action<InputActionsEditorState> propertyChangedCallback)
+        public void Bind<TValue>(
+            Expression<Func<InputActionsEditorState, ReactiveProperty<TValue>>> expr,
+            Action<InputActionsEditorState> propertyChangedCallback
+        )
         {
             WhenChanged(expr, propertyChangedCallback);
             propertyChangedCallback(m_State);
         }
 
-        public void Bind(Expression<Func<InputActionsEditorState, SerializedProperty>> expr,
-            Action<SerializedProperty> serializedPropertyChangedCallback)
+        public void Bind(
+            Expression<Func<InputActionsEditorState, SerializedProperty>> expr,
+            Action<SerializedProperty> serializedPropertyChangedCallback
+        )
         {
             var propertyGetterFunc = WhenChanged(expr, serializedPropertyChangedCallback);
             serializedPropertyChangedCallback(propertyGetterFunc(m_State));
         }
 
-        public Func<InputActionsEditorState, ReactiveProperty<TValue>> WhenChanged<TValue>(Expression<Func<InputActionsEditorState, ReactiveProperty<TValue>>> expr,
-            Action<InputActionsEditorState> propertyChangedCallback)
+        public Func<InputActionsEditorState, ReactiveProperty<TValue>> WhenChanged<TValue>(
+            Expression<Func<InputActionsEditorState, ReactiveProperty<TValue>>> expr,
+            Action<InputActionsEditorState> propertyChangedCallback
+        )
         {
             var func = ExpressionUtils.CreateGetter(expr);
             if (func == null)
@@ -111,8 +120,10 @@ namespace UnityEngine.InputSystem.Editor
             return func;
         }
 
-        public Func<InputActionsEditorState, SerializedProperty> WhenChanged(Expression<Func<InputActionsEditorState, SerializedProperty>> expr,
-            Action<SerializedProperty> serializedPropertyChangedCallback)
+        public Func<InputActionsEditorState, SerializedProperty> WhenChanged(
+            Expression<Func<InputActionsEditorState, SerializedProperty>> expr,
+            Action<SerializedProperty> serializedPropertyChangedCallback
+        )
         {
             var serializedPropertyGetter = ExpressionUtils.CreateGetter(expr);
             if (serializedPropertyGetter == null)

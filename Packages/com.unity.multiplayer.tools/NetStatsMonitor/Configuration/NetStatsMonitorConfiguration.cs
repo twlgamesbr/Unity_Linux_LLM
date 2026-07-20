@@ -11,7 +11,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
     [CreateAssetMenu(
         fileName = "NetStatsMonitorConfiguration",
         menuName = "Multiplayer/NetStatsMonitorConfiguration",
-        order = 900)]
+        order = 900
+    )]
     public class NetStatsMonitorConfiguration : ScriptableObject
     {
         /// <summary>

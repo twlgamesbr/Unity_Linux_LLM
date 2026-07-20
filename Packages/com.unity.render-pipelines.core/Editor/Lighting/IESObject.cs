@@ -11,6 +11,7 @@ namespace UnityEditor.Rendering
         /// Point for the IES
         /// </summary>
         Point,
+
         /// <summary>
         /// Spot for IES (compatible with Area Light)
         /// </summary>
@@ -24,22 +25,30 @@ namespace UnityEditor.Rendering
     {
         /// <summary>Size 16</summary>
         IESResolution16 = 16,
+
         /// <summary>Size 32</summary>
         IESResolution32 = 32,
+
         /// <summary>Size 64</summary>
         IESResolution64 = 64,
+
         /// <summary>Size 128</summary>
         IESResolution128 = 128,
+
         /// <summary>Size 256</summary>
         IESResolution256 = 256,
+
         /// <summary>Size 512</summary>
         IESResolution512 = 512,
+
         /// <summary>Size 1024</summary>
         IESResolution1024 = 1024,
+
         /// <summary>Size 2048</summary>
         IESResolution2048 = 2048,
+
         /// <summary>Size 4096</summary>
-        IESResolution4096 = 4096
+        IESResolution4096 = 4096,
     }
 
     /// <summary>
@@ -52,14 +61,17 @@ namespace UnityEditor.Rendering
         /// Version of the IES File
         /// </summary>
         public string FileFormatVersion;
+
         /// <summary>
         /// Total light intensity (in Lumens) stored on the file, usage of it is optional (through the prefab subasset inside the IESObject)
         /// </summary>
         public string IESPhotometricType;
+
         /// <summary>
         /// IES Max Intensity depends on the various information stored on the IES file
         /// </summary>
         public float IESMaximumIntensity;
+
         /// <summary>
         /// Unit used to measure the IESMaximumIntensity
         /// </summary>
@@ -69,23 +81,27 @@ namespace UnityEditor.Rendering
         /// <summary>
         /// Manufacturer of the current IES file
         /// </summary>
-        public string Manufacturer;           // IES keyword MANUFAC
+        public string Manufacturer; // IES keyword MANUFAC
+
         /// <summary>
         /// Luninaire Catalog Number
         /// </summary>
         public string LuminaireCatalogNumber; // IES keyword LUMCAT
+
         /// <summary>
         /// Luminaire Description
         /// </summary>
-        public string LuminaireDescription;   // IES keyword LUMINAIRE
+        public string LuminaireDescription; // IES keyword LUMINAIRE
+
         /// <summary>
         /// Lamp Catalog Number
         /// </summary>
-        public string LampCatalogNumber;      // IES keyword LAMPCAT
+        public string LampCatalogNumber; // IES keyword LAMPCAT
+
         /// <summary>
         /// Lamp Description
         /// </summary>
-        public string LampDescription;        // IES keyword LAMP
+        public string LampDescription; // IES keyword LAMP
 
         /// <summary>
         /// Prefab Light Type (optional to generate the texture used by the renderer)
@@ -108,6 +124,7 @@ namespace UnityEditor.Rendering
         /// Enable attenuation used for Spot recommanded to be true, particulary with large angle of "SpotAngle" (cf. Gnomonic Projection)
         /// </summary>
         public bool ApplyLightAttenuation = true;
+
         /// <summary>
         /// Enable max intensity for the texture generation
         /// </summary>

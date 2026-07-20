@@ -1,9 +1,9 @@
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
-using EditorAttributes.Editor.Utility;
 using System.Threading.Tasks;
+using EditorAttributes.Editor.Utility;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -13,7 +13,10 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The DataTable Attribute can only be attached to serialized structs or classes and collections containing them", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The DataTable Attribute can only be attached to serialized structs or classes and collections containing them",
+                    HelpBoxMessageType.Error
+                );
 
             var dataTableAttribute = attribute as DataTableAttribute;
             VisualElement root = new();
@@ -28,15 +31,16 @@ namespace EditorAttributes.Editor
             Label label = new(property.displayName)
             {
                 tooltip = property.tooltip,
-                style = {
+                style =
+                {
                     overflow = Overflow.Hidden,
                     unityFontStyleAndWeight = FontStyle.Bold,
                     marginRight = 50f,
                     maxWidth = 100f,
                     width = 100f,
                     alignSelf = Align.Center,
-                    color = EditorExtension.GLOBAL_COLOR
-                }
+                    color = EditorExtension.GLOBAL_COLOR,
+                },
             };
 
             root.Add(label);
@@ -54,7 +58,8 @@ namespace EditorAttributes.Editor
                 tableColumn.style.flexGrow = 1f;
                 tableColumn.style.flexBasis = 0.1f;
 
-                bool isFoldoutProperty = serializedProperty.propertyType is SerializedPropertyType.Generic or SerializedPropertyType.Vector4;
+                bool isFoldoutProperty =
+                    serializedProperty.propertyType is SerializedPropertyType.Generic or SerializedPropertyType.Vector4;
 
                 // Draw column labels
                 if (dataTableAttribute.ShowLabels && IsFirstCollectionElement(property) && !isFoldoutProperty)
@@ -81,20 +86,24 @@ namespace EditorAttributes.Editor
                     ColorUtils.ApplyColor(propertyField, EditorExtension.GLOBAL_COLOR, 100);
 
                 // Hide all property labels, except for the ones inside types with foldout displays (collections, vector 4, serialized objects)
-                propertyField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-                {
-                    if (isFoldoutProperty)
+                propertyField.RegisterCallbackOnce<GeometryChangedEvent>(
+                    (callback) =>
                     {
-                        UpdateFoldoutPropertyLabels(propertyField);
+                        if (isFoldoutProperty)
+                        {
+                            UpdateFoldoutPropertyLabels(propertyField);
 
-                        // If the foldout is folded when the editor is drawn, the labels will not be found by the query so we update them when the foldout is unfolded
-                        propertyField.Q<Foldout>().RegisterValueChangedCallback((callback) => UpdateFoldoutPropertyLabels(propertyField));
+                            // If the foldout is folded when the editor is drawn, the labels will not be found by the query so we update them when the foldout is unfolded
+                            propertyField
+                                .Q<Foldout>()
+                                .RegisterValueChangedCallback((callback) => UpdateFoldoutPropertyLabels(propertyField));
+                        }
+                        else
+                        {
+                            RemoveGeneratedPropertyLabels(propertyField);
+                        }
                     }
-                    else
-                    {
-                        RemoveGeneratedPropertyLabels(propertyField);
-                    }
-                });
+                );
 
                 // If new collection entries are added they will not have the flexGrow value, so we listen for changes to update the labels on the new entries
                 if (serializedProperty.isArray && serializedProperty.propertyType != SerializedPropertyType.String) // Strings are considered arrays but we don't want to include them
@@ -107,7 +116,8 @@ namespace EditorAttributes.Editor
             return root;
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.Generic;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.Generic;
 
         private bool IsFirstCollectionElement(SerializedProperty property)
         {

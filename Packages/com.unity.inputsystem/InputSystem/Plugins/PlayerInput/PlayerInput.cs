@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.OnScreen;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.InputSystem.OnScreen;
-
 #if UNITY_EDITOR
 #endif
 
@@ -808,14 +807,14 @@ namespace UnityEngine.InputSystem
 #if UNITY_EDITOR
         // camera property is deprecated and only available in Editor.
         new
-        #endif
+#endif
         Camera camera
         {
             get => m_Camera;
             set => m_Camera = value;
         }
 
-        #if PACKAGE_DOCS_GENERATION || UNITY_INPUT_SYSTEM_ENABLE_UI
+#if PACKAGE_DOCS_GENERATION || UNITY_INPUT_SYSTEM_ENABLE_UI
         /// <summary>
         /// UI InputModule that should have it's input actions synchronized to this PlayerInput's actions.
         /// </summary>
@@ -836,7 +835,7 @@ namespace UnityEngine.InputSystem
                     m_UIInputModule.actionsAsset = m_Actions;
             }
         }
-        #endif
+#endif
 
         /// <summary>
         /// The internal user tied to the player.
@@ -885,7 +884,8 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="PlayerInputManager.JoinPlayer(int,int,string,InputDevice)"/>
         /// <seealso cref="Instantiate(GameObject,int,string,int,InputDevice)"/>
-        public static ReadOnlyArray<PlayerInput> all => new ReadOnlyArray<PlayerInput>(s_AllActivePlayers, 0, s_AllActivePlayersCount);
+        public static ReadOnlyArray<PlayerInput> all =>
+            new ReadOnlyArray<PlayerInput>(s_AllActivePlayers, 0, s_AllActivePlayersCount);
 
         /// <summary>
         /// Whether PlayerInput operates in single-player mode.
@@ -899,8 +899,8 @@ namespace UnityEngine.InputSystem
         /// This is controlled by <see cref="neverAutoSwitchControlSchemes"/>.
         /// </remarks>
         public static bool isSinglePlayer =>
-            s_AllActivePlayersCount <= 1 &&
-            (PlayerInputManager.instance == null || !PlayerInputManager.instance.joiningEnabled);
+            s_AllActivePlayersCount <= 1
+            && (PlayerInputManager.instance == null || !PlayerInputManager.instance.joiningEnabled);
 
         /// <summary>
         /// Return the first device of the given type from <see cref="devices"/> paired to the player.
@@ -960,6 +960,7 @@ namespace UnityEngine.InputSystem
         // This ensures "actionTriggered" delegates are assigned for new maps (case isxb-711)
         //
         private int m_AllMapsHashCode = 0;
+
         private void UpdateDelegates()
         {
             if (m_Actions == null)
@@ -1038,7 +1039,8 @@ namespace UnityEngine.InputSystem
                 throw new ArgumentNullException(nameof(devices));
             if (actions == null)
                 throw new InvalidOperationException(
-                    "Must set actions on PlayerInput in order to be able to switch control schemes");
+                    "Must set actions on PlayerInput in order to be able to switch control schemes"
+                );
 
             // Find control scheme matching given devices in associated action asset
             var scheme = InputControlScheme.FindControlSchemeForDevices(devices, actions.controlSchemes);
@@ -1200,8 +1202,13 @@ namespace UnityEngine.InputSystem
         /// var p1 = PlayerInput.Instantiate(playerPrefab, controlScheme: "KeyboardLeft", device: Keyboard.current);
         /// </code>
         /// </example>
-        public static PlayerInput Instantiate(GameObject prefab, int playerIndex = -1, string controlScheme = null,
-            int splitScreenIndex = -1, InputDevice pairWithDevice = null)
+        public static PlayerInput Instantiate(
+            GameObject prefab,
+            int playerIndex = -1,
+            string controlScheme = null,
+            int splitScreenIndex = -1,
+            InputDevice pairWithDevice = null
+        )
         {
             if (prefab == null)
                 throw new ArgumentNullException(nameof(prefab));
@@ -1211,7 +1218,11 @@ namespace UnityEngine.InputSystem
             s_InitSplitScreenIndex = splitScreenIndex;
             s_InitControlScheme = controlScheme;
             if (pairWithDevice != null)
-                ArrayHelpers.AppendWithCapacity(ref s_InitPairWithDevices, ref s_InitPairWithDevicesCount, pairWithDevice);
+                ArrayHelpers.AppendWithCapacity(
+                    ref s_InitPairWithDevices,
+                    ref s_InitPairWithDevicesCount,
+                    pairWithDevice
+                );
 
             return DoInstantiate(prefab);
         }
@@ -1238,8 +1249,13 @@ namespace UnityEngine.InputSystem
         /// var p1 = PlayerInput.Instantiate(playerPrefab, controlScheme: "Gamepad", pairWithDevices: devices);
         /// </code>
         /// </example>
-        public static PlayerInput Instantiate(GameObject prefab, int playerIndex = -1, string controlScheme = null,
-            int splitScreenIndex = -1, params InputDevice[] pairWithDevices)
+        public static PlayerInput Instantiate(
+            GameObject prefab,
+            int playerIndex = -1,
+            string controlScheme = null,
+            int splitScreenIndex = -1,
+            params InputDevice[] pairWithDevices
+        )
         {
             if (prefab == null)
                 throw new ArgumentNullException(nameof(prefab));
@@ -1251,7 +1267,11 @@ namespace UnityEngine.InputSystem
             if (pairWithDevices != null)
             {
                 for (var i = 0; i < pairWithDevices.Length; ++i)
-                    ArrayHelpers.AppendWithCapacity(ref s_InitPairWithDevices, ref s_InitPairWithDevicesCount, pairWithDevices[i]);
+                    ArrayHelpers.AppendWithCapacity(
+                        ref s_InitPairWithDevices,
+                        ref s_InitPairWithDevicesCount,
+                        pairWithDevices[i]
+                    );
             }
 
             return DoInstantiate(prefab);
@@ -1297,50 +1317,109 @@ namespace UnityEngine.InputSystem
         }
 
         [Tooltip("Input actions associated with the player.")]
-        [SerializeField] internal InputActionAsset m_Actions;
-        [Tooltip("Determine how notifications should be sent when an input-related event associated with the player happens.")]
-        [SerializeField] internal PlayerNotifications m_NotificationBehavior;
+        [SerializeField]
+        internal InputActionAsset m_Actions;
+
+        [Tooltip(
+            "Determine how notifications should be sent when an input-related event associated with the player happens."
+        )]
+        [SerializeField]
+        internal PlayerNotifications m_NotificationBehavior;
+
         [Tooltip("UI InputModule that should have it's input actions synchronized to this PlayerInput's actions.")]
+#if UNITY_INPUT_SYSTEM_ENABLE_UI
+        [SerializeField]
+        internal InputSystemUIInputModule m_UIInputModule;
 
-        #if UNITY_INPUT_SYSTEM_ENABLE_UI
-        [SerializeField] internal InputSystemUIInputModule m_UIInputModule;
         [Tooltip("Event that is triggered when the PlayerInput loses a paired device (e.g. its battery runs out).")]
-        #endif
+#endif
 
-        [SerializeField] internal DeviceLostEvent m_DeviceLostEvent;
-        [SerializeField] internal DeviceRegainedEvent m_DeviceRegainedEvent;
-        [SerializeField] internal ControlsChangedEvent m_ControlsChangedEvent;
-        [SerializeField] internal ActionEvent[] m_ActionEvents;
-        [SerializeField] internal bool m_NeverAutoSwitchControlSchemes;
-        [SerializeField] internal string m_DefaultControlScheme;////REVIEW: should we have IDs for these so we can rename safely?
-        [SerializeField] internal string m_DefaultActionMap;
-        [SerializeField] internal int m_SplitScreenIndex = -1;
-        [Tooltip("Reference to the player's view camera. Note that this is only required when using split-screen and/or "
-            + "per-player UIs. Otherwise it is safe to leave this property uninitialized.")]
-        [SerializeField] internal Camera m_Camera;
+        [SerializeField]
+        internal DeviceLostEvent m_DeviceLostEvent;
+
+        [SerializeField]
+        internal DeviceRegainedEvent m_DeviceRegainedEvent;
+
+        [SerializeField]
+        internal ControlsChangedEvent m_ControlsChangedEvent;
+
+        [SerializeField]
+        internal ActionEvent[] m_ActionEvents;
+
+        [SerializeField]
+        internal bool m_NeverAutoSwitchControlSchemes;
+
+        [SerializeField]
+        internal string m_DefaultControlScheme; ////REVIEW: should we have IDs for these so we can rename safely?
+
+        [SerializeField]
+        internal string m_DefaultActionMap;
+
+        [SerializeField]
+        internal int m_SplitScreenIndex = -1;
+
+        [Tooltip(
+            "Reference to the player's view camera. Note that this is only required when using split-screen and/or "
+                + "per-player UIs. Otherwise it is safe to leave this property uninitialized."
+        )]
+        [SerializeField]
+        internal Camera m_Camera;
 
         // Value object we use when sending messages via SendMessage() or BroadcastMessage(). Can be ignored
         // by the receiver. We reuse the same object over and over to avoid allocating garbage.
-        [NonSerialized] private InputValue m_InputValueObject;
+        [NonSerialized]
+        private InputValue m_InputValueObject;
 
-        [NonSerialized] internal InputActionMap m_CurrentActionMap;
+        [NonSerialized]
+        internal InputActionMap m_CurrentActionMap;
 
-        [NonSerialized] private int m_PlayerIndex = -1;
-        [NonSerialized] private bool m_InputActive;
-        [NonSerialized] private bool m_Enabled;
-        [NonSerialized] internal bool m_ActionsInitialized;
-        [NonSerialized] private Dictionary<string, string> m_ActionMessageNames;
-        [NonSerialized] private InputUser m_InputUser;
-        [NonSerialized] private Action<InputAction.CallbackContext> m_ActionTriggeredDelegate;
-        [NonSerialized] private CallbackArray<Action<PlayerInput>> m_DeviceLostCallbacks;
-        [NonSerialized] private CallbackArray<Action<PlayerInput>> m_DeviceRegainedCallbacks;
-        [NonSerialized] private CallbackArray<Action<PlayerInput>> m_ControlsChangedCallbacks;
-        [NonSerialized] private CallbackArray<Action<InputAction.CallbackContext>> m_ActionTriggeredCallbacks;
-        [NonSerialized] private Action<InputControl, InputEventPtr> m_UnpairedDeviceUsedDelegate;
-        [NonSerialized] private Func<InputDevice, InputEventPtr, bool> m_PreFilterUnpairedDeviceUsedDelegate;
-        [NonSerialized] private bool m_OnUnpairedDeviceUsedHooked;
-        [NonSerialized] private Action<InputDevice, InputDeviceChange> m_DeviceChangeDelegate;
-        [NonSerialized] private bool m_OnDeviceChangeHooked;
+        [NonSerialized]
+        private int m_PlayerIndex = -1;
+
+        [NonSerialized]
+        private bool m_InputActive;
+
+        [NonSerialized]
+        private bool m_Enabled;
+
+        [NonSerialized]
+        internal bool m_ActionsInitialized;
+
+        [NonSerialized]
+        private Dictionary<string, string> m_ActionMessageNames;
+
+        [NonSerialized]
+        private InputUser m_InputUser;
+
+        [NonSerialized]
+        private Action<InputAction.CallbackContext> m_ActionTriggeredDelegate;
+
+        [NonSerialized]
+        private CallbackArray<Action<PlayerInput>> m_DeviceLostCallbacks;
+
+        [NonSerialized]
+        private CallbackArray<Action<PlayerInput>> m_DeviceRegainedCallbacks;
+
+        [NonSerialized]
+        private CallbackArray<Action<PlayerInput>> m_ControlsChangedCallbacks;
+
+        [NonSerialized]
+        private CallbackArray<Action<InputAction.CallbackContext>> m_ActionTriggeredCallbacks;
+
+        [NonSerialized]
+        private Action<InputControl, InputEventPtr> m_UnpairedDeviceUsedDelegate;
+
+        [NonSerialized]
+        private Func<InputDevice, InputEventPtr, bool> m_PreFilterUnpairedDeviceUsedDelegate;
+
+        [NonSerialized]
+        private bool m_OnUnpairedDeviceUsedHooked;
+
+        [NonSerialized]
+        private Action<InputDevice, InputDeviceChange> m_DeviceChangeDelegate;
+
+        [NonSerialized]
+        private bool m_OnDeviceChangeHooked;
 
         internal static int s_AllActivePlayersCount;
         internal static PlayerInput[] s_AllActivePlayers;
@@ -1371,10 +1450,10 @@ namespace UnityEngine.InputSystem
                     break;
                 }
 
-            #if UNITY_INPUT_SYSTEM_ENABLE_UI
+#if UNITY_INPUT_SYSTEM_ENABLE_UI
             if (uiInputModule != null)
                 uiInputModule.actionsAsset = m_Actions;
-            #endif
+#endif
 
             switch (m_NotificationBehavior)
             {
@@ -1425,7 +1504,9 @@ namespace UnityEngine.InputSystem
             for (var actionMap = 0; actionMap < oldActions.actionMaps.Count; actionMap++)
             {
                 for (var binding = 0; binding < oldActions.actionMaps[actionMap].bindings.Count; binding++)
-                    m_Actions.actionMaps[actionMap].ApplyBindingOverride(binding, oldActions.actionMaps[actionMap].bindings[binding]);
+                    m_Actions
+                        .actionMaps[actionMap]
+                        .ApplyBindingOverride(binding, oldActions.actionMaps[actionMap].bindings[binding]);
             }
         }
 
@@ -1484,13 +1565,19 @@ namespace UnityEngine.InputSystem
 
             // We shouldn't go through this method when using UnityEvents. With events,
             // the callbacks should be wired up directly rather than going all to this method.
-            Debug.Assert(m_NotificationBehavior != PlayerNotifications.InvokeUnityEvents,
-                "OnActionTriggered callback should not be installed if notification behavior is set to InvokeUnityEvents");
+            Debug.Assert(
+                m_NotificationBehavior != PlayerNotifications.InvokeUnityEvents,
+                "OnActionTriggered callback should not be installed if notification behavior is set to InvokeUnityEvents"
+            );
 
             switch (m_NotificationBehavior)
             {
                 case PlayerNotifications.InvokeCSharpEvents:
-                    DelegateHelpers.InvokeCallbacksSafe(ref m_ActionTriggeredCallbacks, context, "PlayerInput.onActionTriggered");
+                    DelegateHelpers.InvokeCallbacksSafe(
+                        ref m_ActionTriggeredCallbacks,
+                        context,
+                        "PlayerInput.onActionTriggered"
+                    );
                     break;
 
                 case PlayerNotifications.BroadcastMessages:
@@ -1602,7 +1689,10 @@ namespace UnityEngine.InputSystem
                     var controlScheme = m_Actions.FindControlScheme(m_DefaultControlScheme);
                     if (controlScheme == null)
                     {
-                        Debug.LogError($"Cannot find default control scheme '{m_DefaultControlScheme}' in '{m_Actions}'", this);
+                        Debug.LogError(
+                            $"Cannot find default control scheme '{m_DefaultControlScheme}' in '{m_Actions}'",
+                            this
+                        );
                     }
                     else
                     {
@@ -1618,19 +1708,27 @@ namespace UnityEngine.InputSystem
                     // want to pick any one control scheme that is the best match for the devices we have regardless of whether
                     // we'll need additional devices. TryToActivateControlScheme will take care of that.
                     var controlScheme = InputControlScheme.FindControlSchemeForDevices(
-                        new ReadOnlyArray<InputDevice>(s_InitPairWithDevices, 0, s_InitPairWithDevicesCount), m_Actions.controlSchemes,
-                        allowUnsuccesfulMatch: true);
+                        new ReadOnlyArray<InputDevice>(s_InitPairWithDevices, 0, s_InitPairWithDevicesCount),
+                        m_Actions.controlSchemes,
+                        allowUnsuccesfulMatch: true
+                    );
                     if (controlScheme != null)
                         TryToActivateControlScheme(controlScheme.Value);
                 }
                 // If we don't have a working control scheme by now and we haven't been instructed to use
                 // one specific control scheme, try each one in the asset one after the other until we
                 // either find one we can use or run out of options.
-                else if ((!m_InputUser.valid || m_InputUser.controlScheme == null) && string.IsNullOrEmpty(s_InitControlScheme))
+                else if (
+                    (!m_InputUser.valid || m_InputUser.controlScheme == null)
+                    && string.IsNullOrEmpty(s_InitControlScheme)
+                )
                 {
                     using (var availableDevices = InputUser.GetUnpairedInputDevices())
                     {
-                        var controlScheme = InputControlScheme.FindControlSchemeForDevices(availableDevices, m_Actions.controlSchemes);
+                        var controlScheme = InputControlScheme.FindControlSchemeForDevices(
+                            availableDevices,
+                            m_Actions.controlSchemes
+                        );
                         if (controlScheme != null)
                         {
                             TryToActivateControlScheme(controlScheme.Value);
@@ -1639,7 +1737,10 @@ namespace UnityEngine.InputSystem
                         {
                             // The device count check is here to allow the unit tests to pass (and not trigger this error message)
                             if (InputSystem.devices.Count > 0 && availableDevices.Count == 0)
-                                Debug.LogWarning($"Cannot find matching control scheme for {this.name} (all control schemes are already paired to matching devices)", this);
+                                Debug.LogWarning(
+                                    $"Cannot find matching control scheme for {this.name} (all control schemes are already paired to matching devices)",
+                                    this
+                                );
                         }
                     }
                 }
@@ -1788,15 +1889,14 @@ namespace UnityEngine.InputSystem
             }
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         void Reset()
         {
             // Set default actions to project wide actions.
             m_Actions = InputSystem.actions;
             // TODO Need to monitor changes?
         }
-
-        #endif
+#endif
 
         private void OnEnable()
         {
@@ -1819,8 +1919,8 @@ namespace UnityEngine.InputSystem
             // Add to global list and sort it by player index.
             ArrayHelpers.AppendWithCapacity(ref s_AllActivePlayers, ref s_AllActivePlayersCount, this);
             for (var i = 1; i < s_AllActivePlayersCount; ++i)
-                for (var j = i; j > 0 && s_AllActivePlayers[j - 1].playerIndex > s_AllActivePlayers[j].playerIndex; --j)
-                    s_AllActivePlayers.SwapElements(j, j - 1);
+            for (var j = i; j > 0 && s_AllActivePlayers[j - 1].playerIndex > s_AllActivePlayers[j].playerIndex; --j)
+                s_AllActivePlayers.SwapElements(j, j - 1);
 
             // If it's the first player, hook into user change notifications.
             if (s_AllActivePlayersCount == 1)
@@ -2061,7 +2161,9 @@ namespace UnityEngine.InputSystem
             // Early out if the device isn't usable with any of our control schemes.
             var actions = all[0].actions;
             // Skip Pointer device if any OnScreenControl is active since they will use it to generate device event
-            return actions != null && (!OnScreenControl.HasAnyActive || !(device is Pointer)) && actions.IsUsableWithDevice(device);
+            return actions != null
+                && (!OnScreenControl.HasAnyActive || !(device is Pointer))
+                && actions.IsUsableWithDevice(device);
         }
 
         private void OnUnpairedDeviceUsed(InputControl control, InputEventPtr eventPtr)
@@ -2096,8 +2198,15 @@ namespace UnityEngine.InputSystem
                     availableDevices.Add(currentDevices[i]);
 
                 // Find the best control scheme to use.
-                if (InputControlScheme.FindControlSchemeForDevices(availableDevices, player.m_Actions.controlSchemes,
-                    out var controlScheme, out var matchResult, mustIncludeDevice: device))
+                if (
+                    InputControlScheme.FindControlSchemeForDevices(
+                        availableDevices,
+                        player.m_Actions.controlSchemes,
+                        out var controlScheme,
+                        out var matchResult,
+                        mustIncludeDevice: device
+                    )
+                )
                 {
                     try
                     {
@@ -2111,7 +2220,10 @@ namespace UnityEngine.InputSystem
                         Debug.Assert(newDevices.Count > 0, "Expecting to see at least one device here");
                         for (var i = 0; i < newDevices.Count; ++i)
                         {
-                            player.m_InputUser = InputUser.PerformPairingWithDevice(newDevices[i], user: player.m_InputUser);
+                            player.m_InputUser = InputUser.PerformPairingWithDevice(
+                                newDevices[i],
+                                user: player.m_InputUser
+                            );
                             if (!userValid && player.actions != null)
                                 player.m_InputUser.AssociateActionsWithUser(player.actions);
                         }
@@ -2131,11 +2243,14 @@ namespace UnityEngine.InputSystem
         {
             // If a device was added and we have no control schemes in the actions and we're in
             // single-player mode, pair the device to the player if it works with the bindings we have.
-            if (change == InputDeviceChange.Added &&
-                isSinglePlayer &&
-                m_Actions != null && m_Actions.controlSchemes.Count == 0 &&
-                HaveBindingForDevice(device) &&
-                m_InputUser.valid)
+            if (
+                change == InputDeviceChange.Added
+                && isSinglePlayer
+                && m_Actions != null
+                && m_Actions.controlSchemes.Count == 0
+                && HaveBindingForDevice(device)
+                && m_InputUser.valid
+            )
             {
                 InputUser.PerformPairingWithDevice(device, user: m_InputUser);
             }
@@ -2208,8 +2323,11 @@ namespace UnityEngine.InputSystem
             /// </summary>
             public string actionName => m_ActionName;
 
-            [SerializeField] private string m_ActionId;
-            [SerializeField] private string m_ActionName;
+            [SerializeField]
+            private string m_ActionId;
+
+            [SerializeField]
+            private string m_ActionName;
 
             /// <summary>
             /// Construct an empty action event.
@@ -2218,9 +2336,7 @@ namespace UnityEngine.InputSystem
             /// The event will not have an associated action.
             /// </remarks>
             /// <seealso cref="PlayerInput.actionEvents"/>
-            public ActionEvent()
-            {
-            }
+            public ActionEvent() { }
 
             /// <summary>
             /// Construct an action event and associate it with an action.
@@ -2237,7 +2353,9 @@ namespace UnityEngine.InputSystem
                 if (action == null)
                     throw new ArgumentNullException(nameof(action));
                 if (action.isSingletonAction)
-                    throw new ArgumentException($"Action must be part of an asset (given action '{action}' is a singleton)");
+                    throw new ArgumentException(
+                        $"Action must be part of an asset (given action '{action}' is a singleton)"
+                    );
                 if (action.actionMap.asset == null)
                     throw new ArgumentException($"Action must be part of an asset (given action '{action}' is not)");
 
@@ -2268,9 +2386,7 @@ namespace UnityEngine.InputSystem
         /// The device lost event can be set on via <see cref="deviceLostEvent"/>.
         /// </remarks>
         [Serializable]
-        public class DeviceLostEvent : UnityEvent<PlayerInput>
-        {
-        }
+        public class DeviceLostEvent : UnityEvent<PlayerInput> { }
 
         /// <summary>
         /// Event that is triggered when a <see cref="PlayerInput"/> regains an <see cref="InputDevice"/> previously lost.
@@ -2279,9 +2395,7 @@ namespace UnityEngine.InputSystem
         /// The device regained event can be set on via <see cref="deviceRegainedEvent"/>.
         /// </remarks>
         [Serializable]
-        public class DeviceRegainedEvent : UnityEvent<PlayerInput>
-        {
-        }
+        public class DeviceRegainedEvent : UnityEvent<PlayerInput> { }
 
         /// <summary>
         /// Event that is triggered when the set of controls used by a <see cref="PlayerInput"/> changes.
@@ -2290,8 +2404,6 @@ namespace UnityEngine.InputSystem
         /// The changed event can be set on via <see cref="controlsChangedEvent"/>.
         /// </remarks>
         [Serializable]
-        public class ControlsChangedEvent : UnityEvent<PlayerInput>
-        {
-        }
+        public class ControlsChangedEvent : UnityEvent<PlayerInput> { }
     }
 }

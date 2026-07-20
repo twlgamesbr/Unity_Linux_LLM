@@ -10,7 +10,10 @@ namespace UnityEngine.TestTools
         private readonly ITestExecutionContext m_Context;
         private static IEnumerator m_TestEnumerator;
 
-        public static IEnumerator Enumerator { get { return m_TestEnumerator; } }
+        public static IEnumerator Enumerator
+        {
+            get { return m_TestEnumerator; }
+        }
 
         public static void Reset()
         {
@@ -72,11 +75,7 @@ namespace UnityEngine.TestTools
                 m_Context = context;
             }
 
-            public bool ExceptionWasRecorded
-            {
-                get;
-                private set;
-            }
+            public bool ExceptionWasRecorded { get; private set; }
 
             public void RecordExceptionWithHint(Exception ex)
             {

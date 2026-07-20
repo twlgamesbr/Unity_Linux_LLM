@@ -10,26 +10,31 @@ namespace UnityEngine.Rendering
         /// No range reduction.
         /// </summary>
         None,
+
         /// <summary>
         /// Reinhard tonemapping.
         /// </summary>
         Reinhard,
+
         /// <summary>
         /// BT2390 Hermite spline EETF range reduction.
         /// </summary>
         BT2390,
+
         /// <summary>
         /// ACES tonemapping preset for 1000 nits displays.
         /// </summary>
         ACES1000Nits,
+
         /// <summary>
         /// ACES tonemapping preset for 2000 nits displays.
         /// </summary>
         ACES2000Nits,
+
         /// <summary>
         /// ACES tonemapping preset for 4000 nits displays.
         /// </summary>
-        ACES4000Nits
+        ACES4000Nits,
     }
 
     /// <summary>
@@ -42,14 +47,16 @@ namespace UnityEngine.Rendering
         /// Rec709 color primaries with D65 white point.
         /// </summary>
         Rec709,
+
         /// <summary>
         /// Rec2020 color primaries with D65 white point.
         /// </summary>
         Rec2020,
+
         /// <summary>
         /// P3 color primaries with D65 white point.
         /// </summary>
-        P3D65
+        P3D65,
     }
 
     /// <summary>
@@ -62,17 +69,20 @@ namespace UnityEngine.Rendering
         /// Linear OETF.
         /// </summary>
         Linear = TransferFunction.Linear,
+
         /// <summary>
         /// ST 2084 PQ OETF
         /// </summary>
         PQ = TransferFunction.PQ,
+
         /// <summary>
         /// Gamma 2.2 OETF.
         /// </summary>
         Gamma22 = TransferFunction.Gamma22,
+
         /// <summary>
         /// sRGB curve OETF.
         /// </summary>
-        sRGB = TransferFunction.sRGB
+        sRGB = TransferFunction.sRGB,
     }
 }

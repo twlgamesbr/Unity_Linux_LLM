@@ -20,7 +20,11 @@ namespace UnityEngine.Rendering
             get { return m_Bits.IsCreated; }
         }
 
-        public ParallelBitArray(int length, Allocator allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public ParallelBitArray(
+            int length,
+            Allocator allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
         {
             m_Allocator = allocator;
             m_Bits = new NativeArray<long>((length + 63) / 64, allocator, options);
@@ -86,7 +90,8 @@ namespace UnityEngine.Rendering
                 long and_mask = (long)(~bit);
                 long or_mask = value ? (long)bit : 0;
 
-                long old_entry, new_entry;
+                long old_entry,
+                    new_entry;
                 do
                 {
                     old_entry = Interlocked.Read(ref entries[entry_index]);
@@ -130,7 +135,8 @@ namespace UnityEngine.Rendering
         {
             long* entries = (long*)m_Bits.GetUnsafePtr();
 
-            long old_entry, new_entry;
+            long old_entry,
+                new_entry;
             do
             {
                 old_entry = Interlocked.Read(ref entries[chunk_index]);
@@ -164,7 +170,7 @@ namespace UnityEngine.Rendering
 
             m_Bits.FillArray(0, 0, chunkIndex);
 
-            if(remainder > 0)
+            if (remainder > 0)
             {
                 long lastChunkMask = (1L << remainder) - 1;
                 m_Bits[chunkIndex] &= ~lastChunkMask;

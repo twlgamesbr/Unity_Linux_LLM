@@ -24,10 +24,9 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
             var bytes = frameData.GetFrameMetaData<byte>(
                 FrameInfo.NetworkProfilerGuid,
-                FrameInfo.NetworkProfilerDataTag);
-            return bytes.Length > 0
-                ? m_NetStatSerializer.Deserialize(bytes)
-                : null;
+                FrameInfo.NetworkProfilerDataTag
+            );
+            return bytes.Length > 0 ? m_NetStatSerializer.Deserialize(bytes) : null;
         }
     }
 }

@@ -6,10 +6,7 @@ namespace Unity.Collections
         ClearMemory,
     }
 
-    public class CollectionsMock
-    {
-
-    }
+    public class CollectionsMock { }
 
     public enum Allocator
     {

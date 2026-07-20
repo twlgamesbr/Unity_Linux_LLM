@@ -38,7 +38,10 @@ namespace Unity.Entities.Serialization
         /// <param name="guid">The prefab asset GUID.</param>
         public EntityPrefabReference(Hash128 guid)
         {
-            Id = new UntypedWeakReferenceId(new RuntimeGlobalObjectId { AssetGUID = guid, IdentifierType = 1 }, WeakReferenceGenerationType.EntityPrefab);
+            Id = new UntypedWeakReferenceId(
+                new RuntimeGlobalObjectId { AssetGUID = guid, IdentifierType = 1 },
+                WeakReferenceGenerationType.EntityPrefab
+            );
         }
 
 #if UNITY_EDITOR
@@ -46,10 +49,8 @@ namespace Unity.Entities.Serialization
         /// Construct an EntityPrefabReference from a GameObject.
         /// </summary>
         /// <param name="prefab">The prefab to construct from.</param>
-        public EntityPrefabReference(GameObject prefab) : this(
-            AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(prefab)))
-        {
-        }
+        public EntityPrefabReference(GameObject prefab)
+            : this(AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(prefab))) { }
 #endif
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace Unity.Entities.Serialization
         public Hash128 AssetGUID => Id.GlobalId.AssetGUID;
 
         /// <summary>
-        /// Returns true if the reference has a valid id.  In the editor, additional checks for the correct GenerationType and the existence of the referenced asset are performed. 
+        /// Returns true if the reference has a valid id.  In the editor, additional checks for the correct GenerationType and the existence of the referenced asset are performed.
         /// </summary>
         public bool IsReferenceValid
         {
@@ -70,7 +71,11 @@ namespace Unity.Entities.Serialization
                 if (Id.GenerationType != WeakReferenceGenerationType.EntityPrefab)
                     return false;
 
-                if (UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(UnityEditor.AssetDatabase.GUIDToAssetPath(Id.GlobalId.AssetGUID)) != typeof(GameObject))
+                if (
+                    UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(
+                        UnityEditor.AssetDatabase.GUIDToAssetPath(Id.GlobalId.AssetGUID)
+                    ) != typeof(GameObject)
+                )
                     return false;
 #endif
                 return true;

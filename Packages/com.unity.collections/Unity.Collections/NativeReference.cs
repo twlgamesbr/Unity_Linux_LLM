@@ -4,7 +4,6 @@ using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
-
 namespace Unity.Collections
 {
     /// <summary>
@@ -15,10 +14,8 @@ namespace Unity.Collections
     /// <typeparam name="T">The type of value.</typeparam>
     [StructLayout(LayoutKind.Sequential)]
     [NativeContainer]
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-    public unsafe struct NativeReference<T>
-        : INativeDisposable
-        , IEquatable<NativeReference<T>>
+    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+    public unsafe struct NativeReference<T> : INativeDisposable, IEquatable<NativeReference<T>>
         where T : unmanaged
     {
         [NativeDisableUnsafePtrRestriction]
@@ -37,7 +34,10 @@ namespace Unity.Collections
         /// </summary>
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public NativeReference(AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public NativeReference(
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
         {
             Allocate(allocator, out this);
             if (options == NativeArrayOptions.ClearMemory)
@@ -87,7 +87,6 @@ namespace Unity.Collections
 #endif
                 return *(T*)m_Data;
             }
-
             set
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -160,7 +159,7 @@ namespace Unity.Collections
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                         m_Safety = m_Safety
 #endif
-                    }
+                    },
                 }.Schedule(inputDeps);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -232,7 +231,6 @@ namespace Unity.Collections
             return Value.GetHashCode();
         }
 
-
         /// <summary>
         /// Returns true if the values stored in two references are equal.
         /// </summary>
@@ -291,12 +289,13 @@ namespace Unity.Collections
         {
             return nativeReference.AsReadOnly();
         }
+
         /// <summary>
         /// A read-only alias for the value of a NativeReference. Does not have its own allocated storage.
         /// </summary>
         [NativeContainer]
         [NativeContainerIsReadOnly]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public unsafe struct ReadOnly
         {
             [NativeDisableUnsafePtrRestriction]
@@ -306,7 +305,9 @@ namespace Unity.Collections
             AtomicSafetyHandle m_Safety;
             internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<ReadOnly>();
 
-            [GenerateTestsForBurstCompatibility(CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+            [GenerateTestsForBurstCompatibility(
+                CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+            )]
             internal ReadOnly(void* data, ref AtomicSafetyHandle safety)
             {
                 m_Data = data;
@@ -382,7 +383,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="reference">The reference.</param>
         /// <returns>A pointer to this reference's stored value.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public static unsafe T* GetUnsafePtr<T>(this NativeReference<T> reference)
             where T : unmanaged
         {
@@ -399,7 +400,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="reference">The reference.</param>
         /// <returns>A pointer to this reference's stored value.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public static unsafe T* GetUnsafeReadOnlyPtr<T>(this NativeReference<T> reference)
             where T : unmanaged
         {
@@ -416,7 +417,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="reference">The reference.</param>
         /// <returns>A pointer to this reference's stored value.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public static unsafe T* GetUnsafePtrWithoutChecks<T>(this NativeReference<T> reference)
             where T : unmanaged
         {

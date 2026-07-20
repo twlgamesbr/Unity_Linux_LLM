@@ -32,7 +32,15 @@ namespace UnityEditor.SettingsManagement
                 }
 
                 var val = pref.GetValue();
-                sb.AppendLine(string.Format("{0,-4}{1,-24}{2,-64}{3}", "", pref.scope, pref.key, val != null ? val.ToString() : "null"));
+                sb.AppendLine(
+                    string.Format(
+                        "{0,-4}{1,-24}{2,-64}{3}",
+                        "",
+                        pref.scope,
+                        pref.key,
+                        val != null ? val.ToString() : "null"
+                    )
+                );
             }
 
             return sb.ToString();
@@ -42,7 +50,12 @@ namespace UnityEditor.SettingsManagement
         /// Collect all registered UserSetting and HiddenSetting attributes.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<IUserSetting> FindUserSettings(IEnumerable<Assembly> assemblies, SettingVisibility visibility, BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+        public static IEnumerable<IUserSetting> FindUserSettings(
+            IEnumerable<Assembly> assemblies,
+            SettingVisibility visibility,
+            BindingFlags flags =
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static
+        )
         {
             var loadedTypes = assemblies.SelectMany(x => x.GetTypes());
             var loadedFields = loadedTypes.SelectMany(x => x.GetFields(flags));
@@ -54,11 +67,19 @@ namespace UnityEditor.SettingsManagement
 
                 foreach (var field in attributes)
                 {
-                    var userSetting = (UserSettingAttribute)Attribute.GetCustomAttribute(field, typeof(UserSettingAttribute));
+                    var userSetting = (UserSettingAttribute)
+                        Attribute.GetCustomAttribute(field, typeof(UserSettingAttribute));
 
                     if (!field.IsStatic || !typeof(IUserSetting).IsAssignableFrom(field.FieldType))
                     {
-                        Debug.LogError("[UserSetting] is only valid on static fields of a type implementing `interface IUserSetting`. \"" + field.Name + "\" (" + field.FieldType + ")\n" + field.DeclaringType);
+                        Debug.LogError(
+                            "[UserSetting] is only valid on static fields of a type implementing `interface IUserSetting`. \""
+                                + field.Name
+                                + "\" ("
+                                + field.FieldType
+                                + ")\n"
+                                + field.DeclaringType
+                        );
                         continue;
                     }
 
@@ -83,21 +104,31 @@ namespace UnityEditor.SettingsManagement
                     }
                     else
                     {
-                        var settingAttribute = (SettingsKeyAttribute)Attribute.GetCustomAttribute(field, typeof(SettingsKeyAttribute));
+                        var settingAttribute = (SettingsKeyAttribute)
+                            Attribute.GetCustomAttribute(field, typeof(SettingsKeyAttribute));
                         var pref = CreateGenericPref(settingAttribute.key, settingAttribute.scope, field);
                         if (pref != null)
                             settings.Add(pref);
                         else
-                            Debug.LogWarning("Failed adding [SettingsKey] " + field.FieldType + "\"" + settingAttribute.key + "\" in " + field.DeclaringType);
+                            Debug.LogWarning(
+                                "Failed adding [SettingsKey] "
+                                    + field.FieldType
+                                    + "\""
+                                    + settingAttribute.key
+                                    + "\" in "
+                                    + field.DeclaringType
+                            );
                     }
                 }
             }
 
             if ((visibility & SettingVisibility.Unregistered) == SettingVisibility.Unregistered)
             {
-                var unregisterd = loadedFields.Where(y => typeof(IUserSetting).IsAssignableFrom(y.FieldType)
-                        && !Attribute.IsDefined(y, typeof(SettingsKeyAttribute))
-                        && !Attribute.IsDefined(y, typeof(UserSettingAttribute)));
+                var unregisterd = loadedFields.Where(y =>
+                    typeof(IUserSetting).IsAssignableFrom(y.FieldType)
+                    && !Attribute.IsDefined(y, typeof(SettingsKeyAttribute))
+                    && !Attribute.IsDefined(y, typeof(UserSettingAttribute))
+                );
 
                 foreach (var field in unregisterd)
                 {
@@ -108,11 +139,14 @@ namespace UnityEditor.SettingsManagement
                     else
                     {
 #if PB_DEBUG
-                        Log.Warning("Found unregistered instance field: "
-                            + field.FieldType
-                            + " "
-                            + field.Name
-                            + " in " + field.DeclaringType);
+                        Log.Warning(
+                            "Found unregistered instance field: "
+                                + field.FieldType
+                                + " "
+                                + field.Name
+                                + " in "
+                                + field.DeclaringType
+                        );
 #endif
                     }
                 }
@@ -130,7 +164,8 @@ namespace UnityEditor.SettingsManagement
                     type = type.GetGenericArguments().FirstOrDefault();
                 var genericPrefClass = typeof(UserSetting<>).MakeGenericType(type);
                 var defaultValue = type.IsValueType ? Activator.CreateInstance(type) : null;
-                return (IUserSetting)Activator.CreateInstance(genericPrefClass, new object[] { key, defaultValue, scope });
+                return (IUserSetting)
+                    Activator.CreateInstance(genericPrefClass, new object[] { key, defaultValue, scope });
             }
             catch
             {

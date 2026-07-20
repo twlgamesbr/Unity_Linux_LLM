@@ -9,14 +9,14 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
 {
     internal class EnableTestOutLoggerTask : TestTaskBase, IDisposable
     {
-        internal Action<Action<PlayModeStateChange>> SubscribePlayModeStateChanged = callback => 
+        internal Action<Action<PlayModeStateChange>> SubscribePlayModeStateChanged = callback =>
             EditorApplication.playModeStateChanged += callback;
-        internal Action<Action<PlayModeStateChange>> UnsubscribePlayModeStateChanged = callback => 
+        internal Action<Action<PlayModeStateChange>> UnsubscribePlayModeStateChanged = callback =>
             EditorApplication.playModeStateChanged -= callback;
-        internal Action<Application.LogCallback> SubscribeLogMessageReceivedThreaded =
-            callback => Application.logMessageReceived += callback;
-        internal Action<Application.LogCallback> UnsubscribeLogMessageReceivedThreaded =
-            callback => Application.logMessageReceived -= callback;
+        internal Action<Application.LogCallback> SubscribeLogMessageReceivedThreaded = callback =>
+            Application.logMessageReceived += callback;
+        internal Action<Application.LogCallback> UnsubscribeLogMessageReceivedThreaded = callback =>
+            Application.logMessageReceived -= callback;
 
         internal Func<TextWriter> GetCurrentContextWriter = () => TestContext.Out;
 
@@ -31,7 +31,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             SubscribeLogMessageReceivedThreaded(LogReceived);
             yield break;
         }
-        
+
         private void WaitForExitPlaymode(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.EnteredEditMode)

@@ -1,31 +1,45 @@
-using UnityEditor;
-using UnityEngine;
-using UnityEditor.Build;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using System.Collections.Generic;
-using FilePath = UnityEditor.FilePathAttribute;
 using System.Linq;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
+using FilePath = UnityEditor.FilePathAttribute;
 
 namespace EditorAttributes.Editor
 {
     [@FilePath("ProjectSettings/EditorAttributes/EditorAttributesSettings.asset", FilePath.Location.ProjectFolder)]
     internal class EditorAttributesSettings : ScriptableSingleton<EditorAttributesSettings>
     {
-        [Tooltip("Disables the drawing of the editor by the editor extension script, usefull if you want to override the base UnityEngine.Object yourself.\nNote that some attributes like Button, PropertyOrder and ShowInInspector will stop working.")]
-        [SerializeField] internal bool disableEditorExtension;
+        [Tooltip(
+            "Disables the drawing of the editor by the editor extension script, usefull if you want to override the base UnityEngine.Object yourself.\nNote that some attributes like Button, PropertyOrder and ShowInInspector will stop working."
+        )]
+        [SerializeField]
+        internal bool disableEditorExtension;
 
         [Tooltip("Disables automatic validation when building the project")]
-        [SerializeField] internal bool disableBuildValidation;
+        [SerializeField]
+        internal bool disableBuildValidation;
 
-        [Tooltip("Time in milliseconds to wait for the asset preview to load, increase this value if the previews are not showing up")]
-        [SerializeField, Suffix("ms")] internal int assetPreviewLoadTime = 20;
+        [Tooltip(
+            "Time in milliseconds to wait for the asset preview to load, increase this value if the previews are not showing up"
+        )]
+        [SerializeField, Suffix("ms")]
+        internal int assetPreviewLoadTime = 20;
 
         [Space, Tooltip("Define custom units for use with UnitField Attribute")]
-        [SerializeField, DataTable] internal UnitDefinition[] customUnitDefinitions;
+        [SerializeField, DataTable]
+        internal UnitDefinition[] customUnitDefinitions;
 
-        [MessageBox(nameof(messageBoxText), nameof(CheckValidUnitDefinitions), MessageMode.Warning, StringInputMode.Dynamic)]
-        [SerializeField] private Void messageBoxHolder;
+        [MessageBox(
+            nameof(messageBoxText),
+            nameof(CheckValidUnitDefinitions),
+            MessageMode.Warning,
+            StringInputMode.Dynamic
+        )]
+        [SerializeField]
+        private Void messageBoxHolder;
 
         private string messageBoxText;
 
@@ -42,7 +56,10 @@ namespace EditorAttributes.Editor
 
             foreach (var customUnitDefinition in customUnitDefinitions)
             {
-                if (string.IsNullOrWhiteSpace(customUnitDefinition.unitName) || string.IsNullOrWhiteSpace(customUnitDefinition.unitLabel))
+                if (
+                    string.IsNullOrWhiteSpace(customUnitDefinition.unitName)
+                    || string.IsNullOrWhiteSpace(customUnitDefinition.unitLabel)
+                )
                     continue;
 
                 if (customUnitDefinition.category != UnitCategory.Custom)
@@ -73,7 +90,10 @@ namespace EditorAttributes.Editor
                     return true;
                 }
 
-                if (customUnitDefinition.category == UnitCategory.Custom && string.IsNullOrWhiteSpace(customUnitDefinition.categoryName))
+                if (
+                    customUnitDefinition.category == UnitCategory.Custom
+                    && string.IsNullOrWhiteSpace(customUnitDefinition.categoryName)
+                )
                 {
                     messageBoxText = "Custom unit category name cannot be empty";
                     return true;
@@ -93,7 +113,8 @@ namespace EditorAttributes.Editor
 
     internal class EditorAttributesSettingsProvider : SettingsProvider
     {
-        internal EditorAttributesSettingsProvider(string path, SettingsScope scope) : base(path, scope) { }
+        internal EditorAttributesSettingsProvider(string path, SettingsScope scope)
+            : base(path, scope) { }
 
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
@@ -110,56 +131,82 @@ namespace EditorAttributes.Editor
                     height = 19f,
                     marginTop = 1f,
                     marginLeft = 9f,
-                    marginBottom = 12f
-                }
+                    marginBottom = 12f,
+                },
             };
 
-            Button helpButton = new(() => Application.OpenURL("https://editorattributesdocs.readthedocs.io/en/latest/GettingStarted/editorattributessettings.html"))
+            Button helpButton = new(() =>
+                Application.OpenURL(
+                    "https://editorattributesdocs.readthedocs.io/en/latest/GettingStarted/editorattributessettings.html"
+                )
+            )
             {
                 tooltip = "Open reference for EditorAttributes Settings.",
                 style =
                 {
-                    borderTopLeftRadius = 0f, borderTopRightRadius = 0f, borderBottomLeftRadius = 0f, borderBottomRightRadius = 0f,
-                    borderTopWidth = 0f, borderBottomWidth = 0f, borderLeftWidth = 0f, borderRightWidth = 0f,
-                    paddingBottom = 0f, paddingTop = 0f, paddingLeft = 0f, paddingRight = 0f,
-                    marginTop = 0f, marginBottom = 0f, marginLeft = 0f, marginRight = 0f,
-                    width = 16.6f, height = 16.6f,
+                    borderTopLeftRadius = 0f,
+                    borderTopRightRadius = 0f,
+                    borderBottomLeftRadius = 0f,
+                    borderBottomRightRadius = 0f,
+                    borderTopWidth = 0f,
+                    borderBottomWidth = 0f,
+                    borderLeftWidth = 0f,
+                    borderRightWidth = 0f,
+                    paddingBottom = 0f,
+                    paddingTop = 0f,
+                    paddingLeft = 0f,
+                    paddingRight = 0f,
+                    marginTop = 0f,
+                    marginBottom = 0f,
+                    marginLeft = 0f,
+                    marginRight = 0f,
+                    width = 16.6f,
+                    height = 16.6f,
                     alignSelf = Align.FlexEnd,
                     backgroundColor = Color.clear,
-                    backgroundImage = (Texture2D)EditorGUIUtility.IconContent("d__Help@2x").image
-                }
+                    backgroundImage = (Texture2D)EditorGUIUtility.IconContent("d__Help@2x").image,
+                },
             };
 
-            helpButton.RegisterCallback<MouseOverEvent>((callack) => helpButton.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f, 1f));
+            helpButton.RegisterCallback<MouseOverEvent>(
+                (callack) => helpButton.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f, 1f)
+            );
             helpButton.RegisterCallback<MouseOutEvent>((callack) => helpButton.style.backgroundColor = Color.clear);
 
             InspectorElement inspectorElement = new(serializedObject);
 
             inspectorElement.Q<ObjectField>("unity-input-m_Script").parent.RemoveFromHierarchy(); // Remove the auto-generated script field
 
-            inspectorElement.Q<Toggle>("unity-input-disableEditorExtension").RegisterValueChangedCallback((changeEvent) =>
-            {
-                const string disableEditorExtensionDefine = "DISABLE_EDITOR_EXTENTION";
+            inspectorElement
+                .Q<Toggle>("unity-input-disableEditorExtension")
+                .RegisterValueChangedCallback(
+                    (changeEvent) =>
+                    {
+                        const string disableEditorExtensionDefine = "DISABLE_EDITOR_EXTENTION";
 
-                if (changeEvent.newValue) // Enabled
-                {
-                    PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.Standalone, disableEditorExtensionDefine);
-                }
-                else // Disabled
-                {
-                    PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone, out string[] defines);
+                        if (changeEvent.newValue) // Enabled
+                        {
+                            PlayerSettings.SetScriptingDefineSymbols(
+                                NamedBuildTarget.Standalone,
+                                disableEditorExtensionDefine
+                            );
+                        }
+                        else // Disabled
+                        {
+                            PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone, out string[] defines);
 
-                    defines = defines.Where((define) => define != disableEditorExtensionDefine).ToArray();
+                            defines = defines.Where((define) => define != disableEditorExtensionDefine).ToArray();
 
-                    PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.Standalone, defines);
-                }
-            });
+                            PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.Standalone, defines);
+                        }
+                    }
+                );
 
             Button clearParamsButton = new(() => ButtonDrawer.ClearAllParamsData())
             {
                 text = "Delete Buttons Parameter Data",
                 tooltip = "Deletes all buttons parameter data stored in ProjectSettings/EditorAttributes",
-                style = { marginTop = 10f }
+                style = { marginTop = 10f },
             };
 
             header.Add(helpButton);
@@ -174,9 +221,10 @@ namespace EditorAttributes.Editor
         public override void OnDeactivate() => EditorAttributesSettings.instance.SaveSettings();
 
         [SettingsProvider]
-        internal static SettingsProvider CreateSettingsProvider() => new EditorAttributesSettingsProvider("Project/EditorAttributes", SettingsScope.Project)
-        {
-            keywords = new HashSet<string>(new[] { "EditorAttributes", "Editor", "Attributes" })
-        };
+        internal static SettingsProvider CreateSettingsProvider() =>
+            new EditorAttributesSettingsProvider("Project/EditorAttributes", SettingsScope.Project)
+            {
+                keywords = new HashSet<string>(new[] { "EditorAttributes", "Editor", "Attributes" }),
+            };
     }
 }

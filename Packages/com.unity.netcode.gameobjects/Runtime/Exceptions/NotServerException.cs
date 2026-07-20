@@ -16,13 +16,15 @@ namespace Unity.Netcode
         /// Constructs a NotServerException with a message
         /// </summary>
         /// <param name="message">The exception message</param>
-        public NotServerException(string message) : base(message) { }
+        public NotServerException(string message)
+            : base(message) { }
 
         /// <summary>
         /// Constructs a NotServerException with a message and a inner exception
         /// </summary>
         /// <param name="message">The exception message</param>
         /// <param name="inner">The inner exception</param>
-        public NotServerException(string message, Exception inner) : base(message, inner) { }
+        public NotServerException(string message, Exception inner)
+            : base(message, inner) { }
     }
 }

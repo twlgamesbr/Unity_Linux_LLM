@@ -7,5 +7,5 @@ public enum RefWrapperType
     RefRO,
     RefRW,
     EnabledRefRO,
-    EnabledRefRW
+    EnabledRefRW,
 }

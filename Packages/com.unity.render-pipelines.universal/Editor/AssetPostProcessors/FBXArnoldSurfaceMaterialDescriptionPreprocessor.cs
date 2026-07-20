@@ -15,8 +15,10 @@ namespace UnityEditor.Rendering.Universal
         static readonly uint k_Version = 3;
         static readonly int k_Order = -960;
 
-        static readonly string k_ShaderPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/ArnoldStandardSurface/ArnoldStandardSurface.shadergraph";
-        static readonly string k_ShaderTransparentPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/ArnoldStandardSurface/ArnoldStandardSurfaceTransparent.shadergraph";
+        static readonly string k_ShaderPath =
+            "Packages/com.unity.render-pipelines.universal/Runtime/Materials/ArnoldStandardSurface/ArnoldStandardSurface.shadergraph";
+        static readonly string k_ShaderTransparentPath =
+            "Packages/com.unity.render-pipelines.universal/Runtime/Materials/ArnoldStandardSurface/ArnoldStandardSurfaceTransparent.shadergraph";
 
         public override uint GetVersion()
         {
@@ -46,8 +48,11 @@ namespace UnityEditor.Rendering.Universal
             return classIdA == 2121471519 && classIdB == 1660373836 && originalMtl != "PHYSICAL_MTL";
         }
 
-        public void OnPreprocessMaterialDescription(MaterialDescription description, Material material,
-            AnimationClip[] clips)
+        public void OnPreprocessMaterialDescription(
+            MaterialDescription description,
+            Material material,
+            AnimationClip[] clips
+        )
         {
             var pipelineAsset = GraphicsSettings.currentRenderPipeline;
             if (!pipelineAsset || pipelineAsset.GetType() != typeof(UniversalRenderPipelineAsset))
@@ -63,8 +68,11 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        void CreateFromMayaArnoldStandardSurfaceMaterial(MaterialDescription description, Material material,
-            AnimationClip[] clips)
+        void CreateFromMayaArnoldStandardSurfaceMaterial(
+            MaterialDescription description,
+            Material material,
+            AnimationClip[] clips
+        )
         {
             float floatProperty;
             Vector4 vectorProperty;
@@ -111,7 +119,6 @@ namespace UnityEditor.Rendering.Universal
                 material.shader = shader;
             }
 
-
             foreach (var clip in clips)
             {
                 clip.ClearCurves();
@@ -153,8 +160,11 @@ namespace UnityEditor.Rendering.Universal
             remapPropertyTexture(description, material, "normalCamera", "_NORMAL_MAP");
         }
 
-        void CreateFrom3DsMaxArnoldStandardSurfaceMaterial(MaterialDescription description, Material material,
-            AnimationClip[] clips)
+        void CreateFrom3DsMaxArnoldStandardSurfaceMaterial(
+            MaterialDescription description,
+            Material material,
+            AnimationClip[] clips
+        )
         {
             float floatProperty;
             Vector4 vectorProperty;
@@ -163,7 +173,6 @@ namespace UnityEditor.Rendering.Universal
             var shader = AssetDatabase.LoadAssetAtPath<Shader>(k_ShaderPath);
             if (shader == null)
                 return;
-
 
             material.shader = shader;
             foreach (var clip in clips)
@@ -212,32 +221,49 @@ namespace UnityEditor.Rendering.Universal
 
             if (description.TryGetProperty("emission", out floatProperty) && floatProperty > 0.0f)
             {
-                remapPropertyColorOrTexture3DsMax(description, material, "emission_color", "_EMISSION_COLOR",
-                    floatProperty);
+                remapPropertyColorOrTexture3DsMax(
+                    description,
+                    material,
+                    "emission_color",
+                    "_EMISSION_COLOR",
+                    floatProperty
+                );
             }
 
             remapPropertyFloatOrTexture3DsMax(description, material, "metalness", "_METALNESS");
 
             description.TryGetProperty("specular", out float specularFactor);
 
-            remapPropertyColorOrTexture3DsMax(description, material, "specular_color", "_SPECULAR_COLOR",
-                specularFactor);
+            remapPropertyColorOrTexture3DsMax(
+                description,
+                material,
+                "specular_color",
+                "_SPECULAR_COLOR",
+                specularFactor
+            );
             remapPropertyFloatOrTexture3DsMax(description, material, "specular_roughness", "_SPECULAR_ROUGHNESS");
             remapPropertyFloatOrTexture3DsMax(description, material, "specular_IOR", "_SPECULAR_IOR");
 
             remapPropertyTexture(description, material, "normal_camera", "_NORMAL_MAP");
         }
 
-        static void SetMaterialTextureProperty(string propertyName, Material material,
-            TexturePropertyDescription textureProperty)
+        static void SetMaterialTextureProperty(
+            string propertyName,
+            Material material,
+            TexturePropertyDescription textureProperty
+        )
         {
             material.SetTexture(propertyName, textureProperty.texture);
             material.SetTextureOffset(propertyName, textureProperty.offset);
             material.SetTextureScale(propertyName, textureProperty.scale);
         }
 
-        static void remapPropertyFloat(MaterialDescription description, Material material, string inPropName,
-            string outPropName)
+        static void remapPropertyFloat(
+            MaterialDescription description,
+            Material material,
+            string inPropName,
+            string outPropName
+        )
         {
             if (description.TryGetProperty(inPropName, out float floatProperty))
             {
@@ -245,8 +271,12 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void remapPropertyTexture(MaterialDescription description, Material material, string inPropName,
-            string outPropName)
+        static void remapPropertyTexture(
+            MaterialDescription description,
+            Material material,
+            string inPropName,
+            string outPropName
+        )
         {
             if (description.TryGetProperty(inPropName, out TexturePropertyDescription textureProperty))
             {
@@ -254,8 +284,13 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void remapPropertyColorOrTexture3DsMax(MaterialDescription description, Material material,
-            string inPropName, string outPropName, float multiplier = 1.0f)
+        static void remapPropertyColorOrTexture3DsMax(
+            MaterialDescription description,
+            Material material,
+            string inPropName,
+            string outPropName,
+            float multiplier = 1.0f
+        )
         {
             if (description.TryGetProperty(inPropName + ".shader", out TexturePropertyDescription textureProperty))
             {
@@ -269,8 +304,12 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void remapPropertyFloatOrTexture3DsMax(MaterialDescription description, Material material,
-            string inPropName, string outPropName)
+        static void remapPropertyFloatOrTexture3DsMax(
+            MaterialDescription description,
+            Material material,
+            string inPropName,
+            string outPropName
+        )
         {
             if (description.TryGetProperty(inPropName, out TexturePropertyDescription textureProperty))
             {
@@ -284,8 +323,13 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void remapPropertyColorOrTexture(MaterialDescription description, Material material, string inPropName,
-            string outPropName, float multiplier = 1.0f)
+        static void remapPropertyColorOrTexture(
+            MaterialDescription description,
+            Material material,
+            string inPropName,
+            string outPropName,
+            float multiplier = 1.0f
+        )
         {
             if (description.TryGetProperty(inPropName, out TexturePropertyDescription textureProperty))
             {
@@ -299,8 +343,12 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void remapPropertyFloatOrTexture(MaterialDescription description, Material material, string inPropName,
-            string outPropName)
+        static void remapPropertyFloatOrTexture(
+            MaterialDescription description,
+            Material material,
+            string inPropName,
+            string outPropName
+        )
         {
             if (description.TryGetProperty(inPropName, out TexturePropertyDescription textureProperty))
             {

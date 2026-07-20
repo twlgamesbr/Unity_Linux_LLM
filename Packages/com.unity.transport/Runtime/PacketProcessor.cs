@@ -67,11 +67,14 @@ namespace Unity.Networking.Transport
         /// collections checks are enabled (i.e. in the editor). Otherwise the obtained reference
         /// may be partially corrupted.
         /// </exception>
-        public ref T GetPayloadDataRef<T>(int offset = 0) where T : unmanaged
+        public ref T GetPayloadDataRef<T>(int offset = 0)
+            where T : unmanaged
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (UnsafeUtility.SizeOf<T>() + offset > Length)
-                throw new ArgumentException($"The requested type {typeof(T).ToString()} does not fit in the payload data ({Length - offset})");
+                throw new ArgumentException(
+                    $"The requested type {typeof(T).ToString()} does not fit in the payload data ({Length - offset})"
+                );
 #endif
             return ref *(T*)(((byte*)GetUnsafePayloadPtr()) + Offset + offset);
         }
@@ -91,9 +94,13 @@ namespace Unity.Networking.Transport
             if (size > BytesAvailableAtEnd)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available)");
+                throw new ArgumentException(
+                    $"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available)"
+                );
 #else
-                Debug.LogError($"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available).");
+                Debug.LogError(
+                    $"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available)."
+                );
                 return;
 #endif
             }
@@ -123,15 +130,20 @@ namespace Unity.Networking.Transport
         /// collections checks are enabled (i.e. in the editor). Otherwise an error is logged and
         /// nothing is copied.
         /// </exception>
-        public void AppendToPayload<T>(T value) where T : unmanaged
+        public void AppendToPayload<T>(T value)
+            where T : unmanaged
         {
             var size = UnsafeUtility.SizeOf<T>();
             if (size > BytesAvailableAtEnd)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available)");
+                throw new ArgumentException(
+                    $"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available)"
+                );
 #else
-                Debug.LogError($"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available).");
+                Debug.LogError(
+                    $"The requested data size ({size}) does not fit at the end of the payload ({BytesAvailableAtEnd} Bytes available)."
+                );
                 return;
 #endif
             }
@@ -149,15 +161,20 @@ namespace Unity.Networking.Transport
         /// collections checks are enabled (i.e. in the editor). Otherwise an error is logged and
         /// nothing is copied.
         /// </exception>
-        public void PrependToPayload<T>(T value) where T : unmanaged
+        public void PrependToPayload<T>(T value)
+            where T : unmanaged
         {
             var size = UnsafeUtility.SizeOf<T>();
             if (size > BytesAvailableAtStart)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"The requested data size ({size}) does not fit at the start of the payload ({BytesAvailableAtStart} Bytes available)");
+                throw new ArgumentException(
+                    $"The requested data size ({size}) does not fit at the start of the payload ({BytesAvailableAtStart} Bytes available)"
+                );
 #else
-                Debug.LogError($"The requested data size ({size}) does not fit at the start of the payload ({BytesAvailableAtStart} Bytes available).");
+                Debug.LogError(
+                    $"The requested data size ({size}) does not fit at the start of the payload ({BytesAvailableAtStart} Bytes available)."
+                );
                 return;
 #endif
             }
@@ -177,13 +194,16 @@ namespace Unity.Networking.Transport
         /// collections checks are enabled (i.e. in the editor). Otherwise an error is logged and
         /// a default value is returned.
         /// </exception>
-        public T RemoveFromPayloadStart<T>() where T : unmanaged
+        public T RemoveFromPayloadStart<T>()
+            where T : unmanaged
         {
             var size = UnsafeUtility.SizeOf<T>();
             if (size > Length)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"The size of the required type ({size}) does not fit in the payload ({Length}).");
+                throw new ArgumentException(
+                    $"The size of the required type ({size}) does not fit in the payload ({Length})."
+                );
 #else
                 Debug.LogError($"The size of the required type ({size}) does not fit in the payload ({Length}).");
                 return default(T);
@@ -245,12 +265,13 @@ namespace Unity.Networking.Transport
             if (size < Length)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"The payload size ({Length}) does not fit in the provided pointer ({size})");
+                throw new ArgumentException(
+                    $"The payload size ({Length}) does not fit in the provided pointer ({size})"
+                );
 #else
                 Debug.LogError($"The payload size ({Length}) does not fit in the provided pointer ({size})");
                 copiedBytes = size;
 #endif
-                
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -289,7 +310,9 @@ namespace Unity.Networking.Transport
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (offset + size > Capacity || offset < 0 || size < 0)
-                throw new ArgumentException($"The requested data size ({size}) and offset ({offset}) does not fit in the payload ({Capacity} Bytes available)");
+                throw new ArgumentException(
+                    $"The requested data size ({size}) and offset ({offset}) does not fit in the payload ({Capacity} Bytes available)"
+                );
 #endif
             PacketMetadataRef.DataLength = size;
             PacketMetadataRef.DataOffset = offset;

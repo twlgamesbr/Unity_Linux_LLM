@@ -5,7 +5,6 @@ using UnityEditor.IMGUI.Controls;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEditor;
 using Unity.Profiling;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeView = UnityEditor.IMGUI.Controls.TreeView<int>;
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
@@ -29,7 +28,9 @@ namespace UnityEngine.InputSystem.Editor
     {
         private readonly InputEventTrace m_EventTrace;
         private readonly InputControl m_RootControl;
-        private static readonly ProfilerMarker k_InputEventTreeBuildRootMarker = new ProfilerMarker("InputEventTreeView.BuildRoot");
+        private static readonly ProfilerMarker k_InputEventTreeBuildRootMarker = new ProfilerMarker(
+            "InputEventTreeView.BuildRoot"
+        );
 
         private enum ColumnId
         {
@@ -39,10 +40,15 @@ namespace UnityEngine.InputSystem.Editor
             Size,
             Time,
             Details,
-            COUNT
+            COUNT,
         }
 
-        public static InputEventTreeView Create(InputDevice device, InputEventTrace eventTrace, ref TreeViewState treeState, ref MultiColumnHeaderState headerState)
+        public static InputEventTreeView Create(
+            InputDevice device,
+            InputEventTrace eventTrace,
+            ref TreeViewState treeState,
+            ref MultiColumnHeaderState headerState
+        )
         {
             if (treeState == null)
                 treeState = new TreeViewState();
@@ -60,60 +66,59 @@ namespace UnityEngine.InputSystem.Editor
         {
             var columns = new MultiColumnHeaderState.Column[(int)ColumnId.COUNT];
 
-            columns[(int)ColumnId.Id] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Id] = new MultiColumnHeaderState.Column
             {
                 width = 80,
                 minWidth = 60,
                 headerContent = new GUIContent("Id"),
-                canSort = false
+                canSort = false,
             };
-            columns[(int)ColumnId.Type] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Type] = new MultiColumnHeaderState.Column
             {
                 width = 60,
                 minWidth = 60,
                 headerContent = new GUIContent("Type"),
-                canSort = false
+                canSort = false,
             };
-            columns[(int)ColumnId.Device] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Device] = new MultiColumnHeaderState.Column
             {
                 width = 80,
                 minWidth = 60,
                 headerContent = new GUIContent("Device"),
-                canSort = false
+                canSort = false,
             };
-            columns[(int)ColumnId.Size] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Size] = new MultiColumnHeaderState.Column
             {
                 width = 50,
                 minWidth = 50,
                 headerContent = new GUIContent("Size"),
-                canSort = false
+                canSort = false,
             };
-            columns[(int)ColumnId.Time] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Time] = new MultiColumnHeaderState.Column
             {
                 width = 100,
                 minWidth = 80,
                 headerContent = new GUIContent("Time"),
-                canSort = false
+                canSort = false,
             };
 
-            columns[(int)ColumnId.Details] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Details] = new MultiColumnHeaderState.Column
             {
                 width = 250,
                 minWidth = 100,
                 headerContent = new GUIContent("Details"),
-                canSort = false
+                canSort = false,
             };
 
             return new MultiColumnHeaderState(columns);
         }
 
-        private InputEventTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, InputEventTrace eventTrace, InputControl rootControl)
+        private InputEventTreeView(
+            TreeViewState state,
+            MultiColumnHeader multiColumnHeader,
+            InputEventTrace eventTrace,
+            InputControl rootControl
+        )
             : base(state, multiColumnHeader)
         {
             m_EventTrace = eventTrace;
@@ -162,7 +167,10 @@ namespace UnityEngine.InputSystem.Editor
         {
             var selection = (IList<int>)userData;
             var window = ScriptableObject.CreateInstance<InputStateWindow>();
-            window.InitializeWithEvents(selection.Select(id => ((EventItem)FindItem(id, rootItem)).eventPtr).ToArray(), m_RootControl);
+            window.InitializeWithEvents(
+                selection.Select(id => ((EventItem)FindItem(id, rootItem)).eventPtr).ToArray(),
+                m_RootControl
+            );
             window.Show();
         }
 
@@ -190,7 +198,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 id = 0,
                 depth = -1,
-                displayName = "Root"
+                displayName = "Root",
             };
 
             var eventCount = m_EventTrace.eventCount;
@@ -216,7 +224,7 @@ namespace UnityEngine.InputSystem.Editor
                         id = i + 1,
                         depth = 1,
                         displayName = current.id.ToString(),
-                        eventPtr = current
+                        eventPtr = current,
                     };
 
                     root.AddChild(item);
@@ -267,7 +275,10 @@ namespace UnityEngine.InputSystem.Editor
                     if (eventPtr.IsA<DeltaStateEvent>())
                     {
                         var deltaEventPtr = DeltaStateEvent.From(eventPtr);
-                        GUI.Label(cellRect, $"Format={deltaEventPtr->stateFormat}, Offset={deltaEventPtr->stateOffset}");
+                        GUI.Label(
+                            cellRect,
+                            $"Format={deltaEventPtr->stateFormat}, Offset={deltaEventPtr->stateOffset}"
+                        );
                     }
                     else if (eventPtr.IsA<StateEvent>())
                     {

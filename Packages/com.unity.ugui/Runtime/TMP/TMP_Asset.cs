@@ -19,7 +19,6 @@ namespace TMPro
             internal set { m_Version = value; }
         }
 
-
         /// <summary>
         /// Instance ID of the TMP Asset
         /// </summary>
@@ -119,7 +118,8 @@ namespace TMPro
         [SerializeField]
         internal FaceInfo m_FaceInfo;
 
-        [SerializeField][FormerlySerializedAs("material")]
+        [SerializeField]
+        [FormerlySerializedAs("material")]
         internal Material m_Material;
 
         internal int m_MaterialHashCode;

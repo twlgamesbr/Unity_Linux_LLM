@@ -7,7 +7,6 @@ using System.Text;
 using UnityEditor.TestTools.TestRunner.Api;
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
 
-
 namespace UnityEditor.TestTools.TestRunner.GUI
 {
     internal sealed class TestTreeViewItem : TreeViewItem
@@ -20,14 +19,24 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
         private const int k_ResultTestMaxLength = 15000;
 
-        public bool IsGroupNode { get { return m_Test.IsSuite; } }
+        public bool IsGroupNode
+        {
+            get { return m_Test.IsSuite; }
+        }
 
-        public string FullName { get { return m_Test.FullName; } }
-        public string UniqueName { get { return m_Test.UniqueName; } }
+        public string FullName
+        {
+            get { return m_Test.FullName; }
+        }
+        public string UniqueName
+        {
+            get { return m_Test.UniqueName; }
+        }
 
         public override string displayName
         {
-            get => $"{base.displayName}{(hasChildren ? $" ({TotalChildrenCount} tests) {(TotalSuccessChildrenCount > 0 ? $" {TotalSuccessChildrenCount} tests failed" : null)}" : null)}";
+            get =>
+                $"{base.displayName}{(hasChildren ? $" ({TotalChildrenCount} tests) {(TotalSuccessChildrenCount > 0 ? $" {TotalSuccessChildrenCount} tests failed" : null)}" : null)}";
             set => base.displayName = value;
         }
 
@@ -47,7 +56,6 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             return null;
         }
 
-
         public IEnumerable<ITestAdaptor> GetMinimizedSelectedTree()
         {
             if (!m_Test.HasChildren)
@@ -56,7 +64,10 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                 yield break;
             }
 
-            var minimizedDescendants = children.OfType<TestTreeViewItem>().SelectMany(c => c.GetMinimizedSelectedTree()).ToArray();
+            var minimizedDescendants = children
+                .OfType<TestTreeViewItem>()
+                .SelectMany(c => c.GetMinimizedSelectedTree())
+                .ToArray();
             var includeChildren = minimizedDescendants.Count(c => c.Parent == m_Test);
             if (includeChildren == m_Test.Children.Count())
             {
@@ -64,7 +75,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                 yield return m_Test;
                 yield break;
             }
-            
+
             foreach (var child in minimizedDescendants)
             {
                 yield return child;
@@ -175,7 +186,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                     break;
             }
         }
-        
+
         private static string StacktraceWithHyperlinks(string stacktraceText)
         {
             StringBuilder textWithHyperlinks = new StringBuilder();
@@ -201,7 +212,9 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 #else
                             var displayedPath = filePath;
 #endif
-                            textWithHyperlinks.Append($"{lines[i].Substring(0, filePathIndex)}<color=#40a0ff><a href=\"{filePath}\" line=\"{lineString}\">{displayedPath}:{lineString}</a></color>\n");
+                            textWithHyperlinks.Append(
+                                $"{lines[i].Substring(0, filePathIndex)}<color=#40a0ff><a href=\"{filePath}\" line=\"{lineString}\">{displayedPath}:{lineString}</a></color>\n"
+                            );
 
                             continue; // continue to evade the default case
                         }
@@ -213,7 +226,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             // Remove the last \n
             if (textWithHyperlinks.Length > 0) // textWithHyperlinks always ends with \n if it is not empty
                 textWithHyperlinks.Remove(textWithHyperlinks.Length - 1, 1);
-            
+
             return textWithHyperlinks.ToString();
         }
     }

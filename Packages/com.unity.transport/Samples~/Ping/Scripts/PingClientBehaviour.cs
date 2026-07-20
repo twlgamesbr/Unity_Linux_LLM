@@ -1,8 +1,8 @@
-using UnityEngine;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 namespace Unity.Networking.Transport.Samples
 {
@@ -139,7 +139,7 @@ namespace Unity.Networking.Transport.Samples
                     Driver = m_ClientDriver,
                     Connection = m_ClientConnection,
                     PingLastRTT = m_PingLastRTT,
-                    CurrentTime = currentTime
+                    CurrentTime = currentTime,
                 };
 
                 // If it's time to send, schedule a send job.
@@ -153,7 +153,7 @@ namespace Unity.Networking.Transport.Samples
                     {
                         Driver = m_ClientDriver.ToConcurrent(),
                         Connection = m_ClientConnection.Value,
-                        CurrentTime = currentTime
+                        CurrentTime = currentTime,
                     }.Schedule();
                 }
 

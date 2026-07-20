@@ -52,8 +52,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </example>
         /// </remarks>
         /// <seealso cref="InputSystem.onEvent"/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "_", Justification = "Keep this for future implementation")]
-        public static InputEventListener operator+(InputEventListener _, Action<InputEventPtr, InputDevice> callback)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Usage",
+            "CA1801:ReviewUnusedParameters",
+            MessageId = "_",
+            Justification = "Keep this for future implementation"
+        )]
+        public static InputEventListener operator +(InputEventListener _, Action<InputEventPtr, InputDevice> callback)
         {
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
@@ -77,8 +82,13 @@ namespace UnityEngine.InputSystem.LowLevel
         /// </example>
         /// </remarks>
         /// <seealso cref="InputSystem.onEvent"/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "_", Justification = "Keep this for future implementation")]
-        public static InputEventListener operator-(InputEventListener _, Action<InputEventPtr, InputDevice> callback)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Usage",
+            "CA1801:ReviewUnusedParameters",
+            MessageId = "_",
+            Justification = "Keep this for future implementation"
+        )]
+        public static InputEventListener operator -(InputEventListener _, Action<InputEventPtr, InputDevice> callback)
         {
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
@@ -123,8 +133,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
             public ObserverState()
             {
-                onEventDelegate =
-                    (eventPtr, device) =>
+                onEventDelegate = (eventPtr, device) =>
                 {
                     for (var i = observers.length - 1; i >= 0; --i)
                         observers[i].OnNext(eventPtr);

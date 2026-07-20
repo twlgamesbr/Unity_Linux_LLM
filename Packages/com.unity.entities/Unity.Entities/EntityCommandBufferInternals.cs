@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using UnityEngine.Assertions;
 using Unity.Burst.CompilerServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnityEngine.Assertions;
 
 namespace Unity.Entities
 {
@@ -24,8 +24,8 @@ namespace Unity.Entities
 
         internal static void InitChain(EntityCommandBufferChain* chain, AllocatorManager.AllocatorHandle allocator)
         {
-            chain->m_Cleanup =
-                (ChainCleanup*)Memory.Unmanaged.Allocate(sizeof(ChainCleanup), sizeof(ChainCleanup), allocator);
+            chain->m_Cleanup = (ChainCleanup*)
+                Memory.Unmanaged.Allocate(sizeof(ChainCleanup), sizeof(ChainCleanup), allocator);
             chain->m_Cleanup->CleanupList = null;
             chain->m_Cleanup->BufferCleanupList = null;
             chain->m_Cleanup->EntityArraysCleanupList = null;
@@ -75,13 +75,16 @@ namespace Unity.Entities
         private readonly AllocatorManager.AllocatorHandle m_Allocator;
         private static readonly int BaseIndex = 1;
 
-        public ECBChainPriorityQueue(ECBChainPlaybackState* chainStates, int chainStateCount,
-            AllocatorManager.AllocatorHandle alloc)
+        public ECBChainPriorityQueue(
+            ECBChainPlaybackState* chainStates,
+            int chainStateCount,
+            AllocatorManager.AllocatorHandle alloc
+        )
         {
             m_Size = chainStateCount;
             m_Allocator = alloc;
-            m_Heap = (ECBChainHeapElement*)Memory.Unmanaged.Allocate((m_Size + BaseIndex) * sizeof(ECBChainHeapElement),
-                64, m_Allocator);
+            m_Heap = (ECBChainHeapElement*)
+                Memory.Unmanaged.Allocate((m_Size + BaseIndex) * sizeof(ECBChainHeapElement), 64, m_Allocator);
             for (int i = m_Size - 1; i >= m_Size / 2; --i)
             {
                 m_Heap[BaseIndex + i].SortKey = chainStates[i].NextSortKey;
@@ -243,8 +246,8 @@ namespace Unity.Entities
 #endif
             int allocSize = sizeof(EntityCommandBufferChain) * maxThreadCount;
 
-            m_ThreadedChains =
-                (EntityCommandBufferChain*)Memory.Unmanaged.Allocate(allocSize, JobsUtility.CacheLineSize, m_Allocator);
+            m_ThreadedChains = (EntityCommandBufferChain*)
+                Memory.Unmanaged.Allocate(allocSize, JobsUtility.CacheLineSize, m_Allocator);
             UnsafeUtility.MemClear(m_ThreadedChains, allocSize);
             // each thread's chain is lazily initialized inside Reserve() when its first command is written.
         }
@@ -274,11 +277,13 @@ namespace Unity.Entities
             ResetEntityCommandBatching(chain);
         }
 
-        internal Entity* CloneAndSearchForDeferredEntities(NativeArray<Entity> entities,
-            out bool containsDeferredEntities)
+        internal Entity* CloneAndSearchForDeferredEntities(
+            NativeArray<Entity> entities,
+            out bool containsDeferredEntities
+        )
         {
-            var output =
-                (Entity*)Memory.Unmanaged.Allocate(entities.Length * sizeof(Entity), ALIGN_64_BIT, m_Allocator);
+            var output = (Entity*)
+                Memory.Unmanaged.Allocate(entities.Length * sizeof(Entity), ALIGN_64_BIT, m_Allocator);
             containsDeferredEntities = false;
             int i = 0;
             int len = entities.Length;
@@ -301,12 +306,16 @@ namespace Unity.Entities
             return output;
         }
 
-        internal void AddCreateCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op, int index,
-            EntityArchetype archetype, bool batchable)
+        internal void AddCreateCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            int index,
+            EntityArchetype archetype,
+            bool batchable
+        )
         {
-            if (batchable &&
-                chain->m_PrevCreateCommand != null &&
-                chain->m_PrevCreateCommand->Archetype == archetype)
+            if (batchable && chain->m_PrevCreateCommand != null && chain->m_PrevCreateCommand->Archetype == archetype)
             {
                 ++chain->m_PrevCreateCommand->BatchCount;
             }
@@ -327,12 +336,16 @@ namespace Unity.Entities
             }
         }
 
-        internal void AddEntityCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op, int index, Entity e,
-            bool batchable)
+        internal void AddEntityCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            int index,
+            Entity e,
+            bool batchable
+        )
         {
-            if (batchable &&
-                chain->m_PrevEntityCommand != null &&
-                chain->m_PrevEntityCommand->Entity == e)
+            if (batchable && chain->m_PrevEntityCommand != null && chain->m_PrevEntityCommand->Entity == e)
             {
                 ++chain->m_PrevEntityCommand->BatchCount;
             }
@@ -356,13 +369,21 @@ namespace Unity.Entities
             }
         }
 
-        internal void AddLinkedEntityGroupComponentCommand<T>(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, EntityQueryMask mask, Entity e, T component) where T : unmanaged, IComponentData
+        internal void AddLinkedEntityGroupComponentCommand<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQueryMask mask,
+            Entity e,
+            T component
+        )
+            where T : unmanaged, IComponentData
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddLinkedEntityGroupComponentCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddLinkedEntityGroupComponentCommand"
+                );
 #endif
             var ctype = ComponentType.ReadWrite<T>();
             if (ctype.IsZeroSized)
@@ -390,17 +411,25 @@ namespace Unity.Entities
             cmd->Mask = mask;
             byte* componentValue = (byte*)(cmd + 1);
             UnsafeUtility.CopyStructureToPtr(ref component, componentValue);
-            cmd->Header.ValueRequiresEntityFixup =
-                RequiresEntityFixUp(componentValue, ctype.TypeIndex) ? (byte)1 : (byte)0;
+            cmd->Header.ValueRequiresEntityFixup = RequiresEntityFixUp(componentValue, ctype.TypeIndex)
+                ? (byte)1
+                : (byte)0;
         }
 
-        internal void AddLinkedEntityGroupTypeCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            EntityQueryMask mask, Entity e, ComponentType t)
+        internal void AddLinkedEntityGroupTypeCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQueryMask mask,
+            Entity e,
+            ComponentType t
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddLinkedEntityGroupTypeCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddLinkedEntityGroupTypeCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntityQueryMaskCommand), ALIGN_64_BIT);
 
@@ -419,12 +448,17 @@ namespace Unity.Entities
             data->Mask = mask;
         }
 
-        internal void AddMultipleEntityCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            int firstIndex, int count, Entity e, bool batchable)
+        internal void AddMultipleEntityCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            int firstIndex,
+            int count,
+            Entity e,
+            bool batchable
+        )
         {
-            if (batchable &&
-                chain->m_PrevEntityCommand != null &&
-                chain->m_PrevEntityCommand->Entity == e)
+            if (batchable && chain->m_PrevEntityCommand != null && chain->m_PrevEntityCommand->Entity == e)
             {
                 chain->m_PrevEntityCommand->BatchCount += count;
             }
@@ -433,7 +467,8 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 if (Hint.Unlikely(e == Entity.Null))
                     throw new InvalidOperationException(
-                        "Invalid Entity.Null passed. ECBCommand.AddMultipleEntityCommand");
+                        "Invalid Entity.Null passed. ECBCommand.AddMultipleEntityCommand"
+                    );
 #endif
                 ResetCreateCommandBatching(chain);
                 var sizeNeeded = Align(sizeof(EntityCommand), ALIGN_64_BIT);
@@ -466,8 +501,14 @@ namespace Unity.Entities
             return false;
         }
 
-        internal void AddEntityComponentTypeWithValueCommand<T>(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, Entity e, T component) where T : unmanaged, IComponentData
+        internal void AddEntityComponentTypeWithValueCommand<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            T component
+        )
+            where T : unmanaged, IComponentData
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
@@ -501,16 +542,27 @@ namespace Unity.Entities
             cmd->ValueRequiresEntityFixup = RequiresEntityFixUp(componentValue, ctype.TypeIndex) ? (byte)1 : (byte)0;
         }
 
-        internal void UnsafeAddEntityComponentCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            Entity e, TypeIndex typeIndex, int typeSize, void* componentDataPtr)
+        internal void UnsafeAddEntityComponentCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            TypeIndex typeIndex,
+            int typeSize,
+            void* componentDataPtr
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            UnityEngine.Assertions.Assert.AreEqual(TypeManager.GetTypeInfo(typeIndex).TypeSize, typeSize,
-                "Type size does not match TypeManager's size!");
+            UnityEngine.Assertions.Assert.AreEqual(
+                TypeManager.GetTypeInfo(typeIndex).TypeSize,
+                typeSize,
+                "Type size does not match TypeManager's size!"
+            );
             UnityEngine.Assertions.Assert.IsTrue(componentDataPtr != null, "componentDataPtr is null!");
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.UnsafeAddEntityComponentCommand");
+                    "Invalid Entity.Null passed. ECBCommand.UnsafeAddEntityComponentCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntityComponentCommand) + typeSize, ALIGN_64_BIT);
 
@@ -530,8 +582,13 @@ namespace Unity.Entities
             cmd->ValueRequiresEntityFixup = RequiresEntityFixUp(componentValue, typeIndex) ? (byte)1 : (byte)0;
         }
 
-        internal void AddEntityEnabledCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op, Entity e,
-            bool value)
+        internal void AddEntityEnabledCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            bool value
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
@@ -551,13 +608,20 @@ namespace Unity.Entities
             cmd->IsEnabled = value ? (byte)1 : (byte)0;
         }
 
-        internal void AddEntityComponentEnabledCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            Entity e, TypeIndex typeIndex, bool value)
+        internal void AddEntityComponentEnabledCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            TypeIndex typeIndex,
+            bool value
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentEnabledCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentEnabledCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntityComponentEnabledCommand), ALIGN_64_BIT);
 
@@ -574,13 +638,19 @@ namespace Unity.Entities
             cmd->Header.IsEnabled = value ? (byte)1 : (byte)0;
         }
 
-        internal void AddEntityNameCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op, Entity e,
-            in FixedString64Bytes name)
+        internal void AddEntityNameCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            in FixedString64Bytes name
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentEnabledCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentEnabledCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntityNameCommand), ALIGN_64_BIT);
 
@@ -596,8 +666,14 @@ namespace Unity.Entities
             cmd->Name = name;
         }
 
-        internal BufferHeader* AddEntityBufferCommand<T>(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            Entity e, out int internalCapacity) where T : struct, IBufferElementData
+        internal BufferHeader* AddEntityBufferCommand<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            out int internalCapacity
+        )
+            where T : struct, IBufferElementData
         {
             var typeIndex = TypeManager.GetTypeIndex<T>();
             ref readonly var type = ref TypeManager.GetTypeInfo<T>();
@@ -650,13 +726,19 @@ namespace Unity.Entities
             return (size + alignmentPowerOfTwo - 1) & ~(alignmentPowerOfTwo - 1);
         }
 
-        internal void AddEntityComponentTypeWithoutValueCommand(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, Entity e, ComponentType t)
+        internal void AddEntityComponentTypeWithoutValueCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            ComponentType t
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentTypeCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentTypeCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntityComponentCommand), ALIGN_64_BIT);
 
@@ -674,13 +756,19 @@ namespace Unity.Entities
             data->ValueRequiresEntityFixup = 0;
         }
 
-        internal void AddEntityComponentTypesCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            Entity e, in ComponentTypeSet t)
+        internal void AddEntityComponentTypesCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            in ComponentTypeSet t
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentTypesCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddEntityComponentTypesCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntityMultipleComponentsCommand), ALIGN_64_BIT);
 
@@ -696,8 +784,12 @@ namespace Unity.Entities
             data->TypeSet = t;
         }
 
-        internal bool AppendMultipleEntitiesCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            EntityQuery entityQuery)
+        internal bool AppendMultipleEntitiesCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQuery entityQuery
+        )
         {
             var entities = entityQuery.ToEntityArray(m_Allocator.ToAllocator);
             if (entities.Length == 0)
@@ -706,17 +798,28 @@ namespace Unity.Entities
                 return false;
             }
 
-            var result = AppendMultipleEntitiesCommand(chain, sortKey, op,
-                (Entity*)entities.GetUnsafeReadOnlyPtr(), entities.Length, false);
+            var result = AppendMultipleEntitiesCommand(
+                chain,
+                sortKey,
+                op,
+                (Entity*)entities.GetUnsafeReadOnlyPtr(),
+                entities.Length,
+                false
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.DisposeHandle(ref entities
-                .m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
+            AtomicSafetyHandle.DisposeHandle(ref entities.m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
 #endif
             return result;
         }
 
-        internal bool AppendMultipleEntitiesCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            Entity* entities, int entityCount, bool mayContainDeferredEntities)
+        internal bool AppendMultipleEntitiesCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity* entities,
+            int entityCount,
+            bool mayContainDeferredEntities
+        )
         {
             var sizeNeeded = Align(sizeof(MultipleEntitiesCommand), ALIGN_64_BIT);
 
@@ -738,8 +841,14 @@ namespace Unity.Entities
             return true;
         }
 
-        internal bool AppendMultipleEntitiesComponentCommandWithValue<T>(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, EntityQuery entityQuery, T component) where T : unmanaged, IComponentData
+        internal bool AppendMultipleEntitiesComponentCommandWithValue<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQuery entityQuery,
+            T component
+        )
+            where T : unmanaged, IComponentData
         {
             var entities = entityQuery.ToEntityArray(m_Allocator.ToAllocator); // disposed in playback
             if (entities.Length == 0)
@@ -748,23 +857,43 @@ namespace Unity.Entities
                 return false;
             }
 
-            var result = AppendMultipleEntitiesComponentCommandWithValue(chain, sortKey, op,
-                (Entity*)entities.GetUnsafeReadOnlyPtr(), entities.Length, false, component);
+            var result = AppendMultipleEntitiesComponentCommandWithValue(
+                chain,
+                sortKey,
+                op,
+                (Entity*)entities.GetUnsafeReadOnlyPtr(),
+                entities.Length,
+                false,
+                component
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.DisposeHandle(ref entities
-                .m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
+            AtomicSafetyHandle.DisposeHandle(ref entities.m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
 #endif
             return result;
         }
 
-        internal bool AppendMultipleEntitiesComponentCommandWithValue<T>(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, Entity* entities, int entityCount, bool mayContainDeferredEntities, T component)
+        internal bool AppendMultipleEntitiesComponentCommandWithValue<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity* entities,
+            int entityCount,
+            bool mayContainDeferredEntities,
+            T component
+        )
             where T : unmanaged, IComponentData
         {
             var ctype = ComponentType.ReadWrite<T>();
             if (ctype.IsZeroSized)
-                return AppendMultipleEntitiesComponentCommand(chain, sortKey, op, entities, entityCount,
-                    mayContainDeferredEntities, ctype);
+                return AppendMultipleEntitiesComponentCommand(
+                    chain,
+                    sortKey,
+                    op,
+                    entities,
+                    entityCount,
+                    mayContainDeferredEntities,
+                    ctype
+                );
 
             var typeSize = (short)UnsafeUtility.SizeOf<T>();
             var sizeNeeded = Align(sizeof(MultipleEntitiesComponentCommand) + typeSize, ALIGN_64_BIT);
@@ -791,8 +920,14 @@ namespace Unity.Entities
             return true;
         }
 
-        internal bool AppendMultipleEntitiesComponentCommandWithObject(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, EntityQuery entityQuery, object boxedComponent, ComponentType ctype)
+        internal bool AppendMultipleEntitiesComponentCommandWithObject(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQuery entityQuery,
+            object boxedComponent,
+            ComponentType ctype
+        )
         {
             var entities = entityQuery.ToEntityArray(m_Allocator.ToAllocator);
             if (entities.Length == 0)
@@ -801,18 +936,32 @@ namespace Unity.Entities
                 return false;
             }
 
-            var result = AppendMultipleEntitiesComponentCommandWithObject(chain, sortKey, op,
-                (Entity*)entities.GetUnsafeReadOnlyPtr(), entities.Length, false, boxedComponent, ctype);
+            var result = AppendMultipleEntitiesComponentCommandWithObject(
+                chain,
+                sortKey,
+                op,
+                (Entity*)entities.GetUnsafeReadOnlyPtr(),
+                entities.Length,
+                false,
+                boxedComponent,
+                ctype
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.DisposeHandle(ref entities
-                .m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
+            AtomicSafetyHandle.DisposeHandle(ref entities.m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
 #endif
             return result;
         }
 
-        internal bool AppendMultipleEntitiesComponentCommandWithObject(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, Entity* entities, int entityCount, bool mayContainDeferredEntities, object boxedComponent,
-            ComponentType ctype)
+        internal bool AppendMultipleEntitiesComponentCommandWithObject(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity* entities,
+            int entityCount,
+            bool mayContainDeferredEntities,
+            object boxedComponent,
+            ComponentType ctype
+        )
         {
             var sizeNeeded = Align(sizeof(MultipleEntitiesComponentCommandWithObject), ALIGN_64_BIT);
 
@@ -850,9 +999,15 @@ namespace Unity.Entities
             return true;
         }
 
-        internal bool AppendEntityQueryComponentCommandWithSharedValue<T>(EntityCommandBufferChain* chain,
-            int sortKey, ECBCommand op, EntityQuery entityQuery, int hashCode,
-            object boxedComponent) where T : struct, ISharedComponentData
+        internal bool AppendEntityQueryComponentCommandWithSharedValue<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQuery entityQuery,
+            int hashCode,
+            object boxedComponent
+        )
+            where T : struct, ISharedComponentData
         {
             var ctype = ComponentType.ReadWrite<T>();
             var sizeNeeded = Align(sizeof(EntityQueryComponentCommandWithObject), ALIGN_64_BIT);
@@ -886,9 +1041,15 @@ namespace Unity.Entities
             return true;
         }
 
-        internal bool AppendMultipleEntitiesComponentCommandWithSharedValue<T>(EntityCommandBufferChain* chain,
-            int sortKey, ECBCommand op, EntityQuery entityQuery, int hashCode,
-            object boxedComponent) where T : struct, ISharedComponentData
+        internal bool AppendMultipleEntitiesComponentCommandWithSharedValue<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQuery entityQuery,
+            int hashCode,
+            object boxedComponent
+        )
+            where T : struct, ISharedComponentData
         {
             var entities = entityQuery.ToEntityArray(m_Allocator.ToAllocator);
             if (entities.Length == 0)
@@ -897,13 +1058,18 @@ namespace Unity.Entities
                 return false;
             }
 
-            var result = AppendMultipleEntitiesComponentCommandWithSharedValue<T>(chain, sortKey, op,
-                (Entity*)entities.GetUnsafeReadOnlyPtr(), entities.Length, false, hashCode,
-                boxedComponent);
+            var result = AppendMultipleEntitiesComponentCommandWithSharedValue<T>(
+                chain,
+                sortKey,
+                op,
+                (Entity*)entities.GetUnsafeReadOnlyPtr(),
+                entities.Length,
+                false,
+                hashCode,
+                boxedComponent
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.DisposeHandle(ref entities
-                .m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
-
+            AtomicSafetyHandle.DisposeHandle(ref entities.m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
 #endif
             return result;
         }
@@ -916,7 +1082,8 @@ namespace Unity.Entities
             int entityCount,
             bool mayContainDeferredEntities,
             int hashCode,
-            object boxedComponent)
+            object boxedComponent
+        )
             where T : struct, ISharedComponentData
         {
             var ctype = ComponentType.ReadWrite<T>();
@@ -964,7 +1131,8 @@ namespace Unity.Entities
             EntityQuery entityQuery,
             bool mayContainDeferredEntities,
             int hashCode,
-            void* componentAddr)
+            void* componentAddr
+        )
             where T : struct, ISharedComponentData
         {
             var entities = entityQuery.ToEntityArray(m_Allocator.ToAllocator);
@@ -982,11 +1150,11 @@ namespace Unity.Entities
                 entities.Length,
                 mayContainDeferredEntities,
                 hashCode,
-                componentAddr);
+                componentAddr
+            );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.DisposeHandle(ref entities
-                .m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
+            AtomicSafetyHandle.DisposeHandle(ref entities.m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
 #endif
             return true;
         }
@@ -997,13 +1165,16 @@ namespace Unity.Entities
             ECBCommand op,
             EntityQuery entityQuery,
             int hashCode,
-            void* componentAddr)
+            void* componentAddr
+        )
             where T : struct, ISharedComponentData
         {
             var ctype = ComponentType.ReadWrite<T>();
             var typeSize = UnsafeUtility.SizeOf<T>();
-            var sizeNeeded = Align(sizeof(EntityQueryComponentCommandWithUnmanagedSharedComponent) + typeSize,
-                ALIGN_64_BIT);
+            var sizeNeeded = Align(
+                sizeof(EntityQueryComponentCommandWithUnmanagedSharedComponent) + typeSize,
+                ALIGN_64_BIT
+            );
 
             ResetCommandBatching(chain);
 
@@ -1040,12 +1211,16 @@ namespace Unity.Entities
             int entityCount,
             bool mayContainDeferredEntities,
             int hashCode,
-            void* componentAddr) where T : struct, ISharedComponentData
+            void* componentAddr
+        )
+            where T : struct, ISharedComponentData
         {
             var ctype = ComponentType.ReadWrite<T>();
             var typeSize = UnsafeUtility.SizeOf<T>();
-            var sizeNeeded = Align(sizeof(MultipleEntitiesCommand_WithUnmanagedSharedComponent) + typeSize,
-                ALIGN_64_BIT);
+            var sizeNeeded = Align(
+                sizeof(MultipleEntitiesCommand_WithUnmanagedSharedComponent) + typeSize,
+                ALIGN_64_BIT
+            );
 
             ResetCommandBatching(chain);
 
@@ -1085,7 +1260,8 @@ namespace Unity.Entities
             EntityCommandBufferChain* chain,
             int sortKey,
             ECBCommand op,
-            EntityQuery entityQuery)
+            EntityQuery entityQuery
+        )
         {
             var sizeNeeded = Align(sizeof(EntityQueryCommand), ALIGN_64_BIT);
 
@@ -1105,7 +1281,8 @@ namespace Unity.Entities
             int sortKey,
             ECBCommand op,
             EntityQuery entityQuery,
-            ComponentType t)
+            ComponentType t
+        )
         {
             var sizeNeeded = Align(sizeof(EntityQueryComponentCommand), ALIGN_64_BIT);
 
@@ -1126,7 +1303,8 @@ namespace Unity.Entities
             int sortKey,
             ECBCommand op,
             EntityQuery entityQuery,
-            in ComponentTypeSet typeSet)
+            in ComponentTypeSet typeSet
+        )
         {
             var sizeNeeded = Align(sizeof(EntityQueryComponentTypeSetCommand), ALIGN_64_BIT);
 
@@ -1147,7 +1325,8 @@ namespace Unity.Entities
             int sortKey,
             ECBCommand op,
             EntityQuery entityQuery,
-            ComponentType t)
+            ComponentType t
+        )
         {
             var entities = entityQuery.ToEntityArray(m_Allocator.ToAllocator); // disposed in playback
             if (entities.Length == 0)
@@ -1156,18 +1335,30 @@ namespace Unity.Entities
                 return false;
             }
 
-            var result = AppendMultipleEntitiesComponentCommand(chain, sortKey, op,
-                (Entity*)entities.GetUnsafeReadOnlyPtr(), entities.Length, false, t);
+            var result = AppendMultipleEntitiesComponentCommand(
+                chain,
+                sortKey,
+                op,
+                (Entity*)entities.GetUnsafeReadOnlyPtr(),
+                entities.Length,
+                false,
+                t
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.DisposeHandle(ref entities
-                .m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
+            AtomicSafetyHandle.DisposeHandle(ref entities.m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
 #endif
             return result;
         }
 
-        internal bool AppendMultipleEntitiesComponentCommand(EntityCommandBufferChain* chain, int sortKey,
+        internal bool AppendMultipleEntitiesComponentCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
             ECBCommand op,
-            Entity* entities, int entityCount, bool mayContainDeferredEntities, ComponentType t)
+            Entity* entities,
+            int entityCount,
+            bool mayContainDeferredEntities,
+            ComponentType t
+        )
         {
             var sizeNeeded = Align(sizeof(MultipleEntitiesComponentCommand), ALIGN_64_BIT);
 
@@ -1191,8 +1382,13 @@ namespace Unity.Entities
             return true;
         }
 
-        internal bool AppendMultipleEntitiesMultipleComponentsCommand(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, EntityQuery entityQuery, in ComponentTypeSet t)
+        internal bool AppendMultipleEntitiesMultipleComponentsCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            EntityQuery entityQuery,
+            in ComponentTypeSet t
+        )
         {
             var entities = entityQuery.ToEntityArray(m_Allocator.ToAllocator); // disposed in playback
             if (entities.Length == 0)
@@ -1201,17 +1397,30 @@ namespace Unity.Entities
                 return false;
             }
 
-            var result = AppendMultipleEntitiesMultipleComponentsCommand(chain, sortKey, op,
-                (Entity*)entities.GetUnsafeReadOnlyPtr(), entities.Length, false, t);
+            var result = AppendMultipleEntitiesMultipleComponentsCommand(
+                chain,
+                sortKey,
+                op,
+                (Entity*)entities.GetUnsafeReadOnlyPtr(),
+                entities.Length,
+                false,
+                t
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.DisposeHandle(ref entities
-                .m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
+            AtomicSafetyHandle.DisposeHandle(ref entities.m_Safety); // dispose safety handle, but we'll dispose of the actual data in playback
 #endif
             return result;
         }
 
-        internal bool AppendMultipleEntitiesMultipleComponentsCommand(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, Entity* entities, int entityCount, bool mayContainDeferredEntities, in ComponentTypeSet t)
+        internal bool AppendMultipleEntitiesMultipleComponentsCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity* entities,
+            int entityCount,
+            bool mayContainDeferredEntities,
+            in ComponentTypeSet t
+        )
         {
             var sizeNeeded = Align(sizeof(MultipleEntitiesAndComponentsCommand), ALIGN_64_BIT);
 
@@ -1234,21 +1443,35 @@ namespace Unity.Entities
             return true;
         }
 
-        internal void AddEntitySharedComponentCommand<T>(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            Entity e, int hashCode, object boxedObject)
+        internal void AddEntitySharedComponentCommand<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            int hashCode,
+            object boxedObject
+        )
             where T : struct
         {
             var typeIndex = TypeManager.GetTypeIndex<T>();
             AddEntitySharedComponentCommand(chain, sortKey, op, e, hashCode, typeIndex, boxedObject);
         }
 
-        internal void AddEntitySharedComponentCommand(EntityCommandBufferChain* chain, int sortKey, ECBCommand op,
-            Entity e, int hashCode, TypeIndex typeIndex, object boxedObject)
+        internal void AddEntitySharedComponentCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            int hashCode,
+            TypeIndex typeIndex,
+            object boxedObject
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddEntitySharedComponentCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddEntitySharedComponentCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntitySharedComponentCommand), ALIGN_64_BIT);
 
@@ -1279,25 +1502,48 @@ namespace Unity.Entities
             }
         }
 
-        internal void AddEntityUnmanagedSharedComponentCommand<T>(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, Entity e, int hashCode, void* componentData)
+        internal void AddEntityUnmanagedSharedComponentCommand<T>(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            int hashCode,
+            void* componentData
+        )
             where T : struct
         {
             // NOTE: This has to be sizeof not TypeManager.SizeInChunk since we use UnsafeUtility.CopyStructureToPtr
             //       even on zero size components.
             var typeSize = UnsafeUtility.SizeOf<T>();
             var typeIndex = TypeManager.GetTypeIndex<T>();
-            AddEntityUnmanagedSharedComponentCommand(chain, sortKey, op, e, hashCode, typeIndex, typeSize,
-                componentData);
+            AddEntityUnmanagedSharedComponentCommand(
+                chain,
+                sortKey,
+                op,
+                e,
+                hashCode,
+                typeIndex,
+                typeSize,
+                componentData
+            );
         }
 
-        internal void AddEntityUnmanagedSharedComponentCommand(EntityCommandBufferChain* chain, int sortKey,
-            ECBCommand op, Entity e, int hashCode, TypeIndex typeIndex, int typeSize, void* componentData)
+        internal void AddEntityUnmanagedSharedComponentCommand(
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            ECBCommand op,
+            Entity e,
+            int hashCode,
+            TypeIndex typeIndex,
+            int typeSize,
+            void* componentData
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Hint.Unlikely(e == Entity.Null))
                 throw new InvalidOperationException(
-                    "Invalid Entity.Null passed. ECBCommand.AddEntityUnmanagedSharedComponentCommand");
+                    "Invalid Entity.Null passed. ECBCommand.AddEntityUnmanagedSharedComponentCommand"
+                );
 #endif
             var sizeNeeded = Align(sizeof(EntityUnmanagedSharedComponentCommand) + typeSize, ALIGN_64_BIT);
 
@@ -1331,8 +1577,10 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             var align = Align(size, ALIGN_64_BIT);
             if (align != size)
-                Assert.IsTrue(false,
-                    $"Misaligned size. Expected alignment of {ALIGN_64_BIT} but was {align}. Unaligned access can cause crashes on platforms such as ARM.");
+                Assert.IsTrue(
+                    false,
+                    $"Misaligned size. Expected alignment of {ALIGN_64_BIT} but was {align}. Unaligned access can cause crashes on platforms such as ARM."
+                );
 #endif
             if (Hint.Unlikely(chain->m_Head == null))
                 EntityCommandBufferChain.InitChain(chain, m_Allocator);
@@ -1341,9 +1589,8 @@ namespace Unity.Entities
             if (Hint.Unlikely(newSortKey < chain->m_LastSortKey))
             {
                 // copy current chain to new next and reset current chain
-                EntityCommandBufferChain* nextChain =
-                    (EntityCommandBufferChain*)Memory.Unmanaged.Allocate(sizeof(EntityCommandBufferChain), ALIGN_64_BIT,
-                        m_Allocator);
+                EntityCommandBufferChain* nextChain = (EntityCommandBufferChain*)
+                    Memory.Unmanaged.Allocate(sizeof(EntityCommandBufferChain), ALIGN_64_BIT, m_Allocator);
                 *nextChain = *chain;
                 EntityCommandBufferChain.InitChain(chain, m_Allocator);
                 chain->m_NextChain = nextChain;
@@ -1382,11 +1629,23 @@ namespace Unity.Entities
         }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        public DynamicBuffer<T> CreateBufferCommand<T>(ECBCommand commandType, EntityCommandBufferChain* chain,
-            int sortKey, Entity e, AtomicSafetyHandle bufferSafety, AtomicSafetyHandle arrayInvalidationSafety)
+        public DynamicBuffer<T> CreateBufferCommand<T>(
+            ECBCommand commandType,
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            Entity e,
+            AtomicSafetyHandle bufferSafety,
+            AtomicSafetyHandle arrayInvalidationSafety
+        )
             where T : unmanaged, IBufferElementData
 #else
-        public DynamicBuffer<T> CreateBufferCommand<T>(ECBCommand commandType, EntityCommandBufferChain* chain, int sortKey, Entity e) where T : unmanaged, IBufferElementData
+        public DynamicBuffer<T> CreateBufferCommand<T>(
+            ECBCommand commandType,
+            EntityCommandBufferChain* chain,
+            int sortKey,
+            Entity e
+        )
+            where T : unmanaged, IBufferElementData
 #endif
         {
             int internalCapacity;

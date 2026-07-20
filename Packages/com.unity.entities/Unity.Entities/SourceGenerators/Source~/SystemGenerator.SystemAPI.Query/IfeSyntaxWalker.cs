@@ -30,8 +30,8 @@ public class IfeSyntaxWalker : CSharpSyntaxWalker, IModuleSyntaxWalker
     private readonly IDictionary<SyntaxNode, string> _candidateNodesToReplacementCode;
     private bool _hasWrittenSyntax;
 
-    public IfeSyntaxWalker(IDictionary<SyntaxNode, string> candidateNodesToReplacementCode) : base(SyntaxWalkerDepth.Trivia) =>
-        _candidateNodesToReplacementCode = candidateNodesToReplacementCode;
+    public IfeSyntaxWalker(IDictionary<SyntaxNode, string> candidateNodesToReplacementCode)
+        : base(SyntaxWalkerDepth.Trivia) => _candidateNodesToReplacementCode = candidateNodesToReplacementCode;
 
     public bool TryWriteSyntax(IndentedTextWriter writer, CandidateSyntax candidateSyntax)
     {

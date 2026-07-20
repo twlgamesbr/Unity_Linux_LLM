@@ -46,7 +46,10 @@ namespace Unity.Physics.GraphicsIntegration
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RigidTransform Extrapolate(
-            in RigidTransform currentTransform, in PhysicsVelocity currentVelocity, in PhysicsMass mass, float timeAhead
+            in RigidTransform currentTransform,
+            in PhysicsVelocity currentVelocity,
+            in PhysicsMass mass,
+            float timeAhead
         )
         {
             var newTransform = currentTransform;
@@ -122,21 +125,32 @@ namespace Unity.Physics.GraphicsIntegration
             in PhysicsVelocity previousVelocity,
             in PhysicsVelocity currentVelocity,
             in PhysicsMass mass,
-            float timeAhead, float normalizedTimeAhead
+            float timeAhead,
+            float normalizedTimeAhead
         )
         {
             var newTransform = previousTransform;
 
             // Partially integrate with old velocities
-            previousVelocity.Integrate(mass, timeAhead * (1f - normalizedTimeAhead), ref newTransform.pos, ref newTransform.rot);
+            previousVelocity.Integrate(
+                mass,
+                timeAhead * (1f - normalizedTimeAhead),
+                ref newTransform.pos,
+                ref newTransform.rot
+            );
             // Blend the previous and current velocities
             var interpolatedVelocity = new PhysicsVelocity
             {
                 Linear = math.lerp(previousVelocity.Linear, currentVelocity.Linear, normalizedTimeAhead),
-                Angular = math.lerp(previousVelocity.Angular, currentVelocity.Angular, normalizedTimeAhead)
+                Angular = math.lerp(previousVelocity.Angular, currentVelocity.Angular, normalizedTimeAhead),
             };
             // Then finish integration with blended velocities
-            interpolatedVelocity.Integrate(mass, timeAhead * normalizedTimeAhead, ref newTransform.pos, ref newTransform.rot);
+            interpolatedVelocity.Integrate(
+                mass,
+                timeAhead * normalizedTimeAhead,
+                ref newTransform.pos,
+                ref newTransform.rot
+            );
 
             return newTransform;
         }
@@ -153,9 +167,9 @@ namespace Unity.Physics.GraphicsIntegration
         /// <param name="postTransformMatrices">The array of post transform matrices in the chunk.</param>
         /// <returns>A LocalToWorld matrix to use in place of those produced by default.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
         public static LocalToWorld BuildLocalToWorld(
-            int i, RigidTransform transform,
+            int i,
+            RigidTransform transform,
             float uniformScale,
             bool hasPostTransformMatrix,
             NativeArray<PostTransformMatrix> postTransformMatrices
@@ -168,7 +182,10 @@ namespace Unity.Physics.GraphicsIntegration
                 return new LocalToWorld { Value = math.mul(new float4x4(transform), m) };
             }
             else if (uniformScale != 0)
-                return new LocalToWorld { Value = float4x4.TRS(transform.pos, transform.rot, new float3(uniformScale)) };
+                return new LocalToWorld
+                {
+                    Value = float4x4.TRS(transform.pos, transform.rot, new float3(uniformScale)),
+                };
             else
                 return new LocalToWorld { Value = new float4x4(transform) };
         }

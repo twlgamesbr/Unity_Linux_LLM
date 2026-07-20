@@ -19,7 +19,7 @@ namespace Unity.Entities.Editor
             IntegrateGameObjectChanges,
             IntegratePrefabStageChanges,
             ExportImmutable,
-            End
+            End,
         }
 
         readonly SubSceneMap m_SubSceneMap;
@@ -111,8 +111,10 @@ namespace Unity.Entities.Editor
             {
                 const float kEntityChangeIntegrationWeight = 1;
                 const float kBuildImmutableWeight = 1;
-                const float kEntityChangeProgress = kEntityChangeIntegrationWeight / (kEntityChangeIntegrationWeight + kBuildImmutableWeight);
-                const float kBuildImmutableProgress = kBuildImmutableWeight / (kEntityChangeIntegrationWeight + kBuildImmutableWeight);
+                const float kEntityChangeProgress =
+                    kEntityChangeIntegrationWeight / (kEntityChangeIntegrationWeight + kBuildImmutableWeight);
+                const float kBuildImmutableProgress =
+                    kBuildImmutableWeight / (kEntityChangeIntegrationWeight + kBuildImmutableWeight);
 
                 switch (m_Step)
                 {
@@ -140,7 +142,14 @@ namespace Unity.Entities.Editor
 
         public bool IsHierarchyVisible { private get; set; }
 
-        public HierarchyUpdater(HierarchyNodeStore hierarchyNodeStore, HierarchyNodeImmutableStore hierarchyNodeImmutableStore, HierarchyNameStore hierarchyNameStore, HierarchyNodes hierarchyNodes, SubSceneMap subSceneMap, Allocator allocator)
+        public HierarchyUpdater(
+            HierarchyNodeStore hierarchyNodeStore,
+            HierarchyNodeImmutableStore hierarchyNodeImmutableStore,
+            HierarchyNameStore hierarchyNameStore,
+            HierarchyNodes hierarchyNodes,
+            SubSceneMap subSceneMap,
+            Allocator allocator
+        )
         {
             m_SubSceneMap = subSceneMap;
             m_HierarchyNodeStore = hierarchyNodeStore;
@@ -195,7 +204,10 @@ namespace Unity.Entities.Editor
                 if (!TypeManager.IsInitialized)
                     Debug.LogError($"{nameof(TypeManager)} has not been initialized properly");
                 else
-                    m_HierarchyEntityChangeTracker = new HierarchyEntityChangeTracker(m_World, m_Allocator) { OperationMode = m_HierarchyEntityChangeTrackerOperationMode };   
+                    m_HierarchyEntityChangeTracker = new HierarchyEntityChangeTracker(m_World, m_Allocator)
+                    {
+                        OperationMode = m_HierarchyEntityChangeTrackerOperationMode,
+                    };
             }
 
             Reset();
@@ -254,7 +266,13 @@ namespace Unity.Entities.Editor
                         if (m_HierarchyEntityChanges.HasChanges() && m_World is { IsCreated: true })
                         {
                             // Delegate the implementation to another enumerator.
-                            m_IntegrateEntityChangesEnumerator = m_HierarchyNodeStore.CreateIntegrateEntityChangesEnumerator(m_World, m_HierarchyEntityChanges, EntityChangeIntegrationBatchSize, m_SubSceneMap.GetSceneTagToSubSceneHandleMap());
+                            m_IntegrateEntityChangesEnumerator =
+                                m_HierarchyNodeStore.CreateIntegrateEntityChangesEnumerator(
+                                    m_World,
+                                    m_HierarchyEntityChanges,
+                                    EntityChangeIntegrationBatchSize,
+                                    m_SubSceneMap.GetSceneTagToSubSceneHandleMap()
+                                );
                         }
                         else
                         {
@@ -270,7 +288,12 @@ namespace Unity.Entities.Editor
                         if (m_HierarchyGameObjectChanges.HasChanges())
                         {
                             // Delegate the implementation to another enumerator.
-                            m_IntegrateGameObjectChangesEnumerator = m_HierarchyNodeStore.CreateIntegrateGameObjectChangesEnumerator(m_HierarchyGameObjectChanges, m_SubSceneMap, GameObjectChangeIntegrationBatchSize);
+                            m_IntegrateGameObjectChangesEnumerator =
+                                m_HierarchyNodeStore.CreateIntegrateGameObjectChangesEnumerator(
+                                    m_HierarchyGameObjectChanges,
+                                    m_SubSceneMap,
+                                    GameObjectChangeIntegrationBatchSize
+                                );
                         }
                         else if (!IsHierarchyVisible)
                         {
@@ -299,9 +322,19 @@ namespace Unity.Entities.Editor
 
                     case UpdateStep.ExportImmutable:
                     {
-                        if (IsHierarchyVisible && m_HierarchyNodeStore.GetRootChangeVersion() != m_HierarchyNodeImmutableStore.GetReadBuffer().ChangeVersion)
+                        if (
+                            IsHierarchyVisible
+                            && m_HierarchyNodeStore.GetRootChangeVersion()
+                                != m_HierarchyNodeImmutableStore.GetReadBuffer().ChangeVersion
+                        )
                         {
-                            m_ExportImmutableEnumerator = m_HierarchyNodeStore.CreateBuildImmutableEnumerator(m_World, m_ExportImmutableState,m_HierarchyNodeImmutableStore.GetWriteBuffer(), m_HierarchyNodeImmutableStore.GetReadBuffer(), ExportImmutableBatchSize);
+                            m_ExportImmutableEnumerator = m_HierarchyNodeStore.CreateBuildImmutableEnumerator(
+                                m_World,
+                                m_ExportImmutableState,
+                                m_HierarchyNodeImmutableStore.GetWriteBuffer(),
+                                m_HierarchyNodeImmutableStore.GetReadBuffer(),
+                                ExportImmutableBatchSize
+                            );
                         }
                         else
                         {
@@ -343,7 +376,12 @@ namespace Unity.Entities.Editor
 
                     m_SubSceneChangeTracker.GetChanges(m_SubSceneChanges);
                     if (m_SubSceneChanges.HasChanges())
-                        m_SubSceneMap.IntegrateChanges(m_World, m_HierarchyNodeStore, m_HierarchyNameStore, m_SubSceneChanges);
+                        m_SubSceneMap.IntegrateChanges(
+                            m_World,
+                            m_HierarchyNodeStore,
+                            m_HierarchyNameStore,
+                            m_SubSceneChanges
+                        );
 
                     SetState(UpdateStep.GetGameObjectChanges);
                     return true;
@@ -417,7 +455,9 @@ namespace Unity.Entities.Editor
         public void Execute()
         {
             if (m_Step != UpdateStep.Start && m_Step != UpdateStep.End)
-                throw new InvalidDataException("Failed to execute the enumerator. The state must be reset before running.");
+                throw new InvalidDataException(
+                    "Failed to execute the enumerator. The state must be reset before running."
+                );
 
             Reset();
             Flush();
@@ -430,9 +470,7 @@ namespace Unity.Entities.Editor
 
         public void Flush()
         {
-            while (MoveNext())
-            {
-            }
+            while (MoveNext()) { }
         }
     }
 }

@@ -23,7 +23,7 @@ namespace UnityEngine.EventSystems
 
         private BaseInputModule m_CurrentInputModule;
 
-        private  static List<EventSystem> m_EventSystems = new List<EventSystem>();
+        private static List<EventSystem> m_EventSystems = new List<EventSystem>();
 
         /// <summary>
         /// Return the current EventSystem.
@@ -121,8 +121,7 @@ namespace UnityEngine.EventSystems
             get { return m_HasFocus; }
         }
 
-        protected EventSystem()
-        {}
+        protected EventSystem() { }
 
         /// <summary>
         /// Recalculate the internal list of BaseInputModules.
@@ -159,7 +158,7 @@ namespace UnityEngine.EventSystems
         {
             if (m_SelectionGuard)
             {
-                Debug.LogError("Attempting to select " + selected +  "while already selecting an object.");
+                Debug.LogError("Attempting to select " + selected + "while already selecting an object.");
                 return;
             }
 
@@ -241,16 +240,19 @@ namespace UnityEngine.EventSystems
             if (lhs.distance != rhs.distance)
                 return lhs.distance.CompareTo(rhs.distance);
 
-            #if PACKAGE_PHYSICS2D
-			// Sorting group
-            if (lhs.sortingGroupID != SortingGroup.invalidSortingGroupID && rhs.sortingGroupID != SortingGroup.invalidSortingGroupID)
+#if PACKAGE_PHYSICS2D
+            // Sorting group
+            if (
+                lhs.sortingGroupID != SortingGroup.invalidSortingGroupID
+                && rhs.sortingGroupID != SortingGroup.invalidSortingGroupID
+            )
             {
                 if (lhs.sortingGroupID != rhs.sortingGroupID)
                     return lhs.sortingGroupID.CompareTo(rhs.sortingGroupID);
                 if (lhs.sortingGroupOrder != rhs.sortingGroupOrder)
                     return rhs.sortingGroupOrder.CompareTo(lhs.sortingGroupOrder);
             }
-            #endif
+#endif
 
             return lhs.index.CompareTo(rhs.index);
         }
@@ -327,7 +329,7 @@ namespace UnityEngine.EventSystems
         // This code is disabled unless the com.unity.modules.uielements module is present.
         // The UIElements module is always present in the Editor but it can be stripped from a project build if unused.
 #if PACKAGE_UITOOLKIT
-        private UIToolkitInteroperabilityBridge m_UIToolkitInterop = new ();
+        private UIToolkitInteroperabilityBridge m_UIToolkitInterop = new();
 
         /// <summary>
         /// Use this property to initialize UI Toolkit interoperability with uGUI events.
@@ -344,7 +346,9 @@ namespace UnityEngine.EventSystems
             get
             {
 #if PACKAGE_UITOOLKIT
-                return uiToolkitInterop.overrideUIToolkitEvents && IRuntimePanel.uIElementsRuntimeUtility != null && IRuntimePanel.uIElementsRuntimeUtility.HasActiveDocuments();
+                return uiToolkitInterop.overrideUIToolkitEvents
+                    && IRuntimePanel.uIElementsRuntimeUtility != null
+                    && IRuntimePanel.uIElementsRuntimeUtility.HasActiveDocuments();
 #else
                 return false;
 #endif
@@ -358,6 +362,7 @@ namespace UnityEngine.EventSystems
             public bool sendEvents;
             public bool createPanelGameObjectsOnStart;
         }
+
         private static UIToolkitOverrideConfigOld? s_UIToolkitOverrideConfigOld = null;
 #endif
 
@@ -382,26 +387,40 @@ namespace UnityEngine.EventSystems
         /// with children GameObjects of this EventSystem on Start.
         /// </param>
         [Obsolete("Use PanelInputConfiguration component instead.")]
-        public static void SetUITookitEventSystemOverride(EventSystem activeEventSystem, bool sendEvents = true, bool createPanelGameObjectsOnStart = true)
+        public static void SetUITookitEventSystemOverride(
+            EventSystem activeEventSystem,
+            bool sendEvents = true,
+            bool createPanelGameObjectsOnStart = true
+        )
         {
 #if PACKAGE_UITOOLKIT
-            s_UIToolkitOverrideConfigOld = activeEventSystem == null && sendEvents && createPanelGameObjectsOnStart ? null : new UIToolkitOverrideConfigOld
-            {
-                activeEventSystem = activeEventSystem,
-                sendEvents = sendEvents,
-                createPanelGameObjectsOnStart = createPanelGameObjectsOnStart,
-            };
+            s_UIToolkitOverrideConfigOld =
+                activeEventSystem == null && sendEvents && createPanelGameObjectsOnStart
+                    ? null
+                    : new UIToolkitOverrideConfigOld
+                    {
+                        activeEventSystem = activeEventSystem,
+                        sendEvents = sendEvents,
+                        createPanelGameObjectsOnStart = createPanelGameObjectsOnStart,
+                    };
 
             var eventSystem = activeEventSystem != null ? activeEventSystem : EventSystem.current;
             // Can be null if runtime panels have not been created (e.g., if UI Toolkit is stripped or not in use)
-            if (IRuntimePanel.uIElementsRuntimeUtility?.activeEventSystem != null && IRuntimePanel.uIElementsRuntimeUtility.activeEventSystem != eventSystem)
+            if (
+                IRuntimePanel.uIElementsRuntimeUtility?.activeEventSystem != null
+                && IRuntimePanel.uIElementsRuntimeUtility.activeEventSystem != eventSystem
+            )
             {
-                ((EventSystem)IRuntimePanel.uIElementsRuntimeUtility.activeEventSystem).uiToolkitInterop.overrideUIToolkitEvents = false;
+                ((EventSystem)IRuntimePanel.uIElementsRuntimeUtility.activeEventSystem)
+                    .uiToolkitInterop
+                    .overrideUIToolkitEvents = false;
             }
             if (eventSystem != null && eventSystem.isActiveAndEnabled)
             {
                 eventSystem.uiToolkitInterop.overrideUIToolkitEvents = sendEvents;
-                eventSystem.uiToolkitInterop.handlerTypes = createPanelGameObjectsOnStart ? (UIToolkitInteroperabilityBridge.EventHandlerTypes)~0 : 0;
+                eventSystem.uiToolkitInterop.handlerTypes = createPanelGameObjectsOnStart
+                    ? (UIToolkitInteroperabilityBridge.EventHandlerTypes)~0
+                    : 0;
             }
 #endif
         }
@@ -525,7 +544,11 @@ namespace UnityEngine.EventSystems
                 }
 
                 if (eventSystemCount > 1)
-                    Debug.LogWarning("There are " + eventSystemCount + " event systems in the scene. Please ensure there is always exactly one event system in the scene");
+                    Debug.LogWarning(
+                        "There are "
+                            + eventSystemCount
+                            + " event systems in the scene. Please ensure there is always exactly one event system in the scene"
+                    );
             }
 #endif
         }

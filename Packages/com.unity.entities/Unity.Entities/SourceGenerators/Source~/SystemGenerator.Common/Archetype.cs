@@ -23,7 +23,8 @@ public readonly struct Archetype : IEquatable<Archetype>
         IReadOnlyCollection<Query> disabled,
         IReadOnlyCollection<Query> absent,
         IReadOnlyCollection<Query> present,
-        EntityQueryOptions options = default)
+        EntityQueryOptions options = default
+    )
     {
         All = all;
         Any = any;
@@ -42,6 +43,7 @@ public readonly struct Archetype : IEquatable<Archetype>
         && Disabled.SequenceEqual(other.Disabled)
         && Present.SequenceEqual(other.Present)
         && Absent.SequenceEqual(other.Absent);
+
     public override int GetHashCode()
     {
         unchecked

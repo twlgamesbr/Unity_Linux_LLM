@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityObject = UnityEngine.Object;
 using static Unity.Debug;
+using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities.Conversion
 {
@@ -19,11 +19,9 @@ namespace Unity.Entities.Conversion
             return new EntityGuid(@this.GetEntityId(), EntityId.None, namespaceId, (uint)serial);
         }
 
-        public static bool IsPrefab(this GameObject @this) =>
-            !@this.scene.IsValid();
+        public static bool IsPrefab(this GameObject @this) => !@this.scene.IsValid();
 
-        public static bool IsAsset(this UnityObject @this) =>
-            !(@this is GameObject) && !(@this is Component);
+        public static bool IsAsset(this UnityObject @this) => !(@this is GameObject) && !(@this is Component);
 
         public static bool IsActiveIgnorePrefab(this GameObject @this)
         {
@@ -46,10 +44,14 @@ namespace Unity.Entities.Conversion
         {
             switch (@this)
             {
-                case Renderer  r: return !r.enabled;
-                case Collider  c: return !c.enabled;
-                case LODGroup  l: return !l.enabled;
-                case Behaviour b: return !b.enabled;
+                case Renderer r:
+                    return !r.enabled;
+                case Collider c:
+                    return !c.enabled;
+                case LODGroup l:
+                    return !l.enabled;
+                case Behaviour b:
+                    return !b.enabled;
             }
 
             return false;
@@ -65,7 +67,10 @@ namespace Unity.Entities.Conversion
                 var component = componentsCache[i];
 
                 if (component == null)
-                    LogWarning($"The referenced script is missing on {gameObject.name} (index {i} in components list)", gameObject);
+                    LogWarning(
+                        $"The referenced script is missing on {gameObject.name} (index {i} in components list)",
+                        gameObject
+                    );
                 else
                 {
                     componentsCache[outputIndex] = component;

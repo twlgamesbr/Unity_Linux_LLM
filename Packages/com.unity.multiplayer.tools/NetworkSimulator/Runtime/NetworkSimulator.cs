@@ -23,9 +23,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
         /// </summary>
         internal enum ScenarioPlaybackState
         {
-            Initial,    // The scenario has not been started yet
+            Initial, // The scenario has not been started yet
             Running,
-            Paused
+            Paused,
         }
 
         void OnPauseStateChangedEvent(bool isPaused)
@@ -97,9 +97,7 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
         /// </summary>
         public INetworkSimulatorPreset ConnectionPreset
         {
-            get => m_PresetAsset != null
-                ? m_PresetAsset
-                : m_PresetReference;
+            get => m_PresetAsset != null ? m_PresetAsset : m_PresetReference;
             set
             {
                 if (value is NetworkSimulatorPresetAsset presetAsset)
@@ -221,17 +219,16 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
                     PacketDelayMilliseconds = ConnectionPreset?.PacketDelayMs ?? 0,
                     PacketDelayRangeMilliseconds = ConnectionPreset?.PacketJitterMs ?? 0,
                     PacketLossIntervalMilliseconds = ConnectionPreset?.PacketLossInterval ?? 0,
-                    PacketLossPercent = ConnectionPreset?.PacketLossPercent ?? 0
-                });
+                    PacketLossPercent = ConnectionPreset?.PacketLossPercent ?? 0,
+                }
+            );
         }
 
         private void Analytic(bool forceUpdate)
         {
 #if UNITY_EDITOR && UNITY_2023_2_OR_NEWER
             // Track when a connection preset is changed to a preset, only once per changed.
-            if (forceUpdate == false &&
-                m_LastPresetName != ConnectionPreset?.Name &&
-                ConnectionPreset?.Name != "None")
+            if (forceUpdate == false && m_LastPresetName != ConnectionPreset?.Name && ConnectionPreset?.Name != "None")
             {
                 m_LastPresetName = ConnectionPreset?.Name;
                 var presetName = m_LastPresetName;
@@ -242,7 +239,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
                     presetName = "Custom";
                 }
 
-                EditorAnalytics.SendAnalytic(new ConnectionPresetChangedAnalytic(UsedEditorGUI, presetName, isPartOfScenario));
+                EditorAnalytics.SendAnalytic(
+                    new ConnectionPresetChangedAnalytic(UsedEditorGUI, presetName, isPartOfScenario)
+                );
             }
 #endif
         }
@@ -263,7 +262,6 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
 
         void OnEnable()
         {
-
             SetUsedEditorReset();
 
             if (m_CachedPreset != null)

@@ -7,8 +7,6 @@ namespace UnityEditor.Rendering.Universal
     [CustomEditor(typeof(UniversalAdditionalCameraData))]
     class UniversalAdditionalCameraDataEditor : Editor
     {
-        public override void OnInspectorGUI()
-        {
-        }
+        public override void OnInspectorGUI() { }
     }
 }

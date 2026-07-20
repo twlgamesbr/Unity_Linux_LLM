@@ -9,7 +9,11 @@ namespace Unity.Entities.Editor
         readonly SystemScheduleWindow m_SearchWindow;
 
         public SystemSearchView(SystemScheduleWindow window)
-            : base(new SearchViewState(SearchService.CreateContext(new[] { SystemSearchProvider.CreateProvider() }, "")).LoadDefaults())
+            : base(
+                new SearchViewState(
+                    SearchService.CreateContext(new[] { SystemSearchProvider.CreateProvider() }, "")
+                ).LoadDefaults()
+            )
         {
             m_SearchWindow = window;
             SetWorld(window.SelectedWorld);
@@ -18,7 +22,10 @@ namespace Unity.Entities.Editor
 
         public void SetWorld(World world) => SystemSearchProvider.SetWorld(world);
 
-        public override void SetSearchText(string searchText, TextCursorPlacement moveCursor = TextCursorPlacement.Default)
+        public override void SetSearchText(
+            string searchText,
+            TextCursorPlacement moveCursor = TextCursorPlacement.Default
+        )
         {
             ((ISearchView)this).SetSearchText(searchText, moveCursor, 0);
         }
@@ -27,9 +34,9 @@ namespace Unity.Entities.Editor
         {
             if (string.Equals(context.searchText.Trim(), searchText.Trim(), StringComparison.Ordinal))
                 return;
-            
+
             context.searchText = searchText;
-            
+
             if (string.IsNullOrEmpty(searchText))
                 m_SearchWindow.StopSearch();
             else

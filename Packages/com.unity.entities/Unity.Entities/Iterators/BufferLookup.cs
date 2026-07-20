@@ -7,10 +7,12 @@ namespace Unity.Entities
 {
     /// <summary> Obsolete. Use <see cref="BufferLookup{T}"/> instead.</summary>
     /// <typeparam name="T">The type of <see cref="IBufferElementData"/> to access.</typeparam>
-    [Obsolete("This type has been renamed to BufferLookup<T>. (RemovedAfter Entities 1.0) (UnityUpgradable) -> BufferLookup<T>", true)]
-    public struct BufferFromEntity<T> where T : unmanaged, IBufferElementData
-    {
-    }
+    [Obsolete(
+        "This type has been renamed to BufferLookup<T>. (RemovedAfter Entities 1.0) (UnityUpgradable) -> BufferLookup<T>",
+        true
+    )]
+    public struct BufferFromEntity<T>
+        where T : unmanaged, IBufferElementData { }
 
     /// <summary>
     /// A [NativeContainer] that provides access to all instances of DynamicBuffer components with elements of type T,
@@ -36,29 +38,34 @@ namespace Unity.Entities
     /// </remarks>
     [NativeContainer]
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct BufferLookup<T> where T : unmanaged, IBufferElementData
+    public unsafe struct BufferLookup<T>
+        where T : unmanaged, IBufferElementData
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         internal AtomicSafetyHandle m_Safety0;
         internal AtomicSafetyHandle m_ArrayInvalidationSafety;
         private int m_SafetyReadOnlyCount;
         private int m_SafetyReadWriteCount;
-
 #endif
-        [NativeDisableUnsafePtrRestriction] private readonly EntityDataAccess* m_Access;
+        [NativeDisableUnsafePtrRestriction]
+        private readonly EntityDataAccess* m_Access;
         LookupCache m_Cache;
         private readonly TypeIndex m_TypeIndex;
 
         uint m_GlobalSystemVersion;
         int m_InternalCapacity;
-        private readonly byte  m_IsReadOnly;
+        private readonly byte m_IsReadOnly;
 
         internal uint GlobalSystemVersion => m_GlobalSystemVersion;
 
-
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal BufferLookup(TypeIndex typeIndex, EntityDataAccess* access, bool isReadOnly,
-                                  AtomicSafetyHandle safety, AtomicSafetyHandle arrayInvalidationSafety)
+        internal BufferLookup(
+            TypeIndex typeIndex,
+            EntityDataAccess* access,
+            bool isReadOnly,
+            AtomicSafetyHandle safety,
+            AtomicSafetyHandle arrayInvalidationSafety
+        )
         {
             m_Safety0 = safety;
             m_ArrayInvalidationSafety = arrayInvalidationSafety;
@@ -73,24 +80,22 @@ namespace Unity.Entities
             if (!TypeManager.IsBuffer(m_TypeIndex))
             {
                 var typeName = m_TypeIndex.ToFixedString();
-                throw new ArgumentException(
-                    $"GetComponentBufferArray<{typeName}> must be IBufferElementData");
+                throw new ArgumentException($"GetComponentBufferArray<{typeName}> must be IBufferElementData");
             }
 
             m_InternalCapacity = TypeManager.GetTypeInfo<T>().BufferCapacity;
         }
-
 #else
         internal BufferLookup(TypeIndex typeIndex, EntityDataAccess* access, bool isReadOnly)
         {
             m_TypeIndex = typeIndex;
             m_Access = access;
-            m_IsReadOnly = isReadOnly ? (byte)1 : (byte)0;;
+            m_IsReadOnly = isReadOnly ? (byte)1 : (byte)0;
+            ;
             m_Cache = default;
             m_GlobalSystemVersion = access->EntityComponentStore->GlobalSystemVersion;
             m_InternalCapacity = TypeManager.GetTypeInfo<T>().BufferCapacity;
         }
-
 #endif
 
         /// <summary>
@@ -100,7 +105,8 @@ namespace Unity.Entities
         /// <param name="entity">The entity.</param>
         /// /// <param name="bufferData">The buffer component of type T for the given entity, if it exists.</param>
         /// <returns>True if the entity has a buffer component of type T, and false if it does not.</returns>
-        public bool TryGetBuffer(Entity entity, out DynamicBuffer<T> bufferData) => TryGetBuffer(entity, out bufferData, out _);
+        public bool TryGetBuffer(Entity entity, out DynamicBuffer<T> bufferData) =>
+            TryGetBuffer(entity, out bufferData, out _);
 
         /// <summary>
         /// Retrieves the buffer components associated with the specified <see cref="Entity"/>, if it exists. Then reports if the instance still refers to a valid entity and that it has a
@@ -124,14 +130,29 @@ namespace Unity.Entities
                 return false;
             }
 
-            var header = (m_IsReadOnly != 0)?
-                (BufferHeader*)ecs->GetOptionalComponentDataWithTypeRO(entity, m_TypeIndex, ref m_Cache) :
-                (BufferHeader*)ecs->GetOptionalComponentDataWithTypeRW(entity, m_TypeIndex, m_GlobalSystemVersion, ref m_Cache);
+            var header =
+                (m_IsReadOnly != 0)
+                    ? (BufferHeader*)ecs->GetOptionalComponentDataWithTypeRO(entity, m_TypeIndex, ref m_Cache)
+                    : (BufferHeader*)
+                        ecs->GetOptionalComponentDataWithTypeRW(
+                            entity,
+                            m_TypeIndex,
+                            m_GlobalSystemVersion,
+                            ref m_Cache
+                        );
 
             if (header != null)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                bufferData =  new DynamicBuffer<T>(header, m_Safety0, m_ArrayInvalidationSafety, m_IsReadOnly != 0, false, 0, m_InternalCapacity);
+                bufferData = new DynamicBuffer<T>(
+                    header,
+                    m_Safety0,
+                    m_ArrayInvalidationSafety,
+                    m_IsReadOnly != 0,
+                    false,
+                    0,
+                    m_InternalCapacity
+                );
 #else
                 bufferData = new DynamicBuffer<T>(header, m_InternalCapacity);
 #endif
@@ -256,12 +277,22 @@ namespace Unity.Entities
                 ecs->AssertEntityHasComponent(entity, m_TypeIndex, ref m_Cache);
 #endif
 
-                var header = (m_IsReadOnly != 0)?
-                    (BufferHeader*)ecs->GetComponentDataWithTypeRO(entity, m_TypeIndex, ref m_Cache) :
-                    (BufferHeader*)ecs->GetComponentDataWithTypeRW(entity, m_TypeIndex, m_GlobalSystemVersion, ref m_Cache);
+                var header =
+                    (m_IsReadOnly != 0)
+                        ? (BufferHeader*)ecs->GetComponentDataWithTypeRO(entity, m_TypeIndex, ref m_Cache)
+                        : (BufferHeader*)
+                            ecs->GetComponentDataWithTypeRW(entity, m_TypeIndex, m_GlobalSystemVersion, ref m_Cache);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                return new DynamicBuffer<T>(header, m_Safety0, m_ArrayInvalidationSafety, m_IsReadOnly != 0, false, 0, m_InternalCapacity);
+                return new DynamicBuffer<T>(
+                    header,
+                    m_Safety0,
+                    m_ArrayInvalidationSafety,
+                    m_IsReadOnly != 0,
+                    false,
+                    0,
+                    m_InternalCapacity
+                );
 #else
                 return new DynamicBuffer<T>(header, m_InternalCapacity);
 #endif
@@ -357,7 +388,7 @@ namespace Unity.Entities
             // NOTE: We could in theory fetch all this data from m_Access.EntityComponentStore and void the SystemState from being passed in.
             //       That would unfortunately allow this API to be called from a job. So we use the required system parameter as a way of signifying to the user that this can only be invoked from main thread system code.
             //       Additionally this makes the API symmetric to ComponentTypeHandle.
-            m_GlobalSystemVersion =  systemState.m_EntityComponentStore->GlobalSystemVersion;
+            m_GlobalSystemVersion = systemState.m_EntityComponentStore->GlobalSystemVersion;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var safetyHandles = &m_Access->DependencyManager->Safety;
@@ -372,6 +403,7 @@ namespace Unity.Entities
 #else
             => new SafeBitRef(ptr, offsetInBits);
 #endif
+
         /// <summary>
         /// Gets a safe reference to the buffer component enabled state.
         /// </summary>
@@ -379,7 +411,8 @@ namespace Unity.Entities
         /// <param name="entity">The referenced entity</param>
         /// <returns>Returns a safe reference to the component enabled state.
         /// Throws an exception if the component doesn't exist.</returns>
-        public EnabledRefRW<T2> GetEnabledRefRW<T2>(Entity entity) where T2 : unmanaged, IEnableableComponent, IBufferElementData
+        public EnabledRefRW<T2> GetEnabledRefRW<T2>(Entity entity)
+            where T2 : unmanaged, IEnableableComponent, IBufferElementData
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(m_Safety0);
@@ -389,8 +422,14 @@ namespace Unity.Entities
 
             int indexInBitField;
             int* ptrChunkDisabledCount;
-            var ptr = ecs->GetEnabledRawRW(entity, m_TypeIndex, ref m_Cache, m_GlobalSystemVersion,
-                out indexInBitField, out ptrChunkDisabledCount);
+            var ptr = ecs->GetEnabledRawRW(
+                entity,
+                m_TypeIndex,
+                ref m_Cache,
+                m_GlobalSystemVersion,
+                out indexInBitField,
+                out ptrChunkDisabledCount
+            );
 
             return new EnabledRefRW<T2>(MakeSafeBitRef(ptr, indexInBitField), ptrChunkDisabledCount);
         }
@@ -414,11 +453,18 @@ namespace Unity.Entities
             var ecs = m_Access->EntityComponentStore;
             ecs->AssertEntityHasComponent(entity, m_TypeIndex, ref m_Cache);
 
-            var ptr = ecs->GetEnabledRawRW(entity, m_TypeIndex, ref m_Cache, m_GlobalSystemVersion,
-                out var indexInBitField, out var ptrChunkDisabledCount);
+            var ptr = ecs->GetEnabledRawRW(
+                entity,
+                m_TypeIndex,
+                ref m_Cache,
+                m_GlobalSystemVersion,
+                out var indexInBitField,
+                out var ptrChunkDisabledCount
+            );
 
             return new EnabledRefRW<T2>(MakeSafeBitRef(ptr, indexInBitField), ptrChunkDisabledCount);
         }
+
         /// <summary> Obsolete. Use <see cref="GetEnabledRefRWOptional{T}"/> instead.</summary>
         /// <typeparam name="T2">The component type</typeparam>
         /// <param name="entity">The referenced entity</param>
@@ -438,7 +484,8 @@ namespace Unity.Entities
         /// <param name="entity">The referenced entity</param>
         /// <returns>Returns a safe reference to the component enabled state.
         /// Throws an exception if the component doesn't exist.</returns>
-        public EnabledRefRO<T2> GetEnabledRefRO<T2>(Entity entity) where T2 : unmanaged, IEnableableComponent, IBufferElementData
+        public EnabledRefRO<T2> GetEnabledRefRO<T2>(Entity entity)
+            where T2 : unmanaged, IEnableableComponent, IBufferElementData
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckReadAndThrow(m_Safety0);

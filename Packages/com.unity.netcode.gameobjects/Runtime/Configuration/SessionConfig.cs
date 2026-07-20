@@ -19,7 +19,6 @@ namespace Unity.Netcode
 
         public bool ServiceSideDistribution;
 
-
         /// <summary>
         /// Service to client
         /// Set when the client receives a <see cref="ConnectionApprovedMessage"/>

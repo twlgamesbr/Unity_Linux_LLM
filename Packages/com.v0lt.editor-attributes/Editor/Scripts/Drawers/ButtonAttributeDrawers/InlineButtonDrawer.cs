@@ -1,9 +1,9 @@
 using System.Linq;
-using UnityEditor;
 using System.Reflection;
+using EditorAttributes.Editor.Utility;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
@@ -19,37 +19,56 @@ namespace EditorAttributes.Editor
             propertyField.style.flexGrow = 1f;
 
             root.Add(propertyField);
-            root.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                // Adding multiple InlineButton attributes on the same property causes a root and propertyField to be continously added to the hierarchy with each property drawer call
-                // So we move children recursively from the bottom of the hierarchy to the root and remove their original parents so there is only one root and property field no matter how many times this attribute is used
-                MoveChildren(root, propertyField.name);
-                MoveChildren(propertyField, propertyField.name);
+            root.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    // Adding multiple InlineButton attributes on the same property causes a root and propertyField to be continously added to the hierarchy with each property drawer call
+                    // So we move children recursively from the bottom of the hierarchy to the root and remove their original parents so there is only one root and property field no matter how many times this attribute is used
+                    MoveChildren(root, propertyField.name);
+                    MoveChildren(propertyField, propertyField.name);
 
-                MemberInfo propertyInfo = ReflectionUtils.GetValidMemberInfo(property.name, property);
-                var inlineButtonAttributes = propertyInfo.GetCustomAttributes(typeof(InlineButtonAttribute), true) as InlineButtonAttribute[];
+                    MemberInfo propertyInfo = ReflectionUtils.GetValidMemberInfo(property.name, property);
+                    var inlineButtonAttributes =
+                        propertyInfo.GetCustomAttributes(typeof(InlineButtonAttribute), true)
+                        as InlineButtonAttribute[];
 
-                foreach (var inlineButtonAttribute in inlineButtonAttributes)
-                    root.Add(CreateInlineButton(inlineButtonAttribute, property));
-            });
+                    foreach (var inlineButtonAttribute in inlineButtonAttributes)
+                        root.Add(CreateInlineButton(inlineButtonAttribute, property));
+                }
+            );
 
             return root;
         }
 
-        private VisualElement CreateInlineButton(InlineButtonAttribute inlineButtonAttribute, SerializedProperty property)
+        private VisualElement CreateInlineButton(
+            InlineButtonAttribute inlineButtonAttribute,
+            SerializedProperty property
+        )
         {
             MethodInfo methodInfo = ReflectionUtils.FindFunction(inlineButtonAttribute.FunctionName, property);
 
             if (methodInfo.GetParameters().Length > 0)
                 return new HelpBox("The function cannot have parameters", HelpBoxMessageType.Error);
 
-            string buttonLabel = inlineButtonAttribute.ButtonLabel == string.Empty ? inlineButtonAttribute.FunctionName : inlineButtonAttribute.ButtonLabel;
+            string buttonLabel =
+                inlineButtonAttribute.ButtonLabel == string.Empty
+                    ? inlineButtonAttribute.FunctionName
+                    : inlineButtonAttribute.ButtonLabel;
 
             if (inlineButtonAttribute.IsRepetable)
             {
-                RepeatButton repeatButton = new(() => InvokeFunctionOnAllTargets(property.serializedObject.targetObjects, methodInfo.Name, makeTargetsDirty: inlineButtonAttribute.MakeDirty), inlineButtonAttribute.PressDelay, inlineButtonAttribute.RepetitionInterval)
+                RepeatButton repeatButton = new(
+                    () =>
+                        InvokeFunctionOnAllTargets(
+                            property.serializedObject.targetObjects,
+                            methodInfo.Name,
+                            makeTargetsDirty: inlineButtonAttribute.MakeDirty
+                        ),
+                    inlineButtonAttribute.PressDelay,
+                    inlineButtonAttribute.RepetitionInterval
+                )
                 {
-                    text = buttonLabel
+                    text = buttonLabel,
                 };
 
                 repeatButton.style.width = inlineButtonAttribute.ButtonWidth;
@@ -59,9 +78,15 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Button button = new(() => InvokeFunctionOnAllTargets(property.serializedObject.targetObjects, methodInfo.Name, makeTargetsDirty: inlineButtonAttribute.MakeDirty))
+                Button button = new(() =>
+                    InvokeFunctionOnAllTargets(
+                        property.serializedObject.targetObjects,
+                        methodInfo.Name,
+                        makeTargetsDirty: inlineButtonAttribute.MakeDirty
+                    )
+                )
                 {
-                    text = buttonLabel
+                    text = buttonLabel,
                 };
 
                 button.style.width = inlineButtonAttribute.ButtonWidth;

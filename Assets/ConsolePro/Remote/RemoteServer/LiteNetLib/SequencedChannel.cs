@@ -13,12 +13,13 @@ namespace FlyingWormConsole3.LiteNetLib
         private readonly byte _id;
         private long _lastPacketSendTime;
 
-        public SequencedChannel(NetPeer peer, bool reliable, byte id) : base(peer)
+        public SequencedChannel(NetPeer peer, bool reliable, byte id)
+            : base(peer)
         {
             _id = id;
             _reliable = reliable;
             if (_reliable)
-                _ackPacket = new NetPacket(PacketProperty.Ack, 0) {ChannelId = id};
+                _ackPacket = new NetPacket(PacketProperty.Ack, 0) { ChannelId = id };
         }
 
         protected override bool SendNextPackets()
@@ -98,7 +99,8 @@ namespace FlyingWormConsole3.LiteNetLib
                     _reliable ? DeliveryMethod.ReliableSequenced : DeliveryMethod.Sequenced,
                     (byte)(packet.ChannelId / NetConstants.ChannelTypeCount),
                     NetConstants.ChanneledHeaderSize,
-                    Peer);
+                    Peer
+                );
                 packetProcessed = true;
             }
 

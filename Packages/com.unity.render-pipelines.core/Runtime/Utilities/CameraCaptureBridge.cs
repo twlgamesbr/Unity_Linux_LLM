@@ -23,14 +23,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static bool enabled
         {
-            get
-            {
-                return _enabled;
-            }
-            set
-            {
-                _enabled = value;
-            }
+            get { return _enabled; }
+            set { _enabled = value; }
         }
 
         /// <summary>
@@ -46,7 +40,9 @@ namespace UnityEngine.Rendering
             return entry.actions.GetEnumerator();
         }
 
-        internal static IEnumerator<Action<RenderTargetIdentifier, CommandBuffer>> GetCachedCaptureActionsEnumerator(Camera camera)
+        internal static IEnumerator<Action<RenderTargetIdentifier, CommandBuffer>> GetCachedCaptureActionsEnumerator(
+            Camera camera
+        )
         {
             if (!actionDict.TryGetValue(camera, out var entry) || entry.actions.Count == 0)
                 return null;
@@ -66,7 +62,7 @@ namespace UnityEngine.Rendering
             actionDict.TryGetValue(camera, out var entry);
             if (entry == null)
             {
-                entry = new CameraEntry {actions = new HashSet<Action<RenderTargetIdentifier, CommandBuffer>>()};
+                entry = new CameraEntry { actions = new HashSet<Action<RenderTargetIdentifier, CommandBuffer>>() };
                 actionDict.Add(camera, entry);
             }
 

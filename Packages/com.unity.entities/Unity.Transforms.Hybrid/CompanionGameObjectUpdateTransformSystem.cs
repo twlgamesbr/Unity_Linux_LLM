@@ -9,9 +9,7 @@ using UnityEngine.Jobs;
 
 namespace Unity.Entities
 {
-    struct CompanionGameObjectUpdateTransformCleanup : ICleanupComponentData
-    {
-    }
+    struct CompanionGameObjectUpdateTransformCleanup : ICleanupComponentData { }
 
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     [UpdateAfter(typeof(TransformSystemGroup))]
@@ -47,7 +45,7 @@ namespace Unity.Entities
             m_Entities = new NativeList<Entity>(64, Allocator.Persistent);
             m_EntitiesMap = new NativeHashMap<Entity, IndexAndInstance>(64, Allocator.Persistent);
             m_CreatedQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<CompanionLink,CompanionLinkTransform,LocalToWorld>()
+                .WithAll<CompanionLink, CompanionLinkTransform, LocalToWorld>()
                 .WithNone<CompanionGameObjectUpdateTransformCleanup>()
                 .Build(ref state);
             m_DestroyedQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -142,7 +140,7 @@ namespace Unity.Entities
                         DestroyedQuery = m_DestroyedQuery,
                         EntitiesMap = m_EntitiesMap,
                         EntityManager = state.EntityManager,
-                        TransformAccessArray = m_TransformAccessArray
+                        TransformAccessArray = m_TransformAccessArray,
                     };
                     RemoveDestroyedEntities(ref args);
                 }
@@ -150,7 +148,12 @@ namespace Unity.Entities
 
             using (s_ProfilerMarkerUpdate.Auto())
             {
-                foreach (var (link, entity) in SystemAPI.Query<CompanionLinkTransform>().WithChangeFilter<CompanionLink>().WithEntityAccess())
+                foreach (
+                    var (link, entity) in SystemAPI
+                        .Query<CompanionLinkTransform>()
+                        .WithChangeFilter<CompanionLink>()
+                        .WithEntityAccess()
+                )
                 {
                     var cached = m_EntitiesMap[entity];
                     var currentID = link.CompanionTransform.Id.entityId;
@@ -174,15 +177,18 @@ namespace Unity.Entities
             state.Dependency = new CopyTransformJob
             {
                 localToWorld = m_LocalToWorldLookup,
-                entities = m_Entities
+                entities = m_Entities,
             }.Schedule(m_TransformAccessArray, state.Dependency);
         }
 
         [BurstCompile]
         struct CopyTransformJob : IJobParallelForTransform
         {
-            [NativeDisableParallelForRestriction] public ComponentLookup<LocalToWorld> localToWorld;
-            [ReadOnly] public NativeList<Entity> entities;
+            [NativeDisableParallelForRestriction]
+            public ComponentLookup<LocalToWorld> localToWorld;
+
+            [ReadOnly]
+            public NativeList<Entity> entities;
 
             public unsafe void Execute(int index, TransformAccess transform)
             {
@@ -192,7 +198,7 @@ namespace Unity.Entities
                 // We need to use the safe version as the vectors will not be normalized if there is some scale
                 transform.localRotation = quaternion.LookRotationSafe(ltw.Forward, ltw.Up);
 
-                var mat = *(UnityEngine.Matrix4x4*) &ltw;
+                var mat = *(UnityEngine.Matrix4x4*)&ltw;
                 transform.localScale = mat.lossyScale;
             }
         }

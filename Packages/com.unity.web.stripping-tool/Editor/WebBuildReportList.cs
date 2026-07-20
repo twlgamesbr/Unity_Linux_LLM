@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -147,7 +147,10 @@ namespace Unity.Web.Stripping.Editor
         internal void LoadBuildList()
         {
             // Migrate build list stored in ProjectSettings in version < 1.0.0-final, this logic can be removed at some point
-            var buildsFromProjectSettings = PackageSettings.GetProjectSetting(k_BuildListKey, new List<WebBuildReport>());
+            var buildsFromProjectSettings = PackageSettings.GetProjectSetting(
+                k_BuildListKey,
+                new List<WebBuildReport>()
+            );
             if (buildsFromProjectSettings.Count > 0)
             {
                 m_Builds = buildsFromProjectSettings;

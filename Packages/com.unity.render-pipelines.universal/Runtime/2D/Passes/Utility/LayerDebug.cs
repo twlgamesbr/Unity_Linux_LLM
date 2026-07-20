@@ -9,7 +9,7 @@ namespace UnityEngine.Rendering.Universal
 #if UNITY_EDITOR
         static internal bool enabled => FrameDebugger.enabled || RenderGraph.isRenderGraphViewerActive;
 
-        static internal string GetDebugLayerNames(LayerBatch layerBatch)
+        internal static string GetDebugLayerNames(LayerBatch layerBatch)
         {
             var debugNames = string.Empty;
             var sortingLayers = Light2DManager.GetCachedSortingLayer();
@@ -37,7 +37,7 @@ namespace UnityEngine.Rendering.Universal
 #endif
         }
 
-        static internal ProfilingSampler GetProfilingSampler(string passName, ProfilingSampler sampler)
+        internal static ProfilingSampler GetProfilingSampler(string passName, ProfilingSampler sampler)
         {
 #if UNITY_EDITOR
             if (enabled)
@@ -47,4 +47,3 @@ namespace UnityEngine.Rendering.Universal
         }
     }
 }
-

@@ -22,6 +22,7 @@ namespace Unity.Entities
             /// The version of the source Entity.
             /// </summary>
             public int SourceVersion;
+
             /// <summary>
             /// The target Entity ID after the remapping.
             /// </summary>
@@ -116,6 +117,7 @@ namespace Unity.Entities
             /// The offset within the chunk where the patch is applied.
             /// </summary>
             public int Offset;
+
             /// <summary>
             /// The stride between adjacent entities that need patching.
             /// </summary>
@@ -129,10 +131,13 @@ namespace Unity.Entities
         {
             /// <summary>Offset within chunk where first buffer header can be found.</summary>
             public int BufferOffset;
+
             /// <summary>Stride between adjacent buffers that need patching.</summary>
             public int BufferStride;
+
             /// <summary>Offset (from base pointer of array) where the first entity can be found.</summary>
             public int ElementOffset;
+
             /// <summary>Stride between adjacent buffer elements.</summary>
             public int ElementStride;
         }
@@ -150,7 +155,8 @@ namespace Unity.Entities
         /// <param name="weakAssetRefOffsets">The offsets of the fields of type <see cref="UntypedWeakReferenceId"/>.</param>
         /// <param name="unityObjectRefOffsets">The offsets of the fields of type <see cref="UnityObjectRef{T}"/>.</param>
         /// <param name="cache">Cache to accelerate type inspection codepaths when calling this function multiple times.</param>
-        public static void CalculateFieldOffsetsUnmanaged(Type type,
+        public static void CalculateFieldOffsetsUnmanaged(
+            Type type,
             out bool hasEntityRefs,
             out bool hasBlobRefs,
             out bool hasWeakAssetRefs,
@@ -159,16 +165,25 @@ namespace Unity.Entities
             ref NativeList<EntityOffsetInfo> blobOffsets,
             ref NativeList<EntityOffsetInfo> weakAssetRefOffsets,
             ref NativeList<EntityOffsetInfo> unityObjectRefOffsets,
-            HashSet<Type> cache = null)
+            HashSet<Type> cache = null
+        )
         {
-            if(cache == null)
+            if (cache == null)
                 cache = new HashSet<Type>();
 
             int entityOffsetsCount = entityOffsets.Length;
             int blobOffsetsCount = blobOffsets.Length;
             int weakAssetRefCount = weakAssetRefOffsets.Length;
             int unityObjectRefCount = unityObjectRefOffsets.Length;
-            CalculateOffsetsRecurse(ref entityOffsets, ref blobOffsets, ref weakAssetRefOffsets, ref unityObjectRefOffsets, type, 0, cache);
+            CalculateOffsetsRecurse(
+                ref entityOffsets,
+                ref blobOffsets,
+                ref weakAssetRefOffsets,
+                ref unityObjectRefOffsets,
+                type,
+                0,
+                cache
+            );
 
             hasEntityRefs = entityOffsets.Length != entityOffsetsCount;
             hasBlobRefs = blobOffsets.Length != blobOffsetsCount;
@@ -176,7 +191,15 @@ namespace Unity.Entities
             hasUnityObjectRefs = unityObjectRefOffsets.Length != unityObjectRefCount;
         }
 
-        static bool CalculateOffsetsRecurse(ref NativeList<EntityOffsetInfo> entityOffsets, ref NativeList<EntityOffsetInfo> blobOffsets, ref NativeList<EntityOffsetInfo> weakAssetRefOffsets, ref NativeList<EntityOffsetInfo> unityObjectRefOffsets, Type type, int baseOffset, HashSet<Type> noOffsetTypes)
+        static bool CalculateOffsetsRecurse(
+            ref NativeList<EntityOffsetInfo> entityOffsets,
+            ref NativeList<EntityOffsetInfo> blobOffsets,
+            ref NativeList<EntityOffsetInfo> weakAssetRefOffsets,
+            ref NativeList<EntityOffsetInfo> unityObjectRefOffsets,
+            Type type,
+            int baseOffset,
+            HashSet<Type> noOffsetTypes
+        )
         {
             if (noOffsetTypes.Contains(type))
                 return false;
@@ -207,7 +230,15 @@ namespace Unity.Entities
             foreach (var field in fields)
             {
                 if (field.FieldType.IsValueType && !field.FieldType.IsPrimitive)
-                    foundOffset |= CalculateOffsetsRecurse(ref entityOffsets, ref blobOffsets, ref weakAssetRefOffsets, ref unityObjectRefOffsets, field.FieldType, baseOffset + UnsafeUtility.GetFieldOffset(field), noOffsetTypes);
+                    foundOffset |= CalculateOffsetsRecurse(
+                        ref entityOffsets,
+                        ref blobOffsets,
+                        ref weakAssetRefOffsets,
+                        ref unityObjectRefOffsets,
+                        field.FieldType,
+                        baseOffset + UnsafeUtility.GetFieldOffset(field),
+                        noOffsetTypes
+                    );
             }
 
             if (!foundOffset)
@@ -225,6 +256,7 @@ namespace Unity.Entities
             /// Specifies if there are any <see cref="Entity"/> references.
             /// </summary>
             public bool HasEntityRef;
+
             /// <summary>
             /// Specifies if there are any <see cref="BlobAssetReferenceData"/> references.
             /// </summary>
@@ -258,47 +290,80 @@ namespace Unity.Entities
         /// <param name="hasUnityObjectReferences">Specifies if the type has any <see cref="UnityObjectRef{T}"/> references.</param>
         /// <param name="cache">Map of type to <see cref="EntityBlobRefResult"/> used to accelerate the type recursion.</param>
         /// <param name="maxDepth">The maximum depth for the recursion.</param>
-        public static void HasReferencesManaged(Type type, out bool hasEntityReferences, out bool hasBlobReferences, out bool hasUnityObjectReferences, Dictionary<Type,EntityBlobRefResult> cache = null, int maxDepth = 128)
+        public static void HasReferencesManaged(
+            Type type,
+            out bool hasEntityReferences,
+            out bool hasBlobReferences,
+            out bool hasUnityObjectReferences,
+            Dictionary<Type, EntityBlobRefResult> cache = null,
+            int maxDepth = 128
+        )
         {
             if (cache == null)
                 cache = new Dictionary<Type, EntityBlobRefResult>();
 
-            ProcessReferencesRecursiveManaged(type, out hasEntityReferences, out hasBlobReferences, out hasUnityObjectReferences, 0, ref cache, maxDepth);
+            ProcessReferencesRecursiveManaged(
+                type,
+                out hasEntityReferences,
+                out hasBlobReferences,
+                out hasUnityObjectReferences,
+                0,
+                ref cache,
+                maxDepth
+            );
         }
 
         /*
          * copied and translated for reflection in TypeInfoGeneration.cs
          */
-        static void ProcessReferencesRecursiveManaged(Type type, out bool hasEntityReferences, out bool hasBlobReferences, out bool hasUnityObjectReferences, int depth, ref Dictionary<Type,EntityBlobRefResult> cache, int maxDepth = 10)
+        static void ProcessReferencesRecursiveManaged(
+            Type type,
+            out bool hasEntityReferences,
+            out bool hasBlobReferences,
+            out bool hasUnityObjectReferences,
+            int depth,
+            ref Dictionary<Type, EntityBlobRefResult> cache,
+            int maxDepth = 10
+        )
         {
             hasEntityReferences = false;
             hasBlobReferences = false;
             hasUnityObjectReferences = false;
 
-           var forceReference = type.GetCustomAttribute<TypeManager.ForceReferenceAttribute>(true);
-           if (forceReference != null)
-           {
-               hasEntityReferences = forceReference.HasEntityReferences;
-               hasBlobReferences = forceReference.HasBlobReferences;
-               hasUnityObjectReferences = forceReference.HasUnityObjectReferences;
+            var forceReference = type.GetCustomAttribute<TypeManager.ForceReferenceAttribute>(true);
+            if (forceReference != null)
+            {
+                hasEntityReferences = forceReference.HasEntityReferences;
+                hasBlobReferences = forceReference.HasBlobReferences;
+                hasUnityObjectReferences = forceReference.HasUnityObjectReferences;
 
-               // If we know for certain that all references are present, we can early out on the search
-               if(forceReference.HasBlobReferences && forceReference.HasEntityReferences && forceReference.HasUnityObjectReferences)
-                   return;
-           }
+                // If we know for certain that all references are present, we can early out on the search
+                if (
+                    forceReference.HasBlobReferences
+                    && forceReference.HasEntityReferences
+                    && forceReference.HasUnityObjectReferences
+                )
+                    return;
+            }
 
-           // If we are certain that there will be no reference of any type, we can early out
-           var typeOverrides = type.GetCustomAttribute<TypeManager.TypeOverridesAttribute>(true);
-           if (typeOverrides != null && typeOverrides.HasNoBlobReferences && typeOverrides.HasNoEntityReferences && typeOverrides.HasNoUnityObjectReferences)
-               return;
+            // If we are certain that there will be no reference of any type, we can early out
+            var typeOverrides = type.GetCustomAttribute<TypeManager.TypeOverridesAttribute>(true);
+            if (
+                typeOverrides != null
+                && typeOverrides.HasNoBlobReferences
+                && typeOverrides.HasNoEntityReferences
+                && typeOverrides.HasNoUnityObjectReferences
+            )
+                return;
 
             // Avoid deep / infinite recursion
             if (depth > maxDepth)
             {
                 Debug.LogWarning(
-                    $"The max depth is reached on searching for nested Entity References, Blob References or Unity Object References " +
-                    $"It will ignore any Entity, Blob or Unity Object References. If you are certain that there is any of these types " +
-                    $"somewhere in the nesting structure, please add the [{nameof(TypeManager.ForceReferenceAttribute)}] attribute to the type.");
+                    $"The max depth is reached on searching for nested Entity References, Blob References or Unity Object References "
+                        + $"It will ignore any Entity, Blob or Unity Object References. If you are certain that there is any of these types "
+                        + $"somewhere in the nesting structure, please add the [{nameof(TypeManager.ForceReferenceAttribute)}] attribute to the type."
+                );
                 return;
             }
 
@@ -328,14 +393,8 @@ namespace Unity.Entities
                 else if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
                     fieldType = fieldType.GetGenericArguments()[0];
 
-                if (fieldType.IsPrimitive)
-                {
-
-                }
-                else if (typeof(UnityEngine.Object).IsAssignableFrom(fieldType))
-                {
-
-                }
+                if (fieldType.IsPrimitive) { }
+                else if (typeof(UnityEngine.Object).IsAssignableFrom(fieldType)) { }
                 else if (fieldType == typeof(Entity))
                 {
                     hasEntityReferences = true;
@@ -350,8 +409,15 @@ namespace Unity.Entities
                 }
                 else if (fieldType.IsValueType || fieldType.IsSealed)
                 {
-                    ProcessReferencesRecursiveManaged(fieldType, out var recursiveHasEntityRefs,
-                        out var recursiveHasBlobRefs, out var recursiveHasUnityObjectRefs, depth + 1, ref cache, maxDepth);
+                    ProcessReferencesRecursiveManaged(
+                        fieldType,
+                        out var recursiveHasEntityRefs,
+                        out var recursiveHasBlobRefs,
+                        out var recursiveHasUnityObjectRefs,
+                        depth + 1,
+                        ref cache,
+                        maxDepth
+                    );
 
                     hasEntityReferences |= recursiveHasEntityRefs;
                     hasBlobReferences |= recursiveHasBlobRefs;
@@ -361,15 +427,15 @@ namespace Unity.Entities
                 else
                 {
                     Debug.LogWarning(
-                        $"We can't determine if there are references in a polymorphic non-sealed class type in the TypeManager. " +
-                        $"It will ignore any Entity, Blob or Unity Object References. If you are certain that there is any of these types " +
-                        $"somewhere in the nesting structure, please add the [{nameof(TypeManager.ForceReferenceAttribute)}] attribute to the type.");
+                        $"We can't determine if there are references in a polymorphic non-sealed class type in the TypeManager. "
+                            + $"It will ignore any Entity, Blob or Unity Object References. If you are certain that there is any of these types "
+                            + $"somewhere in the nesting structure, please add the [{nameof(TypeManager.ForceReferenceAttribute)}] attribute to the type."
+                    );
                 }
             }
 
-            if(!cache.ContainsKey(type))
+            if (!cache.ContainsKey(type))
                 cache[type] = new EntityBlobRefResult(hasEntityReferences, hasBlobReferences, hasUnityObjectReferences);
-
         }
 
         /// <summary>
@@ -381,7 +447,13 @@ namespace Unity.Entities
         /// <param name="baseOffset">The base offset of the patch.</param>
         /// <param name="stride">The stride of the patch.</param>
         /// <returns>Returns a pointer to the next free slot in the <paramref name="patches"/> array.</returns>
-        public static EntityPatchInfo* AppendEntityPatches(EntityPatchInfo* patches, EntityOffsetInfo* offsets, int offsetCount, int baseOffset, int stride)
+        public static EntityPatchInfo* AppendEntityPatches(
+            EntityPatchInfo* patches,
+            EntityOffsetInfo* offsets,
+            int offsetCount,
+            int baseOffset,
+            int stride
+        )
         {
             if (offsets == null)
                 return patches;
@@ -401,7 +473,14 @@ namespace Unity.Entities
         /// <param name="bufferStride">The stride between adjacent buffers that need patching.</param>
         /// <param name="elementStride">The stride between adjacent buffer elements.</param>
         /// <returns>Returns a pointer to the next free slot in the <paramref name="patches"/> array.</returns>
-        public static BufferEntityPatchInfo* AppendBufferEntityPatches(BufferEntityPatchInfo* patches, EntityOffsetInfo* offsets, int offsetCount, int bufferBaseOffset, int bufferStride, int elementStride)
+        public static BufferEntityPatchInfo* AppendBufferEntityPatches(
+            BufferEntityPatchInfo* patches,
+            EntityOffsetInfo* offsets,
+            int offsetCount,
+            int bufferBaseOffset,
+            int bufferStride,
+            int elementStride
+        )
         {
             if (offsets == null)
                 return patches;
@@ -430,9 +509,15 @@ namespace Unity.Entities
         /// <param name="chunkBuffer">The chunk buffer, where the patches are applied.</param>
         /// <param name="entityCount">The number of entities in the chunk.</param>
         /// <param name="remapping">The remapping array.</param>
-        public static void PatchEntities(EntityPatchInfo* scalarPatches, int scalarPatchCount,
-            BufferEntityPatchInfo* bufferPatches, int bufferPatchCount,
-            byte* chunkBuffer, int entityCount, ref NativeArray<EntityRemapInfo> remapping)
+        public static void PatchEntities(
+            EntityPatchInfo* scalarPatches,
+            int scalarPatchCount,
+            BufferEntityPatchInfo* bufferPatches,
+            int bufferPatchCount,
+            byte* chunkBuffer,
+            int entityCount,
+            ref NativeArray<EntityRemapInfo> remapping
+        )
         {
             // Patch scalars (single components) with entity references.
             for (int p = 0; p < scalarPatchCount; p++)
@@ -483,9 +568,18 @@ namespace Unity.Entities
         /// <param name="remapSrc">The remap source array.</param>
         /// <param name="remapDst">The remap target array.</param>
         /// <param name="remappingCount">The size of the remap arrays.</param>
-        public static void PatchEntitiesForPrefab(EntityPatchInfo* scalarPatches, int scalarPatchCount,
-            BufferEntityPatchInfo* bufferPatches, int bufferPatchCount,
-            byte* chunkBuffer, int indexInChunk, int entityCount, Entity* remapSrc, Entity* remapDst, int remappingCount)
+        public static void PatchEntitiesForPrefab(
+            EntityPatchInfo* scalarPatches,
+            int scalarPatchCount,
+            BufferEntityPatchInfo* bufferPatches,
+            int bufferPatchCount,
+            byte* chunkBuffer,
+            int indexInChunk,
+            int entityCount,
+            Entity* remapSrc,
+            Entity* remapDst,
+            int remappingCount
+        )
         {
             // Patch scalars (single components) with entity references.
             for (int p = 0; p < scalarPatchCount; p++)
@@ -505,7 +599,9 @@ namespace Unity.Entities
 
                 for (int e = 0; e != entityCount; e++)
                 {
-                    BufferHeader* header = (BufferHeader*)(bufferData + bufferPatches[p].BufferStride * (e + indexInChunk));
+                    BufferHeader* header = (BufferHeader*)(
+                        bufferData + bufferPatches[p].BufferStride * (e + indexInChunk)
+                    );
 
                     byte* elemsBase = BufferHeader.GetElementPointer(header) + bufferPatches[p].ElementOffset;
                     int elemCount = header->Length;
@@ -513,7 +609,12 @@ namespace Unity.Entities
                     for (int k = 0; k != elemCount; ++k)
                     {
                         Entity* entityPtr = (Entity*)elemsBase;
-                        *entityPtr = RemapEntityForPrefab(remapSrc, remapDst + e * remappingCount, remappingCount, *entityPtr);
+                        *entityPtr = RemapEntityForPrefab(
+                            remapSrc,
+                            remapDst + e * remappingCount,
+                            remappingCount,
+                            *entityPtr
+                        );
                         elemsBase += bufferPatches[p].ElementStride;
                     }
                 }

@@ -51,14 +51,28 @@ namespace Unity.Netcode
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private protected override Quaternion SmoothDamp(Quaternion current, Quaternion target, ref Quaternion rateOfChange, float duration, float deltaTime, float maxSpeed = float.PositiveInfinity)
+        private protected override Quaternion SmoothDamp(
+            Quaternion current,
+            Quaternion target,
+            ref Quaternion rateOfChange,
+            float duration,
+            float deltaTime,
+            float maxSpeed = float.PositiveInfinity
+        )
         {
             Vector3 currentEuler = current.eulerAngles;
             Vector3 targetEuler = target.eulerAngles;
             for (int i = 0; i < 3; i++)
             {
                 var velocity = rateOfChange[i];
-                currentEuler[i] = Mathf.SmoothDampAngle(currentEuler[i], targetEuler[i], ref velocity, duration, maxSpeed, deltaTime);
+                currentEuler[i] = Mathf.SmoothDampAngle(
+                    currentEuler[i],
+                    targetEuler[i],
+                    ref velocity,
+                    duration,
+                    maxSpeed,
+                    deltaTime
+                );
                 rateOfChange[i] = velocity;
             }
             return Quaternion.Euler(currentEuler);
@@ -68,15 +82,19 @@ namespace Unity.Netcode
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private protected override bool IsApproximately(Quaternion first, Quaternion second, float precision = 1E-06F)
         {
-            return Mathf.Abs(first.x - second.x) <= precision &&
-                Mathf.Abs(first.y - second.y) <= precision &&
-                Mathf.Abs(first.z - second.z) <= precision &&
-                Mathf.Abs(first.w - second.w) <= precision;
+            return Mathf.Abs(first.x - second.x) <= precision
+                && Mathf.Abs(first.y - second.y) <= precision
+                && Mathf.Abs(first.z - second.z) <= precision
+                && Mathf.Abs(first.w - second.w) <= precision;
         }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected internal override Quaternion OnConvertTransformSpace(Transform transform, Quaternion rotation, bool inLocalSpace)
+        protected internal override Quaternion OnConvertTransformSpace(
+            Transform transform,
+            Quaternion rotation,
+            bool inLocalSpace
+        )
         {
             if (inLocalSpace)
             {

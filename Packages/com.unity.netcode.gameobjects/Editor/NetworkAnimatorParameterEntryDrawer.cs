@@ -1,4 +1,3 @@
-
 #if COM_UNITY_MODULES_ANIMATION
 using Unity.Netcode.Components;
 using UnityEditor;
@@ -15,7 +14,9 @@ namespace Unity.Netcode.Editor
             EditorGUI.BeginProperty(position, label, property);
 
             // Draw the foldout for the list
-            SerializedProperty items = property.FindPropertyRelative(nameof(NetworkAnimator.AnimatorParameterEntries.ParameterEntries));
+            SerializedProperty items = property.FindPropertyRelative(
+                nameof(NetworkAnimator.AnimatorParameterEntries.ParameterEntries)
+            );
             position.height = EditorGUIUtility.singleLineHeight;
             property.isExpanded = EditorGUI.Foldout(position, property.isExpanded, label);
 
@@ -39,16 +40,27 @@ namespace Unity.Netcode.Editor
                     // Set the indention level down
                     EditorGUI.indentLevel++;
                     // Calculate rects
-                    var nameHashRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+                    var nameHashRect = new Rect(
+                        position.x,
+                        position.y,
+                        position.width,
+                        EditorGUIUtility.singleLineHeight
+                    );
                     position.y += EditorGUIUtility.singleLineHeight + 2;
                     var paramRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
                     position.y += EditorGUIUtility.singleLineHeight + 2;
                     var syncRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
 
                     // Get the three properties we want to visualize in the inspector view
-                    var synchronizeField = element.FindPropertyRelative(nameof(NetworkAnimator.AnimatorParameterEntry.Synchronize));
-                    var nameHashField = element.FindPropertyRelative(nameof(NetworkAnimator.AnimatorParameterEntry.NameHash));
-                    var parameterTypeField = element.FindPropertyRelative(nameof(NetworkAnimator.AnimatorParameterEntry.ParameterType));
+                    var synchronizeField = element.FindPropertyRelative(
+                        nameof(NetworkAnimator.AnimatorParameterEntry.Synchronize)
+                    );
+                    var nameHashField = element.FindPropertyRelative(
+                        nameof(NetworkAnimator.AnimatorParameterEntry.NameHash)
+                    );
+                    var parameterTypeField = element.FindPropertyRelative(
+                        nameof(NetworkAnimator.AnimatorParameterEntry.ParameterType)
+                    );
 
                     // Draw the read only fields
                     GUI.enabled = false;
@@ -74,7 +86,9 @@ namespace Unity.Netcode.Editor
                 return totalHeight;
             }
             var singleLineWithSpace = EditorGUIUtility.singleLineHeight + 2;
-            SerializedProperty items = property.FindPropertyRelative(nameof(NetworkAnimator.AnimatorParameterEntries.ParameterEntries));
+            SerializedProperty items = property.FindPropertyRelative(
+                nameof(NetworkAnimator.AnimatorParameterEntries.ParameterEntries)
+            );
 
             totalHeight += singleLineWithSpace;
             for (int i = 0; i < items.arraySize; i++)

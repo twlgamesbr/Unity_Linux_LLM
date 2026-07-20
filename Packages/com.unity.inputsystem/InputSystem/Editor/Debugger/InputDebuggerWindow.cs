@@ -10,7 +10,6 @@ using UnityEditor.Networking.PlayerConnection;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.InputSystem.Utilities;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeView = UnityEditor.IMGUI.Controls.TreeView<int>;
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
@@ -120,8 +119,11 @@ namespace UnityEngine.InputSystem.Editor
             Refresh();
         }
 
-        private string OnFindLayout(ref InputDeviceDescription description, string matchedLayout,
-            InputDeviceExecuteCommandDelegate executeCommandDelegate)
+        private string OnFindLayout(
+            ref InputDeviceDescription description,
+            string matchedLayout,
+            InputDeviceExecuteCommandDelegate executeCommandDelegate
+        )
         {
             // If there's no matched layout, there's a chance this device will go in
             // the unsupported list. There's no direct notification for that so we
@@ -190,10 +192,12 @@ namespace UnityEngine.InputSystem.Editor
             if (!EditorPlayerSettingHelpers.newSystemBackendsEnabled)
             {
                 EditorGUILayout.HelpBox(
-                    "Platform backends for the new input system are not enabled. " +
-                    "No devices and input from hardware will come through in the new input system APIs.\n\n" +
-                    "To enable the backends, set 'Active Input Handling' in the player settings to either 'Input System (Preview)' " +
-                    "or 'Both' and restart the editor.", MessageType.Warning);
+                    "Platform backends for the new input system are not enabled. "
+                        + "No devices and input from hardware will come through in the new input system APIs.\n\n"
+                        + "To enable the backends, set 'Active Input Handling' in the player settings to either 'Input System (Preview)' "
+                        + "or 'Both' and restart the editor.",
+                    MessageType.Warning
+                );
             }
 
             // This also brings us back online after a domain reload.
@@ -251,7 +255,11 @@ namespace UnityEngine.InputSystem.Editor
         {
             foreach (var player in EditorConnection.instance.ConnectedPlayers)
             {
-                EditorConnection.instance.Send(enable ? RemoteInputPlayerConnection.kStartSendingMsg : RemoteInputPlayerConnection.kStopSendingMsg, new byte[0], player.playerId);
+                EditorConnection.instance.Send(
+                    enable ? RemoteInputPlayerConnection.kStartSendingMsg : RemoteInputPlayerConnection.kStopSendingMsg,
+                    new byte[0],
+                    player.playerId
+                );
                 if (!enable)
                     InputSystem.remoting.RemoveRemoteDevices(player.playerId);
             }
@@ -264,10 +272,14 @@ namespace UnityEngine.InputSystem.Editor
                 var menu = new GenericMenu();
                 var haveRemotes = InputSystem.devices.Any(x => x.remote);
                 if (EditorConnection.instance.ConnectedPlayers.Count > 0)
-                    menu.AddItem(new GUIContent("Show remote devices"), haveRemotes, () =>
-                    {
-                        EnableRemoteDevices(!haveRemotes);
-                    });
+                    menu.AddItem(
+                        new GUIContent("Show remote devices"),
+                        haveRemotes,
+                        () =>
+                        {
+                            EnableRemoteDevices(!haveRemotes);
+                        }
+                    );
                 else
                     menu.AddDisabledItem(new GUIContent("Show remote input devices"));
 
@@ -280,28 +292,38 @@ namespace UnityEngine.InputSystem.Editor
                     var profilerName = ProfilerDriver.GetConnectionIdentifier(profiler);
                     var isConnected = ProfilerDriver.connectedProfiler == profiler;
                     if (enabled)
-                        menu.AddItem(new GUIContent(profilerName), isConnected, () =>
-                        {
-                            ProfilerDriver.connectedProfiler = profiler;
-                            EnableRemoteDevices();
-                        });
+                        menu.AddItem(
+                            new GUIContent(profilerName),
+                            isConnected,
+                            () =>
+                            {
+                                ProfilerDriver.connectedProfiler = profiler;
+                                EnableRemoteDevices();
+                            }
+                        );
                     else
                         menu.AddDisabledItem(new GUIContent(profilerName));
                 }
 
                 foreach (var device in UnityEditor.Hardware.DevDeviceList.GetDevices())
                 {
-                    var supportsPlayerConnection = (device.features & UnityEditor.Hardware.DevDeviceFeatures.PlayerConnection) != 0;
+                    var supportsPlayerConnection =
+                        (device.features & UnityEditor.Hardware.DevDeviceFeatures.PlayerConnection) != 0;
                     if (!device.isConnected || !supportsPlayerConnection)
                         continue;
 
                     var url = "device://" + device.id;
-                    var isConnected = ProfilerDriver.connectedProfiler == 0xFEEE && ProfilerDriver.directConnectionUrl == url;
-                    menu.AddItem(new GUIContent(device.name), isConnected, () =>
-                    {
-                        ProfilerDriver.DirectURLConnect(url);
-                        EnableRemoteDevices();
-                    });
+                    var isConnected =
+                        ProfilerDriver.connectedProfiler == 0xFEEE && ProfilerDriver.directConnectionUrl == url;
+                    menu.AddItem(
+                        new GUIContent(device.name),
+                        isConnected,
+                        () =>
+                        {
+                            ProfilerDriver.DirectURLConnect(url);
+                            EnableRemoteDevices();
+                        }
+                    );
                 }
 
                 menu.ShowAsContext();
@@ -316,11 +338,21 @@ namespace UnityEngine.InputSystem.Editor
             {
                 var menu = new GenericMenu();
 
-                menu.AddItem(Contents.addDevicesNotSupportedByProjectContent, InputEditorUserSettings.addDevicesNotSupportedByProject,
-                    ToggleAddDevicesNotSupportedByProject);
-                menu.AddItem(Contents.diagnosticsModeContent, InputSystem.s_Manager.m_Diagnostics != null,
-                    ToggleDiagnosticMode);
-                menu.AddItem(Contents.touchSimulationContent, InputEditorUserSettings.simulateTouch, ToggleTouchSimulation);
+                menu.AddItem(
+                    Contents.addDevicesNotSupportedByProjectContent,
+                    InputEditorUserSettings.addDevicesNotSupportedByProject,
+                    ToggleAddDevicesNotSupportedByProject
+                );
+                menu.AddItem(
+                    Contents.diagnosticsModeContent,
+                    InputSystem.s_Manager.m_Diagnostics != null,
+                    ToggleDiagnosticMode
+                );
+                menu.AddItem(
+                    Contents.touchSimulationContent,
+                    InputEditorUserSettings.simulateTouch,
+                    ToggleTouchSimulation
+                );
 
                 // Add the inverse of "Copy Device Description" which adds a device with the description from
                 // the clipboard to the system. This is most useful for debugging and makes it very easy to
@@ -328,14 +360,21 @@ namespace UnityEngine.InputSystem.Editor
                 try
                 {
                     var copyBuffer = EditorHelpers.GetSystemCopyBufferContents();
-                    if (!string.IsNullOrEmpty(copyBuffer) &&
-                        copyBuffer.StartsWith("{") && !InputDeviceDescription.FromJson(copyBuffer).empty)
+                    if (
+                        !string.IsNullOrEmpty(copyBuffer)
+                        && copyBuffer.StartsWith("{")
+                        && !InputDeviceDescription.FromJson(copyBuffer).empty
+                    )
                     {
-                        menu.AddItem(Contents.pasteDeviceDescriptionAsDevice, false, () =>
-                        {
-                            var description = InputDeviceDescription.FromJson(copyBuffer);
-                            InputSystem.AddDevice(description);
-                        });
+                        menu.AddItem(
+                            Contents.pasteDeviceDescriptionAsDevice,
+                            false,
+                            () =>
+                            {
+                                var description = InputDeviceDescription.FromJson(copyBuffer);
+                                InputSystem.AddDevice(description);
+                            }
+                        );
                     }
                 }
                 catch (ArgumentException)
@@ -353,12 +392,20 @@ namespace UnityEngine.InputSystem.Editor
             EditorGUILayout.EndHorizontal();
         }
 
-        [SerializeField] private TreeViewState m_TreeViewState;
+        [SerializeField]
+        private TreeViewState m_TreeViewState;
 
-        [NonSerialized] private InputDiagnostics m_Diagnostics;
-        [NonSerialized] private InputSystemTreeView m_TreeView;
-        [NonSerialized] private bool m_Initialized;
-        [NonSerialized] private bool m_NeedReload;
+        [NonSerialized]
+        private InputDiagnostics m_Diagnostics;
+
+        [NonSerialized]
+        private InputSystemTreeView m_TreeView;
+
+        [NonSerialized]
+        private bool m_Initialized;
+
+        [NonSerialized]
+        private bool m_NeedReload;
 
         internal static void ReviveAfterDomainReload()
         {
@@ -373,9 +420,15 @@ namespace UnityEngine.InputSystem.Editor
         private static class Contents
         {
             public static readonly GUIContent optionsContent = new GUIContent("Options");
-            public static readonly GUIContent touchSimulationContent = new GUIContent("Simulate Touch Input From Mouse or Pen");
-            public static readonly GUIContent pasteDeviceDescriptionAsDevice = new GUIContent("Paste Device Description as Device");
-            public static readonly GUIContent addDevicesNotSupportedByProjectContent = new GUIContent("Add Devices Not Listed in 'Supported Devices'");
+            public static readonly GUIContent touchSimulationContent = new GUIContent(
+                "Simulate Touch Input From Mouse or Pen"
+            );
+            public static readonly GUIContent pasteDeviceDescriptionAsDevice = new GUIContent(
+                "Paste Device Description as Device"
+            );
+            public static readonly GUIContent addDevicesNotSupportedByProjectContent = new GUIContent(
+                "Add Devices Not Listed in 'Supported Devices'"
+            );
             public static readonly GUIContent diagnosticsModeContent = new GUIContent("Enable Event Diagnostics");
             public static readonly GUIContent openDebugView = new GUIContent("Open Device Debug View");
             public static readonly GUIContent copyDeviceDescription = new GUIContent("Copy Device Description");
@@ -390,9 +443,7 @@ namespace UnityEngine.InputSystem.Editor
             public static readonly GUIContent hardResetDevice = new GUIContent("Reset Device (Hard)");
         }
 
-        void ISerializationCallbackReceiver.OnBeforeSerialize()
-        {
-        }
+        void ISerializationCallbackReceiver.OnBeforeSerialize() { }
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
@@ -423,9 +474,16 @@ namespace UnityEngine.InputSystem.Editor
                 if (item is DeviceItem deviceItem)
                 {
                     var menu = new GenericMenu();
-                    menu.AddItem(Contents.openDebugView, false, () => InputDeviceDebuggerWindow.CreateOrShowExisting(deviceItem.device));
-                    menu.AddItem(Contents.copyDeviceDescription, false,
-                        () => EditorHelpers.SetSystemCopyBufferContents(deviceItem.device.description.ToJson()));
+                    menu.AddItem(
+                        Contents.openDebugView,
+                        false,
+                        () => InputDeviceDebuggerWindow.CreateOrShowExisting(deviceItem.device)
+                    );
+                    menu.AddItem(
+                        Contents.copyDeviceDescription,
+                        false,
+                        () => EditorHelpers.SetSystemCopyBufferContents(deviceItem.device.description.ToJson())
+                    );
                     menu.AddItem(Contents.removeDevice, false, () => InputSystem.RemoveDevice(deviceItem.device));
                     if (deviceItem.device.enabled)
                         menu.AddItem(Contents.disableDevice, false, () => InputSystem.DisableDevice(deviceItem.device));
@@ -440,8 +498,11 @@ namespace UnityEngine.InputSystem.Editor
                 if (item is UnsupportedDeviceItem unsupportedDeviceItem)
                 {
                     var menu = new GenericMenu();
-                    menu.AddItem(Contents.copyDeviceDescription, false,
-                        () => EditorHelpers.SetSystemCopyBufferContents(unsupportedDeviceItem.description.ToJson()));
+                    menu.AddItem(
+                        Contents.copyDeviceDescription,
+                        false,
+                        () => EditorHelpers.SetSystemCopyBufferContents(unsupportedDeviceItem.description.ToJson())
+                    );
                     menu.ShowAsContext();
                 }
 
@@ -451,26 +512,48 @@ namespace UnityEngine.InputSystem.Editor
                     if (layout != null)
                     {
                         var menu = new GenericMenu();
-                        menu.AddItem(Contents.copyLayoutAsJSON, false,
-                            () => EditorHelpers.SetSystemCopyBufferContents(layout.ToJson()));
+                        menu.AddItem(
+                            Contents.copyLayoutAsJSON,
+                            false,
+                            () => EditorHelpers.SetSystemCopyBufferContents(layout.ToJson())
+                        );
                         if (layout.isDeviceLayout)
                         {
-                            menu.AddItem(Contents.createDeviceFromLayout, false,
-                                () => InputSystem.AddDevice(layout.name));
-                            menu.AddItem(Contents.generateCodeFromLayout, false, () =>
-                            {
-                                var fileName = EditorUtility.SaveFilePanel("Generate InputDevice Code", "", "Fast" + layoutItem.layoutName, "cs");
-                                var isInAssets = fileName.StartsWith(Application.dataPath, StringComparison.OrdinalIgnoreCase);
-                                if (isInAssets)
-                                    fileName = "Assets/" + fileName.Substring(Application.dataPath.Length + 1);
-                                if (!string.IsNullOrEmpty(fileName))
+                            menu.AddItem(
+                                Contents.createDeviceFromLayout,
+                                false,
+                                () => InputSystem.AddDevice(layout.name)
+                            );
+                            menu.AddItem(
+                                Contents.generateCodeFromLayout,
+                                false,
+                                () =>
                                 {
-                                    var code = InputLayoutCodeGenerator.GenerateCodeFileForDeviceLayout(layoutItem.layoutName, fileName, prefix: "Fast");
-                                    File.WriteAllText(fileName, code);
+                                    var fileName = EditorUtility.SaveFilePanel(
+                                        "Generate InputDevice Code",
+                                        "",
+                                        "Fast" + layoutItem.layoutName,
+                                        "cs"
+                                    );
+                                    var isInAssets = fileName.StartsWith(
+                                        Application.dataPath,
+                                        StringComparison.OrdinalIgnoreCase
+                                    );
                                     if (isInAssets)
-                                        AssetDatabase.Refresh();
+                                        fileName = "Assets/" + fileName.Substring(Application.dataPath.Length + 1);
+                                    if (!string.IsNullOrEmpty(fileName))
+                                    {
+                                        var code = InputLayoutCodeGenerator.GenerateCodeFileForDeviceLayout(
+                                            layoutItem.layoutName,
+                                            fileName,
+                                            prefix: "Fast"
+                                        );
+                                        File.WriteAllText(fileName, code);
+                                        if (isInAssets)
+                                            AssetDatabase.Refresh();
+                                    }
                                 }
-                            });
+                            );
                         }
                         menu.ShowAsContext();
                     }
@@ -489,11 +572,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 var id = 0;
 
-                var root = new TreeViewItem
-                {
-                    id = id++,
-                    depth = -1
-                };
+                var root = new TreeViewItem { id = id++, depth = -1 };
 
                 ////TODO: this will need to be improved for multi-user scenarios
                 // Actions.
@@ -561,7 +640,11 @@ namespace UnityEngine.InputSystem.Editor
                 if (m_UnsupportedDevices.Count > 0)
                 {
                     var parent = haveRemotes ? localDevicesNode : devicesItem;
-                    var unsupportedDevicesNode = AddChild(parent, $"Unsupported ({m_UnsupportedDevices.Count})", ref id);
+                    var unsupportedDevicesNode = AddChild(
+                        parent,
+                        $"Unsupported ({m_UnsupportedDevices.Count})",
+                        ref id
+                    );
                     foreach (var device in m_UnsupportedDevices)
                     {
                         var item = new UnsupportedDeviceItem
@@ -569,23 +652,29 @@ namespace UnityEngine.InputSystem.Editor
                             id = id++,
                             depth = unsupportedDevicesNode.depth + 1,
                             displayName = device.ToString(),
-                            description = device
+                            description = device,
                         };
                         unsupportedDevicesNode.AddChild(item);
                     }
-                    unsupportedDevicesNode.children.Sort((a, b) =>
-                        string.Compare(a.displayName, b.displayName, StringComparison.InvariantCulture));
+                    unsupportedDevicesNode.children.Sort(
+                        (a, b) => string.Compare(a.displayName, b.displayName, StringComparison.InvariantCulture)
+                    );
                 }
 
                 var disconnectedDevices = InputSystem.disconnectedDevices;
                 if (disconnectedDevices.Count > 0)
                 {
                     var parent = haveRemotes ? localDevicesNode : devicesItem;
-                    var disconnectedDevicesNode = AddChild(parent, $"Disconnected ({disconnectedDevices.Count})", ref id);
+                    var disconnectedDevicesNode = AddChild(
+                        parent,
+                        $"Disconnected ({disconnectedDevices.Count})",
+                        ref id
+                    );
                     foreach (var device in disconnectedDevices)
                         AddChild(disconnectedDevicesNode, device.ToString(), ref id);
-                    disconnectedDevicesNode.children.Sort((a, b) =>
-                        string.Compare(a.displayName, b.displayName, StringComparison.InvariantCulture));
+                    disconnectedDevicesNode.children.Sort(
+                        (a, b) => string.Compare(a.displayName, b.displayName, StringComparison.InvariantCulture)
+                    );
                 }
 
                 // Layouts.
@@ -601,7 +690,12 @@ namespace UnityEngine.InputSystem.Editor
                     settingsLabel = $"Settings ({Path.GetFileName(settingsAssetPath)})";
                 settingsItem = AddChild(root, settingsLabel, ref id);
                 AddValueItem(settingsItem, "Update Mode", settings.updateMode, ref id);
-                AddValueItem(settingsItem, "Compensate For Screen Orientation", settings.compensateForScreenOrientation, ref id);
+                AddValueItem(
+                    settingsItem,
+                    "Compensate For Screen Orientation",
+                    settings.compensateForScreenOrientation,
+                    ref id
+                );
                 AddValueItem(settingsItem, "Default Button Press Point", settings.defaultButtonPressPoint, ref id);
                 AddValueItem(settingsItem, "Default Deadzone Min", settings.defaultDeadzoneMin, ref id);
                 AddValueItem(settingsItem, "Default Deadzone Max", settings.defaultDeadzoneMax, ref id);
@@ -617,14 +711,18 @@ namespace UnityEngine.InputSystem.Editor
                         AddChild(supportedDevices, item, ref id, icon);
                     }
                 }
-                settingsItem.children.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.InvariantCultureIgnoreCase));
+                settingsItem.children.Sort(
+                    (a, b) => string.Compare(a.displayName, b.displayName, StringComparison.InvariantCultureIgnoreCase)
+                );
 
                 // Metrics.
                 var metrics = InputSystem.metrics;
                 metricsItem = AddChild(root, "Metrics", ref id);
-                AddChild(metricsItem,
+                AddChild(
+                    metricsItem,
                     "Current State Size in Bytes: " + StringHelpers.NicifyMemorySize(metrics.currentStateSizeInBytes),
-                    ref id);
+                    ref id
+                );
                 AddValueItem(metricsItem, "Current Control Count", metrics.currentControlCount, ref id);
                 AddValueItem(metricsItem, "Current Layout Count", metrics.currentLayoutCount, ref id);
 
@@ -653,11 +751,19 @@ namespace UnityEngine.InputSystem.Editor
                     foreach (var action in actions)
                         AddActionItem(actionsItem, action, ref id);
 
-                    parent.children?.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.CurrentCultureIgnoreCase));
+                    parent.children?.Sort(
+                        (a, b) =>
+                            string.Compare(a.displayName, b.displayName, StringComparison.CurrentCultureIgnoreCase)
+                    );
                 }
             }
 
-            private void AddDeviceListToUser(string title, ReadOnlyArray<InputDevice> devices, ref int id, TreeViewItem userItem)
+            private void AddDeviceListToUser(
+                string title,
+                ReadOnlyArray<InputDevice> devices,
+                ref int id,
+                TreeViewItem userItem
+            )
             {
                 if (devices.Count == 0)
                     return;
@@ -681,7 +787,12 @@ namespace UnityEngine.InputSystem.Editor
                 }
             }
 
-            private static void AddDevices(TreeViewItem parent, IEnumerable<InputDevice> devices, ref int id, int participantId = InputDevice.kLocalParticipantId)
+            private static void AddDevices(
+                TreeViewItem parent,
+                IEnumerable<InputDevice> devices,
+                ref int id,
+                int participantId = InputDevice.kLocalParticipantId
+            )
             {
                 foreach (var device in devices)
                 {
@@ -779,17 +890,15 @@ namespace UnityEngine.InputSystem.Editor
                 }
                 if (layout.commonUsages.Count > 0)
                 {
-                    AddChild(item,
-                        "Common Usages: " +
-                        string.Join(", ", layout.commonUsages.Select(x => x.ToString()).ToArray()),
-                        ref id);
+                    AddChild(
+                        item,
+                        "Common Usages: " + string.Join(", ", layout.commonUsages.Select(x => x.ToString()).ToArray()),
+                        ref id
+                    );
                 }
                 if (layout.appliedOverrides.Count() > 0)
                 {
-                    AddChild(item,
-                        "Applied Overrides: " +
-                        string.Join(", ", layout.appliedOverrides),
-                        ref id);
+                    AddChild(item, "Applied Overrides: " + string.Join(", ", layout.appliedOverrides), ref id);
                 }
 
                 ////TODO: find a more elegant solution than multiple "Matching Devices" parents when having multiple
@@ -817,8 +926,13 @@ namespace UnityEngine.InputSystem.Editor
 
             private void AddControlItem(InputControlLayout.ControlItem control, TreeViewItem parent, ref int id)
             {
-                var item = AddChild(parent, control.variants.IsEmpty() ? control.name : string.Format("{0} ({1})",
-                    control.name, control.variants), ref id);
+                var item = AddChild(
+                    parent,
+                    control.variants.IsEmpty()
+                        ? control.name
+                        : string.Format("{0} ({1})", control.name, control.variants),
+                    ref id
+                );
 
                 if (!control.layout.IsEmpty())
                     item.icon = EditorInputControlLayoutCache.GetIconForLayout(control.layout);
@@ -854,9 +968,17 @@ namespace UnityEngine.InputSystem.Editor
                     AddChild(item, $"Max Value: {control.maxValue.ToString()}", ref id);
 
                 if (control.usages.Count > 0)
-                    AddChild(item, "Usages: " + string.Join(", ", control.usages.Select(x => x.ToString()).ToArray()), ref id);
+                    AddChild(
+                        item,
+                        "Usages: " + string.Join(", ", control.usages.Select(x => x.ToString()).ToArray()),
+                        ref id
+                    );
                 if (control.aliases.Count > 0)
-                    AddChild(item, "Aliases: " + string.Join(", ", control.aliases.Select(x => x.ToString()).ToArray()), ref id);
+                    AddChild(
+                        item,
+                        "Aliases: " + string.Join(", ", control.aliases.Select(x => x.ToString()).ToArray()),
+                        ref id
+                    );
 
                 if (control.isNoisy || control.isSynthetic)
                 {
@@ -899,7 +1021,7 @@ namespace UnityEngine.InputSystem.Editor
                     id = id++,
                     depth = parent.depth + 1,
                     displayName = $"{name}: {value.ToString()}",
-                    name = name
+                    name = name,
                 };
                 parent.AddChild(item);
             }
@@ -925,7 +1047,9 @@ namespace UnityEngine.InputSystem.Editor
                         AddActionItem(parent, action, ref id);
                 }
 
-                parent.children?.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.CurrentCultureIgnoreCase));
+                parent.children?.Sort(
+                    (a, b) => string.Compare(a.displayName, b.displayName, StringComparison.CurrentCultureIgnoreCase)
+                );
             }
 
             private unsafe void AddActionItem(TreeViewItem parent, InputAction action, ref int id)
@@ -967,8 +1091,10 @@ namespace UnityEngine.InputSystem.Editor
                     for (var n = 0; n < controlCount; ++n)
                     {
                         var control = state.controls[controlStartIndex + n];
-                        var interactions =
-                            StringHelpers.Join(new[] { binding.effectiveInteractions, action.interactions }, ",");
+                        var interactions = StringHelpers.Join(
+                            new[] { binding.effectiveInteractions, action.interactions },
+                            ","
+                        );
 
                         var text = control.path;
                         if (!string.IsNullOrEmpty(interactions))

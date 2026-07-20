@@ -15,7 +15,17 @@ namespace UnityEngine.Rendering.Universal
         // Static allocation of JitterFunc delegate to avoid GC
         internal static TemporalAA.JitterFunc s_JitterFunc = CalculateJitter;
 
-        static void PopulateStpConfig(UniversalCameraData cameraData, in TextureHandle inputColor, in TextureHandle inputDepth, in TextureHandle inputMotion, int debugViewIndex, in TextureHandle debugView, in TextureHandle destination, Texture2D noiseTexture, out STP.Config config)
+        static void PopulateStpConfig(
+            UniversalCameraData cameraData,
+            in TextureHandle inputColor,
+            in TextureHandle inputDepth,
+            in TextureHandle inputMotion,
+            int debugViewIndex,
+            in TextureHandle debugView,
+            in TextureHandle destination,
+            Texture2D noiseTexture,
+            out STP.Config config
+        )
         {
             cameraData.camera.TryGetComponent<UniversalAdditionalCameraData>(out var additionalCameraData);
             Debug.Assert(additionalCameraData != null);
@@ -73,7 +83,10 @@ namespace UnityEngine.Rendering.Universal
             config.lastDeltaTime = motionData.lastDeltaTime;
 
             // Note: The current and prior image sizes are always identical since DRS is not currently supported.
-            config.currentImageSize = new Vector2Int(cameraData.cameraTargetDescriptor.width, cameraData.cameraTargetDescriptor.height);
+            config.currentImageSize = new Vector2Int(
+                cameraData.cameraTargetDescriptor.width,
+                cameraData.cameraTargetDescriptor.height
+            );
             config.priorImageSize = config.currentImageSize;
             config.outputImageSize = new Vector2Int(cameraData.pixelWidth, cameraData.pixelHeight);
 
@@ -102,9 +115,18 @@ namespace UnityEngine.Rendering.Universal
                 Vector3 lastPosition = motionData.previousWorldSpaceCameraPos;
                 Vector3 lastLastPosition = motionData.previousPreviousWorldSpaceCameraPos;
 
-                perViewConfig.currentView.SetColumn(3, new Vector4(-currentPosition.x, -currentPosition.y, -currentPosition.z, 1.0f));
-                perViewConfig.lastView.SetColumn(3, new Vector4(-lastPosition.x, -lastPosition.y, -lastPosition.z, 1.0f));
-                perViewConfig.lastLastView.SetColumn(3, new Vector4(-lastLastPosition.x, -lastLastPosition.y, -lastLastPosition.z, 1.0f));
+                perViewConfig.currentView.SetColumn(
+                    3,
+                    new Vector4(-currentPosition.x, -currentPosition.y, -currentPosition.z, 1.0f)
+                );
+                perViewConfig.lastView.SetColumn(
+                    3,
+                    new Vector4(-lastPosition.x, -lastPosition.y, -lastPosition.z, 1.0f)
+                );
+                perViewConfig.lastLastView.SetColumn(
+                    3,
+                    new Vector4(-lastLastPosition.x, -lastLastPosition.y, -lastLastPosition.z, 1.0f)
+                );
 
                 STP.perViewConfigs[viewIndex] = perViewConfig;
             }
@@ -113,7 +135,16 @@ namespace UnityEngine.Rendering.Universal
             config.perViewConfigs = STP.perViewConfigs;
         }
 
-        static internal void Execute(RenderGraph renderGraph, UniversalResourceData resourceData, UniversalCameraData cameraData, in TextureHandle inputColor, in TextureHandle inputDepth, in TextureHandle inputMotion, in TextureHandle destination, Texture2D noiseTexture)
+        internal static void Execute(
+            RenderGraph renderGraph,
+            UniversalResourceData resourceData,
+            UniversalCameraData cameraData,
+            in TextureHandle inputColor,
+            in TextureHandle inputDepth,
+            in TextureHandle inputMotion,
+            in TextureHandle destination,
+            Texture2D noiseTexture
+        )
         {
             var debugView = TextureHandle.nullHandle;
             int debugViewIndex = 0;
@@ -123,13 +154,20 @@ namespace UnityEngine.Rendering.Universal
             {
                 if (fullscreenDebugMode == DebugFullScreenMode.STP)
                 {
-                    debugView = renderGraph.CreateTexture(new TextureDesc(cameraData.pixelWidth, cameraData.pixelHeight, false, (cameraData.xr.enabled && cameraData.xr.singlePassEnabled))
-                    {
-                        name = "STP Debug View",
-                        format = GraphicsFormat.R8G8B8A8_UNorm,
-                        clearBuffer = true,
-                        enableRandomWrite = true
-                    });
+                    debugView = renderGraph.CreateTexture(
+                        new TextureDesc(
+                            cameraData.pixelWidth,
+                            cameraData.pixelHeight,
+                            false,
+                            (cameraData.xr.enabled && cameraData.xr.singlePassEnabled)
+                        )
+                        {
+                            name = "STP Debug View",
+                            format = GraphicsFormat.R8G8B8A8_UNorm,
+                            clearBuffer = true,
+                            enableRandomWrite = true,
+                        }
+                    );
 
                     debugViewIndex = debugHandler.stpDebugViewIndex;
 
@@ -138,7 +176,17 @@ namespace UnityEngine.Rendering.Universal
                 }
             }
 
-            PopulateStpConfig(cameraData, inputColor, inputDepth, inputMotion, debugViewIndex, debugView, destination, noiseTexture, out var config);
+            PopulateStpConfig(
+                cameraData,
+                inputColor,
+                inputDepth,
+                inputMotion,
+                debugViewIndex,
+                debugView,
+                destination,
+                noiseTexture,
+                out var config
+            );
             STP.Execute(renderGraph, ref config);
         }
     }

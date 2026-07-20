@@ -34,7 +34,9 @@ namespace UnityEditor.Rendering.Universal
 #pragma warning disable 618
             if (urpAsset.supportsDynamicBatching)
             {
-                Debug.LogWarning("Dynamic Batching is deprecated and will be removed in a future release. Use SRP Batcher or GPU Instancing instead. Disable Dynamic Batching in the Universal Render Pipeline Asset to remove this warning.");
+                Debug.LogWarning(
+                    "Dynamic Batching is deprecated and will be removed in a future release. Use SRP Batcher or GPU Instancing instead. Disable Dynamic Batching in the Universal Render Pipeline Asset to remove this warning."
+                );
             }
 #pragma warning restore 618
         }

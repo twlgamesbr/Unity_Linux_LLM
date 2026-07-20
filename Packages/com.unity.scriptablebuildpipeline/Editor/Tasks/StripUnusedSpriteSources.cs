@@ -12,7 +12,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class StripUnusedSpriteSources : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 2; } }
+        public int Version
+        {
+            get { return 2; }
+        }
 
 #pragma warning disable 649
         [InjectContext]
@@ -60,7 +63,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
                 assetInfo.includedObjects.RemoveAt(0);
 
                 ExtendedAssetData extendedData;
-                if (m_ExtendedAssetData != null && m_ExtendedAssetData.ExtendedData.TryGetValue(source.guid, out extendedData))
+                if (
+                    m_ExtendedAssetData != null
+                    && m_ExtendedAssetData.ExtendedData.TryGetValue(source.guid, out extendedData)
+                )
                 {
                     extendedData.Representations.Remove(source);
                     if (extendedData.Representations.Count == 1)

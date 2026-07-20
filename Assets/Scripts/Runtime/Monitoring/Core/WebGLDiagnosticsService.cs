@@ -107,7 +107,9 @@ namespace NPCSystem.Monitoring
                 if (!_warnedLowFps)
                 {
                     _warnedLowFps = true;
-                    Debug.LogWarning($"[WebGLDiagnostics] Low FPS detected: {fps:F1}. Consider reducing quality settings.");
+                    Debug.LogWarning(
+                        $"[WebGLDiagnostics] Low FPS detected: {fps:F1}. Consider reducing quality settings."
+                    );
                 }
                 // Keep emitting warning events
                 TelemetryRouter.Point(

@@ -10,6 +10,7 @@ namespace EditorAttributes
         /// <summary>
         /// Attribute to hide a field in the inspector but still show it in debug view
         /// </summary>
-        public HidePropertyAttribute() : base(true) { }
+        public HidePropertyAttribute()
+            : base(true) { }
     }
 }

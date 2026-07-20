@@ -28,6 +28,5 @@ namespace UnityEditor.Rendering.Universal
             //This fallback is used with sprite output.
         }
     }
-
 }
 #endif

@@ -3,7 +3,7 @@ using Unity.Transforms;
 
 namespace Unity.Entities.Editor
 {
-    class EntityInspectorComponentsComparer: IComparer<IComponentProperty>
+    class EntityInspectorComponentsComparer : IComparer<IComponentProperty>
     {
         static readonly string[] k_TopComponents =
         {
@@ -15,7 +15,7 @@ namespace Unity.Entities.Editor
 
         public static EntityInspectorComponentsComparer Instance { get; } = new();
 
-        public int Compare(IComponentProperty x, IComponentProperty y)
-            => InspectorUtility.Compare(x.DisplayName, y.DisplayName, k_TopComponents);
+        public int Compare(IComponentProperty x, IComponentProperty y) =>
+            InspectorUtility.Compare(x.DisplayName, y.DisplayName, k_TopComponents);
     }
 }

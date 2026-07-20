@@ -20,10 +20,10 @@ namespace Unity.Physics.Extensions
         /// </returns>
         public static FloatRange GetLimitedDistanceRange(in this PhysicsJoint joint) =>
             new FloatRange
-        {
-            Min = joint[PhysicsJoint.k_LimitedDistanceRangeIndex].Min,
-            Max = joint[PhysicsJoint.k_LimitedDistanceRangeIndex].Max
-        };
+            {
+                Min = joint[PhysicsJoint.k_LimitedDistanceRangeIndex].Min,
+                Max = joint[PhysicsJoint.k_LimitedDistanceRangeIndex].Max,
+            };
 
         /// <summary>
         /// Applies the specified range of motion to a <see cref="PhysicsJoint"/> created using <see cref="PhysicsJoint.CreateLimitedDistance"/>
@@ -57,10 +57,10 @@ namespace Unity.Physics.Extensions
         /// </returns>
         public static FloatRange GetLimitedHingeRange(in this PhysicsJoint joint) =>
             new FloatRange
-        {
-            Min = joint[PhysicsJoint.k_LimitedHingeRangeIndex].Min,
-            Max = joint[PhysicsJoint.k_LimitedHingeRangeIndex].Max
-        };
+            {
+                Min = joint[PhysicsJoint.k_LimitedHingeRangeIndex].Min,
+                Max = joint[PhysicsJoint.k_LimitedHingeRangeIndex].Max,
+            };
 
         /// <summary>
         /// Applies the specified range of motion to a <see cref="PhysicsJoint"/> created using <see cref="PhysicsJoint.CreateLimitedHinge"/>
@@ -95,10 +95,10 @@ namespace Unity.Physics.Extensions
         /// </returns>
         public static FloatRange GetPrismaticRange(in this PhysicsJoint joint) =>
             new FloatRange
-        {
-            Min = joint[PhysicsJoint.k_PrismaticDistanceOnAxisIndex].Min,
-            Max = joint[PhysicsJoint.k_PrismaticDistanceOnAxisIndex].Max
-        };
+            {
+                Min = joint[PhysicsJoint.k_PrismaticDistanceOnAxisIndex].Min,
+                Max = joint[PhysicsJoint.k_PrismaticDistanceOnAxisIndex].Max,
+            };
 
         /// <summary>
         /// Applies the specified range of motion to a <see cref="PhysicsJoint"/> created using <see cref="PhysicsJoint.CreatePrismatic"/>
@@ -131,13 +131,17 @@ namespace Unity.Physics.Extensions
         /// <param name="angularTwistRange"> [out] The range of angular motion for twisting around the
         /// primary axis within the region defined by the primary and perpendicular cones. This range is
         /// usually symmetrical. </param>
-        public static void GetRagdollPrimaryConeAndTwistRange(in this PhysicsJoint joint, out float maxConeAngle, out FloatRange angularTwistRange)
+        public static void GetRagdollPrimaryConeAndTwistRange(
+            in this PhysicsJoint joint,
+            out float maxConeAngle,
+            out FloatRange angularTwistRange
+        )
         {
             maxConeAngle = joint[PhysicsJoint.k_RagdollPrimaryMaxConeIndex].Max;
             angularTwistRange = new FloatRange
             {
                 Min = joint[PhysicsJoint.k_RagdollPrimaryTwistRangeIndex].Min,
-                Max = joint[PhysicsJoint.k_RagdollPrimaryTwistRangeIndex].Max
+                Max = joint[PhysicsJoint.k_RagdollPrimaryTwistRangeIndex].Max,
             };
         }
 
@@ -153,12 +157,19 @@ namespace Unity.Physics.Extensions
         /// <param name="angularTwistRange"> The range of angular motion for twisting around the primary
         /// axis within the region defined by the primary and perpendicular cones. This range is usually
         /// symmetrical, and is clamped to the range (-pi, pi). </param>
-        public static void SetRagdollPrimaryConeAndTwistRange(ref this PhysicsJoint joint, float maxConeAngle, FloatRange angularTwistRange)
+        public static void SetRagdollPrimaryConeAndTwistRange(
+            ref this PhysicsJoint joint,
+            float maxConeAngle,
+            FloatRange angularTwistRange
+        )
         {
             angularTwistRange = math.clamp(angularTwistRange, new float2(-math.PI), new float2(math.PI));
             var constraints = joint.GetConstraints();
             constraints.ElementAt(PhysicsJoint.k_RagdollPrimaryMaxConeIndex).Min = 0f;
-            constraints.ElementAt(PhysicsJoint.k_RagdollPrimaryMaxConeIndex).Max = math.min(math.abs(maxConeAngle), math.PI);
+            constraints.ElementAt(PhysicsJoint.k_RagdollPrimaryMaxConeIndex).Max = math.min(
+                math.abs(maxConeAngle),
+                math.PI
+            );
             constraints.ElementAt(PhysicsJoint.k_RagdollPrimaryTwistRangeIndex).Min = angularTwistRange.Min;
             constraints.ElementAt(PhysicsJoint.k_RagdollPrimaryTwistRangeIndex).Max = angularTwistRange.Max;
             joint.SetConstraints(constraints);
@@ -177,12 +188,10 @@ namespace Unity.Physics.Extensions
         /// </returns>
         public static FloatRange GetRagdollPerpendicularConeRange(in this PhysicsJoint joint) =>
             new FloatRange
-        {
-            Min = joint[PhysicsJoint.k_RagdollPerpendicularRangeIndex].Min,
-            Max = joint[PhysicsJoint.k_RagdollPerpendicularRangeIndex].Max
-        }
-
-        -new float2(math.PI / 2);
+            {
+                Min = joint[PhysicsJoint.k_RagdollPerpendicularRangeIndex].Min,
+                Max = joint[PhysicsJoint.k_RagdollPerpendicularRangeIndex].Max,
+            } - new float2(math.PI / 2);
 
         /// <summary>
         /// Applies the specified range of motion to a ragdoll perpendicular cone <see cref="PhysicsJoint"/>
@@ -195,7 +204,11 @@ namespace Unity.Physics.Extensions
         /// asymmetrical, and is clamped to the range (-pi/2, pi/2). </param>
         public static void SetRagdollPerpendicularConeRange(ref this PhysicsJoint joint, FloatRange angularPlaneRange)
         {
-            angularPlaneRange = math.clamp(angularPlaneRange + new float2(math.PI / 2), new float2(0f), new float2(math.PI));
+            angularPlaneRange = math.clamp(
+                angularPlaneRange + new float2(math.PI / 2),
+                new float2(0f),
+                new float2(math.PI)
+            );
             var constraints = joint.GetConstraints();
             constraints.ElementAt(PhysicsJoint.k_RagdollPerpendicularRangeIndex).Min = angularPlaneRange.Min;
             constraints.ElementAt(PhysicsJoint.k_RagdollPerpendicularRangeIndex).Max = angularPlaneRange.Max;

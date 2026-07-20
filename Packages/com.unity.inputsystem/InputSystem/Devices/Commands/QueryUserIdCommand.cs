@@ -9,7 +9,10 @@ namespace UnityEngine.InputSystem.LowLevel
     [StructLayout(LayoutKind.Explicit, Size = kSize)]
     internal unsafe struct QueryUserIdCommand : IInputDeviceCommandInfo
     {
-        public static FourCC Type { get { return new FourCC('U', 'S', 'E', 'R'); } }
+        public static FourCC Type
+        {
+            get { return new FourCC('U', 'S', 'E', 'R'); }
+        }
 
         public const int kMaxIdLength = 256;
         internal const int kSize = InputDeviceCommand.kBaseCommandSize + kMaxIdLength * 2;
@@ -22,7 +25,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public string ReadId()
         {
-            fixed(QueryUserIdCommand * thisPtr = &this)
+            fixed (QueryUserIdCommand* thisPtr = &this)
             {
                 return StringHelpers.ReadStringFromBuffer(new IntPtr(thisPtr->idBuffer), kMaxIdLength);
             }
@@ -35,10 +38,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static QueryUserIdCommand Create()
         {
-            return new QueryUserIdCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize),
-            };
+            return new QueryUserIdCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

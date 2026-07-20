@@ -20,7 +20,8 @@ namespace Unity.Entities.Graphics
         /// For entities that Unity converts from GameObjects, this value is the same as the Layer setting of the source
         /// GameObject.
         /// </remarks>
-        [LayerField] public int Layer;
+        [LayerField]
+        public int Layer;
 
         /// <summary>
         /// The rendering layer the entity is part of.
@@ -84,23 +85,23 @@ namespace Unity.Entities.Graphics
         /// <summary>
         /// Returns a new default instance of RenderFilterSettings.
         /// </summary>
-        public static RenderFilterSettings Default => new RenderFilterSettings
-        {
-            Layer = 0,
-            RenderingLayerMask = 0xffffffff,
-            MotionMode = MotionVectorGenerationMode.Object,
-            ShadowCastingMode = ShadowCastingMode.On,
-            ReceiveShadows = true,
-            StaticShadowCaster = false,
-            ForceMeshLod = -1,
-            MeshLodSelectionBias = 0.0f
-        };
+        public static RenderFilterSettings Default =>
+            new RenderFilterSettings
+            {
+                Layer = 0,
+                RenderingLayerMask = 0xffffffff,
+                MotionMode = MotionVectorGenerationMode.Object,
+                ShadowCastingMode = ShadowCastingMode.On,
+                ReceiveShadows = true,
+                StaticShadowCaster = false,
+                ForceMeshLod = -1,
+                MeshLodSelectionBias = 0.0f,
+            };
 
         /// <summary>
         /// Indicates whether the motion mode for the current pass is not camera.
         /// </summary>
-        public bool IsInMotionPass =>
-            MotionMode != MotionVectorGenerationMode.Camera;
+        public bool IsInMotionPass => MotionMode != MotionVectorGenerationMode.Camera;
 
         /// <summary>
         /// Indicates whether the current instance is equal to the specified object.
@@ -110,7 +111,7 @@ namespace Unity.Entities.Graphics
         public override bool Equals(object obj)
         {
             if (obj is RenderFilterSettings)
-                return Equals((RenderFilterSettings) obj);
+                return Equals((RenderFilterSettings)obj);
 
             return false;
         }
@@ -123,13 +124,13 @@ namespace Unity.Entities.Graphics
         public bool Equals(RenderFilterSettings other)
         {
             return Layer == other.Layer
-                   && RenderingLayerMask == other.RenderingLayerMask
-                   && MotionMode == other.MotionMode
-                   && ShadowCastingMode == other.ShadowCastingMode
-                   && ReceiveShadows == other.ReceiveShadows
-                   && StaticShadowCaster == other.StaticShadowCaster
-                   && ForceMeshLod == other.ForceMeshLod
-                   && MeshLodSelectionBias == other.MeshLodSelectionBias;
+                && RenderingLayerMask == other.RenderingLayerMask
+                && MotionMode == other.MotionMode
+                && ShadowCastingMode == other.ShadowCastingMode
+                && ReceiveShadows == other.ReceiveShadows
+                && StaticShadowCaster == other.StaticShadowCaster
+                && ForceMeshLod == other.ForceMeshLod
+                && MeshLodSelectionBias == other.MeshLodSelectionBias;
         }
 
         /// <summary>

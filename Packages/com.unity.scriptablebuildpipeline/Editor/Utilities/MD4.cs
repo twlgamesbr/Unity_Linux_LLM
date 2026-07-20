@@ -38,9 +38,70 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
         static readonly byte[] kPadding =
         {
-            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            0x80,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
         };
 
         MD4()
@@ -52,7 +113,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// Creates a new MD4 hashing algorithm object.
         /// </summary>
         /// <returns>Returns the new MD4 hashing algorithm instance.</returns>
-        public new static MD4 Create()
+        public static new MD4 Create()
         {
             return new MD4();
         }
@@ -62,13 +123,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// </summary>
         public override void Initialize()
         {
-            m_Buffer = new uint[]
-            {
-                0x67452301,
-                0xefcdab89,
-                0x98badcfe,
-                0x10325476
-            };
+            m_Buffer = new uint[] { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476 };
 
             m_Block = new uint[16];
             m_Bytes = 0;
@@ -191,7 +246,6 @@ namespace UnityEditor.Build.Pipeline.Utilities
             buffer[3] = RotateLeft(buffer[3] + H(buffer[0], buffer[1], buffer[2]) + m_Block[11] + 0x6ED9EBA1, 9);
             buffer[2] = RotateLeft(buffer[2] + H(buffer[3], buffer[0], buffer[1]) + m_Block[7] + 0x6ED9EBA1, 11);
             buffer[1] = RotateLeft(buffer[1] + H(buffer[2], buffer[3], buffer[0]) + m_Block[15] + 0x6ED9EBA1, 15);
-
             unchecked
             {
                 m_Buffer[0] += buffer[0];

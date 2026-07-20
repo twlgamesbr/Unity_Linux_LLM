@@ -1,4 +1,3 @@
-
 namespace UnityEngine.Rendering
 {
     // Based on C++ LODGroupManager code.
@@ -21,17 +20,29 @@ namespace UnityEngine.Rendering
             return 2.0f * halfAngle;
         }
 
-        public static float CalculateMeshLodConstant(LODParameters lodParams, float screenRelativeMetric, float meshLodThreshold)
+        public static float CalculateMeshLodConstant(
+            LODParameters lodParams,
+            float screenRelativeMetric,
+            float meshLodThreshold
+        )
         {
             return meshLodThreshold * screenRelativeMetric / lodParams.cameraPixelHeight;
         }
 
-        public static float CalculatePerspectiveDistance(Vector3 objPosition, Vector3 camPosition, float sqrScreenRelativeMetric)
+        public static float CalculatePerspectiveDistance(
+            Vector3 objPosition,
+            Vector3 camPosition,
+            float sqrScreenRelativeMetric
+        )
         {
             return Mathf.Sqrt(CalculateSqrPerspectiveDistance(objPosition, camPosition, sqrScreenRelativeMetric));
         }
 
-        public static float CalculateSqrPerspectiveDistance(Vector3 objPosition, Vector3 camPosition, float sqrScreenRelativeMetric)
+        public static float CalculateSqrPerspectiveDistance(
+            Vector3 objPosition,
+            Vector3 camPosition,
+            float sqrScreenRelativeMetric
+        )
         {
             return (objPosition - camPosition).sqrMagnitude * sqrScreenRelativeMetric;
         }

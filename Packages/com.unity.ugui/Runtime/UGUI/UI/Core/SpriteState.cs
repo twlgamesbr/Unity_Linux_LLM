@@ -25,29 +25,45 @@ namespace UnityEngine.UI
         /// <summary>
         /// Highlighted sprite.
         /// </summary>
-        public Sprite highlightedSprite    { get { return m_HighlightedSprite; } set { m_HighlightedSprite = value; } }
+        public Sprite highlightedSprite
+        {
+            get { return m_HighlightedSprite; }
+            set { m_HighlightedSprite = value; }
+        }
 
         /// <summary>
         /// Pressed sprite.
         /// </summary>
-        public Sprite pressedSprite     { get { return m_PressedSprite; } set { m_PressedSprite = value; } }
+        public Sprite pressedSprite
+        {
+            get { return m_PressedSprite; }
+            set { m_PressedSprite = value; }
+        }
 
         /// <summary>
         /// Selected sprite.
         /// </summary>
-        public Sprite selectedSprite    { get { return m_SelectedSprite; } set { m_SelectedSprite = value; } }
+        public Sprite selectedSprite
+        {
+            get { return m_SelectedSprite; }
+            set { m_SelectedSprite = value; }
+        }
 
         /// <summary>
         /// Disabled sprite.
         /// </summary>
-        public Sprite disabledSprite    { get { return m_DisabledSprite; } set { m_DisabledSprite = value; } }
+        public Sprite disabledSprite
+        {
+            get { return m_DisabledSprite; }
+            set { m_DisabledSprite = value; }
+        }
 
         public bool Equals(SpriteState other)
         {
-            return highlightedSprite == other.highlightedSprite &&
-                pressedSprite == other.pressedSprite &&
-                selectedSprite == other.selectedSprite &&
-                disabledSprite == other.disabledSprite;
+            return highlightedSprite == other.highlightedSprite
+                && pressedSprite == other.pressedSprite
+                && selectedSprite == other.selectedSprite
+                && disabledSprite == other.disabledSprite;
         }
     }
 }

@@ -10,9 +10,15 @@ namespace Unity.PlatformToolkit.PlayMode
     [Serializable]
     internal class PlayModeControlsAttributeDefinition
     {
-        public static readonly Type[] k_SupportedValueTypes = { typeof(string), typeof(int),  typeof(long), typeof(Texture2D) };
+        public static readonly Type[] k_SupportedValueTypes =
+        {
+            typeof(string),
+            typeof(int),
+            typeof(long),
+            typeof(Texture2D),
+        };
 
-        public WeakEvent ValueTypeChanged { get; } = new ();
+        public WeakEvent ValueTypeChanged { get; } = new();
 
         public ScriptableObjectDataChangePersistor Persistor { private get; set; }
 
@@ -48,6 +54,7 @@ namespace Unity.PlatformToolkit.PlayMode
         [SerializeField]
         private string m_ValueTypeName = k_SupportedValueTypes[0].FullName;
         private Type m_ValueType;
+
         [CreateProperty]
         public Type ValueType
         {
@@ -59,13 +66,14 @@ namespace Unity.PlatformToolkit.PlayMode
                 m_ValueType = GetTypeFromFullName(m_ValueTypeName);
                 return m_ValueType;
             }
-
             set
             {
                 if (m_ValueType == value)
                     return;
                 if (!k_SupportedValueTypes.Contains(value))
-                    throw new InvalidOperationException($"{value} is not a valid type for {nameof(PlayModeControlsAttributeDefinition)}");
+                    throw new InvalidOperationException(
+                        $"{value} is not a valid type for {nameof(PlayModeControlsAttributeDefinition)}"
+                    );
                 m_ValueType = value;
                 m_ValueTypeName = m_ValueType.FullName;
                 Persistor?.PersistWrites();
@@ -79,15 +87,13 @@ namespace Unity.PlatformToolkit.PlayMode
             if (type != null)
                 return type;
 
-            #if UNITY_6000_4_OR_NEWER
-                var assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
-            #else
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            #endif
+#if UNITY_6000_4_OR_NEWER
+            var assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
+#else
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
 
-            return assemblies
-                .Select(assembly => assembly.GetType(fullName))
-                .FirstOrDefault(t => t != null);
+            return assemblies.Select(assembly => assembly.GetType(fullName)).FirstOrDefault(t => t != null);
         }
     }
 }

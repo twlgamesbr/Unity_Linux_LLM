@@ -87,10 +87,13 @@ namespace Unity.Entities.UI
             if (null == m_BindingTarget)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(BindingContextElement)}: Could not get value of type `{typeof(T).Name}`, as no target has been set.");
+                    $"{nameof(BindingContextElement)}: Could not get value of type `{typeof(T).Name}`, as no target has been set."
+                );
             }
 
-            throw new InvalidCastException($"{nameof(BindingContextElement)}: Could not get value of type `{typeof(T).Name}`. Actual value is of type`{m_BindingTarget.TargetType.Name}`");
+            throw new InvalidCastException(
+                $"{nameof(BindingContextElement)}: Could not get value of type `{typeof(T).Name}`. Actual value is of type`{m_BindingTarget.TargetType.Name}`"
+            );
         }
 
         /// <summary>
@@ -121,7 +124,7 @@ namespace Unity.Entities.UI
 
                 if (declaredType == m_BindingTarget.DeclaredType && targetType == m_BindingTarget.TargetType)
                 {
-                    ((BindingTarget<T>) m_BindingTarget).Target = target;
+                    ((BindingTarget<T>)m_BindingTarget).Target = target;
                     return;
                 }
             }
@@ -145,7 +148,7 @@ namespace Unity.Entities.UI
                     equals = EqualityComparer<T>.Default.Equals(x, y);
                     return true;
                 }
-                catch (NullReferenceException) 
+                catch (NullReferenceException)
                 {
                     // NullReferenceException can happen when comparing disposed native structures like NativeReference
                     // This makes sure we don't throw in this case and considere X and Y equals.
@@ -225,9 +228,11 @@ namespace Unity.Entities.UI
         public T GetContext<T>(string contextName = null)
             where T : InspectionContext
         {
-            return m_InspectionContexts.OfType<T>().FirstOrDefault(c => string.IsNullOrEmpty(contextName) || c.Name == contextName)
-                   ?? m_Root?.GetContext<T>()
-                   ?? GetFirstAncestorOfType<BindingContextElement>()?.GetContext<T>(contextName);
+            return m_InspectionContexts
+                    .OfType<T>()
+                    .FirstOrDefault(c => string.IsNullOrEmpty(contextName) || c.Name == contextName)
+                ?? m_Root?.GetContext<T>()
+                ?? GetFirstAncestorOfType<BindingContextElement>()?.GetContext<T>(contextName);
         }
 
         /// <summary>
@@ -240,7 +245,7 @@ namespace Unity.Entities.UI
             where T : InspectionContext
         {
             return m_InspectionContexts.OfType<T>().Any(c => string.IsNullOrEmpty(contextName) || c.Name == contextName)
-                   || (GetFirstAncestorOfType<BindingContextElement>()?.HasContext<T>(contextName) ?? false);
+                || (GetFirstAncestorOfType<BindingContextElement>()?.HasContext<T>(contextName) ?? false);
         }
 
         /// <summary>
@@ -254,7 +259,9 @@ namespace Unity.Entities.UI
         {
             if (null == m_BindingTarget)
             {
-                throw new InvalidOperationException($"{nameof(BindingContextElement)}: Could not set value of type `{typeof(TValue).Name}`, as no target was set.");
+                throw new InvalidOperationException(
+                    $"{nameof(BindingContextElement)}: Could not set value of type `{typeof(TValue).Name}`, as no target was set."
+                );
             }
             m_BindingTarget.SetAtPath(value, path);
         }
@@ -282,7 +289,9 @@ namespace Unity.Entities.UI
         {
             if (null == m_BindingTarget)
             {
-                throw new InvalidOperationException($"{nameof(BindingContextElement)}: Could not set value of type `{typeof(TValue).Name}`, as no target was set.");
+                throw new InvalidOperationException(
+                    $"{nameof(BindingContextElement)}: Could not set value of type `{typeof(TValue).Name}`, as no target was set."
+                );
             }
             return m_BindingTarget.GetAtPath<TValue>(path);
         }
@@ -390,7 +399,7 @@ namespace Unity.Entities.UI
                 previousParent.Insert(index + i, element[i]);
             }
 
-            if (typeof(TValue) ==typeof(string) && previousParent.childCount > index)
+            if (typeof(TValue) == typeof(string) && previousParent.childCount > index)
                 previousParent[index]?.Q(className: UssClasses.Unity.BaseTextFieldInput)?.Focus();
 
             current.RemoveFromHierarchy();
@@ -399,7 +408,9 @@ namespace Unity.Entities.UI
 
         internal void StartHighlightAtPath(PropertyPath path)
         {
-            foreach (var element in this.ChildrenOfType<IContextElement>().Where(c => c.Path.Equals(path)).OfType<Foldout>())
+            foreach (
+                var element in this.ChildrenOfType<IContextElement>().Where(c => c.Path.Equals(path)).OfType<Foldout>()
+            )
             {
                 element.Q<Toggle>().AddToClassList(UssClasses.Highlight);
             }
@@ -407,7 +418,9 @@ namespace Unity.Entities.UI
 
         internal void StopHighlightAtPath(PropertyPath path)
         {
-            foreach (var element in this.ChildrenOfType<IContextElement>().Where(c => c.Path.Equals(path)).OfType<Foldout>())
+            foreach (
+                var element in this.ChildrenOfType<IContextElement>().Where(c => c.Path.Equals(path)).OfType<Foldout>()
+            )
             {
                 element.Q<Toggle>().RemoveFromClassList(UssClasses.Highlight);
             }

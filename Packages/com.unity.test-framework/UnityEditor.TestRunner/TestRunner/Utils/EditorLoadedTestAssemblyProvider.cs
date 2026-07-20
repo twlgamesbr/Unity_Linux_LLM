@@ -17,7 +17,10 @@ namespace UnityEditor.TestTools.TestRunner
         private readonly ScriptAssembly[] m_AllEditorScriptAssemblies;
         private readonly PrecompiledAssembly[] m_AllPrecompiledAssemblies;
 
-        public EditorLoadedTestAssemblyProvider(IEditorCompilationInterfaceProxy compilationInterfaceProxy, IEditorAssembliesProxy editorAssembliesProxy)
+        public EditorLoadedTestAssemblyProvider(
+            IEditorCompilationInterfaceProxy compilationInterfaceProxy,
+            IEditorAssembliesProxy editorAssembliesProxy
+        )
         {
             m_EditorAssembliesProxy = editorAssembliesProxy;
             m_AllEditorScriptAssemblies = compilationInterfaceProxy.GetAllEditorScriptAssemblies();
@@ -27,21 +30,27 @@ namespace UnityEditor.TestTools.TestRunner
         public List<IAssemblyWrapper> GetAssembliesGroupedByType(TestPlatform mode)
         {
             var assemblies = GetAssembliesGroupedByTypeAsync(mode);
-            while (assemblies.MoveNext())
-            {
-            }
+            while (assemblies.MoveNext()) { }
 
-            return assemblies.Current.Where(pair => mode.IsFlagIncluded(pair.Key)).SelectMany(pair => pair.Value).ToList();
+            return assemblies
+                .Current.Where(pair => mode.IsFlagIncluded(pair.Key))
+                .SelectMany(pair => pair.Value)
+                .ToList();
         }
 
-        public IEnumerator<IDictionary<TestPlatform, List<IAssemblyWrapper>>> GetAssembliesGroupedByTypeAsync(TestPlatform mode)
+        public IEnumerator<IDictionary<TestPlatform, List<IAssemblyWrapper>>> GetAssembliesGroupedByTypeAsync(
+            TestPlatform mode
+        )
         {
             IAssemblyWrapper[] loadedAssemblies = m_EditorAssembliesProxy.loadedAssemblies;
 
-            IDictionary<TestPlatform, List<IAssemblyWrapper>> result = new Dictionary<TestPlatform, List<IAssemblyWrapper>>
+            IDictionary<TestPlatform, List<IAssemblyWrapper>> result = new Dictionary<
+                TestPlatform,
+                List<IAssemblyWrapper>
+            >
             {
-                {TestPlatform.EditMode, new List<IAssemblyWrapper>() },
-                {TestPlatform.PlayMode, new List<IAssemblyWrapper>() }
+                { TestPlatform.EditMode, new List<IAssemblyWrapper>() },
+                { TestPlatform.PlayMode, new List<IAssemblyWrapper>() },
             };
             var filteredAssemblies = FilterAssembliesWithTestReference(loadedAssemblies);
 
@@ -49,14 +58,22 @@ namespace UnityEditor.TestTools.TestRunner
             {
                 var assemblyName = new FileInfo(loadedAssembly.Location).Name;
                 var scriptAssemblies = m_AllEditorScriptAssemblies.Where(x => x.Filename == assemblyName).ToList();
-                var precompiledAssemblies = m_AllPrecompiledAssemblies.Where(x => new FileInfo(x.Path).Name == assemblyName).ToList();
+                var precompiledAssemblies = m_AllPrecompiledAssemblies
+                    .Where(x => new FileInfo(x.Path).Name == assemblyName)
+                    .ToList();
                 if (scriptAssemblies.Count < 1 && precompiledAssemblies.Count < 1)
                 {
                     continue;
                 }
 
-                var assemblyFlags = scriptAssemblies.Any() ? scriptAssemblies.Single().Flags : precompiledAssemblies.Single().Flags;
-                var assemblyType = (assemblyFlags & UnityEditor.Scripting.ScriptCompilation.AssemblyFlags.EditorOnly) == UnityEditor.Scripting.ScriptCompilation.AssemblyFlags.EditorOnly ? TestPlatform.EditMode : TestPlatform.PlayMode;
+                var assemblyFlags = scriptAssemblies.Any()
+                    ? scriptAssemblies.Single().Flags
+                    : precompiledAssemblies.Single().Flags;
+                var assemblyType =
+                    (assemblyFlags & UnityEditor.Scripting.ScriptCompilation.AssemblyFlags.EditorOnly)
+                    == UnityEditor.Scripting.ScriptCompilation.AssemblyFlags.EditorOnly
+                        ? TestPlatform.EditMode
+                        : TestPlatform.PlayMode;
                 result[assemblyType].Add(loadedAssembly);
                 yield return null;
             }
@@ -69,11 +86,18 @@ namespace UnityEditor.TestTools.TestRunner
             var resultsCache = new Dictionary<IAssemblyWrapper, bool>();
             var loadedAssembliesDict = loadedAssemblies.ToDictionary(asm => asm.Name.Name, asm => asm);
             return loadedAssemblies
-                       .Where(assembly => FilterAssemblyForTestReference(assembly, loadedAssembliesDict, resultsCache, new HashSet<string>()))
-                       .ToArray();
+                .Where(assembly =>
+                    FilterAssemblyForTestReference(assembly, loadedAssembliesDict, resultsCache, new HashSet<string>())
+                )
+                .ToArray();
         }
 
-        private bool FilterAssemblyForTestReference(IAssemblyWrapper assemblyToFilter, IReadOnlyDictionary<string, IAssemblyWrapper> loadedAssemblies, IDictionary<IAssemblyWrapper, bool> resultsCache, HashSet<string> visitedAssemblies)
+        private bool FilterAssemblyForTestReference(
+            IAssemblyWrapper assemblyToFilter,
+            IReadOnlyDictionary<string, IAssemblyWrapper> loadedAssemblies,
+            IDictionary<IAssemblyWrapper, bool> resultsCache,
+            HashSet<string> visitedAssemblies
+        )
         {
             if (!visitedAssemblies.Add(assemblyToFilter.Name.FullName))
             {
@@ -87,7 +111,18 @@ namespace UnityEditor.TestTools.TestRunner
 
             foreach (var reference in assemblyToFilter.GetReferencedAssemblies())
             {
-                if (IsTestReference(reference) || (loadedAssemblies.TryGetValue(reference.Name, out var referencedAssembly) && FilterAssemblyForTestReference(referencedAssembly, loadedAssemblies, resultsCache, visitedAssemblies)))
+                if (
+                    IsTestReference(reference)
+                    || (
+                        loadedAssemblies.TryGetValue(reference.Name, out var referencedAssembly)
+                        && FilterAssemblyForTestReference(
+                            referencedAssembly,
+                            loadedAssemblies,
+                            resultsCache,
+                            visitedAssemblies
+                        )
+                    )
+                )
                 {
                     resultsCache[assemblyToFilter] = true;
                     return true;
@@ -100,9 +135,9 @@ namespace UnityEditor.TestTools.TestRunner
 
         private static bool IsTestReference(System.Reflection.AssemblyName assemblyName)
         {
-            return assemblyName.Name == k_NunitAssemblyName ||
-                   assemblyName.Name == k_TestRunnerAssemblyName ||
-                   assemblyName.Name == k_PerformanceTestingAssemblyName;
+            return assemblyName.Name == k_NunitAssemblyName
+                || assemblyName.Name == k_TestRunnerAssemblyName
+                || assemblyName.Name == k_PerformanceTestingAssemblyName;
         }
     }
 }

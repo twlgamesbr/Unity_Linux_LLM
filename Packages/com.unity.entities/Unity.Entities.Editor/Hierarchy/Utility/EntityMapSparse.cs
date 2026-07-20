@@ -11,18 +11,19 @@ namespace Unity.Entities.Editor
     /// </summary>
     /// <remarks>
     /// This structure stores values indexed by <see cref="Entity.Index"/>. It offers efficient read/write at the cost of memory.
-    /// 
+    ///
     /// This structure is best used if:
     ///     - the size of <typeparamref name="T"/> is smaller than ~8 bytes
     ///     - the data must exist on MANY entity in a world
     ///
     /// otherwise; consider using <seealso cref="EntityMapDense{T}"/>
-    /// 
+    ///
     /// This data structure has a fixed memory overhead of sizeof(T) + 4 bytes per entity.
     /// </remarks>
     /// <typeparam name="T">The data type to store per entity.</typeparam>
     [NativeContainer]
-    unsafe struct EntityMapSparse<T> : IEntityMap<T> where T : unmanaged
+    unsafe struct EntityMapSparse<T> : IEntityMap<T>
+        where T : unmanaged
     {
         /// <summary>
         /// The allocator used to construct this instance.
@@ -32,7 +33,8 @@ namespace Unity.Entities.Editor
         /// <summary>
         /// The internal unsafe implementation.
         /// </summary>
-        [NativeDisableUnsafePtrRestriction] UnsafeEntityMapSparse<T>* m_EntityMapSparseData;
+        [NativeDisableUnsafePtrRestriction]
+        UnsafeEntityMapSparse<T>* m_EntityMapSparseData;
 
         /// <summary>
         /// Returns the upper bound of the sparse array.
@@ -52,7 +54,7 @@ namespace Unity.Entities.Editor
         public EntityMapSparse(int initialCapacity, Allocator allocator)
         {
             m_Allocator = allocator;
-            var handle = (AllocatorManager.AllocatorHandle) allocator;
+            var handle = (AllocatorManager.AllocatorHandle)allocator;
             m_EntityMapSparseData = AllocatorManager.Allocate<UnsafeEntityMapSparse<T>>(handle);
             *m_EntityMapSparseData = new UnsafeEntityMapSparse<T>(initialCapacity, allocator);
         }
@@ -79,46 +81,43 @@ namespace Unity.Entities.Editor
             get => m_EntityMapSparseData->GetValue(entity);
             set => m_EntityMapSparseData->SetValue(entity, value);
         }
-        
+
         /// <summary>
         /// Clears the storage for re-use.
         /// </summary>
-        public void Clear()
-            => m_EntityMapSparseData->Clear();
+        public void Clear() => m_EntityMapSparseData->Clear();
 
         /// <summary>
         /// Resizes to sparse data set to the given capacity.
         /// </summary>
         /// <param name="capacity">The capacity to set.</param>
-        public void Resize(int capacity)
-            => m_EntityMapSparseData->Resize(capacity);
+        public void Resize(int capacity) => m_EntityMapSparseData->Resize(capacity);
 
         /// <summary>
         /// Returns <see langword="true"/> if the specified entity exists in the storage.
         /// </summary>
         /// <param name="entity">The entity to check existence for.</param>
         /// <returns><see langword="true"/> if the entity exists in the storage; <see langword="false"/> otherwise.</returns>
-        public bool Exists(Entity entity)
-            => m_EntityMapSparseData->Exists(entity);
+        public bool Exists(Entity entity) => m_EntityMapSparseData->Exists(entity);
 
         /// <summary>
         /// Removes the data for the specified entity.
         /// </summary>
         /// <param name="entity">The entity to remove data for.</param>
-        public void Remove(Entity entity)
-            => m_EntityMapSparseData->Remove(entity);
+        public void Remove(Entity entity) => m_EntityMapSparseData->Remove(entity);
     }
-    
+
     /// <summary>
     /// The internal storage for the <see cref="EntityMapSparse{T}"/>.
     /// </summary>
-    struct UnsafeEntityMapSparse<T> : IDisposable where T : unmanaged
+    struct UnsafeEntityMapSparse<T> : IDisposable
+        where T : unmanaged
     {
         /// <summary>
         /// Collection of values indexed by <see cref="Entity.Index"/>.
         /// </summary>
         UnsafeList<T> m_ValueByEntity;
-        
+
         /// <summary>
         /// Collection of version indexed by <see cref="Entity.Index"/>. This is used to track destroyed entities.
         /// </summary>
@@ -128,7 +127,7 @@ namespace Unity.Entities.Editor
         /// The actual number of entries in the storage.
         /// </summary>
         int m_Count;
-        
+
         /// <summary>
         /// Returns the upper bound of the sparse array.
         /// </summary>
@@ -138,7 +137,7 @@ namespace Unity.Entities.Editor
         /// Returns the number of entries in the storage.
         /// </summary>
         public int Count => m_Count;
-        
+
         /// <summary>
         /// Gets or sets the data for the specified <see cref="Entity"/>.
         /// </summary>
@@ -217,7 +216,7 @@ namespace Unity.Entities.Editor
 
             m_VersionByEntity[entity.Index] = 0;
         }
-        
+
         /// <summary>
         /// Gets the value for the specified entity.
         /// </summary>
@@ -255,9 +254,8 @@ namespace Unity.Entities.Editor
             m_VersionByEntity[entity.Index] = entity.Version;
         }
 
-        public Enumerator GetEnumerator()
-            => new Enumerator(m_ValueByEntity, m_VersionByEntity);
-        
+        public Enumerator GetEnumerator() => new Enumerator(m_ValueByEntity, m_VersionByEntity);
+
         /// <summary>
         /// An enumerator which will iterate key-value pairs in the map.
         /// </summary>
@@ -275,15 +273,11 @@ namespace Unity.Entities.Editor
                 m_Index = -1;
             }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {
-                while (++m_Index < m_VersionByEntity.Length && m_VersionByEntity[m_Index] == 0)
-                {
-                }
+                while (++m_Index < m_VersionByEntity.Length && m_VersionByEntity[m_Index] == 0) { }
 
                 return m_Index < m_ValueByEntity.Length;
             }
@@ -293,7 +287,12 @@ namespace Unity.Entities.Editor
                 m_Index = -1;
             }
 
-            public EntityWithValue<T> Current => new EntityWithValue<T> {Entity = new Entity {Index = m_Index, Version = m_VersionByEntity[m_Index]}, Value = m_ValueByEntity[m_Index]};
+            public EntityWithValue<T> Current =>
+                new EntityWithValue<T>
+                {
+                    Entity = new Entity { Index = m_Index, Version = m_VersionByEntity[m_Index] },
+                    Value = m_ValueByEntity[m_Index],
+                };
 
             object IEnumerator.Current => Current;
         }

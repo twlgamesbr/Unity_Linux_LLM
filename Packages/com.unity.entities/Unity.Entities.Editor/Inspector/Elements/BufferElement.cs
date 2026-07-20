@@ -14,7 +14,12 @@ namespace Unity.Entities.Editor
 
         int m_Count;
 
-        public BufferElement(IComponentProperty property, EntityInspectorContext context, ref InspectedBuffer<TList, TElement> value) : base(property, context)
+        public BufferElement(
+            IComponentProperty property,
+            EntityInspectorContext context,
+            ref InspectedBuffer<TList, TElement> value
+        )
+            : base(property, context)
         {
             binding = this;
             m_Content = CreateContent(property, ref value);
@@ -23,10 +28,12 @@ namespace Unity.Entities.Editor
 
             if (TypeManager.IsEnableable(TypeIndex))
             {
-                m_Enabled.RegisterValueChangedCallback((e) =>
-                {
-                    Context.EntityManager.SetComponentEnabled(Context.Entity, typeof(TElement), e.newValue);
-                });
+                m_Enabled.RegisterValueChangedCallback(
+                    (e) =>
+                    {
+                        Context.EntityManager.SetComponentEnabled(Context.Entity, typeof(TElement), e.newValue);
+                    }
+                );
             }
         }
 
@@ -59,9 +66,7 @@ namespace Unity.Entities.Editor
             menu.AddCopyValue(buffer.Value);
         }
 
-        void IBinding.PreUpdate()
-        {
-        }
+        void IBinding.PreUpdate() { }
 
         void IBinding.Update()
         {
@@ -71,10 +76,15 @@ namespace Unity.Entities.Editor
                 return;
             }
 
-            if (TypeManager.IsEnableable(TypeIndex) && Context.EntityManager.HasComponent(Context.Entity, typeof(TElement)))
+            if (
+                TypeManager.IsEnableable(TypeIndex)
+                && Context.EntityManager.HasComponent(Context.Entity, typeof(TElement))
+            )
             {
                 m_Enabled.visible = true;
-                m_Enabled.SetValueWithoutNotify(Context.EntityManager.IsComponentEnabled(Context.Entity, typeof(TElement)));
+                m_Enabled.SetValueWithoutNotify(
+                    Context.EntityManager.IsComponentEnabled(Context.Entity, typeof(TElement))
+                );
             }
             else
             {
@@ -91,8 +101,6 @@ namespace Unity.Entities.Editor
             }
         }
 
-        void IBinding.Release()
-        {
-        }
+        void IBinding.Release() { }
     }
 }

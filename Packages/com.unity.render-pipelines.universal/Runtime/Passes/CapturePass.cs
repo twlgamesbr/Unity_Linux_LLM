@@ -33,7 +33,9 @@ namespace UnityEngine.Rendering.Universal
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
 
-            using (var builder = renderGraph.AddUnsafePass<UnsafePassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddUnsafePass<UnsafePassData>(passName, out var passData, profilingSampler)
+            )
             {
                 // Setup up the pass data with activeColorTexture, which has the correct orientation and position in a built player
                 // In most cases, it will be resolved to cameraColor as the source since we cannot sample the backbuffer directly.
@@ -46,13 +48,15 @@ namespace UnityEngine.Rendering.Universal
                 // Setup up the builder
                 builder.AllowPassCulling(false);
                 builder.UseTexture(resourceData.activeColorTexture, AccessFlags.Read);
-                builder.SetRenderFunc(static (UnsafePassData data, UnsafeGraphContext unsafeContext) =>
-                {
-                    var nativeCommandBuffer = CommandBufferHelpers.GetNativeCommandBuffer(unsafeContext.cmd);
-                    var captureActions = data.captureActions;
-                    for (data.captureActions.Reset(); data.captureActions.MoveNext();)
-                        captureActions.Current(data.source, nativeCommandBuffer);
-                });
+                builder.SetRenderFunc(
+                    static (UnsafePassData data, UnsafeGraphContext unsafeContext) =>
+                    {
+                        var nativeCommandBuffer = CommandBufferHelpers.GetNativeCommandBuffer(unsafeContext.cmd);
+                        var captureActions = data.captureActions;
+                        for (data.captureActions.Reset(); data.captureActions.MoveNext(); )
+                            captureActions.Current(data.source, nativeCommandBuffer);
+                    }
+                );
             }
         }
     }

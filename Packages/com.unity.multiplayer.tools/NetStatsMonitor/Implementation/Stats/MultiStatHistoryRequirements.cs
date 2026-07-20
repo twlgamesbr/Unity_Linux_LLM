@@ -31,13 +31,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     {
                         allStatRequirements[metricId] = new StatHistoryRequirements(
                             decayConstants: new HashSet<double>(),
-                            sampleCounts: new());
+                            sampleCounts: new()
+                        );
                     }
                     var requirements = multiStatHistoryRequirements.Data[metricId];
 
                     requirements.SampleCounts[sampleRate] = Math.Max(
                         requirements.SampleCounts[sampleRate],
-                        sampleCount);
+                        sampleCount
+                    );
 
                     if (decayConstant.HasValue)
                     {

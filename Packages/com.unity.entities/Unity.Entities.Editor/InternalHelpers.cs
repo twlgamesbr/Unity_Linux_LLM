@@ -13,7 +13,10 @@ namespace Unity.Entities.Editor
 
         static InternalsHelpers()
         {
-            s_TexturePixelsPerPoint = typeof(Texture2D).GetProperty("pixelsPerPoint", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            s_TexturePixelsPerPoint = typeof(Texture2D).GetProperty(
+                "pixelsPerPoint",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+            );
         }
 
         public static float GetPixelsPerPoint(this Texture2D @this)

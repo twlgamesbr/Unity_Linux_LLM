@@ -2,7 +2,6 @@ using System;
 using Unity.Collections;
 using UnityEngine.U2D;
 
-
 namespace UnityEngine.Rendering.Universal
 {
     [Serializable]
@@ -22,7 +21,10 @@ namespace UnityEngine.Rendering.Universal
                 Sprite sprite = spriteRenderer.sprite;
 
                 Vector2 srSize = spriteRenderer.size;
-                Vector3 pivot = new Vector2(srSize.x * sprite.pivot.x / sprite.rect.width, srSize.y * sprite.pivot.y / sprite.rect.height);
+                Vector3 pivot = new Vector2(
+                    srSize.x * sprite.pivot.x / sprite.rect.width,
+                    srSize.y * sprite.pivot.y / sprite.rect.height
+                );
                 Rect rect = new Rect(-pivot, new Vector2(srSize.x, srSize.y));
 
                 NativeArray<Vector3> vertices = new NativeArray<Vector3>(4, Allocator.Temp);
@@ -64,7 +66,6 @@ namespace UnityEngine.Rendering.Universal
                 for (int i = 0; i < vertices.Length; i++)
                     vertices[i] = vertexSlice[i];
 
-
                 shadowShape2D.SetShape(vertices, indices, ShadowShape2D.OutlineTopology.Triangles);
 
                 vertices.Dispose();
@@ -76,7 +77,15 @@ namespace UnityEngine.Rendering.Universal
         {
             if (spriteRenderer != null && spriteRenderer.sprite != null)
             {
-                if (spriteRenderer.drawMode != SpriteDrawMode.Simple && (spriteRenderer.size.x != m_CurrentDrawModeSize.x || spriteRenderer.size.y != m_CurrentDrawModeSize.y || spriteRenderer.drawMode != m_CurrentDrawMode || force))
+                if (
+                    spriteRenderer.drawMode != SpriteDrawMode.Simple
+                    && (
+                        spriteRenderer.size.x != m_CurrentDrawModeSize.x
+                        || spriteRenderer.size.y != m_CurrentDrawModeSize.y
+                        || spriteRenderer.drawMode != m_CurrentDrawMode
+                        || force
+                    )
+                )
                 {
                     m_CurrentDrawModeSize = spriteRenderer.size;
                     SetFullRectShapeData(spriteRenderer, persistantShadowShape);
@@ -84,7 +93,9 @@ namespace UnityEngine.Rendering.Universal
                 else if (spriteRenderer.drawMode != m_CurrentDrawMode || force)
                 {
                     Sprite sprite = spriteRenderer.sprite;
-                    NativeSlice<Vector3> vertexSlice = sprite.GetVertexAttribute<Vector3>(UnityEngine.Rendering.VertexAttribute.Position);
+                    NativeSlice<Vector3> vertexSlice = sprite.GetVertexAttribute<Vector3>(
+                        UnityEngine.Rendering.VertexAttribute.Position
+                    );
                     SetPersistantShapeData(sprite, m_PersistantShapeData, vertexSlice);
                 }
 
@@ -100,8 +111,15 @@ namespace UnityEngine.Rendering.Universal
         //============================================================================================================
         //                                                  Public
         //============================================================================================================
-        public override int MenuPriority() { return 1; }  // give higher than default menu priority
-        public override bool IsRequiredComponentData(Component sourceComponent) { return sourceComponent is SpriteRenderer; }
+        public override int MenuPriority()
+        {
+            return 1;
+        } // give higher than default menu priority
+
+        public override bool IsRequiredComponentData(Component sourceComponent)
+        {
+            return sourceComponent is SpriteRenderer;
+        }
 
         public override void OnInitialized(Component sourceComponent, ShadowShape2D persistantShadowShape)
         {
@@ -111,14 +129,21 @@ namespace UnityEngine.Rendering.Universal
 
             if (spriteRenderer.sprite != null)
             {
-                float trimEdge = ShadowShapeProvider2DUtility.GetTrimEdgeFromBounds(spriteRenderer.bounds, k_InitialTrim);
+                float trimEdge = ShadowShapeProvider2DUtility.GetTrimEdgeFromBounds(
+                    spriteRenderer.bounds,
+                    k_InitialTrim
+                );
                 persistantShadowShape.SetDefaultTrim(trimEdge);
             }
 
             TryToSetPersistantShapeData(spriteRenderer, persistantShadowShape, true);
         }
 
-        public override void OnBeforeRender(Component sourceComponent, Bounds worldCullingBounds, ShadowShape2D persistantShadowShape)
+        public override void OnBeforeRender(
+            Component sourceComponent,
+            Bounds worldCullingBounds,
+            ShadowShape2D persistantShadowShape
+        )
         {
             SpriteRenderer spriteRenderer = (SpriteRenderer)sourceComponent;
             persistantShadowShape.SetFlip(spriteRenderer.flipX, spriteRenderer.flipY);

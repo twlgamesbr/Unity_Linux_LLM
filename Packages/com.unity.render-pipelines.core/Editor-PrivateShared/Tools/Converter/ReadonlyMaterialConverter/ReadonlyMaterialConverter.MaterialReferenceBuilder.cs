@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System;
 using UnityEngine;
 
 namespace UnityEditor.Rendering.Converter
@@ -27,7 +27,12 @@ namespace UnityEditor.Rendering.Converter
             m_MaterialReferenceCache = null;
         }
 
-        public static bool TryGetFromMemberInfoAccessors(object obj, MemberInfo member, out Func<object> getter, out Action<object> setter)
+        public static bool TryGetFromMemberInfoAccessors(
+            object obj,
+            MemberInfo member,
+            out Func<object> getter,
+            out Action<object> setter
+        )
         {
             getter = null;
             setter = null;
@@ -63,7 +68,9 @@ namespace UnityEditor.Rendering.Converter
         /// If both a regular and a corresponding "shared" accessor exist (e.g., "material" and "sharedMaterial"),
         /// only the "shared" accessor is kept to ensure safer and consistent material access.
         /// </summary>
-        static List<(MemberInfo member, bool isArray)> GetSafeMaterialAccessors(List<(MemberInfo member, bool isArray)> materialAccessors)
+        static List<(MemberInfo member, bool isArray)> GetSafeMaterialAccessors(
+            List<(MemberInfo member, bool isArray)> materialAccessors
+        )
         {
             var safeMaterialAccessors = new List<(MemberInfo member, bool isArray)>();
 
@@ -106,7 +113,6 @@ namespace UnityEditor.Rendering.Converter
 
             return safeMaterialAccessors;
         }
-
 
         void BuildMaterialReferenceCache()
         {
@@ -155,7 +161,7 @@ namespace UnityEditor.Rendering.Converter
                 referenceInfo = new MaterialReferenceInfo
                 {
                     type = type,
-                    materialAccessors = GetSafeMaterialAccessors(materialAccessors)
+                    materialAccessors = GetSafeMaterialAccessors(materialAccessors),
                 };
                 return true;
             }

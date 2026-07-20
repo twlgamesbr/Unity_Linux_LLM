@@ -41,7 +41,8 @@ namespace Unity.Multiplayer.Tools.DependencyInjection.UIElements
 
         async Task LoadUxmlAsync()
         {
-            var uxmlPath = (LoadUxmlViewAttribute)Attribute.GetCustomAttribute(typeof(TView), typeof(LoadUxmlViewAttribute));
+            var uxmlPath = (LoadUxmlViewAttribute)
+                Attribute.GetCustomAttribute(typeof(TView), typeof(LoadUxmlViewAttribute));
             if (uxmlPath == null || string.IsNullOrWhiteSpace(uxmlPath.RootPath))
             {
                 return;
@@ -64,9 +65,7 @@ namespace Unity.Multiplayer.Tools.DependencyInjection.UIElements
             }
         }
 
-        protected virtual void Initialized()
-        {
-        }
+        protected virtual void Initialized() { }
     }
 
     /// <remarks>
@@ -81,10 +80,12 @@ namespace Unity.Multiplayer.Tools.DependencyInjection.UIElements
 
         static InjectedVisualElementCache()
         {
-            s_InjectAttributeFields = TypeCache.GetFieldsWithAttribute<InjectAttribute>()
+            s_InjectAttributeFields = TypeCache
+                .GetFieldsWithAttribute<InjectAttribute>()
                 .GroupBy(x => x.ReflectedType)
                 .ToDictionary(x => x.Key, x => x.ToList());
-            s_QueryAttributeFields = TypeCache.GetFieldsWithAttribute<UxmlQueryAttribute>()
+            s_QueryAttributeFields = TypeCache
+                .GetFieldsWithAttribute<UxmlQueryAttribute>()
                 .GroupBy(x => x.ReflectedType)
                 .ToDictionary(x => x.Key, x => x.ToList());
         }

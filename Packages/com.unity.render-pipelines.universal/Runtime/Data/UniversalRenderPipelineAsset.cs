@@ -1,15 +1,15 @@
 using System;
+using System.ComponentModel;
+using UnityEngine.Assertions;
+using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using System.IO;
 using ShaderKeywordFilter = UnityEditor.ShaderKeywordFilter;
 #endif
-using System.ComponentModel;
-using UnityEngine.Serialization;
-using UnityEngine.Experimental.Rendering;
-using UnityEngine.Rendering.RenderGraphModule;
-using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -22,10 +22,12 @@ namespace UnityEngine.Rendering.Universal
         /// Disables the shadows.
         /// </summary>
         Disabled,
+
         /// <summary>
         /// Shadows have hard edges.
         /// </summary>
         HardShadows,
+
         /// <summary>
         /// Filtering is applied when sampling shadows. Shadows have smooth edges.
         /// </summary>
@@ -47,10 +49,12 @@ namespace UnityEngine.Rendering.Universal
         /// Low quality soft shadows. Recommended for mobile. 4 PCF sample filtering.
         /// </summary>
         Low,
+
         /// <summary>
         /// Medium quality soft shadows. The default. 5x5 tent filtering.
         /// </summary>
         Medium,
+
         /// <summary>
         /// High quality soft shadows. Low performance due to high sample count. 7x7 tent filtering.
         /// </summary>
@@ -121,7 +125,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Use this for 4096x4096 Light Cookie resolution.
         /// </summary>
-        _4096 = 4096
+        _4096 = 4096,
     }
 
     /// <summary>
@@ -166,6 +170,7 @@ namespace UnityEngine.Rendering.Universal
         /// R11G11B10f can cause a subtle blue/yellow banding in some rare cases due to lower precision of the blue component.</summary>
         [Tooltip("Use 32-bits per pixel for HDR rendering.")]
         _32Bits,
+
         /// <summary>Typically R16G16B16A16f for better quality. Can reduce banding at the cost of memory and performance.</summary>
         [Tooltip("Use 64-bits per pixel for HDR rendering.")]
         _64Bits,
@@ -195,7 +200,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Use this for 8 samples per pixel.
         /// </summary>
-        _8x = 8
+        _8x = 8,
     }
 
     /// <summary>
@@ -221,7 +226,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Use this to produce a quarter-resolution image with bi-linear filtering.
         /// </summary>
-        _4xBilinear
+        _4xBilinear,
     }
 
     /// <summary>
@@ -279,7 +284,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// This mode works best for high precision grading similar to movie production workflows. Unity applies color grading before tonemapping.
         /// </summary>
-        HighDynamicRange
+        HighDynamicRange,
     }
 
     /// <summary>
@@ -290,10 +295,12 @@ namespace UnityEngine.Rendering.Universal
     {
         /// <summary>Unity uses the Discard option by default, and falls back to the Store option if it detects any injected Passes.</summary>
         Auto,
+
         /// <summary>Unity discards the render targets of render Passes that are not reused later (lower memory bandwidth).</summary>
         Discard,
+
         /// <summary>Unity stores all render targets of each Pass (higher memory bandwidth).</summary>
-        Store
+        Store,
     }
 
     /// <summary>
@@ -323,7 +330,7 @@ namespace UnityEngine.Rendering.Universal
     /// <summary>
     /// Defines the upscaling filter selected by the user the universal render pipeline asset.
     /// </summary>
-    /// 
+    ///
 #if ENABLE_UPSCALER_FRAMEWORK
     [Obsolete("UpscalingFilterSelection is obsolete. #from(6000.3)", false)]
 #endif
@@ -332,7 +339,12 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Unity selects a filtering option automatically based on the Render Scale value and the current screen resolution.
         /// </summary>
-        [InspectorName("Automatic"), Tooltip("Unity selects a filtering option automatically based on the Render Scale value and the current screen resolution.")]
+        [
+            InspectorName("Automatic"),
+            Tooltip(
+                "Unity selects a filtering option automatically based on the Render Scale value and the current screen resolution."
+            )
+        ]
         Auto,
 
         /// <summary>
@@ -350,14 +362,24 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Unity uses the AMD FSR 1.0 technique to perform upscaling.
         /// </summary>
-        [InspectorName("FidelityFX Super Resolution 1.0"), Tooltip("If the target device does not support Unity shader model 4.5, Unity falls back to the Automatic option.")]
+        [
+            InspectorName("FidelityFX Super Resolution 1.0"),
+            Tooltip(
+                "If the target device does not support Unity shader model 4.5, Unity falls back to the Automatic option."
+            )
+        ]
         FSR,
 
         /// <summary>
         /// Unity uses the Spatial-Temporal Post-Processing technique to perform upscaling.
         /// </summary>
-        [InspectorName("Spatial-Temporal Post-Processing"), Tooltip("If the target device does not support compute shaders or is running GLES, Unity falls back to the Automatic option.")]
-        STP
+        [
+            InspectorName("Spatial-Temporal Post-Processing"),
+            Tooltip(
+                "If the target device does not support compute shaders or is running GLES, Unity falls back to the Automatic option."
+            )
+        ]
+        STP,
     }
 
     /// <summary>
@@ -372,8 +394,13 @@ namespace UnityEngine.Rendering.Universal
         BlueNoise,
 
         /// <summary>Unity uses stencil test to make 2x2 pixel dithering pattern by using 2 stencil bits (4 and 8). This option significantly decreases the number of the shader variants, while GPU performance cost becomes slightly higher.</summary>
-        [InspectorName("2x2 Stencil"), Tooltip("2x2 pixel dithering pattern by stencil test with 2 stencil bits (4 and 8). This option decreases the number of the shader variants.")]
-        Stencil
+        [
+            InspectorName("2x2 Stencil"),
+            Tooltip(
+                "2x2 pixel dithering pattern by stencil test with 2 stencil bits (4 and 8). This option decreases the number of the shader variants."
+            )
+        ]
+        Stencil,
     }
 
     /// <summary>
@@ -384,6 +411,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>The light probe group system.</summary>
         [InspectorName("Light Probe Groups")]
         LegacyLightProbes = 0,
+
         /// <summary>Adaptive Probe Volumes system.</summary>
         [InspectorName("Adaptive Probe Volumes")]
         ProbeVolumes = 1,
@@ -396,10 +424,13 @@ namespace UnityEngine.Rendering.Universal
     {
         /// <summary>Unity selects a mode automatically.</summary>
         Auto = 0,
+
         /// <summary>Evaluate lighting per vertex.</summary>
         PerVertex = 1,
+
         /// <summary>Evaluate lighting partially per vertex, partially per pixel.</summary>
         Mixed = 2,
+
         /// <summary>Evaluate lighting per pixel.</summary>
         PerPixel = 3,
     }
@@ -416,208 +447,367 @@ namespace UnityEngine.Rendering.Universal
 #if UNITY_EDITOR
     [ShaderKeywordFilter.ApplyRulesIfTagsEqual("RenderPipeline", "UniversalPipeline")]
 #endif
-    public partial class UniversalRenderPipelineAsset : RenderPipelineAsset<UniversalRenderPipeline>, ISerializationCallbackReceiver, IProbeVolumeEnabledRenderPipeline, IGPUResidentRenderPipeline, IRenderGraphEnabledRenderPipeline, ISTPEnabledRenderPipeline
+    public partial class UniversalRenderPipelineAsset
+        : RenderPipelineAsset<UniversalRenderPipeline>,
+            ISerializationCallbackReceiver,
+            IProbeVolumeEnabledRenderPipeline,
+            IGPUResidentRenderPipeline,
+            IRenderGraphEnabledRenderPipeline,
+            ISTPEnabledRenderPipeline
     {
         ScriptableRenderer[] m_Renderers = new ScriptableRenderer[1];
 
         internal bool IsAtLastVersion() => k_LastVersion == k_AssetVersion;
 
         private const int k_LastVersion = 13;
+
         // Default values set when a new UniversalRenderPipeline asset is created
-        [SerializeField] int k_AssetVersion = k_LastVersion;
-        [SerializeField] int k_AssetPreviousVersion = k_LastVersion;
+        [SerializeField]
+        int k_AssetVersion = k_LastVersion;
+
+        [SerializeField]
+        int k_AssetPreviousVersion = k_LastVersion;
 
         // Deprecated settings for upgrading sakes
-        [SerializeField] RendererType m_RendererType = RendererType.UniversalRenderer;
+        [SerializeField]
+        RendererType m_RendererType = RendererType.UniversalRenderer;
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Use m_RendererDataList instead. #from(2023.1)")]
-        [SerializeField] internal ScriptableRendererData m_RendererData = null;
+        [SerializeField]
+        internal ScriptableRendererData m_RendererData = null;
 
         // Renderer settings
-        [SerializeField] internal ScriptableRendererData[] m_RendererDataList = new ScriptableRendererData[1];
-        [SerializeField] internal int m_DefaultRendererIndex = 0;
+        [SerializeField]
+        internal ScriptableRendererData[] m_RendererDataList = new ScriptableRendererData[1];
+
+        [SerializeField]
+        internal int m_DefaultRendererIndex = 0;
 
         // General settings
-        [SerializeField] bool m_RequireDepthTexture = false;
-        [SerializeField] bool m_RequireOpaqueTexture = false;
-        [SerializeField] Downsampling m_OpaqueDownsampling = Downsampling._2xBilinear;
-        [SerializeField] bool m_SupportsTerrainHoles = true;
+        [SerializeField]
+        bool m_RequireDepthTexture = false;
+
+        [SerializeField]
+        bool m_RequireOpaqueTexture = false;
+
+        [SerializeField]
+        Downsampling m_OpaqueDownsampling = Downsampling._2xBilinear;
+
+        [SerializeField]
+        bool m_SupportsTerrainHoles = true;
 
         // Quality settings
-        [SerializeField] bool m_SupportsHDR = true;
-        [SerializeField] HDRColorBufferPrecision m_HDRColorBufferPrecision = HDRColorBufferPrecision._32Bits;
-        [SerializeField] MsaaQuality m_MSAA = MsaaQuality.Disabled;
-        [SerializeField] float m_RenderScale = 1.0f;
+        [SerializeField]
+        bool m_SupportsHDR = true;
+
+        [SerializeField]
+        HDRColorBufferPrecision m_HDRColorBufferPrecision = HDRColorBufferPrecision._32Bits;
+
+        [SerializeField]
+        MsaaQuality m_MSAA = MsaaQuality.Disabled;
+
+        [SerializeField]
+        float m_RenderScale = 1.0f;
+
 #if ENABLE_UPSCALER_FRAMEWORK
         [Obsolete("m_UpscalingFilter is replaced by m_SelectedUpscalerName #from(6000.3)")]
 #endif
-        [SerializeField] UpscalingFilterSelection m_UpscalingFilter = UpscalingFilterSelection.Auto;
+        [SerializeField]
+        UpscalingFilterSelection m_UpscalingFilter = UpscalingFilterSelection.Auto;
         // The upscaler name is null if the upscaling filter is coming from a built-in upscaler. It will be non-null if
         // the upscaling filter is coming from an IUpscaler, which can be a separate package, or part of Unity code.
 #if ENABLE_UPSCALER_FRAMEWORK
-        [SerializeField] string m_SelectedUpscalerName = "Bilinear";
+        [SerializeField]
+        string m_SelectedUpscalerName = "Bilinear";
 
         [SerializeField]
         [SerializeReference]
         List<UpscalerOptions> m_UpscalerOptions = new List<UpscalerOptions>();
 #endif
-        [SerializeField] bool m_FsrOverrideSharpness = false;
-        [SerializeField] float m_FsrSharpness = FSRUtils.kDefaultSharpnessLinear;
+
+        [SerializeField]
+        bool m_FsrOverrideSharpness = false;
+
+        [SerializeField]
+        float m_FsrSharpness = FSRUtils.kDefaultSharpnessLinear;
 
 #if UNITY_EDITOR // multi_compile _ LOD_FADE_CROSSFADE
         [ShaderKeywordFilter.RemoveIf(false, keywordNames: ShaderKeywordStrings.LOD_FADE_CROSSFADE)]
 #endif
-        [SerializeField] bool m_EnableLODCrossFade = true;
+        [SerializeField]
+        bool m_EnableLODCrossFade = true;
 
-        [SerializeField] LODCrossFadeDitheringType m_LODCrossFadeDitheringType = LODCrossFadeDitheringType.BlueNoise;
+        [SerializeField]
+        LODCrossFadeDitheringType m_LODCrossFadeDitheringType = LODCrossFadeDitheringType.BlueNoise;
 
         // ShEvalMode.Auto is handled in shader preprocessor.
 #if UNITY_EDITOR // multi_compile _ EVALUATE_SH_MIXED EVALUATE_SH_VERTEX
-        [ShaderKeywordFilter.RemoveIf(ShEvalMode.PerPixel,  keywordNames:  new [] { ShaderKeywordStrings.EVALUATE_SH_MIXED, ShaderKeywordStrings.EVALUATE_SH_VERTEX })]
-        [ShaderKeywordFilter.SelectIf(ShEvalMode.Mixed,     keywordNames:  new [] { ShaderKeywordStrings.EVALUATE_SH_MIXED })]
-        [ShaderKeywordFilter.SelectIf(ShEvalMode.PerVertex, keywordNames: new [] { ShaderKeywordStrings.EVALUATE_SH_VERTEX })]
+        [ShaderKeywordFilter.RemoveIf(
+            ShEvalMode.PerPixel,
+            keywordNames: new[] { ShaderKeywordStrings.EVALUATE_SH_MIXED, ShaderKeywordStrings.EVALUATE_SH_VERTEX }
+        )]
+        [ShaderKeywordFilter.SelectIf(ShEvalMode.Mixed, keywordNames: new[] { ShaderKeywordStrings.EVALUATE_SH_MIXED })]
+        [ShaderKeywordFilter.SelectIf(
+            ShEvalMode.PerVertex,
+            keywordNames: new[] { ShaderKeywordStrings.EVALUATE_SH_VERTEX }
+        )]
 #endif
-        [SerializeField] ShEvalMode m_ShEvalMode = ShEvalMode.Auto;
+        [SerializeField]
+        ShEvalMode m_ShEvalMode = ShEvalMode.Auto;
 
         // Probe volume settings
 #if UNITY_EDITOR
-        [ShaderKeywordFilter.RemoveIf(LightProbeSystem.LegacyLightProbes, keywordNames: new [] { ShaderKeywordStrings.ProbeVolumeL1, ShaderKeywordStrings.ProbeVolumeL2 })]
-        [ShaderKeywordFilter.SelectIf(LightProbeSystem.ProbeVolumes,      keywordNames: new [] { ShaderKeywordStrings.ProbeVolumeL1, ShaderKeywordStrings.ProbeVolumeL2 })]
+        [ShaderKeywordFilter.RemoveIf(
+            LightProbeSystem.LegacyLightProbes,
+            keywordNames: new[] { ShaderKeywordStrings.ProbeVolumeL1, ShaderKeywordStrings.ProbeVolumeL2 }
+        )]
+        [ShaderKeywordFilter.SelectIf(
+            LightProbeSystem.ProbeVolumes,
+            keywordNames: new[] { ShaderKeywordStrings.ProbeVolumeL1, ShaderKeywordStrings.ProbeVolumeL2 }
+        )]
 #endif
-        [SerializeField] LightProbeSystem m_LightProbeSystem = LightProbeSystem.LegacyLightProbes;
-        [SerializeField] ProbeVolumeTextureMemoryBudget m_ProbeVolumeMemoryBudget = ProbeVolumeTextureMemoryBudget.MemoryBudgetMedium;
-        [SerializeField] ProbeVolumeBlendingTextureMemoryBudget m_ProbeVolumeBlendingMemoryBudget = ProbeVolumeBlendingTextureMemoryBudget.MemoryBudgetMedium;
-        [SerializeField] [FormerlySerializedAs("m_SupportProbeVolumeStreaming")] bool m_SupportProbeVolumeGPUStreaming = false;
-        [SerializeField] bool m_SupportProbeVolumeDiskStreaming = false;
-        [SerializeField] bool m_SupportProbeVolumeScenarios = false;
-        [SerializeField] bool m_SupportProbeVolumeScenarioBlending = false;
+        [SerializeField]
+        LightProbeSystem m_LightProbeSystem = LightProbeSystem.LegacyLightProbes;
+
+        [SerializeField]
+        ProbeVolumeTextureMemoryBudget m_ProbeVolumeMemoryBudget = ProbeVolumeTextureMemoryBudget.MemoryBudgetMedium;
+
+        [SerializeField]
+        ProbeVolumeBlendingTextureMemoryBudget m_ProbeVolumeBlendingMemoryBudget =
+            ProbeVolumeBlendingTextureMemoryBudget.MemoryBudgetMedium;
+
+        [SerializeField]
+        [FormerlySerializedAs("m_SupportProbeVolumeStreaming")]
+        bool m_SupportProbeVolumeGPUStreaming = false;
+
+        [SerializeField]
+        bool m_SupportProbeVolumeDiskStreaming = false;
+
+        [SerializeField]
+        bool m_SupportProbeVolumeScenarios = false;
+
+        [SerializeField]
+        bool m_SupportProbeVolumeScenarioBlending = false;
+
 #if UNITY_EDITOR
-        [ShaderKeywordFilter.RemoveIf(ProbeVolumeSHBands.SphericalHarmonicsL1, keywordNames: ShaderKeywordStrings.ProbeVolumeL2)]
-        [ShaderKeywordFilter.RemoveIf(ProbeVolumeSHBands.SphericalHarmonicsL2, keywordNames: ShaderKeywordStrings.ProbeVolumeL1)]
+        [ShaderKeywordFilter.RemoveIf(
+            ProbeVolumeSHBands.SphericalHarmonicsL1,
+            keywordNames: ShaderKeywordStrings.ProbeVolumeL2
+        )]
+        [ShaderKeywordFilter.RemoveIf(
+            ProbeVolumeSHBands.SphericalHarmonicsL2,
+            keywordNames: ShaderKeywordStrings.ProbeVolumeL1
+        )]
 #endif
-        [SerializeField] ProbeVolumeSHBands m_ProbeVolumeSHBands = ProbeVolumeSHBands.SphericalHarmonicsL1;
+        [SerializeField]
+        ProbeVolumeSHBands m_ProbeVolumeSHBands = ProbeVolumeSHBands.SphericalHarmonicsL1;
 
         // Main directional light Settings
-        [SerializeField] LightRenderingMode m_MainLightRenderingMode = LightRenderingMode.PerPixel;
-        [SerializeField] bool m_MainLightShadowsSupported = true;
-        [SerializeField] ShadowResolution m_MainLightShadowmapResolution = ShadowResolution._2048;
+        [SerializeField]
+        LightRenderingMode m_MainLightRenderingMode = LightRenderingMode.PerPixel;
+
+        [SerializeField]
+        bool m_MainLightShadowsSupported = true;
+
+        [SerializeField]
+        ShadowResolution m_MainLightShadowmapResolution = ShadowResolution._2048;
 
         // Additional lights settings
-        [SerializeField] LightRenderingMode m_AdditionalLightsRenderingMode = LightRenderingMode.PerPixel;
+        [SerializeField]
+        LightRenderingMode m_AdditionalLightsRenderingMode = LightRenderingMode.PerPixel;
 
 #if UNITY_META_QUEST
 #if UNITY_EDITOR // multi_compile _ META_QUEST_LIGHTUNROLL (only on  meta platforms)
         [ShaderKeywordFilter.RemoveIfNot(1, keywordNames: ShaderKeywordStrings.META_QUEST_LIGHTUNROLL)]
 #endif
 #endif
-        [SerializeField] int m_AdditionalLightsPerObjectLimit = 4;
-        [SerializeField] bool m_AdditionalLightShadowsSupported = false;
-        [SerializeField] ShadowResolution m_AdditionalLightsShadowmapResolution = ShadowResolution._2048;
+        [SerializeField]
+        int m_AdditionalLightsPerObjectLimit = 4;
 
-        [SerializeField] int m_AdditionalLightsShadowResolutionTierLow = AdditionalLightsDefaultShadowResolutionTierLow;
-        [SerializeField] int m_AdditionalLightsShadowResolutionTierMedium = AdditionalLightsDefaultShadowResolutionTierMedium;
-        [SerializeField] int m_AdditionalLightsShadowResolutionTierHigh = AdditionalLightsDefaultShadowResolutionTierHigh;
+        [SerializeField]
+        bool m_AdditionalLightShadowsSupported = false;
+
+        [SerializeField]
+        ShadowResolution m_AdditionalLightsShadowmapResolution = ShadowResolution._2048;
+
+        [SerializeField]
+        int m_AdditionalLightsShadowResolutionTierLow = AdditionalLightsDefaultShadowResolutionTierLow;
+
+        [SerializeField]
+        int m_AdditionalLightsShadowResolutionTierMedium = AdditionalLightsDefaultShadowResolutionTierMedium;
+
+        [SerializeField]
+        int m_AdditionalLightsShadowResolutionTierHigh = AdditionalLightsDefaultShadowResolutionTierHigh;
 
         // Reflection Probes
-        [SerializeField] bool m_ReflectionProbeBlending = false;
-        [SerializeField] bool m_ReflectionProbeBoxProjection = false;
-        [SerializeField] bool m_ReflectionProbeAtlas = true;
+        [SerializeField]
+        bool m_ReflectionProbeBlending = false;
+
+        [SerializeField]
+        bool m_ReflectionProbeBoxProjection = false;
+
+        [SerializeField]
+        bool m_ReflectionProbeAtlas = true;
 
         // Shadows Settings
-        [SerializeField] float m_ShadowDistance = 50.0f;
-        [SerializeField] int m_ShadowCascadeCount = 1;
-        [SerializeField] float m_Cascade2Split = 0.25f;
-        [SerializeField] Vector2 m_Cascade3Split = new Vector2(0.1f, 0.3f);
-        [SerializeField] Vector3 m_Cascade4Split = new Vector3(0.067f, 0.2f, 0.467f);
-        [SerializeField] float m_CascadeBorder = 0.2f;
-        [SerializeField] float m_ShadowDepthBias = 1.0f;
-        [SerializeField] float m_ShadowNormalBias = 1.0f;
+        [SerializeField]
+        float m_ShadowDistance = 50.0f;
+
+        [SerializeField]
+        int m_ShadowCascadeCount = 1;
+
+        [SerializeField]
+        float m_Cascade2Split = 0.25f;
+
+        [SerializeField]
+        Vector2 m_Cascade3Split = new Vector2(0.1f, 0.3f);
+
+        [SerializeField]
+        Vector3 m_Cascade4Split = new Vector3(0.067f, 0.2f, 0.467f);
+
+        [SerializeField]
+        float m_CascadeBorder = 0.2f;
+
+        [SerializeField]
+        float m_ShadowDepthBias = 1.0f;
+
+        [SerializeField]
+        float m_ShadowNormalBias = 1.0f;
+
 #if UNITY_EDITOR // multi_compile_fragment _ _SHADOWS_SOFT
         [ShaderKeywordFilter.RemoveIf(false, keywordNames: ShaderKeywordStrings.SoftShadows)]
-        [SerializeField] bool m_AnyShadowsSupported = true;
+        [SerializeField]
+        bool m_AnyShadowsSupported = true;
 
         // No option to force soft shadows -> we'll need to keep the off variant around
         [ShaderKeywordFilter.RemoveIf(false, keywordNames: ShaderKeywordStrings.SoftShadows)]
 #endif
-        [SerializeField] bool m_SoftShadowsSupported = false;
-        [SerializeField] bool m_ConservativeEnclosingSphere = false;
-        [SerializeField] int m_NumIterationsEnclosingSphere = 64;
-        [SerializeField] SoftShadowQuality m_SoftShadowQuality = SoftShadowQuality.Medium;
+        [SerializeField]
+        bool m_SoftShadowsSupported = false;
+
+        [SerializeField]
+        bool m_ConservativeEnclosingSphere = false;
+
+        [SerializeField]
+        int m_NumIterationsEnclosingSphere = 64;
+
+        [SerializeField]
+        SoftShadowQuality m_SoftShadowQuality = SoftShadowQuality.Medium;
 
         // Light Cookie Settings
-        [SerializeField] LightCookieResolution m_AdditionalLightsCookieResolution = LightCookieResolution._2048;
-        [SerializeField] LightCookieFormat m_AdditionalLightsCookieFormat = LightCookieFormat.ColorHigh;
+        [SerializeField]
+        LightCookieResolution m_AdditionalLightsCookieResolution = LightCookieResolution._2048;
+
+        [SerializeField]
+        LightCookieFormat m_AdditionalLightsCookieFormat = LightCookieFormat.ColorHigh;
 
         // Advanced settings
-        [SerializeField] bool m_UseSRPBatcher = true;
-        [SerializeField] bool m_SupportsDynamicBatching = false;
+        [SerializeField]
+        bool m_UseSRPBatcher = true;
+
+        [SerializeField]
+        bool m_SupportsDynamicBatching = false;
 #if UNITY_EDITOR
         // multi_compile _ LIGHTMAP_SHADOW_MIXING
         [ShaderKeywordFilter.RemoveIf(false, keywordNames: ShaderKeywordStrings.LightmapShadowMixing)]
         // multi_compile _ SHADOWS_SHADOWMASK
         [ShaderKeywordFilter.RemoveIf(false, keywordNames: ShaderKeywordStrings.ShadowsShadowMask)]
 #endif
-        [SerializeField] bool m_MixedLightingSupported = true;
+        [SerializeField]
+        bool m_MixedLightingSupported = true;
 #if UNITY_EDITOR
         // multi_compile_fragment _ _LIGHT_COOKIES
         [ShaderKeywordFilter.RemoveIf(false, keywordNames: ShaderKeywordStrings.LightCookies)]
 #endif
-        [SerializeField] bool m_SupportsLightCookies = true;
+        [SerializeField]
+        bool m_SupportsLightCookies = true;
 #if UNITY_EDITOR
         // multi_compile_fragment _ _LIGHT_LAYERS
         [ShaderKeywordFilter.SelectOrRemove(true, keywordNames: ShaderKeywordStrings.LightLayers)]
 #endif
-        [SerializeField] bool m_SupportsLightLayers = false;
-        [SerializeField][Obsolete("#from(6000.0) #breakingFrom(6000.4)", true)] StoreActionsOptimization m_StoreActionsOptimization = StoreActionsOptimization.Auto;
+        [SerializeField]
+        bool m_SupportsLightLayers = false;
+
+        [SerializeField]
+        [Obsolete("#from(6000.0) #breakingFrom(6000.4)", true)]
+        StoreActionsOptimization m_StoreActionsOptimization = StoreActionsOptimization.Auto;
 
         // Adaptive performance settings
-        [SerializeField] bool m_UseAdaptivePerformance = true;
+        [SerializeField]
+        bool m_UseAdaptivePerformance = true;
 
         // Post-processing settings
-        [SerializeField] ColorGradingMode m_ColorGradingMode = ColorGradingMode.LowDynamicRange;
-        [SerializeField] int m_ColorGradingLutSize = 32;
+        [SerializeField]
+        ColorGradingMode m_ColorGradingMode = ColorGradingMode.LowDynamicRange;
+
+        [SerializeField]
+        int m_ColorGradingLutSize = 32;
+
 #if UNITY_EDITOR // multi_compile_fragment _ _ENABLE_ALPHA_OUTPUT
         [ShaderKeywordFilter.SelectOrRemove(true, keywordNames: ShaderKeywordStrings._ENABLE_ALPHA_OUTPUT)]
 #endif
-        [SerializeField] bool m_AllowPostProcessAlphaOutput = false;
+        [SerializeField]
+        bool m_AllowPostProcessAlphaOutput = false;
+
 #if UNITY_EDITOR // multi_compile_local_fragment _ _USE_FAST_SRGB_LINEAR_CONVERSION
         [ShaderKeywordFilter.SelectOrRemove(true, keywordNames: ShaderKeywordStrings.UseFastSRGBLinearConversion)]
 #endif
-        [SerializeField] bool m_UseFastSRGBLinearConversion = false;
-        [SerializeField] bool m_SupportDataDrivenLensFlare = true;
-        [SerializeField] bool m_SupportScreenSpaceLensFlare = true;
+        [SerializeField]
+        bool m_UseFastSRGBLinearConversion = false;
+
+        [SerializeField]
+        bool m_SupportDataDrivenLensFlare = true;
+
+        [SerializeField]
+        bool m_SupportScreenSpaceLensFlare = true;
 
         // GPU Resident Drawer
         [FormerlySerializedAs("m_MacroBatcherMode"), SerializeField]
         private GPUResidentDrawerMode m_GPUResidentDrawerMode = GPUResidentDrawerMode.Disabled;
-        [SerializeField] float m_SmallMeshScreenPercentage = 0.0f;
 
-        [SerializeField] bool m_GPUResidentDrawerEnableOcclusionCullingInCameras;
+        [SerializeField]
+        float m_SmallMeshScreenPercentage = 0.0f;
 
-        GPUResidentDrawerSettings IGPUResidentRenderPipeline.gpuResidentDrawerSettings => new()
-        {
-            mode = m_GPUResidentDrawerMode,
-            enableOcclusionCulling = m_GPUResidentDrawerEnableOcclusionCullingInCameras,
-            supportDitheringCrossFade = m_EnableLODCrossFade,
-            allowInEditMode = true,
-            smallMeshScreenPercentage = m_SmallMeshScreenPercentage,
+        [SerializeField]
+        bool m_GPUResidentDrawerEnableOcclusionCullingInCameras;
+
+        GPUResidentDrawerSettings IGPUResidentRenderPipeline.gpuResidentDrawerSettings =>
+            new()
+            {
+                mode = m_GPUResidentDrawerMode,
+                enableOcclusionCulling = m_GPUResidentDrawerEnableOcclusionCullingInCameras,
+                supportDitheringCrossFade = m_EnableLODCrossFade,
+                allowInEditMode = true,
+                smallMeshScreenPercentage = m_SmallMeshScreenPercentage,
 #if UNITY_EDITOR
-            pickingShader = Shader.Find("Hidden/Universal Render Pipeline/BRGPicking"),
+                pickingShader = Shader.Find("Hidden/Universal Render Pipeline/BRGPicking"),
 #endif
-            errorShader = Shader.Find("Hidden/Universal Render Pipeline/FallbackError"),
-            loadingShader = Shader.Find("Hidden/Universal Render Pipeline/FallbackLoading"),
-        };
+                errorShader = Shader.Find("Hidden/Universal Render Pipeline/FallbackError"),
+                loadingShader = Shader.Find("Hidden/Universal Render Pipeline/FallbackLoading"),
+            };
 
         // Deprecated settings
-        [SerializeField] ShadowQuality m_ShadowType = ShadowQuality.HardShadows;
-        [SerializeField] bool m_LocalShadowsSupported = false;
-        [SerializeField] ShadowResolution m_LocalShadowsAtlasResolution = ShadowResolution._256;
-        [SerializeField] int m_MaxPixelLights = 0;
-        [SerializeField] ShadowResolution m_ShadowAtlasResolution = ShadowResolution._256;
+        [SerializeField]
+        ShadowQuality m_ShadowType = ShadowQuality.HardShadows;
 
-        [SerializeField] VolumeFrameworkUpdateMode m_VolumeFrameworkUpdateMode = VolumeFrameworkUpdateMode.EveryFrame;
+        [SerializeField]
+        bool m_LocalShadowsSupported = false;
 
-        [SerializeField] VolumeProfile m_VolumeProfile;
+        [SerializeField]
+        ShadowResolution m_LocalShadowsAtlasResolution = ShadowResolution._256;
+
+        [SerializeField]
+        int m_MaxPixelLights = 0;
+
+        [SerializeField]
+        ShadowResolution m_ShadowAtlasResolution = ShadowResolution._256;
+
+        [SerializeField]
+        VolumeFrameworkUpdateMode m_VolumeFrameworkUpdateMode = VolumeFrameworkUpdateMode.EveryFrame;
+
+        [SerializeField]
+        VolumeProfile m_VolumeProfile;
 
         // Note: A lut size of 16^3 is barely usable with the HDR grading mode. 32 should be the
         // minimum, the lut being encoded in log. Lower sizes would work better with an additional
@@ -688,7 +878,8 @@ namespace UnityEngine.Rendering.Universal
             var instance = CreateInstance<UniversalRenderPipelineAsset>();
 
             // Initialize default renderer data
-            instance.m_RendererDataList[0] = (rendererData != null) ? rendererData : CreateInstance<UniversalRendererData>();
+            instance.m_RendererDataList[0] =
+                (rendererData != null) ? rendererData : CreateInstance<UniversalRendererData>();
 
             // Only enable for new URP assets by default
             instance.m_ConservativeEnclosingSphere = true;
@@ -704,18 +895,34 @@ namespace UnityEngine.Rendering.Universal
             public override void Action(EntityId entityId, string pathName, string resourceFile)
             {
                 //Create asset
-                AssetDatabase.CreateAsset(Create(CreateRendererAsset(pathName, RendererType.UniversalRenderer)), pathName);
+                AssetDatabase.CreateAsset(
+                    Create(CreateRendererAsset(pathName, RendererType.UniversalRenderer)),
+                    pathName
+                );
             }
         }
 
-        [MenuItem("Assets/Create/Rendering/URP Asset (with Universal Renderer)", priority = CoreUtils.Sections.section2 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 1)]
+        [MenuItem(
+            "Assets/Create/Rendering/URP Asset (with Universal Renderer)",
+            priority = CoreUtils.Sections.section2 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 1
+        )]
         static void CreateUniversalPipeline()
         {
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None, CreateInstance<CreateUniversalPipelineAsset>(),
-                "New Universal Render Pipeline Asset.asset", CoreUtils.GetIconForType<UniversalRenderPipelineAsset>(), null);
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
+                EntityId.None,
+                CreateInstance<CreateUniversalPipelineAsset>(),
+                "New Universal Render Pipeline Asset.asset",
+                CoreUtils.GetIconForType<UniversalRenderPipelineAsset>(),
+                null
+            );
         }
 
-        internal static ScriptableRendererData CreateRendererAsset(string path, RendererType type, bool relativePath = true, string suffix = "Renderer")
+        internal static ScriptableRendererData CreateRendererAsset(
+            string path,
+            RendererType type,
+            bool relativePath = true,
+            string suffix = "Renderer"
+        )
         {
             ScriptableRendererData data = CreateRendererData(type);
             string dataPath;
@@ -743,6 +950,7 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 #endif
+
         /// <summary>
         /// Use this class to initialize the rendererData element that is required by the renderer.
         /// </summary>
@@ -753,8 +961,7 @@ namespace UnityEngine.Rendering.Universal
         {
 #if UNITY_EDITOR
             EditorUtility.SetDirty(this);
-            return m_RendererDataList[0] =
-                CreateRendererAsset("Assets/UniversalRenderer.asset", type, false);
+            return m_RendererDataList[0] = CreateRendererAsset("Assets/UniversalRenderer.asset", type, false);
 #else
             m_RendererDataList[0] = null;
             return m_RendererDataList[0];
@@ -784,7 +991,10 @@ namespace UnityEngine.Rendering.Universal
                 m_RendererDataList = new ScriptableRendererData[1];
 
             // If no default data we can't create pipeline instance
-            if (m_DefaultRendererIndex >= m_RendererDataList.Length || m_RendererDataList[m_DefaultRendererIndex] == null)
+            if (
+                m_DefaultRendererIndex >= m_RendererDataList.Length
+                || m_RendererDataList[m_DefaultRendererIndex] == null
+            )
             {
                 // If previous version and current version are miss-matched then we are waiting for the upgrader to kick in
                 if (k_AssetPreviousVersion != k_AssetVersion)
@@ -792,7 +1002,8 @@ namespace UnityEngine.Rendering.Universal
 
                 Debug.LogError(
                     $"Default Renderer is missing, make sure there is a Renderer assigned as the default on the current Universal RP asset:{UniversalRenderPipeline.asset.name}",
-                    this);
+                    this
+                );
                 return null;
             }
 
@@ -841,7 +1052,9 @@ namespace UnityEngine.Rendering.Universal
                 for (int i = 0; i < m_Renderers.Length; ++i)
                 {
                     if (m_Renderers[i] != null)
-                        Debug.LogError($"Creating renderers but previous instance wasn't properly destroyed: m_Renderers[{i}]");
+                        Debug.LogError(
+                            $"Creating renderers but previous instance wasn't properly destroyed: m_Renderers[{i}]"
+                        );
                 }
             }
 
@@ -862,7 +1075,10 @@ namespace UnityEngine.Rendering.Universal
         {
             get
             {
-                if (m_RendererDataList?.Length > m_DefaultRendererIndex && m_RendererDataList[m_DefaultRendererIndex] == null)
+                if (
+                    m_RendererDataList?.Length > m_DefaultRendererIndex
+                    && m_RendererDataList[m_DefaultRendererIndex] == null
+                )
                 {
                     Debug.LogError("Default renderer is missing from the current Pipeline Asset.", this);
                     return null;
@@ -898,7 +1114,8 @@ namespace UnityEngine.Rendering.Universal
             {
                 Debug.LogWarning(
                     $"Renderer at index {index.ToString()} is missing, falling back to Default Renderer {m_RendererDataList[m_DefaultRendererIndex].name}",
-                    this);
+                    this
+                );
                 index = m_DefaultRendererIndex;
             }
 
@@ -951,7 +1168,7 @@ namespace UnityEngine.Rendering.Universal
 
                 index = m_DefaultRendererIndex; //out of range index fallback on default
             }
-            
+
             result = m_RendererDataList[index];
             return result != null;
         }
@@ -961,11 +1178,15 @@ namespace UnityEngine.Rendering.Universal
             get
             {
                 GUIContent[] list = new GUIContent[m_RendererDataList.Length + 1];
-                list[0] = new GUIContent($"Default Renderer ({RendererDataDisplayName(m_RendererDataList[m_DefaultRendererIndex])})");
+                list[0] = new GUIContent(
+                    $"Default Renderer ({RendererDataDisplayName(m_RendererDataList[m_DefaultRendererIndex])})"
+                );
 
                 for (var i = 1; i < list.Length; i++)
                 {
-                    list[i] = new GUIContent($"{(i - 1).ToString()}: {RendererDataDisplayName(m_RendererDataList[i - 1])}");
+                    list[i] = new GUIContent(
+                        $"{(i - 1).ToString()}: {RendererDataDisplayName(m_RendererDataList[i - 1])}"
+                    );
                 }
                 return list;
             }
@@ -978,15 +1199,26 @@ namespace UnityEngine.Rendering.Universal
 
             return "NULL (Missing RendererData)";
         }
-
 #endif
+
         private static GraphicsFormat[][] s_LightCookieFormatList = new GraphicsFormat[][]
         {
-            /* Grayscale Low */ new GraphicsFormat[] {GraphicsFormat.R8_UNorm},
-            /* Grayscale High*/ new GraphicsFormat[] {GraphicsFormat.R16_UNorm},
-            /* Color Low     */ new GraphicsFormat[] {GraphicsFormat.R5G6B5_UNormPack16, GraphicsFormat.B5G6R5_UNormPack16, GraphicsFormat.R5G5B5A1_UNormPack16, GraphicsFormat.B5G5R5A1_UNormPack16},
-            /* Color High    */ new GraphicsFormat[] {GraphicsFormat.A2B10G10R10_UNormPack32, GraphicsFormat.R8G8B8A8_SRGB, GraphicsFormat.B8G8R8A8_SRGB},
-            /* Color HDR     */ new GraphicsFormat[] {GraphicsFormat.B10G11R11_UFloatPack32},
+            /* Grayscale Low */new GraphicsFormat[] { GraphicsFormat.R8_UNorm },
+            /* Grayscale High*/new GraphicsFormat[] { GraphicsFormat.R16_UNorm },
+            /* Color Low     */new GraphicsFormat[]
+            {
+                GraphicsFormat.R5G6B5_UNormPack16,
+                GraphicsFormat.B5G6R5_UNormPack16,
+                GraphicsFormat.R5G5B5A1_UNormPack16,
+                GraphicsFormat.B5G5R5A1_UNormPack16,
+            },
+            /* Color High    */new GraphicsFormat[]
+            {
+                GraphicsFormat.A2B10G10R10_UNormPack32,
+                GraphicsFormat.R8G8B8A8_SRGB,
+                GraphicsFormat.B8G8R8A8_SRGB,
+            },
+            /* Color HDR     */new GraphicsFormat[] { GraphicsFormat.B10G11R11_UFloatPack32 },
         };
 
         internal GraphicsFormat additionalLightsCookieFormat
@@ -1010,14 +1242,17 @@ namespace UnityEngine.Rendering.Universal
                 if (result == GraphicsFormat.None)
                 {
                     result = GraphicsFormat.R8G8B8A8_UNorm;
-                    Debug.LogWarning($"Additional Lights Cookie Format ({ m_AdditionalLightsCookieFormat.ToString() }) is not supported by the platform. Falling back to {GraphicsFormatUtility.GetBlockSize(result) * 8}-bit format ({GraphicsFormatUtility.GetFormatString(result)})");
+                    Debug.LogWarning(
+                        $"Additional Lights Cookie Format ({m_AdditionalLightsCookieFormat.ToString()}) is not supported by the platform. Falling back to {GraphicsFormatUtility.GetBlockSize(result) * 8}-bit format ({GraphicsFormatUtility.GetFormatString(result)})"
+                    );
                 }
 
                 return result;
             }
         }
 
-        internal Vector2Int additionalLightsCookieResolution => new Vector2Int((int)m_AdditionalLightsCookieResolution, (int)m_AdditionalLightsCookieResolution);
+        internal Vector2Int additionalLightsCookieResolution =>
+            new Vector2Int((int)m_AdditionalLightsCookieResolution, (int)m_AdditionalLightsCookieResolution);
 
         internal int[] rendererIndexList
         {
@@ -1125,7 +1360,6 @@ namespace UnityEngine.Rendering.Universal
         /// Note: Filter selections differ from actual filters in that they may include "meta-filters" such as
         ///       "Automatic" which resolve to an actual filter at a later time.
         /// </summary>
-
 #if ENABLE_UPSCALER_FRAMEWORK
         [Obsolete("upscalingFilter is replaced by upscalerName #from(6000.3)", false)]
 #endif
@@ -1134,7 +1368,6 @@ namespace UnityEngine.Rendering.Universal
             get => m_UpscalingFilter;
             set => m_UpscalingFilter = value;
         }
-
 
         /// <summary>
         /// Returns the name of the selected upscaling filter.
@@ -1166,7 +1399,7 @@ namespace UnityEngine.Rendering.Universal
         /// <returns>The matching <see cref="UpscalerOptions"/> asset if found; otherwise, null.</returns>
         public UpscalerOptions GetUpscalerOptions(string UpscalerName)
         {
-            foreach(UpscalerOptions option in m_UpscalerOptions)
+            foreach (UpscalerOptions option in m_UpscalerOptions)
             {
                 if (option == null)
                     continue;
@@ -1238,7 +1471,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Support GPU Streaming for Probe Volumes.
         /// </summary>
-        [Obsolete( "This is obsolete, use supportProbeVolumeGPUStreaming instead. #from(2023.3)")]
+        [Obsolete("This is obsolete, use supportProbeVolumeGPUStreaming instead. #from(2023.3)")]
         public bool supportProbeVolumeStreaming
         {
             get => m_SupportProbeVolumeGPUStreaming;
@@ -1396,13 +1629,22 @@ namespace UnityEngine.Rendering.Universal
 
         internal int GetAdditionalLightsShadowResolution(int additionalLightsShadowResolutionTier)
         {
-            if (additionalLightsShadowResolutionTier <= UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow /* 0 */)
+            if (
+                additionalLightsShadowResolutionTier
+                <= UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow /* 0 */
+            )
                 return additionalLightsShadowResolutionTierLow;
 
-            if (additionalLightsShadowResolutionTier == UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierMedium /* 1 */)
+            if (
+                additionalLightsShadowResolutionTier
+                == UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierMedium /* 1 */
+            )
                 return additionalLightsShadowResolutionTierMedium;
 
-            if (additionalLightsShadowResolutionTier >= UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierHigh /* 2 */)
+            if (
+                additionalLightsShadowResolutionTier
+                >= UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierHigh /* 2 */
+            )
                 return additionalLightsShadowResolutionTierHigh;
 
             return additionalLightsShadowResolutionTierMedium;
@@ -1477,7 +1719,9 @@ namespace UnityEngine.Rendering.Universal
             {
                 if (value < k_ShadowCascadeMinCount || value > k_ShadowCascadeMaxCount)
                 {
-                    throw new ArgumentException($"Value ({value}) needs to be between {k_ShadowCascadeMinCount} and {k_ShadowCascadeMaxCount}.");
+                    throw new ArgumentException(
+                        $"Value ({value}) needs to be between {k_ShadowCascadeMinCount} and {k_ShadowCascadeMaxCount}."
+                    );
                 }
                 m_ShadowCascadeCount = value;
             }
@@ -1562,7 +1806,10 @@ namespace UnityEngine.Rendering.Universal
         /// Specifies if this <c>UniversalRenderPipelineAsset</c> should use dynamic batching.
         /// </summary>
         /// <see href="https://docs.unity3d.com/Manual/DrawCallBatching.html"/>
-        [Obsolete("supportsDynamicBatching is deprecated and will be removed in a future release. #from(6000.5)", false)]
+        [Obsolete(
+            "supportsDynamicBatching is deprecated and will be removed in a future release. #from(6000.5)",
+            false
+        )]
         public bool supportsDynamicBatching
         {
             get => m_SupportsDynamicBatching;
@@ -1691,17 +1938,24 @@ namespace UnityEngine.Rendering.Universal
         protected override bool requiresCompatibleRenderPipelineGlobalSettings => true;
 
         /// <summary>Names used for display of rendering layer masks.</summary>
-        [Obsolete("This property is obsolete. Use RenderingLayerMask API and Tags & Layers project settings instead. #from(2023.3)")]
+        [Obsolete(
+            "This property is obsolete. Use RenderingLayerMask API and Tags & Layers project settings instead. #from(2023.3)"
+        )]
         public override string[] renderingLayerMaskNames => RenderingLayerMask.GetDefinedRenderingLayerNames();
 
         /// <summary>Names used for display of rendering layer masks with prefix.</summary>
-        [Obsolete("This property is obsolete. Use RenderingLayerMask API and Tags & Layers project settings instead. #from(2023.3)")]
+        [Obsolete(
+            "This property is obsolete. Use RenderingLayerMask API and Tags & Layers project settings instead. #from(2023.3)"
+        )]
         public override string[] prefixedRenderingLayerMaskNames => Array.Empty<string>();
 
         /// <summary>
         /// Names used for display of light layers.
         /// </summary>
-        [Obsolete("This is obsolete, please use renderingLayerMaskNames instead. #from(2023.1) #breakingFrom(2023.1)", true)]
+        [Obsolete(
+            "This is obsolete, please use renderingLayerMaskNames instead. #from(2023.1) #breakingFrom(2023.1)",
+            true
+        )]
         public string[] lightLayerMaskNames => new string[0];
 
         /// <summary>
@@ -1738,9 +1992,12 @@ namespace UnityEngine.Rendering.Universal
 
         static class Strings
         {
-            public static readonly string nullRenderer = $"{nameof(GPUResidentDrawer)} Disabled. One or more Scriptable Renderer in the Render Pipeline Asset is null.";
-            public static readonly string notURPRenderer = $"{nameof(GPUResidentDrawer)} Disabled. One or more Scriptable Renderer in the Render Pipeline Asset is not of the type {nameof(UniversalRendererData)}.";
-            public static readonly string renderingModeIncompatible = $"{nameof(GPUResidentDrawer)} Disabled due to some configured Universal Renderers not using the Forward+ or Deferred+ rendering paths.";
+            public static readonly string nullRenderer =
+                $"{nameof(GPUResidentDrawer)} Disabled. One or more Scriptable Renderer in the Render Pipeline Asset is null.";
+            public static readonly string notURPRenderer =
+                $"{nameof(GPUResidentDrawer)} Disabled. One or more Scriptable Renderer in the Render Pipeline Asset is not of the type {nameof(UniversalRendererData)}.";
+            public static readonly string renderingModeIncompatible =
+                $"{nameof(GPUResidentDrawer)} Disabled due to some configured Universal Renderers not using the Forward+ or Deferred+ rendering paths.";
         }
 
         /// <inheritdoc/>
@@ -1794,9 +2051,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Unity raises a callback to this method before it serializes the asset.
         /// </summary>
-        public void OnBeforeSerialize()
-        {
-        }
+        public void OnBeforeSerialize() { }
 
         /// <summary>
         /// Unity raises a callback to this method after it deserializes the asset.
@@ -1866,16 +2121,22 @@ namespace UnityEngine.Rendering.Universal
             if (k_AssetVersion < 9)
             {
                 bool assetContainsCustomAdditionalLightShadowResolutions =
-                    m_AdditionalLightsShadowResolutionTierHigh != AdditionalLightsDefaultShadowResolutionTierHigh ||
-                    m_AdditionalLightsShadowResolutionTierMedium != AdditionalLightsDefaultShadowResolutionTierMedium ||
-                    m_AdditionalLightsShadowResolutionTierLow != AdditionalLightsDefaultShadowResolutionTierLow;
+                    m_AdditionalLightsShadowResolutionTierHigh != AdditionalLightsDefaultShadowResolutionTierHigh
+                    || m_AdditionalLightsShadowResolutionTierMedium != AdditionalLightsDefaultShadowResolutionTierMedium
+                    || m_AdditionalLightsShadowResolutionTierLow != AdditionalLightsDefaultShadowResolutionTierLow;
 
                 if (!assetContainsCustomAdditionalLightShadowResolutions)
                 {
                     // if all resolutions are still the default values, we assume that they have never been customized and that it is safe to upgrade them to fit better the Additional Lights Shadow Atlas size
                     m_AdditionalLightsShadowResolutionTierHigh = (int)m_AdditionalLightsShadowmapResolution;
-                    m_AdditionalLightsShadowResolutionTierMedium = Mathf.Max(m_AdditionalLightsShadowResolutionTierHigh / 2, UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution);
-                    m_AdditionalLightsShadowResolutionTierLow = Mathf.Max(m_AdditionalLightsShadowResolutionTierMedium / 2, UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution);
+                    m_AdditionalLightsShadowResolutionTierMedium = Mathf.Max(
+                        m_AdditionalLightsShadowResolutionTierHigh / 2,
+                        UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution
+                    );
+                    m_AdditionalLightsShadowResolutionTierLow = Mathf.Max(
+                        m_AdditionalLightsShadowResolutionTierMedium / 2,
+                        UniversalAdditionalLightData.AdditionalLightsShadowMinimumResolution
+                    );
                 }
 
                 k_AssetPreviousVersion = k_AssetVersion;
@@ -1917,7 +2178,8 @@ namespace UnityEngine.Rendering.Universal
 #if UNITY_EDITOR
         static void UpgradeAsset(EntityId assetInstanceID)
         {
-            UniversalRenderPipelineAsset asset = EditorUtility.EntityIdToObject(assetInstanceID) as UniversalRenderPipelineAsset;
+            UniversalRenderPipelineAsset asset =
+                EditorUtility.EntityIdToObject(assetInstanceID) as UniversalRenderPipelineAsset;
 
             if (asset.k_AssetPreviousVersion < 5)
             {
@@ -1950,7 +2212,7 @@ namespace UnityEngine.Rendering.Universal
             {
 #pragma warning disable 618 // Obsolete warning
                 var instance = UniversalRenderPipelineGlobalSettings.Ensure();
-                instance.m_ShaderVariantLogLevel = (Rendering.ShaderVariantLogLevel) asset.m_ShaderVariantLogLevel;
+                instance.m_ShaderVariantLogLevel = (Rendering.ShaderVariantLogLevel)asset.m_ShaderVariantLogLevel;
 #pragma warning restore 618 // Obsolete warning
                 asset.k_AssetPreviousVersion = 10;
             }
@@ -1978,7 +2240,6 @@ namespace UnityEngine.Rendering.Universal
             ResourceReloader.ReloadAllNullIn(asset, packagePath);
             EditorUtility.SetDirty(asset);
         }
-
 #endif
 
         float ValidateShadowBias(float value)
@@ -1993,7 +2254,10 @@ namespace UnityEngine.Rendering.Universal
 
         float ValidateRenderScale(float value)
         {
-            return Mathf.Max(UniversalRenderPipeline.minRenderScale, Mathf.Min(value, UniversalRenderPipeline.maxRenderScale));
+            return Mathf.Max(
+                UniversalRenderPipeline.minRenderScale,
+                Mathf.Min(value, UniversalRenderPipeline.maxRenderScale)
+            );
         }
 
         /// <summary>
@@ -2066,6 +2330,5 @@ namespace UnityEngine.Rendering.Universal
 #endif
             }
         }
-
     }
 }

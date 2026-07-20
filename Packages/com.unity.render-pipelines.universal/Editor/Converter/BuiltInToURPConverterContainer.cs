@@ -1,6 +1,5 @@
 using UnityEngine.Rendering.Universal;
 
-
 namespace UnityEditor.Rendering.Universal
 {
     [URPHelpURL("features/rp-converter")]

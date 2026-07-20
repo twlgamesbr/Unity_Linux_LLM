@@ -1,17 +1,27 @@
-using UnityEngine;
 using UnityEditor;
-
+using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomEditor(typeof(TextMeshPro), true), CanEditMultipleObjects]
     public class TMP_EditorPanel : TMP_BaseEditorPanel
     {
-        static readonly GUIContent k_SortingLayerLabel = new GUIContent("Sorting Layer", "Name of the Renderer's sorting layer.");
-        static readonly GUIContent k_OrderInLayerLabel = new GUIContent("Order in Layer", "Renderer's order within a sorting layer.");
-        static readonly GUIContent k_OrthographicLabel = new GUIContent("Orthographic Mode", "Should be enabled when using an orthographic camera. Instructs the shader to not perform any perspective correction.");
-        static readonly GUIContent k_VolumetricLabel = new GUIContent("Volumetric Setup", "Use cubes rather than quads to render the text. Allows for volumetric rendering when combined with a compatible shader.");
+        static readonly GUIContent k_SortingLayerLabel = new GUIContent(
+            "Sorting Layer",
+            "Name of the Renderer's sorting layer."
+        );
+        static readonly GUIContent k_OrderInLayerLabel = new GUIContent(
+            "Order in Layer",
+            "Renderer's order within a sorting layer."
+        );
+        static readonly GUIContent k_OrthographicLabel = new GUIContent(
+            "Orthographic Mode",
+            "Should be enabled when using an orthographic camera. Instructs the shader to not perform any perspective correction."
+        );
+        static readonly GUIContent k_VolumetricLabel = new GUIContent(
+            "Volumetric Setup",
+            "Use cubes rather than quads to render the text. Allows for volumetric rendering when combined with a compatible shader."
+        );
 
         private static string[] k_SortingLayerNames;
         bool IsPreset;
@@ -28,7 +38,6 @@ namespace TMPro.EditorUtilities
         SerializedProperty m_TextSortingLayerProp;
         SerializedProperty m_TextSortingLayerIDProp;
         SerializedProperty m_TextSortingOrderProp;
-
 
         protected override void OnEnable()
         {
@@ -69,7 +78,6 @@ namespace TMPro.EditorUtilities
 
             if (Foldout.extraSettings)
             {
-
                 DrawMargins();
 
                 DrawSortingLayer();
@@ -93,7 +101,6 @@ namespace TMPro.EditorUtilities
                 DrawFontFeatures();
 
                 DrawPadding();
-                
             }
         }
 
@@ -110,7 +117,9 @@ namespace TMPro.EditorUtilities
             EditorGUI.BeginProperty(rect, k_SortingLayerLabel, sortingLayerIDProp);
             EditorGUI.BeginChangeCheck();
 
-            int currentLayerIndex = SortingLayerHelper.GetSortingLayerIndexFromSortingLayerID(sortingLayerIDProp.intValue);
+            int currentLayerIndex = SortingLayerHelper.GetSortingLayerIndexFromSortingLayerID(
+                sortingLayerIDProp.intValue
+            );
             int newLayerIndex = EditorGUI.Popup(rect, k_SortingLayerLabel, currentLayerIndex, k_SortingLayerNames);
 
             if (EditorGUI.EndChangeCheck())
@@ -197,6 +206,5 @@ namespace TMPro.EditorUtilities
                 }
             }
         }
-
     }
 }

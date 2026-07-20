@@ -6,7 +6,9 @@ namespace UnityEngine.Rendering.Universal
 {
     internal class DecalDrawGBufferSystem : DecalDrawSystem
     {
-        public DecalDrawGBufferSystem(DecalEntityManager entityManager) : base("DecalDrawGBufferSystem.Execute", entityManager) { }
+        public DecalDrawGBufferSystem(DecalEntityManager entityManager)
+            : base("DecalDrawGBufferSystem.Execute", entityManager) { }
+
         protected override int GetPassIndex(DecalCachedChunk decalCachedChunk) => decalCachedChunk.passIndexGBuffer;
     }
 
@@ -19,7 +21,11 @@ namespace UnityEngine.Rendering.Universal
         private DeferredLights m_DeferredLights;
         private bool m_DecalLayers;
 
-        public DecalGBufferRenderPass(DecalScreenSpaceSettings settings, DecalDrawGBufferSystem drawSystem, bool decalLayers)
+        public DecalGBufferRenderPass(
+            DecalScreenSpaceSettings settings,
+            DecalDrawGBufferSystem drawSystem,
+            bool decalLayers
+        )
         {
             renderPassEvent = RenderPassEvent.AfterRenderingGbuffer;
 
@@ -63,9 +69,18 @@ namespace UnityEngine.Rendering.Universal
         {
             NormalReconstruction.SetupProperties(cmd, passData.cameraData);
 
-            cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendLow, passData.settings.normalBlend == DecalNormalBlend.Low);
-            cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendMedium, passData.settings.normalBlend == DecalNormalBlend.Medium);
-            cmd.SetKeyword(ShaderGlobalKeywords.DecalNormalBlendHigh, passData.settings.normalBlend == DecalNormalBlend.High);
+            cmd.SetKeyword(
+                ShaderGlobalKeywords.DecalNormalBlendLow,
+                passData.settings.normalBlend == DecalNormalBlend.Low
+            );
+            cmd.SetKeyword(
+                ShaderGlobalKeywords.DecalNormalBlendMedium,
+                passData.settings.normalBlend == DecalNormalBlend.Medium
+            );
+            cmd.SetKeyword(
+                ShaderGlobalKeywords.DecalNormalBlendHigh,
+                passData.settings.normalBlend == DecalNormalBlend.High
+            );
 
             cmd.SetKeyword(ShaderGlobalKeywords.DecalLayers, passData.decalLayers);
 
@@ -79,7 +94,9 @@ namespace UnityEngine.Rendering.Universal
             TextureHandle cameraDepthTexture = resourceData.cameraDepthTexture;
             TextureHandle renderingLayersTexture = resourceData.renderingLayersTexture;
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 UniversalRenderingData renderingData = frameData.Get<UniversalRenderingData>();
                 UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
@@ -103,18 +120,25 @@ namespace UnityEngine.Rendering.Universal
                     builder.SetInputAttachment(resourceData.gBuffer[5], 1);
 
                 SortingCriteria sortingCriteria = passData.cameraData.defaultOpaqueSortFlags;
-                DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(m_ShaderTagIdList, renderingData,
-                    passData.cameraData, lightData, sortingCriteria);
+                DrawingSettings drawingSettings = RenderingUtils.CreateDrawingSettings(
+                    m_ShaderTagIdList,
+                    renderingData,
+                    passData.cameraData,
+                    lightData,
+                    sortingCriteria
+                );
                 var param = new RendererListParams(renderingData.cullResults, drawingSettings, m_FilteringSettings);
                 passData.rendererList = renderGraph.CreateRendererList(param);
                 builder.UseRendererList(passData.rendererList);
 
                 builder.AllowGlobalStateModification(true);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext rgContext) =>
-                {
-                    ExecutePass(rgContext.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext rgContext) =>
+                    {
+                        ExecutePass(rgContext.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
 

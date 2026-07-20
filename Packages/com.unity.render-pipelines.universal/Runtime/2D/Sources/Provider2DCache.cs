@@ -6,9 +6,11 @@ using UnityEditor;
 namespace UnityEngine.Rendering.Universal
 {
     [Serializable]
-    internal class Provider2DCache<T> : IProvider2DCache where T : Provider2D
+    internal class Provider2DCache<T> : IProvider2DCache
+        where T : Provider2D
     {
-        [SerializeField] private List<Provider2DKVPair> m_Cache = new List<Provider2DKVPair>();
+        [SerializeField]
+        private List<Provider2DKVPair> m_Cache = new List<Provider2DKVPair>();
 
         public IEnumerable<Provider2DKVPair> Cache
         {
@@ -27,9 +29,9 @@ namespace UnityEngine.Rendering.Universal
 
         static int CacheContainsKeyAt(List<Provider2DKVPair> cache, Provider2DInfo key)
         {
-            for(int i=0;i < cache.Count; i++)
+            for (int i = 0; i < cache.Count; i++)
             {
-                Provider2DKVPair pair  = cache[i];
+                Provider2DKVPair pair = cache[i];
                 if (IsProviderInfoEqual(key, pair.m_Key))
                     return i;
             }
@@ -37,17 +39,21 @@ namespace UnityEngine.Rendering.Universal
             return -1;
         }
 
-        internal static bool AreProviderCachesEqual(Provider2DCache<T> a, Provider2DCache<T> b, Action<string> onNotEqual)
+        internal static bool AreProviderCachesEqual(
+            Provider2DCache<T> a,
+            Provider2DCache<T> b,
+            Action<string> onNotEqual
+        )
         {
-            if(a.m_Cache.Count != b.m_Cache.Count)
+            if (a.m_Cache.Count != b.m_Cache.Count)
             {
                 onNotEqual("Cache sizes are Different Sizes");
                 return false;
             }
 
             for (int i = 0; i < a.m_Cache.Count; i++)
-            { 
-                if(!IsProviderInfoEqual(a.m_Cache[i].m_Key, b.m_Cache[i].m_Key))
+            {
+                if (!IsProviderInfoEqual(a.m_Cache[i].m_Key, b.m_Cache[i].m_Key))
                 {
                     onNotEqual("Key info is different");
                     return false;
@@ -68,7 +74,7 @@ namespace UnityEngine.Rendering.Universal
 
         static bool IsProviderInfoEqual(Provider2DInfo a, Provider2DInfo b)
         {
-            if(a.m_Component == null || b.m_Component == null)
+            if (a.m_Component == null || b.m_Component == null)
                 return a.m_TypeName == b.m_TypeName && a.m_Component == b.m_Component;
             else
                 return a.m_TypeName == b.m_TypeName && a.m_Component.GetType().Name == b.m_Component.GetType().Name;
@@ -110,7 +116,6 @@ namespace UnityEngine.Rendering.Universal
             m_Cache.Clear();
             for (int i = 0; i < activeProviders.Count; i++)
                 m_Cache.Add(activeProviders[i]);
-
         }
     }
 }

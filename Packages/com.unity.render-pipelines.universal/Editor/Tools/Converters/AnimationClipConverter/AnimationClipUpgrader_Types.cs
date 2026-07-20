@@ -29,7 +29,9 @@ namespace UnityEditor.Rendering
         internal struct AnimationClipProxy : IAnimationClip
         {
             public AnimationClip Clip { get; set; }
+
             public EditorCurveBinding[] GetCurveBindings() => AnimationUtility.GetCurveBindings(Clip);
+
             public void ReplaceBindings(EditorCurveBinding[] oldBindings, EditorCurveBinding[] newBindings)
             {
                 var curves = new AnimationCurve[oldBindings.Length];
@@ -42,17 +44,19 @@ namespace UnityEditor.Rendering
             }
 
             public static implicit operator AnimationClip(AnimationClipProxy proxy) => proxy.Clip;
-            public static implicit operator AnimationClipProxy(AnimationClip clip) => new AnimationClipProxy { Clip = clip };
+
+            public static implicit operator AnimationClipProxy(AnimationClip clip) =>
+                new AnimationClipProxy { Clip = clip };
+
             public override string ToString() => Clip.ToString();
         }
 
-        internal interface IRenderer
-        {
-        }
+        internal interface IRenderer { }
 
         internal struct RendererProxy : IRenderer
         {
             Renderer m_Renderer;
+
             public void GetSharedMaterials(List<IMaterial> materials)
             {
                 materials.Clear();
@@ -63,7 +67,10 @@ namespace UnityEditor.Rendering
             }
 
             public static implicit operator Renderer(RendererProxy proxy) => proxy.m_Renderer;
-            public static implicit operator RendererProxy(Renderer renderer) => new RendererProxy { m_Renderer = renderer };
+
+            public static implicit operator RendererProxy(Renderer renderer) =>
+                new RendererProxy { m_Renderer = renderer };
+
             public override string ToString() => m_Renderer.ToString();
         }
 
@@ -79,27 +86,42 @@ namespace UnityEditor.Rendering
         internal struct ClipPath : IAssetPath
         {
             public string Path { get; set; }
+
             public static implicit operator string(ClipPath clip) => clip.Path;
+
             public static implicit operator ClipPath(string path) => new ClipPath { Path = path };
-            public static implicit operator ClipPath(AnimationClip clip) => new ClipPath { Path = AssetDatabase.GetAssetPath(clip) };
+
+            public static implicit operator ClipPath(AnimationClip clip) =>
+                new ClipPath { Path = AssetDatabase.GetAssetPath(clip) };
+
             public override string ToString() => Path;
         }
 
         internal struct PrefabPath : IAssetPath
         {
             public string Path { get; set; }
+
             public static implicit operator string(PrefabPath prefab) => prefab.Path;
+
             public static implicit operator PrefabPath(string path) => new PrefabPath { Path = path };
-            public static implicit operator PrefabPath(GameObject go) => new PrefabPath { Path = AssetDatabase.GetAssetPath(go) };
+
+            public static implicit operator PrefabPath(GameObject go) =>
+                new PrefabPath { Path = AssetDatabase.GetAssetPath(go) };
+
             public override string ToString() => Path;
         }
 
         internal struct ScenePath : IAssetPath
         {
             public string Path { get; set; }
+
             public static implicit operator string(ScenePath scene) => scene.Path;
+
             public static implicit operator ScenePath(string path) => new ScenePath { Path = path };
-            public static implicit operator ScenePath(SceneAsset scene) => new ScenePath { Path = AssetDatabase.GetAssetPath(scene) };
+
+            public static implicit operator ScenePath(SceneAsset scene) =>
+                new ScenePath { Path = AssetDatabase.GetAssetPath(scene) };
+
             public override string ToString() => Path;
         }
 

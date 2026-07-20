@@ -55,7 +55,9 @@ namespace Unity.Netcode.Editor
         /// <inheritdoc/>
         public override void OnEnable()
         {
-            m_SwitchTransformSpaceWhenParented = serializedObject.FindProperty(nameof(NetworkTransform.SwitchTransformSpaceWhenParented));
+            m_SwitchTransformSpaceWhenParented = serializedObject.FindProperty(
+                nameof(NetworkTransform.SwitchTransformSpaceWhenParented)
+            );
             m_TickSyncChildren = serializedObject.FindProperty(nameof(NetworkTransform.TickSyncChildren));
             m_UseUnreliableDeltas = serializedObject.FindProperty(nameof(NetworkTransform.UseUnreliableDeltas));
             m_SyncPositionXProperty = serializedObject.FindProperty(nameof(NetworkTransform.SyncPositionX));
@@ -73,21 +75,35 @@ namespace Unity.Netcode.Editor
             m_InLocalSpaceProperty = serializedObject.FindProperty(nameof(NetworkTransform.InLocalSpace));
             m_InterpolateProperty = serializedObject.FindProperty(nameof(NetworkTransform.Interpolate));
 
-            m_PositionInterpolationTypeProperty = serializedObject.FindProperty(nameof(NetworkTransform.PositionInterpolationType));
-            m_PositionMaximumInterpolationTimeProperty = serializedObject.FindProperty(nameof(NetworkTransform.PositionMaxInterpolationTime));
-            m_RotationInterpolationTypeProperty = serializedObject.FindProperty(nameof(NetworkTransform.RotationInterpolationType));
-            m_RotationMaximumInterpolationTimeProperty = serializedObject.FindProperty(nameof(NetworkTransform.RotationMaxInterpolationTime));
-            m_ScaleInterpolationTypeProperty = serializedObject.FindProperty(nameof(NetworkTransform.ScaleInterpolationType));
-            m_ScaleMaximumInterpolationTimeProperty = serializedObject.FindProperty(nameof(NetworkTransform.ScaleMaxInterpolationTime));
+            m_PositionInterpolationTypeProperty = serializedObject.FindProperty(
+                nameof(NetworkTransform.PositionInterpolationType)
+            );
+            m_PositionMaximumInterpolationTimeProperty = serializedObject.FindProperty(
+                nameof(NetworkTransform.PositionMaxInterpolationTime)
+            );
+            m_RotationInterpolationTypeProperty = serializedObject.FindProperty(
+                nameof(NetworkTransform.RotationInterpolationType)
+            );
+            m_RotationMaximumInterpolationTimeProperty = serializedObject.FindProperty(
+                nameof(NetworkTransform.RotationMaxInterpolationTime)
+            );
+            m_ScaleInterpolationTypeProperty = serializedObject.FindProperty(
+                nameof(NetworkTransform.ScaleInterpolationType)
+            );
+            m_ScaleMaximumInterpolationTimeProperty = serializedObject.FindProperty(
+                nameof(NetworkTransform.ScaleMaxInterpolationTime)
+            );
 
             m_PositionLerpSmoothing = serializedObject.FindProperty(nameof(NetworkTransform.PositionLerpSmoothing));
             m_RotationLerpSmoothing = serializedObject.FindProperty(nameof(NetworkTransform.RotationLerpSmoothing));
             m_ScaleLerpSmoothing = serializedObject.FindProperty(nameof(NetworkTransform.ScaleLerpSmoothing));
 
-
-
-            m_UseQuaternionSynchronization = serializedObject.FindProperty(nameof(NetworkTransform.UseQuaternionSynchronization));
-            m_UseQuaternionCompression = serializedObject.FindProperty(nameof(NetworkTransform.UseQuaternionCompression));
+            m_UseQuaternionSynchronization = serializedObject.FindProperty(
+                nameof(NetworkTransform.UseQuaternionSynchronization)
+            );
+            m_UseQuaternionCompression = serializedObject.FindProperty(
+                nameof(NetworkTransform.UseQuaternionCompression)
+            );
             m_UseHalfFloatPrecision = serializedObject.FindProperty(nameof(NetworkTransform.UseHalfFloatPrecision));
             m_SlerpPosition = serializedObject.FindProperty(nameof(NetworkTransform.SlerpPosition));
             m_AuthorityMode = serializedObject.FindProperty(nameof(NetworkTransform.AuthorityMode));
@@ -101,7 +117,13 @@ namespace Unity.Netcode.Editor
             {
                 GUILayout.BeginHorizontal();
 
-                var rect = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, s_MaxRowWidth, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight, EditorStyles.numberField);
+                var rect = GUILayoutUtility.GetRect(
+                    EditorGUIUtility.fieldWidth,
+                    s_MaxRowWidth,
+                    EditorGUIUtility.singleLineHeight,
+                    EditorGUIUtility.singleLineHeight,
+                    EditorStyles.numberField
+                );
                 var ctid = GUIUtility.GetControlID(7231, FocusType.Keyboard, rect);
 
                 rect = EditorGUI.PrefixLabel(rect, ctid, s_PositionLabel);
@@ -120,7 +142,13 @@ namespace Unity.Netcode.Editor
             {
                 GUILayout.BeginHorizontal();
 
-                var rect = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, s_MaxRowWidth, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight, EditorStyles.numberField);
+                var rect = GUILayoutUtility.GetRect(
+                    EditorGUIUtility.fieldWidth,
+                    s_MaxRowWidth,
+                    EditorGUIUtility.singleLineHeight,
+                    EditorGUIUtility.singleLineHeight,
+                    EditorStyles.numberField
+                );
                 var ctid = GUIUtility.GetControlID(7231, FocusType.Keyboard, rect);
 
                 rect = EditorGUI.PrefixLabel(rect, ctid, s_RotationLabel);
@@ -144,7 +172,13 @@ namespace Unity.Netcode.Editor
             {
                 GUILayout.BeginHorizontal();
 
-                var rect = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, s_MaxRowWidth, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight, EditorStyles.numberField);
+                var rect = GUILayoutUtility.GetRect(
+                    EditorGUIUtility.fieldWidth,
+                    s_MaxRowWidth,
+                    EditorGUIUtility.singleLineHeight,
+                    EditorGUIUtility.singleLineHeight,
+                    EditorStyles.numberField
+                );
                 var ctid = GUIUtility.GetControlID(7231, FocusType.Keyboard, rect);
 
                 rect = EditorGUI.PrefixLabel(rect, ctid, s_ScaleLabel);
@@ -195,7 +229,9 @@ namespace Unity.Netcode.Editor
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PropertyField(m_UseUnreliableDeltas);
-                EditorGUILayout.LabelField($"Cannot use with {nameof(NetworkTransform.SwitchTransformSpaceWhenParented)}.");
+                EditorGUILayout.LabelField(
+                    $"Cannot use with {nameof(NetworkTransform.SwitchTransformSpaceWhenParented)}."
+                );
                 EditorGUILayout.EndHorizontal();
             }
             else
@@ -235,7 +271,10 @@ namespace Unity.Netcode.Editor
                 {
                     EditorGUILayout.Space();
                 }
-                DrawPropertyField(m_InterpolateProperty, networkTransform.Interpolate ? FontStyle.Bold : FontStyle.Normal);
+                DrawPropertyField(
+                    m_InterpolateProperty,
+                    networkTransform.Interpolate ? FontStyle.Bold : FontStyle.Normal
+                );
                 if (networkTransform.Interpolate)
                 {
                     BeginIndent();
@@ -244,7 +283,10 @@ namespace Unity.Netcode.Editor
                         DrawPropertyField(m_PositionInterpolationTypeProperty);
 
                         BeginIndent();
-                        if (networkTransform.PositionInterpolationType != NetworkTransform.InterpolationTypes.SmoothDampening)
+                        if (
+                            networkTransform.PositionInterpolationType
+                            != NetworkTransform.InterpolationTypes.SmoothDampening
+                        )
                         {
                             DrawPropertyField(m_SlerpPosition);
                         }
@@ -297,18 +339,30 @@ namespace Unity.Netcode.Editor
 
 #if COM_UNITY_MODULES_PHYSICS
             // if rigidbody is present but network rigidbody is not present
-            if (networkTransform.TryGetComponent<Rigidbody>(out _) && networkTransform.TryGetComponent<NetworkRigidbody>(out _) == false)
+            if (
+                networkTransform.TryGetComponent<Rigidbody>(out _)
+                && networkTransform.TryGetComponent<NetworkRigidbody>(out _) == false
+            )
             {
-                EditorGUILayout.HelpBox("This GameObject contains a Rigidbody but no NetworkRigidbody.\n" +
-                    "Add a NetworkRigidbody component to improve Rigidbody synchronization.", MessageType.Warning);
+                EditorGUILayout.HelpBox(
+                    "This GameObject contains a Rigidbody but no NetworkRigidbody.\n"
+                        + "Add a NetworkRigidbody component to improve Rigidbody synchronization.",
+                    MessageType.Warning
+                );
             }
 #endif // COM_UNITY_MODULES_PHYSICS
 
 #if COM_UNITY_MODULES_PHYSICS2D
-            if (networkTransform.TryGetComponent<Rigidbody2D>(out _) && networkTransform.TryGetComponent<NetworkRigidbody2D>(out _) == false)
+            if (
+                networkTransform.TryGetComponent<Rigidbody2D>(out _)
+                && networkTransform.TryGetComponent<NetworkRigidbody2D>(out _) == false
+            )
             {
-                EditorGUILayout.HelpBox("This GameObject contains a Rigidbody2D but no NetworkRigidbody2D.\n" +
-                    "Add a NetworkRigidbody2D component to improve Rigidbody2D synchronization.", MessageType.Warning);
+                EditorGUILayout.HelpBox(
+                    "This GameObject contains a Rigidbody2D but no NetworkRigidbody2D.\n"
+                        + "Add a NetworkRigidbody2D component to improve Rigidbody2D synchronization.",
+                    MessageType.Warning
+                );
             }
 #endif // COM_UNITY_MODULES_PHYSICS2D
         }
@@ -344,7 +398,12 @@ namespace Unity.Netcode.Editor
                 networkTransform.NetworkTransformExpanded = expanded;
             }
 
-            DrawFoldOutGroup<NetworkTransform>(networkTransform.GetType(), DisplayNetworkTransformProperties, networkTransform.NetworkTransformExpanded, SetExpanded);
+            DrawFoldOutGroup<NetworkTransform>(
+                networkTransform.GetType(),
+                DisplayNetworkTransformProperties,
+                networkTransform.NetworkTransformExpanded,
+                SetExpanded
+            );
             base.OnInspectorGUI();
         }
     }

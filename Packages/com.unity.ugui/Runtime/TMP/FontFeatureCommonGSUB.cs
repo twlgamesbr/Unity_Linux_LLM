@@ -23,12 +23,20 @@ namespace TMPro
         /// <summary>
         /// The index of the target glyph being substituted.
         /// </summary>
-        public uint targetGlyphID { get { return m_TargetGlyphID; } set { m_TargetGlyphID = value; } }
+        public uint targetGlyphID
+        {
+            get { return m_TargetGlyphID; }
+            set { m_TargetGlyphID = value; }
+        }
 
         /// <summary>
         /// Array that contains the index of the glyphs replacing the single target glyph.
         /// </summary>
-        public uint[] substituteGlyphIDs { get { return m_SubstituteGlyphIDs; } set { m_SubstituteGlyphIDs = value; } }
+        public uint[] substituteGlyphIDs
+        {
+            get { return m_SubstituteGlyphIDs; }
+            set { m_SubstituteGlyphIDs = value; }
+        }
 
         // =============================================
         // Private backing fields for public properties.
@@ -45,10 +53,7 @@ namespace TMPro
     /// The AlternateSubstitutionRecord defines the substitution of a single glyph by several potential alternative glyphs.
     /// </summary>
     [Serializable]
-    public struct AlternateSubstitutionRecord
-    {
-
-    }
+    public struct AlternateSubstitutionRecord { }
 
     /// <summary>
     /// The LigatureSubstitutionRecord defines the substitution of multiple glyphs by a single glyph.
@@ -59,12 +64,20 @@ namespace TMPro
         /// <summary>
         /// Array that contains the index of the glyphs being substituted.
         /// </summary>
-        public uint[] componentGlyphIDs { get { return m_ComponentGlyphIDs; } set { m_ComponentGlyphIDs = value; } }
+        public uint[] componentGlyphIDs
+        {
+            get { return m_ComponentGlyphIDs; }
+            set { m_ComponentGlyphIDs = value; }
+        }
 
         /// <summary>
         /// The index of the replacement glyph.
         /// </summary>
-        public uint ligatureGlyphID { get { return m_LigatureGlyphID; } set { m_LigatureGlyphID = value; } }
+        public uint ligatureGlyphID
+        {
+            get { return m_LigatureGlyphID; }
+            set { m_LigatureGlyphID = value; }
+        }
 
         // =============================================
         // Private backing fields for public properties.
@@ -75,18 +88,18 @@ namespace TMPro
 
         [SerializeField]
         private uint m_LigatureGlyphID;
-        
+
         // =============================================
         // Operator overrides
         // =============================================
 
-        public static bool operator==(LigatureSubstitutionRecord lhs, LigatureSubstitutionRecord rhs)
+        public static bool operator ==(LigatureSubstitutionRecord lhs, LigatureSubstitutionRecord rhs)
         {
             if (lhs.ligatureGlyphID != rhs.m_LigatureGlyphID)
                 return false;
-            
+
             int lhsComponentCount = lhs.m_ComponentGlyphIDs.Length;
-            
+
             if (lhsComponentCount != rhs.m_ComponentGlyphIDs.Length)
                 return false;
 
@@ -99,7 +112,7 @@ namespace TMPro
             return true;
         }
 
-        public static bool operator!=(LigatureSubstitutionRecord lhs, LigatureSubstitutionRecord rhs)
+        public static bool operator !=(LigatureSubstitutionRecord lhs, LigatureSubstitutionRecord rhs)
         {
             return !(lhs == rhs);
         }

@@ -33,10 +33,8 @@ namespace NPCSystem.Initialization
                     NPCFlowLogLevel.Debug,
                     "Skipped smoke validation because dialogue manager is not initialized yet (deferred loading active).",
                     source: nameof(SmokeValidationPhase),
-                    data: new Dictionary<string, object>
-                    {
-                        ["correlationId"] = ctx.CorrelationId
-                    });
+                    data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId }
+                );
                 return;
             }
 
@@ -64,8 +62,9 @@ namespace NPCSystem.Initialization
                     data: new Dictionary<string, object>
                     {
                         ["correlationId"] = ctx.CorrelationId,
-                        ["exception"] = ex.GetType().Name
-                    });
+                        ["exception"] = ex.GetType().Name,
+                    }
+                );
                 passed = false;
             }
 
@@ -75,11 +74,8 @@ namespace NPCSystem.Initialization
                 passed ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
                 passed ? "Smoke validation passed." : "Smoke validation failed \u2014 see previous logs for details.",
                 source: nameof(SmokeValidationPhase),
-                data: new Dictionary<string, object>
-                {
-                    ["correlationId"] = ctx.CorrelationId,
-                    ["passed"] = passed
-                });
+                data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId, ["passed"] = passed }
+            );
 
             if (!passed)
             {
@@ -97,13 +93,10 @@ namespace NPCSystem.Initialization
                 NPCFlowStatus.Error,
                 NPCFlowLogLevel.Error,
                 $"Required reference {refName} is not assigned. "
-                + "Wire it in the Inspector — FindAnyObjectByType is not used.",
+                    + "Wire it in the Inspector — FindAnyObjectByType is not used.",
                 source: nameof(SmokeValidationPhase),
-                data: new Dictionary<string, object>
-                {
-                    ["correlationId"] = ctx.CorrelationId,
-                    ["missingRef"] = refName
-                });
+                data: new Dictionary<string, object> { ["correlationId"] = ctx.CorrelationId, ["missingRef"] = refName }
+            );
         }
     }
 }

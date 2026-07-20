@@ -45,20 +45,16 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
             const string k_TypeIndexPropertyName = nameof(MetricId.TypeIndex);
             const string k_EnumValuePropertyName = nameof(MetricId.EnumValue);
 
-            var fields = typeof(MetricId)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+            var fields = typeof(MetricId).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-            k_TypeIndexFieldName = fields
-                .First(info => info.Name.Contains(k_TypeIndexPropertyName))
-                .Name;
+            k_TypeIndexFieldName = fields.First(info => info.Name.Contains(k_TypeIndexPropertyName)).Name;
 
-            k_EnumValueFieldName = fields
-                .First(info => info.Name.Contains(k_EnumValuePropertyName))
-                .Name;
+            k_EnumValueFieldName = fields.First(info => info.Name.Contains(k_EnumValuePropertyName)).Name;
 
-            k_AvailableTypes = MetricIdTypeLibrary.Types
-                .Where(t => t.CustomAttributes
-                    .All(attr => attr.AttributeType != typeof(MetricTypeEnumHideInInspectorAttribute)))
+            k_AvailableTypes = MetricIdTypeLibrary
+                .Types.Where(t =>
+                    t.CustomAttributes.All(attr => attr.AttributeType != typeof(MetricTypeEnumHideInInspectorAttribute))
+                )
                 .ToArray();
 
             ComputeTypeDisplayNamesWithoutClashes();
@@ -94,9 +90,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
                     }
                 }
 
-                var nameShown = nameClash
-                    ? k_AvailableTypes[i].FullName
-                    : availableTypeShortNames[i];
+                var nameShown = nameClash ? k_AvailableTypes[i].FullName : availableTypeShortNames[i];
                 k_TypeNamesShown.Add(nameShown);
             }
         }
@@ -125,18 +119,22 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
                 ;
                 content.Add(m_TypeDropdown);
 
-                m_TypeDropdown.RegisterValueChangedCallback((evt =>
-                {
-                    var newTypeSelectionIndex = m_TypeDropdown.index;
-                    var newType = k_AvailableTypes[newTypeSelectionIndex];
-                    var newValueIndex = 0;
+                m_TypeDropdown.RegisterValueChangedCallback(
+                    (
+                        evt =>
+                        {
+                            var newTypeSelectionIndex = m_TypeDropdown.index;
+                            var newType = k_AvailableTypes[newTypeSelectionIndex];
+                            var newValueIndex = 0;
 
-                    m_TypeIndexProperty.intValue = MetricIdTypeLibrary.GetTypeIndex(newType);
-                    RefreshValueChoicesForType(newType);
-                    m_ValueDropdown.index = newValueIndex;
-                    UpdateStoredValueFromDropdownIndex();
-                    CommitSerializedPropertyChanges();
-                }));
+                            m_TypeIndexProperty.intValue = MetricIdTypeLibrary.GetTypeIndex(newType);
+                            RefreshValueChoicesForType(newType);
+                            m_ValueDropdown.index = newValueIndex;
+                            UpdateStoredValueFromDropdownIndex();
+                            CommitSerializedPropertyChanges();
+                        }
+                    )
+                );
             }
 
             m_ValueDropdown.label = "Value";
@@ -145,11 +143,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
             var value = m_EnumValueProperty.intValue;
             int index = values.IndexOf(value);
             m_ValueDropdown.index = index;
-            m_ValueDropdown.RegisterValueChangedCallback((evt =>
-            {
-                UpdateStoredValueFromDropdownIndex();
-                CommitSerializedPropertyChanges();
-            }));
+            m_ValueDropdown.RegisterValueChangedCallback(
+                (
+                    evt =>
+                    {
+                        UpdateStoredValueFromDropdownIndex();
+                        CommitSerializedPropertyChanges();
+                    }
+                )
+            );
 
             content.Add(m_ValueDropdown);
         }

@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.UIElements;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -11,7 +11,10 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The TypeDropdown Attribute can only be attached to string fields", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The TypeDropdown Attribute can only be attached to string fields",
+                    HelpBoxMessageType.Error
+                );
 
             List<string> dropdownValues = GetTypeList();
             DropdownField typeDropdown = CreateDropdownField(dropdownValues, property);
@@ -31,7 +34,9 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"Could not paste value <b>{dropdownValue}</b> since is not availiable as an option in the dropdown");
+                Debug.LogWarning(
+                    $"Could not paste value <b>{dropdownValue}</b> since is not availiable as an option in the dropdown"
+                );
             }
         }
 
@@ -66,11 +71,15 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"The value <b>{property.stringValue}</b> set to the <b>{property.name}</b> variable is not a valid type string.", property.serializedObject.targetObject);
+                Debug.LogWarning(
+                    $"The value <b>{property.stringValue}</b> set to the <b>{property.name}</b> variable is not a valid type string.",
+                    property.serializedObject.targetObject
+                );
             }
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.String;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.String;
 
         private List<string> GetTypeList()
         {
@@ -78,12 +87,18 @@ namespace EditorAttributes.Editor
 
             List<string> typeNameList = new();
 
-            TypeCache.TypeCollection typeCollection = (typeDropdownAttribute.BaseTypeFilter, typeDropdownAttribute.AssemblyName) switch
+            TypeCache.TypeCollection typeCollection = (
+                typeDropdownAttribute.BaseTypeFilter,
+                typeDropdownAttribute.AssemblyName
+            ) switch
             {
                 (null, "") => TypeCache.GetTypesDerivedFrom<object>(),
                 (null, _) => TypeCache.GetTypesDerivedFrom<object>(typeDropdownAttribute.AssemblyName),
                 (_, "") => TypeCache.GetTypesDerivedFrom(typeDropdownAttribute.BaseTypeFilter),
-                (_, _) => TypeCache.GetTypesDerivedFrom(typeDropdownAttribute.BaseTypeFilter, typeDropdownAttribute.AssemblyName),
+                (_, _) => TypeCache.GetTypesDerivedFrom(
+                    typeDropdownAttribute.BaseTypeFilter,
+                    typeDropdownAttribute.AssemblyName
+                ),
             };
 
             foreach (var item in typeCollection)

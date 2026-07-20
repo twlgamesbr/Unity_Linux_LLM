@@ -9,12 +9,13 @@ namespace UnityEditor.TestTools.TestRunner
     {
         private string m_oldApplicationIdentifier;
         private string m_oldDeviceSocketAddress;
+
         [SerializeField]
         private bool m_Stripping;
 
         private bool RequiresLegacyConnectionMechanism =>
 #if !UNITY_2021_2_OR_NEWER
-             true;
+            true;
 #else
             false;
 #endif
@@ -43,8 +44,13 @@ namespace UnityEditor.TestTools.TestRunner
             while (tryCount-- > 0 && connectionResult == -1)
             {
                 connectionResult = EditorConnectionInternal.ConnectPlayerProxy(IPAddress.Loopback.ToString(), 34999);
-                if (EditorUtility.DisplayCancelableProgressBar("Editor Connection", "Connecting to the player",
-                    1 - ((float)tryCount / maxTryCount)))
+                if (
+                    EditorUtility.DisplayCancelableProgressBar(
+                        "Editor Connection",
+                        "Connecting to the player",
+                        1 - ((float)tryCount / maxTryCount)
+                    )
+                )
                 {
                     EditorUtility.ClearProgressBar();
                     throw new TestLaunchFailedException();
@@ -53,7 +59,8 @@ namespace UnityEditor.TestTools.TestRunner
             EditorUtility.ClearProgressBar();
             if (connectionResult == -1)
                 throw new TestLaunchFailedException(
-                    "Timed out trying to connect to the player. Player failed to launch or crashed soon after launching");
+                    "Timed out trying to connect to the player. Player failed to launch or crashed soon after launching"
+                );
         }
 
         public void Setup()
@@ -65,8 +72,6 @@ namespace UnityEditor.TestTools.TestRunner
             m_oldApplicationIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android);
             PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.UnityTestRunner.UnityTestRunner");
 #endif
-            
-
             if (RequiresLegacyConnectionMechanism)
                 PerformLegacySetup();
 
@@ -80,9 +85,7 @@ namespace UnityEditor.TestTools.TestRunner
             PlayerSettings.stripEngineCode = m_Stripping;
         }
 
-        public void PostSuccessfulBuildAction()
-        {
-        }
+        public void PostSuccessfulBuildAction() { }
 
         public void PostSuccessfulLaunchAction()
         {

@@ -13,11 +13,24 @@ namespace Unity.Rendering
             var group = GetEntityQuery(
                 new EntityQueryDesc
                 {
-                    Any = new ComponentType[] { typeof(MeshLODGroupComponent), typeof(MeshLODComponent), typeof(LODGroupWorldReferencePoint) },
-                    All = new ComponentType[] { typeof(Static) }
-                });
+                    Any = new ComponentType[]
+                    {
+                        typeof(MeshLODGroupComponent),
+                        typeof(MeshLODComponent),
+                        typeof(LODGroupWorldReferencePoint),
+                    },
+                    All = new ComponentType[] { typeof(Static) },
+                }
+            );
 
-            EntityManager.RemoveComponent(group, new ComponentTypeSet(typeof(MeshLODGroupComponent), typeof(MeshLODComponent), typeof(LODGroupWorldReferencePoint)));
+            EntityManager.RemoveComponent(
+                group,
+                new ComponentTypeSet(
+                    typeof(MeshLODGroupComponent),
+                    typeof(MeshLODComponent),
+                    typeof(LODGroupWorldReferencePoint)
+                )
+            );
         }
     }
 }

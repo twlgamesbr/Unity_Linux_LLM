@@ -15,7 +15,7 @@ namespace UnityEditor.Rendering
             Up = 1 << 1,
             Right = 1 << 2,
             Down = 1 << 3,
-            All = Left | Up | Right | Down
+            All = Left | Up | Right | Down,
         }
 
         static readonly Vector3[] directionalLightHandlesRayPositions =
@@ -27,7 +27,7 @@ namespace UnityEditor.Rendering
             new Vector3(1, 1, 0).normalized,
             new Vector3(1, -1, 0).normalized,
             new Vector3(-1, 1, 0).normalized,
-            new Vector3(-1, -1, 0).normalized
+            new Vector3(-1, -1, 0).normalized,
         };
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace UnityEditor.Rendering
 
             Vector3 lightPos = light.transform.position;
             float lightSize;
-            using (new Handles.DrawingScope(Matrix4x4.identity))    //be sure no matrix affect the size computation
+            using (new Handles.DrawingScope(Matrix4x4.identity)) //be sure no matrix affect the size computation
             {
                 lightSize = HandleUtility.GetHandleSize(lightPos);
             }
@@ -200,7 +200,9 @@ namespace UnityEditor.Rendering
                     default:
                         return;
                 }
-                string labelText = FormattableString.Invariant($"w:{light.areaSize.x:0.00} x h:{light.areaSize.y:0.00}");
+                string labelText = FormattableString.Invariant(
+                    $"w:{light.areaSize.x:0.00} x h:{light.areaSize.y:0.00}"
+                );
                 DrawHandleLabel(labelPosition, labelText);
             }
         }
@@ -315,12 +317,18 @@ namespace UnityEditor.Rendering
             var style = new GUIStyle { normal = { background = Texture2D.whiteTexture } };
             GUI.color = new Color(0.82f, 0.82f, 0.82f, 1);
 
-            labelPosition = handlePosition + HandleUtility.GetHandleSize(handlePosition) * offsetFromHandle * Handles.inverseMatrix.MultiplyVector(Vector3.up);
+            labelPosition =
+                handlePosition
+                + HandleUtility.GetHandleSize(handlePosition)
+                    * offsetFromHandle
+                    * Handles.inverseMatrix.MultiplyVector(Vector3.up);
             Handles.Label(labelPosition, labelText, style);
         }
 
-        static readonly BoxBoundsHandle s_AreaLightHandle =
-            new BoxBoundsHandle { axes = PrimitiveBoundsHandle.Axes.X | PrimitiveBoundsHandle.Axes.Y };
+        static readonly BoxBoundsHandle s_AreaLightHandle = new BoxBoundsHandle
+        {
+            axes = PrimitiveBoundsHandle.Axes.X | PrimitiveBoundsHandle.Axes.Y,
+        };
 
         static Vector2 DoRectHandles(Vector2 size)
         {
@@ -331,8 +339,11 @@ namespace UnityEditor.Rendering
             return s_AreaLightHandle.size;
         }
 
-        static readonly SphereBoundsHandle s_DiscLightHandle =
-            new SphereBoundsHandle { axes = PrimitiveBoundsHandle.Axes.X | PrimitiveBoundsHandle.Axes.Y };
+        static readonly SphereBoundsHandle s_DiscLightHandle = new SphereBoundsHandle
+        {
+            axes = PrimitiveBoundsHandle.Axes.X | PrimitiveBoundsHandle.Axes.Y,
+        };
+
         static float DoDiscHandles(float radius)
         {
             s_DiscLightHandle.center = Vector3.zero;
@@ -342,8 +353,10 @@ namespace UnityEditor.Rendering
             return s_DiscLightHandle.radius;
         }
 
-        static readonly SphereBoundsHandle s_PointLightHandle =
-            new SphereBoundsHandle { axes = PrimitiveBoundsHandle.Axes.All };
+        static readonly SphereBoundsHandle s_PointLightHandle = new SphereBoundsHandle
+        {
+            axes = PrimitiveBoundsHandle.Axes.All,
+        };
 
         static float DoPointHandles(float range)
         {
@@ -450,7 +463,13 @@ namespace UnityEditor.Rendering
             if (light.shadows != LightShadows.None && light.lightmapBakeType != LightmapBakeType.Baked)
             {
                 EditorGUI.BeginChangeCheck();
-                nearPlaneRange = SliderLineHandle(GUIUtility.GetControlID(FocusType.Passive), Vector3.zero, Vector3.forward, nearPlaneRange, "Near Plane: ");
+                nearPlaneRange = SliderLineHandle(
+                    GUIUtility.GetControlID(FocusType.Passive),
+                    Vector3.zero,
+                    Vector3.forward,
+                    nearPlaneRange,
+                    "Near Plane: "
+                );
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RecordObjects(new[] { light }, "Undo shadow near plane change.");
@@ -520,7 +539,9 @@ namespace UnityEditor.Rendering
             var outerDiscRadius = range * Mathf.Sin(outerAngle * Mathf.Deg2Rad * 0.5f);
             var outerDiscDistance = Mathf.Cos(Mathf.Deg2Rad * outerAngle * 0.5f) * range;
             var vectorLineUp = Vector3.Normalize(Vector3.forward * outerDiscDistance + Vector3.up * outerDiscRadius);
-            var vectorLineLeft = Vector3.Normalize(Vector3.forward * outerDiscDistance + Vector3.left * outerDiscRadius);
+            var vectorLineLeft = Vector3.Normalize(
+                Vector3.forward * outerDiscDistance + Vector3.left * outerDiscRadius
+            );
 
             // Need to check if we need to draw inner angle
             // Need to disable this for now until we get all the inner angle baking working.
@@ -565,8 +586,14 @@ namespace UnityEditor.Rendering
             var shadowDiscRadius = Mathf.Tan(spotlight.spotAngle * Mathf.Deg2Rad * 0.5f) * spotlight.shadowNearPlane;
             var shadowDiscDistance = spotlight.shadowNearPlane;
             Handles.DrawWireDisc(Vector3.forward * shadowDiscDistance, Vector3.forward, shadowDiscRadius);
-            Handles.DrawLine(Vector3.forward * shadowDiscDistance, (Vector3.right * shadowDiscRadius) + (Vector3.forward * shadowDiscDistance));
-            Handles.DrawLine(Vector3.forward * shadowDiscDistance, (-Vector3.right * shadowDiscRadius) + (Vector3.forward * shadowDiscDistance));
+            Handles.DrawLine(
+                Vector3.forward * shadowDiscDistance,
+                (Vector3.right * shadowDiscRadius) + (Vector3.forward * shadowDiscDistance)
+            );
+            Handles.DrawLine(
+                Vector3.forward * shadowDiscDistance,
+                (-Vector3.right * shadowDiscRadius) + (Vector3.forward * shadowDiscDistance)
+            );
 
             Handles.color = previousColor;
         }
@@ -602,7 +629,13 @@ namespace UnityEditor.Rendering
             Handles.DrawWireDisc(rangeCenter, Vector3.forward, radius);
         }
 
-        static float DrawConeHandles(Vector3 position, float angle, float range, HandleDirections handleDirections, string controlName)
+        static float DrawConeHandles(
+            Vector3 position,
+            float angle,
+            float range,
+            HandleDirections handleDirections,
+            string controlName
+        )
         {
             if (handleDirections.HasFlag(HandleDirections.Left))
             {
@@ -645,7 +678,14 @@ namespace UnityEditor.Rendering
             return value;
         }
 
-        static float SizeSliderSpotAngle(Vector3 position, Vector3 forward, Vector3 axis, float range, float spotAngle, string controlName)
+        static float SizeSliderSpotAngle(
+            Vector3 position,
+            Vector3 forward,
+            Vector3 axis,
+            float range,
+            float spotAngle,
+            string controlName
+        )
         {
             if (Math.Abs(spotAngle) <= 0.05f)
                 return spotAngle;
@@ -655,7 +695,10 @@ namespace UnityEditor.Rendering
             GUI.changed = false;
             var handlePosition = position + forward * range;
             var id = GUIUtility.GetControlID(FocusType.Passive);
-            var newMagnitude = Mathf.Max(0f, SliderLineHandle(id, handlePosition, centerToLeftOnSphere.normalized, centerToLeftOnSphere.magnitude));
+            var newMagnitude = Mathf.Max(
+                0f,
+                SliderLineHandle(id, handlePosition, centerToLeftOnSphere.normalized, centerToLeftOnSphere.magnitude)
+            );
             if (GUI.changed)
             {
                 centerToLeftOnSphere = centerToLeftOnSphere.normalized * newMagnitude;

@@ -46,6 +46,7 @@ namespace UnityEditor.UI
                 rightAlignedLabel.alignment = TextAnchor.MiddleRight;
             }
         }
+
         private static Styles s_Styles;
         private bool bIsPreset;
 
@@ -66,7 +67,10 @@ namespace UnityEditor.UI
             if (m_SerializedObject == null || m_SerializedObject.targetObject == null)
                 bIsPreset = false;
             else
-                bIsPreset = m_SerializedObject.targetObject is Component ? ((int)(m_SerializedObject.targetObject as Component).gameObject.hideFlags == 93) : !AssetDatabase.Contains(m_SerializedObject.targetObject);
+                bIsPreset =
+                    m_SerializedObject.targetObject is Component
+                        ? ((int)(m_SerializedObject.targetObject as Component).gameObject.hideFlags == 93)
+                        : !AssetDatabase.Contains(m_SerializedObject.targetObject);
         }
 
         public override void OnInspectorGUI()
@@ -98,7 +102,10 @@ namespace UnityEditor.UI
                         allAreRoot = false;
                         break;
                     }
-                    if (showWorld && canvas.renderMode != RenderMode.WorldSpace || !showWorld && canvas.renderMode == RenderMode.WorldSpace)
+                    if (
+                        showWorld && canvas.renderMode != RenderMode.WorldSpace
+                        || !showWorld && canvas.renderMode == RenderMode.WorldSpace
+                    )
                     {
                         showWorldDiffers = true;
                         break;
@@ -146,10 +153,22 @@ namespace UnityEditor.UI
                 {
                     EditorGUILayout.PropertyField(m_ReferenceResolution);
                     EditorGUILayout.PropertyField(m_ScreenMatchMode);
-                    if (m_ScreenMatchMode.enumValueIndex == (int)CanvasScaler.ScreenMatchMode.MatchWidthOrHeight && !m_ScreenMatchMode.hasMultipleDifferentValues)
+                    if (
+                        m_ScreenMatchMode.enumValueIndex == (int)CanvasScaler.ScreenMatchMode.MatchWidthOrHeight
+                        && !m_ScreenMatchMode.hasMultipleDifferentValues
+                    )
                     {
-                        Rect r = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight + kSliderEndpointLabelsHeight);
-                        DualLabeledSlider(r, m_MatchWidthOrHeight, s_Styles.matchContent, s_Styles.widthContent, s_Styles.heightContent);
+                        Rect r = EditorGUILayout.GetControlRect(
+                            true,
+                            EditorGUIUtility.singleLineHeight + kSliderEndpointLabelsHeight
+                        );
+                        DualLabeledSlider(
+                            r,
+                            m_MatchWidthOrHeight,
+                            s_Styles.matchContent,
+                            s_Styles.widthContent,
+                            s_Styles.heightContent
+                        );
                     }
                 }
                 // Constant physical size
@@ -166,7 +185,13 @@ namespace UnityEditor.UI
             serializedObject.ApplyModifiedProperties();
         }
 
-        private static void DualLabeledSlider(Rect position, SerializedProperty property, GUIContent mainLabel, GUIContent labelLeft, GUIContent labelRight)
+        private static void DualLabeledSlider(
+            Rect position,
+            SerializedProperty property,
+            GUIContent mainLabel,
+            GUIContent labelLeft,
+            GUIContent labelRight
+        )
         {
             position.height = EditorGUIUtility.singleLineHeight;
             Rect pos = position;

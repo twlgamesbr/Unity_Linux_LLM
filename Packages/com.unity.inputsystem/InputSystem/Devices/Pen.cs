@@ -84,17 +84,67 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Button mask for which buttons on the pen are active.
         /// </summary>
         /// <value>Bitmask for buttons on the pen.</value>
-        [InputControl(name = "tip", displayName = "Tip", layout = "Button", bit = (int)PenButton.Tip, usage = "PrimaryAction")]
+        [InputControl(
+            name = "tip",
+            displayName = "Tip",
+            layout = "Button",
+            bit = (int)PenButton.Tip,
+            usage = "PrimaryAction"
+        )]
         [InputControl(name = "press", useStateFrom = "tip", synthetic = true, usages = new string[0])]
         [InputControl(name = "eraser", displayName = "Eraser", layout = "Button", bit = (int)PenButton.Eraser)]
-        [InputControl(name = "inRange", displayName = "In Range?", layout = "Button", bit = (int)PenButton.InRange, synthetic = true)]
-        [InputControl(name = "barrel1", displayName = "Barrel Button #1", layout = "Button", bit = (int)PenButton.BarrelFirst, alias = "barrelFirst", usage = "SecondaryAction")]
-        [InputControl(name = "barrel2", displayName = "Barrel Button #2", layout = "Button", bit = (int)PenButton.BarrelSecond, alias = "barrelSecond")]
-        [InputControl(name = "barrel3", displayName = "Barrel Button #3", layout = "Button", bit = (int)PenButton.BarrelThird, alias = "barrelThird")]
-        [InputControl(name = "barrel4", displayName = "Barrel Button #4", layout = "Button", bit = (int)PenButton.BarrelFourth, alias = "barrelFourth")]
+        [InputControl(
+            name = "inRange",
+            displayName = "In Range?",
+            layout = "Button",
+            bit = (int)PenButton.InRange,
+            synthetic = true
+        )]
+        [InputControl(
+            name = "barrel1",
+            displayName = "Barrel Button #1",
+            layout = "Button",
+            bit = (int)PenButton.BarrelFirst,
+            alias = "barrelFirst",
+            usage = "SecondaryAction"
+        )]
+        [InputControl(
+            name = "barrel2",
+            displayName = "Barrel Button #2",
+            layout = "Button",
+            bit = (int)PenButton.BarrelSecond,
+            alias = "barrelSecond"
+        )]
+        [InputControl(
+            name = "barrel3",
+            displayName = "Barrel Button #3",
+            layout = "Button",
+            bit = (int)PenButton.BarrelThird,
+            alias = "barrelThird"
+        )]
+        [InputControl(
+            name = "barrel4",
+            displayName = "Barrel Button #4",
+            layout = "Button",
+            bit = (int)PenButton.BarrelFourth,
+            alias = "barrelFourth"
+        )]
         // "Park" unused controls.
-        [InputControl(name = "radius", layout = "Vector2", format = "VEC2", sizeInBits = 64, usage = "Radius", offset = InputStateBlock.AutomaticOffset)]
-        [InputControl(name = "pointerId", layout = "Digital", format = "UINT", sizeInBits = 32, offset = InputStateBlock.AutomaticOffset)] ////TODO: this should be used
+        [InputControl(
+            name = "radius",
+            layout = "Vector2",
+            format = "VEC2",
+            sizeInBits = 64,
+            usage = "Radius",
+            offset = InputStateBlock.AutomaticOffset
+        )]
+        [InputControl(
+            name = "pointerId",
+            layout = "Digital",
+            format = "UINT",
+            sizeInBits = 32,
+            offset = InputStateBlock.AutomaticOffset
+        )] ////TODO: this should be used
         [FieldOffset(32)]
         public ushort buttons;
 
@@ -320,7 +370,7 @@ namespace UnityEngine.InputSystem
         /// <summary>
         /// The pen that was active or connected last or <c>null</c> if there is no pen.
         /// </summary>
-        public new static Pen current { get; internal set; }
+        public static new Pen current { get; internal set; }
 
         /// <summary>
         /// Return the given pen button.
@@ -333,13 +383,20 @@ namespace UnityEngine.InputSystem
             {
                 switch (button)
                 {
-                    case PenButton.Tip: return tip;
-                    case PenButton.Eraser: return eraser;
-                    case PenButton.BarrelFirst: return firstBarrelButton;
-                    case PenButton.BarrelSecond: return secondBarrelButton;
-                    case PenButton.BarrelThird: return thirdBarrelButton;
-                    case PenButton.BarrelFourth: return fourthBarrelButton;
-                    case PenButton.InRange: return inRange;
+                    case PenButton.Tip:
+                        return tip;
+                    case PenButton.Eraser:
+                        return eraser;
+                    case PenButton.BarrelFirst:
+                        return firstBarrelButton;
+                    case PenButton.BarrelSecond:
+                        return secondBarrelButton;
+                    case PenButton.BarrelThird:
+                        return thirdBarrelButton;
+                    case PenButton.BarrelFourth:
+                        return fourthBarrelButton;
+                    case PenButton.InRange:
+                        return inRange;
                     default:
                         throw new InvalidEnumArgumentException(nameof(button), (int)button, typeof(PenButton));
                 }

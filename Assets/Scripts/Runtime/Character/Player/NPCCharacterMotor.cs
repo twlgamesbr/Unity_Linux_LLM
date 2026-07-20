@@ -1,20 +1,19 @@
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Character.Player
 {
     /// <summary>
@@ -100,8 +99,7 @@ namespace NPCSystem.Character.Player
         public void RequestJump() => _jumpRequested = true;
 
         /// <summary>Current horizontal velocity magnitude.</summary>
-        public float CurrentSpeed =>
-            new Vector3(_currentVelocity.x, 0, _currentVelocity.z).magnitude;
+        public float CurrentSpeed => new Vector3(_currentVelocity.x, 0, _currentVelocity.z).magnitude;
 
         /// <summary>Normalized 0-1 speed ratio relative to the target speed.</summary>
         public float SpeedRatio => CurrentSpeed / TargetSpeed;
@@ -172,11 +170,7 @@ namespace NPCSystem.Character.Player
                     _rotationSpeed * deltaTime
                 );
 
-                _currentSpeed = Mathf.MoveTowards(
-                    _currentSpeed,
-                    TargetSpeed,
-                    _acceleration * deltaTime
-                );
+                _currentSpeed = Mathf.MoveTowards(_currentSpeed, TargetSpeed, _acceleration * deltaTime);
                 _currentVelocity = transform.forward * _currentSpeed;
             }
             else
@@ -224,10 +218,7 @@ namespace NPCSystem.Character.Player
             if (!Application.isPlaying)
                 return;
             Gizmos.color = _grounded ? Color.green : Color.red;
-            Gizmos.DrawRay(
-                transform.position + Vector3.up * 0.1f,
-                Vector3.down * _groundCheckDistance
-            );
+            Gizmos.DrawRay(transform.position + Vector3.up * 0.1f, Vector3.down * _groundCheckDistance);
         }
     }
 }

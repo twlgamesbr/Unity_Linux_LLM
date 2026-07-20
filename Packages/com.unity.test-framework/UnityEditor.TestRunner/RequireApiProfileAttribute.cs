@@ -19,16 +19,28 @@ namespace UnityEditor.TestTools
 
         void IApplyToTest.ApplyToTest(Test test)
         {
-            test.Properties.Add(PropertyNames.Category, string.Format("ApiProfile({0})", string.Join(", ", apiProfiles.Select(p => p.ToString()).OrderBy(p => p).ToArray())));
+            test.Properties.Add(
+                PropertyNames.Category,
+                string.Format(
+                    "ApiProfile({0})",
+                    string.Join(", ", apiProfiles.Select(p => p.ToString()).OrderBy(p => p).ToArray())
+                )
+            );
 #if UNITY_2021_2_OR_NEWER
-            ApiCompatibilityLevel testProfile = PlayerSettings.GetApiCompatibilityLevel(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup));
+            ApiCompatibilityLevel testProfile = PlayerSettings.GetApiCompatibilityLevel(
+                NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.activeBuildTargetGroup)
+            );
 #else
-            ApiCompatibilityLevel testProfile = PlayerSettings.GetApiCompatibilityLevel(EditorUserBuildSettings.activeBuildTargetGroup);
+            ApiCompatibilityLevel testProfile = PlayerSettings.GetApiCompatibilityLevel(
+                EditorUserBuildSettings.activeBuildTargetGroup
+            );
 #endif
 
             if (!apiProfiles.Contains(testProfile))
             {
-                string skipReason = "Skipping test as it requires a compatible api profile set: " + string.Join(", ", apiProfiles.Select(p => p.ToString()).ToArray());
+                string skipReason =
+                    "Skipping test as it requires a compatible api profile set: "
+                    + string.Join(", ", apiProfiles.Select(p => p.ToString()).ToArray());
                 test.RunState = RunState.Skipped;
                 test.Properties.Add(PropertyNames.SkipReason, skipReason);
             }

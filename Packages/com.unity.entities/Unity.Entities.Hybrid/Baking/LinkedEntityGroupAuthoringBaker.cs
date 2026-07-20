@@ -7,7 +7,7 @@
 
         public static implicit operator LinkedEntityGroupBakingData(Entity e)
         {
-            return new LinkedEntityGroupBakingData {Value = e};
+            return new LinkedEntityGroupBakingData { Value = e };
         }
     }
 

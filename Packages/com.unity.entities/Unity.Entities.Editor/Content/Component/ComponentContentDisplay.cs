@@ -13,12 +13,15 @@ namespace Unity.Entities.Editor
 
         public ComponentContentDisplay(ComponentContent content)
         {
-            Header = new Header(ComponentsUtility.GetComponentDisplayName(TypeUtility.GetTypeDisplayName(content.Type)), "component-type__icon");
+            Header = new Header(
+                ComponentsUtility.GetComponentDisplayName(TypeUtility.GetTypeDisplayName(content.Type)),
+                "component-type__icon"
+            );
 
             Tabs = new ITabContent[]
             {
                 new ComponentAttributes(content.Type),
-                new ComponentRelationships(content.Type)
+                new ComponentRelationships(content.Type),
             };
         }
     }

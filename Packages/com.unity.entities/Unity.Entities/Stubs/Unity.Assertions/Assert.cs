@@ -71,9 +71,10 @@ namespace Unity.Assertions
         /// <typeparam name="T">The type of the object being tested.</typeparam>
         /// <param name="value">The value that the caller expects to be a null reference.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void IsNull<T>(T value) where T : class
+        public static void IsNull<T>(T value)
+            where T : class
         {
-            if(value != null)
+            if (value != null)
             {
                 UnityEngine.Assertions.Assert.IsNull(value);
             }
@@ -86,7 +87,8 @@ namespace Unity.Assertions
         /// <param name="value">The value that the caller expects to be a null reference.</param>
         /// <param name="message">If the assertion fails, this message will be logged.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void IsNull<T>(T value, string message) where T : class
+        public static void IsNull<T>(T value, string message)
+            where T : class
         {
             if (value != null)
             {
@@ -100,7 +102,8 @@ namespace Unity.Assertions
         /// <typeparam name="T">The type of the object being tested.</typeparam>
         /// <param name="value">The value that the caller expects to be a non-null reference to <typeparamref name="T"/>.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void IsNotNull<T>(T value) where T : class
+        public static void IsNotNull<T>(T value)
+            where T : class
         {
             if (value == null)
             {
@@ -115,7 +118,8 @@ namespace Unity.Assertions
         /// <param name="value">The value that the caller expects to be a non-null reference to <typeparamref name="T"/>.</param>
         /// <param name="message">If the assertion fails, this message will be logged.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void IsNotNull<T>(T value, string message) where T : class
+        public static void IsNotNull<T>(T value, string message)
+            where T : class
         {
             if (value == null)
             {
@@ -166,7 +170,8 @@ namespace Unity.Assertions
         /// <param name="expected">The expected value.</param>
         /// <param name="actual">The actual value.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void AreEqual<T>(T expected, T actual) where T: IEquatable<T>
+        public static void AreEqual<T>(T expected, T actual)
+            where T : IEquatable<T>
         {
             if (!expected.Equals(actual))
                 UnityEngine.Assertions.Assert.AreEqual(expected, actual);
@@ -180,7 +185,8 @@ namespace Unity.Assertions
         /// <param name="actual">The actual value.</param>
         /// <param name="message">If the assertion fails, this message will be logged.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void AreEqual<T>(T expected, T actual, string message) where T: IEquatable<T>
+        public static void AreEqual<T>(T expected, T actual, string message)
+            where T : IEquatable<T>
         {
             if (!expected.Equals(actual))
             {
@@ -195,7 +201,8 @@ namespace Unity.Assertions
         /// <param name="expected">The expected value.</param>
         /// <param name="actual">The actual value.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void AreNotEqual<T>(T expected, T actual) where T: IEquatable<T>
+        public static void AreNotEqual<T>(T expected, T actual)
+            where T : IEquatable<T>
         {
             if (expected.Equals(actual))
                 UnityEngine.Assertions.Assert.AreNotEqual(expected, actual);
@@ -209,7 +216,8 @@ namespace Unity.Assertions
         /// <param name="actual">The actual value.</param>
         /// <param name="message">If the assertion fails, this message will be logged.</param>
         [Conditional("UNITY_ASSERTIONS")]
-        public static void AreNotEqual<T>(T expected, T actual, string message) where T: IEquatable<T>
+        public static void AreNotEqual<T>(T expected, T actual, string message)
+            where T : IEquatable<T>
         {
             if (expected.Equals(actual))
             {

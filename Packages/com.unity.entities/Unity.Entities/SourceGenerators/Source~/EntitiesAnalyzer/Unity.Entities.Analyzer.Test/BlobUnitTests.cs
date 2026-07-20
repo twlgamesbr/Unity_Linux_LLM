@@ -1,8 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VerifyCS = Unity.Entities.Analyzer.Test.CSharpCodeFixVerifier<
     Unity.Entities.Analyzer.BlobAssetAnalyzer,
-    Unity.Entities.Analyzer.EntitiesCodeFixProvider>;
+    Unity.Entities.Analyzer.EntitiesCodeFixProvider
+>;
 
 namespace Unity.Entities.Analyzer
 {
@@ -14,11 +15,11 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task NoErrors() => await VerifyCS.VerifyAnalyzerAsync("");
 
-
         [TestMethod]
         public async Task WithGenericMethod()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -38,7 +39,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task WithManagedRefInStaticField()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -64,7 +66,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task ClassWithValidBlobReferenceUsage()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -97,7 +100,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task StoreBlobAssetReferenceValueInLocal()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -107,7 +111,8 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -117,7 +122,9 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0001).WithLocation(0)
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0001)
+                .WithLocation(0)
                 .WithArguments("_blobAssetReference.Value", "MyBlob", "blob");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
@@ -125,7 +132,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task WorksFromConstructRootErrors()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -135,7 +143,8 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -145,15 +154,18 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0001).WithLocation(0)
-                .WithArguments("blobBuilder.ConstructRoot<AnimationBlobData>()", "AnimationBlobData","root");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0001)
+                .WithLocation(0)
+                .WithArguments("blobBuilder.ConstructRoot<AnimationBlobData>()", "AnimationBlobData", "root");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
 
         [TestMethod]
         public async Task WorksFromDirectLineErrors()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -163,7 +175,8 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -172,15 +185,22 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0001).WithLocation(0)
-                .WithArguments("new BlobBuilder(Unity.Collections.Allocator.Temp).ConstructRoot<AnimationBlobData>()", "var", "root");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0001)
+                .WithLocation(0)
+                .WithArguments(
+                    "new BlobBuilder(Unity.Collections.Allocator.Temp).ConstructRoot<AnimationBlobData>()",
+                    "var",
+                    "root"
+                );
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
 
         [TestMethod]
         public async Task WorksFromFieldErrors()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -191,7 +211,8 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 class TypeName {
@@ -202,14 +223,18 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0001).WithLocation(0).WithArguments("root.Keys", "var", "keys");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0001)
+                .WithLocation(0)
+                .WithArguments("root.Keys", "var", "keys");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
 
         [TestMethod]
         public async Task LoadFieldFromBlobAssetReference()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -225,7 +250,8 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -241,7 +267,9 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0001).WithLocation(0)
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0001)
+                .WithLocation(0)
                 .WithArguments("_blobAssetReference.Value.myfloats", "BlobArray<float>", "myFloats");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
@@ -249,7 +277,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task StoreBlobAssetReferenceValue_IntoReadonlyReference()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
 
@@ -263,7 +292,8 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
 
@@ -276,7 +306,9 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0001).WithLocation(0)
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0001)
+                .WithLocation(0)
                 .WithArguments("_blobAssetReference.Value", "MyBlob", "readonlyBlob");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
@@ -284,7 +316,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task LoadFieldFromBlobAssetReference_IntoReadonlyReference()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
 
@@ -297,7 +330,8 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
 
@@ -309,7 +343,9 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0001).WithLocation(0)
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0001)
+                .WithLocation(0)
                 .WithArguments("_blobAssetReference.Value.myfloats", "BlobArray<float>", "myReadOnlyFloats");
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
@@ -320,7 +356,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task ObjectInitOnNewVarErrors()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 public struct Node
@@ -341,14 +378,18 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0002).WithLocation(0).WithArguments("new Node()");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0002)
+                .WithLocation(0)
+                .WithArguments("new Node()");
             await VerifyCS.VerifyAnalyzerAsync(test, expected);
         }
 
         [TestMethod]
         public async Task CanSupressEA0002()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 public struct Node
@@ -381,7 +422,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task PointerToFixedSize()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -396,14 +438,22 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0003).WithLocation(0).WithArguments("TestStruct256bytes", "TestStruct256bytes.array", "is a pointer.  Only non-reference types are allowed in Blobs.");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0003)
+                .WithLocation(0)
+                .WithArguments(
+                    "TestStruct256bytes",
+                    "TestStruct256bytes.array",
+                    "is a pointer.  Only non-reference types are allowed in Blobs."
+                );
             await VerifyCS.VerifyAnalyzerAsync(test, expected);
         }
 
         [TestMethod]
         public async Task WithPointerInBlob()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -418,15 +468,22 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0003).WithLocation(0)
-                .WithArguments("BlobWithPointer", "BlobWithPointer.p", "is a pointer.  Only non-reference types are allowed in Blobs.");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0003)
+                .WithLocation(0)
+                .WithArguments(
+                    "BlobWithPointer",
+                    "BlobWithPointer.p",
+                    "is a pointer.  Only non-reference types are allowed in Blobs."
+                );
             await VerifyCS.VerifyAnalyzerAsync(test, expected);
         }
 
         [TestMethod]
         public async Task WithManagedRefsInBlob()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -439,15 +496,22 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0003).WithLocation(0)
-                .WithArguments("Unity.Entities.Tests.ManagedBlob", "Unity.Entities.Tests.ManagedBlob.s", "is a reference.  Only non-reference types are allowed in Blobs.");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0003)
+                .WithLocation(0)
+                .WithArguments(
+                    "Unity.Entities.Tests.ManagedBlob",
+                    "Unity.Entities.Tests.ManagedBlob.s",
+                    "is a reference.  Only non-reference types are allowed in Blobs."
+                );
             await VerifyCS.VerifyAnalyzerAsync(test, expected);
         }
 
         [TestMethod]
         public async Task WithManagedRefInBlobArray()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -465,15 +529,22 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0003).WithLocation(0)
-                .WithArguments("ManagedRefInBlobArray", "ManagedRefInBlobArray.array[].s", "is a reference.  Only non-reference types are allowed in Blobs.");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0003)
+                .WithLocation(0)
+                .WithArguments(
+                    "ManagedRefInBlobArray",
+                    "ManagedRefInBlobArray.array[].s",
+                    "is a reference.  Only non-reference types are allowed in Blobs."
+                );
             await VerifyCS.VerifyAnalyzerAsync(test, expected);
         }
 
         [TestMethod]
         public async Task WithUnmanagedPtrInBlobPtr()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -496,15 +567,22 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0003).WithLocation(0)
-                .WithArguments("UnmanagedPtrInBlobPtr", "UnmanagedPtrInBlobPtr.ptr.Value.p", "is a pointer.  Only non-reference types are allowed in Blobs.");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0003)
+                .WithLocation(0)
+                .WithArguments(
+                    "UnmanagedPtrInBlobPtr",
+                    "UnmanagedPtrInBlobPtr.ptr.Value.p",
+                    "is a pointer.  Only non-reference types are allowed in Blobs."
+                );
             await VerifyCS.VerifyAnalyzerAsync(test, expected);
         }
 
         [TestMethod]
         public async Task WithWeakAssetRefInBlob()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -520,8 +598,14 @@ namespace Unity.Entities.Analyzer
                     }
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0003).WithLocation(0)
-                .WithArguments("BlobWithWeakAssetRef", "BlobWithWeakAssetRef.PrefabRef.PrefabId", "is an UntypedWeakReferenceId. Weak asset references are not yet supported in Blobs.");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0003)
+                .WithLocation(0)
+                .WithArguments(
+                    "BlobWithWeakAssetRef",
+                    "BlobWithWeakAssetRef.PrefabRef.PrefabId",
+                    "is an UntypedWeakReferenceId. Weak asset references are not yet supported in Blobs."
+                );
             await VerifyCS.VerifyAnalyzerAsync(test, expected);
         }
         #endregion
@@ -531,7 +615,8 @@ namespace Unity.Entities.Analyzer
         [TestMethod]
         public async Task BlobPassedByValue()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -541,7 +626,8 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -550,15 +636,21 @@ namespace Unity.Entities.Analyzer
                     void FunctionName(ref AnimationBlobData data) {}
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0009).WithLocation(0)
-                .WithArguments("global::Unity.Entities.Tests.AnimationBlobData", "TypeName.FunctionName(Unity.Entities.Tests.AnimationBlobData)");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0009)
+                .WithLocation(0)
+                .WithArguments(
+                    "global::Unity.Entities.Tests.AnimationBlobData",
+                    "TypeName.FunctionName(Unity.Entities.Tests.AnimationBlobData)"
+                );
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
 
         [TestMethod]
         public async Task BlobPassedByIn()
         {
-            const string test = @"
+            const string test =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -568,7 +660,8 @@ namespace Unity.Entities.Analyzer
                 }
             ";
 
-            const string fixedSource = @"
+            const string fixedSource =
+                @"
                 using Unity.Collections;
                 using Unity.Entities;
                 using Unity.Entities.Tests;
@@ -577,8 +670,13 @@ namespace Unity.Entities.Analyzer
                     void FunctionName(ref AnimationBlobData data) {}
                 }
             ";
-            var expected = VerifyCS.Diagnostic(EntitiesDiagnostics.ID_EA0009).WithLocation(0)
-                .WithArguments("global::Unity.Entities.Tests.AnimationBlobData", "TypeName.FunctionName(in Unity.Entities.Tests.AnimationBlobData)");
+            var expected = VerifyCS
+                .Diagnostic(EntitiesDiagnostics.ID_EA0009)
+                .WithLocation(0)
+                .WithArguments(
+                    "global::Unity.Entities.Tests.AnimationBlobData",
+                    "TypeName.FunctionName(in Unity.Entities.Tests.AnimationBlobData)"
+                );
             await VerifyCS.VerifyCodeFixAsync(test, expected, fixedSource);
         }
         #endregion

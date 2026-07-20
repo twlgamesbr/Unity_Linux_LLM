@@ -22,7 +22,11 @@ namespace Unity.Entities.Editor
 
             public EntityQuery EntityQuery => m_Query;
 
-            public EntityQueryCache(EntityManager entityManager, EntityQueryDesc desc, HierarchyFilter.ModifyEntityQuery[] entityQueryModifiers)
+            public EntityQueryCache(
+                EntityManager entityManager,
+                EntityQueryDesc desc,
+                HierarchyFilter.ModifyEntityQuery[] entityQueryModifiers
+            )
             {
                 m_Desc = desc;
                 m_Query = entityManager.CreateEntityQuery(desc);
@@ -41,12 +45,16 @@ namespace Unity.Entities.Editor
                 m_OriginatingWorld = null;
             }
 
-            public bool Equals(EntityQueryDesc other, World world, HierarchyFilter.ModifyEntityQuery[] entityQueryModifiers)
+            public bool Equals(
+                EntityQueryDesc other,
+                World world,
+                HierarchyFilter.ModifyEntityQuery[] entityQueryModifiers
+            )
             {
-                return m_OriginatingWorld != null &&
-                    world.SequenceNumber == m_OriginatingWorld.SequenceNumber &&
-                    Enumerable.SequenceEqual(m_EntityQueryModifiers, entityQueryModifiers) &&
-                    Equals(m_Desc, other);
+                return m_OriginatingWorld != null
+                    && world.SequenceNumber == m_OriginatingWorld.SequenceNumber
+                    && Enumerable.SequenceEqual(m_EntityQueryModifiers, entityQueryModifiers)
+                    && Equals(m_Desc, other);
             }
         }
 
@@ -93,7 +101,11 @@ namespace Unity.Entities.Editor
             m_EntityQueryCache.Dispose();
         }
 
-        public HierarchyFilter CreateHierarchyFilter(string searchString, ICollection<string> tokens, Allocator allocator)
+        public HierarchyFilter CreateHierarchyFilter(
+            string searchString,
+            ICollection<string> tokens,
+            Allocator allocator
+        )
         {
             return new HierarchyFilter(this, searchString, tokens, allocator);
         }
@@ -127,7 +139,13 @@ namespace Unity.Entities.Editor
             }.Run();
         }
 
-        internal void ApplyEntityQueryFilter(HierarchyNodeStore.Immutable nodes, EntityQueryDesc queryDesc, HierarchyFilter.ModifyEntityQuery[] entityQueryModifiers, NativeBitArray mask, Allocator allocator)
+        internal void ApplyEntityQueryFilter(
+            HierarchyNodeStore.Immutable nodes,
+            EntityQueryDesc queryDesc,
+            HierarchyFilter.ModifyEntityQuery[] entityQueryModifiers,
+            NativeBitArray mask,
+            Allocator allocator
+        )
         {
             if (null == queryDesc)
                 return;
@@ -166,7 +184,11 @@ namespace Unity.Entities.Editor
         /// <param name="nodes">The source nodes being filtered.</param>
         /// <param name="tokens">The search tokens.</param>
         /// <param name="mask">The bitmask of currently included nodes.</param>
-        internal void ApplyNameFilter(HierarchyNodeStore.Immutable nodes, NativeList<FixedString64Bytes> tokens, NativeBitArray mask)
+        internal void ApplyNameFilter(
+            HierarchyNodeStore.Immutable nodes,
+            NativeList<FixedString64Bytes> tokens,
+            NativeBitArray mask
+        )
         {
             unsafe
             {
@@ -183,7 +205,7 @@ namespace Unity.Entities.Editor
                     {
                         EntityNameStorageMask = m_EntityNameStorageMask,
                         Tokens = tokens,
-                        EntityNameStorageLowerInvariant = m_HierarchyNameStore.EntityNameStorageLowerInvariant
+                        EntityNameStorageLowerInvariant = m_HierarchyNameStore.EntityNameStorageLowerInvariant,
                     }.Run();
                 }
 #endif
@@ -214,27 +236,22 @@ namespace Unity.Entities.Editor
         /// <param name="mask"></param>
         internal void ApplyIncludeSubSceneFilter(HierarchyNodeStore.Immutable nodes, NativeBitArray mask)
         {
-            new FilterIncludeSubScene
-            {
-                Nodes = nodes,
-                NodeMatchesMask = mask
-            }.Run();
+            new FilterIncludeSubScene { Nodes = nodes, NodeMatchesMask = mask }.Run();
         }
 
         internal void ApplyPrefabStageFilter(HierarchyNodeStore.Immutable nodes, NativeBitArray mask)
         {
-            new FilterByPrefabStage
-            {
-                Nodes = nodes,
-                NodeMatchesMask = mask
-            }.Run();
+            new FilterByPrefabStage { Nodes = nodes, NodeMatchesMask = mask }.Run();
         }
 
         [BurstCompile(DisableSafetyChecks = true)]
         struct FilterByPrefabStage : IJob
         {
-            [ReadOnly] public HierarchyNodeStore.Immutable Nodes;
-            [ReadOnly] public int Index;
+            [ReadOnly]
+            public HierarchyNodeStore.Immutable Nodes;
+
+            [ReadOnly]
+            public int Index;
 
             public NativeBitArray NodeMatchesMask;
 
@@ -254,8 +271,11 @@ namespace Unity.Entities.Editor
         [BurstCompile(DisableSafetyChecks = true)]
         struct FilterByIndex : IJob
         {
-            [ReadOnly] public HierarchyNodeStore.Immutable Nodes;
-            [ReadOnly] public int Index;
+            [ReadOnly]
+            public HierarchyNodeStore.Immutable Nodes;
+
+            [ReadOnly]
+            public int Index;
 
             public NativeBitArray NodeMatchesMask;
 
@@ -282,8 +302,11 @@ namespace Unity.Entities.Editor
         [BurstCompile(DisableSafetyChecks = true)]
         struct FilterByKind : IJob
         {
-            [ReadOnly] public HierarchyNodeStore.Immutable Nodes;
-            [ReadOnly] public NodeKind Kind;
+            [ReadOnly]
+            public HierarchyNodeStore.Immutable Nodes;
+
+            [ReadOnly]
+            public NodeKind Kind;
 
             public NativeBitArray NodeMatchesMask;
 
@@ -303,7 +326,12 @@ namespace Unity.Entities.Editor
         }
 
         [BurstCompile(DisableSafetyChecks = true)]
-        static void FilterByEntityQuery(ref NativeBitArray nodeMatchesMask, in HierarchyNodeStore.Immutable nodes, ref EntityQuery query, Allocator allocator)
+        static void FilterByEntityQuery(
+            ref NativeBitArray nodeMatchesMask,
+            in HierarchyNodeStore.Immutable nodes,
+            ref EntityQuery query,
+            Allocator allocator
+        )
         {
             for (var index = 0; index < nodes.Count; index++)
             {
@@ -312,7 +340,7 @@ namespace Unity.Entities.Editor
 
             // Apply entity query:
             var entities = query.ToEntityArray(allocator);
-            for(var entityIndex = 0; entityIndex < entities.Length; ++entityIndex)
+            for (var entityIndex = 0; entityIndex < entities.Length; ++entityIndex)
             {
                 // Map the entities to their respective nodes and set the node mask:
                 var entity = entities[entityIndex];
@@ -324,7 +352,11 @@ namespace Unity.Entities.Editor
         }
 
         [BurstCompile(DisableSafetyChecks = true)]
-        static void FilterByEntityQuery(ref NativeBitArray nodeMatchesMask, in HierarchyNodeStore.Immutable nodes, ref EntityQueryMask queryMask)
+        static void FilterByEntityQuery(
+            ref NativeBitArray nodeMatchesMask,
+            in HierarchyNodeStore.Immutable nodes,
+            ref EntityQueryMask queryMask
+        )
         {
             for (var index = 0; index < nodes.Count; index++)
             {
@@ -353,9 +385,11 @@ namespace Unity.Entities.Editor
         struct BuildEntityNameStoragePatternCacheLowerInvariant<TPattern> : IJob
             where TPattern : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
         {
-            [ReadOnly] public NativeList<TPattern> Tokens;
+            [ReadOnly]
+            public NativeList<TPattern> Tokens;
 
-            [WriteOnly] public NativeBitArray EntityNameStorageMask;
+            [WriteOnly]
+            public NativeBitArray EntityNameStorageMask;
 
             public EntityNameStorageLowerInvariant EntityNameStorageLowerInvariant;
 
@@ -381,22 +415,34 @@ namespace Unity.Entities.Editor
         unsafe struct FilterByNameLowerInvariant<TPattern> : IJob
             where TPattern : unmanaged, IUTF8Bytes, INativeList<byte>, IEquatable<TPattern>
         {
-            [ReadOnly] public HierarchyNodeStore.Immutable Nodes;
-            [ReadOnly] public NativeList<TPattern> Tokens;
-            [ReadOnly] public bool ExcludeUnnamedNodes;
-            [ReadOnly] public bool CurrentWorldExists;
+            [ReadOnly]
+            public HierarchyNodeStore.Immutable Nodes;
+
+            [ReadOnly]
+            public NativeList<TPattern> Tokens;
+
+            [ReadOnly]
+            public bool ExcludeUnnamedNodes;
+
+            [ReadOnly]
+            public bool CurrentWorldExists;
 
 #if !DOTS_DISABLE_DEBUG_NAMES
-            [ReadOnly] public NativeBitArray EntityNameStorageMask;
+            [ReadOnly]
+            public NativeBitArray EntityNameStorageMask;
+
 #if ENTITY_STORE_V1
-            [NativeDisableUnsafePtrRestriction] public EntityName* NameByEntity;
+            [NativeDisableUnsafePtrRestriction]
+            public EntityName* NameByEntity;
 #else
-            [ReadOnly] public EntityNameStoreAccess NameStoreAccess;
+            [ReadOnly]
+            public EntityNameStoreAccess NameStoreAccess;
 #endif
 
 #endif
 
-            [ReadOnly] public NativeParallelHashMap<HierarchyNodeHandle, FixedString64Bytes> NameByHandleLowerInvariant;
+            [ReadOnly]
+            public NativeParallelHashMap<HierarchyNodeHandle, FixedString64Bytes> NameByHandleLowerInvariant;
 
             public NativeBitArray NodeMatchesMask;
 
@@ -475,7 +521,8 @@ namespace Unity.Entities.Editor
         [BurstCompile(DisableSafetyChecks = true)]
         struct FilterIncludeSubScene : IJob
         {
-            [ReadOnly] public HierarchyNodeStore.Immutable Nodes;
+            [ReadOnly]
+            public HierarchyNodeStore.Immutable Nodes;
 
             public NativeBitArray NodeMatchesMask;
 

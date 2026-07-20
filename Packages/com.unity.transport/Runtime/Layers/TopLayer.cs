@@ -13,7 +13,7 @@ namespace Unity.Networking.Transport
     {
         private ConnectionList connections;
 
-        public void Dispose() {}
+        public void Dispose() { }
 
         public int Initialize(ref NetworkSettings settings, ref ConnectionList connectionList, ref int packetPadding)
         {
@@ -68,7 +68,9 @@ namespace Unity.Networking.Transport
                 }
 
                 if (Receiver.ReceiveQueue.Count == Receiver.ReceiveQueue.Capacity)
-                    Debug.LogWarning($"Receive queue is full, some packets could be dropped, consider increase its size ({Receiver.ReceiveQueue.Capacity}).");
+                    Debug.LogWarning(
+                        $"Receive queue is full, some packets could be dropped, consider increase its size ({Receiver.ReceiveQueue.Capacity})."
+                    );
 
                 Receiver.ReceiveQueue.Clear();
 
@@ -91,20 +93,29 @@ namespace Unity.Networking.Transport
                 {
                     var connection = new NetworkConnection(packetProcessor.ConnectionRef);
                     var packetPtr = (byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset;
-                    PipelineProcessor.Receive(pipelineId, ref Receiver, ref EventQueue, ref connection, packetPtr, packetProcessor.Length);
+                    PipelineProcessor.Receive(
+                        pipelineId,
+                        ref Receiver,
+                        ref EventQueue,
+                        ref connection,
+                        packetPtr,
+                        packetProcessor.Length
+                    );
                 }
                 else
                 {
                     var offset = Receiver.AppendToStream(ref packetProcessor);
 
-                    EventQueue.PushEvent(new NetworkEvent
-                    {
-                        pipelineId = (short)pipelineId,
-                        connectionId = packetProcessor.ConnectionRef.Id,
-                        type = NetworkEvent.Type.Data,
-                        offset = offset,
-                        size = packetProcessor.Length
-                    });
+                    EventQueue.PushEvent(
+                        new NetworkEvent
+                        {
+                            pipelineId = (short)pipelineId,
+                            connectionId = packetProcessor.ConnectionRef.Id,
+                            type = NetworkEvent.Type.Data,
+                            offset = offset,
+                            size = packetProcessor.Length,
+                        }
+                    );
                 }
             }
 
@@ -125,13 +136,15 @@ namespace Unity.Networking.Transport
                         ConnectionPayloads.Remove(connectionId);
                     }
 
-                    EventQueue.PushEvent(new NetworkEvent
-                    {
-                        connectionId = connectionId.Id,
-                        type = NetworkEvent.Type.Connect,
-                        offset = offset,
-                        size = size
-                    });
+                    EventQueue.PushEvent(
+                        new NetworkEvent
+                        {
+                            connectionId = connectionId.Id,
+                            type = NetworkEvent.Type.Connect,
+                            offset = offset,
+                            size = size,
+                        }
+                    );
                 }
             }
 
@@ -147,13 +160,15 @@ namespace Unity.Networking.Transport
 
                     var offset = Receiver.AppendToStream((byte)disconnectionCommand.Reason);
 
-                    EventQueue.PushEvent(new NetworkEvent
-                    {
-                        connectionId = disconnectionCommand.Connection.Id,
-                        type = NetworkEvent.Type.Disconnect,
-                        offset = offset,
-                        size = 1
-                    });
+                    EventQueue.PushEvent(
+                        new NetworkEvent
+                        {
+                            connectionId = disconnectionCommand.Connection.Id,
+                            type = NetworkEvent.Type.Disconnect,
+                            offset = offset,
+                            size = 1,
+                        }
+                    );
                 }
             }
         }

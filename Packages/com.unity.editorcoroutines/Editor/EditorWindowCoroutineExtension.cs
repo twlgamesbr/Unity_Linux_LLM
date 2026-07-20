@@ -13,7 +13,7 @@ namespace Unity.EditorCoroutines.Editor
         /// <para>
         /// Start an <see cref="EditorCoroutine">EditorCoroutine</see>, owned by the calling <see cref="EditorWindow">EditorWindow</see> instance.
         /// </para>
-        /// <code> 
+        /// <code>
         /// using System.Collections;
         /// using Unity.EditorCoroutines.Editor;
         /// using UnityEditor;
@@ -83,15 +83,17 @@ namespace Unity.EditorCoroutines.Editor
         /// <param name="coroutine">The EditorCoroutine to stop.</param>
         public static void StopCoroutine(this EditorWindow window, EditorCoroutine coroutine)
         {
-            if(coroutine == null)
+            if (coroutine == null)
             {
                 Debug.LogAssertion("Provided EditorCoroutine handle is null.");
                 return;
             }
 
-            if(coroutine.m_Owner == null)
+            if (coroutine.m_Owner == null)
             {
-                Debug.LogError("The EditorCoroutine is ownerless. Please use EditorCoroutineEditor.StopCoroutine to terminate such coroutines.");
+                Debug.LogError(
+                    "The EditorCoroutine is ownerless. Please use EditorCoroutineEditor.StopCoroutine to terminate such coroutines."
+                );
                 return;
             }
 

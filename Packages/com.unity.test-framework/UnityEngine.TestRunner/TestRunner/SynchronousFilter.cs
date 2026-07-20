@@ -32,12 +32,18 @@ namespace UnityEngine.TestTools.TestRunner.GUI
 
             if (test.TypeInfo?.Type != null)
             {
-                if (Reflect.GetMethodsWithAttribute(test.TypeInfo.Type, typeof(UnitySetUpAttribute), true)
-                    .Any(mi => mi.ReturnType == typeof(IEnumerator)))
+                if (
+                    Reflect
+                        .GetMethodsWithAttribute(test.TypeInfo.Type, typeof(UnitySetUpAttribute), true)
+                        .Any(mi => mi.ReturnType == typeof(IEnumerator))
+                )
                     return false;
 
-                if (Reflect.GetMethodsWithAttribute(test.TypeInfo.Type, typeof(UnityTearDownAttribute), true)
-                    .Any(mi => mi.ReturnType == typeof(IEnumerator)))
+                if (
+                    Reflect
+                        .GetMethodsWithAttribute(test.TypeInfo.Type, typeof(UnityTearDownAttribute), true)
+                        .Any(mi => mi.ReturnType == typeof(IEnumerator))
+                )
                     return false;
             }
 

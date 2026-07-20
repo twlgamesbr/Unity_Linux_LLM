@@ -9,7 +9,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
     public class PostPackingCallback : IBuildTask
     {
         /// <inheritdoc />
-        public int Version { get { return 1; } }
+        public int Version
+        {
+            get { return 1; }
+        }
 
 #pragma warning disable 649
         [InjectContext]

@@ -8,10 +8,13 @@ namespace UnityEngine.TestTools.Logging
     {
         [SerializeField]
         private bool m_UseRegex;
+
         [SerializeField]
         private string m_Message;
+
         [SerializeField]
         private string m_MessageRegex;
+
         [SerializeField]
         private string m_LogType;
 
@@ -57,7 +60,7 @@ namespace UnityEngine.TestTools.Logging
             {
                 if (!string.IsNullOrEmpty(m_LogType))
                 {
-                    return Enum.Parse(typeof(LogType), m_LogType) as LogType ? ;
+                    return Enum.Parse(typeof(LogType), m_LogType) as LogType?;
                 }
 
                 return null;

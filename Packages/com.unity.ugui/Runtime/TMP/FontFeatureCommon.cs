@@ -1,5 +1,3 @@
-
-
 namespace UnityEngine.TextCore
 {
     /// <summary>

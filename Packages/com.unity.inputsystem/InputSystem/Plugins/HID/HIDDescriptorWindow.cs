@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeView = UnityEditor.IMGUI.Controls.TreeView<int>;
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
@@ -80,24 +79,37 @@ namespace UnityEngine.InputSystem.HID.Editor
             m_Initialized = true;
 
             // Set up tree view for HID descriptor.
-            var hidDescriptor = HID.ReadHIDDeviceDescriptor(ref m_DeviceDescription,
-                (ref InputDeviceCommand command) => InputRuntime.s_Instance.DeviceCommand(m_DeviceId, ref command));
+            var hidDescriptor = HID.ReadHIDDeviceDescriptor(
+                ref m_DeviceDescription,
+                (ref InputDeviceCommand command) => InputRuntime.s_Instance.DeviceCommand(m_DeviceId, ref command)
+            );
             if (m_TreeViewState == null)
                 m_TreeViewState = new TreeViewState();
             m_TreeView = new HIDDescriptorTreeView(m_TreeViewState, hidDescriptor);
             m_TreeView.SetExpanded(1, true);
 
             m_Label = new GUIContent(
-                $"HID Descriptor for '{deviceDescription.manufacturer} {deviceDescription.product}'");
+                $"HID Descriptor for '{deviceDescription.manufacturer} {deviceDescription.product}'"
+            );
         }
 
-        [NonSerialized] private bool m_Initialized;
-        [NonSerialized] private HIDDescriptorTreeView m_TreeView;
-        [NonSerialized] private GUIContent m_Label;
+        [NonSerialized]
+        private bool m_Initialized;
 
-        [SerializeField] private int m_DeviceId;
-        [SerializeField] private InputDeviceDescription m_DeviceDescription;
-        [SerializeField] private TreeViewState m_TreeViewState;
+        [NonSerialized]
+        private HIDDescriptorTreeView m_TreeView;
+
+        [NonSerialized]
+        private GUIContent m_Label;
+
+        [SerializeField]
+        private int m_DeviceId;
+
+        [SerializeField]
+        private InputDeviceDescription m_DeviceDescription;
+
+        [SerializeField]
+        private TreeViewState m_TreeViewState;
 
         private void AddToList()
         {
@@ -130,11 +142,7 @@ namespace UnityEngine.InputSystem.HID.Editor
             {
                 var id = 0;
 
-                var root = new TreeViewItem
-                {
-                    id = id++,
-                    depth = -1
-                };
+                var root = new TreeViewItem { id = id++, depth = -1 };
 
                 var item = BuildDeviceItem(m_Descriptor, ref id);
                 root.AddChild(item);
@@ -148,12 +156,16 @@ namespace UnityEngine.InputSystem.HID.Editor
                 {
                     id = id++,
                     depth = 0,
-                    displayName = "Device"
+                    displayName = "Device",
                 };
 
                 AddChild(item, string.Format("Vendor ID: 0x{0:X}", device.vendorId), ref id);
                 AddChild(item, string.Format("Product ID: 0x{0:X}", device.productId), ref id);
-                AddChild(item, string.Format("Usage Page: 0x{0:X} ({1})", (uint)device.usagePage, device.usagePage), ref id);
+                AddChild(
+                    item,
+                    string.Format("Usage Page: 0x{0:X} ({1})", (uint)device.usagePage, device.usagePage),
+                    ref id
+                );
                 AddChild(item, string.Format("Usage: 0x{0:X}", device.usage), ref id);
                 AddChild(item, "Input Report Size: " + device.inputReportSize, ref id);
                 AddChild(item, "Output Report Size: " + device.outputReportSize, ref id);
@@ -175,14 +187,23 @@ namespace UnityEngine.InputSystem.HID.Editor
                 return item;
             }
 
-            private TreeViewItem BuildElementItem(int index, TreeViewItem parent, HID.HIDElementDescriptor element, ref int id)
+            private TreeViewItem BuildElementItem(
+                int index,
+                TreeViewItem parent,
+                HID.HIDElementDescriptor element,
+                ref int id
+            )
             {
                 var item = AddChild(parent, string.Format("Element {0} ({1})", index, element.reportType), ref id);
 
                 string usagePageString = HID.UsagePageToString(element.usagePage);
                 string usageString = HID.UsageToString(element.usagePage, element.usage);
 
-                AddChild(item, string.Format("Usage Page: 0x{0:X} ({1})", (uint)element.usagePage, usagePageString), ref id);
+                AddChild(
+                    item,
+                    string.Format("Usage Page: 0x{0:X} ({1})", (uint)element.usagePage, usagePageString),
+                    ref id
+                );
                 if (usageString != null)
                     AddChild(item, string.Format("Usage: 0x{0:X} ({1})", element.usage, usageString), ref id);
                 else
@@ -216,7 +237,7 @@ namespace UnityEngine.InputSystem.HID.Editor
                 {
                     id = id++,
                     depth = parent.depth + 1,
-                    displayName = displayName
+                    displayName = displayName,
                 };
 
                 parent.AddChild(item);
@@ -225,9 +246,7 @@ namespace UnityEngine.InputSystem.HID.Editor
             }
         }
 
-        public void OnBeforeSerialize()
-        {
-        }
+        public void OnBeforeSerialize() { }
 
         public void OnAfterDeserialize()
         {

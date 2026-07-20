@@ -4,7 +4,6 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
-
 using UnityEngine.Profiling;
 using Hash128 = Unity.Entities.Hash128;
 
@@ -36,21 +35,27 @@ namespace Unity.Physics.Authoring
         {
             base.OnCreate();
             m_BeginColliderBakingSystem = World.GetOrCreateSystemManaged<BeginColliderBakingSystem>();
-            m_RebakedRootQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<PhysicsRootBaked>() },
-                Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities
-            });
-            m_RootQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<PhysicsCompoundData>() },
-                Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities
-            });
-            m_ColliderSourceQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<PhysicsColliderBakedData>() },
-                Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities
-            });
+            m_RebakedRootQuery = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<PhysicsRootBaked>() },
+                    Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities,
+                }
+            );
+            m_RootQuery = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<PhysicsCompoundData>() },
+                    Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities,
+                }
+            );
+            m_ColliderSourceQuery = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<PhysicsColliderBakedData>() },
+                    Options = EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities,
+                }
+            );
 
             m_StaticCleanUpTypes = new ComponentTypeSet(
                 typeof(PhysicsWorldIndex),
@@ -83,9 +88,13 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         partial struct ChildrenGatheringJob : IJobEntity
         {
-            [ReadOnly] public NativeParallelHashMap<Entity, int> rootEntitiesLookUp;
-            [ReadOnly] public BlobAssetComputationContext<int, Collider> blobComputationContext;
+            [ReadOnly]
+            public NativeParallelHashMap<Entity, int> rootEntitiesLookUp;
+
+            [ReadOnly]
+            public BlobAssetComputationContext<int, Collider> blobComputationContext;
             public NativeParallelMultiHashMap<Entity, ChildInstance>.ParallelWriter childrenPerRootWriter;
+
             private void Execute(in PhysicsColliderBakedData blobBakingData)
             {
                 // Check if we care about this entity
@@ -94,17 +103,20 @@ namespace Unity.Physics.Authoring
                     var blobFound = blobComputationContext.GetBlobAsset(blobBakingData.Hash, out var blobAsset);
                     SafetyChecks.CheckAreEqualAndThrow(true, blobFound);
                     SafetyChecks.CheckAreEqualAndThrow(true, blobAsset.IsCreated);
-                    childrenPerRootWriter.Add(blobBakingData.BodyEntity, new ChildInstance()
-                    {
-                        Hash = blobBakingData.Hash,
-                        IsLeaf = blobBakingData.IsLeafEntityBody,
-                        Child = new CompoundCollider.ColliderBlobInstance
+                    childrenPerRootWriter.Add(
+                        blobBakingData.BodyEntity,
+                        new ChildInstance()
                         {
-                            Collider = blobAsset,
-                            CompoundFromChild = blobBakingData.BodyFromShape,
-                            Entity = blobBakingData.ChildEntity,
+                            Hash = blobBakingData.Hash,
+                            IsLeaf = blobBakingData.IsLeafEntityBody,
+                            Child = new CompoundCollider.ColliderBlobInstance
+                            {
+                                Collider = blobAsset,
+                                CompoundFromChild = blobBakingData.BodyFromShape,
+                                Entity = blobBakingData.ChildEntity,
+                            },
                         }
-                    });
+                    );
                 }
             }
         }
@@ -119,13 +131,24 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         partial struct BlobCalculationJob : IJobEntity
         {
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, ChildInstance> childrenPerRoot;
-            [ReadOnly] public BlobAssetComputationContext<int, Collider> blobComputationContext;
-            [ReadOnly] public NativeParallelHashMap<Entity, int> rootEntitiesLookUp;
-            public NativeParallelHashMap<Hash128, int>.ParallelWriter deduplicationHashMapWriter;
-            [NativeDisableParallelForRestriction] public NativeArray<DeferredCompoundResult> deferredCompoundResults;
+            [ReadOnly]
+            public NativeParallelMultiHashMap<Entity, ChildInstance> childrenPerRoot;
 
-            private void Execute(Entity rootEntity, ref PhysicsCompoundData rootBaking, ref PhysicsCollider rootCollider)
+            [ReadOnly]
+            public BlobAssetComputationContext<int, Collider> blobComputationContext;
+
+            [ReadOnly]
+            public NativeParallelHashMap<Entity, int> rootEntitiesLookUp;
+            public NativeParallelHashMap<Hash128, int>.ParallelWriter deduplicationHashMapWriter;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<DeferredCompoundResult> deferredCompoundResults;
+
+            private void Execute(
+                Entity rootEntity,
+                ref PhysicsCompoundData rootBaking,
+                ref PhysicsCollider rootCollider
+            )
             {
                 // Reset values in case of incremental
                 rootCollider.Value = default;
@@ -192,7 +215,10 @@ namespace Unity.Physics.Authoring
                                 // Calculate the Compound Collider
                                 rootBaking.DeferredCompoundBlob = false;
                                 rootBaking.RegisterBlob = true;
-                                var colliderBlobs = new NativeArray<CompoundCollider.ColliderBlobInstance>(colliders.Length, Allocator.Temp);
+                                var colliderBlobs = new NativeArray<CompoundCollider.ColliderBlobInstance>(
+                                    colliders.Length,
+                                    Allocator.Temp
+                                );
                                 for (int index = 0; index < colliders.Length; ++index)
                                 {
                                     var child = colliders[index].Child;
@@ -209,12 +235,15 @@ namespace Unity.Physics.Authoring
                                 // Create compound collider
                                 // Note: by always using the same blob id here we ensure the collider blob can be shared among PhysicsCollider components
                                 // in all scenarios (e.g., the differ comparing the memory and deciding that the blob is the same)
-                                rootCollider.Value = CompoundCollider.CreateInternal(colliderBlobs, ColliderConstants.k_SharedBlobID);
+                                rootCollider.Value = CompoundCollider.CreateInternal(
+                                    colliderBlobs,
+                                    ColliderConstants.k_SharedBlobID
+                                );
 
                                 deferredCompoundResults[rootIndex] = new DeferredCompoundResult()
                                 {
                                     Hash = compoundHash,
-                                    Result = rootCollider.Value
+                                    Result = rootCollider.Value,
                                 };
                                 colliderBlobs.Dispose();
                             }
@@ -240,12 +269,17 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         struct AddColliderKeyEntityPairBufferJob : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<PhysicsCompoundData> PhysicsCompoundDataHandle;
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsCompoundData> PhysicsCompoundDataHandle;
             public EntityTypeHandle Entities;
             public EntityCommandBuffer.ParallelWriter ECB;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
-                in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 var entities = chunk.GetNativeArray(Entities);
                 var compoundDataArray = chunk.GetNativeArray(ref PhysicsCompoundDataHandle);
@@ -263,11 +297,21 @@ namespace Unity.Physics.Authoring
         [BurstCompile]
         partial struct DeferredResolutionJob : IJobEntity
         {
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, ChildInstance> childrenPerRoot;
-            [ReadOnly] public NativeParallelHashMap<Hash128, int> deduplicationHashMap;
-            [ReadOnly] public NativeArray<DeferredCompoundResult> deferredCompoundResults;
+            [ReadOnly]
+            public NativeParallelMultiHashMap<Entity, ChildInstance> childrenPerRoot;
 
-            private void Execute(Entity entity, ref DynamicBuffer<PhysicsColliderKeyEntityPair> colliderKeyEntityBuffer, ref PhysicsCollider rootCollider, in PhysicsCompoundData rootBaking)
+            [ReadOnly]
+            public NativeParallelHashMap<Hash128, int> deduplicationHashMap;
+
+            [ReadOnly]
+            public NativeArray<DeferredCompoundResult> deferredCompoundResults;
+
+            private void Execute(
+                Entity entity,
+                ref DynamicBuffer<PhysicsColliderKeyEntityPair> colliderKeyEntityBuffer,
+                ref PhysicsCollider rootCollider,
+                in PhysicsCompoundData rootBaking
+            )
             {
                 colliderKeyEntityBuffer.Clear();
 
@@ -301,11 +345,13 @@ namespace Unity.Physics.Authoring
                         SafetyChecks.CheckAreEqualAndThrow(compoundCollider->NumChildren, sortedColliders.Length);
                         for (int i = 0; i < compoundCollider->NumChildren; i++)
                         {
-                            colliderKeyEntityBuffer.Add(new PhysicsColliderKeyEntityPair
-                            {
-                                Entity = sortedColliders[i].Child.Entity,
-                                Key = compoundCollider->ConvertChildIndexToColliderKey(i)
-                            });
+                            colliderKeyEntityBuffer.Add(
+                                new PhysicsColliderKeyEntityPair
+                                {
+                                    Entity = sortedColliders[i].Child.Entity,
+                                    Key = compoundCollider->ConvertChildIndexToColliderKey(i),
+                                }
+                            );
                         }
                     }
                 }
@@ -321,8 +367,12 @@ namespace Unity.Physics.Authoring
         partial struct BlobContextUpdateJob : IJobEntity
         {
             public BlobAssetComputationContext<int, Collider> blobComputationContext;
-            [ReadOnly] public NativeParallelHashMap<Hash128, int> deduplicationHashMap;
-            [ReadOnly] public NativeArray<DeferredCompoundResult> deferredCompoundResults;
+
+            [ReadOnly]
+            public NativeParallelHashMap<Hash128, int> deduplicationHashMap;
+
+            [ReadOnly]
+            public NativeArray<DeferredCompoundResult> deferredCompoundResults;
 
             private void Execute(in PhysicsCompoundData rootBaking)
             {
@@ -330,10 +380,14 @@ namespace Unity.Physics.Authoring
                 {
                     // Register the blob asset if needed
                     int resultIndex = deduplicationHashMap[rootBaking.Hash];
-                    blobComputationContext.AddComputedBlobAsset(rootBaking.Hash, deferredCompoundResults[resultIndex].Result);
+                    blobComputationContext.AddComputedBlobAsset(
+                        rootBaking.Hash,
+                        deferredCompoundResults[resultIndex].Result
+                    );
                 }
             }
         }
+
         protected override void OnUpdate()
         {
             Profiler.BeginSample("Build Compound Colliders");
@@ -342,7 +396,10 @@ namespace Unity.Physics.Authoring
 
             // Collect the root entities that need regeneration because they were rebaked
             using var rootEntities = m_RebakedRootQuery.ToEntityArray(Allocator.TempJob);
-            NativeParallelHashMap<Entity, int> rootEntitiesLookUp = new NativeParallelHashMap<Entity, int>(maxRootCount, Allocator.TempJob);
+            NativeParallelHashMap<Entity, int> rootEntitiesLookUp = new NativeParallelHashMap<Entity, int>(
+                maxRootCount,
+                Allocator.TempJob
+            );
             int count = 0;
             foreach (var rootEntity in rootEntities)
             {
@@ -354,10 +411,14 @@ namespace Unity.Physics.Authoring
             // in the m_RootQuery. Add this entity to the rootEntitiesLookUp hashmap if it isn't there already
             if (m_ColliderSourceQuery.CalculateChunkCount() > 0)
             {
-                using var rebakedColliders = m_ColliderSourceQuery.ToComponentDataArray<PhysicsColliderBakedData>(Allocator.TempJob);
+                using var rebakedColliders = m_ColliderSourceQuery.ToComponentDataArray<PhysicsColliderBakedData>(
+                    Allocator.TempJob
+                );
                 foreach (var collider in rebakedColliders)
                 {
-                    if (!rootEntitiesLookUp.ContainsKey(collider.BodyEntity) && m_RootQuery.Matches(collider.BodyEntity))
+                    if (
+                        !rootEntitiesLookUp.ContainsKey(collider.BodyEntity) && m_RootQuery.Matches(collider.BodyEntity)
+                    )
                     {
                         rootEntitiesLookUp.Add(collider.BodyEntity, count);
                         ++count;
@@ -372,7 +433,10 @@ namespace Unity.Physics.Authoring
             var deduplicationHashMap = new NativeParallelHashMap<Hash128, int>(maxRootCount, Allocator.TempJob);
             var deduplicationHashMapWriter = deduplicationHashMap.AsParallelWriter();
 
-            NativeParallelMultiHashMap<Entity, ChildInstance> childrenPerRoot = new NativeParallelMultiHashMap<Entity, ChildInstance>(maxColliderCount, Allocator.TempJob);
+            NativeParallelMultiHashMap<Entity, ChildInstance> childrenPerRoot = new NativeParallelMultiHashMap<
+                Entity,
+                ChildInstance
+            >(maxColliderCount, Allocator.TempJob);
             var childrenPerRootWriter = childrenPerRoot.AsParallelWriter();
             var blobComputationContext = BlobComputationContext;
 
@@ -380,7 +444,7 @@ namespace Unity.Physics.Authoring
             {
                 rootEntitiesLookUp = rootEntitiesLookUp,
                 blobComputationContext = blobComputationContext,
-                childrenPerRootWriter = childrenPerRootWriter
+                childrenPerRootWriter = childrenPerRootWriter,
             }.ScheduleParallel(Dependency);
 
             // We need to compose the blobs
@@ -390,7 +454,7 @@ namespace Unity.Physics.Authoring
                 blobComputationContext = blobComputationContext,
                 rootEntitiesLookUp = rootEntitiesLookUp,
                 deduplicationHashMapWriter = deduplicationHashMapWriter,
-                deferredCompoundResults = deferredCompoundResults
+                deferredCompoundResults = deferredCompoundResults,
             }.ScheduleParallel(childrenGatheringJobHandle);
 
             Profiler.EndSample();
@@ -401,7 +465,7 @@ namespace Unity.Physics.Authoring
             {
                 PhysicsCompoundDataHandle = GetComponentTypeHandle<PhysicsCompoundData>(true),
                 Entities = GetEntityTypeHandle(),
-                ECB = ecb.AsParallelWriter()
+                ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_RootQuery, blobCalculationJobHandle);
 
             // Update the blob assets relation to the authoring component
@@ -409,7 +473,7 @@ namespace Unity.Physics.Authoring
             {
                 blobComputationContext = blobComputationContext,
                 deduplicationHashMap = deduplicationHashMap,
-                deferredCompoundResults = deferredCompoundResults
+                deferredCompoundResults = deferredCompoundResults,
             }.Schedule(blobCalculationJobHandle);
 
             var combinedJobHandle = JobHandle.CombineDependencies(blobContextUpdateJobHandle, addBufferJobHandle);
@@ -426,14 +490,19 @@ namespace Unity.Physics.Authoring
             {
                 childrenPerRoot = childrenPerRoot,
                 deduplicationHashMap = deduplicationHashMap,
-                deferredCompoundResults = deferredCompoundResults
-            }.ScheduleParallel(addBufferJobHandle).Complete();
+                deferredCompoundResults = deferredCompoundResults,
+            }
+                .ScheduleParallel(addBufferJobHandle)
+                .Complete();
 
             // Check for unused StaticOptimizeEntity roots
             ecb = new EntityCommandBuffer(WorldUpdateAllocator);
-            foreach (var(_, entity) in SystemAPI.Query<RefRO<StaticOptimizePhysicsBaking>>()
-                     .WithEntityAccess()
-                     .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities))
+            foreach (
+                var (_, entity) in SystemAPI
+                    .Query<RefRO<StaticOptimizePhysicsBaking>>()
+                    .WithEntityAccess()
+                    .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
+            )
             {
                 if (!childrenPerRoot.ContainsKey(entity))
                 {
@@ -444,7 +513,11 @@ namespace Unity.Physics.Authoring
             ecb.Playback(EntityManager);
             ecb.Dispose();
 
-            var handle = JobHandle.CombineDependencies(deduplicationHashMap.Dispose(combinedJobHandle), deferredCompoundResults.Dispose(combinedJobHandle), childrenPerRoot.Dispose(combinedJobHandle));
+            var handle = JobHandle.CombineDependencies(
+                deduplicationHashMap.Dispose(combinedJobHandle),
+                deferredCompoundResults.Dispose(combinedJobHandle),
+                childrenPerRoot.Dispose(combinedJobHandle)
+            );
             Dependency = JobHandle.CombineDependencies(handle, rootEntitiesLookUp.Dispose(combinedJobHandle));
         }
     }

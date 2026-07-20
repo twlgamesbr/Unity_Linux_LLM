@@ -12,7 +12,12 @@ namespace Unity.Netcode
             m_GroupSendTarget = null;
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             if (m_GroupSendTarget == null)
             {
@@ -49,7 +54,11 @@ namespace Unity.Netcode
                     }
 
                     // If we are in distributed authority mode and connected to the service, then we exclude the owner/authority from the list
-                    if (m_NetworkManager.DistributedAuthorityMode && m_NetworkManager.CMBServiceConnection && clientId == behaviour.OwnerClientId)
+                    if (
+                        m_NetworkManager.DistributedAuthorityMode
+                        && m_NetworkManager.CMBServiceConnection
+                        && clientId == behaviour.OwnerClientId
+                    )
                     {
                         continue;
                     }
@@ -67,7 +76,8 @@ namespace Unity.Netcode
             m_GroupSendTarget.Target.Send(behaviour, ref message, delivery, rpcParams);
         }
 
-        internal NotServerRpcTarget(NetworkManager manager) : base(manager)
+        internal NotServerRpcTarget(NetworkManager manager)
+            : base(manager)
         {
             m_LocalSendRpcTarget = new LocalSendRpcTarget(manager);
         }

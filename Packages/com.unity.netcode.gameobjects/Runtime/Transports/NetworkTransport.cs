@@ -32,7 +32,12 @@ namespace Unity.Netcode
         /// <param name="clientId">The ID of the client associated with this event</param>
         /// <param name="payload">The data payload received with this event</param>
         /// <param name="receiveTime">The time when this event was received</param>
-        public delegate void TransportEventDelegate(NetworkEvent eventType, ulong clientId, ArraySegment<byte> payload, float receiveTime);
+        public delegate void TransportEventDelegate(
+            NetworkEvent eventType,
+            ulong clientId,
+            ArraySegment<byte> payload,
+            float receiveTime
+        );
 
         /// <summary>
         /// Occurs when the transport has a new transport network event.
@@ -48,7 +53,12 @@ namespace Unity.Netcode
         /// <param name="clientId">The clientId this event is for</param>
         /// <param name="payload">The incoming data payload</param>
         /// <param name="receiveTime">The time the event was received, as reported by Time.realtimeSinceStartup.</param>
-        protected void InvokeOnTransportEvent(NetworkEvent eventType, ulong clientId, ArraySegment<byte> payload, float receiveTime)
+        protected void InvokeOnTransportEvent(
+            NetworkEvent eventType,
+            ulong clientId,
+            ArraySegment<byte> payload,
+            float receiveTime
+        )
         {
             OnTransportEvent?.Invoke(eventType, clientId, payload, receiveTime);
         }
@@ -68,7 +78,11 @@ namespace Unity.Netcode
         /// <param name="payload">The incoming data payload</param>
         /// <param name="receiveTime">The time the event was received, as reported by Time.realtimeSinceStartup.</param>
         /// <returns>Returns the event type</returns>
-        public abstract NetworkEvent PollEvent(out ulong clientId, out ArraySegment<byte> payload, out float receiveTime);
+        public abstract NetworkEvent PollEvent(
+            out ulong clientId,
+            out ArraySegment<byte> payload,
+            out float receiveTime
+        );
 
         /// <summary>
         /// Connects client to the server
@@ -118,10 +132,7 @@ namespace Unity.Netcode
         /// <remarks>
         /// Useful to handle processing any transport-layer events such as processing inbound messages or changes in connection state(s).
         /// </remarks>
-        protected virtual void OnEarlyUpdate()
-        {
-
-        }
+        protected virtual void OnEarlyUpdate() { }
 
         /// <summary>
         /// Invoked by NetworkManager at the beginning of its EarlyUpdate
@@ -138,10 +149,7 @@ namespace Unity.Netcode
         /// <remarks>
         /// Useful to handle any end of frame transport tasks such as sending queued transport messages.
         /// </remarks>
-        protected virtual void OnPostLateUpdate()
-        {
-
-        }
+        protected virtual void OnPostLateUpdate() { }
 
         /// <summary>
         /// Invoked by NetworkManager towards the end of the PostLateUpdate
@@ -174,30 +182,37 @@ namespace Unity.Netcode
             /// If transport has mapped its disconnect events, this event signifies that the transport closed the connection due to a locally invoked shutdown.
             /// </summary>
             TransportShutdown,
+
             /// <summary>
             /// If transport has mapped its disconnect events, this event signifies a graceful disconnect.
             /// </summary>
             Disconnected,
+
             /// <summary>
             /// If transport has mapped its disconnect events, this event signifies that the transport's connection to the endpoint has timed out and the connection was closed.
             /// </summary>
             ProtocolTimeout,
+
             /// <summary>
             /// If transport has mapped its disconnect events, this event signifies that the disconnect is due to the maximum number of failed connection attempts has been reached.
             /// </summary>
             MaxConnectionAttempts,
+
             /// <summary>
             /// If transport has mapped its disconnect events, this event signifies that the remote endpoint closed the connection.
             /// </summary>
             ClosedByRemote,
+
             /// <summary>
             /// If transport has mapped its disconnect events, this event signifies the local transport closed the incoming remote endpoint connection.
             /// </summary>
             ClosedRemoteConnection,
+
             /// <summary>
             /// If transport has mapped its disconnect events, this event signifies that the connection was closed due to an authentication failure.
             /// </summary>
             AuthenticationFailure,
+
             /// <summary>
             /// If transport has mapped its disconnect events, this event signifies that a lower-level (unkown) transport error occurred.
             /// </summary>
@@ -276,16 +291,14 @@ namespace Unity.Netcode
         /// The traditional client-server network topology.
         /// </summary>
         ClientServer,
+
         /// <summary>
         /// The distributed authorityy network topology only supported by <see cref="Transports.UTP.UnityTransport"/>.
         /// </summary>
-        DistributedAuthority
+        DistributedAuthority,
     }
 
 #if UNITY_INCLUDE_TESTS
-    public abstract class TestingNetworkTransport : NetworkTransport
-    {
-
-    }
+    public abstract class TestingNetworkTransport : NetworkTransport { }
 #endif
 }

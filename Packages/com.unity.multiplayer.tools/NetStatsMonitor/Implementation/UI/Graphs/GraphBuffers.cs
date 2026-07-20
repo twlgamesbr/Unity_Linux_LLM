@@ -35,9 +35,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         /// 1. Resizing/allocating buffers
         /// 2. Recomputing index buffer values
         /// 3. Recomputing vertex color buffer values
-        public void UpdateIfNeeded(
-            in GraphBufferParameters newParams,
-            in Color[] variableColors)
+        public void UpdateIfNeeded(in GraphBufferParameters newParams, in Color[] variableColors)
         {
             var pointCount = newParams.StatCount * newParams.GraphWidthPoints;
             var vertexCount = k_VerticesPerPoint * pointCount;
@@ -56,8 +54,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             }
 
             var bufferParamsChanged =
-                newParams.StatCount != Parameters.StatCount ||
-                newParams.GraphWidthPoints != Parameters.GraphWidthPoints;
+                newParams.StatCount != Parameters.StatCount
+                || newParams.GraphWidthPoints != Parameters.GraphWidthPoints;
             if (bufferParamsChanged)
             {
                 ComputeIndices(newParams.StatCount, newParams.GraphWidthPoints);
@@ -115,9 +113,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             for (var statIndex = 0; statIndex < statCount; ++statIndex)
             {
                 var statVerticesBegin = statIndex * verticesPerStat;
-                var statColor = (variableColors != null && statIndex < variableColors.Length)
-                    ? variableColors[statIndex]
-                    : CategoricalColorPalette.GetColor(statIndex);
+                var statColor =
+                    (variableColors != null && statIndex < variableColors.Length)
+                        ? variableColors[statIndex]
+                        : CategoricalColorPalette.GetColor(statIndex);
                 for (var vertexIndex = 0; vertexIndex < verticesPerStat; ++vertexIndex)
                 {
                     var vertexIndexAbsolute = statVerticesBegin + vertexIndex;
@@ -128,10 +127,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
         public void WriteToMeshGenerationContext(MeshGenerationContext mgc)
         {
-            if (Vertices == null ||
-                Indices == null ||
-                Vertices.Length == 0 ||
-                Indices.Length == 0)
+            if (Vertices == null || Indices == null || Vertices.Length == 0 || Indices.Length == 0)
             {
                 // This can occur if a graph is configured without any stats, samples, or space on screen
                 // in which case the buffers are not allocated

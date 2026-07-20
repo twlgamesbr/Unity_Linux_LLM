@@ -41,7 +41,7 @@ namespace Unity.Entities.Editor
                 {
                     var worldName = Value.World?.Name ?? string.Empty;
                     const StringComparison comp = StringComparison.InvariantCultureIgnoreCase;
-                    if (worldName.IndexOf("Editor World", comp) >= 0 || worldName.IndexOf("Default World", comp) >=  0)
+                    if (worldName.IndexOf("Editor World", comp) >= 0 || worldName.IndexOf("Default World", comp) >= 0)
                         worldName = "Editor And Default World";
 
                     if (worldName.IndexOf("Client", comp) >= 0)
@@ -89,11 +89,7 @@ namespace Unity.Entities.Editor
         public override bool IsRunning => Value.IsRunning;
     }
 
-    class ComponentGroupNode : SystemHandleNode<ComponentGroupNode>
-    {
-    }
+    class ComponentGroupNode : SystemHandleNode<ComponentGroupNode> { }
 
-    class SystemHandleNode : SystemHandleNode<SystemHandleNode>
-    {
-    }
+    class SystemHandleNode : SystemHandleNode<SystemHandleNode> { }
 }

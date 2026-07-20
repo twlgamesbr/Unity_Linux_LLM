@@ -98,15 +98,17 @@ namespace UnityEngine.TestTools
         /// <value>The value of the ignoreFailingMessages boolean property.</value>
         public static bool ignoreFailingMessages
         {
-            get
-            {
-                return LogScope.Current.IgnoreFailingMessages;
-            }
+            get { return LogScope.Current.IgnoreFailingMessages; }
             set
             {
                 if (value != LogScope.Current.IgnoreFailingMessages)
                 {
-                    Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "\nIgnoreFailingMessages:" + (value ? "true" : "false"));
+                    Debug.LogFormat(
+                        LogType.Log,
+                        LogOption.NoStacktrace,
+                        null,
+                        "\nIgnoreFailingMessages:" + (value ? "true" : "false")
+                    );
                 }
                 LogScope.Current.IgnoreFailingMessages = value;
             }

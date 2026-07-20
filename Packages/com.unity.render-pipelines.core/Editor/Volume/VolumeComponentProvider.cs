@@ -5,9 +5,9 @@ using UnityEngine.Rendering;
 
 namespace UnityEditor.Rendering
 {
-    using IProvider = FilterWindow.IProvider;
     using Element = FilterWindow.Element;
     using GroupElement = FilterWindow.GroupElement;
+    using IProvider = FilterWindow.IProvider;
 
     class VolumeComponentProvider : IProvider
     {
@@ -58,7 +58,9 @@ namespace UnityEditor.Rendering
 
             tree.Add(new GroupElement(0, "Volume Overrides"));
 
-            var volumeComponentTypesFiltered = VolumeManager.instance.GetVolumeComponentsForDisplay(currentPipelineAssetType);
+            var volumeComponentTypesFiltered = VolumeManager.instance.GetVolumeComponentsForDisplay(
+                currentPipelineAssetType
+            );
             if (volumeComponentTypesFiltered.Count == 0)
                 return;
 

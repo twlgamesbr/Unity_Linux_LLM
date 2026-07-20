@@ -4,9 +4,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Filters
 {
     internal class FullNameFilter : NUnit.Framework.Internal.Filters.FullNameFilter
     {
-        public FullNameFilter(string expectedValue) : base(expectedValue)
-        {
-        }
+        public FullNameFilter(string expectedValue)
+            : base(expectedValue) { }
 
         public override bool Match(ITest test)
         {
@@ -14,6 +13,5 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Filters
         }
 
         protected override string ElementName => "test";
-
     }
 }

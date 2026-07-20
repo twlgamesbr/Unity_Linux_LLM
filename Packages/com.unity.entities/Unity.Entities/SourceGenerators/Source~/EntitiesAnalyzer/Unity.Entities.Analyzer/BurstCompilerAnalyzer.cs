@@ -1,10 +1,10 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Unity.Entities.SourceGen.Common;
 
 namespace Unity.Entities.Analyzer
@@ -19,7 +19,10 @@ namespace Unity.Entities.Analyzer
             context.RegisterSyntaxNodeAction(AnalyzeType, SyntaxKind.MethodDeclaration);
         }
 
-        static bool ContainsBurstCompilerAttribute(SemanticModel model, SyntaxList<AttributeListSyntax> attributeListList)
+        static bool ContainsBurstCompilerAttribute(
+            SemanticModel model,
+            SyntaxList<AttributeListSyntax> attributeListList
+        )
         {
             foreach (var attributeList in attributeListList)
             {
@@ -58,7 +61,7 @@ namespace Unity.Entities.Analyzer
                     {
                         foreach (var type in typeDeclaration.BaseList.Types)
                         {
-                            if (type.Type is IdentifierNameSyntax {Identifier: {ValueText: "ISystem"}})
+                            if (type.Type is IdentifierNameSyntax { Identifier: { ValueText: "ISystem" } })
                             {
                                 var declaredType = context.SemanticModel.GetTypeInfo(type.Type).Type;
                                 var fullName = declaredType.ToFullName();
@@ -84,15 +87,23 @@ namespace Unity.Entities.Analyzer
             }
         }
 
-        static void EmitDiagnostic(SyntaxNodeAnalysisContext context, SyntaxToken typeDeclarationIdentifier,
-            SyntaxToken methodDeclarationIdentifier)
+        static void EmitDiagnostic(
+            SyntaxNodeAnalysisContext context,
+            SyntaxToken typeDeclarationIdentifier,
+            SyntaxToken methodDeclarationIdentifier
+        )
         {
-            context.ReportDiagnostic(Diagnostic.Create(
-                EntitiesDiagnostics.k_Ea0010Descriptor, typeDeclarationIdentifier.GetLocation(),
-                typeDeclarationIdentifier, methodDeclarationIdentifier));
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    EntitiesDiagnostics.k_Ea0010Descriptor,
+                    typeDeclarationIdentifier.GetLocation(),
+                    typeDeclarationIdentifier,
+                    methodDeclarationIdentifier
+                )
+            );
         }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-            EntitiesDiagnostics.k_Ea0010Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+            ImmutableArray.Create(EntitiesDiagnostics.k_Ea0010Descriptor);
     }
 }

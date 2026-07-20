@@ -16,7 +16,7 @@ namespace Unity.Web.Stripping.Editor
     {
         Disabled = 0,
         Gzip = 1,
-        Brotli = 2
+        Brotli = 2,
     }
 
     /// <summary>
@@ -27,9 +27,7 @@ namespace Unity.Web.Stripping.Editor
         public class GzipException : System.Exception
         {
             public GzipException(string message)
-                : base(message)
-            {
-            }
+                : base(message) { }
         }
 
         /// <summary>
@@ -58,6 +56,7 @@ namespace Unity.Web.Stripping.Editor
         public string SevenZipPath { get; set; } = "";
 
         public delegate void LogCallback(string text);
+
         /// <summary>
         /// A log callback that is called each time a new line is written to stdout.
         /// </summary>
@@ -71,7 +70,9 @@ namespace Unity.Web.Stripping.Editor
         internal const string k_CompressionMarkerBrotli = "UnityWeb Compressed Content (brotli)";
         internal const string k_CompressionMarkerGzip = "UnityWeb Compressed Content (gzip)";
 
-        static readonly Regex k_SevenZipListRegex = new (@"(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\s+([.]+)\s+(\d+)\s+(\d+)\s+([\w\d.]+)");
+        static readonly Regex k_SevenZipListRegex = new(
+            @"(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\s+([.]+)\s+(\d+)\s+(\d+)\s+([\w\d.]+)"
+        );
 
         string BrotliExePath
         {
@@ -86,14 +87,17 @@ namespace Unity.Web.Stripping.Editor
         }
 
         internal static bool IsCompressed(string file) => IsBrotliCompressed(file) || IsGzipCompressed(file);
+
         internal static bool IsBrotliCompressed(string file) =>
             HasFileExtension(file, ".br") || HasFileExtension(file, ".unityweb") && HasBrotliUnityMarker(file);
+
         internal static bool IsGzipCompressed(string file) =>
             HasFileExtension(file, ".gz") || HasFileExtension(file, ".unityweb") && HasGzipUnityMarker(file);
 
         static bool HasFileExtension(string filename, string ext) =>
-            Path.GetFileName(filename).EndsWith(ext, StringComparison.OrdinalIgnoreCase) ||
-            Path.GetFileName(filename).EndsWith($"{ext}{FileBackup.BackupFileExtension}", StringComparison.OrdinalIgnoreCase);
+            Path.GetFileName(filename).EndsWith(ext, StringComparison.OrdinalIgnoreCase)
+            || Path.GetFileName(filename)
+                .EndsWith($"{ext}{FileBackup.BackupFileExtension}", StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Compress a file with brotli compression.
@@ -163,11 +167,7 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="outputFile">Path to the compressed file.</param>
         public void CompressGzip(string inputFile, string outputFile)
         {
-            CommandLineUtils.Execute(
-                SevenZipPath,
-                $"a -tgzip \"{outputFile}\" \"{inputFile}\"",
-                GetCommandOptions()
-            );
+            CommandLineUtils.Execute(SevenZipPath, $"a -tgzip \"{outputFile}\" \"{inputFile}\"", GetCommandOptions());
             AddGzipUnityMarker(outputFile);
         }
 
@@ -214,7 +214,8 @@ namespace Unity.Web.Stripping.Editor
             if (data.Length == 0)
                 throw new GzipException($"Cannot add gzip comment to {file}. The file does not exist or it is empty.");
 
-            int commentOffset = 10, commentLength = 0;
+            int commentOffset = 10,
+                commentLength = 0;
             if (commentOffset > data.Length)
                 throw new GzipException(errorMessage);
 
@@ -269,6 +270,7 @@ namespace Unity.Web.Stripping.Editor
 
         // Converted from the code in UnityLoader.js
         internal static bool HasBrotliUnityMarker(string filename) => HasBrotliUnityMarker(ReadFile(filename));
+
         internal static bool HasBrotliUnityMarker(byte[] data)
         {
             if (data.Length == 0)
@@ -281,19 +283,23 @@ namespace Unity.Web.Stripping.Editor
             if (wbits == 0x11 || commentOffset > data.Length)
                 return false;
 
-            int expectedCommentPrefix = wbits + ((3 << 1) + (mskipbytes << 4) + ((k_CompressionMarkerBrotli.Length - 1) << 6) << wbitsLength);
+            int expectedCommentPrefix =
+                wbits + ((3 << 1) + (mskipbytes << 4) + ((k_CompressionMarkerBrotli.Length - 1) << 6) << wbitsLength);
             for (int i = 0; i < commentOffset; i++, expectedCommentPrefix >>= 8)
             {
                 if (data[i] != (expectedCommentPrefix & 0xFF))
                     return false;
             }
 
-            var extractedComment = Encoding.UTF8.GetString(data.AsSpan(commentOffset, k_CompressionMarkerBrotli.Length));
+            var extractedComment = Encoding.UTF8.GetString(
+                data.AsSpan(commentOffset, k_CompressionMarkerBrotli.Length)
+            );
             return extractedComment == k_CompressionMarkerBrotli;
         }
 
         // Converted from the code in UnityLoader.js
         internal static bool HasGzipUnityMarker(string filename) => HasGzipUnityMarker(ReadFile(filename));
+
         internal static bool HasGzipUnityMarker(byte[] data)
         {
             if (data.Length == 0)
@@ -324,7 +330,9 @@ namespace Unity.Web.Stripping.Editor
 
             if ((flags & 0x10) != 0)
             {
-                var extractedComment = Encoding.UTF8.GetString(data.AsSpan(commentOffset, k_CompressionMarkerGzip.Length + 1));
+                var extractedComment = Encoding.UTF8.GetString(
+                    data.AsSpan(commentOffset, k_CompressionMarkerGzip.Length + 1)
+                );
                 return extractedComment == k_CompressionMarkerGzip + "\0";
             }
 

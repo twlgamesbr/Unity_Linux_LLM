@@ -232,7 +232,9 @@ namespace Unity.Networking.Transport
             if (reconnectionTimeoutMS < 0)
             {
                 valid = false;
-                Debug.LogError($"reconnectionTimeoutMS value ({reconnectionTimeoutMS}) must be greater than or equal to 0");
+                Debug.LogError(
+                    $"reconnectionTimeoutMS value ({reconnectionTimeoutMS}) must be greater than or equal to 0"
+                );
             }
             if (maxFrameTimeMS < 0)
             {
@@ -257,7 +259,9 @@ namespace Unity.Networking.Transport
             if (maxMessageSize <= 0 || maxMessageSize > NetworkParameterConstants.AbsoluteMaxMessageSize)
             {
                 valid = false;
-                Debug.LogError($"maxMessageSize value ({maxMessageSize}) must be greater than 0 and less than or equal to {NetworkParameterConstants.AbsoluteMaxMessageSize}");
+                Debug.LogError(
+                    $"maxMessageSize value ({maxMessageSize}) must be greater than 0 and less than or equal to {NetworkParameterConstants.AbsoluteMaxMessageSize}"
+                );
             }
 
             // Warn if the value is set ridiculously low. Packets 576 bytes long or less are always
@@ -266,7 +270,9 @@ namespace Unity.Networking.Transport
             // 548 instead of 576 to account for IP and UDP headers).
             if (valid && maxMessageSize < 548)
             {
-                Debug.LogWarning($"maxMessageSize value ({maxMessageSize}) is unnecessarily low. 548 should be safe in all circumstances.");
+                Debug.LogWarning(
+                    $"maxMessageSize value ({maxMessageSize}) is unnecessarily low. 548 should be safe in all circumstances."
+                );
             }
 
             return valid;
@@ -355,16 +361,16 @@ namespace Unity.Networking.Transport
         /// <returns>Settings structure with modified values.</returns>
         public static ref NetworkSettings WithNetworkConfigParameters(
             ref this NetworkSettings settings,
-            int connectTimeoutMS        = NetworkParameterConstants.ConnectTimeoutMS,
-            int maxConnectAttempts      = NetworkParameterConstants.MaxConnectAttempts,
-            int disconnectTimeoutMS     = NetworkParameterConstants.DisconnectTimeoutMS,
-            int heartbeatTimeoutMS      = NetworkParameterConstants.HeartbeatTimeoutMS,
-            int reconnectionTimeoutMS   = NetworkParameterConstants.ReconnectionTimeoutMS,
-            int maxFrameTimeMS          = 0,
-            int fixedFrameTimeMS        = 0,
-            int receiveQueueCapacity    = NetworkParameterConstants.ReceiveQueueCapacity,
-            int sendQueueCapacity       = NetworkParameterConstants.SendQueueCapacity,
-            int maxMessageSize          = NetworkParameterConstants.MaxMessageSize,
+            int connectTimeoutMS = NetworkParameterConstants.ConnectTimeoutMS,
+            int maxConnectAttempts = NetworkParameterConstants.MaxConnectAttempts,
+            int disconnectTimeoutMS = NetworkParameterConstants.DisconnectTimeoutMS,
+            int heartbeatTimeoutMS = NetworkParameterConstants.HeartbeatTimeoutMS,
+            int reconnectionTimeoutMS = NetworkParameterConstants.ReconnectionTimeoutMS,
+            int maxFrameTimeMS = 0,
+            int fixedFrameTimeMS = 0,
+            int receiveQueueCapacity = NetworkParameterConstants.ReceiveQueueCapacity,
+            int sendQueueCapacity = NetworkParameterConstants.SendQueueCapacity,
+            int maxMessageSize = NetworkParameterConstants.MaxMessageSize,
             bool performPathMtuDiscovery = false
         )
         {
@@ -380,7 +386,7 @@ namespace Unity.Networking.Transport
                 receiveQueueCapacity = receiveQueueCapacity,
                 sendQueueCapacity = sendQueueCapacity,
                 maxMessageSize = maxMessageSize,
-                performPathMtuDiscovery = performPathMtuDiscovery
+                performPathMtuDiscovery = performPathMtuDiscovery,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -416,7 +422,7 @@ namespace Unity.Networking.Transport
                 receiveQueueCapacity = receiveQueueCapacity,
                 sendQueueCapacity = sendQueueCapacity,
                 maxMessageSize = NetworkParameterConstants.MaxMessageSize,
-                performPathMtuDiscovery = performPathMtuDiscovery
+                performPathMtuDiscovery = performPathMtuDiscovery,
             };
 
             settings.AddRawParameterStruct(ref parameter);
@@ -433,16 +439,16 @@ namespace Unity.Networking.Transport
         {
             if (!settings.TryGet<NetworkConfigParameter>(out var parameters))
             {
-                parameters.connectTimeoutMS      = NetworkParameterConstants.ConnectTimeoutMS;
-                parameters.maxConnectAttempts    = NetworkParameterConstants.MaxConnectAttempts;
-                parameters.disconnectTimeoutMS   = NetworkParameterConstants.DisconnectTimeoutMS;
-                parameters.heartbeatTimeoutMS    = NetworkParameterConstants.HeartbeatTimeoutMS;
+                parameters.connectTimeoutMS = NetworkParameterConstants.ConnectTimeoutMS;
+                parameters.maxConnectAttempts = NetworkParameterConstants.MaxConnectAttempts;
+                parameters.disconnectTimeoutMS = NetworkParameterConstants.DisconnectTimeoutMS;
+                parameters.heartbeatTimeoutMS = NetworkParameterConstants.HeartbeatTimeoutMS;
                 parameters.reconnectionTimeoutMS = NetworkParameterConstants.ReconnectionTimeoutMS;
-                parameters.receiveQueueCapacity  = NetworkParameterConstants.ReceiveQueueCapacity;
-                parameters.sendQueueCapacity     = NetworkParameterConstants.SendQueueCapacity;
-                parameters.maxFrameTimeMS        = 0;
-                parameters.fixedFrameTimeMS      = 0;
-                parameters.maxMessageSize        = NetworkParameterConstants.MaxMessageSize;
+                parameters.receiveQueueCapacity = NetworkParameterConstants.ReceiveQueueCapacity;
+                parameters.sendQueueCapacity = NetworkParameterConstants.SendQueueCapacity;
+                parameters.maxFrameTimeMS = 0;
+                parameters.fixedFrameTimeMS = 0;
+                parameters.maxMessageSize = NetworkParameterConstants.MaxMessageSize;
                 parameters.performPathMtuDiscovery = false;
             }
 

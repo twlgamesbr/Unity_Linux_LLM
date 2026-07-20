@@ -9,7 +9,12 @@ namespace Unity.Entities.Editor
     {
         readonly HierarchyModel m_Model;
 
-        public HierarchyMultiColumnListViewController(HierarchyModel model, Columns columns, SortColumnDescriptions sortDescriptions, List<SortColumnDescription> sortedColumns)
+        public HierarchyMultiColumnListViewController(
+            HierarchyModel model,
+            Columns columns,
+            SortColumnDescriptions sortDescriptions,
+            List<SortColumnDescription> sortedColumns
+        )
             : base(columns, sortDescriptions, sortedColumns)
         {
             m_Model = model;

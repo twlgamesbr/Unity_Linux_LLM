@@ -8,11 +8,11 @@ namespace UnityEngine.Rendering
     /// </summary>
     internal enum PerformanceBottleneck
     {
-        Indeterminate,      // Cannot be determined
-        PresentLimited,     // Limited by presentation (vsync or framerate cap)
-        CPU,                // Limited by CPU (main and/or render thread)
-        GPU,                // Limited by GPU
-        Balanced,           // Limited by both CPU and GPU, i.e. well balanced
+        Indeterminate, // Cannot be determined
+        PresentLimited, // Limited by presentation (vsync or framerate cap)
+        CPU, // Limited by CPU (main and/or render thread)
+        GPU, // Limited by GPU
+        Balanced, // Limited by both CPU and GPU, i.e. well balanced
     }
 
     /// <summary>
@@ -97,24 +97,32 @@ namespace UnityEngine.Rendering
             float fullFrameTimeWithMargin = (1f - kNearFullFrameTimeThresholdPercent) * s.FullFrameTime;
 
             // GPU time is close to frame time, CPU times are not
-            if (s.GPUFrameTime > fullFrameTimeWithMargin &&
-                s.MainThreadCPUFrameTime < fullFrameTimeWithMargin &&
-                s.RenderThreadCPUFrameTime < fullFrameTimeWithMargin)
+            if (
+                s.GPUFrameTime > fullFrameTimeWithMargin
+                && s.MainThreadCPUFrameTime < fullFrameTimeWithMargin
+                && s.RenderThreadCPUFrameTime < fullFrameTimeWithMargin
+            )
                 return PerformanceBottleneck.GPU;
 
             // One of the CPU times is close to frame time, GPU is not
-            if (s.GPUFrameTime < fullFrameTimeWithMargin &&
-                (s.MainThreadCPUFrameTime > fullFrameTimeWithMargin ||
-                 s.RenderThreadCPUFrameTime > fullFrameTimeWithMargin))
+            if (
+                s.GPUFrameTime < fullFrameTimeWithMargin
+                && (
+                    s.MainThreadCPUFrameTime > fullFrameTimeWithMargin
+                    || s.RenderThreadCPUFrameTime > fullFrameTimeWithMargin
+                )
+            )
                 return PerformanceBottleneck.CPU;
 
             // Main thread waited due to Vsync or target frame rate
             if (s.MainThreadCPUPresentWaitTime > kNonZeroPresentWaitTimeMs)
             {
                 // None of the times are close to frame time
-                if (s.GPUFrameTime < fullFrameTimeWithMargin &&
-                    s.MainThreadCPUFrameTime < fullFrameTimeWithMargin &&
-                    s.RenderThreadCPUFrameTime < fullFrameTimeWithMargin)
+                if (
+                    s.GPUFrameTime < fullFrameTimeWithMargin
+                    && s.MainThreadCPUFrameTime < fullFrameTimeWithMargin
+                    && s.RenderThreadCPUFrameTime < fullFrameTimeWithMargin
+                )
                     return PerformanceBottleneck.PresentLimited;
             }
 

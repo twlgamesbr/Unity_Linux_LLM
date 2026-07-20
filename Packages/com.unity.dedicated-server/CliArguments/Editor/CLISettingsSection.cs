@@ -1,7 +1,7 @@
+using Unity.DedicatedServer.Editor.Internal;
 using Unity.Multiplayer.Editor;
 using UnityEditor;
 using UnityEditor.Build.Profile;
-using Unity.DedicatedServer.Editor.Internal;
 
 namespace Unity.DedicatedServer
 {

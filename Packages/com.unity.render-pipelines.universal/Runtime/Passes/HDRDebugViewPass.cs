@@ -11,7 +11,7 @@ namespace UnityEngine.Rendering.Universal
         private enum HDRDebugPassId
         {
             CIExyPrepass = 0,
-            DebugViewPass = 1
+            DebugViewPass = 1,
         }
 
         RTHandle m_PassthroughRT;
@@ -70,7 +70,12 @@ namespace UnityEngine.Rendering.Universal
             if (cameraData.isHDROutputActive)
             {
                 Tonemapping tonemapping = VolumeManager.instance.stack.GetComponent<Tonemapping>();
-                UniversalRenderPipeline.GetHDROutputLuminanceParameters(cameraData.hdrDisplayInformation, cameraData.hdrDisplayColorGamut, tonemapping, out luminanceParams);
+                UniversalRenderPipeline.GetHDROutputLuminanceParameters(
+                    cameraData.hdrDisplayInformation,
+                    cameraData.hdrDisplayColorGamut,
+                    tonemapping,
+                    out luminanceParams
+                );
             }
             else
             {
@@ -79,47 +84,86 @@ namespace UnityEngine.Rendering.Universal
             return luminanceParams;
         }
 
-        private static void ExecuteCIExyPrepass(CommandBuffer cmd, PassDataCIExy data, RTHandle sourceTexture, RTHandle xyTarget, RTHandle destTexture)
-        {            
-            CoreUtils.SetRenderTarget(cmd, destTexture, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.DontCare, ClearFlag.None, Color.clear);
+        private static void ExecuteCIExyPrepass(
+            CommandBuffer cmd,
+            PassDataCIExy data,
+            RTHandle sourceTexture,
+            RTHandle xyTarget,
+            RTHandle destTexture
+        )
+        {
+            CoreUtils.SetRenderTarget(
+                cmd,
+                destTexture,
+                RenderBufferLoadAction.DontCare,
+                RenderBufferStoreAction.DontCare,
+                ClearFlag.None,
+                Color.clear
+            );
 
-            Vector4 debugParameters = new Vector4(ShaderConstants._SizeOfHDRXYMapping, ShaderConstants._SizeOfHDRXYMapping, 0, 0);
+            Vector4 debugParameters = new Vector4(
+                ShaderConstants._SizeOfHDRXYMapping,
+                ShaderConstants._SizeOfHDRXYMapping,
+                0,
+                0
+            );
 
             cmd.SetRandomWriteTarget(ShaderConstants._CIExyUAVIndex, xyTarget);
             data.material.SetVector(ShaderConstants._HDRDebugParamsId, debugParameters);
             data.material.SetVector(ShaderPropertyId.hdrOutputLuminanceParams, data.luminanceParameters);
 
-            Vector2 viewportScale = sourceTexture.useScaling ? new Vector2(sourceTexture.rtHandleProperties.rtHandleScale.x, sourceTexture.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 viewportScale = sourceTexture.useScaling
+                ? new Vector2(
+                    sourceTexture.rtHandleProperties.rtHandleScale.x,
+                    sourceTexture.rtHandleProperties.rtHandleScale.y
+                )
+                : Vector2.one;
             Blitter.BlitTexture(cmd, sourceTexture, viewportScale, data.material, 0);
 
             cmd.ClearRandomWriteTargets();
         }
 
-        private static void ExecuteHDRDebugViewFinalPass(RasterCommandBuffer cmd, in PassDataDebugView data, RTHandle source, Vector4 scaleBias, RTHandle destination, RTHandle xyTarget)
+        private static void ExecuteHDRDebugViewFinalPass(
+            RasterCommandBuffer cmd,
+            in PassDataDebugView data,
+            RTHandle source,
+            Vector4 scaleBias,
+            RTHandle destination,
+            RTHandle xyTarget
+        )
         {
             if (data.cameraData.isHDROutputActive)
             {
-                HDROutputUtils.ConfigureHDROutput(data.material, data.cameraData.hdrDisplayColorGamut, HDROutputUtils.Operation.ColorEncoding);
+                HDROutputUtils.ConfigureHDROutput(
+                    data.material,
+                    data.cameraData.hdrDisplayColorGamut,
+                    HDROutputUtils.Operation.ColorEncoding
+                );
                 CoreUtils.SetKeyword(data.material, ShaderKeywordStrings.HDROverlay, data.cameraData.rendersOverlayUI);
             }
 
             data.material.SetTexture(ShaderConstants._xyTextureId, xyTarget);
 
-            Vector4 debugParameters = new Vector4(ShaderConstants._SizeOfHDRXYMapping, ShaderConstants._SizeOfHDRXYMapping, 0, 0);
+            Vector4 debugParameters = new Vector4(
+                ShaderConstants._SizeOfHDRXYMapping,
+                ShaderConstants._SizeOfHDRXYMapping,
+                0,
+                0
+            );
             data.material.SetVector(ShaderConstants._HDRDebugParamsId, debugParameters);
             data.material.SetVector(ShaderPropertyId.hdrOutputLuminanceParams, data.luminanceParameters);
-            data.material.SetInteger(ShaderConstants._DebugHDRModeId, (int)data.hdrDebugMode);            
+            data.material.SetInteger(ShaderConstants._DebugHDRModeId, (int)data.hdrDebugMode);
 
             RenderTargetIdentifier cameraTarget = BuiltinRenderTextureType.CameraTarget;
-            #if ENABLE_VR && ENABLE_XR_MODULE
-                if (data.cameraData.xr.enabled)
-                    cameraTarget = data.cameraData.xr.renderTarget;
-            #endif
+#if ENABLE_VR && ENABLE_XR_MODULE
+            if (data.cameraData.xr.enabled)
+                cameraTarget = data.cameraData.xr.renderTarget;
+#endif
 
             if (destination.nameID == cameraTarget || data.cameraData.targetTexture != null)
                 cmd.SetViewport(data.cameraData.pixelRect);
 
-            Blitter.BlitTexture(cmd, source, scaleBias, data.material, 1);            
+            Blitter.BlitTexture(cmd, source, scaleBias, data.material, 1);
         }
 
         // Non-RenderGraph path
@@ -136,11 +180,22 @@ namespace UnityEngine.Rendering.Universal
         public void Setup(UniversalCameraData cameraData, HDRDebugMode hdrdebugMode)
         {
             RenderTextureDescriptor descriptor = cameraData.cameraTargetDescriptor;
-            DebugHandler.ConfigureColorDescriptorForDebugScreen(ref descriptor, cameraData.pixelWidth, cameraData.pixelHeight);
+            DebugHandler.ConfigureColorDescriptorForDebugScreen(
+                ref descriptor,
+                cameraData.pixelWidth,
+                cameraData.pixelHeight
+            );
             RenderingUtils.ReAllocateHandleIfNeeded(ref m_PassthroughRT, descriptor, name: "_HDRDebugDummyRT");
         }
 
-        internal void RenderHDRDebug(RenderGraph renderGraph, UniversalCameraData cameraData, in TextureHandle srcColor, in TextureHandle overlayUITexture, in TextureHandle dstColor, HDRDebugMode hdrDebugMode)
+        internal void RenderHDRDebug(
+            RenderGraph renderGraph,
+            UniversalCameraData cameraData,
+            in TextureHandle srcColor,
+            in TextureHandle overlayUITexture,
+            in TextureHandle dstColor,
+            HDRDebugMode hdrDebugMode
+        )
         {
             bool requiresCIExyData = hdrDebugMode != HDRDebugMode.ValuesAbovePaperWhite;
             Vector4 luminanceParameters = GetLuminanceParameters(cameraData);
@@ -151,15 +206,30 @@ namespace UnityEngine.Rendering.Universal
             if (requiresCIExyData)
             {
                 RenderTextureDescriptor descriptor = cameraData.cameraTargetDescriptor;
-                DebugHandler.ConfigureColorDescriptorForDebugScreen(ref descriptor, cameraData.pixelWidth, cameraData.pixelHeight);
-                intermediateRT = UniversalRenderer.CreateRenderGraphTexture(renderGraph, descriptor, "_HDRDebugDummyRT", false);
+                DebugHandler.ConfigureColorDescriptorForDebugScreen(
+                    ref descriptor,
+                    cameraData.pixelWidth,
+                    cameraData.pixelHeight
+                );
+                intermediateRT = UniversalRenderer.CreateRenderGraphTexture(
+                    renderGraph,
+                    descriptor,
+                    "_HDRDebugDummyRT",
+                    false
+                );
 
                 ConfigureDescriptorForCIEPrepass(ref descriptor);
                 xyBuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, descriptor, "_xyBuffer", true);
 
                 // Using low level pass because of random UAV support, and since this is a debug view, we don't care much about merging passes or optimizing for TBDR.
                 // This could be a compute pass (like in HDRP) but doing it in pixel is compatible with devices that might support HDR output but not compute shaders.
-                using (var builder = renderGraph.AddUnsafePass<PassDataCIExy>("Blit HDR DebugView CIExy", out var passData, profilingSampler))
+                using (
+                    var builder = renderGraph.AddUnsafePass<PassDataCIExy>(
+                        "Blit HDR DebugView CIExy",
+                        out var passData,
+                        profilingSampler
+                    )
+                )
                 {
                     passData.material = m_material;
                     passData.luminanceParameters = luminanceParameters;
@@ -170,14 +240,28 @@ namespace UnityEngine.Rendering.Universal
                     passData.passThrough = intermediateRT;
                     builder.UseTexture(intermediateRT, AccessFlags.Write);
 
-                    builder.SetRenderFunc(static (PassDataCIExy data, UnsafeGraphContext context) =>
-                    {
-                        ExecuteCIExyPrepass(CommandBufferHelpers.GetNativeCommandBuffer(context.cmd), data, data.srcColor, data.xyBuffer, data.passThrough);
-                    });
+                    builder.SetRenderFunc(
+                        static (PassDataCIExy data, UnsafeGraphContext context) =>
+                        {
+                            ExecuteCIExyPrepass(
+                                CommandBufferHelpers.GetNativeCommandBuffer(context.cmd),
+                                data,
+                                data.srcColor,
+                                data.xyBuffer,
+                                data.passThrough
+                            );
+                        }
+                    );
                 }
             }
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassDataDebugView>("Blit HDR DebugView", out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassDataDebugView>(
+                    "Blit HDR DebugView",
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 passData.material = m_material;
                 passData.hdrDebugMode = hdrDebugMode;
@@ -200,12 +284,25 @@ namespace UnityEngine.Rendering.Universal
                     builder.UseTexture(overlayUITexture);
                 }
 
-                builder.SetRenderFunc(static (PassDataDebugView data, RasterGraphContext context) =>
-                {
-                    data.material.enabledKeywords = null;
-                    Vector4 scaleBias = RenderingUtils.GetFinalBlitScaleBias(in context, in data.srcColor, in data.dstColor);
-                    ExecuteHDRDebugViewFinalPass(context.cmd, in data, data.srcColor, scaleBias, data.dstColor,  data.xyBuffer);
-                });
+                builder.SetRenderFunc(
+                    static (PassDataDebugView data, RasterGraphContext context) =>
+                    {
+                        data.material.enabledKeywords = null;
+                        Vector4 scaleBias = RenderingUtils.GetFinalBlitScaleBias(
+                            in context,
+                            in data.srcColor,
+                            in data.dstColor
+                        );
+                        ExecuteHDRDebugViewFinalPass(
+                            context.cmd,
+                            in data,
+                            data.srcColor,
+                            scaleBias,
+                            data.dstColor,
+                            data.xyBuffer
+                        );
+                    }
+                );
             }
         }
 

@@ -37,13 +37,17 @@ namespace UnityEngine.InputSystem.HID
             if (buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
 
-            fixed(byte* bufferPtr = buffer)
+            fixed (byte* bufferPtr = buffer)
             {
                 return ParseReportDescriptor(bufferPtr, buffer.Length, ref deviceDescriptor);
             }
         }
 
-        public unsafe static bool ParseReportDescriptor(byte* bufferPtr, int bufferLength, ref HID.HIDDeviceDescriptor deviceDescriptor)
+        public static unsafe bool ParseReportDescriptor(
+            byte* bufferPtr,
+            int bufferLength,
+            ref HID.HIDDeviceDescriptor deviceDescriptor
+        )
         {
             // Item state.
             var localItemState = new HIDItemStateLocal();
@@ -154,14 +158,16 @@ namespace UnityEngine.InputSystem.HID
                         // Start new collection.
                         var parentCollection = currentCollection;
                         currentCollection = collections.Count;
-                        collections.Add(new HID.HIDCollectionDescriptor
-                        {
-                            type = (HID.HIDCollectionType)ReadData(itemSize, currentPtr, endPtr),
-                            parent = parentCollection,
-                            usagePage = globalItemState.GetUsagePage(0, ref localItemState),
-                            usage = localItemState.GetUsage(0),
-                            firstChild = elements.Count
-                        });
+                        collections.Add(
+                            new HID.HIDCollectionDescriptor
+                            {
+                                type = (HID.HIDCollectionType)ReadData(itemSize, currentPtr, endPtr),
+                                parent = parentCollection,
+                                usagePage = globalItemState.GetUsagePage(0, ref localItemState),
+                                usage = localItemState.GetUsage(0),
+                                firstChild = elements.Count,
+                            }
+                        );
 
                         HIDItemStateLocal.Reset(ref localItemState);
                         break;
@@ -188,10 +194,9 @@ namespace UnityEngine.InputSystem.HID
                     case (int)HIDItemTypeAndTag.Feature:
 
                         // Determine report type.
-                        var reportType = itemTypeAndTag == (int)HIDItemTypeAndTag.Input
-                            ? HID.HIDReportType.Input
-                            : itemTypeAndTag == (int)HIDItemTypeAndTag.Output
-                            ? HID.HIDReportType.Output
+                        var reportType =
+                            itemTypeAndTag == (int)HIDItemTypeAndTag.Input ? HID.HIDReportType.Input
+                            : itemTypeAndTag == (int)HIDItemTypeAndTag.Output ? HID.HIDReportType.Output
                             : HID.HIDReportType.Feature;
 
                         // Find report.
@@ -257,7 +262,7 @@ namespace UnityEngine.InputSystem.HID
             return true;
         }
 
-        private unsafe static int ReadData(int itemSize, byte* currentPtr, byte* endPtr)
+        private static unsafe int ReadData(int itemSize, byte* currentPtr, byte* endPtr)
         {
             if (itemSize == 0)
                 return 0;
@@ -316,11 +321,7 @@ namespace UnityEngine.InputSystem.HID
                         return i;
                 }
 
-                reports.Add(new HIDReportData
-                {
-                    reportId = id,
-                    reportType = reportType
-                });
+                reports.Add(new HIDReportData { reportId = id, reportType = reportType });
 
                 return reports.Count - 1;
             }
@@ -462,16 +463,22 @@ namespace UnityEngine.InputSystem.HID
 
             public int GetPhysicalMin()
             {
-                if (physicalMinimum == null || physicalMaximum == null ||
-                    (physicalMinimum.Value == 0 && physicalMaximum.Value == 0))
+                if (
+                    physicalMinimum == null
+                    || physicalMaximum == null
+                    || (physicalMinimum.Value == 0 && physicalMaximum.Value == 0)
+                )
                     return logicalMinimum.GetValueOrDefault(0);
                 return physicalMinimum.Value;
             }
 
             public int GetPhysicalMax()
             {
-                if (physicalMinimum == null || physicalMaximum == null ||
-                    (physicalMinimum.Value == 0 && physicalMaximum.Value == 0))
+                if (
+                    physicalMinimum == null
+                    || physicalMaximum == null
+                    || (physicalMinimum.Value == 0 && physicalMaximum.Value == 0)
+                )
                     return logicalMaximum.GetValueOrDefault(0);
                 return physicalMaximum.Value;
             }

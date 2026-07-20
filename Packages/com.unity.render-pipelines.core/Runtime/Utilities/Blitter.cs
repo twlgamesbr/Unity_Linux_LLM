@@ -87,7 +87,7 @@ namespace UnityEngine.Rendering
             NearestCubeToOctahedralPadding = 21,
             BilinearCubeToOctahedralPadding = 22,
             NearestQuadPaddingOctahedral = 23,
-            NearestQuadPaddingAlphaBlendOctahedral = 24
+            NearestQuadPaddingAlphaBlendOctahedral = 24,
         }
 
         enum BlitColorAndDepthPassNames
@@ -153,14 +153,18 @@ namespace UnityEngine.Rendering
         {
             if (s_Blit != null)
             {
-                throw new Exception("Blitter is already initialized. Please only initialize the blitter once or you will leak engine resources. If you need to re-initialize the blitter with different shaders destroy & recreate it.");
+                throw new Exception(
+                    "Blitter is already initialized. Please only initialize the blitter once or you will leak engine resources. If you need to re-initialize the blitter with different shaders destroy & recreate it."
+                );
             }
 
             // NOTE NOTE NOTE NOTE NOTE NOTE
             // If you create something here you must also destroy it in Cleanup()
             // or it will leak during enter/leave play mode cycles
             // NOTE NOTE NOTE NOTE NOTE NOTE
-            s_Copy = CoreUtils.CreateEngineMaterial(GraphicsSettings.GetRenderPipelineSettings<RenderGraphUtilsResources>().coreCopyPS);
+            s_Copy = CoreUtils.CreateEngineMaterial(
+                GraphicsSettings.GetRenderPipelineSettings<RenderGraphUtilsResources>().coreCopyPS
+            );
             s_Blit = CoreUtils.CreateEngineMaterial(blitPS);
             s_BlitColorAndDepth = CoreUtils.CreateEngineMaterial(blitColorAndDepthPS);
 
@@ -203,7 +207,9 @@ namespace UnityEngine.Rendering
             }
 
             // Should match Common.hlsl
-            static Vector3[] GetFullScreenTriangleVertexPosition(float z /*= UNITY_NEAR_CLIP_VALUE*/)
+            static Vector3[] GetFullScreenTriangleVertexPosition(
+                float z /*= UNITY_NEAR_CLIP_VALUE*/
+            )
             {
                 var r = new Vector3[3];
                 for (int i = 0; i < 3; i++)
@@ -229,7 +235,9 @@ namespace UnityEngine.Rendering
             }
 
             // Should match Common.hlsl
-            static Vector3[] GetQuadVertexPosition(float z /*= UNITY_NEAR_CLIP_VALUE*/)
+            static Vector3[] GetQuadVertexPosition(
+                float z /*= UNITY_NEAR_CLIP_VALUE*/
+            )
             {
                 var r = new Vector3[4];
                 for (uint i = 0; i < 4; i++)
@@ -301,48 +309,77 @@ namespace UnityEngine.Rendering
         /// <param name="dimension">Dimension of the texture to blit, either 2D or 2D Array.</param>
         /// <param name="singleSlice">Blit only a single slice of the array if applicable.</param>
         /// <returns>The default blit material for the specified arguments.</returns>
-        static public Material GetBlitMaterial(TextureDimension dimension, bool singleSlice = false)
+        public static Material GetBlitMaterial(TextureDimension dimension, bool singleSlice = false)
         {
-            var material = (dimension == TextureDimension.Tex2DArray)
-                ? (singleSlice ? s_BlitTexArraySingleSlice : s_BlitTexArray)
-                : null;
+            var material =
+                (dimension == TextureDimension.Tex2DArray)
+                    ? (singleSlice ? s_BlitTexArraySingleSlice : s_BlitTexArray)
+                    : null;
             return material == null ? s_Blit : material;
         }
 
-        static internal void DrawTriangle(RasterCommandBuffer cmd, Material material, int shaderPass)
+        internal static void DrawTriangle(RasterCommandBuffer cmd, Material material, int shaderPass)
         {
             DrawTriangle(cmd.m_WrappedCommandBuffer, material, shaderPass);
         }
 
-        static internal void DrawTriangle(CommandBuffer cmd, Material material, int shaderPass)
+        internal static void DrawTriangle(CommandBuffer cmd, Material material, int shaderPass)
         {
             DrawTriangle(cmd, material, shaderPass, s_PropertyBlock);
         }
 
-        static internal void DrawTriangle(CommandBuffer cmd, Material material, int shaderPass, MaterialPropertyBlock propertyBlock)
+        internal static void DrawTriangle(
+            CommandBuffer cmd,
+            Material material,
+            int shaderPass,
+            MaterialPropertyBlock propertyBlock
+        )
         {
             if (SystemInfo.graphicsShaderLevel < 30)
                 cmd.DrawMesh(s_TriangleMesh, Matrix4x4.identity, material, 0, shaderPass, propertyBlock);
             else
-                cmd.DrawProcedural(Matrix4x4.identity, material, shaderPass, MeshTopology.Triangles, 3, 1, propertyBlock);
+                cmd.DrawProcedural(
+                    Matrix4x4.identity,
+                    material,
+                    shaderPass,
+                    MeshTopology.Triangles,
+                    3,
+                    1,
+                    propertyBlock
+                );
         }
 
-        static internal void DrawQuadMesh(CommandBuffer cmd, Material material, int shaderPass, MaterialPropertyBlock propertyBlock)
+        internal static void DrawQuadMesh(
+            CommandBuffer cmd,
+            Material material,
+            int shaderPass,
+            MaterialPropertyBlock propertyBlock
+        )
         {
             cmd.DrawMesh(s_QuadMesh, Matrix4x4.identity, material, 0, shaderPass, propertyBlock);
         }
 
-        static internal void DrawQuad(RasterCommandBuffer cmd, Material material, int shaderPass, MaterialPropertyBlock propertyBlock)
+        internal static void DrawQuad(
+            RasterCommandBuffer cmd,
+            Material material,
+            int shaderPass,
+            MaterialPropertyBlock propertyBlock
+        )
         {
             DrawQuad(cmd.m_WrappedCommandBuffer, material, shaderPass, propertyBlock);
         }
 
-        static internal void DrawQuad(CommandBuffer cmd, Material material, int shaderPass)
+        internal static void DrawQuad(CommandBuffer cmd, Material material, int shaderPass)
         {
             DrawQuad(cmd, material, shaderPass, s_PropertyBlock);
         }
 
-        static internal void DrawQuad(CommandBuffer cmd, Material material, int shaderPass, MaterialPropertyBlock propertyBlock)
+        internal static void DrawQuad(
+            CommandBuffer cmd,
+            Material material,
+            int shaderPass,
+            MaterialPropertyBlock propertyBlock
+        )
         {
             if (SystemInfo.graphicsShaderLevel < 30)
                 cmd.DrawMesh(s_QuadMesh, Matrix4x4.identity, material, 0, shaderPass, propertyBlock);
@@ -373,8 +410,7 @@ namespace UnityEngine.Rendering
                 || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan
                 || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12;
 
-            if (SystemInfo.supportsMultisampleAutoResolve &&
-                !hasRenderPass && !srcBindTextureMS)
+            if (SystemInfo.supportsMultisampleAutoResolve && !hasRenderPass && !srcBindTextureMS)
             {
                 // If we have autoresolve it means msaa rendertextures render as MSAA but  magically resolve in the driver when accessed as a texture, the MSAA surface is fully hidden inside the GFX device
                 // this is contrary to most platforms where the resolve magic on reading happens in the engine layer (and thus allocates proper multi sampled and resolve surfaces the engine can access)
@@ -415,9 +451,24 @@ namespace UnityEngine.Rendering
         /// <param name="sourceMipLevel">Mip level to blit from source.</param>
         /// <param name="sourceDepthSlice">Source texture slice index.</param>
         /// <param name="bilinear">Enable bilinear filtering.</param>
-        internal static void BlitTexture(CommandBuffer cmd, RTHandle source, Vector4 scaleBias, float sourceMipLevel, int sourceDepthSlice, bool bilinear)
+        internal static void BlitTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            float sourceMipLevel,
+            int sourceDepthSlice,
+            bool bilinear
+        )
         {
-            BlitTexture(cmd, source, scaleBias, GetBlitMaterial(TextureDimension.Tex2D), s_BlitShaderPassIndicesMap[bilinear ? 1 : 0], sourceMipLevel, sourceDepthSlice);
+            BlitTexture(
+                cmd,
+                source,
+                scaleBias,
+                GetBlitMaterial(TextureDimension.Tex2D),
+                s_BlitShaderPassIndicesMap[bilinear ? 1 : 0],
+                sourceMipLevel,
+                sourceDepthSlice
+            );
         }
 
         /// <summary>
@@ -428,7 +479,15 @@ namespace UnityEngine.Rendering
         /// <param name="scaleBias">Scale and bias for sampling the input texture.</param>
         /// <param name="sourceMipLevel">Mip level to blit from source.</param>
         /// <param name="sourceDepthSlice">Source texture slice index.</param>
-        internal static void BlitTexture(CommandBuffer cmd, RTHandle source, Vector4 scaleBias, Material material, int pass, float sourceMipLevel, int sourceDepthSlice)
+        internal static void BlitTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            Material material,
+            int pass,
+            float sourceMipLevel,
+            int sourceDepthSlice
+        )
         {
             s_PropertyBlock.SetFloat(BlitShaderIDs._BlitMipLevel, sourceMipLevel);
             s_PropertyBlock.SetInt(BlitShaderIDs._BlitTexArraySlice, sourceDepthSlice);
@@ -470,7 +529,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, new Vector4(1, 0.5, 0, 0.5), 4, false);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(RasterCommandBuffer cmd, RTHandle source, Vector4 scaleBias, float mipLevel, bool bilinear)
+        public static void BlitTexture(
+            RasterCommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            float mipLevel,
+            bool bilinear
+        )
         {
             BlitTexture(cmd.m_WrappedCommandBuffer, source, scaleBias, mipLevel, bilinear);
         }
@@ -511,11 +576,23 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, new Vector4(1, 0.5, 0, 0.5), 4, false);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(CommandBuffer cmd, RTHandle source, Vector4 scaleBias, float mipLevel, bool bilinear)
+        public static void BlitTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            float mipLevel,
+            bool bilinear
+        )
         {
             var dimension = (source.rt != null) ? source.rt.dimension : TextureXR.dimension;
             s_PropertyBlock.SetFloat(BlitShaderIDs._BlitMipLevel, mipLevel);
-            BlitTexture(cmd, source, scaleBias, GetBlitMaterial(dimension), s_BlitShaderPassIndicesMap[bilinear ? 1 : 0]);
+            BlitTexture(
+                cmd,
+                source,
+                scaleBias,
+                GetBlitMaterial(dimension),
+                s_BlitShaderPassIndicesMap[bilinear ? 1 : 0]
+            );
         }
 
         /// <summary>
@@ -550,8 +627,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture2D(cmd, source, new Vector4(1, 0.5, 0, 0.5), 4, false);
         /// ]]></code>
         /// </example>
-        
-        public static void BlitTexture2D(RasterCommandBuffer cmd, RTHandle source, Vector4 scaleBias, float mipLevel, bool bilinear)
+        public static void BlitTexture2D(
+            RasterCommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            float mipLevel,
+            bool bilinear
+        )
         {
             BlitTexture2D(cmd.m_WrappedCommandBuffer, source, scaleBias, mipLevel, bilinear);
         }
@@ -588,10 +670,22 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture2D(cmd, source, new Vector4(1, 0.5, 0, 0.5), 4, false);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture2D(CommandBuffer cmd, RTHandle source, Vector4 scaleBias, float mipLevel, bool bilinear)
+        public static void BlitTexture2D(
+            CommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            float mipLevel,
+            bool bilinear
+        )
         {
             s_PropertyBlock.SetFloat(BlitShaderIDs._BlitMipLevel, mipLevel);
-            BlitTexture(cmd, source, scaleBias, GetBlitMaterial(TextureDimension.Tex2D), s_BlitShaderPassIndicesMap[bilinear ? 1 : 0]);
+            BlitTexture(
+                cmd,
+                source,
+                scaleBias,
+                GetBlitMaterial(TextureDimension.Tex2D),
+                s_BlitShaderPassIndicesMap[bilinear ? 1 : 0]
+            );
         }
 
         /// <summary>
@@ -634,7 +728,14 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitColorAndDepth(cmd, sourceColor, sourceDepth, new Vector4(1, 0.5, 0, 0.5), 4, true);
         /// ]]></code>
         /// </example>
-        public static void BlitColorAndDepth(RasterCommandBuffer cmd, Texture sourceColor, RenderTexture sourceDepth, Vector4 scaleBias, float mipLevel, bool blitDepth)
+        public static void BlitColorAndDepth(
+            RasterCommandBuffer cmd,
+            Texture sourceColor,
+            RenderTexture sourceDepth,
+            Vector4 scaleBias,
+            float mipLevel,
+            bool blitDepth
+        )
         {
             BlitColorAndDepth(cmd.m_WrappedCommandBuffer, sourceColor, sourceDepth, scaleBias, mipLevel, blitDepth);
         }
@@ -679,7 +780,14 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitColorAndDepth(cmd, sourceColor, sourceDepth, new Vector4(1, 0.5, 0, 0.5), 4, true);
         /// ]]></code>
         /// </example>
-        public static void BlitColorAndDepth(CommandBuffer cmd, Texture sourceColor, RenderTexture sourceDepth, Vector4 scaleBias, float mipLevel, bool blitDepth)
+        public static void BlitColorAndDepth(
+            CommandBuffer cmd,
+            Texture sourceColor,
+            RenderTexture sourceDepth,
+            Vector4 scaleBias,
+            float mipLevel,
+            bool blitDepth
+        )
         {
             s_PropertyBlock.SetFloat(BlitShaderIDs._BlitMipLevel, mipLevel);
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBias);
@@ -711,7 +819,10 @@ namespace UnityEngine.Rendering
         {
             s_PropertyBlock.SetFloat(BlitShaderIDs._BlitMipLevel, mipLevel);
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBias);
-            s_PropertyBlock.SetVector(BlitShaderIDs._SourceResolution, new Vector2(sourceDepth.width, sourceDepth.height));
+            s_PropertyBlock.SetVector(
+                BlitShaderIDs._SourceResolution,
+                new Vector2(sourceDepth.width, sourceDepth.height)
+            );
 
             // Setup MSAA keywords
             cmd.SetKeyword(s_BlitColorAndDepth, s_ResolveDepthMSAA2X, sourceDepth.antiAliasing == 2);
@@ -757,7 +868,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, new Vector4(1, 0.5, 0, 0.5), blitMaterial, 1);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(RasterCommandBuffer cmd, RTHandle source, Vector4 scaleBias, Material material, int pass)
+        public static void BlitTexture(
+            RasterCommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            Material material,
+            int pass
+        )
         {
             BlitTexture(cmd.m_WrappedCommandBuffer, source, scaleBias, material, pass);
         }
@@ -793,7 +910,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, new Vector4(1, 0.5, 0, 0.5), blitMaterial, 1);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(UnsafeCommandBuffer cmd, RTHandle source, Vector4 scaleBias, Material material, int pass)
+        public static void BlitTexture(
+            UnsafeCommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            Material material,
+            int pass
+        )
         {
             BlitTexture(cmd.m_WrappedCommandBuffer, source, scaleBias, material, pass);
         }
@@ -829,7 +952,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, new Vector4(1, 0.5, 0, 0.5), blitMaterial, 1);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(CommandBuffer cmd, RTHandle source, Vector4 scaleBias, Material material, int pass)
+        public static void BlitTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            Vector4 scaleBias,
+            Material material,
+            int pass
+        )
         {
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBias);
             s_PropertyBlock.SetTexture(BlitShaderIDs._BlitTexture, source);
@@ -867,7 +996,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, new Vector4(1, 0.5, 0, 0.5), blitMaterial, 1);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(RasterCommandBuffer cmd, RenderTargetIdentifier source, Vector4 scaleBias, Material material, int pass)
+        public static void BlitTexture(
+            RasterCommandBuffer cmd,
+            RenderTargetIdentifier source,
+            Vector4 scaleBias,
+            Material material,
+            int pass
+        )
         {
             BlitTexture(cmd.m_WrappedCommandBuffer, source, scaleBias, material, pass);
         }
@@ -903,7 +1038,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, new Vector4(1, 0.5, 0, 0.5), blitMaterial, 1);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(CommandBuffer cmd, RenderTargetIdentifier source, Vector4 scaleBias, Material material, int pass)
+        public static void BlitTexture(
+            CommandBuffer cmd,
+            RenderTargetIdentifier source,
+            Vector4 scaleBias,
+            Material material,
+            int pass
+        )
         {
             s_PropertyBlock.Clear();
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBias);
@@ -936,7 +1077,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, dest, blitMaterial, 0);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(CommandBuffer cmd, RenderTargetIdentifier source, RenderTargetIdentifier destination, Material material, int pass)
+        public static void BlitTexture(
+            CommandBuffer cmd,
+            RenderTargetIdentifier source,
+            RenderTargetIdentifier destination,
+            Material material,
+            int pass
+        )
         {
             s_PropertyBlock.Clear();
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, Vector2.one);
@@ -969,7 +1116,15 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitTexture(cmd, source, dest, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store, blitMaterial, 0);
         /// ]]></code>
         /// </example>
-        public static void BlitTexture(CommandBuffer cmd, RenderTargetIdentifier source, RenderTargetIdentifier destination, RenderBufferLoadAction loadAction, RenderBufferStoreAction storeAction, Material material, int pass)
+        public static void BlitTexture(
+            CommandBuffer cmd,
+            RenderTargetIdentifier source,
+            RenderTargetIdentifier destination,
+            RenderBufferLoadAction loadAction,
+            RenderBufferStoreAction storeAction,
+            Material material,
+            int pass
+        )
         {
             s_PropertyBlock.Clear();
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, Vector2.one);
@@ -1040,9 +1195,17 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCameraTexture(cmd, source, destination, 0, true);
         /// ]]></code>
         /// </example>
-        public static void BlitCameraTexture(CommandBuffer cmd, RTHandle source, RTHandle destination, float mipLevel = 0.0f, bool bilinear = false)
+        public static void BlitCameraTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            RTHandle destination,
+            float mipLevel = 0.0f,
+            bool bilinear = false
+        )
         {
-            Vector2 viewportScale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 viewportScale = source.useScaling
+                ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                : Vector2.one;
             // Will set the correct camera viewport as well.
             CoreUtils.SetRenderTarget(cmd, destination);
             BlitTexture(cmd, source, viewportScale, mipLevel, bilinear);
@@ -1075,9 +1238,17 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCameraTexture2D(cmd, source, destination, 0, true);
         /// ]]></code>
         /// </example>
-        public static void BlitCameraTexture2D(CommandBuffer cmd, RTHandle source, RTHandle destination, float mipLevel = 0.0f, bool bilinear = false)
+        public static void BlitCameraTexture2D(
+            CommandBuffer cmd,
+            RTHandle source,
+            RTHandle destination,
+            float mipLevel = 0.0f,
+            bool bilinear = false
+        )
         {
-            Vector2 viewportScale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 viewportScale = source.useScaling
+                ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                : Vector2.one;
             // Will set the correct camera viewport as well.
             CoreUtils.SetRenderTarget(cmd, destination);
             BlitTexture2D(cmd, source, viewportScale, mipLevel, bilinear);
@@ -1118,9 +1289,17 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCameraTexture(cmd, source, dest, blitMaterial, 0);
         /// ]]></code>
         /// </example>
-        public static void BlitCameraTexture(CommandBuffer cmd, RTHandle source, RTHandle destination, Material material, int pass)
+        public static void BlitCameraTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            RTHandle destination,
+            Material material,
+            int pass
+        )
         {
-            Vector2 viewportScale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 viewportScale = source.useScaling
+                ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                : Vector2.one;
             // Will set the correct camera viewport as well.
             CoreUtils.SetRenderTarget(cmd, destination);
             BlitTexture(cmd, source, viewportScale, material, pass);
@@ -1130,7 +1309,7 @@ namespace UnityEngine.Rendering
         /// Adds in a <see cref="CommandBuffer"/> a command to copy a camera related texture identified by
         /// its <see cref="RTHandle"/> into a destination render target, using a user material, specific shader pass and specific load / store actions.
         /// </summary>
-		/// <remarks>
+        /// <remarks>
         /// Camera related textures are created with the <see cref="RenderGraphModule.RenderGraph.CreateTexture"/>
         /// method using <see cref="RenderGraphModule.TextureDesc.TextureDesc(Vector2,bool,bool)"/> or
         /// <see cref="RenderGraphModule.TextureDesc.TextureDesc(ScaleFunc,bool,bool)"/> to
@@ -1160,7 +1339,16 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCameraTexture(cmd, source, dest, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store, blitMaterial, 0);
         /// ]]></code>
         /// </example>
-        public static void BlitCameraTexture(CommandBuffer cmd, RTHandle source, RTHandle destination, Vector4 scaleBias, RenderBufferLoadAction loadAction, RenderBufferStoreAction storeAction, Material material, int pass)
+        public static void BlitCameraTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            RTHandle destination,
+            Vector4 scaleBias,
+            RenderBufferLoadAction loadAction,
+            RenderBufferStoreAction storeAction,
+            Material material,
+            int pass
+        )
         {
             // Will set the correct camera viewport as well.
             CoreUtils.SetRenderTarget(cmd, destination, loadAction, storeAction, ClearFlag.None, Color.clear);
@@ -1179,9 +1367,19 @@ namespace UnityEngine.Rendering
         /// <param name="storeAction">Store action to perform on the destination render target after the copying.</param>
         /// <param name="material">The material to use for writing to the destination target.</param>
         /// <param name="pass">The index of the pass to use in the material's shader.</param>
-        public static void BlitCameraTexture(CommandBuffer cmd, RTHandle source, RTHandle destination, RenderBufferLoadAction loadAction, RenderBufferStoreAction storeAction, Material material, int pass)
+        public static void BlitCameraTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            RTHandle destination,
+            RenderBufferLoadAction loadAction,
+            RenderBufferStoreAction storeAction,
+            Material material,
+            int pass
+        )
         {
-            Vector2 viewportScale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 viewportScale = source.useScaling
+                ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                : Vector2.one;
             BlitCameraTexture(cmd, source, destination, viewportScale, loadAction, storeAction, material, pass);
         }
 
@@ -1212,7 +1410,14 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCameraTexture(cmd, source, dest, new Vector4(0.5f, 0.5f, 0f, 0f), 1, true);
         /// ]]></code>
         /// </example>
-        public static void BlitCameraTexture(CommandBuffer cmd, RTHandle source, RTHandle destination, Vector4 scaleBias, float mipLevel = 0.0f, bool bilinear = false)
+        public static void BlitCameraTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            RTHandle destination,
+            Vector4 scaleBias,
+            float mipLevel = 0.0f,
+            bool bilinear = false
+        )
         {
             // Will set the correct camera viewport as well.
             CoreUtils.SetRenderTarget(cmd, destination);
@@ -1247,9 +1452,18 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCameraTexture(cmd, source, destination, new Rect(0, 0, 512, 256), 0, true);
         /// ]]></code>
         /// </example>
-        public static void BlitCameraTexture(CommandBuffer cmd, RTHandle source, RTHandle destination, Rect destViewport, float mipLevel = 0.0f, bool bilinear = false)
+        public static void BlitCameraTexture(
+            CommandBuffer cmd,
+            RTHandle source,
+            RTHandle destination,
+            Rect destViewport,
+            float mipLevel = 0.0f,
+            bool bilinear = false
+        )
         {
-            Vector2 viewportScale = source.useScaling ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+            Vector2 viewportScale = source.useScaling
+                ? new Vector2(source.rtHandleProperties.rtHandleScale.x, source.rtHandleProperties.rtHandleScale.y)
+                : Vector2.one;
             CoreUtils.SetRenderTarget(cmd, destination);
             cmd.SetViewport(destViewport);
             BlitTexture(cmd, source, viewportScale, mipLevel, bilinear);
@@ -1282,7 +1496,14 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitQuad(cmd, source, topRight, bottomLeft, 0, false);
         /// ]]></code>
         /// </example>
-        public static void BlitQuad(CommandBuffer cmd, Texture source, Vector4 scaleBiasTex, Vector4 scaleBiasRT, int mipLevelTex, bool bilinear)
+        public static void BlitQuad(
+            CommandBuffer cmd,
+            Texture source,
+            Vector4 scaleBiasTex,
+            Vector4 scaleBiasRT,
+            int mipLevelTex,
+            bool bilinear
+        )
         {
             s_PropertyBlock.SetTexture(BlitShaderIDs._BlitTexture, source);
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBiasTex);
@@ -1340,7 +1561,16 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitQuadWithPadding(cmd, source, subTextureSize, topRight, bottomLeft, 0, false, paddingInPixels);
         /// ]]></code>
         /// </example>
-        public static void BlitQuadWithPadding(CommandBuffer cmd, Texture source, Vector2 textureSize, Vector4 scaleBiasTex, Vector4 scaleBiasRT, int mipLevelTex, bool bilinear, int paddingInPixels)
+        public static void BlitQuadWithPadding(
+            CommandBuffer cmd,
+            Texture source,
+            Vector2 textureSize,
+            Vector4 scaleBiasTex,
+            Vector4 scaleBiasRT,
+            int mipLevelTex,
+            bool bilinear,
+            int paddingInPixels
+        )
         {
             s_PropertyBlock.SetTexture(BlitShaderIDs._BlitTexture, source);
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBiasTex);
@@ -1399,7 +1629,16 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitQuadWithPaddingMultiply(cmd, source, subTextureSize, topRight, bottomLeft, 0, false, paddingInPixels);
         /// ]]></code>
         /// </example>
-        public static void BlitQuadWithPaddingMultiply(CommandBuffer cmd, Texture source, Vector2 textureSize, Vector4 scaleBiasTex, Vector4 scaleBiasRT, int mipLevelTex, bool bilinear, int paddingInPixels)
+        public static void BlitQuadWithPaddingMultiply(
+            CommandBuffer cmd,
+            Texture source,
+            Vector2 textureSize,
+            Vector4 scaleBiasTex,
+            Vector4 scaleBiasRT,
+            int mipLevelTex,
+            bool bilinear,
+            int paddingInPixels
+        )
         {
             s_PropertyBlock.SetTexture(BlitShaderIDs._BlitTexture, source);
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBiasTex);
@@ -1461,7 +1700,16 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitOctahedralWithPadding(cmd, source, subTextureSize, topRight, bottomLeft, 0, false, paddingInPixels);
         /// ]]></code>
         /// </example>
-        public static void BlitOctahedralWithPadding(CommandBuffer cmd, Texture source, Vector2 textureSize, Vector4 scaleBiasTex, Vector4 scaleBiasRT, int mipLevelTex, bool bilinear, int paddingInPixels)
+        public static void BlitOctahedralWithPadding(
+            CommandBuffer cmd,
+            Texture source,
+            Vector2 textureSize,
+            Vector4 scaleBiasTex,
+            Vector4 scaleBiasRT,
+            int mipLevelTex,
+            bool bilinear,
+            int paddingInPixels
+        )
         {
             s_PropertyBlock.SetTexture(BlitShaderIDs._BlitTexture, source);
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBiasTex);
@@ -1517,7 +1765,16 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitOctahedralWithPaddingMultiply(cmd, source, subTextureSize, topRight, bottomLeft, 0, false, paddingInPixels);
         /// ]]></code>
         /// </example>
-        public static void BlitOctahedralWithPaddingMultiply(CommandBuffer cmd, Texture source, Vector2 textureSize, Vector4 scaleBiasTex, Vector4 scaleBiasRT, int mipLevelTex, bool bilinear, int paddingInPixels)
+        public static void BlitOctahedralWithPaddingMultiply(
+            CommandBuffer cmd,
+            Texture source,
+            Vector2 textureSize,
+            Vector4 scaleBiasTex,
+            Vector4 scaleBiasRT,
+            int mipLevelTex,
+            bool bilinear,
+            int paddingInPixels
+        )
         {
             s_PropertyBlock.SetTexture(BlitShaderIDs._BlitTexture, source);
             s_PropertyBlock.SetVector(BlitShaderIDs._BlitScaleBias, scaleBiasTex);
@@ -1556,7 +1813,12 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCubeToOctahedral2DQuad(cmd, source, center3by3, 2);
         /// ]]></code>
         /// </example>
-        public static void BlitCubeToOctahedral2DQuad(CommandBuffer cmd, Texture source, Vector4 scaleBiasRT, int mipLevelTex)
+        public static void BlitCubeToOctahedral2DQuad(
+            CommandBuffer cmd,
+            Texture source,
+            Vector4 scaleBiasRT,
+            int mipLevelTex
+        )
         {
             s_PropertyBlock.SetTexture(BlitShaderIDs._BlitCubeTexture, source);
             s_PropertyBlock.SetFloat(BlitShaderIDs._BlitMipLevel, mipLevelTex);
@@ -1609,7 +1871,16 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCubeToOctahedral2DQuadWithPadding(cmd, source, subTextureSize, center3by3, 2, paddingInPixels);
         /// ]]></code>
         /// </example>
-        public static void BlitCubeToOctahedral2DQuadWithPadding(CommandBuffer cmd, Texture source, Vector2 textureSize, Vector4 scaleBiasRT, int mipLevelTex, bool bilinear, int paddingInPixels, Vector4? decodeInstructions = null)
+        public static void BlitCubeToOctahedral2DQuadWithPadding(
+            CommandBuffer cmd,
+            Texture source,
+            Vector2 textureSize,
+            Vector4 scaleBiasRT,
+            int mipLevelTex,
+            bool bilinear,
+            int paddingInPixels,
+            Vector4? decodeInstructions = null
+        )
         {
             var material = GetBlitMaterial(source.dimension);
 
@@ -1665,7 +1936,12 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitCubeToOctahedral2DQuadSingleChannel(cmd, source, center3by3, 2);
         /// ]]></code>
         /// </example>
-        public static void BlitCubeToOctahedral2DQuadSingleChannel(CommandBuffer cmd, Texture source, Vector4 scaleBiasRT, int mipLevelTex)
+        public static void BlitCubeToOctahedral2DQuadSingleChannel(
+            CommandBuffer cmd,
+            Texture source,
+            Vector4 scaleBiasRT,
+            int mipLevelTex
+        )
         {
             int pass = 15;
             uint sourceChnCount = GraphicsFormatUtility.GetComponentCount(source.graphicsFormat);
@@ -1719,7 +1995,13 @@ namespace UnityEngine.Rendering
         /// Blitter.BlitQuadSingleChannel(cmd, source, topRight, bottomLeft, 0, false);
         /// ]]></code>
         /// </example>
-        public static void BlitQuadSingleChannel(CommandBuffer cmd, Texture source, Vector4 scaleBiasTex, Vector4 scaleBiasRT, int mipLevelTex)
+        public static void BlitQuadSingleChannel(
+            CommandBuffer cmd,
+            Texture source,
+            Vector4 scaleBiasTex,
+            Vector4 scaleBiasRT,
+            int mipLevelTex
+        )
         {
             int pass = 18;
             uint sourceChnCount = GraphicsFormatUtility.GetComponentCount(source.graphicsFormat);

@@ -34,8 +34,12 @@ namespace UnityEngine.PathTracing.Lightmapping
                 public static readonly int ChannelIndex = Shader.PropertyToID("g_ChannelIndex");
                 public static readonly int ChannelValue = Shader.PropertyToID("g_ChannelValue");
                 public static readonly int TemporaryRenderTarget = Shader.PropertyToID("g_TemporaryRenderTarget");
-                public static readonly int SecondTemporaryRenderTarget = Shader.PropertyToID("g_SecondTemporaryRenderTarget");
-                public static readonly int MultiplyTemporaryRenderTarget = Shader.PropertyToID("g_MultiplyTemporaryRenderTarget");
+                public static readonly int SecondTemporaryRenderTarget = Shader.PropertyToID(
+                    "g_SecondTemporaryRenderTarget"
+                );
+                public static readonly int MultiplyTemporaryRenderTarget = Shader.PropertyToID(
+                    "g_MultiplyTemporaryRenderTarget"
+                );
             }
 
             internal static int MultiplyKernel;
@@ -52,7 +56,9 @@ namespace UnityEngine.PathTracing.Lightmapping
             {
 #if UNITY_EDITOR
                 const string packageFolder = "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/";
-                ComputeHelperShader = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(packageFolder + "Shaders/ComputeHelpers.compute");
+                ComputeHelperShader = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                    packageFolder + "Shaders/ComputeHelpers.compute"
+                );
 #endif
                 if (ComputeHelperShader != null)
                 {
@@ -60,7 +66,9 @@ namespace UnityEngine.PathTracing.Lightmapping
                     BroadcastChannelKernel = ComputeHelperShader.FindKernel("BroadcastChannel");
                     SetChannelKernel = ComputeHelperShader.FindKernel("SetChannel");
                     ReferenceBoxFilterKernel = ComputeHelperShader.FindKernel("ReferenceBoxFilter");
-                    ReferenceBoxFilterBlueChannelKernel = ComputeHelperShader.FindKernel("ReferenceBoxFilterBlueChannel");
+                    ReferenceBoxFilterBlueChannelKernel = ComputeHelperShader.FindKernel(
+                        "ReferenceBoxFilterBlueChannel"
+                    );
                     StandardErrorKernel = ComputeHelperShader.FindKernel("StandardError");
                     StandardErrorThresholdKernel = ComputeHelperShader.FindKernel("StandardErrorThreshold");
                     GetValueKernel = ComputeHelperShader.FindKernel("GetValue");
@@ -81,13 +89,13 @@ namespace UnityEngine.PathTracing.Lightmapping
                 {
                     name = "_syncTexture",
                     enableRandomWrite = true,
-                    hideFlags = HideFlags.HideAndDontSave
+                    hideFlags = HideFlags.HideAndDontSave,
                 };
                 _syncTexture.Create();
                 _readableTex = new Texture2D(_syncTexture.width, _syncTexture.height, TextureFormat.ARGB32, false, true)
                 {
                     name = "_readableTex",
-                    hideFlags = HideFlags.HideAndDontSave
+                    hideFlags = HideFlags.HideAndDontSave,
                 };
             }
 
@@ -126,18 +134,25 @@ namespace UnityEngine.PathTracing.Lightmapping
         {
             switch (integratedOutputType)
             {
-                case IntegratedOutputType.Direct: return "irradianceDirect";
-                case IntegratedOutputType.Indirect: return "irradianceIndirect";
-                case IntegratedOutputType.AO: return "ambientOcclusion";
-                case IntegratedOutputType.Validity: return "validity";
-                case IntegratedOutputType.DirectionalityDirect: return "directionalityDirect";
-                case IntegratedOutputType.DirectionalityIndirect: return "directionalityIndirect";
-                case IntegratedOutputType.ShadowMask: return "shadowmask";
+                case IntegratedOutputType.Direct:
+                    return "irradianceDirect";
+                case IntegratedOutputType.Indirect:
+                    return "irradianceIndirect";
+                case IntegratedOutputType.AO:
+                    return "ambientOcclusion";
+                case IntegratedOutputType.Validity:
+                    return "validity";
+                case IntegratedOutputType.DirectionalityDirect:
+                    return "directionalityDirect";
+                case IntegratedOutputType.DirectionalityIndirect:
+                    return "directionalityIndirect";
+                case IntegratedOutputType.ShadowMask:
+                    return "shadowmask";
                 default:
-                    {
-                        Debug.Assert(false, "Missing lightmap type in LightmapTypeToComponentName");
-                        return "Missing lightmap type in LightmapTypeToComponentName";
-                    }
+                {
+                    Debug.Assert(false, "Missing lightmap type in LightmapTypeToComponentName");
+                    return "Missing lightmap type in LightmapTypeToComponentName";
+                }
             }
         }
 
@@ -147,7 +162,13 @@ namespace UnityEngine.PathTracing.Lightmapping
             return $"{path}/{outputType}{lightmapIndex}.r2d";
         }
 
-        public static bool WriteLightmap(CommandBuffer cmd, RenderTexture renderTex, string outputType, int lightmapIndex, string path)
+        public static bool WriteLightmap(
+            CommandBuffer cmd,
+            RenderTexture renderTex,
+            string outputType,
+            int lightmapIndex,
+            string path
+        )
         {
             try
             {
@@ -166,10 +187,21 @@ namespace UnityEngine.PathTracing.Lightmapping
             }
         }
 
-        public static bool WriteLightmap(CommandBuffer cmd, RenderTexture renderTex, IntegratedOutputType integratedOutputType, int lightmapIndex, string path)
+        public static bool WriteLightmap(
+            CommandBuffer cmd,
+            RenderTexture renderTex,
+            IntegratedOutputType integratedOutputType,
+            int lightmapIndex,
+            string path
+        )
         {
-            return WriteLightmap(cmd, renderTex, IntegratedOutputTypeToComponentName(integratedOutputType),
-                lightmapIndex, path);
+            return WriteLightmap(
+                cmd,
+                renderTex,
+                IntegratedOutputTypeToComponentName(integratedOutputType),
+                lightmapIndex,
+                path
+            );
         }
 
         private static void OutputUIntRequestData(string prefix, AsyncGPUReadbackRequest request)
@@ -203,7 +235,12 @@ namespace UnityEngine.PathTracing.Lightmapping
                 output = $"{prefix}:\n";
                 for (int i = 0; i < src.Length; i += 2)
                 {
-                    output += string.Format(System.Globalization.CultureInfo.InvariantCulture, "float2({0}, {1})", src[i], src[i + 1]);
+                    output += string.Format(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        "float2({0}, {1})",
+                        src[i],
+                        src[i + 1]
+                    );
                     if (i < src.Length - 1)
                         output += "\n";
                 }
@@ -222,9 +259,16 @@ namespace UnityEngine.PathTracing.Lightmapping
                 var src = request.GetData<float>();
                 Debug.Assert(src.Length % 4 == 0);
                 output = $"{prefix}:\n";
-                for (int i = 0; i < src.Length; i+=4)
+                for (int i = 0; i < src.Length; i += 4)
                 {
-                    output += string.Format(System.Globalization.CultureInfo.InvariantCulture, "float4({0}, {1}, {2}, {3})", src[i], src[i + 1], src[i + 2], src[i + 3]);
+                    output += string.Format(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        "float4({0}, {1}, {2}, {3})",
+                        src[i],
+                        src[i + 1],
+                        src[i + 2],
+                        src[i + 3]
+                    );
                     if (i < src.Length - 1)
                         output += "\n";
                 }
@@ -251,7 +295,8 @@ namespace UnityEngine.PathTracing.Lightmapping
                 output = $"{prefix}:\n";
                 for (int i = 0; i < src.Length; i++)
                 {
-                    output += $"hitEntry({src[i].instanceID}, {src[i].primitiveIndex}, bary: [{src[i].barycentrics.x}, {src[i].barycentrics.y}])";
+                    output +=
+                        $"hitEntry({src[i].instanceID}, {src[i].primitiveIndex}, bary: [{src[i].barycentrics.x}, {src[i].barycentrics.y}])";
                     if (i < src.Length - 1)
                         output += "\n";
                 }
@@ -266,30 +311,63 @@ namespace UnityEngine.PathTracing.Lightmapping
             UInt,
             Float2,
             Float4,
-            HitEntry
+            HitEntry,
         }
 
-        public static void LogGraphicsBuffer(CommandBuffer cmd, GraphicsBuffer graphicsBuffer, string prefix, LogBufferType type)
+        public static void LogGraphicsBuffer(
+            CommandBuffer cmd,
+            GraphicsBuffer graphicsBuffer,
+            string prefix,
+            LogBufferType type
+        )
         {
-            using GraphicsBuffer stagingBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopyDestination, graphicsBuffer.count, graphicsBuffer.stride);
+            using GraphicsBuffer stagingBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopyDestination,
+                graphicsBuffer.count,
+                graphicsBuffer.stride
+            );
             cmd.CopyBuffer(graphicsBuffer, stagingBuffer);
             switch (type)
             {
                 case LogBufferType.UInt:
                     Debug.Assert(graphicsBuffer.stride == 4);
-                    cmd.RequestAsyncReadback(stagingBuffer, (AsyncGPUReadbackRequest request) => { OutputUIntRequestData(prefix, request); });
+                    cmd.RequestAsyncReadback(
+                        stagingBuffer,
+                        (AsyncGPUReadbackRequest request) =>
+                        {
+                            OutputUIntRequestData(prefix, request);
+                        }
+                    );
                     break;
                 case LogBufferType.Float2:
                     Debug.Assert(graphicsBuffer.stride == 8);
-                    cmd.RequestAsyncReadback(stagingBuffer, (AsyncGPUReadbackRequest request) => { OutputFloat2RequestData(prefix, request); });
+                    cmd.RequestAsyncReadback(
+                        stagingBuffer,
+                        (AsyncGPUReadbackRequest request) =>
+                        {
+                            OutputFloat2RequestData(prefix, request);
+                        }
+                    );
                     break;
                 case LogBufferType.Float4:
                     Debug.Assert(graphicsBuffer.stride == 16);
-                    cmd.RequestAsyncReadback(stagingBuffer, (AsyncGPUReadbackRequest request) => { OutputFloat4RequestData(prefix, request); });
+                    cmd.RequestAsyncReadback(
+                        stagingBuffer,
+                        (AsyncGPUReadbackRequest request) =>
+                        {
+                            OutputFloat4RequestData(prefix, request);
+                        }
+                    );
                     break;
                 case LogBufferType.HitEntry:
                     Debug.Assert(graphicsBuffer.stride == 16);
-                    cmd.RequestAsyncReadback(stagingBuffer, (AsyncGPUReadbackRequest request) => { OutputHitEntryRequestData(prefix, request); });
+                    cmd.RequestAsyncReadback(
+                        stagingBuffer,
+                        (AsyncGPUReadbackRequest request) =>
+                        {
+                            OutputHitEntryRequestData(prefix, request);
+                        }
+                    );
                     break;
                 default:
                     Debug.LogWarning($"LogGraphicsBuffer: GraphicsBuffer type {type} is not implemented.");
@@ -304,14 +382,24 @@ namespace UnityEngine.PathTracing.Lightmapping
 
         internal static GraphicsBuffer CreateDispatchDimensionBuffer()
         {
-            return new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, 3, sizeof(uint));
+            return new GraphicsBuffer(
+                GraphicsBuffer.Target.IndirectArguments
+                    | GraphicsBuffer.Target.Structured
+                    | GraphicsBuffer.Target.CopySource,
+                3,
+                sizeof(uint)
+            );
         }
 
         public static double4 GetSum(int width, int height, RenderTexture renderTex)
         {
             RenderTexture previous = RenderTexture.active;
             RenderTexture.active = renderTex;
-            Texture2D readableTex = new Texture2D(width, height, TextureFormat.RGBAFloat, false, true) { name = "GetSum.readableTex", hideFlags = HideFlags.HideAndDontSave };
+            Texture2D readableTex = new Texture2D(width, height, TextureFormat.RGBAFloat, false, true)
+            {
+                name = "GetSum.readableTex",
+                hideFlags = HideFlags.HideAndDontSave,
+            };
             Assert.IsTrue(readableTex.isReadable);
             readableTex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             RenderTexture.active = previous;
@@ -328,17 +416,42 @@ namespace UnityEngine.PathTracing.Lightmapping
             return color.r * 0.2126f + color.g * 0.7152f + color.b * 0.0722f;
         }
 
-        public static Color GetValue(CommandBuffer cmd, ComputeShader computeShader, int getValueKernel, int sampleX, int sampleY, int width, int height, RenderTargetIdentifier renderTargetIdentifier)
+        public static Color GetValue(
+            CommandBuffer cmd,
+            ComputeShader computeShader,
+            int getValueKernel,
+            int sampleX,
+            int sampleY,
+            int width,
+            int height,
+            RenderTargetIdentifier renderTargetIdentifier
+        )
         {
             using ComputeBuffer colorBuffer = new(4, sizeof(float));
-            cmd.SetComputeBufferParam(computeShader, getValueKernel, ComputeHelpers.ShaderIDs.OutputBuffer, colorBuffer);
-            cmd.SetComputeTextureParam(computeShader, getValueKernel, ComputeHelpers.ShaderIDs.SourceTexture, renderTargetIdentifier);
+            cmd.SetComputeBufferParam(
+                computeShader,
+                getValueKernel,
+                ComputeHelpers.ShaderIDs.OutputBuffer,
+                colorBuffer
+            );
+            cmd.SetComputeTextureParam(
+                computeShader,
+                getValueKernel,
+                ComputeHelpers.ShaderIDs.SourceTexture,
+                renderTargetIdentifier
+            );
             cmd.SetComputeIntParam(computeShader, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(computeShader, ComputeHelpers.ShaderIDs.TextureHeight, height);
             cmd.SetComputeIntParam(computeShader, ComputeHelpers.ShaderIDs.X, sampleX);
             cmd.SetComputeIntParam(computeShader, ComputeHelpers.ShaderIDs.Y, sampleY);
             computeShader.GetKernelThreadGroupSizes(getValueKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(computeShader, getValueKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            cmd.DispatchCompute(
+                computeShader,
+                getValueKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
             Graphics.ExecuteCommandBuffer(cmd);
             cmd.Clear();
             float[] tempColorArray = new float[4];
@@ -347,103 +460,339 @@ namespace UnityEngine.PathTracing.Lightmapping
             return new Color(tempColorArray[0], tempColorArray[1], tempColorArray[2], tempColorArray[3]);
         }
 
-        public static void NormalizeByAlpha(CommandBuffer cmd, ComputeShader computeShader, int normalizeByAlphaKernel, int width, int height, RenderTargetIdentifier inOut)
+        public static void NormalizeByAlpha(
+            CommandBuffer cmd,
+            ComputeShader computeShader,
+            int normalizeByAlphaKernel,
+            int width,
+            int height,
+            RenderTargetIdentifier inOut
+        )
         {
-            cmd.SetComputeTextureParam(computeShader, normalizeByAlphaKernel, ComputeHelpers.ShaderIDs.TextureInOut, inOut);
+            cmd.SetComputeTextureParam(
+                computeShader,
+                normalizeByAlphaKernel,
+                ComputeHelpers.ShaderIDs.TextureInOut,
+                inOut
+            );
             cmd.SetComputeIntParam(computeShader, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(computeShader, ComputeHelpers.ShaderIDs.TextureHeight, height);
             computeShader.GetKernelThreadGroupSizes(normalizeByAlphaKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(computeShader, normalizeByAlphaKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            cmd.DispatchCompute(
+                computeShader,
+                normalizeByAlphaKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
         }
 
-        public static void MultiplyRenderTexture(CommandBuffer cmd, ComputeShader multiplyShader, int multiplyKernel, RenderTargetIdentifier inOut, int width, int height, Vector4 multiplicationFactor)
+        public static void MultiplyRenderTexture(
+            CommandBuffer cmd,
+            ComputeShader multiplyShader,
+            int multiplyKernel,
+            RenderTargetIdentifier inOut,
+            int width,
+            int height,
+            Vector4 multiplicationFactor
+        )
         {
             cmd.SetComputeTextureParam(multiplyShader, multiplyKernel, ComputeHelpers.ShaderIDs.TextureInOut, inOut);
             cmd.SetComputeIntParam(multiplyShader, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(multiplyShader, ComputeHelpers.ShaderIDs.TextureHeight, height);
-            cmd.SetComputeVectorParam(multiplyShader, ComputeHelpers.ShaderIDs.MultiplicationFactor, multiplicationFactor);
+            cmd.SetComputeVectorParam(
+                multiplyShader,
+                ComputeHelpers.ShaderIDs.MultiplicationFactor,
+                multiplicationFactor
+            );
             multiplyShader.GetKernelThreadGroupSizes(multiplyKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(multiplyShader, multiplyKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            cmd.DispatchCompute(
+                multiplyShader,
+                multiplyKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
         }
 
-        public static void MultiplyTexture(CommandBuffer cmd, ComputeShader multiplyShader, int multiplyKernel, Texture2D texture, Vector4 multiplicationFactor)
+        public static void MultiplyTexture(
+            CommandBuffer cmd,
+            ComputeShader multiplyShader,
+            int multiplyKernel,
+            Texture2D texture,
+            Vector4 multiplicationFactor
+        )
         {
             int renderTargetID = ComputeHelpers.ShaderIDs.MultiplyTemporaryRenderTarget;
-            cmd.GetTemporaryRT(renderTargetID, texture.width, texture.height, 0, FilterMode.Point, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear, 1, true);
+            cmd.GetTemporaryRT(
+                renderTargetID,
+                texture.width,
+                texture.height,
+                0,
+                FilterMode.Point,
+                RenderTextureFormat.ARGBFloat,
+                RenderTextureReadWrite.Linear,
+                1,
+                true
+            );
             cmd.CopyTexture(texture, renderTargetID);
-            LightmapIntegrationHelpers.MultiplyRenderTexture(cmd, multiplyShader, multiplyKernel, renderTargetID, texture.width, texture.height, multiplicationFactor);
+            LightmapIntegrationHelpers.MultiplyRenderTexture(
+                cmd,
+                multiplyShader,
+                multiplyKernel,
+                renderTargetID,
+                texture.width,
+                texture.height,
+                multiplicationFactor
+            );
             cmd.CopyTexture(renderTargetID, texture);
             cmd.ReleaseTemporaryRT(renderTargetID);
         }
 
-        public static void StandardErrorRenderTexture(CommandBuffer cmd, ComputeShader standardError, int standardErrorKernel, RenderTargetIdentifier varianceInR, RenderTargetIdentifier sampleCountInW, RenderTargetIdentifier output, int width, int height)
+        public static void StandardErrorRenderTexture(
+            CommandBuffer cmd,
+            ComputeShader standardError,
+            int standardErrorKernel,
+            RenderTargetIdentifier varianceInR,
+            RenderTargetIdentifier sampleCountInW,
+            RenderTargetIdentifier output,
+            int width,
+            int height
+        )
         {
-            cmd.SetComputeTextureParam(standardError, standardErrorKernel, ComputeHelpers.ShaderIDs.VarianceInR, varianceInR);
-            cmd.SetComputeTextureParam(standardError, standardErrorKernel, ComputeHelpers.ShaderIDs.SampleCountInW, sampleCountInW);
+            cmd.SetComputeTextureParam(
+                standardError,
+                standardErrorKernel,
+                ComputeHelpers.ShaderIDs.VarianceInR,
+                varianceInR
+            );
+            cmd.SetComputeTextureParam(
+                standardError,
+                standardErrorKernel,
+                ComputeHelpers.ShaderIDs.SampleCountInW,
+                sampleCountInW
+            );
             cmd.SetComputeTextureParam(standardError, standardErrorKernel, ComputeHelpers.ShaderIDs.TextureOut, output);
             cmd.SetComputeIntParam(standardError, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(standardError, ComputeHelpers.ShaderIDs.TextureHeight, height);
             standardError.GetKernelThreadGroupSizes(standardErrorKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(standardError, standardErrorKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            cmd.DispatchCompute(
+                standardError,
+                standardErrorKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
         }
 
-        public static void StandardErrorThresholdRenderTexture(CommandBuffer cmd, ComputeShader standardErrorThreshold, int StandardErrorThresholdKernel, RenderTargetIdentifier standardErrorInR, RenderTargetIdentifier meanInR, float standardErrorThresholdValue, RenderTargetIdentifier output, int width, int height)
+        public static void StandardErrorThresholdRenderTexture(
+            CommandBuffer cmd,
+            ComputeShader standardErrorThreshold,
+            int StandardErrorThresholdKernel,
+            RenderTargetIdentifier standardErrorInR,
+            RenderTargetIdentifier meanInR,
+            float standardErrorThresholdValue,
+            RenderTargetIdentifier output,
+            int width,
+            int height
+        )
         {
-            cmd.SetComputeTextureParam(standardErrorThreshold, StandardErrorThresholdKernel, ComputeHelpers.ShaderIDs.StandardErrorInR, standardErrorInR);
-            cmd.SetComputeTextureParam(standardErrorThreshold, StandardErrorThresholdKernel, ComputeHelpers.ShaderIDs.MeanInR, meanInR);
-            cmd.SetComputeTextureParam(standardErrorThreshold, StandardErrorThresholdKernel, ComputeHelpers.ShaderIDs.TextureOut, output);
-            cmd.SetComputeFloatParam(standardErrorThreshold, ComputeHelpers.ShaderIDs.StandardErrorThreshold, standardErrorThresholdValue);
+            cmd.SetComputeTextureParam(
+                standardErrorThreshold,
+                StandardErrorThresholdKernel,
+                ComputeHelpers.ShaderIDs.StandardErrorInR,
+                standardErrorInR
+            );
+            cmd.SetComputeTextureParam(
+                standardErrorThreshold,
+                StandardErrorThresholdKernel,
+                ComputeHelpers.ShaderIDs.MeanInR,
+                meanInR
+            );
+            cmd.SetComputeTextureParam(
+                standardErrorThreshold,
+                StandardErrorThresholdKernel,
+                ComputeHelpers.ShaderIDs.TextureOut,
+                output
+            );
+            cmd.SetComputeFloatParam(
+                standardErrorThreshold,
+                ComputeHelpers.ShaderIDs.StandardErrorThreshold,
+                standardErrorThresholdValue
+            );
             cmd.SetComputeIntParam(standardErrorThreshold, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(standardErrorThreshold, ComputeHelpers.ShaderIDs.TextureHeight, height);
-            standardErrorThreshold.GetKernelThreadGroupSizes(StandardErrorThresholdKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(standardErrorThreshold, StandardErrorThresholdKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            standardErrorThreshold.GetKernelThreadGroupSizes(
+                StandardErrorThresholdKernel,
+                out uint x,
+                out uint y,
+                out _
+            );
+            cmd.DispatchCompute(
+                standardErrorThreshold,
+                StandardErrorThresholdKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
         }
 
-        public static void BroadcastChannelRenderTexture(CommandBuffer cmd, ComputeShader broadcastChannelShader, int broadcastChannelKernel, RenderTargetIdentifier inOut, int width, int height, int channelIndex)
+        public static void BroadcastChannelRenderTexture(
+            CommandBuffer cmd,
+            ComputeShader broadcastChannelShader,
+            int broadcastChannelKernel,
+            RenderTargetIdentifier inOut,
+            int width,
+            int height,
+            int channelIndex
+        )
         {
-            cmd.SetComputeTextureParam(broadcastChannelShader, broadcastChannelKernel, ComputeHelpers.ShaderIDs.TextureInOut, inOut);
+            cmd.SetComputeTextureParam(
+                broadcastChannelShader,
+                broadcastChannelKernel,
+                ComputeHelpers.ShaderIDs.TextureInOut,
+                inOut
+            );
             cmd.SetComputeIntParam(broadcastChannelShader, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(broadcastChannelShader, ComputeHelpers.ShaderIDs.TextureHeight, height);
             cmd.SetComputeIntParam(broadcastChannelShader, ComputeHelpers.ShaderIDs.ChannelIndex, channelIndex);
             broadcastChannelShader.GetKernelThreadGroupSizes(broadcastChannelKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(broadcastChannelShader, broadcastChannelKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            cmd.DispatchCompute(
+                broadcastChannelShader,
+                broadcastChannelKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
         }
 
-        public static void SetChannelRenderTexture(CommandBuffer cmd, ComputeShader setChannelShader, int setChannelKernel, RenderTargetIdentifier inOut, int width, int height, int channelIndex, float channelValue)
+        public static void SetChannelRenderTexture(
+            CommandBuffer cmd,
+            ComputeShader setChannelShader,
+            int setChannelKernel,
+            RenderTargetIdentifier inOut,
+            int width,
+            int height,
+            int channelIndex,
+            float channelValue
+        )
         {
-            cmd.SetComputeTextureParam(setChannelShader, setChannelKernel, ComputeHelpers.ShaderIDs.TextureInOut, inOut);
+            cmd.SetComputeTextureParam(
+                setChannelShader,
+                setChannelKernel,
+                ComputeHelpers.ShaderIDs.TextureInOut,
+                inOut
+            );
             cmd.SetComputeIntParam(setChannelShader, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(setChannelShader, ComputeHelpers.ShaderIDs.TextureHeight, height);
             cmd.SetComputeIntParam(setChannelShader, ComputeHelpers.ShaderIDs.ChannelIndex, channelIndex);
             cmd.SetComputeFloatParam(setChannelShader, ComputeHelpers.ShaderIDs.ChannelValue, channelValue);
             setChannelShader.GetKernelThreadGroupSizes(setChannelKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(setChannelShader, setChannelKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            cmd.DispatchCompute(
+                setChannelShader,
+                setChannelKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
         }
 
-        public static void ReferenceBoxFilterRenderTexture(CommandBuffer cmd, ComputeShader referenceBoxFilterShader, int referenceBoxFilterKernel, RenderTargetIdentifier inOut, int width, int height, int radius)
+        public static void ReferenceBoxFilterRenderTexture(
+            CommandBuffer cmd,
+            ComputeShader referenceBoxFilterShader,
+            int referenceBoxFilterKernel,
+            RenderTargetIdentifier inOut,
+            int width,
+            int height,
+            int radius
+        )
         {
-            cmd.GetTemporaryRT(ComputeHelpers.ShaderIDs.TextureOut, width, height, 0, FilterMode.Point, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear, 1, true);
-            cmd.SetComputeTextureParam(referenceBoxFilterShader, referenceBoxFilterKernel, ComputeHelpers.ShaderIDs.SourceTexture, inOut);
-            cmd.SetComputeTextureParam(referenceBoxFilterShader, referenceBoxFilterKernel, ComputeHelpers.ShaderIDs.TextureOut, ComputeHelpers.ShaderIDs.TextureOut);
+            cmd.GetTemporaryRT(
+                ComputeHelpers.ShaderIDs.TextureOut,
+                width,
+                height,
+                0,
+                FilterMode.Point,
+                RenderTextureFormat.ARGBFloat,
+                RenderTextureReadWrite.Linear,
+                1,
+                true
+            );
+            cmd.SetComputeTextureParam(
+                referenceBoxFilterShader,
+                referenceBoxFilterKernel,
+                ComputeHelpers.ShaderIDs.SourceTexture,
+                inOut
+            );
+            cmd.SetComputeTextureParam(
+                referenceBoxFilterShader,
+                referenceBoxFilterKernel,
+                ComputeHelpers.ShaderIDs.TextureOut,
+                ComputeHelpers.ShaderIDs.TextureOut
+            );
             cmd.SetComputeIntParam(referenceBoxFilterShader, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(referenceBoxFilterShader, ComputeHelpers.ShaderIDs.TextureHeight, height);
             cmd.SetComputeIntParam(referenceBoxFilterShader, ComputeHelpers.ShaderIDs.BoxFilterRadius, radius);
             referenceBoxFilterShader.GetKernelThreadGroupSizes(referenceBoxFilterKernel, out uint x, out uint y, out _);
-            cmd.DispatchCompute(referenceBoxFilterShader, referenceBoxFilterKernel, GraphicsHelpers.DivUp(width, x), GraphicsHelpers.DivUp(height, y), 1);
+            cmd.DispatchCompute(
+                referenceBoxFilterShader,
+                referenceBoxFilterKernel,
+                GraphicsHelpers.DivUp(width, x),
+                GraphicsHelpers.DivUp(height, y),
+                1
+            );
             cmd.CopyTexture(ComputeHelpers.ShaderIDs.TextureOut, inOut);
             cmd.ReleaseTemporaryRT(ComputeHelpers.ShaderIDs.TextureOut);
         }
 
-        public static void ReferenceBoxFilterBlueChannelRenderTexture(CommandBuffer cmd, ComputeShader referenceBoxFilterBlueChannelShader, int referenceBoxFilterBlueChannelKernel, RenderTargetIdentifier inOut, int width, int height, int radius, GraphicsBuffer indirectDispatchBuffer)
+        public static void ReferenceBoxFilterBlueChannelRenderTexture(
+            CommandBuffer cmd,
+            ComputeShader referenceBoxFilterBlueChannelShader,
+            int referenceBoxFilterBlueChannelKernel,
+            RenderTargetIdentifier inOut,
+            int width,
+            int height,
+            int radius,
+            GraphicsBuffer indirectDispatchBuffer
+        )
         {
             cmd.BeginSample("BoxFiltering");
-            cmd.GetTemporaryRT(ComputeHelpers.ShaderIDs.TextureOut, width, height, 0, FilterMode.Point, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear, 1, true);
-            cmd.SetComputeTextureParam(referenceBoxFilterBlueChannelShader, referenceBoxFilterBlueChannelKernel, ComputeHelpers.ShaderIDs.SourceTexture, inOut);
-            cmd.SetComputeTextureParam(referenceBoxFilterBlueChannelShader, referenceBoxFilterBlueChannelKernel, ComputeHelpers.ShaderIDs.TextureOut, ComputeHelpers.ShaderIDs.TextureOut);
+            cmd.GetTemporaryRT(
+                ComputeHelpers.ShaderIDs.TextureOut,
+                width,
+                height,
+                0,
+                FilterMode.Point,
+                RenderTextureFormat.ARGBFloat,
+                RenderTextureReadWrite.Linear,
+                1,
+                true
+            );
+            cmd.SetComputeTextureParam(
+                referenceBoxFilterBlueChannelShader,
+                referenceBoxFilterBlueChannelKernel,
+                ComputeHelpers.ShaderIDs.SourceTexture,
+                inOut
+            );
+            cmd.SetComputeTextureParam(
+                referenceBoxFilterBlueChannelShader,
+                referenceBoxFilterBlueChannelKernel,
+                ComputeHelpers.ShaderIDs.TextureOut,
+                ComputeHelpers.ShaderIDs.TextureOut
+            );
             cmd.SetComputeIntParam(referenceBoxFilterBlueChannelShader, ComputeHelpers.ShaderIDs.TextureWidth, width);
             cmd.SetComputeIntParam(referenceBoxFilterBlueChannelShader, ComputeHelpers.ShaderIDs.TextureHeight, height);
-            cmd.SetComputeIntParam(referenceBoxFilterBlueChannelShader, ComputeHelpers.ShaderIDs.BoxFilterRadius, radius);
-            cmd.DispatchCompute(referenceBoxFilterBlueChannelShader, referenceBoxFilterBlueChannelKernel, indirectDispatchBuffer, 0);
+            cmd.SetComputeIntParam(
+                referenceBoxFilterBlueChannelShader,
+                ComputeHelpers.ShaderIDs.BoxFilterRadius,
+                radius
+            );
+            cmd.DispatchCompute(
+                referenceBoxFilterBlueChannelShader,
+                referenceBoxFilterBlueChannelKernel,
+                indirectDispatchBuffer,
+                0
+            );
             cmd.CopyTexture(ComputeHelpers.ShaderIDs.TextureOut, inOut); // TODO(jesper): dont do copy
             cmd.ReleaseTemporaryRT(ComputeHelpers.ShaderIDs.TextureOut);
             cmd.EndSample("BoxFiltering");
@@ -466,7 +815,8 @@ namespace UnityEngine.PathTracing.Lightmapping
             Vector2 uvBoundsOffset,
             out Vector4 normalizedOccupiedST,
             out Vector2Int occupiedTexelSize,
-            out Vector2Int occupiedTexelOffset)
+            out Vector2Int occupiedTexelOffset
+        )
         {
             // Transform the "instance stamp" bounds to contain only the occupied region.
             float normalizedOccupiedWidth = instanceLightmapST.x * uvBoundsSize.x;
@@ -475,7 +825,12 @@ namespace UnityEngine.PathTracing.Lightmapping
             float normalizedOccupiedOffsetX = instanceLightmapST.z + uvBoundsOffset.x * instanceLightmapST.x;
             float normalizedOccupiedOffsetY = instanceLightmapST.w + uvBoundsOffset.y * instanceLightmapST.y;
 
-            normalizedOccupiedST = new Vector4(normalizedOccupiedWidth, normalizedOccupiedHeight, normalizedOccupiedOffsetX, normalizedOccupiedOffsetY);
+            normalizedOccupiedST = new Vector4(
+                normalizedOccupiedWidth,
+                normalizedOccupiedHeight,
+                normalizedOccupiedOffsetX,
+                normalizedOccupiedOffsetY
+            );
 
             // Transform the occupied region to lightmap pixel coordinate space.
             float occupiedWidth = lightmapWidth * normalizedOccupiedWidth;
@@ -501,9 +856,19 @@ namespace UnityEngine.PathTracing.Lightmapping
             float distanceToWholeX = Mathf.Abs(Mathf.Round(offsetFracX) - offsetFracX);
             float distanceToWholeY = Mathf.Abs(Mathf.Round(offsetFracY) - offsetFracY);
 
-            Debug.Assert(Mathf.Min(distanceToHalfX, distanceToWholeX) < 0.001f, $"Expected offset (X) to align with an offset of 0.5 (half texel) or 0.0 (whole texel). Was {occupiedTexelOffsetXFloat}. Was the scene baked with the same resolution as it was atlassed for?");
-            Debug.Assert(Mathf.Min(distanceToHalfY, distanceToWholeY) < 0.001f, $"Expected offset (Y) to align with an offset of 0.5 (half texel) or 0.0 (whole texel). Was {occupiedTexelOffsetYFloat}. Was the scene baked with the same resolution as it was atlassed for?");
-            Debug.Assert((distanceToHalfX < distanceToWholeX && distanceToHalfY < distanceToWholeY) || (distanceToHalfX > distanceToWholeX && distanceToHalfY > distanceToWholeY), "Texel alignment with an offset of 0.5 (half texel) or 0.0 (whole texel) must be the same for X and Y");
+            Debug.Assert(
+                Mathf.Min(distanceToHalfX, distanceToWholeX) < 0.001f,
+                $"Expected offset (X) to align with an offset of 0.5 (half texel) or 0.0 (whole texel). Was {occupiedTexelOffsetXFloat}. Was the scene baked with the same resolution as it was atlassed for?"
+            );
+            Debug.Assert(
+                Mathf.Min(distanceToHalfY, distanceToWholeY) < 0.001f,
+                $"Expected offset (Y) to align with an offset of 0.5 (half texel) or 0.0 (whole texel). Was {occupiedTexelOffsetYFloat}. Was the scene baked with the same resolution as it was atlassed for?"
+            );
+            Debug.Assert(
+                (distanceToHalfX < distanceToWholeX && distanceToHalfY < distanceToWholeY)
+                    || (distanceToHalfX > distanceToWholeX && distanceToHalfY > distanceToWholeY),
+                "Texel alignment with an offset of 0.5 (half texel) or 0.0 (whole texel) must be the same for X and Y"
+            );
 
             int occupiedTexelOffsetX = 0;
             int occupiedTexelOffsetY = 0;
@@ -545,7 +910,8 @@ namespace UnityEngine.PathTracing.Lightmapping
             public float varianceFiltered;
             public float standardError;
             public bool active;
-            override public string ToString()
+
+            public override string ToString()
             {
                 string samplesString = new("");
                 samplesString += sampleCount.ToString() + "\t";
@@ -558,14 +924,16 @@ namespace UnityEngine.PathTracing.Lightmapping
                 samplesString += active.ToString() + "\n";
                 return samplesString;
             }
+
             public static string HeaderString()
             {
                 string headerString = new("");
-                headerString += "sampleCount\taccumulatedLuminance\tmean\tmeanSqr\tvariance\tvarianceFiltered\tstandardError\tactive\n";
+                headerString +=
+                    "sampleCount\taccumulatedLuminance\tmean\tmeanSqr\tvariance\tvarianceFiltered\tstandardError\tactive\n";
                 return headerString;
             }
 
-            static public string SamplesToString(AdaptiveSample[] samples, int x, int y, float adaptiveThreshold)
+            public static string SamplesToString(AdaptiveSample[] samples, int x, int y, float adaptiveThreshold)
             {
                 if (samples.Length == 0)
                     return "";

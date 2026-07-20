@@ -119,7 +119,7 @@ namespace UnityEngine.InputSystem.Editor.Lists
                     continue;
 
                 // Determine parameter name from field.
-                var parameter = new EditableParameterValue {field = field};
+                var parameter = new EditableParameterValue { field = field };
                 var name = field.Name;
                 parameter.value.name = name;
 
@@ -156,7 +156,7 @@ namespace UnityEngine.InputSystem.Editor.Lists
                         parameter.defaultValue = new NamedValue
                         {
                             name = name,
-                            value = PrimitiveValue.FromObject(value)
+                            value = PrimitiveValue.FromObject(value),
                         };
                     }
                     catch
@@ -203,17 +203,26 @@ namespace UnityEngine.InputSystem.Editor.Lists
                 // parameter editor. This is because those types changed from structs to classes when UIToolkit was
                 // introduced, and we don't want to force users to have to create those instances manually on any of their
                 // own editors.
-                var genericArgumentType = TypeHelpers.GetGenericTypeArgumentFromHierarchy(parameterEditorType,
-                    typeof(InputParameterEditor<>), 0);
+                var genericArgumentType = TypeHelpers.GetGenericTypeArgumentFromHierarchy(
+                    parameterEditorType,
+                    typeof(InputParameterEditor<>),
+                    0
+                );
                 if (genericArgumentType != null)
                 {
-                    var fieldInfos = parameterEditorType
-                        .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    var fieldInfos = parameterEditorType.GetFields(
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                    );
                     var customOrDefaultGenericType = typeof(InputParameterEditor<>.CustomOrDefaultSetting);
                     var customOrDefaultType = customOrDefaultGenericType.MakeGenericType(genericArgumentType);
-                    foreach (var customOrDefaultEditorField in fieldInfos.Where(f => f.FieldType == customOrDefaultType))
+                    foreach (
+                        var customOrDefaultEditorField in fieldInfos.Where(f => f.FieldType == customOrDefaultType)
+                    )
                     {
-                        customOrDefaultEditorField.SetValue(m_ParameterEditor, Activator.CreateInstance(customOrDefaultEditorField.FieldType));
+                        customOrDefaultEditorField.SetValue(
+                            m_ParameterEditor,
+                            Activator.CreateInstance(customOrDefaultEditorField.FieldType)
+                        );
                     }
                 }
                 m_ParameterEditor.SetTarget(instance);
@@ -282,15 +291,14 @@ namespace UnityEngine.InputSystem.Editor.Lists
                     if (selectedIndex < 0 || selectedIndex >= names.Count)
                         selectedIndex = 0;
 
-                    var field = new DropdownField(label.text, names, selectedIndex)
-                    {
-                        tooltip = label.tooltip
-                    };
+                    var field = new DropdownField(label.text, names, selectedIndex) { tooltip = label.tooltip };
 
                     field.RegisterValueChangedCallback(evt =>
                     {
                         var newBackingValue = parameter.enumValues[field.index];
-                        parameter.value.value = PrimitiveValue.FromObject(newBackingValue).ConvertTo(parameter.value.type);
+                        parameter.value.value = PrimitiveValue
+                            .FromObject(newBackingValue)
+                            .ConvertTo(parameter.value.type);
                         m_Parameters[closedIndex] = parameter;
                         onChange?.Invoke();
                     });

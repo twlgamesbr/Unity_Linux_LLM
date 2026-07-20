@@ -23,7 +23,11 @@ namespace Unity.PlatformToolkit.Editor
         }
 
         [CreateProperty]
-        public bool Ignore { get => ignore; set => SetProperty(ref ignore, value); }
+        public bool Ignore
+        {
+            get => ignore;
+            set => SetProperty(ref ignore, value);
+        }
 
         public ImplementationData()
         {

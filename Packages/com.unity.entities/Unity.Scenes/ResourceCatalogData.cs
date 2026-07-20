@@ -18,6 +18,7 @@ namespace Unity.Scenes
             /// The resource type is not supported.
             /// </summary>
             Unknown,
+
             /// <summary>
             /// The resource is a Scene.
             /// </summary>
@@ -45,6 +46,7 @@ namespace Unity.Scenes
         /// File format needs to change anytime the data layout for this class changes.
         /// </summary>
         public static readonly int CurrentFileFormatVersion = 1;
+
         /// <summary>
         /// The resource data.
         /// </summary>
@@ -73,7 +75,9 @@ namespace Unity.Scenes
                 var currentPathWithoutExtension = GetFileNameWithoutExtension(currentPath);
                 if (path == currentPathWithoutExtension)
                 {
-                    Debug.LogWarning("Deprecation Warning - Use of GetGUIDFromPath working without extensions is obsolete. (RemovedAfter 2021-02-05)");
+                    Debug.LogWarning(
+                        "Deprecation Warning - Use of GetGUIDFromPath working without extensions is obsolete. (RemovedAfter 2021-02-05)"
+                    );
                     return resources[i].ResourceId;
                 }
 
@@ -81,7 +85,9 @@ namespace Unity.Scenes
                 var pathLower = path.ToLower();
                 if (pathLower == currentPathWithoutExtensionLower)
                 {
-                    Debug.LogWarning("Deprecation Warning - Use of GetGUIDFromPath working with lower-case paths is obsolete. (RemovedAfter 2021-02-05)");
+                    Debug.LogWarning(
+                        "Deprecation Warning - Use of GetGUIDFromPath working with lower-case paths is obsolete. (RemovedAfter 2021-02-05)"
+                    );
                     return resources[i].ResourceId;
                 }
             }
@@ -106,7 +112,7 @@ namespace Unity.Scenes
         internal static string GetFileNameWithoutExtension(string path)
         {
             int i = path.Length - 1;
-            for(; i > 0; --i)
+            for (; i > 0; --i)
             {
                 if (path[i] == '.')
                     break;

@@ -30,7 +30,9 @@ namespace NPCSystem.Monitoring
             lock (_lock)
             {
                 if (_frozen)
-                    throw new InvalidOperationException("TelemetryRouter is frozen — register sinks during initialization only.");
+                    throw new InvalidOperationException(
+                        "TelemetryRouter is frozen — register sinks during initialization only."
+                    );
                 if (!_sinks.Contains(sink))
                     _sinks.Add(sink);
             }
@@ -82,7 +84,9 @@ namespace NPCSystem.Monitoring
                 }
                 catch (Exception ex)
                 {
-                    UnityEngine.Debug.LogError($"[TelemetryRouter] Sink '{snapshot[i].DisplayName}' failed: {ex.Message}");
+                    UnityEngine.Debug.LogError(
+                        $"[TelemetryRouter] Sink '{snapshot[i].DisplayName}' failed: {ex.Message}"
+                    );
                 }
             }
         }
@@ -91,8 +95,13 @@ namespace NPCSystem.Monitoring
         /// Convenience: emit a point-in-time event.
         /// </summary>
         public static void Point(
-            string requestId, string source, string category, string status,
-            string message = null, Dictionary<string, object> tags = null)
+            string requestId,
+            string source,
+            string category,
+            string status,
+            string message = null,
+            Dictionary<string, object> tags = null
+        )
         {
             Instance.Emit(TelemetryEvent.Point(requestId, source, category, status, message, tags));
         }
@@ -101,8 +110,14 @@ namespace NPCSystem.Monitoring
         /// Convenience: emit a timed event.
         /// </summary>
         public static void Timed(
-            string requestId, string source, string category, string status, long durationMs,
-            string message = null, Dictionary<string, object> tags = null)
+            string requestId,
+            string source,
+            string category,
+            string status,
+            long durationMs,
+            string message = null,
+            Dictionary<string, object> tags = null
+        )
         {
             Instance.Emit(TelemetryEvent.Timed(requestId, source, category, status, durationMs, message, tags));
         }

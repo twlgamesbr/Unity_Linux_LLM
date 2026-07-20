@@ -1,11 +1,9 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.TextCore;
-using UnityEditor;
-
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomPropertyDrawer(typeof(TMP_SpriteGlyph))]
     public class TMP_SpriteGlyphPropertyDrawer : PropertyDrawer
     {
@@ -33,17 +31,29 @@ namespace TMPro.EditorUtilities
             EditorGUI.PropertyField(new Rect(rect.x, rect.y + 65, 75, 18), prop_Scale, new GUIContent("Scale:"));
 
             EditorGUIUtility.labelWidth = 74f;
-            EditorGUI.PropertyField(new Rect(rect.x + 85, rect.y + 65, 95, 18), prop_AtlasIndex, new GUIContent("Atlas Index:"));
+            EditorGUI.PropertyField(
+                new Rect(rect.x + 85, rect.y + 65, 95, 18),
+                prop_AtlasIndex,
+                new GUIContent("Atlas Index:")
+            );
 
             DrawGlyph(position, property);
 
             int spriteCharacterIndex;
             int.TryParse(property.displayName.Split(' ')[1], out spriteCharacterIndex);
 
-            EditorGUI.LabelField(new Rect(position.x, position.y + 5, 64f, 18f), new GUIContent("#" + spriteCharacterIndex), style);
+            EditorGUI.LabelField(
+                new Rect(position.x, position.y + 5, 64f, 18f),
+                new GUIContent("#" + spriteCharacterIndex),
+                style
+            );
 
             float labelWidthID = GUI.skin.label.CalcSize(new GUIContent("ID: " + prop_GlyphIndex.intValue)).x;
-            EditorGUI.LabelField(new Rect(position.x + (64 - labelWidthID) / 2, position.y + 110, 64f, 18f), new GUIContent("ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"), style);
+            EditorGUI.LabelField(
+                new Rect(position.x + (64 - labelWidthID) / 2, position.y + 110, 64f, 18f),
+                new GUIContent("ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"),
+                style
+            );
         }
 
         void DrawGlyph(Rect position, SerializedProperty property)
@@ -54,7 +64,12 @@ namespace TMPro.EditorUtilities
             // Return if we don't have a texture assigned to the sprite asset.
             if (tex == null)
             {
-                Debug.LogWarning("Please assign a valid Sprite Atlas texture to the [" + property.serializedObject.targetObject.name + "] Sprite Asset.", property.serializedObject.targetObject);
+                Debug.LogWarning(
+                    "Please assign a valid Sprite Atlas texture to the ["
+                        + property.serializedObject.targetObject.name
+                        + "] Sprite Asset.",
+                    property.serializedObject.targetObject
+                );
                 return;
             }
 
@@ -74,14 +89,23 @@ namespace TMPro.EditorUtilities
             }
 
             // Compute the normalized texture coordinates
-            Rect texCoords = new Rect((float)glyphRect.x / tex.width, (float)glyphRect.y / tex.height, (float)glyphRect.width / tex.width, (float)glyphRect.height / tex.height);
-            GUI.DrawTextureWithTexCoords(new Rect(spriteTexPosition.x + 5, spriteTexPosition.y + 32f, spriteSize.x, spriteSize.y), tex, texCoords, true);
+            Rect texCoords = new Rect(
+                (float)glyphRect.x / tex.width,
+                (float)glyphRect.y / tex.height,
+                (float)glyphRect.width / tex.width,
+                (float)glyphRect.height / tex.height
+            );
+            GUI.DrawTextureWithTexCoords(
+                new Rect(spriteTexPosition.x + 5, spriteTexPosition.y + 32f, spriteSize.x, spriteSize.y),
+                tex,
+                texCoords,
+                true
+            );
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             return 130f;
         }
-
     }
 }

@@ -7,7 +7,10 @@ namespace Unity.Netcode
     /// doesn't have the ability to modify (for example, external structs like `Guid`).
     /// </summary>
     /// <typeparam name="T">The type to be wrapped, must be unmanaged and implement IEquatable{T}</typeparam>
-    public struct ForceNetworkSerializeByMemcpy<T> : INetworkSerializeByMemcpy, IEquatable<ForceNetworkSerializeByMemcpy<T>> where T : unmanaged, IEquatable<T>
+    public struct ForceNetworkSerializeByMemcpy<T>
+        : INetworkSerializeByMemcpy,
+            IEquatable<ForceNetworkSerializeByMemcpy<T>>
+        where T : unmanaged, IEquatable<T>
     {
         /// <summary>
         /// The wrapped value
@@ -35,7 +38,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="underlyingValue">the value</param>
         /// <returns>a new wrapper</returns>
-        public static implicit operator ForceNetworkSerializeByMemcpy<T>(T underlyingValue) => new ForceNetworkSerializeByMemcpy<T> { Value = underlyingValue };
+        public static implicit operator ForceNetworkSerializeByMemcpy<T>(T underlyingValue) =>
+            new ForceNetworkSerializeByMemcpy<T> { Value = underlyingValue };
 
         /// <summary>
         /// Check if wrapped values are equal

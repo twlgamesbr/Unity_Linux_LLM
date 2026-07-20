@@ -11,15 +11,14 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Runtime
         public MetricCounters(
             string displayName,
             ICounterFactory byteCounterFactory,
-            ICounterFactory eventCounterFactory)
+            ICounterFactory eventCounterFactory
+        )
         {
             Bytes = new MetricByteCounters(displayName, byteCounterFactory);
             Events = new MetricEventCounters(displayName, eventCounterFactory);
         }
 
-        public void Sample<TEventData>(
-            IReadOnlyList<TEventData> sent,
-            IReadOnlyList<TEventData> received)
+        public void Sample<TEventData>(IReadOnlyList<TEventData> sent, IReadOnlyList<TEventData> received)
             where TEventData : struct, INetworkMetricEvent
         {
             Bytes.Sample(sent, received);

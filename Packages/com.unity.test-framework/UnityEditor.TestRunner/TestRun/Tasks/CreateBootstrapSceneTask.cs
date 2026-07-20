@@ -38,21 +38,33 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
             }
             */
 
-            var settings = PlaymodeTestsControllerSettings.CreateRunnerSettings(testJobData.executionSettings.filters
-                .Select(filter => filter.ToRuntimeTestRunnerFilter(testJobData.executionSettings.runSynchronously)).ToArray(), testJobData.executionSettings.orderedTestNames,
-                testJobData.executionSettings.randomOrderSeed, testJobData.executionSettings.featureFlags, testJobData.executionSettings.retryCount, testJobData.executionSettings.repeatCount, IsAutomated());
+            var settings = PlaymodeTestsControllerSettings.CreateRunnerSettings(
+                testJobData
+                    .executionSettings.filters.Select(filter =>
+                        filter.ToRuntimeTestRunnerFilter(testJobData.executionSettings.runSynchronously)
+                    )
+                    .ToArray(),
+                testJobData.executionSettings.orderedTestNames,
+                testJobData.executionSettings.randomOrderSeed,
+                testJobData.executionSettings.featureFlags,
+                testJobData.executionSettings.retryCount,
+                testJobData.executionSettings.repeatCount,
+                IsAutomated()
+            );
 
             if (m_includeTestController)
             {
                 var go = new GameObject(PlaymodeTestsController.kPlaymodeTestControllerName);
 
-                var editorLoadedTestAssemblyProvider =
-                    new EditorLoadedTestAssemblyProvider(new EditorCompilationInterfaceProxy(),
-                        new EditorAssembliesProxy());
+                var editorLoadedTestAssemblyProvider = new EditorLoadedTestAssemblyProvider(
+                    new EditorCompilationInterfaceProxy(),
+                    new EditorAssembliesProxy()
+                );
 
                 var runner = go.AddComponent<PlaymodeTestsController>();
                 runner.AssembliesWithTests = editorLoadedTestAssemblyProvider
-                    .GetAssembliesGroupedByType(TestPlatform.PlayMode).Select(x => x.Assembly.GetName().Name)
+                    .GetAssembliesGroupedByType(TestPlatform.PlayMode)
+                    .Select(x => x.Assembly.GetName().Name)
                     .ToList();
                 runner.settings = settings;
                 testJobData.PlaymodeTestsController = runner;

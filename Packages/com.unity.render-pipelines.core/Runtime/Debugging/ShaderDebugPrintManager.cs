@@ -10,7 +10,6 @@ namespace UnityEngine.Rendering
     /// Internal development tool.
     /// Manages gpu-buffers for shader debug printing.
     /// </summary>
-
     public sealed class ShaderDebugPrintManager
     {
         private static readonly ShaderDebugPrintManager s_Instance = new ShaderDebugPrintManager();
@@ -40,7 +39,9 @@ namespace UnityEngine.Rendering
         private static class Profiling
         {
             // Uses nameof to avoid aliasing
-            public static readonly ProfilingSampler BufferReadComplete = new ProfilingSampler($"{nameof(ShaderDebugPrintManager)}.{nameof(BufferReadComplete)}");
+            public static readonly ProfilingSampler BufferReadComplete = new ProfilingSampler(
+                $"{nameof(ShaderDebugPrintManager)}.{nameof(BufferReadComplete)}"
+            );
         }
 
         // Should match: com.unity.render-pipelines.core/ShaderLibrary/ShaderDebugPrint.hlsl
@@ -60,6 +61,7 @@ namespace UnityEngine.Rendering
             TypeFloat4 = 12,
             TypeBool = 13,
         };
+
         private const uint k_TypeHasTag = 128;
 
         private int DebugValueTypeToElemSize(DebugValueType type)
@@ -174,7 +176,7 @@ namespace UnityEngine.Rendering
                 unsafe // Need to do ugly casts via pointers
                 {
                     uint* ptr = (uint*)data.GetUnsafePtr();
-                    for (int i = 1; i < count;)
+                    for (int i = 1; i < count; )
                     {
                         DebugValueType type = (DebugValueType)(data[i] & 0x0f);
                         bool hasTag = (data[i] & k_TypeHasTag) == k_TypeHasTag;
@@ -263,19 +265,22 @@ namespace UnityEngine.Rendering
                             case DebugValueType.TypeUint4:
                             {
                                 uint* valueUint4 = &ptr[i];
-                                newOutputLine += $"uint4({valueUint4[0]}, {valueUint4[1]}, {valueUint4[2]}, {valueUint4[3]})";
+                                newOutputLine +=
+                                    $"uint4({valueUint4[0]}, {valueUint4[1]}, {valueUint4[2]}, {valueUint4[3]})";
                                 break;
                             }
                             case DebugValueType.TypeInt4:
                             {
                                 int* valueInt4 = (int*)&ptr[i];
-                                newOutputLine += $"int4({valueInt4[0]}, {valueInt4[1]}, {valueInt4[2]}, {valueInt4[3]})";
+                                newOutputLine +=
+                                    $"int4({valueInt4[0]}, {valueInt4[1]}, {valueInt4[2]}, {valueInt4[3]})";
                                 break;
                             }
                             case DebugValueType.TypeFloat4:
                             {
                                 float* valueFloat4 = (float*)&ptr[i];
-                                newOutputLine += $"float4({valueFloat4[0]}, {valueFloat4[1]}, {valueFloat4[2]}, {valueFloat4[3]})";
+                                newOutputLine +=
+                                    $"float4({valueFloat4[0]}, {valueFloat4[1]}, {valueFloat4[2]}, {valueFloat4[3]})";
                                 break;
                             }
                             case DebugValueType.TypeBool:
@@ -284,7 +289,7 @@ namespace UnityEngine.Rendering
                                 break;
                             }
                             default:
-                                i = (int)count;  // Cannot handle the rest if there is an unknown type
+                                i = (int)count; // Cannot handle the rest if there is an unknown type
                                 break;
                         }
 
@@ -315,7 +320,10 @@ namespace UnityEngine.Rendering
         public void EndFrame()
         {
             int index = m_FrameCounter % k_FramesInFlight;
-            m_ReadbackRequests[index] = Rendering.AsyncGPUReadback.Request(m_OutputBuffers[index], m_BufferReadCompleteAction);
+            m_ReadbackRequests[index] = Rendering.AsyncGPUReadback.Request(
+                m_OutputBuffers[index],
+                m_BufferReadCompleteAction
+            );
 
             m_FrameCounter++;
             m_FrameCleared = false;
@@ -340,12 +348,18 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Get current print line.
         /// </summary>
-        public string outputLine { get => m_OutputLine; }
+        public string outputLine
+        {
+            get => m_OutputLine;
+        }
 
         /// <summary>
         /// Action taken for each print line. By default prints to the debug log.
         /// </summary>
-        public Action<string> outputAction { set => m_OutputAction = value; }
+        public Action<string> outputAction
+        {
+            set => m_OutputAction = value;
+        }
 
         /// <summary>
         /// The default output action. Print to the debug log.
@@ -407,7 +421,7 @@ namespace UnityEngine.Rendering
         /// Read system input.
         /// </summary>
         /// <returns>Input parameters for ShaderDebugPrintManager.</returns>
-        static public ShaderDebugPrintInput Get()
+        public static ShaderDebugPrintInput Get()
         {
             var r = new ShaderDebugPrintInput();
 #if ENABLE_LEGACY_INPUT_MANAGER

@@ -14,23 +14,14 @@ namespace UnityEditor.TestTools.TestRunner
             // UnityEditor.Switch2.Switch2Settings.nvnDrawValidation_Light = false;
             // UnityEditor.Switch2.Switch2Settings.enableHostIO = true;
 #endif
-
         }
 
-        public void PostBuildAction()
-        {
-        }
+        public void PostBuildAction() { }
 
-        public void PostSuccessfulBuildAction()
-        {
-        }
+        public void PostSuccessfulBuildAction() { }
 
-        public void PostSuccessfulLaunchAction()
-        {
-        }
+        public void PostSuccessfulLaunchAction() { }
 
-        public void CleanUp()
-        {
-        }
+        public void CleanUp() { }
     }
 }

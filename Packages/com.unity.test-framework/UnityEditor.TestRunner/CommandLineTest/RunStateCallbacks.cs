@@ -30,15 +30,16 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
 
         public void TestFinished(ITestResultAdaptor result)
         {
-            if (!result.Test.IsSuite && (result.TestStatus == TestStatus.Failed || result.TestStatus == TestStatus.Inconclusive))
+            if (
+                !result.Test.IsSuite
+                && (result.TestStatus == TestStatus.Failed || result.TestStatus == TestStatus.Inconclusive)
+            )
             {
                 runData.RunState = TestRunState.OneOrMoreTestsExecutedWithOneOrMoreFailed;
             }
         }
 
-        public void RunStarted(ITestAdaptor testsToRun)
-        {
-        }
+        public void RunStarted(ITestAdaptor testsToRun) { }
 
         public void OnError(string message)
         {

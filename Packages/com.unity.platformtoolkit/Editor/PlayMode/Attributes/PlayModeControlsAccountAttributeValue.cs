@@ -26,6 +26,7 @@ namespace Unity.PlatformToolkit.PlayMode
         private string m_SerializedValue;
 
         private object m_Value;
+
         [CreateProperty]
         public object Value
         {
@@ -41,7 +42,11 @@ namespace Unity.PlatformToolkit.PlayMode
             }
         }
 
-        public void Init(ScriptableObjectDataChangePersistor persistor, PlayModeControlsAttributeDefinition attributeDefinition, int userIndex)
+        public void Init(
+            ScriptableObjectDataChangePersistor persistor,
+            PlayModeControlsAttributeDefinition attributeDefinition,
+            int userIndex
+        )
         {
             if (!string.IsNullOrEmpty(m_AttributeDefinitionGuid))
                 Assert.AreEqual(m_AttributeDefinitionGuid, attributeDefinition.Guid);
@@ -63,13 +68,15 @@ namespace Unity.PlatformToolkit.PlayMode
             if (AttributeDefinition.ValueType == typeof(int))
                 Value = displayIndex;
             else if (AttributeDefinition.ValueType == typeof(long))
-                Value = (long) displayIndex;
+                Value = (long)displayIndex;
             else if (AttributeDefinition.ValueType == typeof(string))
                 Value = $"placeholder-{displayIndex}";
             else if (AttributeDefinition.ValueType == typeof(Texture2D))
                 Value = PlayModeControlsAssetTracker.GetAttributeTextureByIndex(displayIndex);
             else
-                throw new NotSupportedException($"AttributeDefinition.ValueType {AttributeDefinition.ValueType.FullName} is not implemented");
+                throw new NotSupportedException(
+                    $"AttributeDefinition.ValueType {AttributeDefinition.ValueType.FullName} is not implemented"
+                );
         }
 
         private void SerializeValue()
@@ -84,7 +91,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
                 if (m_Value is not string stringValue)
                 {
-                    Debug.LogWarning($"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match");
+                    Debug.LogWarning(
+                        $"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match"
+                    );
                     return;
                 }
                 m_SerializedValue = stringValue;
@@ -93,7 +102,9 @@ namespace Unity.PlatformToolkit.PlayMode
             {
                 if (m_Value is not int intValue)
                 {
-                    Debug.LogWarning($"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match");
+                    Debug.LogWarning(
+                        $"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match"
+                    );
                     return;
                 }
                 m_SerializedValue = intValue.ToString();
@@ -102,7 +113,9 @@ namespace Unity.PlatformToolkit.PlayMode
             {
                 if (m_Value is not long)
                 {
-                    Debug.LogWarning($"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match");
+                    Debug.LogWarning(
+                        $"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match"
+                    );
                     return;
                 }
                 m_SerializedValue = m_Value.ToString();
@@ -116,7 +129,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 }
                 if (m_Value is not Texture2D textureValue)
                 {
-                    Debug.LogWarning($"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match");
+                    Debug.LogWarning(
+                        $"Failed to serialize the value of attribute {AttributeDefinition.Name}. The Value type and the attribute definition ValueType do not match"
+                    );
                     return;
                 }
                 var path = AssetDatabase.GetAssetPath(textureValue);
@@ -124,7 +139,9 @@ namespace Unity.PlatformToolkit.PlayMode
             }
             else
             {
-                throw new NotSupportedException($"AttributeDefinition.ValueType {AttributeDefinition.ValueType.FullName} is not implemented");
+                throw new NotSupportedException(
+                    $"AttributeDefinition.ValueType {AttributeDefinition.ValueType.FullName} is not implemented"
+                );
             }
         }
 
@@ -165,7 +182,9 @@ namespace Unity.PlatformToolkit.PlayMode
             }
             else
             {
-                throw new NotSupportedException($"AttributeDefinition.ValueType {AttributeDefinition.ValueType.FullName} is not implemented");
+                throw new NotSupportedException(
+                    $"AttributeDefinition.ValueType {AttributeDefinition.ValueType.FullName} is not implemented"
+                );
             }
         }
     }

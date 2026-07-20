@@ -33,7 +33,11 @@ namespace Unity.Physics
             set
             {
                 m_Displacement = value;
-                ReciprocalDisplacement = math.select(math.rcp(m_Displacement), math.sqrt(float.MaxValue), m_Displacement == float3.zero);
+                ReciprocalDisplacement = math.select(
+                    math.rcp(m_Displacement),
+                    math.sqrt(float.MaxValue),
+                    m_Displacement == float3.zero
+                );
             }
         }
         float3 m_Displacement;
@@ -58,7 +62,10 @@ namespace Unity.Physics
                 float3 end = Ray.Origin + Ray.Displacement;
                 Ray.Origin = value;
                 Ray.Displacement = end - value;
-                Assert.IsTrue(math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F), "RayCast length is very long. This would lead to floating point inaccuracies and invalid results.");
+                Assert.IsTrue(
+                    math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F),
+                    "RayCast length is very long. This would lead to floating point inaccuracies and invalid results."
+                );
             }
         }
 
@@ -71,7 +78,10 @@ namespace Unity.Physics
             set
             {
                 Ray.Displacement = value - Ray.Origin;
-                Assert.IsTrue(math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F), "RayCast length is very long. This would lead to floating point inaccuracies and invalid results.");
+                Assert.IsTrue(
+                    math.all(math.abs(Ray.Displacement) < Math.Constants.MaxDisplacement3F),
+                    "RayCast length is very long. This would lead to floating point inaccuracies and invalid results."
+                );
             }
         }
 
@@ -86,8 +96,7 @@ namespace Unity.Physics
         /// <summary>   Convert this object into a string representation. </summary>
         ///
         /// <returns>   A string that represents this object. </returns>
-        public override string ToString() =>
-            $"RaycastInput {{ Start = {Start}, End = {End}, Filter = {Filter} }}";
+        public override string ToString() => $"RaycastInput {{ Start = {Start}, End = {End}, Filter = {Filter} }}";
     }
 
     // A hit from a ray cast query
@@ -147,9 +156,13 @@ namespace Unity.Physics
         // will be the negation of the ray displacement vector.
 
         public static bool RaySphere(
-            float3 rayOrigin, float3 rayDisplacement,
-            float3 sphereCenter, float sphereRadius,
-            ref float fraction, out float3 normal)
+            float3 rayOrigin,
+            float3 rayDisplacement,
+            float3 sphereCenter,
+            float sphereRadius,
+            ref float fraction,
+            out float3 normal
+        )
         {
             normal = float3.zero;
 
@@ -192,9 +205,14 @@ namespace Unity.Physics
         }
 
         public static bool RayCapsule(
-            float3 rayOrigin, float3 rayDisplacement,
-            float3 vertex0, float3 vertex1, float radius,
-            ref float fraction, out float3 normal)
+            float3 rayOrigin,
+            float3 rayDisplacement,
+            float3 vertex0,
+            float3 vertex1,
+            float radius,
+            ref float fraction,
+            out float3 normal
+        )
         {
             float axisLength = NormalizeWithLength(vertex1 - vertex0, out float3 axis);
 
@@ -242,9 +260,14 @@ namespace Unity.Physics
         }
 
         public static bool RayTriangle(
-            float3 rayOrigin, float3 rayDisplacement,
-            float3 a, float3 b, float3 c, // TODO: float3x3?
-            ref float fraction, out float3 unnormalizedNormal)
+            float3 rayOrigin,
+            float3 rayDisplacement,
+            float3 a,
+            float3 b,
+            float3 c, // TODO: float3x3?
+            ref float fraction,
+            out float3 unnormalizedNormal
+        )
         {
             float3 vAb = b - a;
             float3 vCa = a - c;
@@ -288,9 +311,15 @@ namespace Unity.Physics
         }
 
         public static bool RayQuad(
-            float3 rayOrigin, float3 rayDisplacement,
-            float3 a, float3 b, float3 c, float3 d, // TODO: float3x4?
-            ref float fraction, out float3 unnormalizedNormal)
+            float3 rayOrigin,
+            float3 rayDisplacement,
+            float3 a,
+            float3 b,
+            float3 c,
+            float3 d, // TODO: float3x4?
+            ref float fraction,
+            out float3 unnormalizedNormal
+        )
         {
             float3 vAb = b - a;
             float3 vCa = a - c;
@@ -340,8 +369,12 @@ namespace Unity.Physics
         }
 
         public static bool RayConvex(
-            float3 rayOrigin, float3 rayDisplacement,
-            ref ConvexHull hull, ref float fraction, out float3 normal)
+            float3 rayOrigin,
+            float3 rayDisplacement,
+            ref ConvexHull hull,
+            ref float fraction,
+            out float3 normal
+        )
         {
             // TODO: Call RaySphere/Capsule/Triangle() if num vertices <= 3 ?
 
@@ -397,7 +430,8 @@ namespace Unity.Physics
 
         #region Ray vs colliders
 
-        public static unsafe bool RayCollider<T>(RaycastInput input, Collider* collider, ref T collector) where T : struct, ICollector<RaycastHit>
+        public static unsafe bool RayCollider<T>(RaycastInput input, Collider* collider, ref T collector)
+            where T : struct, ICollector<RaycastHit>
         {
             if (!CollisionFilter.IsCollisionEnabled(input.Filter, collider->GetCollisionFilter()))
             {
@@ -417,18 +451,41 @@ namespace Unity.Physics
             {
                 case ColliderType.Sphere:
                     var sphere = (SphereCollider*)collider;
-                    hadHit = RaySphere(input.Ray.Origin, input.Ray.Displacement, sphere->Center, sphere->Radius, ref fraction, out normal);
+                    hadHit = RaySphere(
+                        input.Ray.Origin,
+                        input.Ray.Displacement,
+                        sphere->Center,
+                        sphere->Radius,
+                        ref fraction,
+                        out normal
+                    );
                     material = sphere->Material;
                     break;
                 case ColliderType.Capsule:
                     var capsule = (CapsuleCollider*)collider;
-                    hadHit = RayCapsule(input.Ray.Origin, input.Ray.Displacement, capsule->Vertex0, capsule->Vertex1, capsule->Radius, ref fraction, out normal);
+                    hadHit = RayCapsule(
+                        input.Ray.Origin,
+                        input.Ray.Displacement,
+                        capsule->Vertex0,
+                        capsule->Vertex1,
+                        capsule->Radius,
+                        ref fraction,
+                        out normal
+                    );
                     material = capsule->Material;
                     break;
                 case ColliderType.Triangle:
                 {
                     var triangle = (PolygonCollider*)collider;
-                    hadHit = RayTriangle(input.Ray.Origin, input.Ray.Displacement, triangle->Vertices[0], triangle->Vertices[1], triangle->Vertices[2], ref fraction, out float3 unnormalizedNormal);
+                    hadHit = RayTriangle(
+                        input.Ray.Origin,
+                        input.Ray.Displacement,
+                        triangle->Vertices[0],
+                        triangle->Vertices[1],
+                        triangle->Vertices[2],
+                        ref fraction,
+                        out float3 unnormalizedNormal
+                    );
                     normal = hadHit ? math.normalize(unnormalizedNormal) : float3.zero;
                     material = triangle->Material;
                     break;
@@ -436,7 +493,16 @@ namespace Unity.Physics
                 case ColliderType.Quad:
                 {
                     var quad = (PolygonCollider*)collider;
-                    hadHit = RayQuad(input.Ray.Origin, input.Ray.Displacement, quad->Vertices[0], quad->Vertices[1], quad->Vertices[2], quad->Vertices[3], ref fraction, out float3 unnormalizedNormal);
+                    hadHit = RayQuad(
+                        input.Ray.Origin,
+                        input.Ray.Displacement,
+                        quad->Vertices[0],
+                        quad->Vertices[1],
+                        quad->Vertices[2],
+                        quad->Vertices[3],
+                        ref fraction,
+                        out float3 unnormalizedNormal
+                    );
                     normal = hadHit ? math.normalize(unnormalizedNormal) : float3.zero;
                     material = quad->Material;
                     break;
@@ -444,7 +510,13 @@ namespace Unity.Physics
                 case ColliderType.Box:
                 case ColliderType.Cylinder:
                 case ColliderType.Convex:
-                    hadHit = RayConvex(input.Ray.Origin, input.Ray.Displacement, ref ((ConvexCollider*)collider)->ConvexHull, ref fraction, out normal);
+                    hadHit = RayConvex(
+                        input.Ray.Origin,
+                        input.Ray.Displacement,
+                        ref ((ConvexCollider*)collider)->ConvexHull,
+                        ref fraction,
+                        out normal
+                    );
                     material = ((ConvexCollider*)collider)->Material;
                     break;
                 case ColliderType.Mesh:
@@ -464,12 +536,15 @@ namespace Unity.Physics
                 var hit = new RaycastHit
                 {
                     Fraction = fraction,
-                    Position = Mul(input.QueryContext.WorldFromLocalTransform, input.Ray.Origin + input.Ray.Displacement * fraction),
+                    Position = Mul(
+                        input.QueryContext.WorldFromLocalTransform,
+                        input.Ray.Origin + input.Ray.Displacement * fraction
+                    ),
                     SurfaceNormal = math.mul(input.QueryContext.WorldFromLocalTransform.Rotation, normal),
                     RigidBodyIndex = input.QueryContext.RigidBodyIndex,
                     ColliderKey = input.QueryContext.ColliderKey,
                     Material = material,
-                    Entity = input.QueryContext.Entity
+                    Entity = input.QueryContext.Entity,
                 };
 
                 return collector.AddHit(hit);
@@ -489,9 +564,16 @@ namespace Unity.Physics
                 m_NumColliderKeyBits = meshCollider->NumColliderKeyBits;
             }
 
-            public bool RayLeaf<T>(RaycastInput input, int primitiveKey, ref T collector) where T : struct, ICollector<RaycastHit>
+            public bool RayLeaf<T>(RaycastInput input, int primitiveKey, ref T collector)
+                where T : struct, ICollector<RaycastHit>
             {
-                m_Mesh->GetPrimitive(primitiveKey, out float3x4 vertices, out Mesh.PrimitiveFlags flags, out CollisionFilter filter, out Material material);
+                m_Mesh->GetPrimitive(
+                    primitiveKey,
+                    out float3x4 vertices,
+                    out Mesh.PrimitiveFlags flags,
+                    out CollisionFilter filter,
+                    out Material material
+                );
 
                 if (!CollisionFilter.IsCollisionEnabled(input.Filter, filter)) // TODO: could do this check within GetPrimitive()
                 {
@@ -510,28 +592,58 @@ namespace Unity.Physics
                     bool hadHit;
                     if (isQuad)
                     {
-                        hadHit = RayQuad(input.Ray.Origin, input.Ray.Displacement, vertices[0], vertices[1], vertices[2], vertices[3], ref fraction, out unnormalizedNormal);
+                        hadHit = RayQuad(
+                            input.Ray.Origin,
+                            input.Ray.Displacement,
+                            vertices[0],
+                            vertices[1],
+                            vertices[2],
+                            vertices[3],
+                            ref fraction,
+                            out unnormalizedNormal
+                        );
                     }
                     else
                     {
-                        hadHit = RayTriangle(input.Ray.Origin, input.Ray.Displacement, vertices[0], vertices[polygonIndex + 1], vertices[polygonIndex + 2], ref fraction, out unnormalizedNormal);
+                        hadHit = RayTriangle(
+                            input.Ray.Origin,
+                            input.Ray.Displacement,
+                            vertices[0],
+                            vertices[polygonIndex + 1],
+                            vertices[polygonIndex + 2],
+                            ref fraction,
+                            out unnormalizedNormal
+                        );
                     }
 
                     if (hadHit && fraction < collector.MaxFraction)
                     {
                         var normalizedNormal = math.normalize(unnormalizedNormal);
 
-                        normalizedNormal = math.select(normalizedNormal, -normalizedNormal, input.QueryContext.TargetScale < 0.0f);
+                        normalizedNormal = math.select(
+                            normalizedNormal,
+                            -normalizedNormal,
+                            input.QueryContext.TargetScale < 0.0f
+                        );
 
                         var hit = new RaycastHit
                         {
                             Fraction = fraction,
-                            Position = Mul(input.QueryContext.WorldFromLocalTransform, input.Ray.Origin + input.Ray.Displacement * fraction),
-                            SurfaceNormal = math.mul(input.QueryContext.WorldFromLocalTransform.Rotation, normalizedNormal),
+                            Position = Mul(
+                                input.QueryContext.WorldFromLocalTransform,
+                                input.Ray.Origin + input.Ray.Displacement * fraction
+                            ),
+                            SurfaceNormal = math.mul(
+                                input.QueryContext.WorldFromLocalTransform.Rotation,
+                                normalizedNormal
+                            ),
                             RigidBodyIndex = input.QueryContext.RigidBodyIndex,
-                            ColliderKey = input.QueryContext.SetSubKey(m_NumColliderKeyBits, (uint)(primitiveKey << 1 | polygonIndex)),
+                            ColliderKey = input.QueryContext.SetSubKey(
+                                m_NumColliderKeyBits,
+                                (uint)(primitiveKey << 1 | polygonIndex)
+                            ),
                             Material = material,
-                            Entity = input.QueryContext.Entity
+                            Entity = input.QueryContext.Entity,
                         };
 
                         acceptHit |= collector.AddHit(hit);
@@ -541,7 +653,8 @@ namespace Unity.Physics
             }
         }
 
-        private static unsafe bool RayMesh<T>(RaycastInput input, MeshCollider* meshCollider, ref T collector) where T : struct, ICollector<RaycastHit>
+        private static unsafe bool RayMesh<T>(RaycastInput input, MeshCollider* meshCollider, ref T collector)
+            where T : struct, ICollector<RaycastHit>
         {
             var leafProcessor = new RayMeshLeafProcessor(meshCollider);
             return meshCollider->Mesh.BoundingVolumeHierarchy.Raycast(input, ref leafProcessor, ref collector);
@@ -558,7 +671,8 @@ namespace Unity.Physics
                 m_CompoundCollider = compoundCollider;
             }
 
-            public bool RayLeaf<T>(RaycastInput input, int leafData, ref T collector) where T : struct, ICollector<RaycastHit>
+            public bool RayLeaf<T>(RaycastInput input, int leafData, ref T collector)
+                where T : struct, ICollector<RaycastHit>
             {
                 ref CompoundCollider.Child child = ref m_CompoundCollider->Children[leafData];
 
@@ -575,16 +689,27 @@ namespace Unity.Physics
                     MTransform childFromCompound = Inverse(compoundFromChild);
                     inputLs.Ray.Origin = Mul(childFromCompound, input.Ray.Origin);
                     inputLs.Ray.Displacement = math.mul(childFromCompound.Rotation, input.Ray.Displacement);
-                    inputLs.QueryContext.ColliderKey = input.QueryContext.PushSubKey(m_CompoundCollider->NumColliderKeyBits, (uint)leafData);
+                    inputLs.QueryContext.ColliderKey = input.QueryContext.PushSubKey(
+                        m_CompoundCollider->NumColliderKeyBits,
+                        (uint)leafData
+                    );
                     inputLs.QueryContext.NumColliderKeyBits = input.QueryContext.NumColliderKeyBits;
-                    inputLs.QueryContext.WorldFromLocalTransform = ScaledMTransform.Mul(inputLs.QueryContext.WorldFromLocalTransform, compoundFromChild);
+                    inputLs.QueryContext.WorldFromLocalTransform = ScaledMTransform.Mul(
+                        inputLs.QueryContext.WorldFromLocalTransform,
+                        compoundFromChild
+                    );
                 }
 
                 return child.Collider->CastRay(inputLs, ref collector);
             }
         }
 
-        private static unsafe bool RayCompound<T>(RaycastInput input, CompoundCollider* compoundCollider, ref T collector) where T : struct, ICollector<RaycastHit>
+        private static unsafe bool RayCompound<T>(
+            RaycastInput input,
+            CompoundCollider* compoundCollider,
+            ref T collector
+        )
+            where T : struct, ICollector<RaycastHit>
         {
             if (!CollisionFilter.IsCollisionEnabled(input.Filter, compoundCollider->GetCollisionFilter()))
             {
@@ -595,7 +720,8 @@ namespace Unity.Physics
             return compoundCollider->BoundingVolumeHierarchy.Raycast(input, ref leafProcessor, ref collector);
         }
 
-        private static unsafe bool RayTerrain<T>(RaycastInput input, TerrainCollider* terrainCollider, ref T collector) where T : struct, ICollector<RaycastHit>
+        private static unsafe bool RayTerrain<T>(RaycastInput input, TerrainCollider* terrainCollider, ref T collector)
+            where T : struct, ICollector<RaycastHit>
         {
             ref var terrain = ref terrainCollider->Terrain;
             Material material = terrainCollider->Material;
@@ -606,7 +732,7 @@ namespace Unity.Physics
             var ray = new Ray
             {
                 Origin = input.Ray.Origin * terrain.InverseScale,
-                Displacement = input.Ray.Displacement * terrain.InverseScale
+                Displacement = input.Ray.Displacement * terrain.InverseScale,
             };
             Terrain.QuadTreeWalker walker;
             {
@@ -632,14 +758,29 @@ namespace Unity.Physics
                     for (int iHit = 0; iHit < hitCount; iHit++)
                     {
                         // Get the quad vertices
-                        walker.GetQuad(hitIndex[iHit], out int2 quadIndex, out float3 a, out float3 b, out float3 c, out float3 d);
+                        walker.GetQuad(
+                            hitIndex[iHit],
+                            out int2 quadIndex,
+                            out float3 a,
+                            out float3 b,
+                            out float3 c,
+                            out float3 d
+                        );
 
                         // Test each triangle in the quad
                         for (int iTriangle = 0; iTriangle < 2; iTriangle++)
                         {
                             // Cast
                             float fraction = collector.MaxFraction;
-                            bool triangleHit = RayTriangle(input.Ray.Origin, input.Ray.Displacement, a, b, c, ref fraction, out float3 unnormalizedNormal);
+                            bool triangleHit = RayTriangle(
+                                input.Ray.Origin,
+                                input.Ray.Displacement,
+                                a,
+                                b,
+                                c,
+                                ref fraction,
+                                out float3 unnormalizedNormal
+                            );
 
                             if (triangleHit && fraction < collector.MaxFraction)
                             {
@@ -648,12 +789,21 @@ namespace Unity.Physics
                                 var hit = new RaycastHit
                                 {
                                     Fraction = fraction,
-                                    Position = Mul(input.QueryContext.WorldFromLocalTransform, input.Ray.Origin + input.Ray.Displacement * fraction),
-                                    SurfaceNormal = math.mul(input.QueryContext.WorldFromLocalTransform.Rotation, normalizedNormal),
+                                    Position = Mul(
+                                        input.QueryContext.WorldFromLocalTransform,
+                                        input.Ray.Origin + input.Ray.Displacement * fraction
+                                    ),
+                                    SurfaceNormal = math.mul(
+                                        input.QueryContext.WorldFromLocalTransform.Rotation,
+                                        normalizedNormal
+                                    ),
                                     RigidBodyIndex = input.QueryContext.RigidBodyIndex,
-                                    ColliderKey = input.QueryContext.SetSubKey(terrain.NumColliderKeyBits, terrain.GetSubKey(quadIndex, iTriangle)),
+                                    ColliderKey = input.QueryContext.SetSubKey(
+                                        terrain.NumColliderKeyBits,
+                                        terrain.GetSubKey(quadIndex, iTriangle)
+                                    ),
                                     Material = material,
-                                    Entity = input.QueryContext.Entity
+                                    Entity = input.QueryContext.Entity,
                                 };
 
                                 hadHit |= collector.AddHit(hit);

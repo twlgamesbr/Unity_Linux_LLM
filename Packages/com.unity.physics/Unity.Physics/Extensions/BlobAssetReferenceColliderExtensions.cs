@@ -32,7 +32,7 @@ namespace Unity.Physics.Extensions
         ///
         /// <returns>   A pointer to the Collider instance, cast to the specified type. </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe static To* AsPtr<To>(this BlobAssetReference<Collider> col)
+        public static unsafe To* AsPtr<To>(this BlobAssetReference<Collider> col)
             where To : unmanaged, ICollider
         {
             SafetyChecks.CheckColliderTypeAndThrow<To>(col.Value.Type);
@@ -47,7 +47,7 @@ namespace Unity.Physics.Extensions
         ///
         /// <returns>   Null if it fails, else a pointer to a Collider. </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe static Collider* AsPtr(this BlobAssetReference<Collider> col)
+        public static unsafe Collider* AsPtr(this BlobAssetReference<Collider> col)
         {
             return (Collider*)col.GetUnsafePtr();
         }

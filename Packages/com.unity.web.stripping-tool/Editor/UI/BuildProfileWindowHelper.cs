@@ -12,11 +12,13 @@ namespace Unity.Web.Stripping.Editor
     {
         public static readonly Type Type =
 #if UNITY_6000_5_OR_NEWER
-            CurrentAssemblies.GetLoadedAssemblies()
+        CurrentAssemblies
+            .GetLoadedAssemblies()
 #else
-            AppDomain.CurrentDomain.GetAssemblies()
+        AppDomain
+            .CurrentDomain.GetAssemblies()
 #endif
-                .SingleOrDefault(assembly => assembly.GetName().Name == "UnityEditor.BuildProfileModule")
+            .SingleOrDefault(assembly => assembly.GetName().Name == "UnityEditor.BuildProfileModule")
             ?.GetType("UnityEditor.Build.Profile.BuildProfileWindow");
 
         public static EditorWindow GetWindow()

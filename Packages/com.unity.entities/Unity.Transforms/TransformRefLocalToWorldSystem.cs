@@ -49,15 +49,12 @@ namespace Unity.Transforms
 
             // TODO(DOTS-10410): This query should only match changed/dirty hierarchies with GameObjects, as there's
             // no need to call QueueTransformDispatch() on pure-Entities hierarchies.
-            _dirtyHierarchyQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<TransformRef>()
-                .Build(ref state);
+            _dirtyHierarchyQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<TransformRef>().Build(ref state);
             _dirtyHierarchyQuery.SetChangedVersionFilter(ComponentType.ReadOnly<TransformRef>());
 
             _transformTypeHandle = state.GetTransformTypeHandle();
             _localToWorldTypeHandle = state.GetComponentTypeHandle<LocalToWorld>();
         }
-
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
@@ -72,24 +69,27 @@ namespace Unity.Transforms
             int maxDirtyHierarchyCount = _dirtyHierarchyQuery.CalculateEntityCountWithoutFiltering();
             var dirtyHierarchyPtrs = new NativeList<IntPtr>(maxDirtyHierarchyCount, state.WorldUpdateAllocator);
             //2 per entity because we are going to register both read and write. We max out the capacity here to avoid growing the hashmap.
-            var hierarchyDependencies = new NativeParallelHashSet<JobHandle>(2*maxDirtyHierarchyCount, state.WorldUpdateAllocator);
+            var hierarchyDependencies = new NativeParallelHashSet<JobHandle>(
+                2 * maxDirtyHierarchyCount,
+                state.WorldUpdateAllocator
+            );
             var buildHierarchyListJob = new BuildDirtyHierarchyListJob
             {
                 TransformHandle = _transformTypeHandle,
                 OutputList = dirtyHierarchyPtrs.AsParallelWriter(),
-                HierarchyDependencies = hierarchyDependencies.AsParallelWriter()
+                HierarchyDependencies = hierarchyDependencies.AsParallelWriter(),
             }.ScheduleParallel(_dirtyHierarchyQuery, state.Dependency);
 
             var hierarchyTransformJob = new LocalToWorldFromTransformRefJob
             {
                 TransformTypeHandle = _transformTypeHandle,
-                LocalToWorldTypeHandle = _localToWorldTypeHandle
+                LocalToWorldTypeHandle = _localToWorldTypeHandle,
             }.ScheduleParallel(_transformHierarchyQuery, state.Dependency);
 
             var freeTransformjob = new LocalToWorldFromTransformRefJob
             {
                 TransformTypeHandle = _transformTypeHandle,
-                LocalToWorldTypeHandle = _localToWorldTypeHandle
+                LocalToWorldTypeHandle = _localToWorldTypeHandle,
                 // These jobs are safe to schedule at the same time because their queries are
                 // mutually exclusive, but the safety system doesn't recognize that.
             }.ScheduleParallel(_freeTransformQuery, state.Dependency);
@@ -101,16 +101,26 @@ namespace Unity.Transforms
             // has more time to run.
             buildHierarchyListJob.Complete();
             JobHandle.CompleteAll(hierarchyDependencies.ToNativeArray(Allocator.Temp));
-            UnsafeTransformAccess.BatchQueueTransformDispatch((IntPtr)dirtyHierarchyPtrs.GetUnsafeReadOnlyPtr(), dirtyHierarchyPtrs.Length);
+            UnsafeTransformAccess.BatchQueueTransformDispatch(
+                (IntPtr)dirtyHierarchyPtrs.GetUnsafeReadOnlyPtr(),
+                dirtyHierarchyPtrs.Length
+            );
         }
 
         [BurstCompile]
         struct BuildDirtyHierarchyListJob : IJobChunk
         {
-            [ReadOnly] public TransformTypeHandle TransformHandle;
+            [ReadOnly]
+            public TransformTypeHandle TransformHandle;
             public NativeList<IntPtr>.ParallelWriter OutputList;
             public NativeParallelHashSet<JobHandle>.ParallelWriter HierarchyDependencies;
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 IntPtr* chunkOutputs = stackalloc IntPtr[chunk.Count];
                 int chunkOutputCount = 0;
@@ -133,16 +143,23 @@ namespace Unity.Transforms
         struct LocalToWorldFromTransformRefJob : IJobChunk
         {
             [NativeDisableContainerSafetyRestriction]
-            [ReadOnly] public TransformTypeHandle TransformTypeHandle;
+            [ReadOnly]
+            public TransformTypeHandle TransformTypeHandle;
             public ComponentTypeHandle<LocalToWorld> LocalToWorldTypeHandle;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 var transformAccess = chunk.GetTransformAccessor(ref TransformTypeHandle);
-                LocalToWorld* chunkLocalToWorlds = (LocalToWorld*)chunk.GetRequiredComponentDataPtrRW(ref LocalToWorldTypeHandle);
+                LocalToWorld* chunkLocalToWorlds = (LocalToWorld*)
+                    chunk.GetRequiredComponentDataPtrRW(ref LocalToWorldTypeHandle);
 
                 var enumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
-                while(enumerator.NextEntityIndex(out var i))
+                while (enumerator.NextEntityIndex(out var i))
                 {
                     chunkLocalToWorlds[i].Value = transformAccess[i].ComputeLocalToWorld();
                 }

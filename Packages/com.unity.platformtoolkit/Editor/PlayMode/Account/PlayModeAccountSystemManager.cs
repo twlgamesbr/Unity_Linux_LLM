@@ -5,11 +5,15 @@ using UnityEditor;
 
 namespace Unity.PlatformToolkit.PlayMode
 {
-    internal sealed class PlayModeAccountSystemManager : IPrimaryAccountSystemProvider, IAccountPickerSystemProvider, IAsyncDisposable
+    internal sealed class PlayModeAccountSystemManager
+        : IPrimaryAccountSystemProvider,
+            IAccountPickerSystemProvider,
+            IAsyncDisposable
     {
         public IAccountSystem AccountSystem => m_AccountSystem;
 
-        private const string k_AccountPickCanceledDisposedExceptionMessage = "Cancelling account request: account system has been disposed. This is expected after exiting playmode while simulating long-running tasks.";
+        private const string k_AccountPickCanceledDisposedExceptionMessage =
+            "Cancelling account request: account system has been disposed. This is expected after exiting playmode while simulating long-running tasks.";
 
         private GenericAccountSystem<PlayModeAccount> m_AccountSystem;
         private ICapabilities m_Capabilities;
@@ -24,7 +28,13 @@ namespace Unity.PlatformToolkit.PlayMode
         private Task m_RunningPrimaryAccountChangeProcessors = Task.CompletedTask;
         private Task m_RunningAccountChangeProcessor = Task.CompletedTask;
 
-        public PlayModeAccountSystemManager(IEnvironment environment, IPlayModeUserManager userManager, ICapabilities capabilities, IPlayModeCapability playModeCapability, PlatformToolkitMetrics metrics)
+        public PlayModeAccountSystemManager(
+            IEnvironment environment,
+            IPlayModeUserManager userManager,
+            ICapabilities capabilities,
+            IPlayModeCapability playModeCapability,
+            PlatformToolkitMetrics metrics
+        )
         {
             m_Capabilities = capabilities ?? throw new ArgumentNullException(nameof(capabilities));
             m_Environment = environment ?? throw new ArgumentNullException(nameof(environment));
@@ -39,7 +49,13 @@ namespace Unity.PlatformToolkit.PlayMode
             PlayModeAccount primaryAccount = null;
             foreach (var accountData in m_UserManager.SignedInAccounts)
             {
-                var playModeAccount = new PlayModeAccount(m_Environment, m_UserManager, accountData, m_Capabilities, m_Metrics);
+                var playModeAccount = new PlayModeAccount(
+                    m_Environment,
+                    m_UserManager,
+                    accountData,
+                    m_Capabilities,
+                    m_Metrics
+                );
                 initialAccounts.Add(playModeAccount);
                 if (accountData == m_UserManager.PrimaryAccountData)
                     primaryAccount = playModeAccount;
@@ -64,7 +80,13 @@ namespace Unity.PlatformToolkit.PlayMode
             if (m_Capabilities.InputOwnership)
                 inputOwnershipSystem = InputOwnership;
 #endif //INPUT_SYSTEM_AVAILABLE
-            m_AccountSystem = new GenericAccountSystem<PlayModeAccount>(initialAccounts: initialAccounts, primaryAccountIndex: primaryAccountIndex, primaryAccountSystemProvider: primaryAccountSystemProvider, accountPickerSystemProvider: accountPickerSystemProvider, inputOwnershipSystem: inputOwnershipSystem);
+            m_AccountSystem = new GenericAccountSystem<PlayModeAccount>(
+                initialAccounts: initialAccounts,
+                primaryAccountIndex: primaryAccountIndex,
+                primaryAccountSystemProvider: primaryAccountSystemProvider,
+                accountPickerSystemProvider: accountPickerSystemProvider,
+                inputOwnershipSystem: inputOwnershipSystem
+            );
 
             foreach (var account in m_AccountSystem.SignedInAccounts)
             {
@@ -161,7 +183,10 @@ namespace Unity.PlatformToolkit.PlayMode
                 modifier.MakePrimary(primaryAccount);
             }
 
-            m_RunningPrimaryAccountChangeProcessors = Task.WhenAll(m_RunningPrimaryAccountChangeProcessors, ProcessPrimaryAccountChange());
+            m_RunningPrimaryAccountChangeProcessors = Task.WhenAll(
+                m_RunningPrimaryAccountChangeProcessors,
+                ProcessPrimaryAccountChange()
+            );
         }
 
         private void AccountStateChangeProcessor(PlayModeAccountData accountData, AccountState accountState)
@@ -177,7 +202,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 if (account is null)
                 {
                     if (accountState != AccountState.SignedIn)
-                        throw new InvalidOperationException("Recieved and account state change with an unexpected state for a new user, check that the user gets properly added");
+                        throw new InvalidOperationException(
+                            "Recieved and account state change with an unexpected state for a new user, check that the user gets properly added"
+                        );
 
                     account = new PlayModeAccount(m_Environment, m_UserManager, accountData, m_Capabilities, m_Metrics);
                     modifier.Add(account);
@@ -185,7 +212,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 }
 
                 if (account.State == accountState)
-                    throw new InvalidOperationException("Recieved an account state change when there was no different account state!");
+                    throw new InvalidOperationException(
+                        "Recieved an account state change when there was no different account state!"
+                    );
 
                 account.State = accountState;
                 if (accountState is AccountState.SignedOut)
@@ -236,7 +265,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 // We are disposing of this class and the account system so we don't care
             }
 
-
             if (m_UserManager is not null)
             {
                 m_UserManager.PrimaryAccountChangeEvent -= PrimaryAccountChangeProcessor;
@@ -267,7 +295,9 @@ namespace Unity.PlatformToolkit.PlayMode
                     throw new InvalidOperationException("Account-input pairing is not supported on this platform.");
 
                 if (m_InputSystem is null)
-                    throw new InvalidOperationException("Input system is not set. Please call SetInputSystem() before accessing InputOwnership.");
+                    throw new InvalidOperationException(
+                        "Input system is not set. Please call SetInputSystem() before accessing InputOwnership."
+                    );
 
                 return m_InputOwnershipSystem ??= new PlayModeInputOwnershipSystem(m_InputSystem, this);
             }

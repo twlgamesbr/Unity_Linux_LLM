@@ -6,7 +6,6 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.Entities.Content
 {
-
     /// <summary>
     /// This class handles the overall process of delivering remote content to the client device.
     /// <seealso cref="ContentLocationService"/>s are used to resolve <seealso cref="RemoteContentId"/> into <seealso cref="RemoteContentLocation"/>s.
@@ -23,30 +22,36 @@ namespace Unity.Entities.Content
             /// Content has not begun the dlivery process.
             /// </summary>
             None,
+
             /// <summary>
             /// The location is being resolved.
             /// </summary>
             ResolvingLocation,
+
             /// <summary>
             /// The location has been resolved.
             /// </summary>
             LocationResolved,
+
             /// <summary>
             /// The content is downloading.
             /// </summary>
             DownloadingContent,
+
             /// <summary>
             /// The content has sucessfully downloaded and is in the cache.
             /// </summary>
             ContentDownloaded,
+
             /// <summary>
             /// The delivery was cancelled.
             /// </summary>
             Cancelled,
+
             /// <summary>
             /// The delivery failed.
             /// </summary>
-            Failed
+            Failed,
         }
 
         /// <summary>
@@ -95,7 +100,6 @@ namespace Unity.Entities.Content
             public ContentDownloadService.DownloadStatus DownloadStatus;
         }
 
-
         struct ContentSet : IDisposable
         {
             public UnsafeList<RemoteContentId> remoteIds;
@@ -105,8 +109,9 @@ namespace Unity.Entities.Content
                 remoteIds.Dispose();
             }
         }
+
         SortedList<int, ContentLocationService> locationServices;
-        SortedList<int, ContentDownloadService>  downloadServices;
+        SortedList<int, ContentDownloadService> downloadServices;
         UnsafeHashMap<RemoteContentId, ContentSet> contentSets;
         UnsafeList<RemoteContentId> activeDownloads;
         UnsafeHashMap<RemoteContentId, DeliveryStatus> downloadStates;
@@ -162,30 +167,40 @@ namespace Unity.Entities.Content
             if (locStatus.State != ContentLocationService.ResolvingState.Complete)
             {
                 //if the resolve fails, it means that the remote catalog did not load or does not contain an entry for this path.
-                ContentDeliveryGlobalState.LogFunc?.Invoke($"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - failed to resolve id to a RemoteLocation.");
+                ContentDeliveryGlobalState.LogFunc?.Invoke(
+                    $"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - failed to resolve id to a RemoteLocation."
+                );
                 return originalPath;
             }
             var dlSvc = GetDownloadServiceForLocation(locStatus.Location);
             if (dlSvc == null)
             {
-                ContentDeliveryGlobalState.LogFunc?.Invoke($"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - failed to find a download service for the resolved location.");
+                ContentDeliveryGlobalState.LogFunc?.Invoke(
+                    $"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - failed to find a download service for the resolved location."
+                );
                 return originalPath;
             }
 
             var cachePath = dlSvc.ComputeCachePath(locStatus.Location);
-            if(string.IsNullOrEmpty(cachePath))
+            if (string.IsNullOrEmpty(cachePath))
             {
-                ContentDeliveryGlobalState.LogFunc?.Invoke($"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - failed to compute local cache path.");
+                ContentDeliveryGlobalState.LogFunc?.Invoke(
+                    $"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - failed to compute local cache path."
+                );
                 return originalPath;
             }
 
             //check for the remapped path on device before returning it, but only if needed.  The local catalog uses this method to remap local archive paths to the cache and they do not need to be on device for this.
             if (requireFileOnDevice && !ContentDeliveryGlobalState.FileExists(cachePath))
             {
-                ContentDeliveryGlobalState.LogFunc?.Invoke($"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - local cache path {cachePath} does not exist.");
+                ContentDeliveryGlobalState.LogFunc?.Invoke(
+                    $"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath} - local cache path {cachePath} does not exist."
+                );
                 return originalPath;
             }
-            ContentDeliveryGlobalState.LogFunc?.Invoke($"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath}, new path = {cachePath}");
+            ContentDeliveryGlobalState.LogFunc?.Invoke(
+                $"RemapContentPath id [{id.Name},{id.Hash}] with relative path {originalPath}, new path = {cachePath}"
+            );
             return cachePath;
         }
 
@@ -234,7 +249,7 @@ namespace Unity.Entities.Content
                 {
                     locationServices.Remove(ds.Key);
                     ds.Value.Dispose();
-                    break; 
+                    break;
                 }
             }
 
@@ -252,7 +267,12 @@ namespace Unity.Entities.Content
         /// <param name="cachedBytes">The total number of bytes already cached by the download service.</param>
         /// <param name="uncachedBytes">The total number of bytes not cached by the download service.</param>
         /// <returns>Returns true if successful.</returns>
-        public bool AccumulateContentSize(ref int entryCount, ref long totalBytes, ref long cachedBytes, ref long uncachedBytes)
+        public bool AccumulateContentSize(
+            ref int entryCount,
+            ref long totalBytes,
+            ref long cachedBytes,
+            ref long uncachedBytes
+        )
         {
             var locations = new NativeHashSet<RemoteContentLocation>(32, Allocator.Temp);
             foreach (var svc in locationServices.Values)
@@ -271,7 +291,13 @@ namespace Unity.Entities.Content
         /// <param name="totalBytes">The total number of bytes of the data.</param>
         /// <param name="cachedBytes">The total number of bytes already cached by the download service.</param>
         /// <param name="uncachedBytes">The total number of bytes not cached by the download service.</param>
-        unsafe public void AccumulateContentSize(in FixedString512Bytes setName, ref int entryCount, ref long totalBytes, ref long cachedBytes, ref long uncachedBytes)
+        public unsafe void AccumulateContentSize(
+            in FixedString512Bytes setName,
+            ref int entryCount,
+            ref long totalBytes,
+            ref long cachedBytes,
+            ref long uncachedBytes
+        )
         {
             var locations = new NativeHashSet<RemoteContentLocation>(32, Allocator.Temp);
             foreach (var svc in locationServices.Values)
@@ -289,7 +315,13 @@ namespace Unity.Entities.Content
             locations.Dispose();
         }
 
-        void AccumulateContentSize(NativeHashSet<RemoteContentLocation> locations, ref int entryCount, ref long totalBytes, ref long cachedBytes, ref long uncachedBytes)
+        void AccumulateContentSize(
+            NativeHashSet<RemoteContentLocation> locations,
+            ref int entryCount,
+            ref long totalBytes,
+            ref long cachedBytes,
+            ref long uncachedBytes
+        )
         {
             foreach (var l in locations)
             {
@@ -316,7 +348,8 @@ namespace Unity.Entities.Content
             {
                 if (status.LocationStatus.State != ContentLocationService.ResolvingState.Complete)
                     return false;
-                GetDownloadServiceForLocation(status.LocationStatus.Location).GetDownloadProgress(status.LocationStatus.Location, ref totalBytes, ref downloadedBytes);
+                GetDownloadServiceForLocation(status.LocationStatus.Location)
+                    .GetDownloadProgress(status.LocationStatus.Location, ref totalBytes, ref downloadedBytes);
                 return true;
             }
             else if (contentSets.TryGetValue(id, out var set))
@@ -414,7 +447,7 @@ namespace Unity.Entities.Content
         /// </summary>
         public void CancelAllDeliveries()
         {
-            foreach(var d in downloadStates)
+            foreach (var d in downloadStates)
                 CancelDelivery(d.Key);
 
             foreach (var cs in contentSets)
@@ -431,7 +464,7 @@ namespace Unity.Entities.Content
         public DeliveryStatus GetDeliveryStatus(in RemoteContentId id)
         {
             if (id.IsValid)
-            { 
+            {
                 if (downloadStates.TryGetValue(id, out var status))
                 {
                     if (status.State != DeliveryState.ContentDownloaded)
@@ -439,7 +472,8 @@ namespace Unity.Entities.Content
                         if (status.LocationStatus.State < ContentLocationService.ResolvingState.Complete)
                             status.LocationStatus = GetLocationStatus(id);
                         if (status.LocationStatus.State == ContentLocationService.ResolvingState.Complete)
-                            status.DownloadStatus = GetDownloadServiceForLocation(status.LocationStatus.Location).GetDownloadStatus(status.LocationStatus.Location);
+                            status.DownloadStatus = GetDownloadServiceForLocation(status.LocationStatus.Location)
+                                .GetDownloadStatus(status.LocationStatus.Location);
                         downloadStates[id] = status;
                     }
                     return status;
@@ -475,7 +509,15 @@ namespace Unity.Entities.Content
         /// <returns>The remote content id for the content that is downloaded.  This id can be used to check the status of the download.</returns>
         public RemoteContentId DeliverContent(string url, Hash128 hash, long size, uint crc = 0)
         {
-            return DeliverContent(new RemoteContentLocation { Path = url, Hash = hash, Size = size, Crc = crc });
+            return DeliverContent(
+                new RemoteContentLocation
+                {
+                    Path = url,
+                    Hash = hash,
+                    Size = size,
+                    Crc = crc,
+                }
+            );
         }
 
         /// <summary>
@@ -483,7 +525,7 @@ namespace Unity.Entities.Content
         /// </summary>
         /// <param name="loc">The location of the content.</param>
         /// <returns>The generated remote content id for the location.  This can be used to track the progress.</returns>
-        unsafe public RemoteContentId DeliverContent(in RemoteContentLocation loc)
+        public unsafe RemoteContentId DeliverContent(in RemoteContentLocation loc)
         {
             var dlSvc = GetDownloadServiceForLocation(loc);
             var id = new RemoteContentId(loc.Path);
@@ -498,7 +540,11 @@ namespace Unity.Entities.Content
             if (!downloadStates.ContainsKey(id))
             {
                 var status = new DeliveryStatus { ContentId = id };
-                status.LocationStatus = new ContentLocationService.LocationStatus { Location = loc, State = ContentLocationService.ResolvingState.Complete };
+                status.LocationStatus = new ContentLocationService.LocationStatus
+                {
+                    Location = loc,
+                    State = ContentLocationService.ResolvingState.Complete,
+                };
                 status.DownloadStatus = dlSvc.DownloadContent(loc);
                 downloadStates[id] = status;
                 activeDownloads.Add(id);
@@ -522,8 +568,9 @@ namespace Unity.Entities.Content
             var i = activeDownloads.IndexOf(id);
             if (i >= 0)
                 activeDownloads.RemoveAtSwapBack(i);
-            if (status.State >= DeliveryState.LocationResolved)// && status.State < DeliveryState.ContentDownloaded)
-                GetDownloadServiceForLocation(status.LocationStatus.Location).CancelDownload(status.LocationStatus.Location);
+            if (status.State >= DeliveryState.LocationResolved) // && status.State < DeliveryState.ContentDownloaded)
+                GetDownloadServiceForLocation(status.LocationStatus.Location)
+                    .CancelDownload(status.LocationStatus.Location);
             status.DownloadStatus.DownloadState = ContentDownloadService.State.Cancelled;
             downloadStates[id] = status;
             return true;
@@ -539,7 +586,7 @@ namespace Unity.Entities.Content
 
             if (downloadStates.TryGetValue(id, out var status))
             {
-                if(status.State == DeliveryState.Failed || status.State == DeliveryState.Cancelled)
+                if (status.State == DeliveryState.Failed || status.State == DeliveryState.Cancelled)
                     downloadStates.Remove(id);
             }
             if (!downloadStates.ContainsKey(id))
@@ -554,7 +601,7 @@ namespace Unity.Entities.Content
         /// </summary>
         /// <param name="setName">The name of the content set.  These are defined during the publishing process.</param>
         /// <returns>The remote id for the content set.  This can be used to check the download status.</returns>
-        unsafe public RemoteContentId DeliverContent(in FixedString512Bytes setName)
+        public unsafe RemoteContentId DeliverContent(in FixedString512Bytes setName)
         {
             ContentDeliveryGlobalState.LogFunc?.Invoke($"Delivering content set for {setName}.");
             foreach (var ls in locationServices)
@@ -571,7 +618,7 @@ namespace Unity.Entities.Content
         /// <param name="remoteIds">A pointer to the array of remote content ids.</param>
         /// <param name="length">The number of remote content ids.</param>
         /// <returns>The remote id for the content set.  This can be used to check the download status.</returns>
-        unsafe public RemoteContentId DeliverContent(RemoteContentId* remoteIds, int length)
+        public unsafe RemoteContentId DeliverContent(RemoteContentId* remoteIds, int length)
         {
             var id = GetRemoteContentIdentifier(remoteIds, length);
             if (!contentSets.ContainsKey(id))
@@ -585,14 +632,16 @@ namespace Unity.Entities.Content
             }
             return id;
         }
+
         /// <summary>
         /// Starts the delivery process of a set of contents.
         /// </summary>
         /// <param name="remoteIds">The set of remote ids to deliver.</param>
         /// <returns>A generated remote content id that can be used to track the progress of the delivery.</returns>
-        unsafe public RemoteContentId DeliverContent(in UnsafeList<RemoteContentId> remoteIds) => DeliverContent(remoteIds.Ptr, remoteIds.Length);
+        public unsafe RemoteContentId DeliverContent(in UnsafeList<RemoteContentId> remoteIds) =>
+            DeliverContent(remoteIds.Ptr, remoteIds.Length);
 
-        unsafe private RemoteContentId GetRemoteContentIdentifier(RemoteContentId* ids, int length)
+        private unsafe RemoteContentId GetRemoteContentIdentifier(RemoteContentId* ids, int length)
         {
             var validIds = new List<RemoteContentId>(length);
             for (int i = 0; i < length; i++)
@@ -617,7 +666,8 @@ namespace Unity.Entities.Content
             }
             if (status.State == DeliveryState.LocationResolved)
             {
-                status.DownloadStatus = GetDownloadServiceForLocation(status.LocationStatus.Location).DownloadContent(status.LocationStatus.Location);
+                status.DownloadStatus = GetDownloadServiceForLocation(status.LocationStatus.Location)
+                    .DownloadContent(status.LocationStatus.Location);
                 downloadStates[id] = status;
             }
             return status;
@@ -630,9 +680,9 @@ namespace Unity.Entities.Content
         {
             foreach (var ls in locationServices)
                 ls.Value.Process();
-            foreach(var ds in downloadServices)
+            foreach (var ds in downloadServices)
                 ds.Value.Process();
-            for(int i = activeDownloads.Length - 1; i >= 0; --i)
+            for (int i = activeDownloads.Length - 1; i >= 0; --i)
             {
                 var id = activeDownloads[i];
                 var status = ProcessDownload(id);
@@ -668,7 +718,7 @@ namespace Unity.Entities.Content
                 }
                 if (downloadStates.IsCreated)
                     downloadStates.Dispose();
-                if(activeDownloads.IsCreated)
+                if (activeDownloads.IsCreated)
                     activeDownloads.Dispose();
             }
             catch (Exception e)

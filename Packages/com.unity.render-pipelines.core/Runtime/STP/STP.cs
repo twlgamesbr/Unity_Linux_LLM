@@ -54,33 +54,37 @@ namespace UnityEngine.Rendering
         {
             new GUIContent("Clipped Input Color", "Shows input color clipped to {0 to 1}"),
             new GUIContent("Log Input Depth", "Shows input depth in log scale"),
-            new GUIContent("Reversible Tonemapped Input Color", "Shows input color after conversion to reversible tonemaped space"),
+            new GUIContent(
+                "Reversible Tonemapped Input Color",
+                "Shows input color after conversion to reversible tonemaped space"
+            ),
             new GUIContent("Shaped Absolute Input Motion", "Visualizes input motion vectors"),
-            new GUIContent("Motion Reprojection {R=Prior G=This Sqrt Luma Feedback Diff, B=Offscreen}", "Visualizes reprojected frame difference"),
+            new GUIContent(
+                "Motion Reprojection {R=Prior G=This Sqrt Luma Feedback Diff, B=Offscreen}",
+                "Visualizes reprojected frame difference"
+            ),
             new GUIContent("Sensitivity {G=No motion match, R=Responsive, B=Luma}", "Visualize pixel sensitivities"),
         };
 
         // Unfortunately we must maintain a sequence of index values that map to the supported debug view indices
         // if we want to be able to display the debug views as an enum field without allocating any garbage.
-        static readonly int[] s_DebugViewIndices = new int[kNumDebugViews]
-        {
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-        };
+        static readonly int[] s_DebugViewIndices = new int[kNumDebugViews] { 0, 1, 2, 3, 4, 5 };
 
         /// <summary>
         /// Array of debug view descriptions expected to be used in the rendering debugger UI
         /// </summary>
-        public static GUIContent[] debugViewDescriptions { get { return s_DebugViewDescriptions; } }
+        public static GUIContent[] debugViewDescriptions
+        {
+            get { return s_DebugViewDescriptions; }
+        }
 
         /// <summary>
         /// Array of debug view indices expected to be used in the rendering debugger UI
         /// </summary>
-        public static int[] debugViewIndices { get { return s_DebugViewIndices; } }
+        public static int[] debugViewIndices
+        {
+            get { return s_DebugViewIndices; }
+        }
 
         /// <summary>
         /// STP configuration data that varies per rendered view
@@ -293,7 +297,7 @@ namespace UnityEngine.Rendering
             Convergence,
             Feedback,
 
-            Count
+            Count,
         }
 
         /// <summary>
@@ -357,7 +361,10 @@ namespace UnityEngine.Rendering
         static Vector2Int CalculateConvergenceTextureSize(Vector2Int historyTextureSize)
         {
             // The convergence texture is a 4x4 reduction of data computed at render size, but we must always make sure the size is rounded up.
-            return new Vector2Int(CoreUtils.DivRoundUp(historyTextureSize.x, 4), CoreUtils.DivRoundUp(historyTextureSize.y, 4));
+            return new Vector2Int(
+                CoreUtils.DivRoundUp(historyTextureSize.x, 4),
+                CoreUtils.DivRoundUp(historyTextureSize.y, 4)
+            );
         }
 
         /// <summary>
@@ -401,7 +408,9 @@ namespace UnityEngine.Rendering
                     // Allocate two new sets of history textures for STP based on the current settings
 
                     Vector2Int historyTextureSize = info.useHwDrs ? info.postUpscaleSize : info.preUpscaleSize;
-                    TextureDimension texDimension = info.useTexArray ? TextureDimension.Tex2DArray : TextureDimension.Tex2D;
+                    TextureDimension texDimension = info.useTexArray
+                        ? TextureDimension.Tex2DArray
+                        : TextureDimension.Tex2D;
                     int numSlices = info.useTexArray ? TextureXR.slices : 1;
 
                     int width = 0;
@@ -465,8 +474,14 @@ namespace UnityEngine.Rendering
                             int offset = (frameIndex * kNumHistoryTextureTypes) + historyTypeIndex;
 
                             m_textures[offset] = RTHandles.Alloc(
-                                width, height, format, numSlices, dimension: texDimension, enableRandomWrite: true,
-                                name: name, useDynamicScaleExplicit: useDynamicScaleExplicit
+                                width,
+                                height,
+                                format,
+                                numSlices,
+                                dimension: texDimension,
+                                enableRandomWrite: true,
+                                name: name,
+                                useDynamicScaleExplicit: useDynamicScaleExplicit
                             );
                         }
                     }
@@ -561,7 +576,7 @@ namespace UnityEngine.Rendering
         [GenerateHLSL(PackingRules.Exact)]
         enum StpSetupPerViewConstants
         {
-            Count = 8
+            Count = 8,
         };
 
         /// <summary>
@@ -615,14 +630,20 @@ namespace UnityEngine.Rendering
             int packedStencilMask = (config.stencilMask & 0xFF) << 16;
             int packedDebugViewIndex = (config.debugViewIndex & 0xFF) << 24;
 
-            int constant0 = packedStencilMask | packedHasValidHistory | packedBlueNoiseWidthMinusOne | packedDebugViewIndex;
+            int constant0 =
+                packedStencilMask | packedHasValidHistory | packedBlueNoiseWidthMinusOne | packedDebugViewIndex;
 
             // Compute values used for linear depth conversion
             // These values are normally in the _ZBufferParams constant, but we re-compute them here since this constant is defined differently across SRPs
             float zBufferParamZ = (config.farPlane - config.nearPlane) / (config.nearPlane * config.farPlane);
             float zBufferParamW = 1.0f / config.farPlane;
 
-            constants._StpCommonConstant = new Vector4(BitConverter.Int32BitsToSingle(constant0), zBufferParamZ, zBufferParamW, 0.0f);
+            constants._StpCommonConstant = new Vector4(
+                BitConverter.Int32BitsToSingle(constant0),
+                zBufferParamZ,
+                zBufferParamW,
+                0.0f
+            );
 
             //
             // NOTE: The logic below is effectively a C# port of the HLSL constant setup logic found in Stp.hlsl
@@ -679,7 +700,9 @@ namespace UnityEngine.Rendering
             constants._StpSetupConstants4.x = Mathf.Log(config.farPlane / config.nearPlane, 2.0f);
             constants._StpSetupConstants4.y = config.nearPlane;
             // kMotionMatch
-            constants._StpSetupConstants4.z = config.enableMotionScaling ? CalculateMotionScale(config.deltaTime, config.lastDeltaTime) : 1.0f;
+            constants._StpSetupConstants4.z = config.enableMotionScaling
+                ? CalculateMotionScale(config.deltaTime, config.lastDeltaTime)
+                : 1.0f;
             // Unused for now.
             constants._StpSetupConstants4.w = 0.0f;
             //------------------------------------------------------------------------------------------------------------------------------
@@ -688,8 +711,10 @@ namespace UnityEngine.Rendering
             constants._StpSetupConstants5.y = config.currentImageSize.y;
             //------------------------------------------------------------------------------------------------------------------------------
             // StpF2 kFS := scale factor used to convert from feedback uv space to reduction uv space
-            constants._StpSetupConstants5.z = config.outputImageSize.x / (Mathf.Ceil(config.outputImageSize.x / 4.0f) * 4.0f);
-            constants._StpSetupConstants5.w = config.outputImageSize.y / (Mathf.Ceil(config.outputImageSize.y / 4.0f) * 4.0f);
+            constants._StpSetupConstants5.z =
+                config.outputImageSize.x / (Mathf.Ceil(config.outputImageSize.x / 4.0f) * 4.0f);
+            constants._StpSetupConstants5.w =
+                config.outputImageSize.y / (Mathf.Ceil(config.outputImageSize.y / 4.0f) * 4.0f);
 
             // Per View
             for (uint viewIndex = 0; viewIndex < config.numActiveViews; ++viewIndex)
@@ -730,10 +755,11 @@ namespace UnityEngine.Rendering
                 prjCurCDGH.z = perViewConfig.currentProj[3, 2];
                 prjCurCDGH.w = perViewConfig.currentProj[3, 3];
 
-                Matrix4x4 forwardTransform = ExtractRotation(perViewConfig.currentView) *
-                                             Matrix4x4.Translate(-perViewConfig.currentView.GetColumn(3)) *
-                                             Matrix4x4.Translate(perViewConfig.lastView.GetColumn(3)) *
-                                             ExtractRotation(perViewConfig.lastView).transpose;
+                Matrix4x4 forwardTransform =
+                    ExtractRotation(perViewConfig.currentView)
+                    * Matrix4x4.Translate(-perViewConfig.currentView.GetColumn(3))
+                    * Matrix4x4.Translate(perViewConfig.lastView.GetColumn(3))
+                    * ExtractRotation(perViewConfig.lastView).transpose;
 
                 Vector4 forIJKL = forwardTransform.GetRow(0);
                 Vector4 forMNOP = forwardTransform.GetRow(1);
@@ -754,10 +780,11 @@ namespace UnityEngine.Rendering
                 prjPrvCDGH.z = perViewConfig.lastLastProj[3, 2];
                 prjPrvCDGH.w = perViewConfig.lastLastProj[3, 3];
 
-                Matrix4x4 backwardTransform = ExtractRotation(perViewConfig.lastLastView) *
-                                              Matrix4x4.Translate(-perViewConfig.lastLastView.GetColumn(3)) *
-                                              Matrix4x4.Translate(perViewConfig.lastView.GetColumn(3)) *
-                                              ExtractRotation(perViewConfig.lastView).transpose;
+                Matrix4x4 backwardTransform =
+                    ExtractRotation(perViewConfig.lastLastView)
+                    * Matrix4x4.Translate(-perViewConfig.lastLastView.GetColumn(3))
+                    * Matrix4x4.Translate(perViewConfig.lastView.GetColumn(3))
+                    * ExtractRotation(perViewConfig.lastView).transpose;
 
                 Vector4 bckIJKL = backwardTransform.GetRow(0);
                 Vector4 bckMNOP = backwardTransform.GetRow(1);
@@ -775,39 +802,57 @@ namespace UnityEngine.Rendering
                     // k4567
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 4] = prjPriCDGH.w / prjPriABEF.y;
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 5] = prjPriABEF.w / prjPriABEF.y;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 6] = forIJKL.x * prjCurABEF.x + forQRST.x * prjCurABEF.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 7] = forIJKL.y * prjCurABEF.x + forQRST.y * prjCurABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 6] =
+                        forIJKL.x * prjCurABEF.x + forQRST.x * prjCurABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 7] =
+                        forIJKL.y * prjCurABEF.x + forQRST.y * prjCurABEF.z;
                     // k89AB
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 8] = forIJKL.z * prjCurABEF.x + forQRST.z * prjCurABEF.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 9] = forIJKL.w * prjCurABEF.x + forQRST.w * prjCurABEF.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 10] = forMNOP.x * prjCurABEF.y + forQRST.x * prjCurABEF.w;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 11] = forMNOP.y * prjCurABEF.y + forQRST.y * prjCurABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 8] =
+                        forIJKL.z * prjCurABEF.x + forQRST.z * prjCurABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 9] =
+                        forIJKL.w * prjCurABEF.x + forQRST.w * prjCurABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 10] =
+                        forMNOP.x * prjCurABEF.y + forQRST.x * prjCurABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 11] =
+                        forMNOP.y * prjCurABEF.y + forQRST.y * prjCurABEF.w;
                     // kCDEF
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 12] = forMNOP.z * prjCurABEF.y + forQRST.z * prjCurABEF.w;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 13] = forMNOP.w * prjCurABEF.y + forQRST.w * prjCurABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 12] =
+                        forMNOP.z * prjCurABEF.y + forQRST.z * prjCurABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 13] =
+                        forMNOP.w * prjCurABEF.y + forQRST.w * prjCurABEF.w;
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 14] = forQRST.x * prjCurCDGH.z;
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 15] = forQRST.y * prjCurCDGH.z;
                     // kGHIJ
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 16] = forQRST.z * prjCurCDGH.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 17] = forQRST.w * prjCurCDGH.z + prjCurCDGH.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 17] =
+                        forQRST.w * prjCurCDGH.z + prjCurCDGH.w;
 
                     // Backwards
 
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 18] = bckIJKL.x * prjPrvABEF.x + bckQRST.x * prjPrvABEF.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 19] = bckIJKL.y * prjPrvABEF.x + bckQRST.y * prjPrvABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 18] =
+                        bckIJKL.x * prjPrvABEF.x + bckQRST.x * prjPrvABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 19] =
+                        bckIJKL.y * prjPrvABEF.x + bckQRST.y * prjPrvABEF.z;
                     // kKLMN
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 20] = bckIJKL.z * prjPrvABEF.x + bckQRST.z * prjPrvABEF.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 21] = bckIJKL.w * prjPrvABEF.x + bckQRST.w * prjPrvABEF.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 22] = bckMNOP.x * prjPrvABEF.y + bckQRST.x * prjPrvABEF.w;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 23] = bckMNOP.y * prjPrvABEF.y + bckQRST.y * prjPrvABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 20] =
+                        bckIJKL.z * prjPrvABEF.x + bckQRST.z * prjPrvABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 21] =
+                        bckIJKL.w * prjPrvABEF.x + bckQRST.w * prjPrvABEF.z;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 22] =
+                        bckMNOP.x * prjPrvABEF.y + bckQRST.x * prjPrvABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 23] =
+                        bckMNOP.y * prjPrvABEF.y + bckQRST.y * prjPrvABEF.w;
                     // kOPQR
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 24] = bckMNOP.z * prjPrvABEF.y + bckQRST.z * prjPrvABEF.w;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 25] = bckMNOP.w * prjPrvABEF.y + bckQRST.w * prjPrvABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 24] =
+                        bckMNOP.z * prjPrvABEF.y + bckQRST.z * prjPrvABEF.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 25] =
+                        bckMNOP.w * prjPrvABEF.y + bckQRST.w * prjPrvABEF.w;
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 26] = bckQRST.x * prjPrvCDGH.z;
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 27] = bckQRST.y * prjPrvCDGH.z;
                     // kST
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 28] = bckQRST.z * prjPrvCDGH.z;
-                    constants._StpSetupPerViewConstants[baseViewDataOffset + 29] = bckQRST.w * prjPrvCDGH.z + prjPrvCDGH.w;
+                    constants._StpSetupPerViewConstants[baseViewDataOffset + 29] =
+                        bckQRST.w * prjPrvCDGH.z + prjPrvCDGH.w;
                     // Unused
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 30] = 0.0f;
                     constants._StpSetupPerViewConstants[baseViewDataOffset + 31] = 0.0f;
@@ -950,7 +995,7 @@ namespace UnityEngine.Rendering
         {
             StpSetup,
             StpPreTaa,
-            StpTaa
+            StpTaa,
         }
 
         /// <summary>
@@ -1047,7 +1092,11 @@ namespace UnityEngine.Rendering
         }
 
         // Internal helper function used to streamline usage of the render graph API
-        static TextureHandle UseTexture(IBaseRenderGraphBuilder builder, in TextureHandle texture, AccessFlags flags = AccessFlags.Read)
+        static TextureHandle UseTexture(
+            IBaseRenderGraphBuilder builder,
+            in TextureHandle texture,
+            AccessFlags flags = AccessFlags.Read
+        )
         {
             builder.UseTexture(texture, flags);
             return texture;
@@ -1078,15 +1127,33 @@ namespace UnityEngine.Rendering
 
             TextureHandle noiseTextureHandle = renderGraph.ImportTexture(noiseTextureRtHandle, noiseTextureInfo);
 
-            var priorDepthMotion = config.historyContext.GetPreviousHistoryTexture(HistoryTextureType.DepthMotion, config.frameIndex);
+            var priorDepthMotion = config.historyContext.GetPreviousHistoryTexture(
+                HistoryTextureType.DepthMotion,
+                config.frameIndex
+            );
             var priorLuma = config.historyContext.GetPreviousHistoryTexture(HistoryTextureType.Luma, config.frameIndex);
-            var priorConvergence = config.historyContext.GetPreviousHistoryTexture(HistoryTextureType.Convergence, config.frameIndex);
-            var priorFeedback = config.historyContext.GetPreviousHistoryTexture(HistoryTextureType.Feedback, config.frameIndex);
+            var priorConvergence = config.historyContext.GetPreviousHistoryTexture(
+                HistoryTextureType.Convergence,
+                config.frameIndex
+            );
+            var priorFeedback = config.historyContext.GetPreviousHistoryTexture(
+                HistoryTextureType.Feedback,
+                config.frameIndex
+            );
 
-            var depthMotion = config.historyContext.GetCurrentHistoryTexture(HistoryTextureType.DepthMotion, config.frameIndex);
+            var depthMotion = config.historyContext.GetCurrentHistoryTexture(
+                HistoryTextureType.DepthMotion,
+                config.frameIndex
+            );
             var luma = config.historyContext.GetCurrentHistoryTexture(HistoryTextureType.Luma, config.frameIndex);
-            var convergence = config.historyContext.GetCurrentHistoryTexture(HistoryTextureType.Convergence, config.frameIndex);
-            var feedback = config.historyContext.GetCurrentHistoryTexture(HistoryTextureType.Feedback, config.frameIndex);
+            var convergence = config.historyContext.GetCurrentHistoryTexture(
+                HistoryTextureType.Convergence,
+                config.frameIndex
+            );
+            var feedback = config.historyContext.GetCurrentHistoryTexture(
+                HistoryTextureType.Feedback,
+                config.frameIndex
+            );
 
             // Resize the current render-size history textures if hardware dynamic scaling is enabled
             if (config.enableHwDrs)
@@ -1106,7 +1173,13 @@ namespace UnityEngine.Rendering
 
             SetupData setupData;
 
-            using (var builder = renderGraph.AddComputePass<SetupData>("STP Setup", out var passData, ProfilingSampler.Get(ProfileId.StpSetup)))
+            using (
+                var builder = renderGraph.AddComputePass<SetupData>(
+                    "STP Setup",
+                    out var passData,
+                    ProfilingSampler.Get(ProfileId.StpSetup)
+                )
+            )
             {
                 passData.cs = runtimeResources.setupCS;
                 passData.cs.shaderKeywords = null;
@@ -1146,23 +1219,44 @@ namespace UnityEngine.Rendering
                     passData.inputStencil = UseTexture(builder, config.inputStencil);
                 }
 
-                passData.intermediateColor = UseTexture(builder, renderGraph.CreateTexture(new TextureDesc(intermediateSize.x, intermediateSize.y, config.enableHwDrs, config.enableTexArray)
-                {
-                    name = "STP Intermediate Color",
-                    format = GraphicsFormat.A2B10G10R10_UNormPack32,
-                    enableRandomWrite = true
-                }), AccessFlags.WriteAll);
+                passData.intermediateColor = UseTexture(
+                    builder,
+                    renderGraph.CreateTexture(
+                        new TextureDesc(
+                            intermediateSize.x,
+                            intermediateSize.y,
+                            config.enableHwDrs,
+                            config.enableTexArray
+                        )
+                        {
+                            name = "STP Intermediate Color",
+                            format = GraphicsFormat.A2B10G10R10_UNormPack32,
+                            enableRandomWrite = true,
+                        }
+                    ),
+                    AccessFlags.WriteAll
+                );
 
                 Vector2Int convergenceSize = CalculateConvergenceTextureSize(intermediateSize);
-                passData.intermediateConvergence = UseTexture(builder, renderGraph.CreateTexture(new TextureDesc(convergenceSize.x, convergenceSize.y, config.enableHwDrs, config.enableTexArray)
-                {
-                    name = "STP Intermediate Convergence",
-                    format = GraphicsFormat.R8_UNorm,
-                    enableRandomWrite = true
-                }), AccessFlags.WriteAll);
+                passData.intermediateConvergence = UseTexture(
+                    builder,
+                    renderGraph.CreateTexture(
+                        new TextureDesc(convergenceSize.x, convergenceSize.y, config.enableHwDrs, config.enableTexArray)
+                        {
+                            name = "STP Intermediate Convergence",
+                            format = GraphicsFormat.R8_UNorm,
+                            enableRandomWrite = true,
+                        }
+                    ),
+                    AccessFlags.WriteAll
+                );
 
                 passData.priorDepthMotion = UseTexture(builder, renderGraph.ImportTexture(priorDepthMotion));
-                passData.depthMotion = UseTexture(builder, renderGraph.ImportTexture(depthMotion), AccessFlags.WriteAll);
+                passData.depthMotion = UseTexture(
+                    builder,
+                    renderGraph.ImportTexture(depthMotion),
+                    AccessFlags.WriteAll
+                );
                 passData.priorLuma = UseTexture(builder, renderGraph.ImportTexture(priorLuma));
                 passData.luma = UseTexture(builder, renderGraph.ImportTexture(luma), AccessFlags.WriteAll);
 
@@ -1178,38 +1272,118 @@ namespace UnityEngine.Rendering
 
                         ConstantBuffer.Set<StpConstantBufferData>(data.cs, ShaderResources._StpConstantBufferData);
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpBlueNoiseIn, data.noiseTexture);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpBlueNoiseIn,
+                            data.noiseTexture
+                        );
 
                         if (data.debugView.IsValid())
-                            ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpDebugOut, data.debugView);
+                            ctx.cmd.SetComputeTextureParam(
+                                data.cs,
+                                data.kernelIndex,
+                                ShaderResources._StpDebugOut,
+                                data.debugView
+                            );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpInputColor, data.inputColor);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpInputDepth, data.inputDepth);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpInputMotion, data.inputMotion);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpInputColor,
+                            data.inputColor
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpInputDepth,
+                            data.inputDepth
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpInputMotion,
+                            data.inputMotion
+                        );
 
                         if (data.inputStencil.IsValid())
-                            ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpInputStencil, data.inputStencil, 0, RenderTextureSubElement.Stencil);
+                            ctx.cmd.SetComputeTextureParam(
+                                data.cs,
+                                data.kernelIndex,
+                                ShaderResources._StpInputStencil,
+                                data.inputStencil,
+                                0,
+                                RenderTextureSubElement.Stencil
+                            );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpIntermediateColor, data.intermediateColor);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpIntermediateConvergence, data.intermediateConvergence);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpIntermediateColor,
+                            data.intermediateColor
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpIntermediateConvergence,
+                            data.intermediateConvergence
+                        );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpPriorDepthMotion, data.priorDepthMotion);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpDepthMotion, data.depthMotion);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpPriorLuma, data.priorLuma);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpPriorDepthMotion,
+                            data.priorDepthMotion
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpDepthMotion,
+                            data.depthMotion
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpPriorLuma,
+                            data.priorLuma
+                        );
                         ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpLuma, data.luma);
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpPriorFeedback, data.priorFeedback);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpPriorConvergence, data.priorConvergence);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpPriorFeedback,
+                            data.priorFeedback
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpPriorConvergence,
+                            data.priorConvergence
+                        );
 
-                        ctx.cmd.DispatchCompute(data.cs, data.kernelIndex, data.dispatchSize.x, data.dispatchSize.y, data.viewCount);
-                    });
+                        ctx.cmd.DispatchCompute(
+                            data.cs,
+                            data.kernelIndex,
+                            data.dispatchSize.x,
+                            data.dispatchSize.y,
+                            data.viewCount
+                        );
+                    }
+                );
 
                 setupData = passData;
             }
 
             PreTaaData preTaaData;
 
-            using (var builder = renderGraph.AddComputePass<PreTaaData>("STP Pre-TAA", out var passData, ProfilingSampler.Get(ProfileId.StpPreTaa)))
+            using (
+                var builder = renderGraph.AddComputePass<PreTaaData>(
+                    "STP Pre-TAA",
+                    out var passData,
+                    ProfilingSampler.Get(ProfileId.StpPreTaa)
+                )
+            )
             {
                 passData.cs = runtimeResources.preTaaCS;
                 passData.cs.shaderKeywords = null;
@@ -1237,42 +1411,95 @@ namespace UnityEngine.Rendering
 
                 passData.intermediateConvergence = UseTexture(builder, setupData.intermediateConvergence);
 
-                passData.intermediateWeights = UseTexture(builder, renderGraph.CreateTexture(new TextureDesc(intermediateSize.x, intermediateSize.y, config.enableHwDrs, config.enableTexArray)
-                {
-                    name = "STP Intermediate Weights",
-                    format = GraphicsFormat.R8_UNorm,
-                    enableRandomWrite = true
-                }), AccessFlags.WriteAll);
+                passData.intermediateWeights = UseTexture(
+                    builder,
+                    renderGraph.CreateTexture(
+                        new TextureDesc(
+                            intermediateSize.x,
+                            intermediateSize.y,
+                            config.enableHwDrs,
+                            config.enableTexArray
+                        )
+                        {
+                            name = "STP Intermediate Weights",
+                            format = GraphicsFormat.R8_UNorm,
+                            enableRandomWrite = true,
+                        }
+                    ),
+                    AccessFlags.WriteAll
+                );
 
                 passData.luma = UseTexture(builder, renderGraph.ImportTexture(luma));
-                passData.convergence = UseTexture(builder, renderGraph.ImportTexture(convergence), AccessFlags.WriteAll);
+                passData.convergence = UseTexture(
+                    builder,
+                    renderGraph.ImportTexture(convergence),
+                    AccessFlags.WriteAll
+                );
 
                 builder.SetRenderFunc(
                     static (PreTaaData data, ComputeGraphContext ctx) =>
                     {
                         ConstantBuffer.Set<StpConstantBufferData>(data.cs, ShaderResources._StpConstantBufferData);
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpBlueNoiseIn, data.noiseTexture);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpBlueNoiseIn,
+                            data.noiseTexture
+                        );
 
                         if (data.debugView.IsValid())
-                            ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpDebugOut, data.debugView);
+                            ctx.cmd.SetComputeTextureParam(
+                                data.cs,
+                                data.kernelIndex,
+                                ShaderResources._StpDebugOut,
+                                data.debugView
+                            );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpIntermediateConvergence, data.intermediateConvergence);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpIntermediateConvergence,
+                            data.intermediateConvergence
+                        );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpIntermediateWeights, data.intermediateWeights);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpIntermediateWeights,
+                            data.intermediateWeights
+                        );
 
                         ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpLuma, data.luma);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpConvergence, data.convergence);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpConvergence,
+                            data.convergence
+                        );
 
-                        ctx.cmd.DispatchCompute(data.cs, data.kernelIndex, data.dispatchSize.x, data.dispatchSize.y, data.viewCount);
-                    });
+                        ctx.cmd.DispatchCompute(
+                            data.cs,
+                            data.kernelIndex,
+                            data.dispatchSize.x,
+                            data.dispatchSize.y,
+                            data.viewCount
+                        );
+                    }
+                );
 
                 preTaaData = passData;
             }
 
             TaaData taaData;
 
-            using (var builder = renderGraph.AddComputePass<TaaData>("STP TAA", out var passData, ProfilingSampler.Get(ProfileId.StpTaa)))
+            using (
+                var builder = renderGraph.AddComputePass<TaaData>(
+                    "STP TAA",
+                    out var passData,
+                    ProfilingSampler.Get(ProfileId.StpTaa)
+                )
+            )
             {
                 passData.cs = runtimeResources.taaCS;
                 passData.cs.shaderKeywords = null;
@@ -1314,23 +1541,75 @@ namespace UnityEngine.Rendering
                     {
                         ConstantBuffer.Set<StpConstantBufferData>(data.cs, ShaderResources._StpConstantBufferData);
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpBlueNoiseIn, data.noiseTexture);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpBlueNoiseIn,
+                            data.noiseTexture
+                        );
 
                         if (data.debugView.IsValid())
-                            ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpDebugOut, data.debugView);
+                            ctx.cmd.SetComputeTextureParam(
+                                data.cs,
+                                data.kernelIndex,
+                                ShaderResources._StpDebugOut,
+                                data.debugView
+                            );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpIntermediateColor, data.intermediateColor);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpIntermediateWeights, data.intermediateWeights);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpIntermediateColor,
+                            data.intermediateColor
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpIntermediateWeights,
+                            data.intermediateWeights
+                        );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpPriorFeedback, data.priorFeedback);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpDepthMotion, data.depthMotion);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpConvergence, data.convergence);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpPriorFeedback,
+                            data.priorFeedback
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpDepthMotion,
+                            data.depthMotion
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpConvergence,
+                            data.convergence
+                        );
 
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpFeedback, data.feedback);
-                        ctx.cmd.SetComputeTextureParam(data.cs, data.kernelIndex, ShaderResources._StpOutput, data.output);
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpFeedback,
+                            data.feedback
+                        );
+                        ctx.cmd.SetComputeTextureParam(
+                            data.cs,
+                            data.kernelIndex,
+                            ShaderResources._StpOutput,
+                            data.output
+                        );
 
-                        ctx.cmd.DispatchCompute(data.cs, data.kernelIndex, data.dispatchSize.x, data.dispatchSize.y, data.viewCount);
-                    });
+                        ctx.cmd.DispatchCompute(
+                            data.cs,
+                            data.kernelIndex,
+                            data.dispatchSize.x,
+                            data.dispatchSize.y,
+                            data.viewCount
+                        );
+                    }
+                );
 
                 taaData = passData;
             }

@@ -6,7 +6,8 @@ using UnityEngine;
 
 namespace Unity.PlatformToolkit
 {
-    internal partial class GenericAccountSystem<TAccount> : IAccountSystem where TAccount : class, IAccount, IDoubleSignOut
+    internal partial class GenericAccountSystem<TAccount> : IAccountSystem
+        where TAccount : class, IAccount, IDoubleSignOut
     {
         private class AccountSystemModifier : IAccountModifier<TAccount>
         {
@@ -18,7 +19,11 @@ namespace Unity.PlatformToolkit
 
             private TAccount m_NewPrimaryAccount;
 
-            public AccountSystemModifier(GenericAccountSystem<TAccount> accountSystem, TAccount currentPrimaryAccount, IReadOnlyList<TAccount> signedInAccounts)
+            public AccountSystemModifier(
+                GenericAccountSystem<TAccount> accountSystem,
+                TAccount currentPrimaryAccount,
+                IReadOnlyList<TAccount> signedInAccounts
+            )
             {
                 m_AccountSystem = accountSystem;
                 CurrentPrimaryAccount = currentPrimaryAccount;
@@ -35,8 +40,7 @@ namespace Unity.PlatformToolkit
                 DisposeCheck();
                 if (SignedInAccounts.Contains(account))
                 {
-                    throw new InvalidOperationException(
-                        "Attempting to add an account that is already signed in.");
+                    throw new InvalidOperationException("Attempting to add an account that is already signed in.");
                 }
 
                 foreach (var accountEvent in m_AccountEvents)
@@ -54,7 +58,8 @@ namespace Unity.PlatformToolkit
                 if (!SignedInAccounts.Contains(account))
                 {
                     throw new InvalidOperationException(
-                        "Attempting to remove an account that was not signed in at the beginning of modification.");
+                        "Attempting to remove an account that was not signed in at the beginning of modification."
+                    );
                 }
 
                 foreach (var accountEvent in m_AccountEvents)

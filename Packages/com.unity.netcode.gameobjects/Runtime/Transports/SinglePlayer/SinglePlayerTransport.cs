@@ -20,7 +20,8 @@ namespace Unity.Netcode.Transports.SinglePlayer
         /// <inheritdoc/>
         public override ulong ServerClientId { get; } = 0;
 
-        internal static readonly string NotStartingAsHostErrorMessage = $"When using {nameof(SinglePlayerTransport)}, you must start a hosted session so both client and server are available locally.";
+        internal static readonly string NotStartingAsHostErrorMessage =
+            $"When using {nameof(SinglePlayerTransport)}, you must start a hosted session so both client and server are available locally.";
 
         private struct MessageData
         {
@@ -30,7 +31,9 @@ namespace Unity.Netcode.Transports.SinglePlayer
             public float AvailableTime;
         }
 
-        private static Dictionary<ulong, Queue<MessageData>> s_MessageQueue = new Dictionary<ulong, Queue<MessageData>>();
+        private static Dictionary<ulong, Queue<MessageData>> s_MessageQueue =
+            new Dictionary<ulong, Queue<MessageData>>();
+
 #if UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStaticsOnLoad() => s_MessageQueue = new Dictionary<ulong, Queue<MessageData>>();
@@ -39,23 +42,29 @@ namespace Unity.Netcode.Transports.SinglePlayer
         private ulong m_TransportId = 0;
         private NetworkManager m_NetworkManager;
 
-
         /// <inheritdoc/>
         public override void Send(ulong clientId, ArraySegment<byte> payload, NetworkDelivery networkDelivery)
         {
             var copy = new byte[payload.Array.Length];
             Array.Copy(payload.Array, copy, payload.Array.Length);
-            s_MessageQueue[clientId].Enqueue(new MessageData
-            {
-                FromClientId = m_TransportId,
-                Payload = new ArraySegment<byte>(copy, payload.Offset, payload.Count),
-                Event = NetworkEvent.Data,
-                AvailableTime = (float)m_NetworkManager.LocalTime.FixedTime,
-            });
+            s_MessageQueue[clientId]
+                .Enqueue(
+                    new MessageData
+                    {
+                        FromClientId = m_TransportId,
+                        Payload = new ArraySegment<byte>(copy, payload.Offset, payload.Count),
+                        Event = NetworkEvent.Data,
+                        AvailableTime = (float)m_NetworkManager.LocalTime.FixedTime,
+                    }
+                );
         }
 
         /// <inheritdoc/>
-        public override NetworkEvent PollEvent(out ulong clientId, out ArraySegment<byte> payload, out float receiveTime)
+        public override NetworkEvent PollEvent(
+            out ulong clientId,
+            out ArraySegment<byte> payload,
+            out float receiveTime
+        )
         {
             if (s_MessageQueue[m_TransportId].Count > 0)
             {
@@ -74,7 +83,15 @@ namespace Unity.Netcode.Transports.SinglePlayer
                 receiveTime = m_NetworkManager.LocalTime.TimeAsFloat;
                 if (m_NetworkManager.IsServer && data.Event == NetworkEvent.Connect)
                 {
-                    s_MessageQueue[data.FromClientId].Enqueue(new MessageData { Event = NetworkEvent.Connect, FromClientId = ServerClientId, Payload = new ArraySegment<byte>() });
+                    s_MessageQueue[data.FromClientId]
+                        .Enqueue(
+                            new MessageData
+                            {
+                                Event = NetworkEvent.Connect,
+                                FromClientId = ServerClientId,
+                                Payload = new ArraySegment<byte>(),
+                            }
+                        );
                 }
                 return data.Event;
             }
@@ -113,13 +130,29 @@ namespace Unity.Netcode.Transports.SinglePlayer
         /// <inheritdoc/>
         public override void DisconnectRemoteClient(ulong clientId)
         {
-            s_MessageQueue[clientId].Enqueue(new MessageData { Event = NetworkEvent.Disconnect, FromClientId = m_TransportId, Payload = new ArraySegment<byte>() });
+            s_MessageQueue[clientId]
+                .Enqueue(
+                    new MessageData
+                    {
+                        Event = NetworkEvent.Disconnect,
+                        FromClientId = m_TransportId,
+                        Payload = new ArraySegment<byte>(),
+                    }
+                );
         }
 
         /// <inheritdoc/>
         public override void DisconnectLocalClient()
         {
-            s_MessageQueue[ServerClientId].Enqueue(new MessageData { Event = NetworkEvent.Disconnect, FromClientId = m_TransportId, Payload = new ArraySegment<byte>() });
+            s_MessageQueue[ServerClientId]
+                .Enqueue(
+                    new MessageData
+                    {
+                        Event = NetworkEvent.Disconnect,
+                        FromClientId = m_TransportId,
+                        Payload = new ArraySegment<byte>(),
+                    }
+                );
         }
 
         /// <inheritdoc/>
@@ -141,7 +174,9 @@ namespace Unity.Netcode.Transports.SinglePlayer
         /// <inheritdoc/>
         protected override NetworkTopologyTypes OnCurrentTopology()
         {
-            return m_NetworkManager != null ? m_NetworkManager.NetworkConfig.NetworkTopology : NetworkTopologyTypes.ClientServer;
+            return m_NetworkManager != null
+                ? m_NetworkManager.NetworkConfig.NetworkTopology
+                : NetworkTopologyTypes.ClientServer;
         }
 
         /// <inheritdoc/>

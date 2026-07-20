@@ -20,44 +20,53 @@ namespace UnityEngine.InputSystem.Editor
             m_UpdateExisting = updateExisting;
 
             var controlSchemeEditor = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                InputActionsEditorConstants.PackagePath +
-                InputActionsEditorConstants.ResourcesPath +
-                InputActionsEditorConstants.ControlSchemeEditorViewUxml);
+                InputActionsEditorConstants.PackagePath
+                    + InputActionsEditorConstants.ResourcesPath
+                    + InputActionsEditorConstants.ControlSchemeEditorViewUxml
+            );
 
             var controlSchemeVisualElement = controlSchemeEditor.CloneTree();
             controlSchemeVisualElement.Q<Button>(kCancelButton).clicked += Cancel;
             controlSchemeVisualElement.Q<Button>(kSaveButton).clicked += SaveAndClose;
-            controlSchemeVisualElement.Q<TextField>(kControlSchemeNameTextField).RegisterCallback<FocusOutEvent>(evt =>
-            {
-                Dispatch((in InputActionsEditorState state) =>
+            controlSchemeVisualElement
+                .Q<TextField>(kControlSchemeNameTextField)
+                .RegisterCallback<FocusOutEvent>(evt =>
                 {
-                    // If the name is the same as the current name, don't change it
-                    var newName = ((TextField)evt.currentTarget).value.Trim();
-                    if (string.IsNullOrEmpty(newName) || String.Compare(newName, state.selectedControlScheme.name) == 0)
-                    {
-                        m_NewName = String.Empty;
-                        // write back the value to the text field if the name was empty
-                        ((TextField)evt.currentTarget).value = state.selectedControlScheme.name;
-                    }
-                    else
-                    {
-                        m_NewName = ControlSchemeCommands.MakeUniqueControlSchemeName(state, newName);
-                        // write back the value to the text field if the name was not unique
-                        ((TextField)evt.currentTarget).value = m_NewName;
-                    }
+                    Dispatch(
+                        (in InputActionsEditorState state) =>
+                        {
+                            // If the name is the same as the current name, don't change it
+                            var newName = ((TextField)evt.currentTarget).value.Trim();
+                            if (
+                                string.IsNullOrEmpty(newName)
+                                || String.Compare(newName, state.selectedControlScheme.name) == 0
+                            )
+                            {
+                                m_NewName = String.Empty;
+                                // write back the value to the text field if the name was empty
+                                ((TextField)evt.currentTarget).value = state.selectedControlScheme.name;
+                            }
+                            else
+                            {
+                                m_NewName = ControlSchemeCommands.MakeUniqueControlSchemeName(state, newName);
+                                // write back the value to the text field if the name was not unique
+                                ((TextField)evt.currentTarget).value = m_NewName;
+                            }
 
-                    return state.With(selectedControlScheme: state.selectedControlScheme);
+                            return state.With(selectedControlScheme: state.selectedControlScheme);
+                        }
+                    );
                 });
-            });
 
-            m_ModalWindow = new VisualElement
-            {
-                style = { position = new StyleEnum<Position>(Position.Absolute) }
-            };
+            m_ModalWindow = new VisualElement { style = { position = new StyleEnum<Position>(Position.Absolute) } };
             var popupWindow = new PopupWindow
             {
                 text = "Add Control Scheme",
-                style = { position = new StyleEnum<Position>(Position.Absolute), maxWidth = new StyleLength(new Length(100, LengthUnit.Percent)) }
+                style =
+                {
+                    position = new StyleEnum<Position>(Position.Absolute),
+                    maxWidth = new StyleLength(new Length(100, LengthUnit.Percent)),
+                },
             };
             popupWindow.contentContainer.Add(controlSchemeVisualElement);
             m_ModalWindow.Add(popupWindow);
@@ -83,17 +92,24 @@ namespace UnityEngine.InputSystem.Editor
 
             m_ListView.itemsSource = new List<string>();
 
-            CreateSelector(s => s.selectedControlScheme,
-                (_, s) => s.selectedControlScheme);
+            CreateSelector(s => s.selectedControlScheme, (_, s) => s.selectedControlScheme);
         }
 
         private void AddDeviceRequirement()
         {
-            var dropdown = new InputControlPickerDropdown(new InputControlPickerState(), path =>
-            {
-                var requirement = new InputControlScheme.DeviceRequirement { controlPath = path, isOptional = false };
-                Dispatch(ControlSchemeCommands.AddDeviceRequirement(requirement));
-            }, mode: InputControlPicker.Mode.PickDevice);
+            var dropdown = new InputControlPickerDropdown(
+                new InputControlPickerState(),
+                path =>
+                {
+                    var requirement = new InputControlScheme.DeviceRequirement
+                    {
+                        controlPath = path,
+                        isOptional = false,
+                    };
+                    Dispatch(ControlSchemeCommands.AddDeviceRequirement(requirement));
+                },
+                mode: InputControlPicker.Mode.PickDevice
+            );
             dropdown.Show(new Rect(Event.current.mousePosition, Vector2.zero));
         }
 
@@ -107,11 +123,14 @@ namespace UnityEngine.InputSystem.Editor
 
         public override void RedrawUI(InputControlScheme viewState)
         {
-            rootElement.Q<TextField>(kControlSchemeNameTextField).value = string.IsNullOrEmpty(m_NewName) ? viewState.name : m_NewName;
+            rootElement.Q<TextField>(kControlSchemeNameTextField).value = string.IsNullOrEmpty(m_NewName)
+                ? viewState.name
+                : m_NewName;
             m_ListView.itemsSource?.Clear();
-            m_ListView.itemsSource = viewState.deviceRequirements.Count > 0 ?
-                viewState.deviceRequirements.Select(r => (r.controlPath, r.isOptional)).ToList() :
-                new List<(string, bool)>();
+            m_ListView.itemsSource =
+                viewState.deviceRequirements.Count > 0
+                    ? viewState.deviceRequirements.Select(r => (r.controlPath, r.isOptional)).ToList()
+                    : new List<(string, bool)>();
             m_ListView.Rebuild();
         }
 
@@ -156,8 +175,8 @@ namespace UnityEngine.InputSystem.Editor
                 {
                     flexDirection = FlexDirection.Column,
                     flexGrow = 1,
-                    alignContent = new StyleEnum<Align>(Align.Center)
-                }
+                    alignContent = new StyleEnum<Align>(Align.Center),
+                },
             };
             ve.Add(new Toggle());
             return ve;
@@ -169,8 +188,10 @@ namespace UnityEngine.InputSystem.Editor
             var rowItem = ((string path, bool optional))m_ListView.itemsSource[rowIndex];
 
             toggle.value = !rowItem.optional;
-            var eventCallback = (EventCallback<ChangeEvent<bool>>)(evt =>
-                Dispatch(ControlSchemeCommands.ChangeDeviceRequirement(rowIndex, evt.newValue)));
+            var eventCallback =
+                (EventCallback<ChangeEvent<bool>>)(
+                    evt => Dispatch(ControlSchemeCommands.ChangeDeviceRequirement(rowIndex, evt.newValue))
+                );
             toggle.userData = eventCallback;
 
             toggle.RegisterValueChangedCallback(eventCallback);

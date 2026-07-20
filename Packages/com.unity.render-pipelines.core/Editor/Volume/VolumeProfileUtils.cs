@@ -12,13 +12,17 @@ namespace UnityEditor.Rendering
     {
         internal static class Styles
         {
-            public static readonly GUIContent newVolumeProfile = EditorGUIUtility.TrTextContent("New Volume Profile...");
+            public static readonly GUIContent newVolumeProfile = EditorGUIUtility.TrTextContent(
+                "New Volume Profile..."
+            );
             public static readonly GUIContent clone = EditorGUIUtility.TrTextContent("Clone");
             public static readonly GUIContent collapseAll = EditorGUIUtility.TrTextContent("Collapse All");
             public static readonly GUIContent expandAll = EditorGUIUtility.TrTextContent("Expand All");
             public static readonly GUIContent reset = EditorGUIUtility.TrTextContent("Reset");
             public static readonly GUIContent resetAll = EditorGUIUtility.TrTextContent("Reset All");
-            public static readonly GUIContent openInRenderingDebugger = EditorGUIUtility.TrTextContent("Open In Rendering Debugger");
+            public static readonly GUIContent openInRenderingDebugger = EditorGUIUtility.TrTextContent(
+                "Open In Rendering Debugger"
+            );
             public static readonly GUIContent copySettings = EditorGUIUtility.TrTextContent("Copy Settings");
             public static readonly GUIContent copyAllSettings = EditorGUIUtility.TrTextContent("Copy All Settings");
             public static readonly GUIContent pasteSettings = EditorGUIUtility.TrTextContent("Paste Settings");
@@ -32,7 +36,11 @@ namespace UnityEditor.Rendering
             VolumeManager.instance.OnVolumeProfileChanged(profile);
         }
 
-        internal static void CopyValuesToComponent(VolumeComponent component, VolumeComponent targetComponent, bool copyOnlyOverriddenParams)
+        internal static void CopyValuesToComponent(
+            VolumeComponent component,
+            VolumeComponent targetComponent,
+            bool copyOnlyOverriddenParams
+        )
         {
             if (targetComponent == null)
                 return;
@@ -47,7 +55,11 @@ namespace UnityEditor.Rendering
             }
         }
 
-        internal static void AssignValuesToProfile(VolumeProfile targetProfile, VolumeComponent component, SerializedProperty newPropertyValue)
+        internal static void AssignValuesToProfile(
+            VolumeProfile targetProfile,
+            VolumeComponent component,
+            SerializedProperty newPropertyValue
+        )
         {
             var defaultComponent = targetProfile.GetVolumeComponentOfType(component.GetType());
             if (defaultComponent != null)
@@ -75,17 +87,25 @@ namespace UnityEditor.Rendering
         /// <typeparam name="TRenderPipeline">The type of RenderPipeline that this VolumeProfile is used for. If it is
         /// not the active pipeline, the function does nothing.</typeparam>
         /// <returns>Whether the operation was confirmed</returns>
-        public static bool UpdateGlobalDefaultVolumeProfileWithConfirmation<TRenderPipeline>(VolumeProfile globalDefaultVolumeProfile, VolumeProfile defaultValueSource = null)
+        public static bool UpdateGlobalDefaultVolumeProfileWithConfirmation<TRenderPipeline>(
+            VolumeProfile globalDefaultVolumeProfile,
+            VolumeProfile defaultValueSource = null
+        )
             where TRenderPipeline : RenderPipeline
         {
             if (RenderPipelineManager.currentPipeline is not TRenderPipeline)
                 return false;
 
             int numComponentsMissingFromProfile = GetTypesMissingFromDefaultProfile(globalDefaultVolumeProfile).Count;
-            if (numComponentsMissingFromProfile == 0 ||
-                EditorUtility.DisplayDialog(
+            if (
+                numComponentsMissingFromProfile == 0
+                || EditorUtility.DisplayDialog(
                     "New Default Volume Profile",
-                    $"Assigning {globalDefaultVolumeProfile.name} as the Default Volume Profile will add {numComponentsMissingFromProfile} Volume Components to it. Are you sure?", "Yes", "Cancel"))
+                    $"Assigning {globalDefaultVolumeProfile.name} as the Default Volume Profile will add {numComponentsMissingFromProfile} Volume Components to it. Are you sure?",
+                    "Yes",
+                    "Cancel"
+                )
+            )
             {
                 UpdateGlobalDefaultVolumeProfile<TRenderPipeline>(globalDefaultVolumeProfile, defaultValueSource);
                 return true;
@@ -104,13 +124,19 @@ namespace UnityEditor.Rendering
         /// any components that are added to <see cref="globalDefaultVolumeProfile"/>.</param>
         /// <typeparam name="TRenderPipeline">The type of RenderPipeline that this VolumeProfile is used for. If it is
         /// not the active pipeline, the function does nothing.</typeparam>
-        public static void UpdateGlobalDefaultVolumeProfile<TRenderPipeline>(VolumeProfile globalDefaultVolumeProfile, VolumeProfile defaultValueSource = null)
+        public static void UpdateGlobalDefaultVolumeProfile<TRenderPipeline>(
+            VolumeProfile globalDefaultVolumeProfile,
+            VolumeProfile defaultValueSource = null
+        )
             where TRenderPipeline : RenderPipeline
         {
             if (RenderPipelineManager.currentPipeline is not TRenderPipeline)
                 return;
 
-            Undo.RecordObject(globalDefaultVolumeProfile, $"Ensure {globalDefaultVolumeProfile.name} has all Volume Components");
+            Undo.RecordObject(
+                globalDefaultVolumeProfile,
+                $"Ensure {globalDefaultVolumeProfile.name} has all Volume Components"
+            );
             foreach (var comp in globalDefaultVolumeProfile.components)
                 Undo.RecordObject(comp, $"Save {comp.name} state");
 
@@ -133,15 +159,16 @@ namespace UnityEditor.Rendering
         // Helper extension method: Returns the VolumeComponent of given type from the profile if present, or a default-constructed one
         static VolumeComponent GetVolumeComponentOfTypeOrDefault(this VolumeProfile profile, Type type)
         {
-            return profile.GetVolumeComponentOfType(type) ?? (VolumeComponent) ScriptableObject.CreateInstance(type);
+            return profile.GetVolumeComponentOfType(type) ?? (VolumeComponent)ScriptableObject.CreateInstance(type);
         }
 
         static List<Type> GetTypesMissingFromDefaultProfile(VolumeProfile profile)
         {
             List<Type> missingTypes = new List<Type>();
 
-            var volumeComponentTypes = VolumeManager.instance.isInitialized ?
-                VolumeManager.instance.baseComponentTypeArray : VolumeManager.instance.LoadBaseTypesByReflection(GraphicsSettings.currentRenderPipelineAssetType);
+            var volumeComponentTypes = VolumeManager.instance.isInitialized
+                ? VolumeManager.instance.baseComponentTypeArray
+                : VolumeManager.instance.LoadBaseTypesByReflection(GraphicsSettings.currentRenderPipelineAssetType);
             foreach (var type in volumeComponentTypes)
             {
                 if (profile.components.Find(c => c.GetType() == type) == null)
@@ -162,8 +189,15 @@ namespace UnityEditor.Rendering
         /// <param name="profile">VolumeProfile to use.</param>
         /// <param name="defaultValueSource">An optional VolumeProfile asset containing default values to use for
         /// any components that are added to <see cref="profile"/>.</param>
-        public static void EnsureAllOverridesForDefaultProfile(VolumeProfile profile, VolumeProfile defaultValueSource = null) => TryEnsureAllOverridesForDefaultProfile(profile, defaultValueSource);
-        internal static bool TryEnsureAllOverridesForDefaultProfile(VolumeProfile profile, VolumeProfile defaultValueSource = null)
+        public static void EnsureAllOverridesForDefaultProfile(
+            VolumeProfile profile,
+            VolumeProfile defaultValueSource = null
+        ) => TryEnsureAllOverridesForDefaultProfile(profile, defaultValueSource);
+
+        internal static bool TryEnsureAllOverridesForDefaultProfile(
+            VolumeProfile profile,
+            VolumeProfile defaultValueSource = null
+        )
         {
             // It's possible that the volume profile is assigned to the default asset inside the HDRP package. In
             // this case it cannot be modified. User is expected to use HDRP Wizard "Fix" to create a local profile.
@@ -175,8 +209,9 @@ namespace UnityEditor.Rendering
             int numComponentsBefore = profile.components.Count;
 
             // Remove any obsolete VolumeComponents
-            profile.components.RemoveAll(
-                comp => comp == null || comp.GetType().IsDefined(typeof(ObsoleteAttribute), false));
+            profile.components.RemoveAll(comp =>
+                comp == null || comp.GetType().IsDefined(typeof(ObsoleteAttribute), false)
+            );
 
             changed |= profile.components.Count != numComponentsBefore;
 
@@ -198,7 +233,9 @@ namespace UnityEditor.Rendering
                     if (resetAll || !param.overrideState)
                     {
                         if (defaultValueComponent == null)
-                            defaultValueComponent = defaultValueSource.GetVolumeComponentOfTypeOrDefault(comp.GetType());
+                            defaultValueComponent = defaultValueSource.GetVolumeComponentOfTypeOrDefault(
+                                comp.GetType()
+                            );
 
                         // Because the parameter values for inactive VolumeComponents or non-overriden parameters are
                         // not in effect, we must reset these values to avoid unexpected changes when assigning an
@@ -264,15 +301,22 @@ namespace UnityEditor.Rendering
             string defaultVolumeProfilePath,
             Action<VolumeProfile> onNewVolumeProfileCreated,
             Action onComponentEditorsExpandedCollapsed = null,
-            bool canCreateNewProfile = true)
+            bool canCreateNewProfile = true
+        )
         {
             if (canCreateNewProfile)
             {
-                menu.AddItem(Styles.newVolumeProfile, false, () =>
-                {
-                    VolumeProfileFactory.CreateVolumeProfileWithCallback(defaultVolumeProfilePath,
-                        onNewVolumeProfileCreated);
-                });
+                menu.AddItem(
+                    Styles.newVolumeProfile,
+                    false,
+                    () =>
+                    {
+                        VolumeProfileFactory.CreateVolumeProfileWithCallback(
+                            defaultVolumeProfilePath,
+                            onNewVolumeProfileCreated
+                        );
+                    }
+                );
             }
             else
             {
@@ -283,12 +327,18 @@ namespace UnityEditor.Rendering
             {
                 if (canCreateNewProfile)
                 {
-                    menu.AddItem(Styles.clone, false, () =>
-                    {
-                        var pathName = AssetDatabase.GenerateUniqueAssetPath(AssetDatabase.GetAssetPath(volumeProfile));
-                        var clone = VolumeProfileFactory.CreateVolumeProfileAtPath(pathName, volumeProfile);
-                        onNewVolumeProfileCreated(clone);
-                    });
+                    menu.AddItem(
+                        Styles.clone,
+                        false,
+                        () =>
+                        {
+                            var pathName = AssetDatabase.GenerateUniqueAssetPath(
+                                AssetDatabase.GetAssetPath(volumeProfile)
+                            );
+                            var clone = VolumeProfileFactory.CreateVolumeProfileAtPath(pathName, volumeProfile);
+                            onNewVolumeProfileCreated(clone);
+                        }
+                    );
                 }
                 else
                 {
@@ -297,18 +347,26 @@ namespace UnityEditor.Rendering
 
                 menu.AddSeparator(string.Empty);
 
-                menu.AddItem(Styles.collapseAll, false, () =>
-                {
-                    if (componentEditors != null)
-                        SetComponentEditorsExpanded(componentEditors, false);
-                    onComponentEditorsExpandedCollapsed?.Invoke();
-                });
-                menu.AddItem(Styles.expandAll, false, () =>
-                {
-                    if (componentEditors != null)
-                        SetComponentEditorsExpanded(componentEditors, true);
-                    onComponentEditorsExpandedCollapsed?.Invoke();
-                });
+                menu.AddItem(
+                    Styles.collapseAll,
+                    false,
+                    () =>
+                    {
+                        if (componentEditors != null)
+                            SetComponentEditorsExpanded(componentEditors, false);
+                        onComponentEditorsExpandedCollapsed?.Invoke();
+                    }
+                );
+                menu.AddItem(
+                    Styles.expandAll,
+                    false,
+                    () =>
+                    {
+                        if (componentEditors != null)
+                            SetComponentEditorsExpanded(componentEditors, true);
+                        onComponentEditorsExpandedCollapsed?.Invoke();
+                    }
+                );
             }
 
             menu.AddSeparator(string.Empty);
@@ -317,21 +375,32 @@ namespace UnityEditor.Rendering
 
             menu.AddSeparator(string.Empty);
 
-            menu.AddItem(Styles.openInRenderingDebugger, false, () => DebugDisplaySettingsVolume.OpenInRenderingDebugger());
+            menu.AddItem(
+                Styles.openInRenderingDebugger,
+                false,
+                () => DebugDisplaySettingsVolume.OpenInRenderingDebugger()
+            );
 
             if (volumeProfile != null)
             {
                 menu.AddSeparator(string.Empty);
 
-                menu.AddItem(Styles.copyAllSettings, false,
-                    () => VolumeComponentCopyPaste.CopySettings(volumeProfile.components));
+                menu.AddItem(
+                    Styles.copyAllSettings,
+                    false,
+                    () => VolumeComponentCopyPaste.CopySettings(volumeProfile.components)
+                );
 
                 if (VolumeComponentCopyPaste.CanPaste(volumeProfile.components))
-                    menu.AddItem(Styles.pasteSettings, false, () =>
-                    {
-                        VolumeComponentCopyPaste.PasteSettings(volumeProfile.components, volumeProfile);
-                        VolumeManager.instance.OnVolumeProfileChanged(volumeProfile);
-                    });
+                    menu.AddItem(
+                        Styles.pasteSettings,
+                        false,
+                        () =>
+                        {
+                            VolumeComponentCopyPaste.PasteSettings(volumeProfile.components, volumeProfile);
+                            VolumeManager.instance.OnVolumeProfileChanged(volumeProfile);
+                        }
+                    );
                 else
                     menu.AddDisabledItem(Styles.pasteSettings, false);
             }
@@ -354,47 +423,75 @@ namespace UnityEditor.Rendering
             bool overrideStateOnReset,
             string defaultVolumeProfilePath,
             Action<VolumeProfile> onNewVolumeProfileCreated,
-            Action onComponentEditorsExpandedCollapsed = null)
+            Action onComponentEditorsExpandedCollapsed = null
+        )
         {
             var menu = new GenericMenu();
-            menu.AddItem(Styles.newVolumeProfile, false, () =>
-            {
-                VolumeProfileFactory.CreateVolumeProfileWithCallback(defaultVolumeProfilePath,
-                    onNewVolumeProfileCreated);
-            });
+            menu.AddItem(
+                Styles.newVolumeProfile,
+                false,
+                () =>
+                {
+                    VolumeProfileFactory.CreateVolumeProfileWithCallback(
+                        defaultVolumeProfilePath,
+                        onNewVolumeProfileCreated
+                    );
+                }
+            );
 
             if (volumeProfile != null)
             {
-                menu.AddItem(Styles.clone, false, () =>
-                {
-                    var pathName = AssetDatabase.GenerateUniqueAssetPath(AssetDatabase.GetAssetPath(volumeProfile));
-                    var clone = VolumeProfileFactory.CreateVolumeProfileAtPath(pathName, volumeProfile);
-                    onNewVolumeProfileCreated(clone);
-                });
+                menu.AddItem(
+                    Styles.clone,
+                    false,
+                    () =>
+                    {
+                        var pathName = AssetDatabase.GenerateUniqueAssetPath(AssetDatabase.GetAssetPath(volumeProfile));
+                        var clone = VolumeProfileFactory.CreateVolumeProfileAtPath(pathName, volumeProfile);
+                        onNewVolumeProfileCreated(clone);
+                    }
+                );
 
                 menu.AddSeparator(string.Empty);
 
-                menu.AddItem(Styles.collapseAll, false, () =>
-                {
-                    SetComponentEditorsExpanded(componentEditors, false);
-                    onComponentEditorsExpandedCollapsed?.Invoke();
-                });
-                menu.AddItem(Styles.expandAll, false, () =>
-                {
-                    SetComponentEditorsExpanded(componentEditors, true);
-                    onComponentEditorsExpandedCollapsed?.Invoke();
-                });
+                menu.AddItem(
+                    Styles.collapseAll,
+                    false,
+                    () =>
+                    {
+                        SetComponentEditorsExpanded(componentEditors, false);
+                        onComponentEditorsExpandedCollapsed?.Invoke();
+                    }
+                );
+                menu.AddItem(
+                    Styles.expandAll,
+                    false,
+                    () =>
+                    {
+                        SetComponentEditorsExpanded(componentEditors, true);
+                        onComponentEditorsExpandedCollapsed?.Invoke();
+                    }
+                );
 
                 menu.AddSeparator(string.Empty);
 
-                menu.AddItem(Styles.resetAll, false, () =>
-                {
-                    VolumeComponent[] components = new VolumeComponent[componentEditors.Count];
-                    for (int i = 0; i < componentEditors.Count; i++)
-                        components[i] = componentEditors[i].volumeComponent;
+                menu.AddItem(
+                    Styles.resetAll,
+                    false,
+                    () =>
+                    {
+                        VolumeComponent[] components = new VolumeComponent[componentEditors.Count];
+                        for (int i = 0; i < componentEditors.Count; i++)
+                            components[i] = componentEditors[i].volumeComponent;
 
-                    ResetComponentsInternal(new SerializedObject(volumeProfile), volumeProfile, components, overrideStateOnReset);
-                });
+                        ResetComponentsInternal(
+                            new SerializedObject(volumeProfile),
+                            volumeProfile,
+                            components,
+                            overrideStateOnReset
+                        );
+                    }
+                );
             }
 
             menu.AddSeparator(string.Empty);
@@ -403,21 +500,32 @@ namespace UnityEditor.Rendering
 
             menu.AddSeparator(string.Empty);
 
-            menu.AddItem(Styles.openInRenderingDebugger, false, () => DebugDisplaySettingsVolume.OpenInRenderingDebugger());
+            menu.AddItem(
+                Styles.openInRenderingDebugger,
+                false,
+                () => DebugDisplaySettingsVolume.OpenInRenderingDebugger()
+            );
 
             if (volumeProfile != null)
             {
                 menu.AddSeparator(string.Empty);
 
-                menu.AddItem(Styles.copyAllSettings, false,
-                    () => VolumeComponentCopyPaste.CopySettings(volumeProfile.components));
+                menu.AddItem(
+                    Styles.copyAllSettings,
+                    false,
+                    () => VolumeComponentCopyPaste.CopySettings(volumeProfile.components)
+                );
 
                 if (VolumeComponentCopyPaste.CanPaste(volumeProfile.components))
-                    menu.AddItem(Styles.pasteSettings, false, () =>
-                    {
-                        VolumeComponentCopyPaste.PasteSettings(volumeProfile.components, volumeProfile);
-                        VolumeManager.instance.OnVolumeProfileChanged(volumeProfile);
-                    });
+                    menu.AddItem(
+                        Styles.pasteSettings,
+                        false,
+                        () =>
+                        {
+                            VolumeComponentCopyPaste.PasteSettings(volumeProfile.components, volumeProfile);
+                            VolumeManager.instance.OnVolumeProfileChanged(volumeProfile);
+                        }
+                    );
                 else
                     menu.AddDisabledItem(Styles.pasteSettings);
             }
@@ -427,7 +535,7 @@ namespace UnityEditor.Rendering
 
         internal static VolumeComponent CreateNewComponent(Type type)
         {
-            var volumeComponent = (VolumeComponent) ScriptableObject.CreateInstance(type);
+            var volumeComponent = (VolumeComponent)ScriptableObject.CreateInstance(type);
             volumeComponent.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
             volumeComponent.name = type.Name;
             return volumeComponent;
@@ -437,7 +545,8 @@ namespace UnityEditor.Rendering
             SerializedObject serializedObject,
             VolumeProfile asset,
             VolumeComponent[] components,
-            bool newComponentDefaultOverrideState)
+            bool newComponentDefaultOverrideState
+        )
         {
             Undo.RecordObjects(components, "Reset All Volume Overrides");
 

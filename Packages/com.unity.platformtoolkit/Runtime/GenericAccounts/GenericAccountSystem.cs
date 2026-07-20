@@ -7,7 +7,8 @@ using UnityEngine.Assertions;
 
 namespace Unity.PlatformToolkit
 {
-    internal partial class GenericAccountSystem<TAccount> : IAccountSystem where TAccount : class, IAccount, IDoubleSignOut
+    internal partial class GenericAccountSystem<TAccount> : IAccountSystem
+        where TAccount : class, IAccount, IDoubleSignOut
     {
         public IReadOnlyList<IAccount> SignedIn => m_SignedInAccounts;
         private ReadOnlyCollection<IAccount> m_SignedInAccounts;
@@ -51,9 +52,9 @@ namespace Unity.PlatformToolkit
         internal IAccount PrimaryCurrentUser => m_PrimaryAccountSystem.CurrentPrimaryAccount;
         internal IReadOnlyCollection<IAccount> SignedInAccounts => m_SignedInAccounts;
 
-
         private AccountSystemModifier m_CurrentAccountModifier;
-        private readonly Queue<TaskCompletionSource<IAccountModifier<TAccount>>> m_PendingAccountModifications = new Queue<TaskCompletionSource<IAccountModifier<TAccount>>>();
+        private readonly Queue<TaskCompletionSource<IAccountModifier<TAccount>>> m_PendingAccountModifications =
+            new Queue<TaskCompletionSource<IAccountModifier<TAccount>>>();
 
         /// <param name="initialAccounts">List of accounts that are signed in during initialization. These accounts will appear in <see cref="IAccountSystem.SignedIn"/>, but <see cref="IAccountSystem.OnChange"/> will not be called.</param>
         /// <param name="primaryAccountSystemProvider">Null if the <see cref="IPrimaryAccountSystem"/> is not supported, or provider instance if it is.</param>
@@ -106,11 +107,13 @@ namespace Unity.PlatformToolkit
         ///     }
         /// }
         /// </code>
-        public GenericAccountSystem(IReadOnlyList<TAccount> initialAccounts = null,
+        public GenericAccountSystem(
+            IReadOnlyList<TAccount> initialAccounts = null,
             IPrimaryAccountSystemProvider primaryAccountSystemProvider = null,
             int primaryAccountIndex = -1,
             IAccountPickerSystemProvider accountPickerSystemProvider = null,
-            IInputOwnershipSystem inputOwnershipSystem = null)
+            IInputOwnershipSystem inputOwnershipSystem = null
+        )
         {
             initialAccounts ??= Array.Empty<TAccount>();
             foreach (var account in initialAccounts)
@@ -123,7 +126,10 @@ namespace Unity.PlatformToolkit
             {
                 Assert.IsTrue(primaryAccountIndex < initialAccounts.Count, "Primary account index is out of range");
                 if (primaryAccountIndex >= 0)
-                    m_PrimaryAccountSystem = new GenericPrimaryAccountSystem(primaryAccountSystemProvider, initialAccounts[primaryAccountIndex]);
+                    m_PrimaryAccountSystem = new GenericPrimaryAccountSystem(
+                        primaryAccountSystemProvider,
+                        initialAccounts[primaryAccountIndex]
+                    );
                 else
                     m_PrimaryAccountSystem = new GenericPrimaryAccountSystem(primaryAccountSystemProvider, null);
             }
@@ -155,7 +161,11 @@ namespace Unity.PlatformToolkit
             {
                 if (m_CurrentAccountModifier == null && m_PendingAccountModifications.Count == 0)
                 {
-                    m_CurrentAccountModifier = new AccountSystemModifier(this, m_PrimaryAccountSystem?.CurrentPrimaryAccount, m_Accounts.ToArray());
+                    m_CurrentAccountModifier = new AccountSystemModifier(
+                        this,
+                        m_PrimaryAccountSystem?.CurrentPrimaryAccount,
+                        m_Accounts.ToArray()
+                    );
                     return Task.FromResult<IAccountModifier<TAccount>>(m_CurrentAccountModifier);
                 }
                 else
@@ -177,7 +187,11 @@ namespace Unity.PlatformToolkit
                 m_CurrentAccountModifier = null;
                 if (m_PendingAccountModifications.Count > 0)
                 {
-                    m_CurrentAccountModifier = new AccountSystemModifier(this, m_PrimaryAccountSystem?.CurrentPrimaryAccount, m_Accounts.ToArray());
+                    m_CurrentAccountModifier = new AccountSystemModifier(
+                        this,
+                        m_PrimaryAccountSystem?.CurrentPrimaryAccount,
+                        m_Accounts.ToArray()
+                    );
                     var completionSource = m_PendingAccountModifications.Dequeue();
                     completionSource.SetResult(m_CurrentAccountModifier);
                 }

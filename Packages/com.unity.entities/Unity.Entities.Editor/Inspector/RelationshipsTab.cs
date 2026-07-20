@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Entities.UI;
 using Unity.Profiling;
 using Unity.Properties;
-using Unity.Entities.UI;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.Pool;
@@ -14,7 +14,9 @@ namespace Unity.Entities.Editor
 {
     class RelationshipsTab : ITabContent
     {
-        static readonly ProfilerMarker k_UpdateMarker = new ProfilerMarker($"EntityInspector.{nameof(RelationshipsTab)}.{nameof(Update)}");
+        static readonly ProfilerMarker k_UpdateMarker = new ProfilerMarker(
+            $"EntityInspector.{nameof(RelationshipsTab)}.{nameof(Update)}"
+        );
         readonly EntityInspectorContext m_Context;
 
         readonly List<QueryViewData> m_QueryCache = new List<QueryViewData>();
@@ -34,6 +36,7 @@ namespace Unity.Entities.Editor
         }
 
         internal void ClearSearch() => m_Inspector?.ClearSearch();
+
         internal void ApplySearch(string searchText) => m_Inspector?.ApplySearch(searchText);
 
         ~RelationshipsTab()
@@ -57,7 +60,13 @@ namespace Unity.Entities.Editor
         }
 
         // internal for tests.
-        internal static void GetMatchSystems(Entity entity, World world, List<QueryViewData> matchingQueries, List<SystemQueriesViewData> matchingSystems, WorldProxy worldProxy)
+        internal static void GetMatchSystems(
+            Entity entity,
+            World world,
+            List<QueryViewData> matchingQueries,
+            List<SystemQueriesViewData> matchingSystems,
+            WorldProxy worldProxy
+        )
         {
             var findDuplicatesDict = new Dictionary<string, int>();
             foreach (var system in worldProxy.AllSystemsInOrder)
@@ -66,15 +75,33 @@ namespace Unity.Entities.Editor
             }
         }
 
-        static unsafe void GatherMatchingSystem(Entity entity, World world, SystemProxy systemProxy, List<QueryViewData> matchingQueries, List<SystemQueriesViewData> matchingSystems, Dictionary<string, int> findDuplicatesDict)
+        static unsafe void GatherMatchingSystem(
+            Entity entity,
+            World world,
+            SystemProxy systemProxy,
+            List<QueryViewData> matchingQueries,
+            List<SystemQueriesViewData> matchingSystems,
+            Dictionary<string, int> findDuplicatesDict
+        )
         {
             var ecs = world.EntityManager.GetCheckedEntityDataAccess()->EntityComponentStore;
 
-            GatherMatchingQueries(ecs, entity, ref systemProxy.StatePointerForQueryResults->EntityQueries, matchingQueries, world, systemProxy);
+            GatherMatchingQueries(
+                ecs,
+                entity,
+                ref systemProxy.StatePointerForQueryResults->EntityQueries,
+                matchingQueries,
+                world,
+                systemProxy
+            );
             if (matchingQueries.Count <= 0)
                 return;
 
-            var currentViewData = new SystemQueriesViewData(systemProxy, GetSystemKind(systemProxy), matchingQueries.ToArray());
+            var currentViewData = new SystemQueriesViewData(
+                systemProxy,
+                GetSystemKind(systemProxy),
+                matchingQueries.ToArray()
+            );
             if (findDuplicatesDict.TryGetValue(systemProxy.TypeName, out var existingViewDataIndex))
             {
                 currentViewData.MarkAsDuplicatedTypeName();
@@ -93,7 +120,14 @@ namespace Unity.Entities.Editor
         }
 
         // internal for tests
-        internal static unsafe void GatherMatchingQueries(EntityComponentStore* ecs, Entity entity, ref UnsafeList<EntityQuery> queries, List<QueryViewData> matchingQueries, World world, SystemProxy systemProxy)
+        internal static unsafe void GatherMatchingQueries(
+            EntityComponentStore* ecs,
+            Entity entity,
+            ref UnsafeList<EntityQuery> queries,
+            List<QueryViewData> matchingQueries,
+            World world,
+            SystemProxy systemProxy
+        )
         {
             var archetype = ecs->GetArchetype(entity);
             for (var i = 0; i < queries.Length; i++)
@@ -103,7 +137,10 @@ namespace Unity.Entities.Editor
                     continue;
 
                 var matchingArchetypes = query._GetImpl()->_QueryData->MatchingArchetypes;
-                var matchingArchetypeIndex = EntityQueryManager.FindMatchingArchetypeIndexForArchetype(ref matchingArchetypes, archetype);
+                var matchingArchetypeIndex = EntityQueryManager.FindMatchingArchetypeIndexForArchetype(
+                    ref matchingArchetypes,
+                    archetype
+                );
                 if (matchingArchetypeIndex == -1)
                     continue;
 
@@ -126,24 +163,35 @@ namespace Unity.Entities.Editor
                 SystemCategory.Unmanaged => SystemQueriesViewData.SystemKind.Unmanaged,
                 SystemCategory.ECBSystemBegin => SystemQueriesViewData.SystemKind.CommandBufferBegin,
                 SystemCategory.ECBSystemEnd => SystemQueriesViewData.SystemKind.CommandBufferEnd,
-                _ => SystemQueriesViewData.SystemKind.Regular
+                _ => SystemQueriesViewData.SystemKind.Regular,
             };
         }
 
         public string TabName { get; } = L10n.Tr("Relationships");
+
         public void OnTabVisibilityChanged(bool isVisible)
         {
             if (isVisible)
-                Analytics.SendEditorEvent(Analytics.Window.Inspector, Analytics.EventType.InspectorTabFocus, Analytics.RelationshipsTabName);
+                Analytics.SendEditorEvent(
+                    Analytics.Window.Inspector,
+                    Analytics.EventType.InspectorTabFocus,
+                    Analytics.RelationshipsTabName
+                );
             m_IsVisible = isVisible;
         }
 
         [UsedImplicitly]
         internal class RelationshipsTabView : PropertyInspector<RelationshipsTab>
         {
-            static readonly string k_MoreLabel = L10n.Tr("More systems are matching this entity. You can use the search to filter systems by name.");
-            static readonly string k_MoreLabelWithFilter = L10n.Tr("More systems are matching this search. Refine the search terms to find a particular system.");
-            static readonly ProfilerMarker k_ViewUpdateMarker = new ProfilerMarker($"EntityInspector.{nameof(RelationshipsTabView)}.{nameof(Update)}");
+            static readonly string k_MoreLabel = L10n.Tr(
+                "More systems are matching this entity. You can use the search to filter systems by name."
+            );
+            static readonly string k_MoreLabelWithFilter = L10n.Tr(
+                "More systems are matching this search. Refine the search terms to find a particular system."
+            );
+            static readonly ProfilerMarker k_ViewUpdateMarker = new ProfilerMarker(
+                $"EntityInspector.{nameof(RelationshipsTabView)}.{nameof(Update)}"
+            );
             readonly Cooldown m_Cooldown = new Cooldown(TimeSpan.FromMilliseconds(Constants.Inspector.CoolDownTime));
             Label m_EmptyMessage;
 
@@ -164,12 +212,18 @@ namespace Unity.Entities.Editor
                 m_SearchField = InspectorUtility.CreateSearchField(
                     UssClasses.Inspector.RelationshipsTab.SearchField,
                     ApplySearch,
-                    ClearSearch);
+                    ClearSearch
+                );
 
                 var searchContainer = root.Q(className: "search-field-container");
                 searchContainer.Add(m_SearchField);
 
-                systemQueriesListView = new SystemQueriesListView(new List<SystemQueriesViewData>(), SearchTerms, k_MoreLabel, k_MoreLabelWithFilter);
+                systemQueriesListView = new SystemQueriesListView(
+                    new List<SystemQueriesViewData>(),
+                    SearchTerms,
+                    k_MoreLabel,
+                    k_MoreLabelWithFilter
+                );
 
                 var contentContainer = root.Q(className: "entity-inspector-relationships-tab__content");
                 contentContainer.Add(systemQueriesListView);
@@ -198,8 +252,9 @@ namespace Unity.Entities.Editor
 
                 foreach (var system in allSystems)
                 {
-                    var isMatch = system.Data.SystemName != null &&
-                                  system.Data.SystemName.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0;
+                    var isMatch =
+                        system.Data.SystemName != null
+                        && system.Data.SystemName.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0;
                     system.SetVisibility(isMatch);
                 }
             }

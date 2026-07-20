@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,7 +19,7 @@ namespace UnityEngine.Rendering
     {
         // For player builds, implement the singleton pattern internally
 #if !UNITY_EDITOR
-        static Lazy<DebugDisplaySerializer> s_Instance = new (() => new ());
+        static Lazy<DebugDisplaySerializer> s_Instance = new(() => new());
 
         /// <summary>Gets the instance of the singleton.</summary>
         public static DebugDisplaySerializer instance => s_Instance.Value;
@@ -67,7 +66,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <typeparam name="T">The debug display settings type to retrieve.</typeparam>
         /// <returns>The serialized instance for the given debug display settings type.</returns>
-        public static T GetOrCreate<T>() where T : class, ISerializedDebugDisplaySettings
+        public static T GetOrCreate<T>()
+            where T : class, ISerializedDebugDisplaySettings
         {
             return instance.GetOrCreate(typeof(T)) as T;
         }
@@ -78,7 +78,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <typeparam name="T">The debug display settings type to retrieve.</typeparam>
         /// <returns>The serialized instance for the given debug display settings type if it exists, or null otherwise.</returns>
-        public static T Get<T>() where T : class, ISerializedDebugDisplaySettings
+        public static T Get<T>()
+            where T : class, ISerializedDebugDisplaySettings
         {
             return instance.Get(typeof(T)) as T;
         }

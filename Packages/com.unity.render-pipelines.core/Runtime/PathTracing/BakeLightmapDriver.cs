@@ -19,7 +19,14 @@ namespace UnityEngine.PathTracing.Lightmapping
                 TexelIndex = 0;
             }
 
-            public void Tick(uint passSampleCount, uint totalSampleCount, UInt64 chunkTexelCount, UInt64 totalTexelCount, out bool instanceIsDone, out bool chunkIsDone)
+            public void Tick(
+                uint passSampleCount,
+                uint totalSampleCount,
+                UInt64 chunkTexelCount,
+                UInt64 totalTexelCount,
+                out bool instanceIsDone,
+                out bool chunkIsDone
+            )
             {
                 instanceIsDone = false;
                 chunkIsDone = false;
@@ -45,14 +52,14 @@ namespace UnityEngine.PathTracing.Lightmapping
         public struct IntegrationSettings
         {
             public RayTracingBackend Backend;
-            public uint MaxDispatchesPerFlush;      // how many dispatches to do before flushing the GPU
+            public uint MaxDispatchesPerFlush; // how many dispatches to do before flushing the GPU
             public bool DebugDispatches;
 
             public static readonly IntegrationSettings Default = new IntegrationSettings
             {
                 Backend = RayTracingBackend.Compute,
                 MaxDispatchesPerFlush = 1,
-                DebugDispatches = false
+                DebugDispatches = false,
             };
         }
 
@@ -74,17 +81,25 @@ namespace UnityEngine.PathTracing.Lightmapping
             public float AOMaxDistance = 1.0f;
             public float PushOff = 0.00001f;
             public UInt64 ExpandedBufferSize = 262144;
+
             public uint GetSampleCount(IntegratedOutputType integratedOutputType)
             {
                 switch (integratedOutputType)
                 {
-                    case IntegratedOutputType.AO: return AOSampleCount;
-                    case IntegratedOutputType.Direct: return DirectSampleCount;
-                    case IntegratedOutputType.DirectionalityDirect: return DirectSampleCount;
-                    case IntegratedOutputType.Indirect: return IndirectSampleCount;
-                    case IntegratedOutputType.DirectionalityIndirect: return IndirectSampleCount;
-                    case IntegratedOutputType.Validity: return ValiditySampleCount;
-                    case IntegratedOutputType.ShadowMask: return DirectSampleCount;
+                    case IntegratedOutputType.AO:
+                        return AOSampleCount;
+                    case IntegratedOutputType.Direct:
+                        return DirectSampleCount;
+                    case IntegratedOutputType.DirectionalityDirect:
+                        return DirectSampleCount;
+                    case IntegratedOutputType.Indirect:
+                        return IndirectSampleCount;
+                    case IntegratedOutputType.DirectionalityIndirect:
+                        return IndirectSampleCount;
+                    case IntegratedOutputType.Validity:
+                        return ValiditySampleCount;
+                    case IntegratedOutputType.ShadowMask:
+                        return DirectSampleCount;
                     default:
                         Debug.Assert(false, "Unexpected case.");
                         return 0;
@@ -95,13 +110,20 @@ namespace UnityEngine.PathTracing.Lightmapping
             {
                 switch (integratedOutputType)
                 {
-                    case IntegratedOutputType.AO: return AOAntiAliasingType;
-                    case IntegratedOutputType.Direct: return DirectAntiAliasingType;
-                    case IntegratedOutputType.DirectionalityDirect: return DirectAntiAliasingType;
-                    case IntegratedOutputType.Indirect: return IndirectAntiAliasingType;
-                    case IntegratedOutputType.DirectionalityIndirect: return IndirectAntiAliasingType;
-                    case IntegratedOutputType.Validity: return ValidityAntiAliasingType;
-                    case IntegratedOutputType.ShadowMask: return DirectAntiAliasingType;
+                    case IntegratedOutputType.AO:
+                        return AOAntiAliasingType;
+                    case IntegratedOutputType.Direct:
+                        return DirectAntiAliasingType;
+                    case IntegratedOutputType.DirectionalityDirect:
+                        return DirectAntiAliasingType;
+                    case IntegratedOutputType.Indirect:
+                        return IndirectAntiAliasingType;
+                    case IntegratedOutputType.DirectionalityIndirect:
+                        return IndirectAntiAliasingType;
+                    case IntegratedOutputType.Validity:
+                        return ValidityAntiAliasingType;
+                    case IntegratedOutputType.ShadowMask:
+                        return DirectAntiAliasingType;
                     default:
                         Debug.Assert(false, "Unexpected case.");
                         return 0;
@@ -113,14 +135,14 @@ namespace UnityEngine.PathTracing.Lightmapping
             uint maxChunkSize,
             uint instanceWidth,
             uint instanceHeight,
-            uint currentChunkTexelOffset,   // current starting texel index for the chunk, linear offset into instanceWidth*instanceHeight
-            uint currentSampleIndex,        // current sample index for the chunk
-            uint maxSamplesPerTexel,        // total sample count per texel
-            out uint chunkSize,             // number of texels to process in a single pass
-            out uint expandedSampleWidth,   // number of expanded samples per texel, power of two, this might exceed the required sample count
-            out uint passSampleCount,       // the actual number of samples to take, this might be smaller than the expanded sample width
-            out uint2 chunkOffset           // the chunk offset in 2D
-            )
+            uint currentChunkTexelOffset, // current starting texel index for the chunk, linear offset into instanceWidth*instanceHeight
+            uint currentSampleIndex, // current sample index for the chunk
+            uint maxSamplesPerTexel, // total sample count per texel
+            out uint chunkSize, // number of texels to process in a single pass
+            out uint expandedSampleWidth, // number of expanded samples per texel, power of two, this might exceed the required sample count
+            out uint passSampleCount, // the actual number of samples to take, this might be smaller than the expanded sample width
+            out uint2 chunkOffset // the chunk offset in 2D
+        )
         {
             // this function should only be called when there is work to do
             Debug.Assert(currentSampleIndex < maxSamplesPerTexel);
@@ -128,10 +150,16 @@ namespace UnityEngine.PathTracing.Lightmapping
             Debug.Assert(instanceWidth > 0);
             Debug.Assert(instanceHeight > 0);
             Debug.Assert(currentChunkTexelOffset < instanceWidth * instanceHeight);
-            chunkOffset = new uint2((uint)(currentChunkTexelOffset % (UInt64)instanceWidth), (uint)(currentChunkTexelOffset / (UInt64)instanceWidth));
+            chunkOffset = new uint2(
+                (uint)(currentChunkTexelOffset % (UInt64)instanceWidth),
+                (uint)(currentChunkTexelOffset / (UInt64)instanceWidth)
+            );
             Debug.Assert(chunkOffset.x < instanceWidth);
             Debug.Assert(chunkOffset.y < instanceHeight);
-            uint remainingTexels = (uint)instanceWidth - chunkOffset.x + ((uint)(instanceHeight - 1) - chunkOffset.y) * (uint)instanceWidth;
+            uint remainingTexels =
+                (uint)instanceWidth
+                - chunkOffset.x
+                + ((uint)(instanceHeight - 1) - chunkOffset.y) * (uint)instanceWidth;
             Debug.Assert(remainingTexels > 0);
             uint remainingSampleCount = math.max(0, maxSamplesPerTexel - currentSampleIndex);
             Debug.Assert(remainingSampleCount > 0);
@@ -169,7 +197,8 @@ namespace UnityEngine.PathTracing.Lightmapping
             UVFallbackBuffer uvFallbackBuffer,
             bool doDirectionality,
             out uint chunkSize,
-            out bool instanceIsDone)
+            out bool instanceIsDone
+        )
         {
             CommandBuffer cmd = lightmappingContext.GetCommandBuffer();
             GraphicsBuffer traceScratchBuffer = lightmappingContext.TraceScratchBuffer;
@@ -195,22 +224,58 @@ namespace UnityEngine.PathTracing.Lightmapping
                     out chunkSize,
                     out uint expandedSampleWidth,
                     out uint passSampleCount,
-                    out uint2 chunkOffset);
+                    out uint2 chunkOffset
+                );
 
                 if (newChunkStarted)
                 {
                     // compact the texels
-                    ExpansionHelpers.CompactGBuffer(cmd, expansionShaders, ctx.CompactGBufferKernel, (uint)instanceWidth, chunkSize, chunkOffset, uvFallbackBuffer, ctx.CompactedGBufferLength, lightmappingContext.CompactedTexelIndices);
+                    ExpansionHelpers.CompactGBuffer(
+                        cmd,
+                        expansionShaders,
+                        ctx.CompactGBufferKernel,
+                        (uint)instanceWidth,
+                        chunkSize,
+                        chunkOffset,
+                        uvFallbackBuffer,
+                        ctx.CompactedGBufferLength,
+                        lightmappingContext.CompactedTexelIndices
+                    );
 
                     // clear the expanded output buffer
                     // Populate the expanded clear indirect dispatch buffer - using the compacted size.
-                    expansionShaders.GetKernelThreadGroupSizes(ctx.ClearBufferKernel, out uint clearThreadGroupSizeX, out uint clearThreadGroupSizeY, out uint clearThreadGroupSizeZ);
+                    expansionShaders.GetKernelThreadGroupSizes(
+                        ctx.ClearBufferKernel,
+                        out uint clearThreadGroupSizeX,
+                        out uint clearThreadGroupSizeY,
+                        out uint clearThreadGroupSizeZ
+                    );
                     Debug.Assert(clearThreadGroupSizeY == 1 && clearThreadGroupSizeZ == 1);
-                    ExpansionHelpers.PopulateClearExpandedOutputIndirectDispatch(cmd, expansionShaders, ctx.PopulateClearDispatchKernel, clearThreadGroupSizeX, expandedSampleWidth, ctx.CompactedGBufferLength, ctx.ClearDispatchBuffer);
+                    ExpansionHelpers.PopulateClearExpandedOutputIndirectDispatch(
+                        cmd,
+                        expansionShaders,
+                        ctx.PopulateClearDispatchKernel,
+                        clearThreadGroupSizeX,
+                        expandedSampleWidth,
+                        ctx.CompactedGBufferLength,
+                        ctx.ClearDispatchBuffer
+                    );
                     // Clear the output buffers.
-                    ExpansionHelpers.ClearExpandedOutput(cmd, expansionShaders, ctx.ClearBufferKernel, lightmappingContext.ExpandedOutput, ctx.ClearDispatchBuffer);
+                    ExpansionHelpers.ClearExpandedOutput(
+                        cmd,
+                        expansionShaders,
+                        ctx.ClearBufferKernel,
+                        lightmappingContext.ExpandedOutput,
+                        ctx.ClearDispatchBuffer
+                    );
                     if (doDirectional)
-                        ExpansionHelpers.ClearExpandedOutput(cmd, expansionShaders, ctx.ClearBufferKernel, lightmappingContext.ExpandedDirectional, ctx.ClearDispatchBuffer);
+                        ExpansionHelpers.ClearExpandedOutput(
+                            cmd,
+                            expansionShaders,
+                            ctx.ClearBufferKernel,
+                            lightmappingContext.ExpandedDirectional,
+                            ctx.ClearDispatchBuffer
+                        );
                 }
 
                 // Work out the super sampling resolution. It's the width of the N x N supersampling kernel. Find the largest perfect square that is less than or equal to the max sample count per texel.
@@ -235,10 +300,12 @@ namespace UnityEngine.PathTracing.Lightmapping
                     sampleOffset,
                     lightmapBakeSettings.GetAntiAliasingType(integratedOutputType),
                     superSampleWidth
-                    );
+                );
 
                 GraphicsBuffer expandedDirectional = lightmappingContext.ExpandedDirectional;
-                var instanceGeometryIndex = lightmappingContext.World.PathTracingWorld.GetAccelerationStructure().GeometryPool.GetInstanceGeometryIndex(instance.Mesh);
+                var instanceGeometryIndex = lightmappingContext
+                    .World.PathTracingWorld.GetAccelerationStructure()
+                    .GeometryPool.GetInstanceGeometryIndex(instance.Mesh);
 
                 bool debugGBuffer = false;
                 if (debugGBuffer)
@@ -248,12 +315,29 @@ namespace UnityEngine.PathTracing.Lightmapping
                     Debug.Log($"Instance offset: {instanceTexelOffset}");
                     Debug.Log($"Sample count: {maxSampleCountPerTexel}");
                     var occupancy = (double)(passSampleCount * chunkSize) / (double)maxChunkSize * 100.0;
-                    Debug.Log(string.Format(System.Globalization.CultureInfo.InvariantCulture, "Occupancy: {0:F2}%", occupancy));
+                    Debug.Log(
+                        string.Format(
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            "Occupancy: {0:F2}%",
+                            occupancy
+                        )
+                    );
                     // write out the lightmap UV samples
-                    var uvSampleData = ExpansionHelpers.DebugGBuffer(cmd, instance, lightmappingContext, expandedSampleWidth, passSampleCount);
+                    var uvSampleData = ExpansionHelpers.DebugGBuffer(
+                        cmd,
+                        instance,
+                        lightmappingContext,
+                        expandedSampleWidth,
+                        passSampleCount
+                    );
                     string sampleOutput = new("");
                     foreach (var sample in uvSampleData)
-                        sampleOutput += string.Format(System.Globalization.CultureInfo.InvariantCulture, "float2({0}, {1})\n", sample.x, sample.y);
+                        sampleOutput += string.Format(
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            "float2({0}, {1})\n",
+                            sample.x,
+                            sample.y
+                        );
 
                     System.Console.WriteLine(sampleOutput);
                 }
@@ -402,27 +486,95 @@ namespace UnityEngine.PathTracing.Lightmapping
                     chunkSize,
                     instanceTexelCount,
                     out instanceIsDone,
-                    out bool chunkIsDone);
+                    out bool chunkIsDone
+                );
 
                 if (chunkIsDone)
                 {
                     int maxExpandedDispatchSize = instanceWidth * instanceHeight * (int)expandedSampleWidth;
                     // Gather to lightmap -> first reduce to output resolution
                     // Populate the reduce indirect dispatch buffer - using the compacted size.
-                    expansionShaders.GetKernelThreadGroupSizes(ctx.ReductionKernel, out uint reduceThreadGroupSizeX, out uint reduceThreadGroupSizeY, out uint reduceThreadGroupSizeZ);
+                    expansionShaders.GetKernelThreadGroupSizes(
+                        ctx.ReductionKernel,
+                        out uint reduceThreadGroupSizeX,
+                        out uint reduceThreadGroupSizeY,
+                        out uint reduceThreadGroupSizeZ
+                    );
                     Debug.Assert(reduceThreadGroupSizeY == 1 && reduceThreadGroupSizeZ == 1);
-                    ExpansionHelpers.PopulateReduceExpandedOutputIndirectDispatch(cmd, expansionShaders, ctx.PopulateReduceDispatchKernel, reduceThreadGroupSizeX, expandedSampleWidth, ctx.CompactedGBufferLength, ctx.ReduceDispatchBuffer);
-                    ExpansionHelpers.ReduceExpandedOutput(cmd, expansionShaders, ctx.ReductionKernel, lightmappingContext.ExpandedOutput, maxExpandedDispatchSize, expandedSampleWidth, ctx.ReduceDispatchBuffer);
+                    ExpansionHelpers.PopulateReduceExpandedOutputIndirectDispatch(
+                        cmd,
+                        expansionShaders,
+                        ctx.PopulateReduceDispatchKernel,
+                        reduceThreadGroupSizeX,
+                        expandedSampleWidth,
+                        ctx.CompactedGBufferLength,
+                        ctx.ReduceDispatchBuffer
+                    );
+                    ExpansionHelpers.ReduceExpandedOutput(
+                        cmd,
+                        expansionShaders,
+                        ctx.ReductionKernel,
+                        lightmappingContext.ExpandedOutput,
+                        maxExpandedDispatchSize,
+                        expandedSampleWidth,
+                        ctx.ReduceDispatchBuffer
+                    );
                     if (doDirectional)
-                        ExpansionHelpers.ReduceExpandedOutput(cmd, expansionShaders, ctx.ReductionKernel, lightmappingContext.ExpandedDirectional, maxExpandedDispatchSize, expandedSampleWidth, ctx.ReduceDispatchBuffer);
+                        ExpansionHelpers.ReduceExpandedOutput(
+                            cmd,
+                            expansionShaders,
+                            ctx.ReductionKernel,
+                            lightmappingContext.ExpandedDirectional,
+                            maxExpandedDispatchSize,
+                            expandedSampleWidth,
+                            ctx.ReduceDispatchBuffer
+                        );
 
                     // Populate the copy indirect dispatch buffer - using the compacted size.
-                    expansionShaders.GetKernelThreadGroupSizes(ctx.CopyToLightmapKernel, out uint copyThreadGroupSizeX, out uint copyThreadGroupSizeY, out uint copyThreadGroupSizeZ);
+                    expansionShaders.GetKernelThreadGroupSizes(
+                        ctx.CopyToLightmapKernel,
+                        out uint copyThreadGroupSizeX,
+                        out uint copyThreadGroupSizeY,
+                        out uint copyThreadGroupSizeZ
+                    );
                     Debug.Assert(copyThreadGroupSizeY == 1 && copyThreadGroupSizeZ == 1);
-                    ExpansionHelpers.PopulateCopyToLightmapIndirectDispatch(cmd, expansionShaders, ctx.PopulateCopyDispatchKernel, copyThreadGroupSizeX, ctx.CompactedGBufferLength, ctx.CopyDispatchBuffer);
-                    ExpansionHelpers.CopyToLightmap(cmd, expansionShaders, ctx.CopyToLightmapKernel, expandedSampleWidth, instanceWidth, instanceTexelOffset, chunkOffset, ctx.CompactedGBufferLength, lightmappingContext.CompactedTexelIndices, lightmappingContext.ExpandedOutput, ctx.CopyDispatchBuffer, lightmappingContext.AccumulatedOutput);
+                    ExpansionHelpers.PopulateCopyToLightmapIndirectDispatch(
+                        cmd,
+                        expansionShaders,
+                        ctx.PopulateCopyDispatchKernel,
+                        copyThreadGroupSizeX,
+                        ctx.CompactedGBufferLength,
+                        ctx.CopyDispatchBuffer
+                    );
+                    ExpansionHelpers.CopyToLightmap(
+                        cmd,
+                        expansionShaders,
+                        ctx.CopyToLightmapKernel,
+                        expandedSampleWidth,
+                        instanceWidth,
+                        instanceTexelOffset,
+                        chunkOffset,
+                        ctx.CompactedGBufferLength,
+                        lightmappingContext.CompactedTexelIndices,
+                        lightmappingContext.ExpandedOutput,
+                        ctx.CopyDispatchBuffer,
+                        lightmappingContext.AccumulatedOutput
+                    );
                     if (doDirectional)
-                        ExpansionHelpers.CopyToLightmap(cmd, expansionShaders, ctx.CopyToLightmapKernel, expandedSampleWidth, instanceWidth, instanceTexelOffset, chunkOffset, ctx.CompactedGBufferLength, lightmappingContext.CompactedTexelIndices, lightmappingContext.ExpandedDirectional, ctx.CopyDispatchBuffer, lightmappingContext.AccumulatedDirectionalOutput);
+                        ExpansionHelpers.CopyToLightmap(
+                            cmd,
+                            expansionShaders,
+                            ctx.CopyToLightmapKernel,
+                            expandedSampleWidth,
+                            instanceWidth,
+                            instanceTexelOffset,
+                            chunkOffset,
+                            ctx.CompactedGBufferLength,
+                            lightmappingContext.CompactedTexelIndices,
+                            lightmappingContext.ExpandedDirectional,
+                            ctx.CopyDispatchBuffer,
+                            lightmappingContext.AccumulatedDirectionalOutput
+                        );
                 }
                 return passSampleCount;
             }

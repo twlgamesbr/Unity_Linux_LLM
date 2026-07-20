@@ -26,11 +26,9 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
         static GraphConfigurationInspector()
         {
-            var fields = typeof(GraphConfiguration)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+            var fields = typeof(GraphConfiguration).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-            string GetFieldName(string propertyName)
-                => fields.First(field => field.Name.Contains(propertyName)).Name;
+            string GetFieldName(string propertyName) => fields.First(field => field.Name.Contains(propertyName)).Name;
 
             k_SampleCountFieldName = GetFieldName(nameof(GraphConfiguration.SampleCount));
             k_SampleRateFieldName = GetFieldName(nameof(GraphConfiguration.SampleRate));
@@ -58,10 +56,11 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
             (_, m_LineGraphField) = Content.AddFieldForProperty(configurationProp, k_LineGraphConfigurationFieldName);
 
-            var displayElementType = (DisplayElementType)configurationProp
-                .GetParent()
-                .FindPropertyRelative(DisplayElementConfigurationInspector.k_TypeFieldName)
-                .enumValueIndex;
+            var displayElementType = (DisplayElementType)
+                configurationProp
+                    .GetParent()
+                    .FindPropertyRelative(DisplayElementConfigurationInspector.k_TypeFieldName)
+                    .enumValueIndex;
             OnTypeChanged(displayElementType);
         }
 

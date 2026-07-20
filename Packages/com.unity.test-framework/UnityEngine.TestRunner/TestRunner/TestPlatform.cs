@@ -13,14 +13,16 @@ namespace UnityEngine.TestTools
         /// Both platforms.
         /// </summary>
         All = 0xFF,
+
         /// <summary>
         /// The EditMode test platform.
         /// </summary>
         EditMode = 1 << 1,
+
         /// <summary>
         /// The PlayMode test platform.
         /// </summary>
-        PlayMode = 1 << 2
+        PlayMode = 1 << 2,
     }
 
     internal static class TestPlatformEnumExtensions

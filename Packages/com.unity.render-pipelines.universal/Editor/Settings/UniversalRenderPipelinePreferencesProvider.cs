@@ -9,8 +9,7 @@ namespace UnityEditor.Rendering.Universal
     {
         public static void OpenPackageManagerToPackage(string packageName)
         {
-            var packageManagerUI = typeof(Editor).Assembly
-                .GetType("UnityEditor.PackageManager.UI.Window");
+            var packageManagerUI = typeof(Editor).Assembly.GetType("UnityEditor.PackageManager.UI.Window");
 
             if (packageManagerUI != null)
             {
@@ -32,17 +31,20 @@ namespace UnityEditor.Rendering.Universal
     {
         class Styles
         {
-            public static readonly GUIContent configPackageLabel = new("Config Package", "Choose whether to embed or sync with registry version.");
+            public static readonly GUIContent configPackageLabel = new(
+                "Config Package",
+                "Choose whether to embed or sync with registry version."
+            );
 
             public static readonly GUIContent viewInPackageManagerLabel = new("View in Package Manager", "");
 
-            public static readonly GUIContent urpProjectSettingsPathLabel = EditorGUIUtility.TrTextContent("Resources Folder Name", "Resources Folder will be the one where to get project elements related to URP as default scene and default settings.");
+            public static readonly GUIContent urpProjectSettingsPathLabel = EditorGUIUtility.TrTextContent(
+                "Resources Folder Name",
+                "Resources Folder will be the one where to get project elements related to URP as default scene and default settings."
+            );
         }
 
-        static List<string> s_SearchKeywords = new() {
-            "Default Resources Folder",
-            "Config Package"
-        };
+        static List<string> s_SearchKeywords = new() { "Default Resources Folder", "Config Package" };
 
         /// <summary>
         /// Keywords for the preferences
@@ -55,13 +57,16 @@ namespace UnityEditor.Rendering.Universal
         public void PreferenceGUI()
         {
             EditorGUI.indentLevel++;
-            UniversalProjectSettings.projectSettingsFolderPath = EditorGUILayout.TextField(Styles.urpProjectSettingsPathLabel, UniversalProjectSettings.projectSettingsFolderPath);
+            UniversalProjectSettings.projectSettingsFolderPath = EditorGUILayout.TextField(
+                Styles.urpProjectSettingsPathLabel,
+                UniversalProjectSettings.projectSettingsFolderPath
+            );
             DrawConfigPackageDropdown();
             EditorGUI.indentLevel--;
         }
 
         private const string k_PackageName = "com.unity.render-pipelines.universal-config";
-        
+
         void DrawConfigPackageDropdown()
         {
             GUILayout.BeginHorizontal();

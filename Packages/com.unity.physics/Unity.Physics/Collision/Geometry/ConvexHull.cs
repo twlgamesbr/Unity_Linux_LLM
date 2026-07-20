@@ -13,21 +13,29 @@ namespace Unity.Physics
     {
         public struct Face : IEquatable<Face>
         {
-            public short FirstIndex;             // index into FaceVertexIndices array
-            public byte NumVertices;             // number of vertex indices in the FaceVertexIndices array
-            public byte MinHalfAngleCompressed;  // 0-255 = 0-90 degrees
+            public short FirstIndex; // index into FaceVertexIndices array
+            public byte NumVertices; // number of vertex indices in the FaceVertexIndices array
+            public byte MinHalfAngleCompressed; // 0-255 = 0-90 degrees
 
             const float k_CompressionFactor = 255.0f / (math.PI * 0.5f);
+
             // Minimum of all half angles between this and adjacent faces
-            public float MinHalfAngle { set => MinHalfAngleCompressed = (byte)math.min(value * k_CompressionFactor, 255); }
-            public bool Equals(Face other) => FirstIndex.Equals(other.FirstIndex) && NumVertices.Equals(other.NumVertices) && MinHalfAngleCompressed.Equals(other.MinHalfAngleCompressed);
+            public float MinHalfAngle
+            {
+                set => MinHalfAngleCompressed = (byte)math.min(value * k_CompressionFactor, 255);
+            }
+
+            public bool Equals(Face other) =>
+                FirstIndex.Equals(other.FirstIndex)
+                && NumVertices.Equals(other.NumVertices)
+                && MinHalfAngleCompressed.Equals(other.MinHalfAngleCompressed);
         }
 
         [StructLayout(LayoutKind.Sequential, Size = 4)]
         public struct Edge : IEquatable<Edge>
         {
-            public short FaceIndex;             // index into Faces array
-            public byte EdgeIndex;              // edge index within the face
+            public short FaceIndex; // index into Faces array
+            public byte EdgeIndex; // edge index within the face
 
             public bool Equals(Edge other) => FaceIndex.Equals(other.FaceIndex) && EdgeIndex.Equals(other.EdgeIndex);
 
@@ -58,11 +66,13 @@ namespace Unity.Physics
         // Vertices in the convex hull.
         // Associated with the faces (see array Faces) through the FaceVertexIndices array.
         public BlobArray.Accessor<float3> Vertices => new BlobArray.Accessor<float3>(ref VerticesBlob);
+
         // (Half-) Edges of the convex hull.
         // Each vertex has an outgoing half edge, pointing towards the next vertex in the face.
         // As such, between two adjacent faces are two half edges, one for each face.
         // To obtain the half edge for the adjacent face, use the FaceLinks array.
         public BlobArray.Accessor<Edge> VertexEdges => new BlobArray.Accessor<Edge>(ref VertexEdgesBlob);
+
         // Faces of the convex hull, each with a number of vertices / edges given by Face.NumVertices.
         // Each face holds a FirstIndex member which provides entry points to the FaceVertexIndices and FaceLinks arrays.
         // - The first index of the first vertex for the face is given as FaceVertexIndices[face.FirstIndex].
@@ -73,10 +83,13 @@ namespace Unity.Physics
         // - Finally, a face has a corresponding plane which can be found in the FacePlanes array using the face index.
         //   That is, FacePlanes[i] corresponds to the plane for face Faces[i].
         public BlobArray.Accessor<Face> Faces => new BlobArray.Accessor<Face>(ref FacesBlob);
+
         // Planes of the convex hull, one plane per face. See Faces for more information.
         public BlobArray.Accessor<Plane> Planes => new BlobArray.Accessor<Plane>(ref FacePlanesBlob);
+
         // Indices into the Vertices array for the vertices of each face. See Faces for more information.
         public BlobArray.Accessor<byte> FaceVertexIndices => new BlobArray.Accessor<byte>(ref FaceVertexIndicesBlob);
+
         // Links to adjacent faces of each face through half edges. See Faces for more information.
         // For a given half edge, the adjacent half edge, and from it the adjacent face, can be obtained through
         //      Face face = Faces[edge.FaceIndex];
@@ -84,9 +97,12 @@ namespace Unity.Physics
         //      Face adjacentFace = Faces[adjacentEdge.FaceIndex];
         public BlobArray.Accessor<Edge> FaceLinks => new BlobArray.Accessor<Edge>(ref FaceLinksBlob);
 
-        public unsafe float3* VerticesPtr => (float3*)((byte*)UnsafeUtility.AddressOf(ref VerticesBlob.Offset) + VerticesBlob.Offset);
-        public unsafe byte* FaceVertexIndicesPtr => (byte*)UnsafeUtility.AddressOf(ref FaceVertexIndicesBlob.Offset) + FaceVertexIndicesBlob.Offset;
-        public unsafe Plane* PlanesPtr => (Plane*)((byte*)UnsafeUtility.AddressOf(ref FacePlanesBlob.Offset) + FacePlanesBlob.Offset);
+        public unsafe float3* VerticesPtr =>
+            (float3*)((byte*)UnsafeUtility.AddressOf(ref VerticesBlob.Offset) + VerticesBlob.Offset);
+        public unsafe byte* FaceVertexIndicesPtr =>
+            (byte*)UnsafeUtility.AddressOf(ref FaceVertexIndicesBlob.Offset) + FaceVertexIndicesBlob.Offset;
+        public unsafe Plane* PlanesPtr =>
+            (Plane*)((byte*)UnsafeUtility.AddressOf(ref FacePlanesBlob.Offset) + FacePlanesBlob.Offset);
 
         // Returns the index of the face with maximum normal dot direction
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -99,7 +115,7 @@ namespace Unity.Physics
         }
 
         // Returns the index of the face with maximum normal dot direction
-        public unsafe static int GetSupportingFace(float3 direction, Plane* planes, int numFaces)
+        public static unsafe int GetSupportingFace(float3 direction, Plane* planes, int numFaces)
         {
             int bestIndex = 0;
             float bestDot = math.dot(direction, planes[0].Normal);
@@ -181,7 +197,12 @@ namespace Unity.Physics
             return math.sqrt(maxDistanceSq) + ConvexRadius;
         }
 
-        internal unsafe void CalculateScalingData(float3* scaledVerticesOut, Plane* scaledPlanesOut, float uniformScale, out float scaledConvexRadius)
+        internal unsafe void CalculateScalingData(
+            float3* scaledVerticesOut,
+            Plane* scaledPlanesOut,
+            float uniformScale,
+            out float scaledConvexRadius
+        )
         {
             ScaleVerticesAndRadius(scaledVerticesOut, uniformScale, out scaledConvexRadius);
             ScalePlanes(scaledPlanesOut, uniformScale);
@@ -197,7 +218,11 @@ namespace Unity.Physics
             }
         }
 
-        internal unsafe void ScaleVerticesAndRadius(float3* scaledVerticesOut, float uniformScale, out float scaledConvexRadius)
+        internal unsafe void ScaleVerticesAndRadius(
+            float3* scaledVerticesOut,
+            float uniformScale,
+            out float scaledConvexRadius
+        )
         {
             int numVertices = NumVertices;
             for (int i = 0; i < numVertices; i++)

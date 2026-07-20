@@ -59,9 +59,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
         /// Handle inconvertible units by raising an error with information about the
         /// inconvertible units and then picking the most popular one
-        static BaseUnits HandleInconvertibleUnits(
-            List<MetricId> metrics,
-            string displayElementLabel)
+        static BaseUnits HandleInconvertibleUnits(List<MetricId> metrics, string displayElementLabel)
         {
             HashSet<BaseUnits> inconvertibleUnits = new();
             foreach (var metric in metrics)
@@ -69,8 +67,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 inconvertibleUnits.Add(metric.Units);
             }
             var inconvertibleUnitsString = String.Join(", ", inconvertibleUnits);
-            Debug.LogWarning($"Display Element {displayElementLabel} is configured with " +
-                             $"inconvertible units:\n {{{inconvertibleUnitsString}}}");
+            Debug.LogWarning(
+                $"Display Element {displayElementLabel} is configured with "
+                    + $"inconvertible units:\n {{{inconvertibleUnitsString}}}"
+            );
             return ChooseMostPopularUnits(metrics);
         }
 
@@ -96,13 +96,13 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             return firstMetricShouldBeDisplayedAsPercentage;
         }
 
-        static bool HandleMismatchedDisplayAsPercentages(
-            List<MetricId> metrics,
-            string displayElementLabel)
+        static bool HandleMismatchedDisplayAsPercentages(List<MetricId> metrics, string displayElementLabel)
         {
-            Debug.LogWarning($"Display Element {displayElementLabel} is configured with " +
-                             "some stats that should be displayed as percentages and others not. " +
-                             "This display element will display its values without percentages.");
+            Debug.LogWarning(
+                $"Display Element {displayElementLabel} is configured with "
+                    + "some stats that should be displayed as percentages and others not. "
+                    + "This display element will display its values without percentages."
+            );
             return false;
         }
     }

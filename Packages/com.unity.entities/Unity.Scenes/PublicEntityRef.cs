@@ -8,17 +8,20 @@ namespace Unity.Scenes
         public int entityIndex; //TODO: Should be GUID
         public Entity targetEntity;
 
-        public static bool operator<(PublicEntityRef a, PublicEntityRef b)
+        public static bool operator <(PublicEntityRef a, PublicEntityRef b)
         {
             return a.entityIndex < b.entityIndex;
         }
 
-        public static bool operator>(PublicEntityRef a, PublicEntityRef b)
+        public static bool operator >(PublicEntityRef a, PublicEntityRef b)
         {
             return a.entityIndex > b.entityIndex;
         }
 
-        private static unsafe int FindInsertionPoint(ref DynamicBuffer<PublicEntityRef> buffer, PublicEntityRef entityref)
+        private static unsafe int FindInsertionPoint(
+            ref DynamicBuffer<PublicEntityRef> buffer,
+            PublicEntityRef entityref
+        )
         {
             int low = 0;
             int high = buffer.Length;

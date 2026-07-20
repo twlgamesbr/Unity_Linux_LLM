@@ -5,7 +5,8 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace UnityEngine.Rendering.Universal
 {
-    unsafe struct PinnedArray<T> : IDisposable where T : struct
+    unsafe struct PinnedArray<T> : IDisposable
+        where T : struct
     {
         public T[] managedArray;
         public GCHandle handle;
@@ -17,7 +18,11 @@ namespace UnityEngine.Rendering.Universal
         {
             managedArray = new T[length];
             handle = GCHandle.Alloc(managedArray, GCHandleType.Pinned);
-            nativeArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>((void*)handle.AddrOfPinnedObject(), length, Allocator.None);
+            nativeArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                (void*)handle.AddrOfPinnedObject(),
+                length,
+                Allocator.None
+            );
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref nativeArray, AtomicSafetyHandle.Create());
 #endif

@@ -8,7 +8,5 @@ namespace Unity.Multiplayer.Tools.NetStats
     /// the multiplayer tools package that require code generation to work correctly
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class AssemblyRequiresTypeRegistrationAttribute : Attribute
-    {
-    }
+    public class AssemblyRequiresTypeRegistrationAttribute : Attribute { }
 }

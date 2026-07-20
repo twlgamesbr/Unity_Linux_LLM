@@ -1,6 +1,4 @@
-﻿
-
-namespace TMPro
+﻿namespace TMPro
 {
     /// <summary>
     /// Interface used for preprocessing and shaping of text.

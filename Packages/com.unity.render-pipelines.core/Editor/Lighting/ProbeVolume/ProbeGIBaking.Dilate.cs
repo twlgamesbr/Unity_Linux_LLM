@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEditor;
-
 using Cell = UnityEngine.Rendering.ProbeReferenceVolume.Cell;
 
 namespace UnityEngine.Rendering
@@ -14,7 +13,9 @@ namespace UnityEngine.Rendering
         {
             if (dilationShader == null)
             {
-                dilationShader = GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeBakingResources>().dilationShader;
+                dilationShader = GraphicsSettings
+                    .GetRenderPipelineSettings<ProbeVolumeBakingResources>()
+                    .dilationShader;
                 dilationKernel = dilationShader.FindKernel("DilateCell");
             }
         }
@@ -80,8 +81,21 @@ namespace UnityEngine.Rendering
 
                 var cellChunkData = GetCellChunkData(cell.data, chunkIndex);
 
-                ReadFromShaderCoeffsL0L1(ref sh, cellChunkData.shL0L1RxData, cellChunkData.shL1GL1RyData, cellChunkData.shL1BL1RzData, index * 4);
-                ReadFromShaderCoeffsL2(ref sh, cellChunkData.shL2Data_0, cellChunkData.shL2Data_1, cellChunkData.shL2Data_2, cellChunkData.shL2Data_3, index * 4);
+                ReadFromShaderCoeffsL0L1(
+                    ref sh,
+                    cellChunkData.shL0L1RxData,
+                    cellChunkData.shL1GL1RyData,
+                    cellChunkData.shL1BL1RzData,
+                    index * 4
+                );
+                ReadFromShaderCoeffsL2(
+                    ref sh,
+                    cellChunkData.shL2Data_0,
+                    cellChunkData.shL2Data_1,
+                    cellChunkData.shL2Data_2,
+                    cellChunkData.shL2Data_3,
+                    index * 4
+                );
                 FromSphericalHarmonicsL2(ref sh);
 
                 if (cellChunkData.skyOcclusionDataL0L1.Length != 0)
@@ -106,13 +120,27 @@ namespace UnityEngine.Rendering
 
                 var cellChunkData = GetCellChunkData(cell.data, chunkIndex);
 
-                WriteToShaderCoeffsL0L1(sh, cellChunkData.shL0L1RxData, cellChunkData.shL1GL1RyData, cellChunkData.shL1BL1RzData, index * 4);
-                WriteToShaderCoeffsL2(sh, cellChunkData.shL2Data_0, cellChunkData.shL2Data_1, cellChunkData.shL2Data_2, cellChunkData.shL2Data_3, index * 4);
+                WriteToShaderCoeffsL0L1(
+                    sh,
+                    cellChunkData.shL0L1RxData,
+                    cellChunkData.shL1GL1RyData,
+                    cellChunkData.shL1BL1RzData,
+                    index * 4
+                );
+                WriteToShaderCoeffsL2(
+                    sh,
+                    cellChunkData.shL2Data_0,
+                    cellChunkData.shL2Data_1,
+                    cellChunkData.shL2Data_2,
+                    cellChunkData.shL2Data_3,
+                    index * 4
+                );
 
                 if (cellChunkData.skyOcclusionDataL0L1.Length != 0)
                     WriteToShaderSkyOcclusion(SO_L0L1, cellChunkData.skyOcclusionDataL0L1, index * 4);
                 if (cellChunkData.skyShadingDirectionIndices.Length != 0)
-                    cellChunkData.skyShadingDirectionIndices[index] = (byte)SkyOcclusionBaker.EncodeSkyShadingDirection(SO_Direction);
+                    cellChunkData.skyShadingDirectionIndices[index] = (byte)
+                        SkyOcclusionBaker.EncodeSkyShadingDirection(SO_Direction);
 
                 if (cellChunkData.probeOcclusion.Length != 0)
                     WriteToShaderProbeOcclusion(ProbeOcclusion, cellChunkData.probeOcclusion, index * 4);
@@ -137,8 +165,14 @@ namespace UnityEngine.Rendering
 
                 int probeCount = cellData.probePositions.Length;
 
-                positionBuffer = new ComputeBuffer(probeCount, System.Runtime.InteropServices.Marshal.SizeOf<Vector3>());
-                outputProbes = new ComputeBuffer(probeCount, System.Runtime.InteropServices.Marshal.SizeOf<DilatedProbe>());
+                positionBuffer = new ComputeBuffer(
+                    probeCount,
+                    System.Runtime.InteropServices.Marshal.SizeOf<Vector3>()
+                );
+                outputProbes = new ComputeBuffer(
+                    probeCount,
+                    System.Runtime.InteropServices.Marshal.SizeOf<DilatedProbe>()
+                );
                 needDilatingBuffer = new ComputeBuffer(probeCount, sizeof(int));
 
                 // Init with pre-dilated SH so we don't need to re-fill from sampled data from texture (that might be less precise).
@@ -148,8 +182,9 @@ namespace UnityEngine.Rendering
                 for (int i = 0; i < probeCount; ++i)
                 {
                     dilatedProbes[i].FromSphericalHarmonicsShaderConstants(cell, i);
-                    needDilating[i] = m_BakingBatch.customDilationThresh.ContainsKey((cellDesc.index, i)) ?
-                        (cellData.validity[i] > m_BakingBatch.customDilationThresh[(cellDesc.index, i)] ? 1 : 0) : (cellData.validity[i] > defaultThreshold ? 1 : 0);
+                    needDilating[i] = m_BakingBatch.customDilationThresh.ContainsKey((cellDesc.index, i))
+                        ? (cellData.validity[i] > m_BakingBatch.customDilationThresh[(cellDesc.index, i)] ? 1 : 0)
+                        : (cellData.validity[i] > defaultThreshold ? 1 : 0);
                 }
 
                 outputProbes.SetData(dilatedProbes);
@@ -180,14 +215,14 @@ namespace UnityEngine.Rendering
         static readonly int _NeedDilating = Shader.PropertyToID("_NeedDilating");
         static readonly int _DilationParameters = Shader.PropertyToID("_DilationParameters");
         static readonly int _OutputProbes = Shader.PropertyToID("_OutputProbes");
-        
+
         // We need to keep the original list of cells that were actually baked to feed it to the dilation process.
         // This is because during partial bake we only want to dilate those cells.
         static Dictionary<int, BakingCell> m_CellsToDilate = new Dictionary<int, BakingCell>();
         static Dictionary<Vector3Int, int> m_CellPosToIndex = new Dictionary<Vector3Int, int>();
 
         // Free up dilation related data
-        static internal void FinalizeDilation()
+        internal static void FinalizeDilation()
         {
             m_CellPosToIndex.Clear();
             m_CellsToDilate.Clear();
@@ -266,7 +301,9 @@ namespace UnityEngine.Rendering
                                                     tempLoadedCells.Add(cellToLoad);
                                                 }
                                                 else
-                                                    Debug.LogError($"Not enough memory to perform dilation for cell {cell.desc.index}");
+                                                    Debug.LogError(
+                                                        $"Not enough memory to perform dilation for cell {cell.desc.index}"
+                                                    );
                                             }
                                         }
                                     }
@@ -314,9 +351,21 @@ namespace UnityEngine.Rendering
             cmd.SetComputeBufferParam(dilationShader, dilationKernel, _NeedDilating, data.needDilatingBuffer);
 
             // There's an upper limit on the number of bricks supported inside a single cell
-            int probeCount = Mathf.Min(cell.data.probePositions.Length, ushort.MaxValue * ProbeBrickPool.kBrickProbeCountTotal);
+            int probeCount = Mathf.Min(
+                cell.data.probePositions.Length,
+                ushort.MaxValue * ProbeBrickPool.kBrickProbeCountTotal
+            );
 
-            cmd.SetComputeVectorParam(dilationShader, _DilationParameters, new Vector4(probeCount, settings.dilationValidityThreshold, settings.dilationDistance, settings.squaredDistWeighting ? 1 : 0));
+            cmd.SetComputeVectorParam(
+                dilationShader,
+                _DilationParameters,
+                new Vector4(
+                    probeCount,
+                    settings.dilationValidityThreshold,
+                    settings.dilationDistance,
+                    settings.squaredDistWeighting ? 1 : 0
+                )
+            );
 
             var refVolume = ProbeReferenceVolume.instance;
             ProbeReferenceVolume.RuntimeResources rr = refVolume.GetRuntimeResources();
@@ -337,11 +386,29 @@ namespace UnityEngine.Rendering
                 cmd.SetGlobalTexture(ProbeReferenceVolume.ShaderIDs._APVResL2_2, rr.L2_2);
                 cmd.SetGlobalTexture(ProbeReferenceVolume.ShaderIDs._APVResL2_3, rr.L2_3);
 
-                cmd.SetGlobalTexture(ProbeReferenceVolume.ShaderIDs._APVProbeOcclusion, rr.ProbeOcclusion ?? (RenderTargetIdentifier)CoreUtils.whiteVolumeTexture);
+                cmd.SetGlobalTexture(
+                    ProbeReferenceVolume.ShaderIDs._APVProbeOcclusion,
+                    rr.ProbeOcclusion ?? (RenderTargetIdentifier)CoreUtils.whiteVolumeTexture
+                );
 
-                cmd.SetComputeTextureParam(dilationShader, dilationKernel, ProbeReferenceVolume.ShaderIDs._SkyOcclusionTexL0L1, rr.SkyOcclusionL0L1 ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture);
-                cmd.SetComputeTextureParam(dilationShader, dilationKernel, ProbeReferenceVolume.ShaderIDs._SkyShadingDirectionIndicesTex, rr.SkyShadingDirectionIndices ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture);
-                cmd.SetComputeBufferParam(dilationShader, dilationKernel, ProbeReferenceVolume.ShaderIDs._SkyPrecomputedDirections, rr.SkyPrecomputedDirections);
+                cmd.SetComputeTextureParam(
+                    dilationShader,
+                    dilationKernel,
+                    ProbeReferenceVolume.ShaderIDs._SkyOcclusionTexL0L1,
+                    rr.SkyOcclusionL0L1 ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture
+                );
+                cmd.SetComputeTextureParam(
+                    dilationShader,
+                    dilationKernel,
+                    ProbeReferenceVolume.ShaderIDs._SkyShadingDirectionIndicesTex,
+                    rr.SkyShadingDirectionIndices ?? (RenderTargetIdentifier)CoreUtils.blackVolumeTexture
+                );
+                cmd.SetComputeBufferParam(
+                    dilationShader,
+                    dilationKernel,
+                    ProbeReferenceVolume.ShaderIDs._SkyPrecomputedDirections,
+                    rr.SkyPrecomputedDirections
+                );
             }
 
             ProbeVolumeShadingParameters parameters;
@@ -360,7 +427,6 @@ namespace UnityEngine.Rendering
             parameters.regionLayerMasks = 1;
             parameters.worldOffset = Vector3.zero;
             ProbeReferenceVolume.instance.UpdateConstantBuffer(cmd, parameters);
-
 
             int groupCount = (probeCount + 63) / 64;
             cmd.DispatchCompute(dilationShader, dilationKernel, groupCount, 1, 1);
@@ -391,14 +457,31 @@ namespace UnityEngine.Rendering
             {
                 for (int i = 0; i < cell.data.validity.Length; ++i)
                 {
-                    if (dilationSettings.enableDilation && dilationSettings.dilationDistance > 0.0f && cell.data.validity[i] > dilationSettings.dilationValidityThreshold)
+                    if (
+                        dilationSettings.enableDilation
+                        && dilationSettings.dilationDistance > 0.0f
+                        && cell.data.validity[i] > dilationSettings.dilationValidityThreshold
+                    )
                     {
                         GetProbeAndChunkIndex(i, out var chunkIndex, out var index);
 
                         var cellChunkData = GetCellChunkData(cell.data, chunkIndex);
 
-                        WriteToShaderCoeffsL0L1(blackProbe, cellChunkData.shL0L1RxData, cellChunkData.shL1GL1RyData, cellChunkData.shL1BL1RzData, index * 4);
-                        WriteToShaderCoeffsL2(blackProbe, cellChunkData.shL2Data_0, cellChunkData.shL2Data_1, cellChunkData.shL2Data_2, cellChunkData.shL2Data_3, index * 4);
+                        WriteToShaderCoeffsL0L1(
+                            blackProbe,
+                            cellChunkData.shL0L1RxData,
+                            cellChunkData.shL1GL1RyData,
+                            cellChunkData.shL1BL1RzData,
+                            index * 4
+                        );
+                        WriteToShaderCoeffsL2(
+                            blackProbe,
+                            cellChunkData.shL2Data_0,
+                            cellChunkData.shL2Data_1,
+                            cellChunkData.shL2Data_2,
+                            cellChunkData.shL2Data_3,
+                            index * 4
+                        );
                     }
                 }
             }

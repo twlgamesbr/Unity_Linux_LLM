@@ -20,7 +20,9 @@ public partial class JobEntityDescription
         // Discussion: https://github.cds.internal.unity3d.com/unity/dots/pull/3217#discussion_r227389
         // Also do this for EntitiesSourceFactory.JobStructFor if that is still a thing.
 
-        var inheritsFromBeginEndChunk = m_JobEntityTypeSymbol.InheritsFromInterface("Unity.Entities.IJobEntityChunkBeginEnd");
+        var inheritsFromBeginEndChunk = m_JobEntityTypeSymbol.InheritsFromInterface(
+            "Unity.Entities.IJobEntityChunkBeginEnd"
+        );
 
         using var stringWriter = new StringWriter();
         using var indentedTextWriter = new IndentedTextWriter(stringWriter);
@@ -34,13 +36,21 @@ public partial class JobEntityDescription
         if (m_RequiresEntityManager)
             indentedTextWriter.WriteLine("public global::Unity.Entities.EntityManager __EntityManager;");
         if (m_HasEntityIndexInQuery)
-            indentedTextWriter.WriteLine("[global::Unity.Collections.ReadOnly] public global::Unity.Collections.NativeArray<int> __ChunkBaseEntityIndices;");
+            indentedTextWriter.WriteLine(
+                "[global::Unity.Collections.ReadOnly] public global::Unity.Collections.NativeArray<int> __ChunkBaseEntityIndices;"
+            );
 
-        indentedTextWriter.WriteExecuteMethod(inheritsFromBeginEndChunk, hasEnableableComponent, _userExecuteMethodParams);
+        indentedTextWriter.WriteExecuteMethod(
+            inheritsFromBeginEndChunk,
+            hasEnableableComponent,
+            _userExecuteMethodParams
+        );
 
         if (inheritsFromBeginEndChunk)
         {
-            indentedTextWriter.WriteLine("OnChunkEnd(in chunk, chunkIndexInQuery, useEnabledMask, in chunkEnabledMask, shouldExecuteChunk);");
+            indentedTextWriter.WriteLine(
+                "OnChunkEnd(in chunk, chunkIndexInQuery, useEnabledMask, in chunkEnabledMask, shouldExecuteChunk);"
+            );
             indentedTextWriter.Indent--;
             indentedTextWriter.WriteLine("}");
         }
@@ -51,7 +61,8 @@ public partial class JobEntityDescription
             shouldHaveUpdate: true,
             fieldsArePublic: true,
             writeAdditionalSyntaxInInternalCompilerQueryAndHandleData: WriteAdditionalSyntax,
-            _queriesAndHandles);
+            _queriesAndHandles
+        );
 
         indentedTextWriter.WriteInternalCompilerStruct(m_RequiresEntityManager);
 
@@ -63,16 +74,23 @@ public partial class JobEntityDescription
     void WriteAdditionalSyntax(IndentedTextWriter writer)
     {
         const string jobExtensions = "global::Unity.Entities.JobChunkExtensions";
-        const string internalJobExtensions = "global::Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface";
+        const string internalJobExtensions =
+            "global::Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface";
 
         // Generate all methods required for throwing a runtime exception if users schedule/run jobs with incompatible queries.
         if (m_CheckUserDefinedQueryForScheduling)
         {
-            writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-            writer.WriteLine($"public static int GetRequiredComponentTypeCount() => {m_ComponentTypesInExecuteMethod.Count};");
+            writer.WriteLine(
+                "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+            );
+            writer.WriteLine(
+                $"public static int GetRequiredComponentTypeCount() => {m_ComponentTypesInExecuteMethod.Count};"
+            );
 
             writer.WriteLine();
-            writer.WriteLine("public static void AddRequiredComponentTypes(ref global::System.Span<Unity.Entities.ComponentType> components)");
+            writer.WriteLine(
+                "public static void AddRequiredComponentTypes(ref global::System.Span<Unity.Entities.ComponentType> components)"
+            );
             writer.WriteLine("{");
             writer.Indent++;
             for (var index = 0; index < m_ComponentTypesInExecuteMethod.Count; index++)
@@ -81,10 +99,16 @@ public partial class JobEntityDescription
             writer.WriteLine("}");
 
             writer.WriteLine();
-            writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-            writer.WriteLine("public static bool QueryHasRequiredComponentsForExecuteMethodToRun(ref EntityQuery userDefinedQuery, ref global::System.Span<global::Unity.Entities.ComponentType> components) =>");
+            writer.WriteLine(
+                "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+            );
+            writer.WriteLine(
+                "public static bool QueryHasRequiredComponentsForExecuteMethodToRun(ref EntityQuery userDefinedQuery, ref global::System.Span<global::Unity.Entities.ComponentType> components) =>"
+            );
             writer.Indent++;
-            writer.WriteLine("global::Unity.Entities.Internal.InternalCompilerInterface.EntityQueryInterface.HasComponentsRequiredForExecuteMethodToRun(ref userDefinedQuery, ref components);");
+            writer.WriteLine(
+                "global::Unity.Entities.Internal.InternalCompilerInterface.EntityQueryInterface.HasComponentsRequiredForExecuteMethodToRun(ref userDefinedQuery, ref components);"
+            );
             writer.Indent--;
         }
 
@@ -101,18 +125,26 @@ public partial class JobEntityDescription
         writer.WriteLine("}");
 
         writer.WriteLine();
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
         writer.WriteLine($"public void Run(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query)");
         writer.WriteLine("{");
         writer.Indent++;
         writer.WriteLine("job.__TypeHandle = __TypeHandle;");
-        writer.WriteLine($"{(m_RequiresEntityManager ? internalJobExtensions : jobExtensions)}.{(m_RequiresEntityManager ? "RunByRefWithoutJobs(ref job, query)" : "RunByRef(ref job, query)")};");
+        writer.WriteLine(
+            $"{(m_RequiresEntityManager ? internalJobExtensions : jobExtensions)}.{(m_RequiresEntityManager ? "RunByRefWithoutJobs(ref job, query)" : "RunByRef(ref job, query)")};"
+        );
         writer.Indent--;
         writer.WriteLine("}");
 
         writer.WriteLine();
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-        writer.WriteLine($"public global::Unity.Jobs.JobHandle Schedule(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency)");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
+        writer.WriteLine(
+            $"public global::Unity.Jobs.JobHandle Schedule(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency)"
+        );
         writer.WriteLine("{");
         writer.Indent++;
         writer.WriteLine("job.__TypeHandle = __TypeHandle;");
@@ -121,38 +153,56 @@ public partial class JobEntityDescription
         writer.WriteLine("}");
 
         writer.WriteLine();
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-        writer.WriteLine($"public global::Unity.Jobs.JobHandle ScheduleParallel(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency)");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
+        writer.WriteLine(
+            $"public global::Unity.Jobs.JobHandle ScheduleParallel(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency)"
+        );
         writer.WriteLine("{");
         writer.Indent++;
         writer.WriteLine("job.__TypeHandle = __TypeHandle;");
-        writer.WriteLine($"return {(m_HasEntityIndexInQuery ? internalJobExtensions : jobExtensions)}.ScheduleParallelByRef(ref job, query, dependency{(m_HasEntityIndexInQuery?", job.__ChunkBaseEntityIndices" : string.Empty)});");
+        writer.WriteLine(
+            $"return {(m_HasEntityIndexInQuery ? internalJobExtensions : jobExtensions)}.ScheduleParallelByRef(ref job, query, dependency{(m_HasEntityIndexInQuery ? ", job.__ChunkBaseEntityIndices" : string.Empty)});"
+        );
         writer.Indent--;
         writer.WriteLine("}");
 
         writer.WriteLine();
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-        writer.WriteLine($"public void UpdateBaseEntityIndexArray(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, ref global::Unity.Entities.SystemState state)");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
+        writer.WriteLine(
+            $"public void UpdateBaseEntityIndexArray(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, ref global::Unity.Entities.SystemState state)"
+        );
         writer.WriteLine("{");
         if (m_HasEntityIndexInQuery)
         {
             writer.Indent++;
-            writer.WriteLine( "var baseEntityIndexArray = query.CalculateBaseEntityIndexArray(state.WorldUpdateAllocator);");
-            writer.WriteLine( "job.__ChunkBaseEntityIndices = baseEntityIndexArray;");
+            writer.WriteLine(
+                "var baseEntityIndexArray = query.CalculateBaseEntityIndexArray(state.WorldUpdateAllocator);"
+            );
+            writer.WriteLine("job.__ChunkBaseEntityIndices = baseEntityIndexArray;");
             writer.Indent--;
         }
         writer.WriteLine("}");
 
         writer.WriteLine();
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-        writer.WriteLine($"public global::Unity.Jobs.JobHandle UpdateBaseEntityIndexArray(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency, ref global::Unity.Entities.SystemState state)");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
+        writer.WriteLine(
+            $"public global::Unity.Jobs.JobHandle UpdateBaseEntityIndexArray(ref {FullTypeName} job, global::Unity.Entities.EntityQuery query, global::Unity.Jobs.JobHandle dependency, ref global::Unity.Entities.SystemState state)"
+        );
         writer.WriteLine("{");
         writer.Indent++;
         if (m_HasEntityIndexInQuery)
         {
-            writer.WriteLine( "var baseEntityIndexArray = query.CalculateBaseEntityIndexArrayAsync(state.WorldUpdateAllocator, dependency, out var indexDependency);");
-            writer.WriteLine( "job.__ChunkBaseEntityIndices = baseEntityIndexArray;");
-            writer.WriteLine( "return indexDependency;");
+            writer.WriteLine(
+                "var baseEntityIndexArray = query.CalculateBaseEntityIndexArrayAsync(state.WorldUpdateAllocator, dependency, out var indexDependency);"
+            );
+            writer.WriteLine("job.__ChunkBaseEntityIndices = baseEntityIndexArray;");
+            writer.WriteLine("return indexDependency;");
         }
         else
             writer.WriteLine("return dependency;");
@@ -160,8 +210,12 @@ public partial class JobEntityDescription
         writer.WriteLine("}");
 
         writer.WriteLine();
-        writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-        writer.WriteLine($"public void AssignEntityManager(ref {FullTypeName} job, global::Unity.Entities.EntityManager entityManager)");
+        writer.WriteLine(
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]"
+        );
+        writer.WriteLine(
+            $"public void AssignEntityManager(ref {FullTypeName} job, global::Unity.Entities.EntityManager entityManager)"
+        );
         writer.WriteLine("{");
         if (m_RequiresEntityManager)
         {

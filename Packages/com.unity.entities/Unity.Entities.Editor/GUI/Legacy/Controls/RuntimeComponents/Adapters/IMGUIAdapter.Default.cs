@@ -7,7 +7,11 @@ namespace Unity.Editor.Legacy
 {
     sealed partial class RuntimeComponentsDrawer : IVisitPropertyAdapter
     {
-        public void Visit<TContainer, TValue>(in VisitContext<TContainer, TValue> context, ref TContainer container, ref TValue value)
+        public void Visit<TContainer, TValue>(
+            in VisitContext<TContainer, TValue> context,
+            ref TContainer container,
+            ref TValue value
+        )
         {
             if (typeof(TValue).IsEnum)
             {
@@ -18,12 +22,7 @@ namespace Unity.Editor.Legacy
 
                 var index = Array.FindIndex(options, name => name == local.ToString());
 
-                EditorGUILayout.Popup
-                    (
-                        GetDisplayName(context.Property),
-                        index,
-                        options
-                    );
+                EditorGUILayout.Popup(GetDisplayName(context.Property), index, options);
 
                 return;
             }
@@ -34,7 +33,10 @@ namespace Unity.Editor.Legacy
                 return;
             }
 
-            if (typeof(TValue).IsGenericType && typeof(TValue).GetGenericTypeDefinition() == typeof(BlobAssetReference<>))
+            if (
+                typeof(TValue).IsGenericType
+                && typeof(TValue).GetGenericTypeDefinition() == typeof(BlobAssetReference<>)
+            )
             {
                 return;
             }

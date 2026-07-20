@@ -9,7 +9,7 @@ namespace Unity.Numerics.Linear.Sparse.Primitives
     //
 
     [BurstCompile]
-    internal unsafe static partial class DenseVectorExtensions
+    internal static unsafe partial class DenseVectorExtensions
     {
         public static void AddScaled(this Dense.Primitives.Vector u, ref Vector v, float alpha)
         {

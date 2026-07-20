@@ -8,7 +8,6 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
 #endif
@@ -129,7 +128,7 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             ////FIXME: with ExpandHeight(false), editor still expands height for some reason....
-            EditorGUILayout.BeginVertical("OL Box", GUILayout.Height(170));// GUILayout.ExpandHeight(false));
+            EditorGUILayout.BeginVertical("OL Box", GUILayout.Height(170)); // GUILayout.ExpandHeight(false));
             EditorGUILayout.LabelField("Name", m_Device.name);
             EditorGUILayout.LabelField("Layout", m_Device.layout);
             EditorGUILayout.LabelField("Type", m_Device.GetType().Name);
@@ -150,19 +149,27 @@ namespace UnityEngine.InputSystem.Editor
                 EditorGUILayout.LabelField("Flags", m_DeviceFlagsString);
             if (m_Device is Keyboard)
                 EditorGUILayout.LabelField("Keyboard Layout", ((Keyboard)m_Device).keyboardLayout);
-            const string sampleFrequencyTooltip = "Displays the current event or sample frequency of this device in Hertz (Hz) averaged over measurement period of 1 second. " +
-                "The target frequency is device and backend dependent and may not be supported by all devices nor backends. " +
-                "The Polling Frequency indicates system polling target frequency.";
+            const string sampleFrequencyTooltip =
+                "Displays the current event or sample frequency of this device in Hertz (Hz) averaged over measurement period of 1 second. "
+                + "The target frequency is device and backend dependent and may not be supported by all devices nor backends. "
+                + "The Polling Frequency indicates system polling target frequency.";
             if (!string.IsNullOrEmpty(m_DeviceFrequencyString))
-                EditorGUILayout.LabelField(new GUIContent("Sample Frequency", sampleFrequencyTooltip), new GUIContent(m_DeviceFrequencyString), EditorStyles.label);
+                EditorGUILayout.LabelField(
+                    new GUIContent("Sample Frequency", sampleFrequencyTooltip),
+                    new GUIContent(m_DeviceFrequencyString),
+                    EditorStyles.label
+                );
             const string processingDelayTooltip =
-                "Displays the average, minimum and maximum observed input processing delay. This shows the time from " +
-                "when an input event is first created within Unity until its processed by the Input System. " +
-                "Note that this excludes additional input latency introduced by OS, driver or device communication. " +
-                "It also doesn't include output latency introduced by script processing, rendering, swap-chains, display refresh latency etc.";
+                "Displays the average, minimum and maximum observed input processing delay. This shows the time from "
+                + "when an input event is first created within Unity until its processed by the Input System. "
+                + "Note that this excludes additional input latency introduced by OS, driver or device communication. "
+                + "It also doesn't include output latency introduced by script processing, rendering, swap-chains, display refresh latency etc.";
             if (!string.IsNullOrEmpty(m_DeviceLatencyString))
-                EditorGUILayout.LabelField(new GUIContent("Processing Delay", processingDelayTooltip),
-                    new GUIContent(m_DeviceLatencyString), EditorStyles.label);
+                EditorGUILayout.LabelField(
+                    new GUIContent("Processing Delay", processingDelayTooltip),
+                    new GUIContent(m_DeviceLatencyString),
+                    EditorStyles.label
+                );
             EditorGUILayout.EndVertical();
 
             DrawControlTree();
@@ -171,9 +178,10 @@ namespace UnityEngine.InputSystem.Editor
 
         private void DrawControlTree()
         {
-            var label = m_InputUpdateTypeShownInControlTree == InputUpdateType.Editor
-                ? Contents.editorStateContent
-                : Contents.playerStateContent;
+            var label =
+                m_InputUpdateTypeShownInControlTree == InputUpdateType.Editor
+                    ? Contents.editorStateContent
+                    : Contents.playerStateContent;
 
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
             GUILayout.Label(label, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true));
@@ -199,8 +207,11 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             if (m_Device.disabledInFrontend)
-                EditorGUILayout.HelpBox("Device is DISABLED. Control values will not receive updates. "
-                    + "To force-enable the device, you can right-click it in the input debugger and use 'Enable Device'.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "Device is DISABLED. Control values will not receive updates. "
+                        + "To force-enable the device, you can right-click it in the input debugger and use 'Enable Device'.",
+                    MessageType.Info
+                );
 
             var rect = EditorGUILayout.GetControlRect(GUILayout.ExpandHeight(true));
             m_ControlTree.OnGUI(rect);
@@ -218,8 +229,15 @@ namespace UnityEngine.InputSystem.Editor
             // Text field to determine size of event trace.
             var currentTraceSizeInKb = m_EventTrace.allocatedSizeInBytes / 1024;
             var oldSizeText = currentTraceSizeInKb + " KB";
-            var newSizeText = EditorGUILayout.DelayedTextField(oldSizeText, Styles.toolbarTextField, GUILayout.Width(75));
-            if (oldSizeText != newSizeText && StringHelpers.FromNicifiedMemorySize(newSizeText, out var newSizeInBytes, defaultMultiplier: 1024))
+            var newSizeText = EditorGUILayout.DelayedTextField(
+                oldSizeText,
+                Styles.toolbarTextField,
+                GUILayout.Width(75)
+            );
+            if (
+                oldSizeText != newSizeText
+                && StringHelpers.FromNicifiedMemorySize(newSizeText, out var newSizeInBytes, defaultMultiplier: 1024)
+            )
                 m_EventTrace.Resize(newSizeInBytes);
 
             // Button to clear event trace.
@@ -233,7 +251,11 @@ namespace UnityEngine.InputSystem.Editor
             // NOTE: We force-disable event tracing while a replay is in progress.
             using (new EditorGUI.DisabledScope(m_ReplayController != null && !m_ReplayController.finished))
             {
-                var eventTraceDisabledNow = GUILayout.Toggle(!m_EventTraceDisabled, Contents.pauseContent, Styles.toolbarButton);
+                var eventTraceDisabledNow = GUILayout.Toggle(
+                    !m_EventTraceDisabled,
+                    Contents.pauseContent,
+                    Styles.toolbarButton
+                );
                 if (eventTraceDisabledNow != m_EventTraceDisabled)
                 {
                     m_EventTraceDisabled = eventTraceDisabledNow;
@@ -245,14 +267,22 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             // Button to toggle recording of frame markers.
-            m_EventTrace.recordFrameMarkers =
-                GUILayout.Toggle(m_EventTrace.recordFrameMarkers, Contents.recordFramesContent, Styles.toolbarButton);
+            m_EventTrace.recordFrameMarkers = GUILayout.Toggle(
+                m_EventTrace.recordFrameMarkers,
+                Contents.recordFramesContent,
+                Styles.toolbarButton
+            );
 
             // Button to save event trace to file.
             if (GUILayout.Button(Contents.saveContent, Styles.toolbarButton))
             {
                 var defaultName = m_Device?.displayName + ".inputtrace";
-                var fileName = EditorUtility.SaveFilePanel("Choose where to save event trace", string.Empty, defaultName, "inputtrace");
+                var fileName = EditorUtility.SaveFilePanel(
+                    "Choose where to save event trace",
+                    string.Empty,
+                    defaultName,
+                    "inputtrace"
+                );
                 if (!string.IsNullOrEmpty(fileName))
                     m_EventTrace.WriteTo(fileName);
             }
@@ -277,7 +307,8 @@ namespace UnityEngine.InputSystem.Editor
                     m_EventTrace.ReadFrom(fileName);
                     m_EventTree.Reload();
 
-                    m_ReplayController = m_EventTrace.Replay()
+                    m_ReplayController = m_EventTrace
+                        .Replay()
                         .PlayAllFramesOneByOne()
                         .OnFinished(() =>
                         {
@@ -331,11 +362,7 @@ namespace UnityEngine.InputSystem.Editor
                 if (traceSizeInBytes / deviceStateSize > kMaxEventsPerTrace)
                     traceSizeInBytes = kMaxEventsPerTrace * deviceStateSize;
 
-                m_EventTrace =
-                    new InputEventTrace(traceSizeInBytes)
-                {
-                    deviceId = device.deviceId
-                };
+                m_EventTrace = new InputEventTrace(traceSizeInBytes) { deviceId = device.deviceId };
             }
 
             m_EventTrace.onEvent += _ => m_ReloadEventTree = true;
@@ -343,10 +370,20 @@ namespace UnityEngine.InputSystem.Editor
                 m_EventTrace.Enable();
 
             // Set up event tree.
-            m_EventTree = InputEventTreeView.Create(m_Device, m_EventTrace, ref m_EventTreeState, ref m_EventTreeHeaderState);
+            m_EventTree = InputEventTreeView.Create(
+                m_Device,
+                m_EventTrace,
+                ref m_EventTreeState,
+                ref m_EventTreeHeaderState
+            );
 
             // Set up control tree.
-            m_ControlTree = InputControlTreeView.Create(m_Device, 1, ref m_ControlTreeState, ref m_ControlTreeHeaderState);
+            m_ControlTree = InputControlTreeView.Create(
+                m_Device,
+                1,
+                ref m_ControlTreeState,
+                ref m_ControlTreeHeaderState
+            );
             m_ControlTree.Reload();
             m_ControlTree.ExpandAll();
 
@@ -392,9 +429,11 @@ namespace UnityEngine.InputSystem.Editor
 
             // Display target frequency reported for device
             sb.Append(" (Target @ ");
-            sb.Append(float.IsNaN(m_SampleFrequencyCalculator.targetFrequency)
-                ? "n/a"
-                : m_SampleFrequencyCalculator.targetFrequency.ToString(frequencyFormat));
+            sb.Append(
+                float.IsNaN(m_SampleFrequencyCalculator.targetFrequency)
+                    ? "n/a"
+                    : m_SampleFrequencyCalculator.targetFrequency.ToString(frequencyFormat)
+            );
 
             // Display system-wide polling frequency
             sb.Append(", Polling-Frequency @ ");
@@ -414,9 +453,9 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             var millis = 1000.0f * value;
-            sb.Append(millis <= 1000.0f
-                ? (millis).ToString(latencyFormat, CultureInfo.InvariantCulture)
-                : ">1000.0 ms");
+            sb.Append(
+                millis <= 1000.0f ? (millis).ToString(latencyFormat, CultureInfo.InvariantCulture) : ">1000.0 ms"
+            );
         }
 
         private string CreateDeviceLatencyString(ref StringBuilder sb)
@@ -474,7 +513,12 @@ namespace UnityEngine.InputSystem.Editor
             InputStateBuffers.SwitchTo(InputSystem.s_Manager.m_StateBuffers, currentUpdateType);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "device", Justification = "Keep this for future implementation")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Usage",
+            "CA1801:ReviewUnusedParameters",
+            MessageId = "device",
+            Justification = "Keep this for future implementation"
+        )]
         internal static InputUpdateType DetermineUpdateTypeToShow(InputDevice device)
         {
             if (EditorApplication.isPlaying)
@@ -518,12 +562,23 @@ namespace UnityEngine.InputSystem.Editor
         private InputLatencyCalculator m_InputLatencyCalculator;
         private SampleFrequencyCalculator m_SampleFrequencyCalculator;
 
-        [SerializeField] private int m_DeviceId = InputDevice.InvalidDeviceId;
-        [SerializeField] private TreeViewState m_ControlTreeState;
-        [SerializeField] private TreeViewState m_EventTreeState;
-        [SerializeField] private MultiColumnHeaderState m_ControlTreeHeaderState;
-        [SerializeField] private MultiColumnHeaderState m_EventTreeHeaderState;
-        [SerializeField] private bool m_EventTraceDisabled;
+        [SerializeField]
+        private int m_DeviceId = InputDevice.InvalidDeviceId;
+
+        [SerializeField]
+        private TreeViewState m_ControlTreeState;
+
+        [SerializeField]
+        private TreeViewState m_EventTreeState;
+
+        [SerializeField]
+        private MultiColumnHeaderState m_ControlTreeHeaderState;
+
+        [SerializeField]
+        private MultiColumnHeaderState m_EventTreeHeaderState;
+
+        [SerializeField]
+        private bool m_EventTraceDisabled;
 
         private static List<InputDeviceDebuggerWindow> s_OpenDebuggerWindows;
 
@@ -614,9 +669,7 @@ namespace UnityEngine.InputSystem.Editor
             public static GUIContent playerStateContent = new GUIContent("Controls (Player State)");
         }
 
-        void ISerializationCallbackReceiver.OnBeforeSerialize()
-        {
-        }
+        void ISerializationCallbackReceiver.OnBeforeSerialize() { }
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {

@@ -11,22 +11,18 @@ namespace Unity.Multiplayer.Editor
     internal class ProjectSettingsProvider : SettingsProvider
     {
         internal const string k_SettingsGroupPath = "Project/Multiplayer/";
-        private static readonly string[] k_Keywords = new string[]
-        {
-            "Multiplayer",
-            "Server",
-        };
+        private static readonly string[] k_Keywords = new string[] { "Multiplayer", "Server" };
 
         [SettingsProviderGroup]
         public static SettingsProvider[] CreateDedicatedServerSettingsProvider()
         {
-            var paths = TypeCache.GetTypesWithAttribute<ProjectSettingsSectionAttribute>()
-                .Select
-                (
-                    t => t.GetCustomAttributes(typeof(ProjectSettingsSectionAttribute), true)
-                    .Cast<ProjectSettingsSectionAttribute>()
-                    .First()
-                    .SettingsPath
+            var paths = TypeCache
+                .GetTypesWithAttribute<ProjectSettingsSectionAttribute>()
+                .Select(t =>
+                    t.GetCustomAttributes(typeof(ProjectSettingsSectionAttribute), true)
+                        .Cast<ProjectSettingsSectionAttribute>()
+                        .First()
+                        .SettingsPath
                 )
                 .Distinct();
 
@@ -42,7 +38,8 @@ namespace Unity.Multiplayer.Editor
 
         private string m_Path;
 
-        public ProjectSettingsProvider(string path) : base(path, SettingsScope.Project)
+        public ProjectSettingsProvider(string path)
+            : base(path, SettingsScope.Project)
         {
             keywords = new HashSet<string>(k_Keywords);
             activateHandler = ActivateHandler;
@@ -52,7 +49,11 @@ namespace Unity.Multiplayer.Editor
         {
             var container = new ScrollView();
             container.AddToClassList("dedicated-server-settings-container");
-            container.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.unity.dedicated-server/Common/Editor/ServerSettings/DedicatedServerSettings.uss"));
+            container.styleSheets.Add(
+                AssetDatabase.LoadAssetAtPath<StyleSheet>(
+                    "Packages/com.unity.dedicated-server/Common/Editor/ServerSettings/DedicatedServerSettings.uss"
+                )
+            );
 
             var header = new Label(Path.GetFileName(this.settingsPath));
             header.AddToClassList("dedicated-server-settings-header");
@@ -64,7 +65,9 @@ namespace Unity.Multiplayer.Editor
             {
                 Assert.IsTrue(type.IsSubclassOf(typeof(VisualElement)));
 
-                var sectionAttribute = type.GetCustomAttributes(typeof(ProjectSettingsSectionAttribute), true).Cast<ProjectSettingsSectionAttribute>().First();
+                var sectionAttribute = type.GetCustomAttributes(typeof(ProjectSettingsSectionAttribute), true)
+                    .Cast<ProjectSettingsSectionAttribute>()
+                    .First();
 
                 var constructor = type.GetConstructor(new Type[0]);
                 Assert.IsNotNull(constructor, $"The type {type} must have a parameterless constructor");
@@ -85,8 +88,14 @@ namespace Unity.Multiplayer.Editor
 
         private IEnumerable<Type> GetAllSectionTypes()
         {
-            return TypeCache.GetTypesWithAttribute<ProjectSettingsSectionAttribute>()
-                .Where(t => t.GetCustomAttributes(typeof(ProjectSettingsSectionAttribute), true).Cast<ProjectSettingsSectionAttribute>().First().SettingsPath == settingsPath);
+            return TypeCache
+                .GetTypesWithAttribute<ProjectSettingsSectionAttribute>()
+                .Where(t =>
+                    t.GetCustomAttributes(typeof(ProjectSettingsSectionAttribute), true)
+                        .Cast<ProjectSettingsSectionAttribute>()
+                        .First()
+                        .SettingsPath == settingsPath
+                );
         }
     }
 }

@@ -12,7 +12,10 @@ namespace UnityEditor.Rendering.Converter
         public PipelineConverterAttribute(string pipelineFrom, string pipelineTo)
         {
             if (string.IsNullOrEmpty(pipelineFrom) || string.IsNullOrEmpty(pipelineTo))
-                throw new ArgumentNullException(string.IsNullOrEmpty(pipelineTo) ? nameof(pipelineTo) : nameof(pipelineFrom), "PipelineConverterAttribute parameters cannot be null or empty");
+                throw new ArgumentNullException(
+                    string.IsNullOrEmpty(pipelineTo) ? nameof(pipelineTo) : nameof(pipelineFrom),
+                    "PipelineConverterAttribute parameters cannot be null or empty"
+                );
 
             source = pipelineFrom;
             destination = pipelineTo;

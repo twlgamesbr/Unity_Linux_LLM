@@ -31,7 +31,9 @@ namespace UnityEngine.Rendering
             public Vector4 visualizationParams;
         }
 
-        internal static readonly int shadingRateFragmentSizeCount = Enum.GetNames(typeof(ShadingRateFragmentSize)).Length;
+        internal static readonly int shadingRateFragmentSizeCount = Enum.GetNames(
+            typeof(ShadingRateFragmentSize)
+        ).Length;
 
         static VrsResources s_VrsResources;
 
@@ -42,14 +44,12 @@ namespace UnityEngine.Rendering
         ///  The `IsColorMaskTextureConversionSupported` method checks for the following:
         ///- VRS hardware support through [ShadingRateInfo.supportsPerImageTile](xref:UnityEngine.Rendering.ShadingRateInfo.supportsPerImageTile). The `supportsPerImageTile` property determines whether your GPU can define different quality levels to different tiles.
         ///- Compute shader support through [SystemInfo.supportsComputeShaders](xref:UnityEngine.Device.SystemInfo.supportsComputeShaders)
-        ///- Proper initialization of VRS utility functions and compute shaders required for converting color textures to shading rate image (SRI). This is automatically handled by the render pipeline. However, for custom implementations, you must call  <see cref="InitializeResources"/> manually.  
+        ///- Proper initialization of VRS utility functions and compute shaders required for converting color textures to shading rate image (SRI). This is automatically handled by the render pipeline. However, for custom implementations, you must call  <see cref="InitializeResources"/> manually.
         /// </summary>
         /// <returns>Returns true if conversion of color texture to shading rate image is supported, false otherwise.</returns>
         public static bool IsColorMaskTextureConversionSupported()
         {
-            return SystemInfo.supportsComputeShaders &&
-                ShadingRateInfo.supportsPerImageTile &&
-                IsInitialized();
+            return SystemInfo.supportsComputeShaders && ShadingRateInfo.supportsPerImageTile && IsInitialized();
         }
 
         /// <summary>
@@ -59,10 +59,10 @@ namespace UnityEngine.Rendering
         /// <returns>Returns true if the Vrs resources are initialized.</returns>
         public static bool IsInitialized()
         {
-            return s_VrsResources != null &&
-                   s_VrsResources.textureComputeShader != null &&
-                   s_VrsResources.textureReduceKernel != -1 &&
-                   s_VrsResources.textureCopyKernel != -1;
+            return s_VrsResources != null
+                && s_VrsResources.textureComputeShader != null
+                && s_VrsResources.textureReduceKernel != -1
+                && s_VrsResources.textureCopyKernel != -1;
         }
 
         /// <summary>
@@ -72,8 +72,9 @@ namespace UnityEngine.Rendering
         {
             // GLES3.0/WebGL2 and older GL platforms do not support compute shaders (for conversion).
             // Unity does not implement VRS for OpenGL.
-            bool isOpenGL = SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
-                            SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3;
+            bool isOpenGL =
+                SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore
+                || SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3;
 
             // NOTE: should match "#pragma exclude_renderers" in shaders.
             bool isPlatformSupported = !isOpenGL;
@@ -82,10 +83,10 @@ namespace UnityEngine.Rendering
             // For example when you are building on a non-VRS platform to a VRS platform.
             // VRS conversion requires compute shader support.
             // NOTE: Init might fail.
-            if (SystemInfo.supportsComputeShaders &&
-                isPlatformSupported)
+            if (SystemInfo.supportsComputeShaders && isPlatformSupported)
             {
-                var pipelineRuntimeResources = GraphicsSettings.GetRenderPipelineSettings<VrsRenderPipelineRuntimeResources>();
+                var pipelineRuntimeResources =
+                    GraphicsSettings.GetRenderPipelineSettings<VrsRenderPipelineRuntimeResources>();
                 s_VrsResources = new VrsResources(pipelineRuntimeResources);
             }
         }
@@ -110,7 +111,12 @@ namespace UnityEngine.Rendering
         /// <remarks>
         /// sriRtHandle and colorMaskRtHandle are imported with renderGraph before doing the conversion.
         /// </remarks>
-        public static TextureHandle ColorMaskTextureToShadingRateImage(RenderGraph renderGraph, RTHandle sriRtHandle, RTHandle colorMaskRtHandle, bool yFlip)
+        public static TextureHandle ColorMaskTextureToShadingRateImage(
+            RenderGraph renderGraph,
+            RTHandle sriRtHandle,
+            RTHandle colorMaskRtHandle,
+            bool yFlip
+        )
         {
             if (renderGraph == null || sriRtHandle == null || colorMaskRtHandle == null)
             {
@@ -121,11 +127,13 @@ namespace UnityEngine.Rendering
             var sriTextureHandle = renderGraph.ImportShadingRateImageTexture(sriRtHandle);
             var colorMaskHandle = renderGraph.ImportTexture(colorMaskRtHandle);
 
-            return ColorMaskTextureToShadingRateImage(renderGraph,
+            return ColorMaskTextureToShadingRateImage(
+                renderGraph,
                 sriTextureHandle,
                 colorMaskHandle,
                 ((Texture)colorMaskRtHandle).dimension,
-                yFlip);
+                yFlip
+            );
         }
 
         /// <summary>
@@ -140,7 +148,13 @@ namespace UnityEngine.Rendering
         /// <remarks>
         /// sriRtHandle and colorMaskHandle are expected to be imported by renderGraph prior to this call.
         /// </remarks>
-        public static TextureHandle ColorMaskTextureToShadingRateImage(RenderGraph renderGraph, TextureHandle sriTextureHandle, TextureHandle colorMaskHandle, TextureDimension colorMaskDimension, bool yFlip)
+        public static TextureHandle ColorMaskTextureToShadingRateImage(
+            RenderGraph renderGraph,
+            TextureHandle sriTextureHandle,
+            TextureHandle colorMaskHandle,
+            TextureDimension colorMaskDimension,
+            bool yFlip
+        )
         {
             if (!IsColorMaskTextureConversionSupported())
             {
@@ -161,13 +175,21 @@ namespace UnityEngine.Rendering
                 return TextureHandle.nullHandle;
             }
 
-            using (var builder = renderGraph.AddComputePass<ConversionPassData>("TextureToShadingRateImage", out var outerPassData, s_VrsResources.conversionProfilingSampler))
+            using (
+                var builder = renderGraph.AddComputePass<ConversionPassData>(
+                    "TextureToShadingRateImage",
+                    out var outerPassData,
+                    s_VrsResources.conversionProfilingSampler
+                )
+            )
             {
                 outerPassData.sriTextureHandle = sriTextureHandle;
                 outerPassData.mainTexHandle = colorMaskHandle;
                 outerPassData.mainTexDimension = colorMaskDimension;
                 outerPassData.mainTexLutHandle = renderGraph.ImportBuffer(s_VrsResources.conversionLutBuffer);
-                outerPassData.validatedShadingRateFragmentSizeHandle = renderGraph.ImportBuffer(s_VrsResources.validatedShadingRateFragmentSizeBuffer);
+                outerPassData.validatedShadingRateFragmentSizeHandle = renderGraph.ImportBuffer(
+                    s_VrsResources.validatedShadingRateFragmentSizeBuffer
+                );
 
                 outerPassData.computeShader = s_VrsResources.textureComputeShader;
                 outerPassData.kernelIndex = s_VrsResources.textureReduceKernel;
@@ -187,10 +209,12 @@ namespace UnityEngine.Rendering
 
                 builder.AllowGlobalStateModification(true);
 
-                builder.SetRenderFunc(static (ConversionPassData innerPassData, ComputeGraphContext context) =>
-                {
-                    ConversionDispatch(context.cmd, innerPassData);
-                });
+                builder.SetRenderFunc(
+                    static (ConversionPassData innerPassData, ComputeGraphContext context) =>
+                    {
+                        ConversionDispatch(context.cmd, innerPassData);
+                    }
+                );
 
                 return outerPassData.sriTextureHandle;
             }
@@ -202,7 +226,11 @@ namespace UnityEngine.Rendering
         /// <param name="renderGraph">Render graph to record conversion commands</param>
         /// <param name="sriTextureHandle">Texture to convert from.</param>
         /// <param name="colorMaskHandle">Output of conversion.</param>
-        public static void ShadingRateImageToColorMaskTexture(RenderGraph renderGraph, in TextureHandle sriTextureHandle, in TextureHandle colorMaskHandle)
+        public static void ShadingRateImageToColorMaskTexture(
+            RenderGraph renderGraph,
+            in TextureHandle sriTextureHandle,
+            in TextureHandle colorMaskHandle
+        )
         {
             if (s_VrsResources == null)
             {
@@ -216,7 +244,13 @@ namespace UnityEngine.Rendering
                 return;
             }
 
-            using (var builder = renderGraph.AddRasterRenderPass<VisualizationPassData>("ShadingRateImageToTexture", out var outerPassData, s_VrsResources.visualizationProfilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<VisualizationPassData>(
+                    "ShadingRateImageToTexture",
+                    out var outerPassData,
+                    s_VrsResources.visualizationProfilingSampler
+                )
+            )
             {
                 outerPassData.material = s_VrsResources.visualizationMaterial;
 
@@ -231,7 +265,8 @@ namespace UnityEngine.Rendering
                     1.0f / s_VrsResources.tileSize.x,
                     1.0f / s_VrsResources.tileSize.y,
                     0,
-                    0);
+                    0
+                );
                 ;
 
                 builder.UseTexture(outerPassData.source);
@@ -241,25 +276,35 @@ namespace UnityEngine.Rendering
 
                 builder.AllowPassCulling(false);
 
-                builder.SetRenderFunc(static (VisualizationPassData innerPassData, RasterGraphContext context) =>
-                {
-                    // must setup blitter source via the material: it's a typed texture (uint)
-                    innerPassData.material.SetTexture(VrsShaders.s_ShadingRateImage, innerPassData.source);
-                    innerPassData.material.SetBuffer(VrsShaders.s_VisualizationLut, innerPassData.lut);
-                    innerPassData.material.SetVector(VrsShaders.s_VisualizationParams, innerPassData.visualizationParams);
+                builder.SetRenderFunc(
+                    static (VisualizationPassData innerPassData, RasterGraphContext context) =>
+                    {
+                        // must setup blitter source via the material: it's a typed texture (uint)
+                        innerPassData.material.SetTexture(VrsShaders.s_ShadingRateImage, innerPassData.source);
+                        innerPassData.material.SetBuffer(VrsShaders.s_VisualizationLut, innerPassData.lut);
+                        innerPassData.material.SetVector(
+                            VrsShaders.s_VisualizationParams,
+                            innerPassData.visualizationParams
+                        );
 
-                    Blitter.BlitTexture(context.cmd,
-                        innerPassData.dummy,
-                        new Vector4(1, 1, 0, 0),
-                        innerPassData.material,
-                        0);
-                });
+                        Blitter.BlitTexture(
+                            context.cmd,
+                            innerPassData.dummy,
+                            new Vector4(1, 1, 0, 0),
+                            innerPassData.material,
+                            0
+                        );
+                    }
+                );
             }
         }
 
         static void ConversionDispatch(ComputeCommandBuffer cmd, ConversionPassData conversionPassData)
         {
-            var disableTexture2dXArray = new LocalKeyword(conversionPassData.computeShader, VrsShaders.k_DisableTexture2dXArray);
+            var disableTexture2dXArray = new LocalKeyword(
+                conversionPassData.computeShader,
+                VrsShaders.k_DisableTexture2dXArray
+            );
             if (conversionPassData.mainTexDimension == TextureDimension.Tex2DArray)
                 cmd.DisableKeyword(conversionPassData.computeShader, disableTexture2dXArray);
             else
@@ -271,13 +316,43 @@ namespace UnityEngine.Rendering
             else
                 cmd.DisableKeyword(conversionPassData.computeShader, yFlip);
 
-            cmd.SetComputeTextureParam(conversionPassData.computeShader, conversionPassData.kernelIndex, VrsShaders.s_MainTex, conversionPassData.mainTexHandle);
-            cmd.SetComputeBufferParam(conversionPassData.computeShader, conversionPassData.kernelIndex, VrsShaders.s_MainTexLut, conversionPassData.mainTexLutHandle);
-            cmd.SetComputeBufferParam(conversionPassData.computeShader, conversionPassData.kernelIndex, VrsShaders.s_ShadingRateNativeValues, conversionPassData.validatedShadingRateFragmentSizeHandle);
-            cmd.SetComputeTextureParam(conversionPassData.computeShader, conversionPassData.kernelIndex, VrsShaders.s_ShadingRateImage, conversionPassData.sriTextureHandle);
-            cmd.SetComputeVectorParam(conversionPassData.computeShader, VrsShaders.s_ScaleBias, conversionPassData.scaleBias);
+            cmd.SetComputeTextureParam(
+                conversionPassData.computeShader,
+                conversionPassData.kernelIndex,
+                VrsShaders.s_MainTex,
+                conversionPassData.mainTexHandle
+            );
+            cmd.SetComputeBufferParam(
+                conversionPassData.computeShader,
+                conversionPassData.kernelIndex,
+                VrsShaders.s_MainTexLut,
+                conversionPassData.mainTexLutHandle
+            );
+            cmd.SetComputeBufferParam(
+                conversionPassData.computeShader,
+                conversionPassData.kernelIndex,
+                VrsShaders.s_ShadingRateNativeValues,
+                conversionPassData.validatedShadingRateFragmentSizeHandle
+            );
+            cmd.SetComputeTextureParam(
+                conversionPassData.computeShader,
+                conversionPassData.kernelIndex,
+                VrsShaders.s_ShadingRateImage,
+                conversionPassData.sriTextureHandle
+            );
+            cmd.SetComputeVectorParam(
+                conversionPassData.computeShader,
+                VrsShaders.s_ScaleBias,
+                conversionPassData.scaleBias
+            );
 
-            cmd.DispatchCompute(conversionPassData.computeShader, conversionPassData.kernelIndex, conversionPassData.dispatchSize.x, conversionPassData.dispatchSize.y, 1);
+            cmd.DispatchCompute(
+                conversionPassData.computeShader,
+                conversionPassData.kernelIndex,
+                conversionPassData.dispatchSize.x,
+                conversionPassData.dispatchSize.y,
+                1
+            );
         }
 
         /// <summary>
@@ -288,11 +363,18 @@ namespace UnityEngine.Rendering
         /// <param name="sriDestination">Shading rate images to convert to.</param>
         /// <param name="colorMaskSource">Texture to convert from.</param>
         /// <param name="yFlip">True if shading rate image should be generated flipped.</param>
-        public static void ColorMaskTextureToShadingRateImageDispatch(CommandBuffer cmd, RTHandle sriDestination, Texture colorMaskSource, bool yFlip = true)
+        public static void ColorMaskTextureToShadingRateImageDispatch(
+            CommandBuffer cmd,
+            RTHandle sriDestination,
+            Texture colorMaskSource,
+            bool yFlip = true
+        )
         {
             if (sriDestination == null)
             {
-                Debug.LogError("ColorMaskTextureToShadingRateImageDispatch: VRS destination shading rate texture is null.");
+                Debug.LogError(
+                    "ColorMaskTextureToShadingRateImageDispatch: VRS destination shading rate texture is null."
+                );
                 return;
             }
 
@@ -339,7 +421,12 @@ namespace UnityEngine.Rendering
 
             cmd.SetComputeTextureParam(computeShader, kernelIndex, VrsShaders.s_MainTex, colorMaskSource);
             cmd.SetComputeBufferParam(computeShader, kernelIndex, VrsShaders.s_MainTexLut, colorLutBuffer);
-            cmd.SetComputeBufferParam(computeShader, kernelIndex, VrsShaders.s_ShadingRateNativeValues, validatedShadingRateFragmentSizeBuffer);
+            cmd.SetComputeBufferParam(
+                computeShader,
+                kernelIndex,
+                VrsShaders.s_ShadingRateNativeValues,
+                validatedShadingRateFragmentSizeBuffer
+            );
             cmd.SetComputeTextureParam(computeShader, kernelIndex, VrsShaders.s_ShadingRateImage, sriDestination);
             cmd.SetComputeVectorParam(computeShader, VrsShaders.s_ScaleBias, scaleBias);
 
@@ -353,7 +440,11 @@ namespace UnityEngine.Rendering
         /// <param name="cmd">CommandBuffer used for the compute dispatch.</param>
         /// <param name="sriSource">Shading rate images to convert from.</param>
         /// <param name="colorMaskDestination">Texture to convert to.</param>
-        public static void ShadingRateImageToColorMaskTextureBlit(CommandBuffer cmd, RTHandle sriSource, RTHandle colorMaskDestination)
+        public static void ShadingRateImageToColorMaskTextureBlit(
+            CommandBuffer cmd,
+            RTHandle sriSource,
+            RTHandle colorMaskDestination
+        )
         {
             if (sriSource == null)
             {
@@ -367,7 +458,7 @@ namespace UnityEngine.Rendering
                 return;
             }
 
-            if(!IsInitialized())
+            if (!IsInitialized())
             {
                 Debug.LogError("ShadingRateImageToColorMaskTextureBlit: VRS is not initialized.");
                 return;
@@ -382,17 +473,15 @@ namespace UnityEngine.Rendering
                 1.0f / s_VrsResources.tileSize.x,
                 1.0f / s_VrsResources.tileSize.y,
                 0,
-                0);
+                0
+            );
 
             material.SetTexture(VrsShaders.s_ShadingRateImage, source);
             material.SetBuffer(VrsShaders.s_VisualizationLut, lut);
             material.SetVector(VrsShaders.s_VisualizationParams, visualizationParams);
 
             CoreUtils.SetRenderTarget(cmd, destination);
-            Blitter.BlitTexture(cmd,
-                new Vector4(1, 1, 0, 0),
-                material,
-                0);
+            Blitter.BlitTexture(cmd, new Vector4(1, 1, 0, 0), material, 0);
         }
     }
 }

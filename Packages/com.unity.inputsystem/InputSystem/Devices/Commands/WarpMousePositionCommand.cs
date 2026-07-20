@@ -6,7 +6,10 @@ namespace UnityEngine.InputSystem.LowLevel
     [StructLayout(LayoutKind.Explicit, Size = kSize)]
     internal struct WarpMousePositionCommand : IInputDeviceCommandInfo
     {
-        public static FourCC Type { get { return new FourCC('W', 'P', 'M', 'S'); } }
+        public static FourCC Type
+        {
+            get { return new FourCC('W', 'P', 'M', 'S'); }
+        }
 
         internal const int kSize = InputDeviceCommand.kBaseCommandSize + sizeof(float) * 2;
 
@@ -26,7 +29,7 @@ namespace UnityEngine.InputSystem.LowLevel
             return new WarpMousePositionCommand
             {
                 baseCommand = new InputDeviceCommand(Type, kSize),
-                warpPositionInPlayerDisplaySpace = position
+                warpPositionInPlayerDisplaySpace = position,
             };
         }
     }

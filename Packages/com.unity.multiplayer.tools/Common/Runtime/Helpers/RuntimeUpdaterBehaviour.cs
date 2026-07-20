@@ -14,22 +14,27 @@ namespace Unity.Multiplayer.Tools.Common
         /// Callback for OnStart
         /// </summary>
         event Action OnStart;
+
         /// <summary>
         /// Callback for OnAwake
         /// </summary>
         event Action OnAwake;
+
         /// <summary>
         /// Callback for OnUpdate
         /// </summary>
         event Action OnUpdate;
+
         /// <summary>
         /// Callback for OnFixedUpdate
         /// </summary>
         event Action OnFixedUpdate;
+
         /// <summary>
         /// Callback for OnLateUpdate
         /// </summary>
         event Action OnLateUpdate;
+
         /// <summary>
         /// Callback for OnDestroyed
         /// </summary>
@@ -212,9 +217,18 @@ namespace Unity.Multiplayer.Tools.Common
         {
             Debug.Assert(m_Component == null, m_Component);
 
-            m_Component = new GameObject($"[{nameof(RuntimeUpdaterBehaviour)}]").AddComponent<RuntimeUpdaterBehaviour>();
+            m_Component = new GameObject(
+                $"[{nameof(RuntimeUpdaterBehaviour)}]"
+            ).AddComponent<RuntimeUpdaterBehaviour>();
             m_Component.gameObject.hideFlags = HideFlags.HideAndDontSave;
-            m_Component.ReplaceCallbacks(m_OnAwake, m_OnStart, m_OnUpdate, m_OnFixedUpdate, m_OnLateUpdate, m_OnDestroyed);
+            m_Component.ReplaceCallbacks(
+                m_OnAwake,
+                m_OnStart,
+                m_OnUpdate,
+                m_OnFixedUpdate,
+                m_OnLateUpdate,
+                m_OnDestroyed
+            );
             Object.DontDestroyOnLoad(m_Component.gameObject);
         }
     }
@@ -239,7 +253,8 @@ namespace Unity.Multiplayer.Tools.Common
             Action onUpdate,
             Action onFixedUpdate,
             Action onLateUpdate,
-            Action onDestroyed)
+            Action onDestroyed
+        )
         {
             OnAwake = onAwake;
             OnStart = onStart;

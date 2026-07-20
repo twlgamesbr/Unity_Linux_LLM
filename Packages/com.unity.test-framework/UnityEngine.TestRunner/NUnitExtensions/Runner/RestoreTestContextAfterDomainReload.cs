@@ -1,4 +1,4 @@
 namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 {
-    internal class RestoreTestContextAfterDomainReload {}
+    internal class RestoreTestContextAfterDomainReload { }
 }

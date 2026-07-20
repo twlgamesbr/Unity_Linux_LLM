@@ -6,7 +6,8 @@ namespace Unity.Entities.Editor
     /// Common interface for the per-entity data storage.
     /// </summary>
     /// <typeparam name="T">The data type stored.</typeparam>
-    interface IEntityMap<T> : IDisposable where T : unmanaged
+    interface IEntityMap<T> : IDisposable
+        where T : unmanaged
     {
         /// <summary>
         /// Returns the upper bound for the array.

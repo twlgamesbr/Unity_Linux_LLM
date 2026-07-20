@@ -4,10 +4,17 @@ namespace UnityEngine.Rendering.Universal
 {
     public sealed partial class Light2D
     {
-        [SerializeField] float m_PointLightInnerAngle = 360.0f;
-        [SerializeField] float m_PointLightOuterAngle = 360.0f;
-        [SerializeField] float m_PointLightInnerRadius = 0.0f;
-        [SerializeField] float m_PointLightOuterRadius = 1.0f;
+        [SerializeField]
+        float m_PointLightInnerAngle = 360.0f;
+
+        [SerializeField]
+        float m_PointLightOuterAngle = 360.0f;
+
+        [SerializeField]
+        float m_PointLightInnerRadius = 0.0f;
+
+        [SerializeField]
+        float m_PointLightOuterRadius = 1.0f;
 
         /// <summary>
         /// The inner angle of the point light shape. The bigger the angle, the wider the gap.

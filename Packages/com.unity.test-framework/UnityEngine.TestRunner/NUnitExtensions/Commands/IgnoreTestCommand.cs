@@ -11,7 +11,9 @@ namespace UnityEngine.TestTools
     internal class IgnoreTestCommand : DelegatingTestCommand, IEnumerableTestMethodCommand
     {
         private ITest _test;
-        public IgnoreTestCommand(TestCommand innerCommand, ITest test) : base(innerCommand)
+
+        public IgnoreTestCommand(TestCommand innerCommand, ITest test)
+            : base(innerCommand)
         {
             _test = test;
         }
@@ -23,7 +25,7 @@ namespace UnityEngine.TestTools
 
         public IEnumerable ExecuteEnumerable(ITestExecutionContext context)
         {
-            var ignoreTests = ((UnityTestExecutionContext) context).IgnoreTests;
+            var ignoreTests = ((UnityTestExecutionContext)context).IgnoreTests;
             if (ignoreTests != null && ignoreTests.Length > 0)
             {
                 var fullName = _test.GetFullNameWithoutDllPath();
@@ -31,7 +33,7 @@ namespace UnityEngine.TestTools
                 {
                     if (ignoreTest.test.Equals(fullName))
                     {
-                        context.CurrentResult.SetResult(ResultState.Ignored,ignoreTest.ignoreComment);
+                        context.CurrentResult.SetResult(ResultState.Ignored, ignoreTest.ignoreComment);
                         yield break;
                     }
                 }

@@ -7,7 +7,7 @@ namespace UnityEngine.Rendering
         static DebugShapes s_Instance = null;
 
         /// <summary>Singleton instance</summary>
-        static public DebugShapes instance
+        public static DebugShapes instance
         {
             get
             {
@@ -69,13 +69,18 @@ namespace UnityEngine.Rendering
             {
                 for (int lon = 0; lon <= longSubdiv; lon++)
                 {
-                    uvs[lon + lat * (longSubdiv + 1) + 1] = new Vector2((float)lon / longSubdiv, 1f - (float)(lat + 1) / (latSubdiv + 1));
+                    uvs[lon + lat * (longSubdiv + 1) + 1] = new Vector2(
+                        (float)lon / longSubdiv,
+                        1f - (float)(lat + 1) / (latSubdiv + 1)
+                    );
                 }
             }
 
             // Build the index array
-            uint nbTriangles = longSubdiv * 2 +                    // Top and bottom cap
-                               (latSubdiv - 1) * longSubdiv * 2;   // Middle part
+            uint nbTriangles =
+                longSubdiv * 2
+                + // Top and bottom cap
+                (latSubdiv - 1) * longSubdiv * 2; // Middle part
             uint nbIndexes = nbTriangles * 3;
             int[] triangles = new int[nbIndexes];
 
@@ -140,17 +145,35 @@ namespace UnityEngine.Rendering
             Vector3[] vertices = new Vector3[]
             {
                 // Bottom
-                p0, p1, p2, p3,
+                p0,
+                p1,
+                p2,
+                p3,
                 // Left
-                p7, p4, p0, p3,
+                p7,
+                p4,
+                p0,
+                p3,
                 // Front
-                p4, p5, p1, p0,
+                p4,
+                p5,
+                p1,
+                p0,
                 // Back
-                p6, p7, p3, p2,
+                p6,
+                p7,
+                p3,
+                p2,
                 // Right
-                p5, p6, p2, p1,
+                p5,
+                p6,
+                p2,
+                p1,
                 // Top
-                p7, p6, p5, p4
+                p7,
+                p6,
+                p5,
+                p4,
             };
 
             Vector3 up = Vector3.up;
@@ -163,17 +186,35 @@ namespace UnityEngine.Rendering
             Vector3[] normales = new Vector3[]
             {
                 // Bottom
-                down, down, down, down,
+                down,
+                down,
+                down,
+                down,
                 // Left
-                left, left, left, left,
+                left,
+                left,
+                left,
+                left,
                 // Front
-                front, front, front, front,
+                front,
+                front,
+                front,
+                front,
                 // Back
-                back, back, back, back,
+                back,
+                back,
+                back,
+                back,
                 // Right
-                right, right, right, right,
+                right,
+                right,
+                right,
+                right,
                 // Top
-                up, up, up, up
+                up,
+                up,
+                up,
+                up,
             };
 
             Vector2 _00 = new Vector2(0f, 0f);
@@ -184,39 +225,81 @@ namespace UnityEngine.Rendering
             Vector2[] uvs = new Vector2[]
             {
                 // Bottom
-                _11, _01, _00, _10,
+                _11,
+                _01,
+                _00,
+                _10,
                 // Left
-                _11, _01, _00, _10,
+                _11,
+                _01,
+                _00,
+                _10,
                 // Front
-                _11, _01, _00, _10,
+                _11,
+                _01,
+                _00,
+                _10,
                 // Back
-                _11, _01, _00, _10,
+                _11,
+                _01,
+                _00,
+                _10,
                 // Right
-                _11, _01, _00, _10,
+                _11,
+                _01,
+                _00,
+                _10,
                 // Top
-                _11, _01, _00, _10,
+                _11,
+                _01,
+                _00,
+                _10,
             };
 
             int[] triangles = new int[]
             {
                 // Bottom
-                3, 1, 0,
-                3, 2, 1,
+                3,
+                1,
+                0,
+                3,
+                2,
+                1,
                 // Left
-                3 + 4 * 1, 1 + 4 * 1, 0 + 4 * 1,
-                3 + 4 * 1, 2 + 4 * 1, 1 + 4 * 1,
+                3 + 4 * 1,
+                1 + 4 * 1,
+                0 + 4 * 1,
+                3 + 4 * 1,
+                2 + 4 * 1,
+                1 + 4 * 1,
                 // Front
-                3 + 4 * 2, 1 + 4 * 2, 0 + 4 * 2,
-                3 + 4 * 2, 2 + 4 * 2, 1 + 4 * 2,
+                3 + 4 * 2,
+                1 + 4 * 2,
+                0 + 4 * 2,
+                3 + 4 * 2,
+                2 + 4 * 2,
+                1 + 4 * 2,
                 // Back
-                3 + 4 * 3, 1 + 4 * 3, 0 + 4 * 3,
-                3 + 4 * 3, 2 + 4 * 3, 1 + 4 * 3,
+                3 + 4 * 3,
+                1 + 4 * 3,
+                0 + 4 * 3,
+                3 + 4 * 3,
+                2 + 4 * 3,
+                1 + 4 * 3,
                 // Right
-                3 + 4 * 4, 1 + 4 * 4, 0 + 4 * 4,
-                3 + 4 * 4, 2 + 4 * 4, 1 + 4 * 4,
+                3 + 4 * 4,
+                1 + 4 * 4,
+                0 + 4 * 4,
+                3 + 4 * 4,
+                2 + 4 * 4,
+                1 + 4 * 4,
                 // Top
-                3 + 4 * 5, 1 + 4 * 5, 0 + 4 * 5,
-                3 + 4 * 5, 2 + 4 * 5, 1 + 4 * 5,
+                3 + 4 * 5,
+                1 + 4 * 5,
+                0 + 4 * 5,
+                3 + 4 * 5,
+                2 + 4 * 5,
+                1 + 4 * 5,
             };
 
             outputMesh.vertices = vertices;

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,8 +19,11 @@ namespace UnityEngine.Rendering
 
         // Warning: this is the baking set this scene was part of during last bake
         // It shouldn't be used while baking as the scene may have been moved since then
-        [SerializeField, FormerlySerializedAs("bakingSet")] internal ProbeVolumeBakingSet serializedBakingSet;
-        [SerializeField] internal string sceneGUID = "";
+        [SerializeField, FormerlySerializedAs("bakingSet")]
+        internal ProbeVolumeBakingSet serializedBakingSet;
+
+        [SerializeField]
+        internal string sceneGUID = "";
 
         // All code bellow is only kept in order to be able to cleanup obsolete data.
         [Serializable]
@@ -42,18 +44,28 @@ namespace UnityEngine.Rendering
         }
 
         [FormerlySerializedAs("asset")]
-        [SerializeField] internal ObsoleteProbeVolumeAsset obsoleteAsset;
+        [SerializeField]
+        internal ObsoleteProbeVolumeAsset obsoleteAsset;
+
         [FormerlySerializedAs("cellSharedDataAsset")]
-        [SerializeField] internal TextAsset obsoleteCellSharedDataAsset; // Contains bricks and validity data
+        [SerializeField]
+        internal TextAsset obsoleteCellSharedDataAsset; // Contains bricks and validity data
+
         [FormerlySerializedAs("cellSupportDataAsset")]
-        [SerializeField] internal TextAsset obsoleteCellSupportDataAsset; // Contains debug data
+        [SerializeField]
+        internal TextAsset obsoleteCellSupportDataAsset; // Contains debug data
+
         [FormerlySerializedAs("serializedScenarios")]
-        [SerializeField] List<ObsoleteSerializablePerScenarioDataItem> obsoleteSerializedScenarios = new();
+        [SerializeField]
+        List<ObsoleteSerializablePerScenarioDataItem> obsoleteSerializedScenarios = new();
 
 #if UNITY_EDITOR
         void DeleteAsset(Object asset)
         {
-            if (asset != null && AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out string guid, out long instanceID))
+            if (
+                asset != null
+                && AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out string guid, out long instanceID)
+            )
             {
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 AssetDatabase.DeleteAsset(assetPath);
@@ -76,12 +88,12 @@ namespace UnityEngine.Rendering
             if (serializedBakingSet == null)
                 return;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             // Check if we are trying to load APV data for a scene which has not enabled APV (or it was removed)
             var bakedData = serializedBakingSet.GetSceneBakeData(sceneGUID, addIfMissing: false);
             if (bakedData != null && bakedData.hasProbeVolume == false)
                 return;
-            #endif
+#endif
 
             var refVol = ProbeReferenceVolume.instance;
             refVol.AddPendingSceneLoading(sceneGUID, serializedBakingSet);
@@ -125,7 +137,7 @@ namespace UnityEngine.Rendering
                 DeleteAsset(obsoleteAsset);
                 DeleteAsset(obsoleteCellSharedDataAsset);
                 DeleteAsset(obsoleteCellSupportDataAsset);
-                foreach(var scenario in obsoleteSerializedScenarios)
+                foreach (var scenario in obsoleteSerializedScenarios)
                 {
                     DeleteAsset(scenario.data.cellDataAsset);
                     DeleteAsset(scenario.data.cellOptionalDataAsset);

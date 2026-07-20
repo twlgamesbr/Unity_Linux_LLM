@@ -11,13 +11,17 @@ namespace UnityEngine.Rendering
         public struct Args
         {
             /// <summary>Count</summary>
-            public uint             count;
+            public uint count;
+
             /// <summary>Defines the maximum height of the bitonic sort. By default, should be the same as count for a full sort.</summary>
-            public uint             maxDepth;
+            public uint maxDepth;
+
             /// <summary>Input Keys</summary>
-            public GraphicsBuffer   inputKeys;
+            public GraphicsBuffer inputKeys;
+
             /// <summary>Input Values</summary>
-            public GraphicsBuffer   inputValues;
+            public GraphicsBuffer inputValues;
+
             /// <summary>Required runtime resources.</summary>
             public SupportResources resources;
 
@@ -31,6 +35,7 @@ namespace UnityEngine.Rendering
         {
             /// <summary>Render Graph Buffer Handle to the sorted keys.</summary>
             public BufferHandle sortBufferKeys;
+
             /// <summary>Render Graph Buffer Handle to the sorted values.</summary>
             public BufferHandle sortBufferValues;
 
@@ -41,15 +46,19 @@ namespace UnityEngine.Rendering
             /// <param name="renderGraph">Render Graph</param>
             /// <param name="builder">Render Graph Builder</param>
             /// <returns>An initialized RenderGraphResources object containing the created sort buffers.</returns>
-            [Obsolete("This Create signature is deprecated and will be removed in the future. Please use Create(IBaseRenderGraphBuilder) instead. #from(6000.3)")]
+            [Obsolete(
+                "This Create signature is deprecated and will be removed in the future. Please use Create(IBaseRenderGraphBuilder) instead. #from(6000.3)"
+            )]
             public static RenderGraphResources Create(int count, RenderGraph renderGraph, RenderGraphBuilder builder)
             {
                 var targets = GraphicsBuffer.Target.Raw | GraphicsBuffer.Target.CopyDestination;
 
                 var resources = new RenderGraphResources
                 {
-                    sortBufferKeys   = builder.CreateTransientBuffer(new BufferDesc(count, 4, targets) { name = "Keys" }),
-                    sortBufferValues = builder.CreateTransientBuffer(new BufferDesc(count, 4, targets) { name = "Values" })
+                    sortBufferKeys = builder.CreateTransientBuffer(new BufferDesc(count, 4, targets) { name = "Keys" }),
+                    sortBufferValues = builder.CreateTransientBuffer(
+                        new BufferDesc(count, 4, targets) { name = "Values" }
+                    ),
                 };
 
                 return resources;
@@ -62,14 +71,20 @@ namespace UnityEngine.Rendering
             /// <param name="renderGraph">Render Graph</param>
             /// <param name="builder">Render Graph Builder</param>
             /// <returns>An initialized RenderGraphResources object containing the created sort buffers.</returns>
-            public static RenderGraphResources Create(int count, RenderGraph renderGraph, IBaseRenderGraphBuilder builder)
+            public static RenderGraphResources Create(
+                int count,
+                RenderGraph renderGraph,
+                IBaseRenderGraphBuilder builder
+            )
             {
                 var targets = GraphicsBuffer.Target.Raw | GraphicsBuffer.Target.CopyDestination;
 
                 var resources = new RenderGraphResources
                 {
                     sortBufferKeys = builder.CreateTransientBuffer(new BufferDesc(count, 4, targets) { name = "Keys" }),
-                    sortBufferValues = builder.CreateTransientBuffer(new BufferDesc(count, 4, targets) { name = "Values" })
+                    sortBufferValues = builder.CreateTransientBuffer(
+                        new BufferDesc(count, 4, targets) { name = "Values" }
+                    ),
                 };
 
                 return resources;
@@ -83,6 +98,7 @@ namespace UnityEngine.Rendering
         {
             /// <summary>Sorted key buffer.</summary>
             public GraphicsBuffer sortBufferKeys;
+
             /// <summary>Sorted values buffer.</summary>
             public GraphicsBuffer sortBufferValues;
 
@@ -95,8 +111,8 @@ namespace UnityEngine.Rendering
             {
                 var resources = new SupportResources
                 {
-                    sortBufferKeys   = renderGraphResources.sortBufferKeys,
-                    sortBufferValues = renderGraphResources.sortBufferValues
+                    sortBufferKeys = renderGraphResources.sortBufferKeys,
+                    sortBufferValues = renderGraphResources.sortBufferValues,
                 };
 
                 return resources;

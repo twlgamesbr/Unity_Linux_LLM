@@ -35,8 +35,9 @@ namespace UnityEngine.InputSystem.LowLevel
             if (!eventPtr.valid)
                 throw new ArgumentNullException(nameof(eventPtr));
             if (!eventPtr.IsA<TextEvent>())
-                throw new InvalidCastException(string.Format("Cannot cast event with type '{0}' into TextEvent",
-                    eventPtr.type));
+                throw new InvalidCastException(
+                    string.Format("Cannot cast event with type '{0}' into TextEvent", eventPtr.type)
+                );
 
             return (TextEvent*)eventPtr.data;
         }
@@ -47,7 +48,7 @@ namespace UnityEngine.InputSystem.LowLevel
             var inputEvent = new TextEvent
             {
                 baseEvent = new InputEvent(Type, InputEvent.kBaseEventSize + 4, deviceId, time),
-                character = character
+                character = character,
             };
             return inputEvent;
         }
@@ -57,7 +58,7 @@ namespace UnityEngine.InputSystem.LowLevel
             var inputEvent = new TextEvent
             {
                 baseEvent = new InputEvent(Type, InputEvent.kBaseEventSize + 4, deviceId, time),
-                character = character
+                character = character,
             };
             return inputEvent;
         }

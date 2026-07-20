@@ -6,13 +6,14 @@ using Unity.Properties;
 
 namespace Unity.Serialization.Binary
 {
-    unsafe class BinaryPropertyReader : BinaryPropertyVisitor,
-        ISerializedTypeProvider,
-        IPropertyBagVisitor,
-        IListPropertyBagVisitor,
-        ISetPropertyBagVisitor,
-        IDictionaryPropertyBagVisitor,
-        IPropertyVisitor
+    unsafe class BinaryPropertyReader
+        : BinaryPropertyVisitor,
+            ISerializedTypeProvider,
+            IPropertyBagVisitor,
+            IListPropertyBagVisitor,
+            ISetPropertyBagVisitor,
+            IDictionaryPropertyBagVisitor,
+            IPropertyVisitor
     {
         UnsafeAppendBuffer.Reader* m_Stream;
         Type m_SerializedType;
@@ -22,23 +23,18 @@ namespace Unity.Serialization.Binary
 
         internal UnsafeAppendBuffer.Reader* Reader => m_Stream;
 
-        public void SetStream(UnsafeAppendBuffer.Reader* stream)
-            => m_Stream = stream;
+        public void SetStream(UnsafeAppendBuffer.Reader* stream) => m_Stream = stream;
 
-        public void SetSerializedType(Type type)
-            => m_SerializedType = type;
+        public void SetSerializedType(Type type) => m_SerializedType = type;
 
-        public void SetDisableRootAdapters(bool disableRootAdapters)
-            => m_DisableRootAdapters = disableRootAdapters;
+        public void SetDisableRootAdapters(bool disableRootAdapters) => m_DisableRootAdapters = disableRootAdapters;
 
-        public void SetGlobalAdapters(List<IBinaryAdapter> adapters)
-            => m_Adapters.Global = adapters;
+        public void SetGlobalAdapters(List<IBinaryAdapter> adapters) => m_Adapters.Global = adapters;
 
-        public void SetUserDefinedAdapters(List<IBinaryAdapter> adapters)
-            => m_Adapters.UserDefined = adapters;
+        public void SetUserDefinedAdapters(List<IBinaryAdapter> adapters) => m_Adapters.UserDefined = adapters;
 
-        public void SetSerializedReferences(SerializedReferences serializedReferences)
-            => m_SerializedReferences = serializedReferences;
+        public void SetSerializedReferences(SerializedReferences serializedReferences) =>
+            m_SerializedReferences = serializedReferences;
 
         public BinaryPropertyReader()
         {
@@ -58,7 +54,10 @@ namespace Unity.Serialization.Binary
             }
         }
 
-        void IListPropertyBagVisitor.Visit<TList, TElement>(IListPropertyBag<TList, TElement> properties, ref TList container)
+        void IListPropertyBagVisitor.Visit<TList, TElement>(
+            IListPropertyBag<TList, TElement> properties,
+            ref TList container
+        )
         {
             m_SerializedReferences?.AddDeserializedReference(container);
 
@@ -94,7 +93,10 @@ namespace Unity.Serialization.Binary
             }
         }
 
-        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(IDictionaryPropertyBag<TDictionary, TKey, TValue> properties, ref TDictionary container)
+        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(
+            IDictionaryPropertyBag<TDictionary, TKey, TValue> properties,
+            ref TDictionary container
+        )
         {
             m_SerializedReferences?.AddDeserializedReference(container);
 
@@ -118,7 +120,14 @@ namespace Unity.Serialization.Binary
             {
                 property.SetValue(ref container, value);
             }
-            else if (PropertyChecks.CheckReadOnlyPropertyForDeserialization(property, ref container, ref value, out var error))
+            else if (
+                PropertyChecks.CheckReadOnlyPropertyForDeserialization(
+                    property,
+                    ref container,
+                    ref value,
+                    out var error
+                )
+            )
             {
                 throw new SerializationException(error);
             }
@@ -139,7 +148,11 @@ namespace Unity.Serialization.Binary
                 ReadValueWithoutAdapters(ref value, true);
         }
 
-        internal void ReadValueWithAdapters<TValue>(ref TValue value, BinaryAdapterCollection.Enumerator adapters, bool isRoot)
+        internal void ReadValueWithAdapters<TValue>(
+            ref TValue value,
+            BinaryAdapterCollection.Enumerator adapters,
+            bool isRoot
+        )
         {
             while (adapters.MoveNext())
             {
@@ -150,7 +163,11 @@ namespace Unity.Serialization.Binary
                         return;
                     case IContravariantBinaryAdapter<TValue> typedContravariant:
                         // NOTE: Boxing
-                        value = (TValue) typedContravariant.Deserialize((IBinaryDeserializationContext) new BinaryDeserializationContext<TValue>(this, adapters, isRoot));
+                        value = (TValue)
+                            typedContravariant.Deserialize(
+                                (IBinaryDeserializationContext)
+                                    new BinaryDeserializationContext<TValue>(this, adapters, isRoot)
+                            );
                         return;
                 }
             }
@@ -180,8 +197,10 @@ namespace Unity.Serialization.Binary
                     case k_TokenSerializedReference:
                         var id = m_Stream->ReadNext<int>();
                         if (null == m_SerializedReferences)
-                            throw new Exception("Deserialization encountered a serialized object reference while running with DisableSerializedReferences.");
-                        value = (TValue) m_SerializedReferences.GetDeserializedReference(id);
+                            throw new Exception(
+                                "Deserialization encountered a serialized object reference while running with DisableSerializedReferences."
+                            );
+                        value = (TValue)m_SerializedReferences.GetDeserializedReference(id);
                         return;
                 }
             }
@@ -213,11 +232,15 @@ namespace Unity.Serialization.Binary
                     }
 
                     // Repack the T as Nullable<T>
-                    value = (TValue) underlyingValue;
+                    value = (TValue)underlyingValue;
                 }
                 else
                 {
-                    BinarySerialization.ReadPrimitiveBoxed(m_Stream, ref value, Nullable.GetUnderlyingType(typeof(TValue)));
+                    BinarySerialization.ReadPrimitiveBoxed(
+                        m_Stream,
+                        ref value,
+                        Nullable.GetUnderlyingType(typeof(TValue))
+                    );
                 }
                 return;
             }
@@ -231,11 +254,14 @@ namespace Unity.Serialization.Binary
                     if (adapters.Current is IContravariantBinaryAdapter<UnityEngine.Object> unityObjectAdaper)
                     {
                         // Special path for polymorphic unity object references.
-                        value = (TValue) unityObjectAdaper.Deserialize(new BinaryDeserializationContext<TValue>(this, default, isRoot));
+                        value = (TValue)
+                            unityObjectAdaper.Deserialize(
+                                new BinaryDeserializationContext<TValue>(this, default, isRoot)
+                            );
                         break;
                     }
                 }
-                
+
                 return;
             }
 
@@ -252,7 +278,12 @@ namespace Unity.Serialization.Binary
 
                 if (null == concreteType)
                 {
-                    if (FormerNameAttribute.TryGetCurrentTypeName(assemblyQualifiedTypeName, out var currentAssemblyQualifiedTypeName))
+                    if (
+                        FormerNameAttribute.TryGetCurrentTypeName(
+                            assemblyQualifiedTypeName,
+                            out var currentAssemblyQualifiedTypeName
+                        )
+                    )
                     {
                         concreteType = Type.GetType(currentAssemblyQualifiedTypeName);
                     }

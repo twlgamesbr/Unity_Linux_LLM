@@ -17,7 +17,7 @@ namespace UnityEngine.Rendering
         LODBuffer = 1 << 4,
 
         PermutationCount = 1 << 5,
-        AllBits = PermutationCount - 1
+        AllBits = PermutationCount - 1,
     }
 
     internal enum LODGroupUpdateBatchMode
@@ -73,20 +73,44 @@ namespace UnityEngine.Rendering
         public LODGroupComponentMask componentMask;
         public LODGroupUpdateBatchMode updateMode;
 
-        public LODGroupUpdateBatch(LODGroupComponentMask componentMask, LODGroupUpdateBatchMode updateMode, int initialCapacity, Allocator allocator)
+        public LODGroupUpdateBatch(
+            LODGroupComponentMask componentMask,
+            LODGroupUpdateBatchMode updateMode,
+            int initialCapacity,
+            Allocator allocator
+        )
         {
             this.updateMode = updateMode;
             this.componentMask = componentMask;
             this.instanceIDs = new JaggedSpan<EntityId>(initialCapacity, allocator);
-            this.worldSpaceReferencePoints = new JaggedSpan<float3>(componentMask.HasAnyBit(LODGroupComponentMask.WorldSpaceReferencePoint) ? initialCapacity : 0, allocator);
-            this.worldSpaceSizes = new JaggedSpan<float>(componentMask.HasAnyBit(LODGroupComponentMask.WorldSpaceSize) ? initialCapacity : 0, allocator);
-            this.lodGroupSettings = new JaggedSpan<InternalLODGroupSettings>(componentMask.HasAnyBit(LODGroupComponentMask.GroupSettings) ? initialCapacity : 0, allocator);
-            this.forceLODMask = new JaggedSpan<byte>(componentMask.HasAnyBit(LODGroupComponentMask.ForceLOD) ? initialCapacity : 0, allocator);
-            this.lodBuffers = new JaggedSpan<EmbeddedLODBuffer>(componentMask.HasAnyBit(LODGroupComponentMask.LODBuffer) ? initialCapacity : 0, allocator);
+            this.worldSpaceReferencePoints = new JaggedSpan<float3>(
+                componentMask.HasAnyBit(LODGroupComponentMask.WorldSpaceReferencePoint) ? initialCapacity : 0,
+                allocator
+            );
+            this.worldSpaceSizes = new JaggedSpan<float>(
+                componentMask.HasAnyBit(LODGroupComponentMask.WorldSpaceSize) ? initialCapacity : 0,
+                allocator
+            );
+            this.lodGroupSettings = new JaggedSpan<InternalLODGroupSettings>(
+                componentMask.HasAnyBit(LODGroupComponentMask.GroupSettings) ? initialCapacity : 0,
+                allocator
+            );
+            this.forceLODMask = new JaggedSpan<byte>(
+                componentMask.HasAnyBit(LODGroupComponentMask.ForceLOD) ? initialCapacity : 0,
+                allocator
+            );
+            this.lodBuffers = new JaggedSpan<EmbeddedLODBuffer>(
+                componentMask.HasAnyBit(LODGroupComponentMask.LODBuffer) ? initialCapacity : 0,
+                allocator
+            );
         }
 
-        public LODGroupUpdateBatch(in LODGroupUpdateSection section, LODGroupUpdateBatchMode updateMode, Allocator allocator) :
-            this(section.BuildComponentMask(), updateMode, 1, allocator)
+        public LODGroupUpdateBatch(
+            in LODGroupUpdateSection section,
+            LODGroupUpdateBatchMode updateMode,
+            Allocator allocator
+        )
+            : this(section.BuildComponentMask(), updateMode, 1, allocator)
         {
             AddSection(section);
         }
@@ -162,7 +186,13 @@ namespace UnityEngine.Rendering
 
         private void ValidateImpl()
         {
-            if (!ValidateEmptyOrSameLayout(LODGroupComponentMask.WorldSpaceReferencePoint, worldSpaceReferencePoints, instanceIDs))
+            if (
+                !ValidateEmptyOrSameLayout(
+                    LODGroupComponentMask.WorldSpaceReferencePoint,
+                    worldSpaceReferencePoints,
+                    instanceIDs
+                )
+            )
                 return;
 
             if (!ValidateEmptyOrSameLayout(LODGroupComponentMask.WorldSpaceSize, worldSpaceSizes, instanceIDs))
@@ -201,19 +231,25 @@ namespace UnityEngine.Rendering
 
                 if (HasAnyComponent(LODGroupComponentMask.ForceLOD))
                 {
-                    Debug.LogError("LODGroupComponentMask.ForceLOD component is not supported in LODGroupUpdateBatchMode.OnlyKnownInstances mode");
+                    Debug.LogError(
+                        "LODGroupComponentMask.ForceLOD component is not supported in LODGroupUpdateBatchMode.OnlyKnownInstances mode"
+                    );
                     return;
                 }
 
                 if (HasAnyComponent(LODGroupComponentMask.GroupSettings))
                 {
-                    Debug.LogError("LODGroupComponentMask.GroupSettings component is not supported in LODGroupUpdateBatchMode.OnlyKnownInstances mode");
+                    Debug.LogError(
+                        "LODGroupComponentMask.GroupSettings component is not supported in LODGroupUpdateBatchMode.OnlyKnownInstances mode"
+                    );
                     return;
                 }
 
                 if (HasAnyComponent(LODGroupComponentMask.LODBuffer))
                 {
-                    Debug.LogError("LODGroupComponentMask.LODBuffer component is not supported in LODGroupUpdateBatchMode.OnlyKnownInstances mode");
+                    Debug.LogError(
+                        "LODGroupComponentMask.LODBuffer component is not supported in LODGroupUpdateBatchMode.OnlyKnownInstances mode"
+                    );
                     return;
                 }
             }
@@ -241,18 +277,26 @@ namespace UnityEngine.Rendering
             return true;
 #pragma warning restore CS0162
         }
+
         private bool ValidateRequiredComponentIsPresent(LODGroupComponentMask component)
         {
             if (!HasAnyComponent(component))
             {
-                Debug.LogError($"Invalid LODGroupUpdateBatch. {component} was not provided. This is required when using the update mode {updateMode}.");
+                Debug.LogError(
+                    $"Invalid LODGroupUpdateBatch. {component} was not provided. This is required when using the update mode {updateMode}."
+                );
                 return false;
             }
 
             return true;
         }
 
-        private bool ValidateEmptyOrSameLayout<T>(LODGroupComponentMask component, JaggedSpan<T> components, JaggedSpan<EntityId> instanceIDs) where T : unmanaged
+        private bool ValidateEmptyOrSameLayout<T>(
+            LODGroupComponentMask component,
+            JaggedSpan<T> components,
+            JaggedSpan<EntityId> instanceIDs
+        )
+            where T : unmanaged
         {
             if (!components.isEmpty && !components.HasSameLayout(instanceIDs))
             {

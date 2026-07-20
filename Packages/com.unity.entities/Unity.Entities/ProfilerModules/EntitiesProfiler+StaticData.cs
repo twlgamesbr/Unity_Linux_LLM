@@ -28,7 +28,10 @@ namespace Unity.Entities
                 m_WorldsData = new UnsafeList<WorldData>(worldCount, Allocator.Persistent);
                 m_SystemsData = new UnsafeList<SystemData>(systemCount, Allocator.Persistent);
                 m_ArchetypesData = new UnsafeList<ArchetypeData>(archetypeCount, Allocator.Persistent);
-                m_ArchetypeComponentsData = new UnsafeList<ArchetypeComponentData>(archetypeCount * 16, Allocator.Persistent);
+                m_ArchetypeComponentsData = new UnsafeList<ArchetypeComponentData>(
+                    archetypeCount * 16,
+                    Allocator.Persistent
+                );
                 m_ArchetypesDataLock = new SpinLock();
                 m_LastProfilerEnabled = false;
                 m_Initialized = true;
@@ -76,8 +79,12 @@ namespace Unity.Entities
                     {
                         var typeIndex = archetype->Types[i].TypeIndex;
                         var stableTypeHash = TypeManager.GetTypeInfo(typeIndex).StableTypeHash;
-                        var flags = TypeManager.IsChunkComponent(typeIndex) ? ComponentTypeFlags.ChunkComponent : ComponentTypeFlags.None;
-                        m_ArchetypeComponentsData.Add(new ArchetypeComponentData(archetypeStableHash, stableTypeHash, flags, i));
+                        var flags = TypeManager.IsChunkComponent(typeIndex)
+                            ? ComponentTypeFlags.ChunkComponent
+                            : ComponentTypeFlags.None;
+                        m_ArchetypeComponentsData.Add(
+                            new ArchetypeComponentData(archetypeStableHash, stableTypeHash, flags, i)
+                        );
                     }
                 }
                 finally
@@ -169,8 +176,17 @@ namespace Unity.Entities
                                 {
                                     var typeIndex = archetype->Types[componentIter].TypeIndex;
                                     var stableTypeHash = TypeManager.GetTypeInfo(typeIndex).StableTypeHash;
-                                    var flags = TypeManager.IsChunkComponent(typeIndex) ? ComponentTypeFlags.ChunkComponent : ComponentTypeFlags.None;
-                                    m_ArchetypeComponentsData.Add(new ArchetypeComponentData(archetypeStableHash, stableTypeHash, flags, componentIter));
+                                    var flags = TypeManager.IsChunkComponent(typeIndex)
+                                        ? ComponentTypeFlags.ChunkComponent
+                                        : ComponentTypeFlags.None;
+                                    m_ArchetypeComponentsData.Add(
+                                        new ArchetypeComponentData(
+                                            archetypeStableHash,
+                                            stableTypeHash,
+                                            flags,
+                                            componentIter
+                                        )
+                                    );
                                 }
                             }
                         }

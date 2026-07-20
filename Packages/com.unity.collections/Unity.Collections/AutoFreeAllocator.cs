@@ -8,7 +8,8 @@ using Unity.Mathematics;
 
 namespace Unity.Collections
 {
-    unsafe internal struct ArrayOfArrays<T> : IDisposable where  T : unmanaged
+    internal unsafe struct ArrayOfArrays<T> : IDisposable
+        where T : unmanaged
     {
         AllocatorManager.AllocatorHandle m_backingAllocatorHandle;
         int m_lengthInElements;
@@ -24,7 +25,11 @@ namespace Unity.Collections
         public int Length => m_lengthInElements;
         public int Capacity => m_capacityInElements;
 
-        public ArrayOfArrays(int capacityInElements, AllocatorManager.AllocatorHandle backingAllocatorHandle, int log2BlockSizeInElements = 12)
+        public ArrayOfArrays(
+            int capacityInElements,
+            AllocatorManager.AllocatorHandle backingAllocatorHandle,
+            int log2BlockSizeInElements = 12
+        )
         {
             this = default;
             m_backingAllocatorHandle = backingAllocatorHandle;
@@ -41,14 +46,17 @@ namespace Unity.Collections
             var elementIndex = Interlocked.Increment(ref m_lengthInElements) - 1;
             var blockIndex = BlockIndexOfElement(elementIndex);
             CheckBlockIndex(blockIndex);
-            if(m_block[blockIndex] == IntPtr.Zero)
+            if (m_block[blockIndex] == IntPtr.Zero)
             {
                 void* pointer = Memory.Unmanaged.Allocate(BlockSizeInBytes, 16, m_backingAllocatorHandle); // $$$!
                 var lastBlock = math.min(m_blocks, blockIndex + 4); // don't overgrow too fast, simply to avoid a $$$ free
-                for(; blockIndex < lastBlock; ++blockIndex)
-                    if(IntPtr.Zero == Interlocked.CompareExchange(ref m_block[blockIndex], (IntPtr)pointer, IntPtr.Zero))
+                for (; blockIndex < lastBlock; ++blockIndex)
+                    if (
+                        IntPtr.Zero
+                        == Interlocked.CompareExchange(ref m_block[blockIndex], (IntPtr)pointer, IntPtr.Zero)
+                    )
                         break; // install the new block, into *any* empty slot available, to avoid wasting the time we spent on malloc
-                if(blockIndex == lastBlock)
+                if (blockIndex == lastBlock)
                     Memory.Unmanaged.Free(pointer, m_backingAllocatorHandle); // $$$, only if absolutely necessary
             }
             this[elementIndex] = t;
@@ -77,8 +85,8 @@ namespace Unity.Collections
         public void Clear()
         {
             Rewind();
-            for(var i = 0; i < m_blocks; ++i)
-                if(m_block[i] != IntPtr.Zero)
+            for (var i = 0; i < m_blocks; ++i)
+                if (m_block[i] != IntPtr.Zero)
                 {
                     Memory.Unmanaged.Free((void*)m_block[i], m_backingAllocatorHandle);
                     m_block[i] = IntPtr.Zero;
@@ -95,7 +103,9 @@ namespace Unity.Collections
         void CheckElementIndex(int elementIndex)
         {
             if (elementIndex >= m_lengthInElements)
-                throw new ArgumentException($"Element index {elementIndex} must be less than length in elements {m_lengthInElements}.");
+                throw new ArgumentException(
+                    $"Element index {elementIndex} must be less than length in elements {m_lengthInElements}."
+                );
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
@@ -108,13 +118,13 @@ namespace Unity.Collections
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         void CheckBlockIsNotNull(int blockIndex)
         {
-            if(m_block[blockIndex] == IntPtr.Zero)
+            if (m_block[blockIndex] == IntPtr.Zero)
                 throw new ArgumentException($"Block index {blockIndex} is a null pointer.");
         }
 
         public void RemoveAtSwapBack(int elementIndex)
         {
-            this[elementIndex] = this[Length-1];
+            this[elementIndex] = this[Length - 1];
             --m_lengthInElements;
         }
 
@@ -125,10 +135,14 @@ namespace Unity.Collections
 
         public void TrimExcess()
         {
-            for(var blockIndex = BlockIndexOfElement(m_lengthInElements + BlockMask); blockIndex < m_blocks; ++blockIndex)
+            for (
+                var blockIndex = BlockIndexOfElement(m_lengthInElements + BlockMask);
+                blockIndex < m_blocks;
+                ++blockIndex
+            )
             {
                 CheckBlockIndex(blockIndex);
-                if(m_block[blockIndex] != IntPtr.Zero)
+                if (m_block[blockIndex] != IntPtr.Zero)
                 {
                     var blockIntPtr = m_block[blockIndex];
                     void* blockPointer = (void*)blockIntPtr;
@@ -147,33 +161,33 @@ namespace Unity.Collections
         AllocatorManager.AllocatorHandle m_handle;
         AllocatorManager.AllocatorHandle m_backingAllocatorHandle;
 
-        unsafe public void Update()
+        public unsafe void Update()
         {
-            for(var i = m_tofree.Length; i --> 0;)
-                for(var j = m_allocated.Length; j --> 0;)
-                    if(m_allocated[j] == m_tofree[i])
-                    {
-                        Memory.Unmanaged.Free((void*)m_tofree[i], m_backingAllocatorHandle);
-                        m_allocated.RemoveAtSwapBack(j);
-                        break;
-                    }
+            for (var i = m_tofree.Length; i-- > 0; )
+            for (var j = m_allocated.Length; j-- > 0; )
+                if (m_allocated[j] == m_tofree[i])
+                {
+                    Memory.Unmanaged.Free((void*)m_tofree[i], m_backingAllocatorHandle);
+                    m_allocated.RemoveAtSwapBack(j);
+                    break;
+                }
             m_tofree.Rewind();
             m_allocated.TrimExcess();
         }
 
-        unsafe public void Initialize(AllocatorManager.AllocatorHandle backingAllocatorHandle)
+        public unsafe void Initialize(AllocatorManager.AllocatorHandle backingAllocatorHandle)
         {
             m_allocated = new ArrayOfArrays<IntPtr>(1024 * 1024, backingAllocatorHandle);
             m_tofree = new ArrayOfArrays<IntPtr>(128 * 1024, backingAllocatorHandle);
             m_backingAllocatorHandle = backingAllocatorHandle;
         }
 
-        unsafe public void FreeAll()
+        public unsafe void FreeAll()
         {
             Update();
             m_handle.Rewind();
-            for(var i = 0; i < m_allocated.Length; ++i)
-                Memory.Unmanaged.Free((void*) m_allocated[i], m_backingAllocatorHandle);
+            for (var i = 0; i < m_allocated.Length; ++i)
+                Memory.Unmanaged.Free((void*)m_allocated[i], m_backingAllocatorHandle);
             m_allocated.Rewind();
         }
 
@@ -245,23 +259,36 @@ namespace Unity.Collections
         /// This allocator.
         /// </summary>
         /// <value>This allocator.</value>
-        public AllocatorManager.AllocatorHandle Handle { get { return m_handle; } set { m_handle = value; } }
+        public AllocatorManager.AllocatorHandle Handle
+        {
+            get { return m_handle; }
+            set { m_handle = value; }
+        }
 
         /// <summary>
         /// Cast the Allocator index into Allocator
         /// </summary>
-        public Allocator ToAllocator { get { return m_handle.ToAllocator; } }
+        public Allocator ToAllocator
+        {
+            get { return m_handle.ToAllocator; }
+        }
 
         /// <summary>
         /// Check whether an allocator is a custom allocator
         /// </summary>
-        public bool IsCustomAllocator { get { return m_handle.IsCustomAllocator; } }
+        public bool IsCustomAllocator
+        {
+            get { return m_handle.IsCustomAllocator; }
+        }
 
         /// <summary>
         /// Check whether this allocator will automatically dispose allocations.
         /// </summary>
         /// <remarks>Allocations made by Auto free allocator are automatically disposed.</remarks>
         /// <value>Always true</value>
-        public bool IsAutoDispose { get { return true; } }
+        public bool IsAutoDispose
+        {
+            get { return true; }
+        }
     }
 }

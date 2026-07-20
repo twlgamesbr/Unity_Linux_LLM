@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.InputSystem.LowLevel;
 using UnityEditor;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UIElements;
 
 #if UNITY_EDITOR
@@ -30,7 +30,9 @@ namespace UnityEngine.InputSystem.Editor
 
             if (property.propertyType == SerializedPropertyType.Enum)
             {
-                property.intValue = m_EnumValues[EditorGUI.Popup(position, label.text, GetEnumIndex(property.intValue), m_EnumDisplayNames)];
+                property.intValue = m_EnumValues[
+                    EditorGUI.Popup(position, label.text, GetEnumIndex(property.intValue), m_EnumDisplayNames)
+                ];
             }
 
             EditorGUI.EndProperty();
@@ -106,4 +108,4 @@ namespace UnityEngine.InputSystem.Editor
         private string[] m_EnumDisplayNames;
     }
 }
- #endif // UNITY_EDITOR
+#endif // UNITY_EDITOR

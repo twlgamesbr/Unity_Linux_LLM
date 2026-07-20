@@ -5,7 +5,11 @@ using Unity.Mathematics;
 
 namespace UnityEngine.Rendering.RadeonRays
 {
-    enum IndexFormat { Int32 = 0, Int16 };
+    enum IndexFormat
+    {
+        Int32 = 0,
+        Int16,
+    };
 
     internal struct MeshBuildInfo
     {
@@ -50,19 +54,19 @@ namespace UnityEngine.Rendering.RadeonRays
     internal enum BuildFlags
     {
         None = 0,
-        PreferFastBuild = 1 << 0
+        PreferFastBuild = 1 << 0,
     }
 
     internal enum RayQueryType
     {
         ClosestHit,
-        AnyHit
+        AnyHit,
     }
 
     internal enum RayQueryOutputType
     {
         FullHitData,
-        InstanceID
+        InstanceID,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -71,7 +75,6 @@ namespace UnityEngine.Rendering.RadeonRays
         public float4 row0;
         public float4 row1;
         public float4 row2;
-
 
         public Transform(float4 row0, float4 row1, float4 row2)
         {
@@ -85,7 +88,8 @@ namespace UnityEngine.Rendering.RadeonRays
             return new Transform(
                 new float4(1.0f, 0.0f, 0.0f, 0.0f),
                 new float4(0.0f, 1.0f, 0.0f, 0.0f),
-                new float4(0.0f, 0.0f, 1.0f, 0.0f));
+                new float4(0.0f, 0.0f, 1.0f, 0.0f)
+            );
         }
 
         public static Transform Translation(float3 translation)
@@ -93,7 +97,8 @@ namespace UnityEngine.Rendering.RadeonRays
             return new Transform(
                 new float4(1.0f, 0.0f, 0.0f, translation.x),
                 new float4(0.0f, 1.0f, 0.0f, translation.y),
-                new float4(0.0f, 0.0f, 1.0f, translation.z));
+                new float4(0.0f, 0.0f, 1.0f, translation.z)
+            );
         }
 
         public static Transform Scale(float3 scale)
@@ -101,7 +106,8 @@ namespace UnityEngine.Rendering.RadeonRays
             return new Transform(
                 new float4(scale.x, 0.0f, 0.0f, 0.0f),
                 new float4(0.0f, scale.y, 0.0f, 0.0f),
-                new float4(0.0f, 0.0f, scale.z, 0.0f));
+                new float4(0.0f, 0.0f, scale.z, 0.0f)
+            );
         }
 
         public static Transform TRS(float3 translation, float3 rotation, float3 scale)
@@ -112,9 +118,10 @@ namespace UnityEngine.Rendering.RadeonRays
             rot.c2 *= scale.z;
 
             return new Transform(
-                    new float4(rot.c0.x, rot.c1.x, rot.c2.x, translation.x),
-                    new float4(rot.c0.y, rot.c1.y, rot.c2.y, translation.y),
-                    new float4(rot.c0.z, rot.c1.z, rot.c2.z, translation.z));
+                new float4(rot.c0.x, rot.c1.x, rot.c2.x, translation.x),
+                new float4(rot.c0.y, rot.c1.y, rot.c2.y, translation.y),
+                new float4(rot.c0.z, rot.c1.z, rot.c2.z, translation.z)
+            );
         }
 
         public Transform Inverse()
@@ -206,12 +213,24 @@ namespace UnityEngine.Rendering.RadeonRays
         {
             var res = new RadeonRaysShaders();
 
-            res.bitHistogram =           UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(Path.Combine(kernelFolderPath, "bit_histogram.compute"));
-            res.blockReducePart =        UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(Path.Combine(kernelFolderPath, "block_reduce_part.compute"));
-            res.blockScan =              UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(Path.Combine(kernelFolderPath, "block_scan.compute"));
-            res.buildHlbvh =             UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(Path.Combine(kernelFolderPath, "build_hlbvh.compute"));
-            res.restructureBvh =         UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(Path.Combine(kernelFolderPath, "restructure_bvh.compute"));
-            res.scatter =                UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(Path.Combine(kernelFolderPath, "scatter.compute"));
+            res.bitHistogram = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                Path.Combine(kernelFolderPath, "bit_histogram.compute")
+            );
+            res.blockReducePart = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                Path.Combine(kernelFolderPath, "block_reduce_part.compute")
+            );
+            res.blockScan = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                Path.Combine(kernelFolderPath, "block_scan.compute")
+            );
+            res.buildHlbvh = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                Path.Combine(kernelFolderPath, "build_hlbvh.compute")
+            );
+            res.restructureBvh = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                Path.Combine(kernelFolderPath, "restructure_bvh.compute")
+            );
+            res.scatter = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                Path.Combine(kernelFolderPath, "scatter.compute")
+            );
 
             return res;
         }
@@ -232,39 +251,75 @@ namespace UnityEngine.Rendering.RadeonRays
             buildTopLevelBvh = new HlbvhTopLevelBuilder(shaders);
             restructureBvh = new RestructureBvh(shaders);
         }
+
         public void Dispose()
         {
             restructureBvh.Dispose();
         }
 
-        static public int BvhInternalNodeSizeInDwords() { return Marshal.SizeOf<BvhNode>() / 4; }
-        static public int BvhInternalNodeSizeInBytes() { return Marshal.SizeOf<BvhNode>(); }
-        static public int BvhLeafNodeSizeInBytes() { return Marshal.SizeOf<uint4>(); }
-        static public int BvhLeafNodeSizeInDwords() { return Marshal.SizeOf<uint4>() / 4; }
+        public static int BvhInternalNodeSizeInDwords()
+        {
+            return Marshal.SizeOf<BvhNode>() / 4;
+        }
+
+        public static int BvhInternalNodeSizeInBytes()
+        {
+            return Marshal.SizeOf<BvhNode>();
+        }
+
+        public static int BvhLeafNodeSizeInBytes()
+        {
+            return Marshal.SizeOf<uint4>();
+        }
+
+        public static int BvhLeafNodeSizeInDwords()
+        {
+            return Marshal.SizeOf<uint4>() / 4;
+        }
 
         public void BuildMeshAccelStruct(
             CommandBuffer cmd,
-            MeshBuildInfo buildInfo, BuildFlags buildFlags,
+            MeshBuildInfo buildInfo,
+            BuildFlags buildFlags,
             GraphicsBuffer scratchBuffer,
-            in BottomLevelLevelAccelStruct result)
+            in BottomLevelLevelAccelStruct result
+        )
         {
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal)
                 buildFlags |= BuildFlags.PreferFastBuild;
 
-            buildBvh.Execute(cmd,
-                buildInfo.vertices, buildInfo.verticesStartOffset, buildInfo.vertexStride,
-                buildInfo.triangleIndices, buildInfo.indicesStartOffset, buildInfo.baseIndex, buildInfo.indexFormat, buildInfo.triangleCount,
-                scratchBuffer, in result);
+            buildBvh.Execute(
+                cmd,
+                buildInfo.vertices,
+                buildInfo.verticesStartOffset,
+                buildInfo.vertexStride,
+                buildInfo.triangleIndices,
+                buildInfo.indicesStartOffset,
+                buildInfo.baseIndex,
+                buildInfo.indexFormat,
+                buildInfo.triangleCount,
+                scratchBuffer,
+                in result
+            );
 
             if ((buildFlags & BuildFlags.PreferFastBuild) == 0)
             {
-                restructureBvh.Execute(cmd,
-                    buildInfo.vertices, buildInfo.verticesStartOffset, buildInfo.vertexStride, buildInfo.triangleCount,
-                    scratchBuffer, in result);
+                restructureBvh.Execute(
+                    cmd,
+                    buildInfo.vertices,
+                    buildInfo.verticesStartOffset,
+                    buildInfo.vertexStride,
+                    buildInfo.triangleCount,
+                    scratchBuffer,
+                    in result
+                );
             }
         }
 
-        public MeshBuildMemoryRequirements GetMeshBuildMemoryRequirements(MeshBuildInfo buildInfo, BuildFlags buildFlags)
+        public MeshBuildMemoryRequirements GetMeshBuildMemoryRequirements(
+            MeshBuildInfo buildInfo,
+            BuildFlags buildFlags
+        )
         {
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal)
                 buildFlags |= BuildFlags.PreferFastBuild;
@@ -275,17 +330,21 @@ namespace UnityEngine.Rendering.RadeonRays
 
             result.buildScratchSizeInDwords = buildBvh.GetScratchDataSizeInDwords(buildInfo.triangleCount);
 
-            ulong restructureScratchSize = ((buildFlags & BuildFlags.PreferFastBuild) == 0) ? restructureBvh.GetScratchDataSizeInDwords(buildInfo.triangleCount) : 0;
+            ulong restructureScratchSize =
+                ((buildFlags & BuildFlags.PreferFastBuild) == 0)
+                    ? restructureBvh.GetScratchDataSizeInDwords(buildInfo.triangleCount)
+                    : 0;
             result.buildScratchSizeInDwords = math.max(result.buildScratchSizeInDwords, restructureScratchSize);
 
             return result;
         }
 
         public TopLevelAccelStruct BuildSceneAccelStruct(
-                CommandBuffer cmd,
-                GraphicsBuffer meshAccelStructsBuffer,
-                Instance[] instances,
-                GraphicsBuffer scratchBuffer)
+            CommandBuffer cmd,
+            GraphicsBuffer meshAccelStructsBuffer,
+            Instance[] instances,
+            GraphicsBuffer scratchBuffer
+        )
         {
             var accelStruct = new TopLevelAccelStruct();
 
@@ -310,7 +369,7 @@ namespace UnityEngine.Rendering.RadeonRays
                     disableTriangleCulling = instances[i].triangleCullingEnabled ? 0 : (1u << 30),
                     invertTriangleCulling = instances[i].invertTriangleCulling ? (1u << 31) : 0,
                     userInstanceID = instances[i].userInstanceID,
-                    isOpaque = instances[i].isOpaque ? 1 : 0
+                    isOpaque = instances[i].isOpaque ? 1 : 0,
                     // worldToLocal computed in the shader
                 };
             }
@@ -324,9 +383,10 @@ namespace UnityEngine.Rendering.RadeonRays
         }
 
         public TopLevelAccelStruct CreateSceneAccelStructBuffers(
-                GraphicsBuffer meshAccelStructsBuffer,
-                uint tlasSizeInDwords,
-                Instance[] instances)
+            GraphicsBuffer meshAccelStructsBuffer,
+            uint tlasSizeInDwords,
+            Instance[] instances
+        )
         {
             var accelStruct = new TopLevelAccelStruct();
 
@@ -349,14 +409,22 @@ namespace UnityEngine.Rendering.RadeonRays
                     disableTriangleCulling = instances[i].triangleCullingEnabled ? 0 : (1u << 30),
                     invertTriangleCulling = instances[i].invertTriangleCulling ? (1u << 31) : 0,
                     userInstanceID = instances[i].userInstanceID,
-                    worldToLocalTransform = instances[i].localToWorldTransform.Inverse()
+                    worldToLocalTransform = instances[i].localToWorldTransform.Inverse(),
                 };
             }
 
-            accelStruct.instanceInfos = new GraphicsBuffer(TopLevelAccelStruct.instanceInfoTarget, instances.Length, Marshal.SizeOf<InstanceInfo>());
+            accelStruct.instanceInfos = new GraphicsBuffer(
+                TopLevelAccelStruct.instanceInfoTarget,
+                instances.Length,
+                Marshal.SizeOf<InstanceInfo>()
+            );
             accelStruct.instanceInfos.SetData(instancesInfos);
             accelStruct.bottomLevelBvhs = meshAccelStructsBuffer;
-            accelStruct.topLevelBvh = new GraphicsBuffer(TopLevelAccelStruct.topLevelBvhTarget, (int)tlasSizeInDwords / BvhInternalNodeSizeInDwords(), Marshal.SizeOf<BvhNode>());
+            accelStruct.topLevelBvh = new GraphicsBuffer(
+                TopLevelAccelStruct.topLevelBvhTarget,
+                (int)tlasSizeInDwords / BvhInternalNodeSizeInDwords(),
+                Marshal.SizeOf<BvhNode>()
+            );
             accelStruct.instanceCount = (uint)instances.Length;
 
             return accelStruct;
@@ -391,16 +459,25 @@ namespace UnityEngine.Rendering.RadeonRays
             {
                 var meshRequirements = GetMeshBuildMemoryRequirements(buildInfo, buildFlags);
 
-                requirements.buildScratchSizeInDwords = math.max(requirements.buildScratchSizeInDwords, meshRequirements.buildScratchSizeInDwords);
+                requirements.buildScratchSizeInDwords = math.max(
+                    requirements.buildScratchSizeInDwords,
+                    meshRequirements.buildScratchSizeInDwords
+                );
 
-                requirements.bottomLevelBvhSizeInNodes[i] = meshRequirements.bvhSizeInDwords / (ulong)RadeonRaysAPI.BvhInternalNodeSizeInDwords();
+                requirements.bottomLevelBvhSizeInNodes[i] =
+                    meshRequirements.bvhSizeInDwords / (ulong)RadeonRaysAPI.BvhInternalNodeSizeInDwords();
                 requirements.bottomLevelBvhOffsetInNodes[i] = bvhOffset;
 
-                requirements.bottomLevelBvhLeavesSizeInNodes[i] = meshRequirements.bvhLeavesSizeInDwords / (ulong)RadeonRaysAPI.BvhLeafNodeSizeInDwords();
+                requirements.bottomLevelBvhLeavesSizeInNodes[i] =
+                    meshRequirements.bvhLeavesSizeInDwords / (ulong)RadeonRaysAPI.BvhLeafNodeSizeInDwords();
                 requirements.bottomLevelBvhLeavesOffsetInNodes[i] = bvhLeavesOffset;
 
-                bvhOffset += (uint)(meshRequirements.bvhSizeInDwords / (ulong)RadeonRaysAPI.BvhInternalNodeSizeInDwords());
-                bvhLeavesOffset += (uint)(meshRequirements.bvhLeavesSizeInDwords / (ulong)RadeonRaysAPI.BvhLeafNodeSizeInDwords());
+                bvhOffset += (uint)(
+                    meshRequirements.bvhSizeInDwords / (ulong)RadeonRaysAPI.BvhInternalNodeSizeInDwords()
+                );
+                bvhLeavesOffset += (uint)(
+                    meshRequirements.bvhLeavesSizeInDwords / (ulong)RadeonRaysAPI.BvhLeafNodeSizeInDwords()
+                );
                 i++;
             }
 
@@ -408,16 +485,18 @@ namespace UnityEngine.Rendering.RadeonRays
             requirements.totalBottomLevelBvhLeavesSizeInNodes = bvhLeavesOffset;
 
             ulong topLevelScratchSize = buildTopLevelBvh.GetScratchDataSizeInDwords((uint)buildInfos.Length);
-            requirements.buildScratchSizeInDwords = math.max(requirements.buildScratchSizeInDwords, topLevelScratchSize);
+            requirements.buildScratchSizeInDwords = math.max(
+                requirements.buildScratchSizeInDwords,
+                topLevelScratchSize
+            );
 
             return requirements;
         }
 
-        static public ulong GetTraceMemoryRequirements(uint rayCount)
+        public static ulong GetTraceMemoryRequirements(uint rayCount)
         {
             const uint kStackSize = 64u;
-            return kStackSize* rayCount;
+            return kStackSize * rayCount;
         }
-
     }
 }

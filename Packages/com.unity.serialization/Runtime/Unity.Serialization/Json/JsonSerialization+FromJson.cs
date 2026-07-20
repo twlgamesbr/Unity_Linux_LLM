@@ -19,28 +19,28 @@ namespace Unity.Serialization.Json
         /// <see cref="EventType"/> used for errors.
         /// </summary>
         Error,
-        
+
         /// <summary>
         /// <see cref="EventType"/> used for assertions.
         /// </summary>
         Assert,
-        
+
         /// <summary>
         /// <see cref="EventType"/> used for warnings.
         /// </summary>
         Warning,
-        
+
         /// <summary>
         /// <see cref="EventType"/> used for logs.
         /// </summary>
         Log,
-        
+
         /// <summary>
         /// <see cref="EventType"/> used for exceptions.
         /// </summary>
-        Exception
+        Exception,
     }
-    
+
     /// <summary>
     /// Structure to events that occur during deserialization.
     /// </summary>
@@ -50,7 +50,7 @@ namespace Unity.Serialization.Json
         /// The type of event.
         /// </summary>
         public readonly EventType Type;
-        
+
         /// <summary>
         /// The payload for the event.
         /// </summary>
@@ -66,11 +66,11 @@ namespace Unity.Serialization.Json
             Type = type;
             Payload = payload;
         }
-        
+
         /// <inheritdoc/>
         public override string ToString() => Payload.ToString();
     }
-    
+
     /// <summary>
     /// Object containing the results of a deserialization. Use this to capture any errors or events.
     /// </summary>
@@ -87,37 +87,35 @@ namespace Unity.Serialization.Json
         /// Returns any events with <see cref="EventType.Log"/> that occured during deserialization.
         /// </summary>
         public IEnumerable<DeserializationEvent> Logs => Events.Where(e => e.Type == EventType.Log);
-        
+
         /// <summary>
         /// Returns any events with <see cref="EventType.Error"/> that occured during deserialization.
         /// </summary>
         public IEnumerable<DeserializationEvent> Errors => Events.Where(e => e.Type == EventType.Error);
-        
+
         /// <summary>
         /// Returns any events with <see cref="EventType.Warning"/> that occured during deserialization.
         /// </summary>
         public IEnumerable<DeserializationEvent> Warnings => Events.Where(e => e.Type == EventType.Warning);
-        
+
         /// <summary>
         /// Returns any events with <see cref="EventType.Exception"/> that occured during deserialization.
         /// </summary>
         public IEnumerable<DeserializationEvent> Exceptions => Events.Where(e => e.Type == EventType.Exception);
-        
+
         internal DeserializationResult(List<DeserializationEvent> events) => m_Events = events;
-        
+
         /// <summary>
-        /// Rethrows any errors encountered during deserialization. 
+        /// Rethrows any errors encountered during deserialization.
         /// </summary>
         /// <remarks>
         /// If a single exception was encountered the exception is re-thrown. If multiple exceptions were encountered a <see cref="AggregateException"/> is thrown.
         /// </remarks>
         public void Throw()
         {
-            var exceptions = Events
-                             .Where(e => e.Payload is Exception)
-                             .Select(e => (Exception) e.Payload);
-            
-            if (exceptions.Count() == 1) 
+            var exceptions = Events.Where(e => e.Payload is Exception).Select(e => (Exception)e.Payload);
+
+            if (exceptions.Count() == 1)
                 throw exceptions.First();
 
             throw new AggregateException(exceptions);
@@ -129,14 +127,16 @@ namespace Unity.Serialization.Json
         /// <returns><see langword="true"/> if deserialization succeeded; otherwise, false.</returns>
         public bool DidSucceed() => !Events.Any(e => e.Type == EventType.Exception || e.Type == EventType.Error);
     }
-    
+
     public static partial class JsonSerialization
     {
         [BurstCompile(CompileSynchronously = true)]
         unsafe struct ReadJob : IJob
         {
             public SerializedObjectReader Reader;
-            [NativeDisableUnsafePtrRestriction] public SerializedValueView* View;
+
+            [NativeDisableUnsafePtrRestriction]
+            public SerializedValueView* View;
 
             public void Execute()
             {
@@ -144,13 +144,19 @@ namespace Unity.Serialization.Json
                 *View = view;
             }
         }
-        
-        static SerializedObjectReaderConfiguration GetDefaultConfigurationForString(string json, JsonSerializationParameters parameters = default)
+
+        static SerializedObjectReaderConfiguration GetDefaultConfigurationForString(
+            string json,
+            JsonSerializationParameters parameters = default
+        )
         {
             var configuration = SerializedObjectReaderConfiguration.Default;
-            
+
             configuration.UseReadAsync = false;
-            configuration.ValidationType = parameters.DisableValidation ? JsonValidationType.None : parameters.Simplified ? JsonValidationType.Simple : JsonValidationType.Standard;
+            configuration.ValidationType =
+                parameters.DisableValidation ? JsonValidationType.None
+                : parameters.Simplified ? JsonValidationType.Simple
+                : JsonValidationType.Standard;
             configuration.BlockBufferSize = math.max(json.Length * sizeof(char), 16);
             configuration.TokenBufferSize = math.max(json.Length / 2, 16);
             configuration.OutputBufferSize = math.max(json.Length * sizeof(char), 16);
@@ -158,8 +164,11 @@ namespace Unity.Serialization.Json
 
             return configuration;
         }
-        
-        static SerializedObjectReaderConfiguration GetDefaultConfigurationForFile(FileInfo file, JsonSerializationParameters parameters = default)
+
+        static SerializedObjectReaderConfiguration GetDefaultConfigurationForFile(
+            FileInfo file,
+            JsonSerializationParameters parameters = default
+        )
         {
             var configuration = SerializedObjectReaderConfiguration.Default;
 
@@ -169,27 +178,35 @@ namespace Unity.Serialization.Json
             }
 
             configuration.UseReadAsync = file.Length > 512 << 10;
-            configuration.ValidationType = parameters.DisableValidation ? JsonValidationType.None : parameters.Simplified ? JsonValidationType.Simple : JsonValidationType.Standard;
-            configuration.BlockBufferSize = math.min((int) file.Length, 512 << 10); // 512 kb max
-            configuration.OutputBufferSize = math.min((int) file.Length, 1024 << 10); // 1 mb max
+            configuration.ValidationType =
+                parameters.DisableValidation ? JsonValidationType.None
+                : parameters.Simplified ? JsonValidationType.Simple
+                : JsonValidationType.Standard;
+            configuration.BlockBufferSize = math.min((int)file.Length, 512 << 10); // 512 kb max
+            configuration.OutputBufferSize = math.min((int)file.Length, 1024 << 10); // 1 mb max
             configuration.StripStringEscapeCharacters = parameters.StringEscapeHandling;
 
             return configuration;
         }
-        
-        static SerializedObjectReaderConfiguration GetDefaultConfigurationForStream(Stream stream, JsonSerializationParameters parameters = default)
+
+        static SerializedObjectReaderConfiguration GetDefaultConfigurationForStream(
+            Stream stream,
+            JsonSerializationParameters parameters = default
+        )
         {
             var configuration = SerializedObjectReaderConfiguration.Default;
 
             configuration.UseReadAsync = stream.Length > 512 << 10;
-            configuration.ValidationType = parameters.Simplified ? JsonValidationType.Simple : JsonValidationType.Standard;
-            configuration.BlockBufferSize = math.min((int) stream.Length, 512 << 10); // 512 kb max
-            configuration.OutputBufferSize = math.min((int) stream.Length, 1024 << 10); // 1 mb max
+            configuration.ValidationType = parameters.Simplified
+                ? JsonValidationType.Simple
+                : JsonValidationType.Standard;
+            configuration.BlockBufferSize = math.min((int)stream.Length, 512 << 10); // 512 kb max
+            configuration.OutputBufferSize = math.min((int)stream.Length, 1024 << 10); // 1 mb max
             configuration.StripStringEscapeCharacters = parameters.StringEscapeHandling;
 
             return configuration;
         }
-        
+
         /// <summary>
         /// Deserializes from the specified json string and returns a new instance of <typeparamref name="T"/>.
         /// </summary>
@@ -203,10 +220,10 @@ namespace Unity.Serialization.Json
             {
                 result.Throw();
             }
-            
+
             return container;
         }
-        
+
         /// <summary>
         /// Deserializes from the specified json string and returns a new instance of <typeparamref name="T"/>.
         /// </summary>
@@ -216,7 +233,12 @@ namespace Unity.Serialization.Json
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public static bool TryFromJson<T>(string json, out T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static bool TryFromJson<T>(
+            string json,
+            out T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
             container = default;
             return TryFromJsonOverride(json, ref container, out result, parameters);
@@ -229,13 +251,18 @@ namespace Unity.Serialization.Json
         /// <param name="container">The reference to be overwritten.</param>
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
-        public static void FromJsonOverride<T>(string json, ref T container, JsonSerializationParameters parameters = default)
+        public static void FromJsonOverride<T>(
+            string json,
+            ref T container,
+            JsonSerializationParameters parameters = default
+        )
         {
             if (!TryFromJsonOverride(json, ref container, out var result, parameters))
             {
                 result.Throw();
             }
         }
+
         /// <summary>
         /// Deserializes from the specified json string in to an existing instance of <typeparamref name="T"/>.
         /// </summary>
@@ -245,18 +272,30 @@ namespace Unity.Serialization.Json
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public static bool TryFromJsonOverride<T>(string json, ref T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static bool TryFromJsonOverride<T>(
+            string json,
+            ref T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
             if (json == null)
             {
                 throw new ArgumentNullException(nameof(json));
             }
-            
+
             unsafe
             {
                 fixed (char* ptr = json)
                 {
-                    var reader = new SerializedObjectReader(ptr, json.Length, GetDefaultConfigurationForString(json, parameters)) { RequiresExplicitExceptionHandling = true };
+                    var reader = new SerializedObjectReader(
+                        ptr,
+                        json.Length,
+                        GetDefaultConfigurationForString(json, parameters)
+                    )
+                    {
+                        RequiresExplicitExceptionHandling = true,
+                    };
                     var view = stackalloc SerializedValueView[1];
                     new ReadJob { Reader = reader, View = view }.Run();
 
@@ -269,14 +308,14 @@ namespace Unity.Serialization.Json
                         result = CreateResult(new List<DeserializationEvent> { new(EventType.Exception, e) });
                         return false;
                     }
-                    
+
                     var success = TryFromJson(view[0], ref container, out result, parameters);
                     reader.Dispose();
                     return success;
                 }
             }
         }
-        
+
         /// <summary>
         /// Deserializes from the specified path and returns a new instance of <typeparamref name="T"/>.
         /// </summary>
@@ -290,10 +329,10 @@ namespace Unity.Serialization.Json
             {
                 result.Throw();
             }
-            
+
             return container;
         }
-        
+
         /// <summary>
         /// Deserializes from the specified path and returns a new instance of <typeparamref name="T"/>.
         /// </summary>
@@ -303,7 +342,12 @@ namespace Unity.Serialization.Json
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public static bool TryFromJson<T>(FileInfo file, out T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static bool TryFromJson<T>(
+            FileInfo file,
+            out T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
             container = default;
             return TryFromJsonOverride(file, ref container, out result, parameters);
@@ -316,14 +360,18 @@ namespace Unity.Serialization.Json
         /// <param name="container">The reference to be overwritten.</param>
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
-        public static void FromJsonOverride<T>(FileInfo file, ref T container, JsonSerializationParameters parameters = default)
+        public static void FromJsonOverride<T>(
+            FileInfo file,
+            ref T container,
+            JsonSerializationParameters parameters = default
+        )
         {
             if (!TryFromJsonOverride(file, ref container, out var result, parameters))
             {
                 result.Throw();
             }
         }
-        
+
         /// <summary>
         /// Deserializes from the specified path in to an existing instance of <typeparamref name="T"/>.
         /// </summary>
@@ -333,13 +381,23 @@ namespace Unity.Serialization.Json
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <param name="parameters">The reader parameters to use.</param>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public unsafe static bool TryFromJsonOverride<T>(FileInfo file, ref T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static unsafe bool TryFromJsonOverride<T>(
+            FileInfo file,
+            ref T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
-            using (var reader = new SerializedObjectReader(file.FullName, GetDefaultConfigurationForFile(file, parameters)) { RequiresExplicitExceptionHandling = true })
+            using (
+                var reader = new SerializedObjectReader(file.FullName, GetDefaultConfigurationForFile(file, parameters))
+                {
+                    RequiresExplicitExceptionHandling = true,
+                }
+            )
             {
                 var view = stackalloc SerializedValueView[1];
                 new ReadJob { Reader = reader, View = view }.Run();
-                
+
                 try
                 {
                     reader.CheckAndThrowInvalidJsonException();
@@ -349,7 +407,7 @@ namespace Unity.Serialization.Json
                     result = CreateResult(new List<DeserializationEvent> { new(EventType.Exception, e) });
                     return false;
                 }
-                
+
                 return TryFromJson(view[0], ref container, out result, parameters);
             }
         }
@@ -367,10 +425,10 @@ namespace Unity.Serialization.Json
             {
                 result.Throw();
             }
-            
+
             return container;
         }
-        
+
         /// <summary>
         /// Deserializes from the specified stream and returns a new instance of <typeparamref name="T"/>.
         /// </summary>
@@ -380,12 +438,17 @@ namespace Unity.Serialization.Json
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public static bool TryFromJson<T>(Stream stream, out T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static bool TryFromJson<T>(
+            Stream stream,
+            out T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
             container = default;
             return TryFromJsonOverride(stream, ref container, out result);
         }
-        
+
         /// <summary>
         /// Deserializes from the specified stream in to an existing instance of <typeparamref name="T"/>.
         /// </summary>
@@ -393,7 +456,11 @@ namespace Unity.Serialization.Json
         /// <param name="container">The reference to be overwritten.</param>
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
-        public static void FromJsonOverride<T>(Stream stream, ref T container, JsonSerializationParameters parameters = default)
+        public static void FromJsonOverride<T>(
+            Stream stream,
+            ref T container,
+            JsonSerializationParameters parameters = default
+        )
         {
             if (!TryFromJsonOverride(stream, ref container, out var result, parameters))
             {
@@ -410,13 +477,23 @@ namespace Unity.Serialization.Json
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public static unsafe bool TryFromJsonOverride<T>(Stream stream, ref T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static unsafe bool TryFromJsonOverride<T>(
+            Stream stream,
+            ref T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
-            using (var reader = new SerializedObjectReader(stream, GetDefaultConfigurationForStream(stream, parameters)) { RequiresExplicitExceptionHandling = true })
+            using (
+                var reader = new SerializedObjectReader(stream, GetDefaultConfigurationForStream(stream, parameters))
+                {
+                    RequiresExplicitExceptionHandling = true,
+                }
+            )
             {
                 var view = stackalloc SerializedValueView[1];
                 new ReadJob { Reader = reader, View = view }.Run();
-                
+
                 try
                 {
                     reader.CheckAndThrowInvalidJsonException();
@@ -426,7 +503,7 @@ namespace Unity.Serialization.Json
                     result = CreateResult(new List<DeserializationEvent> { new(EventType.Exception, e) });
                     return false;
                 }
-                
+
                 return TryFromJson(view[0], ref container, out result, parameters);
             }
         }
@@ -456,14 +533,18 @@ namespace Unity.Serialization.Json
         /// <param name="container">The reference to be overwritten.</param>
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
-        public static void FromJsonOverride<T>(SerializedValueView view, ref T container, JsonSerializationParameters parameters = default)
+        public static void FromJsonOverride<T>(
+            SerializedValueView view,
+            ref T container,
+            JsonSerializationParameters parameters = default
+        )
         {
             if (!TryFromJsonOverride(view, ref container, out var result, parameters))
             {
                 result.Throw();
             }
         }
-        
+
         /// <summary>
         /// Deserializes from the specified <see cref="SerializedValueView"/> and returns a new instance of <typeparamref name="T"/>.
         /// </summary>
@@ -473,17 +554,23 @@ namespace Unity.Serialization.Json
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public static bool TryFromJson<T>(SerializedValueView view, ref T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static bool TryFromJson<T>(
+            SerializedValueView view,
+            ref T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
             var serializedReferences = default(SerializedReferences);
-            var state = parameters.State ?? (parameters.RequiresThreadSafety ? new JsonSerializationState() : GetSharedState());
-            
+            var state =
+                parameters.State ?? (parameters.RequiresThreadSafety ? new JsonSerializationState() : GetSharedState());
+
             if (!parameters.DisableSerializedReferences)
                 serializedReferences = state.GetSerializedReferences();
-            
+
             var visitor = state.GetJsonPropertyReader();
             var events = state.GetDeserializationEvents();
-            
+
             visitor.SetView(view.AsUnsafe());
             visitor.SetSerializedType(parameters.SerializedType);
             visitor.SetDisableRootAdapters(parameters.DisableRootAdapters);
@@ -494,7 +581,7 @@ namespace Unity.Serialization.Json
             visitor.SetUserData(parameters.UserData);
             visitor.SetEvents(events);
             visitor.SetSerializedReferences(serializedReferences);
-            
+
             var wrapper = new PropertyWrapper<T>(container);
             try
             {
@@ -506,12 +593,12 @@ namespace Unity.Serialization.Json
                 events.Add(new DeserializationEvent(EventType.Exception, e));
             }
             container = wrapper.Value;
-            
+
             result = CreateResult(events);
-            
+
             if (null == parameters.State && null != serializedReferences)
                 serializedReferences.Clear();
-            
+
             return result.DidSucceed();
         }
 
@@ -524,12 +611,17 @@ namespace Unity.Serialization.Json
         /// <param name="parameters">The reader parameters to use.</param>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <returns>True if the deserialization succeeded; otherwise, false.</returns>
-        public static bool TryFromJsonOverride<T>(SerializedValueView view, ref T container, out DeserializationResult result, JsonSerializationParameters parameters = default)
+        public static bool TryFromJsonOverride<T>(
+            SerializedValueView view,
+            ref T container,
+            out DeserializationResult result,
+            JsonSerializationParameters parameters = default
+        )
         {
             return TryFromJson(view, ref container, out result, parameters);
         }
 
-        static DeserializationResult CreateResult(List<DeserializationEvent> events)
-            => events.Count > 0 ? new DeserializationResult(events.ToList()) : default;
+        static DeserializationResult CreateResult(List<DeserializationEvent> events) =>
+            events.Count > 0 ? new DeserializationResult(events.ToList()) : default;
     }
 }

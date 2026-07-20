@@ -47,9 +47,11 @@ namespace Unity.Netcode
 #if UNITY_6000_6_OR_NEWER
     [Scripting.LifecycleManagement.AutoStaticsCleanup]
 #endif
-    internal static partial class MessageDeliveryType<T> where T : INetworkMessage
+    internal static partial class MessageDeliveryType<T>
+        where T : INetworkMessage
     {
         internal static NetworkDelivery DefaultDelivery { get; private set; }
+
         internal static void Initialize()
         {
             DefaultDelivery = MessageDelivery.GetDelivery(typeof(T));

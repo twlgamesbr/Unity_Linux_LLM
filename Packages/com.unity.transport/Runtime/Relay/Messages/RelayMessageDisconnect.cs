@@ -12,7 +12,10 @@ namespace Unity.Networking.Transport.Relay
         public RelayAllocationId FromAllocationId;
         public RelayAllocationId ToAllocationId;
 
-        public static RelayMessageDisconnect Create(RelayAllocationId fromAllocationId, RelayAllocationId toAllocationId)
+        public static RelayMessageDisconnect Create(
+            RelayAllocationId fromAllocationId,
+            RelayAllocationId toAllocationId
+        )
         {
             return new RelayMessageDisconnect
             {
@@ -22,7 +25,11 @@ namespace Unity.Networking.Transport.Relay
             };
         }
 
-        public static void Write(ref PacketProcessor packetProcessor, ref RelayAllocationId fromAllocationId, ref RelayAllocationId toAllocationId)
+        public static void Write(
+            ref PacketProcessor packetProcessor,
+            ref RelayAllocationId fromAllocationId,
+            ref RelayAllocationId toAllocationId
+        )
         {
             RelayMessageHeader.Write(ref packetProcessor, RelayMessageType.Disconnect);
             packetProcessor.AppendToPayload<RelayAllocationId>(fromAllocationId);

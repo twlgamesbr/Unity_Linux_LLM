@@ -9,8 +9,15 @@ namespace UnityEditor.Rendering
     {
         class Styles
         {
-            public static readonly GUIContent additionalPropertiesLabel = EditorGUIUtility.TrTextContent("Advanced Properties", "Tells Unity to show or hide Advanced Properties.");
-            public static readonly GUIContent[] additionalPropertiesNames = { EditorGUIUtility.TrTextContent("All Visible"), EditorGUIUtility.TrTextContent("All Hidden") };
+            public static readonly GUIContent additionalPropertiesLabel = EditorGUIUtility.TrTextContent(
+                "Advanced Properties",
+                "Tells Unity to show or hide Advanced Properties."
+            );
+            public static readonly GUIContent[] additionalPropertiesNames =
+            {
+                EditorGUIUtility.TrTextContent("All Visible"),
+                EditorGUIUtility.TrTextContent("All Hidden"),
+            };
             public static readonly int[] additionalPropertiesValues = { 1, 0 };
         }
 
@@ -20,9 +27,13 @@ namespace UnityEditor.Rendering
         public void PreferenceGUI()
         {
             EditorGUI.indentLevel++;
-            AdvancedProperties.enabled = EditorGUILayout.IntPopup(Styles.additionalPropertiesLabel,
-                AdvancedProperties.enabled ? 1 : 0, Styles.additionalPropertiesNames,
-                Styles.additionalPropertiesValues) == 1;
+            AdvancedProperties.enabled =
+                EditorGUILayout.IntPopup(
+                    Styles.additionalPropertiesLabel,
+                    AdvancedProperties.enabled ? 1 : 0,
+                    Styles.additionalPropertiesNames,
+                    Styles.additionalPropertiesValues
+                ) == 1;
             EditorGUI.indentLevel--;
         }
     }

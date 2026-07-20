@@ -58,7 +58,9 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
                 if (K != (opB == Op.None ? B.NumRows : B.NumCols))
                 {
-                    UnityEngine.Debug.LogError("Mismatched matrix dimensions for A and B in Matrix.ScaleAndAddProduct()");
+                    UnityEngine.Debug.LogError(
+                        "Mismatched matrix dimensions for A and B in Matrix.ScaleAndAddProduct()"
+                    );
                 }
 
                 if (M == 0 || N == 0)
@@ -201,7 +203,9 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         {
             if (Rows == A.Rows || Cols == A.Cols)
             {
-                UnityEngine.Debug.LogError("Can't add a matrix to itself in Matrix.AddScaled(). This would lead to undefined behavior. Use a copy as input matrix.");
+                UnityEngine.Debug.LogError(
+                    "Can't add a matrix to itself in Matrix.AddScaled(). This would lead to undefined behavior. Use a copy as input matrix."
+                );
             }
 
             if (NumRows != A.NumRows || NumCols != A.NumCols)
@@ -245,7 +249,14 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         /// <param name="alpha"></param>
         /// <param name="A"></param>
         /// <remarks>BLAS equivalent: STRMM</remarks>
-        public void MultiplyByTriangular(Side side, TriangularType type, Op op, DiagonalType diag, float alpha, in Matrix A)
+        public void MultiplyByTriangular(
+            Side side,
+            TriangularType type,
+            Op op,
+            DiagonalType diag,
+            float alpha,
+            in Matrix A
+        )
         {
             var rowsA = (side == Side.Left) ? A.NumRows : A.NumCols;
 
@@ -503,7 +514,14 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         /// <param name="alpha"></param>
         /// <param name="A"></param>
         /// <remarks>BLAS equivalent: STRSM</remarks>
-        public void SolveGeneralizedTriangular(Side side, TriangularType type, Op op, DiagonalType diag, float alpha, in Matrix A)
+        public void SolveGeneralizedTriangular(
+            Side side,
+            TriangularType type,
+            Op op,
+            DiagonalType diag,
+            float alpha,
+            in Matrix A
+        )
         {
             if (alpha == 0)
             {

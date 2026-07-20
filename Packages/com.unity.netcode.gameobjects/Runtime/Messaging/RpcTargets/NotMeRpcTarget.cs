@@ -12,7 +12,12 @@ namespace Unity.Netcode
             m_GroupSendTarget = null;
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             if (m_GroupSendTarget == null)
             {
@@ -50,7 +55,10 @@ namespace Unity.Netcode
                     // We only add when there is a "DAHost" by
                     // - excluding the server id when using client-server (i.e. !m_NetworkManager.DistributedAuthorityMode )
                     // - excluding if connected to the CMB backend service (i.e. we don't want to send to service as it will broadcast it back)
-                    if (clientId == NetworkManager.ServerClientId && (!m_NetworkManager.DistributedAuthorityMode || m_NetworkManager.CMBServiceConnection))
+                    if (
+                        clientId == NetworkManager.ServerClientId
+                        && (!m_NetworkManager.DistributedAuthorityMode || m_NetworkManager.CMBServiceConnection)
+                    )
                     {
                         continue;
                     }
@@ -66,7 +74,8 @@ namespace Unity.Netcode
             }
         }
 
-        internal NotMeRpcTarget(NetworkManager manager) : base(manager)
+        internal NotMeRpcTarget(NetworkManager manager)
+            : base(manager)
         {
             m_ServerRpcTarget = new ServerRpcTarget(manager);
         }

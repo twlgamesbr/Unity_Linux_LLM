@@ -32,6 +32,7 @@ namespace UnityEngine.Rendering.LiveGI
 
         // TODO: Use 32-bit float formats because they are required by the neural network denoising backends.
         GraphicsFormat bufferFormat = GraphicsFormat.R32G32B32A32_SFloat;
+
         //GraphicsFormat bufferFormat = GraphicsFormat.R16G16B16A16_SFloat;
 
         // Start is called before the first frame update
@@ -42,10 +43,7 @@ namespace UnityEngine.Rendering.LiveGI
         }
 
         // Update is called once per frame
-        void Update()
-        {
-
-        }
+        void Update() { }
 
         public void UpdateCameraDataPostRender(Camera camera)
         {
@@ -74,10 +72,50 @@ namespace UnityEngine.Rendering.LiveGI
             if (rayTracingOutput == null)
             {
                 RTHandles.ResetReferenceSize(scaledWidth, scaledHeight);
-                rayTracingOutput    = RTHandles.Alloc(Vector2.one, 1, DepthBits.None, bufferFormat, FilterMode.Point, TextureWrapMode.Repeat, TextureDimension.Tex2D, true, name: "Path tracing render target");
-                normals             = RTHandles.Alloc(Vector2.one, 1, DepthBits.None, bufferFormat, FilterMode.Point, TextureWrapMode.Repeat, TextureDimension.Tex2D, true, name: "Path tracing normal AOV");
-                motionVectors       = RTHandles.Alloc(Vector2.one, 1, DepthBits.None, bufferFormat, FilterMode.Point, TextureWrapMode.Repeat, TextureDimension.Tex2D, true, name: "Path tracing motion vectors");
-                debugOutput         = RTHandles.Alloc(Vector2.one, 1, DepthBits.None, bufferFormat, FilterMode.Point, TextureWrapMode.Repeat, TextureDimension.Tex2D, true, name: "Path tracing debug output");
+                rayTracingOutput = RTHandles.Alloc(
+                    Vector2.one,
+                    1,
+                    DepthBits.None,
+                    bufferFormat,
+                    FilterMode.Point,
+                    TextureWrapMode.Repeat,
+                    TextureDimension.Tex2D,
+                    true,
+                    name: "Path tracing render target"
+                );
+                normals = RTHandles.Alloc(
+                    Vector2.one,
+                    1,
+                    DepthBits.None,
+                    bufferFormat,
+                    FilterMode.Point,
+                    TextureWrapMode.Repeat,
+                    TextureDimension.Tex2D,
+                    true,
+                    name: "Path tracing normal AOV"
+                );
+                motionVectors = RTHandles.Alloc(
+                    Vector2.one,
+                    1,
+                    DepthBits.None,
+                    bufferFormat,
+                    FilterMode.Point,
+                    TextureWrapMode.Repeat,
+                    TextureDimension.Tex2D,
+                    true,
+                    name: "Path tracing motion vectors"
+                );
+                debugOutput = RTHandles.Alloc(
+                    Vector2.one,
+                    1,
+                    DepthBits.None,
+                    bufferFormat,
+                    FilterMode.Point,
+                    TextureWrapMode.Repeat,
+                    TextureDimension.Tex2D,
+                    true,
+                    name: "Path tracing debug output"
+                );
 
                 // when we (re)create the output buffer, reset the iteration for the camera
                 frameIndex = 0;
@@ -92,7 +130,6 @@ namespace UnityEngine.Rendering.LiveGI
             }
 
             denoiser.Init(requestedDenoiser, scaledWidth, scaledHeight);
-
         }
 
         public void ReleaseRTHandles()

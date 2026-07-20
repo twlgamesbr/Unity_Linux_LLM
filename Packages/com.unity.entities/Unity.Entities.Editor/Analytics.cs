@@ -20,7 +20,7 @@ namespace Unity.Entities.Editor
             Query = 5,
             Archetypes = 6,
             Journaling = 7,
-            Profiler = 8
+            Profiler = 8,
         }
 
         // NOTE: Don't change names or numbers here because
@@ -35,7 +35,7 @@ namespace Unity.Entities.Editor
             InspectorTabFocus = 3,
             RelationshipGoTo = 4,
             DataModeSwitch = 5,
-            DataModeManualSwitch = 6
+            DataModeManualSwitch = 6,
         }
 
         // NOTE: Don't change existing fields here because
@@ -47,7 +47,7 @@ namespace Unity.Entities.Editor
 #endif
         public struct EventPayload
 #if UNITY_2023_2_OR_NEWER
-        : IAnalytic.IData
+            : IAnalytic.IData
 #endif
         {
             public string window_name;
@@ -79,7 +79,13 @@ namespace Unity.Entities.Editor
 
         static bool EnableEditorAnalytics()
         {
-            AnalyticsResult result = EditorAnalytics.RegisterEventWithLimit(k_EditorEventName, k_MaxEventsPerHour, k_MaxNumberOfElements, k_VendorKey, 2);
+            AnalyticsResult result = EditorAnalytics.RegisterEventWithLimit(
+                k_EditorEventName,
+                k_MaxEventsPerHour,
+                k_MaxNumberOfElements,
+                k_VendorKey,
+                2
+            );
             if (result == AnalyticsResult.Ok)
                 s_EditorEventRegistered = true;
 
@@ -103,7 +109,7 @@ namespace Unity.Entities.Editor
             {
                 window_name = window.ToString(),
                 event_type = eventType.ToString(),
-                context = context
+                context = context,
             };
 
             EditorAnalytics.SendEventWithLimit(k_EditorEventName, data, 2);
@@ -118,7 +124,7 @@ namespace Unity.Entities.Editor
             {
                 window_name = window.ToString(),
                 event_type = eventType.ToString(),
-                context = context
+                context = context,
             };
 
             EditorAnalytics.SendAnalytic(new EntitiesEditorUsageAnalytic(data));
@@ -126,13 +132,18 @@ namespace Unity.Entities.Editor
         }
 
 #if UNITY_2023_2_OR_NEWER
-        [AnalyticInfo(eventName: k_EditorEventName, vendorKey: k_VendorKey, version: 2, maxEventsPerHour: k_MaxEventsPerHour, maxNumberOfElements: k_MaxNumberOfElements)]
+        [AnalyticInfo(
+            eventName: k_EditorEventName,
+            vendorKey: k_VendorKey,
+            version: 2,
+            maxEventsPerHour: k_MaxEventsPerHour,
+            maxNumberOfElements: k_MaxNumberOfElements
+        )]
         internal class EntitiesEditorUsageAnalytic : IAnalytic
         {
             private readonly EventPayload m_Data;
 
-            public EntitiesEditorUsageAnalytic(EventPayload data)
-                => m_Data = data;
+            public EntitiesEditorUsageAnalytic(EventPayload data) => m_Data = data;
 
             public bool TryGatherData(out IAnalytic.IData data, out Exception error)
             {

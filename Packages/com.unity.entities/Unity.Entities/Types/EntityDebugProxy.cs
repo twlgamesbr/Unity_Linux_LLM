@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-
 namespace Unity.Entities
 {
     /// <summary>
@@ -11,6 +10,7 @@ namespace Unity.Entities
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         Entity _Entity;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         World _World;
 
@@ -23,7 +23,7 @@ namespace Unity.Entities
         // Used by Entity DebuggerDisplay
         public static string GetDebugName(int index, int version)
         {
-            Entity entity = new Entity {Index = index, Version = version};
+            Entity entity = new Entity { Index = index, Version = version };
             return new DebuggerDataAccess(GetWorld(entity)).GetDebugNameWithWorld(entity);
         }
 
@@ -106,7 +106,7 @@ namespace Unity.Entities
     /// <summary>
     /// Entity debug proxy when the world is explicitly known
     /// </summary>
-    unsafe internal struct Entity_
+    internal unsafe struct Entity_
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         Entity _Entity;
@@ -149,6 +149,7 @@ namespace Unity.Entities
             _Access = access;
             _IncludeWorldName = includeWorldName;
         }
+
         public override string ToString()
         {
             if (_IncludeWorldName)

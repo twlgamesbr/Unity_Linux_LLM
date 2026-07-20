@@ -30,19 +30,37 @@ namespace Unity.Netcode.Editor
             m_NetworkVariableFields.Clear();
             m_NetworkVariableObjects.Clear();
 
-            m_NetworkVariableLabelGuiContent = new GUIContent("NetworkVariable", "This variable is a NetworkVariable. It can not be serialized and can only be changed during runtime.");
-            m_NetworkListLabelGuiContent = new GUIContent("NetworkList", "This variable is a NetworkList. It is rendered, but you can't serialize or change it.");
+            m_NetworkVariableLabelGuiContent = new GUIContent(
+                "NetworkVariable",
+                "This variable is a NetworkVariable. It can not be serialized and can only be changed during runtime."
+            );
+            m_NetworkListLabelGuiContent = new GUIContent(
+                "NetworkList",
+                "This variable is a NetworkList. It is rendered, but you can't serialize or change it."
+            );
 
-            var fields = script.GetClass().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            var fields = script
+                .GetClass()
+                .GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             for (int i = 0; i < fields.Length; i++)
             {
                 var ft = fields[i].FieldType;
-                if (ft.IsGenericType && ft.GetGenericTypeDefinition() == typeof(NetworkVariable<>) && !fields[i].IsDefined(typeof(HideInInspector), true) && !fields[i].IsDefined(typeof(NonSerializedAttribute), true))
+                if (
+                    ft.IsGenericType
+                    && ft.GetGenericTypeDefinition() == typeof(NetworkVariable<>)
+                    && !fields[i].IsDefined(typeof(HideInInspector), true)
+                    && !fields[i].IsDefined(typeof(NonSerializedAttribute), true)
+                )
                 {
                     m_NetworkVariableNames.Add(ObjectNames.NicifyVariableName(fields[i].Name));
                     m_NetworkVariableFields.Add(ObjectNames.NicifyVariableName(fields[i].Name), fields[i]);
                 }
-                if (ft.IsGenericType && ft.GetGenericTypeDefinition() == typeof(NetworkList<>) && !fields[i].IsDefined(typeof(HideInInspector), true) && !fields[i].IsDefined(typeof(NonSerializedAttribute), true))
+                if (
+                    ft.IsGenericType
+                    && ft.GetGenericTypeDefinition() == typeof(NetworkList<>)
+                    && !fields[i].IsDefined(typeof(HideInInspector), true)
+                    && !fields[i].IsDefined(typeof(NonSerializedAttribute), true)
+                )
                 {
                     m_NetworkVariableNames.Add(ObjectNames.NicifyVariableName(fields[i].Name));
                     m_NetworkVariableFields.Add(ObjectNames.NicifyVariableName(fields[i].Name), fields[i]);
@@ -91,11 +109,23 @@ namespace Unity.Netcode.Editor
                 MethodInfo method;
                 if (isEquatable)
                 {
-                    method = typeof(NetworkBehaviourEditor).GetMethod(nameof(RenderNetworkContainerValueTypeIEquatable), BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.NonPublic);
+                    method = typeof(NetworkBehaviourEditor).GetMethod(
+                        nameof(RenderNetworkContainerValueTypeIEquatable),
+                        BindingFlags.Public
+                            | BindingFlags.Instance
+                            | BindingFlags.FlattenHierarchy
+                            | BindingFlags.NonPublic
+                    );
                 }
                 else
                 {
-                    method = typeof(NetworkBehaviourEditor).GetMethod(nameof(RenderNetworkContainerValueType), BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.NonPublic);
+                    method = typeof(NetworkBehaviourEditor).GetMethod(
+                        nameof(RenderNetworkContainerValueType),
+                        BindingFlags.Public
+                            | BindingFlags.Instance
+                            | BindingFlags.FlattenHierarchy
+                            | BindingFlags.NonPublic
+                    );
                 }
 
                 var genericMethod = method.MakeGenericMethod(genericType);
@@ -105,16 +135,22 @@ namespace Unity.Netcode.Editor
             {
                 EditorGUILayout.LabelField("Type not renderable");
 
-                GUILayout.Label(m_NetworkVariableLabelGuiContent, EditorStyles.miniLabel, GUILayout.Width(EditorStyles.miniLabel.CalcSize(m_NetworkVariableLabelGuiContent).x));
+                GUILayout.Label(
+                    m_NetworkVariableLabelGuiContent,
+                    EditorStyles.miniLabel,
+                    GUILayout.Width(EditorStyles.miniLabel.CalcSize(m_NetworkVariableLabelGuiContent).x)
+                );
                 EditorGUILayout.EndHorizontal();
             }
         }
 
-        private void RenderNetworkContainerValueType<T>(int index) where T : unmanaged
+        private void RenderNetworkContainerValueType<T>(int index)
+            where T : unmanaged
         {
             try
             {
-                var networkVariable = (NetworkVariable<T>)m_NetworkVariableFields[m_NetworkVariableNames[index]].GetValue(target);
+                var networkVariable =
+                    (NetworkVariable<T>)m_NetworkVariableFields[m_NetworkVariableNames[index]].GetValue(target);
                 RenderNetworkVariableValueType(index, networkVariable);
             }
             catch (Exception e)
@@ -126,18 +162,21 @@ namespace Unity.Netcode.Editor
             EditorGUILayout.EndHorizontal();
         }
 
-        private void RenderNetworkContainerValueTypeIEquatable<T>(int index) where T : unmanaged, IEquatable<T>
+        private void RenderNetworkContainerValueTypeIEquatable<T>(int index)
+            where T : unmanaged, IEquatable<T>
         {
             try
             {
-                var networkVariable = (NetworkVariable<T>)m_NetworkVariableFields[m_NetworkVariableNames[index]].GetValue(target);
+                var networkVariable =
+                    (NetworkVariable<T>)m_NetworkVariableFields[m_NetworkVariableNames[index]].GetValue(target);
                 RenderNetworkVariableValueType(index, networkVariable);
             }
             catch (Exception)
             {
                 try
                 {
-                    var networkList = (NetworkList<T>)m_NetworkVariableFields[m_NetworkVariableNames[index]].GetValue(target);
+                    var networkList =
+                        (NetworkList<T>)m_NetworkVariableFields[m_NetworkVariableNames[index]].GetValue(target);
                     RenderNetworkListValueType(index, networkList);
                 }
                 catch (Exception e)
@@ -150,7 +189,8 @@ namespace Unity.Netcode.Editor
             EditorGUILayout.EndHorizontal();
         }
 
-        private void RenderNetworkVariableValueType<T>(int index, NetworkVariable<T> networkVariable) where T : unmanaged
+        private void RenderNetworkVariableValueType<T>(int index, NetworkVariable<T> networkVariable)
+            where T : unmanaged
         {
             var type = typeof(T);
             object val = networkVariable.Value;
@@ -221,7 +261,11 @@ namespace Unity.Netcode.Editor
                 EditorGUILayout.LabelField(variableName, EditorStyles.wordWrappedLabel);
                 EditorGUILayout.SelectableLabel(val.ToString(), EditorStyles.wordWrappedLabel);
             }
-            GUILayout.Label(m_NetworkVariableLabelGuiContent, EditorStyles.miniLabel, GUILayout.Width(EditorStyles.miniLabel.CalcSize(m_NetworkVariableLabelGuiContent).x));
+            GUILayout.Label(
+                m_NetworkVariableLabelGuiContent,
+                EditorStyles.miniLabel,
+                GUILayout.Width(EditorStyles.miniLabel.CalcSize(m_NetworkVariableLabelGuiContent).x)
+            );
         }
 
         private void RenderNetworkListValueType<T>(int index, NetworkList<T> networkList)
@@ -241,7 +285,11 @@ namespace Unity.Netcode.Editor
                 addComma = true;
             }
             EditorGUILayout.LabelField(variableName, value);
-            GUILayout.Label(m_NetworkListLabelGuiContent, EditorStyles.miniLabel, GUILayout.Width(EditorStyles.miniLabel.CalcSize(m_NetworkListLabelGuiContent).x));
+            GUILayout.Label(
+                m_NetworkListLabelGuiContent,
+                EditorStyles.miniLabel,
+                GUILayout.Width(EditorStyles.miniLabel.CalcSize(m_NetworkListLabelGuiContent).x)
+            );
         }
 
         /// <inheritdoc/>
@@ -341,7 +389,14 @@ namespace Unity.Netcode.Editor
         {
             // If there are no NetworkBehaviours or gameObjects then exit early
             // If we are in play mode and a user is inspecting something then exit early (we don't add NetworkObjects to something when in play mode)
-            if (EditorApplication.isPlaying || gameObject == null || (gameObject.GetComponent<NetworkBehaviour>() == null && gameObject.GetComponentInChildren<NetworkBehaviour>() == null))
+            if (
+                EditorApplication.isPlaying
+                || gameObject == null
+                || (
+                    gameObject.GetComponent<NetworkBehaviour>() == null
+                    && gameObject.GetComponentInChildren<NetworkBehaviour>() == null
+                )
+            )
             {
                 return;
             }
@@ -366,8 +421,15 @@ namespace Unity.Netcode.Editor
                 var networkBehavioursChildren = networkManager.gameObject.GetComponentsInChildren<NetworkBehaviour>();
                 if (networkBehaviours.Length > 0 || networkBehavioursChildren.Length > 0)
                 {
-                    if (EditorUtility.DisplayDialog("NetworkBehaviour or NetworkManager Cannot Be Added", $"{nameof(NetworkManager)}s cannot have {nameof(NetworkBehaviour)} components added to the root parent or any of its children." +
-                        $" Would you like to remove the NetworkManager or NetworkBehaviour?", "NetworkManager", "NetworkBehaviour"))
+                    if (
+                        EditorUtility.DisplayDialog(
+                            "NetworkBehaviour or NetworkManager Cannot Be Added",
+                            $"{nameof(NetworkManager)}s cannot have {nameof(NetworkBehaviour)} components added to the root parent or any of its children."
+                                + $" Would you like to remove the NetworkManager or NetworkBehaviour?",
+                            "NetworkManager",
+                            "NetworkBehaviour"
+                        )
+                    )
                     {
                         DestroyImmediate(networkManager);
                     }
@@ -401,14 +463,25 @@ namespace Unity.Netcode.Editor
                     // again.
                     if (networkObjectRemoved && NetcodeForGameObjectsEditorSettings.GetAutoAddNetworkObjectSetting())
                     {
-                        Debug.LogWarning($"{gameObject.name} still has {nameof(NetworkBehaviour)}s and Auto-Add NetworkObjects is enabled. A NetworkObject is being added back to {gameObject.name}.");
-                        Debug.Log($"To reset Auto-Add NetworkObjects: Select the Netcode->General->Reset Auto-Add NetworkObject menu item.");
+                        Debug.LogWarning(
+                            $"{gameObject.name} still has {nameof(NetworkBehaviour)}s and Auto-Add NetworkObjects is enabled. A NetworkObject is being added back to {gameObject.name}."
+                        );
+                        Debug.Log(
+                            $"To reset Auto-Add NetworkObjects: Select the Netcode->General->Reset Auto-Add NetworkObject menu item."
+                        );
                     }
 
                     // Notify and provide the option to add it one time, always add a NetworkObject, or do nothing and let the user manually add it
-                    if (EditorUtility.DisplayDialog($"{nameof(NetworkBehaviour)}s require a {nameof(NetworkObject)}",
-                    $"{gameObject.name} does not have a {nameof(NetworkObject)} component.  Would you like to add one now?", "Yes", "No (manually add it)",
-                    DialogOptOutDecisionType.ForThisMachine, NetcodeForGameObjectsEditorSettings.AutoAddNetworkObjectIfNoneExists))
+                    if (
+                        EditorUtility.DisplayDialog(
+                            $"{nameof(NetworkBehaviour)}s require a {nameof(NetworkObject)}",
+                            $"{gameObject.name} does not have a {nameof(NetworkObject)} component.  Would you like to add one now?",
+                            "Yes",
+                            "No (manually add it)",
+                            DialogOptOutDecisionType.ForThisMachine,
+                            NetcodeForGameObjectsEditorSettings.AutoAddNetworkObjectIfNoneExists
+                        )
+                    )
                     {
                         gameObject.AddComponent<NetworkObject>();
                         var activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();

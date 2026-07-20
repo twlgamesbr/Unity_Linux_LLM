@@ -13,10 +13,12 @@ namespace UnityEngine.TestTools
         /// Returns true if the instruction expects a domain reload to occur.
         /// </summary>
         public bool ExpectDomainReload { get; }
+
         /// <summary>
         /// Returns true if the instruction expects the Unity Editor to be in **Play Mode**.
         /// </summary>
         public bool ExpectedPlaymodeState { get; private set; }
+
         /// <summary>
         /// When creating an Editor test that uses the UnityTest attribute, use this to trigger the Editor to enter Play Mode.
         /// Throws an exception if the Editor is already in Play Mode or if there is a script compilation error.

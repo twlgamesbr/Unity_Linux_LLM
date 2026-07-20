@@ -8,7 +8,10 @@ namespace Unity.Entities
         [UpdateInGroup(typeof(PresentationSystemGroup), OrderLast = true), BurstCompile]
         partial struct FrameCountSystem : ISystem
         {
-            sealed class SharedFrameCount { internal static readonly SharedStatic<int> Ref = SharedStatic<int>.GetOrCreate<SharedFrameCount>(); }
+            sealed class SharedFrameCount
+            {
+                internal static readonly SharedStatic<int> Ref = SharedStatic<int>.GetOrCreate<SharedFrameCount>();
+            }
 
             public static int FrameCount
             {
@@ -17,8 +20,11 @@ namespace Unity.Entities
             }
 
             public void OnCreate(ref SystemState state) => FrameCount = 0;
+
             public void OnDestroy(ref SystemState state) => FrameCount = 0;
-            [BurstCompile] public void OnUpdate(ref SystemState state) => FrameCount++;
+
+            [BurstCompile]
+            public void OnUpdate(ref SystemState state) => FrameCount++;
         }
     }
 }

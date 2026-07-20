@@ -8,7 +8,5 @@ namespace Unity.Entities
     /// necessary every frame.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class AlwaysSynchronizeSystemAttribute : Attribute
-    {
-    }
+    public class AlwaysSynchronizeSystemAttribute : Attribute { }
 }

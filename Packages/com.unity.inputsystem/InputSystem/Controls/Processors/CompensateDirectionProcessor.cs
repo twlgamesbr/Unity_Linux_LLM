@@ -14,9 +14,15 @@ namespace UnityEngine.InputSystem.Processors
             var rotation = Quaternion.identity;
             switch (InputRuntime.s_Instance.screenOrientation)
             {
-                case ScreenOrientation.PortraitUpsideDown: rotation = Quaternion.Euler(0, 0, 180); break;
-                case ScreenOrientation.LandscapeLeft: rotation = Quaternion.Euler(0, 0, 90); break;
-                case ScreenOrientation.LandscapeRight: rotation = Quaternion.Euler(0, 0, 270); break;
+                case ScreenOrientation.PortraitUpsideDown:
+                    rotation = Quaternion.Euler(0, 0, 180);
+                    break;
+                case ScreenOrientation.LandscapeLeft:
+                    rotation = Quaternion.Euler(0, 0, 90);
+                    break;
+                case ScreenOrientation.LandscapeRight:
+                    rotation = Quaternion.Euler(0, 0, 270);
+                    break;
             }
             return rotation * value;
         }

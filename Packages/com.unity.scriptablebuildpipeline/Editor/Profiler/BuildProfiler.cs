@@ -49,7 +49,12 @@ namespace UnityEditor.Build.Profiler
             for (int i = 0; i < m_Trackers.Length; i++)
             {
                 Debug.Assert(!m_Trackers[i].IsRunning);
-                msg += string.Format("Counter[{0}]\t{1}\t{2}\n", m_Names[i], m_CallCount[i], m_Trackers[i].ElapsedMilliseconds);
+                msg += string.Format(
+                    "Counter[{0}]\t{1}\t{2}\n",
+                    m_Names[i],
+                    m_CallCount[i],
+                    m_Trackers[i].ElapsedMilliseconds
+                );
             }
             UnityEngine.Debug.Log(msg);
         }

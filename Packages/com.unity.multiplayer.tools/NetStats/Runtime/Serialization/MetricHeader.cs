@@ -13,7 +13,8 @@ namespace Unity.Multiplayer.Tools.NetStats
         public MetricHeader(
             FixedString128Bytes eventFactoryTypeName,
             MetricContainerType metricContainerType,
-            MetricId metricId)
+            MetricId metricId
+        )
         {
             EventFactoryTypeName = eventFactoryTypeName;
             MetricContainerType = metricContainerType;

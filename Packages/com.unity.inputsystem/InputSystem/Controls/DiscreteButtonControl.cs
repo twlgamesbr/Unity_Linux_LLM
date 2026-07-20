@@ -84,14 +84,19 @@ namespace UnityEngine.InputSystem.Controls
 
             if (!stateBlock.format.IsIntegerFormat())
                 throw new NotSupportedException(
-                    $"Non-integer format '{stateBlock.format}' is not supported for DiscreteButtonControl '{this}'");
+                    $"Non-integer format '{stateBlock.format}' is not supported for DiscreteButtonControl '{this}'"
+                );
         }
 
         public override unsafe float ReadUnprocessedValueFromState(void* statePtr)
         {
             var valuePtr = (byte*)statePtr + (int)m_StateBlock.byteOffset;
             // Note that all signed data in state buffers is in excess-K format.
-            var intValue = MemoryHelpers.ReadTwosComplementMultipleBitsAsInt(valuePtr, m_StateBlock.bitOffset, m_StateBlock.sizeInBits);
+            var intValue = MemoryHelpers.ReadTwosComplementMultipleBitsAsInt(
+                valuePtr,
+                m_StateBlock.bitOffset,
+                m_StateBlock.sizeInBits
+            );
 
             var value = 0.0f;
             if (minValue > maxValue)
@@ -101,8 +106,9 @@ namespace UnityEngine.InputSystem.Controls
                 if (wrapAtValue == nullValue)
                     wrapAtValue = minValue;
 
-                if ((intValue >= minValue && intValue <= wrapAtValue)
-                    || (intValue != nullValue && intValue <= maxValue))
+                if (
+                    (intValue >= minValue && intValue <= wrapAtValue) || (intValue != nullValue && intValue <= maxValue)
+                )
                     value = 1.0f;
             }
             else
@@ -119,13 +125,20 @@ namespace UnityEngine.InputSystem.Controls
             {
                 var valuePtr = (byte*)statePtr + (int)m_StateBlock.byteOffset;
                 var valueToWrite = value >= pressPointOrDefault ? maxValue : nullValue;
-                MemoryHelpers.WriteIntAsTwosComplementMultipleBits(valuePtr, m_StateBlock.bitOffset, m_StateBlock.sizeInBits, valueToWrite);
+                MemoryHelpers.WriteIntAsTwosComplementMultipleBits(
+                    valuePtr,
+                    m_StateBlock.bitOffset,
+                    m_StateBlock.sizeInBits,
+                    valueToWrite
+                );
                 return;
             }
 
             // The way these controls are usually used, the state is shared between multiple DiscreteButtons. So writing one
             // may have unpredictable effects on the value of other buttons.
-            throw new NotSupportedException("Writing value states for DiscreteButtonControl is not supported as a single value may correspond to multiple states");
+            throw new NotSupportedException(
+                "Writing value states for DiscreteButtonControl is not supported as a single value may correspond to multiple states"
+            );
         }
 
         /// <summary>

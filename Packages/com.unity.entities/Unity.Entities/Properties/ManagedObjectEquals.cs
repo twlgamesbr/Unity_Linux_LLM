@@ -10,12 +10,12 @@ namespace Unity.Entities
     /// <remarks>
     /// An instance of this class can be re-used for multiple clone operations.
     /// </remarks>
-    class ManagedObjectEqual :
-        IPropertyBagVisitor,
-        IListPropertyBagVisitor,
-        ISetPropertyBagVisitor,
-        IDictionaryPropertyBagVisitor,
-        IPropertyVisitor
+    class ManagedObjectEqual
+        : IPropertyBagVisitor,
+            IListPropertyBagVisitor,
+            ISetPropertyBagVisitor,
+            IDictionaryPropertyBagVisitor,
+            IPropertyVisitor
     {
         /// <summary>
         /// Map used to track of references within the same object.
@@ -104,7 +104,10 @@ namespace Unity.Entities
         /// <param name="srcContainer">The source list being visited.</param>
         /// <typeparam name="TList">The list type.</typeparam>
         /// <typeparam name="TElement">The element type.</typeparam>
-        void IListPropertyBagVisitor.Visit<TList, TElement>(IListPropertyBag<TList, TElement> properties, ref TList srcContainer)
+        void IListPropertyBagVisitor.Visit<TList, TElement>(
+            IListPropertyBag<TList, TElement> properties,
+            ref TList srcContainer
+        )
         {
             var dstContainer = (TList)m_Stack;
 
@@ -130,7 +133,10 @@ namespace Unity.Entities
         /// <param name="srcContainer">The source set being visited.</param>
         /// <typeparam name="TSet">The set type.</typeparam>
         /// <typeparam name="TElement">The element type.</typeparam>
-        void ISetPropertyBagVisitor.Visit<TSet, TElement>(ISetPropertyBag<TSet, TElement> properties, ref TSet srcContainer)
+        void ISetPropertyBagVisitor.Visit<TSet, TElement>(
+            ISetPropertyBag<TSet, TElement> properties,
+            ref TSet srcContainer
+        )
         {
             var dstContainer = (TSet)m_Stack;
 
@@ -143,7 +149,7 @@ namespace Unity.Entities
             using (var srcContainerEnumerator = srcContainer.GetEnumerator())
             using (var dstContainerEnumerator = dstContainer.GetEnumerator())
             {
-                for (;;)
+                for (; ; )
                 {
                     var srcNext = srcContainerEnumerator.MoveNext();
                     var dstNext = dstContainerEnumerator.MoveNext();
@@ -173,7 +179,10 @@ namespace Unity.Entities
         /// <typeparam name="TDictionary">The dictionary type.</typeparam>
         /// <typeparam name="TKey">The key type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
-        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(IDictionaryPropertyBag<TDictionary, TKey, TValue> properties, ref TDictionary srcContainer)
+        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(
+            IDictionaryPropertyBag<TDictionary, TKey, TValue> properties,
+            ref TDictionary srcContainer
+        )
         {
             var dstContainer = (TDictionary)m_Stack;
 
@@ -186,7 +195,7 @@ namespace Unity.Entities
             using (var srcContainerEnumerator = srcContainer.GetEnumerator())
             using (var dstContainerEnumerator = dstContainer.GetEnumerator())
             {
-                for (;;)
+                for (; ; )
                 {
                     var srcNext = srcContainerEnumerator.MoveNext();
                     var dstNext = dstContainerEnumerator.MoveNext();
@@ -200,8 +209,14 @@ namespace Unity.Entities
                     if (!srcNext)
                         break;
 
-                    var keysAreEqual = CompareEquality(srcContainerEnumerator.Current.Key, dstContainerEnumerator.Current.Key);
-                    var valuesAreEqual = CompareEquality(srcContainerEnumerator.Current.Key, dstContainerEnumerator.Current.Key);
+                    var keysAreEqual = CompareEquality(
+                        srcContainerEnumerator.Current.Key,
+                        dstContainerEnumerator.Current.Key
+                    );
+                    var valuesAreEqual = CompareEquality(
+                        srcContainerEnumerator.Current.Key,
+                        dstContainerEnumerator.Current.Key
+                    );
 
                     if (keysAreEqual && valuesAreEqual)
                         continue;
@@ -218,7 +233,10 @@ namespace Unity.Entities
         /// <param name="srcContainer">The source container.</param>
         /// <typeparam name="TContainer">The container type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
-        void IPropertyVisitor.Visit<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer srcContainer)
+        void IPropertyVisitor.Visit<TContainer, TValue>(
+            Property<TContainer, TValue> property,
+            ref TContainer srcContainer
+        )
         {
             // Unbox the current destination container being written to.
             var dstContainer = (TContainer)m_Stack;

@@ -36,7 +36,12 @@ namespace UnityEngine.Rendering.Universal
 
             // SMAA
             // Only two components are needed for edge render texture, but on some vendors four components may be faster.
-            if (SystemInfo.IsFormatSupported(Experimental.Rendering.GraphicsFormat.R8G8_UNorm, Experimental.Rendering.GraphicsFormatUsage.Render) && SystemInfo.graphicsDeviceVendor.ToLowerInvariant().Contains("arm"))
+            if (
+                SystemInfo.IsFormatSupported(
+                    Experimental.Rendering.GraphicsFormat.R8G8_UNorm,
+                    Experimental.Rendering.GraphicsFormatUsage.Render
+                ) && SystemInfo.graphicsDeviceVendor.ToLowerInvariant().Contains("arm")
+            )
                 m_SMAAEdgeFormat = Experimental.Rendering.GraphicsFormat.R8G8_UNorm;
             else
                 m_SMAAEdgeFormat = Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm;
@@ -80,29 +85,64 @@ namespace UnityEngine.Rendering.Universal
 
             var sourceTexture = resourceData.cameraColor;
             var destDesc = renderGraph.GetTextureDesc(sourceTexture);
-            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, destDesc, k_TargetName, true, FilterMode.Bilinear);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                destDesc,
+                k_TargetName,
+                true,
+                FilterMode.Bilinear
+            );
 
             destDesc.clearColor = Color.black;
             destDesc.clearColor.a = 0.0f;
 
             var edgeTextureDesc = destDesc;
             edgeTextureDesc.format = m_SMAAEdgeFormat;
-            var edgeTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, edgeTextureDesc, "_EdgeStencilTexture", true, FilterMode.Bilinear);
+            var edgeTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                edgeTextureDesc,
+                "_EdgeStencilTexture",
+                true,
+                FilterMode.Bilinear
+            );
 
             var edgeTextureStencilDesc = destDesc;
             edgeTextureStencilDesc.format = Experimental.Rendering.GraphicsFormatUtility.GetDepthStencilFormat(24);
-            var edgeTextureStencil = PostProcessUtils.CreateCompatibleTexture(renderGraph, edgeTextureStencilDesc, "_EdgeTexture", true, FilterMode.Bilinear);
+            var edgeTextureStencil = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                edgeTextureStencilDesc,
+                "_EdgeTexture",
+                true,
+                FilterMode.Bilinear
+            );
 
             var blendTextureDesc = destDesc;
             blendTextureDesc.format = Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm;
-            var blendTexture = PostProcessUtils.CreateCompatibleTexture(renderGraph, blendTextureDesc, "_BlendTexture", true, FilterMode.Point);
+            var blendTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                blendTextureDesc,
+                "_BlendTexture",
+                true,
+                FilterMode.Point
+            );
 
-            using (var builder = renderGraph.AddRasterRenderPass<SMAASetupPassData>(k_passNameEdgeDetection, out var passData, m_ProfilingSamplerEdgeDetection))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<SMAASetupPassData>(
+                    k_passNameEdgeDetection,
+                    out var passData,
+                    m_ProfilingSamplerEdgeDetection
+                )
+            )
             {
                 // Material setup
                 const int kStencilBit = 64;
                 // TODO RENDERGRAPH: handle dynamic scaling
-                passData.metrics = new Vector4(1f / destDesc.width, 1f / destDesc.height, destDesc.width, destDesc.height);
+                passData.metrics = new Vector4(
+                    1f / destDesc.width,
+                    1f / destDesc.height,
+                    destDesc.width,
+                    destDesc.height
+                );
 
                 // TODO: These are constant for every frame
                 passData.areaTexture = m_AreaTexture;
@@ -117,24 +157,43 @@ namespace UnityEngine.Rendering.Universal
                 builder.SetRenderAttachmentDepth(edgeTextureStencil, AccessFlags.Write);
                 passData.sourceTexture = sourceTexture;
                 builder.UseTexture(sourceTexture, AccessFlags.Read);
-                builder.UseTexture(resourceData.cameraDepth ,AccessFlags.Read);
+                builder.UseTexture(resourceData.cameraDepth, AccessFlags.Read);
 
-                builder.SetRenderFunc(static (SMAASetupPassData data, RasterGraphContext context) =>
-                {
-                    var SMAAMaterial = data.material;
-                    var cmd = context.cmd;
-                    RTHandle sourceTextureHdl = data.sourceTexture;
+                builder.SetRenderFunc(
+                    static (SMAASetupPassData data, RasterGraphContext context) =>
+                    {
+                        var SMAAMaterial = data.material;
+                        var cmd = context.cmd;
+                        RTHandle sourceTextureHdl = data.sourceTexture;
 
-                    // Pass 0: Material Setup
-                    SetupMaterial(data);
+                        // Pass 0: Material Setup
+                        SetupMaterial(data);
 
-                    // Pass 1: Edge detection
-                    Vector2 viewportScale = sourceTextureHdl.useScaling ? new Vector2(sourceTextureHdl.rtHandleProperties.rtHandleScale.x, sourceTextureHdl.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, SMAAMaterial, ShaderPass.k_EdgeDetection);
-                });
+                        // Pass 1: Edge detection
+                        Vector2 viewportScale = sourceTextureHdl.useScaling
+                            ? new Vector2(
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.x,
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.y
+                            )
+                            : Vector2.one;
+                        Blitter.BlitTexture(
+                            cmd,
+                            sourceTextureHdl,
+                            viewportScale,
+                            SMAAMaterial,
+                            ShaderPass.k_EdgeDetection
+                        );
+                    }
+                );
             }
 
-            using (var builder = renderGraph.AddRasterRenderPass<SMAAPassData>(k_passNameBlendWeights, out var passData, m_ProfilingSamplerBlendWeights))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<SMAAPassData>(
+                    k_passNameBlendWeights,
+                    out var passData,
+                    m_ProfilingSamplerBlendWeights
+                )
+            )
             {
                 builder.SetRenderAttachment(blendTexture, 0, AccessFlags.Write);
                 builder.SetRenderAttachmentDepth(edgeTextureStencil, AccessFlags.Read);
@@ -142,19 +201,38 @@ namespace UnityEngine.Rendering.Universal
                 builder.UseTexture(edgeTexture, AccessFlags.Read);
                 passData.material = m_Material;
 
-                builder.SetRenderFunc(static (SMAAPassData data, RasterGraphContext context) =>
-                {
-                    var SMAAMaterial = data.material;
-                    var cmd = context.cmd;
-                    RTHandle sourceTextureHdl = data.sourceTexture;
+                builder.SetRenderFunc(
+                    static (SMAAPassData data, RasterGraphContext context) =>
+                    {
+                        var SMAAMaterial = data.material;
+                        var cmd = context.cmd;
+                        RTHandle sourceTextureHdl = data.sourceTexture;
 
-                    // Pass 2: Blend weights
-                    Vector2 viewportScale = sourceTextureHdl.useScaling ? new Vector2(sourceTextureHdl.rtHandleProperties.rtHandleScale.x, sourceTextureHdl.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, SMAAMaterial, ShaderPass.k_BlendWeightsCalculation);
-                });
+                        // Pass 2: Blend weights
+                        Vector2 viewportScale = sourceTextureHdl.useScaling
+                            ? new Vector2(
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.x,
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.y
+                            )
+                            : Vector2.one;
+                        Blitter.BlitTexture(
+                            cmd,
+                            sourceTextureHdl,
+                            viewportScale,
+                            SMAAMaterial,
+                            ShaderPass.k_BlendWeightsCalculation
+                        );
+                    }
+                );
             }
 
-            using (var builder = renderGraph.AddRasterRenderPass<SMAAPassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<SMAAPassData>(
+                    passName,
+                    out var passData,
+                    profilingSampler
+                )
+            )
             {
                 builder.SetRenderAttachment(destinationTexture, 0, AccessFlags.Write);
                 passData.sourceTexture = sourceTexture;
@@ -163,17 +241,30 @@ namespace UnityEngine.Rendering.Universal
                 builder.UseTexture(blendTexture, AccessFlags.Read);
                 passData.material = m_Material;
 
-                builder.SetRenderFunc(static (SMAAPassData data, RasterGraphContext context) =>
-                {
-                    var SMAAMaterial = data.material;
-                    var cmd = context.cmd;
-                    RTHandle sourceTextureHdl = data.sourceTexture;
+                builder.SetRenderFunc(
+                    static (SMAAPassData data, RasterGraphContext context) =>
+                    {
+                        var SMAAMaterial = data.material;
+                        var cmd = context.cmd;
+                        RTHandle sourceTextureHdl = data.sourceTexture;
 
-                    // Pass 3: Neighborhood blending
-                    SMAAMaterial.SetTexture(ShaderConstants._BlendTexture, data.blendTexture);
-                    Vector2 viewportScale = sourceTextureHdl.useScaling ? new Vector2(sourceTextureHdl.rtHandleProperties.rtHandleScale.x, sourceTextureHdl.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(cmd, sourceTextureHdl, viewportScale, SMAAMaterial, ShaderPass.k_NeighborhoodBlending);
-                });
+                        // Pass 3: Neighborhood blending
+                        SMAAMaterial.SetTexture(ShaderConstants._BlendTexture, data.blendTexture);
+                        Vector2 viewportScale = sourceTextureHdl.useScaling
+                            ? new Vector2(
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.x,
+                                sourceTextureHdl.rtHandleProperties.rtHandleScale.y
+                            )
+                            : Vector2.one;
+                        Blitter.BlitTexture(
+                            cmd,
+                            sourceTextureHdl,
+                            viewportScale,
+                            SMAAMaterial,
+                            ShaderPass.k_NeighborhoodBlending
+                        );
+                    }
+                );
             }
 
             resourceData.cameraColor = destinationTexture;
@@ -215,6 +306,7 @@ namespace UnityEngine.Rendering.Universal
             public static readonly int _AreaTexture = Shader.PropertyToID("_AreaTexture");
             public static readonly int _SearchTexture = Shader.PropertyToID("_SearchTexture");
             public static readonly int _BlendTexture = Shader.PropertyToID("_BlendTexture");
+
             //public static readonly int _EdgeTexture = Shader.PropertyToID("_EdgeTexture");
 
             public static readonly int _StencilRef = Shader.PropertyToID("_StencilRef");

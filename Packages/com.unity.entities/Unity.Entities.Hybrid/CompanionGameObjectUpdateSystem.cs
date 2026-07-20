@@ -17,11 +17,8 @@ using UnityEngine;
 
 namespace Unity.Entities
 {
-
     // Needs to be a cleanup component because instantiation will always create disabled GameObjects
-    struct CompanionGameObjectActiveCleanup : ICleanupComponentData
-    {
-    }
+    struct CompanionGameObjectActiveCleanup : ICleanupComponentData { }
 
 #if UNITY_EDITOR
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
@@ -43,10 +40,13 @@ namespace Unity.Entities
         {
             // First time initialize only in Editor
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            foreach(var (link, entity) in SystemAPI.Query<RefRO<CompanionLink>>()
-                        .WithNone<CompanionReference>()
-                        .WithEntityAccess()
-                        .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab))
+            foreach (
+                var (link, entity) in SystemAPI
+                    .Query<RefRO<CompanionLink>>()
+                    .WithNone<CompanionReference>()
+                    .WithEntityAccess()
+                    .WithOptions(EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab)
+            )
             {
                 ecb.AddComponent(entity, new CompanionReference { Companion = link.ValueRO.Companion });
             }
@@ -67,9 +67,7 @@ namespace Unity.Entities
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            companionChanged = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<CompanionLink>()
-                .Build(ref state);
+            companionChanged = new EntityQueryBuilder(Allocator.Temp).WithAll<CompanionLink>().Build(ref state);
             companionChanged.SetChangedVersionFilter(ComponentType.ReadWrite<CompanionLink>());
 
             toActivate = new EntityQueryBuilder(Allocator.Temp)
@@ -93,7 +91,9 @@ namespace Unity.Entities
             // Activate
             if (!toActivate.IsEmpty)
             {
-                using var companionLinksToActivate = toActivate.ToComponentDataArray<CompanionLink>(Allocator.Temp).Reinterpret<EntityId>();
+                using var companionLinksToActivate = toActivate
+                    .ToComponentDataArray<CompanionLink>(Allocator.Temp)
+                    .Reinterpret<EntityId>();
                 GameObject.SetGameObjectsActive(companionLinksToActivate, true);
                 state.EntityManager.AddComponent<CompanionGameObjectActiveCleanup>(toActivate);
             }
@@ -101,7 +101,9 @@ namespace Unity.Entities
             // Deactivate
             if (!toDeactivate.IsEmpty)
             {
-                using var companionLinksToDeactivate = toDeactivate.ToComponentDataArray<CompanionLink>(Allocator.Temp).Reinterpret<EntityId>();
+                using var companionLinksToDeactivate = toDeactivate
+                    .ToComponentDataArray<CompanionLink>(Allocator.Temp)
+                    .Reinterpret<EntityId>();
                 GameObject.SetGameObjectsActive(companionLinksToDeactivate, false);
                 state.EntityManager.RemoveComponent<CompanionGameObjectActiveCleanup>(toDeactivate);
             }

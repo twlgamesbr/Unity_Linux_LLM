@@ -10,10 +10,15 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.Analytics
         public bool usedEditorGUI;
         public bool isPartOfLagSpike;
     }
-    
+
     // Schema: com.unity3d.data.schemas.editor.analytics.multiplayerToolsNetworkSimulatorConnectionStateChanged_v1
     // Taxonomy: editor.analytics.mpToolsNetSimConnectionStateChanged.v1
-    [AnalyticInfo(eventName: "mpToolsNetSimConnectionStateChanged", vendorKey: "unity.multiplayer.tools", version:1, maxEventsPerHour: 1000)]
+    [AnalyticInfo(
+        eventName: "mpToolsNetSimConnectionStateChanged",
+        vendorKey: "unity.multiplayer.tools",
+        version: 1,
+        maxEventsPerHour: 1000
+    )]
     internal class ConnectionStateChangedAnalytic : IAnalytic
     {
         public ConnectionStateChangedAnalytic(bool usedEditorGUI, bool isPartOfLagSpike)
@@ -28,7 +33,7 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.Analytics
             data = new ConnectionStateChangedData
             {
                 usedEditorGUI = m_UsedEditorGUI,
-                isPartOfLagSpike = m_IsPartOfLagSpike
+                isPartOfLagSpike = m_IsPartOfLagSpike,
             };
             return true;
         }

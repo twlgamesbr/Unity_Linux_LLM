@@ -215,28 +215,30 @@ namespace Unity.Collections
                     return value == ' '
                         || (value >= 0x9 && value <= 0xD) // CHARACTER TABULATION (U+0009), LINE FEED (U+000A), LINE TABULATION (U+000B), FORM FEED (U+000C), CARRIAGE RETURN (U+000D)
                         || value == 0xA0 // NO-BREAK SPACE
-                        || value == 0x85 // NEXT LINE
-                        ;
+                        || value
+                            == 0x85 // NEXT LINE
+                    ;
                 }
 
                 return value == 0x1680 // OGHAM SPACE MARK
                     || (value >= 0x2000 && value <= 0x200A) // EN QUAD(U+2000)
-                                                            // EM QUAD(U+2001)
-                                                            // EN SPACE(U+2002)
-                                                            // EM SPACE(U+2003)
-                                                            // THREE - PER - EM SPACE(U + 2004)
-                                                            // FOUR - PER - EM SPACE(U + 2005)
-                                                            // SIX - PER - EM SPACE(U + 2006)
-                                                            // FIGURE SPACE(U+2007)
-                                                            // PUNCTUATION SPACE(U+2008)
-                                                            // THIN SPACE(U+2009)
-                                                            // HAIR SPACE(U+200A)
+                    // EM QUAD(U+2001)
+                    // EN SPACE(U+2002)
+                    // EM SPACE(U+2003)
+                    // THREE - PER - EM SPACE(U + 2004)
+                    // FOUR - PER - EM SPACE(U + 2005)
+                    // SIX - PER - EM SPACE(U + 2006)
+                    // FIGURE SPACE(U+2007)
+                    // PUNCTUATION SPACE(U+2008)
+                    // THIN SPACE(U+2009)
+                    // HAIR SPACE(U+200A)
                     || value == 0x2028 // LINE SEPARATOR
                     || value == 0x2029 // PARAGRAPH SEPARATOR
                     || value == 0x202F // NARROW NO-BREAK SPACE
                     || value == 0x205F // MEDIUM MATHEMATICAL SPACE
-                    || value == 0x3000 // IDEOGRAPHIC SPACE
-                    ;
+                    || value
+                        == 0x3000 // IDEOGRAPHIC SPACE
+                ;
             }
 
             internal Rune ToLowerAscii()
@@ -283,8 +285,8 @@ namespace Unity.Collections
         {
             if (codepoint > kMaximumValidCodePoint) // maximum valid code point
                 return false;
-//            if (codepoint >= 0xD800 && codepoint <= 0xDFFF) // surrogate pair
-//                return false;
+            //            if (codepoint >= 0xD800 && codepoint <= 0xDFFF) // surrogate pair
+            //                return false;
             if (codepoint < 0) // negative?
                 return false;
             return true;
@@ -368,7 +370,12 @@ namespace Unity.Collections
                 code = (buffer[index + 0] & 0b00001111);
                 code = (code << 6) | (buffer[index + 1] & 0b00111111);
                 code = (code << 6) | (buffer[index + 2] & 0b00111111);
-                if (code < (1 << 11) || !IsValidCodePoint(code) || NotTrailer(buffer[index + 1]) || NotTrailer(buffer[index + 2]))
+                if (
+                    code < (1 << 11)
+                    || !IsValidCodePoint(code)
+                    || NotTrailer(buffer[index + 1])
+                    || NotTrailer(buffer[index + 2])
+                )
                 {
                     index += 1;
                     return ConversionError.Encoding;
@@ -389,7 +396,13 @@ namespace Unity.Collections
                 code = (code << 6) | (buffer[index + 1] & 0b00111111);
                 code = (code << 6) | (buffer[index + 2] & 0b00111111);
                 code = (code << 6) | (buffer[index + 3] & 0b00111111);
-                if (code < (1 << 16) || !IsValidCodePoint(code) || NotTrailer(buffer[index + 1]) || NotTrailer(buffer[index + 2]) || NotTrailer(buffer[index + 3]))
+                if (
+                    code < (1 << 16)
+                    || !IsValidCodePoint(code)
+                    || NotTrailer(buffer[index + 1])
+                    || NotTrailer(buffer[index + 2])
+                    || NotTrailer(buffer[index + 3])
+                )
                 {
                     index += 1;
                     return ConversionError.Encoding;
@@ -413,7 +426,6 @@ namespace Unity.Collections
                 }
 
                 --index;
-
             } while ((ptr[index] & 0xC0) == 0x80);
 
             return index;
@@ -477,7 +489,7 @@ namespace Unity.Collections
                 index += 1;
                 return ConversionError.None;
             }
-            code =                (buffer[index + 0] & 0x03FF);
+            code = (buffer[index + 0] & 0x03FF);
             char next = buffer[index + 1];
             if (!IsTrailingSurrogate(next))
             {
@@ -624,10 +636,16 @@ namespace Unity.Collections
         /// <param name="utf8Length">Outputs the number of bytes written to the destination.</param>
         /// <param name="utf8Capacity">The size in bytes of the destination buffer.</param>
         /// <returns><see cref="ConversionError.None"/> if the copy fully completes. Otherwise, returns <see cref="ConversionError.Overflow"/>.</returns>
-        public static ConversionError Utf16ToUtf8(char* utf16Buffer, int utf16Length, byte* utf8Buffer, out int utf8Length, int utf8Capacity)
+        public static ConversionError Utf16ToUtf8(
+            char* utf16Buffer,
+            int utf16Length,
+            byte* utf8Buffer,
+            out int utf8Length,
+            int utf8Capacity
+        )
         {
             utf8Length = 0;
-            for (var utf16Offset = 0; utf16Offset < utf16Length;)
+            for (var utf16Offset = 0; utf16Offset < utf16Length; )
             {
                 Utf16ToUcs(out var ucs, utf16Buffer, ref utf16Offset, utf16Length);
                 if (UcsToUtf8(utf8Buffer, ref utf8Length, utf8Capacity, ucs) == ConversionError.Overflow)
@@ -646,7 +664,13 @@ namespace Unity.Collections
         /// <param name="destLength">Outputs the number of bytes written to the destination.</param>
         /// <param name="destCapacity">The size in bytes of the destination buffer.</param>
         /// <returns><see cref="ConversionError.None"/> if the copy fully completes. Otherwise, returns <see cref="ConversionError.Overflow"/>.</returns>
-        public static ConversionError Utf8ToUtf8(byte* srcBuffer, int srcLength, byte* destBuffer, out int destLength, int destCapacity)
+        public static ConversionError Utf8ToUtf8(
+            byte* srcBuffer,
+            int srcLength,
+            byte* destBuffer,
+            out int destLength,
+            int destCapacity
+        )
         {
             if (destCapacity >= srcLength)
             {
@@ -658,7 +682,7 @@ namespace Unity.Collections
             // TODO the high bits of the last 3 bytes that fit, decide how many of the 3 to append. but that requires a
             // TODO little UNICODE presence of mind that nobody has today.
             destLength = 0;
-            for (var srcOffset = 0; srcOffset < srcLength;)
+            for (var srcOffset = 0; srcOffset < srcLength; )
             {
                 Utf8ToUcs(out var ucs, srcBuffer, ref srcOffset, srcLength);
                 if (UcsToUtf8(destBuffer, ref destLength, destCapacity, ucs) == ConversionError.Overflow)
@@ -677,11 +701,16 @@ namespace Unity.Collections
         /// <param name="utf16Length">Outputs the number of chars written to the destination.</param>
         /// <param name="utf16Capacity">The size in chars of the destination buffer.</param>
         /// <returns><see cref="ConversionError.None"/> if the copy fully completes. Otherwise, <see cref="ConversionError.Overflow"/>.</returns>
-        public static ConversionError Utf8ToUtf16(byte* utf8Buffer, int utf8Length, char* utf16Buffer, out int utf16Length, int utf16Capacity)
+        public static ConversionError Utf8ToUtf16(
+            byte* utf8Buffer,
+            int utf8Length,
+            char* utf16Buffer,
+            out int utf16Length,
+            int utf16Capacity
+        )
         {
             utf16Length = 0;
-            for (var utf8Offset
-                = 0; utf8Offset < utf8Length;)
+            for (var utf8Offset = 0; utf8Offset < utf8Length; )
             {
                 Utf8ToUcs(out var ucs, utf8Buffer, ref utf8Offset, utf8Length);
                 if (UcsToUtf16(utf16Buffer, ref utf16Length, utf16Capacity, ucs) == ConversionError.Overflow)

@@ -12,7 +12,9 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks.Events
             RerunAfterResume = true;
         }
 
-        internal Func<TestRunCallbackListener> GetListener = () => ScriptableObject.CreateInstance<TestRunCallbackListener>();
+        internal Func<TestRunCallbackListener> GetListener = () =>
+            ScriptableObject.CreateInstance<TestRunCallbackListener>();
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             var listener = GetListener();

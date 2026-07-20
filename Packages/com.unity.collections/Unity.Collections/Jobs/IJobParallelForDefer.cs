@@ -1,8 +1,8 @@
 using System;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs.LowLevel.Unsafe;
-using Unity.Burst;
 
 namespace Unity.Jobs
 {
@@ -12,23 +12,23 @@ namespace Unity.Jobs
     /// <remarks>
     /// A replacement for IJobParallelFor when the number of work items is not known at Schedule time.
     ///
-    /// When Scheduling the job's Execute(int index) method will be invoked on multiple worker threads in 
+    /// When Scheduling the job's Execute(int index) method will be invoked on multiple worker threads in
     /// parallel to each other.
     ///
     /// Execute(int index) will be executed once for each index from 0 to the provided length. Each iteration
-    /// must be independent from other iterations and the safety system enforces this rule for you. The indices 
+    /// must be independent from other iterations and the safety system enforces this rule for you. The indices
     /// have no guaranteed order and are executed on multiple cores in parallel.
     ///
-    /// Unity automatically splits the work into chunks of no less than the provided batchSize, and schedules 
+    /// Unity automatically splits the work into chunks of no less than the provided batchSize, and schedules
     /// an appropriate number of jobs based on the number of worker threads, the length of the array and the batch size.
     ///
-    /// Choose a batch size sbased on the amount of work performed in the job. A simple job, 
-    /// for example adding a couple of float3 to each other could have a batch size of 32 to 128. However, 
-    /// if the work performed is very expensive then it's best to use a small batch size, such as a batch 
-    /// size of 1. IJobParallelFor performs work stealing using atomic operations. Batch sizes can be 
+    /// Choose a batch size sbased on the amount of work performed in the job. A simple job,
+    /// for example adding a couple of float3 to each other could have a batch size of 32 to 128. However,
+    /// if the work performed is very expensive then it's best to use a small batch size, such as a batch
+    /// size of 1. IJobParallelFor performs work stealing using atomic operations. Batch sizes can be
     /// small but they aren't free.
     ///
-    /// The returned JobHandle can be used to ensure that the job has completed. Or it can be passed to other jobs as 
+    /// The returned JobHandle can be used to ensure that the job has completed. Or it can be passed to other jobs as
     /// a dependency, ensuring that the jobs are executed one after another on the worker threads.
     /// </remarks>
     [JobProducerType(typeof(IJobParallelForDeferExtensions.JobParallelForDeferProducer<>))]
@@ -46,20 +46,38 @@ namespace Unity.Jobs
     /// </summary>
     public static class IJobParallelForDeferExtensions
     {
-        internal struct JobParallelForDeferProducer<T> where T : struct, IJobParallelForDefer
+        internal struct JobParallelForDeferProducer<T>
+            where T : struct, IJobParallelForDefer
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<JobParallelForDeferProducer<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                JobParallelForDeferProducer<T>
+            >();
 
             [BurstDiscard]
             internal static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
-            public delegate void ExecuteJobFunction(ref T jobData, IntPtr additionalPtr, IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref T jobData,
+                IntPtr additionalPtr,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
-            public unsafe static void Execute(ref T jobData, IntPtr additionalPtr, IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static unsafe void Execute(
+                ref T jobData,
+                IntPtr additionalPtr,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
@@ -67,7 +85,12 @@ namespace Unity.Jobs
                         break;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData), begin, end - begin);
+                    JobsUtility.PatchBufferMinMaxRanges(
+                        bufferRangePatchData,
+                        UnsafeUtility.AddressOf(ref jobData),
+                        begin,
+                        end - begin
+                    );
 #endif
 
                     // Cache the end value to make it super obvious to the
@@ -86,7 +109,7 @@ namespace Unity.Jobs
         /// <typeparam name="T"></typeparam>
         /// <remarks>
         /// When the Jobs package is included in the project, Unity generates code to call EarlyJobInit at startup. This allows Burst compiled code to schedule jobs because the reflection part of initialization, which is not compatible with burst compiler constraints, has already happened in EarlyJobInit.
-        /// 
+        ///
         /// __Note__: While the Jobs package code generator handles this automatically for all closed job types, you must register those with generic arguments (like IJobParallelForDefer&amp;lt;MyJobType&amp;lt;T&amp;gt;&amp;gt;) manually for each specialization with [[Unity.Jobs.RegisterGenericJobTypeAttribute]].
         /// </remarks>
         public static void EarlyJobInit<T>()
@@ -107,8 +130,12 @@ namespace Unity.Jobs
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
         /// <typeparam name="U">List element type</typeparam>
-        public static unsafe JobHandle Schedule<T, U>(this T jobData, NativeList<U> list, int innerloopBatchCount,
-            JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle Schedule<T, U>(
+            this T jobData,
+            NativeList<U> list,
+            int innerloopBatchCount,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobParallelForDefer
             where U : unmanaged
         {
@@ -120,9 +147,13 @@ namespace Unity.Jobs
             var safety = NativeListUnsafeUtility.GetAtomicSafetyHandle(ref list);
             atomicSafetyHandlePtr = UnsafeUtility.AddressOf(ref safety);
 #endif
-            return ScheduleInternal(ref jobData, innerloopBatchCount,
+            return ScheduleInternal(
+                ref jobData,
+                innerloopBatchCount,
                 list.GetUnsafeList(),
-                atomicSafetyHandlePtr, dependsOn);
+                atomicSafetyHandlePtr,
+                dependsOn
+            );
         }
 
         /// <summary>
@@ -138,8 +169,12 @@ namespace Unity.Jobs
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
         /// <typeparam name="U">List element type</typeparam>
-        public static unsafe JobHandle ScheduleByRef<T, U>(this ref T jobData, NativeList<U> list, int innerloopBatchCount,
-            JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle ScheduleByRef<T, U>(
+            this ref T jobData,
+            NativeList<U> list,
+            int innerloopBatchCount,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobParallelForDefer
             where U : unmanaged
         {
@@ -151,9 +186,13 @@ namespace Unity.Jobs
             var safety = NativeListUnsafeUtility.GetAtomicSafetyHandle(ref list);
             atomicSafetyHandlePtr = UnsafeUtility.AddressOf(ref safety);
 #endif
-            return ScheduleInternal(ref jobData, innerloopBatchCount,
+            return ScheduleInternal(
+                ref jobData,
+                innerloopBatchCount,
                 list.GetUnsafeList(),
-                atomicSafetyHandlePtr, dependsOn);
+                atomicSafetyHandlePtr,
+                dependsOn
+            );
         }
 
         /// <summary>
@@ -168,8 +207,12 @@ namespace Unity.Jobs
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T">Job type</typeparam>
         /// <returns></returns>
-        public static unsafe JobHandle Schedule<T>(this T jobData, int* forEachCount, int innerloopBatchCount,
-            JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle Schedule<T>(
+            this T jobData,
+            int* forEachCount,
+            int innerloopBatchCount,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobParallelForDefer
         {
             var forEachListPtr = (byte*)forEachCount - sizeof(void*);
@@ -189,25 +232,42 @@ namespace Unity.Jobs
         /// <returns>JobHandle The handle identifying the scheduled job. Can be used as a dependency for a later job or ensure completion on the main thread.</returns>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static unsafe JobHandle ScheduleByRef<T>(this ref T jobData, int* forEachCount, int innerloopBatchCount,
-            JobHandle dependsOn = new JobHandle())
+        public static unsafe JobHandle ScheduleByRef<T>(
+            this ref T jobData,
+            int* forEachCount,
+            int innerloopBatchCount,
+            JobHandle dependsOn = new JobHandle()
+        )
             where T : struct, IJobParallelForDefer
         {
             var forEachListPtr = (byte*)forEachCount - sizeof(void*);
             return ScheduleInternal(ref jobData, innerloopBatchCount, forEachListPtr, null, dependsOn);
         }
 
-        private static unsafe JobHandle ScheduleInternal<T>(ref T jobData,
+        private static unsafe JobHandle ScheduleInternal<T>(
+            ref T jobData,
             int innerloopBatchCount,
             void* forEachListPtr,
-            void *atomicSafetyHandlePtr,
-            JobHandle dependsOn) where T : struct, IJobParallelForDefer
+            void* atomicSafetyHandlePtr,
+            JobHandle dependsOn
+        )
+            where T : struct, IJobParallelForDefer
         {
             JobParallelForDeferProducer<T>.Initialize();
             var reflectionData = JobParallelForDeferProducer<T>.jobReflectionData.Data;
             CollectionHelper.CheckReflectionDataCorrect<T>(reflectionData);
-            var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref jobData), reflectionData, dependsOn, ScheduleMode.Parallel);
-            return JobsUtility.ScheduleParallelForDeferArraySize(ref scheduleParams, innerloopBatchCount, forEachListPtr, atomicSafetyHandlePtr);
+            var scheduleParams = new JobsUtility.JobScheduleParameters(
+                UnsafeUtility.AddressOf(ref jobData),
+                reflectionData,
+                dependsOn,
+                ScheduleMode.Parallel
+            );
+            return JobsUtility.ScheduleParallelForDeferArraySize(
+                ref scheduleParams,
+                innerloopBatchCount,
+                forEachListPtr,
+                atomicSafetyHandlePtr
+            );
         }
     }
 }

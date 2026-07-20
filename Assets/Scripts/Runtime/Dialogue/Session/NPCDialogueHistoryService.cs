@@ -1,22 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+
 namespace NPCSystem.Dialogue.Session
 {
     /// <summary>
@@ -33,8 +32,9 @@ namespace NPCSystem.Dialogue.Session
         bool _persistHistory = true;
         int _maxHistoryPerNPC = 20;
 
-        readonly Dictionary<string, List<DialogueEntry>> _historyByNpc =
-            new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
+        readonly Dictionary<string, List<DialogueEntry>> _historyByNpc = new Dictionary<string, List<DialogueEntry>>(
+            StringComparer.OrdinalIgnoreCase
+        );
 
         static NPCFlowLogger Logger => NPCFlowLogger.FindOrCreate();
 
@@ -42,11 +42,7 @@ namespace NPCSystem.Dialogue.Session
         /// Initialise the service with dependencies from NPCDialogueManager.
         /// Call once during manager initialisation before any other methods.
         /// </summary>
-        public void Initialize(
-            SupabaseDialogueRepository supabaseRepo,
-            bool persistHistory,
-            int maxHistoryPerNPC
-        )
+        public void Initialize(SupabaseDialogueRepository supabaseRepo, bool persistHistory, int maxHistoryPerNPC)
         {
             _supabaseRepo = supabaseRepo;
             _persistHistory = persistHistory;
@@ -79,9 +75,7 @@ namespace NPCSystem.Dialogue.Session
                 // Try Supabase first if configured and authenticated
                 if (_supabaseRepo != null && _supabaseRepo.IsConfigured)
                 {
-                    List<DialogueEntry> supabaseHistory = await _supabaseRepo.LoadHistoryAsync(
-                        slug
-                    );
+                    List<DialogueEntry> supabaseHistory = await _supabaseRepo.LoadHistoryAsync(slug);
                     if (supabaseHistory != null)
                     {
                         _historyByNpc[slug] = supabaseHistory;
@@ -140,11 +134,7 @@ namespace NPCSystem.Dialogue.Session
         /// Append a user/assistant turn pair to the history, persist locally
         /// (and to Supabase when configured), then trim to the max allowed size.
         /// </summary>
-        public async Task AppendConversationAsync(
-            NPCProfile profile,
-            string playerMessage,
-            string response
-        )
+        public async Task AppendConversationAsync(NPCProfile profile, string playerMessage, string response)
         {
             if (profile == null)
                 return;
@@ -172,13 +162,9 @@ namespace NPCSystem.Dialogue.Session
         /// Capture a deep-cloned snapshot of every NPC's history.
         /// Used by NPCDialogueNetworkBridge to seed client sessions.
         /// </summary>
-        public Dictionary<string, List<DialogueEntry>> CaptureHistorySnapshot(
-            NPCProfile[] profiles
-        )
+        public Dictionary<string, List<DialogueEntry>> CaptureHistorySnapshot(NPCProfile[] profiles)
         {
-            var snapshot = new Dictionary<string, List<DialogueEntry>>(
-                StringComparer.OrdinalIgnoreCase
-            );
+            var snapshot = new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
 
             foreach (NPCProfile profile in profiles)
             {
@@ -196,10 +182,7 @@ namespace NPCSystem.Dialogue.Session
         /// Replace the entire in-memory history with a previously-captured snapshot.
         /// Histories are normalised for chat-template compliance during application.
         /// </summary>
-        public void ApplyHistorySnapshot(
-            Dictionary<string, List<DialogueEntry>> historyByNpc,
-            NPCProfile[] profiles
-        )
+        public void ApplyHistorySnapshot(Dictionary<string, List<DialogueEntry>> historyByNpc, NPCProfile[] profiles)
         {
             _historyByNpc.Clear();
 
@@ -210,10 +193,7 @@ namespace NPCSystem.Dialogue.Session
 
                 string slug = profile.GetNpcSlug();
 
-                if (
-                    historyByNpc != null
-                    && historyByNpc.TryGetValue(slug, out List<DialogueEntry> history)
-                )
+                if (historyByNpc != null && historyByNpc.TryGetValue(slug, out List<DialogueEntry> history))
                 {
                     _historyByNpc[slug] = CloneEntries(history);
                 }

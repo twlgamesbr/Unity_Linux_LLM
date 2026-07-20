@@ -76,7 +76,11 @@ namespace Unity.Netcode.Editor
 
                 foreach (var type in types)
                 {
-                    if (type.IsSubclassOf(typeof(NetworkTransport)) && !type.IsSubclassOf(typeof(TestingNetworkTransport)) && type != typeof(TestingNetworkTransport))
+                    if (
+                        type.IsSubclassOf(typeof(NetworkTransport))
+                        && !type.IsSubclassOf(typeof(TestingNetworkTransport))
+                        && type != typeof(TestingNetworkTransport)
+                    )
                     {
                         m_TransportTypes.Add(type);
                     }
@@ -117,12 +121,18 @@ namespace Unity.Netcode.Editor
             // Only display the auto spawn property when the distributed authority network topology is selected
             if (m_NetworkManager.NetworkConfig.NetworkTopology == NetworkTopologyTypes.DistributedAuthority)
             {
-                m_AutoSpawnPlayerPrefabClientSide = m_NetworkConfigProperty.FindPropertyRelative("AutoSpawnPlayerPrefabClientSide");
+                m_AutoSpawnPlayerPrefabClientSide = m_NetworkConfigProperty.FindPropertyRelative(
+                    "AutoSpawnPlayerPrefabClientSide"
+                );
             }
 #endif
-            m_ClientConnectionBufferTimeoutProperty = m_NetworkConfigProperty.FindPropertyRelative("ClientConnectionBufferTimeout");
+            m_ClientConnectionBufferTimeoutProperty = m_NetworkConfigProperty.FindPropertyRelative(
+                "ClientConnectionBufferTimeout"
+            );
             m_ConnectionApprovalProperty = m_NetworkConfigProperty.FindPropertyRelative("ConnectionApproval");
-            m_EnsureNetworkVariableLengthSafetyProperty = m_NetworkConfigProperty.FindPropertyRelative("EnsureNetworkVariableLengthSafety");
+            m_EnsureNetworkVariableLengthSafetyProperty = m_NetworkConfigProperty.FindPropertyRelative(
+                "EnsureNetworkVariableLengthSafety"
+            );
             m_ForceSamePrefabsProperty = m_NetworkConfigProperty.FindPropertyRelative("ForceSamePrefabs");
             m_RecycleNetworkIdsProperty = m_NetworkConfigProperty.FindPropertyRelative("RecycleNetworkIds");
             m_NetworkIdRecycleDelayProperty = m_NetworkConfigProperty.FindPropertyRelative("NetworkIdRecycleDelay");
@@ -160,16 +170,21 @@ namespace Unity.Netcode.Editor
             // Only display the auto spawn property when the distributed authority network topology is selected
             if (m_NetworkManager.NetworkConfig.NetworkTopology == NetworkTopologyTypes.DistributedAuthority)
             {
-                m_AutoSpawnPlayerPrefabClientSide = m_NetworkConfigProperty.FindPropertyRelative("AutoSpawnPlayerPrefabClientSide");
+                m_AutoSpawnPlayerPrefabClientSide = m_NetworkConfigProperty.FindPropertyRelative(
+                    "AutoSpawnPlayerPrefabClientSide"
+                );
             }
 #endif
-            m_ClientConnectionBufferTimeoutProperty = m_NetworkConfigProperty.FindPropertyRelative("ClientConnectionBufferTimeout");
+            m_ClientConnectionBufferTimeoutProperty = m_NetworkConfigProperty.FindPropertyRelative(
+                "ClientConnectionBufferTimeout"
+            );
             m_ConnectionApprovalProperty = m_NetworkConfigProperty.FindPropertyRelative("ConnectionApproval");
-            m_EnsureNetworkVariableLengthSafetyProperty = m_NetworkConfigProperty.FindPropertyRelative("EnsureNetworkVariableLengthSafety");
+            m_EnsureNetworkVariableLengthSafetyProperty = m_NetworkConfigProperty.FindPropertyRelative(
+                "EnsureNetworkVariableLengthSafety"
+            );
             m_ForceSamePrefabsProperty = m_NetworkConfigProperty.FindPropertyRelative("ForceSamePrefabs");
             m_RecycleNetworkIdsProperty = m_NetworkConfigProperty.FindPropertyRelative("RecycleNetworkIds");
             m_NetworkIdRecycleDelayProperty = m_NetworkConfigProperty.FindPropertyRelative("NetworkIdRecycleDelay");
-
 
             m_EnableSceneManagementProperty = m_NetworkConfigProperty.FindPropertyRelative("EnableSceneManagement");
             m_SpawnTimeOutProperty = m_NetworkConfigProperty.FindPropertyRelative("SpawnTimeout");
@@ -204,7 +219,10 @@ namespace Unity.Netcode.Editor
                 EditorGUILayout.PropertyField(m_NetworkTransportProperty);
                 if (m_NetworkTransportProperty.objectReferenceValue == null)
                 {
-                    EditorGUILayout.HelpBox("You have no transport selected. A transport is required for netcode to work. Which one do you want?", MessageType.Warning);
+                    EditorGUILayout.HelpBox(
+                        "You have no transport selected. A transport is required for netcode to work. Which one do you want?",
+                        MessageType.Warning
+                    );
 
                     int selection = EditorGUILayout.Popup(0, m_TransportNames);
 
@@ -212,7 +230,9 @@ namespace Unity.Netcode.Editor
                     {
                         ReloadTransports();
 
-                        var transportComponent = m_NetworkManager.gameObject.GetComponent(m_TransportTypes[selection - 1]) ?? m_NetworkManager.gameObject.AddComponent(m_TransportTypes[selection - 1]);
+                        var transportComponent =
+                            m_NetworkManager.gameObject.GetComponent(m_TransportTypes[selection - 1])
+                            ?? m_NetworkManager.gameObject.AddComponent(m_TransportTypes[selection - 1]);
                         m_NetworkTransportProperty.objectReferenceValue = transportComponent;
 
                         Repaint();
@@ -225,7 +245,10 @@ namespace Unity.Netcode.Editor
                 {
                     EditorGUILayout.PropertyField(m_ClientConnectionBufferTimeoutProperty);
                 }
-                EditorGUILayout.PropertyField(m_EnsureNetworkVariableLengthSafetyProperty, new GUIContent("NetworkVariable Length Safety"));
+                EditorGUILayout.PropertyField(
+                    m_EnsureNetworkVariableLengthSafetyProperty,
+                    new GUIContent("NetworkVariable Length Safety")
+                );
                 EditorGUILayout.PropertyField(m_RecycleNetworkIdsProperty);
                 if (m_NetworkManager.NetworkConfig.RecycleNetworkIds)
                 {
@@ -245,17 +268,28 @@ namespace Unity.Netcode.Editor
                 // Only display the auto spawn property when the distributed authority network topology is selected
                 if (m_NetworkManager.NetworkConfig.NetworkTopology == NetworkTopologyTypes.DistributedAuthority)
                 {
-                    EditorGUILayout.PropertyField(m_AutoSpawnPlayerPrefabClientSide, new GUIContent("Auto Spawn Player Prefab"));
+                    EditorGUILayout.PropertyField(
+                        m_AutoSpawnPlayerPrefabClientSide,
+                        new GUIContent("Auto Spawn Player Prefab")
+                    );
                 }
 #endif
                 EditorGUILayout.PropertyField(m_PlayerPrefabProperty, new GUIContent("Default Player Prefab"));
 
-
-
                 if (m_NetworkManager.NetworkConfig.HasOldPrefabList())
                 {
-                    EditorGUILayout.HelpBox("Network Prefabs serialized in old format. Migrate to new format to edit the list.", MessageType.Info);
-                    if (GUILayout.Button(new GUIContent("Migrate Prefab List", "Converts the old format Network Prefab list to a new Scriptable Object")))
+                    EditorGUILayout.HelpBox(
+                        "Network Prefabs serialized in old format. Migrate to new format to edit the list.",
+                        MessageType.Info
+                    );
+                    if (
+                        GUILayout.Button(
+                            new GUIContent(
+                                "Migrate Prefab List",
+                                "Converts the old format Network Prefab list to a new Scriptable Object"
+                            )
+                        )
+                    )
                     {
                         // Default directory
                         var directory = "Assets/";
@@ -272,9 +306,14 @@ namespace Unity.Netcode.Editor
                         else
                         {
 #if UNITY_2021_1_OR_NEWER
-                            var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(m_NetworkManager.gameObject);
+                            var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(
+                                m_NetworkManager.gameObject
+                            );
 #else
-                            var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(m_NetworkManager.gameObject);
+                            var prefabStage =
+                                UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(
+                                    m_NetworkManager.gameObject
+                                );
 #endif
                             if (prefabStage != null)
                             {
@@ -293,13 +332,19 @@ namespace Unity.Netcode.Editor
                                 }
                             }
                         }
-                        var networkPrefabs = m_NetworkManager.NetworkConfig.MigrateOldNetworkPrefabsToNetworkPrefabsList();
+                        var networkPrefabs =
+                            m_NetworkManager.NetworkConfig.MigrateOldNetworkPrefabsToNetworkPrefabsList();
 #if UNITY_6000_2_OR_NEWER
                         string path = Path.Combine(directory, $"NetworkPrefabs-{m_NetworkManager.GetEntityId()}.asset");
 #else
-                        string path = Path.Combine(directory, $"NetworkPrefabs-{m_NetworkManager.GetInstanceID()}.asset");
+                        string path = Path.Combine(
+                            directory,
+                            $"NetworkPrefabs-{m_NetworkManager.GetInstanceID()}.asset"
+                        );
 #endif
-                        m_NetworkManager.Log.Info(new Context(LogLevel.Normal, "Saving migrated Network Prefabs List").AddInfo("Path", path));
+                        m_NetworkManager.Log.Info(
+                            new Context(LogLevel.Normal, "Saving migrated Network Prefabs List").AddInfo("Path", path)
+                        );
                         AssetDatabase.CreateAsset(networkPrefabs, path);
                         EditorUtility.SetDirty(m_NetworkManager);
                     }
@@ -308,11 +353,17 @@ namespace Unity.Netcode.Editor
                 {
                     if (m_NetworkManager.NetworkConfig.Prefabs.NetworkPrefabsLists.Count == 0)
                     {
-                        EditorGUILayout.HelpBox("You have no prefab list selected. You will have to add your prefabs manually at runtime for netcode to work.", MessageType.Warning);
+                        EditorGUILayout.HelpBox(
+                            "You have no prefab list selected. You will have to add your prefabs manually at runtime for netcode to work.",
+                            MessageType.Warning
+                        );
                     }
                     else if (m_NetworkManager.NetworkConfig.Prefabs.NetworkPrefabsLists.All(x => x == null))
                     {
-                        EditorGUILayout.HelpBox("All prefab lists selected are uninitialized. You will have to add your prefabs manually at runtime for netcode to work.", MessageType.Warning);
+                        EditorGUILayout.HelpBox(
+                            "All prefab lists selected are uninitialized. You will have to add your prefabs manually at runtime for netcode to work.",
+                            MessageType.Warning
+                        );
                     }
                     EditorGUILayout.PropertyField(m_PrefabsList);
                 }
@@ -343,29 +394,47 @@ namespace Unity.Netcode.Editor
 
                 if (m_NetworkManager.NetworkConfig.NetworkTopology == NetworkTopologyTypes.ClientServer)
                 {
-                    if (GUILayout.Button(new GUIContent("Start Host", "Starts a host instance" + buttonDisabledReasonSuffix)))
+                    if (
+                        GUILayout.Button(
+                            new GUIContent("Start Host", "Starts a host instance" + buttonDisabledReasonSuffix)
+                        )
+                    )
                     {
                         m_NetworkManager.StartHost();
                     }
 
-                    if (GUILayout.Button(new GUIContent("Start Server", "Starts a server instance" + buttonDisabledReasonSuffix)))
+                    if (
+                        GUILayout.Button(
+                            new GUIContent("Start Server", "Starts a server instance" + buttonDisabledReasonSuffix)
+                        )
+                    )
                     {
                         m_NetworkManager.StartServer();
                     }
 
-                    if (GUILayout.Button(new GUIContent("Start Client", "Starts a client instance" + buttonDisabledReasonSuffix)))
+                    if (
+                        GUILayout.Button(
+                            new GUIContent("Start Client", "Starts a client instance" + buttonDisabledReasonSuffix)
+                        )
+                    )
                     {
                         m_NetworkManager.StartClient();
                     }
                 }
                 else
                 {
-                    if (GUILayout.Button(new GUIContent("Start Client", "Starts a distributed authority client instance" + buttonDisabledReasonSuffix)))
+                    if (
+                        GUILayout.Button(
+                            new GUIContent(
+                                "Start Client",
+                                "Starts a distributed authority client instance" + buttonDisabledReasonSuffix
+                            )
+                        )
+                    )
                     {
                         m_NetworkManager.StartClient();
                     }
                 }
-
 
                 if (!EditorApplication.isPlaying)
                 {
@@ -389,9 +458,14 @@ namespace Unity.Netcode.Editor
                     instanceType = "Client";
                 }
 
-                EditorGUILayout.HelpBox("You cannot edit the NetworkConfig when a " + instanceType + " is running.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "You cannot edit the NetworkConfig when a " + instanceType + " is running.",
+                    MessageType.Info
+                );
 
-                if (GUILayout.Button(new GUIContent("Stop " + instanceType, "Stops the " + instanceType + " instance.")))
+                if (
+                    GUILayout.Button(new GUIContent("Stop " + instanceType, "Stops the " + instanceType + " instance."))
+                )
                 {
                     m_NetworkManager.Shutdown();
                 }
@@ -412,14 +486,20 @@ namespace Unity.Netcode.Editor
                 networkManager.NetworkManagerExpanded = expanded;
             }
             ;
-            DrawFoldOutGroup<NetworkManager>(networkManager.GetType(), DisplayNetworkManagerProperties, networkManager.NetworkManagerExpanded, SetExpanded);
+            DrawFoldOutGroup<NetworkManager>(
+                networkManager.GetType(),
+                DisplayNetworkManagerProperties,
+                networkManager.NetworkManagerExpanded,
+                SetExpanded
+            );
             DisplayCallToActionButtons();
             base.OnInspectorGUI();
         }
 
         private static void DrawInstallMultiplayerToolsTip()
         {
-            const string getToolsText = "Access additional tools for multiplayer development by installing the Multiplayer Tools package in the Package Manager.";
+            const string getToolsText =
+                "Access additional tools for multiplayer development by installing the Multiplayer Tools package in the Package Manager.";
             const string openDocsButtonText = "Open Docs";
             const string dismissButtonText = "Dismiss";
             const string targetUrl = "https://docs-multiplayer.unity3d.com/tools/current/install-tools";
@@ -435,16 +515,13 @@ namespace Unity.Netcode.Editor
                 s_CenteredWordWrappedLabelStyle = new GUIStyle(GUI.skin.label)
                 {
                     wordWrap = true,
-                    alignment = TextAnchor.MiddleLeft
+                    alignment = TextAnchor.MiddleLeft,
                 };
             }
 
             if (s_HelpBoxStyle == null)
             {
-                s_HelpBoxStyle = new GUIStyle(EditorStyles.helpBox)
-                {
-                    padding = new RectOffset(10, 10, 10, 10)
-                };
+                s_HelpBoxStyle = new GUIStyle(EditorStyles.helpBox) { padding = new RectOffset(10, 10, 10, 10) };
             }
 
             var openDocsButtonStyle = GUI.skin.button;
@@ -452,9 +529,18 @@ namespace Unity.Netcode.Editor
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            GUILayout.BeginHorizontal(s_HelpBoxStyle, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(false), GUILayout.MaxWidth(800));
+            GUILayout.BeginHorizontal(
+                s_HelpBoxStyle,
+                GUILayout.ExpandWidth(true),
+                GUILayout.ExpandHeight(false),
+                GUILayout.MaxWidth(800)
+            );
             {
-                GUILayout.Label(new GUIContent(EditorGUIUtility.IconContent(infoIconName)), GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true));
+                GUILayout.Label(
+                    new GUIContent(EditorGUIUtility.IconContent(infoIconName)),
+                    GUILayout.ExpandWidth(false),
+                    GUILayout.ExpandHeight(true)
+                );
                 GUILayout.Space(4);
                 GUILayout.Label(getToolsText, s_CenteredWordWrappedLabelStyle, GUILayout.ExpandHeight(true));
 
@@ -462,7 +548,9 @@ namespace Unity.Netcode.Editor
 
                 GUILayout.BeginVertical();
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button(openDocsButtonText, openDocsButtonStyle, GUILayout.Width(90), GUILayout.Height(30)))
+                if (
+                    GUILayout.Button(openDocsButtonText, openDocsButtonStyle, GUILayout.Width(90), GUILayout.Height(30))
+                )
                 {
                     Application.OpenURL(targetUrl);
                 }

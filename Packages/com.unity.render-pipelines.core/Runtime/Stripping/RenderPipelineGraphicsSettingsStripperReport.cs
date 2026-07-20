@@ -50,12 +50,14 @@ namespace UnityEngine.Rendering
                     m_Data.totalSettingsOnPlayer++;
                 }
 
-                m_Data.settings.Add(new SettingsStrippingInfo()
-                {
-                    type = settingsType.AssemblyQualifiedName,
-                    isAvailableInPlayerBuild = isAvailableInPlayerBuild,
-                    strippersDefined = strippersDefined
-                });
+                m_Data.settings.Add(
+                    new SettingsStrippingInfo()
+                    {
+                        type = settingsType.AssemblyQualifiedName,
+                        isAvailableInPlayerBuild = isAvailableInPlayerBuild,
+                        strippersDefined = strippersDefined,
+                    }
+                );
             }
 
             static void ExportStrippingInfo(string path, Export data)

@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using UnityEngine.InputSystem.Utilities;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.InputSystem.Utilities;
 
 namespace UnityEngine.InputSystem.LowLevel
 {
@@ -49,8 +49,11 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public const long GenericSuccess = 1;
 
-        [FieldOffset(0)] public FourCC type;
-        [FieldOffset(4)] public int sizeInBytes;
+        [FieldOffset(0)]
+        public FourCC type;
+
+        [FieldOffset(4)]
+        public int sizeInBytes;
 
         public int payloadSizeInBytes => sizeInBytes - kBaseCommandSize;
 
@@ -58,7 +61,7 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(void* thisPtr = &this)
+                fixed (void* thisPtr = &this)
                 {
                     return ((byte*)thisPtr) + kBaseCommandSize;
                 }

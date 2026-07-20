@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor.SceneManagement;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline.Utilities
 {
@@ -14,7 +14,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
         {
             Invalid,
             Asset,
-            Scene
+            Scene,
         }
 
         public static Status ValidAsset(GUID asset)

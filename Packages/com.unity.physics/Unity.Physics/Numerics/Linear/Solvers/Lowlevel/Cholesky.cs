@@ -29,9 +29,9 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             L.Clear();
             L.SetDiagonal(0, 1, false, false, true);
 
-            for(int i = 0; i < n; ++i)
+            for (int i = 0; i < n; ++i)
             {
-                for(int j = 0; j < i; ++j)
+                for (int j = 0; j < i; ++j)
                 {
                     L[i, j] = (A[i, j] - L.Rows[i].Subvector(0, i).Dot(L.Rows[j].Subvector(0, i))) / L[j, j];
                 }
@@ -57,15 +57,15 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             singularRow = -1;
 
             var n = A.MinDimension;
-            for(int k = 0; k < n; ++k)
+            for (int k = 0; k < n; ++k)
             {
-                int rs = n - (k+1); // remaining size
+                int rs = n - (k + 1); // remaining size
 
-                using var A21 = A.Submatrix(k+1, k, rs, 1);
+                using var A21 = A.Submatrix(k + 1, k, rs, 1);
                 using var A10 = A.Submatrix(k, 0, 1, k);
-                using var A20 = A.Submatrix(k+1, 0, rs, k);
+                using var A20 = A.Submatrix(k + 1, 0, rs, k);
 
-                var x = A[k,k];
+                var x = A[k, k];
                 if (k > 0)
                 {
                     x -= A10.Rows[0].Dot(A10.Rows[0]); // squared norm: ||A10||^2
@@ -86,7 +86,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
 
                 if (rs > 0)
                 {
-                    A21.ScaleAndAddProduct(Op.None, Op.None, 0, A21, A21, 1/x); // A21 /= x;
+                    A21.ScaleAndAddProduct(Op.None, Op.None, 0, A21, A21, 1 / x); // A21 /= x;
                 }
             }
         }
@@ -107,17 +107,17 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             int n = L_FF.MinDimension;
             int n_1 = n - 1;
             int rows = n_1 - index;
-            var w = L_FF.Cols[index].Subvector(n-rows, rows);
+            var w = L_FF.Cols[index].Subvector(n - rows, rows);
             var beta = 1f;
-            for(int j = 0; j < rows; ++j)
+            for (int j = 0; j < rows; ++j)
             {
                 int k = index + j + 1;
                 var x_j = w[j];
-                var x_j_sq = x_j*x_j;
+                var x_j_sq = x_j * x_j;
                 var y = L_FF[k, k];
-                var ysq = y*y;
+                var ysq = y * y;
                 var z = ysq + x_j_sq / beta;
-                var gamma = ysq*beta + x_j_sq;
+                var gamma = ysq * beta + x_j_sq;
                 var sqrt_z = math.sqrt(z);
                 L_FF[k, k] = sqrt_z;
                 beta += x_j_sq / ysq;
@@ -129,8 +129,8 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                     int k1 = k + 1;
                     var w_sub = w.Subvector(j1, rs);
                     var L_sub = L_FF.Cols[k].Subvector(k1, rs);
-                    w_sub.AddScaled(L_sub, -x_j/y);
-                    if(gamma != 0)
+                    w_sub.AddScaled(L_sub, -x_j / y);
+                    if (gamma != 0)
                     {
                         // todo: combine both in one operation, e.g., by using submatrix and Matrix.ScaleAndAddProduct() rather than subvector
                         L_sub.Scale(sqrt_z / y);
@@ -165,7 +165,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
             int n = L_FF.MinDimension;
             var x = L_FF.Cols[index].Subvector(n - rows, rows);
 
-            for(int k = 0; k < rows; ++k)
+            for (int k = 0; k < rows; ++k)
             {
                 int kk = k + index + 1; // skip over zeros in L
                 var l_kk = L_FF[kk, kk];
@@ -174,7 +174,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                 var c = r / l_kk;
                 var s = x_k / l_kk;
                 L_FF[kk, kk] = r;
-                if(kk < size)
+                if (kk < size)
                 {
                     int tail_size = size - kk;
 
@@ -183,7 +183,7 @@ namespace Unity.Numerics.Linear.Dense.Primitives
                     var L_kk_tail = L_FF.Cols[kk].Subvector(n - tail_size, tail_size);
                     var w_tail = x.Subvector(rows - tail_size, tail_size);
                     L_kk_tail.AddScaled(w_tail, s);
-                    L_kk_tail.Scale(1/c);
+                    L_kk_tail.Scale(1 / c);
                     w_tail.Scale(c);
                     w_tail.AddScaled(L_kk_tail, -s);
                 }

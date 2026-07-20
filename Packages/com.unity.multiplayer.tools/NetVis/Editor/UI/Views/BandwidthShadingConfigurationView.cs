@@ -13,42 +13,66 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
     [LoadUxmlView(NetVisEditorPaths.k_UxmlRoot)]
     partial class BandwidthShadingConfigurationView : InjectedVisualElement<BandwidthShadingConfigurationView>
     {
-        [UxmlQuery(Name = nameof(BandwidthSettings.MeshShadingFill))] MeshShadingFillDropdown MeshShadingFillField;
-        [UxmlQuery] Toggle AutoScale;
-        [UxmlQuery] IntegerField BandwidthMin;
-        [UxmlQuery] IntegerField BandwidthMax;
-        [UxmlQuery] HelpBox MinAndMaxWarning;
+        [UxmlQuery(Name = nameof(BandwidthSettings.MeshShadingFill))]
+        MeshShadingFillDropdown MeshShadingFillField;
 
-        [Inject] NetVisConfigurationWithEvents Configuration;
-        [Inject] IReadonlyBandwidthStats BandwidthStats;
+        [UxmlQuery]
+        Toggle AutoScale;
+
+        [UxmlQuery]
+        IntegerField BandwidthMin;
+
+        [UxmlQuery]
+        IntegerField BandwidthMax;
+
+        [UxmlQuery]
+        HelpBox MinAndMaxWarning;
+
+        [Inject]
+        NetVisConfigurationWithEvents Configuration;
+
+        [Inject]
+        IReadonlyBandwidthStats BandwidthStats;
 
         BandwidthSettings Settings => Configuration.Configuration.Settings.Bandwidth;
 
         public BandwidthShadingConfigurationView()
         {
-            MeshShadingFillField.Bind(Settings.MeshShadingFill, value =>
-            {
-                Settings.MeshShadingFill = value;
-                Configuration.NotifySettingsChanged();
-            });
+            MeshShadingFillField.Bind(
+                Settings.MeshShadingFill,
+                value =>
+                {
+                    Settings.MeshShadingFill = value;
+                    Configuration.NotifySettingsChanged();
+                }
+            );
 
-            AutoScale.Bind(Settings.BandwidthAutoscaling, value =>
-            {
-                Settings.BandwidthAutoscaling = value;
-                Configuration.NotifySettingsChanged();
-            });
+            AutoScale.Bind(
+                Settings.BandwidthAutoscaling,
+                value =>
+                {
+                    Settings.BandwidthAutoscaling = value;
+                    Configuration.NotifySettingsChanged();
+                }
+            );
 
-            BandwidthMin.Bind(Settings.BandwidthMin, value =>
-            {
-                Settings.BandwidthMin = value;
-                Configuration.NotifySettingsChanged();
-            });
+            BandwidthMin.Bind(
+                Settings.BandwidthMin,
+                value =>
+                {
+                    Settings.BandwidthMin = value;
+                    Configuration.NotifySettingsChanged();
+                }
+            );
 
-            BandwidthMax.Bind(Settings.BandwidthMax, value =>
-            {
-                Settings.BandwidthMax = value;
-                Configuration.NotifySettingsChanged();
-            });
+            BandwidthMax.Bind(
+                Settings.BandwidthMax,
+                value =>
+                {
+                    Settings.BandwidthMax = value;
+                    Configuration.NotifySettingsChanged();
+                }
+            );
 
             UpdateMinAndMaxBandwidthFields();
 
@@ -106,11 +130,13 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             if (displayWarning)
             {
                 MinAndMaxWarning.messageType = HelpBoxMessageType.Warning;
-                MinAndMaxWarning.text = min > max
-                    ? "Max bandwidth must be larger than min bandwidth"
-                    : $"Max bandwidth must be larger than min bandwidth. A value of {min + 1} will be used";
+                MinAndMaxWarning.text =
+                    min > max
+                        ? "Max bandwidth must be larger than min bandwidth"
+                        : $"Max bandwidth must be larger than min bandwidth. A value of {min + 1} will be used";
             }
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<BandwidthShadingConfigurationView, UxmlTraits> { }
 #endif

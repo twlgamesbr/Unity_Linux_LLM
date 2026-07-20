@@ -35,12 +35,14 @@ namespace Unity.Netcode
 
         public event NetworkManager.ReanticipateDelegate OnReanticipate;
 
-        private HashSet<IAnticipationEventReceiver> m_AnticipationEventReceivers = new HashSet<IAnticipationEventReceiver>();
+        private HashSet<IAnticipationEventReceiver> m_AnticipationEventReceivers =
+            new HashSet<IAnticipationEventReceiver>();
 
         public void RegisterForAnticipationEvents(IAnticipationEventReceiver receiver)
         {
             m_AnticipationEventReceivers.Add(receiver);
         }
+
         public void DeregisterForAnticipationEvents(IAnticipationEventReceiver receiver)
         {
             m_AnticipationEventReceivers.Remove(receiver);
@@ -88,10 +90,23 @@ namespace Unity.Netcode
 
         public void Sync()
         {
-            if (AllAnticipatedObjects.Count != 0 && !m_NetworkManager.ShutdownInProgress && !m_NetworkManager.ConnectionManager.LocalClient.IsServer && m_NetworkManager.ConnectionManager.LocalClient.IsConnected)
+            if (
+                AllAnticipatedObjects.Count != 0
+                && !m_NetworkManager.ShutdownInProgress
+                && !m_NetworkManager.ConnectionManager.LocalClient.IsServer
+                && m_NetworkManager.ConnectionManager.LocalClient.IsConnected
+            )
             {
-                var message = new AnticipationCounterSyncPingMessage { Counter = AnticipationCounter, Time = m_NetworkManager.LocalTime.Time };
-                m_NetworkManager.MessageManager.SendMessage(ref message, NetworkDelivery.Reliable, NetworkManager.ServerClientId);
+                var message = new AnticipationCounterSyncPingMessage
+                {
+                    Counter = AnticipationCounter,
+                    Time = m_NetworkManager.LocalTime.Time,
+                };
+                m_NetworkManager.MessageManager.SendMessage(
+                    ref message,
+                    NetworkDelivery.Reliable,
+                    NetworkManager.ServerClientId
+                );
             }
 
             ++AnticipationCounter;

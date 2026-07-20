@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine.Rendering;
-
 #if ENABLE_VR && ENABLE_XR_MODULE
 using UnityEngine.XR;
 #endif
@@ -15,6 +14,7 @@ namespace UnityEngine.Experimental.Rendering
     {
         /// <summary> XR shader keyword used by multiview rendering </summary>
         public static GlobalKeyword STEREO_MULTIVIEW_ON;
+
         /// <summary> XR shader keywordused by single pass instanced rendering </summary>
         public static GlobalKeyword STEREO_INSTANCING_ON;
     }
@@ -25,7 +25,7 @@ namespace UnityEngine.Experimental.Rendering
     public static class XRSystem
     {
         // Keep track of only one XR layout
-        static XRLayoutStack s_Layout = new ();
+        static XRLayoutStack s_Layout = new();
 
         // Delegate allocations of XRPass to the render pipeline
         static Func<XRPassCreateInfo, XRPass> s_PassAllocator = null;
@@ -37,7 +37,7 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// Returns the active XR display.
         /// </summary>
-        static public XRDisplaySubsystem GetActiveDisplay()
+        public static XRDisplaySubsystem GetActiveDisplay()
         {
             return s_Display;
         }
@@ -64,7 +64,7 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// Returns true if a XR device is connected and running.
         /// </summary>
-        static public bool displayActive
+        public static bool displayActive
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             get => (s_Display != null) ? s_Display.running : false;
@@ -76,7 +76,7 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// Returns if the XR display is running in HDR mode.
         /// </summary>
-        static public bool isHDRDisplayOutputActive
+        public static bool isHDRDisplayOutputActive
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             get => s_Display?.hdrOutputSettings?.active ?? false;
@@ -93,17 +93,17 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// If true, the system will try to create a layout compatible with single-pass rendering.
         /// </summary>
-        static public bool singlePassAllowed { get; set; } = true;
+        public static bool singlePassAllowed { get; set; } = true;
 
         /// <summary>
         /// Cached value of SystemInfo.foveatedRenderingCaps.
         /// </summary>
-        static public FoveatedRenderingCaps foveatedRenderingCaps { get; set; }
+        public static FoveatedRenderingCaps foveatedRenderingCaps { get; set; }
 
         /// <summary>
         /// If true, the system will log some information about the layout to the console.
         /// </summary>
-        static public bool dumpDebugInfo { get; set; } = false;
+        public static bool dumpDebugInfo { get; set; } = false;
 
         /// <summary>
         /// Use this method to assign the shaders that will be used to render occlusion mesh for each XRPass and the final mirror view.
@@ -111,7 +111,11 @@ namespace UnityEngine.Experimental.Rendering
         /// <param name="passAllocator"> Delegate funcion used to allocate XRPasses. </param>
         /// <param name="occlusionMeshPS"> Fragement shader used for rendering occlusion mesh. </param>
         /// <param name="mirrorViewPS"> Fragement shader used for rendering mirror view. </param>
-        public static void Initialize(Func<XRPassCreateInfo, XRPass> passAllocator, Shader occlusionMeshPS, Shader mirrorViewPS)
+        public static void Initialize(
+            Func<XRPassCreateInfo, XRPass> passAllocator,
+            Shader occlusionMeshPS,
+            Shader mirrorViewPS
+        )
         {
             if (passAllocator == null)
                 throw new ArgumentNullException("passCreator");
@@ -251,7 +255,6 @@ namespace UnityEngine.Experimental.Rendering
                 display.scaleOfAllRenderTargets = renderScale;
 #endif
         }
-
 
         /// <summary>
         /// Used by the render pipeline to retrieve the applied renderViewportScale value from the XR display.
@@ -459,8 +462,10 @@ namespace UnityEngine.Experimental.Rendering
 
             // Pre-calculate view bounds for quad view (2 passes × 2 views) using fixed-size stack variables
             // This avoids List allocations that would cause GC pressure every frame
-            Vector4 pass0View0Bounds = default, pass0View1Bounds = default;
-            Vector4 pass1View0Bounds = default, pass1View1Bounds = default;
+            Vector4 pass0View0Bounds = default,
+                pass0View1Bounds = default;
+            Vector4 pass1View0Bounds = default,
+                pass1View1Bounds = default;
             bool isQuadViewSetup = renderPassCount == 2;
             if (isQuadViewSetup)
             {
@@ -506,7 +511,14 @@ namespace UnityEngine.Experimental.Rendering
 
                 if (CanUseSinglePass(camera, renderPass))
                 {
-                    var createInfo = BuildPass(renderPass, cullingParams, layout, renderPassIndex == s_Display.GetRenderPassCount() - 1, uvScales, uvOffsets);
+                    var createInfo = BuildPass(
+                        renderPass,
+                        cullingParams,
+                        layout,
+                        renderPassIndex == s_Display.GetRenderPassCount() - 1,
+                        uvScales,
+                        uvOffsets
+                    );
                     var xrPass = s_PassAllocator(createInfo);
 
                     for (int renderParamIndex = 0; renderParamIndex < renderParameterCount; ++renderParamIndex)
@@ -520,7 +532,14 @@ namespace UnityEngine.Experimental.Rendering
                 {
                     for (int renderParamIndex = 0; renderParamIndex < renderParameterCount; ++renderParamIndex)
                     {
-                        var createInfo = BuildPass(renderPass, cullingParams, layout, renderPassIndex == s_Display.GetRenderPassCount() - 1, uvScales, uvOffsets);
+                        var createInfo = BuildPass(
+                            renderPass,
+                            cullingParams,
+                            layout,
+                            renderPassIndex == s_Display.GetRenderPassCount() - 1,
+                            uvScales,
+                            uvOffsets
+                        );
                         var xrPass = s_PassAllocator(createInfo);
                         AddViewToPass(xrPass, renderPass, renderParamIndex);
                         layout.AddPass(camera, xrPass);
@@ -544,7 +563,11 @@ namespace UnityEngine.Experimental.Rendering
                 s_Display.GetCullingParameters(camera, renderPass.cullingPassIndex, out var cullingParams);
                 xrPass.AssignCullingParams(renderPass.cullingPassIndex, cullingParams);
 
-                for (int renderParamIndex = 0; renderParamIndex < renderPass.GetRenderParameterCount(); ++renderParamIndex)
+                for (
+                    int renderParamIndex = 0;
+                    renderParamIndex < renderPass.GetRenderParameterCount();
+                    ++renderParamIndex
+                )
                 {
                     renderPass.GetRenderParameter(camera, renderParamIndex, out var renderParam);
                     xrPass.AssignView(renderParamIndex, BuildView(renderPass, renderParam));
@@ -579,59 +602,88 @@ namespace UnityEngine.Experimental.Rendering
             return true;
         }
 
-        static XRView BuildView(XRDisplaySubsystem.XRRenderPass renderPass, XRDisplaySubsystem.XRRenderParameter renderParameter)
+        static XRView BuildView(
+            XRDisplaySubsystem.XRRenderPass renderPass,
+            XRDisplaySubsystem.XRRenderParameter renderParameter
+        )
         {
             // Convert viewport from normalized to screen space
             Rect viewport = renderParameter.viewport;
-            viewport.x      *= renderPass.renderTargetScaledWidth;
-            viewport.width  *= renderPass.renderTargetScaledWidth;
-            viewport.y      *= renderPass.renderTargetScaledHeight;
+            viewport.x *= renderPass.renderTargetScaledWidth;
+            viewport.width *= renderPass.renderTargetScaledWidth;
+            viewport.y *= renderPass.renderTargetScaledHeight;
             viewport.height *= renderPass.renderTargetScaledHeight;
 
             // XRTODO : remove this line and use XRSettings.useOcclusionMesh instead when it's fixed
             Mesh occlusionMesh = XRGraphicsAutomatedTests.running ? null : renderParameter.occlusionMesh;
             Mesh visibleMesh = XRGraphicsAutomatedTests.running ? null : renderParameter.visibleMesh;
 
-            return new XRView(renderParameter.projection, renderParameter.view, renderParameter.previousView, renderParameter.isPreviousViewValid, viewport, occlusionMesh, visibleMesh, renderParameter.textureArraySlice);
+            return new XRView(
+                renderParameter.projection,
+                renderParameter.view,
+                renderParameter.previousView,
+                renderParameter.isPreviousViewValid,
+                viewport,
+                occlusionMesh,
+                visibleMesh,
+                renderParameter.textureArraySlice
+            );
         }
 
-        private static RenderTextureDescriptor XrRenderTextureDescToUnityRenderTextureDesc(RenderTextureDescriptor xrDesc)
+        private static RenderTextureDescriptor XrRenderTextureDescToUnityRenderTextureDesc(
+            RenderTextureDescriptor xrDesc
+        )
         {
             // We can't use descriptor directly because y-flip is forced
             // XRTODO : fix root problem
-            RenderTextureDescriptor rtDesc = new RenderTextureDescriptor(xrDesc.width, xrDesc.height, xrDesc.graphicsFormat, xrDesc.depthStencilFormat, xrDesc.mipCount);
-            rtDesc.dimension    = xrDesc.dimension;
-            rtDesc.msaaSamples  = xrDesc.msaaSamples;
-            rtDesc.volumeDepth  = xrDesc.volumeDepth;
-            rtDesc.vrUsage      = xrDesc.vrUsage;
-            rtDesc.sRGB         = xrDesc.sRGB;
+            RenderTextureDescriptor rtDesc = new RenderTextureDescriptor(
+                xrDesc.width,
+                xrDesc.height,
+                xrDesc.graphicsFormat,
+                xrDesc.depthStencilFormat,
+                xrDesc.mipCount
+            );
+            rtDesc.dimension = xrDesc.dimension;
+            rtDesc.msaaSamples = xrDesc.msaaSamples;
+            rtDesc.volumeDepth = xrDesc.volumeDepth;
+            rtDesc.vrUsage = xrDesc.vrUsage;
+            rtDesc.sRGB = xrDesc.sRGB;
             rtDesc.shadowSamplingMode = xrDesc.shadowSamplingMode;
             return rtDesc;
         }
 
-        static XRPassCreateInfo BuildPass(XRDisplaySubsystem.XRRenderPass xrRenderPass, ScriptableCullingParameters cullingParameters, XRLayout layout, bool isLastPass, Vector4 uvScales, Vector4 uvOffsets)
+        static XRPassCreateInfo BuildPass(
+            XRDisplaySubsystem.XRRenderPass xrRenderPass,
+            ScriptableCullingParameters cullingParameters,
+            XRLayout layout,
+            bool isLastPass,
+            Vector4 uvScales,
+            Vector4 uvOffsets
+        )
         {
             XRPassCreateInfo passInfo = new XRPassCreateInfo
             {
-                renderTarget            = xrRenderPass.renderTarget,
-                renderTargetDesc        = XrRenderTextureDescToUnityRenderTextureDesc(xrRenderPass.renderTargetDesc),
+                renderTarget = xrRenderPass.renderTarget,
+                renderTargetDesc = XrRenderTextureDescToUnityRenderTextureDesc(xrRenderPass.renderTargetDesc),
                 renderTargetScaledWidth = xrRenderPass.renderTargetScaledWidth,
                 renderTargetScaledHeight = xrRenderPass.renderTargetScaledHeight,
-                hasMotionVectorPass      = xrRenderPass.hasMotionVectorPass,
+                hasMotionVectorPass = xrRenderPass.hasMotionVectorPass,
                 motionVectorRenderTarget = xrRenderPass.motionVectorRenderTarget,
-                motionVectorRenderTargetDesc = XrRenderTextureDescToUnityRenderTextureDesc(xrRenderPass.motionVectorRenderTargetDesc),
-                cullingParameters       = cullingParameters,
-                occlusionMeshMaterial   = s_OcclusionMeshMaterial,
-                occlusionMeshScale      = GetOcclusionMeshScale(),
-                foveatedRenderingInfo   = xrRenderPass.foveatedRenderingInfo,
-                multipassId             = layout.GetActivePasses().Count,
-                cullingPassId           = xrRenderPass.cullingPassIndex,
-                copyDepth               = xrRenderPass.shouldFillOutDepth,
+                motionVectorRenderTargetDesc = XrRenderTextureDescToUnityRenderTextureDesc(
+                    xrRenderPass.motionVectorRenderTargetDesc
+                ),
+                cullingParameters = cullingParameters,
+                occlusionMeshMaterial = s_OcclusionMeshMaterial,
+                occlusionMeshScale = GetOcclusionMeshScale(),
+                foveatedRenderingInfo = xrRenderPass.foveatedRenderingInfo,
+                multipassId = layout.GetActivePasses().Count,
+                cullingPassId = xrRenderPass.cullingPassIndex,
+                copyDepth = xrRenderPass.shouldFillOutDepth,
                 spaceWarpRightHandedNDC = xrRenderPass.spaceWarpRightHandedNDC,
-                xrSdkRenderPass         = xrRenderPass,
-                isLastCameraPass        = isLastPass,
-                uvScales                 = uvScales,
-                uvOffsets                = uvOffsets
+                xrSdkRenderPass = xrRenderPass,
+                isLastCameraPass = isLastPass,
+                uvScales = uvScales,
+                uvOffsets = uvOffsets,
             };
 
             return passInfo;

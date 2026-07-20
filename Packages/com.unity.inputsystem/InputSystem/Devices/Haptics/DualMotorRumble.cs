@@ -35,8 +35,7 @@ namespace UnityEngine.InputSystem.Haptics
         /// may actually be paused with <see cref="PauseHaptics"/>.
         /// </remarks>
         public bool isRumbling =>
-            !Mathf.Approximately(lowFrequencyMotorSpeed, 0f)
-            || !Mathf.Approximately(highFrequencyMotorSpeed, 0f);
+            !Mathf.Approximately(lowFrequencyMotorSpeed, 0f) || !Mathf.Approximately(highFrequencyMotorSpeed, 0f);
 
         /// <summary>
         /// Stops haptics by setting motor speeds to zero.

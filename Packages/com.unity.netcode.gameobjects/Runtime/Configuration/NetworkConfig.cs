@@ -18,6 +18,7 @@ namespace Unity.Netcode
         // well, the SpawnTimeOut is now being clamped to within this recommended
         // range both via UI and when NetworkManager is validated.
         internal const float MinSpawnTimeout = 10.0f;
+
         // Clamp spawn time outs to no more than 1 hour (really that is a bit high)
         internal const float MaxSpawnTimeout = 3600.0f;
 
@@ -36,7 +37,9 @@ namespace Unity.Netcode
         /// <summary>
         /// The default player prefab
         /// </summary>
-        [Tooltip("When set, NetworkManager will automatically create and spawn the assigned player prefab. This can be overridden by adding it to the NetworkPrefabs list and selecting override.")]
+        [Tooltip(
+            "When set, NetworkManager will automatically create and spawn the assigned player prefab. This can be overridden by adding it to the NetworkPrefabs list and selecting override."
+        )]
         public GameObject PlayerPrefab;
 
         /// <summary>
@@ -45,11 +48,12 @@ namespace Unity.Netcode
         [SerializeField]
         public NetworkPrefabs Prefabs = new NetworkPrefabs();
 
-
         /// <summary>
         /// The tickrate of network ticks. This value controls how often netcode runs user code and sends out data.
         /// </summary>
-        [Tooltip("The tickrate. This value controls how often netcode runs user code and sends out data. The value is in 'ticks per seconds' which means a value of 50 will result in 50 ticks being executed per second or a fixed delta time of 0.02.")]
+        [Tooltip(
+            "The tickrate. This value controls how often netcode runs user code and sends out data. The value is in 'ticks per seconds' which means a value of 50 will result in 50 ticks being executed per second or a fixed delta time of 0.02."
+        )]
         public uint TickRate = 30;
 
         /// <summary>
@@ -67,7 +71,9 @@ namespace Unity.Netcode
         ///
         /// This setting is server-side only.
         /// </remarks>
-        [Tooltip("The amount of seconds for the server to wait for the connection approval handshake to complete before the client is disconnected")]
+        [Tooltip(
+            "The amount of seconds for the server to wait for the connection approval handshake to complete before the client is disconnected"
+        )]
         public int ClientConnectionBufferTimeout = 10;
 
         /// <summary>
@@ -97,15 +103,19 @@ namespace Unity.Netcode
         /// <summary>
         /// Whether or not to ensure that NetworkVariables can be read even if a client accidentally writes where its not allowed to. This costs some CPU and bandwidth.
         /// </summary>
-        [Tooltip("Ensures that NetworkVariables can be read even if a client accidental writes where its not allowed to. This will cost some CPU time and bandwidth")]
+        [Tooltip(
+            "Ensures that NetworkVariables can be read even if a client accidental writes where its not allowed to. This will cost some CPU time and bandwidth"
+        )]
         public bool EnsureNetworkVariableLengthSafety = false;
 
         /// <summary>
         /// Enables scene management. This will allow network scene switches and automatic scene difference corrections upon connect.
         /// SoftSynced scene objects wont work with this disabled. That means that disabling SceneManagement also enables PrefabSync.
         /// </summary>
-        [Tooltip("Enables scene management. This will allow network scene switches and automatic scene difference corrections upon connect.\n" +
-                 "SoftSynced scene objects wont work with this disabled. That means that disabling SceneManagement also enables PrefabSync.")]
+        [Tooltip(
+            "Enables scene management. This will allow network scene switches and automatic scene difference corrections upon connect.\n"
+                + "SoftSynced scene objects wont work with this disabled. That means that disabling SceneManagement also enables PrefabSync."
+        )]
         public bool EnableSceneManagement = true;
 
         /// <summary>
@@ -136,14 +146,17 @@ namespace Unity.Netcode
         /// <summary>
         /// The amount of seconds to wait for all clients to load or unload a requested scene
         /// </summary>
-        [Tooltip("The amount of seconds to wait for all clients to load or unload a requested scene (only when EnableSceneManagement is enabled)")]
+        [Tooltip(
+            "The amount of seconds to wait for all clients to load or unload a requested scene (only when EnableSceneManagement is enabled)"
+        )]
         public int LoadSceneTimeOut = 120;
 
         /// <summary>
         /// The amount of time a message will be held (deferred) if the destination NetworkObject needed to process the message doesn't exist yet. If the NetworkObject is not spawned within this time period, all deferred messages for that NetworkObject will be dropped.
         /// </summary>
-        [Tooltip("The amount of time a message will be held (deferred) if the destination NetworkObject needed to process the message doesn't exist yet. If the NetworkObject is not spawned within this time period, all deferred messages for that NetworkObject will be dropped.")]
-
+        [Tooltip(
+            "The amount of time a message will be held (deferred) if the destination NetworkObject needed to process the message doesn't exist yet. If the NetworkObject is not spawned within this time period, all deferred messages for that NetworkObject will be dropped."
+        )]
         [Range(MinSpawnTimeout, MaxSpawnTimeout)]
         public float SpawnTimeout = 10f;
 
@@ -177,7 +190,9 @@ namespace Unity.Netcode
         /// <summary>
         /// When enabled (default), the player prefab will automatically be spawned client-side upon the client being approved and synchronized
         /// </summary>
-        [Tooltip("When enabled (default), the player prefab will automatically be spawned (client-side) upon the client being approved and synchronized.")]
+        [Tooltip(
+            "When enabled (default), the player prefab will automatically be spawned (client-side) upon the client being approved and synchronized."
+        )]
         public bool AutoSpawnPlayerPrefabClientSide = true;
 
 #if UNITY_EDITOR
@@ -219,7 +234,6 @@ namespace Unity.Netcode
 
 #endif
 
-
 #if MULTIPLAYER_TOOLS
         /// <summary>
         /// Controls whether network messaging metrics will be gathered. (defaults to true)
@@ -228,14 +242,19 @@ namespace Unity.Netcode
         /// <remarks>
         /// The Realtime Network Stats Monitoring tool requires this to be enabled.
         /// </remarks>
-        [Tooltip("Enable (default) if you want to gather messaging metrics. Realtime Network Stats Monitor requires this to be enabled. Disabling this can improve performance in release builds.")]
+        [Tooltip(
+            "Enable (default) if you want to gather messaging metrics. Realtime Network Stats Monitor requires this to be enabled. Disabling this can improve performance in release builds."
+        )]
         public bool NetworkMessageMetrics = true;
 #endif
+
         /// <summary>
         /// When enabled (default, this enables network profiling information. This does come with a per message processing cost.
         /// Network profiling information is automatically disabled in release builds.
         /// </summary>
-        [Tooltip("Enable (default) if you want to profile network messages with development builds and defaults to being disabled in release builds. When disabled, network messaging profiling will be disabled in development builds.")]
+        [Tooltip(
+            "Enable (default) if you want to profile network messages with development builds and defaults to being disabled in release builds. When disabled, network messaging profiling will be disabled in development builds."
+        )]
         public bool NetworkProfilingMetrics = true;
 
         /// <summary>
@@ -309,7 +328,6 @@ namespace Unity.Netcode
             }
         }
 
-
         private ulong? m_ConfigHash = null;
 
         /// <summary>
@@ -342,7 +360,6 @@ namespace Unity.Netcode
                 {
                     var sortedDictionary = Prefabs.NetworkPrefabOverrideLinks.OrderBy(x => x.Key);
                     foreach (var sortedEntry in sortedDictionary)
-
                     {
                         writer.WriteValueSafe(sortedEntry.Key);
                     }

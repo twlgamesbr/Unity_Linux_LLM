@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEngine.UIElements;
 
 namespace Unity.Entities.Editor
@@ -8,11 +8,11 @@ namespace Unity.Entities.Editor
     [DOTSEditorPreferencesSetting(Constants.Settings.SystemsWindow), UsedImplicitly]
     class SystemsWindowPreferenceSettings : ISetting
     {
-        [InternalSetting] public SystemScheduleWindow.SystemsWindowConfiguration Configuration = new SystemScheduleWindow.SystemsWindowConfiguration();
+        [InternalSetting]
+        public SystemScheduleWindow.SystemsWindowConfiguration Configuration =
+            new SystemScheduleWindow.SystemsWindowConfiguration();
 
-        void ISetting.OnSettingChanged(PropertyPath path)
-        {
-        }
+        void ISetting.OnSettingChanged(PropertyPath path) { }
 
         string[] ISetting.GetSearchKeywords()
         {
@@ -29,8 +29,18 @@ namespace Unity.Entities.Editor
                 var showZeroValues = new VisualElement();
                 var showMorePrecision = new VisualElement();
 
-                DoDefaultGui(showZeroValues, nameof(Configuration) + "." + nameof(SystemScheduleWindow.SystemsWindowConfiguration.Show0sInEntityCountAndTimeColumn));
-                DoDefaultGui(showMorePrecision, nameof(Configuration) + "." + nameof(SystemScheduleWindow.SystemsWindowConfiguration.ShowMorePrecisionForRunningTime));
+                DoDefaultGui(
+                    showZeroValues,
+                    nameof(Configuration)
+                        + "."
+                        + nameof(SystemScheduleWindow.SystemsWindowConfiguration.Show0sInEntityCountAndTimeColumn)
+                );
+                DoDefaultGui(
+                    showMorePrecision,
+                    nameof(Configuration)
+                        + "."
+                        + nameof(SystemScheduleWindow.SystemsWindowConfiguration.ShowMorePrecisionForRunningTime)
+                );
 
                 root.Add(showZeroValues);
                 root.Add(showMorePrecision);

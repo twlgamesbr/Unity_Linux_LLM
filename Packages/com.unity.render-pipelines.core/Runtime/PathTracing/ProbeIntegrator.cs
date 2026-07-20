@@ -2,8 +2,8 @@ using System;
 using UnityEngine.LightTransport;
 using UnityEngine.PathTracing.Core;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.UnifiedRayTracing;
 using UnityEngine.Rendering.Sampling;
+using UnityEngine.Rendering.UnifiedRayTracing;
 
 namespace UnityEngine.PathTracing.Integration
 {
@@ -18,12 +18,14 @@ namespace UnityEngine.PathTracing.Integration
 #if UNITY_EDITOR
         public void Load(RayTracingContext context)
         {
-			const string packageFolder = "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/";
+            const string packageFolder = "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/";
 
             IndirectShader = context.LoadRayTracingShader(packageFolder + "Shaders/ProbeIntegrationIndirect.urtshader");
             DirectShader = context.LoadRayTracingShader(packageFolder + "Shaders/ProbeIntegrationDirect.urtshader");
             ValidityShader = context.LoadRayTracingShader(packageFolder + "Shaders/ProbeIntegrationValidity.urtshader");
-            OcclusionShader = context.LoadRayTracingShader(packageFolder + "Shaders/ProbeIntegrationOcclusion.urtshader");
+            OcclusionShader = context.LoadRayTracingShader(
+                packageFolder + "Shaders/ProbeIntegrationOcclusion.urtshader"
+            );
             GatherKernel = new(SegmentedReduction.LoadShader());
         }
 #endif
@@ -67,7 +69,11 @@ namespace UnityEngine.PathTracing.Integration
             _countNEERayAsPathSegment = countNEERayAsPathSegment;
         }
 
-        internal void Prepare(GraphicsBuffer positionsBuffer, ProbeIntegratorResources integrationResources, SamplingResources samplingResources)
+        internal void Prepare(
+            GraphicsBuffer positionsBuffer,
+            ProbeIntegratorResources integrationResources,
+            SamplingResources samplingResources
+        )
         {
             // First release any previously allocated resources, prepare may be called multiple times
             ReleaseExistingAllocations();
@@ -79,21 +85,65 @@ namespace UnityEngine.PathTracing.Integration
         }
 
         // We need 2 buffers for expansion and gathering: 1 buffer to store expanded samples, and 1 buffer to use as scratch space for the segmented reduction.
-        public static void GetScratchBufferSizesInDwords(uint outputStride, uint positionCount, uint sampleCount, out uint expansionBufferSize, out uint reductionBufferSize)
+        public static void GetScratchBufferSizesInDwords(
+            uint outputStride,
+            uint positionCount,
+            uint sampleCount,
+            out uint expansionBufferSize,
+            out uint reductionBufferSize
+        )
         {
             uint maxProbesPerDispatch = maxTotalSamplesPerDispatch / sampleCount;
             expansionBufferSize = Math.Min(maxTotalSamplesPerDispatch, positionCount * sampleCount) * outputStride;
-            reductionBufferSize = SegmentedReduction.GetScratchBufferSizeInDwords(sampleCount, outputStride, Math.Min(maxProbesPerDispatch, positionCount));
+            reductionBufferSize = SegmentedReduction.GetScratchBufferSizeInDwords(
+                sampleCount,
+                outputStride,
+                Math.Min(maxProbesPerDispatch, positionCount)
+            );
         }
 
-        public static void GetRadianceScratchBufferSizesInDwords(uint positionCount, uint sampleCount, out uint expansionBufferSize, out uint reductionBufferSize)
-            => GetScratchBufferSizesInDwords(27, positionCount, sampleCount, out expansionBufferSize, out reductionBufferSize);
+        public static void GetRadianceScratchBufferSizesInDwords(
+            uint positionCount,
+            uint sampleCount,
+            out uint expansionBufferSize,
+            out uint reductionBufferSize
+        ) =>
+            GetScratchBufferSizesInDwords(
+                27,
+                positionCount,
+                sampleCount,
+                out expansionBufferSize,
+                out reductionBufferSize
+            );
 
-        public static void GetValidityScratchBufferSizesInDwords(uint positionCount, uint sampleCount, out uint expansionBufferSize, out uint reductionBufferSize)
-            => GetScratchBufferSizesInDwords(1, positionCount, sampleCount, out expansionBufferSize, out reductionBufferSize);
+        public static void GetValidityScratchBufferSizesInDwords(
+            uint positionCount,
+            uint sampleCount,
+            out uint expansionBufferSize,
+            out uint reductionBufferSize
+        ) =>
+            GetScratchBufferSizesInDwords(
+                1,
+                positionCount,
+                sampleCount,
+                out expansionBufferSize,
+                out reductionBufferSize
+            );
 
-        public static void GetOcclusionScratchBufferSizesInDwords(uint maxLightsPerProbe, uint positionCount, uint sampleCount, out uint expansionBufferSize, out uint reductionBufferSize)
-            => GetScratchBufferSizesInDwords(maxLightsPerProbe, positionCount, sampleCount, out expansionBufferSize, out reductionBufferSize);
+        public static void GetOcclusionScratchBufferSizesInDwords(
+            uint maxLightsPerProbe,
+            uint positionCount,
+            uint sampleCount,
+            out uint expansionBufferSize,
+            out uint reductionBufferSize
+        ) =>
+            GetScratchBufferSizesInDwords(
+                maxLightsPerProbe,
+                positionCount,
+                sampleCount,
+                out expansionBufferSize,
+                out reductionBufferSize
+            );
 
         private void DispatchRadianceEstimationKernel(
             CommandBuffer cmd,
@@ -111,21 +161,48 @@ namespace UnityEngine.PathTracing.Integration
             GraphicsBuffer radianceShl2,
             uint radianceOffset,
             GraphicsBuffer expansionBuffer,
-            GraphicsBuffer reductionBuffer)
+            GraphicsBuffer reductionBuffer
+        )
         {
             Debug.Assert(world.GetAccelerationStructure() != null);
 
             // General path tracing parameters
             bool preExpose = false;
-            Util.BindPathTracingInputs(cmd, shader, _countNEERayAsPathSegment, risCandidateCount, preExpose, (int)bounceCount, environmentIntensityMultiplier, RenderedGameObjectsFilter.OnlyStatic, _samplingResources, _emptyExposureTexture);
+            Util.BindPathTracingInputs(
+                cmd,
+                shader,
+                _countNEERayAsPathSegment,
+                risCandidateCount,
+                preExpose,
+                (int)bounceCount,
+                environmentIntensityMultiplier,
+                RenderedGameObjectsFilter.OnlyStatic,
+                _samplingResources,
+                _emptyExposureTexture
+            );
             Util.BindWorld(cmd, shader, world);
 
             // Zero initialize the output buffer
             const uint floatsPerSH = 27;
             cmd.SetBufferData(radianceShl2, new float[positionCount * floatsPerSH]);
 
-            DispatchProbeKernel(cmd, shader, positionOffset, positionCount, sampleOffset, sampleCount, floatsPerSH, ShaderProperties.RadianceShl2, radianceShl2, radianceOffset, expansionBuffer, reductionBuffer,
-                bounceCount, roundRobin, maxLightsInAnyCell);
+            DispatchProbeKernel(
+                cmd,
+                shader,
+                positionOffset,
+                positionCount,
+                sampleOffset,
+                sampleCount,
+                floatsPerSH,
+                ShaderProperties.RadianceShl2,
+                radianceShl2,
+                radianceOffset,
+                expansionBuffer,
+                reductionBuffer,
+                bounceCount,
+                roundRobin,
+                maxLightsInAnyCell
+            );
         }
 
         private void DispatchProbeKernel(
@@ -143,7 +220,8 @@ namespace UnityEngine.PathTracing.Integration
             GraphicsBuffer reductionBuffer,
             uint bounceCount,
             bool roundRobin,
-            uint maxLightsInAnyCell)
+            uint maxLightsInAnyCell
+        )
         {
             // Set constant kernel parameters
             shader.SetBufferParam(cmd, ShaderProperties.Positions, _positionsBuffer);
@@ -151,7 +229,13 @@ namespace UnityEngine.PathTracing.Integration
             shader.SetBufferParam(cmd, outputBufferPropertyID, expansionBuffer);
 
             uint totalSamples = positionCount * sampleCount;
-            RayTracingHelper.ResizeScratchBufferForTrace(shader, Math.Min(maxTotalSamplesPerDispatch, totalSamples), 1, 1, ref _traceScratchBuffer);
+            RayTracingHelper.ResizeScratchBufferForTrace(
+                shader,
+                Math.Min(maxTotalSamplesPerDispatch, totalSamples),
+                1,
+                1,
+                ref _traceScratchBuffer
+            );
 
             uint maxProbesPerDispatch = Math.Max(maxTotalSamplesPerDispatch / sampleCount, 1);
 
@@ -189,17 +273,27 @@ namespace UnityEngine.PathTracing.Integration
                         expansionBuffer,
                         reductionBuffer,
                         outputBuffer,
-                        false);
+                        false
+                    );
 
                     // Chip-off work steps based on the current request
                     ulong workStepsForThisRequest = CalculateWorkSteps(probesToDispatch, sampleCount, bounceCount);
                     // We need some resource in order to be able to get an async readback, outputBuffer is as good a candidate as any other
-                    cmd.RequestAsyncReadback(outputBuffer, 1, 0, _ => { _progressState.IncrementCompletedWorkSteps(workStepsForThisRequest); });
+                    cmd.RequestAsyncReadback(
+                        outputBuffer,
+                        1,
+                        0,
+                        _ =>
+                        {
+                            _progressState.IncrementCompletedWorkSteps(workStepsForThisRequest);
+                        }
+                    );
 
                     GraphicsHelpers.Flush(cmd);
                 }
             }
         }
+
         internal static ulong CalculateWorkSteps(ulong probesCount, ulong sampleCount, ulong bounceCount) =>
             probesCount * sampleCount * (0 == bounceCount ? 1 : bounceCount);
 
@@ -217,10 +311,28 @@ namespace UnityEngine.PathTracing.Integration
             GraphicsBuffer radianceShl2,
             uint radianceOffset,
             GraphicsBuffer expansionBuffer,
-            GraphicsBuffer reductionBuffer)
+            GraphicsBuffer reductionBuffer
+        )
         {
             float environmentIntensityMultiplier = ignoreEnvironment ? 0.0f : 1.0f;
-            DispatchRadianceEstimationKernel(cmd, _resourceLibrary.IndirectShader, world, positionOffset, positionCount, bounceCount, sampleOffset, sampleCount, risCandidateCount, maxLightsInAnyCell, false, environmentIntensityMultiplier, radianceShl2, radianceOffset, expansionBuffer, reductionBuffer);
+            DispatchRadianceEstimationKernel(
+                cmd,
+                _resourceLibrary.IndirectShader,
+                world,
+                positionOffset,
+                positionCount,
+                bounceCount,
+                sampleOffset,
+                sampleCount,
+                risCandidateCount,
+                maxLightsInAnyCell,
+                false,
+                environmentIntensityMultiplier,
+                radianceShl2,
+                radianceOffset,
+                expansionBuffer,
+                reductionBuffer
+            );
         }
 
         internal void EstimateDirectRadianceShl2(
@@ -236,10 +348,28 @@ namespace UnityEngine.PathTracing.Integration
             GraphicsBuffer radianceShl2,
             uint radianceOffset,
             GraphicsBuffer expansionBuffer,
-            GraphicsBuffer reductionBuffer)
+            GraphicsBuffer reductionBuffer
+        )
         {
             float environmentIntensityMultiplier = ignoreEnvironment ? 0.0f : 1.0f;
-            DispatchRadianceEstimationKernel(cmd, _resourceLibrary.DirectShader, world, positionOffset, positionCount, 0, sampleOffset, sampleCount, risCandidateCount, maxLightsInAnyCell, true, environmentIntensityMultiplier, radianceShl2, radianceOffset, expansionBuffer, reductionBuffer);
+            DispatchRadianceEstimationKernel(
+                cmd,
+                _resourceLibrary.DirectShader,
+                world,
+                positionOffset,
+                positionCount,
+                0,
+                sampleOffset,
+                sampleCount,
+                risCandidateCount,
+                maxLightsInAnyCell,
+                true,
+                environmentIntensityMultiplier,
+                radianceShl2,
+                radianceOffset,
+                expansionBuffer,
+                reductionBuffer
+            );
         }
 
         internal void EstimateValidity(
@@ -252,7 +382,8 @@ namespace UnityEngine.PathTracing.Integration
             GraphicsBuffer validity,
             uint validityOffset,
             GraphicsBuffer expansionBuffer,
-            GraphicsBuffer reductionBuffer)
+            GraphicsBuffer reductionBuffer
+        )
         {
             var validityShader = _resourceLibrary.ValidityShader;
 
@@ -261,8 +392,23 @@ namespace UnityEngine.PathTracing.Integration
             Util.BindMaterialsAndTextures(cmd, validityShader, world);
             SamplingResources.Bind(cmd, _samplingResources);
 
-            DispatchProbeKernel(cmd, validityShader, positionOffset, positionCount, sampleOffset, sampleCount, 1, ShaderProperties.Validity, validity, validityOffset, expansionBuffer, reductionBuffer,
-                0, false, 0);
+            DispatchProbeKernel(
+                cmd,
+                validityShader,
+                positionOffset,
+                positionCount,
+                sampleOffset,
+                sampleCount,
+                1,
+                ShaderProperties.Validity,
+                validity,
+                validityOffset,
+                expansionBuffer,
+                reductionBuffer,
+                0,
+                false,
+                0
+            );
         }
 
         internal void EstimateLightOcclusion(
@@ -278,7 +424,8 @@ namespace UnityEngine.PathTracing.Integration
             GraphicsBuffer occlusion,
             uint occlusionOffset,
             GraphicsBuffer expansionBuffer,
-            GraphicsBuffer reductionBuffer)
+            GraphicsBuffer reductionBuffer
+        )
         {
             var occlusionShader = _resourceLibrary.OcclusionShader;
 
@@ -287,11 +434,30 @@ namespace UnityEngine.PathTracing.Integration
             SamplingResources.Bind(cmd, _samplingResources);
 
             occlusionShader.SetBufferParam(cmd, ShaderProperties.PerProbeLightIndices, perProbeLightIndices);
-            occlusionShader.SetIntParam(cmd, ShaderProperties.PerProbeLightIndicesOffset, (int)perProbeLightIndicesOffset);
+            occlusionShader.SetIntParam(
+                cmd,
+                ShaderProperties.PerProbeLightIndicesOffset,
+                (int)perProbeLightIndicesOffset
+            );
             occlusionShader.SetIntParam(cmd, ShaderProperties.MaxLightsPerProbe, (int)maxLightsPerProbe);
 
-            DispatchProbeKernel(cmd, occlusionShader, positionOffset, positionCount, sampleOffset, sampleCount, maxLightsPerProbe, ShaderProperties.Occlusion, occlusion, occlusionOffset, expansionBuffer, reductionBuffer,
-                0, false, 0);
+            DispatchProbeKernel(
+                cmd,
+                occlusionShader,
+                positionOffset,
+                positionCount,
+                sampleOffset,
+                sampleCount,
+                maxLightsPerProbe,
+                ShaderProperties.Occlusion,
+                occlusion,
+                occlusionOffset,
+                expansionBuffer,
+                reductionBuffer,
+                0,
+                false,
+                0
+            );
         }
 
         private void ReleaseExistingAllocations()

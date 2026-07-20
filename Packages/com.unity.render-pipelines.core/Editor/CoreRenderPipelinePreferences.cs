@@ -22,7 +22,10 @@ namespace UnityEditor.Rendering
         {
             foreach (var provider in TypeCache.GetTypesDerivedFrom<ICoreRenderPipelinePreferencesProvider>())
             {
-                if (provider.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null) == null)
+                if (
+                    provider.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null)
+                    == null
+                )
                     continue;
                 s_Providers.Add(Activator.CreateInstance(provider) as ICoreRenderPipelinePreferencesProvider);
             }
@@ -54,7 +57,7 @@ namespace UnityEditor.Rendering
                             }
                         }
                     }
-                }
+                },
             };
 
             FillKeywords(provider);

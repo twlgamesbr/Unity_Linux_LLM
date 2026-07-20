@@ -112,7 +112,6 @@ namespace Unity.Netcode
             this += timeSec;
         }
 
-
         /// <summary>
         /// Converts the network time into a fixed time value.
         /// </summary>

@@ -6,9 +6,7 @@ namespace UnityEngine.TestTools.TestRunner
     internal class InvalidSignatureException : ResultStateException
     {
         public InvalidSignatureException(string message)
-            : base(message)
-        {
-        }
+            : base(message) { }
 
         public override ResultState ResultState
         {

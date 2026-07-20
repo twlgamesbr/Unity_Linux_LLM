@@ -1,22 +1,21 @@
 using System.Collections.Generic;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Items
 {
     [DisallowMultipleComponent]
@@ -25,7 +24,8 @@ namespace NPCSystem.Items
     {
         public readonly NetworkList<FixedString64Bytes> itemIds = new NetworkList<FixedString64Bytes>();
 
-        [SerializeField] private string lastInventoryStatus = "Empty";
+        [SerializeField]
+        private string lastInventoryStatus = "Empty";
 
         public IReadOnlyList<string> Items
         {
@@ -109,19 +109,23 @@ namespace NPCSystem.Items
 
         void HandleInventoryChanged(NetworkListEvent<FixedString64Bytes> changeEvent)
         {
-            lastInventoryStatus = itemIds.Count == 0
-                ? "Empty"
-                : $"{itemIds.Count} item(s): {string.Join(", ", Items)}";
+            lastInventoryStatus = itemIds.Count == 0 ? "Empty" : $"{itemIds.Count} item(s): {string.Join(", ", Items)}";
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Inventory updated for player {OwnerClientId}.",
-                source: nameof(NPCPlayerInventory),
-                data: new Dictionary<string, object>
-                {
-                    ["ownerClientId"] = OwnerClientId,
-                    ["eventType"] = changeEvent.Type.ToString(),
-                    ["itemCount"] = itemIds.Count
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.OwnershipAuthority,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    $"Inventory updated for player {OwnerClientId}.",
+                    source: nameof(NPCPlayerInventory),
+                    data: new Dictionary<string, object>
+                    {
+                        ["ownerClientId"] = OwnerClientId,
+                        ["eventType"] = changeEvent.Type.ToString(),
+                        ["itemCount"] = itemIds.Count,
+                    }
+                );
         }
 
         static string NormalizeItemId(string itemId)

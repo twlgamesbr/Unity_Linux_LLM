@@ -4,8 +4,5 @@ namespace Unity.Multiplayer.Tools.Adapters
     /// Purposely empty marker interface, for use in
     /// <see cref="INetworkAdapter"/>.<see cref="INetworkAdapter.GetComponent{K}()"/>.
     /// </summary>
-    interface IAdapterComponent
-    {
-
-    }
+    interface IAdapterComponent { }
 }

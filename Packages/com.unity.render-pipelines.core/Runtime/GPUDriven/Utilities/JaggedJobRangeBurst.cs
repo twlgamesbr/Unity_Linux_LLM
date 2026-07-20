@@ -1,5 +1,5 @@
-using Unity.Collections;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
@@ -29,8 +29,14 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static void ComputeRanges(int workerThreadCount, int batchSizeHint, int totalLength, bool canExceedBatchSizeHint,
-            in NativeArray<UntypedUnsafeList> sections, ref NativeList<JaggedJobRange> jobRanges)
+        public static void ComputeRanges(
+            int workerThreadCount,
+            int batchSizeHint,
+            int totalLength,
+            bool canExceedBatchSizeHint,
+            in NativeArray<UntypedUnsafeList> sections,
+            ref NativeList<JaggedJobRange> jobRanges
+        )
         {
             int idealJobCount = ComputeIdealJobCount(totalLength, batchSizeHint, workerThreadCount);
             Assert.IsTrue(idealJobCount > 0);
@@ -50,7 +56,8 @@ namespace UnityEngine.Rendering
                 while (remainingLength > 0)
                 {
                     // Check for idealBatchSize * 1.5 so that if there is small batch left a the end it is merged with the previous job.
-                    int batchSizeUncapped = remainingLength >= (int)(idealBatchSize * 1.5) ? idealBatchSize : remainingLength;
+                    int batchSizeUncapped =
+                        remainingLength >= (int)(idealBatchSize * 1.5) ? idealBatchSize : remainingLength;
 
                     int batchSize = batchSizeUncapped;
                     if (!canExceedBatchSizeHint && batchSize > batchSizeHint)

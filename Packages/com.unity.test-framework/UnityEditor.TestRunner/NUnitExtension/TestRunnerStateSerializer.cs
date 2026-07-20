@@ -12,7 +12,8 @@ namespace UnityEditor.TestTools.TestRunner
     [Serializable]
     internal class TestRunnerStateSerializer : IStateSerializer
     {
-        private const BindingFlags Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+        private const BindingFlags Flags =
+            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
 
         [SerializeField]
         private HideFlags m_OriginalHideFlags;
@@ -102,7 +103,8 @@ namespace UnityEditor.TestTools.TestRunner
                 LogScope.Current.IgnoreFailingMessages = m_IgnoreFailingMessages;
             }
 
-            currentContext.HasErrorsInDomainReload = currentContext.HasErrorsAfterDomainReload() && !m_IgnoreFailingMessages;
+            currentContext.HasErrorsInDomainReload =
+                currentContext.HasErrorsAfterDomainReload() && !m_IgnoreFailingMessages;
             m_ShouldRestore = false;
         }
 

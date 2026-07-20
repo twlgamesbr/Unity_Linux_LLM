@@ -21,7 +21,7 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
         Type,
         Guid,
         Hash128,
-        Invalid
+        Invalid,
     }
 
     // Custom serializers can be provided by the client code to implement serialization for types that cannot be adequately handled by the generic reflection based code

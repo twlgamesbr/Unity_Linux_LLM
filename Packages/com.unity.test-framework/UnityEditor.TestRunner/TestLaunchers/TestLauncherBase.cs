@@ -19,7 +19,14 @@ namespace UnityEditor.TestTools.TestRunner
             using (new ProfilerMarker(nameof(ExecutePreBuildSetupMethods)).Auto())
             {
                 var logString = "Executing setup for: {0}";
-                return ExecuteMethods<IPrebuildSetup>(tests, testRunnerFilter, new PrebuildSetupAttributeFinder(), logString, targetClass => targetClass.Setup(), TestTargetPlatform);
+                return ExecuteMethods<IPrebuildSetup>(
+                    tests,
+                    testRunnerFilter,
+                    new PrebuildSetupAttributeFinder(),
+                    logString,
+                    targetClass => targetClass.Setup(),
+                    TestTargetPlatform
+                );
             }
         }
 
@@ -31,7 +38,14 @@ namespace UnityEditor.TestTools.TestRunner
                 List<ITest> filteredTests = new List<ITest>();
                 TestFiltering.GetMatchingTests(tests, testRunnerFilter, ref filteredTests, TestTargetPlatform);
                 var testRun = new TestData(TestMode.Player, TestTargetPlatform, filteredTests);
-                return ExecuteMethods<IPrebuildSetupWithTestData>(tests, testRunnerFilter, new PrebuildSetupWithTestDataAttributeFinder(), logString, targetClass => targetClass.Setup(testRun), TestTargetPlatform);
+                return ExecuteMethods<IPrebuildSetupWithTestData>(
+                    tests,
+                    testRunnerFilter,
+                    new PrebuildSetupWithTestDataAttributeFinder(),
+                    logString,
+                    targetClass => targetClass.Setup(testRun),
+                    TestTargetPlatform
+                );
             }
         }
 
@@ -44,17 +58,32 @@ namespace UnityEditor.TestTools.TestRunner
             }
         }
 
-        static void ExecutePostBuildCleanupMethods(ITest tests, ITestFilter testRunnerFilter, RuntimePlatform testTargetPlatform)
+        static void ExecutePostBuildCleanupMethods(
+            ITest tests,
+            ITestFilter testRunnerFilter,
+            RuntimePlatform testTargetPlatform
+        )
         {
             using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto())
             {
                 var attributeFinder = new PostbuildCleanupAttributeFinder();
                 var logString = "Executing cleanup for: {0}";
-                ExecuteMethods<IPostBuildCleanup>(tests, testRunnerFilter, attributeFinder, logString, targetClass => targetClass.Cleanup(), testTargetPlatform);
+                ExecuteMethods<IPostBuildCleanup>(
+                    tests,
+                    testRunnerFilter,
+                    attributeFinder,
+                    logString,
+                    targetClass => targetClass.Cleanup(),
+                    testTargetPlatform
+                );
             }
         }
 
-        static void ExecutePostBuildCleanupWithTestDataMethods(ITest tests, ITestFilter testRunnerFilter, RuntimePlatform testTargetPlatform)
+        static void ExecutePostBuildCleanupWithTestDataMethods(
+            ITest tests,
+            ITestFilter testRunnerFilter,
+            RuntimePlatform testTargetPlatform
+        )
         {
             using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto())
             {
@@ -63,11 +92,25 @@ namespace UnityEditor.TestTools.TestRunner
                 List<ITest> filteredTests = new List<ITest>();
                 TestFiltering.GetMatchingTests(tests, testRunnerFilter, ref filteredTests, testTargetPlatform);
                 var testRun = new TestData(TestMode.Player, testTargetPlatform, filteredTests);
-                ExecuteMethods<IPostbuildCleanupWithTestData>(tests, testRunnerFilter, attributeFinder, logString, targetClass => targetClass.Cleanup(testRun), testTargetPlatform);
+                ExecuteMethods<IPostbuildCleanupWithTestData>(
+                    tests,
+                    testRunnerFilter,
+                    attributeFinder,
+                    logString,
+                    targetClass => targetClass.Cleanup(testRun),
+                    testTargetPlatform
+                );
             }
         }
 
-        private static bool ExecuteMethods<T>(ITest tests, ITestFilter testRunnerFilter, AttributeFinderBase attributeFinder, string logString, Action<T> action, RuntimePlatform testTargetPlatform)
+        private static bool ExecuteMethods<T>(
+            ITest tests,
+            ITestFilter testRunnerFilter,
+            AttributeFinderBase attributeFinder,
+            string logString,
+            Action<T> action,
+            RuntimePlatform testTargetPlatform
+        )
         {
             var exceptionsThrown = false;
             foreach (var targetClassType in attributeFinder.Search(tests, testRunnerFilter, testTargetPlatform))
@@ -84,7 +127,7 @@ namespace UnityEditor.TestTools.TestRunner
                         logScope.EvaluateLogScope(true);
                     }
                 }
-                catch (InvalidCastException) {}
+                catch (InvalidCastException) { }
                 catch (Exception e)
                 {
                     Debug.LogException(e);

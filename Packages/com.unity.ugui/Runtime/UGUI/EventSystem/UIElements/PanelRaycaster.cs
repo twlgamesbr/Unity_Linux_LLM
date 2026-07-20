@@ -58,9 +58,14 @@ namespace UnityEngine.UIElements
         private GameObject selectableGameObject => m_Panel?.selectableGameObject;
 
         public override int sortOrderPriority => Mathf.FloorToInt(m_Panel?.sortingPriority ?? 0f);
-        // Can be null if runtime panels have not been created or UI Toolkit is stripped; default to 0
-        public override int renderOrderPriority => int.MaxValue - ((IRuntimePanel.uIElementsRuntimeUtility?.s_ResolvedSortingIndexMax ?? 0) - (m_Panel?.resolvedSortingIndex ?? 0));
 
+        // Can be null if runtime panels have not been created or UI Toolkit is stripped; default to 0
+        public override int renderOrderPriority =>
+            int.MaxValue
+            - (
+                (IRuntimePanel.uIElementsRuntimeUtility?.s_ResolvedSortingIndexMax ?? 0)
+                - (m_Panel?.resolvedSortingIndex ?? 0)
+            );
 
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
@@ -93,16 +98,21 @@ namespace UnityEngine.UIElements
             var pointerId = currentInputModule.ConvertUIToolkitPointerId(eventData);
 
             var uiElementsUtil = IRuntimePanel.uIElementsRuntimeUtility;
-            if (uiElementsUtil == null || !uiElementsUtil.TryPick(m_Panel, pointerId, position, delta, (int)eventPosition.z, out _))
+            if (
+                uiElementsUtil == null
+                || !uiElementsUtil.TryPick(m_Panel, pointerId, position, delta, (int)eventPosition.z, out _)
+            )
                 return;
 
-            resultAppendList.Add(new RaycastResult
-            {
-                gameObject = selectableGameObject,
-                module = this,
-                screenPosition = eventPosition,
-                displayIndex = m_Panel.targetDisplay,
-            });
+            resultAppendList.Add(
+                new RaycastResult
+                {
+                    gameObject = selectableGameObject,
+                    module = this,
+                    screenPosition = eventPosition,
+                    displayIndex = m_Panel.targetDisplay,
+                }
+            );
         }
 
         public override Camera eventCamera => null;

@@ -13,7 +13,8 @@ namespace Unity.Entities
     /// </summary>
     internal struct BakerState : IDisposable
     {
-        internal UnsafeList<TypeIndex>                 AddedComponents;
+        internal UnsafeList<TypeIndex> AddedComponents;
+
         /// <summary>
         /// Unordered set of valid entities created by a baker. Includes the primary entity.
         /// </summary>
@@ -21,15 +22,15 @@ namespace Unity.Entities
         /// This set is always in sync with the ordered list of entities.
         /// Its main purpose is to speed up the checks of entity validity.
         /// </remarks>
-        internal UnsafeHashSet<Entity>                 Entities;
-        internal Entity                                PrimaryEntity;
+        internal UnsafeHashSet<Entity> Entities;
+        internal Entity PrimaryEntity;
 
 #if UNITY_EDITOR
-        internal UnsafeParallelHashSet<EntityId>                    ReferencedPrefabs;
+        internal UnsafeParallelHashSet<EntityId> ReferencedPrefabs;
 #endif
 
         internal BakeDependencies.RecordedDependencies Dependencies;
-        internal BakerEntityUsage                      Usage;
+        internal BakerEntityUsage Usage;
 
         public BakerState(Entity entity, Allocator allocator)
         {
@@ -45,7 +46,15 @@ namespace Unity.Entities
             Usage = new BakerEntityUsage(entity, 0, allocator);
         }
 
-        public void Revert(EntityCommandBuffer ecb, Entity newPrimaryEntity, ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsage, BlobAssetStore blobAssetStore, ref BakerDebugState bakerDebugState, ref bool dirtyEntityUsage, ref BakedEntityData bakedEntityData)
+        public void Revert(
+            EntityCommandBuffer ecb,
+            Entity newPrimaryEntity,
+            ref UnsafeParallelHashMap<Entity, TransformUsageFlagCounters> transformUsage,
+            BlobAssetStore blobAssetStore,
+            ref BakerDebugState bakerDebugState,
+            ref bool dirtyEntityUsage,
+            ref BakedEntityData bakedEntityData
+        )
         {
             var oldPrimaryEntity = PrimaryEntity;
 

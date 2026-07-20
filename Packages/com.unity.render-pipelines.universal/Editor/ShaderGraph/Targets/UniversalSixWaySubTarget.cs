@@ -1,11 +1,11 @@
 using System;
-using UnityEngine;
 using UnityEditor.ShaderGraph;
-using UnityEngine.UIElements;
+using UnityEngine;
 using UnityEngine.Rendering;
-using static UnityEditor.Rendering.Universal.ShaderGraph.SubShaderUtils;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UIElements;
 using static Unity.Rendering.Universal.ShaderUtils;
+using static UnityEditor.Rendering.Universal.ShaderGraph.SubShaderUtils;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
@@ -50,7 +50,17 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             }
 
             // Process SubShaders
-            context.AddSubShader(PostProcessSubShader(SubShaders.SixWaySubShader(target,  target.renderType, target.renderQueue, target.disableBatching, useColorAbsorption)));
+            context.AddSubShader(
+                PostProcessSubShader(
+                    SubShaders.SixWaySubShader(
+                        target,
+                        target.renderType,
+                        target.renderQueue,
+                        target.disableBatching,
+                        useColorAbsorption
+                    )
+                )
+            );
         }
 
         public override void ProcessPreviewMaterial(Material material)
@@ -70,7 +80,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 material.SetFloat(Property.CullMode, (int)target.renderFace);
                 material.SetFloat(Property.ZWriteControl, (float)target.zWriteControl);
                 material.SetFloat(Property.ZTest, (float)target.zTestMode);
-                material.SetFloat(SixWayProperties.UseColorAbsorption, useColorAbsorption ? 1.0f : 0.0f );
+                material.SetFloat(SixWayProperties.UseColorAbsorption, useColorAbsorption ? 1.0f : 0.0f);
             }
 
             // We always need these properties regardless of whether the material is allowed to override
@@ -94,32 +104,47 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             bool containsNormalDescriptor = false;
             foreach (var block in context.blocks)
             {
-                if (Equals(block.descriptor, BlockFields.SurfaceDescription.NormalOS) ||
-                    Equals(block.descriptor, BlockFields.SurfaceDescription.NormalTS) ||
-                    Equals(block.descriptor, BlockFields.SurfaceDescription.NormalWS))
+                if (
+                    Equals(block.descriptor, BlockFields.SurfaceDescription.NormalOS)
+                    || Equals(block.descriptor, BlockFields.SurfaceDescription.NormalTS)
+                    || Equals(block.descriptor, BlockFields.SurfaceDescription.NormalWS)
+                )
                 {
                     containsNormalDescriptor = true;
                     break;
                 }
             }
             context.AddField(UniversalFields.Normal, containsNormalDescriptor);
-
         }
 
         public struct Varyings
         {
             public static string name = "Varyings";
 
-            public static FieldDescriptor diffuseGIData0 = new FieldDescriptor(Varyings.name, "diffuseGIData0",
-                "VARYINGS_NEED_SIX_WAY_DIFFUSE_GI_DATA", ShaderValueType.Float4 ,subscriptOptions: StructFieldOptions.Optional);
+            public static FieldDescriptor diffuseGIData0 = new FieldDescriptor(
+                Varyings.name,
+                "diffuseGIData0",
+                "VARYINGS_NEED_SIX_WAY_DIFFUSE_GI_DATA",
+                ShaderValueType.Float4,
+                subscriptOptions: StructFieldOptions.Optional
+            );
 
-            public static FieldDescriptor diffuseGIData1 = new FieldDescriptor(Varyings.name, "diffuseGIData1",
-                "VARYINGS_NEED_SIX_WAY_DIFFUSE_GI_DATA", ShaderValueType.Float4 ,subscriptOptions: StructFieldOptions.Optional);
+            public static FieldDescriptor diffuseGIData1 = new FieldDescriptor(
+                Varyings.name,
+                "diffuseGIData1",
+                "VARYINGS_NEED_SIX_WAY_DIFFUSE_GI_DATA",
+                ShaderValueType.Float4,
+                subscriptOptions: StructFieldOptions.Optional
+            );
 
-            public static FieldDescriptor diffuseGIData2 = new FieldDescriptor(Varyings.name, "diffuseGIData2",
-                "VARYINGS_NEED_SIX_WAY_DIFFUSE_GI_DATA", ShaderValueType.Float4, subscriptOptions: StructFieldOptions.Optional);
+            public static FieldDescriptor diffuseGIData2 = new FieldDescriptor(
+                Varyings.name,
+                "diffuseGIData2",
+                "VARYINGS_NEED_SIX_WAY_DIFFUSE_GI_DATA",
+                ShaderValueType.Float4,
+                subscriptOptions: StructFieldOptions.Optional
+            );
         }
-
 
         public override void GetActiveBlocks(ref TargetActiveBlockContext context)
         {
@@ -127,13 +152,21 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             context.AddBlock(BlockFields.SurfaceDescription.Occlusion);
             context.AddBlock(BlockFields.SurfaceDescription.MapRightTopBack);
             context.AddBlock(BlockFields.SurfaceDescription.MapLeftBottomFront);
-            context.AddBlock(BlockFields.SurfaceDescription.AbsorptionStrength, useColorAbsorption || target.allowMaterialOverride);
+            context.AddBlock(
+                BlockFields.SurfaceDescription.AbsorptionStrength,
+                useColorAbsorption || target.allowMaterialOverride
+            );
 
             // when the surface options are material controlled, we must show all of these blocks
             // when target controlled, we can cull the unnecessary blocks
-            context.AddBlock(BlockFields.SurfaceDescription.Alpha, (target.surfaceType == SurfaceType.Transparent || target.alphaClip) || target.allowMaterialOverride);
-            context.AddBlock(BlockFields.SurfaceDescription.AlphaClipThreshold, (target.alphaClip) || target.allowMaterialOverride);
-
+            context.AddBlock(
+                BlockFields.SurfaceDescription.Alpha,
+                (target.surfaceType == SurfaceType.Transparent || target.alphaClip) || target.allowMaterialOverride
+            );
+            context.AddBlock(
+                BlockFields.SurfaceDescription.AlphaClipThreshold,
+                (target.alphaClip) || target.allowMaterialOverride
+            );
         }
 
         public override void CollectShaderProperties(PropertyCollector collector, GenerationMode generationMode)
@@ -148,14 +181,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 collector.AddFloatProperty(Property.SurfaceType, (float)target.surfaceType);
                 collector.AddFloatProperty(Property.BlendMode, (float)target.alphaMode);
                 collector.AddFloatProperty(Property.AlphaClip, target.alphaClip ? 1.0f : 0.0f);
-                collector.AddFloatProperty(Property.SrcBlend, 1.0f);    // always set by material inspector, ok to have incorrect values here
-                collector.AddFloatProperty(Property.DstBlend, 0.0f);    // always set by material inspector, ok to have incorrect values here
-                collector.AddFloatProperty(Property.SrcBlendAlpha, 1.0f);    // always set by material inspector, ok to have incorrect values here
-                collector.AddFloatProperty(Property.DstBlendAlpha, 0.0f);    // always set by material inspector, ok to have incorrect values here
+                collector.AddFloatProperty(Property.SrcBlend, 1.0f); // always set by material inspector, ok to have incorrect values here
+                collector.AddFloatProperty(Property.DstBlend, 0.0f); // always set by material inspector, ok to have incorrect values here
+                collector.AddFloatProperty(Property.SrcBlendAlpha, 1.0f); // always set by material inspector, ok to have incorrect values here
+                collector.AddFloatProperty(Property.DstBlendAlpha, 0.0f); // always set by material inspector, ok to have incorrect values here
                 collector.AddToggleProperty(Property.ZWrite, (target.surfaceType == SurfaceType.Opaque));
                 collector.AddFloatProperty(Property.ZWriteControl, (float)target.zWriteControl);
-                collector.AddFloatProperty(Property.ZTest, (float)target.zTestMode);    // ztest mode is designed to directly pass as ztest
-                collector.AddFloatProperty(Property.CullMode, (float)target.renderFace);    // render face enum is designed to directly pass as a cull mode
+                collector.AddFloatProperty(Property.ZTest, (float)target.zTestMode); // ztest mode is designed to directly pass as ztest
+                collector.AddFloatProperty(Property.CullMode, (float)target.renderFace); // render face enum is designed to directly pass as a cull mode
 
                 bool enableAlphaToMask = (target.alphaClip && (target.surfaceType == SurfaceType.Opaque));
                 collector.AddFloatProperty(Property.AlphaToMask, enableAlphaToMask ? 1.0f : 0.0f);
@@ -170,23 +203,35 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             collector.AddFloatProperty(Property.QueueControl, -1.0f);
         }
 
-        public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public override void GetPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
             var universalTarget = (target as UniversalTarget);
             universalTarget.AddDefaultMaterialOverrideGUI(ref context, onChange, registerUndo);
 
-            universalTarget.AddDefaultSurfacePropertiesGUI(ref context, onChange, registerUndo, showReceiveShadows: true);
+            universalTarget.AddDefaultSurfacePropertiesGUI(
+                ref context,
+                onChange,
+                registerUndo,
+                showReceiveShadows: true
+            );
 
-            context.AddProperty("Use Color Absorption", new Toggle() { value = useColorAbsorption }, (evt) =>
-            {
-                if (Equals(useColorAbsorption, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Use Color Absorption",
+                new Toggle() { value = useColorAbsorption },
+                (evt) =>
+                {
+                    if (Equals(useColorAbsorption, evt.newValue))
+                        return;
 
-                registerUndo("Change Use Color Absorption");
-                useColorAbsorption = evt.newValue;
-                onChange();
-            });
-
+                    registerUndo("Change Use Color Absorption");
+                    useColorAbsorption = evt.newValue;
+                    onChange();
+                }
+            );
         }
 
         protected override int ComputeMaterialNeedsUpdateHash()
@@ -201,7 +246,13 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             const string kSixWayMaterialTypeTag = "\"UniversalMaterialType\" = \"SixWayLit\"";
 
-            public static SubShaderDescriptor SixWaySubShader(UniversalTarget target, string renderType, string renderQueue, string disableBatchingTag, bool useColorAbsorption)
+            public static SubShaderDescriptor SixWaySubShader(
+                UniversalTarget target,
+                string renderType,
+                string renderQueue,
+                string disableBatchingTag,
+                bool useColorAbsorption
+            )
             {
                 SubShaderDescriptor result = new SubShaderDescriptor()
                 {
@@ -211,10 +262,19 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     renderQueue = renderQueue,
                     disableBatchingTag = disableBatchingTag,
                     generatesPreview = true,
-                    passes = new PassCollection()
+                    passes = new PassCollection(),
                 };
 
-                result.passes.Add(SixWayPasses.ForwardOnly(target,  CoreBlockMasks.Vertex, SixWayBlockMasks.FragmentLit, CorePragmas.Forward, SixWayKeywords.Forward, useColorAbsorption));
+                result.passes.Add(
+                    SixWayPasses.ForwardOnly(
+                        target,
+                        CoreBlockMasks.Vertex,
+                        SixWayBlockMasks.FragmentLit,
+                        CorePragmas.Forward,
+                        SixWayKeywords.Forward,
+                        useColorAbsorption
+                    )
+                );
 
                 // cull the shadowcaster pass if we know it will never be used
                 if (target.castShadows || target.allowMaterialOverride)
@@ -238,7 +298,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Passes
         static class SixWayPasses
         {
-            static void AddReceiveShadowsControlToPass(ref PassDescriptor pass, UniversalTarget target, bool receiveShadows)
+            static void AddReceiveShadowsControlToPass(
+                ref PassDescriptor pass,
+                UniversalTarget target,
+                bool receiveShadows
+            )
             {
                 if (target.allowMaterialOverride)
                     pass.keywords.Add(SixWayKeywords.ReceiveShadowsOff);
@@ -246,8 +310,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     pass.defines.Add(SixWayKeywords.ReceiveShadowsOff, 1);
             }
 
-            static void AddColorAbsorptionControlToPass(ref PassDescriptor pass, UniversalTarget target,
-                bool useColorAbsorption)
+            static void AddColorAbsorptionControlToPass(
+                ref PassDescriptor pass,
+                UniversalTarget target,
+                bool useColorAbsorption
+            )
             {
                 if (target.allowMaterialOverride)
                     pass.keywords.Add(SixWayKeywords.UseColorAbsorption);
@@ -261,13 +328,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 {
                     var baseVaryingsDescriptor = UniversalStructs.Varyings;
 
-                    FieldDescriptor[] varyingsDescriptorFields =
-                        new FieldDescriptor[baseVaryingsDescriptor.fields.Length + 3];
+                    FieldDescriptor[] varyingsDescriptorFields = new FieldDescriptor[
+                        baseVaryingsDescriptor.fields.Length + 3
+                    ];
 
                     varyingsDescriptorFields[0] = Varyings.diffuseGIData0;
                     varyingsDescriptorFields[1] = Varyings.diffuseGIData1;
                     varyingsDescriptorFields[2] = Varyings.diffuseGIData2;
-                    baseVaryingsDescriptor.fields.CopyTo(varyingsDescriptorFields,3);
+                    baseVaryingsDescriptor.fields.CopyTo(varyingsDescriptorFields, 3);
                     baseVaryingsDescriptor.fields = varyingsDescriptorFields;
 
                     return baseVaryingsDescriptor;
@@ -288,7 +356,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 BlockFieldDescriptor[] pixelBlocks,
                 PragmaCollection pragmas,
                 KeywordCollection keywords,
-                bool useColorAbsorption)
+                bool useColorAbsorption
+            )
             {
                 var result = new PassDescriptor
                 {
@@ -319,7 +388,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = new IncludeCollection { SixWayIncludes.Forward },
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 CorePasses.AddTargetSurfaceControlsToPass(ref result, target);
@@ -330,8 +399,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
                 return result;
             }
-
-
 
             public static PassDescriptor Meta(UniversalTarget target)
             {
@@ -363,7 +430,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = SixWayIncludes.Meta,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 CorePasses.AddAlphaClipControlToPass(ref result, target);
@@ -388,7 +455,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 BlockFields.SurfaceDescription.AlphaClipThreshold,
             };
 
-
             public static readonly BlockFieldDescriptor[] FragmentMeta = new BlockFieldDescriptor[]
             {
                 BlockFields.SurfaceDescription.BaseColor,
@@ -408,13 +474,13 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 StructFields.Attributes.uv2,
                 StructFields.Varyings.positionWS,
                 StructFields.Varyings.normalWS,
-                StructFields.Varyings.tangentWS,                        // needed for vertex lighting
+                StructFields.Varyings.tangentWS, // needed for vertex lighting
                 UniversalStructFields.Varyings.staticLightmapUV,
                 UniversalStructFields.Varyings.dynamicLightmapUV,
                 UniversalStructFields.Varyings.sh,
                 UniversalStructFields.Varyings.probeOcclusion,
                 UniversalStructFields.Varyings.fogFactorAndVertexLight, // fog and vertex lighting, vert input is dependency
-                UniversalStructFields.Varyings.shadowCoord,             // shadow coord, vert input is dependency
+                UniversalStructFields.Varyings.shadowCoord, // shadow coord, vert input is dependency
                 Varyings.diffuseGIData0,
                 Varyings.diffuseGIData1,
                 Varyings.diffuseGIData2,
@@ -424,14 +490,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             {
                 StructFields.Attributes.positionOS,
                 StructFields.Attributes.normalOS,
-                StructFields.Attributes.uv0,                            //
-                StructFields.Attributes.uv1,                            // needed for meta vertex position
-                StructFields.Attributes.uv2,                            // needed for meta UVs
-                StructFields.Attributes.instanceID,                     // needed for rendering instanced terrain
+                StructFields.Attributes.uv0, //
+                StructFields.Attributes.uv1, // needed for meta vertex position
+                StructFields.Attributes.uv2, // needed for meta UVs
+                StructFields.Attributes.instanceID, // needed for rendering instanced terrain
                 StructFields.Varyings.positionCS,
-                StructFields.Varyings.texCoord0,                        // needed for meta UVs
-                StructFields.Varyings.texCoord1,                        // VizUV
-                StructFields.Varyings.texCoord2,                        // LightCoord
+                StructFields.Varyings.texCoord0, // needed for meta UVs
+                StructFields.Varyings.texCoord1, // VizUV
+                StructFields.Varyings.texCoord2, // LightCoord
             };
         }
         #endregion
@@ -464,7 +530,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 type = KeywordType.Boolean,
                 definition = KeywordDefinition.ShaderFeature,
                 scope = KeywordScope.Local,
-                stages = KeywordShaderStage.Fragment
+                stages = KeywordShaderStage.Fragment,
             };
 
             public static readonly KeywordCollection Forward = new KeywordCollection
@@ -479,7 +545,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreKeywordDescriptors.LightCookies },
                 { CoreKeywordDescriptors.ClusterLightLoop },
             };
-
         }
         #endregion
 
@@ -488,9 +553,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             const string kShadows = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl";
             const string kMetaInput = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl";
-            const string kForwardPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/SixWayForwardPass.hlsl";
-            const string kLightingMetaPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/LightingMetaPass.hlsl";
-            const string kSixWayLighting = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SixWayLighting.hlsl";
+            const string kForwardPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/SixWayForwardPass.hlsl";
+            const string kLightingMetaPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/LightingMetaPass.hlsl";
+            const string kSixWayLighting =
+                "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SixWayLighting.hlsl";
 
             public static readonly IncludeCollection Forward = new IncludeCollection
             {
@@ -502,10 +570,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { kShadows, IncludeLocation.Pregraph },
                 { CoreIncludes.ShaderGraphPregraph },
                 { CoreIncludes.DBufferPregraph },
-
-
                 // Post-graph
-                { kSixWayLighting, IncludeLocation.Postgraph},
+                { kSixWayLighting, IncludeLocation.Postgraph },
                 { CoreIncludes.CorePostgraph },
                 { kForwardPass, IncludeLocation.Postgraph },
             };
@@ -516,7 +582,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.CorePregraph },
                 { CoreIncludes.ShaderGraphPregraph },
                 { kMetaInput, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { CoreIncludes.CorePostgraph },
                 { kLightingMetaPass, IncludeLocation.Postgraph },

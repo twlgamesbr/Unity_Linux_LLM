@@ -106,12 +106,12 @@ namespace UnityEngine.Rendering.Universal
                 _cameraNormalsTexture[i] = TextureHandle.nullHandle;
 
             for (int i = 0; i < _shadowTextures.Length; i++)
-                for (int j = 0; j < _shadowTextures[i].Length; j++)
-                    _shadowTextures[i][j] = TextureHandle.nullHandle;
+            for (int j = 0; j < _shadowTextures[i].Length; j++)
+                _shadowTextures[i][j] = TextureHandle.nullHandle;
 
             for (int i = 0; i < _lightTextures.Length; i++)
-                for (int j = 0; j < _lightTextures[i].Length; j++)
-                    _lightTextures[i][j] = TextureHandle.nullHandle;
+            for (int j = 0; j < _lightTextures[i].Length; j++)
+                _lightTextures[i][j] = TextureHandle.nullHandle;
         }
     }
 }

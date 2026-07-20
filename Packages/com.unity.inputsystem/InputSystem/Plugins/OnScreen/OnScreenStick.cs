@@ -7,7 +7,6 @@ using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.UI;
 using UnityEngine.InputSystem.Controls;
-
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.AnimatedValues;
@@ -97,16 +96,16 @@ namespace UnityEngine.InputSystem.OnScreen
                     else if (m_PointerDownAction.m_Type != InputActionType.PassThrough)
                         m_PointerDownAction.m_Type = InputActionType.PassThrough;
 
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     InputExitPlayModeAnalytic.suppress = true;
-                    #endif
+#endif
                     m_PointerDownAction.AddBinding("<Mouse>/leftButton");
                     m_PointerDownAction.AddBinding("<Pen>/tip");
                     m_PointerDownAction.AddBinding("<Touchscreen>/touch*/press");
                     m_PointerDownAction.AddBinding("<XRController>/trigger");
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     InputExitPlayModeAnalytic.suppress = false;
-                    #endif
+#endif
                 }
 
                 if (m_PointerMoveAction == null || m_PointerMoveAction.bindings.Count == 0)
@@ -114,15 +113,15 @@ namespace UnityEngine.InputSystem.OnScreen
                     if (m_PointerMoveAction == null)
                         m_PointerMoveAction = new InputAction();
 
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     InputExitPlayModeAnalytic.suppress = true;
-                    #endif
+#endif
                     m_PointerMoveAction.AddBinding("<Mouse>/position");
                     m_PointerMoveAction.AddBinding("<Pen>/position");
                     m_PointerMoveAction.AddBinding("<Touchscreen>/touch*/position");
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     InputExitPlayModeAnalytic.suppress = false;
-                    #endif
+#endif
                 }
 
                 m_PointerDownAction.performed += OnPointerChanged;
@@ -174,14 +173,29 @@ namespace UnityEngine.InputSystem.OnScreen
             switch (m_Behaviour)
             {
                 case Behaviour.RelativePositionWithStaticOrigin:
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRectTransform, pointerPosition, uiCamera, out m_PointerDownPos);
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        canvasRectTransform,
+                        pointerPosition,
+                        uiCamera,
+                        out m_PointerDownPos
+                    );
                     break;
                 case Behaviour.ExactPositionWithStaticOrigin:
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRectTransform, pointerPosition, uiCamera, out m_PointerDownPos);
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        canvasRectTransform,
+                        pointerPosition,
+                        uiCamera,
+                        out m_PointerDownPos
+                    );
                     MoveStick(pointerPosition, uiCamera);
                     break;
                 case Behaviour.ExactPositionWithDynamicOrigin:
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRectTransform, pointerPosition, uiCamera, out var pointerDown);
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        canvasRectTransform,
+                        pointerPosition,
+                        uiCamera,
+                        out var pointerDown
+                    );
                     m_PointerDownPos = ((RectTransform)transform).anchoredPosition = pointerDown;
                     break;
             }
@@ -196,7 +210,12 @@ namespace UnityEngine.InputSystem.OnScreen
                 return;
             }
 
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRectTransform, pointerPosition, uiCamera, out var position);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRectTransform,
+                pointerPosition,
+                uiCamera,
+                out var position
+            );
             var delta = position - m_PointerDownPos;
 
             switch (m_Behaviour)
@@ -270,7 +289,10 @@ namespace UnityEngine.InputSystem.OnScreen
             if (touchControl != null)
             {
                 m_TouchControl = touchControl;
-                m_PointerMoveAction.ApplyBindingOverride($"{touchControl.path}/position", path: "<Touchscreen>/touch*/position");
+                m_PointerMoveAction.ApplyBindingOverride(
+                    $"{touchControl.path}/position",
+                    path: "<Touchscreen>/touch*/position"
+                );
             }
 
             m_PointerMoveAction.performed += OnPointerMove;
@@ -332,8 +354,10 @@ namespace UnityEngine.InputSystem.OnScreen
         {
             var canvas = GetComponentInParent<Canvas>();
             var renderMode = canvas?.renderMode;
-            if (renderMode == RenderMode.ScreenSpaceOverlay
-                || (renderMode == RenderMode.ScreenSpaceCamera && canvas?.worldCamera == null))
+            if (
+                renderMode == RenderMode.ScreenSpaceOverlay
+                || (renderMode == RenderMode.ScreenSpaceCamera && canvas?.worldCamera == null)
+            )
                 return null;
 
             return canvas?.worldCamera ?? Camera.main;
@@ -375,7 +399,8 @@ namespace UnityEngine.InputSystem.OnScreen
                 var nextRadian = (i + 1) / 32f * Mathf.PI * 2;
                 Gizmos.DrawLine(
                     new Vector3(center.x + Mathf.Cos(radians) * radius, center.y + Mathf.Sin(radians) * radius, 0),
-                    new Vector3(center.x + Mathf.Cos(nextRadian) * radius, center.y + Mathf.Sin(nextRadian) * radius, 0));
+                    new Vector3(center.x + Mathf.Cos(nextRadian) * radius, center.y + Mathf.Sin(nextRadian) * radius, 0)
+                );
             }
         }
 
@@ -458,28 +483,36 @@ namespace UnityEngine.InputSystem.OnScreen
         private string m_ControlPath;
 
         [SerializeField]
-        [Tooltip("Choose how the onscreen stick will move relative to it's origin and the press position.\n\n" +
-            "RelativePositionWithStaticOrigin: The control's center of origin is fixed. " +
-            "The control will begin un-actuated at it's centered position and then move relative to the pointer or finger motion.\n\n" +
-            "ExactPositionWithStaticOrigin: The control's center of origin is fixed. The stick will immediately jump to the " +
-            "exact position of the click or touch and begin tracking motion from there.\n\n" +
-            "ExactPositionWithDynamicOrigin: The control's center of origin is determined by the initial press position. " +
-            "The stick will begin un-actuated at this center position and then track the current pointer or finger position.")]
+        [Tooltip(
+            "Choose how the onscreen stick will move relative to it's origin and the press position.\n\n"
+                + "RelativePositionWithStaticOrigin: The control's center of origin is fixed. "
+                + "The control will begin un-actuated at it's centered position and then move relative to the pointer or finger motion.\n\n"
+                + "ExactPositionWithStaticOrigin: The control's center of origin is fixed. The stick will immediately jump to the "
+                + "exact position of the click or touch and begin tracking motion from there.\n\n"
+                + "ExactPositionWithDynamicOrigin: The control's center of origin is determined by the initial press position. "
+                + "The stick will begin un-actuated at this center position and then track the current pointer or finger position."
+        )]
         private Behaviour m_Behaviour;
 
         [SerializeField]
-        [Tooltip("Set this to true to prevent cancellation of pointer events due to device switching. Cancellation " +
-            "will appear as the stick jumping back and forth between the pointer position and the stick center.")]
+        [Tooltip(
+            "Set this to true to prevent cancellation of pointer events due to device switching. Cancellation "
+                + "will appear as the stick jumping back and forth between the pointer position and the stick center."
+        )]
         private bool m_UseIsolatedInputActions;
 
         [SerializeField]
-        [Tooltip("The action that will be used to detect pointer down events on the stick control. Note that if no bindings " +
-            "are set, default ones will be provided.")]
+        [Tooltip(
+            "The action that will be used to detect pointer down events on the stick control. Note that if no bindings "
+                + "are set, default ones will be provided."
+        )]
         private InputAction m_PointerDownAction;
 
         [SerializeField]
-        [Tooltip("The action that will be used to detect pointer movement on the stick control. Note that if no bindings " +
-            "are set, default ones will be provided.")]
+        [Tooltip(
+            "The action that will be used to detect pointer movement on the stick control. Note that if no bindings "
+                + "are set, default ones will be provided."
+        )]
         private InputAction m_PointerMoveAction;
 
         private Vector3 m_StartPos;
@@ -487,10 +520,13 @@ namespace UnityEngine.InputSystem.OnScreen
 
         [NonSerialized]
         private List<RaycastResult> m_RaycastResults;
+
         [NonSerialized]
         private PointerEventData m_PointerEventData;
+
         [NonSerialized]
         private TouchControl m_TouchControl;
+
         [NonSerialized]
         private bool m_IsIsolationActive;
 
@@ -520,7 +556,7 @@ namespace UnityEngine.InputSystem.OnScreen
 
             /// <summary>The control's center of origin is determined by the initial press position.
             /// The control will begin unactuated at this center position and then track the current press position.</summary>
-            ExactPositionWithDynamicOrigin
+            ExactPositionWithDynamicOrigin,
         }
 
 #if UNITY_EDITOR
@@ -543,7 +579,9 @@ namespace UnityEngine.InputSystem.OnScreen
                 m_ShowDynamicOriginOptions = new AnimBool(false);
                 m_ShowIsolatedInputActions = new AnimBool(false);
 
-                m_UseIsolatedInputActions = serializedObject.FindProperty(nameof(OnScreenStick.m_UseIsolatedInputActions));
+                m_UseIsolatedInputActions = serializedObject.FindProperty(
+                    nameof(OnScreenStick.m_UseIsolatedInputActions)
+                );
 
                 m_Behaviour = serializedObject.FindProperty(nameof(OnScreenStick.m_Behaviour));
                 m_ControlPathInternal = serializedObject.FindProperty(nameof(OnScreenStick.m_ControlPath));
@@ -569,8 +607,8 @@ namespace UnityEngine.InputSystem.OnScreen
                 EditorGUILayout.PropertyField(m_ControlPathInternal);
                 EditorGUILayout.PropertyField(m_Behaviour);
 
-                m_ShowDynamicOriginOptions.target = ((OnScreenStick)target).behaviour ==
-                    Behaviour.ExactPositionWithDynamicOrigin;
+                m_ShowDynamicOriginOptions.target =
+                    ((OnScreenStick)target).behaviour == Behaviour.ExactPositionWithDynamicOrigin;
                 if (EditorGUILayout.BeginFadeGroup(m_ShowDynamicOriginOptions.faded))
                 {
                     EditorGUI.indentLevel++;

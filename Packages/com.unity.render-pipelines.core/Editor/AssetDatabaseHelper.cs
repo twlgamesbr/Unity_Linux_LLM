@@ -23,7 +23,7 @@ namespace UnityEditor.Rendering
                     yield return castAsset;
             }
         }
-        
+
         /// <summary>
         /// Finds all assets paths of type T in the project.
         /// </summary>
@@ -45,7 +45,7 @@ namespace UnityEditor.Rendering
             int i = typeName.LastIndexOf('.');
             if (i != -1)
             {
-                typeName = typeName.Substring(i+1, typeName.Length - i-1);
+                typeName = typeName.Substring(i + 1, typeName.Length - i - 1);
             }
 
             return string.IsNullOrEmpty(extension) ? $"t:{typeName}" : $"t:{typeName} glob:\"**/*{extension}\"";

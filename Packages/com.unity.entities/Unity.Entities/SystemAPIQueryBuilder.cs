@@ -474,7 +474,6 @@ namespace Unity.Entities
         /// <exception cref="ThrowNotBuildException"></exception>
         public SystemAPIQueryBuilder WithNone<T1, T2, T3>() => throw ThrowNotBuildException();
 
-
         /// <summary>
         /// Specify component types that must NOT be present.
         /// </summary>
@@ -539,7 +538,6 @@ namespace Unity.Entities
         /// <typeparam name="T">Component type to use as an excluded Chunk Component</typeparam>
         /// <returns>The builder object that invoked this method.</returns>
         public SystemAPIQueryBuilder WithNoneChunkComponent<T>() => throw ThrowNotBuildException();
-
 
         /// <summary>
         /// Specify all read-only component types that must be present, whether or not they are enabled on matching entities.
@@ -695,6 +693,9 @@ namespace Unity.Entities
         /// <exception cref="ThrowNotBuildException"></exception>
         public EntityQuery Build() => throw InternalCompilerInterface.ThrowCodeGenException();
 
-        static InvalidOperationException ThrowNotBuildException() => throw new InvalidOperationException("QueryBuilder method chains must end with a Build() invocation to generate an EntityQuery. Please use e.g. QueryBuilder().WithAll<T>().Build() to generate a fully-formed EntityQuery.");
+        static InvalidOperationException ThrowNotBuildException() =>
+            throw new InvalidOperationException(
+                "QueryBuilder method chains must end with a Build() invocation to generate an EntityQuery. Please use e.g. QueryBuilder().WithAll<T>().Build() to generate a fully-formed EntityQuery."
+            );
     }
 }

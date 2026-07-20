@@ -1,5 +1,5 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Unity.Properties;
 using UnityEditor;
@@ -25,12 +25,14 @@ namespace Unity.Entities.Editor
 
         static IEnumerable<string> GetSearchKeywordsFromProperties(System.Type type)
         {
-            return type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Select(prop => ObjectNames.NicifyVariableName(prop.Name));
+            return type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Select(prop => ObjectNames.NicifyVariableName(prop.Name));
         }
 
         static IEnumerable<string> GetSearchKeywordsFromFields(System.Type type)
         {
-            return type.GetFields(BindingFlags.Instance | BindingFlags.Public).Select(prop => ObjectNames.NicifyVariableName(prop.Name));
+            return type.GetFields(BindingFlags.Instance | BindingFlags.Public)
+                .Select(prop => ObjectNames.NicifyVariableName(prop.Name));
         }
 
         static string[] GetSearchKeywordsFromType(System.Type type)

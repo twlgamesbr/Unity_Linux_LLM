@@ -1,8 +1,8 @@
-using UnityEngine;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 namespace Unity.Networking.Transport.Samples
 {
@@ -90,7 +90,9 @@ namespace Unity.Networking.Transport.Samples
                 var connection = Connections[i];
 
                 NetworkEvent.Type eventType;
-                while ((eventType = Driver.PopEventForConnection(connection, out var reader)) != NetworkEvent.Type.Empty)
+                while (
+                    (eventType = Driver.PopEventForConnection(connection, out var reader)) != NetworkEvent.Type.Empty
+                )
                 {
                     if (eventType == NetworkEvent.Type.Data)
                     {
@@ -131,15 +133,11 @@ namespace Unity.Networking.Transport.Samples
             m_ServerJobHandle.Complete();
 
             // Create the jobs first.
-            var updateJob = new ConnectionsUpdateJob
-            {
-                Driver = m_ServerDriver,
-                Connections = m_ServerConnections
-            };
+            var updateJob = new ConnectionsUpdateJob { Driver = m_ServerDriver, Connections = m_ServerConnections };
             var eventsJobs = new ConnectionsEventsJobs
             {
                 Driver = m_ServerDriver.ToConcurrent(),
-                Connections = m_ServerConnections.AsDeferredJobArray()
+                Connections = m_ServerConnections.AsDeferredJobArray(),
             };
 
             // Schedule the job chain.

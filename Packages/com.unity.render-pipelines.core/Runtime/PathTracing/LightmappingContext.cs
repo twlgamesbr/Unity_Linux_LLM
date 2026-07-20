@@ -7,7 +7,7 @@ using UnityEngine.Rendering.UnifiedRayTracing;
 
 namespace UnityEngine.PathTracing.Lightmapping
 {
-    internal class LightmappingContext: IDisposable
+    internal class LightmappingContext : IDisposable
     {
         UnityComputeDeviceContext _deviceContext;
         public UnityComputeWorld World;
@@ -25,6 +25,7 @@ namespace UnityEngine.PathTracing.Lightmapping
         public GraphicsBuffer IndirectDispatchRayTracingBuffer;
 
         public ChartRasterizer ChartRasterizer;
+
         // Temporary buffers required for chart rasterization
         public ChartRasterizer.Buffers ChartRasterizerBuffers;
 
@@ -48,9 +49,14 @@ namespace UnityEngine.PathTracing.Lightmapping
             }
         }
 
-        static public RenderTexture MakeRenderTexture(int width, int height, string name)
+        public static RenderTexture MakeRenderTexture(int width, int height, string name)
         {
-            RenderTextureDescriptor rtDesc = new RenderTextureDescriptor(width, height, RenderTextureFormat.ARGBFloat, 0)
+            RenderTextureDescriptor rtDesc = new RenderTextureDescriptor(
+                width,
+                height,
+                RenderTextureFormat.ARGBFloat,
+                0
+            )
             {
                 sRGB = false,
                 useMipMap = false,
@@ -62,27 +68,29 @@ namespace UnityEngine.PathTracing.Lightmapping
                 vrUsage = VRTextureUsage.None,
                 memoryless = RenderTextureMemoryless.None,
                 useDynamicScale = false,
-                depthBufferBits = 0
+                depthBufferBits = 0,
             };
             RenderTexture renderTexture = new RenderTexture(rtDesc)
             {
                 name = name,
                 enableRandomWrite = true,
-                hideFlags = HideFlags.HideAndDontSave
+                hideFlags = HideFlags.HideAndDontSave,
             };
             return renderTexture;
         }
 
         internal bool ExpandedBufferNeedsUpdating(UInt64 expandedSize)
         {
-            if (ExpandedOutput is not null &&
-                ExpandedDirectional is not null &&
-                CompactedTexelIndices is not null &&
-                GBuffer is not null &&
-                expandedSize == (UInt64)ExpandedOutput.count &&
-                expandedSize == (UInt64)ExpandedDirectional.count &&
-                expandedSize == (UInt64)CompactedTexelIndices.count &&
-                expandedSize == (UInt64)CompactedTexelIndices.count)
+            if (
+                ExpandedOutput is not null
+                && ExpandedDirectional is not null
+                && CompactedTexelIndices is not null
+                && GBuffer is not null
+                && expandedSize == (UInt64)ExpandedOutput.count
+                && expandedSize == (UInt64)ExpandedDirectional.count
+                && expandedSize == (UInt64)CompactedTexelIndices.count
+                && expandedSize == (UInt64)CompactedTexelIndices.count
+            )
             {
                 return false;
             }
@@ -95,7 +103,11 @@ namespace UnityEngine.PathTracing.Lightmapping
                 return true;
 
             ExpandedOutput?.Dispose();
-            ExpandedOutput = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, (int)(expandedSize), sizeof(float) * 4);
+            ExpandedOutput = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource,
+                (int)(expandedSize),
+                sizeof(float) * 4
+            );
             if (ExpandedOutput is null)
             {
                 Dispose();
@@ -103,7 +115,11 @@ namespace UnityEngine.PathTracing.Lightmapping
             }
 
             ExpandedDirectional?.Dispose();
-            ExpandedDirectional = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, (int)(expandedSize), sizeof(float) * 4);
+            ExpandedDirectional = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource,
+                (int)(expandedSize),
+                sizeof(float) * 4
+            );
             if (ExpandedDirectional is null)
             {
                 Dispose();
@@ -111,7 +127,11 @@ namespace UnityEngine.PathTracing.Lightmapping
             }
 
             CompactedTexelIndices?.Dispose();
-            CompactedTexelIndices = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, (int)(expandedSize), sizeof(uint));
+            CompactedTexelIndices = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource,
+                (int)(expandedSize),
+                sizeof(uint)
+            );
             if (CompactedTexelIndices is null)
             {
                 Dispose();
@@ -119,7 +139,11 @@ namespace UnityEngine.PathTracing.Lightmapping
             }
 
             GBuffer?.Dispose();
-            GBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, (int)(expandedSize), 16); // the GBuffer is used to store the UV samples as HitEntry (StochasticLightmapSampling.hlsl) hence the stride
+            GBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource,
+                (int)(expandedSize),
+                16
+            ); // the GBuffer is used to store the UV samples as HitEntry (StochasticLightmapSampling.hlsl) hence the stride
 
             if (GBuffer is null)
             {
@@ -130,14 +154,25 @@ namespace UnityEngine.PathTracing.Lightmapping
             return true;
         }
 
-        internal bool Initialize(UnityComputeDeviceContext deviceContext, int width, int height, UnityComputeWorld world, uint maxIndexCount, uint maxVertexCount, LightmapResourceLibrary resources)
+        internal bool Initialize(
+            UnityComputeDeviceContext deviceContext,
+            int width,
+            int height,
+            UnityComputeWorld world,
+            uint maxIndexCount,
+            uint maxVertexCount,
+            LightmapResourceLibrary resources
+        )
         {
             _deviceContext = deviceContext;
             World = world;
             IntegratorContext = new LightmapIntegratorContext();
             ResourceCache = new LightmapIntegrationResourceCache();
 
-            ChartRasterizer = new ChartRasterizer(resources.SoftwareChartRasterizationShader, resources.HardwareChartRasterizationShader);
+            ChartRasterizer = new ChartRasterizer(
+                resources.SoftwareChartRasterizationShader,
+                resources.HardwareChartRasterizationShader
+            );
             InitializeChartRasterizationBuffers(maxIndexCount, maxVertexCount);
 
             return SetOutputResolution(width, height);
@@ -167,8 +202,19 @@ namespace UnityEngine.PathTracing.Lightmapping
             CompactedGBufferLength?.Dispose();
             IndirectDispatchBuffer?.Dispose();
             IndirectDispatchRayTracingBuffer?.Dispose();
-            CompactedGBufferLength = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource, 1, sizeof(uint));
-            IndirectDispatchBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments | GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource | GraphicsBuffer.Target.CopyDestination, 3, sizeof(uint));
+            CompactedGBufferLength = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource,
+                1,
+                sizeof(uint)
+            );
+            IndirectDispatchBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.IndirectArguments
+                    | GraphicsBuffer.Target.Structured
+                    | GraphicsBuffer.Target.CopySource
+                    | GraphicsBuffer.Target.CopyDestination,
+                3,
+                sizeof(uint)
+            );
             IndirectDispatchRayTracingBuffer = RayTracingHelper.CreateDispatchIndirectBuffer();
 
             return true;
@@ -180,12 +226,22 @@ namespace UnityEngine.PathTracing.Lightmapping
             TraceScratchBuffer = null;
 
             Debug.Assert(World is not null);
-            ulong scratchSize = World.RayTracingContext.GetRequiredTraceScratchBufferSizeInBytes(width, height, expandedSampleWidth);
+            ulong scratchSize = World.RayTracingContext.GetRequiredTraceScratchBufferSizeInBytes(
+                width,
+                height,
+                expandedSampleWidth
+            );
             uint scratchStride = RayTracingContext.GetScratchBufferStrideInBytes();
             if (scratchSize > 0)
             {
-                TraceScratchBuffer = new GraphicsBuffer(RayTracingHelper.ScratchBufferTarget, (int)(scratchSize / scratchStride), 4);
-                Debug.Assert(TraceScratchBuffer == null || TraceScratchBuffer.target == RayTracingHelper.ScratchBufferTarget);
+                TraceScratchBuffer = new GraphicsBuffer(
+                    RayTracingHelper.ScratchBufferTarget,
+                    (int)(scratchSize / scratchStride),
+                    4
+                );
+                Debug.Assert(
+                    TraceScratchBuffer == null || TraceScratchBuffer.target == RayTracingHelper.ScratchBufferTarget
+                );
             }
         }
 
@@ -200,9 +256,21 @@ namespace UnityEngine.PathTracing.Lightmapping
 
             // We base the size of the temporary buffers on the vertex count or index count of the mesh with the most vertices / indices, to avoid constant reallocations.
             uint maxCount = Math.Max(maxIndexCount, maxVertexCount);
-            ChartRasterizerBuffers.vertex = new GraphicsBuffer(GraphicsBuffer.Target.Structured, (int)maxCount, UnsafeUtility.SizeOf<Vector2>());
-            ChartRasterizerBuffers.vertexToOriginalVertex = new GraphicsBuffer(GraphicsBuffer.Target.Structured, (int)maxCount, sizeof(uint));
-            ChartRasterizerBuffers.vertexToChartID = new GraphicsBuffer(GraphicsBuffer.Target.Structured, (int)maxCount, sizeof(uint));
+            ChartRasterizerBuffers.vertex = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                (int)maxCount,
+                UnsafeUtility.SizeOf<Vector2>()
+            );
+            ChartRasterizerBuffers.vertexToOriginalVertex = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                (int)maxCount,
+                sizeof(uint)
+            );
+            ChartRasterizerBuffers.vertexToChartID = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                (int)maxCount,
+                sizeof(uint)
+            );
         }
 
         public CommandBuffer GetCommandBuffer()

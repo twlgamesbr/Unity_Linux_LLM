@@ -7,7 +7,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Filters
 {
     internal class AndFilterExtended : AndFilter
     {
-        public AndFilterExtended(params ITestFilter[] filters) : base(filters) {}
+        public AndFilterExtended(params ITestFilter[] filters)
+            : base(filters) { }
 
         public override bool IsExplicitMatch(ITest test)
         {

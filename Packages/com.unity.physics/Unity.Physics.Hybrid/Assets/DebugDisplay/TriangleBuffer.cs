@@ -25,14 +25,21 @@ namespace Unity.DebugDisplay
             m_BufferAllocations = new NativeReference<Unit>(Allocator.Persistent);
         }
 
-        internal void SetTriangle(float3 vertex0, float3 vertex1, float3 vertex2, float3 normal, Unity.DebugDisplay.ColorIndex colorIndex, int index)
+        internal void SetTriangle(
+            float3 vertex0,
+            float3 vertex1,
+            float3 vertex2,
+            float3 normal,
+            Unity.DebugDisplay.ColorIndex colorIndex,
+            int index
+        )
         {
             m_Buffer[index] = new Instance
             {
                 m_vertex0 = new float4(vertex0, colorIndex.value),
                 m_vertex1 = new float4(vertex1, colorIndex.value),
                 m_vertex2 = new float4(vertex2, colorIndex.value),
-                normal = new float3(normal.x, normal.y, normal.z)
+                normal = new float3(normal.x, normal.y, normal.z),
             };
         }
 
@@ -42,7 +49,7 @@ namespace Unity.DebugDisplay
 
         internal void ClearTriangle(int index)
         {
-            m_Buffer[index] = new Instance {};
+            m_Buffer[index] = new Instance { };
         }
 
         internal NativeArray<Instance> AsArray()

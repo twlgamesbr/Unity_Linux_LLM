@@ -1,9 +1,8 @@
 #if ENABLE_INPUT_SYSTEM && ENABLE_INPUT_SYSTEM_PACKAGE
 #define USE_INPUT_SYSTEM
+using UnityEditor;
 using UnityEngine.InputSystem;
 #endif
-
-using UnityEditor;
 
 namespace UnityEngine.Rendering
 {
@@ -18,7 +17,7 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Singleton instance.
         /// </summary>
-        static public MousePositionDebug instance
+        public static MousePositionDebug instance
         {
             get
             {
@@ -36,6 +35,7 @@ namespace UnityEngine.Rendering
         class GameViewEventCatcher : MonoBehaviour
         {
             public static GameViewEventCatcher s_Instance = null;
+
             public static void Cleanup()
             {
                 if (s_Instance != null)
@@ -58,8 +58,8 @@ namespace UnityEngine.Rendering
             void Update()
             {
                 Vector2 mousePosition;
-                bool    rightClickPressed = false;
-                bool    endKeyPressed = false;
+                bool rightClickPressed = false;
+                bool endKeyPressed = false;
 
 #if USE_INPUT_SYSTEM
                 mousePosition = Pointer.current != null ? Pointer.current.position.ReadValue() : new Vector2(-1, -1);
@@ -73,10 +73,12 @@ namespace UnityEngine.Rendering
                 endKeyPressed = Input.GetKey(KeyCode.End);
 #endif
 
-                if (mousePosition.x < 0
+                if (
+                    mousePosition.x < 0
                     || mousePosition.y < 0
                     || mousePosition.x > Screen.width
-                    || mousePosition.y > Screen.height)
+                    || mousePosition.y > Screen.height
+                )
                     return;
 
                 instance.m_mousePosition = mousePosition;
@@ -111,7 +113,6 @@ namespace UnityEngine.Rendering
                     break;
             }
         }
-
 #endif
 
         /// <summary>

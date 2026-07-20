@@ -12,21 +12,24 @@ namespace UnityEngine.Rendering
         /// Additive: Blend One One
         /// </summary>
         Additive,
+
         /// <summary>
         /// Screen:
         ///     Blend One OneMinusSrcColor
         /// </summary>
         Screen,
+
         /// <summary>
         /// Premultiply:
         ///     Blend One OneMinusSrcAlpha
         ///     ColorMask RGB
         /// </summary>
         Premultiply,
+
         /// <summary>
         /// Lerp: Blend SrcAlpha OneMinusSrcAlpha
         /// </summary>
-        Lerp
+        Lerp,
     }
 
     /// <summary>
@@ -39,14 +42,16 @@ namespace UnityEngine.Rendering
         /// Uniformly spread
         /// </summary>
         Uniform,
+
         /// <summary>
         /// Controlled with curved
         /// </summary>
         Curve,
+
         /// <summary>
         /// Random distribution
         /// </summary>
-        Random
+        Random,
     }
 
     /// <summary>
@@ -62,22 +67,26 @@ namespace UnityEngine.Rendering
         /// Image from a file or a RenderTexture
         /// </summary>
         Image,
+
         /// <summary>
         /// Procedural Circle
         /// </summary>
         Circle,
+
         /// <summary>
         /// Polygon
         /// </summary>
         Polygon,
+
         /// <summary>
         /// shape as a ring
         /// </summary>
         Ring,
+
         /// <summary>
         /// Hoop
         /// </summary>
-        LensFlareDataSRP
+        LensFlareDataSRP,
     }
 
     /// <summary>
@@ -91,14 +100,16 @@ namespace UnityEngine.Rendering
         /// Constant Color
         /// </summary>
         Constant = 0,
+
         /// <summary>
         /// Radial Gradient
         /// </summary>
         RadialGradient,
+
         /// <summary>
         /// Angular Gradient
         /// </summary>
-        AngularGradient
+        AngularGradient,
     }
 
     /// <summary>
@@ -144,8 +155,13 @@ namespace UnityEngine.Rendering
             tintColorType = SRPLensFlareColorType.Constant;
             tint = new Color(1.0f, 1.0f, 1.0f, 0.5f);
             tintGradient = new TextureGradient(
-                new GradientColorKey[] { new GradientColorKey(Color.black, 0.0f), new GradientColorKey(Color.white, 1.0f) },
-                new GradientAlphaKey[] { new GradientAlphaKey(0.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) });
+                new GradientColorKey[]
+                {
+                    new GradientColorKey(Color.black, 0.0f),
+                    new GradientColorKey(Color.white, 1.0f),
+                },
+                new GradientAlphaKey[] { new GradientAlphaKey(0.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+            );
             blendMode = SRPLensFlareBlendMode.Additive;
 
             autoRotate = false;
@@ -156,9 +172,18 @@ namespace UnityEngine.Rendering
 
             lengthSpread = 1f;
             colorGradient = new Gradient();
-            colorGradient.SetKeys(new GradientColorKey[] { new GradientColorKey(Color.white, 0.0f), new GradientColorKey(Color.white, 1.0f) },
-                new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) });
-            positionCurve = new AnimationCurve(new Keyframe(0.0f, 0.0f, 1.0f, 1.0f), new Keyframe(1.0f, 1.0f, 1.0f, -1.0f));
+            colorGradient.SetKeys(
+                new GradientColorKey[]
+                {
+                    new GradientColorKey(Color.white, 0.0f),
+                    new GradientColorKey(Color.white, 1.0f),
+                },
+                new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+            );
+            positionCurve = new AnimationCurve(
+                new Keyframe(0.0f, 0.0f, 1.0f, 1.0f),
+                new Keyframe(1.0f, 1.0f, 1.0f, -1.0f)
+            );
             scaleCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f), new Keyframe(1.0f, 1.0f));
             uniformAngle = 0.0f;
             uniformAngleCurve = new AnimationCurve(new Keyframe(0.0f, 0.0f), new Keyframe(1.0f, 0.0f));
@@ -173,7 +198,10 @@ namespace UnityEngine.Rendering
             // Distortion
             enableRadialDistortion = false;
             targetSizeDistortion = Vector2.one;
-            distortionCurve = new AnimationCurve(new Keyframe(0.0f, 0.0f, 1.0f, 1.0f), new Keyframe(1.0f, 1.0f, 1.0f, -1.0f));
+            distortionCurve = new AnimationCurve(
+                new Keyframe(0.0f, 0.0f, 1.0f, 1.0f),
+                new Keyframe(1.0f, 1.0f, 1.0f, -1.0f)
+            );
             distortionRelativeToCenter = false;
 
             // Parameters for Procedural
@@ -221,7 +249,13 @@ namespace UnityEngine.Rendering
 
             clone.tintColorType = tintColorType;
             clone.tint = tint;
-            clone.tintGradient = new TextureGradient(tintGradient.colorKeys, tintGradient.alphaKeys, tintGradient.mode, tintGradient.colorSpace, tintGradient.textureSize);
+            clone.tintGradient = new TextureGradient(
+                tintGradient.colorKeys,
+                tintGradient.alphaKeys,
+                tintGradient.mode,
+                tintGradient.colorSpace,
+                tintGradient.textureSize
+            );
             clone.tintGradient = new TextureGradient(tintGradient.colorKeys, tintGradient.alphaKeys);
             clone.blendMode = blendMode;
 
@@ -234,7 +268,7 @@ namespace UnityEngine.Rendering
             clone.lengthSpread = lengthSpread;
             clone.colorGradient = new Gradient();
             clone.colorGradient.SetKeys(colorGradient.colorKeys, colorGradient.alphaKeys);
-            clone.colorGradient.mode =  colorGradient.mode;
+            clone.colorGradient.mode = colorGradient.mode;
             clone.colorGradient.colorSpace = colorGradient.colorSpace;
             clone.positionCurve = new AnimationCurve(positionCurve.keys);
             clone.scaleCurve = new AnimationCurve(scaleCurve.keys);
@@ -291,13 +325,16 @@ namespace UnityEngine.Rendering
         // For Ring
         /// <summary>Noise parameter amplitude</summary>
         public float noiseAmplitude;
+
         /// <summary>Noise parameter frequency</summary>
         public int noiseFrequency;
+
         /// <summary>Noise parameter Speed</summary>
         public float noiseSpeed;
 
         /// <summary>To simulate the cutoff of the flare by the circular shape of the lens. How quickly this cutoff happen.</summary>
         public float shapeCutOffSpeed;
+
         /// <summary>To simulate the cutoff of the flare by the circular shape of the lens.</summary>
         public float shapeCutOffRadius;
 

@@ -128,9 +128,7 @@ namespace Unity.Collections
     [NativeContainer]
     [DebuggerTypeProxy(typeof(NativeHashMapDebuggerTypeProxy<,>))]
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-    public unsafe struct NativeHashMap<TKey, TValue>
-        : INativeDisposable
-        , IEnumerable<KVPair<TKey, TValue>> // Used by collection initializers.
+    public unsafe struct NativeHashMap<TKey, TValue> : INativeDisposable, IEnumerable<KVPair<TKey, TValue>> // Used by collection initializers.
         where TKey : unmanaged, IEquatable<TKey>
         where TValue : unmanaged
     {
@@ -139,7 +137,9 @@ namespace Unity.Collections
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         internal AtomicSafetyHandle m_Safety;
-        static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<NativeHashMap<TKey, TValue>>();
+        static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<
+            NativeHashMap<TKey, TValue>
+        >();
 #endif
 
         /// <summary>
@@ -149,7 +149,12 @@ namespace Unity.Collections
         /// <param name="allocator">The allocator to use.</param>
         public NativeHashMap(int initialCapacity, AllocatorManager.AllocatorHandle allocator)
         {
-            m_Data = HashMapHelper<TKey>.Alloc(initialCapacity, sizeof(TValue), HashMapHelper<TKey>.kMinCapacity, allocator);
+            m_Data = HashMapHelper<TKey>.Alloc(
+                initialCapacity,
+                sizeof(TValue),
+                HashMapHelper<TKey>.kMinCapacity,
+                allocator
+            );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             m_Safety = CollectionHelper.CreateSafetyHandle(allocator);
@@ -205,10 +210,20 @@ namespace Unity.Collections
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            var jobHandle = new NativeHashMapDisposeJob { Data = new NativeHashMapDispose { m_HashMapData = (UnsafeHashMap<int, int>*)m_Data, m_Safety = m_Safety } }.Schedule(inputDeps);
+            var jobHandle = new NativeHashMapDisposeJob
+            {
+                Data = new NativeHashMapDispose
+                {
+                    m_HashMapData = (UnsafeHashMap<int, int>*)m_Data,
+                    m_Safety = m_Safety,
+                },
+            }.Schedule(inputDeps);
             AtomicSafetyHandle.Release(m_Safety);
 #else
-            var jobHandle = new NativeHashMapDisposeJob { Data = new NativeHashMapDispose { m_HashMapData = (UnsafeHashMap<int, int>*)m_Data } }.Schedule(inputDeps);
+            var jobHandle = new NativeHashMapDisposeJob
+            {
+                Data = new NativeHashMapDispose { m_HashMapData = (UnsafeHashMap<int, int>*)m_Data },
+            }.Schedule(inputDeps);
 #endif
             m_Data = null;
 
@@ -271,7 +286,6 @@ namespace Unity.Collections
                 CheckRead();
                 return m_Data->Capacity;
             }
-
             set
             {
                 CheckWrite();
@@ -407,7 +421,6 @@ namespace Unity.Collections
 
                 return result;
             }
-
             set
             {
                 CheckWrite();
@@ -468,13 +481,11 @@ namespace Unity.Collections
             var ash = m_Safety;
             AtomicSafetyHandle.UseSecondaryVersion(ref ash);
 #endif
-            return new Enumerator
-            {
+            return new Enumerator {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 m_Safety = ash,
 #endif
-                m_Enumerator = new HashMapHelper<TKey>.Enumerator(m_Data),
-            };
+                m_Enumerator = new HashMapHelper<TKey>.Enumerator(m_Data) };
         }
 
         /// <summary>
@@ -575,8 +586,7 @@ namespace Unity.Collections
         [NativeContainer]
         [NativeContainerIsReadOnly]
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public struct ReadOnly
-            : IEnumerable<KVPair<TKey, TValue>>
+        public struct ReadOnly : IEnumerable<KVPair<TKey, TValue>>
         {
             [NativeDisableUnsafePtrRestriction]
             internal HashMapHelper<TKey>* m_Data;
@@ -726,7 +736,9 @@ namespace Unity.Collections
             /// <remarks>The key-value pairs are copied in no particular order. For all `i`, `Values[i]` will be the value associated with `Keys[i]`.</remarks>
             /// <param name="allocator">The allocator to use.</param>
             /// <returns>A NativeKeyValueArrays with a copy of all this hash map's keys and values.</returns>
-            public readonly NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays(AllocatorManager.AllocatorHandle allocator)
+            public readonly NativeKeyValueArrays<TKey, TValue> GetKeyValueArrays(
+                AllocatorManager.AllocatorHandle allocator
+            )
             {
                 CheckRead();
                 return m_Data->GetKeyValueArrays<TValue>(allocator);
@@ -743,13 +755,11 @@ namespace Unity.Collections
                 var ash = m_Safety;
                 AtomicSafetyHandle.UseSecondaryVersion(ref ash);
 #endif
-                return new Enumerator
-                {
+                return new Enumerator {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                     m_Safety = ash,
 #endif
-                    m_Enumerator = new HashMapHelper<TKey>.Enumerator(m_Data),
-                };
+                    m_Enumerator = new HashMapHelper<TKey>.Enumerator(m_Data) };
             }
 
             /// <summary>
@@ -821,11 +831,13 @@ namespace Unity.Collections
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
         void ThrowAtMaxCapacity()
         {
-            throw new InvalidOperationException($"Capacity is insufficient, and resize would fail (Capacity {Capacity} / {MaxCapacity}, Count {Count})!");
+            throw new InvalidOperationException(
+                $"Capacity is insufficient, and resize would fail (Capacity {Capacity} / {MaxCapacity}, Count {Count})!"
+            );
         }
     }
 
-    internal unsafe sealed class NativeHashMapDebuggerTypeProxy<TKey, TValue>
+    internal sealed unsafe class NativeHashMapDebuggerTypeProxy<TKey, TValue>
         where TKey : unmanaged, IEquatable<TKey>
         where TValue : unmanaged
     {

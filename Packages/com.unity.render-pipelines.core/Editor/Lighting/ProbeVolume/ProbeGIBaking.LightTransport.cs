@@ -8,7 +8,11 @@ using UnityEngine.LightTransport;
 using UnityEngine.Rendering.Sampling;
 using UnityEngine.Rendering.UnifiedRayTracing;
 using UnityEngine.SceneManagement;
-using TouchupVolumeWithBoundsList = System.Collections.Generic.List<(UnityEngine.Rendering.ProbeReferenceVolume.Volume obb, UnityEngine.Bounds aabb, UnityEngine.Rendering.ProbeAdjustmentVolume volume)>;
+using TouchupVolumeWithBoundsList = System.Collections.Generic.List<(
+    UnityEngine.Rendering.ProbeReferenceVolume.Volume obb,
+    UnityEngine.Bounds aabb,
+    UnityEngine.Rendering.ProbeAdjustmentVolume volume
+)>;
 
 namespace UnityEngine.Rendering
 {
@@ -21,18 +25,22 @@ namespace UnityEngine.Rendering
         {
             /// <summary>Indicates that the Step method can be safely called from a thread.</summary>
             public virtual bool isThreadSafe => false;
+
             /// <summary>Set to true when the main thread cancels baking.</summary>
             public static bool cancel { get; internal set; }
 
             /// <summary>The current baking step.</summary>
             public abstract ulong currentStep { get; }
+
             /// <summary>The total amount of step.</summary>
             public abstract ulong stepCount { get; }
 
             /// <summary>Array storing the probe lighting as Spherical Harmonics.</summary>
             public abstract NativeArray<SphericalHarmonicsL2> irradiance { get; }
+
             /// <summary>Array storing the probe validity. A value of 1 means a probe is invalid.</summary>
             public abstract NativeArray<float> validity { get; }
+
             /// <summary>Array storing 4 light occlusion values for each probe.</summary>
             public abstract NativeArray<Vector4> occlusion { get; }
 
@@ -49,7 +57,11 @@ namespace UnityEngine.Rendering
             /// <param name="bakeProbeOcclusion">Whether to bake occlusion for mixed lights for each probe.</param>
             /// <param name="probePositions">The probe positions. Also contains reflection probe positions used for normalization.</param>
             /// <param name="bakedRenderingLayerMasks">The rendering layer masks assigned to each probe. It is used when fixing seams between subdivision levels</param>
-            public abstract void Initialize(bool bakeProbeOcclusion, NativeArray<Vector3> probePositions, NativeArray<uint> bakedRenderingLayerMasks);
+            public abstract void Initialize(
+                bool bakeProbeOcclusion,
+                NativeArray<Vector3> probePositions,
+                NativeArray<uint> bakedRenderingLayerMasks
+            );
 
             /// <summary>
             /// Run a step of light baking. Baking is considered done when currentStep property equals stepCount.
@@ -94,13 +106,29 @@ namespace UnityEngine.Rendering
                 isDone = false;
                 step = 0;
                 probeCount = probePositions.Length;
-                irradianceResults = new NativeArray<SphericalHarmonicsL2>(probePositions.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                validityResults = new NativeArray<float>(probePositions.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                irradianceResults = new NativeArray<SphericalHarmonicsL2>(
+                    probePositions.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
+                validityResults = new NativeArray<float>(
+                    probePositions.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 if (bakeProbeOcclusion)
-                    occlusionResults = new NativeArray<Vector4>(probePositions.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                    occlusionResults = new NativeArray<Vector4>(
+                        probePositions.Length,
+                        Allocator.Persistent,
+                        NativeArrayOptions.UninitializedMemory
+                    );
             }
 
-            public override void Initialize(bool bakeProbeOcclusion, NativeArray<Vector3> probePositions, NativeArray<uint> bakedRenderingLayerMasks)
+            public override void Initialize(
+                bool bakeProbeOcclusion,
+                NativeArray<Vector3> probePositions,
+                NativeArray<uint> bakedRenderingLayerMasks
+            )
             {
                 renderingLayerMasks.Dispose();
                 if (bakedRenderingLayerMasks.IsCreated)
@@ -128,8 +156,10 @@ namespace UnityEngine.Rendering
                         bakePipelineDriver = new BakePipelineDriver();
 
                         bakePipelineDriver.StartBake(
-                        bakeType == BakeType.ApvOnly, // We need patching for ApvOnly, not for AdditionalApvOnly.
-                        ref progress, ref stage);
+                            bakeType == BakeType.ApvOnly, // We need patching for ApvOnly, not for AdditionalApvOnly.
+                            ref progress,
+                            ref stage
+                        );
                     }
 
                     // For a full bake, we are called after the bake pipeline driver has finished.
@@ -155,31 +185,52 @@ namespace UnityEngine.Rendering
                     string postProcessOutputFolder = APVLightBakerPostProcessingOutputFolder + probeOutputSubFolder;
 
                     {
-                        using NativeArray<byte> shBytes = new(File.ReadAllBytes(Path.Combine(postProcessOutputFolder, "irradiance.shl2")), Allocator.TempJob);
-                        using NativeArray<SphericalHarmonicsL2> shData = shBytes.GetSubArray(sizeof(ulong), shBytes.Length - sizeof(ulong)).Reinterpret<SphericalHarmonicsL2>(sizeof(byte));
+                        using NativeArray<byte> shBytes = new(
+                            File.ReadAllBytes(Path.Combine(postProcessOutputFolder, "irradiance.shl2")),
+                            Allocator.TempJob
+                        );
+                        using NativeArray<SphericalHarmonicsL2> shData = shBytes
+                            .GetSubArray(sizeof(ulong), shBytes.Length - sizeof(ulong))
+                            .Reinterpret<SphericalHarmonicsL2>(sizeof(byte));
                         irradiance.GetSubArray(job.startOffset, job.probeCount).CopyFrom(shData);
                     }
                     {
-                        using NativeArray<byte> validityBytes = new(File.ReadAllBytes(Path.Combine(outputFolder, $"validity{requestIdx}.float")), Allocator.TempJob);
-                        using NativeArray<float> validityData = validityBytes.GetSubArray(sizeof(ulong), validityBytes.Length - sizeof(ulong)).Reinterpret<float>(sizeof(byte));
+                        using NativeArray<byte> validityBytes = new(
+                            File.ReadAllBytes(Path.Combine(outputFolder, $"validity{requestIdx}.float")),
+                            Allocator.TempJob
+                        );
+                        using NativeArray<float> validityData = validityBytes
+                            .GetSubArray(sizeof(ulong), validityBytes.Length - sizeof(ulong))
+                            .Reinterpret<float>(sizeof(byte));
                         validity.GetSubArray(job.startOffset, job.probeCount).CopyFrom(validityData);
                     }
 
                     if (occlusionResults.IsCreated)
                     {
                         // Read LightProbeOcclusion structs from disk
-                        using NativeArray<byte> occlusionBytes = new(File.ReadAllBytes(Path.Combine(postProcessOutputFolder, "occlusion.occ")), Allocator.TempJob);
-                        using NativeArray<LightProbeOcclusion> occlusionData = occlusionBytes.GetSubArray(sizeof(ulong), occlusionBytes.Length - sizeof(ulong)).Reinterpret<LightProbeOcclusion>(sizeof(byte));
+                        using NativeArray<byte> occlusionBytes = new(
+                            File.ReadAllBytes(Path.Combine(postProcessOutputFolder, "occlusion.occ")),
+                            Allocator.TempJob
+                        );
+                        using NativeArray<LightProbeOcclusion> occlusionData = occlusionBytes
+                            .GetSubArray(sizeof(ulong), occlusionBytes.Length - sizeof(ulong))
+                            .Reinterpret<LightProbeOcclusion>(sizeof(byte));
 
                         // Create swizzled occlusion buffer which is indexed by shadowmask channel. This the format expected by shader code.
-                        NativeArray<Vector4> swizzledOcclusion = new NativeArray<Vector4>(occlusionData.Length, Allocator.TempJob);
+                        NativeArray<Vector4> swizzledOcclusion = new NativeArray<Vector4>(
+                            occlusionData.Length,
+                            Allocator.TempJob
+                        );
                         for (int probeIdx = 0; probeIdx < occlusionData.Length; probeIdx++)
                         {
                             LightProbeOcclusion probeOcclusionData = occlusionData[probeIdx];
                             Vector4 swizzled = Vector4.zero;
                             for (int lightIdx = 0; lightIdx < 4; lightIdx++)
                             {
-                                if (probeOcclusionData.GetOcclusionMaskChannel(lightIdx, out sbyte shadowmaskIdx) && shadowmaskIdx >= 0)
+                                if (
+                                    probeOcclusionData.GetOcclusionMaskChannel(lightIdx, out sbyte shadowmaskIdx)
+                                    && shadowmaskIdx >= 0
+                                )
                                 {
                                     probeOcclusionData.GetOcclusion(lightIdx, out float occlusionFactor);
                                     swizzled[shadowmaskIdx] = occlusionFactor;
@@ -232,11 +283,22 @@ namespace UnityEngine.Rendering
             public bool ignoreEnvironement;
 
             public BakeProgressState progress;
-            public ulong currentStep => (ulong)Mathf.Min(progress.Progress() * 0.01f / (float)(directSampleCount + indirectSampleCount + validitySampleCount), stepCount); // this is how the progress is computed in c++
+            public ulong currentStep =>
+                (ulong)
+                    Mathf.Min(
+                        progress.Progress()
+                            * 0.01f
+                            / (float)(directSampleCount + indirectSampleCount + validitySampleCount),
+                        stepCount
+                    ); // this is how the progress is computed in c++
             public ulong stepCount => (ulong)probeCount;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Create(ProbeVolumeBakingSet bakingSet, LightingSettings lightingSettings, bool ignoreEnvironement)
+            public void Create(
+                ProbeVolumeBakingSet bakingSet,
+                LightingSettings lightingSettings,
+                bool ignoreEnvironement
+            )
             {
                 skyOcclusionBakingSamples = bakingSet != null ? bakingSet.skyOcclusionBakingSamples : 0;
                 skyOcclusionBakingBounces = bakingSet != null ? bakingSet.skyOcclusionBakingBounces : 0;
@@ -244,14 +306,28 @@ namespace UnityEngine.Rendering
 #if UNIFIED_BAKER
                 int indirectSampleCount = lightingSettings.indirectSampleCount;
 #else
-                int indirectSampleCount = Math.Max(lightingSettings.indirectSampleCount, lightingSettings.environmentSampleCount);
+                int indirectSampleCount = Math.Max(
+                    lightingSettings.indirectSampleCount,
+                    lightingSettings.environmentSampleCount
+                );
 #endif
-                Create(lightingSettings, ignoreEnvironement, lightingSettings.directSampleCount, indirectSampleCount, lightingSettings.environmentSampleCount,
-                    (int)lightingSettings.lightProbeSampleCountMultiplier, lightingSettings.maxBounces);
+                Create(
+                    lightingSettings,
+                    ignoreEnvironement,
+                    lightingSettings.directSampleCount,
+                    indirectSampleCount,
+                    lightingSettings.environmentSampleCount,
+                    (int)lightingSettings.lightProbeSampleCountMultiplier,
+                    lightingSettings.maxBounces
+                );
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal void Create(LightingSettings lightingSettings, bool ignoreEnvironement, (ProbeReferenceVolume.Volume obb, Bounds aabb, ProbeAdjustmentVolume touchup) volume)
+            internal void Create(
+                LightingSettings lightingSettings,
+                bool ignoreEnvironement,
+                (ProbeReferenceVolume.Volume obb, Bounds aabb, ProbeAdjustmentVolume touchup) volume
+            )
             {
                 obb = volume.obb;
                 aabb = volume.aabb;
@@ -260,11 +336,27 @@ namespace UnityEngine.Rendering
                 skyOcclusionBakingSamples = touchup.skyOcclusionSampleCount;
                 skyOcclusionBakingBounces = touchup.skyOcclusionMaxBounces;
 
-                Create(lightingSettings, ignoreEnvironement, touchup.directSampleCount, touchup.indirectSampleCount, touchup.indirectSampleCount,touchup.sampleCountMultiplier, touchup.maxBounces);
+                Create(
+                    lightingSettings,
+                    ignoreEnvironement,
+                    touchup.directSampleCount,
+                    touchup.indirectSampleCount,
+                    touchup.indirectSampleCount,
+                    touchup.sampleCountMultiplier,
+                    touchup.maxBounces
+                );
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            void Create(LightingSettings lightingSettings, bool ignoreEnvironement, int directSampleCount, int indirectSampleCount, int environmentSampleCount, int sampleCountMultiplier, int maxBounces)
+            void Create(
+                LightingSettings lightingSettings,
+                bool ignoreEnvironement,
+                int directSampleCount,
+                int indirectSampleCount,
+                int environmentSampleCount,
+                int sampleCountMultiplier,
+                int maxBounces
+            )
             {
                 // We could preallocate wrt touchup aabb volume, or total brick count for the global job
                 progress = new BakeProgressState();
@@ -382,12 +474,15 @@ namespace UnityEngine.Rendering
             internal AccelStructAdapter CreateAccelerationStructure()
             {
                 var c = context;
-                return new AccelStructAdapter(c.CreateAccelerationStructure(new AccelerationStructureOptions
-                {
-                    // Use PreferFastBuild to avoid bug triggered with big meshes (UUM-52552));
-                    buildFlags = BuildFlags.PreferFastBuild
-                }),
-                m_RayTracingResources
+                return new AccelStructAdapter(
+                    c.CreateAccelerationStructure(
+                        new AccelerationStructureOptions
+                        {
+                            // Use PreferFastBuild to avoid bug triggered with big meshes (UUM-52552));
+                            buildFlags = BuildFlags.PreferFastBuild,
+                        }
+                    ),
+                    m_RayTracingResources
                 );
             }
 
@@ -400,7 +495,9 @@ namespace UnityEngine.Rendering
                         m_RayTracingResources = new RayTracingResources();
                         m_RayTracingResources.Load();
 
-                        m_Backend = RayTracingContext.IsBackendSupported(RayTracingBackend.Hardware) ? RayTracingBackend.Hardware : RayTracingBackend.Compute;
+                        m_Backend = RayTracingContext.IsBackendSupported(RayTracingBackend.Hardware)
+                            ? RayTracingBackend.Hardware
+                            : RayTracingBackend.Compute;
 
                         m_Context = new RayTracingContext(m_Backend, m_RayTracingResources);
                     }
@@ -416,12 +513,14 @@ namespace UnityEngine.Rendering
                     if (m_ShaderVO == null)
                     {
                         var bakingResources = GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeBakingResources>();
-                        m_ShaderVO = m_Context.CreateRayTracingShader(m_Backend switch
-                        {
-                            RayTracingBackend.Hardware => bakingResources.traceVirtualOffsetRT,
-                            RayTracingBackend.Compute => bakingResources.traceVirtualOffsetCS,
-                            _ => null
-                        });
+                        m_ShaderVO = m_Context.CreateRayTracingShader(
+                            m_Backend switch
+                            {
+                                RayTracingBackend.Hardware => bakingResources.traceVirtualOffsetRT,
+                                RayTracingBackend.Compute => bakingResources.traceVirtualOffsetCS,
+                                _ => null,
+                            }
+                        );
                     }
 
                     return m_ShaderVO;
@@ -435,12 +534,14 @@ namespace UnityEngine.Rendering
                     if (m_ShaderSO == null)
                     {
                         var bakingResources = GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeBakingResources>();
-                        m_ShaderSO = m_Context.CreateRayTracingShader(m_Backend switch
-                        {
-                            RayTracingBackend.Hardware => bakingResources.skyOcclusionRT,
-                            RayTracingBackend.Compute => bakingResources.skyOcclusionCS,
-                            _ => null
-                        });
+                        m_ShaderSO = m_Context.CreateRayTracingShader(
+                            m_Backend switch
+                            {
+                                RayTracingBackend.Hardware => bakingResources.skyOcclusionRT,
+                                RayTracingBackend.Compute => bakingResources.skyOcclusionCS,
+                                _ => null,
+                            }
+                        );
                     }
 
                     return m_ShaderSO;
@@ -454,12 +555,14 @@ namespace UnityEngine.Rendering
                     if (m_ShaderRL == null)
                     {
                         var bakingResources = GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeBakingResources>();
-                        m_ShaderRL = m_Context.CreateRayTracingShader(m_Backend switch
-                        {
-                            RayTracingBackend.Hardware => bakingResources.renderingLayerRT,
-                            RayTracingBackend.Compute => bakingResources.renderingLayerCS,
-                            _ => null
-                        });
+                        m_ShaderRL = m_Context.CreateRayTracingShader(
+                            m_Backend switch
+                            {
+                                RayTracingBackend.Hardware => bakingResources.renderingLayerRT,
+                                RayTracingBackend.Compute => bakingResources.renderingLayerCS,
+                                _ => null,
+                            }
+                        );
                     }
 
                     return m_ShaderRL;
@@ -491,7 +594,10 @@ namespace UnityEngine.Rendering
                     return false;
 
                 // This would error out later in LoadIndexBuffer in LightTransport package
-                if ((mesh.indexBufferTarget & GraphicsBuffer.Target.Raw) == 0 && (mesh.GetIndices(0) == null || mesh.GetIndices(0).Length == 0))
+                if (
+                    (mesh.indexBufferTarget & GraphicsBuffer.Target.Raw) == 0
+                    && (mesh.GetIndices(0) == null || mesh.GetIndices(0).Length == 0)
+                )
                     return false;
 
                 return true;
@@ -516,8 +622,7 @@ namespace UnityEngine.Rendering
         }
 
         // Helper functions to bake a subset of the probes
-        private static void BakeAdditionalProbes(out SphericalHarmonicsL2[] shValues,
-            out float[] validityValues)
+        private static void BakeAdditionalProbes(out SphericalHarmonicsL2[] shValues, out float[] validityValues)
         {
             while (s_BakeData.lightingJob.currentStep < s_BakeData.lightingJob.stepCount)
                 if (!s_BakeData.lightingJob.Step())
@@ -533,9 +638,14 @@ namespace UnityEngine.Rendering
         {
             var prv = ProbeReferenceVolume.instance;
             var scenario = bakingSet.lightingScenario;
-            if (!bakingSet.scenarios.TryGetValue(scenario, out var scenarioData) || !scenarioData.ComputeHasValidData(prv.shBands))
+            if (
+                !bakingSet.scenarios.TryGetValue(scenario, out var scenarioData)
+                || !scenarioData.ComputeHasValidData(prv.shBands)
+            )
             {
-                Debug.LogError($"Lighting for scenario '{scenario}' is not baked. You need to Generate Lighting from the Lighting Window before updating baked data");
+                Debug.LogError(
+                    $"Lighting for scenario '{scenario}' is not baked. You need to Generate Lighting from the Lighting Window before updating baked data"
+                );
                 return;
             }
 
@@ -545,7 +655,7 @@ namespace UnityEngine.Rendering
             int savedLevels = bakingSet.simplificationLevels;
             float savedDistance = bakingSet.minDistanceBetweenProbes;
             bool savedSkyOcclusion = bakingSet.skyOcclusion;
-            bool savedSkyDirection  = bakingSet.skyOcclusionShadingDirection;
+            bool savedSkyDirection = bakingSet.skyOcclusionShadingDirection;
             bool savedVirtualOffset = bakingSet.settings.virtualOffsetSettings.useVirtualOffset;
             bool savedRenderingLayers = bakingSet.useRenderingLayers;
             {
@@ -602,7 +712,11 @@ namespace UnityEngine.Rendering
 
             var job = new BakeJob();
             if (touchup.isActiveAndEnabled && touchup.mode == ProbeAdjustmentVolume.Mode.OverrideSampleCount)
-                job.Create(ProbeVolumeLightingTab.GetLightingSettings(), bakingSet.bakedSkyOcclusion, (obb, aabb, touchup));
+                job.Create(
+                    ProbeVolumeLightingTab.GetLightingSettings(),
+                    bakingSet.bakedSkyOcclusion,
+                    (obb, aabb, touchup)
+                );
             else
                 job.Create(bakingSet, ProbeVolumeLightingTab.GetLightingSettings(), bakingSet.bakedSkyOcclusion);
 
@@ -629,7 +743,10 @@ namespace UnityEngine.Rendering
                             uniquePositions.Add(pos);
                         }
                         else
-                            m_BakingBatch.uniqueBrickSubdiv[probeHash] = Mathf.Min(subdivLevel, m_BakingBatch.uniqueBrickSubdiv[probeHash]);
+                            m_BakingBatch.uniqueBrickSubdiv[probeHash] = Mathf.Min(
+                                subdivLevel,
+                                m_BakingBatch.uniqueBrickSubdiv[probeHash]
+                            );
 
                         bakedProbes.Add((index, c, i));
                         m_CellsToDilate[cell.index] = cell;
@@ -680,10 +797,20 @@ namespace UnityEngine.Rendering
                 foreach ((int uniqueProbeIndex, int cellIndex, int i) in bakedProbes)
                 {
                     ref var cell = ref bakingCells[cellIndex];
-                    cell.SetBakedData(bakingSet, m_BakingBatch, cellVolumes[cellIndex], i, uniqueProbeIndex,
-                        lightingJob.irradiance[uniqueProbeIndex], lightingJob.validity[uniqueProbeIndex],
-                        layerMaskJob.renderingLayerMasks, virtualOffsetJob.offsets,
-                        skyOcclusionJob.occlusion, skyOcclusionJob.encodedDirections, lightingJob.occlusion);
+                    cell.SetBakedData(
+                        bakingSet,
+                        m_BakingBatch,
+                        cellVolumes[cellIndex],
+                        i,
+                        uniqueProbeIndex,
+                        lightingJob.irradiance[uniqueProbeIndex],
+                        lightingJob.validity[uniqueProbeIndex],
+                        layerMaskJob.renderingLayerMasks,
+                        virtualOffsetJob.offsets,
+                        skyOcclusionJob.occlusion,
+                        skyOcclusionJob.encodedDirections,
+                        lightingJob.occlusion
+                    );
                 }
 
                 skyOcclusionJob.encodedDirections.Dispose();

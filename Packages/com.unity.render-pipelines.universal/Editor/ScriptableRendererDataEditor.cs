@@ -17,15 +17,20 @@ namespace UnityEditor.Rendering.Universal
     {
         class Styles
         {
-            public static readonly GUIContent RenderFeatures =
-                new GUIContent("Renderer Features",
-                    "A Renderer Feature is an asset that lets you add extra Render passes to a URP Renderer and configure their behavior.");
+            public static readonly GUIContent RenderFeatures = new GUIContent(
+                "Renderer Features",
+                "A Renderer Feature is an asset that lets you add extra Render passes to a URP Renderer and configure their behavior."
+            );
 
-            public static readonly GUIContent PassNameField =
-                new GUIContent("Name", "Render pass name. This name is the name displayed in Frame Debugger.");
+            public static readonly GUIContent PassNameField = new GUIContent(
+                "Name",
+                "Render pass name. This name is the name displayed in Frame Debugger."
+            );
 
-            public static readonly GUIContent MissingFeature = new GUIContent("Missing RendererFeature",
-                "Missing reference, due to compilation issues or missing files. you can attempt auto fix or choose to remove the feature.");
+            public static readonly GUIContent MissingFeature = new GUIContent(
+                "Missing RendererFeature",
+                "Missing reference, due to compilation issues or missing files. you can attempt auto fix or choose to remove the feature."
+            );
 
             public static GUIStyle BoldLabelSimple;
 
@@ -39,9 +44,11 @@ namespace UnityEditor.Rendering.Universal
         private SerializedProperty m_RendererFeatures;
         private SerializedProperty m_RendererFeaturesMap;
         private SerializedProperty m_FalseBool;
-        [SerializeField] private bool falseBool = false;
+
+        [SerializeField]
+        private bool falseBool = false;
         List<Editor> m_Editors = new List<Editor>();
-        
+
         // Computed on first access on this editor frame, and cleaned at the end of OnInspectorGUI
         /// <summary>
         /// Compute if this ScriptableRenderer is contained by an URPAsset that has IntermediateTextureMode == Never.
@@ -63,7 +70,9 @@ namespace UnityEditor.Rendering.Universal
                 m_RendererFeatures = serializedObject.FindProperty(nameof(ScriptableRendererData.m_RendererFeatures));
 
             if (m_RendererFeaturesMap == null)
-                m_RendererFeaturesMap = serializedObject.FindProperty(nameof(ScriptableRendererData.m_RendererFeatureMap));
+                m_RendererFeaturesMap = serializedObject.FindProperty(
+                    nameof(ScriptableRendererData.m_RendererFeatureMap)
+                );
         }
 
         private void OnDisable()
@@ -132,9 +141,7 @@ namespace UnityEditor.Rendering.Universal
         /// Should be called at the top of the Inspector.
         /// </summary>
         [Obsolete("This method is not used. #from(6000.3)", false)]
-        protected void DisplayIntermediateTextureWarnings()
-        {
-        }
+        protected void DisplayIntermediateTextureWarnings() { }
 
         private bool GetTooltip(Type type, out string tooltip)
         {
@@ -177,7 +184,15 @@ namespace UnityEditor.Rendering.Universal
                 // Foldout header
                 EditorGUI.BeginChangeCheck();
                 SerializedProperty activeProperty = serializedRendererFeaturesEditor.FindProperty("m_Active");
-                bool displayContent = CoreEditorUtils.DrawHeaderToggle(EditorGUIUtility.TrTextContent(title, tooltip), renderFeatureProperty, activeProperty, pos => OnContextClick(rendererFeatureObjRef, pos, index), null, null, helpURL);
+                bool displayContent = CoreEditorUtils.DrawHeaderToggle(
+                    EditorGUIUtility.TrTextContent(title, tooltip),
+                    renderFeatureProperty,
+                    activeProperty,
+                    pos => OnContextClick(rendererFeatureObjRef, pos, index),
+                    null,
+                    null,
+                    helpURL
+                );
                 hasChangedProperties |= EditorGUI.EndChangeCheck();
 
                 // ObjectEditor
@@ -187,7 +202,9 @@ namespace UnityEditor.Rendering.Universal
                     {
                         EditorGUI.BeginChangeCheck();
                         SerializedProperty nameProperty = serializedRendererFeaturesEditor.FindProperty("m_Name");
-                        nameProperty.stringValue = ValidateName(EditorGUILayout.DelayedTextField(Styles.PassNameField, nameProperty.stringValue));
+                        nameProperty.stringValue = ValidateName(
+                            EditorGUILayout.DelayedTextField(Styles.PassNameField, nameProperty.stringValue)
+                        );
                         if (EditorGUI.EndChangeCheck())
                         {
                             hasChangedProperties = true;
@@ -204,11 +221,11 @@ namespace UnityEditor.Rendering.Universal
                     EditorGUI.BeginChangeCheck();
                     if (rendererFeatureEditor is IOwningRendererDataConsumer consumer)
                     {
-                        consumer.owningRendererData = target as ScriptableRendererData;                        
+                        consumer.owningRendererData = target as ScriptableRendererData;
                     }
-                   
+
                     rendererFeatureEditor.OnInspectorGUI();
-                    
+
                     hasChangedProperties |= EditorGUI.EndChangeCheck();
 
                     EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
@@ -224,7 +241,12 @@ namespace UnityEditor.Rendering.Universal
             }
             else
             {
-                CoreEditorUtils.DrawHeaderToggle(Styles.MissingFeature, renderFeatureProperty, m_FalseBool, pos => OnContextClick(rendererFeatureObjRef, pos, index));
+                CoreEditorUtils.DrawHeaderToggle(
+                    Styles.MissingFeature,
+                    renderFeatureProperty,
+                    m_FalseBool,
+                    pos => OnContextClick(rendererFeatureObjRef, pos, index)
+                );
                 m_FalseBool.boolValue = false; // always make sure false bool is false
                 EditorGUILayout.HelpBox(Styles.MissingFeature.tooltip, MessageType.Error);
                 if (GUILayout.Button("Attempt Fix", EditorStyles.miniButton))
@@ -232,9 +254,14 @@ namespace UnityEditor.Rendering.Universal
                     ScriptableRendererData data = target as ScriptableRendererData;
                     if (!data.ValidateRendererFeatures())
                     {
-                        if (EditorUtility.DisplayDialog("Remove Missing Renderer Feature",
+                        if (
+                            EditorUtility.DisplayDialog(
+                                "Remove Missing Renderer Feature",
                                 "This renderer feature script is missing (likely deleted or failed to compile). Do you want to remove it from the list and delete the associated sub-asset?",
-                                "Yes", "No"))
+                                "Yes",
+                                "No"
+                            )
+                        )
                         {
                             data.RemoveMissingRendererFeatures();
                         }
@@ -257,7 +284,7 @@ namespace UnityEditor.Rendering.Universal
             else
                 menu.AddItem(EditorGUIUtility.TrTextContent("Move Down"), false, () => MoveComponent(id, 1));
 
-            if(rendererFeatureObject?.GetType() == typeof(FullScreenPassRendererFeature))
+            if (rendererFeatureObject?.GetType() == typeof(FullScreenPassRendererFeature))
                 menu.AddAdvancedPropertiesBoolMenuItem();
 
             menu.AddSeparator(string.Empty);
@@ -265,7 +292,6 @@ namespace UnityEditor.Rendering.Universal
 
             menu.DropDown(new Rect(position, Vector2.zero));
         }
-
 
         internal void AddComponent(Type type)
         {
@@ -288,12 +314,16 @@ namespace UnityEditor.Rendering.Universal
 
             // Grow the list first, then add - that's how serialized lists work in Unity
             m_RendererFeatures.arraySize++;
-            SerializedProperty componentProp = m_RendererFeatures.GetArrayElementAtIndex(m_RendererFeatures.arraySize - 1);
+            SerializedProperty componentProp = m_RendererFeatures.GetArrayElementAtIndex(
+                m_RendererFeatures.arraySize - 1
+            );
             componentProp.objectReferenceValue = component;
 
             // Update GUID Map
             m_RendererFeaturesMap.arraySize++;
-            SerializedProperty guidProp = m_RendererFeaturesMap.GetArrayElementAtIndex(m_RendererFeaturesMap.arraySize - 1);
+            SerializedProperty guidProp = m_RendererFeaturesMap.GetArrayElementAtIndex(
+                m_RendererFeaturesMap.arraySize - 1
+            );
             guidProp.longValue = localId;
             UpdateEditorList();
             serializedObject.ApplyModifiedProperties();

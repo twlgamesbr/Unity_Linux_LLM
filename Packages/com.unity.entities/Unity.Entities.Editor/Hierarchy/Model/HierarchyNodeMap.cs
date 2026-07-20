@@ -9,14 +9,15 @@ namespace Unity.Entities.Editor
     /// </summary>
     /// <remarks>
     /// !!IMPORTANT!! This has an 8 byte memory overhead for EACH entity in the world. Use with caution.
-    /// 
+    ///
     /// This structure uses an internal entity lookup to access entity nodes in O(1). All other node types use hash map access.
-    /// 
+    ///
     /// This structure has a fixed memory overhead of 8 bytes per entity plus any node data stored.
     /// </remarks>
     /// <typeparam name="T">The hierarchy node data type.</typeparam>
     [GenerateTestsForBurstCompatibility]
-    unsafe struct HierarchyNodeMap<T> : IDisposable where T : unmanaged
+    unsafe struct HierarchyNodeMap<T> : IDisposable
+        where T : unmanaged
     {
         /// <summary>
         /// The internal unmanaged data.
@@ -34,7 +35,8 @@ namespace Unity.Entities.Editor
         /// <summary>
         /// Instance data for this structure.
         /// </summary>
-        [NativeDisableUnsafePtrRestriction] HierarchyNodeMapData* m_HierarchyNodeMapData;
+        [NativeDisableUnsafePtrRestriction]
+        HierarchyNodeMapData* m_HierarchyNodeMapData;
 
         /// <summary>
         /// Storage for <see cref="Entity"/> based nodes. This is a linear lookup indexed by <see cref="Entity.Index"/>.
@@ -89,19 +91,27 @@ namespace Unity.Entities.Editor
             switch (handle.Kind)
             {
                 case NodeKind.Entity:
-                {
-                    m_ValueByEntity.Add(handle.ToEntity(), value);
-                }
-                break;
+                    {
+                        m_ValueByEntity.Add(handle.ToEntity(), value);
+                    }
+                    break;
 
                 default:
-                {
-                    if (!UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryAdd(m_ValueByHandle.m_Buffer, handle, value, false, m_Allocator))
-                        throw new InvalidOperationException("The key already exists in the map.");
+                    {
+                        if (
+                            !UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryAdd(
+                                m_ValueByHandle.m_Buffer,
+                                handle,
+                                value,
+                                false,
+                                m_Allocator
+                            )
+                        )
+                            throw new InvalidOperationException("The key already exists in the map.");
 
-                    m_HierarchyNodeMapData->ValueByHandleCount++;
-                }
-                break;
+                        m_HierarchyNodeMapData->ValueByHandleCount++;
+                    }
+                    break;
             }
         }
 
@@ -120,7 +130,15 @@ namespace Unity.Entities.Editor
 
                 default:
                 {
-                    if (!UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryAdd(m_ValueByHandle.m_Buffer, handle, value, false, m_Allocator))
+                    if (
+                        !UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryAdd(
+                            m_ValueByHandle.m_Buffer,
+                            handle,
+                            value,
+                            false,
+                            m_Allocator
+                        )
+                    )
                         return false;
 
                     m_HierarchyNodeMapData->ValueByHandleCount++;
@@ -138,19 +156,30 @@ namespace Unity.Entities.Editor
             switch (handle.Kind)
             {
                 case NodeKind.Entity:
-                {
-                    m_ValueByEntity.Update(handle.ToEntity(), value);
-                }
-                break;
+                    {
+                        m_ValueByEntity.Update(handle.ToEntity(), value);
+                    }
+                    break;
 
                 default:
-                {
-                    if (!UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryGetFirstValueAtomic(m_ValueByHandle.m_Buffer, handle, out _, out var iterator))
-                        throw new InvalidOperationException("The key does not exist in the map.");
+                    {
+                        if (
+                            !UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryGetFirstValueAtomic(
+                                m_ValueByHandle.m_Buffer,
+                                handle,
+                                out _,
+                                out var iterator
+                            )
+                        )
+                            throw new InvalidOperationException("The key does not exist in the map.");
 
-                    UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.SetValue(m_ValueByHandle.m_Buffer, ref iterator, ref value);
-                }
-                break;
+                        UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.SetValue(
+                            m_ValueByHandle.m_Buffer,
+                            ref iterator,
+                            ref value
+                        );
+                    }
+                    break;
             }
         }
 
@@ -169,10 +198,21 @@ namespace Unity.Entities.Editor
 
                 default:
                 {
-                    if (!UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryGetFirstValueAtomic(m_ValueByHandle.m_Buffer, handle, out _, out var iterator))
+                    if (
+                        !UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.TryGetFirstValueAtomic(
+                            m_ValueByHandle.m_Buffer,
+                            handle,
+                            out _,
+                            out var iterator
+                        )
+                    )
                         return false;
 
-                    UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.SetValue(m_ValueByHandle.m_Buffer, ref iterator, ref value);
+                    UnsafeParallelHashMapBase<HierarchyNodeHandle, T>.SetValue(
+                        m_ValueByHandle.m_Buffer,
+                        ref iterator,
+                        ref value
+                    );
                     return true;
                 }
             }
@@ -186,8 +226,16 @@ namespace Unity.Entities.Editor
         {
             m_Allocator = allocator;
             m_ValueByEntity = new EntityMapDense<T>(16, allocator);
-            m_ValueByHandle = new UnsafeParallelHashMap<HierarchyNodeHandle, T>(16, allocator) {{HierarchyNodeHandle.Root, default}};
-            m_HierarchyNodeMapData = (HierarchyNodeMapData*) Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<HierarchyNodeMapData>(), UnsafeUtility.AlignOf<HierarchyNodeMapData>(), allocator);
+            m_ValueByHandle = new UnsafeParallelHashMap<HierarchyNodeHandle, T>(16, allocator)
+            {
+                { HierarchyNodeHandle.Root, default },
+            };
+            m_HierarchyNodeMapData = (HierarchyNodeMapData*)
+                Memory.Unmanaged.Allocate(
+                    UnsafeUtility.SizeOf<HierarchyNodeMapData>(),
+                    UnsafeUtility.AlignOf<HierarchyNodeMapData>(),
+                    allocator
+                );
             m_HierarchyNodeMapData->ValueByHandleCount = 1;
         }
 
@@ -252,17 +300,17 @@ namespace Unity.Entities.Editor
             switch (handle.Kind)
             {
                 case NodeKind.Entity:
-                {
-                    m_ValueByEntity.Remove(handle.ToEntity());
-                }
-                break;
+                    {
+                        m_ValueByEntity.Remove(handle.ToEntity());
+                    }
+                    break;
 
                 default:
-                {
-                    if (m_ValueByHandle.Remove(handle))
-                        m_HierarchyNodeMapData->ValueByHandleCount--;
-                }
-                break;
+                    {
+                        if (m_ValueByHandle.Remove(handle))
+                            m_HierarchyNodeMapData->ValueByHandleCount--;
+                    }
+                    break;
             }
         }
 
@@ -270,10 +318,8 @@ namespace Unity.Entities.Editor
         /// Resizes to sparse entity data set to the given capacity.
         /// </summary>
         /// <param name="capacity">The capacity to set.</param>
-        public void ResizeEntityCapacity(int capacity)
-            => m_ValueByEntity.Resize(capacity);
+        public void ResizeEntityCapacity(int capacity) => m_ValueByEntity.Resize(capacity);
 
-        public void SetSharedDefault(T value)
-            => m_ValueByEntity.SetSharedDefaultValue(value);
+        public void SetSharedDefault(T value) => m_ValueByEntity.SetSharedDefaultValue(value);
     }
 }

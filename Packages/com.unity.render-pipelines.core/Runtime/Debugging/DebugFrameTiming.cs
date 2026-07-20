@@ -74,132 +74,256 @@ namespace UnityEngine.Rendering
         /// <param name="list">List of widgets to add the stats.</param>
         public void RegisterDebugUI(List<DebugUI.Widget> list)
         {
-            list.Add(new DebugUI.Foldout()
-            {
-                displayName = "Frame Stats",
-                opened = true,
-                columnLabels = new string[] { "Avg", "Min", "Max" },
-                alternateRowColors = true,
-                children =
+            list.Add(
+                new DebugUI.Foldout()
                 {
-                    new DebugUI.ValueTuple
+                    displayName = "Frame Stats",
+                    opened = true,
+                    columnLabels = new string[] { "Avg", "Min", "Max" },
+                    alternateRowColors = true,
+                    children =
                     {
-                        displayName = "Frame Rate (FPS)",
-                        values = new[]
+                        new DebugUI.ValueTuple
                         {
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FpsFormatString, getter = () => m_FrameHistory.SampleAverage.FramesPerSecond },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FpsFormatString, getter = () => m_FrameHistory.SampleMin.FramesPerSecond },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FpsFormatString, getter = () => m_FrameHistory.SampleMax.FramesPerSecond },
-                        }
+                            displayName = "Frame Rate (FPS)",
+                            values = new[]
+                            {
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_FpsFormatString,
+                                    getter = () => m_FrameHistory.SampleAverage.FramesPerSecond,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_FpsFormatString,
+                                    getter = () => m_FrameHistory.SampleMin.FramesPerSecond,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_FpsFormatString,
+                                    getter = () => m_FrameHistory.SampleMax.FramesPerSecond,
+                                },
+                            },
+                        },
+                        new DebugUI.ValueTuple
+                        {
+                            displayName = "Frame Time",
+                            values = new[]
+                            {
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleAverage.FullFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMin.FullFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMax.FullFrameTime,
+                                },
+                            },
+                        },
+                        new DebugUI.ValueTuple
+                        {
+                            displayName = "CPU Main Thread Frame",
+                            values = new[]
+                            {
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleAverage.MainThreadCPUFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMin.MainThreadCPUFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMax.MainThreadCPUFrameTime,
+                                },
+                            },
+                        },
+                        new DebugUI.ValueTuple
+                        {
+                            displayName = "CPU Render Thread Frame",
+                            values = new[]
+                            {
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleAverage.RenderThreadCPUFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMin.RenderThreadCPUFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMax.RenderThreadCPUFrameTime,
+                                },
+                            },
+                        },
+                        new DebugUI.ValueTuple
+                        {
+                            displayName = "CPU Present Wait",
+                            values = new[]
+                            {
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleAverage.MainThreadCPUPresentWaitTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMin.MainThreadCPUPresentWaitTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMax.MainThreadCPUPresentWaitTime,
+                                },
+                            },
+                        },
+                        new DebugUI.ValueTuple
+                        {
+                            displayName = "GPU Frame",
+                            values = new[]
+                            {
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleAverage.GPUFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMin.GPUFrameTime,
+                                },
+                                new DebugUI.Value
+                                {
+                                    refreshRate = k_RefreshRate,
+                                    formatString = k_MsFormatString,
+                                    getter = () => m_FrameHistory.SampleMax.GPUFrameTime,
+                                },
+                            },
+                        },
                     },
-                    new DebugUI.ValueTuple
-                    {
-                        displayName = "Frame Time",
-                        values = new[]
-                        {
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleAverage.FullFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMin.FullFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMax.FullFrameTime },
-                        }
-                    },
-                    new DebugUI.ValueTuple
-                    {
-                        displayName = "CPU Main Thread Frame",
-                        values = new[]
-                        {
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleAverage.MainThreadCPUFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMin.MainThreadCPUFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMax.MainThreadCPUFrameTime },
-                        }
-                    },
-                    new DebugUI.ValueTuple
-                    {
-                        displayName = "CPU Render Thread Frame",
-                        values = new[]
-                        {
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleAverage.RenderThreadCPUFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMin.RenderThreadCPUFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMax.RenderThreadCPUFrameTime },
-                        }
-                    },
-                    new DebugUI.ValueTuple
-                    {
-                        displayName = "CPU Present Wait",
-                        values = new[]
-                        {
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleAverage.MainThreadCPUPresentWaitTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMin.MainThreadCPUPresentWaitTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMax.MainThreadCPUPresentWaitTime },
-                        }
-                    },
-                    new DebugUI.ValueTuple
-                    {
-                        displayName = "GPU Frame",
-                        values = new[]
-                        {
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleAverage.GPUFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMin.GPUFrameTime },
-                            new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_MsFormatString, getter = () => m_FrameHistory.SampleMax.GPUFrameTime },
-                        }
-                    }
                 }
-            });
+            );
 
-            list.Add(new DebugUI.Foldout
-            {
-                displayName = "Bottlenecks",
-                children =
+            list.Add(
+                new DebugUI.Foldout
                 {
+                    displayName = "Bottlenecks",
+                    children =
+                    {
 #if UNITY_EDITOR
-                    new DebugUI.Container { displayName = "Not supported in Editor" }
+                        new DebugUI.Container { displayName = "Not supported in Editor" }
 #else
-                    new DebugUI.ProgressBarValue { displayName = "CPU", getter = () => m_BottleneckHistory.Histogram.CPU },
-                    new DebugUI.ProgressBarValue { displayName = "GPU", getter = () => m_BottleneckHistory.Histogram.GPU },
-                    new DebugUI.ProgressBarValue { displayName = "Present limited", getter = () => m_BottleneckHistory.Histogram.PresentLimited },
-                    new DebugUI.ProgressBarValue { displayName = "Balanced", getter = () => m_BottleneckHistory.Histogram.Balanced },
+                        new DebugUI.ProgressBarValue
+                        {
+                            displayName = "CPU",
+                            getter = () => m_BottleneckHistory.Histogram.CPU,
+                        },
+                        new DebugUI.ProgressBarValue
+                        {
+                            displayName = "GPU",
+                            getter = () => m_BottleneckHistory.Histogram.GPU,
+                        },
+                        new DebugUI.ProgressBarValue
+                        {
+                            displayName = "Present limited",
+                            getter = () => m_BottleneckHistory.Histogram.PresentLimited,
+                        },
+                        new DebugUI.ProgressBarValue
+                        {
+                            displayName = "Balanced",
+                            getter = () => m_BottleneckHistory.Histogram.Balanced,
+                        },
 #endif
+                    },
                 }
-            });
+            );
 #if RTPROFILER_DEBUG
-            list.Add(new DebugUI.Foldout
-            {
-                displayName = "Realtime Profiler Debug",
-                children =
+            list.Add(
+                new DebugUI.Foldout
                 {
-                    new DebugUI.IntField
+                    displayName = "Realtime Profiler Debug",
+                    children =
                     {
-                        displayName = "Frame Time Sample History Size",
-                        getter = () => sampleHistorySize,
-                        setter = (value) => { sampleHistorySize = value; },
-                        min = () => 1,
-                        max = () => 100
-                    },
-                    new DebugUI.IntField
-                    {
-                        displayName = "Bottleneck History Size",
-                        getter = () => bottleneckHistorySize,
-                        setter = (value) => { bottleneckHistorySize = value; },
-                        min = () => 1,
-                        max = () => 100
-                    },
-                    new DebugUI.IntField
-                    {
-                        displayName = "Force VSyncCount",
-                        min = () => - 1,
-                        max = () => 4,
-                        getter = () => QualitySettings.vSyncCount,
-                        setter = (value) => { QualitySettings.vSyncCount = value; }
-                    },
-                    new DebugUI.IntField
-                    {
-                        displayName = "Force TargetFrameRate",
-                        min = () => - 1,
-                        max = () => 1000,
-                        getter = () => Application.targetFrameRate,
-                        setter = (value) => { Application.targetFrameRate = value; }
+                        new DebugUI.IntField
+                        {
+                            displayName = "Frame Time Sample History Size",
+                            getter = () => sampleHistorySize,
+                            setter = (value) =>
+                            {
+                                sampleHistorySize = value;
+                            },
+                            min = () => 1,
+                            max = () => 100,
+                        },
+                        new DebugUI.IntField
+                        {
+                            displayName = "Bottleneck History Size",
+                            getter = () => bottleneckHistorySize,
+                            setter = (value) =>
+                            {
+                                bottleneckHistorySize = value;
+                            },
+                            min = () => 1,
+                            max = () => 100,
+                        },
+                        new DebugUI.IntField
+                        {
+                            displayName = "Force VSyncCount",
+                            min = () => -1,
+                            max = () => 4,
+                            getter = () => QualitySettings.vSyncCount,
+                            setter = (value) =>
+                            {
+                                QualitySettings.vSyncCount = value;
+                            },
+                        },
+                        new DebugUI.IntField
+                        {
+                            displayName = "Force TargetFrameRate",
+                            min = () => -1,
+                            max = () => 1000,
+                            getter = () => Application.targetFrameRate,
+                            setter = (value) =>
+                            {
+                                Application.targetFrameRate = value;
+                            },
+                        },
                     },
                 }
-            });
+            );
 #endif
         }
 

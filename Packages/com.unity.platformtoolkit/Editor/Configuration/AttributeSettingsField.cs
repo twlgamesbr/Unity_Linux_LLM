@@ -9,7 +9,9 @@ namespace Unity.PlatformToolkit.Editor
 
         public AttributeSettingsField(AttributeSettings settings)
         {
-            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/EditorResources/UI/AttributeSettingsField.uxml");
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/EditorResources/UI/AttributeSettingsField.uxml"
+            );
             uxml.CloneTree(this);
 
             m_SettingsViewModel = new AttributeSettingsViewModel(settings);

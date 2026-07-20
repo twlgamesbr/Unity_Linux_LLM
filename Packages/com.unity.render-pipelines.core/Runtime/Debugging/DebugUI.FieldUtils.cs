@@ -3,7 +3,6 @@
 #endif
 
 using System;
-
 #if ENABLE_RENDERING_DEBUGGER_UI
 using UnityEngine.UIElements;
 
@@ -23,10 +22,16 @@ namespace UnityEngine.Rendering
 
                 field.RegisterCallback<ChangeEvent<T>>(evt => widget.SetValue(evt.newValue));
 
-                widget.ScheduleTracked(field, () => field.schedule.Execute(() =>
-                {
-                    field.SetValueWithoutNotify((T)Convert.ChangeType(widget.GetValue(), typeof(T)));
-                }).Every(100));
+                widget.ScheduleTracked(
+                    field,
+                    () =>
+                        field
+                            .schedule.Execute(() =>
+                            {
+                                field.SetValueWithoutNotify((T)Convert.ChangeType(widget.GetValue(), typeof(T)));
+                            })
+                            .Every(100)
+                );
 
                 field.AddToClassList(UIElements.BaseField<T>.alignedFieldUssClassName);
             }
@@ -40,7 +45,8 @@ namespace UnityEngine.Rendering
                 Action<T> onValueChanged,
                 Func<T> getValue,
                 Action<bool> onDecrement = null,
-                Action<bool> onIncrement = null)
+                Action<bool> onIncrement = null
+            )
                 where T : struct
             {
                 // Create stepper buttons
@@ -48,7 +54,12 @@ namespace UnityEngine.Rendering
                 var btnDecSmall = new UIElements.Button { text = "<", focusable = false };
                 var btnIncSmall = new UIElements.Button { text = ">", focusable = false };
                 // Need to remove marginRight of latest button to perfectly align with the other fields
-                var btnIncLarge = new UIElements.Button { text = ">>", focusable = false, style = { marginRight = 0 } };
+                var btnIncLarge = new UIElements.Button
+                {
+                    text = ">>",
+                    focusable = false,
+                    style = { marginRight = 0 },
+                };
 
                 // Add button event handlers
                 btnDecLarge.clicked += () =>

@@ -5,8 +5,10 @@ namespace Unity.Multiplayer.Tools.NetVis.Configuration
 {
     class BandwidthSettings
     {
-        static readonly MeshShadingGradientPreset k_FirstGradientPreset =
-            EnumUtil.GetValuesAndNames(skip: MeshShadingGradientPreset.None).First().value;
+        static readonly MeshShadingGradientPreset k_FirstGradientPreset = EnumUtil
+            .GetValuesAndNames(skip: MeshShadingGradientPreset.None)
+            .First()
+            .value;
 
         public bool MeshShadingEnabled { get; set; } = true;
         public bool TextOverlayEnabled { get; set; } = true;
@@ -60,8 +62,6 @@ namespace Unity.Multiplayer.Tools.NetVis.Configuration
         /// <remarks>
         /// This behaviour is documented for the user in the help box text in BandwidthConfigurationView.cs
         /// </remarks>
-        public int BandwidthMaxSafe => BandwidthMin == BandwidthMax
-            ? BandwidthMin + 1
-            : BandwidthMax;
+        public int BandwidthMaxSafe => BandwidthMin == BandwidthMax ? BandwidthMin + 1 : BandwidthMax;
     }
 }

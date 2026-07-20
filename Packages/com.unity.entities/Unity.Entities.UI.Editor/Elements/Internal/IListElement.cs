@@ -33,10 +33,7 @@ namespace Unity.Entities.UI
             toggleInput.AddToClassList(UssClasses.ListElement.ToggleInput);
             toggle.Add(m_Size);
 
-            m_AddItemButton = new Button(OnAddItem)
-            {
-                text = "+ Add Element"
-            };
+            m_AddItemButton = new Button(OnAddItem) { text = "+ Add Element" };
             m_AddItemButton.AddToClassList(UssClasses.ListElement.AddItemButton);
 
             m_ContentRoot = new VisualElement();
@@ -55,7 +52,7 @@ namespace Unity.Entities.UI
                 evt.StopPropagation();
                 (evt.target as VisualElement)?.focusController?.IgnoreEvent(evt);
 #else
-                    evt.PreventDefault();
+                evt.PreventDefault();
 #endif
             }
         }
@@ -82,8 +79,12 @@ namespace Unity.Entities.UI
 
             m_PaginationElement.OnChanged += () =>
             {
-                UiPersistentState.SetPaginationState(Root.GetTargetType(), Path, m_PaginationElement.PaginationSize,
-                    m_PaginationElement.CurrentPage);
+                UiPersistentState.SetPaginationState(
+                    Root.GetTargetType(),
+                    Path,
+                    m_PaginationElement.PaginationSize,
+                    m_PaginationElement.CurrentPage
+                );
                 Reload();
             };
 
@@ -197,9 +198,7 @@ namespace Unity.Entities.UI
                 return default;
 
             var type = context.Type;
-            return null == type
-                ? TypeUtility.Instantiate<TElement>()
-                : TypeUtility.Instantiate<TElement>(type);
+            return null == type ? TypeUtility.Instantiate<TElement>() : TypeUtility.Instantiate<TElement>(type);
         }
 
         protected override void OnUpdate()
@@ -375,23 +374,44 @@ namespace Unity.Entities.UI
                 new ContextualMenuManipulator(evt =>
                 {
                     evt.menu.AppendSeparator();
-                    evt.menu.AppendAction("Delete", action => { OnRemoveItem(index); },
-                        disableRemove ? DropdownMenuAction.Status.Disabled : DropdownMenuAction.Status.Normal);
+                    evt.menu.AppendAction(
+                        "Delete",
+                        action =>
+                        {
+                            OnRemoveItem(index);
+                        },
+                        disableRemove ? DropdownMenuAction.Status.Disabled : DropdownMenuAction.Status.Normal
+                    );
                     evt.menu.AppendSeparator();
-                    evt.menu.AppendAction("Move Up", action => { Swap(index, index - 1); },
+                    evt.menu.AppendAction(
+                        "Move Up",
+                        action =>
+                        {
+                            Swap(index, index - 1);
+                        },
                         list.Count > 1 && index - 1 >= 0
                             ? DropdownMenuAction.Status.Normal
-                            : DropdownMenuAction.Status.Disabled);
-                    evt.menu.AppendAction("Move Down", action => { Swap(index, index + 1); },
+                            : DropdownMenuAction.Status.Disabled
+                    );
+                    evt.menu.AppendAction(
+                        "Move Down",
+                        action =>
+                        {
+                            Swap(index, index + 1);
+                        },
                         list.Count > 1 && index + 1 < list.Count
                             ? DropdownMenuAction.Status.Normal
-                            : DropdownMenuAction.Status.Disabled);
-                }));
-
+                            : DropdownMenuAction.Status.Disabled
+                    );
+                })
+            );
 
             var button = new Button();
             button.AddToClassList(UssClasses.ListElement.RemoveItemButton);
-            button.clickable.clicked += () => { OnRemoveItem(index); };
+            button.clickable.clicked += () =>
+            {
+                OnRemoveItem(index);
+            };
             button.SetEnabled(!disableRemove);
             toRemoveParent.Add(button);
         }

@@ -2,7 +2,6 @@
 using UnityEditor;
 using UnityEngine;
 
-
 internal class TMP_MarkupTagUpdateUtility
 {
     struct MarkupTagDescriptor
@@ -45,16 +44,22 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("MARK", "mark", "// <mark>"),
         new MarkupTagDescriptor("SLASH_MARK", "/mark", "// </mark>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("COLOR", "color", "// <color>"),
         new MarkupTagDescriptor("SLASH_COLOR", "/color", "// </color>"),
         new MarkupTagDescriptor("ALPHA", "alpha", "// <alpha>"),
         new MarkupTagDescriptor("SLASH_ALPHA", "/alpha", "// </alpha>"),
         MarkupTagDescriptor.linefeed,
-
-        new MarkupTagDescriptor("FONT", "font", "// <font=\"Name of Font Asset\"> or <font family=\"Arial\" style=\"Regular\">" ),
+        new MarkupTagDescriptor(
+            "FONT",
+            "font",
+            "// <font=\"Name of Font Asset\"> or <font family=\"Arial\" style=\"Regular\">"
+        ),
         new MarkupTagDescriptor("SLASH_FONT", "/font", "// </font>"),
-        new MarkupTagDescriptor("MATERIAL", "material", "// <material=\"Name of Material Preset\"> or as attribute <font=\"Name of font asset\" material=\"Name of material\">"),
+        new MarkupTagDescriptor(
+            "MATERIAL",
+            "material",
+            "// <material=\"Name of Material Preset\"> or as attribute <font=\"Name of font asset\" material=\"Name of material\">"
+        ),
         new MarkupTagDescriptor("SLASH_MATERIAL", "/material", "// </material>"),
         new MarkupTagDescriptor("SIZE", "size", "// <size>"),
         new MarkupTagDescriptor("SLASH_SIZE", "/size", "// </size>"),
@@ -63,27 +68,24 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("SCALE", "scale", "// <scale>"),
         new MarkupTagDescriptor("SLASH_SCALE", "/scale", "// </scale>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("SPRITE", "sprite", "// <sprite>"),
         new MarkupTagDescriptor("STYLE", "style", "// <style>"),
         new MarkupTagDescriptor("SLASH_STYLE", "/style", "// </style>"),
         new MarkupTagDescriptor("GRADIENT", "gradient", "// <gradient>"),
         new MarkupTagDescriptor("SLASH_GRADIENT", "/gradient", "// </gradient>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("A", "a", "// <a>"),
         new MarkupTagDescriptor("SLASH_A", "/a", "// </a>"),
         new MarkupTagDescriptor("LINK", "link", "// <link>"),
         new MarkupTagDescriptor("SLASH_LINK", "/link", "// </link>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("POSITION", "pos", "// <pos>"),
         new MarkupTagDescriptor("SLASH_POSITION", "/pos", "// </pos>"),
-        new MarkupTagDescriptor("VERTICAL_OFFSET", "voffset","// <voffset>"),
+        new MarkupTagDescriptor("VERTICAL_OFFSET", "voffset", "// <voffset>"),
         new MarkupTagDescriptor("SLASH_VERTICAL_OFFSET", "/voffset", "// </voffset>"),
         new MarkupTagDescriptor("ROTATE", "rotate", "// <rotate>"),
         new MarkupTagDescriptor("SLASH_ROTATE", "/rotate", "// </rotate>"),
-        new MarkupTagDescriptor("TRANSFORM", "transform","// <transform=\"position, rotation, scale\">"),
+        new MarkupTagDescriptor("TRANSFORM", "transform", "// <transform=\"position, rotation, scale\">"),
         new MarkupTagDescriptor("SLASH_TRANSFORM", "/transform", "// </transform>"),
         new MarkupTagDescriptor("SPACE", "space", "// <space>"),
         new MarkupTagDescriptor("SLASH_SPACE", "/space", "// </space>"),
@@ -94,7 +96,6 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("CHARACTER_SPACING", "character-spacing", "// <character-spacing>"),
         new MarkupTagDescriptor("SLASH_CHARACTER_SPACING", "/character-spacing", "// </character-spacing>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("ALIGN", "align", "// <align>"),
         new MarkupTagDescriptor("SLASH_ALIGN", "/align", "// </align>"),
         new MarkupTagDescriptor("WIDTH", "width", "// <width>"),
@@ -110,19 +111,16 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("LINE_HEIGHT", "line-height", "// <line-height>"),
         new MarkupTagDescriptor("SLASH_LINE_HEIGHT", "/line-height", "// </line-height>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("NO_BREAK", "nobr", "// <nobr>"),
         new MarkupTagDescriptor("SLASH_NO_BREAK", "/nobr", "// </nobr>"),
-        new MarkupTagDescriptor("NO_PARSE", "noparse","// <noparse>"),
+        new MarkupTagDescriptor("NO_PARSE", "noparse", "// <noparse>"),
         new MarkupTagDescriptor("SLASH_NO_PARSE", "/noparse", "// </noparse>"),
         new MarkupTagDescriptor("PAGE", "page", "// <page>"),
         new MarkupTagDescriptor("SLASH_PAGE", "/page", "// </page>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("ACTION", "action", "// <action>"),
         new MarkupTagDescriptor("SLASH_ACTION", "/action", "// </action>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("CLASS", "class", "// <class>"),
         new MarkupTagDescriptor("TABLE", "table", "// <table>"),
         new MarkupTagDescriptor("SLASH_TABLE", "/table", "// </table>"),
@@ -133,7 +131,6 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("TD", "td", "// <td>"),
         new MarkupTagDescriptor("SLASH_TD", "/td", "// </td>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("// Text Styles"),
         new MarkupTagDescriptor("LOWERCASE", "lowercase", "// <lowercase>"),
         new MarkupTagDescriptor("SLASH_LOWERCASE", "/lowercase", "// </lowercase>"),
@@ -146,14 +143,12 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("CAPITALIZE", "capitalize", "// <capitalize>"),
         new MarkupTagDescriptor("SLASH_CAPITALIZE", "/capitalize", "// </capitalize>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("// Font Features"),
         new MarkupTagDescriptor("LIGA", "liga", "// <liga>"),
         new MarkupTagDescriptor("SLASH_LIGA", "/liga", "// </liga>"),
         new MarkupTagDescriptor("FRAC", "frac", "// <frac>"),
         new MarkupTagDescriptor("SLASH_FRAC", "/frac", "// </frac>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("// Attributes"),
         new MarkupTagDescriptor("NAME", "name", "// <sprite name=\"Name of Sprite\">"),
         new MarkupTagDescriptor("INDEX", "index", "// <sprite index=7>"),
@@ -163,9 +158,8 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("ANGLE", "angle", "// <i angle=\"40\">Italic Slant Angle</i>"),
         new MarkupTagDescriptor("FAMILY", "family", "// <font family=\"Arial\">"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("// Named Colors"),
-        new MarkupTagDescriptor("RED", "red",""),
+        new MarkupTagDescriptor("RED", "red", ""),
         new MarkupTagDescriptor("GREEN", "green", ""),
         new MarkupTagDescriptor("BLUE", "blue", ""),
         new MarkupTagDescriptor("WHITE", "white", ""),
@@ -176,7 +170,6 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("ORANGE", "orange", ""),
         new MarkupTagDescriptor("PURPLE", "purple", ""),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("// Unicode Characters"),
         new MarkupTagDescriptor("BR", "br", "// <br> Line Feed (LF) \\u0A"),
         new MarkupTagDescriptor("ZWSP", "zwsp", "// <zwsp> Zero Width Space \\u200B"),
@@ -185,7 +178,6 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("ZWJ", "zwj", "// <zwj> Zero Width Joiner \\u200D"),
         new MarkupTagDescriptor("WJ", "wj", "// <wj> Word Joiner \\u2060"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("// Alignment"),
         new MarkupTagDescriptor("LEFT", "left", "// <align=left>"),
         new MarkupTagDescriptor("RIGHT", "right", "// <align=right>"),
@@ -193,7 +185,6 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("JUSTIFIED", "justified", "// <align=justified>"),
         new MarkupTagDescriptor("FLUSH", "flush", "// <align=flush>"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("// Prefix and Unit suffix"),
         new MarkupTagDescriptor("NONE", "none", ""),
         new MarkupTagDescriptor("PLUS", "+", ""),
@@ -212,18 +203,14 @@ internal class TMP_MarkupTagUpdateUtility
         new MarkupTagDescriptor("MINUS_PERCENTAGE", "-%", ""),
         new MarkupTagDescriptor("HASH", "#", "// #"),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("TRUE", "true", ""),
         new MarkupTagDescriptor("FALSE", "false", ""),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("INVALID", "invalid", ""),
         MarkupTagDescriptor.linefeed,
-
         new MarkupTagDescriptor("NORMAL", "normal", "// <style=\"Normal\">"),
         new MarkupTagDescriptor("DEFAULT", "default", "// <font=\"Default\">"),
     };
-
 
     [MenuItem("Window/TextMeshPro/Internal/Update Markup Tag Hash Codes", false, 2200, true)]
     static void UpdateMarkupTagHashCodes()
@@ -247,7 +234,15 @@ internal class TMP_MarkupTagUpdateUtility
                 if (markupHashCodes.ContainsKey(hashCode) == false)
                     markupHashCodes.Add(hashCode, descriptor);
                 else
-                    Debug.Log("[" + descriptor.name + "] with HashCode [" + hashCode + "] collides with [" + markupHashCodes[hashCode].name + "].");
+                    Debug.Log(
+                        "["
+                            + descriptor.name
+                            + "] with HashCode ["
+                            + hashCode
+                            + "] collides with ["
+                            + markupHashCodes[hashCode].name
+                            + "]."
+                    );
             }
         }
 
@@ -257,7 +252,8 @@ internal class TMP_MarkupTagUpdateUtility
     /// <summary>
     /// Table used to convert character to uppercase.
     /// </summary>
-    const string k_lookupStringU = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
+    const string k_lookupStringU =
+        "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
 
     /// <summary>
     /// Get uppercase version of this ASCII character.

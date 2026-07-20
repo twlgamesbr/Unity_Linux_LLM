@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine.InputSystem.LowLevel;
 using Unity.Profiling;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeView = UnityEditor.IMGUI.Controls.TreeView<int>;
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
@@ -31,7 +30,12 @@ namespace UnityEngine.InputSystem.Editor
 
         static readonly ProfilerMarker k_InputBuildControlTreeMarker = new ProfilerMarker("BuildControlTree");
 
-        public static InputControlTreeView Create(InputControl rootControl, int numValueColumns, ref TreeViewState treeState, ref MultiColumnHeaderState headerState)
+        public static InputControlTreeView Create(
+            InputControl rootControl,
+            int numValueColumns,
+            ref TreeViewState treeState,
+            ref MultiColumnHeaderState headerState
+        )
         {
             if (treeState == null)
                 treeState = new TreeViewState();
@@ -67,7 +71,7 @@ namespace UnityEngine.InputSystem.Editor
             Optimized,
             Value,
 
-            COUNT
+            COUNT,
         }
 
         private InputControl m_RootControl;
@@ -76,58 +80,67 @@ namespace UnityEngine.InputSystem.Editor
         {
             var columns = new MultiColumnHeaderState.Column[(int)ColumnId.COUNT + numValueColumns - 1];
 
-            columns[(int)ColumnId.Name] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Name] = new MultiColumnHeaderState.Column
             {
                 width = 180,
                 minWidth = 60,
-                headerContent = new GUIContent("Name")
+                headerContent = new GUIContent("Name"),
             };
-            columns[(int)ColumnId.DisplayName] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.DisplayName] = new MultiColumnHeaderState.Column
             {
                 width = 160,
                 minWidth = 60,
-                headerContent = new GUIContent("Display Name")
+                headerContent = new GUIContent("Display Name"),
             };
-            columns[(int)ColumnId.Layout] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Layout] = new MultiColumnHeaderState.Column
             {
                 width = 100,
                 minWidth = 60,
-                headerContent = new GUIContent("Layout")
+                headerContent = new GUIContent("Layout"),
             };
-            columns[(int)ColumnId.Type] =
-                new MultiColumnHeaderState.Column
+            columns[(int)ColumnId.Type] = new MultiColumnHeaderState.Column
             {
                 width = 100,
                 minWidth = 60,
-                headerContent = new GUIContent("Type")
+                headerContent = new GUIContent("Type"),
             };
-            columns[(int)ColumnId.Format] =
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Format") };
-            columns[(int)ColumnId.Offset] =
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Offset") };
-            columns[(int)ColumnId.Bit] =
-                new MultiColumnHeaderState.Column { width = 40, headerContent = new GUIContent("Bit") };
-            columns[(int)ColumnId.Size] =
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Size (Bits)") };
-            columns[(int)ColumnId.Optimized] =
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Optimized") };
+            columns[(int)ColumnId.Format] = new MultiColumnHeaderState.Column
+            {
+                headerContent = new GUIContent("Format"),
+            };
+            columns[(int)ColumnId.Offset] = new MultiColumnHeaderState.Column
+            {
+                headerContent = new GUIContent("Offset"),
+            };
+            columns[(int)ColumnId.Bit] = new MultiColumnHeaderState.Column
+            {
+                width = 40,
+                headerContent = new GUIContent("Bit"),
+            };
+            columns[(int)ColumnId.Size] = new MultiColumnHeaderState.Column
+            {
+                headerContent = new GUIContent("Size (Bits)"),
+            };
+            columns[(int)ColumnId.Optimized] = new MultiColumnHeaderState.Column
+            {
+                headerContent = new GUIContent("Optimized"),
+            };
 
             if (numValueColumns == 1)
             {
-                columns[(int)ColumnId.Value] =
-                    new MultiColumnHeaderState.Column { width = 120, headerContent = new GUIContent("Value") };
+                columns[(int)ColumnId.Value] = new MultiColumnHeaderState.Column
+                {
+                    width = 120,
+                    headerContent = new GUIContent("Value"),
+                };
             }
             else
             {
                 for (var i = 0; i < numValueColumns; ++i)
-                    columns[(int)ColumnId.Value + i] =
-                        new MultiColumnHeaderState.Column
+                    columns[(int)ColumnId.Value + i] = new MultiColumnHeaderState.Column
                     {
                         width = 100,
-                        headerContent = new GUIContent("Value " + (char)('A' + i))
+                        headerContent = new GUIContent("Value " + (char)('A' + i)),
                     };
             }
 
@@ -158,7 +171,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 id = 0,
                 children = new List<TreeViewItem> { rootItem },
-                depth = -1
+                depth = -1,
             };
         }
 
@@ -201,7 +214,7 @@ namespace UnityEngine.InputSystem.Editor
                 id = id++,
                 control = control,
                 depth = depth,
-                children = children
+                children = children,
             };
 
             ////TODO: come up with nice icons depicting different control types
@@ -232,7 +245,9 @@ namespace UnityEngine.InputSystem.Editor
             item.bit = new GUIContent(control.stateBlock.bitOffset.ToString());
             item.sizeInBits = new GUIContent(control.stateBlock.sizeInBits.ToString());
             item.type = new GUIContent(control.GetType().Name);
-            item.optimized = new GUIContent(control.optimizedControlDataType != InputStateBlock.kFormatInvalid ? "+" : "-");
+            item.optimized = new GUIContent(
+                control.optimizedControlDataType != InputStateBlock.kFormatInvalid ? "+" : "-"
+            );
 
             try
             {
@@ -327,7 +342,7 @@ namespace UnityEngine.InputSystem.Editor
 
         private unsafe string ReadRawValueAsString(InputControl control, byte[] state)
         {
-            fixed(byte* statePtr = state)
+            fixed (byte* statePtr = state)
             {
                 var ptr = statePtr - m_RootControl.m_StateBlock.byteOffset;
                 return control.ReadValueFromStateAsObject(ptr).ToString();

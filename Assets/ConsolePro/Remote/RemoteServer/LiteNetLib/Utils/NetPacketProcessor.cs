@@ -62,7 +62,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
         /// Register nested property type
         /// </summary>
         /// <typeparam name="T">INetSerializable structure</typeparam>
-        public void RegisterNestedType<T>() where T : struct, INetSerializable
+        public void RegisterNestedType<T>()
+            where T : struct, INetSerializable
         {
             _netSerializer.RegisterNestedType<T>();
         }
@@ -81,7 +82,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
         /// Register nested property type
         /// </summary>
         /// <typeparam name="T">INetSerializable class</typeparam>
-        public void RegisterNestedType<T>(Func<T> constructor) where T : class, INetSerializable
+        public void RegisterNestedType<T>(Func<T> constructor)
+            where T : class, INetSerializable
         {
             _netSerializer.RegisterNestedType(constructor);
         }
@@ -122,13 +124,15 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 #if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
 #endif
-        T>(NetDataWriter writer, T packet) where T : class, new()
+            T>(NetDataWriter writer, T packet)
+            where T : class, new()
         {
             WriteHash<T>(writer);
             _netSerializer.Serialize(writer, packet);
         }
 
-        public void WriteNetSerializable<T>(NetDataWriter writer, ref T packet) where T : INetSerializable
+        public void WriteNetSerializable<T>(NetDataWriter writer, ref T packet)
+            where T : INetSerializable
         {
             WriteHash<T>(writer);
             packet.Serialize(writer);
@@ -155,7 +159,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 #if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
 #endif
-        T>(Action<T> onReceive, Func<T> packetConstructor) where T : class, new()
+            T>(Action<T> onReceive, Func<T> packetConstructor)
+            where T : class, new()
         {
             _netSerializer.Register<T>();
             _callbacks[GetHash<T>()] = (reader, userData) =>
@@ -176,7 +181,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 #if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
 #endif
-        T, TUserData>(Action<T, TUserData> onReceive, Func<T> packetConstructor) where T : class, new()
+            T, TUserData>(Action<T, TUserData> onReceive, Func<T> packetConstructor)
+            where T : class, new()
         {
             _netSerializer.Register<T>();
             _callbacks[GetHash<T>()] = (reader, userData) =>
@@ -197,7 +203,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 #if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
 #endif
-        T>(Action<T> onReceive) where T : class, new()
+            T>(Action<T> onReceive)
+            where T : class, new()
         {
             _netSerializer.Register<T>();
             var reference = new T();
@@ -218,7 +225,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
 #if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
 #endif
-        T, TUserData>(Action<T, TUserData> onReceive) where T : class, new()
+            T, TUserData>(Action<T, TUserData> onReceive)
+            where T : class, new()
         {
             _netSerializer.Register<T>();
             var reference = new T();
@@ -229,9 +237,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             };
         }
 
-        public void SubscribeNetSerializable<T, TUserData>(
-            Action<T, TUserData> onReceive,
-            Func<T> packetConstructor) where T : INetSerializable
+        public void SubscribeNetSerializable<T, TUserData>(Action<T, TUserData> onReceive, Func<T> packetConstructor)
+            where T : INetSerializable
         {
             _callbacks[GetHash<T>()] = (reader, userData) =>
             {
@@ -241,9 +248,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             };
         }
 
-        public void SubscribeNetSerializable<T>(
-            Action<T> onReceive,
-            Func<T> packetConstructor) where T : INetSerializable
+        public void SubscribeNetSerializable<T>(Action<T> onReceive, Func<T> packetConstructor)
+            where T : INetSerializable
         {
             _callbacks[GetHash<T>()] = (reader, userData) =>
             {
@@ -253,8 +259,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             };
         }
 
-        public void SubscribeNetSerializable<T, TUserData>(
-            Action<T, TUserData> onReceive) where T : INetSerializable, new()
+        public void SubscribeNetSerializable<T, TUserData>(Action<T, TUserData> onReceive)
+            where T : INetSerializable, new()
         {
             var reference = new T();
             _callbacks[GetHash<T>()] = (reader, userData) =>
@@ -264,8 +270,8 @@ namespace FlyingWormConsole3.LiteNetLib.Utils
             };
         }
 
-        public void SubscribeNetSerializable<T>(
-            Action<T> onReceive) where T : INetSerializable, new()
+        public void SubscribeNetSerializable<T>(Action<T> onReceive)
+            where T : INetSerializable, new()
         {
             var reference = new T();
             _callbacks[GetHash<T>()] = (reader, userData) =>

@@ -7,8 +7,10 @@ namespace UnityEditor.Rendering
     {
         /// <summary>The camera serialized</summary>
         SerializedObject serializedObject { get; }
+
         /// <summary>The additional camera data serialized</summary>
         SerializedObject serializedAdditionalDataObject { get; }
+
         /// <summary>The base camera settings</summary>
         CameraEditor.Settings baseCameraSettings { get; }
 
@@ -19,14 +21,19 @@ namespace UnityEditor.Rendering
         // Common properties
         /// <summary>Dithering property</summary>
         SerializedProperty dithering { get; }
+
         /// <summary>Stop NaNs property</summary>
         SerializedProperty stopNaNs { get; }
+
         /// <summary>Allow Dynamic resolution property</summary>
         SerializedProperty allowDynamicResolution { get; }
+
         /// <summary>Volume layer mask property</summary>
         SerializedProperty volumeLayerMask { get; }
+
         /// <summary>Clear Depth property property</summary>
         SerializedProperty clearDepth { get; }
+
         /// <summary>Anti aliasing property</summary>
         SerializedProperty antialiasing { get; }
 

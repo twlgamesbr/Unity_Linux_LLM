@@ -59,7 +59,8 @@ namespace Unity.Entities.Editor
                 m_NameLabel = this.Q<Label>();
 
                 this.Q(className: UssClasses.Hierarchy.PrefabStage).AddManipulator(new Clickable(OnContainerClicked));
-                this.Q(className: UssClasses.Hierarchy.PrefabStage + "__back").AddManipulator(new Clickable(OnBackClicked));
+                this.Q(className: UssClasses.Hierarchy.PrefabStage + "__back")
+                    .AddManipulator(new Clickable(OnBackClicked));
             }
 
             public void SetText(string text)
@@ -89,7 +90,7 @@ namespace Unity.Entities.Editor
             Hidden,
             Loading,
             Hierarchy,
-            Message
+            Message,
         }
 
         static readonly int[] k_SingleSelectionBuffer = new int[1];
@@ -121,8 +122,8 @@ namespace Unity.Entities.Editor
 
         public event Action<HierarchyNodeHandle> OnSelectionChanged;
 
-        internal void SetDecorators(HierarchyDecoratorCollection decorators)
-            => HierarchyMultiColumnListView.SetDecorators(decorators);
+        internal void SetDecorators(HierarchyDecoratorCollection decorators) =>
+            HierarchyMultiColumnListView.SetDecorators(decorators);
 
         public HierarchyElement(HierarchyModel model)
         {
@@ -139,7 +140,7 @@ namespace Unity.Entities.Editor
             {
                 name = k_ListViewName,
                 selectionType = SelectionType.Single,
-                itemsSource = m_Model.GetNodes()
+                itemsSource = m_Model.GetNodes(),
             };
             m_HierarchyContextMenu.RegisterCallbacksOnTarget(this);
 
@@ -170,19 +171,22 @@ namespace Unity.Entities.Editor
 
             HierarchyMultiColumnListView.RegisterCallback<PointerDownEvent>(evt =>
             {
-                #if UNITY_2023_2_OR_NEWER
-                if (evt.target == HierarchyMultiColumnListView.Q(className: ScrollView.contentAndVerticalScrollUssClassName))
+#if UNITY_2023_2_OR_NEWER
+                if (
+                    evt.target
+                    == HierarchyMultiColumnListView.Q(className: ScrollView.contentAndVerticalScrollUssClassName)
+                )
                 {
                     // Clear the global selection.
                     Selection.activeObject = null;
                 }
-                #else
-                if (evt.button == (int) MouseButton.LeftMouse)
+#else
+                if (evt.button == (int)MouseButton.LeftMouse)
                 {
                     // Clear the global selection.
                     Selection.activeObject = null;
                 }
-                #endif
+#endif
             });
 
             listViewInnerScrollView.StretchToParentSize();
@@ -193,13 +197,22 @@ namespace Unity.Entities.Editor
             Refresh();
         }
 
-        public void HandleCommand(string commandName) => m_HierarchyContextMenu?.HandleCommand(HierarchyMultiColumnListView.selectedIndex > 0 ? m_Nodes[HierarchyMultiColumnListView.selectedIndex].GetHandle() : default, commandName);
+        public void HandleCommand(string commandName) =>
+            m_HierarchyContextMenu?.HandleCommand(
+                HierarchyMultiColumnListView.selectedIndex > 0
+                    ? m_Nodes[HierarchyMultiColumnListView.selectedIndex].GetHandle()
+                    : default,
+                commandName
+            );
 
         void OnMouseDown(PointerDownEvent evt)
         {
             if (evt.button == (int)MouseButton.RightMouse)
             {
-                var itemIndex = ListViewBridge.VirtualizationControllerGetItemIndexFromMousePosition(HierarchyMultiColumnListView, evt.localPosition);
+                var itemIndex = ListViewBridge.VirtualizationControllerGetItemIndexFromMousePosition(
+                    HierarchyMultiColumnListView,
+                    evt.localPosition
+                );
                 HierarchyMultiColumnListView.SetSelection(itemIndex);
             }
         }
@@ -211,7 +224,10 @@ namespace Unity.Entities.Editor
 
             if (evt.button == (int)MouseButton.LeftMouse)
             {
-                var itemIndex = ListViewBridge.VirtualizationControllerGetItemIndexFromMousePosition(HierarchyMultiColumnListView, evt.localPosition);
+                var itemIndex = ListViewBridge.VirtualizationControllerGetItemIndexFromMousePosition(
+                    HierarchyMultiColumnListView,
+                    evt.localPosition
+                );
 
                 var delay = evt.timestamp - m_LastMouseUpSelectionTime;
 

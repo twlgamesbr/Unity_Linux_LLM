@@ -17,9 +17,7 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             m_ResultFilePath = GetDefaultResultFilePath();
         }
 
-        public void RunStarted(ITestAdaptor testsToRun)
-        {
-        }
+        public void RunStarted(ITestAdaptor testsToRun) { }
 
         public virtual void RunFinished(ITestResultAdaptor testResults)
         {
@@ -31,13 +29,9 @@ namespace UnityEditor.TestTools.TestRunner.CommandLineTest
             TestRunnerApi.SaveResultToFile(testResults, m_ResultFilePath);
         }
 
-        public void TestStarted(ITestAdaptor test)
-        {
-        }
+        public void TestStarted(ITestAdaptor test) { }
 
-        public void TestFinished(ITestResultAdaptor result)
-        {
-        }
+        public void TestFinished(ITestResultAdaptor result) { }
 
         private static string GetDefaultResultFilePath()
         {

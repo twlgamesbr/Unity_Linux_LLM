@@ -78,7 +78,11 @@ namespace Unity.Networking.Transport
             }
 
             /// <inheritdoc cref="NetworkDriver.PopEventForConnection(NetworkConnection, out DataStreamReader, out NetworkPipeline)"/>
-            public NetworkEvent.Type PopEventForConnection(NetworkConnection connection, out DataStreamReader reader, out NetworkPipeline pipe)
+            public NetworkEvent.Type PopEventForConnection(
+                NetworkConnection connection,
+                out DataStreamReader reader,
+                out NetworkPipeline pipe
+            )
             {
                 pipe = default;
 
@@ -86,7 +90,12 @@ namespace Unity.Networking.Transport
                 if (m_ConnectionList.ConnectionAt(connection.InternalId) != connection.ConnectionId)
                     return (int)NetworkEvent.Type.Empty;
 
-                var type = m_EventQueue.PopEventForConnection(connection.InternalId, out var offset, out var size, out var pipelineId);
+                var type = m_EventQueue.PopEventForConnection(
+                    connection.InternalId,
+                    out var offset,
+                    out var size,
+                    out var pipelineId
+                );
                 pipe = new NetworkPipeline { Id = pipelineId };
 
                 if (size > 0)
@@ -115,13 +124,22 @@ namespace Unity.Networking.Transport
             }
 
             /// <inheritdoc cref="NetworkDriver.BeginSend(NetworkConnection, out DataStreamWriter, int)"/>
-            public unsafe int BeginSend(NetworkConnection connection, out DataStreamWriter writer, int requiredPayloadSize = 0)
+            public unsafe int BeginSend(
+                NetworkConnection connection,
+                out DataStreamWriter writer,
+                int requiredPayloadSize = 0
+            )
             {
                 return BeginSend(NetworkPipeline.Null, connection, out writer, requiredPayloadSize);
             }
 
             /// <inheritdoc cref="NetworkDriver.BeginSend(NetworkPipeline, NetworkConnection, out DataStreamWriter, int)"/>
-            public unsafe int BeginSend(NetworkPipeline pipe, NetworkConnection connection, out DataStreamWriter writer, int requiredPayloadSize = 0)
+            public unsafe int BeginSend(
+                NetworkPipeline pipe,
+                NetworkConnection connection,
+                out DataStreamWriter writer,
+                int requiredPayloadSize = 0
+            )
             {
                 writer = default;
 
@@ -166,14 +184,23 @@ namespace Unity.Networking.Transport
                 if (sendHandle.capacity < totalCapacity)
                     return (int)Error.StatusCode.NetworkPacketOverflow;
 
-                var slice = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>((byte*)sendHandle.data + m_PacketPadding + pipelineHeader, payloadCapacity, Allocator.Invalid);
+                var slice = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<byte>(
+                    (byte*)sendHandle.data + m_PacketPadding + pipelineHeader,
+                    payloadCapacity,
+                    Allocator.Invalid
+                );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 var safety = AtomicSafetyHandle.GetTempMemoryHandle();
                 NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref slice, safety);
 #endif
                 writer = new DataStreamWriter(slice);
-                writer.m_SendHandleData = (IntPtr)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<PendingSend>(), UnsafeUtility.AlignOf<PendingSend>(), Allocator.Temp);
+                writer.m_SendHandleData = (IntPtr)
+                    UnsafeUtility.Malloc(
+                        UnsafeUtility.SizeOf<PendingSend>(),
+                        UnsafeUtility.AlignOf<PendingSend>(),
+                        Allocator.Temp
+                    );
                 *(PendingSend*)writer.m_SendHandleData = new PendingSend
                 {
                     Pipeline = pipe,
@@ -181,7 +208,8 @@ namespace Unity.Networking.Transport
                     SendHandle = sendHandle,
                 };
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] = m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] + 1;
+                m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] =
+                    m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] + 1;
 #endif
                 return (int)Error.StatusCode.Success;
             }
@@ -205,7 +233,13 @@ namespace Unity.Networking.Transport
                 if (pendingSend.Pipeline.Id > 0)
                 {
                     pendingSend.SendHandle.size += m_PipelineProcessor.SendHeaderCapacity(pendingSend.Pipeline);
-                    ret = m_PipelineProcessor.Send(this, pendingSend.Pipeline, pendingSend.Connection, pendingSend.SendHandle, m_PacketPadding);
+                    ret = m_PipelineProcessor.Send(
+                        this,
+                        pendingSend.Pipeline,
+                        pendingSend.Connection,
+                        pendingSend.SendHandle,
+                        m_PacketPadding
+                    );
                 }
                 else
                 {
@@ -235,7 +269,10 @@ namespace Unity.Networking.Transport
 #endif
                 }
 
-                if (m_ConnectionList.ConnectionAt(pendingSendPtr->Connection.InternalId).Version != pendingSendPtr->Connection.Version)
+                if (
+                    m_ConnectionList.ConnectionAt(pendingSendPtr->Connection.InternalId).Version
+                    != pendingSendPtr->Connection.Version
+                )
                 {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                     throw new InvalidOperationException("Connection closed between begin and end send");
@@ -250,7 +287,8 @@ namespace Unity.Networking.Transport
                 pendingSendPtr->Connection = default;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] = m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] - 1;
+                m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] =
+                    m_PendingBeginSend[m_ThreadIndex * JobsUtility.CacheLineSize / 4] - 1;
 #endif
                 return 0;
             }
@@ -287,7 +325,9 @@ namespace Unity.Networking.Transport
             public unsafe void AbortSend(DataStreamWriter writer)
             {
                 if (ExtractPendingSendFromWriter(writer, out var pendingSend) != 0)
-                    Debug.LogError("Invalid call to AbortSend. Either there is no matching BeginSend call or the connection was closed since.");
+                    Debug.LogError(
+                        "Invalid call to AbortSend. Either there is no matching BeginSend call or the connection was closed since."
+                    );
 
                 AbortSend(pendingSend.SendHandle);
             }
@@ -354,15 +394,21 @@ namespace Unity.Networking.Transport
 
             internal NetworkEventQueue.Concurrent m_EventQueue;
 
-            [ReadOnly] internal ConnectionList m_ConnectionList;
+            [ReadOnly]
+            internal ConnectionList m_ConnectionList;
             internal NetworkPipelineProcessor.Concurrent m_PipelineProcessor;
             internal NetworkDriverSender.Concurrent m_DriverSender;
-            [ReadOnly] internal NetworkDriverReceiver m_DriverReceiver;
+
+            [ReadOnly]
+            internal NetworkDriverReceiver m_DriverReceiver;
             internal int m_PacketPadding;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            [NativeSetThreadIndex] internal int m_ThreadIndex;
-            [NativeDisableParallelForRestriction] internal NativeArray<int> m_PendingBeginSend;
+            [NativeSetThreadIndex]
+            internal int m_ThreadIndex;
+
+            [NativeDisableParallelForRestriction]
+            internal NativeArray<int> m_PendingBeginSend;
 #endif
         }
 
@@ -395,7 +441,8 @@ namespace Unity.Networking.Transport
 
         private NetworkPipelineProcessor m_PipelineProcessor;
 
-        [ReadOnly] internal NetworkSettings m_NetworkSettings;
+        [ReadOnly]
+        internal NetworkSettings m_NetworkSettings;
 
         private NativeHashMap<ConnectionId, ConnectionPayload> m_ConnectionPayloads;
 
@@ -479,12 +526,12 @@ namespace Unity.Networking.Transport
         /// <typeparam name="N">Type of the network interface to use.</typeparam>
         /// <param name="networkInterface">Instance of the custom network interface.</param>
         /// <returns>Newly-constructed driver.</returns>
-        public static NetworkDriver Create<N>(N networkInterface) where N : unmanaged, INetworkInterface
-            => Create(ref networkInterface);
+        public static NetworkDriver Create<N>(N networkInterface)
+            where N : unmanaged, INetworkInterface => Create(ref networkInterface);
 
         /// <inheritdoc cref="NetworkDriver.Create{N}(N)"/>
-        public static NetworkDriver Create<N>(ref N networkInterface) where N : unmanaged, INetworkInterface
-            => Create(ref networkInterface, new NetworkSettings(Allocator.Temp));
+        public static NetworkDriver Create<N>(ref N networkInterface)
+            where N : unmanaged, INetworkInterface => Create(ref networkInterface, new NetworkSettings(Allocator.Temp));
 
         /// <summary>
         /// Create a new <c>NetworkDriver</c> with a custom network interface and custom settings.
@@ -493,11 +540,12 @@ namespace Unity.Networking.Transport
         /// <param name="networkInterface">Instance of the custom network interface.</param>
         /// <param name="settings">Configuration for the driver.</param>
         /// <returns>Newly-constructed driver.</returns>
-        public static NetworkDriver Create<N>(N networkInterface, NetworkSettings settings) where N : unmanaged, INetworkInterface
-            => Create(ref networkInterface, settings);
+        public static NetworkDriver Create<N>(N networkInterface, NetworkSettings settings)
+            where N : unmanaged, INetworkInterface => Create(ref networkInterface, settings);
 
         /// <inheritdoc cref="NetworkDriver.Create{N}(N, NetworkSettings)"/>
-        public static NetworkDriver Create<N>(ref N networkInterface, NetworkSettings settings) where N : unmanaged, INetworkInterface
+        public static NetworkDriver Create<N>(ref N networkInterface, NetworkSettings settings)
+            where N : unmanaged, INetworkInterface
         {
             var driver = default(NetworkDriver);
 
@@ -510,22 +558,32 @@ namespace Unity.Networking.Transport
 
                 if (relayParameter.ServerData.IsWebSocket == (byte)1 && netifTypeHash != wsTypeHash)
                 {
-                    Debug.LogError("Relay is configured to use WebSockets, but NetworkDriver uses UDP. " +
-                        "Make sure to pass WebSocketNetworkInterface as the first parameter when calling NetworkDriver.Create().");
+                    Debug.LogError(
+                        "Relay is configured to use WebSockets, but NetworkDriver uses UDP. "
+                            + "Make sure to pass WebSocketNetworkInterface as the first parameter when calling NetworkDriver.Create()."
+                    );
                     throw new ArgumentException("Mismatched Relay configuration and network interface.");
                 }
 
                 if (relayParameter.ServerData.IsWebSocket == (byte)0 && netifTypeHash == wsTypeHash)
                 {
-                    Debug.LogError("Relay is configured to use UDP, but NetworkDriver was created with WebSocketNetworkInterface." +
-                        "If usage of WebSockets is intended, the Relay allocation should be created with the \"wss\" connection type.");
+                    Debug.LogError(
+                        "Relay is configured to use UDP, but NetworkDriver was created with WebSocketNetworkInterface."
+                            + "If usage of WebSockets is intended, the Relay allocation should be created with the \"wss\" connection type."
+                    );
                     throw new ArgumentException("Mismatched Relay configuration and network interface.");
                 }
             }
 
             driver.m_NetworkSettings = new NetworkSettings(settings, Allocator.Persistent);
 
-            NetworkStack.InitializeForSettings(out driver.m_NetworkStack, ref networkInterface, ref settings, out var sendQueue, out var receiveQueue);
+            NetworkStack.InitializeForSettings(
+                out driver.m_NetworkStack,
+                ref networkInterface,
+                ref settings,
+                out var sendQueue,
+                out var receiveQueue
+            );
 
             driver.m_PipelineProcessor = new NetworkPipelineProcessor(settings, driver.m_NetworkStack.PacketPadding);
 
@@ -533,7 +591,10 @@ namespace Unity.Networking.Transport
             driver.m_DriverReceiver = new NetworkDriverReceiver(receiveQueue);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            driver.m_PendingBeginSend = new NativeArray<int>(JobsUtility.MaxJobThreadCount * JobsUtility.CacheLineSize / 4, Allocator.Persistent);
+            driver.m_PendingBeginSend = new NativeArray<int>(
+                JobsUtility.MaxJobThreadCount * JobsUtility.CacheLineSize / 4,
+                Allocator.Persistent
+            );
 #endif
             driver.m_EventQueue = new NetworkEventQueue(NetworkParameterConstants.InitialEventQueueSize);
 
@@ -600,7 +661,11 @@ namespace Unity.Networking.Transport
             {
                 var conCount = m_EventQueue.GetCountForConnection(i);
                 var connectionState = connectionList.GetConnectionState(connectionList.ConnectionAt(i));
-                if (conCount != 0 && connectionState != NetworkConnection.State.Disconnected && connectionState != NetworkConnection.State.Disconnecting)
+                if (
+                    conCount != 0
+                    && connectionState != NetworkConnection.State.Disconnected
+                    && connectionState != NetworkConnection.State.Disconnecting
+                )
                 {
                     Debug.LogError($"Resetting event queue with pending events (Count={conCount}, ConnectionID={i})");
                 }
@@ -613,7 +678,9 @@ namespace Unity.Networking.Transport
                     m_PendingBeginSend[i * JobsUtility.CacheLineSize / 4] = 0;
                     if (!didPrint)
                     {
-                        Debug.LogError("Missing EndSend, calling BeginSend without calling EndSend will result in a memory leak");
+                        Debug.LogError(
+                            "Missing EndSend, calling BeginSend without calling EndSend will result in a memory leak"
+                        );
                         didPrint = true;
                     }
                 }
@@ -628,9 +695,10 @@ namespace Unity.Networking.Transport
             var state = m_InternalState.Value;
             var networkParams = m_NetworkSettings.GetNetworkConfigParameters();
 
-            long now = networkParams.fixedFrameTimeMS > 0
-                ? LastUpdateTime + networkParams.fixedFrameTimeMS
-                : TimerHelpers.GetCurrentTimestampMS() - state.UpdateTimeAdjustment;
+            long now =
+                networkParams.fixedFrameTimeMS > 0
+                    ? LastUpdateTime + networkParams.fixedFrameTimeMS
+                    : TimerHelpers.GetCurrentTimestampMS() - state.UpdateTimeAdjustment;
 
             long frameTime = now - LastUpdateTime;
             if (networkParams.maxFrameTimeMS > 0 && frameTime > networkParams.maxFrameTimeMS)
@@ -655,7 +723,7 @@ namespace Unity.Networking.Transport
         {
             UpdateLastUpdateTime();
 
-            var updateJob = new UpdateJob {driver = this};
+            var updateJob = new UpdateJob { driver = this };
 
             // Clearing the event queue and receiving/sending data only makes sense if we're bound.
             if (Bound)
@@ -663,7 +731,15 @@ namespace Unity.Networking.Transport
                 var connections = m_NetworkStack.Connections;
 
                 var handle = updateJob.Schedule(dependency);
-                handle = m_NetworkStack.ScheduleReceive(ref m_DriverReceiver, ref connections, ref m_EventQueue, ref m_PipelineProcessor, ref m_ConnectionPayloads, LastUpdateTime, handle);
+                handle = m_NetworkStack.ScheduleReceive(
+                    ref m_DriverReceiver,
+                    ref connections,
+                    ref m_EventQueue,
+                    ref m_PipelineProcessor,
+                    ref m_ConnectionPayloads,
+                    LastUpdateTime,
+                    handle
+                );
                 handle = m_NetworkStack.ScheduleSend(ref m_DriverSender, LastUpdateTime, handle);
 
                 return handle;
@@ -736,7 +812,8 @@ namespace Unity.Networking.Transport
         /// are enabled (i.e. in the editor). Otherwise the pipeline is registered anyway (with
         /// likely erroneous behavior down the line).
         /// </exception>
-        public void RegisterPipelineStage<T>(T stage) where T : unmanaged, INetworkPipelineStage
+        public void RegisterPipelineStage<T>(T stage)
+            where T : unmanaged, INetworkPipelineStage
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!IsCreated)
@@ -822,14 +899,13 @@ namespace Unity.Networking.Transport
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!IsCreated)
                 throw new InvalidOperationException(
-                    "Driver must be constructed with a populated or empty INetworkParameter params list");
+                    "Driver must be constructed with a populated or empty INetworkParameter params list"
+                );
             // question: should this really be an error?
             if (Bound)
-                throw new InvalidOperationException(
-                    "Bind can only be called once per NetworkDriver");
+                throw new InvalidOperationException("Bind can only be called once per NetworkDriver");
             if (m_NetworkStack.Connections.Count > 0)
-                throw new InvalidOperationException(
-                    "Bind cannot be called after establishing connections");
+                throw new InvalidOperationException("Bind cannot be called after establishing connections");
 #endif
 
             // If using Relay, you usually want to bind to an ephemeral port since we'll be acting
@@ -838,7 +914,9 @@ namespace Unity.Networking.Transport
             // provided by the Relay service. It's not an error though so just warn about it.
             var usingRelay = m_NetworkStack.TryGetLayer<RelayLayer>(out _);
             if (usingRelay && endpoint.Port != 0)
-                Debug.LogWarning("When using Unity Relay, NetworkDriver should be bound to 0.0.0.0:0 (i.e. NetworkEndpoint.AnyIpv4).");
+                Debug.LogWarning(
+                    "When using Unity Relay, NetworkDriver should be bound to 0.0.0.0:0 (i.e. NetworkEndpoint.AnyIpv4)."
+                );
 
             // Binding is the best place to set the OS headers overhead in the analytics layer since
             // it's the first time we have access to the actual local endpoint being used.
@@ -863,14 +941,13 @@ namespace Unity.Networking.Transport
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!IsCreated)
                 throw new InvalidOperationException(
-                    "Driver must be constructed with a populated or empty INetworkParameter params list");
+                    "Driver must be constructed with a populated or empty INetworkParameter params list"
+                );
 
             if (Listening)
-                throw new InvalidOperationException(
-                    "Listen can only be called once per NetworkDriver");
+                throw new InvalidOperationException("Listen can only be called once per NetworkDriver");
             if (!Bound)
-                throw new InvalidOperationException(
-                    "Listen can only be called after a successful call to Bind");
+                throw new InvalidOperationException("Listen can only be called after a successful call to Bind");
 #endif
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -878,7 +955,9 @@ namespace Unity.Networking.Transport
             var usingRelay = m_NetworkStack.TryGetLayer<RelayLayer>(out _);
             if (usingWebSocket && !usingRelay)
             {
-                throw new InvalidOperationException("Web browsers do not support listening for new WebSocket connections.");
+                throw new InvalidOperationException(
+                    "Web browsers do not support listening for new WebSocket connections."
+                );
             }
 #endif
 
@@ -951,11 +1030,14 @@ namespace Unity.Networking.Transport
         /// <param name="payload">Payload to send when accepting connections.</param>
         public unsafe void SetAcceptPayload(NativeArray<byte> payload)
         {
-            var connectAcceptHeaderSize = m_NetworkStack.PacketPadding + SimpleConnectionLayer.k_HandshakeSize + sizeof(ushort);
+            var connectAcceptHeaderSize =
+                m_NetworkStack.PacketPadding + SimpleConnectionLayer.k_HandshakeSize + sizeof(ushort);
             var maxSize = m_DriverSender.SendQueue.PayloadCapacity - connectAcceptHeaderSize;
             if (payload.Length > maxSize)
             {
-                Debug.LogError($"Payload provided to SetAcceptPayload() call is too large ({payload.Length} bytes, maximum is {maxSize}). Ignoring.");
+                Debug.LogError(
+                    $"Payload provided to SetAcceptPayload() call is too large ({payload.Length} bytes, maximum is {maxSize}). Ignoring."
+                );
             }
             else
             {
@@ -967,11 +1049,14 @@ namespace Unity.Networking.Transport
 
         private unsafe void SetConnectPayload(NetworkConnection connection, NativeArray<byte> payload)
         {
-            var connectRequestHeaderSize = m_NetworkStack.PacketPadding + SimpleConnectionLayer.k_HandshakeSize + sizeof(ushort);
+            var connectRequestHeaderSize =
+                m_NetworkStack.PacketPadding + SimpleConnectionLayer.k_HandshakeSize + sizeof(ushort);
             var maxSize = m_DriverSender.SendQueue.PayloadCapacity - connectRequestHeaderSize;
             if (payload.Length > maxSize)
             {
-                Debug.LogError($"Payload provided to Connect() call is too large ({payload.Length} bytes, maximum is {maxSize}). Ignoring.");
+                Debug.LogError(
+                    $"Payload provided to Connect() call is too large ({payload.Length} bytes, maximum is {maxSize}). Ignoring."
+                );
             }
             else
             {
@@ -1141,7 +1226,13 @@ namespace Unity.Networking.Transport
                 }
             }
 
-            var connectionId = m_NetworkStack.Connections.StartConnecting(address, port, out var hostnameLookupFinished, out var resolvedEndpoint, out var disconnectReason);
+            var connectionId = m_NetworkStack.Connections.StartConnecting(
+                address,
+                port,
+                out var hostnameLookupFinished,
+                out var resolvedEndpoint,
+                out var disconnectReason
+            );
             var networkConnection = new NetworkConnection(connectionId);
 
             if (hostnameLookupFinished)
@@ -1204,7 +1295,11 @@ namespace Unity.Networking.Transport
         internal bool CheckHostnameLookupStatus(NetworkConnection connection)
         {
             var c = connection.ConnectionId;
-            var hostnameLookupFinished = m_NetworkStack.Connections.CheckHostnameLookupStatus(ref c, out var resolvedEndpoint, out var disconnectReason);
+            var hostnameLookupFinished = m_NetworkStack.Connections.CheckHostnameLookupStatus(
+                ref c,
+                out var resolvedEndpoint,
+                out var disconnectReason
+            );
 
             if (hostnameLookupFinished)
             {
@@ -1230,13 +1325,15 @@ namespace Unity.Networking.Transport
         {
             var offset = Receiver.AppendToStream((byte)reason);
 
-            EventQueue.PushEvent(new NetworkEvent
-            {
-                connectionId = connection.ConnectionId.Id,
-                type = NetworkEvent.Type.Disconnect,
-                offset = offset,
-                size = 1
-            });
+            EventQueue.PushEvent(
+                new NetworkEvent
+                {
+                    connectionId = connection.ConnectionId.Id,
+                    type = NetworkEvent.Type.Disconnect,
+                    offset = offset,
+                    size = 1,
+                }
+            );
         }
 
         /// <summary>
@@ -1272,7 +1369,14 @@ namespace Unity.Networking.Transport
         /// <param name="writeProcessingBuffer">Buffer used by the send method of the pipeline.</param>
         /// <param name="sharedBuffer">Buffer used by both receive and send methods of the pipeline.</param>
         /// <exception cref="InvalidOperationException">If the connection is invalid.</exception>
-        public void GetPipelineBuffers(NetworkPipeline pipeline, NetworkPipelineStageId stageId, NetworkConnection connection, out NativeArray<byte> readProcessingBuffer, out NativeArray<byte> writeProcessingBuffer, out NativeArray<byte> sharedBuffer)
+        public void GetPipelineBuffers(
+            NetworkPipeline pipeline,
+            NetworkPipelineStageId stageId,
+            NetworkConnection connection,
+            out NativeArray<byte> readProcessingBuffer,
+            out NativeArray<byte> writeProcessingBuffer,
+            out NativeArray<byte> sharedBuffer
+        )
         {
             if (m_NetworkStack.Connections.ConnectionAt(connection.InternalId) != connection.ConnectionId)
             {
@@ -1286,7 +1390,14 @@ namespace Unity.Networking.Transport
                 return;
 #endif
             }
-            m_PipelineProcessor.GetPipelineBuffers(pipeline, stageId, connection, out readProcessingBuffer, out writeProcessingBuffer, out sharedBuffer);
+            m_PipelineProcessor.GetPipelineBuffers(
+                pipeline,
+                stageId,
+                connection,
+                out readProcessingBuffer,
+                out writeProcessingBuffer,
+                out sharedBuffer
+            );
         }
 
         // Keeping the pipeline parameter there to avoid breaking DOTS.
@@ -1406,7 +1517,12 @@ namespace Unity.Networking.Transport
         /// which means the <see cref="DataStreamWriter"/> will be as large as it can be.
         /// </param>
         /// <returns>0 on success, a negative error code on error.</returns>
-        public int BeginSend(NetworkPipeline pipe, NetworkConnection connection, out DataStreamWriter writer, int requiredPayloadSize = 0)
+        public int BeginSend(
+            NetworkPipeline pipe,
+            NetworkConnection connection,
+            out DataStreamWriter writer,
+            int requiredPayloadSize = 0
+        )
         {
             return ToConcurrentSendOnly().BeginSend(pipe, connection, out writer, requiredPayloadSize);
         }
@@ -1486,7 +1602,11 @@ namespace Unity.Networking.Transport
         /// </param>
         /// <param name="pipe">Pipeline on which the data event was received.</param>
         /// <returns>The type of the event popped.</returns>
-        public NetworkEvent.Type PopEvent(out NetworkConnection connection, out DataStreamReader reader, out NetworkPipeline pipe)
+        public NetworkEvent.Type PopEvent(
+            out NetworkConnection connection,
+            out DataStreamReader reader,
+            out NetworkPipeline pipe
+        )
         {
             reader = default;
 
@@ -1503,9 +1623,15 @@ namespace Unity.Networking.Transport
 
                 //This is in service of not providing any means for a server's / listening NetworkDriver's user-level code to obtain a NetworkConnection handle
                 //that corresponds to an underlying Connection that lives in m_NetworkStack.Connections without having obtained it from Accept() first.
-                if (id >= 0 && type == NetworkEvent.Type.Data && !m_NetworkStack.Connections.IsConnectionAccepted(ref connectionId))
+                if (
+                    id >= 0
+                    && type == NetworkEvent.Type.Data
+                    && !m_NetworkStack.Connections.IsConnectionAccepted(ref connectionId)
+                )
                 {
-                    Debug.LogWarning("A NetworkEvent.Data event was discarded for a connection that had not been accepted yet. To avoid this, consider calling Accept() prior to PopEvent() in your project's network update loop, or only use PopEventForConnection() in conjunction with Accept().");
+                    Debug.LogWarning(
+                        "A NetworkEvent.Data event was discarded for a connection that had not been accepted yet. To avoid this, consider calling Accept() prior to PopEvent() in your project's network update loop, or only use PopEventForConnection() in conjunction with Accept()."
+                    );
                     continue;
                 }
 
@@ -1517,9 +1643,7 @@ namespace Unity.Networking.Transport
             if (size >= 0)
                 reader = new DataStreamReader(m_DriverReceiver.GetDataStreamSubArray(offset, size));
 
-            connection = id < 0
-                ? default
-                : new NetworkConnection(m_NetworkStack.Connections.ConnectionAt(id));
+            connection = id < 0 ? default : new NetworkConnection(m_NetworkStack.Connections.ConnectionAt(id));
 
             return type;
         }
@@ -1562,15 +1686,27 @@ namespace Unity.Networking.Transport
         /// </param>
         /// <param name="pipe">Pipeline on which the data event was received.</param>
         /// <returns>The type of the event popped.</returns>
-        public NetworkEvent.Type PopEventForConnection(NetworkConnection connection, out DataStreamReader reader, out NetworkPipeline pipe)
+        public NetworkEvent.Type PopEventForConnection(
+            NetworkConnection connection,
+            out DataStreamReader reader,
+            out NetworkPipeline pipe
+        )
         {
             reader = default;
             pipe = default;
 
-            if (connection.InternalId < 0 || connection.InternalId >= m_NetworkStack.Connections.Count ||
-                m_NetworkStack.Connections.ConnectionAt(connection.InternalId).Version != connection.Version)
+            if (
+                connection.InternalId < 0
+                || connection.InternalId >= m_NetworkStack.Connections.Count
+                || m_NetworkStack.Connections.ConnectionAt(connection.InternalId).Version != connection.Version
+            )
                 return (int)NetworkEvent.Type.Empty;
-            var type = m_EventQueue.PopEventForConnection(connection.InternalId, out var offset, out var size, out var pipelineId);
+            var type = m_EventQueue.PopEventForConnection(
+                connection.InternalId,
+                out var offset,
+                out var size,
+                out var pipelineId
+            );
             pipe = new NetworkPipeline { Id = pipelineId };
 
             if (size > 0)
@@ -1587,8 +1723,11 @@ namespace Unity.Networking.Transport
         /// <returns>Number of events in the connection's event queue.</returns>
         public int GetEventQueueSizeForConnection(NetworkConnection connection)
         {
-            if (connection.InternalId < 0 || connection.InternalId >= m_NetworkStack.Connections.Count ||
-                m_NetworkStack.Connections.ConnectionAt(connection.InternalId).Version != connection.Version)
+            if (
+                connection.InternalId < 0
+                || connection.InternalId >= m_NetworkStack.Connections.Count
+                || m_NetworkStack.Connections.ConnectionAt(connection.InternalId).Version != connection.Version
+            )
                 return 0;
             return m_EventQueue.GetCountForConnection(connection.InternalId);
         }
@@ -1609,7 +1748,9 @@ namespace Unity.Networking.Transport
 #else
                 var usingUdp = m_NetworkStack.TryGetLayer<NetworkInterfaceLayer<UDPNetworkInterface>>(out _);
 #endif
-                var usingWebSocket = m_NetworkStack.TryGetLayer<NetworkInterfaceLayer<WebSocketNetworkInterface>>(out _);
+                var usingWebSocket = m_NetworkStack.TryGetLayer<NetworkInterfaceLayer<WebSocketNetworkInterface>>(
+                    out _
+                );
                 var usingRelay = m_NetworkStack.TryGetLayer<RelayLayer>(out _);
 
                 if (usingUdp || usingWebSocket)
@@ -1621,7 +1762,7 @@ namespace Unity.Networking.Transport
                         // nowadays so just assume 20 bytes. IPv6 is always a fixed 40 bytes header.
                         NetworkFamily.Ipv4 => 20,
                         NetworkFamily.Ipv6 => 40,
-                        _ => 0
+                        _ => 0,
                     };
 
                     if (usingUdp)
@@ -1703,8 +1844,11 @@ namespace Unity.Networking.Transport
         /// <returns>Statistics about the connection.</returns>
         public unsafe ConnectionStatistics GetConnectionStatistics(NetworkConnection connection)
         {
-            if (connection.InternalId < 0 || connection.InternalId >= m_NetworkStack.Connections.Count ||
-                m_NetworkStack.Connections.ConnectionAt(connection.InternalId).Version != connection.Version)
+            if (
+                connection.InternalId < 0
+                || connection.InternalId >= m_NetworkStack.Connections.Count
+                || m_NetworkStack.Connections.ConnectionAt(connection.InternalId).Version != connection.Version
+            )
                 return default;
 
             var stats = default(ConnectionStatistics);

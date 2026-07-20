@@ -9,35 +9,40 @@ namespace Unity.Entities.SourceGen.Common
 {
     public static class SyntaxExtensions
     {
-        public static bool IsReadOnly(this ParameterSyntax parameter) => parameter.Modifiers.Any(mod => mod.IsKind(SyntaxKind.InKeyword));
+        public static bool IsReadOnly(this ParameterSyntax parameter) =>
+            parameter.Modifiers.Any(mod => mod.IsKind(SyntaxKind.InKeyword));
+
         public static bool IsReadOnly(this IParameterSymbol parameter) => parameter.RefKind == RefKind.In;
 
         class PreprocessorTriviaRemover : CSharpSyntaxRewriter
         {
             public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
             {
-                if (trivia.IsKind(SyntaxKind.DisabledTextTrivia) ||
-                    trivia.IsKind(SyntaxKind.PreprocessingMessageTrivia) ||
-                    trivia.IsKind(SyntaxKind.IfDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.ElifDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.ElseDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.EndIfDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.RegionDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.EndRegionDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.DefineDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.UndefDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.ErrorDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.WarningDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.PragmaWarningDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.PragmaChecksumDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.ReferenceDirectiveTrivia) ||
-                    trivia.IsKind(SyntaxKind.BadDirectiveTrivia))
+                if (
+                    trivia.IsKind(SyntaxKind.DisabledTextTrivia)
+                    || trivia.IsKind(SyntaxKind.PreprocessingMessageTrivia)
+                    || trivia.IsKind(SyntaxKind.IfDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.ElifDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.ElseDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.EndIfDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.RegionDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.EndRegionDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.DefineDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.UndefDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.ErrorDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.WarningDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.PragmaWarningDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.PragmaChecksumDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.ReferenceDirectiveTrivia)
+                    || trivia.IsKind(SyntaxKind.BadDirectiveTrivia)
+                )
                     return default;
                 return trivia;
             }
         }
 
-        public static T WithoutPreprocessorTrivia<T>(this T node) where T : SyntaxNode
+        public static T WithoutPreprocessorTrivia<T>(this T node)
+            where T : SyntaxNode
         {
             var preprocessorTriviaRemover = new PreprocessorTriviaRemover();
             return (T)preprocessorTriviaRemover.Visit(node);
@@ -53,7 +58,7 @@ namespace Unity.Entities.SourceGen.Common
             {
                 StatementSyntax lambdaBodyStatement => Block(lambdaBodyStatement),
                 ExpressionSyntax lambdaBodyExpression => Block(ExpressionStatement(lambdaBodyExpression)),
-                _ => throw new InvalidOperationException($"Invalid lambda body: {node.Body}")
+                _ => throw new InvalidOperationException($"Invalid lambda body: {node.Body}"),
             };
         }
 
@@ -63,7 +68,8 @@ namespace Unity.Entities.SourceGen.Common
             return argumentList?.DescendantNodes().OfType<ConditionalExpressionSyntax>().FirstOrDefault() != null;
         }
 
-        public static T AncestorOfKind<T>(this SyntaxNode node) where T : SyntaxNode
+        public static T AncestorOfKind<T>(this SyntaxNode node)
+            where T : SyntaxNode
         {
             foreach (var ancestor in node.Ancestors())
                 if (ancestor is T t)
@@ -71,7 +77,8 @@ namespace Unity.Entities.SourceGen.Common
             throw new InvalidOperationException($"No Ancestor {nameof(T)} found.");
         }
 
-        public static T AncestorOfKindOrDefault<T>(this SyntaxNode node) where T : SyntaxNode
+        public static T AncestorOfKindOrDefault<T>(this SyntaxNode node)
+            where T : SyntaxNode
         {
             foreach (var ancestor in node.Ancestors())
                 if (ancestor is T t)
@@ -79,7 +86,8 @@ namespace Unity.Entities.SourceGen.Common
             return null;
         }
 
-        public static int GetLineNumber(this SyntaxNode node) => node.GetLocation().GetLineSpan().StartLinePosition.Line;
+        public static int GetLineNumber(this SyntaxNode node) =>
+            node.GetLocation().GetLineSpan().StartLinePosition.Line;
 
         public static string GetModifierString(this ParameterSyntax parameter)
         {

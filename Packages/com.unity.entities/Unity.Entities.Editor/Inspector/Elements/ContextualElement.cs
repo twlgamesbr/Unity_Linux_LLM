@@ -43,11 +43,15 @@ namespace Unity.Entities.Editor
             {
                 var local = i;
 
-                menu.AppendAction(m_Items[i].ContextMenuLabel, e =>
-                {
-                    m_State.Index = local;
-                    UpdateVisibility(m_State.Index);
-                }, i == m_State.Index ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal);
+                menu.AppendAction(
+                    m_Items[i].ContextMenuLabel,
+                    e =>
+                    {
+                        m_State.Index = local;
+                        UpdateVisibility(m_State.Index);
+                    },
+                    i == m_State.Index ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal
+                );
             }
         }
 

@@ -37,10 +37,13 @@ namespace Unity.Physics.GraphicsIntegration
         //and that Entity will get a whole Chunk allocated anyway. This capacity is just a limit for keeping the buffer inside the Chunk,
         //reducing it does not affect memory consumption
         [InternalBufferCapacity(256)]
-        struct RigidBodySmoothingWorldIndex : IBufferElementData,
-                                              IEquatable<RigidBodySmoothingWorldIndex>, IComparable<RigidBodySmoothingWorldIndex>
+        struct RigidBodySmoothingWorldIndex
+            : IBufferElementData,
+                IEquatable<RigidBodySmoothingWorldIndex>,
+                IComparable<RigidBodySmoothingWorldIndex>
         {
             public int Value;
+
             public RigidBodySmoothingWorldIndex(PhysicsWorldIndex index)
             {
                 Value = (int)index.Value;
@@ -63,8 +66,11 @@ namespace Unity.Physics.GraphicsIntegration
         /// <param name="state"><see cref="SystemState"/> reference from an <see cref="ISystem"/></param>
         /// <param name="mostRecentTimeEntity">Entity for looking up <see cref="MostRecentFixedTime"/> and <see cref="RigidBodySmoothingWorldIndex"/> buffers.</param>
         /// <param name="physicsWorldIndex">    Zero-based index of the physics world. </param>
-        public static void RegisterPhysicsWorldForSmoothRigidBodyMotion(ref SystemState state,
-            Entity mostRecentTimeEntity, PhysicsWorldIndex physicsWorldIndex)
+        public static void RegisterPhysicsWorldForSmoothRigidBodyMotion(
+            ref SystemState state,
+            Entity mostRecentTimeEntity,
+            PhysicsWorldIndex physicsWorldIndex
+        )
         {
             var mostRecentFixedTimes = state.EntityManager.GetBuffer<MostRecentFixedTime>(mostRecentTimeEntity);
             var worldIndexToUpdate = state.EntityManager.GetBuffer<RigidBodySmoothingWorldIndex>(mostRecentTimeEntity);
@@ -85,8 +91,11 @@ namespace Unity.Physics.GraphicsIntegration
         /// <param name="state"><see cref="SystemState"/> reference from an <see cref="ISystem"/></param>
         /// <param name="mostRecentTimeEntity">Entity for looking up <see cref="MostRecentFixedTime"/> and <see cref="RigidBodySmoothingWorldIndex"/> buffers.</param>
         /// <param name="physicsWorldIndex">    Zero-based index of the physics world. </param>
-        public static void UnregisterPhysicsWorldForSmoothRigidBodyMotion(ref SystemState state,
-            Entity mostRecentTimeEntity, PhysicsWorldIndex physicsWorldIndex)
+        public static void UnregisterPhysicsWorldForSmoothRigidBodyMotion(
+            ref SystemState state,
+            Entity mostRecentTimeEntity,
+            PhysicsWorldIndex physicsWorldIndex
+        )
         {
             var worldIndexToUpdate = state.EntityManager.GetBuffer<RigidBodySmoothingWorldIndex>(mostRecentTimeEntity);
             for (int i = 0; i < worldIndexToUpdate.Length; ++i)
@@ -153,7 +162,7 @@ namespace Unity.Physics.GraphicsIntegration
                     PhysicsGraphicalSmoothingType = m_PhysicsGraphicalSmoothingType,
                     LocalToWorldType = m_LocalToWorldType,
                     TimeAhead = timeAhead,
-                    NormalizedTimeAhead = normalizedTimeAhead
+                    NormalizedTimeAhead = normalizedTimeAhead,
                 }.ScheduleParallel(SmoothedDynamicBodiesQuery, state.Dependency);
             }
         }
@@ -161,24 +170,42 @@ namespace Unity.Physics.GraphicsIntegration
         [BurstCompile]
         struct SmoothMotionJob : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<LocalTransform> LocalTransformType;
-            [ReadOnly] public ComponentTypeHandle<PostTransformMatrix> PostTransformMatrixType;
-            [ReadOnly] public ComponentTypeHandle<PhysicsMass> PhysicsMassType;
-            [ReadOnly] public ComponentTypeHandle<PhysicsGraphicalInterpolationBuffer> InterpolationBufferType;
+            [ReadOnly]
+            public ComponentTypeHandle<LocalTransform> LocalTransformType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<PostTransformMatrix> PostTransformMatrixType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsMass> PhysicsMassType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<PhysicsGraphicalInterpolationBuffer> InterpolationBufferType;
             public ComponentTypeHandle<PhysicsGraphicalSmoothing> PhysicsGraphicalSmoothingType;
             public ComponentTypeHandle<LocalToWorld> LocalToWorldType;
             public float TimeAhead;
             public float NormalizedTimeAhead;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
 
                 NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref LocalTransformType);
-                NativeArray<PostTransformMatrix> postTransformMatrices = chunk.GetNativeArray(ref PostTransformMatrixType);
+                NativeArray<PostTransformMatrix> postTransformMatrices = chunk.GetNativeArray(
+                    ref PostTransformMatrixType
+                );
                 NativeArray<PhysicsMass> physicsMasses = chunk.GetNativeArray(ref PhysicsMassType);
-                NativeArray<PhysicsGraphicalSmoothing> physicsGraphicalSmoothings = chunk.GetNativeArray(ref PhysicsGraphicalSmoothingType);
-                NativeArray<PhysicsGraphicalInterpolationBuffer> interpolationBuffers = chunk.GetNativeArray(ref InterpolationBufferType);
+                NativeArray<PhysicsGraphicalSmoothing> physicsGraphicalSmoothings = chunk.GetNativeArray(
+                    ref PhysicsGraphicalSmoothingType
+                );
+                NativeArray<PhysicsGraphicalInterpolationBuffer> interpolationBuffers = chunk.GetNativeArray(
+                    ref InterpolationBufferType
+                );
                 NativeArray<LocalToWorld> localToWorlds = chunk.GetNativeArray(ref LocalToWorldType);
 
                 var hasPostTransformMatrix = postTransformMatrices.IsCreated;
@@ -194,8 +221,9 @@ namespace Unity.Physics.GraphicsIntegration
                     var smoothing = physicsGraphicalSmoothings[i];
                     var currentVelocity = smoothing.CurrentVelocity;
 
-
-                    var currentTransform = hasLocalTransform ? new RigidTransform(localTransforms[i].Rotation, localTransforms[i].Position) : RigidTransform.identity;
+                    var currentTransform = hasLocalTransform
+                        ? new RigidTransform(localTransforms[i].Rotation, localTransforms[i].Position)
+                        : RigidTransform.identity;
 
                     RigidTransform smoothedTransform;
 
@@ -213,20 +241,28 @@ namespace Unity.Physics.GraphicsIntegration
                         if (hasInterpolationBuffer)
                         {
                             smoothedTransform = GraphicalSmoothingUtility.Interpolate(
-                                interpolationBuffers[i].PreviousTransform, currentTransform, NormalizedTimeAhead);
+                                interpolationBuffers[i].PreviousTransform,
+                                currentTransform,
+                                NormalizedTimeAhead
+                            );
                         }
                         else
                         {
                             smoothedTransform = GraphicalSmoothingUtility.Extrapolate(
-                                currentTransform, currentVelocity, physicsMass, TimeAhead);
+                                currentTransform,
+                                currentVelocity,
+                                physicsMass,
+                                TimeAhead
+                            );
                         }
                     }
 
                     localToWorlds[i] = GraphicalSmoothingUtility.BuildLocalToWorld(
-
-                        i, smoothedTransform,
+                        i,
+                        smoothedTransform,
                         hasLocalTransform ? localTransforms[i].Scale : 1.0f,
-                        hasPostTransformMatrix, postTransformMatrices
+                        hasPostTransformMatrix,
+                        postTransformMatrices
                     );
 
                     // reset smoothing to apply again next frame (i.e., finish teleportation)

@@ -60,9 +60,15 @@ namespace UnityEngine.TestRunner
             var interfaceType = typeof(ITestRunCallback);
             if (!interfaceType.IsAssignableFrom(type))
             {
-                throw new ArgumentException(string.Format(
-                    "Type {2} provided to {0} does not implement {1}. If the stripping level is set to high, the implementing class should have the {3}.",
-                    GetType().Name, interfaceType.Name, type.Name, typeof(PreserveAttribute).Name));
+                throw new ArgumentException(
+                    string.Format(
+                        "Type {2} provided to {0} does not implement {1}. If the stripping level is set to high, the implementing class should have the {3}.",
+                        GetType().Name,
+                        interfaceType.Name,
+                        type.Name,
+                        typeof(PreserveAttribute).Name
+                    )
+                );
             }
             m_Type = type;
         }

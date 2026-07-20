@@ -1,11 +1,7 @@
-
 using System;
-
 
 namespace UnityEngine.Rendering.Universal
 {
-
-
     [Serializable]
     internal struct Provider2DKVPair
     {

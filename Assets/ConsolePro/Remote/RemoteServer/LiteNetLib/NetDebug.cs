@@ -5,16 +5,14 @@ namespace FlyingWormConsole3.LiteNetLib
 {
     public class InvalidPacketException : ArgumentException
     {
-        public InvalidPacketException(string message) : base(message)
-        {
-        }
+        public InvalidPacketException(string message)
+            : base(message) { }
     }
 
     public class TooBigPacketException : InvalidPacketException
     {
-        public TooBigPacketException(string message) : base(message)
-        {
-        }
+        public TooBigPacketException(string message)
+            : base(message) { }
     }
 
     public enum NetLogLevel
@@ -22,7 +20,7 @@ namespace FlyingWormConsole3.LiteNetLib
         Warning,
         Error,
         Trace,
-        Info
+        Info,
     }
 
     /// <summary>
@@ -41,6 +39,7 @@ namespace FlyingWormConsole3.LiteNetLib
     {
         public static INetLogger Logger = null;
         private static readonly object DebugLogLock = new object();
+
         private static void WriteLogic(NetLogLevel logLevel, string str, params object[] args)
         {
             lock (DebugLogLock)

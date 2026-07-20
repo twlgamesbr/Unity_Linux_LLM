@@ -14,6 +14,7 @@ namespace UnityEngine.Rendering
     {
         const int k_MaxDistanceFieldTextureSize = 128;
         const int k_MaxSubdivisionInSubCell = 4; // Levels strictly higher than this can't be generated directly
+
         // The UAV binding index 4 isn't in use when we bake the probes and doesn't crash unity.
         const int k_RandomWriteBindingIndex = 4;
 
@@ -21,7 +22,7 @@ namespace UnityEngine.Rendering
         {
             Terrain = 0,
             NonInstancedMesh = 1,
-            InstancedMesh = 2
+            InstancedMesh = 2,
         }
 
         [GenerateHLSL(needAccessors = false)]
@@ -100,13 +101,23 @@ namespace UnityEngine.Rendering
                 for (int i = 0; i <= maxSubdivisionLevelInSubCell; i++)
                 {
                     int brickCountPerAxis = maxBrickCountPerAxisInSubCell / ProbeReferenceVolume.CellSize(i);
-                    bricksBuffers[i] = new ComputeBuffer(brickCountPerAxis * brickCountPerAxis * brickCountPerAxis, sizeof(float) * 4, ComputeBufferType.Structured);
+                    bricksBuffers[i] = new ComputeBuffer(
+                        brickCountPerAxis * brickCountPerAxis * brickCountPerAxis,
+                        sizeof(float) * 4,
+                        ComputeBufferType.Structured
+                    );
                 }
 
                 // Allocate a readback buffer
-                brickCountBuffer = new ComputeBuffer(maxSubdivisionLevelInSubCell + 1, sizeof(uint), ComputeBufferType.Structured);
+                brickCountBuffer = new ComputeBuffer(
+                    maxSubdivisionLevelInSubCell + 1,
+                    sizeof(uint),
+                    ComputeBufferType.Structured
+                );
 
-                brickPositions = new Vector4[maxBrickCountPerAxisInSubCell * maxBrickCountPerAxisInSubCell * maxBrickCountPerAxisInSubCell];
+                brickPositions = new Vector4[
+                    maxBrickCountPerAxisInSubCell * maxBrickCountPerAxisInSubCell * maxBrickCountPerAxisInSubCell
+                ];
             }
 
             public void Dispose()
@@ -168,7 +179,9 @@ namespace UnityEngine.Rendering
             {
                 if (_subdivideSceneCS == null)
                 {
-                    _subdivideSceneCS = GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeBakingResources>().subdivideSceneCS;
+                    _subdivideSceneCS = GraphicsSettings
+                        .GetRenderPipelineSettings<ProbeVolumeBakingResources>()
+                        .subdivideSceneCS;
 
                     // The compute shader is not supported on OpenGL (see #pragma only_renderers in ProbeVolumeSubdivide.compute)
                     // The kernels won't exist, so we skip initialization. This is caught earlier in RunPlacement with a proper error message.
@@ -186,8 +199,10 @@ namespace UnityEngine.Rendering
                     {
                         // Kernels not found - likely running on unsupported graphics API
                         string message = "ProbeVolumeSubdivide compute shader kernels not found.";
-                        if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore ||
-                            SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3)
+                        if (
+                            SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore
+                            || SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3
+                        )
                         {
                             message += " This is expected on OpenGL which is not supported for APV baking.";
                         }
@@ -205,15 +220,23 @@ namespace UnityEngine.Rendering
             get
             {
                 if (_voxelizeMaterial == null)
-                    _voxelizeMaterial = new Material(GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeBakingResources>().voxelizeSceneShader);
+                    _voxelizeMaterial = new Material(
+                        GraphicsSettings.GetRenderPipelineSettings<ProbeVolumeBakingResources>().voxelizeSceneShader
+                    );
 
                 return _voxelizeMaterial;
             }
         }
 
-        public static GPUSubdivisionContext AllocateGPUResources(int probeVolumeCount, ProbeVolumeProfileInfo profile) => new GPUSubdivisionContext(probeVolumeCount, profile);
+        public static GPUSubdivisionContext AllocateGPUResources(
+            int probeVolumeCount,
+            ProbeVolumeProfileInfo profile
+        ) => new GPUSubdivisionContext(probeVolumeCount, profile);
 
-        static IEnumerable<(Bounds bounds, Vector3 parentPosition)> SubdivideVolumeIntoSubVolume(GPUSubdivisionContext ctx, Bounds bounds)
+        static IEnumerable<(Bounds bounds, Vector3 parentPosition)> SubdivideVolumeIntoSubVolume(
+            GPUSubdivisionContext ctx,
+            Bounds bounds
+        )
         {
             float subdivisionCount = ctx.maxBrickCountPerAxis / (float)ctx.maxBrickCountPerAxisInSubCell;
             var subVolumeSize = bounds.size / subdivisionCount;
@@ -221,18 +244,31 @@ namespace UnityEngine.Rendering
             for (int x = 0; x < (int)subdivisionCount; x++)
             {
                 for (int y = 0; y < (int)subdivisionCount; y++)
-                    for (int z = 0; z < (int)subdivisionCount; z++)
-                    {
-                        var center = bounds.min + new Vector3((x + 0.5f) * subVolumeSize.x, (y + 0.5f) * subVolumeSize.y, (z + 0.5f) * subVolumeSize.z);
-                        Bounds subBounds = new Bounds(center, subVolumeSize);
-                        var parentCellPosition = new Vector3(x, y, z);
+                for (int z = 0; z < (int)subdivisionCount; z++)
+                {
+                    var center =
+                        bounds.min
+                        + new Vector3(
+                            (x + 0.5f) * subVolumeSize.x,
+                            (y + 0.5f) * subVolumeSize.y,
+                            (z + 0.5f) * subVolumeSize.z
+                        );
+                    Bounds subBounds = new Bounds(center, subVolumeSize);
+                    var parentCellPosition = new Vector3(x, y, z);
 
-                        yield return (subBounds, parentCellPosition);
-                    }
+                    yield return (subBounds, parentCellPosition);
+                }
             }
         }
 
-        public static Brick[] SubdivideCell(Vector3Int cellPosition, Bounds cellBounds, ProbeSubdivisionContext subdivisionCtx, GPUSubdivisionContext ctx, GIContributors contributors, List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)> probeVolumes)
+        public static Brick[] SubdivideCell(
+            Vector3Int cellPosition,
+            Bounds cellBounds,
+            ProbeSubdivisionContext subdivisionCtx,
+            GPUSubdivisionContext ctx,
+            GIContributors contributors,
+            List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)> probeVolumes
+        )
         {
             Brick[] finalBricks;
             HashSet<Brick> brickSet = new HashSet<Brick>();
@@ -246,10 +282,17 @@ namespace UnityEngine.Rendering
                     {
                         // redo the renderers and probe volume culling to avoid unnecessary work
                         // Calculate overlaping probe volumes to avoid unnecessary work
-                        var overlappingProbeVolumes = new List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)>();
+                        var overlappingProbeVolumes =
+                            new List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)>();
                         foreach (var probeVolume in probeVolumes)
                         {
-                            if (ProbeVolumePositioning.OBBAABBIntersect(probeVolume.volume, subVolume.bounds, probeVolume.bounds))
+                            if (
+                                ProbeVolumePositioning.OBBAABBIntersect(
+                                    probeVolume.volume,
+                                    subVolume.bounds,
+                                    probeVolume.bounds
+                                )
+                            )
                                 overlappingProbeVolumes.Add(probeVolume);
                         }
 
@@ -258,13 +301,27 @@ namespace UnityEngine.Rendering
                         if (overlappingProbeVolumes.Count == 0 && filteredContributors.Count == 0)
                             continue;
 
-                         // If any volume wants only subdivisions higher than what can be generated, we will need to filter out some bricks
-                        bool requireSubFiltering = overlappingProbeVolumes.Any(p => p.component.overridesSubdivLevels && p.component.lowestSubdivLevelOverride > k_MaxSubdivisionInSubCell);
-                        bool fastSubFiltering = overlappingProbeVolumes.All(p => p.component.overridesSubdivLevels && p.component.lowestSubdivLevelOverride > k_MaxSubdivisionInSubCell);
+                        // If any volume wants only subdivisions higher than what can be generated, we will need to filter out some bricks
+                        bool requireSubFiltering = overlappingProbeVolumes.Any(p =>
+                            p.component.overridesSubdivLevels
+                            && p.component.lowestSubdivLevelOverride > k_MaxSubdivisionInSubCell
+                        );
+                        bool fastSubFiltering = overlappingProbeVolumes.All(p =>
+                            p.component.overridesSubdivLevels
+                            && p.component.lowestSubdivLevelOverride > k_MaxSubdivisionInSubCell
+                        );
                         bool hasMaxSizedBricks = false;
 
                         var subBrickSet = new HashSet<Brick>();
-                        SubdivideSubCell(subVolume.bounds, ctx, filteredContributors, overlappingProbeVolumes, subdivisionCtx.profile.minBrickSize, subdivisionCtx.profile.probeOffset, subBrickSet);
+                        SubdivideSubCell(
+                            subVolume.bounds,
+                            ctx,
+                            filteredContributors,
+                            overlappingProbeVolumes,
+                            subdivisionCtx.profile.minBrickSize,
+                            subdivisionCtx.profile.probeOffset,
+                            subBrickSet
+                        );
                         if (subBrickSet.Count == 0)
                             continue;
 
@@ -275,7 +332,9 @@ namespace UnityEngine.Rendering
                             {
                                 float brickSize = ProbeReferenceVolume.instance.BrickSize(brick.subdivisionLevel);
                                 Bounds brickBounds = new Bounds();
-                                brickBounds.min = subdivisionCtx.profile.probeOffset + (Vector3)brick.position * ProbeReferenceVolume.instance.MinBrickSize();
+                                brickBounds.min =
+                                    subdivisionCtx.profile.probeOffset
+                                    + (Vector3)brick.position * ProbeReferenceVolume.instance.MinBrickSize();
                                 brickBounds.max = brickBounds.min + new Vector3(brickSize, brickSize, brickSize);
 
                                 // If any volume that overlaps this brick wants this subdiv level, we keep it
@@ -285,7 +344,12 @@ namespace UnityEngine.Rendering
                                         continue;
 
                                     hasMaxSizedBricks |= brick.subdivisionLevel == k_MaxSubdivisionInSubCell;
-                                    (int minSubdiv, int maxSubdiv) = ComputeSubdivRange(ctx.maxSubdivisionLevel, p.component, p.bounds, cellBounds);
+                                    (int minSubdiv, int maxSubdiv) = ComputeSubdivRange(
+                                        ctx.maxSubdivisionLevel,
+                                        p.component,
+                                        p.bounds,
+                                        cellBounds
+                                    );
                                     if (brick.subdivisionLevel < minSubdiv || brick.subdivisionLevel > maxSubdiv)
                                         continue;
 
@@ -316,7 +380,12 @@ namespace UnityEngine.Rendering
                                 Vector3 subCellPos = (subVolume.parentPosition / parentSubdivLevel);
                                 // Add the sub-cell offset:
                                 int brickSize = (int)Mathf.Pow(3, i + 1);
-                                Vector3Int subCellPosInt = new Vector3Int(Mathf.FloorToInt(subCellPos.x), Mathf.FloorToInt(subCellPos.y), Mathf.FloorToInt(subCellPos.z)) * brickSize;
+                                Vector3Int subCellPosInt =
+                                    new Vector3Int(
+                                        Mathf.FloorToInt(subCellPos.x),
+                                        Mathf.FloorToInt(subCellPos.y),
+                                        Mathf.FloorToInt(subCellPos.z)
+                                    ) * brickSize;
                                 Vector3Int parentSubCellPos = cellPosition * cellSizeInBricks + subCellPosInt;
 
                                 // Find the corner in bricks of the parent volume:
@@ -328,7 +397,15 @@ namespace UnityEngine.Rendering
                 }
                 else
                 {
-                    SubdivideSubCell(cellBounds, ctx, contributors, probeVolumes, subdivisionCtx.profile.minBrickSize, subdivisionCtx.profile.probeOffset, brickSet);
+                    SubdivideSubCell(
+                        cellBounds,
+                        ctx,
+                        contributors,
+                        probeVolumes,
+                        subdivisionCtx.profile.minBrickSize,
+                        subdivisionCtx.profile.probeOffset,
+                        brickSet
+                    );
                 }
 
                 finalBricks = brickSet.ToArray();
@@ -336,19 +413,22 @@ namespace UnityEngine.Rendering
                 // TODO: this is really slow :/
                 Profiler.BeginSample($"Sort {finalBricks.Length} bricks");
                 // sort from larger to smaller bricks
-                Array.Sort(finalBricks, (Brick lhs, Brick rhs) =>
-                {
-                    if (lhs.subdivisionLevel != rhs.subdivisionLevel)
-                        return lhs.subdivisionLevel > rhs.subdivisionLevel ? -1 : 1;
-                    if (lhs.position.z != rhs.position.z)
-                        return lhs.position.z < rhs.position.z ? -1 : 1;
-                    if (lhs.position.y != rhs.position.y)
-                        return lhs.position.y < rhs.position.y ? -1 : 1;
-                    if (lhs.position.x != rhs.position.x)
-                        return lhs.position.x < rhs.position.x ? -1 : 1;
+                Array.Sort(
+                    finalBricks,
+                    (Brick lhs, Brick rhs) =>
+                    {
+                        if (lhs.subdivisionLevel != rhs.subdivisionLevel)
+                            return lhs.subdivisionLevel > rhs.subdivisionLevel ? -1 : 1;
+                        if (lhs.position.z != rhs.position.z)
+                            return lhs.position.z < rhs.position.z ? -1 : 1;
+                        if (lhs.position.y != rhs.position.y)
+                            return lhs.position.y < rhs.position.y ? -1 : 1;
+                        if (lhs.position.x != rhs.position.x)
+                            return lhs.position.x < rhs.position.x ? -1 : 1;
 
-                    return 0;
-                });
+                        return 0;
+                    }
+                );
                 Profiler.EndSample();
             }
             Profiler.EndSample();
@@ -356,22 +436,34 @@ namespace UnityEngine.Rendering
             return finalBricks;
         }
 
-        static void SubdivideSubCell(Bounds cellAABB,
-            GPUSubdivisionContext ctx, GIContributors contributors,
+        static void SubdivideSubCell(
+            Bounds cellAABB,
+            GPUSubdivisionContext ctx,
+            GIContributors contributors,
             List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)> probeVolumes,
             float minBrickSize,
             Vector3 cellOffset,
-            HashSet<Brick> brickSet)
+            HashSet<Brick> brickSet
+        )
         {
             var firstLayerMask = probeVolumes.First().component.objectLayerMask;
             if (probeVolumes.Count > 1 && probeVolumes.Any(p => p.component.objectLayerMask != firstLayerMask))
             {
                 // Pack list of probe volumes per layer mask so we can process multiple of volumes in a single voxelization step
-                var probeVolumesPerLayers = new Dictionary<LayerMask, List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)>>();
+                var probeVolumesPerLayers =
+                    new Dictionary<
+                        LayerMask,
+                        List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)>
+                    >();
 
                 foreach (var probeVolume in probeVolumes)
                 {
-                    if (!probeVolumesPerLayers.TryGetValue(probeVolume.component.objectLayerMask, out var probeVolumeList))
+                    if (
+                        !probeVolumesPerLayers.TryGetValue(
+                            probeVolume.component.objectLayerMask,
+                            out var probeVolumeList
+                        )
+                    )
                         probeVolumeList = probeVolumesPerLayers[probeVolume.component.objectLayerMask] = new();
                     probeVolumeList.Add(probeVolume);
                 }
@@ -379,9 +471,19 @@ namespace UnityEngine.Rendering
                 foreach (var probeVolumesPerLayer in probeVolumesPerLayers.Values)
                 {
                     // re-filter contributors locally for these layers:
-                    var contributorsPerLayer = contributors.FilterLayerMaskOnly(probeVolumesPerLayer.First().component.objectLayerMask);
+                    var contributorsPerLayer = contributors.FilterLayerMaskOnly(
+                        probeVolumesPerLayer.First().component.objectLayerMask
+                    );
                     // Subdivide the cell using  a list of probe volumes containing the same layer mask
-                    SubdivideSubCell(cellAABB, ctx, contributorsPerLayer, probeVolumesPerLayer, minBrickSize, cellOffset, brickSet);
+                    SubdivideSubCell(
+                        cellAABB,
+                        ctx,
+                        contributorsPerLayer,
+                        probeVolumesPerLayer,
+                        minBrickSize,
+                        cellOffset,
+                        brickSet
+                    );
                 }
 
                 return;
@@ -392,7 +494,14 @@ namespace UnityEngine.Rendering
             var deferredBufferDisposals = new List<GraphicsBuffer>();
             if (contributors.Count > 0)
             {
-                VoxelizeGeometry(cmd, cellAABB, ctx.sceneSDF, ctx.dummyRenderTarget, contributors, deferredBufferDisposals);
+                VoxelizeGeometry(
+                    cmd,
+                    cellAABB,
+                    ctx.sceneSDF,
+                    ctx.dummyRenderTarget,
+                    contributors,
+                    deferredBufferDisposals
+                );
                 GenerateDistanceField(cmd, ctx.sceneSDF, ctx.sceneSDF2);
             }
             else
@@ -401,9 +510,19 @@ namespace UnityEngine.Rendering
                 using (new ProfilingScope(cmd, new ProfilingSampler("Clear")))
                 {
                     cmd.SetComputeTextureParam(subdivideSceneCS, s_ClearKernel, _Output, ctx.sceneSDF);
-                    cmd.SetComputeVectorParam(subdivideSceneCS, _Size, new Vector3(ctx.sceneSDF.width, ctx.sceneSDF.height, ctx.sceneSDF.volumeDepth));
+                    cmd.SetComputeVectorParam(
+                        subdivideSceneCS,
+                        _Size,
+                        new Vector3(ctx.sceneSDF.width, ctx.sceneSDF.height, ctx.sceneSDF.volumeDepth)
+                    );
                     cmd.SetComputeFloatParam(subdivideSceneCS, _ClearValue, 1000);
-                    DispatchCompute(cmd, s_ClearKernel, ctx.sceneSDF.width, ctx.sceneSDF.height, ctx.sceneSDF.volumeDepth);
+                    DispatchCompute(
+                        cmd,
+                        s_ClearKernel,
+                        ctx.sceneSDF.width,
+                        ctx.sceneSDF.height,
+                        ctx.sceneSDF.volumeDepth
+                    );
                 }
             }
 
@@ -416,7 +535,8 @@ namespace UnityEngine.Rendering
 
             for (int subdivisionLevel = cellMinSubdiv; subdivisionLevel <= cellMaxSubdiv; subdivisionLevel++)
             {
-                int brickCountPerAxis = ctx.maxBrickCountPerAxisInSubCell / ProbeReferenceVolume.CellSize(subdivisionLevel);
+                int brickCountPerAxis =
+                    ctx.maxBrickCountPerAxisInSubCell / ProbeReferenceVolume.CellSize(subdivisionLevel);
                 var bricksBuffer = ctx.bricksBuffers[subdivisionLevel];
 
                 using (new ProfilingScope(cmd, new ProfilingSampler("Clear Bricks Buffer")))
@@ -428,24 +548,48 @@ namespace UnityEngine.Rendering
                 }
 
                 // Generate the list of bricks on the GPU
-                SubdivideFromDistanceField(cmd, cellAABB, ctx, probeSubdivisionData, bricksBuffer, ctx.brickCountBuffer, brickCountPerAxis, subdivisionLevel, minBrickSize, cellOffset);
+                SubdivideFromDistanceField(
+                    cmd,
+                    cellAABB,
+                    ctx,
+                    probeSubdivisionData,
+                    bricksBuffer,
+                    ctx.brickCountBuffer,
+                    brickCountPerAxis,
+                    subdivisionLevel,
+                    minBrickSize,
+                    cellOffset
+                );
 
                 // Capture locally the subdivision level to use it inside the lambda
                 int localSubdivLevel = subdivisionLevel;
-                cmd.RequestAsyncReadback(ctx.brickCountBuffer, sizeof(int), subdivisionLevel * sizeof(int), (data) => {
-                    int readbackBrickCount = data.GetData<int>()[0];
-
-                    if (readbackBrickCount > 0)
+                cmd.RequestAsyncReadback(
+                    ctx.brickCountBuffer,
+                    sizeof(int),
+                    subdivisionLevel * sizeof(int),
+                    (data) =>
                     {
-                        bricksBuffer.GetData(ctx.brickPositions, 0, 0, readbackBrickCount);
-                        for (int i = 0; i < readbackBrickCount; i++)
+                        int readbackBrickCount = data.GetData<int>()[0];
+
+                        if (readbackBrickCount > 0)
                         {
-                            var pos = ctx.brickPositions[i];
-                            var brick = new Brick(new Vector3Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y), Mathf.RoundToInt(pos.z)), localSubdivLevel);
-                            brickSet.Add(brick);
+                            bricksBuffer.GetData(ctx.brickPositions, 0, 0, readbackBrickCount);
+                            for (int i = 0; i < readbackBrickCount; i++)
+                            {
+                                var pos = ctx.brickPositions[i];
+                                var brick = new Brick(
+                                    new Vector3Int(
+                                        Mathf.RoundToInt(pos.x),
+                                        Mathf.RoundToInt(pos.y),
+                                        Mathf.RoundToInt(pos.z)
+                                    ),
+                                    localSubdivLevel
+                                );
+                                brickSet.Add(brick);
+                            }
                         }
                     }
-                });
+                );
             }
 
             // ExternalGPUProfiler.BeginGPUCapture();
@@ -460,7 +604,15 @@ namespace UnityEngine.Rendering
             // ExternalGPUProfiler.EndGPUCapture();
         }
 
-        static void VoxelizeMesh(Mesh mesh, Matrix4x4 instanceTransform, Matrix4x4[] instanceTransforms, int instanceCount, MaterialPropertyBlock props, List<GraphicsBuffer> deferredBufferRemovals, CommandBuffer cmd)
+        static void VoxelizeMesh(
+            Mesh mesh,
+            Matrix4x4 instanceTransform,
+            Matrix4x4[] instanceTransforms,
+            int instanceCount,
+            MaterialPropertyBlock props,
+            List<GraphicsBuffer> deferredBufferRemovals,
+            CommandBuffer cmd
+        )
         {
             var shaderPassIndex = VoxelizeShaderPassIndex.NonInstancedMesh;
             if (instanceTransforms != null)
@@ -473,8 +625,14 @@ namespace UnityEngine.Rendering
             int vertexBufferPositionOffset = mesh.GetVertexAttributeOffset(VertexAttribute.Position);
             int vertexBufferStride = mesh.GetVertexBufferStride(positionVertexBufferIndex);
 
-            Debug.Assert(positionVertexBufferIndex != -1, "Meshes are expected to have a vertex buffer which contains positions.");
-            Debug.Assert(vertexBufferPositionOffset != -1, "Meshes are expected to have a vertex buffer which contains positions.");
+            Debug.Assert(
+                positionVertexBufferIndex != -1,
+                "Meshes are expected to have a vertex buffer which contains positions."
+            );
+            Debug.Assert(
+                vertexBufferPositionOffset != -1,
+                "Meshes are expected to have a vertex buffer which contains positions."
+            );
 
             var oldIndexBufferTarget = mesh.indexBufferTarget;
             var oldVertexBufferTarget = mesh.vertexBufferTarget;
@@ -497,7 +655,8 @@ namespace UnityEngine.Rendering
                 var topology = submesh.topology;
                 if (topology is MeshTopology.Triangles or MeshTopology.Quads)
                 {
-                    int vertexCount, topologyInt;
+                    int vertexCount,
+                        topologyInt;
                     if (topology == MeshTopology.Triangles)
                     {
                         topologyInt = 0;
@@ -518,7 +677,15 @@ namespace UnityEngine.Rendering
                     for (int axisIdx = 0; axisIdx < 3; ++axisIdx)
                     {
                         props.SetInt(_AxisIndex, axisIdx);
-                        cmd.DrawProcedural(instanceTransform, voxelizeMaterial, (int)shaderPassIndex, MeshTopology.Triangles, vertexCount, instanceCount, props);
+                        cmd.DrawProcedural(
+                            instanceTransform,
+                            voxelizeMaterial,
+                            (int)shaderPassIndex,
+                            MeshTopology.Triangles,
+                            vertexCount,
+                            instanceCount,
+                            props
+                        );
                     }
                 }
             }
@@ -530,12 +697,14 @@ namespace UnityEngine.Rendering
             deferredBufferRemovals.Add(vertexBuffer);
         }
 
-        internal static void VoxelizeGeometry(CommandBuffer cmd,
+        internal static void VoxelizeGeometry(
+            CommandBuffer cmd,
             Bounds cellAABB,
             RenderTexture output3dTexture,
             RenderTexture dummyRenderTarget,
             GIContributors contributors,
-            List<GraphicsBuffer> deferredBufferRemovals)
+            List<GraphicsBuffer> deferredBufferRemovals
+        )
         {
             Debug.Assert(output3dTexture.width == output3dTexture.height);
             Debug.Assert(output3dTexture.height == output3dTexture.volumeDepth);
@@ -551,9 +720,19 @@ namespace UnityEngine.Rendering
             using (new ProfilingScope(cmd, new ProfilingSampler("Clear")))
             {
                 cmd.SetComputeTextureParam(subdivideSceneCS, s_ClearKernel, _Output, output3dTexture);
-                cmd.SetComputeVectorParam(subdivideSceneCS, _Size, new Vector3(output3dTexture.width, output3dTexture.height, output3dTexture.volumeDepth));
+                cmd.SetComputeVectorParam(
+                    subdivideSceneCS,
+                    _Size,
+                    new Vector3(output3dTexture.width, output3dTexture.height, output3dTexture.volumeDepth)
+                );
                 cmd.SetComputeFloatParam(subdivideSceneCS, _ClearValue, 0);
-                DispatchCompute(cmd, s_ClearKernel, output3dTexture.width, output3dTexture.height, output3dTexture.volumeDepth);
+                DispatchCompute(
+                    cmd,
+                    s_ClearKernel,
+                    output3dTexture.width,
+                    output3dTexture.height,
+                    output3dTexture.volumeDepth
+                );
             }
 
             cmd.SetRandomWriteTarget(k_RandomWriteBindingIndex, output3dTexture);
@@ -576,7 +755,15 @@ namespace UnityEngine.Rendering
                         if (!renderer.TryGetComponent<MeshFilter>(out var meshFilter) || meshFilter.sharedMesh == null)
                             continue;
 
-                        VoxelizeMesh(meshFilter.sharedMesh, renderer.transform.localToWorldMatrix, null, 1, props, deferredBufferRemovals, cmd);
+                        VoxelizeMesh(
+                            meshFilter.sharedMesh,
+                            renderer.transform.localToWorldMatrix,
+                            null,
+                            1,
+                            props,
+                            deferredBufferRemovals,
+                            cmd
+                        );
                     }
                 }
             }
@@ -600,14 +787,25 @@ namespace UnityEngine.Rendering
                         for (int axisIdx = 0; axisIdx < 3; ++axisIdx)
                         {
                             props.SetInt(_AxisIndex, axisIdx);
-                            cmd.DrawProcedural(transform, voxelizeMaterial, (int)VoxelizeShaderPassIndex.Terrain, MeshTopology.Quads, 4 * terrainTileCount, 1, props);
+                            cmd.DrawProcedural(
+                                transform,
+                                voxelizeMaterial,
+                                (int)VoxelizeShaderPassIndex.Terrain,
+                                MeshTopology.Quads,
+                                4 * terrainTileCount,
+                                1,
+                                props
+                            );
                         }
 
                         foreach (var prototype in kp.treePrototypes)
                         {
                             if (prototype.component == null || prototype.instances.Count == 0)
                                 continue;
-                            if (!prototype.component.TryGetComponent<MeshFilter>(out var meshFilter) || meshFilter.sharedMesh == null)
+                            if (
+                                !prototype.component.TryGetComponent<MeshFilter>(out var meshFilter)
+                                || meshFilter.sharedMesh == null
+                            )
                                 continue;
 
                             var mesh = meshFilter.sharedMesh;
@@ -616,7 +814,15 @@ namespace UnityEngine.Rendering
                             for (int i = 0; i < treeMatrices.Length; i++)
                                 treeMatrices[i] = prototype.instances[i].transform;
 
-                            VoxelizeMesh(mesh, prototype.transform, treeMatrices, treeMatrices.Length, props, deferredBufferRemovals, cmd);
+                            VoxelizeMesh(
+                                mesh,
+                                prototype.transform,
+                                treeMatrices,
+                                treeMatrices.Length,
+                                props,
+                                deferredBufferRemovals,
+                                cmd
+                            );
                         }
                     }
                 }
@@ -635,7 +841,8 @@ namespace UnityEngine.Rendering
                 kernel,
                 Mathf.Max(1, Mathf.CeilToInt(width / (float)x)),
                 Mathf.Max(1, Mathf.CeilToInt(height / (float)y)),
-                Mathf.Max(1, Mathf.CeilToInt(depth / (float)z)));
+                Mathf.Max(1, Mathf.CeilToInt(depth / (float)z))
+            );
         }
 
         static void CopyTexture(CommandBuffer cmd, RenderTexture source, RenderTexture destination)
@@ -652,7 +859,11 @@ namespace UnityEngine.Rendering
             using (new ProfilingScope(cmd, new ProfilingSampler("GenerateDistanceField")))
             {
                 // Generate distance field with JFA
-                cmd.SetComputeVectorParam(subdivideSceneCS, _Size, new Vector4(sceneSDF1.width, 1.0f / sceneSDF1.width));
+                cmd.SetComputeVectorParam(
+                    subdivideSceneCS,
+                    _Size,
+                    new Vector4(sceneSDF1.width, 1.0f / sceneSDF1.width)
+                );
 
                 // We need those copies because there is a compute barrier bug only happening on low-resolution textures
                 CopyTexture(cmd, sceneSDF1, sceneSDF2);
@@ -671,7 +882,13 @@ namespace UnityEngine.Rendering
                         cmd.SetComputeFloatParam(subdivideSceneCS, _Offset, offset);
                         cmd.SetComputeTextureParam(subdivideSceneCS, s_JumpFloodingKernel, _Input, sceneSDF1);
                         cmd.SetComputeTextureParam(subdivideSceneCS, s_JumpFloodingKernel, _Output, sceneSDF2);
-                        DispatchCompute(cmd, s_JumpFloodingKernel, sceneSDF1.width, sceneSDF1.height, sceneSDF1.volumeDepth);
+                        DispatchCompute(
+                            cmd,
+                            s_JumpFloodingKernel,
+                            sceneSDF1.width,
+                            sceneSDF1.height,
+                            sceneSDF1.volumeDepth
+                        );
 
                         CopyTexture(cmd, sceneSDF2, sceneSDF1);
                     }
@@ -701,9 +918,12 @@ namespace UnityEngine.Rendering
             return (minSubdiv, maxSubdiv);
         }
 
-        static (int, int) VoxelizeProbeVolumeData(CommandBuffer cmd, Bounds cellAABB,
+        static (int, int) VoxelizeProbeVolumeData(
+            CommandBuffer cmd,
+            Bounds cellAABB,
             List<(ProbeVolume component, ProbeReferenceVolume.Volume volume, Bounds bounds)> probeVolumes,
-            GPUSubdivisionContext ctx)
+            GPUSubdivisionContext ctx
+        )
         {
             using (new ProfilingScope(cmd, new ProfilingSampler("Voxelize Probe Volume Data")))
             {
@@ -714,19 +934,26 @@ namespace UnityEngine.Rendering
                 // Prepare list of GPU probe volumes
                 foreach (var kp in probeVolumes)
                 {
-                    (int minSubdiv, int maxSubdiv) = ComputeSubdivRange(ctx.maxSubdivisionLevelInSubCell, kp.component, kp.bounds, cellAABB);
+                    (int minSubdiv, int maxSubdiv) = ComputeSubdivRange(
+                        ctx.maxSubdivisionLevelInSubCell,
+                        kp.component,
+                        kp.bounds,
+                        cellAABB
+                    );
 
-                    gpuProbeVolumes.Add(new GPUProbeVolumeOBB
-                    {
-                        corner = kp.volume.corner,
-                        X = kp.volume.X,
-                        Y = kp.volume.Y,
-                        Z = kp.volume.Z,
-                        minControllerSubdivLevel = minSubdiv,
-                        maxControllerSubdivLevel = maxSubdiv,
-                        fillEmptySpaces = kp.component.fillEmptySpaces ? 1 : 0,
-                        maxSubdivLevelInsideVolume = 0, // unused
-                    });
+                    gpuProbeVolumes.Add(
+                        new GPUProbeVolumeOBB
+                        {
+                            corner = kp.volume.corner,
+                            X = kp.volume.X,
+                            Y = kp.volume.Y,
+                            Z = kp.volume.Z,
+                            minControllerSubdivLevel = minSubdiv,
+                            maxControllerSubdivLevel = maxSubdiv,
+                            fillEmptySpaces = kp.component.fillEmptySpaces ? 1 : 0,
+                            maxSubdivLevelInsideVolume = 0, // unused
+                        }
+                    );
 
                     // Record global range
                     cellMinSubdiv = Mathf.Min(cellMinSubdiv, minSubdiv);
@@ -734,18 +961,39 @@ namespace UnityEngine.Rendering
                 }
 
                 cmd.SetBufferData(ctx.probeVolumesBuffer, gpuProbeVolumes);
-                cmd.SetComputeBufferParam(subdivideSceneCS, s_VoxelizeProbeVolumesKernel, _ProbeVolumes, ctx.probeVolumesBuffer);
+                cmd.SetComputeBufferParam(
+                    subdivideSceneCS,
+                    s_VoxelizeProbeVolumesKernel,
+                    _ProbeVolumes,
+                    ctx.probeVolumesBuffer
+                );
                 cmd.SetComputeFloatParam(subdivideSceneCS, _ProbeVolumeCount, probeVolumes.Count);
                 cmd.SetComputeVectorParam(subdivideSceneCS, _VolumeWorldOffset, cellAABB.center - cellAABB.extents);
-                cmd.SetComputeVectorParam(subdivideSceneCS, _MaxBrickCount, Vector3.one * ctx.maxBrickCountPerAxisInSubCell);
+                cmd.SetComputeVectorParam(
+                    subdivideSceneCS,
+                    _MaxBrickCount,
+                    Vector3.one * ctx.maxBrickCountPerAxisInSubCell
+                );
 
                 for (int i = cellMinSubdiv; i <= cellMaxSubdiv; i++)
                 {
                     int brickCountPerAxis = ctx.maxBrickCountPerAxisInSubCell / ProbeReferenceVolume.CellSize(i);
                     cmd.SetComputeFloatParam(subdivideSceneCS, _SubdivisionLevel, i);
                     cmd.SetComputeFloatParam(subdivideSceneCS, _BrickSize, cellAABB.size.x / brickCountPerAxis);
-                    cmd.SetComputeTextureParam(subdivideSceneCS, s_VoxelizeProbeVolumesKernel, _Output, ctx.sceneSDF2, i);
-                    DispatchCompute(cmd, s_VoxelizeProbeVolumesKernel, brickCountPerAxis, brickCountPerAxis, brickCountPerAxis);
+                    cmd.SetComputeTextureParam(
+                        subdivideSceneCS,
+                        s_VoxelizeProbeVolumesKernel,
+                        _Output,
+                        ctx.sceneSDF2,
+                        i
+                    );
+                    DispatchCompute(
+                        cmd,
+                        s_VoxelizeProbeVolumesKernel,
+                        brickCountPerAxis,
+                        brickCountPerAxis,
+                        brickCountPerAxis
+                    );
                 }
 
                 return (cellMinSubdiv, cellMaxSubdiv);
@@ -753,10 +1001,21 @@ namespace UnityEngine.Rendering
         }
 
         static void SubdivideFromDistanceField(
-            CommandBuffer cmd, Bounds volume, GPUSubdivisionContext ctx, RenderTexture probeVolumeData,
-            ComputeBuffer buffer, ComputeBuffer brickCountBuffer, int brickCount, int subdivisionLevel, float minBrickSize, Vector3 cellOffset)
+            CommandBuffer cmd,
+            Bounds volume,
+            GPUSubdivisionContext ctx,
+            RenderTexture probeVolumeData,
+            ComputeBuffer buffer,
+            ComputeBuffer brickCountBuffer,
+            int brickCount,
+            int subdivisionLevel,
+            float minBrickSize,
+            Vector3 cellOffset
+        )
         {
-            using (new ProfilingScope(cmd, new ProfilingSampler($"Subdivide Bricks at level {Mathf.Log(brickCount, 3)}")))
+            using (
+                new ProfilingScope(cmd, new ProfilingSampler($"Subdivide Bricks at level {Mathf.Log(brickCount, 3)}"))
+            )
             {
                 // We convert the world space volume position (of a corner) in bricks.
                 // This is necessary to have correct brick position (the position calculated in the compute shader needs to be in number of bricks from the reference volume (origin)).
@@ -767,8 +1026,16 @@ namespace UnityEngine.Rendering
                 cmd.SetComputeVectorParam(subdivideSceneCS, _MaxBrickCount, Vector3.one * brickCount);
                 cmd.SetComputeFloatParam(subdivideSceneCS, _SubdivisionLevel, subdivisionLevel);
                 cmd.SetComputeFloatParam(subdivideSceneCS, _MaxSubdivisionLevel, ctx.maxSubdivisionLevelInSubCell);
-                cmd.SetComputeVectorParam(subdivideSceneCS, _VolumeSizeInBricks, Vector3.one * ctx.maxBrickCountPerAxisInSubCell);
-                cmd.SetComputeVectorParam(subdivideSceneCS, _SDFSize, new Vector3(ctx.sceneSDF.width, ctx.sceneSDF.height, ctx.sceneSDF.volumeDepth));
+                cmd.SetComputeVectorParam(
+                    subdivideSceneCS,
+                    _VolumeSizeInBricks,
+                    Vector3.one * ctx.maxBrickCountPerAxisInSubCell
+                );
+                cmd.SetComputeVectorParam(
+                    subdivideSceneCS,
+                    _SDFSize,
+                    new Vector3(ctx.sceneSDF.width, ctx.sceneSDF.height, ctx.sceneSDF.volumeDepth)
+                );
                 cmd.SetComputeTextureParam(subdivideSceneCS, s_SubdivideKernel, _Input, ctx.sceneSDF);
                 cmd.SetComputeTextureParam(subdivideSceneCS, s_SubdivideKernel, _ProbeVolumeData, probeVolumeData);
                 DispatchCompute(cmd, s_SubdivideKernel, brickCount, brickCount, brickCount);

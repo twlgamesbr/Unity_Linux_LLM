@@ -115,7 +115,10 @@ namespace Unity.Networking.Transport.Utilities
         /// </remarks>
         /// <param name="driver">Driver to modify.</param>
         /// <param name="newParams">New parameters for the simulator stage.</param>
-        public static unsafe void ModifySimulatorStageParameters(this NetworkDriver driver, SimulatorUtility.Parameters newParams)
+        public static unsafe void ModifySimulatorStageParameters(
+            this NetworkDriver driver,
+            SimulatorUtility.Parameters newParams
+        )
         {
             var stageId = NetworkPipelineStageId.Get<SimulatorPipelineStage>();
             var currentParams = driver.GetWriteablePipelineParameter<SimulatorUtility.Parameters>(default, stageId);
@@ -146,10 +149,13 @@ namespace Unity.Networking.Transport.Utilities
         // We put received packets first so that the default value will match old behavior.
         /// <summary>Only apply simulator pipeline to received packets.</summary>
         ReceivedPacketsOnly,
+
         /// <summary>Only apply simulator pipeline to sent packets.</summary>
         SentPacketsOnly,
+
         /// <summary>Apply simulator pipeline to both sent and received packets.</summary>
         AllPackets,
+
         /// <summary>Don't apply the simulator pipeline. Used for runtime toggling.</summary>
         Off,
     }
@@ -276,8 +282,12 @@ namespace Unity.Networking.Transport.Utilities
                 ctx->Random.InitState();
         }
 
-        private static unsafe bool GetEmptyDataSlot(NetworkPipelineContext ctx, byte* processBufferPtr, ref int packetPayloadOffset,
-            ref int packetDataOffset)
+        private static unsafe bool GetEmptyDataSlot(
+            NetworkPipelineContext ctx,
+            byte* processBufferPtr,
+            ref int packetPayloadOffset,
+            ref int packetDataOffset
+        )
         {
             var param = *(Parameters*)ctx.staticInstanceBuffer;
             var dataSize = UnsafeUtility.SizeOf<DelayedPacket>();
@@ -301,8 +311,12 @@ namespace Unity.Networking.Transport.Utilities
             return foundSlot;
         }
 
-        internal static unsafe bool GetDelayedPacket(ref NetworkPipelineContext ctx, ref InboundSendBuffer delayedPacket,
-            ref NetworkPipelineStage.Requests requests, long currentTimestamp)
+        internal static unsafe bool GetDelayedPacket(
+            ref NetworkPipelineContext ctx,
+            ref InboundSendBuffer delayedPacket,
+            ref NetworkPipelineStage.Requests requests,
+            long currentTimestamp
+        )
         {
             requests = NetworkPipelineStage.Requests.None;
             var param = *(Parameters*)ctx.staticInstanceBuffer;
@@ -317,13 +331,16 @@ namespace Unity.Networking.Transport.Utilities
             for (int i = 0; i < param.MaxPacketCount; i++)
             {
                 DelayedPacket* packet = (DelayedPacket*)(processBufferPtr + dataSize * i);
-                if ((int)packet->delayUntil == 0) continue;
+                if ((int)packet->delayUntil == 0)
+                    continue;
                 packetsInQueue++;
 
-                if (packet->delayUntil > currentTimestamp) continue;
+                if (packet->delayUntil > currentTimestamp)
+                    continue;
                 readyPackets++;
 
-                if (oldestTime <= packet->delayUntil) continue;
+                if (oldestTime <= packet->delayUntil)
+                    continue;
                 oldestPacketIndex = i;
                 oldestTime = packet->delayUntil;
             }
@@ -357,7 +374,7 @@ namespace Unity.Networking.Transport.Utilities
             return false;
         }
 
-        internal static unsafe void FuzzPacket(Context *ctx, ref Parameters param, ref InboundSendBuffer inboundBuffer)
+        internal static unsafe void FuzzPacket(Context* ctx, ref Parameters param, ref InboundSendBuffer inboundBuffer)
         {
             int fuzzFactor = param.FuzzFactor;
             int fuzzOffset = param.FuzzOffset;
@@ -379,9 +396,13 @@ namespace Unity.Networking.Transport.Utilities
         }
 
         /// <summary>Storing it twice will trigger a resend.</summary>
-        internal static unsafe bool TryDelayPacket(ref NetworkPipelineContext ctx, ref Parameters param, ref InboundSendBuffer inboundBuffer,
+        internal static unsafe bool TryDelayPacket(
+            ref NetworkPipelineContext ctx,
+            ref Parameters param,
+            ref InboundSendBuffer inboundBuffer,
             ref NetworkPipelineStage.Requests requests,
-            long timestamp)
+            long timestamp
+        )
         {
             var simCtx = (Context*)ctx.internalSharedProcessBuffer;
 
@@ -393,15 +414,24 @@ namespace Unity.Networking.Transport.Utilities
 
             if (!foundSlot)
             {
-                Debug.LogWarning($"Simulator has no space left in the delayed packets queue ({param.MaxPacketCount} packets already in queue). Letting packet go through. Increase MaxPacketCount during driver construction.");
+                Debug.LogWarning(
+                    $"Simulator has no space left in the delayed packets queue ({param.MaxPacketCount} packets already in queue). Letting packet go through. Increase MaxPacketCount during driver construction."
+                );
                 return false;
             }
 
-            UnsafeUtility.MemCpy(ctx.internalProcessBuffer + packetPayloadOffset + inboundBuffer.headerPadding, inboundBuffer.buffer, inboundBuffer.bufferLength);
+            UnsafeUtility.MemCpy(
+                ctx.internalProcessBuffer + packetPayloadOffset + inboundBuffer.headerPadding,
+                inboundBuffer.buffer,
+                inboundBuffer.bufferLength
+            );
 
             // Add tracking for this packet so we can resurrect later
             DelayedPacket packet;
-            var addedDelay = math.max(0, param.PacketDelayMs + simCtx->Random.NextInt(param.PacketJitterMs * 2) - param.PacketJitterMs);
+            var addedDelay = math.max(
+                0,
+                param.PacketDelayMs + simCtx->Random.NextInt(param.PacketJitterMs * 2) - param.PacketJitterMs
+            );
             packet.delayUntil = timestamp + addedDelay;
             packet.processBufferOffset = packetPayloadOffset;
             packet.packetSize = (ushort)(inboundBuffer.headerPadding + inboundBuffer.bufferLength);
@@ -420,7 +450,11 @@ namespace Unity.Networking.Transport.Utilities
         /// Also ensures requests are updated if there are other packets in the store.
         /// </summary>
         /// <returns>True if we can skip delaying this packet.</returns>
-        internal static unsafe bool TrySkipDelayingPacket(ref Parameters param, ref NetworkPipelineStage.Requests requests, Context* simCtx)
+        internal static unsafe bool TrySkipDelayingPacket(
+            ref Parameters param,
+            ref NetworkPipelineStage.Requests requests,
+            Context* simCtx
+        )
         {
             if (param.PacketDelayMs == 0 && param.PacketJitterMs == 0)
             {

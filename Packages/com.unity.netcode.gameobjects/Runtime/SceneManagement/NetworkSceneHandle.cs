@@ -24,7 +24,8 @@ namespace Unity.Netcode
         /// <returns>True if this scene handle represents the <see langword="default"/>; otherwise false.</returns>
         public bool IsEmpty() => Equals(default(NetworkSceneHandle));
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             if (serializer.IsWriter)
             {
@@ -153,18 +154,21 @@ namespace Unity.Netcode
         /// <returns>True if the two SceneHandles are different</returns>
         public static bool operator !=(NetworkSceneHandle left, NetworkSceneHandle right) => !left.Equals(right);
 
-
 #if SCENE_MANAGEMENT_SCENE_HANDLE_AVAILABLE
         public static bool operator ==(SceneHandle left, NetworkSceneHandle right) => left.Equals(right.m_Handle);
+
         public static bool operator !=(SceneHandle left, NetworkSceneHandle right) => !left.Equals(right.m_Handle);
 
         public static bool operator ==(NetworkSceneHandle left, SceneHandle right) => left.Equals(right);
+
         public static bool operator !=(NetworkSceneHandle left, SceneHandle right) => !left.Equals(right);
 #else
         public static bool operator ==(int left, NetworkSceneHandle right) => left.Equals(right.m_Handle);
+
         public static bool operator !=(int left, NetworkSceneHandle right) => !left.Equals(right.m_Handle);
 
         public static bool operator ==(NetworkSceneHandle left, int right) => left.Equals(right);
+
         public static bool operator !=(NetworkSceneHandle left, int right) => !left.Equals(right);
 #endif
         #endregion

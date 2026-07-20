@@ -1,24 +1,23 @@
 using System.Collections.Generic;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Character.NPC
 {
     [DisallowMultipleComponent]
@@ -34,54 +33,96 @@ namespace NPCSystem.Character.NPC
         [FormerlySerializedAs("NetworkManager")]
         [SerializeField]
         NetworkManager _networkManager;
-        public NetworkManager NetworkManager { get => _networkManager; set => _networkManager = value; }
+        public NetworkManager NetworkManager
+        {
+            get => _networkManager;
+            set => _networkManager = value;
+        }
 
         [FormerlySerializedAs("NetworkBootstrap")]
         [SerializeField]
         NPCNetworkBootstrap _networkBootstrap;
-        public NPCNetworkBootstrap NetworkBootstrap { get => _networkBootstrap; set => _networkBootstrap = value; }
+        public NPCNetworkBootstrap NetworkBootstrap
+        {
+            get => _networkBootstrap;
+            set => _networkBootstrap = value;
+        }
 
         [FormerlySerializedAs("DialogueManager")]
         [SerializeField]
         NPCDialogueManager _dialogueManager;
-        public NPCDialogueManager DialogueManager { get => _dialogueManager; set => _dialogueManager = value; }
+        public NPCDialogueManager DialogueManager
+        {
+            get => _dialogueManager;
+            set => _dialogueManager = value;
+        }
 
         [FormerlySerializedAs("NpcPrefab")]
         [SerializeField]
         GameObject _npcPrefab;
-        public GameObject NpcPrefab { get => _npcPrefab; set => _npcPrefab = value; }
+        public GameObject NpcPrefab
+        {
+            get => _npcPrefab;
+            set => _npcPrefab = value;
+        }
 
         [FormerlySerializedAs("NpcPrefabResourcesPath")]
         [SerializeField]
         string _npcPrefabResourcesPath = "Networking/NPCServerCharacter";
-        public string NpcPrefabResourcesPath { get => _npcPrefabResourcesPath; set => _npcPrefabResourcesPath = value; }
+        public string NpcPrefabResourcesPath
+        {
+            get => _npcPrefabResourcesPath;
+            set => _npcPrefabResourcesPath = value;
+        }
 
         [Header("Spawn Layout")]
         [FormerlySerializedAs("spawnOrigin")]
         [SerializeField]
         Vector3 _spawnOrigin = new Vector3(-4f, 0f, 6f);
-        public Vector3 SpawnOrigin { get => _spawnOrigin; set => _spawnOrigin = value; }
+        public Vector3 SpawnOrigin
+        {
+            get => _spawnOrigin;
+            set => _spawnOrigin = value;
+        }
 
         [FormerlySerializedAs("spawnSpacing")]
         [SerializeField]
         Vector3 _spawnSpacing = new Vector3(2.75f, 0f, 2.5f);
-        public Vector3 SpawnSpacing { get => _spawnSpacing; set => _spawnSpacing = value; }
+        public Vector3 SpawnSpacing
+        {
+            get => _spawnSpacing;
+            set => _spawnSpacing = value;
+        }
 
         [FormerlySerializedAs("MaxColumns")]
         [SerializeField]
         int _maxColumns = 3;
-        public int MaxColumns { get => _maxColumns; set => _maxColumns = value; }
+        public int MaxColumns
+        {
+            get => _maxColumns;
+            set => _maxColumns = value;
+        }
 
         [FormerlySerializedAs("ClearExistingNpcCharactersBeforeSpawn")]
         [SerializeField]
         bool _clearExistingNpcCharactersBeforeSpawn = true;
-        public bool ClearExistingNpcCharactersBeforeSpawn { get => _clearExistingNpcCharactersBeforeSpawn; set => _clearExistingNpcCharactersBeforeSpawn = value; }
+        public bool ClearExistingNpcCharactersBeforeSpawn
+        {
+            get => _clearExistingNpcCharactersBeforeSpawn;
+            set => _clearExistingNpcCharactersBeforeSpawn = value;
+        }
 
         [FormerlySerializedAs("SnapToGround")]
         [SerializeField]
-        [Tooltip("Raycast down to snap spawned NPCs to ground level. Disable if using a NavMesh with automatic ground placement.")]
+        [Tooltip(
+            "Raycast down to snap spawned NPCs to ground level. Disable if using a NavMesh with automatic ground placement."
+        )]
         bool _snapToGround = true;
-        public bool SnapToGround { get => _snapToGround; set => _snapToGround = value; }
+        public bool SnapToGround
+        {
+            get => _snapToGround;
+            set => _snapToGround = value;
+        }
 
         [Header("Diagnostics")]
         [SerializeField, ReadOnly]
@@ -141,8 +182,7 @@ namespace NPCSystem.Character.NPC
 
             if (_npcPrefab == null)
             {
-                lastSpawnStatus =
-                    $"NPC prefab could not be loaded from Resources/{_npcPrefabResourcesPath}.";
+                lastSpawnStatus = $"NPC prefab could not be loaded from Resources/{_npcPrefabResourcesPath}.";
                 NPCFlowLogger
                     .FindOrCreate()
                     ?.Log(
@@ -156,9 +196,7 @@ namespace NPCSystem.Character.NPC
             }
 
             NPCProfile[] profiles =
-                _dialogueManager == null
-                    ? System.Array.Empty<NPCProfile>()
-                    : _dialogueManager.Profiles;
+                _dialogueManager == null ? System.Array.Empty<NPCProfile>() : _dialogueManager.Profiles;
             if (profiles.Length == 0)
             {
                 lastSpawnStatus = "No NPC profiles are configured on the dialogue manager.";
@@ -188,16 +226,11 @@ namespace NPCSystem.Character.NPC
                     continue;
                 }
 
-                GameObject instance = Instantiate(
-                    _npcPrefab,
-                    GetSpawnPosition(i),
-                    Quaternion.identity
-                );
+                GameObject instance = Instantiate(_npcPrefab, GetSpawnPosition(i), Quaternion.identity);
                 if (!instance.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                 {
                     Destroy(instance);
-                    lastSpawnStatus =
-                        $"Spawned prefab '{_npcPrefab.name}' is missing a NetworkObject.";
+                    lastSpawnStatus = $"Spawned prefab '{_npcPrefab.name}' is missing a NetworkObject.";
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
@@ -248,16 +281,12 @@ namespace NPCSystem.Character.NPC
 
             if (_networkBootstrap == null)
             {
-                _networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
-                    FindObjectsInactive.Include
-                );
+                _networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(FindObjectsInactive.Include);
             }
 
             if (_dialogueManager == null)
             {
-                _dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
-                    FindObjectsInactive.Include
-                );
+                _dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
             }
 
             if (_npcPrefab == null && !string.IsNullOrWhiteSpace(_npcPrefabResourcesPath))
@@ -295,9 +324,7 @@ namespace NPCSystem.Character.NPC
 
         void ClearExistingNpcCharacters()
         {
-            NPCServerCharacter[] characters = FindObjectsByType<NPCServerCharacter>(
-                FindObjectsInactive.Include
-            );
+            NPCServerCharacter[] characters = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
             foreach (NPCServerCharacter character in characters)
             {
                 if (character == null)

@@ -5,7 +5,6 @@ using System;
 //how is it achieved that this applies on a per-device level rather than for all devices of a given type?
 //do we do this at the event-level?
 
-
 //where to do perform the input modification? pre-source or post-source?
 //pre-source:
 //  + can be persisted such that the outcome is agnostic to user profile settings
@@ -100,6 +99,7 @@ namespace UnityEngine.InputSystem.Users
             //set overrideProcessors and redirectPaths on respective bindings
         }
 
-        [SerializeField] private string m_CustomBindings;
+        [SerializeField]
+        private string m_CustomBindings;
     }
 }

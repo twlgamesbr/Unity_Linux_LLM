@@ -6,11 +6,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable]
     internal class Shadow2DProviderSources : Provider2DSources<ShadowShape2DProvider, Shadow2DProviderSource>
     {
-
-        void SetSelectedHashCode(Provider2D provider, Component component)
-        {
-            
-        }
+        void SetSelectedHashCode(Provider2D provider, Component component) { }
     }
 }
 #endif

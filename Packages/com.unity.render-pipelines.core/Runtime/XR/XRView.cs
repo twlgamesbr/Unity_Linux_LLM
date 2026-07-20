@@ -14,7 +14,16 @@ namespace UnityEngine.Experimental.Rendering
         internal readonly Vector2 eyeCenterUV;
         internal readonly bool isPrevViewMatrixValid;
 
-        internal XRView(Matrix4x4 projMatrix, Matrix4x4 viewMatrix, Matrix4x4 prevViewMatrix, bool isPrevViewMatrixValid, Rect viewport, Mesh occlusionMesh, Mesh visibleMesh, int textureArraySlice)
+        internal XRView(
+            Matrix4x4 projMatrix,
+            Matrix4x4 viewMatrix,
+            Matrix4x4 prevViewMatrix,
+            bool isPrevViewMatrixValid,
+            Rect viewport,
+            Mesh occlusionMesh,
+            Mesh visibleMesh,
+            int textureArraySlice
+        )
         {
             this.projMatrix = projMatrix;
             this.viewMatrix = viewMatrix;

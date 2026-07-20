@@ -1,7 +1,6 @@
 using System;
-using UnityEngine.Scripting.APIUpdating;
 using Unity.Collections;
-
+using UnityEngine.Scripting.APIUpdating;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -18,10 +17,8 @@ namespace UnityEngine.Rendering.Universal
     [Icon("UnityEngine/UI/Shadow Icon")]
     [AddComponentMenu("Rendering/2D/Shadow Caster 2D")]
     [MovedFrom(false, "UnityEngine.Experimental.Rendering.Universal", "com.unity.render-pipelines.universal")]
-
     public class ShadowCaster2D : ShadowCasterGroup2D, ISerializationCallbackReceiver
     {
-
         internal enum ComponentVersions
         {
             Version_Unserialized = 0,
@@ -34,15 +31,16 @@ namespace UnityEngine.Rendering.Universal
         }
 
         const ComponentVersions k_CurrentComponentVersion = ComponentVersions.Version_6;
-        [SerializeField] ComponentVersions m_ComponentVersion = ComponentVersions.Version_Unserialized;
+
+        [SerializeField]
+        ComponentVersions m_ComponentVersion = ComponentVersions.Version_Unserialized;
 
         internal enum ShadowCastingSources
         {
             None,
             ShapeEditor,
-            ShapeProvider
+            ShapeProvider,
         }
-
 
         /// <summary>
         /// Options for what type of shadows are cast.
@@ -67,7 +65,7 @@ namespace UnityEngine.Rendering.Universal
             /// <summary>
             /// Renders a sprite without shadow casting correctly on top of other shadow casting sprites
             /// </summary>
-            NoShadow
+            NoShadow,
         }
 
         internal enum EdgeProcessing
@@ -76,36 +74,68 @@ namespace UnityEngine.Rendering.Universal
             Clipping = ShadowMesh2D.EdgeProcessing.Clipping,
         }
 
-        [SerializeField] bool m_HasRenderer = false;
-        [SerializeField] bool m_UseRendererSilhouette = true;
-        [SerializeField] bool m_CastsShadows = true;
-        [SerializeField] bool m_SelfShadows = false;
+        [SerializeField]
+        bool m_HasRenderer = false;
+
+        [SerializeField]
+        bool m_UseRendererSilhouette = true;
+
+        [SerializeField]
+        bool m_CastsShadows = true;
+
+        [SerializeField]
+        bool m_SelfShadows = false;
+
         [Range(0, 1)]
-        [SerializeField] float m_AlphaCutoff = 0.1f;
-        [SerializeField] int[] m_ApplyToSortingLayers = null;
-        [SerializeField] Vector3[] m_ShapePath = null;
-        [SerializeField] int m_ShapePathHash = 0;
+        [SerializeField]
+        float m_AlphaCutoff = 0.1f;
 
-        [SerializeField] int m_InstanceId;
-        [SerializeField] Component m_ShadowShape2DComponent;
-        [SerializeReference] ShadowShape2DProvider m_ShadowShape2DProvider;
-        [SerializeField] ShadowCastingSources m_ShadowCastingSource = (ShadowCastingSources)(-1);
+        [SerializeField]
+        int[] m_ApplyToSortingLayers = null;
 
-        [SerializeReference] internal ShadowMesh2D m_ShadowMesh;
-        [SerializeField] ShadowCastingOptions m_CastingOption = ShadowCastingOptions.CastShadow;
+        [SerializeField]
+        Vector3[] m_ShapePath = null;
 
-        [SerializeField] internal float m_PreviousTrimEdge = 0;
-        [SerializeField] internal int m_PreviousEdgeProcessing;
-        [SerializeField] internal int m_PreviousShadowCastingSource;
-        [SerializeField] internal Component m_PreviousShadowShape2DSource = null;
+        [SerializeField]
+        int m_ShapePathHash = 0;
+
+        [SerializeField]
+        int m_InstanceId;
+
+        [SerializeField]
+        Component m_ShadowShape2DComponent;
+
+        [SerializeReference]
+        ShadowShape2DProvider m_ShadowShape2DProvider;
+
+        [SerializeField]
+        ShadowCastingSources m_ShadowCastingSource = (ShadowCastingSources)(-1);
+
+        [SerializeReference]
+        internal ShadowMesh2D m_ShadowMesh;
+
+        [SerializeField]
+        ShadowCastingOptions m_CastingOption = ShadowCastingOptions.CastShadow;
+
+        [SerializeField]
+        internal float m_PreviousTrimEdge = 0;
+
+        [SerializeField]
+        internal int m_PreviousEdgeProcessing;
+
+        [SerializeField]
+        internal int m_PreviousShadowCastingSource;
+
+        [SerializeField]
+        internal Component m_PreviousShadowShape2DSource = null;
 
 #if UNITY_EDITOR
-        [SerializeReference] internal Shadow2DProviderSources m_SelectionSources = new Shadow2DProviderSources();
+        [SerializeReference]
+        internal Shadow2DProviderSources m_SelectionSources = new Shadow2DProviderSources();
 #endif
 
         internal ShadowCasterGroup2D m_ShadowCasterGroup = null;
         internal ShadowCasterGroup2D m_PreviousShadowCasterGroup = null;
-
 
         internal bool m_ForceShadowMeshRebuild;
 
@@ -130,7 +160,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public float trimEdge
         {
-            get { return m_ShadowMesh.trimEdge; } set { m_ShadowMesh.trimEdge = value; }
+            get { return m_ShadowMesh.trimEdge; }
+            set { m_ShadowMesh.trimEdge = value; }
         }
 
         /// <summary>
@@ -147,14 +178,29 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public Vector3[] shapePath => m_ShapePath;
 
-        internal int shapePathHash { get { return m_ShapePathHash; } set { m_ShapePathHash = value; } }
+        internal int shapePathHash
+        {
+            get { return m_ShapePathHash; }
+            set { m_ShapePathHash = value; }
+        }
 
-        internal ShadowCastingSources shadowCastingSource { get { return m_ShadowCastingSource; } set { m_ShadowCastingSource = value; } }
-
+        internal ShadowCastingSources shadowCastingSource
+        {
+            get { return m_ShadowCastingSource; }
+            set { m_ShadowCastingSource = value; }
+        }
 
         // Make this public if possible...
-        internal Component shadowShape2DComponent { get { return m_ShadowShape2DComponent; } set { m_ShadowShape2DComponent = value; } }
-        internal ShadowShape2DProvider shadowShape2DProvider { get { return m_ShadowShape2DProvider; } set { m_ShadowShape2DProvider = value; } }
+        internal Component shadowShape2DComponent
+        {
+            get { return m_ShadowShape2DComponent; }
+            set { m_ShadowShape2DComponent = value; }
+        }
+        internal ShadowShape2DProvider shadowShape2DProvider
+        {
+            get { return m_ShadowShape2DProvider; }
+            set { m_ShadowShape2DProvider = value; }
+        }
 
         int m_PreviousShadowGroup = 0;
         bool m_PreviousCastsShadows = true;
@@ -176,7 +222,8 @@ namespace UnityEngine.Rendering.Universal
             m_CachedLossyScale = transform.lossyScale;
             m_CachedRotation = transform.rotation;
 
-            bool flipX, flipY;
+            bool flipX,
+                flipY;
             m_ShadowMesh.GetFlip(out flipX, out flipY);
             Vector3 scale = new Vector3(flipX ? -1 : 1, flipY ? -1 : 1, 1);
 
@@ -199,7 +246,9 @@ namespace UnityEngine.Rendering.Universal
         /// This property is obsolete and no longer has any effect. Its functionality has been removed because it is no longer required.
         /// To achieve similar behavior, add a ShadowCaster2D component to an empty parent GameObject instead.
         /// </summary>
-        [Obsolete("useRendererSilhouette is obsolete and no longer has any effect. To achieve similar behavior, add a ShadowCaster2D component to an empty parent GameObject. #from(2023.1)")]
+        [Obsolete(
+            "useRendererSilhouette is obsolete and no longer has any effect. To achieve similar behavior, add a ShadowCaster2D component to an empty parent GameObject. #from(2023.1)"
+        )]
         public bool useRendererSilhouette
         {
             set { m_UseRendererSilhouette = value; }
@@ -222,14 +271,17 @@ namespace UnityEngine.Rendering.Universal
                 }
                 else
                 {
-                    if (castingOption == ShadowCastingOptions.CastAndSelfShadow )
+                    if (castingOption == ShadowCastingOptions.CastAndSelfShadow)
                         castingOption = ShadowCastingOptions.CastShadow;
-                    else if(castingOption == ShadowCastingOptions.SelfShadow)
+                    else if (castingOption == ShadowCastingOptions.SelfShadow)
                         castingOption = ShadowCastingOptions.NoShadow;
                 }
-
             }
-            get { return castingOption == ShadowCastingOptions.CastAndSelfShadow || castingOption == ShadowCastingOptions.SelfShadow; }
+            get
+            {
+                return castingOption == ShadowCastingOptions.CastAndSelfShadow
+                    || castingOption == ShadowCastingOptions.SelfShadow;
+            }
         }
 
         /// <summary>
@@ -240,7 +292,7 @@ namespace UnityEngine.Rendering.Universal
         {
             set
             {
-                if(value)
+                if (value)
                 {
                     if (castingOption == ShadowCastingOptions.SelfShadow)
                         castingOption = ShadowCastingOptions.CastAndSelfShadow;
@@ -255,8 +307,11 @@ namespace UnityEngine.Rendering.Universal
                         castingOption = ShadowCastingOptions.NoShadow;
                 }
             }
-
-            get { return castingOption == ShadowCastingOptions.CastShadow || castingOption == ShadowCastingOptions.CastAndSelfShadow; }
+            get
+            {
+                return castingOption == ShadowCastingOptions.CastShadow
+                    || castingOption == ShadowCastingOptions.CastAndSelfShadow;
+            }
         }
 
         static int[] SetDefaultSortingLayers()
@@ -316,7 +371,11 @@ namespace UnityEngine.Rendering.Universal
             }
             if (m_ShadowCastingSource == ShadowCastingSources.ShapeProvider)
             {
-                ShapeProviderUtility.PersistantDataCreated(m_ShadowShape2DProvider, m_ShadowShape2DComponent, shadowMesh);
+                ShapeProviderUtility.PersistantDataCreated(
+                    m_ShadowShape2DProvider,
+                    m_ShadowShape2DComponent,
+                    shadowMesh
+                );
             }
         }
 
@@ -325,7 +384,11 @@ namespace UnityEngine.Rendering.Universal
             if (m_ShadowCastingSource < 0)
             {
 #if UNITY_EDITOR
-                ShapeProviderUtility.TryGetDefaultShadowShapeProviderSource(gameObject, out var component, out var provider);
+                ShapeProviderUtility.TryGetDefaultShadowShapeProviderSource(
+                    gameObject,
+                    out var component,
+                    out var provider
+                );
                 if (component != null && provider != null && (shapePath == null || shapePath.Length == 0))
                 {
                     m_ShadowShape2DComponent = component;
@@ -350,10 +413,8 @@ namespace UnityEngine.Rendering.Universal
                 relOffset = new Vector3(inverseScale.x * -transform.position.x, inverseScale.y * -transform.position.y);
             }
 
-
             if (m_ApplyToSortingLayers == null)
                 m_ApplyToSortingLayers = SetDefaultSortingLayers();
-
 
             Bounds bounds = new Bounds(transform.position, Vector3.one);
             Renderer renderer = GetComponent<Renderer>();
@@ -374,15 +435,12 @@ namespace UnityEngine.Rendering.Universal
                 };
             }
 
-
             if (m_ShadowMesh == null)
             {
                 ShadowMesh2D newShadowMesh = new ShadowMesh2D();
                 SetShadowShape(newShadowMesh);
                 m_ShadowMesh = newShadowMesh;
             }
-
-
 #if USING_PHYSICS2D_MODULE
             else
             {
@@ -433,9 +491,13 @@ namespace UnityEngine.Rendering.Universal
             Renderer renderer;
             m_HasRenderer = TryGetComponent<Renderer>(out renderer);
 
-            bool rebuildMesh = LightUtility.CheckForChange((int)m_ShadowCastingSource, ref m_PreviousShadowCastingSource);
+            bool rebuildMesh = LightUtility.CheckForChange(
+                (int)m_ShadowCastingSource,
+                ref m_PreviousShadowCastingSource
+            );
             rebuildMesh |= LightUtility.CheckForChange((int)edgeProcessing, ref m_PreviousEdgeProcessing);
-            rebuildMesh |= edgeProcessing != EdgeProcessing.None && LightUtility.CheckForChange(trimEdge, ref m_PreviousTrimEdge);
+            rebuildMesh |=
+                edgeProcessing != EdgeProcessing.None && LightUtility.CheckForChange(trimEdge, ref m_PreviousTrimEdge);
             rebuildMesh |= m_ForceShadowMeshRebuild;
 
             if (m_ShadowCastingSource == ShadowCastingSources.ShapeEditor)
@@ -448,14 +510,24 @@ namespace UnityEngine.Rendering.Universal
             }
             else
             {
-                if ((rebuildMesh || LightUtility.CheckForChange(m_ShadowShape2DComponent, ref m_PreviousShadowShape2DSource)) && m_ShadowShape2DComponent != null)
+                if (
+                    (
+                        rebuildMesh
+                        || LightUtility.CheckForChange(m_ShadowShape2DComponent, ref m_PreviousShadowShape2DSource)
+                    )
+                    && m_ShadowShape2DComponent != null
+                )
                 {
                     SetShadowShape(m_ShadowMesh);
                 }
             }
 
             m_PreviousShadowCasterGroup = m_ShadowCasterGroup;
-            bool addedToNewGroup = ShadowCasterGroup2DManager.AddToShadowCasterGroup(this, ref m_ShadowCasterGroup, ref m_Priority);
+            bool addedToNewGroup = ShadowCasterGroup2DManager.AddToShadowCasterGroup(
+                this,
+                ref m_ShadowCasterGroup,
+                ref m_Priority
+            );
             if (addedToNewGroup && m_ShadowCasterGroup != null)
             {
                 if (m_PreviousShadowCasterGroup == this)
@@ -477,10 +549,9 @@ namespace UnityEngine.Rendering.Universal
                 ShadowCasterGroup2DManager.AddGroup(this);
             }
 
-            if(m_ShadowMesh != null)
+            if (m_ShadowMesh != null)
                 m_ShadowMesh.UpdateBoundingSphere(transform);
         }
-
 
 #if UNITY_EDITOR
         internal void DrawPreviewOutline(Transform t, float trimionDistance)
@@ -508,7 +579,8 @@ namespace UnityEngine.Rendering.Universal
                 Vector3 trimPt1 = new Vector3(pt1.x + trimionDistance * tan1.x, pt1.y + trimionDistance * tan1.y, 0);
                 Vector3 trimPt2 = new Vector3(pt2.x + trimionDistance * tan2.x, pt2.y + trimionDistance * tan2.y, 0);
 
-                bool flipX, flipY;
+                bool flipX,
+                    flipY;
                 m_ShadowMesh.GetFlip(out flipX, out flipY);
                 Vector3 scale = new Vector3(t.lossyScale.x * (flipX ? -1 : 1), t.lossyScale.y * (flipY ? -1 : 1), 1);
                 Matrix4x4 mat = Matrix4x4.TRS(t.position, t.rotation, scale);
@@ -595,7 +667,6 @@ namespace UnityEngine.Rendering.Universal
         }
 #endif
 
-
         /// <inheritdoc/>
         public void OnBeforeSerialize()
         {
@@ -637,13 +708,16 @@ namespace UnityEngine.Rendering.Universal
             {
 #if UNITY_EDITOR
                 if (m_ShadowCastingSource == ShadowCastingSources.ShapeProvider)
-                    m_SelectionSources.selectedHashCode = LightUtility.ProviderToHash(shadowShape2DProvider, shadowShape2DComponent);
+                    m_SelectionSources.selectedHashCode = LightUtility.ProviderToHash(
+                        shadowShape2DProvider,
+                        shadowShape2DComponent
+                    );
                 else
                     m_SelectionSources.selectedHashCode = (int)m_ShadowCastingSource;
 #endif
             }
 
-            if(m_ShadowMesh != null)
+            if (m_ShadowMesh != null)
                 m_ShadowMesh.OnAfterDeserialize();
         }
     }

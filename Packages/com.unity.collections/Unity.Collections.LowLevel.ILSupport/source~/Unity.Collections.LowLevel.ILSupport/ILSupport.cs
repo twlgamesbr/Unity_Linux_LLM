@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Unity.Collections.LowLevel.Unsafe
 {
-    internal unsafe static class ILSupport
+    internal static unsafe class ILSupport
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void* AddressOf<T>(in T thing)

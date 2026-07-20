@@ -42,10 +42,9 @@ namespace Unity.Collections
         {
             fixed (void* secret = xxHashDefaultKey.kSecret)
             {
-                return ToUint2(Hash64Internal((byte*) input, null, length, (byte*) secret, 0));
+                return ToUint2(Hash64Internal((byte*)input, null, length, (byte*)secret, 0));
             }
         }
-
 
         /// <summary>
         /// Compute a 64bits hash from the contents of the input struct
@@ -53,8 +52,9 @@ namespace Unity.Collections
         /// <typeparam name="T">The input type.</typeparam>
         /// <param name="input">The input struct that will be hashed</param>
         /// <returns>The hash result</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public static unsafe uint2 Hash64<T>(in T input) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static unsafe uint2 Hash64<T>(in T input)
+            where T : unmanaged
         {
             return Hash64(UnsafeUtilityExtensions.AddressOf(input), sizeof(T));
         }
@@ -70,7 +70,7 @@ namespace Unity.Collections
         {
             fixed (byte* secret = xxHashDefaultKey.kSecret)
             {
-                return ToUint2(Hash64Internal((byte*) input, null, length, secret, seed));
+                return ToUint2(Hash64Internal((byte*)input, null, length, secret, seed));
             }
         }
 
@@ -84,7 +84,7 @@ namespace Unity.Collections
         {
             fixed (void* secret = xxHashDefaultKey.kSecret)
             {
-                Hash128Internal((byte*) input, null, length, (byte*) secret, 0, out var result);
+                Hash128Internal((byte*)input, null, length, (byte*)secret, 0, out var result);
                 return result;
             }
         }
@@ -95,8 +95,9 @@ namespace Unity.Collections
         /// <typeparam name="T">The input type.</typeparam>
         /// <param name="input">The input struct that will be hashed</param>
         /// <returns>The hash result</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public static unsafe uint4 Hash128<T>(in T input) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static unsafe uint4 Hash128<T>(in T input)
+            where T : unmanaged
         {
             return Hash128(UnsafeUtilityExtensions.AddressOf(input), sizeof(T));
         }
@@ -114,7 +115,7 @@ namespace Unity.Collections
         {
             fixed (byte* secret = xxHashDefaultKey.kSecret)
             {
-                Hash128Internal((byte*) input, (byte*) destination, length, secret, 0, out var result);
+                Hash128Internal((byte*)input, (byte*)destination, length, secret, 0, out var result);
 
                 return result;
             }
@@ -131,7 +132,7 @@ namespace Unity.Collections
         {
             fixed (byte* secret = xxHashDefaultKey.kSecret)
             {
-                Hash128Internal((byte*) input, null, length, secret, seed, out var result);
+                Hash128Internal((byte*)input, null, length, secret, seed, out var result);
 
                 return result;
             }
@@ -149,7 +150,7 @@ namespace Unity.Collections
         {
             fixed (byte* secret = xxHashDefaultKey.kSecret)
             {
-                Hash128Internal((byte*) input, (byte*) destination, length, secret, seed, out var result);
+                Hash128Internal((byte*)input, (byte*)destination, length, secret, seed, out var result);
 
                 return result;
             }
@@ -237,7 +238,14 @@ namespace Unity.Collections
             return Hash64Long(input, dest, length, secret);
         }
 
-        internal static unsafe void Hash128Internal(byte* input, byte* dest, long length, byte* secret, ulong seed, out uint4 result)
+        internal static unsafe void Hash128Internal(
+            byte* input,
+            byte* dest,
+            long length,
+            byte* secret,
+            ulong seed,
+            out uint4 result
+        )
         {
             if (dest != null && length < MIDSIZE_MAX)
             {
@@ -267,7 +275,7 @@ namespace Unity.Collections
                 var addr = stackalloc byte[SECRET_KEY_SIZE + 31];
 
                 // Aligned the allocated address on 32 bytes
-                var newSecret = (byte*) ((ulong) addr + 31 & 0xFFFFFFFFFFFFFFE0);
+                var newSecret = (byte*)((ulong)addr + 31 & 0xFFFFFFFFFFFFFFE0);
 
                 EncodeSecretKey(newSecret, secret, seed);
                 Hash128Long(input, dest, length, newSecret, out result);
@@ -287,8 +295,8 @@ namespace Unity.Collections
                 var c1 = input[0];
                 var c2 = input[len >> 1];
                 var c3 = input[len - 1];
-                var combined = ((uint)c1 << 16) | ((uint)c2  << 24) | ((uint)c3 <<  0) | ((uint)len << 8);
-                ulong bitflip = (Read32LE(secret) ^ Read32LE(secret+4)) + seed;
+                var combined = ((uint)c1 << 16) | ((uint)c2 << 24) | ((uint)c3 << 0) | ((uint)len << 8);
+                ulong bitflip = (Read32LE(secret) ^ Read32LE(secret + 4)) + seed;
                 ulong keyed = (ulong)combined ^ bitflip;
                 return AvalancheH64(keyed);
             }
@@ -301,7 +309,7 @@ namespace Unity.Collections
                 seed ^= (ulong)Swap32((uint)seed) << 32;
                 var input1 = Read32LE(input);
                 var input2 = Read32LE(input + length - 4);
-                var bitflip = (Read64LE(secret+8) ^ Read64LE(secret+16)) - seed;
+                var bitflip = (Read64LE(secret + 8) ^ Read64LE(secret + 16)) - seed;
                 var input64 = input2 + (((ulong)input1) << 32);
                 var keyed = input64 ^ bitflip;
                 return rrmxmx(keyed, (ulong)length);
@@ -312,8 +320,8 @@ namespace Unity.Collections
         {
             unchecked
             {
-                var bitflip1 = (Read64LE(secret+24) ^ Read64LE(secret+32)) + seed;
-                var bitflip2 = (Read64LE(secret+40) ^ Read64LE(secret+48)) - seed;
+                var bitflip1 = (Read64LE(secret + 24) ^ Read64LE(secret + 32)) + seed;
+                var bitflip2 = (Read64LE(secret + 40) ^ Read64LE(secret + 48)) - seed;
                 var input_lo = Read64LE(input) ^ bitflip1;
                 var input_hi = Read64LE(input + length - 8) ^ bitflip2;
                 var acc = (ulong)length + Swap64(input_lo) + input_hi + Mul128Fold64(input_lo, input_hi);
@@ -338,14 +346,14 @@ namespace Unity.Collections
                 return Hash64Len1To3(input, length, secret, seed);
             }
 
-            return AvalancheH64(seed ^ (Read64LE(secret+56) ^ Read64LE(secret+64)));
+            return AvalancheH64(seed ^ (Read64LE(secret + 56) ^ Read64LE(secret + 64)));
         }
 
         private static unsafe ulong Hash64Len17To128(byte* input, long length, byte* secret, ulong seed)
         {
             unchecked
             {
-                var acc = (ulong) length * PRIME64_1;
+                var acc = (ulong)length * PRIME64_1;
                 if (length > 32)
                 {
                     if (length > 64)
@@ -375,8 +383,8 @@ namespace Unity.Collections
         {
             unchecked
             {
-                var acc = (ulong) length * PRIME64_1;
-                var nbRounds = (int) length / 16;
+                var acc = (ulong)length * PRIME64_1;
+                var nbRounds = (int)length / 16;
                 for (var i = 0; i < 8; i++)
                 {
                     acc += Mix16(input + (16 * i), secret + (16 * i), seed);
@@ -398,7 +406,7 @@ namespace Unity.Collections
         private static unsafe ulong Hash64Long(byte* input, byte* dest, long length, byte* secret)
         {
             var addr = stackalloc byte[STRIPE_LEN + 31];
-            var acc = (ulong*) ((ulong) addr + 31 & 0xFFFFFFFFFFFFFFE0); // Aligned the allocated address on 32 bytes
+            var acc = (ulong*)((ulong)addr + 31 & 0xFFFFFFFFFFFFFFE0); // Aligned the allocated address on 32 bytes
             acc[0] = PRIME32_3;
             acc[1] = PRIME64_1;
             acc[2] = PRIME64_2;
@@ -407,7 +415,6 @@ namespace Unity.Collections
             acc[5] = PRIME32_2;
             acc[6] = PRIME64_5;
             acc[7] = PRIME32_1;
-
             unchecked
             {
                 if (X86.Avx2.IsAvx2Supported)
@@ -418,7 +425,7 @@ namespace Unity.Collections
                 {
                     DefaultHashLongInternalLoop(acc, input, dest, length, secret, 1);
                 }
-                return MergeAcc(acc, secret + SECRET_MERGEACCS_START, (ulong) length * PRIME64_1);
+                return MergeAcc(acc, secret + SECRET_MERGEACCS_START, (ulong)length * PRIME64_1);
             }
         }
 
@@ -426,18 +433,17 @@ namespace Unity.Collections
 
         #region 128-bits hash, size dependent implementations
 
-        private static unsafe void Hash128Len1To3(byte* input, long length, byte* secret, ulong seed,
-            out uint4 result)
+        private static unsafe void Hash128Len1To3(byte* input, long length, byte* secret, ulong seed, out uint4 result)
         {
             unchecked
             {
                 var c1 = input[0];
                 var c2 = input[length >> 1];
                 var c3 = input[length - 1];
-                var combinedl = ((uint) c1 << 16) + (((uint) c2) << 24) + (((uint) c3) << 0) + (((uint) length) << 8);
+                var combinedl = ((uint)c1 << 16) + (((uint)c2) << 24) + (((uint)c3) << 0) + (((uint)length) << 8);
                 var combinedh = RotL32(Swap32(combinedl), 13);
-                var bitflipl = (Read32LE(secret) ^ Read32LE(secret+4)) + seed;
-                var bitfliph = (Read32LE(secret+8) ^ Read32LE(secret+12)) - seed;
+                var bitflipl = (Read32LE(secret) ^ Read32LE(secret + 4)) + seed;
+                var bitfliph = (Read32LE(secret + 8) ^ Read32LE(secret + 12)) - seed;
                 var keyed_lo = combinedl ^ bitflipl;
                 var keyed_hi = combinedh ^ bitfliph;
 
@@ -445,8 +451,7 @@ namespace Unity.Collections
             }
         }
 
-        private static unsafe void Hash128Len4To8(byte* input, long len, byte* secret, ulong seed,
-            out uint4 result)
+        private static unsafe void Hash128Len4To8(byte* input, long len, byte* secret, ulong seed, out uint4 result)
         {
             unchecked
             {
@@ -454,7 +459,7 @@ namespace Unity.Collections
                 var input_lo = Read32LE(input);
                 var input_hi = Read32LE(input + len - 4);
                 var input_64 = input_lo + ((ulong)input_hi << 32);
-                var bitflip = (Read64LE(secret+16) ^ Read64LE(secret+24)) + seed;
+                var bitflip = (Read64LE(secret + 16) ^ Read64LE(secret + 24)) + seed;
                 var keyed = input_64 ^ bitflip;
 
                 var low = Common.umul128(keyed, PRIME64_1 + (ulong)(len << 2), out var high);
@@ -463,28 +468,27 @@ namespace Unity.Collections
                 low ^= (high >> 3);
 
                 low = XorShift64(low, 35);
-                low*= 0x9FB21C651E98DF25UL;
+                low *= 0x9FB21C651E98DF25UL;
                 low = XorShift64(low, 28);
                 high = Avalanche(high);
                 result = ToUint4(low, high);
             }
         }
 
-        private static unsafe void Hash128Len9To16(byte* input, long len, byte* secret, ulong seed,
-            out uint4 result)
+        private static unsafe void Hash128Len9To16(byte* input, long len, byte* secret, ulong seed, out uint4 result)
         {
             unchecked
             {
-                var bitflipl = (Read64LE(secret+32) ^ Read64LE(secret+40)) - seed;
-                var bitfliph = (Read64LE(secret+48) ^ Read64LE(secret+56)) + seed;
+                var bitflipl = (Read64LE(secret + 32) ^ Read64LE(secret + 40)) - seed;
+                var bitfliph = (Read64LE(secret + 48) ^ Read64LE(secret + 56)) + seed;
                 var input_lo = Read64LE(input);
                 var input_hi = Read64LE(input + len - 8);
                 var low = Common.umul128(input_lo ^ input_hi ^ bitflipl, PRIME64_1, out var high);
 
                 low += (ulong)(len - 1) << 54;
-                input_hi   ^= bitfliph;
+                input_hi ^= bitfliph;
                 high += input_hi + Mul32To64((uint)input_hi, PRIME32_2 - 1);
-                low  ^= Swap64(high);
+                low ^= Swap64(high);
 
                 var hlow = Common.umul128(low, PRIME64_2, out var hhigh);
                 hhigh += high * PRIME64_2;
@@ -493,8 +497,7 @@ namespace Unity.Collections
             }
         }
 
-        private static unsafe void Hash128Len0To16(byte* input, long length, byte* secret, ulong seed,
-            out uint4 result)
+        private static unsafe void Hash128Len0To16(byte* input, long length, byte* secret, ulong seed, out uint4 result)
         {
             if (length > 8)
             {
@@ -514,19 +517,24 @@ namespace Unity.Collections
                 return;
             }
 
-            var bitflipl = Read64LE(secret+64) ^ Read64LE(secret+72);
-            var bitfliph = Read64LE(secret+80) ^ Read64LE(secret+88);
+            var bitflipl = Read64LE(secret + 64) ^ Read64LE(secret + 72);
+            var bitfliph = Read64LE(secret + 80) ^ Read64LE(secret + 88);
             var low = AvalancheH64(seed ^ bitflipl);
-            var hi = AvalancheH64( seed ^ bitfliph);
+            var hi = AvalancheH64(seed ^ bitfliph);
             result = ToUint4(low, hi);
         }
 
-        private static unsafe void Hash128Len17To128(byte* input, long length, byte* secret, ulong seed,
-            out uint4 result)
+        private static unsafe void Hash128Len17To128(
+            byte* input,
+            long length,
+            byte* secret,
+            ulong seed,
+            out uint4 result
+        )
         {
             unchecked
             {
-                var acc = new ulong2((ulong) length * PRIME64_1, 0);
+                var acc = new ulong2((ulong)length * PRIME64_1, 0);
                 if (length > 32)
                 {
                     if (length > 64)
@@ -545,18 +553,23 @@ namespace Unity.Collections
                 acc = Mix32(acc, input, input + length - 16, secret, seed);
 
                 var low64 = acc.x + acc.y;
-                var high64 = acc.x * PRIME64_1 + acc.y * PRIME64_4 + ((ulong) length - seed) * PRIME64_2;
+                var high64 = acc.x * PRIME64_1 + acc.y * PRIME64_4 + ((ulong)length - seed) * PRIME64_2;
 
                 result = ToUint4(Avalanche(low64), 0ul - Avalanche(high64));
             }
         }
 
-        private static unsafe void Hash128Len129To240(byte* input, long length, byte* secret, ulong seed,
-            out uint4 result)
+        private static unsafe void Hash128Len129To240(
+            byte* input,
+            long length,
+            byte* secret,
+            ulong seed,
+            out uint4 result
+        )
         {
             unchecked
             {
-                var acc = new ulong2((ulong) length * PRIME64_1, 0);
+                var acc = new ulong2((ulong)length * PRIME64_1, 0);
                 var nbRounds = length / 32;
                 int i;
 
@@ -570,15 +583,25 @@ namespace Unity.Collections
 
                 for (i = 4; i < nbRounds; i++)
                 {
-                    acc = Mix32(acc, input + 32 * i, input + 32 * i + 16, secret + MIDSIZE_STARTOFFSET + 32 * (i - 4),
-                        seed);
+                    acc = Mix32(
+                        acc,
+                        input + 32 * i,
+                        input + 32 * i + 16,
+                        secret + MIDSIZE_STARTOFFSET + 32 * (i - 4),
+                        seed
+                    );
                 }
 
-                acc = Mix32(acc, input + length - 16, input + length - 32,
-                    secret + SECRET_KEY_MIN_SIZE - MIDSIZE_LASTOFFSET - 16, 0UL - seed);
+                acc = Mix32(
+                    acc,
+                    input + length - 16,
+                    input + length - 32,
+                    secret + SECRET_KEY_MIN_SIZE - MIDSIZE_LASTOFFSET - 16,
+                    0UL - seed
+                );
 
                 var low64 = acc.x + acc.y;
-                var high64 = acc.x * PRIME64_1 + acc.y * PRIME64_4 + ((ulong) length - seed) * PRIME64_2;
+                var high64 = acc.x * PRIME64_1 + acc.y * PRIME64_4 + ((ulong)length - seed) * PRIME64_2;
 
                 result = ToUint4(Avalanche(low64), 0ul - Avalanche(high64));
             }
@@ -589,7 +612,7 @@ namespace Unity.Collections
         {
             // var acc = stackalloc ulong[ACC_NB];
             var addr = stackalloc byte[STRIPE_LEN + 31];
-            var acc = (ulong*) ((ulong) addr + 31 & 0xFFFFFFFFFFFFFFE0); // Aligned the allocated address on 32 bytes
+            var acc = (ulong*)((ulong)addr + 31 & 0xFFFFFFFFFFFFFFE0); // Aligned the allocated address on 32 bytes
             acc[0] = PRIME32_3;
             acc[1] = PRIME64_1;
             acc[2] = PRIME64_2;
@@ -598,7 +621,6 @@ namespace Unity.Collections
             acc[5] = PRIME32_2;
             acc[6] = PRIME64_5;
             acc[7] = PRIME32_1;
-
             unchecked
             {
                 if (X86.Avx2.IsAvx2Supported)
@@ -610,9 +632,12 @@ namespace Unity.Collections
                     DefaultHashLongInternalLoop(acc, input, dest, length, secret, 0);
                 }
 
-                var low64 = MergeAcc(acc, secret + SECRET_MERGEACCS_START, (ulong) length * PRIME64_1);
-                var high64 = MergeAcc(acc, secret + SECRET_KEY_SIZE - 64 - SECRET_MERGEACCS_START,
-                    ~((ulong) length * PRIME64_2));
+                var low64 = MergeAcc(acc, secret + SECRET_MERGEACCS_START, (ulong)length * PRIME64_1);
+                var high64 = MergeAcc(
+                    acc,
+                    secret + SECRET_KEY_SIZE - 64 - SECRET_MERGEACCS_START,
+                    ~((ulong)length * PRIME64_2)
+                );
 
                 result = ToUint4(low64, high64);
             }
@@ -655,32 +680,33 @@ namespace Unity.Collections
         private static unsafe void Write64LE(void* addr, ulong value) => Unsafe.WriteUnaligned(addr, value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ulong Mul32To64(uint x, uint y) => (ulong) x * y;
+        private static ulong Mul32To64(uint x, uint y) => (ulong)x * y;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ulong Swap64(ulong x)
         {
-            return ((x << 56) & 0xff00000000000000UL) |
-                   ((x << 40) & 0x00ff000000000000UL) |
-                   ((x << 24) & 0x0000ff0000000000UL) |
-                   ((x <<  8) & 0x000000ff00000000UL) |
-                   ((x >>  8) & 0x00000000ff000000UL) |
-                   ((x >> 24) & 0x0000000000ff0000UL) |
-                   ((x >> 40) & 0x000000000000ff00UL) |
-                   ((x >> 56) & 0x00000000000000ffUL);
+            return ((x << 56) & 0xff00000000000000UL)
+                | ((x << 40) & 0x00ff000000000000UL)
+                | ((x << 24) & 0x0000ff0000000000UL)
+                | ((x << 8) & 0x000000ff00000000UL)
+                | ((x >> 8) & 0x00000000ff000000UL)
+                | ((x >> 24) & 0x0000000000ff0000UL)
+                | ((x >> 40) & 0x000000000000ff00UL)
+                | ((x >> 56) & 0x00000000000000ffUL);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint Swap32(uint x)
         {
-            return ((x << 24) & 0xff000000) |
-                   ((x <<  8) & 0x00ff0000) |
-                   ((x >>  8) & 0x0000ff00) |
-                   ((x >> 24) & 0x000000ff);
+            return ((x << 24) & 0xff000000)
+                | ((x << 8) & 0x00ff0000)
+                | ((x >> 8) & 0x0000ff00)
+                | ((x >> 24) & 0x000000ff);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint RotL32(uint x, int r) => (((x) << (r)) | ((x) >> (32 - (r))));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ulong RotL64(ulong x, int r) => (((x) << (r)) | ((x) >> (64 - (r))));
 
@@ -702,9 +728,7 @@ namespace Unity.Collections
         {
             var input_lo = Read64LE(input);
             var input_hi = Read64LE(input + 8);
-            return Mul128Fold64(
-                input_lo ^ (Read64LE(secret + 0) + seed),
-                input_hi ^ (Read64LE(secret + 8) - seed));
+            return Mul128Fold64(input_lo ^ (Read64LE(secret + 0) + seed), input_hi ^ (Read64LE(secret + 8) - seed));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -753,7 +777,7 @@ namespace Unity.Collections
         {
             h64 ^= RotL64(h64, 49) ^ RotL64(h64, 24);
             h64 *= 0x9FB21C651E98DF25UL;
-            h64 ^= (h64 >> 35) + length ;
+            h64 ^= (h64 >> 35) + length;
             h64 *= 0x9FB21C651E98DF25UL;
             return XorShift64(h64, 28);
         }
@@ -761,7 +785,7 @@ namespace Unity.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe ulong Mix2Acc(ulong acc0, ulong acc1, byte* secret)
         {
-            return Mul128Fold64(acc0 ^ Read64LE(secret), acc1 ^ Read64LE(secret+8));
+            return Mul128Fold64(acc0 ^ Read64LE(secret), acc1 ^ Read64LE(secret + 8));
         }
 
         internal static unsafe ulong MergeAcc(ulong* acc, byte* secret, ulong start)
@@ -783,24 +807,42 @@ namespace Unity.Collections
 
         #region Default Implementation
 
-        private static unsafe void DefaultHashLongInternalLoop(ulong* acc, byte* input, byte* dest, long length, byte* secret, int isHash64)
+        private static unsafe void DefaultHashLongInternalLoop(
+            ulong* acc,
+            byte* input,
+            byte* dest,
+            long length,
+            byte* secret,
+            int isHash64
+        )
         {
             // Process packets of 512 bits
-            var nb_blocks = (length-1) / BLOCK_LEN;
+            var nb_blocks = (length - 1) / BLOCK_LEN;
             for (int n = 0; n < nb_blocks; n++)
             {
-                DefaultAccumulate(acc, input + n * BLOCK_LEN, dest == null ? null : dest + n * BLOCK_LEN, secret,
-                    NB_ROUNDS, isHash64);
+                DefaultAccumulate(
+                    acc,
+                    input + n * BLOCK_LEN,
+                    dest == null ? null : dest + n * BLOCK_LEN,
+                    secret,
+                    NB_ROUNDS,
+                    isHash64
+                );
                 DefaultScrambleAcc(acc, secret + SECRET_KEY_SIZE - STRIPE_LEN);
             }
 
-            var nbStripes = ((length-1) - (BLOCK_LEN * nb_blocks)) / STRIPE_LEN;
-            DefaultAccumulate(acc, input + nb_blocks * BLOCK_LEN, dest == null ? null : dest + nb_blocks * BLOCK_LEN,
-                secret, nbStripes, isHash64);
+            var nbStripes = ((length - 1) - (BLOCK_LEN * nb_blocks)) / STRIPE_LEN;
+            DefaultAccumulate(
+                acc,
+                input + nb_blocks * BLOCK_LEN,
+                dest == null ? null : dest + nb_blocks * BLOCK_LEN,
+                secret,
+                nbStripes,
+                isHash64
+            );
 
             var p = input + length - STRIPE_LEN;
-            DefaultAccumulate512(acc, p, null, secret + SECRET_KEY_SIZE - STRIPE_LEN - SECRET_LASTACC_START,
-                isHash64);
+            DefaultAccumulate512(acc, p, null, secret + SECRET_KEY_SIZE - STRIPE_LEN - SECRET_LASTACC_START, isHash64);
 
             if (dest != null)
             {
@@ -812,16 +854,34 @@ namespace Unity.Collections
             }
         }
 
-        internal static unsafe void DefaultAccumulate(ulong* acc, byte* input, byte* dest, byte* secret, long nbStripes, int isHash64)
+        internal static unsafe void DefaultAccumulate(
+            ulong* acc,
+            byte* input,
+            byte* dest,
+            byte* secret,
+            long nbStripes,
+            int isHash64
+        )
         {
             for (int n = 0; n < nbStripes; n++)
             {
-                DefaultAccumulate512(acc, input + n * STRIPE_LEN, dest == null ? null : dest + n * STRIPE_LEN,
-                    secret + n * SECRET_CONSUME_RATE, isHash64);
+                DefaultAccumulate512(
+                    acc,
+                    input + n * STRIPE_LEN,
+                    dest == null ? null : dest + n * STRIPE_LEN,
+                    secret + n * SECRET_CONSUME_RATE,
+                    isHash64
+                );
             }
         }
 
-        internal static unsafe void DefaultAccumulate512(ulong* acc, byte* input, byte* dest, byte* secret, int isHash64)
+        internal static unsafe void DefaultAccumulate512(
+            ulong* acc,
+            byte* input,
+            byte* dest,
+            byte* secret,
+            int isHash64
+        )
         {
             var count = ACC_NB;
             for (var i = 0; i < count; i++)
@@ -835,7 +895,7 @@ namespace Unity.Collections
                 }
 
                 acc[i ^ 1] += data_val;
-                acc[i] += Mul32To64((uint) (data_key & 0xFFFFFFFF), (uint) (data_key >> 32));
+                acc[i] += Mul32To64((uint)(data_key & 0xFFFFFFFF), (uint)(data_key >> 32));
             }
         }
 
@@ -860,19 +920,198 @@ namespace Unity.Collections
         // The default xxHash3 encoding key, other implementations of this algorithm should use the same key to produce identical hashes
         public static readonly byte[] kSecret =
         {
-            0xb8, 0xfe, 0x6c, 0x39, 0x23, 0xa4, 0x4b, 0xbe, 0x7c, 0x01, 0x81, 0x2c, 0xf7, 0x21, 0xad, 0x1c,
-            0xde, 0xd4, 0x6d, 0xe9, 0x83, 0x90, 0x97, 0xdb, 0x72, 0x40, 0xa4, 0xa4, 0xb7, 0xb3, 0x67, 0x1f,
-            0xcb, 0x79, 0xe6, 0x4e, 0xcc, 0xc0, 0xe5, 0x78, 0x82, 0x5a, 0xd0, 0x7d, 0xcc, 0xff, 0x72, 0x21,
-            0xb8, 0x08, 0x46, 0x74, 0xf7, 0x43, 0x24, 0x8e, 0xe0, 0x35, 0x90, 0xe6, 0x81, 0x3a, 0x26, 0x4c,
-            0x3c, 0x28, 0x52, 0xbb, 0x91, 0xc3, 0x00, 0xcb, 0x88, 0xd0, 0x65, 0x8b, 0x1b, 0x53, 0x2e, 0xa3,
-            0x71, 0x64, 0x48, 0x97, 0xa2, 0x0d, 0xf9, 0x4e, 0x38, 0x19, 0xef, 0x46, 0xa9, 0xde, 0xac, 0xd8,
-            0xa8, 0xfa, 0x76, 0x3f, 0xe3, 0x9c, 0x34, 0x3f, 0xf9, 0xdc, 0xbb, 0xc7, 0xc7, 0x0b, 0x4f, 0x1d,
-            0x8a, 0x51, 0xe0, 0x4b, 0xcd, 0xb4, 0x59, 0x31, 0xc8, 0x9f, 0x7e, 0xc9, 0xd9, 0x78, 0x73, 0x64,
-
-            0xea, 0xc5, 0xac, 0x83, 0x34, 0xd3, 0xeb, 0xc3, 0xc5, 0x81, 0xa0, 0xff, 0xfa, 0x13, 0x63, 0xeb,
-            0x17, 0x0d, 0xdd, 0x51, 0xb7, 0xf0, 0xda, 0x49, 0xd3, 0x16, 0x55, 0x26, 0x29, 0xd4, 0x68, 0x9e,
-            0x2b, 0x16, 0xbe, 0x58, 0x7d, 0x47, 0xa1, 0xfc, 0x8f, 0xf8, 0xb8, 0xd1, 0x7a, 0xd0, 0x31, 0xce,
-            0x45, 0xcb, 0x3a, 0x8f, 0x95, 0x16, 0x04, 0x28, 0xaf, 0xd7, 0xfb, 0xca, 0xbb, 0x4b, 0x40, 0x7e,
+            0xb8,
+            0xfe,
+            0x6c,
+            0x39,
+            0x23,
+            0xa4,
+            0x4b,
+            0xbe,
+            0x7c,
+            0x01,
+            0x81,
+            0x2c,
+            0xf7,
+            0x21,
+            0xad,
+            0x1c,
+            0xde,
+            0xd4,
+            0x6d,
+            0xe9,
+            0x83,
+            0x90,
+            0x97,
+            0xdb,
+            0x72,
+            0x40,
+            0xa4,
+            0xa4,
+            0xb7,
+            0xb3,
+            0x67,
+            0x1f,
+            0xcb,
+            0x79,
+            0xe6,
+            0x4e,
+            0xcc,
+            0xc0,
+            0xe5,
+            0x78,
+            0x82,
+            0x5a,
+            0xd0,
+            0x7d,
+            0xcc,
+            0xff,
+            0x72,
+            0x21,
+            0xb8,
+            0x08,
+            0x46,
+            0x74,
+            0xf7,
+            0x43,
+            0x24,
+            0x8e,
+            0xe0,
+            0x35,
+            0x90,
+            0xe6,
+            0x81,
+            0x3a,
+            0x26,
+            0x4c,
+            0x3c,
+            0x28,
+            0x52,
+            0xbb,
+            0x91,
+            0xc3,
+            0x00,
+            0xcb,
+            0x88,
+            0xd0,
+            0x65,
+            0x8b,
+            0x1b,
+            0x53,
+            0x2e,
+            0xa3,
+            0x71,
+            0x64,
+            0x48,
+            0x97,
+            0xa2,
+            0x0d,
+            0xf9,
+            0x4e,
+            0x38,
+            0x19,
+            0xef,
+            0x46,
+            0xa9,
+            0xde,
+            0xac,
+            0xd8,
+            0xa8,
+            0xfa,
+            0x76,
+            0x3f,
+            0xe3,
+            0x9c,
+            0x34,
+            0x3f,
+            0xf9,
+            0xdc,
+            0xbb,
+            0xc7,
+            0xc7,
+            0x0b,
+            0x4f,
+            0x1d,
+            0x8a,
+            0x51,
+            0xe0,
+            0x4b,
+            0xcd,
+            0xb4,
+            0x59,
+            0x31,
+            0xc8,
+            0x9f,
+            0x7e,
+            0xc9,
+            0xd9,
+            0x78,
+            0x73,
+            0x64,
+            0xea,
+            0xc5,
+            0xac,
+            0x83,
+            0x34,
+            0xd3,
+            0xeb,
+            0xc3,
+            0xc5,
+            0x81,
+            0xa0,
+            0xff,
+            0xfa,
+            0x13,
+            0x63,
+            0xeb,
+            0x17,
+            0x0d,
+            0xdd,
+            0x51,
+            0xb7,
+            0xf0,
+            0xda,
+            0x49,
+            0xd3,
+            0x16,
+            0x55,
+            0x26,
+            0x29,
+            0xd4,
+            0x68,
+            0x9e,
+            0x2b,
+            0x16,
+            0xbe,
+            0x58,
+            0x7d,
+            0x47,
+            0xa1,
+            0xfc,
+            0x8f,
+            0xf8,
+            0xb8,
+            0xd1,
+            0x7a,
+            0xd0,
+            0x31,
+            0xce,
+            0x45,
+            0xcb,
+            0x3a,
+            0x8f,
+            0x95,
+            0x16,
+            0x04,
+            0x28,
+            0xaf,
+            0xd7,
+            0xfb,
+            0xca,
+            0xbb,
+            0x4b,
+            0x40,
+            0x7e,
         };
     }
 

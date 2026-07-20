@@ -58,6 +58,7 @@ namespace Unity.Entities
             Value = value;
             Enabled = enabled;
         }
+
         public override string ToString()
         {
             var enabledStr = Enabled ? "Enabled" : "Disabled";
@@ -79,12 +80,13 @@ namespace Unity.Entities
     sealed class EntityManagerDebugView
     {
         private EntityManager m_target;
+
         public EntityManagerDebugView(EntityManager target)
         {
             m_target = target;
         }
 
-        unsafe public Entity_[] Entities
+        public unsafe Entity_[] Entities
         {
             get
             {
@@ -141,14 +143,22 @@ namespace Unity.Entities
             get
             {
                 var entities = Entities;
-                return CountAndCapacityViewStr(entities.Length, EntityComponentStore.k_MaximumEntitiesPerWorld, "World");
+                return CountAndCapacityViewStr(
+                    entities.Length,
+                    EntityComponentStore.k_MaximumEntitiesPerWorld,
+                    "World"
+                );
             }
         }
         public string NumEntityNames
         {
             get
             {
-                return CountAndCapacityViewStr(EntityNameStorage.s_State.Data.entries, EntityNameStorage.kMaxEntries, "Global");
+                return CountAndCapacityViewStr(
+                    EntityNameStorage.s_State.Data.entries,
+                    EntityNameStorage.kMaxEntries,
+                    "Global"
+                );
             }
         }
         public World World => m_target.World;
@@ -157,6 +167,7 @@ namespace Unity.Entities
     sealed class WorldDebugView
     {
         private World m_world;
+
         public WorldDebugView(World world)
         {
             m_world = world;
@@ -169,27 +180,30 @@ namespace Unity.Entities
                 var result = new List<SystemDebugView>();
                 using var systems = m_world.Unmanaged.GetAllSystems(Allocator.TempJob);
                 for (int i = 0; i < systems.Length; i++)
-                   result.Add(new SystemDebugView(systems[i]));
+                    result.Add(new SystemDebugView(systems[i]));
 
                 return result;
             }
         }
 
-        public ComponentSystemBase InitializationSystemGroup => m_world.GetExistingSystemManaged<InitializationSystemGroup>();
+        public ComponentSystemBase InitializationSystemGroup =>
+            m_world.GetExistingSystemManaged<InitializationSystemGroup>();
         public ComponentSystemBase SimulationSystemGroup => m_world.GetExistingSystemManaged<SimulationSystemGroup>();
-        public ComponentSystemBase PresentationSystemGroup => m_world.GetExistingSystemManaged<PresentationSystemGroup>();
+        public ComponentSystemBase PresentationSystemGroup =>
+            m_world.GetExistingSystemManaged<PresentationSystemGroup>();
         public EntityManager EntityManager => m_world.EntityManager;
     }
+
     sealed class ArchetypeChunkDebugView
     {
         private ArchetypeChunk m_ArchetypeChunk;
+
         public ArchetypeChunkDebugView(ArchetypeChunk ArchetypeChunk)
         {
             m_ArchetypeChunk = ArchetypeChunk;
         }
 
         public unsafe EntityArchetype Archetype => new EntityArchetype(m_ArchetypeChunk.Archetype.Archetype);
-
 
         public unsafe Entity_[] Entities
         {
@@ -202,7 +216,8 @@ namespace Unity.Entities
                 var length = m_ArchetypeChunk.Count;
                 var result = new Entity_[length];
 
-                var entityPtr = (Entity*) ChunkIterationUtility.GetChunkComponentDataROPtr(m_ArchetypeChunk.Archetype.Archetype, chunk, 0);
+                var entityPtr = (Entity*)
+                    ChunkIterationUtility.GetChunkComponentDataROPtr(m_ArchetypeChunk.Archetype.Archetype, chunk, 0);
                 for (int i = 0; i < length; i++)
                     result[i] = new Entity_(m_ArchetypeChunk.m_EntityComponentStore, entityPtr[i], false);
 
@@ -226,7 +241,9 @@ namespace Unity.Entities
                 {
                     var componentType = archetype->Types[i];
                     var sharedComponentValues = archetype->Chunks.GetSharedComponentValues(chunk.ListIndex);
-                    result[sharedIter] = new DebuggerDataAccess(m_ArchetypeChunk.m_EntityComponentStore).GetSharedComponentDataBoxed(sharedComponentValues[sharedIter], componentType.TypeIndex);
+                    result[sharedIter] = new DebuggerDataAccess(
+                        m_ArchetypeChunk.m_EntityComponentStore
+                    ).GetSharedComponentDataBoxed(sharedComponentValues[sharedIter], componentType.TypeIndex);
                     sharedIter++;
                 }
                 return result;
@@ -241,10 +258,13 @@ namespace Unity.Entities
                 if (chunk == ChunkIndex.Null)
                     return Entity_.Null;
 
-                return new Entity_(m_ArchetypeChunk.m_EntityComponentStore, m_ArchetypeChunk.m_Chunk.MetaChunkEntity, false);
+                return new Entity_(
+                    m_ArchetypeChunk.m_EntityComponentStore,
+                    m_ArchetypeChunk.m_Chunk.MetaChunkEntity,
+                    false
+                );
             }
         }
-
 
         public unsafe ComponentType_[] ComponentTypes
         {
@@ -263,7 +283,10 @@ namespace Unity.Entities
                     result[i].Type = componentType;
                     result[i].Version = archetype->Chunks.GetChangeVersion(i, chunk.ListIndex);
                     result[i].IsEnableable = TypeManager.IsEnableable(componentType.TypeIndex);
-                    result[i].NumDisabledEntitiesInChunk = archetype->Chunks.GetChunkDisabledCountForType(memoryOrderIndexInArchetype, chunk.ListIndex);
+                    result[i].NumDisabledEntitiesInChunk = archetype->Chunks.GetChunkDisabledCountForType(
+                        memoryOrderIndexInArchetype,
+                        chunk.ListIndex
+                    );
                 }
 
                 return result;
@@ -286,9 +309,9 @@ namespace Unity.Entities
     struct ComponentType_
     {
         public ComponentType Type;
-        public uint          Version;
-        public bool          IsEnableable;
-        public int           NumDisabledEntitiesInChunk;
+        public uint Version;
+        public bool IsEnableable;
+        public int NumDisabledEntitiesInChunk;
 
         public override string ToString()
         {
@@ -302,10 +325,12 @@ namespace Unity.Entities
     sealed class ComponentTypeSetDebugView
     {
         private ComponentTypeSet m_ComponentTypeSet;
+
         public ComponentTypeSetDebugView(in ComponentTypeSet componentTypeSet)
         {
             m_ComponentTypeSet = componentTypeSet;
         }
+
         public unsafe ComponentType[] ComponentTypes
         {
             get
@@ -323,6 +348,7 @@ namespace Unity.Entities
     sealed class EntityArchetypeDebugView
     {
         private EntityArchetype m_EntityArchetype;
+
         public EntityArchetypeDebugView(EntityArchetype entityArchetype)
         {
             m_EntityArchetype = entityArchetype;
@@ -357,6 +383,7 @@ namespace Unity.Entities
                 return $"{AvgUtilization * 100}%";
             }
         }
+
         public unsafe ChunkReport ChunkUtilization
         {
             get
@@ -375,7 +402,7 @@ namespace Unity.Entities
                 var result = new ChunkReport
                 {
                     PerChunk = new List<float>(numChunks),
-                    WorstUtilization = archetype->Chunks[0].Count / chunkCapacity
+                    WorstUtilization = archetype->Chunks[0].Count / chunkCapacity,
                 };
 
                 for (var i = 0; i < numChunks; ++i)
@@ -454,7 +481,7 @@ namespace Unity.Entities
                 return result;
             }
         }
-        public unsafe Dictionary<TypeIndex,int> TypeMemoryOrderIndex
+        public unsafe Dictionary<TypeIndex, int> TypeMemoryOrderIndex
         {
             get
             {
@@ -542,7 +569,10 @@ namespace Unity.Entities
                     int valueIndex = impl->_Filter.Shared.SharedComponentIndex[i];
                     int indexInQuery = impl->_Filter.Shared.IndexInEntityQuery[i];
                     var typeIndex = impl->_QueryData->RequiredComponents[indexInQuery].TypeIndex;
-                    result[i] = new DebuggerDataAccess(impl->_Access->EntityComponentStore).GetSharedComponentDataBoxed(valueIndex, typeIndex);
+                    result[i] = new DebuggerDataAccess(impl->_Access->EntityComponentStore).GetSharedComponentDataBoxed(
+                        valueIndex,
+                        typeIndex
+                    );
                 }
                 return result;
             }
@@ -557,7 +587,8 @@ namespace Unity.Entities
     class SystemDebugView
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        readonly World               m_World;
+        readonly World m_World;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly SystemHandle m_unmanagedSystem;
 
@@ -573,7 +604,7 @@ namespace Unity.Entities
             }
         }
 
-        unsafe public SystemDebugView(ComponentSystemBase mManagedSystem)
+        public unsafe SystemDebugView(ComponentSystemBase mManagedSystem)
         {
             if (mManagedSystem != null && mManagedSystem.World != null && mManagedSystem.World.IsCreated)
             {
@@ -588,7 +619,7 @@ namespace Unity.Entities
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        unsafe public object UserData
+        public unsafe object UserData
         {
             get
             {
@@ -604,7 +635,11 @@ namespace Unity.Entities
                         return null;
 
                     var gcHandle = GCHandle.Alloc(obj, GCHandleType.Pinned);
-                    UnsafeUtility.MemCpy((void*)gcHandle.AddrOfPinnedObject(), state->m_SystemPtr, Marshal.SizeOf(type));
+                    UnsafeUtility.MemCpy(
+                        (void*)gcHandle.AddrOfPinnedObject(),
+                        state->m_SystemPtr,
+                        Marshal.SizeOf(type)
+                    );
                     gcHandle.Free();
 
                     return obj;
@@ -616,7 +651,7 @@ namespace Unity.Entities
             }
         }
 
-        unsafe public SystemState_ SystemState
+        public unsafe SystemState_ SystemState
         {
             get
             {
@@ -670,11 +705,15 @@ namespace Unity.Entities
                     var updateIndex = m_componentSystemGroup.m_MasterUpdateList[i];
                     if (updateIndex.IsManaged)
                     {
-                        systems[i] = new SystemDebugView(m_componentSystemGroup.m_managedSystemsToUpdate[updateIndex.Index]);
+                        systems[i] = new SystemDebugView(
+                            m_componentSystemGroup.m_managedSystemsToUpdate[updateIndex.Index]
+                        );
                     }
                     else
                     {
-                        systems[i] = new SystemDebugView(m_componentSystemGroup.m_UnmanagedSystemsToUpdate[updateIndex.Index]);
+                        systems[i] = new SystemDebugView(
+                            m_componentSystemGroup.m_UnmanagedSystemsToUpdate[updateIndex.Index]
+                        );
                     }
                 }
 
@@ -691,8 +730,9 @@ namespace Unity.Entities
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         SystemHandle _SystemHandle;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        World               _World;
+        World _World;
 
         public SystemState_(ref SystemState systemState)
         {
@@ -750,7 +790,7 @@ namespace Unity.Entities
             {
                 var unsafeQueries = Resolve()->EntityQueries;
                 var result = new List<EntityQuery>();
-                foreach(var query in unsafeQueries)
+                foreach (var query in unsafeQueries)
                     result.Add(query);
 
                 return result;
@@ -779,7 +819,6 @@ namespace Unity.Entities
                 return result;
             }
         }
-
 
         public override string ToString()
         {

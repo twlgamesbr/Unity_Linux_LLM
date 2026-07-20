@@ -7,6 +7,7 @@ namespace Unity.Entities
     internal partial class RemoveEntityInBakeDestroyEntitiesSystem : SystemBase
     {
         EntityQuery _DestroyRemoveEntityInBake;
+
         protected override void OnCreate()
         {
             _DestroyRemoveEntityInBake = new EntityQueryBuilder(Allocator.Temp)

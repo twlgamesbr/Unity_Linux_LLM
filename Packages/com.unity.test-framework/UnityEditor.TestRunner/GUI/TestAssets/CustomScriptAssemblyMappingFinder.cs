@@ -31,7 +31,9 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
         {
             try
             {
-                var customScriptAssembly = EditorCompilationInterface.Instance.FindCustomScriptAssemblyFromScriptPath(scriptPath);
+                var customScriptAssembly = EditorCompilationInterface.Instance.FindCustomScriptAssemblyFromScriptPath(
+                    scriptPath
+                );
                 return new CustomScriptAssemblyWrapper(customScriptAssembly);
             }
             catch (Exception)
@@ -54,7 +56,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
             /// <exception cref="ArgumentNullException">The provided <paramref name="assembly" /> argument is null.</exception>
             internal CustomScriptAssemblyWrapper(CustomScriptAssembly assembly)
             {
-                targetAssembly = assembly
+                targetAssembly =
+                    assembly
                     ?? throw new ArgumentNullException(nameof(assembly), "The provided assembly must not be null.");
             }
 
@@ -62,7 +65,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
             public bool HasPrecompiledReference(string libraryFilename)
             {
                 var precompiledReferences = targetAssembly.PrecompiledReferences;
-                var libraryReferenceExists = precompiledReferences != null
+                var libraryReferenceExists =
+                    precompiledReferences != null
                     && precompiledReferences.Any(r => Path.GetFileName(r) == libraryFilename);
                 return libraryReferenceExists;
             }

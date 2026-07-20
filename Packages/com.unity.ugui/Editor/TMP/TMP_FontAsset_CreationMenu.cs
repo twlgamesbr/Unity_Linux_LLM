@@ -1,12 +1,10 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
-using UnityEditor;
-
 using Object = UnityEngine.Object;
-
 
 namespace TMPro
 {
@@ -38,7 +36,9 @@ namespace TMPro
             string folderPath = Path.GetDirectoryName(sourceFontFilePath);
             string assetName = Path.GetFileNameWithoutExtension(sourceFontFilePath);
 
-            string newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(folderPath + "/" + assetName + " - Variant.asset");
+            string newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(
+                folderPath + "/" + assetName + " - Variant.asset"
+            );
 
             // Set Texture and Material reference to the source font asset.
             TMP_FontAsset fontAsset = ScriptableObject.Instantiate<TMP_FontAsset>(sourceFontAsset);
@@ -69,13 +69,13 @@ namespace TMPro
             CreateFontAsset(GlyphRenderMode.SMOOTH);
         }
 
-        #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+#if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
         [MenuItem("Assets/Create/TextMeshPro/Font Asset/Color", false, 110)]
         static void CreateFontAssetColor()
         {
             CreateFontAsset(GlyphRenderMode.COLOR);
         }
-        #endif
+#endif
 
         static void CreateFontAsset(GlyphRenderMode renderMode)
         {
@@ -103,7 +103,12 @@ namespace TMPro
                 // Make sure the selection is a font file
                 if (target == null || target.GetType() != typeof(Font))
                 {
-                    Debug.LogWarning("Selected Object [" + target.name + "] is not a Font file. A Font file must be selected in order to create a Font Asset.", target);
+                    Debug.LogWarning(
+                        "Selected Object ["
+                            + target.name
+                            + "] is not a Font file. A Font file must be selected in order to create a Font Asset.",
+                        target
+                    );
                     continue;
                 }
 
@@ -125,16 +130,22 @@ namespace TMPro
             switch (renderMode)
             {
                 case GlyphRenderMode.SMOOTH:
-                    newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(folderPath + "/" + assetName + " Bitmap.asset");
+                    newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(
+                        folderPath + "/" + assetName + " Bitmap.asset"
+                    );
                     break;
-                #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+#if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
                 case GlyphRenderMode.COLOR:
-                    newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(folderPath + "/" + assetName + " Color.asset");
+                    newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(
+                        folderPath + "/" + assetName + " Color.asset"
+                    );
                     break;
-                #endif
+#endif
                 case GlyphRenderMode.SDFAA:
                 default:
-                    newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(folderPath + "/" + assetName + " SDF.asset");
+                    newAssetFilePathWithName = AssetDatabase.GenerateUniqueAssetPath(
+                        folderPath + "/" + assetName + " SDF.asset"
+                    );
                     break;
             }
 
@@ -144,7 +155,12 @@ namespace TMPro
             // Load Font Face
             if (FontEngine.LoadFontFace(font, 90) != FontEngineError.Success)
             {
-                Debug.LogWarning("Unable to load font face for [" + font.name + "]. Make sure \"Include Font Data\" is enabled in the Font Import Settings.", font);
+                Debug.LogWarning(
+                    "Unable to load font face for ["
+                        + font.name
+                        + "]. Make sure \"Include Font Data\" is enabled in the Font Import Settings.",
+                    font
+                );
                 return;
             }
 
@@ -186,7 +202,7 @@ namespace TMPro
                     packingModifier = 0;
                     mat = new Material(shader);
                     break;
-                #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+#if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
                 case GlyphRenderMode.COLOR:
                     fontAsset.atlasRenderMode = GlyphRenderMode.COLOR;
                     texture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
@@ -194,7 +210,7 @@ namespace TMPro
                     packingModifier = 0;
                     mat = new Material(shader);
                     break;
-                #endif
+#endif
                 case GlyphRenderMode.SDFAA:
                 default:
                     fontAsset.atlasRenderMode = GlyphRenderMode.SDFAA;
@@ -216,7 +232,10 @@ namespace TMPro
             fontAsset.atlasTextures[0] = texture;
             AssetDatabase.AddObjectToAsset(texture, fontAsset);
 
-            fontAsset.freeGlyphRects = new List<GlyphRect>() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
+            fontAsset.freeGlyphRects = new List<GlyphRect>()
+            {
+                new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier),
+            };
             fontAsset.usedGlyphRects = new List<GlyphRect>();
 
             mat.SetTexture(ShaderUtilities.ID_MainTex, texture);
@@ -227,7 +246,18 @@ namespace TMPro
             AssetDatabase.AddObjectToAsset(mat, fontAsset);
 
             // Add Font Asset Creation Settings
-            fontAsset.creationSettings = new FontAssetCreationSettings(fontAsset.m_SourceFontFileGUID, (int)fontAsset.faceInfo.pointSize, 0, atlasPadding, 0, 1024, 1024, 7, string.Empty, (int)renderMode);
+            fontAsset.creationSettings = new FontAssetCreationSettings(
+                fontAsset.m_SourceFontFileGUID,
+                (int)fontAsset.faceInfo.pointSize,
+                0,
+                atlasPadding,
+                0,
+                1024,
+                1024,
+                7,
+                string.Empty,
+                (int)renderMode
+            );
 
             // Not sure if this is still necessary in newer versions of Unity.
             //EditorUtility.SetDirty(fontAsset);

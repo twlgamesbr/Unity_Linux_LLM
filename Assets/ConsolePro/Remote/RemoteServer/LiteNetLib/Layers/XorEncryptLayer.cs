@@ -8,17 +8,17 @@ namespace FlyingWormConsole3.LiteNetLib.Layers
     {
         private byte[] _byteKey;
 
-        public XorEncryptLayer() : base(0)
-        {
+        public XorEncryptLayer()
+            : base(0) { }
 
-        }
-
-        public XorEncryptLayer(byte[] key) : this()
+        public XorEncryptLayer(byte[] key)
+            : this()
         {
             SetKey(key);
         }
 
-        public XorEncryptLayer(string key) : this()
+        public XorEncryptLayer(string key)
+            : this()
         {
             SetKey(key);
         }
@@ -45,7 +45,12 @@ namespace FlyingWormConsole3.LiteNetLib.Layers
             }
         }
 
-        public override void ProcessOutBoundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int offset, ref int length)
+        public override void ProcessOutBoundPacket(
+            ref IPEndPoint endPoint,
+            ref byte[] data,
+            ref int offset,
+            ref int length
+        )
         {
             if (_byteKey == null)
                 return;

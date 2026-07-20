@@ -8,14 +8,11 @@ namespace Unity.Entities.UI
     {
         ContentStatus m_State = ContentStatus.ContentNotReady;
 
-        internal ContentStatus MoveNext()
-            => m_State = GetStatus();
+        internal ContentStatus MoveNext() => m_State = GetStatus();
 
-        internal bool IsValid()
-            => m_State != ContentStatus.ContentUnavailable;
+        internal bool IsValid() => m_State != ContentStatus.ContentUnavailable;
 
-        internal bool IsReady()
-            => m_State == ContentStatus.ContentReady;
+        internal bool IsReady() => m_State == ContentStatus.ContentReady;
 
         /// <summary>
         /// Implement this property to assign the name to display in the title bar of the owning editor window or as the
@@ -39,8 +36,6 @@ namespace Unity.Entities.UI
         /// Override this method to be notified when the UI detects a change.
         /// </summary>
         /// <param name="context">Context object allowing to retrieve information about the change.</param>
-        protected internal virtual void OnContentChanged(ChangeContext context)
-        {
-        }
+        protected internal virtual void OnContentChanged(ChangeContext context) { }
     }
 }

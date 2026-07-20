@@ -62,7 +62,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
             int packetDelayMs = 0,
             int packetJitterMs = 0,
             int packetLossInterval = 0,
-            int packetLossPercent = 0)
+            int packetLossPercent = 0
+        )
         {
             var configuration = new NetworkSimulatorPreset
             {
@@ -110,7 +111,14 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, Description, PacketDelayMs, PacketJitterMs, PacketLossInterval, PacketLossPercent);
+            return HashCode.Combine(
+                Name,
+                Description,
+                PacketDelayMs,
+                PacketJitterMs,
+                PacketLossInterval,
+                PacketLossPercent
+            );
         }
 
         /// <inheritdoc />

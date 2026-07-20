@@ -4,7 +4,7 @@ using System.Collections;
 namespace UnityEngine.UIElements.TestFramework
 {
     /// <summary>
-	/// Test fixture base class that creates a runtime panel.
+    /// Test fixture base class that creates a runtime panel.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -102,7 +102,9 @@ namespace UnityEngine.UIElements.TestFramework
 
             if (m_PanelSettings == null)
             {
-                throw new InvalidOperationException("The provided UIDocument does not have a PanelSettings assigned. Please assign a PanelSettings to the UIDocument before using it in tests.");
+                throw new InvalidOperationException(
+                    "The provided UIDocument does not have a PanelSettings assigned. Please assign a PanelSettings to the UIDocument before using it in tests."
+                );
             }
 
             m_GameObject = doc.gameObject;
@@ -131,7 +133,9 @@ namespace UnityEngine.UIElements.TestFramework
 
             if (m_PanelSettings == null)
             {
-                throw new InvalidOperationException("The provided PanelRenderer does not have a PanelSettings assigned. Please assign a PanelSettings to the PanelRenderer before using it in tests.");
+                throw new InvalidOperationException(
+                    "The provided PanelRenderer does not have a PanelSettings assigned. Please assign a PanelSettings to the PanelRenderer before using it in tests."
+                );
             }
 
             m_PanelRenderer = renderer;
@@ -255,10 +259,10 @@ namespace UnityEngine.UIElements.TestFramework
             base.FixtureTearDown();
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         void DisplayNotification(string msg)
         {
-            var mainWindow =  UnityEditor.EditorWindow.focusedWindow;
+            var mainWindow = UnityEditor.EditorWindow.focusedWindow;
             if (mainWindow != null)
             {
                 mainWindow.ShowNotification(new GUIContent(msg));
@@ -268,7 +272,7 @@ namespace UnityEngine.UIElements.TestFramework
                 Debug.Log(msg);
             }
         }
-        #endif
+#endif
 
         /// <inheritdoc cref="AbstractUITestFixture.FixtureUnityTearDown()"/>
         public override IEnumerator FixtureUnityTearDown()
@@ -352,7 +356,9 @@ namespace UnityEngine.UIElements.TestFramework
 
                 if (defaultTheme == null)
                 {
-                    throw new Exception($"No ThemeStyleSheet found in the project. Please load one and assign it to {nameof(AbstractUITestFixture)}.{nameof(themeStyleSheet)}");
+                    throw new Exception(
+                        $"No ThemeStyleSheet found in the project. Please load one and assign it to {nameof(AbstractUITestFixture)}.{nameof(themeStyleSheet)}"
+                    );
                 }
 
                 theme = defaultTheme;

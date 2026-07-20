@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using UnityEditor.Build.Content;
 
@@ -21,15 +21,12 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             void CustomDumper(DumpToText dumpToText, object value);
         }
 
-
         Dictionary<Type, ICustomDumper> m_CustomDumpers = new Dictionary<Type, ICustomDumper>();
 
         StringBuilder m_StringBuilder = new StringBuilder();
         string m_Indent = "";
 
-        internal DumpToText()
-        {
-        }
+        internal DumpToText() { }
 
         internal DumpToText(params ICustomDumper[] customDumpers)
         {
@@ -150,7 +147,11 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
 
             Indent();
 
-            foreach (FieldInfo field in thingType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+            foreach (
+                FieldInfo field in thingType.GetFields(
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                )
+            )
             {
                 if (typeof(Array).IsAssignableFrom(field.FieldType))
                 {
@@ -159,7 +160,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                     if (array != null)
                     {
                         if (array.Rank != 1)
-                            throw new InvalidDataException($"Arrays of ranks other than 1 are not currently supported - array '{field.Name}' is rank {array.Rank})");
+                            throw new InvalidDataException(
+                                $"Arrays of ranks other than 1 are not currently supported - array '{field.Name}' is rank {array.Rank})"
+                            );
                         Type elementType = field.FieldType.GetElementType();
                         Add(field.FieldType.Name, field.Name, $"{DescribeType(elementType)}[{array.Length}]");
                         string name = SanitiseFieldName(field.Name);
@@ -191,7 +194,9 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                     else
                         Add(field.FieldType.Name, field.Name, "null (array)");
                 }
-                else if (field.FieldType.IsGenericType && (field.FieldType.GetGenericTypeDefinition() == typeof(List<>)))
+                else if (
+                    field.FieldType.IsGenericType && (field.FieldType.GetGenericTypeDefinition() == typeof(List<>))
+                )
                 {
                     // A List<>
                     System.Collections.IList list = field.GetValue(thingToDump) as System.Collections.IList;
@@ -213,7 +218,11 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                 }
                 else if (field.FieldType.IsEnum)
                 {
-                    Add("enum " + field.FieldType.Name, SanitiseFieldName(field.Name), Enum.GetName(field.FieldType, field.GetValue(thingToDump)));
+                    Add(
+                        "enum " + field.FieldType.Name,
+                        SanitiseFieldName(field.Name),
+                        Enum.GetName(field.FieldType, field.GetValue(thingToDump))
+                    );
                 }
                 else if (field.FieldType == typeof(String))
                 {
@@ -225,18 +234,28 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
                 }
                 else if (field.FieldType == typeof(RuntimeTypeHandle))
                 {
-                    Add("RuntimeTypeHandle", field.Name, Type.GetTypeFromHandle((RuntimeTypeHandle)field.GetValue(thingToDump)).AssemblyQualifiedName);
+                    Add(
+                        "RuntimeTypeHandle",
+                        field.Name,
+                        Type.GetTypeFromHandle((RuntimeTypeHandle)field.GetValue(thingToDump)).AssemblyQualifiedName
+                    );
                 }
                 else if (field.FieldType.IsClass)
                 {
                     if (String.Equals(field.FieldType.Name, "MonoCMethod")) // Don't recurse into 'MonoCMethod' as it can end up in a loop
                         Add("class " + field.FieldType.Name, SanitiseFieldName(field.Name));
                     else
-                        Dump("class " + field.FieldType.Name + " " + SanitiseFieldName(field.Name), field.GetValue(thingToDump));
+                        Dump(
+                            "class " + field.FieldType.Name + " " + SanitiseFieldName(field.Name),
+                            field.GetValue(thingToDump)
+                        );
                 }
                 else if (field.FieldType.IsValueType && (!field.FieldType.IsPrimitive))
                 {
-                    Dump("struct " + field.FieldType.Name + " " + SanitiseFieldName(field.Name), field.GetValue(thingToDump));
+                    Dump(
+                        "struct " + field.FieldType.Name + " " + SanitiseFieldName(field.Name),
+                        field.GetValue(thingToDump)
+                    );
                 }
                 else
                     Add(field.FieldType.Name, SanitiseFieldName(field.Name), field.GetValue(thingToDump).ToString());
@@ -287,9 +306,17 @@ namespace UnityEditor.Build.Pipeline.Utilities.USerialize
             dumpToText.Indent();
             if (objectIdentifiers != null)
             {
-                dumpToText.Add("ObjectIdentifier[]", "objectIdentifiers", $"ObjectIdentifier[{objectIdentifiers.Length}]");
+                dumpToText.Add(
+                    "ObjectIdentifier[]",
+                    "objectIdentifiers",
+                    $"ObjectIdentifier[{objectIdentifiers.Length}]"
+                );
                 dumpToText.Indent();
-                for (int objectIdentifierIndex = 0; objectIdentifierIndex < objectIdentifiers.Length; objectIdentifierIndex++)
+                for (
+                    int objectIdentifierIndex = 0;
+                    objectIdentifierIndex < objectIdentifiers.Length;
+                    objectIdentifierIndex++
+                )
                 {
                     dumpToText.Add("ObjectIdentifier", $"[{objectIdentifierIndex}]");
                     dumpToText.Indent();

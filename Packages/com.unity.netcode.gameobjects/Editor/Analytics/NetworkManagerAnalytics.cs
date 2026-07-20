@@ -17,6 +17,7 @@ namespace Unity.Netcode.Editor
         public string NetworkTransport;
         public bool EnableSceneManagement;
         public int TickRate;
+
         public override string ToString()
         {
             var message = new StringBuilder();
@@ -35,11 +36,16 @@ namespace Unity.Netcode.Editor
         {
             Debug.Log($"{nameof(NetworkManagerAnalytics)} Session-{sessionNumber}:\n {ToString()}");
         }
+
         public bool Equals(NetworkManagerAnalytics other)
         {
-            return IsDistributedAuthority == other.IsDistributedAuthority && WasServer == other.WasServer && WasClient == other.WasClient
-                && UsedCMBService == other.UsedCMBService && IsUsingMultiplayerSDK == other.IsUsingMultiplayerSDK
-                && EnableSceneManagement == other.EnableSceneManagement && TickRate == other.TickRate
+            return IsDistributedAuthority == other.IsDistributedAuthority
+                && WasServer == other.WasServer
+                && WasClient == other.WasClient
+                && UsedCMBService == other.UsedCMBService
+                && IsUsingMultiplayerSDK == other.IsUsingMultiplayerSDK
+                && EnableSceneManagement == other.EnableSceneManagement
+                && TickRate == other.TickRate
                 && NetworkTransport.Equals(other.NetworkTransport);
         }
     }

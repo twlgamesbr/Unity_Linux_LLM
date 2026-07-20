@@ -250,8 +250,11 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="InputBinding.ToDisplayString(InputBinding.DisplayStringOptions,InputControl)"/>
         /// <seealso cref="InputControlPath.ToHumanReadableString(string,InputControlPath.HumanReadableStringOptions,InputControl)"/>
-        public static string GetBindingDisplayString(this InputAction action, InputBinding.DisplayStringOptions options = default,
-            string group = default)
+        public static string GetBindingDisplayString(
+            this InputAction action,
+            InputBinding.DisplayStringOptions options = default,
+            string group = default
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -308,8 +311,11 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="InputBinding.ToDisplayString(InputBinding.DisplayStringOptions,InputControl)"/>
         /// <seealso cref="InputControlPath.ToHumanReadableString(string,InputControlPath.HumanReadableStringOptions,InputControl)"/>
-        public static string GetBindingDisplayString(this InputAction action, InputBinding bindingMask,
-            InputBinding.DisplayStringOptions options = default)
+        public static string GetBindingDisplayString(
+            this InputAction action,
+            InputBinding bindingMask,
+            InputBinding.DisplayStringOptions options = default
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -365,7 +371,11 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="InputBinding.ToDisplayString(InputBinding.DisplayStringOptions,InputControl)"/>
         /// <seealso cref="InputControlPath.ToHumanReadableString(string,InputControlPath.HumanReadableStringOptions,InputControl)"/>
-        public static string GetBindingDisplayString(this InputAction action, int bindingIndex, InputBinding.DisplayStringOptions options = default)
+        public static string GetBindingDisplayString(
+            this InputAction action,
+            int bindingIndex,
+            InputBinding.DisplayStringOptions options = default
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -417,9 +427,13 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputBinding.ToDisplayString(InputBinding.DisplayStringOptions,InputControl)"/>
         /// <seealso cref="InputControlPath.ToHumanReadableString(string,InputControlPath.HumanReadableStringOptions,InputControl)"/>
         /// <seealso cref="InputActionRebindingExtensions.GetBindingIndex(InputAction,InputBinding)"/>
-        public static unsafe string GetBindingDisplayString(this InputAction action, int bindingIndex,
-            out string deviceLayoutName, out string controlPath,
-            InputBinding.DisplayStringOptions options = default)
+        public static unsafe string GetBindingDisplayString(
+            this InputAction action,
+            int bindingIndex,
+            out string deviceLayoutName,
+            out string controlPath,
+            InputBinding.DisplayStringOptions options = default
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -432,7 +446,8 @@ namespace UnityEngine.InputSystem
             if (bindingIndex < 0 || bindingIndex >= bindingCount)
                 throw new ArgumentOutOfRangeException(
                     $"Binding index {bindingIndex} is out of range on action '{action}' with {bindings.Count} bindings",
-                    nameof(bindingIndex));
+                    nameof(bindingIndex)
+                );
 
             // If the binding is a composite, compose a string using the display format string for
             // the composite.
@@ -467,7 +482,8 @@ namespace UnityEngine.InputSystem
                     return StringHelpers.Join("/", partStrings);
                 }
 
-                return StringHelpers.ExpandTemplateString(displayFormatString,
+                return StringHelpers.ExpandTemplateString(
+                    displayFormatString,
                     fragment =>
                     {
                         var result = string.Empty;
@@ -475,7 +491,13 @@ namespace UnityEngine.InputSystem
                         // Go through all parts and look for one with the given name.
                         for (var i = 0; i < partCount; ++i)
                         {
-                            if (!string.Equals(bindings[firstPartIndex + i].name, fragment, StringComparison.InvariantCultureIgnoreCase))
+                            if (
+                                !string.Equals(
+                                    bindings[firstPartIndex + i].name,
+                                    fragment,
+                                    StringComparison.InvariantCultureIgnoreCase
+                                )
+                            )
                                 continue;
 
                             if (!string.IsNullOrEmpty(result))
@@ -488,7 +510,8 @@ namespace UnityEngine.InputSystem
                             result = " ";
 
                         return result;
-                    });
+                    }
+                );
             }
 
             // See if the binding maps to controls.
@@ -498,9 +521,14 @@ namespace UnityEngine.InputSystem
             var actionState = actionMap.m_State;
             Debug.Assert(actionState != null, "Expecting action state to be in place at this point");
             var bindingIndexInMap = action.BindingIndexOnActionToBindingIndexOnMap(bindingIndex);
-            var bindingIndexInState = actionState.GetBindingIndexInState(actionMap.m_MapIndexInState, bindingIndexInMap);
-            Debug.Assert(bindingIndexInState >= 0 && bindingIndexInState < actionState.totalBindingCount,
-                "Computed binding index is out of range");
+            var bindingIndexInState = actionState.GetBindingIndexInState(
+                actionMap.m_MapIndexInState,
+                bindingIndexInMap
+            );
+            Debug.Assert(
+                bindingIndexInState >= 0 && bindingIndexInState < actionState.totalBindingCount,
+                "Computed binding index is out of range"
+            );
             var bindingStatePtr = &actionState.bindingStates[bindingIndexInState];
             if (bindingStatePtr->controlCount > 0)
             {
@@ -548,12 +576,25 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputBinding.effectivePath"/>
         /// <seealso cref="InputBinding.overridePath"/>
         /// <seealso cref="InputBinding.Matches"/>
-        public static void ApplyBindingOverride(this InputAction action, string newPath, string group = null, string path = null)
+        public static void ApplyBindingOverride(
+            this InputAction action,
+            string newPath,
+            string group = null,
+            string path = null
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            ApplyBindingOverride(action, new InputBinding {overridePath = newPath, groups = group, path = path});
+            ApplyBindingOverride(
+                action,
+                new InputBinding
+                {
+                    overridePath = newPath,
+                    groups = group,
+                    path = path,
+                }
+            );
         }
 
         /// <summary>
@@ -690,7 +731,7 @@ namespace UnityEngine.InputSystem
         {
             if (path == null)
                 throw new ArgumentException("Binding path cannot be null", nameof(path));
-            ApplyBindingOverride(action, bindingIndex, new InputBinding {overridePath = path});
+            ApplyBindingOverride(action, bindingIndex, new InputBinding { overridePath = path });
         }
 
         /// <summary>
@@ -750,15 +791,21 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="actionMap"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="bindingIndex"/> is not a valid index for
         /// <see cref="InputActionMap.bindings"/> of <paramref name="actionMap"/>.</exception>
-        public static void ApplyBindingOverride(this InputActionMap actionMap, int bindingIndex, InputBinding bindingOverride)
+        public static void ApplyBindingOverride(
+            this InputActionMap actionMap,
+            int bindingIndex,
+            InputBinding bindingOverride
+        )
         {
             if (actionMap == null)
                 throw new ArgumentNullException(nameof(actionMap));
 
             var bindingsCount = actionMap.m_Bindings?.Length ?? 0;
             if (bindingIndex < 0 || bindingIndex >= bindingsCount)
-                throw new ArgumentOutOfRangeException(nameof(bindingIndex),
-                    $"Cannot apply override to binding at index {bindingIndex} in map '{actionMap}' with only {bindingsCount} bindings");
+                throw new ArgumentOutOfRangeException(
+                    nameof(bindingIndex),
+                    $"Cannot apply override to binding at index {bindingIndex} in map '{actionMap}' with only {bindingsCount} bindings"
+                );
 
             actionMap.m_Bindings[bindingIndex].overridePath = bindingOverride.overridePath;
             actionMap.m_Bindings[bindingIndex].overrideInteractions = bindingOverride.overrideInteractions;
@@ -1110,7 +1157,7 @@ namespace UnityEngine.InputSystem
             if (overrides.Count == 0)
                 return string.Empty;
 
-            return JsonUtility.ToJson(new InputActionMap.BindingOverrideListJson {bindings = overrides});
+            return JsonUtility.ToJson(new InputActionMap.BindingOverrideListJson { bindings = overrides });
         }
 
         /// <summary>
@@ -1145,11 +1192,15 @@ namespace UnityEngine.InputSystem
             if (list.Count == 0)
                 return string.Empty;
 
-            return JsonUtility.ToJson(new InputActionMap.BindingOverrideListJson {bindings = list});
+            return JsonUtility.ToJson(new InputActionMap.BindingOverrideListJson { bindings = list });
         }
 
-        private static void AddBindingOverrideJsonTo(this IInputActionCollection2 actions, InputBinding binding,
-            List<InputActionMap.BindingOverrideJson> list, InputAction action = null)
+        private static void AddBindingOverrideJsonTo(
+            this IInputActionCollection2 actions,
+            InputBinding binding,
+            List<InputActionMap.BindingOverrideJson> list,
+            InputAction action = null
+        )
         {
             if (!binding.hasOverrides)
                 return;
@@ -1160,7 +1211,8 @@ namespace UnityEngine.InputSystem
             if (action == null)
                 action = actions.FindAction(binding.action);
 
-            string actionName = action != null && !action.isSingletonAction ? $"{action.actionMap.name}/{action.name}" : "";
+            string actionName =
+                action != null && !action.isSingletonAction ? $"{action.actionMap.name}/{action.name}" : "";
             var @override = InputActionMap.BindingOverrideJson.FromBinding(binding, actionName);
 
             list.Add(@override);
@@ -1198,7 +1250,11 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="actions"/> is <c>null</c>.</exception>
         /// <seealso cref="SaveBindingOverridesAsJson(IInputActionCollection2)"/>
         /// <seealso cref="InputBinding.overridePath"/>
-        public static void LoadBindingOverridesFromJson(this IInputActionCollection2 actions, string json, bool removeExisting = true)
+        public static void LoadBindingOverridesFromJson(
+            this IInputActionCollection2 actions,
+            string json,
+            bool removeExisting = true
+        )
         {
             if (actions == null)
                 throw new ArgumentNullException(nameof(actions));
@@ -1243,7 +1299,11 @@ namespace UnityEngine.InputSystem
         /// <exception cref="ArgumentNullException"><paramref name="actions"/> is <c>null</c>.</exception>
         /// <seealso cref="SaveBindingOverridesAsJson(IInputActionCollection2)"/>
         /// <seealso cref="InputBinding.overridePath"/>
-        public static void LoadBindingOverridesFromJson(this InputAction action, string json, bool removeExisting = true)
+        public static void LoadBindingOverridesFromJson(
+            this InputAction action,
+            string json,
+            bool removeExisting = true
+        )
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -1275,7 +1335,9 @@ namespace UnityEngine.InputSystem
                         continue;
                     }
                 }
-                Debug.LogWarning("Could not override binding as no existing binding was found with the id: " + entry.id);
+                Debug.LogWarning(
+                    "Could not override binding as no existing binding was found with the id: " + entry.id
+                );
             }
         }
 
@@ -1689,7 +1751,10 @@ namespace UnityEngine.InputSystem
                     // If it's a composite, this also changes the type of the control we're looking for.
                     if (binding.isPartOfComposite)
                     {
-                        var composite = m_ActionToRebind.ChangeBinding(bindingIndex).PreviousCompositeBinding().binding.GetNameOfComposite();
+                        var composite = m_ActionToRebind
+                            .ChangeBinding(bindingIndex)
+                            .PreviousCompositeBinding()
+                            .binding.GetNameOfComposite();
                         var partName = binding.name;
                         var expectedLayout = InputBindingComposite.GetExpectedControlLayoutName(composite, partName);
                         if (!string.IsNullOrEmpty(expectedLayout))
@@ -1703,8 +1768,9 @@ namespace UnityEngine.InputSystem
                     {
                         foreach (var group in binding.groups.Split(InputBinding.Separator))
                         {
-                            var controlSchemeIndex =
-                                asset.controlSchemes.IndexOf(x => group.Equals(x.bindingGroup, StringComparison.InvariantCultureIgnoreCase));
+                            var controlSchemeIndex = asset.controlSchemes.IndexOf(x =>
+                                group.Equals(x.bindingGroup, StringComparison.InvariantCultureIgnoreCase)
+                            );
                             if (controlSchemeIndex == -1)
                                 continue;
 
@@ -1745,7 +1811,7 @@ namespace UnityEngine.InputSystem
             /// <seealso cref="WithTargetBinding"/>
             public RebindingOperation WithBindingGroup(string group)
             {
-                return WithBindingMask(new InputBinding {groups = group});
+                return WithBindingMask(new InputBinding { groups = group });
             }
 
             /// <summary>
@@ -1818,8 +1884,7 @@ namespace UnityEngine.InputSystem
             {
                 ThrowIfRebindInProgress();
                 if (magnitude < 0)
-                    throw new ArgumentException($"Magnitude has to be positive but was {magnitude}",
-                        nameof(magnitude));
+                    throw new ArgumentException($"Magnitude has to be positive but was {magnitude}", nameof(magnitude));
                 m_MagnitudeThreshold = magnitude;
                 return this;
             }
@@ -2138,12 +2203,18 @@ namespace UnityEngine.InputSystem
                     return this;
 
                 // Make sure our configuration is sound.
-                if (m_ActionToRebind != null && m_ActionToRebind.bindings.Count == 0 && (m_Flags & Flags.AddNewBinding) == 0)
+                if (
+                    m_ActionToRebind != null
+                    && m_ActionToRebind.bindings.Count == 0
+                    && (m_Flags & Flags.AddNewBinding) == 0
+                )
                     throw new InvalidOperationException(
-                        $"Action '{action}' must have at least one existing binding or must be used with WithRebindingAddNewBinding()");
+                        $"Action '{action}' must have at least one existing binding or must be used with WithRebindingAddNewBinding()"
+                    );
                 if (m_ActionToRebind == null && m_OnApplyBinding == null)
                     throw new InvalidOperationException(
-                        "Must either have an action (call WithAction()) to apply binding to or have a custom callback to apply the binding (call OnApplyBinding())");
+                        "Must either have an action (call WithAction()) to apply binding to or have a custom callback to apply the binding (call OnApplyBinding())"
+                    );
 
                 m_StartTime = InputState.currentTime;
 
@@ -2339,11 +2410,17 @@ namespace UnityEngine.InputSystem
                 foreach (var control in eventPtr.EnumerateControls(controlEnumerationFlags, device))
                 {
                     var statePtr = control.GetStatePtrFromStateEventUnchecked(eventPtr, eventType);
-                    Debug.Assert(statePtr != null, "If EnumerateControls() returns a control, GetStatePtrFromStateEvent should not return null for it");
+                    Debug.Assert(
+                        statePtr != null,
+                        "If EnumerateControls() returns a control, GetStatePtrFromStateEvent should not return null for it"
+                    );
 
                     // If the control that cancels has been actuated, abort the operation now.
-                    if (!string.IsNullOrEmpty(m_CancelBinding) && InputControlPath.Matches(m_CancelBinding, control) &&
-                        control.HasValueChangeInState(statePtr))
+                    if (
+                        !string.IsNullOrEmpty(m_CancelBinding)
+                        && InputControlPath.Matches(m_CancelBinding, control)
+                        && control.HasValueChangeInState(statePtr)
+                    )
                     {
                         // ISXB-1595: Mark event as handled, otherwise the direct cancellation may affect actions bound
                         // to the same control. Since the cancellation is part of the rebind process it should be
@@ -2369,9 +2446,11 @@ namespace UnityEngine.InputSystem
 
                     // If we're expecting controls to be based on a specific layout, skip if control
                     // isn't based on that layout.
-                    if (!m_ExpectedLayout.IsEmpty() &&
-                        m_ExpectedLayout != control.m_Layout &&
-                        !InputControlLayout.s_Layouts.IsBasedOn(m_ExpectedLayout, control.m_Layout))
+                    if (
+                        !m_ExpectedLayout.IsEmpty()
+                        && m_ExpectedLayout != control.m_Layout
+                        && !InputControlLayout.s_Layouts.IsBasedOn(m_ExpectedLayout, control.m_Layout)
+                    )
                         continue;
 
                     ////REVIEW: shouldn't we generally require any already actuated control to go back to 0 actuation before considering it for a rebind?
@@ -2547,8 +2626,7 @@ namespace UnityEngine.InputSystem
             {
                 // If we don't have a match yet but we have a timeout and have expired it,
                 // cancel the operation.
-                if (m_LastMatchTime < 0 && m_Timeout > 0 &&
-                    InputState.currentTime - m_StartTime > m_Timeout)
+                if (m_LastMatchTime < 0 && m_Timeout > 0 && InputState.currentTime - m_StartTime > m_Timeout)
                 {
                     Cancel();
                     return;
@@ -2610,7 +2688,8 @@ namespace UnityEngine.InputSystem
                             {
                                 if (m_TargetBindingIndex >= m_ActionToRebind.bindings.Count)
                                     throw new InvalidOperationException(
-                                        $"Target binding index {m_TargetBindingIndex} out of range for action '{m_ActionToRebind}' with {m_ActionToRebind.bindings.Count} bindings");
+                                        $"Target binding index {m_TargetBindingIndex} out of range for action '{m_ActionToRebind}' with {m_ActionToRebind.bindings.Count} bindings"
+                                    );
 
                                 m_ActionToRebind.ApplyBindingOverride(m_TargetBindingIndex, path);
                             }
@@ -2673,8 +2752,10 @@ namespace UnityEngine.InputSystem
                 var device = control.device;
                 Debug.Assert(control != device, "Control must not be a device");
 
-                var deviceLayoutName =
-                    InputControlLayout.s_Layouts.FindLayoutThatIntroducesControl(control, m_LayoutCache);
+                var deviceLayoutName = InputControlLayout.s_Layouts.FindLayoutThatIntroducesControl(
+                    control,
+                    m_LayoutCache
+                );
 
                 if (m_PathBuilder == null)
                     m_PathBuilder = new StringBuilder();
@@ -2715,6 +2796,7 @@ namespace UnityEngine.InputSystem
             private Action<RebindingOperation, string> m_OnApplyBinding;
             private Action<InputEventPtr, InputDevice> m_OnEventDelegate;
             private Action m_OnAfterUpdateDelegate;
+
             ////TODO: use global cache
             private InputControlLayout.Cache m_LayoutCache;
             private StringBuilder m_PathBuilder;
@@ -2735,7 +2817,7 @@ namespace UnityEngine.InputSystem
                 DontIgnoreNoisyControls = 1 << 6,
                 DontGeneralizePathOfSelectedControl = 1 << 7,
                 AddNewBinding = 1 << 8,
-                SuppressMatchingEvents = 1 << 9
+                SuppressMatchingEvents = 1 << 9,
             }
         }
 
@@ -2820,10 +2902,12 @@ namespace UnityEngine.InputSystem
                 if (bindingIndex >= bindings.Count)
                     throw new ArgumentOutOfRangeException(
                         $"Binding index {bindingIndex} is out of range for action '{action}' with {bindings.Count} bindings",
-                        nameof(bindings));
+                        nameof(bindings)
+                    );
                 if (bindings[bindingIndex].isComposite)
                     throw new InvalidOperationException(
-                        $"Cannot perform rebinding on composite binding '{bindings[bindingIndex]}' of '{action}'");
+                        $"Cannot perform rebinding on composite binding '{bindings[bindingIndex]}' of '{action}'"
+                    );
 
                 rebind.WithTargetBinding(bindingIndex);
             }

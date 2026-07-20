@@ -1,0 +1,19 @@
+{
+  "printWidth": 120,
+  "tabWidth": 4,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "singleQuote": false,
+  "trailingCommas": "es5",
+  "parser": "csharp",
+  "exclude": [
+    "**/Packages/**",
+    "**/Library/**",
+    "**/obj/**",
+    "**/bin/**",
+    "**/Builds/**",
+    "**/.codebase-index/**",
+    "**/Tools/CodebaseEmbedder/roslyn_parser/bin/**",
+    "**/Tools/CodebaseEmbedder/roslyn_parser/obj/**"
+  ]
+}

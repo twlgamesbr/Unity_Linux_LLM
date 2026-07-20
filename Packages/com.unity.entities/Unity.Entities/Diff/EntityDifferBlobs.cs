@@ -61,17 +61,27 @@ namespace Unity.Entities
         struct SortBlobAssetPtr : IJob
         {
             public NativeArray<BlobAssetPtr> Array;
+
             public void Execute() => Array.Sort(new BlobAssetPtrHashComparer());
         }
 
         [BurstCompile]
         struct GatherCreatedAndDestroyedBlobAssets : IJob
         {
-            [ReadOnly] public NativeList<BlobAssetPtr> AfterBlobAssets;
-            [ReadOnly] public NativeList<BlobAssetPtr> BeforeBlobAssets;
-            [WriteOnly] public NativeList<BlobAssetPtr> CreatedBlobAssets;
-            [WriteOnly] public NativeList<BlobAssetPtr> DestroyedBlobAssets;
-            [WriteOnly] public NativeList<BlobAssetPtr> SameHashDifferentAddressBlobAssets;
+            [ReadOnly]
+            public NativeList<BlobAssetPtr> AfterBlobAssets;
+
+            [ReadOnly]
+            public NativeList<BlobAssetPtr> BeforeBlobAssets;
+
+            [WriteOnly]
+            public NativeList<BlobAssetPtr> CreatedBlobAssets;
+
+            [WriteOnly]
+            public NativeList<BlobAssetPtr> DestroyedBlobAssets;
+
+            [WriteOnly]
+            public NativeList<BlobAssetPtr> SameHashDifferentAddressBlobAssets;
 
             public void Execute()
             {
@@ -124,10 +134,17 @@ namespace Unity.Entities
         [BurstCompile]
         struct GatherBlobAssetChanges : IJob
         {
-            [ReadOnly] public NativeList<BlobAssetPtr> CreatedBlobAssets;
-            [ReadOnly] public NativeList<BlobAssetPtr> DestroyedBlobAssets;
-            [WriteOnly] public NativeList<BlobAssetChange> CreatedBlobAssetChanges;
-            [WriteOnly] public NativeList<ulong> DestroyedBlobAssetChanges;
+            [ReadOnly]
+            public NativeList<BlobAssetPtr> CreatedBlobAssets;
+
+            [ReadOnly]
+            public NativeList<BlobAssetPtr> DestroyedBlobAssets;
+
+            [WriteOnly]
+            public NativeList<BlobAssetChange> CreatedBlobAssetChanges;
+
+            [WriteOnly]
+            public NativeList<ulong> DestroyedBlobAssetChanges;
             public NativeList<byte> BlobAssetData;
 
             public void Execute()
@@ -137,7 +154,9 @@ namespace Unity.Entities
                 for (var i = 0; i < CreatedBlobAssets.Length; i++)
                 {
                     var length = CreatedBlobAssets[i].Header->Length;
-                    CreatedBlobAssetChanges.Add(new BlobAssetChange {Length = length, Hash = CreatedBlobAssets[i].Header->Hash});
+                    CreatedBlobAssetChanges.Add(
+                        new BlobAssetChange { Length = length, Hash = CreatedBlobAssets[i].Header->Hash }
+                    );
                     totalBlobAssetLength += length;
                 }
 
@@ -159,7 +178,8 @@ namespace Unity.Entities
             EntityComponentStore* entityComponentStore,
             ManagedComponentStore managedComponentStore,
             NativeArray<ArchetypeChunk> chunks,
-            AllocatorManager.AllocatorHandle allocator)
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             s_GetBlobAssetsWithDistinctHash.Begin();
             var blobAssetsWithDistinctHash = new BlobAssetsWithDistinctHash(allocator);
@@ -183,9 +203,15 @@ namespace Unity.Entities
                 var typesCount = archetype->TypesCount;
                 var entityCount = chunks[chunkIndex].Count;
 
-                for (var unorderedTypeIndexInArchetype = 0; unorderedTypeIndexInArchetype < typesCount; unorderedTypeIndexInArchetype++)
+                for (
+                    var unorderedTypeIndexInArchetype = 0;
+                    unorderedTypeIndexInArchetype < typesCount;
+                    unorderedTypeIndexInArchetype++
+                )
                 {
-                    var typeIndexInArchetype = archetype->TypeMemoryOrderIndexToIndexInArchetype[unorderedTypeIndexInArchetype];
+                    var typeIndexInArchetype = archetype->TypeMemoryOrderIndexToIndexInArchetype[
+                        unorderedTypeIndexInArchetype
+                    ];
                     var componentTypeInArchetype = archetype->Types[typeIndexInArchetype];
                     if (componentTypeInArchetype.IsZeroSized)
                         continue;
@@ -203,13 +229,23 @@ namespace Unity.Entities
                         var componentSize = archetype->SizeOfs[typeIndexInArchetype];
                         var end = componentArrayStart + componentSize * entityCount;
 
-                        for (var componentData = componentArrayStart; componentData < end; componentData += componentSize)
+                        for (
+                            var componentData = componentArrayStart;
+                            componentData < end;
+                            componentData += componentSize
+                        )
                         {
                             var managedComponentIndex = *(int*)componentData;
-                            var managedComponentValue = managedComponentStore.GetManagedComponent(managedComponentIndex);
+                            var managedComponentValue = managedComponentStore.GetManagedComponent(
+                                managedComponentIndex
+                            );
 
                             if (null != managedComponentValue)
-                                managedObjectBlobs.GatherBlobAssetReferences(managedComponentValue, managedObjectBlobAssets, managedObjectBlobAssetsMap);
+                                managedObjectBlobs.GatherBlobAssetReferences(
+                                    managedComponentValue,
+                                    managedObjectBlobAssets,
+                                    managedObjectBlobAssetsMap
+                                );
                         }
                     }
                     else
@@ -229,9 +265,18 @@ namespace Unity.Entities
                                 var bufferStart = BufferHeader.GetElementPointer(header);
                                 var bufferEnd = bufferStart + header->Length * elementSize;
 
-                                for (var componentData = bufferStart; componentData < bufferEnd; componentData += elementSize)
+                                for (
+                                    var componentData = bufferStart;
+                                    componentData < bufferEnd;
+                                    componentData += elementSize
+                                )
                                 {
-                                    AddBlobAssetsWithDistinctHash(componentData, blobAssetRefOffsets, blobAssetRefCount, blobAssetsWithDistinctHash);
+                                    AddBlobAssetsWithDistinctHash(
+                                        componentData,
+                                        blobAssetRefOffsets,
+                                        blobAssetRefCount,
+                                        blobAssetsWithDistinctHash
+                                    );
                                 }
 
                                 header = (BufferHeader*)(((byte*)header) + strideSize);
@@ -242,9 +287,18 @@ namespace Unity.Entities
                             var componentSize = archetype->SizeOfs[typeIndexInArchetype];
                             var end = componentArrayStart + componentSize * entityCount;
 
-                            for (var componentData = componentArrayStart; componentData < end; componentData += componentSize)
+                            for (
+                                var componentData = componentArrayStart;
+                                componentData < end;
+                                componentData += componentSize
+                            )
                             {
-                                AddBlobAssetsWithDistinctHash(componentData, blobAssetRefOffsets, blobAssetRefCount, blobAssetsWithDistinctHash);
+                                AddBlobAssetsWithDistinctHash(
+                                    componentData,
+                                    blobAssetRefOffsets,
+                                    blobAssetRefCount,
+                                    blobAssetsWithDistinctHash
+                                );
                             }
                         }
                     }
@@ -254,7 +308,13 @@ namespace Unity.Entities
                 for (var i = 0; i < archetype->NumSharedComponents; i++)
                 {
                     var sharedComponentIndex = sharedComponentValues[i];
-                    if (!TypeManager.GetTypeInfo(EntityComponentStore.GetComponentTypeFromSharedComponentIndex(sharedComponentIndex)).HasBlobAssetRefs)
+                    if (
+                        !TypeManager
+                            .GetTypeInfo(
+                                EntityComponentStore.GetComponentTypeFromSharedComponentIndex(sharedComponentIndex)
+                            )
+                            .HasBlobAssetRefs
+                    )
                         continue;
 
                     if (!EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
@@ -266,9 +326,15 @@ namespace Unity.Entities
                     if (blobAssetRefCount <= 0)
                         continue;
 
-                    var dataPtr = (byte*)entityComponentStore->GetSharedComponentDataAddr_Unmanaged(sharedComponentIndex, typeIndex);
+                    var dataPtr = (byte*)
+                        entityComponentStore->GetSharedComponentDataAddr_Unmanaged(sharedComponentIndex, typeIndex);
                     var blobAssetRefOffsets = TypeManager.GetBlobAssetRefOffsets(ct);
-                    AddBlobAssetsWithDistinctHash(dataPtr, blobAssetRefOffsets, blobAssetRefCount, blobAssetsWithDistinctHash);
+                    AddBlobAssetsWithDistinctHash(
+                        dataPtr,
+                        blobAssetRefOffsets,
+                        blobAssetRefCount,
+                        blobAssetsWithDistinctHash
+                    );
                 }
             }
 
@@ -281,15 +347,27 @@ namespace Unity.Entities
                 for (var i = 0; i < archetype->NumSharedComponents; i++)
                 {
                     var sharedComponentIndex = sharedComponentValues[i];
-                    if (!TypeManager.GetTypeInfo(EntityComponentStore.GetComponentTypeFromSharedComponentIndex(sharedComponentIndex)).HasBlobAssetRefs)
+                    if (
+                        !TypeManager
+                            .GetTypeInfo(
+                                EntityComponentStore.GetComponentTypeFromSharedComponentIndex(sharedComponentIndex)
+                            )
+                            .HasBlobAssetRefs
+                    )
                         continue;
 
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                         continue;
 
-                    var sharedComponentValue = managedComponentStore.GetSharedComponentDataNonDefaultBoxed(sharedComponentIndex);
+                    var sharedComponentValue = managedComponentStore.GetSharedComponentDataNonDefaultBoxed(
+                        sharedComponentIndex
+                    );
 
-                    managedObjectBlobs.GatherBlobAssetReferences(sharedComponentValue, managedObjectBlobAssets, managedObjectBlobAssetsMap);
+                    managedObjectBlobs.GatherBlobAssetReferences(
+                        sharedComponentValue,
+                        managedObjectBlobAssets,
+                        managedObjectBlobAssetsMap
+                    );
                 }
             }
 
@@ -314,10 +392,7 @@ namespace Unity.Entities
             managedObjectBlobAssets.Dispose();
             managedObjectBlobAssetsMap.Dispose();
 
-            new SortBlobAssetPtr
-            {
-                Array = blobAssetsWithDistinctHash.BlobAssets.AsDeferredJobArray()
-            }.Run();
+            new SortBlobAssetPtr { Array = blobAssetsWithDistinctHash.BlobAssets.AsDeferredJobArray() }.Run();
 
             s_GetBlobAssetsWithDistinctHash.End();
 
@@ -328,7 +403,8 @@ namespace Unity.Entities
             byte* componentData,
             TypeManager.EntityOffsetInfo* blobAssetRefOffsets,
             int blobAssetRefCount,
-            BlobAssetsWithDistinctHash blobAssets)
+            BlobAssetsWithDistinctHash blobAssets
+        )
         {
             for (var i = 0; i < blobAssetRefCount; ++i)
             {
@@ -357,7 +433,8 @@ namespace Unity.Entities
             NativeList<BlobAssetPtr> beforeBlobAssets,
             AllocatorManager.AllocatorHandle allocator,
             out JobHandle jobHandle,
-            JobHandle dependsOn = default)
+            JobHandle dependsOn = default
+        )
         {
             var changes = new BlobAssetChanges(allocator);
 
@@ -371,7 +448,7 @@ namespace Unity.Entities
                 BeforeBlobAssets = beforeBlobAssets,
                 CreatedBlobAssets = createdBlobAssets,
                 DestroyedBlobAssets = destroyedBlobAssets,
-                SameHashDifferentAddressBlobAssets = sameHashDifferentAddressBlobAssets
+                SameHashDifferentAddressBlobAssets = sameHashDifferentAddressBlobAssets,
             }.Schedule(dependsOn);
 
             jobHandle = new GatherBlobAssetChanges
@@ -380,15 +457,14 @@ namespace Unity.Entities
                 DestroyedBlobAssets = destroyedBlobAssets,
                 CreatedBlobAssetChanges = changes.CreatedBlobAssets,
                 DestroyedBlobAssetChanges = changes.DestroyedBlobAssets,
-                BlobAssetData = changes.BlobAssetData
+                BlobAssetData = changes.BlobAssetData,
             }.Schedule(jobHandle);
 
-            jobHandle = JobHandle.CombineDependencies
-                (
-                    createdBlobAssets.Dispose(jobHandle),
-                    destroyedBlobAssets.Dispose(jobHandle),
-                    sameHashDifferentAddressBlobAssets.Dispose(jobHandle)
-                );
+            jobHandle = JobHandle.CombineDependencies(
+                createdBlobAssets.Dispose(jobHandle),
+                destroyedBlobAssets.Dispose(jobHandle),
+                sameHashDifferentAddressBlobAssets.Dispose(jobHandle)
+            );
 
             return changes;
         }

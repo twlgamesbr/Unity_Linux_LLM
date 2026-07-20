@@ -32,10 +32,18 @@ namespace Unity.Entities.Content
             [ExcludeFromBurstCompatTesting("Takes managed string")]
             public Counter(string name, bool perFrame)
             {
-                m_Counter = new ProfilerCounterValue<long>(ProfilerCategory.Loading, name, ProfilerMarkerDataUnit.Count, perFrame ? (ProfilerCounterOptions.ResetToZeroOnFlush | ProfilerCounterOptions.FlushOnEndOfFrame) : ProfilerCounterOptions.FlushOnEndOfFrame);
+                m_Counter = new ProfilerCounterValue<long>(
+                    ProfilerCategory.Loading,
+                    name,
+                    ProfilerMarkerDataUnit.Count,
+                    perFrame
+                        ? (ProfilerCounterOptions.ResetToZeroOnFlush | ProfilerCounterOptions.FlushOnEndOfFrame)
+                        : ProfilerCounterOptions.FlushOnEndOfFrame
+                );
                 m_Counter.Value = 0;
             }
         }
+
         [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_PROFILER")]
         public readonly struct TimeCounter
         {
@@ -50,8 +58,12 @@ namespace Unity.Entities.Content
             [ExcludeFromBurstCompatTesting("Takes managed string")]
             public TimeCounter(string name)
             {
-                m_Counter = new ProfilerCounterValue<long>(ProfilerCategory.Loading, name, ProfilerMarkerDataUnit.TimeNanoseconds,
-                    ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush);
+                m_Counter = new ProfilerCounterValue<long>(
+                    ProfilerCategory.Loading,
+                    name,
+                    ProfilerMarkerDataUnit.TimeNanoseconds,
+                    ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush
+                );
             }
         }
 
@@ -67,19 +79,80 @@ namespace Unity.Entities.Content
         internal const string k_ObjectRefsCounterName = "Object Ref Count";
         internal const string k_ProcessCommandsFrameTimeCounterName = "Command Process Time";
 
-        sealed class SharedGuid { internal static readonly SharedStatic<Guid> Ref = SharedStatic<Guid>.GetOrCreate<SharedGuid>(); }
-        sealed class SharedInit { internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedInit>(); }
-        sealed class SharedLoadedObjectsCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedLoadedObjectsCounter>(); }
-        sealed class SharedLoadedFilesCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedLoadedFilesCounter>(); }
-        sealed class SharedLoadedArchivesCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedLoadedArchivesCounter>(); }
-        sealed class SharedLoadObjectRequestsCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedLoadObjectRequestsCounter>(); }
-        sealed class SharedReleaseObjectRequestsCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedReleaseObjectRequestsCounter>(); }
-        sealed class SharedObjectRefCountCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedObjectRefCountCounter>(); }
-        sealed class SharedProcessTimeCounter { internal static readonly SharedStatic<TimeCounter> Ref = SharedStatic<TimeCounter>.GetOrCreate<SharedProcessTimeCounter>(); }
-        sealed class SharedProcessStartTime { internal static readonly SharedStatic<long> Ref = SharedStatic<long>.GetOrCreate<SharedProcessStartTime>(); }
-        sealed class SharedLoadedScenesCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedLoadedScenesCounter>(); }
-        sealed class SharedLoadSceneRequestsCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedLoadSceneRequestsCounter>(); }
-        sealed class SharedUnloadSceneRequestsCounter { internal static readonly SharedStatic<Counter> Ref = SharedStatic<Counter>.GetOrCreate<SharedUnloadSceneRequestsCounter>(); }
+        sealed class SharedGuid
+        {
+            internal static readonly SharedStatic<Guid> Ref = SharedStatic<Guid>.GetOrCreate<SharedGuid>();
+        }
+
+        sealed class SharedInit
+        {
+            internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<SharedInit>();
+        }
+
+        sealed class SharedLoadedObjectsCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedLoadedObjectsCounter>();
+        }
+
+        sealed class SharedLoadedFilesCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedLoadedFilesCounter>();
+        }
+
+        sealed class SharedLoadedArchivesCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedLoadedArchivesCounter>();
+        }
+
+        sealed class SharedLoadObjectRequestsCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedLoadObjectRequestsCounter>();
+        }
+
+        sealed class SharedReleaseObjectRequestsCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedReleaseObjectRequestsCounter>();
+        }
+
+        sealed class SharedObjectRefCountCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedObjectRefCountCounter>();
+        }
+
+        sealed class SharedProcessTimeCounter
+        {
+            internal static readonly SharedStatic<TimeCounter> Ref =
+                SharedStatic<TimeCounter>.GetOrCreate<SharedProcessTimeCounter>();
+        }
+
+        sealed class SharedProcessStartTime
+        {
+            internal static readonly SharedStatic<long> Ref = SharedStatic<long>.GetOrCreate<SharedProcessStartTime>();
+        }
+
+        sealed class SharedLoadedScenesCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedLoadedScenesCounter>();
+        }
+
+        sealed class SharedLoadSceneRequestsCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedLoadSceneRequestsCounter>();
+        }
+
+        sealed class SharedUnloadSceneRequestsCounter
+        {
+            internal static readonly SharedStatic<Counter> Ref =
+                SharedStatic<Counter>.GetOrCreate<SharedUnloadSceneRequestsCounter>();
+        }
 
         static ref bool s_Initialized => ref SharedInit.Ref.Data;
         public static Guid Guid => SharedGuid.Ref.Data;
@@ -125,7 +198,10 @@ namespace Unity.Entities.Content
             if (!s_Initialized)
                 return;
             var conversionRatio = ProfilerUnsafeUtility.TimestampToNanosecondsConversionRatio;
-            var elapsed = (ProfilerUnsafeUtility.Timestamp - SharedProcessStartTime.Ref.Data) * conversionRatio.Numerator / conversionRatio.Denominator;
+            var elapsed =
+                (ProfilerUnsafeUtility.Timestamp - SharedProcessStartTime.Ref.Data)
+                * conversionRatio.Numerator
+                / conversionRatio.Denominator;
             SharedProcessTimeCounter.Ref.Data.Value += elapsed;
         }
 
@@ -136,7 +212,6 @@ namespace Unity.Entities.Content
             SharedLoadSceneRequestsCounter.Ref.Data.Value++;
             SharedLoadedScenesCounter.Ref.Data.Value++;
         }
-
 
         public static void RecordUnloadSceneRequest()
         {

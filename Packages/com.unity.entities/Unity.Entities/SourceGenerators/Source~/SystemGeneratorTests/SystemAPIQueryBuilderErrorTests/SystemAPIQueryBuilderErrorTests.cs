@@ -1,11 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unity.Entities.SourceGen.Common;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
 using Unity.Entities.SourceGen.SystemGenerator.SystemAPI.QueryBuilder;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators
 {
@@ -15,7 +13,8 @@ namespace Unity.Entities.SourceGenerators
         [TestMethod]
         public async Task SGQB001_MultipleWithOptionsInvocations()
         {
-            const string source = @"
+            const string source =
+                @"
                 using Unity.Entities;
                 using Unity.Entities.Tests;
                 partial class SomeSystem : SystemBase
@@ -33,7 +32,8 @@ namespace Unity.Entities.SourceGenerators
         [TestMethod]
         public async Task SGQC005_WithGenericTypeArgument()
         {
-            const string source = @"
+            const string source =
+                @"
             using Unity.Entities;
             using Unity.Entities.Tests;
             partial class SomeSystem<T> : SystemBase where T : struct, IComponentData

@@ -1,6 +1,6 @@
 using System.IO;
-using UnityEngine;
 using UnityEditorInternal;
+using UnityEngine;
 
 namespace UnityEditor.Rendering.Universal
 {
@@ -12,7 +12,7 @@ namespace UnityEditor.Rendering.Universal
         enum Version
         {
             None,
-            First
+            First,
         }
 
         [SerializeField]
@@ -23,10 +23,7 @@ namespace UnityEditor.Rendering.Universal
         public static int materialVersionForUpgrade
         {
             get => instance.m_LastMaterialVersion;
-            set
-            {
-                instance.m_LastMaterialVersion = value;
-            }
+            set { instance.m_LastMaterialVersion = value; }
         }
 
         [SerializeField]
@@ -45,6 +42,7 @@ namespace UnityEditor.Rendering.Universal
         //singleton pattern
         static UniversalProjectSettings s_Instance;
         static UniversalProjectSettings instance => s_Instance ?? CreateOrLoad();
+
         UniversalProjectSettings()
         {
             s_Instance = this;
@@ -78,7 +76,11 @@ namespace UnityEditor.Rendering.Universal
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            InternalEditorUtility.SaveToSerializedFileAndForget(new[] { s_Instance }, filePath, allowTextSerialization: true);
+            InternalEditorUtility.SaveToSerializedFileAndForget(
+                new[] { s_Instance },
+                filePath,
+                allowTextSerialization: true
+            );
         }
     }
 }

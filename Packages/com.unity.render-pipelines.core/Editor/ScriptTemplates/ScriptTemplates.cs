@@ -7,7 +7,10 @@ namespace UnityEditor.Rendering
         [MenuItem("Assets/Create/Shader/SRP Blit Shader", priority = 1)]
         static void CreateBlitSRPShader()
         {
-            ProjectWindowUtil.CreateScriptAssetFromTemplateFile($"{ScriptTemplatePath}BlitSRP.txt", "NewBlitScriptableRenderPipelineShader.shader");
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(
+                $"{ScriptTemplatePath}BlitSRP.txt",
+                "NewBlitScriptableRenderPipelineShader.shader"
+            );
         }
     }
 }

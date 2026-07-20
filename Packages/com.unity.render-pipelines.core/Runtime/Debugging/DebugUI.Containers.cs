@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
-
 #endif
 #if ENABLE_RENDERING_DEBUGGER_UI
 using UnityEngine.UIElements;
@@ -67,22 +66,28 @@ namespace UnityEngine.Rendering
                 // As the elements might change visibility, we need to update alternating background colors
                 if (alternateRowColors)
                 {
-                    this.ScheduleTracked(container, () => container.schedule.Execute(() =>
-                    {
-                        int i = 0;
-                        foreach (var child in container.Children())
-                        {
-                            if (child.style.display == DisplayStyle.Flex)
-                            {
-                                if (i % 2 != 0)
-                                    child.AddToClassList(k_AlternateRowColorClassName);
-                                else
-                                    child.RemoveFromClassList(k_AlternateRowColorClassName);
+                    this.ScheduleTracked(
+                        container,
+                        () =>
+                            container
+                                .schedule.Execute(() =>
+                                {
+                                    int i = 0;
+                                    foreach (var child in container.Children())
+                                    {
+                                        if (child.style.display == DisplayStyle.Flex)
+                                        {
+                                            if (i % 2 != 0)
+                                                child.AddToClassList(k_AlternateRowColorClassName);
+                                            else
+                                                child.RemoveFromClassList(k_AlternateRowColorClassName);
 
-                                ++i;
-                            }
-                        }
-                    }).Every(100));
+                                            ++i;
+                                        }
+                                    }
+                                })
+                                .Every(100)
+                    );
                 }
             }
 #endif
@@ -123,18 +128,14 @@ namespace UnityEngine.Rendering
             /// Constructor
             /// </summary>
             public Container()
-                : this(string.Empty, new ObservableList<Widget>())
-            {
-            }
+                : this(string.Empty, new ObservableList<Widget>()) { }
 
             /// <summary>
             /// Constructor for a container without header
             /// </summary>
             /// <param name="id">The id of the container</param>
             public Container(string id)
-                : this($"{k_IDToken}{id}", new ObservableList<Widget>())
-            {
-            }
+                : this($"{k_IDToken}{id}", new ObservableList<Widget>()) { }
 
             /// <summary>
             /// Constructor.
@@ -202,24 +203,29 @@ namespace UnityEngine.Rendering
         /// </summary>
         public class Foldout : Container
 #pragma warning disable CS0618 // Type or member is obsolete
-            , IValueField
+                , IValueField
 #pragma warning restore CS0618 // Type or member is obsolete
         {
-
 #if ENABLE_RENDERING_DEBUGGER_UI
 
             /// <inheritdoc/>
             protected override VisualElement Create()
             {
                 var container = new UIElements.Foldout { text = displayName };
-                if (m_Context == Context.Editor && (contextMenuItems != null || !string.IsNullOrEmpty(documentationUrl)))
+                if (
+                    m_Context == Context.Editor
+                    && (contextMenuItems != null || !string.IsNullOrEmpty(documentationUrl))
+                )
                 {
 #if UNITY_EDITOR
                     // Get Toggle element of the Foldout to be able to attach the help and menu buttons
                     var toggleHeader = container.Q<Toggle>().ElementAt(0);
                     if (!string.IsNullOrEmpty(documentationUrl))
                     {
-                        var infoButton = new UIElements.Button((Background.FromTexture2D((Texture2D)EditorGUIUtility.TrIconContent("_Help").image )),() => Help.BrowseURL(documentationUrl));
+                        var infoButton = new UIElements.Button(
+                            (Background.FromTexture2D((Texture2D)EditorGUIUtility.TrIconContent("_Help").image)),
+                            () => Help.BrowseURL(documentationUrl)
+                        );
                         infoButton.AddToClassList("info-button");
                         infoButton.tooltip = $"Open Reference for {displayName}.";
                         toggleHeader.Add(infoButton);
@@ -230,9 +236,9 @@ namespace UnityEngine.Rendering
                         button.AddToClassList("more-options-button");
 
                         var contextualMenu = new GenericDropdownMenu();
-                        foreach(var item in contextMenuItems)
+                        foreach (var item in contextMenuItems)
                         {
-                            contextualMenu.AddItem(item.displayName, false, item.action );
+                            contextualMenu.AddItem(item.displayName, false, item.action);
                         }
 
                         button.clicked += () =>
@@ -258,22 +264,31 @@ namespace UnityEngine.Rendering
                     SetValue(container.value);
                 });
                 // Sync value to object based on navigation events separately, because they don't trigger a ChangeEvent
-                container.RegisterCallback<NavigationMoveEvent>(evt =>
-                {
-                    if (DebugManager.instance.selectedWidget == this)
+                container.RegisterCallback<NavigationMoveEvent>(
+                    evt =>
                     {
-                        if (evt.direction == NavigationMoveEvent.Direction.Right)
-                            SetValue(true);
-                        else if (evt.direction == NavigationMoveEvent.Direction.Left)
-                            SetValue(false);
-                    }
-                }, TrickleDown.TrickleDown); // Foldout internally stops propagation so must use TrickleDown to see it
+                        if (DebugManager.instance.selectedWidget == this)
+                        {
+                            if (evt.direction == NavigationMoveEvent.Direction.Right)
+                                SetValue(true);
+                            else if (evt.direction == NavigationMoveEvent.Direction.Left)
+                                SetValue(false);
+                        }
+                    },
+                    TrickleDown.TrickleDown
+                ); // Foldout internally stops propagation so must use TrickleDown to see it
 
                 // Sync opened state from object to UI
-                this.ScheduleTracked(container, () => container.schedule.Execute(() =>
-                {
-                    container.SetValueWithoutNotify(GetValue());
-                }).Every(100));
+                this.ScheduleTracked(
+                    container,
+                    () =>
+                        container
+                            .schedule.Execute(() =>
+                            {
+                                container.SetValueWithoutNotify(GetValue());
+                            })
+                            .Every(100)
+                );
 
                 if (columnLabels is { Length: > 0 })
                 {
@@ -283,18 +298,14 @@ namespace UnityEngine.Rendering
                     {
                         string value = columnLabels[i];
                         object Getter() => value;
-                        columnLabelsValues[i] = new DebugUI.Value()
-                        {
-                            displayName = string.Empty,
-                            getter = Getter
-                        };
+                        columnLabelsValues[i] = new DebugUI.Value() { displayName = string.Empty, getter = Getter };
                     }
 
                     var header = new DebugUI.ValueTuple()
                     {
                         displayName = string.Empty,
                         isHeader = true,
-                        values = columnLabelsValues
+                        values = columnLabelsValues,
                     };
 
                     container.Add(header.ToVisualElement(m_Context));
@@ -342,7 +353,10 @@ namespace UnityEngine.Rendering
             /// <summary>
             /// Always false.
             /// </summary>
-            public bool isReadOnly { get { return false; } }
+            public bool isReadOnly
+            {
+                get { return false; }
+            }
 
             bool m_Opened;
 
@@ -427,7 +441,8 @@ namespace UnityEngine.Rendering
                         {
                             if (m_ColumnTooltips.Length != m_ColumnLabels.Length)
                                 throw new Exception(
-                                    $"Dimension for labels and tooltips on {nameof(DebugUI.Foldout)} - {displayName}, do not match");
+                                    $"Dimension for labels and tooltips on {nameof(DebugUI.Foldout)} - {displayName}, do not match"
+                                );
                         }
 
                         m_RowContents.Clear();
@@ -437,9 +452,9 @@ namespace UnityEngine.Rendering
                             string tooltip = m_ColumnTooltips[i] ?? string.Empty;
                             m_RowContents.Add(
 #if UNITY_EDITOR
-                            EditorGUIUtility.TrTextContent(label, tooltip)
+                                EditorGUIUtility.TrTextContent(label, tooltip)
 #else
-                            new GUIContent(label, tooltip)
+                                new GUIContent(label, tooltip)
 #endif
                             );
                         }
@@ -454,7 +469,9 @@ namespace UnityEngine.Rendering
             /// <summary>
             /// Constructor.
             /// </summary>
-            public Foldout() : base() { }
+            public Foldout()
+                : base() { }
+
             /// <summary>
             /// Constructor.
             /// </summary>
@@ -462,7 +479,12 @@ namespace UnityEngine.Rendering
             /// <param name="children">List of attached children.</param>
             /// <param name="columnLabels">Optional list of column names.</param>
             /// <param name="columnTooltips">Optional list of tooltips for column name labels.</param>
-            public Foldout(string displayName, ObservableList<Widget> children, string[] columnLabels = null, string[] columnTooltips = null)
+            public Foldout(
+                string displayName,
+                ObservableList<Widget> children,
+                string[] columnLabels = null,
+                string[] columnTooltips = null
+            )
                 : base(displayName, children)
             {
                 this.columnLabels = columnLabels;
@@ -556,18 +578,14 @@ namespace UnityEngine.Rendering
                     {
                         string value = tmp[i];
                         object Getter() => value;
-                        columnLabelsValues[i] = new DebugUI.Value()
-                        {
-                            displayName = string.Empty,
-                            getter = Getter
-                        };
+                        columnLabelsValues[i] = new DebugUI.Value() { displayName = string.Empty, getter = Getter };
                     }
 
                     var header = new DebugUI.ValueTuple()
                     {
                         displayName = string.Empty,
                         isHeader = true,
-                        values = columnLabelsValues
+                        values = columnLabelsValues,
                     };
 
                     var headerVisualElement = header.ToVisualElement(m_Context);
@@ -619,10 +637,15 @@ namespace UnityEngine.Rendering
             public class Row : Container
             {
                 /// <summary>Constructor.</summary>
-                public Row() { displayName = "Row"; }
+                public Row()
+                {
+                    displayName = "Row";
+                }
 
                 /// <summary>Opened state of the row. No longer used.</summary>
-                [Obsolete("This class no longer inherits from Foldout, but from Container. This field is kept for compatibility but it no longer does anything. #from(6000.5)")]
+                [Obsolete(
+                    "This class no longer inherits from Foldout, but from Container. This field is kept for compatibility but it no longer does anything. #from(6000.5)"
+                )]
                 public bool opened { get; set; }
 
 #if ENABLE_RENDERING_DEBUGGER_UI
@@ -632,7 +655,7 @@ namespace UnityEngine.Rendering
                     var rowContainer = new UIElements.VisualElement();
                     rowContainer.AddToClassList("debug-window-table-row");
 
-                    var label = new Label(displayName) { style = { width = ValueTuple.GetLabelWidth(m_Context) }, };
+                    var label = new Label(displayName) { style = { width = ValueTuple.GetLabelWidth(m_Context) } };
                     label.AddToClassList("debug-window-table-row-displayname");
                     label.AddToClassList("debug-window-search-filter-target");
                     rowContainer.Add(label);
@@ -667,7 +690,10 @@ namespace UnityEngine.Rendering
             public bool displayRowNames = true;
 
             /// <summary>Constructor.</summary>
-            public Table() { displayName = "Array"; }
+            public Table()
+            {
+                displayName = "Array";
+            }
 
             /// <summary>
             /// Set column visibility.
@@ -774,7 +800,7 @@ namespace UnityEngine.Rendering
                         {
                             canSort = false,
                             headerTextAlignment = TextAlignment.Center,
-                            headerContent = new GUIContent(name, tooltip ?? string.Empty)
+                            headerContent = new GUIContent(name, tooltip ?? string.Empty),
                         };
 
                         //columnHeaderStyle.CalcMinMaxWidth(col.headerContent, out col.width, out float _);
@@ -787,7 +813,7 @@ namespace UnityEngine.Rendering
                     cols[0].allowToggleVisibility = false;
                     for (int i = 0; i < m_ColumnCount; i++)
                     {
-                        var elem = ((Container) children[0]).children[i];
+                        var elem = ((Container)children[0]).children[i];
                         cols[i + 1] = CreateColumn(elem.displayName, elem.tooltip);
                     }
 

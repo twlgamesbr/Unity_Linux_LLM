@@ -7,6 +7,10 @@ namespace UnityEngine.TestTools.NUnitExtensions
 {
     internal interface IAsyncTestAssemblyBuilder : ITestAssemblyBuilder
     {
-        IEnumerator<ITest> BuildAsync(Assembly[] assemblies, TestPlatform[] testPlatforms, IDictionary<string, object> options);
+        IEnumerator<ITest> BuildAsync(
+            Assembly[] assemblies,
+            TestPlatform[] testPlatforms,
+            IDictionary<string, object> options
+        );
     }
 }

@@ -35,7 +35,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
             }
 
 #if UNITY_EDITOR && UNITY_2023_2_OR_NEWER
-            EditorAnalytics.SendAnalytic(new ConnectionStateChangedAnalytic(m_NetworkSimulator.UsedEditorGUI, m_IsLageSpikeRunning));
+            EditorAnalytics.SendAnalytic(
+                new ConnectionStateChangedAnalytic(m_NetworkSimulator.UsedEditorGUI, m_IsLageSpikeRunning)
+            );
 #endif
             m_NetworkTransportApi.SimulateDisconnect();
         }
@@ -47,7 +49,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
                 return;
             }
 #if UNITY_EDITOR && UNITY_2023_2_OR_NEWER
-            EditorAnalytics.SendAnalytic(new ConnectionStateChangedAnalytic(m_NetworkSimulator.UsedEditorGUI, m_IsLageSpikeRunning));
+            EditorAnalytics.SendAnalytic(
+                new ConnectionStateChangedAnalytic(m_NetworkSimulator.UsedEditorGUI, m_IsLageSpikeRunning)
+            );
 #endif
             m_NetworkTransportApi.SimulateReconnect();
         }

@@ -14,7 +14,11 @@ namespace Unity.Physics
         /// <param name="motionDatas">      The motion datas. </param>
         /// <param name="motionVelocities"> The motion velocities. </param>
         /// <param name="timeStep">         The time step. </param>
-        public static void Integrate(NativeArray<MotionData> motionDatas, NativeArray<MotionVelocity> motionVelocities, float timeStep)
+        public static void Integrate(
+            NativeArray<MotionData> motionDatas,
+            NativeArray<MotionVelocity> motionVelocities,
+            float timeStep
+        )
         {
             for (int i = 0; i < motionDatas.Length; i++)
             {
@@ -37,7 +41,12 @@ namespace Unity.Physics
         }
 
         // Schedule a job to integrate the world's motions forward by the given time step.
-        internal static JobHandle ScheduleIntegrateJobs(ref DynamicsWorld world, float timeStep, JobHandle inputDeps, bool multiThreaded = true)
+        internal static JobHandle ScheduleIntegrateJobs(
+            ref DynamicsWorld world,
+            float timeStep,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
             if (!multiThreaded)
             {
@@ -45,7 +54,7 @@ namespace Unity.Physics
                 {
                     MotionDatas = world.MotionDatas,
                     MotionVelocities = world.MotionVelocities,
-                    TimeStep = timeStep
+                    TimeStep = timeStep,
                 };
                 return job.Schedule(inputDeps);
             }
@@ -55,7 +64,7 @@ namespace Unity.Physics
                 {
                     MotionDatas = world.MotionDatas,
                     MotionVelocities = world.MotionVelocities,
-                    TimeStep = timeStep
+                    TimeStep = timeStep,
                 };
                 return job.Schedule(world.NumMotions, 64, inputDeps);
             }
@@ -73,7 +82,12 @@ namespace Unity.Physics
                 ExecuteImpl(i, MotionDatas, MotionVelocities, TimeStep);
             }
 
-            internal static void ExecuteImpl(int i, NativeArray<MotionData> motionDatas, NativeArray<MotionVelocity> motionVelocities, float timeStep)
+            internal static void ExecuteImpl(
+                int i,
+                NativeArray<MotionData> motionDatas,
+                NativeArray<MotionVelocity> motionVelocities,
+                float timeStep
+            )
             {
                 MotionData motionData = motionDatas[i];
                 MotionVelocity motionVelocity = motionVelocities[i];
@@ -85,7 +99,11 @@ namespace Unity.Physics
                 {
                     // damping
                     motionVelocity.LinearVelocity *= math.clamp(1.0f - motionData.LinearDamping * timeStep, 0.0f, 1.0f);
-                    motionVelocity.AngularVelocity *= math.clamp(1.0f - motionData.AngularDamping * timeStep, 0.0f, 1.0f);
+                    motionVelocity.AngularVelocity *= math.clamp(
+                        1.0f - motionData.AngularDamping * timeStep,
+                        0.0f,
+                        1.0f
+                    );
                 }
 
                 // Write back

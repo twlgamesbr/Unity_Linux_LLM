@@ -28,15 +28,11 @@ namespace Unity.Physics
         void Execute(ref ModifiableContactHeader header, ref ModifiableContactPoint contact);
     }
 
-
     /// <summary>
     /// Interface for jobs that iterate through the list of contact manifolds produced by the narrow
     /// phase.
     /// </summary>
-    public interface IContactsJob : IContactsJobBase
-    {
-    }
-
+    public interface IContactsJob : IContactsJobBase { }
 
     /// <summary>   A modifiable contact header. </summary>
     public struct ModifiableContactHeader
@@ -202,7 +198,12 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle Schedule<T>(this T job, SimulationSingleton simulationSingleton, ref PhysicsWorld world, JobHandle inputDeps)
+        public static JobHandle Schedule<T>(
+            this T job,
+            SimulationSingleton simulationSingleton,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IContactsJobBase
         {
             // Should work only for UnityPhysics
@@ -226,7 +227,13 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleParallel<T>(this T job, int innerLoopBatchCount, SimulationSingleton simulationSingleton, ref PhysicsWorld world, JobHandle inputDeps)
+        public static JobHandle ScheduleParallel<T>(
+            this T job,
+            int innerLoopBatchCount,
+            SimulationSingleton simulationSingleton,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IContactsJobBase
         {
             // Should work only for UnityPhysics
@@ -235,13 +242,27 @@ namespace Unity.Physics
                 return inputDeps;
             }
 
-            return ScheduleParallelUnityPhysicsContactsJob(job, innerLoopBatchCount, simulationSingleton.AsSimulation(), ref world, inputDeps);
+            return ScheduleParallelUnityPhysicsContactsJob(
+                job,
+                innerLoopBatchCount,
+                simulationSingleton.AsSimulation(),
+                ref world,
+                inputDeps
+            );
         }
 
-        static unsafe JobHandle ScheduleUnityPhysicsContactsJob<T>(this T job, Simulation simulation, ref PhysicsWorld world, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleUnityPhysicsContactsJob<T>(
+            this T job,
+            Simulation simulation,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IContactsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.PostCreateContacts);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateContacts
+            );
 
             if (simulation.StepContext.Contacts.IsCreated)
             {
@@ -250,23 +271,37 @@ namespace Unity.Physics
                     UserJobData = job,
                     ContactReader = simulation.StepContext.Contacts.AsReader(),
                     Bodies = world.Bodies,
-                    IsParallel = false
+                    IsParallel = false,
                 };
 
                 var reflectionData = ContactsJobProcess<T>.jobReflectionData.Data;
                 ContactsJobProcess<T>.CheckReflectionDataCorrect(reflectionData);
 
-                var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), reflectionData, inputDeps, ScheduleMode.Single);
+                var parameters = new JobsUtility.JobScheduleParameters(
+                    UnsafeUtility.AddressOf(ref data),
+                    reflectionData,
+                    inputDeps,
+                    ScheduleMode.Single
+                );
                 return JobsUtility.Schedule(ref parameters);
             }
 
             return inputDeps;
         }
 
-        static unsafe JobHandle ScheduleParallelUnityPhysicsContactsJob<T>(this T job, int innerLoopBatchCount, Simulation simulation, ref PhysicsWorld world, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleParallelUnityPhysicsContactsJob<T>(
+            this T job,
+            int innerLoopBatchCount,
+            Simulation simulation,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IContactsJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.PostCreateContacts);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateContacts
+            );
 
             if (simulation.StepContext.Contacts.IsCreated)
             {
@@ -276,47 +311,78 @@ namespace Unity.Physics
                     UserJobData = job,
                     ContactReader = contactsStream.AsReader(),
                     Bodies = world.Bodies,
-                    IsParallel = true
+                    IsParallel = true,
                 };
 
                 var reflectionData = ContactsJobProcess<T>.jobReflectionData.Data;
                 ContactsJobProcess<T>.CheckReflectionDataCorrect(reflectionData);
 
-                var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), reflectionData, inputDeps, ScheduleMode.Parallel);
+                var parameters = new JobsUtility.JobScheduleParameters(
+                    UnsafeUtility.AddressOf(ref data),
+                    reflectionData,
+                    inputDeps,
+                    ScheduleMode.Parallel
+                );
                 var forEachCountPtr = NativeStreamUnsafeUtility.GetUnsafeForEachCountPtr(ref contactsStream);
                 var listDataPtr = (byte*)forEachCountPtr - sizeof(void*);
-                return JobsUtility.ScheduleParallelForDeferArraySize(ref parameters, innerLoopBatchCount, listDataPtr, null);
+                return JobsUtility.ScheduleParallelForDeferArraySize(
+                    ref parameters,
+                    innerLoopBatchCount,
+                    listDataPtr,
+                    null
+                );
             }
 
             return inputDeps;
         }
 
-        internal struct ContactsJobData<T> where T : struct
+        internal struct ContactsJobData<T>
+            where T : struct
         {
             public T UserJobData;
 
-            [NativeDisableContainerSafetyRestriction] public NativeStream.Reader ContactReader;
+            [NativeDisableContainerSafetyRestriction]
+            public NativeStream.Reader ContactReader;
+
             // Disable aliasing restriction in case T has a NativeArray of PhysicsWorld.Bodies
-            [ReadOnly, NativeDisableContainerSafetyRestriction] public NativeArray<RigidBody> Bodies;
+            [ReadOnly, NativeDisableContainerSafetyRestriction]
+            public NativeArray<RigidBody> Bodies;
             public bool IsParallel;
         }
 
-        internal struct ContactsJobProcess<T> where T : struct, IContactsJobBase
+        internal struct ContactsJobProcess<T>
+            where T : struct, IContactsJobBase
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<ContactsJobProcess<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                ContactsJobProcess<T>
+            >();
 
             [Preserve]
             public static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(ContactsJobData<T>), typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(ContactsJobData<T>),
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
-            public delegate void ExecuteJobFunction(ref ContactsJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref ContactsJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
-            public unsafe static void Execute(ref ContactsJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static unsafe void Execute(
+                ref ContactsJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
@@ -325,11 +391,23 @@ namespace Unity.Physics
 
                     if (jobData.IsParallel)
                     {
-                        if (!JobsUtility.GetWorkStealingRange(ref ranges, jobIndex, out forEachIndexBegin, out forEachIndexEnd))
+                        if (
+                            !JobsUtility.GetWorkStealingRange(
+                                ref ranges,
+                                jobIndex,
+                                out forEachIndexBegin,
+                                out forEachIndexEnd
+                            )
+                        )
                             break;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData), forEachIndexBegin, forEachIndexEnd - forEachIndexBegin);
+                        JobsUtility.PatchBufferMinMaxRanges(
+                            bufferRangePatchData,
+                            UnsafeUtility.AddressOf(ref jobData),
+                            forEachIndexBegin,
+                            forEachIndexEnd - forEachIndexBegin
+                        );
 #endif
                     }
 
@@ -346,13 +424,13 @@ namespace Unity.Physics
                             EntityPair = new EntityPair
                             {
                                 EntityA = jobData.Bodies[iterator.m_LastHeader->BodyPair.BodyIndexA].Entity,
-                                EntityB = jobData.Bodies[iterator.m_LastHeader->BodyPair.BodyIndexB].Entity
-                            }
+                                EntityB = jobData.Bodies[iterator.m_LastHeader->BodyPair.BodyIndexB].Entity,
+                            },
                         };
                         var contact = new ModifiableContactPoint
                         {
                             ContactPoint = *iterator.m_LastContact,
-                            Index = iterator.CurrentPointIndex
+                            Index = iterator.CurrentPointIndex,
                         };
 
                         jobData.UserJobData.Execute(ref header, ref contact);
@@ -378,7 +456,9 @@ namespace Unity.Physics
             internal static void CheckReflectionDataCorrect(IntPtr reflectionData)
             {
                 if (reflectionData == IntPtr.Zero)
-                    SafetyChecks.ThrowInvalidOperationException("Reflection data was not set up by an Initialize() call");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Reflection data was not set up by an Initialize() call"
+                    );
             }
         }
 
@@ -394,20 +474,28 @@ namespace Unity.Physics
         // Utility to help iterate over all the items in the contacts job stream
         unsafe struct ContactsJobIterator
         {
-            [NativeDisableContainerSafetyRestriction] NativeStream.Reader m_ContactReader;
-            [NativeDisableUnsafePtrRestriction] public ContactHeader* m_LastHeader;
-            [NativeDisableUnsafePtrRestriction] public ContactPoint* m_LastContact;
+            [NativeDisableContainerSafetyRestriction]
+            NativeStream.Reader m_ContactReader;
+
+            [NativeDisableUnsafePtrRestriction]
+            public ContactHeader* m_LastHeader;
+
+            [NativeDisableUnsafePtrRestriction]
+            public ContactPoint* m_LastContact;
             int m_NumPointsLeft;
             int m_CurrentForEachIndex;
             int m_ForEachIndexEnd;
 
             public ContactsJobIterator(NativeStream.Reader reader, int forEachIndexBegin, int forEachIndexEnd)
             {
-                SafetyChecks.CheckAreEqualAndThrow(true, forEachIndexBegin >= 0
-                    && forEachIndexBegin <= forEachIndexEnd // Note: we use <= here since for empty readers,
-                                                            // forEachIndexEnd will be identical to forEachIndexBegin,
-                                                            // both being zero. This is still valid, and should not throw.
-                    && forEachIndexEnd <= reader.ForEachCount);
+                SafetyChecks.CheckAreEqualAndThrow(
+                    true,
+                    forEachIndexBegin >= 0
+                        && forEachIndexBegin <= forEachIndexEnd // Note: we use <= here since for empty readers,
+                        // forEachIndexEnd will be identical to forEachIndexBegin,
+                        // both being zero. This is still valid, and should not throw.
+                        && forEachIndexEnd <= reader.ForEachCount
+                );
 
                 m_ContactReader = reader;
 

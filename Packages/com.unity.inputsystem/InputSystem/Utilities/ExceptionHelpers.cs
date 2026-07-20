@@ -8,9 +8,9 @@ namespace UnityEngine.InputSystem.Utilities
         {
             Debug.Assert(exception != null, "Exception is null");
 
-            return exception is NullReferenceException ||
-                exception is IndexOutOfRangeException ||
-                exception is ArgumentException;
+            return exception is NullReferenceException
+                || exception is IndexOutOfRangeException
+                || exception is ArgumentException;
         }
     }
 }

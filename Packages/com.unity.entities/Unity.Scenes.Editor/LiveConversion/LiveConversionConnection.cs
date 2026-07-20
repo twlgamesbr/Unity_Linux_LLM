@@ -18,20 +18,21 @@ namespace Unity.Scenes.Editor
     // For example server world vs client world.
     class LiveConversionConnection
     {
-        static int                                 GlobalDirtyID = 0;
+        static int GlobalDirtyID = 0;
 
-        HashSet<Hash128>                           _LoadedScenes = new HashSet<Hash128>();
-        HashSet<Hash128>                           _SentLoadScenes = new HashSet<Hash128>();
-        NativeList<Hash128>                        _RemovedScenes;
-        Dictionary<Hash128, LiveConversionDiffGenerator> _SceneGUIDToLiveConversion = new Dictionary<Hash128, LiveConversionDiffGenerator>();
-        int                                        _PreviousGlobalDirtyID;
-        Dictionary<Hash128, Scene>                 _GUIDToEditScene = new Dictionary<Hash128, Scene>();
+        HashSet<Hash128> _LoadedScenes = new HashSet<Hash128>();
+        HashSet<Hash128> _SentLoadScenes = new HashSet<Hash128>();
+        NativeList<Hash128> _RemovedScenes;
+        Dictionary<Hash128, LiveConversionDiffGenerator> _SceneGUIDToLiveConversion =
+            new Dictionary<Hash128, LiveConversionDiffGenerator>();
+        int _PreviousGlobalDirtyID;
+        Dictionary<Hash128, Scene> _GUIDToEditScene = new Dictionary<Hash128, Scene>();
 
-        internal readonly Hash128                  _ConfigurationGUID;
-        IEntitiesPlayerSettings                    _SettingAsset;
-        UnityEngine.Hash128                        _BuildConfigurationArtifactHash;
+        internal readonly Hash128 _ConfigurationGUID;
+        IEntitiesPlayerSettings _SettingAsset;
+        UnityEngine.Hash128 _BuildConfigurationArtifactHash;
 
-        static readonly List<LiveConversionConnection>   k_AllConnections = new List<LiveConversionConnection>();
+        static readonly List<LiveConversionConnection> k_AllConnections = new List<LiveConversionConnection>();
 
         public LiveConversionConnection(Hash128 configGuid)
         {
@@ -136,7 +137,8 @@ namespace Unity.Scenes.Editor
                             GetLiveConversion(evt.previousScene)?.ChangeTracker.MarkRemoved(evt.entityId);
                         }
                         else
-                            GetLiveConversion(evt.newScene)?.ChangeTracker.MarkParentChanged(evt.entityId, evt.newParentEntityId);
+                            GetLiveConversion(evt.newScene)
+                                ?.ChangeTracker.MarkParentChanged(evt.entityId, evt.newParentEntityId);
                         break;
                     }
                     case ObjectChangeKind.ChangeChildrenOrder:
@@ -278,7 +280,12 @@ namespace Unity.Scenes.Editor
                 diffGenerator.ChangeTracker.MarkLightBakingChanged();
         }
 
-        public void Update(List<LiveConversionChangeSet> changeSets, NativeList<Hash128> loadScenes, NativeList<Hash128> unloadScenes, LiveConversionMode mode)
+        public void Update(
+            List<LiveConversionChangeSet> changeSets,
+            NativeList<Hash128> loadScenes,
+            NativeList<Hash128> unloadScenes,
+            LiveConversionMode mode
+        )
         {
             if (_LoadedScenes.Count == 0 && _SceneGUIDToLiveConversion.Count == 0 && _RemovedScenes.Length == 0)
                 return;
@@ -286,7 +293,8 @@ namespace Unity.Scenes.Editor
             // If build configuration changed, we need to trigger a full conversion
             if (_ConfigurationGUID != default)
             {
-                var buildConfigurationDependencyHash = DotsGlobalSettings.Instance.GetSettingsAsset(_ConfigurationGUID)?.GetHash() ?? default;
+                var buildConfigurationDependencyHash =
+                    DotsGlobalSettings.Instance.GetSettingsAsset(_ConfigurationGUID)?.GetHash() ?? default;
                 if (_BuildConfigurationArtifactHash != buildConfigurationDependencyHash)
                 {
                     _BuildConfigurationArtifactHash = buildConfigurationDependencyHash;
@@ -307,8 +315,10 @@ namespace Unity.Scenes.Editor
                 var scene = EditorSceneManager.GetSceneAt(i);
 
                 //this is to avoid trying to get the guid of a scene loaded from a content archive during play mode
-                if (!scene.path.StartsWith("Assets/", System.StringComparison.OrdinalIgnoreCase) &&
-                    !scene.path.StartsWith("Packages/", System.StringComparison.OrdinalIgnoreCase))
+                if (
+                    !scene.path.StartsWith("Assets/", System.StringComparison.OrdinalIgnoreCase)
+                    && !scene.path.StartsWith("Packages/", System.StringComparison.OrdinalIgnoreCase)
+                )
                     continue;
 
                 var sceneGUID = AssetDatabaseCompatibility.PathToGUID(scene.path);
@@ -362,7 +372,13 @@ namespace Unity.Scenes.Editor
                     var liveConversion = GetLiveConversion(sceneGuid);
 
                     if (liveConversion == null || liveConversion.DidRequestUpdate(globalArtifactDependencyVersion))
-                        AddLiveConversionChangeSet(ref liveConversion, sceneGuid, changeSets, globalArtifactDependencyVersion, mode);
+                        AddLiveConversionChangeSet(
+                            ref liveConversion,
+                            sceneGuid,
+                            changeSets,
+                            globalArtifactDependencyVersion,
+                            mode
+                        );
 
                     if (conversionMode == LiveConversionSettings.ConversionMode.IncrementalConversionWithDebug)
                     {
@@ -383,7 +399,13 @@ namespace Unity.Scenes.Editor
             }
         }
 
-        void AddLiveConversionChangeSet(ref LiveConversionDiffGenerator liveConversion, Hash128 sceneGUID, List<LiveConversionChangeSet> changeSets, ulong globalArtifactVersion, LiveConversionMode mode)
+        void AddLiveConversionChangeSet(
+            ref LiveConversionDiffGenerator liveConversion,
+            Hash128 sceneGUID,
+            List<LiveConversionChangeSet> changeSets,
+            ulong globalArtifactVersion,
+            LiveConversionMode mode
+        )
         {
             //@TODO: need one place that LiveConversionDiffGenerators are managed. UpdateLiveConversion does a Dispose()
             // but this must be paired with membership in _SceneGUIDToLiveConversion. not good to have multiple places
@@ -397,7 +419,16 @@ namespace Unity.Scenes.Editor
             try
             {
                 var editScene = _GUIDToEditScene[sceneGUID];
-                var didChange = LiveConversionDiffGenerator.UpdateLiveConversion(editScene, sceneGUID, ref liveConversion, mode, globalArtifactVersion, _ConfigurationGUID, _SettingAsset, out var changes);
+                var didChange = LiveConversionDiffGenerator.UpdateLiveConversion(
+                    editScene,
+                    sceneGUID,
+                    ref liveConversion,
+                    mode,
+                    globalArtifactVersion,
+                    _ConfigurationGUID,
+                    _SettingAsset,
+                    out var changes
+                );
                 if (didChange)
                     changeSets.Add(changes);
             }

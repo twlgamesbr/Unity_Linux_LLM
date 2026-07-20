@@ -11,7 +11,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
     {
         readonly TreeModel m_Tree;
         readonly Dictionary<ulong, TreeModelNode> m_ConnectionsById = new Dictionary<ulong, TreeModelNode>();
-        readonly Dictionary<ulong, Dictionary<ulong, TreeModelNode>> m_NetworkObjectsByConnectionsById = new Dictionary<ulong, Dictionary<ulong, TreeModelNode>>();
+        readonly Dictionary<ulong, Dictionary<ulong, TreeModelNode>> m_NetworkObjectsByConnectionsById =
+            new Dictionary<ulong, Dictionary<ulong, TreeModelNode>>();
         readonly MetricCollection m_MetricCollection;
 
         public TreeModelBuilder(MetricCollection metricCollection)
@@ -28,7 +29,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         internal TreeModelBuilder AddUnderConnection<TMetricType, TViewModelType>(
             MetricType metricType,
             Func<TMetricType, TreeModelNode, TViewModelType> viewModelFactory,
-            Func<TMetricType, bool> filter = null)
+            Func<TMetricType, bool> filter = null
+        )
             where TMetricType : struct, INetworkMetricEvent
             where TViewModelType : ViewModelBase
         {
@@ -77,7 +79,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
         internal TreeModelBuilder AddUnderNetworkObject<TMetricType, TViewModelType>(
             MetricType metricType,
-            Func<TMetricType, TreeModelNode, TViewModelType> viewModelFactory)
+            Func<TMetricType, TreeModelNode, TViewModelType> viewModelFactory
+        )
             where TMetricType : struct, INetworkObjectEvent, INetworkMetricEvent
             where TViewModelType : ViewModelBase
         {
@@ -130,25 +133,31 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             return node;
         }
 
-        TreeModelNode GetOrCreateGameObject(ConnectionInfo connectionInfo, NetworkObjectIdentifier networkObjectIdentifier)
+        TreeModelNode GetOrCreateGameObject(
+            ConnectionInfo connectionInfo,
+            NetworkObjectIdentifier networkObjectIdentifier
+        )
         {
             var connectionNode = GetOrCreateConnection(connectionInfo);
             var networkObjectLookup = m_NetworkObjectsByConnectionsById[connectionInfo.Id];
             if (!networkObjectLookup.TryGetValue(networkObjectIdentifier.NetworkId, out var node))
             {
-                node = new TreeModelNode(new GameObjectViewModel(
-                    networkObjectIdentifier,
-                    connectionNode.RowData,
-                    () =>
-                    {
-                        var foundNetworkObject =
-                            NetworkSolutionInterface.NetworkObjectProvider?.GetNetworkObject(
-                                networkObjectIdentifier.NetworkId);
-                        if (foundNetworkObject)
+                node = new TreeModelNode(
+                    new GameObjectViewModel(
+                        networkObjectIdentifier,
+                        connectionNode.RowData,
+                        () =>
                         {
-                            EditorGUIUtility.PingObject(foundNetworkObject);
+                            var foundNetworkObject = NetworkSolutionInterface.NetworkObjectProvider?.GetNetworkObject(
+                                networkObjectIdentifier.NetworkId
+                            );
+                            if (foundNetworkObject)
+                            {
+                                EditorGUIUtility.PingObject(foundNetworkObject);
+                            }
                         }
-                    }));
+                    )
+                );
                 connectionNode.AddChild(node);
                 networkObjectLookup[networkObjectIdentifier.NetworkId] = node;
             }

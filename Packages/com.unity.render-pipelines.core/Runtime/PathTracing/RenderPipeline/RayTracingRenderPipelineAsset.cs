@@ -1,6 +1,5 @@
 #if ENABLE_PATH_TRACING_SRP
 using UnityEngine.PathTracing.Core;
-
 #if ENABLE_PATH_TRACING_SRP
 using UnityEngine.Rendering;
 using UnityEngine;

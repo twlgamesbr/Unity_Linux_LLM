@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpIncrementalGeneratorVerifier<
-        Unity.Entities.SourceGen.JobEntityGenerator.JobEntityGenerator>;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpIncrementalGeneratorVerifier<Unity.Entities.SourceGen.JobEntityGenerator.JobEntityGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -12,7 +10,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntityBasic()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             public partial struct MyJob : IJobEntity
@@ -26,7 +25,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntityIfDirective()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
 
             #if !UNITY_EDITOR
@@ -36,13 +36,18 @@ public class JobEntityVerify
             }
             #endif";
 
-        await VerifyCS.VerifySourceGeneratorAsync(source, nameof(JobEntityIfDirective), "Test0__JobEntity_19875963024.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            source,
+            nameof(JobEntityIfDirective),
+            "Test0__JobEntity_19875963024.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task JobEntityIfDirectiveInUsing()
     {
-        const string source = @"
+        const string source =
+            @"
             #if !UNITY_EDITOR
             using Unity.Entities;
 
@@ -58,7 +63,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntityRemembersEarlyEscape()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             #if !UNITY_EDITOR
             #endif
@@ -74,7 +80,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntityRemembersEarlyNestedEscape()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             #if !UNITY_EDITOR
             class MyClass {}
@@ -91,7 +98,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntityClassEscape()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             partial class MyClass {
                 #region Example
@@ -114,7 +122,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntityIfDefWithAttribute()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -128,7 +137,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntityDisabledChangeFilter()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -137,13 +147,18 @@ public class JobEntityVerify
             partial struct MyJob : IJobEntity { public void Execute(Entity _) {} }
         ";
 
-        await VerifyCS.VerifySourceGeneratorAsync(source, nameof(JobEntityDisabledChangeFilter), "Test0__JobEntity_19875963024.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            source,
+            nameof(JobEntityDisabledChangeFilter),
+            "Test0__JobEntity_19875963024.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task JobEntity_WithDisabled_EnabledRefRW_RefRW_QueryIsCorrect()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -162,7 +177,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntity_WithDisabled_EnabledRefRW_RefRO_QueryIsCorrect()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -181,7 +197,8 @@ public class JobEntityVerify
     [TestMethod]
     public async Task JobEntity_WithDisabled_EnabledRefRW_QueryIsCorrect()
     {
-        const string source = @"
+        const string source =
+            @"
             using Unity.Entities;
             using Unity.Entities.Tests;
 
@@ -197,10 +214,11 @@ public class JobEntityVerify
         await VerifyCS.VerifySourceGeneratorAsync(source, "JobEntity_Disabled_2", "Test0__JobEntity_19875963024.g.cs");
     }
 
-     [TestMethod]
-     public async Task JobEntity_WithDisabled_RefRW_QueryIsCorrect()
-     {
-         const string source = @"
+    [TestMethod]
+    public async Task JobEntity_WithDisabled_RefRW_QueryIsCorrect()
+    {
+        const string source =
+            @"
              using Unity.Entities;
              using Unity.Entities.Tests;
 
@@ -213,13 +231,14 @@ public class JobEntityVerify
              }
          ";
 
-         await VerifyCS.VerifySourceGeneratorAsync(source, "JobEntity_Disabled_5", "Test0__JobEntity_19875963024.g.cs");
-     }
+        await VerifyCS.VerifySourceGeneratorAsync(source, "JobEntity_Disabled_5", "Test0__JobEntity_19875963024.g.cs");
+    }
 
-     [TestMethod]
-     public async Task JobEntity_WithDisabled_EnabledRefRO_RefRW_QueryIsCorrect()
-     {
-         const string source = @"
+    [TestMethod]
+    public async Task JobEntity_WithDisabled_EnabledRefRO_RefRW_QueryIsCorrect()
+    {
+        const string source =
+            @"
              using Unity.Entities;
              using Unity.Entities.Tests;
 
@@ -232,6 +251,6 @@ public class JobEntityVerify
              }
          ";
 
-         await VerifyCS.VerifySourceGeneratorAsync(source, "JobEntity_Disabled_1", "Test0__JobEntity_19875963024.g.cs");
-     }
+        await VerifyCS.VerifySourceGeneratorAsync(source, "JobEntity_Disabled_1", "Test0__JobEntity_19875963024.g.cs");
+    }
 }

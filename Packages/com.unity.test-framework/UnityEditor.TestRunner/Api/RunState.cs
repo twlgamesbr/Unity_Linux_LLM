@@ -28,6 +28,6 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// <summary>
         /// The test has been ignored. May appear on a Test, when the IgnoreAttribute is used.
         /// </summary>
-        Ignored
+        Ignored,
     }
 }

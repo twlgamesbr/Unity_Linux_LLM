@@ -8,7 +8,8 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
     {
         readonly TestMode m_TestModesIncluded;
 
-        public PostbuildCleanupWithTestDataTask(ExecutionSettings settings) : base(new PostbuildCleanupWithTestDataAttributeFinder())
+        public PostbuildCleanupWithTestDataTask(ExecutionSettings settings)
+            : base(new PostbuildCleanupWithTestDataAttributeFinder())
         {
             if (settings.EditModeIncluded())
                 m_TestModesIncluded |= TestMode.EditMode;
@@ -21,7 +22,9 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
 
         protected override void Action(IPostbuildCleanupWithTestData target, TestJobData testJobData)
         {
-            target.Cleanup(new TestData(m_TestModesIncluded, testJobData.TargetRuntimePlatform, testJobData.filteredTests));
+            target.Cleanup(
+                new TestData(m_TestModesIncluded, testJobData.TargetRuntimePlatform, testJobData.filteredTests)
+            );
         }
     }
 }

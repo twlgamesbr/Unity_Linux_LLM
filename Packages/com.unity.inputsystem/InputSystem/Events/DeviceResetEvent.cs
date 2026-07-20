@@ -28,8 +28,10 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static DeviceResetEvent Create(int deviceId, bool hardReset = false, double time = -1)
         {
-            var inputEvent =
-                new DeviceResetEvent {baseEvent = new InputEvent(Type, InputEvent.kBaseEventSize, deviceId, time)};
+            var inputEvent = new DeviceResetEvent
+            {
+                baseEvent = new InputEvent(Type, InputEvent.kBaseEventSize, deviceId, time),
+            };
             inputEvent.hardReset = hardReset;
             return inputEvent;
         }

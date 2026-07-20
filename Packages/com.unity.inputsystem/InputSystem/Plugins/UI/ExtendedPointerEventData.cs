@@ -20,9 +20,7 @@ namespace UnityEngine.InputSystem.UI
     public class ExtendedPointerEventData : PointerEventData
     {
         public ExtendedPointerEventData(EventSystem eventSystem)
-            : base(eventSystem)
-        {
-        }
+            : base(eventSystem) { }
 
         /// <summary>
         /// The <see cref="InputControl"/> that generated the pointer input.
@@ -166,8 +164,8 @@ namespace UnityEngine.InputSystem.UI
                 {
                     if (pen == otherPen)
                     {
-                        return UIElements.PointerId.penPointerIdBase +
-                            Mathf.Min(n, UIElements.PointerId.penPointerCount - 1);
+                        return UIElements.PointerId.penPointerIdBase
+                            + Mathf.Min(n, UIElements.PointerId.penPointerCount - 1);
                     }
                     n++;
                 }
@@ -177,8 +175,8 @@ namespace UnityEngine.InputSystem.UI
         private static int GetTouchPointerId(TouchControl touchControl)
         {
             var i = ((Touchscreen)touchControl.device).touches.IndexOfReference(touchControl);
-            return UIElements.PointerId.touchPointerIdBase +
-                Mathf.Clamp(i, 0, UIElements.PointerId.touchPointerCount - 1);
+            return UIElements.PointerId.touchPointerIdBase
+                + Mathf.Clamp(i, 0, UIElements.PointerId.touchPointerCount - 1);
         }
     }
 

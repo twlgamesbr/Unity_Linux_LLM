@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEditor.TestTools.TestRunner.Api;
 using TreeViewController = UnityEditor.IMGUI.Controls.TreeViewController<int>;
-using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
 using TreeViewDataSource = UnityEditor.IMGUI.Controls.TreeViewDataSource<int>;
+using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
 
 namespace UnityEditor.TestTools.TestRunner.GUI
 {
@@ -12,7 +12,12 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         private readonly TestListGUI m_TestListGUI;
         private ITestAdaptor[] m_RootTests;
 
-        public TestListTreeViewDataSource(TreeViewController testListTree, TestListGUI testListGUI, ITestAdaptor[] rootTests) : base(testListTree)
+        public TestListTreeViewDataSource(
+            TreeViewController testListTree,
+            TestListGUI testListGUI,
+            ITestAdaptor[] rootTests
+        )
+            : base(testListTree)
         {
             showRootItem = false;
             rootIsCollapsable = false;
@@ -27,7 +32,12 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
         public override void FetchData()
         {
-            var testListBuilder = new TestTreeViewBuilder(m_RootTests, m_TestListGUI.ResultsByKey, m_TestListGUI.m_TestRunnerUIFilter, m_TestListGUI.m_RunOnPlatform);
+            var testListBuilder = new TestTreeViewBuilder(
+                m_RootTests,
+                m_TestListGUI.ResultsByKey,
+                m_TestListGUI.m_TestRunnerUIFilter,
+                m_TestListGUI.m_RunOnPlatform
+            );
 
             m_RootItem = testListBuilder.BuildTreeView();
             SetExpanded(m_RootItem, true);

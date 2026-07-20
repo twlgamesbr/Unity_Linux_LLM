@@ -9,7 +9,7 @@ namespace Unity.Multiplayer.Tools.MetricTestData
         const float k_LargeMax = 20f;
         const float k_MediumMax = 10f;
         const float k_SmallMax = 5f;
-        const float k_MinRtt =  30e-3f;
+        const float k_MinRtt = 30e-3f;
         const float k_MaxRtt = 200e-3f;
 
         const float k_Percent = 1e-2f;
@@ -23,16 +23,19 @@ namespace Unity.Multiplayer.Tools.MetricTestData
         public LogNormalRandomWalk UnnamedMessagesReceived { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
 
         public LogNormalRandomWalk NetworkVariableDeltasSent { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
-        public LogNormalRandomWalk NetworkVariableDeltasReceived { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
+        public LogNormalRandomWalk NetworkVariableDeltasReceived { get; } =
+            new LogNormalRandomWalk { Max = k_LargeMax };
 
-        public LogNormalRandomWalk OwnershipChangeEventsReceived { get; } = new LogNormalRandomWalk { Max = k_MediumMax };
+        public LogNormalRandomWalk OwnershipChangeEventsReceived { get; } =
+            new LogNormalRandomWalk { Max = k_MediumMax };
         public LogNormalRandomWalk OwnershipChangeEventsSent { get; } = new LogNormalRandomWalk { Max = k_MediumMax };
 
         public LogNormalRandomWalk ObjectSpawnEventsSent { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
         public LogNormalRandomWalk ObjectSpawnEventsReceived { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
 
         public LogNormalRandomWalk ObjectDestroyedEventsSent { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
-        public LogNormalRandomWalk ObjectDestroyedEventsReceived { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
+        public LogNormalRandomWalk ObjectDestroyedEventsReceived { get; } =
+            new LogNormalRandomWalk { Max = k_LargeMax };
 
         public LogNormalRandomWalk RpcEventsSent { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
         public LogNormalRandomWalk RpcEventsReceived { get; } = new LogNormalRandomWalk { Max = k_LargeMax };
@@ -49,11 +52,13 @@ namespace Unity.Multiplayer.Tools.MetricTestData
 
         public LogNormalRandomWalk RttToServer { get; } = new LogNormalRandomWalk() { Min = k_MinRtt, Max = k_MaxRtt };
 
-        public LogNormalRandomWalk NetworkObjectsCount { get; } = new LogNormalRandomWalk() { Min = k_SmallMax, Max = k_LargeMax };
+        public LogNormalRandomWalk NetworkObjectsCount { get; } =
+            new LogNormalRandomWalk() { Min = k_SmallMax, Max = k_LargeMax };
 
         public LogNormalRandomWalk ConnectionsCount { get; } = new LogNormalRandomWalk() { Max = k_MediumMax };
 
-        public LogNormalRandomWalk PacketLoss { get; } = new LogNormalRandomWalk() { Min = k_PacketLossMin, Max = k_PacketLossMax };
+        public LogNormalRandomWalk PacketLoss { get; } =
+            new LogNormalRandomWalk() { Min = k_PacketLossMin, Max = k_PacketLossMax };
     }
 }
 

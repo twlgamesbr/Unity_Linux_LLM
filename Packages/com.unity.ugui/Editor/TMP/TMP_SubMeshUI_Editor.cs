@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
@@ -23,7 +23,6 @@ namespace TMPro.EditorUtilities
         //private CanvasRenderer m_canvasRenderer;
         private Material m_targetMaterial;
 
-
         public void OnEnable()
         {
             fontAsset_prop = serializedObject.FindProperty("m_fontAsset");
@@ -32,7 +31,6 @@ namespace TMPro.EditorUtilities
             //m_SubMeshComponent = target as TMP_SubMeshUI;
             //m_rectTransform = m_SubMeshComponent.rectTransform;
             //m_canvasRenderer = m_SubMeshComponent.canvasRenderer;
-
 
             // Create new Material Editor if one does not exists
             /*
@@ -43,7 +41,6 @@ namespace TMPro.EditorUtilities
             }
             */
         }
-
 
         public void OnDisable()
         {
@@ -56,8 +53,6 @@ namespace TMPro.EditorUtilities
             }
             */
         }
-
-
 
         public override void OnInspectorGUI()
         {
@@ -97,6 +92,5 @@ namespace TMPro.EditorUtilities
             }
             */
         }
-
     }
 }

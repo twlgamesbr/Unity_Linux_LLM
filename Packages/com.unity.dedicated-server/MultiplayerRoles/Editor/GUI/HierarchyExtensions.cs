@@ -42,10 +42,10 @@ namespace Unity.Multiplayer.Editor
             if (target == MultiplayerRoleFlags.ClientAndServer)
                 return;
 
-            var iconName = target == MultiplayerRoleFlags.Server
-                ? "BuildSettings.DedicatedServer On"
-                : (target == MultiplayerRoleFlags.Client ? "BuildSettings.Standalone On" : null);
-
+            var iconName =
+                target == MultiplayerRoleFlags.Server
+                    ? "BuildSettings.DedicatedServer On"
+                    : (target == MultiplayerRoleFlags.Client ? "BuildSettings.Standalone On" : null);
 
             var activeTarget = EditorMultiplayerRolesManager.ActiveMultiplayerRoleMask;
 

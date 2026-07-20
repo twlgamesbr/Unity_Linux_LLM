@@ -42,7 +42,10 @@ namespace UnityEngine.Rendering
                 Assert.IsTrue(updateBatch.HasAnyComponent(LODGroupComponentMask.WorldSpaceSize));
                 Assert.IsTrue(updateBatch.HasAnyComponent(LODGroupComponentMask.LODBuffer));
 
-                NativeArray<GPUInstanceIndex> instances = m_LODGroupDataSystem.GetOrAllocateInstances(updateBatch, Allocator.TempJob);
+                NativeArray<GPUInstanceIndex> instances = m_LODGroupDataSystem.GetOrAllocateInstances(
+                    updateBatch,
+                    Allocator.TempJob
+                );
                 m_LODGroupDataSystem.UpdateLODGroupData(updateBatch, instances);
                 instances.Dispose();
             }
@@ -66,19 +69,23 @@ namespace UnityEngine.Rendering
             if (inputData.lodGroup.Length == 0)
                 return;
 
-            var updateMode = inputData.transformOnly ? LODGroupUpdateBatchMode.OnlyKnownInstances : LODGroupUpdateBatchMode.MightIncludeNewInstances;
+            var updateMode = inputData.transformOnly
+                ? LODGroupUpdateBatchMode.OnlyKnownInstances
+                : LODGroupUpdateBatchMode.MightIncludeNewInstances;
 
-            var updateBatch = new LODGroupUpdateBatch(new LODGroupUpdateSection
-            {
-                instanceIDs = inputData.lodGroup,
-                worldSpaceReferencePoints = inputData.worldSpaceReferencePoint.Reinterpret<float3>(),
-                worldSpaceSizes = inputData.worldSpaceSize,
-                lodGroupSettings = inputData.groupSettings,
-                forceLODMask = inputData.forceLODMask,
-                lodBuffers = inputData.lodBuffer
-            },
-            updateMode,
-            Allocator.TempJob);
+            var updateBatch = new LODGroupUpdateBatch(
+                new LODGroupUpdateSection
+                {
+                    instanceIDs = inputData.lodGroup,
+                    worldSpaceReferencePoints = inputData.worldSpaceReferencePoint.Reinterpret<float3>(),
+                    worldSpaceSizes = inputData.worldSpaceSize,
+                    lodGroupSettings = inputData.groupSettings,
+                    forceLODMask = inputData.forceLODMask,
+                    lodBuffers = inputData.lodBuffer,
+                },
+                updateMode,
+                Allocator.TempJob
+            );
 
             updateBatch.Validate();
             ProcessUpdateBatch(updateBatch);

@@ -12,7 +12,11 @@ namespace UnityEditor.RenderPipelines.Core
         /// <param name="name">Default material name.</param>
         /// <param name="callback">A delegate (callback) that will be invoked with the <see cref="Material"/>.</param>
         /// <param name="shaderTemplateAssetPath">Path of the Shader Template file.</param>
-        internal static void CreateShaderAndMaterial(string name, Action<Material> callback, string shaderTemplateAssetPath)
+        internal static void CreateShaderAndMaterial(
+            string name,
+            Action<Material> callback,
+            string shaderTemplateAssetPath
+        )
         {
             CreateShader(
                 name,
@@ -20,12 +24,16 @@ namespace UnityEditor.RenderPipelines.Core
                 {
                     Material material = new Material(shader);
                     var path = AssetDatabase.GetAssetPath(shader);
-                    AssetDatabase.CreateAsset(material, Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path) + ".mat"));
+                    AssetDatabase.CreateAsset(
+                        material,
+                        Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path) + ".mat")
+                    );
                     AssetDatabase.SaveAssetIfDirty(material);
                     AssetDatabase.Refresh(ImportAssetOptions.Default);
                     callback?.Invoke(material);
                 },
-                shaderTemplateAssetPath);
+                shaderTemplateAssetPath
+            );
         }
 
         /// <summary>
@@ -85,14 +93,26 @@ namespace UnityEditor.RenderPipelines.Core
             );
         }
 
-        static void CreateAsset(string name, Action<string> callback = null, string extension = "asset", Type type = null)
+        static void CreateAsset(
+            string name,
+            Action<string> callback = null,
+            string extension = "asset",
+            Type type = null
+        )
         {
             AssetCreationCallback assetCreationCallback = ScriptableObject.CreateInstance<AssetCreationCallback>();
             assetCreationCallback.callback = callback;
             assetCreationCallback.extension = extension;
 
             var icon = AssetPreview.GetMiniTypeThumbnail(type);
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None, assetCreationCallback, name, icon, null, false);
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
+                EntityId.None,
+                assetCreationCallback,
+                name,
+                icon,
+                null,
+                false
+            );
         }
 
         class AssetCreationCallback : ProjectWindowCallback.AssetCreationEndAction

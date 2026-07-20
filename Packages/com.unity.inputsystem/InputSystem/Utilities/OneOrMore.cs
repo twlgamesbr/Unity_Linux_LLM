@@ -86,9 +86,7 @@ namespace UnityEngine.InputSystem.Utilities
             public TValue Current => m_List[m_Index];
             object IEnumerator.Current => Current;
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
     }
 }

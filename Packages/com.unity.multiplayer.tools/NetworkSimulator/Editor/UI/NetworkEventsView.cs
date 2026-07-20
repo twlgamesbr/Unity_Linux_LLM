@@ -60,9 +60,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 
         void OnEditorUpdate()
         {
-            ConnectionToggle.SetValueWithoutNotify(m_NetworkSimulator.IsConnected
-                ? k_ToggleConnectedString
-                : k_ToggleDisconnectedString);
+            ConnectionToggle.SetValueWithoutNotify(
+                m_NetworkSimulator.IsConnected ? k_ToggleConnectedString : k_ToggleDisconnectedString
+            );
 
             ConnectionIndicator.EnableInClassList(k_DisconnectedClassName, !m_NetworkSimulator.IsConnected);
         }

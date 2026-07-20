@@ -24,6 +24,7 @@ namespace Unity.Web.Stripping.Editor
         /// Look up method by assembly name and then method name.
         /// </summary>
         public Dictionary<string, Dictionary<string, List<MethodMapEntry>>> MethodsByAssembly = new();
+
         /// <summary>
         /// Look up method by method name.
         /// </summary>
@@ -60,7 +61,7 @@ namespace Unity.Web.Stripping.Editor
                 {
                     Assembly = components[2],
                     MethodName = components[1],
-                    NativeFunctionName = components[0]
+                    NativeFunctionName = components[0],
                 };
 
                 // Skip methods without native function name

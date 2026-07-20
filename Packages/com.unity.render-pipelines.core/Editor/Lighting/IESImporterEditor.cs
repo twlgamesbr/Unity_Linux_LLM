@@ -46,26 +46,31 @@ namespace UnityEditor.Rendering
         /// Delegate prototype sent by the specialization of the IESImporterEditor per Render Pipeline
         /// </summary>
         public delegate void LayoutRenderPipelineUseIesMaximumIntensity();
+
         /// <summary>
         /// Delegate prototype sent by the specialization of the IESImporterEditor per Render Pipeline
         /// </summary>
         /// <param name="camera">Current camera</param>
         public delegate void SetupRenderPipelinePreviewCamera(Camera camera);
+
         /// <summary>
         /// Delegate prototype sent by the specialization of the IESImporterEditor per Render Pipeline
         /// </summary>
         /// <param name="light">Light will be setuped, specialization for a given SRP</param>
         public delegate void SetupRenderPipelinePreviewLight(Light light);
+
         /// <summary>
         /// Delegate prototype sent by the specialization of the IESImporterEditor per Render Pipeline
         /// </summary>
         /// <param name="wallRenderer">Setup a wall for the preview</param>
         public delegate void SetupRenderPipelinePreviewWallRenderer(MeshRenderer wallRenderer);
+
         /// <summary>
         /// Delegate prototype sent by the specialization of the IESImporterEditor per Render Pipeline
         /// </summary>
         /// <param name="floorRenderer">Setup a floor for the preview</param>
         public delegate void SetupRenderPipelinePreviewFloorRenderer(MeshRenderer floorRenderer);
+
         /// <summary>
         /// Delegate prototype sent by the specialization of the IESImporterEditor per Render Pipeline
         /// </summary>
@@ -73,7 +78,12 @@ namespace UnityEditor.Rendering
         /// <param name="useIESMaximumIntensityProp">Serialized property to the "useIESMaximumIntensity" property</param>
         /// <param name="iesMaximumIntensityUnitProp">Serialized property to the "iesMaximumIntensityUnit" property</param>
         /// <param name="iesMaximumIntensityProp">Serialized property to the "iesMaximumIntensity" property</param>
-        public delegate void SetupRenderPipelinePreviewLightIntensity(Light light, SerializedProperty useIESMaximumIntensityProp, SerializedProperty iesMaximumIntensityUnitProp, SerializedProperty iesMaximumIntensityProp);
+        public delegate void SetupRenderPipelinePreviewLightIntensity(
+            Light light,
+            SerializedProperty useIESMaximumIntensityProp,
+            SerializedProperty iesMaximumIntensityUnitProp,
+            SerializedProperty iesMaximumIntensityProp
+        );
 
         /// <summary>
         /// Callback called on the Implemented IESImporterEditor (currently on HDRP Only)
@@ -113,15 +123,43 @@ namespace UnityEditor.Rendering
 
             EditorGUILayout.LabelField("File Format Version", m_FileFormatVersionProp.stringValue);
             EditorGUILayout.LabelField("Photometric Type", m_IESPhotometricTypeProp.stringValue);
-            EditorGUILayout.LabelField("Maximum Intensity", $"{m_IESMaximumIntensityProp.floatValue} {m_IESMaximumIntensityUnitProp.stringValue}");
+            EditorGUILayout.LabelField(
+                "Maximum Intensity",
+                $"{m_IESMaximumIntensityProp.floatValue} {m_IESMaximumIntensityUnitProp.stringValue}"
+            );
 
-            if (m_ShowLuminaireProductInformation = EditorGUILayout.Foldout(m_ShowLuminaireProductInformation, "Luminaire Product Information"))
+            if (
+                m_ShowLuminaireProductInformation = EditorGUILayout.Foldout(
+                    m_ShowLuminaireProductInformation,
+                    "Luminaire Product Information"
+                )
+            )
             {
-                EditorGUILayout.LabelField(m_ManufacturerProp.displayName, m_ManufacturerProp.stringValue, m_WordWrapStyle);
-                EditorGUILayout.LabelField(m_LuminaireCatalogNumberProp.displayName, m_LuminaireCatalogNumberProp.stringValue, m_WordWrapStyle);
-                EditorGUILayout.LabelField(m_LuminaireDescriptionProp.displayName, m_LuminaireDescriptionProp.stringValue, m_WordWrapStyle);
-                EditorGUILayout.LabelField(m_LampCatalogNumberProp.displayName, m_LampCatalogNumberProp.stringValue, m_WordWrapStyle);
-                EditorGUILayout.LabelField(m_LampDescriptionProp.displayName, m_LampDescriptionProp.stringValue, m_WordWrapStyle);
+                EditorGUILayout.LabelField(
+                    m_ManufacturerProp.displayName,
+                    m_ManufacturerProp.stringValue,
+                    m_WordWrapStyle
+                );
+                EditorGUILayout.LabelField(
+                    m_LuminaireCatalogNumberProp.displayName,
+                    m_LuminaireCatalogNumberProp.stringValue,
+                    m_WordWrapStyle
+                );
+                EditorGUILayout.LabelField(
+                    m_LuminaireDescriptionProp.displayName,
+                    m_LuminaireDescriptionProp.stringValue,
+                    m_WordWrapStyle
+                );
+                EditorGUILayout.LabelField(
+                    m_LampCatalogNumberProp.displayName,
+                    m_LampCatalogNumberProp.stringValue,
+                    m_WordWrapStyle
+                );
+                EditorGUILayout.LabelField(
+                    m_LampDescriptionProp.displayName,
+                    m_LampDescriptionProp.stringValue,
+                    m_WordWrapStyle
+                );
             }
 
             if (m_ShowLightProperties = EditorGUILayout.Foldout(m_ShowLightProperties, "Light and Cookie Properties"))
@@ -133,7 +171,10 @@ namespace UnityEditor.Rendering
                 EditorGUILayout.PropertyField(m_CookieCompressionProp, new GUIContent("IES Compression"));
 
                 // Before enabling this feature, more experimentation is needed with the addition of a Volume in the PreviewRenderUtility scene.
-                EditorGUILayout.PropertyField(m_UseIESMaximumIntensityProp, new GUIContent("Use IES Maximum Intensity"));
+                EditorGUILayout.PropertyField(
+                    m_UseIESMaximumIntensityProp,
+                    new GUIContent("Use IES Maximum Intensity")
+                );
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -169,10 +210,12 @@ namespace UnityEditor.Rendering
         /// <param name="setupRenderPipelinePreviewLight">Delegate provided by the Render pipeline to setup the Preview Wall</param>
         /// <param name="setupRenderPipelinePreviewWallRenderer">Delegate provided by the Render pipeline to setup the Preview Floor</param>
         /// <returns>true to specified IES has a Preview</returns>
-        public bool CommonHasPreviewGUI(SetupRenderPipelinePreviewCamera setupRenderPipelinePreviewCamera,
+        public bool CommonHasPreviewGUI(
+            SetupRenderPipelinePreviewCamera setupRenderPipelinePreviewCamera,
             SetupRenderPipelinePreviewLight setupRenderPipelinePreviewLight,
             SetupRenderPipelinePreviewWallRenderer setupRenderPipelinePreviewWallRenderer,
-            SetupRenderPipelinePreviewFloorRenderer setupRenderPipelinePreviewFloorRenderer)
+            SetupRenderPipelinePreviewFloorRenderer setupRenderPipelinePreviewFloorRenderer
+        )
         {
             if (m_PreviewRenderUtility == null)
             {
@@ -188,7 +231,10 @@ namespace UnityEditor.Rendering
 
                 setupRenderPipelinePreviewCamera(m_PreviewRenderUtility.camera);
 
-                m_PreviewRenderUtility.lights[0].type = (m_PrefabLightTypeProp.enumValueIndex == (int)IESLightType.Point) ? LightType.Point : LightType.Spot;
+                m_PreviewRenderUtility.lights[0].type =
+                    (m_PrefabLightTypeProp.enumValueIndex == (int)IESLightType.Point)
+                        ? LightType.Point
+                        : LightType.Spot;
                 m_PreviewRenderUtility.lights[0].color = Color.white;
                 m_PreviewRenderUtility.lights[0].intensity = 1f;
                 m_PreviewRenderUtility.lights[0].range = 10f;
@@ -250,8 +296,12 @@ namespace UnityEditor.Rendering
         /// <param name="r">Rect of the Preview</param>
         /// <param name="target">ScriptedImporter targeted</param>
         /// <param name="setupRenderPipelinePreviewLightIntensity">Delegate provided by the Rendering Pipeline to setup the Light Intensity</param>
-        public void CommonOnPreviewGUI(Rect r, GUIStyle background, ScriptedImporter target,
-            SetupRenderPipelinePreviewLightIntensity setupRenderPipelinePreviewLightIntensity)
+        public void CommonOnPreviewGUI(
+            Rect r,
+            GUIStyle background,
+            ScriptedImporter target,
+            SetupRenderPipelinePreviewLightIntensity setupRenderPipelinePreviewLightIntensity
+        )
         {
             if (Event.current.type == EventType.Repaint)
             {
@@ -283,10 +333,22 @@ namespace UnityEditor.Rendering
 
                 if (cookieTexture != null)
                 {
-                    m_PreviewRenderUtility.lights[0].transform.localEulerAngles = new Vector3(90f, 0f, m_LightAimAxisRotationProp.floatValue);
-                    setupRenderPipelinePreviewLightIntensity(m_PreviewRenderUtility.lights[0], m_UseIESMaximumIntensityProp, m_IESMaximumIntensityUnitProp, m_IESMaximumIntensityProp);
+                    m_PreviewRenderUtility.lights[0].transform.localEulerAngles = new Vector3(
+                        90f,
+                        0f,
+                        m_LightAimAxisRotationProp.floatValue
+                    );
+                    setupRenderPipelinePreviewLightIntensity(
+                        m_PreviewRenderUtility.lights[0],
+                        m_UseIESMaximumIntensityProp,
+                        m_IESMaximumIntensityUnitProp,
+                        m_IESMaximumIntensityProp
+                    );
                     m_PreviewRenderUtility.lights[0].cookie = cookieTexture;
-                    m_PreviewRenderUtility.lights[0].type = m_PrefabLightTypeProp.enumValueIndex == (int)IESLightType.Point ? LightType.Point : LightType.Spot;
+                    m_PreviewRenderUtility.lights[0].type =
+                        m_PrefabLightTypeProp.enumValueIndex == (int)IESLightType.Point
+                            ? LightType.Point
+                            : LightType.Spot;
 
                     m_PreviewRenderUtility.BeginPreview(r, background);
 

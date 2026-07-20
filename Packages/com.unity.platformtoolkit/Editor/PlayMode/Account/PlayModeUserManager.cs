@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEngine;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.PlatformToolkit.Editor;
+using UnityEngine;
 
 namespace Unity.PlatformToolkit.PlayMode
 {
@@ -51,10 +51,18 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private bool m_IsInPlayMode;
 
-        public PlayModeUserManager(PlayModeUserData serializedData, ObservableSerializableList<PlayModeControlsAttributeDefinition> attributeDefinitions, ScriptableObjectDataChangePersistor persistor, IEnvironment environment, IPlayModeCapability playModeCapability, bool isInPlayMode)
+        public PlayModeUserManager(
+            PlayModeUserData serializedData,
+            ObservableSerializableList<PlayModeControlsAttributeDefinition> attributeDefinitions,
+            ScriptableObjectDataChangePersistor persistor,
+            IEnvironment environment,
+            IPlayModeCapability playModeCapability,
+            bool isInPlayMode
+        )
         {
             m_SerializedData = serializedData ?? throw new ArgumentNullException(nameof(serializedData));
-            m_AttributeDefinitions = attributeDefinitions ?? throw new ArgumentNullException(nameof(attributeDefinitions));
+            m_AttributeDefinitions =
+                attributeDefinitions ?? throw new ArgumentNullException(nameof(attributeDefinitions));
 
             m_Persistor = persistor ?? throw new ArgumentNullException(nameof(persistor));
             m_Persistor.OnDataChanged += OnAccountDataChanged;
@@ -62,7 +70,9 @@ namespace Unity.PlatformToolkit.PlayMode
             m_Capability = playModeCapability ?? throw new ArgumentNullException(nameof(playModeCapability));
             m_Environment = environment ?? throw new ArgumentNullException(nameof(environment));
 
-            m_NotificationManager = environment.NotificationManager ?? throw new ArgumentNullException(nameof(environment.NotificationManager));
+            m_NotificationManager =
+                environment.NotificationManager
+                ?? throw new ArgumentNullException(nameof(environment.NotificationManager));
 
             m_IsInPlayMode = isInPlayMode;
 
@@ -97,13 +107,14 @@ namespace Unity.PlatformToolkit.PlayMode
             }
         }
 
-
-
         private void InitialiseAccountState()
         {
             if (m_IsInPlayMode)
             {
-                if (m_Capability.PrimaryAccountBehaviour == PrimaryAccountBehaviour.AlwaysSignedIn && PrimaryAccountData == null)
+                if (
+                    m_Capability.PrimaryAccountBehaviour == PrimaryAccountBehaviour.AlwaysSignedIn
+                    && PrimaryAccountData == null
+                )
                 {
                     if (m_SerializedData.SignedInAccounts.Count != 1)
                         throw new InvalidOperationException("You cannot start the game without a primary account");
@@ -115,13 +126,20 @@ namespace Unity.PlatformToolkit.PlayMode
             }
             else
             {
-                if (m_Capability.AdditionalAccountBehaviour == AdditionalAccountBehaviour.SignInOnGameRequestAndSignOutAnytime ||
-                    m_Capability.AdditionalAccountBehaviour == AdditionalAccountBehaviour.NotSupported)
+                if (
+                    m_Capability.AdditionalAccountBehaviour
+                        == AdditionalAccountBehaviour.SignInOnGameRequestAndSignOutAnytime
+                    || m_Capability.AdditionalAccountBehaviour == AdditionalAccountBehaviour.NotSupported
+                )
                 {
                     foreach (var account in m_SerializedData.AccountData)
                     {
-                        if ((account == PrimaryAccountData && m_Capability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported) ||
-                            !m_SerializedData.SignedInAccounts.Contains(account))
+                        if (
+                            (
+                                account == PrimaryAccountData
+                                && m_Capability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported
+                            ) || !m_SerializedData.SignedInAccounts.Contains(account)
+                        )
                             continue;
                         SignOutAccount(account);
                     }
@@ -136,7 +154,9 @@ namespace Unity.PlatformToolkit.PlayMode
             // This is not possible in the Play Mode Controls Window as this check is already performed
             var canSignIn = CanSignInAccount(data);
             if (canSignIn != SignInStatus.Allowed)
-                throw new InvalidOperationException($"This user cannot sign-in in this state. SignInState: {canSignIn}");
+                throw new InvalidOperationException(
+                    $"This user cannot sign-in in this state. SignInState: {canSignIn}"
+                );
 
             m_SerializedData.SignedInAccounts.Add(data);
             m_Persistor.PersistWrites();
@@ -145,9 +165,11 @@ namespace Unity.PlatformToolkit.PlayMode
 
             //Every Platform that allows primary accounts cannot have non-primary accounts signed in, while the primary is not signed in
             //Therefore we automatically set the primary account when it has not been set
-            if (m_SerializedData.PrimaryAccountData == null
-            && CanSetAccountToPrimary(data) == SetPrimaryAccountStatus.Allowed
-            && m_Capability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported)
+            if (
+                m_SerializedData.PrimaryAccountData == null
+                && CanSetAccountToPrimary(data) == SetPrimaryAccountStatus.Allowed
+                && m_Capability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported
+            )
             {
                 SetToPrimary(data);
             }
@@ -164,13 +186,17 @@ namespace Unity.PlatformToolkit.PlayMode
             {
                 var setPrimaryAccountStatus = CanSetAccountToPrimary(data);
                 if (setPrimaryAccountStatus != SetPrimaryAccountStatus.Allowed)
-                    throw new InvalidOperationException($"The primary account cannot be set in this state. SetPrimaryAccountStatus: {setPrimaryAccountStatus}");
+                    throw new InvalidOperationException(
+                        $"The primary account cannot be set in this state. SetPrimaryAccountStatus: {setPrimaryAccountStatus}"
+                    );
 
                 var canSignIn = CanSignInAccount(data);
                 if (canSignIn == SignInStatus.Allowed)
                     SignInAccount(data);
                 else if (canSignIn != SignInStatus.AlreadySignedIn)
-                    throw new InvalidOperationException($"This account cannot be signed in, hence it cannot be set to primary. SignInState: {canSignIn}");
+                    throw new InvalidOperationException(
+                        $"This account cannot be signed in, hence it cannot be set to primary. SignInState: {canSignIn}"
+                    );
             }
 
             // Re-check if the account data has changed, as a sign-in may have recursively called SetToPrimary and we don't want duplicated events.
@@ -190,7 +216,9 @@ namespace Unity.PlatformToolkit.PlayMode
             // This is not possible in the Play Mode Controls Window as this check is already performed
             var signOutStatus = CanSignOutAccount(data);
             if (signOutStatus != SignOutStatus.Allowed)
-                throw new InvalidOperationException($"This user cannot sign-out in this state. SignOutState: {signOutStatus}");
+                throw new InvalidOperationException(
+                    $"This user cannot sign-out in this state. SignOutState: {signOutStatus}"
+                );
 
             if (PrimaryAccountData == data)
             {
@@ -200,11 +228,15 @@ namespace Unity.PlatformToolkit.PlayMode
                     {
                         case PrimaryAccountBehaviour.AlwaysSignedIn:
                         case PrimaryAccountBehaviour.OptionalAndImmutable:
-                            throw new InvalidOperationException("Primary account cannot be signed out on this Platform");
+                            throw new InvalidOperationException(
+                                "Primary account cannot be signed out on this Platform"
+                            );
                         case PrimaryAccountBehaviour.OptionalAndMutable:
                             //The only platform with this capability is Xbox and this is how it functions, therefore we are replicating it
                             if (m_SerializedData.SignedInAccounts.Count > 1)
-                                SetToPrimary(m_SerializedData.SignedInAccounts.Find(account => account != PrimaryAccountData));
+                                SetToPrimary(
+                                    m_SerializedData.SignedInAccounts.Find(account => account != PrimaryAccountData)
+                                );
                             else
                                 SetToPrimary(null);
                             break;
@@ -288,7 +320,7 @@ namespace Unity.PlatformToolkit.PlayMode
 
             //TODO: This is a temporary solution, ideally we would only sign out what needs to sign out not everything.
             SetToPrimary(null);
-            foreach(var account in AccountData)
+            foreach (var account in AccountData)
             {
                 if (IsAccountSignedIn(account))
                 {
@@ -314,11 +346,15 @@ namespace Unity.PlatformToolkit.PlayMode
                     if (m_Capability.PrimaryAccountBehaviour == PrimaryAccountBehaviour.NotSupported)
                         return SignInStatus.AdditionalAccountsNotSupported;
 
-                    return m_SerializedData.SignedInAccounts.Count == 0 ? SignInStatus.Allowed : SignInStatus.AdditionalAccountsNotSupported;
+                    return m_SerializedData.SignedInAccounts.Count == 0
+                        ? SignInStatus.Allowed
+                        : SignInStatus.AdditionalAccountsNotSupported;
                 }
                 case AdditionalAccountBehaviour.SignInAndOutAnytime:
                 case AdditionalAccountBehaviour.SignInOnGameRequestAndSignOutAnytime:
-                    return m_SerializedData.SignedInAccounts.Count < m_Capability.MaxSignedInAccounts ? SignInStatus.Allowed : SignInStatus.MaximumAccountsReached;
+                    return m_SerializedData.SignedInAccounts.Count < m_Capability.MaxSignedInAccounts
+                        ? SignInStatus.Allowed
+                        : SignInStatus.MaximumAccountsReached;
             }
 
             return SignInStatus.Allowed;
@@ -332,12 +368,17 @@ namespace Unity.PlatformToolkit.PlayMode
             if (canSignIn != SignInStatus.Allowed)
                 return canSignIn;
 
-            if (m_Capability.AdditionalAccountBehaviour == AdditionalAccountBehaviour.SignInOnGameRequestAndSignOutAnytime)
+            if (
+                m_Capability.AdditionalAccountBehaviour
+                == AdditionalAccountBehaviour.SignInOnGameRequestAndSignOutAnytime
+            )
             {
                 // If we are not play mode and the primary account is not signed in, we can sign in manually
-                if (m_Capability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported
-                && !m_IsInPlayMode
-                && m_SerializedData.PrimaryAccountData == null)
+                if (
+                    m_Capability.PrimaryAccountBehaviour != PrimaryAccountBehaviour.NotSupported
+                    && !m_IsInPlayMode
+                    && m_SerializedData.PrimaryAccountData == null
+                )
                 {
                     return SignInStatus.Allowed;
                 }
@@ -357,8 +398,15 @@ namespace Unity.PlatformToolkit.PlayMode
             if (!m_SerializedData.SignedInAccounts.Contains(accountData))
                 return SignOutStatus.NotSignedIn;
 
-            if (PrimaryAccountData == accountData && m_IsInPlayMode
-                && (m_Capability.PrimaryAccountBehaviour is PrimaryAccountBehaviour.AlwaysSignedIn or PrimaryAccountBehaviour.OptionalAndImmutable))
+            if (
+                PrimaryAccountData == accountData
+                && m_IsInPlayMode
+                && (
+                    m_Capability.PrimaryAccountBehaviour
+                    is PrimaryAccountBehaviour.AlwaysSignedIn
+                        or PrimaryAccountBehaviour.OptionalAndImmutable
+                )
+            )
                 return SignOutStatus.CannotSignOutPrimaryInPlayMode;
 
             return SignOutStatus.Allowed;
@@ -375,7 +423,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 case PrimaryAccountBehaviour.NotSupported:
                     return SetPrimaryAccountStatus.NotSupported;
                 case PrimaryAccountBehaviour.AlwaysSignedIn:
-                    return m_AutoAssignPrimaryMode || !m_IsInPlayMode ? SetPrimaryAccountStatus.Allowed : SetPrimaryAccountStatus.NotSupportedInPlaymode;
+                    return m_AutoAssignPrimaryMode || !m_IsInPlayMode
+                        ? SetPrimaryAccountStatus.Allowed
+                        : SetPrimaryAccountStatus.NotSupportedInPlaymode;
                 case PrimaryAccountBehaviour.OptionalAndImmutable:
                     if (m_IsInPlayMode && (PrimaryAccountData != null))
                         return SetPrimaryAccountStatus.NotSupportedInPlaymode;
@@ -427,7 +477,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 throw new InvalidOperationException("Can't establish primary account while the account picker is open");
 
             if (m_Capability.PrimaryAccountBehaviour is PrimaryAccountBehaviour.NotSupported)
-                throw new InvalidOperationException("Establishing a primary account is not supported, make sure to check capabilities before calling!");
+                throw new InvalidOperationException(
+                    "Establishing a primary account is not supported, make sure to check capabilities before calling!"
+                );
 
             if (!m_Capability.AllowMultipleSignInAttempts && m_SignInAttemptedAndRefused)
                 throw new UserRefusalException("This platform refuses further sign in attempts when refused prior");
@@ -441,7 +493,9 @@ namespace Unity.PlatformToolkit.PlayMode
             if (PrimaryAccountData != null)
             {
                 if (!IsAccountSignedIn(PrimaryAccountData))
-                    throw new InvalidOperationException("Primary account is already set, but it somehow hasn't been signed in as required! Please make sure to sign in before setting.");
+                    throw new InvalidOperationException(
+                        "Primary account is already set, but it somehow hasn't been signed in as required! Please make sure to sign in before setting."
+                    );
 
                 // TODO: Forced refusal and pausing
                 return PrimaryAccountData;
@@ -459,11 +513,17 @@ namespace Unity.PlatformToolkit.PlayMode
                 switch (CanSetAccountToPrimary(data))
                 {
                     case SetPrimaryAccountStatus.CannotSignIn:
-                        throw new InvalidOperationException("We are attempting to set an account as primary, but the account is unable to sign in!");
+                        throw new InvalidOperationException(
+                            "We are attempting to set an account as primary, but the account is unable to sign in!"
+                        );
                     case SetPrimaryAccountStatus.NotSupported:
-                        throw new InvalidOperationException("We are attempting to set a signed in account as primary, but this platform does not support primary accounts!");
+                        throw new InvalidOperationException(
+                            "We are attempting to set a signed in account as primary, but this platform does not support primary accounts!"
+                        );
                     case SetPrimaryAccountStatus.NotSupportedInPlaymode:
-                        throw new InvalidOperationException("We are attempting to set a signed in account as primary, but this platform does not allowing setting it in play mode!");
+                        throw new InvalidOperationException(
+                            "We are attempting to set a signed in account as primary, but this platform does not allowing setting it in play mode!"
+                        );
                 }
 
                 SetToPrimary(data);
@@ -484,7 +544,9 @@ namespace Unity.PlatformToolkit.PlayMode
                 throw new InvalidOperationException("Can't pick an account while the account picker is open");
 
             if (m_Capability.AdditionalAccountBehaviour is AdditionalAccountBehaviour.NotSupported)
-                throw new InvalidOperationException("Picking an additional account is not supported, make sure to check capabilities before calling!");
+                throw new InvalidOperationException(
+                    "Picking an additional account is not supported, make sure to check capabilities before calling!"
+                );
 
             TaskCompletionSource<PlayModeAccountData> completionSource = new();
             m_PendingEstablishAccountSource = completionSource;
@@ -506,7 +568,9 @@ namespace Unity.PlatformToolkit.PlayMode
             m_LifetimeToken.ThrowOnDisposedAccess();
 
             if (!IsPickAccountRequestActive)
-                throw new InvalidOperationException("We are trying to refuse while there is no pending request to establish");
+                throw new InvalidOperationException(
+                    "We are trying to refuse while there is no pending request to establish"
+                );
 
             m_SignInAttemptedAndRefused = true;
 
@@ -529,7 +593,9 @@ namespace Unity.PlatformToolkit.PlayMode
             var completionSource = m_PendingEstablishAccountSource;
             m_PendingEstablishAccountSource = null;
 
-            completionSource?.SetException(new UserRefusalException("The platform or user refused to establish an account"));
+            completionSource?.SetException(
+                new UserRefusalException("The platform or user refused to establish an account")
+            );
         }
 
         public void OnAccountPicked(PlayModeAccountData data)
@@ -537,7 +603,9 @@ namespace Unity.PlatformToolkit.PlayMode
             m_LifetimeToken.ThrowOnDisposedAccess();
 
             if (!IsPickAccountRequestActive)
-                throw new InvalidOperationException("We are trying to finish while there is no pending request to establish");
+                throw new InvalidOperationException(
+                    "We are trying to finish while there is no pending request to establish"
+                );
 
             CheckAccountData(data);
 
@@ -545,7 +613,9 @@ namespace Unity.PlatformToolkit.PlayMode
             if (canSignIn == SignInStatus.Allowed)
                 SignInAccount(data);
             else if (canSignIn != SignInStatus.AlreadySignedIn)
-                throw new InvalidOperationException($"We are trying to sign in an account that cannot be signed in! SignInStatus: {canSignIn}");
+                throw new InvalidOperationException(
+                    $"We are trying to sign in an account that cannot be signed in! SignInStatus: {canSignIn}"
+                );
 
             m_NotificationManager.StopPendingEstablishUserNotification();
             var completionSource = m_PendingEstablishAccountSource;

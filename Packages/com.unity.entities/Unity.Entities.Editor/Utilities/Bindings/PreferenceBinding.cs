@@ -15,7 +15,9 @@ namespace Unity.Entities.Editor
             get
             {
                 var settings = UserSettings<TSetting>.GetOrCreate(SettingsKey);
-                return PropertyContainer.TryGetValue<TSetting, TValue>(ref settings, PreferencePath, out var value) ? value : default;
+                return PropertyContainer.TryGetValue<TSetting, TValue>(ref settings, PreferencePath, out var value)
+                    ? value
+                    : default;
             }
         }
 
@@ -38,27 +40,19 @@ namespace Unity.Entities.Editor
             }
         }
 
-        void IBinding.PreUpdate()
-        {
-        }
+        void IBinding.PreUpdate() { }
 
         void IBinding.Update()
         {
             OnUpdate(Value);
         }
 
-        void IBinding.Release()
-        {
-        }
+        void IBinding.Release() { }
 
         protected abstract void OnUpdate(TValue value);
 
-        protected virtual void ReleaseTarget()
-        {
-        }
+        protected virtual void ReleaseTarget() { }
 
-        protected virtual void SetupTarget()
-        {
-        }
+        protected virtual void SetupTarget() { }
     }
 }

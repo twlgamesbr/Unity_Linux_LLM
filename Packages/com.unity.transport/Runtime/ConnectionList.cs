@@ -1,6 +1,6 @@
 using System;
-using Unity.Collections;
 using Unity.Baselib.LowLevel;
+using Unity.Collections;
 using Unity.Networking.Transport.Error;
 using UnityEngine;
 
@@ -11,7 +11,6 @@ namespace Unity.Networking.Transport
     /// </summary>
     internal struct ConnectionList : IDisposable
     {
-
         internal unsafe struct HostnameLookupTask
         {
             private Binding.Baselib_NetworkAddress_HostnameLookupHandle* m_LookupHandle;
@@ -22,13 +21,22 @@ namespace Unity.Networking.Transport
 
             public bool IsCreated => m_LookupHandle != null;
 
-            public static bool Create(FixedString512Bytes address, out HostnameLookupTask task, out Binding.Baselib_NetworkAddress result, out Binding.Baselib_ErrorState error)
+            public static bool Create(
+                FixedString512Bytes address,
+                out HostnameLookupTask task,
+                out Binding.Baselib_NetworkAddress result,
+                out Binding.Baselib_ErrorState error
+            )
             {
                 task = new HostnameLookupTask();
                 return task.Initialize(address, out result, out error);
             }
 
-            private bool Initialize(FixedString512Bytes address, out Binding.Baselib_NetworkAddress result, out Binding.Baselib_ErrorState error)
+            private bool Initialize(
+                FixedString512Bytes address,
+                out Binding.Baselib_NetworkAddress result,
+                out Binding.Baselib_ErrorState error
+            )
             {
                 var addressBytes = address.GetUnsafePtr();
                 var errorState = default(Binding.Baselib_ErrorState);
@@ -71,7 +79,11 @@ namespace Unity.Networking.Transport
             {
                 var errorState = default(Binding.Baselib_ErrorState);
                 var localResult = default(Binding.Baselib_NetworkAddress);
-                var finished = Binding.Baselib_NetworkAddress_HostnameLookupCheckStatus(m_LookupHandle, &localResult, &errorState);
+                var finished = Binding.Baselib_NetworkAddress_HostnameLookupCheckStatus(
+                    m_LookupHandle,
+                    &localResult,
+                    &errorState
+                );
                 if (finished)
                 {
                     if (errorState.code == Binding.Baselib_ErrorCode.TryAgain)
@@ -103,7 +115,6 @@ namespace Unity.Networking.Transport
                 error = default;
                 return false;
             }
-
         }
 
         private struct HostnameLookupData
@@ -116,6 +127,7 @@ namespace Unity.Networking.Transport
         {
             public NetworkEndpoint Endpoint;
             public NetworkConnection.State State;
+
             // TODO: Eventually this field needs to be moved out of ConnectionData and become part of a ConnectionDataMap
             // in a new PathMTULayer that will sit above SimpleConnectionLayer.
             // At the current time, this field is populated by SimpleConnectionLayer as the last step of the connection
@@ -158,10 +170,15 @@ namespace Unity.Networking.Transport
         public bool IsCreated => m_Connections.IsCreated;
 
         internal ConnectionId ConnectionAt(int index) => m_Connections.ConnectionAt(index);
-        internal NetworkEndpoint GetConnectionEndpoint(ConnectionId connectionId) => m_Connections[connectionId].Endpoint;
-        internal NetworkConnection.State GetConnectionState(ConnectionId connectionId) => m_Connections[connectionId].State;
-        
+
+        internal NetworkEndpoint GetConnectionEndpoint(ConnectionId connectionId) =>
+            m_Connections[connectionId].Endpoint;
+
+        internal NetworkConnection.State GetConnectionState(ConnectionId connectionId) =>
+            m_Connections[connectionId].State;
+
         internal int GetConnectionPathMtu(ConnectionId connectionId) => m_Connections[connectionId].PathMtu;
+
         internal void SetConnectionPathMtu(ConnectionId connectionId, int pathMtu)
         {
             var data = m_Connections[connectionId];
@@ -169,7 +186,8 @@ namespace Unity.Networking.Transport
             m_Connections[connectionId] = data;
         }
 
-        internal NativeArray<ConnectionId> QueryIncomingConnections(Allocator allocator) => m_IncomingConnections.ToArray(allocator);
+        internal NativeArray<ConnectionId> QueryIncomingConnections(Allocator allocator) =>
+            m_IncomingConnections.ToArray(allocator);
 
         public static ConnectionList Create()
         {
@@ -178,7 +196,11 @@ namespace Unity.Networking.Transport
 
         private ConnectionList(Allocator allocator)
         {
-            var defaultConnectionData = new ConnectionData { State = NetworkConnection.State.Disconnected, PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize };
+            var defaultConnectionData = new ConnectionData
+            {
+                State = NetworkConnection.State.Disconnected,
+                PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize,
+            };
             m_Connections = new ConnectionDataMap<ConnectionData>(1, defaultConnectionData, allocator);
             m_HostnameLookupTasks = new NativeHashMap<int, HostnameLookupData>(1, allocator);
             m_IncomingDisconnections = new NativeQueue<IncomingDisconnection>(allocator);
@@ -229,7 +251,7 @@ namespace Unity.Networking.Transport
             {
                 Endpoint = address,
                 State = NetworkConnection.State.Connecting,
-                PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize
+                PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize,
             };
 
             return connection;
@@ -241,7 +263,13 @@ namespace Unity.Networking.Transport
         /// <param name="address">The endpoint to connect to.</param>
         /// <returns>Returns the ConnectionId identifier for the new created connection.</returns>
         /// <remarks>The connection is going to be fully connected only when FinishConnecting() is called.</remarks>
-        internal ConnectionId StartConnecting(FixedString512Bytes address, ushort port, out bool hostnameLookupFinished, out NetworkEndpoint resolvedEndpoint, out DisconnectReason disconnectReason)
+        internal ConnectionId StartConnecting(
+            FixedString512Bytes address,
+            ushort port,
+            out bool hostnameLookupFinished,
+            out NetworkEndpoint resolvedEndpoint,
+            out DisconnectReason disconnectReason
+        )
         {
             var connection = GetNewConnection();
 
@@ -257,13 +285,9 @@ namespace Unity.Networking.Transport
                 m_Connections[connection] = new ConnectionData
                 {
                     State = NetworkConnection.State.Connecting,
-                    PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize
+                    PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize,
                 };
-                m_HostnameLookupTasks[connection.Id] = new HostnameLookupData
-                {
-                    Task = task,
-                    Port = port
-                };
+                m_HostnameLookupTasks[connection.Id] = new HostnameLookupData { Task = task, Port = port };
                 hostnameLookupFinished = false;
                 disconnectReason = DisconnectReason.HostNotFound;
             }
@@ -275,7 +299,7 @@ namespace Unity.Networking.Transport
                 {
                     Endpoint = resolvedEndpoint,
                     State = NetworkConnection.State.Connecting,
-                    PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize
+                    PathMtu = NetworkParameterConstants.AbsoluteMinimumMtuSize,
                 };
                 hostnameLookupFinished = true;
                 disconnectReason = DisconnectReason.Default;
@@ -284,11 +308,19 @@ namespace Unity.Networking.Transport
             return connection;
         }
 
-        internal bool CheckHostnameLookupStatus(ref ConnectionId connectionId, out NetworkEndpoint resolvedEndpoint, out DisconnectReason disconnectReason)
+        internal bool CheckHostnameLookupStatus(
+            ref ConnectionId connectionId,
+            out NetworkEndpoint resolvedEndpoint,
+            out DisconnectReason disconnectReason
+        )
         {
             var connectionData = m_Connections[connectionId];
             var hasLookupTask = m_HostnameLookupTasks.TryGetValue(connectionId.Id, out var hostnameLookupData);
-            if (connectionData.State != NetworkConnection.State.Connecting || !hasLookupTask || !hostnameLookupData.Task.IsCreated)
+            if (
+                connectionData.State != NetworkConnection.State.Connecting
+                || !hasLookupTask
+                || !hostnameLookupData.Task.IsCreated
+            )
             {
                 resolvedEndpoint = default;
                 disconnectReason = DisconnectReason.Default;
@@ -402,22 +434,23 @@ namespace Unity.Networking.Transport
         /// called. A Disconnect event with the provided reason will be enqueued at the begining of
         /// the next ScheduleUpdate call.
         /// </remarks>
-        internal void StartDisconnecting(ref ConnectionId connectionId, Error.DisconnectReason reason = Error.DisconnectReason.Default)
+        internal void StartDisconnecting(
+            ref ConnectionId connectionId,
+            Error.DisconnectReason reason = Error.DisconnectReason.Default
+        )
         {
             var connectionData = m_Connections[connectionId];
 
-            if (connectionData.State == NetworkConnection.State.Disconnected ||
-                connectionData.State == NetworkConnection.State.Disconnecting)
+            if (
+                connectionData.State == NetworkConnection.State.Disconnected
+                || connectionData.State == NetworkConnection.State.Disconnecting
+            )
             {
                 Debug.LogWarning("Attempting to disconnect an already disconnected connection");
                 return;
             }
 
-            m_IncomingDisconnections.Enqueue(new IncomingDisconnection
-            {
-                Connection = connectionId,
-                Reason = reason,
-            });
+            m_IncomingDisconnections.Enqueue(new IncomingDisconnection { Connection = connectionId, Reason = reason });
 
             connectionData.State = NetworkConnection.State.Disconnecting;
             m_Connections[connectionId] = connectionData;
@@ -441,7 +474,9 @@ namespace Unity.Networking.Transport
 
             if (connectionData.State != NetworkConnection.State.Disconnecting)
             {
-                Debug.LogWarning($"Attempting to complete a disconnection with state different to Disconnecting ({connectionData.State})");
+                Debug.LogWarning(
+                    $"Attempting to complete a disconnection with state different to Disconnecting ({connectionData.State})"
+                );
                 return;
             }
 
@@ -461,8 +496,7 @@ namespace Unity.Networking.Transport
 
         public override bool Equals(object obj)
         {
-            return obj is ConnectionList list &&
-                this == list;
+            return obj is ConnectionList list && this == list;
         }
 
         public override int GetHashCode()
@@ -470,12 +504,12 @@ namespace Unity.Networking.Transport
             return m_Connections.GetHashCode();
         }
 
-        public static unsafe bool operator==(ConnectionList a, ConnectionList b)
+        public static unsafe bool operator ==(ConnectionList a, ConnectionList b)
         {
             return a.m_Connections == b.m_Connections;
         }
 
-        public static unsafe bool operator!=(ConnectionList a, ConnectionList b)
+        public static unsafe bool operator !=(ConnectionList a, ConnectionList b)
         {
             return !(a == b);
         }

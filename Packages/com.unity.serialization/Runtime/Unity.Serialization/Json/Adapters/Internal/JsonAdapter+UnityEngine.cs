@@ -4,8 +4,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Unity.Serialization.Json
 {
-    partial class JsonAdapter :
-        IContravariantJsonAdapter<UnityObject>
+    partial class JsonAdapter : IContravariantJsonAdapter<UnityObject>
     {
         void IContravariantJsonAdapter<UnityObject>.Serialize(IJsonSerializationContext context, UnityObject value)
         {
@@ -13,7 +12,7 @@ namespace Unity.Serialization.Json
             var id = UnityEditor.GlobalObjectId.GetGlobalObjectIdSlow(value).ToString();
             context.Writer.WriteValue(id);
 #else
-           context.Writer.WriteNull();
+            context.Writer.WriteNull();
 #endif
         }
 
@@ -32,7 +31,9 @@ namespace Unity.Serialization.Json
                     var obj = UnityEditor.GlobalObjectId.GlobalObjectIdentifierToObjectSlow(id);
                     if (obj == null || !obj)
                     {
-                        throw new InvalidOperationException($"An error occured while deserializing asset reference GUID=[{id.assetGUID.ToString()}]. Asset is not yet loaded and will result in a null reference.");
+                        throw new InvalidOperationException(
+                            $"An error occured while deserializing asset reference GUID=[{id.assetGUID.ToString()}]. Asset is not yet loaded and will result in a null reference."
+                        );
                     }
 
                     return obj;
@@ -46,7 +47,7 @@ namespace Unity.Serialization.Json
 #endif
             return null;
         }
-    
+
 #if UNITY_EDITOR
         static readonly string s_EmptyGuid = Guid.Empty.ToString();
 
@@ -56,7 +57,7 @@ namespace Unity.Serialization.Json
             public UnityObject o;
 #pragma warning restore 649
         }
-        
+
         public static UnityObject FromObjectHandle(SerializedObjectView objectView)
         {
             var container = new Container();
@@ -79,7 +80,7 @@ namespace Unity.Serialization.Json
                         writer.WriteKeyValue("type", type);
                     }
                 }
-                
+
                 var json = writer.ToString();
                 UnityEditor.EditorJsonUtility.FromJsonOverwrite(json, container);
                 return container.o;

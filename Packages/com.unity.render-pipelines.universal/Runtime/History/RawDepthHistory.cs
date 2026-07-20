@@ -14,11 +14,7 @@ namespace UnityEngine.Rendering.Universal
     public sealed class RawDepthHistory : CameraHistoryItem
     {
         private int[] m_Ids = new int[2];
-        private static readonly string[] m_Names = new[]
-        {
-            "RawDepthHistory0",
-            "RawDepthHistory1"
-        };
+        private static readonly string[] m_Names = new[] { "RawDepthHistory0", "RawDepthHistory1" };
         private RenderTextureDescriptor m_Descriptor;
         private Hash128 m_DescKey;
 
@@ -73,7 +69,7 @@ namespace UnityEngine.Rendering.Universal
             // Generic type, we need double buffering.
             AllocHistoryFrameRT(m_Ids[0], 2, ref desc, m_Names[0]);
 
-            if(xrMultipassEnabled)
+            if (xrMultipassEnabled)
                 AllocHistoryFrameRT(m_Ids[1], 2, ref desc, m_Names[1]);
 
             m_Descriptor = desc;
@@ -85,7 +81,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public override void Reset()
         {
-            for(int i = 0; i < m_Ids.Length; i++)
+            for (int i = 0; i < m_Ids.Length; i++)
                 ReleaseHistoryFrameRT(m_Ids[i]);
         }
 
@@ -93,7 +89,7 @@ namespace UnityEngine.Rendering.Universal
         {
             var depthDesc = cameraDesc;
             depthDesc.mipCount = 0;
-            depthDesc.msaaSamples = 1;  // History copy should not have MSAA.
+            depthDesc.msaaSamples = 1; // History copy should not have MSAA.
 
             return depthDesc;
         }
@@ -101,7 +97,14 @@ namespace UnityEngine.Rendering.Universal
         // Return true if the RTHandles were reallocated.
         internal bool Update(ref RenderTextureDescriptor cameraDesc, bool xrMultipassEnabled)
         {
-            if (cameraDesc.width > 0 && cameraDesc.height > 0 && (cameraDesc.depthStencilFormat != GraphicsFormat.None || cameraDesc.graphicsFormat != GraphicsFormat.None) )
+            if (
+                cameraDesc.width > 0
+                && cameraDesc.height > 0
+                && (
+                    cameraDesc.depthStencilFormat != GraphicsFormat.None
+                    || cameraDesc.graphicsFormat != GraphicsFormat.None
+                )
+            )
             {
                 var historyDesc = GetHistoryDescriptor(ref cameraDesc);
 

@@ -8,7 +8,14 @@ namespace UnityEditor.Rendering.Universal
     class UniversalRenderPipelineGlobalSettingsPostprocessor : AssetPostprocessor
     {
         const string k_GraphicsSettingsPath = "ProjectSettings/GraphicsSettings.asset";
-        static void OnPostprocessAllAssets(string[] importedAssets , string[] __, string[] ___, string[] ____, bool didDomainReload)
+
+        static void OnPostprocessAllAssets(
+            string[] importedAssets,
+            string[] __,
+            string[] ___,
+            string[] ____,
+            bool didDomainReload
+        )
         {
             if (didDomainReload || importedAssets.Contains(k_GraphicsSettingsPath))
                 UniversalRenderPipelineGlobalSettings.Ensure();

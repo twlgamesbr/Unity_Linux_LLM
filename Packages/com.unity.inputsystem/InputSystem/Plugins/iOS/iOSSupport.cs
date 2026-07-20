@@ -14,41 +14,47 @@ namespace UnityEngine.InputSystem.iOS
     {
         public static void Initialize()
         {
-            InputSystem.RegisterLayout<iOSGameController>("iOSGameController",
-                matches: new InputDeviceMatcher()
-                    .WithInterface("iOS")
-                    .WithDeviceClass("iOSGameController"));
+            InputSystem.RegisterLayout<iOSGameController>(
+                "iOSGameController",
+                matches: new InputDeviceMatcher().WithInterface("iOS").WithDeviceClass("iOSGameController")
+            );
 
-            InputSystem.RegisterLayout<XboxOneGampadiOS>("XboxOneGampadiOS",
-                matches: new InputDeviceMatcher()
-                    .WithInterface("iOS")
-                    .WithDeviceClass("iOSGameController")
-                    .WithProduct("Xbox Wireless Controller"));
-
-            InputSystem.RegisterLayout<DualShock4GampadiOS>("DualShock4GampadiOS",
+            InputSystem.RegisterLayout<XboxOneGampadiOS>(
+                "XboxOneGampadiOS",
                 matches: new InputDeviceMatcher()
                     .WithInterface("iOS")
                     .WithDeviceClass("iOSGameController")
-                    .WithProduct("DUALSHOCK 4 Wireless Controller"));
+                    .WithProduct("Xbox Wireless Controller")
+            );
 
-            InputSystem.RegisterLayout<DualSenseGampadiOS>("DualSenseGampadiOS",
+            InputSystem.RegisterLayout<DualShock4GampadiOS>(
+                "DualShock4GampadiOS",
                 matches: new InputDeviceMatcher()
                     .WithInterface("iOS")
                     .WithDeviceClass("iOSGameController")
-                    .WithProduct("DualSense Wireless Controller"));
+                    .WithProduct("DUALSHOCK 4 Wireless Controller")
+            );
 
-            InputSystem.RegisterLayoutMatcher("GravitySensor",
-                new InputDeviceMatcher()
+            InputSystem.RegisterLayout<DualSenseGampadiOS>(
+                "DualSenseGampadiOS",
+                matches: new InputDeviceMatcher()
                     .WithInterface("iOS")
-                    .WithDeviceClass("Gravity"));
-            InputSystem.RegisterLayoutMatcher("AttitudeSensor",
-                new InputDeviceMatcher()
-                    .WithInterface("iOS")
-                    .WithDeviceClass("Attitude"));
-            InputSystem.RegisterLayoutMatcher("LinearAccelerationSensor",
-                new InputDeviceMatcher()
-                    .WithInterface("iOS")
-                    .WithDeviceClass("LinearAcceleration"));
+                    .WithDeviceClass("iOSGameController")
+                    .WithProduct("DualSense Wireless Controller")
+            );
+
+            InputSystem.RegisterLayoutMatcher(
+                "GravitySensor",
+                new InputDeviceMatcher().WithInterface("iOS").WithDeviceClass("Gravity")
+            );
+            InputSystem.RegisterLayoutMatcher(
+                "AttitudeSensor",
+                new InputDeviceMatcher().WithInterface("iOS").WithDeviceClass("Attitude")
+            );
+            InputSystem.RegisterLayoutMatcher(
+                "LinearAccelerationSensor",
+                new InputDeviceMatcher().WithInterface("iOS").WithDeviceClass("LinearAcceleration")
+            );
 #if UNITY_EDITOR || UNITY_IOS
             InputSystem.RegisterLayout<iOSStepCounter>();
             // Don't add devices for InputTestRuntime

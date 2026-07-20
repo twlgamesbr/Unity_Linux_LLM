@@ -4,7 +4,6 @@ using System;
 /// This is an extension on the built-in information related to samples.
 /// Information related to common dependencies and doc links can be defined in this class.
 /// </remarks>
-
 /// <summary>
 /// This class defines the informations and dependencies for a specific sample.
 /// </summary>

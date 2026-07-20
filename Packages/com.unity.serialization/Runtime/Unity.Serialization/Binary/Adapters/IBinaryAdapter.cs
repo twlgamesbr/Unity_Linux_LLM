@@ -3,10 +3,7 @@ namespace Unity.Serialization.Binary
     /// <summary>
     /// Base interface for binary adapters.
     /// </summary>
-    public interface IBinaryAdapter
-    {
-
-    }
+    public interface IBinaryAdapter { }
 
     /// <summary>
     /// Implement this interface to override serialization and deserialization behaviour for a given type.

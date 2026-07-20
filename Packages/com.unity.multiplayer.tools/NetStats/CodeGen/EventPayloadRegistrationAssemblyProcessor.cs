@@ -14,17 +14,16 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
         TypeReference m_EventMetricFactoryTypeRef;
         MethodReference m_EventMetricFactoryRegisterMethodRef;
 
-        public bool ImportReferences(
-            ModuleDefinition moduleDefinition,
-            IAssemblyProcessingLogger logger)
+        public bool ImportReferences(ModuleDefinition moduleDefinition, IAssemblyProcessingLogger logger)
         {
             m_EventTypeTypeRef = moduleDefinition.ImportReference(typeof(EventMetric<>));
             m_EventMetricFactoryTypeRef = moduleDefinition.ImportReference(typeof(EventMetricFactory));
-            m_EventMetricFactoryRegisterMethodRef =
-                moduleDefinition.ImportReference(
-                    typeof(EventMetricFactory).GetMethod(
-                        nameof(EventMetricFactory.RegisterType),
-                        BindingFlags.Static | BindingFlags.NonPublic));
+            m_EventMetricFactoryRegisterMethodRef = moduleDefinition.ImportReference(
+                typeof(EventMetricFactory).GetMethod(
+                    nameof(EventMetricFactory.RegisterType),
+                    BindingFlags.Static | BindingFlags.NonPublic
+                )
+            );
 
             return true;
         }
@@ -33,14 +32,17 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
             ICompiledAssembly compiledAssembly,
             AssemblyDefinition assemblyDefinition,
             ModuleDefinition mainModule,
-            IAssemblyProcessingLogger logger)
+            IAssemblyProcessingLogger logger
+        )
         {
-            var fieldTypes = mainModule.GetTypes()
+            var fieldTypes = mainModule
+                .GetTypes()
                 .SelectMany(t => t.Fields)
                 .Where(f => IsEventType(f.FieldType))
                 .Select(f => ((GenericInstanceType)f.FieldType).GenericArguments[0].Resolve());
 
-            var variableTypes = mainModule.GetTypes()
+            var variableTypes = mainModule
+                .GetTypes()
                 .SelectMany(t => t.Methods)
                 .Where(m => m.HasBody)
                 .SelectMany(m => m.Body.Variables)
@@ -74,12 +76,14 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
                                 mainModule,
                                 m_EventMetricFactoryTypeRef,
                                 m_EventMetricFactoryRegisterMethodRef,
-                                importedType);
+                                importedType
+                            );
                             instructions.Add(processor.Create(OpCodes.Call, genericInstanceMethod));
                         }
 
                         return instructions;
-                    });
+                    }
+                );
             }
             catch (Exception e)
             {

@@ -4,7 +4,7 @@ using Unity.Collections;
 namespace Unity.Networking.Transport.TLS
 {
     /// <summary>Utility functions used by the DTLS or TLS layer.</summary>
-    internal unsafe static class DTLSUtilities
+    internal static unsafe class DTLSUtilities
     {
         /// <summary>Check if a DTLS message is a Client Hello message.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -65,16 +65,18 @@ namespace Unity.Networking.Transport.TLS
         {
             return step switch
             {
-                0 =>  "HELLO_REQUEST",
-                1 =>  "CLIENT_HELLO - failure at this step likely means the server is rejecting secure connections",
-                2 =>  "SERVER_HELLO",
-                3 =>  "SERVER_CERTIFICATE - failure at this step likely means the server has a misconfigured certificate",
-                4 =>  "SERVER_KEY_EXCHANGE",
-                5 =>  "CERTIFICATE_REQUEST",
-                6 =>  "SERVER_HELLO_DONE",
-                7 =>  "CLIENT_CERTIFICATE",
-                8 =>  "CLIENT_KEY_EXCHANGE - failure at this step likely means the client couldn't verify the server's certificate",
-                9 =>  "CERTIFICATE_VERIFY",
+                0 => "HELLO_REQUEST",
+                1 => "CLIENT_HELLO - failure at this step likely means the server is rejecting secure connections",
+                2 => "SERVER_HELLO",
+                3 =>
+                    "SERVER_CERTIFICATE - failure at this step likely means the server has a misconfigured certificate",
+                4 => "SERVER_KEY_EXCHANGE",
+                5 => "CERTIFICATE_REQUEST",
+                6 => "SERVER_HELLO_DONE",
+                7 => "CLIENT_CERTIFICATE",
+                8 =>
+                    "CLIENT_KEY_EXCHANGE - failure at this step likely means the client couldn't verify the server's certificate",
+                9 => "CERTIFICATE_VERIFY",
                 10 => "CLIENT_CHANGE_CIPHER_SPEC",
                 11 => "CLIENT_FINISHED",
                 12 => "SERVER_CHANGE_CIPHER_SPEC",
@@ -83,7 +85,7 @@ namespace Unity.Networking.Transport.TLS
                 15 => "WRAPUP",
                 16 => "SERVER_NEW_SESSION_TICKET",
                 17 => "HELLO_VERIFY_REQUIRED",
-                _ =>  "unknown step",
+                _ => "unknown step",
             };
         }
     }

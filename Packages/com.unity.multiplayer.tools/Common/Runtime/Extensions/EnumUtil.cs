@@ -6,17 +6,20 @@ namespace Unity.Multiplayer.Tools.Common
 {
     static class EnumUtil
     {
-        public static T[] GetValues<T>() where T : unmanaged, Enum
+        public static T[] GetValues<T>()
+            where T : unmanaged, Enum
         {
             return (T[])Enum.GetValues(typeof(T));
         }
 
-        public static string[] GetNames<T>() where T : unmanaged, Enum
+        public static string[] GetNames<T>()
+            where T : unmanaged, Enum
         {
             return Enum.GetNames(typeof(T));
         }
 
-        public static IEnumerable<(string name, T value)> GetValuesAndNames<T>(params T[] skip) where T : unmanaged, Enum
+        public static IEnumerable<(string name, T value)> GetValuesAndNames<T>(params T[] skip)
+            where T : unmanaged, Enum
         {
             foreach (var name in GetNames<T>())
             {
@@ -174,7 +177,8 @@ namespace Unity.Multiplayer.Tools.Common
     /// This static class is used to enforce the constraint (via its static constructor)
     /// that the generic parameter passed to it has the flags attribute.
     /// </remarks>
-    static class IntFlagEnumUtils<TEnum> where TEnum : unmanaged, Enum
+    static class IntFlagEnumUtils<TEnum>
+        where TEnum : unmanaged, Enum
     {
         /// <remarks>
         /// Ensure that TEnum has the flags attribute
@@ -204,9 +208,9 @@ namespace Unity.Multiplayer.Tools.Common
 
         public static TEnum SetFlags(TEnum a, TEnum b, bool value)
         {
-            return (value
-                ? a.UnsafeCastToInt() | b.UnsafeCastToInt()
-                : a.UnsafeCastToInt() & ~b.UnsafeCastToInt()).UnsafeCastToEnum<TEnum>();
+            return (
+                value ? a.UnsafeCastToInt() | b.UnsafeCastToInt() : a.UnsafeCastToInt() & ~b.UnsafeCastToInt()
+            ).UnsafeCastToEnum<TEnum>();
         }
     }
 
@@ -214,18 +218,20 @@ namespace Unity.Multiplayer.Tools.Common
         where TEnum : unmanaged, Enum
     {
         public EnumWithoutFlagsAttributeException()
-            : base($"Cannot use {nameof(EnumUtil.ContainsAny)}, {nameof(EnumUtil.SetFlags)}, or {nameof(EnumUtil.SetFlagsInPlace)} " +
-                   $"on enum {nameof(TEnum)}, as it does not have the {nameof(FlagsAttribute)} attribute")
-        { }
+            : base(
+                $"Cannot use {nameof(EnumUtil.ContainsAny)}, {nameof(EnumUtil.SetFlags)}, or {nameof(EnumUtil.SetFlagsInPlace)} "
+                    + $"on enum {nameof(TEnum)}, as it does not have the {nameof(FlagsAttribute)} attribute"
+            ) { }
     }
 
     class UnhandledEnumUnderlyingTypeException<TEnum, TRequiredUnderlyingType> : Exception
         where TEnum : unmanaged, Enum
     {
         public UnhandledEnumUnderlyingTypeException()
-            : base($"Cannot use {nameof(EnumUtil.ContainsAny)}, {nameof(EnumUtil.SetFlags)}, or {nameof(EnumUtil.SetFlagsInPlace)} " +
-                   $"on enum {nameof(TEnum)}, because its underlying type {typeof(TEnum).UnderlyingSystemType} is not the required" +
-                   $" underlying type {typeof(TRequiredUnderlyingType)}")
-        { }
+            : base(
+                $"Cannot use {nameof(EnumUtil.ContainsAny)}, {nameof(EnumUtil.SetFlags)}, or {nameof(EnumUtil.SetFlagsInPlace)} "
+                    + $"on enum {nameof(TEnum)}, because its underlying type {typeof(TEnum).UnderlyingSystemType} is not the required"
+                    + $" underlying type {typeof(TRequiredUnderlyingType)}"
+            ) { }
     }
 }

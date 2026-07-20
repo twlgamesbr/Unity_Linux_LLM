@@ -27,15 +27,14 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
             style.flexGrow = 1;
 
-            m_SearchBar = new SearchBar(
-                HandleOnSearchResultsChanged,
-                HandleOnSearchStringCleared);
+            m_SearchBar = new SearchBar(HandleOnSearchResultsChanged, HandleOnSearchStringCleared);
 #if !UNITY_2022_1_OR_NEWER
             m_ColumnBarNetwork = new ColumnBarNetwork(
                 HandleOnNameClickedEvent,
                 HandleOnTypeClickedEvent,
                 HandleOnBytesSentClickEvent,
-                HandleOnBytesReceivedClickEvent);
+                HandleOnBytesReceivedClickEvent
+            );
 #endif
         }
 
@@ -45,7 +44,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             {
                 TreeViewNetwork.DisplayType.Messages => TreeModelUtility.CreateMessagesTreeStructure(metricCollection),
                 TreeViewNetwork.DisplayType.Activity => TreeModelUtility.CreateActivityTreeStructure(metricCollection),
-                _ => throw new ArgumentOutOfRangeException(nameof(displayType), displayType, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(displayType), displayType, null),
             };
         }
 
@@ -79,15 +78,13 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             m_TreeView = new TreeViewNetwork(m_TreeModel);
             m_TreeView.Show();
 
-            m_TreeViewArea = new VisualElement
-            {
-                name = "TreeView Area"
-            };
+            m_TreeViewArea = new VisualElement { name = "TreeView Area" };
             m_TreeViewArea.style.flexGrow = 1;
             m_TreeViewArea.Add(m_TreeView);
 
             m_FilteredResultsArea = new ListViewContainer();
         }
+
 #if !UNITY_2022_1_OR_NEWER
         void HandleOnNameClickedEvent(bool isAscending)
         {

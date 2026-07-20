@@ -113,7 +113,7 @@ namespace UnityEditor.Rendering
                 return;
 
             // Clear states from memory that don't have a corresponding widget
-            List<string> keysToRemove = new ();
+            List<string> keysToRemove = new();
             foreach (var state in m_WidgetStates)
             {
                 var widget = DebugManager.instance.GetItem(state.Key);

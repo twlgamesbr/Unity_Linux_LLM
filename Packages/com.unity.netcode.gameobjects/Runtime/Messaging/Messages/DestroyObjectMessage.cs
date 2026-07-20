@@ -14,6 +14,7 @@ namespace Unity.Netcode
         public ulong NetworkObjectId;
 
         internal int DeferredDespawnTick;
+
         // Temporary until we make this a list
         internal ulong TargetClientId;
 
@@ -121,9 +122,19 @@ namespace Unity.Netcode
             }
 
             // Client-Server mode we always defer where in distributed authority mode we only defer if it is not a targeted destroy
-            if (!networkManager.DistributedAuthorityMode || !networkManager.IsConnectedClient || (networkManager.DistributedAuthorityMode && !IsTargetedDestroy))
+            if (
+                !networkManager.DistributedAuthorityMode
+                || !networkManager.IsConnectedClient
+                || (networkManager.DistributedAuthorityMode && !IsTargetedDestroy)
+            )
             {
-                networkManager.DeferredMessageManager.DeferMessage(IDeferredNetworkMessageManager.TriggerType.OnSpawn, NetworkObjectId, reader, ref context, k_Name);
+                networkManager.DeferredMessageManager.DeferMessage(
+                    IDeferredNetworkMessageManager.TriggerType.OnSpawn,
+                    NetworkObjectId,
+                    reader,
+                    ref context,
+                    k_Name
+                );
             }
             return true;
         }
@@ -139,7 +150,11 @@ namespace Unity.Netcode
                 HandleDAHostForwardMessage(context.SenderId, ref networkManager, networkObject);
 
                 // DAHost adds the object to the queue only if it is not a targeted destroy, or it is and the target is the DAHost client.
-                if (networkObject && DeferredDespawnTick > 0 && (!IsTargetedDestroy || (IsTargetedDestroy && TargetClientId == 0)))
+                if (
+                    networkObject
+                    && DeferredDespawnTick > 0
+                    && (!IsTargetedDestroy || (IsTargetedDestroy && TargetClientId == 0))
+                )
                 {
                     HandleDeferredDespawn(ref networkManager, ref networkObject);
                     return;
@@ -151,7 +166,9 @@ namespace Unity.Netcode
             {
                 if (networkManager.LogLevel <= LogLevel.Developer)
                 {
-                    NetworkLog.LogWarning($"[{nameof(DestroyObjectMessage)}] Received destroy object message for NetworkObjectId ({NetworkObjectId}) on Client-{networkManager.LocalClientId}, but that {nameof(NetworkObject)} does not exist!");
+                    NetworkLog.LogWarning(
+                        $"[{nameof(DestroyObjectMessage)}] Received destroy object message for NetworkObjectId ({NetworkObjectId}) on Client-{networkManager.LocalClientId}, but that {nameof(NetworkObject)} does not exist!"
+                    );
                 }
                 return;
             }
@@ -176,14 +193,22 @@ namespace Unity.Netcode
 
             // Otherwise just despawn the NetworkObject right now
             networkManager.SpawnManager.OnDespawnNonAuthorityObject(networkObject, DestroyGameObject);
-            networkManager.NetworkMetrics.TrackObjectDestroyReceived(context.SenderId, networkObject, context.MessageSize);
+            networkManager.NetworkMetrics.TrackObjectDestroyReceived(
+                context.SenderId,
+                networkObject,
+                context.MessageSize
+            );
         }
 
         /// <summary>
         /// Handles forwarding the <see cref="DestroyObjectMessage"/> when acting as the DA Host
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void HandleDAHostForwardMessage(ulong senderId, ref NetworkManager networkManager, NetworkObject networkObject)
+        private void HandleDAHostForwardMessage(
+            ulong senderId,
+            ref NetworkManager networkManager,
+            NetworkObject networkObject
+        )
         {
             var message = new DestroyObjectMessage
             {
@@ -195,7 +220,10 @@ namespace Unity.Netcode
                 DeferredDespawnTick = DeferredDespawnTick,
             };
             var ownerClientId = networkObject == null ? senderId : networkObject.OwnerClientId;
-            var clientIds = networkObject == null ? networkManager.ConnectionManager.ConnectedClientIds : networkObject.Observers.ToList();
+            var clientIds =
+                networkObject == null
+                    ? networkManager.ConnectionManager.ConnectedClientIds
+                    : networkObject.Observers.ToList();
             var networkDelivery = MessageDeliveryType<DestroyObjectMessage>.DefaultDelivery;
             foreach (var clientId in clientIds)
             {
@@ -214,7 +242,12 @@ namespace Unity.Netcode
         {
             networkObject.DeferredDespawnTick = DeferredDespawnTick;
             var hasCallback = networkObject.OnDeferredDespawnComplete != null;
-            networkManager.SpawnManager.DeferDespawnNetworkObject(NetworkObjectId, DeferredDespawnTick, hasCallback, DestroyGameObject);
+            networkManager.SpawnManager.DeferDespawnNetworkObject(
+                NetworkObjectId,
+                DeferredDespawnTick,
+                hasCallback,
+                DestroyGameObject
+            );
         }
     }
 }

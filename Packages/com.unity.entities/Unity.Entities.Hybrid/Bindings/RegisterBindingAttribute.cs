@@ -2,7 +2,6 @@ using System;
 
 namespace Unity.Entities
 {
-
     /// <summary>
     /// Creates a table association between the Type specified and the runtime field of an IComponentData,
     /// accessible via the BindingRegistry
@@ -36,8 +35,10 @@ namespace Unity.Entities
         /// <param name="runtimeComponent">The target component type</param>
         /// <param name="runtimeField">The target component field</param>
         /// <param name="generated">If true, the type is auto-generated</param>
-        [Obsolete("You can now use base RegisterBindingAttribute(Type, string) to register vector based properties. (RemovedAfter 2023-02-14)")]
-        public  RegisterBindingAttribute(Type runtimeComponent, string runtimeField, bool generated)
+        [Obsolete(
+            "You can now use base RegisterBindingAttribute(Type, string) to register vector based properties. (RemovedAfter 2023-02-14)"
+        )]
+        public RegisterBindingAttribute(Type runtimeComponent, string runtimeField, bool generated)
         {
             ComponentType = runtimeComponent;
             ComponentField = runtimeField;
@@ -59,7 +60,8 @@ namespace Unity.Entities
             AuthoringField = authoringField;
         }
 
-        internal bool Generated { get;  }
+        internal bool Generated { get; }
+
         /// <summary>
         /// The target component type
         /// </summary>
@@ -73,6 +75,6 @@ namespace Unity.Entities
         /// <summary>
         /// Name of the nested authoring field. The base field if null or empty.
         /// </summary>
-        public string AuthoringField { get;  }
+        public string AuthoringField { get; }
     }
 }

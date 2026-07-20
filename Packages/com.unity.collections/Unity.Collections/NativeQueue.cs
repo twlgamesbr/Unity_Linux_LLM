@@ -1,12 +1,12 @@
 using System;
-using System.Runtime.InteropServices;
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Burst;
-using Unity.Jobs;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Collections.Generic;
-using System.Collections;
+using System.Runtime.InteropServices;
+using Unity.Burst;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 
 namespace Unity.Collections
 {
@@ -16,9 +16,8 @@ namespace Unity.Collections
     /// <typeparam name="T">The type of the elements.</typeparam>
     [StructLayout(LayoutKind.Sequential)]
     [NativeContainer]
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-    public unsafe struct NativeQueue<T>
-        : INativeDisposable
+    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+    public unsafe struct NativeQueue<T> : INativeDisposable
         where T : unmanaged
     {
         [NativeDisableUnsafePtrRestriction]
@@ -44,7 +43,6 @@ namespace Unity.Collections
 #endif
             m_Queue = UnsafeQueue<T>.Alloc(allocator);
             *m_Queue = new UnsafeQueue<T>(allocator);
-
         }
 
         /// <summary>
@@ -191,15 +189,20 @@ namespace Unity.Collections
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            var jobHandle = new NativeQueueDisposeJob { Data = new NativeQueueDispose { m_QueueData = (UnsafeQueue<int>*)m_Queue, m_Safety = m_Safety } }.Schedule(inputDeps);
+            var jobHandle = new NativeQueueDisposeJob
+            {
+                Data = new NativeQueueDispose { m_QueueData = (UnsafeQueue<int>*)m_Queue, m_Safety = m_Safety },
+            }.Schedule(inputDeps);
             AtomicSafetyHandle.Release(m_Safety);
 #else
-            var jobHandle = new NativeQueueDisposeJob { Data = new NativeQueueDispose { m_QueueData = (UnsafeQueue<int>*)m_Queue } }.Schedule(inputDeps);
+            var jobHandle = new NativeQueueDisposeJob
+            {
+                Data = new NativeQueueDispose { m_QueueData = (UnsafeQueue<int>*)m_Queue },
+            }.Schedule(inputDeps);
 #endif
             m_Queue = null;
 
             return jobHandle;
-
         }
 
         /// <summary>
@@ -276,8 +279,7 @@ namespace Unity.Collections
         /// </summary>
         [NativeContainer]
         [NativeContainerIsReadOnly]
-        public struct ReadOnly
-            : IEnumerable<T>
+        public struct ReadOnly : IEnumerable<T>
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle m_Safety;
@@ -358,13 +360,11 @@ namespace Unity.Collections
                 AtomicSafetyHandle.UseSecondaryVersion(ref ash);
 #endif
 
-                return new Enumerator
-                {
+                return new Enumerator {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                     m_Safety = ash,
 #endif
-                    m_Enumerator = m_ReadOnly.GetEnumerator(),
-                };
+                    m_Enumerator = m_ReadOnly.GetEnumerator() };
             }
 
             /// <summary>
@@ -407,7 +407,10 @@ namespace Unity.Collections
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             writer.m_Safety = m_Safety;
-            CollectionHelper.SetStaticSafetyId<ParallelWriter>(ref writer.m_Safety, ref ParallelWriter.s_staticSafetyId.Data);
+            CollectionHelper.SetStaticSafetyId<ParallelWriter>(
+                ref writer.m_Safety,
+                ref ParallelWriter.s_staticSafetyId.Data
+            );
 #endif
             writer.unsafeWriter = m_Queue->AsParallelWriter();
 
@@ -422,14 +425,15 @@ namespace Unity.Collections
         /// </remarks>
         [NativeContainer]
         [NativeContainerIsAtomicWriteOnly]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public unsafe struct ParallelWriter
         {
             internal UnsafeQueue<T>.ParallelWriter unsafeWriter;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             internal AtomicSafetyHandle m_Safety;
-            internal static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<ParallelWriter>();
+            internal static readonly SharedStatic<int> s_staticSafetyId =
+                SharedStatic<int>.GetOrCreate<ParallelWriter>();
 #endif
 
             /// <summary>

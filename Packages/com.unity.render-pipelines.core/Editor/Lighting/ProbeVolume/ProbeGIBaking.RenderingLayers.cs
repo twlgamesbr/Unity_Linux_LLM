@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using UnityEngine.Rendering.UnifiedRayTracing;
 using Unity.Collections;
 using UnityEngine.Rendering.Sampling;
+using UnityEngine.Rendering.UnifiedRayTracing;
 
 namespace UnityEngine.Rendering
 {
@@ -15,6 +15,7 @@ namespace UnityEngine.Rendering
         {
             /// <summary>The current baking step.</summary>
             public abstract ulong currentStep { get; }
+
             /// <summary>The total amount of step.</summary>
             public abstract ulong stepCount { get; }
 
@@ -49,7 +50,8 @@ namespace UnityEngine.Rendering
             static readonly int _RenderingLayerMasks = Shader.PropertyToID("_RenderingLayerMasks");
             static readonly int _SobolBuffer = Shader.PropertyToID("_SobolMatricesBuffer");
 
-            int batchIndex, batchCount;
+            int batchIndex,
+                batchCount;
             Vector4 regionMasks;
 
             // Input data
@@ -73,7 +75,10 @@ namespace UnityEngine.Rendering
             public override void Initialize(ProbeVolumeBakingSet bakingSet, NativeArray<Vector3> positions)
             {
                 // Divide the job into batches to reduce memory usage.
-                batchCount = CoreUtils.DivRoundUp(bakingSet.useRenderingLayers ? positions.Length : 0, k_MaxProbeCountPerBatch);
+                batchCount = CoreUtils.DivRoundUp(
+                    bakingSet.useRenderingLayers ? positions.Length : 0,
+                    k_MaxProbeCountPerBatch
+                );
                 batchIndex = 0;
 
                 probePositions = positions;
@@ -85,18 +90,40 @@ namespace UnityEngine.Rendering
                     regionMasks[i] = Unity.Mathematics.math.asfloat(bakingSet.renderingLayerMasks[i].mask);
 
                 // Allocate array storing results
-                layerMask = new NativeArray<uint>(probePositions.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                layerMask = new NativeArray<uint>(
+                    probePositions.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
 
                 // Create acceleration structure
                 m_AccelerationStructure = BuildAccelerationStructure();
 
                 int batchSize = Mathf.Min(k_MaxProbeCountPerBatch, probePositions.Length);
-                probePositionsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, batchSize, Marshal.SizeOf<Vector3>());
-                layerMaskBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, batchSize, Marshal.SizeOf<uint>());
-                scratchBuffer = RayTracingHelper.CreateScratchBufferForBuildAndDispatch(m_AccelerationStructure.GetAccelerationStructure(), s_TracingContext.shaderRL, (uint)batchSize, 1, 1);
+                probePositionsBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    batchSize,
+                    Marshal.SizeOf<Vector3>()
+                );
+                layerMaskBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    batchSize,
+                    Marshal.SizeOf<uint>()
+                );
+                scratchBuffer = RayTracingHelper.CreateScratchBufferForBuildAndDispatch(
+                    m_AccelerationStructure.GetAccelerationStructure(),
+                    s_TracingContext.shaderRL,
+                    (uint)batchSize,
+                    1,
+                    1
+                );
 
                 int sobolBufferSize = (int)(SobolData.SobolDims * SobolData.SobolSize);
-                sobolBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, sobolBufferSize, Marshal.SizeOf<uint>());
+                sobolBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    sobolBufferSize,
+                    Marshal.SizeOf<uint>()
+                );
                 sobolBuffer.SetData(SobolData.SobolMatrices);
 
                 cmd = new CommandBuffer();
@@ -127,14 +154,28 @@ namespace UnityEngine.Rendering
                     Span<bool> perSubMeshOpaqueness = stackalloc bool[subMeshCount];
                     perSubMeshOpaqueness.Fill(true);
 
-                    accelStruct.AddInstance(EntityId.ToULong(renderer.component.GetEntityId()), renderer.component, perSubMeshMask, matIndices, perSubMeshOpaqueness, 1);
+                    accelStruct.AddInstance(
+                        EntityId.ToULong(renderer.component.GetEntityId()),
+                        renderer.component,
+                        perSubMeshMask,
+                        matIndices,
+                        perSubMeshOpaqueness,
+                        1
+                    );
                 }
 
                 foreach (var terrain in contributors.terrains)
                 {
                     uint mask = GetInstanceMask(terrain.component.shadowCastingMode);
                     uint materialID = terrain.component.renderingLayerMask; // repurpose the material id as we don't need it here
-                    accelStruct.AddInstance(EntityId.ToULong(terrain.component.GetEntityId()), terrain.component, new uint[1] { mask }, new uint[1] { materialID }, new bool[1] { true }, 1);
+                    accelStruct.AddInstance(
+                        EntityId.ToULong(terrain.component.GetEntityId()),
+                        terrain.component,
+                        new uint[1] { mask },
+                        new uint[1] { materialID },
+                        new bool[1] { true },
+                        1
+                    );
                 }
 
                 return accelStruct;
@@ -171,7 +212,12 @@ namespace UnityEngine.Rendering
             void FetchResults(int batchOffset, int batchSize)
             {
                 var batchLayers = layerMask.GetSubArray(batchOffset, batchSize);
-                var req = AsyncGPUReadback.RequestIntoNativeArray(ref batchLayers, layerMaskBuffer, batchSize * sizeof(uint), 0);
+                var req = AsyncGPUReadback.RequestIntoNativeArray(
+                    ref batchLayers,
+                    layerMaskBuffer,
+                    batchSize * sizeof(uint),
+                    0
+                );
 
                 // TODO: use double buffering to hide readback latency
                 req.WaitForCompletion();

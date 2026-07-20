@@ -8,7 +8,8 @@ namespace UnityEngine.Rendering
     /// </summary>
     /// <typeparam name="T">Type of the array.</typeparam>
     [DebuggerDisplay("Size = {size} Capacity = {capacity}")]
-    public class DynamicArray<T> where T : new()
+    public class DynamicArray<T>
+        where T : new()
     {
         /// <summary>
         /// The C# array memory used to store the DynamicArray values in. This array's Length may be longer than the DynamicArrayLength. Objects beyond the length should not be referenced.
@@ -23,7 +24,10 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Allocated size of the array.
         /// </summary>
-        public int capacity { get { return m_Array.Length; } }
+        public int capacity
+        {
+            get { return m_Array.Length; }
+        }
 
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
         /// <summary>
@@ -116,7 +120,7 @@ namespace UnityEngine.Rendering
             // Grow array if needed;
             if (index >= m_Array.Length)
             {
-                var newArray = new T[Math.Max(m_Array.Length * 2,1)];
+                var newArray = new T[Math.Max(m_Array.Length * 2, 1)];
                 Array.Copy(m_Array, newArray, m_Array.Length);
                 m_Array = newArray;
             }
@@ -374,7 +378,9 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <param name="array">Input DynamicArray.</param>
         /// <returns>The internal array.</returns>
-        [Obsolete("This is deprecated because it returns an incorrect value. It may returns an array with elements beyond the size. Please use Span/ReadOnly if you want safe raw access to the DynamicArray memory. #from(2023.2)")]
+        [Obsolete(
+            "This is deprecated because it returns an incorrect value. It may returns an array with elements beyond the size. Please use Span/ReadOnly if you want safe raw access to the DynamicArray memory. #from(2023.2)"
+        )]
         public static implicit operator T[](DynamicArray<T> array) => array.m_Array;
 
         /// <summary>
@@ -382,7 +388,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <param name="array">Input DynamicArray.</param>
         /// <returns>The internal array.</returns>
-        public static implicit operator ReadOnlySpan<T>(DynamicArray<T> array) => new ReadOnlySpan<T>(array.m_Array, 0, array.size);
+        public static implicit operator ReadOnlySpan<T>(DynamicArray<T> array) =>
+            new ReadOnlySpan<T>(array.m_Array, 0, array.size);
 
         /// <summary>
         /// Implicit conversion to Span.
@@ -433,10 +440,7 @@ namespace UnityEngine.Rendering
             /// </summary>
             public ref T Current
             {
-                get
-                {
-                    return ref owner[index];
-                }
+                get { return ref owner[index]; }
             }
 
             /// <summary>
@@ -449,7 +453,7 @@ namespace UnityEngine.Rendering
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                 if (owner.version != localVersion)
                 {
-                    throw  new InvalidOperationException("DynamicArray was modified during enumeration");
+                    throw new InvalidOperationException("DynamicArray was modified during enumeration");
                 }
 #endif
                 index++;
@@ -515,7 +519,6 @@ namespace UnityEngine.Rendering
                 private int localVersion;
 #endif
 
-
                 /// <summary>
                 /// Create an iterator to iterate over the given range in the array.
                 /// </summary>
@@ -533,7 +536,7 @@ namespace UnityEngine.Rendering
 #endif
                     owner = setOwner;
                     this.first = first;
-                    index = first-1;
+                    index = first - 1;
                     last = first + numItems;
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                     localVersion = owner.version;
@@ -545,10 +548,7 @@ namespace UnityEngine.Rendering
                 /// </summary>
                 public ref T Current
                 {
-                    get
-                    {
-                        return ref owner[index];
-                    }
+                    get { return ref owner[index]; }
                 }
 
                 /// <summary>
@@ -561,7 +561,7 @@ namespace UnityEngine.Rendering
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                     if (owner.version != localVersion)
                     {
-                        throw  new InvalidOperationException("DynamicArray was modified during enumeration");
+                        throw new InvalidOperationException("DynamicArray was modified during enumeration");
                     }
 #endif
                     index++;
@@ -573,7 +573,7 @@ namespace UnityEngine.Rendering
                 /// </summary>
                 public void Reset()
                 {
-                    index = first-1;
+                    index = first - 1;
                 }
             }
 
@@ -613,7 +613,10 @@ namespace UnityEngine.Rendering
         /// <seealso cref="RangeIterator"/>
         public RangeEnumerable SubRange(int first, int numItems)
         {
-            RangeEnumerable r = new RangeEnumerable { iterator = new RangeEnumerable.RangeIterator(this, first, numItems) };
+            RangeEnumerable r = new RangeEnumerable
+            {
+                iterator = new RangeEnumerable.RangeIterator(this, first, numItems),
+            };
             return r;
         }
 
@@ -641,7 +644,8 @@ namespace UnityEngine.Rendering
     /// </summary>
     public static class DynamicArrayExtensions
     {
-        static int Partition<T>(Span<T> data, int left, int right) where T : IComparable<T>, new()
+        static int Partition<T>(Span<T> data, int left, int right)
+            where T : IComparable<T>, new()
         {
             var pivot = data[left];
 
@@ -656,8 +660,7 @@ namespace UnityEngine.Rendering
                     ++left;
                     lvalue = data[left];
                     c = lvalue.CompareTo(pivot);
-                }
-                while (c < 0);
+                } while (c < 0);
 
                 var rvalue = default(T);
                 do
@@ -665,8 +668,7 @@ namespace UnityEngine.Rendering
                     --right;
                     rvalue = data[right];
                     c = rvalue.CompareTo(pivot);
-                }
-                while (c > 0);
+                } while (c > 0);
 
                 if (left < right)
                 {
@@ -680,7 +682,8 @@ namespace UnityEngine.Rendering
             }
         }
 
-        static void QuickSort<T>(Span<T> data, int left, int right) where T : IComparable<T>, new()
+        static void QuickSort<T>(Span<T> data, int left, int right)
+            where T : IComparable<T>, new()
         {
             if (left < right)
             {
@@ -696,7 +699,8 @@ namespace UnityEngine.Rendering
 
         // A copy/paste because it's apparently impossible to pass a sort delegate where T is Comparable<T>, otherwise some boxing happens and allocates...
         // So two identical versions of the function, one with delegate but no Comparable and the other with just the comparable.
-        static int Partition<T>(Span<T> data, int left, int right, DynamicArray<T>.SortComparer comparer) where T : new()
+        static int Partition<T>(Span<T> data, int left, int right, DynamicArray<T>.SortComparer comparer)
+            where T : new()
         {
             var pivot = data[left];
 
@@ -711,8 +715,7 @@ namespace UnityEngine.Rendering
                     ++left;
                     lvalue = data[left];
                     c = comparer(lvalue, pivot);
-                }
-                while (c < 0);
+                } while (c < 0);
 
                 var rvalue = default(T);
                 do
@@ -720,8 +723,7 @@ namespace UnityEngine.Rendering
                     --right;
                     rvalue = data[right];
                     c = comparer(rvalue, pivot);
-                }
-                while (c > 0);
+                } while (c > 0);
 
                 if (left < right)
                 {
@@ -735,7 +737,8 @@ namespace UnityEngine.Rendering
             }
         }
 
-        static void QuickSort<T>(Span<T> data, int left, int right, DynamicArray<T>.SortComparer comparer) where T : new()
+        static void QuickSort<T>(Span<T> data, int left, int right, DynamicArray<T>.SortComparer comparer)
+            where T : new()
         {
             if (left < right)
             {
@@ -754,7 +757,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <typeparam name="T">Type of the array.</typeparam>
         /// <param name="array">Array on which to perform the quick sort.</param>
-        public static void QuickSort<T>(this DynamicArray<T> array) where T : IComparable<T>, new()
+        public static void QuickSort<T>(this DynamicArray<T> array)
+            where T : IComparable<T>, new()
         {
             QuickSort<T>(array, 0, array.size - 1);
             array.BumpVersion();
@@ -766,7 +770,8 @@ namespace UnityEngine.Rendering
         /// <typeparam name="T">Type of the array.</typeparam>
         /// <param name="array">Array on which to perform the quick sort.</param>
         /// <param name="comparer">Comparer used for sorting.</param>
-        public static void QuickSort<T>(this DynamicArray<T> array, DynamicArray<T>.SortComparer comparer) where T : new()
+        public static void QuickSort<T>(this DynamicArray<T> array, DynamicArray<T>.SortComparer comparer)
+            where T : new()
         {
             QuickSort<T>(array, 0, array.size - 1, comparer);
             array.BumpVersion();

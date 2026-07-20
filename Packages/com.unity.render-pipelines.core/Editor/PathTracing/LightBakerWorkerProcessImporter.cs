@@ -15,8 +15,13 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         private const string LightBakerWorkerProcess = "[LightBaker worker process] ";
         private const string BakeAssetFolder = "Temp/LightBakerAssetImport";
 
-        internal static bool BakeWithWorkerProcess(string bakeInputPath, string lightmapRequestsPath,
-            string lightProbeRequestsPath, string bakeOutputFolderPath, int progressPort)
+        internal static bool BakeWithWorkerProcess(
+            string bakeInputPath,
+            string lightmapRequestsPath,
+            string lightProbeRequestsPath,
+            string bakeOutputFolderPath,
+            int progressPort
+        )
         {
             // Setup hidden import folder.
             if (!AssetDatabase.AssetPathExists(BakeAssetFolder))
@@ -35,8 +40,15 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
             // Import it.
             var guid = GUID.Generate();
-            UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(new Object[] { importAsset }, assetPath, true);
-            File.WriteAllText(assetPath + ".meta", $"fileFormatVersion: 2\nguid: {guid}\nDefaultImporter:\n  externalObjects: {{}}\n  assetBundleName:\n  assetBundleVariant:\n");
+            UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(
+                new Object[] { importAsset },
+                assetPath,
+                true
+            );
+            File.WriteAllText(
+                assetPath + ".meta",
+                $"fileFormatVersion: 2\nguid: {guid}\nDefaultImporter:\n  externalObjects: {{}}\n  assetBundleName:\n  assetBundleVariant:\n"
+            );
             AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
 
             // Generate an artifact asynchronously, kicking off the bake.
@@ -68,15 +80,25 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     // If the Editor is waiting for us to connect, it will time out if we cannot connect.
                     if (!progressConnection.Connect(bakeImport.ProgressPort))
                     {
-                        Debug.LogError($"{LightBakerWorkerProcess}Failed to connect to the parent process on port '{bakeImport.ProgressPort}'.");
+                        Debug.LogError(
+                            $"{LightBakerWorkerProcess}Failed to connect to the parent process on port '{bakeImport.ProgressPort}'."
+                        );
                         return;
                     }
 
                     // Bake while reporting progress.
-                    Thread progressReporterThread = new(() => ProgressReporterThreadFunction(progressConnection, bakeIsFinished.Token, progressState));
+                    Thread progressReporterThread = new(() =>
+                        ProgressReporterThreadFunction(progressConnection, bakeIsFinished.Token, progressState)
+                    );
                     progressReporterThread.Start();
 
-                    bool bakeOk = LightBakerStrangler.Bake(bakeImport.BakeInputPath, bakeImport.LightmapRequestsPath, bakeImport.LightProbeRequestsPath, bakeImport.BakeOutputFolderPath, progressState);
+                    bool bakeOk = LightBakerStrangler.Bake(
+                        bakeImport.BakeInputPath,
+                        bakeImport.LightmapRequestsPath,
+                        bakeImport.LightProbeRequestsPath,
+                        bakeImport.BakeOutputFolderPath,
+                        progressState
+                    );
 
                     // Stop the progress thread and wait for the thread.
                     bakeIsFinished.Cancel();
@@ -85,7 +107,9 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     ReportResultToParentProcess(
                         bakeOk
                             ? new Result { type = ResultType.Success, message = "Success." }
-                            : new Result { type = ResultType.JobFailed, message = "LightBakerStrangler.Bake failed." }, progressConnection);
+                            : new Result { type = ResultType.JobFailed, message = "LightBakerStrangler.Bake failed." },
+                        progressConnection
+                    );
                 }
                 finally
                 {
@@ -95,7 +119,11 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
         }
 
-        private static void ProgressReporterThreadFunction(ExternalProcessConnection connection, CancellationToken bakeIsFinished, BakeProgressState progressState)
+        private static void ProgressReporterThreadFunction(
+            ExternalProcessConnection connection,
+            CancellationToken bakeIsFinished,
+            BakeProgressState progressState
+        )
         {
             if (connection == null)
                 return;

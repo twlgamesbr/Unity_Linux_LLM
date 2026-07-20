@@ -39,11 +39,12 @@ namespace Unity.Web.Stripping.Editor
 #else
             "Open Backup Folder";
 #endif
+
         // Path inside "Documentation~" folder to the documentation page containing the docs of this asset, no file extension.
         internal static readonly string[] k_DocumentationPages = new[]
         {
             "submodule-stripping-window-reference", // main docs
-            "backup-files" // detailed information about additional and backup files
+            "backup-files", // detailed information about additional and backup files
         };
 
         [SerializeField]
@@ -63,8 +64,8 @@ namespace Unity.Web.Stripping.Editor
         VisualElement m_SelectSubmoduleButtonContainer;
         internal WebBuildReport SelectedBuild =>
             m_BuildListView.selectedIndex >= 0 && m_BuildListView.selectedIndex < Builds.Count
-            ? Builds[m_BuildListView.selectedIndex]
-            : null;
+                ? Builds[m_BuildListView.selectedIndex]
+                : null;
 
         [ExcludeFromCodeCoverage] // used only by human-driven file dialog code
         static string LastBuildPath
@@ -78,6 +79,7 @@ namespace Unity.Web.Stripping.Editor
 
         // Convenience accessors to the global build list
         WebBuildReportList BuildList => WebBuildReportList.Instance;
+
         // This window's own version of the build reports in the global list
         internal List<WebBuildReport> Builds { get; set; } = new();
 
@@ -295,8 +297,7 @@ namespace Unity.Web.Stripping.Editor
             root.Q<Button>("player-settings-button").clicked += () =>
                 SettingsService.OpenProjectSettings("Project/Player");
 
-            root.Q<Button>("build-profiles-button").clicked += () =>
-                BuildProfileWindowHelper.GetWindow();
+            root.Q<Button>("build-profiles-button").clicked += () => BuildProfileWindowHelper.GetWindow();
 
             UIUtils.AddHelpButton(root.Q<Toolbar>(), k_DocumentationPages[0]);
 
@@ -335,18 +336,22 @@ namespace Unity.Web.Stripping.Editor
 
             var stripAfterBuild = root.Q<Toggle>("strip-after-build-toggle");
             stripAfterBuild.value = StrippingProjectSettings.StripAutomaticallyAfterBuild;
-            stripAfterBuild.RegisterCallback<ChangeEvent<bool>>((evt) =>
-            {
-                StrippingProjectSettings.StripAutomaticallyAfterBuild = evt.newValue;
-                RefreshUI();
-            });
+            stripAfterBuild.RegisterCallback<ChangeEvent<bool>>(
+                (evt) =>
+                {
+                    StrippingProjectSettings.StripAutomaticallyAfterBuild = evt.newValue;
+                    RefreshUI();
+                }
+            );
 
             m_ActiveSettingsField = root.Q<ObjectField>("active-settings-field");
             m_ActiveSettingsField.value = StrippingProjectSettings.ActiveSettings;
-            m_ActiveSettingsField.RegisterCallback<ChangeEvent<UnityEngine.Object>>((evt) =>
-            {
-                StrippingProjectSettings.ActiveSettings = evt.newValue as SubmoduleStrippingSettings;
-            });
+            m_ActiveSettingsField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(
+                (evt) =>
+                {
+                    StrippingProjectSettings.ActiveSettings = evt.newValue as SubmoduleStrippingSettings;
+                }
+            );
 
             StrippingProjectSettings.SettingsChanged += (settings) =>
             {
@@ -398,31 +403,30 @@ namespace Unity.Web.Stripping.Editor
         internal static void AddBuildContextMenu(SubmoduleStrippingWindow window, Label label)
         {
             label.AddManipulator(
-                new ContextualMenuManipulator((evt) =>
-                {
-                    if (evt.currentTarget is VisualElement { userData: WebBuildReport build })
+                new ContextualMenuManipulator(
+                    (evt) =>
                     {
-                        evt.menu.AppendAction(
-                            k_RemoveBuildText,
-                            (_) => window.RemoveBuild(build)
-                        );
-                        evt.menu.AppendSeparator();
-                        if (Directory.Exists(build.OutputPath))
+                        if (evt.currentTarget is VisualElement { userData: WebBuildReport build })
                         {
-                            evt.menu.AppendAction(
-                                k_ShowBuildFolderText,
-                                (_) => EditorUtility.RevealInFinder(build.OutputPath)
-                            );
-                        }
-                        if (build.IsBackupFolderValid())
-                        {
-                            evt.menu.AppendAction(
-                                k_ShowBackUpFolderText,
-                                (_) => EditorUtility.RevealInFinder(build.GetBackupFolderPath())
-                            );
+                            evt.menu.AppendAction(k_RemoveBuildText, (_) => window.RemoveBuild(build));
+                            evt.menu.AppendSeparator();
+                            if (Directory.Exists(build.OutputPath))
+                            {
+                                evt.menu.AppendAction(
+                                    k_ShowBuildFolderText,
+                                    (_) => EditorUtility.RevealInFinder(build.OutputPath)
+                                );
+                            }
+                            if (build.IsBackupFolderValid())
+                            {
+                                evt.menu.AppendAction(
+                                    k_ShowBackUpFolderText,
+                                    (_) => EditorUtility.RevealInFinder(build.GetBackupFolderPath())
+                                );
+                            }
                         }
                     }
-                })
+                )
             );
         }
 
@@ -445,7 +449,10 @@ namespace Unity.Web.Stripping.Editor
 
             BuildList.UpdateBuild(build.OutputPath);
             if (!success)
-                AddInstruction("An error occurred during submodule stripping, see Console for more details.", HelpBoxMessageType.Error);
+                AddInstruction(
+                    "An error occurred during submodule stripping, see Console for more details.",
+                    HelpBoxMessageType.Error
+                );
 
             return success;
         }
@@ -472,7 +479,10 @@ namespace Unity.Web.Stripping.Editor
             }
             else
             {
-                AddInstruction("An error occurred when adding submodule profiling to build. See Console.", HelpBoxMessageType.Error);
+                AddInstruction(
+                    "An error occurred when adding submodule profiling to build. See Console.",
+                    HelpBoxMessageType.Error
+                );
             }
         }
 
@@ -491,22 +501,30 @@ namespace Unity.Web.Stripping.Editor
 
             // We want to show editors for all public instance fields of SubmoduleStrippingSettings
             foreach (
-                var prop in
-                typeof(SubmoduleStrippingSettings).GetFields(BindingFlags.Public | BindingFlags.Instance).Select(p => p.Name))
+                var prop in typeof(SubmoduleStrippingSettings)
+                    .GetFields(BindingFlags.Public | BindingFlags.Instance)
+                    .Select(p => p.Name)
+            )
             {
                 // Use different label for RemoveEmbeddedDebugSymbols
-                string label = prop == nameof(SubmoduleStrippingSettings.RemoveEmbeddedDebugSymbols)
-                    ? ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.RemoveDebugInformation))
-                    : ObjectNames.NicifyVariableName(prop);
+                string label =
+                    prop == nameof(SubmoduleStrippingSettings.RemoveEmbeddedDebugSymbols)
+                        ? ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.RemoveDebugInformation))
+                        : ObjectNames.NicifyVariableName(prop);
                 var propField = new PropertyField(m_SerializedSettings.FindProperty(prop), label);
                 // SubmodulesToStrip is a special case, the rest are generic
                 if (prop == nameof(SubmoduleStrippingSettings.SubmodulesToStrip))
                 {
-                    propField.RegisterCallbackOnce<GeometryChangedEvent>((evt) =>
-                    {
-                        var list = SubmoduleStrippingSettingsEditor.InitSubmoduleList(evt.target as PropertyField, m_Settings.SubmodulesToStrip);
-                        list.style.maxHeight = 300;
-                    });
+                    propField.RegisterCallbackOnce<GeometryChangedEvent>(
+                        (evt) =>
+                        {
+                            var list = SubmoduleStrippingSettingsEditor.InitSubmoduleList(
+                                evt.target as PropertyField,
+                                m_Settings.SubmodulesToStrip
+                            );
+                            list.style.maxHeight = 300;
+                        }
+                    );
                 }
                 optionsContainer.Add(propField);
             }
@@ -571,34 +589,35 @@ namespace Unity.Web.Stripping.Editor
             var hasDebugInfo = playerSettings?.HasDebugInfo == true;
             var hasIncompatibleEmscriptenArg = playerSettings?.HasIncompatibleEmscriptenArg == true;
             var canRunStripping = (
-                hasStrippingSettings &&
-                m_Settings.CanRunStripping &&
-                hasDebugInfo &&
-                !hasIncompatibleEmscriptenArg
+                hasStrippingSettings && m_Settings.CanRunStripping && hasDebugInfo && !hasIncompatibleEmscriptenArg
             );
             var isInstrumented = build?.HasSubmoduleProfiling == true;
             var isStripped = build?.HasStrippingInfo == true;
             var buildIsModified = isInstrumented || isStripped;
             var canAddProfiling = (
-                !buildIsModified &&
-                build?.IsBackupFolderValid() == true &&
-                hasDebugInfo &&
-                !hasIncompatibleEmscriptenArg
+                !buildIsModified
+                && build?.IsBackupFolderValid() == true
+                && hasDebugInfo
+                && !hasIncompatibleEmscriptenArg
             );
             m_StripButton.SetEnabled(hasWebBuildSupport && canRunStripping);
             m_StripAndRunButton.SetEnabled(hasWebBuildSupport && canRunStripping);
             m_RunButton.SetEnabled(hasWebBuildSupport && isValidBuild);
             m_AddProfilingButton.SetEnabled(hasWebBuildSupport && canAddProfiling);
             if (isInstrumented)
-                m_AddProfilingButton.tooltip = "The selected build is already instrumented for submodule profiling. Restore the build to remove profiling.";
+                m_AddProfilingButton.tooltip =
+                    "The selected build is already instrumented for submodule profiling. Restore the build to remove profiling.";
             else if (isStripped)
-                m_AddProfilingButton.tooltip = "The selected build is already stripped. Restore the build to add profiling.";
+                m_AddProfilingButton.tooltip =
+                    "The selected build is already stripped. Restore the build to add profiling.";
             else if (!hasDebugInfo)
-                m_AddProfilingButton.tooltip = "The selected build does not have debug information. Rebuild with debug information.";
+                m_AddProfilingButton.tooltip =
+                    "The selected build does not have debug information. Rebuild with debug information.";
             else if (hasIncompatibleEmscriptenArg)
             {
                 var incompatibleArgs = WebPlayerSettings.FindIncompatibleEmscriptenArgs(playerSettings.emscriptenArgs);
-                m_AddProfilingButton.tooltip = $"The selected build has the incompatible Emscripten arguments \"{string.Join(' ', incompatibleArgs)}\". Rebuild without the setting.";
+                m_AddProfilingButton.tooltip =
+                    $"The selected build has the incompatible Emscripten arguments \"{string.Join(' ', incompatibleArgs)}\". Rebuild without the setting.";
             }
             else
                 m_AddProfilingButton.tooltip = k_AddProfilingDefaultTooltip;
@@ -614,7 +633,9 @@ namespace Unity.Web.Stripping.Editor
 
             if (build == null)
             {
-                var l = new DetailLabel("Create/add a build and select it to view its details.\nNew builds are added automatically to the list.");
+                var l = new DetailLabel(
+                    "Create/add a build and select it to view its details.\nNew builds are added automatically to the list."
+                );
                 m_DetailPane.Add(l);
                 return;
             }
@@ -629,7 +650,8 @@ namespace Unity.Web.Stripping.Editor
                 $"{(Math.Sign(bytes) > 0 ? "+" : "")}{ByteString(bytes)} ({MultiByteString(bytes)})";
             const string unknownStr = "Unknown";
             string ValueOrFallback(object value, string fallback = unknownStr) => value?.ToString() ?? fallback;
-            string CondValueOrFallback(bool cond, object value, string fallback = unknownStr) => cond ? ValueOrFallback(value) : fallback;
+            string CondValueOrFallback(bool cond, object value, string fallback = unknownStr) =>
+                cond ? ValueOrFallback(value) : fallback;
             static string ToTitleCase(string str) => Regex.Replace(str, "(\\B[A-Z])", " $1");
 
             // Title
@@ -646,9 +668,15 @@ namespace Unity.Web.Stripping.Editor
                 detailsText.AppendLine($"Unity version: {build.UnityVersion}");
             if (!string.IsNullOrEmpty(build.EmscriptenVersion))
                 detailsText.AppendLine($"Emscripten version: {build.EmscriptenVersion}");
-            detailsText.AppendLine($"Compression: {CondValueOrFallback(build.IsValid, playerSettings?.compressionFormat)}");
-            detailsText.AppendLine($"Decompression Fallback: {CondValueOrFallback(build.IsValid, playerSettings?.decompressionFallback)}");
-            detailsText.AppendLine($"Debug Symbols: {CondValueOrFallback(buildSettings is not null, playerSettings?.DebugSymbolMode)}");
+            detailsText.AppendLine(
+                $"Compression: {CondValueOrFallback(build.IsValid, playerSettings?.compressionFormat)}"
+            );
+            detailsText.AppendLine(
+                $"Decompression Fallback: {CondValueOrFallback(build.IsValid, playerSettings?.decompressionFallback)}"
+            );
+            detailsText.AppendLine(
+                $"Debug Symbols: {CondValueOrFallback(buildSettings is not null, playerSettings?.DebugSymbolMode)}"
+            );
 
             // 2. build settings, introduced in 1.0.0-final
             if (buildSettings != null)
@@ -661,9 +689,13 @@ namespace Unity.Web.Stripping.Editor
                 }
                 else
                 {
-                    detailsText.AppendLine($"Code Optimization: {CodeOptimizationString(buildSettings.codeOptimization)}");
+                    detailsText.AppendLine(
+                        $"Code Optimization: {CodeOptimizationString(buildSettings.codeOptimization)}"
+                    );
                 }
-                detailsText.AppendLine($"Texture Compression: {TextureCompressionString(buildSettings.webGLBuildSubtarget)}");
+                detailsText.AppendLine(
+                    $"Texture Compression: {TextureCompressionString(buildSettings.webGLBuildSubtarget)}"
+                );
             }
             // 3. Presentation settings added in 1.3.0
             detailsText.AppendLine();
@@ -675,12 +707,22 @@ namespace Unity.Web.Stripping.Editor
             // 3. player settings with major impact on codegen
             detailsText.AppendLine();
             detailsText.AppendLine("Script Compilation");
-            detailsText.AppendLine($"Managed Code Stripping Level: {ValueOrFallback(playerSettings?.managedStrippingLevel)}");
+            detailsText.AppendLine(
+                $"Managed Code Stripping Level: {ValueOrFallback(playerSettings?.managedStrippingLevel)}"
+            );
             detailsText.AppendLine($"Strip Engine Code: {ValueOrFallback(playerSettings?.stripEngineCode)}");
-            detailsText.AppendLine($"Scripting Define Symbols: {ValueOrFallback(playerSettings?.scriptingDefineSymbols)}");
-            detailsText.AppendLine($"IL2CPP Code Generation: {(playerSettings != null ? IL2CppCodeGenerationString(playerSettings.il2CppCodeGeneration) : unknownStr)}");
-            detailsText.AppendLine($"IL2CPP Compiler Configuration: {ValueOrFallback(playerSettings?.il2CppCompilerConfiguration)}");
-            detailsText.AppendLine($"Submodule Stripping Compatibility: {ValueOrFallback(playerSettings?.enableSubmoduleStrippingCompatibility)}");
+            detailsText.AppendLine(
+                $"Scripting Define Symbols: {ValueOrFallback(playerSettings?.scriptingDefineSymbols)}"
+            );
+            detailsText.AppendLine(
+                $"IL2CPP Code Generation: {(playerSettings != null ? IL2CppCodeGenerationString(playerSettings.il2CppCodeGeneration) : unknownStr)}"
+            );
+            detailsText.AppendLine(
+                $"IL2CPP Compiler Configuration: {ValueOrFallback(playerSettings?.il2CppCompilerConfiguration)}"
+            );
+            detailsText.AppendLine(
+                $"Submodule Stripping Compatibility: {ValueOrFallback(playerSettings?.enableSubmoduleStrippingCompatibility)}"
+            );
 
             // 3. Graphics API Player Settings added in 1.3.0
             detailsText.AppendLine();
@@ -714,22 +756,40 @@ namespace Unity.Web.Stripping.Editor
                 detailsText.AppendLine($"Difference: {FormatByteDiff(strippedSize - orgSize)}");
                 if (build.HasStrippingInfo)
                 {
-                    var strippingInfo = JsonConvert.DeserializeObject<StrippingInfo>(File.ReadAllText(build.StrippingInfoFilePath));
+                    var strippingInfo = JsonConvert.DeserializeObject<StrippingInfo>(
+                        File.ReadAllText(build.StrippingInfoFilePath)
+                    );
                     detailsText.AppendLine();
-                    detailsText.AppendLine($"Last stripped: {ToIso8061Offset(File.GetLastWriteTime(build.StrippingInfoFilePath))}");
+                    detailsText.AppendLine(
+                        $"Last stripped: {ToIso8061Offset(File.GetLastWriteTime(build.StrippingInfoFilePath))}"
+                    );
                     detailsText.AppendLine($"Package version used: {strippingInfo.version}");
-                    detailsText.AppendLine($"Optimize Code After Stripping: {ValueOrFallback(strippingInfo.optimizeCodeAfterStripping)}");
-                    detailsText.AppendLine($"Remove Debug Information: {ValueOrFallback(strippingInfo.removeDebugInformation)}");
-                    detailsText.AppendLine($"Missing Submodule Error Handling: {ValueOrFallback(strippingInfo.missingSubmoduleErrorHandling)}");
-                    detailsText.AppendLine($"Stripped submodules: {string.Join(", ", strippingInfo.strippedSubmodules)}");
+                    detailsText.AppendLine(
+                        $"Optimize Code After Stripping: {ValueOrFallback(strippingInfo.optimizeCodeAfterStripping)}"
+                    );
+                    detailsText.AppendLine(
+                        $"Remove Debug Information: {ValueOrFallback(strippingInfo.removeDebugInformation)}"
+                    );
+                    detailsText.AppendLine(
+                        $"Missing Submodule Error Handling: {ValueOrFallback(strippingInfo.missingSubmoduleErrorHandling)}"
+                    );
+                    detailsText.AppendLine(
+                        $"Stripped submodules: {string.Join(", ", strippingInfo.strippedSubmodules)}"
+                    );
                     detailsText.AppendLine($"Amount stripped: {FormatBytes(strippingInfo.strippedSize)}");
 
                     if (strippingInfo.strippedCodeSize != null)
-                        detailsText.AppendLine($"Amount code stripped: {FormatBytes((long)strippingInfo.strippedCodeSize)}");
+                        detailsText.AppendLine(
+                            $"Amount code stripped: {FormatBytes((long)strippingInfo.strippedCodeSize)}"
+                        );
                     if (strippingInfo.strippedNameSize != null)
-                        detailsText.AppendLine($"Amount debug information stripped: {FormatBytes((long)strippingInfo.strippedNameSize!)}");
+                        detailsText.AppendLine(
+                            $"Amount debug information stripped: {FormatBytes((long)strippingInfo.strippedNameSize!)}"
+                        );
                     if (strippingInfo.strippedDwarfSize > 0)
-                        detailsText.AppendLine($"Amount DWARF debug information stripped: {FormatBytes((long)strippingInfo.strippedDwarfSize!)}");
+                        detailsText.AppendLine(
+                            $"Amount DWARF debug information stripped: {FormatBytes((long)strippingInfo.strippedDwarfSize!)}"
+                        );
                 }
             }
 
@@ -764,7 +824,8 @@ namespace Unity.Web.Stripping.Editor
             var canRunStripping = hasStrippingSettings && m_Settings.CanRunStripping;
             var hasDebugInfo = playerSettings?.HasDebugInfo == true;
             var hasIncompatibleEmscriptenArg = playerSettings?.HasIncompatibleEmscriptenArg == true;
-            var hasSubmoduleStrippingCompatibility = playerSettings != null && playerSettings.enableSubmoduleStrippingCompatibility;
+            var hasSubmoduleStrippingCompatibility =
+                playerSettings != null && playerSettings.enableSubmoduleStrippingCompatibility;
 
             // Instructions applicable even when we have no builds currently
             if (!isBuildSelected)
@@ -779,10 +840,18 @@ namespace Unity.Web.Stripping.Editor
                     else if (!canRunStripping)
                     {
                         // case 2: no build selected, auto-stripping true, settings object not null, submodules.length == 0
-                        var submodulesPropName = ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.SubmodulesToStrip));
-                        var optimizePropName = ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.OptimizeCodeAfterStripping));
-                        var removeDebugInformationPropName = ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.RemoveDebugInformation));
-                        AddInstruction($"Submodule stripping requires at least one {submodulesPropName} to be specified or '{optimizePropName}' or '{removeDebugInformationPropName}' to be enabled.");
+                        var submodulesPropName = ObjectNames.NicifyVariableName(
+                            nameof(SubmoduleStrippingSettings.SubmodulesToStrip)
+                        );
+                        var optimizePropName = ObjectNames.NicifyVariableName(
+                            nameof(SubmoduleStrippingSettings.OptimizeCodeAfterStripping)
+                        );
+                        var removeDebugInformationPropName = ObjectNames.NicifyVariableName(
+                            nameof(SubmoduleStrippingSettings.RemoveDebugInformation)
+                        );
+                        AddInstruction(
+                            $"Submodule stripping requires at least one {submodulesPropName} to be specified or '{optimizePropName}' or '{removeDebugInformationPropName}' to be enabled."
+                        );
                     }
                 }
                 return;
@@ -795,9 +864,9 @@ namespace Unity.Web.Stripping.Editor
                 {
                     // case 3: build selected, .wasm exists, backup folder not valid (stripping prerequisites missing)
                     AddInstruction(
-                        "Prerequisite files for submodule stripping are missing. " +
-                        $"See <a href=\"{PackageConstants.GetDocumentationUrl(k_DocumentationPages[1])}\">documentation</a> " +
-                        "for more details."
+                        "Prerequisite files for submodule stripping are missing. "
+                            + $"See <a href=\"{PackageConstants.GetDocumentationUrl(k_DocumentationPages[1])}\">documentation</a> "
+                            + "for more details."
                     );
                 }
                 else
@@ -805,7 +874,9 @@ namespace Unity.Web.Stripping.Editor
                     // case 9: build settings introduced in 1.0.0 not in player_settings.json
                     if (playerSettings.BuildSettings is null)
                     {
-                        AddInstruction("Some build settings were not stored for the build and can't be displayed. Rebuild to fix.");
+                        AddInstruction(
+                            "Some build settings were not stored for the build and can't be displayed. Rebuild to fix."
+                        );
                     }
                 }
 
@@ -817,10 +888,18 @@ namespace Unity.Web.Stripping.Editor
                 else if (!canRunStripping)
                 {
                     // case 5: build selected, settings object not null, submodules.length == 0
-                    var submodulesPropName = ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.SubmodulesToStrip));
-                    var optimizePropName = ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.OptimizeCodeAfterStripping));
-                    var removeDebugInformationPropName = ObjectNames.NicifyVariableName(nameof(SubmoduleStrippingSettings.RemoveDebugInformation));
-                    AddInstruction($"Submodule stripping requires at least one {submodulesPropName} to be specified or '{optimizePropName}' or '{removeDebugInformationPropName}' to be enabled.");
+                    var submodulesPropName = ObjectNames.NicifyVariableName(
+                        nameof(SubmoduleStrippingSettings.SubmodulesToStrip)
+                    );
+                    var optimizePropName = ObjectNames.NicifyVariableName(
+                        nameof(SubmoduleStrippingSettings.OptimizeCodeAfterStripping)
+                    );
+                    var removeDebugInformationPropName = ObjectNames.NicifyVariableName(
+                        nameof(SubmoduleStrippingSettings.RemoveDebugInformation)
+                    );
+                    AddInstruction(
+                        $"Submodule stripping requires at least one {submodulesPropName} to be specified or '{optimizePropName}' or '{removeDebugInformationPropName}' to be enabled."
+                    );
                 }
 
                 if (buildHasPlayerSettings && !hasDebugInfo)
@@ -830,19 +909,23 @@ namespace Unity.Web.Stripping.Editor
                 }
 
                 if (
-                    buildHasPlayerSettings &&
-                    PlayerSettingsHelper.IsSubmoduleStrippingCompatibilityAvailable &&
-                    !hasSubmoduleStrippingCompatibility
-                   )
+                    buildHasPlayerSettings
+                    && PlayerSettingsHelper.IsSubmoduleStrippingCompatibilityAvailable
+                    && !hasSubmoduleStrippingCompatibility
+                )
                 {
                     // case 7: build selected, .wasm exists,  player_settings.json exists, compatibility mode is not enabled
-                    AddInstruction("Submodule stripping works best with \"Enable Submodule Stripping Compatibility\". Rebuild with the setting enabled for best results.");
+                    AddInstruction(
+                        "Submodule stripping works best with \"Enable Submodule Stripping Compatibility\". Rebuild with the setting enabled for best results."
+                    );
                 }
 
                 if (hasIncompatibleEmscriptenArg)
                 {
                     // case 8: build selected, .wasm exists, player_settings.json exists, build uses additional emscripten arguments incompatible with submodule stripping
-                    var incompatibleArgs = WebPlayerSettings.FindIncompatibleEmscriptenArgs(playerSettings.emscriptenArgs);
+                    var incompatibleArgs = WebPlayerSettings.FindIncompatibleEmscriptenArgs(
+                        playerSettings.emscriptenArgs
+                    );
                     AddInstruction(
                         $"Incompatible setting in \"PlayerSettings.WebGl.emscriptenArgs\" detected: remove \"{string.Join(' ', incompatibleArgs)}\" and rebuild. Consider using \"PlayerSettings.WebGL.debugSymbolMode = WebGLDebugSymbolMode.Embedded\" instead.",
                         HelpBoxMessageType.Error
@@ -881,28 +964,31 @@ namespace Unity.Web.Stripping.Editor
             return $"{bytes.ToString("N0", CultureInfo.CurrentCulture)} {bytesWord}";
         }
 
-        internal static string TextureCompressionString(WebGLTextureSubtarget t) => t switch
-        {
-            WebGLTextureSubtarget.Generic => "Use Player Settings",
-            _ => t.ToString() // the rest seem to map to the their enum names as is
-        };
+        internal static string TextureCompressionString(WebGLTextureSubtarget t) =>
+            t switch
+            {
+                WebGLTextureSubtarget.Generic => "Use Player Settings",
+                _ => t.ToString(), // the rest seem to map to the their enum names as is
+            };
 
-        internal static string CodeOptimizationString(string str) => str switch
-        {
-            "BuildTimes" => "Shorter Build Time",
-            "RuntimeSpeed" => "Runtime Speed",
-            "RuntimeSpeedLTO" => "Runtime Speed with LTO",
-            "DiskSize" => "Disk Size",
-            "DiskSizeLTO" => "Disk Size with LTO",
-            _ => str,
-        };
+        internal static string CodeOptimizationString(string str) =>
+            str switch
+            {
+                "BuildTimes" => "Shorter Build Time",
+                "RuntimeSpeed" => "Runtime Speed",
+                "RuntimeSpeedLTO" => "Runtime Speed with LTO",
+                "DiskSize" => "Disk Size",
+                "DiskSizeLTO" => "Disk Size with LTO",
+                _ => str,
+            };
 
-        internal static string IL2CppCodeGenerationString(Il2CppCodeGeneration v) => v switch
-        {
-            Il2CppCodeGeneration.OptimizeSpeed => "Faster runtime",
-            Il2CppCodeGeneration.OptimizeSize => "Faster (smaller) builds",
-            _ => v.ToString(),
-        };
+        internal static string IL2CppCodeGenerationString(Il2CppCodeGeneration v) =>
+            v switch
+            {
+                Il2CppCodeGeneration.OptimizeSpeed => "Faster runtime",
+                Il2CppCodeGeneration.OptimizeSize => "Faster (smaller) builds",
+                _ => v.ToString(),
+            };
 
         internal static string GraphicsAPIsString(UnityEngine.Rendering.GraphicsDeviceType[] graphicsAPIs)
         {
@@ -915,9 +1001,10 @@ namespace Unity.Web.Stripping.Editor
             var apiNames = new string[graphicsAPIs.Length];
             for (int i = 0; i < graphicsAPIs.Length; i++)
             {
-                apiNames[i] = graphicsAPIs[i] == UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3
-                    ? "WebGL 2"
-                    : graphicsAPIs[i].ToString();
+                apiNames[i] =
+                    graphicsAPIs[i] == UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3
+                        ? "WebGL 2"
+                        : graphicsAPIs[i].ToString();
             }
             return string.Join(", ", apiNames);
         }

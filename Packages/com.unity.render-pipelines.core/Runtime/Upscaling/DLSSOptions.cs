@@ -110,13 +110,13 @@ public class DLSSOptions : UpscalerOptions
         if (other == null)
             return false;
 
-        return m_DLSSQualityMode == other.m_DLSSQualityMode &&
-               m_FixedResolutionMode == other.m_FixedResolutionMode &&
-               m_DLSSRenderPresetQuality == other.m_DLSSRenderPresetQuality &&
-               m_DLSSRenderPresetBalanced == other.m_DLSSRenderPresetBalanced &&
-               m_DLSSRenderPresetPerformance == other.m_DLSSRenderPresetPerformance &&
-               m_DLSSRenderPresetUltraPerformance == other.m_DLSSRenderPresetUltraPerformance &&
-               m_DLSSRenderPresetDLAA == other.m_DLSSRenderPresetDLAA;
+        return m_DLSSQualityMode == other.m_DLSSQualityMode
+            && m_FixedResolutionMode == other.m_FixedResolutionMode
+            && m_DLSSRenderPresetQuality == other.m_DLSSRenderPresetQuality
+            && m_DLSSRenderPresetBalanced == other.m_DLSSRenderPresetBalanced
+            && m_DLSSRenderPresetPerformance == other.m_DLSSRenderPresetPerformance
+            && m_DLSSRenderPresetUltraPerformance == other.m_DLSSRenderPresetUltraPerformance
+            && m_DLSSRenderPresetDLAA == other.m_DLSSRenderPresetDLAA;
     }
 
     /// <summary>

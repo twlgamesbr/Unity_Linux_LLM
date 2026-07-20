@@ -3,8 +3,11 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_Smoothness"           )]
-    public struct HDRPMaterialPropertySmoothness : IComponentData { public float  Value; }
+    [MaterialProperty("_Smoothness")]
+    public struct HDRPMaterialPropertySmoothness : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertySmoothnessAuthoring : UnityEngine.MonoBehaviour

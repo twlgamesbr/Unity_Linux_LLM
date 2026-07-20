@@ -13,10 +13,13 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return new HardwareRayTracingShader((RayTracingShader)shader, kernelName, dispatchBuffer);
         }
 
-        public IRayTracingAccelStruct CreateAccelerationStructure(AccelerationStructureOptions options, ReferenceCounter counter)
+        public IRayTracingAccelStruct CreateAccelerationStructure(
+            AccelerationStructureOptions options,
+            ReferenceCounter counter
+        )
         {
             return new HardwareRayTracingAccelStruct(options, counter);
-        }   
+        }
 
         public ulong GetRequiredTraceScratchBufferSizeInBytes(uint width, uint height, uint depth)
         {

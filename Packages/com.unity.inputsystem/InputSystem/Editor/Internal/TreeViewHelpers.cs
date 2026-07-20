@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeView = UnityEditor.IMGUI.Controls.TreeView<int>;
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
@@ -37,8 +36,7 @@ namespace UnityEngine.InputSystem.Editor
             do
             {
                 child = child.parent;
-            }
-            while (child != null && child != parent);
+            } while (child != null && child != parent);
             return child != null;
         }
 

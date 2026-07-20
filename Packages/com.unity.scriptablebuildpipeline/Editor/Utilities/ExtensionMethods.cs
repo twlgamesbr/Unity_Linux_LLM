@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine; // explicitly imported for GUID backwards compatibility
 using UnityEditor; // explicitly imported for GUID backwards compatibility
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEditor.Build.Player;
+using UnityEngine; // explicitly imported for GUID backwards compatibility
 
 namespace UnityEditor.Build.Pipeline.Utilities
 {
@@ -29,7 +29,8 @@ namespace UnityEditor.Build.Pipeline.Utilities
             return collection == null || collection.Count == 0;
         }
 
-        public static void GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value) where TValue : new()
+        public static void GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value)
+            where TValue : new()
         {
             if (dictionary.TryGetValue(key, out value))
                 return;
@@ -45,7 +46,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
             list[first] = temp;
         }
 
-        public static void GatherSerializedObjectCacheEntries(this WriteCommand command, HashSet<CacheEntry> cacheEntries)
+        public static void GatherSerializedObjectCacheEntries(
+            this WriteCommand command,
+            HashSet<CacheEntry> cacheEntries
+        )
         {
             if (command.serializeObjects != null)
             {
@@ -56,7 +60,14 @@ namespace UnityEditor.Build.Pipeline.Utilities
             }
         }
 
-        public static void ExtractCommonCacheData(IBuildCache cache, IEnumerable<ObjectIdentifier> includedObjects, IEnumerable<ObjectIdentifier> referencedObjects, HashSet<Type> uniqueTypes, List<ObjectTypes> objectTypes, HashSet<CacheEntry> dependencies)
+        public static void ExtractCommonCacheData(
+            IBuildCache cache,
+            IEnumerable<ObjectIdentifier> includedObjects,
+            IEnumerable<ObjectIdentifier> referencedObjects,
+            HashSet<Type> uniqueTypes,
+            List<ObjectTypes> objectTypes,
+            HashSet<CacheEntry> dependencies
+        )
         {
             if (includedObjects != null)
             {
@@ -81,7 +92,12 @@ namespace UnityEditor.Build.Pipeline.Utilities
         }
 
 #if NONRECURSIVE_DEPENDENCY_DATA
-        public static bool IsPackedSprite(IEnumerable<ObjectIdentifier> includedObjects, ObjectIdentifier sourceTexture, BuildTarget target, TypeDB typeDB)
+        public static bool IsPackedSprite(
+            IEnumerable<ObjectIdentifier> includedObjects,
+            ObjectIdentifier sourceTexture,
+            BuildTarget target,
+            TypeDB typeDB
+        )
         {
             if (EditorSettings.spritePackerMode == SpritePackerMode.Disabled)
                 return false;
@@ -91,7 +107,14 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 if (BuildCacheUtility.GetMainTypeForObject(obj) != typeof(UnityEngine.Sprite))
                     continue;
 
-                foreach (var r in ContentBuildInterface.GetPlayerDependenciesForObject(obj, target, typeDB, DependencyType.ValidReferences))
+                foreach (
+                    var r in ContentBuildInterface.GetPlayerDependenciesForObject(
+                        obj,
+                        target,
+                        typeDB,
+                        DependencyType.ValidReferences
+                    )
+                )
                 {
                     // packed sprites never reference the source texture
                     if (r == sourceTexture)
@@ -102,7 +125,13 @@ namespace UnityEditor.Build.Pipeline.Utilities
             return true;
         }
 
-        public static ObjectIdentifier[] FilterReferencedObjectIDs(GUID asset, ObjectIdentifier[] references, BuildTarget target, TypeDB typeDB, HashSet<GUID> dependencies)
+        public static ObjectIdentifier[] FilterReferencedObjectIDs(
+            GUID asset,
+            ObjectIdentifier[] references,
+            BuildTarget target,
+            TypeDB typeDB,
+            HashSet<GUID> dependencies
+        )
         {
             // Expectation: references is populated with DependencyType.ValidReferences only for the given asset
             var collectedImmediateReferences = new HashSet<ObjectIdentifier>();
@@ -110,12 +139,21 @@ namespace UnityEditor.Build.Pipeline.Utilities
             while (references.Length > 0)
             {
                 // Track which roots we encounter to do dependency pruning
-                encounteredDependencies.UnionWith(references.Where(x => x.guid != asset && dependencies.Contains(x.guid)));
+                encounteredDependencies.UnionWith(
+                    references.Where(x => x.guid != asset && dependencies.Contains(x.guid))
+                );
                 // We only want to recursively grab references for objects being pulled in and won't go to another bundle
-                ObjectIdentifier[] immediateReferencesNotInOtherBundles =  references.Where(x => !dependencies.Contains(x.guid) && !collectedImmediateReferences.Contains(x)).ToArray();
+                ObjectIdentifier[] immediateReferencesNotInOtherBundles = references
+                    .Where(x => !dependencies.Contains(x.guid) && !collectedImmediateReferences.Contains(x))
+                    .ToArray();
                 collectedImmediateReferences.UnionWith(immediateReferencesNotInOtherBundles);
                 // Grab next set of valid references and loop
-                references = ContentBuildInterface.GetPlayerDependenciesForObjects(immediateReferencesNotInOtherBundles, target, typeDB, DependencyType.ValidReferences);
+                references = ContentBuildInterface.GetPlayerDependenciesForObjects(
+                    immediateReferencesNotInOtherBundles,
+                    target,
+                    typeDB,
+                    DependencyType.ValidReferences
+                );
             }
 
             // We need to ensure that we have a reference to a visible representation so our runtime dependency appending process
@@ -125,14 +163,14 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 var representations = ContentBuildInterface.GetPlayerAssetRepresentations(dependency.guid, target);
 
                 // If a sprite is packed we shouldn't add the main representation, as it's the Texture2D, but it uses the texture in the SpriteAtlas instead
-                if (BuildCacheUtility.GetMainTypeForObject(dependency) != typeof(UnityEngine.Sprite)
-                    || !IsPackedSprite(representations, representations[0], target, typeDB))
+                if (
+                    BuildCacheUtility.GetMainTypeForObject(dependency) != typeof(UnityEngine.Sprite)
+                    || !IsPackedSprite(representations, representations[0], target, typeDB)
+                )
                 {
                     // For each dependency, add just the main representation as a reference
                     collectedImmediateReferences.Add(representations.First());
                 }
-
-
             }
             collectedImmediateReferences.UnionWith(encounteredDependencies);
             return collectedImmediateReferences.ToArray();

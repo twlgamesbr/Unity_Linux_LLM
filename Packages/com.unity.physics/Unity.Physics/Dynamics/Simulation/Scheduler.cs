@@ -45,9 +45,10 @@ namespace Unity.Physics
         /// * Indices used for jointed pairs are not necessarily the same as selected in the joint
         /// * For some body A, all its static collisions will be contiguous.
         /// </summary>
-        [DebuggerDisplay("{IsValid ? \"Valid\" : \"Invalid\"}, {IsContact ? \"Contact\" : \"Joint\"}, {SolverType}, Enable Collision: {IsCollisionEnabled}, [{BodyIndexA}, {BodyIndexB}]")]
-        internal struct DispatchPair
-            : IEquatable<DispatchPair>
+        [DebuggerDisplay(
+            "{IsValid ? \"Valid\" : \"Invalid\"}, {IsContact ? \"Contact\" : \"Joint\"}, {SolverType}, Enable Collision: {IsCollisionEnabled}, [{BodyIndexA}, {BodyIndexB}]"
+        )]
+        internal struct DispatchPair : IEquatable<DispatchPair>
         {
             int m_BodyIndexA;
             int m_BodyIndexB;
@@ -62,7 +63,9 @@ namespace Unity.Physics
             /// <summary>   Indicates whether this pair is valid. </summary>
             ///
             /// <value> True if this pair is valid, false if not. </value>
-            public bool IsValid => m_BodyIndexA != DispatchPair.Invalid.BodyIndexA || BodyIndexASubArraySortKey != DispatchPair.Invalid.BodyIndexASubArraySortKey;
+            public bool IsValid =>
+                m_BodyIndexA != DispatchPair.Invalid.BodyIndexA
+                || BodyIndexASubArraySortKey != DispatchPair.Invalid.BodyIndexASubArraySortKey;
 
             /// <summary>   Indicates whether this pair is a joint. </summary>
             ///
@@ -96,7 +99,13 @@ namespace Unity.Physics
             /// <summary>   Gets the invalid dispatch pair. </summary>
             ///
             /// <value> The invalid dispatch pair. </value>
-            public static DispatchPair Invalid => new DispatchPair { m_BodyIndexA = ~0, m_BodyIndexB = ~0, m_Data = ~(uint)0 };
+            public static DispatchPair Invalid =>
+                new DispatchPair
+                {
+                    m_BodyIndexA = ~0,
+                    m_BodyIndexB = ~0,
+                    m_Data = ~(uint)0,
+                };
 
             /// <summary>   Gets or sets the body index a. </summary>
             ///
@@ -168,7 +177,13 @@ namespace Unity.Physics
                 //    solver, yielding lower constraint error for contacts than for joints after every solver iteration.
                 // 2) It is a requirement in the joints' "Enable Collision" feature, in which collisions between a given
                 //    body pair are enabled if any of the joints between them allows it.
-                return Create(overlapResult.BodyPair, (int)k_InvalidJointIndex, enableCollision: true, overlapResult.SolverType, couplingPair: false);
+                return Create(
+                    overlapResult.BodyPair,
+                    (int)k_InvalidJointIndex,
+                    enableCollision: true,
+                    overlapResult.SolverType,
+                    couplingPair: false
+                );
             }
 
             /// <summary>   Creates a joint. </summary>
@@ -179,13 +194,24 @@ namespace Unity.Physics
             /// <param name="solverType">       Solver type used for this joint. </param>
             ///
             /// <returns>   The new dispatch pair representing the joint. </returns>
-            public static DispatchPair CreateJoint(BodyIndexPair pair, int jointIndex, bool enableCollision, SolverType solverType = SolverType.Iterative)
+            public static DispatchPair CreateJoint(
+                BodyIndexPair pair,
+                int jointIndex,
+                bool enableCollision,
+                SolverType solverType = SolverType.Iterative
+            )
             {
                 Assert.IsTrue(jointIndex < k_InvalidJointIndex);
                 return Create(pair, jointIndex, enableCollision, solverType, couplingPair: false);
             }
 
-            static DispatchPair Create(BodyIndexPair pair, int jointIndex, bool enableCollision, SolverType solverType, bool couplingPair)
+            static DispatchPair Create(
+                BodyIndexPair pair,
+                int jointIndex,
+                bool enableCollision,
+                SolverType solverType,
+                bool couplingPair
+            )
             {
                 int selectedA = math.min(pair.BodyIndexA, pair.BodyIndexB);
                 int selectedB = math.max(pair.BodyIndexA, pair.BodyIndexB);
@@ -194,16 +220,17 @@ namespace Unity.Physics
                     BodyIndexA = selectedA,
                     BodyIndexB = selectedB,
                     m_Data =
-                        (solverType == SolverType.Direct ? k_DirectSolverBit : 0) |
-                        (couplingPair ? k_EnableCouplingBit : 0) |
-                        (enableCollision ? k_EnableCollisionBit : 0) |
-                        (uint)(jointIndex & k_InvalidJointIndex)
+                        (solverType == SolverType.Direct ? k_DirectSolverBit : 0)
+                        | (couplingPair ? k_EnableCouplingBit : 0)
+                        | (enableCollision ? k_EnableCollisionBit : 0)
+                        | (uint)(jointIndex & k_InvalidJointIndex),
                 };
             }
 
             public bool Equals(DispatchPair other)
             {
-                return m_BodyIndexA == other.m_BodyIndexA && BodyIndexASubArraySortKey == other.BodyIndexASubArraySortKey;
+                return m_BodyIndexA == other.m_BodyIndexA
+                    && BodyIndexASubArraySortKey == other.BodyIndexASubArraySortKey;
             }
 
             public override int GetHashCode()
@@ -213,20 +240,25 @@ namespace Unity.Physics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void SortDispatchPairs(NativeList<DispatchPair> dispatchPairs) => dispatchPairs.Sort(new DispatchPairComparer());
+        internal static void SortDispatchPairs(NativeList<DispatchPair> dispatchPairs) =>
+            dispatchPairs.Sort(new DispatchPairComparer());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void SortDispatchPairs(NativeArray<DispatchPair> dispatchPairs) => dispatchPairs.Sort(new DispatchPairComparer());
+        internal static void SortDispatchPairs(NativeArray<DispatchPair> dispatchPairs) =>
+            dispatchPairs.Sort(new DispatchPairComparer());
 
         [NoAlias]
         internal struct SolverSchedulerInfo : IDisposable
         {
             [NoAlias]
             public IterativeSolverSchedulerInfo IterativePairsIterativeScheduling;
+
             [NoAlias]
             public IterativeSolverSchedulerInfo CouplingPairsIterativeScheduling;
+
             [NoAlias]
             public IterativeSolverSchedulerInfo DirectPairsIterativeScheduling;
+
             [NoAlias]
             public DirectSolverSchedulerInfo DirectPairsDirectScheduling;
 
@@ -258,9 +290,10 @@ namespace Unity.Physics
                 numWorkItems += CouplingPairsIterativeScheduling.NumWorkItems[0];
                 DirectPairsIterativeScheduling.FirstWorkItemIndex.Value = numWorkItems;
 
-                NumIterativeWorkItems.Value = IterativePairsIterativeScheduling.NumWorkItems[0] +
-                    CouplingPairsIterativeScheduling.NumWorkItems[0] +
-                    DirectPairsIterativeScheduling.NumWorkItems[0];
+                NumIterativeWorkItems.Value =
+                    IterativePairsIterativeScheduling.NumWorkItems[0]
+                    + CouplingPairsIterativeScheduling.NumWorkItems[0]
+                    + DirectPairsIterativeScheduling.NumWorkItems[0];
             }
 
             public void Dispose()
@@ -280,7 +313,9 @@ namespace Unity.Physics
                     JobHandle.CombineDependencies(
                         DirectPairsIterativeScheduling.ScheduleDisposeJob(inputDeps),
                         DirectPairsDirectScheduling.ScheduleDisposeJob(inputDeps),
-                        NumIterativeWorkItems.Dispose(inputDeps)));
+                        NumIterativeWorkItems.Dispose(inputDeps)
+                    )
+                );
             }
         }
 
@@ -293,6 +328,7 @@ namespace Unity.Physics
         {
             /// <summary> Index of the dispatch pair in the unphased (lexicographically sorted) array </summary>
             public int UnphasedDispatchPairIndex;
+
             /// <summary> Index of the island this dispatch pair belongs to </summary>
             public int IslandIndex;
         }
@@ -304,6 +340,7 @@ namespace Unity.Physics
         internal struct DispatchPairJacobianMapping
         {
             public UnsafeStream.ReaderState ReaderState;
+
             /// <summary> Work item index (buffer) where this dispatch pair's Jacobian data is located in the Jacobian stream </summary>
             public int WorkItemIndex;
 
@@ -379,7 +416,7 @@ namespace Unity.Physics
                     DispatchPairIslandInfos = new NativeList<DispatchPairIslandInfo>(allocator),
                     FirstDispatchPairIslandInfoIndices = new NativeList<int>(128, allocator),
                     DispatchPairIslandInfoCounts = new NativeList<int>(128, allocator),
-                    FirstDispatchPairIndex = new NativeReference<int>(0, allocator)
+                    FirstDispatchPairIndex = new NativeReference<int>(0, allocator),
                 };
             }
 
@@ -404,10 +441,18 @@ namespace Unity.Physics
 
             public JobHandle ScheduleDisposeJob(JobHandle inputDeps)
             {
-                return JobHandle.CombineDependencies(UnphasedToPhasedDispatchPairMap.Dispose(inputDeps), PhasedDispatchPairJacobianMappings.Dispose(inputDeps),
-                    JobHandle.CombineDependencies(DispatchPairIslandInfos.Dispose(inputDeps),
-                        JobHandle.CombineDependencies(FirstDispatchPairIslandInfoIndices.Dispose(inputDeps),
-                            DispatchPairIslandInfoCounts.Dispose(inputDeps), FirstDispatchPairIndex.Dispose(inputDeps))));
+                return JobHandle.CombineDependencies(
+                    UnphasedToPhasedDispatchPairMap.Dispose(inputDeps),
+                    PhasedDispatchPairJacobianMappings.Dispose(inputDeps),
+                    JobHandle.CombineDependencies(
+                        DispatchPairIslandInfos.Dispose(inputDeps),
+                        JobHandle.CombineDependencies(
+                            FirstDispatchPairIslandInfoIndices.Dispose(inputDeps),
+                            DispatchPairIslandInfoCounts.Dispose(inputDeps),
+                            FirstDispatchPairIndex.Dispose(inputDeps)
+                        )
+                    )
+                );
             }
         }
 
@@ -423,26 +468,31 @@ namespace Unity.Physics
                 internal int DispatchPairCount; // The total number of pairs in this phase
                 internal int BatchSize; // The number of items per thread work item; at most, the number of pairs
                 internal int NumWorkItems; // The amount of "subtasks" of size BatchSize in this phase
-                internal int FirstWorkItemIndexOffset;  // Offset to first work item index of this phase. Calculated as
-                                                        // the sum of NumWorkItems in all previous phases.
-                                                        // Index for this work item in the global work item array is
-                                                        // IterativeSolverSchedulerInfo.FirstWorkItemIndex + SolvePhaseInfo.FirstWorkItemIndexOffset.
-                internal int FirstDispatchPairOffset;   // Offset to first dispatch pair in this phase within the sub-array
-                                                        // of dispatch pairs for this scheduler info.
-                                                        // Index for this pair in the global dispatch pair array is
-                                                        // IterativeSolverSchedulerInfo.FirstDispatchPairIndex + SolvePhaseInfo.FirstDispatchPairOffset.
+                internal int FirstWorkItemIndexOffset; // Offset to first work item index of this phase. Calculated as
+
+                // the sum of NumWorkItems in all previous phases.
+                // Index for this work item in the global work item array is
+                // IterativeSolverSchedulerInfo.FirstWorkItemIndex + SolvePhaseInfo.FirstWorkItemIndexOffset.
+                internal int FirstDispatchPairOffset; // Offset to first dispatch pair in this phase within the sub-array
+
+                // of dispatch pairs for this scheduler info.
+                // Index for this pair in the global dispatch pair array is
+                // IterativeSolverSchedulerInfo.FirstDispatchPairIndex + SolvePhaseInfo.FirstDispatchPairOffset.
                 internal bool ContainsDuplicateIndices; // Indicates that there are duplicate body indices across batches within this phase.
             }
 
             [NoAlias]
             internal NativeArray<SolvePhaseInfo> PhaseInfo;
+
             [NoAlias]
             internal NativeArray<int> NumActivePhases;
+
             [NoAlias]
-            internal NativeReference<int> FirstWorkItemIndex;   // Index of first work item used for this scheduler info. Indicates where the
-                                                                // solver data can be found in the corresponding streams (jacobian and contact).
-                                                                // All work item indices specified in the SolvePhaseInfo of this scheduler info
-                                                                // are relative to this index.
+            internal NativeReference<int> FirstWorkItemIndex; // Index of first work item used for this scheduler info. Indicates where the
+
+            // solver data can be found in the corresponding streams (jacobian and contact).
+            // All work item indices specified in the SolvePhaseInfo of this scheduler info
+            // are relative to this index.
             [NoAlias]
             // Total number of work items in all phases for this scheduler info.
             internal NativeArray<int> NumWorkItems;
@@ -477,7 +527,9 @@ namespace Unity.Physics
                 SolvePhaseInfo phaseInfo = PhaseInfo[FindPhaseId(workItemIndexOffset)];
 
                 int numItemsToRead = phaseInfo.BatchSize;
-                int readStartOffset = phaseInfo.FirstDispatchPairOffset + (workItemIndexOffset - phaseInfo.FirstWorkItemIndexOffset) * phaseInfo.BatchSize;
+                int readStartOffset =
+                    phaseInfo.FirstDispatchPairOffset
+                    + (workItemIndexOffset - phaseInfo.FirstWorkItemIndexOffset) * phaseInfo.BatchSize;
 
                 int lastWorkItemIndexOffset = phaseInfo.FirstWorkItemIndexOffset + phaseInfo.NumWorkItems - 1;
                 bool isLastWorkItemInPhase = workItemIndexOffset == lastWorkItemIndexOffset;
@@ -538,8 +590,19 @@ namespace Unity.Physics
 
             public JobHandle ScheduleDisposeJob(JobHandle inputDeps)
             {
-                return JobHandle.CombineDependencies(new DisposeJob { PhaseInfo = PhaseInfo, NumActivePhases = NumActivePhases, NumWorkItems = NumWorkItems }.Schedule(inputDeps),
-                    JobHandle.CombineDependencies(FirstWorkItemIndex.Dispose(inputDeps), NumDispatchPairs.Dispose(inputDeps), FirstDispatchPairIndex.Dispose(inputDeps)));
+                return JobHandle.CombineDependencies(
+                    new DisposeJob
+                    {
+                        PhaseInfo = PhaseInfo,
+                        NumActivePhases = NumActivePhases,
+                        NumWorkItems = NumWorkItems,
+                    }.Schedule(inputDeps),
+                    JobHandle.CombineDependencies(
+                        FirstWorkItemIndex.Dispose(inputDeps),
+                        NumDispatchPairs.Dispose(inputDeps),
+                        FirstDispatchPairIndex.Dispose(inputDeps)
+                    )
+                );
             }
 
             // A job to dispose the phase information
@@ -555,7 +618,7 @@ namespace Unity.Physics
                 [DeallocateOnJobCompletion]
                 public NativeArray<int> NumWorkItems;
 
-                public void Execute() {}
+                public void Execute() { }
             }
         }
 
@@ -563,21 +626,34 @@ namespace Unity.Physics
         {
             public int Compare(DispatchPair x, DispatchPair y)
             {
-                return math.select(x.BodyIndexA.CompareTo(y.BodyIndexA),
+                return math.select(
+                    x.BodyIndexA.CompareTo(y.BodyIndexA),
                     x.BodyIndexASubArraySortKey.CompareTo(y.BodyIndexASubArraySortKey),
-                    x.BodyIndexA == y.BodyIndexA);
+                    x.BodyIndexA == y.BodyIndexA
+                );
             }
         }
 
-        static void CreatePhasedDispatchPairsForSerialProcessing(int numDynamicBodies,
-            NativeArray<DispatchPair> unsortedDispatchPairs, NativeArray<DispatchPair> dispatchPairs, int dispatchPairOffset,
-            ref IterativeSolverSchedulerInfo solverSchedulerInfo, NativeArray<int> unphasedToPhasedDispatchPairMap = default)
+        static void CreatePhasedDispatchPairsForSerialProcessing(
+            int numDynamicBodies,
+            NativeArray<DispatchPair> unsortedDispatchPairs,
+            NativeArray<DispatchPair> dispatchPairs,
+            int dispatchPairOffset,
+            ref IterativeSolverSchedulerInfo solverSchedulerInfo,
+            NativeArray<int> unphasedToPhasedDispatchPairMap = default
+        )
         {
             NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo> phaseInfo =
                 new NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo>(kMaxNumPhases, Allocator.Temp);
             CreateDispatchPairPhasesJob.CreateDispatchPairPhases(
-                unsortedDispatchPairs, numDynamicBodies,
-                dispatchPairs, out int numActivePhases, out int numWorkItems, ref phaseInfo, unphasedToPhasedDispatchPairMap);
+                unsortedDispatchPairs,
+                numDynamicBodies,
+                dispatchPairs,
+                out int numActivePhases,
+                out int numWorkItems,
+                ref phaseInfo,
+                unphasedToPhasedDispatchPairMap
+            );
 
             int totalDispatchPairs = 0;
             for (int i = 0; i < numActivePhases; i++)
@@ -594,7 +670,7 @@ namespace Unity.Physics
                     NumWorkItems = 1,
                     BatchSize = totalDispatchPairs,
                     FirstDispatchPairOffset = 0,
-                    FirstWorkItemIndexOffset = 0
+                    FirstWorkItemIndexOffset = 0,
                 };
 
                 solverSchedulerInfo.NumActivePhases[0] = 1;
@@ -621,9 +697,11 @@ namespace Unity.Physics
         /// in parallel by the direct solver. The method uses a breadth-first search to find connected components in the graph
         /// formed by the direct solver pairs and adds them to the direct solver scheduler info.
         /// </summary>
-        static void FindDirectSolverIslands(int numDynamicBodies,
+        static void FindDirectSolverIslands(
+            int numDynamicBodies,
             NativeArray<DispatchPair> directPairs,
-            ref DirectSolverSchedulerInfo solverSchedulerInfo)
+            ref DirectSolverSchedulerInfo solverSchedulerInfo
+        )
         {
             solverSchedulerInfo.DispatchPairIslandInfos.SetCapacity(directPairs.Length);
 
@@ -643,11 +721,7 @@ namespace Unity.Physics
                 // to be connected across edges (constraints) which do not actually exist (are not simulated).
                 SafetyChecks.CheckAreEqualAndThrow(true, pair.IsValid && (pair.IsJoint || pair.IsCollisionEnabled));
 
-                var edge = new IslandSearchEdge
-                {
-                    Pair = pair,
-                    PairIndex = i
-                };
+                var edge = new IslandSearchEdge { Pair = pair, PairIndex = i };
 
                 edges.Add(pair.BodyIndexA, edge);
 
@@ -677,8 +751,11 @@ namespace Unity.Physics
                 }
 
                 // Sanity check: if edge was not yet visited, both of its nodes should also not have been visited yet.
-                SafetyChecks.CheckAreEqualAndThrow(false, visitedNodes.Contains(pair.BodyIndexA) &&
-                    (pair.BodyIndexB >= numDynamicBodies || visitedNodes.Contains(pair.BodyIndexB)));
+                SafetyChecks.CheckAreEqualAndThrow(
+                    false,
+                    visitedNodes.Contains(pair.BodyIndexA)
+                        && (pair.BodyIndexB >= numDynamicBodies || visitedNodes.Contains(pair.BodyIndexB))
+                );
 
                 // breadth first search:
                 // @todo direct solver (DOTS-10860): for bandwidth reduction, in the future, we need to do Cuthill-McKee or its reverse here.
@@ -712,7 +789,7 @@ namespace Unity.Physics
                             var info = new DispatchPairIslandInfo()
                             {
                                 UnphasedDispatchPairIndex = connectedEdge.PairIndex,
-                                IslandIndex = solverSchedulerInfo.DispatchPairIslandInfoCounts.Length
+                                IslandIndex = solverSchedulerInfo.DispatchPairIslandInfoCounts.Length,
                             };
                             solverSchedulerInfo.DispatchPairIslandInfos.Add(info);
                             ++numProcessedDirectPairs;
@@ -720,15 +797,20 @@ namespace Unity.Physics
                             visitedEdges.Add(connectedEdge.PairIndex);
 
                             var connectedPair = connectedEdge.Pair;
-                            int otherBodyIndex = math.select(connectedPair.BodyIndexA, connectedPair.BodyIndexB,
-                                connectedPair.BodyIndexA == bodyIndex);
-                            if (otherBodyIndex < numDynamicBodies && // skip static bodies
-                                !visitedNodes.Contains(otherBodyIndex))
+                            int otherBodyIndex = math.select(
+                                connectedPair.BodyIndexA,
+                                connectedPair.BodyIndexB,
+                                connectedPair.BodyIndexA == bodyIndex
+                            );
+                            if (
+                                otherBodyIndex < numDynamicBodies
+                                && // skip static bodies
+                                !visitedNodes.Contains(otherBodyIndex)
+                            )
                             {
                                 queue.Enqueue(otherBodyIndex);
                             }
-                        }
-                        while (edges.TryGetNextValue(out connectedEdge, ref iterator));
+                        } while (edges.TryGetNextValue(out connectedEdge, ref iterator));
                     }
                 }
 
@@ -745,15 +827,25 @@ namespace Unity.Physics
         /// <summary>
         /// Merge streams of body pairs and joints into a sorted array of dispatch pairs.
         /// </summary>
-        internal static void CreateDispatchPairs(in SimulationStepInput stepInput,
-            ref NativeStream dynamicVsDynamicBodyPairs, ref NativeStream staticVsDynamicBodyPairs,
-            ref SolverSchedulerInfo solverSchedulerInfo, ref NativeList<DispatchPair> dispatchPairs)
+        internal static void CreateDispatchPairs(
+            in SimulationStepInput stepInput,
+            ref NativeStream dynamicVsDynamicBodyPairs,
+            ref NativeStream staticVsDynamicBodyPairs,
+            ref SolverSchedulerInfo solverSchedulerInfo,
+            ref NativeList<DispatchPair> dispatchPairs
+        )
         {
             int numDynamicBodies = stepInput.World.NumDynamicBodies;
             var tempPairs = new NativeList<DispatchPair>(Allocator.Temp);
 
-            CreateUnsortedDispatchPairs(stepInput, dynamicVsDynamicBodyPairs, staticVsDynamicBodyPairs, tempPairs,
-                out int numIterativePairs, out int numDirectPairs);
+            CreateUnsortedDispatchPairs(
+                stepInput,
+                dynamicVsDynamicBodyPairs,
+                staticVsDynamicBodyPairs,
+                tempPairs,
+                out int numIterativePairs,
+                out int numDirectPairs
+            );
 
             int numIterativeCouplingPairs = 0;
 
@@ -774,12 +866,19 @@ namespace Unity.Physics
             }
             else if (numDirectPairs > 0)
             {
-                var directSolverBodyFlags = new NativeArray<bool>(numDynamicBodies, Allocator.Temp,
+                var directSolverBodyFlags = new NativeArray<bool>(
+                    numDynamicBodies,
+                    Allocator.Temp,
                     // Note: important to clear memory for direct solver body flags, so that all are set to false initially.
-                    options: NativeArrayOptions.ClearMemory);
+                    options: NativeArrayOptions.ClearMemory
+                );
 
-                SetDirectSolverBodyFlags(stepInput, dynamicVsDynamicBodyPairs, staticVsDynamicBodyPairs,
-                    directSolverBodyFlags);
+                SetDirectSolverBodyFlags(
+                    stepInput,
+                    dynamicVsDynamicBodyPairs,
+                    staticVsDynamicBodyPairs,
+                    directSolverBodyFlags
+                );
 
                 SetCouplingConstraintFlags(tempPairs, directSolverBodyFlags, out numIterativeCouplingPairs);
             }
@@ -816,8 +915,13 @@ namespace Unity.Physics
                 if (numDirectPairs == 0)
                 {
                     // no direct pairs
-                    CreatePhasedDispatchPairsForSerialProcessing(numDynamicBodies, tempPairs.AsArray(), dispatchPairs.AsArray(),
-                        dispatchPairOffset: 0, ref solverSchedulerInfo.IterativePairsIterativeScheduling);
+                    CreatePhasedDispatchPairsForSerialProcessing(
+                        numDynamicBodies,
+                        tempPairs.AsArray(),
+                        dispatchPairs.AsArray(),
+                        dispatchPairOffset: 0,
+                        ref solverSchedulerInfo.IterativePairsIterativeScheduling
+                    );
                 }
                 else
                 {
@@ -853,13 +957,19 @@ namespace Unity.Physics
 
                         if (numPureIterativePairs > 0)
                         {
-                            var unphasedPureIterativePairs =
-                                unphasedIterativePairs.GetSubArray(0, numPureIterativePairs);
-                            var pureIterativePairs =
-                                dispatchPairs.AsArray().GetSubArray(0, numPureIterativePairs);
+                            var unphasedPureIterativePairs = unphasedIterativePairs.GetSubArray(
+                                0,
+                                numPureIterativePairs
+                            );
+                            var pureIterativePairs = dispatchPairs.AsArray().GetSubArray(0, numPureIterativePairs);
 
-                            CreatePhasedDispatchPairsForSerialProcessing(numDynamicBodies, unphasedPureIterativePairs, pureIterativePairs,
-                                dispatchPairOffset: 0, ref solverSchedulerInfo.IterativePairsIterativeScheduling);
+                            CreatePhasedDispatchPairsForSerialProcessing(
+                                numDynamicBodies,
+                                unphasedPureIterativePairs,
+                                pureIterativePairs,
+                                dispatchPairOffset: 0,
+                                ref solverSchedulerInfo.IterativePairsIterativeScheduling
+                            );
                         }
 
                         // @todo direct solver (DOTS-10982): we keep these separate for now so that we can benefit from
@@ -869,13 +979,21 @@ namespace Unity.Physics
                         if (numIterativeCouplingPairs > 0)
                         {
                             SafetyChecks.CheckAreEqualAndThrow(numIterativePairs, unphasedIterativePairs.Length);
-                            var unphasedIterativeCouplingPairs =
-                                unphasedIterativePairs.GetSubArray(numPureIterativePairs, numIterativeCouplingPairs);
-                            var iterativeCouplingPairs =
-                                dispatchPairs.AsArray().GetSubArray(numPureIterativePairs, numIterativeCouplingPairs);
+                            var unphasedIterativeCouplingPairs = unphasedIterativePairs.GetSubArray(
+                                numPureIterativePairs,
+                                numIterativeCouplingPairs
+                            );
+                            var iterativeCouplingPairs = dispatchPairs
+                                .AsArray()
+                                .GetSubArray(numPureIterativePairs, numIterativeCouplingPairs);
 
-                            CreatePhasedDispatchPairsForSerialProcessing(numDynamicBodies, unphasedIterativeCouplingPairs, iterativeCouplingPairs,
-                                dispatchPairOffset: numPureIterativePairs, ref solverSchedulerInfo.CouplingPairsIterativeScheduling);
+                            CreatePhasedDispatchPairsForSerialProcessing(
+                                numDynamicBodies,
+                                unphasedIterativeCouplingPairs,
+                                iterativeCouplingPairs,
+                                dispatchPairOffset: numPureIterativePairs,
+                                ref solverSchedulerInfo.CouplingPairsIterativeScheduling
+                            );
                         }
                     }
 
@@ -892,8 +1010,7 @@ namespace Unity.Physics
                         for (int i = 0; i < tempPairs.Length; ++i)
                         {
                             var pair = tempPairs[i];
-                            if (pair.SolverType == SolverType.Direct &&
-                                (pair.IsJoint || pair.IsCollisionEnabled)) // exclude disabled collision pairs
+                            if (pair.SolverType == SolverType.Direct && (pair.IsJoint || pair.IsCollisionEnabled)) // exclude disabled collision pairs
                             {
                                 directPairs.Add(pair);
                             }
@@ -909,13 +1026,20 @@ namespace Unity.Physics
                             // Phase direct pairs, and create unphased-to-phased map:
 
                             var directPairsOffset = numIterativePairs;
-                            solverSchedulerInfo.DirectPairsDirectScheduling.FirstDispatchPairIndex.Value = directPairsOffset;
+                            solverSchedulerInfo.DirectPairsDirectScheduling.FirstDispatchPairIndex.Value =
+                                directPairsOffset;
 
-                            var phasedDirectPairs =
-                                dispatchPairs.AsArray().GetSubArray(numIterativePairs, numDirectPairs);
-                            CreatePhasedDispatchPairsForSerialProcessing(numDynamicBodies, directPairs.AsArray(), phasedDirectPairs,
-                                dispatchPairOffset: directPairsOffset, ref solverSchedulerInfo.DirectPairsIterativeScheduling,
-                                solverSchedulerInfo.DirectPairsDirectScheduling.UnphasedToPhasedDispatchPairMap.AsArray());
+                            var phasedDirectPairs = dispatchPairs
+                                .AsArray()
+                                .GetSubArray(numIterativePairs, numDirectPairs);
+                            CreatePhasedDispatchPairsForSerialProcessing(
+                                numDynamicBodies,
+                                directPairs.AsArray(),
+                                phasedDirectPairs,
+                                dispatchPairOffset: directPairsOffset,
+                                ref solverSchedulerInfo.DirectPairsIterativeScheduling,
+                                solverSchedulerInfo.DirectPairsDirectScheduling.UnphasedToPhasedDispatchPairMap.AsArray()
+                            );
 
                             // Find islands:
 
@@ -927,7 +1051,11 @@ namespace Unity.Physics
                             // disabled due to the joints' disable collision feature), since some might remain at the end
                             // of the coupling pairs array section.
 
-                            FindDirectSolverIslands(numDynamicBodies, directPairs.AsArray(), ref solverSchedulerInfo.DirectPairsDirectScheduling);
+                            FindDirectSolverIslands(
+                                numDynamicBodies,
+                                directPairs.AsArray(),
+                                ref solverSchedulerInfo.DirectPairsDirectScheduling
+                            );
                         }
                     }
                 }
@@ -942,10 +1070,15 @@ namespace Unity.Physics
         /// Schedule a set of jobs to merge streams of body pairs and joints into a sorted array of
         /// dispatch pairs.
         /// </summary>
-        internal static SimulationJobHandles ScheduleCreatePhasedDispatchPairsJob(in SimulationStepInput stepInput,
-            ref NativeStream dynamicVsDynamicBroadphasePairsStream, ref NativeStream staticVsDynamicBroadphasePairsStream,
-            JobHandle inputDeps, ref NativeList<DispatchPair> dispatchPairs, out SolverSchedulerInfo solverSchedulerInfo,
-            bool multiThreaded = true)
+        internal static SimulationJobHandles ScheduleCreatePhasedDispatchPairsJob(
+            in SimulationStepInput stepInput,
+            ref NativeStream dynamicVsDynamicBroadphasePairsStream,
+            ref NativeStream staticVsDynamicBroadphasePairsStream,
+            JobHandle inputDeps,
+            ref NativeList<DispatchPair> dispatchPairs,
+            out SolverSchedulerInfo solverSchedulerInfo,
+            bool multiThreaded = true
+        )
         {
             SimulationJobHandles returnHandles = default;
 
@@ -968,7 +1101,8 @@ namespace Unity.Physics
                 // where we would ideally like to schedule their disposal
                 returnHandles.FinalExecutionHandle = JobHandle.CombineDependencies(
                     dynamicVsDynamicBroadphasePairsStream.Dispose(returnHandles.FinalExecutionHandle),
-                    staticVsDynamicBroadphasePairsStream.Dispose(returnHandles.FinalExecutionHandle));
+                    staticVsDynamicBroadphasePairsStream.Dispose(returnHandles.FinalExecutionHandle)
+                );
 
                 return returnHandles;
             }
@@ -1019,9 +1153,12 @@ namespace Unity.Physics
             // @todo direct solver (DOTS-11060): use world allocator here
             var jointDispatchPairsStream = new NativeStream(numWorkers, Allocator.TempJob);
             // @todo direct solver (DOTS-11060): use world allocator here, and/or reuse memory some place
-            var directSolverBodyFlags = new NativeArray<bool>(stepInput.World.NumDynamicBodies, Allocator.TempJob,
+            var directSolverBodyFlags = new NativeArray<bool>(
+                stepInput.World.NumDynamicBodies,
+                Allocator.TempJob,
                 // Note: important to clear memory for direct solver body flags, so that all are set to false initially.
-                options: NativeArrayOptions.ClearMemory);
+                options: NativeArrayOptions.ClearMemory
+            );
             // Note: use int for directSolverUsed flag instead of bool so that it can be used as work item count in
             // parallel-for-defer jobs in order to eliminate any job execution whatsoever when the flag is 0 (false).
             var directSolverUsed = new NativeReference<int>(0, Allocator.TempJob);
@@ -1038,16 +1175,19 @@ namespace Unity.Physics
             JobHandle dynamicVsDynamicStreamPrefixSumHandle = new CreateStreamPrefixSumJob
             {
                 Reader = dynamicVsDynamicBroadphasePairsStream.AsReader(),
-                StreamPrefixSum = dynamicVsDynamicStreamPrefixSum
+                StreamPrefixSum = dynamicVsDynamicStreamPrefixSum,
             }.Schedule(inputDeps);
 
             JobHandle staticVsDynamicStreamPrefixSumHandle = new CreateStreamPrefixSumJob
             {
                 Reader = staticVsDynamicBroadphasePairsStream.AsReader(),
-                StreamPrefixSum = staticVsDynamicStreamPrefixSum
+                StreamPrefixSum = staticVsDynamicStreamPrefixSum,
             }.Schedule(inputDeps);
 
-            JobHandle prefixSumHandle = JobHandle.CombineDependencies(dynamicVsDynamicStreamPrefixSumHandle, staticVsDynamicStreamPrefixSumHandle);
+            JobHandle prefixSumHandle = JobHandle.CombineDependencies(
+                dynamicVsDynamicStreamPrefixSumHandle,
+                staticVsDynamicStreamPrefixSumHandle
+            );
 
             // Allocate unsorted and sorted dispatch pair arrays
             JobHandle allocateDispatchPairs = new AllocateDispatchPairsJob
@@ -1056,7 +1196,7 @@ namespace Unity.Physics
                 DynamicVsDynamicStreamPrefixSum = dynamicVsDynamicStreamPrefixSum,
                 StaticVsDynamicStreamPrefixSum = staticVsDynamicStreamPrefixSum,
                 UnsortedDispatchPairs = unsortedPairs,
-                SortedDispatchPairs = sortedPairs
+                SortedDispatchPairs = sortedPairs,
             }.Schedule(prefixSumHandle);
 
             // Here we launch three parallel chains of jobs for creation of the unsorted dispatch pair array,
@@ -1100,7 +1240,7 @@ namespace Unity.Physics
             jointPairsHandle = new CreateStreamPrefixSumJob
             {
                 Reader = jointDispatchPairsStream.AsReader(),
-                StreamPrefixSum = jointStreamPrefixSum
+                StreamPrefixSum = jointStreamPrefixSum,
             }.Schedule(jointPairsHandle);
 
             jointPairsHandle = new MergeJointDispatchPairsStreamJob
@@ -1109,10 +1249,18 @@ namespace Unity.Physics
                 JointDispatchPairReader = jointDispatchPairsStream.AsReader(),
                 JointDispatchPairStreamHistogram = jointStreamPrefixSum.AsDeferredJobArray(),
                 DynamicVsDynamicStreamHistogram = dynamicVsDynamicStreamPrefixSum.AsDeferredJobArray(),
-                StaticVsDynamicStreamHistogram = staticVsDynamicStreamPrefixSum.AsDeferredJobArray()
-            }.ScheduleUnsafe(jointDispatchPairsStream, 1, JobHandle.CombineDependencies(jointPairsHandle, allocateDispatchPairs));
+                StaticVsDynamicStreamHistogram = staticVsDynamicStreamPrefixSum.AsDeferredJobArray(),
+            }.ScheduleUnsafe(
+                jointDispatchPairsStream,
+                1,
+                JobHandle.CombineDependencies(jointPairsHandle, allocateDispatchPairs)
+            );
 
-            JobHandle dispatchPairsHandle = JobHandle.CombineDependencies(jointPairsHandle,  dynamicVsDynamicPairsHandle, staticVsDynamicPairsHandle);
+            JobHandle dispatchPairsHandle = JobHandle.CombineDependencies(
+                jointPairsHandle,
+                dynamicVsDynamicPairsHandle,
+                staticVsDynamicPairsHandle
+            );
 
             dispatchPairsHandle = new ShrinkDispatchPairListJob
             {
@@ -1120,7 +1268,7 @@ namespace Unity.Physics
                 SortedDispatchPairs = sortedPairs,
                 DynamicVsDynamicStreamPrefixSum = dynamicVsDynamicStreamPrefixSum.AsDeferredJobArray(),
                 StaticVsDynamicStreamPrefixSum = staticVsDynamicStreamPrefixSum.AsDeferredJobArray(),
-                JointStreamPrefixSum = jointStreamPrefixSum.AsDeferredJobArray()
+                JointStreamPrefixSum = jointStreamPrefixSum.AsDeferredJobArray(),
             }.Schedule(dispatchPairsHandle);
 
             // dispose dependent resources once done with creation of unsorted pair array
@@ -1135,10 +1283,11 @@ namespace Unity.Physics
                 // The direct solver will be used for all constraints. Therefore, there are no coupling constraints, which means, we
                 // don't need to set the direct solver body flags or the coupling flags.
                 // Also, the solver type will have to be forced to be direct for all constraints.
-                dispatchPairsHandle = new ForceDirectSolverOnAllPairsJob
-                {
-                    DispatchPairs = unsortedPairs,
-                }.Schedule(unsortedPairs, 32, dispatchPairsHandle);
+                dispatchPairsHandle = new ForceDirectSolverOnAllPairsJob { DispatchPairs = unsortedPairs }.Schedule(
+                    unsortedPairs,
+                    32,
+                    dispatchPairsHandle
+                );
 
                 // Make sure that the direct solver used flag is set in order to enable subsequent direct solver related phases
                 directSolverUsed.Value = 1;
@@ -1157,24 +1306,29 @@ namespace Unity.Physics
                     DirectSolverEnabledFlag = stepInput.World.DynamicsWorld.DirectSolverEnabledFlag,
                     NumJointsToProcess = numJointsToProcessForDirectSolver,
                     NumDynamicVsDynamicBroadphaseStreamsToProcess = numDynamicVsDynamicStreamsToProcessForDirectSolver,
-                    NumStaticVsDynamicBroadphaseStreamsToProcess = numStaticVsDynamicStreamsToProcessForDirectSolver
+                    NumStaticVsDynamicBroadphaseStreamsToProcess = numStaticVsDynamicStreamsToProcessForDirectSolver,
                 }.Schedule(inputDeps);
 
                 JobHandle directSolverBodyFlagsJointsHandle = new SetDirectSolverBodyFlagsForJointsJob
                 {
                     StepInput = stepInput,
                     DirectSolverBodyFlags = directSolverBodyFlags,
-                    DirectSolverUsed = directSolverUsed
+                    DirectSolverUsed = directSolverUsed,
                 }.ScheduleUnsafe(numJointsToProcessForDirectSolver, 16, enableDirectSolverPairProcessingHandle);
 
-                JobHandle directSolverBodyFlagsDynamicVsDynamicHandle = new SetDirectSolverBodyFlagsForBroadphasePairsJob
-                {
-                    OverlapResultsReader = dynamicVsDynamicBroadphasePairsStream.AsReader(),
-                    DirectSolverBodyFlags = directSolverBodyFlags,
-                    DirectSolverUsed = directSolverUsed,
-                    DirectSolverEnabledFlag = stepInput.World.DynamicsWorld.DirectSolverEnabledFlag,
-                    StaticDynamicOverlaps = false
-                }.ScheduleUnsafe(numDynamicVsDynamicStreamsToProcessForDirectSolver, 1, enableDirectSolverPairProcessingHandle);
+                JobHandle directSolverBodyFlagsDynamicVsDynamicHandle =
+                    new SetDirectSolverBodyFlagsForBroadphasePairsJob
+                    {
+                        OverlapResultsReader = dynamicVsDynamicBroadphasePairsStream.AsReader(),
+                        DirectSolverBodyFlags = directSolverBodyFlags,
+                        DirectSolverUsed = directSolverUsed,
+                        DirectSolverEnabledFlag = stepInput.World.DynamicsWorld.DirectSolverEnabledFlag,
+                        StaticDynamicOverlaps = false,
+                    }.ScheduleUnsafe(
+                        numDynamicVsDynamicStreamsToProcessForDirectSolver,
+                        1,
+                        enableDirectSolverPairProcessingHandle
+                    );
 
                 JobHandle directSolverBodyFlagsStaticVsDynamicHandle = new SetDirectSolverBodyFlagsForBroadphasePairsJob
                 {
@@ -1182,12 +1336,21 @@ namespace Unity.Physics
                     DirectSolverBodyFlags = directSolverBodyFlags,
                     DirectSolverUsed = directSolverUsed,
                     DirectSolverEnabledFlag = stepInput.World.DynamicsWorld.DirectSolverEnabledFlag,
-                    StaticDynamicOverlaps = true
-                }.ScheduleUnsafe(numStaticVsDynamicStreamsToProcessForDirectSolver, 1, enableDirectSolverPairProcessingHandle);
+                    StaticDynamicOverlaps = true,
+                }.ScheduleUnsafe(
+                    numStaticVsDynamicStreamsToProcessForDirectSolver,
+                    1,
+                    enableDirectSolverPairProcessingHandle
+                );
 
-                dispatchPairsHandle = JobHandle.CombineDependencies(dispatchPairsHandle,
-                    JobHandle.CombineDependencies(directSolverBodyFlagsJointsHandle,
-                        directSolverBodyFlagsDynamicVsDynamicHandle, directSolverBodyFlagsStaticVsDynamicHandle));
+                dispatchPairsHandle = JobHandle.CombineDependencies(
+                    dispatchPairsHandle,
+                    JobHandle.CombineDependencies(
+                        directSolverBodyFlagsJointsHandle,
+                        directSolverBodyFlagsDynamicVsDynamicHandle,
+                        directSolverBodyFlagsStaticVsDynamicHandle
+                    )
+                );
             }
 
             // Now, dispose the broad phase pairs
@@ -1208,7 +1371,7 @@ namespace Unity.Physics
                 NumPairsToProcessForCouplingDetection = numPairsToProcessForCouplingDetection,
                 DirectSolverUsed = directSolverUsed,
                 NumWorkersForPairGrouping = numWorkersForPairGrouping,
-                NumWorkers = numWorkers
+                NumWorkers = numWorkers,
             }.Schedule(dispatchPairsHandle);
 
             // Perform coupling detection (unless direct solver is forced on for everything)
@@ -1217,7 +1380,7 @@ namespace Unity.Physics
                 couplingDetectionHandle = new DetectCouplingConstraintsJob
                 {
                     DispatchPairs = unsortedPairs.AsDeferredJobArray(),
-                    DirectSolverBodyFlags = directSolverBodyFlags
+                    DirectSolverBodyFlags = directSolverBodyFlags,
                 }.ScheduleUnsafe(numPairsToProcessForCouplingDetection, 16, couplingDetectionHandle);
             }
 
@@ -1237,12 +1400,17 @@ namespace Unity.Physics
             //
             // Here, we start with the global lexicographical first sorting, followed by the "Enable Collisions" feature.
             // After that, we will do perform the optional pair re-organization from (1) and then the phasing.
-            JobHandle sortHandle = ScheduleSortJob(stepInput.World.NumBodies, unsortedPairs, sortedPairs, dispatchPairsHandle);
+            JobHandle sortHandle = ScheduleSortJob(
+                stepInput.World.NumBodies,
+                unsortedPairs,
+                sortedPairs,
+                dispatchPairsHandle
+            );
 
             sortHandle = new SetDisableCollisionFlagsJob
             {
                 DispatchPairs = sortedPairs.AsDeferredJobArray(),
-                NumWorkers = numWorkers
+                NumWorkers = numWorkers,
             }.Schedule(numWorkers, 1, sortHandle);
 
             // Create phases for multi-threading in iterative solvers and islands for the direct solver.
@@ -1289,29 +1457,32 @@ namespace Unity.Physics
                 IterativePairsWriter = iterativePairsStream.AsWriter(),
                 CouplingPairsWriter = couplingPairsStream.AsWriter(),
                 DirectPairsWriter = directPairsStream.AsWriter(),
-                NumWorkers = numWorkers
+                NumWorkers = numWorkers,
             }.ScheduleUnsafe(numWorkersForPairGrouping, 1, sortHandle);
 
             var iterativePairsPrefixSumHandle = new CreateStreamPrefixSumJobDefer
             {
                 Reader = iterativePairsStream.AsReader(),
-                StreamPrefixSum = iterativePairsStreamPrefixSum
+                StreamPrefixSum = iterativePairsStreamPrefixSum,
             }.ScheduleUnsafe(directSolverUsed, 1, groupPairsHandle);
 
             var couplingPairsPrefixSumHandle = new CreateStreamPrefixSumJobDefer
             {
                 Reader = couplingPairsStream.AsReader(),
-                StreamPrefixSum = couplingPairsStreamPrefixSum
+                StreamPrefixSum = couplingPairsStreamPrefixSum,
             }.ScheduleUnsafe(directSolverUsed, 1, groupPairsHandle);
 
             var directPairsPrefixSumHandle = new CreateStreamPrefixSumJobDefer
             {
                 Reader = directPairsStream.AsReader(),
-                StreamPrefixSum = directPairsStreamPrefixSum
+                StreamPrefixSum = directPairsStreamPrefixSum,
             }.ScheduleUnsafe(directSolverUsed, 1, groupPairsHandle);
 
-            groupPairsHandle = JobHandle.CombineDependencies(iterativePairsPrefixSumHandle,
-                couplingPairsPrefixSumHandle, directPairsPrefixSumHandle);
+            groupPairsHandle = JobHandle.CombineDependencies(
+                iterativePairsPrefixSumHandle,
+                couplingPairsPrefixSumHandle,
+                directPairsPrefixSumHandle
+            );
 
             groupPairsHandle = new GatherDispatchPairsByTypeJob
             {
@@ -1321,7 +1492,7 @@ namespace Unity.Physics
                 DirectPairsReader = directPairsStream.AsReader(),
                 IterativePairsStreamPrefixSum = iterativePairsStreamPrefixSum.AsDeferredJobArray(),
                 CouplingPairsStreamPrefixSum = couplingPairsStreamPrefixSum.AsDeferredJobArray(),
-                DirectPairsStreamPrefixSum = directPairsStreamPrefixSum.AsDeferredJobArray()
+                DirectPairsStreamPrefixSum = directPairsStreamPrefixSum.AsDeferredJobArray(),
             }.ScheduleUnsafe(numWorkersForPairGrouping, 1, groupPairsHandle);
 
             disposeHandles.Add(numWorkersForPairGrouping.Dispose(groupPairsHandle));
@@ -1338,7 +1509,7 @@ namespace Unity.Physics
                 CouplingPairsStreamPrefixSum = couplingPairsStreamPrefixSum.AsDeferredJobArray(),
                 DirectPairsStreamPrefixSum = directPairsStreamPrefixSum.AsDeferredJobArray(),
                 NumDirectPairs = numDirectPairs,
-                NumCouplingPairs = numIterativeCouplingPairs
+                NumCouplingPairs = numIterativeCouplingPairs,
             }.ScheduleUnsafe(directSolverUsed, 1, groupPairsHandle);
 
             disposeHandles.Add(iterativePairsStreamPrefixSum.Dispose(groupPairsHandle));
@@ -1354,7 +1525,7 @@ namespace Unity.Physics
                 NumDynamicBodies = stepInput.World.NumDynamicBodies,
                 PhasedDispatchPairs = unsortedPairs.AsDeferredJobArray(),
                 NumDirectPairs = numDirectPairs,
-                NumCouplingPairs = numIterativeCouplingPairs
+                NumCouplingPairs = numIterativeCouplingPairs,
             }.Schedule(groupPairsHandle);
 
             JobHandle phaseCouplingPairsHandle = new CreateDispatchPairPhasesJobDefer
@@ -1365,7 +1536,7 @@ namespace Unity.Physics
                 NumDynamicBodies = stepInput.World.NumDynamicBodies,
                 PhasedDispatchPairs = unsortedPairs.AsDeferredJobArray(),
                 NumDirectPairs = numDirectPairs,
-                NumCouplingPairs = numIterativeCouplingPairs
+                NumCouplingPairs = numIterativeCouplingPairs,
             }.ScheduleUnsafe(directSolverUsed, 1, groupPairsHandle); // skip if direct solver not used
 
             JobHandle phaseDirectPairsHandle = new CreateDispatchPairPhasesJobDefer
@@ -1376,7 +1547,7 @@ namespace Unity.Physics
                 NumDynamicBodies = stepInput.World.NumDynamicBodies,
                 PhasedDispatchPairs = unsortedPairs.AsDeferredJobArray(),
                 NumDirectPairs = numDirectPairs,
-                NumCouplingPairs = numIterativeCouplingPairs
+                NumCouplingPairs = numIterativeCouplingPairs,
             }.ScheduleUnsafe(directSolverUsed, 1, groupPairsHandle); // skip if direct solver not used
 
             // island search:
@@ -1385,16 +1556,19 @@ namespace Unity.Physics
                 DispatchPairs = sortedPairs.AsDeferredJobArray(),
                 DirectSolverSchedulerInfo = solverSchedulerInfo.DirectPairsDirectScheduling,
                 NumDirectPairs = numDirectPairs,
-                NumDynamicBodies = stepInput.World.NumDynamicBodies
+                NumDynamicBodies = stepInput.World.NumDynamicBodies,
             }.ScheduleUnsafe(directSolverUsed, 1, groupPairsHandle); // skip if direct solver not used
 
-            var phasedDispatchPairsHandle = JobHandle.CombineDependencies(phaseIterativePairsHandle,
-                phaseCouplingPairsHandle, phaseDirectPairsHandle);
+            var phasedDispatchPairsHandle = JobHandle.CombineDependencies(
+                phaseIterativePairsHandle,
+                phaseCouplingPairsHandle,
+                phaseDirectPairsHandle
+            );
 
             // Finalize iterative work item info
             phasedDispatchPairsHandle = new FinalizeIterativeWorkItemInfoJob
             {
-                SolverSchedulerInfo = solverSchedulerInfo
+                SolverSchedulerInfo = solverSchedulerInfo,
             }.Schedule(phasedDispatchPairsHandle);
 
             var schedulerHandle = JobHandle.CombineDependencies(phasedDispatchPairsHandle, directSolverIslandsHandle);
@@ -1423,7 +1597,8 @@ namespace Unity.Physics
             int numBodies,
             NativeList<DispatchPair> unsortedPairsIn,
             NativeList<DispatchPair> sortedPairsOut,
-            JobHandle inputDependencies)
+            JobHandle inputDependencies
+        )
         {
 #if SERIAL_RADIX_SORT   // Serial Radix Sort with Parallel Bucket Sort:
             var histogram = new NativeArray<int>(numBodies + 1, Allocator.TempJob);
@@ -1438,7 +1613,7 @@ namespace Unity.Physics
                 InputArray = unsortedPairsIn.AsDeferredJobArray(),
                 OutputArray = sortedPairsOut.AsDeferredJobArray(),
                 MaxIndex = maxBodyIndex,
-                BodyIndexHistogram = histogram
+                BodyIndexHistogram = histogram,
             }.Schedule(inputDependencies);
 
             // Sort sub arrays with default sort.
@@ -1447,7 +1622,7 @@ namespace Unity.Physics
             inputDependencies = new SortSubArraysJob
             {
                 InOutArray = sortedPairsOut.AsDeferredJobArray(),
-                NextElementIndex = histogram
+                NextElementIndex = histogram,
             }.Schedule(histogram.Length, numPerBatch, inputDependencies);
 
             return inputDependencies;
@@ -1472,14 +1647,11 @@ namespace Unity.Physics
             {
                 DispatchPairs = unsortedPairsIn.AsDeferredJobArray(),
                 SortKeyHistogram = sortKeyHistogram,
-                NumWorkers = numWorkersPhase1
+                NumWorkers = numWorkersPhase1,
             }.Schedule(numWorkersPhase1, 1, inputDependencies);
 
             var sortKeyPrefixSum = sortKeyHistogram;
-            sortHandle = new RadixSortPrefixSumJob
-            {
-                SortKeyPrefixSum = sortKeyPrefixSum,
-            }.Schedule(sortHandle);
+            sortHandle = new RadixSortPrefixSumJob { SortKeyPrefixSum = sortKeyPrefixSum }.Schedule(sortHandle);
 
             var numWorkersPhase2 = math.max(1, JobsUtility.JobWorkerCount);
             sortHandle = new RadixSortGatherJob
@@ -1487,7 +1659,7 @@ namespace Unity.Physics
                 InputDispatchPairs = unsortedPairsIn.AsDeferredJobArray(),
                 OutputDispatchPairs = sortedPairsOut.AsDeferredJobArray(),
                 SortKeyPrefixSum = sortKeyPrefixSum,
-                NumWorkers = numWorkersPhase2
+                NumWorkers = numWorkersPhase2,
             }.Schedule(numWorkersPhase2, 1, sortHandle);
 
             // Sort sub arrays by bodyB index and remaining dispatch pair values with default sort:
@@ -1499,7 +1671,7 @@ namespace Unity.Physics
             sortHandle = new SortSubArraysJob
             {
                 InOutArray = sortedPairsOut.AsDeferredJobArray(),
-                NextElementIndex = nextElementIndex
+                NextElementIndex = nextElementIndex,
             }.Schedule(nextElementIndex.Length, numPerBatch, sortHandle);
 
             return sortHandle;
@@ -1541,16 +1713,22 @@ namespace Unity.Physics
         {
             [ReadOnly]
             public NativeArray<Joint> Joints;
+
             [ReadOnly]
             public NativeStream DynamicVsDynamicBroadphaseStream;
+
             [ReadOnly]
             public NativeStream StaticVsDynamicBroadphaseStream;
+
             [ReadOnly]
             public NativeReference<bool>.ReadOnly DirectSolverEnabledFlag;
+
             [WriteOnly]
             public NativeReference<int> NumJointsToProcess;
+
             [WriteOnly]
             public NativeReference<int> NumDynamicVsDynamicBroadphaseStreamsToProcess;
+
             [WriteOnly]
             public NativeReference<int> NumStaticVsDynamicBroadphaseStreamsToProcess;
 
@@ -1657,7 +1835,10 @@ namespace Unity.Physics
                         {
                             // Note: We only need to flag the single dynamic body here for direct solving, since static bodies
                             // can't move by design and are unaffected by the solver.
-                            var dynamicBodyIndex = math.min(overlapResult.BodyPair.BodyIndexA, overlapResult.BodyPair.BodyIndexB);
+                            var dynamicBodyIndex = math.min(
+                                overlapResult.BodyPair.BodyIndexA,
+                                overlapResult.BodyPair.BodyIndexB
+                            );
                             DirectSolverBodyFlags[dynamicBodyIndex] = true;
                             directSolverUsed = true;
                         }
@@ -1748,8 +1929,10 @@ namespace Unity.Physics
                 if (pair.SolverType == SolverType.Iterative)
                 {
                     // Check if either body is incident to a direct solver pair
-                    if ((pair.BodyIndexA < DirectSolverBodyFlags.Length && DirectSolverBodyFlags[pair.BodyIndexA]) ||
-                        (pair.BodyIndexB < DirectSolverBodyFlags.Length && DirectSolverBodyFlags[pair.BodyIndexB]))
+                    if (
+                        (pair.BodyIndexA < DirectSolverBodyFlags.Length && DirectSolverBodyFlags[pair.BodyIndexA])
+                        || (pair.BodyIndexB < DirectSolverBodyFlags.Length && DirectSolverBodyFlags[pair.BodyIndexB])
+                    )
                     {
                         pair.EnableCoupling();
                         DispatchPairs[index] = pair;
@@ -1798,7 +1981,11 @@ namespace Unity.Physics
                 {
                     var previousPair = DispatchPairs[startIndex - 1];
                     var startPair = DispatchPairs[startIndex];
-                    while (startIndex < endIndex - 1 && startPair.BodyIndexA == previousPair.BodyIndexA && startPair.BodyIndexB == previousPair.BodyIndexB)
+                    while (
+                        startIndex < endIndex - 1
+                        && startPair.BodyIndexA == previousPair.BodyIndexA
+                        && startPair.BodyIndexB == previousPair.BodyIndexB
+                    )
                     {
                         startPair = DispatchPairs[++startIndex];
                     }
@@ -1870,13 +2057,11 @@ namespace Unity.Physics
 
             public void Execute()
             {
-                var numDynamicVsDynamicOverlapResults = DynamicVsDynamicStreamPrefixSum[^ 1];
-                var numStaticVsDynamicOverlapResults = StaticVsDynamicStreamPrefixSum[^ 1];
+                var numDynamicVsDynamicOverlapResults = DynamicVsDynamicStreamPrefixSum[^1];
+                var numStaticVsDynamicOverlapResults = StaticVsDynamicStreamPrefixSum[^1];
 
                 var numDispatchPairsConservative =
-                    numDynamicVsDynamicOverlapResults +
-                    numStaticVsDynamicOverlapResults +
-                    Joints.Length;
+                    numDynamicVsDynamicOverlapResults + numStaticVsDynamicOverlapResults + Joints.Length;
 
                 if (numDispatchPairsConservative == 0)
                 {
@@ -1908,15 +2093,13 @@ namespace Unity.Physics
 
             public void Execute()
             {
-                var numDispatchPairs = JointStreamPrefixSum[^ 1]
-                    + DynamicVsDynamicStreamPrefixSum[^ 1]
-                    + StaticVsDynamicStreamPrefixSum[^ 1];
+                var numDispatchPairs =
+                    JointStreamPrefixSum[^1] + DynamicVsDynamicStreamPrefixSum[^1] + StaticVsDynamicStreamPrefixSum[^1];
 
                 UnsortedDispatchPairs.ResizeUninitialized(numDispatchPairs);
                 SortedDispatchPairs.ResizeUninitialized(numDispatchPairs);
             }
         }
-
 
         [BurstCompile]
         struct CreateJointDispatchPairsJob : IJobParallelForDefer
@@ -1955,7 +2138,9 @@ namespace Unity.Physics
                         // Note: Since only valid joints are commited to the dispatch pair stream the joint indices will
                         // have some gaps, but that is alright, since the joint index is only used as a key for sorting
                         // of the dispatch pairs.
-                        JointDispatchPairWriter.Write(DispatchPair.CreateJoint(joint.BodyPair, i, joint.EnableCollision, joint.SolverType));
+                        JointDispatchPairWriter.Write(
+                            DispatchPair.CreateJoint(joint.BodyPair, i, joint.EnableCollision, joint.SolverType)
+                        );
                     }
                 }
 
@@ -1983,7 +2168,7 @@ namespace Unity.Physics
                 }
 
                 // store total stream element count at the end of the histogram
-                streamPrefixSum[^ 1] = totalCount;
+                streamPrefixSum[^1] = totalCount;
             }
 
             public void Execute()
@@ -2024,8 +2209,10 @@ namespace Unity.Physics
 
             [ReadOnly]
             public NativeArray<int> JointDispatchPairStreamHistogram;
+
             [ReadOnly]
             public NativeArray<int> DynamicVsDynamicStreamHistogram;
+
             [ReadOnly]
             public NativeArray<int> StaticVsDynamicStreamHistogram;
 
@@ -2033,8 +2220,10 @@ namespace Unity.Physics
             {
                 // calculate index for first dispatch pair in this worker, considering that the joint pairs are
                 // located after the collision pairs in the dispatch pair array.
-                var currentPairIndex = JointDispatchPairStreamHistogram[index]
-                    + DynamicVsDynamicStreamHistogram[^ 1] + StaticVsDynamicStreamHistogram[^ 1];
+                var currentPairIndex =
+                    JointDispatchPairStreamHistogram[index]
+                    + DynamicVsDynamicStreamHistogram[^1]
+                    + StaticVsDynamicStreamHistogram[^1];
 
                 var jointPairs = JointDispatchPairReader.BeginForEachIndex(index);
                 for (int j = 0; j < jointPairs; ++j)
@@ -2068,7 +2257,7 @@ namespace Unity.Physics
                 var currentPairIndex = OverlapResultsStreamHistogram[index];
                 if (PrecedingStreamHistogram.IsCreated)
                 {
-                    currentPairIndex += PrecedingStreamHistogram[^ 1];
+                    currentPairIndex += PrecedingStreamHistogram[^1];
                 }
 
                 var overlapResults = OverlapResultsReader.BeginForEachIndex(index);
@@ -2086,9 +2275,14 @@ namespace Unity.Physics
         /// Accumulates dispatch pairs for joints (joint pairs) and broadphase overlaps (collision pairs) into a single unsorted list.
         /// Note: the resultant list does not follow any particular pair order.
         /// </summary>
-        internal static void CreateUnsortedDispatchPairs(in SimulationStepInput stepInput,
-            NativeStream dynamicVsDynamicPairs, NativeStream staticVsDynamicPairs,
-            NativeList<DispatchPair> unsortedDispatchPairs, out int numIterativePairs, out int numDirectPairs)
+        internal static void CreateUnsortedDispatchPairs(
+            in SimulationStepInput stepInput,
+            NativeStream dynamicVsDynamicPairs,
+            NativeStream staticVsDynamicPairs,
+            NativeList<DispatchPair> unsortedDispatchPairs,
+            out int numIterativePairs,
+            out int numDirectPairs
+        )
         {
             // count the number of valid joints:
             var joints = stepInput.World.Joints;
@@ -2110,10 +2304,7 @@ namespace Unity.Physics
                 }
             }
 
-            int numDispatchPairs =
-                dynamicVsDynamicPairs.Count() +
-                staticVsDynamicPairs.Count() +
-                numValidJoints;
+            int numDispatchPairs = dynamicVsDynamicPairs.Count() + staticVsDynamicPairs.Count() + numValidJoints;
 
             if (numDispatchPairs == 0)
             {
@@ -2173,8 +2364,12 @@ namespace Unity.Physics
                 var joint = joints[i];
                 if (joint.BodyPair.IsValid)
                 {
-                    pairs[totalPairCounter++] =
-                        DispatchPair.CreateJoint(joints[i].BodyPair, i, joints[i].EnableCollision, joints[i].SolverType);
+                    pairs[totalPairCounter++] = DispatchPair.CreateJoint(
+                        joints[i].BodyPair,
+                        i,
+                        joints[i].EnableCollision,
+                        joints[i].SolverType
+                    );
                 }
             }
 
@@ -2188,9 +2383,12 @@ namespace Unity.Physics
         /// Sets the direct solver body flags for all dynamic bodies that are adjacent to at least one
         /// joint or collision pair that is solved with the direct solver.
         /// </summary>
-        internal static void SetDirectSolverBodyFlags(in SimulationStepInput stepInput,
-            NativeStream dynamicVsDynamicPairs, NativeStream staticVsDynamicPairs,
-            NativeArray<bool> directSolverBodyFlags)
+        internal static void SetDirectSolverBodyFlags(
+            in SimulationStepInput stepInput,
+            NativeStream dynamicVsDynamicPairs,
+            NativeStream staticVsDynamicPairs,
+            NativeArray<bool> directSolverBodyFlags
+        )
         {
             int numDynamicBodies = stepInput.World.NumDynamicBodies;
             var joints = stepInput.World.Joints;
@@ -2262,7 +2460,10 @@ namespace Unity.Physics
 
                         // Note: We only need to flag the single dynamic body index here for direct solving, since static bodies
                         // can't move by design and are unaffected by the solver.
-                        var dynamicBodyIndex = math.min(overlapResult.BodyPair.BodyIndexA, overlapResult.BodyPair.BodyIndexB);
+                        var dynamicBodyIndex = math.min(
+                            overlapResult.BodyPair.BodyIndexA,
+                            overlapResult.BodyPair.BodyIndexB
+                        );
                         directSolverBodyFlags[dynamicBodyIndex] = true;
                     }
                 }
@@ -2275,18 +2476,22 @@ namespace Unity.Physics
         /// Enables coupling in all iteratively solved pairs which are adjacent to a body that itself is adjacent
         /// to a pair that is solved with the direct solver.
         /// </summary>
-        internal static void SetCouplingConstraintFlags(NativeList<DispatchPair> pairs,
-            NativeArray<bool> directSolverBodyFlags, out int numIterativeCouplingPairs)
+        internal static void SetCouplingConstraintFlags(
+            NativeList<DispatchPair> pairs,
+            NativeArray<bool> directSolverBodyFlags,
+            out int numIterativeCouplingPairs
+        )
         {
             int numDynamicBodies = directSolverBodyFlags.Length;
             numIterativeCouplingPairs = 0;
             for (int i = 0; i < pairs.Length; ++i)
             {
                 var pair = pairs[i];
-                if (pair.SolverType == SolverType.Iterative &&
-                    (
-                        (pair.BodyIndexA < numDynamicBodies && directSolverBodyFlags[pair.BodyIndexA]) ||
-                        (pair.BodyIndexB < numDynamicBodies && directSolverBodyFlags[pair.BodyIndexB])
+                if (
+                    pair.SolverType == SolverType.Iterative
+                    && (
+                        (pair.BodyIndexA < numDynamicBodies && directSolverBodyFlags[pair.BodyIndexA])
+                        || (pair.BodyIndexB < numDynamicBodies && directSolverBodyFlags[pair.BodyIndexB])
                     )
                 )
                 {
@@ -2349,17 +2554,26 @@ namespace Unity.Physics
         [BurstCompile]
         struct CreateDispatchPairsJob : IJob
         {
-            [ReadOnly] public SimulationStepInput StepInput;
-            [ReadOnly] public NativeStream DynamicVsDynamicBroadphasePairsStream;
-            [ReadOnly] public NativeStream StaticVsDynamicBroadphasePairsStream;
+            [ReadOnly]
+            public SimulationStepInput StepInput;
+
+            [ReadOnly]
+            public NativeStream DynamicVsDynamicBroadphasePairsStream;
+
+            [ReadOnly]
+            public NativeStream StaticVsDynamicBroadphasePairsStream;
             public SolverSchedulerInfo SolverSchedulerInfo;
             public NativeList<DispatchPair> DispatchPairs;
 
             public void Execute()
             {
-                CreateDispatchPairs(StepInput,
-                    ref DynamicVsDynamicBroadphasePairsStream, ref StaticVsDynamicBroadphasePairsStream,
-                    ref SolverSchedulerInfo, ref DispatchPairs);
+                CreateDispatchPairs(
+                    StepInput,
+                    ref DynamicVsDynamicBroadphasePairsStream,
+                    ref StaticVsDynamicBroadphasePairsStream,
+                    ref SolverSchedulerInfo,
+                    ref DispatchPairs
+                );
             }
         }
 
@@ -2369,8 +2583,10 @@ namespace Unity.Physics
         {
             [ReadOnly]
             public NativeArray<DispatchPair> InputArray;
+
             [NativeDisableParallelForRestriction]
             public NativeArray<DispatchPair> OutputArray;
+
             [NativeDisableParallelForRestriction]
             public NativeArray<int> BodyIndexHistogram;
 
@@ -2382,8 +2598,12 @@ namespace Unity.Physics
             }
 
             // Performs single pass of Radix sort on NativeArray<DispatchPair> based on BodyIndexA.
-            public static void RadixSortPerBodyA(NativeArray<DispatchPair> inputArray, NativeArray<DispatchPair> outputArray,
-                NativeArray<int> bodyIndexHistogram, int maxBodyIndex)
+            public static void RadixSortPerBodyA(
+                NativeArray<DispatchPair> inputArray,
+                NativeArray<DispatchPair> outputArray,
+                NativeArray<int> bodyIndexHistogram,
+                int maxBodyIndex
+            )
             {
                 SafetyChecks.CheckAreEqualAndThrow(inputArray.Length, outputArray.Length);
 
@@ -2574,7 +2794,10 @@ namespace Unity.Physics
                 }
                 else if (length == 2)
                 {
-                    if (inOutArray[startIndex].BodyIndexASubArraySortKey > inOutArray[startIndex + 1].BodyIndexASubArraySortKey)
+                    if (
+                        inOutArray[startIndex].BodyIndexASubArraySortKey
+                        > inOutArray[startIndex + 1].BodyIndexASubArraySortKey
+                    )
                     {
                         var temp = inOutArray[startIndex + 1];
                         inOutArray[startIndex + 1] = inOutArray[startIndex];
@@ -2697,8 +2920,10 @@ namespace Unity.Physics
 
             [ReadOnly]
             public NativeArray<int> IterativePairsStreamPrefixSum;
+
             [ReadOnly]
             public NativeArray<int> CouplingPairsStreamPrefixSum;
+
             [ReadOnly]
             public NativeArray<int> DirectPairsStreamPrefixSum;
 
@@ -2727,7 +2952,7 @@ namespace Unity.Physics
                     GatherPairs(firstPairIndex, workerIndex, IterativePairsReader);
                 }
 
-                var numPurelyIterativePairs = IterativePairsStreamPrefixSum[^ 1];
+                var numPurelyIterativePairs = IterativePairsStreamPrefixSum[^1];
 
                 // gather iterative coupling pairs:
                 {
@@ -2741,7 +2966,10 @@ namespace Unity.Physics
                 {
                     // calculate index for first dispatch pair in this worker, considering that the direct pairs are
                     // located after the iterative and coupling pairs in the dispatch pair array.
-                    var firstPairIndex = numPurelyIterativePairs + CouplingPairsStreamPrefixSum[^ 1] + DirectPairsStreamPrefixSum[workerIndex];
+                    var firstPairIndex =
+                        numPurelyIterativePairs
+                        + CouplingPairsStreamPrefixSum[^1]
+                        + DirectPairsStreamPrefixSum[workerIndex];
                     GatherPairs(firstPairIndex, workerIndex, DirectPairsReader);
                 }
             }
@@ -2752,13 +2980,16 @@ namespace Unity.Physics
         {
             [NativeDisableContainerSafetyRestriction]
             public NativeList<DispatchPair> DispatchPairs;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeList<DispatchPair> PhasedDispatchPairs;
 
             [ReadOnly]
             public NativeArray<int> IterativePairsStreamPrefixSum;
+
             [ReadOnly]
             public NativeArray<int> CouplingPairsStreamPrefixSum;
+
             [ReadOnly]
             public NativeArray<int> DirectPairsStreamPrefixSum;
 
@@ -2773,9 +3004,9 @@ namespace Unity.Physics
                 // Note: will be launched with a single worker or no worker to prevent job launch if unnecessary
                 SafetyChecks.CheckAreEqualAndThrow(0, workerIndex);
 
-                var numPureIterativePairs = IterativePairsStreamPrefixSum[^ 1];
-                var numCouplingPairs = CouplingPairsStreamPrefixSum[^ 1];
-                var numDirectPairs = DirectPairsStreamPrefixSum[^ 1];
+                var numPureIterativePairs = IterativePairsStreamPrefixSum[^1];
+                var numCouplingPairs = CouplingPairsStreamPrefixSum[^1];
+                var numDirectPairs = DirectPairsStreamPrefixSum[^1];
 
                 // Note: number of pairs of each type present in the full dispatch pair array corresponds
                 // to the last element of the corresponding prefix sum arrays, which are created if grouping is needed, that is,
@@ -2798,7 +3029,7 @@ namespace Unity.Physics
             {
                 Iterative,
                 Coupling,
-                Direct
+                Direct,
             }
 
             public PairType ProcessedPairType;
@@ -2821,16 +3052,23 @@ namespace Unity.Physics
             internal const int kMaxBatchSize = 8;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static void ExecuteImpl(PairType processedPairType, NativeArray<DispatchPair> dispatchPairs,
-                SolverSchedulerInfo solverSchedulerInfo, NativeArray<DispatchPair> phasedDispatchPairs,
-                NativeReference<int>.ReadOnly numDirectPairs, NativeReference<int>.ReadOnly numCouplingPairs, int numDynamicBodies)
+            public static void ExecuteImpl(
+                PairType processedPairType,
+                NativeArray<DispatchPair> dispatchPairs,
+                SolverSchedulerInfo solverSchedulerInfo,
+                NativeArray<DispatchPair> phasedDispatchPairs,
+                NativeReference<int>.ReadOnly numDirectPairs,
+                NativeReference<int>.ReadOnly numCouplingPairs,
+                int numDynamicBodies
+            )
             {
                 NativeArray<DispatchPair> dispatchPairSubArray = default;
                 NativeArray<DispatchPair> phasedDispatchPairSubArray = default;
                 IterativeSolverSchedulerInfo schedulerInfo = default;
                 NativeArray<int> unphasedToPhasedDispatchPairMap = default;
 
-                int startPairIndex = 0, numPairsToProcess = 0;
+                int startPairIndex = 0,
+                    numPairsToProcess = 0;
                 var numPairs = dispatchPairs.Length;
                 var numPurelyIterativePairs = numPairs - numDirectPairs.Value - numCouplingPairs.Value;
 
@@ -2861,7 +3099,8 @@ namespace Unity.Physics
                         // Make sure we have sufficient space for the mapping between iterative and direct solver
                         solverSchedulerInfo.DirectPairsDirectScheduling.ResizeMaps(numDirectPairs.Value);
 
-                        unphasedToPhasedDispatchPairMap = solverSchedulerInfo.DirectPairsDirectScheduling.UnphasedToPhasedDispatchPairMap.AsArray();
+                        unphasedToPhasedDispatchPairMap =
+                            solverSchedulerInfo.DirectPairsDirectScheduling.UnphasedToPhasedDispatchPairMap.AsArray();
                         break;
                     }
                 }
@@ -2877,8 +3116,14 @@ namespace Unity.Physics
                 phasedDispatchPairSubArray = phasedDispatchPairs.GetSubArray(startPairIndex, numPairsToProcess);
 
                 CreateDispatchPairPhases(
-                    dispatchPairSubArray, numDynamicBodies, phasedDispatchPairSubArray,
-                    out int numActivePhases, out int numWorkItems, ref schedulerInfo.PhaseInfo, unphasedToPhasedDispatchPairMap);
+                    dispatchPairSubArray,
+                    numDynamicBodies,
+                    phasedDispatchPairSubArray,
+                    out int numActivePhases,
+                    out int numWorkItems,
+                    ref schedulerInfo.PhaseInfo,
+                    unphasedToPhasedDispatchPairMap
+                );
 
                 schedulerInfo.NumActivePhases[0] = numActivePhases;
                 schedulerInfo.NumWorkItems[0] = numWorkItems;
@@ -2889,21 +3134,36 @@ namespace Unity.Physics
 
             public void Execute()
             {
-                ExecuteImpl(ProcessedPairType, DispatchPairs,
-                    SolverSchedulerInfo, PhasedDispatchPairs, NumDirectPairs, NumCouplingPairs, NumDynamicBodies);
+                ExecuteImpl(
+                    ProcessedPairType,
+                    DispatchPairs,
+                    SolverSchedulerInfo,
+                    PhasedDispatchPairs,
+                    NumDirectPairs,
+                    NumCouplingPairs,
+                    NumDynamicBodies
+                );
             }
 
             // @todo direct solver (DOTS-7639): optionally use this (old) version for faster processing in serial case if no direct solver in use
             internal static unsafe void CreateDispatchPairPhasesAndDisableCollision(
-                NativeArray<DispatchPair> dispatchPairs, int numDynamicBodies,
-                NativeArray<DispatchPair> phasedDispatchPairs, out int numActivePhases, out int numWorkItems,
-                ref NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo> phaseInfo)
+                NativeArray<DispatchPair> dispatchPairs,
+                int numDynamicBodies,
+                NativeArray<DispatchPair> phasedDispatchPairs,
+                out int numActivePhases,
+                out int numWorkItems,
+                ref NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo> phaseInfo
+            )
             {
                 const byte kUninitializedPair = byte.MaxValue;
                 const byte kInvalidPhaseID = kUninitializedPair - 1;
                 // make sure that we can fit all phase indices into a byte
                 SafetyChecks.CheckAreEqualAndThrow(true, byte.MaxValue >= kMaxNumPhases);
-                var phaseIdPerPair = new NativeArray<byte>(dispatchPairs.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                var phaseIdPerPair = new NativeArray<byte>(
+                    dispatchPairs.Length,
+                    Allocator.Temp,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 for (int i = 0; i < dispatchPairs.Length; i++)
                 {
                     phaseIdPerPair[i] = kUninitializedPair;
@@ -2947,7 +3207,12 @@ namespace Unity.Physics
                         // Skip dynamic-static pairs since we need to ensure that those are solved after all dynamic-dynamic pairs.
                         if (!isBodyBStatic)
                         {
-                            int phaseIndex = FindFreePhaseDynamicDynamicPair(rigidBodyMask, bodyIndexA, bodyIndexB, lastPhaseIndex);
+                            int phaseIndex = FindFreePhaseDynamicDynamicPair(
+                                rigidBodyMask,
+                                bodyIndexA,
+                                bodyIndexB,
+                                lastPhaseIndex
+                            );
                             phaseIdPerPair[i] = (byte)phaseIndex;
 
                             if (phaseIndex != lastPhaseIndex)
@@ -3013,7 +3278,8 @@ namespace Unity.Physics
 
                 for (int i = 0; i < lastPhaseIndex; i++)
                 {
-                    numPairsPerPhase[i] = batchInfos[i].m_NumBatchesProcessed * kMaxBatchSize + batchInfos[i].m_NumElements;
+                    numPairsPerPhase[i] =
+                        batchInfos[i].m_NumBatchesProcessed * kMaxBatchSize + batchInfos[i].m_NumElements;
                 }
 
                 // Calculate phase start offset
@@ -3085,15 +3351,24 @@ namespace Unity.Physics
             }
 
             internal static unsafe void CreateDispatchPairPhases(
-                NativeArray<DispatchPair> dispatchPairs, int numDynamicBodies,
-                NativeArray<DispatchPair> phasedDispatchPairs, out int numActivePhases, out int numWorkItems,
-                ref NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo> phaseInfo, NativeArray<int> unphasedToPhasedDispatchPairMap = default)
+                NativeArray<DispatchPair> dispatchPairs,
+                int numDynamicBodies,
+                NativeArray<DispatchPair> phasedDispatchPairs,
+                out int numActivePhases,
+                out int numWorkItems,
+                ref NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo> phaseInfo,
+                NativeArray<int> unphasedToPhasedDispatchPairMap = default
+            )
             {
                 // make sure that we can fit all phase indices into a byte
                 SafetyChecks.CheckAreEqualAndThrow(true, byte.MaxValue >= kMaxNumPhases);
 
                 const byte kUninitializedPair = 0;
-                var phaseIdPerPair = new NativeArray<byte>(dispatchPairs.Length, Allocator.Temp, NativeArrayOptions.ClearMemory);
+                var phaseIdPerPair = new NativeArray<byte>(
+                    dispatchPairs.Length,
+                    Allocator.Temp,
+                    NativeArrayOptions.ClearMemory
+                );
 
                 var rigidBodyMask = new NativeArray<ulong>(numDynamicBodies, Allocator.Temp);
 
@@ -3118,12 +3393,20 @@ namespace Unity.Physics
                     int bodyIndexB = dispatchPair.BodyIndexB;
                     bool isBodyBStatic = bodyIndexB >= numDynamicBodies;
 
-                    if (!isBodyBStatic && // skip dynamic-static pairs since we need to ensure that those are solved after all dynamic-dynamic pairs.
-                        (dispatchPair.IsJoint || dispatchPair.IsCollisionEnabled)) // skip over disabled collision pairs
+                    if (
+                        !isBodyBStatic
+                        && // skip dynamic-static pairs since we need to ensure that those are solved after all dynamic-dynamic pairs.
+                        (dispatchPair.IsJoint || dispatchPair.IsCollisionEnabled)
+                    ) // skip over disabled collision pairs
                     {
                         int bodyIndexA = dispatchPair.BodyIndexA;
 
-                        int phaseIndex = FindFreePhaseDynamicDynamicPair(rigidBodyMask, bodyIndexA, bodyIndexB, lastPhaseIndex);
+                        int phaseIndex = FindFreePhaseDynamicDynamicPair(
+                            rigidBodyMask,
+                            bodyIndexA,
+                            bodyIndexB,
+                            lastPhaseIndex
+                        );
                         phaseIdPerPair[i] = (byte)(phaseIndex + 1); // +1 since kUninitializedPair == 0
 
                         if (phaseIndex != lastPhaseIndex)
@@ -3151,8 +3434,10 @@ namespace Unity.Physics
                     var dispatchPair = dispatchPairs[pairIndex];
                     int bodyIndexB = dispatchPair.BodyIndexB;
 
-                    if (phaseIdPerPair[pairIndex] == kUninitializedPair // previously not processed. So, either static or collision pair with disabled collision (see below)
-                        && (dispatchPair.IsJoint || dispatchPair.IsCollisionEnabled)) // skip over disabled collision pairs
+                    if (
+                        phaseIdPerPair[pairIndex] == kUninitializedPair // previously not processed. So, either static or collision pair with disabled collision (see below)
+                        && (dispatchPair.IsJoint || dispatchPair.IsCollisionEnabled)
+                    ) // skip over disabled collision pairs
                     {
                         SafetyChecks.CheckAreEqualAndThrow(true, bodyIndexB >= numDynamicBodies); // body must be static by design
                         int bodyIndexA = dispatchPair.BodyIndexA;
@@ -3174,7 +3459,8 @@ namespace Unity.Physics
 
                 for (int i = 0; i < lastPhaseIndex; i++)
                 {
-                    numPairsPerPhase[i] = batchInfos[i].m_NumBatchesProcessed * kMaxBatchSize + batchInfos[i].m_NumElements;
+                    numPairsPerPhase[i] =
+                        batchInfos[i].m_NumBatchesProcessed * kMaxBatchSize + batchInfos[i].m_NumElements;
                 }
 
                 // Calculate phase start offset
@@ -3186,7 +3472,10 @@ namespace Unity.Physics
                 }
 
                 var createMap = unphasedToPhasedDispatchPairMap.IsCreated;
-                SafetyChecks.CheckAreEqualAndThrow(true, !createMap || unphasedToPhasedDispatchPairMap.Length == dispatchPairs.Length);
+                SafetyChecks.CheckAreEqualAndThrow(
+                    true,
+                    !createMap || unphasedToPhasedDispatchPairMap.Length == dispatchPairs.Length
+                );
 
                 // Populate PhasedDispatchPairsArray with dynamic-dynamic pairs
                 for (int i = 0; i < dispatchPairs.Length; i++)
@@ -3270,8 +3559,11 @@ namespace Unity.Physics
                 numWorkItems = firstWorkItemIndex;
             }
 
-            internal static void CheckIntegrity(NativeArray<DispatchPair> phasedDispatchPairs,
-                int numDynamicBodies, ref NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo> solverPhaseInfos)
+            internal static void CheckIntegrity(
+                NativeArray<DispatchPair> phasedDispatchPairs,
+                int numDynamicBodies,
+                ref NativeArray<IterativeSolverSchedulerInfo.SolvePhaseInfo> solverPhaseInfos
+            )
             {
                 int dispatchPairCount = 0;
                 int expectedFirstWorkItemIndex = 0;
@@ -3284,10 +3576,14 @@ namespace Unity.Physics
                     Assert.IsTrue(info.DispatchPairCount >= 0);
 
                     // make sure the batch size is valid
-                    Assert.IsTrue((info.BatchSize == 0 && info.DispatchPairCount == 0) || (info.BatchSize > 0 && info.BatchSize <= info.DispatchPairCount));
+                    Assert.IsTrue(
+                        (info.BatchSize == 0 && info.DispatchPairCount == 0)
+                            || (info.BatchSize > 0 && info.BatchSize <= info.DispatchPairCount)
+                    );
 
                     // make sure the number of work items in this phase is valid
-                    int expectedWorkItemCount = info.BatchSize == 0 ? 0 : (int)((info.DispatchPairCount - 1) / info.BatchSize) + 1;
+                    int expectedWorkItemCount =
+                        info.BatchSize == 0 ? 0 : (int)((info.DispatchPairCount - 1) / info.BatchSize) + 1;
                     Assert.AreEqual(expectedWorkItemCount, info.NumWorkItems);
 
                     if (info.NumWorkItems > 0)
@@ -3317,15 +3613,19 @@ namespace Unity.Physics
                         for (int k = j + 1; k < j + 1 + info.NumWorkItems; k++)
                         {
                             int secondIndex = info.FirstDispatchPairOffset + k * info.BatchSize;
-                            for (int pairIndex1 = firstIndex;
-                                 pairIndex1 < math.min(firstIndex + info.BatchSize, dispatchPairCount);
-                                 pairIndex1++)
+                            for (
+                                int pairIndex1 = firstIndex;
+                                pairIndex1 < math.min(firstIndex + info.BatchSize, dispatchPairCount);
+                                pairIndex1++
+                            )
                             {
                                 int aIndex1 = phasedDispatchPairs[pairIndex1].BodyIndexA;
                                 int bIndex1 = phasedDispatchPairs[pairIndex1].BodyIndexB;
-                                for (int pairIndex2 = secondIndex;
-                                     pairIndex2 < math.min(secondIndex + info.BatchSize, dispatchPairCount);
-                                     pairIndex2++)
+                                for (
+                                    int pairIndex2 = secondIndex;
+                                    pairIndex2 < math.min(secondIndex + info.BatchSize, dispatchPairCount);
+                                    pairIndex2++
+                                )
                                 {
                                     int aIndex2 = phasedDispatchPairs[pairIndex2].BodyIndexA;
                                     int bIndex2 = phasedDispatchPairs[pairIndex2].BodyIndexB;
@@ -3336,7 +3636,11 @@ namespace Unity.Physics
                                     // across batches inside a phase. We therefore can (and must) safely ignore them in the duplicate search here.
                                     if (bIndex1 < numDynamicBodies || bIndex2 < numDynamicBodies)
                                     {
-                                        numDuplicatesFound += math.select(0, 1, bIndex1 == bIndex2 || bIndex1 == aIndex2);
+                                        numDuplicatesFound += math.select(
+                                            0,
+                                            1,
+                                            bIndex1 == bIndex2 || bIndex1 == aIndex2
+                                        );
                                     }
                                 }
                             }
@@ -3353,9 +3657,9 @@ namespace Unity.Physics
             {
                 internal void Add(NativeArray<ulong> rigidBodyMasks, int bodyIndexA, int bodyIndexB)
                 {
-                    int indexInBuffer = m_NumElements++ *2;
+                    int indexInBuffer = m_NumElements++ * 2;
 
-                    fixed(int* bodyIndices = m_BodyIndices)
+                    fixed (int* bodyIndices = m_BodyIndices)
                     {
                         bodyIndices[indexInBuffer++] = bodyIndexA;
                         bodyIndices[indexInBuffer] = bodyIndexB;
@@ -3379,7 +3683,7 @@ namespace Unity.Physics
                 {
                     // Flush
                     int indexInBuffer = 0;
-                    fixed(int* bodyIndices = m_BodyIndices)
+                    fixed (int* bodyIndices = m_BodyIndices)
                     {
                         for (int i = 0; i < m_NumElements; i++)
                         {
@@ -3396,8 +3700,12 @@ namespace Unity.Physics
                 internal int m_NumElements;
             }
 
-            static int FindFreePhaseDynamicDynamicPair(NativeArray<ulong> rigidBodyMask, int bodyIndexA, int bodyIndexB,
-                int lastPhaseIndex)
+            static int FindFreePhaseDynamicDynamicPair(
+                NativeArray<ulong> rigidBodyMask,
+                int bodyIndexA,
+                int bodyIndexB,
+                int lastPhaseIndex
+            )
             {
                 var mask = rigidBodyMask[bodyIndexA] | rigidBodyMask[bodyIndexB];
                 int phaseIndex = -1;
@@ -3417,8 +3725,11 @@ namespace Unity.Physics
                 return phaseIndex;
             }
 
-            static int FindFreePhaseDynamicStaticPair(NativeArray<ulong> rigidBodyMask, int bodyIndexA,
-                int lastPhaseIndex)
+            static int FindFreePhaseDynamicStaticPair(
+                NativeArray<ulong> rigidBodyMask,
+                int bodyIndexA,
+                int lastPhaseIndex
+            )
             {
                 ulong mask = rigidBodyMask[bodyIndexA];
 
@@ -3470,8 +3781,15 @@ namespace Unity.Physics
                 // of this job if not required, i.e., it is either scheduled with a single worker or with no worker.
                 SafetyChecks.CheckAreEqualAndThrow(0, workerIndex);
 
-                CreateDispatchPairPhasesJob.ExecuteImpl(ProcessedPairType, DispatchPairs,
-                    SolverSchedulerInfo, PhasedDispatchPairs, NumDirectPairs, NumCouplingPairs, NumDynamicBodies);
+                CreateDispatchPairPhasesJob.ExecuteImpl(
+                    ProcessedPairType,
+                    DispatchPairs,
+                    SolverSchedulerInfo,
+                    PhasedDispatchPairs,
+                    NumDirectPairs,
+                    NumCouplingPairs,
+                    NumDynamicBodies
+                );
             }
         }
 

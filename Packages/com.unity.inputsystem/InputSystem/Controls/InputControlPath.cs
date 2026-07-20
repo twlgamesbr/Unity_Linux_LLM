@@ -1,7 +1,7 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Unity.Collections;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
@@ -145,9 +145,11 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputBinding.path"/>
         /// <seealso cref="InputBinding.ToDisplayString(InputBinding.DisplayStringOptions,InputControl)"/>
         /// <seealso cref="InputActionRebindingExtensions.GetBindingDisplayString(InputAction,int,InputBinding.DisplayStringOptions)"/>
-        public static string ToHumanReadableString(string path,
+        public static string ToHumanReadableString(
+            string path,
             HumanReadableStringOptions options = HumanReadableStringOptions.None,
-            InputControl control = null)
+            InputControl control = null
+        )
         {
             return ToHumanReadableString(path, out _, out _, options, control);
         }
@@ -194,11 +196,13 @@ namespace UnityEngine.InputSystem
         /// <seealso cref="InputBinding.path"/>
         /// <seealso cref="InputBinding.ToDisplayString(InputBinding.DisplayStringOptions,InputControl)"/>
         /// <seealso cref="InputActionRebindingExtensions.GetBindingDisplayString(InputAction,int,InputBinding.DisplayStringOptions)"/>
-        public static string ToHumanReadableString(string path,
+        public static string ToHumanReadableString(
+            string path,
             out string deviceLayoutName,
             out string controlPath,
             HumanReadableStringOptions options = HumanReadableStringOptions.None,
-            InputControl control = null)
+            InputControl control = null
+        )
         {
             deviceLayoutName = null;
             controlPath = null;
@@ -216,10 +220,11 @@ namespace UnityEngine.InputSystem
 
                 if (matchedControl != null)
                 {
-                    var text = (options & HumanReadableStringOptions.UseShortNames) != 0 &&
-                        !string.IsNullOrEmpty(matchedControl.shortDisplayName)
-                        ? matchedControl.shortDisplayName
-                        : matchedControl.displayName;
+                    var text =
+                        (options & HumanReadableStringOptions.UseShortNames) != 0
+                        && !string.IsNullOrEmpty(matchedControl.shortDisplayName)
+                            ? matchedControl.shortDisplayName
+                            : matchedControl.displayName;
 
                     if ((options & HumanReadableStringOptions.OmitDevice) == 0)
                         text = $"{text} [{matchedControl.device.displayName}]";
@@ -245,7 +250,13 @@ namespace UnityEngine.InputSystem
                 {
                     // Keep track of which control layout we're on (if any) as we're crawling
                     // down the path.
-                    var device = parser.current.ToHumanReadableString(null, null, out var currentLayoutName, out var _, options);
+                    var device = parser.current.ToHumanReadableString(
+                        null,
+                        null,
+                        out var currentLayoutName,
+                        out var _,
+                        options
+                    );
                     deviceLayoutName = currentLayoutName;
 
                     // Any additional levels (if present) are taken to form a control path on the device.
@@ -255,8 +266,15 @@ namespace UnityEngine.InputSystem
                         if (!isFirstControlLevel)
                             buffer.Append('/');
 
-                        buffer.Append(parser.current.ToHumanReadableString(
-                            currentLayoutName, controlPath, out currentLayoutName, out controlPath, options));
+                        buffer.Append(
+                            parser.current.ToHumanReadableString(
+                                currentLayoutName,
+                                controlPath,
+                                out currentLayoutName,
+                                out controlPath,
+                                options
+                            )
+                        );
                         isFirstControlLevel = false;
                     }
 
@@ -385,7 +403,10 @@ namespace UnityEngine.InputSystem
             using (InputControlLayout.CacheRef())
             {
                 // Load layout.
-                var layout = InputControlLayout.cache.FindOrLoadLayout(new InternedString(layoutName), throwIfNotFound: false);
+                var layout = InputControlLayout.cache.FindOrLoadLayout(
+                    new InternedString(layoutName),
+                    throwIfNotFound: false
+                );
                 if (layout == null)
                     return null;
 
@@ -435,7 +456,10 @@ namespace UnityEngine.InputSystem
             return currentResult;
         }
 
-        private static bool ControlLayoutMatchesPathComponent(ref InputControlLayout.ControlItem controlItem, ref PathParser parser)
+        private static bool ControlLayoutMatchesPathComponent(
+            ref InputControlLayout.ControlItem controlItem,
+            ref PathParser parser
+        )
         {
             // Match layout.
             var layout = parser.current.m_Layout;
@@ -551,7 +575,12 @@ namespace UnityEngine.InputSystem
             }
         }
 
-        public static int TryFindControls(InputControl control, string path, ref InputControlList<InputControl> matches, int indexInPath = 0)
+        public static int TryFindControls(
+            InputControl control,
+            string path,
+            ref InputControlList<InputControl> matches,
+            int indexInPath = 0
+        )
         {
             return TryFindControls(control, path, indexInPath, ref matches);
         }
@@ -616,8 +645,12 @@ namespace UnityEngine.InputSystem
         ///
         /// Does not allocate managed memory.
         /// </remarks>
-        public static int TryFindControls<TControl>(InputControl control, string path, int indexInPath,
-            ref InputControlList<TControl> matches)
+        public static int TryFindControls<TControl>(
+            InputControl control,
+            string path,
+            int indexInPath,
+            ref InputControlList<TControl> matches
+        )
             where TControl : InputControl
         {
             if (control == null)
@@ -674,7 +707,11 @@ namespace UnityEngine.InputSystem
             return MatchesRecursive(ref parser, control);
         }
 
-        internal static bool MatchControlComponent(ref ParsedPathComponent expectedControlComponent, ref InputControlLayout.ControlItem controlItem, bool matchAlias = false)
+        internal static bool MatchControlComponent(
+            ref ParsedPathComponent expectedControlComponent,
+            ref InputControlLayout.ControlItem controlItem,
+            bool matchAlias = false
+        )
         {
             bool controlItemNameMatched = false;
             var anyUsageMatches = false;
@@ -759,7 +796,11 @@ namespace UnityEngine.InputSystem
             return false;
         }
 
-        private static bool MatchesRecursive(ref PathParser parser, InputControl currentControl, bool prefixOnly = false)
+        private static bool MatchesRecursive(
+            ref PathParser parser,
+            InputControl currentControl,
+            bool prefixOnly = false
+        )
         {
             // Recurse into parent before looking at the current control. This
             // will advance the parser to where our control is in the path.
@@ -787,8 +828,13 @@ namespace UnityEngine.InputSystem
         /// <param name="matchMultiple"></param>
         /// <typeparam name="TControl"></typeparam>
         /// <returns></returns>
-        private static TControl MatchControlsRecursive<TControl>(InputControl control, string path, int indexInPath,
-            ref InputControlList<TControl> matches, bool matchMultiple)
+        private static TControl MatchControlsRecursive<TControl>(
+            InputControl control,
+            string path,
+            int indexInPath,
+            ref InputControlList<TControl> matches,
+            bool matchMultiple
+        )
             where TControl : InputControl
         {
             var pathLength = path.Length;
@@ -806,8 +852,7 @@ namespace UnityEngine.InputSystem
             if (path[indexInPath] == '<')
             {
                 ++indexInPath;
-                controlIsMatch =
-                    MatchPathComponent(control.layout, path, ref indexInPath, PathComponentType.Layout);
+                controlIsMatch = MatchPathComponent(control.layout, path, ref indexInPath, PathComponentType.Layout);
 
                 // If the layout isn't a match, walk up the base layout
                 // chain and match each base layout.
@@ -816,8 +861,12 @@ namespace UnityEngine.InputSystem
                     var baseLayout = control.m_Layout;
                     while (InputControlLayout.s_Layouts.baseLayoutTable.TryGetValue(baseLayout, out baseLayout))
                     {
-                        controlIsMatch = MatchPathComponent(baseLayout, path, ref indexInPath,
-                            PathComponentType.Layout);
+                        controlIsMatch = MatchPathComponent(
+                            baseLayout,
+                            path,
+                            ref indexInPath,
+                            PathComponentType.Layout
+                        );
                         if (controlIsMatch)
                             break;
                     }
@@ -831,19 +880,32 @@ namespace UnityEngine.InputSystem
 
                 for (var i = 0; i < control.usages.Count; ++i)
                 {
-                    controlIsMatch = MatchPathComponent(control.usages[i], path, ref indexInPath, PathComponentType.Usage);
+                    controlIsMatch = MatchPathComponent(
+                        control.usages[i],
+                        path,
+                        ref indexInPath,
+                        PathComponentType.Usage
+                    );
                     if (controlIsMatch)
                         break;
                 }
             }
 
             // Match by display name.
-            if (indexInPath < pathLength - 1 && controlIsMatch && path[indexInPath] == '#' &&
-                path[indexInPath + 1] == '(')
+            if (
+                indexInPath < pathLength - 1
+                && controlIsMatch
+                && path[indexInPath] == '#'
+                && path[indexInPath + 1] == '('
+            )
             {
                 indexInPath += 2;
-                controlIsMatch = MatchPathComponent(control.displayName, path, ref indexInPath,
-                    PathComponentType.DisplayName);
+                controlIsMatch = MatchPathComponent(
+                    control.displayName,
+                    path,
+                    ref indexInPath,
+                    PathComponentType.DisplayName
+                );
             }
 
             // Match by name.
@@ -857,8 +919,12 @@ namespace UnityEngine.InputSystem
                 {
                     for (var i = 0; i < control.aliases.Count && !controlIsMatch; ++i)
                     {
-                        controlIsMatch = MatchPathComponent(control.aliases[i], path, ref indexInPath,
-                            PathComponentType.Name);
+                        controlIsMatch = MatchPathComponent(
+                            control.aliases[i],
+                            path,
+                            ref indexInPath,
+                            PathComponentType.Name
+                        );
                     }
                 }
             }
@@ -906,7 +972,13 @@ namespace UnityEngine.InputSystem
                         // Usages are kind of like entry points that can route to anywhere else
                         // on a device's control hierarchy and then we keep going from that re-routed
                         // point.
-                        lastMatch = MatchByUsageAtDeviceRootRecursive(control.device, path, indexInPath, ref matches, matchMultiple);
+                        lastMatch = MatchByUsageAtDeviceRootRecursive(
+                            control.device,
+                            path,
+                            indexInPath,
+                            ref matches,
+                            matchMultiple
+                        );
                     }
                     else
                     {
@@ -921,8 +993,13 @@ namespace UnityEngine.InputSystem
             return null;
         }
 
-        private static TControl MatchByUsageAtDeviceRootRecursive<TControl>(InputDevice device, string path, int indexInPath,
-            ref InputControlList<TControl> matches, bool matchMultiple)
+        private static TControl MatchByUsageAtDeviceRootRecursive<TControl>(
+            InputDevice device,
+            string path,
+            int indexInPath,
+            ref InputControlList<TControl> matches,
+            bool matchMultiple
+        )
             where TControl : InputControl
         {
             // NOTE: m_UsagesForEachControl includes usages for the device. m_UsageToControl does not.
@@ -963,8 +1040,13 @@ namespace UnityEngine.InputSystem
                 // If there's more to go in the path, dive into the children of the control.
                 if (indexInPath < pathLength && path[indexInPath] == '/')
                 {
-                    lastMatch = MatchChildrenRecursive(controlMatchedByUsage, path, indexInPath + 1,
-                        ref matches, matchMultiple);
+                    lastMatch = MatchChildrenRecursive(
+                        controlMatchedByUsage,
+                        path,
+                        indexInPath + 1,
+                        ref matches,
+                        matchMultiple
+                    );
 
                     // We can stop going through usages if we matched something and the
                     // path component covering usage does not contain wildcards.
@@ -995,8 +1077,13 @@ namespace UnityEngine.InputSystem
             return lastMatch;
         }
 
-        private static TControl MatchChildrenRecursive<TControl>(InputControl control, string path, int indexInPath,
-            ref InputControlList<TControl> matches, bool matchMultiple)
+        private static TControl MatchChildrenRecursive<TControl>(
+            InputControl control,
+            string path,
+            int indexInPath,
+            ref InputControlList<TControl> matches,
+            bool matchMultiple
+        )
             where TControl : InputControl
         {
             var children = control.children;
@@ -1035,10 +1122,16 @@ namespace UnityEngine.InputSystem
             Name,
             DisplayName,
             Usage,
-            Layout
+            Layout,
         }
 
-        internal static bool MatchPathComponent(string component, string path, ref int indexInPath, PathComponentType componentType, int startIndexInComponent = 0)
+        internal static bool MatchPathComponent(
+            string component,
+            string path,
+            ref int indexInPath,
+            PathComponentType componentType,
+            int startIndexInComponent = 0
+        )
         {
             Debug.Assert(component != null, "Component string is null");
             Debug.Assert(path != null, "Path is null");
@@ -1063,9 +1156,11 @@ namespace UnityEngine.InputSystem
                 {
                     if (nextCharInPath == '/' && componentType == PathComponentType.Name)
                         break;
-                    if ((nextCharInPath == '>' && componentType == PathComponentType.Layout)
+                    if (
+                        (nextCharInPath == '>' && componentType == PathComponentType.Layout)
                         || (nextCharInPath == '}' && componentType == PathComponentType.Usage)
-                        || (nextCharInPath == ')' && componentType == PathComponentType.DisplayName))
+                        || (nextCharInPath == ')' && componentType == PathComponentType.DisplayName)
+                    )
                     {
                         ++indexInPath;
                         break;
@@ -1086,9 +1181,17 @@ namespace UnityEngine.InputSystem
                         //       the path. Otherwise, in the example above, we would stop on seeing the lowercase 't' and then be left
                         //       trying to match "tTrigger" against "Trigger".
                         var indexAfterWildcard = indexInPath + 1;
-                        if (indexInPath < (pathLength - 1) &&
-                            indexInComponent < componentLength &&
-                            MatchPathComponent(component, path, ref indexAfterWildcard, componentType, indexInComponent))
+                        if (
+                            indexInPath < (pathLength - 1)
+                            && indexInComponent < componentLength
+                            && MatchPathComponent(
+                                component,
+                                path,
+                                ref indexAfterWildcard,
+                                componentType,
+                                indexInComponent
+                            )
+                        )
                         {
                             indexInPath = indexAfterWildcard;
                             return true;
@@ -1112,7 +1215,10 @@ namespace UnityEngine.InputSystem
                 }
 
                 var charInComponent = component[indexInComponent];
-                if (charInComponent == nextCharInPath || char.ToLowerInvariant(charInComponent) == char.ToLowerInvariant(nextCharInPath))
+                if (
+                    charInComponent == nextCharInPath
+                    || char.ToLowerInvariant(charInComponent) == char.ToLowerInvariant(nextCharInPath)
+                )
                 {
                     ++indexInComponent;
                     ++indexInPath;
@@ -1197,8 +1303,13 @@ namespace UnityEngine.InputSystem
             internal bool isWildcard => m_Name == Wildcard;
             internal bool isDoubleWildcard => m_Name == DoubleWildcard;
 
-            internal string ToHumanReadableString(string parentLayoutName, string parentControlPath, out string referencedLayoutName,
-                out string controlPath, HumanReadableStringOptions options)
+            internal string ToHumanReadableString(
+                string parentLayoutName,
+                string parentControlPath,
+                out string referencedLayoutName,
+                out string controlPath,
+                HumanReadableStringOptions options
+            )
             {
                 referencedLayoutName = null;
                 controlPath = null;
@@ -1237,7 +1348,10 @@ namespace UnityEngine.InputSystem
                     // Where possible, use the displayName of the given layout rather than
                     // just the internal layout name.
                     string layoutString;
-                    var referencedLayout = InputControlLayout.cache.FindOrLoadLayout(referencedLayoutName, throwIfNotFound: false);
+                    var referencedLayout = InputControlLayout.cache.FindOrLoadLayout(
+                        referencedLayoutName,
+                        throwIfNotFound: false
+                    );
                     if (referencedLayout != null && !string.IsNullOrEmpty(referencedLayout.m_DisplayName))
                         layoutString = referencedLayout.m_DisplayName;
                     else
@@ -1259,12 +1373,17 @@ namespace UnityEngine.InputSystem
                     {
                         // NOTE: This produces a fully merged layout. We should thus pick up display names
                         //       from base layouts automatically wherever applicable.
-                        var parentLayout =
-                            InputControlLayout.cache.FindOrLoadLayout(new InternedString(parentLayoutName), throwIfNotFound: false);
+                        var parentLayout = InputControlLayout.cache.FindOrLoadLayout(
+                            new InternedString(parentLayoutName),
+                            throwIfNotFound: false
+                        );
                         if (parentLayout != null)
                         {
                             var controlName = new InternedString(m_Name.ToString());
-                            var control = parentLayout.FindControlIncludingArrayElements(controlName, out var arrayIndex);
+                            var control = parentLayout.FindControlIncludingArrayElements(
+                                controlName,
+                                out var arrayIndex
+                            );
                             if (control != null)
                             {
                                 // Synthesize path of control.
@@ -1283,9 +1402,10 @@ namespace UnityEngine.InputSystem
                                         controlPath = $"{parentControlPath}/{control.Value.name}";
                                 }
 
-                                var shortDisplayName = (options & HumanReadableStringOptions.UseShortNames) != 0
-                                    ? control.Value.shortDisplayName
-                                    : null;
+                                var shortDisplayName =
+                                    (options & HumanReadableStringOptions.UseShortNames) != 0
+                                        ? control.Value.shortDisplayName
+                                        : null;
 
                                 var displayName = !string.IsNullOrEmpty(shortDisplayName)
                                     ? shortDisplayName
@@ -1351,7 +1471,10 @@ namespace UnityEngine.InputSystem
                     {
                         // No direct match but base layout may match.
                         var baseLayout = control.m_Layout;
-                        while (InputControlLayout.s_Layouts.baseLayoutTable.TryGetValue(baseLayout, out baseLayout) && !layoutMatches)
+                        while (
+                            InputControlLayout.s_Layouts.baseLayoutTable.TryGetValue(baseLayout, out baseLayout)
+                            && !layoutMatches
+                        )
                             layoutMatches = ComparePathElementToString(m_Layout, baseLayout.ToString());
                     }
 
@@ -1406,10 +1529,10 @@ namespace UnityEngine.InputSystem
                 var pathElementLength = pathElement.length;
                 var elementLength = element.Length;
 
-                for (int i = 0, j = 0;; i++, j++)
+                for (int i = 0, j = 0; ; i++, j++)
                 {
                     var pathElementDone = i == pathElementLength;
-                    var elementDone     = j == elementLength;
+                    var elementDone = j == elementLength;
 
                     if (pathElementDone || elementDone)
                         return pathElementDone == elementDone;
@@ -1538,7 +1661,7 @@ namespace UnityEngine.InputSystem
                     m_Layout = layout,
                     m_Usages = usages,
                     m_Name = name,
-                    m_DisplayName = displayName
+                    m_DisplayName = displayName,
                 };
 
                 return leftIndexInPath != rightIndexInPath;

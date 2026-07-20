@@ -6,7 +6,7 @@ namespace UnityEngine.Experimental.Rendering
 {
     internal class XRLayoutStack : IDisposable
     {
-        readonly Stack<XRLayout> m_Stack = new ();
+        readonly Stack<XRLayout> m_Stack = new();
 
         public XRLayout New()
         {

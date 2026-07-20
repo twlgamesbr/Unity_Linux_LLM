@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using Unity.Collections;
 using Unity.DebugDisplay;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -18,7 +18,11 @@ namespace Unity.Physics.Authoring
         internal readonly NativeArray<int> IndicesArray;
         internal readonly NativeArray<Vector3> EdgesArray;
 
-        internal ColliderGeometry(NativeArray<Vector3> vertices, NativeArray<int> indices, NativeArray<Vector3> edgesArray)
+        internal ColliderGeometry(
+            NativeArray<Vector3> vertices,
+            NativeArray<int> indices,
+            NativeArray<Vector3> edgesArray
+        )
         {
             VerticesArray = vertices;
             IndicesArray = indices;
@@ -72,18 +76,24 @@ namespace Unity.Physics.Authoring
                 outGeometry = new ColliderGeometry(
                     vertices.ToNativeArray(Allocator.Persistent),
                     indices.ToNativeArray(Allocator.Persistent),
-                    DrawColliderUtility.CreateCapsuleWireFrame(Allocator.Persistent));
+                    DrawColliderUtility.CreateCapsuleWireFrame(Allocator.Persistent)
+                );
             }
             else
             {
                 outGeometry = new ColliderGeometry(
                     vertices.ToNativeArray(Allocator.Persistent),
                     indices.ToNativeArray(Allocator.Persistent),
-                    new NativeArray<Vector3>(0, Allocator.Persistent));
+                    new NativeArray<Vector3>(0, Allocator.Persistent)
+                );
             }
         }
 
-        public static void GetRigidBodiesFromQuery(ref SystemState state, ref EntityQuery query, ref NativeList<RigidBody> rigidBodiesList)
+        public static void GetRigidBodiesFromQuery(
+            ref SystemState state,
+            ref EntityQuery query,
+            ref NativeList<RigidBody> rigidBodiesList
+        )
         {
             using var entities = query.ToEntityArray(Allocator.Temp);
             var manager = state.EntityManager;
@@ -95,8 +105,12 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void GetBodiesByMotionsFromQuery(ref SystemState state, ref EntityQuery rigidBodiesQuery, ref NativeList<RigidBody> rigidBodies,
-            ref NativeList<BodyMotionType> bodyMotionTypes)
+        public static void GetBodiesByMotionsFromQuery(
+            ref SystemState state,
+            ref EntityQuery rigidBodiesQuery,
+            ref NativeList<RigidBody> rigidBodies,
+            ref NativeList<BodyMotionType> bodyMotionTypes
+        )
         {
             using var dynamicEntities = rigidBodiesQuery.ToEntityArray(Allocator.Temp);
             var manager = state.EntityManager;
@@ -117,7 +131,10 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void GetBodiesMotionTypesFromWorld(ref PhysicsWorld physicsWorld, ref NativeArray<BodyMotionType> bodyMotionTypes)
+        public static void GetBodiesMotionTypesFromWorld(
+            ref PhysicsWorld physicsWorld,
+            ref NativeArray<BodyMotionType> bodyMotionTypes
+        )
         {
             for (int index = 0; index < physicsWorld.NumBodies; ++index)
             {
@@ -134,7 +151,12 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        static void GetRigidBodyTransform(ref EntityManager inManager, in Entity inEntity, out RigidTransform outTransform, out float outScale)
+        static void GetRigidBodyTransform(
+            ref EntityManager inManager,
+            in Entity inEntity,
+            out RigidTransform outTransform,
+            out float outScale
+        )
         {
             bool hasParent = inManager.HasComponent<Parent>(inEntity);
             bool hasLocalTransform = inManager.HasComponent<LocalTransform>(inEntity);
@@ -153,13 +175,17 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        static RigidBody CreateRigidBody(in RigidTransform worldTransform, in float scale, BlobAssetReference<Collider> collider)
+        static RigidBody CreateRigidBody(
+            in RigidTransform worldTransform,
+            in float scale,
+            BlobAssetReference<Collider> collider
+        )
         {
             return new RigidBody
             {
                 Collider = collider,
                 WorldFromBody = worldTransform,
-                Scale = scale
+                Scale = scale,
             };
         }
 
@@ -179,7 +205,7 @@ namespace Unity.Physics.Authoring
                 CylinderGeometry = cylinderGeometry,
                 SphereGeometry = sphereGeometry,
                 OpenHemisphere = openHemisphereGeometry,
-                OpenCylinder = openCylinderGeometry
+                OpenCylinder = openCylinderGeometry,
             };
         }
 
@@ -198,7 +224,14 @@ namespace Unity.Physics.Authoring
             return DebugStaticColor;
         }
 
-        public static void DrawPrimitiveSphereEdges(DebugDraw debugDraw, float radius, float3 center, RigidTransform wfc, ref ColliderGeometry sphereGeometry, float uniformScale)
+        public static void DrawPrimitiveSphereEdges(
+            DebugDraw debugDraw,
+            float radius,
+            float3 center,
+            RigidTransform wfc,
+            ref ColliderGeometry sphereGeometry,
+            float uniformScale
+        )
         {
             var edgesColor = DebugDisplay.ColorIndex.Green;
             var shapeScale = new float3(radius * 2.0f); // Radius to scale : Multiple by 2
@@ -222,7 +255,15 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void DrawPrimitiveSphereFaces(DebugDraw debugDraw, float radius, float3 center, RigidTransform wfc, ref ColliderGeometry sphereGeometry, ColorIndex color, float uniformScale)
+        public static void DrawPrimitiveSphereFaces(
+            DebugDraw debugDraw,
+            float radius,
+            float3 center,
+            RigidTransform wfc,
+            ref ColliderGeometry sphereGeometry,
+            ColorIndex color,
+            float uniformScale
+        )
         {
             var shapeScale = new float3(radius * 2.0f) * uniformScale;
             var sphereTransform = float4x4.TRS(center, Quaternion.identity, shapeScale);
@@ -244,7 +285,15 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void DrawPrimitiveCapsuleEdges(DebugDraw debugDraw, float radius, float height, float3 center, Quaternion orientation, RigidTransform wfc, float uniformScale)
+        public static void DrawPrimitiveCapsuleEdges(
+            DebugDraw debugDraw,
+            float radius,
+            float height,
+            float3 center,
+            Quaternion orientation,
+            RigidTransform wfc,
+            float uniformScale
+        )
         {
             var edgesColor = ColorIndex.Green;
             var capsuleTransform = float4x4.TRS(center * uniformScale, orientation, uniformScale);
@@ -268,7 +317,18 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void DrawPrimitiveCapsuleFaces(DebugDraw debugDraw, float radius, float cylinderHeight, float3 center, Quaternion orientation, RigidTransform wfc, ref ColliderGeometry cylinderGeometry, ref ColliderGeometry hemisphereGeometry, ColorIndex color, float uniformScale)
+        public static void DrawPrimitiveCapsuleFaces(
+            DebugDraw debugDraw,
+            float radius,
+            float cylinderHeight,
+            float3 center,
+            Quaternion orientation,
+            RigidTransform wfc,
+            ref ColliderGeometry cylinderGeometry,
+            ref ColliderGeometry hemisphereGeometry,
+            ColorIndex color,
+            float uniformScale
+        )
         {
             // Cylinder
             var cylinderShapeScale = new float3(2.0f * radius, cylinderHeight, 2.0f * radius);
@@ -283,28 +343,47 @@ namespace Unity.Physics.Authoring
             // Top hemisphere
             var topHemisphereTransform = float4x4.TRS(center + halfHeight, orientation, hemisphereShapeScale);
             var topHemisphereWorldTransform = math.mul(new float4x4(wfc), topHemisphereTransform);
-            var topHemisphereVerticesWorld = new NativeArray<float3>(hemisphereGeometry.VerticesArray.Length, Allocator.Temp);
+            var topHemisphereVerticesWorld = new NativeArray<float3>(
+                hemisphereGeometry.VerticesArray.Length,
+                Allocator.Temp
+            );
 
             // Bottom hemisphere
-            var bottomHemisphereTransform = float4x4.TRS(center - halfHeight, math.mul(orientation, quaternion.RotateX(math.PI)), hemisphereShapeScale);
+            var bottomHemisphereTransform = float4x4.TRS(
+                center - halfHeight,
+                math.mul(orientation, quaternion.RotateX(math.PI)),
+                hemisphereShapeScale
+            );
             var bottomHemisphereWorldTransform = math.mul(new float4x4(wfc), bottomHemisphereTransform);
-            var bottomHemisphereVerticesWorld = new NativeArray<float3>(hemisphereGeometry.VerticesArray.Length, Allocator.Temp);
+            var bottomHemisphereVerticesWorld = new NativeArray<float3>(
+                hemisphereGeometry.VerticesArray.Length,
+                Allocator.Temp
+            );
 
             try
             {
                 for (int i = 0; i < cylinderVerticesWorld.Length; ++i)
                 {
-                    cylinderVerticesWorld[i] = math.transform(cylinderWorldTransform, cylinderGeometry.VerticesArray[i]);
+                    cylinderVerticesWorld[i] = math.transform(
+                        cylinderWorldTransform,
+                        cylinderGeometry.VerticesArray[i]
+                    );
                 }
 
                 for (int i = 0; i < topHemisphereVerticesWorld.Length; ++i)
                 {
-                    topHemisphereVerticesWorld[i] = math.transform(topHemisphereWorldTransform, hemisphereGeometry.VerticesArray[i]);
+                    topHemisphereVerticesWorld[i] = math.transform(
+                        topHemisphereWorldTransform,
+                        hemisphereGeometry.VerticesArray[i]
+                    );
                 }
 
                 for (int i = 0; i < bottomHemisphereVerticesWorld.Length; ++i)
                 {
-                    bottomHemisphereVerticesWorld[i] = math.transform(bottomHemisphereWorldTransform, hemisphereGeometry.VerticesArray[i]);
+                    bottomHemisphereVerticesWorld[i] = math.transform(
+                        bottomHemisphereWorldTransform,
+                        hemisphereGeometry.VerticesArray[i]
+                    );
                 }
 
                 debugDraw.Triangles(cylinderVerticesWorld, cylinderGeometry.IndicesArray, color);
@@ -319,7 +398,16 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void DrawPrimitiveBoxFaces(DebugDraw debugDraw, float3 size, float3 center, Quaternion orientation, RigidTransform wfc, ref ColliderGeometry boxGeometry, ColorIndex color, float uniformScale)
+        public static void DrawPrimitiveBoxFaces(
+            DebugDraw debugDraw,
+            float3 size,
+            float3 center,
+            Quaternion orientation,
+            RigidTransform wfc,
+            ref ColliderGeometry boxGeometry,
+            ColorIndex color,
+            float uniformScale
+        )
         {
             var boxVerticesWorld = new NativeArray<float3>(boxGeometry.VerticesArray.Length, Allocator.Temp);
             var boxTransform = float4x4.TRS(center, orientation, uniformScale * size);
@@ -329,7 +417,7 @@ namespace Unity.Physics.Authoring
             {
                 for (int i = 0; i < boxVerticesWorld.Length; ++i)
                 {
-                    boxVerticesWorld[i] = math.transform(worldTransform,  boxGeometry.VerticesArray[i]);
+                    boxVerticesWorld[i] = math.transform(worldTransform, boxGeometry.VerticesArray[i]);
                 }
 
                 debugDraw.Triangles(boxVerticesWorld, boxGeometry.IndicesArray, color);
@@ -340,7 +428,16 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void DrawPrimitiveCylinderEdges(DebugDraw debugDraw, float radius, float height, float3 center, Quaternion orientation, RigidTransform wfc, ref ColliderGeometry cylinderGeometry, float uniformScale)
+        public static void DrawPrimitiveCylinderEdges(
+            DebugDraw debugDraw,
+            float radius,
+            float height,
+            float3 center,
+            Quaternion orientation,
+            RigidTransform wfc,
+            ref ColliderGeometry cylinderGeometry,
+            float uniformScale
+        )
         {
             var edgesColor = ColorIndex.Green;
             var shapeScale = new float3(2.0f * radius, height * 0.5f, 2.0f * radius) * uniformScale;
@@ -363,7 +460,17 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        public static void DrawPrimitiveCylinderFaces(DebugDraw debugDraw, float radius, float height, float3 center, Quaternion orientation, RigidTransform wfc, ref ColliderGeometry cylinderGeometry, ColorIndex color, float uniformScale)
+        public static void DrawPrimitiveCylinderFaces(
+            DebugDraw debugDraw,
+            float radius,
+            float height,
+            float3 center,
+            Quaternion orientation,
+            RigidTransform wfc,
+            ref ColliderGeometry cylinderGeometry,
+            ColorIndex color,
+            float uniformScale
+        )
         {
             var shapeScale = new float3(2.0f * radius, height * 0.5f, 2.0f * radius);
             var cylinderTransform = float4x4.TRS(center, orientation, uniformScale * shapeScale);
@@ -386,7 +493,14 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        private static void SetDiscSectionPoints(NativeArray<Vector3> dest, int count, Vector3 normalAxis, Vector3 from, float angle, float radius)
+        private static void SetDiscSectionPoints(
+            NativeArray<Vector3> dest,
+            int count,
+            Vector3 normalAxis,
+            Vector3 from,
+            float angle,
+            float radius
+        )
         {
             Vector3 startingPoint = math.normalize(from) * radius;
             var step = angle * math.PI / 180f;
@@ -399,8 +513,15 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        private static void GetWireArcSegments(ref NativeArray<Vector3> segmentArray, int segmentIndex, Vector3 center,
-            Vector3 normal, Vector3 from, float angle, float radius)
+        private static void GetWireArcSegments(
+            ref NativeArray<Vector3> segmentArray,
+            int segmentIndex,
+            Vector3 center,
+            Vector3 normal,
+            Vector3 from,
+            float angle,
+            float radius
+        )
         {
             const int kMaxArcPoints = 15;
             NativeArray<Vector3> sPoints = new NativeArray<Vector3>(kMaxArcPoints, Allocator.Temp);
@@ -419,19 +540,18 @@ namespace Unity.Physics.Authoring
             sPoints.Dispose();
         }
 
-        private static readonly float3[] s_HeightAxes = new float3[3]
-        {
-            Vector3.right,
-            Vector3.up,
-            Vector3.forward
-        };
+        private static readonly float3[] s_HeightAxes = new float3[3] { Vector3.right, Vector3.up, Vector3.forward };
 
-        private static readonly int[] s_NextAxis = new int[3] {1, 2, 0};
+        private static readonly int[] s_NextAxis = new int[3] { 1, 2, 0 };
 
         // Create a wireframe capsule with a default orientation along the y-axis. Use the general method of DrawWireArc
         // declared in GizmoUtil.cpp and with CapsuleBoundsHandle.DrawWireframe(). Output is an array that comprises
         // pairs of vertices to be used in the drawing of Capsule Collider Edges.
-        static NativeArray<Vector3> CreateCapsuleWireFrame(Allocator allocator, float radius = 0.5f, float height = 2.0f)
+        static NativeArray<Vector3> CreateCapsuleWireFrame(
+            Allocator allocator,
+            float radius = 0.5f,
+            float height = 2.0f
+        )
         {
             const int mHeightAxis = 1; //corresponds to the y-axis
             var center = new float3(0, 0, 0);
@@ -458,7 +578,6 @@ namespace Unity.Physics.Authoring
 
             capsuleEdges[122] = center1 - heightAx3 * radius;
             capsuleEdges[123] = center2 - heightAx3 * radius;
-
 
             capsuleEdges[124] = center1 + heightAx2 * radius;
             capsuleEdges[125] = center2 + heightAx2 * radius;

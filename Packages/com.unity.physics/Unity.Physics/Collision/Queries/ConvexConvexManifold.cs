@@ -27,7 +27,7 @@ namespace Unity.Physics
                 this[0] = new ContactPoint
                 {
                     Distance = convexDistance.Distance,
-                    Position = Mul(worldFromA, convexDistance.PositionOnBinA)
+                    Position = Mul(worldFromA, convexDistance.PositionOnBinA),
                 };
             }
 
@@ -40,12 +40,12 @@ namespace Unity.Physics
                     int offset = contactIndex * 3;
                     var contact = new ContactPoint();
 
-                    fixed(float* positions = m_ContactPositions)
+                    fixed (float* positions = m_ContactPositions)
                     {
                         contact.Position = *(float3*)(positions + offset);
                     }
 
-                    fixed(float* distances = m_Distances)
+                    fixed (float* distances = m_Distances)
                     {
                         contact.Distance = distances[contactIndex];
                     }
@@ -57,12 +57,12 @@ namespace Unity.Physics
                     Assert.IsTrue(contactIndex >= 0 && contactIndex < k_MaxNumContacts);
 
                     int offset = contactIndex * 3;
-                    fixed(float* positions = m_ContactPositions)
+                    fixed (float* positions = m_ContactPositions)
                     {
                         *(float3*)(positions + offset) = value.Position;
                     }
 
-                    fixed(float* distances = m_Distances)
+                    fixed (float* distances = m_Distances)
                     {
                         distances[contactIndex] = value.Distance;
                     }
@@ -85,9 +85,13 @@ namespace Unity.Physics
 
         // Create a contact point for a pair of spheres in world space.
         public static unsafe void SphereSphere(
-            SphereCollider* sphereA, SphereCollider* sphereB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            SphereCollider* sphereA,
+            SphereCollider* sphereB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             DistanceQueries.Result convexDistance = DistanceQueries.SphereSphere(sphereA, sphereB, aFromB);
             if (convexDistance.Distance < maxDistance)
@@ -102,9 +106,13 @@ namespace Unity.Physics
 
         // Create a contact point for a box and a sphere in world space.
         public static unsafe void BoxSphere(
-            [NoAlias] BoxCollider* boxA, [NoAlias] SphereCollider* sphereB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            [NoAlias] BoxCollider* boxA,
+            [NoAlias] SphereCollider* sphereB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             DistanceQueries.Result convexDistance = DistanceQueries.BoxSphere(boxA, sphereB, aFromB);
             if (convexDistance.Distance < maxDistance)
@@ -119,9 +127,13 @@ namespace Unity.Physics
 
         // Create contact points for a pair of boxes in world space.
         public static unsafe void BoxBox(
-            BoxCollider* boxA, BoxCollider* boxB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            BoxCollider* boxA,
+            BoxCollider* boxB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             manifold = new Manifold();
 
@@ -142,8 +154,10 @@ namespace Unity.Physics
                 float3 normalB = new float3(1, 0, 0);
                 float distA = 0.0f;
                 float distB = 0.0f;
-                if (!PointPlanes(boxAFromBoxB, halfExtentsA, halfExtentsB, maxDistance, ref normalA, ref distA) ||
-                    !PointPlanes(boxBFromBoxA, halfExtentsB, halfExtentsA, maxDistance, ref normalB, ref distB))
+                if (
+                    !PointPlanes(boxAFromBoxB, halfExtentsA, halfExtentsB, maxDistance, ref normalA, ref distA)
+                    || !PointPlanes(boxBFromBoxA, halfExtentsB, halfExtentsA, maxDistance, ref normalB, ref distB)
+                )
                 {
                     return;
                 }
@@ -164,10 +178,18 @@ namespace Unity.Physics
                         float3 edgeB;
                         switch (j)
                         {
-                            case 0: edgeB = boxAFromBoxB.Rotation.c0; break;
-                            case 1: edgeB = boxAFromBoxB.Rotation.c1; break;
-                            case 2: edgeB = boxAFromBoxB.Rotation.c2; break;
-                            default: edgeB = new float3(0.0f); break;
+                            case 0:
+                                edgeB = boxAFromBoxB.Rotation.c0;
+                                break;
+                            case 1:
+                                edgeB = boxAFromBoxB.Rotation.c1;
+                                break;
+                            case 2:
+                                edgeB = boxAFromBoxB.Rotation.c2;
+                                break;
+                            default:
+                                edgeB = new float3(0.0f);
+                                break;
                         }
                         float3 dir = math.cross(edgeA, edgeB);
 
@@ -218,27 +240,56 @@ namespace Unity.Physics
                 float3 normalInA = math.mul(boxA->Orientation, normal);
                 manifold.Normal = math.mul(worldFromA.Rotation, normalInA);
                 int faceIndexA = boxA->ConvexHull.GetSupportingFace(-normalInA);
-                int faceIndexB = boxB->ConvexHull.GetSupportingFace(math.mul(math.transpose(aFromB.Rotation), normalInA));
+                int faceIndexB = boxB->ConvexHull.GetSupportingFace(
+                    math.mul(math.transpose(aFromB.Rotation), normalInA)
+                );
 
                 // Build manifold
-                if (!FaceFace(ref boxA->ConvexHull, ref boxB->ConvexHull, faceIndexA, faceIndexB, worldFromA, aFromB, normalInA, distance, ref manifold))
+                if (
+                    !FaceFace(
+                        ref boxA->ConvexHull,
+                        ref boxB->ConvexHull,
+                        faceIndexA,
+                        faceIndexB,
+                        worldFromA,
+                        aFromB,
+                        normalInA,
+                        distance,
+                        ref manifold
+                    )
+                )
                 {
                     // The closest points are vertices, we need GJK to find them
                     ConvexConvex(
-                        ref ((ConvexCollider*)boxA)->ConvexHull, ref ((ConvexCollider*)boxB)->ConvexHull,
-                        worldFromA, aFromB, maxDistance, out manifold);
+                        ref ((ConvexCollider*)boxA)->ConvexHull,
+                        ref ((ConvexCollider*)boxB)->ConvexHull,
+                        worldFromA,
+                        aFromB,
+                        maxDistance,
+                        out manifold
+                    );
                 }
             }
         }
 
         // Create a single point manifold between a capsule and a sphere in world space.
         public static unsafe void CapsuleSphere(
-            [NoAlias] CapsuleCollider* capsuleA, [NoAlias] SphereCollider* sphereB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            [NoAlias] CapsuleCollider* capsuleA,
+            [NoAlias] SphereCollider* sphereB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             DistanceQueries.Result convexDistance = DistanceQueries.CapsuleSphere(
-                capsuleA->Vertex0, capsuleA->Vertex1, capsuleA->Radius, sphereB->Center, sphereB->Radius, aFromB);
+                capsuleA->Vertex0,
+                capsuleA->Vertex1,
+                capsuleA->Radius,
+                sphereB->Center,
+                sphereB->Radius,
+                aFromB
+            );
             if (convexDistance.Distance < maxDistance)
             {
                 manifold = new Manifold(convexDistance, worldFromA);
@@ -251,9 +302,13 @@ namespace Unity.Physics
 
         // Create a contact point for a pair of capsules in world space.
         public static unsafe void CapsuleCapsule(
-            CapsuleCollider* capsuleA, CapsuleCollider* capsuleB,
-            [NoAlias] MTransform worldFromA, [NoAlias] MTransform aFromB, float maxDistance,
-            out Manifold manifold)
+            CapsuleCollider* capsuleA,
+            CapsuleCollider* capsuleB,
+            [NoAlias] MTransform worldFromA,
+            [NoAlias] MTransform aFromB,
+            float maxDistance,
+            out Manifold manifold
+        )
         {
             // TODO: Should produce a multi-point manifold
             DistanceQueries.Result convexDistance = DistanceQueries.CapsuleCapsule(capsuleA, capsuleB, aFromB);
@@ -269,9 +324,13 @@ namespace Unity.Physics
 
         // Create contact points for a box and triangle in world space.
         public static unsafe void BoxTriangle(
-            [NoAlias] BoxCollider* boxA, [NoAlias] PolygonCollider* triangleB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            [NoAlias] BoxCollider* boxA,
+            [NoAlias] PolygonCollider* triangleB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             Assert.IsTrue(triangleB->Vertices.Length == 3);
 
@@ -322,7 +381,8 @@ namespace Unity.Physics
                     float expansionOffset = math.dot(math.abs(triangleNormal), halfExtents);
                     planeVertexFace = SelectMaxW(
                         new float4(triangleNormal, -triangleOffset - expansionOffset),
-                        new float4(-triangleNormal, triangleOffset - expansionOffset));
+                        new float4(-triangleNormal, triangleOffset - expansionOffset)
+                    );
                 }
 
                 // Edge planes
@@ -332,14 +392,22 @@ namespace Unity.Physics
                     for (int i = 0, j = 1, k = 2; i < 3; j = k, k = i, i++)
                     {
                         // Normalize the cross product and flip it to point outward from the edge
-                        float4 lengthsSq = edgesB.GetComponent(j) * edgesB.GetComponent(j) + edgesB.GetComponent(k) * edgesB.GetComponent(k);
+                        float4 lengthsSq =
+                            edgesB.GetComponent(j) * edgesB.GetComponent(j)
+                            + edgesB.GetComponent(k) * edgesB.GetComponent(k);
                         float4 invLengths = math.rsqrt(lengthsSq);
-                        float4 dots = edgesB.GetComponent(j) * perpsB.GetComponent(k) - edgesB.GetComponent(k) * perpsB.GetComponent(j);
+                        float4 dots =
+                            edgesB.GetComponent(j) * perpsB.GetComponent(k)
+                            - edgesB.GetComponent(k) * perpsB.GetComponent(j);
                         float4 factors = invLengths * math.sign(dots);
 
                         float4 nj = -edgesB.GetComponent(k) * factors;
                         float4 nk = edgesB.GetComponent(j) * factors;
-                        float4 distances = -nj * vertsB.GetComponent(j) - nk * vertsB.GetComponent(k) - math.abs(nj) * halfExtents[j] - math.abs(nk) * halfExtents[k];
+                        float4 distances =
+                            -nj * vertsB.GetComponent(j)
+                            - nk * vertsB.GetComponent(k)
+                            - math.abs(nj) * halfExtents[j]
+                            - math.abs(nk) * halfExtents[k];
 
                         // If the box edge is parallel to the triangle face then skip it, the plane is redundant with a vertex-face plane
                         bool4 valid = dots != float4.zero;
@@ -357,7 +425,10 @@ namespace Unity.Physics
                         n2[i] = 0.0f;
                         n2[j] = nj[2];
                         n2[k] = nk[2];
-                        float4 temp = SelectMaxW(SelectMaxW(new float4(n0, distances.x), new float4(n1, distances.y)), new float4(n2, distances.z));
+                        float4 temp = SelectMaxW(
+                            SelectMaxW(new float4(n0, distances.x), new float4(n1, distances.y)),
+                            new float4(n2, distances.z)
+                        );
                         planeEdgeEdge = SelectMaxW(planeEdgeEdge, temp);
                     }
                 }
@@ -374,30 +445,59 @@ namespace Unity.Physics
                 float3 normalInA = math.mul(boxA->Orientation, plane.xyz);
                 manifold.Normal = math.mul(worldFromA.Rotation, normalInA);
                 int faceIndexA = boxA->ConvexHull.GetSupportingFace(-normalInA);
-                int faceIndexB = triangleB->ConvexHull.GetSupportingFace(math.mul(math.transpose(aFromB.Rotation), normalInA));
+                int faceIndexB = triangleB->ConvexHull.GetSupportingFace(
+                    math.mul(math.transpose(aFromB.Rotation), normalInA)
+                );
 
                 // Build manifold
-                if (!FaceFace(ref boxA->ConvexHull, ref triangleB->ConvexHull, faceIndexA, faceIndexB, worldFromA, aFromB, normalInA, float.MaxValue, ref manifold))
+                if (
+                    !FaceFace(
+                        ref boxA->ConvexHull,
+                        ref triangleB->ConvexHull,
+                        faceIndexA,
+                        faceIndexB,
+                        worldFromA,
+                        aFromB,
+                        normalInA,
+                        float.MaxValue,
+                        ref manifold
+                    )
+                )
                 {
                     // The closest points are vertices, we need GJK to find them
                     ConvexConvex(
-                        ref ((ConvexCollider*)boxA)->ConvexHull, ref ((ConvexCollider*)triangleB)->ConvexHull,
-                        worldFromA, aFromB, maxDistance, out manifold);
+                        ref ((ConvexCollider*)boxA)->ConvexHull,
+                        ref ((ConvexCollider*)triangleB)->ConvexHull,
+                        worldFromA,
+                        aFromB,
+                        maxDistance,
+                        out manifold
+                    );
                 }
             }
         }
 
         // Create a single point manifold between a triangle and sphere in world space.
         public static unsafe void TriangleSphere(
-            [NoAlias] PolygonCollider* triangleA, [NoAlias] SphereCollider* sphereB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            [NoAlias] PolygonCollider* triangleA,
+            [NoAlias] SphereCollider* sphereB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             Assert.IsTrue(triangleA->Vertices.Length == 3);
 
             DistanceQueries.Result convexDistance = DistanceQueries.TriangleSphere(
-                triangleA->Vertices[0], triangleA->Vertices[1], triangleA->Vertices[2], triangleA->Planes[0].Normal,
-                sphereB->Center, sphereB->Radius, aFromB);
+                triangleA->Vertices[0],
+                triangleA->Vertices[1],
+                triangleA->Vertices[2],
+                triangleA->Planes[0].Normal,
+                sphereB->Center,
+                sphereB->Radius,
+                aFromB
+            );
             if (convexDistance.Distance < maxDistance)
             {
                 manifold = new Manifold(convexDistance, worldFromA);
@@ -410,9 +510,13 @@ namespace Unity.Physics
 
         // Create contact points for a capsule and triangle in world space.
         public static unsafe void CapsuleTriangle(
-            [NoAlias] CapsuleCollider* capsuleA, [NoAlias] PolygonCollider* triangleB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            [NoAlias] CapsuleCollider* capsuleA,
+            [NoAlias] PolygonCollider* triangleB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             Assert.IsTrue(triangleB->Vertices.Length == 3);
 
@@ -422,13 +526,24 @@ namespace Unity.Physics
                 // Build manifold
                 manifold = new Manifold
                 {
-                    Normal = math.mul(worldFromA.Rotation, -convexDistance.NormalInA) // negate the normal because we are temporarily flipping to triangle A capsule B
+                    Normal = math.mul(worldFromA.Rotation, -convexDistance.NormalInA), // negate the normal because we are temporarily flipping to triangle A capsule B
                 };
                 MTransform worldFromB = Mul(worldFromA, aFromB);
                 MTransform bFromA = Inverse(aFromB);
                 float3 normalInB = math.mul(bFromA.Rotation, convexDistance.NormalInA);
                 int faceIndexB = triangleB->ConvexHull.GetSupportingFace(normalInB);
-                if (FaceEdge(ref triangleB->ConvexHull, ref capsuleA->ConvexHull, faceIndexB, worldFromB, bFromA, -normalInB, convexDistance.Distance + capsuleA->Radius, ref manifold))
+                if (
+                    FaceEdge(
+                        ref triangleB->ConvexHull,
+                        ref capsuleA->ConvexHull,
+                        faceIndexB,
+                        worldFromB,
+                        bFromA,
+                        -normalInB,
+                        convexDistance.Distance + capsuleA->Radius,
+                        ref manifold
+                    )
+                )
                 {
                     manifold.Flip();
                 }
@@ -445,26 +560,37 @@ namespace Unity.Physics
 
         // Create contact points for a pair of generic convex hulls in world space.
         public static unsafe void ConvexConvex(
-            in float3* vertexPtrA, in float3* vertexPtrB,
-            in Plane* planesA, in Plane* planesB,
-            float convexRadiusA, float convexRadiusB,
-            ref ConvexHull hullA, ref ConvexHull hullB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
+            in float3* vertexPtrA,
+            in float3* vertexPtrB,
+            in Plane* planesA,
+            in Plane* planesB,
+            float convexRadiusA,
+            float convexRadiusB,
+            ref ConvexHull hullA,
+            ref ConvexHull hullB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
             [NoAlias] out Manifold manifold,
-            bool aNegativeScaled = false, bool bNegativeScaled = false)
+            bool aNegativeScaled = false,
+            bool bNegativeScaled = false
+        )
         {
             ConvexConvexDistanceQueries.Result result = ConvexConvexDistanceQueries.ConvexConvex(
-                vertexPtrA, hullA.NumVertices, vertexPtrB, hullB.NumVertices, aFromB, ConvexConvexDistanceQueries.PenetrationHandling.Exact3D);
+                vertexPtrA,
+                hullA.NumVertices,
+                vertexPtrB,
+                hullB.NumVertices,
+                aFromB,
+                ConvexConvexDistanceQueries.PenetrationHandling.Exact3D
+            );
 
             float sumRadii = convexRadiusB + convexRadiusA;
             if (result.ClosestPoints.Distance < maxDistance + sumRadii)
             {
                 float3 normal = result.ClosestPoints.NormalInA;
 
-                manifold = new Manifold
-                {
-                    Normal = math.mul(worldFromA.Rotation, normal)
-                };
+                manifold = new Manifold { Normal = math.mul(worldFromA.Rotation, normal) };
 
                 if (hullA.NumFaces > 0)
                 {
@@ -472,10 +598,33 @@ namespace Unity.Physics
                     if (hullB.NumFaces > 0)
                     {
                         // Convex vs convex
-                        int faceIndexB = hullB.GetSupportingFace(math.mul(math.transpose(aFromB.Rotation), normal), result.SimplexVertexB(0), planesB);
+                        int faceIndexB = hullB.GetSupportingFace(
+                            math.mul(math.transpose(aFromB.Rotation), normal),
+                            result.SimplexVertexB(0),
+                            planesB
+                        );
 
-                        if (FaceFace(vertexPtrA, vertexPtrB, faceIndexA, faceIndexB, in worldFromA, in aFromB, normal, planesA, planesB, result.ClosestPoints.Distance, ref manifold, ref hullA, ref hullB,
-                            convexRadiusA, convexRadiusB, aNegativeScaled, bNegativeScaled))
+                        if (
+                            FaceFace(
+                                vertexPtrA,
+                                vertexPtrB,
+                                faceIndexA,
+                                faceIndexB,
+                                in worldFromA,
+                                in aFromB,
+                                normal,
+                                planesA,
+                                planesB,
+                                result.ClosestPoints.Distance,
+                                ref manifold,
+                                ref hullA,
+                                ref hullB,
+                                convexRadiusA,
+                                convexRadiusB,
+                                aNegativeScaled,
+                                bNegativeScaled
+                            )
+                        )
                         {
                             return;
                         }
@@ -483,8 +632,23 @@ namespace Unity.Physics
                     else if (hullB.NumVertices == 2)
                     {
                         // Convex vs capsule
-                        if (FaceEdge(vertexPtrA, vertexPtrB, faceIndexA, worldFromA, aFromB, normal, result.ClosestPoints.Distance, ref manifold,
-                            planesA, ref hullA, convexRadiusA, convexRadiusB, aNegativeScaled))
+                        if (
+                            FaceEdge(
+                                vertexPtrA,
+                                vertexPtrB,
+                                faceIndexA,
+                                worldFromA,
+                                aFromB,
+                                normal,
+                                result.ClosestPoints.Distance,
+                                ref manifold,
+                                planesA,
+                                ref hullA,
+                                convexRadiusA,
+                                convexRadiusB,
+                                aNegativeScaled
+                            )
+                        )
                         {
                             return;
                         }
@@ -500,8 +664,21 @@ namespace Unity.Physics
                         MTransform bFromA = Inverse(aFromB);
                         float3 normalInB = math.mul(bFromA.Rotation, normal);
                         int faceIndexB = hullB.GetSupportingFace(normalInB, result.SimplexVertexB(0), planesB);
-                        bool foundClosestPoint = FaceEdge(vertexPtrB, vertexPtrA, faceIndexB, worldFromB, bFromA, -normalInB, result.ClosestPoints.Distance, ref manifold,
-                            planesB, ref hullB, convexRadiusB, convexRadiusA, bNegativeScaled);
+                        bool foundClosestPoint = FaceEdge(
+                            vertexPtrB,
+                            vertexPtrA,
+                            faceIndexB,
+                            worldFromB,
+                            bFromA,
+                            -normalInB,
+                            result.ClosestPoints.Distance,
+                            ref manifold,
+                            planesB,
+                            ref hullB,
+                            convexRadiusB,
+                            convexRadiusA,
+                            bNegativeScaled
+                        );
                         manifold.Flip();
                         if (foundClosestPoint)
                         {
@@ -517,8 +694,10 @@ namespace Unity.Physics
                     DistanceQueries.Result convexDistance = result.ClosestPoints;
                     manifold[manifold.NumContacts++] = new ContactPoint
                     {
-                        Position = Mul(worldFromA, convexDistance.PositionOnAinA) - manifold.Normal * (convexDistance.Distance - convexRadiusB),
-                        Distance = convexDistance.Distance - sumRadii
+                        Position =
+                            Mul(worldFromA, convexDistance.PositionOnAinA)
+                            - manifold.Normal * (convexDistance.Distance - convexRadiusB),
+                        Distance = convexDistance.Distance - sumRadii,
                     };
                 }
             }
@@ -530,14 +709,32 @@ namespace Unity.Physics
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ConvexConvex(
-            ref ConvexHull hullA, ref ConvexHull hullB,
-            [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB, float maxDistance,
-            [NoAlias] out Manifold manifold)
+            ref ConvexHull hullA,
+            ref ConvexHull hullB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float maxDistance,
+            [NoAlias] out Manifold manifold
+        )
         {
             unsafe
             {
-                ConvexConvex(hullA.VerticesPtr, hullB.VerticesPtr, hullA.PlanesPtr, hullB.PlanesPtr, hullA.ConvexRadius,
-                    hullB.ConvexRadius, ref hullA, ref hullB, in worldFromA, aFromB, maxDistance, out manifold, false, false);
+                ConvexConvex(
+                    hullA.VerticesPtr,
+                    hullB.VerticesPtr,
+                    hullA.PlanesPtr,
+                    hullB.PlanesPtr,
+                    hullA.ConvexRadius,
+                    hullB.ConvexRadius,
+                    ref hullA,
+                    ref hullB,
+                    in worldFromA,
+                    aFromB,
+                    maxDistance,
+                    out manifold,
+                    false,
+                    false
+                );
             }
         }
 
@@ -546,7 +743,14 @@ namespace Unity.Physics
         #region Helpers
 
         // BoxBox() helper
-        private static bool PointPlanes(MTransform aFromB, float3 halfExtA, float3 halfExtB, float maxDistance, ref float3 normalOut, ref float distanceOut)
+        private static bool PointPlanes(
+            MTransform aFromB,
+            float3 halfExtA,
+            float3 halfExtB,
+            float maxDistance,
+            ref float3 normalOut,
+            ref float distanceOut
+        )
         {
             // Calculate the AABB of box B in A-space
             Aabb aabbBinA;
@@ -595,8 +799,15 @@ namespace Unity.Physics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CalcTrianglePlanes(float3 v0, float3 v1, float3 v2, float3 normalDirection,
-            [NoAlias] out FourTransposedPoints verts, [NoAlias] out FourTransposedPoints edges, [NoAlias] out FourTransposedPoints perps)
+        private static void CalcTrianglePlanes(
+            float3 v0,
+            float3 v1,
+            float3 v2,
+            float3 normalDirection,
+            [NoAlias] out FourTransposedPoints verts,
+            [NoAlias] out FourTransposedPoints edges,
+            [NoAlias] out FourTransposedPoints perps
+        )
         {
             verts = new FourTransposedPoints(v0, v1, v2, v0);
             edges = verts.V1230 - verts;
@@ -629,7 +840,13 @@ namespace Unity.Physics
             private short indexToSubstractFrom;
             private int iterationIndex;
 
-            public static unsafe EdgeIterator Begin(float3* vertices, byte* indices, float3 normal, int count, bool inverseOrder = false)
+            public static unsafe EdgeIterator Begin(
+                float3* vertices,
+                byte* indices,
+                float3 normal,
+                int count,
+                bool inverseOrder = false
+            )
             {
                 EdgeIterator iterator = new EdgeIterator();
                 iterator.vertices = vertices;
@@ -641,7 +858,8 @@ namespace Unity.Physics
 
                 iterator.VertexIndex = inverseOrder ? 0 : count - 1;
 
-                iterator.Vertex1 = (indices == null) ? vertices[iterator.VertexIndex] : vertices[indices[iterator.VertexIndex]];
+                iterator.Vertex1 =
+                    (indices == null) ? vertices[iterator.VertexIndex] : vertices[indices[iterator.VertexIndex]];
                 iterator.update();
                 return iterator;
             }
@@ -675,7 +893,14 @@ namespace Unity.Physics
         }
 
         // Cast ray originA, directionA against plane normalB, offsetB and update the ray hit fractions
-        private static void castRayPlane(float3 originA, float3 directionA, float3 normalB, float offsetB, ref float fracEnter, ref float fracExit)
+        private static void castRayPlane(
+            float3 originA,
+            float3 directionA,
+            float3 normalB,
+            float offsetB,
+            ref float fracEnter,
+            ref float fracExit
+        )
         {
             // Cast edge A against plane B
             float start = math.dot(originA, normalB) - offsetB;
@@ -706,9 +931,24 @@ namespace Unity.Physics
         // In those cases, FaceFace() returns false and the caller should generate a contact from the closest points on the shapes.
         // Passed in vertices are either aliases or scaled copies from hulls.
         private static unsafe bool FaceFace(
-            float3* vertexPtrA, float3* vertexPtrB, int faceIndexA, int faceIndexB, [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB,
-            float3 normal, Plane* planePtrA, Plane* planePtrB, float distance, [NoAlias] ref Manifold manifold,
-            ref ConvexHull hullA, ref ConvexHull hullB, float convexRadiusA, float convexRadiusB, bool aNegativeScaled = false, bool bNegativeScaled = false)
+            float3* vertexPtrA,
+            float3* vertexPtrB,
+            int faceIndexA,
+            int faceIndexB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float3 normal,
+            Plane* planePtrA,
+            Plane* planePtrB,
+            float distance,
+            [NoAlias] ref Manifold manifold,
+            ref ConvexHull hullA,
+            ref ConvexHull hullB,
+            float convexRadiusA,
+            float convexRadiusB,
+            bool aNegativeScaled = false,
+            bool bNegativeScaled = false
+        )
         {
             Plane planeA = planePtrA[faceIndexA];
             Plane planeB = TransformPlane(aFromB, planePtrB[faceIndexB]);
@@ -737,8 +977,25 @@ namespace Unity.Physics
                 MTransform bFromA = Inverse(aFromB);
                 float3 normalInB = math.mul(bFromA.Rotation, -normal);
                 MTransform worldFromB = Mul(worldFromA, aFromB);
-                bool result = FaceFace(vertexPtrB, vertexPtrA, faceIndexB, faceIndexA, worldFromB, bFromA, normalInB,
-                    planePtrB, planePtrA, distance, ref manifold, ref hullB, ref hullA, convexRadiusB, convexRadiusA, bNegativeScaled, aNegativeScaled);
+                bool result = FaceFace(
+                    vertexPtrB,
+                    vertexPtrA,
+                    faceIndexB,
+                    faceIndexA,
+                    worldFromB,
+                    bFromA,
+                    normalInB,
+                    planePtrB,
+                    planePtrA,
+                    distance,
+                    ref manifold,
+                    ref hullB,
+                    ref hullA,
+                    convexRadiusB,
+                    convexRadiusA,
+                    bNegativeScaled,
+                    aNegativeScaled
+                );
                 manifold.Normal = -manifold.Normal;
                 manifold.Flip();
                 return result;
@@ -769,13 +1026,33 @@ namespace Unity.Physics
             float sumRadii = convexRadiusA + convexRadiusB;
             byte* indicesA = hullA.FaceVertexIndicesPtr + faceA.FirstIndex;
             float3* verticesA = vertexPtrA;
-            for (EdgeIterator edgeA = EdgeIterator.Begin(verticesA, indicesA, -normal, faceA.NumVertices, aNegativeScaled); edgeA.Valid(); edgeA.Advance())
+            for (
+                EdgeIterator edgeA = EdgeIterator.Begin(
+                    verticesA,
+                    indicesA,
+                    -normal,
+                    faceA.NumVertices,
+                    aNegativeScaled
+                );
+                edgeA.Valid();
+                edgeA.Advance()
+            )
             {
                 float fracEnterA = 0.0f;
                 float fracExitA = 1.0f;
 
                 // For each edge of B
-                for (EdgeIterator edgeB = EdgeIterator.Begin(verticesBinA, null, normal, faceB.NumVertices, bNegativeScaled); edgeB.Valid(); edgeB.Advance())
+                for (
+                    EdgeIterator edgeB = EdgeIterator.Begin(
+                        verticesBinA,
+                        null,
+                        normal,
+                        faceB.NumVertices,
+                        bNegativeScaled
+                    );
+                    edgeB.Valid();
+                    edgeB.Advance()
+                )
                 {
                     // Cast edge A against plane B and test if vertex B is inside plane A
                     castRayPlane(edgeA.Vertex0, edgeA.Edge, edgeB.Perp, edgeB.Offset, ref fracEnterA, ref fracExitA);
@@ -790,10 +1067,34 @@ namespace Unity.Physics
                     float deltaDistance = math.dot(edgeA.Edge, planeB.Normal) * invDotB;
                     float3 vertexAOnB = edgeA.Vertex0 - normal * distance0;
                     float3 edgeAOnB = edgeA.Edge - normal * deltaDistance;
-                    foundClosestPoint |= AddEdgeContact(vertexAOnB, edgeAOnB, distance0, deltaDistance, fracEnterA, normal, convexRadiusB, sumRadii, worldFromA, distance, ref manifold);
+                    foundClosestPoint |= AddEdgeContact(
+                        vertexAOnB,
+                        edgeAOnB,
+                        distance0,
+                        deltaDistance,
+                        fracEnterA,
+                        normal,
+                        convexRadiusB,
+                        sumRadii,
+                        worldFromA,
+                        distance,
+                        ref manifold
+                    );
                     if (fracExitA < 1.0f) // If the exit fraction is 1, then the next edge has the same contact point with enter fraction 0
                     {
-                        foundClosestPoint |= AddEdgeContact(vertexAOnB, edgeAOnB, distance0, deltaDistance, fracExitA, normal, convexRadiusB, sumRadii, worldFromA, distance, ref manifold);
+                        foundClosestPoint |= AddEdgeContact(
+                            vertexAOnB,
+                            edgeAOnB,
+                            distance0,
+                            deltaDistance,
+                            fracExitA,
+                            normal,
+                            convexRadiusB,
+                            sumRadii,
+                            worldFromA,
+                            distance,
+                            ref manifold
+                        );
                     }
                 }
             }
@@ -810,7 +1111,7 @@ namespace Unity.Physics
                     ContactPoint cp = new ContactPoint
                     {
                         Position = Mul(worldFromA, vertexB) + manifold.Normal * convexRadiusB,
-                        Distance = distanceB - sumRadii
+                        Distance = distanceB - sumRadii,
                     };
 
                     manifold[manifold.NumContacts++] = cp;
@@ -823,22 +1124,58 @@ namespace Unity.Physics
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool FaceFace(
-            ref ConvexHull convexA, ref ConvexHull convexB, int faceIndexA, int faceIndexB, [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB,
-            float3 normal, float distance, [NoAlias] ref Manifold manifold)
+            ref ConvexHull convexA,
+            ref ConvexHull convexB,
+            int faceIndexA,
+            int faceIndexB,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float3 normal,
+            float distance,
+            [NoAlias] ref Manifold manifold
+        )
         {
             unsafe
             {
-                return FaceFace(convexA.VerticesPtr, convexB.VerticesPtr, faceIndexA, faceIndexB, worldFromA, aFromB, normal,
-                    convexA.PlanesPtr, convexB.PlanesPtr, distance, ref manifold, ref convexA, ref convexB, convexA.ConvexRadius, convexB.ConvexRadius, false, false);
+                return FaceFace(
+                    convexA.VerticesPtr,
+                    convexB.VerticesPtr,
+                    faceIndexA,
+                    faceIndexB,
+                    worldFromA,
+                    aFromB,
+                    normal,
+                    convexA.PlanesPtr,
+                    convexB.PlanesPtr,
+                    distance,
+                    ref manifold,
+                    ref convexA,
+                    ref convexB,
+                    convexA.ConvexRadius,
+                    convexB.ConvexRadius,
+                    false,
+                    false
+                );
             }
         }
 
         // Tries to generate a manifold between a face and an edge.  It can fail for the same reasons as FaceFace().
         // In those cases, FaceEdge() returns false and the caller should generate a contact from the closest points on the shapes.
         private static unsafe bool FaceEdge(
-            in float3* vertexPtrA, in float3* vertexPtrB, int faceIndexA, [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB,
-            float3 normal, float distance, [NoAlias] ref Manifold manifold, Plane* planesA, ref ConvexHull faceConvexA,
-            float convexRadiusA, float convexRadiusB, bool aNegativeScaled = false)
+            in float3* vertexPtrA,
+            in float3* vertexPtrB,
+            int faceIndexA,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float3 normal,
+            float distance,
+            [NoAlias] ref Manifold manifold,
+            Plane* planesA,
+            ref ConvexHull faceConvexA,
+            float convexRadiusA,
+            float convexRadiusB,
+            bool aNegativeScaled = false
+        )
         {
             // Check if the face is nearly perpendicular to the normal
             const float cosMaxAngle = 0.05f;
@@ -863,7 +1200,17 @@ namespace Unity.Physics
             // For each edge of A
             float fracEnterB = 0.0f;
             float fracExitB = 1.0f;
-            for (EdgeIterator edgeA = EdgeIterator.Begin(vertexPtrA, indicesA, -normal, faceA.NumVertices, aNegativeScaled); edgeA.Valid(); edgeA.Advance())
+            for (
+                EdgeIterator edgeA = EdgeIterator.Begin(
+                    vertexPtrA,
+                    indicesA,
+                    -normal,
+                    faceA.NumVertices,
+                    aNegativeScaled
+                );
+                edgeA.Valid();
+                edgeA.Advance()
+            )
             {
                 // Cast edge B against plane A
                 castRayPlane(vertexB0, edgeB, edgeA.Perp, edgeA.Offset, ref fracEnterB, ref fracExitB);
@@ -876,8 +1223,32 @@ namespace Unity.Physics
                 float sumRadii = convexRadiusA + convexRadiusB;
                 float distance0 = (math.dot(vertexB0, planeA.Normal) + planeA.Distance) * -invDotA;
                 float deltaDistance = math.dot(edgeB, planeA.Normal) * -invDotA;
-                foundClosestPoint |= AddEdgeContact(vertexB0, edgeB, distance0, deltaDistance, fracEnterB, normal, convexRadiusB, sumRadii, worldFromA, distance, ref manifold);
-                foundClosestPoint |= AddEdgeContact(vertexB0, edgeB, distance0, deltaDistance, fracExitB, normal, convexRadiusB, sumRadii, worldFromA, distance, ref manifold);
+                foundClosestPoint |= AddEdgeContact(
+                    vertexB0,
+                    edgeB,
+                    distance0,
+                    deltaDistance,
+                    fracEnterB,
+                    normal,
+                    convexRadiusB,
+                    sumRadii,
+                    worldFromA,
+                    distance,
+                    ref manifold
+                );
+                foundClosestPoint |= AddEdgeContact(
+                    vertexB0,
+                    edgeB,
+                    distance0,
+                    deltaDistance,
+                    fracExitB,
+                    normal,
+                    convexRadiusB,
+                    sumRadii,
+                    worldFromA,
+                    distance,
+                    ref manifold
+                );
             }
 
             return foundClosestPoint;
@@ -885,19 +1256,50 @@ namespace Unity.Physics
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool FaceEdge(
-            ref ConvexHull faceConvexA, ref ConvexHull edgeConvexB, int faceIndexA, [NoAlias] in MTransform worldFromA, [NoAlias] in MTransform aFromB,
-            float3 normal, float distance, [NoAlias] ref Manifold manifold)
+            ref ConvexHull faceConvexA,
+            ref ConvexHull edgeConvexB,
+            int faceIndexA,
+            [NoAlias] in MTransform worldFromA,
+            [NoAlias] in MTransform aFromB,
+            float3 normal,
+            float distance,
+            [NoAlias] ref Manifold manifold
+        )
         {
             unsafe
             {
-                return FaceEdge(faceConvexA.VerticesPtr, edgeConvexB.VerticesPtr, faceIndexA, worldFromA, aFromB, normal, distance, ref manifold,
-                    faceConvexA.PlanesPtr, ref faceConvexA, faceConvexA.ConvexRadius, edgeConvexB.ConvexRadius, false);
+                return FaceEdge(
+                    faceConvexA.VerticesPtr,
+                    edgeConvexB.VerticesPtr,
+                    faceIndexA,
+                    worldFromA,
+                    aFromB,
+                    normal,
+                    distance,
+                    ref manifold,
+                    faceConvexA.PlanesPtr,
+                    ref faceConvexA,
+                    faceConvexA.ConvexRadius,
+                    edgeConvexB.ConvexRadius,
+                    false
+                );
             }
         }
 
         // Adds a contact to the manifold from an edge and fraction
-        private static bool AddEdgeContact(float3 vertex0, float3 edge, float distance0, float deltaDistance, float fraction, float3 normalInA, float radiusB, float sumRadii,
-            [NoAlias] in MTransform worldFromA, float distanceThreshold, [NoAlias] ref Manifold manifold)
+        private static bool AddEdgeContact(
+            float3 vertex0,
+            float3 edge,
+            float distance0,
+            float deltaDistance,
+            float fraction,
+            float3 normalInA,
+            float radiusB,
+            float sumRadii,
+            [NoAlias] in MTransform worldFromA,
+            float distanceThreshold,
+            [NoAlias] ref Manifold manifold
+        )
         {
             if (manifold.NumContacts < Manifold.k_MaxNumContacts)
             {
@@ -907,7 +1309,7 @@ namespace Unity.Physics
                 manifold[manifold.NumContacts++] = new ContactPoint
                 {
                     Position = Mul(worldFromA, position + normalInA * radiusB),
-                    Distance = distance - sumRadii
+                    Distance = distance - sumRadii,
                 };
 
                 return distance <= distanceThreshold;

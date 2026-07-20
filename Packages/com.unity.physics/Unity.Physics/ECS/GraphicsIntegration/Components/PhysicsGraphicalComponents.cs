@@ -17,6 +17,7 @@ namespace Unity.Physics.GraphicsIntegration
         /// The body's linear and angular velocity from the most recent physics tick.
         /// </summary>
         public PhysicsVelocity CurrentVelocity;
+
         /// <summary>
         /// If non-zero, apply smoothing.
         /// Set this value to 0 when teleporting a body to prevent smoothing the motion of its graphics representation.
@@ -36,6 +37,7 @@ namespace Unity.Physics.GraphicsIntegration
         /// The body's position and orientation from the previous physics tick.
         /// </summary>
         public RigidTransform PreviousTransform;
+
         /// <summary>
         /// The body's linear and angular velocity from the previous physics tick.
         /// </summary>

@@ -89,7 +89,7 @@ namespace UnityEngine.InputSystem
             /// <summary>
             /// Process value every call to <see cref="InputControl{TValue}.ReadValue()"/> even if unprocessed value has not been changed.
             /// </summary>
-            EvaluateOnEveryRead = 1
+            EvaluateOnEveryRead = 1,
         }
 
         /// <summary>
@@ -176,7 +176,8 @@ namespace UnityEngine.InputSystem
             if (!(value is TValue))
                 throw new ArgumentException(
                     $"Expecting value of type '{typeof(TValue).Name}' but got value '{value}' of type '{value.GetType().Name}'",
-                    nameof(value));
+                    nameof(value)
+                );
 
             var valueOfType = (TValue)value;
 
@@ -192,7 +193,8 @@ namespace UnityEngine.InputSystem
             if (bufferSize < valueSize)
                 throw new ArgumentException(
                     $"Expected buffer of at least {valueSize} bytes but got buffer with just {bufferSize} bytes",
-                    nameof(bufferSize));
+                    nameof(bufferSize)
+                );
 
             var value = default(TValue);
             var valuePtr = UnsafeUtility.AddressOf(ref value);

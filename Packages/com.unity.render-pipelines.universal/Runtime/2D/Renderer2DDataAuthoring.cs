@@ -30,7 +30,7 @@ namespace UnityEngine.Rendering.Universal
                     {
                         Renderer2DDefaultMaterialType.Lit => resources.defaultMesh2DLitMaterial,
                         Renderer2DDefaultMaterialType.Unlit => resources.defaultMesh2DLitMaterial,
-                        _ => m_DefaultCustomMaterial
+                        _ => m_DefaultCustomMaterial,
                     };
                 }
                 case DefaultMaterialType.Sprite:
@@ -40,7 +40,7 @@ namespace UnityEngine.Rendering.Universal
                     {
                         Renderer2DDefaultMaterialType.Lit => resources.defaultLitMaterial,
                         Renderer2DDefaultMaterialType.Unlit => resources.defaultUnlitMaterial,
-                        _ => m_DefaultCustomMaterial
+                        _ => m_DefaultCustomMaterial,
                     };
                 }
                 case DefaultMaterialType.SpriteMask:
@@ -93,7 +93,7 @@ namespace UnityEngine.Rendering.Universal
                     ref var blendStyle = ref m_LightBlendStyles[i];
 
                     // Custom blend mode (99) now falls back to Multiply.
-                    if ((int) blendStyle.blendMode == 99)
+                    if ((int)blendStyle.blendMode == 99)
                         blendStyle.blendMode = Light2DBlendStyle.BlendMode.Multiply;
                 }
 

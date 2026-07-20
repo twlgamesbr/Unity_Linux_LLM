@@ -31,13 +31,23 @@ namespace Unity.Physics.Authoring
             using (var allIncludedIndices = new NativeList<int>(0, Allocator.TempJob))
             using (var blendShapeWeights = new NativeArray<float>(0, Allocator.TempJob))
             using (var allBlendShapeWeights = new NativeList<float>(0, Allocator.TempJob))
-                return FromSkinnedMesh(mesh, leafToBody, includedIndices, allIncludedIndices, blendShapeWeights, allBlendShapeWeights);
+                return FromSkinnedMesh(
+                    mesh,
+                    leafToBody,
+                    includedIndices,
+                    allIncludedIndices,
+                    blendShapeWeights,
+                    allBlendShapeWeights
+                );
         }
 
         public static HashableShapeInputs FromSkinnedMesh(
-            UnityEngine.Mesh mesh, float4x4 leafToBody,
-            NativeArray<int> includedIndices, NativeList<int> allIncludedIndices,
-            NativeArray<float> blendShapeWeights, NativeList<float> allBlendShapeWeights
+            UnityEngine.Mesh mesh,
+            float4x4 leafToBody,
+            NativeArray<int> includedIndices,
+            NativeList<int> allIncludedIndices,
+            NativeArray<float> blendShapeWeights,
+            NativeList<float> allBlendShapeWeights
         )
         {
             using (var result = new NativeArray<HashableShapeInputs>(1, Allocator.TempJob))
@@ -75,7 +85,7 @@ namespace Unity.Physics.Authoring
                     IncludedIndices = tmpIndices,
                     AllIncludedIndices = tmpAllIndices,
                     BlendShapeWeights = tmpBlendWeights,
-                    AllBlendShapeWeights = tmpAllBlendWeights
+                    AllBlendShapeWeights = tmpAllBlendWeights,
                 }.Run();
 
                 if (includedIndices.Length > 0)
@@ -107,26 +117,43 @@ namespace Unity.Physics.Authoring
             public EntityId MeshKey;
             public Bounds Bounds;
             public float4x4 LeafToBody;
-            [ReadOnly] public NativeArray<int> IncludedIndices;
+
+            [ReadOnly]
+            public NativeArray<int> IncludedIndices;
             public NativeList<int> AllIncludedIndices;
-            [ReadOnly] public NativeArray<float> BlendShapeWeights;
+
+            [ReadOnly]
+            public NativeArray<float> BlendShapeWeights;
             public NativeList<float> AllBlendShapeWeights;
 
-            public void Execute() => Result[0] = new HashableShapeInputs(
-                MeshKey, Bounds, LeafToBody, IncludedIndices, AllIncludedIndices, BlendShapeWeights, AllBlendShapeWeights
-            );
+            public void Execute() =>
+                Result[0] = new HashableShapeInputs(
+                    MeshKey,
+                    Bounds,
+                    LeafToBody,
+                    IncludedIndices,
+                    AllIncludedIndices,
+                    BlendShapeWeights,
+                    AllBlendShapeWeights
+                );
         }
 
         HashableShapeInputs(
-            EntityId meshKey, Bounds bounds, float4x4 leafToBody,
+            EntityId meshKey,
+            Bounds bounds,
+            float4x4 leafToBody,
             float linearPrecision = k_DefaultLinearPrecision
         )
         {
             Bounds = new Aabb { Min = bounds.min, Max = bounds.max };
 
             GetQuantizedTransformations(
-                leafToBody, Bounds,
-                out var translation, out var orientation, out var scale, out var shear,
+                leafToBody,
+                Bounds,
+                out var translation,
+                out var orientation,
+                out var scale,
+                out var shear,
                 linearPrecision
             );
 
@@ -140,9 +167,13 @@ namespace Unity.Physics.Authoring
         }
 
         HashableShapeInputs(
-            EntityId meshKey, Bounds bounds, float4x4 leafToBody,
-            NativeArray<int> includedIndices, NativeList<int> allIncludedIndices,
-            NativeArray<float> blendShapeWeights, NativeList<float> allBlendShapeWeights,
+            EntityId meshKey,
+            Bounds bounds,
+            float4x4 leafToBody,
+            NativeArray<int> includedIndices,
+            NativeList<int> allIncludedIndices,
+            NativeArray<float> blendShapeWeights,
+            NativeList<float> allBlendShapeWeights,
             float linearPrecision = k_DefaultLinearPrecision
         )
         {
@@ -164,26 +195,39 @@ namespace Unity.Physics.Authoring
         }
 
         internal static void GetQuantizedTransformations(
-            float4x4 leafToBody, Aabb bounds, out float4x4 transformations,
+            float4x4 leafToBody,
+            Aabb bounds,
+            out float4x4 transformations,
             float linearPrecision = k_DefaultLinearPrecision
         )
         {
             GetQuantizedTransformations(
-                leafToBody, bounds, out var t, out var r, out var s, out var sh, linearPrecision
+                leafToBody,
+                bounds,
+                out var t,
+                out var r,
+                out var s,
+                out var sh,
+                linearPrecision
             );
             transformations = math.mul(new float4x4(sh, 0f), float4x4.TRS(t, r, s));
         }
 
         static void GetQuantizedTransformations(
-            float4x4 leafToBody, Aabb bounds,
-            out float3 translation, out quaternion orientationQ, out float3 scale, out float3x3 shear,
+            float4x4 leafToBody,
+            Aabb bounds,
+            out float3 translation,
+            out quaternion orientationQ,
+            out float3 scale,
+            out float3x3 shear,
             float linearPrecision = k_DefaultLinearPrecision
         )
         {
             translation = RoundToNearest(leafToBody.c3.xyz, linearPrecision);
 
-            var farthestPoint =
-                math.abs(math.lengthsq(bounds.Max) > math.lengthsq(bounds.Min) ? bounds.Max : bounds.Min);
+            var farthestPoint = math.abs(
+                math.lengthsq(bounds.Max) > math.lengthsq(bounds.Min) ? bounds.Max : bounds.Min
+            );
 
             // round scale using precision inversely proportional to mesh size along largest axis
             // (i.e. amount to scale farthest point one unit of linear precision)
@@ -305,8 +349,12 @@ namespace Unity.Physics.Authoring
             var Bounds = new Aabb { Min = meshBounds.min, Max = meshBounds.max };
 
             GetQuantizedTransformations(
-                childToShape, Bounds,
-                out var translation, out var orientation, out var scale, out var shear,
+                childToShape,
+                Bounds,
+                out var translation,
+                out var orientation,
+                out var scale,
+                out var shear,
                 k_DefaultLinearPrecision
             );
 

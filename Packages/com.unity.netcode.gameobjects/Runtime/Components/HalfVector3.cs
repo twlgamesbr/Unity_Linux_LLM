@@ -22,10 +22,12 @@ namespace Unity.Netcode.Components
         /// The half float precision value of the x-axis as a <see cref="half"/>.
         /// </summary>
         public half X => Axis.x;
+
         /// <summary>
         /// The half float precision value of the y-axis as a <see cref="half"/>.
         /// </summary>
         public half Y => Axis.y;
+
         /// <summary>
         /// The half float precision value of the z-axis as a <see cref="half"/>.
         /// </summary>
@@ -77,7 +79,8 @@ namespace Unity.Netcode.Components
         }
 
         /// <inheritdoc />
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             if (serializer.IsReader)
             {
@@ -141,10 +144,8 @@ namespace Unity.Netcode.Components
         /// Constructor that defaults to all axis being synchronized.
         /// </summary>
         /// <param name="vector3">The initial axial values (converted to half floats) when instantiated.</param>
-        public HalfVector3(Vector3 vector3) : this(vector3, math.bool3(true))
-        {
-
-        }
+        public HalfVector3(Vector3 vector3)
+            : this(vector3, math.bool3(true)) { }
 
         /// <summary>
         /// Constructor
@@ -153,9 +154,8 @@ namespace Unity.Netcode.Components
         /// <param name="y">The initial y axis (converted to half float) value when instantiated.</param>
         /// <param name="z">The initial z axis (converted to half float) value when instantiated.</param>
         /// <param name="axisToSynchronize">The axis to synchronize.</param>
-        public HalfVector3(float x, float y, float z, bool3 axisToSynchronize) : this(new Vector3(x, y, z), axisToSynchronize)
-        {
-        }
+        public HalfVector3(float x, float y, float z, bool3 axisToSynchronize)
+            : this(new Vector3(x, y, z), axisToSynchronize) { }
 
         /// <summary>
         /// Constructor that defaults to all axis being synchronized.
@@ -163,8 +163,7 @@ namespace Unity.Netcode.Components
         /// <param name="x">The initial x axis (converted to half float) value when instantiated.</param>
         /// <param name="y">The initial y axis (converted to half float) value when instantiated.</param>
         /// <param name="z">The initial z axis (converted to half float) value when instantiated.</param>
-        public HalfVector3(float x, float y, float z) : this(new Vector3(x, y, z), math.bool3(true))
-        {
-        }
+        public HalfVector3(float x, float y, float z)
+            : this(new Vector3(x, y, z), math.bool3(true)) { }
     }
 }

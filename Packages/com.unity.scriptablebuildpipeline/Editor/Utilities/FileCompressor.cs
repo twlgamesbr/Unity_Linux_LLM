@@ -29,7 +29,12 @@ namespace UnityEditor.Build.Pipeline.Utilities
                 return false;
 
             var files = directory.GetFiles("*", SearchOption.AllDirectories);
-            files = files.Where(x => (File.GetAttributes(x.FullName) & FileAttributes.Hidden) != FileAttributes.Hidden && x.Extension != ".sbpGz").ToArray();
+            files = files
+                .Where(x =>
+                    (File.GetAttributes(x.FullName) & FileAttributes.Hidden) != FileAttributes.Hidden
+                    && x.Extension != ".sbpGz"
+                )
+                .ToArray();
             if (files.Length == 0)
                 return false;
 
@@ -108,10 +113,18 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
                         var pathSeperator = filePath.LastIndexOf("/");
                         if (pathSeperator > -1)
-                            Directory.CreateDirectory(string.Format("{0}/{1}", directoryPath, filePath.Substring(0, pathSeperator)));
+                            Directory.CreateDirectory(
+                                string.Format("{0}/{1}", directoryPath, filePath.Substring(0, pathSeperator))
+                            );
 
                         // Read file contents
-                        using (var fileStream = new FileStream(directoryPath + "/" + filePath, FileMode.OpenOrCreate, FileAccess.Write))
+                        using (
+                            var fileStream = new FileStream(
+                                directoryPath + "/" + filePath,
+                                FileMode.OpenOrCreate,
+                                FileAccess.Write
+                            )
+                        )
                         {
                             byte[] readBuffer = new byte[4096];
                             long readRemaining = fileLenth;

@@ -18,7 +18,12 @@ namespace Unity.Physics.Systems
         {
             public EntityCommandBuffer.ParallelWriter ECB;
 
-            void Execute(in Entity entity, in EnsureUniqueColliderBlobTag tag, ref PhysicsCollider collider, [ChunkIndexInQuery] int chunkIndex)
+            void Execute(
+                in Entity entity,
+                in EnsureUniqueColliderBlobTag tag,
+                ref PhysicsCollider collider,
+                [ChunkIndexInQuery] int chunkIndex
+            )
             {
                 // If the collider is not unique but should be, we need to ensure it is
                 if (!collider.IsUnique)
@@ -38,13 +43,12 @@ namespace Unity.Physics.Systems
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
+            var ecb = SystemAPI
+                .GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>()
+                .CreateCommandBuffer(state.WorldUnmanaged);
 
             // Run on all entities with colliders which are required to be unique and ensure that they are.
-            state.Dependency = new MakeUniqueJob
-            {
-                ECB = ecb.AsParallelWriter()
-            }.ScheduleParallel(state.Dependency);
+            state.Dependency = new MakeUniqueJob { ECB = ecb.AsParallelWriter() }.ScheduleParallel(state.Dependency);
         }
     }
 }

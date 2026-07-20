@@ -1,8 +1,8 @@
 using System;
-using UnityEngine.Assertions;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering
 {
@@ -23,8 +23,8 @@ namespace UnityEngine.Rendering
         public int lodCount;
         public fixed float sqrDistances[LODGroupData.k_MaxLODLevelsCount]; // we use square distance to get rid of a sqrt in gpu culling..
         public fixed float transitionDistances[LODGroupData.k_MaxLODLevelsCount]; // todo - make this a separate data struct (CPUOnly, as we do not support dithering on GPU..)
-        public float worldSpaceSize;// SpeedTree crossfade.
-        public fixed bool percentageFlags[LODGroupData.k_MaxLODLevelsCount];// SpeedTree crossfade.
+        public float worldSpaceSize; // SpeedTree crossfade.
+        public fixed bool percentageFlags[LODGroupData.k_MaxLODLevelsCount]; // SpeedTree crossfade.
         public byte forceLODMask;
     }
 
@@ -64,16 +64,25 @@ namespace UnityEngine.Rendering
             m_FreeLODGroupDataHandles.Dispose();
         }
 
-        public NativeArray<GPUInstanceIndex> GetOrAllocateInstances(in LODGroupUpdateBatch updateBatch, Allocator allocator)
+        public NativeArray<GPUInstanceIndex> GetOrAllocateInstances(
+            in LODGroupUpdateBatch updateBatch,
+            Allocator allocator
+        )
         {
-            var instances = new NativeArray<GPUInstanceIndex>(updateBatch.TotalLength, allocator, NativeArrayOptions.UninitializedMemory);
+            var instances = new NativeArray<GPUInstanceIndex>(
+                updateBatch.TotalLength,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
 
-            int previousRendererCount = LODGroupDataSystemBurst.GetOrAllocateLODGroupDataInstances(updateBatch.instanceIDs,
+            int previousRendererCount = LODGroupDataSystemBurst.GetOrAllocateLODGroupDataInstances(
+                updateBatch.instanceIDs,
                 ref m_LODGroupData,
                 ref m_LODGroupCullingData,
                 ref m_LODGroupDataHash,
                 ref m_FreeLODGroupDataHandles,
-                ref instances);
+                ref instances
+            );
 
             m_CrossfadedRendererCount -= previousRendererCount;
             Assert.IsTrue(m_CrossfadedRendererCount >= 0);
@@ -81,9 +90,16 @@ namespace UnityEngine.Rendering
             return instances;
         }
 
-        public unsafe void UpdateLODGroupData(in LODGroupUpdateBatch updateBatch, NativeArray<GPUInstanceIndex> instances)
+        public unsafe void UpdateLODGroupData(
+            in LODGroupUpdateBatch updateBatch,
+            NativeArray<GPUInstanceIndex> instances
+        )
         {
-            var jobRanges = JaggedJobRange.FromSpanWithRelaxedBatchSize(updateBatch.instanceIDs, 256, Allocator.TempJob);
+            var jobRanges = JaggedJobRange.FromSpanWithRelaxedBatchSize(
+                updateBatch.instanceIDs,
+                256,
+                Allocator.TempJob
+            );
 
             int rendererCount = 0;
 
@@ -96,8 +112,7 @@ namespace UnityEngine.Rendering
                 lodGroupsData = m_LODGroupData.AsArray(),
                 lodGroupsCullingData = m_LODGroupCullingData.AsArray(),
                 rendererCount = new UnsafeAtomicCounter32(&rendererCount),
-            }
-            .RunParallel(jobRanges);
+            }.RunParallel(jobRanges);
 
             m_CrossfadedRendererCount += rendererCount;
 
@@ -106,7 +121,11 @@ namespace UnityEngine.Rendering
 
         public unsafe void UpdateLODGroupTransforms(in LODGroupUpdateBatch updateBatch)
         {
-            var jobRanges = JaggedJobRange.FromSpanWithRelaxedBatchSize(updateBatch.instanceIDs, 256, Allocator.TempJob);
+            var jobRanges = JaggedJobRange.FromSpanWithRelaxedBatchSize(
+                updateBatch.instanceIDs,
+                256,
+                Allocator.TempJob
+            );
 
             new UpdateLODGroupTransformJob()
             {
@@ -118,8 +137,7 @@ namespace UnityEngine.Rendering
                 lodGroupDatas = m_LODGroupData,
                 lodGroupCullingDatas = m_LODGroupCullingData,
                 supportDitheringCrossFade = m_SupportDitheringCrossFade,
-            }
-            .RunParallel(jobRanges);
+            }.RunParallel(jobRanges);
 
             jobRanges.Dispose();
         }
@@ -129,7 +147,12 @@ namespace UnityEngine.Rendering
             if (destroyedLODGroupsID.Length == 0)
                 return;
 
-            int removedRendererCount = LODGroupDataSystemBurst.FreeLODGroupData(destroyedLODGroupsID, ref m_LODGroupData, ref m_LODGroupDataHash, ref m_FreeLODGroupDataHandles);
+            int removedRendererCount = LODGroupDataSystemBurst.FreeLODGroupData(
+                destroyedLODGroupsID,
+                ref m_LODGroupData,
+                ref m_LODGroupDataHash,
+                ref m_FreeLODGroupDataHandles
+            );
 
             m_CrossfadedRendererCount -= removedRendererCount;
             Assert.IsTrue(m_CrossfadedRendererCount >= 0);

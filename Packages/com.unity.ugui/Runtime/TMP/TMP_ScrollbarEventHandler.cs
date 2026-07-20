@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-
 namespace TMPro
 {
     [TMPHelpURL("index")]

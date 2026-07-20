@@ -56,7 +56,7 @@ namespace Unity.Serialization
                 m_DeserializationIndex[id] = value;
             }
         }
-        
+
         /// <summary>
         /// Adds a reference to a deserialized object. This is an internal method.
         /// </summary>
@@ -80,23 +80,20 @@ namespace Unity.Serialization
             m_DeserializationIndex.TryGetValue(id, out var value);
             return value;
         }
-        
+
         /// <summary>
         /// Flags the specified object as being gathered during the serialized reference pre-pass. This is an internal method.
         /// </summary>
         /// <param name="value">The object being visited.</param>
         /// <returns><see langword="true"/> if this is the first time encountering this object; otherwise, <see langword="false"/>.</returns>
-        internal bool SetVisited(object value)
-            => m_References.Add(value);
-        
+        internal bool SetVisited(object value) => m_References.Add(value);
+
         /// <summary>
         /// Flags the specified object as being serialized during the main serialization pass. This is an internal method.
         /// </summary>
         /// <param name="value">The object being serialized.</param>
         /// <returns><see langword="true"/> if this is the first time encountering this object; otherwise, <see langword="false"/>.</returns>
-        internal bool SetSerialized(object value)
-            => m_Serialized.Add(value);
-
+        internal bool SetSerialized(object value) => m_Serialized.Add(value);
 
         /// <summary>
         /// Clears this object for re-use. This is an internal method.
@@ -109,16 +106,15 @@ namespace Unity.Serialization
             m_DeserializationIndex.Clear();
         }
     }
-    
+
     /// <summary>
     /// This visitor is used as a pre-pass to serialization to gather references between objects. This is an internal class.
     /// </summary>
     class SerializedReferenceVisitor : IPropertyBagVisitor, IPropertyVisitor
     {
         SerializedReferences m_SerializedReferences;
-        
-        public void SetSerializedReference(SerializedReferences references)
-            => m_SerializedReferences = references;
+
+        public void SetSerializedReference(SerializedReferences references) => m_SerializedReferences = references;
 
         void IPropertyBagVisitor.Visit<TContainer>(IPropertyBag<TContainer> properties, ref TContainer container)
         {
@@ -129,14 +125,14 @@ namespace Unity.Serialization
         void IPropertyVisitor.Visit<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container)
         {
             var value = property.GetValue(ref container);
-            
+
             var isReferenceType = !TypeTraits<TValue>.IsValueType;
 
             if (isReferenceType)
             {
-                if (null == value) 
+                if (null == value)
                     return;
-                
+
                 isReferenceType = !value.GetType().IsValueType;
             }
 

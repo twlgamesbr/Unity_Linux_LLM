@@ -1,9 +1,9 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -20,13 +20,15 @@ namespace UnityEditor.Rendering
             private set => m_Strippers = value;
         }
 
-        Lazy<string> m_GlobalRenderPipeline = new (FetchGlobalRenderPipelineShaderTag);
+        Lazy<string> m_GlobalRenderPipeline = new(FetchGlobalRenderPipelineShaderTag);
         string globalRenderPipeline => m_GlobalRenderPipeline.Value;
 
         IVariantStripperScope<TShader, TShaderVariant>[] m_Scopes = null;
-        protected virtual IVariantStripperScope<TShader, TShaderVariant>[] scopes => m_Scopes ??= strippers.OfType<IVariantStripperScope<TShader, TShaderVariant>>().ToArray();
+        protected virtual IVariantStripperScope<TShader, TShaderVariant>[] scopes =>
+            m_Scopes ??= strippers.OfType<IVariantStripperScope<TShader, TShaderVariant>>().ToArray();
 
         protected ShaderPreprocessor() { }
+
         protected ShaderPreprocessor(IVariantStripper<TShader, TShaderVariant>[] strippers)
         {
             this.strippers = strippers ?? throw new ArgumentNullException(nameof(strippers));
@@ -51,7 +53,11 @@ namespace UnityEditor.Rendering
             return globalRenderPipelineTag;
         }
 
-        bool TryGetShaderVariantRenderPipelineTag([DisallowNull] TShader shader, TShaderVariant shaderVariant, out string renderPipelineTag)
+        bool TryGetShaderVariantRenderPipelineTag(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            out string renderPipelineTag
+        )
         {
             var inputShader = (Shader)Convert.ChangeType(shader, typeof(Shader));
             var snippetData = (ShaderSnippetData)Convert.ChangeType(shaderVariant, typeof(ShaderSnippetData));
@@ -65,8 +71,10 @@ namespace UnityEditor.Rendering
             // Gather all the implementations of IVariantStripper and add them as the strippers
             foreach (var stripper in TypeCache.GetTypesDerivedFrom<IVariantStripper<TShader, TShaderVariant>>())
             {
-                if (stripper.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null) !=
-                    null)
+                if (
+                    stripper.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null)
+                    != null
+                )
                 {
                     var stripperInstance =
                         Activator.CreateInstance(stripper) as IVariantStripper<TShader, TShaderVariant>;
@@ -78,10 +86,17 @@ namespace UnityEditor.Rendering
             return validStrippers.ToArray();
         }
 
-        bool CanRemoveVariant([DisallowNull] TShader shader, TShaderVariant shaderVariant, ShaderCompilerData shaderCompilerData)
+        bool CanRemoveVariant(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            ShaderCompilerData shaderCompilerData
+        )
         {
             return strippers
-                .Where(s => s is not IVariantStripperSkipper<TShader, TShaderVariant> skipper || !skipper.SkipShader(shader, shaderVariant))
+                .Where(s =>
+                    s is not IVariantStripperSkipper<TShader, TShaderVariant> skipper
+                    || !skipper.SkipShader(shader, shaderVariant)
+                )
                 .All(s => s.CanRemoveVariant(shader, shaderVariant, shaderCompilerData));
         }
 
@@ -93,7 +108,12 @@ namespace UnityEditor.Rendering
         /// <param name="compilerDataList">A list of <see cref="ShaderCompilerData" /></param>
         [CollectionAccess(CollectionAccessType.ModifyExistingContent)]
         [MustUseReturnValue]
-        protected bool TryStripShaderVariants([DisallowNull] TShader shader, TShaderVariant shaderVariant, IList<ShaderCompilerData> compilerDataList, [NotNullWhen(false)] out Exception error)
+        protected bool TryStripShaderVariants(
+            [DisallowNull] TShader shader,
+            TShaderVariant shaderVariant,
+            IList<ShaderCompilerData> compilerDataList,
+            [NotNullWhen(false)] out Exception error
+        )
         {
             if (shader == null)
             {
@@ -131,7 +151,7 @@ namespace UnityEditor.Rendering
                         scopes[i].BeforeShaderStripping(shader);
 
                     // Go through all the shader variants
-                    for (var i = 0; i < afterStrippingShaderVariantCount;)
+                    for (var i = 0; i < afterStrippingShaderVariantCount; )
                     {
                         // Remove at swap back
                         if (CanRemoveVariant(shader, shaderVariant, compilerDataList[i]))
@@ -142,7 +162,13 @@ namespace UnityEditor.Rendering
                 }
 
                 // Remove the shader variants that will be at the back
-                if (!compilerDataList.TryRemoveElementsInRange(afterStrippingShaderVariantCount, compilerDataList.Count - afterStrippingShaderVariantCount, out error))
+                if (
+                    !compilerDataList.TryRemoveElementsInRange(
+                        afterStrippingShaderVariantCount,
+                        compilerDataList.Count - afterStrippingShaderVariantCount,
+                        out error
+                    )
+                )
                     return false;
 
                 if (strippersAvailable)
@@ -152,7 +178,14 @@ namespace UnityEditor.Rendering
                 }
             }
 
-            ShaderStripping.reporter.OnShaderProcessed(shader, shaderVariant, renderPipelineTag, (uint)beforeStrippingInputShaderVariantCount, (uint)compilerDataList.Count, stripTimeMs);
+            ShaderStripping.reporter.OnShaderProcessed(
+                shader,
+                shaderVariant,
+                renderPipelineTag,
+                (uint)beforeStrippingInputShaderVariantCount,
+                (uint)compilerDataList.Count,
+                stripTimeMs
+            );
             ShaderStrippingWatcher.OnShaderProcessed(shader, shaderVariant, (uint)compilerDataList.Count, stripTimeMs);
 
             error = null;

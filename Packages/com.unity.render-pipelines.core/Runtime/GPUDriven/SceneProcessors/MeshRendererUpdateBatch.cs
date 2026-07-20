@@ -45,7 +45,8 @@ namespace UnityEngine.Rendering
         UnsafeList<byte> m_Data;
         GPUComponent m_Component;
 
-        public static GPUComponentUpdate FromArray<T>(GPUComponent component, NativeArray<T> data) where T : unmanaged
+        public static GPUComponentUpdate FromArray<T>(GPUComponent component, NativeArray<T> data)
+            where T : unmanaged
         {
             var typeSize = UnsafeUtility.SizeOf<T>();
             Assert.IsTrue(typeSize == component.SizeInBytes);
@@ -147,14 +148,14 @@ namespace UnityEngine.Rendering
         {
             Unknown,
             All,
-            None
+            None,
         }
 
         public enum BlendProbesUsage
         {
             Unknown,
             AllEnabled,
-            AllDisabled
+            AllDisabled,
         }
 
         public JaggedSpan<EntityId> instanceIDs;
@@ -183,14 +184,16 @@ namespace UnityEngine.Rendering
         public bool useSharedSceneCullingMask; // If true, each sceneCullingMask array in a section contains only one entry that is shared for all instances.
         internal bool mightIncludeTrees; // Only used internally to support Speed Tree with GameObjects.
 
-        public MeshRendererUpdateBatch(MeshRendererComponentMask componentMask,
+        public MeshRendererUpdateBatch(
+            MeshRendererComponentMask componentMask,
             NativeArray<GPUComponent> gpuComponents,
             MeshRendererUpdateType updateType,
             LightmapUsage lightmapUsage,
             BlendProbesUsage blendProbesUsage,
             bool useSharedSceneCullingMask,
             int initialCapacity,
-            Allocator allocator)
+            Allocator allocator
+        )
         {
             if (useSharedSceneCullingMask)
                 Assert.IsTrue(componentMask.HasAnyBit(MeshRendererComponentMask.SceneCullingMask));
@@ -203,22 +206,69 @@ namespace UnityEngine.Rendering
             this.mightIncludeTrees = false;
 
             instanceIDs = new JaggedSpan<EntityId>(initialCapacity, allocator);
-            localToWorlds = new JaggedSpan<float4x4>(componentMask.HasAnyBit(MeshRendererComponentMask.LocalToWorld | MeshRendererComponentMask.LocalBounds) ? initialCapacity : 0, allocator);
-            prevLocalToWorlds = new JaggedSpan<float4x4>(componentMask.HasAnyBit(MeshRendererComponentMask.PrevLocalToWorld) ? initialCapacity : 0, allocator);
-            meshIDs = new JaggedSpan<EntityId>(componentMask.HasAnyBit(MeshRendererComponentMask.Mesh) ? initialCapacity : 0, allocator);
-            materialIDs = new JaggedSpan<EntityId>(componentMask.HasAnyBit(MeshRendererComponentMask.Material) ? initialCapacity : 0, allocator);
-            subMaterialRanges = new JaggedSpan<RangeInt>(componentMask.HasAnyBit(MeshRendererComponentMask.Material) ? initialCapacity : 0, allocator);
-            subMeshStartIndices = new JaggedSpan<ushort>(componentMask.HasAnyBit(MeshRendererComponentMask.SubMeshStartIndex) ? initialCapacity : 0, allocator);
-            localBounds = new JaggedSpan<AABB>(componentMask.HasAnyBit(MeshRendererComponentMask.LocalBounds) ? initialCapacity : 0, allocator);
-            rendererSettings = new JaggedSpan<InternalMeshRendererSettings>(componentMask.HasAnyBit(MeshRendererComponentMask.RendererSettings) ? initialCapacity : 0, allocator);
-            parentLODGroupIDs = new JaggedSpan<EntityId>(componentMask.HasAnyBit(MeshRendererComponentMask.ParentLODGroup) ? initialCapacity : 0, allocator);
-            lodMasks = new JaggedSpan<byte>(componentMask.HasAnyBit(MeshRendererComponentMask.LODMask) ? initialCapacity : 0, allocator);
-            meshLodSettings = new JaggedSpan<InternalMeshLodRendererSettings>(componentMask.HasAnyBit(MeshRendererComponentMask.MeshLodSettings) ? initialCapacity : 0, allocator);
-            lightmapIndices = new JaggedSpan<short>(componentMask.HasAnyBit(MeshRendererComponentMask.Lightmap) ? initialCapacity : 0, allocator);
-            rendererPriorities = new JaggedSpan<int>(componentMask.HasAnyBit(MeshRendererComponentMask.RendererPriority) ? initialCapacity : 0, allocator);
-            sceneCullingMasks = new JaggedSpan<ulong>(componentMask.HasAnyBit(MeshRendererComponentMask.SceneCullingMask) ? initialCapacity : 0, allocator);
+            localToWorlds = new JaggedSpan<float4x4>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.LocalToWorld | MeshRendererComponentMask.LocalBounds)
+                    ? initialCapacity
+                    : 0,
+                allocator
+            );
+            prevLocalToWorlds = new JaggedSpan<float4x4>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.PrevLocalToWorld) ? initialCapacity : 0,
+                allocator
+            );
+            meshIDs = new JaggedSpan<EntityId>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.Mesh) ? initialCapacity : 0,
+                allocator
+            );
+            materialIDs = new JaggedSpan<EntityId>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.Material) ? initialCapacity : 0,
+                allocator
+            );
+            subMaterialRanges = new JaggedSpan<RangeInt>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.Material) ? initialCapacity : 0,
+                allocator
+            );
+            subMeshStartIndices = new JaggedSpan<ushort>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.SubMeshStartIndex) ? initialCapacity : 0,
+                allocator
+            );
+            localBounds = new JaggedSpan<AABB>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.LocalBounds) ? initialCapacity : 0,
+                allocator
+            );
+            rendererSettings = new JaggedSpan<InternalMeshRendererSettings>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.RendererSettings) ? initialCapacity : 0,
+                allocator
+            );
+            parentLODGroupIDs = new JaggedSpan<EntityId>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.ParentLODGroup) ? initialCapacity : 0,
+                allocator
+            );
+            lodMasks = new JaggedSpan<byte>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.LODMask) ? initialCapacity : 0,
+                allocator
+            );
+            meshLodSettings = new JaggedSpan<InternalMeshLodRendererSettings>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.MeshLodSettings) ? initialCapacity : 0,
+                allocator
+            );
+            lightmapIndices = new JaggedSpan<short>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.Lightmap) ? initialCapacity : 0,
+                allocator
+            );
+            rendererPriorities = new JaggedSpan<int>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.RendererPriority) ? initialCapacity : 0,
+                allocator
+            );
+            sceneCullingMasks = new JaggedSpan<ulong>(
+                componentMask.HasAnyBit(MeshRendererComponentMask.SceneCullingMask) ? initialCapacity : 0,
+                allocator
+            );
             sharedSceneCullingMasks = new NativeList<ulong>(useSharedSceneCullingMask ? initialCapacity : 0, allocator);
-            renderingEnabled = new JaggedBitSpan(componentMask.HasAnyBit(MeshRendererComponentMask.RenderingEnabled) ? initialCapacity : 0, allocator);
+            renderingEnabled = new JaggedBitSpan(
+                componentMask.HasAnyBit(MeshRendererComponentMask.RenderingEnabled) ? initialCapacity : 0,
+                allocator
+            );
 
             if (componentMask.HasAnyBit(MeshRendererComponentMask.GPUComponent))
             {
@@ -267,19 +317,46 @@ namespace UnityEngine.Rendering
 
         public bool HasAnyComponent(MeshRendererComponentMask bits) => componentMask.HasAnyBit(bits);
 
-        public NativeArray<float4x4> GetLocalToWorldSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.LocalToWorld | MeshRendererComponentMask.LocalBounds) ? localToWorlds[index] : default;
-        public NativeArray<AABB> GetLocalBoundsSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.LocalBounds) ? localBounds[index] : default;
-        public NativeArray<EntityId> GetMaterialSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.Material) ? materialIDs[index] : default;
-        public NativeArray<RangeInt> GetSubMaterialRangeSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.Material) ? subMaterialRanges[index] : default;
-        public NativeArray<EntityId> GetMeshSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.Mesh) ? meshIDs[index] : default;
-        public NativeArray<short> GetLightmapIndexSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.Lightmap) ? lightmapIndices[index] : default;
-        public NativeArray<int> GetRendererPrioritySectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.RendererPriority) ? rendererPriorities[index] : default;
-        public NativeArray<ushort> GetSubMeshStartIndexSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.SubMeshStartIndex) ? subMeshStartIndices[index] : default;
-        public NativeArray<InternalMeshRendererSettings> GetRendererSettingsSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.RendererSettings) ? rendererSettings[index] : default;
-        public NativeArray<EntityId> GetParentLODGroupIDSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.ParentLODGroup) ? parentLODGroupIDs[index] : default;
-        public NativeArray<byte> GetLODMaskSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.LODMask) ? lodMasks[index] : default;
-        public NativeArray<InternalMeshLodRendererSettings> GetMeshLodSettingsSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.MeshLodSettings) ? meshLodSettings[index] : default;
-        public UnsafeBitArray GetRenderingEnabledSectionOrDefault(int index) => HasAnyComponent(MeshRendererComponentMask.RenderingEnabled) ? renderingEnabled[index] : default;
+        public NativeArray<float4x4> GetLocalToWorldSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.LocalToWorld | MeshRendererComponentMask.LocalBounds)
+                ? localToWorlds[index]
+                : default;
+
+        public NativeArray<AABB> GetLocalBoundsSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.LocalBounds) ? localBounds[index] : default;
+
+        public NativeArray<EntityId> GetMaterialSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.Material) ? materialIDs[index] : default;
+
+        public NativeArray<RangeInt> GetSubMaterialRangeSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.Material) ? subMaterialRanges[index] : default;
+
+        public NativeArray<EntityId> GetMeshSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.Mesh) ? meshIDs[index] : default;
+
+        public NativeArray<short> GetLightmapIndexSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.Lightmap) ? lightmapIndices[index] : default;
+
+        public NativeArray<int> GetRendererPrioritySectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.RendererPriority) ? rendererPriorities[index] : default;
+
+        public NativeArray<ushort> GetSubMeshStartIndexSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.SubMeshStartIndex) ? subMeshStartIndices[index] : default;
+
+        public NativeArray<InternalMeshRendererSettings> GetRendererSettingsSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.RendererSettings) ? rendererSettings[index] : default;
+
+        public NativeArray<EntityId> GetParentLODGroupIDSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.ParentLODGroup) ? parentLODGroupIDs[index] : default;
+
+        public NativeArray<byte> GetLODMaskSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.LODMask) ? lodMasks[index] : default;
+
+        public NativeArray<InternalMeshLodRendererSettings> GetMeshLodSettingsSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.MeshLodSettings) ? meshLodSettings[index] : default;
+
+        public UnsafeBitArray GetRenderingEnabledSectionOrDefault(int index) =>
+            HasAnyComponent(MeshRendererComponentMask.RenderingEnabled) ? renderingEnabled[index] : default;
 
         public void AddSection(in MeshRendererUpdateSection section)
         {
@@ -483,7 +560,13 @@ namespace UnityEngine.Rendering
             if (!ValidateEmptyOrSameLayout(MeshRendererComponentMask.Material, subMaterialRanges, instanceIDs))
                 return;
 
-            if (!ValidateEmptyOrSameLayout(MeshRendererComponentMask.SubMeshStartIndex, subMeshStartIndices, instanceIDs))
+            if (
+                !ValidateEmptyOrSameLayout(
+                    MeshRendererComponentMask.SubMeshStartIndex,
+                    subMeshStartIndices,
+                    instanceIDs
+                )
+            )
                 return;
 
             if (!ValidateEmptyOrSameLayout(MeshRendererComponentMask.LocalBounds, localBounds, instanceIDs))
@@ -510,7 +593,14 @@ namespace UnityEngine.Rendering
             if (!ValidateEmptyOrSameSectionCount(MeshRendererComponentMask.Material, materialIDs, instanceIDs))
                 return;
 
-            if (!ValidateSceneCullingMask(sceneCullingMasks, sharedSceneCullingMasks, useSharedSceneCullingMask, instanceIDs))
+            if (
+                !ValidateSceneCullingMask(
+                    sceneCullingMasks,
+                    sharedSceneCullingMasks,
+                    useSharedSceneCullingMask,
+                    instanceIDs
+                )
+            )
                 return;
 
             foreach (GPUComponentJaggedUpdate jaggedUpdate in gpuComponentUpdates)
@@ -526,7 +616,9 @@ namespace UnityEngine.Rendering
                     // This component must only be set when new instances might be created.
                     // It is only useful to generate correct motion vectors when objects that just got created moved before they got rendered.
                     // Otherwise previous local to worlds will be handled automatically by GRD.
-                    Debug.LogError("Invalid MeshRendererUpdateBatch. PrevLocalToWorld component was set in MeshRendererUpdateType.NoStructuralChanges.");
+                    Debug.LogError(
+                        "Invalid MeshRendererUpdateBatch. PrevLocalToWorld component was set in MeshRendererUpdateType.NoStructuralChanges."
+                    );
                     return;
                 }
             }
@@ -535,7 +627,9 @@ namespace UnityEngine.Rendering
             {
                 if (!HasAnyComponent(MeshRendererComponentMask.LocalToWorld))
                 {
-                    Debug.LogError("Invalid MeshRendererUpdateBatch. PrevLocalToWorld component was set, but not the LocalToWorld.");
+                    Debug.LogError(
+                        "Invalid MeshRendererUpdateBatch. PrevLocalToWorld component was set, but not the LocalToWorld."
+                    );
                     return;
                 }
             }
@@ -548,7 +642,9 @@ namespace UnityEngine.Rendering
                 // GRD doesn't store the local to worlds on the CPU. That would be wasteful memory wise.
                 if (!localToWorlds.HasSameLayout(instanceIDs))
                 {
-                    Debug.LogError("Invalid MeshRendererUpdateBatch. LocalBounds component was set, but local to worlds were not provided.");
+                    Debug.LogError(
+                        "Invalid MeshRendererUpdateBatch. LocalBounds component was set, but local to worlds were not provided."
+                    );
                     return;
                 }
             }
@@ -580,22 +676,28 @@ namespace UnityEngine.Rendering
 #pragma warning restore CS0162
         }
 
-        private bool ValidateSceneCullingMask(JaggedSpan<ulong> sceneCullingMasks,
+        private bool ValidateSceneCullingMask(
+            JaggedSpan<ulong> sceneCullingMasks,
             NativeList<ulong> sharedSceneCullingMasks,
             bool useSharedSceneCullingMask,
-            JaggedSpan<EntityId> instanceIDs)
+            JaggedSpan<EntityId> instanceIDs
+        )
         {
             if (useSharedSceneCullingMask)
             {
                 if (!sceneCullingMasks.isEmpty)
                 {
-                    Debug.LogError("Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.useSharedSceneCullingMask is true but MeshRendererUpdateBatch.sceneCullingMasks is not empty.");
+                    Debug.LogError(
+                        "Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.useSharedSceneCullingMask is true but MeshRendererUpdateBatch.sceneCullingMasks is not empty."
+                    );
                     return false;
                 }
 
                 if (!sharedSceneCullingMasks.IsEmpty && sharedSceneCullingMasks.Length != instanceIDs.sectionCount)
                 {
-                    Debug.LogError($"Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.sharedSceneCullingMasks has an unexpected layout.");
+                    Debug.LogError(
+                        $"Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.sharedSceneCullingMasks has an unexpected layout."
+                    );
                     return false;
                 }
             }
@@ -603,13 +705,17 @@ namespace UnityEngine.Rendering
             {
                 if (!sharedSceneCullingMasks.IsEmpty)
                 {
-                    Debug.LogError("Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.useSharedSceneCullingMask is false but MeshRendererUpdateBatch.sharedSceneCullingMasks is not empty.");
+                    Debug.LogError(
+                        "Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.useSharedSceneCullingMask is false but MeshRendererUpdateBatch.sharedSceneCullingMasks is not empty."
+                    );
                     return false;
                 }
 
                 if (!sceneCullingMasks.isEmpty && !sceneCullingMasks.HasSameLayout(instanceIDs))
                 {
-                    Debug.LogError($"Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.sceneCullingMasks has an unexpected layout.");
+                    Debug.LogError(
+                        $"Invalid MeshRendererUpdateBatch. MeshRendererUpdateBatch.sceneCullingMasks has an unexpected layout."
+                    );
                     return false;
                 }
             }
@@ -624,7 +730,9 @@ namespace UnityEngine.Rendering
                 // Replace when Shader.PropertyIDToName API lands
                 // string propertyName = Shader.PropertyIDToName(update.PropertyID);
                 string propertyName = "<unknown>";
-                Debug.LogError($"Invalid MeshRendererUpdateBatch. Material property update jagged span has an unexpected layout. Shader property: \"{propertyName}\". StrideInBytes: ({update.StrideInBytes}).");
+                Debug.LogError(
+                    $"Invalid MeshRendererUpdateBatch. Material property update jagged span has an unexpected layout. Shader property: \"{propertyName}\". StrideInBytes: ({update.StrideInBytes})."
+                );
                 return false;
             }
 
@@ -633,7 +741,9 @@ namespace UnityEngine.Rendering
                 // Replace when Shader.PropertyIDToName API lands
                 // string propertyName = Shader.PropertyIDToName(update.PropertyID);
                 string propertyName = "<unknown>";
-                Debug.LogError($"Invalid MeshRendererUpdateBatch. Material property size must be a multiple of 4. ByteAddressBuffer only works at 32-bits granularity. Shader property: \"{propertyName}\". StrideInBytes: ({update.StrideInBytes}).");
+                Debug.LogError(
+                    $"Invalid MeshRendererUpdateBatch. Material property size must be a multiple of 4. ByteAddressBuffer only works at 32-bits granularity. Shader property: \"{propertyName}\". StrideInBytes: ({update.StrideInBytes})."
+                );
                 return false;
             }
 
@@ -655,7 +765,9 @@ namespace UnityEngine.Rendering
                     // Replace when Shader.PropertyIDToName API lands
                     // string propertyName = Shader.PropertyIDToName(propertyID);
                     string propertyName = "<unknown>";
-                    Debug.LogError($"Multiple MaterialPropertyJaggedUpdate refer to the same shader property \"{propertyName}\")");
+                    Debug.LogError(
+                        $"Multiple MaterialPropertyJaggedUpdate refer to the same shader property \"{propertyName}\")"
+                    );
                     return false;
                 }
             }
@@ -663,7 +775,12 @@ namespace UnityEngine.Rendering
             return true;
         }
 
-        private bool ValidateEmptyOrSameLayout<T>(MeshRendererComponentMask component, JaggedSpan<T> components, JaggedSpan<EntityId> instanceIDs) where T : unmanaged
+        private bool ValidateEmptyOrSameLayout<T>(
+            MeshRendererComponentMask component,
+            JaggedSpan<T> components,
+            JaggedSpan<EntityId> instanceIDs
+        )
+            where T : unmanaged
         {
             if (!components.isEmpty && !components.HasSameLayout(instanceIDs))
             {
@@ -674,11 +791,18 @@ namespace UnityEngine.Rendering
             return true;
         }
 
-        private bool ValidateEmptyOrSameSectionCount<T>(MeshRendererComponentMask component, JaggedSpan<T> components, JaggedSpan<EntityId> instanceIDs) where T : unmanaged
+        private bool ValidateEmptyOrSameSectionCount<T>(
+            MeshRendererComponentMask component,
+            JaggedSpan<T> components,
+            JaggedSpan<EntityId> instanceIDs
+        )
+            where T : unmanaged
         {
             if (!components.isEmpty && components.sectionCount != instanceIDs.sectionCount)
             {
-                Debug.LogError($"Invalid MeshRendererUpdateBatch. {component} jagged span has an unexpected SectionCount ({components.sectionCount}). Expected value is ({instanceIDs.sectionCount})");
+                Debug.LogError(
+                    $"Invalid MeshRendererUpdateBatch. {component} jagged span has an unexpected SectionCount ({components.sectionCount}). Expected value is ({instanceIDs.sectionCount})"
+                );
                 return false;
             }
 

@@ -9,13 +9,22 @@ namespace UnityEditor.Rendering
         const string k_MainCategoryName = "Main";
 
         // Declare some known SRP Volume categories in order to affect their order. Empty categories won't be displayed.
-        static readonly string[] s_DefaultCategoryNames = { k_MainCategoryName, "Sky", "Lighting", "Shadowing", "Post-processing" };
+        static readonly string[] s_DefaultCategoryNames =
+        {
+            k_MainCategoryName,
+            "Sky",
+            "Lighting",
+            "Shadowing",
+            "Post-processing",
+        };
 
         public Dictionary<string, List<VolumeComponentEditor>> categories { get; } = new();
 
         public DefaultVolumeProfileCategories(VolumeProfile profile)
         {
-            var volumeComponentTypeList = VolumeManager.instance.GetVolumeComponentsForDisplay(GraphicsSettings.currentRenderPipelineAssetType);
+            var volumeComponentTypeList = VolumeManager.instance.GetVolumeComponentsForDisplay(
+                GraphicsSettings.currentRenderPipelineAssetType
+            );
 
             foreach (var defaultCategory in s_DefaultCategoryNames)
                 categories.Add(defaultCategory, new());
@@ -27,14 +36,14 @@ namespace UnityEditor.Rendering
                 {
                     if (type == component.GetType())
                     {
-                        var editor = (VolumeComponentEditor) Editor.CreateEditor(component);
+                        var editor = (VolumeComponentEditor)Editor.CreateEditor(component);
                         editor.SetVolumeProfile(profile);
                         editor.enableOverrides = false;
                         editor.categoryTitle = ToCategoryName(path);
                         editor.Init();
 
                         if (!categories.ContainsKey(editor.categoryTitle))
-                            categories.Add(editor.categoryTitle, new ());
+                            categories.Add(editor.categoryTitle, new());
 
                         categories[editor.categoryTitle].Add(editor);
 
@@ -45,8 +54,7 @@ namespace UnityEditor.Rendering
 
             foreach (var (_, categoryEditors) in categories)
             {
-                categoryEditors.Sort((a, b) =>
-                    a.GetDisplayTitle().text.CompareTo(b.GetDisplayTitle().text));
+                categoryEditors.Sort((a, b) => a.GetDisplayTitle().text.CompareTo(b.GetDisplayTitle().text));
             }
         }
 
@@ -61,8 +69,8 @@ namespace UnityEditor.Rendering
         public void Destroy()
         {
             foreach (var (_, categoryEditors) in categories)
-                foreach (var editor in categoryEditors)
-                    CoreUtils.Destroy(editor);
+            foreach (var editor in categoryEditors)
+                CoreUtils.Destroy(editor);
         }
     }
 }

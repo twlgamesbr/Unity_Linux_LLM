@@ -13,9 +13,15 @@ namespace UnityEngine.Rendering
         /// <param name="translation">Translation component to multiply to the matrix.</param>
         public static void MatrixTimesTranslation(ref Matrix4x4 inOutMatrix, Vector3 translation)
         {
-            inOutMatrix.m03 += (inOutMatrix.m00 * translation.x + inOutMatrix.m01 * translation.y + inOutMatrix.m02 * translation.z);
-            inOutMatrix.m13 += (inOutMatrix.m10 * translation.x + inOutMatrix.m11 * translation.y + inOutMatrix.m12 * translation.z);
-            inOutMatrix.m23 += (inOutMatrix.m20 * translation.x + inOutMatrix.m21 * translation.y + inOutMatrix.m22 * translation.z);
+            inOutMatrix.m03 += (
+                inOutMatrix.m00 * translation.x + inOutMatrix.m01 * translation.y + inOutMatrix.m02 * translation.z
+            );
+            inOutMatrix.m13 += (
+                inOutMatrix.m10 * translation.x + inOutMatrix.m11 * translation.y + inOutMatrix.m12 * translation.z
+            );
+            inOutMatrix.m23 += (
+                inOutMatrix.m20 * translation.x + inOutMatrix.m21 * translation.y + inOutMatrix.m22 * translation.z
+            );
         }
 
         /// <summary>

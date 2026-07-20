@@ -71,8 +71,10 @@ namespace UnityEngine.Rendering
 
             debugManager.UpdateActions();
 
-            if (debugManager.GetAction(DebugAction.EnableDebugMenu) != 0.0f ||
-                debugManager.GetActionToggleDebugMenuWithTouch())
+            if (
+                debugManager.GetAction(DebugAction.EnableDebugMenu) != 0.0f
+                || debugManager.GetActionToggleDebugMenuWithTouch()
+            )
             {
                 debugManager.displayRuntimeUI = !debugManager.displayRuntimeUI;
             }

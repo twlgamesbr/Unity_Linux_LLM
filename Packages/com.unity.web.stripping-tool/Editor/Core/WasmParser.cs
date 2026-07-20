@@ -103,12 +103,7 @@ namespace Unity.Web.Stripping.Editor
         {
             try
             {
-                using var stream = new FileStream(
-                    filePath,
-                    FileMode.Open,
-                    FileAccess.Read,
-                    FileShare.Read
-                );
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 return ParseWasmSectionSizes(stream);
             }
             catch (Exception)
@@ -146,10 +141,7 @@ namespace Unity.Web.Stripping.Editor
             using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
 
             // Check header of WebAssembly file
-            if (
-                reader.ReadUInt32() != k_WebAssemblyMagicNumber
-                || reader.ReadUInt32() != k_WebAssemblyVersion
-            )
+            if (reader.ReadUInt32() != k_WebAssemblyMagicNumber || reader.ReadUInt32() != k_WebAssemblyVersion)
                 return null;
 
             // Parse sections and measure their size
@@ -166,15 +158,12 @@ namespace Unity.Web.Stripping.Editor
                         // Custom section: payload starts with a name string
                         uint nameLen = ReadLEB128(reader);
                         if (stream.Position + nameLen > sectionEnd)
-                            throw new InvalidDataException(
-                                "Custom section name length exceeds section boundary."
-                            );
+                            throw new InvalidDataException("Custom section name length exceeds section boundary.");
                         string name = Encoding.UTF8.GetString(reader.ReadBytes((int)nameLen));
 
                         // There can be multiple sections with the same name.
                         // Accumulate the size of custom sections with same name.
-                        sizes.CustomSections[name] =
-                            sizes.CustomSections.GetValueOrDefault(name, 0L) + sectionSize;
+                        sizes.CustomSections[name] = sizes.CustomSections.GetValueOrDefault(name, 0L) + sectionSize;
                         break;
                     case WasmSectionId.Type:
                         sizes.Type = sectionSize;

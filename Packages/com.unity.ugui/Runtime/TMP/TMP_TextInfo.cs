@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System;
-
+﻿using System;
+using UnityEngine;
 
 namespace TMPro
 {
@@ -27,14 +26,19 @@ namespace TMPro
 
         [NonSerialized]
         public TMP_CharacterInfo[] characterInfo;
+
         [NonSerialized]
         public TMP_WordInfo[] wordInfo;
+
         [NonSerialized]
         public TMP_LinkInfo[] linkInfo;
+
         [NonSerialized]
         public TMP_LineInfo[] lineInfo;
+
         [NonSerialized]
         public TMP_PageInfo[] pageInfo;
+
         [NonSerialized]
         public TMP_MeshInfo[] meshInfo;
 
@@ -80,7 +84,6 @@ namespace TMPro
             materialCount = 1;
         }
 
-
         /// <summary>
         /// Function to clear the counters of the text object.
         /// </summary>
@@ -99,7 +102,6 @@ namespace TMPro
                 this.meshInfo[i].vertexCount = 0;
             }
         }
-
 
         /// <summary>
         ///
@@ -125,7 +127,6 @@ namespace TMPro
             this.meshInfo = new TMP_MeshInfo[1];
         }
 
-
         /// <summary>
         /// Function to clear the content of the MeshInfo array while preserving the Triangles, Normals and Tangents.
         /// </summary>
@@ -134,7 +135,6 @@ namespace TMPro
             for (int i = 0; i < this.meshInfo.Length; i++)
                 this.meshInfo[i].Clear(updateMesh);
         }
-
 
         /// <summary>
         /// Function to clear the content of all the MeshInfo arrays while preserving their Triangles, Normals and Tangents.
@@ -145,7 +145,6 @@ namespace TMPro
                 this.meshInfo[i].Clear(true);
         }
 
-
         /// <summary>
         ///
         /// </summary>
@@ -154,7 +153,6 @@ namespace TMPro
             for (int i = 0; i < this.meshInfo.Length; i++)
                 this.meshInfo[i].ResizeMeshInfo(0, isVolumetric);
         }
-
 
         /// <summary>
         /// Function used to mark unused vertices as degenerate.
@@ -168,7 +166,6 @@ namespace TMPro
                 meshInfo[i].ClearUnusedVertices(start);
             }
         }
-
 
         /// <summary>
         /// Function to clear and initialize the lineInfo array.
@@ -221,7 +218,6 @@ namespace TMPro
             }
         }
 
-
         /// <summary>
         /// Function to copy the MeshInfo Arrays and their primary vertex data content.
         /// </summary>
@@ -264,7 +260,6 @@ namespace TMPro
                     //m_CachedMeshInfo[i].triangles = new int[meshInfo[i].triangles.Length];
                 }
 
-
                 // Only copy the primary vertex data
                 Array.Copy(meshInfo[i].vertices, m_CachedMeshInfo[i].vertices, length);
                 Array.Copy(meshInfo[i].uvs0, m_CachedMeshInfo[i].uvs0, length);
@@ -279,22 +274,19 @@ namespace TMPro
             return m_CachedMeshInfo;
         }
 
-
-
         /// <summary>
         /// Function to resize any of the structure contained in the TMP_TextInfo class.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
         /// <param name="size"></param>
-        public static void Resize<T> (ref T[] array, int size)
+        public static void Resize<T>(ref T[] array, int size)
         {
             // Allocated to the next power of two
             int newSize = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size);
 
             Array.Resize(ref array, newSize);
         }
-
 
         /// <summary>
         /// Function to resize any of the structure contained in the TMP_TextInfo class.
@@ -315,6 +307,5 @@ namespace TMPro
 
             Array.Resize(ref array, size);
         }
-
     }
 }

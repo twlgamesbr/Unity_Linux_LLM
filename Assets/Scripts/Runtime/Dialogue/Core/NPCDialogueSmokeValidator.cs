@@ -1,22 +1,21 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Dialogue.Core
 {
     /// <summary>
@@ -50,11 +49,7 @@ namespace NPCSystem.Dialogue.Core
 
         public async Task ValidateConfiguration()
         {
-            using var scope = NPCFlowScope.Start(
-                Logger,
-                NPCFlowStage.SmokeValidation,
-                "NPC Dialogue Smoke Test"
-            );
+            using var scope = NPCFlowScope.Start(Logger, NPCFlowStage.SmokeValidation, "NPC Dialogue Smoke Test");
 
             bool ok = ValidateComponentReferences();
 
@@ -107,10 +102,7 @@ namespace NPCSystem.Dialogue.Core
                 float startTime = Time.realtimeSinceStartup;
                 float smokeTimeoutSeconds = 60f;
 
-                while (
-                    !_responseCompleted
-                    && Time.realtimeSinceStartup - startTime < smokeTimeoutSeconds
-                )
+                while (!_responseCompleted && Time.realtimeSinceStartup - startTime < smokeTimeoutSeconds)
                 {
                     await Task.Yield();
                 }
@@ -158,10 +150,7 @@ namespace NPCSystem.Dialogue.Core
                     scope.Error(
                         null,
                         "Smoke failed: NPC response was empty.",
-                        new Dictionary<string, object>
-                        {
-                            ["npcSlug"] = _dialogueManager.CurrentProfile.GetNpcSlug(),
-                        }
+                        new Dictionary<string, object> { ["npcSlug"] = _dialogueManager.CurrentProfile.GetNpcSlug() }
                     );
                     Application.Quit(1);
                     return;
@@ -180,10 +169,7 @@ namespace NPCSystem.Dialogue.Core
                 scope.Success(
                     "First-question smoke passed.",
                     NPCFlowTextSanitizer.MergeSummary(
-                        new Dictionary<string, object>
-                        {
-                            ["npcSlug"] = _dialogueManager.CurrentProfile.GetNpcSlug(),
-                        },
+                        new Dictionary<string, object> { ["npcSlug"] = _dialogueManager.CurrentProfile.GetNpcSlug() },
                         "response",
                         _lastResponse,
                         includeSnippet: false,
@@ -203,11 +189,7 @@ namespace NPCSystem.Dialogue.Core
 
         bool ValidateComponentReferences()
         {
-            using var scope = NPCFlowScope.Start(
-                Logger,
-                NPCFlowStage.SmokeValidation,
-                "Component validation"
-            );
+            using var scope = NPCFlowScope.Start(Logger, NPCFlowStage.SmokeValidation, "Component validation");
 
             bool ok = true;
 

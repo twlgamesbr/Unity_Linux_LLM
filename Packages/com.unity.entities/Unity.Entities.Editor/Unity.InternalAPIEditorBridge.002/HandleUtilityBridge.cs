@@ -1,6 +1,6 @@
 using System;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Unity.Editor.Bridge
 {
@@ -10,6 +10,7 @@ namespace Unity.Editor.Bridge
         /// Registers a resolver function that converts entity indices to EntityIds.
         /// </summary>
         /// <param name="method">A function that takes an entity index and returns the corresponding EntityId, or EntityId.None if not found.</param>
-        public static void RegisterEntityIdFromIndexResolver(Func<int, EntityId> method) => HandleUtility.getEntityIdFromIndex += method;
+        public static void RegisterEntityIdFromIndexResolver(Func<int, EntityId> method) =>
+            HandleUtility.getEntityIdFromIndex += method;
     }
 }

@@ -1,8 +1,7 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine.Rendering.RenderGraphModule;
-
 #if UNITY_EDITOR
 using UnityEditor.Rendering;
 #endif
@@ -81,7 +80,7 @@ namespace UnityEngine.Rendering.Tests
                         scriptableRenderContext = renderContext,
                         currentFrameIndex = Time.frameCount,
                         invalidContextForTesting = asset.invalidContextForTesting,
-                        renderTextureUVOriginStrategy = asset.renderTextureUVOriginStrategy
+                        renderTextureUVOriginStrategy = asset.renderTextureUVOriginStrategy,
                     };
 
                     try
@@ -118,9 +117,11 @@ namespace UnityEngine.Rendering.Tests
 
         [SupportedOnRenderPipeline(typeof(RenderGraphTestPipelineAsset))]
         [System.ComponentModel.DisplayName("RenderGraphTest")]
-        internal class RenderGraphTestGlobalSettings : RenderPipelineGlobalSettings<RenderGraphTestGlobalSettings, RenderGraphTestPipelineInstance>
+        internal class RenderGraphTestGlobalSettings
+            : RenderPipelineGlobalSettings<RenderGraphTestGlobalSettings, RenderGraphTestPipelineInstance>
         {
-            [SerializeField] RenderPipelineGraphicsSettingsContainer m_Settings = new();
+            [SerializeField]
+            RenderPipelineGraphicsSettingsContainer m_Settings = new();
 
             protected override List<IRenderPipelineGraphicsSettings> settingsList => m_Settings.settingsList;
         }
@@ -131,7 +132,9 @@ namespace UnityEngine.Rendering.Tests
             // Setting default global settings to the custom RG render pipeline type, no quality settings so we can rely on the default RP
             m_RenderGraphTestGlobalSettings = ScriptableObject.CreateInstance<RenderGraphTestGlobalSettings>();
 #if UNITY_EDITOR
-            EditorGraphicsSettings.SetRenderPipelineGlobalSettingsAsset<RenderGraphTestPipelineInstance>(m_RenderGraphTestGlobalSettings);
+            EditorGraphicsSettings.SetRenderPipelineGlobalSettingsAsset<RenderGraphTestPipelineInstance>(
+                m_RenderGraphTestGlobalSettings
+            );
 #endif
             // Saving old render pipelines to set them back after testing
             m_OldDefaultRenderPipeline = GraphicsSettings.defaultRenderPipeline;
@@ -149,10 +152,7 @@ namespace UnityEngine.Rendering.Tests
             RenderGraph.RenderGraphExceptionMessages.enableCaller = false;
 
             // We need a real ScriptableRenderContext and a camera to execute the Render Graph
-            m_GameObject = new GameObject("testGameObject")
-            {
-                hideFlags = HideFlags.HideAndDontSave
-            };
+            m_GameObject = new GameObject("testGameObject") { hideFlags = HideFlags.HideAndDontSave };
             m_GameObject.tag = "MainCamera";
             m_Camera = m_GameObject.AddComponent<Camera>();
         }

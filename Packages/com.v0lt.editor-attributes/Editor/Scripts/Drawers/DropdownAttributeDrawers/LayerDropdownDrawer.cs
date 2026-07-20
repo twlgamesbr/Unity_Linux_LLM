@@ -1,9 +1,9 @@
-using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
+using UnityEngine;
 using UnityEngine.UIElements;
-using System.Collections.Generic;
 
 namespace EditorAttributes.Editor
 {
@@ -13,18 +13,24 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The LayerDropdown Attribute can only be attached to a string", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The LayerDropdown Attribute can only be attached to a string",
+                    HelpBoxMessageType.Error
+                );
 
             List<string> layerNames = InternalEditorUtility.layers.ToList();
             DropdownField dropdownField = CreateDropdownField(layerNames, property);
 
-            UpdateVisualElement(dropdownField, () =>
-            {
-                List<string> sceneNames = InternalEditorUtility.layers.ToList();
+            UpdateVisualElement(
+                dropdownField,
+                () =>
+                {
+                    List<string> sceneNames = InternalEditorUtility.layers.ToList();
 
-                if (IsCollectionValid(sceneNames))
-                    dropdownField.choices = sceneNames;
-            });
+                    if (IsCollectionValid(sceneNames))
+                        dropdownField.choices = sceneNames;
+                }
+            );
 
             return dropdownField;
         }
@@ -40,10 +46,13 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"Could not paste value <b>{clipboardValue}</b> since is not availiable as an option in the dropdown");
+                Debug.LogWarning(
+                    $"Could not paste value <b>{clipboardValue}</b> since is not availiable as an option in the dropdown"
+                );
             }
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.String;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.String;
     }
 }

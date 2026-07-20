@@ -10,11 +10,7 @@ namespace NPCSystem.Monitoring
     {
         static readonly SHA256 Sha256 = SHA256.Create();
 
-        public static Dictionary<string, object> SummarizeText(
-            string text,
-            bool includeSnippet,
-            int maxSnippetChars
-        )
+        public static Dictionary<string, object> SummarizeText(string text, bool includeSnippet, int maxSnippetChars)
         {
             string safeText = text ?? string.Empty;
             var summary = new Dictionary<string, object>
@@ -25,10 +21,7 @@ namespace NPCSystem.Monitoring
 
             if (includeSnippet)
             {
-                string snippet = safeText
-                    .Replace("\r\n", " ")
-                    .Replace('\n', ' ')
-                    .Replace('\r', ' ');
+                string snippet = safeText.Replace("\r\n", " ").Replace('\n', ' ').Replace('\r', ' ');
                 int limit = Math.Max(0, maxSnippetChars);
                 if (snippet.Length > limit)
                 {
@@ -49,11 +42,7 @@ namespace NPCSystem.Monitoring
         )
         {
             target ??= new Dictionary<string, object>();
-            Dictionary<string, object> summary = SummarizeText(
-                text,
-                includeSnippet,
-                maxSnippetChars
-            );
+            Dictionary<string, object> summary = SummarizeText(text, includeSnippet, maxSnippetChars);
             foreach (KeyValuePair<string, object> pair in summary)
             {
                 target[$"{prefix}{pair.Key}"] = pair.Value;

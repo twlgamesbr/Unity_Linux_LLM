@@ -45,13 +45,18 @@ namespace UnityEngine.InputSystem.Editor
                     message: $"Do you want to save the changes you made in:\n{path}\n\nYour changes will be lost if you don't save them.",
                     ok: "Save",
                     cancel: "Cancel",
-                    alt: "Don't Save");
+                    alt: "Don't Save"
+                );
                 switch (id)
                 {
-                    case 0: return Result.Save;
-                    case 1: return Result.Cancel;
-                    case 2: return Result.Discard;
-                    default: throw new ArgumentOutOfRangeException(nameof(id));
+                    case 0:
+                        return Result.Save;
+                    case 1:
+                        return Result.Cancel;
+                    case 2:
+                        return Result.Discard;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(id));
                 }
             }
 
@@ -77,10 +82,10 @@ namespace UnityEngine.InputSystem.Editor
             {
                 var pressedOkButton = EditorUtility.DisplayDialog(
                     title: "Unsaved changes",
-                    message:
-                    $"You have unsaved changes for '{path}'. Do you want to discard the changes and delete the asset?",
+                    message: $"You have unsaved changes for '{path}'. Do you want to discard the changes and delete the asset?",
                     ok: "Yes, Delete",
-                    cancel: "No, Cancel");
+                    cancel: "No, Cancel"
+                );
                 return pressedOkButton ? Result.Discard : Result.Cancel;
             }
 
@@ -95,8 +100,8 @@ namespace UnityEngine.InputSystem.Editor
 
             #region Create and overwrite existing asset dialog
 
-            private static Func<string, Result>
-            createAndOverwriteExistingAsset = DefaultCreateAndOverwriteExistingAsset;
+            private static Func<string, Result> createAndOverwriteExistingAsset =
+                DefaultCreateAndOverwriteExistingAsset;
 
             internal static void SetCreateAndOverwriteExistingAsset(Func<string, Result> dialog)
             {
@@ -109,7 +114,8 @@ namespace UnityEngine.InputSystem.Editor
                     title: "Create Input Action Asset",
                     message: $"This will overwrite the existing asset: '{path}'. Continue and overwrite?",
                     ok: "Ok",
-                    cancel: "Cancel");
+                    cancel: "Cancel"
+                );
                 return pressedOkButton ? Result.Discard : Result.Cancel;
             }
 
@@ -136,10 +142,12 @@ namespace UnityEngine.InputSystem.Editor
             private static Result DefaultDeleteControlScheme(string controlSchemeName)
             {
                 // Ask for confirmation.
-                var pressedOkButton = EditorUtility.DisplayDialog("Delete scheme?",
+                var pressedOkButton = EditorUtility.DisplayDialog(
+                    "Delete scheme?",
                     message: $"Do you want to delete control scheme '{controlSchemeName}'?",
                     ok: "Delete",
-                    cancel: "Cancel");
+                    cancel: "Cancel"
+                );
                 return pressedOkButton ? Result.Delete : Result.Cancel;
             }
 

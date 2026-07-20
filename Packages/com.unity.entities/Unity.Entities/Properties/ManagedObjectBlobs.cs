@@ -6,12 +6,12 @@ using Unity.Properties;
 
 namespace Unity.Entities
 {
-    unsafe class ManagedObjectBlobs :
-        IPropertyBagVisitor,
-        IPropertyVisitor,
-        ISetPropertyBagVisitor,
-        IListPropertyBagVisitor,
-        IDictionaryPropertyBagVisitor
+    unsafe class ManagedObjectBlobs
+        : IPropertyBagVisitor,
+            IPropertyVisitor,
+            ISetPropertyBagVisitor,
+            IListPropertyBagVisitor,
+            IDictionaryPropertyBagVisitor
     {
         /// <summary>
         /// Set used to track already visited references.
@@ -30,7 +30,11 @@ namespace Unity.Entities
         /// <param name="blobAssetMap">Mapping to track existing blob asset references encountered.</param>
         /// <exception cref="ArgumentNullException">The given object was null.</exception>
         /// <exception cref="MissingPropertyBagException">The given object has no property bag associated with it.</exception>
-        public void GatherBlobAssetReferences(object obj, NativeList<BlobAssetPtr> blobAssets, NativeParallelHashMap<BlobAssetPtr, int> blobAssetMap)
+        public void GatherBlobAssetReferences(
+            object obj,
+            NativeList<BlobAssetPtr> blobAssets,
+            NativeParallelHashMap<BlobAssetPtr, int> blobAssetMap
+        )
         {
             if (null == obj)
             {
@@ -87,7 +91,10 @@ namespace Unity.Entities
         /// <remarks>
         /// We specialize on well known types to avoid struct enumerator boxing.
         /// </remarks>
-        void ISetPropertyBagVisitor.Visit<TSet, TElement>(ISetPropertyBag<TSet, TElement> properties, ref TSet container)
+        void ISetPropertyBagVisitor.Visit<TSet, TElement>(
+            ISetPropertyBag<TSet, TElement> properties,
+            ref TSet container
+        )
         {
             if (container is HashSet<TElement> hashSet)
             {
@@ -111,7 +118,10 @@ namespace Unity.Entities
         /// <remarks>
         /// We specialize on well known types to avoid struct enumerator boxing.
         /// </remarks>
-        void IListPropertyBagVisitor.Visit<TList, TElement>(IListPropertyBag<TList, TElement> properties, ref TList container)
+        void IListPropertyBagVisitor.Visit<TList, TElement>(
+            IListPropertyBag<TList, TElement> properties,
+            ref TList container
+        )
         {
             if (container is List<TElement> list)
             {
@@ -142,7 +152,10 @@ namespace Unity.Entities
         /// <remarks>
         /// We specialize on well known types to avoid struct enumerator boxing.
         /// </remarks>
-        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(IDictionaryPropertyBag<TDictionary, TKey, TValue> properties, ref TDictionary container)
+        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(
+            IDictionaryPropertyBag<TDictionary, TKey, TValue> properties,
+            ref TDictionary container
+        )
         {
             if (container is Dictionary<TKey, TValue> dictionary)
             {

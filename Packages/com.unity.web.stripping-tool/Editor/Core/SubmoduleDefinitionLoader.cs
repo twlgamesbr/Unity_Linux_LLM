@@ -61,8 +61,10 @@ namespace Unity.Web.Stripping.Editor
 
         [JsonIgnore]
         public Version Version => version == null ? DefaultSubmoduleVersion : Version.Parse(version);
+
         [JsonIgnore]
         public Version? MinUnityVersion => SubmoduleDefinitionLoader.ParseUnityVersion(minUnityVersion);
+
         [JsonIgnore]
         public Version? MaxUnityVersion => SubmoduleDefinitionLoader.ParseUnityVersion(maxUnityVersion);
 

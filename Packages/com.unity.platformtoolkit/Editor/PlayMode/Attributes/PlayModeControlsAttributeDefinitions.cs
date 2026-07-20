@@ -23,7 +23,7 @@ namespace Unity.PlatformToolkit.PlayMode
         }
 
         [SerializeField]
-        private ObservableSerializableList<PlayModeControlsAttributeDefinition> m_Definitions = new ();
+        private ObservableSerializableList<PlayModeControlsAttributeDefinition> m_Definitions = new();
         public ObservableSerializableList<PlayModeControlsAttributeDefinition> Definitions => m_Definitions;
 
         public void CreateDefinition()

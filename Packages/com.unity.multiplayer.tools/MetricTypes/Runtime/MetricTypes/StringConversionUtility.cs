@@ -23,7 +23,13 @@ namespace Unity.Multiplayer.Tools.MetricTypes
                 {
                     fixed (char* chars = value)
                     {
-                        UTF8ArrayUnsafeUtility.Copy(fixedString.GetUnsafePtr(), out var copiedLength, FixedString64Bytes.UTF8MaxLengthInBytes, chars, value.Length);
+                        UTF8ArrayUnsafeUtility.Copy(
+                            fixedString.GetUnsafePtr(),
+                            out var copiedLength,
+                            FixedString64Bytes.UTF8MaxLengthInBytes,
+                            chars,
+                            value.Length
+                        );
                         fixedString.Length = copiedLength;
                     }
                 }

@@ -11,7 +11,6 @@ using Unity.Mathematics;
 
 namespace Unity.Collections.LowLevel.Unsafe
 {
-
     [BurstCompile]
     internal unsafe struct UnsafeDisposeJob : IJob
     {
@@ -48,10 +47,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     [DebuggerTypeProxy(typeof(UnsafeListTDebugView<>))]
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct UnsafeList<T>
-        : INativeDisposable
-        , INativeList<T>
-        , IEnumerable<T> // Used by collection initializers.
+    public unsafe struct UnsafeList<T> : INativeDisposable, INativeList<T>, IEnumerable<T> // Used by collection initializers.
         where T : unmanaged
     {
         // <WARNING>
@@ -89,7 +85,6 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             readonly get => CollectionHelper.AssumePositive(m_length);
-
             set
             {
                 if (value > Capacity)
@@ -132,7 +127,6 @@ namespace Unity.Collections.LowLevel.Unsafe
                 CollectionHelper.CheckIndexInRange(index, m_length);
                 return Ptr[CollectionHelper.AssumePositive(index)];
             }
-
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
@@ -219,7 +213,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <param name="ptr">An existing byte array to set as the internal buffer.</param>
         /// <param name="length">The length.</param>
-        public UnsafeList(T* ptr, int length) : this()
+        public UnsafeList(T* ptr, int length)
+            : this()
         {
             Ptr = ptr;
             m_length = length;
@@ -233,7 +228,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="initialCapacity">The initial capacity of the list.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public UnsafeList(int initialCapacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory)
+        public UnsafeList(
+            int initialCapacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.UninitializedMemory
+        )
         {
             Ptr = null;
             m_length = 0;
@@ -251,7 +250,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(AllocatorManager.AllocatorHandle) })]
-        internal static UnsafeList<T>* Create<U>(int initialCapacity, ref U allocator, NativeArrayOptions options) where U : unmanaged, AllocatorManager.IAllocator
+        internal static UnsafeList<T>* Create<U>(int initialCapacity, ref U allocator, NativeArrayOptions options)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
             UnsafeList<T>* listData = allocator.Allocate(default(UnsafeList<T>), 1);
             *listData = new UnsafeList<T>(initialCapacity, allocator.Handle, options);
@@ -259,7 +259,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(AllocatorManager.AllocatorHandle) })]
-        internal static void Destroy<U>(UnsafeList<T>* listData, ref U allocator) where U : unmanaged, AllocatorManager.IAllocator
+        internal static void Destroy<U>(UnsafeList<T>* listData, ref U allocator)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
             CheckNull(listData);
             listData->Dispose(ref allocator);
@@ -273,7 +274,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
         /// <returns>A pointer to the new list.</returns>
-        public static UnsafeList<T>* Create(int initialCapacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory)
+        public static UnsafeList<T>* Create(
+            int initialCapacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.UninitializedMemory
+        )
         {
             UnsafeList<T>* listData = AllocatorManager.Allocate<UnsafeList<T>>(allocator);
             *listData = new UnsafeList<T>(initialCapacity, allocator, options);
@@ -314,7 +319,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(AllocatorManager.AllocatorHandle) })]
-        internal void Dispose<U>(ref U allocator) where U : unmanaged, AllocatorManager.IAllocator
+        internal void Dispose<U>(ref U allocator)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
             allocator.Free(Ptr, m_capacity);
             Ptr = null;
@@ -404,7 +410,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             }
         }
 
-        void ResizeExact<U>(ref U allocator, int newCapacity) where U : unmanaged, AllocatorManager.IAllocator
+        void ResizeExact<U>(ref U allocator, int newCapacity)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
             newCapacity = math.max(0, newCapacity);
 
@@ -438,7 +445,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             ResizeExact(ref Allocator, capacity);
         }
 
-        void SetCapacity<U>(ref U allocator, int capacity) where U : unmanaged, AllocatorManager.IAllocator
+        void SetCapacity<U>(ref U allocator, int capacity)
+            where U : unmanaged, AllocatorManager.IAllocator
         {
             CollectionHelper.CheckCapacityInRange(capacity, Length);
 
@@ -851,8 +859,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// Use <see cref="AsReadOnly"/> to create a read only for a list.
         /// </remarks>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe struct ReadOnly
-            : IEnumerable<T>
+        public unsafe struct ReadOnly : IEnumerable<T>
         {
             /// <summary>
             /// The internal buffer of the list.
@@ -926,7 +933,12 @@ namespace Unity.Collections.LowLevel.Unsafe
             /// <returns>An enumerator over the elements of the list.</returns>
             public Enumerator GetEnumerator()
             {
-                return new Enumerator { m_Ptr = Ptr, m_Length = Length, m_Index = -1 };
+                return new Enumerator
+                {
+                    m_Ptr = Ptr,
+                    m_Length = Length,
+                    m_Index = -1,
+                };
             }
 
             /// <summary>
@@ -954,7 +966,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// **Obsolete.** Use <see cref="AsReadOnly"/> instead.
         /// </summary>
         /// <returns>A parallel reader of this list.</returns>
-//        [Obsolete("'AsParallelReader' has been deprecated; use 'AsReadOnly' instead. (UnityUpgradable) -> AsReadOnly")]
+        //        [Obsolete("'AsParallelReader' has been deprecated; use 'AsReadOnly' instead. (UnityUpgradable) -> AsReadOnly")]
         public ParallelReader AsParallelReader()
         {
             return new ParallelReader(Ptr, Length);
@@ -966,8 +978,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <remarks>
         /// Use <see cref="AsParallelReader"/> to create a parallel reader for a list.
         /// </remarks>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-//        [Obsolete("'ParallelReader' has been deprecated; use 'ReadOnly' instead. (UnityUpgradable) -> ReadOnly")]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        //        [Obsolete("'ParallelReader' has been deprecated; use 'ReadOnly' instead. (UnityUpgradable) -> ReadOnly")]
         public unsafe struct ParallelReader
         {
             /// <summary>
@@ -1023,7 +1035,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <remarks>
         /// Use <see cref="AsParallelWriter"/> to create a parallel writer for a list.
         /// </remarks>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public unsafe struct ParallelWriter
         {
             /// <summary>
@@ -1032,10 +1044,7 @@ namespace Unity.Collections.LowLevel.Unsafe
             public readonly void* Ptr
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    return ListData->Ptr;
-                }
+                get { return ListData->Ptr; }
             }
 
             /// <summary>
@@ -1098,7 +1107,7 @@ namespace Unity.Collections.LowLevel.Unsafe
                     {
                         AddRangeNoResize(ptr, count);
                     }
-                } 
+                }
             }
 
             /// <summary>
@@ -1138,7 +1147,12 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <returns>An enumerator over the elements of the list.</returns>
         public Enumerator GetEnumerator()
         {
-            return new Enumerator { m_Ptr = Ptr, m_Length = Length, m_Index = -1 };
+            return new Enumerator
+            {
+                m_Ptr = Ptr,
+                m_Length = Length,
+                m_Index = -1,
+            };
         }
 
         /// <summary>
@@ -1283,7 +1297,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             if (Capacity < index + length)
             {
-                throw new InvalidOperationException($"AddNoResize assumes that list capacity is sufficient (Capacity {Capacity}, Length {Length}), requested length {length}!");
+                throw new InvalidOperationException(
+                    $"AddNoResize assumes that list capacity is sufficient (Capacity {Capacity}, Length {Length}), requested length {length}!"
+                );
             }
         }
 
@@ -1295,7 +1311,9 @@ namespace Unity.Collections.LowLevel.Unsafe
 
             if (maxCapacity < newLength)
             {
-                throw new InvalidOperationException($"Capacity is insufficient, and resize would fail (Capacity {maxCapacity}, Length {currentLength}), requested length {newLength}!");
+                throw new InvalidOperationException(
+                    $"Capacity is insufficient, and resize would fail (Capacity {maxCapacity}, Length {currentLength}), requested length {newLength}!"
+                );
             }
         }
     }
@@ -1304,7 +1322,7 @@ namespace Unity.Collections.LowLevel.Unsafe
     /// Provides extension methods for UnsafeList.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static class UnsafeListExtensions
+    public static unsafe class UnsafeListExtensions
     {
         /// <summary>
         /// Finds the index of the first occurrence of a particular value in this list.
@@ -1314,8 +1332,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="container">This list.</param>
         /// <param name="value">A value to locate.</param>
         /// <returns>The zero-based index of the first occurrence of the value if it is found. Returns -1 if no occurrence is found.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static int IndexOf<T, U>(this UnsafeList<T> container, U value) where T : unmanaged, IEquatable<U>
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static int IndexOf<T, U>(this UnsafeList<T> container, U value)
+            where T : unmanaged, IEquatable<U>
         {
             return NativeArrayExtensions.IndexOf(container.AsReadOnlySpan(), value);
         }
@@ -1328,8 +1347,9 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="container">This list.</param>
         /// <param name="value">The value to locate.</param>
         /// <returns>True if the value is present in this list.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(this UnsafeList<T> container, U value) where T : unmanaged, IEquatable<U>
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static bool Contains<T, U>(this UnsafeList<T> container, U value)
+            where T : unmanaged, IEquatable<U>
         {
             return container.IndexOf(value) != -1;
         }
@@ -1343,7 +1363,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="value">A value to locate.</param>
         /// <returns>The zero-based index of the first occurrence of the value if it is found. Returns -1 if no occurrence is found.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public static int IndexOf<T, U>(this UnsafeList<T>.ReadOnly container, U value) where T : unmanaged, IEquatable<U>
+        public static int IndexOf<T, U>(this UnsafeList<T>.ReadOnly container, U value)
+            where T : unmanaged, IEquatable<U>
         {
             return NativeArrayExtensions.IndexOf(container.AsReadOnlySpan(), value);
         }
@@ -1357,7 +1378,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="value">The value to locate.</param>
         /// <returns>True if the value is present in the list.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(this UnsafeList<T>.ReadOnly container, U value) where T : unmanaged, IEquatable<U>
+        public static bool Contains<T, U>(this UnsafeList<T>.ReadOnly container, U value)
+            where T : unmanaged, IEquatable<U>
         {
             return container.IndexOf(value) != -1;
         }
@@ -1370,24 +1392,26 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="container">This reader of the list.</param>
         /// <param name="value">A value to locate.</param>
         /// <returns>The zero-based index of the first occurrence of the value if it is found. Returns -1 if no occurrence is found.</returns>
-//        [Obsolete("'UnsafeList<T>.ParallelReader' has been deprecated; use 'UnsafeList<T>.ReadOnly' instead.")]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static int IndexOf<T, U>(this UnsafeList<T>.ParallelReader container, U value) where T : unmanaged, IEquatable<U>
+        //        [Obsolete("'UnsafeList<T>.ParallelReader' has been deprecated; use 'UnsafeList<T>.ReadOnly' instead.")]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static int IndexOf<T, U>(this UnsafeList<T>.ParallelReader container, U value)
+            where T : unmanaged, IEquatable<U>
         {
             return NativeArrayExtensions.IndexOf(container.AsReadOnlySpan(), value);
         }
 
         /// <summary>
-        /// **Obsolete.** Use <see cref="UnsafeList{T}.ReadOnly"/> instead. 
+        /// **Obsolete.** Use <see cref="UnsafeList{T}.ReadOnly"/> instead.
         /// </summary>
         /// <typeparam name="T">The type of elements in the list.</typeparam>
         /// <typeparam name="U">The type of value to locate.</typeparam>
         /// <param name="container">This reader of the list.</param>
         /// <param name="value">The value to locate.</param>
         /// <returns>True if the value is present in the list.</returns>
-//        [Obsolete("'UnsafeList<T>.ParallelReader' has been deprecated; use 'UnsafeList<T>.ReadOnly' instead.")]
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int), typeof(int) })]
-        public static bool Contains<T, U>(this UnsafeList<T>.ParallelReader container, U value) where T : unmanaged, IEquatable<U>
+        //        [Obsolete("'UnsafeList<T>.ParallelReader' has been deprecated; use 'UnsafeList<T>.ReadOnly' instead.")]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(int) })]
+        public static bool Contains<T, U>(this UnsafeList<T>.ParallelReader container, U value)
+            where T : unmanaged, IEquatable<U>
         {
             return container.IndexOf(value) != -1;
         }
@@ -1399,7 +1423,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="container">The container to compare for equality.</param>
         /// <param name="other">The other container to compare for equality.</param>
         /// <returns>True if the containers have equal length and content.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public static bool ArraysEqual<T>(this UnsafeList<T> container, in UnsafeList<T> other)
             where T : unmanaged, IEquatable<T>
         {
@@ -1414,7 +1438,6 @@ namespace Unity.Collections.LowLevel.Unsafe
 
             return true;
         }
-
     }
 
     internal sealed class UnsafeListTDebugView<T>
@@ -1453,8 +1476,9 @@ namespace Unity.Collections.LowLevel.Unsafe
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct UnsafePtrList<T>
         : INativeDisposable
-        // IIndexable<T> and INativeList<T> can't be implemented because this[index] and ElementAt return T* instead of T.
-        , IEnumerable<IntPtr> // Used by collection initializers.
+            // IIndexable<T> and INativeList<T> can't be implemented because this[index] and ElementAt return T* instead of T.
+            ,
+            IEnumerable<IntPtr> // Used by collection initializers.
         where T : unmanaged
     {
         // <WARNING>
@@ -1519,7 +1543,6 @@ namespace Unity.Collections.LowLevel.Unsafe
                 CollectionHelper.CheckIndexInRange(index, Length);
                 return Ptr[CollectionHelper.AssumePositive(index)];
             }
-
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
@@ -1545,7 +1568,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <param name="ptr">An existing pointer array to set as the internal buffer.</param>
         /// <param name="length">The length.</param>
-        public unsafe UnsafePtrList(T** ptr, int length) : this()
+        public unsafe UnsafePtrList(T** ptr, int length)
+            : this()
         {
             Ptr = ptr;
             m_length = length;
@@ -1559,7 +1583,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="initialCapacity">The initial capacity of the list.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public unsafe UnsafePtrList(int initialCapacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory)
+        public unsafe UnsafePtrList(
+            int initialCapacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.UninitializedMemory
+        )
         {
             Ptr = null;
             m_length = 0;
@@ -1590,7 +1618,11 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
         /// <returns>A pointer to the new list.</returns>
-        public static UnsafePtrList<T>* Create(int initialCapacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory)
+        public static UnsafePtrList<T>* Create(
+            int initialCapacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.UninitializedMemory
+        )
         {
             UnsafePtrList<T>* listData = AllocatorManager.Allocate<UnsafePtrList<T>>(allocator);
             *listData = new UnsafePtrList<T>(initialCapacity, allocator, options);
@@ -1604,10 +1636,10 @@ namespace Unity.Collections.LowLevel.Unsafe
         public static void Destroy(UnsafePtrList<T>* listData)
         {
             UnsafeList<IntPtr>.CheckNull(listData);
-            var allocator = listData->ListData().Allocator.Value == AllocatorManager.Invalid.Value
-                ? AllocatorManager.Persistent
-                : listData->ListData().Allocator
-            ;
+            var allocator =
+                listData->ListData().Allocator.Value == AllocatorManager.Invalid.Value
+                    ? AllocatorManager.Persistent
+                    : listData->ListData().Allocator;
             listData->Dispose();
             AllocatorManager.Free(allocator, listData);
         }
@@ -1658,7 +1690,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// </summary>
         /// <param name="length">The new length.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public void Resize(int length, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory) => this.ListData().Resize(length, options);
+        public void Resize(int length, NativeArrayOptions options = NativeArrayOptions.UninitializedMemory) =>
+            this.ListData().Resize(length, options);
 
         /// <summary>
         /// Sets the capacity.
@@ -1945,7 +1978,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// **Obsolete**. Use <see cref="AsReadOnly"/> instead.
         /// </summary>
         /// <returns>A parallel reader of this list.</returns>
-//        [Obsolete("'AsParallelReader' has been deprecated; use 'AsReadOnly' instead. (UnityUpgradable) -> AsReadOnly")]
+        //        [Obsolete("'AsParallelReader' has been deprecated; use 'AsReadOnly' instead. (UnityUpgradable) -> AsReadOnly")]
         public ParallelReader AsParallelReader()
         {
             return new ParallelReader(Ptr, Length);
@@ -1957,7 +1990,7 @@ namespace Unity.Collections.LowLevel.Unsafe
         /// <remarks>
         /// Use <see cref="AsParallelReader"/> to create a parallel reader for a list.
         /// </remarks>
-//        [Obsolete("'ParallelReader' has been deprecated; use 'ReadOnly' instead. (UnityUpgradable) -> ReadOnly")]
+        //        [Obsolete("'ParallelReader' has been deprecated; use 'ReadOnly' instead. (UnityUpgradable) -> ReadOnly")]
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public unsafe struct ParallelReader
         {
@@ -2078,11 +2111,13 @@ namespace Unity.Collections.LowLevel.Unsafe
     {
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref UnsafeList<IntPtr> ListData<T>(ref this UnsafePtrList<T> from) where T : unmanaged => ref UnsafeUtility.As<UnsafePtrList<T>, UnsafeList<IntPtr>>(ref from);
+        public static ref UnsafeList<IntPtr> ListData<T>(ref this UnsafePtrList<T> from)
+            where T : unmanaged => ref UnsafeUtility.As<UnsafePtrList<T>, UnsafeList<IntPtr>>(ref from);
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UnsafeList<IntPtr> ListDataRO<T>(this UnsafePtrList<T> from) where T : unmanaged => UnsafeUtility.As<UnsafePtrList<T>, UnsafeList<IntPtr>>(ref from);
+        public static UnsafeList<IntPtr> ListDataRO<T>(this UnsafePtrList<T> from)
+            where T : unmanaged => UnsafeUtility.As<UnsafePtrList<T>, UnsafeList<IntPtr>>(ref from);
     }
 
     internal sealed class UnsafePtrListDebugView<T>

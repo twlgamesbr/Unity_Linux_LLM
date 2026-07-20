@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
-using UnityEngine.UIElements;
+using UnityEngine;
 using UnityEngine.Assertions;
-using static UnityEditor.Rendering.Universal.ShaderGraph.SubShaderUtils;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UIElements;
 using static Unity.Rendering.Universal.ShaderUtils;
+using static UnityEditor.Rendering.Universal.ShaderGraph.SubShaderUtils;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
@@ -64,15 +64,55 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
             // terrain shaders are always opaque, so these values are hardcoded to not inherit from the Universal Target
             var renderTypeOpaque = RenderType.Opaque.ToString();
-            var renderQueue = target.alphaClip?RenderQueue.AlphaTest.ToString():RenderQueue.Geometry.ToString();
+            var renderQueue = target.alphaClip ? RenderQueue.AlphaTest.ToString() : RenderQueue.Geometry.ToString();
 
-            context.AddSubShader(PostProcessSubShader(TerrainSubShaders.LitComputeDotsSubShader(target, renderTypeOpaque, renderQueue, blendModePreserveSpecular)));
-            context.AddSubShader(PostProcessSubShader(TerrainSubShaders.LitGLESSubShader(target, renderTypeOpaque, renderQueue, blendModePreserveSpecular)));
+            context.AddSubShader(
+                PostProcessSubShader(
+                    TerrainSubShaders.LitComputeDotsSubShader(
+                        target,
+                        renderTypeOpaque,
+                        renderQueue,
+                        blendModePreserveSpecular
+                    )
+                )
+            );
+            context.AddSubShader(
+                PostProcessSubShader(
+                    TerrainSubShaders.LitGLESSubShader(target, renderTypeOpaque, renderQueue, blendModePreserveSpecular)
+                )
+            );
 
-            context.AddSubShader(PostProcessSubShader(TerrainLitAddSubShaders.LitComputeDotsSubShader(target, renderTypeOpaque, renderQueue, blendModePreserveSpecular)));
-            context.AddSubShader(PostProcessSubShader(TerrainLitAddSubShaders.LitGLESSubShader(target, renderTypeOpaque, renderQueue, blendModePreserveSpecular)));
+            context.AddSubShader(
+                PostProcessSubShader(
+                    TerrainLitAddSubShaders.LitComputeDotsSubShader(
+                        target,
+                        renderTypeOpaque,
+                        renderQueue,
+                        blendModePreserveSpecular
+                    )
+                )
+            );
+            context.AddSubShader(
+                PostProcessSubShader(
+                    TerrainLitAddSubShaders.LitGLESSubShader(
+                        target,
+                        renderTypeOpaque,
+                        renderQueue,
+                        blendModePreserveSpecular
+                    )
+                )
+            );
 
-            context.AddSubShader(PostProcessSubShader(TerrainLitBaseMapGenSubShaders.GenerateBaseMap(target, renderTypeOpaque, renderQueue, blendModePreserveSpecular)));
+            context.AddSubShader(
+                PostProcessSubShader(
+                    TerrainLitBaseMapGenSubShaders.GenerateBaseMap(
+                        target,
+                        renderTypeOpaque,
+                        renderQueue,
+                        blendModePreserveSpecular
+                    )
+                )
+            );
         }
 
         public override void ProcessPreviewMaterial(Material material)
@@ -100,15 +140,15 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         public override void GetActiveBlocks(ref TargetActiveBlockContext context)
         {
             context.AddBlock(BlockFields.SurfaceDescription.Smoothness);
-            context.AddBlock(BlockFields.SurfaceDescription.NormalOS,    normalDropOffSpace == NormalDropOffSpace.Object);
-            context.AddBlock(BlockFields.SurfaceDescription.NormalTS,    normalDropOffSpace == NormalDropOffSpace.Tangent);
-            context.AddBlock(BlockFields.SurfaceDescription.NormalWS,    normalDropOffSpace == NormalDropOffSpace.World);
+            context.AddBlock(BlockFields.SurfaceDescription.NormalOS, normalDropOffSpace == NormalDropOffSpace.Object);
+            context.AddBlock(BlockFields.SurfaceDescription.NormalTS, normalDropOffSpace == NormalDropOffSpace.Tangent);
+            context.AddBlock(BlockFields.SurfaceDescription.NormalWS, normalDropOffSpace == NormalDropOffSpace.World);
             context.AddBlock(BlockFields.SurfaceDescription.Emission);
             context.AddBlock(BlockFields.SurfaceDescription.Occlusion);
 
             // when the surface options are material controlled, we must show all of these blocks
             // when target controlled, we can cull the unnecessary blocks
-            context.AddBlock(BlockFields.SurfaceDescription.Specular,    target.allowMaterialOverride);
+            context.AddBlock(BlockFields.SurfaceDescription.Specular, target.allowMaterialOverride);
             context.AddBlock(BlockFields.SurfaceDescription.Metallic);
             context.AddBlock(BlockFields.SurfaceDescription.Alpha, target.alphaClip);
             context.AddBlock(BlockFields.SurfaceDescription.AlphaClipThreshold, target.alphaClip);
@@ -116,283 +156,355 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
         public override void CollectShaderProperties(PropertyCollector collector, GenerationMode generationMode)
         {
-            collector.AddShaderProperty(new BooleanShaderProperty
-            {
-                value = enableInstancedPerPixelNormal,
-                hidden = false,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_EnableInstancedPerPixelNormal",
-                displayName = "Enable Instanced per Pixel Normal",
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.White,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_TerrainHolesTexture",
-                displayName = "Holes Map (RGB)",
-            });
+            collector.AddShaderProperty(
+                new BooleanShaderProperty
+                {
+                    value = enableInstancedPerPixelNormal,
+                    hidden = false,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_EnableInstancedPerPixelNormal",
+                    displayName = "Enable Instanced per Pixel Normal",
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.White,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_TerrainHolesTexture",
+                    displayName = "Holes Map (RGB)",
+                }
+            );
 
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.White,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_DefaultWhiteTex",
-                displayName = "DefaultWhiteTex",
-            });
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.White,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_DefaultWhiteTex",
+                    displayName = "DefaultWhiteTex",
+                }
+            );
 
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.NormalMap,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_NormalBlank",
-                displayName = "Empty Normal Map",
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.Black,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_BlackTex",
-                displayName = "Empty Texture",
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.White,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Splat0",
-                displayName = "Layer 0 (R)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.White,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Splat1",
-                displayName = "Layer 1 (G)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.White,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Splat2",
-                displayName = "Layer 2 (B)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.White,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Splat3",
-                displayName = "Layer 3 (A)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.Grey,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Mask3",
-                displayName = "Layer 3 (A)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.Grey,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Mask2",
-                displayName = "Layer 2 (B)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.Grey,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Mask1",
-                displayName = "Layer 1 (G)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Texture2DShaderProperty
-            {
-                defaultType = Texture2DShaderProperty.DefaultType.Grey,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Mask0",
-                displayName = "Layer 0 (R)",
-                useTilingAndOffset = true,
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Metallic0",
-                displayName = "Metallic 0",
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Metallic1",
-                displayName = "Metallic 1",
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Metallic2",
-                displayName = "Metallic 2",
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Metallic3",
-                displayName = "Metallic 3",
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                value = 1.0f,
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Smoothness0",
-                displayName = "Smoothness 0",
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                value = 1.0f,
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Smoothness1",
-                displayName = "Smoothness 1",
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                value = 1.0f,
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Smoothness2",
-                displayName = "Smoothness 2",
-            });
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                value = 1.0f,
-                floatType = FloatType.Slider,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
-                overrideReferenceName = "_Smoothness3",
-                displayName = "Smoothness 3",
-            });
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.NormalMap,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_NormalBlank",
+                    displayName = "Empty Normal Map",
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.Black,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_BlackTex",
+                    displayName = "Empty Texture",
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.White,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Splat0",
+                    displayName = "Layer 0 (R)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.White,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Splat1",
+                    displayName = "Layer 1 (G)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.White,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Splat2",
+                    displayName = "Layer 2 (B)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.White,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Splat3",
+                    displayName = "Layer 3 (A)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.Grey,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Mask3",
+                    displayName = "Layer 3 (A)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.Grey,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Mask2",
+                    displayName = "Layer 2 (B)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.Grey,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Mask1",
+                    displayName = "Layer 1 (G)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Texture2DShaderProperty
+                {
+                    defaultType = Texture2DShaderProperty.DefaultType.Grey,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Mask0",
+                    displayName = "Layer 0 (R)",
+                    useTilingAndOffset = true,
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Metallic0",
+                    displayName = "Metallic 0",
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Metallic1",
+                    displayName = "Metallic 1",
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Metallic2",
+                    displayName = "Metallic 2",
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Metallic3",
+                    displayName = "Metallic 3",
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    value = 1.0f,
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Smoothness0",
+                    displayName = "Smoothness 0",
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    value = 1.0f,
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Smoothness1",
+                    displayName = "Smoothness 1",
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    value = 1.0f,
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Smoothness2",
+                    displayName = "Smoothness 2",
+                }
+            );
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    value = 1.0f,
+                    floatType = FloatType.Slider,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.DoNotDeclare,
+                    overrideReferenceName = "_Smoothness3",
+                    displayName = "Smoothness 3",
+                }
+            );
 
-            collector.AddShaderProperty(new Vector1ShaderProperty
-            {
-                floatType = FloatType.Default,
-                value = 0.0f,
-                hidden = true,
-                overrideHLSLDeclaration = true,
-                hlslDeclarationOverride = HLSLDeclaration.Global,
-                overrideReferenceName = "_DstBlend",
-                displayName = "DstBlend",
-            });
+            collector.AddShaderProperty(
+                new Vector1ShaderProperty
+                {
+                    floatType = FloatType.Default,
+                    value = 0.0f,
+                    hidden = true,
+                    overrideHLSLDeclaration = true,
+                    hlslDeclarationOverride = HLSLDeclaration.Global,
+                    overrideReferenceName = "_DstBlend",
+                    displayName = "DstBlend",
+                }
+            );
         }
 
-        public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public override void GetPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
-            context.AddProperty("Depth Write", new EnumField(ZWriteControl.Auto) { value = target.zWriteControl }, (evt) =>
-            {
-                if (Equals(target.zWriteControl, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Depth Write",
+                new EnumField(ZWriteControl.Auto) { value = target.zWriteControl },
+                (evt) =>
+                {
+                    if (Equals(target.zWriteControl, evt.newValue))
+                        return;
 
-                registerUndo("Change Depth Write Control");
-                target.zWriteControl = (ZWriteControl)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Depth Write Control");
+                    target.zWriteControl = (ZWriteControl)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Depth Test", new EnumField(ZTestModeForUI.LEqual) { value = (ZTestModeForUI)target.zTestMode }, (evt) =>
-            {
-                if (Equals(target.zTestMode, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Depth Test",
+                new EnumField(ZTestModeForUI.LEqual) { value = (ZTestModeForUI)target.zTestMode },
+                (evt) =>
+                {
+                    if (Equals(target.zTestMode, evt.newValue))
+                        return;
 
-                registerUndo("Change Depth Test");
-                target.zTestMode = (ZTestMode)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Depth Test");
+                    target.zTestMode = (ZTestMode)evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Alpha Clipping", new Toggle() { value = target.alphaClip }, (evt) =>
-            {
-                if (Equals(target.alphaClip, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Alpha Clipping",
+                new Toggle() { value = target.alphaClip },
+                (evt) =>
+                {
+                    if (Equals(target.alphaClip, evt.newValue))
+                        return;
 
-                registerUndo("Change Alpha Clip");
-                target.alphaClip = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Alpha Clip");
+                    target.alphaClip = evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Cast Shadows", new Toggle() { value = target.castShadows }, (evt) =>
-            {
-                if (Equals(target.castShadows, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Cast Shadows",
+                new Toggle() { value = target.castShadows },
+                (evt) =>
+                {
+                    if (Equals(target.castShadows, evt.newValue))
+                        return;
 
-                registerUndo("Change Cast Shadows");
-                target.castShadows = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Cast Shadows");
+                    target.castShadows = evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Receive Shadows", new Toggle() {value = target.receiveShadows}, (evt) =>
-            {
-                if (Equals(target.receiveShadows, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Receive Shadows",
+                new Toggle() { value = target.receiveShadows },
+                (evt) =>
+                {
+                    if (Equals(target.receiveShadows, evt.newValue))
+                        return;
 
-                registerUndo("Change Receive Shadows");
-                target.receiveShadows = evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Receive Shadows");
+                    target.receiveShadows = evt.newValue;
+                    onChange();
+                }
+            );
 
-            context.AddProperty("Fragment Normal Space", new EnumField(NormalDropOffSpace.Tangent) { value = normalDropOffSpace }, (evt) =>
-            {
-                if (Equals(normalDropOffSpace, evt.newValue))
-                    return;
+            context.AddProperty(
+                "Fragment Normal Space",
+                new EnumField(NormalDropOffSpace.Tangent) { value = normalDropOffSpace },
+                (evt) =>
+                {
+                    if (Equals(normalDropOffSpace, evt.newValue))
+                        return;
 
-                registerUndo("Change Fragment Normal Space");
-                normalDropOffSpace = (NormalDropOffSpace)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Fragment Normal Space");
+                    normalDropOffSpace = (NormalDropOffSpace)evt.newValue;
+                    onChange();
+                }
+            );
         }
 
         protected override int ComputeMaterialNeedsUpdateHash()
@@ -408,7 +520,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             Never = 1,
             Less = 2,
             Equal = 3,
-            LEqual = 4,     // default for most rendering
+            LEqual = 4, // default for most rendering
             Greater = 5,
             NotEqual = 6,
             GEqual = 7,
@@ -440,13 +552,18 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Template
         static class TerrainLitTemplate
         {
-            public static readonly string kPassTemplate = "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainPass.template";
+            public static readonly string kPassTemplate =
+                "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainPass.template";
             public static readonly string[] kSharedTemplateDirectories;
 
             static TerrainLitTemplate()
             {
                 kSharedTemplateDirectories = new string[UniversalTarget.kSharedTemplateDirectories.Length + 1];
-                Array.Copy(UniversalTarget.kSharedTemplateDirectories, kSharedTemplateDirectories, UniversalTarget.kSharedTemplateDirectories.Length);
+                Array.Copy(
+                    UniversalTarget.kSharedTemplateDirectories,
+                    kSharedTemplateDirectories,
+                    UniversalTarget.kSharedTemplateDirectories.Length
+                );
                 kSharedTemplateDirectories[^1] = "Packages/com.unity.render-pipelines.universal/Editor/Terrain/";
             }
         }
@@ -458,23 +575,70 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             public struct Varyings
             {
                 public static FieldDescriptor uvSplat01 = new FieldDescriptor(
-                    StructFields.Varyings.name, "uvSplat01", "", ShaderValueType.Float4, "TEXCOORD1", preprocessor: "defined(UNIVERSAL_TERRAIN_SPLAT01)", subscriptOptions: StructFieldOptions.Optional);
+                    StructFields.Varyings.name,
+                    "uvSplat01",
+                    "",
+                    ShaderValueType.Float4,
+                    "TEXCOORD1",
+                    preprocessor: "defined(UNIVERSAL_TERRAIN_SPLAT01)",
+                    subscriptOptions: StructFieldOptions.Optional
+                );
                 public static FieldDescriptor uvSplat23 = new FieldDescriptor(
-                    StructFields.Varyings.name, "uvSplat23", "", ShaderValueType.Float4, "TEXCOORD2", preprocessor: "defined(UNIVERSAL_TERRAIN_SPLAT23)", subscriptOptions: StructFieldOptions.Optional);
+                    StructFields.Varyings.name,
+                    "uvSplat23",
+                    "",
+                    ShaderValueType.Float4,
+                    "TEXCOORD2",
+                    preprocessor: "defined(UNIVERSAL_TERRAIN_SPLAT23)",
+                    subscriptOptions: StructFieldOptions.Optional
+                );
                 public static FieldDescriptor normalViewDir = new FieldDescriptor(
-                    StructFields.Varyings.name, "normalViewDir", "", ShaderValueType.Float4, "TEXCOORD3", "defined(_NORMALMAP) && !defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)", StructFieldOptions.Optional);
+                    StructFields.Varyings.name,
+                    "normalViewDir",
+                    "",
+                    ShaderValueType.Float4,
+                    "TEXCOORD3",
+                    "defined(_NORMALMAP) && !defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)",
+                    StructFieldOptions.Optional
+                );
                 public static FieldDescriptor tangentViewDir = new FieldDescriptor(
-                    StructFields.Varyings.name, "tangentViewDir", "", ShaderValueType.Float4, "TEXCOORD4", "defined(_NORMALMAP) && !defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)", StructFieldOptions.Optional);
+                    StructFields.Varyings.name,
+                    "tangentViewDir",
+                    "",
+                    ShaderValueType.Float4,
+                    "TEXCOORD4",
+                    "defined(_NORMALMAP) && !defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)",
+                    StructFieldOptions.Optional
+                );
                 public static FieldDescriptor bitangentViewDir = new FieldDescriptor(
-                    StructFields.Varyings.name, "bitangentViewDir", "", ShaderValueType.Float4, "TEXCOORD5", "defined(_NORMALMAP) && !defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)", StructFieldOptions.Optional);
+                    StructFields.Varyings.name,
+                    "bitangentViewDir",
+                    "",
+                    ShaderValueType.Float4,
+                    "TEXCOORD5",
+                    "defined(_NORMALMAP) && !defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)",
+                    StructFieldOptions.Optional
+                );
             }
 
             public struct SurfaceDescriptionInputs
             {
                 public static FieldDescriptor uvSplat01 = new FieldDescriptor(
-                    StructFields.SurfaceDescriptionInputs.name, "uvSplat01", "", ShaderValueType.Float4, "TEXCOORD1", "defined(UNIVERSAL_TERRAIN_SPLAT01)");
+                    StructFields.SurfaceDescriptionInputs.name,
+                    "uvSplat01",
+                    "",
+                    ShaderValueType.Float4,
+                    "TEXCOORD1",
+                    "defined(UNIVERSAL_TERRAIN_SPLAT01)"
+                );
                 public static FieldDescriptor uvSplat23 = new FieldDescriptor(
-                    StructFields.SurfaceDescriptionInputs.name, "uvSplat23", "", ShaderValueType.Float4, "TEXCOORD2", "defined(UNIVERSAL_TERRAIN_SPLAT23)");
+                    StructFields.SurfaceDescriptionInputs.name,
+                    "uvSplat23",
+                    "",
+                    ShaderValueType.Float4,
+                    "TEXCOORD2",
+                    "defined(UNIVERSAL_TERRAIN_SPLAT23)"
+                );
             }
         }
 
@@ -495,7 +659,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     StructFields.Attributes.color,
                     StructFields.Attributes.instanceID,
                     StructFields.Attributes.vertexID,
-                }
+                },
             };
 
             public static StructDescriptor MetaAttributes = new StructDescriptor()
@@ -513,7 +677,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     StructFields.Attributes.color,
                     StructFields.Attributes.instanceID,
                     StructFields.Attributes.vertexID,
-                }
+                },
             };
 
             public static StructDescriptor Varyings = new StructDescriptor()
@@ -547,7 +711,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     UniversalStructFields.Varyings.stereoTargetEyeIndexAsBlendIdx0,
                     UniversalStructFields.Varyings.stereoTargetEyeIndexAsRTArrayIdx,
                     StructFields.Varyings.cullFace,
-                }
+                },
             };
 
             public static StructDescriptor MetaVaryings = new StructDescriptor()
@@ -581,7 +745,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     UniversalStructFields.Varyings.stereoTargetEyeIndexAsBlendIdx0,
                     UniversalStructFields.Varyings.stereoTargetEyeIndexAsRTArrayIdx,
                     StructFields.Varyings.cullFace,
-                }
+                },
             };
 
             private static StructDescriptor SurfaceDescriptionInputsImpl()
@@ -640,12 +804,20 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             };
 
             // SM 4.5, compute with dots instancing
-            public static SubShaderDescriptor LitComputeDotsSubShader(UniversalTarget target, string renderType, string renderQueue, bool blendModePreserveSpecular)
+            public static SubShaderDescriptor LitComputeDotsSubShader(
+                UniversalTarget target,
+                string renderType,
+                string renderQueue,
+                bool blendModePreserveSpecular
+            )
             {
                 SubShaderDescriptor result = new SubShaderDescriptor()
                 {
                     pipelineTag = UniversalTarget.kPipelineTag,
-                    customTags = string.Concat(UniversalTarget.kLitMaterialTypeTag, UniversalTarget.kTerrainMaterialTypeTag),
+                    customTags = string.Concat(
+                        UniversalTarget.kLitMaterialTypeTag,
+                        UniversalTarget.kTerrainMaterialTypeTag
+                    ),
                     renderType = renderType,
                     renderQueue = renderQueue,
                     generatesPreview = true,
@@ -653,15 +825,21 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     shaderDependencies = new List<ShaderDependency>(),
                 };
 
-                result.passes.Add(TerrainLitPasses.Forward(target, blendModePreserveSpecular, TerrainCorePragmas.DOTSForward));
+                result.passes.Add(
+                    TerrainLitPasses.Forward(target, blendModePreserveSpecular, TerrainCorePragmas.DOTSForward)
+                );
                 result.passes.Add(TerrainLitPasses.GBuffer(target, blendModePreserveSpecular));
 
                 // cull the shadowcaster pass if we know it will never be used
                 if (target.castShadows || target.allowMaterialOverride)
-                    result.passes.Add(PassVariant(TerrainLitPasses.ShadowCaster(target), TerrainCorePragmas.DOTSInstanced));
+                    result.passes.Add(
+                        PassVariant(TerrainLitPasses.ShadowCaster(target), TerrainCorePragmas.DOTSInstanced)
+                    );
 
                 if (target.mayWriteDepth)
-                    result.passes.Add(PassVariant(TerrainLitPasses.DepthOnly(target), TerrainCorePragmas.DOTSInstanced));
+                    result.passes.Add(
+                        PassVariant(TerrainLitPasses.DepthOnly(target), TerrainCorePragmas.DOTSInstanced)
+                    );
 
                 result.passes.Add(PassVariant(TerrainLitPasses.DepthNormal(target), TerrainCorePragmas.DOTSInstanced));
                 result.passes.Add(PassVariant(TerrainLitPasses.Meta(target), TerrainCorePragmas.DOTSInstanced));
@@ -678,7 +856,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 return result;
             }
 
-            public static SubShaderDescriptor LitGLESSubShader(UniversalTarget target, string renderType, string renderQueue, bool blendModePreserveSpecular)
+            public static SubShaderDescriptor LitGLESSubShader(
+                UniversalTarget target,
+                string renderType,
+                string renderQueue,
+                bool blendModePreserveSpecular
+            )
             {
                 // SM 2.0, GLES
 
@@ -688,7 +871,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 SubShaderDescriptor result = new SubShaderDescriptor()
                 {
                     pipelineTag = UniversalTarget.kPipelineTag,
-                    customTags = string.Concat(UniversalTarget.kLitMaterialTypeTag, UniversalTarget.kTerrainMaterialTypeTag),
+                    customTags = string.Concat(
+                        UniversalTarget.kLitMaterialTypeTag,
+                        UniversalTarget.kTerrainMaterialTypeTag
+                    ),
                     renderType = renderType,
                     renderQueue = renderQueue,
                     generatesPreview = true,
@@ -727,7 +913,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             private static InstancingOptions[] InstancingOptionList()
             {
-                return new []
+                return new[]
                 {
                     InstancingOptions.AssumeUniformScaling,
                     InstancingOptions.NoMatrices,
@@ -791,7 +977,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             public static readonly PragmaCollection DOTSForward = new PragmaCollection
             {
                 { Pragma.Target(ShaderModel.Target45) },
-                { Pragma.ExcludeRenderers(new[] {Platform.GLES3, Platform.GLCore}) },
+                { Pragma.ExcludeRenderers(new[] { Platform.GLES3, Platform.GLCore }) },
                 { Pragma.MultiCompileInstancing },
                 { Pragma.MultiCompileFog },
                 { Pragma.InstancingOptions(InstancingOptionList()) },
@@ -820,7 +1006,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             {
                 RenderState.ZTest(target.zTestMode.ToString()),
                 RenderState.Cull(Cull.Back),
-                RenderState.Blend(Blend.One, Blend.Zero)
+                RenderState.Blend(Blend.One, Blend.Zero),
             };
             switch (target.zWriteControl)
             {
@@ -838,13 +1024,21 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Passes
         internal static class TerrainLitPasses
         {
-            private static void AddReceiveShadowsControlToPass(ref PassDescriptor pass, UniversalTarget target, bool receiveShadows)
+            private static void AddReceiveShadowsControlToPass(
+                ref PassDescriptor pass,
+                UniversalTarget target,
+                bool receiveShadows
+            )
             {
                 if (!receiveShadows)
                     pass.defines.Add(TerrainLitKeywords.ReceiveShadowsOff, 1);
             }
 
-            public static PassDescriptor Forward(UniversalTarget target, bool blendModePreserveSpecular, PragmaCollection pragmas = null)
+            public static PassDescriptor Forward(
+                UniversalTarget target,
+                bool blendModePreserveSpecular,
+                PragmaCollection pragmas = null
+            )
             {
                 var result = new PassDescriptor()
                 {
@@ -870,12 +1064,12 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     // Conditional State
                     renderStates = GetTerrainRenderState(target),
                     pragmas = pragmas ?? TerrainCorePragmas.Forward,
-                    defines = new DefineCollection() { CoreDefines.UseFragmentFog, },
+                    defines = new DefineCollection() { CoreDefines.UseFragmentFog },
                     keywords = new KeywordCollection() { TerrainLitKeywords.Forward },
                     includes = TerrainCoreIncludes.Forward,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
                 result.defines.Add(TerrainDefines.TerrainSplat01, 1);
@@ -885,7 +1079,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 result.keywords.Add(TerrainDefines.TerrainInstancedPerPixelNormal);
                 result.defines.Add(TerrainDefines.MetallicSpecGlossMap, 1);
                 result.defines.Add(TerrainDefines.SmoothnessTextureAlbedoChannelA, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
 
                 CorePasses.AddAlphaClipControlToPass(ref result, target);
                 AddReceiveShadowsControlToPass(ref result, target, target.receiveShadows);
@@ -924,7 +1118,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = TerrainCoreIncludes.GBuffer,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
@@ -935,7 +1129,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 result.keywords.Add(TerrainDefines.TerrainInstancedPerPixelNormal);
                 result.defines.Add(TerrainDefines.MetallicSpecGlossMap, 1);
                 result.defines.Add(TerrainDefines.SmoothnessTextureAlbedoChannelA, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
 
                 CorePasses.AddAlphaClipControlToPass(ref result, target);
                 AddReceiveShadowsControlToPass(ref result, target, target.receiveShadows);
@@ -969,15 +1163,15 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     renderStates = CoreRenderStates.ShadowCaster(target),
                     pragmas = TerrainCorePragmas.Instanced,
                     defines = new DefineCollection(),
-                    keywords = new KeywordCollection() { CoreKeywords.ShadowCaster,  },
+                    keywords = new KeywordCollection() { CoreKeywords.ShadowCaster },
                     includes = TerrainCoreIncludes.ShadowCaster,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
 
                 if (target.alphaClip)
                     result.defines.Add(CoreKeywordDescriptors.AlphaTestOn, 1);
@@ -1016,11 +1210,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     includes = TerrainCoreIncludes.DepthOnly,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
 
                 if (target.alphaClip)
                     result.defines.Add(CoreKeywordDescriptors.AlphaTestOn, 1);
@@ -1055,17 +1249,17 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     renderStates = CoreRenderStates.DepthNormalsOnly(target),
                     pragmas = TerrainCorePragmas.Instanced,
                     defines = new DefineCollection(),
-                    keywords = new KeywordCollection() { TerrainSubShaders.AlphaTestOn, },
+                    keywords = new KeywordCollection() { TerrainSubShaders.AlphaTestOn },
                     includes = TerrainCoreIncludes.DepthNormalsOnly,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
                 result.defines.Add(TerrainDefines.TerrainSplat01, 1);
                 result.defines.Add(TerrainDefines.TerrainSplat23, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
                 result.keywords.Add(TerrainDefines.TerrainNormalmap);
                 result.keywords.Add(TerrainDefines.TerrainInstancedPerPixelNormal);
 
@@ -1101,11 +1295,15 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     renderStates = CoreRenderStates.Meta,
                     pragmas = TerrainCorePragmas.Default,
                     defines = new DefineCollection() { CoreDefines.UseFragmentFog },
-                    keywords = new KeywordCollection() { CoreKeywordDescriptors.EditorVisualization, TerrainSubShaders.AlphaTestOn, },
+                    keywords = new KeywordCollection()
+                    {
+                        CoreKeywordDescriptors.EditorVisualization,
+                        TerrainSubShaders.AlphaTestOn,
+                    },
                     includes = TerrainCoreIncludes.Meta,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
@@ -1113,7 +1311,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 result.defines.Add(TerrainDefines.TerrainSplat23, 1);
                 result.defines.Add(TerrainDefines.MetallicSpecGlossMap, 1);
                 result.defines.Add(TerrainDefines.SmoothnessTextureAlbedoChannelA, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
 
                 if (target.alphaClip)
                     result.defines.Add(CoreKeywordDescriptors.AlphaTestOn, 1);
@@ -1147,16 +1345,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     // Conditional State
                     renderStates = CoreRenderStates.SceneSelection(target),
                     pragmas = TerrainCorePragmas.Default,
-                    defines = new DefineCollection { CoreDefines.SceneSelection, },
-                    keywords = new KeywordCollection() { TerrainSubShaders.AlphaTestOn, },
+                    defines = new DefineCollection { CoreDefines.SceneSelection },
+                    keywords = new KeywordCollection() { TerrainSubShaders.AlphaTestOn },
                     includes = TerrainCoreIncludes.SceneSelection,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
 
                 if (target.alphaClip)
                     result.defines.Add(CoreKeywordDescriptors.AlphaTestOn, 1);
@@ -1190,16 +1388,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     // Conditional State
                     renderStates = CoreRenderStates.ScenePicking(target),
                     pragmas = TerrainCorePragmas.Default,
-                    defines = new DefineCollection { CoreDefines.ScenePicking, },
-                    keywords = new KeywordCollection() { TerrainSubShaders.AlphaTestOn, },
+                    defines = new DefineCollection { CoreDefines.ScenePicking },
+                    keywords = new KeywordCollection() { TerrainSubShaders.AlphaTestOn },
                     includes = TerrainCoreIncludes.ScenePicking,
 
                     // Custom Interpolator Support
-                    customInterpolators = CoreCustomInterpDescriptors.Common
+                    customInterpolators = CoreCustomInterpDescriptors.Common,
                 };
 
                 result.defines.Add(TerrainDefines.TerrainEnabled, 1);
-                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip?1:0);
+                result.defines.Add(TerrainDefines.TerrainAlphaClipEnable, target.alphaClip ? 1 : 0);
 
                 if (target.alphaClip)
                     result.defines.Add(CoreKeywordDescriptors.AlphaTestOn, 1);
@@ -1220,6 +1418,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     shaderName = "Hidden/{Name}_AddPass",
                 };
             }
+
             public static ShaderDependency BaseMapShader()
             {
                 return new ShaderDependency()
@@ -1228,6 +1427,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     shaderName = "Hidden/Universal Render Pipeline/Terrain/Lit (Base Pass)",
                 };
             }
+
             public static ShaderDependency BaseMapGenShader()
             {
                 return new ShaderDependency()
@@ -1291,7 +1491,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 UniversalStructFields.Varyings.dynamicLightmapUV,
                 UniversalStructFields.Varyings.sh,
                 UniversalStructFields.Varyings.fogFactorAndVertexLight, // fog and vertex lighting, vert input is dependency
-                UniversalStructFields.Varyings.shadowCoord,             // shadow coord, vert input is dependency
+                UniversalStructFields.Varyings.shadowCoord, // shadow coord, vert input is dependency
                 TerrainStructFields.SurfaceDescriptionInputs.uvSplat01,
                 TerrainStructFields.SurfaceDescriptionInputs.uvSplat23,
             };
@@ -1313,7 +1513,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 UniversalStructFields.Varyings.dynamicLightmapUV,
                 UniversalStructFields.Varyings.sh,
                 UniversalStructFields.Varyings.fogFactorAndVertexLight, // fog and vertex lighting, vert input is dependency
-                UniversalStructFields.Varyings.shadowCoord,             // shadow coord, vert input is dependency
+                UniversalStructFields.Varyings.shadowCoord, // shadow coord, vert input is dependency
                 TerrainStructFields.SurfaceDescriptionInputs.uvSplat01,
                 TerrainStructFields.SurfaceDescriptionInputs.uvSplat23,
             };
@@ -1354,16 +1554,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             {
                 StructFields.Attributes.positionOS,
                 StructFields.Attributes.normalOS,
-                StructFields.Attributes.uv0,                            //
-                StructFields.Attributes.uv1,                            // needed for meta vertex position
-                StructFields.Attributes.uv2,                            // needed for meta UVs
-                StructFields.Attributes.instanceID,                     // needed for rendering instanced terrain
+                StructFields.Attributes.uv0, //
+                StructFields.Attributes.uv1, // needed for meta vertex position
+                StructFields.Attributes.uv2, // needed for meta UVs
+                StructFields.Attributes.instanceID, // needed for rendering instanced terrain
                 TerrainStructFields.Varyings.uvSplat01,
                 TerrainStructFields.Varyings.uvSplat23,
                 StructFields.Varyings.positionCS,
-                StructFields.Varyings.texCoord0,                        // needed for meta UVs
-                StructFields.Varyings.texCoord1,                        // VizUV
-                StructFields.Varyings.texCoord2,                        // LightCoord
+                StructFields.Varyings.texCoord0, // needed for meta UVs
+                StructFields.Varyings.texCoord1, // VizUV
+                StructFields.Varyings.texCoord2, // LightCoord
                 StructFields.Varyings.instanceID,
                 TerrainStructFields.SurfaceDescriptionInputs.uvSplat01,
                 TerrainStructFields.SurfaceDescriptionInputs.uvSplat23,
@@ -1540,22 +1740,37 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         #region Includes
         static class TerrainCoreIncludes
         {
-            public static readonly string kVaryings = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Varyings.hlsl";
-            public static readonly string kShaderPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl";
-            public static readonly string kShadows = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl";
-            public static readonly string kMetaInput = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl";
-            public static readonly string kDepthOnlyPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/DepthOnlyPass.hlsl";
-            public static readonly string kDepthNormalsOnlyPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Terrain/DepthNormalsOnlyPass.hlsl";
-            public static readonly string kShadowCasterPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShadowCasterPass.hlsl";
-            public static readonly string kForwardPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Terrain/PBRForwardPass.hlsl";
-            public static readonly string kGBuffer = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutput.hlsl";
-            public static readonly string kPBRGBufferPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Terrain/PBRGBufferPass.hlsl";
-            public static readonly string kLightingMetaPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/LightingMetaPass.hlsl";
-            public static readonly string kSelectionPickingPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/SelectionPickingPass.hlsl";
+            public static readonly string kVaryings =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Varyings.hlsl";
+            public static readonly string kShaderPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl";
+            public static readonly string kShadows =
+                "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl";
+            public static readonly string kMetaInput =
+                "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl";
+            public static readonly string kDepthOnlyPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/DepthOnlyPass.hlsl";
+            public static readonly string kDepthNormalsOnlyPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Terrain/DepthNormalsOnlyPass.hlsl";
+            public static readonly string kShadowCasterPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShadowCasterPass.hlsl";
+            public static readonly string kForwardPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Terrain/PBRForwardPass.hlsl";
+            public static readonly string kGBuffer =
+                "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutput.hlsl";
+            public static readonly string kPBRGBufferPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/Terrain/PBRGBufferPass.hlsl";
+            public static readonly string kLightingMetaPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/LightingMetaPass.hlsl";
+            public static readonly string kSelectionPickingPass =
+                "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/SelectionPickingPass.hlsl";
 
-            public static readonly string kTerrainLitInput = "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl";
-            public static readonly string kTerrainPassUtils = "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainPassUtils.hlsl";
-            public static readonly string kRenderingLayers = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl";
+            public static readonly string kTerrainLitInput =
+                "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl";
+            public static readonly string kTerrainPassUtils =
+                "Packages/com.unity.render-pipelines.universal/Editor/Terrain/TerrainPassUtils.hlsl";
+            public static readonly string kRenderingLayers =
+                "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl";
 
             public static readonly IncludeCollection CorePostgraph = new IncludeCollection
             {
@@ -1573,7 +1788,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.DBufferPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kForwardPass, IncludeLocation.Postgraph },
@@ -1586,7 +1800,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kDepthOnlyPass, IncludeLocation.Postgraph },
@@ -1599,7 +1812,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kDepthNormalsOnlyPass, IncludeLocation.Postgraph },
@@ -1612,7 +1824,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kShadowCasterPass, IncludeLocation.Postgraph },
@@ -1627,7 +1838,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.DBufferPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kGBuffer, IncludeLocation.Postgraph },
@@ -1643,7 +1853,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { TerrainCoreIncludes.kMetaInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kLightingMetaPass, IncludeLocation.Postgraph },
@@ -1656,7 +1865,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kSelectionPickingPass, IncludeLocation.Postgraph },
@@ -1669,7 +1877,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreIncludes.ShaderGraphPregraph },
                 { TerrainCoreIncludes.kTerrainLitInput, IncludeLocation.Pregraph },
                 { TerrainCoreIncludes.kTerrainPassUtils, IncludeLocation.Pregraph },
-
                 // Post-graph
                 { TerrainCoreIncludes.CorePostgraph },
                 { TerrainCoreIncludes.kSelectionPickingPass, IncludeLocation.Postgraph },

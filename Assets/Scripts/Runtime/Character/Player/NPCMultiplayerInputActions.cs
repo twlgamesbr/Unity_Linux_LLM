@@ -1,22 +1,21 @@
 using System;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Character.Player
 {
     /// <summary>
@@ -173,13 +172,15 @@ namespace NPCSystem.Character.Player
 
             if (_playerMap == null)
             {
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Error,
-                    $"[{nameof(NPCMultiplayerInputActions)}] Action map '{_actionMapName}' not found in {_inputActions.name}.",
-                    source: nameof(NPCMultiplayerInputActions)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"[{nameof(NPCMultiplayerInputActions)}] Action map '{_actionMapName}' not found in {_inputActions.name}.",
+                        source: nameof(NPCMultiplayerInputActions)
+                    );
                 return;
             }
 
@@ -195,21 +196,25 @@ namespace NPCSystem.Character.Player
 
             // Optional: log missing non-critical actions
             if (_moveAction == null)
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Warning,
-                    $"[{nameof(NPCMultiplayerInputActions)}] 'Move' action not found.",
-                    source: nameof(NPCMultiplayerInputActions)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        $"[{nameof(NPCMultiplayerInputActions)}] 'Move' action not found.",
+                        source: nameof(NPCMultiplayerInputActions)
+                    );
             if (_jumpAction == null)
-                NPCFlowLogger.FindOrCreate().Log(
-                    NPCFlowStage.SceneBootstrap,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Warning,
-                    $"[{nameof(NPCMultiplayerInputActions)}] 'Jump' action not found.",
-                    source: nameof(NPCMultiplayerInputActions)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        $"[{nameof(NPCMultiplayerInputActions)}] 'Jump' action not found.",
+                        source: nameof(NPCMultiplayerInputActions)
+                    );
         }
 
         public void SetActionMap(string mapName)

@@ -1,11 +1,11 @@
 using System;
-using Unity.Entities.Content;
 using System.Runtime.InteropServices;
 using Unity.Assertions;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Core.Compression;
 using Unity.Entities;
+using Unity.Entities.Content;
 using Unity.Entities.Serialization;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -42,7 +42,7 @@ namespace Unity.Scenes
             WaitingForUnityObjectReferencesLoad,
             WaitingForResourcesLoad,
             WaitingForEntitiesLoad,
-            WaitingForSceneDeserialization
+            WaitingForSceneDeserialization,
         }
 
         public override string ToString()
@@ -83,9 +83,18 @@ namespace Unity.Scenes
 
         public void Dispose()
         {
-            if (_LoadingStatus == LoadingStatus.WaitingForResourcesLoad || _LoadingStatus == LoadingStatus.WaitingForEntitiesLoad)
+            if (
+                _LoadingStatus == LoadingStatus.WaitingForResourcesLoad
+                || _LoadingStatus == LoadingStatus.WaitingForEntitiesLoad
+            )
             {
-                var freeJob = new FreeJob { Ptr = _FileContent, DeserializationStatus = _DeserializationStatus, ReadCommands = _ReadCommands, ReadHandle = _ReadHandle };
+                var freeJob = new FreeJob
+                {
+                    Ptr = _FileContent,
+                    DeserializationStatus = _DeserializationStatus,
+                    ReadCommands = _ReadCommands,
+                    ReadHandle = _ReadHandle,
+                };
                 freeJob.FreeChunks = true;
                 freeJob.Schedule(_ReadHandle.JobHandle);
             }
@@ -103,20 +112,25 @@ namespace Unity.Scenes
         struct AsyncLoadSceneJob : IJob
         {
             [NativeDisableUnsafePtrRestriction]
-            public byte*                        FileContent;            // Only to use when deserializing from memory
-            public long                         FileLength;
+            public byte* FileContent; // Only to use when deserializing from memory
+            public long FileLength;
 
-            public GCHandle                     LoadingOperationHandle;
+            public GCHandle LoadingOperationHandle;
+
             [DeallocateOnJobCompletion]
             public NativeArray<EntityId> UnityObjectRefs;
 
-            public ExclusiveEntityTransaction   Transaction;
+            public ExclusiveEntityTransaction Transaction;
             public NativeArray<SerializeUtility.WorldDeserializationResult> DeserializationResult;
 
-            static readonly ProfilerMarker k_ProfileDeserializeWorld = new ProfilerMarker("AsyncLoadSceneJob.DeserializeWorld");
+            static readonly ProfilerMarker k_ProfileDeserializeWorld = new ProfilerMarker(
+                "AsyncLoadSceneJob.DeserializeWorld"
+            );
+
             [NativeDisableUnsafePtrRestriction]
             public SerializeUtility.WorldDeserializationStatus DeserializationStatus;
             public BlobAssetReference<DotsSerialization.BlobHeader> BlobHeader;
+
             [NativeDisableUnsafePtrRestriction]
             public BlobAssetOwner BlobHeaderOwner;
             public Entity SceneSectionEntity;
@@ -137,7 +151,14 @@ namespace Unity.Scenes
                         using (var reader = new MemoryBinaryReader(FileContent, FileLength))
                         {
                             k_ProfileDeserializeWorld.Begin();
-                            SerializeUtility.DeserializeWorldInternal(Transaction, reader, out deserializationResult, ExternalEntitiesRefRange, SceneSectionIndex, UnityObjectRefs);
+                            SerializeUtility.DeserializeWorldInternal(
+                                Transaction,
+                                reader,
+                                out deserializationResult,
+                                ExternalEntitiesRefRange,
+                                SceneSectionIndex,
+                                UnityObjectRefs
+                            );
                             k_ProfileDeserializeWorld.End();
                         }
                     }
@@ -145,10 +166,21 @@ namespace Unity.Scenes
                     {
                         k_ProfileDeserializeWorld.Begin();
                         var dotsReader = DotsSerialization.CreateReader(ref BlobHeader.Value);
-                        SerializeUtility.EndDeserializeWorld(Transaction, dotsReader, ref DeserializationStatus, out deserializationResult, ExternalEntitiesRefRange, SceneSectionIndex, UnityObjectRefs);
+                        SerializeUtility.EndDeserializeWorld(
+                            Transaction,
+                            dotsReader,
+                            ref DeserializationStatus,
+                            out deserializationResult,
+                            ExternalEntitiesRefRange,
+                            SceneSectionIndex,
+                            UnityObjectRefs
+                        );
                         k_ProfileDeserializeWorld.End();
                     }
-                    Transaction.EntityManager.AddSharedComponentManaged(Transaction.EntityManager.UniversalQueryWithSystems, new SceneTag { SceneEntity = SceneSectionEntity });
+                    Transaction.EntityManager.AddSharedComponentManaged(
+                        Transaction.EntityManager.UniversalQueryWithSystems,
+                        new SceneTag { SceneEntity = SceneSectionEntity }
+                    );
                     DeserializationResult[0] = deserializationResult;
                 }
                 catch (Exception exc)
@@ -164,45 +196,44 @@ namespace Unity.Scenes
             }
         }
 
-        AsyncLoadSceneData      _Data;
-        string                  _ScenePath => _Data.ScenePath;
-        int                     _SceneSize => _Data.SceneSize;
-        ref EntityManager           _EntityManager => ref _Data.EntityManager;
-        bool                    _BlockUntilFullyLoaded => _Data.BlockUntilFullyLoaded;
+        AsyncLoadSceneData _Data;
+        string _ScenePath => _Data.ScenePath;
+        int _SceneSize => _Data.SceneSize;
+        ref EntityManager _EntityManager => ref _Data.EntityManager;
+        bool _BlockUntilFullyLoaded => _Data.BlockUntilFullyLoaded;
 
         UntypedWeakReferenceId _UnityObjectRefId;
 #if UNITY_EDITOR
         RuntimeContentManager.InstanceHandle _UnityObjectRefsHandle;
 #endif
 
-        LoadingStatus           _LoadingStatus;
-        string                  _LoadingFailure;
-        Exception               _LoadingException;
+        LoadingStatus _LoadingStatus;
+        string _LoadingFailure;
+        Exception _LoadingException;
 
-        private byte*            _FileContent;
-        ReadHandle               _ReadHandle;
-        UnsafeList<ReadCommand>  _ReadCommands;
+        private byte* _FileContent;
+        ReadHandle _ReadHandle;
+        UnsafeList<ReadCommand> _ReadCommands;
 
         private double _StartTime;
         private SerializeUtility.WorldDeserializationStatus _DeserializationStatus;
         private NativeArray<SerializeUtility.WorldDeserializationResult> _DeserializationResultArray;
         public SerializeUtility.WorldDeserializationResult DeserializationResult => _DeserializationResultArray[0];
 
-
         public AsyncLoadSceneOperation(AsyncLoadSceneData asyncLoadSceneData)
         {
             _Data = asyncLoadSceneData;
             _UnityObjectRefId = asyncLoadSceneData.UnityObjectRefId;
             _LoadingStatus = LoadingStatus.NotStarted;
-            _DeserializationResultArray = new NativeArray<SerializeUtility.WorldDeserializationResult>(1, Allocator.Persistent);
+            _DeserializationResultArray = new NativeArray<SerializeUtility.WorldDeserializationResult>(
+                1,
+                Allocator.Persistent
+            );
         }
 
         public bool IsCompleted
         {
-            get
-            {
-                return _LoadingStatus == LoadingStatus.Completed;
-            }
+            get { return _LoadingStatus == LoadingStatus.Completed; }
         }
 
         public string ErrorStatus
@@ -239,7 +270,12 @@ namespace Unity.Scenes
 
                 _Data.BlobHeader.m_data.ValidateNotNull();
                 var dotsReader = DotsSerialization.CreateReader(ref _Data.BlobHeader.Value);
-                _ReadHandle = SerializeUtility.BeginDeserializeWorld(_ScenePath, dotsReader, out _DeserializationStatus, out _ReadCommands);
+                _ReadHandle = SerializeUtility.BeginDeserializeWorld(
+                    _ScenePath,
+                    dotsReader,
+                    out _DeserializationStatus,
+                    out _ReadCommands
+                );
 
                 if (_UnityObjectRefId.IsValid)
                 {
@@ -280,29 +316,40 @@ namespace Unity.Scenes
                     // Load the file into memory if it's a compressed one, then decompress via a job and deserialize from memory
                     if (_Data.Codec != Codec.None)
                     {
-                        _FileContent = (byte*) Memory.Unmanaged.Allocate(_SceneSize, 16, Allocator.Persistent);
+                        _FileContent = (byte*)Memory.Unmanaged.Allocate(_SceneSize, 16, Allocator.Persistent);
                         _ReadCommands = new UnsafeList<ReadCommand>(1, Allocator.Persistent);
-                        _ReadCommands.Add(new ReadCommand
-                        {
-                            Buffer = _FileContent,
-                            Offset = 0,
-                            Size = _SceneSize
-                        });
+                        _ReadCommands.Add(
+                            new ReadCommand
+                            {
+                                Buffer = _FileContent,
+                                Offset = 0,
+                                Size = _SceneSize,
+                            }
+                        );
 #if ENABLE_PROFILER
                         // When AsyncReadManagerMetrics are available, mark up the file read for more informative IO metrics.
                         // Metrics can be retrieved by AsyncReadManagerMetrics.GetMetrics
-                        _ReadHandle = AsyncReadManager.Read(_ScenePath, _ReadCommands.Ptr, 1, subsystem: AssetLoadingSubsystem.EntitiesScene);
+                        _ReadHandle = AsyncReadManager.Read(
+                            _ScenePath,
+                            _ReadCommands.Ptr,
+                            1,
+                            subsystem: AssetLoadingSubsystem.EntitiesScene
+                        );
 #else
                         _ReadHandle = AsyncReadManager.Read(_ScenePath, _ReadCommands.Ptr, 1);
 #endif
                     }
-
                     // Asynchronous deserialization from file, the BeginDeserializeWorld call will schedule the reads, the End call will perform the deserialization itself
                     else
                     {
                         _Data.BlobHeader.m_data.ValidateNotNull();
                         var dotsReader = DotsSerialization.CreateReader(ref _Data.BlobHeader.Value);
-                        _ReadHandle = SerializeUtility.BeginDeserializeWorld(_ScenePath, dotsReader, out _DeserializationStatus, out _ReadCommands);
+                        _ReadHandle = SerializeUtility.BeginDeserializeWorld(
+                            _ScenePath,
+                            dotsReader,
+                            out _DeserializationStatus,
+                            out _ReadCommands
+                        );
                     }
 
                     if (_UnityObjectRefId.IsValid)
@@ -331,7 +378,10 @@ namespace Unity.Scenes
             if (_LoadingStatus == LoadingStatus.WaitingForUnityObjectReferencesLoad)
             {
 #if UNITY_EDITOR
-                if (RuntimeContentManager.GetInstanceLoadingStatus(_UnityObjectRefsHandle) == ObjectLoadingStatus.Completed)
+                if (
+                    RuntimeContentManager.GetInstanceLoadingStatus(_UnityObjectRefsHandle)
+                    == ObjectLoadingStatus.Completed
+                )
 #else
                 if (RuntimeContentManager.GetObjectLoadingStatus(_UnityObjectRefId) == ObjectLoadingStatus.Completed)
 #endif
@@ -368,7 +418,9 @@ namespace Unity.Scenes
                     var currentTime = Time.realtimeSinceStartup;
                     var totalTime = currentTime - _StartTime;
 
-                    System.Console.WriteLine($"Streamed scene with {totalTime * 1000,4:f0}ms latency from {_ScenePath}");
+                    System.Console.WriteLine(
+                        $"Streamed scene with {totalTime * 1000, 4:f0}ms latency from {_ScenePath}"
+                    );
                 }
             }
         }
@@ -392,12 +444,18 @@ namespace Unity.Scenes
 #if UNITY_EDITOR
             if (_UnityObjectRefsHandle.IsValid)
             {
-                SerializeUtilityHybrid.DeserializeObjectReferences(RuntimeContentManager.GetInstanceValue<ReferencedUnityObjects>(_UnityObjectRefsHandle), out objectReferences);
+                SerializeUtilityHybrid.DeserializeObjectReferences(
+                    RuntimeContentManager.GetInstanceValue<ReferencedUnityObjects>(_UnityObjectRefsHandle),
+                    out objectReferences
+                );
                 RuntimeContentManager.ReleaseInstancesAsync(_UnityObjectRefsHandle);
             }
 #else
-            if(_UnityObjectRefId.IsValid)
-                SerializeUtilityHybrid.DeserializeObjectReferences(RuntimeContentManager.GetObjectValue<ReferencedUnityObjects>(_UnityObjectRefId), out objectReferences);
+            if (_UnityObjectRefId.IsValid)
+                SerializeUtilityHybrid.DeserializeObjectReferences(
+                    RuntimeContentManager.GetObjectValue<ReferencedUnityObjects>(_UnityObjectRefId),
+                    out objectReferences
+                );
 #endif
             NativeArray<EntityId> unityObjectRefs = default;
             if (objectReferences != null && objectReferences.Length > 0)
@@ -434,12 +492,20 @@ namespace Unity.Scenes
                     ExternalEntitiesRefRange = _Data.ExternalEntitiesRefRange,
                 };
 
-                var loadJobHandle = loadJob.Schedule(JobHandle.CombineDependencies(
-                    _EntityManager.ExclusiveEntityTransactionDependency,
-                    _ReadHandle.JobHandle));
+                var loadJobHandle = loadJob.Schedule(
+                    JobHandle.CombineDependencies(
+                        _EntityManager.ExclusiveEntityTransactionDependency,
+                        _ReadHandle.JobHandle
+                    )
+                );
                 _EntityManager.ExclusiveEntityTransactionDependency = loadJobHandle;
                 _DeserializationStatus = default; // _DeserializationStatus is disposed by AsyncLoadSceneJob
-                var freeJob = new FreeJob { Ptr = _FileContent, ReadCommands = _ReadCommands, ReadHandle = _ReadHandle };
+                var freeJob = new FreeJob
+                {
+                    Ptr = _FileContent,
+                    ReadCommands = _ReadCommands,
+                    ReadHandle = _ReadHandle,
+                };
                 freeJob.Schedule(loadJobHandle);
 
                 _FileContent = null;
@@ -454,6 +520,7 @@ namespace Unity.Scenes
         }
 
         static readonly ProfilerMarker s_PostProcessScene = new ProfilerMarker(nameof(PostProcessScene));
+
         void PostProcessScene()
         {
             using var marker = s_PostProcessScene.Auto();
@@ -473,7 +540,10 @@ namespace Unity.Scenes
             _EntityManager.World.DestroyAllSystemsAndLogException(out bool errorsWhileDestroyingSystems);
             using var missingSceneTag = _EntityManager.CreateEntityQuery(ComponentType.Exclude<SceneTag>());
             if (!missingSceneTag.IsEmptyIgnoreFilter)
-                _EntityManager.AddSharedComponentManaged(missingSceneTag, new SceneTag { SceneEntity = _Data.SceneSectionEntity });
+                _EntityManager.AddSharedComponentManaged(
+                    missingSceneTag,
+                    new SceneTag { SceneEntity = _Data.SceneSectionEntity }
+                );
         }
 
 #if !UNITY_EDITOR
@@ -483,10 +553,12 @@ namespace Unity.Scenes
 #endif
         public static void EditorInitializeOnLoadMethod()
         {
-            UnityObjectRefUtility.RegisterAdditionalRootsHandlerForEntitiesAssetGC(
-                state => UnityObjectRefUtility.MarkInstanceIDsAsRoot(s_UnityObjectsRefs.AsArray(), state));
+            UnityObjectRefUtility.RegisterAdditionalRootsHandlerForEntitiesAssetGC(state =>
+                UnityObjectRefUtility.MarkInstanceIDsAsRoot(s_UnityObjectsRefs.AsArray(), state)
+            );
             s_UnityObjectsRefs = new NativeList<EntityId>(Allocator.Domain);
         }
+
         static NativeList<EntityId> s_UnityObjectsRefs;
     }
 }

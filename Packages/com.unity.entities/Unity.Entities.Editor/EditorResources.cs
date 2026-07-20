@@ -13,7 +13,8 @@ namespace Unity.Entities.Editor
         /// <param name="path">The resource path. Must include the extension.</param>
         /// <param name="logError">Whether or not an error should be logged to the console.</param>
         /// <returns>The loaded resource if it was found, <see langword="null"/> otherwise.</returns>
-        public static T Load<T>(string path, bool logError) where T : UnityEngine.Object
+        public static T Load<T>(string path, bool logError)
+            where T : UnityEngine.Object
         {
             var resource = AssetDatabase.LoadAssetAtPath<T>(path);
             if (resource == null || !resource)
@@ -33,7 +34,8 @@ namespace Unity.Entities.Editor
         /// <param name="path">The resource path. Must include the extension.</param>
         /// <param name="logError">Whether or not an error should be logged to the console.</param>
         /// <returns>The loaded resource if it was found, <see langword="null"/> otherwise.</returns>
-        public static T Load<T>(string packageId, string path, bool logError) where T : UnityEngine.Object
+        public static T Load<T>(string packageId, string path, bool logError)
+            where T : UnityEngine.Object
         {
             var resource = Load<T>(GetPackagePath(packageId, path), false);
             return resource != null && resource ? resource : Load<T>(path, logError);
@@ -46,7 +48,8 @@ namespace Unity.Entities.Editor
         /// <param name="path">The texture resource path. Must include the extension.</param>
         /// <param name="logError">Whether or not an error should be logged to the console.</param>
         /// <returns>The loaded texture resource if it was found, <see langword="null"/> otherwise.</returns>
-        public static T LoadTexture<T>(string path, bool logError) where T : UnityEngine.Texture
+        public static T LoadTexture<T>(string path, bool logError)
+            where T : UnityEngine.Texture
         {
             path = GetTexturePathWithFilePrefix(path);
 
@@ -68,7 +71,8 @@ namespace Unity.Entities.Editor
         /// <param name="path">The texture resource path. Must include the extension.</param>
         /// <param name="logError">Whether or not an error should be logged to the console.</param>
         /// <returns>The loaded texture resource if it was found, <see langword="null"/> otherwise.</returns>
-        public static T LoadTexture<T>(string packageId, string path, bool logError) where T : UnityEngine.Texture
+        public static T LoadTexture<T>(string packageId, string path, bool logError)
+            where T : UnityEngine.Texture
         {
             path = GetTexturePathWithFolderPrefix(path);
 
@@ -99,8 +103,9 @@ namespace Unity.Entities.Editor
         {
             const string darkSkinPrefix = "d_";
             var name = Path.GetFileNameWithoutExtension(path);
-            return EditorGUIUtility.isProSkin && !name.StartsWith(darkSkinPrefix, StringComparison.Ordinal) ?
-                path.ReplaceLastOccurrence(name, darkSkinPrefix + name) : path;
+            return EditorGUIUtility.isProSkin && !name.StartsWith(darkSkinPrefix, StringComparison.Ordinal)
+                ? path.ReplaceLastOccurrence(name, darkSkinPrefix + name)
+                : path;
         }
 
         static string AppendHighDPISuffix(string path)

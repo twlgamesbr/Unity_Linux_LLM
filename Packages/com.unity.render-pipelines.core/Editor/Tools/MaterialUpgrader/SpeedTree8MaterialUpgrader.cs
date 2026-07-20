@@ -15,7 +15,7 @@ namespace UnityEditor.Rendering
             Better,
             Best,
             Palm,
-            Count
+            Count,
         }
 
         private static string[] WindQualityString =
@@ -25,10 +25,10 @@ namespace UnityEditor.Rendering
             "_WINDQUALITY_FAST",
             "_WINDQUALITY_BETTER",
             "_WINDQUALITY_BEST",
-            "_WINDQUALITY_PALM"
+            "_WINDQUALITY_PALM",
         };
 
-        static private class Uniforms
+        private static class Uniforms
         {
             internal static int _WINDQUALITY = Shader.PropertyToID("_WINDQUALITY");
             internal static int EFFECT_BILLBOARD = Shader.PropertyToID("EFFECT_BILLBOARD");
@@ -36,6 +36,7 @@ namespace UnityEditor.Rendering
             internal static int _TwoSided = Shader.PropertyToID("_TwoSided");
             internal static int _WindQuality = Shader.PropertyToID("_WindQuality");
         }
+
         /// <summary>
         /// Returns true if the material contains a SpeedTree Wind keyword.
         /// </summary>
@@ -43,8 +44,8 @@ namespace UnityEditor.Rendering
         /// <returns> true if the material has a SpeedTree wind keyword that enables Vertex Shader wind animation </returns>
         public static bool DoesMaterialHaveSpeedTreeWindKeyword(Material material)
         {
-            foreach(string keyword in WindQualityString)
-                if(material.IsKeywordEnabled(keyword))
+            foreach (string keyword in WindQualityString)
+                if (material.IsKeywordEnabled(keyword))
                     return true;
             return false;
         }
@@ -54,19 +55,27 @@ namespace UnityEditor.Rendering
         /// </summary>
         /// <param name="material">Material to check</param>
         /// <returns> true if the material has a SpeedTree wind keyword that enables Vertex Shader wind animation and WindQuality other than None (0) </returns>
-        public static bool IsWindEnabled(Material material) 
-        { 
-            return HasWindEnabledKeyword(material) && HasWindQualityPropertyEnabled(material); 
+        public static bool IsWindEnabled(Material material)
+        {
+            return HasWindEnabledKeyword(material) && HasWindQualityPropertyEnabled(material);
         }
+
         private static bool HasWindEnabledKeyword(Material material)
         {
-            for(int i=1/*skip NONE*/; i<WindQualityString.Length; ++i)
+            for (
+                int i =
+                    1 /*skip NONE*/
+                ;
+                i < WindQualityString.Length;
+                ++i
+            )
             {
-                if(material.IsKeywordEnabled(WindQualityString[i]))
+                if (material.IsKeywordEnabled(WindQualityString[i]))
                     return true;
             }
             return false;
         }
+
         private static bool HasWindQualityPropertyEnabled(Material material)
         {
             return material.HasProperty("_WindQuality") && material.GetFloat(Uniforms._WindQuality) > 0.0f;
@@ -79,7 +88,11 @@ namespace UnityEditor.Rendering
         /// <param name="sourceShaderName">Original SpeedTree8 shader name.</param>
         /// <param name="destShaderName">New SpeedTree 8 shader name.</param>
         /// <param name="finalizer">A delegate that postprocesses the material for the render pipeline in use.</param>
-        public SpeedTree8MaterialUpgrader(string sourceShaderName, string destShaderName, MaterialFinalizer finalizer = null)
+        public SpeedTree8MaterialUpgrader(
+            string sourceShaderName,
+            string destShaderName,
+            MaterialFinalizer finalizer = null
+        )
         {
             RenameShader(sourceShaderName, destShaderName, finalizer);
             RenameFloat("_WindQuality", "_WINDQUALITY");
@@ -96,7 +109,11 @@ namespace UnityEditor.Rendering
         /// <param name="speedtree">The GameObject Unity creates from this imported SpeedTree.</param>
         /// <param name="stImporter">The asset importer used to import this SpeedTree asset.</param>
         /// <param name="finalizer">Render pipeline-specific material finalizer.</param>
-        public static void PostprocessSpeedTree8Materials(GameObject speedtree, SpeedTreeImporter stImporter, MaterialFinalizer finalizer = null)
+        public static void PostprocessSpeedTree8Materials(
+            GameObject speedtree,
+            SpeedTreeImporter stImporter,
+            MaterialFinalizer finalizer = null
+        )
         {
             LODGroup lg = speedtree.GetComponent<LODGroup>();
             LOD[] lods = lg.GetLODs();
@@ -154,7 +171,9 @@ namespace UnityEditor.Rendering
             // input WindQuality > enabled keyword > _WindQuality float value
             if (!WindIntValid(windQuality))
             {
-                windQuality = material.HasProperty(Uniforms._WindQuality) ? (int)material.GetFloat(Uniforms._WindQuality) : 0;
+                windQuality = material.HasProperty(Uniforms._WindQuality)
+                    ? (int)material.GetFloat(Uniforms._WindQuality)
+                    : 0;
                 if (!WindIntValid(windQuality))
                 {
                     windQuality = GetWindQualityFromKeywords(material.shaderKeywords);
@@ -177,7 +196,10 @@ namespace UnityEditor.Rendering
 
         private static void SetWindQuality(Material material, int windQuality)
         {
-            Debug.Assert(WindIntValid(windQuality), "Attempting to set invalid wind quality on material " + material.name);
+            Debug.Assert(
+                WindIntValid(windQuality),
+                "Attempting to set invalid wind quality on material " + material.name
+            );
 
             if (material == null)
                 return;

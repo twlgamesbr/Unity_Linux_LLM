@@ -10,7 +10,8 @@ namespace Unity.Rendering
         const int k_ChunkSize = 2048;
 
         static readonly int k_SkinMatricesBuffer = Shader.PropertyToID("_SkinMatrices");
-        static readonly int k_MaxSize = (int)math.min(SystemInfo.maxGraphicsBufferSize / UnsafeUtility.SizeOf<float3x4>(), int.MaxValue);
+        static readonly int k_MaxSize = (int)
+            math.min(SystemInfo.maxGraphicsBufferSize / UnsafeUtility.SizeOf<float3x4>(), int.MaxValue);
 
         FencedBufferPool m_BufferPool;
 
@@ -34,8 +35,10 @@ namespace Unity.Rendering
                 if (newSize > k_MaxSize)
                 {
                     // Only inform users if the content requires a buffer that is too big.
-                    if(requiredSize > k_MaxSize)
-                        UnityEngine.Debug.LogWarning("The world contains too many skin matrices to fit into a single GraphicsBuffer. Not all skinned meshes are guaranteed to render correctly. Reduce the number of active deformed meshes.");
+                    if (requiredSize > k_MaxSize)
+                        UnityEngine.Debug.LogWarning(
+                            "The world contains too many skin matrices to fit into a single GraphicsBuffer. Not all skinned meshes are guaranteed to render correctly. Reduce the number of active deformed meshes."
+                        );
 
                     // Do not actually resize the buffer if we are already at max capacity.
                     if (size == k_MaxSize)

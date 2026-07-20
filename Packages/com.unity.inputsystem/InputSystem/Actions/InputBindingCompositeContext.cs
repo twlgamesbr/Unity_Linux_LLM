@@ -59,11 +59,7 @@ namespace UnityEngine.InputSystem
                     for (var i = 0; i < bindingState.controlCount; ++i)
                     {
                         var control = m_State.controls[controlStartIndex + i];
-                        yield return new PartBinding
-                        {
-                            part = bindingState.partIndex,
-                            control = control
-                        };
+                        yield return new PartBinding { part = bindingState.partIndex, control = control };
                     }
                 }
             }
@@ -143,8 +139,12 @@ namespace UnityEngine.InputSystem
             if (m_State == null)
                 return default;
 
-            return m_State.ReadCompositePartValue<TValue, DefaultComparer<TValue>>
-                    (m_BindingIndex, partNumber, null, out _);
+            return m_State.ReadCompositePartValue<TValue, DefaultComparer<TValue>>(
+                m_BindingIndex,
+                partNumber,
+                null,
+                out _
+            );
         }
 
         /// <summary>
@@ -177,8 +177,12 @@ namespace UnityEngine.InputSystem
                 return default;
             }
 
-            var value = m_State.ReadCompositePartValue<TValue, DefaultComparer<TValue>>(m_BindingIndex, partNumber,
-                null, out var controlIndex);
+            var value = m_State.ReadCompositePartValue<TValue, DefaultComparer<TValue>>(
+                m_BindingIndex,
+                partNumber,
+                null,
+                out var controlIndex
+            );
             if (controlIndex != InputActionState.kInvalidIndex)
                 sourceControl = m_State.controls[controlIndex];
             else
@@ -235,8 +239,7 @@ namespace UnityEngine.InputSystem
             if (m_State == null)
                 return default;
 
-            return m_State.ReadCompositePartValue<TValue, TComparer>(
-                m_BindingIndex, partNumber, null, out _, comparer);
+            return m_State.ReadCompositePartValue<TValue, TComparer>(m_BindingIndex, partNumber, null, out _, comparer);
         }
 
         /// <summary>
@@ -260,7 +263,11 @@ namespace UnityEngine.InputSystem
         /// the given part. All values will be compared using <c>TComparer.Compare</c> and
         /// the greatest value will be returned.</typeparam>
         /// <returns>The value read from the part bindings.</returns>
-        public unsafe TValue ReadValue<TValue, TComparer>(int partNumber, out InputControl sourceControl, TComparer comparer = default)
+        public unsafe TValue ReadValue<TValue, TComparer>(
+            int partNumber,
+            out InputControl sourceControl,
+            TComparer comparer = default
+        )
             where TValue : struct
             where TComparer : IComparer<TValue>
         {
@@ -270,8 +277,13 @@ namespace UnityEngine.InputSystem
                 return default;
             }
 
-            var value = m_State.ReadCompositePartValue<TValue, TComparer>(m_BindingIndex, partNumber, null,
-                out var controlIndex, comparer);
+            var value = m_State.ReadCompositePartValue<TValue, TComparer>(
+                m_BindingIndex,
+                partNumber,
+                null,
+                out var controlIndex,
+                comparer
+            );
 
             if (controlIndex != InputActionState.kInvalidIndex)
                 sourceControl = m_State.controls[controlIndex];
@@ -307,8 +319,12 @@ namespace UnityEngine.InputSystem
             ////REVIEW: wouldn't this have to take release points into account now?
 
             var buttonValue = false;
-            m_State.ReadCompositePartValue<float, DefaultComparer<float>>(m_BindingIndex, partNumber, &buttonValue,
-                out _);
+            m_State.ReadCompositePartValue<float, DefaultComparer<float>>(
+                m_BindingIndex,
+                partNumber,
+                &buttonValue,
+                out _
+            );
             return buttonValue;
         }
 

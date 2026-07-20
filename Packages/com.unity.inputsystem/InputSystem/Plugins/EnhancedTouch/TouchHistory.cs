@@ -59,7 +59,9 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                 CheckValid();
                 if (index < 0 || index >= Count)
                     throw new ArgumentOutOfRangeException(
-                        $"Index {index} is out of range for history with {Count} entries", nameof(index));
+                        $"Index {index} is out of range for history with {Count} entries",
+                        nameof(index)
+                    );
 
                 // History records oldest-first but we index newest-first.
                 return new Touch(m_Finger, m_History[m_StartIndex - index]);
@@ -72,7 +74,8 @@ namespace UnityEngine.InputSystem.EnhancedTouch
                 throw new InvalidOperationException("Touch history not initialized");
             if (m_History.version != m_Version)
                 throw new InvalidOperationException(
-                    "Touch history is no longer valid; the recorded history has been changed");
+                    "Touch history is no longer valid; the recorded history has been changed"
+                );
         }
 
         private class Enumerator : IEnumerator<Touch>
@@ -103,9 +106,7 @@ namespace UnityEngine.InputSystem.EnhancedTouch
 
             object IEnumerator.Current => Current;
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
     }
 }

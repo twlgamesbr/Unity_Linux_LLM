@@ -1,8 +1,8 @@
-using UnityEditor;
 using System.Reflection;
+using EditorAttributes.Editor.Utility;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
@@ -13,7 +13,10 @@ namespace EditorAttributes.Editor
         {
             var messageBoxAttribute = attribute as MessageBoxAttribute;
 
-            MemberInfo conditionalProperty = ReflectionUtils.GetValidMemberInfo(messageBoxAttribute.ConditionName, property);
+            MemberInfo conditionalProperty = ReflectionUtils.GetValidMemberInfo(
+                messageBoxAttribute.ConditionName,
+                property
+            );
 
             VisualElement root = new();
             HelpBox errorBox = new();
@@ -33,20 +36,28 @@ namespace EditorAttributes.Editor
             if (messageBoxAttribute.DrawAbove)
                 messageBox.PlaceBehind(propertyField);
 
-            UpdateVisualElement(propertyField, () =>
-            {
-                if (GetConditionValue(conditionalProperty, messageBoxAttribute, property, errorBox))
+            UpdateVisualElement(
+                propertyField,
+                () =>
                 {
-                    messageBox.text = GetDynamicString(messageBoxAttribute.Message, property, messageBoxAttribute, errorBox);
-                    messageBox.style.display = DisplayStyle.Flex;
-                }
-                else
-                {
-                    messageBox.style.display = DisplayStyle.None;
-                }
+                    if (GetConditionValue(conditionalProperty, messageBoxAttribute, property, errorBox))
+                    {
+                        messageBox.text = GetDynamicString(
+                            messageBoxAttribute.Message,
+                            property,
+                            messageBoxAttribute,
+                            errorBox
+                        );
+                        messageBox.style.display = DisplayStyle.Flex;
+                    }
+                    else
+                    {
+                        messageBox.style.display = DisplayStyle.None;
+                    }
 
-                DisplayErrorBox(root, errorBox);
-            });
+                    DisplayErrorBox(root, errorBox);
+                }
+            );
 
             return root;
         }

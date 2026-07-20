@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
+using NPCSystem.Network.Core;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Monitoring.Datadog;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.LocalAI
 {
     [DefaultExecutionOrder(-1)]
@@ -31,12 +30,20 @@ namespace NPCSystem.LocalAI
         [FormerlySerializedAs("host")]
         [SerializeField]
         string _host = "127.0.0.1";
-        public string Host { get => _host; set => _host = value; }
+        public string Host
+        {
+            get => _host;
+            set => _host = value;
+        }
 
         [FormerlySerializedAs("port")]
         [SerializeField]
         int _port = NPCLocalAIConfig.LocalAIDirectPort;
-        public int Port { get => _port; set => _port = value; }
+        public int Port
+        {
+            get => _port;
+            set => _port = value;
+        }
 
         [FormerlySerializedAs("apiKey")]
         [SerializeField]
@@ -82,7 +89,11 @@ namespace NPCSystem.LocalAI
         [FormerlySerializedAs("numRetries")]
         [SerializeField]
         int _numRetries = 3;
-        public int NumRetries { get => _numRetries; set => _numRetries = value; }
+        public int NumRetries
+        {
+            get => _numRetries;
+            set => _numRetries = value;
+        }
 
         [FormerlySerializedAs("requestTimeoutSeconds")]
         [SerializeField]
@@ -232,21 +243,14 @@ namespace NPCSystem.LocalAI
                             source: nameof(NPCLocalAIClient),
                             requestId: reqId,
                             durationMs: sw.ElapsedMilliseconds,
-                            data: new Dictionary<string, object>
-                            {
-                                ["attempts"] = _numRetries + 1,
-                            }
+                            data: new Dictionary<string, object> { ["attempts"] = _numRetries + 1 }
                         );
                         return string.Empty;
                     }
 
                     var response = JsonUtility.FromJson<NPCOpenAIChatResponse>(responseJson);
 
-                    if (
-                        response?.choices != null
-                        && response.choices.Length > 0
-                        && response.choices[0].message != null
-                    )
+                    if (response?.choices != null && response.choices.Length > 0 && response.choices[0].message != null)
                     {
                         sw.Stop();
                         llmSpan.SetTag("status", "success");
@@ -302,12 +306,7 @@ namespace NPCSystem.LocalAI
                     llmSpan.SetError(ex.Message);
                     DatadogMetricsService.Increment(
                         "llm.request.error",
-                        tags: new[]
-                        {
-                            $"model:{modelName}",
-                            $"reason:exception",
-                            $"attempt:{attempt}",
-                        }
+                        tags: new[] { $"model:{modelName}", $"reason:exception", $"attempt:{attempt}" }
                     );
 
                     _logger?.Log(

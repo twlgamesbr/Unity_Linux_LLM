@@ -16,13 +16,22 @@ namespace UnityEngine.Rendering.Universal.Internal
         private FilteringSettings m_FilteringSettings;
 
         // Statics
-        private static readonly List<ShaderTagId> k_DepthNormals = new List<ShaderTagId> { new ShaderTagId("DepthNormals"), new ShaderTagId("DepthNormalsOnly") };
-        private static readonly List<ShaderTagId> k_DepthNormalsOnly = new List<ShaderTagId> { new ShaderTagId("DepthNormalsOnly") };
+        private static readonly List<ShaderTagId> k_DepthNormals = new List<ShaderTagId>
+        {
+            new ShaderTagId("DepthNormals"),
+            new ShaderTagId("DepthNormalsOnly"),
+        };
+        private static readonly List<ShaderTagId> k_DepthNormalsOnly = new List<ShaderTagId>
+        {
+            new ShaderTagId("DepthNormalsOnly"),
+        };
 
         internal static readonly string k_CameraNormalsTextureName = "_CameraNormalsTexture";
         private static readonly int s_CameraDepthTextureID = Shader.PropertyToID("_CameraDepthTexture");
         private static readonly int s_CameraNormalsTextureID = Shader.PropertyToID(k_CameraNormalsTextureName);
-        private static readonly int s_CameraRenderingLayersTextureID = Shader.PropertyToID("_CameraRenderingLayersTexture");
+        private static readonly int s_CameraRenderingLayersTextureID = Shader.PropertyToID(
+            "_CameraRenderingLayersTexture"
+        );
 
         /// <summary>
         /// Creates a new <c>DepthNormalOnlyPass</c> instance.
@@ -114,15 +123,35 @@ namespace UnityEngine.Rendering.Universal.Internal
             internal RendererListHandle rendererList;
         }
 
-        private RendererListParams InitRendererListParams(UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+        private RendererListParams InitRendererListParams(
+            UniversalRenderingData renderingData,
+            UniversalCameraData cameraData,
+            UniversalLightData lightData
+        )
         {
             var sortFlags = cameraData.defaultOpaqueSortFlags;
-            var drawSettings = RenderingUtils.CreateDrawingSettings(this.shaderTagIds, renderingData, cameraData, lightData, sortFlags);
+            var drawSettings = RenderingUtils.CreateDrawingSettings(
+                this.shaderTagIds,
+                renderingData,
+                cameraData,
+                lightData,
+                sortFlags
+            );
             drawSettings.perObjectData = PerObjectData.None;
             return new RendererListParams(renderingData.cullResults, drawSettings, m_FilteringSettings);
         }
 
-        internal void Render(RenderGraph renderGraph, ContextContainer frameData, in TextureHandle cameraNormalsTexture, in TextureHandle depthTexture, in TextureHandle renderingLayersTexture, uint batchLayerMask, bool setGlobalDepth, bool setGlobalNormalAndRenderingLayers, bool allowPartialPass)
+        internal void Render(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            in TextureHandle cameraNormalsTexture,
+            in TextureHandle depthTexture,
+            in TextureHandle renderingLayersTexture,
+            uint batchLayerMask,
+            bool setGlobalDepth,
+            bool setGlobalNormalAndRenderingLayers,
+            bool allowPartialPass
+        )
         {
             if (allowPartialPass)
             {
@@ -137,7 +166,9 @@ namespace UnityEngine.Rendering.Universal.Internal
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalLightData lightData = frameData.Get<UniversalLightData>();
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 builder.SetRenderAttachment(cameraNormalsTexture, 0, AccessFlags.Write);
                 builder.SetRenderAttachmentDepth(depthTexture, AccessFlags.ReadWrite);
@@ -156,7 +187,9 @@ namespace UnityEngine.Rendering.Universal.Internal
                 builder.UseRendererList(passData.rendererList);
                 if (cameraData.xr.enabled)
                 {
-                    builder.EnableFoveatedRasterization(cameraData.xr.supportsFoveatedRendering && cameraData.xrUniversal.canFoveateIntermediatePasses);
+                    builder.EnableFoveatedRasterization(
+                        cameraData.xr.supportsFoveatedRendering && cameraData.xrUniversal.canFoveateIntermediatePasses
+                    );
                     // Apply MultiviewRenderRegionsCompatible flag only to the peripheral view in Quad Views
                     if (cameraData.xr.multipassId == 0)
                     {
@@ -179,12 +212,14 @@ namespace UnityEngine.Rendering.Universal.Internal
                 if (passData.enableRenderingLayers)
                     builder.AllowGlobalStateModification(true);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    if (data.enableRenderingLayers)
-                        RenderingLayerUtils.SetupProperties(context.cmd, data.maskSize);
-                    ExecutePass(context.cmd, data, data.rendererList);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        if (data.enableRenderingLayers)
+                            RenderingLayerUtils.SetupProperties(context.cmd, data.maskSize);
+                        ExecutePass(context.cmd, data, data.rendererList);
+                    }
+                );
             }
         }
     }

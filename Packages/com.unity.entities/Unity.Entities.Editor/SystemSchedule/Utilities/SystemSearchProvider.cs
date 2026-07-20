@@ -10,15 +10,15 @@ namespace Unity.Entities.Editor
     internal static class SystemSearchProvider
     {
         /// <summary>
-        /// Search Provider type id. 
+        /// Search Provider type id.
         /// </summary>
         const string k_Type = "system";
 
-        static Dictionary<string, string[]> s_SystemDependencyMap = new ();
+        static Dictionary<string, string[]> s_SystemDependencyMap = new();
         static World s_CurrentWorld;
         static WorldProxyManager s_WorldProxyManager;
         static WorldProxy s_WorldProxy;
-        
+
         static QueryEngine<SystemDescriptor> s_QueryEngine;
         static QueryEngine<SystemDescriptor> queryEngine
         {
@@ -35,9 +35,9 @@ namespace Unity.Entities.Editor
         {
             get
             {
-                if (s_Systems != null) 
+                if (s_Systems != null)
                     return s_Systems;
-                
+
                 if (SetupSystemDescriptors())
                     GetAllSystems();
                 return s_Systems;
@@ -53,21 +53,16 @@ namespace Unity.Entities.Editor
         static void SelectItem(SearchItem item, SearchContext ctx)
         {
             var data = (SystemDescriptor)item.data;
-            SelectionUtility.ShowInInspector(new SystemContentProvider
-            {
-                World = data.Proxy.World,
-                SystemProxy = data.Proxy
-            }, new InspectorContentParameters
-            {
-                UseDefaultMargins = false,
-                ApplyInspectorStyling = false
-            });
+            SelectionUtility.ShowInInspector(
+                new SystemContentProvider { World = data.Proxy.World, SystemProxy = data.Proxy },
+                new InspectorContentParameters { UseDefaultMargins = false, ApplyInspectorStyling = false }
+            );
         }
 
         [SearchActionsProvider]
         internal static IEnumerable<SearchAction> ActionHandlers()
         {
-            return new []
+            return new[]
             {
                 new SearchAction(k_Type, "select", null, "Select System")
                 {
@@ -75,8 +70,8 @@ namespace Unity.Entities.Editor
                     {
                         SelectItem(items[0], null);
                     },
-                    closeWindowAfterExecution = false
-                }
+                    closeWindowAfterExecution = false,
+                },
             };
         }
 
@@ -108,7 +103,7 @@ namespace Unity.Entities.Editor
                     wrapper.item = item;
                     wrapper.objItem = (SystemDescriptor)item.data;
                     return wrapper;
-                }
+                },
             };
             SearchBridge.SetTableConfig(p, GetDefaultTableConfig);
             return p;
@@ -124,39 +119,101 @@ namespace Unity.Entities.Editor
             s_QueryEngine = new();
             s_QueryEngine.SetSearchDataCallback(GetWords);
 
-            SearchBridge.AddFilter<string, SystemDescriptor>(s_QueryEngine, "c", OnComponentTypeFilter, new[] { ":", "=" });
-            SearchBridge.AddFilter<string, SystemDescriptor>(s_QueryEngine, "ns", OnNamespaceFilter, new[] { ":", "=" });
-            SearchBridge.AddFilter<string, SystemDescriptor>(s_QueryEngine, "sd", OnSystemDependencyFilter, new[] { ":", "=" });
-            SearchBridge.AddFilter<string, SystemDescriptor>(s_QueryEngine, "parent", OnParentFilter, new[] { ":", "=" });
+            SearchBridge.AddFilter<string, SystemDescriptor>(
+                s_QueryEngine,
+                "c",
+                OnComponentTypeFilter,
+                new[] { ":", "=" }
+            );
+            SearchBridge.AddFilter<string, SystemDescriptor>(
+                s_QueryEngine,
+                "ns",
+                OnNamespaceFilter,
+                new[] { ":", "=" }
+            );
+            SearchBridge.AddFilter<string, SystemDescriptor>(
+                s_QueryEngine,
+                "sd",
+                OnSystemDependencyFilter,
+                new[] { ":", "=" }
+            );
+            SearchBridge.AddFilter<string, SystemDescriptor>(
+                s_QueryEngine,
+                "parent",
+                OnParentFilter,
+                new[] { ":", "=" }
+            );
 
             // Note: Skip filter for world filter that shouldn't be tested against the dataset
             s_QueryEngine.skipUnknownFilters = true;
 
-            SearchBridge.SetFilter(s_QueryEngine, "entitycount", data => data.Proxy.TotalEntityMatches)
-                .AddOrUpdateProposition(category: null, label: "Entity Count", replacement: "entitycount>10", help: "Search Systems by Entity Count");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "entitycount", data => data.Proxy.TotalEntityMatches)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Entity Count",
+                    replacement: "entitycount>10",
+                    help: "Search Systems by Entity Count"
+                );
 
-            SearchBridge.SetFilter(s_QueryEngine, "componentcount", data => data.ComponentNamesInQueryCache.Length)
-                .AddOrUpdateProposition(category: null, label: "Component Count", replacement: "componentcount>5", help: "Search Systems by Component Count");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "componentcount", data => data.ComponentNamesInQueryCache.Length)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Component Count",
+                    replacement: "componentcount>5",
+                    help: "Search Systems by Component Count"
+                );
 
-            SearchBridge.SetFilter(s_QueryEngine, "dependencycount", data => data.SystemDependencyCache.Length)
-                .AddOrUpdateProposition(category: null, label: "Dependency Count", replacement: "dependencycount>0", help: "Search Systems by Dependency Count");
-            SearchBridge.SetFilter(s_QueryEngine, "time", data => data.Proxy.RunTimeMillisecondsForDisplay)
-                .AddOrUpdateProposition(category: null, label: "Time", replacement: "time>100", help: "Search Systems by time");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "dependencycount", data => data.SystemDependencyCache.Length)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Dependency Count",
+                    replacement: "dependencycount>0",
+                    help: "Search Systems by Dependency Count"
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "time", data => data.Proxy.RunTimeMillisecondsForDisplay)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Time",
+                    replacement: "time>100",
+                    help: "Search Systems by time"
+                );
 
-            SearchBridge.SetFilter(s_QueryEngine, "enabled", data => data.Proxy.Enabled)
-                .AddOrUpdateProposition(category: null, label: "Enabled", replacement: "enabled=true", help: "Search Enabled systems");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "enabled", data => data.Proxy.Enabled)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Enabled",
+                    replacement: "enabled=true",
+                    help: "Search Enabled systems"
+                );
 
-            SearchBridge.SetFilter(s_QueryEngine, "isrunning", data => data.Proxy.IsRunning)
-                .AddOrUpdateProposition(category: null, label: "Is Running", replacement: "isrunning=true", help: "Search Running systems");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "isrunning", data => data.Proxy.IsRunning)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Is Running",
+                    replacement: "isrunning=true",
+                    help: "Search Running systems"
+                );
 
-            SearchBridge.SetFilter(s_QueryEngine, "childcount", data => data.Proxy.ChildCount)
-                .AddOrUpdateProposition(category: null, label: "childcount", replacement: "childcount>5", help: "Search systems by child count");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "childcount", data => data.Proxy.ChildCount)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "childcount",
+                    replacement: "childcount>5",
+                    help: "Search systems by child count"
+                );
         }
 
         static bool SetupSystemDescriptors()
         {
             s_WorldProxyManager = new WorldProxyManager();
-            s_SystemDependencyMap = new();            
+            s_SystemDependencyMap = new();
             if (s_CurrentWorld == null)
             {
                 Debug.LogWarning("System Search provider: cannot find a valid World");
@@ -171,7 +228,7 @@ namespace Unity.Entities.Editor
         static void OnEnable()
         {
             s_CurrentWorld = World.DefaultGameObjectInjectionWorld;
-            
+
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         }
@@ -195,11 +252,17 @@ namespace Unity.Entities.Editor
 
         static void OnPlayModeStateChanged(PlayModeStateChange stateChange)
         {
-            if (stateChange == PlayModeStateChange.ExitingEditMode || stateChange == PlayModeStateChange.ExitingPlayMode)
+            if (
+                stateChange == PlayModeStateChange.ExitingEditMode
+                || stateChange == PlayModeStateChange.ExitingPlayMode
+            )
             {
                 Cleanup();
             }
-            else if (stateChange == PlayModeStateChange.EnteredPlayMode || stateChange == PlayModeStateChange.EnteredEditMode)
+            else if (
+                stateChange == PlayModeStateChange.EnteredPlayMode
+                || stateChange == PlayModeStateChange.EnteredEditMode
+            )
             {
                 SearchBridge.RefreshWindowsWithProvider(k_Type);
             }
@@ -209,16 +272,16 @@ namespace Unity.Entities.Editor
         {
             return SearchBridge.CompareWords(op, value, desc.ComponentNamesInQueryCache);
         }
-        
+
         static bool OnNamespaceFilter(SystemDescriptor desc, QueryFilterOperator op, string value)
         {
             return SearchBridge.CompareWords(op, value, desc.Proxy.Namespace);
         }
-        
+
         static bool OnParentFilter(SystemDescriptor desc, QueryFilterOperator op, string value)
         {
             return SearchBridge.CompareWords(op, value, desc.Proxy.Parent.TypeName);
-        }        
+        }
 
         static bool OnSystemDependencyFilter(SystemDescriptor desc, QueryFilterOperator op, string value)
         {
@@ -262,9 +325,15 @@ namespace Unity.Entities.Editor
         {
             public static Texture2D systemIcon = PackageResources.LoadIcon("System/System.png");
             public static Texture2D systemGroupIcon = PackageResources.LoadIcon("Group/Group.png");
-            public static Texture2D beginCommandBufferIcon = PackageResources.LoadIcon("BeginCommandBuffer/BeginCommandBuffer.png");
-            public static Texture2D endCommandBufferIcon = PackageResources.LoadIcon("EndCommandBuffer/EndCommandBuffer.png");
-            public static Texture2D unmanagedSystemIcon = PackageResources.LoadIcon("UnmanagedSystem/UnmanagedSystem.png");
+            public static Texture2D beginCommandBufferIcon = PackageResources.LoadIcon(
+                "BeginCommandBuffer/BeginCommandBuffer.png"
+            );
+            public static Texture2D endCommandBufferIcon = PackageResources.LoadIcon(
+                "EndCommandBuffer/EndCommandBuffer.png"
+            );
+            public static Texture2D unmanagedSystemIcon = PackageResources.LoadIcon(
+                "UnmanagedSystem/UnmanagedSystem.png"
+            );
         }
 
         static Texture2D GetSystemIcon(SystemProxy systemProxy)
@@ -286,7 +355,10 @@ namespace Unity.Entities.Editor
             return null;
         }
 
-        static void FillSystemDependencyCache(List<SystemDescriptor> descriptors, Dictionary<string, string[]> dependencyMap)
+        static void FillSystemDependencyCache(
+            List<SystemDescriptor> descriptors,
+            Dictionary<string, string[]> dependencyMap
+        )
         {
             foreach (var desc in descriptors)
             {
@@ -296,7 +368,7 @@ namespace Unity.Entities.Editor
                     if (dependencies != null && System.Array.IndexOf(dependencies, desc.Name) >= 0)
                         dependenciesList.Add(system);
                 }
-                var dependenciesArr = dependenciesList.ToArray();                
+                var dependenciesArr = dependenciesList.ToArray();
                 desc.UpdateDependencies(dependenciesArr);
             }
         }
@@ -305,7 +377,7 @@ namespace Unity.Entities.Editor
         {
             if (s_CurrentWorld == null)
                 s_CurrentWorld = World.DefaultGameObjectInjectionWorld;
-            
+
             var searchQuery = context.searchQuery;
             ParsedQuery<SystemDescriptor> query = null;
             if (!string.IsNullOrEmpty(searchQuery))
@@ -314,7 +386,7 @@ namespace Unity.Entities.Editor
                 if (!query.valid)
                 {
                     foreach (var e in query.errors)
-                        context.AddSearchQueryErrors(new SearchQueryError[] { new (e, context, provider) });
+                        context.AddSearchQueryErrors(new SearchQueryError[] { new(e, context, provider) });
                     yield break;
                 }
 
@@ -329,13 +401,21 @@ namespace Unity.Entities.Editor
                 SearchUtils.AddError("Cannot find a world to execute the query", context, provider);
                 yield break;
             }
-            
+
             var score = 0;
             var results = string.IsNullOrEmpty(searchQuery) ? systems : query.Apply(systems);
             var tmpResults = new List<SystemDescriptor>(results);
             foreach (var data in tmpResults)
             {
-                yield return provider.CreateItem(context, data.Proxy.TypeFullName, score++, data.Name, data.Proxy.Namespace, GetSystemIcon(data.Proxy), data);
+                yield return provider.CreateItem(
+                    context,
+                    data.Proxy.TypeFullName,
+                    score++,
+                    data.Name,
+                    data.Proxy.Namespace,
+                    GetSystemIcon(data.Proxy),
+                    data
+                );
             }
         }
 
@@ -343,7 +423,7 @@ namespace Unity.Entities.Editor
         {
             if (!options.flags.HasAny(SearchPropositionFlags.QueryBuilder))
                 yield break;
-            
+
             foreach (var p in SearchBridge.GetAndOrQueryBlockPropositions())
                 yield return p;
             foreach (var p in SearchBridge.GetPropositions(queryEngine))
@@ -365,7 +445,7 @@ namespace Unity.Entities.Editor
             {
                 yield return new SearchColumn("Name", "label");
             }
-            
+
             yield return new SearchColumn("Systems/Namespace", "namespace", nameof(System));
             yield return new SearchColumn("Systems/Entity Count", "entitycount", nameof(System));
             yield return new SearchColumn("Systems/Time", "time", nameof(System));
@@ -379,7 +459,7 @@ namespace Unity.Entities.Editor
             yield return new SearchColumn("Systems/Child Count", "childcount", nameof(System));
         }
     }
-    
+
     internal class SystemDescriptor
     {
         public SystemProxy Proxy { get; }
@@ -387,7 +467,7 @@ namespace Unity.Entities.Editor
 
         public string[] ComponentNamesInQueryCache { get; }
         public string[] SystemDependencyCache { get; private set; }
-        
+
         public string Name => Proxy.TypeName;
 
         public SystemDescriptor(SystemProxy proxy)
@@ -415,5 +495,5 @@ namespace Unity.Entities.Editor
         {
             hideFlags &= HideFlags.NotEditable;
         }
-    }    
+    }
 }

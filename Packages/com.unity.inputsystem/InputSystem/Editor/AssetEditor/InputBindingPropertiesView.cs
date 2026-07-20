@@ -29,15 +29,21 @@ namespace UnityEngine.InputSystem.Editor
             InputControlPickerState controlPickerState = null,
             string expectedControlLayout = null,
             ReadOnlyArray<InputControlScheme> controlSchemes = new ReadOnlyArray<InputControlScheme>(),
-            IEnumerable<string> controlPathsToMatch = null)
-            : base(InputActionSerializationHelpers.IsCompositeBinding(bindingProperty) ? "Composite" : "Binding",
-                   bindingProperty, onChange, expectedControlLayout)
+            IEnumerable<string> controlPathsToMatch = null
+        )
+            : base(
+                InputActionSerializationHelpers.IsCompositeBinding(bindingProperty) ? "Composite" : "Binding",
+                bindingProperty,
+                onChange,
+                expectedControlLayout
+            )
         {
             m_BindingProperty = bindingProperty;
             m_GroupsProperty = bindingProperty.FindPropertyRelative("m_Groups");
             m_PathProperty = bindingProperty.FindPropertyRelative("m_Path");
-            m_BindingGroups = m_GroupsProperty.stringValue
-                .Split(new[] {InputBinding.Separator}, StringSplitOptions.RemoveEmptyEntries).ToList();
+            m_BindingGroups = m_GroupsProperty
+                .stringValue.Split(new[] { InputBinding.Separator }, StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
             m_ExpectedControlLayout = expectedControlLayout;
             m_ControlSchemes = controlSchemes;
 
@@ -72,7 +78,11 @@ namespace UnityEngine.InputSystem.Editor
                     InitializeCompositeProperties();
 
                 // Composite type dropdown.
-                var selectedCompositeType = EditorGUILayout.Popup(s_CompositeTypeLabel, m_SelectedCompositeType, m_CompositeTypeOptions);
+                var selectedCompositeType = EditorGUILayout.Popup(
+                    s_CompositeTypeLabel,
+                    m_SelectedCompositeType,
+                    m_CompositeTypeOptions
+                );
                 if (selectedCompositeType != m_SelectedCompositeType)
                 {
                     m_SelectedCompositeType = selectedCompositeType;
@@ -96,8 +106,11 @@ namespace UnityEngine.InputSystem.Editor
                     // If m_CompositeParts still null after InitializeCompositePartProperties something went wrong and we can't select
                     if (m_CompositeParts != null)
                     {
-                        var selectedPart = EditorGUILayout.Popup(s_CompositePartAssignmentLabel, m_SelectedCompositePart,
-                            m_CompositePartOptions);
+                        var selectedPart = EditorGUILayout.Popup(
+                            s_CompositePartAssignmentLabel,
+                            m_SelectedCompositePart,
+                            m_CompositePartOptions
+                        );
                         if (selectedPart != m_SelectedCompositePart)
                         {
                             m_SelectedCompositePart = selectedPart;
@@ -131,7 +144,10 @@ namespace UnityEngine.InputSystem.Editor
                 if (matchingControlPath.children.Count() > 0 && !matchingControlPath.isRoot)
                 {
                     showMatchingChildLayouts.TryGetValue(matchingControlPath.deviceName, out showLayout);
-                    showMatchingChildLayouts[matchingControlPath.deviceName] = EditorGUILayout.Foldout(showLayout, text);
+                    showMatchingChildLayouts[matchingControlPath.deviceName] = EditorGUILayout.Foldout(
+                        showLayout,
+                        text
+                    );
                 }
                 else
                 {
@@ -152,7 +168,11 @@ namespace UnityEngine.InputSystem.Editor
         private void DrawMatchingControlPaths()
         {
             bool controlPathUsagePresent = false;
-            List<MatchingControlPath> matchingControlPaths = MatchingControlPath.CollectMatchingControlPaths(m_ControlPathEditor.pathProperty.stringValue, showMatchingLayouts, ref controlPathUsagePresent);
+            List<MatchingControlPath> matchingControlPaths = MatchingControlPath.CollectMatchingControlPaths(
+                m_ControlPathEditor.pathProperty.stringValue,
+                showMatchingLayouts,
+                ref controlPathUsagePresent
+            );
             if (matchingControlPaths == null || matchingControlPaths.Count != 0)
             {
                 EditorGUILayout.BeginVertical();
@@ -163,9 +183,15 @@ namespace UnityEngine.InputSystem.Editor
                     if (matchingControlPaths == null)
                     {
                         if (controlPathUsagePresent)
-                            EditorGUILayout.HelpBox("No registered controls match this current binding. Some controls are only registered at runtime.", MessageType.Warning);
+                            EditorGUILayout.HelpBox(
+                                "No registered controls match this current binding. Some controls are only registered at runtime.",
+                                MessageType.Warning
+                            );
                         else
-                            EditorGUILayout.HelpBox("No other registered controls match this current binding. Some controls are only registered at runtime.", MessageType.Warning);
+                            EditorGUILayout.HelpBox(
+                                "No other registered controls match this current binding. Some controls are only registered at runtime.",
+                                MessageType.Warning
+                            );
                     }
                     else
                     {
@@ -225,15 +251,22 @@ namespace UnityEngine.InputSystem.Editor
             var compositeTypeOptionsList = new List<GUIContent>();
             var compositeTypeList = new List<string>();
             var currentIndex = 0;
-            foreach (var composite in InputBindingComposite.s_Composites.internedNames.Where(x =>
-                !InputBindingComposite.s_Composites.aliases.Contains(x)).OrderBy(x => x))
+            foreach (
+                var composite in InputBindingComposite
+                    .s_Composites.internedNames.Where(x => !InputBindingComposite.s_Composites.aliases.Contains(x))
+                    .OrderBy(x => x)
+            )
             {
                 if (!string.IsNullOrEmpty(m_ExpectedControlLayout))
                 {
                     var valueType = InputBindingComposite.GetValueType(composite);
-                    if (valueType != null &&
-                        !InputControlLayout.s_Layouts.ValueTypeIsAssignableFrom(
-                            new InternedString(m_ExpectedControlLayout), valueType))
+                    if (
+                        valueType != null
+                        && !InputControlLayout.s_Layouts.ValueTypeIsAssignableFrom(
+                            new InternedString(m_ExpectedControlLayout),
+                            valueType
+                        )
+                    )
                         continue;
                 }
 
@@ -259,10 +292,7 @@ namespace UnityEngine.InputSystem.Editor
             m_SelectedCompositeType = selectedCompositeIndex;
 
             // Initialize parameters.
-            m_CompositeParameters = new ParameterListView
-            {
-                onChange = OnCompositeParametersModified
-            };
+            m_CompositeParameters = new ParameterListView { onChange = OnCompositeParametersModified };
             if (compositeType != null)
                 m_CompositeParameters.Initialize(compositeType, compositeNameAndParameters.parameters);
         }
@@ -275,8 +305,10 @@ namespace UnityEngine.InputSystem.Editor
             // Determine the name of the current composite type that the part belongs to.
             var bindingArrayProperty = m_BindingProperty.GetArrayPropertyFromElement();
             var partBindingIndex = InputActionSerializationHelpers.GetIndex(bindingArrayProperty, m_BindingProperty);
-            var compositeBindingIndex =
-                InputActionSerializationHelpers.GetCompositeStartIndex(bindingArrayProperty, partBindingIndex);
+            var compositeBindingIndex = InputActionSerializationHelpers.GetCompositeStartIndex(
+                bindingArrayProperty,
+                partBindingIndex
+            );
             if (compositeBindingIndex == -1)
                 return;
             var compositeBindingProperty = bindingArrayProperty.GetArrayElementAtIndex(compositeBindingIndex);
@@ -344,7 +376,7 @@ namespace UnityEngine.InputSystem.Editor
             var nameAndParameters = new NameAndParameters
             {
                 name = m_CompositeTypes[m_SelectedCompositeType],
-                parameters = m_CompositeParameters.GetParameters()
+                parameters = m_CompositeParameters.GetParameters(),
             };
 
             InputActionSerializationHelpers.ChangeCompositeBindingType(m_BindingProperty, nameAndParameters);
@@ -378,15 +410,20 @@ namespace UnityEngine.InputSystem.Editor
         private readonly InputControlPickerState m_ControlPickerState;
         private readonly InputControlPathEditor m_ControlPathEditor;
 
-        private static readonly GUIContent s_CompositeTypeLabel = EditorGUIUtility.TrTextContent("Composite Type",
-            "Type of composite. Allows changing the composite type retroactively. Doing so will modify the bindings that are part of the composite.");
-        private static readonly GUIContent s_UseInControlSchemesLAbel = EditorGUIUtility.TrTextContent("Use in control scheme",
+        private static readonly GUIContent s_CompositeTypeLabel = EditorGUIUtility.TrTextContent(
+            "Composite Type",
+            "Type of composite. Allows changing the composite type retroactively. Doing so will modify the bindings that are part of the composite."
+        );
+        private static readonly GUIContent s_UseInControlSchemesLAbel = EditorGUIUtility.TrTextContent(
+            "Use in control scheme",
             "In which control schemes the binding is active. A binding can be used by arbitrary many control schemes. If a binding is not "
-            + "assigned to a specific control schemes, it is active in all of them.");
+                + "assigned to a specific control schemes, it is active in all of them."
+        );
         private static readonly GUIContent s_CompositePartAssignmentLabel = EditorGUIUtility.TrTextContent(
             "Composite Part",
             "The named part of the composite that the binding is assigned to. Multiple bindings may be assigned the same part. All controls from "
-            + "all bindings that are assigned the same part will collectively feed values into that part of the composite.");
+                + "all bindings that are assigned the same part will collectively feed values into that part of the composite."
+        );
 
         private ReadOnlyArray<InputControlScheme> m_ControlSchemes;
         private readonly List<string> m_BindingGroups;

@@ -17,8 +17,12 @@ namespace Unity.Entities
 
             public TimeCounter(string name)
             {
-                m_Counter = new ProfilerCounterValue<long>(s_Data.Category, name, ProfilerMarkerDataUnit.TimeNanoseconds,
-                    ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush);
+                m_Counter = new ProfilerCounterValue<long>(
+                    s_Data.Category,
+                    name,
+                    ProfilerMarkerDataUnit.TimeNanoseconds,
+                    ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush
+                );
             }
         }
     }

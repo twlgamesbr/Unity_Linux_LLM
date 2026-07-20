@@ -23,7 +23,6 @@ public static class JobEntitySyntaxFinder
         // Has IJobEntity identifier
         var hasIJobEntityIdentifier = false;
         foreach (var baseType in structDeclarationSyntax.BaseList.Types)
-
             if (baseType.Type is IdentifierNameSyntax { Identifier.ValueText: "IJobEntity" })
             {
                 hasIJobEntityIdentifier = true;
@@ -45,11 +44,17 @@ public static class JobEntitySyntaxFinder
         return hasPartial;
     }
 
-    public static StructDeclarationSyntax GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx, CancellationToken cancellationToken)
+    public static StructDeclarationSyntax GetSemanticTargetForGeneration(
+        GeneratorSyntaxContext ctx,
+        CancellationToken cancellationToken
+    )
     {
         var structDeclarationSyntax = (StructDeclarationSyntax)ctx.Node;
         foreach (var baseTypeSyntax in structDeclarationSyntax.BaseList!.Types)
-            if (ctx.SemanticModel.GetTypeInfo(baseTypeSyntax.Type).Type.ToFullName() == "global::Unity.Entities.IJobEntity")
+            if (
+                ctx.SemanticModel.GetTypeInfo(baseTypeSyntax.Type).Type.ToFullName()
+                == "global::Unity.Entities.IJobEntity"
+            )
                 return structDeclarationSyntax;
         return null;
     }

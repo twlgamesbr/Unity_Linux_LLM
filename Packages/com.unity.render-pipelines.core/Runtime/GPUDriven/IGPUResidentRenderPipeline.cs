@@ -13,7 +13,7 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// If used, the BatchRendererGroup will be used for draw submission whenever possible.
         /// </summary>
-        InstancedDrawing
+        InstancedDrawing,
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ namespace UnityEngine.Rendering
         /// </summary>
         public bool allowInEditMode;
 
-		/// <summary>
+        /// <summary>
         /// Default minimum screen percentage (0-20%) gpu-driven Renderers can cover before getting culled.
         /// </summary>
         public float smallMeshScreenPercentage;
@@ -78,11 +78,7 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// The mode the GPUResidentDrawer is configured for on this RenderPipeline
         /// </summary>
-        GPUResidentDrawerMode gpuResidentDrawerMode
-        {
-            get;
-            set;
-        }
+        GPUResidentDrawerMode gpuResidentDrawerMode { get; set; }
 
         /// <summary>
         /// Callback for use when the GPUResidentDrawer needs to be reinitialized.

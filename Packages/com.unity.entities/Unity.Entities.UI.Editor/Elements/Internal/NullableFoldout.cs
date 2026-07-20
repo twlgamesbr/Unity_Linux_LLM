@@ -15,8 +15,11 @@ namespace Unity.Entities.UI
     {
         protected BindingContextElement Root { get; private set; }
         public PropertyPath Path { get; private set; }
+
         protected InspectorVisitor GetVisitor() => Root.GetVisitor();
+
         protected TValue GetValue() => Root.TryGetValue(Path, out TValue v) ? v : default;
+
         protected IProperty GetProperty() => Root.TryGetProperty(Path, out var property) ? property : default;
 
         public NullableFoldout()
@@ -24,27 +27,32 @@ namespace Unity.Entities.UI
             binding = this;
             AddToClassList(UssClasses.NullableFoldoutElement.NullableFoldout);
             Resources.Templates.NullableFoldout.AddStyles(this);
-            this.Q<Foldout>().Q<VisualElement>(className: UssClasses.Unity.ToggleInput).AddManipulator(
-                new ContextualMenuManipulator(evt =>
-                {
-                    var property = GetProperty();
-                    if (null == property)
-                        return;
-
-                    var inspectorOptions = property.GetAttribute<InspectorOptionsAttribute>();
-
-                    if (property.IsReadOnly || true == inspectorOptions?.HideResetToDefault)
+            this.Q<Foldout>()
+                .Q<VisualElement>(className: UssClasses.Unity.ToggleInput)
+                .AddManipulator(
+                    new ContextualMenuManipulator(evt =>
                     {
-                        return;
-                    }
+                        var property = GetProperty();
+                        if (null == property)
+                            return;
 
-                    evt.menu.AppendAction(
-                        "Reset to default",
-                        p => ReloadWithInstance(),
-                        p => property.HasAttribute<CreateInstanceOnInspectionAttribute>()
-                            ? DropdownMenuAction.Status.Disabled
-                            : DropdownMenuAction.Status.Normal);
-                }));
+                        var inspectorOptions = property.GetAttribute<InspectorOptionsAttribute>();
+
+                        if (property.IsReadOnly || true == inspectorOptions?.HideResetToDefault)
+                        {
+                            return;
+                        }
+
+                        evt.menu.AppendAction(
+                            "Reset to default",
+                            p => ReloadWithInstance(),
+                            p =>
+                                property.HasAttribute<CreateInstanceOnInspectionAttribute>()
+                                    ? DropdownMenuAction.Status.Disabled
+                                    : DropdownMenuAction.Status.Normal
+                        );
+                    })
+                );
         }
 
         void IContextElement.SetContext(BindingContextElement root, PropertyPath path)
@@ -54,13 +62,9 @@ namespace Unity.Entities.UI
             OnContextReady();
         }
 
-        public virtual void OnContextReady()
-        {
-        }
+        public virtual void OnContextReady() { }
 
-        void IBinding.PreUpdate()
-        {
-        }
+        void IBinding.PreUpdate() { }
 
         void IBinding.Update()
         {
@@ -83,14 +87,10 @@ namespace Unity.Entities.UI
 
                 OnUpdate();
             }
-            catch (Exception)
-            {
-            }
+            catch (Exception) { }
         }
 
-        void IBinding.Release()
-        {
-        }
+        void IBinding.Release() { }
 
         public void Reload()
         {
@@ -117,20 +117,18 @@ namespace Unity.Entities.UI
             }
         }
 
-        public virtual void Reload(IProperty property)
-        {
-        }
+        public virtual void Reload(IProperty property) { }
 
-        protected virtual void OnUpdate()
-        {
-        }
+        protected virtual void OnUpdate() { }
 
-        protected bool HasAttribute<T>() where T:Attribute
+        protected bool HasAttribute<T>()
+            where T : Attribute
         {
             return Root.TryGetProperty(Path, out var property) && property.HasAttribute<T>();
         }
 
-        protected T GetAttribute<T>() where T:Attribute
+        protected T GetAttribute<T>()
+            where T : Attribute
         {
             return Root.TryGetProperty(Path, out var property) ? property.GetAttribute<T>() : null;
         }

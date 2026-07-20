@@ -1,24 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Auth
 {
     [DefaultExecutionOrder(-300)]
@@ -213,24 +212,15 @@ namespace NPCSystem.Auth
             }
             Transform root = authPanel != null ? authPanel.transform : null;
 
-            authTitle =
-                authTitle != null
-                    ? authTitle
-                    : FindChildComponent<TMP_Text>(root, "AuthContent/AuthTitle");
+            authTitle = authTitle != null ? authTitle : FindChildComponent<TMP_Text>(root, "AuthContent/AuthTitle");
             usernameInput =
                 usernameInput != null
                     ? usernameInput
-                    : FindChildComponent<TMP_InputField>(
-                        root,
-                        "AuthContent/UsernameGroup/UsernameInput"
-                    );
+                    : FindChildComponent<TMP_InputField>(root, "AuthContent/UsernameGroup/UsernameInput");
             passwordInput =
                 passwordInput != null
                     ? passwordInput
-                    : FindChildComponent<TMP_InputField>(
-                        root,
-                        "AuthContent/PasswordGroup/PasswordInput"
-                    );
+                    : FindChildComponent<TMP_InputField>(root, "AuthContent/PasswordGroup/PasswordInput");
             confirmPasswordGroup =
                 confirmPasswordGroup != null
                     ? confirmPasswordGroup
@@ -238,10 +228,7 @@ namespace NPCSystem.Auth
             confirmPasswordInput =
                 confirmPasswordInput != null
                     ? confirmPasswordInput
-                    : FindChildComponent<TMP_InputField>(
-                        root,
-                        "AuthContent/ConfirmPasswordGroup/ConfirmPasswordInput"
-                    );
+                    : FindChildComponent<TMP_InputField>(root, "AuthContent/ConfirmPasswordGroup/ConfirmPasswordInput");
             rememberToggle =
                 rememberToggle != null
                     ? rememberToggle
@@ -249,31 +236,19 @@ namespace NPCSystem.Auth
             rememberLabel =
                 rememberLabel != null
                     ? rememberLabel
-                    : FindChildComponent<TMP_Text>(
-                        root,
-                        "AuthContent/RememberToggle/RememberLabel"
-                    );
+                    : FindChildComponent<TMP_Text>(root, "AuthContent/RememberToggle/RememberLabel");
             submitButton =
-                submitButton != null
-                    ? submitButton
-                    : FindChildComponent<Button>(root, "AuthContent/SubmitButton");
-            submitButtonText =
-                submitButtonText != null ? submitButtonText : FindButtonText(submitButton);
+                submitButton != null ? submitButton : FindChildComponent<Button>(root, "AuthContent/SubmitButton");
+            submitButtonText = submitButtonText != null ? submitButtonText : FindButtonText(submitButton);
             switchModeButton =
                 switchModeButton != null
                     ? switchModeButton
                     : FindChildComponent<Button>(root, "AuthContent/SwitchModeButton");
-            switchModeText =
-                switchModeText != null ? switchModeText : FindButtonText(switchModeButton);
-            errorText =
-                errorText != null
-                    ? errorText
-                    : FindChildComponent<TMP_Text>(root, "AuthContent/ErrorText");
+            switchModeText = switchModeText != null ? switchModeText : FindButtonText(switchModeButton);
+            errorText = errorText != null ? errorText : FindChildComponent<TMP_Text>(root, "AuthContent/ErrorText");
             authService = authService != null ? authService : GetComponent<PlayerAuthService>();
             authService =
-                authService != null
-                    ? authService
-                    : FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
+                authService != null ? authService : FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
             authCanvas =
                 authCanvas != null ? authCanvas
                 : authPanel != null ? authPanel.GetComponent<Canvas>()
@@ -282,8 +257,7 @@ namespace NPCSystem.Auth
                 authRaycaster != null ? authRaycaster
                 : authPanel != null ? authPanel.GetComponent<GraphicRaycaster>()
                 : null;
-            gameplayCanvas =
-                gameplayCanvas != null ? gameplayCanvas : FindGameplayCanvas(authPanel);
+            gameplayCanvas = gameplayCanvas != null ? gameplayCanvas : FindGameplayCanvas(authPanel);
             gameplayRaycaster =
                 gameplayRaycaster != null ? gameplayRaycaster
                 : gameplayCanvas != null ? gameplayCanvas.GetComponent<GraphicRaycaster>()
@@ -366,9 +340,7 @@ namespace NPCSystem.Auth
 
             if (authPanel != null)
             {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(
-                    authPanel.GetComponent<RectTransform>()
-                );
+                LayoutRebuilder.ForceRebuildLayoutImmediate(authPanel.GetComponent<RectTransform>());
             }
         }
 
@@ -436,8 +408,7 @@ namespace NPCSystem.Auth
 
             string username = usernameInput != null ? usernameInput.text.Trim() : string.Empty;
             string password = passwordInput != null ? passwordInput.text : string.Empty;
-            string confirmPassword =
-                confirmPasswordInput != null ? confirmPasswordInput.text : string.Empty;
+            string confirmPassword = confirmPasswordInput != null ? confirmPasswordInput.text : string.Empty;
 
             HideError();
             SetInputEnabled(false);
@@ -454,11 +425,7 @@ namespace NPCSystem.Auth
                 if (_isRegisterMode)
                     await HandleRegisterAsync(username, password);
                 else
-                    await HandleLoginAsync(
-                        username,
-                        password,
-                        rememberToggle != null && rememberToggle.isOn
-                    );
+                    await HandleLoginAsync(username, password, rememberToggle != null && rememberToggle.isOn);
             }
             catch (Exception ex)
             {
@@ -517,18 +484,10 @@ namespace NPCSystem.Auth
                     NPCFlowLogLevel.Info,
                     "Login attempt.",
                     source: nameof(AuthUIController),
-                    data: new Dictionary<string, object>
-                    {
-                        ["username"] = username,
-                        ["rememberMe"] = rememberMe,
-                    }
+                    data: new Dictionary<string, object> { ["username"] = username, ["rememberMe"] = rememberMe }
                 );
 
-            PlayerAuthSessionResponse session = await authService.LoginAsync(
-                username,
-                password,
-                rememberMe
-            );
+            PlayerAuthSessionResponse session = await authService.LoginAsync(username, password, rememberMe);
 
             NPCFlowLogger
                 .FindOrCreate()
@@ -566,10 +525,7 @@ namespace NPCSystem.Auth
                     data: new Dictionary<string, object> { ["username"] = username }
                 );
 
-            PlayerAuthRegisterResponse registration = await authService.RegisterAsync(
-                username,
-                password
-            );
+            PlayerAuthRegisterResponse registration = await authService.RegisterAsync(username, password);
 
             NPCFlowLogger
                 .FindOrCreate()

@@ -68,7 +68,8 @@ namespace Unity.Entities
     {
         public ECBCommand CommandType;
         public int TotalSize;
-        public int SortKey;  /// Used to order command execution during playback
+        public int SortKey;
+        /// Used to order command execution during playback
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -275,7 +276,6 @@ namespace Unity.Entities
         public byte ValueRequiresEntityFixup;
     }
 
-
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe struct EntitySharedComponentCommand
     {
@@ -319,5 +319,4 @@ namespace Unity.Entities
         public BufferHeaderNode* BufferCleanupList;
         public EntityComponentGCNode* CleanupList;
     }
-
 }

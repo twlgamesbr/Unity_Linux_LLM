@@ -287,11 +287,13 @@ namespace UnityEngine.InputSystem
     ///
     /// In all other ways, this interface is identical to <see cref="IInputInteraction"/>.
     /// </remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces", Justification = "This interface is used to mark implementing classes to advertise the value it expects. This seems more elegant then the suggestion to use an attribute.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Microsoft.Design",
+        "CA1040:AvoidEmptyInterfaces",
+        Justification = "This interface is used to mark implementing classes to advertise the value it expects. This seems more elegant then the suggestion to use an attribute."
+    )]
     public interface IInputInteraction<TValue> : IInputInteraction
-        where TValue : struct
-    {
-    }
+        where TValue : struct { }
 
     internal static class InputInteraction
     {

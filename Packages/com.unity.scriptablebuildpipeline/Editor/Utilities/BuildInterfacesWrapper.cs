@@ -84,18 +84,28 @@ namespace UnityEditor.Build.Pipeline.Utilities
             {
                 var attribute = (VersionedCallbackAttribute)Attribute.GetCustomAttribute(type, versionedType);
 #if UNITY_2020_2_OR_NEWER
-                if (typeof(IPreprocessShaders).IsAssignableFrom(type) || typeof(IPreprocessComputeShaders).IsAssignableFrom(type))
+                if (
+                    typeof(IPreprocessShaders).IsAssignableFrom(type)
+                    || typeof(IPreprocessComputeShaders).IsAssignableFrom(type)
+                )
 #else
                 if (typeof(IPreprocessShaders).IsAssignableFrom(type))
 #endif
                 {
-                    shaderInputs.Add(HashingMethods.Calculate(type.AssemblyQualifiedName, attribute.version).ToHash128());
+                    shaderInputs.Add(
+                        HashingMethods.Calculate(type.AssemblyQualifiedName, attribute.version).ToHash128()
+                    );
                 }
 #pragma warning disable CS0618 // Type or member is obsolete
-                else if (typeof(IProcessScene).IsAssignableFrom(type) || typeof(IProcessSceneWithReport).IsAssignableFrom(type))
+                else if (
+                    typeof(IProcessScene).IsAssignableFrom(type)
+                    || typeof(IProcessSceneWithReport).IsAssignableFrom(type)
+                )
 #pragma warning restore CS0618 // Type or member is obsolete
                 {
-                    sceneInputs.Add(HashingMethods.Calculate(type.AssemblyQualifiedName, attribute.version).ToHash128());
+                    sceneInputs.Add(
+                        HashingMethods.Calculate(type.AssemblyQualifiedName, attribute.version).ToHash128()
+                    );
                 }
             }
 

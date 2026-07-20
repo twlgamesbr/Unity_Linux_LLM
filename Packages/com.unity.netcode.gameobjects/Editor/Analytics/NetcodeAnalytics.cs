@@ -49,6 +49,7 @@ namespace Unity.Netcode.Editor
         internal List<NetworkManagerAnalyticsHandler> AnalyticsTestResults = new List<NetworkManagerAnalyticsHandler>();
 
         internal List<NetworkSessionInfo> RecentSessions = new List<NetworkSessionInfo>();
+
         /// <summary>
         /// Invoked from <see cref="NetworkManager.ModeChanged(PlayModeStateChange)"/>.
         /// </summary>
@@ -59,25 +60,26 @@ namespace Unity.Netcode.Editor
             switch (playModeState)
             {
                 case PlayModeStateChange.EnteredPlayMode:
+                {
+                    if (IsIntegrationTest)
                     {
-                        if (IsIntegrationTest)
-                        {
-                            AnalyticsTestResults.Clear();
-                        }
-                        break;
+                        AnalyticsTestResults.Clear();
                     }
+                    break;
+                }
                 case PlayModeStateChange.ExitingPlayMode:
-                    {
-                        // Update analytics
-                        UpdateAnalytics(networkManager);
-                        break;
-                    }
+                {
+                    // Update analytics
+                    UpdateAnalytics(networkManager);
+                    break;
+                }
             }
         }
 
         private bool ShouldLogAnalytics()
         {
-            return (IsIntegrationTest && EnableIntegrationTestAnalytics) || (!IsIntegrationTest && EditorAnalytics.enabled);
+            return (IsIntegrationTest && EnableIntegrationTestAnalytics)
+                || (!IsIntegrationTest && EditorAnalytics.enabled);
         }
 
         /// <summary>
@@ -98,7 +100,10 @@ namespace Unity.Netcode.Editor
                 WasClient = networkManager.IsClient,
                 WasServer = networkManager.IsServer,
                 NetworkConfig = networkManager.NetworkConfig.Copy(),
-                Transport = networkManager.NetworkConfig.NetworkTransport != null ? networkManager.NetworkConfig.NetworkTransport.GetType().Name : "None",
+                Transport =
+                    networkManager.NetworkConfig.NetworkTransport != null
+                        ? networkManager.NetworkConfig.NetworkTransport.GetType().Name
+                        : "None",
             };
             RecentSessions.Add(newSession);
         }
@@ -171,7 +176,9 @@ namespace Unity.Netcode.Editor
                 // If not running an integration test, then go ahead and send the anlytics event data.
                 if (!IsIntegrationTest)
                 {
-                    var result = EditorAnalytics.SendAnalytic(new NetworkManagerAnalyticsHandler(networkManagerAnalytics));
+                    var result = EditorAnalytics.SendAnalytic(
+                        new NetworkManagerAnalyticsHandler(networkManagerAnalytics)
+                    );
                     if (EnableLogging && result != AnalyticsResult.Ok)
                     {
                         Debug.LogWarning($"[Analytics] Problem sending analytics: {result}");
@@ -212,7 +219,8 @@ namespace Unity.Netcode.Editor
             }
             var networkManagerAnalytics = new NetworkManagerAnalytics()
             {
-                IsDistributedAuthority = networkSession.NetworkConfig.NetworkTopology == NetworkTopologyTypes.DistributedAuthority,
+                IsDistributedAuthority =
+                    networkSession.NetworkConfig.NetworkTopology == NetworkTopologyTypes.DistributedAuthority,
                 WasServer = networkSession.WasServer,
                 WasClient = networkSession.WasClient,
                 UsedCMBService = networkSession.UsedCMBService,

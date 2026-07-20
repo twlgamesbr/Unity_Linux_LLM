@@ -9,7 +9,7 @@ namespace UnityEngine.TestTools
     internal class UnityTestMethodCommand : TestMethodCommand
     {
         public UnityTestMethodCommand(TestMethod testMethod)
-            : base(testMethod) {}
+            : base(testMethod) { }
 
         public override TestResult Execute(ITestExecutionContext context)
         {
@@ -17,11 +17,11 @@ namespace UnityEngine.TestTools
             {
                 var result = base.Execute(context);
 
-                if (((UnityTestExecutionContext) context).HasTimedOut())
+                if (((UnityTestExecutionContext)context).HasTimedOut())
                 {
                     context.CurrentResult.RecordException(new UnityTestTimeoutException(context.TestCaseTimeout));
                 }
-                
+
                 return result;
             }
         }

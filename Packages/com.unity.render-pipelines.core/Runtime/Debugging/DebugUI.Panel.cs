@@ -3,7 +3,6 @@
 #endif
 
 using System;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -29,11 +28,7 @@ namespace UnityEngine.Rendering
             /// <inheritdoc/>
             public VisualElement Create(DebugUI.Context context)
             {
-                VisualElement container = new GroupBox()
-                {
-                    text = displayName,
-                    name = displayName + "_Content"
-                };
+                VisualElement container = new GroupBox() { text = displayName, name = displayName + "_Content" };
 
                 var label = container.Q<Label>(className: "unity-group-box__label");
                 label.AddToClassList("debug-window-header-title");
@@ -79,31 +74,49 @@ namespace UnityEngine.Rendering
             /// Widget flags for this panel.
             /// </summary>
             public Flags flags { get; set; }
+
             /// <summary>
             /// Display name of the panel.
             /// </summary>
             public string displayName { get; set; }
+
             /// <summary>
             /// Group index of the panel.
             /// </summary>
             public int groupIndex { get; set; }
+
             /// <summary>
             /// Path of the panel.
             /// </summary>
-            public string queryPath { get { return displayName; } }
+            public string queryPath
+            {
+                get { return displayName; }
+            }
 
             /// <summary>
             /// Specify if the panel is editor only.
             /// </summary>
-            public bool isEditorOnly { get { return (flags & Flags.EditorOnly) != 0; } }
+            public bool isEditorOnly
+            {
+                get { return (flags & Flags.EditorOnly) != 0; }
+            }
+
             /// <summary>
             /// Specify if the panel is runtime only.
             /// </summary>
-            public bool isRuntimeOnly { get { return (flags & Flags.RuntimeOnly) != 0; } }
+            public bool isRuntimeOnly
+            {
+                get { return (flags & Flags.RuntimeOnly) != 0; }
+            }
+
             /// <summary>
             /// Returns true if the panel is inactive in the editor.
             /// </summary>
-            public bool isInactiveInEditor { get { return (isRuntimeOnly && !Application.isPlaying); } }
+            public bool isInactiveInEditor
+            {
+                get { return (isRuntimeOnly && !Application.isPlaying); }
+            }
+
             /// <summary>
             /// Returns true if the panel should always be updated.
             /// </summary>
@@ -114,6 +127,7 @@ namespace UnityEngine.Rendering
             /// List of children.
             /// </summary>
             public ObservableList<Widget> children { get; private set; }
+
             /// <summary>
             /// Callback used when the panel is set dirty.
             /// </summary>
@@ -122,7 +136,8 @@ namespace UnityEngine.Rendering
 #if UNITY_EDITOR
             private string m_DocumentationURL;
 
-            public string documentationUrl {
+            public string documentationUrl
+            {
                 get => m_DocumentationURL;
                 set
                 {

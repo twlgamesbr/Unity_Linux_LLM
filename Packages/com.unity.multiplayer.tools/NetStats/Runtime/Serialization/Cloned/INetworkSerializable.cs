@@ -13,6 +13,7 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// Either BufferSerializerReader or BufferSerializerWriter, depending whether the serializer
         /// is in read mode or write mode.
         /// </typeparam>
-        void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter;
+        void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter;
     }
 }

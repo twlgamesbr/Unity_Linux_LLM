@@ -25,8 +25,10 @@ namespace UnityEngine.InputSystem.Editor
             EditorGUILayout.Space();
 
             if (inputActionAsset == null)
-                EditorGUILayout.HelpBox("The currently selected object is not an editable input action asset.",
-                    MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "The currently selected object is not an editable input action asset.",
+                    MessageType.Info
+                );
 
             // Button to pop up window to edit the asset.
             using (new EditorGUI.DisabledScope(inputActionAsset == null))
@@ -38,9 +40,14 @@ namespace UnityEngine.InputSystem.Editor
             EditorGUILayout.Space();
 
             // Project-wide Input Actions Asset UI.
-            InputAssetEditorUtils.DrawMakeActiveGui(InputSystem.actions, inputActionAsset,
-                inputActionAsset ? inputActionAsset.name : "Null", "Project-wide Input Actions",
-                (value) => InputSystem.actions = value, !EditorApplication.isPlayingOrWillChangePlaymode);
+            InputAssetEditorUtils.DrawMakeActiveGui(
+                InputSystem.actions,
+                inputActionAsset,
+                inputActionAsset ? inputActionAsset.name : "Null",
+                "Project-wide Input Actions",
+                (value) => InputSystem.actions = value,
+                !EditorApplication.isPlayingOrWillChangePlaymode
+            );
 
             EditorGUILayout.Space();
 
@@ -66,9 +73,12 @@ namespace UnityEngine.InputSystem.Editor
 
                 if (GUILayout.Button("…", EditorStyles.miniButton, GUILayout.MaxWidth(20)))
                 {
-                    var fileName = EditorUtility.SaveFilePanel("Location for generated C# file",
+                    var fileName = EditorUtility.SaveFilePanel(
+                        "Location for generated C# file",
                         Path.GetDirectoryName(defaultFileName),
-                        Path.GetFileName(defaultFileName), "cs");
+                        Path.GetFileName(defaultFileName),
+                        "cs"
+                    );
                     if (!string.IsNullOrEmpty(fileName))
                     {
                         if (fileName.StartsWith(Application.dataPath))
@@ -82,12 +92,18 @@ namespace UnityEngine.InputSystem.Editor
                 string typeName = null;
                 if (inputActionAsset != null)
                     typeName = CSharpCodeHelpers.MakeTypeName(inputActionAsset?.name);
-                wrapperClassNameProperty.PropertyFieldWithDefaultText(m_WrapperClassNameLabel, typeName ?? "<Class name>");
+                wrapperClassNameProperty.PropertyFieldWithDefaultText(
+                    m_WrapperClassNameLabel,
+                    typeName ?? "<Class name>"
+                );
 
                 if (!CSharpCodeHelpers.IsEmptyOrProperIdentifier(wrapperClassNameProperty.stringValue))
                     EditorGUILayout.HelpBox("Must be a valid C# identifier", MessageType.Error);
 
-                wrapperCodeNamespaceProperty.PropertyFieldWithDefaultText(m_WrapperCodeNamespaceLabel, "<Global namespace>");
+                wrapperCodeNamespaceProperty.PropertyFieldWithDefaultText(
+                    m_WrapperCodeNamespaceLabel,
+                    "<Global namespace>"
+                );
 
                 if (!CSharpCodeHelpers.IsEmptyOrProperNamespaceName(wrapperCodeNamespaceProperty.stringValue))
                     EditorGUILayout.HelpBox("Must be a valid C# namespace name", MessageType.Error);

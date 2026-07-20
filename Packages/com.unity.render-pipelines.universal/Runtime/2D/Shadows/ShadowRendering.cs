@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
-
 #if USING_SPRITESHAPE
 using UnityEngine.U2D;
 #endif
@@ -30,15 +29,27 @@ namespace UnityEngine.Rendering.Universal
         private static readonly int k_ShadowContractionDistanceID = Shader.PropertyToID("_ShadowContractionDistance");
         private static readonly int k_ShadowAlphaCutoffID = Shader.PropertyToID("_ShadowAlphaCutoff");
         private static readonly int k_SoftShadowAngle = Shader.PropertyToID("_SoftShadowAngle");
-        private static readonly int k_ShadowSoftnessFalloffIntensityID = Shader.PropertyToID("_ShadowSoftnessFalloffIntensity");
+        private static readonly int k_ShadowSoftnessFalloffIntensityID = Shader.PropertyToID(
+            "_ShadowSoftnessFalloffIntensity"
+        );
         private static readonly int k_ShadowShadowColorID = Shader.PropertyToID("_ShadowColor");
         private static readonly int k_ShadowUnshadowColorID = Shader.PropertyToID("_UnshadowColor");
 
-        private static readonly ProfilingSampler m_ProfilingSamplerShadows = new ProfilingSampler("Draw 2D Shadow Texture");
-        private static readonly ProfilingSampler m_ProfilingSamplerShadowsA = new ProfilingSampler("Draw 2D Shadows (A)");
-        private static readonly ProfilingSampler m_ProfilingSamplerShadowsR = new ProfilingSampler("Draw 2D Shadows (R)");
-        private static readonly ProfilingSampler m_ProfilingSamplerShadowsG = new ProfilingSampler("Draw 2D Shadows (G)");
-        private static readonly ProfilingSampler m_ProfilingSamplerShadowsB = new ProfilingSampler("Draw 2D Shadows (B)");
+        private static readonly ProfilingSampler m_ProfilingSamplerShadows = new ProfilingSampler(
+            "Draw 2D Shadow Texture"
+        );
+        private static readonly ProfilingSampler m_ProfilingSamplerShadowsA = new ProfilingSampler(
+            "Draw 2D Shadows (A)"
+        );
+        private static readonly ProfilingSampler m_ProfilingSamplerShadowsR = new ProfilingSampler(
+            "Draw 2D Shadows (R)"
+        );
+        private static readonly ProfilingSampler m_ProfilingSamplerShadowsG = new ProfilingSampler(
+            "Draw 2D Shadows (G)"
+        );
+        private static readonly ProfilingSampler m_ProfilingSamplerShadowsB = new ProfilingSampler(
+            "Draw 2D Shadows (B)"
+        );
 
         private static readonly float k_MaxShadowSoftnessAngle = 15;
         private static readonly Color k_ShadowColorLookup = new Color(0, 0, 1, 0);
@@ -56,9 +67,10 @@ namespace UnityEngine.Rendering.Universal
         private static Material GetProjectedShadowMaterial(
             Material material,
             Func<Renderer2DResources, Shader> shaderFunc,
-            int offset, int pass)
+            int offset,
+            int pass
+        )
         {
-
 #if !UNITY_EDITOR // In standalone builds, shaders are never changed. We can early exit
             if (material != null)
                 return material;
@@ -90,7 +102,9 @@ namespace UnityEngine.Rendering.Universal
             rendererData.projectedShadowMaterial = GetProjectedShadowMaterial(
                 rendererData.projectedShadowMaterial,
                 r => r.projectedShadowShader,
-                0, 0);
+                0,
+                0
+            );
 
             return rendererData.projectedShadowMaterial;
         }
@@ -100,7 +114,9 @@ namespace UnityEngine.Rendering.Universal
             rendererData.projectedUnshadowMaterial = GetProjectedShadowMaterial(
                 rendererData.projectedUnshadowMaterial,
                 r => r.projectedShadowShader,
-                1, 1);
+                1,
+                1
+            );
 
             return rendererData.projectedUnshadowMaterial;
         }
@@ -110,7 +126,9 @@ namespace UnityEngine.Rendering.Universal
             rendererData.spriteSelfShadowMaterial = GetProjectedShadowMaterial(
                 rendererData.spriteSelfShadowMaterial,
                 r => r.spriteShadowShader,
-                0, 0);
+                0,
+                0
+            );
 
             return rendererData.spriteSelfShadowMaterial;
         }
@@ -120,7 +138,9 @@ namespace UnityEngine.Rendering.Universal
             rendererData.spriteUnshadowMaterial = GetProjectedShadowMaterial(
                 rendererData.spriteUnshadowMaterial,
                 r => r.spriteUnshadowShader,
-                1, 0);
+                1,
+                0
+            );
 
             return rendererData.spriteUnshadowMaterial;
         }
@@ -130,7 +150,9 @@ namespace UnityEngine.Rendering.Universal
             rendererData.geometrySelfShadowMaterial = GetProjectedShadowMaterial(
                 rendererData.geometrySelfShadowMaterial,
                 r => r.geometryShadowShader,
-                0, 0);
+                0,
+                0
+            );
 
             return rendererData.geometrySelfShadowMaterial;
         }
@@ -140,14 +162,20 @@ namespace UnityEngine.Rendering.Universal
             rendererData.geometryUnshadowMaterial = GetProjectedShadowMaterial(
                 rendererData.geometryUnshadowMaterial,
                 r => r.geometryUnshadowShader,
-                1, 0);
+                1,
+                0
+            );
 
             return rendererData.geometryUnshadowMaterial;
         }
 
-        private static void CalculateFrustumCornersPerspective(Camera camera, float distance, NativeArray<Vector3> corners)
+        private static void CalculateFrustumCornersPerspective(
+            Camera camera,
+            float distance,
+            NativeArray<Vector3> corners
+        )
         {
-            float verticalFieldOfView = camera.fieldOfView;  // This will need to be converted if user direction is allowed
+            float verticalFieldOfView = camera.fieldOfView; // This will need to be converted if user direction is allowed
 
             float halfHeight = Mathf.Tan(0.5f * verticalFieldOfView * Mathf.Deg2Rad) * distance;
             float halfWidth = halfHeight * camera.aspect;
@@ -158,7 +186,11 @@ namespace UnityEngine.Rendering.Universal
             corners[3] = new Vector3(-halfWidth, -halfHeight, distance);
         }
 
-        private static void CalculateFrustumCornersOrthographic(Camera camera, float distance, NativeArray<Vector3> corners)
+        private static void CalculateFrustumCornersOrthographic(
+            Camera camera,
+            float distance,
+            NativeArray<Vector3> corners
+        )
         {
             float halfHeight = camera.orthographicSize;
             float halfWidth = halfHeight * camera.aspect;
@@ -174,8 +206,16 @@ namespace UnityEngine.Rendering.Universal
             // TODO: This will need to take into account on screen lights as shadows can be cast from offscreen.
 
             const int k_Corners = 4;
-            NativeArray<Vector3> nearCorners = new NativeArray<Vector3>(k_Corners, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            NativeArray<Vector3> farCorners = new NativeArray<Vector3>(k_Corners, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            NativeArray<Vector3> nearCorners = new NativeArray<Vector3>(
+                k_Corners,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
+            NativeArray<Vector3> farCorners = new NativeArray<Vector3>(
+                k_Corners,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             if (camera.orthographic)
             {
@@ -233,9 +273,17 @@ namespace UnityEngine.Rendering.Universal
                         for (int shadowCasterIndex = 0; shadowCasterIndex < shadowCasters.Count; shadowCasterIndex++)
                         {
                             ShadowCaster2D shadowCaster = shadowCasters[shadowCasterIndex];
-                            if (shadowCaster != null && shadowCaster.shadowCastingSource == ShadowCaster2D.ShadowCastingSources.ShapeProvider)
+                            if (
+                                shadowCaster != null
+                                && shadowCaster.shadowCastingSource == ShadowCaster2D.ShadowCastingSources.ShapeProvider
+                            )
                             {
-                                ShapeProviderUtility.CallOnBeforeRender(shadowCaster.shadowShape2DProvider, shadowCaster.shadowShape2DComponent, shadowCaster.m_ShadowMesh, bounds);
+                                ShapeProviderUtility.CallOnBeforeRender(
+                                    shadowCaster.shadowShape2DProvider,
+                                    shadowCaster.shadowShape2DComponent,
+                                    shadowCaster.m_ShadowMesh,
+                                    bounds
+                                );
                             }
                         }
                     }
@@ -243,12 +291,23 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        internal static void PrerenderShadows(UnsafeCommandBuffer cmdBuffer, Renderer2DData rendererData, ref LayerBatch layer, Light2D light, int shadowIndex, float shadowIntensity)
+        internal static void PrerenderShadows(
+            UnsafeCommandBuffer cmdBuffer,
+            Renderer2DData rendererData,
+            ref LayerBatch layer,
+            Light2D light,
+            int shadowIndex,
+            float shadowIntensity
+        )
         {
             RenderShadows(cmdBuffer, rendererData, ref layer, light);
         }
 
-        private static void SetShadowProjectionGlobals(UnsafeCommandBuffer cmdBuffer, ShadowCaster2D shadowCaster, Light2D light)
+        private static void SetShadowProjectionGlobals(
+            UnsafeCommandBuffer cmdBuffer,
+            ShadowCaster2D shadowCaster,
+            Light2D light
+        )
         {
             cmdBuffer.SetGlobalVector(k_ShadowModelScaleID, shadowCaster.m_CachedLossyScale);
             cmdBuffer.SetGlobalMatrix(k_ShadowModelMatrixID, shadowCaster.m_CachedShadowMatrix);
@@ -270,7 +329,8 @@ namespace UnityEngine.Rendering.Universal
         static bool ShadowCasterIsVisible(ShadowCaster2D shadowCaster)
         {
 #if UNITY_EDITOR
-            return SceneVisibilityManager.instance == null || !SceneVisibilityManager.instance.IsHidden(shadowCaster.gameObject);
+            return SceneVisibilityManager.instance == null
+                || !SceneVisibilityManager.instance.IsHidden(shadowCaster.gameObject);
 #else
             return true;
 #endif
@@ -291,7 +351,15 @@ namespace UnityEngine.Rendering.Universal
             return renderer;
         }
 
-        private static void RenderProjectedShadows(UnsafeCommandBuffer cmdBuffer, int layerToRender, Light2D light, List<ShadowCaster2D> shadowCasters, Material projectedShadowsMaterial, int pass, ShadowTestType shadowTestType)
+        private static void RenderProjectedShadows(
+            UnsafeCommandBuffer cmdBuffer,
+            int layerToRender,
+            Light2D light,
+            List<ShadowCaster2D> shadowCasters,
+            Material projectedShadowsMaterial,
+            int pass,
+            ShadowTestType shadowTestType
+        )
         {
             // Draw the projected shadows for the shadow caster group. Writing into the group stencil buffer bit
             for (var i = 0; i < shadowCasters.Count; i++)
@@ -301,12 +369,25 @@ namespace UnityEngine.Rendering.Universal
                 {
                     if (ShadowCasterIsVisible(shadowCaster) && shadowCaster.castsShadows && shadowCaster.IsLit(light))
                     {
-                        if (shadowCaster != null && projectedShadowsMaterial != null && shadowCaster.IsShadowedLayer(layerToRender))
+                        if (
+                            shadowCaster != null
+                            && projectedShadowsMaterial != null
+                            && shadowCaster.IsShadowedLayer(layerToRender)
+                        )
                         {
-                            if (shadowCaster.shadowCastingSource != ShadowCaster2D.ShadowCastingSources.None && shadowCaster.mesh != null)
+                            if (
+                                shadowCaster.shadowCastingSource != ShadowCaster2D.ShadowCastingSources.None
+                                && shadowCaster.mesh != null
+                            )
                             {
                                 SetShadowProjectionGlobals(cmdBuffer, shadowCaster, light);
-                                cmdBuffer.DrawMesh(shadowCaster.mesh, shadowCaster.transform.localToWorldMatrix, projectedShadowsMaterial, 0, pass);
+                                cmdBuffer.DrawMesh(
+                                    shadowCaster.mesh,
+                                    shadowCaster.transform.localToWorldMatrix,
+                                    projectedShadowsMaterial,
+                                    0,
+                                    pass
+                                );
                             }
                         }
                     }
@@ -329,13 +410,24 @@ namespace UnityEngine.Rendering.Universal
                 numberOfSubmeshes = shadowCaster2D.spriteMaterialCount;
             }
 #else
-                numberOfSubmeshes = shadowCaster2D.spriteMaterialCount;
+            numberOfSubmeshes = shadowCaster2D.spriteMaterialCount;
 #endif
 
             return numberOfSubmeshes;
         }
 
-        private static void RenderSpriteShadow(UnsafeCommandBuffer cmdBuffer, int layerToRender, Light2D light, List<ShadowCaster2D> shadowCasters, Material spriteShadowMaterial, Material spriteUnshadowMaterial, Material geometryShadowMaterial, Material geometryUnshadowMaterial, int pass, ShadowTestType shadowTestType)
+        private static void RenderSpriteShadow(
+            UnsafeCommandBuffer cmdBuffer,
+            int layerToRender,
+            Light2D light,
+            List<ShadowCaster2D> shadowCasters,
+            Material spriteShadowMaterial,
+            Material spriteUnshadowMaterial,
+            Material geometryShadowMaterial,
+            Material geometryUnshadowMaterial,
+            int pass,
+            ShadowTestType shadowTestType
+        )
         {
             //Draw the sprites, either as self shadowing or unshadowing
             for (var i = 0; i < shadowCasters.Count; i++)
@@ -364,7 +456,6 @@ namespace UnityEngine.Rendering.Universal
                             for (int submeshIndex = 0; submeshIndex < numberOfSubmeshes; submeshIndex++)
                             {
                                 cmdBuffer.DrawRenderer(renderer, spriteUnshadowMaterial, submeshIndex, pass);
-
                             }
                         }
                     }
@@ -373,9 +464,21 @@ namespace UnityEngine.Rendering.Universal
                         if (shadowCaster.mesh != null)
                         {
                             if (ShadowCasterIsVisible(shadowCaster) && shadowCaster.selfShadows)
-                                cmdBuffer.DrawMesh(shadowCaster.mesh, shadowCaster.transform.localToWorldMatrix, geometryShadowMaterial, 0, pass);
+                                cmdBuffer.DrawMesh(
+                                    shadowCaster.mesh,
+                                    shadowCaster.transform.localToWorldMatrix,
+                                    geometryShadowMaterial,
+                                    0,
+                                    pass
+                                );
                             else
-                                cmdBuffer.DrawMesh(shadowCaster.mesh, shadowCaster.transform.localToWorldMatrix, geometryUnshadowMaterial, 0, pass);
+                                cmdBuffer.DrawMesh(
+                                    shadowCaster.mesh,
+                                    shadowCaster.transform.localToWorldMatrix,
+                                    geometryUnshadowMaterial,
+                                    0,
+                                    pass
+                                );
                         }
                     }
                 }
@@ -385,24 +488,32 @@ namespace UnityEngine.Rendering.Universal
         internal static bool ShadowTest(ShadowTestType shadowTestType, ShadowCaster2D shadowCaster)
         {
             // This is just being done because using delegates are creating garbage and my tests are failing
-            if(shadowTestType == ShadowTestType.Always)
+            if (shadowTestType == ShadowTestType.Always)
                 return true;
-            else if(shadowTestType == ShadowTestType.Unshadow)
+            else if (shadowTestType == ShadowTestType.Unshadow)
                 return !shadowCaster.selfShadows;
 
             return false;
         }
 
-
-        private static void RenderShadows(UnsafeCommandBuffer cmdBuffer, Renderer2DData rendererData, ref LayerBatch layer, Light2D light)
+        private static void RenderShadows(
+            UnsafeCommandBuffer cmdBuffer,
+            Renderer2DData rendererData,
+            ref LayerBatch layer,
+            Light2D light
+        )
         {
             using (new ProfilingScope(cmdBuffer, m_ProfilingSamplerShadows))
             {
-                var shadowRadius = light.boundingSphere.radius + (light.transform.position - light.boundingSphere.position).magnitude;
+                var shadowRadius =
+                    light.boundingSphere.radius + (light.transform.position - light.boundingSphere.position).magnitude;
 
                 cmdBuffer.SetGlobalVector(k_LightPosID, light.transform.position);
                 cmdBuffer.SetGlobalFloat(k_ShadowRadiusID, shadowRadius);
-                cmdBuffer.SetGlobalFloat(k_SoftShadowAngle, Mathf.Deg2Rad * light.shadowSoftness * k_MaxShadowSoftnessAngle);
+                cmdBuffer.SetGlobalFloat(
+                    k_SoftShadowAngle,
+                    Mathf.Deg2Rad * light.shadowSoftness * k_MaxShadowSoftnessAngle
+                );
 
                 var projectedShadowMaterial = rendererData.GetProjectedShadowMaterial();
                 var projectedUnshadowMaterial = rendererData.GetProjectedUnshadowMaterial();
@@ -411,19 +522,56 @@ namespace UnityEngine.Rendering.Universal
                 var geometryShadowMaterial = rendererData.GetGeometryShadowMaterial();
                 var geometryUnshadowMaterial = rendererData.GetGeometryUnshadowMaterial();
 
-
                 for (var group = 0; group < layer.shadowCasters.Count; group++)
                 {
                     var shadowCasters = layer.shadowCasters[group].GetShadowCasters();
 
                     // Render self shadowing or non self shadowing
-                    RenderSpriteShadow(cmdBuffer, layer.startLayerID, light, shadowCasters, spriteShadowMaterial, spriteUnshadowMaterial, geometryShadowMaterial, geometryUnshadowMaterial, 0, ShadowTestType.Always);
+                    RenderSpriteShadow(
+                        cmdBuffer,
+                        layer.startLayerID,
+                        light,
+                        shadowCasters,
+                        spriteShadowMaterial,
+                        spriteUnshadowMaterial,
+                        geometryShadowMaterial,
+                        geometryUnshadowMaterial,
+                        0,
+                        ShadowTestType.Always
+                    );
                     // Draw the projected shadows for the shadow caster group. Only writes the composite stencil bit
-                    RenderProjectedShadows(cmdBuffer, layer.startLayerID, light, shadowCasters, projectedShadowMaterial, 0, ShadowTestType.Always);
+                    RenderProjectedShadows(
+                        cmdBuffer,
+                        layer.startLayerID,
+                        light,
+                        shadowCasters,
+                        projectedShadowMaterial,
+                        0,
+                        ShadowTestType.Always
+                    );
                     // Draw the projected shadows for the shadow caster group. Only writes the composite stencil bit
-                    RenderProjectedShadows(cmdBuffer, layer.startLayerID, light, shadowCasters, projectedShadowMaterial, 1, ShadowTestType.Unshadow);
+                    RenderProjectedShadows(
+                        cmdBuffer,
+                        layer.startLayerID,
+                        light,
+                        shadowCasters,
+                        projectedShadowMaterial,
+                        1,
+                        ShadowTestType.Unshadow
+                    );
                     //Render self shadowing or non self shadowing
-                    RenderSpriteShadow(cmdBuffer, layer.startLayerID, light, shadowCasters, spriteShadowMaterial, spriteUnshadowMaterial, geometryShadowMaterial, geometryUnshadowMaterial, 1, ShadowTestType.Unshadow);
+                    RenderSpriteShadow(
+                        cmdBuffer,
+                        layer.startLayerID,
+                        light,
+                        shadowCasters,
+                        spriteShadowMaterial,
+                        spriteUnshadowMaterial,
+                        geometryShadowMaterial,
+                        geometryUnshadowMaterial,
+                        1,
+                        ShadowTestType.Unshadow
+                    );
                 }
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+
 namespace Unity.Multiplayer.Tools.Editor
 {
     static class AssetDatabaseHelper
@@ -13,7 +14,8 @@ namespace Unity.Multiplayer.Tools.Editor
         /// <param name="filePath"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static async Task<T> LoadAssetAtPathAsync<T>(string filePath) where T : Object
+        public static async Task<T> LoadAssetAtPathAsync<T>(string filePath)
+            where T : Object
         {
             var asset = AssetDatabase.LoadAssetAtPath<T>(filePath);
 

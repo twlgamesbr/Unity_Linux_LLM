@@ -23,10 +23,10 @@ namespace Unity.Entities.UI
         public static void AlignInspectorLabelWidth(VisualElement root)
         {
             var width = root.localBound.width * k_LabelRatio;
-            AlignInspectorLabelWidth (root, width, 0);
+            AlignInspectorLabelWidth(root, width, 0);
         }
 
-        static void AlignInspectorLabelWidth (VisualElement element, float topLevelLabelWidth, int indentLevel)
+        static void AlignInspectorLabelWidth(VisualElement element, float topLevelLabelWidth, int indentLevel)
         {
             if (element.ClassListContains(UssClasses.Unity.Label))
             {
@@ -40,7 +40,7 @@ namespace Unity.Entities.UI
 
             if (element is Foldout)
             {
-                var label = element.Q<Toggle>().Q(className:UssClasses.ListElement.ToggleInput);
+                var label = element.Q<Toggle>().Q(className: UssClasses.ListElement.ToggleInput);
                 if (null != label)
                 {
                     label.style.width = Mathf.Max(topLevelLabelWidth - indentLevel * k_Indent + 16.0f, 0.0f);
@@ -57,10 +57,10 @@ namespace Unity.Entities.UI
             if (element is IReloadableElement && element.ClassListContains(UssClasses.ListElement.Item))
                 --indentLevel;
 
-            for(var i = 0; i < element.childCount; ++i)
+            for (var i = 0; i < element.childCount; ++i)
             {
                 var child = element[i];
-                AlignInspectorLabelWidth (child, topLevelLabelWidth, indentLevel);
+                AlignInspectorLabelWidth(child, topLevelLabelWidth, indentLevel);
             }
         }
     }

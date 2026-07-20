@@ -1,8 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -12,7 +10,8 @@ public class SystemAPIVerifyTests
     [TestMethod]
     public async Task SystemMethodWithComponentAccessInvocation()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -40,13 +39,18 @@ public partial struct RotationSpeedSystemForEachISystem : ISystem
 }
 ";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(SystemMethodWithComponentAccessInvocation), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(SystemMethodWithComponentAccessInvocation),
+            "Test0__System_19875963020.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task SystemMethodWithBufferAccessInvocation()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -80,13 +84,18 @@ public partial struct RotationSpeedSystemForEachISystem : ISystem
 }
 ";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(SystemMethodWithBufferAccessInvocation), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(SystemMethodWithBufferAccessInvocation),
+            "Test0__System_19875963020.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task SystemMethodWithStorageInfoInvocation()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -116,13 +125,18 @@ public partial struct RotationSpeedSystemForEachISystem : ISystem
 }
 ";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(SystemMethodWithStorageInfoInvocation), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(SystemMethodWithStorageInfoInvocation),
+            "Test0__System_19875963020.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task SystemMethodWithManagedComponent()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -138,13 +152,18 @@ public partial struct SomeSystem : ISystem {
 }
 ";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(SystemMethodWithManagedComponent), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(SystemMethodWithManagedComponent),
+            "Test0__System_19875963020.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task SystemAPIInPartialMethod()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -168,13 +187,18 @@ public unsafe partial struct PartialMethodSystem : ISystem
 }
 ";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(SystemAPIInPartialMethod), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(SystemAPIInPartialMethod),
+            "Test0__System_19875963020.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task NestedSystemAPIInvocation_Example1()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -192,12 +216,18 @@ public unsafe partial struct NestedSystemAPIInvocation_Example1 : ISystem
     }
 }";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(NestedSystemAPIInvocation_Example1), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(NestedSystemAPIInvocation_Example1),
+            "Test0__System_19875963020.g.cs"
+        );
     }
+
     [TestMethod]
     public async Task NestedSystemAPIInvocation_Example2()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -210,13 +240,18 @@ public unsafe partial struct NestedSystemAPIInvocation_Example2 : ISystem
     }
 }";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(NestedSystemAPIInvocation_Example2), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(NestedSystemAPIInvocation_Example2),
+            "Test0__System_19875963020.g.cs"
+        );
     }
 
     [TestMethod]
     public async Task NestedGetSingletonEntity()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -230,9 +265,10 @@ public unsafe partial struct NestedGetSingletonEntity : ISystem
     }
 }";
 
-        await VerifyCS.VerifySourceGeneratorAsync(testSource, nameof(NestedGetSingletonEntity), "Test0__System_19875963020.g.cs");
+        await VerifyCS.VerifySourceGeneratorAsync(
+            testSource,
+            nameof(NestedGetSingletonEntity),
+            "Test0__System_19875963020.g.cs"
+        );
     }
 }
-
-
-

@@ -25,10 +25,11 @@ namespace Unity.Entities
     }
 
     /// <summary> Obsolete. Use <see  cref="BufferLookup{T}"/> instead.</summary>
-    [Obsolete("This type has been renamed to EntityStorageInfoLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> EntityStorageInfoLookup", true)]
-    public unsafe struct StorageInfoFromEntity
-    {
-    }
+    [Obsolete(
+        "This type has been renamed to EntityStorageInfoLookup. (RemovedAfter Entities 1.0) (UnityUpgradable) -> EntityStorageInfoLookup",
+        true
+    )]
+    public unsafe struct StorageInfoFromEntity { }
 
     /// <summary>
     /// A [NativeContainer] that provides access to information about how Entities are stored. <see cref="Entity"/>.
@@ -56,11 +57,11 @@ namespace Unity.Entities
     public unsafe struct EntityStorageInfoLookup
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        AtomicSafetyHandle      m_Safety;
+        AtomicSafetyHandle m_Safety;
 #endif
+
         [NativeDisableUnsafePtrRestriction]
         readonly EntityDataAccess* m_EntityDataAccess;
-
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         internal EntityStorageInfoLookup(EntityDataAccess* entityDataAccess, AtomicSafetyHandle safety)
@@ -130,7 +131,7 @@ namespace Unity.Entities
                 return new EntityStorageInfo
                 {
                     Chunk = new ArchetypeChunk(entityInChunk.Chunk, m_EntityDataAccess->EntityComponentStore),
-                    IndexInChunk = entityInChunk.IndexInChunk
+                    IndexInChunk = entityInChunk.IndexInChunk,
                 };
             }
         }

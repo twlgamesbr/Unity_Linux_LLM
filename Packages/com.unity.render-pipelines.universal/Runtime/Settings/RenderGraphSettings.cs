@@ -17,7 +17,7 @@ namespace UnityEngine.Rendering.Universal
     /// <code>
     /// using UnityEngine.Rendering;
     /// using UnityEngine.Rendering.Universal;
-    /// 
+    ///
     /// public static class URPRenderGraphHelper
     /// {
     ///     public static bool enabled
@@ -46,7 +46,8 @@ namespace UnityEngine.Rendering.Universal
             Initial = 0,
         }
 
-        [SerializeField][HideInInspector]
+        [SerializeField]
+        [HideInInspector]
         private Version m_Version;
 
         /// <summary>Current version of the settings container. Used only for upgrading a project.</summary>
@@ -64,6 +65,5 @@ namespace UnityEngine.Rendering.Universal
         public bool enableRenderCompatibilityMode => false;
 
         #endregion
-
     }
 }

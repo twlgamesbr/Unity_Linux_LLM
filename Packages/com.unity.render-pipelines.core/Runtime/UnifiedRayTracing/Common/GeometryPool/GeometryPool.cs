@@ -21,7 +21,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             {
                 vertexPoolByteSize = 256 * 1024 * 1024, //256 mb
                 indexPoolByteSize = 32 * 1024 * 1024, //32 mb
-                meshChunkTablesByteSize = 4 * 1024 * 1024
+                meshChunkTablesByteSize = 4 * 1024 * 1024,
             };
         }
     }
@@ -33,6 +33,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         public int index;
         public static readonly GeometryPoolHandle Invalid = new GeometryPoolHandle() { index = -1 };
         public readonly bool valid => index != -1;
+
         public bool Equals(GeometryPoolHandle other) => index == other.index;
     }
 
@@ -45,11 +46,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         public static GeometryPoolEntryInfo NewDefault()
         {
-            return new GeometryPoolEntryInfo()
-            {
-                valid = false,
-                refCount = 0
-            };
+            return new GeometryPoolEntryInfo() { valid = false, refCount = 0 };
         }
     }
 
@@ -73,6 +70,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
     {
         private const int kMaxThreadGroupsPerDispatch = 65535; // Counted in groups, not threads.
         private const int kThreadGroupSize = 256; // Counted in threads
+
         private static class GeoPoolShaderIDs
         {
             // MainUpdateIndexBuffer32 and MainUpdateIndexBuffer16 Kernel Strings
@@ -116,7 +114,8 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             public GeoPoolMeshChunk EncodeGPUEntry()
             {
-                return new GeoPoolMeshChunk() {
+                return new GeoPoolMeshChunk()
+                {
                     indexOffset = indexAlloc.block.offset,
                     indexCount = indexAlloc.block.count,
                     vertexOffset = vertexAlloc.block.offset,
@@ -124,11 +123,12 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 };
             }
 
-            public static MeshChunk Invalid => new MeshChunk()
-            {
-                vertexAlloc = BlockAllocator.Allocation.Invalid,
-                indexAlloc = BlockAllocator.Allocation.Invalid
-            };
+            public static MeshChunk Invalid =>
+                new MeshChunk()
+                {
+                    vertexAlloc = BlockAllocator.Allocation.Invalid,
+                    indexAlloc = BlockAllocator.Allocation.Invalid,
+                };
         }
 
         public struct GeometrySlot
@@ -162,6 +162,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             public bool valid => geoSlotHandle != InvalidHandle;
         }
+
         private struct VertexBufferAttribInfo
         {
             public GraphicsBuffer buffer;
@@ -173,25 +174,40 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
 
         public static int GetVertexByteSize() => GeometryPoolConstants.GeoPoolVertexByteSize;
+
         public static int GetIndexByteSize() => GeometryPoolConstants.GeoPoolIndexByteSize;
-        public static int GetMeshChunkTableEntryByteSize() => System.Runtime.InteropServices.Marshal.SizeOf<GeoPoolMeshChunk>();
+
+        public static int GetMeshChunkTableEntryByteSize() =>
+            System.Runtime.InteropServices.Marshal.SizeOf<GeoPoolMeshChunk>();
 
         private int GetFormatByteCount(VertexAttributeFormat format)
         {
             switch (format)
             {
-                case VertexAttributeFormat.Float32: return 4;
-                case VertexAttributeFormat.Float16: return 2;
-                case VertexAttributeFormat.UNorm8: return 1;
-                case VertexAttributeFormat.SNorm8: return 1;
-                case VertexAttributeFormat.UNorm16: return 2;
-                case VertexAttributeFormat.SNorm16: return 2;
-                case VertexAttributeFormat.UInt8: return 1;
-                case VertexAttributeFormat.SInt8: return 1;
-                case VertexAttributeFormat.UInt16: return 2;
-                case VertexAttributeFormat.SInt16: return 2;
-                case VertexAttributeFormat.UInt32: return 4;
-                case VertexAttributeFormat.SInt32: return 4;
+                case VertexAttributeFormat.Float32:
+                    return 4;
+                case VertexAttributeFormat.Float16:
+                    return 2;
+                case VertexAttributeFormat.UNorm8:
+                    return 1;
+                case VertexAttributeFormat.SNorm8:
+                    return 1;
+                case VertexAttributeFormat.UNorm16:
+                    return 2;
+                case VertexAttributeFormat.SNorm16:
+                    return 2;
+                case VertexAttributeFormat.UInt8:
+                    return 1;
+                case VertexAttributeFormat.SInt8:
+                    return 1;
+                case VertexAttributeFormat.UInt16:
+                    return 2;
+                case VertexAttributeFormat.SInt16:
+                    return 2;
+                case VertexAttributeFormat.UInt32:
+                    return 4;
+                case VertexAttributeFormat.SInt32:
+                    return 4;
             }
             return 4;
         }
@@ -200,10 +216,22 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         private const GraphicsBuffer.Target VertexBufferTarget = GraphicsBuffer.Target.Structured;
         private const GraphicsBuffer.Target IndexBufferTarget = GraphicsBuffer.Target.Structured;
-        public GraphicsBuffer globalIndexBuffer { get { return m_GlobalIndexBuffer; } }
-        public GraphicsBuffer globalVertexBuffer { get { return m_GlobalVertexBuffer; } }
-        public int globalVertexBufferStrideBytes { get { return GetVertexByteSize(); } }
-        public GraphicsBuffer globalMeshChunkTableEntryBuffer { get { return m_GlobalMeshChunkTableEntryBuffer; } }
+        public GraphicsBuffer globalIndexBuffer
+        {
+            get { return m_GlobalIndexBuffer; }
+        }
+        public GraphicsBuffer globalVertexBuffer
+        {
+            get { return m_GlobalVertexBuffer; }
+        }
+        public int globalVertexBufferStrideBytes
+        {
+            get { return GetVertexByteSize(); }
+        }
+        public GraphicsBuffer globalMeshChunkTableEntryBuffer
+        {
+            get { return m_GlobalMeshChunkTableEntryBuffer; }
+        }
 
         public int indicesCount => m_MaxIndexCounts;
         public int verticesCount => m_MaxVertCounts;
@@ -257,9 +285,17 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             m_MaxIndexCounts = CalcIndexCount(desc.indexPoolByteSize);
             m_MaxMeshChunkTableEntriesCount = CalcMeshChunkTablesCount(desc.meshChunkTablesByteSize);
 
-            m_GlobalVertexBuffer = new GraphicsBuffer(VertexBufferTarget, DivUp(m_MaxVertCounts * GetVertexByteSize(), 4), 4);
+            m_GlobalVertexBuffer = new GraphicsBuffer(
+                VertexBufferTarget,
+                DivUp(m_MaxVertCounts * GetVertexByteSize(), 4),
+                4
+            );
             m_GlobalIndexBuffer = new GraphicsBuffer(IndexBufferTarget, m_MaxIndexCounts, 4);
-            m_GlobalMeshChunkTableEntryBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, m_MaxMeshChunkTableEntriesCount, GetMeshChunkTableEntryByteSize());
+            m_GlobalMeshChunkTableEntryBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                m_MaxMeshChunkTableEntriesCount,
+                GetMeshChunkTableEntryByteSize()
+            );
             m_DummyBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, 16, 4);
 
             var initialCapacity = 4096;
@@ -267,7 +303,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             m_GeoSlots = new List<GeometrySlot>();
             m_FreeGeoSlots = new NativeList<int>(Allocator.Persistent);
 
-            m_GeoPoolEntryHashToSlot = new NativeParallelHashMap<uint, GeometryPoolHandle>(initialCapacity, Allocator.Persistent);
+            m_GeoPoolEntryHashToSlot = new NativeParallelHashMap<uint, GeometryPoolHandle>(
+                initialCapacity,
+                Allocator.Persistent
+            );
             m_GeoPoolEntrySlots = new NativeList<GeoPoolEntrySlot>(Allocator.Persistent);
             m_FreeGeoPoolEntrySlots = new NativeList<GeometryPoolHandle>(Allocator.Persistent);
 
@@ -331,8 +370,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
 
         private int CalcVertexCount(int bufferByteSize) => DivUp(bufferByteSize, GetVertexByteSize());
+
         private int CalcIndexCount(int bufferByteSize) => DivUp(bufferByteSize, GetIndexByteSize());
-        private int CalcMeshChunkTablesCount(int bufferByteSize) => DivUp(bufferByteSize, GetMeshChunkTableEntryByteSize());
+
+        private int CalcMeshChunkTablesCount(int bufferByteSize) =>
+            DivUp(bufferByteSize, GetMeshChunkTableEntryByteSize());
 
         private void DeallocateGeometrySlot(ref GeometrySlot slot)
         {
@@ -404,11 +446,25 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 newSlot.meshChunkTableAlloc = m_MeshChunkTableAllocator.Allocate(mesh.subMeshCount);
                 if (!newSlot.meshChunkTableAlloc.valid)
                 {
-                    newSlot.meshChunkTableAlloc = m_MeshChunkTableAllocator.GrowAndAllocate(mesh.subMeshCount, (int)(GraphicsHelpers.MaxGraphicsBufferSizeInBytes / GetMeshChunkTableEntryByteSize()), out int oldCapacity, out int newCapacity);
+                    newSlot.meshChunkTableAlloc = m_MeshChunkTableAllocator.GrowAndAllocate(
+                        mesh.subMeshCount,
+                        (int)(GraphicsHelpers.MaxGraphicsBufferSizeInBytes / GetMeshChunkTableEntryByteSize()),
+                        out int oldCapacity,
+                        out int newCapacity
+                    );
                     if (!newSlot.meshChunkTableAlloc.valid)
-                        throw new UnifiedRayTracingException($"Can't allocate a GraphicsBuffer bigger than {GraphicsHelpers.MaxGraphicsBufferSizeInGigaBytes:F1}GB", UnifiedRayTracingError.GraphicsBufferAllocationFailed);
+                        throw new UnifiedRayTracingException(
+                            $"Can't allocate a GraphicsBuffer bigger than {GraphicsHelpers.MaxGraphicsBufferSizeInGigaBytes:F1}GB",
+                            UnifiedRayTracingError.GraphicsBufferAllocationFailed
+                        );
 
-                    GraphicsHelpers.ReallocateBuffer(m_CopyShader, oldCapacity, newCapacity, GetMeshChunkTableEntryByteSize(), ref m_GlobalMeshChunkTableEntryBuffer);
+                    GraphicsHelpers.ReallocateBuffer(
+                        m_CopyShader,
+                        oldCapacity,
+                        newCapacity,
+                        GetMeshChunkTableEntryByteSize(),
+                        ref m_GlobalMeshChunkTableEntryBuffer
+                    );
                     m_MaxMeshChunkTableEntriesCount = newCapacity;
                 }
 
@@ -421,22 +477,50 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                     newMeshChunk.vertexAlloc = m_VertexAllocator.Allocate(submeshDescriptor.vertexCount);
                     if (!newMeshChunk.vertexAlloc.valid)
                     {
-                        newMeshChunk.vertexAlloc = m_VertexAllocator.GrowAndAllocate(submeshDescriptor.vertexCount, (int)(GraphicsHelpers.MaxGraphicsBufferSizeInBytes / GetVertexByteSize()), out int oldCapacity, out int newCapacity);
+                        newMeshChunk.vertexAlloc = m_VertexAllocator.GrowAndAllocate(
+                            submeshDescriptor.vertexCount,
+                            (int)(GraphicsHelpers.MaxGraphicsBufferSizeInBytes / GetVertexByteSize()),
+                            out int oldCapacity,
+                            out int newCapacity
+                        );
                         if (!newMeshChunk.vertexAlloc.valid)
-                            throw new UnifiedRayTracingException($"Can't allocate a GraphicsBuffer bigger than {GraphicsHelpers.MaxGraphicsBufferSizeInGigaBytes:F1}GB", UnifiedRayTracingError.GraphicsBufferAllocationFailed);
+                            throw new UnifiedRayTracingException(
+                                $"Can't allocate a GraphicsBuffer bigger than {GraphicsHelpers.MaxGraphicsBufferSizeInGigaBytes:F1}GB",
+                                UnifiedRayTracingError.GraphicsBufferAllocationFailed
+                            );
 
-                        GraphicsHelpers.ReallocateBuffer(m_CopyShader, oldCapacity, newCapacity, GetVertexByteSize(), ref m_GlobalVertexBuffer);
+                        GraphicsHelpers.ReallocateBuffer(
+                            m_CopyShader,
+                            oldCapacity,
+                            newCapacity,
+                            GetVertexByteSize(),
+                            ref m_GlobalVertexBuffer
+                        );
                         m_MaxVertCounts = newCapacity;
                     }
 
                     newMeshChunk.indexAlloc = m_IndexAllocator.Allocate(submeshDescriptor.indexCount);
                     if (!newMeshChunk.indexAlloc.valid)
                     {
-                        newMeshChunk.indexAlloc = m_IndexAllocator.GrowAndAllocate(submeshDescriptor.indexCount, (int)(GraphicsHelpers.MaxGraphicsBufferSizeInBytes / sizeof(int)), out int oldCapacity, out int newCapacity);
+                        newMeshChunk.indexAlloc = m_IndexAllocator.GrowAndAllocate(
+                            submeshDescriptor.indexCount,
+                            (int)(GraphicsHelpers.MaxGraphicsBufferSizeInBytes / sizeof(int)),
+                            out int oldCapacity,
+                            out int newCapacity
+                        );
                         if (!newMeshChunk.indexAlloc.valid)
-                            throw new UnifiedRayTracingException($"Can't allocate a GraphicsBuffer bigger than {GraphicsHelpers.MaxGraphicsBufferSizeInGigaBytes:F1}GB", UnifiedRayTracingError.GraphicsBufferAllocationFailed);
+                            throw new UnifiedRayTracingException(
+                                $"Can't allocate a GraphicsBuffer bigger than {GraphicsHelpers.MaxGraphicsBufferSizeInGigaBytes:F1}GB",
+                                UnifiedRayTracingError.GraphicsBufferAllocationFailed
+                            );
 
-                        GraphicsHelpers.ReallocateBuffer(m_CopyShader, oldCapacity, newCapacity, sizeof(int), ref m_GlobalIndexBuffer);
+                        GraphicsHelpers.ReallocateBuffer(
+                            m_CopyShader,
+                            oldCapacity,
+                            newCapacity,
+                            sizeof(int),
+                            ref m_GlobalIndexBuffer
+                        );
                         m_MaxIndexCounts = newCapacity;
                     }
 
@@ -500,12 +584,9 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             if (slot.geoSlotHandle == -1)
                 Debug.LogErrorFormat("Found invalid geometry slot handle with handle id {0}.", handle.index);
-            return new GeometryPoolEntryInfo()
-            {
-                valid = slot.valid,
-                refCount = slot.refCount
-            };
+            return new GeometryPoolEntryInfo() { valid = slot.valid, refCount = slot.refCount };
         }
+
         public GeometrySlot GetEntryGeomAllocation(GeometryPoolHandle handle)
         {
             var slot = m_GeoPoolEntrySlots[handle.index];
@@ -549,28 +630,49 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 VertexBufferAttribInfo normalAttrib;
                 LoadVertexAttribInfo(mesh, VertexAttribute.Normal, out normalAttrib);
 
-                var meshChunkAllocationTable = new NativeArray<GeoPoolMeshChunk>(geoSlot.meshChunks.Length, Allocator.Temp);
+                var meshChunkAllocationTable = new NativeArray<GeoPoolMeshChunk>(
+                    geoSlot.meshChunks.Length,
+                    Allocator.Temp
+                );
                 for (int submeshIndex = 0; submeshIndex < mesh.subMeshCount; ++submeshIndex)
                 {
                     SubMeshDescriptor submeshDescriptor = mesh.GetSubMesh(submeshIndex);
                     MeshChunk targetMeshChunk = geoSlot.meshChunks[submeshIndex];
                     //Update mesh chunk vertex offset
                     AddVertexUpdateCommand(
-                        cmdBuffer, submeshDescriptor.baseVertex + submeshDescriptor.firstVertex,
-                        posAttrib, uv0Attrib, uv1Attrib, normalAttrib,
-                        targetMeshChunk.vertexAlloc, m_GlobalVertexBuffer);
+                        cmdBuffer,
+                        submeshDescriptor.baseVertex + submeshDescriptor.firstVertex,
+                        posAttrib,
+                        uv0Attrib,
+                        uv1Attrib,
+                        normalAttrib,
+                        targetMeshChunk.vertexAlloc,
+                        m_GlobalVertexBuffer
+                    );
 
                     //Update mesh chunk index offset
                     AddIndexUpdateCommand(
                         cmdBuffer,
-                        mesh.indexFormat, buffer, targetMeshChunk.indexAlloc, submeshDescriptor.firstVertex,
-                        submeshDescriptor.indexStart, submeshDescriptor.indexCount, 0,
-                        m_GlobalIndexBuffer);
+                        mesh.indexFormat,
+                        buffer,
+                        targetMeshChunk.indexAlloc,
+                        submeshDescriptor.firstVertex,
+                        submeshDescriptor.indexStart,
+                        submeshDescriptor.indexCount,
+                        0,
+                        m_GlobalIndexBuffer
+                    );
 
                     meshChunkAllocationTable[submeshIndex] = targetMeshChunk.EncodeGPUEntry();
                 }
 
-                cmdBuffer.SetBufferData(m_GlobalMeshChunkTableEntryBuffer, meshChunkAllocationTable, 0, geoSlot.meshChunkTableAlloc.block.offset, meshChunkAllocationTable.Length);
+                cmdBuffer.SetBufferData(
+                    m_GlobalMeshChunkTableEntryBuffer,
+                    meshChunkAllocationTable,
+                    0,
+                    geoSlot.meshChunkTableAlloc.block.offset,
+                    meshChunkAllocationTable.Length
+                );
                 meshChunkAllocationTable.Dispose();
 
                 geoSlot.hasGPUData = true;
@@ -631,11 +733,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         public bool Register(Mesh mesh, out GeometryPoolHandle outHandle)
         {
-            return Register(new GeometryPoolEntryDesc()
-            {
-                mesh = mesh,
-                submeshData = null
-            }, out outHandle);
+            return Register(new GeometryPoolEntryDesc() { mesh = mesh, submeshData = null }, out outHandle);
         }
 
         public bool Register(in GeometryPoolEntryDesc entryDesc, out GeometryPoolHandle outHandle)
@@ -675,7 +773,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                     int entryIndex = FindSubmeshEntryInDesc(submeshIndex, entryDesc.submeshData);
                     if (entryIndex == -1)
                     {
-                        Debug.LogErrorFormat("Could not find submesh index {0} for mesh entry descriptor of mesh {1}.", submeshIndex, mesh.name);
+                        Debug.LogErrorFormat(
+                            "Could not find submesh index {0} for mesh entry descriptor of mesh {1}.",
+                            submeshIndex,
+                            mesh.name
+                        );
                         continue;
                     }
                     validSubmeshData.Add(entryDesc.submeshData[entryIndex]);
@@ -687,7 +789,6 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 DeallocateGeoPoolEntrySlot(ref newSlot);
                 return false;
             }
-
 
             if (m_FreeGeoPoolEntrySlots.IsEmpty)
             {
@@ -729,8 +830,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         private GraphicsBuffer LoadIndexBuffer(Mesh mesh)
         {
-            Debug.Assert((mesh.indexBufferTarget & GraphicsBuffer.Target.Raw) != 0 || (mesh.GetIndices(0) != null && mesh.GetIndices(0).Length != 0),
-                "Cant use a mesh buffer that is not raw and has no CPU index information.");
+            Debug.Assert(
+                (mesh.indexBufferTarget & GraphicsBuffer.Target.Raw) != 0
+                    || (mesh.GetIndices(0) != null && mesh.GetIndices(0).Length != 0),
+                "Cant use a mesh buffer that is not raw and has no CPU index information."
+            );
 
             mesh.indexBufferTarget |= GraphicsBuffer.Target.Raw;
             mesh.vertexBufferTarget |= GraphicsBuffer.Target.Raw;
@@ -752,7 +856,9 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             output.stride = mesh.GetVertexBufferStride(stream);
             output.offset = mesh.GetVertexAttributeOffset(attribute);
-            output.byteCount = GetFormatByteCount(mesh.GetVertexAttributeFormat(attribute)) * mesh.GetVertexAttributeDimension(attribute);
+            output.byteCount =
+                GetFormatByteCount(mesh.GetVertexAttributeFormat(attribute))
+                * mesh.GetVertexAttributeDimension(attribute);
 
             output.buffer = mesh.GetVertexBuffer(stream);
             m_InputBufferReferences.Add(output.buffer);
@@ -778,8 +884,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             in GraphicsBuffer inputBuffer,
             in BlockAllocator.Allocation location,
             int firstVertex,
-            int inputOffset, int indexCount, int outputOffset,
-            GraphicsBuffer outputIdxBuffer)
+            int inputOffset,
+            int indexCount,
+            int outputOffset,
+            GraphicsBuffer outputIdxBuffer
+        )
         {
             if (location.block.count == 0)
                 return;
@@ -789,10 +898,25 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputIBBaseOffset, inputOffset);
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputIBCount, indexCount);
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputFirstVertex, firstVertex);
-            cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._OutputIBOffset, location.block.offset + outputOffset);
-            int kernel = inputFormat == IndexFormat.UInt16 ? m_KernelMainUpdateIndexBuffer16 : m_KernelMainUpdateIndexBuffer32;
-            cmdBuffer.SetComputeBufferParam(m_GeometryPoolKernelsCS, kernel, GeoPoolShaderIDs._InputIndexBuffer, inputBuffer);
-            cmdBuffer.SetComputeBufferParam(m_GeometryPoolKernelsCS, kernel, GeoPoolShaderIDs._OutputIndexBuffer, outputIdxBuffer);
+            cmdBuffer.SetComputeIntParam(
+                m_GeometryPoolKernelsCS,
+                GeoPoolShaderIDs._OutputIBOffset,
+                location.block.offset + outputOffset
+            );
+            int kernel =
+                inputFormat == IndexFormat.UInt16 ? m_KernelMainUpdateIndexBuffer16 : m_KernelMainUpdateIndexBuffer32;
+            cmdBuffer.SetComputeBufferParam(
+                m_GeometryPoolKernelsCS,
+                kernel,
+                GeoPoolShaderIDs._InputIndexBuffer,
+                inputBuffer
+            );
+            cmdBuffer.SetComputeBufferParam(
+                m_GeometryPoolKernelsCS,
+                kernel,
+                GeoPoolShaderIDs._OutputIndexBuffer,
+                outputIdxBuffer
+            );
 
             int totalGroupCount = DivUp(location.block.count, kThreadGroupSize);
             int dispatchCount = DivUp(totalGroupCount, kMaxThreadGroupsPerDispatch);
@@ -800,18 +924,30 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             for (int dispatchIndex = 0; dispatchIndex < dispatchCount; ++dispatchIndex)
             {
                 int indexOffset = dispatchIndex * kMaxThreadGroupsPerDispatch * kThreadGroupSize;
-                int dispatchGroupCount = Math.Min(kMaxThreadGroupsPerDispatch, totalGroupCount - dispatchIndex * kMaxThreadGroupsPerDispatch);
+                int dispatchGroupCount = Math.Min(
+                    kMaxThreadGroupsPerDispatch,
+                    totalGroupCount - dispatchIndex * kMaxThreadGroupsPerDispatch
+                );
 
-                cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._DispatchIndexOffset, indexOffset);
+                cmdBuffer.SetComputeIntParam(
+                    m_GeometryPoolKernelsCS,
+                    GeoPoolShaderIDs._DispatchIndexOffset,
+                    indexOffset
+                );
                 cmdBuffer.DispatchCompute(m_GeometryPoolKernelsCS, kernel, dispatchGroupCount, 1, 1);
             }
         }
 
         private void AddVertexUpdateCommand(
-            CommandBuffer cmdBuffer, int baseVertexOffset,
-            in VertexBufferAttribInfo pos, in VertexBufferAttribInfo uv0, in VertexBufferAttribInfo uv1, in VertexBufferAttribInfo n,
+            CommandBuffer cmdBuffer,
+            int baseVertexOffset,
+            in VertexBufferAttribInfo pos,
+            in VertexBufferAttribInfo uv0,
+            in VertexBufferAttribInfo uv1,
+            in VertexBufferAttribInfo n,
             in BlockAllocator.Allocation location,
-            GraphicsBuffer outputVertexBuffer)
+            GraphicsBuffer outputVertexBuffer
+        )
         {
             if (location.block.count == 0)
                 return;
@@ -832,9 +968,17 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             int vertexCount = location.block.count;
 
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputVBCount, vertexCount);
-            cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputBaseVertexOffset, baseVertexOffset);
+            cmdBuffer.SetComputeIntParam(
+                m_GeometryPoolKernelsCS,
+                GeoPoolShaderIDs._InputBaseVertexOffset,
+                baseVertexOffset
+            );
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._OutputVBSize, m_MaxVertCounts);
-            cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._OutputVBOffset, location.block.offset);
+            cmdBuffer.SetComputeIntParam(
+                m_GeometryPoolKernelsCS,
+                GeoPoolShaderIDs._OutputVBOffset,
+                location.block.offset
+            );
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputPosBufferStride, pos.stride);
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputPosBufferOffset, pos.offset);
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._InputUv0BufferStride, uv0.stride);
@@ -846,11 +990,36 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._AttributesMask, (int)attributes);
 
             int kernel = m_KernelMainUpdateVertexBuffer;
-            cmdBuffer.SetComputeBufferParam(m_GeometryPoolKernelsCS, kernel, GeoPoolShaderIDs._PosBuffer, pos.valid ? pos.buffer : m_DummyBuffer);
-            cmdBuffer.SetComputeBufferParam(m_GeometryPoolKernelsCS, kernel, GeoPoolShaderIDs._Uv0Buffer, uv0.valid ? uv0.buffer : m_DummyBuffer);
-            cmdBuffer.SetComputeBufferParam(m_GeometryPoolKernelsCS, kernel, GeoPoolShaderIDs._Uv1Buffer, uv1.valid ? uv1.buffer : m_DummyBuffer);
-            cmdBuffer.SetComputeBufferParam(m_GeometryPoolKernelsCS, kernel, GeoPoolShaderIDs._NormalBuffer, n.valid ? n.buffer : m_DummyBuffer);
-            cmdBuffer.SetComputeBufferParam(m_GeometryPoolKernelsCS, kernel, GeoPoolShaderIDs._OutputVB, outputVertexBuffer);
+            cmdBuffer.SetComputeBufferParam(
+                m_GeometryPoolKernelsCS,
+                kernel,
+                GeoPoolShaderIDs._PosBuffer,
+                pos.valid ? pos.buffer : m_DummyBuffer
+            );
+            cmdBuffer.SetComputeBufferParam(
+                m_GeometryPoolKernelsCS,
+                kernel,
+                GeoPoolShaderIDs._Uv0Buffer,
+                uv0.valid ? uv0.buffer : m_DummyBuffer
+            );
+            cmdBuffer.SetComputeBufferParam(
+                m_GeometryPoolKernelsCS,
+                kernel,
+                GeoPoolShaderIDs._Uv1Buffer,
+                uv1.valid ? uv1.buffer : m_DummyBuffer
+            );
+            cmdBuffer.SetComputeBufferParam(
+                m_GeometryPoolKernelsCS,
+                kernel,
+                GeoPoolShaderIDs._NormalBuffer,
+                n.valid ? n.buffer : m_DummyBuffer
+            );
+            cmdBuffer.SetComputeBufferParam(
+                m_GeometryPoolKernelsCS,
+                kernel,
+                GeoPoolShaderIDs._OutputVB,
+                outputVertexBuffer
+            );
 
             int totalGroupCount = DivUp(vertexCount, kThreadGroupSize);
             int dispatchCount = DivUp(totalGroupCount, kMaxThreadGroupsPerDispatch);
@@ -858,9 +1027,16 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             for (int dispatchIndex = 0; dispatchIndex < dispatchCount; ++dispatchIndex)
             {
                 int vertexOffset = dispatchIndex * kMaxThreadGroupsPerDispatch * kThreadGroupSize;
-                int dispatchGroupCount = Math.Min(kMaxThreadGroupsPerDispatch, totalGroupCount - dispatchIndex * kMaxThreadGroupsPerDispatch);
+                int dispatchGroupCount = Math.Min(
+                    kMaxThreadGroupsPerDispatch,
+                    totalGroupCount - dispatchIndex * kMaxThreadGroupsPerDispatch
+                );
 
-                cmdBuffer.SetComputeIntParam(m_GeometryPoolKernelsCS, GeoPoolShaderIDs._DispatchVertexOffset, vertexOffset);
+                cmdBuffer.SetComputeIntParam(
+                    m_GeometryPoolKernelsCS,
+                    GeoPoolShaderIDs._DispatchVertexOffset,
+                    vertexOffset
+                );
                 cmdBuffer.DispatchCompute(m_GeometryPoolKernelsCS, kernel, dispatchGroupCount, 1, 1);
             }
         }

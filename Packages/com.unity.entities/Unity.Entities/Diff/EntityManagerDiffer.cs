@@ -8,14 +8,12 @@ namespace Unity.Entities
     /// </summary>
     public struct EntityManagerDiffer : IDisposable
     {
-        internal static EntityQueryDesc EntityGuidQueryDesc { get; } = new EntityQueryDesc
-        {
-            All = new ComponentType[]
+        internal static EntityQueryDesc EntityGuidQueryDesc { get; } =
+            new EntityQueryDesc
             {
-                typeof(EntityGuid)
-            },
-            Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-        };
+                All = new ComponentType[] { typeof(EntityGuid) },
+                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+            };
 
         World m_ShadowWorld;
 
@@ -33,13 +31,20 @@ namespace Unity.Entities
         /// <param name="sourceEntityManager">The EntityManager to associate with this differ.</param>
         /// <param name="allocator">The allocator to use for any internal memory allocations for this object.</param>
         /// <param name="entityQueryDesc">If non-null, the differ limits its change-tracking to the entities that this query matches.</param>
-        public EntityManagerDiffer(EntityManager sourceEntityManager, AllocatorManager.AllocatorHandle allocator, EntityQueryDesc entityQueryDesc = null)
+        public EntityManagerDiffer(
+            EntityManager sourceEntityManager,
+            AllocatorManager.AllocatorHandle allocator,
+            EntityQueryDesc entityQueryDesc = null
+        )
         {
             m_CachedComponentChanges = new EntityDiffer.CachedComponentChanges(1024);
             m_SourceEntityManager = sourceEntityManager;
 
             m_EntityQueryDesc = entityQueryDesc ?? EntityGuidQueryDesc;
-            m_ShadowWorld = new World(sourceEntityManager.World.Name + " (Shadow)", sourceEntityManager.World.Flags | WorldFlags.Shadow);
+            m_ShadowWorld = new World(
+                sourceEntityManager.World.Name + " (Shadow)",
+                sourceEntityManager.World.Flags | WorldFlags.Shadow
+            );
             m_ShadowEntityManager = m_ShadowWorld.EntityManager;
             m_BlobAssetCache = new BlobAssetCache(allocator);
         }
@@ -80,7 +85,8 @@ namespace Unity.Entities
                 options,
                 m_EntityQueryDesc,
                 m_BlobAssetCache,
-                allocator);
+                allocator
+            );
 
             return changes;
         }

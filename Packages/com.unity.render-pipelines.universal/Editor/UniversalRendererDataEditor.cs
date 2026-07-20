@@ -14,37 +14,113 @@ namespace UnityEditor.Rendering.Universal
     {
         private static class Styles
         {
-            public static readonly GUIContent PostProcessIncluded = EditorGUIUtility.TrTextContent("Enabled", "Enables the use of post processing effects within the scene. If disabled, Unity excludes post processing renderer Passes, shaders and textures from the build.");
-            public static readonly GUIContent PostProcessLabel = EditorGUIUtility.TrTextContent("Data", "The asset containing references to shaders and Textures that the Renderer uses for post-processing.");
-            public static readonly GUIContent FilteringSectionLabel = EditorGUIUtility.TrTextContent("Filtering", "Settings that controls and define which layers the renderer draws.");
-            public static readonly GUIContent PrepassMask = EditorGUIUtility.TrTextContent("Prepass Layer Mask", "Controls which prepass layers this renderer draws. It applies to any prepass.");
-            public static readonly GUIContent OpaqueMask = EditorGUIUtility.TrTextContent("Opaque Layer Mask", "Controls which opaque layers this renderer draws.");
-            public static readonly GUIContent TransparentMask = EditorGUIUtility.TrTextContent("Transparent Layer Mask", "Controls which transparent layers this renderer draws.");
+            public static readonly GUIContent PostProcessIncluded = EditorGUIUtility.TrTextContent(
+                "Enabled",
+                "Enables the use of post processing effects within the scene. If disabled, Unity excludes post processing renderer Passes, shaders and textures from the build."
+            );
+            public static readonly GUIContent PostProcessLabel = EditorGUIUtility.TrTextContent(
+                "Data",
+                "The asset containing references to shaders and Textures that the Renderer uses for post-processing."
+            );
+            public static readonly GUIContent FilteringSectionLabel = EditorGUIUtility.TrTextContent(
+                "Filtering",
+                "Settings that controls and define which layers the renderer draws."
+            );
+            public static readonly GUIContent PrepassMask = EditorGUIUtility.TrTextContent(
+                "Prepass Layer Mask",
+                "Controls which prepass layers this renderer draws. It applies to any prepass."
+            );
+            public static readonly GUIContent OpaqueMask = EditorGUIUtility.TrTextContent(
+                "Opaque Layer Mask",
+                "Controls which opaque layers this renderer draws."
+            );
+            public static readonly GUIContent TransparentMask = EditorGUIUtility.TrTextContent(
+                "Transparent Layer Mask",
+                "Controls which transparent layers this renderer draws."
+            );
 
-            public static readonly GUIContent RenderingSectionLabel = EditorGUIUtility.TrTextContent("Rendering", "Settings related to rendering and lighting.");
-            public static readonly GUIContent RenderingModeLabel = EditorGUIUtility.TrTextContent("Rendering Path", "Select a rendering path.");
-            public static readonly GUIContent DepthPrimingModeLabel = EditorGUIUtility.TrTextContent("Depth Priming Mode", "With depth priming enabled, Unity uses the depth buffer generated in the depth prepass to determine if a fragment should be rendered or skipped during the Base Camera opaque pass. Disabled: Unity does not perform depth priming. Auto: If there is a Render Pass that requires a depth prepass, Unity performs the depth prepass and depth priming. Forced: Unity performs the depth prepass and depth priming.");
-            public static readonly GUIContent DepthPrimingModeInfo = EditorGUIUtility.TrTextContent("On Android, iOS, and Apple TV, Unity performs depth priming only in Forced mode.");
-            public static readonly GUIContent DepthPrimingMSAAWarning = EditorGUIUtility.TrTextContent("Depth priming is not supported because MSAA is enabled.");
-            public static readonly GUIContent CopyDepthModeLabel = EditorGUIUtility.TrTextContent("Depth Texture Mode", "Controls after which pass URP copies the scene depth. It has a significant impact on mobile devices bandwidth usage. It also allows to force a depth prepass to generate it.");
-            public static readonly GUIContent DepthAttachmentFormat = EditorGUIUtility.TrTextContent("Depth Attachment Format", "Which format to use (if it is supported) when creating _CameraDepthAttachment.");
-            public static readonly GUIContent DepthTextureFormat = EditorGUIUtility.TrTextContent("Depth Texture Format", "Which format to use (if it is supported) when creating _CameraDepthTexture.");
-            public static readonly GUIContent ShadowsSectionLabel = EditorGUIUtility.TrTextContent("Shadows", "This section contains properties related to rendering shadows.");
-            public static readonly GUIContent PostProcessingSectionLabel = EditorGUIUtility.TrTextContent("Post-processing", "This section contains properties related to rendering post-processing.");
+            public static readonly GUIContent RenderingSectionLabel = EditorGUIUtility.TrTextContent(
+                "Rendering",
+                "Settings related to rendering and lighting."
+            );
+            public static readonly GUIContent RenderingModeLabel = EditorGUIUtility.TrTextContent(
+                "Rendering Path",
+                "Select a rendering path."
+            );
+            public static readonly GUIContent DepthPrimingModeLabel = EditorGUIUtility.TrTextContent(
+                "Depth Priming Mode",
+                "With depth priming enabled, Unity uses the depth buffer generated in the depth prepass to determine if a fragment should be rendered or skipped during the Base Camera opaque pass. Disabled: Unity does not perform depth priming. Auto: If there is a Render Pass that requires a depth prepass, Unity performs the depth prepass and depth priming. Forced: Unity performs the depth prepass and depth priming."
+            );
+            public static readonly GUIContent DepthPrimingModeInfo = EditorGUIUtility.TrTextContent(
+                "On Android, iOS, and Apple TV, Unity performs depth priming only in Forced mode."
+            );
+            public static readonly GUIContent DepthPrimingMSAAWarning = EditorGUIUtility.TrTextContent(
+                "Depth priming is not supported because MSAA is enabled."
+            );
+            public static readonly GUIContent CopyDepthModeLabel = EditorGUIUtility.TrTextContent(
+                "Depth Texture Mode",
+                "Controls after which pass URP copies the scene depth. It has a significant impact on mobile devices bandwidth usage. It also allows to force a depth prepass to generate it."
+            );
+            public static readonly GUIContent DepthAttachmentFormat = EditorGUIUtility.TrTextContent(
+                "Depth Attachment Format",
+                "Which format to use (if it is supported) when creating _CameraDepthAttachment."
+            );
+            public static readonly GUIContent DepthTextureFormat = EditorGUIUtility.TrTextContent(
+                "Depth Texture Format",
+                "Which format to use (if it is supported) when creating _CameraDepthTexture."
+            );
+            public static readonly GUIContent ShadowsSectionLabel = EditorGUIUtility.TrTextContent(
+                "Shadows",
+                "This section contains properties related to rendering shadows."
+            );
+            public static readonly GUIContent PostProcessingSectionLabel = EditorGUIUtility.TrTextContent(
+                "Post-processing",
+                "This section contains properties related to rendering post-processing."
+            );
 
-            public static readonly GUIContent OverridesSectionLabel = EditorGUIUtility.TrTextContent("Overrides", "This section contains Render Pipeline properties that this Renderer overrides.");
+            public static readonly GUIContent OverridesSectionLabel = EditorGUIUtility.TrTextContent(
+                "Overrides",
+                "This section contains Render Pipeline properties that this Renderer overrides."
+            );
 
-            public static readonly GUIContent accurateGbufferNormalsLabel = EditorGUIUtility.TrTextContent("Accurate G-buffer Normals", "Normals in G-buffer use octahedron encoding/decoding. This improves visual quality but might reduce performance.");
-            public static readonly GUIContent defaultStencilStateLabel = EditorGUIUtility.TrTextContent("Default Stencil State", "Configure the stencil state for the opaque and transparent render passes.");
-            public static readonly GUIContent shadowTransparentReceiveLabel = EditorGUIUtility.TrTextContent("Transparent Receive Shadows", "When disabled, none of the transparent objects will receive shadows.");
-            public static readonly GUIContent invalidStencilOverride = EditorGUIUtility.TrTextContent("Error: When using the deferred rendering path, the Renderer requires the control over the 4 highest bits of the stencil buffer to store Material types. The current combination of the stencil override options prevents the Renderer from controlling the required bits. Try changing one of the options to Replace.");
-            public static readonly GUIContent intermediateTextureMode = EditorGUIUtility.TrTextContent("Intermediate Texture (Obsolete)", "Should be set to Auto. Controls when URP renders via an intermediate texture.");
-            public static readonly GUIContent warningIntermediateTextureMode = EditorGUIUtility.TrTextContent("'Always' is Obsolete. Change it to Auto. This can improve performance. The setting will disappear once it is corrected to 'Auto'.");
-            public static readonly GUIContent tileOnlyMode = EditorGUIUtility.TrTextContent("Tile-Only Mode", "Restricts render passes to avoid memory load/store of main camera targets, keeping them in on‑chip tile memory. This is a potential GPU performance optimization on Tile-Based GPU architectures. It activates additional RenderGaph validation. Some features may be disabled or fall back. See docs for details.");
-            public static readonly string tileOnlyModeWarning = L10n.Tr("Tile-Only mode will disable or block features, including Renderer Features and Render Passes, that would trigger GPU memory store/load actions.");
-            public static readonly string deferredTileOnlyModeWarning = L10n.Tr("Deferred rendering path is incompatible with the enabled 'Tile-Only Mode'. Change this to Forward.");
-            public static readonly string deferredPlusTileOnlyModeWarning = L10n.Tr("Deferred+ rendering path is incompatible with the enabled 'Tile-Only Mode'. Change this to Forward+.");
-            public static readonly string postProcessingTileOnlyModeWarning = L10n.Tr("'Post-processing' is incompatible with the enabled 'Tile-Only Mode'. Disable this setting. Renderer Features can add On-Tile Post Processing.");
+            public static readonly GUIContent accurateGbufferNormalsLabel = EditorGUIUtility.TrTextContent(
+                "Accurate G-buffer Normals",
+                "Normals in G-buffer use octahedron encoding/decoding. This improves visual quality but might reduce performance."
+            );
+            public static readonly GUIContent defaultStencilStateLabel = EditorGUIUtility.TrTextContent(
+                "Default Stencil State",
+                "Configure the stencil state for the opaque and transparent render passes."
+            );
+            public static readonly GUIContent shadowTransparentReceiveLabel = EditorGUIUtility.TrTextContent(
+                "Transparent Receive Shadows",
+                "When disabled, none of the transparent objects will receive shadows."
+            );
+            public static readonly GUIContent invalidStencilOverride = EditorGUIUtility.TrTextContent(
+                "Error: When using the deferred rendering path, the Renderer requires the control over the 4 highest bits of the stencil buffer to store Material types. The current combination of the stencil override options prevents the Renderer from controlling the required bits. Try changing one of the options to Replace."
+            );
+            public static readonly GUIContent intermediateTextureMode = EditorGUIUtility.TrTextContent(
+                "Intermediate Texture (Obsolete)",
+                "Should be set to Auto. Controls when URP renders via an intermediate texture."
+            );
+            public static readonly GUIContent warningIntermediateTextureMode = EditorGUIUtility.TrTextContent(
+                "'Always' is Obsolete. Change it to Auto. This can improve performance. The setting will disappear once it is corrected to 'Auto'."
+            );
+            public static readonly GUIContent tileOnlyMode = EditorGUIUtility.TrTextContent(
+                "Tile-Only Mode",
+                "Restricts render passes to avoid memory load/store of main camera targets, keeping them in on‑chip tile memory. This is a potential GPU performance optimization on Tile-Based GPU architectures. It activates additional RenderGaph validation. Some features may be disabled or fall back. See docs for details."
+            );
+            public static readonly string tileOnlyModeWarning = L10n.Tr(
+                "Tile-Only mode will disable or block features, including Renderer Features and Render Passes, that would trigger GPU memory store/load actions."
+            );
+            public static readonly string deferredTileOnlyModeWarning = L10n.Tr(
+                "Deferred rendering path is incompatible with the enabled 'Tile-Only Mode'. Change this to Forward."
+            );
+            public static readonly string deferredPlusTileOnlyModeWarning = L10n.Tr(
+                "Deferred+ rendering path is incompatible with the enabled 'Tile-Only Mode'. Change this to Forward+."
+            );
+            public static readonly string postProcessingTileOnlyModeWarning = L10n.Tr(
+                "'Post-processing' is incompatible with the enabled 'Tile-Only Mode'. Disable this setting. Renderer Features can add On-Tile Post Processing."
+            );
         }
 
         SerializedProperty m_PrepassLayerMask;
@@ -110,7 +186,8 @@ namespace UnityEditor.Rendering.Universal
 
                 if (field.GetCustomAttributes(typeof(RenderPathCompatibleAttribute), false).Length > 0)
                 {
-                    var attribute = (RenderPathCompatibleAttribute)field.GetCustomAttributes(typeof(RenderPathCompatibleAttribute), false)[0];
+                    var attribute = (RenderPathCompatibleAttribute)
+                        field.GetCustomAttributes(typeof(RenderPathCompatibleAttribute), false)[0];
                     if (attribute.renderPath.HasFlag(renderPathCompatibility))
                         m_DepthFormatStrings.Add(format.ToString());
                 }
@@ -173,7 +250,10 @@ namespace UnityEditor.Rendering.Universal
             EditorGUILayout.LabelField(Styles.RenderingSectionLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
 
-            int depthFormatIndex = GetDepthFormatIndex((DepthFormat)m_DepthAttachmentFormat.intValue, m_RenderingMode.intValue);
+            int depthFormatIndex = GetDepthFormatIndex(
+                (DepthFormat)m_DepthAttachmentFormat.intValue,
+                m_RenderingMode.intValue
+            );
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_RenderingMode, Styles.RenderingModeLabel);
@@ -181,9 +261,12 @@ namespace UnityEditor.Rendering.Universal
             if (EditorGUI.EndChangeCheck())
             {
                 PopulateCompatibleDepthFormats(m_RenderingMode.intValue);
-                depthFormatIndex = GetDepthFormatIndex((DepthFormat)m_DepthAttachmentFormat.intValue, m_RenderingMode.intValue);
+                depthFormatIndex = GetDepthFormatIndex(
+                    (DepthFormat)m_DepthAttachmentFormat.intValue,
+                    m_RenderingMode.intValue
+                );
             }
-            
+
             if (m_TileOnlyMode.boolValue)
             {
                 switch ((RenderingMode)m_RenderingMode.intValue)
@@ -197,21 +280,31 @@ namespace UnityEditor.Rendering.Universal
                 }
             }
 
-            if (m_RenderingMode.intValue == (int)RenderingMode.Deferred || m_RenderingMode.intValue == (int)RenderingMode.DeferredPlus)
+            if (
+                m_RenderingMode.intValue == (int)RenderingMode.Deferred
+                || m_RenderingMode.intValue == (int)RenderingMode.DeferredPlus
+            )
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_AccurateGbufferNormals, Styles.accurateGbufferNormalsLabel, true);
                 EditorGUI.indentLevel--;
             }
 
-            if (m_RenderingMode.intValue == (int)RenderingMode.Forward || m_RenderingMode.intValue == (int)RenderingMode.ForwardPlus)
+            if (
+                m_RenderingMode.intValue == (int)RenderingMode.Forward
+                || m_RenderingMode.intValue == (int)RenderingMode.ForwardPlus
+            )
             {
                 EditorGUI.indentLevel++;
 
                 EditorGUILayout.PropertyField(m_DepthPrimingMode, Styles.DepthPrimingModeLabel);
                 if (m_DepthPrimingMode.intValue != (int)DepthPrimingMode.Disabled)
                 {
-                    if (GraphicsSettings.currentRenderPipeline != null && GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset asset && asset.msaaSampleCount > 1)
+                    if (
+                        GraphicsSettings.currentRenderPipeline != null
+                        && GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset asset
+                        && asset.msaaSampleCount > 1
+                    )
                     {
                         EditorGUILayout.HelpBox(Styles.DepthPrimingMSAAWarning.text, MessageType.Warning);
                     }
@@ -226,11 +319,15 @@ namespace UnityEditor.Rendering.Universal
 
             EditorGUILayout.PropertyField(m_CopyDepthMode, Styles.CopyDepthModeLabel);
 
-            depthFormatIndex = EditorGUILayout.Popup(Styles.DepthAttachmentFormat, depthFormatIndex, GetCompatibleDepthFormats(m_RenderingMode.intValue));
+            depthFormatIndex = EditorGUILayout.Popup(
+                Styles.DepthAttachmentFormat,
+                depthFormatIndex,
+                GetCompatibleDepthFormats(m_RenderingMode.intValue)
+            );
             m_DepthAttachmentFormat.intValue = (int)GetDepthFormatAt(depthFormatIndex, m_RenderingMode.intValue);
 
             EditorGUILayout.PropertyField(m_DepthTextureFormat, Styles.DepthTextureFormat);
-            
+
             EditorGUILayout.PropertyField(m_TileOnlyMode, Styles.tileOnlyMode);
             if (m_TileOnlyMode.boolValue)
                 EditorGUILayout.HelpBox(Styles.tileOnlyModeWarning, MessageType.Info);
@@ -246,10 +343,15 @@ namespace UnityEditor.Rendering.Universal
             EditorGUILayout.LabelField(Styles.PostProcessingSectionLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
             EditorGUI.BeginChangeCheck();
-            var postProcessIncluded = EditorGUILayout.Toggle(Styles.PostProcessIncluded, m_PostProcessData.objectReferenceValue != null);
+            var postProcessIncluded = EditorGUILayout.Toggle(
+                Styles.PostProcessIncluded,
+                m_PostProcessData.objectReferenceValue != null
+            );
             if (EditorGUI.EndChangeCheck())
             {
-                m_PostProcessData.objectReferenceValue = postProcessIncluded ? PostProcessData.GetDefaultPostProcessData() : null;
+                m_PostProcessData.objectReferenceValue = postProcessIncluded
+                    ? PostProcessData.GetDefaultPostProcessData()
+                    : null;
             }
             if (postProcessIncluded && m_TileOnlyMode.boolValue)
                 EditorGUILayout.HelpBox(Styles.postProcessingTileOnlyModeWarning, MessageType.Error);
@@ -269,12 +371,20 @@ namespace UnityEditor.Rendering.Universal
 
             if (overrideStencil.boolValue && usesDeferredLighting)
             {
-                CompareFunction stencilFunction = (CompareFunction)m_DefaultStencilState.FindPropertyRelative("stencilCompareFunction").enumValueIndex;
-                StencilOp stencilPass = (StencilOp)m_DefaultStencilState.FindPropertyRelative("passOperation").enumValueIndex;
-                StencilOp stencilFail = (StencilOp)m_DefaultStencilState.FindPropertyRelative("failOperation").enumValueIndex;
-                StencilOp stencilZFail = (StencilOp)m_DefaultStencilState.FindPropertyRelative("zFailOperation").enumValueIndex;
-                bool invalidFunction = stencilFunction == CompareFunction.Disabled || stencilFunction == CompareFunction.Never;
-                bool invalidOp = stencilPass != StencilOp.Replace && stencilFail != StencilOp.Replace && stencilZFail != StencilOp.Replace;
+                CompareFunction stencilFunction = (CompareFunction)
+                    m_DefaultStencilState.FindPropertyRelative("stencilCompareFunction").enumValueIndex;
+                StencilOp stencilPass = (StencilOp)
+                    m_DefaultStencilState.FindPropertyRelative("passOperation").enumValueIndex;
+                StencilOp stencilFail = (StencilOp)
+                    m_DefaultStencilState.FindPropertyRelative("failOperation").enumValueIndex;
+                StencilOp stencilZFail = (StencilOp)
+                    m_DefaultStencilState.FindPropertyRelative("zFailOperation").enumValueIndex;
+                bool invalidFunction =
+                    stencilFunction == CompareFunction.Disabled || stencilFunction == CompareFunction.Never;
+                bool invalidOp =
+                    stencilPass != StencilOp.Replace
+                    && stencilFail != StencilOp.Replace
+                    && stencilZFail != StencilOp.Replace;
 
                 if (invalidFunction || invalidOp)
                     EditorGUILayout.HelpBox(Styles.invalidStencilOverride.text, MessageType.Error, true);
@@ -284,7 +394,7 @@ namespace UnityEditor.Rendering.Universal
             EditorGUILayout.Space();
 
             //Hide the obsolete setting if the value is Auto. This is the only valid setting from now. Users that still have it at Always can still see it and change it to Auto.
-            if( m_IntermediateTextureMode.enumValueIndex != 0)
+            if (m_IntermediateTextureMode.enumValueIndex != 0)
             {
                 EditorGUILayout.LabelField("Compatibility", EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;

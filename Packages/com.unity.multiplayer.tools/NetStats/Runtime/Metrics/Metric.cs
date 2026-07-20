@@ -18,7 +18,9 @@ namespace Unity.Multiplayer.Tools.NetStats
 
         // public string Name => Id.get
         public MetricId Id { get; }
+
         public int GetWriteSize() => FastBufferWriter.GetWriteSize<TValue>();
+
         public void Write(FastBufferWriter writer)
         {
             writer.TryBeginWriteValue(Value);

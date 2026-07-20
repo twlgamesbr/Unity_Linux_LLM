@@ -1,12 +1,12 @@
+using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Analytics;
-using System;
+using UnityEngine.Rendering;
 
 namespace UnityEditor.Rendering.Analytics
 {
@@ -16,8 +16,12 @@ namespace UnityEditor.Rendering.Analytics
     {
         public int callbackOrder => int.MaxValue;
 
-
-        [AnalyticInfo(eventName: "uVolumeProfileOverridesAnalytic", version: 2, maxEventsPerHour:1000, vendorKey: "unity.srp")]
+        [AnalyticInfo(
+            eventName: "uVolumeProfileOverridesAnalytic",
+            version: 2,
+            maxEventsPerHour: 1000,
+            vendorKey: "unity.srp"
+        )]
         public class Analytic : IAnalytic
         {
             public Analytic(string asset_guid, string type, string[] p)
@@ -26,11 +30,13 @@ namespace UnityEditor.Rendering.Analytics
                 {
                     volume_profile_asset_guid = asset_guid,
                     component_type = type,
-                    overrided_parameters = p
+                    overrided_parameters = p,
                 };
             }
 
-            [System.Diagnostics.DebuggerDisplay("{volume_profile_asset_guid} - {component_type} - {overrided_parameters.Length}")]
+            [System.Diagnostics.DebuggerDisplay(
+                "{volume_profile_asset_guid} - {component_type} - {overrided_parameters.Length}"
+            )]
             [Serializable]
             struct Data : IAnalytic.IData
             {
@@ -39,12 +45,14 @@ namespace UnityEditor.Rendering.Analytics
                 public string component_type;
                 public string[] overrided_parameters;
             }
+
             public bool TryGatherData(out IAnalytic.IData data, out Exception error)
             {
                 data = m_Data;
                 error = null;
                 return true;
             }
+
             Data m_Data;
         }
 
@@ -56,13 +64,19 @@ namespace UnityEditor.Rendering.Analytics
         private static readonly string[] k_SearchFolders = new[] { "Assets" };
 
         [MustUseReturnValue]
-        static bool TryGatherData([NotNullWhen(true)] out List<IAnalytic> datas, [NotNullWhen(false)] out string warning)
+        static bool TryGatherData(
+            [NotNullWhen(true)] out List<IAnalytic> datas,
+            [NotNullWhen(false)] out string warning
+        )
         {
             warning = string.Empty;
 
             datas = new List<IAnalytic>();
 
-            var volumeProfileGUIDs = AssetDatabase.FindAssets($"t:{nameof(VolumeProfile)} glob:\"**/*.asset\"", k_SearchFolders);
+            var volumeProfileGUIDs = AssetDatabase.FindAssets(
+                $"t:{nameof(VolumeProfile)} glob:\"**/*.asset\"",
+                k_SearchFolders
+            );
             foreach (var guid in volumeProfileGUIDs)
             {
                 var volumeProfile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(AssetDatabase.GUIDToAssetPath(guid));
@@ -72,7 +86,7 @@ namespace UnityEditor.Rendering.Analytics
                 foreach (var volumeComponent in volumeProfile.components)
                 {
                     var volumeComponentType = volumeComponent.GetType();
-                    var defaultVolumeComponent = (VolumeComponent) ScriptableObject.CreateInstance(volumeComponentType);
+                    var defaultVolumeComponent = (VolumeComponent)ScriptableObject.CreateInstance(volumeComponentType);
                     var overrideParameters = volumeComponent.ToNestedColumnWithDefault(defaultVolumeComponent, true);
                     if (overrideParameters.Length == 0)
                         continue;
@@ -91,5 +105,4 @@ namespace UnityEditor.Rendering.Analytics
             data.ForEach(d => AnalyticsUtils.SendData(d));
         }
     }
-
 }

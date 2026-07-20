@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
-
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.InputSystem.Editor;
@@ -44,7 +43,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int up;
+        [InputControl(layout = "Axis")]
+        public int up;
 
         /// <summary>
         /// Binding for the button that represents the down (that is, <c>(0,-1,0)</c>) direction of the vector.
@@ -54,7 +54,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int down;
+        [InputControl(layout = "Axis")]
+        public int down;
 
         /// <summary>
         /// Binding for the button that represents the left (that is, <c>(-1,0,0)</c>) direction of the vector.
@@ -64,7 +65,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int left;
+        [InputControl(layout = "Axis")]
+        public int left;
 
         /// <summary>
         /// Binding for the button that represents the right (that is, <c>(1,0,0)</c>) direction of the vector.
@@ -74,7 +76,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int right;
+        [InputControl(layout = "Axis")]
+        public int right;
 
         /// <summary>
         /// Binding for the button that represents the right (that is, <c>(0,0,1)</c>) direction of the vector.
@@ -84,7 +87,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int forward;
+        [InputControl(layout = "Axis")]
+        public int forward;
 
         /// <summary>
         /// Binding for the button that represents the right (that is, <c>(0,0,-1)</c>) direction of the vector.
@@ -94,7 +98,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int backward;
+        [InputControl(layout = "Axis")]
+        public int backward;
 
         /// <summary>
         /// How to synthesize a <c>Vector3</c> from the values read from <see cref="up"/>, <see cref="down"/>,
@@ -169,13 +174,15 @@ namespace UnityEngine.InputSystem.Composites
         }
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     internal class Vector3CompositeEditor : InputParameterEditor<Vector3Composite>
     {
-        private GUIContent m_ModeLabel = new GUIContent("Mode",
+        private GUIContent m_ModeLabel = new GUIContent(
+            "Mode",
             "How to synthesize a Vector3 from the inputs. Digital "
-            + "treats part bindings as buttons (on/off) whereas Analog preserves "
-            + "floating-point magnitudes as read from controls.");
+                + "treats part bindings as buttons (on/off) whereas Analog preserves "
+                + "floating-point magnitudes as read from controls."
+        );
 
         public override void OnGUI()
         {
@@ -187,10 +194,7 @@ namespace UnityEngine.InputSystem.Composites
 
         public override void OnDrawVisualElements(VisualElement root, Action onChangedCallback)
         {
-            var modeField = new EnumField(m_ModeLabel.text, target.mode)
-            {
-                tooltip = m_ModeLabel.tooltip
-            };
+            var modeField = new EnumField(m_ModeLabel.text, target.mode) { tooltip = m_ModeLabel.tooltip };
 
             modeField.RegisterValueChangedCallback(evt =>
             {
@@ -201,5 +205,5 @@ namespace UnityEngine.InputSystem.Composites
             root.Add(modeField);
         }
     }
-    #endif
+#endif
 }

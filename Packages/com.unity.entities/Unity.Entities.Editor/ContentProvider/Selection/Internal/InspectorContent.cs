@@ -8,14 +8,16 @@ namespace Unity.Entities.UI
         public static InspectorContent Show(ContentProvider provider, InspectorContentParameters parameters)
         {
             var dynamicContent = CreateInstance<InspectorContent>();
-            dynamicContent.SetContent(new SerializableContent {Provider = provider}, parameters);
+            dynamicContent.SetContent(new SerializableContent { Provider = provider }, parameters);
             Selection.activeObject = dynamicContent;
             return dynamicContent;
         }
 
-        [SerializeField] SerializableContent m_Content;
+        [SerializeField]
+        SerializableContent m_Content;
 
-        [SerializeField] InspectorContentParameters m_Parameters;
+        [SerializeField]
+        InspectorContentParameters m_Parameters;
         public SerializableContent Content => m_Content;
         public InspectorContentParameters Parameters => m_Parameters;
 

@@ -20,7 +20,7 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Use this for a more realistic but slower depth of field.
         /// </summary>
-        Bokeh
+        Bokeh,
     }
 
     /// <summary>
@@ -151,7 +151,9 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Use this to select Focusing modes for the depth of field effect.
         /// </summary>
-        [Tooltip("Use \"Gaussian\" for a faster but non physical depth of field; \"Bokeh\" for a more realistic but slower depth of field.")]
+        [Tooltip(
+            "Use \"Gaussian\" for a faster but non physical depth of field; \"Bokeh\" for a more realistic but slower depth of field."
+        )]
         public DepthOfFieldModeParameter mode = new DepthOfFieldModeParameter(DepthOfFieldMode.Off);
 
         /// <summary>
@@ -187,13 +189,17 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// The ratio of aperture (known as f-stop or f-number). The smaller the value is, the shallower the depth of field is.
         /// </summary>
-        [Tooltip("The ratio of aperture (known as f-stop or f-number). The smaller the value is, the shallower the depth of field is.")]
+        [Tooltip(
+            "The ratio of aperture (known as f-stop or f-number). The smaller the value is, the shallower the depth of field is."
+        )]
         public ClampedFloatParameter aperture = new ClampedFloatParameter(5.6f, 1f, 32f);
 
         /// <summary>
         /// The distance between the lens and the film. The larger the value is, the shallower the depth of field is.
         /// </summary>
-        [Tooltip("The distance between the lens and the film. The larger the value is, the shallower the depth of field is.")]
+        [Tooltip(
+            "The distance between the lens and the film. The larger the value is, the shallower the depth of field is."
+        )]
         public ClampedFloatParameter focalLength = new ClampedFloatParameter(50f, 1f, 300f);
 
         /// <summary>
@@ -205,7 +211,9 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// The curvature of aperture blades. The smaller the value is, the more visible aperture blades are. A value of 1 will make the bokeh perfectly circular.
         /// </summary>
-        [Tooltip("The curvature of aperture blades. The smaller the value is, the more visible aperture blades are. A value of 1 will make the bokeh perfectly circular.")]
+        [Tooltip(
+            "The curvature of aperture blades. The smaller the value is, the more visible aperture blades are. A value of 1 will make the bokeh perfectly circular."
+        )]
         public ClampedFloatParameter bladeCurvature = new ClampedFloatParameter(1f, 0f, 1f);
 
         /// <summary>
@@ -245,6 +253,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <param name="value">The initial value to store in the parameter.</param>
         /// <param name="overrideState">The initial override state for the parameter.</param>
-        public DepthOfFieldModeParameter(DepthOfFieldMode value, bool overrideState = false) : base(value, overrideState) { }
+        public DepthOfFieldModeParameter(DepthOfFieldMode value, bool overrideState = false)
+            : base(value, overrideState) { }
     }
 }

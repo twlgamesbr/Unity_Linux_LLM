@@ -23,6 +23,7 @@ namespace Unity.Physics
             internal static float3 Min3F => new float3(float.MinValue);
             internal static float3 Max3F => new float3(float.MaxValue);
             internal static float3 MaxDisplacement3F => new float3(float.MaxValue * 0.5f);
+
             // used for de-skewing basis vectors; default priority assumes primary axis is z, secondary axis is y
             internal static int3 DefaultAxisPriority => new int3(2, 1, 0);
             internal static int3 NextAxis => new int3(1, 2, 0);
@@ -68,7 +69,8 @@ namespace Unity.Physics
         internal static int NextMultipleOf(int input, int alignment) => (input + (alignment - 1)) & (~(alignment - 1));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ulong NextMultipleOf(ulong input, ulong alignment) => (input + (alignment - 1)) & (~(alignment - 1));
+        internal static ulong NextMultipleOf(ulong input, ulong alignment) =>
+            (input + (alignment - 1)) & (~(alignment - 1));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int IndexOfMinComponent(float2 v) => v.x < v.y ? 0 : 1;
@@ -77,7 +79,8 @@ namespace Unity.Physics
         internal static int IndexOfMinComponent(float3 v) => v.x < v.y ? ((v.x < v.z) ? 0 : 2) : ((v.y < v.z) ? 1 : 2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int IndexOfMinComponent(float4 v) => math.cmax(math.select(new int4(0, 1, 2, 3), new int4(-1), math.cmin(v) < v));
+        internal static int IndexOfMinComponent(float4 v) =>
+            math.cmax(math.select(new int4(0, 1, 2, 3), new int4(-1), math.cmin(v) < v));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int IndexOfMaxComponent(float2 v) => v.x > v.y ? 0 : 1;
@@ -86,7 +89,8 @@ namespace Unity.Physics
         internal static int IndexOfMaxComponent(float3 v) => v.x > v.y ? ((v.x > v.z) ? 0 : 2) : ((v.y > v.z) ? 1 : 2);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int IndexOfMaxComponent(float4 v) => math.cmax(math.select(new int4(0, 1, 2, 3), new int4(-1), math.cmax(v) > v));
+        internal static int IndexOfMaxComponent(float4 v) =>
+            math.cmax(math.select(new int4(0, 1, 2, 3), new int4(-1), math.cmax(v) > v));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static float HorizontalMul(float3 v) => v.x * v.y * v.z;
@@ -193,16 +197,25 @@ namespace Unity.Physics
         /// <param name="a">            A float3x3 to process. </param>
         /// <param name="eigenVectors"> [out] The eigen vectors. </param>
         /// <param name="eigenValues">  [out] The eigen values. </param>
-        internal static void DiagonalizeSymmetricApproximation(float3x3 a, out float3x3 eigenVectors, out float3 eigenValues)
+        internal static void DiagonalizeSymmetricApproximation(
+            float3x3 a,
+            out float3x3 eigenVectors,
+            out float3 eigenValues
+        )
         {
             float GetMatrixElement(float3x3 m, int row, int col)
             {
                 switch (col)
                 {
-                    case 0: return m.c0[row];
-                    case 1: return m.c1[row];
-                    case 2: return m.c2[row];
-                    default: UnityEngine.Assertions.Assert.IsTrue(false); return 0.0f;
+                    case 0:
+                        return m.c0[row];
+                    case 1:
+                        return m.c1[row];
+                    case 2:
+                        return m.c2[row];
+                    default:
+                        UnityEngine.Assertions.Assert.IsTrue(false);
+                        return 0.0f;
                 }
             }
 
@@ -210,10 +223,18 @@ namespace Unity.Physics
             {
                 switch (col)
                 {
-                    case 0: m.c0[row] = x; break;
-                    case 1: m.c1[row] = x; break;
-                    case 2: m.c2[row] = x; break;
-                    default: UnityEngine.Assertions.Assert.IsTrue(false); break;
+                    case 0:
+                        m.c0[row] = x;
+                        break;
+                    case 1:
+                        m.c1[row] = x;
+                        break;
+                    case 2:
+                        m.c2[row] = x;
+                        break;
+                    default:
+                        UnityEngine.Assertions.Assert.IsTrue(false);
+                        break;
                 }
             }
 
@@ -223,7 +244,8 @@ namespace Unity.Physics
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
                 // Find the row (p) and column (q) of the off-diagonal entry with greater magnitude
-                int p = 0, q = 1;
+                int p = 0,
+                    q = 1;
                 {
                     float maxEntry = math.abs(a.c1[0]);
                     float mag02 = math.abs(a.c2[0]);
@@ -466,7 +488,7 @@ namespace Unity.Physics
                         var z2 = d3.x + d3.w - d3.y - d3.z;
                         euler = new float3(math.atan2(x1, x2), -math.asin(y1), math.atan2(z1, z2));
                     }
-                    else   //xzx
+                    else //xzx
                     {
                         y1 = math.clamp(y1, -1.0f, 1.0f);
                         var abcd = new float4(d2.z, d1.y, d2.x, d1.z);
@@ -580,10 +602,9 @@ namespace Unity.Physics
             var rs2 = m.c2.xyz / math.max(math.cmax(math.abs(m.c2.xyz)), float.Epsilon);
             // verify all axes are orthogonal
             const float k_Zero = 1e-6f;
-            return
-                math.abs(math.dot(rs0, rs1)) > k_Zero ||
-                math.abs(math.dot(rs0, rs2)) > k_Zero ||
-                math.abs(math.dot(rs1, rs2)) > k_Zero;
+            return math.abs(math.dot(rs0, rs1)) > k_Zero
+                || math.abs(math.dot(rs0, rs2)) > k_Zero
+                || math.abs(math.dot(rs1, rs2)) > k_Zero;
         }
 
         /// <summary>
@@ -635,8 +656,12 @@ namespace Unity.Physics
             new(math.length(matrix.rs.c0), math.length(matrix.rs.c1), math.length(matrix.rs.c2));
 
         // matrix to transform point from shape's local basis into world space
-        internal static float4x4 GetBasisToWorldMatrix(float4x4 localToWorld, float3 center, quaternion orientation, float3 size) =>
-            math.mul(localToWorld, float4x4.TRS(center, orientation, size));
+        internal static float4x4 GetBasisToWorldMatrix(
+            float4x4 localToWorld,
+            float3 center,
+            quaternion orientation,
+            float3 size
+        ) => math.mul(localToWorld, float4x4.TRS(center, orientation, size));
 
         // priority is determined by length of each size dimension in the shape's basis after applying localToWorld transformation
         internal static int3 GetBasisAxisPriority(float4x4 basisToWorld)
@@ -647,14 +672,26 @@ namespace Unity.Physics
             if (max == min)
                 return Constants.DefaultAxisPriority;
 
-            var imax = max == basisAxisLengths.x ? 0 : max == basisAxisLengths.y ? 1 : 2;
+            var imax =
+                max == basisAxisLengths.x ? 0
+                : max == basisAxisLengths.y ? 1
+                : 2;
 
-            basisToWorld[Constants.NextAxis[imax]] = DeskewSecondaryAxis(basisToWorld[imax], basisToWorld[Constants.NextAxis[imax]]);
-            basisToWorld[Constants.PrevAxis[imax]] = DeskewSecondaryAxis(basisToWorld[imax], basisToWorld[Constants.PrevAxis[imax]]);
+            basisToWorld[Constants.NextAxis[imax]] = DeskewSecondaryAxis(
+                basisToWorld[imax],
+                basisToWorld[Constants.NextAxis[imax]]
+            );
+            basisToWorld[Constants.PrevAxis[imax]] = DeskewSecondaryAxis(
+                basisToWorld[imax],
+                basisToWorld[Constants.PrevAxis[imax]]
+            );
 
             basisAxisLengths = basisToWorld.DecomposeScale();
             min = math.cmin(basisAxisLengths);
-            var imin = min == basisAxisLengths.x ? 0 : min == basisAxisLengths.y ? 1 : 2;
+            var imin =
+                min == basisAxisLengths.x ? 0
+                : min == basisAxisLengths.y ? 1
+                : 2;
             if (imin == imax)
                 imin = Constants.NextAxis[imax];
             var imid = Constants.NextAxis[imax] == imin ? Constants.PrevAxis[imax] : Constants.NextAxis[imax];
@@ -687,7 +724,13 @@ namespace Unity.Physics
 
         // matrix to transform point on a primitive from bake space into space of the shape
         internal static float4x4 GetPrimitiveBakeToShapeMatrix(
-            float4x4 localToWorld, float4x4 shapeToWorld, ref float3 center, ref quaternion orientation, int3 basisPriority, bool bakeUniformScale = true)
+            float4x4 localToWorld,
+            float4x4 shapeToWorld,
+            ref float3 center,
+            ref quaternion orientation,
+            int3 basisPriority,
+            bool bakeUniformScale = true
+        )
         {
             SafetyChecks.CheckValidBasisPriorityAndThrow(basisPriority);
 
@@ -700,8 +743,10 @@ namespace Unity.Physics
                 var localToBake = math.mul(localToWorld, localToBasis);
 
                 // deskew second longest axis with respect to longest axis
-                localToBake[basisPriority[1]] =
-                    DeskewSecondaryAxis(localToBake[basisPriority[0]], localToBake[basisPriority[1]]);
+                localToBake[basisPriority[1]] = DeskewSecondaryAxis(
+                    localToBake[basisPriority[0]],
+                    localToBake[basisPriority[1]]
+                );
 
                 // recompute third axes from first two
                 var n2 = math.normalizesafe(
@@ -725,15 +770,23 @@ namespace Unity.Physics
             }
 
             // transform baked center/orientation (i.e. primitive basis) into shape space
-            orientation =
-                quaternion.LookRotationSafe(bakeToShape[basisPriority[0]].xyz, bakeToShape[basisPriority[1]].xyz);
+            orientation = quaternion.LookRotationSafe(
+                bakeToShape[basisPriority[0]].xyz,
+                bakeToShape[basisPriority[1]].xyz
+            );
             center = bakeToShape.c3.xyz;
 
             return bakeToShape;
         }
 
-        internal static float4x4 GetBakeToShape(float4x4 localToWorld, float4x4 shapeToWorld, ref float3 center,
-            ref quaternion orientation, bool bakeUniformScale = true, bool makeZAxisPrimaryBasis = false)
+        internal static float4x4 GetBakeToShape(
+            float4x4 localToWorld,
+            float4x4 shapeToWorld,
+            ref float3 center,
+            ref quaternion orientation,
+            bool bakeUniformScale = true,
+            bool makeZAxisPrimaryBasis = false
+        )
         {
             var rotationMatrix = float4x4.identity;
             var basisPriority = Constants.DefaultAxisPriority;
@@ -744,8 +797,7 @@ namespace Unity.Physics
                 if (sheared)
                 {
                     var transformScale = localToWorld.DecomposeScale();
-                    var basisToWorld =
-                        GetBasisToWorldMatrix(localToWorld, center, orientation, transformScale);
+                    var basisToWorld = GetBasisToWorldMatrix(localToWorld, center, orientation, transformScale);
                     basisPriority = GetBasisAxisPriority(basisToWorld);
                 }
 
@@ -757,16 +809,22 @@ namespace Unity.Physics
                 {
                     // align with principal axes
                     rotationMatrix = new float4x4(
-                        new float4 {[basisPriority[2]] = 1},
-                        new float4 {[basisPriority[1]] = 1},
-                        new float4 {[basisPriority[0]] = 1},
-                        new float4 {[3] = 1}
+                        new float4 { [basisPriority[2]] = 1 },
+                        new float4 { [basisPriority[1]] = 1 },
+                        new float4 { [basisPriority[0]] = 1 },
+                        new float4 { [3] = 1 }
                     );
                 }
             }
 
-            var bakeToShape = GetPrimitiveBakeToShapeMatrix(localToWorld, shapeToWorld, ref center,
-                ref orientation, basisPriority, bakeUniformScale);
+            var bakeToShape = GetPrimitiveBakeToShapeMatrix(
+                localToWorld,
+                shapeToWorld,
+                ref center,
+                ref orientation,
+                basisPriority,
+                bakeUniformScale
+            );
 
             if (needsAlignment && !makeZAxisPrimaryBasis)
             {

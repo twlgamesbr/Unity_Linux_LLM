@@ -11,7 +11,10 @@ namespace UnityEditor.Rendering
 
         /// <summary>The value as the underlying enum type used</summary>
         public T value
-        { get => (T)(object)EditorPrefs.GetInt(m_Key); set => EditorPrefs.SetInt(m_Key, (int)(object)value); }
+        {
+            get => (T)(object)EditorPrefs.GetInt(m_Key);
+            set => EditorPrefs.SetInt(m_Key, (int)(object)value);
+        }
 
         /// <summary>The raw value</summary>
         public uint rawValue
@@ -41,6 +44,7 @@ namespace UnityEditor.Rendering
         /// <param name="v">Given flags</param>
         /// <returns>True: all the given flags are set</returns>
         public bool HasFlag(T v) => ((uint)(int)(object)v & rawValue) == (uint)(int)(object)v;
+
         /// <summary>Set or unset the flags</summary>
         /// <param name="f">Flags to edit</param>
         /// <param name="v">Boolean value to set to the given flags</param>
@@ -56,6 +60,7 @@ namespace UnityEditor.Rendering
         /// <param name="v">The EditorPrefBoolFlags to convert</param>
         /// <returns>The converted value</returns>
         public static explicit operator T(EditorPrefBoolFlags<T> v) => v.value;
+
         /// <summary>Or operator between a EditorPrefBoolFlags and a value</summary>
         /// <param name="l">The EditorPrefBoolFlags</param>
         /// <param name="r">The value</param>

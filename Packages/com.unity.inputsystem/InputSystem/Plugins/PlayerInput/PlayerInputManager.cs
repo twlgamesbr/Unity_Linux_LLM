@@ -205,7 +205,8 @@ namespace UnityEngine.InputSystem
 
                 ////REVIEW: should we suppress notifications for temporary disables?
 
-                var joinEnabled = m_AllowJoining && m_JoinBehavior == PlayerJoinBehavior.JoinPlayersWhenJoinActionIsTriggered;
+                var joinEnabled =
+                    m_AllowJoining && m_JoinBehavior == PlayerJoinBehavior.JoinPlayersWhenJoinActionIsTriggered;
                 if (joinEnabled)
                     DisableJoining();
 
@@ -329,7 +330,8 @@ namespace UnityEngine.InputSystem
                     {
                         Debug.LogError(
                             $"No join action configured on PlayerInputManager but join behavior is set to {nameof(PlayerJoinBehavior.JoinPlayersWhenJoinActionIsTriggered)}",
-                            this);
+                            this
+                        );
                     }
                     break;
             }
@@ -439,14 +441,24 @@ namespace UnityEngine.InputSystem
         ///
         /// To pair multiple devices, use <see cref="JoinPlayer(int,int,string,InputDevice[])"/>.
         /// </remarks>
-        public PlayerInput JoinPlayer(int playerIndex = -1, int splitScreenIndex = -1, string controlScheme = null, InputDevice pairWithDevice = null)
+        public PlayerInput JoinPlayer(
+            int playerIndex = -1,
+            int splitScreenIndex = -1,
+            string controlScheme = null,
+            InputDevice pairWithDevice = null
+        )
         {
             if (!CheckIfPlayerCanJoin(playerIndex))
                 return null;
 
             PlayerInput.s_DestroyIfDeviceSetupUnsuccessful = true;
-            return PlayerInput.Instantiate(m_PlayerPrefab, playerIndex: playerIndex, splitScreenIndex: splitScreenIndex,
-                controlScheme: controlScheme, pairWithDevice: pairWithDevice);
+            return PlayerInput.Instantiate(
+                m_PlayerPrefab,
+                playerIndex: playerIndex,
+                splitScreenIndex: splitScreenIndex,
+                controlScheme: controlScheme,
+                pairWithDevice: pairWithDevice
+            );
         }
 
         /// <summary>
@@ -465,43 +477,85 @@ namespace UnityEngine.InputSystem
         /// <remarks>
         /// Joining must be enabled (see <see cref="joiningEnabled"/>) or the method will fail.
         /// </remarks>
-        public PlayerInput JoinPlayer(int playerIndex = -1, int splitScreenIndex = -1, string controlScheme = null, params InputDevice[] pairWithDevices)
+        public PlayerInput JoinPlayer(
+            int playerIndex = -1,
+            int splitScreenIndex = -1,
+            string controlScheme = null,
+            params InputDevice[] pairWithDevices
+        )
         {
             if (!CheckIfPlayerCanJoin(playerIndex))
                 return null;
 
             PlayerInput.s_DestroyIfDeviceSetupUnsuccessful = true;
-            return PlayerInput.Instantiate(m_PlayerPrefab, playerIndex: playerIndex, splitScreenIndex: splitScreenIndex,
-                controlScheme: controlScheme, pairWithDevices: pairWithDevices);
+            return PlayerInput.Instantiate(
+                m_PlayerPrefab,
+                playerIndex: playerIndex,
+                splitScreenIndex: splitScreenIndex,
+                controlScheme: controlScheme,
+                pairWithDevices: pairWithDevices
+            );
         }
 
-        [SerializeField] internal PlayerNotifications m_NotificationBehavior;
+        [SerializeField]
+        internal PlayerNotifications m_NotificationBehavior;
+
         [Tooltip("Set a limit for the maximum number of players who are able to join.")]
-        [SerializeField] internal int m_MaxPlayerCount = -1;
-        [SerializeField] internal bool m_AllowJoining = true;
-        [SerializeField] internal PlayerJoinBehavior m_JoinBehavior;
-        [SerializeField] internal PlayerJoinedEvent m_PlayerJoinedEvent;
-        [SerializeField] internal PlayerLeftEvent m_PlayerLeftEvent;
-        [SerializeField] internal InputActionProperty m_JoinAction;
-        [SerializeField] internal GameObject m_PlayerPrefab;
-        [SerializeField] internal bool m_SplitScreen;
-        [SerializeField] internal bool m_MaintainAspectRatioInSplitScreen;
-        [Tooltip("Explicitly set a fixed number of screens or otherwise allow the screen to be divided automatically to best fit the number of players.")]
-        [SerializeField] internal int m_FixedNumberOfSplitScreens = -1;
-        [SerializeField] internal Rect m_SplitScreenRect = new Rect(0, 0, 1, 1);
+        [SerializeField]
+        internal int m_MaxPlayerCount = -1;
 
-        [NonSerialized] private bool m_JoinActionDelegateHooked;
-        [NonSerialized] private bool m_UnpairedDeviceUsedDelegateHooked;
-        [NonSerialized] private Action<InputAction.CallbackContext> m_JoinActionDelegate;
-        [NonSerialized] private Action<InputControl, InputEventPtr> m_UnpairedDeviceUsedDelegate;
-        [NonSerialized] private CallbackArray<Action<PlayerInput>> m_PlayerJoinedCallbacks;
-        [NonSerialized] private CallbackArray<Action<PlayerInput>> m_PlayerLeftCallbacks;
+        [SerializeField]
+        internal bool m_AllowJoining = true;
 
-        internal static string[] messages => new[]
-        {
-            PlayerJoinedMessage,
-            PlayerLeftMessage,
-        };
+        [SerializeField]
+        internal PlayerJoinBehavior m_JoinBehavior;
+
+        [SerializeField]
+        internal PlayerJoinedEvent m_PlayerJoinedEvent;
+
+        [SerializeField]
+        internal PlayerLeftEvent m_PlayerLeftEvent;
+
+        [SerializeField]
+        internal InputActionProperty m_JoinAction;
+
+        [SerializeField]
+        internal GameObject m_PlayerPrefab;
+
+        [SerializeField]
+        internal bool m_SplitScreen;
+
+        [SerializeField]
+        internal bool m_MaintainAspectRatioInSplitScreen;
+
+        [Tooltip(
+            "Explicitly set a fixed number of screens or otherwise allow the screen to be divided automatically to best fit the number of players."
+        )]
+        [SerializeField]
+        internal int m_FixedNumberOfSplitScreens = -1;
+
+        [SerializeField]
+        internal Rect m_SplitScreenRect = new Rect(0, 0, 1, 1);
+
+        [NonSerialized]
+        private bool m_JoinActionDelegateHooked;
+
+        [NonSerialized]
+        private bool m_UnpairedDeviceUsedDelegateHooked;
+
+        [NonSerialized]
+        private Action<InputAction.CallbackContext> m_JoinActionDelegate;
+
+        [NonSerialized]
+        private Action<InputControl, InputEventPtr> m_UnpairedDeviceUsedDelegate;
+
+        [NonSerialized]
+        private CallbackArray<Action<PlayerInput>> m_PlayerJoinedCallbacks;
+
+        [NonSerialized]
+        private CallbackArray<Action<PlayerInput>> m_PlayerLeftCallbacks;
+
+        internal static string[] messages => new[] { PlayerJoinedMessage, PlayerLeftMessage };
 
         private bool CheckIfPlayerCanJoin(int playerIndex = -1)
         {
@@ -525,7 +579,8 @@ namespace UnityEngine.InputSystem
                     {
                         Debug.LogError(
                             $"Player index #{playerIndex} is already taken by player {PlayerInput.s_AllActivePlayers[i]}",
-                            PlayerInput.s_AllActivePlayers[i]);
+                            PlayerInput.s_AllActivePlayers[i]
+                        );
                         return false;
                     }
             }
@@ -563,7 +618,10 @@ namespace UnityEngine.InputSystem
             }
             else
             {
-                Debug.LogWarning("Multiple PlayerInputManagers in the game. There should only be one PlayerInputManager", this);
+                Debug.LogWarning(
+                    "Multiple PlayerInputManagers in the game. There should only be one PlayerInputManager",
+                    this
+                );
                 return;
             }
 
@@ -572,7 +630,9 @@ namespace UnityEngine.InputSystem
             if (joinAction.reference != null && joinAction.action?.actionMap?.asset != null)
             {
                 var inputActionAsset = Instantiate(joinAction.action.actionMap.asset);
-                var inputActionReference = InputActionReference.Create(inputActionAsset.FindAction(joinAction.action.name));
+                var inputActionReference = InputActionReference.Create(
+                    inputActionAsset.FindAction(joinAction.action.name)
+                );
                 joinAction = new InputActionProperty(inputActionReference);
             }
 
@@ -618,7 +678,8 @@ namespace UnityEngine.InputSystem
                 if (m_FixedNumberOfSplitScreens < minSplitScreenCount)
                     Debug.LogWarning(
                         $"Highest playerIndex of {minSplitScreenCount} exceeds fixed number of split-screens of {m_FixedNumberOfSplitScreens}",
-                        this);
+                        this
+                    );
 
                 minSplitScreenCount = m_FixedNumberOfSplitScreens;
             }
@@ -643,7 +704,8 @@ namespace UnityEngine.InputSystem
                 {
                     Debug.LogError(
                         $"Split-screen index of {splitScreenIndex} on player is out of range (have {numDivisionsX * numDivisionsY} screens); resetting to playerIndex",
-                        player);
+                        player
+                    );
                     player.m_SplitScreenIndex = player.playerIndex;
                 }
 
@@ -653,7 +715,8 @@ namespace UnityEngine.InputSystem
                 {
                     Debug.LogError(
                         "Player has no camera associated with it. Cannot set up split-screen. Point PlayerInput.camera to camera for player.",
-                        player);
+                        player
+                    );
                     continue;
                 }
 
@@ -663,7 +726,7 @@ namespace UnityEngine.InputSystem
                 var rect = new Rect
                 {
                     width = m_SplitScreenRect.width / numDivisionsX,
-                    height = m_SplitScreenRect.height / numDivisionsY
+                    height = m_SplitScreenRect.height / numDivisionsY,
                 };
                 rect.x = m_SplitScreenRect.x + column * rect.width;
                 // Y is bottom-to-top but we fill from top down.
@@ -693,8 +756,13 @@ namespace UnityEngine.InputSystem
             {
                 using (var unpairedDevices = InputUser.GetUnpairedInputDevices())
                 {
-                    if (InputControlScheme.FindControlSchemeForDevices(unpairedDevices, actions.controlSchemes,
-                        mustIncludeDevice: device) == null)
+                    if (
+                        InputControlScheme.FindControlSchemeForDevices(
+                            unpairedDevices,
+                            actions.controlSchemes,
+                            mustIncludeDevice: device
+                        ) == null
+                    )
                         return false;
                 }
                 return true;
@@ -734,10 +802,13 @@ namespace UnityEngine.InputSystem
 #if UNITY_EDITOR
             assetInfo = AssetDatabase.GetAssetPath(actions);
 #endif
-            Debug.LogWarning($"The input action asset '{assetInfo}' in the player prefab assigned to PlayerInputManager has " +
-                "no control schemes with required devices. The JoinPlayersWhenButtonIsPressed join behavior " +
-                "will not work unless the expected input devices are listed as requirements in the input " +
-                "action asset.", m_PlayerPrefab);
+            Debug.LogWarning(
+                $"The input action asset '{assetInfo}' in the player prefab assigned to PlayerInputManager has "
+                    + "no control schemes with required devices. The JoinPlayersWhenButtonIsPressed join behavior "
+                    + "will not work unless the expected input devices are listed as requirements in the input "
+                    + "action asset.",
+                m_PlayerPrefab
+            );
 #endif
         }
 
@@ -802,13 +873,9 @@ namespace UnityEngine.InputSystem
         }
 
         [Serializable]
-        public class PlayerJoinedEvent : UnityEvent<PlayerInput>
-        {
-        }
+        public class PlayerJoinedEvent : UnityEvent<PlayerInput> { }
 
         [Serializable]
-        public class PlayerLeftEvent : UnityEvent<PlayerInput>
-        {
-        }
+        public class PlayerLeftEvent : UnityEvent<PlayerInput> { }
     }
 }

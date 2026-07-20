@@ -10,7 +10,8 @@ namespace Unity.Multiplayer.Tools.DependencyInjection
             Type implementationType,
             Lifetime lifetime,
             object implementationInstance = null,
-            Func<object> implementationFactory = null)
+            Func<object> implementationFactory = null
+        )
         {
             DependencyType = dependencyType;
             ImplementationType = implementationType;
@@ -37,7 +38,9 @@ namespace Unity.Multiplayer.Tools.DependencyInjection
             return Define(typeof(TDependency), typeof(TImplementation), Lifetime.Transient);
         }
 
-        public static DependencyDefinition Transient<TDependency, TImplementation>(Func<TImplementation> implementationFactory)
+        public static DependencyDefinition Transient<TDependency, TImplementation>(
+            Func<TImplementation> implementationFactory
+        )
             where TImplementation : class, TDependency
         {
             return Define(typeof(TDependency), typeof(TImplementation), Lifetime.Transient, implementationFactory);
@@ -49,7 +52,9 @@ namespace Unity.Multiplayer.Tools.DependencyInjection
             return Define(typeof(TDependency), typeof(TImplementation), Lifetime.Singleton);
         }
 
-        public static DependencyDefinition Singleton<TDependency, TImplementation>(TImplementation implementationInstance)
+        public static DependencyDefinition Singleton<TDependency, TImplementation>(
+            TImplementation implementationInstance
+        )
             where TImplementation : class, TDependency
         {
             return Define(typeof(TDependency), typeof(TImplementation), Lifetime.Singleton, implementationInstance);
@@ -60,12 +65,22 @@ namespace Unity.Multiplayer.Tools.DependencyInjection
             return new DependencyDefinition(dependencyType, implementationType, lifetime);
         }
 
-        static DependencyDefinition Define(Type dependencyType, Type implementationType, Lifetime lifetime, object implementationInstance)
+        static DependencyDefinition Define(
+            Type dependencyType,
+            Type implementationType,
+            Lifetime lifetime,
+            object implementationInstance
+        )
         {
             return new DependencyDefinition(dependencyType, implementationType, lifetime, implementationInstance);
         }
 
-        static DependencyDefinition Define(Type dependencyType, Type implementationType, Lifetime lifetime, Func<object> implementationFactory)
+        static DependencyDefinition Define(
+            Type dependencyType,
+            Type implementationType,
+            Lifetime lifetime,
+            Func<object> implementationFactory
+        )
         {
             return new DependencyDefinition(dependencyType, implementationType, lifetime, implementationFactory);
         }

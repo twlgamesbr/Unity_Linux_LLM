@@ -8,15 +8,12 @@ namespace Unity.Entities.Editor
         [SettingsProvider]
         public static SettingsProvider GetPreferences()
         {
-            return HasAnySettings
-                ? new DOTSEditorProjectSettingsProvider()
-                : null;
+            return HasAnySettings ? new DOTSEditorProjectSettingsProvider() : null;
         }
 
         protected override string Title { get; } = "Editor Settings for DOTS";
 
-        DOTSEditorProjectSettingsProvider(IEnumerable<string> keywords = null) : base("DOTS/Editor", SettingsScope.Project, keywords)
-        {
-        }
+        DOTSEditorProjectSettingsProvider(IEnumerable<string> keywords = null)
+            : base("DOTS/Editor", SettingsScope.Project, keywords) { }
     }
 }

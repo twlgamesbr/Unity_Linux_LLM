@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
-
 #if UNITY_6000_2_OR_NEWER
 using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
 #endif
@@ -48,7 +47,11 @@ namespace UnityEngine.InputSystem.Editor
             var viewData = GetOrCreateViewData(property);
             var propertyIsClone = IsPropertyAClone(property);
 
-            if (!propertyIsClone && viewData.TreeView != null && viewData.TreeView.serializedObject == property.serializedObject)
+            if (
+                !propertyIsClone
+                && viewData.TreeView != null
+                && viewData.TreeView.serializedObject == property.serializedObject
+            )
                 return;
 
             if (propertyIsClone)
@@ -59,7 +62,7 @@ namespace UnityEngine.InputSystem.Editor
                 onBuildTree = () => BuildTree(property),
                 onDoubleClick = item => OnItemDoubleClicked(item, property),
                 drawActionPropertiesButton = true,
-                title = (GetPropertyTitle(property), property.GetTooltip())
+                title = (GetPropertyTitle(property), property.GetTooltip()),
             };
             viewData.TreeView.Reload();
         }
@@ -109,14 +112,18 @@ namespace UnityEngine.InputSystem.Editor
             if (property.GetParentProperty() != null && property.GetParentProperty().isArray)
                 propertyTitleNumeral = $" {property.GetIndexOfArrayElement()}";
 
-            if (property.displayName != null &&
-                property.displayName.Length > 0 &&
-                (property.type == nameof(InputAction) || property.type == nameof(InputActionMap)))
+            if (
+                property.displayName != null
+                && property.displayName.Length > 0
+                && (property.type == nameof(InputAction) || property.type == nameof(InputActionMap))
+            )
             {
                 return $"{property.displayName}{propertyTitleNumeral}";
             }
 
-            return property.type == nameof(InputActionMap) ? $"Input Action Map{propertyTitleNumeral}" : $"Input Action{propertyTitleNumeral}";
+            return property.type == nameof(InputActionMap)
+                ? $"Input Action Map{propertyTitleNumeral}"
+                : $"Input Action{propertyTitleNumeral}";
         }
 
         private void OnItemDoubleClicked(ActionTreeItemBase item, SerializedProperty property)
@@ -129,16 +136,19 @@ namespace UnityEngine.InputSystem.Editor
             {
                 if (viewData.ControlPickerState == null)
                     viewData.ControlPickerState = new InputControlPickerState();
-                propertyView = new InputBindingPropertiesView(item.property,
+                propertyView = new InputBindingPropertiesView(
+                    item.property,
                     controlPickerState: viewData.ControlPickerState,
                     expectedControlLayout: item.expectedControlLayout,
-                    onChange:
-                    change => viewData.TreeView.Reload());
+                    onChange: change => viewData.TreeView.Reload()
+                );
             }
             else if (item is ActionTreeItem)
             {
-                propertyView = new InputActionPropertiesView(item.property,
-                    onChange: change => viewData.TreeView.Reload());
+                propertyView = new InputActionPropertiesView(
+                    item.property,
+                    onChange: change => viewData.TreeView.Reload()
+                );
             }
 
             if (propertyView != null)
@@ -185,6 +195,7 @@ namespace UnityEngine.InputSystem.Editor
             }
 
             private Vector2 m_ScrollPos;
+
             private void OnGUI()
             {
                 m_ScrollPos = EditorGUILayout.BeginScrollView(m_ScrollPos);

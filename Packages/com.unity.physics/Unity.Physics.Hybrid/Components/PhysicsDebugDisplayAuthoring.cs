@@ -10,8 +10,9 @@ namespace Unity.Physics.Authoring
     {
         /// <summary> PreIntegration displays the state of the body before the simulation. </summary>
         PreIntegration,
+
         /// <summary> PostIntegration displays the state of the body when the simulation results have been integrated. </summary>
-        PostIntegration
+        PostIntegration,
     }
 
     /// <summary>
@@ -112,7 +113,7 @@ namespace Unity.Physics.Authoring
     [HelpURL(HelpURLs.PhysicsDebugDisplayAuthoring)]
     public sealed class PhysicsDebugDisplayAuthoring : MonoBehaviour
     {
-        PhysicsDebugDisplayAuthoring() {}
+        PhysicsDebugDisplayAuthoring() { }
 
         /// <summary>
         /// Enables the debug display of the colliders.
@@ -171,25 +172,31 @@ namespace Unity.Physics.Authoring
         /// <summary>
         /// The debug display mode for colliders.
         /// </summary>
-        [Tooltip("The debug display mode for colliders.\n\n" +
-            "Pre Integration displays the state of the data at the beginning of the simulation step, before rigid bodies have been integrated.\n" +
-            "Post Integration displays the state of the data at the end of the simulation step, after rigid bodies have been integrated.")]
+        [Tooltip(
+            "The debug display mode for colliders.\n\n"
+                + "Pre Integration displays the state of the data at the beginning of the simulation step, before rigid bodies have been integrated.\n"
+                + "Post Integration displays the state of the data at the end of the simulation step, after rigid bodies have been integrated."
+        )]
         public PhysicsDebugDisplayMode ColliderDisplayMode = PhysicsDebugDisplayMode.PreIntegration;
 
         /// <summary>
         /// The debug display mode for collider edges.
         /// </summary>
-        [Tooltip("The debug display mode for collider edges.\n\n" +
-            "- Pre Integration displays the state of the data at the beginning of the simulation step, before rigid bodies have been integrated.\n" +
-            "- Post Integration displays the state of the data at the end of the simulation step, after rigid bodies have been integrated.")]
+        [Tooltip(
+            "The debug display mode for collider edges.\n\n"
+                + "- Pre Integration displays the state of the data at the beginning of the simulation step, before rigid bodies have been integrated.\n"
+                + "- Post Integration displays the state of the data at the end of the simulation step, after rigid bodies have been integrated."
+        )]
         public PhysicsDebugDisplayMode ColliderEdgesDisplayMode = PhysicsDebugDisplayMode.PreIntegration;
 
         /// <summary>
         /// The debug display mode of the colliders' axis-aligned bounding boxes.
         /// </summary>
-        [Tooltip("The debug display mode for the colliders' axis-aligned bounding boxes.\n\n" +
-            "- Pre Integration displays the state of the data at the beginning of the simulation step, before rigid bodies have been integrated.\n" +
-            "- Post Integration displays the state of the data at the end of the simulation step, after rigid bodies have been integrated.")]
+        [Tooltip(
+            "The debug display mode for the colliders' axis-aligned bounding boxes.\n\n"
+                + "- Pre Integration displays the state of the data at the beginning of the simulation step, before rigid bodies have been integrated.\n"
+                + "- Post Integration displays the state of the data at the end of the simulation step, after rigid bodies have been integrated."
+        )]
         public PhysicsDebugDisplayMode ColliderAabbDisplayMode = PhysicsDebugDisplayMode.PreIntegration;
 
         /// <summary>
@@ -202,7 +209,9 @@ namespace Unity.Physics.Authoring
         /// <summary>
         /// Enables the debug display of the Direct Solver groups index.
         /// </summary>
-        [Tooltip("Displays the index of Direct Solver Islands for debugging. Requires Direct Solver Islands to be enabled.")]
+        [Tooltip(
+            "Displays the index of Direct Solver Islands for debugging. Requires Direct Solver Islands to be enabled."
+        )]
         public bool DisplayDirectSolverIslandsIndex;
 #endif
 
@@ -216,31 +225,34 @@ namespace Unity.Physics.Authoring
         /// <summary>
         /// Enables the debug display of the Iterative Solver phase index.
         /// </summary>
-        [Tooltip("Displays the index of Iterative Solver phase for debugging. Requires Iterative Solver Phases to be enabled.")]
+        [Tooltip(
+            "Displays the index of Iterative Solver phase for debugging. Requires Iterative Solver Phases to be enabled."
+        )]
         public bool DrawIterativeSolverPhaseIndex;
 #endif
 
-        internal PhysicsDebugDisplayData AsComponent => new PhysicsDebugDisplayData
-        {
-            DrawColliders = DrawColliders ? 1 : 0,
-            DrawColliderEdges = DrawColliderEdges ? 1 : 0,
-            DrawColliderAabbs = DrawColliderAabbs ? 1 : 0,
-            DrawBroadphase = DrawBroadphase ? 1 : 0,
-            DrawMassProperties = DrawMassProperties ? 1 : 0,
-            DrawContacts = DrawContacts ? 1 : 0,
-            DrawCollisionEvents = DrawCollisionEvents ? 1 : 0,
-            DrawTriggerEvents = DrawTriggerEvents ? 1 : 0,
-            DrawJoints = DrawJoints ? 1 : 0,
-            DisplayDirectSolverIslands = DisplayDirectSolverIslands ? 1 : 0,
-            DrawIterativeSolverPhases = DrawIterativeSolverPhases ? 1 : 0,
+        internal PhysicsDebugDisplayData AsComponent =>
+            new PhysicsDebugDisplayData
+            {
+                DrawColliders = DrawColliders ? 1 : 0,
+                DrawColliderEdges = DrawColliderEdges ? 1 : 0,
+                DrawColliderAabbs = DrawColliderAabbs ? 1 : 0,
+                DrawBroadphase = DrawBroadphase ? 1 : 0,
+                DrawMassProperties = DrawMassProperties ? 1 : 0,
+                DrawContacts = DrawContacts ? 1 : 0,
+                DrawCollisionEvents = DrawCollisionEvents ? 1 : 0,
+                DrawTriggerEvents = DrawTriggerEvents ? 1 : 0,
+                DrawJoints = DrawJoints ? 1 : 0,
+                DisplayDirectSolverIslands = DisplayDirectSolverIslands ? 1 : 0,
+                DrawIterativeSolverPhases = DrawIterativeSolverPhases ? 1 : 0,
 #if UNITY_PHYSICS_DISPLAY_ADVANCED_SOLVER_DATA
-            DisplayDirectSolverIslandsIndex = DisplayDirectSolverIslandsIndex ? 1 : 0,
-            DrawIterativeSolverIndex = DrawIterativeSolverPhaseIndex ? 1 : 0,
+                DisplayDirectSolverIslandsIndex = DisplayDirectSolverIslandsIndex ? 1 : 0,
+                DrawIterativeSolverIndex = DrawIterativeSolverPhaseIndex ? 1 : 0,
 #endif
-            ColliderDisplayMode = ColliderDisplayMode,
-            ColliderEdgesDisplayMode = ColliderEdgesDisplayMode,
-            ColliderAabbDisplayMode = ColliderAabbDisplayMode
-        };
+                ColliderDisplayMode = ColliderDisplayMode,
+                ColliderEdgesDisplayMode = ColliderEdgesDisplayMode,
+                ColliderAabbDisplayMode = ColliderAabbDisplayMode,
+            };
     }
 
     /// <summary>

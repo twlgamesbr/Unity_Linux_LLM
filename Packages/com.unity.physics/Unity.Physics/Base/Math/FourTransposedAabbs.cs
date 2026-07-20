@@ -5,19 +5,23 @@ namespace Unity.Physics
     // 4 transposed AABBs
     internal struct FourTransposedAabbs
     {
-        public float4 Lx, Hx;    // Lower and upper bounds along the X axis.
-        public float4 Ly, Hy;    // Lower and upper bounds along the Y axis.
-        public float4 Lz, Hz;    // Lower and upper bounds along the Z axis.
+        public float4 Lx,
+            Hx; // Lower and upper bounds along the X axis.
+        public float4 Ly,
+            Hy; // Lower and upper bounds along the Y axis.
+        public float4 Lz,
+            Hz; // Lower and upper bounds along the Z axis.
 
-        public static FourTransposedAabbs Empty => new FourTransposedAabbs
-        {
-            Lx = new float4(float.MaxValue),
-            Hx = new float4(float.MinValue),
-            Ly = new float4(float.MaxValue),
-            Hy = new float4(float.MinValue),
-            Lz = new float4(float.MaxValue),
-            Hz = new float4(float.MinValue)
-        };
+        public static FourTransposedAabbs Empty =>
+            new FourTransposedAabbs
+            {
+                Lx = new float4(float.MaxValue),
+                Hx = new float4(float.MinValue),
+                Ly = new float4(float.MaxValue),
+                Hy = new float4(float.MinValue),
+                Lz = new float4(float.MaxValue),
+                Hz = new float4(float.MinValue),
+            };
 
         public void SetAllAabbs(Aabb aabb)
         {
@@ -41,27 +45,30 @@ namespace Unity.Physics
             Hz[index] = aabb.Max.z;
         }
 
-        public Aabb GetAabb(int index) => new Aabb
-        {
-            Min = new float3(Lx[index], Ly[index], Lz[index]),
-            Max = new float3(Hx[index], Hy[index], Hz[index])
-        };
+        public Aabb GetAabb(int index) =>
+            new Aabb
+            {
+                Min = new float3(Lx[index], Ly[index], Lz[index]),
+                Max = new float3(Hx[index], Hy[index], Hz[index]),
+            };
 
-        public FourTransposedAabbs GetAabbT(int index) => new FourTransposedAabbs
-        {
-            Lx = new float4(Lx[index]),
-            Ly = new float4(Ly[index]),
-            Lz = new float4(Lz[index]),
-            Hx = new float4(Hx[index]),
-            Hy = new float4(Hy[index]),
-            Hz = new float4(Hz[index])
-        };
+        public FourTransposedAabbs GetAabbT(int index) =>
+            new FourTransposedAabbs
+            {
+                Lx = new float4(Lx[index]),
+                Ly = new float4(Ly[index]),
+                Lz = new float4(Lz[index]),
+                Hx = new float4(Hx[index]),
+                Hy = new float4(Hy[index]),
+                Hz = new float4(Hz[index]),
+            };
 
-        public Aabb GetCompoundAabb() => new Aabb
-        {
-            Min = new float3(math.cmin(Lx), math.cmin(Ly), math.cmin(Lz)),
-            Max = new float3(math.cmax(Hx), math.cmax(Hy), math.cmax(Hz))
-        };
+        public Aabb GetCompoundAabb() =>
+            new Aabb
+            {
+                Min = new float3(math.cmin(Lx), math.cmin(Ly), math.cmin(Lz)),
+                Max = new float3(math.cmax(Hx), math.cmax(Hy), math.cmax(Hz)),
+            };
 
         public bool4 Overlap1Vs4(ref FourTransposedAabbs aabbT)
         {

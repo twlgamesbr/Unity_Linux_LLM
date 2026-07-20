@@ -21,7 +21,8 @@ namespace UnityEditor.Build.Pipeline
         public virtual long SerializationIndexFromObjectIdentifier(ObjectIdentifier objectID)
         {
             RawHash hash;
-            bool extraArtifact = HashingMethods.IsVirtualArtifactsExtraPath(objectID.filePath)
+            bool extraArtifact =
+                HashingMethods.IsVirtualArtifactsExtraPath(objectID.filePath)
                 || HashingMethods.IsUdsDataPath(objectID.filePath);
             int hashSeed = ScriptableBuildPipeline.fileIDHashSeed;
             if (extraArtifact && hashSeed != 0)
@@ -37,14 +38,23 @@ namespace UnityEditor.Build.Pipeline
             else if (hashSeed != 0)
             {
                 if (objectID.fileType == FileType.MetaAssetType || objectID.fileType == FileType.SerializedAssetType)
-                    hash = HashingMethods.Calculate<MD4>(hashSeed, objectID.guid.ToString(), objectID.fileType, objectID.localIdentifierInFile);
+                    hash = HashingMethods.Calculate<MD4>(
+                        hashSeed,
+                        objectID.guid.ToString(),
+                        objectID.fileType,
+                        objectID.localIdentifierInFile
+                    );
                 else
                     hash = HashingMethods.Calculate<MD4>(hashSeed, objectID.filePath, objectID.localIdentifierInFile);
             }
             else
             {
                 if (objectID.fileType == FileType.MetaAssetType || objectID.fileType == FileType.SerializedAssetType)
-                    hash = HashingMethods.Calculate<MD4>(objectID.guid.ToString(), objectID.fileType, objectID.localIdentifierInFile);
+                    hash = HashingMethods.Calculate<MD4>(
+                        objectID.guid.ToString(),
+                        objectID.fileType,
+                        objectID.localIdentifierInFile
+                    );
                 else
                     hash = HashingMethods.Calculate<MD4>(objectID.filePath, objectID.localIdentifierInFile);
             }

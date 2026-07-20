@@ -24,9 +24,10 @@ namespace Unity.Multiplayer.Tools.Context
             var netVisPresentationContext = NetVis.Editor.UI.PresentationContext.InitializeInstance(
                 netVisRuntimeContext.ConfigurationWithEvents,
                 netVisRuntimeContext.BandwidthStats,
-                netVisRuntimeContext.ConnectedClients);
+                netVisRuntimeContext.ConnectedClients
+            );
             contexts.Add(netVisPresentationContext);
-#endif 
+#endif
         }
     }
 }

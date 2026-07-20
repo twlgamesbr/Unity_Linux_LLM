@@ -54,7 +54,7 @@ namespace UnityEngine.Experimental.Rendering
             m_Views = new List<XRView>(2);
             m_OcclusionMesh = new XROcclusionMesh(this);
             m_VisibleMesh = new XRVisibleMesh(this);
-            isLastCameraPass = true;    // default to last camera pass when creating from default constructor
+            isLastCameraPass = true; // default to last camera pass when creating from default constructor
             uvScales = Vector4.one;
             uvOffsets = Vector4.zero;
         }
@@ -74,7 +74,7 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// Default release method. Can be overridden by render pipelines.
         /// </summary>
-        virtual public void Release()
+        public virtual void Release()
         {
             m_VisibleMesh.Dispose();
             GenericPool<XRPass>.Release(this);
@@ -98,7 +98,10 @@ namespace UnityEngine.Experimental.Rendering
         public bool supportsFoveatedRendering
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
-            get => enabled && foveatedRenderingInfo != IntPtr.Zero && XRSystem.foveatedRenderingCaps != FoveatedRenderingCaps.None;
+            get =>
+                enabled
+                && foveatedRenderingInfo != IntPtr.Zero
+                && XRSystem.foveatedRenderingCaps != FoveatedRenderingCaps.None;
 #else
             get => false;
 #endif
@@ -116,7 +119,7 @@ namespace UnityEngine.Experimental.Rendering
 
         /// <summary>
         /// Reports which NDC convention the render pipeline should use when calculating motion vectors.
-        /// if <c>true</c>, motion vector data must use the right-handed NDC space. If <c>false</c> motion vector data 
+        /// if <c>true</c>, motion vector data must use the right-handed NDC space. If <c>false</c> motion vector data
         /// must use the left-handed NDC space.
         /// </summary>
         /// <remarks>
@@ -214,12 +217,18 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// Returns the number of views inside this pass.
         /// </summary>
-        public int viewCount { get => m_Views.Count; }
+        public int viewCount
+        {
+            get => m_Views.Count;
+        }
 
         /// <summary>
         /// If true, the render pipeline is expected to use single-pass techniques to save CPU time.
         /// </summary>
-        public bool singlePassEnabled { get => viewCount > 1; }
+        public bool singlePassEnabled
+        {
+            get => viewCount > 1;
+        }
 
         /// <summary>
         /// Native pointer from the XR plugin to be consumed by ConfigureFoveatedRendering.
@@ -256,11 +265,12 @@ namespace UnityEngine.Experimental.Rendering
         public HDROutputUtils.HDRDisplayInformation hdrDisplayOutputInformation
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
-            get => new HDROutputUtils.HDRDisplayInformation(
-                XRSystem.GetActiveDisplay().hdrOutputSettings?.maxFullFrameToneMapLuminance ?? -1,
-                XRSystem.GetActiveDisplay().hdrOutputSettings?.maxToneMapLuminance ?? -1,
-                XRSystem.GetActiveDisplay().hdrOutputSettings?.minToneMapLuminance ?? -1,
-                XRSystem.GetActiveDisplay().hdrOutputSettings?.paperWhiteNits ?? 160.0f
+            get =>
+                new HDROutputUtils.HDRDisplayInformation(
+                    XRSystem.GetActiveDisplay().hdrOutputSettings?.maxFullFrameToneMapLuminance ?? -1,
+                    XRSystem.GetActiveDisplay().hdrOutputSettings?.maxToneMapLuminance ?? -1,
+                    XRSystem.GetActiveDisplay().hdrOutputSettings?.minToneMapLuminance ?? -1,
+                    XRSystem.GetActiveDisplay().hdrOutputSettings?.paperWhiteNits ?? 160.0f
                 );
 #else
             get => new HDROutputUtils.HDRDisplayInformation(-1, -1, -1, 160.0f);
@@ -377,7 +387,9 @@ namespace UnityEngine.Experimental.Rendering
                     }
                     else
                     {
-                        throw new NotImplementedException($"Invalid XR setup for single-pass, trying to render too many views! Max supported: {TextureXR.slices}");
+                        throw new NotImplementedException(
+                            $"Invalid XR setup for single-pass, trying to render too many views! Max supported: {TextureXR.slices}"
+                        );
                     }
                 }
             }
@@ -415,7 +427,6 @@ namespace UnityEngine.Experimental.Rendering
             }
         }
 
-
         /// <summary>
         /// Queue up render commands to disable single-pass techniques.
         /// </summary>
@@ -428,12 +439,18 @@ namespace UnityEngine.Experimental.Rendering
         /// <summary>
         /// Returns true if the pass was setup with expected mesh and material.
         /// </summary>
-        public bool hasValidOcclusionMesh { get => m_OcclusionMesh.hasValidOcclusionMesh; }
+        public bool hasValidOcclusionMesh
+        {
+            get => m_OcclusionMesh.hasValidOcclusionMesh;
+        }
 
         /// <summary>
         /// Returns true if the pass was setup with expected mesh and enabled by settings.
         /// </summary>
-        public bool hasValidVisibleMesh { get => m_VisibleMesh.hasValidVisibleMesh && XRSystem.GetUseVisibilityMesh(); }
+        public bool hasValidVisibleMesh
+        {
+            get => m_VisibleMesh.hasValidVisibleMesh && XRSystem.GetUseVisibilityMesh();
+        }
 
         /// <summary>
         /// Generate commands to render the occlusion mesh for this pass.
@@ -474,12 +491,24 @@ namespace UnityEngine.Experimental.Rendering
         /// <param name="materialBlock">Material block with all the shader parameters that need to be set.</param>
         /// <param name="shaderPass">Material shader pass to render, set 0 by default.</param>
         /// <param name="renderIntoTexture">Set to true when rendering into a render texture. Used for handling Unity yflip.</param>
-        public void RenderVisibleMeshCustomMaterial(RasterCommandBuffer cmd, float occlusionMeshScale,
-            Material material, MaterialPropertyBlock materialBlock, int shaderPass, bool renderIntoTexture = false)
+        public void RenderVisibleMeshCustomMaterial(
+            RasterCommandBuffer cmd,
+            float occlusionMeshScale,
+            Material material,
+            MaterialPropertyBlock materialBlock,
+            int shaderPass,
+            bool renderIntoTexture = false
+        )
         {
             if (occlusionMeshScale > 0)
-                m_VisibleMesh.RenderVisibleMeshCustomMaterial(cmd.m_WrappedCommandBuffer, occlusionMeshScale, material, materialBlock, shaderPass, renderIntoTexture);
-
+                m_VisibleMesh.RenderVisibleMeshCustomMaterial(
+                    cmd.m_WrappedCommandBuffer,
+                    occlusionMeshScale,
+                    material,
+                    materialBlock,
+                    shaderPass,
+                    renderIntoTexture
+                );
         }
 
         /// <summary>
@@ -493,12 +522,24 @@ namespace UnityEngine.Experimental.Rendering
         /// <param name="materialBlock">Material block with all the shader parameters that need to be set.</param>
         /// <param name="shaderPass">Material shader pass to render, set 0 by default.</param>
         /// <param name="renderIntoTexture">Set to true when rendering into a render texture. Used for handling Unity yflip.</param>
-        public void RenderVisibleMeshCustomMaterial(CommandBuffer cmd, float occlusionMeshScale,
-            Material material, MaterialPropertyBlock materialBlock, int shaderPass = 0, bool renderIntoTexture = false)
+        public void RenderVisibleMeshCustomMaterial(
+            CommandBuffer cmd,
+            float occlusionMeshScale,
+            Material material,
+            MaterialPropertyBlock materialBlock,
+            int shaderPass = 0,
+            bool renderIntoTexture = false
+        )
         {
             if (occlusionMeshScale > 0)
-                m_VisibleMesh.RenderVisibleMeshCustomMaterial(cmd, occlusionMeshScale, material, materialBlock, shaderPass, renderIntoTexture);
-
+                m_VisibleMesh.RenderVisibleMeshCustomMaterial(
+                    cmd,
+                    occlusionMeshScale,
+                    material,
+                    materialBlock,
+                    shaderPass,
+                    renderIntoTexture
+                );
         }
 
         /// <summary>
@@ -506,7 +547,7 @@ namespace UnityEngine.Experimental.Rendering
         /// </summary>
         public void RenderDebugXRViewsFrustum()
         {
-            for(int i = 0; i < m_Views.Count; i++)
+            for (int i = 0; i < m_Views.Count; i++)
             {
                 const float k_DebugVeiwsFrustumDepthZ = 10.0f;
                 var view = m_Views[i];
@@ -514,8 +555,12 @@ namespace UnityEngine.Experimental.Rendering
 
                 // Get world space camera pos
                 Vector3 worldSpaceCameraPos = -(view.viewMatrix).GetColumn(3);
-                for(int j = 0; j < 4; j++)
-                    Debug.DrawLine(worldSpaceCameraPos, view.viewMatrix.MultiplyPoint(corners[j]), i == 0 ? Color.green : Color.red);
+                for (int j = 0; j < 4; j++)
+                    Debug.DrawLine(
+                        worldSpaceCameraPos,
+                        view.viewMatrix.MultiplyPoint(corners[j]),
+                        i == 0 ? Color.green : Color.red
+                    );
             }
         }
 
@@ -579,7 +624,12 @@ namespace UnityEngine.Experimental.Rendering
             renderTargetDesc = createInfo.renderTargetDesc;
             renderTargetScaledWidth = createInfo.renderTargetScaledWidth;
             renderTargetScaledHeight = createInfo.renderTargetScaledHeight;
-            motionVectorRenderTarget = new RenderTargetIdentifier(createInfo.motionVectorRenderTarget, 0, CubemapFace.Unknown, -1);
+            motionVectorRenderTarget = new RenderTargetIdentifier(
+                createInfo.motionVectorRenderTarget,
+                0,
+                CubemapFace.Unknown,
+                -1
+            );
             motionVectorRenderTargetDesc = createInfo.motionVectorRenderTargetDesc;
             hasMotionVectorPass = createInfo.hasMotionVectorPass;
             spaceWarpRightHandedNDC = createInfo.spaceWarpRightHandedNDC;
@@ -599,7 +649,9 @@ namespace UnityEngine.Experimental.Rendering
             }
             else
             {
-                throw new NotImplementedException($"Invalid XR setup for single-pass, trying to add too many views! Max supported: {TextureXR.slices}");
+                throw new NotImplementedException(
+                    $"Invalid XR setup for single-pass, trying to add too many views! Max supported: {TextureXR.slices}"
+                );
             }
         }
     }

@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor.Rendering.Analytics;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace UnityEditor.Rendering
@@ -23,7 +23,7 @@ namespace UnityEditor.Rendering
     [CoreRPHelpURL("Rendering-Debugger")]
     sealed partial class DebugWindow : EditorWindowWithHelpButton
 #if ENABLE_RENDERING_DEBUGGER_UI
-        , IHasCustomMenu
+            , IHasCustomMenu
 #endif
     {
         internal static GUIContent s_TitleContent = EditorGUIUtility.TrTextContent("Rendering Debugger");
@@ -51,7 +51,8 @@ namespace UnityEditor.Rendering
 #else
             var helpBox = new HelpBox(
                 "UIElements Module is disabled. In order to use Rendering Debugger, enable the module in Package Manager > Built-in. ",
-                HelpBoxMessageType.Info);
+                HelpBoxMessageType.Info
+            );
             helpBox.buttonText = "Open in Package Manager";
             helpBox.onButtonClicked += () => PackageManager.UI.Window.Open("com.unity.modules.uielements");
             rootVisualElement.Add(helpBox);
@@ -76,7 +77,8 @@ namespace UnityEditor.Rendering
         VisualElement m_LeftPaneElement;
         VisualElement m_RightPaneElement;
 
-        const string k_UssCommon = "Packages/com.unity.render-pipelines.core/Runtime/DEbugging/Runtime UI Resources/DebugWindowCommon.uss";
+        const string k_UssCommon =
+            "Packages/com.unity.render-pipelines.core/Runtime/DEbugging/Runtime UI Resources/DebugWindowCommon.uss";
         const string k_Uss = "Packages/com.unity.render-pipelines.core/Editor/Debugging/DebugWindow.uss";
         const string k_Uxml = "Packages/com.unity.render-pipelines.core/Editor/Debugging/DebugWindow.uxml";
 
@@ -121,8 +123,15 @@ namespace UnityEditor.Rendering
                     if (fieldType.IsAbstract || genericArgs.Length == 0)
                         continue;
 
-                    var field = fieldType.GetField(nameof(DebugUI.Field<int>.onWidgetValueChangedAnalytic), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-                    var method = GetType().GetMethod(nameof(SendWidgetValueChangedAnalytic), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                    var field = fieldType.GetField(
+                        nameof(DebugUI.Field<int>.onWidgetValueChangedAnalytic),
+                        BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy
+                    );
+                    var method = GetType()
+                        .GetMethod(
+                            nameof(SendWidgetValueChangedAnalytic),
+                            BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy
+                        );
                     var genericArg = fieldType.BaseType.GetGenericArguments()[0];
                     var genericMethod = method.MakeGenericMethod(genericArg);
                     var delegateType = typeof(Action<,,>).MakeGenericType(typeof(string), genericArg, genericArg);
@@ -137,7 +146,7 @@ namespace UnityEditor.Rendering
         }
 
         // Store timestamps to throttle event sending
-        static readonly Dictionary<string, float> s_SentAnalyticsTimestamps = new ();
+        static readonly Dictionary<string, float> s_SentAnalyticsTimestamps = new();
 
         static void SendWidgetValueChangedAnalytic<T>(string queryPath, T previousValue, T newValue)
         {
@@ -146,17 +155,23 @@ namespace UnityEditor.Rendering
 
             const float kMaxSendRateSeconds = 0.5f;
             float now = (float)EditorApplication.timeSinceStartup;
-            if (s_SentAnalyticsTimestamps.TryGetValue(queryPath, out float lastSentAt) && now - lastSentAt < kMaxSendRateSeconds)
+            if (
+                s_SentAnalyticsTimestamps.TryGetValue(queryPath, out float lastSentAt)
+                && now - lastSentAt < kMaxSendRateSeconds
+            )
                 return;
 
             s_SentAnalyticsTimestamps[queryPath] = now;
 
-            var analytic = new List<WidgetChangedAction<T>> { new()
+            var analytic = new List<WidgetChangedAction<T>>
             {
-                query_path = queryPath,
-                previous_value = previousValue,
-                new_value = newValue
-            } };
+                new()
+                {
+                    query_path = queryPath,
+                    previous_value = previousValue,
+                    new_value = newValue,
+                },
+            };
             GraphicsToolUsageAnalytic.ActionPerformed<DebugWindow>("Widget Value Changed", analytic.ToNestedColumn());
         }
 
@@ -237,7 +252,12 @@ namespace UnityEditor.Rendering
 
             if (activePanels.Count == 0)
             {
-                rootVisualElement.Add(new HelpBox("No debug items registered. Make sure a Render Pipeline Asset is assigned in Quality Settings.", HelpBoxMessageType.Info));
+                rootVisualElement.Add(
+                    new HelpBox(
+                        "No debug items registered. Make sure a Render Pipeline Asset is assigned in Quality Settings.",
+                        HelpBoxMessageType.Info
+                    )
+                );
                 return;
             }
 
@@ -267,7 +287,7 @@ namespace UnityEditor.Rendering
 
             var uiPanels = DebugUIExtensions.CreatePanels(activePanels, DebugUI.Context.Editor);
 
-            foreach (var (tab, panel)  in uiPanels)
+            foreach (var (tab, panel) in uiPanels)
             {
                 panel.style.display = DisplayStyle.None;
                 tab.RegisterCallback<ClickEvent>(_ => SetSelectedPanel(tab.text));
@@ -276,7 +296,10 @@ namespace UnityEditor.Rendering
             }
 
             string selectedPanelName = m_SelectedPanelName;
-            if (string.IsNullOrEmpty(selectedPanelName) || m_LeftPaneElement.Q<Label>(name: m_SelectedPanelName + "_Tab") == null)
+            if (
+                string.IsNullOrEmpty(selectedPanelName)
+                || m_LeftPaneElement.Q<Label>(name: m_SelectedPanelName + "_Tab") == null
+            )
             {
                 // No selected panel, or selected panel is not existing anymore, pick the first
                 if (m_LeftPaneElement.childCount > 0 && m_LeftPaneElement[0] is Label firstLabel)
@@ -310,18 +333,29 @@ namespace UnityEditor.Rendering
 
             if (selectedPanel != null)
             {
-                m_LeftPaneElement.Q<VisualElement>(name: $"{selectedPanel.displayName}_Tab")?.RemoveFromClassList("selected");
-                if (m_RightPaneElement.Q<VisualElement>(name: $"{selectedPanel.displayName}_Content") is { } previousContent)
+                m_LeftPaneElement
+                    .Q<VisualElement>(name: $"{selectedPanel.displayName}_Tab")
+                    ?.RemoveFromClassList("selected");
+                if (
+                    m_RightPaneElement.Q<VisualElement>(name: $"{selectedPanel.displayName}_Content") is
+                    { } previousContent
+                )
                     previousContent.style.display = DisplayStyle.None;
 
-                DebugManager.instance.schedulerTracker.SetHierarchyEnabled(DebugUI.Context.Editor, selectedPanel, false);
+                DebugManager.instance.schedulerTracker.SetHierarchyEnabled(
+                    DebugUI.Context.Editor,
+                    selectedPanel,
+                    false
+                );
             }
 
             selectedPanel = DebugManager.instance.GetPanel(panelName);
 
             if (selectedPanel != null)
             {
-                m_LeftPaneElement.Q<VisualElement>(name: $"{selectedPanel.displayName}_Tab")?.AddToClassList("selected");
+                m_LeftPaneElement
+                    .Q<VisualElement>(name: $"{selectedPanel.displayName}_Tab")
+                    ?.AddToClassList("selected");
                 if (m_RightPaneElement.Q<VisualElement>(name: $"{selectedPanel.displayName}_Content") is { } newContent)
                     newContent.style.display = DisplayStyle.Flex;
 

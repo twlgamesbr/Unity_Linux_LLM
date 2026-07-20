@@ -30,7 +30,11 @@ namespace Unity.Netcode
             Read(reader, ref value);
         }
 
-        void INetworkVariableSerializer<short>.ReadWithAllocator(FastBufferReader reader, out short value, Allocator allocator)
+        void INetworkVariableSerializer<short>.ReadWithAllocator(
+            FastBufferReader reader,
+            out short value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -66,7 +70,11 @@ namespace Unity.Netcode
             Read(reader, ref value);
         }
 
-        void INetworkVariableSerializer<ushort>.ReadWithAllocator(FastBufferReader reader, out ushort value, Allocator allocator)
+        void INetworkVariableSerializer<ushort>.ReadWithAllocator(
+            FastBufferReader reader,
+            out ushort value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -102,7 +110,11 @@ namespace Unity.Netcode
             Read(reader, ref value);
         }
 
-        void INetworkVariableSerializer<int>.ReadWithAllocator(FastBufferReader reader, out int value, Allocator allocator)
+        void INetworkVariableSerializer<int>.ReadWithAllocator(
+            FastBufferReader reader,
+            out int value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -138,7 +150,11 @@ namespace Unity.Netcode
             Read(reader, ref value);
         }
 
-        void INetworkVariableSerializer<uint>.ReadWithAllocator(FastBufferReader reader, out uint value, Allocator allocator)
+        void INetworkVariableSerializer<uint>.ReadWithAllocator(
+            FastBufferReader reader,
+            out uint value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -174,7 +190,11 @@ namespace Unity.Netcode
             Read(reader, ref value);
         }
 
-        void INetworkVariableSerializer<long>.ReadWithAllocator(FastBufferReader reader, out long value, Allocator allocator)
+        void INetworkVariableSerializer<long>.ReadWithAllocator(
+            FastBufferReader reader,
+            out long value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -210,7 +230,11 @@ namespace Unity.Netcode
             Read(reader, ref value);
         }
 
-        void INetworkVariableSerializer<ulong>.ReadWithAllocator(FastBufferReader reader, out ulong value, Allocator allocator)
+        void INetworkVariableSerializer<ulong>.ReadWithAllocator(
+            FastBufferReader reader,
+            out ulong value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -229,7 +253,8 @@ namespace Unity.Netcode
     ///     the specific constraints that the various generic WriteValue calls require.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class UnmanagedTypeSerializer<T> : INetworkVariableSerializer<T> where T : unmanaged
+    internal class UnmanagedTypeSerializer<T> : INetworkVariableSerializer<T>
+        where T : unmanaged
     {
         public void Write(FastBufferWriter writer, ref T value)
         {
@@ -328,7 +353,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadListDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<List<T>>.ReadWithAllocator(FastBufferReader reader, out List<T> value, Allocator allocator)
+        void INetworkVariableSerializer<List<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out List<T> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -374,7 +403,6 @@ namespace Unity.Netcode
             }
         }
 
-
         public void Read(FastBufferReader reader, ref HashSet<T> value)
         {
             reader.ReadValueSafe(out bool isNull);
@@ -413,7 +441,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadHashSetDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<HashSet<T>>.ReadWithAllocator(FastBufferReader reader, out HashSet<T> value, Allocator allocator)
+        void INetworkVariableSerializer<HashSet<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out HashSet<T> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -441,7 +473,6 @@ namespace Unity.Netcode
             }
         }
     }
-
 
     internal class DictionarySerializer<TKey, TVal> : INetworkVariableSerializer<Dictionary<TKey, TVal>>
         where TKey : IEquatable<TKey>
@@ -491,7 +522,11 @@ namespace Unity.Netcode
             }
         }
 
-        public void WriteDelta(FastBufferWriter writer, ref Dictionary<TKey, TVal> value, ref Dictionary<TKey, TVal> previousValue)
+        public void WriteDelta(
+            FastBufferWriter writer,
+            ref Dictionary<TKey, TVal> value,
+            ref Dictionary<TKey, TVal> previousValue
+        )
         {
             CollectionSerializationUtility.WriteDictionaryDelta(writer, ref value, ref previousValue);
         }
@@ -501,7 +536,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadDictionaryDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<Dictionary<TKey, TVal>>.ReadWithAllocator(FastBufferReader reader, out Dictionary<TKey, TVal> value, Allocator allocator)
+        void INetworkVariableSerializer<Dictionary<TKey, TVal>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out Dictionary<TKey, TVal> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -532,7 +571,8 @@ namespace Unity.Netcode
         }
     }
 
-    internal class UnmanagedArraySerializer<T> : INetworkVariableSerializer<NativeArray<T>> where T : unmanaged
+    internal class UnmanagedArraySerializer<T> : INetworkVariableSerializer<NativeArray<T>>
+        where T : unmanaged
     {
         public void Write(FastBufferWriter writer, ref NativeArray<T> value)
         {
@@ -555,7 +595,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeArrayDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeArray<T>>.ReadWithAllocator(FastBufferReader reader, out NativeArray<T> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeArray<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeArray<T> value,
+            Allocator allocator
+        )
         {
             reader.ReadUnmanagedSafe(out value, allocator);
         }
@@ -569,7 +613,11 @@ namespace Unity.Netcode
                     duplicatedValue.Dispose();
                 }
 
-                duplicatedValue = new NativeArray<T>(value.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                duplicatedValue = new NativeArray<T>(
+                    value.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             duplicatedValue.CopyFrom(value);
@@ -577,7 +625,8 @@ namespace Unity.Netcode
     }
 
 #if UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT
-    internal class UnmanagedListSerializer<T> : INetworkVariableSerializer<NativeList<T>> where T : unmanaged
+    internal class UnmanagedListSerializer<T> : INetworkVariableSerializer<NativeList<T>>
+        where T : unmanaged
     {
         public void Write(FastBufferWriter writer, ref NativeList<T> value)
         {
@@ -599,7 +648,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeListDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeList<T>>.ReadWithAllocator(FastBufferReader reader, out NativeList<T> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeList<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeList<T> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -619,8 +672,8 @@ namespace Unity.Netcode
         }
     }
 
-
-    internal class NativeHashSetSerializer<T> : INetworkVariableSerializer<NativeHashSet<T>> where T : unmanaged, IEquatable<T>
+    internal class NativeHashSetSerializer<T> : INetworkVariableSerializer<NativeHashSet<T>>
+        where T : unmanaged, IEquatable<T>
     {
         public void Write(FastBufferWriter writer, ref NativeHashSet<T> value)
         {
@@ -642,7 +695,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeHashSetDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeHashSet<T>>.ReadWithAllocator(FastBufferReader reader, out NativeHashSet<T> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeHashSet<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeHashSet<T> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -662,7 +719,6 @@ namespace Unity.Netcode
         }
     }
 
-
     internal class NativeHashMapSerializer<TKey, TVal> : INetworkVariableSerializer<NativeHashMap<TKey, TVal>>
         where TKey : unmanaged, IEquatable<TKey>
         where TVal : unmanaged
@@ -677,7 +733,11 @@ namespace Unity.Netcode
             reader.ReadValueSafeInPlace(ref value);
         }
 
-        public void WriteDelta(FastBufferWriter writer, ref NativeHashMap<TKey, TVal> value, ref NativeHashMap<TKey, TVal> previousValue)
+        public void WriteDelta(
+            FastBufferWriter writer,
+            ref NativeHashMap<TKey, TVal> value,
+            ref NativeHashMap<TKey, TVal> previousValue
+        )
         {
             CollectionSerializationUtility.WriteNativeHashMapDelta(writer, ref value, ref previousValue);
         }
@@ -687,7 +747,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeHashMapDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeHashMap<TKey, TVal>>.ReadWithAllocator(FastBufferReader reader, out NativeHashMap<TKey, TVal> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeHashMap<TKey, TVal>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeHashMap<TKey, TVal> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -712,7 +776,8 @@ namespace Unity.Netcode
     /// Serializer for FixedStrings
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class FixedStringSerializer<T> : INetworkVariableSerializer<T> where T : unmanaged, INativeList<byte>, IUTF8Bytes
+    internal class FixedStringSerializer<T> : INetworkVariableSerializer<T>
+        where T : unmanaged, INativeList<byte>, IUTF8Bytes
     {
         public void Write(FastBufferWriter writer, ref T value)
         {
@@ -750,7 +815,10 @@ namespace Unity.Netcode
                 changes.Set(i);
             }
 
-            if (changes.GetSerializedSize() + FastBufferWriter.GetWriteSize<byte>() * numChanges > FastBufferWriter.GetWriteSize<byte>() * value.Length)
+            if (
+                changes.GetSerializedSize() + FastBufferWriter.GetWriteSize<byte>() * numChanges
+                > FastBufferWriter.GetWriteSize<byte>() * value.Length
+            )
             {
                 // If there are too many changes, send the entire array.
                 writer.WriteByteSafe(1); // Flag that we're sending the entire array
@@ -819,7 +887,8 @@ namespace Unity.Netcode
     ///     Serializer for FixedStrings
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class FixedStringArraySerializer<T> : INetworkVariableSerializer<NativeArray<T>> where T : unmanaged, INativeList<byte>, IUTF8Bytes
+    internal class FixedStringArraySerializer<T> : INetworkVariableSerializer<NativeArray<T>>
+        where T : unmanaged, INativeList<byte>, IUTF8Bytes
     {
         public void Write(FastBufferWriter writer, ref NativeArray<T> value)
         {
@@ -832,7 +901,6 @@ namespace Unity.Netcode
             reader.ReadValueSafe(out value, Allocator.Persistent);
         }
 
-
         public void WriteDelta(FastBufferWriter writer, ref NativeArray<T> value, ref NativeArray<T> previousValue)
         {
             CollectionSerializationUtility.WriteNativeArrayDelta(writer, ref value, ref previousValue);
@@ -843,7 +911,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeArrayDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeArray<T>>.ReadWithAllocator(FastBufferReader reader, out NativeArray<T> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeArray<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeArray<T> value,
+            Allocator allocator
+        )
         {
             reader.ReadValueSafe(out value, allocator);
         }
@@ -857,7 +929,11 @@ namespace Unity.Netcode
                     duplicatedValue.Dispose();
                 }
 
-                duplicatedValue = new NativeArray<T>(value.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                duplicatedValue = new NativeArray<T>(
+                    value.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             duplicatedValue.CopyFrom(value);
@@ -869,7 +945,8 @@ namespace Unity.Netcode
     ///     Serializer for FixedStrings
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class FixedStringListSerializer<T> : INetworkVariableSerializer<NativeList<T>> where T : unmanaged, INativeList<byte>, IUTF8Bytes
+    internal class FixedStringListSerializer<T> : INetworkVariableSerializer<NativeList<T>>
+        where T : unmanaged, INativeList<byte>, IUTF8Bytes
     {
         public void Write(FastBufferWriter writer, ref NativeList<T> value)
         {
@@ -891,7 +968,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeListDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeList<T>>.ReadWithAllocator(FastBufferReader reader, out NativeList<T> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeList<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeList<T> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -916,7 +997,8 @@ namespace Unity.Netcode
     ///     Serializer for unmanaged INetworkSerializable types
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class UnmanagedNetworkSerializableSerializer<T> : INetworkVariableSerializer<T> where T : unmanaged, INetworkSerializable
+    internal class UnmanagedNetworkSerializableSerializer<T> : INetworkVariableSerializer<T>
+        where T : unmanaged, INetworkSerializable
     {
         public void Write(FastBufferWriter writer, ref T value)
         {
@@ -932,7 +1014,10 @@ namespace Unity.Netcode
 
         public void WriteDelta(FastBufferWriter writer, ref T value, ref T previousValue)
         {
-            if (UserNetworkVariableSerialization<T>.WriteDelta != null && UserNetworkVariableSerialization<T>.ReadDelta != null)
+            if (
+                UserNetworkVariableSerialization<T>.WriteDelta != null
+                && UserNetworkVariableSerialization<T>.ReadDelta != null
+            )
             {
                 UserNetworkVariableSerialization<T>.WriteDelta(writer, value, previousValue);
                 return;
@@ -943,7 +1028,10 @@ namespace Unity.Netcode
 
         public void ReadDelta(FastBufferReader reader, ref T value)
         {
-            if (UserNetworkVariableSerialization<T>.WriteDelta != null && UserNetworkVariableSerialization<T>.ReadDelta != null)
+            if (
+                UserNetworkVariableSerialization<T>.WriteDelta != null
+                && UserNetworkVariableSerialization<T>.ReadDelta != null
+            )
             {
                 UserNetworkVariableSerialization<T>.ReadDelta(reader, ref value);
                 return;
@@ -963,12 +1051,12 @@ namespace Unity.Netcode
         }
     }
 
-
     /// <summary>
     ///     Serializer for unmanaged INetworkSerializable types
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class UnmanagedNetworkSerializableArraySerializer<T> : INetworkVariableSerializer<NativeArray<T>> where T : unmanaged, INetworkSerializable
+    internal class UnmanagedNetworkSerializableArraySerializer<T> : INetworkVariableSerializer<NativeArray<T>>
+        where T : unmanaged, INetworkSerializable
     {
         public void Write(FastBufferWriter writer, ref NativeArray<T> value)
         {
@@ -981,7 +1069,6 @@ namespace Unity.Netcode
             reader.ReadNetworkSerializable(out value, Allocator.Persistent);
         }
 
-
         public void WriteDelta(FastBufferWriter writer, ref NativeArray<T> value, ref NativeArray<T> previousValue)
         {
             CollectionSerializationUtility.WriteNativeArrayDelta(writer, ref value, ref previousValue);
@@ -992,7 +1079,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeArrayDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeArray<T>>.ReadWithAllocator(FastBufferReader reader, out NativeArray<T> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeArray<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeArray<T> value,
+            Allocator allocator
+        )
         {
             reader.ReadNetworkSerializable(out value, allocator);
         }
@@ -1006,7 +1097,11 @@ namespace Unity.Netcode
                     duplicatedValue.Dispose();
                 }
 
-                duplicatedValue = new NativeArray<T>(value.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                duplicatedValue = new NativeArray<T>(
+                    value.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             duplicatedValue.CopyFrom(value);
@@ -1018,7 +1113,8 @@ namespace Unity.Netcode
     ///     Serializer for unmanaged INetworkSerializable types
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class UnmanagedNetworkSerializableListSerializer<T> : INetworkVariableSerializer<NativeList<T>> where T : unmanaged, INetworkSerializable
+    internal class UnmanagedNetworkSerializableListSerializer<T> : INetworkVariableSerializer<NativeList<T>>
+        where T : unmanaged, INetworkSerializable
     {
         public void Write(FastBufferWriter writer, ref NativeList<T> value)
         {
@@ -1040,7 +1136,11 @@ namespace Unity.Netcode
             CollectionSerializationUtility.ReadNativeListDelta(reader, ref value);
         }
 
-        void INetworkVariableSerializer<NativeList<T>>.ReadWithAllocator(FastBufferReader reader, out NativeList<T> value, Allocator allocator)
+        void INetworkVariableSerializer<NativeList<T>>.ReadWithAllocator(
+            FastBufferReader reader,
+            out NativeList<T> value,
+            Allocator allocator
+        )
         {
             throw new NotImplementedException();
         }
@@ -1065,7 +1165,8 @@ namespace Unity.Netcode
     ///     Serializer for managed INetworkSerializable types, which differs from the unmanaged implementation in that it
     ///     has to be null-aware
     ///     <typeparam name="T"></typeparam>
-    internal class ManagedNetworkSerializableSerializer<T> : INetworkVariableSerializer<T> where T : class, INetworkSerializable, new()
+    internal class ManagedNetworkSerializableSerializer<T> : INetworkVariableSerializer<T>
+        where T : class, INetworkSerializable, new()
     {
         public void Write(FastBufferWriter writer, ref T value)
         {
@@ -1100,7 +1201,10 @@ namespace Unity.Netcode
 
         public void WriteDelta(FastBufferWriter writer, ref T value, ref T previousValue)
         {
-            if (UserNetworkVariableSerialization<T>.WriteDelta != null && UserNetworkVariableSerialization<T>.ReadDelta != null)
+            if (
+                UserNetworkVariableSerialization<T>.WriteDelta != null
+                && UserNetworkVariableSerialization<T>.ReadDelta != null
+            )
             {
                 UserNetworkVariableSerialization<T>.WriteDelta(writer, value, previousValue);
                 return;
@@ -1111,7 +1215,10 @@ namespace Unity.Netcode
 
         public void ReadDelta(FastBufferReader reader, ref T value)
         {
-            if (UserNetworkVariableSerialization<T>.WriteDelta != null && UserNetworkVariableSerialization<T>.ReadDelta != null)
+            if (
+                UserNetworkVariableSerialization<T>.WriteDelta != null
+                && UserNetworkVariableSerialization<T>.ReadDelta != null
+            )
             {
                 UserNetworkVariableSerialization<T>.ReadDelta(reader, ref value);
                 return;
@@ -1124,7 +1231,6 @@ namespace Unity.Netcode
         {
             throw new NotImplementedException();
         }
-
 
         public void Duplicate(in T value, ref T duplicatedValue)
         {

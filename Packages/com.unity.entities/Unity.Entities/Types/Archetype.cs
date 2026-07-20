@@ -63,9 +63,9 @@ namespace Unity.Entities
         public int* TypeIndexInArchetypeToMemoryOrderIndex; // The Nth element is the MemoryOrderIndex of the type with IndexInArchetype=N
 
         // These arrays each have TypeCount elements, ordered by IndexInArchetype (the same order as the Types array)
-        public int*    Offsets; // Byte offset of each component type's data within this archetype's chunk buffer.
+        public int* Offsets; // Byte offset of each component type's data within this archetype's chunk buffer.
         public ushort* SizeOfs; // Size in bytes of each component type
-        public int*    BufferCapacities; // For IBufferElementData components, the buffer capacity of each component. Not meaningful for non-buffer components.
+        public int* BufferCapacities; // For IBufferElementData components, the buffer capacity of each component. Not meaningful for non-buffer components.
 
         // Order of components in the types array is always:
         // Entity, native component data, buffer components, managed component data, tag component, shared components, chunk components
@@ -137,7 +137,12 @@ namespace Unity.Entities
             return info;
         }
 
-        public void AddToChunkList(ChunkIndex chunk, SharedComponentValues sharedComponentIndices, uint changeVersion, ref EntityComponentStore.ChunkListChanges changes)
+        public void AddToChunkList(
+            ChunkIndex chunk,
+            SharedComponentValues sharedComponentIndices,
+            uint changeVersion,
+            ref EntityComponentStore.ChunkListChanges changes
+        )
         {
             chunk.ListIndex = Chunks.Count;
             if (Chunks.Count == Chunks.Capacity)
@@ -147,7 +152,9 @@ namespace Unity.Entities
                 // The shared component indices we are inserting belong to the same archetype so they need to be adjusted after reallocation
                 if (Chunks.InsideAllocation((ulong)sharedComponentIndices.firstIndex))
                 {
-                    int chunkIndex = (int)(sharedComponentIndices.firstIndex - Chunks.GetSharedComponentValueArrayForType(0));
+                    int chunkIndex = (int)(
+                        sharedComponentIndices.firstIndex - Chunks.GetSharedComponentValueArrayForType(0)
+                    );
                     Chunks.Grow(newCapacity);
                     sharedComponentIndices = Chunks.GetSharedComponentValues(chunkIndex);
                 }
@@ -159,7 +166,7 @@ namespace Unity.Entities
 
             Chunks.Add(chunk, sharedComponentIndices, changeVersion);
 
-            fixed(Archetype* archetype = &this)
+            fixed (Archetype* archetype = &this)
             {
                 changes.TrackArchetype(archetype);
             }
@@ -172,7 +179,7 @@ namespace Unity.Entities
             var chunkThatMoved = Chunks[chunkListIndex];
             chunkThatMoved.ListIndex = chunkListIndex;
 
-            fixed(Archetype* archetype = &this)
+            fixed (Archetype* archetype = &this)
             {
                 changes.TrackArchetype(archetype);
             }

@@ -48,16 +48,21 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
             int openingBracket = id.IndexOf('[');
             int closingBracket = id.IndexOf(']');
-            if (openingBracket >= 0 && openingBracket < id.Length && closingBracket > openingBracket &&
-                openingBracket < id.Length)
+            if (
+                openingBracket >= 0
+                && openingBracket < id.Length
+                && closingBracket > openingBracket
+                && openingBracket < id.Length
+            )
             {
                 //Some assemblies are absolute and explicitly part of the test ID e.g.
                 //"[/path/to/assembly-name.dll][rest of ID ...]"
                 //While some are minimal assembly names e.g.
                 //"[assembly-name][rest of ID ...]"
                 //Strip them down to just the assembly name
-                string assemblyNameFromID =
-                    AssemblyNameFromPath(id.Substring(openingBracket + 1, closingBracket - openingBracket - 1));
+                string assemblyNameFromID = AssemblyNameFromPath(
+                    id.Substring(openingBracket + 1, closingBracket - openingBracket - 1)
+                );
                 foreach (string assemblyName in assemblyNames)
                 {
                     if (assemblyName.Equals(assemblyNameFromID, StringComparison.OrdinalIgnoreCase))
@@ -129,8 +134,11 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                 var result = kvp.Value;
                 if (!result.IsSuite && CategoryMatches(result.Categories))
                 {
-                    if (IDMatchesAssembly(result.Id) && NameMatches(result.FullName) &&
-                        NameMatchesExactly(result.FullName, nameLookup))
+                    if (
+                        IDMatchesAssembly(result.Id)
+                        && NameMatches(result.FullName)
+                        && NameMatchesExactly(result.FullName, nameLookup)
+                    )
                     {
                         result.Clear();
                         ClearAncestors(newResultList, result.ParentId);

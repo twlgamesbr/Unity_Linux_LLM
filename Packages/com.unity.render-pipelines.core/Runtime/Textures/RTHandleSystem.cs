@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
 using UnityEngine.Experimental.Rendering;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -25,18 +24,22 @@ namespace UnityEngine.Rendering
         /// Size set as reference at the previous frame
         /// </summary>
         public Vector2Int previousViewportSize;
+
         /// <summary>
         /// Size of the render targets at the previous frame
         /// </summary>
         public Vector2Int previousRenderTargetSize;
+
         /// <summary>
         /// Size set as reference at the current frame
         /// </summary>
         public Vector2Int currentViewportSize;
+
         /// <summary>
         /// Size of the render targets at the current frame
         /// </summary>
         public Vector2Int currentRenderTargetSize;
+
         /// <summary>
         /// Scale factor from RTHandleSystem max size to requested reference size (referenceSize/maxSize)
         /// (x,y) current frame (z,w) last frame (this is only used for buffered RTHandle Systems)
@@ -156,7 +159,7 @@ namespace UnityEngine.Rendering
         internal enum ResizeMode
         {
             Auto,
-            OnDemand
+            OnDemand,
         }
 
         // Parameters for auto-scaled Render Textures
@@ -169,7 +172,10 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Current properties of the RTHandle System.
         /// </summary>
-        public RTHandleProperties rtHandleProperties { get { return m_RTHandleProperties; } }
+        public RTHandleProperties rtHandleProperties
+        {
+            get { return m_RTHandleProperties; }
+        }
 
         int m_MaxWidths = 0;
         int m_MaxHeights = 0;
@@ -211,7 +217,12 @@ namespace UnityEngine.Rendering
                 {
                     leakingResources = string.Format("{0}\n    {1}", leakingResources, rt.name);
                 }
-                Debug.LogError(string.Format("RTHandleSystem.Initialize should only be called once before allocating any Render Texture. This may be caused by an unreleased RTHandle resource.\n{0}\n", leakingResources));
+                Debug.LogError(
+                    string.Format(
+                        "RTHandleSystem.Initialize should only be called once before allocating any Render Texture. This may be caused by an unreleased RTHandle resource.\n{0}\n",
+                        leakingResources
+                    )
+                );
             }
 
             m_MaxWidths = width;
@@ -226,7 +237,9 @@ namespace UnityEngine.Rendering
         /// <param name="width">Initial reference rendering width.</param>
         /// <param name="height">Initial reference rendering height.</param>
         /// <param name="useLegacyDynamicResControl">Use legacy hardware DynamicResolution control in RTHandle system.</param>
-        [Obsolete("useLegacyDynamicResControl is deprecated. Please use SetHardwareDynamicResolutionState() instead. #from(2023.3)")]
+        [Obsolete(
+            "useLegacyDynamicResControl is deprecated. Please use SetHardwareDynamicResolutionState() instead. #from(2023.3)"
+        )]
         public void Initialize(int width, int height, bool useLegacyDynamicResControl = false)
         {
             Initialize(width, height);
@@ -294,8 +307,10 @@ namespace UnityEngine.Rendering
             // If the reference size is significantly higher than the current actualWidth/Height and it is larger than 1440p dimensions, we reset the reference size every several frames
             // in editor to avoid issues if a large resolution was temporarily set.
             const int resetInterval = 100;
-            if (((m_MaxWidths / (float)width) > 2.0f && m_MaxWidths > 2560) ||
-                ((m_MaxHeights / (float)height) > 2.0f && m_MaxHeights > 1440))
+            if (
+                ((m_MaxWidths / (float)width) > 2.0f && m_MaxWidths > 2560)
+                || ((m_MaxHeights / (float)height) > 2.0f && m_MaxHeights > 1440)
+            )
             {
                 if (m_FramesSinceLastReset > resetInterval)
                 {
@@ -334,7 +349,12 @@ namespace UnityEngine.Rendering
             if (DynamicResolutionHandler.instance.HardwareDynamicResIsEnabled() && m_HardwareDynamicResRequested)
             {
                 // Making the final scale in 'drs' space, since the final scale must account for rounding pixel values.
-                m_RTHandleProperties.rtHandleScale = new Vector4(scales.x, scales.y, m_RTHandleProperties.rtHandleScale.x, m_RTHandleProperties.rtHandleScale.y);
+                m_RTHandleProperties.rtHandleScale = new Vector4(
+                    scales.x,
+                    scales.y,
+                    m_RTHandleProperties.rtHandleScale.x,
+                    m_RTHandleProperties.rtHandleScale.y
+                );
             }
             else
             {
@@ -347,13 +367,20 @@ namespace UnityEngine.Rendering
         {
             Vector2 maxSize = new Vector2(GetMaxWidth(), GetMaxHeight());
 
-            if (DynamicResolutionHandler.instance.HardwareDynamicResIsEnabled() && m_HardwareDynamicResRequested && viewportSize != DynamicResolutionHandler.instance.finalViewport)
+            if (
+                DynamicResolutionHandler.instance.HardwareDynamicResIsEnabled()
+                && m_HardwareDynamicResRequested
+                && viewportSize != DynamicResolutionHandler.instance.finalViewport
+            )
             {
                 //for hardware resolution, the final goal is to figure out a scale from finalViewport into maxViewport.
                 //This is however wrong! because the actualViewport might not fit the finalViewport perfectly, due to rounding.
                 //A correct way is to instead downscale the maxViewport, and keep the final scale in terms of downsampled buffers.
                 Vector2 currentScale = (Vector2)viewportSize / (Vector2)DynamicResolutionHandler.instance.finalViewport;
-                maxSize = DynamicResolutionHandler.instance.ApplyScalesOnSize(new Vector2Int(GetMaxWidth(), GetMaxHeight()), currentScale);
+                maxSize = DynamicResolutionHandler.instance.ApplyScalesOnSize(
+                    new Vector2Int(GetMaxWidth(), GetMaxHeight()),
+                    currentScale
+                );
             }
 
             return new Vector2((float)viewportSize.x / maxSize.x, (float)viewportSize.y / maxSize.y);
@@ -416,7 +443,10 @@ namespace UnityEngine.Rendering
 
         void DemandResize(RTHandle rth)
         {
-            Assert.IsTrue(m_ResizeOnDemandRTs.Contains(rth), "The RTHandle is not an resize on demand handle in this RTHandleSystem. Please call SwitchToResizeOnDemand(rth, true) before resizing on demand.");
+            Assert.IsTrue(
+                m_ResizeOnDemandRTs.Contains(rth),
+                "The RTHandle is not an resize on demand handle in this RTHandleSystem. Please call SwitchToResizeOnDemand(rth, true) before resizing on demand."
+            );
 
             // Grab the render texture
             var rt = rth.m_RT;
@@ -441,7 +471,7 @@ namespace UnityEngine.Rendering
                     rt.width,
                     rt.height,
                     rt.volumeDepth,
-                    (rt.depthStencilFormat!=GraphicsFormat.None)? rt.depthStencilFormat : rt.graphicsFormat,
+                    (rt.depthStencilFormat != GraphicsFormat.None) ? rt.depthStencilFormat : rt.graphicsFormat,
                     rt.dimension,
                     rth.m_Name,
                     mips: rt.useMipMap,
@@ -460,12 +490,19 @@ namespace UnityEngine.Rendering
         /// Returns the maximum allocated width of the RTHandle System.
         /// </summary>
         /// <returns>Maximum allocated width of the RTHandle System.</returns>
-        public int GetMaxWidth() { return m_MaxWidths; }
+        public int GetMaxWidth()
+        {
+            return m_MaxWidths;
+        }
+
         /// <summary>
         /// Returns the maximum allocated height of the RTHandle System.
         /// </summary>
         /// <returns>Maximum allocated height of the RTHandle System.</returns>
-        public int GetMaxHeight() { return m_MaxHeights; }
+        public int GetMaxHeight()
+        {
+            return m_MaxHeights;
+        }
 
         void Dispose(bool disposing)
         {
@@ -523,10 +560,21 @@ namespace UnityEngine.Rendering
                 renderTexture.height = Mathf.Max(scaledSize.y, 1);
 
                 // Regenerate the name
-                renderTexture.name = CoreUtils.GetRenderTargetAutoName(renderTexture.width, renderTexture.height, renderTexture.volumeDepth
-                    , (renderTexture.depthStencilFormat != GraphicsFormat.None) ? renderTexture.depthStencilFormat : renderTexture.graphicsFormat
-                    , renderTexture.dimension, rth.m_Name, mips: renderTexture.useMipMap, enableMSAA: rth.m_EnableMSAA
-                    , msaaSamples: (MSAASamples)renderTexture.antiAliasing, dynamicRes: renderTexture.useDynamicScale, dynamicResExplicit: renderTexture.useDynamicScaleExplicit);
+                renderTexture.name = CoreUtils.GetRenderTargetAutoName(
+                    renderTexture.width,
+                    renderTexture.height,
+                    renderTexture.volumeDepth,
+                    (renderTexture.depthStencilFormat != GraphicsFormat.None)
+                        ? renderTexture.depthStencilFormat
+                        : renderTexture.graphicsFormat,
+                    renderTexture.dimension,
+                    rth.m_Name,
+                    mips: renderTexture.useMipMap,
+                    enableMSAA: rth.m_EnableMSAA,
+                    msaaSamples: (MSAASamples)renderTexture.antiAliasing,
+                    dynamicRes: renderTexture.useDynamicScale,
+                    dynamicResExplicit: renderTexture.useDynamicScaleExplicit
+                );
 
                 // Create the render texture
                 renderTexture.Create();
@@ -582,10 +630,35 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            var format = (depthBufferBits != DepthBits.None) ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits) : colorFormat;
+            var format =
+                (depthBufferBits != DepthBits.None)
+                    ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits)
+                    : colorFormat;
 
-            return Alloc(width, height, format, wrapMode, wrapMode, wrapMode, slices, filterMode, dimension, enableRandomWrite, useMipMap,
-                autoGenerateMips, isShadowMap, anisoLevel, mipMapBias, msaaSamples, bindTextureMS, useDynamicScale, useDynamicScaleExplicit, memoryless, vrUsage, name);
+            return Alloc(
+                width,
+                height,
+                format,
+                wrapMode,
+                wrapMode,
+                wrapMode,
+                slices,
+                filterMode,
+                dimension,
+                enableRandomWrite,
+                useMipMap,
+                autoGenerateMips,
+                isShadowMap,
+                anisoLevel,
+                mipMapBias,
+                msaaSamples,
+                bindTextureMS,
+                useDynamicScale,
+                useDynamicScaleExplicit,
+                memoryless,
+                vrUsage,
+                name
+            );
         }
 
         /// <summary>
@@ -635,8 +708,30 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            return Alloc(width, height, format, wrapMode, wrapMode, wrapMode, slices, filterMode, dimension, enableRandomWrite, useMipMap,
-                autoGenerateMips, isShadowMap, anisoLevel, mipMapBias, msaaSamples, bindTextureMS, useDynamicScale, useDynamicScaleExplicit, memoryless, vrUsage, name);
+            return Alloc(
+                width,
+                height,
+                format,
+                wrapMode,
+                wrapMode,
+                wrapMode,
+                slices,
+                filterMode,
+                dimension,
+                enableRandomWrite,
+                useMipMap,
+                autoGenerateMips,
+                isShadowMap,
+                anisoLevel,
+                mipMapBias,
+                msaaSamples,
+                bindTextureMS,
+                useDynamicScale,
+                useDynamicScaleExplicit,
+                memoryless,
+                vrUsage,
+                name
+            );
         }
 
         /// <summary>
@@ -692,32 +787,35 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            var format = (depthBufferBits != DepthBits.None) ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits) : colorFormat;
+            var format =
+                (depthBufferBits != DepthBits.None)
+                    ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits)
+                    : colorFormat;
 
             return Alloc(
-                 width,
-                 height,
-                 format,
-                 wrapModeU,
-                 wrapModeV,
-                 wrapModeW,
-                 slices,
-                 filterMode,
-                 dimension,
-                 enableRandomWrite,
-                 useMipMap,
-                 autoGenerateMips ,
-                 isShadowMap,
-                 anisoLevel,
-                 mipMapBias,
-                 msaaSamples,
-                 bindTextureMS,
-                 useDynamicScale,
-                 useDynamicScaleExplicit,
-                 memoryless,
-                 vrUsage,
-                 name
-             );
+                width,
+                height,
+                format,
+                wrapModeU,
+                wrapModeV,
+                wrapModeW,
+                slices,
+                filterMode,
+                dimension,
+                enableRandomWrite,
+                useMipMap,
+                autoGenerateMips,
+                isShadowMap,
+                anisoLevel,
+                mipMapBias,
+                msaaSamples,
+                bindTextureMS,
+                useDynamicScale,
+                useDynamicScaleExplicit,
+                memoryless,
+                vrUsage,
+                name
+            );
         }
 
         /// <summary>
@@ -772,9 +870,30 @@ namespace UnityEngine.Rendering
         )
         {
             var rt = CreateRenderTexture(
-                width, height, format, slices, filterMode, wrapModeU, wrapModeV, wrapModeW, dimension, enableRandomWrite, useMipMap
-                , autoGenerateMips, isShadowMap, anisoLevel, mipMapBias, msaaSamples, bindTextureMS
-                , useDynamicScale, useDynamicScaleExplicit, memoryless, vrUsage, false, name);
+                width,
+                height,
+                format,
+                slices,
+                filterMode,
+                wrapModeU,
+                wrapModeV,
+                wrapModeW,
+                dimension,
+                enableRandomWrite,
+                useMipMap,
+                autoGenerateMips,
+                isShadowMap,
+                anisoLevel,
+                mipMapBias,
+                msaaSamples,
+                bindTextureMS,
+                useDynamicScale,
+                useDynamicScaleExplicit,
+                memoryless,
+                vrUsage,
+                false,
+                name
+            );
 
             var newRT = new RTHandle(this);
             newRT.SetRenderTexture(rt);
@@ -812,20 +931,25 @@ namespace UnityEngine.Rendering
             RenderTextureMemoryless memoryless,
             VRTextureUsage vrUsage,
             bool enableShadingRate,
-            string name)
+            string name
+        )
         {
             bool enableMSAA = msaaSamples != MSAASamples.None;
             // Here user made a mistake in setting up msaa/bindMS, hence the warning
             if (!enableMSAA && bindTextureMS == true)
             {
-                Debug.LogWarning("RTHandle allocated without MSAA but with bindMS set to true, forcing bindMS to false.");
+                Debug.LogWarning(
+                    "RTHandle allocated without MSAA but with bindMS set to true, forcing bindMS to false."
+                );
                 bindTextureMS = false;
             }
 
             // MSAA Does not support random read/write.
             if (enableMSAA && (enableRandomWrite == true))
             {
-                Debug.LogWarning("RTHandle that is MSAA-enabled cannot allocate MSAA RT with 'enableRandomWrite = true'.");
+                Debug.LogWarning(
+                    "RTHandle that is MSAA-enabled cannot allocate MSAA RT with 'enableRandomWrite = true'."
+                );
                 enableRandomWrite = false;
             }
 
@@ -833,12 +957,16 @@ namespace UnityEngine.Rendering
 
             if (enableShadingRate && (isShadowMap || isDepthStencilFormat))
             {
-                Debug.LogWarning("RTHandle allocated with incompatible enableShadingRate, forcing enableShadingRate to false.");
+                Debug.LogWarning(
+                    "RTHandle allocated with incompatible enableShadingRate, forcing enableShadingRate to false."
+                );
                 enableShadingRate = false;
             }
 
             string fullName;
-            GraphicsFormat colorFormat, depthStencilFormat, stencilFormat;
+            GraphicsFormat colorFormat,
+                depthStencilFormat,
+                stencilFormat;
             ShadowSamplingMode shadowSamplingMode = ShadowSamplingMode.None;
 
             if (isShadowMap)
@@ -854,7 +982,16 @@ namespace UnityEngine.Rendering
                 stencilFormat = GraphicsFormat.None;
                 shadowSamplingMode = ShadowSamplingMode.CompareDepths;
 
-                fullName = CoreUtils.GetRenderTargetAutoName(width, height, slices, RenderTextureFormat.Shadowmap, name, mips: useMipMap, enableMSAA: enableMSAA, msaaSamples: msaaSamples);
+                fullName = CoreUtils.GetRenderTargetAutoName(
+                    width,
+                    height,
+                    slices,
+                    RenderTextureFormat.Shadowmap,
+                    name,
+                    mips: useMipMap,
+                    enableMSAA: enableMSAA,
+                    msaaSamples: msaaSamples
+                );
             }
             else if (isDepthStencilFormat)
             {
@@ -862,9 +999,22 @@ namespace UnityEngine.Rendering
                 colorFormat = GraphicsFormat.None;
                 depthStencilFormat = format;
                 // If the depth stencil buffer is memoryless, you cannot read the stencil buffer as a texture (through sampling)
-                stencilFormat = (memoryless != RenderTextureMemoryless.None) ? GraphicsFormat.None : GetStencilFormat(format);
+                stencilFormat =
+                    (memoryless != RenderTextureMemoryless.None) ? GraphicsFormat.None : GetStencilFormat(format);
 
-                fullName = CoreUtils.GetRenderTargetAutoName(width, height, slices, format, dimension, name, mips: useMipMap, enableMSAA: enableMSAA, msaaSamples: msaaSamples, dynamicRes: useDynamicScale, dynamicResExplicit: useDynamicScaleExplicit);
+                fullName = CoreUtils.GetRenderTargetAutoName(
+                    width,
+                    height,
+                    slices,
+                    format,
+                    dimension,
+                    name,
+                    mips: useMipMap,
+                    enableMSAA: enableMSAA,
+                    msaaSamples: msaaSamples,
+                    dynamicRes: useDynamicScale,
+                    dynamicResExplicit: useDynamicScaleExplicit
+                );
             }
             else
             {
@@ -873,7 +1023,19 @@ namespace UnityEngine.Rendering
                 depthStencilFormat = GraphicsFormat.None;
                 stencilFormat = GraphicsFormat.None;
 
-                fullName = CoreUtils.GetRenderTargetAutoName(width, height, slices, format, dimension, name, mips: useMipMap, enableMSAA: enableMSAA, msaaSamples: msaaSamples, dynamicRes: useDynamicScale, dynamicResExplicit: useDynamicScaleExplicit);
+                fullName = CoreUtils.GetRenderTargetAutoName(
+                    width,
+                    height,
+                    slices,
+                    format,
+                    dimension,
+                    name,
+                    mips: useMipMap,
+                    enableMSAA: enableMSAA,
+                    msaaSamples: msaaSamples,
+                    dynamicRes: useDynamicScale,
+                    dynamicResExplicit: useDynamicScaleExplicit
+                );
             }
 
             var desc = new RenderTextureDescriptor(width, height, colorFormat, depthStencilFormat)
@@ -925,9 +1087,30 @@ namespace UnityEngine.Rendering
         public RTHandle Alloc(int width, int height, RTHandleAllocInfo info)
         {
             var rt = CreateRenderTexture(
-                 width, height, info.format, info.slices, info.filterMode, info.wrapModeU, info.wrapModeV, info.wrapModeW, info.dimension, info.enableRandomWrite, info.useMipMap
-                 , info.autoGenerateMips, info.isShadowMap, info.anisoLevel, info.mipMapBias, info.msaaSamples, info.bindTextureMS
-                 , info.useDynamicScale, info.useDynamicScaleExplicit, info.memoryless, info.vrUsage, info.enableShadingRate, info.name);
+                width,
+                height,
+                info.format,
+                info.slices,
+                info.filterMode,
+                info.wrapModeU,
+                info.wrapModeV,
+                info.wrapModeW,
+                info.dimension,
+                info.enableRandomWrite,
+                info.useMipMap,
+                info.autoGenerateMips,
+                info.isShadowMap,
+                info.anisoLevel,
+                info.mipMapBias,
+                info.msaaSamples,
+                info.bindTextureMS,
+                info.useDynamicScale,
+                info.useDynamicScaleExplicit,
+                info.memoryless,
+                info.vrUsage,
+                info.enableShadingRate,
+                info.name
+            );
 
             var newRT = new RTHandle(this);
             newRT.SetRenderTexture(rt);
@@ -1021,7 +1204,8 @@ namespace UnityEngine.Rendering
             var actualDimensions = CalculateDimensions(scaleFactor);
 
             bool enableShadingRate = false; // Not supported, use RTHandleAllocInfo API instead.
-            var rth = AllocAutoSizedRenderTexture(actualDimensions.x,
+            var rth = AllocAutoSizedRenderTexture(
+                actualDimensions.x,
                 actualDimensions.y,
                 slices,
                 format,
@@ -1097,9 +1281,13 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            var format = (depthBufferBits != DepthBits.None) ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits) : colorFormat;
+            var format =
+                (depthBufferBits != DepthBits.None)
+                    ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits)
+                    : colorFormat;
 
-            return Alloc(scaleFactor,
+            return Alloc(
+                scaleFactor,
                 format,
                 slices,
                 filterMode,
@@ -1174,10 +1362,7 @@ namespace UnityEngine.Rendering
         public Vector2Int CalculateDimensions(ScaleFunc scaleFunc)
         {
             var scaleFactor = scaleFunc(new Vector2Int(GetMaxWidth(), GetMaxHeight()));
-            return new Vector2Int(
-                Mathf.Max(scaleFactor.x, 1),
-                Mathf.Max(scaleFactor.y, 1)
-            );
+            return new Vector2Int(Mathf.Max(scaleFactor.x, 1), Mathf.Max(scaleFactor.y, 1));
         }
 
         /// <summary>
@@ -1227,9 +1412,13 @@ namespace UnityEngine.Rendering
             string name = ""
         )
         {
-            var format = (depthBufferBits != DepthBits.None) ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits) : colorFormat;
+            var format =
+                (depthBufferBits != DepthBits.None)
+                    ? GraphicsFormatUtility.GetDepthStencilFormat((int)depthBufferBits)
+                    : colorFormat;
 
-            return Alloc(scaleFunc,
+            return Alloc(
+                scaleFunc,
                 format,
                 slices,
                 filterMode,
@@ -1299,7 +1488,8 @@ namespace UnityEngine.Rendering
             var actualDimensions = CalculateDimensions(scaleFunc);
 
             bool enableShadingRate = false; // Not supported, use RTHandleAllocInfo API instead.
-            var rth = AllocAutoSizedRenderTexture(actualDimensions.x,
+            var rth = AllocAutoSizedRenderTexture(
+                actualDimensions.x,
                 actualDimensions.y,
                 slices,
                 format,
@@ -1401,9 +1591,30 @@ namespace UnityEngine.Rendering
             }
 
             var rt = CreateRenderTexture(
-                width, height, format, slices, filterMode, wrapMode, wrapMode, wrapMode, dimension, enableRandomWrite, useMipMap
-                , autoGenerateMips, isShadowMap, anisoLevel, mipMapBias, msaaSamples, bindTextureMS
-                , useDynamicScale, useDynamicScaleExplicit, memoryless, vrUsage, enableShadingRate, name);
+                width,
+                height,
+                format,
+                slices,
+                filterMode,
+                wrapMode,
+                wrapMode,
+                wrapMode,
+                dimension,
+                enableRandomWrite,
+                useMipMap,
+                autoGenerateMips,
+                isShadowMap,
+                anisoLevel,
+                mipMapBias,
+                msaaSamples,
+                bindTextureMS,
+                useDynamicScale,
+                useDynamicScaleExplicit,
+                memoryless,
+                vrUsage,
+                enableShadingRate,
+                name
+            );
 
             var rth = new RTHandle(this);
             rth.SetRenderTexture(rt);
@@ -1429,9 +1640,30 @@ namespace UnityEngine.Rendering
             }
 
             var rt = CreateRenderTexture(
-                width, height, info.format, info.slices, info.filterMode, info.wrapModeU, info.wrapModeV, info.wrapModeW, info.dimension, info.enableRandomWrite, info.useMipMap
-                , info.autoGenerateMips, info.isShadowMap, info.anisoLevel, info.mipMapBias, info.msaaSamples, info.bindTextureMS
-                , info.useDynamicScale, info.useDynamicScaleExplicit, info.memoryless, info.vrUsage, info.enableShadingRate, info.name);
+                width,
+                height,
+                info.format,
+                info.slices,
+                info.filterMode,
+                info.wrapModeU,
+                info.wrapModeV,
+                info.wrapModeW,
+                info.dimension,
+                info.enableRandomWrite,
+                info.useMipMap,
+                info.autoGenerateMips,
+                info.isShadowMap,
+                info.anisoLevel,
+                info.mipMapBias,
+                info.msaaSamples,
+                info.bindTextureMS,
+                info.useDynamicScale,
+                info.useDynamicScaleExplicit,
+                info.memoryless,
+                info.vrUsage,
+                info.enableShadingRate,
+                info.name
+            );
 
             var rth = new RTHandle(this);
             rth.SetRenderTexture(rt);
@@ -1454,8 +1686,10 @@ namespace UnityEngine.Rendering
         {
             var rth = new RTHandle(this);
 #if UNITY_EDITOR
-            Debug.Assert(!(EditorUtility.IsPersistent(texture) == true && transferOwnership == true),
-                    "RTHandle should not have ownership of RenderTarget asset, set transfer ownership as false");
+            Debug.Assert(
+                !(EditorUtility.IsPersistent(texture) == true && transferOwnership == true),
+                "RTHandle should not have ownership of RenderTarget asset, set transfer ownership as false"
+            );
 #endif
             rth.SetRenderTexture(texture, transferOwnership);
             rth.m_EnableMSAA = false;
@@ -1525,7 +1759,14 @@ namespace UnityEngine.Rendering
             for (int i = 0, c = m_AutoSizedRTsArray.Length; i < c; ++i)
             {
                 var rt = m_AutoSizedRTsArray[i].rt;
-                result = string.Format("{0}\nRT ({1})\t Format: {2} W: {3} H {4}\n", result, i, rt.format, rt.width, rt.height);
+                result = string.Format(
+                    "{0}\nRT ({1})\t Format: {2} W: {3} H {4}\n",
+                    result,
+                    i,
+                    rt.format,
+                    rt.width,
+                    rt.height
+                );
             }
 
             return result;
@@ -1533,8 +1774,12 @@ namespace UnityEngine.Rendering
 
         private GraphicsFormat GetStencilFormat(GraphicsFormat depthStencilFormat)
         {
-            return (GraphicsFormatUtility.IsStencilFormat(depthStencilFormat) && SystemInfo.IsFormatSupported(GraphicsFormat.R8_UInt, GraphicsFormatUsage.StencilSampling)) ?
-                GraphicsFormat.R8_UInt : GraphicsFormat.None;
+            return (
+                GraphicsFormatUtility.IsStencilFormat(depthStencilFormat)
+                && SystemInfo.IsFormatSupported(GraphicsFormat.R8_UInt, GraphicsFormatUsage.StencilSampling)
+            )
+                ? GraphicsFormat.R8_UInt
+                : GraphicsFormat.None;
         }
     }
 }

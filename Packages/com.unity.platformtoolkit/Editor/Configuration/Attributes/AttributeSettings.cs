@@ -80,22 +80,28 @@ namespace Unity.PlatformToolkit.Editor
                 if (!usedAttributeIds.Add(attributeDefinition.AttributeId))
                     throw new ArgumentException("Duplicate attribute definition", nameof(attributeDefinition));
 
-                m_AttributeDefinitions.Add(new AttributeDefinition(attributeDefinition.AttributeId, attributeDefinition.AttributeType, attributeDefinition.AttributeName));
+                m_AttributeDefinitions.Add(
+                    new AttributeDefinition(
+                        attributeDefinition.AttributeId,
+                        attributeDefinition.AttributeType,
+                        attributeDefinition.AttributeName
+                    )
+                );
             }
 
             m_AttributeIds = m_AttributeDefinitions.Select(a => a.Id).ToList();
         }
 
-        protected abstract void InitializeAttributes(out IReadOnlyList<(string AttributeId, Type AttributeType, string AttributeName)> attributeDefinitions);
+        protected abstract void InitializeAttributes(
+            out IReadOnlyList<(string AttributeId, Type AttributeType, string AttributeName)> attributeDefinitions
+        );
 
         private List<AttributeDefinition> m_AttributeDefinitions = new List<AttributeDefinition>();
 
         [SerializeField]
         private List<Attribute> attributes = new List<Attribute>();
 
-        public void OnBeforeSerialize()
-        {
-        }
+        public void OnBeforeSerialize() { }
 
         public void OnAfterDeserialize()
         {

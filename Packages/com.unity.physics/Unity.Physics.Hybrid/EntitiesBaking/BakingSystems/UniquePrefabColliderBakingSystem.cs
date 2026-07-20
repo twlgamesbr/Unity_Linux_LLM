@@ -23,10 +23,13 @@ namespace Unity.Physics.Authoring
             using var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             // Obtain all entities with colliders in baked entity prefabs and check if these have a "force unique" collider
-            foreach (var(collider, entity) in SystemAPI.Query<RefRW<PhysicsCollider>>()
-                     .WithAll<Prefab>()
-                     .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
-                     .WithEntityAccess())
+            foreach (
+                var (collider, entity) in SystemAPI
+                    .Query<RefRW<PhysicsCollider>>()
+                    .WithAll<Prefab>()
+                    .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
+                    .WithEntityAccess()
+            )
             {
                 ref var physicsCollider = ref collider.ValueRW;
                 if (physicsCollider.IsUnique)

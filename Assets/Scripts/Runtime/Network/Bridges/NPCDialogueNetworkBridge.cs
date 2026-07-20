@@ -1,25 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Network.Bridges
 {
     /// <summary>
@@ -71,10 +70,10 @@ namespace NPCSystem.Network.Bridges
         bool _disconnectCallbackRegistered;
         bool _isRelayMode; // True when processing RPC-originated requests; false when delegating locally
         BaseRpcTarget _persistentClientTarget;
-        Dictionary<string, List<DialogueEntry>> _baselineHistorySnapshot =
-            new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
-        readonly Queue<PendingDialogueRequest> _pendingRequests =
-            new Queue<PendingDialogueRequest>();
+        Dictionary<string, List<DialogueEntry>> _baselineHistorySnapshot = new Dictionary<string, List<DialogueEntry>>(
+            StringComparer.OrdinalIgnoreCase
+        );
+        readonly Queue<PendingDialogueRequest> _pendingRequests = new Queue<PendingDialogueRequest>();
 
         [SerializeField]
         string lastRoutingStatus = "Idle";
@@ -156,19 +155,11 @@ namespace NPCSystem.Network.Bridges
 
             _localSelectedNpcSlug = selection.npcSlug;
 
-            if (
-                !Application.isPlaying
-                || NetworkManager == null
-                || !NetworkManager.IsListening
-                || IsServer
-            )
+            if (!Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer)
             {
                 if (_sessionManager != null && NetworkManager != null)
                 {
-                    _sessionManager.SetSelectedNpcSlug(
-                        NetworkManager.LocalClientId,
-                        selection.npcSlug
-                    );
+                    _sessionManager.SetSelectedNpcSlug(NetworkManager.LocalClientId, selection.npcSlug);
                 }
 
                 if (_dialogueManager != null)
@@ -188,8 +179,7 @@ namespace NPCSystem.Network.Bridges
             var request = new NPCDialogueRequestMessage
             {
                 requestId = Guid.NewGuid().ToString("N"),
-                npcSlug =
-                    CurrentProfile != null ? CurrentProfile.GetNpcSlug() : _localSelectedNpcSlug,
+                npcSlug = CurrentProfile != null ? CurrentProfile.GetNpcSlug() : _localSelectedNpcSlug,
                 playerMessage = playerMessage,
             };
             request.SanitizeInPlace();
@@ -200,12 +190,7 @@ namespace NPCSystem.Network.Bridges
                 return;
             }
 
-            if (
-                !Application.isPlaying
-                || NetworkManager == null
-                || !NetworkManager.IsListening
-                || IsServer
-            )
+            if (!Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer)
             {
                 _dialogueManager?.SendDialogueMessage(request.playerMessage);
                 return;
@@ -223,12 +208,7 @@ namespace NPCSystem.Network.Bridges
         {
             ResolveReferences();
 
-            if (
-                !Application.isPlaying
-                || NetworkManager == null
-                || !NetworkManager.IsListening
-                || IsServer
-            )
+            if (!Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer)
             {
                 _dialogueManager?.CancelRequests();
                 return;
@@ -243,9 +223,7 @@ namespace NPCSystem.Network.Bridges
         {
             if (_dialogueManager == null)
             {
-                _dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
-                    FindObjectsInactive.Include
-                );
+                _dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
             }
 
             if (_sessionManager == null)
@@ -253,9 +231,7 @@ namespace NPCSystem.Network.Bridges
                 _sessionManager = GetComponent<NPCNetworkSessionManager>();
                 if (_sessionManager == null)
                 {
-                    _sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(
-                        FindObjectsInactive.Include
-                    );
+                    _sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(FindObjectsInactive.Include);
                 }
             }
         }
@@ -320,10 +296,7 @@ namespace NPCSystem.Network.Bridges
         // ── Server RPCs ─────────────────────────────────────────────────
 
         [Rpc(SendTo.Server)]
-        void RequestNpcSelectionServerRpc(
-            NPCDialogueSelectionMessage selection,
-            RpcParams rpcParams = default
-        )
+        void RequestNpcSelectionServerRpc(NPCDialogueSelectionMessage selection, RpcParams rpcParams = default)
         {
             if (!IsServer)
                 return;
@@ -333,10 +306,7 @@ namespace NPCSystem.Network.Bridges
             );
         }
 
-        async Task HandleNpcSelectionServerAsync(
-            NPCDialogueSelectionMessage selection,
-            ulong senderClientId
-        )
+        async Task HandleNpcSelectionServerAsync(NPCDialogueSelectionMessage selection, ulong senderClientId)
         {
             ResolveReferences();
             selection.SanitizeInPlace();
@@ -385,10 +355,7 @@ namespace NPCSystem.Network.Bridges
         }
 
         [Rpc(SendTo.Server)]
-        void SubmitDialogueServerRpc(
-            NPCDialogueRequestMessage request,
-            RpcParams rpcParams = default
-        )
+        void SubmitDialogueServerRpc(NPCDialogueRequestMessage request, RpcParams rpcParams = default)
         {
             if (!IsServer)
                 return;
@@ -398,10 +365,7 @@ namespace NPCSystem.Network.Bridges
             );
         }
 
-        async Task HandleSubmitDialogueServerAsync(
-            NPCDialogueRequestMessage request,
-            ulong senderClientId
-        )
+        async Task HandleSubmitDialogueServerAsync(NPCDialogueRequestMessage request, ulong senderClientId)
         {
             ResolveReferences();
             request.SanitizeInPlace();
@@ -429,10 +393,7 @@ namespace NPCSystem.Network.Bridges
                 request.requestId,
                 NPCFlowStatus.Start,
                 $"Received dialogue request for NPC '{request.npcSlug}'.",
-                new Dictionary<string, object>
-                {
-                    ["messageLength"] = request.playerMessage?.Length ?? 0,
-                }
+                new Dictionary<string, object> { ["messageLength"] = request.playerMessage?.Length ?? 0 }
             );
 
             if (_activeClientId.HasValue || _dialogueManager.IsResponding)
@@ -449,10 +410,7 @@ namespace NPCSystem.Network.Bridges
         {
             if (!IsServer)
                 return;
-            if (
-                _activeClientId.HasValue
-                && _activeClientId.Value == rpcParams.Receive.SenderClientId
-            )
+            if (_activeClientId.HasValue && _activeClientId.Value == rpcParams.Receive.SenderClientId)
             {
                 _dialogueManager?.CancelRequests();
                 ClearActiveClient();
@@ -498,9 +456,7 @@ namespace NPCSystem.Network.Bridges
 
         void SendErrorToClient(ulong clientId, string error)
         {
-            string normalizedError = string.IsNullOrWhiteSpace(error)
-                ? "Unknown dialogue error."
-                : error.Trim();
+            string normalizedError = string.IsNullOrWhiteSpace(error) ? "Unknown dialogue error." : error.Trim();
             NPCFlowLogger
                 .FindOrCreate()
                 ?.Log(
@@ -510,11 +466,7 @@ namespace NPCSystem.Network.Bridges
                     $"Sending dialogue error to client {clientId}: {normalizedError}",
                     source: nameof(NPCDialogueNetworkBridge),
                     requestId: _activeRequestId,
-                    data: new Dictionary<string, object>
-                    {
-                        ["clientId"] = clientId,
-                        ["error"] = normalizedError,
-                    }
+                    data: new Dictionary<string, object> { ["clientId"] = clientId, ["error"] = normalizedError }
                 );
             ReceiveErrorClientRpc(normalizedError, GetClientTarget(clientId));
         }
@@ -522,38 +474,26 @@ namespace NPCSystem.Network.Bridges
         // ── Client RPC Receivers ────────────────────────────────────────
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveNpcChangedClientRpc(
-            NPCDialogueResponseMessage payload,
-            RpcParams rpcParams = default
-        )
+        void ReceiveNpcChangedClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
         {
             _localSelectedNpcSlug = payload.npcSlug;
             OnNpcChanged?.Invoke(payload.displayName);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveResponseStartClientRpc(
-            NPCDialogueResponseMessage payload,
-            RpcParams rpcParams = default
-        )
+        void ReceiveResponseStartClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
         {
             OnResponseStart?.Invoke(payload.content);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveResponseUpdatedClientRpc(
-            NPCDialogueResponseMessage payload,
-            RpcParams rpcParams = default
-        )
+        void ReceiveResponseUpdatedClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
         {
             OnResponseUpdated?.Invoke(payload.content);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveResponseCompleteClientRpc(
-            NPCDialogueResponseMessage payload,
-            RpcParams rpcParams = default
-        )
+        void ReceiveResponseCompleteClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
         {
             _localSelectedNpcSlug = payload.npcSlug;
             OnResponseComplete?.Invoke(payload.displayName, payload.content);
@@ -606,18 +546,14 @@ namespace NPCSystem.Network.Bridges
                 ?.Log(
                     NPCFlowStage.ClientSession,
                     status,
-                    status == NPCFlowStatus.Warning
-                        ? NPCFlowLogLevel.Warning
-                        : NPCFlowLogLevel.Info,
+                    status == NPCFlowStatus.Warning ? NPCFlowLogLevel.Warning : NPCFlowLogLevel.Info,
                     message,
                     source: nameof(NPCDialogueNetworkBridge),
                     data: new Dictionary<string, object>
                     {
                         ["clientId"] = clientId,
                         ["playerName"] =
-                            _sessionManager != null
-                                ? _sessionManager.GetPlayerDisplayName(clientId)
-                                : string.Empty,
+                            _sessionManager != null ? _sessionManager.GetPlayerDisplayName(clientId) : string.Empty,
                     }
                 );
         }
@@ -729,21 +665,14 @@ namespace NPCSystem.Network.Bridges
         /// </summary>
         void EnqueueDialogueRequest(ulong clientId, NPCDialogueRequestMessage request)
         {
-            _pendingRequests.Enqueue(new PendingDialogueRequest
-            {
-                clientId = clientId,
-                request = request,
-            });
+            _pendingRequests.Enqueue(new PendingDialogueRequest { clientId = clientId, request = request });
 
             LogRoutingEvent(
                 clientId,
                 request.requestId,
                 NPCFlowStatus.Start,
                 $"Dialogue request queued (position {_pendingRequests.Count}) from client {clientId}.",
-                new Dictionary<string, object>
-                {
-                    ["queuePosition"] = _pendingRequests.Count,
-                }
+                new Dictionary<string, object> { ["queuePosition"] = _pendingRequests.Count }
             );
         }
 
@@ -757,12 +686,15 @@ namespace NPCSystem.Network.Bridges
             _isRelayMode = true;
 
             // Notify client that processing has started
-            SendResponseStartToClient(senderClientId, new NPCDialogueResponseMessage
-            {
-                requestId = request.requestId,
-                npcSlug = request.npcSlug,
-                content = "...",
-            });
+            SendResponseStartToClient(
+                senderClientId,
+                new NPCDialogueResponseMessage
+                {
+                    requestId = request.requestId,
+                    npcSlug = request.npcSlug,
+                    content = "...",
+                }
+            );
 
             if (_dialogueManager == null)
             {
@@ -814,12 +746,15 @@ namespace NPCSystem.Network.Bridges
             }
             else
             {
-                SendResponseCompleteToClient(senderClientId, new NPCDialogueResponseMessage
-                {
-                    requestId = request.requestId,
-                    npcSlug = request.npcSlug,
-                    content = responseContent,
-                });
+                SendResponseCompleteToClient(
+                    senderClientId,
+                    new NPCDialogueResponseMessage
+                    {
+                        requestId = request.requestId,
+                        npcSlug = request.npcSlug,
+                        content = responseContent,
+                    }
+                );
             }
 
             ClearActiveClient();

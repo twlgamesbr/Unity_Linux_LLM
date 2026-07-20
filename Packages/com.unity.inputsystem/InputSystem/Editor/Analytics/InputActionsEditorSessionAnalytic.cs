@@ -8,14 +8,18 @@ namespace UnityEngine.InputSystem.Editor
     /// Analytics record for tracking engagement with Input Action Asset editor(s).
     /// </summary>
 #if UNITY_2023_2_OR_NEWER
-    [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-        maxNumberOfElements: kMaxNumberOfElements, vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey)]
+    [UnityEngine.Analytics.AnalyticInfo(
+        eventName: kEventName,
+        maxEventsPerHour: kMaxEventsPerHour,
+        maxNumberOfElements: kMaxNumberOfElements,
+        vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey
+    )]
 #endif // UNITY_2023_2_OR_NEWER
     internal class InputActionsEditorSessionAnalytic : UnityEngine.InputSystem.InputAnalytics.IInputAnalytic
     {
         public const string kEventName = "input_actionasset_editor_closed";
-        public const int kMaxEventsPerHour = 100;     // default: 1000
-        public const int kMaxNumberOfElements = 100;     // default: 1000
+        public const int kMaxEventsPerHour = 100; // default: 1000
+        public const int kMaxNumberOfElements = 100; // default: 1000
 
         /// <summary>
         /// Construct a new <c>InputActionsEditorSession</c> record of the given <para>type</para>.
@@ -102,7 +106,7 @@ namespace UnityEngine.InputSystem.Editor
         public void RegisterExplicitSave()
         {
             if (!hasSession)
-                return;     // No pending session
+                return; // No pending session
 
             ++m_Data.explicit_save_count;
         }
@@ -114,7 +118,7 @@ namespace UnityEngine.InputSystem.Editor
         public void RegisterAutoSave()
         {
             if (!hasSession)
-                return;     // No pending session
+                return; // No pending session
 
             ++m_Data.auto_save_count;
         }
@@ -125,7 +129,7 @@ namespace UnityEngine.InputSystem.Editor
         public void RegisterReset()
         {
             if (!hasSession)
-                return;     // No pending session
+                return; // No pending session
 
             ++m_Data.reset_count;
         }
@@ -140,7 +144,7 @@ namespace UnityEngine.InputSystem.Editor
         public void Begin()
         {
             if (hasSession)
-                return;     // Session already started.
+                return; // Session already started.
 
             m_SessionStart = currentTime;
         }
@@ -155,7 +159,7 @@ namespace UnityEngine.InputSystem.Editor
         public void End()
         {
             if (!hasSession)
-                return;     // No pending session
+                return; // No pending session
 
             // Make sure we register focus out if failed to capture or not invoked
             if (hasFocus)
@@ -194,7 +198,8 @@ namespace UnityEngine.InputSystem.Editor
             return true;
         }
 
-        public InputAnalytics.InputAnalyticInfo info => new InputAnalytics.InputAnalyticInfo(kEventName, kMaxEventsPerHour, kMaxNumberOfElements);
+        public InputAnalytics.InputAnalyticInfo info =>
+            new InputAnalytics.InputAnalyticInfo(kEventName, kMaxEventsPerHour, kMaxNumberOfElements);
 
         #endregion
 
@@ -224,6 +229,7 @@ namespace UnityEngine.InputSystem.Editor
         private static IInputRuntime runtime => InputSystem.s_Manager.m_Runtime;
         private bool hasFocus => !double.IsNaN(m_FocusStart);
         private bool hasSession => !double.IsNaN(m_SessionStart);
+
         // Returns current time since startup. Note that IInputRuntime explicitly defines in interface that
         // IInputRuntime.currentTime corresponds to EditorApplication.timeSinceStartup in editor.
         private double currentTime => runtime.currentTime;
@@ -243,7 +249,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 Invalid = 0,
                 EditorWindow = 1,
-                EmbeddedInProjectSettings = 2
+                EmbeddedInProjectSettings = 2,
             }
 
             /// <summary>

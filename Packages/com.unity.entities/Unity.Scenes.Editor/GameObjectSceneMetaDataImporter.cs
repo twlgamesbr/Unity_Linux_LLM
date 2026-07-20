@@ -47,7 +47,11 @@ namespace Unity.Scenes.Editor
             return true;
         }
 
-        static bool GetGameObjectSceneMetaData(Hash128 sceneGUID, bool async, out BlobAssetReference<GameObjectSceneMetaData> sceneMetaDataRef)
+        static bool GetGameObjectSceneMetaData(
+            Hash128 sceneGUID,
+            bool async,
+            out BlobAssetReference<GameObjectSceneMetaData> sceneMetaDataRef
+        )
         {
             sceneMetaDataRef = default;
 
@@ -56,30 +60,43 @@ namespace Unity.Scenes.Editor
 
             var scenePath = AssetDatabaseCompatibility.GuidToPath(sceneGUID);
             var importMode = async ? ImportMode.Asynchronous : ImportMode.Synchronous;
-            var hash = AssetDatabaseCompatibility.GetArtifactHash(sceneGUID, GameObjectSceneMetaDataImporterType, importMode);
+            var hash = AssetDatabaseCompatibility.GetArtifactHash(
+                sceneGUID,
+                GameObjectSceneMetaDataImporterType,
+                importMode
+            );
             if (!hash.isValid)
             {
 #if ENABLE_BUILD_DIAGNOSTICS
-                UnityEngine.Debug.Log($"Invalid GameObjectSceneMetadata artifact hash for scene: {scenePath} - {sceneGUID}");
+                UnityEngine.Debug.Log(
+                    $"Invalid GameObjectSceneMetadata artifact hash for scene: {scenePath} - {sceneGUID}"
+                );
 #endif
                 return false;
             }
 
             if (!GetMetaDataArtifactPath(hash, out var metaPath))
             {
-                throw new InvalidOperationException($"Failed to get GameObjectSceneMetadata artifact paths for scene {scenePath} - {sceneGUID}");
+                throw new InvalidOperationException(
+                    $"Failed to get GameObjectSceneMetadata artifact paths for scene {scenePath} - {sceneGUID}"
+                );
             }
 
-            if (!BlobAssetReference<GameObjectSceneMetaData>.TryRead(metaPath, CurrentFileFormatVersion, out sceneMetaDataRef))
+            if (
+                !BlobAssetReference<GameObjectSceneMetaData>.TryRead(
+                    metaPath,
+                    CurrentFileFormatVersion,
+                    out sceneMetaDataRef
+                )
+            )
                 throw new InvalidOperationException($"Unable to read {metaPath}");
 
             return true;
         }
 
-
         internal static Hash128[] GetSubScenes(UnityEngine.GUID guid)
         {
-            if(!GetGameObjectSceneMetaData(guid, false, out var sceneMetaDataRef))
+            if (!GetGameObjectSceneMetaData(guid, false, out var sceneMetaDataRef))
             {
                 return new Hash128[0];
             }
@@ -98,10 +115,14 @@ namespace Unity.Scenes.Editor
             try
             {
                 var subScenes = SubScene.AllSubScenes;
-                var sceneGuids = subScenes.Where(x => x.SceneGUID.IsValid).Select(x =>
+                var sceneGuids = subScenes
+                    .Where(x => x.SceneGUID.IsValid)
+                    .Select(x =>
                     {
 #if ENABLE_BUILD_DIAGNOSTICS
-                        Debug.Log($"Including subscene: {x.SceneGUID} in the GameObjectSceneMetaData blobAssetReference of root scene {ctx.assetPath}.");
+                        Debug.Log(
+                            $"Including subscene: {x.SceneGUID} in the GameObjectSceneMetaData blobAssetReference of root scene {ctx.assetPath}."
+                        );
 #endif
                         return x.SceneGUID;
                     })

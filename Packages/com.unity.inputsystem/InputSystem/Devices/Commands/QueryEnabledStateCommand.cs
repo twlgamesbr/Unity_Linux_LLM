@@ -23,10 +23,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public static QueryEnabledStateCommand Create()
         {
-            return new QueryEnabledStateCommand
-            {
-                baseCommand = new InputDeviceCommand(Type, kSize)
-            };
+            return new QueryEnabledStateCommand { baseCommand = new InputDeviceCommand(Type, kSize) };
         }
     }
 }

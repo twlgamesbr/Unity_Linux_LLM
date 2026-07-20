@@ -94,7 +94,8 @@ namespace UnityEngine.PathTracing.Core
             return true;
         }
 
-        public void ReadBuffer<T>(BufferSlice<T> src, NativeArray<T> result) where T : struct
+        public void ReadBuffer<T>(BufferSlice<T> src, NativeArray<T> result)
+            where T : struct
         {
             Debug.Assert(_buffers.ContainsKey(src.Id), "Invalid buffer ID given.");
 
@@ -104,29 +105,36 @@ namespace UnityEngine.PathTracing.Core
             _cmdBuffer.RequestAsyncReadbackIntoNativeArray(ref result, _buffers[src.Id], size, offset, delegate { });
         }
 
-        public void ReadBuffer<T>(BufferSlice<T> src, NativeArray<T> result, EventID id) where T : struct
+        public void ReadBuffer<T>(BufferSlice<T> src, NativeArray<T> result, EventID id)
+            where T : struct
         {
             Debug.Assert(_buffers.ContainsKey(src.Id), "Invalid buffer ID given.");
 
             int stride = UnsafeUtility.SizeOf<T>();
             int offset = (int)src.Offset * stride;
             int size = result.Length * stride;
-            _cmdBuffer.RequestAsyncReadbackIntoNativeArray(ref result, _buffers[src.Id], size, offset, request =>
-            {
-                Debug.Assert(request.done);
-                // The user may have destroyed the event before the readback was completed, so we check if its still there.
-                if (_inProgressRequests.Remove(id))
+            _cmdBuffer.RequestAsyncReadbackIntoNativeArray(
+                ref result,
+                _buffers[src.Id],
+                size,
+                offset,
+                request =>
                 {
-                    if (request.hasError)
+                    Debug.Assert(request.done);
+                    // The user may have destroyed the event before the readback was completed, so we check if its still there.
+                    if (_inProgressRequests.Remove(id))
                     {
-                        _failedRequests.Add(id);
-                    }
-                    else
-                    {
-                        _successfulRequests.Add(id);
+                        if (request.hasError)
+                        {
+                            _failedRequests.Add(id);
+                        }
+                        else
+                        {
+                            _successfulRequests.Add(id);
+                        }
                     }
                 }
-            });
+            );
             _inProgressRequests.Add(id);
         }
 

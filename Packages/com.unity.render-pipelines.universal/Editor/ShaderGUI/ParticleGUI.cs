@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEditorInternal;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditorInternal;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -46,7 +46,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// <summary>
             /// Use this to select difference mode.
             /// </summary>
-            Difference
+            Difference,
         }
 
         /// <summary>
@@ -57,20 +57,26 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// <summary>
             /// The text and tooltip color mode.
             /// </summary>
-            public static GUIContent colorMode = EditorGUIUtility.TrTextContent("Color Mode",
-                "Controls how the Particle color and the Material color blend together.");
+            public static GUIContent colorMode = EditorGUIUtility.TrTextContent(
+                "Color Mode",
+                "Controls how the Particle color and the Material color blend together."
+            );
 
             /// <summary>
             /// The text and tooltip flip-book blending.
             /// </summary>
-            public static GUIContent flipbookMode = EditorGUIUtility.TrTextContent("Flip-Book Blending",
-                "Blends the frames in a flip-book together in a smooth animation.");
+            public static GUIContent flipbookMode = EditorGUIUtility.TrTextContent(
+                "Flip-Book Blending",
+                "Blends the frames in a flip-book together in a smooth animation."
+            );
 
             /// <summary>
             /// The text and tooltip soft particles.
             /// </summary>
-            public static GUIContent softParticlesEnabled = EditorGUIUtility.TrTextContent("Soft Particles",
-                "Makes particles fade out when they get close to intersecting with the surface of other geometry in the depth buffer.");
+            public static GUIContent softParticlesEnabled = EditorGUIUtility.TrTextContent(
+                "Soft Particles",
+                "Makes particles fade out when they get close to intersecting with the surface of other geometry in the depth buffer."
+            );
 
             /// <summary>
             /// The text and tooltip soft particles surface fade.
@@ -80,22 +86,26 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// <summary>
             /// The text and tooltip soft particles near fade distance.
             /// </summary>
-            public static GUIContent softParticlesNearFadeDistanceText =
-                EditorGUIUtility.TrTextContent("Near",
-                    "The distance from the other surface where the particle is completely transparent.");
+            public static GUIContent softParticlesNearFadeDistanceText = EditorGUIUtility.TrTextContent(
+                "Near",
+                "The distance from the other surface where the particle is completely transparent."
+            );
 
             /// <summary>
             /// The text and tooltip soft particles far fade distance.
             /// </summary>
-            public static GUIContent softParticlesFarFadeDistanceText =
-                EditorGUIUtility.TrTextContent("Far",
-                    "The distance from the other surface where the particle is completely opaque.");
+            public static GUIContent softParticlesFarFadeDistanceText = EditorGUIUtility.TrTextContent(
+                "Far",
+                "The distance from the other surface where the particle is completely opaque."
+            );
 
             /// <summary>
             /// The text and tooltip camera fading.
             /// </summary>
-            public static GUIContent cameraFadingEnabled = EditorGUIUtility.TrTextContent("Camera Fading",
-                "Makes particles fade out when they get close to the camera.");
+            public static GUIContent cameraFadingEnabled = EditorGUIUtility.TrTextContent(
+                "Camera Fading",
+                "Makes particles fade out when they get close to the camera."
+            );
 
             /// <summary>
             /// The text and tooltip camera fading distance.
@@ -105,39 +115,50 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// <summary>
             /// The text and tooltip camera fading near distance.
             /// </summary>
-            public static GUIContent cameraNearFadeDistanceText =
-                EditorGUIUtility.TrTextContent("Near",
-                    "The distance from the camera where the particle is completely transparent.");
+            public static GUIContent cameraNearFadeDistanceText = EditorGUIUtility.TrTextContent(
+                "Near",
+                "The distance from the camera where the particle is completely transparent."
+            );
 
             /// <summary>
             /// The text and tooltip camera fading far distance.
             /// </summary>
-            public static GUIContent cameraFarFadeDistanceText =
-                EditorGUIUtility.TrTextContent("Far", "The distance from the camera where the particle is completely opaque.");
+            public static GUIContent cameraFarFadeDistanceText = EditorGUIUtility.TrTextContent(
+                "Far",
+                "The distance from the camera where the particle is completely opaque."
+            );
 
             /// <summary>
             /// The text and tooltip distortion.
             /// </summary>
-            public static GUIContent distortionEnabled = EditorGUIUtility.TrTextContent("Distortion",
-                "Creates a distortion effect by making particles perform refraction with the objects drawn before them.");
+            public static GUIContent distortionEnabled = EditorGUIUtility.TrTextContent(
+                "Distortion",
+                "Creates a distortion effect by making particles perform refraction with the objects drawn before them."
+            );
 
             /// <summary>
             /// The text and tooltip distortion strength.
             /// </summary>
-            public static GUIContent distortionStrength = EditorGUIUtility.TrTextContent("Strength",
-                "Controls how much the Particle distorts the background. ");
+            public static GUIContent distortionStrength = EditorGUIUtility.TrTextContent(
+                "Strength",
+                "Controls how much the Particle distorts the background. "
+            );
 
             /// <summary>
             /// The text and tooltip distortion blend.
             /// </summary>
-            public static GUIContent distortionBlend = EditorGUIUtility.TrTextContent("Blend",
-                "Controls how visible the distortion effect is. At 0, there’s no visible distortion. At 1, only the distortion effect is visible, not the background.");
+            public static GUIContent distortionBlend = EditorGUIUtility.TrTextContent(
+                "Blend",
+                "Controls how visible the distortion effect is. At 0, there’s no visible distortion. At 1, only the distortion effect is visible, not the background."
+            );
 
             /// <summary>
             /// The text and tooltip for vertex streams.
             /// </summary>
-            public static GUIContent VertexStreams = EditorGUIUtility.TrTextContent("Vertex Streams",
-                "List detailing the expected layout of data sent to the shader from the particle system.");
+            public static GUIContent VertexStreams = EditorGUIUtility.TrTextContent(
+                "Vertex Streams",
+                "List detailing the expected layout of data sent to the shader from the particle system."
+            );
 
             /// <summary>
             /// The string for position vertex stream.
@@ -187,8 +208,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// <summary>
             /// The text and tooltip for the vertex stream fix now GUI.
             /// </summary>
-            public static GUIContent streamApplyToAllSystemsText = EditorGUIUtility.TrTextContent("Fix Now",
-                "Apply the vertex stream layout to all Particle Systems using this material");
+            public static GUIContent streamApplyToAllSystemsText = EditorGUIUtility.TrTextContent(
+                "Fix Now",
+                "Apply the vertex stream layout to all Particle Systems using this material"
+            );
 
             /// <summary>
             /// The string for applying custom vertex streams from material.
@@ -214,7 +237,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             /// The MaterialProperty for color mode.
             /// </summary>
             public MaterialProperty colorMode;
-
 
             // Advanced Props
 
@@ -282,7 +304,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
                 softParticlesEnabled = BaseShaderGUI.FindProperty("_SoftParticlesEnabled", properties);
                 cameraFadingEnabled = BaseShaderGUI.FindProperty("_CameraFadingEnabled", properties);
                 distortionEnabled = BaseShaderGUI.FindProperty("_DistortionEnabled", properties, false);
-                softParticlesNearFadeDistance = BaseShaderGUI.FindProperty("_SoftParticlesNearFadeDistance", properties);
+                softParticlesNearFadeDistance = BaseShaderGUI.FindProperty(
+                    "_SoftParticlesNearFadeDistance",
+                    properties
+                );
                 softParticlesFarFadeDistance = BaseShaderGUI.FindProperty("_SoftParticlesFarFadeDistance", properties);
                 cameraNearFadeDistance = BaseShaderGUI.FindProperty("_CameraNearFadeDistance", properties);
                 cameraFarFadeDistance = BaseShaderGUI.FindProperty("_CameraFarFadeDistance", properties);
@@ -343,7 +368,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
         /// <param name="material">The material to use.</param>
         /// <param name="materialEditor">The material editor to use.</param>
         /// <param name="properties">The particle properties to use.</param>
-        public static void FadingOptions(Material material, MaterialEditor materialEditor, ParticleProperties properties)
+        public static void FadingOptions(
+            Material material,
+            MaterialEditor materialEditor,
+            ParticleProperties properties
+        )
         {
             // Z write doesn't work with fading
             bool hasZWrite = (material.GetFloat("_ZWrite") > 0.0f);
@@ -360,16 +389,21 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
                             GUIStyle warnStyle = new GUIStyle(GUI.skin.label);
                             warnStyle.fontStyle = FontStyle.BoldAndItalic;
                             warnStyle.wordWrap = true;
-                            EditorGUILayout.HelpBox("Soft Particles require depth texture. Please enable \"Depth Texture\" in the Universal Render Pipeline settings.", MessageType.Warning);
+                            EditorGUILayout.HelpBox(
+                                "Soft Particles require depth texture. Please enable \"Depth Texture\" in the Universal Render Pipeline settings.",
+                                MessageType.Warning
+                            );
                         }
 
                         EditorGUI.indentLevel++;
-                        BaseShaderGUI.TwoFloatSingleLine(Styles.softParticlesFadeText,
+                        BaseShaderGUI.TwoFloatSingleLine(
+                            Styles.softParticlesFadeText,
                             properties.softParticlesNearFadeDistance,
                             Styles.softParticlesNearFadeDistanceText,
                             properties.softParticlesFarFadeDistance,
                             Styles.softParticlesFarFadeDistanceText,
-                            materialEditor);
+                            materialEditor
+                        );
                         EditorGUI.indentLevel--;
                     }
                 }
@@ -380,12 +414,14 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
                     if (properties.cameraFadingEnabled.floatValue >= 0.5f)
                     {
                         EditorGUI.indentLevel++;
-                        BaseShaderGUI.TwoFloatSingleLine(Styles.cameraFadingDistanceText,
+                        BaseShaderGUI.TwoFloatSingleLine(
+                            Styles.cameraFadingDistanceText,
                             properties.cameraNearFadeDistance,
                             Styles.cameraNearFadeDistanceText,
                             properties.cameraFarFadeDistance,
                             Styles.cameraFarFadeDistanceText,
-                            materialEditor);
+                            materialEditor
+                        );
                         EditorGUI.indentLevel--;
                     }
                 }
@@ -413,7 +449,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
         /// <param name="material">The material to use.</param>
         /// <param name="renderers">List of particle system renderers.</param>
         /// <param name="useLighting">Marks whether the renderers uses lighting or not.</param>
-        public static void DoVertexStreamsArea(Material material, List<ParticleSystemRenderer> renderers, bool useLighting = false)
+        public static void DoVertexStreamsArea(
+            Material material,
+            List<ParticleSystemRenderer> renderers,
+            bool useLighting = false
+        )
         {
             EditorGUILayout.Space();
             // Display list of streams required to make this shader work
@@ -484,7 +524,11 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
                 renderer.GetActiveVertexStreams(rendererStreams);
 
                 bool streamsValid;
-                if (useGPUInstancing && renderer.renderMode == ParticleSystemRenderMode.Mesh && renderer.supportsMeshInstancing)
+                if (
+                    useGPUInstancing
+                    && renderer.renderMode == ParticleSystemRenderMode.Mesh
+                    && renderer.supportsMeshInstancing
+                )
                     streamsValid = CompareVertexStreams(rendererStreams, instancedStreams);
                 else
                     streamsValid = CompareVertexStreams(rendererStreams, streams);
@@ -496,16 +540,29 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             if (!string.IsNullOrEmpty(Warnings))
             {
                 EditorGUILayout.HelpBox(
-                    "The following Particle System Renderers are using this material with incorrect Vertex Streams:\n" +
-                    Warnings, MessageType.Error, true);
+                    "The following Particle System Renderers are using this material with incorrect Vertex Streams:\n"
+                        + Warnings,
+                    MessageType.Error,
+                    true
+                );
                 // Set the streams on all systems using this material
-                if (GUILayout.Button(Styles.streamApplyToAllSystemsText, EditorStyles.miniButton, GUILayout.ExpandWidth(true)))
+                if (
+                    GUILayout.Button(
+                        Styles.streamApplyToAllSystemsText,
+                        EditorStyles.miniButton,
+                        GUILayout.ExpandWidth(true)
+                    )
+                )
                 {
                     Undo.RecordObjects(renderers.Where(r => r != null).ToArray(), Styles.undoApplyCustomVertexStreams);
 
                     foreach (ParticleSystemRenderer renderer in renderers)
                     {
-                        if (useGPUInstancing && renderer.renderMode == ParticleSystemRenderMode.Mesh && renderer.supportsMeshInstancing)
+                        if (
+                            useGPUInstancing
+                            && renderer.renderMode == ParticleSystemRenderMode.Mesh
+                            && renderer.supportsMeshInstancing
+                        )
                             renderer.SetActiveVertexStreams(instancedStreams);
                         else
                             renderer.SetActiveVertexStreams(streams);
@@ -514,7 +571,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
             }
         }
 
-        private static bool CompareVertexStreams(IEnumerable<ParticleSystemVertexStream> a, IEnumerable<ParticleSystemVertexStream> b)
+        private static bool CompareVertexStreams(
+            IEnumerable<ParticleSystemVertexStream> a,
+            IEnumerable<ParticleSystemVertexStream> b
+        )
         {
             var differenceA = a.Except(b);
             var differenceB = b.Except(a);
@@ -571,9 +631,15 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
                         material.SetFloat("_SoftParticlesFarFadeDistance", 0.0f);
                     }
                     // set keywords
-                    material.SetVector("_SoftParticleFadeParams",
-                        new Vector4(softParticlesNearFadeDistance,
-                            1.0f / (softParticlesFarFadeDistance - softParticlesNearFadeDistance), 0.0f, 0.0f));
+                    material.SetVector(
+                        "_SoftParticleFadeParams",
+                        new Vector4(
+                            softParticlesNearFadeDistance,
+                            1.0f / (softParticlesFarFadeDistance - softParticlesNearFadeDistance),
+                            0.0f,
+                            0.0f
+                        )
+                    );
                 }
                 else
                 {
@@ -603,9 +669,15 @@ namespace UnityEditor.Rendering.Universal.ShaderGUI
                         material.SetFloat("_CameraFarFadeDistance", 0.0f);
                     }
                     // set keywords
-                    material.SetVector("_CameraFadeParams",
-                        new Vector4(cameraNearFadeDistance, 1.0f / (cameraFarFadeDistance - cameraNearFadeDistance),
-                            0.0f, 0.0f));
+                    material.SetVector(
+                        "_CameraFadeParams",
+                        new Vector4(
+                            cameraNearFadeDistance,
+                            1.0f / (cameraFarFadeDistance - cameraNearFadeDistance),
+                            0.0f,
+                            0.0f
+                        )
+                    );
                 }
                 else
                 {

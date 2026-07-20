@@ -59,14 +59,21 @@ namespace UnityEngine.TestTools
     /// </code>
     /// </example>
     [AttributeUsage(AttributeTargets.Method)]
-    public class UnityTestAttribute : CombiningStrategyAttribute, IImplyFixture, ISimpleTestBuilder, ITestBuilder, IApplyToTest
+    public class UnityTestAttribute
+        : CombiningStrategyAttribute,
+            IImplyFixture,
+            ISimpleTestBuilder,
+            ITestBuilder,
+            IApplyToTest
     {
-        private const string k_MethodMarkedWithUnitytestMustReturnIenumerator = "Method marked with UnityTest must return IEnumerator.";
+        private const string k_MethodMarkedWithUnitytestMustReturnIenumerator =
+            "Method marked with UnityTest must return IEnumerator.";
 
         /// <summary>
         /// Initializes and returns an instance of UnityTestAttribute.
         /// </summary>
-        public UnityTestAttribute() : base(new UnityCombinatorialStrategy(), new ParameterDataSourceProvider()) {}
+        public UnityTestAttribute()
+            : base(new UnityCombinatorialStrategy(), new ParameterDataSourceProvider()) { }
 
         private readonly NUnitTestCaseBuilder _builder = new NUnitTestCaseBuilder();
 
@@ -95,7 +102,7 @@ namespace UnityEngine.TestTools
         /// <returns>A TestMethod object</returns>
         IEnumerable<TestMethod> ITestBuilder.BuildFrom(IMethodInfo method, Test suite)
         {
-            var testMethods  = base.BuildFrom(method, suite);
+            var testMethods = base.BuildFrom(method, suite);
 
             foreach (var t in testMethods)
             {
@@ -110,7 +117,7 @@ namespace UnityEngine.TestTools
             TestCaseParameters parms = new TestCaseParameters
             {
                 ExpectedResult = new object(),
-                HasExpectedResult = true
+                HasExpectedResult = true,
             };
 
             var t = _builder.BuildTestMethod(method, suite, parms);

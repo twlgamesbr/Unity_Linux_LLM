@@ -1,6 +1,5 @@
 using UnityEngine.Scripting.APIUpdating;
 
-
 namespace UnityEngine.Rendering.Universal
 {
     /// <summary>

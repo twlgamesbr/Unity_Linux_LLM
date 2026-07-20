@@ -24,10 +24,10 @@ namespace UnityEngine.UI.CoroutineTween
         {
             All,
             RGB,
-            Alpha
+            Alpha,
         }
 
-        public class ColorTweenCallback : UnityEvent<Color> {}
+        public class ColorTweenCallback : UnityEvent<Color> { }
 
         private ColorTweenCallback m_Target;
         private Color m_StartColor;
@@ -116,7 +116,7 @@ namespace UnityEngine.UI.CoroutineTween
     // the value on the target.
     internal struct FloatTween : ITweenValue
     {
-        public class FloatTweenCallback : UnityEvent<float> {}
+        public class FloatTweenCallback : UnityEvent<float> { }
 
         private FloatTweenCallback m_Target;
         private float m_StartValue;
@@ -185,7 +185,8 @@ namespace UnityEngine.UI.CoroutineTween
     // Tween runner, executes the given tween.
     // The coroutine will live within the given
     // behaviour container.
-    internal class TweenRunner<T> where T : struct, ITweenValue
+    internal class TweenRunner<T>
+        where T : struct, ITweenValue
     {
         protected MonoBehaviour m_CoroutineContainer;
         protected IEnumerator m_Tween;

@@ -1,5 +1,5 @@
-using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -31,13 +31,21 @@ namespace UnityEngine.Rendering.Universal
                 // Setup Legacy XR buffer states
                 if (cameraData.xr.singlePassEnabled)
                 {
-                    skyRendererListHandle = renderGraph.CreateSkyboxRendererList(cameraData.camera,
-                        cameraData.GetProjectionMatrix(0), cameraData.GetViewMatrix(0),
-                        cameraData.GetProjectionMatrix(1), cameraData.GetViewMatrix(1));
+                    skyRendererListHandle = renderGraph.CreateSkyboxRendererList(
+                        cameraData.camera,
+                        cameraData.GetProjectionMatrix(0),
+                        cameraData.GetViewMatrix(0),
+                        cameraData.GetProjectionMatrix(1),
+                        cameraData.GetViewMatrix(1)
+                    );
                 }
                 else
                 {
-                    skyRendererListHandle = renderGraph.CreateSkyboxRendererList(cameraData.camera, cameraData.GetProjectionMatrix(0), cameraData.GetViewMatrix(0));
+                    skyRendererListHandle = renderGraph.CreateSkyboxRendererList(
+                        cameraData.camera,
+                        cameraData.GetProjectionMatrix(0),
+                        cameraData.GetViewMatrix(0)
+                    );
                 }
             }
             else
@@ -53,7 +61,9 @@ namespace UnityEngine.Rendering.Universal
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             if (xr.enabled && xr.singlePassEnabled)
-                cmd.SetSinglePassStereo(SystemInfo.supportsMultiview ? SinglePassStereoMode.Multiview : SinglePassStereoMode.Instancing);
+                cmd.SetSinglePassStereo(
+                    SystemInfo.supportsMultiview ? SinglePassStereoMode.Multiview : SinglePassStereoMode.Instancing
+                );
 #endif
             cmd.DrawRendererList(rendererList);
 
@@ -76,7 +86,14 @@ namespace UnityEngine.Rendering.Universal
             passData.skyRendererListHandle = handle;
         }
 
-        internal void Render(RenderGraph renderGraph, ContextContainer frameData, ScriptableRenderContext context, in TextureHandle colorTarget, in TextureHandle depthTarget, Material skyboxMaterial)
+        internal void Render(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            ScriptableRenderContext context,
+            in TextureHandle colorTarget,
+            in TextureHandle depthTarget,
+            Material skyboxMaterial
+        )
         {
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
@@ -92,7 +109,9 @@ namespace UnityEngine.Rendering.Universal
                 }
             }
 
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 var skyRendererListHandle = CreateSkyBoxRendererList(renderGraph, cameraData);
                 InitPassData(ref passData, cameraData.xr, skyRendererListHandle);
@@ -104,8 +123,11 @@ namespace UnityEngine.Rendering.Universal
                 builder.AllowPassCulling(false);
                 if (cameraData.xr.enabled)
                 {
-                    bool passSupportsFoveation = cameraData.xrUniversal.canFoveateIntermediatePasses || resourceData.isActiveTargetBackBuffer;
-                    builder.EnableFoveatedRasterization(cameraData.xr.supportsFoveatedRendering && passSupportsFoveation);
+                    bool passSupportsFoveation =
+                        cameraData.xrUniversal.canFoveateIntermediatePasses || resourceData.isActiveTargetBackBuffer;
+                    builder.EnableFoveatedRasterization(
+                        cameraData.xr.supportsFoveatedRendering && passSupportsFoveation
+                    );
                     // Apply MultiviewRenderRegionsCompatible flag only to the peripheral view in Quad Views
                     if (cameraData.xr.multipassId == 0)
                     {
@@ -113,10 +135,12 @@ namespace UnityEngine.Rendering.Universal
                     }
                 }
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    ExecutePass(context.cmd, data.xr, data.skyRendererListHandle);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        ExecutePass(context.cmd, data.xr, data.skyRendererListHandle);
+                    }
+                );
             }
         }
     }

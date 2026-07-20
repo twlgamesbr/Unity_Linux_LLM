@@ -23,7 +23,5 @@ namespace Unity.Entities
     /// <seealso cref="M:Unity.Entities.ComponentSystemBase.RequireForUpdate``1"/>
     /// <seealso cref="M:Unity.Entities.ComponentSystemBase.RequireForUpdate(Unity.Entities.EntityQuery)"/>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
-    public class RequireMatchingQueriesForUpdateAttribute : Attribute
-    {
-    }
+    public class RequireMatchingQueriesForUpdateAttribute : Attribute { }
 }

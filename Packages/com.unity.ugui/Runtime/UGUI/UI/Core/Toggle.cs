@@ -29,15 +29,14 @@ namespace UnityEngine.UI
             /// <summary>
             /// Fade the toggle in / out smoothly.
             /// </summary>
-            Fade
+            Fade,
         }
 
         [Serializable]
         /// <summary>
         /// UnityEvent callback for when a toggle is toggled.
         /// </summary>
-        public class ToggleEvent : UnityEvent<bool>
-        {}
+        public class ToggleEvent : UnityEvent<bool> { }
 
         /// <summary>
         /// Transition mode for the toggle.
@@ -111,8 +110,7 @@ namespace UnityEngine.UI
         [SerializeField]
         private bool m_IsOn;
 
-        protected Toggle()
-        {}
+        protected Toggle() { }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -122,7 +120,6 @@ namespace UnityEngine.UI
             if (!UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this) && !Application.isPlaying)
                 CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
         }
-
 #endif // if UNITY_EDITOR
 
         public virtual void Rebuild(CanvasUpdate executing)
@@ -133,11 +130,9 @@ namespace UnityEngine.UI
 #endif
         }
 
-        public virtual void LayoutComplete()
-        {}
+        public virtual void LayoutComplete() { }
 
-        public virtual void GraphicUpdateComplete()
-        {}
+        public virtual void GraphicUpdateComplete() { }
 
         protected override void OnDestroy()
         {
@@ -237,15 +232,10 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-
         public bool isOn
         {
             get { return m_IsOn; }
-
-            set
-            {
-                Set(value);
-            }
+            set { Set(value); }
         }
 
         /// <summary>

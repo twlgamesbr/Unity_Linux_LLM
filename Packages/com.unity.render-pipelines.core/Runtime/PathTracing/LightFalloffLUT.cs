@@ -8,7 +8,8 @@ namespace UnityEngine.PathTracing.Core
     {
         public float LUTRange;
         public Experimental.GlobalIllumination.FalloffType FalloffType;
-        public readonly override int GetHashCode()
+
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(LUTRange, FalloffType);
         }
@@ -75,7 +76,10 @@ namespace UnityEngine.PathTracing.Core
             return 1.0f / (math.max(DistThresholdSqr, squaredDistance));
         }
 
-        public static float[] BuildLightFalloffLUTs(LightFalloffDesc[] lightFalloffDescs, uint lightFalloffLUTLength = 1024)
+        public static float[] BuildLightFalloffLUTs(
+            LightFalloffDesc[] lightFalloffDescs,
+            uint lightFalloffLUTLength = 1024
+        )
         {
             List<float> lightFalloffData = new();
             foreach (var lightFalloffDesc in lightFalloffDescs)

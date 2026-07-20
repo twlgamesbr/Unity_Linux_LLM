@@ -42,7 +42,10 @@ namespace Unity.Entities.Editor
             }
         }
 
-        internal BaseStateContainer BaseState => SessionState<BaseStateContainer>.GetOrCreate($"{GetType().Name}.{nameof(BaseStateContainer)}+{EditorWindowInstanceKey}");
+        internal BaseStateContainer BaseState =>
+            SessionState<BaseStateContainer>.GetOrCreate(
+                $"{GetType().Name}.{nameof(BaseStateContainer)}+{EditorWindowInstanceKey}"
+            );
 
         protected string SearchFilter
         {
@@ -82,7 +85,8 @@ namespace Unity.Entities.Editor
             Update();
         }
 
-        protected bool IsSearchFieldVisible => m_SearchField != null && m_SearchField.style.display == DisplayStyle.Flex;
+        protected bool IsSearchFieldVisible =>
+            m_SearchField != null && m_SearchField.style.display == DisplayStyle.Flex;
 
         World FindSelectedWorld()
         {
@@ -105,16 +109,14 @@ namespace Unity.Entities.Editor
 
         protected ToolbarMenu CreateWorldSelector()
         {
-            m_WorldSelector = new ToolbarMenu
-            {
-                name = "worldMenu",
-                variant = ToolbarMenu.Variant.Popup
-            };
+            m_WorldSelector = new ToolbarMenu { name = "worldMenu", variant = ToolbarMenu.Variant.Popup };
 
             UpdateWorldDropDownMenu();
             SelectedWorld = FindSelectedWorld();
 
-            m_PreviousShowAdvancedWorldsValue = UserSettings<AdvancedSettings>.GetOrCreate(Constants.Settings.Advanced).ShowAdvancedWorlds;
+            m_PreviousShowAdvancedWorldsValue = UserSettings<AdvancedSettings>
+                .GetOrCreate(Constants.Settings.Advanced)
+                .ShowAdvancedWorlds;
 
             return m_WorldSelector;
         }
@@ -125,7 +127,9 @@ namespace Unity.Entities.Editor
             m_SearchFieldContainer.AddToClassList(ussClass);
 
             m_SearchField = new SearchElement();
-            m_SearchField.SetValueWithoutNotify(string.IsNullOrEmpty(BaseState.SearchFilter) ? string.Empty : BaseState.SearchFilter);
+            m_SearchField.SetValueWithoutNotify(
+                string.IsNullOrEmpty(BaseState.SearchFilter) ? string.Empty : BaseState.SearchFilter
+            );
             m_SearchField.AddToClassList(UssClasses.DotsEditorCommon.SearchField);
             m_SearchField.RegisterSearchQueryHandler<TData>(query =>
             {
@@ -244,7 +248,9 @@ namespace Unity.Entities.Editor
                 return true;
             }
 
-            var showAdvancedWorlds = UserSettings<AdvancedSettings>.GetOrCreate(Constants.Settings.Advanced).ShowAdvancedWorlds;
+            var showAdvancedWorlds = UserSettings<AdvancedSettings>
+                .GetOrCreate(Constants.Settings.Advanced)
+                .ShowAdvancedWorlds;
             if (m_PreviousShowAdvancedWorldsValue != showAdvancedWorlds)
             {
                 m_PreviousShowAdvancedWorldsValue = showAdvancedWorlds;
@@ -300,10 +306,13 @@ namespace Unity.Entities.Editor
         {
             foreach (var world in category.Worlds)
             {
-                menu.AppendAction(m_WorldDisplayNameCache.GetWorldDisplayName(world), OnWorldSelected, a =>
-                    (SelectedWorld == world)
-                    ? DropdownMenuAction.Status.Checked
-                    : DropdownMenuAction.Status.Normal, world);
+                menu.AppendAction(
+                    m_WorldDisplayNameCache.GetWorldDisplayName(world),
+                    OnWorldSelected,
+                    a =>
+                        (SelectedWorld == world) ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal,
+                    world
+                );
             }
         }
 

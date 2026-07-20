@@ -14,7 +14,8 @@ namespace UnityEngine.InputSystem.Editor
 
         public static string SettingsPath => InputSettingsPath.kSettingsRootPath;
 
-        [SerializeField] InputActionsEditorState m_State;
+        [SerializeField]
+        InputActionsEditorState m_State;
         VisualElement m_RootVisualElement;
         private bool m_HasEditFocus;
         private bool m_IsActivated;
@@ -26,9 +27,12 @@ namespace UnityEngine.InputSystem.Editor
 
         private InputActionsEditorSessionAnalytic m_ActionEditorAnalytics;
 
-        public InputActionsEditorSettingsProvider(string path, SettingsScope scopes, IEnumerable<string> keywords = null)
-            : base(path, scopes, keywords)
-        {}
+        public InputActionsEditorSettingsProvider(
+            string path,
+            SettingsScope scopes,
+            IEnumerable<string> keywords = null
+        )
+            : base(path, scopes, keywords) { }
 
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
@@ -49,7 +53,8 @@ namespace UnityEngine.InputSystem.Editor
             // Always begin a session when activated (note that OnActivate isn't called when navigating back
             // to editor from another setting category)
             m_ActionEditorAnalytics = new InputActionsEditorSessionAnalytic(
-                InputActionsEditorSessionAnalytic.Data.Kind.EmbeddedInProjectSettings);
+                InputActionsEditorSessionAnalytic.Data.Kind.EmbeddedInProjectSettings
+            );
             m_ActionEditorAnalytics.Begin();
 
             CreateUI();
@@ -183,16 +188,17 @@ namespace UnityEngine.InputSystem.Editor
                 return;
             }
 
-            ProjectWideActionsAsset.Verify(asset);     // Ignore verification result for save
+            ProjectWideActionsAsset.Verify(asset); // Ignore verification result for save
             EditorHelpers.SaveAsset(AssetDatabase.GetAssetPath(asset), asset.ToJson());
         }
 
         private void CreateUI()
         {
             var projectSettingsAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                InputActionsEditorConstants.PackagePath +
-                InputActionsEditorConstants.ResourcesPath +
-                InputActionsEditorConstants.ProjectSettingsUxml);
+                InputActionsEditorConstants.PackagePath
+                    + InputActionsEditorConstants.ResourcesPath
+                    + InputActionsEditorConstants.ProjectSettingsUxml
+            );
 
             projectSettingsAsset.CloneTree(m_RootVisualElement);
 
@@ -204,7 +210,10 @@ namespace UnityEngine.InputSystem.Editor
             // Construct from InputSystem.actions asset
             var asset = InputSystem.actions;
             var hasAsset = asset != null;
-            m_State = (asset != null) ? new InputActionsEditorState(m_ActionEditorAnalytics, new SerializedObject(asset)) : default;
+            m_State =
+                (asset != null)
+                    ? new InputActionsEditorState(m_ActionEditorAnalytics, new SerializedObject(asset))
+                    : default;
 
             // Dynamically show a section indicating that an asset is missing if not currently having an associated asset
             var missingAssetSection = m_RootVisualElement.Q<VisualElement>("missing-asset-section");
@@ -220,11 +229,13 @@ namespace UnityEngine.InputSystem.Editor
             if (objectField != null)
             {
                 objectField.value = (asset == null) ? null : asset;
-                objectField.RegisterCallback<ChangeEvent<Object>>((evt) =>
-                {
-                    if (evt.newValue != asset)
-                        InputSystem.actions = evt.newValue as InputActionAsset;
-                });
+                objectField.RegisterCallback<ChangeEvent<Object>>(
+                    (evt) =>
+                    {
+                        if (evt.newValue != asset)
+                            InputSystem.actions = evt.newValue as InputActionAsset;
+                    }
+                );
 
                 // Prevent reassignment in in editor which would result in exception during play-mode
                 objectField.SetEnabled(!EditorApplication.isPlayingOrWillChangePlaymode);
@@ -252,7 +263,10 @@ namespace UnityEngine.InputSystem.Editor
             // If the editor is associated with an asset we show input action editor
             if (hasAsset)
             {
-                m_StateContainer = new StateContainer(m_State, AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(asset)));
+                m_StateContainer = new StateContainer(
+                    m_State,
+                    AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(asset))
+                );
                 m_View = new InputActionsEditorView(m_RootVisualElement, m_StateContainer, true, null);
                 m_StateContainer.Initialize(m_RootVisualElement.Q("action-editor"));
             }
@@ -302,21 +316,21 @@ namespace UnityEngine.InputSystem.Editor
         [Shortcut("Input Action Editor/Project Settings/Add Action Map", null, KeyCode.M, ShortcutModifiers.Alt)]
         private static void AddActionMapShortcut(ShortcutArguments arguments)
         {
-            if (m_ActiveSettingsProvider is { m_HasEditFocus : true })
+            if (m_ActiveSettingsProvider is { m_HasEditFocus: true })
                 m_ActiveSettingsProvider.m_StateContainer.Dispatch(Commands.AddActionMap());
         }
 
         [Shortcut("Input Action Editor/Project Settings/Add Action", null, KeyCode.A, ShortcutModifiers.Alt)]
         private static void AddActionShortcut(ShortcutArguments arguments)
         {
-            if (m_ActiveSettingsProvider is { m_HasEditFocus : true })
+            if (m_ActiveSettingsProvider is { m_HasEditFocus: true })
                 m_ActiveSettingsProvider.m_StateContainer.Dispatch(Commands.AddAction());
         }
 
         [Shortcut("Input Action Editor/Project Settings/Add Binding", null, KeyCode.B, ShortcutModifiers.Alt)]
         private static void AddBindingShortcut(ShortcutArguments arguments)
         {
-            if (m_ActiveSettingsProvider is { m_HasEditFocus : true })
+            if (m_ActiveSettingsProvider is { m_HasEditFocus: true })
                 m_ActiveSettingsProvider.m_StateContainer.Dispatch(Commands.AddBinding());
         }
 

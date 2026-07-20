@@ -5,7 +5,12 @@ namespace Unity.Numerics.Linear.Dense.Primitives
     [GenerateTestsForBurstCompatibility]
     internal unsafe partial struct Matrix
     {
-        public void InterchangeRows(in NativeArray<int> pivots, int startPivot = 0, int endPivot = -1, int pivotStride = 1)
+        public void InterchangeRows(
+            in NativeArray<int> pivots,
+            int startPivot = 0,
+            int endPivot = -1,
+            int pivotStride = 1
+        )
         {
             if (endPivot < 0)
                 endPivot = pivots.Length - 1;

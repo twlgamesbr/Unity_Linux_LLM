@@ -903,7 +903,7 @@ namespace Unity.Multiplayer.Tools.MetricTestData.Definitions
             "worldly",
             "worldwide",
             "worsted",
-            "worthless"
+            "worthless",
         };
     }
 }

@@ -26,8 +26,7 @@ namespace UnityEngine.InputSystem.Editor
             maxLatencySeconds = float.NaN;
         }
 
-        public void ProcessSample(InputEventPtr eventPtr) =>
-            ProcessSample(eventPtr, Time.realtimeSinceStartupAsDouble);
+        public void ProcessSample(InputEventPtr eventPtr) => ProcessSample(eventPtr, Time.realtimeSinceStartupAsDouble);
 
         public void ProcessSample(InputEventPtr eventPtr, double realtimeSinceStartup)
         {

@@ -9,7 +9,7 @@ namespace Unity.Entities.Editor
         None = 0,
         ChildrenRequireSorting = 1 << 0,
         IsPrefabStage = 1 << 1,
-        Disabled = 1 << 2
+        Disabled = 1 << 2,
     }
 
     /// <summary>
@@ -27,26 +27,22 @@ namespace Unity.Entities.Editor
             m_Handle = handle;
 
             if (!m_Hierarchy.Exists(handle))
-                throw new ArgumentException($"Unable to create {nameof(HierarchyNodeHandle)}. The specified handle does not exist in the hierarchy.");
+                throw new ArgumentException(
+                    $"Unable to create {nameof(HierarchyNodeHandle)}. The specified handle does not exist in the hierarchy."
+                );
         }
 
-        public HierarchyNodeHandle GetHandle() 
-            => m_Handle;
+        public HierarchyNodeHandle GetHandle() => m_Handle;
 
-        public int GetSortIndex()
-            => m_Hierarchy.GetSortIndex(m_Handle);
-        
-        public void SetSortIndex(int index)
-            => m_Hierarchy.SetSortIndex(m_Handle, index);
+        public int GetSortIndex() => m_Hierarchy.GetSortIndex(m_Handle);
 
-        public int GetDepth()
-            => m_Hierarchy.GetDepth(m_Handle);
-        
-        public HierarchyNode GetParent()
-            => m_Hierarchy.GetNode(m_Hierarchy.GetParent(m_Handle));
-        
-        public void SetParent(HierarchyNodeHandle parent)
-            => m_Hierarchy.SetParent(m_Handle, parent);
+        public void SetSortIndex(int index) => m_Hierarchy.SetSortIndex(m_Handle, index);
+
+        public int GetDepth() => m_Hierarchy.GetDepth(m_Handle);
+
+        public HierarchyNode GetParent() => m_Hierarchy.GetNode(m_Hierarchy.GetParent(m_Handle));
+
+        public void SetParent(HierarchyNodeHandle parent) => m_Hierarchy.SetParent(m_Handle, parent);
 
         public void AddChild(HierarchyNodeHandle child)
         {
@@ -56,25 +52,18 @@ namespace Unity.Entities.Editor
                 m_Hierarchy.SetParent(child, m_Handle);
         }
 
-        public int GetChildCount()
-            => m_Hierarchy.GetChildCount(m_Handle);
+        public int GetChildCount() => m_Hierarchy.GetChildCount(m_Handle);
 
-        public HierarchyNode[] GetChildren()
-            => m_Hierarchy.GetChildren(m_Handle);
+        public HierarchyNode[] GetChildren() => m_Hierarchy.GetChildren(m_Handle);
 
-        public HierarchyNodeFlags GetFlags()
-            => m_Hierarchy.GetFlags(m_Handle);
+        public HierarchyNodeFlags GetFlags() => m_Hierarchy.GetFlags(m_Handle);
 
-        public bool Equals(HierarchyNode other)
-            => m_Handle.Equals(other.m_Handle);
+        public bool Equals(HierarchyNode other) => m_Handle.Equals(other.m_Handle);
 
-        public override bool Equals(object obj)
-            => obj is HierarchyNode other && Equals(other);
+        public override bool Equals(object obj) => obj is HierarchyNode other && Equals(other);
 
-        public override int GetHashCode()
-            => m_Handle.GetHashCode();
-        
-        public static implicit operator HierarchyNodeHandle(HierarchyNode node) 
-            => node.m_Handle;
+        public override int GetHashCode() => m_Handle.GetHashCode();
+
+        public static implicit operator HierarchyNodeHandle(HierarchyNode node) => node.m_Handle;
     }
 }

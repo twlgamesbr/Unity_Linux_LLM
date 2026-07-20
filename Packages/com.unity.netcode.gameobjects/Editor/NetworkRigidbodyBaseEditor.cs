@@ -12,12 +12,15 @@ namespace Unity.Netcode.Editor
         private SerializedProperty m_AutoUpdateKinematicState;
         private SerializedProperty m_AutoSetKinematicOnDespawn;
 
-
         public override void OnEnable()
         {
             m_UseRigidBodyForMotion = serializedObject.FindProperty(nameof(NetworkRigidbodyBase.UseRigidBodyForMotion));
-            m_AutoUpdateKinematicState = serializedObject.FindProperty(nameof(NetworkRigidbodyBase.AutoUpdateKinematicState));
-            m_AutoSetKinematicOnDespawn = serializedObject.FindProperty(nameof(NetworkRigidbodyBase.AutoSetKinematicOnDespawn));
+            m_AutoUpdateKinematicState = serializedObject.FindProperty(
+                nameof(NetworkRigidbodyBase.AutoUpdateKinematicState)
+            );
+            m_AutoSetKinematicOnDespawn = serializedObject.FindProperty(
+                nameof(NetworkRigidbodyBase.AutoSetKinematicOnDespawn)
+            );
 
             base.OnEnable();
         }
@@ -38,7 +41,12 @@ namespace Unity.Netcode.Editor
                 networkRigidbodyBase.NetworkRigidbodyBaseExpanded = expanded;
             }
 
-            DrawFoldOutGroup<NetworkRigidbodyBase>(networkRigidbodyBase.GetType(), DisplayNetworkRigidbodyProperties, networkRigidbodyBase.NetworkRigidbodyBaseExpanded, SetExpanded);
+            DrawFoldOutGroup<NetworkRigidbodyBase>(
+                networkRigidbodyBase.GetType(),
+                DisplayNetworkRigidbodyProperties,
+                networkRigidbodyBase.NetworkRigidbodyBaseExpanded,
+                SetExpanded
+            );
             base.OnInspectorGUI();
         }
     }

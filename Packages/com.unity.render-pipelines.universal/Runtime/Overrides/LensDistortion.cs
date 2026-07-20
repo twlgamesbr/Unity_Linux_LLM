@@ -132,7 +132,9 @@ namespace UnityEngine.Rendering.Universal
         /// <summary>
         /// Controls global screen scaling for the distortion effect. Use this to hide the screen borders when using high \"Intensity.\"
         /// </summary>
-        [Tooltip("Controls global screen scaling for the distortion effect. Use this to hide the screen borders when using high \"Intensity.\"")]
+        [Tooltip(
+            "Controls global screen scaling for the distortion effect. Use this to hide the screen borders when using high \"Intensity.\""
+        )]
         public ClampedFloatParameter scale = new ClampedFloatParameter(1f, 0.01f, 5f);
 
         /// <summary>
@@ -141,8 +143,7 @@ namespace UnityEngine.Rendering.Universal
         /// <returns><c>true</c> if the effect should be rendered, <c>false</c> otherwise.</returns>
         public bool IsActive()
         {
-            return Mathf.Abs(intensity.value) > 0
-                && (xMultiplier.value > 0f || yMultiplier.value > 0f);
+            return Mathf.Abs(intensity.value) > 0 && (xMultiplier.value > 0f || yMultiplier.value > 0f);
         }
 
         /// <summary>

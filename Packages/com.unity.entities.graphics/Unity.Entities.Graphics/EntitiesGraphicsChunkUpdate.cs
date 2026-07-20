@@ -32,7 +32,8 @@ namespace Unity.Rendering
         public uint LastSystemVersion;
 
 #pragma warning disable 649
-        [NativeSetThreadIndex] public int ThreadIndex;
+        [NativeSetThreadIndex]
+        public int ThreadIndex;
 #pragma warning restore 649
 
         public int LocalToWorldType;
@@ -53,24 +54,31 @@ namespace Unity.Rendering
 
             Assert.IsTrue(qw < UnreferencedBatchIndices.Length, "Batch index out of bounds");
 
-            AtomicHelpers.AtomicAnd(
-                (long*)UnreferencedBatchIndices.GetUnsafePtr(),
-                qw,
-                ~mask);
+            AtomicHelpers.AtomicAnd((long*)UnreferencedBatchIndices.GetUnsafePtr(), qw, ~mask);
         }
 
-        public void ProcessChunk(in EntitiesGraphicsChunkInfo chunkInfo, ArchetypeChunk chunk, ChunkWorldRenderBounds chunkBounds)
+        public void ProcessChunk(
+            in EntitiesGraphicsChunkInfo chunkInfo,
+            ArchetypeChunk chunk,
+            ChunkWorldRenderBounds chunkBounds
+        )
         {
 #if DEBUG_LOG_CHUNKS
-            Debug.Log($"HybridChunkUpdater.ProcessChunk(internalBatchIndex: {chunkInfo.BatchIndex}, valid: {chunkInfo.Valid}, count: {chunk.Count}, chunk: {chunk.GetHashCode()})");
+            Debug.Log(
+                $"HybridChunkUpdater.ProcessChunk(internalBatchIndex: {chunkInfo.BatchIndex}, valid: {chunkInfo.Valid}, count: {chunk.Count}, chunk: {chunk.GetHashCode()})"
+            );
 #endif
 
             if (chunkInfo.Valid)
                 ProcessValidChunk(chunkInfo, chunk, chunkBounds.Value, false);
         }
 
-        public unsafe void ProcessValidChunk(in EntitiesGraphicsChunkInfo chunkInfo, ArchetypeChunk chunk,
-            MinMaxAABB chunkAABB, bool isNewChunk)
+        public unsafe void ProcessValidChunk(
+            in EntitiesGraphicsChunkInfo chunkInfo,
+            ArchetypeChunk chunk,
+            MinMaxAABB chunkAABB,
+            bool isNewChunk
+        )
         {
             if (!isNewChunk)
                 MarkBatchAsReferenced(chunkInfo.BatchIndex);
@@ -80,7 +88,7 @@ namespace Unity.Rendering
             var dstOffsetWorldToLocal = -1;
             var dstOffsetPrevWorldToLocal = -1;
 
-            fixed(DynamicComponentTypeHandle* fixedT0 = &ComponentTypes.t0)
+            fixed (DynamicComponentTypeHandle* fixedT0 = &ComponentTypes.t0)
             {
                 for (int i = chunkInfo.ChunkTypesBegin; i < chunkInfo.ChunkTypesEnd; ++i)
                 {
@@ -111,11 +119,15 @@ namespace Unity.Rendering
                     if (copyComponentData)
                     {
 #if DEBUG_LOG_PROPERTY_UPDATES
-                        Debug.Log($"UpdateChunkProperty(internalBatchIndex: {chunkInfo.BatchIndex}, property: {i}, elementSize: {chunkProperty.ValueSizeBytesCPU})");
+                        Debug.Log(
+                            $"UpdateChunkProperty(internalBatchIndex: {chunkInfo.BatchIndex}, property: {i}, elementSize: {chunkProperty.ValueSizeBytesCPU})"
+                        );
 #endif
 
-                        var src = chunk.GetDynamicComponentDataArrayReinterpret<int>(ref type,
-                            chunkProperty.ValueSizeBytesCPU);
+                        var src = chunk.GetDynamicComponentDataArrayReinterpret<int>(
+                            ref type,
+                            chunkProperty.ValueSizeBytesCPU
+                        );
 
 #if PROFILE_BURST_JOB_INTERNALS
                         ProfileAddUpload.Begin();
@@ -137,14 +149,12 @@ namespace Unity.Rendering
                                     : ThreadedSparseUploader.MatrixType.MatrixType4x4,
                                 (chunkProperty.ValueSizeBytesGPU == 4 * 4 * 3)
                                     ? ThreadedSparseUploader.MatrixType.MatrixType3x4
-                                    : ThreadedSparseUploader.MatrixType.MatrixType4x4);
+                                    : ThreadedSparseUploader.MatrixType.MatrixType4x4
+                            );
                         }
                         else
                         {
-                            AddUpload(
-                                srcPtr,
-                                sizeBytes,
-                                dstOffset);
+                            AddUpload(srcPtr, sizeBytes, dstOffset);
                         }
 #if PROFILE_BURST_JOB_INTERNALS
                         ProfileAddUpload.End();
@@ -158,14 +168,14 @@ namespace Unity.Rendering
 
         private unsafe void UpdateAABB(MinMaxAABB chunkAABB)
         {
-            var threadLocalAABB = ((ThreadLocalAABB*) ThreadLocalAABBs.GetUnsafePtr()) + ThreadIndex;
+            var threadLocalAABB = ((ThreadLocalAABB*)ThreadLocalAABBs.GetUnsafePtr()) + ThreadIndex;
             ref var aabb = ref threadLocalAABB->AABB;
             aabb.Encapsulate(chunkAABB);
         }
 
         private unsafe void AddUpload(void* srcPtr, int sizeBytes, int dstOffset)
         {
-            int* numGpuUploadOperations = (int*) NumGpuUploadOperations.GetUnsafePtr();
+            int* numGpuUploadOperations = (int*)NumGpuUploadOperations.GetUnsafePtr();
             int index = System.Threading.Interlocked.Add(ref numGpuUploadOperations[0], 1) - 1;
 
             if (index < GpuUploadOperations.Length)
@@ -191,18 +201,20 @@ namespace Unity.Rendering
             int dstOffset,
             int dstOffsetInverse,
             ThreadedSparseUploader.MatrixType matrixTypeCpu,
-            ThreadedSparseUploader.MatrixType matrixTypeGpu)
+            ThreadedSparseUploader.MatrixType matrixTypeGpu
+        )
         {
-            int* numGpuUploadOperations = (int*) NumGpuUploadOperations.GetUnsafePtr();
+            int* numGpuUploadOperations = (int*)NumGpuUploadOperations.GetUnsafePtr();
             int index = System.Threading.Interlocked.Add(ref numGpuUploadOperations[0], 1) - 1;
 
             if (index < GpuUploadOperations.Length)
             {
                 GpuUploadOperations[index] = new GpuUploadOperation
                 {
-                    Kind = (matrixTypeGpu == ThreadedSparseUploader.MatrixType.MatrixType3x4)
-                        ? GpuUploadOperation.UploadOperationKind.SOAMatrixUpload3x4
-                        : GpuUploadOperation.UploadOperationKind.SOAMatrixUpload4x4,
+                    Kind =
+                        (matrixTypeGpu == ThreadedSparseUploader.MatrixType.MatrixType3x4)
+                            ? GpuUploadOperation.UploadOperationKind.SOAMatrixUpload3x4
+                            : GpuUploadOperation.UploadOperationKind.SOAMatrixUpload4x4,
                     SrcMatrixType = matrixTypeCpu,
                     Src = srcPtr,
                     DstOffset = dstOffset,
@@ -220,15 +232,24 @@ namespace Unity.Rendering
     [BurstCompile]
     internal struct ClassifyNewChunksJob : IJobChunk
     {
-        [ReadOnly] public ComponentTypeHandle<ChunkHeader> ChunkHeader;
-        [ReadOnly] public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
+        [ReadOnly]
+        public ComponentTypeHandle<ChunkHeader> ChunkHeader;
+
+        [ReadOnly]
+        public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
 
         [NativeDisableParallelForRestriction]
         public NativeArray<ArchetypeChunk> NewChunks;
+
         [NativeDisableParallelForRestriction]
         public NativeArray<int> NumNewChunks;
 
-        public void Execute(in ArchetypeChunk metaChunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        public void Execute(
+            in ArchetypeChunk metaChunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMask
+        )
         {
             // This job is not written to support queries with enableable component types.
             Assert.IsFalse(useEnabledMask);
@@ -267,15 +288,32 @@ namespace Unity.Rendering
     internal struct UpdateOldEntitiesGraphicsChunksJob : IJobChunk
     {
         public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
-        [ReadOnly] public ComponentTypeHandle<ChunkWorldRenderBounds> ChunkWorldRenderBounds;
-        [ReadOnly] public ComponentTypeHandle<ChunkHeader> ChunkHeader;
-        [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorld;
-        [ReadOnly] public ComponentTypeHandle<LODRange> LodRange;
-        [ReadOnly] public ComponentTypeHandle<RootLODRange> RootLodRange;
-        [ReadOnly] public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfo;
+
+        [ReadOnly]
+        public ComponentTypeHandle<ChunkWorldRenderBounds> ChunkWorldRenderBounds;
+
+        [ReadOnly]
+        public ComponentTypeHandle<ChunkHeader> ChunkHeader;
+
+        [ReadOnly]
+        public ComponentTypeHandle<LocalToWorld> LocalToWorld;
+
+        [ReadOnly]
+        public ComponentTypeHandle<LODRange> LodRange;
+
+        [ReadOnly]
+        public ComponentTypeHandle<RootLODRange> RootLodRange;
+
+        [ReadOnly]
+        public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfo;
         public EntitiesGraphicsChunkUpdater EntitiesGraphicsChunkUpdater;
 
-        public void Execute(in ArchetypeChunk metaChunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        public void Execute(
+            in ArchetypeChunk metaChunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMask
+        )
         {
             // This job is not written to support queries with enableable component types.
             Assert.IsFalse(useEnabledMask);
@@ -303,13 +341,19 @@ namespace Unity.Rendering
 
                 ChunkWorldRenderBounds chunkBounds = chunkBoundsArray[i];
 
-                bool localToWorldChange = chunkHeader.ArchetypeChunk.DidChange(ref LocalToWorld, EntitiesGraphicsChunkUpdater.LastSystemVersion);
+                bool localToWorldChange = chunkHeader.ArchetypeChunk.DidChange(
+                    ref LocalToWorld,
+                    EntitiesGraphicsChunkUpdater.LastSystemVersion
+                );
 
                 // When LOD ranges change, we must reset the movement grace to avoid using stale data
                 bool lodRangeChange =
-                    chunkHeader.ArchetypeChunk.DidOrderChange(EntitiesGraphicsChunkUpdater.LastSystemVersion) |
-                    chunkHeader.ArchetypeChunk.DidChange(ref LodRange, EntitiesGraphicsChunkUpdater.LastSystemVersion) |
-                    chunkHeader.ArchetypeChunk.DidChange(ref RootLodRange, EntitiesGraphicsChunkUpdater.LastSystemVersion);
+                    chunkHeader.ArchetypeChunk.DidOrderChange(EntitiesGraphicsChunkUpdater.LastSystemVersion)
+                    | chunkHeader.ArchetypeChunk.DidChange(ref LodRange, EntitiesGraphicsChunkUpdater.LastSystemVersion)
+                    | chunkHeader.ArchetypeChunk.DidChange(
+                        ref RootLodRange,
+                        EntitiesGraphicsChunkUpdater.LastSystemVersion
+                    );
 
                 if (lodRangeChange)
                 {
@@ -325,8 +369,11 @@ namespace Unity.Rendering
     [BurstCompile]
     internal struct UpdateNewEntitiesGraphicsChunksJob : IJobParallelFor
     {
-        [ReadOnly] public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
-        [ReadOnly] public ComponentTypeHandle<ChunkWorldRenderBounds> ChunkWorldRenderBounds;
+        [ReadOnly]
+        public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
+
+        [ReadOnly]
+        public ComponentTypeHandle<ChunkWorldRenderBounds> ChunkWorldRenderBounds;
 
         public NativeArray<ArchetypeChunk> NewChunks;
         public EntitiesGraphicsChunkUpdater EntitiesGraphicsChunkUpdater;
@@ -342,5 +389,4 @@ namespace Unity.Rendering
             EntitiesGraphicsChunkUpdater.ProcessValidChunk(chunkInfo, chunk, chunkBounds.Value, true);
         }
     }
-
 }

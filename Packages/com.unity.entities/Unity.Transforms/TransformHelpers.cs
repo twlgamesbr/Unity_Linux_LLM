@@ -157,7 +157,8 @@ namespace Unity.Transforms
         /// <returns>
         /// A vector containing the transformed point.
         /// </returns>
-        public static float3 InverseTransformPoint(in this float4x4 m, in float3 p) => math.mul(math.inverse(m), new float4(p, 1)).xyz;
+        public static float3 InverseTransformPoint(in this float4x4 m, in float3 p) =>
+            math.mul(math.inverse(m), new float4(p, 1)).xyz;
 
         /// <summary>Transforms a 3D direction by the inverse of a 4x4 transformation matrix.</summary>
         /// <remarks>
@@ -168,7 +169,8 @@ namespace Unity.Transforms
         /// <returns>
         /// A vector containing the transformed direction. This vector will not necessarily be unit-length.
         /// </returns>
-        public static float3 InverseTransformDirection(in this float4x4 m, in float3 d) => math.rotate(math.inverse(m), d);
+        public static float3 InverseTransformDirection(in this float4x4 m, in float3 d) =>
+            math.rotate(math.inverse(m), d);
 
         /// <summary>Transforms a 3D rotation by the inverse of a 4x4 transformation matrix.</summary>
         /// <remarks>
@@ -242,10 +244,13 @@ namespace Unity.Transforms
         /// or are missing the required <see cref="LocalTransform"/> component.</exception>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public static unsafe void ComputeWorldTransformMatrix(in Entity entity, out float4x4 outputMatrix,
+        public static unsafe void ComputeWorldTransformMatrix(
+            in Entity entity,
+            out float4x4 outputMatrix,
             ref ComponentLookup<LocalTransform> localTransformLookup,
             ref ComponentLookup<Parent> parentLookup,
-            ref ComponentLookup<PostTransformMatrix> scaleLookup)
+            ref ComponentLookup<PostTransformMatrix> scaleLookup
+        )
         {
             // We expect most hierarchies to be shallow enough to fit in a small fixed list, which avoids the need for
             // a memory allocation. But we fall back on a larger allocation if necessary, for correctness.
@@ -262,7 +267,7 @@ namespace Unity.Transforms
                 if (Hint.Unlikely(fitsInFixedList && entityCount == fixedListCapacity))
                 {
                     fitsInFixedList = false;
-                    entitiesDynamicList = new NativeList<Entity>(2*fixedListCapacity, Allocator.TempJob);
+                    entitiesDynamicList = new NativeList<Entity>(2 * fixedListCapacity, Allocator.TempJob);
                     for (int i = 0; i < entityCount; ++i)
                         entitiesDynamicList.AddNoResize(entities[i]);
                 }
@@ -299,7 +304,8 @@ namespace Unity.Transforms
                         if (Hint.Unlikely((entitiesDynamicList.IsCreated)))
                             entitiesDynamicList.Dispose();
                         throw new InvalidOperationException(
-                            $"Entity {e} does not have the required LocalTransform component");
+                            $"Entity {e} does not have the required LocalTransform component"
+                        );
                     }
                 }
             }
@@ -318,7 +324,8 @@ namespace Unity.Transforms
                         if (Hint.Unlikely((entitiesDynamicList.IsCreated)))
                             entitiesDynamicList.Dispose();
                         throw new InvalidOperationException(
-                            $"Entity {e} does not have the required LocalTransform component");
+                            $"Entity {e} does not have the required LocalTransform component"
+                        );
                     }
                 }
             }

@@ -1,7 +1,7 @@
 using System;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Burst;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Networking.Transport.Utilities;
@@ -97,8 +97,7 @@ namespace Unity.Networking.Transport
 
         private bool ShouldSkipSimulatorInReceive()
         {
-            return Parameters.ReceivePacketLossPercent == 0.0f
-                && Parameters.ReceiveMtu == 0;
+            return Parameters.ReceivePacketLossPercent == 0.0f && Parameters.ReceiveMtu == 0;
         }
 
         private bool ShouldSkipSimulatorInSend()
@@ -158,7 +157,7 @@ namespace Unity.Networking.Transport
 
                 ProcessPackets(ref random);
                 EnqueuePendingPackets();
-                
+
                 RNG.Value = random;
             }
 
@@ -292,19 +291,25 @@ namespace Unity.Networking.Transport
         {
             if (ReceivePacketLossPercent < 0.0f || ReceivePacketLossPercent > 100.0f)
             {
-                Debug.LogError($"{nameof(ReceivePacketLossPercent)} value ({ReceivePacketLossPercent}) must be between 0 and 100.");
+                Debug.LogError(
+                    $"{nameof(ReceivePacketLossPercent)} value ({ReceivePacketLossPercent}) must be between 0 and 100."
+                );
                 return false;
             }
 
             if (SendPacketLossPercent < 0.0f || SendPacketLossPercent > 100.0f)
             {
-                Debug.LogError($"{nameof(SendPacketLossPercent)} value ({SendPacketLossPercent}) must be between 0 and 100.");
+                Debug.LogError(
+                    $"{nameof(SendPacketLossPercent)} value ({SendPacketLossPercent}) must be between 0 and 100."
+                );
                 return false;
             }
 
             if (SendDuplicatePercent < 0.0f || SendDuplicatePercent > 100.0f)
             {
-                Debug.LogError($"{nameof(SendDuplicatePercent)} value ({SendDuplicatePercent}) must be between 0 and 100.");
+                Debug.LogError(
+                    $"{nameof(SendDuplicatePercent)} value ({SendDuplicatePercent}) must be between 0 and 100."
+                );
                 return false;
             }
 
@@ -333,7 +338,8 @@ namespace Unity.Networking.Transport
             uint sendDelayMS = 0,
             uint sendJitterMS = 0,
             float sendDuplicatePercent = 0.0f,
-            int receiveMtu = 0)
+            int receiveMtu = 0
+        )
         {
             var parameters = new NetworkSimulatorParameter
             {
@@ -342,7 +348,7 @@ namespace Unity.Networking.Transport
                 SendDelayMS = sendDelayMS,
                 SendJitterMS = sendJitterMS,
                 SendDuplicatePercent = sendDuplicatePercent,
-                ReceiveMtu = receiveMtu
+                ReceiveMtu = receiveMtu,
             };
 
             settings.AddRawParameterStruct(ref parameters);
@@ -356,12 +362,17 @@ namespace Unity.Networking.Transport
         /// <summary>Modify the parameters of the global network simulator.</summary>
         /// <param name="driver">Driver to modify.</param>
         /// <param name="newParams">New parameters for the simulator.</param>
-        public static void ModifyNetworkSimulatorParameters(this NetworkDriver driver, NetworkSimulatorParameter newParams)
+        public static void ModifyNetworkSimulatorParameters(
+            this NetworkDriver driver,
+            NetworkSimulatorParameter newParams
+        )
         {
             if (!driver.m_NetworkStack.TryGetLayer<SimulatorLayer>(out var layer))
             {
-                Debug.LogError("Network simulator not available. Driver must have been configured with " +
-                                  "NetworkSettings.WithNetworkSimulatorParameters for network simulator to be available.");
+                Debug.LogError(
+                    "Network simulator not available. Driver must have been configured with "
+                        + "NetworkSettings.WithNetworkSimulatorParameters for network simulator to be available."
+                );
             }
             else if (!newParams.Validate())
             {

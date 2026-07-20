@@ -7,6 +7,6 @@ namespace UnityEngine.InputSystem
     {
         Added,
         Removed,
-        Replaced
+        Replaced,
     }
 }

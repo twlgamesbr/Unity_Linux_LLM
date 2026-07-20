@@ -26,11 +26,9 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
         static DisplayElementConfigurationInspector()
         {
-            var fields = typeof(DisplayElementConfiguration)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+            var fields = typeof(DisplayElementConfiguration).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-            string GetFieldName(string propertyName)
-                => fields.First(field => field.Name.Contains(propertyName)).Name;
+            string GetFieldName(string propertyName) => fields.First(field => field.Name.Contains(propertyName)).Name;
 
             k_TypeFieldName = GetFieldName(nameof(DisplayElementConfiguration.Type));
             k_LabelFieldName = GetFieldName(nameof(DisplayElementConfiguration.Label));
@@ -75,8 +73,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
         void OnTypeChanged(SerializedProperty property)
         {
             var newCount = GetDisplayElementCount(property);
-            if (m_DisplayElementConfigurationCount == 0
-                || newCount < m_DisplayElementConfigurationCount)
+            if (m_DisplayElementConfigurationCount == 0 || newCount < m_DisplayElementConfigurationCount)
             {
                 // Due to how UI Toolkit updates, this event will be propagated after an element was added, removed
                 // or moved in the list view. In the case of added or moved, things will be fine.
@@ -97,9 +94,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
             var counterVisible = type == DisplayElementType.Counter;
 
-            var graphVisible =
-                type == DisplayElementType.LineGraph ||
-                type == DisplayElementType.StackedAreaGraph;
+            var graphVisible = type == DisplayElementType.LineGraph || type == DisplayElementType.StackedAreaGraph;
 
             // Requested by our UX designer (Selena). We want to indicate to users that the Label field
             // is optional for graphs. A default of null will provide the default label for the Label field.
@@ -116,7 +111,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
 
         int GetDisplayElementCount(SerializedProperty property)
         {
-            return (property.serializedObject.targetObject as NetStatsMonitorConfiguration)?.DisplayElements?.Count ?? 0;
+            return (property.serializedObject.targetObject as NetStatsMonitorConfiguration)?.DisplayElements?.Count
+                ?? 0;
         }
     }
 }

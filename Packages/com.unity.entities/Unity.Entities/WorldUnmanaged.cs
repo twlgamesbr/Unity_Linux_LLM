@@ -2,12 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Unity.Burst;
-using static Unity.Burst.BurstRuntime;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Core;
-using Unity.Mathematics;
 using Unity.Jobs.LowLevel.Unsafe;
+using Unity.Mathematics;
+using static Unity.Burst.BurstRuntime;
 
 namespace Unity.Entities
 {
@@ -27,18 +27,25 @@ namespace Unity.Entities
             m_Version = version;
             m_WorldSeqNo = worldSeqNo;
         }
+
         /// <inheritdoc cref="SystemHandle.CompareTo(SystemHandle)"/>
         public int CompareTo(SystemHandleUntyped other) => 0;
+
         /// <inheritdoc cref="SystemHandle.Equals(object)"/>
         public override bool Equals(object obj) => false;
+
         /// <inheritdoc cref="SystemHandle.Equals(SystemHandle)"/>
         public bool Equals(SystemHandleUntyped other) => false;
+
         /// <inheritdoc cref="SystemHandle.GetHashCode"/>
         public override int GetHashCode() => 0;
+
         /// <inheritdoc cref="SystemHandle.operator=="/>
         public static bool operator ==(SystemHandleUntyped lhs, SystemHandleUntyped rhs) => false;
+
         /// <inheritdoc cref="SystemHandle.operator!="/>
         public static bool operator !=(SystemHandleUntyped lhs, SystemHandleUntyped rhs) => false;
+
         /// <inheritdoc cref="SystemHandle.Update(WorldUnmanaged)"/>
         public void Update(WorldUnmanaged world) { }
     }
@@ -126,7 +133,7 @@ namespace Unity.Entities
         /// <param name="lhs">A SystemHandle instance.</param>
         /// <param name="rhs">Another SystemHandle instance.</param>
         /// <returns>True, if both SystemHandles represent the same system instance.</returns>
-        public static bool operator==(SystemHandle lhs, SystemHandle rhs)
+        public static bool operator ==(SystemHandle lhs, SystemHandle rhs)
         {
             return lhs.Equals(rhs);
         }
@@ -137,7 +144,7 @@ namespace Unity.Entities
         /// <param name="lhs">A SystemHandle instance.</param>
         /// <param name="rhs">Another SystemHandle instance.</param>
         /// <returns>True, if the SystemHandles represent different system instances.</returns>
-        public static bool operator!=(SystemHandle lhs, SystemHandle rhs)
+        public static bool operator !=(SystemHandle lhs, SystemHandle rhs)
         {
             return !lhs.Equals(rhs);
         }
@@ -188,7 +195,7 @@ namespace Unity.Entities
         public TimeData CurrentTime;
         public FixedString128Bytes Name;
         public SystemHandle ExecutingSystem;
-        public DoubleRewindableAllocators *DoubleUpdateAllocators;
+        public DoubleRewindableAllocators* DoubleUpdateAllocators;
         internal DoubleRewindableAllocators* GroupUpdateAllocators;
         internal EntityManager m_EntityManager;
 
@@ -209,10 +216,10 @@ namespace Unity.Entities
         private static UnmanagedUpdateSignature s_UnmanagedUpdateFn;
 
         // Initial memory block size in bytes
-        const int InitialUpdateAllocatorBlockSizeInBytes = 128 * 1024;    // 128k
-
+        const int InitialUpdateAllocatorBlockSizeInBytes = 128 * 1024; // 128k
 
         public int Version { get; private set; }
+
         internal void BumpVersion() => Version++;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
@@ -228,7 +235,8 @@ namespace Unity.Entities
             ulong sequenceNumber,
             WorldFlags flags,
             AllocatorHelper<AutoFreeAllocator> worldAllocatorHelper,
-            string worldName)
+            string worldName
+        )
         {
             m_WorldAllocatorHelper = worldAllocatorHelper;
             var allocatorHandle = worldAllocatorHelper.Allocator.Handle;
@@ -248,13 +256,21 @@ namespace Unity.Entities
             ExecutingSystem = default;
 
             if (s_UnmanagedUpdateFn == null)
-                s_UnmanagedUpdateFn = BurstCompiler.CompileFunctionPointer<UnmanagedUpdateSignature>(UnmanagedUpdate).Invoke;
+                s_UnmanagedUpdateFn = BurstCompiler
+                    .CompileFunctionPointer<UnmanagedUpdateSignature>(UnmanagedUpdate)
+                    .Invoke;
 
-            GroupUpdateAllocators = (DoubleRewindableAllocators*)Memory.Unmanaged.Allocate(sizeof(DoubleRewindableAllocators),
-                                                                                                       JobsUtility.CacheLineSize,
-                                                                                                       allocatorHandle);
+            GroupUpdateAllocators = (DoubleRewindableAllocators*)
+                Memory.Unmanaged.Allocate(
+                    sizeof(DoubleRewindableAllocators),
+                    JobsUtility.CacheLineSize,
+                    allocatorHandle
+                );
 
-            GroupUpdateAllocators[0] = new DoubleRewindableAllocators(allocatorHandle, InitialUpdateAllocatorBlockSizeInBytes);
+            GroupUpdateAllocators[0] = new DoubleRewindableAllocators(
+                allocatorHandle,
+                InitialUpdateAllocatorBlockSizeInBytes
+            );
             DoubleUpdateAllocators = GroupUpdateAllocators;
 
             m_SystemStatePtrMap = new NativeParallelHashMap<int, IntPtr>(32, Allocator.Persistent);
@@ -309,8 +325,6 @@ namespace Unity.Entities
             m_SystemStatePtrMap.Dispose();
             sysHandlesInCreationOrder.Dispose();
         }
-
-
 
         private void InvalidateSlot(ushort handle)
         {
@@ -369,14 +383,19 @@ namespace Unity.Entities
             if (_unmanagedSlotByTypeHash.TryGetFirstValue(typeHash, out ushort handle, out _))
             {
                 var block = _stateMemory.GetBlock(handle, out var subIndex);
-                return new SystemHandle(block->States[subIndex].SystemHandle.m_Entity, handle, block->Version[subIndex], (uint)SequenceNumber);
+                return new SystemHandle(
+                    block->States[subIndex].SystemHandle.m_Entity,
+                    handle,
+                    block->Version[subIndex],
+                    (uint)SequenceNumber
+                );
             }
             return SystemHandle.Null;
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleSystem) })]
-        internal SystemHandle GetExistingUnmanagedSystem<T>() where T : unmanaged, ISystem
-            => GetExistingUnmanagedSystem(GetHashCode64<T>());
+        internal SystemHandle GetExistingUnmanagedSystem<T>()
+            where T : unmanaged, ISystem => GetExistingUnmanagedSystem(GetHashCode64<T>());
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleSystem) })]
         internal ref SystemState GetExistingSystemState<T>()
@@ -386,7 +405,9 @@ namespace Unity.Entities
             if (statePtr == null)
             {
                 var name = TypeManager.GetSystemName(TypeManager.GetSystemTypeIndex<T>());
-                throw new InvalidOperationException($"System {name} did not exist when calling GetExistingSystemState<{name}>. Please create it first.");
+                throw new InvalidOperationException(
+                    $"System {name} did not exist when calling GetExistingSystemState<{name}>. Please create it first."
+                );
             }
 #endif
             return ref *statePtr;
@@ -438,7 +459,8 @@ namespace Unity.Entities
                     entities: null,
                     entityCount: 0,
                     data: &sysHandle,
-                    dataLength: sizeof(SystemHandle));
+                    dataLength: sizeof(SystemHandle)
+                );
             }
 #pragma warning restore 0618
 #endif
@@ -461,16 +483,25 @@ namespace Unity.Entities
             FreeSlot(sysHandle.m_Handle);
         }
 
-        private SystemHandle CreateUnmanagedSystemInternal(World self, int structSize, long typeHash, int typeIndex, out void* systemPtr, bool callOnCreate)
+        private SystemHandle CreateUnmanagedSystemInternal(
+            World self,
+            int structSize,
+            long typeHash,
+            int typeIndex,
+            out void* systemPtr,
+            bool callOnCreate
+        )
         {
             var metaIndex = SystemBaseRegistry.GetSystemTypeMetaIndex(typeHash);
             if (metaIndex == -1)
-                throw new ArgumentException($"Type {TypeManager.GetSystemName(typeIndex)} couldn't be found in the SystemRegistry. (This is likely a bug in an ILPostprocessor.)");
+                throw new ArgumentException(
+                    $"Type {TypeManager.GetSystemName(typeIndex)} couldn't be found in the SystemRegistry. (This is likely a bug in an ILPostprocessor.)"
+                );
 
             var statePtr = _stateMemory.Alloc(out var handle, out var version, typeHash);
             var systemEntity = CreateSystemEntity(self, typeIndex, statePtr);
 
-            var systemHandle = new SystemHandle(systemEntity, handle, version, (uint) SequenceNumber);
+            var systemHandle = new SystemHandle(systemEntity, handle, version, (uint)SequenceNumber);
 
             systemPtr = Memory.Unmanaged.Allocate(structSize, 16, Allocator.Persistent);
             UnsafeUtility.MemClear(systemPtr, structSize);
@@ -492,7 +523,8 @@ namespace Unity.Entities
                     entities: null,
                     entityCount: 0,
                     data: &systemHandle,
-                    dataLength: sizeof(SystemHandle));
+                    dataLength: sizeof(SystemHandle)
+                );
             }
 #pragma warning restore 0618
 #endif
@@ -500,18 +532,16 @@ namespace Unity.Entities
             if (callOnCreate)
                 CallSystemOnCreateWithCleanup(statePtr);
 
-            sysHandlesInCreationOrder.Add(new PerWorldSystemInfo
-            {
-                handle = systemHandle,
-                systemTypeIndex = typeIndex
-            });
+            sysHandlesInCreationOrder.Add(
+                new PerWorldSystemInfo { handle = systemHandle, systemTypeIndex = typeIndex }
+            );
 
             return systemHandle;
         }
 
         Entity CreateSystemEntity(World self, int typeIndex, SystemState* statePtr)
         {
-#if UNITY_EDITOR            
+#if UNITY_EDITOR
             var componentTypes = new NativeArray<ComponentType>(2, Allocator.Temp);
             componentTypes[0] = ComponentType.ReadWrite<SystemInstance>();
             componentTypes[1] = ComponentType.ReadWrite<HideInHierarchy>();
@@ -538,10 +568,10 @@ namespace Unity.Entities
             if (!typeof(ComponentSystemGroup).IsAssignableFrom(type))
                 systemEntity = CreateSystemEntity(self, TypeManager.GetSystemTypeIndex(type), statePtr);
 
-            var safeHandle = new SystemHandle(systemEntity, handle, version, (uint) SequenceNumber);
+            var safeHandle = new SystemHandle(systemEntity, handle, version, (uint)SequenceNumber);
             statePtr->InitManaged(self, safeHandle, type, system);
             _unmanagedSlotByTypeHash.Add(typeHash, handle);
-            m_SystemStatePtrMap.Add(statePtr->m_SystemID, (IntPtr) statePtr);
+            m_SystemStatePtrMap.Add(statePtr->m_SystemID, (IntPtr)statePtr);
             ++Version;
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
@@ -555,7 +585,8 @@ namespace Unity.Entities
                     entities: null,
                     entityCount: 0,
                     data: &safeHandle,
-                    dataLength: sizeof(SystemHandle));
+                    dataLength: sizeof(SystemHandle)
+                );
             }
 #pragma warning restore 0618
 #endif
@@ -564,17 +595,26 @@ namespace Unity.Entities
         }
 
         [ExcludeFromBurstCompatTesting("Takes managed World")]
-
-        internal SystemHandle CreateUnmanagedSystem<T>(World self, bool callOnCreate) where T : unmanaged, ISystem
+        internal SystemHandle CreateUnmanagedSystem<T>(World self, bool callOnCreate)
+            where T : unmanaged, ISystem
         {
             int systemTypeIndex = TypeManager.GetSystemTypeIndex<T>();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (!UnsafeUtility.IsUnmanaged<T>())
-                throw new ArgumentException($"The system {TypeManager.GetSystemName(systemTypeIndex)} cannot contain managed fields. If you need have to store managed fields in your system, please use SystemBase instead.");
+                throw new ArgumentException(
+                    $"The system {TypeManager.GetSystemName(systemTypeIndex)} cannot contain managed fields. If you need have to store managed fields in your system, please use SystemBase instead."
+                );
 #endif
 
-            var systemHandle = CreateUnmanagedSystemInternal(self, UnsafeUtility.SizeOf<T>(), GetHashCode64<T>(), systemTypeIndex, out var systemPtr, callOnCreate);
+            var systemHandle = CreateUnmanagedSystemInternal(
+                self,
+                UnsafeUtility.SizeOf<T>(),
+                GetHashCode64<T>(),
+                systemTypeIndex,
+                out var systemPtr,
+                callOnCreate
+            );
 
 #if ENABLE_PROFILER
             EntitiesProfiler.OnSystemCreated(TypeManager.GetSystemTypeIndex<T>(), in systemHandle);
@@ -596,12 +636,21 @@ namespace Unity.Entities
             var systemType = TypeManager.GetSystemType(t);
             if (TypeManager.IsSystemManaged(systemType))
             {
-                throw new ArgumentException($"The system {t} cannot contain managed fields. If you need have to store managed fields in your system, please use SystemBase instead. Reason: {UnsafeUtility.GetReasonForTypeNonBlittable(systemType)}");
+                throw new ArgumentException(
+                    $"The system {t} cannot contain managed fields. If you need have to store managed fields in your system, please use SystemBase instead. Reason: {UnsafeUtility.GetReasonForTypeNonBlittable(systemType)}"
+                );
             }
 
 #endif
 
-            var untypedHandle = CreateUnmanagedSystemInternal(m_EntityManager.World, TypeManager.GetSystemTypeSize(t), typeHash, t, out _, callOnCreate);
+            var untypedHandle = CreateUnmanagedSystemInternal(
+                m_EntityManager.World,
+                TypeManager.GetSystemTypeSize(t),
+                typeHash,
+                t,
+                out _,
+                callOnCreate
+            );
 
 #if ENABLE_PROFILER
             EntitiesProfiler.OnSystemCreated(t, in untypedHandle);
@@ -635,7 +684,9 @@ namespace Unity.Entities
             {
                 state.Restore(ref this, statePtr);
                 var handle = statePtr->m_Handle.m_Handle;
-                var typeHash = TypeManager.GetSystemTypeHash(SystemBaseRegistry.GetStructType(statePtr->UnmanagedMetaIndex));
+                var typeHash = TypeManager.GetSystemTypeHash(
+                    SystemBaseRegistry.GetStructType(statePtr->UnmanagedMetaIndex)
+                );
                 _unmanagedSlotByTypeHash.Remove(typeHash, handle);
                 for (int i = 0; i < sysHandlesInCreationOrder.Length; i++)
                 {
@@ -651,7 +702,8 @@ namespace Unity.Entities
         }
 
         [ExcludeFromBurstCompatTesting("Uses managed World")]
-        internal SystemHandle GetOrCreateUnmanagedSystem<T>(bool callOnCreate = true) where T : unmanaged, ISystem
+        internal SystemHandle GetOrCreateUnmanagedSystem<T>(bool callOnCreate = true)
+            where T : unmanaged, ISystem
         {
             if (_unmanagedSlotByTypeHash.ContainsKey(GetHashCode64<T>()))
             {
@@ -678,7 +730,6 @@ namespace Unity.Entities
             }
 
             return GetOrCreateUnmanagedSystem(t, true);
-
         }
 
         [ExcludeFromBurstCompatTesting("Uses managed World")]
@@ -788,7 +839,7 @@ namespace Unity.Entities
                 {
                     int bit = math.tzcnt(allocBits);
 
-                    var systemState = _stateMemory.GetState((ushort) (i * 64 + bit));
+                    var systemState = _stateMemory.GetState((ushort)(i * 64 + bit));
                     if (systemState->m_SystemPtr != null)
                         result[outputIndex++] = systemState->m_Handle;
 
@@ -837,11 +888,12 @@ namespace Unity.Entities
         {
             public SystemHandle OldExecutingSystem;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            public int                 OldIsInForEachDisallowStructuralChange;
+            public int OldIsInForEachDisallowStructuralChange;
 #endif
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            public int                 OldPreviousSystemID;
+            public int OldPreviousSystemID;
 #endif
+
             public PreviousSystemGlobalState(ref WorldUnmanagedImpl world, SystemState* state)
             {
                 OldExecutingSystem = world.ExecutingSystem;
@@ -858,7 +910,9 @@ namespace Unity.Entities
             {
                 world.ExecutingSystem = OldExecutingSystem;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-                state->m_DependencyManager->ForEachStructuralChange.SetIsInForEachDisallowStructuralChangeCounter(OldIsInForEachDisallowStructuralChange);
+                state->m_DependencyManager->ForEachStructuralChange.SetIsInForEachDisallowStructuralChangeCounter(
+                    OldIsInForEachDisallowStructuralChange
+                );
 #endif
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 SystemState.SetCurrentSystemIdForJobDebugger(OldPreviousSystemID);
@@ -870,7 +924,7 @@ namespace Unity.Entities
         [BurstCompile]
         internal static void UnmanagedUpdate(void* pSystemState)
         {
-            SystemState* state = (SystemState*) pSystemState;
+            SystemState* state = (SystemState*)pSystemState;
 
 #if ENABLE_PROFILER
             if (SystemBaseRegistry.IsOnUpdateUsingBurst(state))
@@ -920,7 +974,9 @@ namespace Unity.Entities
         internal void UpdateSystem(SystemHandle sh)
         {
             if (sh == SystemHandle.Null)
-                throw new NullReferenceException("The system couldn't be updated. The SystemHandle is default/null, so was never assigned.");
+                throw new NullReferenceException(
+                    "The system couldn't be updated. The SystemHandle is default/null, so was never assigned."
+                );
 
             SystemState* sys = ResolveSystemStateChecked(sh);
             if (sys == null)
@@ -1027,7 +1083,10 @@ namespace Unity.Entities
         internal void BumpVersion() => GetImpl().BumpVersion();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor)]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS",
+            CompileTarget = GenerateTestsForBurstCompatibilityAttribute.BurstCompatibleCompileTarget.Editor
+        )]
         internal bool AllowGetSystem
         {
             get => GetImpl().AllowGetSystem;
@@ -1060,13 +1119,19 @@ namespace Unity.Entities
             m_Impl = (WorldUnmanagedImpl*)ptr;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             m_Safety = AtomicSafetyHandle.Create();
-            CollectionHelper.SetStaticSafetyId(ref m_Safety, ref s_staticSafetyId.Data, "Unity.Entities.WorldUnmanaged");
+            CollectionHelper.SetStaticSafetyId(
+                ref m_Safety,
+                ref s_staticSafetyId.Data,
+                "Unity.Entities.WorldUnmanaged"
+            );
 #endif
-            UnsafeUtility.AsRef<WorldUnmanagedImpl>(m_Impl) = new WorldUnmanagedImpl(world,
+            UnsafeUtility.AsRef<WorldUnmanagedImpl>(m_Impl) = new WorldUnmanagedImpl(
+                world,
                 NextSequenceNumber.Data++,
                 flags,
                 worldAllocatorHelper,
-                world.Name);
+                world.Name
+            );
 
             /*
              * if we init the entitymanager inside the WorldUnmanagedImpl ctor, m_Impl will not be set, and so when the
@@ -1103,6 +1168,7 @@ namespace Unity.Entities
 #endif
             return ref UnsafeUtility.AsRef<WorldUnmanagedImpl>(m_Impl);
         }
+
         internal WorldUnmanagedImpl* GetImplPtr()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -1132,7 +1198,9 @@ namespace Unity.Entities
         [GenerateTestsForBurstCompatibility]
         internal SystemState* TryGetSystemStateForId(int systemId)
         {
-            return GetImpl().m_SystemStatePtrMap.TryGetValue(systemId, out var systemStatePtr) ? (SystemState*) systemStatePtr : null;
+            return GetImpl().m_SystemStatePtrMap.TryGetValue(systemId, out var systemStatePtr)
+                ? (SystemState*)systemStatePtr
+                : null;
         }
 
         [ExcludeFromBurstCompatTesting("Takes managed system")]
@@ -1140,12 +1208,12 @@ namespace Unity.Entities
             GetImpl().AllocateSystemStateForManagedSystem(self, system);
 
         [ExcludeFromBurstCompatTesting("Takes managed World")]
-        internal SystemHandle CreateUnmanagedSystem<T>(World self, bool callOnCreate) where T : unmanaged, ISystem =>
-            GetImpl().CreateUnmanagedSystem<T>(self, callOnCreate);
+        internal SystemHandle CreateUnmanagedSystem<T>(World self, bool callOnCreate)
+            where T : unmanaged, ISystem => GetImpl().CreateUnmanagedSystem<T>(self, callOnCreate);
 
         [ExcludeFromBurstCompatTesting("Uses managed World under the hood")]
-        internal SystemHandle GetOrCreateUnmanagedSystem<T>() where T : unmanaged, ISystem =>
-            GetImpl().GetOrCreateUnmanagedSystem<T>();
+        internal SystemHandle GetOrCreateUnmanagedSystem<T>()
+            where T : unmanaged, ISystem => GetImpl().GetOrCreateUnmanagedSystem<T>();
 
         [ExcludeFromBurstCompatTesting("Uses managed World under the hood")]
         internal SystemHandle GetOrCreateUnmanagedSystem(SystemTypeIndex unmanagedType) =>
@@ -1160,17 +1228,18 @@ namespace Unity.Entities
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (ExecutingSystem != default)
-                throw new ArgumentException("A system can not be disposed while another system in that world is executing");
+                throw new ArgumentException(
+                    "A system can not be disposed while another system in that world is executing"
+                );
 #endif
             GetImpl().DestroyUnmanagedSystem(sysHandle);
         }
 
-
         [ExcludeFromBurstCompatTesting("accesses managed World")]
-        internal void DestroyManagedSystemState(SystemState* state) =>
-            GetImpl().DestroyManagedSystem(state);
+        internal void DestroyManagedSystemState(SystemState* state) => GetImpl().DestroyManagedSystem(state);
 
         internal SystemState* ResolveSystemStateChecked(SystemHandle id) => GetImpl().ResolveSystemStateChecked(id);
+
         internal SystemState* ResolveSystemState(SystemHandle id) => GetImpl().ResolveSystemState(id);
 
         /// <summary>
@@ -1179,8 +1248,7 @@ namespace Unity.Entities
         /// <param name="id">The system handle</param>
         /// <returns>A reference to the <see cref="SystemState"/> for this system</returns>
         /// <exception cref="InvalidOperationException">Thrown if the system handle is invalid or does not belong to this world.</exception>
-        public ref SystemState ResolveSystemStateRef(SystemHandle id)
-            => ref *(GetImpl().ResolveSystemStateChecked(id));
+        public ref SystemState ResolveSystemStateRef(SystemHandle id) => ref *(GetImpl().ResolveSystemStateChecked(id));
 
         /// <summary>
         /// Resolves the system handle to a reference to its underlying system instantiation.
@@ -1207,7 +1275,8 @@ namespace Unity.Entities
         /// <returns>A reference to the concrete <see cref="ISystem"/> compatible instance for this system</returns>
         /// <exception cref="InvalidOperationException">Thrown if the system handle is invalid or does not belong to this world.</exception>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleSystem) })]
-        public ref T GetUnsafeSystemRef<T>(SystemHandle id) where T : unmanaged, ISystem
+        public ref T GetUnsafeSystemRef<T>(SystemHandle id)
+            where T : unmanaged, ISystem
         {
             ref var systemState = ref ResolveSystemStateRef(id);
             return ref UnsafeUtility.AsRef<T>(systemState.m_SystemPtr);
@@ -1246,9 +1315,9 @@ namespace Unity.Entities
         /// </summary>
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>The existing instance of system type <typeparamref name="T"/> in this World. If no such instance exists, the method returns default.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[]{typeof(BurstCompatibleSystem)})]
-        public SystemHandle GetExistingUnmanagedSystem<T>() where T : unmanaged, ISystem =>
-            GetImpl().GetExistingUnmanagedSystem<T>();
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleSystem) })]
+        public SystemHandle GetExistingUnmanagedSystem<T>()
+            where T : unmanaged, ISystem => GetImpl().GetExistingUnmanagedSystem<T>();
 
         /// <summary>
         /// Return the system state for an existing instance of a system of type <typeparamref name="T"/> in this World.
@@ -1256,9 +1325,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>The system state for the existing instance of system type <typeparamref name="T"/> in this World. If no such instance exists, throws.</returns>
         /// <exception cref="InvalidOperationException">Thrown if no such system of type <typeparamref name="T"/> exists in the World.</exception>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[]{typeof(BurstCompatibleSystem)})]
-        public ref SystemState GetExistingSystemState<T>() =>
-            ref GetImpl().GetExistingSystemState<T>();
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleSystem) })]
+        public ref SystemState GetExistingSystemState<T>() => ref GetImpl().GetExistingSystemState<T>();
 
         /// <summary>
         /// Return an existing instance of a system of type <paramref name="type"/> in this World. Prefer the version
@@ -1267,8 +1335,7 @@ namespace Unity.Entities
         /// <param name="type">The system type</param>
         /// <returns>The existing instance of system type <paramref name="type"/> in this World. If no such instance exists, the method returns SystemHandle.Null.</returns>
         [ExcludeFromBurstCompatTesting("Takes System.Type")]
-        public SystemHandle GetExistingUnmanagedSystem(Type type) =>
-            GetImpl().GetExistingUnmanagedSystem(type);
+        public SystemHandle GetExistingUnmanagedSystem(Type type) => GetImpl().GetExistingUnmanagedSystem(type);
 
         /// <summary>
         /// Return an existing instance of a system of type <paramref name="type"/> in this World. This avoids
@@ -1284,15 +1351,15 @@ namespace Unity.Entities
         /// </summary>
         /// <param name="id">The system handle</param>
         /// <returns>True if the system handle identifies a valid system, false otherwise</returns>
-        public bool IsSystemValid(SystemHandle id) =>
-            GetImpl().IsSystemValid(id);
+        public bool IsSystemValid(SystemHandle id) => GetImpl().IsSystemValid(id);
 
         /// <summary> Obsolete. Use <see cref="WorldUnmanaged.GetUnsafeSystemRef{T}(SystemHandle)"/> instead.</summary>
         /// <param name="systemHandle">The system handle</param>
         /// <typeparam name="T">The unmanaged system</typeparam>
         /// <returns></returns>
         [Obsolete("Use GetUnsafeSystemRef (UnityUpgradable) -> GetUnsafeSystemRef<T>(*)", true)]
-        public ref T ResolveSystem<T>(SystemHandle systemHandle) where T : unmanaged, ISystem
+        public ref T ResolveSystem<T>(SystemHandle systemHandle)
+            where T : unmanaged, ISystem
         {
             var ptr = ResolveSystemState(systemHandle);
             CheckSystemReference(ptr);
@@ -1327,7 +1394,9 @@ namespace Unity.Entities
         }
 
         [ExcludeFromBurstCompatTesting("Accesses managed World under the hood")]
-        unsafe internal NativeArray<SystemHandle> GetOrCreateUnmanagedSystems(NativeList<SystemTypeIndex> unmanagedTypes)
+        internal unsafe NativeArray<SystemHandle> GetOrCreateUnmanagedSystems(
+            NativeList<SystemTypeIndex> unmanagedTypes
+        )
         {
             int count = unmanagedTypes.Length;
             var result = new NativeArray<SystemHandle>(count, Allocator.Temp);
@@ -1354,11 +1423,12 @@ namespace Unity.Entities
             executingSystem = impl.ExecutingSystem;
         }
 #endif
+
         public override bool Equals(object compare)
         {
             return compare is WorldUnmanaged compareWorld && Equals(compareWorld);
         }
-        
+
         public override int GetHashCode()
         {
             unchecked
@@ -1367,8 +1437,8 @@ namespace Unity.Entities
                 hashCode = (hashCode * 397) ^ Version;
                 return hashCode;
             }
-        }        
-        
+        }
+
         public bool Equals(WorldUnmanaged world)
         {
             return world.SequenceNumber == SequenceNumber && world.Version == Version;
@@ -1379,15 +1449,15 @@ namespace Unity.Entities
             var compareVal = SequenceNumber.CompareTo(other.SequenceNumber);
             return compareVal != 0 ? compareVal : Version.CompareTo(other.Version);
         }
-        
-        public static bool operator==(WorldUnmanaged lhs, WorldUnmanaged rhs)
+
+        public static bool operator ==(WorldUnmanaged lhs, WorldUnmanaged rhs)
         {
             return lhs.SequenceNumber == rhs.SequenceNumber && lhs.Version == rhs.Version;
         }
-        
-        public static bool operator!=(WorldUnmanaged lhs, WorldUnmanaged rhs)
+
+        public static bool operator !=(WorldUnmanaged lhs, WorldUnmanaged rhs)
         {
             return !(lhs == rhs);
-        }        
+        }
     }
 }

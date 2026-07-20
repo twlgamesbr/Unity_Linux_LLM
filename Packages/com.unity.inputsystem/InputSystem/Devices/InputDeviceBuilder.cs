@@ -44,8 +44,11 @@ namespace UnityEngine.InputSystem.Layouts
     /// </remarks>
     internal struct InputDeviceBuilder : IDisposable
     {
-        public void Setup(InternedString layout, InternedString variants,
-            InputDeviceDescription deviceDescription = default)
+        public void Setup(
+            InternedString layout,
+            InternedString variants,
+            InputDeviceDescription deviceDescription = default
+        )
         {
             m_LayoutCacheRef = InputControlLayout.CacheRef();
 
@@ -112,7 +115,12 @@ namespace UnityEngine.InputSystem.Layouts
             // Leave the cache in place so we can reuse them in another setup path.
         }
 
-        private InputControl InstantiateLayout(InternedString layout, InternedString variants, InternedString name, InputControl parent)
+        private InputControl InstantiateLayout(
+            InternedString layout,
+            InternedString variants,
+            InternedString name,
+            InputControl parent
+        )
         {
             // Look up layout by name.
             var layoutInstance = FindOrLoadLayout(layout);
@@ -121,8 +129,12 @@ namespace UnityEngine.InputSystem.Layouts
             return InstantiateLayout(layoutInstance, variants, name, parent);
         }
 
-        private InputControl InstantiateLayout(InputControlLayout layout, InternedString variants, InternedString name,
-            InputControl parent)
+        private InputControl InstantiateLayout(
+            InputControlLayout layout,
+            InternedString variants,
+            InternedString name,
+            InputControl parent
+        )
         {
             Debug.Assert(layout.type != null, "Layout has no type set on it");
 
@@ -131,7 +143,8 @@ namespace UnityEngine.InputSystem.Layouts
             if (!(controlObject is InputControl control))
             {
                 throw new InvalidOperationException(
-                    $"Type '{layout.type.Name}' referenced by layout '{layout.name}' is not an InputControl");
+                    $"Type '{layout.type.Name}' referenced by layout '{layout.name}' is not an InputControl"
+                );
             }
 
             // If it's a device, perform some extra work specific to the control
@@ -140,7 +153,8 @@ namespace UnityEngine.InputSystem.Layouts
             {
                 if (parent != null)
                     throw new InvalidOperationException(
-                        $"Cannot instantiate device layout '{layout.name}' as child of '{parent.path}'; devices must be added at root");
+                        $"Cannot instantiate device layout '{layout.name}' as child of '{parent.path}'; devices must be added at root"
+                    );
 
                 m_Device = controlAsDevice;
                 m_Device.m_StateBlock.byteOffset = 0;
@@ -171,7 +185,8 @@ namespace UnityEngine.InputSystem.Layouts
                 // Someone did "new InputDeviceBuilder(...)" with a control layout.
                 // We don't support creating control hierarchies without a device at the root.
                 throw new InvalidOperationException(
-                    $"Toplevel layout used with InputDeviceBuilder must be a device layout; '{layout.name}' is a control layout");
+                    $"Toplevel layout used with InputDeviceBuilder must be a device layout; '{layout.name}' is a control layout"
+                );
             }
 
             // Name defaults to name of layout.
@@ -220,8 +235,7 @@ namespace UnityEngine.InputSystem.Layouts
                 // actually reuse the existing control (and thus control.m_ChildrenReadOnly will
                 // now be blank) but still want crawling down the hierarchy to preserve existing
                 // controls where possible.
-                AddChildControls(layout, variants, control,
-                    ref haveChildrenUsingStateFromOtherControl);
+                AddChildControls(layout, variants, control, ref haveChildrenUsingStateFromOtherControl);
             }
             catch
             {
@@ -251,8 +265,12 @@ namespace UnityEngine.InputSystem.Layouts
 
         private const uint kSizeForControlUsingStateFromOtherControl = InputStateBlock.InvalidOffset;
 
-        private void AddChildControls(InputControlLayout layout, InternedString variants, InputControl parent,
-            ref bool haveChildrenUsingStateFromOtherControls)
+        private void AddChildControls(
+            InputControlLayout layout,
+            InternedString variants,
+            InputControl parent,
+            ref bool haveChildrenUsingStateFromOtherControls
+        )
         {
             var controlLayouts = layout.m_Controls;
             if (controlLayouts == null)
@@ -264,9 +282,14 @@ namespace UnityEngine.InputSystem.Layouts
             for (var i = 0; i < controlLayouts.Length; ++i)
             {
                 // Skip if variants don't match.
-                if (!controlLayouts[i].variants.IsEmpty() &&
-                    !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(controlLayouts[i].variants,
-                        variants, InputControlLayout.VariantSeparator[0]))
+                if (
+                    !controlLayouts[i].variants.IsEmpty()
+                    && !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                        controlLayouts[i].variants,
+                        variants,
+                        InputControlLayout.VariantSeparator[0]
+                    )
+                )
                     continue;
 
                 ////REVIEW: I'm not sure this is good enough. ATM if you have a control layout with
@@ -280,7 +303,8 @@ namespace UnityEngine.InputSystem.Layouts
                 {
                     if (controlLayouts[i].isArray)
                         throw new NotSupportedException(
-                            $"Control '{controlLayouts[i].name}' in layout '{layout.name}' is modifying the child of another control but is marked as an array");
+                            $"Control '{controlLayouts[i].name}' in layout '{layout.name}' is modifying the child of another control but is marked as an array"
+                        );
 
                     haveControlLayoutWithPath = true;
                     InsertChildControlOverride(parent, ref controlLayouts[i]);
@@ -320,9 +344,14 @@ namespace UnityEngine.InputSystem.Layouts
 
                 // If the control is part of a variant, skip it if it isn't in the variants we're
                 // looking for.
-                if (!controlLayout.variants.IsEmpty() &&
-                    !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(controlLayout.variants,
-                        variants, InputControlLayout.VariantSeparator[0]))
+                if (
+                    !controlLayout.variants.IsEmpty()
+                    && !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                        controlLayout.variants,
+                        variants,
+                        InputControlLayout.VariantSeparator[0]
+                    )
+                )
                     continue;
 
                 // If it's an array, add a control for each array element.
@@ -331,8 +360,15 @@ namespace UnityEngine.InputSystem.Layouts
                     for (var n = 0; n < controlLayout.arraySize; ++n)
                     {
                         var name = controlLayout.name + n;
-                        var control = AddChildControl(layout, variants, parent, ref haveChildrenUsingStateFromOtherControls,
-                            controlLayout, childIndex, nameOverride: name);
+                        var control = AddChildControl(
+                            layout,
+                            variants,
+                            parent,
+                            ref haveChildrenUsingStateFromOtherControls,
+                            controlLayout,
+                            childIndex,
+                            nameOverride: name
+                        );
                         ++childIndex;
 
                         // Adjust offset, if the control uses explicit offsets.
@@ -342,8 +378,14 @@ namespace UnityEngine.InputSystem.Layouts
                 }
                 else
                 {
-                    AddChildControl(layout, variants, parent, ref haveChildrenUsingStateFromOtherControls,
-                        controlLayout, childIndex);
+                    AddChildControl(
+                        layout,
+                        variants,
+                        parent,
+                        ref haveChildrenUsingStateFromOtherControls,
+                        controlLayout,
+                        childIndex
+                    );
                     ++childIndex;
                 }
             }
@@ -367,27 +409,44 @@ namespace UnityEngine.InputSystem.Layouts
 
                     // If the control is part of a variants, skip it if it isn't the variants we're
                     // looking for.
-                    if (!controlLayout.variants.IsEmpty() &&
-                        !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(controlLayouts[i].variants,
-                            variants, InputControlLayout.VariantSeparator[0]))
+                    if (
+                        !controlLayout.variants.IsEmpty()
+                        && !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                            controlLayouts[i].variants,
+                            variants,
+                            InputControlLayout.VariantSeparator[0]
+                        )
+                    )
                         continue;
 
-                    AddChildControlIfMissing(layout, variants, parent, ref haveChildrenUsingStateFromOtherControls,
-                        ref controlLayout);
+                    AddChildControlIfMissing(
+                        layout,
+                        variants,
+                        parent,
+                        ref haveChildrenUsingStateFromOtherControls,
+                        ref controlLayout
+                    );
                 }
             }
         }
 
-        private InputControl AddChildControl(InputControlLayout layout, InternedString variants, InputControl parent,
+        private InputControl AddChildControl(
+            InputControlLayout layout,
+            InternedString variants,
+            InputControl parent,
             ref bool haveChildrenUsingStateFromOtherControls,
             InputControlLayout.ControlItem controlItem,
-            int childIndex, string nameOverride = null)
+            int childIndex,
+            string nameOverride = null
+        )
         {
             var name = nameOverride != null ? new InternedString(nameOverride) : controlItem.name;
 
             ////REVIEW: can we check this in InputControlLayout instead?
             if (string.IsNullOrEmpty(controlItem.layout))
-                throw new InvalidOperationException($"Layout has not been set on control '{controlItem.name}' in '{layout.name}'");
+                throw new InvalidOperationException(
+                    $"Layout has not been set on control '{controlItem.name}' in '{layout.name}'"
+                );
 
             // See if there is an override for the control.
             if (m_ChildControlOverrides != null)
@@ -411,7 +470,8 @@ namespace UnityEngine.InputSystem.Layouts
                 // Throw better exception that gives more info.
                 throw new InputControlLayout.LayoutNotFoundException(
                     $"Cannot find layout '{exception.layout}' used in control '{name}' of layout '{layout.name}'",
-                    exception);
+                    exception
+                );
             }
 
             // Add to array.
@@ -473,8 +533,7 @@ namespace UnityEngine.InputSystem.Layouts
             if (usages.Count > 0)
             {
                 var usageCount = usages.Count;
-                var usageIndex =
-                    ArrayHelpers.AppendToImmutable(ref m_Device.m_UsagesForEachControl, usages.m_Array);
+                var usageIndex = ArrayHelpers.AppendToImmutable(ref m_Device.m_UsagesForEachControl, usages.m_Array);
                 control.m_UsageStartIndex = usageIndex;
                 control.m_UsageCount = usageCount;
 
@@ -487,8 +546,10 @@ namespace UnityEngine.InputSystem.Layouts
             if (controlItem.aliases.Count > 0)
             {
                 var aliasCount = controlItem.aliases.Count;
-                var aliasIndex =
-                    ArrayHelpers.AppendToImmutable(ref m_Device.m_AliasesForEachControl, controlItem.aliases.m_Array);
+                var aliasIndex = ArrayHelpers.AppendToImmutable(
+                    ref m_Device.m_AliasesForEachControl,
+                    controlItem.aliases.m_Array
+                );
                 control.m_AliasStartIndex = aliasIndex;
                 control.m_AliasCount = aliasCount;
             }
@@ -533,9 +594,13 @@ namespace UnityEngine.InputSystem.Layouts
             return pathLowerCase;
         }
 
-        private void AddChildControlIfMissing(InputControlLayout layout, InternedString variants, InputControl parent,
+        private void AddChildControlIfMissing(
+            InputControlLayout layout,
+            InternedString variants,
+            InputControl parent,
             ref bool haveChildrenUsingStateFromOtherControls,
-            ref InputControlLayout.ControlItem controlItem)
+            ref InputControlLayout.ControlItem controlItem
+        )
         {
             ////TODO: support arrays (we may modify an entire array in bulk)
 
@@ -550,17 +615,26 @@ namespace UnityEngine.InputSystem.Layouts
 
             ////TODO: this path does not support recovering existing controls? does it matter?
 
-            child = InsertChildControl(layout, variants, parent,
-                ref haveChildrenUsingStateFromOtherControls, ref controlItem);
+            child = InsertChildControl(
+                layout,
+                variants,
+                parent,
+                ref haveChildrenUsingStateFromOtherControls,
+                ref controlItem
+            );
 
             // Apply layout change.
             if (!ReferenceEquals(child.parent, parent))
                 ComputeStateLayout(child.parent);
         }
 
-        private InputControl InsertChildControl(InputControlLayout layout, InternedString variant, InputControl parent,
+        private InputControl InsertChildControl(
+            InputControlLayout layout,
+            InternedString variant,
+            InputControl parent,
             ref bool haveChildrenUsingStateFromOtherControls,
-            ref InputControlLayout.ControlItem controlItem)
+            ref InputControlLayout.ControlItem controlItem
+        )
         {
             var path = controlItem.name.ToString();
 
@@ -573,12 +647,14 @@ namespace UnityEngine.InputSystem.Layouts
             var immediateParent = InputControlPath.TryFindChild(parent, immediateParentPath);
             if (immediateParent == null)
                 throw new InvalidOperationException(
-                    $"Cannot find parent '{immediateParentPath}' of control '{controlItem.name}' in layout '{layout.name}'");
+                    $"Cannot find parent '{immediateParentPath}' of control '{controlItem.name}' in layout '{layout.name}'"
+                );
 
             var controlName = path.Substring(indexOfSlash + 1);
             if (controlName.Length == 0)
                 throw new InvalidOperationException(
-                    $"Path cannot end in '/' (control '{controlItem.name}' in layout '{layout.name}')");
+                    $"Path cannot end in '/' (control '{controlItem.name}' in layout '{layout.name}')"
+                );
 
             // Make room in the device's child array.
             var childStartIndex = immediateParent.m_ChildStartIndex;
@@ -596,13 +672,24 @@ namespace UnityEngine.InputSystem.Layouts
             // Insert the child.
             // NOTE: This may *add several* controls depending on the layout of the control we are inserting.
             //       The children will be appended to the child array.
-            var control = AddChildControl(layout, variant, immediateParent,
-                ref haveChildrenUsingStateFromOtherControls, controlItem, childIndex, controlName);
+            var control = AddChildControl(
+                layout,
+                variant,
+                immediateParent,
+                ref haveChildrenUsingStateFromOtherControls,
+                controlItem,
+                childIndex,
+                controlName
+            );
 
             return control;
         }
 
-        private static void ApplyUseStateFrom(InputControl parent, ref InputControlLayout.ControlItem controlItem, InputControlLayout layout)
+        private static void ApplyUseStateFrom(
+            InputControl parent,
+            ref InputControlLayout.ControlItem controlItem,
+            InputControlLayout layout
+        )
         {
             var child = InputControlPath.TryFindChild(parent, controlItem.name);
             Debug.Assert(child != null, "Could not find child control which should be present at this point");
@@ -611,7 +698,8 @@ namespace UnityEngine.InputSystem.Layouts
             var referencedControl = InputControlPath.TryFindChild(parent, controlItem.useStateFrom);
             if (referencedControl == null)
                 throw new InvalidOperationException(
-                    $"Cannot find control '{controlItem.useStateFrom}' referenced in 'useStateFrom' of control '{controlItem.name}' in layout '{layout.name}'");
+                    $"Cannot find control '{controlItem.useStateFrom}' referenced in 'useStateFrom' of control '{controlItem.name}' in layout '{layout.name}'"
+                );
 
             // Copy its state settings.
             child.m_StateBlock = referencedControl.m_StateBlock;
@@ -622,11 +710,19 @@ namespace UnityEngine.InputSystem.Layouts
             // walk up the referenced control's parent chain and add offsets until
             // we are at the same level that we are at.
             if (child.parent != referencedControl.parent)
-                for (var parentInChain = referencedControl.parent; parentInChain != parent; parentInChain = parentInChain.parent)
+                for (
+                    var parentInChain = referencedControl.parent;
+                    parentInChain != parent;
+                    parentInChain = parentInChain.parent
+                )
                     child.m_StateBlock.byteOffset += parentInChain.m_StateBlock.byteOffset;
         }
 
-        private static void ShiftChildIndicesInHierarchyOneUp(InputDevice device, int startIndex, InputControl exceptControl)
+        private static void ShiftChildIndicesInHierarchyOneUp(
+            InputDevice device,
+            int startIndex,
+            InputControl exceptControl
+        )
         {
             var controls = device.m_ChildrenForEachControl;
             var count = controls.Length;
@@ -640,7 +736,12 @@ namespace UnityEngine.InputSystem.Layouts
 
         // NOTE: We can only do this once we've initialized the names on the parent control. I.e. it has to be
         //       done in the second pass we do over the control hierarchy.
-        private void SetDisplayName(InputControl control, string longDisplayNameFromLayout, string shortDisplayNameFromLayout, bool shortName)
+        private void SetDisplayName(
+            InputControl control,
+            string longDisplayNameFromLayout,
+            string shortDisplayNameFromLayout,
+            bool shortName
+        )
         {
             var displayNameFromLayout = shortName ? shortDisplayNameFromLayout : longDisplayNameFromLayout;
 
@@ -698,8 +799,11 @@ namespace UnityEngine.InputSystem.Layouts
                 control.m_DisplayNameFromLayout = displayNameFromLayout;
         }
 
-        private static void AddParentDisplayNameRecursive(InputControl control, StringBuilder stringBuilder,
-            bool shortName)
+        private static void AddParentDisplayNameRecursive(
+            InputControl control,
+            StringBuilder stringBuilder,
+            bool shortName
+        )
         {
             if (control.parent != null && control.parent != control.device)
                 AddParentDisplayNameRecursive(control.parent, stringBuilder, shortName);
@@ -719,7 +823,11 @@ namespace UnityEngine.InputSystem.Layouts
             stringBuilder.Append(' ');
         }
 
-        private static void AddProcessors(InputControl control, ref InputControlLayout.ControlItem controlItem, string layoutName)
+        private static void AddProcessors(
+            InputControl control,
+            ref InputControlLayout.ControlItem controlItem,
+            string layoutName
+        )
         {
             var processorCount = controlItem.processors.Count;
             for (var n = 0; n < processorCount; ++n)
@@ -728,7 +836,8 @@ namespace UnityEngine.InputSystem.Layouts
                 var type = InputProcessor.s_Processors.LookupTypeRegistration(name);
                 if (type == null)
                     throw new InvalidOperationException(
-                        $"Cannot find processor '{name}' referenced by control '{controlItem.name}' in layout '{layoutName}'");
+                        $"Cannot find processor '{name}' referenced by control '{controlItem.name}' in layout '{layoutName}'"
+                    );
 
                 var processor = Activator.CreateInstance(type);
 
@@ -775,7 +884,8 @@ namespace UnityEngine.InputSystem.Layouts
             if (control.m_StateBlock.sizeInBits == 0 && children.Count == 0)
             {
                 throw new InvalidOperationException(
-                    $"Control '{control.path}' with layout '{control.layout}' has no size set and has no children to compute size from");
+                    $"Control '{control.path}' with layout '{control.layout}' has no size set and has no children to compute size from"
+                );
             }
 
             // If there's no children, our job is done.
@@ -796,12 +906,13 @@ namespace UnityEngine.InputSystem.Layouts
                 // Make sure the child has a valid size set on it.
                 var childSizeInBits = child.m_StateBlock.sizeInBits;
                 if (childSizeInBits == 0 || childSizeInBits == InputStateBlock.InvalidOffset)
-                    throw new InvalidOperationException(
-                        $"Child '{child.name}' of '{control.name}' has no size set!");
+                    throw new InvalidOperationException($"Child '{child.name}' of '{control.name}' has no size set!");
 
                 // Skip children that don't have fixed offsets.
-                if (child.m_StateBlock.byteOffset == InputStateBlock.InvalidOffset ||
-                    child.m_StateBlock.byteOffset == InputStateBlock.AutomaticOffset)
+                if (
+                    child.m_StateBlock.byteOffset == InputStateBlock.InvalidOffset
+                    || child.m_StateBlock.byteOffset == InputStateBlock.AutomaticOffset
+                )
                     continue;
 
                 // At this point, if the child has no valid bit offset, put it at #0 now.
@@ -809,8 +920,10 @@ namespace UnityEngine.InputSystem.Layouts
                     child.m_StateBlock.bitOffset = 0;
 
                 // See if the control bumps our fixed layout size.
-                var endOffset =
-                    MemoryHelpers.ComputeFollowingByteOffset(child.m_StateBlock.byteOffset, child.m_StateBlock.bitOffset + childSizeInBits);
+                var endOffset = MemoryHelpers.ComputeFollowingByteOffset(
+                    child.m_StateBlock.byteOffset,
+                    child.m_StateBlock.bitOffset + childSizeInBits
+                );
                 if (endOffset > firstUnfixedByteOffset)
                     firstUnfixedByteOffset = endOffset;
             }
@@ -828,8 +941,10 @@ namespace UnityEngine.InputSystem.Layouts
             foreach (var child in children)
             {
                 // Skip children with fixed offsets.
-                if (child.m_StateBlock.byteOffset != InputStateBlock.InvalidOffset &&
-                    child.m_StateBlock.byteOffset != InputStateBlock.AutomaticOffset)
+                if (
+                    child.m_StateBlock.byteOffset != InputStateBlock.InvalidOffset
+                    && child.m_StateBlock.byteOffset != InputStateBlock.AutomaticOffset
+                )
                     continue;
 
                 // Skip children using state from other controls.
@@ -845,8 +960,10 @@ namespace UnityEngine.InputSystem.Layouts
                         firstBitAddressingChild = child;
 
                     // Keep a running count of the size of the bitfield.
-                    if (child.m_StateBlock.bitOffset == InputStateBlock.InvalidOffset ||
-                        child.m_StateBlock.bitOffset == InputStateBlock.AutomaticOffset)
+                    if (
+                        child.m_StateBlock.bitOffset == InputStateBlock.InvalidOffset
+                        || child.m_StateBlock.bitOffset == InputStateBlock.AutomaticOffset
+                    )
                     {
                         // Put child at current bit offset.
                         child.m_StateBlock.bitOffset = bitfieldSizeInBits;
@@ -867,7 +984,10 @@ namespace UnityEngine.InputSystem.Layouts
                     // Terminate bitfield group (if there was one).
                     if (firstBitAddressingChild != null)
                     {
-                        runningByteOffset = MemoryHelpers.ComputeFollowingByteOffset(runningByteOffset, bitfieldSizeInBits);
+                        runningByteOffset = MemoryHelpers.ComputeFollowingByteOffset(
+                            runningByteOffset,
+                            bitfieldSizeInBits
+                        );
                         firstBitAddressingChild = null;
                     }
 
@@ -876,15 +996,20 @@ namespace UnityEngine.InputSystem.Layouts
 
                     // Conform to memory addressing constraints of CPU architecture. If we don't do
                     // this, ARMs will end up choking on misaligned memory accesses.
-                    runningByteOffset = MemoryHelpers.AlignNatural(runningByteOffset, child.m_StateBlock.alignedSizeInBytes);
+                    runningByteOffset = MemoryHelpers.AlignNatural(
+                        runningByteOffset,
+                        child.m_StateBlock.alignedSizeInBytes
+                    );
                 }
 
                 ////FIXME: seems like this should take bitOffset into account
                 child.m_StateBlock.byteOffset = runningByteOffset;
 
                 if (!isBitAddressingChild)
-                    runningByteOffset =
-                        MemoryHelpers.ComputeFollowingByteOffset(runningByteOffset, child.m_StateBlock.sizeInBits);
+                    runningByteOffset = MemoryHelpers.ComputeFollowingByteOffset(
+                        runningByteOffset,
+                        child.m_StateBlock.sizeInBits
+                    );
             }
 
             // Compute total size.
@@ -903,7 +1028,9 @@ namespace UnityEngine.InputSystem.Layouts
                 m_StateOffsetToControlMap = new List<uint>();
 
             if (m_Device.allControls.Count > (1U << InputDevice.kControlIndexBits))
-                throw new NotSupportedException($"Device '{m_Device}' exceeds maximum supported control count of {1U << InputDevice.kControlIndexBits} (has {m_Device.allControls.Count} controls)");
+                throw new NotSupportedException(
+                    $"Device '{m_Device}' exceeds maximum supported control count of {1U << InputDevice.kControlIndexBits} (has {m_Device.allControls.Count} controls)"
+                );
 
             var rootNode = new InputDevice.ControlBitRangeNode((ushort)(m_Device.m_StateBlock.sizeInBits - 1));
             m_Device.m_ControlTreeNodes = new InputDevice.ControlBitRangeNode[1];
@@ -911,28 +1038,56 @@ namespace UnityEngine.InputSystem.Layouts
 
             var controlIndiciesNextFreeIndex = 0;
             // Device is not in m_ChildrenForEachControl so use index -1.
-            FinalizeControlHierarchyRecursive(m_Device, -1, m_Device.m_ChildrenForEachControl, false, false, ref controlIndiciesNextFreeIndex);
+            FinalizeControlHierarchyRecursive(
+                m_Device,
+                -1,
+                m_Device.m_ChildrenForEachControl,
+                false,
+                false,
+                ref controlIndiciesNextFreeIndex
+            );
         }
 
-        private void FinalizeControlHierarchyRecursive(InputControl control, int controlIndex, InputControl[] allControls, bool noisy, bool dontReset, ref int controlIndiciesNextFreeIndex)
+        private void FinalizeControlHierarchyRecursive(
+            InputControl control,
+            int controlIndex,
+            InputControl[] allControls,
+            bool noisy,
+            bool dontReset,
+            ref int controlIndiciesNextFreeIndex
+        )
         {
             // Make sure we're staying within limits on state offsets and sizes.
             if (control.m_ChildCount == 0)
             {
                 if (control.m_StateBlock.effectiveBitOffset >= (1U << InputDevice.kStateOffsetBits))
-                    throw new NotSupportedException($"Control '{control}' exceeds maximum supported state bit offset of {(1U << InputDevice.kStateOffsetBits) - 1} (bit offset {control.stateBlock.effectiveBitOffset})");
+                    throw new NotSupportedException(
+                        $"Control '{control}' exceeds maximum supported state bit offset of {(1U << InputDevice.kStateOffsetBits) - 1} (bit offset {control.stateBlock.effectiveBitOffset})"
+                    );
                 if (control.m_StateBlock.sizeInBits >= (1U << InputDevice.kStateSizeBits))
-                    throw new NotSupportedException($"Control '{control}' exceeds maximum supported state bit size of {(1U << InputDevice.kStateSizeBits) - 1} (bit offset {control.stateBlock.sizeInBits})");
+                    throw new NotSupportedException(
+                        $"Control '{control}' exceeds maximum supported state bit size of {(1U << InputDevice.kStateSizeBits) - 1} (bit offset {control.stateBlock.sizeInBits})"
+                    );
             }
 
             // Construct control bit range tree
             if (control != m_Device)
-                InsertControlBitRangeNode(ref m_Device.m_ControlTreeNodes[0], control, ref controlIndiciesNextFreeIndex, 0);
+                InsertControlBitRangeNode(
+                    ref m_Device.m_ControlTreeNodes[0],
+                    control,
+                    ref controlIndiciesNextFreeIndex,
+                    0
+                );
 
             // Add all leaf controls to state offset mapping.
             if (control.m_ChildCount == 0)
                 m_StateOffsetToControlMap.Add(
-                    InputDevice.EncodeStateOffsetToControlMapEntry((uint)controlIndex, control.m_StateBlock.effectiveBitOffset, control.m_StateBlock.sizeInBits));
+                    InputDevice.EncodeStateOffsetToControlMapEntry(
+                        (uint)controlIndex,
+                        control.m_StateBlock.effectiveBitOffset,
+                        control.m_StateBlock.sizeInBits
+                    )
+                );
 
             // Set final display names. This may overwrite the ones supplied by the layout so temporarily
             // store the values here.
@@ -964,13 +1119,25 @@ namespace UnityEngine.InputSystem.Layouts
                 var child = allControls[childIndex];
                 child.m_StateBlock.byteOffset += ourOffset;
 
-                FinalizeControlHierarchyRecursive(child, childIndex, allControls, noisy, dontReset, ref controlIndiciesNextFreeIndex);
+                FinalizeControlHierarchyRecursive(
+                    child,
+                    childIndex,
+                    allControls,
+                    noisy,
+                    dontReset,
+                    ref controlIndiciesNextFreeIndex
+                );
             }
 
             control.isSetupFinished = true;
         }
 
-        private void InsertControlBitRangeNode(ref InputDevice.ControlBitRangeNode parent, InputControl control, ref int controlIndiciesNextFreeIndex, ushort startOffset)
+        private void InsertControlBitRangeNode(
+            ref InputDevice.ControlBitRangeNode parent,
+            InputControl control,
+            ref int controlIndiciesNextFreeIndex,
+            ushort startOffset
+        )
         {
             InputDevice.ControlBitRangeNode leftNode;
             InputDevice.ControlBitRangeNode rightNode;
@@ -989,10 +1156,11 @@ namespace UnityEngine.InputSystem.Layouts
                 rightNode = m_Device.m_ControlTreeNodes[parent.leftChildIndex + 1];
             }
 
-
             // if the control starts in the left node and ends in the right, add a pointer to both nodes and return
-            if (control.m_StateBlock.effectiveBitOffset < leftNode.endBitOffset &&
-                control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits > leftNode.endBitOffset)
+            if (
+                control.m_StateBlock.effectiveBitOffset < leftNode.endBitOffset
+                && control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits > leftNode.endBitOffset
+            )
             {
                 AddControlToNode(control, ref controlIndiciesNextFreeIndex, parent.leftChildIndex);
                 AddControlToNode(control, ref controlIndiciesNextFreeIndex, parent.leftChildIndex + 1);
@@ -1000,15 +1168,19 @@ namespace UnityEngine.InputSystem.Layouts
             }
 
             // if it exactly fits one of the nodes, add a pointer to just that node and return
-            if (control.m_StateBlock.effectiveBitOffset == startOffset &&
-                control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits == leftNode.endBitOffset)
+            if (
+                control.m_StateBlock.effectiveBitOffset == startOffset
+                && control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits == leftNode.endBitOffset
+            )
             {
                 AddControlToNode(control, ref controlIndiciesNextFreeIndex, parent.leftChildIndex);
                 return;
             }
 
-            if (control.m_StateBlock.effectiveBitOffset == leftNode.endBitOffset &&
-                control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits == rightNode.endBitOffset)
+            if (
+                control.m_StateBlock.effectiveBitOffset == leftNode.endBitOffset
+                && control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits == rightNode.endBitOffset
+            )
             {
                 AddControlToNode(control, ref controlIndiciesNextFreeIndex, parent.leftChildIndex + 1);
                 return;
@@ -1016,11 +1188,19 @@ namespace UnityEngine.InputSystem.Layouts
 
             // otherwise, if the node ends in the left node, recurse left
             if (control.m_StateBlock.effectiveBitOffset < leftNode.endBitOffset)
-                InsertControlBitRangeNode(ref m_Device.m_ControlTreeNodes[parent.leftChildIndex], control,
-                    ref controlIndiciesNextFreeIndex, startOffset);
+                InsertControlBitRangeNode(
+                    ref m_Device.m_ControlTreeNodes[parent.leftChildIndex],
+                    control,
+                    ref controlIndiciesNextFreeIndex,
+                    startOffset
+                );
             else
-                InsertControlBitRangeNode(ref m_Device.m_ControlTreeNodes[parent.leftChildIndex + 1], control,
-                    ref controlIndiciesNextFreeIndex, leftNode.endBitOffset);
+                InsertControlBitRangeNode(
+                    ref m_Device.m_ControlTreeNodes[parent.leftChildIndex + 1],
+                    control,
+                    ref controlIndiciesNextFreeIndex,
+                    leftNode.endBitOffset
+                );
         }
 
         private ushort GetBestMidPoint(InputDevice.ControlBitRangeNode parent, ushort startOffset)
@@ -1037,8 +1217,10 @@ namespace UnityEngine.InputSystem.Layouts
 
                 // don't consider controls that end before the start of the parent range, or start after
                 // the end of the parent range
-                if (stateBlock.effectiveBitOffset + stateBlock.sizeInBits - 1 < startOffset ||
-                    stateBlock.effectiveBitOffset >= parent.endBitOffset)
+                if (
+                    stateBlock.effectiveBitOffset + stateBlock.sizeInBits - 1 < startOffset
+                    || stateBlock.effectiveBitOffset >= parent.endBitOffset
+                )
                     continue;
 
                 // don't consider controls that are larger than the parent range
@@ -1046,61 +1228,85 @@ namespace UnityEngine.InputSystem.Layouts
                     continue;
 
                 // don't consider controls that start or end on the same boundary as the parent
-                if (stateBlock.effectiveBitOffset == startOffset ||
-                    stateBlock.effectiveBitOffset + stateBlock.sizeInBits == parent.endBitOffset)
+                if (
+                    stateBlock.effectiveBitOffset == startOffset
+                    || stateBlock.effectiveBitOffset + stateBlock.sizeInBits == parent.endBitOffset
+                )
                     continue;
 
-                if (Math.Abs(stateBlock.effectiveBitOffset + stateBlock.sizeInBits - (int)absoluteMidPoint) <
-                    Math.Abs(closestControlEndPointToMidPoint - absoluteMidPoint) &&
-                    stateBlock.effectiveBitOffset + stateBlock.sizeInBits < parent.endBitOffset)
+                if (
+                    Math.Abs(stateBlock.effectiveBitOffset + stateBlock.sizeInBits - (int)absoluteMidPoint)
+                        < Math.Abs(closestControlEndPointToMidPoint - absoluteMidPoint)
+                    && stateBlock.effectiveBitOffset + stateBlock.sizeInBits < parent.endBitOffset
+                )
                 {
                     closestControlEndPointToMidPoint = (ushort)(stateBlock.effectiveBitOffset + stateBlock.sizeInBits);
                 }
 
-                if (Math.Abs(stateBlock.effectiveBitOffset - (int)absoluteMidPoint) <
-                    Math.Abs(closestControlStartPointToMidPoint - absoluteMidPoint) &&
-                    stateBlock.effectiveBitOffset >= startOffset)
+                if (
+                    Math.Abs(stateBlock.effectiveBitOffset - (int)absoluteMidPoint)
+                        < Math.Abs(closestControlStartPointToMidPoint - absoluteMidPoint)
+                    && stateBlock.effectiveBitOffset >= startOffset
+                )
                 {
                     closestControlStartPointToMidPoint = (ushort)stateBlock.effectiveBitOffset;
                 }
             }
 
             var absoluteMidPointCollisions = 0;
-            var controlStartMidPointCollisions  = 0;
+            var controlStartMidPointCollisions = 0;
             var controlEndMidPointCollisions = 0;
 
             // figure out which of the possible midpoints intersects the fewest controls. The one with the fewest
             // is the best one because it means fewer controls will be added to this node.
             foreach (var control in m_Device.m_ChildrenForEachControl)
             {
-                if (closestControlStartPointToMidPoint != ushort.MaxValue &&
-                    closestControlStartPointToMidPoint > control.m_StateBlock.effectiveBitOffset &&
-                    closestControlStartPointToMidPoint < control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits)
+                if (
+                    closestControlStartPointToMidPoint != ushort.MaxValue
+                    && closestControlStartPointToMidPoint > control.m_StateBlock.effectiveBitOffset
+                    && closestControlStartPointToMidPoint
+                        < control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits
+                )
                     controlStartMidPointCollisions++;
 
-                if (closestControlEndPointToMidPoint != ushort.MaxValue &&
-                    closestControlEndPointToMidPoint > control.m_StateBlock.effectiveBitOffset &&
-                    closestControlEndPointToMidPoint < control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits)
+                if (
+                    closestControlEndPointToMidPoint != ushort.MaxValue
+                    && closestControlEndPointToMidPoint > control.m_StateBlock.effectiveBitOffset
+                    && closestControlEndPointToMidPoint
+                        < control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits
+                )
                     controlEndMidPointCollisions++;
 
-                if (absoluteMidPoint > control.m_StateBlock.effectiveBitOffset &&
-                    absoluteMidPoint < control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits)
+                if (
+                    absoluteMidPoint > control.m_StateBlock.effectiveBitOffset
+                    && absoluteMidPoint < control.m_StateBlock.effectiveBitOffset + control.m_StateBlock.sizeInBits
+                )
                     absoluteMidPointCollisions++;
             }
 
-            if (closestControlEndPointToMidPoint != ushort.MaxValue &&
-                controlEndMidPointCollisions <= controlStartMidPointCollisions &&
-                controlEndMidPointCollisions <= absoluteMidPointCollisions)
+            if (
+                closestControlEndPointToMidPoint != ushort.MaxValue
+                && controlEndMidPointCollisions <= controlStartMidPointCollisions
+                && controlEndMidPointCollisions <= absoluteMidPointCollisions
+            )
             {
-                Debug.Assert(closestControlEndPointToMidPoint >= startOffset && closestControlEndPointToMidPoint <= startOffset + parent.endBitOffset);
+                Debug.Assert(
+                    closestControlEndPointToMidPoint >= startOffset
+                        && closestControlEndPointToMidPoint <= startOffset + parent.endBitOffset
+                );
                 return closestControlEndPointToMidPoint;
             }
 
-            if (closestControlStartPointToMidPoint != ushort.MaxValue &&
-                controlStartMidPointCollisions <= controlEndMidPointCollisions &&
-                controlStartMidPointCollisions <= absoluteMidPointCollisions)
+            if (
+                closestControlStartPointToMidPoint != ushort.MaxValue
+                && controlStartMidPointCollisions <= controlEndMidPointCollisions
+                && controlStartMidPointCollisions <= absoluteMidPointCollisions
+            )
             {
-                Debug.Assert(closestControlStartPointToMidPoint >= startOffset && closestControlStartPointToMidPoint <= startOffset + parent.endBitOffset);
+                Debug.Assert(
+                    closestControlStartPointToMidPoint >= startOffset
+                        && closestControlStartPointToMidPoint <= startOffset + parent.endBitOffset
+                );
                 return closestControlStartPointToMidPoint;
             }
 
@@ -1110,8 +1316,10 @@ namespace UnityEngine.InputSystem.Layouts
 
         private void AddControlToNode(InputControl control, ref int controlIndiciesNextFreeIndex, int nodeIndex)
         {
-            Debug.Assert(m_Device.m_ControlTreeNodes[nodeIndex].controlCount < 255,
-                "Control bit range nodes can address maximum of 255 controls.");
+            Debug.Assert(
+                m_Device.m_ControlTreeNodes[nodeIndex].controlCount < 255,
+                "Control bit range nodes can address maximum of 255 controls."
+            );
 
             ref var node = ref m_Device.m_ControlTreeNodes[nodeIndex];
             var leafControlStartIndex = node.controlStartIndex;
@@ -1121,24 +1329,32 @@ namespace UnityEngine.InputSystem.Layouts
                 leafControlStartIndex = node.controlStartIndex;
             }
 
-            ArrayHelpers.InsertAt(ref m_Device.m_ControlTreeIndices,
+            ArrayHelpers.InsertAt(
+                ref m_Device.m_ControlTreeIndices,
                 node.controlStartIndex + node.controlCount,
-                GetControlIndex(control));
+                GetControlIndex(control)
+            );
             ++node.controlCount;
             ++controlIndiciesNextFreeIndex;
 
             // bump up all the start indicies for nodes that have a start index larger than the one we just inserted into
             for (var i = 0; i < m_Device.m_ControlTreeNodes.Length; i++)
             {
-                if (m_Device.m_ControlTreeNodes[i].controlCount == 0 ||
-                    m_Device.m_ControlTreeNodes[i].controlStartIndex <= leafControlStartIndex)
+                if (
+                    m_Device.m_ControlTreeNodes[i].controlCount == 0
+                    || m_Device.m_ControlTreeNodes[i].controlStartIndex <= leafControlStartIndex
+                )
                     continue;
 
                 ++m_Device.m_ControlTreeNodes[i].controlStartIndex;
             }
         }
 
-        private void AddChildren(ref InputDevice.ControlBitRangeNode parent, InputDevice.ControlBitRangeNode left, InputDevice.ControlBitRangeNode right)
+        private void AddChildren(
+            ref InputDevice.ControlBitRangeNode parent,
+            InputDevice.ControlBitRangeNode left,
+            InputDevice.ControlBitRangeNode right
+        )
         {
             // if this node has a child start index, its already in the tree
             if (parent.leftChildIndex != -1)
@@ -1176,8 +1392,10 @@ namespace UnityEngine.InputSystem.Layouts
 
         internal static RefInstance Ref()
         {
-            Debug.Assert(s_Instance.m_Device == null,
-                "InputDeviceBuilder is already in use! Cannot use the builder recursively");
+            Debug.Assert(
+                s_Instance.m_Device == null,
+                "InputDeviceBuilder is already in use! Cannot use the builder recursively"
+            );
             ++s_InstanceRef;
             return new RefInstance();
         }

@@ -12,7 +12,6 @@ namespace UnityEditor.VFX.URP
 {
     abstract class VFXAbstractParticleURPLitOutput : VFXShaderGraphParticleOutput
     {
-
         public enum MaterialType
         {
             Standard,
@@ -57,59 +56,149 @@ namespace UnityEditor.VFX.URP
             CustomCurve,
         }
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Header("Lighting"), Tooltip("Specifies the surface type of this output. Surface types determine how the particle will react to light.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Header("Lighting"),
+            Tooltip(
+                "Specifies the surface type of this output. Surface types determine how the particle will react to light."
+            )
+        ]
         protected MaterialType materialType = MaterialType.Standard;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, FormerlySerializedAs("materialType"), Tooltip("Select a workflow that fits your textures. Choose between Metallic or Specular.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            FormerlySerializedAs("materialType"),
+            Tooltip("Select a workflow that fits your textures. Choose between Metallic or Specular.")
+        ]
         protected WorkflowMode workflowMode = WorkflowMode.Metallic;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("Specified the smoothness map source. It can be the alpha channel of the Metallic Map or the Base Color Map if they are used in the output.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "Specified the smoothness map source. It can be the alpha channel of the Metallic Map or the Base Color Map if they are used in the output."
+            )
+        ]
         protected SmoothnessSource smoothnessSource = SmoothnessSource.None;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the output will accept an occlusion to control how the particle receives lighting.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("When enabled, the output will accept an occlusion to control how the particle receives lighting.")
+        ]
         protected bool useOcclusionMap = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the output will accept a metallic map to multiply the metallic value.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("When enabled, the output will accept a metallic map to multiply the metallic value.")
+        ]
         protected bool useMetallicMap = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the output will accept a metallic map to multiply the metallic value.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("When enabled, the output will accept a metallic map to multiply the metallic value.")
+        ]
         protected bool useSpecularMap = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the output will accept a Normal Map to simulate additional surface details when illuminated.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "When enabled, the output will accept a Normal Map to simulate additional surface details when illuminated."
+            )
+        ]
         protected bool useNormalMap = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the output will accept an Emissive Map to control how particles glow.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("When enabled, the output will accept an Emissive Map to control how particles glow.")
+        ]
         protected bool useEmissiveMap = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("Specifies how the color attribute is applied to the particles. It can be disregarded, used for the base color, used for the emissiveness, or used for both the base color and the emissiveness.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "Specifies how the color attribute is applied to the particles. It can be disregarded, used for the base color, used for the emissiveness, or used for both the base color and the emissiveness."
+            )
+        ]
         protected ColorMode colorMode = ColorMode.BaseColor;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Header("\nSix-way Smoke Lit Settings"), Tooltip("Specifies how to remap the values in the lightmaps.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Header("\nSix-way Smoke Lit Settings"),
+            Tooltip("Specifies how to remap the values in the lightmaps.")
+        ]
         protected LightmapRemapMode lightmapRemapMode = LightmapRemapMode.None;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("Enables the modification of the light map ranges.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("Enables the modification of the light map ranges.")
+        ]
         protected bool lightmapRemapRanges = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the alpha of the particles can be remapped with the Alpha Remap curve.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("When enabled, the alpha of the particles can be remapped with the Alpha Remap curve.")
+        ]
         protected bool useAlphaRemap = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, an emissive color field becomes available in the output to make particles glow.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("When enabled, an emissive color field becomes available in the output to make particles glow.")
+        ]
         protected bool useEmissive = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField,
-         Tooltip("Specifies what information is used to control the emissive color of the particle. It can come from the Alpha channel of the Negative Axes Lightmap or from an Emissive map.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "Specifies what information is used to control the emissive color of the particle. It can come from the Alpha channel of the Negative Axes Lightmap or from an Emissive map."
+            )
+        ]
         protected EmissiveMode emissiveMode = EmissiveMode.None;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, you can scale the values in the emissive channel before applying the Emissive Gradient.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "When enabled, you can scale the values in the emissive channel before applying the Emissive Gradient."
+            )
+        ]
         protected bool useEmissiveChannelScale = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the lightmaps are used to simulate color absorption whose strength can be tuned with the Absorption Strength parameter.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "When enabled, the lightmaps are used to simulate color absorption whose strength can be tuned with the Absorption Strength parameter."
+            )
+        ]
         protected bool useColorAbsorption = true;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the normals of the particle are inverted when seen from behind, allowing quads with culling set to off to receive correct lighting information.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "When enabled, the normals of the particle are inverted when seen from behind, allowing quads with culling set to off to receive correct lighting information."
+            )
+        ]
         protected bool doubleSided = false;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("When enabled, the particle will receive shadows.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip("When enabled, the particle will receive shadows.")
+        ]
         protected bool receiveShadows = true;
 
         protected bool useEmissiveColor
@@ -122,7 +211,8 @@ namespace UnityEditor.VFX.URP
             }
         }
 
-        protected VFXAbstractParticleURPLitOutput(bool strip = false) : base(strip) {}
+        protected VFXAbstractParticleURPLitOutput(bool strip = false)
+            : base(strip) { }
 
         private bool useDeprecatedShaderGraph => GetOrRefreshShaderGraphObject() != null;
 
@@ -135,10 +225,7 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                return base.hasAnyMap
-                       || useNormalMap
-                       || useEmissiveMap
-                       || materialType == MaterialType.SixWaySmokeLit;
+                return base.hasAnyMap || useNormalMap || useEmissiveMap || materialType == MaterialType.SixWaySmokeLit;
             }
         }
 
@@ -160,7 +247,7 @@ namespace UnityEditor.VFX.URP
             public Color specularColor = Color.gray;
         }
 
-        public override sealed bool CanBeCompiled()
+        public sealed override bool CanBeCompiled()
         {
             return (VFXLibrary.currentSRPBinder is VFXURPBinder) && base.CanBeCompiled();
         }
@@ -195,13 +282,18 @@ namespace UnityEditor.VFX.URP
         {
             base.Invalidate(model, cause);
 
-            if (cause == InvalidationCause.kSettingChanged
-                && !validSmoothnessSources.Contains(smoothnessSource))
+            if (cause == InvalidationCause.kSettingChanged && !validSmoothnessSources.Contains(smoothnessSource))
             {
                 var fallbackSmoothness = SmoothnessSource.None;
-                if (smoothnessSource == SmoothnessSource.MetallicAlpha && validSmoothnessSources.Contains(SmoothnessSource.SpecularAlpha))
+                if (
+                    smoothnessSource == SmoothnessSource.MetallicAlpha
+                    && validSmoothnessSources.Contains(SmoothnessSource.SpecularAlpha)
+                )
                     fallbackSmoothness = SmoothnessSource.SpecularAlpha;
-                if (smoothnessSource == SmoothnessSource.SpecularAlpha && validSmoothnessSources.Contains(SmoothnessSource.MetallicAlpha))
+                if (
+                    smoothnessSource == SmoothnessSource.SpecularAlpha
+                    && validSmoothnessSources.Contains(SmoothnessSource.MetallicAlpha)
+                )
                     fallbackSmoothness = SmoothnessSource.MetallicAlpha;
 
                 SetSettingValue(nameof(smoothnessSource), fallbackSmoothness);
@@ -213,7 +305,14 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), kBaseColorMap, new TooltipAttribute("Specifies the base color (RGB) and opacity (A) of the particle.")), (usesFlipbook ? null : VFXResources.defaultResources.particleTexture));
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        kBaseColorMap,
+                        new TooltipAttribute("Specifies the base color (RGB) and opacity (A) of the particle.")
+                    ),
+                    (usesFlipbook ? null : VFXResources.defaultResources.particleTexture)
+                );
             }
         }
 
@@ -222,7 +321,14 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), kOcclusionMap, new TooltipAttribute("Specifies the Occlusion Map for the particle - Ambient occlusion (G)")), (usesFlipbook ? null : VFXResources.defaultResources.maskTexture));
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        kOcclusionMap,
+                        new TooltipAttribute("Specifies the Occlusion Map for the particle - Ambient occlusion (G)")
+                    ),
+                    (usesFlipbook ? null : VFXResources.defaultResources.maskTexture)
+                );
             }
         }
 
@@ -231,7 +337,15 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), kSpecularMap, new TooltipAttribute("Specifies the Specular Map for the particle - Color (RGB) - (Optional A) Smoothness")));
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        kSpecularMap,
+                        new TooltipAttribute(
+                            "Specifies the Specular Map for the particle - Color (RGB) - (Optional A) Smoothness"
+                        )
+                    )
+                );
             }
         }
 
@@ -240,7 +354,16 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), kMetallicMap, new TooltipAttribute("Specifies the Metallic Map for the particle - Metallic (R) - (Optional A) Smoothness")), (usesFlipbook ? null : VFXResources.defaultResources.maskTexture));
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        kMetallicMap,
+                        new TooltipAttribute(
+                            "Specifies the Metallic Map for the particle - Metallic (R) - (Optional A) Smoothness"
+                        )
+                    ),
+                    (usesFlipbook ? null : VFXResources.defaultResources.maskTexture)
+                );
             }
         }
 
@@ -250,9 +373,27 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), kNormalMap, new TooltipAttribute("Specifies the Normal map to obtain normals in tangent space for the particle.")), (usesFlipbook ? null : VFXResources.defaultResources.normalTexture));
-                if(useNormalScale)
-                    yield return new VFXPropertyWithValue(new VFXProperty(typeof(float), kNormalScale, new TooltipAttribute("Sets the scale of the normals. Larger values increase the impact of the normals.")), 1.0f);
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        kNormalMap,
+                        new TooltipAttribute(
+                            "Specifies the Normal map to obtain normals in tangent space for the particle."
+                        )
+                    ),
+                    (usesFlipbook ? null : VFXResources.defaultResources.normalTexture)
+                );
+                if (useNormalScale)
+                    yield return new VFXPropertyWithValue(
+                        new VFXProperty(
+                            typeof(float),
+                            kNormalScale,
+                            new TooltipAttribute(
+                                "Sets the scale of the normals. Larger values increase the impact of the normals."
+                            )
+                        ),
+                        1.0f
+                    );
             }
         }
 
@@ -262,8 +403,21 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), kEmissiveMap, new TooltipAttribute("Specifies the Emissive map (RGB) used to make particles glow.")));
-                yield return new VFXPropertyWithValue(new VFXProperty(typeof(float), kEmissiveScale, new TooltipAttribute("Sets the scale of the emission obtained from the emissive map.")), 1.0f);
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        kEmissiveMap,
+                        new TooltipAttribute("Specifies the Emissive map (RGB) used to make particles glow.")
+                    )
+                );
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        typeof(float),
+                        kEmissiveScale,
+                        new TooltipAttribute("Sets the scale of the emission obtained from the emissive map.")
+                    ),
+                    1.0f
+                );
             }
         }
 
@@ -283,7 +437,13 @@ namespace UnityEditor.VFX.URP
         {
             [Range(-5, 5), Tooltip("Sets the contrast strength applied the lightmaps.")]
             public float contrastIntensity = 0.0f;
-            [Range(0, 1), Tooltip("Specifies on which value of the lightmap the contrast transition happens. If Contrast Intensity is zero, this parameter has not effect.")]
+
+            [
+                Range(0, 1),
+                Tooltip(
+                    "Specifies on which value of the lightmap the contrast transition happens. If Contrast Intensity is zero, this parameter has not effect."
+                )
+            ]
             public float contrastPivot = 0.5f;
         }
 
@@ -291,13 +451,24 @@ namespace UnityEditor.VFX.URP
         {
             [Tooltip("Sets the source range of the lightmaps used for remapping.")]
             public Vector2 remapFrom = new Vector2(0, 1);
+
             [Tooltip("Sets the output range of the lightmaps.")]
             public Vector2 remapTo = new Vector2(0, 1);
         }
 
-        protected override bool needsExposureWeight { get { return GetOrRefreshShaderGraphObject() == null && ((colorMode & ColorMode.Emissive) != 0 || useEmissive || useEmissiveMap); } }
+        protected override bool needsExposureWeight
+        {
+            get
+            {
+                return GetOrRefreshShaderGraphObject() == null
+                    && ((colorMode & ColorMode.Emissive) != 0 || useEmissive || useEmissiveMap);
+            }
+        }
 
-        protected override bool bypassExposure { get { return false; } }
+        protected override bool bypassExposure
+        {
+            get { return false; }
+        }
 
         protected override VFXOldShaderGraphHelpers.RPInfo currentRP => VFXOldShaderGraphHelpers.urpLitInfo;
 
@@ -307,8 +478,26 @@ namespace UnityEditor.VFX.URP
         {
             get
             {
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), "positiveAxesLightmap", new TooltipAttribute("Specifies the lightmap for the positive axes, Right (R), Up (G), Back (B), and the opacity (A).")), (usesFlipbook ? null : VFXResources.defaultResources.sixWayPositiveTexture));
-                yield return new VFXPropertyWithValue(new VFXProperty(GetTextureType(), "negativeAxesLightmap", new TooltipAttribute("Specifies the lightmap for the Negative axes: Left (R), Bottom (G), Front (B), and the Emissive mask (A) for Single Channel emission mode.")), (usesFlipbook ? null : VFXResources.defaultResources.sixWayNegativeTexture));
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        "positiveAxesLightmap",
+                        new TooltipAttribute(
+                            "Specifies the lightmap for the positive axes, Right (R), Up (G), Back (B), and the opacity (A)."
+                        )
+                    ),
+                    (usesFlipbook ? null : VFXResources.defaultResources.sixWayPositiveTexture)
+                );
+                yield return new VFXPropertyWithValue(
+                    new VFXProperty(
+                        GetTextureType(),
+                        "negativeAxesLightmap",
+                        new TooltipAttribute(
+                            "Specifies the lightmap for the Negative axes: Left (R), Bottom (G), Front (B), and the Emissive mask (A) for Single Channel emission mode."
+                        )
+                    ),
+                    (usesFlipbook ? null : VFXResources.defaultResources.sixWayNegativeTexture)
+                );
 
                 if (lightmapRemapRanges)
                 {
@@ -321,29 +510,64 @@ namespace UnityEditor.VFX.URP
                         yield return prop;
                 }
                 if (lightmapRemapMode == LightmapRemapMode.CustomCurve)
-                    yield return new VFXPropertyWithValue(new VFXProperty(typeof(AnimationCurve), "lightRemapCurve"),
-                        AnimationCurve.Linear(0, 0, 1, 1));
+                    yield return new VFXPropertyWithValue(
+                        new VFXProperty(typeof(AnimationCurve), "lightRemapCurve"),
+                        AnimationCurve.Linear(0, 0, 1, 1)
+                    );
 
                 if (!isBlendModeOpaque && useAlphaRemap)
                     yield return new VFXPropertyWithValue(
-                        new VFXProperty(typeof(AnimationCurve), "alphaRemap",
-                            new TooltipAttribute("Remaps the alpha value.")), AnimationCurve.Linear(0, 0, 1, 1));
+                        new VFXProperty(
+                            typeof(AnimationCurve),
+                            "alphaRemap",
+                            new TooltipAttribute("Remaps the alpha value.")
+                        ),
+                        AnimationCurve.Linear(0, 0, 1, 1)
+                    );
 
                 if (emissiveMode == EmissiveMode.SingleChannel)
                 {
-                    if(useEmissiveChannelScale)
-                        yield return new VFXPropertyWithValue(new VFXProperty(typeof(float), "emissiveChannelScale", new TooltipAttribute("Multiplies the value contained in the Emission channel, before applying the gradient."), new RangeAttribute(0.0f, 1.0f)), 1.0f);
+                    if (useEmissiveChannelScale)
+                        yield return new VFXPropertyWithValue(
+                            new VFXProperty(
+                                typeof(float),
+                                "emissiveChannelScale",
+                                new TooltipAttribute(
+                                    "Multiplies the value contained in the Emission channel, before applying the gradient."
+                                ),
+                                new RangeAttribute(0.0f, 1.0f)
+                            ),
+                            1.0f
+                        );
 
                     yield return new VFXPropertyWithValue(
-                        new VFXProperty(typeof(Gradient), "emissiveGradient",
-                            new TooltipAttribute("Remaps the values of the Emission channel.")),
-                        VFXResources.defaultResources.gradientMapRamp);
-                    yield return new VFXPropertyWithValue(new VFXProperty(typeof(float), "emissiveMultiplier", new TooltipAttribute("Multiplies the values set in the Emissive Gradient."), new MinAttribute(0.0f)), 1.0f);
-
+                        new VFXProperty(
+                            typeof(Gradient),
+                            "emissiveGradient",
+                            new TooltipAttribute("Remaps the values of the Emission channel.")
+                        ),
+                        VFXResources.defaultResources.gradientMapRamp
+                    );
+                    yield return new VFXPropertyWithValue(
+                        new VFXProperty(
+                            typeof(float),
+                            "emissiveMultiplier",
+                            new TooltipAttribute("Multiplies the values set in the Emissive Gradient."),
+                            new MinAttribute(0.0f)
+                        ),
+                        1.0f
+                    );
                 }
-                if(useColorAbsorption)
-                    yield return new VFXPropertyWithValue(new VFXProperty(typeof(float), "absorptionStrength", new TooltipAttribute("Sets the strength of the color absorption."), new RangeAttribute(0.0f, 1.0f)), 0.5f);
-
+                if (useColorAbsorption)
+                    yield return new VFXPropertyWithValue(
+                        new VFXProperty(
+                            typeof(float),
+                            "absorptionStrength",
+                            new TooltipAttribute("Sets the strength of the color absorption."),
+                            new RangeAttribute(0.0f, 1.0f)
+                        ),
+                        0.5f
+                    );
             }
         }
 
@@ -357,14 +581,14 @@ namespace UnityEditor.VFX.URP
                 {
                     if (materialType == MaterialType.Standard)
                     {
-                        if(useSmoothness)
+                        if (useSmoothness)
                             properties = properties.Concat(PropertiesFromType(nameof(URPLitInputProperties)));
-                        if(useMetallic)
+                        if (useMetallic)
                             properties = properties.Concat(PropertiesFromType(nameof(StandardProperties)));
-                        if(useSpecular)
+                        if (useSpecular)
                             properties = properties.Concat(PropertiesFromType(nameof(SpecularColorProperties)));
                     }
-                    else if(materialType == MaterialType.SixWaySmokeLit)
+                    else if (materialType == MaterialType.SixWaySmokeLit)
                         properties = properties.Concat(sixWayMapsProperties);
 
                     if (!useDeprecatedShaderGraph)
@@ -398,7 +622,9 @@ namespace UnityEditor.VFX.URP
             }
         }
 
-        protected override IEnumerable<VFXNamedExpression> CollectGPUExpressions(IEnumerable<VFXNamedExpression> slotExpressions)
+        protected override IEnumerable<VFXNamedExpression> CollectGPUExpressions(
+            IEnumerable<VFXNamedExpression> slotExpressions
+        )
         {
             foreach (var exp in base.CollectGPUExpressions(slotExpressions))
                 yield return exp;
@@ -414,7 +640,7 @@ namespace UnityEditor.VFX.URP
                     {
                         yield return slotExpressions.First(o => o.name == "emissiveGradient");
                         yield return slotExpressions.First(o => o.name == "emissiveMultiplier");
-                        if(useEmissiveChannelScale)
+                        if (useEmissiveChannelScale)
                             yield return slotExpressions.First(o => o.name == "emissiveChannelScale");
                     }
                     if (!isBlendModeOpaque && useAlphaRemap)
@@ -430,17 +656,23 @@ namespace UnityEditor.VFX.URP
                     {
                         var lightmapBrightnessExp = slotExpressions.First(o => o.name == "contrastPivot").exp;
                         var rawLightMapContrastExp = slotExpressions.First(o => o.name == "contrastIntensity").exp;
-                        var lightmapContrastExp = VFXOperatorUtility.Exp(rawLightMapContrastExp, VFXOperatorUtility.Base.Base2);
+                        var lightmapContrastExp = VFXOperatorUtility.Exp(
+                            rawLightMapContrastExp,
+                            VFXOperatorUtility.Base.Base2
+                        );
                         var lightmapControlsExp = new VFXExpressionCombine(lightmapBrightnessExp, lightmapContrastExp);
                         yield return new VFXNamedExpression(lightmapControlsExp, "lightmapRemapControls");
                     }
 
-                    if(lightmapRemapMode == LightmapRemapMode.CustomCurve)
+                    if (lightmapRemapMode == LightmapRemapMode.CustomCurve)
                         yield return slotExpressions.First(o => o.name == "lightRemapCurve");
                     if (useColorAbsorption)
                     {
                         var absorptionStrenghtExp = slotExpressions.First(o => o.name == "absorptionStrength").exp;
-                        var absorptionRangeExp = (VFXValue.Constant(1 - 1.0f / Mathf.PI) * absorptionStrenghtExp + VFXValue.Constant(1.0f / Mathf.PI));
+                        var absorptionRangeExp = (
+                            VFXValue.Constant(1 - 1.0f / Mathf.PI) * absorptionStrenghtExp
+                            + VFXValue.Constant(1.0f / Mathf.PI)
+                        );
 
                         yield return new VFXNamedExpression(absorptionRangeExp, "absorptionRange");
                     }
@@ -457,18 +689,20 @@ namespace UnityEditor.VFX.URP
                 }
                 else
                 {
-                    if(useSmoothness)
+                    if (useSmoothness)
                         yield return slotExpressions.First(o => o.name == nameof(URPLitInputProperties.smoothness));
 
                     switch (workflowMode)
                     {
                         case WorkflowMode.Metallic:
-                            if(useMetallic)
+                            if (useMetallic)
                                 yield return slotExpressions.First(o => o.name == nameof(StandardProperties.metallic));
                             break;
                         case WorkflowMode.Specular:
-                            if(useSpecular)
-                                yield return slotExpressions.First(o => o.name == nameof(SpecularColorProperties.specularColor));
+                            if (useSpecular)
+                                yield return slotExpressions.First(o =>
+                                    o.name == nameof(SpecularColorProperties.specularColor)
+                                );
                             break;
                         default:
                             break;
@@ -487,8 +721,8 @@ namespace UnityEditor.VFX.URP
                         if (useNormalMap)
                         {
                             yield return slotExpressions.First(o => o.name == kNormalMap);
-                            if(useNormalScale)
-                            	yield return slotExpressions.First(o => o.name == kNormalScale);
+                            if (useNormalScale)
+                                yield return slotExpressions.First(o => o.name == kNormalScale);
                         }
 
                         if (useEmissiveMap)
@@ -503,8 +737,7 @@ namespace UnityEditor.VFX.URP
                     yield return slotExpressions.First(o => o.name == nameof(BaseColorProperties.baseColor));
 
                 if (((colorMode & ColorMode.Emissive) == 0) && useEmissiveColor)
-                    yield return slotExpressions.First(o =>
-                        o.name == nameof(EmissiveColorProperties.emissiveColor));
+                    yield return slotExpressions.First(o => o.name == nameof(EmissiveColorProperties.emissiveColor));
             }
         }
 
@@ -534,7 +767,7 @@ namespace UnityEditor.VFX.URP
                         if (!isBlendModeOpaque && useAlphaRemap)
                             yield return "VFX_SIX_WAY_USE_ALPHA_REMAP";
 
-                        if(lightmapRemapMode != LightmapRemapMode.None || lightmapRemapRanges)
+                        if (lightmapRemapMode != LightmapRemapMode.None || lightmapRemapRanges)
                             yield return "VFX_SIX_WAY_REMAP";
 
                         if (lightmapRemapRanges)
@@ -552,7 +785,6 @@ namespace UnityEditor.VFX.URP
                                 yield return "VFX_SIX_WAY_REMAP_CURVE";
                                 break;
                         }
-
                     }
                     else
                     {
@@ -568,7 +800,6 @@ namespace UnityEditor.VFX.URP
                         }
                     }
                 }
-
 
                 if (!useDeprecatedShaderGraph)
                 {
@@ -604,12 +835,19 @@ namespace UnityEditor.VFX.URP
 
                     switch (smoothnessSource)
                     {
-                        case SmoothnessSource.None: yield return "URP_USE_SMOOTHNESS_IN_NONE"; break;
-                        case SmoothnessSource.MetallicAlpha: yield return "URP_USE_SMOOTHNESS_IN_METALLIC"; break;
-                        case SmoothnessSource.SpecularAlpha: yield return "URP_USE_SMOOTHNESS_IN_SPECULAR"; break;
-                        case SmoothnessSource.AlbedoAlpha: yield return "URP_USE_SMOOTHNESS_IN_ALBEDO"; break;
+                        case SmoothnessSource.None:
+                            yield return "URP_USE_SMOOTHNESS_IN_NONE";
+                            break;
+                        case SmoothnessSource.MetallicAlpha:
+                            yield return "URP_USE_SMOOTHNESS_IN_METALLIC";
+                            break;
+                        case SmoothnessSource.SpecularAlpha:
+                            yield return "URP_USE_SMOOTHNESS_IN_SPECULAR";
+                            break;
+                        case SmoothnessSource.AlbedoAlpha:
+                            yield return "URP_USE_SMOOTHNESS_IN_ALBEDO";
+                            break;
                     }
-
                 }
 
                 if (doubleSided)
@@ -776,8 +1014,13 @@ namespace UnityEditor.VFX.URP
                 yield return new KeyValuePair<string, VFXShaderWriter>("${VFXURPGBufferDefines}", gbufferDefines);
 
                 var forwardPassLightMode = new VFXShaderWriter();
-                forwardPassLightMode.Write(materialType == MaterialType.SixWaySmokeLit ? "UniversalForwardOnly" : "UniversalForward");
-                yield return new KeyValuePair<string, VFXShaderWriter>("${VFXURPForwardPassLightMode}", forwardPassLightMode);
+                forwardPassLightMode.Write(
+                    materialType == MaterialType.SixWaySmokeLit ? "UniversalForwardOnly" : "UniversalForward"
+                );
+                yield return new KeyValuePair<string, VFXShaderWriter>(
+                    "${VFXURPForwardPassLightMode}",
+                    forwardPassLightMode
+                );
             }
         }
     }

@@ -54,9 +54,7 @@ namespace Unity.Networking.Transport.Utilities.LowLevel.Unsafe
         {
             int* buffer = m_Buffer;
             int idx = Interlocked.Increment(ref buffer[1]) - 1;
-            while (Interlocked.CompareExchange(ref buffer[idx + 2], item + 1, 0) != 0)
-            {
-            }
+            while (Interlocked.CompareExchange(ref buffer[idx + 2], item + 1, 0) != 0) { }
         }
 
         /// <summary>

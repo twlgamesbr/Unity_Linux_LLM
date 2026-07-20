@@ -13,11 +13,12 @@ namespace Unity.Entities
         SharedComponent = 1 << 2,
         ChunkComponent = 1 << 3,
         CompanionComponent = 1 << 4,
+
         [Obsolete("Use ComponentPropertyType.CompanionComponent instead.", error: false)]
         HybridComponent = CompanionComponent,
         Tag = 1 << 5,
         Buffer = 1 << 6,
-        All = Component | SharedComponent | ChunkComponent | CompanionComponent | Tag | Buffer
+        All = Component | SharedComponent | ChunkComponent | CompanionComponent | Tag | Buffer,
     }
 
     interface IComponentProperty : IProperty<EntityContainer>
@@ -60,7 +61,10 @@ namespace Unity.Entities
         }
     }
 
-    class EntityContainerPropertyBag : PropertyBag<EntityContainer>, INamedProperties<EntityContainer>, IIndexedProperties<EntityContainer>
+    class EntityContainerPropertyBag
+        : PropertyBag<EntityContainer>,
+            INamedProperties<EntityContainer>,
+            IIndexedProperties<EntityContainer>
     {
         class ComponentPropertyConstructor : ITypeVisitor
         {
@@ -71,17 +75,24 @@ namespace Unity.Entities
 
             void ITypeVisitor.Visit<TComponent>()
             {
-                IComponentProperty CreateInstance(Type propertyType)
-                    => (IComponentProperty)Activator.CreateInstance(propertyType.MakeGenericType(typeof(TComponent)), TypeIndex, IsReadOnly);
+                IComponentProperty CreateInstance(Type propertyType) =>
+                    (IComponentProperty)
+                        Activator.CreateInstance(
+                            propertyType.MakeGenericType(typeof(TComponent)),
+                            TypeIndex,
+                            IsReadOnly
+                        );
 
                 var type = typeof(TComponent);
                 if (typeof(IComponentData).IsAssignableFrom(type))
                 {
                     if (TypeManager.IsChunkComponent(TypeIndex))
 #if !UNITY_DISABLE_MANAGED_COMPONENTS
-                        Property = CreateInstance(type.IsValueType
-                        ? typeof(StructChunkComponentProperty<>)
-                        : typeof(ClassChunkComponentProperty<>));
+                        Property = CreateInstance(
+                            type.IsValueType
+                                ? typeof(StructChunkComponentProperty<>)
+                                : typeof(ClassChunkComponentProperty<>)
+                        );
 #else
                         Property = CreateInstance(typeof(StructChunkComponentProperty<>));
 #endif
@@ -108,7 +119,8 @@ namespace Unity.Entities
             public override string Name { get; } = SanitizedPropertyName(GetComponentName(typeof(TComponent)));
             public override bool IsReadOnly { get; }
             public TypeIndex TypeIndex { get; }
-            public string DisplayName { get; } = SanitizedPropertyName(TypeUtility.GetTypeDisplayName(typeof(TComponent)));
+            public string DisplayName { get; } =
+                SanitizedPropertyName(TypeUtility.GetTypeDisplayName(typeof(TComponent)));
             public abstract ComponentPropertyType Type { get; }
 
             public ComponentProperty(TypeIndex typeIndex, bool isReadOnly)
@@ -137,9 +149,10 @@ namespace Unity.Entities
             protected abstract void DoSetValue(ref EntityContainer container, TComponent value);
             protected abstract bool IsZeroSize { get; }
 
-            protected static string GetComponentName(Type type)
-                => string.IsNullOrEmpty(type.Namespace) ? TypeUtility.GetTypeDisplayName(type)
-                                                        : $"{type.Namespace}.{TypeUtility.GetTypeDisplayName(type)}";
+            protected static string GetComponentName(Type type) =>
+                string.IsNullOrEmpty(type.Namespace)
+                    ? TypeUtility.GetTypeDisplayName(type)
+                    : $"{type.Namespace}.{TypeUtility.GetTypeDisplayName(type)}";
         }
 
         class SharedComponentProperty<TComponent> : ComponentProperty<TComponent>
@@ -148,9 +161,8 @@ namespace Unity.Entities
             protected override bool IsZeroSize { get; } = false;
             public override ComponentPropertyType Type { get; } = ComponentPropertyType.SharedComponent;
 
-            public SharedComponentProperty(TypeIndex typeIndex, bool isReadOnly) : base(typeIndex, isReadOnly)
-            {
-            }
+            public SharedComponentProperty(TypeIndex typeIndex, bool isReadOnly)
+                : base(typeIndex, isReadOnly) { }
 
             protected override TComponent DoGetValue(ref EntityContainer container)
             {
@@ -168,12 +180,13 @@ namespace Unity.Entities
         class StructComponentProperty<TComponent> : ComponentProperty<TComponent>
             where TComponent : unmanaged, IComponentData
         {
-            protected override bool IsZeroSize { get; } = TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
-            public override ComponentPropertyType Type => IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.Component;
+            protected override bool IsZeroSize { get; } =
+                TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
+            public override ComponentPropertyType Type =>
+                IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.Component;
 
-            public StructComponentProperty(TypeIndex typeIndex, bool isReadOnly) : base(typeIndex, isReadOnly)
-            {
-            }
+            public StructComponentProperty(TypeIndex typeIndex, bool isReadOnly)
+                : base(typeIndex, isReadOnly) { }
 
             protected override TComponent DoGetValue(ref EntityContainer container)
             {
@@ -192,12 +205,13 @@ namespace Unity.Entities
         class ClassComponentProperty<TComponent> : ComponentProperty<TComponent>
             where TComponent : class, IComponentData, new()
         {
-            protected override bool IsZeroSize { get; } = TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
-            public override ComponentPropertyType Type => IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.Component;
+            protected override bool IsZeroSize { get; } =
+                TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
+            public override ComponentPropertyType Type =>
+                IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.Component;
 
-            public ClassComponentProperty(TypeIndex typeIndex, bool isReadOnly) : base(typeIndex, isReadOnly)
-            {
-            }
+            public ClassComponentProperty(TypeIndex typeIndex, bool isReadOnly)
+                : base(typeIndex, isReadOnly) { }
 
             protected override TComponent DoGetValue(ref EntityContainer container)
             {
@@ -216,12 +230,13 @@ namespace Unity.Entities
         class ManagedComponentProperty<TComponent> : ComponentProperty<TComponent>
             where TComponent : UnityEngine.Object
         {
-            protected override bool IsZeroSize { get; } = TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
-            public override ComponentPropertyType Type => IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.CompanionComponent;
+            protected override bool IsZeroSize { get; } =
+                TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
+            public override ComponentPropertyType Type =>
+                IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.CompanionComponent;
 
-            public ManagedComponentProperty(TypeIndex typeIndex, bool isReadOnly) : base(typeIndex, isReadOnly)
-            {
-            }
+            public ManagedComponentProperty(TypeIndex typeIndex, bool isReadOnly)
+                : base(typeIndex, isReadOnly) { }
 
             protected override TComponent DoGetValue(ref EntityContainer container)
             {
@@ -239,12 +254,13 @@ namespace Unity.Entities
         class StructChunkComponentProperty<TComponent> : ComponentProperty<TComponent>
             where TComponent : unmanaged, IComponentData
         {
-            protected override bool IsZeroSize { get; } = TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
-            public override ComponentPropertyType Type => IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.ChunkComponent;
+            protected override bool IsZeroSize { get; } =
+                TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
+            public override ComponentPropertyType Type =>
+                IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.ChunkComponent;
 
-            public StructChunkComponentProperty(TypeIndex typeIndex, bool isReadOnly) : base(typeIndex, isReadOnly)
-            {
-            }
+            public StructChunkComponentProperty(TypeIndex typeIndex, bool isReadOnly)
+                : base(typeIndex, isReadOnly) { }
 
             protected override TComponent DoGetValue(ref EntityContainer container)
             {
@@ -263,12 +279,13 @@ namespace Unity.Entities
         class ClassChunkComponentProperty<TComponent> : ComponentProperty<TComponent>
             where TComponent : class, IComponentData, new()
         {
-            protected override bool IsZeroSize { get; } = TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
-            public override ComponentPropertyType Type => IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.ChunkComponent;
+            protected override bool IsZeroSize { get; } =
+                TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TComponent>());
+            public override ComponentPropertyType Type =>
+                IsZeroSize ? ComponentPropertyType.Tag : ComponentPropertyType.ChunkComponent;
 
-            public ClassChunkComponentProperty(TypeIndex typeIndex, bool isReadOnly) : base(typeIndex, isReadOnly)
-            {
-            }
+            public ClassChunkComponentProperty(TypeIndex typeIndex, bool isReadOnly)
+                : base(typeIndex, isReadOnly) { }
 
             protected override TComponent DoGetValue(ref EntityContainer container)
             {
@@ -291,9 +308,8 @@ namespace Unity.Entities
             protected override bool IsZeroSize { get; } = TypeManager.IsZeroSized(TypeManager.GetTypeIndex<TElement>());
             public override ComponentPropertyType Type { get; } = ComponentPropertyType.Buffer;
 
-            public DynamicBufferProperty(TypeIndex typeIndex, bool isReadOnly) : base(typeIndex, isReadOnly)
-            {
-            }
+            public DynamicBufferProperty(TypeIndex typeIndex, bool isReadOnly)
+                : base(typeIndex, isReadOnly) { }
 
             protected override DynamicBufferContainer<TElement> DoGetValue(ref EntityContainer container)
             {
@@ -306,8 +322,10 @@ namespace Unity.Entities
             }
         }
 
-        readonly Dictionary<TypeIndex, IComponentProperty> m_ReadOnlyPropertyCache = new Dictionary<TypeIndex, IComponentProperty>();
-        readonly Dictionary<TypeIndex, IComponentProperty> m_ReadWritePropertyCache = new Dictionary<TypeIndex, IComponentProperty>();
+        readonly Dictionary<TypeIndex, IComponentProperty> m_ReadOnlyPropertyCache =
+            new Dictionary<TypeIndex, IComponentProperty>();
+        readonly Dictionary<TypeIndex, IComponentProperty> m_ReadWritePropertyCache =
+            new Dictionary<TypeIndex, IComponentProperty>();
 
         readonly ComponentPropertyConstructor m_ComponentPropertyConstructor = new ComponentPropertyConstructor();
 
@@ -336,7 +354,11 @@ namespace Unity.Entities
             }
         }
 
-        bool INamedProperties<EntityContainer>.TryGetProperty(ref EntityContainer container, string name, out IProperty<EntityContainer> property)
+        bool INamedProperties<EntityContainer>.TryGetProperty(
+            ref EntityContainer container,
+            string name,
+            out IProperty<EntityContainer> property
+        )
         {
             if (!container.Exists())
             {
@@ -356,7 +378,11 @@ namespace Unity.Entities
             return false;
         }
 
-        bool IIndexedProperties<EntityContainer>.TryGetProperty(ref EntityContainer container, int index, out IProperty<EntityContainer> property)
+        bool IIndexedProperties<EntityContainer>.TryGetProperty(
+            ref EntityContainer container,
+            int index,
+            out IProperty<EntityContainer> property
+        )
         {
             if (!container.Exists())
             {
@@ -365,7 +391,10 @@ namespace Unity.Entities
             }
 
             var entityManager = container.EntityManager;
-            property = GetOrCreatePropertyForType(entityManager.GetComponentTypeIndex(container.Entity, index), container.IsReadOnly);
+            property = GetOrCreatePropertyForType(
+                entityManager.GetComponentTypeIndex(container.Entity, index),
+                container.IsReadOnly
+            );
             return true;
         }
 

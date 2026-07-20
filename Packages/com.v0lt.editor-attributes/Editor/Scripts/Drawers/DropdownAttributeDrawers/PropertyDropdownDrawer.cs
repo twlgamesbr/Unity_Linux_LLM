@@ -1,7 +1,7 @@
-using UnityEngine;
 using UnityEditor;
-using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -11,7 +11,10 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The PropertyDropdown Attribute can only be attached on to <b>UnityEngine.Object</b> types", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The PropertyDropdown Attribute can only be attached on to <b>UnityEngine.Object</b> types",
+                    HelpBoxMessageType.Error
+                );
 
             VisualElement root = new();
             PropertyField propertyField = CreatePropertyField(property);
@@ -22,18 +25,21 @@ namespace EditorAttributes.Editor
 
             InitializeFoldoutDrawer(root, property);
 
-            propertyField.RegisterCallback<SerializedPropertyChangeEvent>((callback) =>
-            {
-                if (root.childCount > 1 && root.ElementAt(1) != null)
-                    root.RemoveAt(1);
+            propertyField.RegisterCallback<SerializedPropertyChangeEvent>(
+                (callback) =>
+                {
+                    if (root.childCount > 1 && root.ElementAt(1) != null)
+                        root.RemoveAt(1);
 
-                InitializeFoldoutDrawer(root, property);
-            });
+                    InitializeFoldoutDrawer(root, property);
+                }
+            );
 
             return root;
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.ObjectReference;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.ObjectReference;
 
         private void InitializeFoldoutDrawer(VisualElement root, SerializedProperty property)
         {
@@ -54,11 +60,7 @@ namespace EditorAttributes.Editor
         {
             string foldoutSaveKey = CreatePropertySaveKey(serializedProperty, "IsPropertyDropdownFolded");
 
-            Foldout foldout = new()
-            {
-                text = "Properties",
-                value = EditorPrefs.GetBool(foldoutSaveKey)
-            };
+            Foldout foldout = new() { text = "Properties", value = EditorPrefs.GetBool(foldoutSaveKey) };
 
             ApplyBoxStyle(foldout);
 
@@ -68,11 +70,14 @@ namespace EditorAttributes.Editor
             serializedObject.ApplyModifiedProperties();
 
             foldout.RegisterValueChangedCallback((callback) => EditorPrefs.SetBool(foldoutSaveKey, callback.newValue));
-            foldout.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                foldout.Q<Label>(className: Foldout.textUssClassName).style.unityFontStyleAndWeight = FontStyle.Bold;
-                foldout.Q<ObjectField>("unity-input-m_Script")?.parent.RemoveFromHierarchy();
-            });
+            foldout.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    foldout.Q<Label>(className: Foldout.textUssClassName).style.unityFontStyleAndWeight =
+                        FontStyle.Bold;
+                    foldout.Q<ObjectField>("unity-input-m_Script")?.parent.RemoveFromHierarchy();
+                }
+            );
 
             return foldout;
         }

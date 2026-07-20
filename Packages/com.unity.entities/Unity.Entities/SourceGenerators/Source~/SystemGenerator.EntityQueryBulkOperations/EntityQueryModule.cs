@@ -16,7 +16,8 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
             IReadOnlyDictionary<string, List<InvocationExpressionSyntax>> allMethodInvocations,
             string methodName,
             QueryType resultsShouldHaveThisQueryType,
-            out List<Query> result)
+            out List<Query> result
+        )
         {
             result = new List<Query>();
 
@@ -26,10 +27,11 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
             if (!allMethodInvocations.ContainsKey(methodName))
                 return true;
 
-            var symbols =
-                allMethodInvocations[methodName]
-                    .Select(methodInvocation => (IMethodSymbol)systemDescription.SemanticModel.GetSymbolInfo(methodInvocation).Symbol)
-                    .Where(symbol => symbol != null);
+            var symbols = allMethodInvocations[methodName]
+                .Select(methodInvocation =>
+                    (IMethodSymbol)systemDescription.SemanticModel.GetSymbolInfo(methodInvocation).Symbol
+                )
+                .Where(symbol => symbol != null);
 
             foreach (var symbol in symbols)
             {
@@ -47,7 +49,14 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
                         isValid = false;
                         continue;
                     }
-                    result.Add(new Query { IsReadOnly = true, Type = resultsShouldHaveThisQueryType, TypeSymbol = argumentType});
+                    result.Add(
+                        new Query
+                        {
+                            IsReadOnly = true,
+                            Type = resultsShouldHaveThisQueryType,
+                            TypeSymbol = argumentType,
+                        }
+                    );
                 }
             }
 
@@ -59,36 +68,45 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
             get
             {
                 foreach (var kvp in EntityQueryCandidatesGroupedBySystemType)
-                    foreach (var node in kvp.Value)
-                        yield return (node, kvp.Key);
+                foreach (var node in kvp.Value)
+                    yield return (node, kvp.Key);
             }
         }
 
         public bool RequiresReferenceToBurst => false;
-        Dictionary<TypeDeclarationSyntax, List<SyntaxNode>> EntityQueryCandidatesGroupedBySystemType { get; } = new Dictionary<TypeDeclarationSyntax, List<SyntaxNode>>();
+        Dictionary<TypeDeclarationSyntax, List<SyntaxNode>> EntityQueryCandidatesGroupedBySystemType { get; } =
+            new Dictionary<TypeDeclarationSyntax, List<SyntaxNode>>();
 
         static string[] BulkOperationMethodNames { get; } =
-        {
-            "AddChunkComponentData",
-            "AddComponent",
-            "AddComponentData",
-            "AddSharedComponent",
-            "AddSharedComponentManaged",
-            "DestroyEntity",
-            "RemoveChunkComponentData",
-            "RemoveComponent",
-            "SetSharedComponent",
-            "SetSharedComponentManaged",
-            "ToQuery",
-        };
-
-        public void OnReceiveSyntaxNode(SyntaxNode entitiesSyntaxNode, Dictionary<SyntaxNode, CandidateSyntax> candidateOwnership)
-        {
-            if (entitiesSyntaxNode is IdentifierNameSyntax identifierNameSyntax
-                && identifierNameSyntax.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression)
-                && identifierNameSyntax.Identifier.Text == "Entities")
             {
-                EntityQueryCandidatesGroupedBySystemType.Add(entitiesSyntaxNode.Ancestors().OfType<TypeDeclarationSyntax>().First(), entitiesSyntaxNode);
+                "AddChunkComponentData",
+                "AddComponent",
+                "AddComponentData",
+                "AddSharedComponent",
+                "AddSharedComponentManaged",
+                "DestroyEntity",
+                "RemoveChunkComponentData",
+                "RemoveComponent",
+                "SetSharedComponent",
+                "SetSharedComponentManaged",
+                "ToQuery",
+            };
+
+        public void OnReceiveSyntaxNode(
+            SyntaxNode entitiesSyntaxNode,
+            Dictionary<SyntaxNode, CandidateSyntax> candidateOwnership
+        )
+        {
+            if (
+                entitiesSyntaxNode is IdentifierNameSyntax identifierNameSyntax
+                && identifierNameSyntax.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression)
+                && identifierNameSyntax.Identifier.Text == "Entities"
+            )
+            {
+                EntityQueryCandidatesGroupedBySystemType.Add(
+                    entitiesSyntaxNode.Ancestors().OfType<TypeDeclarationSyntax>().First(),
+                    entitiesSyntaxNode
+                );
             }
         }
 
@@ -110,7 +128,10 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
                 {
                     bool isEntitiesForEachInvocation = false;
 
-                    if (invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
+                    if (
+                        invocationExpressionSyntax.Expression
+                        is MemberAccessExpressionSyntax memberAccessExpressionSyntax
+                    )
                     {
                         switch (memberAccessExpressionSyntax.Name)
                         {
@@ -131,7 +152,10 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
                                 switch (identifierNameSyntax.Identifier.ValueText)
                                 {
                                     case "WithSharedComponentFilter":
-                                        bulkOperationQueryMethodInvocations.Add("WithSharedComponentFilter", invocationExpressionSyntax);
+                                        bulkOperationQueryMethodInvocations.Add(
+                                            "WithSharedComponentFilter",
+                                            invocationExpressionSyntax
+                                        );
                                         break;
                                     default:
                                         foundMethodInvocationsDisallowedByBulkOperations = true;
@@ -158,16 +182,28 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
                                         bulkOperationQueryMethodInvocations.Add("WithNone", invocationExpressionSyntax);
                                         break;
                                     case "WithDisabled":
-                                        bulkOperationQueryMethodInvocations.Add("WithDisabled", invocationExpressionSyntax);
+                                        bulkOperationQueryMethodInvocations.Add(
+                                            "WithDisabled",
+                                            invocationExpressionSyntax
+                                        );
                                         break;
                                     case "WithAbsent":
-                                        bulkOperationQueryMethodInvocations.Add("WithAbsent", invocationExpressionSyntax);
+                                        bulkOperationQueryMethodInvocations.Add(
+                                            "WithAbsent",
+                                            invocationExpressionSyntax
+                                        );
                                         break;
                                     case "WithPresent":
-                                        bulkOperationQueryMethodInvocations.Add("WithPresent", invocationExpressionSyntax);
+                                        bulkOperationQueryMethodInvocations.Add(
+                                            "WithPresent",
+                                            invocationExpressionSyntax
+                                        );
                                         break;
                                     case "WithChangeFilter":
-                                        bulkOperationQueryMethodInvocations.Add("WithChangeFilter", invocationExpressionSyntax);
+                                        bulkOperationQueryMethodInvocations.Add(
+                                            "WithChangeFilter",
+                                            invocationExpressionSyntax
+                                        );
                                         break;
                                     default:
                                         foundMethodInvocationsDisallowedByBulkOperations = true;
@@ -193,53 +229,127 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
                     break;
                 }
 
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithAll", QueryType.All, out var withAllTypes);
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithAny", QueryType.Any, out var withAnyTypes);
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithNone", QueryType.None, out var withNoneTypes);
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithDisabled", QueryType.Disabled, out var withDisabledTypes);
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithAbsent", QueryType.Absent, out var withAbsentTypes);
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithPresent", QueryType.Present, out var withPresentTypes);
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithChangeFilter", QueryType.ChangeFilter, out var withChangeFilterTypes);
-                success &= TryGetAllTypeArgumentSymbolsOfMethod(systemDescription, candidate, bulkOperationQueryMethodInvocations, "WithSharedComponentFilter", QueryType.All, out var withSharedComponentFilterTypes);
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithAll",
+                    QueryType.All,
+                    out var withAllTypes
+                );
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithAny",
+                    QueryType.Any,
+                    out var withAnyTypes
+                );
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithNone",
+                    QueryType.None,
+                    out var withNoneTypes
+                );
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithDisabled",
+                    QueryType.Disabled,
+                    out var withDisabledTypes
+                );
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithAbsent",
+                    QueryType.Absent,
+                    out var withAbsentTypes
+                );
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithPresent",
+                    QueryType.Present,
+                    out var withPresentTypes
+                );
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithChangeFilter",
+                    QueryType.ChangeFilter,
+                    out var withChangeFilterTypes
+                );
+                success &= TryGetAllTypeArgumentSymbolsOfMethod(
+                    systemDescription,
+                    candidate,
+                    bulkOperationQueryMethodInvocations,
+                    "WithSharedComponentFilter",
+                    QueryType.All,
+                    out var withSharedComponentFilterTypes
+                );
 
-                var queryDescription =
-                    new SingleArchetypeQueryFieldDescription(
-                        new Archetype(
-                            withAllTypes.Concat(withSharedComponentFilterTypes).ToArray(),
-                            withAnyTypes,
-                            withNoneTypes,
-                            withDisabledTypes,
-                            withAbsentTypes,
-                            withPresentTypes),
-                        changeFilterTypes: withChangeFilterTypes);
+                var queryDescription = new SingleArchetypeQueryFieldDescription(
+                    new Archetype(
+                        withAllTypes.Concat(withSharedComponentFilterTypes).ToArray(),
+                        withAnyTypes,
+                        withNoneTypes,
+                        withDisabledTypes,
+                        withAbsentTypes,
+                        withPresentTypes
+                    ),
+                    changeFilterTypes: withChangeFilterTypes
+                );
 
-                var generatedQueryFieldName = systemDescription.QueriesAndHandles.GetOrCreateQueryField(queryDescription);
+                var generatedQueryFieldName = systemDescription.QueriesAndHandles.GetOrCreateQueryField(
+                    queryDescription
+                );
 
                 systemDescription.CandidateNodes.Add(
                     bulkOperationInvocationNodeToReplace,
-                    new CandidateSyntax(CandidateType.EntityQueryBulkOps, CandidateFlags.None, bulkOperationInvocationNodeToReplace));
+                    new CandidateSyntax(
+                        CandidateType.EntityQueryBulkOps,
+                        CandidateFlags.None,
+                        bulkOperationInvocationNodeToReplace
+                    )
+                );
 
                 if (bulkOperationInvocationText != "ToQuery")
                 {
-                    var args = new List<ArgumentSyntax> { SyntaxFactory.Argument(SyntaxFactory.IdentifierName(generatedQueryFieldName)) };
+                    var args = new List<ArgumentSyntax>
+                    {
+                        SyntaxFactory.Argument(SyntaxFactory.IdentifierName(generatedQueryFieldName)),
+                    };
                     args.AddRange(bulkOperationInvocationNodeToReplace.ArgumentList.Arguments);
 
-                    var replacementSyntaxNode =
-                        SyntaxFactory.InvocationExpression(
-                            SyntaxFactory.MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression,
-                                SyntaxFactory.IdentifierName("EntityManager"),
-                                SyntaxFactory.IdentifierName(bulkOperationInvocationText)),
-                            SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(args)));
+                    var replacementSyntaxNode = SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            SyntaxFactory.IdentifierName("EntityManager"),
+                            SyntaxFactory.IdentifierName(bulkOperationInvocationText)
+                        ),
+                        SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(args))
+                    );
 
                     originalToReplacementNodes.Add(bulkOperationInvocationNodeToReplace, replacementSyntaxNode);
                 }
                 else
-                    originalToReplacementNodes.Add(bulkOperationInvocationNodeToReplace, SyntaxFactory.IdentifierName(generatedQueryFieldName));
+                    originalToReplacementNodes.Add(
+                        bulkOperationInvocationNodeToReplace,
+                        SyntaxFactory.IdentifierName(generatedQueryFieldName)
+                    );
             }
 
             if (originalToReplacementNodes.Count > 0)
-                systemDescription.SyntaxWalkers.Add(Module.EntityQueryBulkOps, new EntityQueryBulkOperationSyntaxWalker(originalToReplacementNodes));
+                systemDescription.SyntaxWalkers.Add(
+                    Module.EntityQueryBulkOps,
+                    new EntityQueryBulkOperationSyntaxWalker(originalToReplacementNodes)
+                );
 
             return success;
         }

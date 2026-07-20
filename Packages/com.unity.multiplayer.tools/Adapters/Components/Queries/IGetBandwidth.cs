@@ -28,7 +28,8 @@ namespace Unity.Multiplayer.Tools.Adapters
         float GetBandwidthBytes(
             ObjectId objectId,
             BandwidthTypes bandwidthTypes = BandwidthTypes.All,
-            NetworkDirection networkDirection = NetworkDirection.SentAndReceived);
+            NetworkDirection networkDirection = NetworkDirection.SentAndReceived
+        );
 
         /// <summary>
         /// Event that is triggered when new object bandwidth data is available.

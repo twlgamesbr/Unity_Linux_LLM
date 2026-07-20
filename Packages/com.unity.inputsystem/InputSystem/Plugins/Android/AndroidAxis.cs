@@ -5,7 +5,11 @@ namespace UnityEngine.InputSystem.Android.LowLevel
     /// Enum used to identity the axis type in the Android motion input event. See <see cref="AndroidGameControllerState.axis"/>.
     /// See https://developer.android.com/reference/android/view/MotionEvent#constants_1 for more details.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags", Justification = "False positive")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Microsoft.Design",
+        "CA1027:MarkEnumsWithFlags",
+        Justification = "False positive"
+    )]
     public enum AndroidAxis
     {
         /// <summary>

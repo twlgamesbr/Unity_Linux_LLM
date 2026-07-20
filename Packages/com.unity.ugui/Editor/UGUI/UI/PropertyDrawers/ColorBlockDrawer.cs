@@ -1,6 +1,6 @@
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace UnityEditor.UI
@@ -64,7 +64,7 @@ namespace UnityEditor.UI
                 property.FindPropertyRelative(kSelectedColor),
                 property.FindPropertyRelative(kDisabledColor),
                 property.FindPropertyRelative(kColorMultiplier),
-                property.FindPropertyRelative(kFadeDuration)
+                property.FindPropertyRelative(kFadeDuration),
             };
 
             foreach (var prop in properties)

@@ -10,7 +10,8 @@ namespace Unity.Editor.Bridge
 
         public static void ClearPersistentViewData(EditorWindow window) => window.ClearPersistentViewData();
 
-        public static T[] GetEditorWindowInstances<T>() where T : EditorWindow => Resources.FindObjectsOfTypeAll<T>();
+        public static T[] GetEditorWindowInstances<T>()
+            where T : EditorWindow => Resources.FindObjectsOfTypeAll<T>();
 
         static EditorWindowBridge()
         {
@@ -49,8 +50,7 @@ namespace Unity.Editor.Bridge
                 m_DockArea = dockArea;
             }
 
-            public void AddTab(EditorWindow windowToDock)
-                => m_DockArea.AddTab(windowToDock);
+            public void AddTab(EditorWindow windowToDock) => m_DockArea.AddTab(windowToDock);
 
             public bool IsValid => m_DockArea;
         }

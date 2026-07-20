@@ -11,32 +11,44 @@ namespace UnityEditor.TestTools.TestRunner
     [Serializable]
     internal class TestResultSerializer
     {
-        private static readonly BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public |
-            BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+        private static readonly BindingFlags flags =
+            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
 
-        [SerializeField] public string id;
+        [SerializeField]
+        public string id;
 
-        [SerializeField] public string fullName;
+        [SerializeField]
+        public string fullName;
 
-        [SerializeField] private double duration;
+        [SerializeField]
+        private double duration;
 
-        [SerializeField] private string label;
+        [SerializeField]
+        private string label;
 
-        [SerializeField] private string message;
+        [SerializeField]
+        private string message;
 
-        [SerializeField] private string output;
+        [SerializeField]
+        private string output;
 
-        [SerializeField] private string site;
+        [SerializeField]
+        private string site;
 
-        [SerializeField] private string stacktrace;
+        [SerializeField]
+        private string stacktrace;
 
-        [SerializeField] private double startTimeAO;
+        [SerializeField]
+        private double startTimeAO;
 
-        [SerializeField] private double endTimeAO;
+        [SerializeField]
+        private double endTimeAO;
 
-        [SerializeField] private string status;
+        [SerializeField]
+        private string status;
 
-        [SerializeField] public string uniqueName;
+        [SerializeField]
+        public string uniqueName;
 
         public static TestResultSerializer MakeFromTestResult(ITestResult result)
         {
@@ -58,21 +70,22 @@ namespace UnityEditor.TestTools.TestRunner
 
         public void RestoreTestResult(TestResult result)
         {
-            var resultState = new ResultState((TestStatus)Enum.Parse(typeof(TestStatus), status), label,
-                (FailureSite)Enum.Parse(typeof(FailureSite), site));
+            var resultState = new ResultState(
+                (TestStatus)Enum.Parse(typeof(TestStatus), status),
+                label,
+                (FailureSite)Enum.Parse(typeof(FailureSite), site)
+            );
             var baseType = result.GetType().BaseType;
             baseType.GetField("_resultState", flags).SetValue(result, resultState);
             baseType.GetField("_output", flags).SetValue(result, new StringBuilder(output));
             baseType.GetField("_duration", flags).SetValue(result, duration);
             if (!string.IsNullOrEmpty(message))
             {
-                baseType.GetField("_message", flags).SetValue(result, message);   
+                baseType.GetField("_message", flags).SetValue(result, message);
             }
             baseType.GetField("_stackTrace", flags).SetValue(result, stacktrace);
-            baseType.GetProperty("StartTime", flags)
-                .SetValue(result, DateTime.FromOADate(startTimeAO), null);
-            baseType.GetProperty("EndTime", flags)
-                .SetValue(result, DateTime.FromOADate(endTimeAO), null);
+            baseType.GetProperty("StartTime", flags).SetValue(result, DateTime.FromOADate(startTimeAO), null);
+            baseType.GetProperty("EndTime", flags).SetValue(result, DateTime.FromOADate(endTimeAO), null);
         }
 
         public bool IsPassed()

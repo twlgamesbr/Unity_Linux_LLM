@@ -3,7 +3,8 @@ using Unity.Collections;
 
 namespace Unity.Entities.Editor
 {
-    struct SimpleDiffer<T> : IDisposable where T : unmanaged, IEquatable<T>
+    struct SimpleDiffer<T> : IDisposable
+        where T : unmanaged, IEquatable<T>
     {
         NativeParallelHashSet<T> m_Current;
         NativeParallelHashSet<T> m_Existing;
@@ -14,7 +15,11 @@ namespace Unity.Entities.Editor
             m_Existing = new(initialCapacity, allocator);
         }
 
-        public void GetCreatedAndRemovedItems(NativeArray<T> source, NativeList<T> createdItems, NativeList<T> removedItems)
+        public void GetCreatedAndRemovedItems(
+            NativeArray<T> source,
+            NativeList<T> createdItems,
+            NativeList<T> removedItems
+        )
         {
             createdItems.Clear();
             removedItems.Clear();
@@ -53,5 +58,4 @@ namespace Unity.Entities.Editor
             m_Existing.Dispose();
         }
     }
-
 }

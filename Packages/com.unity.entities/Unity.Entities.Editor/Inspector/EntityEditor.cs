@@ -1,11 +1,11 @@
 using JetBrains.Annotations;
+using Unity.Assertions;
+using Unity.Entities.UI;
 using Unity.Mathematics;
 using Unity.Properties;
-using Unity.Entities.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Unity.Assertions;
 using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities.Editor
@@ -68,11 +68,11 @@ namespace Unity.Entities.Editor
 
         static EntityEditor()
         {
-            TypeConversion.Register((ref float3 v) => (Vector3) v);
-            TypeConversion.Register((ref Vector3 v) => (float3) v);
+            TypeConversion.Register((ref float3 v) => (Vector3)v);
+            TypeConversion.Register((ref Vector3 v) => (float3)v);
 
-            TypeConversion.Register((ref float4 v) => (Vector4) v);
-            TypeConversion.Register((ref Vector4 v) => (float4) v);
+            TypeConversion.Register((ref float4 v) => (Vector4)v);
+            TypeConversion.Register((ref Vector4 v) => (float4)v);
 
             TypeConversion.Register<quaternion, Vector3>((ref quaternion v) => ((Quaternion)v).eulerAngles);
             TypeConversion.Register<Vector3, quaternion>((ref Vector3 v) => quaternion.Euler(math.radians(v)));
@@ -190,7 +190,7 @@ namespace Unity.Entities.Editor
                 Tabs = new ITabContent[]
                 {
                     new ComponentsTab(entityInspectorContext),
-                    new RelationshipsTab(entityInspectorContext)
+                    new RelationshipsTab(entityInspectorContext),
                 };
             }
         }

@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,7 +12,8 @@ namespace Unity.Entities.Editor
     {
         // System.Type is not serializable by default, so we use the assembly qualified name in order to reconstruct the type.
         // TODO: Support type migration through [FormallySerializedAs], [MovedFrom] and [FormerName]
-        [CreateProperty, HideInInspector] string m_AssemblyQualifiedTypeName;
+        [CreateProperty, HideInInspector]
+        string m_AssemblyQualifiedTypeName;
 
         Type m_ComponentType;
 
@@ -30,9 +31,8 @@ namespace Unity.Entities.Editor
                     if (TypeManager.GetTypeIndex(value) != TypeIndex.Null)
                         m_ComponentType = value;
 
-                    m_AssemblyQualifiedTypeName = m_ComponentType != null
-                        ? m_ComponentType.AssemblyQualifiedName
-                        : null;
+                    m_AssemblyQualifiedTypeName =
+                        m_ComponentType != null ? m_ComponentType.AssemblyQualifiedName : null;
                 }
                 catch (ArgumentException ex)
                 {
@@ -61,12 +61,11 @@ namespace Unity.Entities.Editor
                     return ContentStatus.ContentUnavailable;
             }
 
-            return ComponentType == null
-                ? ContentStatus.ContentNotReady
-                : ContentStatus.ContentReady;
+            return ComponentType == null ? ContentStatus.ContentNotReady : ContentStatus.ContentReady;
         }
 
         public override string Name { get; } = L10n.Tr("Component");
+
         public override object GetContent()
         {
             return this;

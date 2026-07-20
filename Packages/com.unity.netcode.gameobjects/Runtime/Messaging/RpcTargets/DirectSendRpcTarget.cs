@@ -11,7 +11,12 @@ namespace Unity.Netcode
             CheckLockBeforeDispose();
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             SendMessageToClient(behaviour, ClientId, ref message, delivery);
         }
@@ -21,12 +26,11 @@ namespace Unity.Netcode
             ClientId = clientId;
         }
 
-        internal DirectSendRpcTarget(NetworkManager manager) : base(manager)
-        {
+        internal DirectSendRpcTarget(NetworkManager manager)
+            : base(manager) { }
 
-        }
-
-        internal DirectSendRpcTarget(ulong clientId, NetworkManager manager) : base(manager)
+        internal DirectSendRpcTarget(ulong clientId, NetworkManager manager)
+            : base(manager)
         {
             ClientId = clientId;
         }

@@ -19,7 +19,8 @@ namespace EditorAttributes.Editor
         /// <param name="vector">The vector to subtract the value from</param>
         /// <param name="subtrahend">The value to subtract</param>
         /// <returns>A vector with the value subtracted from all axis</returns>
-        public static Vector3 SubtractVector(Vector3 vector, float subtrahend) => vector - new Vector3(subtrahend, subtrahend, subtrahend);
+        public static Vector3 SubtractVector(Vector3 vector, float subtrahend) =>
+            vector - new Vector3(subtrahend, subtrahend, subtrahend);
 
         /// <summary>
         /// Converts a Vector3Int to a Vector2Int
@@ -47,14 +48,16 @@ namespace EditorAttributes.Editor
         /// </summary>
         /// <param name="vector3">The Vector3 to convert</param>
         /// <returns>The converted Vector3Int</returns>
-        public static Vector3Int Vector3ToVector3Int(Vector3 vector3) => new((int)vector3.x, (int)vector3.y, (int)vector3.z);
+        public static Vector3Int Vector3ToVector3Int(Vector3 vector3) =>
+            new((int)vector3.x, (int)vector3.y, (int)vector3.z);
 
         /// <summary>
         /// Converts a Bounds to a BoundsInt
         /// </summary>
         /// <param name="bounds">The bounds to convert</param>
         /// <returns>The converted BoundsInt</returns>
-        public static BoundsInt BoundsToBoundsInt(Bounds bounds) => new(Vector3ToVector3Int(bounds.center), Vector3ToVector3Int(bounds.extents));
+        public static BoundsInt BoundsToBoundsInt(Bounds bounds) =>
+            new(Vector3ToVector3Int(bounds.center), Vector3ToVector3Int(bounds.extents));
 
         /// <summary>
         /// Parses a string to a Vector2
@@ -84,7 +87,8 @@ namespace EditorAttributes.Editor
         /// </summary>
         /// <param name="vectorString">The string representing the vector</param>
         /// <returns>The vector value from the string</returns>
-        public static Vector2Int ParseVector2Int(string vectorString) => Vector2ToVector2Int(ParseVector2(vectorString));
+        public static Vector2Int ParseVector2Int(string vectorString) =>
+            Vector2ToVector2Int(ParseVector2(vectorString));
 
         /// <summary>
         /// Parses a string to a Vector3
@@ -115,7 +119,8 @@ namespace EditorAttributes.Editor
         /// </summary>
         /// <param name="vectorString">The string representing the vector</param>
         /// <returns>The vector value from the string</returns>
-        public static Vector3Int ParseVector3Int(string vectorString) => Vector3ToVector3Int(ParseVector3(vectorString));
+        public static Vector3Int ParseVector3Int(string vectorString) =>
+            Vector3ToVector3Int(ParseVector3(vectorString));
 
         /// <summary>
         /// Parses a string to a Vector4

@@ -13,13 +13,16 @@ namespace Unity.Entities
         /// <summary>
         /// Array of <see cref="ComponentTypeView"/>.
         /// </summary>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [DebuggerDisplay("Length = {Length}")]
         [DebuggerTypeProxy(typeof(ComponentTypeViewArrayDebugView))]
         [StructLayout(LayoutKind.Sequential)]
-        public unsafe readonly struct ComponentTypeViewArray : IEnumerable<ComponentTypeView>
+        public readonly unsafe struct ComponentTypeViewArray : IEnumerable<ComponentTypeView>
         {
-            [NativeDisableUnsafePtrRestriction] readonly TypeIndex* m_TypeIndexPtr;
+            [NativeDisableUnsafePtrRestriction]
+            readonly TypeIndex* m_TypeIndexPtr;
             readonly int m_TypeIndexCount;
 
             /// <summary>
@@ -47,7 +50,10 @@ namespace Unity.Entities
             /// <returns>The index of the component type view if found, otherwise -1.</returns>
             public int IndexOf(ComponentTypeView componentTypeView)
             {
-                if (componentTypeView.m_TypeIndexPtr < m_TypeIndexPtr || componentTypeView.m_TypeIndexPtr >= m_TypeIndexPtr + m_TypeIndexCount)
+                if (
+                    componentTypeView.m_TypeIndexPtr < m_TypeIndexPtr
+                    || componentTypeView.m_TypeIndexPtr >= m_TypeIndexPtr + m_TypeIndexCount
+                )
                     return -1;
 
                 return (int)(componentTypeView.m_TypeIndexPtr - m_TypeIndexPtr);
@@ -98,7 +104,9 @@ namespace Unity.Entities
             /// <summary>
             /// Enumerator that can iterate through the <see cref="ComponentTypeViewArray"/>.
             /// </summary>
-            [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+            [GenerateTestsForBurstCompatibility(
+                RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+            )]
             public struct Enumerator : IEnumerator<ComponentTypeView>
             {
                 readonly ComponentTypeViewArray m_ComponentTypeViewArray;
@@ -116,7 +124,9 @@ namespace Unity.Entities
                 }
 
                 public void Dispose() { }
+
                 public bool MoveNext() => ++m_Index < m_ComponentTypeViewArray.m_TypeIndexCount;
+
                 public void Reset() => m_Index = -1;
             }
 

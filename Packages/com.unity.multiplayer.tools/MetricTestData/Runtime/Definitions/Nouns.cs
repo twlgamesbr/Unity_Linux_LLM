@@ -8802,7 +8802,7 @@ namespace Unity.Multiplayer.Tools.MetricTestData.Definitions
             "youngster",
             "younker",
             "youth",
-            "zealot"
+            "zealot",
         };
     }
 }

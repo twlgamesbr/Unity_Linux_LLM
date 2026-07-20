@@ -8,11 +8,11 @@ namespace UnityEditor.Rendering.Universal
     {
         public partial class Environment
         {
-
             internal enum BackgroundType
             {
                 Skybox = 0,
                 SolidColor,
+
                 [InspectorName("Uninitialized")]
                 DontCare,
             }
@@ -27,11 +27,10 @@ namespace UnityEditor.Rendering.Universal
                     k_ExpandedState,
                     FoldoutOption.Indent,
                     CED.Conditional(
-                        (serialized, owner) => (CameraRenderType)serialized.cameraType.intValue == CameraRenderType.Base,
-                        CED.Group(
-                            Drawer_Environment_ClearFlags
-                        )
-                        ),
+                        (serialized, owner) =>
+                            (CameraRenderType)serialized.cameraType.intValue == CameraRenderType.Base,
+                        CED.Group(Drawer_Environment_ClearFlags)
+                    ),
                     CED.Group(
                         Styles.volumesSettingsText,
                         CED.Group(
@@ -67,8 +66,11 @@ namespace UnityEditor.Rendering.Universal
                 EditorGUI.BeginProperty(clearFlagsRect, Styles.backgroundType, p.baseCameraSettings.clearFlags);
                 {
                     EditorGUI.BeginChangeCheck();
-                    BackgroundType backgroundType = GetBackgroundType((CameraClearFlags)p.baseCameraSettings.clearFlags.intValue);
-                    var selectedValue = (BackgroundType)EditorGUI.EnumPopup(clearFlagsRect, Styles.backgroundType, backgroundType);
+                    BackgroundType backgroundType = GetBackgroundType(
+                        (CameraClearFlags)p.baseCameraSettings.clearFlags.intValue
+                    );
+                    var selectedValue = (BackgroundType)
+                        EditorGUI.EnumPopup(clearFlagsRect, Styles.backgroundType, backgroundType);
                     if (EditorGUI.EndChangeCheck())
                     {
                         CameraClearFlags selectedClearFlags;
@@ -92,7 +94,10 @@ namespace UnityEditor.Rendering.Universal
 
                     if (!p.baseCameraSettings.clearFlags.hasMultipleDifferentValues)
                     {
-                        if (GetBackgroundType((CameraClearFlags)p.baseCameraSettings.clearFlags.intValue) == BackgroundType.SolidColor)
+                        if (
+                            GetBackgroundType((CameraClearFlags)p.baseCameraSettings.clearFlags.intValue)
+                            == BackgroundType.SolidColor
+                        )
                         {
                             using (var group = new EditorGUI.IndentLevelScope())
                             {
@@ -109,14 +114,17 @@ namespace UnityEditor.Rendering.Universal
             {
                 Rect volumeUpdateRect = EditorGUILayout.GetControlRect();
                 EditorGUI.BeginChangeCheck();
-                VolumeFrameworkUpdateMode prevVolumeUpdateMode = (VolumeFrameworkUpdateMode)p.volumeFrameworkUpdateMode.intValue;
-                VolumeFrameworkUpdateMode selectedValue = (VolumeFrameworkUpdateMode)EditorGUI.EnumPopup(volumeUpdateRect, Styles.volumeUpdates, prevVolumeUpdateMode);
+                VolumeFrameworkUpdateMode prevVolumeUpdateMode = (VolumeFrameworkUpdateMode)
+                    p.volumeFrameworkUpdateMode.intValue;
+                VolumeFrameworkUpdateMode selectedValue = (VolumeFrameworkUpdateMode)
+                    EditorGUI.EnumPopup(volumeUpdateRect, Styles.volumeUpdates, prevVolumeUpdateMode);
                 if (EditorGUI.EndChangeCheck())
                 {
                     if (p.serializedObject.targetObject is not Camera cam)
                         return;
 
-                    VolumeFrameworkUpdateMode curVolumeUpdateMode = (VolumeFrameworkUpdateMode)p.volumeFrameworkUpdateMode.intValue;
+                    VolumeFrameworkUpdateMode curVolumeUpdateMode = (VolumeFrameworkUpdateMode)
+                        p.volumeFrameworkUpdateMode.intValue;
                     cam.SetVolumeFrameworkUpdateMode(curVolumeUpdateMode);
                     p.volumeFrameworkUpdateMode.intValue = (int)selectedValue;
                 }
@@ -128,7 +136,13 @@ namespace UnityEditor.Rendering.Universal
                 EditorGUI.BeginProperty(controlRect, Styles.volumeTrigger, p.volumeTrigger);
                 {
                     EditorGUI.BeginChangeCheck();
-                    var newValue = EditorGUI.ObjectField(controlRect, Styles.volumeTrigger, (Transform)p.volumeTrigger.objectReferenceValue, typeof(Transform), true);
+                    var newValue = EditorGUI.ObjectField(
+                        controlRect,
+                        Styles.volumeTrigger,
+                        (Transform)p.volumeTrigger.objectReferenceValue,
+                        typeof(Transform),
+                        true
+                    );
                     if (EditorGUI.EndChangeCheck() && !Equals(p.volumeTrigger.objectReferenceValue, newValue))
                         p.volumeTrigger.objectReferenceValue = newValue;
                 }

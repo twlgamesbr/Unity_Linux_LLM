@@ -44,7 +44,6 @@ namespace UnityEngine.InputSystem.Controls
         // it is set up here is to avoid any state bytes being reserved for the DpadAxisControl.
         [InputControl(name = "x", layout = "DpadAxis", useStateFrom = "right", synthetic = true)]
         [InputControl(name = "y", layout = "DpadAxis", useStateFrom = "up", synthetic = true)]
-
         /// <summary>
         /// The button representing the vertical upwards state of the D-Pad.
         /// </summary>

@@ -3,8 +3,11 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_Metallic"             )]
-    public struct HDRPMaterialPropertyMetallic : IComponentData { public float  Value; }
+    [MaterialProperty("_Metallic")]
+    public struct HDRPMaterialPropertyMetallic : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyMetallicAuthoring : UnityEngine.MonoBehaviour

@@ -31,10 +31,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// graphs if you would like to make them more compact.
         /// </summary>
         [Tooltip(
-            "The label to display for this visual element in the on-screen display. " +
-            "For graphs this field is optional, as the variables displayed in the " +
-            "graph are shown in the legend. Consider leaving this field blank for " +
-            "graphs if you would like to make them more compact."
+            "The label to display for this visual element in the on-screen display. "
+                + "For graphs this field is optional, as the variables displayed in the "
+                + "graph are shown in the legend. Consider leaving this field blank for "
+                + "graphs if you would like to make them more compact."
         )]
         [field: SerializeField]
         public DisplayElementType Type { get; set; }
@@ -71,17 +71,16 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
                 switch (Type)
                 {
                     case DisplayElementType.Counter:
-                        {
-                            return CounterConfiguration.SampleCount;
-                        }
+                    {
+                        return CounterConfiguration.SampleCount;
+                    }
                     case DisplayElementType.LineGraph:
                     case DisplayElementType.StackedAreaGraph:
-                        {
-                            return GraphConfiguration.SampleCount;
-                        }
+                    {
+                        return GraphConfiguration.SampleCount;
+                    }
                     default:
-                        throw new NotSupportedException(
-                            $"Unhandled {nameof(DisplayElementType)} {Type}");
+                        throw new NotSupportedException($"Unhandled {nameof(DisplayElementType)} {Type}");
                 }
             }
         }
@@ -94,17 +93,16 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
                 switch (Type)
                 {
                     case DisplayElementType.Counter:
-                        {
-                            return CounterConfiguration.SampleRate;
-                        }
+                    {
+                        return CounterConfiguration.SampleRate;
+                    }
                     case DisplayElementType.LineGraph:
                     case DisplayElementType.StackedAreaGraph:
-                        {
-                            return GraphConfiguration.SampleRate;
-                        }
+                    {
+                        return GraphConfiguration.SampleRate;
+                    }
                     default:
-                        throw new NotSupportedException(
-                            $"Unhandled {nameof(DisplayElementType)} {Type}");
+                        throw new NotSupportedException($"Unhandled {nameof(DisplayElementType)} {Type}");
                 }
             }
         }
@@ -118,34 +116,33 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
                 switch (Type)
                 {
                     case DisplayElementType.Counter:
+                    {
+                        var smoothingMethod = CounterConfiguration.SmoothingMethod;
+                        switch (smoothingMethod)
                         {
-                            var smoothingMethod = CounterConfiguration.SmoothingMethod;
-                            switch (smoothingMethod)
-                            {
-                                case SmoothingMethod.ExponentialMovingAverage:
-                                    return CounterConfiguration.ExponentialMovingAverageParams.HalfLife;
-                                case SmoothingMethod.SimpleMovingAverage:
-                                    return null;
-                                default:
-                                    throw new NotSupportedException(
-                                        $"Unhandled {nameof(SmoothingMethod)} {smoothingMethod}");
-                            }
+                            case SmoothingMethod.ExponentialMovingAverage:
+                                return CounterConfiguration.ExponentialMovingAverageParams.HalfLife;
+                            case SmoothingMethod.SimpleMovingAverage:
+                                return null;
+                            default:
+                                throw new NotSupportedException(
+                                    $"Unhandled {nameof(SmoothingMethod)} {smoothingMethod}"
+                                );
                         }
+                    }
                     case DisplayElementType.LineGraph:
                     case DisplayElementType.StackedAreaGraph:
                         return null;
                     default:
-                        throw new NotSupportedException(
-                            $"Unhandled {nameof(DisplayElementType)} {Type}");
+                        throw new NotSupportedException($"Unhandled {nameof(DisplayElementType)} {Type}");
                 }
             }
         }
 
         /// The DecayConstant required for the Continuous Exponential Moving Average
         /// of this DisplayElement (if any)
-        internal double? DecayConstant => HalfLife.HasValue
-            ? ContinuousExponentialMovingAverage.GetDecayConstantForHalfLife(HalfLife.Value)
-            : null;
+        internal double? DecayConstant =>
+            HalfLife.HasValue ? ContinuousExponentialMovingAverage.GetDecayConstantForHalfLife(HalfLife.Value) : null;
 
         internal void OnValidate()
         {
@@ -155,6 +152,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
 
         int m_PreviousStatsHash = 0;
         string m_PreviousGeneratedLabel = "";
+
         void RefreshGenerateLabel()
         {
             if (Type != DisplayElementType.Counter)
@@ -205,10 +203,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
             for (int j = 0; j < variableColors.Count; ++j)
             {
                 var graphConfigurationVariableColor = variableColors[j];
-                if (graphConfigurationVariableColor.a != 0f ||
-                    graphConfigurationVariableColor.r != 0f ||
-                    graphConfigurationVariableColor.g != 0f ||
-                    graphConfigurationVariableColor.b != 0f)
+                if (
+                    graphConfigurationVariableColor.a != 0f
+                    || graphConfigurationVariableColor.r != 0f
+                    || graphConfigurationVariableColor.g != 0f
+                    || graphConfigurationVariableColor.b != 0f
+                )
                 {
                     areAllColorsZeroInitialized = false;
                     break;

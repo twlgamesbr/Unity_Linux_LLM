@@ -70,8 +70,15 @@ namespace Unity.Networking.Transport
 
             m_UnderlyingConnectionList = connectionList;
             connectionList = m_ConnectionList = ConnectionList.Create();
-            m_ConnectionsData = new ConnectionDataMap<TLSConnectionData>(1, default(TLSConnectionData), Allocator.Persistent);
-            m_UnderlyingIdToCurrentIdMap = new NativeParallelHashMap<ConnectionId, ConnectionId>(1, Allocator.Persistent);
+            m_ConnectionsData = new ConnectionDataMap<TLSConnectionData>(
+                1,
+                default(TLSConnectionData),
+                Allocator.Persistent
+            );
+            m_UnderlyingIdToCurrentIdMap = new NativeParallelHashMap<ConnectionId, ConnectionId>(
+                1,
+                Allocator.Persistent
+            );
             m_UnityTLSConfiguration = new UnityTLSConfiguration(ref settings, SecureTransportProtocol.TLS);
             m_DeferredSends = new PacketsQueue(k_DeferredSendsQueueSize, netConfig.maxMessageSize);
 
@@ -86,7 +93,7 @@ namespace Unity.Networking.Transport
             return 0;
         }
 
-        public void Dispose() 
+        public void Dispose()
         {
             // Destroy any remaining UnityTLS clients (their memory is managed by UnityTLS).
             for (int i = 0; i < m_ConnectionsData.Length; i++)
@@ -114,8 +121,10 @@ namespace Unity.Networking.Transport
             public PacketsQueue ReceiveQueue;
             public long Time;
             public long HalfOpenDisconnectTimeout;
+
             [NativeDisableUnsafePtrRestriction]
             public Binding.unitytls_client_config* UnityTLSConfig;
+
             [NativeDisableUnsafePtrRestriction]
             public UnityTLSCallbacks.CallbackContext* UnityTLSCallbackContext;
 
@@ -157,7 +166,10 @@ namespace Unity.Networking.Transport
                     // If in initial or handshake state, process everything as a handshake message.
                     var clientPtr = ConnectionsData[connectionId].UnityTLSClientPtr;
                     var clientState = Binding.unitytls_client_get_state(clientPtr);
-                    if (clientState == Binding.UnityTLSClientState_Init || clientState == Binding.UnityTLSClientState_Handshake)
+                    if (
+                        clientState == Binding.UnityTLSClientState_Init
+                        || clientState == Binding.UnityTLSClientState_Handshake
+                    )
                     {
                         ProcessHandshakeMessage(ref packetProcessor);
 
@@ -244,7 +256,11 @@ namespace Unity.Networking.Transport
 
                     var decryptedLength = new UIntPtr();
                     var result = Binding.unitytls_client_read_data(
-                        data.UnityTLSClientPtr, bufferPtr, new UIntPtr((uint)bufferLength), &decryptedLength);
+                        data.UnityTLSClientPtr,
+                        bufferPtr,
+                        new UIntPtr((uint)bufferLength),
+                        &decryptedLength
+                    );
 
                     var wouldBlock = result == Binding.UNITYTLS_USER_WOULD_BLOCK;
                     if (wouldBlock || (result == Binding.UNITYTLS_SUCCESS && decryptedLength.ToUInt32() == 0))
@@ -365,7 +381,10 @@ namespace Unity.Networking.Transport
                 {
                     var clientPtr = ConnectionsData[connection].UnityTLSClientPtr;
                     var clientState = Binding.unitytls_client_get_state(clientPtr);
-                    if (clientState == Binding.UnityTLSClientState_Init || clientState == Binding.UnityTLSClientState_Handshake)
+                    if (
+                        clientState == Binding.UnityTLSClientState_Init
+                        || clientState == Binding.UnityTLSClientState_Handshake
+                    )
                     {
                         UnityTLSCallbackContext->ReceivedPacket = default;
                         UnityTLSCallbackContext->NewPacketsEndpoint = endpoint;
@@ -400,7 +419,9 @@ namespace Unity.Networking.Transport
                     if (clientState == Binding.UnityTLSClientState_Fail)
                     {
                         var step = Binding.unitytls_client_get_handshake_state(clientPtr);
-                        Debug.LogError($"TLS handshake failed at step {step} ({DTLSUtilities.DescribeHandshakeStep(step)}). Closing connection.");
+                        Debug.LogError(
+                            $"TLS handshake failed at step {step} ({DTLSUtilities.DescribeHandshakeStep(step)}). Closing connection."
+                        );
                     }
 
                     UnderlyingConnections.StartDisconnecting(ref data.UnderlyingConnection);
@@ -417,7 +438,10 @@ namespace Unity.Networking.Transport
                     return;
 
                 var clientState = Binding.unitytls_client_get_state(data.UnityTLSClientPtr);
-                if (clientState != Binding.UnityTLSClientState_Init && clientState != Binding.UnityTLSClientState_Handshake)
+                if (
+                    clientState != Binding.UnityTLSClientState_Init
+                    && clientState != Binding.UnityTLSClientState_Handshake
+                )
                     return;
 
                 if (Time - data.LastHandshakeUpdate > HalfOpenDisconnectTimeout)
@@ -430,7 +454,7 @@ namespace Unity.Networking.Transport
 
             private void CopyDecryptBufferToPacket(ref TLSConnectionData data, ref PacketProcessor packetProcessor)
             {
-                fixed(byte* decryptBuffer = data.DecryptBuffer)
+                fixed (byte* decryptBuffer = data.DecryptBuffer)
                 {
                     var copyLength = math.min(packetProcessor.BytesAvailableAtEnd, data.DecryptBufferLength);
                     packetProcessor.AppendToPayload(decryptBuffer, copyLength);
@@ -446,7 +470,8 @@ namespace Unity.Networking.Transport
 
             private void AdvanceHandshake(Binding.unitytls_client* clientPtr)
             {
-                while (Binding.unitytls_client_handshake(clientPtr) == Binding.UNITYTLS_HANDSHAKE_STEP);
+                while (Binding.unitytls_client_handshake(clientPtr) == Binding.UNITYTLS_HANDSHAKE_STEP)
+                    ;
             }
 
             private void Disconnect(ConnectionId connection)
@@ -485,6 +510,7 @@ namespace Unity.Networking.Transport
             public ConnectionDataMap<TLSConnectionData> ConnectionsData;
             public PacketsQueue SendQueue;
             public PacketsQueue DeferredSends;
+
             [NativeDisableUnsafePtrRestriction]
             public UnityTLSCallbacks.CallbackContext* UnityTLSCallbackContext;
 
@@ -515,10 +541,16 @@ namespace Unity.Networking.Transport
                     }
 
                     var packetPtr = (byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset;
-                    var result = Binding.unitytls_client_send_data(clientPtr, packetPtr, new UIntPtr((uint)packetProcessor.Length));
+                    var result = Binding.unitytls_client_send_data(
+                        clientPtr,
+                        packetPtr,
+                        new UIntPtr((uint)packetProcessor.Length)
+                    );
                     if (result != Binding.UNITYTLS_SUCCESS)
                     {
-                        Debug.LogError($"Failed to encrypt packet (error: {result}). Likely internal TLS failure. Closing connection.");
+                        Debug.LogError(
+                            $"Failed to encrypt packet (error: {result}). Likely internal TLS failure. Closing connection."
+                        );
                         packetProcessor.Drop();
                     }
                 }

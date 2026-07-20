@@ -15,7 +15,7 @@ namespace UnityEngine.InputSystem.Editor
         const string packageName = "com.unity.inputsystem";
 
         [InitializeOnLoadMethod]
-        static void  SubscribePackageManagerEvent()
+        static void SubscribePackageManagerEvent()
         {
             //There's a number of cases where it might not be called, for instance if the user changed the project manifest and deleted the Library folder before opening the project
             UnityEditor.PackageManager.Events.registeringPackages += CheckForInputSystemPackageRemoved;
@@ -41,7 +41,14 @@ namespace UnityEngine.InputSystem.Editor
         {
             //Set input handling to InputManager
             EditorPlayerSettingHelpers.newSystemBackendsEnabled = false;
-            if (EditorUtility.DisplayDialog("The Unity Editor needs to be restarted", "You've removed the Input System package. This requires a restart of the Unity Editor.", "Restart the Editor", "Ignore (Not recommended)"))
+            if (
+                EditorUtility.DisplayDialog(
+                    "The Unity Editor needs to be restarted",
+                    "You've removed the Input System package. This requires a restart of the Unity Editor.",
+                    "Restart the Editor",
+                    "Ignore (Not recommended)"
+                )
+            )
                 EditorApplication.OpenProject(Environment.CurrentDirectory);
         }
     }

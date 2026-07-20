@@ -13,7 +13,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return new ComputeRayTracingShader((ComputeShader)shader, kernelName, dispatchBuffer);
         }
 
-        public IRayTracingAccelStruct CreateAccelerationStructure(AccelerationStructureOptions options, ReferenceCounter counter)
+        public IRayTracingAccelStruct CreateAccelerationStructure(
+            AccelerationStructureOptions options,
+            ReferenceCounter counter
+        )
         {
             return new ComputeRayTracingAccelStruct(options, m_Resources, counter);
         }
@@ -21,7 +24,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         public ulong GetRequiredTraceScratchBufferSizeInBytes(uint width, uint height, uint depth)
         {
             uint rayCount = width * height * depth;
-            return (RadeonRays.RadeonRaysAPI.GetTraceMemoryRequirements(rayCount) * RayTracingContext.GetScratchBufferStrideInBytes());
+            return (
+                RadeonRays.RadeonRaysAPI.GetTraceMemoryRequirements(rayCount)
+                * RayTracingContext.GetScratchBufferStrideInBytes()
+            );
         }
 
         readonly RayTracingResources m_Resources;

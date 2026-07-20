@@ -1,7 +1,7 @@
 using System.Linq;
+using NPCSystem.Items;
 using UnityEditor;
 using UnityEngine;
-using NPCSystem.Items;
 
 namespace NPCSystem.Editor.Tools
 {
@@ -62,25 +62,55 @@ namespace NPCSystem.Editor.Tools
             EnsureFolder();
 
             // 1. Create item definition assets
-            var healthPotion = CreateItem("health-potion", "Health Potion",
+            var healthPotion = CreateItem(
+                "health-potion",
+                "Health Potion",
                 "Restores 50 HP when consumed. A staple for any adventurer.",
-                ItemCategory.Consumable, 10, 5, new[] { "healing", "consumable" });
+                ItemCategory.Consumable,
+                10,
+                5,
+                new[] { "healing", "consumable" }
+            );
 
-            var ironOre = CreateItem("iron-ore", "Iron Ore",
+            var ironOre = CreateItem(
+                "iron-ore",
+                "Iron Ore",
                 "A chunk of raw iron. Can be smelted into bars and forged into weapons.",
-                ItemCategory.Material, 99, 1, new[] { "ore", "crafting", "material" });
+                ItemCategory.Material,
+                99,
+                1,
+                new[] { "ore", "crafting", "material" }
+            );
 
-            var silverKey = CreateItem("silver-key", "Silver Key",
+            var silverKey = CreateItem(
+                "silver-key",
+                "Silver Key",
                 "A gleaming silver key. It looks like it opens something important.",
-                ItemCategory.Key, 1, 0, new[] { "key", "quest" });
+                ItemCategory.Key,
+                1,
+                0,
+                new[] { "key", "quest" }
+            );
 
-            var woodenSword = CreateItem("wooden-sword", "Wooden Sword",
+            var woodenSword = CreateItem(
+                "wooden-sword",
+                "Wooden Sword",
                 "A simple practice sword. Better than nothing in a fight.",
-                ItemCategory.Weapon, 1, 10, new[] { "weapon", "melee", "starter" });
+                ItemCategory.Weapon,
+                1,
+                10,
+                new[] { "weapon", "melee", "starter" }
+            );
 
-            var goldCoin = CreateItem("gold-coin", "Gold Coin",
+            var goldCoin = CreateItem(
+                "gold-coin",
+                "Gold Coin",
                 "A shiny gold coin. The universal currency of the realm.",
-                ItemCategory.Currency, 999, 0, new[] { "currency", "trade" });
+                ItemCategory.Currency,
+                999,
+                0,
+                new[] { "currency", "trade" }
+            );
 
             Debug.Log($"[CreateGenericItems] Created {5} item definition(s).");
 
@@ -105,8 +135,10 @@ namespace NPCSystem.Editor.Tools
             if (profile != null)
             {
                 var profileType = profile.GetType();
-                var field = profileType.GetField("_inventoryItems",
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var field = profileType.GetField(
+                    "_inventoryItems",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+                );
                 if (field != null)
                 {
                     var startingItems = new NPCItemDefinition[] { healthPotion, ironOre, goldCoin };
@@ -123,9 +155,14 @@ namespace NPCSystem.Editor.Tools
         }
 
         static NPCItemDefinition CreateItem(
-            string itemId, string displayName, string description,
-            ItemCategory category, int maxStackSize, int tradeValue,
-            string[] tags)
+            string itemId,
+            string displayName,
+            string description,
+            ItemCategory category,
+            int maxStackSize,
+            int tradeValue,
+            string[] tags
+        )
         {
             var path = $"{ItemsFolder}/{itemId}.asset";
             var existing = AssetDatabase.LoadAssetAtPath<NPCItemDefinition>(path);

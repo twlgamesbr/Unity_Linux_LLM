@@ -11,18 +11,18 @@ namespace Unity.Entities.Analyzer
             {
                 return new[]
                 {
-                    new[] {"GetComponentLookup", "SystemAPI.GetComponentLookup<EcsTestData>()"},
-                    new[] {"GetComponent", "SystemAPI.GetComponent<EcsTestData>(entity)"},
-                    new[] {"GetComponentRW", "SystemAPI.GetComponentRW<EcsTestData>(entity)"},
-                    new[] {"GetComponentRO", "SystemAPI.GetComponentRO<EcsTestData>(entity)"},
-                    new[] {"TryGetComponent", "SystemAPI.TryGetComponent<EcsTestData>(entity, out var result)"},
-                    new[] {"SetComponent", "SystemAPI.SetComponent<EcsTestData>(entity, new EcsTestData())"},
-                    new[] {"HasComponent", "SystemAPI.HasComponent<EcsTestData>(entity)"},
-                    new[] {"GetBufferLookup", "SystemAPI.GetBufferLookup<EcsIntElement>(true)"},
-                    new[] {"GetBuffer", "SystemAPI.GetBuffer<EcsIntElement>(entity)"},
-                    new[] {"HasBuffer", "SystemAPI.HasBuffer<EcsIntElement>(entity)"},
-                    new[] {"GetEntityStorageInfoLookup", "SystemAPI.GetEntityStorageInfoLookup()"},
-                    new[] {"Exists", "SystemAPI.Exists(entity)"},
+                    new[] { "GetComponentLookup", "SystemAPI.GetComponentLookup<EcsTestData>()" },
+                    new[] { "GetComponent", "SystemAPI.GetComponent<EcsTestData>(entity)" },
+                    new[] { "GetComponentRW", "SystemAPI.GetComponentRW<EcsTestData>(entity)" },
+                    new[] { "GetComponentRO", "SystemAPI.GetComponentRO<EcsTestData>(entity)" },
+                    new[] { "TryGetComponent", "SystemAPI.TryGetComponent<EcsTestData>(entity, out var result)" },
+                    new[] { "SetComponent", "SystemAPI.SetComponent<EcsTestData>(entity, new EcsTestData())" },
+                    new[] { "HasComponent", "SystemAPI.HasComponent<EcsTestData>(entity)" },
+                    new[] { "GetBufferLookup", "SystemAPI.GetBufferLookup<EcsIntElement>(true)" },
+                    new[] { "GetBuffer", "SystemAPI.GetBuffer<EcsIntElement>(entity)" },
+                    new[] { "HasBuffer", "SystemAPI.HasBuffer<EcsIntElement>(entity)" },
+                    new[] { "GetEntityStorageInfoLookup", "SystemAPI.GetEntityStorageInfoLookup()" },
+                    new[] { "Exists", "SystemAPI.Exists(entity)" },
                 };
             }
         }

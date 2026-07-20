@@ -13,9 +13,11 @@ namespace Unity.Entities.UI
 
             protected override void VisitContainer<TContainer>(ref TContainer target)
             {
-                if (Inspector.TryGetTarget(out TContainer currentTarget)
+                if (
+                    Inspector.TryGetTarget(out TContainer currentTarget)
                     && TypeTraits<TContainer>.CanBeNull
-                    && EqualityComparer<TContainer>.Default.Equals(currentTarget, target))
+                    && EqualityComparer<TContainer>.Default.Equals(currentTarget, target)
+                )
                     return;
 
                 Inspector.SetTarget(target);
@@ -25,8 +27,7 @@ namespace Unity.Entities.UI
                 // content to take the full size of the window. For this window, users can choose between the default
                 // window behaviour and the inspector behaviour. To support this, we will force the root to fully expand.
                 // When a custom inspector is provided, we need to adjust the CustomInspectorElement to also fully expand.
-                if (Inspector.childCount == 1
-                    && Inspector[0] is CustomInspectorElement customInspector)
+                if (Inspector.childCount == 1 && Inspector[0] is CustomInspectorElement customInspector)
                 {
                     customInspector.style.flexGrow = 1;
                 }

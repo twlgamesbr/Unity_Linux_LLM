@@ -8,40 +8,62 @@ namespace UnityEngine.Rendering.Universal
     internal class ScreenSpaceAmbientOcclusionSettings
     {
         // Parameters
-        [SerializeField] internal AOMethodOptions AOMethod = AOMethodOptions.BlueNoise;
-        [SerializeField] internal bool Downsample = false;
-        [SerializeField] internal bool AfterOpaque = false;
-        [SerializeField] internal DepthSource Source = DepthSource.DepthNormals;
-        [SerializeField] internal NormalQuality NormalSamples = NormalQuality.Medium;
-        [SerializeField] internal float Intensity = 3.0f;
-        [SerializeField] internal float DirectLightingStrength = 0.25f;
-        [SerializeField] internal float Radius = 0.035f;
-        [SerializeField] internal AOSampleOption Samples = AOSampleOption.Medium;
-        [SerializeField] internal BlurQualityOptions BlurQuality = BlurQualityOptions.High;
-        [SerializeField] internal float Falloff = 100f;
+        [SerializeField]
+        internal AOMethodOptions AOMethod = AOMethodOptions.BlueNoise;
+
+        [SerializeField]
+        internal bool Downsample = false;
+
+        [SerializeField]
+        internal bool AfterOpaque = false;
+
+        [SerializeField]
+        internal DepthSource Source = DepthSource.DepthNormals;
+
+        [SerializeField]
+        internal NormalQuality NormalSamples = NormalQuality.Medium;
+
+        [SerializeField]
+        internal float Intensity = 3.0f;
+
+        [SerializeField]
+        internal float DirectLightingStrength = 0.25f;
+
+        [SerializeField]
+        internal float Radius = 0.035f;
+
+        [SerializeField]
+        internal AOSampleOption Samples = AOSampleOption.Medium;
+
+        [SerializeField]
+        internal BlurQualityOptions BlurQuality = BlurQualityOptions.High;
+
+        [SerializeField]
+        internal float Falloff = 100f;
 
         // Legacy. Kept to migrate users over to use Samples instead.
-        [SerializeField] internal int SampleCount = -1;
+        [SerializeField]
+        internal int SampleCount = -1;
 
         // Enums
         internal enum DepthSource
         {
             Depth = 0,
-            DepthNormals = 1
+            DepthNormals = 1,
         }
 
         internal enum NormalQuality
         {
             Low,
             Medium,
-            High
+            High,
         }
 
         internal enum AOSampleOption
         {
-            High,   // 12 Samples
+            High, // 12 Samples
             Medium, // 8 Samples
-            Low,    // 4 Samples
+            Low, // 4 Samples
         }
 
         internal enum AOMethodOptions
@@ -52,9 +74,9 @@ namespace UnityEngine.Rendering.Universal
 
         internal enum BlurQualityOptions
         {
-            High,   // Bilateral
+            High, // Bilateral
             Medium, // Gaussian
-            Low,    // Kawase
+            Low, // Kawase
         }
     }
 
@@ -76,7 +98,9 @@ namespace UnityEngine.Rendering.Universal
 
         public bool isAvailableInPlayerBuild => true;
 
-        [SerializeField][HideInInspector] private int m_Version = 0;
+        [SerializeField]
+        [HideInInspector]
+        private int m_Version = 0;
 
         /// <summary>Current version of the resource container. Used only for upgrading a project.</summary>
         public int version => m_Version;
@@ -100,24 +124,28 @@ namespace UnityEngine.Rendering.Universal
 
         public bool isAvailableInPlayerBuild => true;
 
-        [SerializeField][HideInInspector] private int m_Version = 0;
+        [SerializeField]
+        [HideInInspector]
+        private int m_Version = 0;
 
         /// <summary>Current version of the resource container. Used only for upgrading a project.</summary>
         public int version => m_Version;
     }
-
 
     /// <summary>
     /// The class for the SSAO renderer feature.
     /// </summary>
     [SupportedOnRenderer(typeof(UniversalRendererData))]
     [DisallowMultipleRendererFeature("Screen Space Ambient Occlusion")]
-    [Tooltip("The Ambient Occlusion effect darkens creases, holes, intersections and surfaces that are close to each other.")]
+    [Tooltip(
+        "The Ambient Occlusion effect darkens creases, holes, intersections and surfaces that are close to each other."
+    )]
     [URPHelpURL("post-processing-ssao")]
     public class ScreenSpaceAmbientOcclusion : ScriptableRendererFeature
     {
         // Serialized Fields
-        [SerializeField] private ScreenSpaceAmbientOcclusionSettings m_Settings = new ScreenSpaceAmbientOcclusionSettings();
+        [SerializeField]
+        private ScreenSpaceAmbientOcclusionSettings m_Settings = new ScreenSpaceAmbientOcclusionSettings();
 
         // Private Fields
         private Material m_Material;
@@ -175,13 +203,20 @@ namespace UnityEngine.Rendering.Universal
             RenderPassEvent passEvent;
             if (usesDeferred)
             {
-                passEvent = m_Settings.AfterOpaque ? RenderPassEvent.AfterRenderingOpaques : RenderPassEvent.AfterRenderingPrePasses;
+                passEvent = m_Settings.AfterOpaque
+                    ? RenderPassEvent.AfterRenderingOpaques
+                    : RenderPassEvent.AfterRenderingPrePasses;
                 requirements = ScriptableRenderPassInput.Depth | ScriptableRenderPassInput.Normal;
             }
             else
             {
-                passEvent = m_Settings.AfterOpaque ? RenderPassEvent.BeforeRenderingTransparents : RenderPassEvent.AfterRenderingPrePasses + 1;
-                requirements = m_Settings.Source == ScreenSpaceAmbientOcclusionSettings.DepthSource.Depth ? ScriptableRenderPassInput.Depth : ScriptableRenderPassInput.Depth | ScriptableRenderPassInput.Normal;
+                passEvent = m_Settings.AfterOpaque
+                    ? RenderPassEvent.BeforeRenderingTransparents
+                    : RenderPassEvent.AfterRenderingPrePasses + 1;
+                requirements =
+                    m_Settings.Source == ScreenSpaceAmbientOcclusionSettings.DepthSource.Depth
+                        ? ScriptableRenderPassInput.Depth
+                        : ScriptableRenderPassInput.Depth | ScriptableRenderPassInput.Normal;
             }
 
             if (renderer is UniversalRenderer universalRenderer && universalRenderer.useTileOnlyMode)
@@ -190,7 +225,9 @@ namespace UnityEngine.Rendering.Universal
                 {
                     Debug.LogErrorFormat(
                         "Screen Space Ambient Occlusion \"{0}\": the current settings are not compatible with Tile-Only Mode. Open the Universal Renderer \"{1}\" in the Inspector for more information.",
-                        name, renderer.name);
+                        name,
+                        renderer.name
+                    );
                     return;
                 }
 
@@ -201,18 +238,25 @@ namespace UnityEngine.Rendering.Universal
                 // Backbuffer depth with uv origin X does not match with texture attachment _SSAO_OcclusionTexture0
                 // with uv origin Y". Pass merging is currently too aggressive here, so disallow After Opaque with
                 // Depth Normals in Tile-Only Mode.
-                if (m_Settings.AfterOpaque && m_Settings.Source == ScreenSpaceAmbientOcclusionSettings.DepthSource.DepthNormals)
+                if (
+                    m_Settings.AfterOpaque
+                    && m_Settings.Source == ScreenSpaceAmbientOcclusionSettings.DepthSource.DepthNormals
+                )
                 {
                     Debug.LogErrorFormat(
                         "Screen Space Ambient Occlusion \"{0}\": the current settings are not compatible with Tile-Only Mode. Open the Universal Renderer \"{1}\" in the Inspector for more information.",
-                        name, renderer.name);
+                        name,
+                        renderer.name
+                    );
                     return;
                 }
             }
 
             m_SSAOPass.renderPassEvent = passEvent;
             m_SSAOPass.ConfigureInput(requirements);
-            var effectiveDepthSource = usesDeferred ? ScreenSpaceAmbientOcclusionSettings.DepthSource.DepthNormals : m_Settings.Source;
+            var effectiveDepthSource = usesDeferred
+                ? ScreenSpaceAmbientOcclusionSettings.DepthSource.DepthNormals
+                : m_Settings.Source;
             bool shouldAdd = m_SSAOPass.Setup(m_Settings, effectiveDepthSource, m_Material, m_BlueNoise256Textures);
             if (shouldAdd)
                 renderer.EnqueuePass(m_SSAOPass);
@@ -230,21 +274,35 @@ namespace UnityEngine.Rendering.Universal
         {
             if (m_Shader == null)
             {
-                if (!GraphicsSettings.TryGetRenderPipelineSettings<ScreenSpaceAmbientOcclusionPersistentResources>(out var ssaoPersistentResources))
+                if (
+                    !GraphicsSettings.TryGetRenderPipelineSettings<ScreenSpaceAmbientOcclusionPersistentResources>(
+                        out var ssaoPersistentResources
+                    )
+                )
                 {
                     Debug.LogErrorFormat(
-                        $"Couldn't find the required resources for the {nameof(ScreenSpaceAmbientOcclusion)} render feature. If this exception appears in the Player, make sure at least one {nameof(ScreenSpaceAmbientOcclusion)} render feature is enabled or adjust your stripping settings.");
+                        $"Couldn't find the required resources for the {nameof(ScreenSpaceAmbientOcclusion)} render feature. If this exception appears in the Player, make sure at least one {nameof(ScreenSpaceAmbientOcclusion)} render feature is enabled or adjust your stripping settings."
+                    );
                     return false;
                 }
 
                 m_Shader = ssaoPersistentResources.Shader;
             }
 
-            if (m_Settings.AOMethod == ScreenSpaceAmbientOcclusionSettings.AOMethodOptions.BlueNoise && (m_BlueNoise256Textures == null || m_BlueNoise256Textures.Length == 0))
+            if (
+                m_Settings.AOMethod == ScreenSpaceAmbientOcclusionSettings.AOMethodOptions.BlueNoise
+                && (m_BlueNoise256Textures == null || m_BlueNoise256Textures.Length == 0)
+            )
             {
-                if (!GraphicsSettings.TryGetRenderPipelineSettings<ScreenSpaceAmbientOcclusionDynamicResources>(out var ssaoDynamicResources))
+                if (
+                    !GraphicsSettings.TryGetRenderPipelineSettings<ScreenSpaceAmbientOcclusionDynamicResources>(
+                        out var ssaoDynamicResources
+                    )
+                )
                 {
-                    Debug.LogErrorFormat($"Couldn't load {nameof(ScreenSpaceAmbientOcclusionDynamicResources.BlueNoise256Textures)}. If this exception appears in the Player, please check the SSAO options for {nameof(ScreenSpaceAmbientOcclusion)} or adjust your stripping settings");
+                    Debug.LogErrorFormat(
+                        $"Couldn't load {nameof(ScreenSpaceAmbientOcclusionDynamicResources.BlueNoise256Textures)}. If this exception appears in the Player, please check the SSAO options for {nameof(ScreenSpaceAmbientOcclusion)} or adjust your stripping settings"
+                    );
                     return false;
                 }
 
@@ -256,12 +314,13 @@ namespace UnityEngine.Rendering.Universal
 
             if (m_Material == null)
             {
-                Debug.LogError($"{GetType().Name}.AddRenderPasses(): Missing material. {name} render pass will not be added.");
+                Debug.LogError(
+                    $"{GetType().Name}.AddRenderPasses(): Missing material. {name} render pass will not be added."
+                );
                 return false;
             }
 
             return true;
-
         }
     }
 }

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
+using Unity.Editor.Bridge;
 using UnityEditor;
 using UnityEditor.Search;
 using UnityEngine;
 using static Unity.Entities.Editor.MemoryProfilerModule;
 using static Unity.Entities.MemoryProfiler;
-using Unity.Editor.Bridge;
 
 namespace Unity.Entities.Editor
 {
@@ -47,7 +47,9 @@ namespace Unity.Entities.Editor
             m_ComponentTypes = new();
             m_ChunkComponentTypes = new();
             m_SharedComponentTypes = new();
-            foreach (var typeIndex in arch.ComponentTypes.OrderByDescending(MemoryProfilerModuleView.GetTypeSizeInChunk))
+            foreach (
+                var typeIndex in arch.ComponentTypes.OrderByDescending(MemoryProfilerModuleView.GetTypeSizeInChunk)
+            )
             {
                 if (TypeManager.IsChunkComponent(typeIndex))
                     m_ChunkComponentTypes.Add(typeIndex);
@@ -178,7 +180,7 @@ namespace Unity.Entities.Editor
                     wrapper.item = item;
                     wrapper.objItem = (MemoryProfilerTreeViewItemData)item.data;
                     return wrapper;
-                }
+                },
             };
             SearchBridge.SetTableConfig(p, GetDefaultTableConfig);
             return p;
@@ -193,14 +195,22 @@ namespace Unity.Entities.Editor
                 {
                     switch (column.selector)
                     {
-                        case "allocated": return FormattingUtility.BytesToString(data.AllocatedBytes);
-                        case "unused": return FormattingUtility.BytesToString(data.UnusedBytes);
-                        case "entities": return data.EntityCount;
-                        case "unusedEntities": return data.UnusedEntityCount;
-                        case "chunks": return data.ChunkCount;
-                        case "capacity": return FormattingUtility.BytesToString((ulong)data.ChunkCapacity);
-                        case "segments": return data.SegmentCount;
-                        case "components": return data.ComponentTypes.Length;
+                        case "allocated":
+                            return FormattingUtility.BytesToString(data.AllocatedBytes);
+                        case "unused":
+                            return FormattingUtility.BytesToString(data.UnusedBytes);
+                        case "entities":
+                            return data.EntityCount;
+                        case "unusedEntities":
+                            return data.UnusedEntityCount;
+                        case "chunks":
+                            return data.ChunkCount;
+                        case "capacity":
+                            return FormattingUtility.BytesToString((ulong)data.ChunkCapacity);
+                        case "segments":
+                            return data.SegmentCount;
+                        case "components":
+                            return data.ComponentTypes.Length;
                     }
                 }
 
@@ -210,10 +220,7 @@ namespace Unity.Entities.Editor
 
         static IEnumerable<string> GetArchComponentTypes(MemoryProfilerTreeViewItemData data)
         {
-            return data.ComponentTypes
-                    .Select(t => TypeManager.GetType(t))
-                    .Where(t => t != null)
-                    .Select(t => t.Name);
+            return data.ComponentTypes.Select(t => TypeManager.GetType(t)).Where(t => t != null).Select(t => t.Name);
         }
 
         static void SetupQueryEngine()
@@ -224,26 +231,79 @@ namespace Unity.Entities.Editor
             {
                 return GetArchComponentTypes(data).Append(FormattingUtility.HashToString(data.StableHash));
             });
-            SearchBridge.SetFilter(s_QueryEngine, "allocated", data => data.AllocatedBytes)
-                .AddOrUpdateProposition(category: null, label: "Allocated", replacement: "allocated>1024", help: "Search archetypes by allocated bytes.");
-            SearchBridge.SetFilter(s_QueryEngine, "unused", data => data.UnusedBytes)
-                .AddOrUpdateProposition(category: null, label: "Unused", replacement: "unused>1024", help: "Search archetypes by unused bytes.");
-            SearchBridge.SetFilter(s_QueryEngine, "entities", data => data.EntityCount)
-                .AddOrUpdateProposition(category: null, label: "Entities Count", replacement: "entities>3", help: "Search archetypes by entity count.");
-            SearchBridge.SetFilter(s_QueryEngine, "unusedEntities", data => data.UnusedEntityCount)
-                .AddOrUpdateProposition(category: null, label: "Unused Entity Count", replacement: "unusedEntities>3", help: "Search archetypes by unused entity count.");
-            SearchBridge.SetFilter(s_QueryEngine, "chunks", data => data.ChunkCount)
-                .AddOrUpdateProposition(category: null, label: "Chunks Count", replacement: "chunks>3", help: "Search archetypes by chunks count.");
-            SearchBridge.SetFilter(s_QueryEngine, "capacity", data => data.ChunkCapacity)
-                .AddOrUpdateProposition(category: null, label: "Capacity", replacement: "capacity>3", help: "Search archetypes by capacity.");
-            SearchBridge.SetFilter(s_QueryEngine, "segments", data => data.SegmentCount)
-                .AddOrUpdateProposition(category: null, label: "Segments Count", replacement: "segments>3", help: "Search archetypes by segments count.");
-            SearchBridge.SetFilter(s_QueryEngine, "components", data => data.ComponentTypes.Length)
-                .AddOrUpdateProposition(category: null, label: "Components Count", replacement: "components>3", help: "Search archetypes by components count.");
+            SearchBridge
+                .SetFilter(s_QueryEngine, "allocated", data => data.AllocatedBytes)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Allocated",
+                    replacement: "allocated>1024",
+                    help: "Search archetypes by allocated bytes."
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "unused", data => data.UnusedBytes)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Unused",
+                    replacement: "unused>1024",
+                    help: "Search archetypes by unused bytes."
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "entities", data => data.EntityCount)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Entities Count",
+                    replacement: "entities>3",
+                    help: "Search archetypes by entity count."
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "unusedEntities", data => data.UnusedEntityCount)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Unused Entity Count",
+                    replacement: "unusedEntities>3",
+                    help: "Search archetypes by unused entity count."
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "chunks", data => data.ChunkCount)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Chunks Count",
+                    replacement: "chunks>3",
+                    help: "Search archetypes by chunks count."
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "capacity", data => data.ChunkCapacity)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Capacity",
+                    replacement: "capacity>3",
+                    help: "Search archetypes by capacity."
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "segments", data => data.SegmentCount)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Segments Count",
+                    replacement: "segments>3",
+                    help: "Search archetypes by segments count."
+                );
+            SearchBridge
+                .SetFilter(s_QueryEngine, "components", data => data.ComponentTypes.Length)
+                .AddOrUpdateProposition(
+                    category: null,
+                    label: "Components Count",
+                    replacement: "components>3",
+                    help: "Search archetypes by components count."
+                );
 
             // ListBlock
             s_QueryEngine.AddFilter("w", data => data.WorldName);
-            SearchBridge.AddFilter<string, MemoryProfilerTreeViewItemData>(s_QueryEngine, "c", OnTypeFilter, new[] { ":", "=" });
+            SearchBridge.AddFilter<string, MemoryProfilerTreeViewItemData>(
+                s_QueryEngine,
+                "c",
+                OnTypeFilter,
+                new[] { ":", "=" }
+            );
         }
 
         static void OnEnable()
@@ -273,10 +333,17 @@ namespace Unity.Entities.Editor
             var archetypeComponentsData = m_Recorder.ArchetypeComponentsData;
             foreach (var archetypeMemoryData in m_Recorder.ArchetypesMemoryData)
             {
-                if (worldsData.TryGetValue(archetypeMemoryData.WorldSequenceNumber, out var worldData) &&
-                    archetypesData.TryGetValue(archetypeMemoryData.StableHash, out var archetypeData))
+                if (
+                    worldsData.TryGetValue(archetypeMemoryData.WorldSequenceNumber, out var worldData)
+                    && archetypesData.TryGetValue(archetypeMemoryData.StableHash, out var archetypeData)
+                )
                 {
-                    yield return new MemoryProfilerTreeViewItemData(worldData.Name, archetypeData, archetypeMemoryData, archetypeComponentsData);
+                    yield return new MemoryProfilerTreeViewItemData(
+                        worldData.Name,
+                        archetypeData,
+                        archetypeMemoryData,
+                        archetypeComponentsData
+                    );
                 }
             }
         }
@@ -284,8 +351,13 @@ namespace Unity.Entities.Editor
         static void TickArchetypeSource()
         {
             m_Recorder.Record();
-            if (!ArchetypesMemoryDataRecorder.MemCmp(m_ArchetypesStableHash.AsArray(), m_Recorder.ArchetypesStableHash) ||
-                !ArchetypesMemoryDataRecorder.MemCmp(m_ArchetypesMemoryData.AsArray(), m_Recorder.ArchetypesMemoryData))
+            if (
+                !ArchetypesMemoryDataRecorder.MemCmp(m_ArchetypesStableHash.AsArray(), m_Recorder.ArchetypesStableHash)
+                || !ArchetypesMemoryDataRecorder.MemCmp(
+                    m_ArchetypesMemoryData.AsArray(),
+                    m_Recorder.ArchetypesMemoryData
+                )
+            )
             {
                 m_ArchetypesDataSource = GetTreeViewData().ToArray();
                 m_ArchetypesStableHash.CopyFrom(m_Recorder.ArchetypesStableHash);
@@ -311,7 +383,9 @@ namespace Unity.Entities.Editor
             }
 
             TickArchetypeSource();
-            var results = m_ArchetypesDataSource?.Where(a => a.EntityCount > 0) ?? Enumerable.Empty<MemoryProfilerTreeViewItemData>();
+            var results =
+                m_ArchetypesDataSource?.Where(a => a.EntityCount > 0)
+                ?? Enumerable.Empty<MemoryProfilerTreeViewItemData>();
             if (query != null)
             {
                 results = query.Apply(results);
@@ -321,13 +395,21 @@ namespace Unity.Entities.Editor
             foreach (var arch in results)
             {
                 var hash = FormattingUtility.HashToString(arch.StableHash);
-                yield return provider.CreateItem(context, hash, arch.WorldName.GetHashCode(), $"Archetype {hash}", arch.WorldName, archetypeIcon, arch);
+                yield return provider.CreateItem(
+                    context,
+                    hash,
+                    arch.WorldName.GetHashCode(),
+                    $"Archetype {hash}",
+                    arch.WorldName,
+                    archetypeIcon,
+                    arch
+                );
             }
         }
 
         static IEnumerable<SearchProposition> FetchPropositions(SearchContext context, SearchPropositionOptions options)
         {
-            foreach(var p in SearchBridge.GetPropositions(queryEngine))
+            foreach (var p in SearchBridge.GetPropositions(queryEngine))
                 yield return p;
 
             foreach (var l in SearchBridge.GetPropositionsFromListBlockType(typeof(QueryWorldBlock)))
@@ -378,5 +460,4 @@ namespace Unity.Entities.Editor
             SearchBridge.OpenContextualTable(type, query ?? "", GetDefaultTableConfig(null));
         }
     }
-
 }

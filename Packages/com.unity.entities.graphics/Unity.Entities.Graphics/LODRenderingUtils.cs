@@ -26,17 +26,29 @@ namespace Unity.Rendering
             return 2.0f * halfAngle;
         }
 
-        public static float CalculateMeshLodConstant(LODParameters lodParams, float screenRelativeMetric, float meshLodThreshold)
+        public static float CalculateMeshLodConstant(
+            LODParameters lodParams,
+            float screenRelativeMetric,
+            float meshLodThreshold
+        )
         {
             return meshLodThreshold * screenRelativeMetric / lodParams.cameraPixelHeight;
         }
 
-        public static float CalculatePerspectiveDistance(float3 objPosition, float3 camPosition, float sqrScreenRelativeMetric)
+        public static float CalculatePerspectiveDistance(
+            float3 objPosition,
+            float3 camPosition,
+            float sqrScreenRelativeMetric
+        )
         {
             return math.sqrt(CalculateSqrPerspectiveDistance(objPosition, camPosition, sqrScreenRelativeMetric));
         }
 
-        public static float CalculateSqrPerspectiveDistance(float3 objPosition, float3 camPosition, float sqrScreenRelativeMetric)
+        public static float CalculateSqrPerspectiveDistance(
+            float3 objPosition,
+            float3 camPosition,
+            float sqrScreenRelativeMetric
+        )
         {
             return math.lengthsq(objPosition - camPosition) * sqrScreenRelativeMetric;
         }

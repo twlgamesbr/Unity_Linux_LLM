@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections.Generic;
-
+using UnityEditor;
+using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
@@ -21,6 +20,7 @@ namespace TMPro.EditorUtilities
                 return m_PackagePath;
             }
         }
+
         [SerializeField]
         private static string m_PackagePath;
 
@@ -37,6 +37,7 @@ namespace TMPro.EditorUtilities
                 return m_PackageFullPath;
             }
         }
+
         [SerializeField]
         private static string m_PackageFullPath;
 
@@ -53,7 +54,6 @@ namespace TMPro.EditorUtilities
             Gameview = EditorWindow.GetWindow(type);
         }
 
-
         internal static void RepaintAll()
         {
             if (isInitialized == false)
@@ -66,7 +66,6 @@ namespace TMPro.EditorUtilities
             Gameview.Repaint();
         }
 
-
         /// <summary>
         /// Create and return a new asset in a smart location based on the current selection and then select it.
         /// </summary>
@@ -76,7 +75,8 @@ namespace TMPro.EditorUtilities
         /// <returns>
         /// The new asset.
         /// </returns>
-        internal static T CreateAsset<T>(string name) where T : ScriptableObject
+        internal static T CreateAsset<T>(string name)
+            where T : ScriptableObject
         {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (path.Length == 0)
@@ -101,8 +101,6 @@ namespace TMPro.EditorUtilities
             return asset;
         }
 
-
-
         // Function used to find all materials which reference a font atlas so we can update all their references.
         internal static Material[] FindMaterialReferences(TMP_FontAsset fontAsset)
         {
@@ -119,7 +117,13 @@ namespace TMPro.EditorUtilities
                 string materialPath = AssetDatabase.GUIDToAssetPath(materialAssetGUIDs[i]);
                 Material targetMaterial = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
-                if (targetMaterial.HasProperty(ShaderUtilities.ID_MainTex) && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex) != null && mat.GetTexture(ShaderUtilities.ID_MainTex) != null && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetEntityId() == mat.GetTexture(ShaderUtilities.ID_MainTex).GetEntityId())
+                if (
+                    targetMaterial.HasProperty(ShaderUtilities.ID_MainTex)
+                    && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex) != null
+                    && mat.GetTexture(ShaderUtilities.ID_MainTex) != null
+                    && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetEntityId()
+                        == mat.GetTexture(ShaderUtilities.ID_MainTex).GetEntityId()
+                )
                 {
                     if (!refs.Contains(targetMaterial))
                         refs.Add(targetMaterial);
@@ -133,7 +137,6 @@ namespace TMPro.EditorUtilities
 
             return refs.ToArray();
         }
-
 
         // Function used to find the Font Asset which matches the given Material Preset and Font Atlas Texture.
         internal static TMP_FontAsset FindMatchingFontAsset(Material mat)
@@ -154,7 +157,6 @@ namespace TMPro.EditorUtilities
             return null;
         }
 
-
         private static string GetPackageRelativePath()
         {
             // Check for potential UPM package
@@ -174,7 +176,11 @@ namespace TMPro.EditorUtilities
                 }
 
                 // Search for potential alternative locations in the user project
-                string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
+                string[] matchingPaths = Directory.GetDirectories(
+                    packagePath,
+                    "TextMesh Pro",
+                    SearchOption.AllDirectories
+                );
                 packagePath = ValidateLocation(matchingPaths, packagePath);
                 if (packagePath != null)
                     return packagePath;
@@ -202,7 +208,11 @@ namespace TMPro.EditorUtilities
                 }
 
                 // Search for potential alternative locations in the user project
-                string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
+                string[] matchingPaths = Directory.GetDirectories(
+                    packagePath,
+                    "TextMesh Pro",
+                    SearchOption.AllDirectories
+                );
                 string path = ValidateLocation(matchingPaths, packagePath);
                 if (path != null)
                     return packagePath + path;
@@ -210,7 +220,6 @@ namespace TMPro.EditorUtilities
 
             return null;
         }
-
 
         /// <summary>
         /// Method to validate the location of the asset folder by making sure the GUISkins folder exists.
@@ -232,7 +241,6 @@ namespace TMPro.EditorUtilities
 
             return null;
         }
-
 
         /// <summary>
         /// Function which returns a string containing a sequence of Decimal character ranges.
@@ -264,7 +272,6 @@ namespace TMPro.EditorUtilities
 
                     first = last = characterSet[i];
                 }
-
             }
 
             // handle the final group
@@ -275,7 +282,6 @@ namespace TMPro.EditorUtilities
 
             return characterSequence;
         }
-
 
         /// <summary>
         /// Function which returns a string containing a sequence of Unicode (Hex) character ranges.
@@ -307,7 +313,6 @@ namespace TMPro.EditorUtilities
 
                     first = last = characterSet[i];
                 }
-
             }
 
             // handle the final group
@@ -319,7 +324,6 @@ namespace TMPro.EditorUtilities
             return characterSequence;
         }
 
-
         /// <summary>
         ///
         /// </summary>
@@ -328,12 +332,28 @@ namespace TMPro.EditorUtilities
         /// <param name="color"></param>
         internal static void DrawBox(Rect rect, float thickness, Color color)
         {
-            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + thickness, rect.width + thickness * 2, thickness), color);
-            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + thickness, thickness, rect.height - thickness * 2), color);
-            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + rect.height - thickness * 2, rect.width + thickness * 2, thickness), color);
-            EditorGUI.DrawRect(new Rect(rect.x + rect.width, rect.y + thickness, thickness, rect.height - thickness * 2), color);
+            EditorGUI.DrawRect(
+                new Rect(rect.x - thickness, rect.y + thickness, rect.width + thickness * 2, thickness),
+                color
+            );
+            EditorGUI.DrawRect(
+                new Rect(rect.x - thickness, rect.y + thickness, thickness, rect.height - thickness * 2),
+                color
+            );
+            EditorGUI.DrawRect(
+                new Rect(
+                    rect.x - thickness,
+                    rect.y + rect.height - thickness * 2,
+                    rect.width + thickness * 2,
+                    thickness
+                ),
+                color
+            );
+            EditorGUI.DrawRect(
+                new Rect(rect.x + rect.width, rect.y + thickness, thickness, rect.height - thickness * 2),
+                color
+            );
         }
-
 
         /// <summary>
         /// Function to return the horizontal alignment grid value.
@@ -400,7 +420,10 @@ namespace TMPro.EditorUtilities
             }
 
             EditorGUI.BeginChangeCheck();
-            string colorString = EditorGUI.TextField(rect, string.Format("#{0}", ColorUtility.ToHtmlStringRGBA(property.colorValue)));
+            string colorString = EditorGUI.TextField(
+                rect,
+                string.Format("#{0}", ColorUtility.ToHtmlStringRGBA(property.colorValue))
+            );
             if (EditorGUI.EndChangeCheck())
             {
                 Color color;
@@ -418,7 +441,11 @@ namespace TMPro.EditorUtilities
             var evt = Event.current;
 
             // Toggle selected toggle on space or return key
-            if (GUIUtility.keyboardControl == id && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Space || evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
+            if (
+                GUIUtility.keyboardControl == id
+                && evt.type == EventType.KeyDown
+                && (evt.keyCode == KeyCode.Space || evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
+            )
             {
                 value = !value;
                 evt.Use();
@@ -434,6 +461,5 @@ namespace TMPro.EditorUtilities
 
             return GUI.Toggle(position, id, value, content, style);
         }
-
     }
 }

@@ -15,13 +15,13 @@ namespace Unity.Serialization.Binary
                 User,
                 Global,
                 Internal,
-                End
+                End,
             }
-            
+
             readonly List<IBinaryAdapter> m_User;
             readonly List<IBinaryAdapter> m_Global;
             readonly IBinaryAdapter m_Internal;
-            
+
             IBinaryAdapter m_Current;
             State m_State;
             int m_Index;
@@ -32,7 +32,10 @@ namespace Unity.Serialization.Binary
                 m_Global = global;
                 m_Internal = @internal;
                 m_Current = null;
-                m_State = null != user ? State.User : null != global ? State.Global : State.Internal;
+                m_State =
+                    null != user ? State.User
+                    : null != global ? State.Global
+                    : State.Internal;
                 m_Index = -1;
             }
 
@@ -40,10 +43,10 @@ namespace Unity.Serialization.Binary
 
             public bool MoveNext()
             {
-                for (;;)
+                for (; ; )
                 {
                     m_Index++;
-                    
+
                     switch (m_State)
                     {
                         case State.User:
@@ -78,12 +81,11 @@ namespace Unity.Serialization.Binary
                 }
             }
         }
-        
+
         public List<IBinaryAdapter> UserDefined;
         public List<IBinaryAdapter> Global;
         public BinaryAdapter Internal;
 
-        public Enumerator GetEnumerator() 
-            => new Enumerator(UserDefined, Global, Internal);
+        public Enumerator GetEnumerator() => new Enumerator(UserDefined, Global, Internal);
     }
 }

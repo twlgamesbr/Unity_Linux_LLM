@@ -25,7 +25,7 @@ namespace Unity.Entities
 
         internal DebuggerDataAccess(World world)
         {
-            if (world !=null && world.IsCreated)
+            if (world != null && world.IsCreated)
             {
                 ComponentStore = world.EntityManager.GetUncheckedEntityDataAccess()->EntityComponentStore;
                 ManagedStore = world.EntityManager.GetUncheckedEntityDataAccess()->ManagedComponentStore;
@@ -36,6 +36,7 @@ namespace Unity.Entities
                 ManagedStore = null;
             }
         }
+
         internal DebuggerDataAccess(EntityComponentStore* store)
         {
             ComponentStore = null;
@@ -54,14 +55,14 @@ namespace Unity.Entities
 
         public bool IsCreated => ComponentStore != null && ManagedStore != null;
 
-        public string GetDebugNameWithWorld (Entity entity)
+        public string GetDebugNameWithWorld(Entity entity)
         {
             if (ComponentStore != null && !entity.Equals(default) && IsCreated)
                 return $"'{GetName(entity)}' Entity({entity.Index}:{entity.Version}) {GetWorld()}";
             return entity.ToString();
         }
 
-        public string GetDebugNameWithoutWorld (Entity entity)
+        public string GetDebugNameWithoutWorld(Entity entity)
         {
             if (ComponentStore != null && !entity.Equals(default) && IsCreated)
                 return $"'{GetName(entity)}' Entity({entity.Index}:{entity.Version})";
@@ -79,7 +80,12 @@ namespace Unity.Entities
 
         object GetComponentObject(Entity entity, ComponentType componentType)
         {
-            int* ptr = (int*)EntityComponentStore.Debugger_GetComponentDataWithTypeRO(ComponentStore, entity, componentType.TypeIndex);
+            int* ptr = (int*)
+                EntityComponentStore.Debugger_GetComponentDataWithTypeRO(
+                    ComponentStore,
+                    entity,
+                    componentType.TypeIndex
+                );
             if (ptr == null)
                 return null;
             return ManagedStore.Debugger_GetManagedComponent(*ptr);
@@ -93,17 +99,18 @@ namespace Unity.Entities
                 return ManagedStore.GetSharedComponentDataBoxed(shareComponentIndex, typeIndex);
         }
 
-
         internal bool Exists(Entity entity)
         {
             return EntityComponentStore.Debugger_Exists(ComponentStore, entity);
         }
 
-
         static bool SanityCheckArchetype(Archetype* archetype)
         {
             // From the debugger we can't safely assume that any pointers are still valid, so just check that some of values are reasonable.
-            return archetype != null && archetype->TypesCount >= 1 && archetype->TypesCount < 4096 && archetype->Offsets[0] == 0;
+            return archetype != null
+                && archetype->TypesCount >= 1
+                && archetype->TypesCount < 4096
+                && archetype->Offsets[0] == 0;
         }
 
         internal object[] GetComponents(Entity entity)
@@ -116,7 +123,7 @@ namespace Unity.Entities
                 return null;
 
             // NOTE: First component is the entity itself
-            var objects = new object[archetype->TypesCount-1];
+            var objects = new object[archetype->TypesCount - 1];
             for (int i = 1; i < archetype->TypesCount; i++)
             {
                 var type = ComponentType.FromTypeIndex(archetype->Types[i].TypeIndex);
@@ -125,7 +132,7 @@ namespace Unity.Entities
                 if (obj != null && TypeManager.IsEnableable(type.TypeIndex))
                     obj = new Component_E(obj, ComponentStore->IsComponentEnabled(entity, type.TypeIndex));
 
-                objects[i-1] = obj;
+                objects[i - 1] = obj;
             }
 
             return objects;
@@ -148,7 +155,7 @@ namespace Unity.Entities
             var archetype = ComponentStore->GetArchetype(entity);
             if (!SanityCheckArchetype(archetype))
                 return default;
-            return new EntityArchetype {Archetype = archetype};
+            return new EntityArchetype { Archetype = archetype };
         }
 
         internal ArchetypeChunk GetChunk(Entity entity)
@@ -164,7 +171,7 @@ namespace Unity.Entities
         {
             var typeIndex = type.TypeIndex;
             ref readonly var typeInfo = ref TypeManager.GetTypeInfo(typeIndex);
-           // object obj = null;
+            // object obj = null;
             if (typeInfo.Category == TypeManager.TypeCategory.ComponentData)
             {
                 if (TypeManager.IsManagedComponent(typeIndex))
@@ -173,7 +180,11 @@ namespace Unity.Entities
                 }
                 else
                 {
-                    var src = EntityComponentStore.Debugger_GetComponentDataWithTypeRO(ComponentStore, entity, typeIndex);
+                    var src = EntityComponentStore.Debugger_GetComponentDataWithTypeRO(
+                        ComponentStore,
+                        entity,
+                        typeIndex
+                    );
                     return TypeManager.ConstructComponentFromBuffer(typeIndex, src);
                 }
             }
@@ -191,7 +202,7 @@ namespace Unity.Entities
             else if (typeInfo.Category == TypeManager.TypeCategory.BufferData)
             {
                 var src = EntityComponentStore.Debugger_GetComponentDataWithTypeRO(ComponentStore, entity, typeIndex);
-                var header = (BufferHeader*) src;
+                var header = (BufferHeader*)src;
                 if (header == null || header->Length < 0)
                     return null;
 

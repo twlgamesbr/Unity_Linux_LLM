@@ -75,8 +75,10 @@ namespace UnityEngine.InputSystem
         public void StartWithPreviousResolve(InputActionState state, bool isFullResolve)
         {
             Debug.Assert(state != null, "Received null state");
-            Debug.Assert(!state.isProcessingControlStateChange,
-                "Cannot re-resolve bindings for an InputActionState that is currently executing an action callback; binding resolution must be deferred to until after the callback has completed");
+            Debug.Assert(
+                !state.isProcessingControlStateChange,
+                "Cannot re-resolve bindings for an InputActionState that is currently executing an action callback; binding resolution must be deferred to until after the callback has completed"
+            );
 
             m_IsControlOnlyResolve = !isFullResolve;
 
@@ -118,7 +120,11 @@ namespace UnityEngine.InputSystem
         /// This is where all binding resolution happens for actions. The method walks through the binding array
         /// in <paramref name="actionMap"/> and adds any controls, interactions, processors, and composites as it goes.
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "TODO: Refactor later.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Performance",
+            "CA1809:AvoidExcessiveLocals",
+            Justification = "TODO: Refactor later."
+        )]
         public unsafe void AddActionMap(InputActionMap actionMap)
         {
             Debug.Assert(actionMap != null, "Received null map");
@@ -149,7 +155,8 @@ namespace UnityEngine.InputSystem
                 // We reallocate for the following once we know the final count.
                 interactionCount: totalInteractionCount,
                 compositeCount: totalCompositeCount,
-                controlCount: totalControlCount);
+                controlCount: totalControlCount
+            );
             if (memory.isAllocated)
                 newMemory.CopyDataFrom(memory);
 
@@ -198,7 +205,8 @@ namespace UnityEngine.InputSystem
                         // Make sure that if it's part of a composite, we are actually part of a composite.
                         if (isPartOfComposite && currentCompositeBindingIndex == InputActionState.kInvalidIndex)
                             throw new InvalidOperationException(
-                                $"Binding '{unresolvedBinding}' is marked as being part of a composite but the preceding binding is not a composite");
+                                $"Binding '{unresolvedBinding}' is marked as being part of a composite but the preceding binding is not a composite"
+                            );
 
                         // Try to find action.
                         //
@@ -240,26 +248,38 @@ namespace UnityEngine.InputSystem
                         // Determine if the binding is disabled.
                         // Disabled if path is empty.
                         var path = unresolvedBinding.effectivePath;
-                        var bindingIsDisabled = string.IsNullOrEmpty(path)
-
+                        var bindingIsDisabled =
+                            string.IsNullOrEmpty(path)
                             // Also, if we can't find the action to trigger for the binding, we just go and disable
                             // the binding.
                             || action == null
-
                             // Also, disabled if binding doesn't match with our binding mask (might be empty).
-                            || (!isComposite && bindingMask != null &&
-                                !bindingMask.Value.Matches(ref unresolvedBinding,
-                                    InputBinding.MatchOptions.EmptyGroupMatchesAny))
-
+                            || (
+                                !isComposite
+                                && bindingMask != null
+                                && !bindingMask.Value.Matches(
+                                    ref unresolvedBinding,
+                                    InputBinding.MatchOptions.EmptyGroupMatchesAny
+                                )
+                            )
                             // Also, disabled if binding doesn't match the binding mask on the map (might be empty).
-                            || (!isComposite && bindingMaskOnThisMap != null &&
-                                !bindingMaskOnThisMap.Value.Matches(ref unresolvedBinding,
-                                    InputBinding.MatchOptions.EmptyGroupMatchesAny))
-
+                            || (
+                                !isComposite
+                                && bindingMaskOnThisMap != null
+                                && !bindingMaskOnThisMap.Value.Matches(
+                                    ref unresolvedBinding,
+                                    InputBinding.MatchOptions.EmptyGroupMatchesAny
+                                )
+                            )
                             // Finally, also disabled if binding doesn't match the binding mask on the action (might be empty).
-                            || (!isComposite && action?.m_BindingMask != null &&
-                                !action.m_BindingMask.Value.Matches(ref unresolvedBinding,
-                                    InputBinding.MatchOptions.EmptyGroupMatchesAny));
+                            || (
+                                !isComposite
+                                && action?.m_BindingMask != null
+                                && !action.m_BindingMask.Value.Matches(
+                                    ref unresolvedBinding,
+                                    InputBinding.MatchOptions.EmptyGroupMatchesAny
+                                )
+                            );
 
                         // If the binding isn't disabled, look up controls now. We do this first as we may still disable the
                         // binding if it doesn't resolve to any controls or resolves only to controls already bound to by
@@ -280,7 +300,12 @@ namespace UnityEngine.InputSystem
                                     var device = list[i];
                                     if (!device.added)
                                         continue; // Skip devices that have been removed.
-                                    numControls += InputControlPath.TryFindControls(device, path, 0, ref resolvedControls);
+                                    numControls += InputControlPath.TryFindControls(
+                                        device,
+                                        path,
+                                        0,
+                                        ref resolvedControls
+                                    );
                                 }
                             }
                             else
@@ -301,16 +326,28 @@ namespace UnityEngine.InputSystem
                             if (!string.IsNullOrEmpty(processorString))
                             {
                                 // Add processors from binding.
-                                firstProcessorIndex = InstantiateWithParameters(InputProcessor.s_Processors, processorString,
-                                    ref processors, ref totalProcessorCount, actionMap, ref unresolvedBinding);
+                                firstProcessorIndex = InstantiateWithParameters(
+                                    InputProcessor.s_Processors,
+                                    processorString,
+                                    ref processors,
+                                    ref totalProcessorCount,
+                                    actionMap,
+                                    ref unresolvedBinding
+                                );
                                 if (firstProcessorIndex != InputActionState.kInvalidIndex)
                                     numProcessors = totalProcessorCount - firstProcessorIndex;
                             }
                             if (!string.IsNullOrEmpty(action.m_Processors))
                             {
                                 // Add processors from action.
-                                var index = InstantiateWithParameters(InputProcessor.s_Processors, action.m_Processors, ref processors,
-                                    ref totalProcessorCount, actionMap, ref unresolvedBinding);
+                                var index = InstantiateWithParameters(
+                                    InputProcessor.s_Processors,
+                                    action.m_Processors,
+                                    ref processors,
+                                    ref totalProcessorCount,
+                                    actionMap,
+                                    ref unresolvedBinding
+                                );
                                 if (index != InputActionState.kInvalidIndex)
                                 {
                                     if (firstProcessorIndex == InputActionState.kInvalidIndex)
@@ -325,7 +362,9 @@ namespace UnityEngine.InputSystem
                                 // Composite's part use composite interactions
                                 if (currentCompositeBindingIndex != InputActionState.kInvalidIndex)
                                 {
-                                    firstInteractionIndex = bindingStatesPtr[currentCompositeBindingIndex].interactionStartIndex;
+                                    firstInteractionIndex = bindingStatesPtr[
+                                        currentCompositeBindingIndex
+                                    ].interactionStartIndex;
                                     numInteractions = bindingStatesPtr[currentCompositeBindingIndex].interactionCount;
                                 }
                             }
@@ -335,16 +374,28 @@ namespace UnityEngine.InputSystem
                                 if (!string.IsNullOrEmpty(interactionString))
                                 {
                                     // Add interactions from binding.
-                                    firstInteractionIndex = InstantiateWithParameters(InputInteraction.s_Interactions, interactionString,
-                                        ref interactions, ref totalInteractionCount, actionMap, ref unresolvedBinding);
+                                    firstInteractionIndex = InstantiateWithParameters(
+                                        InputInteraction.s_Interactions,
+                                        interactionString,
+                                        ref interactions,
+                                        ref totalInteractionCount,
+                                        actionMap,
+                                        ref unresolvedBinding
+                                    );
                                     if (firstInteractionIndex != InputActionState.kInvalidIndex)
                                         numInteractions = totalInteractionCount - firstInteractionIndex;
                                 }
                                 if (!string.IsNullOrEmpty(action.m_Interactions))
                                 {
                                     // Add interactions from action.
-                                    var index = InstantiateWithParameters(InputInteraction.s_Interactions, action.m_Interactions,
-                                        ref interactions, ref totalInteractionCount, actionMap, ref unresolvedBinding);
+                                    var index = InstantiateWithParameters(
+                                        InputInteraction.s_Interactions,
+                                        action.m_Interactions,
+                                        ref interactions,
+                                        ref totalInteractionCount,
+                                        actionMap,
+                                        ref unresolvedBinding
+                                    );
                                     if (index != InputActionState.kInvalidIndex)
                                     {
                                         if (firstInteractionIndex == InputActionState.kInvalidIndex)
@@ -363,8 +414,11 @@ namespace UnityEngine.InputSystem
 
                                 // Instantiate. For composites, the path is the name of the composite.
                                 var composite = InstantiateBindingComposite(ref unresolvedBinding, actionMap);
-                                currentCompositeIndex =
-                                    ArrayHelpers.AppendWithCapacity(ref composites, ref totalCompositeCount, composite);
+                                currentCompositeIndex = ArrayHelpers.AppendWithCapacity(
+                                    ref composites,
+                                    ref totalCompositeCount,
+                                    composite
+                                );
 
                                 // Record where the controls for parts of the composite start.
                                 firstControlIndex = memory.controlCount + resolvedControls.Count;
@@ -373,7 +427,10 @@ namespace UnityEngine.InputSystem
                             {
                                 // If we've reached the end of a composite chain, finish
                                 // off the current composite.
-                                if (!isPartOfComposite && currentCompositeBindingIndex != InputActionState.kInvalidIndex)
+                                if (
+                                    !isPartOfComposite
+                                    && currentCompositeBindingIndex != InputActionState.kInvalidIndex
+                                )
                                 {
                                     currentCompositePartCount = 0;
                                     currentCompositeBindingIndex = InputActionState.kInvalidIndex;
@@ -386,18 +443,26 @@ namespace UnityEngine.InputSystem
 
                         // If the binding is part of a composite, pass the resolved controls
                         // on to the composite.
-                        if (isPartOfComposite && currentCompositeBindingIndex != InputActionState.kInvalidIndex && numControls > 0)
+                        if (
+                            isPartOfComposite
+                            && currentCompositeBindingIndex != InputActionState.kInvalidIndex
+                            && numControls > 0
+                        )
                         {
                             // Make sure the binding is named. The name determines what in the composite
                             // to bind to.
                             if (string.IsNullOrEmpty(unresolvedBinding.name))
                                 throw new InvalidOperationException(
-                                    $"Binding '{unresolvedBinding}' that is part of composite '{composites[currentCompositeIndex]}' is missing a name");
+                                    $"Binding '{unresolvedBinding}' that is part of composite '{composites[currentCompositeIndex]}' is missing a name"
+                                );
 
                             // Assign an index to the current part of the composite which
                             // can be used by the composite to read input from this part.
-                            partIndex = AssignCompositePartIndex(composites[currentCompositeIndex], unresolvedBinding.name,
-                                ref currentCompositePartCount);
+                            partIndex = AssignCompositePartIndex(
+                                composites[currentCompositeIndex],
+                                unresolvedBinding.name,
+                                ref currentCompositePartCount
+                            );
 
                             // Keep track of total number of controls bound in the composite.
                             bindingStatesPtr[currentCompositeBindingIndex].controlCount += numControls;
@@ -424,15 +489,18 @@ namespace UnityEngine.InputSystem
                             isPartOfComposite = unresolvedBinding.isPartOfComposite,
                             partIndex = partIndex,
                             actionIndex = actionIndexForBinding,
-                            compositeOrCompositeBindingIndex = isComposite ? currentCompositeIndex : currentCompositeBindingIndex,
+                            compositeOrCompositeBindingIndex = isComposite
+                                ? currentCompositeIndex
+                                : currentCompositeBindingIndex,
                             mapIndex = totalMapCount,
-                            wantsInitialStateCheck = action?.wantsInitialStateCheck ?? false
+                            wantsInitialStateCheck = action?.wantsInitialStateCheck ?? false,
                         };
                     }
                     catch (Exception exception)
                     {
                         Debug.LogError(
-                            $"{exception.GetType().Name} while resolving binding '{unresolvedBinding}' in action map '{actionMap}'");
+                            $"{exception.GetType().Name} while resolving binding '{unresolvedBinding}' in action map '{actionMap}'"
+                        );
                         Debug.LogException(exception);
 
                         // Don't swallow exceptions that indicate something is wrong in the code rather than
@@ -446,9 +514,11 @@ namespace UnityEngine.InputSystem
                 // we only know once we've completed all resolution.
                 var controlCountInThisMap = resolvedControls.Count;
                 var newTotalControlCount = memory.controlCount + controlCountInThisMap;
-                if (newMemory.interactionCount != totalInteractionCount ||
-                    newMemory.compositeCount != totalCompositeCount ||
-                    newMemory.controlCount != newTotalControlCount)
+                if (
+                    newMemory.interactionCount != totalInteractionCount
+                    || newMemory.compositeCount != totalCompositeCount
+                    || newMemory.controlCount != newTotalControlCount
+                )
                 {
                     var finalMemory = new InputActionState.UnmanagedMemory();
 
@@ -458,7 +528,8 @@ namespace UnityEngine.InputSystem
                         bindingCount: newMemory.bindingCount,
                         controlCount: newTotalControlCount,
                         interactionCount: totalInteractionCount,
-                        compositeCount: totalCompositeCount);
+                        compositeCount: totalCompositeCount
+                    );
 
                     finalMemory.CopyDataFrom(newMemory);
 
@@ -469,8 +540,10 @@ namespace UnityEngine.InputSystem
                 // Add controls to array.
                 var controlCountInArray = memory.controlCount;
                 ArrayHelpers.AppendListWithCapacity(ref controls, ref controlCountInArray, resolvedControls);
-                Debug.Assert(controlCountInArray == newTotalControlCount,
-                    "Control array should have combined count of old and new controls");
+                Debug.Assert(
+                    controlCountInArray == newTotalControlCount,
+                    "Control array should have combined count of old and new controls"
+                );
 
                 // Set up control to binding index mapping.
                 for (var i = 0; i < bindingCountInThisMap; ++i)
@@ -501,7 +574,10 @@ namespace UnityEngine.InputSystem
                     // Correlate action with its trigger state.
                     action.m_ActionIndexInState = actionIndex;
 
-                    Debug.Assert(runningIndexInBindingIndices < ushort.MaxValue, "Binding start index on action exceeds limit");
+                    Debug.Assert(
+                        runningIndexInBindingIndices < ushort.MaxValue,
+                        "Binding start index on action exceeds limit"
+                    );
                     newMemory.actionBindingIndicesAndCounts[actionIndex * 2] = (ushort)runningIndexInBindingIndices;
 
                     // Collect bindings for action.
@@ -556,8 +632,7 @@ namespace UnityEngine.InputSystem
                     var mayNeedConflictResolution = !isPassThroughAction && numPossibleConcurrentActuations > 1;
 
                     // Initialize initial trigger state.
-                    newMemory.actionStates[actionIndex] =
-                        new InputActionState.TriggerState
+                    newMemory.actionStates[actionIndex] = new InputActionState.TriggerState
                     {
                         phase = InputActionPhase.Disabled,
                         mapIndex = mapIndex,
@@ -566,13 +641,12 @@ namespace UnityEngine.InputSystem
                         isPassThrough = isPassThroughAction,
                         isButton = isButtonAction,
                         mayNeedConflictResolution = mayNeedConflictResolution,
-                        bindingIndex = firstBindingIndexForAction
+                        bindingIndex = firstBindingIndexForAction,
                     };
                 }
 
                 // Store indices for map.
-                newMemory.mapIndices[mapIndex] =
-                    new InputActionState.ActionMapIndices
+                newMemory.mapIndices[mapIndex] = new InputActionState.ActionMapIndices
                 {
                     actionStartIndex = actionStartIndex,
                     actionCount = actionCountInThisMap,
@@ -590,8 +664,10 @@ namespace UnityEngine.InputSystem
                 actionMap.m_MapIndexInState = mapIndex;
                 var finalActionMapCount = memory.mapCount;
                 ArrayHelpers.AppendWithCapacity(ref maps, ref finalActionMapCount, actionMap, capacityIncrement: 4);
-                Debug.Assert(finalActionMapCount == newMemory.mapCount,
-                    "Final action map count should match old action map count plus one");
+                Debug.Assert(
+                    finalActionMapCount == newMemory.mapCount,
+                    "Final action map count should match old action map count plus one"
+                );
 
                 // As a final act, swap the new memory in.
                 memory.Dispose();
@@ -610,7 +686,15 @@ namespace UnityEngine.InputSystem
         }
 
         private List<NameAndParameters> m_Parameters; // We retain this to reuse the allocation.
-        private int InstantiateWithParameters<TType>(TypeTable registrations, string namesAndParameters, ref TType[] array, ref int count, InputActionMap actionMap, ref InputBinding binding)
+
+        private int InstantiateWithParameters<TType>(
+            TypeTable registrations,
+            string namesAndParameters,
+            ref TType[] array,
+            ref int count,
+            InputActionMap actionMap,
+            ref InputBinding binding
+        )
         {
             if (!NameAndParameters.ParseMultiple(namesAndParameters, ref m_Parameters))
                 return InputActionState.kInvalidIndex;
@@ -624,7 +708,8 @@ namespace UnityEngine.InputSystem
                 if (type == null)
                 {
                     Debug.LogError(
-                        $"No {typeof(TType).Name} with name '{objectRegistrationName}' (mentioned in '{namesAndParameters}') has been registered");
+                        $"No {typeof(TType).Name} with name '{objectRegistrationName}' (mentioned in '{namesAndParameters}') has been registered"
+                    );
                     continue;
                 }
 
@@ -634,20 +719,30 @@ namespace UnityEngine.InputSystem
                     if (!(Activator.CreateInstance(type) is TType instance))
                     {
                         Debug.LogError(
-                            $"Type '{type.Name}' registered as '{objectRegistrationName}' (mentioned in '{namesAndParameters}') is not an {typeof(TType).Name}");
+                            $"Type '{type.Name}' registered as '{objectRegistrationName}' (mentioned in '{namesAndParameters}') is not an {typeof(TType).Name}"
+                        );
                         continue;
                     }
 
                     // Pass parameters to it.
-                    ApplyParameters(m_Parameters[i].parameters, instance, actionMap, ref binding, objectRegistrationName,
-                        namesAndParameters);
+                    ApplyParameters(
+                        m_Parameters[i].parameters,
+                        instance,
+                        actionMap,
+                        ref binding,
+                        objectRegistrationName,
+                        namesAndParameters
+                    );
 
                     // Add to list.
                     ArrayHelpers.AppendWithCapacity(ref array, ref count, instance);
                 }
                 else
                 {
-                    Debug.Assert(type.IsInstanceOfType(array[count]), "Type of instance in array does not match expected type");
+                    Debug.Assert(
+                        type.IsInstanceOfType(array[count]),
+                        "Type of instance in array does not match expected type"
+                    );
                     ++count;
                 }
             }
@@ -655,7 +750,10 @@ namespace UnityEngine.InputSystem
             return firstIndex;
         }
 
-        private static InputBindingComposite InstantiateBindingComposite(ref InputBinding binding, InputActionMap actionMap)
+        private static InputBindingComposite InstantiateBindingComposite(
+            ref InputBinding binding,
+            InputActionMap actionMap
+        )
         {
             var nameAndParametersParsed = NameAndParameters.Parse(binding.effectivePath);
 
@@ -663,41 +761,63 @@ namespace UnityEngine.InputSystem
             var type = InputBindingComposite.s_Composites.LookupTypeRegistration(nameAndParametersParsed.name);
             if (type == null)
                 throw new InvalidOperationException(
-                    $"No binding composite with name '{nameAndParametersParsed.name}' has been registered");
+                    $"No binding composite with name '{nameAndParametersParsed.name}' has been registered"
+                );
 
             // Instantiate.
             if (!(Activator.CreateInstance(type) is InputBindingComposite instance))
                 throw new InvalidOperationException(
-                    $"Registered type '{type.Name}' used for '{nameAndParametersParsed.name}' is not an InputBindingComposite");
+                    $"Registered type '{type.Name}' used for '{nameAndParametersParsed.name}' is not an InputBindingComposite"
+                );
 
             // Set parameters.
-            ApplyParameters(nameAndParametersParsed.parameters, instance, actionMap, ref binding, nameAndParametersParsed.name,
-                binding.effectivePath);
+            ApplyParameters(
+                nameAndParametersParsed.parameters,
+                instance,
+                actionMap,
+                ref binding,
+                nameAndParametersParsed.name,
+                binding.effectivePath
+            );
 
             return instance;
         }
 
-        private static void ApplyParameters(ReadOnlyArray<NamedValue> parameters, object instance, InputActionMap actionMap, ref InputBinding binding, string objectRegistrationName, string namesAndParameters)
+        private static void ApplyParameters(
+            ReadOnlyArray<NamedValue> parameters,
+            object instance,
+            InputActionMap actionMap,
+            ref InputBinding binding,
+            string objectRegistrationName,
+            string namesAndParameters
+        )
         {
             foreach (var parameter in parameters)
             {
                 // Find field.
-                var field = instance.GetType().GetField(parameter.name,
-                    BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var field = instance
+                    .GetType()
+                    .GetField(
+                        parameter.name,
+                        BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                    );
                 if (field == null)
                 {
                     Debug.LogError(
-                        $"Type '{instance.GetType().Name}' registered as '{objectRegistrationName}' (mentioned in '{namesAndParameters}') has no public field called '{parameter.name}'");
+                        $"Type '{instance.GetType().Name}' registered as '{objectRegistrationName}' (mentioned in '{namesAndParameters}') has no public field called '{parameter.name}'"
+                    );
                     continue;
                 }
                 var fieldTypeCode = Type.GetTypeCode(field.FieldType);
 
                 // See if we have a parameter override.
-                var parameterOverride =
-                    InputActionRebindingExtensions.ParameterOverride.Find(actionMap, ref binding, parameter.name, objectRegistrationName);
-                var value = parameterOverride != null
-                    ? parameterOverride.Value.value
-                    : parameter.value;
+                var parameterOverride = InputActionRebindingExtensions.ParameterOverride.Find(
+                    actionMap,
+                    ref binding,
+                    parameter.name,
+                    objectRegistrationName
+                );
+                var value = parameterOverride != null ? parameterOverride.Value.value : parameter.value;
 
                 field.SetValue(instance, value.ConvertTo(fieldTypeCode).ToObject());
             }
@@ -711,11 +831,14 @@ namespace UnityEngine.InputSystem
 
             ////TODO: allow this to be a property instead
             // Look up field.
-            var field = type.GetField(name,
-                BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var field = type.GetField(
+                name,
+                BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            );
             if (field == null)
                 throw new InvalidOperationException(
-                    $"Cannot find public field '{name}' used as parameter of binding composite '{composite}' of type '{type}'");
+                    $"Cannot find public field '{name}' used as parameter of binding composite '{composite}' of type '{type}'"
+                );
 
             ////REVIEW: should we wrap part numbers in a struct instead of using int?
 
@@ -723,7 +846,8 @@ namespace UnityEngine.InputSystem
             var fieldType = field.FieldType;
             if (fieldType != typeof(int))
                 throw new InvalidOperationException(
-                    $"Field '{name}' used as a parameter of binding composite '{composite}' must be of type 'int' but is of type '{type.Name}' instead");
+                    $"Field '{name}' used as a parameter of binding composite '{composite}' must be of type 'int' but is of type '{type.Name}' instead"
+                );
 
             ////REVIEW: this creates garbage; need a better solution to get to zero garbage during re-resolving
             // See if we've already assigned a part index. This can happen if there are multiple bindings

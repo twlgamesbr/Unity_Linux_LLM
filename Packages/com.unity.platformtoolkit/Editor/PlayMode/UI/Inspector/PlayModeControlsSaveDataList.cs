@@ -28,10 +28,15 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public void Init(PlayModeControlsViewModel playModeControlsView, bool isPerAccountSave)
         {
-            Assert.IsNull(m_PlayModeControlsView, "m_PlayModeControlsView is not null. init should not be called more than once.");
+            Assert.IsNull(
+                m_PlayModeControlsView,
+                "m_PlayModeControlsView is not null. init should not be called more than once."
+            );
             Assert.IsNotNull(playModeControlsView);
 
-            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsSaveDataList.uxml");
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsSaveDataList.uxml"
+            );
             uxml.CloneTree(this);
 
             m_PlayModeControlsView = playModeControlsView;
@@ -93,7 +98,11 @@ namespace Unity.PlatformToolkit.PlayMode
             var saveImportExportHelper = new PlayModeImportExportSave(saveData);
             m_SaveImportCallback = async _ =>
             {
-                var selectedFolder = EditorUtility.OpenFilePanel("Select a Platform Toolkit zip file to add its content as a new save", Application.dataPath, "zip");
+                var selectedFolder = EditorUtility.OpenFilePanel(
+                    "Select a Platform Toolkit zip file to add its content as a new save",
+                    Application.dataPath,
+                    "zip"
+                );
                 if (string.IsNullOrEmpty(selectedFolder))
                     return;
 
@@ -114,7 +123,7 @@ namespace Unity.PlatformToolkit.PlayMode
             {
                 if (!m_PlayModeControlsView.SupportsAccounts)
                 {
-                    m_SaveCapabilityWarning.style.display =  DisplayStyle.Flex;
+                    m_SaveCapabilityWarning.style.display = DisplayStyle.Flex;
                     m_SaveCapabilityWarning.text = "This Behaviour does not support save data per-account.";
                 }
                 else
@@ -140,42 +149,60 @@ namespace Unity.PlatformToolkit.PlayMode
         public static void RegisterConverters()
         {
             var infoImage = new ConverterGroup("Save Info Image To Texture2D Converter");
-            infoImage.AddConverter((ref byte[] imageInfo) =>
-            {
-                if (imageInfo == null || imageInfo.Length == 0)
+            infoImage.AddConverter(
+                (ref byte[] imageInfo) =>
                 {
-                    return new StyleBackground();
+                    if (imageInfo == null || imageInfo.Length == 0)
+                    {
+                        return new StyleBackground();
+                    }
+
+                    Texture2D tex = new(2, 2);
+                    tex.LoadImage(imageInfo);
+
+                    return new StyleBackground(tex);
                 }
-
-                Texture2D tex = new(2, 2);
-                tex.LoadImage(imageInfo);
-
-                return new StyleBackground(tex);
-            });
+            );
 
             var defaultImageDisplay = new ConverterGroup("Default Image Display");
-            defaultImageDisplay.AddConverter((ref byte[] imageInfo) =>
-            {
-                return new StyleEnum<DisplayStyle>(imageInfo == null || imageInfo.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex);
-            });
+            defaultImageDisplay.AddConverter(
+                (ref byte[] imageInfo) =>
+                {
+                    return new StyleEnum<DisplayStyle>(
+                        imageInfo == null || imageInfo.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex
+                    );
+                }
+            );
 
             var defaultImageHide = new ConverterGroup("Default Image Hide");
-            defaultImageHide.AddConverter((ref byte[] imageInfo) =>
-            {
-                return new StyleEnum<DisplayStyle>(imageInfo == null || imageInfo.Length == 0 ? DisplayStyle.Flex : DisplayStyle.None);
-            });
+            defaultImageHide.AddConverter(
+                (ref byte[] imageInfo) =>
+                {
+                    return new StyleEnum<DisplayStyle>(
+                        imageInfo == null || imageInfo.Length == 0 ? DisplayStyle.Flex : DisplayStyle.None
+                    );
+                }
+            );
 
             var defaultTextDisplay = new ConverterGroup("Default Text Hide");
-            defaultTextDisplay.AddConverter((ref string text) =>
-            {
-                return new StyleEnum<DisplayStyle>(string.IsNullOrEmpty(text) ? DisplayStyle.None : DisplayStyle.Flex);
-            });
+            defaultTextDisplay.AddConverter(
+                (ref string text) =>
+                {
+                    return new StyleEnum<DisplayStyle>(
+                        string.IsNullOrEmpty(text) ? DisplayStyle.None : DisplayStyle.Flex
+                    );
+                }
+            );
 
             var defaultTextHide = new ConverterGroup("Default Text Display");
-            defaultTextHide.AddConverter((ref string text) =>
-            {
-                return new StyleEnum<DisplayStyle>(string.IsNullOrEmpty(text) ? DisplayStyle.Flex : DisplayStyle.None);
-            });
+            defaultTextHide.AddConverter(
+                (ref string text) =>
+                {
+                    return new StyleEnum<DisplayStyle>(
+                        string.IsNullOrEmpty(text) ? DisplayStyle.Flex : DisplayStyle.None
+                    );
+                }
+            );
 
             ConverterGroups.RegisterConverterGroup(infoImage);
             ConverterGroups.RegisterConverterGroup(defaultImageDisplay);

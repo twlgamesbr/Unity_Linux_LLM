@@ -89,7 +89,11 @@ namespace Unity.Netcode.Editor.CodeGen
             return false;
         }
 
-        public static string FullNameWithGenericParameters(this TypeReference typeReference, GenericParameter[] contextGenericParameters, TypeReference[] contextGenericParameterTypes)
+        public static string FullNameWithGenericParameters(
+            this TypeReference typeReference,
+            GenericParameter[] contextGenericParameters,
+            TypeReference[] contextGenericParameterTypes
+        )
         {
             var name = typeReference.FullName;
             if (typeReference.HasGenericParameters)
@@ -117,6 +121,7 @@ namespace Unity.Netcode.Editor.CodeGen
 
             return name;
         }
+
         public static TypeReference MakeGenericType(this TypeReference self, params TypeReference[] arguments)
         {
             if (self.GenericParameters.Count != arguments.Length)
@@ -368,21 +373,34 @@ namespace Unity.Netcode.Editor.CodeGen
             diagnostics.AddError((SequencePoint)null, message);
         }
 
-        public static void AddError(this List<DiagnosticMessage> diagnostics, MethodDefinition methodDefinition, string message)
+        public static void AddError(
+            this List<DiagnosticMessage> diagnostics,
+            MethodDefinition methodDefinition,
+            string message
+        )
         {
             diagnostics.AddError(methodDefinition.DebugInformation.SequencePoints.FirstOrDefault(), message);
         }
 
-        public static void AddError(this List<DiagnosticMessage> diagnostics, SequencePoint sequencePoint, string message)
+        public static void AddError(
+            this List<DiagnosticMessage> diagnostics,
+            SequencePoint sequencePoint,
+            string message
+        )
         {
-            diagnostics.Add(new DiagnosticMessage
-            {
-                DiagnosticType = DiagnosticType.Error,
-                File = sequencePoint?.Document.Url.Replace($"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}", ""),
-                Line = sequencePoint?.StartLine ?? 0,
-                Column = sequencePoint?.StartColumn ?? 0,
-                MessageData = $" - {message}"
-            });
+            diagnostics.Add(
+                new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Error,
+                    File = sequencePoint?.Document.Url.Replace(
+                        $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}",
+                        ""
+                    ),
+                    Line = sequencePoint?.StartLine ?? 0,
+                    Column = sequencePoint?.StartColumn ?? 0,
+                    MessageData = $" - {message}",
+                }
+            );
         }
 
         public static void AddWarning(this List<DiagnosticMessage> diagnostics, string message)
@@ -390,21 +408,34 @@ namespace Unity.Netcode.Editor.CodeGen
             diagnostics.AddWarning((SequencePoint)null, message);
         }
 
-        public static void AddWarning(this List<DiagnosticMessage> diagnostics, MethodDefinition methodDefinition, string message)
+        public static void AddWarning(
+            this List<DiagnosticMessage> diagnostics,
+            MethodDefinition methodDefinition,
+            string message
+        )
         {
             diagnostics.AddWarning(methodDefinition.DebugInformation.SequencePoints.FirstOrDefault(), message);
         }
 
-        public static void AddWarning(this List<DiagnosticMessage> diagnostics, SequencePoint sequencePoint, string message)
+        public static void AddWarning(
+            this List<DiagnosticMessage> diagnostics,
+            SequencePoint sequencePoint,
+            string message
+        )
         {
-            diagnostics.Add(new DiagnosticMessage
-            {
-                DiagnosticType = DiagnosticType.Warning,
-                File = sequencePoint?.Document.Url.Replace($"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}", ""),
-                Line = sequencePoint?.StartLine ?? 0,
-                Column = sequencePoint?.StartColumn ?? 0,
-                MessageData = $" - {message}"
-            });
+            diagnostics.Add(
+                new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Warning,
+                    File = sequencePoint?.Document.Url.Replace(
+                        $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}",
+                        ""
+                    ),
+                    Line = sequencePoint?.StartLine ?? 0,
+                    Column = sequencePoint?.StartColumn ?? 0,
+                    MessageData = $" - {message}",
+                }
+            );
         }
 
         public static void RemoveRecursiveReferences(this ModuleDefinition moduleDefinition)
@@ -443,7 +474,10 @@ namespace Unity.Netcode.Editor.CodeGen
             }
         }
 
-        public static AssemblyDefinition AssemblyDefinitionFor(ICompiledAssembly compiledAssembly, out PostProcessorAssemblyResolver assemblyResolver)
+        public static AssemblyDefinition AssemblyDefinitionFor(
+            ICompiledAssembly compiledAssembly,
+            out PostProcessorAssemblyResolver assemblyResolver
+        )
         {
             assemblyResolver = new PostProcessorAssemblyResolver(compiledAssembly);
             var readerParameters = new ReaderParameters
@@ -452,10 +486,13 @@ namespace Unity.Netcode.Editor.CodeGen
                 SymbolReaderProvider = new PortablePdbReaderProvider(),
                 AssemblyResolver = assemblyResolver,
                 ReflectionImporterProvider = new PostProcessorReflectionImporterProvider(),
-                ReadingMode = ReadingMode.Immediate
+                ReadingMode = ReadingMode.Immediate,
             };
 
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(new MemoryStream(compiledAssembly.InMemoryAssembly.PeData), readerParameters);
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(
+                new MemoryStream(compiledAssembly.InMemoryAssembly.PeData),
+                readerParameters
+            );
 
             //apparently, it will happen that when we ask to resolve a type that lives inside Unity.Netcode.Runtime, and we
             //are also postprocessing Unity.Netcode.Runtime, type resolving will fail, because we do not actually try to resolve
@@ -466,9 +503,14 @@ namespace Unity.Netcode.Editor.CodeGen
             return assemblyDefinition;
         }
 
-        private static void SearchForBaseModulesRecursive(AssemblyDefinition assemblyDefinition, PostProcessorAssemblyResolver assemblyResolver, ref ModuleDefinition unityModule, ref ModuleDefinition netcodeModule, HashSet<string> visited)
+        private static void SearchForBaseModulesRecursive(
+            AssemblyDefinition assemblyDefinition,
+            PostProcessorAssemblyResolver assemblyResolver,
+            ref ModuleDefinition unityModule,
+            ref ModuleDefinition netcodeModule,
+            HashSet<string> visited
+        )
         {
-
             foreach (var module in assemblyDefinition.Modules)
             {
                 if (module == null)
@@ -525,12 +567,21 @@ namespace Unity.Netcode.Editor.CodeGen
             }
         }
 
-        public static (ModuleDefinition UnityModule, ModuleDefinition NetcodeModule) FindBaseModules(AssemblyDefinition assemblyDefinition, PostProcessorAssemblyResolver assemblyResolver)
+        public static (ModuleDefinition UnityModule, ModuleDefinition NetcodeModule) FindBaseModules(
+            AssemblyDefinition assemblyDefinition,
+            PostProcessorAssemblyResolver assemblyResolver
+        )
         {
             ModuleDefinition unityModule = null;
             ModuleDefinition netcodeModule = null;
             var visited = new HashSet<string>();
-            SearchForBaseModulesRecursive(assemblyDefinition, assemblyResolver, ref unityModule, ref netcodeModule, visited);
+            SearchForBaseModulesRecursive(
+                assemblyDefinition,
+                assemblyResolver,
+                ref unityModule,
+                ref netcodeModule,
+                visited
+            );
 
             return (unityModule, netcodeModule);
         }

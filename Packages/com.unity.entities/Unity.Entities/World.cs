@@ -18,23 +18,23 @@ namespace Unity.Entities
         /// <summary>
         /// Default WorldFlags value.
         /// </summary>
-        None       = 0,
+        None = 0,
 
         /// <summary>
         /// The main <see cref="World"/> for a game/application.
         /// This flag is combined with <see cref="Editor"/>, <see cref="Game"/> and <see cref="Simulation"/>.
         /// </summary>
-        Live       = 1,
+        Live = 1,
 
         /// <summary>
         /// Main <see cref="Live"/> <see cref="World"/> running in the Editor.
         /// </summary>
-        Editor     = 1 << 1 | Live,
+        Editor = 1 << 1 | Live,
 
         /// <summary>
         /// Main <see cref="Live"/> <see cref="World"/> running in the Player.
         /// </summary>
-        Game       = 1 << 2 | Live,
+        Game = 1 << 2 | Live,
 
         /// <summary>
         /// Any additional <see cref="Live"/> <see cref="World"/> running in the application for background processes that
@@ -51,18 +51,18 @@ namespace Unity.Entities
         /// <see cref="World"/> in which temporary results are staged before being moved into a <see cref="Live"/> <see cref="World"/>.
         /// Typically combined with <see cref="Conversion"/> to represent an intermediate step in the full conversion process.
         /// </summary>
-        Staging    = 1 << 5,
+        Staging = 1 << 5,
 
         /// <summary>
         /// <see cref="World"/> representing a previous state of another <see cref="World"/> typically to compute
         /// a diff of runtime data - for example useful for undo/redo or Live Link.
         /// </summary>
-        Shadow     = 1 << 6,
+        Shadow = 1 << 6,
 
         /// <summary>
         /// Dedicated <see cref="World"/> for managing incoming streamed data to the Player.
         /// </summary>
-        Streaming  = 1 << 7,
+        Streaming = 1 << 7,
 
         /// <summary>
         /// Server <see cref="Live"/> <see cref="World"/> running in the Player.
@@ -134,6 +134,7 @@ namespace Unity.Entities
         internal static event Action<World, ComponentSystemBase> SystemDestroyed;
 
         List<ComponentSystemBase> m_Systems = new List<ComponentSystemBase>();
+
         /// <summary>
         /// List of all managed systems in this World
         /// </summary>
@@ -246,8 +247,10 @@ namespace Unity.Entities
 
             s_AllWorlds.Add(this);
 
-            m_TimeSingletonQuery = EntityManager.CreateEntityQuery(ComponentType.ReadWrite<WorldTime>(),
-                ComponentType.ReadWrite<WorldTimeQueue>());
+            m_TimeSingletonQuery = EntityManager.CreateEntityQuery(
+                ComponentType.ReadWrite<WorldTime>(),
+                ComponentType.ReadWrite<WorldTimeQueue>()
+            );
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
 #pragma warning disable 0618
@@ -258,11 +261,12 @@ namespace Unity.Entities
                     worldSequenceNumber: SequenceNumber,
                     executingSystem: m_Unmanaged.ExecutingSystem,
                     entities: null,
-                    entityCount: 0);
+                    entityCount: 0
+                );
 
                 EntitiesJournaling.OnWorldCreated(this);
             }
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #endif
 
             s_NewWorldMarker.End();
@@ -278,7 +282,10 @@ namespace Unity.Entities
                 throw new ArgumentException("The World has already been Disposed.");
 
             if (Unmanaged.ExecutingSystem != SystemHandle.Null)
-                throw new ArgumentException("The World can not be disposed while a system in that world is executing " + Unmanaged.ExecutingSystem.m_WorldSeqNo);
+                throw new ArgumentException(
+                    "The World can not be disposed while a system in that world is executing "
+                        + Unmanaged.ExecutingSystem.m_WorldSeqNo
+                );
 
             s_DisposeWorldMarker.Begin();
 
@@ -293,13 +300,13 @@ namespace Unity.Entities
                     worldSequenceNumber: SequenceNumber,
                     executingSystem: m_Unmanaged.ExecutingSystem,
                     entities: null,
-                    entityCount: 0);
+                    entityCount: 0
+                );
             }
 #pragma warning restore 0618
 #endif
 
             m_Unmanaged.EntityManager.PreDisposeCheck();
-
 
             // We don't want any jobs making changes to this world as we are disposing it.
             // This could be particularly bad if we are destroying blobs referenced by Components as a job attempts to access them.
@@ -368,7 +375,7 @@ namespace Unity.Entities
         /// <param name="newTimeData">The new time to assign for this World</param>
         public void SetTime(TimeData newTimeData)
         {
-            EntityManager.SetComponentData(TimeSingleton, new WorldTime() {Time = newTimeData});
+            EntityManager.SetComponentData(TimeSingleton, new WorldTime() { Time = newTimeData });
             this.Time = newTimeData;
         }
 
@@ -417,7 +424,8 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (!m_Unmanaged.AllowGetSystem)
                 throw new ArgumentException(
-                    "During destruction of a system you are not allowed to create more systems.");
+                    "During destruction of a system you are not allowed to create more systems."
+                );
 #endif
 
             return TypeManager.ConstructSystem(TypeManager.GetSystemType(type));
@@ -461,16 +469,20 @@ namespace Unity.Entities
 
             AddTypeLookupInternal(systemType, system);
 
-            UnityEngine.Assertions.Assert.AreEqual(system,
-                (ComponentSystemBase)
-                m_Unmanaged.ResolveSystemState(system.SystemHandle)->m_ManagedSystem
-                    .Target);
+            UnityEngine.Assertions.Assert.AreEqual(
+                system,
+                (ComponentSystemBase)m_Unmanaged.ResolveSystemState(system.SystemHandle)->m_ManagedSystem.Target
+            );
 
-            m_Unmanaged.GetImpl().sysHandlesInCreationOrder.Add(new PerWorldSystemInfo
-            {
-                handle = system.SystemHandle,
-                systemTypeIndex = TypeManager.GetSystemTypeIndex(systemType)
-            });
+            m_Unmanaged
+                .GetImpl()
+                .sysHandlesInCreationOrder.Add(
+                    new PerWorldSystemInfo
+                    {
+                        handle = system.SystemHandle,
+                        systemTypeIndex = TypeManager.GetSystemTypeIndex(systemType),
+                    }
+                );
         }
 
         void AddSystem_OnCreate_Internal(ComponentSystemBase system)
@@ -553,7 +565,9 @@ namespace Unity.Entities
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (!m_Unmanaged.AllowGetSystem)
-                throw new ArgumentException("You are not allowed to get or create more systems during destruction of a system.");
+                throw new ArgumentException(
+                    "You are not allowed to get or create more systems during destruction of a system."
+                );
 #endif
         }
 
@@ -572,7 +586,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>The handle for the instance of system type <typeparamref name="T"/> in this World. If the system
         /// does not exist in this World, it will first be created.</returns>
-        public SystemHandle GetOrCreateSystem<T>() where T : ComponentSystemBase
+        public SystemHandle GetOrCreateSystem<T>()
+            where T : ComponentSystemBase
         {
             CheckGetOrCreateSystem();
 
@@ -609,7 +624,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>The instance of system type <typeparamref name="T"/> in this World. If the system
         /// does not exist in this World, it will first be created.</returns>
-        public T GetOrCreateSystemManaged<T>() where T : ComponentSystemBase
+        public T GetOrCreateSystemManaged<T>()
+            where T : ComponentSystemBase
         //sadly, we have to use reflection to account for the fact that T might not have been registered at startup.
         //someday, we can ban this and avoid reflection here.
         {
@@ -723,7 +739,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>A handle to the new instance of system type <typeparamref name="T"/> in this World.</returns>
-        public SystemHandle CreateSystem<T>() where T : ComponentSystemBase, new()
+        public SystemHandle CreateSystem<T>()
+            where T : ComponentSystemBase, new()
         {
             CheckGetOrCreateSystem();
             return CreateSystemInternal(TypeManager.GetSystemTypeIndex<T>()).SystemHandle;
@@ -759,7 +776,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>The new instance of system type <typeparamref name="T"/> in this World.</returns>
-        public T CreateSystemManaged<T>() where T : ComponentSystemBase, new()
+        public T CreateSystemManaged<T>()
+            where T : ComponentSystemBase, new()
         {
             var idx = TypeManager.GetSystemTypeIndexNoThrow<T>();
             if (idx <= 0)
@@ -853,8 +871,8 @@ namespace Unity.Entities
         /// <param name="system">The existing system instance to add</param>
         /// <returns>The input <paramref name="system"/></returns>
         [Obsolete("(UnityUpgradable) -> AddSystemManaged<T>(*)", true)]
-        public T AddSystem<T>(T system) where T : ComponentSystemBase
-            => AddSystemManaged(system);
+        public T AddSystem<T>(T system)
+            where T : ComponentSystemBase => AddSystemManaged(system);
 
         /// <summary>
         /// Adds an existing system instance to this World
@@ -886,7 +904,8 @@ namespace Unity.Entities
         /// <param name="system">The existing system instance to add</param>
         /// <returns>The input <paramref name="system"/></returns>
         /// <exception cref="Exception">Thrown if a system of type <typeparamref name="T"/> already exists in this World</exception>
-        public T AddSystemManaged<T>(T system) where T : ComponentSystemBase
+        public T AddSystemManaged<T>(T system)
+            where T : ComponentSystemBase
         {
             CheckGetOrCreateSystem();
             var systemTypeIndex = TypeManager.GetSystemTypeIndexNoThrow<T>();
@@ -896,7 +915,9 @@ namespace Unity.Entities
                 systemTypeIndex = TypeManager.GetSystemTypeIndex<T>();
             }
             if (GetExistingSystemInternal(systemTypeIndex) != null)
-                throw new Exception($"Attempting to add system '{TypeManager.GetSystemName(systemTypeIndex)}' which has already been added to world '{Name}'");
+                throw new Exception(
+                    $"Attempting to add system '{TypeManager.GetSystemName(systemTypeIndex)}' which has already been added to world '{Name}'"
+                );
 
             AddSystem_Add_Internal(system);
             AddSystem_OnCreate_Internal(system);
@@ -908,8 +929,8 @@ namespace Unity.Entities
         /// </summary>
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>A handle to the existing instance of system type <typeparamref name="T"/> in this World. If no such instance exists, the method returns default.</returns>
-        public SystemHandle GetExistingSystem<T>() where T : ComponentSystemBase
-            => GetExistingSystem(TypeManager.GetSystemTypeIndex<T>());
+        public SystemHandle GetExistingSystem<T>()
+            where T : ComponentSystemBase => GetExistingSystem(TypeManager.GetSystemTypeIndex<T>());
 
         /// <summary>
         /// Return an existing instance of a system of type <typeparamref name="T"/> in this World.
@@ -932,8 +953,8 @@ namespace Unity.Entities
         /// </remarks>
         /// <typeparam name="T">The system type</typeparam>
         /// <returns>The existing instance of system type <typeparamref name="T"/> in this World. If no such instance exists, the method returns null.</returns>
-        public T GetExistingSystemManaged<T>() where T : ComponentSystemBase
-            => (T)GetExistingSystemManaged(typeof(T));
+        public T GetExistingSystemManaged<T>()
+            where T : ComponentSystemBase => (T)GetExistingSystemManaged(typeof(T));
 
         /// <summary>
         /// Return a handle to an existing instance of a system of type <paramref name="type"/> in this World. Prefer
@@ -1016,7 +1037,6 @@ namespace Unity.Entities
         /// </remarks>
         /// <param name="type">The system type</param>
         /// <returns>The existing instance of system type <paramref name="type"/> in this World. If no such instance exists, the method returns null.</returns>
-
         public ComponentSystemBase GetExistingSystemManaged(SystemTypeIndex type)
         {
             CheckGetOrCreateSystem();
@@ -1040,7 +1060,9 @@ namespace Unity.Entities
             CheckGetOrCreateSystem();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Unmanaged.ExecutingSystem != default)
-                throw new ArgumentException("A system can not be disposed while another system in that world is executing");
+                throw new ArgumentException(
+                    "A system can not be disposed while another system in that world is executing"
+                );
 #endif
 
             var sysState = Unmanaged.ResolveSystemStateChecked(sysHandle);
@@ -1069,7 +1091,9 @@ namespace Unity.Entities
             CheckGetOrCreateSystem();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
             if (Unmanaged.ExecutingSystem != default)
-                throw new ArgumentException("A system can not be disposed while another system in that world is executing");
+                throw new ArgumentException(
+                    "A system can not be disposed while another system in that world is executing"
+                );
 #endif
 
             SystemDestroyed?.Invoke(this, system);
@@ -1086,6 +1110,7 @@ namespace Unity.Entities
         {
             DestroyAllSystemsAndLogException(out _);
         }
+
         /// <summary>
         /// Destroy all system instances in the World. Any errors encountered during individual system destruction will be logged to the console.
         /// </summary>
@@ -1101,7 +1126,9 @@ namespace Unity.Entities
             }
 
             if (Unmanaged.ExecutingSystem != default)
-                throw new ArgumentException($"{nameof(DestroyAllSystemsAndLogException)} while another system is running on the same world is not allowed.");
+                throw new ArgumentException(
+                    $"{nameof(DestroyAllSystemsAndLogException)} while another system is running on the same world is not allowed."
+                );
 
             // Systems are destroyed in reverse order from construction, in three phases:
             // 1. Stop all systems from running (if they weren't already stopped), to ensure OnStopRunning() is called.
@@ -1130,10 +1157,13 @@ namespace Unity.Entities
                 else
                 {
                     //TODO: call journaling for unmanaged systems, and clean up action callback stuff for that
-                    if (state->PreviouslyEnabled &&
-                        (TypeManager.GetSystemTypeFlags(sysHandlesInCreationOrder[i].systemTypeIndex) &
-                         TypeManager.SystemTypeInfo.kIsSystemISystemStartStopFlag) !=
-                        0)
+                    if (
+                        state->PreviouslyEnabled
+                        && (
+                            TypeManager.GetSystemTypeFlags(sysHandlesInCreationOrder[i].systemTypeIndex)
+                            & TypeManager.SystemTypeInfo.kIsSystemISystemStartStopFlag
+                        ) != 0
+                    )
                     {
                         SystemBaseRegistry.CallOnStopRunning(state);
                     }
@@ -1221,7 +1251,8 @@ namespace Unity.Entities
         internal NativeList<SystemHandle> GetOrCreateSystemsAndLogException(
             NativeList<SystemTypeIndex> types,
             int typesCount,
-            AllocatorManager.AllocatorHandle allocator)
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             CheckGetOrCreateSystem();
 
@@ -1232,7 +1263,7 @@ namespace Unity.Entities
             var startIndex = sysHandlesToReturn.Length;
             var actuallyAddedTypesList = new NativeList<SystemTypeIndex>(16, Allocator.Temp);
 
-            for (int i=0; i<types.Length; i++)
+            for (int i = 0; i < types.Length; i++)
             {
                 var type = types[i];
                 var handle = SystemHandle.Null;
@@ -1275,9 +1306,8 @@ namespace Unity.Entities
                         UnityEngine.Assertions.Assert.AreEqual(
                             (ComponentSystemBase)system,
                             (ComponentSystemBase)
-                            m_Unmanaged.ResolveSystemState(system.SystemHandle)->m_ManagedSystem
-                                .Target);
-
+                                m_Unmanaged.ResolveSystemState(system.SystemHandle)->m_ManagedSystem.Target
+                        );
                     }
                 }
                 catch (Exception exc)
@@ -1295,7 +1325,7 @@ namespace Unity.Entities
             {
                 try
                 {
-                    var type = actuallyAddedTypesList[i-startIndex];
+                    var type = actuallyAddedTypesList[i - startIndex];
                     if (type == SystemTypeIndex.Null)
                         continue;
 
@@ -1341,7 +1371,10 @@ namespace Unity.Entities
         /// <param name="types">The system types to create, in the order in which they should be created.</param>
         /// <param name="allocator">The allocator to use to allocate the output system list</param>
         /// <returns>A list of system instances</returns>
-        public NativeList<SystemHandle> GetOrCreateSystemsAndLogException(NativeList<SystemTypeIndex> types, AllocatorManager.AllocatorHandle allocator)
+        public NativeList<SystemHandle> GetOrCreateSystemsAndLogException(
+            NativeList<SystemTypeIndex> types,
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             return GetOrCreateSystemsAndLogException(types, types.Length, allocator);
         }
@@ -1404,8 +1437,11 @@ namespace Unity.Entities
             GetExistingSystemManaged<PresentationSystemGroup>()?.Update();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            Assert.IsTrue(EntityManager.GetBuffer<WorldTimeQueue>(TimeSingleton).Length == 0, "PushTime without matching PopTime");
-        #endif
+            Assert.IsTrue(
+                EntityManager.GetBuffer<WorldTimeQueue>(TimeSingleton).Length == 0,
+                "PushTime without matching PopTime"
+            );
+#endif
         }
 
         /// <summary>
@@ -1446,13 +1482,21 @@ namespace Unity.Entities
             /// <returns>True if the element is found in the list, or false if not.</returns>
             public bool Contains(T item) => m_Source.Contains(item);
 
-            IEnumerator<T> IEnumerable<T>.GetEnumerator()
-                => throw new NotSupportedException($"To avoid boxing, do not cast {nameof(NoAllocReadOnlyCollection<T>)} to IEnumerable<T>.");
-            IEnumerator IEnumerable.GetEnumerator()
-                => throw new NotSupportedException($"To avoid boxing, do not cast {nameof(NoAllocReadOnlyCollection<T>)} to IEnumerable.");
+            IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
+                throw new NotSupportedException(
+                    $"To avoid boxing, do not cast {nameof(NoAllocReadOnlyCollection<T>)} to IEnumerable<T>."
+                );
+
+            IEnumerator IEnumerable.GetEnumerator() =>
+                throw new NotSupportedException(
+                    $"To avoid boxing, do not cast {nameof(NoAllocReadOnlyCollection<T>)} to IEnumerable."
+                );
         }
 
-        internal static unsafe SystemState* FindSystemStateForChangeVersion(EntityComponentStore* componentStore, uint changeVersion)
+        internal static unsafe SystemState* FindSystemStateForChangeVersion(
+            EntityComponentStore* componentStore,
+            uint changeVersion
+        )
         {
             foreach (var world in World.All)
             {
@@ -1513,7 +1557,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The system type</typeparam>
         /// <exception cref="ArgumentException">Thrown if the system type <typeparamref name="T"/>has not been registered with the TypeManager.</exception>
         /// <returns>The new system instance's handle of system type <typeparamref name="T"/> in this World.</returns>
-        public static SystemHandle CreateSystem<T>(this World self) where T : unmanaged, ISystem
+        public static SystemHandle CreateSystem<T>(this World self)
+            where T : unmanaged, ISystem
         {
             return self.Unmanaged.CreateUnmanagedSystem<T>(self, true);
         }
@@ -1524,7 +1569,8 @@ namespace Unity.Entities
         /// <typeparam name="T">The system type</typeparam>
         /// <param name="self">The World</param>
         /// <returns>The existing system instance's handle of system type <typeparamref name="T"/> in this World. If no such instance exists, the method returns SystemHandle.Null.</returns>
-        public static SystemHandle GetExistingSystem<T>(this World self) where T : unmanaged, ISystem
+        public static SystemHandle GetExistingSystem<T>(this World self)
+            where T : unmanaged, ISystem
         {
             return self.Unmanaged.GetExistingUnmanagedSystem<T>();
         }
@@ -1544,7 +1590,8 @@ namespace Unity.Entities
         /// <returns>The instance's handle of system type <typeparamref name="T"/> in this World. If the system
         /// does not exist in this World, it will first be created.</returns>
         /// <exception cref="ArgumentException">Thrown if the system type <typeparamref name="T"/>has not been registered with the TypeManager.</exception>
-        public static SystemHandle GetOrCreateSystem<T>(this World self) where T : unmanaged, ISystem
+        public static SystemHandle GetOrCreateSystem<T>(this World self)
+            where T : unmanaged, ISystem
         {
             return self.Unmanaged.GetOrCreateUnmanagedSystem<T>();
         }
@@ -1558,6 +1605,7 @@ namespace Unity.Entities
         {
             return self.GetOrCreateSystem(unmanagedType);
         }
+
         /// <summary> Obsolete. Use <see cref="World.DestroySystem(SystemHandle)"/> instead.</summary>
         /// <param name="self">The World</param>
         /// <param name="sysHandle">The system handle.</param>
@@ -1566,15 +1614,18 @@ namespace Unity.Entities
         {
             self.DestroySystem(sysHandle);
         }
+
         /// <summary> Obsolete. Use <see cref="World.CreateSystem{T}"/> instead.</summary>
         /// <param name="self">The World</param>
         /// <typeparam name="T">The system</typeparam>
         /// <returns></returns>
         [Obsolete("Use World.CreateSystem instead")]
-        public static SystemHandle AddSystem<T>(this World self) where T : unmanaged, ISystem
+        public static SystemHandle AddSystem<T>(this World self)
+            where T : unmanaged, ISystem
         {
             return CreateSystem<T>(self);
         }
+
         /// <summary> Obsolete. Use <see cref="World.GetOrCreateSystem"/> instead.</summary>
         /// <param name="self">The World</param>
         /// <param name="unmanagedType">The type.</param>
@@ -1584,6 +1635,7 @@ namespace Unity.Entities
         {
             return GetOrCreateSystem(self, unmanagedType);
         }
+
         /// <summary> Obsolete. Use <see cref="World.DestroySystem"/> instead.</summary>
         /// <param name="self">The World</param>
         /// <param name="sysHandle">The system handle.</param>

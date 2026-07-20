@@ -54,7 +54,8 @@ namespace Unity.Entities
             internal int RecordCount => m_Records.Count;
             internal ulong RecordIndex => m_RecordIndex;
             internal ulong UsedBytes => (ulong)((float)m_Buffer.Count / m_Buffer.Capacity * AllocatedBytes);
-            internal ulong AllocatedBytes => ((ulong)m_Records.Capacity * (ulong)sizeof(Record)) + (ulong)m_Buffer.Capacity;
+            internal ulong AllocatedBytes =>
+                ((ulong)m_Records.Capacity * (ulong)sizeof(Record)) + (ulong)m_Buffer.Capacity;
 
             public void Dispose()
             {
@@ -133,7 +134,9 @@ namespace Unity.Entities
 
                     // Add system version handle to the buffer
                     if (!buffer->PushBack(new SystemVersionHandle { Version = version, Handle = handle }))
-                        UnityEngine.Debug.LogError($"EntitiesJournaling: Failed to push back system version in buffer.");
+                        UnityEngine.Debug.LogError(
+                            $"EntitiesJournaling: Failed to push back system version in buffer."
+                        );
                 }
                 finally
                 {
@@ -141,7 +144,18 @@ namespace Unity.Entities
                 }
             }
 
-            internal void PushBack(RecordType recordType, ulong worldSequenceNumber, in SystemHandle executingSystem, in SystemHandle originSystem, Entity* entities, int entityCount, TypeIndex* types, int typeCount, void* data, int dataLength)
+            internal void PushBack(
+                RecordType recordType,
+                ulong worldSequenceNumber,
+                in SystemHandle executingSystem,
+                in SystemHandle originSystem,
+                Entity* entities,
+                int entityCount,
+                TypeIndex* types,
+                int typeCount,
+                void* data,
+                int dataLength
+            )
             {
                 m_Lock.Acquire();
                 try
@@ -149,7 +163,15 @@ namespace Unity.Entities
                     if (!PushBackRecord(recordType, entityCount, typeCount, dataLength))
                         return;
 
-                    PushBackHeader(recordType, worldSequenceNumber, in executingSystem, in originSystem, entityCount, typeCount, dataLength);
+                    PushBackHeader(
+                        recordType,
+                        worldSequenceNumber,
+                        in executingSystem,
+                        in originSystem,
+                        entityCount,
+                        typeCount,
+                        dataLength
+                    );
                     PushBackEntities(entities, entityCount);
                     PushBackTypes(types, typeCount);
                     PushBackData(data, dataLength);
@@ -160,7 +182,18 @@ namespace Unity.Entities
                 }
             }
 
-            internal void PushBack(RecordType recordType, ulong worldSequenceNumber, in SystemHandle executingSystem, in SystemHandle originSystem, ArchetypeChunk* chunks, int chunkCount, TypeIndex* types, int typeCount, void* data, int dataLength)
+            internal void PushBack(
+                RecordType recordType,
+                ulong worldSequenceNumber,
+                in SystemHandle executingSystem,
+                in SystemHandle originSystem,
+                ArchetypeChunk* chunks,
+                int chunkCount,
+                TypeIndex* types,
+                int typeCount,
+                void* data,
+                int dataLength
+            )
             {
                 var entityCount = GetEntityCount(chunks, chunkCount);
 
@@ -170,7 +203,15 @@ namespace Unity.Entities
                     if (!PushBackRecord(recordType, entityCount, typeCount, dataLength))
                         return;
 
-                    PushBackHeader(recordType, worldSequenceNumber, in executingSystem, in originSystem, entityCount, typeCount, dataLength);
+                    PushBackHeader(
+                        recordType,
+                        worldSequenceNumber,
+                        in executingSystem,
+                        in originSystem,
+                        entityCount,
+                        typeCount,
+                        dataLength
+                    );
                     PushBackEntities(chunks, chunkCount);
                     PushBackTypes(types, typeCount);
                     PushBackData(data, dataLength);
@@ -181,7 +222,18 @@ namespace Unity.Entities
                 }
             }
 
-            internal void PushBack(RecordType recordType, ulong worldSequenceNumber, in SystemHandle executingSystem, in SystemHandle originSystem, Archetype* archetype, ChunkIndex chunk, TypeIndex* types, int typeCount, void* data, int dataLength)
+            internal void PushBack(
+                RecordType recordType,
+                ulong worldSequenceNumber,
+                in SystemHandle executingSystem,
+                in SystemHandle originSystem,
+                Archetype* archetype,
+                ChunkIndex chunk,
+                TypeIndex* types,
+                int typeCount,
+                void* data,
+                int dataLength
+            )
             {
                 var entityCount = chunk.Count;
 
@@ -191,7 +243,15 @@ namespace Unity.Entities
                     if (!PushBackRecord(recordType, entityCount, typeCount, dataLength))
                         return;
 
-                    PushBackHeader(recordType, worldSequenceNumber, in executingSystem, in originSystem, entityCount, typeCount, dataLength);
+                    PushBackHeader(
+                        recordType,
+                        worldSequenceNumber,
+                        in executingSystem,
+                        in originSystem,
+                        entityCount,
+                        typeCount,
+                        dataLength
+                    );
                     PushBackEntities(archetype, chunk);
                     PushBackTypes(types, typeCount);
                     PushBackData(data, dataLength);
@@ -202,7 +262,18 @@ namespace Unity.Entities
                 }
             }
 
-            internal void PushBack(RecordType recordType, EntityComponentStore* store, uint version, in SystemHandle originSystem, Entity* entities, int entityCount, TypeIndex* types, int typeCount, void* data, int dataLength)
+            internal void PushBack(
+                RecordType recordType,
+                EntityComponentStore* store,
+                uint version,
+                in SystemHandle originSystem,
+                Entity* entities,
+                int entityCount,
+                TypeIndex* types,
+                int typeCount,
+                void* data,
+                int dataLength
+            )
             {
                 m_Lock.Acquire();
                 try
@@ -211,7 +282,15 @@ namespace Unity.Entities
                         return;
 
                     var executingSystem = GetSystemHandle(store, version);
-                    PushBackHeader(recordType, store->WorldSequenceNumber, in executingSystem, in originSystem, entityCount, typeCount, dataLength);
+                    PushBackHeader(
+                        recordType,
+                        store->WorldSequenceNumber,
+                        in executingSystem,
+                        in originSystem,
+                        entityCount,
+                        typeCount,
+                        dataLength
+                    );
                     PushBackEntities(entities, entityCount);
                     PushBackTypes(types, typeCount);
                     PushBackData(data, dataLength);
@@ -222,7 +301,18 @@ namespace Unity.Entities
                 }
             }
 
-            internal void PushBack(RecordType recordType, EntityComponentStore* store, uint version, in SystemHandle originSystem, ArchetypeChunk* chunks, int chunkCount, TypeIndex* types, int typeCount, void* data, int dataLength)
+            internal void PushBack(
+                RecordType recordType,
+                EntityComponentStore* store,
+                uint version,
+                in SystemHandle originSystem,
+                ArchetypeChunk* chunks,
+                int chunkCount,
+                TypeIndex* types,
+                int typeCount,
+                void* data,
+                int dataLength
+            )
             {
                 var entityCount = GetEntityCount(chunks, chunkCount);
 
@@ -233,7 +323,15 @@ namespace Unity.Entities
                         return;
 
                     var executingSystem = GetSystemHandle(store, version);
-                    PushBackHeader(recordType, store->WorldSequenceNumber, in executingSystem, in originSystem, entityCount, typeCount, dataLength);
+                    PushBackHeader(
+                        recordType,
+                        store->WorldSequenceNumber,
+                        in executingSystem,
+                        in originSystem,
+                        entityCount,
+                        typeCount,
+                        dataLength
+                    );
                     PushBackEntities(chunks, chunkCount);
                     PushBackTypes(types, typeCount);
                     PushBackData(data, dataLength);
@@ -244,7 +342,18 @@ namespace Unity.Entities
                 }
             }
 
-            internal void PushBack(RecordType recordType, EntityComponentStore* store, uint version, in SystemHandle originSystem, Archetype* archetype, ChunkIndex chunk, TypeIndex* types, int typeCount, void* data, int dataLength)
+            internal void PushBack(
+                RecordType recordType,
+                EntityComponentStore* store,
+                uint version,
+                in SystemHandle originSystem,
+                Archetype* archetype,
+                ChunkIndex chunk,
+                TypeIndex* types,
+                int typeCount,
+                void* data,
+                int dataLength
+            )
             {
                 var entityCount = chunk.Count;
 
@@ -255,7 +364,15 @@ namespace Unity.Entities
                         return;
 
                     var executingSystem = GetSystemHandle(store, version);
-                    PushBackHeader(recordType, store->WorldSequenceNumber, in executingSystem, in originSystem, entityCount, typeCount, dataLength);
+                    PushBackHeader(
+                        recordType,
+                        store->WorldSequenceNumber,
+                        in executingSystem,
+                        in originSystem,
+                        entityCount,
+                        typeCount,
+                        dataLength
+                    );
                     PushBackEntities(archetype, chunk);
                     PushBackTypes(types, typeCount);
                     PushBackData(data, dataLength);
@@ -311,7 +428,9 @@ namespace Unity.Entities
                 var length = sizeof(Header) + (sizeof(Entity) * entityCount) + (sizeof(int) * typeCount) + dataLength;
                 if (length > m_Buffer.Capacity)
                 {
-                    UnityEngine.Debug.LogError($"EntitiesJournaling: Cannot store {recordType} event, buffer not large enough. Increase entities journaling total memory in preferences.");
+                    UnityEngine.Debug.LogError(
+                        $"EntitiesJournaling: Cannot store {recordType} event, buffer not large enough. Increase entities journaling total memory in preferences."
+                    );
                     return false;
                 }
                 else if (length == m_Buffer.Capacity)
@@ -343,7 +462,9 @@ namespace Unity.Entities
 
                     if (!m_Buffer.PopFront(bytesCount))
                     {
-                        UnityEngine.Debug.LogError($"EntitiesJournaling: Failed to pop front {bytesCount} bytes in buffer.");
+                        UnityEngine.Debug.LogError(
+                            $"EntitiesJournaling: Failed to pop front {bytesCount} bytes in buffer."
+                        );
                         return false;
                     }
                 }
@@ -355,9 +476,27 @@ namespace Unity.Entities
                 return true;
             }
 
-            void PushBackHeader(RecordType recordType, ulong worldSequenceNumber, in SystemHandle executingSystem, in SystemHandle originSystem, int entityCount, int typeCount, int dataLength)
+            void PushBackHeader(
+                RecordType recordType,
+                ulong worldSequenceNumber,
+                in SystemHandle executingSystem,
+                in SystemHandle originSystem,
+                int entityCount,
+                int typeCount,
+                int dataLength
+            )
             {
-                var header = new Header(m_RecordIndex++, recordType, FrameCountSystem.FrameCount, worldSequenceNumber, in executingSystem, in originSystem, entityCount, typeCount, dataLength);
+                var header = new Header(
+                    m_RecordIndex++,
+                    recordType,
+                    FrameCountSystem.FrameCount,
+                    worldSequenceNumber,
+                    in executingSystem,
+                    in originSystem,
+                    entityCount,
+                    typeCount,
+                    dataLength
+                );
                 if (!m_Buffer.PushBack((byte*)&header, sizeof(Header)))
                     UnityEngine.Debug.LogError($"EntitiesJournaling: Failed to push back header in buffer.");
             }
@@ -385,7 +524,9 @@ namespace Unity.Entities
                     var length = archetypeChunk.Count;
                     var startOffset = archetype->Offsets[0];
                     if (!m_Buffer.PushBack(buffer + startOffset, sizeof(Entity) * length))
-                        UnityEngine.Debug.LogError($"EntitiesJournaling: Failed to push back archetype chunk entities in buffer.");
+                        UnityEngine.Debug.LogError(
+                            $"EntitiesJournaling: Failed to push back archetype chunk entities in buffer."
+                        );
                 }
             }
 
@@ -444,7 +585,10 @@ namespace Unity.Entities
                     return null;
 
                 node->Store = store;
-                node->Buffer = Allocate<UnsafeCircularBuffer<SystemVersionHandle>>(Allocator.Persistent, NativeArrayOptions.ClearMemory);
+                node->Buffer = Allocate<UnsafeCircularBuffer<SystemVersionHandle>>(
+                    Allocator.Persistent,
+                    NativeArrayOptions.ClearMemory
+                );
                 if (node->Buffer == null)
                 {
                     AllocatorManager.Free(Allocator.Persistent, node);

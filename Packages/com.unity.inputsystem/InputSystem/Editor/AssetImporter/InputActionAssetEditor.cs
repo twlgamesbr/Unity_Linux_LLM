@@ -9,32 +9,31 @@ namespace UnityEngine.InputSystem.Editor
     [CustomEditor(typeof(InputActionAsset))]
     internal class InputActionAssetEditor : UnityEditor.Editor
     {
-        protected override void OnHeaderGUI()
-        {
-        }
+        protected override void OnHeaderGUI() { }
 
-        public override void OnInspectorGUI()
-        {
-        }
+        public override void OnInspectorGUI() { }
 
         #region Support abstract editor registration
 
         private static readonly List<Type> s_EditorTypes = new List<Type>();
 
         // Registers an asset editor type for receiving asset modification callbacks.
-        public static void RegisterType<T>() where T : IInputActionAssetEditor
+        public static void RegisterType<T>()
+            where T : IInputActionAssetEditor
         {
             if (!s_EditorTypes.Contains(typeof(T)))
                 s_EditorTypes.Add(typeof(T));
         }
 
         // Unregisters an asset editor type from receiving asset modification callbacks.
-        public static void UnregisterType<T>() where T : IInputActionAssetEditor
+        public static void UnregisterType<T>()
+            where T : IInputActionAssetEditor
         {
             s_EditorTypes.Remove(typeof(T));
         }
 
-        public static T FindOpenEditor<T>(string path) where T : EditorWindow
+        public static T FindOpenEditor<T>(string path)
+            where T : EditorWindow
         {
             var openEditors = FindAllEditorsForPath(path);
             foreach (var openEditor in openEditors)
@@ -49,8 +48,9 @@ namespace UnityEngine.InputSystem.Editor
         public static IInputActionAssetEditor[] FindAllEditorsForPath(string path)
         {
             var guid = AssetDatabase.AssetPathToGUID(path);
-            return guid != null ? FindAllEditors((editor) => editor.assetGUID == guid) :
-                Array.Empty<IInputActionAssetEditor>();
+            return guid != null
+                ? FindAllEditors((editor) => editor.assetGUID == guid)
+                : Array.Empty<IInputActionAssetEditor>();
         }
 
         // Finds all asset editors fulfilling the given predicate.
@@ -62,16 +62,21 @@ namespace UnityEngine.InputSystem.Editor
             return editors != null ? editors.ToArray() : Array.Empty<IInputActionAssetEditor>();
         }
 
-        private static List<IInputActionAssetEditor> FindAllEditors(Type type,
+        private static List<IInputActionAssetEditor> FindAllEditors(
+            Type type,
             Predicate<IInputActionAssetEditor> predicate = null,
-            List<IInputActionAssetEditor> result = null)
+            List<IInputActionAssetEditor> result = null
+        )
         {
             if (result == null)
                 result = new List<IInputActionAssetEditor>();
             var editors = Resources.FindObjectsOfTypeAll(type);
             foreach (var editor in editors)
             {
-                if (editor is IInputActionAssetEditor actionsAssetEditor && (predicate == null || predicate(actionsAssetEditor)))
+                if (
+                    editor is IInputActionAssetEditor actionsAssetEditor
+                    && (predicate == null || predicate(actionsAssetEditor))
+                )
                     result.Add(actionsAssetEditor);
             }
             return result;
@@ -90,7 +95,11 @@ namespace UnityEngine.InputSystem.Editor
         // - When an asset is about to get moved, notify any editors having the asset open about the move.
         //
         // See comments further down in this class for expected callback sequences.
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Intantiated through reflection by Unity")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Performance",
+            "CA1812:AvoidUninstantiatedInternalClasses",
+            Justification = "Intantiated through reflection by Unity"
+        )]
         private class InputActionAssetModificationProcessor : UnityEditor.AssetModificationProcessor
         {
             public static AssetDeleteResult OnWillDeleteAsset(string path, RemoveAssetOptions options)
@@ -164,7 +173,11 @@ namespace UnityEngine.InputSystem.Editor
         // Rename                         Imported(d), Deleted(s)
         // Move(drag) / Cut+Paste         Imported(d), Deleted(s)
         // ------------------------------------------------------------------------------------------------------------
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Intantiated through reflection by Unity")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Performance",
+            "CA1812:AvoidUninstantiatedInternalClasses",
+            Justification = "Intantiated through reflection by Unity"
+        )]
         private class InputActionAssetPostprocessor : AssetPostprocessor
         {
             private static bool s_DoNotifyEditorsScheduled;
@@ -172,8 +185,11 @@ namespace UnityEngine.InputSystem.Editor
             private static List<string> s_Deleted = new List<string>();
             private static List<string> s_Moved = new List<string>();
 
-            private static void Notify(IReadOnlyCollection<string> assets,
-                IReadOnlyCollection<IInputActionAssetEditor> editors, Action<IInputActionAssetEditor> callback)
+            private static void Notify(
+                IReadOnlyCollection<string> assets,
+                IReadOnlyCollection<IInputActionAssetEditor> editors,
+                Action<IInputActionAssetEditor> callback
+            )
             {
                 foreach (var asset in assets)
                 {
@@ -247,8 +263,13 @@ namespace UnityEngine.InputSystem.Editor
                 }
             }
 
-            private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
-                string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
+            private static void OnPostprocessAllAssets(
+                string[] importedAssets,
+                string[] deletedAssets,
+                string[] movedAssets,
+                string[] movedFromAssetPaths,
+                bool didDomainReload
+            )
             {
                 Process(importedAssets, s_Imported);
                 Process(deletedAssets, s_Deleted);

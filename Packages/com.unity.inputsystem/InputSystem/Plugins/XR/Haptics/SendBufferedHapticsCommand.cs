@@ -10,7 +10,8 @@ namespace UnityEngine.InputSystem.XR.Haptics
         static FourCC Type => new FourCC('X', 'H', 'U', '0');
 
         private const int kMaxHapticBufferSize = 1024;
-        private const int kSize = InputDeviceCommand.kBaseCommandSize + (sizeof(int) * 2) + (kMaxHapticBufferSize * sizeof(byte));
+        private const int kSize =
+            InputDeviceCommand.kBaseCommandSize + (sizeof(int) * 2) + (kMaxHapticBufferSize * sizeof(byte));
 
         public FourCC typeStatic => Type;
 
@@ -35,13 +36,13 @@ namespace UnityEngine.InputSystem.XR.Haptics
             var newCommand = new SendBufferedHapticCommand
             {
                 baseCommand = new InputDeviceCommand(Type, kSize),
-                bufferSize = rumbleBufferSize
+                bufferSize = rumbleBufferSize,
             };
 
             //TODO TOMB: There must be a more effective, bulk copy operation for fixed buffers than this.
             //Replace if found.
             var commandPtr = &newCommand;
-            fixed(byte* src = rumbleBuffer)
+            fixed (byte* src = rumbleBuffer)
             {
                 for (int cpyIndex = 0; cpyIndex < rumbleBufferSize; cpyIndex++)
                     commandPtr->buffer[cpyIndex] = src[cpyIndex];

@@ -13,10 +13,10 @@ using UnityEngine;
 
 namespace Unity.Networking.Transport
 {
-    using NetworkRequest = Binding.Baselib_RegisteredNetwork_Request;
     using CompletionResult = Binding.Baselib_RegisteredNetwork_CompletionResult;
-    using RegisteredNetworkEndpoint = Binding.Baselib_RegisteredNetwork_Endpoint;
+    using NetworkRequest = Binding.Baselib_RegisteredNetwork_Request;
     using NetworkSocket = Binding.Baselib_RegisteredNetwork_Socket_UDP;
+    using RegisteredNetworkEndpoint = Binding.Baselib_RegisteredNetwork_Endpoint;
 
     /// <summary>
     /// Default interface used by <see cref="NetworkDriver"/>, which will send/receive all traffic
@@ -104,7 +104,10 @@ namespace Unity.Networking.Transport
 
             m_InternalState = new NativeReference<InternalState>(state, Allocator.Persistent);
 
-            var bufferSize = networkConfiguration.maxMessageSize + UnsafeUtility.SizeOf<PacketMetadata>() + UnsafeUtility.SizeOf<NetworkEndpoint>();
+            var bufferSize =
+                networkConfiguration.maxMessageSize
+                + UnsafeUtility.SizeOf<PacketMetadata>()
+                + UnsafeUtility.SizeOf<NetworkEndpoint>();
 
             // Baselib doesn't differientiate between receiving a packet that fits exactly in the
             // receive buffer, and receiving a packet that is larger. In the latter case, it just
@@ -119,7 +122,13 @@ namespace Unity.Networking.Transport
             return 0;
         }
 
-        internal void CreateQueues(int sendQueueCapacity, int receiveQueueCapacity, int payloadSize, out PacketsQueue sendQueue, out PacketsQueue receiveQueue)
+        internal void CreateQueues(
+            int sendQueueCapacity,
+            int receiveQueueCapacity,
+            int payloadSize,
+            out PacketsQueue sendQueue,
+            out PacketsQueue receiveQueue
+        )
         {
             var metadataSize = UnsafeUtility.SizeOf<PacketMetadata>();
             var endpointSize = UnsafeUtility.SizeOf<NetworkEndpoint>();
@@ -139,7 +148,8 @@ namespace Unity.Networking.Transport
                 payloadSize,
                 endpointSize,
                 receiveQueueCapacity,
-                GetTempPacketBuffersArray(receiveQueueCapacity, ref m_ReceiveBuffers));
+                GetTempPacketBuffersArray(receiveQueueCapacity, ref m_ReceiveBuffers)
+            );
 
             m_ReceiveQueue = receiveQueue;
 
@@ -148,28 +158,40 @@ namespace Unity.Networking.Transport
                 payloadSize,
                 endpointSize,
                 sendQueueCapacity,
-                GetTempPacketBuffersArray(sendQueueCapacity, ref m_SendBuffers));
+                GetTempPacketBuffersArray(sendQueueCapacity, ref m_SendBuffers)
+            );
 
             if (m_SendBuffers.ElementSize < metadataSize + payloadSize + endpointSize)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException($"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated send buffers ({m_SendBuffers.ElementSize})");
+                throw new InvalidOperationException(
+                    $"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated send buffers ({m_SendBuffers.ElementSize})"
+                );
 #else
-                Debug.LogError($"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated send buffers ({m_SendBuffers.ElementSize})");
+                Debug.LogError(
+                    $"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated send buffers ({m_SendBuffers.ElementSize})"
+                );
 #endif
             }
 
             if (m_ReceiveBuffers.ElementSize < metadataSize + payloadSize + endpointSize)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new InvalidOperationException($"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated receive buffers ({m_ReceiveBuffers.ElementSize})");
+                throw new InvalidOperationException(
+                    $"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated receive buffers ({m_ReceiveBuffers.ElementSize})"
+                );
 #else
-                Debug.LogError($"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated receive buffers ({m_ReceiveBuffers.ElementSize})");
+                Debug.LogError(
+                    $"The required buffer size ({metadataSize + payloadSize + endpointSize}) does not fit in the allocated receive buffers ({m_ReceiveBuffers.ElementSize})"
+                );
 #endif
             }
         }
 
-        private unsafe NativeArray<PacketBuffer> GetTempPacketBuffersArray(int capacity, ref UnsafeBaselibNetworkArray buffers)
+        private unsafe NativeArray<PacketBuffer> GetTempPacketBuffersArray(
+            int capacity,
+            ref UnsafeBaselibNetworkArray buffers
+        )
         {
             var buffersList = new NativeArray<PacketBuffer>(capacity, Allocator.Temp, NativeArrayOptions.ClearMemory);
 
@@ -202,6 +224,7 @@ namespace Unity.Networking.Transport
         struct FlushSendJob : IJob
         {
             public PacketsQueue SendQueue;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeReference<InternalState> InternalState;
             public UnsafeBaselibNetworkArray SendBuffers;
@@ -230,7 +253,11 @@ namespace Unity.Networking.Transport
                     if (packetProcessor.Length == 0)
                         continue;
 
-                    var request = GetRequest(SendQueue.GetPacketBufferIndex(i), ref SendBuffers, ref PacketBufferLayout);
+                    var request = GetRequest(
+                        SendQueue.GetPacketBufferIndex(i),
+                        ref SendBuffers,
+                        ref PacketBufferLayout
+                    );
 
                     request.payload.offset += (uint)packetProcessor.Offset;
                     request.payload.data += packetProcessor.Offset;
@@ -251,11 +278,18 @@ namespace Unity.Networking.Transport
                 }
 
                 // Schedule all the send requests.
-                var scheduledCount = (int)Binding.Baselib_RegisteredNetwork_Socket_UDP_ScheduleSend(
-                    InternalState.Value.Socket, requestsPtr, (uint)requests.Length, &error);
+                var scheduledCount = (int)
+                    Binding.Baselib_RegisteredNetwork_Socket_UDP_ScheduleSend(
+                        InternalState.Value.Socket,
+                        requestsPtr,
+                        (uint)requests.Length,
+                        &error
+                    );
                 if (error.code != ErrorCode.Success)
                 {
-                    Debug.LogError($"Baselib operation failed. Couldn't schedule send requests. (native error: {(int)error.nativeErrorCode})");
+                    Debug.LogError(
+                        $"Baselib operation failed. Couldn't schedule send requests. (native error: {(int)error.nativeErrorCode})"
+                    );
                     MarkSocketAsNeedingRecreate(ref InternalState);
                     return;
                 }
@@ -292,8 +326,13 @@ namespace Unity.Networking.Transport
                 var resultsPtr = (CompletionResult*)results.GetUnsafePtr();
 
                 var error = default(ErrorState);
-                var count = (int)Binding.Baselib_RegisteredNetwork_Socket_UDP_DequeueSend(
-                    InternalState.Value.Socket, resultsPtr, (uint)results.Length, &error);
+                var count = (int)
+                    Binding.Baselib_RegisteredNetwork_Socket_UDP_DequeueSend(
+                        InternalState.Value.Socket,
+                        resultsPtr,
+                        (uint)results.Length,
+                        &error
+                    );
                 if (error.code != ErrorCode.Success)
                 {
                     Debug.LogError($"Baselib operation failed. Couldn't dequeue send results.");
@@ -328,6 +367,7 @@ namespace Unity.Networking.Transport
         struct ReceiveJob : IJob
         {
             public PacketsQueue ReceiveQueue;
+
             [NativeDisableContainerSafetyRestriction]
             public NativeReference<InternalState> InternalState;
             public UnsafeBaselibNetworkArray ReceiveBuffers;
@@ -384,7 +424,13 @@ namespace Unity.Networking.Transport
                 while (dequeueAgain)
                 {
                     // Pop Completed Requests off the CompletionQ
-                    var count = (int)Binding.Baselib_RegisteredNetwork_Socket_UDP_DequeueRecv(socket, results, k_RequestsBatchSize, &error);
+                    var count = (int)
+                        Binding.Baselib_RegisteredNetwork_Socket_UDP_DequeueRecv(
+                            socket,
+                            results,
+                            k_RequestsBatchSize,
+                            &error
+                        );
                     if (error.code != ErrorCode.Success)
                         return;
 
@@ -448,7 +494,11 @@ namespace Unity.Networking.Transport
                 var count = ReceiveQueue.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    var request = GetRequest(ReceiveQueue.GetPacketBufferIndex(i), ref ReceiveBuffers, ref PacketBufferLayout);
+                    var request = GetRequest(
+                        ReceiveQueue.GetPacketBufferIndex(i),
+                        ref ReceiveBuffers,
+                        ref PacketBufferLayout
+                    );
                     if (!ConvertEndpointBufferToGeneric(request.remoteEndpoint.slice))
                         ReceiveQueue[i].Drop();
                 }
@@ -503,7 +553,13 @@ namespace Unity.Networking.Transport
 
             state.SetDontFragmentBit = state.SetDontFragmentBit && endpoint.Family == NetworkFamily.Ipv4;
 
-            var result = CreateSocket(state.SendQueueCapacity, state.ReceiveQueueCapacity, endpoint, out var newSocket, state.SetDontFragmentBit);
+            var result = CreateSocket(
+                state.SendQueueCapacity,
+                state.ReceiveQueueCapacity,
+                endpoint,
+                out var newSocket,
+                state.SetDontFragmentBit
+            );
             if (result == 0)
             {
                 state.Socket = newSocket;
@@ -513,7 +569,12 @@ namespace Unity.Networking.Transport
                 // Need to release acquisition status of all packet buffers since we closed their socket.
                 ResetReceiveQueue(ref m_ReceiveQueue);
 
-                result = ScheduleAllReceives(newSocket, ref m_ReceiveQueue, ref m_ReceiveBuffers, ref m_PacketBufferLayout);
+                result = ScheduleAllReceives(
+                    newSocket,
+                    ref m_ReceiveQueue,
+                    ref m_ReceiveBuffers,
+                    ref m_PacketBufferLayout
+                );
             }
             else
             {
@@ -532,7 +593,13 @@ namespace Unity.Networking.Transport
             return 0;
         }
 
-        private static unsafe int CreateSocket(int sendQueueCapacity, int receiveQueueCapacity, NetworkEndpoint endpoint, out NetworkSocket socket, bool setDontFragmentBit)
+        private static unsafe int CreateSocket(
+            int sendQueueCapacity,
+            int receiveQueueCapacity,
+            NetworkEndpoint endpoint,
+            out NetworkSocket socket,
+            bool setDontFragmentBit
+        )
         {
             var error = default(ErrorState);
             socket = Binding.Baselib_RegisteredNetwork_Socket_UDP_Create(
@@ -540,14 +607,19 @@ namespace Unity.Networking.Transport
                 Binding.Baselib_NetworkAddress_AddressReuse.DoNotAllow,
                 checked((uint)sendQueueCapacity),
                 checked((uint)receiveQueueCapacity),
-                &error);
+                &error
+            );
 
             if (error.code != ErrorCode.Success)
             {
                 if (error.code == Binding.Baselib_ErrorCode.AddressInUse)
-                    Debug.LogError($"Failed to bind UDP socket because the address is already in use. Likely because there is another process using port {endpoint.Port}.");
+                    Debug.LogError(
+                        $"Failed to bind UDP socket because the address is already in use. Likely because there is another process using port {endpoint.Port}."
+                    );
                 else
-                    Debug.LogError($"Baselib operation failed. Failed to create UDP socket. (error {(int)error.code}: {GetBaselibErrorMessage(error)})");
+                    Debug.LogError(
+                        $"Baselib operation failed. Failed to create UDP socket. (error {(int)error.code}: {GetBaselibErrorMessage(error)})"
+                    );
                 return (int)Error.StatusCode.NetworkSocketError;
             }
 
@@ -575,9 +647,14 @@ namespace Unity.Networking.Transport
             // If we already recreated the socket in the last update or if we hit the limit of
             // socket recreations, then something's wrong at the socket layer and recreating it
             // likely won't solve the issue. Just fail the socket in that scenario.
-            if (state.LastSocketRecreateTime == state.LastUpdateTime || state.NumSocketRecreate >= k_MaxNumSocketRecreate)
+            if (
+                state.LastSocketRecreateTime == state.LastUpdateTime
+                || state.NumSocketRecreate >= k_MaxNumSocketRecreate
+            )
             {
-                Debug.LogError("Unrecoverable socket failure. An unknown condition is preventing the application from reliably creating sockets.");
+                Debug.LogError(
+                    "Unrecoverable socket failure. An unknown condition is preventing the application from reliably creating sockets."
+                );
                 state.SocketStatus = SocketStatus.SocketFailed;
             }
             else
@@ -587,7 +664,13 @@ namespace Unity.Networking.Transport
                 state.NumSocketRecreate++;
 
                 CloseSocket(state.Socket);
-                var result = CreateSocket(state.SendQueueCapacity, state.ReceiveQueueCapacity, state.BindEndpoint, out var newSocket, state.SetDontFragmentBit);
+                var result = CreateSocket(
+                    state.SendQueueCapacity,
+                    state.ReceiveQueueCapacity,
+                    state.BindEndpoint,
+                    out var newSocket,
+                    state.SetDontFragmentBit
+                );
                 if (result == 0)
                 {
                     state.Socket = newSocket;
@@ -614,7 +697,9 @@ namespace Unity.Networking.Transport
             }
         }
 
-        private static unsafe bool ConvertEndpointBufferToGeneric(Binding.Baselib_RegisteredNetwork_BufferSlice endpointSlice)
+        private static unsafe bool ConvertEndpointBufferToGeneric(
+            Binding.Baselib_RegisteredNetwork_BufferSlice endpointSlice
+        )
         {
             var baselibAddress = default(Binding.Baselib_NetworkAddress);
             var registeredEndpoint = new RegisteredNetworkEndpoint { slice = endpointSlice };
@@ -623,7 +708,9 @@ namespace Unity.Networking.Transport
             Binding.Baselib_RegisteredNetwork_Endpoint_GetNetworkAddress(registeredEndpoint, &baselibAddress, &error);
             if (error.code != (int)ErrorCode.Success)
             {
-                Debug.LogError($"Baselib operation failed. Couldn't create registered endpoint. (error {(int)error.code}: {GetBaselibErrorMessage(error)})");
+                Debug.LogError(
+                    $"Baselib operation failed. Couldn't create registered endpoint. (error {(int)error.code}: {GetBaselibErrorMessage(error)})"
+                );
                 return false;
             }
 
@@ -631,17 +718,18 @@ namespace Unity.Networking.Transport
             return true;
         }
 
-        private unsafe static NetworkRequest GetRequest(int bufferIndex, ref UnsafeBaselibNetworkArray buffers, ref PacketBufferLayout bufferLayout)
+        private static unsafe NetworkRequest GetRequest(
+            int bufferIndex,
+            ref UnsafeBaselibNetworkArray buffers,
+            ref PacketBufferLayout bufferLayout
+        )
         {
             var bufferSlice = buffers.AtIndexAsSlice(bufferIndex);
 
             var request = new NetworkRequest
             {
                 payload = bufferSlice,
-                remoteEndpoint = new RegisteredNetworkEndpoint
-                {
-                    slice = bufferSlice,
-                },
+                remoteEndpoint = new RegisteredNetworkEndpoint { slice = bufferSlice },
                 requestUserdata = new IntPtr(bufferIndex + 1),
             };
 
@@ -650,13 +738,20 @@ namespace Unity.Networking.Transport
             request.payload.size -= bufferLayout.PayloadOffset;
 
             request.remoteEndpoint.slice.offset = bufferLayout.EndpointOffset;
-            request.remoteEndpoint.slice.data = new IntPtr((byte*)request.remoteEndpoint.slice.data + bufferLayout.EndpointOffset);
+            request.remoteEndpoint.slice.data = new IntPtr(
+                (byte*)request.remoteEndpoint.slice.data + bufferLayout.EndpointOffset
+            );
             request.remoteEndpoint.slice.size = Binding.Baselib_RegisteredNetwork_Endpoint_MaxSize;
 
             return request;
         }
 
-        private static unsafe int ScheduleAllReceives(NetworkSocket socket, ref PacketsQueue receiveQueue, ref UnsafeBaselibNetworkArray receiveBuffers, ref PacketBufferLayout packetBufferLayout)
+        private static unsafe int ScheduleAllReceives(
+            NetworkSocket socket,
+            ref PacketsQueue receiveQueue,
+            ref UnsafeBaselibNetworkArray receiveBuffers,
+            ref PacketBufferLayout packetBufferLayout
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (packetBufferLayout.PayloadOffset == 0 && packetBufferLayout.MetadataOffset == 0)
@@ -679,20 +774,27 @@ namespace Unity.Networking.Transport
                 if (error.code != ErrorCode.Success)
                 {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                    Debug.LogError($"Baselib operation failed. Couldn't schedule receive requests. (native error: {(int)error.nativeErrorCode})");
+                    Debug.LogError(
+                        $"Baselib operation failed. Couldn't schedule receive requests. (native error: {(int)error.nativeErrorCode})"
+                    );
 #endif
                     return (int)Error.StatusCode.NetworkSocketError;
                 }
-            }
-            while (count == k_RequestsBatchSize);
+            } while (count == k_RequestsBatchSize);
 
             return 0;
         }
-        
+
         internal static unsafe FixedString512Bytes GetBaselibErrorMessage(Binding.Baselib_ErrorState error)
         {
             FixedString512Bytes errorMessage = new FixedString512Bytes();
-            errorMessage.Length = (int)Binding.Baselib_ErrorState_Explain(&error, errorMessage.GetUnsafePtr(), (uint)errorMessage.Capacity, Binding.Baselib_ErrorState_ExplainVerbosity.ErrorType_SourceLocation_Explanation);
+            errorMessage.Length = (int)
+                Binding.Baselib_ErrorState_Explain(
+                    &error,
+                    errorMessage.GetUnsafePtr(),
+                    (uint)errorMessage.Capacity,
+                    Binding.Baselib_ErrorState_ExplainVerbosity.ErrorType_SourceLocation_Explanation
+                );
 
             return errorMessage;
         }

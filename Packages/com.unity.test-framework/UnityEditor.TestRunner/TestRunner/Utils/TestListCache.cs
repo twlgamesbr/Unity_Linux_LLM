@@ -13,7 +13,11 @@ namespace UnityEditor.TestTools.TestRunner
         private readonly IRemoteTestResultDataFactory m_TestResultDataFactory;
         private readonly ITestListCacheData m_TestListCacheData;
 
-        public TestListCache(ITestAdaptorFactory testAdaptorFactory, IRemoteTestResultDataFactory testResultDataFactory, ITestListCacheData testListCacheData)
+        public TestListCache(
+            ITestAdaptorFactory testAdaptorFactory,
+            IRemoteTestResultDataFactory testResultDataFactory,
+            ITestListCacheData testListCacheData
+        )
         {
             m_TestAdaptorFactory = testAdaptorFactory;
             m_TestResultDataFactory = testResultDataFactory;

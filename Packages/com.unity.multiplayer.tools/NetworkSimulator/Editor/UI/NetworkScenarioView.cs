@@ -12,7 +12,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 {
     class NetworkScenarioView : VisualElement
     {
-        const string k_Uxml = "Packages/com.unity.multiplayer.tools/NetworkSimulator/Editor/UI/NetworkScenarioView.uxml";
+        const string k_Uxml =
+            "Packages/com.unity.multiplayer.tools/NetworkSimulator/Editor/UI/NetworkScenarioView.uxml";
         const string k_None = "None";
         const string k_StartString = "Start";
         const string k_PauseString = "Pause";
@@ -34,7 +35,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
         DropdownField ScenarioDropdown => m_DropdownField ??= this.Q<DropdownField>(nameof(ScenarioDropdown));
         Toggle AutoRunToggle => m_AutoRunToggle ??= this.Q<Toggle>(nameof(AutoRunToggle));
         Foldout SettingsFoldout => m_SettingsFoldout ??= this.Q<Foldout>(nameof(SettingsFoldout));
-        NetworkScenarioSettings SettingsContainer => m_SettingsContainer ??= this.Q<NetworkScenarioSettings>(nameof(SettingsContainer));
+        NetworkScenarioSettings SettingsContainer =>
+            m_SettingsContainer ??= this.Q<NetworkScenarioSettings>(nameof(SettingsContainer));
         Button PauseResumeButton => m_PauseResumeButton ??= this.Q<Button>(nameof(PauseResumeButton));
 
         public NetworkScenarioView(SerializedObject serializedObject, Runtime.NetworkSimulator networkSimulator)
@@ -122,7 +124,9 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI
 
             if (hasSettings)
             {
-                ScenarioDropdown.SetValueWithoutNotify(ObjectNames.NicifyVariableName(m_NetworkSimulator.Scenario.GetType().Name));
+                ScenarioDropdown.SetValueWithoutNotify(
+                    ObjectNames.NicifyVariableName(m_NetworkSimulator.Scenario.GetType().Name)
+                );
                 SettingsFoldout.style.display = DisplayStyle.None;
                 PauseResumeButton.SetEnabled(true);
             }

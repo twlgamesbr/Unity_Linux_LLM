@@ -24,6 +24,9 @@ namespace UnityEngine.TestTools.TestRunner
             get { return ResultState.Failure; }
         }
 
-        public override string StackTrace { get { return null; } }
+        public override string StackTrace
+        {
+            get { return null; }
+        }
     }
 }

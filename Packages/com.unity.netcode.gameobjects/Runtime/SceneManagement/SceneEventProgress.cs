@@ -20,41 +20,50 @@ namespace Unity.Netcode
         /// No scene event progress status can be used to initialize a variable that will be checked over time.
         /// </summary>
         None,
+
         /// <summary>
         /// The scene event was successfully started.
         /// </summary>
         Started,
+
         /// <summary>
         /// Returned if you try to unload a scene that was not yet loaded.
         /// </summary>
         SceneNotLoaded,
+
         /// <summary>
         /// Returned if you try to start a new scene event before a previous one is finished.
         /// </summary>
         SceneEventInProgress,
+
         /// <summary>
         /// Returned if the scene name used with <see cref="NetworkSceneManager.LoadScene(string, LoadSceneMode)"/>
         /// or <see cref="NetworkSceneManager.UnloadScene(Scene)"/>is invalid.
         /// </summary>
         InvalidSceneName,
+
         /// <summary>
         /// Server side: Returned if the <see cref="NetworkSceneManager.VerifySceneBeforeLoading"/> delegate handler returns false
         /// (<em>i.e. scene is considered not valid/safe to load</em>).
         /// </summary>
         SceneFailedVerification,
+
         /// <summary>
         /// This is used for internal error notifications.<br/>
         /// If you receive this event then it is most likely due to a bug (<em>please open a GitHub issue with steps to replicate</em>).<br/>
         /// </summary>
         InternalNetcodeError,
+
         /// <summary>
         /// This is returned when an unload or load action is attempted and scene management is disabled
         /// </summary>
         SceneManagementNotEnabled,
+
         /// <summary>
         /// This is returned when a client attempts to perform a server only action
         /// </summary>
         ServerOnlyAction,
+
         /// <summary>
         /// This is returned when a client that is not the session owner attempts to perform a session owner only action
         /// </summary>
@@ -156,20 +165,37 @@ namespace Unity.Netcode
             return clients;
         }
 
-        internal SceneEventProgress(NetworkManager networkManager, SceneEventProgressStatus status = SceneEventProgressStatus.Started)
+        internal SceneEventProgress(
+            NetworkManager networkManager,
+            SceneEventProgressStatus status = SceneEventProgressStatus.Started
+        )
         {
             if (status == SceneEventProgressStatus.Started)
             {
                 m_NetworkManager = networkManager;
-                WhenSceneEventHasTimedOut = networkManager.RealTimeProvider.RealTimeSinceStartup + networkManager.NetworkConfig.LoadSceneTimeOut;
-                if ((networkManager.IsServer && !networkManager.DistributedAuthorityMode) || (networkManager.DistributedAuthorityMode && networkManager.LocalClient.IsSessionOwner))
+                WhenSceneEventHasTimedOut =
+                    networkManager.RealTimeProvider.RealTimeSinceStartup
+                    + networkManager.NetworkConfig.LoadSceneTimeOut;
+                if (
+                    (networkManager.IsServer && !networkManager.DistributedAuthorityMode)
+                    || (networkManager.DistributedAuthorityMode && networkManager.LocalClient.IsSessionOwner)
+                )
                 {
                     m_NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
                     // Track the clients that were connected when we started this event
                     foreach (var connectedClientId in networkManager.ConnectionManager.ConnectedClientIds)
                     {
                         // Ignore the host or session owner
-                        if ((!networkManager.DistributedAuthorityMode && NetworkManager.ServerClientId == connectedClientId) || (networkManager.DistributedAuthorityMode && networkManager.CurrentSessionOwner == connectedClientId))
+                        if (
+                            (
+                                !networkManager.DistributedAuthorityMode
+                                && NetworkManager.ServerClientId == connectedClientId
+                            )
+                            || (
+                                networkManager.DistributedAuthorityMode
+                                && networkManager.CurrentSessionOwner == connectedClientId
+                            )
+                        )
                         {
                             continue;
                         }
@@ -228,7 +254,10 @@ namespace Unity.Netcode
         /// </summary>
         internal bool IsUnloading()
         {
-            return SceneEventType is SceneEventType.Unload or SceneEventType.UnloadComplete or SceneEventType.UnloadEventCompleted;
+            return SceneEventType
+                is SceneEventType.Unload
+                    or SceneEventType.UnloadComplete
+                    or SceneEventType.UnloadEventCompleted;
         }
 
         /// <summary>
@@ -285,7 +314,6 @@ namespace Unity.Netcode
                 TryFinishingSceneEventProgress();
             });
         }
-
 
         internal bool IsNetworkSessionActive()
         {

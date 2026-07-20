@@ -11,7 +11,7 @@ namespace UnityEngine.Rendering.Universal
         public UpscalerPostProcessPass(Texture2D[] blueNoise16LTex)
         {
             this.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing - 1;
-            this.profilingSampler = null;   // Use default name
+            this.profilingSampler = null; // Use default name
             m_BlueNoise16LTex = blueNoise16LTex;
 
             m_IsValid = m_BlueNoise16LTex != null && m_BlueNoise16LTex.Length > 0;
@@ -50,7 +50,9 @@ namespace UnityEngine.Rendering.Universal
             io.jitteredMotionVectors = false; // URP has no jittering in MVs
             // io.exposureTexture; // TODO: set exposure texture when available
             io.preExposureValue = 1.0f; // TODO: set if exposure value is pre-multiplied
-            io.hdrDisplayInformation = cameraData.isHDROutputActive ? cameraData.hdrDisplayInformation : new HDROutputUtils.HDRDisplayInformation(-1, -1, -1, 160.0f);
+            io.hdrDisplayInformation = cameraData.isHDROutputActive
+                ? cameraData.hdrDisplayInformation
+                : new HDROutputUtils.HDRDisplayInformation(-1, -1, -1, 160.0f);
             io.preUpscaleResolution = new Vector2Int(
                 cameraData.cameraTargetDescriptor.width,
                 cameraData.cameraTargetDescriptor.height
@@ -130,14 +132,23 @@ namespace UnityEngine.Rendering.Universal
 
         // Updates render target descriptors and shader constants to reflect a new render size
         // This should be called immediately after the resolution changes mid-frame (typically after an upscaling operation).
-        static internal void UpdateCameraResolution(RenderGraph renderGraph, UniversalCameraData cameraData, Vector2Int newCameraTargetSize)
+        internal static void UpdateCameraResolution(
+            RenderGraph renderGraph,
+            UniversalCameraData cameraData,
+            Vector2Int newCameraTargetSize
+        )
         {
             // Update the camera data descriptor to reflect post-upscaled sizes
             cameraData.cameraTargetDescriptor.width = newCameraTargetSize.x;
             cameraData.cameraTargetDescriptor.height = newCameraTargetSize.y;
 
             // Update the shader constants to reflect the new camera resolution
-            using (var builder = renderGraph.AddUnsafePass<UpdateCameraResolutionPassData>("Update Camera Resolution", out var passData))
+            using (
+                var builder = renderGraph.AddUnsafePass<UpdateCameraResolutionPassData>(
+                    "Update Camera Resolution",
+                    out var passData
+                )
+            )
             {
                 passData.newCameraTargetSize = newCameraTargetSize;
 
@@ -145,24 +156,24 @@ namespace UnityEngine.Rendering.Universal
                 builder.AllowGlobalStateModification(true);
 
                 // Wrap constant modification into a pass to force graph execution timeline.
-                builder.SetRenderFunc(static (UpdateCameraResolutionPassData data, UnsafeGraphContext ctx) =>
-                {
-                    ctx.cmd.SetGlobalVector(
-                        ShaderPropertyId.screenSize,
-                        new Vector4(
-                            data.newCameraTargetSize.x,
-                            data.newCameraTargetSize.y,
-                            1.0f / data.newCameraTargetSize.x,
-                            1.0f / data.newCameraTargetSize.y
-                        )
-                    );
-                });
+                builder.SetRenderFunc(
+                    static (UpdateCameraResolutionPassData data, UnsafeGraphContext ctx) =>
+                    {
+                        ctx.cmd.SetGlobalVector(
+                            ShaderPropertyId.screenSize,
+                            new Vector4(
+                                data.newCameraTargetSize.x,
+                                data.newCameraTargetSize.y,
+                                1.0f / data.newCameraTargetSize.x,
+                                1.0f / data.newCameraTargetSize.y
+                            )
+                        );
+                    }
+                );
             }
         }
 
         // Precomputed shader ids to same some CPU cycles (mostly affects mobile)
-        public static class ShaderConstants
-        {
-        }
+        public static class ShaderConstants { }
     }
 }

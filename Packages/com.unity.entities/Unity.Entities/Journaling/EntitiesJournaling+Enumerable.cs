@@ -125,8 +125,10 @@ namespace Unity.Entities
         /// <param name="name">The system handle untyped.</param>
         /// <returns>IEnumerable of <see cref="RecordView"/>.</returns>
         [ExcludeFromBurstCompatTesting("LINQ")]
-        public static IEnumerable<RecordView> WithExecutingSystem(this IEnumerable<RecordView> records, SystemHandle handle) =>
-            records.Where(r => r.ExecutingSystem.Handle == handle);
+        public static IEnumerable<RecordView> WithExecutingSystem(
+            this IEnumerable<RecordView> records,
+            SystemHandle handle
+        ) => records.Where(r => r.ExecutingSystem.Handle == handle);
 
         /// <summary>
         /// Get all records matching an origin system type name.
@@ -149,8 +151,10 @@ namespace Unity.Entities
         /// <param name="name">The system handle untyped.</param>
         /// <returns>IEnumerable of <see cref="RecordView"/>.</returns>
         [ExcludeFromBurstCompatTesting("LINQ")]
-        public static IEnumerable<RecordView> WithOriginSystem(this IEnumerable<RecordView> records, SystemHandle handle) =>
-            records.Where(r => r.OriginSystem.Handle == handle);
+        public static IEnumerable<RecordView> WithOriginSystem(
+            this IEnumerable<RecordView> records,
+            SystemHandle handle
+        ) => records.Where(r => r.OriginSystem.Handle == handle);
 
         /// <summary>
         /// Get all records matching a component type name.
@@ -173,8 +177,10 @@ namespace Unity.Entities
         /// <param name="name">The component type.</param>
         /// <returns>IEnumerable of <see cref="RecordView"/>.</returns>
         [ExcludeFromBurstCompatTesting("LINQ")]
-        public static IEnumerable<RecordView> WithComponentType(this IEnumerable<RecordView> records, ComponentType componentType) =>
-            records.Where(r => r.ComponentTypes.Any(t => t.TypeIndex == componentType.TypeIndex));
+        public static IEnumerable<RecordView> WithComponentType(
+            this IEnumerable<RecordView> records,
+            ComponentType componentType
+        ) => records.Where(r => r.ComponentTypes.Any(t => t.TypeIndex == componentType.TypeIndex));
 
         /// <summary>
         /// Get all records matching a component type index.
@@ -185,8 +191,10 @@ namespace Unity.Entities
         /// <param name="typeIndex">The component type index.</param>
         /// <returns>IEnumerable of <see cref="RecordView"/>.</returns>
         [ExcludeFromBurstCompatTesting("LINQ")]
-        public static IEnumerable<RecordView> WithComponentType(this IEnumerable<RecordView> records, TypeIndex typeIndex) =>
-            records.Where(r => r.ComponentTypes.Any(t => t.TypeIndex == typeIndex));
+        public static IEnumerable<RecordView> WithComponentType(
+            this IEnumerable<RecordView> records,
+            TypeIndex typeIndex
+        ) => records.Where(r => r.ComponentTypes.Any(t => t.TypeIndex == typeIndex));
 
         /// <summary>
         /// Get all records matching an entity index.
@@ -210,8 +218,11 @@ namespace Unity.Entities
         /// <param name="version">The entity version.</param>
         /// <returns>IEnumerable of <see cref="RecordView"/>.</returns>
         [ExcludeFromBurstCompatTesting("LINQ")]
-        public static IEnumerable<RecordView> WithEntity(this IEnumerable<RecordView> records, int index, int version) =>
-            records.Where(r => r.Entities.Any(e => e.Index == index && e.Version == version));
+        public static IEnumerable<RecordView> WithEntity(
+            this IEnumerable<RecordView> records,
+            int index,
+            int version
+        ) => records.Where(r => r.Entities.Any(e => e.Index == index && e.Version == version));
 
         /// <summary>
         /// Get all records matching an entity.

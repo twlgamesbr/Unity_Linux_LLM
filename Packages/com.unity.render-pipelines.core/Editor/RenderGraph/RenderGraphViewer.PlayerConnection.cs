@@ -13,7 +13,11 @@ namespace UnityEditor.Rendering
             readonly UnityEngine.Events.UnityAction<int> m_OnPlayerConnected;
             readonly UnityEngine.Events.UnityAction<int> m_OnPlayerDisconnected;
 
-            public PlayerConnection(EditorWindow rgvWindow, UnityEngine.Events.UnityAction<int> onPlayerConnected, UnityEngine.Events.UnityAction<int> onPlayerDisconnected)
+            public PlayerConnection(
+                EditorWindow rgvWindow,
+                UnityEngine.Events.UnityAction<int> onPlayerConnected,
+                UnityEngine.Events.UnityAction<int> onPlayerDisconnected
+            )
             {
                 connectionState = PlayerConnectionGUIUtility.GetConnectionState(rgvWindow);
                 m_OnPlayerConnected = onPlayerConnected;
@@ -41,7 +45,11 @@ namespace UnityEditor.Rendering
 
             public void OnConnectionDropdownIMGUI()
             {
-                PlayerConnectionGUILayout.ConnectionTargetSelectionDropdown(connectionState, EditorStyles.toolbarDropDown, 250);
+                PlayerConnectionGUILayout.ConnectionTargetSelectionDropdown(
+                    connectionState,
+                    EditorStyles.toolbarDropDown,
+                    250
+                );
             }
         }
     }

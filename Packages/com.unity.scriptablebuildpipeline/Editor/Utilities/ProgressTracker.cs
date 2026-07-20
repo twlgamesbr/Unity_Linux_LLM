@@ -18,7 +18,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
         /// <summary>
         /// Stores the amount of progress done as a decimal.
         /// </summary>
-        public float Progress { get { return CurrentTask / (float)TaskCount; } }
+        public float Progress
+        {
+            get { return CurrentTask / (float)TaskCount; }
+        }
 
         /// <summary>
         /// Stores the amount of updates per second.

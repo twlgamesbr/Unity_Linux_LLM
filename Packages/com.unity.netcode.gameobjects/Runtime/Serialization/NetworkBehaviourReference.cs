@@ -28,7 +28,9 @@ namespace Unity.Netcode
             }
             if (networkBehaviour.NetworkObject == null)
             {
-                throw new ArgumentException($"Cannot create {nameof(NetworkBehaviourReference)} from {nameof(NetworkBehaviour)} without a {nameof(NetworkObject)}.");
+                throw new ArgumentException(
+                    $"Cannot create {nameof(NetworkBehaviourReference)} from {nameof(NetworkBehaviour)} without a {nameof(NetworkObject)}."
+                );
             }
 
             m_NetworkObjectReference = networkBehaviour.NetworkObject;
@@ -54,14 +56,18 @@ namespace Unity.Netcode
         /// <param name="networkManager">The networkmanager. Uses <see cref="NetworkManager.Singleton"/> to resolve if null.</param>
         /// <typeparam name="T">The type of the networkBehaviour for convenience.</typeparam>
         /// <returns>True if the <see cref="NetworkBehaviour"/> was found; False if the <see cref="NetworkBehaviour"/> was not found. This can happen if the corresponding <see cref="NetworkObject"/> has not been spawned yet. you can try getting the reference at a later point in time.</returns>
-        public bool TryGet<T>(out T networkBehaviour, NetworkManager networkManager = null) where T : NetworkBehaviour
+        public bool TryGet<T>(out T networkBehaviour, NetworkManager networkManager = null)
+            where T : NetworkBehaviour
         {
             networkBehaviour = GetInternal(this, networkManager) as T;
             return networkBehaviour != null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static NetworkBehaviour GetInternal(NetworkBehaviourReference networkBehaviourRef, NetworkManager networkManager = null)
+        private static NetworkBehaviour GetInternal(
+            NetworkBehaviourReference networkBehaviourRef,
+            NetworkManager networkManager = null
+        )
         {
             if (networkBehaviourRef.m_NetworkBehaviourId == k_NullId)
             {
@@ -79,7 +85,8 @@ namespace Unity.Netcode
         /// <inheritdoc/>
         public bool Equals(NetworkBehaviourReference other)
         {
-            return m_NetworkObjectReference.Equals(other.m_NetworkObjectReference) && m_NetworkBehaviourId == other.m_NetworkBehaviourId;
+            return m_NetworkObjectReference.Equals(other.m_NetworkObjectReference)
+                && m_NetworkBehaviourId == other.m_NetworkBehaviourId;
         }
 
         /// <inheritdoc/>
@@ -98,7 +105,8 @@ namespace Unity.Netcode
         }
 
         /// <inheritdoc/>
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             m_NetworkObjectReference.NetworkSerialize(serializer);
             serializer.SerializeValue(ref m_NetworkBehaviourId);
@@ -109,13 +117,15 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="networkBehaviourRef">The <see cref="NetworkBehaviourReference"/> to convert from.</param>
         /// <returns>The <see cref="NetworkBehaviour"/> this class is holding a reference to</returns>
-        public static implicit operator NetworkBehaviour(NetworkBehaviourReference networkBehaviourRef) => GetInternal(networkBehaviourRef);
+        public static implicit operator NetworkBehaviour(NetworkBehaviourReference networkBehaviourRef) =>
+            GetInternal(networkBehaviourRef);
 
         /// <summary>
         /// Implicitly convert <see cref="NetworkBehaviour"/> to <see cref="NetworkBehaviourReference"/>.
         /// </summary>
         /// <param name="networkBehaviour">The <see cref="NetworkBehaviour"/> to convert from.</param>
         /// <returns>The <see cref="NetworkBehaviourReference"/> created from the <see cref="NetworkBehaviour"/> passed in as a parameter</returns>
-        public static implicit operator NetworkBehaviourReference(NetworkBehaviour networkBehaviour) => new NetworkBehaviourReference(networkBehaviour);
+        public static implicit operator NetworkBehaviourReference(NetworkBehaviour networkBehaviour) =>
+            new NetworkBehaviourReference(networkBehaviour);
     }
 }

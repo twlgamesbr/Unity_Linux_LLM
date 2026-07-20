@@ -8,14 +8,19 @@ namespace UnityEngine.Rendering.Universal
     /// <summary>
     /// URP camera history texture manager.
     /// </summary>
-    public class UniversalCameraHistory : ICameraHistoryReadAccess, ICameraHistoryWriteAccess, IPerFrameHistoryAccessTracker, IDisposable
+    public class UniversalCameraHistory
+        : ICameraHistoryReadAccess,
+            ICameraHistoryWriteAccess,
+            IPerFrameHistoryAccessTracker,
+            IDisposable
     {
         /// <summary>
         /// Number of frames to consider history valid.
         /// </summary>
-        const int k_ValidVersionCount = 2;  // current frame + previous frame
+        const int k_ValidVersionCount = 2; // current frame + previous frame
 
         private static uint s_TypeCount = 0;
+
         private static class TypeId<T>
         {
             public static uint value = s_TypeCount++;
@@ -34,28 +39,30 @@ namespace UnityEngine.Rendering.Universal
             public void Reset()
             {
                 storage?.Reset();
-                requestVersion = -k_ValidVersionCount;  // NOTE: must be invalid on frame 0
-                writeVersion   = -k_ValidVersionCount;
+                requestVersion = -k_ValidVersionCount; // NOTE: must be invalid on frame 0
+                writeVersion = -k_ValidVersionCount;
             }
         }
+
         private Item[] m_Items = new Item[32];
         private int m_Version = 0;
 
         // A central storage for camera history textures.
         private BufferedRTHandleSystem m_HistoryTextures = new BufferedRTHandleSystem();
 
-    #region SrpApi
+        #region SrpApi
 
         /// <summary>
         /// Request access to a history item.
         /// </summary>
         /// <typeparam name="Type">Type of the history item.</typeparam>
-        public void RequestAccess<Type>() where Type : ContextItem
+        public void RequestAccess<Type>()
+            where Type : ContextItem
         {
             uint index = TypeId<Type>.value;
 
             // Resize
-            if(index >= m_Items.Length)
+            if (index >= m_Items.Length)
             {
                 var items = new Item[math.max(math.ceilpow2(s_TypeCount), m_Items.Length * 2)];
                 for (var i = 0; i < m_Items.Length; i++)
@@ -74,7 +81,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <typeparam name="Type">Type of the history item.</typeparam>
         /// <returns>Instance of the history item if valid. Null otherwise.</returns>
-        public Type GetHistoryForRead<Type>() where Type : ContextItem
+        public Type GetHistoryForRead<Type>()
+            where Type : ContextItem
         {
             uint index = TypeId<Type>.value;
 
@@ -94,7 +102,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <typeparam name="Type">Type of the history item.</typeparam>
         /// <returns>True if an active request exists. False otherwise.</returns>
-        public bool IsAccessRequested<Type>() where Type : ContextItem
+        public bool IsAccessRequested<Type>()
+            where Type : ContextItem
         {
             uint index = TypeId<Type>.value;
 
@@ -111,7 +120,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <typeparam name="Type">Type of the history item.</typeparam>
         /// <returns>Instance of the history item if valid. Null otherwise.</returns>
-        public Type GetHistoryForWrite<Type>() where Type : ContextItem, new()
+        public Type GetHistoryForWrite<Type>()
+            where Type : ContextItem, new()
         {
             uint index = TypeId<Type>.value;
 
@@ -144,7 +154,8 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         /// <typeparam name="Type">Type of the history item.</typeparam>
         /// <returns>True if write access was obtained this frame. False otherwise.</returns>
-        public bool IsWritten<Type>() where Type : ContextItem
+        public bool IsWritten<Type>()
+            where Type : ContextItem
         {
             uint index = TypeId<Type>.value;
 
@@ -159,13 +170,13 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public event ICameraHistoryReadAccess.HistoryRequestDelegate OnGatherHistoryRequests;
 
-    #endregion
-    #region UrpApi
+        #endregion
+        #region UrpApi
 
         internal UniversalCameraHistory()
         {
             // Init items with invalid versions.
-            for(int i = 0; i < m_Items.Length; i++)
+            for (int i = 0; i < m_Items.Length; i++)
                 m_Items[i].Reset();
         }
 
@@ -222,6 +233,6 @@ namespace UnityEngine.Rendering.Universal
             m_HistoryTextures.SwapAndSetReferenceSize(cameraWidth, cameraHeight);
         }
 
-    #endregion
+        #endregion
     }
 }

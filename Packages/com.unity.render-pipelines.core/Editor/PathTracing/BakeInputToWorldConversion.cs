@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.PathTracing.Core;
-using UnityEngine.Rendering;
-using UnityEngine.LightTransport;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.PathTracing.Lightmapping;
+using UnityEngine.LightTransport;
+using UnityEngine.PathTracing.Core;
 using UnityEngine.PathTracing.Integration;
+using UnityEngine.PathTracing.Lightmapping;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Sampling;
 using UnityEngine.Rendering.UnifiedRayTracing;
 
 namespace UnityEditor.PathTracing.LightBakerBridge
 {
-    using MaterialHandle = Handle<MaterialPool.MaterialDescriptor>;
     using LightHandle = Handle<World.LightDescriptor>;
+    using MaterialHandle = Handle<MaterialPool.MaterialDescriptor>;
 
     internal static class BakeInputToWorldConversion
     {
@@ -28,13 +28,21 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             int vertexCount = (int)vertexData.vertexCount;
             List<VertexAttributeDescriptor> vertexLayout = new();
             if (vertexData.meshShaderChannelMask.HasFlag(MeshShaderChannelMask.Vertex))
-                vertexLayout.Add(new VertexAttributeDescriptor(VertexAttribute.Position, VertexAttributeFormat.Float32, 3));
+                vertexLayout.Add(
+                    new VertexAttributeDescriptor(VertexAttribute.Position, VertexAttributeFormat.Float32, 3)
+                );
             if (vertexData.meshShaderChannelMask.HasFlag(MeshShaderChannelMask.Normal))
-                vertexLayout.Add(new VertexAttributeDescriptor(VertexAttribute.Normal, VertexAttributeFormat.Float32, 3));
+                vertexLayout.Add(
+                    new VertexAttributeDescriptor(VertexAttribute.Normal, VertexAttributeFormat.Float32, 3)
+                );
             if (vertexData.meshShaderChannelMask.HasFlag(MeshShaderChannelMask.TexCoord0))
-                vertexLayout.Add(new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2));
+                vertexLayout.Add(
+                    new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2)
+                );
             if (vertexData.meshShaderChannelMask.HasFlag(MeshShaderChannelMask.TexCoord1))
-                vertexLayout.Add(new VertexAttributeDescriptor(VertexAttribute.TexCoord1, VertexAttributeFormat.Float32, 2));
+                vertexLayout.Add(
+                    new VertexAttributeDescriptor(VertexAttribute.TexCoord1, VertexAttributeFormat.Float32, 2)
+                );
             outRawMesh.SetVertexBufferParams(vertexCount, vertexLayout.ToArray());
             outRawMesh.GetVertexData<byte>().CopyFrom(vertexData.data);
 
@@ -45,7 +53,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             outRawMesh.subMeshCount = subMeshCount;
             for (int sm = 0; sm < outRawMesh.subMeshCount; sm++)
             {
-                var smd = new SubMeshDescriptor((int)meshData.subMeshIndexOffset[sm], (int)meshData.subMeshIndexCount[sm]);
+                var smd = new SubMeshDescriptor(
+                    (int)meshData.subMeshIndexOffset[sm],
+                    (int)meshData.subMeshIndexCount[sm]
+                );
                 outRawMesh.SetSubMesh(sm, smd);
             }
 
@@ -68,9 +79,21 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return outMesh;
         }
 
-        private static Texture2D CreateTexture2DFromTextureData(in TextureData textureData, string name = "CreateTexture2DFromTextureData")
+        private static Texture2D CreateTexture2DFromTextureData(
+            in TextureData textureData,
+            string name = "CreateTexture2DFromTextureData"
+        )
         {
-            Texture2D texture = new Texture2D((int)textureData.width, (int)textureData.height, TextureFormat.RGBAFloat, false, linear: true) { name = name };
+            Texture2D texture = new Texture2D(
+                (int)textureData.width,
+                (int)textureData.height,
+                TextureFormat.RGBAFloat,
+                false,
+                linear: true
+            )
+            {
+                name = name,
+            };
             texture.SetPixelData(textureData.data, 0);
             texture.Apply(false, false);
             texture.wrapMode = TextureWrapMode.Clamp;
@@ -81,11 +104,16 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         {
             if (textureData.slices == 1)
             {
-                Texture2D texture = new Texture2D((int)textureData.width, (int)textureData.height, TextureFormat.RGBA32, false, linear: true);
+                Texture2D texture = new Texture2D(
+                    (int)textureData.width,
+                    (int)textureData.height,
+                    TextureFormat.RGBA32,
+                    false,
+                    linear: true
+                );
                 texture.SetPixelData(textureData.textureData, 0);
                 texture.Apply(false, false);
                 return texture;
-
             }
             else
             {
@@ -93,7 +121,12 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 uint faceStride = textureData.width * textureData.width * textureData.pixelStride;
 
                 for (int faceIndex = 0; faceIndex < textureData.slices; faceIndex++)
-                    texture.SetPixelData(textureData.textureData, 0, (CubemapFace)faceIndex, faceIndex * (int)faceStride);
+                    texture.SetPixelData(
+                        textureData.textureData,
+                        0,
+                        (CubemapFace)faceIndex,
+                        faceIndex * (int)faceStride
+                    );
 
                 texture.Apply(false, false);
                 return texture;
@@ -104,17 +137,26 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         {
             switch (type)
             {
-                case LightBakerBridge.LightType.Directional: return UnityEngine.LightType.Directional;
-                case LightBakerBridge.LightType.Point: return UnityEngine.LightType.Point;
-                case LightBakerBridge.LightType.Spot: return UnityEngine.LightType.Spot;
-                case LightBakerBridge.LightType.Rectangle: return UnityEngine.LightType.Rectangle;
-                case LightBakerBridge.LightType.Disc: return UnityEngine.LightType.Disc;
-                case LightBakerBridge.LightType.SpotBoxShape: return UnityEngine.LightType.Box;
-                default: throw new ArgumentException("Unknown light type");
+                case LightBakerBridge.LightType.Directional:
+                    return UnityEngine.LightType.Directional;
+                case LightBakerBridge.LightType.Point:
+                    return UnityEngine.LightType.Point;
+                case LightBakerBridge.LightType.Spot:
+                    return UnityEngine.LightType.Spot;
+                case LightBakerBridge.LightType.Rectangle:
+                    return UnityEngine.LightType.Rectangle;
+                case LightBakerBridge.LightType.Disc:
+                    return UnityEngine.LightType.Disc;
+                case LightBakerBridge.LightType.SpotBoxShape:
+                    return UnityEngine.LightType.Box;
+                default:
+                    throw new ArgumentException("Unknown light type");
             }
         }
 
-        private static UnityEngine.Experimental.GlobalIllumination.FalloffType LightBakerFalloffTypeToUnityFalloffType(FalloffType falloff)
+        private static UnityEngine.Experimental.GlobalIllumination.FalloffType LightBakerFalloffTypeToUnityFalloffType(
+            FalloffType falloff
+        )
         {
             switch (falloff)
             {
@@ -139,7 +181,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             bool autoEstimateLUTRange,
             in BakeInput bakeInput,
             out LightHandle[] lightHandles,
-            List<UnityEngine.Object> allocatedObjects)
+            List<UnityEngine.Object> allocatedObjects
+        )
         {
             // Extract lights
             var lights = new World.LightDescriptor[bakeInput.lightData.Length];
@@ -149,7 +192,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                 // TODO(pema.malling): The following transform is only correct for linear color space :( https://jira.unity3d.com/browse/LIGHT-1763
                 float maxColor = Mathf.Max(lightData.color.x, Mathf.Max(lightData.color.y, lightData.color.z));
-                float maxIndirectColor = Mathf.Max(lightData.indirectColor.x, Mathf.Max(lightData.indirectColor.y, lightData.indirectColor.z));
+                float maxIndirectColor = Mathf.Max(
+                    lightData.indirectColor.x,
+                    Mathf.Max(lightData.indirectColor.y, lightData.indirectColor.z)
+                );
                 float bounceIntensity = maxColor <= 0 ? 0 : maxIndirectColor / maxColor;
 
                 World.LightDescriptor lightDescriptor;
@@ -162,19 +208,23 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 lightDescriptor.Shadows = lightData.castsShadows ? LightShadows.Hard : LightShadows.None;
                 lightDescriptor.Transform = Matrix4x4.TRS(lightData.position, lightData.orientation, Vector3.one);
                 lightDescriptor.ColorTemperature = 0;
-                lightDescriptor.LightmapBakeType = lightData.mode == LightMode.Mixed ? LightmapBakeType.Mixed : LightmapBakeType.Baked;
+                lightDescriptor.LightmapBakeType =
+                    lightData.mode == LightMode.Mixed ? LightmapBakeType.Mixed : LightmapBakeType.Baked;
                 lightDescriptor.AreaSize = Vector2.one;
                 lightDescriptor.SpotAngle = 0;
                 lightDescriptor.InnerSpotAngle = 0;
                 lightDescriptor.CullingMask = uint.MaxValue;
                 lightDescriptor.BounceIntensity = bounceIntensity;
                 lightDescriptor.Range = lightData.range;
-                lightDescriptor.ShadowMaskChannel = (lightData.shadowMaskChannel < 4) ? (int)lightData.shadowMaskChannel : -1;
+                lightDescriptor.ShadowMaskChannel =
+                    (lightData.shadowMaskChannel < 4) ? (int)lightData.shadowMaskChannel : -1;
                 lightDescriptor.UseColorTemperature = false;
                 lightDescriptor.FalloffType = LightBakerFalloffTypeToUnityFalloffType(lightData.falloff);
                 lightDescriptor.ShadowRadius = Util.IsPunctualLightType(lightDescriptor.Type) ? lightData.shape0 : 0.0f;
                 lightDescriptor.CookieSize = lightData.cookieScale;
-                lightDescriptor.CookieTexture = Util.IsCookieValid(lightData.cookieTextureIndex) ? CreateTextureFromCookieData(in bakeInput.cookieData[lightData.cookieTextureIndex]) : null;
+                lightDescriptor.CookieTexture = Util.IsCookieValid(lightData.cookieTextureIndex)
+                    ? CreateTextureFromCookieData(in bakeInput.cookieData[lightData.cookieTextureIndex])
+                    : null;
                 if (lightDescriptor.CookieTexture != null)
                     allocatedObjects.Add(lightDescriptor.CookieTexture);
 
@@ -204,13 +254,19 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
 
             world.lightPickingMethod = LightPickingMethod.LightGrid;
-            lightHandles = world.AddLights(lights, false, autoEstimateLUTRange, bakeInput.lightingSettings.mixedLightingMode);
+            lightHandles = world.AddLights(
+                lights,
+                false,
+                autoEstimateLUTRange,
+                bakeInput.lightingSettings.mixedLightingMode
+            );
         }
 
         internal static void InjectEnvironmentLight(
             World world,
             in BakeInput bakeInput,
-            List<UnityEngine.Object> allocatedObjects)
+            List<UnityEngine.Object> allocatedObjects
+        )
         {
             // Setup environment light
             int envCubemapResolution = (int)bakeInput.environmentData.cubeResolution;
@@ -218,7 +274,12 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             bool isEmptyCubemap = envCubemapResolution == 1;
             for (int i = 0; i < 6; i++)
             {
-                envCubemap.SetPixelData(bakeInput.environmentData.cubeData, 0, (CubemapFace)i, envCubemapResolution * envCubemapResolution * i);
+                envCubemap.SetPixelData(
+                    bakeInput.environmentData.cubeData,
+                    0,
+                    (CubemapFace)i,
+                    envCubemapResolution * envCubemapResolution * i
+                );
                 isEmptyCubemap &= math.all(bakeInput.environmentData.cubeData[i].xyz == float3.zero);
             }
 
@@ -239,7 +300,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             in BakeInput bakeInput,
             out MaterialHandle[][] perInstanceSubMeshMaterials,
             out bool[][] perInstanceSubMeshVisibility,
-            List<UnityEngine.Object> allocatedObjects)
+            List<UnityEngine.Object> allocatedObjects
+        )
         {
             int allocationCount = allocatedObjects.Count;
 
@@ -251,7 +313,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 ref var material = ref perTexturePairMaterials[i];
                 var baseTexture = CreateTexture2DFromTextureData(in bakeInput.albedoData[i], $"World (albedo) {i}");
                 allocatedObjects.Add(baseTexture);
-                var emissiveTexture = CreateTexture2DFromTextureData(in bakeInput.emissiveData[i], $"World (emissive) {i}");
+                var emissiveTexture = CreateTexture2DFromTextureData(
+                    in bakeInput.emissiveData[i],
+                    $"World (emissive) {i}"
+                );
                 allocatedObjects.Add(emissiveTexture);
                 material.Albedo = baseTexture;
                 material.Emission = emissiveTexture;
@@ -279,7 +344,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             {
                 ref readonly TextureData transmissionData = ref bakeInput.transmissionData[i];
                 ref readonly TextureProperties transmissionDataProperties = ref bakeInput.transmissionDataProperties[i];
-                Texture2D transmissiveTexture = CreateTexture2DFromTextureData(in transmissionData, $"World (transmission) {i}");
+                Texture2D transmissiveTexture = CreateTexture2DFromTextureData(
+                    in transmissionData,
+                    $"World (transmission) {i}"
+                );
                 transmissiveTexture.wrapModeU = transmissionDataProperties.wrapModeU;
                 transmissiveTexture.wrapModeV = transmissionDataProperties.wrapModeV;
                 transmissiveTexture.filterMode = transmissionDataProperties.filterMode;
@@ -303,7 +371,9 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 ref readonly MaterialPool.MaterialDescriptor baseMaterial = ref perTexturePairMaterials[texturePairIdx];
 
                 // Make space for per-submesh materials and visibility
-                perInstanceSubMeshMaterials[instanceIdx] = new MaterialHandle[instanceData.subMeshMaterialIndices.Length];
+                perInstanceSubMeshMaterials[instanceIdx] = new MaterialHandle[
+                    instanceData.subMeshMaterialIndices.Length
+                ];
                 perInstanceSubMeshVisibility[instanceIdx] = new bool[instanceData.subMeshMaterialIndices.Length];
 
                 // Extract per-subMesh materials
@@ -312,7 +382,12 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     int subMeshMaterialIdx = instanceData.subMeshMaterialIndices[subMeshIdx];
 
                     // If we've already created this material, use it
-                    if (materialCache.TryGetValue((texturePairIdx, subMeshMaterialIdx), out MaterialHandle existingHandle))
+                    if (
+                        materialCache.TryGetValue(
+                            (texturePairIdx, subMeshMaterialIdx),
+                            out MaterialHandle existingHandle
+                        )
+                    )
                     {
                         perInstanceSubMeshMaterials[instanceIdx][subMeshIdx] = existingHandle;
                         perInstanceSubMeshVisibility[instanceIdx][subMeshIdx] = true;
@@ -333,11 +408,19 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         if (-1 != transmissionDataIndex)
                         {
                             subMeshMaterial.Transmission = transmissiveTextures[transmissionDataIndex];
-                            ref readonly TextureProperties transmissionDataProperties = ref bakeInput.transmissionDataProperties[transmissionDataIndex];
+                            ref readonly TextureProperties transmissionDataProperties =
+                                ref bakeInput.transmissionDataProperties[transmissionDataIndex];
                             subMeshMaterial.TransmissionScale = transmissionDataProperties.transmissionTextureST.scale;
-                            subMeshMaterial.TransmissionOffset = transmissionDataProperties.transmissionTextureST.offset;
-                            subMeshMaterial.TransmissionChannels = UnityEngine.PathTracing.Core.TransmissionChannels.RGB;
-                            subMeshMaterial.PointSampleTransmission = transmissionDataProperties.filterMode == FilterMode.Point;
+                            subMeshMaterial.TransmissionOffset = transmissionDataProperties
+                                .transmissionTextureST
+                                .offset;
+                            subMeshMaterial.TransmissionChannels = UnityEngine
+                                .PathTracing
+                                .Core
+                                .TransmissionChannels
+                                .RGB;
+                            subMeshMaterial.PointSampleTransmission =
+                                transmissionDataProperties.filterMode == FilterMode.Point;
                         }
 
                         // Apply the stretching operation that LightBaker applies - ensures that the UV layout fills the entire UV space
@@ -366,16 +449,37 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     perInstanceSubMeshVisibility[instanceIdx][subMeshIdx] = subMeshMaterialIdx != -1;
                 }
             }
-            Debug.Assert(allocatedObjects.Count == allocationCount + bakeInput.albedoData.Length * 2 + bakeInput.transmissionData.Length, "InjectMaterials allocated objects incorrectly");
+            Debug.Assert(
+                allocatedObjects.Count
+                    == allocationCount + bakeInput.albedoData.Length * 2 + bakeInput.transmissionData.Length,
+                "InjectMaterials allocated objects incorrectly"
+            );
         }
 
-        internal static Mesh TerrainDataToMesh(in TerrainData terrainData, in HeightmapData heightmapData, in TerrainHoleData holeData)
+        internal static Mesh TerrainDataToMesh(
+            in TerrainData terrainData,
+            in HeightmapData heightmapData,
+            in TerrainHoleData holeData
+        )
         {
-            var outMesh = TerrainToMesh.Convert(heightmapData.resolution, heightmapData.resolution, heightmapData.data, terrainData.heightmapScale, holeData.resolution, holeData.resolution, holeData.data);
+            var outMesh = TerrainToMesh.Convert(
+                heightmapData.resolution,
+                heightmapData.resolution,
+                heightmapData.data,
+                terrainData.heightmapScale,
+                holeData.resolution,
+                holeData.resolution,
+                holeData.data
+            );
             return outMesh;
         }
 
-        private static Bounds CalculateMeshBounds(Vector3[] vertices, Matrix4x4 localToWorldMatrix4x4, out Vector3 meshMinVertex, out Vector3 meshMaxVertex)
+        private static Bounds CalculateMeshBounds(
+            Vector3[] vertices,
+            Matrix4x4 localToWorldMatrix4x4,
+            out Vector3 meshMinVertex,
+            out Vector3 meshMaxVertex
+        )
         {
             meshMinVertex = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             meshMaxVertex = new Vector3(float.MinValue, float.MinValue, float.MinValue);
@@ -400,7 +504,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             out Mesh[] meshes,
             out FatInstance[] fatInstances,
             List<UnityEngine.Object> allocatedObjects,
-            uint renderingObjectLayer)
+            uint renderingObjectLayer
+        )
         {
             // Extract meshes
             meshes = new Mesh[bakeInput.meshData.Length + bakeInput.terrainData.Length];
@@ -417,7 +522,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             for (int i = 0; i < bakeInput.terrainData.Length; i++)
             {
                 var heightMap = bakeInput.heightMapData[bakeInput.terrainData[i].heightMapIndex];
-                var holeMap = bakeInput.terrainData[i].terrainHoleIndex >= 0 ? bakeInput.terrainHoleData[bakeInput.terrainData[i].terrainHoleIndex] : new TerrainHoleData();
+                var holeMap =
+                    bakeInput.terrainData[i].terrainHoleIndex >= 0
+                        ? bakeInput.terrainHoleData[bakeInput.terrainData[i].terrainHoleIndex]
+                        : new TerrainHoleData();
                 meshes[meshIndex] = TerrainDataToMesh(in bakeInput.terrainData[i], in heightMap, in holeMap);
                 meshIndex++;
             }
@@ -428,9 +536,17 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             for (int i = 0; i < meshes.Length; ++i)
             {
                 if (meshes[i].uv2.Length == 0)
-                    LightmapIntegrationHelpers.ComputeUVBounds(meshes[i].uv, out uvBoundsSizes[i], out uvBoundsOffsets[i]);
+                    LightmapIntegrationHelpers.ComputeUVBounds(
+                        meshes[i].uv,
+                        out uvBoundsSizes[i],
+                        out uvBoundsOffsets[i]
+                    );
                 else
-                    LightmapIntegrationHelpers.ComputeUVBounds(meshes[i].uv2, out uvBoundsSizes[i], out uvBoundsOffsets[i]);
+                    LightmapIntegrationHelpers.ComputeUVBounds(
+                        meshes[i].uv2,
+                        out uvBoundsSizes[i],
+                        out uvBoundsOffsets[i]
+                    );
             }
 
             // Baking specific settings
@@ -451,17 +567,32 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                 // Get other instance data
                 float4x4 localToWorldFloat4x4 = instanceData.transform;
-                Matrix4x4 localToWorldMatrix4x4 = new Matrix4x4(localToWorldFloat4x4.c0, localToWorldFloat4x4.c1, localToWorldFloat4x4.c2, localToWorldFloat4x4.c3);
-                ShadowCastingMode shadowCastingMode = instanceData.castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
+                Matrix4x4 localToWorldMatrix4x4 = new Matrix4x4(
+                    localToWorldFloat4x4.c0,
+                    localToWorldFloat4x4.c1,
+                    localToWorldFloat4x4.c2,
+                    localToWorldFloat4x4.c3
+                );
+                ShadowCastingMode shadowCastingMode = instanceData.castShadows
+                    ? ShadowCastingMode.On
+                    : ShadowCastingMode.Off;
 
-                int globalMeshIndex = instanceData.meshIndex >= 0 ? instanceData.meshIndex : terrainMeshOffset + instanceData.terrainIndex; // the mesh array is a concatenation of the meshes and terrain meshes - figure out the right index
+                int globalMeshIndex =
+                    instanceData.meshIndex >= 0
+                        ? instanceData.meshIndex
+                        : terrainMeshOffset + instanceData.terrainIndex; // the mesh array is a concatenation of the meshes and terrain meshes - figure out the right index
                 Debug.Assert(globalMeshIndex >= 0 && globalMeshIndex < meshes.Length);
                 Mesh mesh = meshes[globalMeshIndex];
                 Vector2 uvBoundsSize = uvBoundsSizes[globalMeshIndex];
                 Vector2 uvBoundsOffset = uvBoundsOffsets[globalMeshIndex];
 
                 // Calculate bounds
-                Bounds meshBounds = CalculateMeshBounds(mesh.vertices, localToWorldMatrix4x4, out Vector3 meshMinVertex, out Vector3 meshMaxVertex);
+                Bounds meshBounds = CalculateMeshBounds(
+                    mesh.vertices,
+                    localToWorldMatrix4x4,
+                    out Vector3 meshMinVertex,
+                    out Vector3 meshMaxVertex
+                );
 
                 // Keep track of scene bounds as we go
                 sceneMinVertex = Vector3.Min(sceneMinVertex, meshMinVertex);
@@ -477,8 +608,14 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 // add instance
                 var boundingSphere = new BoundingSphere();
                 boundingSphere.position = localToWorldMatrix4x4.MultiplyPoint(mesh.bounds.center);
-                boundingSphere.radius = (localToWorldMatrix4x4.MultiplyPoint(mesh.bounds.extents) - boundingSphere.position).magnitude;
-                var lodIdentifier = new LodIdentifier(instanceData.lodGroup, instanceData.lodMask, instanceData.contributingLodLevel);
+                boundingSphere.radius = (
+                    localToWorldMatrix4x4.MultiplyPoint(mesh.bounds.extents) - boundingSphere.position
+                ).magnitude;
+                var lodIdentifier = new LodIdentifier(
+                    instanceData.lodGroup,
+                    instanceData.lodMask,
+                    instanceData.contributingLodLevel
+                );
                 var fatInstance = new FatInstance
                 {
                     BoundingSphere = boundingSphere,
@@ -494,7 +631,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     ReceiveShadows = instanceData.receiveShadows,
                     Filter = filter,
                     RenderingObjectLayer = renderingObjectLayer,
-                    EnableEmissiveSampling = true
+                    EnableEmissiveSampling = true,
                 };
                 fatInstanceList.Add(fatInstance);
             }
@@ -505,17 +642,36 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             sceneBounds.SetMinMax(sceneMinVertex, sceneMaxVertex);
         }
 
-        internal static void PopulateWorld(InputExtraction.BakeInput input, UnityComputeWorld world, SamplingResources samplingResources, CommandBuffer cmd, bool autoEstimateLUTRange)
+        internal static void PopulateWorld(
+            InputExtraction.BakeInput input,
+            UnityComputeWorld world,
+            SamplingResources samplingResources,
+            CommandBuffer cmd,
+            bool autoEstimateLUTRange
+        )
         {
             FatInstance[] fatInstances;
-            BakeInputToWorldConversion.DeserializeAndInjectBakeInputData(world.PathTracingWorld, autoEstimateLUTRange, in input,
-                out UnityEngine.Bounds sceneBounds, out world.Meshes, out fatInstances, out world.LightHandles,
-                world.TemporaryObjects, UnityComputeWorld.RenderingObjectLayer);
+            BakeInputToWorldConversion.DeserializeAndInjectBakeInputData(
+                world.PathTracingWorld,
+                autoEstimateLUTRange,
+                in input,
+                out UnityEngine.Bounds sceneBounds,
+                out world.Meshes,
+                out fatInstances,
+                out world.LightHandles,
+                world.TemporaryObjects,
+                UnityComputeWorld.RenderingObjectLayer
+            );
 
             // Add instances to world
             Dictionary<int, List<LodInstanceBuildData>> lodInstances;
             Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances;
-            WorldHelpers.AddContributingInstancesToWorld(world.PathTracingWorld, in fatInstances, out lodInstances, out lodgroupToContributorInstances);
+            WorldHelpers.AddContributingInstancesToWorld(
+                world.PathTracingWorld,
+                in fatInstances,
+                out lodInstances,
+                out lodgroupToContributorInstances
+            );
             world.PathTracingWorld.Build(sceneBounds, cmd, ref world.ScratchBuffer, samplingResources, true, 1024);
         }
 
@@ -528,7 +684,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             out FatInstance[] fatInstances,
             out LightHandle[] lightHandles,
             List<UnityEngine.Object> allocatedObjects,
-            uint renderingObjectLayer)
+            uint renderingObjectLayer
+        )
         {
             string bakeInputPath = $"Temp/TempNative.bakeInput";
             bool serializeSucceeded = LightBaking.LightBaker.Serialize(bakeInputPath, bakeInput.bakeInput);
@@ -538,7 +695,17 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             bool deserializeSucceeded = BakeInputSerialization.Deserialize(bakeInputPath, out conversionBakeInput);
             System.IO.File.Delete(bakeInputPath);
             Debug.Assert(deserializeSucceeded, $"Failed to deserialize input from '{bakeInputPath}'.");
-            InjectBakeInputData(world, autoEstimateLUTRange, conversionBakeInput, out sceneBounds, out meshes, out fatInstances, out lightHandles, allocatedObjects, renderingObjectLayer);
+            InjectBakeInputData(
+                world,
+                autoEstimateLUTRange,
+                conversionBakeInput,
+                out sceneBounds,
+                out meshes,
+                out fatInstances,
+                out lightHandles,
+                allocatedObjects,
+                renderingObjectLayer
+            );
         }
 
         internal static void InjectBakeInputData(
@@ -550,12 +717,29 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             out FatInstance[] fatInstances,
             out LightHandle[] lightHandles,
             List<UnityEngine.Object> allocatedObjects,
-            uint renderingObjectLayer)
+            uint renderingObjectLayer
+        )
         {
             InjectAnalyticalLights(world, autoEstimateLUTRange, bakeInput, out lightHandles, allocatedObjects);
             InjectEnvironmentLight(world, bakeInput, allocatedObjects);
-            InjectMaterials(world, bakeInput, out var perInstanceSubMeshMaterials, out var perInstanceSubMeshVisibility, allocatedObjects);
-            ConvertInstancesAndMeshes(world, bakeInput, perInstanceSubMeshMaterials, perInstanceSubMeshVisibility, out sceneBounds, out meshes, out fatInstances, allocatedObjects, renderingObjectLayer);
+            InjectMaterials(
+                world,
+                bakeInput,
+                out var perInstanceSubMeshMaterials,
+                out var perInstanceSubMeshVisibility,
+                allocatedObjects
+            );
+            ConvertInstancesAndMeshes(
+                world,
+                bakeInput,
+                perInstanceSubMeshMaterials,
+                perInstanceSubMeshVisibility,
+                out sceneBounds,
+                out meshes,
+                out fatInstances,
+                allocatedObjects,
+                renderingObjectLayer
+            );
         }
     }
 }

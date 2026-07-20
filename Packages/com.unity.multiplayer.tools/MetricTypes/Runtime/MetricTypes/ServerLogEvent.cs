@@ -32,7 +32,6 @@ namespace Unity.Multiplayer.Tools.MetricTypes
                 return connectionHash + bytesCountHash + logLevelHash;
             }
         }
-
     }
 
     // These must stay in sync with NetworkLog.LogType in MLAPI
@@ -41,6 +40,6 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         Info,
         Warning,
         Error,
-        None
+        None,
     }
 }

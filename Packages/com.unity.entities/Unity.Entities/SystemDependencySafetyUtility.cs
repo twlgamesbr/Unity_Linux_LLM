@@ -40,19 +40,25 @@ namespace Unity.Entities
                 var type = m_ProblematicTypeIndex;
                 AtomicSafetyHandle h = m_ProblematicHandle;
                 string errorTail =
-                    "but that type was not assigned to the Dependency property. To ensure correct behavior of other systems, " +
-                    "the job or a dependency must be assigned to the Dependency property before returning from the OnUpdate method.";
+                    "but that type was not assigned to the Dependency property. To ensure correct behavior of other systems, "
+                    + "the job or a dependency must be assigned to the Dependency property before returning from the OnUpdate method.";
 
                 string verb = IsWrite ? "writes" : "reads";
-                var jobName = IsWrite ? AtomicSafetyHandle.GetWriterName(h) : AtomicSafetyHandle.GetReaderName(h, m_ReaderIndex);
+                var jobName = IsWrite
+                    ? AtomicSafetyHandle.GetWriterName(h)
+                    : AtomicSafetyHandle.GetReaderName(h, m_ReaderIndex);
 
                 return $"The system {systemName} {verb} {TypeManager.GetType(type)} via {jobName} {errorTail}";
             }
         }
 
         internal static bool FindSystemSchedulingErrors(
-            int currentSystemId, ref UnsafeList<TypeIndex> readingSystems, ref UnsafeList<TypeIndex> writingSystems,
-            ComponentDependencyManager* dependencyManager, out SafetyErrorDetails details)
+            int currentSystemId,
+            ref UnsafeList<TypeIndex> readingSystems,
+            ref UnsafeList<TypeIndex> writingSystems,
+            ComponentDependencyManager* dependencyManager,
+            out SafetyErrorDetails details
+        )
         {
             details = default;
 
@@ -101,7 +107,14 @@ namespace Unity.Entities
             return false;
         }
 
-        static bool CheckJobDependencies(JobHandle* handles, int* systemIds, int mappingCount, ref SafetyErrorDetails details, TypeIndex type, ComponentDependencyManager* dependencyManager)
+        static bool CheckJobDependencies(
+            JobHandle* handles,
+            int* systemIds,
+            int mappingCount,
+            ref SafetyErrorDetails details,
+            TypeIndex type,
+            ComponentDependencyManager* dependencyManager
+        )
         {
             var h = dependencyManager->Safety.GetSafetyHandle(type, true);
 
@@ -125,7 +138,12 @@ namespace Unity.Entities
 
             if (!dependencyManager->HasReaderOrWriterDependency(type, AtomicSafetyHandle.GetWriter(h)))
             {
-                details.m_ProblematicSystemId = FindSystemId(AtomicSafetyHandle.GetWriter(h), systemIds, handles, mappingCount);
+                details.m_ProblematicSystemId = FindSystemId(
+                    AtomicSafetyHandle.GetWriter(h),
+                    systemIds,
+                    handles,
+                    mappingCount
+                );
                 details.m_ProblematicTypeIndex = type;
                 details.m_ProblematicHandle = h;
                 details.m_ReaderIndex = -1;
@@ -151,9 +169,7 @@ namespace Unity.Entities
 #else
     unsafe static class SystemDependencySafetyUtility
     {
-        public struct SafetyErrorDetails
-        {
-        }
+        public struct SafetyErrorDetails { }
     }
 #endif
 }

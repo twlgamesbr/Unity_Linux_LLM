@@ -10,8 +10,8 @@ namespace UnityEngine.Rendering.Universal
     {
         // Add profling samplers to sorts as they often are a bottleneck when scaling things up.
         // By default avoid sampling recursion, but these can be used externally as well.
-        static public ProfilingSampler s_QuickSortSampler = new ProfilingSampler("QuickSort");
-        static public ProfilingSampler s_InsertionSortSampler = new ProfilingSampler("InsertionSort");
+        public static ProfilingSampler s_QuickSortSampler = new ProfilingSampler("QuickSort");
+        public static ProfilingSampler s_InsertionSortSampler = new ProfilingSampler("InsertionSort");
 
         public static void QuickSort<T>(T[] data, Func<T, T, int> compare)
         {
@@ -102,7 +102,7 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-        static public void InsertionSort<T>(T[] data, Func<T, T, int> compare)
+        public static void InsertionSort<T>(T[] data, Func<T, T, int> compare)
         {
             using var scope = new ProfilingScope(s_InsertionSortSampler);
             InsertionSort<T>(data, 0, data.Length - 1, compare);
@@ -111,7 +111,7 @@ namespace UnityEngine.Rendering.Universal
         // A non-allocating predicated sub-array insertion sort for managed arrays.
         //
         // NOTE: called also from QuickSort for small ranges.
-        static public void InsertionSort<T>(T[] data, int start, int end, Func<T, T, int> compare)
+        public static void InsertionSort<T>(T[] data, int start, int end, Func<T, T, int> compare)
         {
             Assertions.Assert.IsTrue((uint)start < data.Length);
             Assertions.Assert.IsTrue((uint)end < data.Length);

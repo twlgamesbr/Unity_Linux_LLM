@@ -1,10 +1,10 @@
-using UnityEditor;
-using UnityEditorInternal;
-using UnityEditor.Build.Reporting;
-using UnityEditor.Build;
 using System.IO;
-using UnityEngine;
 using Newtonsoft.Json;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+using UnityEditorInternal;
+using UnityEngine;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -85,10 +85,13 @@ namespace Unity.Web.Stripping.Editor
 
         // C:\Path\To\MyProject
         public static readonly string ProjectPath = Path.GetDirectoryName(Application.dataPath);
+
         // C:\Path\To\MyProject\Library
         public static readonly string LibraryPath = Path.Combine(ProjectPath, "Library");
+
         // C:\Path\To\GitRepo\package or C:\Path\To\Project\Library\PackageCache\com.unity.web.stripping-tool
-        public static readonly string PackagePath =
-            UnityEditor.PackageManager.PackageInfo.FindForPackageName(PackageConstants.PackageName).resolvedPath;
+        public static readonly string PackagePath = UnityEditor
+            .PackageManager.PackageInfo.FindForPackageName(PackageConstants.PackageName)
+            .resolvedPath;
     }
 }

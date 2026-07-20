@@ -26,9 +26,7 @@ namespace Unity.PlatformToolkit.PlayMode
 
         // Per documentation on SerializableDictionary, we create a subclass in order to serialize its contents.
         [Serializable]
-        private class SaveDataKeyedByName : SerializableDictionary<string, SerializedSaveData>
-        {
-        }
+        private class SaveDataKeyedByName : SerializableDictionary<string, SerializedSaveData> { }
 
         // Save data contents, keyed by save name.
         [SerializeField]
@@ -68,7 +66,7 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public void WriteSave(string name, byte[] data, PlayModeSaveDataInfo saveInfo)
         {
-            m_SaveData[name] = new SerializedSaveData() { data = data, info = saveInfo};
+            m_SaveData[name] = new SerializedSaveData() { data = data, info = saveInfo };
 
             int listEntryIndex = m_BindableNameEntries.IndexOf(name);
             if (listEntryIndex != -1)
@@ -114,7 +112,11 @@ namespace Unity.PlatformToolkit.PlayMode
         private string m_Name;
 
         [CreateProperty]
-        public string Name { get => m_Name; set { SetProperty(ref m_Name, value); } }
+        public string Name
+        {
+            get => m_Name;
+            set { SetProperty(ref m_Name, value); }
+        }
 
         public event EventHandler<BindablePropertyChangedEventArgs> propertyChanged;
 

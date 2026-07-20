@@ -35,26 +35,26 @@ namespace Unity.Serialization.Json
             return $"Type=[{Type}] Range=[{Start}..{End}] Parent=[{Parent}]";
         }
     }
-    
+
     unsafe struct UnsafeJsonTokenStream : IDisposable
     {
         /// <summary>
         /// Special start value to signify this is a partial token continuation.
         /// </summary>
         public const int PartialTokenStart = -1;
-        
+
         /// <summary>
         /// Special end value to signify there is another part to follow.
         /// </summary>
         public const int PartialTokenEnd = -1;
-        
+
         /// <summary>
         /// The default depth limit for discarding completed tokens.
         /// </summary>
         public const int DefaultDiscardDepthLimit = 128;
-        
+
         readonly Allocator m_Label;
-        
+
         public Token* Tokens;
         public int TokenCapacity;
         public int TokenNextIndex;
@@ -64,13 +64,13 @@ namespace Unity.Serialization.Json
         public UnsafeJsonTokenStream(int initialTokenCapacity, Allocator label)
         {
             m_Label = label;
-            Tokens = (Token*) UnsafeUtility.Malloc(initialTokenCapacity * sizeof(Token), 4, label);
-            Discard = (int*) UnsafeUtility.Malloc(initialTokenCapacity * sizeof(int), 4, label);
+            Tokens = (Token*)UnsafeUtility.Malloc(initialTokenCapacity * sizeof(Token), 4, label);
+            Discard = (int*)UnsafeUtility.Malloc(initialTokenCapacity * sizeof(int), 4, label);
             TokenCapacity = initialTokenCapacity;
             TokenNextIndex = 0;
             TokenParentIndex = -1;
         }
-        
+
         public void Dispose()
         {
             UnsafeUtility.Free(Tokens, m_Label);
@@ -92,7 +92,7 @@ namespace Unity.Serialization.Json
             TokenNextIndex = 0;
             TokenParentIndex = -1;
         }
-        
+
         public int DiscardCompleted(int depth = DefaultDiscardDepthLimit)
         {
             if (TokenNextIndex == 0)
@@ -103,7 +103,7 @@ namespace Unity.Serialization.Json
 
             var index = TokenNextIndex - 1;
 
-            for (;;)
+            for (; ; )
             {
                 if (index == -1)
                 {
@@ -115,7 +115,10 @@ namespace Unity.Serialization.Json
                 if (token.Start != PartialTokenStart)
                 {
                     // Support partial tokens
-                    if (token.End == PartialTokenEnd && (token.Type == TokenType.Primitive || token.Type == TokenType.String))
+                    if (
+                        token.End == PartialTokenEnd
+                        && (token.Type == TokenType.Primitive || token.Type == TokenType.String)
+                    )
                     {
                         var partToken = token;
                         var partIndex = index;
@@ -180,7 +183,7 @@ namespace Unity.Serialization.Json
                 Tokens[i] = token;
                 Discard[index] = i;
             }
-            
+
             return 0;
         }
 
@@ -196,9 +199,11 @@ namespace Unity.Serialization.Json
     unsafe struct JsonTokenStream : IDisposable
     {
         const int k_DefaultBufferSize = 1024;
-        
+
         readonly Allocator m_Allocator;
-        [NativeDisableUnsafePtrRestriction] UnsafeJsonTokenStream* m_Data;
+
+        [NativeDisableUnsafePtrRestriction]
+        UnsafeJsonTokenStream* m_Data;
 
         public Token* Tokens => m_Data->Tokens;
         public int TokenNextIndex => m_Data->TokenNextIndex;
@@ -207,15 +212,18 @@ namespace Unity.Serialization.Json
 
         internal UnsafeJsonTokenStream* GetUnsafePtr() => m_Data;
 
-        public JsonTokenStream(Allocator allocator) : this(k_DefaultBufferSize, allocator)
-        {
-            
-        }
-        
+        public JsonTokenStream(Allocator allocator)
+            : this(k_DefaultBufferSize, allocator) { }
+
         public JsonTokenStream(int initialLength, Allocator allocator)
         {
             m_Allocator = allocator;
-            m_Data = (UnsafeJsonTokenStream*)UnsafeUtility.Malloc(sizeof(UnsafeJsonTokenStream), UnsafeUtility.AlignOf<UnsafeJsonTokenStream>(), m_Allocator);
+            m_Data = (UnsafeJsonTokenStream*)
+                UnsafeUtility.Malloc(
+                    sizeof(UnsafeJsonTokenStream),
+                    UnsafeUtility.AlignOf<UnsafeJsonTokenStream>(),
+                    m_Allocator
+                );
             *m_Data = new UnsafeJsonTokenStream(initialLength, allocator);
         }
 

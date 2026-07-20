@@ -7,26 +7,28 @@ namespace UnityEditor.Rendering.Universal
     /// <summary>
     /// Editor script for a <c>ForwardRendererData</c> class.
     /// </summary>
-    [Obsolete("ForwardRendererDataEditor has been deprecated. Use UniversalRendererDataEditor instead #from(2021.2) #breakingFrom(2021.2) (UnityUpgradable) -> UniversalRendererDataEditor", true)]
+    [Obsolete(
+        "ForwardRendererDataEditor has been deprecated. Use UniversalRendererDataEditor instead #from(2021.2) #breakingFrom(2021.2) (UnityUpgradable) -> UniversalRendererDataEditor",
+        true
+    )]
     public class ForwardRendererDataEditor : ScriptableRendererDataEditor
     {
         /// <inheritdoc />
         public override void OnInspectorGUI()
         {
-            throw new NotSupportedException("ForwardRendererDataEditor has been deprecated. Use UniversalRendererDataEditor instead");
+            throw new NotSupportedException(
+                "ForwardRendererDataEditor has been deprecated. Use UniversalRendererDataEditor instead"
+            );
         }
     }
 
-    static partial class EditorUtils
-    {
-    }
+    static partial class EditorUtils { }
 
     /// <summary>
     /// Filter for the list of converters used in batch mode.
     /// </summary>
     /// <seealso cref="Converters.RunInBatchMode(UnityEditor.Rendering.Universal.ConverterContainerId, List{UnityEditor.Rendering.Universal.ConverterId}, UnityEditor.Rendering.Universal.ConverterFilter)"/>
     [Obsolete("ConverterFilter has been deprecated.", false)]
-
     public enum ConverterFilter
     {
         /// <summary>
@@ -37,7 +39,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// Use this to exclude converters matching the filter.
         /// </summary>
-        Exclusive
+        Exclusive,
     }
 
     /// <summary>
@@ -69,7 +71,10 @@ namespace UnityEditor.Rendering.Universal
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    [Obsolete("BatchModeConverterInfo has been deprecated. Please use BatchModeConverterClassInfo or upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.", false)]
+    [Obsolete(
+        "BatchModeConverterInfo has been deprecated. Please use BatchModeConverterClassInfo or upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.",
+        false
+    )]
     internal class BatchModeConverterInfo : Attribute
     {
         public Type converterType { get; }
@@ -86,7 +91,10 @@ namespace UnityEditor.Rendering.Universal
     /// The converter to run in batch mode.
     /// </summary>
     /// <seealso cref="Converters.RunInBatchMode(UnityEditor.Rendering.Universal.ConverterContainerId, List{UnityEditor.Rendering.Universal.ConverterId}, UnityEditor.Rendering.Universal.ConverterFilter)"/>
-    [Obsolete("ConverterId has been deprecated. Please upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.", false)]
+    [Obsolete(
+        "ConverterId has been deprecated. Please upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.",
+        false
+    )]
     public enum ConverterId
     {
         /// <summary>
@@ -116,8 +124,7 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// Use this for 2D material conversion
         /// </summary>
-        [BatchModeConverterInfo(ConverterContainerId.BuiltInToURP2D,
-            typeof(BuiltInToURP2DReadonlyMaterialConverter))]
+        [BatchModeConverterInfo(ConverterContainerId.BuiltInToURP2D, typeof(BuiltInToURP2DReadonlyMaterialConverter))]
         ReadonlyMaterial2D,
 
         /// <summary>
@@ -129,16 +136,15 @@ namespace UnityEditor.Rendering.Universal
         /// <summary>
         /// Use this for 3D URP material conversion
         /// </summary>
-        [BatchModeConverterInfo(ConverterContainerId.UpgradeURP2DAssets,
-            typeof(BuiltInAndURP3DTo2DMaterialUpgrader))]
+        [BatchModeConverterInfo(ConverterContainerId.UpgradeURP2DAssets, typeof(BuiltInAndURP3DTo2DMaterialUpgrader))]
         URPToReadonlyMaterial2D,
 
 #if PPV2_EXISTS
-            /// <summary>
-            /// Use this for post processing V2 converters.
-            /// </summary>
-            [BatchModeConverterInfo(ConverterContainerId.BuiltInToURP, typeof(PPv2Converter))]
-            PPv2,
+        /// <summary>
+        /// Use this for post processing V2 converters.
+        /// </summary>
+        [BatchModeConverterInfo(ConverterContainerId.BuiltInToURP, typeof(PPv2Converter))]
+        PPv2,
 #endif
 
         /// <summary>
@@ -154,13 +160,19 @@ namespace UnityEditor.Rendering.Universal
         /// Call this method to run all the converters in a specific container in batch mode.
         /// </summary>
         /// <param name="containerName">The name of the container which will be batched. All Converters in this Container will run if prerequisites are met.</param>
-        [Obsolete("RunInBatchMode(ConverterContainerId) has been deprecated. Please use RunInBatchMode(string) or upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.", false)]
+        [Obsolete(
+            "RunInBatchMode(ConverterContainerId) has been deprecated. Please use RunInBatchMode(string) or upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.",
+            false
+        )]
         public static void RunInBatchMode(ConverterContainerId containerName)
         {
             RunInBatchMode(containerName, new List<ConverterId>() { }, ConverterFilter.Exclusive);
         }
 
-        [Obsolete("TryGetTypeInContainer has been deprecated. Please upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.", false)]
+        [Obsolete(
+            "TryGetTypeInContainer has been deprecated. Please upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.",
+            false
+        )]
         static bool TryGetTypeInContainer(ConverterId value, ConverterContainerId containerName, out Type type)
         {
             type = null;
@@ -170,7 +182,7 @@ namespace UnityEditor.Rendering.Universal
                 var attr = memberInfo[0].GetCustomAttribute<BatchModeConverterInfo>();
                 if (attr != null)
                 {
-                    if(attr.containerName == containerName)
+                    if (attr.containerName == containerName)
                         type = attr.converterType;
                 }
             }
@@ -183,16 +195,34 @@ namespace UnityEditor.Rendering.Universal
         /// <param name="containerName">The name of the container which will be batched.</param>
         /// <param name="converterList">The list of converters that will be either included or excluded from batching. These converters need to be part of the passed in container for them to run.</param>
         /// <param name="converterFilter">The enum that decide if the list of converters will be included or excluded when batching.</param>
-        [Obsolete("RunInBatchMode(ConverterContainerId, List<ConverterId>, ConverterFilter) has been deprecated. Please use RunInBatchMode(string, List<string>, bool) or upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.", false)]
-        public static void RunInBatchMode(ConverterContainerId containerName, List<ConverterId> converterList, ConverterFilter converterFilter)
+        [Obsolete(
+            "RunInBatchMode(ConverterContainerId, List<ConverterId>, ConverterFilter) has been deprecated. Please use RunInBatchMode(string, List<string>, bool) or upgrade using UnityEditor.Rendering.Universal.Converters.RunInBatchModeCmdLine instead.",
+            false
+        )]
+        public static void RunInBatchMode(
+            ConverterContainerId containerName,
+            List<ConverterId> converterList,
+            ConverterFilter converterFilter
+        )
         {
             var types = FilterConverters(containerName, converterList, converterFilter);
-            SuggestUpdatedCommand(containerName.ToString(), converterList.ConvertAll(id => id.ToString()), converterFilter == ConverterFilter.Inclusive);
+            SuggestUpdatedCommand(
+                containerName.ToString(),
+                converterList.ConvertAll(id => id.ToString()),
+                converterFilter == ConverterFilter.Inclusive
+            );
             RunInBatchMode(types);
         }
 
-        [Obsolete("FilterConverters(ConverterContainerId, List<ConverterId>, ConverterFilter) has been deprecated. Please use FilterConverters(string, List<string>, bool) instead.", false)]
-        internal static List<Type> FilterConverters(ConverterContainerId containerName, List<ConverterId> converterList, ConverterFilter converterFilter)
+        [Obsolete(
+            "FilterConverters(ConverterContainerId, List<ConverterId>, ConverterFilter) has been deprecated. Please use FilterConverters(string, List<string>, bool) instead.",
+            false
+        )]
+        internal static List<Type> FilterConverters(
+            ConverterContainerId containerName,
+            List<ConverterId> converterList,
+            ConverterFilter converterFilter
+        )
         {
             Array converters = Enum.GetValues(typeof(ConverterId));
 

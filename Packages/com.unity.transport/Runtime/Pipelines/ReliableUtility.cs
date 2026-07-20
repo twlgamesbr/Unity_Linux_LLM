@@ -189,7 +189,7 @@ namespace Unity.Networking.Transport.Utilities
         internal enum PacketType : byte
         {
             Payload = 0,
-            Ack = 1
+            Ack = 1,
         }
 
         internal struct SequenceBufferContext
@@ -360,9 +360,11 @@ namespace Unity.Networking.Transport.Utilities
             public long ReceiveTime;
         }
 
-        private static int AlignedSizeOf<T>() where T : struct
+        private static int AlignedSizeOf<T>()
+            where T : struct
         {
-            return (UnsafeUtility.SizeOf<T>() + NetworkPipelineProcessor.AlignmentMinusOne) & (~NetworkPipelineProcessor.AlignmentMinusOne);
+            return (UnsafeUtility.SizeOf<T>() + NetworkPipelineProcessor.AlignmentMinusOne)
+                & (~NetworkPipelineProcessor.AlignmentMinusOne);
         }
 
         internal static int MaxPacketHeaderWireSize(int windowSize)
@@ -370,9 +372,9 @@ namespace Unity.Networking.Transport.Utilities
             var baseHeaderSize = UnsafeUtility.SizeOf<PacketHeader>();
 
             var maskSize =
-                windowSize <= 32 ? sizeof(uint) :
-                windowSize <= 64 ? sizeof(ulong) :
-                windowSize / 8; // Safe since we enforce multiple of 8.
+                windowSize <= 32 ? sizeof(uint)
+                : windowSize <= 64 ? sizeof(ulong)
+                : windowSize / 8; // Safe since we enforce multiple of 8.
 
             return baseHeaderSize + maskSize;
         }
@@ -390,7 +392,9 @@ namespace Unity.Networking.Transport.Utilities
         internal static int ProcessCapacityNeeded(Parameters param)
         {
             var infoSize = AlignedSizeOf<PacketInformation>();
-            var dataSize = (NetworkParameterConstants.AbsoluteMaxMessageSize + NetworkPipelineProcessor.AlignmentMinusOne) & (~NetworkPipelineProcessor.AlignmentMinusOne);
+            var dataSize =
+                (NetworkParameterConstants.AbsoluteMaxMessageSize + NetworkPipelineProcessor.AlignmentMinusOne)
+                & (~NetworkPipelineProcessor.AlignmentMinusOne);
             infoSize *= param.WindowSize;
             dataSize *= param.WindowSize;
 
@@ -399,8 +403,15 @@ namespace Unity.Networking.Transport.Utilities
             return capacityNeeded;
         }
 
-        internal static unsafe SharedContext InitializeContext(byte* sharedBuffer, int sharedBufferLength,
-            byte* sendBuffer, int sendBufferLength, byte* recvBuffer, int recvBufferLength, Parameters param)
+        internal static unsafe SharedContext InitializeContext(
+            byte* sharedBuffer,
+            int sharedBufferLength,
+            byte* sendBuffer,
+            int sendBufferLength,
+            byte* recvBuffer,
+            int recvBufferLength,
+            Parameters param
+        )
         {
             InitializeProcessContext(sendBuffer, sendBufferLength, param);
             InitializeProcessContext(recvBuffer, recvBufferLength, param);
@@ -412,12 +423,23 @@ namespace Unity.Networking.Transport.Utilities
                 SentPackets = new SequenceBufferContext { Acked = NullEntry },
                 MinimumResendTime = param.MinimumResendTime,
                 MaximumResendTime = param.MaximumResendTime,
-                ReceivedPackets = new SequenceBufferContext { Sequence = NullEntry, AckMask = ReliableAckMask.AllAcked },
-                RttInfo = new RTTInfo { SmoothedVariance = 5, SmoothedRtt = 50, ResendTimeout = 50, LastRtt = 50 },
+                ReceivedPackets = new SequenceBufferContext
+                {
+                    Sequence = NullEntry,
+                    AckMask = ReliableAckMask.AllAcked,
+                },
+                RttInfo = new RTTInfo
+                {
+                    SmoothedVariance = 5,
+                    SmoothedRtt = 50,
+                    ResendTimeout = 50,
+                    LastRtt = 50,
+                },
                 TimerDataOffset = AlignedSizeOf<SharedContext>(),
                 TimerDataStride = AlignedSizeOf<PacketTimers>(),
-                RemoteTimerDataOffset = AlignedSizeOf<SharedContext>() + AlignedSizeOf<PacketTimers>() * param.WindowSize,
-                RemoteTimerDataStride = AlignedSizeOf<PacketTimers>()
+                RemoteTimerDataOffset =
+                    AlignedSizeOf<SharedContext>() + AlignedSizeOf<PacketTimers>() * param.WindowSize,
+                RemoteTimerDataStride = AlignedSizeOf<PacketTimers>(),
             };
             return *notifier;
         }
@@ -435,7 +457,9 @@ namespace Unity.Networking.Transport.Utilities
             ctx->Capacity = param.WindowSize;
             ctx->IndexStride = AlignedSizeOf<PacketInformation>();
             ctx->IndexPtrOffset = AlignedSizeOf<Context>();
-            ctx->DataStride = (NetworkParameterConstants.AbsoluteMaxMessageSize + NetworkPipelineProcessor.AlignmentMinusOne) & (~NetworkPipelineProcessor.AlignmentMinusOne);
+            ctx->DataStride =
+                (NetworkParameterConstants.AbsoluteMaxMessageSize + NetworkPipelineProcessor.AlignmentMinusOne)
+                & (~NetworkPipelineProcessor.AlignmentMinusOne);
             ctx->DataPtrOffset = ctx->IndexPtrOffset + (ctx->IndexStride * ctx->Capacity);
             ctx->Resume = NullEntry;
             ctx->Delivered = NullEntry;
@@ -467,9 +491,9 @@ namespace Unity.Networking.Transport.Utilities
             PacketInformation* info = GetPacketInformation(self, sequence);
             info->SequenceId = sequence;
             info->Size = (ushort)length;
-            info->HeaderPadding = 0;      // Not used for packets queued for resume receive
-            info->LastHeaderDelta = 0;    // Not used for packets queued for resume receive
-            info->SendTime = -1;          // Not used for packets queued for resume receive
+            info->HeaderPadding = 0; // Not used for packets queued for resume receive
+            info->LastHeaderDelta = 0; // Not used for packets queued for resume receive
+            info->SendTime = -1; // Not used for packets queued for resume receive
 
             byte* dataPtr = GetPacketPtr((Context*)self, sequence);
             UnsafeUtility.MemCpy(dataPtr, data, length);
@@ -660,7 +684,8 @@ namespace Unity.Networking.Transport.Utilities
 
             if (info->SequenceId == nextExpectedSequenceId)
             {
-                var offset = reliable->DataPtrOffset + ((nextExpectedSequenceId % reliable->Capacity) * reliable->DataStride);
+                var offset =
+                    reliable->DataPtrOffset + ((nextExpectedSequenceId % reliable->Capacity) * reliable->DataStride);
                 var inBuffer = default(InboundRecvBuffer);
                 inBuffer.buffer = context.internalProcessBuffer + offset;
                 inBuffer.bufferLength = info->Size;
@@ -752,7 +777,12 @@ namespace Unity.Networking.Transport.Utilities
             return sequence;
         }
 
-        internal static unsafe int ReadHeader(ReadOnlySpan<byte> buffer, out PacketHeader header, out ReliableAckMask mask, int windowSize)
+        internal static unsafe int ReadHeader(
+            ReadOnlySpan<byte> buffer,
+            out PacketHeader header,
+            out ReliableAckMask mask,
+            int windowSize
+        )
         {
             header = default;
             mask = default;
@@ -774,7 +804,9 @@ namespace Unity.Networking.Transport.Utilities
             var maskSize = (int)header.AckMaskLength;
             if ((maskSize == 0 && windowSize > 64) || (maskSize != 0 && windowSize <= 64))
             {
-                Debug.LogError("Reliable pipeline: received an invalid header (ack mask length doesn't match window size).");
+                Debug.LogError(
+                    "Reliable pipeline: received an invalid header (ack mask length doesn't match window size)."
+                );
                 return 0;
             }
 
@@ -793,7 +825,11 @@ namespace Unity.Networking.Transport.Utilities
             return baseHeaderSize + maskSize;
         }
 
-        internal static unsafe void WriteHeader(ref NetworkPipelineContext ctx, PacketType type, long sequence = NullEntry)
+        internal static unsafe void WriteHeader(
+            ref NetworkPipelineContext ctx,
+            PacketType type,
+            long sequence = NullEntry
+        )
         {
             var reliable = (SharedContext*)ctx.internalSharedProcessBuffer;
 
@@ -816,7 +852,9 @@ namespace Unity.Networking.Transport.Utilities
             {
                 // We only optimize if our peer has acknowledged at least one of our packets.
                 var shouldOptimize = reliable->SentPackets.Acked != NullEntry;
-                maskLength = shouldOptimize ? reliable->ReceivedPackets.AckMask.MinimumWriteSize() : reliable->WindowSize / 8;
+                maskLength = shouldOptimize
+                    ? reliable->ReceivedPackets.AckMask.MinimumWriteSize()
+                    : reliable->WindowSize / 8;
                 header.AckMaskLength = (byte)maskLength;
             }
 
@@ -842,7 +880,12 @@ namespace Unity.Networking.Transport.Utilities
             timerData->ReceiveTime = 0;
         }
 
-        internal static unsafe void StoreReceiveTimestamp(byte* sharedBuffer, long sequenceId, long timestamp, ushort processingTime)
+        internal static unsafe void StoreReceiveTimestamp(
+            byte* sharedBuffer,
+            long sequenceId,
+            long timestamp,
+            ushort processingTime
+        )
         {
             var sharedCtx = (SharedContext*)sharedBuffer;
             var rttInfo = sharedCtx->RttInfo;
@@ -855,7 +898,8 @@ namespace Unity.Networking.Transport.Utilities
                 timerData->ReceiveTime = timestamp;
                 timerData->ProcessingTime = processingTime;
 
-                rttInfo.LastRtt = (int)Math.Max(timerData->ReceiveTime - timerData->SentTime - timerData->ProcessingTime, 1);
+                rttInfo.LastRtt = (int)
+                    Math.Max(timerData->ReceiveTime - timerData->SentTime - timerData->ProcessingTime, 1);
                 var delta = rttInfo.LastRtt - rttInfo.SmoothedRtt;
                 rttInfo.SmoothedRtt += delta / 8;
                 rttInfo.SmoothedVariance += (math.abs(delta) - rttInfo.SmoothedVariance) / 4;
@@ -902,7 +946,8 @@ namespace Unity.Networking.Transport.Utilities
         {
             var sharedCtx = (SharedContext*)sharedBuffer;
             var index = sequenceId % sharedCtx->WindowSize;
-            var timerPtr = (long)sharedBuffer + sharedCtx->RemoteTimerDataOffset + sharedCtx->RemoteTimerDataStride * index;
+            var timerPtr =
+                (long)sharedBuffer + sharedCtx->RemoteTimerDataOffset + sharedCtx->RemoteTimerDataStride * index;
             return (PacketTimers*)timerPtr;
         }
 
@@ -914,7 +959,10 @@ namespace Unity.Networking.Transport.Utilities
 
             // If we've entered a new overflow cycle, the upper 50 bits of the 64 bit sequence ID have changed.
             // We only consider this if the overflow cycle has incremented by exactly one. Any other case is an out of order packet.
-            if (overflowCycle == context.LastReceivedOverflowCycle + 1 || (overflowCycle == 0 && context.LastReceivedOverflowCycle == 3))
+            if (
+                overflowCycle == context.LastReceivedOverflowCycle + 1
+                || (overflowCycle == 0 && context.LastReceivedOverflowCycle == 3)
+            )
             {
                 ++context.NumberOfOverflowsDetected;
             }
@@ -928,7 +976,10 @@ namespace Unity.Networking.Transport.Utilities
             }
             // If we're exactly one overflow cycle behind for this packet, this is an out of order packet that may still be valid to process.
             // The upper 50 bits are exactly one less than the number of overflows detected.
-            else if (overflowCycle == context.LastReceivedOverflowCycle - 1 || (overflowCycle == 3 && context.LastReceivedOverflowCycle == 0))
+            else if (
+                overflowCycle == context.LastReceivedOverflowCycle - 1
+                || (overflowCycle == 3 && context.LastReceivedOverflowCycle == 0)
+            )
             {
                 upper50Bits = context.NumberOfOverflowsDetected - 1;
             }
@@ -962,7 +1013,6 @@ namespace Unity.Networking.Transport.Utilities
 
             var newerThanMostRecent = sequenceId64Bits > reliable->ReceivedPackets.Sequence;
             var distance = (int)math.abs(sequenceId64Bits - reliable->ReceivedPackets.Sequence);
-
 
             // If the packet is older than the most recent sequence number, and if it doesn't fit
             // in the window, then the packet is stale and should be ignored.
@@ -1007,7 +1057,10 @@ namespace Unity.Networking.Transport.Utilities
                 // arrived after more than the resend timeout since we received the latest packet.
                 // A packet that arrives within the resend timeout is not likely to be a resend, and
                 // more likely to reflect the actual network conditions.
-                var timerData = GetRemotePacketTimer(context.internalSharedProcessBuffer, reliable->ReceivedPackets.Sequence);
+                var timerData = GetRemotePacketTimer(
+                    context.internalSharedProcessBuffer,
+                    reliable->ReceivedPackets.Sequence
+                );
                 var mostRecentReceiveTime = timerData->ReceiveTime;
                 var timeDelta = context.timestamp - mostRecentReceiveTime;
                 var updateDuplicates = timeDelta <= CurrentResendTime(context.internalSharedProcessBuffer);
@@ -1027,7 +1080,7 @@ namespace Unity.Networking.Transport.Utilities
                 }
 
                 reliable->ReceivedPackets.AckMask.Ack(distance);
-                
+
                 if (updateOutOfOrder)
                 {
                     // A packet that arrives out of order will have been counted as dropped first.
@@ -1043,13 +1096,21 @@ namespace Unity.Networking.Transport.Utilities
             return sequenceId64Bits;
         }
 
-        internal static unsafe void ReadAckPacket(NetworkPipelineContext context, PacketHeader header, ReliableAckMask mask)
+        internal static unsafe void ReadAckPacket(
+            NetworkPipelineContext context,
+            PacketHeader header,
+            ReliableAckMask mask
+        )
         {
             SharedContext* reliable = (SharedContext*)context.internalSharedProcessBuffer;
 
             // Store receive timestamp for our acked sequence ID with remote processing time
-            StoreReceiveTimestamp(context.internalSharedProcessBuffer, header.AckedSequenceId, context.timestamp, header.ProcessingTime);
-
+            StoreReceiveTimestamp(
+                context.internalSharedProcessBuffer,
+                header.AckedSequenceId,
+                context.timestamp,
+                header.ProcessingTime
+            );
 
             var sequenceId64Bits = GetSequenceId64Bits(ref reliable->SentPackets, header.AckedSequenceId);
 
@@ -1081,9 +1142,9 @@ namespace Unity.Networking.Transport.Utilities
             // If the last received sequence ID has not been acked yet, or the set of acked packet in the window
             // changed without the sequence ID updating (can happen when receiving out of order packets), or we've
             // received a lot of duplicates since last sending a ACK.
-            return shared->ReceivedPackets.Acked < shared->ReceivedPackets.Sequence ||
-                shared->ReceivedPackets.AckMask != shared->ReceivedPackets.LastAckMask ||
-                shared->DuplicatesSinceLastAck >= MaxDuplicatesSinceLastAck;
+            return shared->ReceivedPackets.Acked < shared->ReceivedPackets.Sequence
+                || shared->ReceivedPackets.AckMask != shared->ReceivedPackets.LastAckMask
+                || shared->DuplicatesSinceLastAck >= MaxDuplicatesSinceLastAck;
         }
 
         /// <summary>
@@ -1096,7 +1157,12 @@ namespace Unity.Networking.Transport.Utilities
         /// <param name="driver">Driver to modify.</param>
         /// <param name="pipeline">Pipeline to modify.</param>
         /// <param name="connection">Connection to modify the value for.</param>
-        public static unsafe void SetMinimumResendTime(int value, NetworkDriver driver, NetworkPipeline pipeline, NetworkConnection connection)
+        public static unsafe void SetMinimumResendTime(
+            int value,
+            NetworkDriver driver,
+            NetworkPipeline pipeline,
+            NetworkConnection connection
+        )
         {
             var stageId = NetworkPipelineStageId.Get<ReliableSequencedPipelineStage>();
             driver.GetPipelineBuffers(pipeline, stageId, connection, out _, out _, out var sharedBuffer);
@@ -1115,7 +1181,12 @@ namespace Unity.Networking.Transport.Utilities
         /// <param name="driver">Driver to modify.</param>
         /// <param name="pipeline">Pipeline to modify.</param>
         /// <param name="connection">Connection to modify the value for.</param>
-        public static unsafe void SetMaximumResendTime(int value, NetworkDriver driver, NetworkPipeline pipeline, NetworkConnection connection)
+        public static unsafe void SetMaximumResendTime(
+            int value,
+            NetworkDriver driver,
+            NetworkPipeline pipeline,
+            NetworkConnection connection
+        )
         {
             var stageId = NetworkPipelineStageId.Get<ReliableSequencedPipelineStage>();
             driver.GetPipelineBuffers(pipeline, stageId, connection, out _, out _, out var sharedBuffer);

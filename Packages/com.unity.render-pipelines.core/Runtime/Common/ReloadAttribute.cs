@@ -8,10 +8,10 @@ namespace UnityEngine.Rendering
     /// </summary>
     /// <remarks>
     /// This attribute is designed for use in the Unity Editor and has no effect at runtime.
-    /// 
+    ///
     /// <see cref="IRenderPipelineResources"/> have their own attribute <see cref="ResourcePathAttribute"/> to do this.
     /// When using them, resource reloading is handled automatically by the engine and does not require calling ResourceReloader.
-    /// 
+    ///
     /// While ResourceReloader was originally created for handling Scriptable Render Pipeline (SRP) resources, it has been replaced by <see cref="IRenderPipelineResources"/>.
     /// The <see cref="ResourceReloader"/>, <see cref="ResourceReloader"/> and <see cref="ReloadGroupAttribute"/> remain available for for user-defined assets.
     /// </remarks>
@@ -28,7 +28,7 @@ namespace UnityEngine.Rendering
     ///{
     ///    [Reload("Shaders/Blit.shader")]
     ///    public Shader blit;
-    ///    
+    ///
     ///    // Added in version 2
     ///    [Reload("Shaders/betterBlit.shader")]
     ///    public Shader betterBlit;
@@ -136,8 +136,7 @@ namespace UnityEngine.Rendering
         /// </code>
         /// </example>
         public ReloadAttribute(string path, Package package = Package.Root)
-            : this(new[] { path }, package)
-        { }
+            : this(new[] { path }, package) { }
 
         /// <summary>
         /// Creates a new <see cref="ReloadAttribute"/> for an array using automatic path name
@@ -163,8 +162,7 @@ namespace UnityEngine.Rendering
         ///}
         /// </code>
         /// </example>
-        public ReloadAttribute(string pathFormat, int rangeMin, int rangeMax,
-            Package package = Package.Root)
+        public ReloadAttribute(string pathFormat, int rangeMin, int rangeMax, Package package = Package.Root)
         {
 #if UNITY_EDITOR
             this.package = package;

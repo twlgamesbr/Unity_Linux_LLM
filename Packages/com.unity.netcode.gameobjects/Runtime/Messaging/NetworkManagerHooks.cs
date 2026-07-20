@@ -12,44 +12,45 @@ namespace Unity.Netcode
             m_NetworkManager = manager;
         }
 
-        public void OnBeforeSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery) where T : INetworkMessage
-        {
-        }
+        public void OnBeforeSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery)
+            where T : INetworkMessage { }
 
-        public void OnAfterSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery, int messageSizeBytes) where T : INetworkMessage
-        {
-        }
+        public void OnAfterSendMessage<T>(ulong clientId, ref T message, NetworkDelivery delivery, int messageSizeBytes)
+            where T : INetworkMessage { }
 
-        public void OnBeforeReceiveMessage(ulong senderId, Type messageType, int messageSizeBytes)
-        {
-        }
+        public void OnBeforeReceiveMessage(ulong senderId, Type messageType, int messageSizeBytes) { }
 
-        public void OnAfterReceiveMessage(ulong senderId, Type messageType, int messageSizeBytes)
-        {
-        }
+        public void OnAfterReceiveMessage(ulong senderId, Type messageType, int messageSizeBytes) { }
 
-        public void OnBeforeSendBatch(ulong clientId, int messageCount, int batchSizeInBytes, NetworkDelivery delivery)
-        {
-        }
+        public void OnBeforeSendBatch(
+            ulong clientId,
+            int messageCount,
+            int batchSizeInBytes,
+            NetworkDelivery delivery
+        ) { }
 
-        public void OnAfterSendBatch(ulong clientId, int messageCount, int batchSizeInBytes, NetworkDelivery delivery)
-        {
-        }
+        public void OnAfterSendBatch(
+            ulong clientId,
+            int messageCount,
+            int batchSizeInBytes,
+            NetworkDelivery delivery
+        ) { }
 
-        public void OnBeforeReceiveBatch(ulong senderId, int messageCount, int batchSizeInBytes)
-        {
-        }
+        public void OnBeforeReceiveBatch(ulong senderId, int messageCount, int batchSizeInBytes) { }
 
-        public void OnAfterReceiveBatch(ulong senderId, int messageCount, int batchSizeInBytes)
-        {
-        }
+        public void OnAfterReceiveBatch(ulong senderId, int messageCount, int batchSizeInBytes) { }
 
         public bool OnVerifyCanSend(ulong destinationId, Type messageType, NetworkDelivery delivery)
         {
             return !m_NetworkManager.MessageManager.StopProcessing;
         }
 
-        public bool OnVerifyCanReceive(ulong senderId, Type messageType, FastBufferReader messageContent, ref NetworkContext context)
+        public bool OnVerifyCanReceive(
+            ulong senderId,
+            Type messageType,
+            FastBufferReader messageContent,
+            ref NetworkContext context
+        )
         {
             if (m_NetworkManager.IsServer)
             {
@@ -58,28 +59,46 @@ namespace Unity.Netcode
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
                         var transportErrorMsg = GetTransportErrorMessage(messageContent, m_NetworkManager);
-                        NetworkLog.LogError($"A {nameof(ConnectionApprovedMessage)} was received from a client on the server side. {transportErrorMsg}");
+                        NetworkLog.LogError(
+                            $"A {nameof(ConnectionApprovedMessage)} was received from a client on the server side. {transportErrorMsg}"
+                        );
                     }
 
                     return false;
                 }
 
-                if (m_NetworkManager.ConnectionManager.PendingClients.TryGetValue(senderId, out PendingClient client) && (client.ConnectionState == PendingClient.State.PendingApproval || (client.ConnectionState == PendingClient.State.PendingConnection && messageType != typeof(ConnectionRequestMessage))))
+                if (
+                    m_NetworkManager.ConnectionManager.PendingClients.TryGetValue(senderId, out PendingClient client)
+                    && (
+                        client.ConnectionState == PendingClient.State.PendingApproval
+                        || (
+                            client.ConnectionState == PendingClient.State.PendingConnection
+                            && messageType != typeof(ConnectionRequestMessage)
+                        )
+                    )
+                )
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
-                        NetworkLog.LogWarning($"Message received from {nameof(senderId)}={senderId} before it has been accepted.");
+                        NetworkLog.LogWarning(
+                            $"Message received from {nameof(senderId)}={senderId} before it has been accepted."
+                        );
                     }
 
                     return false;
                 }
 
-                if (m_NetworkManager.ConnectedClients.TryGetValue(senderId, out NetworkClient connectedClient) && messageType == typeof(ConnectionRequestMessage))
+                if (
+                    m_NetworkManager.ConnectedClients.TryGetValue(senderId, out NetworkClient connectedClient)
+                    && messageType == typeof(ConnectionRequestMessage)
+                )
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
                         var transportErrorMsg = GetTransportErrorMessage(messageContent, m_NetworkManager);
-                        NetworkLog.LogError($"A {nameof(ConnectionRequestMessage)} was received from a client when the connection has already been established. {transportErrorMsg}");
+                        NetworkLog.LogError(
+                            $"A {nameof(ConnectionRequestMessage)} was received from a client when the connection has already been established. {transportErrorMsg}"
+                        );
                     }
 
                     return false;
@@ -92,19 +111,30 @@ namespace Unity.Netcode
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
                         var transportErrorMsg = GetTransportErrorMessage(messageContent, m_NetworkManager);
-                        NetworkLog.LogError($"A {nameof(ConnectionRequestMessage)} was received from the server on the client side. {transportErrorMsg}");
+                        NetworkLog.LogError(
+                            $"A {nameof(ConnectionRequestMessage)} was received from the server on the client side. {transportErrorMsg}"
+                        );
                     }
 
                     return false;
                 }
 
-                if (m_NetworkManager.IsConnectedClient && messageType == typeof(ConnectionApprovedMessage) &&
-                    !(m_NetworkManager.CMBServiceConnection && m_NetworkManager.LocalClient.IsSessionOwner && m_NetworkManager.NetworkConfig.EnableSceneManagement))
+                if (
+                    m_NetworkManager.IsConnectedClient
+                    && messageType == typeof(ConnectionApprovedMessage)
+                    && !(
+                        m_NetworkManager.CMBServiceConnection
+                        && m_NetworkManager.LocalClient.IsSessionOwner
+                        && m_NetworkManager.NetworkConfig.EnableSceneManagement
+                    )
+                )
                 {
                     if (NetworkLog.CurrentLogLevel <= LogLevel.Normal)
                     {
                         var transportErrorMsg = GetTransportErrorMessage(messageContent, m_NetworkManager);
-                        NetworkLog.LogError($"A {nameof(ConnectionApprovedMessage)} was received from the server when a connection has already been established. {transportErrorMsg}");
+                        NetworkLog.LogError(
+                            $"A {nameof(ConnectionApprovedMessage)} was received from the server when a connection has already been established. {transportErrorMsg}"
+                        );
                     }
 
                     return false;
@@ -136,12 +166,10 @@ namespace Unity.Netcode
             return transportVersion;
         }
 
-        public void OnBeforeHandleMessage<T>(ref T message, ref NetworkContext context) where T : INetworkMessage
-        {
-        }
+        public void OnBeforeHandleMessage<T>(ref T message, ref NetworkContext context)
+            where T : INetworkMessage { }
 
-        public void OnAfterHandleMessage<T>(ref T message, ref NetworkContext context) where T : INetworkMessage
-        {
-        }
+        public void OnAfterHandleMessage<T>(ref T message, ref NetworkContext context)
+            where T : INetworkMessage { }
     }
 }

@@ -4,7 +4,6 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
-
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -16,8 +15,10 @@ namespace UnityEngine.Rendering
         public static readonly EntityId DefaultMesh = EntityId.None;
         public static readonly ushort DefaultSubMeshStartIndex = 0;
         public static readonly AABB DefaultLocalBounds = default;
-        public static readonly InternalMeshRendererSettings DefaultRendererSettings = InternalMeshRendererSettings.Default;
-        public static readonly InternalMeshLodRendererSettings DefaultMeshLodRendererSettings = InternalMeshLodRendererSettings.Default;
+        public static readonly InternalMeshRendererSettings DefaultRendererSettings =
+            InternalMeshRendererSettings.Default;
+        public static readonly InternalMeshLodRendererSettings DefaultMeshLodRendererSettings =
+            InternalMeshLodRendererSettings.Default;
         public static readonly int DefaultParentLODGroupID = 0;
         public static readonly byte DefaultLODMask = 0;
         public static readonly short DefaultLightmapIndex = LightmapUtils.LightmapIndexNull;
@@ -61,12 +62,15 @@ namespace UnityEngine.Rendering
 
         public NativeArray<InstanceHandle> indexToHandle => m_IndexToHandle.GetSubArray(0, instanceCount);
         public NativeArray<EntityId> instanceIDs => m_InstanceIDs.GetSubArray(0, instanceCount);
-        public NativeArray<EmbeddedArray32<EntityId>> materialIDArrays => m_MaterialIDArrays.GetSubArray(0, instanceCount);
+        public NativeArray<EmbeddedArray32<EntityId>> materialIDArrays =>
+            m_MaterialIDArrays.GetSubArray(0, instanceCount);
         public NativeArray<EntityId> meshIDs => m_MeshIDs.GetSubArray(0, instanceCount);
-        public NativeArray<InternalMeshLodRendererSettings> meshLodRendererSettings => m_MeshLodRendererSettings.GetSubArray(0, instanceCount);
+        public NativeArray<InternalMeshLodRendererSettings> meshLodRendererSettings =>
+            m_MeshLodRendererSettings.GetSubArray(0, instanceCount);
         public NativeArray<ushort> subMeshStartIndices => m_SubMeshStartIndices.GetSubArray(0, instanceCount);
         public NativeArray<AABB> localAABBs => m_LocalAABBs.GetSubArray(0, instanceCount);
-        public NativeArray<InternalMeshRendererSettings> rendererSettings => m_RendererSettings.GetSubArray(0, instanceCount);
+        public NativeArray<InternalMeshRendererSettings> rendererSettings =>
+            m_RendererSettings.GetSubArray(0, instanceCount);
         public NativeArray<short> lightmapIndices => m_LightmapIndices.GetSubArray(0, instanceCount);
         public NativeArray<GPUInstanceIndex> lodGroupIndices => m_LODGroupIndices.GetSubArray(0, instanceCount);
         public NativeArray<byte> lodMasks => m_LODMasks.GetSubArray(0, instanceCount);
@@ -84,43 +88,70 @@ namespace UnityEngine.Rendering
         public NativeArray<ulong> sceneCullingMasks => m_EditorOnly.sceneCullingMasks.GetSubArray(0, instanceCount);
 #endif
 
-        public int instanceCount { get => m_InstancesCount.Value; private set => m_InstancesCount.Value = value; }
+        public int instanceCount
+        {
+            get => m_InstancesCount.Value;
+            private set => m_InstancesCount.Value = value;
+        }
         public int handleCount => m_HandleToIndex.Length;
         public int totalTreeCount => m_TotalTreeCount.Value;
         public int cameraCount => m_PerCameraInstanceDataMap.Count();
-        public unsafe UnsafeAtomicCounter32 atomicTotalTreeCount => new UnsafeAtomicCounter32(m_TotalTreeCount.GetUnsafePtr());
+        public unsafe UnsafeAtomicCounter32 atomicTotalTreeCount =>
+            new UnsafeAtomicCounter32(m_TotalTreeCount.GetUnsafePtr());
 
         public void Initialize(int initCapacity)
         {
             m_InstancesCount = new NativeReference<int>(0, Allocator.Persistent);
             m_TotalTreeCount = new NativeReference<int>(0, Allocator.Persistent);
             m_HandleToIndex = new NativeList<int>(Allocator.Persistent);
-            m_IndexToHandle = new NativeArray<InstanceHandle>(initCapacity, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_IndexToHandle = new NativeArray<InstanceHandle>(
+                initCapacity,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_IndexToHandle.FillArray(InstanceHandle.Invalid);
             m_InstanceIDs = new NativeArray<EntityId>(initCapacity, Allocator.Persistent);
             m_MaterialIDArrays = new NativeArray<EmbeddedArray32<EntityId>>(initCapacity, Allocator.Persistent);
             m_MeshIDs = new NativeArray<EntityId>(initCapacity, Allocator.Persistent);
-            m_MeshLodRendererSettings = new NativeArray<InternalMeshLodRendererSettings>(initCapacity, Allocator.Persistent);
+            m_MeshLodRendererSettings = new NativeArray<InternalMeshLodRendererSettings>(
+                initCapacity,
+                Allocator.Persistent
+            );
             m_SubMeshStartIndices = new NativeArray<ushort>(initCapacity, Allocator.Persistent);
             m_LocalAABBs = new NativeArray<AABB>(initCapacity, Allocator.Persistent);
             m_RendererSettings = new NativeArray<InternalMeshRendererSettings>(initCapacity, Allocator.Persistent);
             m_LightmapIndices = new NativeArray<short>(initCapacity, Allocator.Persistent);
-            m_LODGroupIndices = new NativeArray<GPUInstanceIndex>(initCapacity, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_LODGroupIndices = new NativeArray<GPUInstanceIndex>(
+                initCapacity,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_LODGroupIndices.FillArray(GPUInstanceIndex.Invalid);
             m_LODMasks = new NativeArray<byte>(initCapacity, Allocator.Persistent);
             m_RendererPriorities = new NativeArray<int>(initCapacity, Allocator.Persistent);
-            m_GPUHandles = new NativeArray<InstanceGPUHandle>(initCapacity, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_GPUHandles = new NativeArray<InstanceGPUHandle>(
+                initCapacity,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_GPUHandles.FillArray(InstanceGPUHandle.Invalid);
             m_LocalToWorldIsFlippedBits = new ParallelBitArray(initCapacity, Allocator.Persistent);
             m_WorldAABBs = new NativeArray<AABB>(initCapacity, Allocator.Persistent);
-            m_TetrahedronCacheIndices = new NativeArray<int>(initCapacity, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            m_TetrahedronCacheIndices = new NativeArray<int>(
+                initCapacity,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_TetrahedronCacheIndices.FillArray(InvalidIndex);
             m_MovedInCurrentFrameBits = new ParallelBitArray(initCapacity, Allocator.Persistent);
             m_MovedInPreviousFrameBits = new ParallelBitArray(initCapacity, Allocator.Persistent);
             m_VisibleInPreviousFrameBits = new ParallelBitArray(initCapacity, Allocator.Persistent);
             m_RenderingEnabled = new ParallelBitArray(initCapacity, Allocator.Persistent);
             m_EditorOnly.Initialize(initCapacity);
-            m_PerCameraInstanceDataMap = new NativeParallelHashMap<EntityId, UnsafePerCameraInstanceData>(1, Allocator.Persistent);
+            m_PerCameraInstanceDataMap = new NativeParallelHashMap<EntityId, UnsafePerCameraInstanceData>(
+                1,
+                Allocator.Persistent
+            );
         }
 
         public void Dispose()
@@ -251,7 +282,8 @@ namespace UnityEngine.Rendering
 
         public bool IsFreeInstanceHandle(InstanceHandle instance)
         {
-            return instance.isValid && (instance.index >= m_HandleToIndex.Length || m_HandleToIndex[instance.index] == InvalidIndex);
+            return instance.isValid
+                && (instance.index >= m_HandleToIndex.Length || m_HandleToIndex[instance.index] == InvalidIndex);
         }
 
         public int GetInstanceCapacity()
@@ -377,7 +409,10 @@ namespace UnityEngine.Rendering
                 if (m_PerCameraInstanceDataMap.ContainsKey(cameraID))
                     continue;
 
-                m_PerCameraInstanceDataMap.Add(cameraID, new UnsafePerCameraInstanceData(GetInstanceCapacity(), Allocator.Persistent));
+                m_PerCameraInstanceDataMap.Add(
+                    cameraID,
+                    new UnsafePerCameraInstanceData(GetInstanceCapacity(), Allocator.Persistent)
+                );
             }
         }
 
@@ -467,7 +502,7 @@ namespace UnityEngine.Rendering
                 return new PerCameraInstanceData
                 {
                     meshLods = meshLods.AsNativeArray().GetSubArray(0, instanceCount),
-                    crossFades = crossFades.AsNativeArray().GetSubArray(0, instanceCount)
+                    crossFades = crossFades.AsNativeArray().GetSubArray(0, instanceCount),
                 };
             }
         }
@@ -479,7 +514,11 @@ namespace UnityEngine.Rendering
 
             public void Initialize(int initCapacity)
             {
-                sceneCullingMasks = new NativeArray<ulong>(initCapacity, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                sceneCullingMasks = new NativeArray<ulong>(
+                    initCapacity,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 sceneCullingMasks.FillArray(ulong.MaxValue);
             }
 
@@ -504,9 +543,13 @@ namespace UnityEngine.Rendering
             }
 #else
             public void Initialize(int initCapacity) { }
+
             public void Dispose() { }
+
             public void Grow(int newCapacity) { }
+
             public void Remove(int index, int lastIndex) { }
+
             public void SetDefault(int index) { }
 #endif
         }
@@ -531,7 +574,7 @@ namespace UnityEngine.Rendering
             {
                 packed0 = new float4(m.m00, m.m10, m.m20, m.m01),
                 packed1 = new float4(m.m11, m.m21, m.m02, m.m12),
-                packed2 = new float4(m.m22, m.m03, m.m13, m.m23)
+                packed2 = new float4(m.m22, m.m03, m.m13, m.m23),
             };
         }
 
@@ -541,7 +584,7 @@ namespace UnityEngine.Rendering
             {
                 packed0 = new float4(m.c0.x, m.c0.y, m.c0.z, m.c1.x),
                 packed1 = new float4(m.c1.y, m.c1.z, m.c2.x, m.c2.y),
-                packed2 = new float4(m.c2.z, m.c3.x, m.c3.y, m.c3.z)
+                packed2 = new float4(m.c2.z, m.c3.x, m.c3.y, m.c3.z),
             };
         }
 

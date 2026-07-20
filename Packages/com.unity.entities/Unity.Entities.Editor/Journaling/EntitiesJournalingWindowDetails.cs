@@ -19,15 +19,33 @@ namespace Unity.Entities.Editor
             static readonly string s_SystemHandle = L10n.Tr("Handle");
             static readonly string s_SystemVersion = L10n.Tr("Version");
 
-            static readonly Lazy<Texture2D> s_WorldIcon = new Lazy<Texture2D>(() => PackageResources.LoadIcon("World/World.png"));
-            static readonly Lazy<Texture2D> s_SystemIcon = new Lazy<Texture2D>(() => PackageResources.LoadIcon("System/System.png"));
-            static readonly Lazy<Texture2D> s_EntityIcon = new Lazy<Texture2D>(() => PackageResources.LoadIcon("Entity/Entity.png"));
-            static readonly Lazy<Texture2D> s_ComponentIcon = new Lazy<Texture2D>(() => PackageResources.LoadIcon("Components/Component.png"));
-            static readonly VisualElementTemplate s_DetailsTemplate = PackageResources.LoadTemplate("Journaling/entities-journaling-details");
-            static readonly VisualElementTemplate s_DetailsEntityTemplate = PackageResources.LoadTemplate("Journaling/entities-journaling-details-entity");
-            static readonly VisualElementTemplate s_DetailsComponentTemplate = PackageResources.LoadTemplate("Journaling/entities-journaling-details-component");
-            static readonly VisualElementTemplate s_SearchAndGotoButtons = PackageResources.LoadTemplate("Journaling/search-and-goto-buttons");
-            static readonly StyleSheetWithVariant s_ComponentHeader = PackageResources.LoadStyleSheet("Inspector/component-header");
+            static readonly Lazy<Texture2D> s_WorldIcon = new Lazy<Texture2D>(() =>
+                PackageResources.LoadIcon("World/World.png")
+            );
+            static readonly Lazy<Texture2D> s_SystemIcon = new Lazy<Texture2D>(() =>
+                PackageResources.LoadIcon("System/System.png")
+            );
+            static readonly Lazy<Texture2D> s_EntityIcon = new Lazy<Texture2D>(() =>
+                PackageResources.LoadIcon("Entity/Entity.png")
+            );
+            static readonly Lazy<Texture2D> s_ComponentIcon = new Lazy<Texture2D>(() =>
+                PackageResources.LoadIcon("Components/Component.png")
+            );
+            static readonly VisualElementTemplate s_DetailsTemplate = PackageResources.LoadTemplate(
+                "Journaling/entities-journaling-details"
+            );
+            static readonly VisualElementTemplate s_DetailsEntityTemplate = PackageResources.LoadTemplate(
+                "Journaling/entities-journaling-details-entity"
+            );
+            static readonly VisualElementTemplate s_DetailsComponentTemplate = PackageResources.LoadTemplate(
+                "Journaling/entities-journaling-details-component"
+            );
+            static readonly VisualElementTemplate s_SearchAndGotoButtons = PackageResources.LoadTemplate(
+                "Journaling/search-and-goto-buttons"
+            );
+            static readonly StyleSheetWithVariant s_ComponentHeader = PackageResources.LoadStyleSheet(
+                "Inspector/component-header"
+            );
             static readonly StyleSheetWithVariant s_Variables = PackageResources.LoadStyleSheet("Common/variables");
 
             readonly EntitiesJournalingWindow m_Window;
@@ -137,18 +155,23 @@ namespace Unity.Entities.Editor
                 m_EntitiesTabContent = m_ContentTabs.Q<TabContent>("entities-tab");
                 m_EntitiesTabContent.TabName = s_Entities;
                 m_EntitiesTabContentSplitPane = m_EntitiesTabContent.Q<TwoPaneSplitView>("split-pane");
-                m_EntitiesTabContentSplitPane.RegisterCallback<GeometryChangedEvent>(OnInitialTwoPaneSplitViewGeometryChangedEvent);
+                m_EntitiesTabContentSplitPane.RegisterCallback<GeometryChangedEvent>(
+                    OnInitialTwoPaneSplitViewGeometryChangedEvent
+                );
                 m_EntitiesTabContentTop = m_EntitiesTabContent.Q("entities-tab-top");
                 m_EntitiesTabContentBottom = m_EntitiesTabContent.Q("entities-tab-bottom");
-                m_EntitiesTabContentBottom.RegisterCallback<GeometryChangedEvent>((e) =>
-                {
-                    StylingUtility.AlignInspectorLabelWidth(m_EntitiesTabContentBottom);
-                });
+                m_EntitiesTabContentBottom.RegisterCallback<GeometryChangedEvent>(
+                    (e) =>
+                    {
+                        StylingUtility.AlignInspectorLabelWidth(m_EntitiesTabContentBottom);
+                    }
+                );
 
                 var entitiesList = m_EntitiesTabContent.Q<ListView>("entities-list");
                 entitiesList.fixedItemHeight = 20;
                 entitiesList.makeItem = () => s_DetailsEntityTemplate.Clone();
-                entitiesList.bindItem = (element, index) => BindItem(element, index, GetEntityName, SearchEntity, SelectEntity, EntityExist);
+                entitiesList.bindItem = (element, index) =>
+                    BindItem(element, index, GetEntityName, SearchEntity, SelectEntity, EntityExist);
                 entitiesList.selectionChanged += (items) =>
                 {
                     if (items == null || !items.Any())
@@ -167,9 +190,18 @@ namespace Unity.Entities.Editor
                     entitiesList,
                     entitiesSearch,
                     () => new ReadOnlyEntityViewList(m_Record.Entities),
-                    (e) => new[] { e.Name });
-                entitiesSearch.AddSearchFilterCallbackWithPopupItem<EntitiesJournaling.EntityView, int>(k_EntityIndexToken, e => e.Index, s_EntityIndex);
-                entitiesSearch.AddSearchFilterCallbackWithPopupItem<EntitiesJournaling.EntityView, IEnumerable<string>>(k_ComponentDataValueToken, e => m_Window.GetComponentDataValues(GetEntityComponentData(e)), s_ComponentDataValue);
+                    (e) => new[] { e.Name }
+                );
+                entitiesSearch.AddSearchFilterCallbackWithPopupItem<EntitiesJournaling.EntityView, int>(
+                    k_EntityIndexToken,
+                    e => e.Index,
+                    s_EntityIndex
+                );
+                entitiesSearch.AddSearchFilterCallbackWithPopupItem<EntitiesJournaling.EntityView, IEnumerable<string>>(
+                    k_ComponentDataValueToken,
+                    e => m_Window.GetComponentDataValues(GetEntityComponentData(e)),
+                    s_ComponentDataValue
+                );
 
                 m_EntitiesFooter = m_EntitiesTabContent.Q("entities-footer");
                 m_EntitiesFooterFoldout = m_EntitiesFooter.Q<Foldout>("entities-footer-foldout");
@@ -187,14 +219,16 @@ namespace Unity.Entities.Editor
                 var componentsList = m_ComponentsTabContent.Q<ListView>("components-list");
                 componentsList.fixedItemHeight = 20;
                 componentsList.makeItem = () => s_DetailsComponentTemplate.Clone();
-                componentsList.bindItem = (element, index) => BindItem(element, index, GetComponentTypeName, SearchComponent, SelectComponent, ComponentExist);
+                componentsList.bindItem = (element, index) =>
+                    BindItem(element, index, GetComponentTypeName, SearchComponent, SelectComponent, ComponentExist);
 
                 var componentsSearch = m_ComponentsTabContent.Q<SearchElement>("components-search");
                 m_ComponentsList = new SearchableList<ListView, ComponentTypeView>(
                     componentsList,
                     componentsSearch,
                     () => new ReadOnlyComponentTypeViewList(m_Record.ComponentTypes),
-                    (c) => new[] { c.Name });
+                    (c) => new[] { c.Name }
+                );
 
                 SetEntitiesFooterVisibility(false);
             }
@@ -314,7 +348,9 @@ namespace Unity.Entities.Editor
                             m_ContentSystemName.value = systemView.Name;
                             m_ContentSystemHandle.value = systemView.Handle.m_Handle.ToString();
                             m_ContentSystemVersion.value = systemView.Handle.m_Version.ToString();
-                            m_ContentSystemGotoButton.SetEnabled(record.World.Reference != null && systemView.Handle != default);
+                            m_ContentSystemGotoButton.SetEnabled(
+                                record.World.Reference != null && systemView.Handle != default
+                            );
                             m_ContentWorld.SetVisibility(false);
                             m_ContentSystem.SetVisibility(true);
                             m_ContentTabs.SetVisibility(false);
@@ -366,7 +402,9 @@ namespace Unity.Entities.Editor
             {
                 // This won't work in window OnEnable, have to postpone it here
                 m_EntitiesTabContentSplitPane.CollapseChild(1);
-                m_EntitiesTabContentSplitPane.UnregisterCallback<GeometryChangedEvent>(OnInitialTwoPaneSplitViewGeometryChangedEvent);
+                m_EntitiesTabContentSplitPane.UnregisterCallback<GeometryChangedEvent>(
+                    OnInitialTwoPaneSplitViewGeometryChangedEvent
+                );
             }
 
             object GetEntityComponentData(EntitiesJournaling.EntityView entity)
@@ -392,8 +430,12 @@ namespace Unity.Entities.Editor
                     var componentTypeIndex = TypeManager.GetTypeIndex(componentType);
                     var componentTypeName = componentType.Name;
                     m_EntitiesFooterFoldout.text = componentTypeName;
-                    m_EntitiesFooterFoldout.Q<Button>("search-button").clickable = new Clickable(() => SearchComponent(componentTypeIndex.Index));
-                    m_EntitiesFooterFoldout.Q<Button>("goto-button").clickable = new Clickable(() => SelectComponent(componentType));
+                    m_EntitiesFooterFoldout.Q<Button>("search-button").clickable = new Clickable(() =>
+                        SearchComponent(componentTypeIndex.Index)
+                    );
+                    m_EntitiesFooterFoldout.Q<Button>("goto-button").clickable = new Clickable(() =>
+                        SelectComponent(componentType)
+                    );
 
                     // Important to set footer visible before changing target and aligning
                     SetEntitiesFooterVisibility(true);
@@ -417,7 +459,14 @@ namespace Unity.Entities.Editor
                 m_EntitiesTabContentBottom.SetVisibility(isVisible);
             }
 
-            void BindItem(VisualElement element, int index, Func<int, string> getValue, Action<int> search, Action<int> goTo, Func<int, bool> exist)
+            void BindItem(
+                VisualElement element,
+                int index,
+                Func<int, string> getValue,
+                Action<int> search,
+                Action<int> goTo,
+                Func<int, bool> exist
+            )
             {
                 element.Q<Label>("name").text = getValue(index);
                 element.Q<Button>("search").clickable = new Clickable(() => search(index));

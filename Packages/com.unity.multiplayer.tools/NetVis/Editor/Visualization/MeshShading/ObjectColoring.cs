@@ -48,7 +48,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             {
                 NetVisMetric.Bandwidth => GetColorForBandwidth(objectId, out color),
                 NetVisMetric.Ownership => GetColorForOwnership(objectId, out color),
-                NetVisMetric.None or _ => throw new ArgumentOutOfRangeException()
+                NetVisMetric.None or _ => throw new ArgumentOutOfRangeException(),
             };
         }
 

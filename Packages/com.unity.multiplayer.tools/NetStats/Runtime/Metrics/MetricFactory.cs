@@ -5,7 +5,10 @@ namespace Unity.Multiplayer.Tools.NetStats
 {
     class MetricFactory
     {
-        readonly Dictionary<MetricContainerType, IMetricFactory> k_Factories = new Dictionary<MetricContainerType, IMetricFactory>()
+        readonly Dictionary<MetricContainerType, IMetricFactory> k_Factories = new Dictionary<
+            MetricContainerType,
+            IMetricFactory
+        >()
         {
             { MetricContainerType.Counter, new CounterFactory() },
             { MetricContainerType.Event, new EventMetricFactory() },

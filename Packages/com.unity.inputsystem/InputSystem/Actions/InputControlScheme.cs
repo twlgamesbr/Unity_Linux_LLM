@@ -95,7 +95,11 @@ namespace UnityEngine.InputSystem
         /// associated with the control scheme. If this is <c>null</c> or empty, <paramref name="name"/> is
         /// used instead (with <see cref="InputBinding.Separator"/> characters stripped from the name).</param>
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c> or empty.</exception>
-        public InputControlScheme(string name, IEnumerable<DeviceRequirement> devices = null, string bindingGroup = null)
+        public InputControlScheme(
+            string name,
+            IEnumerable<DeviceRequirement> devices = null,
+            string bindingGroup = null
+        )
             : this()
         {
             if (string.IsNullOrEmpty(name))
@@ -112,7 +116,7 @@ namespace UnityEngine.InputSystem
             }
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         internal InputControlScheme(SerializedProperty sp)
         {
             var requirements = new List<DeviceRequirement>();
@@ -122,19 +126,23 @@ namespace UnityEngine.InputSystem
 
             foreach (SerializedProperty deviceRequirement in deviceRequirementsArray)
             {
-                requirements.Add(new DeviceRequirement
-                {
-                    controlPath = deviceRequirement.FindPropertyRelative(nameof(DeviceRequirement.m_ControlPath)).stringValue,
-                    m_Flags = (DeviceRequirement.Flags)deviceRequirement.FindPropertyRelative(nameof(DeviceRequirement.m_Flags)).enumValueFlag
-                });
+                requirements.Add(
+                    new DeviceRequirement
+                    {
+                        controlPath = deviceRequirement
+                            .FindPropertyRelative(nameof(DeviceRequirement.m_ControlPath))
+                            .stringValue,
+                        m_Flags = (DeviceRequirement.Flags)
+                            deviceRequirement.FindPropertyRelative(nameof(DeviceRequirement.m_Flags)).enumValueFlag,
+                    }
+                );
             }
 
             m_Name = sp.FindPropertyRelative(nameof(m_Name)).stringValue;
             m_DeviceRequirements = requirements.ToArray();
             m_BindingGroup = sp.FindPropertyRelative(nameof(m_BindingGroup)).stringValue;
         }
-
-        #endif
+#endif
 
         internal void SetNameAndBindingGroup(string name, string bindingGroup = null)
         {
@@ -222,7 +230,12 @@ namespace UnityEngine.InputSystem
         /// </code>
         /// </example>
         /// </remarks>
-        public static InputControlScheme? FindControlSchemeForDevices<TDevices, TSchemes>(TDevices devices, TSchemes schemes, InputDevice mustIncludeDevice = null, bool allowUnsuccesfulMatch = false)
+        public static InputControlScheme? FindControlSchemeForDevices<TDevices, TSchemes>(
+            TDevices devices,
+            TSchemes schemes,
+            InputDevice mustIncludeDevice = null,
+            bool allowUnsuccesfulMatch = false
+        )
             where TDevices : IReadOnlyList<InputDevice>
             where TSchemes : IEnumerable<InputControlScheme>
         {
@@ -231,15 +244,30 @@ namespace UnityEngine.InputSystem
             if (schemes == null)
                 throw new ArgumentNullException(nameof(schemes));
 
-            if (!FindControlSchemeForDevices(devices, schemes, out var controlScheme, out var matchResult, mustIncludeDevice, allowUnsuccesfulMatch))
+            if (
+                !FindControlSchemeForDevices(
+                    devices,
+                    schemes,
+                    out var controlScheme,
+                    out var matchResult,
+                    mustIncludeDevice,
+                    allowUnsuccesfulMatch
+                )
+            )
                 return null;
 
             matchResult.Dispose();
             return controlScheme;
         }
 
-        public static bool FindControlSchemeForDevices<TDevices, TSchemes>(TDevices devices, TSchemes schemes,
-            out InputControlScheme controlScheme, out MatchResult matchResult, InputDevice mustIncludeDevice = null, bool allowUnsuccessfulMatch = false)
+        public static bool FindControlSchemeForDevices<TDevices, TSchemes>(
+            TDevices devices,
+            TSchemes schemes,
+            out InputControlScheme controlScheme,
+            out MatchResult matchResult,
+            InputDevice mustIncludeDevice = null,
+            bool allowUnsuccessfulMatch = false
+        )
             where TDevices : IReadOnlyList<InputDevice>
             where TSchemes : IEnumerable<InputControlScheme>
         {
@@ -443,8 +471,13 @@ namespace UnityEngine.InputSystem
                         else
                         {
                             var deviceLayoutOfControl = matchedControl.device.m_Layout;
-                            if (InputControlLayout.s_Layouts.ComputeDistanceInInheritanceHierarchy(deviceLayoutOfControlPath,
-                                deviceLayoutOfControl, out var distance))
+                            if (
+                                InputControlLayout.s_Layouts.ComputeDistanceInInheritanceHierarchy(
+                                    deviceLayoutOfControlPath,
+                                    deviceLayoutOfControl,
+                                    out var distance
+                                )
+                            )
                             {
                                 score += 1 + 1f / (Math.Abs(distance) + 1);
                             }
@@ -540,10 +573,9 @@ namespace UnityEngine.InputSystem
 
             return new MatchResult
             {
-                m_Result = !haveAllRequired
-                    ? MatchResult.Result.MissingRequired
-                    : !haveAllOptional
-                    ? MatchResult.Result.MissingOptional
+                m_Result =
+                    !haveAllRequired ? MatchResult.Result.MissingRequired
+                    : !haveAllOptional ? MatchResult.Result.MissingOptional
                     : MatchResult.Result.AllSatisfied,
                 m_Controls = controls,
                 m_Requirements = m_DeviceRequirements,
@@ -553,8 +585,12 @@ namespace UnityEngine.InputSystem
 
         public bool Equals(InputControlScheme other)
         {
-            if (!(string.Equals(m_Name, other.m_Name, StringComparison.InvariantCultureIgnoreCase) &&
-                  string.Equals(m_BindingGroup, other.m_BindingGroup, StringComparison.InvariantCultureIgnoreCase)))
+            if (
+                !(
+                    string.Equals(m_Name, other.m_Name, StringComparison.InvariantCultureIgnoreCase)
+                    && string.Equals(m_BindingGroup, other.m_BindingGroup, StringComparison.InvariantCultureIgnoreCase)
+                )
+            )
                 return false;
 
             // Compare device requirements.
@@ -629,19 +665,24 @@ namespace UnityEngine.InputSystem
             return builder.ToString();
         }
 
-        public static bool operator==(InputControlScheme left, InputControlScheme right)
+        public static bool operator ==(InputControlScheme left, InputControlScheme right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator!=(InputControlScheme left, InputControlScheme right)
+        public static bool operator !=(InputControlScheme left, InputControlScheme right)
         {
             return !left.Equals(right);
         }
 
-        [SerializeField] internal string m_Name;
-        [SerializeField] internal string m_BindingGroup;
-        [SerializeField] internal DeviceRequirement[] m_DeviceRequirements;
+        [SerializeField]
+        internal string m_Name;
+
+        [SerializeField]
+        internal string m_BindingGroup;
+
+        [SerializeField]
+        internal DeviceRequirement[] m_DeviceRequirements;
 
         /// <summary>
         /// The result of matching a list of <see cref="InputDevice">devices</see> against a list of
@@ -809,7 +850,11 @@ namespace UnityEngine.InputSystem
             /// <remarks>
             /// Links the control that was matched with the respective device requirement.
             /// </remarks>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1724:TypeNamesShouldNotMatchNamespaces", Justification = "Conflicts with UnityEngine.Networking.Match, which is deprecated and will go away.")]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage(
+                "Microsoft.Naming",
+                "CA1724:TypeNamesShouldNotMatchNamespaces",
+                Justification = "Conflicts with UnityEngine.Networking.Match, which is deprecated and will go away."
+            )]
             public struct Match
             {
                 /// <summary>
@@ -891,9 +936,7 @@ namespace UnityEngine.InputSystem
 
                 object IEnumerator.Current => Current;
 
-                public void Dispose()
-                {
-                }
+                public void Dispose() { }
 
                 internal int m_Index;
                 internal DeviceRequirement[] m_Requirements;
@@ -1005,8 +1048,11 @@ namespace UnityEngine.InputSystem
                 }
             }
 
-            [SerializeField] internal string m_ControlPath;
-            [SerializeField] internal Flags m_Flags;
+            [SerializeField]
+            internal string m_ControlPath;
+
+            [SerializeField]
+            internal Flags m_Flags;
 
             [Flags]
             internal enum Flags
@@ -1030,8 +1076,10 @@ namespace UnityEngine.InputSystem
 
             public bool Equals(DeviceRequirement other)
             {
-                return string.Equals(m_ControlPath, other.m_ControlPath) && m_Flags == other.m_Flags &&
-                    string.Equals(controlPath, other.controlPath) && isOptional == other.isOptional;
+                return string.Equals(m_ControlPath, other.m_ControlPath)
+                    && m_Flags == other.m_Flags
+                    && string.Equals(controlPath, other.controlPath)
+                    && isOptional == other.isOptional;
             }
 
             public override bool Equals(object obj)
@@ -1054,12 +1102,12 @@ namespace UnityEngine.InputSystem
                 }
             }
 
-            public static bool operator==(DeviceRequirement left, DeviceRequirement right)
+            public static bool operator ==(DeviceRequirement left, DeviceRequirement right)
             {
                 return left.Equals(right);
             }
 
-            public static bool operator!=(DeviceRequirement left, DeviceRequirement right)
+            public static bool operator !=(DeviceRequirement left, DeviceRequirement right)
             {
                 return !left.Equals(right);
             }

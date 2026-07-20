@@ -16,8 +16,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// The value is clamped to the range [8, 512].
         /// </remarks>
         [field: SerializeField]
-        [field: Tooltip("The number of samples that are maintained for the purpose of smoothing." +
-                        "The value is clamped to the range [8, 512].")]
+        [field: Tooltip(
+            "The number of samples that are maintained for the purpose of smoothing."
+                + "The value is clamped to the range [8, 512]."
+        )]
         [field: Range(ConfigurationLimits.k_CounterSampleMin, ConfigurationLimits.k_CounterSampleMax)]
         int m_SampleCount = ConfigurationLimits.k_CounterSampleDefault;
 
@@ -30,10 +32,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         public int SampleCount
         {
             get => m_SampleCount;
-            set => m_SampleCount = Mathf.Clamp(
-                value,
-                ConfigurationLimits.k_CounterSampleMin,
-                ConfigurationLimits.k_CounterSampleMax);
+            set =>
+                m_SampleCount = Mathf.Clamp(
+                    value,
+                    ConfigurationLimits.k_CounterSampleMin,
+                    ConfigurationLimits.k_CounterSampleMax
+                );
         }
 
         /// <summary>
@@ -47,11 +51,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// </remarks>
         [field: SerializeField]
         [Tooltip(
-            "The sample rate of the counter. " +
-            "If the sample rate is Per Second " +
-            "then each sample in the counter is collected over a full second, whereas " +
-            "if the sample rate is Per Frame " +
-            "then each sample in the counter is collected during a single frame.")]
+            "The sample rate of the counter. "
+                + "If the sample rate is Per Second "
+                + "then each sample in the counter is collected over a full second, whereas "
+                + "if the sample rate is Per Frame "
+                + "then each sample in the counter is collected during a single frame."
+        )]
         public SampleRate SampleRate { get; set; } = SampleRate.PerFrame;
 
         internal int ComputeHashCode()

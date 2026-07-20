@@ -33,7 +33,6 @@ namespace Unity.Editor.Controls
 
         public int LastPage => (Count - 1) / ItemsPerPage;
 
-
         public void OnGUI()
         {
             var indent = EditorGUI.indentLevel;
@@ -55,12 +54,24 @@ namespace Unity.Editor.Controls
 
                 var pageLabelWidth = EditorStyles.label.CalcSize(pageLabel).x + 2.0f;
 
-                if (GUILayout.Button(EditorGUIUtility.IconContent("Animation.FirstKey"), s_ToolbarButtonStyle, GUILayout.Width(k_ButtonSize)))
+                if (
+                    GUILayout.Button(
+                        EditorGUIUtility.IconContent("Animation.FirstKey"),
+                        s_ToolbarButtonStyle,
+                        GUILayout.Width(k_ButtonSize)
+                    )
+                )
                 {
                     Page = 0;
                 }
 
-                if (GUILayout.Button(EditorGUIUtility.IconContent("Animation.PrevKey"), s_ToolbarButtonStyle, GUILayout.Width(k_ButtonSize)))
+                if (
+                    GUILayout.Button(
+                        EditorGUIUtility.IconContent("Animation.PrevKey"),
+                        s_ToolbarButtonStyle,
+                        GUILayout.Width(k_ButtonSize)
+                    )
+                )
                 {
                     Page -= 1;
                 }
@@ -68,12 +79,24 @@ namespace Unity.Editor.Controls
                 EditorGUIUtility.labelWidth = pageLabelWidth;
                 Page = EditorGUILayout.IntField(pageLabel, Page + 1) - 1;
 
-                if (GUILayout.Button(EditorGUIUtility.IconContent("Animation.NextKey"), s_ToolbarButtonStyle, GUILayout.Width(k_ButtonSize)))
+                if (
+                    GUILayout.Button(
+                        EditorGUIUtility.IconContent("Animation.NextKey"),
+                        s_ToolbarButtonStyle,
+                        GUILayout.Width(k_ButtonSize)
+                    )
+                )
                 {
                     Page += 1;
                 }
 
-                if (GUILayout.Button(EditorGUIUtility.IconContent("Animation.LastKey"), s_ToolbarButtonStyle, GUILayout.Width(k_ButtonSize)))
+                if (
+                    GUILayout.Button(
+                        EditorGUIUtility.IconContent("Animation.LastKey"),
+                        s_ToolbarButtonStyle,
+                        GUILayout.Width(k_ButtonSize)
+                    )
+                )
                 {
                     Page = LastPage;
                 }
@@ -114,10 +137,7 @@ namespace Unity.Editor.Controls
 
                 var pageLabelWidth = EditorStyles.label.CalcSize(pageLabel).x + 2.0f;
 
-                var usedWidth = 4 * k_ButtonSize
-                    + pageLabelWidth
-                    + k_PageSize
-                    + pageCountWidth;
+                var usedWidth = 4 * k_ButtonSize + pageLabelWidth + k_PageSize + pageCountWidth;
 
                 rect.x += width - usedWidth;
                 rect.width = usedWidth;
@@ -179,7 +199,7 @@ namespace Unity.Editor.Controls
                     stretchWidth = true,
                     fixedHeight = 20,
                     border = new RectOffset(),
-                    padding = new RectOffset()
+                    padding = new RectOffset(),
                 };
             }
         }

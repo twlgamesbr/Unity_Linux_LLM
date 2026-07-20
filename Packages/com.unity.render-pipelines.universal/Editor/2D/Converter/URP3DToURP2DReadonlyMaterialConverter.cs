@@ -10,9 +10,11 @@ namespace UnityEditor.Rendering.Universal
 {
     [Serializable]
     [PipelineConverter("Universal Render Pipeline (Universal Renderer)", "Universal Render Pipeline (2D Renderer)")]
-    [ElementInfo(Name = "Material Reference Converter",
-                 Order = 100,
-                 Description = "Converts references to URP Lit and Simple Lit readonly material to Mesh 2D Lit material.")]
+    [ElementInfo(
+        Name = "Material Reference Converter",
+        Order = 100,
+        Description = "Converts references to URP Lit and Simple Lit readonly material to Mesh 2D Lit material."
+    )]
     internal class URP3DToURP2DReadonlyMaterialConverter : ReadonlyMaterialConverter
     {
         private List<(string query, string description)> m_ContextSearchQueriesAndIds;
@@ -28,7 +30,8 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        public override string isDisabledMessage => "Converter requires URP with a Renderer 2D. Convert your project to URP to use this converter.";
+        public override string isDisabledMessage =>
+            "Converter requires URP with a Renderer 2D. Convert your project to URP to use this converter.";
 
         private bool m_Initialized = false;
 
@@ -50,15 +53,19 @@ namespace UnityEditor.Rendering.Universal
             m_ContextSearchQueriesAndIds = new List<(string query, string description)>()
             {
                 (string.Format(formattedId, GlobalObjectId.GetGlobalObjectIdSlow(lit)), "URP Lit is being referenced"),
-                (string.Format(formattedId, GlobalObjectId.GetGlobalObjectIdSlow(simpleLit)), "URP Simple Lit is being referenced")
+                (
+                    string.Format(formattedId, GlobalObjectId.GetGlobalObjectIdSlow(simpleLit)),
+                    "URP Simple Lit is being referenced"
+                ),
             };
 
-            Func<Material> mesh2DLitMaterial = () => GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultMesh2DLitMaterial;
+            Func<Material> mesh2DLitMaterial = () =>
+                GraphicsSettings.GetRenderPipelineSettings<Renderer2DResources>().defaultMesh2DLitMaterial;
 
             m_MaterialMappings = new Dictionary<string, Func<Material>>()
             {
                 ["Lit"] = mesh2DLitMaterial,
-                ["SimpleLit"] = mesh2DLitMaterial
+                ["SimpleLit"] = mesh2DLitMaterial,
             };
         }
 

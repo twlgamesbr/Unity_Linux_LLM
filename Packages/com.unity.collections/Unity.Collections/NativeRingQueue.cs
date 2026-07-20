@@ -20,14 +20,14 @@ namespace Unity.Collections
     [DebuggerDisplay("Length = {Length}, Capacity = {Capacity}, IsCreated = {IsCreated}, IsEmpty = {IsEmpty}")]
     [DebuggerTypeProxy(typeof(NativeRingQueueDebugView<>))]
     [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-    public unsafe struct NativeRingQueue<T>
-        : INativeDisposable
+    public unsafe struct NativeRingQueue<T> : INativeDisposable
         where T : unmanaged
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         internal AtomicSafetyHandle m_Safety;
         static readonly SharedStatic<int> s_staticSafetyId = SharedStatic<int>.GetOrCreate<NativeRingQueue<T>>();
 #endif
+
         [NativeDisableUnsafePtrRestriction]
         internal UnsafeRingQueue<T>* m_RingQueue;
 
@@ -90,7 +90,11 @@ namespace Unity.Collections
         /// <param name="capacity">The capacity.</param>
         /// <param name="allocator">The allocator to use.</param>
         /// <param name="options">Whether newly allocated bytes should be zeroed out.</param>
-        public NativeRingQueue(int capacity, AllocatorManager.AllocatorHandle allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
+        public NativeRingQueue(
+            int capacity,
+            AllocatorManager.AllocatorHandle allocator,
+            NativeArrayOptions options = NativeArrayOptions.ClearMemory
+        )
         {
             CollectionHelper.CheckAllocator(allocator);
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -143,10 +147,20 @@ namespace Unity.Collections
             }
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            var jobHandle = new NativeRingQueueDisposeJob { Data = new NativeRingQueueDispose { m_QueueData = (UnsafeRingQueue<int>*)m_RingQueue, m_Safety = m_Safety } }.Schedule(inputDeps);
+            var jobHandle = new NativeRingQueueDisposeJob
+            {
+                Data = new NativeRingQueueDispose
+                {
+                    m_QueueData = (UnsafeRingQueue<int>*)m_RingQueue,
+                    m_Safety = m_Safety,
+                },
+            }.Schedule(inputDeps);
             AtomicSafetyHandle.Release(m_Safety);
 #else
-            var jobHandle = new NativeRingQueueDisposeJob { Data = new NativeRingQueueDispose { m_QueueData = (UnsafeRingQueue<int>*)m_RingQueue } }.Schedule(inputDeps);
+            var jobHandle = new NativeRingQueueDisposeJob
+            {
+                Data = new NativeRingQueueDispose { m_QueueData = (UnsafeRingQueue<int>*)m_RingQueue },
+            }.Schedule(inputDeps);
 #endif
             m_RingQueue = null;
 
@@ -218,7 +232,7 @@ namespace Unity.Collections
         }
     }
 
-    internal unsafe sealed class NativeRingQueueDebugView<T>
+    internal sealed unsafe class NativeRingQueueDebugView<T>
         where T : unmanaged
     {
         UnsafeRingQueue<T>* Data;

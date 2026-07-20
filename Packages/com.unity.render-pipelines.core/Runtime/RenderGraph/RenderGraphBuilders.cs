@@ -2,15 +2,19 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine.Experimental.Rendering;
-using static UnityEngine.Rendering.RenderGraphModule.RenderGraphValidationLayer;
 using static UnityEngine.Rendering.RenderGraphModule.RenderGraph;
+using static UnityEngine.Rendering.RenderGraphModule.RenderGraphValidationLayer;
 
 namespace UnityEngine.Rendering.RenderGraphModule
 {
     // This is a class making it a struct wouldn't help as we pas it around as an interface which means it would be boxed/unboxed anyway
     // Publicly this class has different faces to help the users with different pass types through type safety but internally
     // we just have a single implementation for all builders
-    internal class RenderGraphBuilders : IBaseRenderGraphBuilder, IComputeRenderGraphBuilder, IRasterRenderGraphBuilder, IUnsafeRenderGraphBuilder
+    internal class RenderGraphBuilders
+        : IBaseRenderGraphBuilder,
+            IComputeRenderGraphBuilder,
+            IRasterRenderGraphBuilder,
+            IUnsafeRenderGraphBuilder
     {
         RenderGraphPass m_RenderPass;
         RenderGraphResourceRegistry m_Resources;
@@ -32,14 +36,19 @@ namespace UnityEngine.Rendering.RenderGraphModule
             // By design we don't allow the validation during release. This limits the usage to strictly validation and not actual runtime behavior.
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return (RenderGraph.enableValidityChecks)? m_AdditionalValidationLayer : null; }
+            get { return (RenderGraph.enableValidityChecks) ? m_AdditionalValidationLayer : null; }
 #else
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return null; }
 #endif
         }
 
-        public void Setup(RenderGraphPass renderPass, RenderGraphResourceRegistry resources, RenderGraph renderGraph, RenderGraphValidationLayer validationLayer)
+        public void Setup(
+            RenderGraphPass renderPass,
+            RenderGraphResourceRegistry resources,
+            RenderGraph renderGraph,
+            RenderGraphValidationLayer validationLayer
+        )
         {
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             // If the object is not disposed yet this is an error as the pass is not finished (only in the dispose we register it with the rendergraph)
@@ -52,7 +61,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
             m_RenderPass = renderPass;
             m_Resources = resources;
             m_RenderGraph = renderGraph;
-            m_AdditionalValidationLayer = validationLayer;  
+            m_AdditionalValidationLayer = validationLayer;
             m_Disposed = false;
 
             renderPass.useAllGlobalTextures = false;
@@ -65,16 +74,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             if (additionalValidationLayer != null)
             {
-                RenderPassInfo info = new()
-                {
-                    type = renderPass.type,
-                    name = renderPass.name
-                };
+                RenderPassInfo info = new() { type = renderPass.type, name = renderPass.name };
                 additionalValidationLayer.OnPassAddedBegin(in info);
             }
-#endif            
+#endif
         }
-
 
         public void EnableAsyncCompute(bool value)
         {
@@ -208,7 +212,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 if (handle.IsVersioned)
                 {
                     var name = m_Resources.GetRenderGraphResourceName(handle);
-                    throw new InvalidOperationException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {handle.type} at index {handle.index} - " + RenderGraph.RenderGraphExceptionMessages.k_WriteToVersionedResource);
+                    throw new InvalidOperationException(
+                        $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {handle.type} at index {handle.index} - "
+                            + RenderGraph.RenderGraphExceptionMessages.k_WriteToVersionedResource
+                    );
                 }
 
                 if (m_RenderPass.IsWritten(handle))
@@ -227,7 +234,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
                     // > Get this error they were probably thinking they were writing two separate outputs... but they are just two versions of resource 'a'
                     // where they can only differ between by careful management of versioned resources.
                     var name = m_Resources.GetRenderGraphResourceName(handle);
-                    throw new InvalidOperationException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {handle.type} at index {handle.index} - " + RenderGraph.RenderGraphExceptionMessages.k_WriteToResourceTwice);
+                    throw new InvalidOperationException(
+                        $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {handle.type} at index {handle.index} - "
+                            + RenderGraph.RenderGraphExceptionMessages.k_WriteToResourceTwice
+                    );
                 }
             }
         }
@@ -237,7 +247,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             CheckResource(inputHandle);
 
-            ResourceHandle versionedHandle = inputHandle.IsVersioned ? inputHandle : m_Resources.GetLatestVersionHandle(inputHandle);
+            ResourceHandle versionedHandle = inputHandle.IsVersioned
+                ? inputHandle
+                : m_Resources.GetLatestVersionHandle(inputHandle);
 
             // Transient resources are always considered written and read in the render graph pass where they are used
             // Compiler will take it into account later, no need to add them to read and write lists
@@ -254,7 +266,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
             bool read = (flags & AccessFlags.Read) != 0;
             bool write = (flags & AccessFlags.Write) != 0;
 
-            ResourceHandle versionedHandle = inputHandle.IsVersioned ? inputHandle : m_Resources.GetLatestVersionHandle(inputHandle);
+            ResourceHandle versionedHandle = inputHandle.IsVersioned
+                ? inputHandle
+                : m_Resources.GetLatestVersionHandle(inputHandle);
 
             // If we are not discarding the current version and its data, add a "read" dependency on it
             // this is a bit of a misnomer it really means more like "Preserve existing content or read"
@@ -311,12 +325,18 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             if (RenderGraph.enableValidityChecks)
             {
-                bool usedAsFragment = (m_RenderPass.depthAccess.textureHandle.IsValid() && m_RenderPass.depthAccess.textureHandle.handle.index == tex.handle.index);
+                bool usedAsFragment = (
+                    m_RenderPass.depthAccess.textureHandle.IsValid()
+                    && m_RenderPass.depthAccess.textureHandle.handle.index == tex.handle.index
+                );
                 if (!usedAsFragment)
                 {
                     for (int i = 0; i <= m_RenderPass.colorBufferMaxIndex; i++)
                     {
-                        if (m_RenderPass.colorBufferAccess[i].textureHandle.IsValid() && m_RenderPass.colorBufferAccess[i].textureHandle.handle.index == tex.handle.index)
+                        if (
+                            m_RenderPass.colorBufferAccess[i].textureHandle.IsValid()
+                            && m_RenderPass.colorBufferAccess[i].textureHandle.handle.index == tex.handle.index
+                        )
                         {
                             usedAsFragment = true;
                             break;
@@ -327,7 +347,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 if (usedAsFragment)
                 {
                     var name = m_Resources.GetRenderGraphResourceName(tex.handle);
-                    throw new ArgumentException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - " + RenderGraph.RenderGraphExceptionMessages.k_TextureAlreadyBeingUsedThroughSetAttachment);
+                    throw new ArgumentException(
+                        $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - "
+                            + RenderGraph.RenderGraphExceptionMessages.k_TextureAlreadyBeingUsedThroughSetAttachment
+                    );
                 }
             }
         }
@@ -338,7 +361,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
             if (texRes.textureUVOrigin == TextureUVOriginSelection.TopLeft)
             {
                 var name = m_Resources.GetRenderGraphResourceName(handle);
-                throw new ArgumentException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type `{handle.type}` at index `{handle.index}` - " + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOriginUseTexture(texRes.textureUVOrigin));
+                throw new ArgumentException(
+                    $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type `{handle.type}` at index `{handle.index}` - "
+                        + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOriginUseTexture(
+                            texRes.textureUVOrigin
+                        )
+                );
             }
         }
 
@@ -353,7 +381,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
             if ((flags & AccessFlags.Read) == AccessFlags.Read)
             {
-                if (m_RenderGraph.renderTextureUVOriginStrategy == RenderTextureUVOriginStrategy.PropagateAttachmentOrientation)
+                if (
+                    m_RenderGraph.renderTextureUVOriginStrategy
+                    == RenderTextureUVOriginStrategy.PropagateAttachmentOrientation
+                )
                 {
                     TextureResource texRes = m_Resources.GetTextureResource(input.handle);
                     CheckTextureUVOriginIsValid(input.handle, texRes);
@@ -377,7 +408,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
             {
                 // rose test this path
                 var name = m_Resources.GetRenderGraphResourceName(h.handle);
-                throw new ArgumentException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {h.handle.type} at index {h.handle.index} - " + RenderGraph.RenderGraphExceptionMessages.NoGlobalTextureAtPropertyID(propertyId));
+                throw new ArgumentException(
+                    $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {h.handle.type} at index {h.handle.index} - "
+                        + RenderGraph.RenderGraphExceptionMessages.NoGlobalTextureAtPropertyID(propertyId)
+                );
             }
         }
 
@@ -434,7 +468,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 if (alreadyUsed)
                 {
                     var name = m_Resources.GetRenderGraphResourceName(tex.handle);
-                    throw new InvalidOperationException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - " + RenderGraph.RenderGraphExceptionMessages.k_SetRenderAttachmentTextureAlreadyUsed);
+                    throw new InvalidOperationException(
+                        $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - "
+                            + RenderGraph.RenderGraphExceptionMessages.k_SetRenderAttachmentTextureAlreadyUsed
+                    );
                 }
 
                 m_Resources.GetRenderTargetInfo(tex.handle, out var info);
@@ -450,11 +487,15 @@ namespace UnityEngine.Rendering.RenderGraphModule
                         : RenderGraph.RenderGraphExceptionMessages.k_SetRenderAttachmentOnDepthTexture;
 
                     throw new InvalidOperationException(
-                        $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' " +
-                        $"of type {tex.handle.type} at index {tex.handle.index} - {errorMsg}");
+                        $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' "
+                            + $"of type {tex.handle.type} at index {tex.handle.index} - {errorMsg}"
+                    );
                 }
 
-                if (m_RenderGraph.renderTextureUVOriginStrategy == RenderTextureUVOriginStrategy.PropagateAttachmentOrientation)
+                if (
+                    m_RenderGraph.renderTextureUVOriginStrategy
+                    == RenderTextureUVOriginStrategy.PropagateAttachmentOrientation
+                )
                 {
                     var texResource = m_Resources.GetTextureResource(tex.handle);
                     TextureResource checkTexResource = null;
@@ -464,11 +505,25 @@ namespace UnityEngine.Rendering.RenderGraphModule
                         {
                             ref readonly TextureHandle texCheck = ref m_RenderPass.fragmentInputAccess[i].textureHandle;
                             checkTexResource = m_Resources.GetTextureResource(texCheck.handle);
-                            if (texResource.textureUVOrigin != TextureUVOriginSelection.Unknown && checkTexResource.textureUVOrigin != TextureUVOriginSelection.Unknown && texResource.textureUVOrigin != checkTexResource.textureUVOrigin)
+                            if (
+                                texResource.textureUVOrigin != TextureUVOriginSelection.Unknown
+                                && checkTexResource.textureUVOrigin != TextureUVOriginSelection.Unknown
+                                && texResource.textureUVOrigin != checkTexResource.textureUVOrigin
+                            )
                             {
                                 var name = m_Resources.GetRenderGraphResourceName(tex.handle);
                                 var checkName = m_Resources.GetRenderGraphResourceName(texCheck.handle);
-                                throw new InvalidOperationException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - " + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOrigin(texResource.textureUVOrigin, "input", checkName, texCheck.handle.type, texCheck.handle.index, checkTexResource.textureUVOrigin));
+                                throw new InvalidOperationException(
+                                    $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - "
+                                        + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOrigin(
+                                            texResource.textureUVOrigin,
+                                            "input",
+                                            checkName,
+                                            texCheck.handle.type,
+                                            texCheck.handle.index,
+                                            checkTexResource.textureUVOrigin
+                                        )
+                                );
                             }
                         }
                     }
@@ -479,11 +534,25 @@ namespace UnityEngine.Rendering.RenderGraphModule
                         {
                             ref readonly TextureHandle texCheck = ref m_RenderPass.colorBufferAccess[i].textureHandle;
                             checkTexResource = m_Resources.GetTextureResource(texCheck.handle);
-                            if (texResource.textureUVOrigin != TextureUVOriginSelection.Unknown && checkTexResource.textureUVOrigin != TextureUVOriginSelection.Unknown && texResource.textureUVOrigin != checkTexResource.textureUVOrigin)
+                            if (
+                                texResource.textureUVOrigin != TextureUVOriginSelection.Unknown
+                                && checkTexResource.textureUVOrigin != TextureUVOriginSelection.Unknown
+                                && texResource.textureUVOrigin != checkTexResource.textureUVOrigin
+                            )
                             {
                                 var name = m_Resources.GetRenderGraphResourceName(tex.handle);
                                 var checkName = m_Resources.GetRenderGraphResourceName(texCheck.handle);
-                                throw new InvalidOperationException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - " + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOrigin(texResource.textureUVOrigin, "render", checkName, texCheck.handle.type, texCheck.handle.index, checkTexResource.textureUVOrigin));
+                                throw new InvalidOperationException(
+                                    $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - "
+                                        + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOrigin(
+                                            texResource.textureUVOrigin,
+                                            "render",
+                                            checkName,
+                                            texCheck.handle.type,
+                                            texCheck.handle.index,
+                                            checkTexResource.textureUVOrigin
+                                        )
+                                );
                             }
                         }
                     }
@@ -492,11 +561,25 @@ namespace UnityEngine.Rendering.RenderGraphModule
                     {
                         TextureHandle texCheck = m_RenderPass.depthAccess.textureHandle;
                         checkTexResource = m_Resources.GetTextureResource(texCheck.handle);
-                        if (texResource.textureUVOrigin != TextureUVOriginSelection.Unknown && checkTexResource.textureUVOrigin != TextureUVOriginSelection.Unknown && texResource.textureUVOrigin != checkTexResource.textureUVOrigin)
+                        if (
+                            texResource.textureUVOrigin != TextureUVOriginSelection.Unknown
+                            && checkTexResource.textureUVOrigin != TextureUVOriginSelection.Unknown
+                            && texResource.textureUVOrigin != checkTexResource.textureUVOrigin
+                        )
                         {
                             var name = m_Resources.GetRenderGraphResourceName(tex.handle);
                             var checkName = m_Resources.GetRenderGraphResourceName(texCheck.handle);
-                            throw new InvalidOperationException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - " + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOrigin(texResource.textureUVOrigin, "depth", checkName, texCheck.handle.type, texCheck.handle.index, checkTexResource.textureUVOrigin));
+                            throw new InvalidOperationException(
+                                $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - "
+                                    + RenderGraph.RenderGraphExceptionMessages.IncompatibleTextureUVOrigin(
+                                        texResource.textureUVOrigin,
+                                        "depth",
+                                        checkName,
+                                        texCheck.handle.type,
+                                        texCheck.handle.index,
+                                        checkTexResource.textureUVOrigin
+                                    )
+                            );
                         }
                     }
                 }
@@ -506,7 +589,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
                     if (globalTex.Item1.handle.index == tex.handle.index)
                     {
                         var name = m_Resources.GetRenderGraphResourceName(tex.handle);
-                        throw new InvalidOperationException($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - "  + RenderGraph.RenderGraphExceptionMessages.k_SetRenderAttachmentOnGlobalTexture);
+                        throw new InvalidOperationException(
+                            $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {tex.handle.type} at index {tex.handle.index} - "
+                                + RenderGraph.RenderGraphExceptionMessages.k_SetRenderAttachmentOnGlobalTexture
+                        );
                     }
                 }
             }
@@ -547,7 +633,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
             m_RenderPass.SetDepthBufferRaw(versionedTextureHandle, flags, mipLevel, depthSlice);
         }
 
-        public TextureHandle SetRandomAccessAttachment(TextureHandle input, int index, AccessFlags flags = AccessFlags.Read)
+        public TextureHandle SetRandomAccessAttachment(
+            TextureHandle input,
+            int index,
+            AccessFlags flags = AccessFlags.Read
+        )
         {
             CheckNotUseFragment(input);
             ResourceHandle result = UseResource(input.handle, flags);
@@ -569,24 +659,32 @@ namespace UnityEngine.Rendering.RenderGraphModule
             return input;
         }
 
-        public BufferHandle UseBufferRandomAccess(BufferHandle input, int index, bool preserveCounterValue, AccessFlags flags = AccessFlags.Read)
+        public BufferHandle UseBufferRandomAccess(
+            BufferHandle input,
+            int index,
+            bool preserveCounterValue,
+            AccessFlags flags = AccessFlags.Read
+        )
         {
             var h = UseBuffer(input, flags);
             m_RenderPass.SetRandomWriteResourceRaw(h.handle, index, preserveCounterValue, flags);
             return input;
         }
 
-        public void SetRenderFunc<PassData>(BaseRenderFunc<PassData, ComputeGraphContext> renderFunc) where PassData : class, new()
+        public void SetRenderFunc<PassData>(BaseRenderFunc<PassData, ComputeGraphContext> renderFunc)
+            where PassData : class, new()
         {
             ((ComputeRenderGraphPass<PassData>)m_RenderPass).renderFunc = renderFunc;
         }
 
-        public void SetRenderFunc<PassData>(BaseRenderFunc<PassData, RasterGraphContext> renderFunc) where PassData : class, new()
+        public void SetRenderFunc<PassData>(BaseRenderFunc<PassData, RasterGraphContext> renderFunc)
+            where PassData : class, new()
         {
             ((RasterRenderGraphPass<PassData>)m_RenderPass).renderFunc = renderFunc;
         }
 
-        public void SetRenderFunc<PassData>(BaseRenderFunc<PassData, UnsafeGraphContext> renderFunc) where PassData : class, new()
+        public void SetRenderFunc<PassData>(BaseRenderFunc<PassData, UnsafeGraphContext> renderFunc)
+            where PassData : class, new()
         {
             ((UnsafeRenderGraphPass<PassData>)m_RenderPass).renderFunc = renderFunc;
         }
@@ -595,7 +693,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             m_RenderPass.UseRendererList(input);
         }
-        
+
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         void CheckResource(in ResourceHandle res, bool checkTransientReadWrite = false)
         {
@@ -608,21 +706,30 @@ namespace UnityEngine.Rendering.RenderGraphModule
                     if (transientIndex == m_RenderPass.index && checkTransientReadWrite)
                     {
                         var name = m_Resources.GetRenderGraphResourceName(res);
-                        Debug.LogError($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {res.type} at index {res.index} - "  + RenderGraph.RenderGraphExceptionMessages.k_ReadWriteTransient);
+                        Debug.LogError(
+                            $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {res.type} at index {res.index} - "
+                                + RenderGraph.RenderGraphExceptionMessages.k_ReadWriteTransient
+                        );
                     }
 
                     if (transientIndex != -1 && transientIndex != m_RenderPass.index)
                     {
                         var name = m_Resources.GetRenderGraphResourceName(res);
                         throw new ArgumentException(
-                            $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {res.type} at index {res.index} - " +
-                            RenderGraph.RenderGraphExceptionMessages.UseTransientTextureInWrongPass(transientIndex));
+                            $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {res.type} at index {res.index} - "
+                                + RenderGraph.RenderGraphExceptionMessages.UseTransientTextureInWrongPass(
+                                    transientIndex
+                                )
+                        );
                     }
                 }
                 else
                 {
                     var name = m_Resources.GetRenderGraphResourceName(res);
-                    throw new Exception($"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {res.type} at index {res.index} - "  + RenderGraph.RenderGraphExceptionMessages.k_InvalidResource);
+                    throw new Exception(
+                        $"In pass '{m_RenderPass.name}' when trying to use resource '{name}' of type {res.type} at index {res.index} - "
+                            + RenderGraph.RenderGraphExceptionMessages.k_InvalidResource
+                    );
                 }
             }
         }
@@ -636,7 +743,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 {
                     var sourceInfo = m_RenderGraph.GetRenderTargetInfo(tex);
                     if (sourceInfo.bindMS)
-                        throw new InvalidOperationException($"This API is not supported with MSAA attachments on the current platform: {SystemInfo.graphicsDeviceType}");
+                        throw new InvalidOperationException(
+                            $"This API is not supported with MSAA attachments on the current platform: {SystemInfo.graphicsDeviceType}"
+                        );
                 }
             }
         }

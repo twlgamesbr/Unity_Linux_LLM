@@ -11,8 +11,10 @@ namespace UnityEditor.Rendering.Universal
     {
         protected override Type OldSettingsType { get; } = typeof(BIRPRendering.DepthOfField);
 
-        protected override void ConvertToTarget(BIRPRendering.PostProcessEffectSettings oldSettings,
-            VolumeProfile targetProfile)
+        protected override void ConvertToTarget(
+            BIRPRendering.PostProcessEffectSettings oldSettings,
+            VolumeProfile targetProfile
+        )
         {
             var oldDepthOfField = oldSettings as BIRPRendering.DepthOfField;
 

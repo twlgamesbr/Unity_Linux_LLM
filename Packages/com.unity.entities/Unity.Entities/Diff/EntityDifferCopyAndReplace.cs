@@ -8,18 +8,30 @@ namespace Unity.Entities
 {
     static unsafe partial class EntityDiffer
     {
-        static readonly Profiling.ProfilerMarker s_PlaybackManagedChangesMarker = new Profiling.ProfilerMarker("PlaybackManagedChanges");
-        static readonly Profiling.ProfilerMarker s_CopySharedComponentsMarker = new Profiling.ProfilerMarker("CopySharedComponents");
-        static readonly Profiling.ProfilerMarker s_CopyManagedComponentsMarker = new Profiling.ProfilerMarker("CopyManagedComponents");
+        static readonly Profiling.ProfilerMarker s_PlaybackManagedChangesMarker = new Profiling.ProfilerMarker(
+            "PlaybackManagedChanges"
+        );
+        static readonly Profiling.ProfilerMarker s_CopySharedComponentsMarker = new Profiling.ProfilerMarker(
+            "CopySharedComponents"
+        );
+        static readonly Profiling.ProfilerMarker s_CopyManagedComponentsMarker = new Profiling.ProfilerMarker(
+            "CopyManagedComponents"
+        );
 
         [BurstCompile]
         struct PatchAndAddClonedChunks : IJobParallelFor
         {
-            [ReadOnly] public NativeArray<ArchetypeChunk> SrcChunks;
-            [ReadOnly] public NativeArray<ArchetypeChunk> DstChunks;
+            [ReadOnly]
+            public NativeArray<ArchetypeChunk> SrcChunks;
 
-            [NativeDisableUnsafePtrRestriction] public EntityComponentStore* SrcEntityComponentStore;
-            [NativeDisableUnsafePtrRestriction] public EntityComponentStore* DstEntityComponentStore;
+            [ReadOnly]
+            public NativeArray<ArchetypeChunk> DstChunks;
+
+            [NativeDisableUnsafePtrRestriction]
+            public EntityComponentStore* SrcEntityComponentStore;
+
+            [NativeDisableUnsafePtrRestriction]
+            public EntityComponentStore* DstEntityComponentStore;
 
             public void Execute(int index)
             {
@@ -29,7 +41,12 @@ namespace Unity.Entities
                 var srcArchetype = SrcEntityComponentStore->GetArchetype(srcChunk);
                 var dstArchetype = DstEntityComponentStore->GetArchetype(dstChunk);
 
-                ChunkDataUtility.CloneChangeVersions(srcArchetype, srcChunk.ListIndex, dstArchetype, dstChunk.ListIndex);
+                ChunkDataUtility.CloneChangeVersions(
+                    srcArchetype,
+                    srcChunk.ListIndex,
+                    dstArchetype,
+                    dstChunk.ListIndex
+                );
 
                 DstEntityComponentStore->AddExistingEntitiesInChunk(dstChunk);
             }
@@ -40,7 +57,8 @@ namespace Unity.Entities
             EntityManager dstEntityManager,
             EntityQuery dstEntityQuery,
             ArchetypeChunkChanges archetypeChunkChanges,
-            NativeArray<EntityRemapUtility.EntityRemapInfo> remap = default)
+            NativeArray<EntityRemapUtility.EntityRemapInfo> remap = default
+        )
         {
             s_CopyAndReplaceChunksProfilerMarker.Begin();
             var dstAccess = dstEntityManager.GetCheckedEntityDataAccess();
@@ -57,7 +75,12 @@ namespace Unity.Entities
             else
             {
                 using var cloned = new NativeList<ArchetypeChunk>(Allocator.TempJob);
-                CloneAndAddChunks(srcEntityManager, dstEntityManager, archetypeChunkChanges.CreatedSrcChunks.Chunks, cloned);
+                CloneAndAddChunks(
+                    srcEntityManager,
+                    dstEntityManager,
+                    archetypeChunkChanges.CreatedSrcChunks.Chunks,
+                    cloned
+                );
 
                 var srcChunks = archetypeChunkChanges.CreatedSrcChunks.Chunks;
                 Assert.AreEqual(srcChunks.Length, cloned.Length);
@@ -75,7 +98,10 @@ namespace Unity.Entities
                 }
             }
 
-            dstAccess->EntityComponentStore->EndArchetypeChangeTracking(archetypeChanges, dstAccess->EntityQueryManager);
+            dstAccess->EntityComponentStore->EndArchetypeChangeTracking(
+                archetypeChanges,
+                dstAccess->EntityQueryManager
+            );
             srcAccess->EntityComponentStore->InvalidateChunkListCacheForChangedArchetypes();
             dstAccess->EntityComponentStore->InvalidateChunkListCacheForChangedArchetypes();
 
@@ -130,11 +156,7 @@ namespace Unity.Entities
         static void DestroyChunks(EntityManager entityManager, NativeList<ArchetypeChunk> chunks)
         {
             s_DestroyChunksProfilerMarker.Begin();
-            new DestroyChunksJob
-            {
-                EntityManager = entityManager,
-                Chunks = chunks
-            }.Run();
+            new DestroyChunksJob { EntityManager = entityManager, Chunks = chunks }.Run();
             s_PlaybackManagedChangesMarker.Begin();
             var access = entityManager.GetCheckedEntityDataAccess();
             var ecs = access->EntityComponentStore;
@@ -181,6 +203,7 @@ namespace Unity.Entities
 
             [ReadOnly]
             public NativeArray<int> SrcSharedComponentIndices;
+
             [ReadOnly]
             public NativeArray<int> DstSharedComponentIndices;
 
@@ -195,7 +218,11 @@ namespace Unity.Entities
                     HandleChunk(i, dstEntityComponentStore, remapping);
             }
 
-            void HandleChunk(int idx, EntityComponentStore* dstEntityComponentStore, UnsafeParallelHashMap<int, int> sharedComponentRemap)
+            void HandleChunk(
+                int idx,
+                EntityComponentStore* dstEntityComponentStore,
+                UnsafeParallelHashMap<int, int> sharedComponentRemap
+            )
             {
                 var srcChunk = Chunks[idx].m_Chunk;
                 var srcArchetype = Chunks[idx].Archetype.Archetype;
@@ -206,7 +233,10 @@ namespace Unity.Entities
                 for (int i = 0; i < numSharedComponents; i++)
                     dstSharedIndices[i] = sharedComponentRemap[dstSharedIndices[i]];
 
-                var dstArchetype = dstEntityComponentStore->GetOrCreateArchetype(srcArchetype->Types, srcArchetype->TypesCount);
+                var dstArchetype = dstEntityComponentStore->GetOrCreateArchetype(
+                    srcArchetype->Types,
+                    srcArchetype->TypesCount
+                );
                 var dstChunk = dstEntityComponentStore->GetCleanChunkNoMetaChunk(dstArchetype, dstSharedIndices);
                 dstChunk.MetaChunkEntity = srcChunk.MetaChunkEntity;
                 var srcChunkCount = srcChunk.Count;
@@ -223,6 +253,7 @@ namespace Unity.Entities
         {
             [ReadOnly]
             public NativeList<ArchetypeChunk> Chunks;
+
             [ReadOnly]
             public NativeArray<ArchetypeChunk> ClonedChunks;
 
@@ -235,7 +266,12 @@ namespace Unity.Entities
             }
         }
 
-        static void CloneAndAddChunks(EntityManager srcEntityManager, EntityManager dstEntityManager, NativeList<ArchetypeChunk> chunks, NativeList<ArchetypeChunk> clonedList = default)
+        static void CloneAndAddChunks(
+            EntityManager srcEntityManager,
+            EntityManager dstEntityManager,
+            NativeList<ArchetypeChunk> chunks,
+            NativeList<ArchetypeChunk> clonedList = default
+        )
         {
             s_CloneAndAddChunksProfilerMarker.Begin();
 
@@ -254,8 +290,15 @@ namespace Unity.Entities
             var srcManagedComponentStore = srcAccess->ManagedComponentStore;
             var dstManagedComponentStore = dstAccess->ManagedComponentStore;
 
-            var dstSharedComponentIndicesRemapped = new NativeArray<int>(srcSharedComponentIndices.AsArray(), Allocator.TempJob);
-            dstAccess->CopySharedComponents(srcAccess, (int*) dstSharedComponentIndicesRemapped.GetUnsafeReadOnlyPtr(), dstSharedComponentIndicesRemapped.Length);
+            var dstSharedComponentIndicesRemapped = new NativeArray<int>(
+                srcSharedComponentIndices.AsArray(),
+                Allocator.TempJob
+            );
+            dstAccess->CopySharedComponents(
+                srcAccess,
+                (int*)dstSharedComponentIndicesRemapped.GetUnsafeReadOnlyPtr(),
+                dstSharedComponentIndicesRemapped.Length
+            );
             s_CopySharedComponentsMarker.End();
 
             // clone chunks
@@ -267,7 +310,11 @@ namespace Unity.Entities
             }
             else
             {
-                cloned = new NativeArray<ArchetypeChunk>(chunks.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                cloned = new NativeArray<ArchetypeChunk>(
+                    chunks.Length,
+                    Allocator.TempJob,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             new CreateNewChunks
@@ -279,11 +326,10 @@ namespace Unity.Entities
                 DstSharedComponentIndices = dstSharedComponentIndicesRemapped,
             }.Run();
 
-            var copyJob = new CopyChunkBuffers
-            {
-                Chunks = chunks,
-                ClonedChunks = cloned
-            }.Schedule(chunks.Length, default);
+            var copyJob = new CopyChunkBuffers { Chunks = chunks, ClonedChunks = cloned }.Schedule(
+                chunks.Length,
+                default
+            );
             JobHandle.ScheduleBatchedJobs();
             srcSharedComponentIndices.Dispose();
 
@@ -293,7 +339,11 @@ namespace Unity.Entities
             dstEntityManager.DuplicateEntitiesForDiffer(entityRemapping, chunks.AsArray(), cloned);
 
 #if !DOTS_DISABLE_DEBUG_NAMES
-            dstAccess->EntityComponentStore->CopyAndUpdateNameByEntity(srcAccess->EntityComponentStore, chunks.AsArray(), entityRemapping);
+            dstAccess->EntityComponentStore->CopyAndUpdateNameByEntity(
+                srcAccess->EntityComponentStore,
+                chunks.AsArray(),
+                entityRemapping
+            );
 #endif
 #endif
 
@@ -336,7 +386,7 @@ namespace Unity.Entities
                 {
                     int indexInArchetype = t + dstArchetype->FirstManagedComponent;
                     var offset = dstArchetype->Offsets[indexInArchetype];
-                    var a = (int*) (dstChunk.Buffer + offset);
+                    var a = (int*)(dstChunk.Buffer + offset);
                     int count = dstChunk.Count;
 
                     if (hasCompanionComponents)
@@ -354,12 +404,19 @@ namespace Unity.Entities
                         }
                     }
 
-                    dstManagedComponentStore.CloneManagedComponentsFromDifferentWorld(a, count,
-                        srcManagedComponentStore, ref *dstAccess->EntityComponentStore);
+                    dstManagedComponentStore.CloneManagedComponentsFromDifferentWorld(
+                        a,
+                        count,
+                        srcManagedComponentStore,
+                        ref *dstAccess->EntityComponentStore
+                    );
                 }
 
 #if !ENTITY_STORE_V1
-                dstChunk.MetaChunkEntity = EntityRemapUtility.RemapEntity(ref entityRemapping, dstChunk.MetaChunkEntity);
+                dstChunk.MetaChunkEntity = EntityRemapUtility.RemapEntity(
+                    ref entityRemapping,
+                    dstChunk.MetaChunkEntity
+                );
 #endif
             }
             s_CopyManagedComponentsMarker.End();
@@ -389,8 +446,10 @@ namespace Unity.Entities
                 SrcChunks = chunks.AsArray(),
                 DstChunks = cloned,
                 SrcEntityComponentStore = srcAccess->EntityComponentStore,
-                DstEntityComponentStore = dstAccess->EntityComponentStore
-            }.Schedule(chunks.Length, 64).Complete();
+                DstEntityComponentStore = dstAccess->EntityComponentStore,
+            }
+                .Schedule(chunks.Length, 64)
+                .Complete();
 
             if (!clonedList.IsCreated)
             {

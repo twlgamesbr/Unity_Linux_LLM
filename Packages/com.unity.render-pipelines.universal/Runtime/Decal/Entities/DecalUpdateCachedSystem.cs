@@ -129,7 +129,11 @@ namespace UnityEngine.Rendering.Universal
             using (new ProfilingScope(m_Sampler))
             {
                 for (int i = 0; i < m_EntityManager.chunkCount; ++i)
-                    Execute(m_EntityManager.entityChunks[i], m_EntityManager.cachedChunks[i], m_EntityManager.entityChunks[i].count);
+                    Execute(
+                        m_EntityManager.entityChunks[i],
+                        m_EntityManager.cachedChunks[i],
+                        m_EntityManager.entityChunks[i].count
+                    );
             }
         }
 
@@ -198,11 +202,20 @@ namespace UnityEngine.Rendering.Universal
             public NativeArray<float3> scales;
             public NativeArray<bool> dirty;
 
-            [ReadOnly] public NativeArray<DecalScaleMode> scaleModes;
-            [ReadOnly] public NativeArray<float4x4> sizeOffsets;
-            [WriteOnly] public NativeArray<float4x4> decalToWorlds;
-            [WriteOnly] public NativeArray<float4x4> normalToWorlds;
-            [WriteOnly] public NativeArray<BoundingSphere> boundingSpheres;
+            [ReadOnly]
+            public NativeArray<DecalScaleMode> scaleModes;
+
+            [ReadOnly]
+            public NativeArray<float4x4> sizeOffsets;
+
+            [WriteOnly]
+            public NativeArray<float4x4> decalToWorlds;
+
+            [WriteOnly]
+            public NativeArray<float4x4> normalToWorlds;
+
+            [WriteOnly]
+            public NativeArray<BoundingSphere> boundingSpheres;
 
             public float minDistance;
 

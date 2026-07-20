@@ -40,7 +40,10 @@ namespace UnityEngine.Rendering
 
             m_ComponentHash = new NativeParallelHashMap<int, GPUComponentHandle>(16, Allocator.Persistent);
             m_ArchetypeHash = new NativeParallelHashMap<GPUComponentSet, GPUArchetypeHandle>(16, Allocator.Persistent);
-            m_ComponentSetHash = new NativeParallelHashMap<GPUArchetypeHandle, GPUComponentSet>(16, Allocator.Persistent);
+            m_ComponentSetHash = new NativeParallelHashMap<GPUArchetypeHandle, GPUComponentSet>(
+                16,
+                Allocator.Persistent
+            );
 
             m_GraphicsDeviceType = SystemInfo.graphicsDeviceType;
         }
@@ -103,17 +106,23 @@ namespace UnityEngine.Rendering
         {
             //@ Should we extend this assert to all devices to address slowdowns caused by unaligned access on GPU?
             if (m_GraphicsDeviceType == GraphicsDeviceType.OpenGLES3)
-                Assert.IsTrue(byteSize % UnsafeUtility.SizeOf<Vector4>() == 0, "On OpenGLES3 component size must be aligned by float4.");
+                Assert.IsTrue(
+                    byteSize % UnsafeUtility.SizeOf<Vector4>() == 0,
+                    "On OpenGLES3 component size must be aligned by float4."
+                );
             Assert.IsTrue(m_Components.Length < kMaxComponentsCount, "Maximum GPU components count reached.");
             Assert.IsTrue(byteSize > 0, "Component size is zero.");
-            Assert.IsTrue(!m_ComponentHash.ContainsKey(propertyID), $"Component with propertyID {propertyID} already exists.");
-            
+            Assert.IsTrue(
+                !m_ComponentHash.ContainsKey(propertyID),
+                $"Component with propertyID {propertyID} already exists."
+            );
+
             var componentDesc = new GPUComponentDesc
             {
                 propertyID = propertyID,
                 byteSize = byteSize,
                 isPerInstance = isPerInstance,
-                archetypes = new UnsafeList<GPUArchetypeHandle>(4, Allocator.Persistent)
+                archetypes = new UnsafeList<GPUArchetypeHandle>(4, Allocator.Persistent),
             };
 
             var componentHandle = GPUComponentHandle.Create((short)m_ComponentHandleAllocator.Allocate());
@@ -127,7 +136,8 @@ namespace UnityEngine.Rendering
             return componentHandle;
         }
 
-        public GPUComponentHandle CreateComponent<T>(int propertyID, bool isPerInstance) where T : unmanaged
+        public GPUComponentHandle CreateComponent<T>(int propertyID, bool isPerInstance)
+            where T : unmanaged
         {
             return CreateComponent(propertyID, UnsafeUtility.SizeOf<T>(), isPerInstance);
         }
@@ -135,7 +145,10 @@ namespace UnityEngine.Rendering
         public unsafe GPUArchetypeHandle CreateArchetype(GPUComponentSet componentSet)
         {
             Assert.IsTrue(m_Archetypes.Length < kMaxGPUArchetypesCount, "Maximum GPU archetypes count reached.");
-            Assert.IsFalse(m_ArchetypeHash.ContainsKey(componentSet), "Archetype with the same component set already exists.");
+            Assert.IsFalse(
+                m_ArchetypeHash.ContainsKey(componentSet),
+                "Archetype with the same component set already exists."
+            );
 
             var archetypeHandle = GPUArchetypeHandle.Create((short)m_ArchetypeHandleAllocator.Allocate());
             var components = componentSet.GetComponents(Allocator.Persistent);
@@ -145,7 +158,10 @@ namespace UnityEngine.Rendering
             {
                 Assert.IsTrue(components[i].valid);
                 ref GPUComponentDesc componentDesc = ref m_Components.ElementAt(components[i].index);
-                Assert.IsFalse(componentDesc.archetypes.Contains(archetypeHandle), "Archetype already contains component.");
+                Assert.IsFalse(
+                    componentDesc.archetypes.Contains(archetypeHandle),
+                    "Archetype already contains component."
+                );
                 componentDesc.archetypes.Add(archetypeHandle);
             }
 
@@ -194,22 +210,50 @@ namespace UnityEngine.Rendering
     {
         public short index { get; private set; }
         public bool valid => index >= 0;
-        public static GPUComponentHandle Create(short index) { return new GPUComponentHandle { index = index }; }
+
+        public static GPUComponentHandle Create(short index)
+        {
+            return new GPUComponentHandle { index = index };
+        }
+
         public static readonly GPUComponentHandle Invalid = new GPUComponentHandle { index = -1 };
+
         public bool Equals(GPUComponentHandle other) => index == other.index;
-        public int CompareTo(GPUComponentHandle other) { return index.CompareTo(other.index); }
-        public override int GetHashCode() { return index; }
+
+        public int CompareTo(GPUComponentHandle other)
+        {
+            return index.CompareTo(other.index);
+        }
+
+        public override int GetHashCode()
+        {
+            return index;
+        }
     }
 
     internal struct GPUArchetypeHandle : IEquatable<GPUArchetypeHandle>, IComparable<GPUArchetypeHandle>
     {
         public short index { get; private set; }
         public bool valid => index >= 0;
-        public static GPUArchetypeHandle Create(short index) { return new GPUArchetypeHandle { index = index }; }
+
+        public static GPUArchetypeHandle Create(short index)
+        {
+            return new GPUArchetypeHandle { index = index };
+        }
+
         public static readonly GPUArchetypeHandle Invalid = new GPUArchetypeHandle { index = -1 };
+
         public bool Equals(GPUArchetypeHandle other) => index == other.index;
-        public int CompareTo(GPUArchetypeHandle other) { return index.CompareTo(other.index); }
-        public override int GetHashCode() { return index; }
+
+        public int CompareTo(GPUArchetypeHandle other)
+        {
+            return index.CompareTo(other.index);
+        }
+
+        public override int GetHashCode()
+        {
+            return index;
+        }
     }
 
     //@ We could separate shader parameters from GPUComponents and alias different shader parameters to the same GPUComponent if they have the same size.
@@ -222,12 +266,24 @@ namespace UnityEngine.Rendering
         public bool isEmpty => componentsMask == 0;
 
         public bool Equals(GPUComponentSet other) => componentsMask == other.componentsMask;
-        public int CompareTo(GPUComponentSet other) { return componentsMask.CompareTo(other.componentsMask); }
-        public override int GetHashCode() { return componentsMask.GetHashCode(); }
+
+        public int CompareTo(GPUComponentSet other)
+        {
+            return componentsMask.CompareTo(other.componentsMask);
+        }
+
+        public override int GetHashCode()
+        {
+            return componentsMask.GetHashCode();
+        }
 
         static GPUComponentSet()
         {
-            Assert.AreEqual(GPUArchetypeManager.kMaxComponentsCount, UnsafeUtility.SizeOf<ulong>() * 8, "Adjust componentsMask type to correspond to kMaxComponentsCount.");
+            Assert.AreEqual(
+                GPUArchetypeManager.kMaxComponentsCount,
+                UnsafeUtility.SizeOf<ulong>() * 8,
+                "Adjust componentsMask type to correspond to kMaxComponentsCount."
+            );
         }
 
         public GPUComponentSet(NativeArray<GPUComponentHandle> components)

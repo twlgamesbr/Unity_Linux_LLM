@@ -11,7 +11,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
         internal static (SerializedProperty, PropertyField) AddFieldForProperty(
             this VisualElement parentVisualElement,
             SerializedProperty parentProperty,
-            string fieldName)
+            string fieldName
+        )
         {
             var property = parentProperty.FindPropertyRelative(fieldName);
             var field = new PropertyField(property);

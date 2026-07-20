@@ -68,7 +68,6 @@ namespace Unity.Physics.Hybrid
         static SimulationData s_SimulationData;
 #endif
 
-
         // register an event handler when the class is initialized
         static SceneSimulationAnalytics()
         {
@@ -89,17 +88,19 @@ namespace Unity.Physics.Hybrid
         {
             if (!s_EventRegistered)
             {
-                AnalyticsResult result = EditorAnalytics.RegisterEventWithLimit(k_EventName, k_MaxEventsPerHour,
-                    k_MaxNumberOfElements, k_VendorKey);
+                AnalyticsResult result = EditorAnalytics.RegisterEventWithLimit(
+                    k_EventName,
+                    k_MaxEventsPerHour,
+                    k_MaxNumberOfElements,
+                    k_VendorKey
+                );
                 s_EventRegistered = result == AnalyticsResult.Ok;
                 s_SimulationData = new SimulationData();
             }
 
             return s_EventRegistered;
         }
-
 #endif
-
 
         public static void SendAnalyticsEvent()
         {
@@ -159,8 +160,10 @@ namespace Unity.Physics.Hybrid
             s_SimulationData.angular_max_count = physicsSingleton.m_MaxNumberOfAngularConstraintsInAScene;
             s_SimulationData.motor_planar_max_count = physicsSingleton.m_MaxNumberOfPositionMotorsInAScene;
             s_SimulationData.rotation_motor_max_count = physicsSingleton.m_MaxNumberOfRotationMotorsInAScene;
-            s_SimulationData.linear_velocity_motor_max_count = physicsSingleton.m_MaxNumberOfLinearVelocityMotorsInAScene;
-            s_SimulationData.angular_velocity_motor_max_count = physicsSingleton.m_MaxNumberOfAngularVelocityMotorsInAScene;
+            s_SimulationData.linear_velocity_motor_max_count =
+                physicsSingleton.m_MaxNumberOfLinearVelocityMotorsInAScene;
+            s_SimulationData.angular_velocity_motor_max_count =
+                physicsSingleton.m_MaxNumberOfAngularVelocityMotorsInAScene;
         }
 
 #endif

@@ -25,7 +25,7 @@ namespace UnityEditor.UI
 
         private class Styles
         {
-            readonly public GUIContent navigationContent;
+            public readonly GUIContent navigationContent;
 
             public Styles()
             {
@@ -57,28 +57,28 @@ namespace UnityEditor.UI
             {
                 case Navigation.Mode.Horizontal:
                 case Navigation.Mode.Vertical:
-                {
-                    EditorGUI.PropertyField(drawRect, wrapAround);
-                    drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                }
-                break;
+                    {
+                        EditorGUI.PropertyField(drawRect, wrapAround);
+                        drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                    }
+                    break;
                 case Navigation.Mode.Explicit:
-                {
-                    SerializedProperty selectOnUp = prop.FindPropertyRelative(kSelectOnUpProp);
-                    SerializedProperty selectOnDown = prop.FindPropertyRelative(kSelectOnDownProp);
-                    SerializedProperty selectOnLeft = prop.FindPropertyRelative(kSelectOnLeftProp);
-                    SerializedProperty selectOnRight = prop.FindPropertyRelative(kSelectOnRightProp);
+                    {
+                        SerializedProperty selectOnUp = prop.FindPropertyRelative(kSelectOnUpProp);
+                        SerializedProperty selectOnDown = prop.FindPropertyRelative(kSelectOnDownProp);
+                        SerializedProperty selectOnLeft = prop.FindPropertyRelative(kSelectOnLeftProp);
+                        SerializedProperty selectOnRight = prop.FindPropertyRelative(kSelectOnRightProp);
 
-                    EditorGUI.PropertyField(drawRect, selectOnUp);
-                    drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                    EditorGUI.PropertyField(drawRect, selectOnDown);
-                    drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                    EditorGUI.PropertyField(drawRect, selectOnLeft);
-                    drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                    EditorGUI.PropertyField(drawRect, selectOnRight);
-                    drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                }
-                break;
+                        EditorGUI.PropertyField(drawRect, selectOnUp);
+                        drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                        EditorGUI.PropertyField(drawRect, selectOnDown);
+                        drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                        EditorGUI.PropertyField(drawRect, selectOnLeft);
+                        drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                        EditorGUI.PropertyField(drawRect, selectOnRight);
+                        drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                    }
+                    break;
             }
 
             --EditorGUI.indentLevel;
@@ -136,14 +136,19 @@ namespace UnityEditor.UI
 
             Action<Navigation.Mode> callback = (value) =>
             {
-                wrapAround.EnableInClassList(kHiddenClass, value != Navigation.Mode.Vertical && value != Navigation.Mode.Horizontal);
+                wrapAround.EnableInClassList(
+                    kHiddenClass,
+                    value != Navigation.Mode.Vertical && value != Navigation.Mode.Horizontal
+                );
                 selectOnUp.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
                 selectOnDown.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
                 selectOnLeft.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
                 selectOnRight.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
             };
 
-            navigation.RegisterValueChangeCallback((e) => callback.Invoke((Navigation.Mode)e.changedProperty.enumValueIndex));
+            navigation.RegisterValueChangeCallback(
+                (e) => callback.Invoke((Navigation.Mode)e.changedProperty.enumValueIndex)
+            );
             callback.Invoke((Navigation.Mode)property.FindPropertyRelative(kModeProp).enumValueFlag);
 
             container.Add(indented);

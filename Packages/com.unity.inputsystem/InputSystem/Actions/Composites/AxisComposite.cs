@@ -2,7 +2,6 @@ using System.ComponentModel;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Processors;
 using UnityEngine.InputSystem.Utilities;
-
 #if UNITY_EDITOR
 using System;
 using UnityEditor;
@@ -58,7 +57,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int negative = 0;
+        [InputControl(layout = "Axis")]
+        public int negative = 0;
 
         /// <summary>
         /// Binding for the axis input that controls the positive [0..<see cref="maxValue"/>] direction of the
@@ -69,7 +69,8 @@ namespace UnityEngine.InputSystem.Composites
         /// </remarks>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [InputControl(layout = "Axis")] public int positive = 0;
+        [InputControl(layout = "Axis")]
+        public int positive = 0;
 
         /// <summary>
         /// The lower bound that the axis is limited to. -1 by default.
@@ -119,9 +120,11 @@ namespace UnityEngine.InputSystem.Composites
         /// If both the <see cref="positive"/> and <see cref="negative"/> button are actuated, this
         /// determines which value is returned from the composite.
         /// </summary>
-        [Tooltip("If both the positive and negative side are actuated, decides what value to return. 'Neither' (default) means that " +
-            "the resulting value is the midpoint between min and max. 'Positive' means that max will be returned. 'Negative' means that " +
-            "min will be returned.")]
+        [Tooltip(
+            "If both the positive and negative side are actuated, decides what value to return. 'Neither' (default) means that "
+                + "the resulting value is the midpoint between min and max. 'Positive' means that max will be returned. 'Negative' means that "
+                + "min will be returned."
+        )]
         public WhichSideWins whichSideWins = WhichSideWins.Neither;
 
         /// <summary>
@@ -186,7 +189,11 @@ namespace UnityEngine.InputSystem.Composites
         /// What happens to the value of an <see cref="AxisComposite"/> if both <see cref="positive"/>
         /// and <see cref="negative"/> are actuated at the same time.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1717:OnlyFlagsEnumsShouldHavePluralNames", Justification = "False positive: `Wins` is not a plural form.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Naming",
+            "CA1717:OnlyFlagsEnumsShouldHavePluralNames",
+            Justification = "False positive: `Wins` is not a plural form."
+        )]
         public enum WhichSideWins
         {
             /// <summary>
@@ -209,27 +216,30 @@ namespace UnityEngine.InputSystem.Composites
         }
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     internal class AxisCompositeEditor : InputParameterEditor<AxisComposite>
     {
-        private GUIContent m_WhichAxisWinsLabel = new GUIContent("Which Side Wins",
+        private GUIContent m_WhichAxisWinsLabel = new GUIContent(
+            "Which Side Wins",
             "Determine which axis 'wins' if both are actuated at the same time. "
-            + "If 'Neither' is selected, the result is 0 (or, more precisely, "
-            + "the midpoint between minValue and maxValue).");
+                + "If 'Neither' is selected, the result is 0 (or, more precisely, "
+                + "the midpoint between minValue and maxValue)."
+        );
 
         public override void OnGUI()
         {
             if (!InputSystem.settings.useIMGUIEditorForAssets)
                 return;
 
-            target.whichSideWins = (AxisComposite.WhichSideWins)EditorGUILayout.EnumPopup(m_WhichAxisWinsLabel, target.whichSideWins);
+            target.whichSideWins = (AxisComposite.WhichSideWins)
+                EditorGUILayout.EnumPopup(m_WhichAxisWinsLabel, target.whichSideWins);
         }
 
         public override void OnDrawVisualElements(VisualElement root, Action onChangedCallback)
         {
             var modeField = new EnumField(m_WhichAxisWinsLabel.text, target.whichSideWins)
             {
-                tooltip = m_WhichAxisWinsLabel.tooltip
+                tooltip = m_WhichAxisWinsLabel.tooltip,
             };
 
             modeField.RegisterValueChangedCallback(evt =>
@@ -241,5 +251,5 @@ namespace UnityEngine.InputSystem.Composites
             root.Add(modeField);
         }
     }
-    #endif
+#endif
 }

@@ -42,7 +42,7 @@ namespace Unity.Entities.UI
                 PopulateBindings(child, list);
             }
         }
-        
+
         public static void Show(this VisualElement element)
         {
             element.style.display = DisplayStyle.Flex;
@@ -67,6 +67,6 @@ namespace Unity.Entities.UI
                     yield return e;
                 }
             }
-        }        
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             {
                 RayTracingBackend.Hardware => "raytrace",
                 RayTracingBackend.Compute => "compute",
-                _ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null),
             };
             return $"{fileName}.{postFix}";
         }
@@ -35,7 +35,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             {
                 RayTracingBackend.Hardware => typeof(RayTracingShader),
                 RayTracingBackend.Compute => typeof(ComputeShader),
-                _ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null),
             };
             return shaderType;
         }

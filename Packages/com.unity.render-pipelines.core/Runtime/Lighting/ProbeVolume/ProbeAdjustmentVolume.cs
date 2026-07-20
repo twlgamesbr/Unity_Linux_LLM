@@ -15,6 +15,7 @@ namespace UnityEngine.Rendering
         {
             /// <summary>A Box shape.</summary>
             Box,
+
             /// <summary>A Sphere shape.</summary>
             Sphere,
         };
@@ -26,31 +27,46 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// The size for box shape.
         /// </summary>
-        [Min(0.0f), Tooltip("Modify the size of this Probe Adjustment Volume. This is unaffected by the GameObject's Transform's Scale property.")]
+        [
+            Min(0.0f),
+            Tooltip(
+                "Modify the size of this Probe Adjustment Volume. This is unaffected by the GameObject's Transform's Scale property."
+            )
+        ]
         public Vector3 size = new Vector3(1, 1, 1);
 
         /// <summary>
         /// The size for sphere shape.
         /// </summary>
-        [Min(0.0f), Tooltip("Modify the radius of this Probe Adjustment Volume. This is unaffected by the GameObject's Transform's Scale property.")]
+        [
+            Min(0.0f),
+            Tooltip(
+                "Modify the radius of this Probe Adjustment Volume. This is unaffected by the GameObject's Transform's Scale property."
+            )
+        ]
         public float radius = 1.0f;
-
 
         /// <summary>The mode that adjustment volume will operate in. It determines what probes falling within the volume will do. </summary>
         public enum Mode
         {
             /// <summary>Invalidate the probes within the adjustment volume.</summary>
             InvalidateProbes,
+
             /// <summary>Override the dilation validity threshold for the probes within the adjustment volume.</summary>
             OverrideValidityThreshold,
+
             /// <summary>Apply an explicit virtual offset to the probes within the adjustment volume.</summary>
             ApplyVirtualOffset,
+
             /// <summary>Override the virtual offset settings for the probes within the adjustment volume.</summary>
             OverrideVirtualOffsetSettings,
+
             /// <summary>Override the dynamic sky shading direction for the probes within the adjustment volume.</summary>
             OverrideSkyDirection,
+
             /// <summary>Override the Lightmapper sample count for the probes within the adjustment volume.</summary>
             OverrideSampleCount,
+
             /// <summary>Control the rendering layer masks for the probes within the adjustment volume.</summary>
             OverrideRenderingLayerMask,
 
@@ -63,8 +79,10 @@ namespace UnityEngine.Rendering
         {
             /// <summary>Overrides the rendering layer mask for the probes within the adjustment volume.</summary>
             Override,
+
             /// <summary>Add a rendering layer to the probes within the adjustment volume.</summary>
             Add,
+
             /// <summary>Removes a rendering layer to the probes within the adjustment volume.</summary>
             Remove,
         };
@@ -75,7 +93,10 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// A scale to apply to probes falling within the invalidation volume. It is really important to use this with caution as it can lead to inconsistent lighting.
         /// </summary>
-        [Range(0.0001f, 2.0f), Tooltip("A multiplier applied to the intensity of probes covered by this Probe Adjustment Volume.")]
+        [
+            Range(0.0001f, 2.0f),
+            Tooltip("A multiplier applied to the intensity of probes covered by this Probe Adjustment Volume.")
+        ]
         public float intensityScale = 1.0f;
 
         /// <summary>
@@ -100,7 +121,10 @@ namespace UnityEngine.Rendering
         public float virtualOffsetThreshold = 0.75f;
 
         /// <summary>Distance from the probe position used to determine the origin of the sampling ray.</summary>
-        [Range(-0.05f, 0f), Tooltip("Distance from the probe position used to determine the origin of the sampling ray.")]
+        [
+            Range(-0.05f, 0f),
+            Tooltip("Distance from the probe position used to determine the origin of the sampling ray.")
+        ]
         public float rayOriginBias = -0.001f;
 
         /// <summary>The sky direction.</summary>
@@ -114,7 +138,10 @@ namespace UnityEngine.Rendering
         public int directSampleCount = 32;
 
         /// <summary>Number of samples for indirect lighting computations. This includes environment samples.</summary>
-        [Logarithmic(1, 8192), Tooltip("Number of samples for indirect lighting computations. This includes environment samples.")]
+        [
+            Logarithmic(1, 8192),
+            Tooltip("Number of samples for indirect lighting computations. This includes environment samples.")
+        ]
         public int indirectSampleCount = 512;
 
         /// <summary>Multiplier for the number of samples specified above.</summary>
@@ -140,12 +167,12 @@ namespace UnityEngine.Rendering
         public byte renderingLayerMask;
 
 #if UNITY_EDITOR
-        [SerializeField] internal int cachedHashCode = 0;
+        [SerializeField]
+        internal int cachedHashCode = 0;
 
         public override int GetHashCode()
         {
             int hash = 17;
-
             unchecked
             {
                 hash = hash * 23 + gameObject.transform.worldToLocalMatrix.GetHashCode();
@@ -187,7 +214,11 @@ namespace UnityEngine.Rendering
         {
             if (shape == Shape.Box)
             {
-                volume = new ProbeReferenceVolume.Volume(Matrix4x4.TRS(transform.position, transform.rotation, GetExtents()), 0, 0);
+                volume = new ProbeReferenceVolume.Volume(
+                    Matrix4x4.TRS(transform.position, transform.rotation, GetExtents()),
+                    0,
+                    0
+                );
                 bounds = volume.CalculateAABB();
             }
             else
@@ -205,7 +236,11 @@ namespace UnityEngine.Rendering
                 return (4.0f / 3.0f) * Mathf.PI * radius * radius * radius;
         }
 
-        internal bool IntersectsVolume(in ProbeReferenceVolume.Volume touchupOBB, in Bounds touchupBounds, Bounds volumeBounds)
+        internal bool IntersectsVolume(
+            in ProbeReferenceVolume.Volume touchupOBB,
+            in Bounds touchupBounds,
+            Bounds volumeBounds
+        )
         {
             if (shape == Shape.Box)
                 return ProbeVolumePositioning.OBBAABBIntersect(touchupOBB, volumeBounds, touchupBounds);
@@ -213,7 +248,11 @@ namespace UnityEngine.Rendering
                 return volumeBounds.SqrDistance(touchupBounds.center) < radius * radius;
         }
 
-        internal bool ContainsPoint(in ProbeReferenceVolume.Volume touchupOBB, in Vector3 touchupCenter, in Vector3 position)
+        internal bool ContainsPoint(
+            in ProbeReferenceVolume.Volume touchupOBB,
+            in Vector3 touchupCenter,
+            in Vector3 position
+        )
         {
             if (shape == Shape.Box)
                 return ProbeVolumePositioning.OBBContains(touchupOBB, position);
@@ -225,7 +264,8 @@ namespace UnityEngine.Rendering
         {
             if (mode != Mode.ApplyVirtualOffset)
                 return Vector3.zero;
-            return (transform.rotation * Quaternion.Euler(virtualOffsetRotation) * Vector3.forward) * virtualOffsetDistance;
+            return (transform.rotation * Quaternion.Euler(virtualOffsetRotation) * Vector3.forward)
+                * virtualOffsetDistance;
         }
 #endif
 
@@ -235,7 +275,7 @@ namespace UnityEngine.Rendering
             Initial,
             Mode,
 
-            Count
+            Count,
         }
 
         [SerializeField]

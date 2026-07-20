@@ -32,7 +32,7 @@ namespace Unity.Web.Stripping.Editor
             var button = new ToolbarButton
             {
                 iconImage = EditorGUIUtility.IconContent("_Help").image as Texture2D,
-                tooltip = "Open package manual."
+                tooltip = "Open package manual.",
             };
             button.clicked += () => Help.ShowHelpPage(PackageConstants.GetDocumentationUrl(page));
             toolbar.Add(button);

@@ -57,20 +57,31 @@ namespace UnityEngine.InputSystem.Editor
 
             // ISXB-748 - Scrolling the view causes a visual glitch with the rename TextField. As a work-around we
             // need to cancel the rename operation in this scenario.
-            m_ListView.RegisterCallback<WheelEvent>(e => InputActionMapsTreeViewItem.CancelRename(), TrickleDown.TrickleDown);
+            m_ListView.RegisterCallback<WheelEvent>(
+                e => InputActionMapsTreeViewItem.CancelRename(),
+                TrickleDown.TrickleDown
+            );
 
             var treeView = root.Q<TreeView>("actions-tree-view");
             m_ListView.AddManipulator(new DropManipulator(OnDroppedHandler, treeView));
             m_ListView.itemIndexChanged += OnReorder;
 
-            CreateSelector(Selectors.GetActionMapNames, Selectors.GetSelectedActionMap, (actionMapNames, actionMap, state) => new ViewState(actionMap, actionMapNames, state.GetDisabledActionMaps(actionMapNames.ToList())));
+            CreateSelector(
+                Selectors.GetActionMapNames,
+                Selectors.GetSelectedActionMap,
+                (actionMapNames, actionMap, state) =>
+                    new ViewState(actionMap, actionMapNames, state.GetDisabledActionMaps(actionMapNames.ToList()))
+            );
 
             m_AddActionMapButton = root.Q<Button>("add-new-action-map-button");
             m_AddActionMapButton.AddToClassList(EditorGUIUtility.isProSkin ? "add-button-dark-theme" : "add-button");
 
             m_AddActionMapButton.clicked += AddActionMap;
 
-            ContextMenu.GetContextMenuForActionMapsEmptySpace(this, root.Q<VisualElement>("rclick-area-to-add-new-action-map"));
+            ContextMenu.GetContextMenuForActionMapsEmptySpace(
+                this,
+                root.Q<VisualElement>("rclick-area-to-add-new-action-map")
+            );
         }
 
         void OnDroppedHandler(int mapIndex)
@@ -88,7 +99,9 @@ namespace UnityEngine.InputSystem.Editor
             m_ListView.itemsSource = viewState.actionMapData?.ToList() ?? new List<ActionMapData>();
             if (viewState.selectedActionMap.HasValue)
             {
-                var actionMapData = viewState.actionMapData?.Find(map => map.mapName.Equals(viewState.selectedActionMap.Value.name));
+                var actionMapData = viewState.actionMapData?.Find(map =>
+                    map.mapName.Equals(viewState.selectedActionMap.Value.name)
+                );
                 if (actionMapData.HasValue)
                     m_ListView.SetSelection(viewState.actionMapData.IndexOf(actionMapData.Value));
             }
@@ -149,7 +162,11 @@ namespace UnityEngine.InputSystem.Editor
 
         internal void PasteItems(bool copiedAction)
         {
-            Dispatch(copiedAction ? Commands.PasteActionFromActionMap(InputActionsEditorView.s_OnPasteCutElements) : Commands.PasteActionMaps(InputActionsEditorView.s_OnPasteCutElements));
+            Dispatch(
+                copiedAction
+                    ? Commands.PasteActionFromActionMap(InputActionsEditorView.s_OnPasteCutElements)
+                    : Commands.PasteActionMaps(InputActionsEditorView.s_OnPasteCutElements)
+            );
         }
 
         private void ChangeActionMapName(int index, string newName)
@@ -260,7 +277,11 @@ namespace UnityEngine.InputSystem.Editor
             public SerializedInputActionMap? selectedActionMap;
             public List<ActionMapData> actionMapData;
 
-            public ViewState(SerializedInputActionMap? selectedActionMap, IEnumerable<string> actionMapNames, IEnumerable<string> disabledActionMapNames)
+            public ViewState(
+                SerializedInputActionMap? selectedActionMap,
+                IEnumerable<string> actionMapNames,
+                IEnumerable<string> disabledActionMapNames
+            )
             {
                 this.selectedActionMap = selectedActionMap;
                 actionMapData = new List<ActionMapData>();

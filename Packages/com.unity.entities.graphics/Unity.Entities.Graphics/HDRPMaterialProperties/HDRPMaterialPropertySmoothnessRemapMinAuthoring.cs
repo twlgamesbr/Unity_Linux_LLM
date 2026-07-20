@@ -3,13 +3,19 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_SmoothnessRemapMin"   )]
-    public struct HDRPMaterialPropertySmoothnessRemapMin : IComponentData { public float  Value; }
+    [MaterialProperty("_SmoothnessRemapMin")]
+    public struct HDRPMaterialPropertySmoothnessRemapMin : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertySmoothnessRemapMinAuthoring : UnityEngine.MonoBehaviour
     {
-        [RegisterBinding(typeof(HDRPMaterialPropertySmoothnessRemapMin), nameof(HDRPMaterialPropertySmoothnessRemapMin.Value))]
+        [RegisterBinding(
+            typeof(HDRPMaterialPropertySmoothnessRemapMin),
+            nameof(HDRPMaterialPropertySmoothnessRemapMin.Value)
+        )]
         public float Value;
 
         class HDRPMaterialPropertySmoothnessRemapMinBaker : Baker<HDRPMaterialPropertySmoothnessRemapMinAuthoring>

@@ -1,5 +1,5 @@
-using Unity.Mathematics;
 using System.Runtime.InteropServices;
+using Unity.Mathematics;
 
 namespace UnityEngine.Rendering
 {
@@ -16,8 +16,32 @@ namespace UnityEngine.Rendering
     [StructLayout(LayoutKind.Sequential)]
     internal struct SHUpdatePacket
     {
-        public float shr0, shr1, shr2, shr3, shr4, shr5, shr6, shr7, shr8;
-        public float shg0, shg1, shg2, shg3, shg4, shg5, shg6, shg7, shg8;
-        public float shb0, shb1, shb2, shb3, shb4, shb5, shb6, shb7, shb8;
+        public float shr0,
+            shr1,
+            shr2,
+            shr3,
+            shr4,
+            shr5,
+            shr6,
+            shr7,
+            shr8;
+        public float shg0,
+            shg1,
+            shg2,
+            shg3,
+            shg4,
+            shg5,
+            shg6,
+            shg7,
+            shg8;
+        public float shb0,
+            shb1,
+            shb2,
+            shb3,
+            shb4,
+            shb5,
+            shb6,
+            shb7,
+            shb8;
     }
 }

@@ -4,7 +4,7 @@ namespace Unity.Rendering
 {
 #if ENABLE_DOTS_DEFORMATION_MOTION_VECTORS
     /// <summary>
-    /// Material property that contains the index where the mesh data (pos, nrm, tan) 
+    /// Material property that contains the index where the mesh data (pos, nrm, tan)
     /// of a deformed mesh starts in the deformed mesh instance buffer.
     /// The deformed mesh buffer is double buffered to keep previous vertex positions around for motion vectors.
     /// Use MeshBufferManager.ActiveDeformedMeshBufferIndex to access the DeformedMeshIndex for the current frame.

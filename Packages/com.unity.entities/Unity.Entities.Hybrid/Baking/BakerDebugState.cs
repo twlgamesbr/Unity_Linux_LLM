@@ -12,7 +12,7 @@ namespace Unity.Entities
     {
         internal struct EntityComponentPair : IEquatable<EntityComponentPair>
         {
-            Entity    entity;
+            Entity entity;
             TypeIndex componentTypeIndex;
 
             public EntityComponentPair(Entity _entity, TypeIndex _componentTypeIndex)
@@ -24,7 +24,7 @@ namespace Unity.Entities
             public override int GetHashCode()
             {
                 int mask = 0xffff & TypeManager.ClearFlagsMask;
-                return entity.GetHashCode() ^ ((componentTypeIndex.Value & mask)<<16);
+                return entity.GetHashCode() ^ ((componentTypeIndex.Value & mask) << 16);
             }
 
             public bool Equals(EntityComponentPair rhs)
@@ -39,8 +39,8 @@ namespace Unity.Entities
 
         public struct DebugState : IEquatable<DebugState>
         {
-            public TypeIndex            TypeIndex;
-            public int                  IndexInBakerArray;
+            public TypeIndex TypeIndex;
+            public int IndexInBakerArray;
 
             public bool Equals(DebugState other)
             {

@@ -36,7 +36,10 @@ internal class DownloadableSampleInspector : Editor
         GUILayout.Label("Downloadable Sample", EditorStyles.boldLabel);
 
         var sample = (DownloadableSample)target;
-        EditorGUILayout.HelpBox($"The {target.name} sample is stored outside of the input system package, because it contains custom project settings and is too big to be distributed as part of the sample. Instead, you can download it as a .unitypackage file which you can import into the project. Click the button below to download this sample", MessageType.Info);
+        EditorGUILayout.HelpBox(
+            $"The {target.name} sample is stored outside of the input system package, because it contains custom project settings and is too big to be distributed as part of the sample. Instead, you can download it as a .unitypackage file which you can import into the project. Click the button below to download this sample",
+            MessageType.Info
+        );
         if (GUILayout.Button("Download Sample"))
         {
             var url = sample.url.Replace("%VERSION%", InputSystem.version.ToString());
@@ -63,9 +66,11 @@ internal class DownloadableSampleInspector : Editor
         else
         {
             if (!sample.packageDeps.All(x => HasPackage(x)))
-                EditorGUILayout.HelpBox($"The {target.name} sample requires the following packages to be installed in your Project. Please install all the required packages before downloading the sample!", MessageType.Warning);
+                EditorGUILayout.HelpBox(
+                    $"The {target.name} sample requires the following packages to be installed in your Project. Please install all the required packages before downloading the sample!",
+                    MessageType.Warning
+                );
         }
-
 
         foreach (var req in sample.packageDeps)
         {

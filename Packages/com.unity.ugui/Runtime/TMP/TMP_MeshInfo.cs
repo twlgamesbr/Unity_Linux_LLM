@@ -1,18 +1,26 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-
+using UnityEngine;
 
 namespace TMPro
 {
-    public enum VertexSortingOrder { Normal, Reverse };
+    public enum VertexSortingOrder
+    {
+        Normal,
+        Reverse,
+    };
 
     /// <summary>
     /// Structure which contains the vertex attributes (geometry) of the text object.
     /// </summary>
     public struct TMP_MeshInfo
     {
-        private static readonly Color32 s_DefaultColor = new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+        private static readonly Color32 s_DefaultColor = new Color32(
+            byte.MaxValue,
+            byte.MaxValue,
+            byte.MaxValue,
+            byte.MaxValue
+        );
         private static readonly Vector3 s_DefaultNormal = new Vector3(0.0f, 0.0f, -1f);
         private static readonly Vector4 s_DefaultTangent = new Vector4(-1f, 0.0f, 0.0f, 1f);
         private static readonly Bounds s_DefaultBounds = new Bounds();
@@ -42,7 +50,6 @@ namespace TMPro
         public int[] triangles;
 
         public Material material;
-
 
         /// <summary>
         /// Function to pre-allocate vertex attributes for a mesh of size X.
@@ -115,7 +122,6 @@ namespace TMPro
             this.mesh.bounds = s_DefaultBounds;
             this.material = null;
         }
-
 
         /// <summary>
         /// Function to pre-allocate vertex attributes for a mesh of size X.
@@ -237,7 +243,6 @@ namespace TMPro
             this.material = null;
         }
 
-
         /// <summary>
         /// Function to resized the content of MeshData and re-assign normals, tangents and triangles.
         /// </summary>
@@ -266,7 +271,6 @@ namespace TMPro
             Array.Resize(ref this.colors32, size_X4);
 
             Array.Resize(ref this.triangles, size_X6);
-
 
             // Re-assign Normals, Tangents and Triangles
             if (size <= previousSize)
@@ -309,7 +313,6 @@ namespace TMPro
             this.mesh.triangles = this.triangles;
         }
 
-
         /// <summary>
         /// Function to resized the content of MeshData and re-assign normals, tangents and triangles.
         /// </summary>
@@ -339,7 +342,6 @@ namespace TMPro
             Array.Resize(ref this.colors32, size_X4);
 
             Array.Resize(ref this.triangles, size_X6);
-
 
             // Re-assign Normals, Tangents and Triangles
             if (size <= previousSize)
@@ -438,7 +440,6 @@ namespace TMPro
             this.mesh.triangles = this.triangles;
         }
 
-
         /// <summary>
         /// Function to clear the vertices while preserving the Triangles, Normals and Tangents.
         /// </summary>
@@ -453,7 +454,6 @@ namespace TMPro
             if (this.mesh != null)
                 this.mesh.vertices = this.vertices;
         }
-
 
         /// <summary>
         /// Function to clear the vertices while preserving the Triangles, Normals and Tangents.
@@ -473,7 +473,6 @@ namespace TMPro
                 this.mesh.bounds = s_DefaultBounds;
         }
 
-
         /// <summary>
         /// Function to clear the vertices while preserving the Triangles, Normals and Tangents.
         /// </summary>
@@ -484,7 +483,6 @@ namespace TMPro
             if (length > 0)
                 Array.Clear(vertices, vertexCount, length);
         }
-
 
         /// <summary>
         /// Function used to mark unused vertices as degenerate.
@@ -497,7 +495,6 @@ namespace TMPro
             if (length > 0)
                 Array.Clear(this.vertices, startIndex, length);
         }
-
 
         /// <summary>
         /// Function used to mark unused vertices as degenerate an upload resulting data to the mesh.
@@ -514,8 +511,7 @@ namespace TMPro
                 this.mesh.vertices = this.vertices;
         }
 
-
-        public void SortGeometry (VertexSortingOrder order)
+        public void SortGeometry(VertexSortingOrder order)
         {
             switch (order)
             {
@@ -531,15 +527,12 @@ namespace TMPro
 
                         if (src < dst)
                             SwapVertexData(src, dst);
-
                     }
                     break;
                 //case VertexSortingOrder.Depth:
                 //    break;
-
             }
         }
-
 
         /// <summary>
         /// Function to rearrange the quads of the text object to change their rendering order.
@@ -572,7 +565,6 @@ namespace TMPro
             }
         }
 
-
         /// <summary>
         /// Method to swap the vertex attributes between src and dst quads.
         /// </summary>
@@ -600,7 +592,6 @@ namespace TMPro
             vertex = vertices[dst_Index + 3];
             vertices[dst_Index + 3] = vertices[src_Index + 3];
             vertices[src_Index + 3] = vertex;
-
 
             //Swap UVs0
             Vector4 uvs;
@@ -656,7 +647,6 @@ namespace TMPro
             colors32[src_Index + 3] = color;
         }
 
-
         //int Partition (int start, int end)
         //{
         //    float pivot = vertices[end].z;
@@ -674,13 +664,11 @@ namespace TMPro
         //    return partitionIndex;
         //}
 
-
         //void Swap(Vector3 a, Vector3 b)
         //{
         //    Vector3 temp = a;
         //    a = b;
         //    b = a;
         //}
-
     }
 }

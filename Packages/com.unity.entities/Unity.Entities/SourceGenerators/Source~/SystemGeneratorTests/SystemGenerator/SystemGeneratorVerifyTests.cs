@@ -1,8 +1,6 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators
 {
@@ -12,7 +10,8 @@ namespace Unity.Entities.SourceGenerators
         [TestMethod]
         public async Task CorrectCodeGenerationWithDirectives()
         {
-            const string testSource = @"
+            const string testSource =
+                @"
 namespace MyNamespace
 {
 #if DEFINE_A
@@ -37,9 +36,10 @@ namespace MyNamespace
 }";
             await VerifyCS.VerifySourceGeneratorWithPreprocessorSymbolAsync(
                 testSource,
-                new []{ "DEFINE_A", "DEFINE_B" },
+                new[] { "DEFINE_A", "DEFINE_B" },
                 nameof(CorrectCodeGenerationWithDirectives),
-                "Test0__System_19875963020.g.cs");
+                "Test0__System_19875963020.g.cs"
+            );
         }
     }
 }

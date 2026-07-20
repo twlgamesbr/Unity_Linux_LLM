@@ -18,12 +18,9 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         /// previous stat at this point.
         public IReadOnlyDictionary<MetricId, RingBuffer<float>> PointValues => m_PointValues;
 
-
         public void UpdateConfiguration(List<MetricId> stats)
         {
-            var unrequiredStats = m_PointValues.Keys
-                .Where(key => !stats.Contains(key))
-                .ToList();
+            var unrequiredStats = m_PointValues.Keys.Where(key => !stats.Contains(key)).ToList();
             foreach (var stat in unrequiredStats)
             {
                 m_PointValues.Remove(stat);
@@ -43,8 +40,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             }
         }
 
-        public void ResizeBuffersIfNeeded(
-            in GraphBufferParameters bufferParams)
+        public void ResizeBuffersIfNeeded(in GraphBufferParameters bufferParams)
         {
             var graphWidthPoints = bufferParams.GraphWidthPoints;
             foreach (var buffer in m_PointValues.Values)
@@ -61,7 +57,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             int graphWidthPoints,
             int graphWidthSamples,
             float graphSamplesPerPoint,
-            int pointsToAdvance)
+            int pointsToAdvance
+        )
         {
             if (pointsToAdvance <= 0)
             {
@@ -91,34 +88,36 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 switch (metricKind)
                 {
                     case MetricKind.Counter:
+                    {
+                        var timeStampOffset = timeStamps.Length - sampleCount;
+                        for (var pointIndex = initialPointIndex; pointIndex < graphWidthPoints; ++pointIndex)
                         {
-                            var timeStampOffset = timeStamps.Length - sampleCount;
-                            for (var pointIndex = initialPointIndex; pointIndex < graphWidthPoints; ++pointIndex)
-                            {
-                                var pointValue = SampleCounter(
-                                    timeStamps: timeStamps,
-                                    timeStampOffset: timeStampOffset,
-                                    statData: statData,
-                                    sampleCount: sampleCount,
-                                    graphSamplesPerPoint: graphSamplesPerPoint,
-                                    sampleIndex: ref sampleIndex);
-                                pointValues.PushBack(pointValue);
-                            }
-                            break;
+                            var pointValue = SampleCounter(
+                                timeStamps: timeStamps,
+                                timeStampOffset: timeStampOffset,
+                                statData: statData,
+                                sampleCount: sampleCount,
+                                graphSamplesPerPoint: graphSamplesPerPoint,
+                                sampleIndex: ref sampleIndex
+                            );
+                            pointValues.PushBack(pointValue);
                         }
+                        break;
+                    }
                     case MetricKind.Gauge:
+                    {
+                        for (var pointIndex = initialPointIndex; pointIndex < graphWidthPoints; ++pointIndex)
                         {
-                            for (var pointIndex = initialPointIndex; pointIndex < graphWidthPoints; ++pointIndex)
-                            {
-                                var pointValue = SampleGauge(
-                                    statData: statData,
-                                    sampleCount: sampleCount,
-                                    graphSamplesPerPoint: graphSamplesPerPoint,
-                                    sampleIndex: ref sampleIndex);
-                                pointValues.PushBack(pointValue);
-                            }
-                            break;
+                            var pointValue = SampleGauge(
+                                statData: statData,
+                                sampleCount: sampleCount,
+                                graphSamplesPerPoint: graphSamplesPerPoint,
+                                sampleIndex: ref sampleIndex
+                            );
+                            pointValues.PushBack(pointValue);
                         }
+                        break;
+                    }
                 }
             }
         }
@@ -129,7 +128,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             RingBuffer<float> statData,
             int sampleCount,
             float graphSamplesPerPoint,
-            ref float sampleIndex)
+            ref float sampleIndex
+        )
         {
             // Sum the statData on the continuous interval [a, b],
             // and divide it by the duration timeB - timeA
@@ -148,12 +148,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             var remainderB = b - indexB;
 
             var timeA =
-                (1 - remainderA) * timeStamps[timeStampOffset + indexA - 1] +
-                remainderA * timeStamps[timeStampOffset + indexA];
+                (1 - remainderA) * timeStamps[timeStampOffset + indexA - 1]
+                + remainderA * timeStamps[timeStampOffset + indexA];
 
             var timeB =
-                (1 - remainderB) * timeStamps[timeStampOffset + indexB - 1] +
-                remainderB * timeStamps[timeStampOffset + indexB];
+                (1 - remainderB) * timeStamps[timeStampOffset + indexB - 1]
+                + remainderB * timeStamps[timeStampOffset + indexB];
 
             var fractionOfSampleA = Math.Min(indexA + 1, b) - a;
 
@@ -183,7 +183,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             RingBuffer<float> statData,
             int sampleCount,
             float graphSamplesPerPoint,
-            ref float sampleIndex)
+            ref float sampleIndex
+        )
         {
             // Sum the statData on the continuous interval [a, b],
             // and divide it by b - a

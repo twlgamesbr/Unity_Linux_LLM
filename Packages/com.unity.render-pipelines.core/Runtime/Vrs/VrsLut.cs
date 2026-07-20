@@ -18,13 +18,13 @@ namespace UnityEngine.Rendering
             return new VrsLut()
             {
                 [ShadingRateFragmentSize.FragmentSize1x1] = new Color(0.785f, 0.23f, 0.20f, 1), // Red
-                [ShadingRateFragmentSize.FragmentSize1x2] = new Color(1.00f, 0.80f, 0.80f, 1),  // Light Red
-                [ShadingRateFragmentSize.FragmentSize2x1] = new Color(0.40f, 0.20f, 0.20f, 1),  // Dark Red
-                [ShadingRateFragmentSize.FragmentSize2x2] = new Color(0.51f, 0.80f, 0.60f, 1),  // Green
-                [ShadingRateFragmentSize.FragmentSize1x4] = new Color(0.60f, 0.80f, 1.00f, 1),  // Light Blue
-                [ShadingRateFragmentSize.FragmentSize4x1] = new Color(0.20f, 0.40f, 0.60f, 1),  // Medium Blue
-                [ShadingRateFragmentSize.FragmentSize2x4] = new Color(0.80f, 1.00f, 0.80f, 1),  // Light Green
-                [ShadingRateFragmentSize.FragmentSize4x2] = new Color(0.20f, 0.40f, 0.20f, 1),  // Dark Green
+                [ShadingRateFragmentSize.FragmentSize1x2] = new Color(1.00f, 0.80f, 0.80f, 1), // Light Red
+                [ShadingRateFragmentSize.FragmentSize2x1] = new Color(0.40f, 0.20f, 0.20f, 1), // Dark Red
+                [ShadingRateFragmentSize.FragmentSize2x2] = new Color(0.51f, 0.80f, 0.60f, 1), // Green
+                [ShadingRateFragmentSize.FragmentSize1x4] = new Color(0.60f, 0.80f, 1.00f, 1), // Light Blue
+                [ShadingRateFragmentSize.FragmentSize4x1] = new Color(0.20f, 0.40f, 0.60f, 1), // Medium Blue
+                [ShadingRateFragmentSize.FragmentSize2x4] = new Color(0.80f, 1.00f, 0.80f, 1), // Light Green
+                [ShadingRateFragmentSize.FragmentSize4x2] = new Color(0.20f, 0.40f, 0.20f, 1), // Dark Green
                 [ShadingRateFragmentSize.FragmentSize4x4] = new Color(0.125f, 0.22f, 0.36f, 1), // Dark Blue
             };
         }
@@ -68,7 +68,7 @@ namespace UnityEngine.Rendering
                 {
                     var fragmentSize = (ShadingRateFragmentSize)fragmentSizes.GetValue(i);
                     var nativeValue = ShadingRateInfo.QueryNativeValue(fragmentSize);
-                    bufferData[nativeValue] = m_Data[(int) fragmentSize].linear;
+                    bufferData[nativeValue] = m_Data[(int)fragmentSize].linear;
                 }
             }
             else
@@ -81,7 +81,11 @@ namespace UnityEngine.Rendering
                 }
             }
 
-            buffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, bufferData.Length, Marshal.SizeOf(typeof(Color)));
+            buffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                bufferData.Length,
+                Marshal.SizeOf(typeof(Color))
+            );
             buffer.SetData(bufferData);
 
             return buffer;
@@ -90,29 +94,30 @@ namespace UnityEngine.Rendering
         private const uint Rate1x = 0;
         private const uint Rate2x = 1;
         private const uint Rate4x = 2;
+
         private uint MapFragmentShadingRateToBinary(ShadingRateFragmentSize fs)
         {
             switch (fs)
             {
-            default:
-            case ShadingRateFragmentSize.FragmentSize1x1:
-                return EncodeShadingRate(Rate1x, Rate1x);
-            case ShadingRateFragmentSize.FragmentSize1x2:
-                return EncodeShadingRate(Rate1x, Rate2x);
-            case ShadingRateFragmentSize.FragmentSize2x1:
-                return EncodeShadingRate(Rate2x, Rate1x);
-            case ShadingRateFragmentSize.FragmentSize2x2:
-                return EncodeShadingRate(Rate2x, Rate2x);
-            case ShadingRateFragmentSize.FragmentSize1x4:
-                return EncodeShadingRate(Rate1x, Rate4x);
-            case ShadingRateFragmentSize.FragmentSize4x1:
-                return EncodeShadingRate(Rate4x, Rate1x);
-            case ShadingRateFragmentSize.FragmentSize2x4:
-                return EncodeShadingRate(Rate2x, Rate4x);
-            case ShadingRateFragmentSize.FragmentSize4x2:
-                return EncodeShadingRate(Rate4x, Rate2x);
-            case ShadingRateFragmentSize.FragmentSize4x4:
-                return EncodeShadingRate(Rate4x, Rate4x);
+                default:
+                case ShadingRateFragmentSize.FragmentSize1x1:
+                    return EncodeShadingRate(Rate1x, Rate1x);
+                case ShadingRateFragmentSize.FragmentSize1x2:
+                    return EncodeShadingRate(Rate1x, Rate2x);
+                case ShadingRateFragmentSize.FragmentSize2x1:
+                    return EncodeShadingRate(Rate2x, Rate1x);
+                case ShadingRateFragmentSize.FragmentSize2x2:
+                    return EncodeShadingRate(Rate2x, Rate2x);
+                case ShadingRateFragmentSize.FragmentSize1x4:
+                    return EncodeShadingRate(Rate1x, Rate4x);
+                case ShadingRateFragmentSize.FragmentSize4x1:
+                    return EncodeShadingRate(Rate4x, Rate1x);
+                case ShadingRateFragmentSize.FragmentSize2x4:
+                    return EncodeShadingRate(Rate2x, Rate4x);
+                case ShadingRateFragmentSize.FragmentSize4x2:
+                    return EncodeShadingRate(Rate4x, Rate2x);
+                case ShadingRateFragmentSize.FragmentSize4x4:
+                    return EncodeShadingRate(Rate4x, Rate4x);
             }
         }
 

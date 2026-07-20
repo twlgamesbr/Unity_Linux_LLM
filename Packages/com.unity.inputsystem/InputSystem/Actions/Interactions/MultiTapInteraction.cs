@@ -34,7 +34,9 @@ namespace UnityEngine.InputSystem.Interactions
         /// <remarks>
         /// If this value is equal to or smaller than zero, the input system will use (<see cref="InputSettings.defaultTapTime"/>) instead.
         /// </remarks>
-        [Tooltip("The maximum time (in seconds) allowed to elapse between pressing and releasing a control for it to register as a tap.")]
+        [Tooltip(
+            "The maximum time (in seconds) allowed to elapse between pressing and releasing a control for it to register as a tap."
+        )]
         public float tapTime;
 
         /// <summary>
@@ -44,7 +46,9 @@ namespace UnityEngine.InputSystem.Interactions
         /// If this time is exceeded, the multi-tap interaction is canceled.
         /// If this value is equal to or smaller than zero, the input system will use the duplicate value of <see cref="tapTime"/> instead.
         /// </remarks>
-        [Tooltip("The maximum delay (in seconds) allowed between each tap. If this time is exceeded, the multi-tap is canceled.")]
+        [Tooltip(
+            "The maximum delay (in seconds) allowed between each tap. If this time is exceeded, the multi-tap is canceled."
+        )]
         public float tapDelay;
 
         /// <summary>
@@ -53,7 +57,9 @@ namespace UnityEngine.InputSystem.Interactions
         /// <remarks>
         /// How many taps need to be performed in succession. Two means double-tap, three means triple-tap, and so on.
         /// </remarks>
-        [Tooltip("How many taps need to be performed in succession. Two means double-tap, three means triple-tap, and so on.")]
+        [Tooltip(
+            "How many taps need to be performed in succession. Two means double-tap, three means triple-tap, and so on."
+        )]
         public int tapCount = 2;
 
         /// <summary>
@@ -68,8 +74,10 @@ namespace UnityEngine.InputSystem.Interactions
 
         private float tapTimeOrDefault => tapTime > 0.0 ? tapTime : InputSystem.settings.defaultTapTime;
         internal float tapDelayOrDefault => tapDelay > 0.0 ? tapDelay : InputSystem.settings.multiTapDelayTime;
-        private float pressPointOrDefault => pressPoint > 0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
-        private float releasePointOrDefault => pressPointOrDefault * ButtonControl.s_GlobalDefaultButtonReleaseThreshold;
+        private float pressPointOrDefault =>
+            pressPoint > 0 ? pressPoint : ButtonControl.s_GlobalDefaultButtonPressPoint;
+        private float releasePointOrDefault =>
+            pressPointOrDefault * ButtonControl.s_GlobalDefaultButtonReleaseThreshold;
 
         /// <inheritdoc />
         public void Process(ref InputInteractionContext context)
@@ -99,7 +107,9 @@ namespace UnityEngine.InputSystem.Interactions
                         // effects the result of InputAction.GetTimeoutCompletionPercentage()
                         // such that it accounts for the total time we allocate for the interaction
                         // rather than only the time of one single timeout.
-                        context.SetTotalTimeoutCompletionTime(maxTapTime * tapCount + (tapCount - 1) * maxDelayInBetween);
+                        context.SetTotalTimeoutCompletionTime(
+                            maxTapTime * tapCount + (tapCount - 1) * maxDelayInBetween
+                        );
                     }
                     break;
 
@@ -167,7 +177,7 @@ namespace UnityEngine.InputSystem.Interactions
         }
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     /// <summary>
     /// UI that is displayed when editing <see cref="HoldInteraction"/> in the editor.
     /// </summary>
@@ -175,21 +185,32 @@ namespace UnityEngine.InputSystem.Interactions
     {
         protected override void OnEnable()
         {
-            m_TapTimeSetting.Initialize("Max Tap Duration",
+            m_TapTimeSetting.Initialize(
+                "Max Tap Duration",
                 "Time (in seconds) within with a control has to be released again for it to register as a tap. If the control is held "
-                + "for longer than this time, the tap is canceled.",
+                    + "for longer than this time, the tap is canceled.",
                 "Default Tap Time",
-                () => target.tapTime, x => target.tapTime = x, () => InputSystem.settings.defaultTapTime);
-            m_TapDelaySetting.Initialize("Max Tap Spacing",
+                () => target.tapTime,
+                x => target.tapTime = x,
+                () => InputSystem.settings.defaultTapTime
+            );
+            m_TapDelaySetting.Initialize(
+                "Max Tap Spacing",
                 "The maximum delay (in seconds) allowed between each tap. If this time is exceeded, the multi-tap is canceled.",
                 "Default Tap Spacing",
-                () => target.tapDelay, x => target.tapDelay = x, () => InputSystem.settings.multiTapDelayTime);
-            m_PressPointSetting.Initialize("Press Point",
+                () => target.tapDelay,
+                x => target.tapDelay = x,
+                () => InputSystem.settings.multiTapDelayTime
+            );
+            m_PressPointSetting.Initialize(
+                "Press Point",
                 "The amount of actuation a control requires before being considered pressed. If not set, default to "
-                + "'Default Button Press Point' in the global input settings.",
+                    + "'Default Button Press Point' in the global input settings.",
                 "Default Button Press Point",
-                () => target.pressPoint, v => target.pressPoint = v,
-                () => InputSystem.settings.defaultButtonPressPoint);
+                () => target.pressPoint,
+                v => target.pressPoint = v,
+                () => InputSystem.settings.defaultButtonPressPoint
+            );
         }
 
         public override void OnGUI()
@@ -208,7 +229,7 @@ namespace UnityEngine.InputSystem.Interactions
             var tapCountField = new IntegerField(m_TapCountLabel.text)
             {
                 value = target.tapCount,
-                tooltip = m_TapCountLabel.tooltip
+                tooltip = m_TapCountLabel.tooltip,
             };
             tapCountField.RegisterValueChangedCallback(evt =>
             {
@@ -222,11 +243,14 @@ namespace UnityEngine.InputSystem.Interactions
             m_PressPointSetting.OnDrawVisualElements(root, onChangedCallback);
         }
 
-        private readonly GUIContent m_TapCountLabel = new GUIContent("Tap Count", "How many taps need to be performed in succession. Two means double-tap, three means triple-tap, and so on.");
+        private readonly GUIContent m_TapCountLabel = new GUIContent(
+            "Tap Count",
+            "How many taps need to be performed in succession. Two means double-tap, three means triple-tap, and so on."
+        );
 
         private CustomOrDefaultSetting m_PressPointSetting;
         private CustomOrDefaultSetting m_TapTimeSetting;
         private CustomOrDefaultSetting m_TapDelaySetting;
     }
-    #endif
+#endif
 }

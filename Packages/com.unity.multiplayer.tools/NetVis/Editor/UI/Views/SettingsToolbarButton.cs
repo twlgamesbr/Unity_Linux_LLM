@@ -15,10 +15,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
         static SettingsToolbarButton s_Instance;
 
         public SettingsToolbarButton()
-            : base(
-                string.Empty,
-                EditorGUIUtility.FindTexture("_Popup"),
-                ShowSettings)
+            : base(string.Empty, EditorGUIUtility.FindTexture("_Popup"), ShowSettings)
         {
             s_Instance = this;
         }
@@ -27,6 +24,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
         {
             PopupWindow.Show(s_Instance.worldBound, new NetVisPopupWindowContent<CommonSettingsView>(320));
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<SettingsToolbarButton, UxmlTraits> { }
 #endif

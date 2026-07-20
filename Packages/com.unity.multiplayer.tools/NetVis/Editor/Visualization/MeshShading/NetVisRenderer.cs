@@ -167,13 +167,16 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             RenderTexture existingTexture,
             Camera camera,
             GraphicsFormat colorFormat = GraphicsFormat.R8G8B8A8_UNorm,
-            GraphicsFormat depthStencilFormat = GraphicsFormat.None)
+            GraphicsFormat depthStencilFormat = GraphicsFormat.None
+        )
         {
-            if (existingTexture != null &&
-                existingTexture.width == camera.pixelWidth &&
-                existingTexture.height == camera.pixelHeight &&
-                existingTexture.graphicsFormat == colorFormat &&
-                existingTexture.depthStencilFormat == depthStencilFormat)
+            if (
+                existingTexture != null
+                && existingTexture.width == camera.pixelWidth
+                && existingTexture.height == camera.pixelHeight
+                && existingTexture.graphicsFormat == colorFormat
+                && existingTexture.depthStencilFormat == depthStencilFormat
+            )
             {
                 return existingTexture;
             }
@@ -185,13 +188,18 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
                 width: camera.pixelWidth,
                 height: camera.pixelHeight,
                 colorFormat: colorFormat,
-                depthStencilFormat: depthStencilFormat);
+                depthStencilFormat: depthStencilFormat
+            );
             return new RenderTexture(desc);
         }
 
         void InitializeNewTexturesIfNeeded()
         {
-            m_ObjectIdTexture = InitializeNewTextureIfNeeded(m_ObjectIdTexture, Camera, depthStencilFormat: GraphicsFormat.D32_SFloat);
+            m_ObjectIdTexture = InitializeNewTextureIfNeeded(
+                m_ObjectIdTexture,
+                Camera,
+                depthStencilFormat: GraphicsFormat.D32_SFloat
+            );
             m_SceneRenderTexture = InitializeNewTextureIfNeeded(m_SceneRenderTexture, Camera);
         }
 
@@ -256,7 +264,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             SetComputeBuffer(k_ObjectIdToColorBufferIdentifier, objectIdToColors, ref m_ObjectIdToColorBuffer);
         }
 
-        void SetComputeBuffer<T>(int bufferPropertyId, T[] data, ref ComputeBuffer computeBuffer) where T : struct
+        void SetComputeBuffer<T>(int bufferPropertyId, T[] data, ref ComputeBuffer computeBuffer)
+            where T : struct
         {
             if (data.Length == 0)
             {
@@ -267,7 +276,12 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             {
                 var stride = Marshal.SizeOf(typeof(T));
                 computeBuffer?.Release();
-                computeBuffer = new ComputeBuffer(data.Length, stride, ComputeBufferType.Default, ComputeBufferMode.Dynamic);
+                computeBuffer = new ComputeBuffer(
+                    data.Length,
+                    stride,
+                    ComputeBufferType.Default,
+                    ComputeBufferMode.Dynamic
+                );
             }
 
             computeBuffer.SetData(data);

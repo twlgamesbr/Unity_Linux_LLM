@@ -17,8 +17,12 @@ namespace UnityEngine.InputSystem.Editor
 
         private SerializedProperty m_ListProperty;
 
-        public NameAndParametersListView(VisualElement root, StateContainer stateContainer, SerializedProperty listProperty,
-                                         Func<InputActionsEditorState, IEnumerable<ParameterListView>> parameterListViewSelector)
+        public NameAndParametersListView(
+            VisualElement root,
+            StateContainer stateContainer,
+            SerializedProperty listProperty,
+            Func<InputActionsEditorState, IEnumerable<ParameterListView>> parameterListViewSelector
+        )
             : base(root, stateContainer)
         {
             m_ListProperty = listProperty;
@@ -34,7 +38,7 @@ namespace UnityEngine.InputSystem.Editor
                 return;
 
             var interactionsOrProcessorsList = NameAndParameters.ParseMultiple(m_ListProperty.stringValue).ToList();
-            var newElement = new NameAndParameters() { name = name};
+            var newElement = new NameAndParameters() { name = name };
             interactionsOrProcessorsList.Add(newElement);
 
             m_ListProperty.stringValue = NameAndParameters.ToSerializableString(interactionsOrProcessorsList);
@@ -76,7 +80,11 @@ namespace UnityEngine.InputSystem.Editor
         private void OnParametersChanged(ParameterListView listView, int index)
         {
             var interactionsOrProcessorsList = NameAndParameters.ParseMultiple(m_ListProperty.stringValue).ToList();
-            interactionsOrProcessorsList[index] = new NameAndParameters { name = interactionsOrProcessorsList[index].name, parameters = listView.GetParameters() };
+            interactionsOrProcessorsList[index] = new NameAndParameters
+            {
+                name = interactionsOrProcessorsList[index].name,
+                parameters = listView.GetParameters(),
+            };
             m_ListProperty.stringValue = NameAndParameters.ToSerializableString(interactionsOrProcessorsList);
             m_ListProperty.serializedObject.ApplyModifiedProperties();
         }
@@ -107,7 +115,7 @@ namespace UnityEngine.InputSystem.Editor
                     onClickUp = () => MoveElementUp(index),
                     onDelete = () => DeleteElement(index),
                     isDownButtonActive = index < parameterListViews.Count - 1,
-                    isUpButtonActive = index > 0
+                    isUpButtonActive = index > 0,
                 };
                 new NameAndParametersListViewItem(m_ContentContainer, parameterListViews[i], buttonProperties);
                 parameterListViews[i].onChange += () => OnParametersChanged(parameterListViews[index], index);
@@ -135,12 +143,17 @@ namespace UnityEngine.InputSystem.Editor
 
     internal class NameAndParametersListViewItem
     {
-        public NameAndParametersListViewItem(VisualElement root, ParameterListView parameterListView, ButtonProperties buttonProperties)
+        public NameAndParametersListViewItem(
+            VisualElement root,
+            ParameterListView parameterListView,
+            ButtonProperties buttonProperties
+        )
         {
             var itemTemplate = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                InputActionsEditorConstants.PackagePath +
-                InputActionsEditorConstants.ResourcesPath +
-                InputActionsEditorConstants.NameAndParametersListViewItemUxml);
+                InputActionsEditorConstants.PackagePath
+                    + InputActionsEditorConstants.ResourcesPath
+                    + InputActionsEditorConstants.NameAndParametersListViewItemUxml
+            );
 
             var container = itemTemplate.CloneTree();
             root.Add(container);

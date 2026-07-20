@@ -9,6 +9,7 @@ namespace Unity.Netcode.Transports.UTP
         /// The number of packet sent.
         /// </summary>
         public uint PacketSentCount;
+
         /// <summary>
         /// The number of packet received.
         /// </summary>

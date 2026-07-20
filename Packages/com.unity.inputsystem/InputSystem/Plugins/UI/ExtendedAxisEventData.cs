@@ -15,9 +15,7 @@ namespace UnityEngine.InputSystem.UI
         public InputDevice device { get; set; }
 
         public ExtendedAxisEventData(EventSystem eventSystem)
-            : base(eventSystem)
-        {
-        }
+            : base(eventSystem) { }
 
         public override string ToString()
         {

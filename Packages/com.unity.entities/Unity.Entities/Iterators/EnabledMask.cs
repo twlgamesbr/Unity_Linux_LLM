@@ -45,7 +45,6 @@ namespace Unity.Entities
         }
 #endif
 
-
         /// <summary>
         /// An invalid pointer.
         /// </summary>
@@ -91,7 +90,6 @@ namespace Unity.Entities
         /// <param name="value">The value to write to the pointed bit</param>
         public unsafe void SetBit(bool value)
         {
-
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
 #endif
@@ -145,7 +143,8 @@ namespace Unity.Entities
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                 if (Hint.Unlikely(m_PtrChunkDisabledCount == null))
                     throw new InvalidOperationException(
-                    "This EnabledMask was created from a read-only type handle or is uninitialized, and can not be used to set bit values.");
+                        "This EnabledMask was created from a read-only type handle or is uninitialized, and can not be used to set bit values."
+                    );
 #endif
                 bool wasSet = m_EnableBitRef.Offset(index).GetBit();
                 m_EnableBitRef.Offset(index).SetBit(value);
@@ -222,5 +221,4 @@ namespace Unity.Entities
             return EnabledRefRO<T>.Null;
         }
     }
-
 }

@@ -8,7 +8,9 @@ namespace Unity.PlatformToolkit.PlayMode
     {
         public PlayModeControlsAccountAttributeValuesList()
         {
-            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAccountAttributeValuesList.uxml");
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAccountAttributeValuesList.uxml"
+            );
             uxml.CloneTree(this);
         }
     }

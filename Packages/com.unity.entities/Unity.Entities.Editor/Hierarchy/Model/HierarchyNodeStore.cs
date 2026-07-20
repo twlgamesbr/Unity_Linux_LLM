@@ -16,7 +16,7 @@ namespace Unity.Entities.Editor
         {
             Parent = HierarchyNodeHandle.Root,
             ChangeVersion = -1,
-            SortIndex = int.MaxValue
+            SortIndex = int.MaxValue,
         };
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Unity.Entities.Editor
             [Flags]
             public enum PackingHint
             {
-                ChildrenRequireSorting = 1 << 0
+                ChildrenRequireSorting = 1 << 0,
             }
 
             /// <summary>
@@ -67,7 +67,8 @@ namespace Unity.Entities.Editor
 
         readonly Allocator m_Allocator;
 
-        [NativeDisableUnsafePtrRestriction] HierarchyNodeStoreData* m_HierarchyNodeStoreData;
+        [NativeDisableUnsafePtrRestriction]
+        HierarchyNodeStoreData* m_HierarchyNodeStoreData;
 
         /// <summary>
         /// Internal storage for node data. This abstracts the way we get and set node data and allows optimal performance and storage for specific node types.
@@ -96,7 +97,12 @@ namespace Unity.Entities.Editor
         public HierarchyNodeStore(Allocator allocator)
         {
             m_Allocator = allocator;
-            m_HierarchyNodeStoreData = (HierarchyNodeStoreData*) Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<HierarchyNodeStoreData>(), UnsafeUtility.AlignOf<HierarchyNodeStoreData>(), allocator);
+            m_HierarchyNodeStoreData = (HierarchyNodeStoreData*)
+                Memory.Unmanaged.Allocate(
+                    UnsafeUtility.SizeOf<HierarchyNodeStoreData>(),
+                    UnsafeUtility.AlignOf<HierarchyNodeStoreData>(),
+                    allocator
+                );
             m_HierarchyNodeStoreData->ChangeVersion = 1;
             m_Nodes = new HierarchyNodeMap<HierarchyNodeData>(allocator);
             m_Children = new UnsafeParallelMultiHashMap<HierarchyNodeHandle, HierarchyNodeHandle>(16, allocator);
@@ -125,28 +131,24 @@ namespace Unity.Entities.Editor
             m_HierarchyNodeStoreData->ChangeVersion = 1;
         }
 
-        internal int GetRootChangeVersion()
-            => m_Nodes[HierarchyNodeHandle.Root].ChangeVersion;
+        internal int GetRootChangeVersion() => m_Nodes[HierarchyNodeHandle.Root].ChangeVersion;
 
         /// <summary>
         /// Returns the number of valid nodes that exist in the hierarchy.
         /// </summary>
-        public int Count()
-            => m_Nodes.Count();
+        public int Count() => m_Nodes.Count();
 
         /// <summary>
         /// Returns <see langword="true"/> if the given handle exists in the hierarchy.
         /// </summary>
         /// <param name="handle">The handle to check existence for.</param>
         /// <returns><see langword="true"/> if the given handle exists; <see langword="false"/> otherwise.</returns>
-        public bool Exists(HierarchyNodeHandle handle)
-            => m_Nodes.Exists(handle);
+        public bool Exists(HierarchyNodeHandle handle) => m_Nodes.Exists(handle);
 
         /// <summary>
         /// Gets the root node for the <see cref="HierarchyNodeStore"/>.
         /// </summary>
-        public HierarchyNode GetRoot()
-            => new HierarchyNode(this, HierarchyNodeHandle.Root);
+        public HierarchyNode GetRoot() => new HierarchyNode(this, HierarchyNodeHandle.Root);
 
         /// <summary>
         /// Gets the <see cref="HierarchyNode"/> for the given handle.
@@ -164,8 +166,7 @@ namespace Unity.Entities.Editor
         /// </summary>
         /// <param name="handle">The handle for the new node.</param>
         /// <returns>The newly created node.</returns>
-        public HierarchyNode AddNode(HierarchyNodeHandle handle)
-            => AddNode(handle, HierarchyNodeHandle.Root);
+        public HierarchyNode AddNode(HierarchyNodeHandle handle) => AddNode(handle, HierarchyNodeHandle.Root);
 
         /// <summary>
         /// Adds a new node to the hierarchy with a specified parent node.
@@ -176,7 +177,9 @@ namespace Unity.Entities.Editor
         public HierarchyNode AddNode(HierarchyNodeHandle handle, HierarchyNodeHandle parent)
         {
             if (handle.Kind == NodeKind.Root)
-                throw new InvalidOperationException($"Trying to add {nameof(HierarchyNodeHandle)} with {nameof(NodeKind)}.{nameof(NodeKind.Root)}. This is not allowed.");
+                throw new InvalidOperationException(
+                    $"Trying to add {nameof(HierarchyNodeHandle)} with {nameof(NodeKind)}.{nameof(NodeKind.Root)}. This is not allowed."
+                );
 
             if (m_Nodes.Exists(handle))
                 throw new InvalidOperationException($"The specified handle {handle} already exist in the hierarchy.");
@@ -187,12 +190,15 @@ namespace Unity.Entities.Editor
             if (handle == parent)
                 throw new InvalidOperationException($"Trying to set the parent for {handle} as itself.");
 
-            m_Nodes.Add(handle, new HierarchyNodeData
-            {
-                ChangeVersion = ChangeVersion,
-                Parent = parent,
-                SortIndex = int.MaxValue
-            });
+            m_Nodes.Add(
+                handle,
+                new HierarchyNodeData
+                {
+                    ChangeVersion = ChangeVersion,
+                    Parent = parent,
+                    SortIndex = int.MaxValue,
+                }
+            );
 
             // Special case; Root entities are not included in the 'm_Children' set and instead handled separately for performance reasons.
             if (!(parent == HierarchyNodeHandle.Root && handle.Kind == NodeKind.Entity))
@@ -209,7 +215,9 @@ namespace Unity.Entities.Editor
         public void RemoveNode(HierarchyNodeHandle handle, bool removeChildrenRecursively = false)
         {
             if (handle.Kind == NodeKind.Root)
-                throw new InvalidOperationException($"Trying to remove {nameof(HierarchyNodeHandle)} with {nameof(NodeKind)}.{nameof(NodeKind.Root)}. This is not allowed.");
+                throw new InvalidOperationException(
+                    $"Trying to remove {nameof(HierarchyNodeHandle)} with {nameof(NodeKind)}.{nameof(NodeKind.Root)}. This is not allowed."
+                );
 
             if (!m_Nodes.Exists(handle))
                 throw new InvalidOperationException($"The specified {handle} does not exist in the hierarchy.");
@@ -375,7 +383,7 @@ namespace Unity.Entities.Editor
 
             var depth = -1;
 
-            for (;;)
+            for (; ; )
             {
                 if (handle.Kind <= NodeKind.Root)
                     return depth;
@@ -439,7 +447,9 @@ namespace Unity.Entities.Editor
         public void SetParent(HierarchyNodeHandle handle, HierarchyNodeHandle parent)
         {
             if (handle.Kind == NodeKind.Root)
-                throw new InvalidOperationException($"Trying to set parent for {nameof(HierarchyNodeHandle)} with {nameof(NodeKind)}.{nameof(NodeKind.Root)}. This is not allowed.");
+                throw new InvalidOperationException(
+                    $"Trying to set parent for {nameof(HierarchyNodeHandle)} with {nameof(NodeKind)}.{nameof(NodeKind.Root)}. This is not allowed."
+                );
 
             if (!m_Nodes.Exists(handle))
                 throw new InvalidOperationException($"The specified {handle} does not exist in the hierarchy.");
@@ -505,7 +515,7 @@ namespace Unity.Entities.Editor
 
         void UpdateChangeVersion(HierarchyNodeHandle handle)
         {
-            for (;;)
+            for (; ; )
             {
                 if (handle.Kind == NodeKind.None)
                     return;

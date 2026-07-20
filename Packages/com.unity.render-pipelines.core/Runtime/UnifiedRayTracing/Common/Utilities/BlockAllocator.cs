@@ -70,7 +70,6 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             if (geometricNewCapacity < desiredNewCapacity)
                 return desiredNewCapacity; // geometric growth would be insufficient
-
             else
                 return geometricNewCapacity;
         }
@@ -80,7 +79,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             Debug.Assert(newDesiredCapacity > 0, "newDesiredCapacity must be positive");
             Debug.Assert(maxAllowedCapacity > 0, "maxAllowedCapacity must be positive");
             Debug.Assert(capacity < newDesiredCapacity, "newDesiredCapacity must be greater than curent capacity");
-            Debug.Assert(maxAllowedCapacity >= newDesiredCapacity, "newDesiredCapacity must be smaller than maxAllowedCapacity");
+            Debug.Assert(
+                maxAllowedCapacity >= newDesiredCapacity,
+                "newDesiredCapacity must be smaller than maxAllowedCapacity"
+            );
 
             var newCapacity = CalculateGeometricGrowthCapacity(newDesiredCapacity, maxAllowedCapacity);
             var oldCapacity = m_MaxElementCount;
@@ -103,11 +105,16 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         {
             newCapacity = 0;
 
-            var additionalRequiredElements = m_freeBlocks.IsEmpty ? elementCounts : math.max(elementCounts - m_freeBlocks[m_freeBlocks.Length - 1].count, 0);
+            var additionalRequiredElements = m_freeBlocks.IsEmpty
+                ? elementCounts
+                : math.max(elementCounts - m_freeBlocks[m_freeBlocks.Length - 1].count, 0);
             if (maxAllowedCapacity < capacity || (maxAllowedCapacity - capacity) < additionalRequiredElements)
                 return false;
 
-            newCapacity = additionalRequiredElements > 0 ? CalculateGeometricGrowthCapacity(capacity + additionalRequiredElements, maxAllowedCapacity) : capacity;
+            newCapacity =
+                additionalRequiredElements > 0
+                    ? CalculateGeometricGrowthCapacity(capacity + additionalRequiredElements, maxAllowedCapacity)
+                    : capacity;
             return true;
         }
 
@@ -116,18 +123,28 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return GrowAndAllocate(elementCounts, Int32.MaxValue, out oldCapacity, out newCapacity);
         }
 
-        public Allocation GrowAndAllocate(int elementCounts, int maxAllowedCapacity, out int oldCapacity, out int newCapacity)
+        public Allocation GrowAndAllocate(
+            int elementCounts,
+            int maxAllowedCapacity,
+            out int oldCapacity,
+            out int newCapacity
+        )
         {
             oldCapacity = capacity;
 
-            var additionalRequiredElements = m_freeBlocks.IsEmpty ? elementCounts : math.max(elementCounts - m_freeBlocks[m_freeBlocks.Length - 1].count, 0);
+            var additionalRequiredElements = m_freeBlocks.IsEmpty
+                ? elementCounts
+                : math.max(elementCounts - m_freeBlocks[m_freeBlocks.Length - 1].count, 0);
             if (maxAllowedCapacity < capacity || (maxAllowedCapacity - capacity) < additionalRequiredElements)
             {
                 newCapacity = capacity;
                 return Allocation.Invalid;
             }
 
-            newCapacity = additionalRequiredElements > 0 ? Grow(capacity + additionalRequiredElements, maxAllowedCapacity) : capacity;
+            newCapacity =
+                additionalRequiredElements > 0
+                    ? Grow(capacity + additionalRequiredElements, maxAllowedCapacity)
+                    : capacity;
             Debug.Assert(newCapacity >= oldCapacity + additionalRequiredElements);
 
             var alloc = Allocate(elementCounts);

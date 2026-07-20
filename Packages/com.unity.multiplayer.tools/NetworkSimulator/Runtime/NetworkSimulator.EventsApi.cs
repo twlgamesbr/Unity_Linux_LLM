@@ -17,8 +17,10 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
 
         /// <inheritdoc />
         public Task TriggerLagSpikeAsync(TimeSpan duration) => NetworkEventsApi.TriggerLagSpikeAsync(duration);
+
         /// <inheritdoc />
-        public void ChangeConnectionPreset(INetworkSimulatorPreset preset) => NetworkEventsApi.ChangeConnectionPreset(preset);
+        public void ChangeConnectionPreset(INetworkSimulatorPreset preset) =>
+            NetworkEventsApi.ChangeConnectionPreset(preset);
 
         /// <inheritdoc />
         public INetworkSimulatorPreset CurrentPreset => NetworkEventsApi.CurrentPreset;

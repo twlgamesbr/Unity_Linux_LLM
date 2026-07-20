@@ -8,6 +8,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks.Scene
     {
         internal Func<bool> SaveCurrentModifiedScenesIfUserWantsTo =
             EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo;
+
         public override IEnumerator Execute(TestJobData testJobData)
         {
             var cancelled = !SaveCurrentModifiedScenesIfUserWantsTo();

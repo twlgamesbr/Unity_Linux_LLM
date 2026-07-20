@@ -1,7 +1,7 @@
 using System;
-using UnityEngine;
-using UnityEditor.ProjectWindowCallback;
 using System.IO;
+using UnityEditor.ProjectWindowCallback;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
@@ -41,7 +41,8 @@ namespace UnityEditor.Rendering
                 assetCreator,
                 fullPath,
                 CoreUtils.GetIconForType<VolumeProfile>(),
-                null);
+                null
+            );
         }
 
         /// <summary>

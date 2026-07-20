@@ -15,6 +15,7 @@ namespace Unity.Physics
     {
         /// <summary>   The minimum point. </summary>
         public float3 Min;
+
         /// <summary>   The maximum point. </summary>
         public float3 Max;
 
@@ -187,11 +188,7 @@ namespace Unity.Physics
             float3 halfExtentsInB = math.abs(x) + math.abs(y) + math.abs(z);
             float3 centerInB = math.transform(transform, aabb.Center * uniformScale);
 
-            return new Aabb
-            {
-                Min = centerInB - halfExtentsInB,
-                Max = centerInB + halfExtentsInB
-            };
+            return new Aabb { Min = centerInB - halfExtentsInB, Max = centerInB + halfExtentsInB };
         }
 
         /// <summary>   Transform an AABB into another space, expanding it as needed. </summary>
@@ -219,11 +216,7 @@ namespace Unity.Physics
             float3 halfExtentsInB = transformedX + transformedY + transformedZ;
             float3 centerInB = Mul(transform, aabb.Center * uniformScale);
 
-            return new Aabb
-            {
-                Min = centerInB - halfExtentsInB,
-                Max = centerInB + halfExtentsInB
-            };
+            return new Aabb { Min = centerInB - halfExtentsInB, Max = centerInB + halfExtentsInB };
         }
     }
 }

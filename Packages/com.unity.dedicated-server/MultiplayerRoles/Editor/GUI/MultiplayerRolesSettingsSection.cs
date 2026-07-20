@@ -30,9 +30,11 @@ namespace Unity.Multiplayer.Editor
             var enableContentSelectionBox = new Toggle("Enable Multiplayer Roles")
             {
                 value = EditorMultiplayerRolesManager.EnableMultiplayerRoles,
-                tooltip = "Enable Multiplayer Roles to strip components from builds based on the multiplayer role."
+                tooltip = "Enable Multiplayer Roles to strip components from builds based on the multiplayer role.",
             };
-            enableContentSelectionBox.RegisterValueChangedCallback((evt) => EditorMultiplayerRolesManager.EnableMultiplayerRoles = evt.newValue);
+            enableContentSelectionBox.RegisterValueChangedCallback(
+                (evt) => EditorMultiplayerRolesManager.EnableMultiplayerRoles = evt.newValue
+            );
             Add(enableContentSelectionBox);
 
             m_ContentSelectionContainer = new VisualElement();
@@ -41,14 +43,20 @@ namespace Unity.Multiplayer.Editor
             var enableSafetyChecks = new Toggle("Enable safety checks")
             {
                 value = EditorMultiplayerRolesManager.EnableSafetyChecks,
-                tooltip = "Enable safety checks to prevent null reference errors when stripping components. Disabling this will improve building and entering play mode performance."
+                tooltip =
+                    "Enable safety checks to prevent null reference errors when stripping components. Disabling this will improve building and entering play mode performance.",
             };
-            enableSafetyChecks.RegisterValueChangedCallback((evt) => EditorMultiplayerRolesManager.EnableSafetyChecks = evt.newValue);
+            enableSafetyChecks.RegisterValueChangedCallback(
+                (evt) => EditorMultiplayerRolesManager.EnableSafetyChecks = evt.newValue
+            );
             m_ContentSelectionContainer.Add(enableSafetyChecks);
 
             m_AutomaticSelectionOptions = ContentSelectionSettings.AutomaticSelection.Clone();
 
-            var helpBox = new HelpBox("Select the components that will be stripped from Server or Client builds.", HelpBoxMessageType.Info);
+            var helpBox = new HelpBox(
+                "Select the components that will be stripped from Server or Client builds.",
+                HelpBoxMessageType.Info
+            );
 
             m_TabGroup = new TabGroup();
             m_TabGroup.AddTab("Server", CreateServerContent);
@@ -77,7 +85,9 @@ namespace Unity.Multiplayer.Editor
             OnChange();
 
             RegisterCallback<AttachToPanelEvent>(_ => EditorApplication.playModeStateChanged += OnPlayModeStateChanged);
-            RegisterCallback<DetachFromPanelEvent>(_ => EditorApplication.playModeStateChanged -= OnPlayModeStateChanged);
+            RegisterCallback<DetachFromPanelEvent>(_ =>
+                EditorApplication.playModeStateChanged -= OnPlayModeStateChanged
+            );
 
             SetEnabled(!EditorApplication.isPlayingOrWillChangePlaymode);
         }
@@ -91,7 +101,14 @@ namespace Unity.Multiplayer.Editor
         {
             if (HasPendingChanges())
             {
-                if (EditorUtility.DisplayDialog("Content Selection Settings Have Been Modified", "Do you want to apply changes?", "Apply", "Revert"))
+                if (
+                    EditorUtility.DisplayDialog(
+                        "Content Selection Settings Have Been Modified",
+                        "Do you want to apply changes?",
+                        "Apply",
+                        "Revert"
+                    )
+                )
                     Apply();
                 else
                     Revert();
@@ -103,13 +120,17 @@ namespace Unity.Multiplayer.Editor
             var changed = false;
             var currentOptions = ContentSelectionSettings.AutomaticSelection;
 
-            if (m_AutomaticSelectionOptions.StripAudioComponents != currentOptions.StripAudioComponents ||
-                m_AutomaticSelectionOptions.StripRenderingComponents != currentOptions.StripRenderingComponents ||
-                m_AutomaticSelectionOptions.StripUIComponents != currentOptions.StripUIComponents)
+            if (
+                m_AutomaticSelectionOptions.StripAudioComponents != currentOptions.StripAudioComponents
+                || m_AutomaticSelectionOptions.StripRenderingComponents != currentOptions.StripRenderingComponents
+                || m_AutomaticSelectionOptions.StripUIComponents != currentOptions.StripUIComponents
+            )
             {
                 changed = true;
             }
-            else if (!m_AutomaticSelectionOptions.GetCustomComponents().SequenceEqual(currentOptions.GetCustomComponents()))
+            else if (
+                !m_AutomaticSelectionOptions.GetCustomComponents().SequenceEqual(currentOptions.GetCustomComponents())
+            )
             {
                 changed = true;
             }
@@ -164,16 +185,27 @@ namespace Unity.Multiplayer.Editor
 
             var serializedObject = new SerializedObject(ContentSelectionSettings.instance);
 
-            var stripRendering = new Toggle("Strip Rendering Components") { value = m_AutomaticSelectionOptions.StripRenderingComponents };
-            stripRendering.RegisterValueChangedCallback((evt) => m_AutomaticSelectionOptions.StripRenderingComponents = evt.newValue);
+            var stripRendering = new Toggle("Strip Rendering Components")
+            {
+                value = m_AutomaticSelectionOptions.StripRenderingComponents,
+            };
+            stripRendering.RegisterValueChangedCallback(
+                (evt) => m_AutomaticSelectionOptions.StripRenderingComponents = evt.newValue
+            );
 
             var stripUI = new Toggle("Strip UI Components") { value = m_AutomaticSelectionOptions.StripUIComponents };
             stripUI.RegisterValueChangedCallback((evt) => m_AutomaticSelectionOptions.StripUIComponents = evt.newValue);
 
-            var stripAudio = new Toggle("Strip Audio Components") { value = m_AutomaticSelectionOptions.StripAudioComponents };
-            stripAudio.RegisterValueChangedCallback((evt) => m_AutomaticSelectionOptions.StripAudioComponents = evt.newValue);
+            var stripAudio = new Toggle("Strip Audio Components")
+            {
+                value = m_AutomaticSelectionOptions.StripAudioComponents,
+            };
+            stripAudio.RegisterValueChangedCallback(
+                (evt) => m_AutomaticSelectionOptions.StripAudioComponents = evt.newValue
+            );
 
-            var componentsList = m_AutomaticSelectionOptions.GetCustomComponents()
+            var componentsList = m_AutomaticSelectionOptions
+                .GetCustomComponents()
                 .Where(kvp => (kvp.Value & MultiplayerRoleToFlags(MultiplayerRole.Server)) == 0)
                 .Select(kvp => kvp.Key)
                 .ToList();
@@ -188,7 +220,7 @@ namespace Unity.Multiplayer.Editor
                 showBorder = true,
                 showAlternatingRowBackgrounds = AlternatingRowBackground.ContentOnly,
                 showAddRemoveFooter = true,
-                showBoundCollectionSize = false
+                showBoundCollectionSize = false,
             };
             listView.itemsRemoved += (i) => OnRemoveClicked(componentsList, MultiplayerRole.Server, i);
             SetupListAddButton(listView, MultiplayerRole.Server);
@@ -205,7 +237,8 @@ namespace Unity.Multiplayer.Editor
         {
             var content = new VisualElement();
 
-            var componentsList = m_AutomaticSelectionOptions.GetCustomComponents()
+            var componentsList = m_AutomaticSelectionOptions
+                .GetCustomComponents()
                 .Where(kvp => (kvp.Value & MultiplayerRoleToFlags(MultiplayerRole.Client)) == 0)
                 .Select(kvp => kvp.Key)
                 .ToList();
@@ -220,7 +253,7 @@ namespace Unity.Multiplayer.Editor
                 showBorder = true,
                 showAlternatingRowBackgrounds = AlternatingRowBackground.All,
                 showAddRemoveFooter = true,
-                showBoundCollectionSize = false
+                showBoundCollectionSize = false,
             };
             listView.itemsRemoved += (i) => OnRemoveClicked(componentsList, MultiplayerRole.Client, i);
             SetupListAddButton(listView, MultiplayerRole.Client);
@@ -234,7 +267,11 @@ namespace Unity.Multiplayer.Editor
         {
             var oldButton = list.Q<Button>("unity-list-view__add-button");
             var parent = oldButton.parent;
-            var addButton = new Button(() => OnAddClicked(list, target)) { name = "unity-list-view__add-button", text = "+" };
+            var addButton = new Button(() => OnAddClicked(list, target))
+            {
+                name = "unity-list-view__add-button",
+                text = "+",
+            };
             parent.Add(addButton);
             addButton.PlaceBehind(oldButton);
             oldButton.RemoveFromHierarchy();
@@ -243,18 +280,24 @@ namespace Unity.Multiplayer.Editor
         private void OnAddClicked(ListView list, MultiplayerRole target)
         {
             var position = list.Q<Button>("unity-list-view__add-button").worldBound.position;
-            UnityEditor.PopupWindow.Show(new Rect(position.x, position.y, 0, 0), new NewComponentSelectionPopup(type =>
-            {
-                if (list.itemsSource.Contains(type))
-                    return;
+            UnityEditor.PopupWindow.Show(
+                new Rect(position.x, position.y, 0, 0),
+                new NewComponentSelectionPopup(type =>
+                {
+                    if (list.itemsSource.Contains(type))
+                        return;
 
-                var currentTarget = m_AutomaticSelectionOptions.GetMultiplayerRoleFlagsForType(type);
-                m_AutomaticSelectionOptions.SetCustomComponentMultiplayerRoleFlags(type, currentTarget & ~MultiplayerRoleToFlags(target));
+                    var currentTarget = m_AutomaticSelectionOptions.GetMultiplayerRoleFlagsForType(type);
+                    m_AutomaticSelectionOptions.SetCustomComponentMultiplayerRoleFlags(
+                        type,
+                        currentTarget & ~MultiplayerRoleToFlags(target)
+                    );
 
-                list.itemsSource.Add(type);
-                list.RefreshItems();
-                OnChange();
-            }));
+                    list.itemsSource.Add(type);
+                    list.RefreshItems();
+                    OnChange();
+                })
+            );
         }
 
         private void OnRemoveClicked(List<Type> types, MultiplayerRole target, IEnumerable<int> items)
@@ -263,14 +306,17 @@ namespace Unity.Multiplayer.Editor
             {
                 var type = types[item];
                 var currentTarget = m_AutomaticSelectionOptions.GetMultiplayerRoleFlagsForType(type);
-                m_AutomaticSelectionOptions.SetCustomComponentMultiplayerRoleFlags(type, currentTarget | MultiplayerRoleToFlags(target));
+                m_AutomaticSelectionOptions.SetCustomComponentMultiplayerRoleFlags(
+                    type,
+                    currentTarget | MultiplayerRoleToFlags(target)
+                );
             }
 
             OnChange();
         }
 
-        private static MultiplayerRoleFlags MultiplayerRoleToFlags(MultiplayerRole role)
-            => (MultiplayerRoleFlags)(1 << (int)role);
+        private static MultiplayerRoleFlags MultiplayerRoleToFlags(MultiplayerRole role) =>
+            (MultiplayerRoleFlags)(1 << (int)role);
 
         private class NewComponentSelectionPopup : PopupWindowContent
         {
@@ -286,7 +332,8 @@ namespace Unity.Multiplayer.Editor
             {
                 m_AddCallback = addCallback;
                 m_SearchField = new SearchField();
-                m_Types = TypeCache.GetTypesDerivedFrom<Component>()
+                m_Types = TypeCache
+                    .GetTypesDerivedFrom<Component>()
                     .Where(t => t.IsPublic && t.GetCustomAttribute<MultiplayerRoleRestrictedAttribute>() == null)
                     .Except(new[] { typeof(Transform), typeof(RectTransform) });
             }

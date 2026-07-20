@@ -13,14 +13,14 @@ namespace Unity.Entities
     [DisableAutoCreation]
     internal partial class BakingCompanionComponentSystem : SystemBase
     {
-        EntityQuery                             m_CompanionComponentsQuery;
-        EntityQuery                             m_RemoveCompanionComponentsQuery;
-        HashSet<ComponentType>                  m_CompanionTypeSet = new HashSet<ComponentType>();
-        bool                                    m_CompanionQueryDirty = true;
-        internal static string                  k_CreateCompanionGameObjectsMarkerName = "Create Companion GameObjects";
-        ProfilerMarker                          m_CreateCompanionGameObjectsMarker = new ProfilerMarker(k_CreateCompanionGameObjectsMarkerName);
-        List<ComponentType>                     m_ComponentTypesOrderedByDependency = new();
-        Dictionary<ComponentType, int>          m_ComponentTypeToDependencyOrder = new();
+        EntityQuery m_CompanionComponentsQuery;
+        EntityQuery m_RemoveCompanionComponentsQuery;
+        HashSet<ComponentType> m_CompanionTypeSet = new HashSet<ComponentType>();
+        bool m_CompanionQueryDirty = true;
+        internal static string k_CreateCompanionGameObjectsMarkerName = "Create Companion GameObjects";
+        ProfilerMarker m_CreateCompanionGameObjectsMarker = new ProfilerMarker(k_CreateCompanionGameObjectsMarkerName);
+        List<ComponentType> m_ComponentTypesOrderedByDependency = new();
+        Dictionary<ComponentType, int> m_ComponentTypeToDependencyOrder = new();
 
         void OrderByDependency(List<UnityEngine.Component> components)
         {
@@ -68,7 +68,11 @@ namespace Unity.Entities
             }
 
             // NOTE : the inversion of A and B is intentional, the components should be removed in reverse order.
-            components.Sort((a, b) => m_ComponentTypeToDependencyOrder[b.GetType()].CompareTo(m_ComponentTypeToDependencyOrder[a.GetType()]));
+            components.Sort(
+                (a, b) =>
+                    m_ComponentTypeToDependencyOrder[b.GetType()]
+                        .CompareTo(m_ComponentTypeToDependencyOrder[a.GetType()])
+            );
         }
 
         unsafe void CreateCompanionGameObjects()
@@ -94,7 +98,7 @@ namespace Unity.Entities
                 var unityObjectTypeSizeOf = -1;
                 var unityObjectTypes = new NativeList<TypeManager.TypeInfo>(10, Allocator.Temp);
 
-                foreach(var archetypeChunk in archetypeChunkArray)
+                foreach (var archetypeChunk in archetypeChunkArray)
                 {
                     var archetype = archetypeChunk.Archetype.Archetype;
 
@@ -121,7 +125,9 @@ namespace Unity.Entities
 
                         // For some reason, this archetype had no UnityEngineObjects
                         if (unityObjectTypeOffset == -1)
-                            throw new System.InvalidOperationException("CompanionComponent Query produced Archetype without a Unity Engine Object");
+                            throw new System.InvalidOperationException(
+                                "CompanionComponent Query produced Archetype without a Unity Engine Object"
+                            );
                     }
 
                     var chunk = archetypeChunk.m_Chunk;
@@ -132,7 +138,9 @@ namespace Unity.Entities
                     {
                         var entity = entities[entityIndex];
 
-                        var managedIndex = *(int*)(chunk.Buffer + (unityObjectTypeOffset + unityObjectTypeSizeOf * entityIndex));
+                        var managedIndex = *(int*)(
+                            chunk.Buffer + (unityObjectTypeOffset + unityObjectTypeSizeOf * entityIndex)
+                        );
                         var obj = (UnityEngine.Component)mcs.GetManagedComponent(managedIndex);
                         // The first time this code is called the sourceGameObject is the authoring GameObject.
                         // In further calls, this points to the previous companionGameObject
@@ -155,13 +163,14 @@ namespace Unity.Entities
                             }
 
                             // Replicate the authoringGameObject, we then strip Components we don't care about
-                            var companionGameObject = UnityEngine.Object.Instantiate(sourceGameObject, companionScene) as GameObject;
+                            var companionGameObject =
+                                UnityEngine.Object.Instantiate(sourceGameObject, companionScene) as GameObject;
                             companionGameObject.SetActive(false);
 
-                            #if UNITY_EDITOR
+#if UNITY_EDITOR
                             CompanionGameObjectUtility.SetCompanionFlags(companionGameObject);
                             CompanionGameObjectUtility.SetCompanionName(entity, companionGameObject);
-                            #endif
+#endif
 
                             var components = companionGameObject.GetComponents<UnityEngine.Component>();
                             var unwantedComponentsList = new List<UnityEngine.Component>();
@@ -216,16 +225,30 @@ namespace Unity.Entities
                                 EntityManager.RemoveComponent<CompanionGameObjectActiveCleanup>(entity);
 
                             var newEntityId = companionGameObject.GetEntityId();
-                            EntityManager.AddComponentData(entity, new CompanionLink { Companion = UnityObjectRef<GameObject>.FromInstanceID(newEntityId) });
-                            EntityManager.AddComponentData(entity, new CompanionLinkTransform { CompanionTransform = companionGameObject.transform });
+                            EntityManager.AddComponentData(
+                                entity,
+                                new CompanionLink { Companion = UnityObjectRef<GameObject>.FromInstanceID(newEntityId) }
+                            );
+                            EntityManager.AddComponentData(
+                                entity,
+                                new CompanionLinkTransform { CompanionTransform = companionGameObject.transform }
+                            );
 
                             // We only add the CompanionReference in a serialised Bake, as this doesn't play nice with EntityDiffer
                             if (!bakingSystem.IsLiveConversion())
-                                EntityManager.AddComponentObject(entity, new CompanionReference { Companion = UnityObjectRef<GameObject>.FromInstanceID(newEntityId)});
+                                EntityManager.AddComponentObject(
+                                    entity,
+                                    new CompanionReference
+                                    {
+                                        Companion = UnityObjectRef<GameObject>.FromInstanceID(newEntityId),
+                                    }
+                                );
 
                             // Can't detach children before instantiate because that won't work with a prefab
                             for (int child = companionGameObject.transform.childCount - 1; child >= 0; child -= 1)
-                                UnityEngine.Object.DestroyImmediate(companionGameObject.transform.GetChild(child).gameObject);
+                                UnityEngine.Object.DestroyImmediate(
+                                    companionGameObject.transform.GetChild(child).gameObject
+                                );
                         }
                         catch (System.Exception exception)
                         {
@@ -265,18 +288,20 @@ namespace Unity.Entities
             var entityQueryDesc = new EntityQueryDesc
             {
                 Any = m_CompanionTypeSet.ToArray(),
-                All = new ComponentType[] {typeof(BakedEntity)},
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
+                All = new ComponentType[] { typeof(BakedEntity) },
+                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
             };
             m_CompanionComponentsQuery = EntityManager.CreateEntityQuery(entityQueryDesc);
             m_CompanionComponentsQuery.SetOrderVersionFilter();
 
-            m_RemoveCompanionComponentsQuery = EntityManager.CreateEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[] {typeof(CompanionLink)},
-                None = m_CompanionTypeSet.ToArray(),
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+            m_RemoveCompanionComponentsQuery = EntityManager.CreateEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new ComponentType[] { typeof(CompanionLink) },
+                    None = m_CompanionTypeSet.ToArray(),
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
             m_CompanionQueryDirty = false;
         }

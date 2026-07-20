@@ -9,14 +9,19 @@ namespace Unity.Multiplayer.Tools.NetStats.CodeGen
         const string k_SystemPrivateCoreLib = "System.Private.CoreLib";
         readonly AssemblyNameReference m_CorrectCorlib;
 
-        public PostProcessorReflectionImporter(ModuleDefinition module) : base(module)
+        public PostProcessorReflectionImporter(ModuleDefinition module)
+            : base(module)
         {
-            m_CorrectCorlib = module.AssemblyReferences.FirstOrDefault(a => a.Name == "mscorlib" || a.Name == "netstandard" || a.Name == k_SystemPrivateCoreLib);
+            m_CorrectCorlib = module.AssemblyReferences.FirstOrDefault(a =>
+                a.Name == "mscorlib" || a.Name == "netstandard" || a.Name == k_SystemPrivateCoreLib
+            );
         }
 
         public override AssemblyNameReference ImportReference(AssemblyName reference)
         {
-            return m_CorrectCorlib != null && reference.Name == k_SystemPrivateCoreLib ? m_CorrectCorlib : base.ImportReference(reference);
+            return m_CorrectCorlib != null && reference.Name == k_SystemPrivateCoreLib
+                ? m_CorrectCorlib
+                : base.ImportReference(reference);
         }
     }
 }

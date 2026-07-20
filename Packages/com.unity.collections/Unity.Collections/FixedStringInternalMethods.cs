@@ -1,7 +1,7 @@
 namespace Unity.Collections
 {
     [GenerateTestsForBurstCompatibility]
-    public unsafe static partial class FixedStringMethods
+    public static unsafe partial class FixedStringMethods
     {
         /// <summary>
         /// Append two characters to this IUTF8Bytes.  This is used as a helper for internal formatting.
@@ -11,8 +11,8 @@ namespace Unity.Collections
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             FormatError err = FormatError.None;
-            err |= fs.Append((Unicode.Rune) a);
-            err |= fs.Append((Unicode.Rune) b);
+            err |= fs.Append((Unicode.Rune)a);
+            err |= fs.Append((Unicode.Rune)b);
             if (err != FormatError.None)
                 return FormatError.Overflow;
             return FormatError.None;
@@ -26,9 +26,9 @@ namespace Unity.Collections
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             FormatError err = FormatError.None;
-            err |= fs.Append((Unicode.Rune) a);
-            err |= fs.Append((Unicode.Rune) b);
-            err |= fs.Append((Unicode.Rune) c);
+            err |= fs.Append((Unicode.Rune)a);
+            err |= fs.Append((Unicode.Rune)b);
+            err |= fs.Append((Unicode.Rune)c);
             if (err != FormatError.None)
                 return FormatError.Overflow;
             return FormatError.None;
@@ -38,25 +38,41 @@ namespace Unity.Collections
         /// Append 'I' 'n' 'f' 'i' 'n' 'i' 't' 'y' characters to this IUTF8Bytes.  This is used as a helper for internal formatting.
         /// </summary>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]
-        internal static FormatError Append<T>(ref this T fs, char a, char b, char c, char d, char e, char f, char g, char h)
+        internal static FormatError Append<T>(
+            ref this T fs,
+            char a,
+            char b,
+            char c,
+            char d,
+            char e,
+            char f,
+            char g,
+            char h
+        )
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             FormatError err = FormatError.None;
-            err |= fs.Append((Unicode.Rune) a);
-            err |= fs.Append((Unicode.Rune) b);
-            err |= fs.Append((Unicode.Rune) c);
-            err |= fs.Append((Unicode.Rune) d);
-            err |= fs.Append((Unicode.Rune) e);
-            err |= fs.Append((Unicode.Rune) f);
-            err |= fs.Append((Unicode.Rune) g);
-            err |= fs.Append((Unicode.Rune) h);
+            err |= fs.Append((Unicode.Rune)a);
+            err |= fs.Append((Unicode.Rune)b);
+            err |= fs.Append((Unicode.Rune)c);
+            err |= fs.Append((Unicode.Rune)d);
+            err |= fs.Append((Unicode.Rune)e);
+            err |= fs.Append((Unicode.Rune)f);
+            err |= fs.Append((Unicode.Rune)g);
+            err |= fs.Append((Unicode.Rune)h);
             if (err != FormatError.None)
                 return FormatError.Overflow;
             return FormatError.None;
         }
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]
-        internal static FormatError AppendScientific<T>(ref this T fs, char *source, int sourceLength, int decimalExponent, char decimalSeparator = '.')
+        internal static FormatError AppendScientific<T>(
+            ref this T fs,
+            char* source,
+            int sourceLength,
+            int decimalExponent,
+            char decimalSeparator = '.'
+        )
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             FormatError error;
@@ -114,9 +130,11 @@ namespace Unity.Collections
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             int old = offset;
-            if ((fs.Read(ref offset).value | 32) == a
+            if (
+                (fs.Read(ref offset).value | 32) == a
                 && (fs.Read(ref offset).value | 32) == b
-                && (fs.Read(ref offset).value | 32) == c)
+                && (fs.Read(ref offset).value | 32) == c
+            )
                 return true;
             offset = old;
             return false;
@@ -136,18 +154,31 @@ namespace Unity.Collections
         /// <param name="h"></param>
         /// <returns></returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]
-        internal static bool Found<T>(ref this T fs, ref int offset, char a, char b, char c, char d, char e, char f, char g, char h)
+        internal static bool Found<T>(
+            ref this T fs,
+            ref int offset,
+            char a,
+            char b,
+            char c,
+            char d,
+            char e,
+            char f,
+            char g,
+            char h
+        )
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             int old = offset;
-            if ((fs.Read(ref offset).value | 32) == a
+            if (
+                (fs.Read(ref offset).value | 32) == a
                 && (fs.Read(ref offset).value | 32) == b
                 && (fs.Read(ref offset).value | 32) == c
                 && (fs.Read(ref offset).value | 32) == d
                 && (fs.Read(ref offset).value | 32) == e
                 && (fs.Read(ref offset).value | 32) == f
                 && (fs.Read(ref offset).value | 32) == g
-                && (fs.Read(ref offset).value | 32) == h)
+                && (fs.Read(ref offset).value | 32) == h
+            )
                 return true;
             offset = old;
             return false;

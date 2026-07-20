@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
 #pragma warning disable 0618
 using static Unity.Entities.EntitiesJournaling;
 #pragma warning restore 0618
@@ -36,9 +35,13 @@ namespace Unity.Entities.Editor
             public int Count => m_ComponentTypes.Length;
             public bool IsReadOnly => true;
             public bool IsFixedSize => true;
+
             public bool Contains(ComponentTypeView item) => m_ComponentTypes.Contains(item);
+
             public bool Contains(object value) => Contains((ComponentTypeView)value);
+
             public int IndexOf(ComponentTypeView item) => m_ComponentTypes.IndexOf(item);
+
             public int IndexOf(object value) => IndexOf((ComponentTypeView)value);
 
             public void CopyTo(ComponentTypeView[] array, int startIndex)
@@ -54,18 +57,29 @@ namespace Unity.Entities.Editor
             }
 
             public ComponentTypeViewArray.Enumerator GetEnumerator() => m_ComponentTypes.GetEnumerator();
-            IEnumerator<ComponentTypeView> IEnumerable<ComponentTypeView>.GetEnumerator() => m_ComponentTypes.GetEnumerator();
+
+            IEnumerator<ComponentTypeView> IEnumerable<ComponentTypeView>.GetEnumerator() =>
+                m_ComponentTypes.GetEnumerator();
+
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public bool IsSynchronized => throw new NotSupportedException();
             public object SyncRoot => throw new NotSupportedException();
+
             public void Add(ComponentTypeView item) => throw new NotSupportedException();
+
             public int Add(object value) => throw new NotSupportedException();
+
             public void Clear() => throw new NotSupportedException();
+
             public void Insert(int index, ComponentTypeView item) => throw new NotSupportedException();
+
             public void Insert(int index, object value) => throw new NotSupportedException();
+
             public bool Remove(ComponentTypeView item) => throw new NotSupportedException();
+
             public void Remove(object value) => throw new NotSupportedException();
+
             public void RemoveAt(int index) => throw new NotSupportedException();
         }
     }

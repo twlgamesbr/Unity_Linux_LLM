@@ -12,6 +12,7 @@ namespace UnityEditor.TestTools.TestRunner
     internal class EditorEnumeratorTestWorkItem : UnityWorkItem
     {
         private TestCommand m_Command;
+
         public EditorEnumeratorTestWorkItem(TestMethod test, ITestFilter filter)
             : base(test, null)
         {
@@ -74,7 +75,10 @@ namespace UnityEditor.TestTools.TestRunner
                 var firstEnumerableCommand = FindFirstIEnumerableTestMethodCommand(m_Command);
                 if (firstEnumerableCommand == null)
                 {
-                    Context.CurrentResult.SetResult(ResultState.Error, "Returning IEnumerator but not using test attribute supporting this");
+                    Context.CurrentResult.SetResult(
+                        ResultState.Error,
+                        "Returning IEnumerator but not using test attribute supporting this"
+                    );
                     yield break;
                 }
 
@@ -171,7 +175,8 @@ namespace UnityEditor.TestTools.TestRunner
 
         private bool IsCancelledRun()
         {
-            return Context.ExecutionStatus == TestExecutionStatus.AbortRequested || Context.ExecutionStatus == TestExecutionStatus.StopRequested;
+            return Context.ExecutionStatus == TestExecutionStatus.AbortRequested
+                || Context.ExecutionStatus == TestExecutionStatus.StopRequested;
         }
     }
 }

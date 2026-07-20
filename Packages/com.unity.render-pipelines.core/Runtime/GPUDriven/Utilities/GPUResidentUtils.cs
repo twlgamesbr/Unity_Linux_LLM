@@ -8,7 +8,13 @@ namespace UnityEngine.Rendering
 {
     internal static class GPUResidentUtils
     {
-        public static void RunParallelByRef<T>(this ref T jobData, int arrayLength, int innerloopBatchCount, JobHandle dependsOn = default) where T : unmanaged, IJobParallelFor
+        public static void RunParallelByRef<T>(
+            this ref T jobData,
+            int arrayLength,
+            int innerloopBatchCount,
+            JobHandle dependsOn = default
+        )
+            where T : unmanaged, IJobParallelFor
         {
             if (arrayLength > innerloopBatchCount)
             {
@@ -21,12 +27,24 @@ namespace UnityEngine.Rendering
             }
         }
 
-        public static void RunParallel<T>(this T jobData, int arrayLength, int innerloopBatchCount, JobHandle dependsOn = default) where T : unmanaged, IJobParallelFor
+        public static void RunParallel<T>(
+            this T jobData,
+            int arrayLength,
+            int innerloopBatchCount,
+            JobHandle dependsOn = default
+        )
+            where T : unmanaged, IJobParallelFor
         {
             RunParallelByRef(ref jobData, arrayLength, innerloopBatchCount, dependsOn);
         }
 
-        public static void RunBatchParallelByRef<T>(this ref T jobData, int arrayLength, int innerloopBatchCount, JobHandle dependsOn = default) where T : unmanaged, IJobParallelForBatch
+        public static void RunBatchParallelByRef<T>(
+            this ref T jobData,
+            int arrayLength,
+            int innerloopBatchCount,
+            JobHandle dependsOn = default
+        )
+            where T : unmanaged, IJobParallelForBatch
         {
             if (arrayLength > innerloopBatchCount)
             {
@@ -39,26 +57,37 @@ namespace UnityEngine.Rendering
             }
         }
 
-        public static void RunBatchParallel<T>(this T jobData, int arrayLength, int innerloopBatchCount, JobHandle dependsOn = default) where T : unmanaged, IJobParallelForBatch
+        public static void RunBatchParallel<T>(
+            this T jobData,
+            int arrayLength,
+            int innerloopBatchCount,
+            JobHandle dependsOn = default
+        )
+            where T : unmanaged, IJobParallelForBatch
         {
             RunBatchParallelByRef(ref jobData, arrayLength, innerloopBatchCount, dependsOn);
         }
 
-        public static unsafe ref T ElementAtRW<T>(this NativeArray<T> array, int index) where T : unmanaged
+        public static unsafe ref T ElementAtRW<T>(this NativeArray<T> array, int index)
+            where T : unmanaged
         {
             return ref UnsafeUtility.ArrayElementAsRef<T>(array.GetUnsafePtr(), index);
         }
 
-        public static unsafe ref readonly T ElementAt<T>(this NativeArray<T> array, int index) where T : unmanaged
+        public static unsafe ref readonly T ElementAt<T>(this NativeArray<T> array, int index)
+            where T : unmanaged
         {
             return ref UnsafeUtility.ArrayElementAsRef<T>(array.GetUnsafeReadOnlyPtr(), index);
         }
 
-        public static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list) where T : unmanaged
+        public static unsafe NativeArray<T> AsNativeArray<T>(this UnsafeList<T> list)
+            where T : unmanaged
         {
-            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list.Ptr,
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(
+                list.Ptr,
                 list.Length,
-                Allocator.None);
+                Allocator.None
+            );
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, AtomicSafetyHandle.Create());
@@ -67,17 +96,20 @@ namespace UnityEngine.Rendering
             return array;
         }
 
-        public static unsafe UnsafeList<T> AsUnsafeList<T>(this NativeArray<T> array) where T : unmanaged
+        public static unsafe UnsafeList<T> AsUnsafeList<T>(this NativeArray<T> array)
+            where T : unmanaged
         {
             return new UnsafeList<T>((T*)array.GetUnsafePtr(), array.Length);
         }
 
-        public static unsafe UnsafeList<T> AsUnsafeListReadOnly<T>(this NativeArray<T> array) where T : unmanaged
+        public static unsafe UnsafeList<T> AsUnsafeListReadOnly<T>(this NativeArray<T> array)
+            where T : unmanaged
         {
             return new UnsafeList<T>((T*)array.GetUnsafeReadOnlyPtr(), array.Length);
         }
 
-        public static unsafe UnsafeList<UntypedUnsafeList> AsUntypedUnsafeList<T>(this UnsafeList<UnsafeList<T>> list) where T : unmanaged
+        public static unsafe UnsafeList<UntypedUnsafeList> AsUntypedUnsafeList<T>(this UnsafeList<UnsafeList<T>> list)
+            where T : unmanaged
         {
             Assert.IsTrue(UnsafeUtility.SizeOf<UnsafeList<T>>() == UnsafeUtility.SizeOf<UntypedUnsafeList>());
             return *(UnsafeList<UntypedUnsafeList>*)&list;
@@ -85,10 +117,14 @@ namespace UnityEngine.Rendering
 
         public static unsafe UnsafeBitArray AsUnsafeBitArray(this in NativeBitArray section) => *section.m_BitArray;
 
-        public static unsafe ref T GetRef<T>(this NativeReference<T> reference) where T : unmanaged => ref *reference.GetUnsafePtr();
-        public static unsafe ref readonly T GetRefRO<T>(this NativeReference<T> reference) where T : unmanaged => ref *reference.GetUnsafeReadOnlyPtr();
+        public static unsafe ref T GetRef<T>(this NativeReference<T> reference)
+            where T : unmanaged => ref *reference.GetUnsafePtr();
 
-        public static bool HasAnyBit(this MeshRendererComponentMask mask, MeshRendererComponentMask bits) => (mask & bits) != 0;
+        public static unsafe ref readonly T GetRefRO<T>(this NativeReference<T> reference)
+            where T : unmanaged => ref *reference.GetUnsafeReadOnlyPtr();
+
+        public static bool HasAnyBit(this MeshRendererComponentMask mask, MeshRendererComponentMask bits) =>
+            (mask & bits) != 0;
 
         public static bool HasAnyBit(this LODGroupComponentMask mask, LODGroupComponentMask bits) => (mask & bits) != 0;
     }
@@ -113,6 +149,7 @@ namespace UnityEngine.Rendering
         public static bool UsesLightmaps(int lightmapIndex) => ((short)lightmapIndex) >= 0;
 
         // If the object is light mapped, or has the special influence-only value, it affects lightmaps
-        public static bool AffectsLightmaps(int lightmapIndex) => ((short)lightmapIndex) >= 0 || ((short)lightmapIndex) == LightmapIndexInfluenceOnly;
+        public static bool AffectsLightmaps(int lightmapIndex) =>
+            ((short)lightmapIndex) >= 0 || ((short)lightmapIndex) == LightmapIndexInfluenceOnly;
     }
 }

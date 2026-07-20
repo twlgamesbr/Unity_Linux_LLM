@@ -25,28 +25,45 @@ namespace Unity.Entities.CodeGen.Cloner
                     if (!properties.OriginalLookup.ContainsKey(rewrittenProperty.Source))
                     {
                         throw new InvalidOperationException(
-                            $"Method Cloner ILPP: Cannot find property {rewrittenProperty.Source} in {typeDef.FullName}. " +
-                            $"Property candidates are {string.Join(", ", properties.OriginalLookup.Keys)}");
+                            $"Method Cloner ILPP: Cannot find property {rewrittenProperty.Source} in {typeDef.FullName}. "
+                                + $"Property candidates are {string.Join(", ", properties.OriginalLookup.Keys)}"
+                        );
                     }
 
                     var originalProperty = properties.OriginalLookup[rewrittenProperty.Source];
                     if (rewrittenProperty.Definition.GetMethod != null)
-                        methods.Rewritten.Add((rewrittenProperty.Definition.GetMethod, GetMethodNameAndParamsAsString(originalProperty.GetMethod)));
+                        methods.Rewritten.Add(
+                            (
+                                rewrittenProperty.Definition.GetMethod,
+                                GetMethodNameAndParamsAsString(originalProperty.GetMethod)
+                            )
+                        );
                     if (rewrittenProperty.Definition.SetMethod != null)
-                        methods.Rewritten.Add((rewrittenProperty.Definition.SetMethod, GetMethodNameAndParamsAsString(originalProperty.SetMethod)));
-                    typeDef.Properties.Remove((((PropertyDefinition Definition, string ConstructorArgument))rewrittenProperty).Definition);
+                        methods.Rewritten.Add(
+                            (
+                                rewrittenProperty.Definition.SetMethod,
+                                GetMethodNameAndParamsAsString(originalProperty.SetMethod)
+                            )
+                        );
+                    typeDef.Properties.Remove(
+                        (((PropertyDefinition Definition, string ConstructorArgument))rewrittenProperty).Definition
+                    );
                     madeChange = true;
                 }
 
-                var originalMethodIdsToDefinitions = methods.Original.ToDictionary(GetMethodNameAndParamsAsString, method => method);
+                var originalMethodIdsToDefinitions = methods.Original.ToDictionary(
+                    GetMethodNameAndParamsAsString,
+                    method => method
+                );
 
                 foreach (var rewrittenMethod in methods.Rewritten)
                 {
                     if (!originalMethodIdsToDefinitions.ContainsKey(rewrittenMethod.Source))
                     {
                         throw new InvalidOperationException(
-                            $"Method Cloner ILPP: Cannot find method {rewrittenMethod.Source} in {typeDef.FullName}. " +
-                            $"Method candidates are {string.Join(", ", originalMethodIdsToDefinitions.Keys)}");
+                            $"Method Cloner ILPP: Cannot find method {rewrittenMethod.Source} in {typeDef.FullName}. "
+                                + $"Method candidates are {string.Join(", ", originalMethodIdsToDefinitions.Keys)}"
+                        );
                     }
 
                     typeDef.UpdateOriginalMethod(originalMethodIdsToDefinitions, rewrittenMethod);

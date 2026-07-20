@@ -12,18 +12,22 @@ namespace Unity.Physics.Authoring
     {
         protected override void OnUpdate()
         {
-
             var transformFromEntity = GetComponentLookup<LocalTransform>();
 
             var physicsMassFromEntity = GetComponentLookup<PhysicsMass>();
             var physicsColliderFromEntity = GetComponentLookup<PhysicsCollider>();
-            foreach (var (driver, entity) in SystemAPI.Query<RefRW<CustomPhysicsProxyDriver>>().WithEntityAccess()
-                         .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities))
+            foreach (
+                var (driver, entity) in SystemAPI
+                    .Query<RefRW<CustomPhysicsProxyDriver>>()
+                    .WithEntityAccess()
+                    .WithOptions(EntityQueryOptions.IncludePrefab | EntityQueryOptions.IncludeDisabledEntities)
+            )
             {
-
                 transformFromEntity[entity] = transformFromEntity[driver.ValueRW.rootEntity];
 
-                physicsMassFromEntity[entity] = PhysicsMass.CreateKinematic(physicsColliderFromEntity[driver.ValueRW.rootEntity].MassProperties);
+                physicsMassFromEntity[entity] = PhysicsMass.CreateKinematic(
+                    physicsColliderFromEntity[driver.ValueRW.rootEntity].MassProperties
+                );
                 physicsColliderFromEntity[entity] = physicsColliderFromEntity[driver.ValueRW.rootEntity];
             }
         }

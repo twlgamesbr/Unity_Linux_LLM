@@ -21,7 +21,7 @@ namespace UnityEditor.Rendering
         Lumen = LightUnit.Lumen,
         Candela = LightUnit.Candela,
         Lux = LightUnit.Lux,
-        Ev100 = LightUnit.Ev100
+        Ev100 = LightUnit.Ev100,
     }
 
     /// <summary>
@@ -45,8 +45,12 @@ namespace UnityEditor.Rendering
                 using (new EditorGUI.MixedValueScope(serializedUseColorTemperature.hasMultipleDifferentValues))
                 {
                     var colorTemperaturePopupValue = Convert.ToInt32(serializedUseColorTemperature.boolValue);
-                    colorTemperaturePopupValue = EditorGUILayout.Popup(Styles.lightAppearance, colorTemperaturePopupValue, Styles.lightAppearanceOptions);
-                    if(check.changed)
+                    colorTemperaturePopupValue = EditorGUILayout.Popup(
+                        Styles.lightAppearance,
+                        colorTemperaturePopupValue,
+                        Styles.lightAppearanceOptions
+                    );
+                    if (check.changed)
                         serializedUseColorTemperature.boolValue = Convert.ToBoolean(colorTemperaturePopupValue);
                 }
 
@@ -65,7 +69,12 @@ namespace UnityEditor.Rendering
                     var temperatureSliderRect = lineRect;
                     temperatureSliderRect.x += EditorGUIUtility.labelWidth + k_ValueUnitSeparator;
                     temperatureSliderRect.width -= EditorGUIUtility.labelWidth + k_ValueUnitSeparator;
-                    TemperatureSliderUIDrawer.Draw(serialized.settings, serialized.serializedObject, serialized.settings.colorTemperature, temperatureSliderRect);
+                    TemperatureSliderUIDrawer.Draw(
+                        serialized.settings,
+                        serialized.serializedObject,
+                        serialized.settings.colorTemperature,
+                        temperatureSliderRect
+                    );
 
                     // Value and unit label
                     // Match const defined in EditorGUI.cs
@@ -184,7 +193,6 @@ namespace UnityEditor.Rendering
                     serialized.settings.lightUnit.SetEnumValue(selectedLightUnit);
                 }
             }
-
         }
 
         /// <summary>
@@ -211,17 +219,27 @@ namespace UnityEditor.Rendering
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    serialized.settings.luxAtDistance.floatValue = Mathf.Max(serialized.settings.luxAtDistance.floatValue, 0.01f);
+                    serialized.settings.luxAtDistance.floatValue = Mathf.Max(
+                        serialized.settings.luxAtDistance.floatValue,
+                        0.01f
+                    );
                     // Derive the lux from intensity, which is in Candela, and the old distance value
                     float lux = LightUnitUtils.CandelaToLux(serialized.settings.intensity.floatValue, oldLuxAtDistance);
                     // Calculate the new intensity in Candela from the lux value, and the new distance
-                    serialized.settings.intensity.floatValue = LightUnitUtils.LuxToCandela(lux, serialized.settings.luxAtDistance.floatValue);
+                    serialized.settings.intensity.floatValue = LightUnitUtils.LuxToCandela(
+                        lux,
+                        serialized.settings.luxAtDistance.floatValue
+                    );
                 }
                 EditorGUI.indentLevel--;
             }
 
             // Draw the "Reflector" checkbox
-            if ((lightType == LightType.Spot || lightType == LightType.Pyramid) && lightUnit == (int)LightUnit.Lumen && !hideReflector)
+            if (
+                (lightType == LightType.Spot || lightType == LightType.Pyramid)
+                && lightUnit == (int)LightUnit.Lumen
+                && !hideReflector
+            )
             {
                 EditorGUI.indentLevel++;
                 EditorGUI.BeginChangeCheck();
@@ -234,9 +252,19 @@ namespace UnityEditor.Rendering
                     float aspectRatio = serialized.settings.areaSizeX.floatValue;
                     bool enableSpotReflector = serialized.settings.enableSpotReflector.boolValue;
 
-                    float oldSolidAngle = LightUnitUtils.GetSolidAngle(lightType, !enableSpotReflector, spotAngle, aspectRatio);
+                    float oldSolidAngle = LightUnitUtils.GetSolidAngle(
+                        lightType,
+                        !enableSpotReflector,
+                        spotAngle,
+                        aspectRatio
+                    );
                     float oldLumen = LightUnitUtils.CandelaToLumen(oldCandela, oldSolidAngle);
-                    float newSolidAngle = LightUnitUtils.GetSolidAngle(lightType, enableSpotReflector, spotAngle, aspectRatio);
+                    float newSolidAngle = LightUnitUtils.GetSolidAngle(
+                        lightType,
+                        enableSpotReflector,
+                        spotAngle,
+                        aspectRatio
+                    );
                     serialized.settings.intensity.floatValue = LightUnitUtils.LumenToCandela(oldLumen, newSolidAngle);
                 }
                 EditorGUI.indentLevel--;
@@ -261,7 +289,7 @@ namespace UnityEditor.Rendering
                 case LightType.Point:
                 case LightType.Spot:
                 case LightType.Pyramid:
-                        return (LightUnit)EditorGUI.EnumPopup(position, (PunctualLightUnit)selected);
+                    return (LightUnit)EditorGUI.EnumPopup(position, (PunctualLightUnit)selected);
 
                 default:
                     return (LightUnit)EditorGUI.EnumPopup(position, (AreaLightUnit)selected);

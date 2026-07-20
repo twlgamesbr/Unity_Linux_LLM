@@ -28,13 +28,18 @@ namespace Unity.Netcode
         public void Handle(ref NetworkContext context)
         {
             var networkManager = (NetworkManager)context.SystemOwner;
-            if (networkManager.IsListening && !networkManager.ShutdownInProgress && networkManager.ConnectedClients.ContainsKey(context.SenderId))
+            if (
+                networkManager.IsListening
+                && !networkManager.ShutdownInProgress
+                && networkManager.ConnectedClients.ContainsKey(context.SenderId)
+            )
             {
                 var message = new AnticipationCounterSyncPongMessage { Counter = Counter, Time = Time };
                 networkManager.MessageManager.SendMessage(ref message, NetworkDelivery.Reliable, context.SenderId);
             }
         }
     }
+
     internal struct AnticipationCounterSyncPongMessage : INetworkMessage
     {
         public int Version => 0;

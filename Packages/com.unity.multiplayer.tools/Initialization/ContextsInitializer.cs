@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Scripting;
 
 [assembly: AlwaysLinkAssembly]
+
 namespace Unity.Multiplayer.Tools.Context
 {
     /// <summary>
@@ -36,7 +37,7 @@ namespace Unity.Multiplayer.Tools.Context
                 Application.quitting -= DisableRuntimeContexts;
                 DisableRuntimeContexts();
             }
-            
+
             s_Contexts = ContextsDefinition.GetContextsDefinitions();
 #if UNITY_EDITOR && !UNITY_MP_TOOLS_SIMULATE_BUILD
             EnableEditorContexts();
@@ -47,7 +48,6 @@ namespace Unity.Multiplayer.Tools.Context
         {
             ReinitializeEditorContexts();
         }
-
 
         static void EnableEditorContexts()
         {

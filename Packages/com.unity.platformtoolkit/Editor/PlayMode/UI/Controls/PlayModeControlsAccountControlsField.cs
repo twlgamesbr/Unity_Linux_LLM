@@ -67,7 +67,8 @@ namespace Unity.PlatformToolkit.PlayMode
             m_RefuseButton.EnableInClassList("hidden", !requestActive);
             m_SelectAccountWarning.EnableInClassList("hidden", !requestActive);
             m_AddAccountError.EnableInClassList("hidden", m_PlayModeControlsView.AccountData.Count() > 0);
-            var showNoPrimaryError = m_PlayModeControlsView.Capability.PrimaryAccountBehaviour == PrimaryAccountBehaviour.AlwaysSignedIn
+            var showNoPrimaryError =
+                m_PlayModeControlsView.Capability.PrimaryAccountBehaviour == PrimaryAccountBehaviour.AlwaysSignedIn
                 && m_PlayModeControlsView.PrimaryAccountData == null;
             m_NoPrimaryError.EnableInClassList("hidden", !showNoPrimaryError);
         }

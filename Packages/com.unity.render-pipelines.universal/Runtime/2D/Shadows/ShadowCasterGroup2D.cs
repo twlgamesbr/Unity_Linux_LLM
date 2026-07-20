@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine.Scripting.APIUpdating;
 
-
 namespace UnityEngine.Rendering.Universal
 {
     /// <summary>
@@ -10,8 +9,11 @@ namespace UnityEngine.Rendering.Universal
     [MovedFrom(false, "UnityEngine.Experimental.Rendering.Universal", "com.unity.render-pipelines.universal")]
     public abstract class ShadowCasterGroup2D : MonoBehaviour
     {
-        [SerializeField] internal int  m_ShadowGroup = 0;
-        [SerializeField] internal int  m_Priority = 0;
+        [SerializeField]
+        internal int m_ShadowGroup = 0;
+
+        [SerializeField]
+        internal int m_Priority = 0;
         List<ShadowCaster2D> m_ShadowCasters;
 
         internal virtual void CacheValues()

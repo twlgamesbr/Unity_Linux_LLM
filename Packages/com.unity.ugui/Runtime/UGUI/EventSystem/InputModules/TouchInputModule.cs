@@ -9,8 +9,7 @@ namespace UnityEngine.EventSystems
     [UGUIHelpURL("TouchInputModule")]
     public class TouchInputModule : PointerInputModule
     {
-        protected TouchInputModule()
-        {}
+        protected TouchInputModule() { }
 
         private Vector2 m_LastMousePosition;
         private Vector2 m_MousePosition;
@@ -21,7 +20,9 @@ namespace UnityEngine.EventSystems
         [FormerlySerializedAs("m_AllowActivationOnStandalone")]
         private bool m_ForceModuleActive;
 
-        [Obsolete("allowActivationOnStandalone has been deprecated. Use forceModuleActive instead (UnityUpgradable) -> forceModuleActive")]
+        [Obsolete(
+            "allowActivationOnStandalone has been deprecated. Use forceModuleActive instead (UnityUpgradable) -> forceModuleActive"
+        )]
         public bool allowActivationOnStandalone
         {
             get { return m_ForceModuleActive; }
@@ -38,8 +39,16 @@ namespace UnityEngine.EventSystems
         {
             if (!eventSystem.isFocused)
             {
-                if (m_InputPointerEvent != null && m_InputPointerEvent.pointerDrag != null && m_InputPointerEvent.dragging)
-                    ExecuteEvents.Execute(m_InputPointerEvent.pointerDrag, m_InputPointerEvent, ExecuteEvents.endDragHandler);
+                if (
+                    m_InputPointerEvent != null
+                    && m_InputPointerEvent.pointerDrag != null
+                    && m_InputPointerEvent.dragging
+                )
+                    ExecuteEvents.Execute(
+                        m_InputPointerEvent.pointerDrag,
+                        m_InputPointerEvent,
+                        ExecuteEvents.endDragHandler
+                    );
 
                 m_InputPointerEvent = null;
             }
@@ -98,7 +107,11 @@ namespace UnityEngine.EventSystems
             if (leftPressData.PressedThisFrame())
                 leftPressData.buttonData.delta = Vector2.zero;
 
-            ProcessTouchPress(leftPressData.buttonData, leftPressData.PressedThisFrame(), leftPressData.ReleasedThisFrame());
+            ProcessTouchPress(
+                leftPressData.buttonData,
+                leftPressData.PressedThisFrame(),
+                leftPressData.ReleasedThisFrame()
+            );
 
             // only process move if we are pressed...
             if (input.GetMouseButton(0))
@@ -162,7 +175,11 @@ namespace UnityEngine.EventSystems
                 // search for the control that will receive the press
                 // if we can't find a press handler set the press
                 // handler to be what would receive a click.
-                var newPressed = ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
+                var newPressed = ExecuteEvents.ExecuteHierarchy(
+                    currentOverGo,
+                    pointerEvent,
+                    ExecuteEvents.pointerDownHandler
+                );
 
                 // didnt find a press handler... search for a click handler
                 if (newPressed == null)
@@ -196,7 +213,11 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
 
                 if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    ExecuteEvents.Execute(
+                        pointerEvent.pointerDrag,
+                        pointerEvent,
+                        ExecuteEvents.initializePotentialDrag
+                    );
 
                 m_InputPointerEvent = pointerEvent;
             }
@@ -233,7 +254,11 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = null;
 
                 // send exit events as we need to simulate this on touch up on touch device
-                ExecuteEvents.ExecuteHierarchy(pointerEvent.pointerEnter, pointerEvent, ExecuteEvents.pointerExitHandler);
+                ExecuteEvents.ExecuteHierarchy(
+                    pointerEvent.pointerEnter,
+                    pointerEvent,
+                    ExecuteEvents.pointerExitHandler
+                );
                 pointerEvent.pointerEnter = null;
 
                 m_InputPointerEvent = pointerEvent;

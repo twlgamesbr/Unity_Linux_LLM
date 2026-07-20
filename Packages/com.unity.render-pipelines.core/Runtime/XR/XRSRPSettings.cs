@@ -1,6 +1,5 @@
 using System;
 using UnityEngine.Experimental.Rendering;
-
 #if ENABLE_VR && ENABLE_XR_MODULE
 using UnityEngine.XR;
 #endif
@@ -20,10 +19,7 @@ namespace UnityEngine.Rendering
         // TryEnable gets updated before "play" is pressed- we use this for updating GUI only.
         public static bool tryEnable
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
         }
 #endif
 
@@ -47,14 +43,12 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static bool isDeviceActive
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSettings.isDeviceActive;
 #endif
-                return false;
-            }
+                return false; }
         }
 
         /// <summary>
@@ -62,14 +56,12 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static string loadedDeviceName
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSettings.loadedDeviceName;
 #endif
-                return "No XR device loaded";
-            }
+                return "No XR device loaded"; }
         }
 
         /// <summary>
@@ -77,14 +69,12 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static string[] supportedDevices
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSettings.supportedDevices;
 #endif
-                return new string[1];
-            }
+                return new string[1]; }
         }
 
         /// <summary>
@@ -92,14 +82,12 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static RenderTextureDescriptor eyeTextureDesc
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSettings.eyeTextureDesc;
 #endif
-                return new RenderTextureDescriptor(0, 0);
-            }
+                return new RenderTextureDescriptor(0, 0); }
         }
 
         /// <summary>
@@ -107,14 +95,12 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static int eyeTextureWidth
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSettings.eyeTextureWidth;
 #endif
-                return 0;
-            }
+                return 0; }
         }
 
         /// <summary>
@@ -122,29 +108,25 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static int eyeTextureHeight
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSettings.eyeTextureHeight;
 #endif
-                return 0;
-            }
+                return 0; }
         }
 
         /// <summary>
-        /// Occlusion mesh's scaling factor. 
+        /// Occlusion mesh's scaling factor.
         /// </summary>
         public static float occlusionMeshScale
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSystem.GetOcclusionMeshScale();
 #endif
-                return 0;
-            }
+                return 0; }
             set
             {
 #if ENABLE_VR && ENABLE_XR_MODULE
@@ -155,18 +137,16 @@ namespace UnityEngine.Rendering
         }
 
         /// <summary>
-        /// Controls the use of the Visibility Mesh passes in SRP. 
+        /// Controls the use of the Visibility Mesh passes in SRP.
         /// </summary>
         public static bool useVisibilityMesh
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSystem.GetUseVisibilityMesh();
 #endif
-                return false;
-            }
+                return false; }
             set
             {
 #if ENABLE_VR && ENABLE_XR_MODULE
@@ -181,14 +161,12 @@ namespace UnityEngine.Rendering
         /// </summary>
         public static int mirrorViewMode
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 if (enabled)
                     return XRSystem.GetMirrorViewMode();
 #endif
-                return 0;
-            }
+                return 0; }
             set
             {
 #if ENABLE_VR && ENABLE_XR_MODULE

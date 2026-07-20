@@ -26,7 +26,16 @@ namespace EditorAttributes
         /// <param name="lineThickness">The thickness of the line in pixels</param>
         /// <param name="alignment">The alignment of the title</param>
         /// <param name="stringInputMode">Set if the string input is set trough a constant or dynamically trough another member</param>
-        public TitleAttribute(string title, int titleSize = 20, float titleSpace = 10f, bool drawLine = true, float lineThickness = 2f, TextAnchor alignment = TextAnchor.MiddleLeft, StringInputMode stringInputMode = StringInputMode.Constant) : base(true)
+        public TitleAttribute(
+            string title,
+            int titleSize = 20,
+            float titleSpace = 10f,
+            bool drawLine = true,
+            float lineThickness = 2f,
+            TextAnchor alignment = TextAnchor.MiddleLeft,
+            StringInputMode stringInputMode = StringInputMode.Constant
+        )
+            : base(true)
         {
             Title = title;
             TitleSize = titleSize;

@@ -14,7 +14,7 @@ namespace Unity.Mathematics
         /// <returns>An AABB struct that is the same as the bounds struct</returns>
         public static AABB ToAABB(this Bounds bounds)
         {
-            return new AABB { Center = bounds.center, Extents = bounds.extents};
+            return new AABB { Center = bounds.center, Extents = bounds.extents };
         }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Unity.Mathematics
         /// <returns>A Bounds struct that is the same as the AABB struct</returns>
         public static Bounds ToBounds(this AABB aabb)
         {
-            return new Bounds { center = aabb.Center, extents = aabb.Extents};
+            return new Bounds { center = aabb.Center, extents = aabb.Extents };
         }
     }
 }

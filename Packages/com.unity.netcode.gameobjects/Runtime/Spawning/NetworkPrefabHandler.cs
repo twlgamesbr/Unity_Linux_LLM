@@ -15,13 +15,15 @@ namespace Unity.Netcode
         /// <summary>
         /// Links a network prefab asset to a class with the INetworkPrefabInstanceHandler interface
         /// </summary>
-        private readonly Dictionary<uint, INetworkPrefabInstanceHandler> m_PrefabAssetToPrefabHandler = new Dictionary<uint, INetworkPrefabInstanceHandler>();
+        private readonly Dictionary<uint, INetworkPrefabInstanceHandler> m_PrefabAssetToPrefabHandler =
+            new Dictionary<uint, INetworkPrefabInstanceHandler>();
 
         /// <summary>
         /// Links a network prefab asset to a class with the INetworkPrefabInstanceHandlerWithData interface,
         /// used to keep a smaller lookup table than <see cref="m_PrefabAssetToPrefabHandler"/> for faster instantiation data injection into NetworkObject
         /// </summary>
-        private readonly Dictionary<uint, INetworkPrefabInstanceHandlerWithData> m_PrefabAssetToPrefabHandlerWithData = new Dictionary<uint, INetworkPrefabInstanceHandlerWithData>();
+        private readonly Dictionary<uint, INetworkPrefabInstanceHandlerWithData> m_PrefabAssetToPrefabHandlerWithData =
+            new Dictionary<uint, INetworkPrefabInstanceHandlerWithData>();
 
         /// <summary>
         /// Links the custom prefab instance's GlobalNetworkObjectId to the original prefab asset's GlobalNetworkObjectId.  (Needed for HandleNetworkPrefabDestroy)
@@ -29,7 +31,8 @@ namespace Unity.Netcode
         /// </summary>
         private readonly Dictionary<uint, uint> m_PrefabInstanceToPrefabAsset = new Dictionary<uint, uint>();
 
-        internal static string PrefabDebugHelper(NetworkPrefab networkPrefab) => $"{nameof(NetworkPrefab)} \"{networkPrefab.Prefab.name}\"";
+        internal static string PrefabDebugHelper(NetworkPrefab networkPrefab) =>
+            $"{nameof(NetworkPrefab)} \"{networkPrefab.Prefab.name}\"";
 
         /// <summary>
         /// Use a <see cref="GameObject"/> to register a class that implements the <see cref="INetworkPrefabInstanceHandler"/> interface with the <see cref="NetworkPrefabHandler"/>
@@ -74,13 +77,13 @@ namespace Unity.Netcode
             return false;
         }
 
-
         /// <inheritdoc cref="SetInstantiationData{T}(NetworkObject, T)"/>
         /// <param name="gameObject">
         /// The <see cref="GameObject"/> containing a <see cref="NetworkObject"/> to which the instantiation data will be assigned. The <see cref="NetworkObject.GlobalObjectIdHash"/> must match a handler that was previously registered.
         /// </param>
         /// <param name="instantiationData">The custom instantiation data to serialize and assign.</param>
-        public void SetInstantiationData<T>(GameObject gameObject, T instantiationData) where T : struct, INetworkSerializable
+        public void SetInstantiationData<T>(GameObject gameObject, T instantiationData)
+            where T : struct, INetworkSerializable
         {
             if (gameObject.TryGetComponent<NetworkObject>(out var networkObject))
             {
@@ -97,11 +100,17 @@ namespace Unity.Netcode
         /// The <see cref="NetworkObject"/> to which the instantiation data will be assigned. The <see cref="NetworkObject.GlobalObjectIdHash"/> must match a handler that was previously registered.
         /// </param>
         /// <param name="instantiationData">The custom instantiation data to serialize and assign.</param>
-        public void SetInstantiationData<T>(NetworkObject networkObject, T instantiationData) where T : struct, INetworkSerializable
+        public void SetInstantiationData<T>(NetworkObject networkObject, T instantiationData)
+            where T : struct, INetworkSerializable
         {
-            if (!TryGetHandlerWithData(networkObject.GlobalObjectIdHash, out var prefabHandler) || !prefabHandler.HandlesDataType<T>())
+            if (
+                !TryGetHandlerWithData(networkObject.GlobalObjectIdHash, out var prefabHandler)
+                || !prefabHandler.HandlesDataType<T>()
+            )
             {
-                Debug.LogError("[InstantiationData] Cannot inject data: no compatible handler found for the specified data type.");
+                Debug.LogError(
+                    "[InstantiationData] Cannot inject data: no compatible handler found for the specified data type."
+                );
                 return;
             }
 
@@ -115,7 +124,9 @@ namespace Unity.Netcode
             }
             catch (Exception ex)
             {
-                NetworkLog.LogError($"[InstantiationData] Failed to serialize instantiation data for {nameof(NetworkObject)} '{networkObject.name}': {ex}");
+                NetworkLog.LogError(
+                    $"[InstantiationData] Failed to serialize instantiation data for {nameof(NetworkObject)} '{networkObject.name}': {ex}"
+                );
             }
         }
 
@@ -126,7 +137,10 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="sourceNetworkPrefab">source NetworkPrefab to be overridden</param>
         /// <param name="networkPrefabOverrides">one or more NetworkPrefabs could be used to override the source NetworkPrefab</param>
-        public void RegisterHostGlobalObjectIdHashValues(GameObject sourceNetworkPrefab, List<GameObject> networkPrefabOverrides)
+        public void RegisterHostGlobalObjectIdHashValues(
+            GameObject sourceNetworkPrefab,
+            List<GameObject> networkPrefabOverrides
+        )
         {
             if (NetworkManager.Singleton.IsListening)
             {
@@ -143,7 +157,10 @@ namespace Unity.Netcode
                             {
                                 if (!m_PrefabInstanceToPrefabAsset.ContainsKey(targetNetworkObject.GlobalObjectIdHash))
                                 {
-                                    m_PrefabInstanceToPrefabAsset.Add(targetNetworkObject.GlobalObjectIdHash, sourceGlobalObjectIdHash);
+                                    m_PrefabInstanceToPrefabAsset.Add(
+                                        targetNetworkObject.GlobalObjectIdHash,
+                                        sourceGlobalObjectIdHash
+                                    );
                                 }
                                 else
                                 {
@@ -152,23 +169,31 @@ namespace Unity.Netcode
                             }
                             else
                             {
-                                throw new Exception($"{targetNetworkObject.name} does not have a {nameof(NetworkObject)} component!");
+                                throw new Exception(
+                                    $"{targetNetworkObject.name} does not have a {nameof(NetworkObject)} component!"
+                                );
                             }
                         }
                     }
                     else
                     {
-                        throw new Exception($"{sourceNetworkPrefab.name} does not have a {nameof(NetworkObject)} component!");
+                        throw new Exception(
+                            $"{sourceNetworkPrefab.name} does not have a {nameof(NetworkObject)} component!"
+                        );
                     }
                 }
                 else
                 {
-                    throw new Exception($"You should only call {nameof(RegisterHostGlobalObjectIdHashValues)} as a Host!");
+                    throw new Exception(
+                        $"You should only call {nameof(RegisterHostGlobalObjectIdHashValues)} as a Host!"
+                    );
                 }
             }
             else
             {
-                throw new Exception($"You can only call {nameof(RegisterHostGlobalObjectIdHashValues)} once NetworkManager is listening!");
+                throw new Exception(
+                    $"You can only call {nameof(RegisterHostGlobalObjectIdHashValues)} once NetworkManager is listening!"
+                );
             }
         }
 
@@ -223,7 +248,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="networkPrefab"></param>
         /// <returns>true or false</returns>
-        internal bool ContainsHandler(GameObject networkPrefab) => ContainsHandler(networkPrefab.GetComponent<NetworkObject>().GlobalObjectIdHash);
+        internal bool ContainsHandler(GameObject networkPrefab) =>
+            ContainsHandler(networkPrefab.GetComponent<NetworkObject>().GlobalObjectIdHash);
 
         /// <summary>
         /// Check to see if a <see cref="NetworkObject"/> is registered to an <see cref="INetworkPrefabInstanceHandler"/> implementation
@@ -237,7 +263,9 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="networkPrefabHash"></param>
         /// <returns>true or false</returns>
-        internal bool ContainsHandler(uint networkPrefabHash) => m_PrefabAssetToPrefabHandler.ContainsKey(networkPrefabHash) || m_PrefabInstanceToPrefabAsset.ContainsKey(networkPrefabHash);
+        internal bool ContainsHandler(uint networkPrefabHash) =>
+            m_PrefabAssetToPrefabHandler.ContainsKey(networkPrefabHash)
+            || m_PrefabInstanceToPrefabAsset.ContainsKey(networkPrefabHash);
 
         /// <summary>
         /// Returns the <see cref="INetworkPrefabInstanceHandlerWithData"/> implementation for a given <see cref="NetworkObject.GlobalObjectIdHash"/>
@@ -280,16 +308,32 @@ namespace Unity.Netcode
         /// <param name="rotation"></param>
         /// <param name="instantiationData">Instantiation data sent from the authority if set</param>
         /// <returns></returns>
-        internal NetworkObject HandleNetworkPrefabSpawn(uint networkPrefabAssetHash, ulong ownerClientId, Vector3 position, Quaternion rotation, byte[] instantiationData = null)
+        internal NetworkObject HandleNetworkPrefabSpawn(
+            uint networkPrefabAssetHash,
+            ulong ownerClientId,
+            Vector3 position,
+            Quaternion rotation,
+            byte[] instantiationData = null
+        )
         {
             NetworkObject networkObjectInstance = null;
             if (instantiationData != null)
             {
-                if (m_PrefabAssetToPrefabHandlerWithData.TryGetValue(networkPrefabAssetHash, out var prefabInstanceHandler))
+                if (
+                    m_PrefabAssetToPrefabHandlerWithData.TryGetValue(
+                        networkPrefabAssetHash,
+                        out var prefabInstanceHandler
+                    )
+                )
                 {
                     try
                     {
-                        networkObjectInstance = prefabInstanceHandler.Instantiate(ownerClientId, position, rotation, instantiationData);
+                        networkObjectInstance = prefabInstanceHandler.Instantiate(
+                            ownerClientId,
+                            position,
+                            rotation,
+                            instantiationData
+                        );
                     }
                     catch (Exception ex)
                     {
@@ -299,7 +343,9 @@ namespace Unity.Netcode
                 }
                 else
                 {
-                    Debug.LogError($"[InstantiationData] Failed instantiate with data: no compatible data handler found for object hash {networkPrefabAssetHash}. Instantiation data will be dropped.");
+                    Debug.LogError(
+                        $"[InstantiationData] Failed instantiate with data: no compatible data handler found for object hash {networkPrefabAssetHash}. Instantiation data will be dropped."
+                    );
                     return null;
                 }
             }
@@ -362,15 +408,29 @@ namespace Unity.Netcode
         {
             if (gameObject.TryGetComponent<NetworkObject>(out var networkObject))
             {
-                if (m_NetworkManager.NetworkConfig.Prefabs.NetworkPrefabOverrideLinks.ContainsKey(networkObject.GlobalObjectIdHash))
+                if (
+                    m_NetworkManager.NetworkConfig.Prefabs.NetworkPrefabOverrideLinks.ContainsKey(
+                        networkObject.GlobalObjectIdHash
+                    )
+                )
                 {
-                    switch (m_NetworkManager.NetworkConfig.Prefabs.NetworkPrefabOverrideLinks[networkObject.GlobalObjectIdHash].Override)
+                    switch (
+                        m_NetworkManager
+                            .NetworkConfig
+                            .Prefabs
+                            .NetworkPrefabOverrideLinks[networkObject.GlobalObjectIdHash]
+                            .Override
+                    )
                     {
                         case NetworkPrefabOverride.Hash:
                         case NetworkPrefabOverride.Prefab:
-                            {
-                                return m_NetworkManager.NetworkConfig.Prefabs.NetworkPrefabOverrideLinks[networkObject.GlobalObjectIdHash].OverridingTargetPrefab;
-                            }
+                        {
+                            return m_NetworkManager
+                                .NetworkConfig
+                                .Prefabs
+                                .NetworkPrefabOverrideLinks[networkObject.GlobalObjectIdHash]
+                                .OverridingTargetPrefab;
+                        }
                     }
                 }
             }
@@ -403,7 +463,9 @@ namespace Unity.Netcode
         {
             if (m_NetworkManager.IsListening && m_NetworkManager.NetworkConfig.ForceSamePrefabs)
             {
-                throw new Exception($"All prefabs must be registered before starting {nameof(NetworkManager)} when {nameof(NetworkConfig.ForceSamePrefabs)} is enabled.");
+                throw new Exception(
+                    $"All prefabs must be registered before starting {nameof(NetworkManager)} when {nameof(NetworkConfig.ForceSamePrefabs)} is enabled."
+                );
             }
 
             var networkObject = prefab.GetComponent<NetworkObject>();
@@ -416,7 +478,10 @@ namespace Unity.Netcode
             bool added = m_NetworkManager.NetworkConfig.Prefabs.Add(networkPrefab);
             if (m_NetworkManager.IsListening && added)
             {
-                m_NetworkManager.DeferredMessageManager.ProcessTriggers(IDeferredNetworkMessageManager.TriggerType.OnAddPrefab, networkObject.GlobalObjectIdHash);
+                m_NetworkManager.DeferredMessageManager.ProcessTriggers(
+                    IDeferredNetworkMessageManager.TriggerType.OnAddPrefab,
+                    networkObject.GlobalObjectIdHash
+                );
             }
         }
 
@@ -435,7 +500,9 @@ namespace Unity.Netcode
         {
             if (m_NetworkManager.IsListening && m_NetworkManager.NetworkConfig.ForceSamePrefabs)
             {
-                throw new Exception($"Prefabs cannot be removed after starting {nameof(NetworkManager)} when {nameof(NetworkConfig.ForceSamePrefabs)} is enabled.");
+                throw new Exception(
+                    $"Prefabs cannot be removed after starting {nameof(NetworkManager)} when {nameof(NetworkConfig.ForceSamePrefabs)} is enabled."
+                );
             }
 
             var globalObjectIdHash = prefab.GetComponent<NetworkObject>().GlobalObjectIdHash;
@@ -458,7 +525,11 @@ namespace Unity.Netcode
                 if (networkConfig.PlayerPrefab.TryGetComponent<NetworkObject>(out var playerPrefabNetworkObject))
                 {
                     //In the event there is no NetworkPrefab entry (i.e. no override for default player prefab)
-                    if (!networkConfig.Prefabs.NetworkPrefabOverrideLinks.ContainsKey(playerPrefabNetworkObject.GlobalObjectIdHash))
+                    if (
+                        !networkConfig.Prefabs.NetworkPrefabOverrideLinks.ContainsKey(
+                            playerPrefabNetworkObject.GlobalObjectIdHash
+                        )
+                    )
                     {
                         //Then add a new entry for the player prefab
                         AddNetworkPrefab(networkConfig.PlayerPrefab);
@@ -467,7 +538,9 @@ namespace Unity.Netcode
                 else
                 {
                     // Provide the name of the prefab with issues so the user can more easily find the prefab and fix it
-                    Debug.LogError($"{nameof(NetworkConfig.PlayerPrefab)} (\"{networkConfig.PlayerPrefab.name}\") has no NetworkObject assigned to it!.");
+                    Debug.LogError(
+                        $"{nameof(NetworkConfig.PlayerPrefab)} (\"{networkConfig.PlayerPrefab.name}\") has no NetworkObject assigned to it!."
+                    );
                 }
             }
         }

@@ -7,6 +7,7 @@ namespace Unity.Collections
     {
         public Key key;
         public Value value;
+
         public Pair(Key k, Value v)
         {
             key = k;
@@ -20,7 +21,8 @@ namespace Unity.Collections
     }
 
     // Tiny does not contains an IList definition (or even ICollection)
-    internal struct ListPair<Key, Value> where Value : IList
+    internal struct ListPair<Key, Value>
+        where Value : IList
     {
         public Key key;
         public Value value;

@@ -14,13 +14,15 @@ namespace EditorAttributes
         /// Attribute to enable a field based on a condition
         /// </summary>
         /// <param name="conditionName">The name of the condition to evaluate</param>
-        public EnableFieldAttribute(string conditionName) : base(true) => ConditionName = conditionName;
+        public EnableFieldAttribute(string conditionName)
+            : base(true) => ConditionName = conditionName;
 
         /// <summary>
         /// Attribute to enable a field based on a condition
         /// </summary>
         /// <param name="conditionName">The name of the condition to evaluate</param>
         /// <param name="enumValue">The value of the enum</param>
-        public EnableFieldAttribute(string conditionName, object enumValue) : this(conditionName) => EnumValue = (int)enumValue;
+        public EnableFieldAttribute(string conditionName, object enumValue)
+            : this(conditionName) => EnumValue = (int)enumValue;
     }
 }

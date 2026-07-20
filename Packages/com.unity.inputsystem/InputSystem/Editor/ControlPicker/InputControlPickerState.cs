@@ -20,8 +20,11 @@ namespace UnityEngine.InputSystem.Editor
             set => m_ManualPathEditMode = value;
         }
 
-        [SerializeField] private AdvancedDropdownState m_AdvancedDropdownState = new AdvancedDropdownState();
-        [SerializeField] private bool m_ManualPathEditMode;
+        [SerializeField]
+        private AdvancedDropdownState m_AdvancedDropdownState = new AdvancedDropdownState();
+
+        [SerializeField]
+        private bool m_ManualPathEditMode;
     }
 }
 #endif

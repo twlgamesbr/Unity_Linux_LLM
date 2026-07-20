@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 #if BYPASS_DEFAULT_ENUM_DRAWER && MULTIPLAYER_SERVICES_SDK_INSTALLED
 using System.Linq;
 #endif
-using UnityEditor;
-using UnityEngine;
+
 
 namespace Unity.Netcode.Editor
 {
@@ -14,7 +15,10 @@ namespace Unity.Netcode.Editor
     [CanEditMultipleObjects]
     public class NetworkObjectEditor : UnityEditor.Editor
     {
-        private const NetworkObject.OwnershipStatus k_AllOwnershipFlags = NetworkObject.OwnershipStatus.RequestRequired | NetworkObject.OwnershipStatus.Transferable | NetworkObject.OwnershipStatus.Distributable;
+        private const NetworkObject.OwnershipStatus k_AllOwnershipFlags =
+            NetworkObject.OwnershipStatus.RequestRequired
+            | NetworkObject.OwnershipStatus.Transferable
+            | NetworkObject.OwnershipStatus.Distributable;
         private const int k_SessionOwnerFlagAsInt = (int)NetworkObject.OwnershipStatus.SessionOwner;
 
         private bool m_Initialized;
@@ -39,7 +43,12 @@ namespace Unity.Netcode.Editor
         {
             Initialize();
 
-            if (EditorApplication.isPlaying && !m_NetworkObject.IsSpawned && m_NetworkObject.NetworkManager != null && m_NetworkObject.NetworkManager.IsServer)
+            if (
+                EditorApplication.isPlaying
+                && !m_NetworkObject.IsSpawned
+                && m_NetworkObject.NetworkManager != null
+                && m_NetworkObject.NetworkManager.IsServer
+            )
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(new GUIContent("Spawn", "Spawns the object across the network"));
@@ -59,9 +68,18 @@ namespace Unity.Netcode.Editor
                 {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(NetworkObject.Ownership)));
                 }
-                EditorGUILayout.TextField(nameof(NetworkObject.GlobalObjectIdHash), m_NetworkObject.GlobalObjectIdHash.ToString());
-                EditorGUILayout.TextField(nameof(NetworkObject.NetworkObjectId), m_NetworkObject.NetworkObjectId.ToString());
-                EditorGUILayout.TextField(nameof(NetworkObject.OwnerClientId), m_NetworkObject.OwnerClientId.ToString());
+                EditorGUILayout.TextField(
+                    nameof(NetworkObject.GlobalObjectIdHash),
+                    m_NetworkObject.GlobalObjectIdHash.ToString()
+                );
+                EditorGUILayout.TextField(
+                    nameof(NetworkObject.NetworkObjectId),
+                    m_NetworkObject.NetworkObjectId.ToString()
+                );
+                EditorGUILayout.TextField(
+                    nameof(NetworkObject.OwnerClientId),
+                    m_NetworkObject.OwnerClientId.ToString()
+                );
                 EditorGUILayout.Toggle(nameof(NetworkObject.IsSpawned), m_NetworkObject.IsSpawned);
                 EditorGUILayout.Toggle(nameof(NetworkObject.IsLocalPlayer), m_NetworkObject.IsLocalPlayer);
                 EditorGUILayout.Toggle(nameof(NetworkObject.IsOwner), m_NetworkObject.IsOwner);
@@ -72,7 +90,10 @@ namespace Unity.Netcode.Editor
                 EditorGUILayout.Toggle(nameof(NetworkObject.IsSceneObject), m_NetworkObject.InScenePlaced);
 #pragma warning restore CS0618 // Type or member is obsolete
                 EditorGUILayout.Toggle(nameof(NetworkObject.DestroyWithScene), m_NetworkObject.DestroyWithScene);
-                EditorGUILayout.TextField(nameof(NetworkObject.NetworkManager), m_NetworkObject.NetworkManager == null ? "null" : m_NetworkObject.NetworkManager.gameObject.name);
+                EditorGUILayout.TextField(
+                    nameof(NetworkObject.NetworkManager),
+                    m_NetworkObject.NetworkManager == null ? "null" : m_NetworkObject.NetworkManager.gameObject.name
+                );
                 GUI.enabled = guiEnabled;
 
                 if (m_NetworkObject.NetworkManager != null && m_NetworkObject.NetworkManager.IsServer)
@@ -89,15 +110,31 @@ namespace Unity.Netcode.Editor
                         {
                             if (!m_NetworkObject.NetworkManager.ConnectedClients.ContainsKey(observerClientIds.Current))
                             {
-                                if ((observerClientIds.Current == 0 && m_NetworkObject.NetworkManager.IsHost) || observerClientIds.Current > 0)
+                                if (
+                                    (observerClientIds.Current == 0 && m_NetworkObject.NetworkManager.IsHost)
+                                    || observerClientIds.Current > 0
+                                )
                                 {
-                                    Debug.LogWarning($"Client-{observerClientIds.Current} is listed as an observer but is not connected!");
+                                    Debug.LogWarning(
+                                        $"Client-{observerClientIds.Current} is listed as an observer but is not connected!"
+                                    );
                                 }
                                 continue;
                             }
-                            if (m_NetworkObject.NetworkManager.ConnectedClients[observerClientIds.Current].PlayerObject != null)
+                            if (
+                                m_NetworkObject.NetworkManager.ConnectedClients[observerClientIds.Current].PlayerObject
+                                != null
+                            )
                             {
-                                EditorGUILayout.ObjectField($"ClientId: {observerClientIds.Current}", m_NetworkObject.NetworkManager.ConnectedClients[observerClientIds.Current].PlayerObject, typeof(GameObject), false);
+                                EditorGUILayout.ObjectField(
+                                    $"ClientId: {observerClientIds.Current}",
+                                    m_NetworkObject
+                                        .NetworkManager
+                                        .ConnectedClients[observerClientIds.Current]
+                                        .PlayerObject,
+                                    typeof(GameObject),
+                                    false
+                                );
                             }
                             else
                             {
@@ -151,8 +188,14 @@ namespace Unity.Netcode.Editor
 
                 var guiEnabled = GUI.enabled;
                 GUI.enabled = false;
-                EditorGUILayout.TextField(nameof(NetworkObject.GlobalObjectIdHash), m_NetworkObject.GlobalObjectIdHash.ToString());
-                EditorGUILayout.TextField(nameof(NetworkObject.NetworkManager), m_NetworkObject.NetworkManager == null ? "null" : m_NetworkObject.NetworkManager.gameObject.name);
+                EditorGUILayout.TextField(
+                    nameof(NetworkObject.GlobalObjectIdHash),
+                    m_NetworkObject.GlobalObjectIdHash.ToString()
+                );
+                EditorGUILayout.TextField(
+                    nameof(NetworkObject.NetworkManager),
+                    m_NetworkObject.NetworkManager == null ? "null" : m_NetworkObject.NetworkManager.gameObject.name
+                );
                 GUI.enabled = guiEnabled;
             }
         }

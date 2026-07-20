@@ -9,8 +9,7 @@ namespace Unity.Entities.Editor
         /// Constructs a new instance of <see cref="DOTSEditorProjectSettingsAttribute"/> with the provided section name.
         /// </summary>
         /// <param name="sectionName">The name of the section where the setting should go.</param>
-        public DOTSEditorProjectSettingsAttribute(string sectionName) : base(sectionName)
-        {
-        }
+        public DOTSEditorProjectSettingsAttribute(string sectionName)
+            : base(sectionName) { }
     }
 }

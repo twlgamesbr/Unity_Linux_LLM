@@ -9,7 +9,10 @@ namespace UnityEditor.Rendering.Universal
 {
     class URPBuildDataValidator
     {
-        private static void ValidateRenderPipelineAssetsAreAtLastVersion(List<UniversalRenderPipelineAsset> renderPipelineAssets, StringBuilder failures)
+        private static void ValidateRenderPipelineAssetsAreAtLastVersion(
+            List<UniversalRenderPipelineAsset> renderPipelineAssets,
+            StringBuilder failures
+        )
         {
             // Validate all included assets are at last version
             foreach (var urpPipelineAsset in renderPipelineAssets)
@@ -17,7 +20,8 @@ namespace UnityEditor.Rendering.Universal
                 if (!urpPipelineAsset.IsAtLastVersion())
                 {
                     failures.AppendLine(
-                        $"- The {nameof(UniversalRenderPipelineAsset)} with '{urpPipelineAsset.name}({AssetDatabase.GetAssetPath(urpPipelineAsset)})' is not at last version.");
+                        $"- The {nameof(UniversalRenderPipelineAsset)} with '{urpPipelineAsset.name}({AssetDatabase.GetAssetPath(urpPipelineAsset)})' is not at last version."
+                    );
                 }
             }
         }
@@ -36,20 +40,29 @@ namespace UnityEditor.Rendering.Universal
                 }
             }
 
-            PlayerSettings.SetDynamicBatchingForPlatform(EditorUserBuildSettings.activeBuildTarget, supportsDynamicBatching);
+            PlayerSettings.SetDynamicBatchingForPlatform(
+                EditorUserBuildSettings.activeBuildTarget,
+                supportsDynamicBatching
+            );
 #pragma warning restore 618
         }
 
-        private static void ValidateRenderPipelineGlobalSettings(UniversalRenderPipelineGlobalSettings globalSettingsInstance, StringBuilder failures)
+        private static void ValidateRenderPipelineGlobalSettings(
+            UniversalRenderPipelineGlobalSettings globalSettingsInstance,
+            StringBuilder failures
+        )
         {
             if (globalSettingsInstance == null)
-                failures.AppendLine($"- The {nameof(UniversalRenderPipelineGlobalSettings)} of the project are missing.");
+                failures.AppendLine(
+                    $"- The {nameof(UniversalRenderPipelineGlobalSettings)} of the project are missing."
+                );
             else
             {
                 if (!globalSettingsInstance.IsAtLastVersion())
                 {
                     failures.AppendLine(
-                        $"- The {nameof(UniversalRenderPipelineGlobalSettings)} with '{globalSettingsInstance.name}({AssetDatabase.GetAssetPath(globalSettingsInstance)})' is not at last version.");
+                        $"- The {nameof(UniversalRenderPipelineGlobalSettings)} with '{globalSettingsInstance.name}({AssetDatabase.GetAssetPath(globalSettingsInstance)})' is not at last version."
+                    );
                 }
             }
         }

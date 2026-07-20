@@ -50,7 +50,8 @@ namespace Unity.Entities
             public EntityInChunkChanges(
                 EntityManager afterEntityManager,
                 EntityManager beforeEntityManager,
-                AllocatorManager.AllocatorHandle allocator)
+                AllocatorManager.AllocatorHandle allocator
+            )
             {
                 AfterEntityManager = afterEntityManager;
                 BeforeEntityManager = beforeEntityManager;
@@ -81,7 +82,8 @@ namespace Unity.Entities
 
         struct EntityInChunkWithGuidComparer : IComparer<EntityInChunkWithGuid>
         {
-            public int Compare(EntityInChunkWithGuid x, EntityInChunkWithGuid y) => x.EntityGuid.CompareTo(y.EntityGuid);
+            public int Compare(EntityInChunkWithGuid x, EntityInChunkWithGuid y) =>
+                x.EntityGuid.CompareTo(y.EntityGuid);
         }
 
         [BurstCompile]
@@ -89,18 +91,27 @@ namespace Unity.Entities
         {
             public TypeIndex EntityGuidTypeIndex;
             public TypeIndex EntityTypeIndex;
-            [ReadOnly] public NativeList<ArchetypeChunk> Chunks;
-            [ReadOnly] public NativeList<ArchetypeChunkChangeFlags> Flags;
-            [ReadOnly] public NativeList<int> EntityCounts;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunk> Chunks;
+
+            [ReadOnly]
+            public NativeList<ArchetypeChunkChangeFlags> Flags;
+
+            [ReadOnly]
+            public NativeList<int> EntityCounts;
+
 #if UNITY_EDITOR && !DOTS_DISABLE_DEBUG_NAMES
 #if ENTITY_STORE_V1
-            [NativeDisableUnsafePtrRestriction, ReadOnly] public EntityName* NameByEntity;
+            [NativeDisableUnsafePtrRestriction, ReadOnly]
+            public EntityName* NameByEntity;
 #else
             public EntityNameStoreAccess NameStoreAccess;
 #endif
 
 #endif
-            [NativeDisableParallelForRestriction, WriteOnly] public NativeArray<EntityInChunkWithGuid> Entities;
+            [NativeDisableParallelForRestriction, WriteOnly]
+            public NativeArray<EntityInChunkWithGuid> Entities;
 
             public void Execute(int index)
             {
@@ -136,7 +147,7 @@ namespace Unity.Entities
                         EntityGuid = entityGuidBuffer[i],
                         Entity = entityBuffer[i],
                         NameIndex = nameIndex,
-                        Flags = flags
+                        Flags = flags,
                     };
                 }
             }
@@ -146,18 +157,30 @@ namespace Unity.Entities
         struct SortEntityInChunk : IJob
         {
             public NativeArray<EntityInChunkWithGuid> Array;
+
             public void Execute() => Array.Sort(new EntityInChunkWithGuidComparer());
         }
 
         [BurstCompile]
         struct GatherEntityChanges : IJob
         {
-            [ReadOnly] public NativeArray<EntityInChunkWithGuid> BeforeEntities;
-            [ReadOnly] public NativeArray<EntityInChunkWithGuid> AfterEntities;
-            [WriteOnly] public NativeList<CreatedEntity> CreatedEntities;
-            [WriteOnly] public NativeList<ModifiedEntity> ModifiedEntities;
-            [WriteOnly] public NativeList<DestroyedEntity> DestroyedEntities;
-            [WriteOnly] public NativeList<NameModifiedEntity> NameModifiedEntities;
+            [ReadOnly]
+            public NativeArray<EntityInChunkWithGuid> BeforeEntities;
+
+            [ReadOnly]
+            public NativeArray<EntityInChunkWithGuid> AfterEntities;
+
+            [WriteOnly]
+            public NativeList<CreatedEntity> CreatedEntities;
+
+            [WriteOnly]
+            public NativeList<ModifiedEntity> ModifiedEntities;
+
+            [WriteOnly]
+            public NativeList<DestroyedEntity> DestroyedEntities;
+
+            [WriteOnly]
+            public NativeList<NameModifiedEntity> NameModifiedEntities;
 
             public void Execute()
             {
@@ -172,30 +195,38 @@ namespace Unity.Entities
 
                     if (compare < 0)
                     {
-                        DestroyedEntities.Add(new DestroyedEntity
-                        {
-                            EntityGuid = beforeEntity.EntityGuid,
-                            BeforeEntityInChunk = beforeEntity.EntityInChunk
-                        });
+                        DestroyedEntities.Add(
+                            new DestroyedEntity
+                            {
+                                EntityGuid = beforeEntity.EntityGuid,
+                                BeforeEntityInChunk = beforeEntity.EntityInChunk,
+                            }
+                        );
                         beforeEntityIndex++;
                     }
                     else if (compare == 0)
                     {
-                        ModifiedEntities.Add(new ModifiedEntity
-                        {
-                            EntityGuid = afterEntity.EntityGuid,
-                            AfterEntityInChunk = afterEntity.EntityInChunk,
-                            BeforeEntityInChunk = beforeEntity.EntityInChunk,
-                            CanCompareChunkVersions = (beforeEntity.Flags & afterEntity.Flags & ArchetypeChunkChangeFlags.Cloned) == ArchetypeChunkChangeFlags.Cloned
-                        });
-
-                        if(afterEntity.NameIndex != beforeEntity.NameIndex)
-                        {
-                            NameModifiedEntities.Add(new NameModifiedEntity
+                        ModifiedEntities.Add(
+                            new ModifiedEntity
                             {
                                 EntityGuid = afterEntity.EntityGuid,
-                                Entity = afterEntity.Entity
-                            });
+                                AfterEntityInChunk = afterEntity.EntityInChunk,
+                                BeforeEntityInChunk = beforeEntity.EntityInChunk,
+                                CanCompareChunkVersions =
+                                    (beforeEntity.Flags & afterEntity.Flags & ArchetypeChunkChangeFlags.Cloned)
+                                    == ArchetypeChunkChangeFlags.Cloned,
+                            }
+                        );
+
+                        if (afterEntity.NameIndex != beforeEntity.NameIndex)
+                        {
+                            NameModifiedEntities.Add(
+                                new NameModifiedEntity
+                                {
+                                    EntityGuid = afterEntity.EntityGuid,
+                                    Entity = afterEntity.Entity,
+                                }
+                            );
                         }
 
                         afterEntityIndex++;
@@ -203,11 +234,13 @@ namespace Unity.Entities
                     }
                     else
                     {
-                        CreatedEntities.Add(new CreatedEntity
-                        {
-                            EntityGuid = afterEntity.EntityGuid,
-                            AfterEntityInChunk = afterEntity.EntityInChunk
-                        });
+                        CreatedEntities.Add(
+                            new CreatedEntity
+                            {
+                                EntityGuid = afterEntity.EntityGuid,
+                                AfterEntityInChunk = afterEntity.EntityInChunk,
+                            }
+                        );
                         afterEntityIndex++;
                     }
                 }
@@ -215,37 +248,45 @@ namespace Unity.Entities
                 while (beforeEntityIndex < BeforeEntities.Length)
                 {
                     var beforeEntity = BeforeEntities[beforeEntityIndex];
-                    DestroyedEntities.Add(new DestroyedEntity
-                    {
-                        EntityGuid = beforeEntity.EntityGuid,
-                        BeforeEntityInChunk = beforeEntity.EntityInChunk
-                    });
+                    DestroyedEntities.Add(
+                        new DestroyedEntity
+                        {
+                            EntityGuid = beforeEntity.EntityGuid,
+                            BeforeEntityInChunk = beforeEntity.EntityInChunk,
+                        }
+                    );
                     beforeEntityIndex++;
                 }
 
                 while (afterEntityIndex < AfterEntities.Length)
                 {
                     var afterEntity = AfterEntities[afterEntityIndex];
-                    CreatedEntities.Add(new CreatedEntity
-                    {
-                        EntityGuid = afterEntity.EntityGuid,
-                        AfterEntityInChunk = afterEntity.EntityInChunk
-                    });
+                    CreatedEntities.Add(
+                        new CreatedEntity
+                        {
+                            EntityGuid = afterEntity.EntityGuid,
+                            AfterEntityInChunk = afterEntity.EntityInChunk,
+                        }
+                    );
                     afterEntityIndex++;
                 }
             }
         }
 
-        static NativeArray<EntityInChunkWithGuid> GetSortedEntitiesInChunk
-        (
+        static NativeArray<EntityInChunkWithGuid> GetSortedEntitiesInChunk(
             EntityManager entityManager,
             ArchetypeChunkChangeSet archetypeChunkChangeSet,
             AllocatorManager.AllocatorHandle allocator,
             out JobHandle jobHandle,
-            JobHandle dependsOn = default)
+            JobHandle dependsOn = default
+        )
         {
             // Todo: When NativeArray supports custom allocators, remove these .ToAllocator callsites DOTS-7695
-            var entities = new NativeArray<EntityInChunkWithGuid>(archetypeChunkChangeSet.TotalEntityCount, allocator.ToAllocator, NativeArrayOptions.UninitializedMemory);
+            var entities = new NativeArray<EntityInChunkWithGuid>(
+                archetypeChunkChangeSet.TotalEntityCount,
+                allocator.ToAllocator,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             var gatherEntitiesByChunk = new GatherEntityInChunkWithGuid
             {
@@ -263,35 +304,27 @@ namespace Unity.Entities
 #endif
 
 #endif
-                Entities = entities
+                Entities = entities,
             }.Schedule(archetypeChunkChangeSet.Chunks.Length, 64, dependsOn);
 
-            var sortEntities = new SortEntityInChunk
-            {
-                Array = entities
-            }.Schedule(gatherEntitiesByChunk);
+            var sortEntities = new SortEntityInChunk { Array = entities }.Schedule(gatherEntitiesByChunk);
 
             jobHandle = sortEntities;
 
             return entities;
         }
 
-        static EntityInChunkChanges GetEntityInChunkChanges
-        (
+        static EntityInChunkChanges GetEntityInChunkChanges(
             EntityManager afterEntityManager,
             EntityManager beforeEntityManager,
             NativeArray<EntityInChunkWithGuid> afterEntities,
             NativeArray<EntityInChunkWithGuid> beforeEntities,
             AllocatorManager.AllocatorHandle allocator,
             out JobHandle jobHandle,
-            JobHandle dependsOn = default)
+            JobHandle dependsOn = default
+        )
         {
-            var entityChanges = new EntityInChunkChanges
-                (
-                afterEntityManager,
-                beforeEntityManager,
-                allocator
-                );
+            var entityChanges = new EntityInChunkChanges(afterEntityManager, beforeEntityManager, allocator);
 
             jobHandle = new GatherEntityChanges
             {
@@ -300,7 +333,7 @@ namespace Unity.Entities
                 CreatedEntities = entityChanges.CreatedEntities,
                 ModifiedEntities = entityChanges.ModifiedEntities,
                 DestroyedEntities = entityChanges.DestroyedEntities,
-                NameModifiedEntities = entityChanges.NameModifiedEntities
+                NameModifiedEntities = entityChanges.NameModifiedEntities,
             }.Schedule(dependsOn);
 
             return entityChanges;

@@ -93,7 +93,8 @@ namespace UnityEngine.InputSystem
             var map = action.actionMap;
             if (map == null || map.asset == null)
                 throw new InvalidOperationException(
-                    $"Action '{action}' must be part of an InputActionAsset in order to be able to create an InputActionReference for it");
+                    $"Action '{action}' must be part of an InputActionAsset in order to be able to create an InputActionReference for it"
+                );
 
             SetInternal(map.asset, action);
         }
@@ -129,8 +130,10 @@ namespace UnityEngine.InputSystem
 
             var foundAction = actionMap.FindAction(actionName);
             if (foundAction == null)
-                throw new ArgumentException($"No action '{actionName}' in map '{mapName}' of asset '{asset}'",
-                    nameof(actionName));
+                throw new ArgumentException(
+                    $"No action '{actionName}' in map '{mapName}' of asset '{asset}'",
+                    nameof(actionName)
+                );
 
             SetInternal(asset, foundAction);
         }
@@ -157,7 +160,9 @@ namespace UnityEngine.InputSystem
             if (value == null)
                 return base.ToString();
             if (value.actionMap != null)
-                return m_Asset != null ? $"{m_Asset.name}:{value.actionMap.name}/{value.name}" : $"{value.actionMap.name}/{value.name}";
+                return m_Asset != null
+                    ? $"{m_Asset.name}:{value.actionMap.name}/{value.name}"
+                    : $"{value.actionMap.name}/{value.name}";
             return m_Asset != null ? $"{m_Asset.name}:{m_ActionId}" : m_ActionId;
         }
 
@@ -231,15 +236,19 @@ namespace UnityEngine.InputSystem
             m_Action = null;
         }
 
-        [SerializeField] internal InputActionAsset m_Asset;
+        [SerializeField]
+        internal InputActionAsset m_Asset;
+
         // Can't serialize System.Guid and Unity's GUID is editor only so these
         // go out as strings.
-        [SerializeField] internal string m_ActionId;
+        [SerializeField]
+        internal string m_ActionId;
 
         /// <summary>
         /// The resolved, cached input action.
         /// </summary>
-        [NonSerialized] private InputAction m_Action;
+        [NonSerialized]
+        private InputAction m_Action;
 
         /// <summary>
         /// Equivalent to <see cref="InputActionReference.action"/>.
@@ -261,7 +270,7 @@ namespace UnityEngine.InputSystem
         /// input actions asset and mutating it would have side-effects on the projects assets.</exception>
         private void CheckImmutableReference()
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             // Note that we do a lot of checking here, but it is only for a rather slim (unintended) use case in
             // editor and not in final builds. The alternative would be to set a non-serialized field on the reference
             // when importing assets which would simplify this class, but it adds complexity to import stage and
@@ -293,14 +302,16 @@ namespace UnityEngine.InputSystem
             // This is not needed for players since scriptable objects aren't serialized back from within a player.
             if (!CanSetReference(this))
             {
-                throw new InvalidOperationException("Attempting to modify an immutable InputActionReference instance " +
-                    "that is part of an .inputactions asset. This is not allowed since it would modify the source " +
-                    "asset in which the reference is serialized and potentially corrupt it. " +
-                    "Instead use InputActionReference.Create(action) to create a new mutable " +
-                    "in-memory instance or serialize it as a separate asset if the intent is for changes to " +
-                    "survive domain reloads.");
+                throw new InvalidOperationException(
+                    "Attempting to modify an immutable InputActionReference instance "
+                        + "that is part of an .inputactions asset. This is not allowed since it would modify the source "
+                        + "asset in which the reference is serialized and potentially corrupt it. "
+                        + "Instead use InputActionReference.Create(action) to create a new mutable "
+                        + "in-memory instance or serialize it as a separate asset if the intent is for changes to "
+                        + "survive domain reloads."
+                );
             }
-            #endif // UNITY_EDITOR
+#endif // UNITY_EDITOR
         }
     }
 }

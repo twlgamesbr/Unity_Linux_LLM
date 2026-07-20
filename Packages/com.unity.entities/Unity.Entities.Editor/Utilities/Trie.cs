@@ -8,11 +8,9 @@ namespace Unity.Entities.Editor
     {
         public Trie() { }
 
-        public Trie(IEnumerable<string> items)
-            => Index(items);
+        public Trie(IEnumerable<string> items) => Index(items);
 
-        public void Index(string value)
-            => base.Index(value, value);
+        public void Index(string value) => base.Index(value, value);
 
         public void Index(IEnumerable<string> values)
         {
@@ -43,7 +41,11 @@ namespace Unity.Entities.Editor
             var countHasValue = 0;
             m_Root.GetMetrics(subNodesPerNode, ref countHasValue);
 
-            return (totalNodeCount: subNodesPerNode.Count, nodeCountHavingValue: countHasValue, subNodesPerNode: subNodesPerNode);
+            return (
+                totalNodeCount: subNodesPerNode.Count,
+                nodeCountHavingValue: countHasValue,
+                subNodesPerNode: subNodesPerNode
+            );
         }
 
         struct Node<TValue>

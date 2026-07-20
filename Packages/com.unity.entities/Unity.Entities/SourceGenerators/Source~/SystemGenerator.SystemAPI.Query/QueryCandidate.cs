@@ -14,7 +14,8 @@ public struct QueryCandidate : ISystemCandidate
 
     public static QueryCandidate From(
         InvocationExpressionSyntax fullInvocationChainSyntaxNode,
-        IReadOnlyCollection<TypeSyntax> queryTypeSyntaxNodes)
+        IReadOnlyCollection<TypeSyntax> queryTypeSyntaxNodes
+    )
     {
         return new QueryCandidate
         {

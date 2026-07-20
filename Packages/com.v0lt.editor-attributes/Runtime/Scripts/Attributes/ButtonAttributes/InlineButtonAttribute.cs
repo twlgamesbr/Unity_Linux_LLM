@@ -26,7 +26,12 @@ namespace EditorAttributes
         /// <param name="buttonLabel">The label displayed on the button</param>
         /// <param name="buttonWidth">The width of the button in pixels</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public InlineButtonAttribute(string functionName, string buttonLabel = "", float buttonWidth = 100f, bool makeDirty = true)
+        public InlineButtonAttribute(
+            string functionName,
+            string buttonLabel = "",
+            float buttonWidth = 100f,
+            bool makeDirty = true
+        )
         {
             FunctionName = functionName;
             ButtonLabel = buttonLabel;
@@ -44,7 +49,16 @@ namespace EditorAttributes
         /// <param name="buttonLabel">The label displayed on the button</param>
         /// <param name="buttonWidth">The width of the button in pixels</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public InlineButtonAttribute(string functionName, bool isRepetable, long pressDelay = 60, long repetitionInterval = 100, string buttonLabel = "", float buttonWidth = 100f, bool makeDirty = true) : this(functionName, buttonLabel, buttonWidth, makeDirty)
+        public InlineButtonAttribute(
+            string functionName,
+            bool isRepetable,
+            long pressDelay = 60,
+            long repetitionInterval = 100,
+            string buttonLabel = "",
+            float buttonWidth = 100f,
+            bool makeDirty = true
+        )
+            : this(functionName, buttonLabel, buttonWidth, makeDirty)
         {
             IsRepetable = isRepetable;
             PressDelay = pressDelay;

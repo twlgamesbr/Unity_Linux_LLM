@@ -16,7 +16,7 @@ namespace Unity.Serialization.Json.Unsafe
             readonly int m_Start;
             readonly int m_End;
             int m_Position;
-            
+
             internal Enumerator(UnsafePackedBinaryStream* stream, int index)
             {
                 m_Stream = stream;
@@ -31,7 +31,7 @@ namespace Unity.Serialization.Json.Unsafe
                 {
                     throw new InvalidOperationException();
                 }
-                
+
                 var length = m_Stream->GetToken(m_Position).Length;
 
                 if (m_Position == m_Start)
@@ -40,36 +40,34 @@ namespace Unity.Serialization.Json.Unsafe
                     {
                         return false;
                     }
-                    
+
                     m_Position = m_Stream->GetFirstChildIndex(m_Position);
                     return true;
                 }
-                
+
                 if (m_Position + length < m_End)
                 {
                     m_Position += length;
                     return true;
                 }
-                
+
                 return false;
             }
 
             object IEnumerator.Current => Current;
-            
+
             public UnsafeMemberView Current => new UnsafeMemberView(m_Stream, m_Position);
-            
+
             public void Reset()
             {
                 m_Position = m_Start;
             }
 
-            public void Dispose()
-            {
-                
-            }
+            public void Dispose() { }
         }
 
-        [NativeDisableUnsafePtrRestriction] readonly UnsafePackedBinaryStream* m_Stream;
+        [NativeDisableUnsafePtrRestriction]
+        readonly UnsafePackedBinaryStream* m_Stream;
         readonly int m_TokenIndex;
 
         internal UnsafeObjectView(UnsafePackedBinaryStream* stream, int tokenIndex)
@@ -86,7 +84,7 @@ namespace Unity.Serialization.Json.Unsafe
                 {
                     return value;
                 }
-                
+
                 throw new KeyNotFoundException();
             }
         }
@@ -111,7 +109,7 @@ namespace Unity.Serialization.Json.Unsafe
             member = default;
             return false;
         }
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
@@ -125,27 +123,31 @@ namespace Unity.Serialization.Json.Unsafe
                 var view = stackalloc UnsafeView[1];
 
                 view->Stream = m_Stream;
-            
-                for (int index = m_Stream->GetFirstChildIndex(m_TokenIndex), end = m_TokenIndex + m_Stream->GetToken(m_TokenIndex).Length; index < end;)
+
+                for (
+                    int index = m_Stream->GetFirstChildIndex(m_TokenIndex),
+                        end = m_TokenIndex + m_Stream->GetToken(m_TokenIndex).Length;
+                    index < end;
+
+                )
                 {
                     view->TokenIndex = index;
-                    
-                    if (((UnsafeStringView*) view)->Equals(name))
+
+                    if (((UnsafeStringView*)view)->Equals(name))
                     {
                         view->TokenIndex = m_Stream->GetFirstChildIndex(index);
-                        value = *(UnsafeValueView*) view;
+                        value = *(UnsafeValueView*)view;
                         return true;
                     }
-            
+
                     index += m_Stream->GetToken(index).Length;
                 }
-
             }
-            
+
             value = default;
             return false;
         }
-        
+
         public int Count()
         {
             var count = 0;
@@ -154,7 +156,7 @@ namespace Unity.Serialization.Json.Unsafe
             if (length == 1)
                 return 0;
 
-            for (int index = m_Stream->GetFirstChildIndex(m_TokenIndex), end = m_TokenIndex + length; index < end;)
+            for (int index = m_Stream->GetFirstChildIndex(m_TokenIndex), end = m_TokenIndex + length; index < end; )
             {
                 index += m_Stream->GetToken(index).Length;
                 count++;
@@ -180,7 +182,7 @@ namespace Unity.Serialization.Json.Unsafe
         /// </summary>
         /// <returns>A <see cref="SerializedObjectView.Enumerator"/> for the <see cref="SerializedObjectView"/>.</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        
+
         public UnsafeValueView AsValue() => new UnsafeValueView(m_Stream, m_TokenIndex);
 
         public SerializedObjectView AsSafe() => new SerializedObjectView(m_Stream, m_Stream->GetHandle(m_TokenIndex));

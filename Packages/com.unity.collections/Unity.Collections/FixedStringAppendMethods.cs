@@ -6,7 +6,7 @@ namespace Unity.Collections
     /// Provides extension methods for FixedString*N*Bytes.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static partial class FixedStringMethods
+    public static unsafe partial class FixedStringMethods
     {
         /// <summary>
         /// Appends a Unicode.Rune to this string.
@@ -37,7 +37,7 @@ namespace Unity.Collections
         public static FormatError Append<T>(ref this T fs, char ch)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
-            return fs.Append((Unicode.Rune) ch);
+            return fs.Append((Unicode.Rune)ch);
         }
 
         /// <summary>
@@ -112,8 +112,7 @@ namespace Unity.Collections
                     var digit = (byte)(input % 10);
                     temp[--offset] = (byte)('0' + digit);
                     input /= 10;
-                }
-                while (input != 0);
+                } while (input != 0);
             }
             else
             {
@@ -122,8 +121,7 @@ namespace Unity.Collections
                     var digit = (byte)(input % 10);
                     temp[--offset] = (byte)('0' - digit);
                     input /= 10;
-                }
-                while (input != 0);
+                } while (input != 0);
                 temp[--offset] = (byte)'-';
             }
 
@@ -163,8 +161,7 @@ namespace Unity.Collections
                 var digit = (byte)(input % 10);
                 temp[--offset] = (byte)('0' + digit);
                 input /= 10;
-            }
-            while (input != 0);
+            } while (input != 0);
 
             return fs.Append(temp + offset, maximumDigits - offset);
         }
@@ -225,9 +222,8 @@ namespace Unity.Collections
                 var decimalDigit = decimalMantissa % 10;
                 backwards[8 - decimalDigits++] = (char)('0' + decimalDigit);
                 decimalMantissa /= 10;
-            }
-            while (decimalMantissa > 0);
-            char *ascii = backwards + 9 - decimalDigits;
+            } while (decimalMantissa > 0);
+            char* ascii = backwards + 9 - decimalDigits;
             var leadingZeroes = -decimalExponent - decimalDigits + 1;
             if (leadingZeroes > 0)
             {
@@ -290,8 +286,10 @@ namespace Unity.Collections
         /// <param name="fs">The destination string.</param>
         /// <param name="input">The source string.</param>
         /// <returns>FormatError.None if successful. Returns FormatError.Overflow if the capacity of the destination string is exceeded.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
-        public static FormatError Append<T,T2>(ref this T fs, in T2 input)
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
+        public static FormatError Append<T, T2>(ref this T fs, in T2 input)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
@@ -310,7 +308,9 @@ namespace Unity.Collections
         /// <param name="fs">The destination string.</param>
         /// <param name="input">The source string.</param>
         /// <returns>CopyError.None if successful. Returns CopyError.Truncation if the source string is too large to fit in the destination.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
         public static CopyError CopyFrom<T, T2>(ref this T fs, in T2 input)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
@@ -336,7 +336,7 @@ namespace Unity.Collections
         /// <param name="utf8BytesLength">The number of bytes to append.</param>
         /// <returns>FormatError.None if successful. Returns FormatError.Overflow if the capacity of the destination string is exceeded.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes) })]
-        public unsafe static FormatError Append<T>(ref this T fs, byte* utf8Bytes, int utf8BytesLength)
+        public static unsafe FormatError Append<T>(ref this T fs, byte* utf8Bytes, int utf8BytesLength)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             var origLength = fs.Length;
@@ -357,7 +357,7 @@ namespace Unity.Collections
         /// <param name="s">The string to append.</param>
         /// <returns>FormatError.None if successful. Returns FormatError.Overflow if the capacity of the destination string is exceeded.</returns>
         [ExcludeFromBurstCompatTesting("Takes managed string")]
-        public unsafe static FormatError Append<T>(ref this T fs, string s)
+        public static unsafe FormatError Append<T>(ref this T fs, string s)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             // we don't know how big the expansion from UTF16 to UTF8 will be, so we account for worst case.
@@ -437,12 +437,20 @@ namespace Unity.Collections
         /// <param name="fs">The destination string.</param>
         /// <param name="input">The source string.</param>
         /// <returns>CopyError.None if successful. Returns CopyError.Truncation if the source string is too large to fit in the destination.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) })]
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(FixedString128Bytes), typeof(FixedString128Bytes) }
+        )]
         public static CopyError CopyFromTruncated<T, T2>(ref this T fs, in T2 input)
             where T : unmanaged, INativeList<byte>, IUTF8Bytes
             where T2 : unmanaged, INativeList<byte>, IUTF8Bytes
         {
-            var error = UTF8ArrayUnsafeUtility.Copy(fs.GetUnsafePtr(), out int utf8Len, fs.Capacity, input.GetUnsafePtr(), input.Length);
+            var error = UTF8ArrayUnsafeUtility.Copy(
+                fs.GetUnsafePtr(),
+                out int utf8Len,
+                fs.Capacity,
+                input.GetUnsafePtr(),
+                input.Length
+            );
             fs.Length = utf8Len;
             return error;
         }

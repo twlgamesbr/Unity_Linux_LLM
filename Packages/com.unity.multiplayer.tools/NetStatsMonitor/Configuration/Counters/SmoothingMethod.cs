@@ -13,6 +13,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor
         /// since it doesn't require to keep samples to obtain a value.
         /// </remarks>
         ExponentialMovingAverage,
+
         /// <summary>
         /// Smoothing method using a simple moving average.
         /// </summary>

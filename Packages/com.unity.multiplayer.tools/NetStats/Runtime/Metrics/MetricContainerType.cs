@@ -5,6 +5,6 @@
         Counter = 0,
         Event = 1,
         Gauge = 2,
-        Timer = 3
+        Timer = 3,
     }
 }

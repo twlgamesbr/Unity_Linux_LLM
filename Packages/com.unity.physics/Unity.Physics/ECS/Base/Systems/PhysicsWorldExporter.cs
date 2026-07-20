@@ -60,13 +60,16 @@ namespace Unity.Physics.Systems
             ref ExportPhysicsWorldTypeHandles componentTypeHandles,
             in PhysicsWorld world,
             in JobHandle inputDep,
-            EntityQuery dynamicEntities)
+            EntityQuery dynamicEntities
+        )
         {
             if (world.NumDynamicBodies > 0)
             {
-                var chunkBaseEntityIndices =
-                    dynamicEntities.CalculateBaseEntityIndexArrayAsync(systemState.WorldUpdateAllocator, inputDep,
-                        out var baseIndexJob);
+                var chunkBaseEntityIndices = dynamicEntities.CalculateBaseEntityIndexArrayAsync(
+                    systemState.WorldUpdateAllocator,
+                    inputDep,
+                    out var baseIndexJob
+                );
 
                 componentTypeHandles.Update(ref systemState);
                 return new ExportDynamicBodiesJob
@@ -125,16 +128,28 @@ namespace Unity.Physics.Systems
         [BurstCompile]
         internal struct ExportDynamicBodiesJob : IJobChunk
         {
-            [ReadOnly] public NativeArray<MotionVelocity> MotionVelocities;
-            [ReadOnly] public NativeArray<MotionData> MotionDatas;
-            [ReadOnly] public NativeArray<int> ChunkBaseEntityIndices;
+            [ReadOnly]
+            public NativeArray<MotionVelocity> MotionVelocities;
+
+            [ReadOnly]
+            public NativeArray<MotionData> MotionDatas;
+
+            [ReadOnly]
+            public NativeArray<int> ChunkBaseEntityIndices;
 
             public ComponentTypeHandle<LocalTransform> LocalTransformType;
 
             public ComponentTypeHandle<PhysicsVelocity> VelocityType;
-            [ReadOnly] public ComponentTypeHandle<Simulate> SimulateType;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            [ReadOnly]
+            public ComponentTypeHandle<Simulate> SimulateType;
+
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 int entityStartIndex = ChunkBaseEntityIndices[unfilteredChunkIndex];
 
@@ -164,7 +179,7 @@ namespace Unity.Physics.Systems
                     chunkVelocities[i] = new PhysicsVelocity
                     {
                         Linear = MotionVelocities[motionIndex].LinearVelocity,
-                        Angular = MotionVelocities[motionIndex].AngularVelocity
+                        Angular = MotionVelocities[motionIndex].AngularVelocity,
                     };
                 }
             }

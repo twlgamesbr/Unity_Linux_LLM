@@ -10,10 +10,12 @@ namespace Unity.Netcode.Editor.Configuration
     public class NetcodeForGameObjectsProjectSettings : ScriptableSingleton<NetcodeForGameObjectsProjectSettings>
     {
         internal static readonly string DefaultNetworkPrefabsPath = "Assets/DefaultNetworkPrefabs.asset";
+
         /// <summary>
         /// The path and name for the DefaultNetworkPrefabs asset.
         /// </summary>
-        [SerializeField] public string NetworkPrefabsPath = DefaultNetworkPrefabsPath;
+        [SerializeField]
+        public string NetworkPrefabsPath = DefaultNetworkPrefabsPath;
 
         /// <summary>
         /// A temporary network prefabs path used internally.

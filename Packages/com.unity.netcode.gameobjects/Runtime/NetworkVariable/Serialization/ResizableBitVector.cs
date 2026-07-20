@@ -91,7 +91,8 @@ namespace Unity.Netcode
             return (m_Bits[index] & (byte)(1 << bitWithinIndex)) != 0;
         }
 
-        public unsafe void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public unsafe void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             var length = m_Bits.Length;
             serializer.SerializeValue(ref length);

@@ -382,8 +382,14 @@ namespace UnityEngine.InputSystem
         /// <param name="interactions">Comma-separated list of <see cref="InputBinding.interactions"/> to apply to the
         /// binding.</param>
         /// <param name="name">Optional name for the binding.</param>
-        public InputBinding(string path, string action = null, string groups = null, string processors = null,
-                            string interactions = null, string name = null)
+        public InputBinding(
+            string path,
+            string action = null,
+            string groups = null,
+            string processors = null,
+            string interactions = null,
+            string name = null
+        )
         {
             m_Path = path;
             m_Action = action;
@@ -419,29 +425,54 @@ namespace UnityEngine.InputSystem
 
         public static InputBinding MaskByGroup(string group)
         {
-            return new InputBinding {groups = group};
+            return new InputBinding { groups = group };
         }
 
         public static InputBinding MaskByGroups(params string[] groups)
         {
-            return new InputBinding {groups = string.Join(kSeparatorString, groups.Where(x => !string.IsNullOrEmpty(x)))};
+            return new InputBinding
+            {
+                groups = string.Join(kSeparatorString, groups.Where(x => !string.IsNullOrEmpty(x))),
+            };
         }
 
-        [SerializeField] private string m_Name;
-        [SerializeField] internal string m_Id;
-        [Tooltip("Path of the control to bind to. Matched at runtime to controls from InputDevices present at the time.\n\nCan either be "
-            + "graphically from the control picker dropdown UI or edited manually in text mode by clicking the 'T' button. Internally, both "
-            + "methods result in control path strings that look like, for example, \"<Gamepad>/buttonSouth\".")]
-        [SerializeField] private string m_Path;
-        [SerializeField] private string m_Interactions;
-        [SerializeField] private string m_Processors;
-        [SerializeField] internal string m_Groups;
-        [SerializeField] private string m_Action;
-        [SerializeField] internal Flags m_Flags;
+        [SerializeField]
+        private string m_Name;
 
-        [NonSerialized] private string m_OverridePath;
-        [NonSerialized] private string m_OverrideInteractions;
-        [NonSerialized] private string m_OverrideProcessors;
+        [SerializeField]
+        internal string m_Id;
+
+        [Tooltip(
+            "Path of the control to bind to. Matched at runtime to controls from InputDevices present at the time.\n\nCan either be "
+                + "graphically from the control picker dropdown UI or edited manually in text mode by clicking the 'T' button. Internally, both "
+                + "methods result in control path strings that look like, for example, \"<Gamepad>/buttonSouth\"."
+        )]
+        [SerializeField]
+        private string m_Path;
+
+        [SerializeField]
+        private string m_Interactions;
+
+        [SerializeField]
+        private string m_Processors;
+
+        [SerializeField]
+        internal string m_Groups;
+
+        [SerializeField]
+        private string m_Action;
+
+        [SerializeField]
+        internal Flags m_Flags;
+
+        [NonSerialized]
+        private string m_OverridePath;
+
+        [NonSerialized]
+        private string m_OverrideInteractions;
+
+        [NonSerialized]
+        private string m_OverrideProcessors;
 
         /// <summary>
         /// This is the bindings path which is effectively being used.
@@ -468,8 +499,7 @@ namespace UnityEngine.InputSystem
         public string effectiveProcessors => overrideProcessors ?? processors;
 
         internal bool isEmpty =>
-            string.IsNullOrEmpty(effectivePath) && string.IsNullOrEmpty(action) &&
-            string.IsNullOrEmpty(groups);
+            string.IsNullOrEmpty(effectivePath) && string.IsNullOrEmpty(action) && string.IsNullOrEmpty(groups);
 
         /// <summary>
         /// Check whether the binding is equivalent to the given binding.
@@ -483,11 +513,19 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         public bool Equals(InputBinding other)
         {
-            return string.Equals(effectivePath, other.effectivePath, StringComparison.InvariantCultureIgnoreCase) &&
-                string.Equals(effectiveInteractions, other.effectiveInteractions, StringComparison.InvariantCultureIgnoreCase) &&
-                string.Equals(effectiveProcessors, other.effectiveProcessors, StringComparison.InvariantCultureIgnoreCase) &&
-                string.Equals(groups, other.groups, StringComparison.InvariantCultureIgnoreCase) &&
-                string.Equals(action, other.action, StringComparison.InvariantCultureIgnoreCase);
+            return string.Equals(effectivePath, other.effectivePath, StringComparison.InvariantCultureIgnoreCase)
+                && string.Equals(
+                    effectiveInteractions,
+                    other.effectiveInteractions,
+                    StringComparison.InvariantCultureIgnoreCase
+                )
+                && string.Equals(
+                    effectiveProcessors,
+                    other.effectiveProcessors,
+                    StringComparison.InvariantCultureIgnoreCase
+                )
+                && string.Equals(groups, other.groups, StringComparison.InvariantCultureIgnoreCase)
+                && string.Equals(action, other.action, StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -511,7 +549,7 @@ namespace UnityEngine.InputSystem
         /// <param name="right">The second binding.</param>
         /// <returns>True if the two bindings are equal.</returns>
         /// <seealso cref="Equals(InputBinding)"/>
-        public static bool operator==(InputBinding left, InputBinding right)
+        public static bool operator ==(InputBinding left, InputBinding right)
         {
             return left.Equals(right);
         }
@@ -523,7 +561,7 @@ namespace UnityEngine.InputSystem
         /// <param name="right">The second binding.</param>
         /// <returns>True if the two bindings are not equal.</returns>
         /// <seealso cref="Equals(InputBinding)"/>
-        public static bool operator!=(InputBinding left, InputBinding right)
+        public static bool operator !=(InputBinding left, InputBinding right)
         {
             return !(left == right);
         }
@@ -697,8 +735,12 @@ namespace UnityEngine.InputSystem
         /// </remarks>
         /// <seealso cref="InputControlPath.ToHumanReadableString(string,out string,out string,InputControlPath.HumanReadableStringOptions,InputControl)"/>
         /// <seealso cref="InputActionRebindingExtensions.GetBindingDisplayString(InputAction,int,out string,out string,InputBinding.DisplayStringOptions)"/>
-        public string ToDisplayString(out string deviceLayoutName, out string controlPath, DisplayStringOptions options = default,
-            InputControl control = default)
+        public string ToDisplayString(
+            out string deviceLayoutName,
+            out string controlPath,
+            DisplayStringOptions options = default,
+            InputControl control = default
+        )
         {
             if (isComposite)
             {
@@ -713,13 +755,20 @@ namespace UnityEngine.InputSystem
             if ((options & DisplayStringOptions.DontUseShortDisplayNames) == 0)
                 readableStringOptions |= InputControlPath.HumanReadableStringOptions.UseShortNames;
 
-            var pathToUse = (options & DisplayStringOptions.IgnoreBindingOverrides) != 0
-                ? path
-                : effectivePath;
+            var pathToUse = (options & DisplayStringOptions.IgnoreBindingOverrides) != 0 ? path : effectivePath;
 
-            var result = InputControlPath.ToHumanReadableString(pathToUse, out deviceLayoutName, out controlPath, readableStringOptions, control);
+            var result = InputControlPath.ToHumanReadableString(
+                pathToUse,
+                out deviceLayoutName,
+                out controlPath,
+                readableStringOptions,
+                control
+            );
 
-            if (!string.IsNullOrEmpty(effectiveInteractions) && (options & DisplayStringOptions.DontIncludeInteractions) == 0)
+            if (
+                !string.IsNullOrEmpty(effectiveInteractions)
+                && (options & DisplayStringOptions.DontIncludeInteractions) == 0
+            )
             {
                 var interactionString = string.Empty;
                 var parsedInteractions = NameAndParameters.ParseMultiple(effectiveInteractions);
@@ -848,8 +897,10 @@ namespace UnityEngine.InputSystem
             // Match name.
             if (!string.IsNullOrEmpty(name))
             {
-                if (string.IsNullOrEmpty(binding.name)
-                    || !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(name, binding.name, Separator))
+                if (
+                    string.IsNullOrEmpty(binding.name)
+                    || !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(name, binding.name, Separator)
+                )
                     return false;
             }
 
@@ -859,8 +910,10 @@ namespace UnityEngine.InputSystem
                 ////REVIEW: should this use binding.effectivePath?
                 ////REVIEW: should this support matching by prefix only? should this use control path matching instead of just string comparisons?
                 ////TODO: handle things like ignoring leading '/'
-                if (binding.path == null
-                    || !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(path, binding.path, Separator))
+                if (
+                    binding.path == null
+                    || !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(path, binding.path, Separator)
+                )
                     return false;
             }
 
@@ -870,8 +923,14 @@ namespace UnityEngine.InputSystem
                 ////TODO: handle "map/action" format
                 ////TODO: handle "map/*" format
                 ////REVIEW: this will not be able to handle cases where one binding references an action by ID and the other by name but both do mean the same action
-                if (binding.action == null
-                    || !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(action, binding.action, Separator))
+                if (
+                    binding.action == null
+                    || !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                        action,
+                        binding.action,
+                        Separator
+                    )
+                )
                     return false;
             }
 
@@ -882,8 +941,14 @@ namespace UnityEngine.InputSystem
                 if (!haveGroupsOnBinding && (options & MatchOptions.EmptyGroupMatchesAny) == 0)
                     return false;
 
-                if (haveGroupsOnBinding
-                    && !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(groups, binding.groups, Separator))
+                if (
+                    haveGroupsOnBinding
+                    && !StringHelpers.CharacterSeparatedListsHaveAtLeastOneCommonElement(
+                        groups,
+                        binding.groups,
+                        Separator
+                    )
+                )
                     return false;
             }
 

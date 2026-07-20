@@ -21,7 +21,8 @@ namespace UnityEditor.Rendering
             SerializedProperty volumeProfileSerializedProperty,
             GUIContent volumeProfileLabel,
             Func<VolumeProfile> getOrCreateVolumeProfile,
-            ref bool labelFoldoutExpanded)
+            ref bool labelFoldoutExpanded
+        )
         {
             VolumeProfile asset;
             using (new EditorGUILayout.HorizontalScope())
@@ -44,7 +45,11 @@ namespace UnityEditor.Rendering
                 }
 
                 labelFoldoutExpanded = GUI.Toggle(
-                    GUILayoutUtility.GetLastRect(), labelFoldoutExpanded, GUIContent.none, EditorStyles.foldout);
+                    GUILayoutUtility.GetLastRect(),
+                    labelFoldoutExpanded,
+                    GUIContent.none,
+                    EditorStyles.foldout
+                );
             }
 
             return asset;

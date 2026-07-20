@@ -4,7 +4,6 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using System;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -18,7 +17,7 @@ public class STPOptions : UpscalerOptions
     // provide the option to change the injection point of the IUpscaler.
     //
     // If no options are defined & registered for an IUpscaler, there won't be a dropdown
-    // in the Render Pipeline settings to change the injection point. 
+    // in the Render Pipeline settings to change the injection point.
 }
 
 #endif

@@ -6,8 +6,8 @@ namespace Unity.Entities.UI
 {
     class HashSetElement<TSet, TValue> : NullableFoldout<TSet>
         where TSet : ISet<TValue>
-        {
-            class AddSetValueElement : VisualElement, IBinding, IBindable
+    {
+        class AddSetValueElement : VisualElement, IBinding, IBindable
         {
             struct NewSetValue
             {
@@ -35,12 +35,14 @@ namespace Unity.Entities.UI
                 (this as IBindable).binding = this;
                 AddToClassList(UssClasses.Variables);
                 Resources.Templates.AddCollectionItem.Clone(this);
-                m_ShowAddKeyContainerButton = this.Q<Button>(className: UssClasses.AddKeyDictionaryElement.ShowContainerButton);
+                m_ShowAddKeyContainerButton = this.Q<Button>(
+                    className: UssClasses.AddKeyDictionaryElement.ShowContainerButton
+                );
                 m_ShowAddKeyContainerButton.clickable.clicked += ShowContainer;
                 m_AddValueContainer = this.Q<VisualElement>(className: UssClasses.AddKeyDictionaryElement.Container);
                 m_AddValueContainer.Hide();
                 m_PropertyElement = this.Q<PropertyElement>(className: UssClasses.AddKeyDictionaryElement.Key);
-                this.Q<Button>(className:UssClasses.AddKeyDictionaryElement.Cancel).clickable.clicked += OnCancel;
+                this.Q<Button>(className: UssClasses.AddKeyDictionaryElement.Cancel).clickable.clicked += OnCancel;
                 m_AddValueToSetButton = this.Q<Button>(className: UssClasses.AddKeyDictionaryElement.Add);
                 m_AddValueToSetButton.clickable.clicked += OnAdd;
                 m_ErrorIcon = this.Q(className: UssClasses.AddKeyDictionaryElement.Error);
@@ -75,9 +77,7 @@ namespace Unity.Entities.UI
                 m_PropertyElement.ClearTarget();
             }
 
-            void IBinding.PreUpdate()
-            {
-            }
+            void IBinding.PreUpdate() { }
 
             void IBinding.Update()
             {
@@ -103,9 +103,7 @@ namespace Unity.Entities.UI
                 }
             }
 
-            void IBinding.Release()
-            {
-            }
+            void IBinding.Release() { }
         }
 
         readonly VisualElement m_Content;
@@ -216,24 +214,35 @@ namespace Unity.Entities.UI
                     new ContextualMenuManipulator(evt =>
                     {
                         evt.menu.AppendSeparator();
-                        evt.menu.AppendAction("Delete", action => { OnRemoveItem(key); });
-                    }));
+                        evt.menu.AppendAction(
+                            "Delete",
+                            action =>
+                            {
+                                OnRemoveItem(key);
+                            }
+                        );
+                    })
+                );
 
                 var button = new Button();
                 button.AddToClassList(UssClasses.SetElement.RemoveItemButton);
-                button.clickable.clicked += () => { OnRemoveItem(key); };
+                button.clickable.clicked += () =>
+                {
+                    OnRemoveItem(key);
+                };
                 toRemoveParent.Add(button);
                 m_Content.Add(root);
             }
         }
-            void OnRemoveItem(TValue toRemove)
-            {
-                var set = GetValue();
-                if (EqualityComparer<TSet>.Default.Equals(set, default))
-                    return;
 
-                set.Remove(toRemove);
-                Reload();
-            }
+        void OnRemoveItem(TValue toRemove)
+        {
+            var set = GetValue();
+            if (EqualityComparer<TSet>.Default.Equals(set, default))
+                return;
+
+            set.Remove(toRemove);
+            Reload();
+        }
     }
 }

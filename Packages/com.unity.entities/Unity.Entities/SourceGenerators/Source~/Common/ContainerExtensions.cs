@@ -17,7 +17,7 @@ public static class ContainerExtensions
         // swap to end
         (list[index], list[list.Count - 1]) = (list[list.Count - 1], list[index]);
         // RemoveAt is O(1) at end
-        list.RemoveAt(list.Count-1);
+        list.RemoveAt(list.Count - 1);
     }
 
     public static void Add<T1, T2>(this Dictionary<T1, List<T2>> dictionary, T1 key, T2 value)

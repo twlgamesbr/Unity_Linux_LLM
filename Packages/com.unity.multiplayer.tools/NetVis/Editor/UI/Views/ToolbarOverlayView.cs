@@ -3,7 +3,5 @@
 namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
 {
     [LoadUxmlView(NetVisEditorPaths.k_UxmlRoot)]
-    class ToolbarOverlayView : InjectedVisualElement<ToolbarOverlayView>
-    {
-    }
+    class ToolbarOverlayView : InjectedVisualElement<ToolbarOverlayView> { }
 }

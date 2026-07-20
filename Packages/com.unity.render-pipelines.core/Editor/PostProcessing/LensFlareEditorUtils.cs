@@ -9,10 +9,23 @@ namespace UnityEditor.Rendering
     {
         internal static class Icons
         {
-            const string k_IconFolder = @"Packages/com.unity.render-pipelines.core/Editor/PostProcessing/LensFlareResource/";
-            public static readonly Texture2D circle = CoreEditorUtils.LoadIcon(k_IconFolder, "CircleFlareThumbnail", forceLowRes: false);
-            public static readonly Texture2D polygon = CoreEditorUtils.LoadIcon(k_IconFolder, "PolygonFlareThumbnail", forceLowRes: false);
-            public static readonly Texture2D generic = CoreEditorUtils.LoadIcon(k_IconFolder, "Flare128", forceLowRes: false);
+            const string k_IconFolder =
+                @"Packages/com.unity.render-pipelines.core/Editor/PostProcessing/LensFlareResource/";
+            public static readonly Texture2D circle = CoreEditorUtils.LoadIcon(
+                k_IconFolder,
+                "CircleFlareThumbnail",
+                forceLowRes: false
+            );
+            public static readonly Texture2D polygon = CoreEditorUtils.LoadIcon(
+                k_IconFolder,
+                "PolygonFlareThumbnail",
+                forceLowRes: false
+            );
+            public static readonly Texture2D generic = CoreEditorUtils.LoadIcon(
+                k_IconFolder,
+                "Flare128",
+                forceLowRes: false
+            );
         }
 
         #region Asset Factory
@@ -21,7 +34,10 @@ namespace UnityEditor.Rendering
             public override void Action(EntityId entityId, string pathName, string resourceFile)
             {
                 LensFlareDataSRP asset = ScriptableObject.CreateInstance<LensFlareDataSRP>();
-                UnityEngine.Assertions.Assert.IsNotNull(asset, $"failed to create instance of {nameof(LensFlareDataSRP)}");
+                UnityEngine.Assertions.Assert.IsNotNull(
+                    asset,
+                    $"failed to create instance of {nameof(LensFlareDataSRP)}"
+                );
 
                 pathName = AssetDatabase.GenerateUniqueAssetPath(pathName);
                 asset.name = Path.GetFileName(pathName);
@@ -31,11 +47,20 @@ namespace UnityEditor.Rendering
             }
         }
 
-        [MenuItem("Assets/Create/Rendering/Lens Flare (SRP)", priority = UnityEngine.Rendering.CoreUtils.Priorities.srpLensFlareMenuPriority)]
+        [MenuItem(
+            "Assets/Create/Rendering/Lens Flare (SRP)",
+            priority = UnityEngine.Rendering.CoreUtils.Priorities.srpLensFlareMenuPriority
+        )]
         internal static void CreateLensFlareDataSRPAsset()
         {
             const string relativePath = "New Lens Flare (SRP).asset";
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None, ScriptableObject.CreateInstance<LensFlareDataSRPCreator>(), relativePath, Icons.generic, null);
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
+                EntityId.None,
+                ScriptableObject.CreateInstance<LensFlareDataSRPCreator>(),
+                relativePath,
+                Icons.generic,
+                null
+            );
         }
 
         internal static LensFlareDataSRP CreateLensFlareDataSRPAsset(Scene scene, string targetName)

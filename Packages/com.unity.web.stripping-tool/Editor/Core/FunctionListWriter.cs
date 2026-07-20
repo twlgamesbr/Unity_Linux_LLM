@@ -55,7 +55,9 @@ namespace Unity.Web.Stripping.Editor
         /// <returns>Returns true if function id file is not empty.</returns>
         public bool Write(string path)
         {
-            SubmodulesToStrip = new(SubmoduleListUtils.ExpandNestedSubmodules(SubmodulesToStrip, SubmoduleConfig, ErrorLog));
+            SubmodulesToStrip = new(
+                SubmoduleListUtils.ExpandNestedSubmodules(SubmodulesToStrip, SubmoduleConfig, ErrorLog)
+            );
             var functionIds = GetFunctionIdList();
 
             if (Verbose)
@@ -131,11 +133,7 @@ namespace Unity.Web.Stripping.Editor
         /// <returns>The function name with special characters escaped.</returns>
         public static string EscapeFunctionName(string functionName)
         {
-            return functionName
-                .Replace("(", "\\28")
-                .Replace(")", "\\29")
-                .Replace(" ", "\\20")
-                .Replace(",", "\\2c");
+            return functionName.Replace("(", "\\28").Replace(")", "\\29").Replace(" ", "\\20").Replace(",", "\\2c");
         }
 
         private HashSet<string> GetCSharpFunctionNames(CSharpSubmoduleDefinition? cSharpSubmoduleDefinition)

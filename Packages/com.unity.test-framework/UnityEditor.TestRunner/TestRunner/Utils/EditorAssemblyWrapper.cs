@@ -9,7 +9,7 @@ namespace UnityEditor.TestTools.TestRunner
     internal class EditorAssemblyWrapper : AssemblyWrapper
     {
         public EditorAssemblyWrapper(Assembly assembly)
-            : base(assembly) {}
+            : base(assembly) { }
 
         public override AssemblyName[] GetReferencedAssemblies()
         {

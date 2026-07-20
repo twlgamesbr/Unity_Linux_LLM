@@ -4,8 +4,11 @@ using Unity.Mathematics;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_SpecularColor"        )]
-    public struct HDRPMaterialPropertySpecularColor : IComponentData { public float4 Value; }
+    [MaterialProperty("_SpecularColor")]
+    public struct HDRPMaterialPropertySpecularColor : IComponentData
+    {
+        public float4 Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertySpecularColorAuthoring : UnityEngine.MonoBehaviour

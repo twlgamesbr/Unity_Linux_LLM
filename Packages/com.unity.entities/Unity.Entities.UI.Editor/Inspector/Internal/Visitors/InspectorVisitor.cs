@@ -1,7 +1,6 @@
 namespace Unity.Entities.UI
 {
-    partial class InspectorVisitor
-        : IResetableVisitor
+    partial class InspectorVisitor : IResetableVisitor
     {
         public readonly InspectorContext Context;
 

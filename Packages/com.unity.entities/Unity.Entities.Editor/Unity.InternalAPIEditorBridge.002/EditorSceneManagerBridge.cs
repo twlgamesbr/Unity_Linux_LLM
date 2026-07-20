@@ -10,7 +10,9 @@ namespace Unity.Editor.Bridge
     static class EditorSceneManagerBridge
     {
         public static Scene GetSceneByHandle(SceneHandle handle) => EditorSceneManager.GetSceneByHandle(handle);
-        public static Scene GetSceneByEntityId(EntityId entityId) => EditorSceneManager.GetSceneByHandle(SceneHandle.FromRawData(EntityId.ToULong(entityId)));
+
+        public static Scene GetSceneByEntityId(EntityId entityId) =>
+            EditorSceneManager.GetSceneByHandle(SceneHandle.FromRawData(EntityId.ToULong(entityId)));
 
         public static bool IsAuthoringScene(Scene scene) => scene.isSubScene; //TODO: replace by EditorSceneManager.IsAuthoringScene(scene); when non destructive editing PR is in dots/monorepo
 
@@ -42,19 +44,29 @@ namespace Unity.Editor.Bridge
             var roots = scene.GetRootGameObjects();
             foreach (var root in roots)
             {
-                visitor.VisitAll(root.transform, (transform, list) => {
-                    GameObject go = transform.gameObject;
-                    if (PrefabUtility.IsOutermostPrefabInstanceRoot(go) && PrefabUtility.HasPrefabInstanceNonDefaultOverridesOrUnusedOverrides_CachedForUI(go))
+                visitor.VisitAll(
+                    root.transform,
+                    (transform, list) =>
                     {
-                        gameObjects.Add(go);
-                    }
-                }, null);
+                        GameObject go = transform.gameObject;
+                        if (
+                            PrefabUtility.IsOutermostPrefabInstanceRoot(go)
+                            && PrefabUtility.HasPrefabInstanceNonDefaultOverridesOrUnusedOverrides_CachedForUI(go)
+                        )
+                        {
+                            gameObjects.Add(go);
+                        }
+                    },
+                    null
+                );
             }
 
             return gameObjects;
         }
 
-        static bool AskUserToRemovePrefabInstanceUnusedOverrides(PrefabUtility.InstanceOverridesInfo[] instanceOverridesInfos)
+        static bool AskUserToRemovePrefabInstanceUnusedOverrides(
+            PrefabUtility.InstanceOverridesInfo[] instanceOverridesInfos
+        )
         {
             if (PrefabUtility.DoRemovePrefabInstanceUnusedOverridesDialog(instanceOverridesInfos))
             {
@@ -64,6 +76,5 @@ namespace Unity.Editor.Bridge
 
             return false;
         }
-
     }
 }

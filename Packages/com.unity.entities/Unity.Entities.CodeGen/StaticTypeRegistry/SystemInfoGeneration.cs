@@ -11,7 +11,6 @@ using ParameterAttributes = Mono.Cecil.ParameterAttributes;
 using Unity.Cecil.Awesome;
 using static Unity.Entities.TypeRegistry;
 
-
 namespace Unity.Entities.CodeGen
 {
     internal partial class StaticTypeRegistryPostProcessor : EntitiesILPostProcessor
@@ -23,21 +22,25 @@ namespace Unity.Entities.CodeGen
 
         public List<int> GetSystemTypeFlagsList(List<TypeReference> systems)
         {
-            var inGroup = systems.Select(s =>
-            {
-                var flags = 0;
-                var resolvedSystemType = s.Resolve();
-                if (resolvedSystemType
-                    .IsChildTypeOf(AssemblyDefinition.MainModule.ImportReference(typeof(ComponentSystemGroup))
-                        .Resolve()))
-                    flags |= TypeManager.SystemTypeInfo.kIsSystemGroupFlag;
-                if (TypeUtilsInstance.IsManagedType(s, 0))
-                    flags |= TypeManager.SystemTypeInfo.kIsSystemManagedFlag;
+            var inGroup = systems
+                .Select(s =>
+                {
+                    var flags = 0;
+                    var resolvedSystemType = s.Resolve();
+                    if (
+                        resolvedSystemType.IsChildTypeOf(
+                            AssemblyDefinition.MainModule.ImportReference(typeof(ComponentSystemGroup)).Resolve()
+                        )
+                    )
+                        flags |= TypeManager.SystemTypeInfo.kIsSystemGroupFlag;
+                    if (TypeUtilsInstance.IsManagedType(s, 0))
+                        flags |= TypeManager.SystemTypeInfo.kIsSystemManagedFlag;
 
-                if (s.TypeImplements(AssemblyDefinition.MainModule.ImportReference(typeof(ISystemStartStop))))
-                    flags |= TypeManager.SystemTypeInfo.kIsSystemISystemStartStopFlag;
-                return flags;
-            }).ToList();
+                    if (s.TypeImplements(AssemblyDefinition.MainModule.ImportReference(typeof(ISystemStartStop))))
+                        flags |= TypeManager.SystemTypeInfo.kIsSystemISystemStartStopFlag;
+                    return flags;
+                })
+                .ToList();
             return inGroup;
         }
 
@@ -45,7 +48,9 @@ namespace Unity.Entities.CodeGen
         {
             var flags = WorldSystemFilterFlags.Default;
             bool found = false;
-            var filterFlagsAttribute = typeDef.CustomAttributes.FirstOrDefault(ca => ca.AttributeType.Name == nameof(WorldSystemFilterAttribute));
+            var filterFlagsAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
+                ca.AttributeType.Name == nameof(WorldSystemFilterAttribute)
+            );
             if (filterFlagsAttribute != null)
             {
                 foreach (var field in filterFlagsAttribute.Fields)
@@ -66,19 +71,29 @@ namespace Unity.Entities.CodeGen
                 flags = (WorldSystemFilterFlags)GetChildDefaultFilterFlag(typeDef.BaseType.Resolve());
             return flags;
         }
-        static WorldSystemFilterFlags GetParentGroupDefaultFilterFlags(TypeDefinition typeDef, List<TypeDefinition> visitedSystemGroupsList)
+
+        static WorldSystemFilterFlags GetParentGroupDefaultFilterFlags(
+            TypeDefinition typeDef,
+            List<TypeDefinition> visitedSystemGroupsList
+        )
         {
             var baseTypeDef = typeDef;
             List<CustomAttribute> groupAttributes = new List<CustomAttribute>();
             while (baseTypeDef != null)
             {
-                groupAttributes.Add(baseTypeDef.CustomAttributes.Where(ca => ca.AttributeType.Name == nameof(UpdateInGroupAttribute) && ca.ConstructorArguments.Count == 1));
+                groupAttributes.Add(
+                    baseTypeDef.CustomAttributes.Where(ca =>
+                        ca.AttributeType.Name == nameof(UpdateInGroupAttribute) && ca.ConstructorArguments.Count == 1
+                    )
+                );
                 baseTypeDef = baseTypeDef.BaseType?.Resolve();
             }
             if (groupAttributes.Count == 0)
             {
                 // Fallback default
-                return WorldSystemFilterFlags.LocalSimulation | WorldSystemFilterFlags.ServerSimulation | WorldSystemFilterFlags.ClientSimulation;
+                return WorldSystemFilterFlags.LocalSimulation
+                    | WorldSystemFilterFlags.ServerSimulation
+                    | WorldSystemFilterFlags.ClientSimulation;
             }
 
             WorldSystemFilterFlags systemFlags = default;
@@ -116,7 +131,9 @@ namespace Unity.Entities.CodeGen
         {
             // If no flags are given we assume the default world
             var flags = WorldSystemFilterFlags.Default;
-            var filterFlagsAttribute = typeDef.CustomAttributes.FirstOrDefault(ca => ca.AttributeType.Name == nameof(WorldSystemFilterAttribute) && ca.ConstructorArguments.Count >= 1);
+            var filterFlagsAttribute = typeDef.CustomAttributes.FirstOrDefault(ca =>
+                ca.AttributeType.Name == nameof(WorldSystemFilterAttribute) && ca.ConstructorArguments.Count >= 1
+            );
             if (filterFlagsAttribute != null)
             {
                 // override the default value if flags are provided
@@ -148,12 +165,16 @@ namespace Unity.Entities.CodeGen
             var getSystemAttributesFn = new MethodDefinition(
                 "GetSystemAttributes",
                 MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
-                AssemblyDefinition.MainModule.ImportReference(typeof(Attribute).MakeArrayType()));
+                AssemblyDefinition.MainModule.ImportReference(typeof(Attribute).MakeArrayType())
+            );
 
             getSystemAttributesFn.Parameters.Add(
-                new ParameterDefinition("systemType",
+                new ParameterDefinition(
+                    "systemType",
                     ParameterAttributes.None,
-                    AssemblyDefinition.MainModule.ImportReference(typeof(Type))));
+                    AssemblyDefinition.MainModule.ImportReference(typeof(Type))
+                )
+            );
 
             getSystemAttributesFn.Body.InitLocals = true;
             getSystemAttributesFn.Body.SimplifyMacros();
@@ -169,20 +190,28 @@ namespace Unity.Entities.CodeGen
                 bc.Add(Instruction.Create(OpCodes.Ceq));
                 // Stack: bool
                 int branchToNext = bc.Count;
-                bc.Add(Instruction.Create(OpCodes.Nop));    // will be: Brfalse nextTestCase
+                bc.Add(Instruction.Create(OpCodes.Nop)); // will be: Brfalse nextTestCase
 
                 var attrList = sysDef.CustomAttributes;
 
                 // If ther whole assembly is disabled then add the disableautocreation attribute
                 // if the type isn't already tagged for being disabled (we don't want to add it twice)
-                var disableAutoCreationAttr = sysRef.Module.Assembly.CustomAttributes.FirstOrDefault(ca => ca.AttributeType.Name == nameof(DisableAutoCreationAttribute));
-                if (disableAutoCreationAttr != null && attrList.FirstOrDefault(a=>a.AttributeType.Name == nameof(DisableAutoCreationAttribute)) == null)
+                var disableAutoCreationAttr = sysRef.Module.Assembly.CustomAttributes.FirstOrDefault(ca =>
+                    ca.AttributeType.Name == nameof(DisableAutoCreationAttribute)
+                );
+                if (
+                    disableAutoCreationAttr != null
+                    && attrList.FirstOrDefault(a => a.AttributeType.Name == nameof(DisableAutoCreationAttribute))
+                        == null
+                )
                     attrList.Add(disableAutoCreationAttr);
 
                 int arrayLen = attrList.Count;
                 bc.Add(Instruction.Create(OpCodes.Ldc_I4, arrayLen));
                 // Stack: arrayLen
-                bc.Add(Instruction.Create(OpCodes.Newarr, AssemblyDefinition.MainModule.ImportReference(typeof(Attribute))));
+                bc.Add(
+                    Instruction.Create(OpCodes.Newarr, AssemblyDefinition.MainModule.ImportReference(typeof(Attribute)))
+                );
                 // Stack: array[]
 
                 for (int i = 0; i < attrList.Count; ++i)
@@ -190,23 +219,24 @@ namespace Unity.Entities.CodeGen
                     var attr = attrList[i];
                     var name = attr.AttributeType.Name;
                     /*
-                     * Only include the attributes relevant to ECS. If users want other attributes, they can reflect themselves. 
-                     * Later, we can change this to return the SystemAttributeKind structs. 
+                     * Only include the attributes relevant to ECS. If users want other attributes, they can reflect themselves.
+                     * Later, we can change this to return the SystemAttributeKind structs.
                      */
-                    if (name != nameof(DisableAutoCreationAttribute) &&
-                        name != nameof(UpdateAfterAttribute) &&
-                        name != nameof(UpdateBeforeAttribute) &&
-                        name != nameof(CreateAfterAttribute) &&
-                        name != nameof(CreateBeforeAttribute) &&
-                        name != nameof(UpdateInGroupAttribute) &&
-                        name != nameof(RequireMatchingQueriesForUpdateAttribute))
+                    if (
+                        name != nameof(DisableAutoCreationAttribute)
+                        && name != nameof(UpdateAfterAttribute)
+                        && name != nameof(UpdateBeforeAttribute)
+                        && name != nameof(CreateAfterAttribute)
+                        && name != nameof(CreateBeforeAttribute)
+                        && name != nameof(UpdateInGroupAttribute)
+                        && name != nameof(RequireMatchingQueriesForUpdateAttribute)
+                    )
                         continue;
-
 
                     // The stelem.ref will gobble up the array ref we need to return, so dupe it.
                     bc.Add(Instruction.Create(OpCodes.Dup));
-                    bc.Add(Instruction.Create(OpCodes.Ldc_I4, i));       // the index we will write
-                                                                         // Stack: array[] array[] array-index
+                    bc.Add(Instruction.Create(OpCodes.Ldc_I4, i)); // the index we will write
+                    // Stack: array[] array[] array-index
 
                     // CustomAttributes are usually injected into the ctor of the type being decorated, however for our purposes we want to construct
                     // an Attribute[] with all the custom initialization the decorated type would have. As such we do two passes: construct the attribute using
@@ -233,7 +263,12 @@ namespace Unity.Entities.CodeGen
 
                             var attributeTypeDef = attr.AttributeType.Resolve();
                             var attributeField = attributeTypeDef.Fields.Single(f => f.Name == field.Name);
-                            bc.Add(Instruction.Create(OpCodes.Stfld, AssemblyDefinition.MainModule.ImportReference(attributeField)));
+                            bc.Add(
+                                Instruction.Create(
+                                    OpCodes.Stfld,
+                                    AssemblyDefinition.MainModule.ImportReference(attributeField)
+                                )
+                            );
                         }
                     }
 
@@ -253,9 +288,19 @@ namespace Unity.Entities.CodeGen
                 bc[branchToNext] = Instruction.Create(OpCodes.Brfalse, nextTest);
             }
             bc.Add(Instruction.Create(OpCodes.Ldstr, "FATAL: GetSystemAttributes asked to create an unknown Type."));
-            var arguementExceptionCtor = AssemblyDefinition.MainModule.ImportReference(typeof(ArgumentException)).Resolve().GetConstructors()
-                .Single(c => c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String);
-            bc.Add(Instruction.Create(OpCodes.Newobj, AssemblyDefinition.MainModule.ImportReference(arguementExceptionCtor)));
+            var arguementExceptionCtor = AssemblyDefinition
+                .MainModule.ImportReference(typeof(ArgumentException))
+                .Resolve()
+                .GetConstructors()
+                .Single(c =>
+                    c.Parameters.Count == 1 && c.Parameters[0].ParameterType.MetadataType == MetadataType.String
+                );
+            bc.Add(
+                Instruction.Create(
+                    OpCodes.Newobj,
+                    AssemblyDefinition.MainModule.ImportReference(arguementExceptionCtor)
+                )
+            );
             bc.Add(Instruction.Create(OpCodes.Throw));
 
             getSystemAttributesFn.Body.OptimizeMacros();
@@ -263,7 +308,10 @@ namespace Unity.Entities.CodeGen
             return getSystemAttributesFn;
         }
 
-        void InjectLoadFromCustomArgument(Mono.Collections.Generic.Collection<Instruction> instructions, CustomAttributeArgument customArgument)
+        void InjectLoadFromCustomArgument(
+            Mono.Collections.Generic.Collection<Instruction> instructions,
+            CustomAttributeArgument customArgument
+        )
         {
             var caType = customArgument.Type;
             var caValue = customArgument.Value;
@@ -285,39 +333,58 @@ namespace Unity.Entities.CodeGen
             switch (caType.MetadataType)
             {
                 case MetadataType.Boolean:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (bool) caValue ? 1 : 0)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (bool)caValue ? 1 : 0));
+                    break;
                 case MetadataType.Byte:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(byte)caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(byte)caValue));
+                    break;
                 case MetadataType.Char:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (char) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (char)caValue));
+                    break;
                 case MetadataType.Double:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_R8, (double) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_R8, (double)caValue));
+                    break;
                 case MetadataType.Single:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_R4, (float) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_R4, (float)caValue));
+                    break;
                 case MetadataType.UInt16:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(ushort) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(ushort)caValue));
+                    break;
                 case MetadataType.Int16:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(short) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(short)caValue));
+                    break;
                 case MetadataType.UInt32:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(uint) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(uint)caValue));
+                    break;
                 case MetadataType.Int32:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)caValue));
+                    break;
                 case MetadataType.UInt64:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long)(ulong) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long)(ulong)caValue));
+                    break;
                 case MetadataType.Int64:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long)caValue));
+                    break;
                 case MetadataType.SByte:
-                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (sbyte) caValue)); break;
+                    instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (sbyte)caValue));
+                    break;
                 case MetadataType.String:
-                    instructions.Add(caValue == null
-                                            ? Instruction.Create(OpCodes.Ldnull)
-                                            : Instruction.Create(OpCodes.Ldstr, (string)caValue));
-                                        break;
+                    instructions.Add(
+                        caValue == null
+                            ? Instruction.Create(OpCodes.Ldnull)
+                            : Instruction.Create(OpCodes.Ldstr, (string)caValue)
+                    );
+                    break;
                 case MetadataType.Class:
                 {
                     if (caValue is TypeReference)
                     {
-                        instructions.Add(Instruction.Create(OpCodes.Ldtoken, AssemblyDefinition.MainModule.ImportReference((TypeReference)caValue)));
+                        instructions.Add(
+                            Instruction.Create(
+                                OpCodes.Ldtoken,
+                                AssemblyDefinition.MainModule.ImportReference((TypeReference)caValue)
+                            )
+                        );
                         instructions.Add(Instruction.Create(OpCodes.Call, m_GetTypeFromHandleFnRef));
                     }
                     break;
@@ -331,17 +398,17 @@ namespace Unity.Entities.CodeGen
                         var td = caType.Resolve();
                         var enumTypeRef = td.GetEnumUnderlyingType();
                         if (enumTypeRef.MetadataType == MetadataType.UInt16)
-                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(ushort) caValue));
+                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(ushort)caValue));
                         else if (enumTypeRef.MetadataType == MetadataType.Int16)
-                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(short) caValue));
+                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(short)caValue));
                         else if (enumTypeRef.MetadataType == MetadataType.UInt32)
-                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(uint) caValue));
+                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)(uint)caValue));
                         else if (enumTypeRef.MetadataType == MetadataType.Int32)
-                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int) caValue));
+                            instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)caValue));
                         else if (enumTypeRef.MetadataType == MetadataType.UInt64)
-                            instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long)(ulong) caValue));
-                        else if(enumTypeRef.MetadataType == MetadataType.Int64)
-                            instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long) caValue));
+                            instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long)(ulong)caValue));
+                        else if (enumTypeRef.MetadataType == MetadataType.Int64)
+                            instructions.Add(Instruction.Create(OpCodes.Ldc_I8, (long)caValue));
                     }
                     break;
                 }
@@ -350,11 +417,19 @@ namespace Unity.Entities.CodeGen
             }
         }
 
-        internal void GenerateSystemAttributesArray(ILProcessor il, List<SystemAttributeWithTypeReference> attributes, FieldReference fieldRef, bool isStaticField)
+        internal void GenerateSystemAttributesArray(
+            ILProcessor il,
+            List<SystemAttributeWithTypeReference> attributes,
+            FieldReference fieldRef,
+            bool isStaticField
+        )
         {
-            EntitiesILPostProcessors.PushNewArray(il, AssemblyDefinition.MainModule.ImportReference(typeof(SystemAttributeWithType)), attributes.Count);
+            EntitiesILPostProcessors.PushNewArray(
+                il,
+                AssemblyDefinition.MainModule.ImportReference(typeof(SystemAttributeWithType)),
+                attributes.Count
+            );
             il.Emit(OpCodes.Stloc_2);
-
 
             var sawtRef = AssemblyDefinition.MainModule.ImportReference(typeof(SystemAttributeWithType));
             var sawtDef = sawtRef.Resolve();
@@ -363,14 +438,14 @@ namespace Unity.Entities.CodeGen
             {
                 var attribute = attributes[typeIndex];
                 var targetIsNull = attribute.TargetSystemType == null;
-                TypeReference targetSystemTypeRef = targetIsNull ? null : AssemblyDefinition.MainModule.ImportReference(attribute.TargetSystemType);
-
-
+                TypeReference targetSystemTypeRef = targetIsNull
+                    ? null
+                    : AssemblyDefinition.MainModule.ImportReference(attribute.TargetSystemType);
 
                 il.Emit(OpCodes.Ldloca_S, (byte)1);
                 il.Emit(OpCodes.Initobj, sawtRef);
                 il.Emit(OpCodes.Ldloca_S, (byte)1);
-                EntitiesILPostProcessors.EmitLoadConstant(il, (int)attribute.Kind); 
+                EntitiesILPostProcessors.EmitLoadConstant(il, (int)attribute.Kind);
                 il.Emit(OpCodes.Stfld, AssemblyDefinition.MainModule.ImportReference(sawtDef.Fields[0]));
 
                 il.Emit(OpCodes.Ldloca_S, (byte)1);
@@ -386,21 +461,20 @@ namespace Unity.Entities.CodeGen
 
                 il.Emit(OpCodes.Ldloca_S, (byte)1);
 
-                EntitiesILPostProcessors.EmitLoadConstant(il, (int)attribute.Flags);  
+                EntitiesILPostProcessors.EmitLoadConstant(il, (int)attribute.Flags);
                 il.Emit(OpCodes.Stfld, AssemblyDefinition.MainModule.ImportReference(sawtDef.Fields[2]));
 
-                il.Emit(OpCodes.Ldloc_2);//, (byte)2);
+                il.Emit(OpCodes.Ldloc_2); //, (byte)2);
                 EntitiesILPostProcessors.EmitLoadConstant(il, typeIndex); // Push array index onto the stack
 
                 il.Emit(OpCodes.Ldloc_1);
 
                 il.Emit(OpCodes.Stelem_Any, sawtRef);
-
             }
 
             il.Emit(OpCodes.Ldloc_2);
 
-            EntitiesILPostProcessors.StoreTopOfStackToField(il, fieldRef, isStaticField); 
+            EntitiesILPostProcessors.StoreTopOfStackToField(il, fieldRef, isStaticField);
         }
     }
 }

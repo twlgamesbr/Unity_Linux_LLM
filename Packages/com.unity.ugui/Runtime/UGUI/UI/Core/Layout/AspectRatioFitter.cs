@@ -21,42 +21,54 @@ namespace UnityEngine.UI
             /// The aspect ratio is not enforced
             /// </summary>
             None,
+
             /// <summary>
             /// Changes the height of the rectangle to match the aspect ratio.
             /// </summary>
             WidthControlsHeight,
+
             /// <summary>
             /// Changes the width of the rectangle to match the aspect ratio.
             /// </summary>
             HeightControlsWidth,
+
             /// <summary>
             /// Sizes the rectangle such that it's fully contained within the parent rectangle.
             /// </summary>
             FitInParent,
+
             /// <summary>
             /// Sizes the rectangle such that the parent rectangle is fully contained within.
             /// </summary>
-            EnvelopeParent
+            EnvelopeParent,
         }
 
-        [SerializeField] private AspectMode m_AspectMode = AspectMode.None;
+        [SerializeField]
+        private AspectMode m_AspectMode = AspectMode.None;
 
         /// <summary>
         /// The mode to use to enforce the aspect ratio.
         /// </summary>
-        public AspectMode aspectMode { get { return m_AspectMode; } set
+        public AspectMode aspectMode
+        {
+            get { return m_AspectMode; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_AspectMode, value))
                     SetDirty();
             }
         }
 
-        [SerializeField] private float m_AspectRatio = 1;
+        [SerializeField]
+        private float m_AspectRatio = 1;
 
         /// <summary>
         /// The aspect ratio to enforce. This means width divided by height.
         /// </summary>
-        public float aspectRatio { get { return m_AspectRatio; } set
+        public float aspectRatio
+        {
+            get { return m_AspectRatio; }
+            set
             {
                 if (SetPropertyUtility.SetStruct(ref m_AspectRatio, value))
                     SetDirty();
@@ -83,11 +95,11 @@ namespace UnityEngine.UI
         }
 
         // field is never assigned warning
-        #pragma warning disable 649
+#pragma warning disable 649
         private DrivenRectTransformTracker m_Tracker;
-        #pragma warning restore 649
+#pragma warning restore 649
 
-        protected AspectRatioFitter() {}
+        protected AspectRatioFitter() { }
 
         protected override void OnEnable()
         {
@@ -153,7 +165,11 @@ namespace UnityEngine.UI
                 case AspectMode.None:
                 {
                     if (!Application.isPlaying)
-                        m_AspectRatio = Mathf.Clamp(rectTransform.rect.width / rectTransform.rect.height, 0.001f, 1000f);
+                        m_AspectRatio = Mathf.Clamp(
+                            rectTransform.rect.width / rectTransform.rect.height,
+                            0.001f,
+                            1000f
+                        );
 
                     break;
                 }
@@ -161,13 +177,19 @@ namespace UnityEngine.UI
                 case AspectMode.HeightControlsWidth:
                 {
                     m_Tracker.Add(this, rectTransform, DrivenTransformProperties.SizeDeltaX);
-                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rectTransform.rect.height * m_AspectRatio);
+                    rectTransform.SetSizeWithCurrentAnchors(
+                        RectTransform.Axis.Horizontal,
+                        rectTransform.rect.height * m_AspectRatio
+                    );
                     break;
                 }
                 case AspectMode.WidthControlsHeight:
                 {
                     m_Tracker.Add(this, rectTransform, DrivenTransformProperties.SizeDeltaY);
-                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rectTransform.rect.width / m_AspectRatio);
+                    rectTransform.SetSizeWithCurrentAnchors(
+                        RectTransform.Axis.Vertical,
+                        rectTransform.rect.width / m_AspectRatio
+                    );
                     break;
                 }
                 case AspectMode.FitInParent:
@@ -176,11 +198,14 @@ namespace UnityEngine.UI
                     if (!DoesParentExists())
                         break;
 
-                    m_Tracker.Add(this, rectTransform,
-                        DrivenTransformProperties.Anchors |
-                        DrivenTransformProperties.AnchoredPosition |
-                        DrivenTransformProperties.SizeDeltaX |
-                        DrivenTransformProperties.SizeDeltaY);
+                    m_Tracker.Add(
+                        this,
+                        rectTransform,
+                        DrivenTransformProperties.Anchors
+                            | DrivenTransformProperties.AnchoredPosition
+                            | DrivenTransformProperties.SizeDeltaX
+                            | DrivenTransformProperties.SizeDeltaY
+                    );
 
                     rectTransform.anchorMin = Vector2.zero;
                     rectTransform.anchorMax = Vector2.one;
@@ -217,12 +242,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// Method called by the layout system. Has no effect
         /// </summary>
-        public virtual void SetLayoutHorizontal() {}
+        public virtual void SetLayoutHorizontal() { }
 
         /// <summary>
         /// Method called by the layout system. Has no effect
         /// </summary>
-        public virtual void SetLayoutVertical() {}
+        public virtual void SetLayoutVertical() { }
 
         /// <summary>
         /// Mark the AspectRatioFitter as dirty.
@@ -244,7 +269,9 @@ namespace UnityEngine.UI
 
         public bool IsAspectModeValid()
         {
-            if (!DoesParentExists() && (aspectMode == AspectMode.EnvelopeParent || aspectMode == AspectMode.FitInParent))
+            if (
+                !DoesParentExists() && (aspectMode == AspectMode.EnvelopeParent || aspectMode == AspectMode.FitInParent)
+            )
                 return false;
 
             return true;
@@ -255,13 +282,13 @@ namespace UnityEngine.UI
             return m_DoesParentExist;
         }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             m_AspectRatio = Mathf.Clamp(m_AspectRatio, 0.001f, 1000f);
             m_DelayedSetDirty = true;
         }
 
-    #endif
+#endif
     }
 }

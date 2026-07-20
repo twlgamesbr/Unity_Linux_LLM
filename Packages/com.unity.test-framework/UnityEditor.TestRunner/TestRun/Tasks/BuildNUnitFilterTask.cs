@@ -15,7 +15,13 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
         public override IEnumerator Execute(TestJobData testJobData)
         {
             var executionSettings = testJobData.executionSettings;
-            ITestFilter filter = new OrFilter(executionSettings.filters.Select(f => f.ToRuntimeTestRunnerFilter(executionSettings.runSynchronously).BuildNUnitFilter()).ToArray());
+            ITestFilter filter = new OrFilter(
+                executionSettings
+                    .filters.Select(f =>
+                        f.ToRuntimeTestRunnerFilter(executionSettings.runSynchronously).BuildNUnitFilter()
+                    )
+                    .ToArray()
+            );
 
             testJobData.testFilter = filter;
 

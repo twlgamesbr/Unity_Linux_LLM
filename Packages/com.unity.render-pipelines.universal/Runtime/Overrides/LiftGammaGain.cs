@@ -120,9 +120,7 @@ namespace UnityEngine.Rendering.Universal
         public bool IsActive()
         {
             var defaultState = new Vector4(1f, 1f, 1f, 0f);
-            return lift != defaultState
-                || gamma != defaultState
-                || gain != defaultState;
+            return lift != defaultState || gamma != defaultState || gain != defaultState;
         }
 
         /// <summary>

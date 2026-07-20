@@ -17,7 +17,9 @@ namespace UnityEngine.InputSystem.Editor
             return property;
         }
 
-        private static MemberExpression GetMemberExpression<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> expression)
+        private static MemberExpression GetMemberExpression<TEntity, TProperty>(
+            Expression<Func<TEntity, TProperty>> expression
+        )
         {
             MemberExpression memberExpression = null;
             switch (expression.Body.NodeType)
@@ -39,7 +41,9 @@ namespace UnityEngine.InputSystem.Editor
             return memberExpression;
         }
 
-        public static Func<TEntity, TProperty> CreateGetter<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> property)
+        public static Func<TEntity, TProperty> CreateGetter<TEntity, TProperty>(
+            Expression<Func<TEntity, TProperty>> property
+        )
         {
             var propertyInfo = GetProperty(property);
 

@@ -13,16 +13,14 @@ namespace Unity.Rendering
     /// <summary>
     /// A tag component that allows for granular per-instance culling control.
     /// </summary>
-    public struct PerInstanceCullingTag : IComponentData {}
+    public struct PerInstanceCullingTag : IComponentData { }
 
     internal struct RootLODWorldReferencePoint : IComponentData
     {
         public float3 Value;
     }
 
-    internal struct SkipRootLODWorldReferencePointUpdate : IComponentData
-    {
-    }
+    internal struct SkipRootLODWorldReferencePointUpdate : IComponentData { }
 
     internal struct RootLODRange : IComponentData
     {
@@ -34,9 +32,7 @@ namespace Unity.Rendering
         public float3 Value;
     }
 
-    internal struct SkipLODWorldReferencePointUpdate : IComponentData
-    {
-    }
+    internal struct SkipLODWorldReferencePointUpdate : IComponentData { }
 
     internal struct LODRange : IComponentData
     {
@@ -96,12 +92,12 @@ namespace Unity.Rendering
         }
     }
 
-    internal struct SkipLODRangeUpdate : IComponentData
-    {
-    }
+    internal struct SkipLODRangeUpdate : IComponentData { }
 
     [UpdateInGroup(typeof(StructuralChangePresentationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor
+    )]
     internal partial class AddLODRequirementComponents : SystemBase
     {
         EntityQuery m_MissingRootLODRange;
@@ -115,46 +111,56 @@ namespace Unity.Rendering
         /// </summary>
         protected override void OnCreate()
         {
-            m_MissingRootLODRange = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] {ComponentType.ReadOnly<MeshLODComponent>()},
-                None = new[] {ComponentType.ReadOnly<RootLODRange>()},
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+            m_MissingRootLODRange = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<MeshLODComponent>() },
+                    None = new[] { ComponentType.ReadOnly<RootLODRange>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_MissingRootLODWorldReferencePoint = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<MeshLODComponent>() },
-                None = new[] { ComponentType.ReadOnly<RootLODWorldReferencePoint>() },
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+            m_MissingRootLODWorldReferencePoint = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<MeshLODComponent>() },
+                    None = new[] { ComponentType.ReadOnly<RootLODWorldReferencePoint>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_MissingLODRange = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<MeshLODComponent>() },
-                None = new[] { ComponentType.ReadOnly<LODRange>() },
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+            m_MissingLODRange = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<MeshLODComponent>() },
+                    None = new[] { ComponentType.ReadOnly<LODRange>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_MissingLODWorldReferencePoint = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<MeshLODComponent>() },
-                None = new[] { ComponentType.ReadOnly<LODWorldReferencePoint>() },
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+            m_MissingLODWorldReferencePoint = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<MeshLODComponent>() },
+                    None = new[] { ComponentType.ReadOnly<LODWorldReferencePoint>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
 
-            m_MissingLODGroupWorldReferencePoint = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new[] { ComponentType.ReadOnly<MeshLODGroupComponent>() },
-                None = new[] { ComponentType.ReadOnly<LODGroupWorldReferencePoint>() },
-                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-            });
+            m_MissingLODGroupWorldReferencePoint = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new[] { ComponentType.ReadOnly<MeshLODGroupComponent>() },
+                    None = new[] { ComponentType.ReadOnly<LODGroupWorldReferencePoint>() },
+                    Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+                }
+            );
         }
 
         /// <summary>
         /// Called when this system is updated.
         /// </summary>
-        protected override void  OnUpdate()
+        protected override void OnUpdate()
         {
             EntityManager.AddComponent(m_MissingRootLODRange, typeof(RootLODRange));
             EntityManager.AddComponent(m_MissingRootLODWorldReferencePoint, typeof(RootLODWorldReferencePoint));
@@ -166,7 +172,9 @@ namespace Unity.Rendering
 
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdatePresentationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor)]
+    [WorldSystemFilter(
+        WorldSystemFilterFlags.Default | WorldSystemFilterFlags.EntitySceneOptimizations | WorldSystemFilterFlags.Editor
+    )]
     internal partial class LODRequirementsUpdateSystem : SystemBase
     {
         EntityQuery m_UpdatedLODRanges;
@@ -182,11 +190,12 @@ namespace Unity.Rendering
         [BurstCompile]
         public struct UpdateLODRangesJob : IJobChunk
         {
-            [ReadOnly] public ComponentLookup<MeshLODGroupComponent>    MeshLODGroupComponent;
+            [ReadOnly]
+            public ComponentLookup<MeshLODGroupComponent> MeshLODGroupComponent;
 
-            public ComponentTypeHandle<MeshLODComponent>                MeshLODComponent;
-            public ComponentTypeHandle<RootLODRange>                    RootLODRange;
-            public ComponentTypeHandle<LODRange>                        LODRange;
+            public ComponentTypeHandle<MeshLODComponent> MeshLODComponent;
+            public ComponentTypeHandle<RootLODRange> RootLODRange;
+            public ComponentTypeHandle<LODRange> LODRange;
 
             [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
             private static void CheckDeepHLODSupport(Entity entity)
@@ -195,7 +204,12 @@ namespace Unity.Rendering
                     throw new System.NotImplementedException("Deep HLOD is not supported yet");
             }
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 // This job is not written to support queries with enableable component types.
                 Assert.IsFalse(useEnabledMask);
@@ -243,11 +257,19 @@ namespace Unity.Rendering
         [BurstCompile]
         internal struct UpdateLODGroupWorldReferencePointsJob : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<MeshLODGroupComponent> MeshLODGroupComponent;
-            [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorld;
+            [ReadOnly]
+            public ComponentTypeHandle<MeshLODGroupComponent> MeshLODGroupComponent;
+
+            [ReadOnly]
+            public ComponentTypeHandle<LocalToWorld> LocalToWorld;
             public ComponentTypeHandle<LODGroupWorldReferencePoint> LODGroupWorldReferencePoint;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 // This job is not written to support queries with enableable component types.
                 Assert.IsFalse(useEnabledMask);
@@ -259,7 +281,10 @@ namespace Unity.Rendering
 
                 for (int i = 0; i < instanceCount; i++)
                 {
-                    lodGroupWorldReferencePoint[i] = new LODGroupWorldReferencePoint { Value = math.transform(localToWorld[i].Value, meshLODGroupComponent[i].LocalReferencePoint) };
+                    lodGroupWorldReferencePoint[i] = new LODGroupWorldReferencePoint
+                    {
+                        Value = math.transform(localToWorld[i].Value, meshLODGroupComponent[i].LocalReferencePoint),
+                    };
                 }
             }
         }
@@ -267,12 +292,20 @@ namespace Unity.Rendering
         [BurstCompile]
         internal struct UpdateLODWorldReferencePointsJob : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<MeshLODComponent> MeshLODComponent;
-            [ReadOnly] public ComponentLookup<LODGroupWorldReferencePoint> LODGroupWorldReferencePoint;
+            [ReadOnly]
+            public ComponentTypeHandle<MeshLODComponent> MeshLODComponent;
+
+            [ReadOnly]
+            public ComponentLookup<LODGroupWorldReferencePoint> LODGroupWorldReferencePoint;
             public ComponentTypeHandle<RootLODWorldReferencePoint> RootLODWorldReferencePoint;
             public ComponentTypeHandle<LODWorldReferencePoint> LODWorldReferencePoint;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 // This job is not written to support queries with enableable component types.
                 Assert.IsFalse(useEnabledMask);
@@ -312,37 +345,51 @@ namespace Unity.Rendering
         protected override void OnCreate()
         {
             // Change filter: LODGroupConversion add MeshLODComponent for all LOD children. When the MeshLODComponent is added/changed, we recalculate LOD ranges.
-            m_UpdatedLODRanges = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[]
+            m_UpdatedLODRanges = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadOnly<LocalToWorld>(), typeof(MeshLODComponent), typeof(RootLODRange), typeof(LODRange)
-                },
-                None = new ComponentType[] { typeof(SkipLODRangeUpdate) }
-            });
+                    All = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<LocalToWorld>(),
+                        typeof(MeshLODComponent),
+                        typeof(RootLODRange),
+                        typeof(LODRange),
+                    },
+                    None = new ComponentType[] { typeof(SkipLODRangeUpdate) },
+                }
+            );
             m_UpdatedLODRanges.SetChangedVersionFilter(ComponentType.ReadWrite<MeshLODComponent>());
 
-            m_LODReferencePoints = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[]
+            m_LODReferencePoints = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                    ComponentType.ReadOnly<LocalToWorld>(), ComponentType.ReadOnly<MeshLODComponent>(),
-                    typeof(RootLODWorldReferencePoint), typeof(LODWorldReferencePoint)
-                },
-                None = new ComponentType[] { typeof(SkipLODWorldReferencePointUpdate) }
-            });
+                    All = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<LocalToWorld>(),
+                        ComponentType.ReadOnly<MeshLODComponent>(),
+                        typeof(RootLODWorldReferencePoint),
+                        typeof(LODWorldReferencePoint),
+                    },
+                    None = new ComponentType[] { typeof(SkipLODWorldReferencePointUpdate) },
+                }
+            );
 
             // Change filter: LOD Group world reference points only change when MeshLODGroupComponent or LocalToWorld change
-            m_LODGroupReferencePoints = GetEntityQuery(new EntityQueryDesc()
-            {
-                All = new ComponentType[]
+            m_LODGroupReferencePoints = GetEntityQuery(
+                new EntityQueryDesc()
                 {
-                    ComponentType.ReadOnly<MeshLODGroupComponent>(), ComponentType.ReadOnly<LocalToWorld>(),
-                    typeof(LODGroupWorldReferencePoint)
-                },
-                None = new ComponentType[] { typeof(SkipLODGroupWorldReferencePointUpdate) }
-            });
-            m_LODGroupReferencePoints.SetChangedVersionFilter(new[] { ComponentType.ReadWrite<MeshLODGroupComponent>(), ComponentType.ReadWrite<LocalToWorld>() });
+                    All = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<MeshLODGroupComponent>(),
+                        ComponentType.ReadOnly<LocalToWorld>(),
+                        typeof(LODGroupWorldReferencePoint),
+                    },
+                    None = new ComponentType[] { typeof(SkipLODGroupWorldReferencePointUpdate) },
+                }
+            );
+            m_LODGroupReferencePoints.SetChangedVersionFilter(
+                new[] { ComponentType.ReadWrite<MeshLODGroupComponent>(), ComponentType.ReadWrite<LocalToWorld>() }
+            );
 
             MeshLODGroupComponent = GetComponentLookup<MeshLODGroupComponent>(true);
             MeshLODComponent = GetComponentTypeHandle<MeshLODComponent>();
@@ -365,7 +412,7 @@ namespace Unity.Rendering
                 MeshLODGroupComponent = MeshLODGroupComponent,
                 MeshLODComponent = MeshLODComponent,
                 RootLODRange = RootLODRange,
-                LODRange = LODRange
+                LODRange = LODRange,
             };
 
             var updateGroupReferencePointJob = new UpdateLODGroupWorldReferencePointsJob
@@ -384,7 +431,10 @@ namespace Unity.Rendering
             };
 
             var depLODRanges = updateLODRangesJob.ScheduleParallel(m_UpdatedLODRanges, Dependency);
-            var depGroupReferencePoints = updateGroupReferencePointJob.ScheduleParallel(m_LODGroupReferencePoints, Dependency);
+            var depGroupReferencePoints = updateGroupReferencePointJob.ScheduleParallel(
+                m_LODGroupReferencePoints,
+                Dependency
+            );
             var depCombined = JobHandle.CombineDependencies(depLODRanges, depGroupReferencePoints);
             Dependency = updateReferencePointJob.ScheduleParallel(m_LODReferencePoints, depCombined);
         }

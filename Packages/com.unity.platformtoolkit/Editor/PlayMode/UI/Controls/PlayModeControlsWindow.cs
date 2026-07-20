@@ -24,7 +24,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private void CreateGUI()
         {
-            var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Controls/PlayModeControlsWindowRoot.uxml");
+            var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Controls/PlayModeControlsWindowRoot.uxml"
+            );
             rootVisualElement.Add(visualTreeAsset.CloneTree());
 
             m_SettingsField = rootVisualElement.Q<PlayModeControlsSettingsField>("play-mode-controls-settings-field");
@@ -40,7 +42,9 @@ namespace Unity.PlatformToolkit.PlayMode
 
             if (m_PlayModeControls == null)
             {
-                m_PlayModeControls = new PlayModeControls(playModeControlsTab.Q<VisualElement>("play-mode-controls-view"));
+                m_PlayModeControls = new PlayModeControls(
+                    playModeControlsTab.Q<VisualElement>("play-mode-controls-view")
+                );
             }
 
             if (m_TestAccountDataView == null)
@@ -59,8 +63,11 @@ namespace Unity.PlatformToolkit.PlayMode
             if (!m_HasCreatedGui)
                 return;
 
-            if (PlayModeControlsEditorSettings.instance.CurrentSettings is { } settings &&
-                settings.ViewModel != null && settings.ViewModel.IsValid)
+            if (
+                PlayModeControlsEditorSettings.instance.CurrentSettings is { } settings
+                && settings.ViewModel != null
+                && settings.ViewModel.IsValid
+            )
             {
                 rootVisualElement.dataSource = settings.ViewModel;
                 m_PlayModeControls.BindElements();

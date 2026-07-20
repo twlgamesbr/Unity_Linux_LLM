@@ -65,7 +65,10 @@ namespace UnityEngine.UI
         /// </returns>
         public static float GetPreferredWidth(RectTransform rect)
         {
-            return Mathf.Max(GetLayoutProperty(rect, e => e.minWidth, 0), GetLayoutProperty(rect, e => e.preferredWidth, 0));
+            return Mathf.Max(
+                GetLayoutProperty(rect, e => e.minWidth, 0),
+                GetLayoutProperty(rect, e => e.preferredWidth, 0)
+            );
         }
 
         /// <summary>
@@ -101,7 +104,10 @@ namespace UnityEngine.UI
         /// </remarks>
         public static float GetPreferredHeight(RectTransform rect)
         {
-            return Mathf.Max(GetLayoutProperty(rect, e => e.minHeight, 0), GetLayoutProperty(rect, e => e.preferredHeight, 0));
+            return Mathf.Max(
+                GetLayoutProperty(rect, e => e.minHeight, 0),
+                GetLayoutProperty(rect, e => e.preferredHeight, 0)
+            );
         }
 
         /// <summary>
@@ -123,7 +129,11 @@ namespace UnityEngine.UI
         /// <param name="property">The property to calculate.</param>
         /// <param name="defaultValue">The default value to use if no component on the layout element supplies the given property</param>
         /// <returns>The calculated value of the layout property.</returns>
-        public static float GetLayoutProperty(RectTransform rect, System.Func<ILayoutElement, float> property, float defaultValue)
+        public static float GetLayoutProperty(
+            RectTransform rect,
+            System.Func<ILayoutElement, float> property,
+            float defaultValue
+        )
         {
             ILayoutElement dummy;
             return GetLayoutProperty(rect, property, defaultValue, out dummy);
@@ -137,7 +147,12 @@ namespace UnityEngine.UI
         /// <param name="defaultValue">The default value to use if no component on the layout element supplies the given property</param>
         /// <param name="source">Optional out parameter to get the component that supplied the calculated value.</param>
         /// <returns>The calculated value of the layout property.</returns>
-        public static float GetLayoutProperty(RectTransform rect, System.Func<ILayoutElement, float> property, float defaultValue, out ILayoutElement source)
+        public static float GetLayoutProperty(
+            RectTransform rect,
+            System.Func<ILayoutElement, float> property,
+            float defaultValue,
+            out ILayoutElement source
+        )
         {
             source = null;
             if (rect == null)

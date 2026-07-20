@@ -20,16 +20,32 @@ namespace Unity.Entities
         // ReSharper disable InconsistentNaming
         /// <summary>This field, when combined with `b`, is for working with EntityGuid as opaque bits (the packing may
         /// change again in the future, as there are still unused bits remaining).</summary>
-        [Obsolete("'a' is obsolete, it is now split up into the fields: 'OriginatingEntityId' and 'OriginatingSubEntityId'.", true)]
-        public ulong a { get => throw new InvalidOperationException("a is obsolete."); set => throw new InvalidOperationException("a is obsolete."); }
+        [Obsolete(
+            "'a' is obsolete, it is now split up into the fields: 'OriginatingEntityId' and 'OriginatingSubEntityId'.",
+            true
+        )]
+        public ulong a
+        {
+            get => throw new InvalidOperationException("a is obsolete.");
+            set => throw new InvalidOperationException("a is obsolete.");
+        }
+
         /// <summary>Use same as `a` field.</summary>
         [Obsolete("'b' is obsolete, please use 'FullNamespaceId' and 'Serial' instead.", true)]
-        public ulong b { get => throw new InvalidOperationException("b is obsolete."); set => throw new InvalidOperationException("b is obsolete."); }
+        public ulong b
+        {
+            get => throw new InvalidOperationException("b is obsolete.");
+            set => throw new InvalidOperationException("b is obsolete.");
+        }
+
         // ReSharper restore InconsistentNaming
 
         //Backing fields for the public properties
-        [SerializeField] internal EntityId _OriginatingEntityId;
-        [SerializeField] internal EntityId _OriginatingSubEntityId;
+        [SerializeField]
+        internal EntityId _OriginatingEntityId;
+
+        [SerializeField]
+        internal EntityId _OriginatingSubEntityId;
 
         /// <summary>Static value that represents an invalid EntityGuid.</summary>
         public static readonly EntityGuid Null = new EntityGuid();
@@ -41,9 +57,14 @@ namespace Unity.Entities
         /// <param name="originatingSubId">Secondary session-unique ID for the originating object. This is typically the authoring Component's InstanceID.</param>
         /// <param name="namespaceId">A unique number to identify the namespace</param>
         /// <param name="serial">A unique number used to differentiate Entities associated with the same originating object and namespace</param>
-        [Obsolete("EntityGuid(int originatingId, int originatingSubId, uint namespaceId, uint serial) is obsolete please use EntityGuid(EntityId originatingId, EntityId originatingSubId, uint namespaceId, uint serial) instead.", true)]
-        public EntityGuid(int originatingId, int originatingSubId, uint namespaceId, uint serial) => throw new InvalidOperationException("EntityGuid(int originatingId, int originatingSubId, uint namespaceId, uint serial), this constructor is obsolete, use the EntityId version.");
-
+        [Obsolete(
+            "EntityGuid(int originatingId, int originatingSubId, uint namespaceId, uint serial) is obsolete please use EntityGuid(EntityId originatingId, EntityId originatingSubId, uint namespaceId, uint serial) instead.",
+            true
+        )]
+        public EntityGuid(int originatingId, int originatingSubId, uint namespaceId, uint serial) =>
+            throw new InvalidOperationException(
+                "EntityGuid(int originatingId, int originatingSubId, uint namespaceId, uint serial), this constructor is obsolete, use the EntityId version."
+            );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityGuid"/>.
@@ -62,7 +83,11 @@ namespace Unity.Entities
 
         /// <summary>Session-unique ID for originating object (typically the authoring GameObject's InstanceID).</summary>
         [Obsolete("OriginatingId is deprecated, use OriginatingEntityId instead.", true)]
-        public int OriginatingId{get => throw new InvalidOperationException("OriginatingId is obsolete, use OriginatingEntityId instead."); set => throw new InvalidOperationException("OriginatingId is obsolete, use OriginatingEntityId instead."); }
+        public int OriginatingId
+        {
+            get => throw new InvalidOperationException("OriginatingId is obsolete, use OriginatingEntityId instead.");
+            set => throw new InvalidOperationException("OriginatingId is obsolete, use OriginatingEntityId instead.");
+        }
 
         /// <summary>Session-unique ID for originating object (typically the authoring GameObject's EntityId).</summary>
         public EntityId OriginatingEntityId
@@ -73,7 +98,17 @@ namespace Unity.Entities
 
         /// <summary>Secondary session-unique ID for the originating object. This is typically the authoring Component's InstanceID.</summary>
         [Obsolete("OriginatingSubId is deprecated, use OriginatingSubEntityId", true)]
-        public int OriginatingSubId{get => throw new InvalidOperationException("OriginatingSubId is obsolete, use OriginatingSubEntityId instead."); set => throw new InvalidOperationException("OriginatingSubId is obsolete, use OriginatingSubEntityId instead."); }
+        public int OriginatingSubId
+        {
+            get =>
+                throw new InvalidOperationException(
+                    "OriginatingSubId is obsolete, use OriginatingSubEntityId instead."
+                );
+            set =>
+                throw new InvalidOperationException(
+                    "OriginatingSubId is obsolete, use OriginatingSubEntityId instead."
+                );
+        }
 
         /// <summary>Secondary session-unique ID for the originating object. This is typically the authoring Component's EntityId.</summary>
         public EntityId OriginatingSubEntityId
@@ -97,14 +132,15 @@ namespace Unity.Entities
         /// <param name="lhs">An EntityGuid</param>
         /// <param name="rhs">Another EntityGuid</param>
         /// <returns>True, if both EntityGuid instances contain the same opaque bits.</returns>
-        public static bool operator==(in EntityGuid lhs, in EntityGuid rhs) => lhs.Equals(rhs);
+        public static bool operator ==(in EntityGuid lhs, in EntityGuid rhs) => lhs.Equals(rhs);
+
         /// <summary>
         /// Checks if two EntityGuid instances aren't equal.
         /// </summary>
         /// <param name="lhs">An EntityGuid</param>
         /// <param name="rhs">Another EntityGuid</param>
         /// <returns>True, if any of the opaque bits contained in the EntityGuid instances is different.</returns>
-        public static bool operator!=(in EntityGuid lhs, in EntityGuid rhs) => !(lhs.Equals(rhs));
+        public static bool operator !=(in EntityGuid lhs, in EntityGuid rhs) => !(lhs.Equals(rhs));
 
         /// <summary>
         /// Checks if two objects are EntityGuid instances and if they are equal.
@@ -120,12 +156,11 @@ namespace Unity.Entities
         /// <returns>True if <paramref name="other"/> contains the same opaque bits.</returns>
         public bool Equals(EntityGuid other)
         {
-            return OriginatingEntityId == other.OriginatingEntityId &&
-                   OriginatingSubEntityId == other.OriginatingSubEntityId &&
-                   FullNamespaceId == other.FullNamespaceId &&
-                   Serial == other.Serial;
+            return OriginatingEntityId == other.OriginatingEntityId
+                && OriginatingSubEntityId == other.OriginatingSubEntityId
+                && FullNamespaceId == other.FullNamespaceId
+                && Serial == other.Serial;
         }
-
 
         /// <summary>
         /// Computes a hashcode to support hash-based collections.
@@ -154,7 +189,9 @@ namespace Unity.Entities
 
             if (OriginatingSubEntityId != other.OriginatingSubEntityId)
             {
-                return EntityId.ToULong(OriginatingSubEntityId) > EntityId.ToULong(other.OriginatingSubEntityId) ? 1 : -1;
+                return EntityId.ToULong(OriginatingSubEntityId) > EntityId.ToULong(other.OriginatingSubEntityId)
+                    ? 1
+                    : -1;
             }
 
             if (FullNamespaceId != other.FullNamespaceId)
@@ -174,7 +211,8 @@ namespace Unity.Entities
         /// Converts this EntityGuid to a standard C# <see cref="string"/> representation.
         /// </summary>
         /// <returns>The C# string.</returns>
-        public override string ToString() => $"{EntityId.ToULong(OriginatingEntityId)}:{EntityId.ToULong(OriginatingSubEntityId)}:{FullNamespaceId:x8}:{Serial:x8}";
+        public override string ToString() =>
+            $"{EntityId.ToULong(OriginatingEntityId)}:{EntityId.ToULong(OriginatingSubEntityId)}:{FullNamespaceId:x8}:{Serial:x8}";
     }
 
     /// <summary>
@@ -204,11 +242,13 @@ namespace Unity.Entities
         /// </summary>
         /// <returns>True if there is any change.</returns>
         public bool AnyChanges => HasForwardChangeSet || HasReverseChangeSet;
+
         /// <summary>
         /// Checks if there is any forward change
         /// </summary>
         /// <returns>True if there is any forward change.</returns>
         public bool HasForwardChangeSet => m_ForwardChangeSet.IsCreated && m_ForwardChangeSet.HasChanges;
+
         /// <summary>
         /// Checks if there is any reverse change
         /// </summary>
@@ -220,6 +260,7 @@ namespace Unity.Entities
         /// </summary>
         /// <returns>Forward change set.</returns>
         public EntityChangeSet ForwardChangeSet => m_ForwardChangeSet;
+
         /// <summary>
         /// Access to the reverse change set
         /// </summary>
@@ -363,6 +404,7 @@ namespace Unity.Entities
         /// Represents the entity and component the patch is targeted at.
         /// </summary>
         public PackedComponent Component;
+
         /// <summary>
         /// Represents the field offset of the shared component data for unmanaged components.
         /// </summary>
@@ -370,10 +412,12 @@ namespace Unity.Entities
         /// For managed components, this field contains the bit matching <see cref="PackedSharedComponentDataChange.kManagedFlag"/>) set to 1.
         /// </remarks>
         public int UnmanagedSharedValueDataOffsetWithManagedFlag;
+
         /// <summary>
         /// Represents a bit mask that indicates if the share component data is managed.
         /// </summary>
         public const int kManagedFlag = 1 << 31;
+
         /// <summary>
         /// Represents the shared component value for managed components.
         /// </summary>
@@ -390,6 +434,7 @@ namespace Unity.Entities
         /// Represents the entity and component this patch is targeted at.
         /// </summary>
         public PackedComponent Component;
+
         /// <summary>
         /// Managed component value
         /// </summary>
@@ -405,6 +450,7 @@ namespace Unity.Entities
         /// <see cref="EntityGuid"/> of the root entity for the linked entity group
         /// </summary>
         public EntityGuid RootEntityGuid;
+
         /// <summary>
         /// <see cref="EntityGuid"/> of a child entity for the linked entity group
         /// </summary>
@@ -421,10 +467,11 @@ namespace Unity.Entities
         /// Not a chunk component type
         /// </summary>
         None = 0,
+
         /// <summary>
         /// A chunk component type
         /// </summary>
-        ChunkComponent = 1 << 0
+        ChunkComponent = 1 << 0,
     }
 
     /// <summary>
@@ -438,6 +485,7 @@ namespace Unity.Entities
         /// The hash value. Not expected to be stable across versions.
         /// </summary>
         public ulong StableTypeHash;
+
         /// <summary>
         /// Flags for this component type.
         /// </summary>
@@ -449,26 +497,29 @@ namespace Unity.Entities
         /// <param name="other">A ComponentTypeHash to compare with</param>
         /// <returns>True if <paramref name="other"/> contains the hash value and flags.</returns>
         public bool Equals(ComponentTypeHash other) => StableTypeHash == other.StableTypeHash && Flags == other.Flags;
+
         /// <summary>
         /// Checks if a ComponentTypeHash equals some object which may or may not be a ComponentTypeHash
         /// </summary>
         /// <param name="obj">An object to compare with</param>
         /// <returns>True if <paramref name="obj"/> is a ComponentTypeHash, and contains the same hash value and flags.</returns>
         public override bool Equals(object obj) => obj is ComponentTypeHash other && Equals(other);
+
         /// <summary>
         /// Checks if two ComponentTypeHash instances are equal
         /// </summary>
         /// <param name="left">A ComponentTypeHash to compare</param>
         /// <param name="right">A ComponentTypeHash to compare</param>
         /// <returns>True if <paramref name="left"/> and <paramref name="right"/> are equal.</returns>
-        public static bool operator==(ComponentTypeHash left, ComponentTypeHash right) => left.Equals(right);
+        public static bool operator ==(ComponentTypeHash left, ComponentTypeHash right) => left.Equals(right);
+
         /// <summary>
         /// Checks if two ComponentTypeHash instances are not equal
         /// </summary>
         /// <param name="left">A ComponentTypeHash to compare</param>
         /// <param name="right">A ComponentTypeHash to compare</param>
         /// <returns>True if <paramref name="left"/> and <paramref name="right"/> are not equal.</returns>
-        public static bool operator!=(ComponentTypeHash left, ComponentTypeHash right) => !left.Equals(right);
+        public static bool operator !=(ComponentTypeHash left, ComponentTypeHash right) => !left.Equals(right);
 
         /// <summary>
         /// Computes a hashcode to support hash-based collections.
@@ -653,7 +704,8 @@ namespace Unity.Entities
             NativeArray<LinkedEntityGroupChange> linkedEntityGroupRemovals,
             NativeArray<BlobAssetChange> createdBlobAssets,
             NativeArray<ulong> destroyedBlobAssets,
-            NativeArray<byte> blobAssetData)
+            NativeArray<byte> blobAssetData
+        )
         {
             CreatedEntityCount = createdEntityCount;
             DestroyedEntityCount = destroyedEntityCount;
@@ -692,20 +744,21 @@ namespace Unity.Entities
 
         internal bool HasChangesIncludeNames(bool ignoreNameChangeCount = false, bool ignoreData = false)
         {
-            bool hasChange = CreatedEntityCount != 0 ||
-            DestroyedEntityCount != 0 ||
-            AddComponents.Length != 0 ||
-            AddArchetypes.Length != 0 ||
-            RemoveComponents.Length != 0 ||
-            SetComponents.Length != 0 ||
-            EntityReferenceChanges.Length != 0 ||
-            BlobAssetReferenceChanges.Length != 0 ||
-            SetManagedComponents.Length != 0 ||
-            SetSharedComponents.Length != 0 ||
-            LinkedEntityGroupAdditions.Length != 0 ||
-            LinkedEntityGroupRemovals.Length != 0 ||
-            CreatedBlobAssets.Length != 0 ||
-            DestroyedBlobAssets.Length != 0;
+            bool hasChange =
+                CreatedEntityCount != 0
+                || DestroyedEntityCount != 0
+                || AddComponents.Length != 0
+                || AddArchetypes.Length != 0
+                || RemoveComponents.Length != 0
+                || SetComponents.Length != 0
+                || EntityReferenceChanges.Length != 0
+                || BlobAssetReferenceChanges.Length != 0
+                || SetManagedComponents.Length != 0
+                || SetSharedComponents.Length != 0
+                || LinkedEntityGroupAdditions.Length != 0
+                || LinkedEntityGroupRemovals.Length != 0
+                || CreatedBlobAssets.Length != 0
+                || DestroyedBlobAssets.Length != 0;
 
             if (!ignoreData)
             {
@@ -713,7 +766,7 @@ namespace Unity.Entities
                 hasChange = hasChange || BlobAssetData.Length != 0;
             }
 
-            if(!ignoreNameChangeCount)
+            if (!ignoreNameChangeCount)
             {
                 hasChange = hasChange || NameChangedCount != 0;
             }
@@ -733,21 +786,30 @@ namespace Unity.Entities
 
             foreach (var shared in SetSharedComponents)
             {
-                if ((shared.UnmanagedSharedValueDataOffsetWithManagedFlag &
-                     PackedSharedComponentDataChange.kManagedFlag) !=
-                    0)
+                if (
+                    (
+                        shared.UnmanagedSharedValueDataOffsetWithManagedFlag
+                        & PackedSharedComponentDataChange.kManagedFlag
+                    ) != 0
+                )
                     (shared.BoxedSharedValue as IRefCounted)?.Release();
                 else
                 {
                     var typeIndex = TypeManager.GetTypeIndexFromStableTypeHash(
-                        TypeHashes[shared.Component.PackedTypeIndex].StableTypeHash);
+                        TypeHashes[shared.Component.PackedTypeIndex].StableTypeHash
+                    );
                     if (typeIndex.IsRefCounted)
                     {
-                        (TypeManager.ConstructComponentFromBuffer(
-                            typeIndex,
-                            UnmanagedSharedComponentData.Ptr +
-                            (shared.UnmanagedSharedValueDataOffsetWithManagedFlag &
-                             (~PackedSharedComponentDataChange.kManagedFlag))) as IRefCounted)?.Release();
+                        (
+                            TypeManager.ConstructComponentFromBuffer(
+                                typeIndex,
+                                UnmanagedSharedComponentData.Ptr
+                                    + (
+                                        shared.UnmanagedSharedValueDataOffsetWithManagedFlag
+                                        & (~PackedSharedComponentDataChange.kManagedFlag)
+                                    )
+                            ) as IRefCounted
+                        )?.Release();
                     }
                 }
             }
@@ -755,7 +817,7 @@ namespace Unity.Entities
             var companionLinkPackedTypeIndex = GetCompanionLinkPackedTypeIndex(TypeHashes);
             foreach (var managed in SetManagedComponents)
             {
-                if(managed.Component.PackedTypeIndex != companionLinkPackedTypeIndex)
+                if (managed.Component.PackedTypeIndex != companionLinkPackedTypeIndex)
                     (managed.BoxedValue as IDisposable)?.Dispose();
             }
 
@@ -787,12 +849,15 @@ namespace Unity.Entities
         }
 
         private static ulong CompanionLinkStableTypeHash = 0;
+
         internal static ulong GetCompanionLinkStableTypeHash()
         {
             if (CompanionLinkStableTypeHash != 0)
                 return CompanionLinkStableTypeHash;
 
-            CompanionLinkStableTypeHash = TypeManager.GetTypeInfo(ManagedComponentStore.CompanionReferenceTypeIndex).StableTypeHash;
+            CompanionLinkStableTypeHash = TypeManager
+                .GetTypeInfo(ManagedComponentStore.CompanionReferenceTypeIndex)
+                .StableTypeHash;
 
             return CompanionLinkStableTypeHash;
         }
@@ -810,20 +875,17 @@ namespace Unity.Entities
 #endif
             return -1;
         }
-
     }
 
     [BurstCompile]
     internal static unsafe class EntityChangeSetFormatter
     {
-        static EntityQueryDesc EntityGuidQueryDesc { get; } = new EntityQueryDesc
-        {
-            All = new ComponentType[]
+        static EntityQueryDesc EntityGuidQueryDesc { get; } =
+            new EntityQueryDesc
             {
-                typeof(EntityGuid)
-            },
-            Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab
-        };
+                All = new ComponentType[] { typeof(EntityGuid) },
+                Options = EntityQueryOptions.IncludeDisabledEntities | EntityQueryOptions.IncludePrefab,
+            };
 
         struct NameInfoSet
         {
@@ -831,7 +893,11 @@ namespace Unity.Entities
             internal NativeArray<Entity> NameChangedEntities;
             internal bool IsCreated;
 
-            internal NameInfoSet(int namesLength, int nameChangedEntitiesLength, AllocatorManager.AllocatorHandle allocator)
+            internal NameInfoSet(
+                int namesLength,
+                int nameChangedEntitiesLength,
+                AllocatorManager.AllocatorHandle allocator
+            )
             {
                 // Todo: When NativeArray supports custom allocators, remove these .ToAllocator callsites DOTS-7695
                 Names = new NativeArray<FixedString64Bytes>(namesLength, allocator.ToAllocator);
@@ -850,13 +916,22 @@ namespace Unity.Entities
         [BurstCompile]
         struct BuildEntityGuidToEntityHashMap : IJobChunk
         {
-            [ReadOnly] public ComponentTypeHandle<EntityGuid> ComponentTypeHandle;
-            [ReadOnly] public EntityTypeHandle EntityTypeHandle;
+            [ReadOnly]
+            public ComponentTypeHandle<EntityGuid> ComponentTypeHandle;
 
-            [WriteOnly] public NativeParallelMultiHashMap<EntityGuid, Entity>.ParallelWriter EntityGuidToEntity;
+            [ReadOnly]
+            public EntityTypeHandle EntityTypeHandle;
+
+            [WriteOnly]
+            public NativeParallelMultiHashMap<EntityGuid, Entity>.ParallelWriter EntityGuidToEntity;
 
             [BurstCompile]
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
 
@@ -872,10 +947,18 @@ namespace Unity.Entities
         [BurstCompile]
         struct GatherNamesForComponentChanges : IJobParallelFor
         {
-            [ReadOnly] public NativeParallelMultiHashMap<EntityGuid, Entity> EntityGuidToEntity;
-            [ReadOnly] public NativeArray<EntityGuid> Entities;
-            [NativeDisableUnsafePtrRestriction] public EntityComponentStore* EntityComponentStore;
-            [WriteOnly] public NativeArray<FixedString64Bytes> Names;
+            [ReadOnly]
+            public NativeParallelMultiHashMap<EntityGuid, Entity> EntityGuidToEntity;
+
+            [ReadOnly]
+            public NativeArray<EntityGuid> Entities;
+
+            [NativeDisableUnsafePtrRestriction]
+            public EntityComponentStore* EntityComponentStore;
+
+            [WriteOnly]
+            public NativeArray<FixedString64Bytes> Names;
+
             [BurstCompile]
             public void Execute(int index)
             {
@@ -889,9 +972,15 @@ namespace Unity.Entities
         [BurstCompile]
         struct GatherNamesChangedEntities : IJobParallelFor
         {
-            [ReadOnly] public NativeParallelMultiHashMap<EntityGuid, Entity> EntityGuidToEntity;
-            [ReadOnly] public NativeArray<EntityGuid> NameChangedEntityGuids;
-            [WriteOnly] public NativeArray<Entity> NameChangedEntities;
+            [ReadOnly]
+            public NativeParallelMultiHashMap<EntityGuid, Entity> EntityGuidToEntity;
+
+            [ReadOnly]
+            public NativeArray<EntityGuid> NameChangedEntityGuids;
+
+            [WriteOnly]
+            public NativeArray<Entity> NameChangedEntities;
+
             [BurstCompile]
             public void Execute(int index)
             {
@@ -905,7 +994,8 @@ namespace Unity.Entities
             EntityManager entityManager,
             EntityChangeSet changeSet,
             NameInfoSet nameInfoSet,
-            AllocatorManager.AllocatorHandle allocator)
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             var entityQuery = entityManager.CreateEntityQuery(EntityGuidQueryDesc);
             var entityCount = entityQuery.CalculateEntityCount();
@@ -916,11 +1006,12 @@ namespace Unity.Entities
             {
                 EntityTypeHandle = entityManager.GetEntityTypeHandle(),
                 ComponentTypeHandle = entityManager.GetComponentTypeHandle<EntityGuid>(true),
-                EntityGuidToEntity = entityGuidToEntity.AsParallelWriter()
+                EntityGuidToEntity = entityGuidToEntity.AsParallelWriter(),
             }.ScheduleParallel(entityQuery, default);
 
             var startIndex = changeSet.CreatedEntityCount;
-            var numComponentChange = changeSet.Entities.Length - changeSet.CreatedEntityCount - changeSet.DestroyedEntityCount;
+            var numComponentChange =
+                changeSet.Entities.Length - changeSet.CreatedEntityCount - changeSet.DestroyedEntityCount;
             var subEntities = changeSet.Entities.GetSubArray(startIndex, numComponentChange);
             var names = nameInfoSet.Names.GetSubArray(startIndex, numComponentChange);
             var jobNamesForComponentChanges = new GatherNamesForComponentChanges
@@ -928,14 +1019,14 @@ namespace Unity.Entities
                 EntityGuidToEntity = entityGuidToEntity,
                 EntityComponentStore = entityManager.GetCheckedEntityDataAccess()->EntityComponentStore,
                 Entities = subEntities,
-                Names = names
+                Names = names,
             }.Schedule(numComponentChange, 64, buildEntityGuidToEntity);
 
             var jobNamesChangedEntities = new GatherNamesChangedEntities
             {
                 EntityGuidToEntity = entityGuidToEntity,
                 NameChangedEntityGuids = changeSet.NameChangedEntityGuids,
-                NameChangedEntities = nameInfoSet.NameChangedEntities
+                NameChangedEntities = nameInfoSet.NameChangedEntities,
             }.Schedule(changeSet.NameChangedCount, 64, buildEntityGuidToEntity);
 
             jobNamesForComponentChanges.Complete();
@@ -950,7 +1041,8 @@ namespace Unity.Entities
         static NameInfoSet BuildEntityNames(
             EntityManager targetEntityManager,
             EntityChangeSet changeSet,
-            AllocatorManager.AllocatorHandle allocator)
+            AllocatorManager.AllocatorHandle allocator
+        )
         {
             var nameLength = changeSet.Entities.Length;
             var nameChangedEntitiesLength = changeSet.NameChangedCount;
@@ -969,7 +1061,13 @@ namespace Unity.Entities
             {
                 var srcStartIndex = changeSet.Names.Length - changeSet.DestroyedEntityCount;
                 var dstStartIndex = changeSet.Entities.Length - changeSet.DestroyedEntityCount;
-                NativeArray<FixedString64Bytes>.Copy(changeSet.Names, srcStartIndex, nameInfoSet.Names, dstStartIndex, changeSet.DestroyedEntityCount);
+                NativeArray<FixedString64Bytes>.Copy(
+                    changeSet.Names,
+                    srcStartIndex,
+                    nameInfoSet.Names,
+                    dstStartIndex,
+                    changeSet.DestroyedEntityCount
+                );
             }
 
             return nameInfoSet;
@@ -985,7 +1083,8 @@ namespace Unity.Entities
         internal static void PrintSummary(
             this EntityChangeSet changeSet,
             EntityManager targetEntityManager,
-            System.Text.StringBuilder sb)
+            System.Text.StringBuilder sb
+        )
         {
             sb.AppendLine("Change Summary:");
             if (changeSet.CreatedEntityCount > 0)
@@ -1107,7 +1206,12 @@ namespace Unity.Entities
             {
                 sb.AppendLine("Entity references changed:");
                 for (int i = 0; i < changeSet.EntityReferenceChanges.Length; i++)
-                    FormatComponentChange(ref changeSet, changeSet.EntityReferenceChanges[i].Component, nameInfoSet, sb);
+                    FormatComponentChange(
+                        ref changeSet,
+                        changeSet.EntityReferenceChanges[i].Component,
+                        nameInfoSet,
+                        sb
+                    );
                 sb.AppendLine();
             }
 
@@ -1115,7 +1219,12 @@ namespace Unity.Entities
             {
                 sb.AppendLine("Blob asset references changed:");
                 for (int i = 0; i < changeSet.BlobAssetReferenceChanges.Length; i++)
-                    FormatComponentChange(ref changeSet, changeSet.BlobAssetReferenceChanges[i].Component, nameInfoSet, sb);
+                    FormatComponentChange(
+                        ref changeSet,
+                        changeSet.BlobAssetReferenceChanges[i].Component,
+                        nameInfoSet,
+                        sb
+                    );
                 sb.AppendLine();
             }
 
@@ -1155,7 +1264,12 @@ namespace Unity.Entities
             }
         }
 
-        static void FormatComponentChange(ref EntityChangeSet changeSet, PackedComponent c, NameInfoSet nameInfoSet, System.Text.StringBuilder sb)
+        static void FormatComponentChange(
+            ref EntityChangeSet changeSet,
+            PackedComponent c,
+            NameInfoSet nameInfoSet,
+            System.Text.StringBuilder sb
+        )
         {
             var ti = TypeManager.GetTypeIndexFromStableTypeHash(changeSet.TypeHashes[c.PackedTypeIndex].StableTypeHash);
             var typeName = TypeManager.GetTypeInfo(ti).DebugTypeName;

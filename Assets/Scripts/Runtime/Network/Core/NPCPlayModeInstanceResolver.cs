@@ -61,13 +61,7 @@ namespace NPCSystem.Network.Core
             string[] args = Environment.GetCommandLineArgs();
             for (int index = 0; index < args.Length - 1; index++)
             {
-                if (
-                    !string.Equals(
-                        args[index],
-                        ClientBindPortArg,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                if (!string.Equals(args[index], ClientBindPortArg, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }

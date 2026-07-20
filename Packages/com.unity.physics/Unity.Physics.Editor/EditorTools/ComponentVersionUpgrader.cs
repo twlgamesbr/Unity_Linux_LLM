@@ -16,24 +16,33 @@ namespace Unity.Physics.Editor
         [MenuItem("Tools/Unity Physics/Upgrade Force Unique Collider Versions")]
         static void UpgradeAssetsWithForceUniqueCollider()
         {
-            var componentNeedsUpgradeFunction = new Func<Authoring.ForceUniqueColliderAuthoring, bool>(
-                component => component.NeedsVersionUpgrade);
+            var componentNeedsUpgradeFunction = new Func<Authoring.ForceUniqueColliderAuthoring, bool>(component =>
+                component.NeedsVersionUpgrade
+            );
             UpgradeAssets("Force Unique Collider", componentNeedsUpgradeFunction);
         }
 
-        internal static void UpgradeAssets<T>(in string componentName, Func<T, bool> componentNeedsUpgradeFunction) where T : Component
+        internal static void UpgradeAssets<T>(in string componentName, Func<T, bool> componentNeedsUpgradeFunction)
+            where T : Component
         {
             int prefabCount = 0;
             int upgradedPrefabCount = 0;
             int sceneCount = 0;
             int upgradedSceneCount = 0;
 
-            Debug.Log($"Starting upgrade of assets containing {componentName} components." +
-                "This may take a while depending on the number of assets in your project.");
+            Debug.Log(
+                $"Starting upgrade of assets containing {componentName} components."
+                    + "This may take a while depending on the number of assets in your project."
+            );
 
             try
             {
-                var cancelled = UpgradePrefabs(componentName, componentNeedsUpgradeFunction, out prefabCount, out upgradedPrefabCount);
+                var cancelled = UpgradePrefabs(
+                    componentName,
+                    componentNeedsUpgradeFunction,
+                    out prefabCount,
+                    out upgradedPrefabCount
+                );
                 if (!cancelled)
                 {
                     UpgradeScenes(componentName, componentNeedsUpgradeFunction, out sceneCount, out upgradedSceneCount);
@@ -43,10 +52,12 @@ namespace Unity.Physics.Editor
             {
                 EditorUtility.FocusProjectWindow();
 
-                EditorUtility.DisplayDialog($"Completed {componentName} Version Upgrade",
-                    $"Checked {prefabCount} prefab(s) and upgraded {upgradedPrefabCount} prefab(s).\n" +
-                    $"Checked {sceneCount} scene(s) and upgraded {upgradedSceneCount} scene(s).",
-                    "OK");
+                EditorUtility.DisplayDialog(
+                    $"Completed {componentName} Version Upgrade",
+                    $"Checked {prefabCount} prefab(s) and upgraded {upgradedPrefabCount} prefab(s).\n"
+                        + $"Checked {sceneCount} scene(s) and upgraded {upgradedSceneCount} scene(s).",
+                    "OK"
+                );
 
                 Debug.Log("Asset upgrade complete.");
             }
@@ -56,8 +67,13 @@ namespace Unity.Physics.Editor
         /// Finds and processes all prefabs and prefab variants in the project.
         /// <returns> False if cancelled. True otherwise. </returns>
         /// </summary>
-        static bool UpgradePrefabs<T>(in string componentName, Func<T, bool> componentNeedsUpgradeFunction,
-            out int prefabCount, out int upgradedPrefabCount) where T : Component
+        static bool UpgradePrefabs<T>(
+            in string componentName,
+            Func<T, bool> componentNeedsUpgradeFunction,
+            out int prefabCount,
+            out int upgradedPrefabCount
+        )
+            where T : Component
         {
             string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
             int processedCount = 0;
@@ -76,7 +92,8 @@ namespace Unity.Physics.Editor
                     cancelled = EditorUtility.DisplayCancelableProgressBar(
                         "Upgrading Prefabs",
                         $"Checking: {path}",
-                        (float)processedCount / prefabGuids.Length);
+                        (float)processedCount / prefabGuids.Length
+                    );
 
                     if (cancelled)
                     {
@@ -145,8 +162,13 @@ namespace Unity.Physics.Editor
         /// Finds and processes all scenes in the project.
         /// <returns> False if cancelled. True otherwise. </returns>
         /// </summary>
-        static bool UpgradeScenes<T>(in string componentName, Func<T, bool> componentNeedsUpgradeFunction,
-            out int sceneCount, out int upgradedSceneCount) where T : Component
+        static bool UpgradeScenes<T>(
+            in string componentName,
+            Func<T, bool> componentNeedsUpgradeFunction,
+            out int sceneCount,
+            out int upgradedSceneCount
+        )
+            where T : Component
         {
             // Save the current scene setup to restore it later.
             SceneSetup[] originalSceneSetup = EditorSceneManager.GetSceneManagerSetup();
@@ -168,7 +190,8 @@ namespace Unity.Physics.Editor
                     cancelled = EditorUtility.DisplayCancelableProgressBar(
                         "Upgrading Scenes",
                         $"Checking: {path}",
-                        (float)processedCount / sceneGuids.Length);
+                        (float)processedCount / sceneGuids.Length
+                    );
 
                     if (cancelled)
                     {

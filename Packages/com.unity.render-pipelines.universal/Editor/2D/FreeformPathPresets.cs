@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 namespace UnityEditor.Rendering.Universal
 {
     internal static class FreeformPathPresets
@@ -12,7 +11,7 @@ namespace UnityEditor.Rendering.Universal
                 new Vector3(-0.5f, -0.5f),
                 new Vector3(0.5f, -0.5f),
                 new Vector3(0.5f, 0.5f),
-                new Vector3(-0.5f, 0.5f)
+                new Vector3(-0.5f, 0.5f),
             };
 
             return returnPath;
@@ -25,7 +24,7 @@ namespace UnityEditor.Rendering.Universal
                 new Vector3(-0.5f, 0.0f),
                 new Vector3(0.0f, -0.25f),
                 new Vector3(0.5f, 0.0f),
-                new Vector3(0.0f, 0.25f)
+                new Vector3(0.0f, 0.25f),
             };
 
             return returnPath;

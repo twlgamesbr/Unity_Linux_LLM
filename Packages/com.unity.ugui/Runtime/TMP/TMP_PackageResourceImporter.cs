@@ -5,7 +5,6 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 
-
 namespace TMPro
 {
     [Serializable]
@@ -21,13 +20,23 @@ namespace TMPro
         public TMP_PackageResourceImporter(bool logErrors = true)
         {
             m_LogErrors = logErrors;
-            m_EssentialResourcesNeedUpdate = m_ExamplesAndExtrasNeedUpdate = !TMP_Settings.isTMPSettingsNull && TMP_Settings.instance.assetVersion != TMP_Settings.s_CurrentAssetVersion;
+            m_EssentialResourcesNeedUpdate = m_ExamplesAndExtrasNeedUpdate =
+                !TMP_Settings.isTMPSettingsNull
+                && TMP_Settings.instance.assetVersion != TMP_Settings.s_CurrentAssetVersion;
         }
 
         public void OnDestroy()
         {
-            if (m_LogErrors && (TMP_Settings.isTMPSettingsNull || TMP_Settings.instance?.assetVersion != TMP_Settings.s_CurrentAssetVersion))
-                Debug.LogError("TextMesh Pro Essential Resources are missing, which are crucial for proper functionality. To import them, go to 'Window > Text Mesh Pro > Import TMP Essential Resources' in the menu.");
+            if (
+                m_LogErrors
+                && (
+                    TMP_Settings.isTMPSettingsNull
+                    || TMP_Settings.instance?.assetVersion != TMP_Settings.s_CurrentAssetVersion
+                )
+            )
+                Debug.LogError(
+                    "TextMesh Pro Essential Resources are missing, which are crucial for proper functionality. To import them, go to 'Window > Text Mesh Pro > Import TMP Essential Resources' in the menu."
+                );
         }
 
         public void OnGUI()
@@ -43,10 +52,16 @@ namespace TMPro
                 {
                     GUILayout.Label("TMP Essentials", EditorStyles.boldLabel);
                     if (m_EssentialResourcesImported && m_EssentialResourcesNeedUpdate)
-                        GUILayout.Label("It appears that the essential resources for TextMesh Pro have been updated. To ensure proper functionality, you need to reimport these resources into your project. The updated resources will be placed at the root of your project in the \"TextMesh Pro\" folder.", new GUIStyle(EditorStyles.label) { wordWrap = true } );
+                        GUILayout.Label(
+                            "It appears that the essential resources for TextMesh Pro have been updated. To ensure proper functionality, you need to reimport these resources into your project. The updated resources will be placed at the root of your project in the \"TextMesh Pro\" folder.",
+                            new GUIStyle(EditorStyles.label) { wordWrap = true }
+                        );
                     else
                     {
-                        GUILayout.Label("This appears to be the first time you access TextMesh Pro, as such we need to add resources to your project that are essential for using TextMesh Pro. These new resources will be placed at the root of your project in the \"TextMesh Pro\" folder.", new GUIStyle(EditorStyles.label) { wordWrap = true } );
+                        GUILayout.Label(
+                            "This appears to be the first time you access TextMesh Pro, as such we need to add resources to your project that are essential for using TextMesh Pro. These new resources will be placed at the root of your project in the \"TextMesh Pro\" folder.",
+                            new GUIStyle(EditorStyles.label) { wordWrap = true }
+                        );
                     }
                     GUILayout.Space(5f);
 
@@ -60,7 +75,10 @@ namespace TMPro
                         AssetDatabase.importPackageCompleted += ImportCallback;
 
                         string packageFullPath = GetPackageFullPath();
-                        AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage", false);
+                        AssetDatabase.ImportPackage(
+                            packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage",
+                            false
+                        );
                     }
 
                     GUILayout.Space(5f);
@@ -73,12 +91,20 @@ namespace TMPro
                 {
                     GUILayout.Label("TMP Examples & Extras", EditorStyles.boldLabel);
                     if (m_ExamplesAndExtrasResourcesImported && m_ExamplesAndExtrasNeedUpdate)
-                        GUILayout.Label("It appears that the Examples & Extras package for TextMesh Pro has been updated. To ensure proper functionality, you need to reimport these updated resources into your project. The updated resources will be placed in the same folder as the TMP essential resources.", new GUIStyle(EditorStyles.label) { wordWrap = true });
+                        GUILayout.Label(
+                            "It appears that the Examples & Extras package for TextMesh Pro has been updated. To ensure proper functionality, you need to reimport these updated resources into your project. The updated resources will be placed in the same folder as the TMP essential resources.",
+                            new GUIStyle(EditorStyles.label) { wordWrap = true }
+                        );
                     else
-                        GUILayout.Label("The Examples & Extras package contains addition resources and examples that will make discovering and learning about TextMesh Pro's powerful features easier. These additional resources will be placed in the same folder as the TMP essential resources.", new GUIStyle(EditorStyles.label) { wordWrap = true });
+                        GUILayout.Label(
+                            "The Examples & Extras package contains addition resources and examples that will make discovering and learning about TextMesh Pro's powerful features easier. These additional resources will be placed in the same folder as the TMP essential resources.",
+                            new GUIStyle(EditorStyles.label) { wordWrap = true }
+                        );
                     GUILayout.Space(5f);
 
-                    GUI.enabled = (m_EssentialResourcesImported && !m_ExamplesAndExtrasResourcesImported) || m_ExamplesAndExtrasNeedUpdate;
+                    GUI.enabled =
+                        (m_EssentialResourcesImported && !m_ExamplesAndExtrasResourcesImported)
+                        || m_ExamplesAndExtrasNeedUpdate;
                     if (GUILayout.Button("Import TMP Examples & Extras"))
                     {
                         // Set flag to get around importing scripts as per of this package which results in an assembly reload which in turn prevents / clears any callbacks.
@@ -89,7 +115,10 @@ namespace TMPro
                         //AssetDatabase.DisallowAutoRefresh();
 
                         string packageFullPath = GetPackageFullPath();
-                        AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Examples & Extras.unitypackage", false);
+                        AssetDatabase.ImportPackage(
+                            packageFullPath + "/Package Resources/TMP Examples & Extras.unitypackage",
+                            false
+                        );
                     }
                     GUILayout.Space(5f);
                     GUI.enabled = true;
@@ -104,7 +133,6 @@ namespace TMPro
         {
             AssetDatabase.importPackageCompleted += ImportCallback;
         }
-
 
         private static string k_SettingsFilePath;
         private static byte[] k_SettingsBackup;
@@ -146,9 +174,9 @@ namespace TMPro
                 m_EssentialResourcesImported = true;
                 TMPro_EventManager.ON_RESOURCES_LOADED();
 
-                #if UNITY_2018_3_OR_NEWER
+#if UNITY_2018_3_OR_NEWER
                 SettingsService.NotifySettingsProviderChanged();
-                #endif
+#endif
             }
             else if (packageName == "TMP Examples & Extras")
             {
@@ -187,7 +215,11 @@ namespace TMPro
                 }
 
                 // Search for potential alternative locations in the user project
-                string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
+                string[] matchingPaths = Directory.GetDirectories(
+                    packagePath,
+                    "TextMesh Pro",
+                    SearchOption.AllDirectories
+                );
                 string path = ValidateLocation(matchingPaths, packagePath);
                 if (path != null)
                     return packagePath + path;
@@ -223,10 +255,16 @@ namespace TMPro
             string packageFullPath = GetPackageFullPath();
 
             if (importEssentials)
-                AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage", interactive);
+                AssetDatabase.ImportPackage(
+                    packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage",
+                    interactive
+                );
 
             if (importExamples)
-                AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Examples & Extras.unitypackage", interactive);
+                AssetDatabase.ImportPackage(
+                    packageFullPath + "/Package Resources/TMP Examples & Extras.unitypackage",
+                    interactive
+                );
         }
     }
 
@@ -287,7 +325,6 @@ namespace TMPro
         }
     }
 
-
     [Serializable]
     internal class TMP_ShaderPackageImporter
     {
@@ -305,7 +342,10 @@ namespace TMPro
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     //GUILayout.Label("TextMeshPro Resources Update", EditorStyles.boldLabel);
-                    GUILayout.Label("This release of the TMP package includes updated resources.\n\nPlease use the menu options located in \"Window\\TextMeshPro\\...\" to import the updated\n\"TMP Essential Resources\" and \"TMP Examples & Extras\".\n\nAs usual please be sure to backup any of the files and resources that you may have added or modified in the \"Assets\\TextMesh Pro\\...\" folders.", new GUIStyle(EditorStyles.label) { wordWrap = true } );
+                    GUILayout.Label(
+                        "This release of the TMP package includes updated resources.\n\nPlease use the menu options located in \"Window\\TextMeshPro\\...\" to import the updated\n\"TMP Essential Resources\" and \"TMP Examples & Extras\".\n\nAs usual please be sure to backup any of the files and resources that you may have added or modified in the \"Assets\\TextMesh Pro\\...\" folders.",
+                        new GUIStyle(EditorStyles.label) { wordWrap = true }
+                    );
                     GUILayout.Space(5f);
 
                     GUI.enabled = !m_ShadersImported;
@@ -363,7 +403,6 @@ namespace TMPro
             AssetDatabase.ImportPackage(packagePath, interactive);
         }
     }
-
 
     internal class TMP_ShaderPackageImporterWindow : EditorWindow
     {
@@ -430,7 +469,6 @@ namespace TMPro
             editorWindow.maxSize = windowSize;
         }
     }
-
 }
 
 #endif

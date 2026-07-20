@@ -25,7 +25,9 @@ namespace Unity.Netcode
             else
             {
                 writer.WriteValueSafe(string.Empty);
-                NetworkLog.LogWarning("Disconnect reason didn't fit. Disconnected without sending a reason. Consider shortening the reason string.");
+                NetworkLog.LogWarning(
+                    "Disconnect reason didn't fit. Disconnected without sending a reason. Consider shortening the reason string."
+                );
             }
         }
 

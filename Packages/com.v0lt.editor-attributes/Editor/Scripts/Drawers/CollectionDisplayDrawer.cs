@@ -1,13 +1,13 @@
 using System;
-using UnityEngine;
-using UnityEditor;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Collections;
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
-using System.Collections.Generic;
 using EditorAttributes.Editor.Utility;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -23,7 +23,9 @@ namespace EditorAttributes.Editor
         /// <returns>The dropdown field created</returns>
         protected virtual DropdownField CreateDropdownField(List<string> choices, SerializedProperty property)
         {
-            DropdownField dropdownField = IsCollectionValid(choices) ? new(property.displayName, choices, SetDropdownDefaultValue(choices, property)) : new(property.displayName, nullList, 0);
+            DropdownField dropdownField = IsCollectionValid(choices)
+                ? new(property.displayName, choices, SetDropdownDefaultValue(choices, property))
+                : new(property.displayName, nullList, 0);
 
             dropdownField.tooltip = property.tooltip;
             dropdownField.showMixedValue = property.hasMultipleDifferentValues;
@@ -34,9 +36,18 @@ namespace EditorAttributes.Editor
             if (dropdownField.value != "NULL")
                 SetPropertyValueFromDropdown(property, dropdownField);
 
-            dropdownField.TrackPropertyValue(property, (trackedProperty) => SetDropdownValueFromProperty(trackedProperty, dropdownField));
-            dropdownField.RegisterValueChangedCallback((callback) => SetPropertyValueFromDropdown(property, dropdownField));
-            dropdownField.RegisterCallbackOnce<GeometryChangedEvent>((callback) => dropdownField.Q(className: DropdownField.inputUssClassName).style.backgroundColor = EditorExtension.GLOBAL_COLOR / 2f);
+            dropdownField.TrackPropertyValue(
+                property,
+                (trackedProperty) => SetDropdownValueFromProperty(trackedProperty, dropdownField)
+            );
+            dropdownField.RegisterValueChangedCallback(
+                (callback) => SetPropertyValueFromDropdown(property, dropdownField)
+            );
+            dropdownField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                    dropdownField.Q(className: DropdownField.inputUssClassName).style.backgroundColor =
+                        EditorExtension.GLOBAL_COLOR / 2f
+            );
 
             return dropdownField;
         }
@@ -47,7 +58,8 @@ namespace EditorAttributes.Editor
         /// <param name="collectionValues">The collection linked to the dropdown</param>
         /// <param name="property">The serialized property attached to the dropdown</param>
         /// <returns>The string value set to the dropdown</returns>
-        protected virtual string SetDropdownDefaultValue(List<string> collectionValues, SerializedProperty property) => collectionValues.Contains(property.stringValue) ? property.stringValue : collectionValues[0];
+        protected virtual string SetDropdownDefaultValue(List<string> collectionValues, SerializedProperty property) =>
+            collectionValues.Contains(property.stringValue) ? property.stringValue : collectionValues[0];
 
         /// <summary>
         /// Sets the value of the property from the dropdown selection
@@ -67,7 +79,10 @@ namespace EditorAttributes.Editor
         /// </summary>
         /// <param name="trackedProperty">The property attached to the dropdown</param>
         /// <param name="dropdownField">The dropdown field</param>
-        protected virtual void SetDropdownValueFromProperty(SerializedProperty trackedProperty, DropdownField dropdownField)
+        protected virtual void SetDropdownValueFromProperty(
+            SerializedProperty trackedProperty,
+            DropdownField dropdownField
+        )
         {
             if (dropdownField.choices.Contains(trackedProperty.stringValue))
             {
@@ -75,7 +90,10 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                Debug.LogWarning($"The value <b>{trackedProperty.stringValue}</b> set to the <b>{trackedProperty.name}</b> variable is not a value available in the dropdown", trackedProperty.serializedObject.targetObject);
+                Debug.LogWarning(
+                    $"The value <b>{trackedProperty.stringValue}</b> set to the <b>{trackedProperty.name}</b> variable is not a value available in the dropdown",
+                    trackedProperty.serializedObject.targetObject
+                );
             }
         }
 
@@ -87,7 +105,12 @@ namespace EditorAttributes.Editor
         /// <param name="serializedProperty">The target property</param>
         /// <param name="propertyValues">A collection of all property values as a string</param>
         /// <returns>A list with the display names</returns>
-        protected List<string> GetDisplayValues(MemberInfo collectionInfo, IDisplayNamesAttribute displayNamesAttribute, SerializedProperty serializedProperty, List<string> propertyValues)
+        protected List<string> GetDisplayValues(
+            MemberInfo collectionInfo,
+            IDisplayNamesAttribute displayNamesAttribute,
+            SerializedProperty serializedProperty,
+            List<string> propertyValues
+        )
         {
             List<string> displayStrings = new();
 
@@ -118,7 +141,11 @@ namespace EditorAttributes.Editor
         /// <param name="serializedProperty">The target property</param>
         /// <param name="dictionary">The collection as a dictionary</param>
         /// <returns>True if the collection is an IDictionary, false otherwise</returns>
-        protected bool IsCollectionDictionary(MemberInfo collectionInfo, SerializedProperty serializedProperty, out IDictionary dictionary)
+        protected bool IsCollectionDictionary(
+            MemberInfo collectionInfo,
+            SerializedProperty serializedProperty,
+            out IDictionary dictionary
+        )
         {
             object collectionValue = ReflectionUtils.GetMemberInfoValue(collectionInfo, serializedProperty);
 
@@ -134,7 +161,12 @@ namespace EditorAttributes.Editor
         /// <param name="memberInfo">The member info of the collection</param>
         /// <param name="errorBox">The error box to display any errors to</param>
         /// <returns>The values of the collection in a list of strings</returns>
-        protected static List<string> ConvertCollectionValuesToStrings(string collectionName, SerializedProperty serializedProperty, MemberInfo memberInfo, HelpBox errorBox)
+        protected static List<string> ConvertCollectionValuesToStrings(
+            string collectionName,
+            SerializedProperty serializedProperty,
+            MemberInfo memberInfo,
+            HelpBox errorBox
+        )
         {
             List<string> stringList = new();
             object memberInfoValue = ReflectionUtils.GetMemberInfoValue(memberInfo, serializedProperty);

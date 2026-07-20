@@ -1,7 +1,4 @@
 namespace Unity.Multiplayer.Tools.Adapters
 {
-    interface IGetTransformWithoutArtificialLatency : IAdapterComponent
-    {
-
-    }
+    interface IGetTransformWithoutArtificialLatency : IAdapterComponent { }
 }

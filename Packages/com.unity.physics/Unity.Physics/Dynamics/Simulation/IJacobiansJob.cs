@@ -33,14 +33,10 @@ namespace Unity.Physics
         void Execute(ref ModifiableJacobianHeader header, ref ModifiableTriggerJacobian jacobian);
     }
 
-
     /// <summary>
     /// Interface for jobs that iterate through the list of Jacobians before they are solved.
     /// </summary>
-    public interface IJacobiansJob : IJacobiansJobBase
-    {
-    }
-
+    public interface IJacobiansJob : IJacobiansJobBase { }
 
     /// <summary>   A modifiable jacobian header. </summary>
     public unsafe struct ModifiableJacobianHeader
@@ -50,13 +46,11 @@ namespace Unity.Physics
         /// <summary>   Gets a value indicating whether the modifiers was changed. </summary>
         ///
         /// <value> True if modifiers changed, false if not. </value>
-
         public bool ModifiersChanged { get; private set; }
 
         /// <summary>   Gets a value indicating whether the angular was changed. </summary>
         ///
         /// <value> True if angular changed, false if not. </value>
-
         public bool AngularChanged { get; private set; }
 
         internal EntityPair EntityPair;
@@ -64,44 +58,42 @@ namespace Unity.Physics
         /// <summary>   Gets the entity b. </summary>
         ///
         /// <value> The entity b. </value>
-
         public Entity EntityB => EntityPair.EntityB;
 
         /// <summary>   Gets the entity a. </summary>
         ///
         /// <value> The entity a. </value>
-
         public Entity EntityA => EntityPair.EntityA;
 
         /// <summary>   Gets the body index b. </summary>
         ///
         /// <value> The body index b. </value>
-
         public int BodyIndexB => m_Header->BodyPair.BodyIndexB;
 
         /// <summary>   Gets the body index a. </summary>
         ///
         /// <value> The body index a. </value>
-
         public int BodyIndexA => m_Header->BodyPair.BodyIndexA;
 
         /// <summary>   Gets the Jacobian type. </summary>
         ///
         /// <value> The Jacobian type. </value>
-
         public JacobianType Type => m_Header->Type;
 
         /// <summary>   Gets or sets the Jacobian flags. </summary>
         ///
         /// <value> The Jacobian flags. </value>
-
         public JacobianFlags Flags
         {
             get => m_Header->Flags;
             set
             {
                 // Some flags change the size of the jacobian; don't allow these to be changed:
-                byte notPermitted = (byte)(JacobianFlags.EnableSurfaceVelocity | JacobianFlags.EnableMassFactors | JacobianFlags.EnableCollisionEvents);
+                byte notPermitted = (byte)(
+                    JacobianFlags.EnableSurfaceVelocity
+                    | JacobianFlags.EnableMassFactors
+                    | JacobianFlags.EnableCollisionEvents
+                );
                 byte userFlags = (byte)value;
                 byte alreadySet = (byte)m_Header->Flags;
 
@@ -118,13 +110,11 @@ namespace Unity.Physics
         /// <summary>   Gets a value indicating whether this object has mass factors. </summary>
         ///
         /// <value> True if this object has mass factors, false if not. </value>
-
         public bool HasMassFactors => m_Header->HasMassFactors;
 
         /// <summary>   Gets or sets the mass factors. </summary>
         ///
         /// <value> The mass factors. </value>
-
         public MassFactors MassFactors
         {
             get => m_Header->MassFactors;
@@ -138,13 +128,11 @@ namespace Unity.Physics
         /// <summary>   Gets a value indicating whether this object has surface velocity. </summary>
         ///
         /// <value> True if this object has surface velocity, false if not. </value>
-
         public bool HasSurfaceVelocity => m_Header->HasSurfaceVelocity;
 
         /// <summary>   Gets or sets the surface velocity. </summary>
         ///
         /// <value> The surface velocity. </value>
-
         public SurfaceVelocity SurfaceVelocity
         {
             get => m_Header->SurfaceVelocity;
@@ -160,7 +148,6 @@ namespace Unity.Physics
         /// <param name="i">    Zero-based index of the jacobian. </param>
         ///
         /// <returns>   The angular jacobian. </returns>
-
         public ContactJacAngAndVelToReachCp GetAngularJacobian(int i)
         {
             return m_Header->AccessAngularJacobian(i);
@@ -170,7 +157,6 @@ namespace Unity.Physics
         ///
         /// <param name="i">    Zero-based index of the jacobian. </param>
         /// <param name="j">    A ContactJacAngAndVelToReachCp to set. </param>
-
         public void SetAngularJacobian(int i, ContactJacAngAndVelToReachCp j)
         {
             m_Header->AccessAngularJacobian(i) = j;
@@ -277,7 +263,12 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle Schedule<T>(this T job, SimulationSingleton simulationSingleton, ref PhysicsWorld world, JobHandle inputDeps)
+        public static JobHandle Schedule<T>(
+            this T job,
+            SimulationSingleton simulationSingleton,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IJacobiansJobBase
         {
             // Should work only for UnityPhysics
@@ -288,7 +279,6 @@ namespace Unity.Physics
 
             return ScheduleUnityPhysicsJacobiansJob(job, simulationSingleton.AsSimulation(), ref world, inputDeps);
         }
-
 
         /// <summary>   Schedules an IJacobiansJob for parallel processing. </summary>
         ///
@@ -302,7 +292,13 @@ namespace Unity.Physics
         /// <param name="inputDeps">            The input dependencies. </param>
         ///
         /// <returns>   A JobHandle. </returns>
-        public static JobHandle ScheduleParallel<T>(this T job, int innerLoopBatchCount, SimulationSingleton simulationSingleton, ref PhysicsWorld world, JobHandle inputDeps)
+        public static JobHandle ScheduleParallel<T>(
+            this T job,
+            int innerLoopBatchCount,
+            SimulationSingleton simulationSingleton,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IJacobiansJobBase
         {
             // Should work only for UnityPhysics
@@ -311,13 +307,27 @@ namespace Unity.Physics
                 return inputDeps;
             }
 
-            return ScheduleParallelUnityPhysicsJacobiansJob(job, innerLoopBatchCount, simulationSingleton.AsSimulation(), ref world, inputDeps);
+            return ScheduleParallelUnityPhysicsJacobiansJob(
+                job,
+                innerLoopBatchCount,
+                simulationSingleton.AsSimulation(),
+                ref world,
+                inputDeps
+            );
         }
 
-        static unsafe JobHandle ScheduleUnityPhysicsJacobiansJob<T>(T job, Simulation simulation, ref PhysicsWorld world, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleUnityPhysicsJacobiansJob<T>(
+            T job,
+            Simulation simulation,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IJacobiansJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.PostCreateJacobians);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateJacobians
+            );
 
             if (simulation.StepContext.Jacobians.IsCreated)
             {
@@ -326,13 +336,18 @@ namespace Unity.Physics
                     UserJobData = job,
                     JacobiansReader = simulation.StepContext.Jacobians.AsReader(),
                     Bodies = world.Bodies,
-                    IsParallel = false
+                    IsParallel = false,
                 };
 
                 var jobReflectionData = JacobiansJobProcess<T>.jobReflectionData.Data;
                 JacobiansJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-                var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Single);
+                var parameters = new JobsUtility.JobScheduleParameters(
+                    UnsafeUtility.AddressOf(ref data),
+                    jobReflectionData,
+                    inputDeps,
+                    ScheduleMode.Single
+                );
                 return JobsUtility.Schedule(ref parameters);
             }
             // else:
@@ -340,10 +355,19 @@ namespace Unity.Physics
             return inputDeps;
         }
 
-        static unsafe JobHandle ScheduleParallelUnityPhysicsJacobiansJob<T>(T job, int innerLoopBatchCount, Simulation simulation, ref PhysicsWorld world, JobHandle inputDeps)
+        static unsafe JobHandle ScheduleParallelUnityPhysicsJacobiansJob<T>(
+            T job,
+            int innerLoopBatchCount,
+            Simulation simulation,
+            ref PhysicsWorld world,
+            JobHandle inputDeps
+        )
             where T : struct, IJacobiansJobBase
         {
-            SafetyChecks.CheckSimulationStageAndThrow(simulation.m_SimulationScheduleStage, SimulationScheduleStage.PostCreateJacobians);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                simulation.m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateJacobians
+            );
 
             if (simulation.StepContext.Jacobians.IsCreated)
             {
@@ -353,23 +377,34 @@ namespace Unity.Physics
                     UserJobData = job,
                     JacobiansReader = jacobiansStream.AsReader(),
                     Bodies = world.Bodies,
-                    IsParallel = true
+                    IsParallel = true,
                 };
 
                 var jobReflectionData = JacobiansJobProcess<T>.jobReflectionData.Data;
                 JacobiansJobProcess<T>.CheckReflectionDataCorrect(jobReflectionData);
 
-                var parameters = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref data), jobReflectionData, inputDeps, ScheduleMode.Parallel);
+                var parameters = new JobsUtility.JobScheduleParameters(
+                    UnsafeUtility.AddressOf(ref data),
+                    jobReflectionData,
+                    inputDeps,
+                    ScheduleMode.Parallel
+                );
                 var forEachCountPtr = NativeStreamUnsafeUtility.GetUnsafeForEachCountPtr(ref jacobiansStream);
                 var listDataPtr = (byte*)forEachCountPtr - sizeof(void*);
-                return JobsUtility.ScheduleParallelForDeferArraySize(ref parameters, innerLoopBatchCount, listDataPtr, null);
+                return JobsUtility.ScheduleParallelForDeferArraySize(
+                    ref parameters,
+                    innerLoopBatchCount,
+                    listDataPtr,
+                    null
+                );
             }
             // else:
 
             return inputDeps;
         }
 
-        internal struct JacobiansJobData<T> where T : struct
+        internal struct JacobiansJobData<T>
+            where T : struct
         {
             public T UserJobData;
             public NativeStream.Reader JacobiansReader;
@@ -389,11 +424,14 @@ namespace Unity.Physics
 
             public JacobiansJobIterator(NativeStream.Reader reader, int forEachIndexBegin, int forEachIndexEnd)
             {
-                SafetyChecks.CheckAreEqualAndThrow(true, forEachIndexBegin >= 0
-                    && forEachIndexBegin <= forEachIndexEnd // Note: we use <= here since for empty readers,
-                                                            // forEachIndexEnd will be identical to forEachIndexBegin,
-                                                            // both being zero. This is still valid, and should not throw.
-                    && forEachIndexEnd <= reader.ForEachCount);
+                SafetyChecks.CheckAreEqualAndThrow(
+                    true,
+                    forEachIndexBegin >= 0
+                        && forEachIndexBegin <= forEachIndexEnd // Note: we use <= here since for empty readers,
+                        // forEachIndexEnd will be identical to forEachIndexBegin,
+                        // both being zero. This is still valid, and should not throw.
+                        && forEachIndexEnd <= reader.ForEachCount
+                );
 
                 m_JacobiansReader = reader;
                 m_CurrentForEachIndex = forEachIndexBegin;
@@ -417,7 +455,8 @@ namespace Unity.Physics
                 return dataPtr;
             }
 
-            ref T2 Read<T2>() where T2 : struct
+            ref T2 Read<T2>()
+                where T2 : struct
             {
                 int size = UnsafeUtility.SizeOf<T2>();
                 return ref UnsafeUtility.AsRef<T2>(Read(size));
@@ -432,29 +471,48 @@ namespace Unity.Physics
             }
         }
 
-        internal struct JacobiansJobProcess<T> where T : struct, IJacobiansJobBase
+        internal struct JacobiansJobProcess<T>
+            where T : struct, IJacobiansJobBase
         {
-            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<JacobiansJobProcess<T>>();
+            internal static readonly SharedStatic<IntPtr> jobReflectionData = SharedStatic<IntPtr>.GetOrCreate<
+                JacobiansJobProcess<T>
+            >();
 
             [Preserve]
             public static void Initialize()
             {
                 if (jobReflectionData.Data == IntPtr.Zero)
-                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(typeof(JacobiansJobData<T>), typeof(T), (ExecuteJobFunction)Execute);
+                    jobReflectionData.Data = JobsUtility.CreateJobReflectionData(
+                        typeof(JacobiansJobData<T>),
+                        typeof(T),
+                        (ExecuteJobFunction)Execute
+                    );
             }
 
             [System.Diagnostics.Conditional("ENABLE_UNITY_COLLECTIONS_CHECK")]
             internal static void CheckReflectionDataCorrect(IntPtr reflectionData)
             {
                 if (reflectionData == IntPtr.Zero)
-                    SafetyChecks.ThrowInvalidOperationException("Reflection data was not set up by an Initialize() call");
+                    SafetyChecks.ThrowInvalidOperationException(
+                        "Reflection data was not set up by an Initialize() call"
+                    );
             }
 
-            public delegate void ExecuteJobFunction(ref JacobiansJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex);
+            public delegate void ExecuteJobFunction(
+                ref JacobiansJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            );
 
-            public unsafe static void Execute(ref JacobiansJobData<T> jobData, IntPtr additionalData,
-                IntPtr bufferRangePatchData, ref JobRanges ranges, int jobIndex)
+            public static unsafe void Execute(
+                ref JacobiansJobData<T> jobData,
+                IntPtr additionalData,
+                IntPtr bufferRangePatchData,
+                ref JobRanges ranges,
+                int jobIndex
+            )
             {
                 while (true)
                 {
@@ -463,17 +521,31 @@ namespace Unity.Physics
 
                     if (jobData.IsParallel)
                     {
-                        if (!JobsUtility.GetWorkStealingRange(ref ranges, jobIndex, out forEachIndexBegin,
-                                out forEachIndexEnd))
+                        if (
+                            !JobsUtility.GetWorkStealingRange(
+                                ref ranges,
+                                jobIndex,
+                                out forEachIndexBegin,
+                                out forEachIndexEnd
+                            )
+                        )
                             break;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                        JobsUtility.PatchBufferMinMaxRanges(bufferRangePatchData, UnsafeUtility.AddressOf(ref jobData),
-                            forEachIndexBegin, forEachIndexEnd - forEachIndexBegin);
+                        JobsUtility.PatchBufferMinMaxRanges(
+                            bufferRangePatchData,
+                            UnsafeUtility.AddressOf(ref jobData),
+                            forEachIndexBegin,
+                            forEachIndexEnd - forEachIndexBegin
+                        );
 #endif
                     }
 
-                    var iterator = new JacobiansJobIterator(jobData.JacobiansReader, forEachIndexBegin, forEachIndexEnd);
+                    var iterator = new JacobiansJobIterator(
+                        jobData.JacobiansReader,
+                        forEachIndexBegin,
+                        forEachIndexEnd
+                    );
 
                     while (iterator.HasItemsLeft)
                     {
@@ -485,16 +557,15 @@ namespace Unity.Physics
                             EntityPair = new EntityPair
                             {
                                 EntityA = jobData.Bodies[header->BodyPair.BodyIndexA].Entity,
-                                EntityB = jobData.Bodies[header->BodyPair.BodyIndexB].Entity
-                            }
+                                EntityB = jobData.Bodies[header->BodyPair.BodyIndexB].Entity,
+                            },
                         };
                         if (header->Type == JacobianType.Contact)
                         {
                             var contact = new ModifiableContactJacobian
                             {
-                                m_ContactJacobian =
-                                    (ContactJacobian*)UnsafeUtility.AddressOf(
-                                        ref header->AccessBaseJacobian<ContactJacobian>())
+                                m_ContactJacobian = (ContactJacobian*)
+                                    UnsafeUtility.AddressOf(ref header->AccessBaseJacobian<ContactJacobian>()),
                             };
                             jobData.UserJobData.Execute(ref h, ref contact);
                         }
@@ -502,9 +573,8 @@ namespace Unity.Physics
                         {
                             var trigger = new ModifiableTriggerJacobian
                             {
-                                m_TriggerJacobian =
-                                    (TriggerJacobian*)UnsafeUtility.AddressOf(
-                                        ref header->AccessBaseJacobian<TriggerJacobian>())
+                                m_TriggerJacobian = (TriggerJacobian*)
+                                    UnsafeUtility.AddressOf(ref header->AccessBaseJacobian<TriggerJacobian>()),
                             };
 
                             jobData.UserJobData.Execute(ref h, ref trigger);

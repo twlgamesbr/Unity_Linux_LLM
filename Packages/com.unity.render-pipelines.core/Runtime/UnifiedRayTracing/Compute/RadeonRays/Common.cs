@@ -1,4 +1,3 @@
-
 namespace UnityEngine.Rendering.RadeonRays
 {
     internal static class Common

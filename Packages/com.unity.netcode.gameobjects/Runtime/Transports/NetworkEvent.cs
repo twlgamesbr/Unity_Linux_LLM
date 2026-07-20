@@ -28,6 +28,6 @@ namespace Unity.Netcode
         /// <summary>
         /// No new event
         /// </summary>
-        Nothing
+        Nothing,
     }
 }

@@ -12,9 +12,10 @@ namespace UnityEngine.InputSystem.Editor
         private readonly DropdownField m_CompositePartField;
         private readonly IMGUIContainer m_PathEditorContainer;
 
-        private const string UxmlName = InputActionsEditorConstants.PackagePath +
-            InputActionsEditorConstants.ResourcesPath +
-            InputActionsEditorConstants.CompositePartBindingPropertiesViewUxml;
+        private const string UxmlName =
+            InputActionsEditorConstants.PackagePath
+            + InputActionsEditorConstants.ResourcesPath
+            + InputActionsEditorConstants.CompositePartBindingPropertiesViewUxml;
 
         public CompositePartBindingPropertiesView(VisualElement root, StateContainer stateContainer)
             : base(root, stateContainer)
@@ -26,8 +27,13 @@ namespace UnityEngine.InputSystem.Editor
             m_PathEditorContainer = container.Q<IMGUIContainer>("path-editor-container");
             m_CompositePartField = container.Q<DropdownField>("composite-part-dropdown");
 
-            CreateSelector(Selectors.GetSelectedBinding,
-                (b, s) => b.HasValue && b.Value.isPartOfComposite ? Selectors.GetCompositePartBindingViewState(b.Value, s) : null);
+            CreateSelector(
+                Selectors.GetSelectedBinding,
+                (b, s) =>
+                    b.HasValue && b.Value.isPartOfComposite
+                        ? Selectors.GetCompositePartBindingViewState(b.Value, s)
+                        : null
+            );
         }
 
         public override void RedrawUI(ViewState viewState)
@@ -35,10 +41,18 @@ namespace UnityEngine.InputSystem.Editor
             if (viewState == null)
                 return;
             // TODO: Persist control picker state
-            var controlPathEditor = new InputControlPathEditor(viewState.selectedBindingPath, new InputControlPickerState(),
-                () => { Dispatch(Commands.ApplyModifiedProperties()); });
+            var controlPathEditor = new InputControlPathEditor(
+                viewState.selectedBindingPath,
+                new InputControlPickerState(),
+                () =>
+                {
+                    Dispatch(Commands.ApplyModifiedProperties());
+                }
+            );
 
-            controlPathEditor.SetControlPathsToMatch(viewState.currentControlScheme.deviceRequirements.Select(x => x.controlPath));
+            controlPathEditor.SetControlPathsToMatch(
+                viewState.currentControlScheme.deviceRequirements.Select(x => x.controlPath)
+            );
             controlPathEditor.SetExpectedControlLayout(viewState.expectedControlLayoutName);
 
             m_PathEditorContainer.onGUIHandler = controlPathEditor.OnGUI;
@@ -66,12 +80,15 @@ namespace UnityEngine.InputSystem.Editor
 
     internal static partial class Selectors
     {
-        public static CompositePartBindingPropertiesView.ViewState GetCompositePartBindingViewState(SerializedInputBinding binding,
-            InputActionsEditorState state)
+        public static CompositePartBindingPropertiesView.ViewState GetCompositePartBindingViewState(
+            SerializedInputBinding binding,
+            InputActionsEditorState state
+        )
         {
             var compositeParts = GetCompositePartOptions(binding.name, binding.compositePath).ToList();
             var selectedCompositePartName = ObjectNames.NicifyVariableName(
-                compositeParts.First(str => string.Equals(str, binding.name, StringComparison.OrdinalIgnoreCase)));
+                compositeParts.First(str => string.Equals(str, binding.name, StringComparison.OrdinalIgnoreCase))
+            );
 
             var compositePartBindingViewState = new CompositePartBindingPropertiesView.ViewState
             {
@@ -80,7 +97,8 @@ namespace UnityEngine.InputSystem.Editor
                 selectedCompositePartName = selectedCompositePartName,
                 currentControlScheme = state.selectedControlScheme,
                 compositePartNames = compositeParts.Select(ObjectNames.NicifyVariableName).ToList(),
-                expectedControlLayoutName = InputBindingComposite.GetExpectedControlLayoutName(binding.compositePath, binding.name) ?? ""
+                expectedControlLayoutName =
+                    InputBindingComposite.GetExpectedControlLayoutName(binding.compositePath, binding.name) ?? "",
             };
             return compositePartBindingViewState;
         }

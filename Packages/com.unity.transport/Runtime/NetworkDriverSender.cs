@@ -32,12 +32,9 @@ namespace Unity.Networking.Transport
 
         internal JobHandle FlushPackets(JobHandle dependency)
         {
-            return new DequeuePacketsJob
-            {
-                Queue = m_SendQueue,
-                PendingSendQueue = m_PendingSendQueue,
-            }
-                .Schedule(dependency);
+            return new DequeuePacketsJob { Queue = m_SendQueue, PendingSendQueue = m_PendingSendQueue }.Schedule(
+                dependency
+            );
         }
 
         [BurstCompile]
@@ -67,7 +64,8 @@ namespace Unity.Networking.Transport
 
         internal struct Concurrent
         {
-            [ReadOnly] internal PacketsQueue m_SendQueue;
+            [ReadOnly]
+            internal PacketsQueue m_SendQueue;
             internal NativeQueue<int>.ParallelWriter m_PendingSendQueue;
 
             public int BeginSend(out NetworkInterfaceSendHandle sendHandle, uint packetSize = 0)
@@ -108,14 +106,21 @@ namespace Unity.Networking.Transport
                 m_SendQueue.ReleaseBuffer(sendHandle.id);
             }
 
-            public void EndSend(ref NetworkEndpoint destination, ref NetworkInterfaceSendHandle sendHandle, int padding = 0, ConnectionId connectionId = default)
+            public void EndSend(
+                ref NetworkEndpoint destination,
+                ref NetworkInterfaceSendHandle sendHandle,
+                int padding = 0,
+                ConnectionId connectionId = default
+            )
             {
                 var bufferIndex = sendHandle.id;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 if (!m_SendQueue.IsUsed(bufferIndex))
                 {
-                    throw new InvalidOperationException(string.Format("Trying to EndSend a packet with a non-acquired buffer (idx: {0}).", bufferIndex));
+                    throw new InvalidOperationException(
+                        string.Format("Trying to EndSend a packet with a non-acquired buffer (idx: {0}).", bufferIndex)
+                    );
                 }
 
                 if (m_SendQueue.GetMetadataRef(bufferIndex) != default)

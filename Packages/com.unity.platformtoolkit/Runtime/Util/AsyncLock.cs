@@ -73,7 +73,9 @@ namespace Unity.PlatformToolkit
 #if DEBUG
             else
             {
-                Debug.LogError("An instance of a ScopedLock was copied and redudantly Disposed. Only one instance should be disposed. This is safely handled, however it indicates there is a programming error.");
+                Debug.LogError(
+                    "An instance of a ScopedLock was copied and redudantly Disposed. Only one instance should be disposed. This is safely handled, however it indicates there is a programming error."
+                );
             }
 #endif
         }

@@ -15,8 +15,15 @@ namespace Unity.Entities
         internal const string k_RemoveComponentCounterName = "Remove Component";
         internal const string k_SetSharedComponentCounterName = "Set Shared Component";
 
-        sealed class SharedInitialized { internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<bool>(); }
-        sealed class SharedStaticData { internal static readonly SharedStatic<StaticData> Ref = SharedStatic<StaticData>.GetOrCreate<StaticData>(); }
+        sealed class SharedInitialized
+        {
+            internal static readonly SharedStatic<bool> Ref = SharedStatic<bool>.GetOrCreate<bool>();
+        }
+
+        sealed class SharedStaticData
+        {
+            internal static readonly SharedStatic<StaticData> Ref = SharedStatic<StaticData>.GetOrCreate<StaticData>();
+        }
 
         public static bool Enabled => Profiler.enabled && Profiler.IsCategoryEnabled(s_Data.Category);
         public static Guid Guid => s_Data.Guid;
@@ -30,7 +37,9 @@ namespace Unity.Entities
             if (s_Initialized)
                 return;
 
-            s_Data = new StaticData(/*dummy*/0);
+            s_Data = new StaticData( /*dummy*/
+                0
+            );
             s_Initialized = true;
         }
 
@@ -43,7 +52,7 @@ namespace Unity.Entities
             s_Initialized = false;
         }
 
-        public unsafe static void Flush()
+        public static unsafe void Flush()
         {
             if (!s_Initialized || !Enabled)
                 return;

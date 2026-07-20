@@ -9,7 +9,9 @@ namespace UnityEngine.TestTools
 {
     internal class OuterUnityTestActionCommand : BeforeAfterTestCommandBase<IOuterUnityTestAction>
     {
-        private static readonly Dictionary<MethodInfo, List<IOuterUnityTestAction>> m_TestActionsCache = new Dictionary<MethodInfo, List<IOuterUnityTestAction>>();
+        private static readonly Dictionary<MethodInfo, List<IOuterUnityTestAction>> m_TestActionsCache =
+            new Dictionary<MethodInfo, List<IOuterUnityTestAction>>();
+
         public OuterUnityTestActionCommand(TestCommand innerCommand)
             : base(innerCommand, "BeforeTest", "AfterTest")
         {
@@ -20,12 +22,20 @@ namespace UnityEngine.TestTools
             }
         }
 
-        protected override IEnumerator InvokeBefore(IOuterUnityTestAction action, Test test, UnityTestExecutionContext context)
+        protected override IEnumerator InvokeBefore(
+            IOuterUnityTestAction action,
+            Test test,
+            UnityTestExecutionContext context
+        )
         {
             return action.BeforeTest(test);
         }
 
-        protected override IEnumerator InvokeAfter(IOuterUnityTestAction action, Test test, UnityTestExecutionContext context)
+        protected override IEnumerator InvokeAfter(
+            IOuterUnityTestAction action,
+            Test test,
+            UnityTestExecutionContext context
+        )
         {
             return action.AfterTest(test);
         }

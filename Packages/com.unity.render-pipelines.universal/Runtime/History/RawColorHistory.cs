@@ -13,11 +13,7 @@ namespace UnityEngine.Rendering.Universal
     public sealed class RawColorHistory : CameraHistoryItem
     {
         private int[] m_Ids = new int[2];
-        private static readonly string[] m_Names = new[]
-        {
-            "RawColorHistory0",
-            "RawColorHistory1"
-        };
+        private static readonly string[] m_Names = new[] { "RawColorHistory0", "RawColorHistory1" };
         private RenderTextureDescriptor m_Descriptor;
         private Hash128 m_DescKey;
 
@@ -73,7 +69,7 @@ namespace UnityEngine.Rendering.Universal
             // In generic case, the current texture might not have been written yet. We need double buffering.
             AllocHistoryFrameRT(m_Ids[0], 2, ref desc, m_Names[0]);
 
-            if(xrMultipassEnabled)
+            if (xrMultipassEnabled)
                 AllocHistoryFrameRT(m_Ids[1], 2, ref desc, m_Names[1]);
 
             m_Descriptor = desc;
@@ -85,7 +81,7 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public override void Reset()
         {
-            for(int i = 0; i < m_Ids.Length; i++)
+            for (int i = 0; i < m_Ids.Length; i++)
                 ReleaseHistoryFrameRT(m_Ids[i]);
         }
 

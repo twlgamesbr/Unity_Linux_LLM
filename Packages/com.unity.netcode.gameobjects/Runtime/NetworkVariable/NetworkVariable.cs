@@ -17,6 +17,7 @@ namespace Unity.Netcode
         /// <param name="previousValue">The value before the change</param>
         /// <param name="newValue">The new value</param>
         public delegate void OnValueChangedDelegate(T previousValue, T newValue);
+
         /// <summary>
         /// The callback to be invoked when the value gets changed
         /// </summary>
@@ -67,9 +68,11 @@ namespace Unity.Netcode
         /// <param name="value">initial value set that is of type T</param>
         /// <param name="readPerm">the <see cref="NetworkVariableReadPermission"/> for this <see cref="NetworkVariable{T}"/></param>
         /// <param name="writePerm">the <see cref="NetworkVariableWritePermission"/> for this <see cref="NetworkVariable{T}"/></param>
-        public NetworkVariable(T value = default,
+        public NetworkVariable(
+            T value = default,
             NetworkVariableReadPermission readPerm = DefaultReadPerm,
-            NetworkVariableWritePermission writePerm = DefaultWritePerm)
+            NetworkVariableWritePermission writePerm = DefaultWritePerm
+        )
             : base(readPerm, writePerm)
         {
             m_InternalValue = value;
@@ -193,7 +196,10 @@ namespace Unity.Netcode
             }
 
             // Compare the last internal value with the current value if not dirty or forcing a check.
-            if ((!isDirty || forceCheck) && !NetworkVariableSerialization<T>.AreEqual(ref m_LastInternalValue, ref m_InternalValue))
+            if (
+                (!isDirty || forceCheck)
+                && !NetworkVariableSerialization<T>.AreEqual(ref m_LastInternalValue, ref m_InternalValue)
+            )
             {
                 SetDirty(true);
                 OnValueChanged?.Invoke(m_LastInternalValue, m_InternalValue);
@@ -266,7 +272,11 @@ namespace Unity.Netcode
         {
             // If the client does not have write permissions but the internal value is determined to be locally modified and we are applying updates, then we should revert
             // to the original collection value prior to applying updates (primarily for collections).
-            if (!NetworkUpdaterCheck && CannotWrite() && !NetworkVariableSerialization<T>.AreEqual(ref m_InternalValue, ref m_LastInternalValue))
+            if (
+                !NetworkUpdaterCheck
+                && CannotWrite()
+                && !NetworkVariableSerialization<T>.AreEqual(ref m_InternalValue, ref m_LastInternalValue)
+            )
             {
                 NetworkVariableSerialization<T>.Duplicate(m_LastInternalValue, ref m_InternalValue);
                 return true;
@@ -328,7 +338,9 @@ namespace Unity.Netcode
         {
             // If the client does not have write permissions but the internal value is determined to be locally modified and we are applying updates, then we should revert
             // to the original collection value prior to applying updates (primarily for collections).
-            if (CannotWrite() && !NetworkVariableSerialization<T>.AreEqual(ref m_LastInternalValue, ref m_InternalValue))
+            if (
+                CannotWrite() && !NetworkVariableSerialization<T>.AreEqual(ref m_LastInternalValue, ref m_InternalValue)
+            )
             {
                 NetworkVariableSerialization<T>.Duplicate(m_LastInternalValue, ref m_InternalValue);
             }
@@ -370,7 +382,9 @@ namespace Unity.Netcode
         {
             // If the client does not have write permissions but the internal value is determined to be locally modified and we are applying updates, then we should revert
             // to the original collection value prior to applying updates (primarily for collections).
-            if (CannotWrite() && !NetworkVariableSerialization<T>.AreEqual(ref m_LastInternalValue, ref m_InternalValue))
+            if (
+                CannotWrite() && !NetworkVariableSerialization<T>.AreEqual(ref m_LastInternalValue, ref m_InternalValue)
+            )
             {
                 NetworkVariableSerialization<T>.Duplicate(m_LastInternalValue, ref m_InternalValue);
             }

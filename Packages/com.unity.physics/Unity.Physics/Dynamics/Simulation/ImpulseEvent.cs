@@ -35,6 +35,7 @@ namespace Unity.Physics
         /// <value> The joint entity. </value>
         public Entity JointEntity => EventData.JointEntity;
     }
+
     /// <summary>
     /// A stream of impulse events. This is a value type, which means it can be used in Burst jobs
     /// (unlike IEnumerable&lt;ImpulseEvent&gt;).
@@ -128,10 +129,7 @@ namespace Unity.Physics
 
         internal ImpulseEvent CreateImpulseEvent()
         {
-            return new ImpulseEvent
-            {
-                EventData = this
-            };
+            return new ImpulseEvent { EventData = this };
         }
     }
 

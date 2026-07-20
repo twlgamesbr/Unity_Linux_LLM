@@ -13,10 +13,14 @@ namespace Unity.Networking.Transport
     internal struct WebSocketLayer : INetworkLayer
     {
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
-        static void Warn(string msg) =>  UnityEngine.Debug.LogWarning(msg);
+        static void Warn(string msg) => UnityEngine.Debug.LogWarning(msg);
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
-        static void WarnIf(bool condition, string msg) { if (condition) UnityEngine.Debug.LogWarning(msg); }
+        static void WarnIf(bool condition, string msg)
+        {
+            if (condition)
+                UnityEngine.Debug.LogWarning(msg);
+        }
 
         // Maps a connection id from the connection list to its connection data.
         private ConnectionDataMap<ConnectionData> m_ConnectionMap;
@@ -66,7 +70,9 @@ namespace Unity.Networking.Transport
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!connectionList.IsCreated)
-                throw new InvalidOperationException($"{GetType().Name} requires an underlying connection list to track packets.");
+                throw new InvalidOperationException(
+                    $"{GetType().Name} requires an underlying connection list to track packets."
+                );
 #endif
 
             packetPadding += WebSocket.MaxHeaderSize;
@@ -78,7 +84,7 @@ namespace Unity.Networking.Transport
                 Path = settings.GetWebSocketParameters().Path,
                 ConnectTimeoutMS = Math.Max(0, networkConfigParameters.connectTimeoutMS),
                 DisconnectTimeoutMS = Math.Max(0, networkConfigParameters.disconnectTimeoutMS),
-                HeartbeatTimeoutMS = Math.Max(0, networkConfigParameters.heartbeatTimeoutMS)
+                HeartbeatTimeoutMS = Math.Max(0, networkConfigParameters.heartbeatTimeoutMS),
             };
 
             if (connectionList.IsCreated)
@@ -130,7 +136,10 @@ namespace Unity.Networking.Transport
                 {
                     var packetProcessor = SendQueue[i];
                     // Don't send empty packets or packets larger than we can receive on the other side.
-                    if (packetProcessor.Length == 0 || (ushort)packetProcessor.Length > (SendQueue.PayloadCapacity - WebSocket.MaxHeaderSize))
+                    if (
+                        packetProcessor.Length == 0
+                        || (ushort)packetProcessor.Length > (SendQueue.PayloadCapacity - WebSocket.MaxHeaderSize)
+                    )
                         continue;
 
                     var connectionId = packetProcessor.ConnectionRef;
@@ -141,8 +150,16 @@ namespace Unity.Networking.Transport
                     // while a CLOSE hasn't been sent.
                     var connectionData = ConnectionMap[connectionId];
                     packetProcessor.ConnectionRef = connectionData.UnderlyingConnectionId;
-                    if ((connectionState == NetworkConnection.State.Connected && connectionData.WebSocketState == WebSocket.State.Open)
-                        || (connectionState == NetworkConnection.State.Disconnecting && connectionData.WebSocketState != WebSocket.State.Closing))
+                    if (
+                        (
+                            connectionState == NetworkConnection.State.Connected
+                            && connectionData.WebSocketState == WebSocket.State.Open
+                        )
+                        || (
+                            connectionState == NetworkConnection.State.Disconnecting
+                            && connectionData.WebSocketState != WebSocket.State.Closing
+                        )
+                    )
                     {
                         if (!WebSocket.Binary(ref packetProcessor, connectionData.IsClient, Rand.NextUInt()))
                         {
@@ -160,7 +177,7 @@ namespace Unity.Networking.Transport
                 // because packets from the upper layer are guaranteed to be no greater than
                 // SendQueue.PayloadCapacity - WebSocket.MaxHeaderSize bytes.
                 count = ConnectionList.Count;
-                for (int i  = 0; i < count; i++)
+                for (int i = 0; i < count; i++)
                 {
                     var connectionId = ConnectionList.ConnectionAt(i);
                     var connectionState = ConnectionList.GetConnectionState(connectionId);
@@ -193,7 +210,11 @@ namespace Unity.Networking.Transport
 
                     // Move any data that remains pending to the beginning of the buffer for the next iteration
                     if (pending > 0)
-                        UnsafeUtility.MemMove(connectionData.SendBuffer.Data, connectionData.SendBuffer.Data + total - pending, pending);
+                        UnsafeUtility.MemMove(
+                            connectionData.SendBuffer.Data,
+                            connectionData.SendBuffer.Data + total - pending,
+                            pending
+                        );
 
                     connectionData.SendBuffer.Length = pending;
                     ConnectionMap[connectionId] = connectionData;
@@ -245,7 +266,10 @@ namespace Unity.Networking.Transport
                         // means we (or a layer above) initiated the disconnection and this will be
                         // handled elsewhere.
                         var state = ConnectionList.GetConnectionState(connectionId);
-                        if (state != NetworkConnection.State.Disconnecting && state != NetworkConnection.State.Disconnected)
+                        if (
+                            state != NetworkConnection.State.Disconnecting
+                            && state != NetworkConnection.State.Disconnected
+                        )
                         {
                             ConnectionList.StartDisconnecting(ref connectionId, disconnection.Reason);
                             ConnectionList.FinishDisconnecting(ref connectionId);
@@ -266,136 +290,170 @@ namespace Unity.Networking.Transport
                     switch (connectionState)
                     {
                         case NetworkConnection.State.Disconnecting:
-                        {
-                            var connectionData = ConnectionMap[connectionId];
-                            switch (connectionData.WebSocketState)
                             {
-                                case WebSocket.State.ClosedAndFlushed:
-                                    break;
-                                // If the WebSocket is closed, wait until the send buffer is flushed to the
-                                // underlying layer.
-                                case WebSocket.State.Closed:
-                                    if (connectionData.SendBuffer.Length == 0)
+                                var connectionData = ConnectionMap[connectionId];
+                                switch (connectionData.WebSocketState)
+                                {
+                                    case WebSocket.State.ClosedAndFlushed:
+                                        break;
+                                    // If the WebSocket is closed, wait until the send buffer is flushed to the
+                                    // underlying layer.
+                                    case WebSocket.State.Closed:
+                                        if (connectionData.SendBuffer.Length == 0)
+                                            connectionData.WebSocketState = WebSocket.State.ClosedAndFlushed;
+                                        break;
+                                    // If a WebSocket CLOSE has been sent, check for the close timeout waiting for a
+                                    // reply. A WebSocket CLOSE reply is expected in the receive queue and no other
+                                    // packet will be sent after the send buffer is flushed. If the remote peer does
+                                    // not close the connection within the time limit we can force it.
+                                    case WebSocket.State.Closing:
+                                        if (Time - connectionData.CloseTimeStamp > Settings.DisconnectTimeoutMS)
+                                        {
+                                            // Nothing in the send buffer is relevant anymore because a timeout is final.
+                                            connectionData.WebSocketState = WebSocket.State.ClosedAndFlushed;
+                                        }
+                                        break;
+                                    // If we were still in the middle of the handshake, the upper layer must want to
+                                    // abort the connection, so we can just force a disconnection.
+                                    case WebSocket.State.Opening:
+                                        // Nothing in the send buffer is relevant anymore because an abort is final.
                                         connectionData.WebSocketState = WebSocket.State.ClosedAndFlushed;
-                                    break;
-                                // If a WebSocket CLOSE has been sent, check for the close timeout waiting for a
-                                // reply. A WebSocket CLOSE reply is expected in the receive queue and no other
-                                // packet will be sent after the send buffer is flushed. If the remote peer does
-                                // not close the connection within the time limit we can force it.
-                                case WebSocket.State.Closing:
-                                    if (Time - connectionData.CloseTimeStamp > Settings.DisconnectTimeoutMS)
-                                    {
-                                        // Nothing in the send buffer is relevant anymore because a timeout is final.
-                                        connectionData.WebSocketState = WebSocket.State.ClosedAndFlushed;
-                                    }
-                                    break;
-                                // If we were still in the middle of the handshake, the upper layer must want to
-                                // abort the connection, so we can just force a disconnection.
-                                case WebSocket.State.Opening:
-                                    // Nothing in the send buffer is relevant anymore because an abort is final.
-                                    connectionData.WebSocketState = WebSocket.State.ClosedAndFlushed;
-                                    break;
-                                // If the upper layer is trying to disconnect normally, send a WebSocket Close and
-                                // wait for a CLOSE reply. If the send buffer is full and we cannot send a CLOSE
-                                // now ignore. In the next scheduled received we can try again and the send queue
-                                // will eventually free up for the send buffer to flush and make room for the close.
-                                // This is safe as no user data can be sent by this connection since it's not
-                                // NetworkConnection.State.Connected anymore.
-                                case WebSocket.State.Open:
-                                    if (WebSocket.Close(ref connectionData.SendBuffer, WebSocket.StatusCode.Normal, connectionData.IsClient, Rand.NextUInt()))
-                                    {
-                                        connectionData.WebSocketState = WebSocket.State.Closing;
-                                        connectionData.CloseTimeStamp = Time;
-                                    }
-                                    break;
-                            }
+                                        break;
+                                    // If the upper layer is trying to disconnect normally, send a WebSocket Close and
+                                    // wait for a CLOSE reply. If the send buffer is full and we cannot send a CLOSE
+                                    // now ignore. In the next scheduled received we can try again and the send queue
+                                    // will eventually free up for the send buffer to flush and make room for the close.
+                                    // This is safe as no user data can be sent by this connection since it's not
+                                    // NetworkConnection.State.Connected anymore.
+                                    case WebSocket.State.Open:
+                                        if (
+                                            WebSocket.Close(
+                                                ref connectionData.SendBuffer,
+                                                WebSocket.StatusCode.Normal,
+                                                connectionData.IsClient,
+                                                Rand.NextUInt()
+                                            )
+                                        )
+                                        {
+                                            connectionData.WebSocketState = WebSocket.State.Closing;
+                                            connectionData.CloseTimeStamp = Time;
+                                        }
+                                        break;
+                                }
 
-                            // If the WebSocket connection is closed-and-flushed we can close the underlying
-                            // connection and discard all the connection data. Note that this may take multiple
-                            // schedules as the layer below is not required to disconnect immediately.
-                            if (connectionData.WebSocketState == WebSocket.State.ClosedAndFlushed)
-                            {
-                                UnderlyingConnectionList.Disconnect(ref connectionData.UnderlyingConnectionId);
-                                ConnectionList.FinishDisconnecting(ref connectionId);
-                            }
+                                // If the WebSocket connection is closed-and-flushed we can close the underlying
+                                // connection and discard all the connection data. Note that this may take multiple
+                                // schedules as the layer below is not required to disconnect immediately.
+                                if (connectionData.WebSocketState == WebSocket.State.ClosedAndFlushed)
+                                {
+                                    UnderlyingConnectionList.Disconnect(ref connectionData.UnderlyingConnectionId);
+                                    ConnectionList.FinishDisconnecting(ref connectionId);
+                                }
 
-                            ConnectionMap[connectionId] = connectionData;
-                        }
-                        break;
+                                ConnectionMap[connectionId] = connectionData;
+                            }
+                            break;
                         case NetworkConnection.State.Connecting:
-                        {
-                            var connectionData = ConnectionMap[connectionId];
-
-                            switch (connectionData.WebSocketState)
                             {
-                                // If this is a brand new CLIENT connection from which we have to send an
-                                // HTTP UPGARDE try to complete an underlying connection and initialize the
-                                // connection data.
-                                case WebSocket.State.None:
+                                var connectionData = ConnectionMap[connectionId];
+
+                                switch (connectionData.WebSocketState)
                                 {
-                                    var remoteEndpoint = ConnectionList.GetConnectionEndpoint(connectionId);
-                                    if (!UnderlyingConnectionList.TryConnect(ref remoteEndpoint, ref connectionData.UnderlyingConnectionId))
-                                    {
-                                        ConnectionMap[connectionId] = connectionData;
-                                        if (connectionData.UnderlyingConnectionId.IsCreated)
-                                            UnderlyingConnectionMap[connectionData.UnderlyingConnectionId] = connectionId;
+                                    // If this is a brand new CLIENT connection from which we have to send an
+                                    // HTTP UPGARDE try to complete an underlying connection and initialize the
+                                    // connection data.
+                                    case WebSocket.State.None:
+                                        {
+                                            var remoteEndpoint = ConnectionList.GetConnectionEndpoint(connectionId);
+                                            if (
+                                                !UnderlyingConnectionList.TryConnect(
+                                                    ref remoteEndpoint,
+                                                    ref connectionData.UnderlyingConnectionId
+                                                )
+                                            )
+                                            {
+                                                ConnectionMap[connectionId] = connectionData;
+                                                if (connectionData.UnderlyingConnectionId.IsCreated)
+                                                    UnderlyingConnectionMap[connectionData.UnderlyingConnectionId] =
+                                                        connectionId;
 
-                                        continue;
-                                    }
+                                                continue;
+                                            }
 
-                                    connectionData.WebSocketState = WebSocket.State.Opening;
-                                    connectionData.Role = WebSocket.Role.Client;
-                                    connectionData.Keys.Key[0] = Rand.NextUInt();
-                                    connectionData.Keys.Key[1] = Rand.NextUInt();
-                                    connectionData.Keys.Key[2] = Rand.NextUInt();
-                                    connectionData.Keys.Key[3] = Rand.NextUInt();
-                                    connectionData.CreateTimeStamp = Time;
+                                            connectionData.WebSocketState = WebSocket.State.Opening;
+                                            connectionData.Role = WebSocket.Role.Client;
+                                            connectionData.Keys.Key[0] = Rand.NextUInt();
+                                            connectionData.Keys.Key[1] = Rand.NextUInt();
+                                            connectionData.Keys.Key[2] = Rand.NextUInt();
+                                            connectionData.Keys.Key[3] = Rand.NextUInt();
+                                            connectionData.CreateTimeStamp = Time;
 
-                                    WebSocket.Connect(ref connectionData.SendBuffer, ref remoteEndpoint, ref connectionData.Keys, ref Settings.Path);
+                                            WebSocket.Connect(
+                                                ref connectionData.SendBuffer,
+                                                ref remoteEndpoint,
+                                                ref connectionData.Keys,
+                                                ref Settings.Path
+                                            );
+                                        }
+                                        break;
+                                    // If this is a active (client) connection for which an HTTP UPGARDE has already
+                                    // been sent and we're waiting for an HTTP SWITCHING PROTOCOL; or this is a
+                                    // passive (server) connection from which we're waiting for a complete (and valid)
+                                    // HTTP UPGRADE, check the connection timeout.
+                                    case WebSocket.State.Opening:
+                                        if (Time - connectionData.CreateTimeStamp > Settings.ConnectTimeoutMS)
+                                        {
+                                            // Nothing in the send buffer is releavent anymore because a timeout is final.
+                                            ConnectionList.StartDisconnecting(
+                                                ref connectionId,
+                                                Error.DisconnectReason.MaxConnectionAttempts
+                                            );
+                                            connectionData.WebSocketState = WebSocket.State.ClosedAndFlushed;
+                                        }
+                                        break;
+                                    default:
+                                        Warn(
+                                            $"Invalid connection state: {connectionState}, {connectionData.WebSocketState}"
+                                        );
+                                        break;
                                 }
-                                break;
-                                // If this is a active (client) connection for which an HTTP UPGARDE has already
-                                // been sent and we're waiting for an HTTP SWITCHING PROTOCOL; or this is a
-                                // passive (server) connection from which we're waiting for a complete (and valid)
-                                // HTTP UPGRADE, check the connection timeout.
-                                case WebSocket.State.Opening:
-                                    if (Time - connectionData.CreateTimeStamp >  Settings.ConnectTimeoutMS)
-                                    {
-                                        // Nothing in the send buffer is releavent anymore because a timeout is final.
-                                        ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.MaxConnectionAttempts);
-                                        connectionData.WebSocketState = WebSocket.State.ClosedAndFlushed;
-                                    }
-                                    break;
-                                default:
-                                    Warn($"Invalid connection state: {connectionState}, {connectionData.WebSocketState}");
-                                    break;
+                                ConnectionMap[connectionId] = connectionData;
                             }
-                            ConnectionMap[connectionId] = connectionData;
-                        }
-                        break;
+                            break;
                         case NetworkConnection.State.Connected:
-                        {
-                            var connectionData = ConnectionMap[connectionId];
-                            if (connectionData.WebSocketState == WebSocket.State.Open)
                             {
-                                if (Settings.HeartbeatTimeoutMS > 0 && !connectionData.IsWaitingForPong &&
-                                    Time - connectionData.ReceiveTimeStamp > Settings.HeartbeatTimeoutMS)
+                                var connectionData = ConnectionMap[connectionId];
+                                if (connectionData.WebSocketState == WebSocket.State.Open)
                                 {
-                                    // If there is not enough space in the send buffer we can try again in the
-                                    // next schedule, this is not a critial error.
-                                    if (WebSocket.Ping(ref connectionData.SendBuffer, connectionData.IsClient, Rand.NextUInt()))
+                                    if (
+                                        Settings.HeartbeatTimeoutMS > 0
+                                        && !connectionData.IsWaitingForPong
+                                        && Time - connectionData.ReceiveTimeStamp > Settings.HeartbeatTimeoutMS
+                                    )
                                     {
-                                        connectionData.IsWaitingForPong = true;
+                                        // If there is not enough space in the send buffer we can try again in the
+                                        // next schedule, this is not a critial error.
+                                        if (
+                                            WebSocket.Ping(
+                                                ref connectionData.SendBuffer,
+                                                connectionData.IsClient,
+                                                Rand.NextUInt()
+                                            )
+                                        )
+                                        {
+                                            connectionData.IsWaitingForPong = true;
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    Warn(
+                                        $"Invalid connection state: {connectionState}, {connectionData.WebSocketState}"
+                                    );
+                                }
+                                ConnectionMap[connectionId] = connectionData;
                             }
-                            else
-                            {
-                                Warn($"Invalid connection state: {connectionState}, {connectionData.WebSocketState}");
-                            }
-                            ConnectionMap[connectionId] = connectionData;
-                        }
-                        break;
+                            break;
                         case NetworkConnection.State.Disconnected:
                             // Do nothing. This is not a default fallback clause so the compiler can generate a warning
                             // if someone one day defines a new connection state and forgets to handle it here.
@@ -439,7 +497,7 @@ namespace Unity.Networking.Transport
                             // WebSocket.Keys to be initialized.
                             WebSocketState = WebSocket.State.Opening,
                             Role = WebSocket.Role.Server,
-                            CreateTimeStamp = Time
+                            CreateTimeStamp = Time,
                         };
 
                         UnderlyingConnectionMap[underlyingConnectionId] = connectionId;
@@ -451,14 +509,19 @@ namespace Unity.Networking.Transport
                     if (connectionState != NetworkConnection.State.Disconnected)
                     {
                         var connectionData = ConnectionMap[connectionId];
-                        if (connectionData.WebSocketState != WebSocket.State.Closed
-                            && connectionData.WebSocketState != WebSocket.State.ClosedAndFlushed)
+                        if (
+                            connectionData.WebSocketState != WebSocket.State.Closed
+                            && connectionData.WebSocketState != WebSocket.State.ClosedAndFlushed
+                        )
                         {
                             var available = connectionData.RecvBuffer.Available;
                             if (packetProcessor.Length <= available)
                             {
                                 // Copy packet data into the receive buffer.
-                                packetProcessor.CopyPayload(connectionData.RecvBuffer.Data + connectionData.RecvBuffer.Length, packetProcessor.Length);
+                                packetProcessor.CopyPayload(
+                                    connectionData.RecvBuffer.Data + connectionData.RecvBuffer.Length,
+                                    packetProcessor.Length
+                                );
                                 connectionData.RecvBuffer.Length += packetProcessor.Length;
 
                                 // If handshake is incomplete, try to complete.
@@ -468,12 +531,20 @@ namespace Unity.Networking.Transport
                                     // WebSocket.State.Open (complete) or WebSocket.State.Closed (error).
                                     // If an error occurs, an error message may get written into the send buffer to
                                     // be transmitted by the next send job scheduled.
-                                    connectionData.WebSocketState = WebSocket.Handshake(ref connectionData.RecvBuffer,
-                                        ref connectionData.SendBuffer, connectionData.IsClient, ref connectionData.Keys, ref Settings.Path);
+                                    connectionData.WebSocketState = WebSocket.Handshake(
+                                        ref connectionData.RecvBuffer,
+                                        ref connectionData.SendBuffer,
+                                        connectionData.IsClient,
+                                        ref connectionData.Keys,
+                                        ref Settings.Path
+                                    );
 
                                     if (connectionData.WebSocketState == WebSocket.State.Closed)
                                     {
-                                        ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.ProtocolError);
+                                        ConnectionList.StartDisconnecting(
+                                            ref connectionId,
+                                            Error.DisconnectReason.ProtocolError
+                                        );
                                     }
                                     else if (connectionData.WebSocketState == WebSocket.State.Open)
                                     {
@@ -490,7 +561,10 @@ namespace Unity.Networking.Transport
                                 // because the data was already in flight or because the remote peer wants to
                                 // complete its transmission. We are not required to reply to PINGs after a CLOSE is
                                 // received but we are [required] while waiting for a CLOSE reply.
-                                if (connectionData.WebSocketState == WebSocket.State.Open || connectionData.WebSocketState == WebSocket.State.Closing)
+                                if (
+                                    connectionData.WebSocketState == WebSocket.State.Open
+                                    || connectionData.WebSocketState == WebSocket.State.Closing
+                                )
                                     ProcessWebSocketFrames(ref connectionId, ref connectionData);
                             }
                             else
@@ -501,7 +575,10 @@ namespace Unity.Networking.Transport
                                 // can do is abort and tell the user what they can do to avoid this
                                 // problem in the future.
                                 Warn("Insufficient space in receive queue, consider increasing receiveQueueCapacity.");
-                                ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.ProtocolError);
+                                ConnectionList.StartDisconnecting(
+                                    ref connectionId,
+                                    Error.DisconnectReason.ProtocolError
+                                );
                                 connectionData.WebSocketState = WebSocket.State.Closed;
                             }
                         }
@@ -526,7 +603,7 @@ namespace Unity.Networking.Transport
                 var maxPayloadSize = ReceiveQueue.PayloadCapacity - WebSocket.MaxHeaderSize;
 
                 var pending = total;
-                fixed(byte* start = connectionData.RecvBuffer.Data)
+                fixed (byte* start = connectionData.RecvBuffer.Data)
                 {
                     byte* end = start + total;
                     byte* data = start;
@@ -564,7 +641,10 @@ namespace Unity.Networking.Transport
                         // either.
                         var invalidHeaderBits = (data[0] & 0x70) != 0;
                         var invalidMasking = masked == isClient;
-                        var invalidFragmentation = isFragment && opcode != (int)WebSocket.Opcode.Continuation && opcode != (int)WebSocket.Opcode.BinaryData;
+                        var invalidFragmentation =
+                            isFragment
+                            && opcode != (int)WebSocket.Opcode.Continuation
+                            && opcode != (int)WebSocket.Opcode.BinaryData;
 
                         if (invalidHeaderBits || invalidMasking || invalidFragmentation)
                         {
@@ -580,10 +660,15 @@ namespace Unity.Networking.Transport
                         var wsPayloadSize = 0UL;
                         if (payloadByte == 127)
                         {
-                            wsPayloadSize = ((ulong)data[6] << 56) + ((ulong)data[7] << 48) +
-                                ((ulong)data[6] << 40) + ((ulong)data[7] << 32) +
-                                ((ulong)data[6] << 24) + ((ulong)data[7] << 16) +
-                                ((ulong)data[8] << 8)  +  (ulong)data[9];
+                            wsPayloadSize =
+                                ((ulong)data[6] << 56)
+                                + ((ulong)data[7] << 48)
+                                + ((ulong)data[6] << 40)
+                                + ((ulong)data[7] << 32)
+                                + ((ulong)data[6] << 24)
+                                + ((ulong)data[7] << 16)
+                                + ((ulong)data[8] << 8)
+                                + (ulong)data[9];
                         }
                         else if (payloadByte == 126)
                         {
@@ -597,7 +682,9 @@ namespace Unity.Networking.Transport
                         // We don't support payloads larger than maxPayloadSize.
                         if (wsPayloadSize > (ulong)maxPayloadSize)
                         {
-                            Warn($"Received a message with a payload size of {wsPayloadSize} which exceeds maximum of {maxPayloadSize} supported");
+                            Warn(
+                                $"Received a message with a payload size of {wsPayloadSize} which exceeds maximum of {maxPayloadSize} supported"
+                            );
                             Abort(ref connectionId, ref connectionData, WebSocket.StatusCode.MessageTooBig, isClient);
                             return;
                         }
@@ -634,9 +721,14 @@ namespace Unity.Networking.Transport
                             if (invalidFragment || invalidTotalSize)
                             {
                                 WarnIf(invalidFragment, "Received a continuation that doesn't belong to a message");
-                                WarnIf(invalidTotalSize, $"Total message size is larger than maximum of {maxPayloadSize} supported");
+                                WarnIf(
+                                    invalidTotalSize,
+                                    $"Total message size is larger than maximum of {maxPayloadSize} supported"
+                                );
 
-                                var status = invalidFragment ? WebSocket.StatusCode.ProtocolError : WebSocket.StatusCode.MessageTooBig;
+                                var status = invalidFragment
+                                    ? WebSocket.StatusCode.ProtocolError
+                                    : WebSocket.StatusCode.MessageTooBig;
                                 Abort(ref connectionId, ref connectionData, status, isClient);
                                 return;
                             }
@@ -645,9 +737,13 @@ namespace Unity.Networking.Transport
                             // empty fragments (no payload).
                             if (payloadSize > 0)
                             {
-                                fixed(byte* recvPayload = connectionData.RecvPayload.Data)
+                                fixed (byte* recvPayload = connectionData.RecvPayload.Data)
                                 {
-                                    UnsafeUtility.MemCpy(recvPayload + connectionData.RecvPayload.Length, data, payloadSize);
+                                    UnsafeUtility.MemCpy(
+                                        recvPayload + connectionData.RecvPayload.Length,
+                                        data,
+                                        payloadSize
+                                    );
                                     connectionData.RecvPayload.Length += payloadSize;
 
                                     // If this is the last fragment we can push the message
@@ -660,7 +756,9 @@ namespace Unity.Networking.Transport
                                         }
 
                                         packetProcessor.ConnectionRef = connectionId;
-                                        packetProcessor.EndpointRef = ConnectionList.GetConnectionEndpoint(connectionId);
+                                        packetProcessor.EndpointRef = ConnectionList.GetConnectionEndpoint(
+                                            connectionId
+                                        );
                                         packetProcessor.AppendToPayload(recvPayload, connectionData.RecvPayload.Length);
 
                                         connectionData.RecvPayload.Length = 0;
@@ -671,7 +769,12 @@ namespace Unity.Networking.Transport
                         }
                         else if (opcode == (int)WebSocket.Opcode.TextData)
                         {
-                            Abort(ref connectionId, ref connectionData, WebSocket.StatusCode.UnsupportedDataType, isClient);
+                            Abort(
+                                ref connectionId,
+                                ref connectionData,
+                                WebSocket.StatusCode.UnsupportedDataType,
+                                isClient
+                            );
                             return;
                         }
                         else if (opcode == (int)WebSocket.Opcode.BinaryData)
@@ -683,9 +786,13 @@ namespace Unity.Networking.Transport
                                 // If this is a fragment store in the RecvPayload
                                 if (isFragment)
                                 {
-                                    fixed(byte* payload = connectionData.RecvPayload.Data)
+                                    fixed (byte* payload = connectionData.RecvPayload.Data)
                                     {
-                                        UnsafeUtility.MemCpy(payload + connectionData.RecvPayload.Length, data, payloadSize);
+                                        UnsafeUtility.MemCpy(
+                                            payload + connectionData.RecvPayload.Length,
+                                            data,
+                                            payloadSize
+                                        );
                                         connectionData.RecvPayload.Length = payloadSize;
                                         connectionData.IsReceivingPayload = true;
                                     }
@@ -697,7 +804,12 @@ namespace Unity.Networking.Transport
                                     // from a previous message.
                                     if (connectionData.IsReceivingPayload)
                                     {
-                                        Abort(ref connectionId, ref connectionData, WebSocket.StatusCode.ProtocolError, isClient);
+                                        Abort(
+                                            ref connectionId,
+                                            ref connectionData,
+                                            WebSocket.StatusCode.ProtocolError,
+                                            isClient
+                                        );
                                         return;
                                     }
 
@@ -728,7 +840,10 @@ namespace Unity.Networking.Transport
                             {
                                 // Spec recommends echoing the status code of the CLOSE received which comes encoded
                                 // in big endian.
-                                var status = payloadSize > 1 ? (WebSocket.StatusCode)((data[0] << 8) + data[1]) : WebSocket.StatusCode.Normal;
+                                var status =
+                                    payloadSize > 1
+                                        ? (WebSocket.StatusCode)((data[0] << 8) + data[1])
+                                        : WebSocket.StatusCode.Normal;
                                 Abort(ref connectionId, ref connectionData, status, isClient);
                             }
                             return;
@@ -738,10 +853,23 @@ namespace Unity.Networking.Transport
                             // There is no point in sending anything else even PONGs after we have sent a CLOSE request.
                             if (connectionData.WebSocketState != WebSocket.State.Closing)
                             {
-                                if (!WebSocket.Pong(ref connectionData.SendBuffer, data, payloadSize, isClient, Rand.NextUInt()))
+                                if (
+                                    !WebSocket.Pong(
+                                        ref connectionData.SendBuffer,
+                                        data,
+                                        payloadSize,
+                                        isClient,
+                                        Rand.NextUInt()
+                                    )
+                                )
                                 {
                                     Warn("Insufficient send buffer.");
-                                    Abort(ref connectionId, ref connectionData, WebSocket.StatusCode.InternalError, isClient);
+                                    Abort(
+                                        ref connectionId,
+                                        ref connectionData,
+                                        WebSocket.StatusCode.InternalError,
+                                        isClient
+                                    );
                                     return;
                                 }
                             }
@@ -772,7 +900,12 @@ namespace Unity.Networking.Transport
                 connectionData.RecvBuffer.Length = pending;
             }
 
-            void Abort(ref ConnectionId connectionId, ref ConnectionData connectionData, WebSocket.StatusCode status, bool isClient)
+            void Abort(
+                ref ConnectionId connectionId,
+                ref ConnectionData connectionData,
+                WebSocket.StatusCode status,
+                bool isClient
+            )
             {
                 if (connectionData.WebSocketState != WebSocket.State.Closing)
                 {

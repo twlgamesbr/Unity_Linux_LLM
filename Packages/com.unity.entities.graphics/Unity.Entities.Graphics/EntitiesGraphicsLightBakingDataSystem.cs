@@ -33,9 +33,7 @@ namespace Unity.Rendering
         /// </summary>
         protected override void OnCreate()
         {
-            m_LightBakingQuery = SystemAPI.QueryBuilder()
-                .WithAll<LightBakingOutputData, Light>()
-                .Build();
+            m_LightBakingQuery = SystemAPI.QueryBuilder().WithAll<LightBakingOutputData, Light>().Build();
             m_LightBakingQuery.SetChangedVersionFilter(ComponentType.ReadOnly<Light>());
         }
 

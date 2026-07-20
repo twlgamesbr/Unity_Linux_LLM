@@ -17,10 +17,15 @@ namespace UnityEditor.Rendering.Analytics
         public enum SessionType
         {
             Local = 0,
-            Remote = 1
+            Remote = 1,
         }
 
-        [AnalyticInfo(eventName: k_EventName, vendorKey: k_VendorKey, maxEventsPerHour: k_MaxEventsPerHour, maxNumberOfElements: k_MaxNumberOfElements)]
+        [AnalyticInfo(
+            eventName: k_EventName,
+            vendorKey: k_VendorKey,
+            maxEventsPerHour: k_MaxEventsPerHour,
+            maxNumberOfElements: k_MaxNumberOfElements
+        )]
         class Analytic : IAnalytic
         {
             public Analytic(SessionType sessionType, DebugMessageHandler.AnalyticsPayload payload)

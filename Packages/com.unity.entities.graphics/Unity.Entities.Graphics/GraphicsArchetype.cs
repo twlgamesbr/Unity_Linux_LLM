@@ -9,14 +9,19 @@ using UnityEngine.Rendering;
 namespace Unity.Rendering
 {
     // Describes a single type in a GraphicsArchetype that overrides a material property
-    internal struct ArchetypePropertyOverride : IEquatable<ArchetypePropertyOverride>, IComparable<ArchetypePropertyOverride>
+    internal struct ArchetypePropertyOverride
+        : IEquatable<ArchetypePropertyOverride>,
+            IComparable<ArchetypePropertyOverride>
     {
         // NameID of the shader material property being overridden, also used as the sorting key
         public int NameID;
+
         // IComponentData (or ISharedComponentData) TypeIndex of the overriding component
         public int TypeIndex;
+
         // Byte size of the ECS data in the chunks
         public short SizeBytesCPU;
+
         // Byte size of the GPU data, can differ from SizeBytesCPU e.g. for transform matrices
         public short SizeBytesGPU;
 
@@ -37,7 +42,10 @@ namespace Unity.Rendering
     }
 
     // Precomputed collection of the subset of types in an EntityArchetype that are used by Entities Graphics package
-    internal unsafe struct GraphicsArchetype : IDisposable, IEquatable<GraphicsArchetype>, IComparable<GraphicsArchetype>
+    internal unsafe struct GraphicsArchetype
+        : IDisposable,
+            IEquatable<GraphicsArchetype>,
+            IComparable<GraphicsArchetype>
     {
         // All IComponentData overrides, which allocate memory per entity.
         // Sorted in NameID order.
@@ -48,10 +56,7 @@ namespace Unity.Rendering
             var overrides = new UnsafeList<ArchetypePropertyOverride>(PropertyComponents.Length, allocator);
             overrides.AddRangeNoResize(PropertyComponents);
 
-            return new GraphicsArchetype
-            {
-                PropertyComponents = overrides,
-            };
+            return new GraphicsArchetype { PropertyComponents = overrides };
         }
 
         public int MaxEntitiesPerBatch
@@ -92,14 +97,19 @@ namespace Unity.Rendering
             return UnsafeUtility.MemCmp(
                 PropertyComponents.Ptr,
                 other.PropertyComponents.Ptr,
-                numA * UnsafeUtility.SizeOf<ArchetypePropertyOverride>());
+                numA * UnsafeUtility.SizeOf<ArchetypePropertyOverride>()
+            );
         }
 
         public override int GetHashCode()
         {
-            return (int)xxHash3.Hash64(
-                PropertyComponents.Ptr,
-                PropertyComponents.Length * UnsafeUtility.SizeOf<ArchetypePropertyOverride>()).x;
+            return (int)
+                xxHash3
+                    .Hash64(
+                        PropertyComponents.Ptr,
+                        PropertyComponents.Length * UnsafeUtility.SizeOf<ArchetypePropertyOverride>()
+                    )
+                    .x;
         }
 
         public void Dispose()
@@ -126,8 +136,10 @@ namespace Unity.Rendering
         public EntitiesGraphicsArchetypes(int capacity)
         {
             m_GraphicsArchetypes = new NativeParallelHashMap<EntityArchetype, int>(capacity, Allocator.Persistent);
-            m_GraphicsArchetypeDeduplication =
-                new NativeParallelHashMap<GraphicsArchetype, int>(capacity, Allocator.Persistent);
+            m_GraphicsArchetypeDeduplication = new NativeParallelHashMap<GraphicsArchetype, int>(
+                capacity,
+                Allocator.Persistent
+            );
             m_GraphicsArchetypeList = new NativeList<GraphicsArchetype>(capacity, Allocator.Persistent);
         }
 
@@ -145,7 +157,9 @@ namespace Unity.Rendering
 
         public int GetGraphicsArchetypeIndex(
             EntityArchetype archetype,
-            NativeParallelHashMap<int, MaterialPropertyType> typeIndexToMaterialProperty, ref MaterialPropertyType failureProperty)
+            NativeParallelHashMap<int, MaterialPropertyType> typeIndexToMaterialProperty,
+            ref MaterialPropertyType failureProperty
+        )
         {
             int archetypeIndex;
             if (m_GraphicsArchetypes.TryGetValue(archetype, out archetypeIndex))
@@ -161,13 +175,15 @@ namespace Unity.Rendering
                     if (type.TypeIndex != property.TypeIndex)
                         return false;
 
-                    overrides.Add(new ArchetypePropertyOverride
-                    {
-                        NameID = property.NameID,
-                        TypeIndex = property.TypeIndex,
-                        SizeBytesCPU = property.SizeBytesCPU,
-                        SizeBytesGPU = property.SizeBytesGPU,
-                    });
+                    overrides.Add(
+                        new ArchetypePropertyOverride
+                        {
+                            NameID = property.NameID,
+                            TypeIndex = property.TypeIndex,
+                            SizeBytesCPU = property.SizeBytesCPU,
+                            SizeBytesGPU = property.SizeBytesGPU,
+                        }
+                    );
                 }
 
                 return true;
@@ -189,10 +205,7 @@ namespace Unity.Rendering
 
             overrides.Sort();
 
-            GraphicsArchetype graphicsArchetype = new GraphicsArchetype
-            {
-                PropertyComponents = overrides,
-            };
+            GraphicsArchetype graphicsArchetype = new GraphicsArchetype { PropertyComponents = overrides };
 
             // If the same archetype has already been created, make sure to use the same index
             if (m_GraphicsArchetypeDeduplication.TryGetValue(graphicsArchetype, out archetypeIndex))
@@ -213,5 +226,4 @@ namespace Unity.Rendering
             }
         }
     }
-
 }

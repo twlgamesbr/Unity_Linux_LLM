@@ -49,7 +49,10 @@ namespace UnityEngine.Rendering
         /// <param name="parentRPAsset">The Render Pipeline Asset that will contain these options as sub-assets.</param>
         /// <param name="optionsListProp">The SerializedProperty representing the list/array of UpscalerOptions.</param>
         /// <returns>True if the property was modified (cleaned up or populated), false otherwise.</returns>
-        public static bool ValidateSerializedUpscalerOptionReferencesWithinRPAsset(ScriptableObject parentRPAsset, SerializedProperty optionsListProp)
+        public static bool ValidateSerializedUpscalerOptionReferencesWithinRPAsset(
+            ScriptableObject parentRPAsset,
+            SerializedProperty optionsListProp
+        )
         {
             if (parentRPAsset == null)
             {
@@ -58,7 +61,9 @@ namespace UnityEngine.Rendering
             }
             if (optionsListProp == null || !optionsListProp.isArray)
             {
-                Debug.LogError($"[Auto-Populate] Provided SerializedProperty '{optionsListProp?.name ?? "null"}' is not a valid list for upscaler options.");
+                Debug.LogError(
+                    $"[Auto-Populate] Provided SerializedProperty '{optionsListProp?.name ?? "null"}' is not a valid list for upscaler options."
+                );
                 return false;
             }
 
@@ -97,7 +102,9 @@ namespace UnityEngine.Rendering
                 {
                     optionsListProp.DeleteArrayElementAtIndex(i);
                     propertyModified = true;
-                    Debug.LogWarning($"[RP Asset] Removed duplicate active reference of type {objType.Name} from list in '{parentRPAsset.name}'.");
+                    Debug.LogWarning(
+                        $"[RP Asset] Removed duplicate active reference of type {objType.Name} from list in '{parentRPAsset.name}'."
+                    );
                     // We do NOT add to validReferencedObjects, so it will be caught in Pass 2 and destroyed.
                 }
                 else
@@ -132,7 +139,9 @@ namespace UnityEngine.Rendering
 
             if (assetsToDestroy.Count > 0)
             {
-                Debug.Log($"[RP Asset] Found {assetsToDestroy.Count} orphaned/duplicate sub-assets in '{parentRPAsset.name}'. Cleaning up...");
+                Debug.Log(
+                    $"[RP Asset] Found {assetsToDestroy.Count} orphaned/duplicate sub-assets in '{parentRPAsset.name}'. Cleaning up..."
+                );
 
                 foreach (Object orphan in assetsToDestroy)
                 {
@@ -174,10 +183,13 @@ namespace UnityEngine.Rendering
 
                     // Add the reference to the list
                     optionsListProp.arraySize++;
-                    optionsListProp.GetArrayElementAtIndex(optionsListProp.arraySize - 1).objectReferenceValue = newOption;
+                    optionsListProp.GetArrayElementAtIndex(optionsListProp.arraySize - 1).objectReferenceValue =
+                        newOption;
 
                     propertyModified = true;
-                    Debug.Log($"[RP Asset] Created missing upscaler option on asset '{parentRPAsset.name}': {optionsType.Name} for ID: {upscalerName}");
+                    Debug.Log(
+                        $"[RP Asset] Created missing upscaler option on asset '{parentRPAsset.name}': {optionsType.Name} for ID: {upscalerName}"
+                    );
                 }
             }
 

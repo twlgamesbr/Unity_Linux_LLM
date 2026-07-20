@@ -104,7 +104,12 @@ namespace Unity.Web.Stripping.Editor
         {
             get
             {
-                return Path.Combine(EmscriptenSdkPath, "binaryen", "bin", $"wasm-opt{CommandLineUtils.HostPlatformExe}");
+                return Path.Combine(
+                    EmscriptenSdkPath,
+                    "binaryen",
+                    "bin",
+                    $"wasm-opt{CommandLineUtils.HostPlatformExe}"
+                );
             }
         }
 
@@ -138,18 +143,18 @@ namespace Unity.Web.Stripping.Editor
                 if (Development)
                     return $" -O1{SkipDuplicateFunctionEliminationArg}";
 
-                switch(CodeOptimization?.ToLowerInvariant() ?? "")
+                switch (CodeOptimization?.ToLowerInvariant() ?? "")
                 {
-                case "buildtimes":
-                    return $" -O2{SkipDuplicateFunctionEliminationArg}";
-                case "runtimespeed":
-                case "runtimespeedlto":
-                    return $" -O3{SkipDuplicateFunctionEliminationArg}";
-                case "disksize":
-                case "disksizelto":
-                    return $" -Os{SkipDuplicateFunctionEliminationArg}";
-                default:
-                    return "";
+                    case "buildtimes":
+                        return $" -O2{SkipDuplicateFunctionEliminationArg}";
+                    case "runtimespeed":
+                    case "runtimespeedlto":
+                        return $" -O3{SkipDuplicateFunctionEliminationArg}";
+                    case "disksize":
+                    case "disksizelto":
+                        return $" -Os{SkipDuplicateFunctionEliminationArg}";
+                    default:
+                        return "";
                 }
             }
         }
@@ -186,7 +191,6 @@ namespace Unity.Web.Stripping.Editor
                 out stderror,
                 options
             );
-
 
             // Workaound: wasm-opt logs to stderror instead of stdout
             return ParseRemoveFunctionOutput(stderror);
@@ -291,13 +295,13 @@ namespace Unity.Web.Stripping.Editor
                 // The function map file uses a format where function index and name are separated by ':'
                 // and there is one function per line
                 var lines = File.ReadLines(tmpFile);
-                foreach(var line in lines)
+                foreach (var line in lines)
                 {
                     var components = line.Split(':');
                     if (components.Length != 2)
                         continue;
 
-                    long functionIndex  = -1L;
+                    long functionIndex = -1L;
                     if (!long.TryParse(components[0], out functionIndex))
                         continue;
 

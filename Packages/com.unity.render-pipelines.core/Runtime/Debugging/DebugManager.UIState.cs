@@ -9,7 +9,6 @@ using System;
 
 namespace UnityEngine.Rendering
 {
-
     public sealed partial class DebugManager
     {
         /// <summary>
@@ -21,10 +20,11 @@ namespace UnityEngine.Rendering
             /// Editor Window
             /// </summary>
             EditorMode,
+
             /// <summary>
             /// In Game view
             /// </summary>
-            RuntimeMode
+            RuntimeMode,
         }
 
         /// <summary>
@@ -96,7 +96,10 @@ namespace UnityEngine.Rendering
             {
                 if (value)
                 {
-                    if (m_RuntimeDebugWindow == null && GraphicsSettings.TryGetRenderPipelineSettings<RenderingDebuggerRuntimeResources>(out _))
+                    if (
+                        m_RuntimeDebugWindow == null
+                        && GraphicsSettings.TryGetRenderPipelineSettings<RenderingDebuggerRuntimeResources>(out _)
+                    )
                     {
                         var go = new GameObject("[Debug UI]");
                         m_RuntimeDebugWindow = go.AddComponent<RuntimeDebugWindow>();
@@ -120,7 +123,8 @@ namespace UnityEngine.Rendering
 
                 onDisplayRuntimeUIChanged(value);
 
-                m_RuntimeUIState.open = m_RuntimeDebugWindow != null && m_RuntimeDebugWindow.gameObject.activeInHierarchy;
+                m_RuntimeUIState.open =
+                    m_RuntimeDebugWindow != null && m_RuntimeDebugWindow.gameObject.activeInHierarchy;
             }
 #else
             get => false;
@@ -143,7 +147,10 @@ namespace UnityEngine.Rendering
             {
                 if (value)
                 {
-                    if (m_RuntimePersistentDebugUI == null && GraphicsSettings.TryGetRenderPipelineSettings<RenderingDebuggerRuntimeResources>(out _))
+                    if (
+                        m_RuntimePersistentDebugUI == null
+                        && GraphicsSettings.TryGetRenderPipelineSettings<RenderingDebuggerRuntimeResources>(out _)
+                    )
                     {
                         var go = new GameObject("[Persistent Debug UI]");
                         m_RuntimePersistentDebugUI = go.AddComponent<RuntimePersistentDebugUI>();
@@ -167,4 +174,3 @@ namespace UnityEngine.Rendering
         }
     }
 }
-

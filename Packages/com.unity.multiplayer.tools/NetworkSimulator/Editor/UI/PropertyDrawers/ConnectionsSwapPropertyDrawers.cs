@@ -17,9 +17,16 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI.PropertyDrawers
             EditorGUI.BeginProperty(position, label, property);
             EditorGUI.BeginChangeCheck();
 
-            var changeInterval = property.FindPropertyRelative(nameof(RandomConnectionsSwap.ChangeIntervalMilliseconds));
+            var changeInterval = property.FindPropertyRelative(
+                nameof(RandomConnectionsSwap.ChangeIntervalMilliseconds)
+            );
             position.height = EditorGUIUtility.singleLineHeight;
-            EditorGUI.PropertyField(position, changeInterval, new(ObjectNames.NicifyVariableName(nameof(RandomConnectionsSwap.ChangeIntervalMilliseconds))), true);
+            EditorGUI.PropertyField(
+                position,
+                changeInterval,
+                new(ObjectNames.NicifyVariableName(nameof(RandomConnectionsSwap.ChangeIntervalMilliseconds))),
+                true
+            );
 
             var connections = property.FindPropertyRelative($"m_{nameof(RandomConnectionsSwap.Configurations)}");
             EditorGUILayout.PropertyField(connections, true);
@@ -43,17 +50,24 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Editor.UI.PropertyDrawers
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            s_Presets ??= NetworkSimulatorPresets.Values
-                .Select(preset => preset.Name)
+            s_Presets ??= NetworkSimulatorPresets
+                .Values.Select(preset => preset.Name)
                 .Concat(new[] { "Custom" })
                 .ToArray();
 
-            var connectionType = property.FindPropertyRelative(nameof(RandomConnectionsSwap.Configuration.m_ClassPreset));
-            var customPresetProperty = property.FindPropertyRelative(nameof(RandomConnectionsSwap.Configuration.m_ScriptableObjectPreset));
+            var connectionType = property.FindPropertyRelative(
+                nameof(RandomConnectionsSwap.Configuration.m_ClassPreset)
+            );
+            var customPresetProperty = property.FindPropertyRelative(
+                nameof(RandomConnectionsSwap.Configuration.m_ScriptableObjectPreset)
+            );
             var customPresetIndex = s_Presets.Length - 1;
             var dropdownIndex = customPresetIndex;
 
-            if (connectionType.managedReferenceValue is NetworkSimulatorPreset classPreset && !string.IsNullOrWhiteSpace(classPreset.Name))
+            if (
+                connectionType.managedReferenceValue is NetworkSimulatorPreset classPreset
+                && !string.IsNullOrWhiteSpace(classPreset.Name)
+            )
             {
                 dropdownIndex = Array.IndexOf(s_Presets, classPreset.Name);
             }

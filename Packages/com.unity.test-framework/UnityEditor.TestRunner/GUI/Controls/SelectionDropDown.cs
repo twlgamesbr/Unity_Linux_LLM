@@ -118,7 +118,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
         {
             return m_ContentProvider.Count * Styles.LineHeight
                 + m_ContentProvider.SeparatorIndices.Length * Styles.SeparatorHeight
-                + Styles.TopMargin + Styles.BottomMargin;
+                + Styles.TopMargin
+                + Styles.BottomMargin;
         }
 
         private float DrawSeparator(int i, Rect itemRect)

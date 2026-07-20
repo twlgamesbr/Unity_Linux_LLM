@@ -11,10 +11,15 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.Analytics
         public string presetName;
         public bool isPartOfScenario;
     }
-    
+
     // Schema: com.unity3d.data.schemas.editor.analytics.multiplayerToolsNetworkSimulatorConnectionPresetChanged_v1
     // Taxonomy: editor.analytics.mpToolsNetSimConnectionPresetChanged.v1
-    [AnalyticInfo(eventName: "mpToolsNetSimConnectionPresetChanged", vendorKey: "unity.multiplayer.tools", version:1, maxEventsPerHour: 1000)]
+    [AnalyticInfo(
+        eventName: "mpToolsNetSimConnectionPresetChanged",
+        vendorKey: "unity.multiplayer.tools",
+        version: 1,
+        maxEventsPerHour: 1000
+    )]
     internal class ConnectionPresetChangedAnalytic : IAnalytic
     {
         public ConnectionPresetChangedAnalytic(bool usedEditorGUI, string presetName, bool isPartOfScenario)
@@ -27,11 +32,11 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime.Analytics
         public bool TryGatherData(out IAnalytic.IData data, out Exception error)
         {
             error = null;
-            data= new ConnectionPresetChangedData
+            data = new ConnectionPresetChangedData
             {
                 usedEditorGUI = m_UsedEditorGUI,
                 presetName = m_PresetName,
-                isPartOfScenario = m_IsPartOfScenario
+                isPartOfScenario = m_IsPartOfScenario,
             };
             return true;
         }

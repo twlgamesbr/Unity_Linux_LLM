@@ -6,7 +6,13 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
 {
     public enum QueryType
     {
-        All, None, Any, ChangeFilter, Disabled, Absent, Present
+        All,
+        None,
+        Any,
+        ChangeFilter,
+        Disabled,
+        Absent,
+        Present,
     }
 
     public struct Query : IEquatable<Query>
@@ -15,8 +21,9 @@ namespace Unity.Entities.SourceGen.SystemGenerator.Common
         public ITypeSymbol TypeSymbol;
         public bool IsReadOnly;
 
-        public bool Equals(Query other) => SymbolEqualityComparer.Default.Equals(TypeSymbol, other.TypeSymbol)
-                                           && IsReadOnly == other.IsReadOnly;
+        public bool Equals(Query other) =>
+            SymbolEqualityComparer.Default.Equals(TypeSymbol, other.TypeSymbol) && IsReadOnly == other.IsReadOnly;
+
         public override int GetHashCode()
         {
             unchecked

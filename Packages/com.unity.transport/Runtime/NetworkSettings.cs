@@ -35,13 +35,18 @@ namespace Unity.Networking.Transport
             {
                 m_Initialized = 1;
                 m_Parameters = new NativeList<byte>(Allocator.Temp);
-                m_ParameterOffsets = new NativeParallelHashMap<long, ParameterSlice>(k_MapInitialCapacity, Allocator.Temp);
+                m_ParameterOffsets = new NativeParallelHashMap<long, ParameterSlice>(
+                    k_MapInitialCapacity,
+                    Allocator.Temp
+                );
             }
 
             if (!m_Parameters.IsCreated)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ObjectDisposedException($"The {nameof(NetworkSettings)} has been deallocated, it is not allowed to access it.");
+                throw new ObjectDisposedException(
+                    $"The {nameof(NetworkSettings)} has been deallocated, it is not allowed to access it."
+                );
 #else
                 Debug.LogError($"The {nameof(NetworkSettings)} has been deallocated, it is not allowed to access it.");
                 return false;
@@ -118,7 +123,8 @@ namespace Unity.Networking.Transport
         /// collections checks are enabled (i.e. in the editor). Otherwise an error is logged and
         /// the parameters are added anyway.
         /// </exception>
-        public unsafe void AddRawParameterStruct<T>(ref T parameter) where T : unmanaged, INetworkParameter
+        public unsafe void AddRawParameterStruct<T>(ref T parameter)
+            where T : unmanaged, INetworkParameter
         {
             if (!EnsureInitializedOrError())
                 return;
@@ -132,11 +138,7 @@ namespace Unity.Networking.Transport
             ValidateParameterOrError(ref parameter);
 
             var typeHash = BurstRuntime.GetHashCode64<T>();
-            var parameterSlice = new ParameterSlice
-            {
-                Offset = m_Parameters.Length,
-                Size = UnsafeUtility.SizeOf<T>(),
-            };
+            var parameterSlice = new ParameterSlice { Offset = m_Parameters.Length, Size = UnsafeUtility.SizeOf<T>() };
 
             if (m_ParameterOffsets.TryAdd(typeHash, parameterSlice))
             {
@@ -155,7 +157,8 @@ namespace Unity.Networking.Transport
         /// <typeparam name="T">Type of the parameter structure to get.</typeparam>
         /// <param name="parameter">Stored parameter structure (if true is returned).</param>
         /// <returns>True if the parameter structure is in the settings.</returns>
-        public unsafe bool TryGet<T>(out T parameter) where T : unmanaged, INetworkParameter
+        public unsafe bool TryGet<T>(out T parameter)
+            where T : unmanaged, INetworkParameter
         {
             parameter = default;
 
@@ -168,10 +171,14 @@ namespace Unity.Networking.Transport
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 if (UnsafeUtility.SizeOf<T>() != parameterSlice.Size)
-                    throw new ArgumentException($"The size of the parameter type {typeof(T)} ({UnsafeUtility.SizeOf<T>()}) is different to the stored size ({parameterSlice.Size})");
+                    throw new ArgumentException(
+                        $"The size of the parameter type {typeof(T)} ({UnsafeUtility.SizeOf<T>()}) is different to the stored size ({parameterSlice.Size})"
+                    );
 
                 if (m_Parameters.Length < parameterSlice.Offset + parameterSlice.Size)
-                    throw new OverflowException($"The registered parameter slice is out of bounds of the parameters buffer");
+                    throw new OverflowException(
+                        $"The registered parameter slice is out of bounds of the parameters buffer"
+                    );
 #endif
                 parameter = *(T*)((byte*)m_Parameters.GetUnsafeReadOnlyPtr<byte>() + parameterSlice.Offset);
                 return true;
@@ -180,12 +187,15 @@ namespace Unity.Networking.Transport
             return false;
         }
 
-        internal static void ValidateParameterOrError<T>(ref T parameter) where T : INetworkParameter
+        internal static void ValidateParameterOrError<T>(ref T parameter)
+            where T : INetworkParameter
         {
             if (!parameter.Validate())
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"The provided network parameter ({parameter.GetType().Name}) is not valid");
+                throw new ArgumentException(
+                    $"The provided network parameter ({parameter.GetType().Name}) is not valid"
+                );
 #else
                 Debug.LogError($"The provided network parameter ({parameter.GetType().Name}) is not valid");
 #endif

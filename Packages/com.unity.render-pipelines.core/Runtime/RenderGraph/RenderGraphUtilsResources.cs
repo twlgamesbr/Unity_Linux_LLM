@@ -17,9 +17,11 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             Initial,
 
             Count,
-            Latest = Count - 1
+            Latest = Count - 1,
         }
-        [SerializeField, HideInInspector] Version m_Version = Version.Latest;
+
+        [SerializeField, HideInInspector]
+        Version m_Version = Version.Latest;
         int IRenderPipelineGraphicsSettings.version => (int)m_Version;
 
         [SerializeField, ResourcePath("Shaders/CoreCopy.shader")]

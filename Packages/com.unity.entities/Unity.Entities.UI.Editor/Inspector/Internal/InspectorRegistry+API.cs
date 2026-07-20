@@ -5,9 +5,12 @@ namespace Unity.Entities.UI
 {
     static partial class InspectorRegistry
     {
-        public static IInspector GetInspector<TValue>(InspectorVisitor.InspectorContext inspectorContext,
+        public static IInspector GetInspector<TValue>(
+            InspectorVisitor.InspectorContext inspectorContext,
             IProperty property,
-            ref TValue value, PropertyPath path)
+            ref TValue value,
+            PropertyPath path
+        )
         {
             if (TypeTraits<TValue>.CanBeNull && EqualityComparer<TValue>.Default.Equals(value, default))
                 return null;
@@ -40,8 +43,12 @@ namespace Unity.Entities.UI
             }
         }
 
-        public static IInspector GetPropertyInspector<TValue>(InspectorVisitor.InspectorContext inspectorContext,
-            IProperty property, ref TValue value, PropertyPath path)
+        public static IInspector GetPropertyInspector<TValue>(
+            InspectorVisitor.InspectorContext inspectorContext,
+            IProperty property,
+            ref TValue value,
+            PropertyPath path
+        )
         {
             if (TypeTraits<TValue>.CanBeNull && EqualityComparer<TValue>.Default.Equals(value, default))
                 return null;
@@ -74,8 +81,12 @@ namespace Unity.Entities.UI
             }
         }
 
-        public static IInspector GetAttributeInspector<TValue>(InspectorVisitor.InspectorContext inspectorContext,
-            IProperty property, ref TValue value, PropertyPath path)
+        public static IInspector GetAttributeInspector<TValue>(
+            InspectorVisitor.InspectorContext inspectorContext,
+            IProperty property,
+            ref TValue value,
+            PropertyPath path
+        )
         {
             if (TypeTraits<TValue>.CanBeNull && EqualityComparer<TValue>.Default.Equals(value, default))
                 return null;

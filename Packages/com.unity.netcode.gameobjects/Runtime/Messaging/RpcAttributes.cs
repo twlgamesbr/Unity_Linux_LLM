@@ -15,7 +15,7 @@ namespace Unity.Netcode
         /// <summary>
         /// Unreliable delivery
         /// </summary>
-        Unreliable
+        Unreliable,
     }
 
     /// <summary>
@@ -98,7 +98,9 @@ namespace Unity.Netcode
         /// <remarks>
         /// Deprecated in favor of <see cref="InvokePermission"/>.
         /// </remarks>
-        [Obsolete("RequireOwnership is deprecated. Please use InvokePermission = RpcInvokePermission.Owner or InvokePermission = RpcInvokePermission.Everyone instead.")]
+        [Obsolete(
+            "RequireOwnership is deprecated. Please use InvokePermission = RpcInvokePermission.Owner or InvokePermission = RpcInvokePermission.Everyone instead."
+        )]
         public bool RequireOwnership;
 
         /// <summary>
@@ -115,15 +117,10 @@ namespace Unity.Netcode
         /// Initializes a new instance of the RpcAttribute with the specified target
         /// </summary>
         /// <param name="target">The target for this RPC</param>
-        public RpcAttribute(SendTo target)
-        {
-        }
+        public RpcAttribute(SendTo target) { }
 
         // To get around an issue with the release validator, RuntimeAccessModifiersILPP will make this 'public'
-        private RpcAttribute()
-        {
-
-        }
+        private RpcAttribute() { }
     }
 
     /// <summary>
@@ -151,16 +148,16 @@ namespace Unity.Netcode
         ///     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
         /// </code>
         /// </remarks>
-        [Obsolete("ServerRpc with RequireOwnership is deprecated. Use [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)] or [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)] instead.)]")]
+        [Obsolete(
+            "ServerRpc with RequireOwnership is deprecated. Use [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)] or [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)] instead.)]"
+        )]
         public new bool RequireOwnership;
 
         /// <summary>
         /// Initializes a new instance of ServerRpcAttribute that targets the server
         /// </summary>
-        public ServerRpcAttribute() : base(SendTo.Server)
-        {
-
-        }
+        public ServerRpcAttribute()
+            : base(SendTo.Server) { }
     }
 
     /// <summary>
@@ -173,8 +170,7 @@ namespace Unity.Netcode
         /// <summary>
         /// Initializes a new instance of ClientRpcAttribute that targets all clients except the server
         /// </summary>
-        public ClientRpcAttribute() : base(SendTo.NotServer)
-        {
-        }
+        public ClientRpcAttribute()
+            : base(SendTo.NotServer) { }
     }
 }

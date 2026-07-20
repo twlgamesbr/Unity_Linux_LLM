@@ -72,7 +72,12 @@ namespace UnityEditor.Rendering
                 return;
 
             var gizmoColor = VolumesPreferences.volumeGizmoColor;
-            var gizmoColorWhenBlendRegionEnabled = new Color(gizmoColor.r, gizmoColor.g, gizmoColor.b, 0.5f * gizmoColor.a);
+            var gizmoColorWhenBlendRegionEnabled = new Color(
+                gizmoColor.r,
+                gizmoColor.g,
+                gizmoColor.b,
+                0.5f * gizmoColor.a
+            );
 
             foreach (var collider in volume.colliders)
             {
@@ -81,7 +86,10 @@ namespace UnityEditor.Rendering
 
                 // Reduce gizmo opacity when blend region is enabled because there are two of them
                 bool blendDistanceEnabled = volume.blendDistance > 0f;
-                Gizmos.color = blendDistanceEnabled && VolumesPreferences.drawSolid ? gizmoColorWhenBlendRegionEnabled : gizmoColor;
+                Gizmos.color =
+                    blendDistanceEnabled && VolumesPreferences.drawSolid
+                        ? gizmoColorWhenBlendRegionEnabled
+                        : gizmoColor;
 
                 switch (collider)
                 {
@@ -107,11 +115,13 @@ namespace UnityEditor.Rendering
             var twiceFadeRadius = blendDistance * 2;
             var transformScale = c.transform.localScale;
             // Divide by scale because blendDistance is absolute units and we don't want transform scale to affect it
-            Vector3 size = c.size + new Vector3(
-                twiceFadeRadius / transformScale.x,
-                twiceFadeRadius / transformScale.y,
-                twiceFadeRadius / transformScale.z
-            );
+            Vector3 size =
+                c.size
+                + new Vector3(
+                    twiceFadeRadius / transformScale.x,
+                    twiceFadeRadius / transformScale.y,
+                    twiceFadeRadius / transformScale.z
+                );
 
             if (VolumesPreferences.drawWireFrame)
                 Gizmos.DrawWireCube(c.center, size);

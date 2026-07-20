@@ -8,7 +8,11 @@ namespace UnityEditor.Rendering
         // Note: To have the right icons along the skin, we do not use the editor resource loading mechanism at the moment. This could be revisited once this is converted to UITK.
         static Texture2D GetLightUnitIcon(string name)
         {
-            return CoreEditorUtils.LoadIcon(@"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/LightUnitIcons", name, ".png");
+            return CoreEditorUtils.LoadIcon(
+                @"Packages/com.unity.render-pipelines.core/Editor/Lighting/Icons/LightUnitIcons",
+                name,
+                ".png"
+            );
         }
 
         // TODO: Move all light unit icons from the package into the built-in resources.
@@ -21,23 +25,23 @@ namespace UnityEditor.Rendering
         static Texture2D SunriseSunset = GetLightUnitIcon("SunriseSunset");
         static Texture2D BrightSky = GetLightUnitIcon("BrightSky");
 
-        static GUIStyle k_IconButton = new ("IconButton");
+        static GUIStyle k_IconButton = new("IconButton");
 
         private static readonly LightUnitSliderUIRange[] LumenRanges =
         {
-            new (Candlelight, "Candle", new Vector2(0, 15), 12.5f),
-            new (DecorativeLight, "Decorative", new Vector2(15, 300), 100),
-            new (InteriorLight, "Interior", new Vector2(300, 3000), 1000),
-            new (ExteriorLight, "Exterior", new Vector2(3000, 40000), 10000),
+            new(Candlelight, "Candle", new Vector2(0, 15), 12.5f),
+            new(DecorativeLight, "Decorative", new Vector2(15, 300), 100),
+            new(InteriorLight, "Interior", new Vector2(300, 3000), 1000),
+            new(ExteriorLight, "Exterior", new Vector2(3000, 40000), 10000),
         };
         private static readonly float[] LumenDistribution = { 0f, 0.25f, 0.5f, 0.75f, 1f };
 
         private static readonly LightUnitSliderUIRange[] LuxRanges =
         {
-            new (Moonlight, "Moon", new Vector2(0, 1), 0.5f),
-            new (SunriseSunset, "Low Sun", new Vector2(1, 10000), 5000),
-            new (Overcast, "Cloudy", new Vector2(10000, 80000), 20000),
-            new (BrightSky, "High Sun", new Vector2(80000, 130000), 100000),
+            new(Moonlight, "Moon", new Vector2(0, 1), 0.5f),
+            new(SunriseSunset, "Low Sun", new Vector2(1, 10000), 5000),
+            new(Overcast, "Cloudy", new Vector2(10000, 80000), 20000),
+            new(BrightSky, "High Sun", new Vector2(80000, 130000), 100000),
         };
         private static readonly float[] LuxDistribution = { 0.0f, 0.05f, 0.5f, 0.9f, 1.0f };
 
@@ -46,7 +50,8 @@ namespace UnityEditor.Rendering
         internal static void Draw(ISerializedLight serialized, Editor owner, Rect baseRect)
         {
             // Calculate UI rects
-            Rect sliderRect, iconRect;
+            Rect sliderRect,
+                iconRect;
             {
                 sliderRect = baseRect;
                 sliderRect.width -= EditorGUIUtility.singleLineHeight;
@@ -74,9 +79,10 @@ namespace UnityEditor.Rendering
             float nativeIntensity = serialized.settings.intensity.floatValue;
             // This is the intensity above converted to the unit (either lux or lumen) that's the basis of the ranges/distribution for this light type
             float convertedIntensity;
-            bool isSpotReflectorRelevant = (lightType == LightType.Pyramid || lightType == LightType.Spot) &&
-                                           lightUnit == LightUnit.Lumen &&
-                                           serialized.settings.enableSpotReflector.boolValue;
+            bool isSpotReflectorRelevant =
+                (lightType == LightType.Pyramid || lightType == LightType.Spot)
+                && lightUnit == LightUnit.Lumen
+                && serialized.settings.enableSpotReflector.boolValue;
 
             if (lightType == LightType.Pyramid || lightType == LightType.Spot || lightType == LightType.Box)
             {
@@ -180,18 +186,34 @@ namespace UnityEditor.Rendering
                         float solidAngle = LightUnitUtils.SphereSolidAngle;
                         if (isSpotReflectorRelevant)
                         {
-                            solidAngle = LightUnitUtils.GetSolidAngle(lightType, true, light.spotAngle, light.areaSize.x);
+                            solidAngle = LightUnitUtils.GetSolidAngle(
+                                lightType,
+                                true,
+                                light.spotAngle,
+                                light.areaSize.x
+                            );
                         }
-                        serialized.settings.intensity.floatValue = LightUnitUtils.LumenToCandela(newConvertedIntensity, solidAngle);
+                        serialized.settings.intensity.floatValue = LightUnitUtils.LumenToCandela(
+                            newConvertedIntensity,
+                            solidAngle
+                        );
                     }
                     else if (nativeUnit == LightUnit.Nits && lightUnit != LightUnit.Lumen)
                     {
-                        serialized.settings.intensity.floatValue = LightUnitUtils.LumenToNits(newConvertedIntensity, ConstantNitsToLumenArea);
+                        serialized.settings.intensity.floatValue = LightUnitUtils.LumenToNits(
+                            newConvertedIntensity,
+                            ConstantNitsToLumenArea
+                        );
                     }
                     else
                     {
                         LightUnit fromUnit = usesLuxBasedRange ? LightUnit.Lux : LightUnit.Lumen;
-                        serialized.settings.intensity.floatValue = LightUnitUtils.ConvertIntensity(light, newConvertedIntensity, fromUnit, nativeUnit);
+                        serialized.settings.intensity.floatValue = LightUnitUtils.ConvertIntensity(
+                            light,
+                            newConvertedIntensity,
+                            fromUnit,
+                            nativeUnit
+                        );
                     }
                 }
             }
@@ -316,7 +338,12 @@ namespace UnityEditor.Rendering
                             float solidAngle = LightUnitUtils.SphereSolidAngle;
                             if (isSpotReflectorRelevant)
                             {
-                                solidAngle = LightUnitUtils.GetSolidAngle(lightType, true, light.spotAngle, light.areaSize.x);
+                                solidAngle = LightUnitUtils.GetSolidAngle(
+                                    lightType,
+                                    true,
+                                    light.spotAngle,
+                                    light.areaSize.x
+                                );
                             }
                             nativePresetValue = LightUnitUtils.LumenToCandela(preset.presetValue, solidAngle);
                         }
@@ -327,13 +354,18 @@ namespace UnityEditor.Rendering
                         else
                         {
                             LightUnit fromUnit = usesLuxBasedRange ? LightUnit.Lux : LightUnit.Lumen;
-                            nativePresetValue = LightUnitUtils.ConvertIntensity(light, preset.presetValue, fromUnit, nativeUnit);
+                            nativePresetValue = LightUnitUtils.ConvertIntensity(
+                                light,
+                                preset.presetValue,
+                                fromUnit,
+                                nativeUnit
+                            );
                         }
 
                         menu.AddItem(
                             EditorGUIUtility.TrTextContent(preset.content.tooltip),
-                           rangeIndex == i,
-                           () => SetIntensityValue(serialized, nativePresetValue)
+                            rangeIndex == i,
+                            () => SetIntensityValue(serialized, nativePresetValue)
                         );
                     }
 

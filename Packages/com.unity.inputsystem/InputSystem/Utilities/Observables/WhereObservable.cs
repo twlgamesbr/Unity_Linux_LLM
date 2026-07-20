@@ -29,9 +29,7 @@ namespace UnityEngine.InputSystem.Utilities
                 m_Observer = observer;
             }
 
-            public void OnCompleted()
-            {
-            }
+            public void OnCompleted() { }
 
             public void OnError(Exception error)
             {

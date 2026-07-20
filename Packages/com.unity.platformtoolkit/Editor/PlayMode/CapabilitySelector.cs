@@ -50,9 +50,11 @@ namespace Unity.PlatformToolkit.PlayMode
 
         public event Action CurrentCapabilityChanged;
 
-        public IEnumerable<IPlayModeCapability> Capabilities => PlayModeControlsAssetTracker.GetPlayModeCapabilityAssets();
+        public IEnumerable<IPlayModeCapability> Capabilities =>
+            PlayModeControlsAssetTracker.GetPlayModeCapabilityAssets();
 
         public event Action CapabilitiesCreatedOrDeleted;
+
         private void OnCapabilitiesCreatedOrDeleted()
         {
             CapabilitiesCreatedOrDeleted?.Invoke();

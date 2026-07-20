@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using UnityEngine.Networking.PlayerConnection;
+using static UnityEngine.Rendering.RenderGraphModule.RenderGraph;
 #if UNITY_EDITOR
 using UnityEditor.Networking.PlayerConnection;
 #endif
-using static UnityEngine.Rendering.RenderGraphModule.RenderGraph;
+
 
 namespace UnityEngine.Rendering.RenderGraphModule
 {
@@ -31,7 +32,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             Activate = 0,
             DebugData = 1,
-            AnalyticsData = 2
+            AnalyticsData = 2,
         }
 
         public abstract class IPayload
@@ -104,7 +105,6 @@ namespace UnityEngine.Rendering.RenderGraphModule
 #endif
         }
 
-
         internal static byte[] SerializeMessage(MessageType type, IPayload payload = null)
         {
             using var memoryStream = new MemoryStream();
@@ -152,7 +152,9 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 payload.version = reader.ReadInt32();
                 if (!payload.isCompatible)
                 {
-                    Debug.LogWarning($"Render Graph Viewer message version mismatch (expected {k_Version}, received {payload.version})");
+                    Debug.LogWarning(
+                        $"Render Graph Viewer message version mismatch (expected {k_Version}, received {payload.version})"
+                    );
                     return (type, payload);
                 }
 

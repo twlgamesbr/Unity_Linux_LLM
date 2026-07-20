@@ -1,9 +1,9 @@
-using UnityEditor;
+using System.Collections.Generic;
 using System.Reflection;
+using EditorAttributes.Editor.Utility;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using System.Collections.Generic;
-using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
@@ -17,28 +17,41 @@ namespace EditorAttributes.Editor
             HelpBox errorBox = new();
             PropertyField propertyField = CreatePropertyField(property);
 
-            UpdateVisualElement(propertyField, () =>
-            {
-                bool canActivateProperty = CanActivateProperty(conditionalAttribute, conditionalAttribute.BooleanNames, property, errorBox);
-
-                switch (conditionalAttribute.ConditionResult)
+            UpdateVisualElement(
+                propertyField,
+                () =>
                 {
-                    case ConditionResult.ShowHide:
-                        propertyField.style.display = canActivateProperty ? DisplayStyle.Flex : DisplayStyle.None;
-                        break;
+                    bool canActivateProperty = CanActivateProperty(
+                        conditionalAttribute,
+                        conditionalAttribute.BooleanNames,
+                        property,
+                        errorBox
+                    );
 
-                    case ConditionResult.EnableDisable:
-                        propertyField.SetEnabled(canActivateProperty);
-                        break;
+                    switch (conditionalAttribute.ConditionResult)
+                    {
+                        case ConditionResult.ShowHide:
+                            propertyField.style.display = canActivateProperty ? DisplayStyle.Flex : DisplayStyle.None;
+                            break;
+
+                        case ConditionResult.EnableDisable:
+                            propertyField.SetEnabled(canActivateProperty);
+                            break;
+                    }
+
+                    DisplayErrorBox(propertyField, errorBox);
                 }
-
-                DisplayErrorBox(propertyField, errorBox);
-            });
+            );
 
             return propertyField;
         }
 
-        private bool CanActivateProperty(ConditionalFieldAttribute attribute, string[] conditionNames, SerializedProperty property, HelpBox errorBox)
+        private bool CanActivateProperty(
+            ConditionalFieldAttribute attribute,
+            string[] conditionNames,
+            SerializedProperty property,
+            HelpBox errorBox
+        )
         {
             List<bool> booleanList = new();
 
@@ -59,7 +72,10 @@ namespace EditorAttributes.Editor
 
                     booleanList.Add(propertyValue);
                 }
-                else if (serializedProperty != null && serializedProperty.propertyType == SerializedPropertyType.Boolean)
+                else if (
+                    serializedProperty != null
+                    && serializedProperty.propertyType == SerializedPropertyType.Boolean
+                )
                 {
                     bool propertyValue = serializedProperty.boolValue;
 
@@ -82,32 +98,32 @@ namespace EditorAttributes.Editor
                 switch (attribute.ConditionType)
                 {
                     case ConditionType.AND:
-                    {
-                        if (!booleanList[i])
-                            return false;
-                    }
-                    continue;
+                        {
+                            if (!booleanList[i])
+                                return false;
+                        }
+                        continue;
 
                     case ConditionType.OR:
-                    {
-                        if (booleanList[i])
-                            return true;
-                    }
-                    continue;
+                        {
+                            if (booleanList[i])
+                                return true;
+                        }
+                        continue;
 
                     case ConditionType.NAND:
-                    {
-                        if (!booleanList[i])
-                            return true;
-                    }
-                    continue;
+                        {
+                            if (!booleanList[i])
+                                return true;
+                        }
+                        continue;
 
                     case ConditionType.NOR:
-                    {
-                        if (booleanList[i])
-                            return false;
-                    }
-                    continue;
+                        {
+                            if (booleanList[i])
+                                return false;
+                        }
+                        continue;
                 }
             }
 

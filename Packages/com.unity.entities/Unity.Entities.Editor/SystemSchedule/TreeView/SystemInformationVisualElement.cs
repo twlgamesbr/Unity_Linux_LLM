@@ -5,7 +5,8 @@ namespace Unity.Entities.Editor
 {
     class SystemInformationVisualElement : BindableElement, IBinding
     {
-        internal static readonly ObjectPool<SystemInformationVisualElement> Pool = new ObjectPool<SystemInformationVisualElement>(() => new SystemInformationVisualElement());
+        internal static readonly ObjectPool<SystemInformationVisualElement> Pool =
+            new ObjectPool<SystemInformationVisualElement>(() => new SystemInformationVisualElement());
 
         SystemTreeViewItemData m_Target;
         public SystemTreeView TreeView { get; set; }
@@ -87,7 +88,8 @@ namespace Unity.Entities.Editor
             var itemRoot = parent?.parent;
             itemRoot.Insert(0, m_SystemEnableToggleContainer);
 
-            m_Icon.style.display = string.Empty == GetSystemClass(Target.SystemProxy) ? DisplayStyle.None : DisplayStyle.Flex;
+            m_Icon.style.display =
+                string.Empty == GetSystemClass(Target.SystemProxy) ? DisplayStyle.None : DisplayStyle.Flex;
             SetText(m_SystemNameLabel, Target.GetSystemName());
             SetSystemNameLabelWidth(m_SystemNameLabel);
 
@@ -124,20 +126,44 @@ namespace Unity.Entities.Editor
             switch (Target.GetSystemToggleState())
             {
                 case SystemTreeViewItemData.SystemToggleState.Disabled:
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled, false);
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleMixed, false);
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled,
+                        false
+                    );
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleMixed,
+                        false
+                    );
                     break;
                 case SystemTreeViewItemData.SystemToggleState.Mixed:
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled, false);
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleMixed, true);
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled,
+                        false
+                    );
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleMixed,
+                        true
+                    );
                     break;
                 case SystemTreeViewItemData.SystemToggleState.AllEnabled:
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled, true);
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleMixed, false);
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled,
+                        true
+                    );
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleMixed,
+                        false
+                    );
                     break;
                 default:
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled, true);
-                    m_SystemEnableToggle.EnableInClassList(UssClasses.SystemScheduleWindow.Items.SystemToggleMixed, false);
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleEnabled,
+                        true
+                    );
+                    m_SystemEnableToggle.EnableInClassList(
+                        UssClasses.SystemScheduleWindow.Items.SystemToggleMixed,
+                        false
+                    );
                     break;
             }
         }
@@ -164,19 +190,24 @@ namespace Unity.Entities.Editor
 
             element.EnableInClassList(
                 UssClasses.SystemScheduleWindow.Items.BeginCommandBufferIcon,
-                (flags & SystemCategory.ECBSystemBegin) != 0);
+                (flags & SystemCategory.ECBSystemBegin) != 0
+            );
             element.EnableInClassList(
                 UssClasses.SystemScheduleWindow.Items.EndCommandBufferIcon,
-                (flags & SystemCategory.ECBSystemEnd) != 0);
+                (flags & SystemCategory.ECBSystemEnd) != 0
+            );
             element.EnableInClassList(
                 UssClasses.SystemScheduleWindow.Items.UnmanagedSystemIcon,
-                (flags & SystemCategory.Unmanaged) != 0);
+                (flags & SystemCategory.Unmanaged) != 0
+            );
             element.EnableInClassList(
                 UssClasses.SystemScheduleWindow.Items.SystemIcon,
-                (flags & SystemCategory.SystemBase) != 0 && (flags & SystemCategory.EntityCommandBufferSystem) == 0);
+                (flags & SystemCategory.SystemBase) != 0 && (flags & SystemCategory.EntityCommandBufferSystem) == 0
+            );
             element.EnableInClassList(
                 UssClasses.SystemScheduleWindow.Items.SystemGroupIcon,
-                (flags & SystemCategory.SystemGroup) != 0);
+                (flags & SystemCategory.SystemGroup) != 0
+            );
         }
 
         static void SetGroupNodeLabelBold(VisualElement element, SystemProxy systemProxy)

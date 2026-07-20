@@ -8,228 +8,241 @@ using System.Net.Sockets;
 
 namespace Microsoft.Unity.VisualStudio.Editor.Messaging
 {
-	internal class Messager : IDisposable
-	{
-		public event EventHandler<MessageEventArgs> ReceiveMessage;
-		public event EventHandler<ExceptionEventArgs> MessagerException;
+    internal class Messager : IDisposable
+    {
+        public event EventHandler<MessageEventArgs> ReceiveMessage;
+        public event EventHandler<ExceptionEventArgs> MessagerException;
 
-		private readonly UdpSocket _socket;
-		private bool _disposed;
-
-#if UNITY_EDITOR_WIN
-		[System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
-		private static extern bool SetHandleInformation(IntPtr hObject, HandleFlags dwMask, HandleFlags dwFlags);
-
-		[Flags]
-		private enum HandleFlags: uint
-		{
-			None = 0,
-			Inherit = 1,
-			ProtectFromClose = 2
-		}
-#endif
-
-		protected Messager(int port)
-		{
-			_socket = new UdpSocket();
-			_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
-			_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+        private readonly UdpSocket _socket;
+        private bool _disposed;
 
 #if UNITY_EDITOR_WIN
-			// Explicitely disable inheritance for our UDP socket handle 
-			// We found that Unity is creating a fork when importing new assets that can clone our socket
-			SetHandleInformation(_socket.Handle, HandleFlags.Inherit, HandleFlags.None);
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetHandleInformation(IntPtr hObject, HandleFlags dwMask, HandleFlags dwFlags);
+
+        [Flags]
+        private enum HandleFlags : uint
+        {
+            None = 0,
+            Inherit = 1,
+            ProtectFromClose = 2,
+        }
 #endif
 
-			_socket.Bind(IPAddress.Any, port);
+        protected Messager(int port)
+        {
+            _socket = new UdpSocket();
+            _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
+            _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
-			BeginReceiveMessage();
-		}
+#if UNITY_EDITOR_WIN
+            // Explicitely disable inheritance for our UDP socket handle
+            // We found that Unity is creating a fork when importing new assets that can clone our socket
+            SetHandleInformation(_socket.Handle, HandleFlags.Inherit, HandleFlags.None);
+#endif
 
-		private void BeginReceiveMessage()
-		{
-			var buffer = new byte[UdpSocket.BufferSize];
-			var any = UdpSocket.Any();
+            _socket.Bind(IPAddress.Any, port);
 
-			try
-			{
-				beginReceive:
-				if (_disposed)
-					return;
+            BeginReceiveMessage();
+        }
 
-				var result = _socket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref any, ReceiveMessageCallback, buffer);
-				if (result.CompletedSynchronously)
-					goto beginReceive;
-			}
-			catch (SocketException se)
-			{
-				MessagerException?.Invoke(this, new ExceptionEventArgs(se));
+        private void BeginReceiveMessage()
+        {
+            var buffer = new byte[UdpSocket.BufferSize];
+            var any = UdpSocket.Any();
 
-				BeginReceiveMessage();
-			}
-			catch (ObjectDisposedException)
-			{
-			}
-		}
+            try
+            {
+                beginReceive:
+                if (_disposed)
+                    return;
 
-		private void ReceiveMessageCallback(IAsyncResult result)
-		{
-			try
-			{
-				var endPoint = UdpSocket.Any();
+                var result = _socket.BeginReceiveFrom(
+                    buffer,
+                    0,
+                    buffer.Length,
+                    SocketFlags.None,
+                    ref any,
+                    ReceiveMessageCallback,
+                    buffer
+                );
+                if (result.CompletedSynchronously)
+                    goto beginReceive;
+            }
+            catch (SocketException se)
+            {
+                MessagerException?.Invoke(this, new ExceptionEventArgs(se));
 
-				if (_disposed)
-					return;
+                BeginReceiveMessage();
+            }
+            catch (ObjectDisposedException) { }
+        }
 
-				_socket.EndReceiveFrom(result, ref endPoint);
+        private void ReceiveMessageCallback(IAsyncResult result)
+        {
+            try
+            {
+                var endPoint = UdpSocket.Any();
 
-				var message = DeserializeMessage(UdpSocket.BufferFor(result));
-				if (message != null)
-				{
-					message.Origin = (IPEndPoint)endPoint;
+                if (_disposed)
+                    return;
 
-					if (IsValidTcpMessage(message, out var port, out var bufferSize))
-					{
-						// switch to TCP mode to handle big messages
-						TcpClient.Queue(message.Origin.Address, port, bufferSize, buffer =>
-						{
-							var originalMessage = DeserializeMessage(buffer);
-							originalMessage.Origin = message.Origin;
-							ReceiveMessage?.Invoke(this, new MessageEventArgs(originalMessage));
-						});
-					}
-					else
-					{
-						ReceiveMessage?.Invoke(this, new MessageEventArgs(message));
-					}
-				}
-			}
-			catch (ObjectDisposedException)
-			{
-				return;
-			}
-			catch (Exception e)
-			{
-				RaiseMessagerException(e);
-			}
+                _socket.EndReceiveFrom(result, ref endPoint);
 
-			if (!result.CompletedSynchronously)
-				BeginReceiveMessage();
-		}
+                var message = DeserializeMessage(UdpSocket.BufferFor(result));
+                if (message != null)
+                {
+                    message.Origin = (IPEndPoint)endPoint;
 
-		private static bool IsValidTcpMessage(Message message, out int port, out int bufferSize)
-		{
-			port = 0;
-			bufferSize = 0;
-			if (message.Value == null)
-				return false;
-			if (message.Type != MessageType.Tcp)
-				return false;
-			var parts = message.Value.Split(':');
-			if (parts.Length != 2)
-				return false;
-			if (!int.TryParse(parts[0], out port))
-				return false;
-			return int.TryParse(parts[1], out bufferSize);
-		}
+                    if (IsValidTcpMessage(message, out var port, out var bufferSize))
+                    {
+                        // switch to TCP mode to handle big messages
+                        TcpClient.Queue(
+                            message.Origin.Address,
+                            port,
+                            bufferSize,
+                            buffer =>
+                            {
+                                var originalMessage = DeserializeMessage(buffer);
+                                originalMessage.Origin = message.Origin;
+                                ReceiveMessage?.Invoke(this, new MessageEventArgs(originalMessage));
+                            }
+                        );
+                    }
+                    else
+                    {
+                        ReceiveMessage?.Invoke(this, new MessageEventArgs(message));
+                    }
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+            catch (Exception e)
+            {
+                RaiseMessagerException(e);
+            }
 
-		private void RaiseMessagerException(Exception e)
-		{
-			MessagerException?.Invoke(this, new ExceptionEventArgs(e));
-		}
+            if (!result.CompletedSynchronously)
+                BeginReceiveMessage();
+        }
 
-		private static Message MessageFor(MessageType type, string value)
-		{
-			return new Message { Type = type, Value = value };
-		}
+        private static bool IsValidTcpMessage(Message message, out int port, out int bufferSize)
+        {
+            port = 0;
+            bufferSize = 0;
+            if (message.Value == null)
+                return false;
+            if (message.Type != MessageType.Tcp)
+                return false;
+            var parts = message.Value.Split(':');
+            if (parts.Length != 2)
+                return false;
+            if (!int.TryParse(parts[0], out port))
+                return false;
+            return int.TryParse(parts[1], out bufferSize);
+        }
 
-		public void SendMessage(IPEndPoint target, MessageType type, string value = "")
-		{
-			var message = MessageFor(type, value);
-			var buffer = SerializeMessage(message);
+        private void RaiseMessagerException(Exception e)
+        {
+            MessagerException?.Invoke(this, new ExceptionEventArgs(e));
+        }
 
-			try
-			{
-				if (_disposed)
-					return;
+        private static Message MessageFor(MessageType type, string value)
+        {
+            return new Message { Type = type, Value = value };
+        }
 
-				if (buffer.Length >= UdpSocket.BufferSize)
-				{
-					// switch to TCP mode to handle big messages
-					var port = TcpListener.Queue(buffer);
-					if (port > 0)
-					{
-						// success, replace original message with "switch to tcp" marker + port information + buffer length
-						message = MessageFor(MessageType.Tcp, string.Concat(port, ':', buffer.Length));
-						buffer = SerializeMessage(message);
-					}
-				}
+        public void SendMessage(IPEndPoint target, MessageType type, string value = "")
+        {
+            var message = MessageFor(type, value);
+            var buffer = SerializeMessage(message);
 
-				_socket.BeginSendTo(buffer, 0, Math.Min(buffer.Length, UdpSocket.BufferSize), SocketFlags.None, target, SendMessageCallback, null);
-			}
-			catch (SocketException se)
-			{
-				MessagerException?.Invoke(this, new ExceptionEventArgs(se));
-			}
-			catch (ObjectDisposedException)
-			{
-			}
-		}
+            try
+            {
+                if (_disposed)
+                    return;
 
-		private void SendMessageCallback(IAsyncResult result)
-		{
-			try
-			{
-				if (_disposed)
-					return;
+                if (buffer.Length >= UdpSocket.BufferSize)
+                {
+                    // switch to TCP mode to handle big messages
+                    var port = TcpListener.Queue(buffer);
+                    if (port > 0)
+                    {
+                        // success, replace original message with "switch to tcp" marker + port information + buffer length
+                        message = MessageFor(MessageType.Tcp, string.Concat(port, ':', buffer.Length));
+                        buffer = SerializeMessage(message);
+                    }
+                }
 
-				_socket.EndSendTo(result);
-			}
-			catch (SocketException se)
-			{
-				MessagerException?.Invoke(this, new ExceptionEventArgs(se));
-			}
-			catch (ObjectDisposedException)
-			{
-			}
-		}
+                _socket.BeginSendTo(
+                    buffer,
+                    0,
+                    Math.Min(buffer.Length, UdpSocket.BufferSize),
+                    SocketFlags.None,
+                    target,
+                    SendMessageCallback,
+                    null
+                );
+            }
+            catch (SocketException se)
+            {
+                MessagerException?.Invoke(this, new ExceptionEventArgs(se));
+            }
+            catch (ObjectDisposedException) { }
+        }
 
-		private static byte[] SerializeMessage(Message message)
-		{
-			var serializer = new Serializer();
-			serializer.WriteInt32((int)message.Type);
-			serializer.WriteString(message.Value);
+        private void SendMessageCallback(IAsyncResult result)
+        {
+            try
+            {
+                if (_disposed)
+                    return;
 
-			return serializer.Buffer();
-		}
+                _socket.EndSendTo(result);
+            }
+            catch (SocketException se)
+            {
+                MessagerException?.Invoke(this, new ExceptionEventArgs(se));
+            }
+            catch (ObjectDisposedException) { }
+        }
 
-		private static Message DeserializeMessage(byte[] buffer)
-		{
-			if (buffer.Length < 4)
-				return null;
+        private static byte[] SerializeMessage(Message message)
+        {
+            var serializer = new Serializer();
+            serializer.WriteInt32((int)message.Type);
+            serializer.WriteString(message.Value);
 
-			var deserializer = new Deserializer(buffer);
-			var type = (MessageType)deserializer.ReadInt32();
-			var value = deserializer.ReadString();
+            return serializer.Buffer();
+        }
 
-			return new Message { Type = type, Value = value };
-		}
+        private static Message DeserializeMessage(byte[] buffer)
+        {
+            if (buffer.Length < 4)
+                return null;
 
-		public static Messager BindTo(int port)
-		{
-			return new Messager(port);
-		}
+            var deserializer = new Deserializer(buffer);
+            var type = (MessageType)deserializer.ReadInt32();
+            var value = deserializer.ReadString();
 
-		public void Dispose()
-		{
-			try
-			{
-				_disposed = true;
-				_socket.Close();
-			}
-			catch
-			{
-			}
-		}
-	}
+            return new Message { Type = type, Value = value };
+        }
+
+        public static Messager BindTo(int port)
+        {
+            return new Messager(port);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                _disposed = true;
+                _socket.Close();
+            }
+            catch { }
+        }
+    }
 }

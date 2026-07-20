@@ -7,6 +7,7 @@ namespace Unity.Scenes
     {
 #if UNITY_EDITOR
         public static bool DidRequest = false;
+
         public static void EditModeQueuePlayerLoopUpdate()
         {
             if (!Application.isPlaying && !DidRequest)
@@ -25,7 +26,7 @@ namespace Unity.Scenes
         }
 
 #else
-        public static void EditModeQueuePlayerLoopUpdate() {}
+        public static void EditModeQueuePlayerLoopUpdate() { }
 #endif
     }
 }

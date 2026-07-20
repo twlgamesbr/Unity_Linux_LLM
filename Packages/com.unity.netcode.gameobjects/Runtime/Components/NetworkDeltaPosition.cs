@@ -30,7 +30,8 @@ namespace Unity.Netcode.Components
         internal bool CollapsedDeltaIntoBase;
 
         /// <inheritdoc />
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             if (!SynchronizeBase)
             {
@@ -190,10 +191,8 @@ namespace Unity.Netcode.Components
         /// </summary>
         /// <param name="vector3">The initial axial values (converted to half floats) when instantiated.</param>
         /// <param name="networkTick">Set the network tick value to the current network tick when instantiating.</param>
-        public NetworkDeltaPosition(Vector3 vector3, int networkTick) : this(vector3, networkTick, math.bool3(true))
-        {
-
-        }
+        public NetworkDeltaPosition(Vector3 vector3, int networkTick)
+            : this(vector3, networkTick, math.bool3(true)) { }
 
         /// <summary>
         /// Constructor
@@ -203,10 +202,8 @@ namespace Unity.Netcode.Components
         /// <param name="z">The initial z axis (converted to half float) value when instantiated.</param>
         /// <param name="networkTick">Set the network tick value to the current network tick when instantiating.</param>
         /// <param name="axisToSynchronize">The axis to be synchronized.</param>
-        public NetworkDeltaPosition(float x, float y, float z, int networkTick, bool3 axisToSynchronize) :
-            this(new Vector3(x, y, z), networkTick, axisToSynchronize)
-        {
-        }
+        public NetworkDeltaPosition(float x, float y, float z, int networkTick, bool3 axisToSynchronize)
+            : this(new Vector3(x, y, z), networkTick, axisToSynchronize) { }
 
         /// <summary>
         /// Constructor
@@ -215,9 +212,7 @@ namespace Unity.Netcode.Components
         /// <param name="y">The initial y axis (converted to half float) value when instantiated.</param>
         /// <param name="z">The initial z axis (converted to half float) value when instantiated.</param>
         /// <param name="networkTick">Set the network tick value to the current network tick when instantiating.</param>
-        public NetworkDeltaPosition(float x, float y, float z, int networkTick) :
-            this(new Vector3(x, y, z), networkTick, math.bool3(true))
-        {
-        }
+        public NetworkDeltaPosition(float x, float y, float z, int networkTick)
+            : this(new Vector3(x, y, z), networkTick, math.bool3(true)) { }
     }
 }

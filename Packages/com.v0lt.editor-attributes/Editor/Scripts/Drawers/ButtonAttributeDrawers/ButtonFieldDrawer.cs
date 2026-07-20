@@ -1,8 +1,8 @@
 using System;
-using UnityEditor;
 using System.Reflection;
-using UnityEngine.UIElements;
 using EditorAttributes.Editor.Utility;
+using UnityEditor;
+using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
@@ -32,22 +32,36 @@ namespace EditorAttributes.Editor
             MethodInfo function = ReflectionUtils.FindFunction(buttonFieldAttribute.FunctionName, ownerObject);
 
             if (function == null)
-                return new HelpBox($"Could not find function <b>{buttonFieldAttribute.FunctionName}</b>", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    $"Could not find function <b>{buttonFieldAttribute.FunctionName}</b>",
+                    HelpBoxMessageType.Error
+                );
 
             ParameterInfo[] functionParameters = function.GetParameters();
 
             if (functionParameters.Length != 0)
                 return new HelpBox("The function cannot have parameters", HelpBoxMessageType.Error);
 
-            string buttonLabel = string.IsNullOrWhiteSpace(buttonFieldAttribute.ButtonLabel) ? function.Name : buttonFieldAttribute.ButtonLabel;
+            string buttonLabel = string.IsNullOrWhiteSpace(buttonFieldAttribute.ButtonLabel)
+                ? function.Name
+                : buttonFieldAttribute.ButtonLabel;
 
             if (buttonFieldAttribute.IsRepetable)
             {
-                RepeatButton repeatButton = new(() => InvokeFunctionOnAllTargets(property.serializedObject.targetObjects, function.Name, makeTargetsDirty: buttonFieldAttribute.MakeDirty), buttonFieldAttribute.PressDelay, buttonFieldAttribute.RepetitionInterval)
+                RepeatButton repeatButton = new(
+                    () =>
+                        InvokeFunctionOnAllTargets(
+                            property.serializedObject.targetObjects,
+                            function.Name,
+                            makeTargetsDirty: buttonFieldAttribute.MakeDirty
+                        ),
+                    buttonFieldAttribute.PressDelay,
+                    buttonFieldAttribute.RepetitionInterval
+                )
                 {
                     text = buttonLabel,
                     tooltip = property.tooltip,
-                    style = { height = buttonFieldAttribute.ButtonHeight }
+                    style = { height = buttonFieldAttribute.ButtonHeight },
                 };
 
                 repeatButton.AddToClassList(Button.ussClassName);
@@ -56,11 +70,17 @@ namespace EditorAttributes.Editor
             }
             else
             {
-                return new Button(() => InvokeFunctionOnAllTargets(property.serializedObject.targetObjects, function.Name, makeTargetsDirty: buttonFieldAttribute.MakeDirty))
+                return new Button(() =>
+                    InvokeFunctionOnAllTargets(
+                        property.serializedObject.targetObjects,
+                        function.Name,
+                        makeTargetsDirty: buttonFieldAttribute.MakeDirty
+                    )
+                )
                 {
                     text = buttonLabel,
                     tooltip = property.tooltip,
-                    style = { height = buttonFieldAttribute.ButtonHeight }
+                    style = { height = buttonFieldAttribute.ButtonHeight },
                 };
             }
         }

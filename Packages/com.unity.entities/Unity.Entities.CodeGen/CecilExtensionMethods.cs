@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using MethodBody = Mono.Cecil.Cil.MethodBody;
 using Unity.Cecil.Awesome;
 using Unity.Cecil.Awesome.Comparers;
+using MethodBody = Mono.Cecil.Cil.MethodBody;
 
 namespace Unity.Entities.CodeGen
 {
@@ -28,7 +28,6 @@ namespace Unity.Entities.CodeGen
             return false;
         }
 
-
         public static TypeReference LaunderTypeRef(TypeReference r_, ModuleDefinition mod)
         {
             TypeDefinition def = r_.Resolve();
@@ -48,7 +47,6 @@ namespace Unity.Entities.CodeGen
                 }
 
                 result = gt;
-
             }
             else
             {
@@ -84,10 +82,8 @@ namespace Unity.Entities.CodeGen
 
         // Roslyn can decide to start this class with <>c__DisplayClass or just <>c
         // (seems to do the latter with DisplayClasses in value types for some reason)
-        public static bool IsDisplayClassCandidate(this TypeReference tr) =>
-            tr.Name.StartsWith("<>c");
-            
-            
+        public static bool IsDisplayClassCandidate(this TypeReference tr) => tr.Name.StartsWith("<>c");
+
         // Roslyn tends to generate local functions with names that contain g__ (and they are always static)
         public static bool IsLocalFunctionCandidate(this MethodDefinition md) =>
             (md.IsStatic && md.Name.Contains("g__"));
@@ -107,8 +103,10 @@ namespace Unity.Entities.CodeGen
         /// <param name="method"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public static MethodReference MakeGenericInstanceMethod(this MethodReference method,
-            params TypeReference[] types)
+        public static MethodReference MakeGenericInstanceMethod(
+            this MethodReference method,
+            params TypeReference[] types
+        )
         {
             var result = new GenericInstanceMethod(method);
             foreach (var type in types)
@@ -127,13 +125,16 @@ namespace Unity.Entities.CodeGen
         /// <param name="self"></param>
         /// <param name="closedDeclaringType">See summary above for example. Typically construct this type using `MakeGenericInstanceMethod`</param>
         /// <returns></returns>
-        public static MethodReference MakeGenericHostMethod(this MethodReference self, TypeReference closedDeclaringType)
+        public static MethodReference MakeGenericHostMethod(
+            this MethodReference self,
+            TypeReference closedDeclaringType
+        )
         {
             var reference = new MethodReference(self.Name, self.ReturnType, closedDeclaringType)
             {
                 HasThis = self.HasThis,
                 ExplicitThis = self.ExplicitThis,
-                CallingConvention = self.CallingConvention
+                CallingConvention = self.CallingConvention,
             };
 
             foreach (var parameter in self.Parameters)
@@ -154,17 +155,16 @@ namespace Unity.Entities.CodeGen
     {
         internal static bool HasCompilerServicesIsReadOnlyAttribute(this ParameterDefinition p)
         {
-            return p.HasCustomAttributes && p.CustomAttributes.Any(c =>
-                c.AttributeType.FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute");
+            return p.HasCustomAttributes
+                && p.CustomAttributes.Any(c =>
+                    c.AttributeType.FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"
+                );
         }
     }
-
-
 
     static class TypeDefinitionExtensions
     {
         public static bool IsDelegate(this TypeDefinition typeDefinition) =>
-
             //XXX THIS IS BAD https://jira.unity3d.com/browse/DOTS-10211
             typeDefinition.BaseType?.Name == nameof(MulticastDelegate);
 
@@ -194,7 +194,11 @@ namespace Unity.Entities.CodeGen
             {
                 var baseTypeRef = arg.BaseType;
 
-                if (arg.Interfaces.Any(typeInterface => typeInterface.InterfaceType.FullName == "Unity.Entities.ISystem"))
+                if (
+                    arg.Interfaces.Any(typeInterface =>
+                        typeInterface.InterfaceType.FullName == "Unity.Entities.ISystem"
+                    )
+                )
                     return true;
 
                 if (baseTypeRef == null)
@@ -216,7 +220,6 @@ namespace Unity.Entities.CodeGen
             }
         }
 
-
         public static bool IsUnityEngineObject(this TypeDefinition typeDefinition)
         {
             if (typeDefinition.IsValueType())
@@ -229,8 +232,6 @@ namespace Unity.Entities.CodeGen
             var baseType = typeDefinition.BaseType.Resolve();
             return IsUnityEngineObject(baseType);
         }
-
-
 
         public static bool IsChildTypeOf(this TypeDefinition typeDefinition, TypeDefinition baseClass)
         {
@@ -252,7 +253,7 @@ namespace Unity.Entities.CodeGen
                 {
                     typeDefinition.IsNestedFamilyOrAssembly = true;
                 }
-		        MakeTypeInternal(typeDefinition.DeclaringType);
+                MakeTypeInternal(typeDefinition.DeclaringType);
             }
             else if (!typeDefinition.IsPublic)
             {
@@ -289,8 +290,11 @@ namespace Unity.Entities.CodeGen
             }
         }
 
-        public static void InsertAfter(this ILProcessor ilProcessor, Instruction insertAfterThisOne,
-            IEnumerable<Instruction> instructions)
+        public static void InsertAfter(
+            this ILProcessor ilProcessor,
+            Instruction insertAfterThisOne,
+            IEnumerable<Instruction> instructions
+        )
         {
             var prev = insertAfterThisOne;
             foreach (var instruction in instructions)
@@ -300,8 +304,11 @@ namespace Unity.Entities.CodeGen
             }
         }
 
-        public static void InsertBefore(this ILProcessor ilProcessor, Instruction insertBeforeThisOne,
-            IEnumerable<Instruction> instructions)
+        public static void InsertBefore(
+            this ILProcessor ilProcessor,
+            Instruction insertBeforeThisOne,
+            IEnumerable<Instruction> instructions
+        )
         {
             foreach (var instruction in instructions)
                 ilProcessor.InsertBefore(insertBeforeThisOne, instruction);
@@ -313,8 +320,11 @@ namespace Unity.Entities.CodeGen
                 ilProcessor.Append(instruction);
         }
 
-        public static void Replace(this ILProcessor ilProcessor, Instruction replaceThisOne,
-            IEnumerable<Instruction> withThese)
+        public static void Replace(
+            this ILProcessor ilProcessor,
+            Instruction replaceThisOne,
+            IEnumerable<Instruction> withThese
+        )
         {
             replaceThisOne.OpCode = withThese.First().OpCode;
             replaceThisOne.Operand = withThese.First().Operand;
@@ -430,11 +440,21 @@ namespace Unity.Entities.CodeGen
             index = 0;
             switch (instruction.OpCode.Code)
             {
-                case Code.Ldarg: index = (int)instruction.Operand; return true;
-                case Code.Ldarg_0: index = 0; return true;
-                case Code.Ldarg_1: index = 1; return true;
-                case Code.Ldarg_2: index = 2; return true;
-                case Code.Ldarg_3: index = 3; return true;
+                case Code.Ldarg:
+                    index = (int)instruction.Operand;
+                    return true;
+                case Code.Ldarg_0:
+                    index = 0;
+                    return true;
+                case Code.Ldarg_1:
+                    index = 1;
+                    return true;
+                case Code.Ldarg_2:
+                    index = 2;
+                    return true;
+                case Code.Ldarg_3:
+                    index = 3;
+                    return true;
                 default:
                     return false;
             }
@@ -519,9 +539,15 @@ namespace Unity.Entities.CodeGen
             throw new ArgumentException(instruction.ToString());
         }
 
-        public static bool IsLoadFieldOrLoadFieldAddress(this Instruction instruction) => (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Ldflda);
-        public static bool IsLoadField(this Instruction instruction) => (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Ldflda);
-        public static bool IsLoadStaticField(this Instruction instruction) => (instruction.OpCode == OpCodes.Ldsfld || instruction.OpCode == OpCodes.Ldsflda);
+        public static bool IsLoadFieldOrLoadFieldAddress(this Instruction instruction) =>
+            (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Ldflda);
+
+        public static bool IsLoadField(this Instruction instruction) =>
+            (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Ldflda);
+
+        public static bool IsLoadStaticField(this Instruction instruction) =>
+            (instruction.OpCode == OpCodes.Ldsfld || instruction.OpCode == OpCodes.Ldsflda);
+
         public static bool IsStoreField(this Instruction instruction) => (instruction.OpCode == OpCodes.Stfld);
 
         public static bool IsLoadConstantInt(this Instruction instruction, out int intValue)

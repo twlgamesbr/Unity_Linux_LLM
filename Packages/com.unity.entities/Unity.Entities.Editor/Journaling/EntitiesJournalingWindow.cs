@@ -8,7 +8,6 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 #pragma warning disable 0618
 using static Unity.Entities.EntitiesJournaling;
 #pragma warning restore 0618
@@ -34,19 +33,24 @@ namespace Unity.Entities.Editor
                     property.Accept(this, ref container);
             }
 
-            void IPropertyVisitor.Visit<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container)
+            void IPropertyVisitor.Visit<TContainer, TValue>(
+                Property<TContainer, TValue> property,
+                ref TContainer container
+            )
             {
                 var value = property.GetValue(ref container);
 
                 // Special handling for some containers
-                if (typeof(TValue) == typeof(Entity) ||
-                    typeof(TValue) == typeof(EntityGuid) ||
-                    typeof(TValue) == typeof(Hash128) ||
-                    typeof(TValue) == typeof(FixedString32Bytes) ||
-                    typeof(TValue) == typeof(FixedString64Bytes) ||
-                    typeof(TValue) == typeof(FixedString128Bytes) ||
-                    typeof(TValue) == typeof(FixedString512Bytes) ||
-                    typeof(TValue) == typeof(FixedString4096Bytes))
+                if (
+                    typeof(TValue) == typeof(Entity)
+                    || typeof(TValue) == typeof(EntityGuid)
+                    || typeof(TValue) == typeof(Hash128)
+                    || typeof(TValue) == typeof(FixedString32Bytes)
+                    || typeof(TValue) == typeof(FixedString64Bytes)
+                    || typeof(TValue) == typeof(FixedString128Bytes)
+                    || typeof(TValue) == typeof(FixedString512Bytes)
+                    || typeof(TValue) == typeof(FixedString4096Bytes)
+                )
                 {
                     m_Values.Add(value.ToString());
                     return; // Do not visit property, stop here
@@ -112,16 +116,26 @@ namespace Unity.Entities.Editor
         static readonly string s_Components = L10n.Tr("Components");
         static readonly string s_ComponentCount = L10n.Tr("Component Count");
         static readonly string s_ComponentDataValue = L10n.Tr("Component Data Value");
-        static readonly string s_RecordingMessage = L10n.Tr("Journaling data is currently being recorded. Stop recording to view recorded data.");
-        static readonly string s_PostProcessingMessage = L10n.Tr("Post processing journaling data, this might take some time, please wait.");
+        static readonly string s_RecordingMessage = L10n.Tr(
+            "Journaling data is currently being recorded. Stop recording to view recorded data."
+        );
+        static readonly string s_PostProcessingMessage = L10n.Tr(
+            "Post processing journaling data, this might take some time, please wait."
+        );
         static readonly string s_Stop = L10n.Tr("Stop Recording");
         static readonly string s_SearchResult = L10n.Tr("{0} Results Found");
         static readonly string s_Records = L10n.Tr("{0} Records");
         static readonly string s_MemoryUsed = L10n.Tr("Memory Used: {0} / {1}");
 
-        static readonly Lazy<Texture2D> s_JournalingIcon = new Lazy<Texture2D>(() => PackageResources.LoadIcon("Journaling/Journaling.png"));
-        static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate("Journaling/entities-journaling-window");
-        static readonly VisualElementTemplate s_ContentTemplate = PackageResources.LoadTemplate("Journaling/entities-journaling-content");
+        static readonly Lazy<Texture2D> s_JournalingIcon = new Lazy<Texture2D>(() =>
+            PackageResources.LoadIcon("Journaling/Journaling.png")
+        );
+        static readonly VisualElementTemplate s_WindowTemplate = PackageResources.LoadTemplate(
+            "Journaling/entities-journaling-window"
+        );
+        static readonly VisualElementTemplate s_ContentTemplate = PackageResources.LoadTemplate(
+            "Journaling/entities-journaling-content"
+        );
 
         [MenuItem(Constants.MenuItems.JournalingWindow, false, Constants.MenuItems.JournalingWindowPriority)]
         static void OpenWindow() => GetWindow<EntitiesJournalingWindow>();
@@ -151,8 +165,8 @@ namespace Unity.Entities.Editor
         Label m_RecordCountLabel;
         Label m_UsedBytesLabel;
 
-        public EntitiesJournalingWindow() : base(Analytics.Window.Journaling)
-        { }
+        public EntitiesJournalingWindow()
+            : base(Analytics.Window.Journaling) { }
 
         protected override void OnCreate()
         {
@@ -171,13 +185,15 @@ namespace Unity.Entities.Editor
             m_RecordToggle = toolbar.Q<Toggle>("record");
             m_RecordToggle.value = Preferences.Enabled;
             m_RecordToggle.tooltip = s_RecordTooltip;
-            m_RecordToggle.RegisterValueChangedCallback((e) =>
-            {
-                m_HasShownDeprecationWarning = true;
-                Enabled = e.newValue;
-                Preferences.Enabled = e.newValue;
-                Refresh();
-            });
+            m_RecordToggle.RegisterValueChangedCallback(
+                (e) =>
+                {
+                    m_HasShownDeprecationWarning = true;
+                    Enabled = e.newValue;
+                    Preferences.Enabled = e.newValue;
+                    Refresh();
+                }
+            );
 
             var exportButton = toolbar.Q<Button>("export");
             exportButton.tooltip = s_ExportTooltip;
@@ -199,21 +215,102 @@ namespace Unity.Entities.Editor
             var searchContainer = window.Q("search-container");
             var searchElement = searchContainer.Q<SearchElement>("search");
             var defaultSearchOptions = new SearchFilterOptions();
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, ulong>(k_RecordIndexToken, r => r.Index, s_RecordIndex, "", defaultSearchOptions, "=");
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(k_RecordTypeToken, r => r.RecordType.ToString(), s_RecordType);
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, int>(k_FrameIndexToken, r => r.FrameIndex, s_FrameIndex, "", defaultSearchOptions, "=");
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(k_WorldNameToken, GetWorldName, s_WorldName);
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, ulong>(k_WorldIndexToken, r => r.World.SequenceNumber, s_WorldIndex, "", defaultSearchOptions, "=");
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(k_SystemToken, r => new[] { GetExecutingSystemName(r), GetOriginSystemName(r) }, s_System);
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(k_ExecutingSystemToken, GetExecutingSystemName, s_ExecutingSystem);
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(k_OriginSystemToken, GetOriginSystemName, s_OriginSystem);
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(k_EntityNameToken, r => r.Entities.Select(e => e.Name), s_EntityName);
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<int>>(k_EntityIndexToken, r => r.Entities.Select(e => e.Index), s_EntityIndex, "", defaultSearchOptions, "=");
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, int>(k_EntityCountToken, r => r.Entities.Length, s_EntityCount, "", defaultSearchOptions, "=");
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(k_ComponentTypeNameToken, r => r.ComponentTypes.Select(t => t.Name), s_ComponentTypeName);
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<int>>(k_ComponentTypeIndexToken, r => r.ComponentTypes.Select(t => t.TypeIndex.Value), s_ComponentTypeIndex, "", defaultSearchOptions, "=");
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, int>(k_ComponentCountToken, r => r.ComponentTypes.Length, s_ComponentCount, "", defaultSearchOptions, "=");
-            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(k_ComponentDataValueToken, GetComponentDataText, s_ComponentDataValue);
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, ulong>(
+                k_RecordIndexToken,
+                r => r.Index,
+                s_RecordIndex,
+                "",
+                defaultSearchOptions,
+                "="
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(
+                k_RecordTypeToken,
+                r => r.RecordType.ToString(),
+                s_RecordType
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, int>(
+                k_FrameIndexToken,
+                r => r.FrameIndex,
+                s_FrameIndex,
+                "",
+                defaultSearchOptions,
+                "="
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(
+                k_WorldNameToken,
+                GetWorldName,
+                s_WorldName
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, ulong>(
+                k_WorldIndexToken,
+                r => r.World.SequenceNumber,
+                s_WorldIndex,
+                "",
+                defaultSearchOptions,
+                "="
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(
+                k_SystemToken,
+                r => new[] { GetExecutingSystemName(r), GetOriginSystemName(r) },
+                s_System
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(
+                k_ExecutingSystemToken,
+                GetExecutingSystemName,
+                s_ExecutingSystem
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, string>(
+                k_OriginSystemToken,
+                GetOriginSystemName,
+                s_OriginSystem
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(
+                k_EntityNameToken,
+                r => r.Entities.Select(e => e.Name),
+                s_EntityName
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<int>>(
+                k_EntityIndexToken,
+                r => r.Entities.Select(e => e.Index),
+                s_EntityIndex,
+                "",
+                defaultSearchOptions,
+                "="
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, int>(
+                k_EntityCountToken,
+                r => r.Entities.Length,
+                s_EntityCount,
+                "",
+                defaultSearchOptions,
+                "="
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(
+                k_ComponentTypeNameToken,
+                r => r.ComponentTypes.Select(t => t.Name),
+                s_ComponentTypeName
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<int>>(
+                k_ComponentTypeIndexToken,
+                r => r.ComponentTypes.Select(t => t.TypeIndex.Value),
+                s_ComponentTypeIndex,
+                "",
+                defaultSearchOptions,
+                "="
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, int>(
+                k_ComponentCountToken,
+                r => r.ComponentTypes.Length,
+                s_ComponentCount,
+                "",
+                defaultSearchOptions,
+                "="
+            );
+            searchElement.AddSearchFilterCallbackWithPopupItem<RecordView, IEnumerable<string>>(
+                k_ComponentDataValueToken,
+                GetComponentDataText,
+                s_ComponentDataValue
+            );
 
             var jump = toolbar.Q<Button>("jump");
             SearchUtils.SetupJumpButton(jump, () => JournalSearchProvider.OpenProvider(searchElement.value));
@@ -228,7 +325,10 @@ namespace Unity.Entities.Editor
             m_MessageContainer = window.Q("message-container");
             m_MessageContainer.SetVisibility(isRecording);
             m_MessageLabel = m_MessageContainer.Q<Label>("message");
-            m_MessageLabel.text = isRecording ? s_RecordingMessage : m_NeedPostProcess > 0 ? s_PostProcessingMessage : string.Empty;
+            m_MessageLabel.text =
+                isRecording ? s_RecordingMessage
+                : m_NeedPostProcess > 0 ? s_PostProcessingMessage
+                : string.Empty;
 
             m_StopButton = window.Q<Button>("stop");
             m_StopButton.text = s_Stop;
@@ -252,23 +352,31 @@ namespace Unity.Entities.Editor
             var recordsList = m_ContentContainer.Q<MultiColumnListView>("records");
             recordsList.showAlternatingRowBackgrounds = AlternatingRowBackground.All;
             recordsList.columns[k_RecordIndexColumn].title = s_RecordIndex;
-            recordsList.columns[k_RecordIndexColumn].bindCell = (element, index) => BindCell(element, index, GetRecordIndexText);
+            recordsList.columns[k_RecordIndexColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetRecordIndexText);
             recordsList.columns[k_RecordTypeColumn].title = s_RecordType;
-            recordsList.columns[k_RecordTypeColumn].bindCell = (element, index) => BindCell(element, index, GetRecordTypeText);
+            recordsList.columns[k_RecordTypeColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetRecordTypeText);
             recordsList.columns[k_SummaryColumn].title = s_Summary;
-            recordsList.columns[k_SummaryColumn].bindCell = (element, index) => BindCell(element, index, GetSummaryText);
+            recordsList.columns[k_SummaryColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetSummaryText);
             recordsList.columns[k_FrameIndexColumn].title = s_FrameIndex;
-            recordsList.columns[k_FrameIndexColumn].bindCell = (element, index) => BindCell(element, index, GetFrameIndexText);
+            recordsList.columns[k_FrameIndexColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetFrameIndexText);
             recordsList.columns[k_WorldColumn].title = s_World;
             recordsList.columns[k_WorldColumn].bindCell = (element, index) => BindCell(element, index, GetWorldName);
             recordsList.columns[k_ExecutingSystemColumn].title = s_ExecutingSystem;
-            recordsList.columns[k_ExecutingSystemColumn].bindCell = (element, index) => BindCell(element, index, GetExecutingSystemName);
+            recordsList.columns[k_ExecutingSystemColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetExecutingSystemName);
             recordsList.columns[k_OriginSystemColumn].title = s_OriginSystem;
-            recordsList.columns[k_OriginSystemColumn].bindCell = (element, index) => BindCell(element, index, GetOriginSystemName);
+            recordsList.columns[k_OriginSystemColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetOriginSystemName);
             recordsList.columns[k_EntitiesColumn].title = s_Entities;
-            recordsList.columns[k_EntitiesColumn].bindCell = (element, index) => BindCell(element, index, GetEntitiesText);
+            recordsList.columns[k_EntitiesColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetEntitiesText);
             recordsList.columns[k_ComponentsColumn].title = s_Components;
-            recordsList.columns[k_ComponentsColumn].bindCell = (element, index) => BindCell(element, index, GetComponentTypesText);
+            recordsList.columns[k_ComponentsColumn].bindCell = (element, index) =>
+                BindCell(element, index, GetComponentTypesText);
             recordsList.selectionChanged += (objects) =>
             {
                 m_Details.SetRecord((RecordView)objects.FirstOrDefault());
@@ -288,11 +396,12 @@ namespace Unity.Entities.Editor
                         record.World.Name,
                         record.ExecutingSystem.Name,
                         record.OriginSystem.Name,
-                        GetRecordDataSystemName(record)
+                        GetRecordDataSystemName(record),
                     }
-                    .Concat(record.Entities.Select(e => e.Name))
-                    .Concat(record.ComponentTypes.Select(t => t.Name));
-                });
+                        .Concat(record.Entities.Select(e => e.Name))
+                        .Concat(record.ComponentTypes.Select(t => t.Name));
+                }
+            );
             m_RecordsList.AddDefaultEnumerableOperatorHandlers();
 
             m_Details = new EntitiesJournalingWindowDetails(this, m_ContentContainer.Q("details"));
@@ -331,12 +440,21 @@ namespace Unity.Entities.Editor
             var isRecording = Enabled;
             m_RecordToggle.value = isRecording;
             m_RecordCountLabel.text = string.Format(s_Records, FormattingUtility.CountToString(RecordCount));
-            m_UsedBytesLabel.text = string.Format(s_MemoryUsed, FormattingUtility.BytesToString(UsedBytes), FormattingUtility.BytesToString(AllocatedBytes));
-            m_SearchResultLabel.text = m_RecordsList.HasFilter ? string.Format(s_SearchResult, FormattingUtility.CountToString(m_RecordsList.Count)) : string.Empty;
+            m_UsedBytesLabel.text = string.Format(
+                s_MemoryUsed,
+                FormattingUtility.BytesToString(UsedBytes),
+                FormattingUtility.BytesToString(AllocatedBytes)
+            );
+            m_SearchResultLabel.text = m_RecordsList.HasFilter
+                ? string.Format(s_SearchResult, FormattingUtility.CountToString(m_RecordsList.Count))
+                : string.Empty;
             m_ContentContainer.SetVisibility(!isRecording && m_NeedPostProcess == 0 && m_HasShownDeprecationWarning);
             m_MessageContainer.SetVisibility(isRecording || m_NeedPostProcess > 0 && m_HasShownDeprecationWarning);
             m_WarningBox.SetVisibility(!m_HasShownDeprecationWarning);
-            m_MessageLabel.text = isRecording ? s_RecordingMessage : m_NeedPostProcess > 0 ? s_PostProcessingMessage : string.Empty;
+            m_MessageLabel.text =
+                isRecording ? s_RecordingMessage
+                : m_NeedPostProcess > 0 ? s_PostProcessingMessage
+                : string.Empty;
             m_StopButton.SetVisibility(isRecording);
 
             if (m_NeedPostProcess > 0)
@@ -350,9 +468,7 @@ namespace Unity.Entities.Editor
             }
         }
 
-        protected override void OnWorldSelected(World world)
-        {
-        }
+        protected override void OnWorldSelected(World world) { }
 
         void OnInitialTwoPaneSplitViewGeometryChangedEvent(GeometryChangedEvent e)
         {
@@ -421,7 +537,9 @@ namespace Unity.Entities.Editor
 
         internal string[] GetComponentDataText(RecordView record)
         {
-            return TryGetRecordDataAsComponentDataArrayBoxed(record, out var componentDataArray) ? GetComponentDataValues(componentDataArray) : Array.Empty<string>();
+            return TryGetRecordDataAsComponentDataArrayBoxed(record, out var componentDataArray)
+                ? GetComponentDataValues(componentDataArray)
+                : Array.Empty<string>();
         }
 
         string[] GetComponentDataValues(object componentDataArray)
@@ -468,10 +586,16 @@ namespace Unity.Entities.Editor
         }
 
         internal static string GetRecordIndexText(RecordView record) => FormattingUtility.CountToString(record.Index);
+
         internal static string GetRecordTypeText(RecordView record) => record.RecordType.ToString();
-        internal static string GetFrameIndexText(RecordView record) => FormattingUtility.CountToString(record.FrameIndex);
+
+        internal static string GetFrameIndexText(RecordView record) =>
+            FormattingUtility.CountToString(record.FrameIndex);
+
         internal static string GetWorldName(RecordView record) => record.World.Name;
+
         internal static string GetExecutingSystemName(RecordView record) => record.ExecutingSystem.Name;
+
         internal static string GetOriginSystemName(RecordView record) => record.OriginSystem.Name;
 
         internal static string GetEntitiesText(RecordView record)

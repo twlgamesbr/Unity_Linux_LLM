@@ -54,7 +54,6 @@ namespace Unity.Entities
     /// TransformUsageFlags has a Dynamic parent and Dynamic children, then that entity is considered Dynamic as
     /// well and it isn't stripped out.
     ///</remarks>
-
     [Flags]
     public enum TransformUsageFlags : int
     {
@@ -130,7 +129,7 @@ namespace Unity.Entities
         RequestParent = 1 << 2,
         PostTransformMatrix = 1 << 3,
 
-        ManualOverride =  1 << 4,
+        ManualOverride = 1 << 4,
     }
 
     /// <summary>
@@ -141,7 +140,7 @@ namespace Unity.Entities
         const int ManualOverrideIndex = 4;
         const int Length = 5;
         fixed int Counts[Length];
-        int       IsUsed;
+        int IsUsed;
 
         public void Add(TransformUsageFlags value)
         {
@@ -192,7 +191,7 @@ namespace Unity.Entities
                 int flags = 0;
                 for (int i = 0; i != Length; i++)
                     flags |= Counts[i] != 0 ? 1 << i : 0;
-                return (TransformUsageFlags) flags;
+                return (TransformUsageFlags)flags;
             }
         }
 

@@ -64,16 +64,27 @@ internal class MaterialPropPopup : PopupWindowContent
                             overrideProp.FindPropertyRelative("displayName").stringValue = displayName;
 
                             overrideProp.FindPropertyRelative("shaderName").stringValue = shaderName;
-                            overrideProp.FindPropertyRelative("materialName").stringValue = _overrideAsset.material.name;
+                            overrideProp.FindPropertyRelative("materialName").stringValue = _overrideAsset
+                                .material
+                                .name;
                             overrideProp.FindPropertyRelative("type").intValue = (int)propertyType;
                             overrideProp.FindPropertyRelative("instanceOverride").boolValue = false;
                             if (propertyType == ShaderPropertyType.Vector || propertyType == ShaderPropertyType.Color)
                             {
-                                overrideProp.FindPropertyRelative("value").vector4Value = _overrideAsset.material.GetVector(propertyName);
+                                overrideProp.FindPropertyRelative("value").vector4Value =
+                                    _overrideAsset.material.GetVector(propertyName);
                             }
-                            else if (propertyType == ShaderPropertyType.Float || propertyType == ShaderPropertyType.Range)
+                            else if (
+                                propertyType == ShaderPropertyType.Float
+                                || propertyType == ShaderPropertyType.Range
+                            )
                             {
-                                Vector4 vec4 = new Vector4(_overrideAsset.material.GetFloat(propertyName), 0.0f, 0.0f, 0.0f);
+                                Vector4 vec4 = new Vector4(
+                                    _overrideAsset.material.GetFloat(propertyName),
+                                    0.0f,
+                                    0.0f,
+                                    0.0f
+                                );
                                 overrideProp.FindPropertyRelative("value").vector4Value = vec4;
                             }
                         }
@@ -102,7 +113,7 @@ internal class MaterialPropPopup : PopupWindowContent
     {
         string filepath = null;
         string preamble =
-@"using Unity.Entities;
+            @"using Unity.Entities;
 using Unity.Mathematics;
 
 namespace Unity.Rendering
@@ -111,7 +122,6 @@ namespace Unity.Rendering
         for (int i = 0; i < _overrideAsset.overrideList.Count; i++)
         {
             MaterialOverrideAsset.OverrideData overrideData = _overrideAsset.overrideList[i];
-
 
             if (_overrideAsset.GetTypeFromAttrs(overrideData) != null)
             {
@@ -151,8 +161,10 @@ namespace Unity.Rendering
             if (generatedStruct != "")
             {
                 //TODO(andrew.theisen): writeall text 260 char limit for filepath
-                filepath = Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(_overrideAsset.material)),
-                    $@"{@fieldName}{@typeName}OverrideGenerated.cs");
+                filepath = Path.Combine(
+                    Path.GetDirectoryName(AssetDatabase.GetAssetPath(_overrideAsset.material)),
+                    $@"{@fieldName}{@typeName}OverrideGenerated.cs"
+                );
                 File.WriteAllText(filepath, preamble + generatedStruct);
 
                 _overrideAsset.overrideList[i] = overrideData;
@@ -212,7 +224,12 @@ public class MaterialOverrideAssetEditor : Editor
             if (type == ShaderPropertyType.Color)
             {
                 SerializedProperty colorProp = overrideProp.FindPropertyRelative("value");
-                Color color = new Color(colorProp.vector4Value.x, colorProp.vector4Value.y, colorProp.vector4Value.z, colorProp.vector4Value.w);
+                Color color = new Color(
+                    colorProp.vector4Value.x,
+                    colorProp.vector4Value.y,
+                    colorProp.vector4Value.z,
+                    colorProp.vector4Value.w
+                );
                 Color newColor = EditorGUILayout.ColorField(new GUIContent(displayName), color);
                 Vector4 vec4 = new Vector4(newColor.r, newColor.g, newColor.b, newColor.a);
                 colorProp.vector4Value = vec4;
@@ -246,7 +263,6 @@ public class MaterialOverrideAssetEditor : Editor
         {
             GUI.enabled = false;
         }
-
 
         if (GUILayout.Button(buttonTxt))
         {

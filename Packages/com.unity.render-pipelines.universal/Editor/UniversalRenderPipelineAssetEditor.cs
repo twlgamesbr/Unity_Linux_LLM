@@ -47,7 +47,7 @@ namespace UnityEditor.Rendering.Universal
         {
 #if ENABLE_UPSCALER_FRAMEWORK
             m_UpscalerOptionsEditorCache?.Cleanup();
-#endif            
+#endif
         }
 
         void CreateRendererReorderableList()
@@ -60,7 +60,8 @@ namespace UnityEditor.Rendering.Universal
                 drawHeaderCallback = (Rect rect) => EditorGUI.LabelField(rect, Styles.rendererHeaderText),
                 onCanRemoveCallback = reorderableList => reorderableList.count > 1,
                 onRemoveCallback = OnRemoveElement,
-                onReorderCallbackWithDetails = (reorderableList, index, newIndex) => UpdateDefaultRendererValue(index, newIndex) // Need to update the default renderer index
+                onReorderCallbackWithDetails = (reorderableList, index, newIndex) =>
+                    UpdateDefaultRendererValue(index, newIndex), // Need to update the default renderer index
             };
         }
 
@@ -78,7 +79,11 @@ namespace UnityEditor.Rendering.Universal
             }
             else
             {
-                EditorUtility.DisplayDialog(Styles.rendererListDefaultMessage.text, Styles.rendererListDefaultMessage.tooltip, "Close");
+                EditorUtility.DisplayDialog(
+                    Styles.rendererListDefaultMessage.text,
+                    Styles.rendererListDefaultMessage.tooltip,
+                    "Close"
+                );
             }
 
             if (shouldUpdateIndex)
@@ -98,7 +103,12 @@ namespace UnityEditor.Rendering.Universal
             using (var changeCheck = new EditorGUI.ChangeCheckScope())
             {
                 var objectFieldWidth = rect.width - 110;
-                var objRect = new Rect(rect.x + indexRect.width, rect.y, objectFieldWidth, EditorGUIUtility.singleLineHeight);
+                var objRect = new Rect(
+                    rect.x + indexRect.width,
+                    rect.y,
+                    objectFieldWidth,
+                    EditorGUIUtility.singleLineHeight
+                );
                 EditorGUI.ObjectField(objRect, m_RendererDataProp.GetArrayElementAtIndex(index), GUIContent.none);
                 if (changeCheck.changed)
                     EditorUtility.SetDirty(target);
@@ -109,7 +119,12 @@ namespace UnityEditor.Rendering.Universal
             {
                 var defaultButtonX = rect.width - 51;
                 var defaultButtonRect = new Rect(defaultButtonX, rect.y, 86, EditorGUIUtility.singleLineHeight);
-                if (GUI.Button(defaultButtonRect, !GUI.enabled ? Styles.rendererDefaultText : Styles.rendererSetDefaultText))
+                if (
+                    GUI.Button(
+                        defaultButtonRect,
+                        !GUI.enabled ? Styles.rendererDefaultText : Styles.rendererSetDefaultText
+                    )
+                )
                 {
                     m_DefaultRendererProp.intValue = index;
                     EditorUtility.SetDirty(target);
@@ -117,9 +132,13 @@ namespace UnityEditor.Rendering.Universal
             }
 
             // If object selector chose an object, assign it to the correct ScriptableRendererData slot.
-            if (Event.current.commandName == "ObjectSelectorUpdated" && EditorGUIUtility.GetObjectPickerControlID() == index)
+            if (
+                Event.current.commandName == "ObjectSelectorUpdated"
+                && EditorGUIUtility.GetObjectPickerControlID() == index
+            )
             {
-                m_RendererDataProp.GetArrayElementAtIndex(index).objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
+                m_RendererDataProp.GetArrayElementAtIndex(index).objectReferenceValue =
+                    EditorGUIUtility.GetObjectPickerObject();
             }
         }
 

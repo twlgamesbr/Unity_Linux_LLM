@@ -12,7 +12,8 @@ namespace Unity.Scenes
     //@TODO: This doesn't yet automatically handle triggering a refresh if a dependent asset was changed on disk but refresh hasn't been called yet.
     //       Fixing that requires 20.2 branch from asset pipeline team to land.
 
-    internal class AssetDependencyTracker<T> : IDisposable where T : unmanaged, IEquatable<T>
+    internal class AssetDependencyTracker<T> : IDisposable
+        where T : unmanaged, IEquatable<T>
     {
         public struct Completed
         {
@@ -52,26 +53,27 @@ namespace Unity.Scenes
         }
 
         private NativeParallelMultiHashMap<UnityEngine.GUID, ReportedValue> _AllAssets;
-        private NativeParallelHashMap<UnityEngine.GUID, RefCount>               _AllAssetsRefCount;
+        private NativeParallelHashMap<UnityEngine.GUID, RefCount> _AllAssetsRefCount;
 
         private NativeList<UnityEngine.GUID> _InProgress;
         private NativeList<Hash128> _ArtifactCache;
 
-        Type   _AssetImportType;
-        bool   _RequestRefresh;
+        Type _AssetImportType;
+        bool _RequestRefresh;
 
         // Tracks if any dependencies have changed anywhere in the project.
         // When they change we have to call ProduceAsset
-        ulong  _GlobalArtifactDependencyVersion;
+        ulong _GlobalArtifactDependencyVersion;
+
         // Tracks if any artifacts might have completed imported.
         // We need to lookup if something has changed based on this.
-        ulong  _GlobalArtifactProcessedVersion;
+        ulong _GlobalArtifactProcessedVersion;
 
-        int    _ProgressID;
-        bool   _UpdateProgressBar;
-        int    _TotalProgressAssets;
+        int _ProgressID;
+        bool _UpdateProgressBar;
+        int _TotalProgressAssets;
         string _ProgressSummary;
-        bool   _IsAssetWorker;
+        bool _IsAssetWorker;
 
         public AssetDependencyTracker(Type importerType, string progressSummary)
         {
@@ -79,9 +81,9 @@ namespace Unity.Scenes
             _ProgressID = -1;
             _ProgressSummary = progressSummary;
 
-             _AllAssets = new NativeParallelMultiHashMap<UnityEngine.GUID, ReportedValue>(1024, Allocator.Persistent);
-             _AllAssetsRefCount = new NativeParallelHashMap<UnityEngine.GUID, RefCount>(1024, Allocator.Persistent);
-             _InProgress = new NativeList<UnityEngine.GUID>(1024, Allocator.Persistent);
+            _AllAssets = new NativeParallelMultiHashMap<UnityEngine.GUID, ReportedValue>(1024, Allocator.Persistent);
+            _AllAssetsRefCount = new NativeParallelHashMap<UnityEngine.GUID, RefCount>(1024, Allocator.Persistent);
+            _InProgress = new NativeList<UnityEngine.GUID>(1024, Allocator.Persistent);
             _ArtifactCache = new NativeList<Hash128>(1024, Allocator.Persistent);
             _IsAssetWorker = AssetDatabaseCompatibility.IsAssetImportWorkerProcess();
         }
@@ -100,12 +102,19 @@ namespace Unity.Scenes
         public void Add(UnityEngine.GUID asset, T userKey, bool async)
         {
             if (GetIterator(asset, userKey, out var temp, out var temp2))
-                throw new ArgumentException("Add must not be called with an asset & userKey that has already been Added.");
+                throw new ArgumentException(
+                    "Add must not be called with an asset & userKey that has already been Added."
+                );
 
             LogDependencyTracker($"Add: {asset}");
 
             var value = new ReportedValue
-                {ReportedHash = default, UserKey = userKey, Async = async, DidReport = false};
+            {
+                ReportedHash = default,
+                UserKey = userKey,
+                Async = async,
+                DidReport = false,
+            };
             _AllAssets.Add(asset, value);
 
             //@TODO: Don't trigger full _GlobalArtifactDependencyVersion if no new assets were added?
@@ -178,7 +187,9 @@ namespace Unity.Scenes
             {
                 // This requires special codepaths declaring dependencies / changes in asset pipeline / tests to work correctly.
                 // For now just disallow it for clarity.
-                throw new System.ArgumentException("Importing dependent assets on an import workers is currently not supported");
+                throw new System.ArgumentException(
+                    "Importing dependent assets on an import workers is currently not supported"
+                );
             }
 
             // LogDependencyTracker("AssetDependencyTracker.GetCompleted");
@@ -212,7 +223,11 @@ namespace Unity.Scenes
                     // Process any sync imported assets
                     if (allSync.Length != 0)
                     {
-                        var wasSuccessful = AssetDatabaseCompatibility.ProduceArtifactsRefreshIfNecessary(allSync.AsArray(), _AssetImportType, _ArtifactCache);
+                        var wasSuccessful = AssetDatabaseCompatibility.ProduceArtifactsRefreshIfNecessary(
+                            allSync.AsArray(),
+                            _AssetImportType,
+                            _ArtifactCache
+                        );
 
                         foreach (var artifact in _ArtifactCache)
                         {
@@ -227,7 +242,8 @@ namespace Unity.Scenes
                             {
                                 if (!_ArtifactCache[i].isValid)
                                     Debug.LogError(
-                                        $"Asset {AssetDatabaseCompatibility.GuidToPath(allSync[i])} couldn't be imported. (Most likely the assets dependencies or the asset itself is being modified during import.)");
+                                        $"Asset {AssetDatabaseCompatibility.GuidToPath(allSync[i])} couldn't be imported. (Most likely the assets dependencies or the asset itself is being modified during import.)"
+                                    );
                             }
                         }
                     }
@@ -272,7 +288,7 @@ namespace Unity.Scenes
                 LogDependencyTracker($"New artifacts: {globalArtifactProcessedVersion}");
 
                 // Clean up any _InProgress assets that are no longer required
-                for (int i = 0; i < _InProgress.Length;)
+                for (int i = 0; i < _InProgress.Length; )
                 {
                     if (!_AllAssets.ContainsKey(_InProgress[i]))
                     {
@@ -285,7 +301,7 @@ namespace Unity.Scenes
 
                 AssetDatabaseCompatibility.LookupArtifacts(_InProgress.AsArray(), _AssetImportType, _ArtifactCache);
 
-                for (int i = 0; i < _InProgress.Length;)
+                for (int i = 0; i < _InProgress.Length; )
                 {
                     var artifact = _ArtifactCache[i];
                     var guid = _InProgress[i];
@@ -301,7 +317,11 @@ namespace Unity.Scenes
                     }
                     else
                     {
-                        if (AssetDatabaseExperimental.GetOnDemandArtifactProgress(new ArtifactKey(guid, _AssetImportType)).state == OnDemandState.Failed)
+                        if (
+                            AssetDatabaseExperimental
+                                .GetOnDemandArtifactProgress(new ArtifactKey(guid, _AssetImportType))
+                                .state == OnDemandState.Failed
+                        )
                         {
                             _RequestRefresh = true;
                         }
@@ -329,7 +349,7 @@ namespace Unity.Scenes
                     if (_ProgressID == -1 || !Progress.Exists(_ProgressID))
                         _ProgressID = Progress.Start(_ProgressSummary);
 
-                    float progress = (_TotalProgressAssets - _InProgress.Length) / (float) _TotalProgressAssets;
+                    float progress = (_TotalProgressAssets - _InProgress.Length) / (float)_TotalProgressAssets;
                     string description = $"{_TotalProgressAssets - _InProgress.Length} out of {_TotalProgressAssets}";
 
                     LogDependencyTracker($"Progress update: " + description);
@@ -351,7 +371,12 @@ namespace Unity.Scenes
             get { return _InProgress.Length; }
         }
 
-        bool GetIterator(UnityEngine.GUID asset, T userKey, out NativeParallelMultiHashMapIterator<UnityEngine.GUID> iterator, out ReportedValue value)
+        bool GetIterator(
+            UnityEngine.GUID asset,
+            T userKey,
+            out NativeParallelMultiHashMapIterator<UnityEngine.GUID> iterator,
+            out ReportedValue value
+        )
         {
             if (_AllAssets.TryGetFirstValue(asset, out value, out iterator))
             {
@@ -375,7 +400,14 @@ namespace Unity.Scenes
             {
                 if (!value.DidReport || value.ReportedHash != artifact)
                 {
-                    completed.Add(new Completed {Asset = guid, UserKey = value.UserKey, ArtifactID = artifact});
+                    completed.Add(
+                        new Completed
+                        {
+                            Asset = guid,
+                            UserKey = value.UserKey,
+                            ArtifactID = artifact,
+                        }
+                    );
                     value.ReportedHash = artifact;
                     value.DidReport = true;
                     _AllAssets.SetValue(value, it);

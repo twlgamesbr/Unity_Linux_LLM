@@ -54,7 +54,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             List<MetricId> stats,
             SampleRate rate,
             float minPlotValue,
-            float maxPlotValue)
+            float maxPlotValue
+        )
         {
             if (m_Renderer == null)
             {
@@ -67,17 +68,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 return new();
             }
 
-            var bufferParams = new GraphBufferParameters(
-                m_GraphParams,
-                graphWidth,
-                m_Renderer.MaxPointsPerPixel);
+            var bufferParams = new GraphBufferParameters(m_GraphParams, graphWidth, m_Renderer.MaxPointsPerPixel);
 
             var graphWidthSamples = m_GraphParams.SamplesPerStat;
             var graphWidthPoints = bufferParams.GraphWidthPoints;
             var graphSamplesPerPoint = ((float)graphWidthSamples) / graphWidthPoints;
             var pointsToAdvance = m_InputSynchronizer.ComputeNumberOfPointsToAdvance(
                 history.TimeStamps[rate],
-                graphSamplesPerPoint);
+                graphSamplesPerPoint
+            );
 
             m_DataSampler.ResizeBuffersIfNeeded(bufferParams);
             m_DataSampler.SampleNewPoints(
@@ -87,7 +86,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 graphWidthPoints: graphWidthPoints,
                 graphWidthSamples: graphWidthSamples,
                 graphSamplesPerPoint: graphSamplesPerPoint,
-                pointsToAdvance: pointsToAdvance);
+                pointsToAdvance: pointsToAdvance
+            );
 
             // We need to do this each time we draw, as even if the configuration hasn't changed,
             // the contentRect may have
@@ -103,13 +103,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 m_Buffers.Parameters,
                 renderBoundsXMin: graphContentRect.xMin,
                 renderBoundsXMax: graphContentRect.xMax,
-
                 // Inverting renderBoundsYMin and renderBoundsYMax
                 // since we want our graph from bottom to top
                 renderBoundsYMin: graphContentRect.yMax,
                 renderBoundsYMax: graphContentRect.yMin,
-
-                m_Buffers.Vertices);
+                m_Buffers.Vertices
+            );
 
             MarkDirtyRepaint();
             return minAndMaxPlotValue;

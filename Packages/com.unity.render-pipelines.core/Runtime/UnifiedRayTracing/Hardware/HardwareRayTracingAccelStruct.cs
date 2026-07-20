@@ -14,9 +14,9 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         readonly Dictionary<int, Mesh> m_Meshes = new();
         readonly ReferenceCounter m_Counter;
 
-        #if UNITY_ASSERTIONS
-            readonly HashSet<int> m_InstanceHandles = new();
-        #endif
+#if UNITY_ASSERTIONS
+        readonly HashSet<int> m_InstanceHandles = new();
+#endif
 
         internal HardwareRayTracingAccelStruct(AccelerationStructureOptions options, ReferenceCounter counter)
         {
@@ -44,15 +44,34 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         public int AddInstance(MeshInstanceDesc meshInstance)
         {
             Utils.CheckArgIsNotNull(meshInstance.mesh, "meshInstance.mesh");
-            Utils.CheckArg(meshInstance.mesh.HasVertexAttribute(VertexAttribute.Position), "Cant use a mesh buffer that has no positions.");
-            Utils.CheckArgRange(meshInstance.subMeshIndex, 0, meshInstance.mesh.subMeshCount, "meshInstance.subMeshIndex");
+            Utils.CheckArg(
+                meshInstance.mesh.HasVertexAttribute(VertexAttribute.Position),
+                "Cant use a mesh buffer that has no positions."
+            );
+            Utils.CheckArgRange(
+                meshInstance.subMeshIndex,
+                0,
+                meshInstance.mesh.subMeshCount,
+                "meshInstance.subMeshIndex"
+            );
 
-            var instanceDesc = new RayTracingMeshInstanceConfig(meshInstance.mesh, (uint)meshInstance.subMeshIndex, null);
+            var instanceDesc = new RayTracingMeshInstanceConfig(
+                meshInstance.mesh,
+                (uint)meshInstance.subMeshIndex,
+                null
+            );
             instanceDesc.mask = meshInstance.mask;
             instanceDesc.enableTriangleCulling = meshInstance.enableTriangleCulling;
             instanceDesc.frontTriangleCounterClockwise = meshInstance.frontTriangleCounterClockwise;
-            instanceDesc.subMeshFlags = meshInstance.opaqueGeometry ? RayTracingSubMeshFlags.Enabled | RayTracingSubMeshFlags.ClosestHitOnly : RayTracingSubMeshFlags.Enabled | RayTracingSubMeshFlags.UniqueAnyHitCalls;
-            int instanceHandle = accelStruct.AddInstance(instanceDesc, meshInstance.localToWorldMatrix, null, meshInstance.instanceID);
+            instanceDesc.subMeshFlags = meshInstance.opaqueGeometry
+                ? RayTracingSubMeshFlags.Enabled | RayTracingSubMeshFlags.ClosestHitOnly
+                : RayTracingSubMeshFlags.Enabled | RayTracingSubMeshFlags.UniqueAnyHitCalls;
+            int instanceHandle = accelStruct.AddInstance(
+                instanceDesc,
+                meshInstance.localToWorldMatrix,
+                null,
+                meshInstance.instanceID
+            );
 
             // If instanceID is auto assigned, set it in the same way as ComputeRaytracingAccelStruct
             if (meshInstance.instanceID == 0xFFFFFFFF)
@@ -60,19 +79,22 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             m_Meshes.Add(instanceHandle, meshInstance.mesh);
 
-            #if UNITY_ASSERTIONS
-                m_InstanceHandles.Add(instanceHandle);
-            #endif
+#if UNITY_ASSERTIONS
+            m_InstanceHandles.Add(instanceHandle);
+#endif
 
             return instanceHandle;
         }
 
         public void RemoveInstance(int instanceHandle)
         {
-            #if UNITY_ASSERTIONS
-                if (!m_InstanceHandles.Remove(instanceHandle))
-                    throw new System.ArgumentException($"accel struct does not contain instanceHandle {instanceHandle}", "instanceHandle");
-            #endif
+#if UNITY_ASSERTIONS
+            if (!m_InstanceHandles.Remove(instanceHandle))
+                throw new System.ArgumentException(
+                    $"accel struct does not contain instanceHandle {instanceHandle}",
+                    "instanceHandle"
+                );
+#endif
 
             m_Meshes.Remove(instanceHandle);
             accelStruct.RemoveInstance(instanceHandle);
@@ -80,9 +102,9 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
         public void ClearInstances()
         {
-            #if UNITY_ASSERTIONS
-                m_InstanceHandles.Clear();
-            #endif
+#if UNITY_ASSERTIONS
+            m_InstanceHandles.Clear();
+#endif
 
             m_Meshes.Clear();
             accelStruct.ClearInstances();
@@ -116,7 +138,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             var buildSettings = new RayTracingAccelerationStructure.BuildSettings()
             {
                 buildFlags = m_BuildFlags,
-                relativeOrigin = Vector3.zero
+                relativeOrigin = Vector3.zero,
             };
             cmd.BuildRayTracingAccelerationStructure(accelStruct, buildSettings);
         }
@@ -133,9 +155,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         {
 #if UNITY_ASSERTIONS
             if (!m_InstanceHandles.Contains(instanceHandle))
-                throw new System.ArgumentException($"accel struct does not contain instanceHandle {instanceHandle}", "instanceHandle");
+                throw new System.ArgumentException(
+                    $"accel struct does not contain instanceHandle {instanceHandle}",
+                    "instanceHandle"
+                );
 #endif
         }
     }
 }
-

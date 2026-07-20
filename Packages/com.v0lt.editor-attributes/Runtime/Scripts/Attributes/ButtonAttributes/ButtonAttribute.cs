@@ -30,7 +30,12 @@ namespace EditorAttributes
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="serializeParameters">Have the button parameters persist between selections</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonAttribute(string buttonLabel = "", float buttonHeight = 18f, bool serializeParameters = true, bool makeDirty = true)
+        public ButtonAttribute(
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool serializeParameters = true,
+            bool makeDirty = true
+        )
         {
             ConditionName = "";
             ButtonLabel = buttonLabel;
@@ -49,7 +54,15 @@ namespace EditorAttributes
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="serializeParameters">Have the button parameters persist between selections</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonAttribute(bool isRepetable, long pressDelay = 60, long repetitionInterval = 100, string buttonLabel = "", float buttonHeight = 18f, bool serializeParameters = true, bool makeDirty = true)
+        public ButtonAttribute(
+            bool isRepetable,
+            long pressDelay = 60,
+            long repetitionInterval = 100,
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool serializeParameters = true,
+            bool makeDirty = true
+        )
             : this(buttonLabel, buttonHeight, serializeParameters, makeDirty)
         {
             ConditionName = "";
@@ -68,7 +81,15 @@ namespace EditorAttributes
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="serializeParameters">Have the button parameters persist between selections</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonAttribute(string conditionName, ConditionResult conditionResult, bool negate = false, string buttonLabel = "", float buttonHeight = 18f, bool serializeParameters = true, bool makeDirty = true)
+        public ButtonAttribute(
+            string conditionName,
+            ConditionResult conditionResult,
+            bool negate = false,
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool serializeParameters = true,
+            bool makeDirty = true
+        )
             : this(buttonLabel, buttonHeight, serializeParameters, makeDirty)
         {
             ConditionResult = conditionResult;
@@ -89,7 +110,18 @@ namespace EditorAttributes
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="serializeParameters">Have the button parameters persist between selections</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonAttribute(bool isRepetable, string conditionName, ConditionResult conditionResult, bool negate = false, long pressDelay = 60, long repetitionInterval = 100, string buttonLabel = "", float buttonHeight = 18f, bool serializeParameters = true, bool makeDirty = true)
+        public ButtonAttribute(
+            bool isRepetable,
+            string conditionName,
+            ConditionResult conditionResult,
+            bool negate = false,
+            long pressDelay = 60,
+            long repetitionInterval = 100,
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool serializeParameters = true,
+            bool makeDirty = true
+        )
             : this(conditionName, conditionResult, negate, buttonLabel, buttonHeight, serializeParameters, makeDirty)
         {
             IsRepetable = isRepetable;
@@ -108,8 +140,18 @@ namespace EditorAttributes
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="serializeParameters">Have the button parameters persist between selections</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonAttribute(string conditionName, object enumValue, ConditionResult conditionResult, bool negate = false, string buttonLabel = "", float buttonHeight = 18f, bool serializeParameters = true, bool makeDirty = true)
-            : this(conditionName, conditionResult, negate, buttonLabel, buttonHeight, serializeParameters, makeDirty) => EnumValue = (int)enumValue;
+        public ButtonAttribute(
+            string conditionName,
+            object enumValue,
+            ConditionResult conditionResult,
+            bool negate = false,
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool serializeParameters = true,
+            bool makeDirty = true
+        )
+            : this(conditionName, conditionResult, negate, buttonLabel, buttonHeight, serializeParameters, makeDirty) =>
+            EnumValue = (int)enumValue;
 
         /// <summary>
         /// Attribute to add a button in the inspector
@@ -125,7 +167,30 @@ namespace EditorAttributes
         /// <param name="buttonHeight">The height of the button in pixels</param>
         /// <param name="serializeParameters">Have the button parameters persist between selections</param>
         /// <param name="makeDirty">Whether to mark the object as dirty after invoking the function</param>
-        public ButtonAttribute(bool isRepetable, string conditionName, object enumValue, ConditionResult conditionResult, bool negate = false, long pressDelay = 60, long repetitionInterval = 100, string buttonLabel = "", float buttonHeight = 18f, bool serializeParameters = true, bool makeDirty = true)
-            : this(isRepetable, conditionName, conditionResult, negate, pressDelay, repetitionInterval, buttonLabel, buttonHeight, serializeParameters, makeDirty) => EnumValue = (int)enumValue;
+        public ButtonAttribute(
+            bool isRepetable,
+            string conditionName,
+            object enumValue,
+            ConditionResult conditionResult,
+            bool negate = false,
+            long pressDelay = 60,
+            long repetitionInterval = 100,
+            string buttonLabel = "",
+            float buttonHeight = 18f,
+            bool serializeParameters = true,
+            bool makeDirty = true
+        )
+            : this(
+                isRepetable,
+                conditionName,
+                conditionResult,
+                negate,
+                pressDelay,
+                repetitionInterval,
+                buttonLabel,
+                buttonHeight,
+                serializeParameters,
+                makeDirty
+            ) => EnumValue = (int)enumValue;
     }
 }

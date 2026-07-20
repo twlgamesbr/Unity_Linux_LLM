@@ -7,7 +7,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
     /// </summary>
     [CreateAssetMenu(
         fileName = nameof(NetworkSimulatorPresetAsset),
-        menuName = "Multiplayer/" + nameof(NetworkSimulatorPresetAsset))]
+        menuName = "Multiplayer/" + nameof(NetworkSimulatorPresetAsset)
+    )]
     public class NetworkSimulatorPresetAsset : ScriptableObject, INetworkSimulatorPreset
     {
         /// <summary>
@@ -63,7 +64,8 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
             int packetDelayMs = 0,
             int packetJitterMs = 0,
             int packetLossInterval = 0,
-            int packetLossPercent = 0)
+            int packetLossPercent = 0
+        )
         {
             var configuration = CreateInstance<NetworkSimulatorPresetAsset>();
 

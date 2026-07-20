@@ -13,9 +13,14 @@ namespace Unity.Entities
         public const int kMinimumCapacity = 8;
 
         [NoAlias]
-        [FieldOffset(0)] public byte* Pointer;
-        [FieldOffset(8)] public int Length;
-        [FieldOffset(12)] public int Capacity;
+        [FieldOffset(0)]
+        public byte* Pointer;
+
+        [FieldOffset(8)]
+        public int Length;
+
+        [FieldOffset(12)]
+        public int Capacity;
 
         public static byte* GetElementPointer(BufferHeader* header)
         {
@@ -28,18 +33,44 @@ namespace Unity.Entities
         public enum TrashMode
         {
             TrashOldData,
-            RetainOldData
+            RetainOldData,
         }
 
-        public static void EnsureCapacity(BufferHeader* header, int count, int typeSize, int alignment, TrashMode trashMode, bool useMemoryInitPattern, byte memoryInitPattern)
+        public static void EnsureCapacity(
+            BufferHeader* header,
+            int count,
+            int typeSize,
+            int alignment,
+            TrashMode trashMode,
+            bool useMemoryInitPattern,
+            byte memoryInitPattern
+        )
         {
             if (count <= header->Capacity)
                 return;
             var adjustedCount = Math.Max(kMinimumCapacity, Math.Max(2 * header->Capacity, count)); // stop pathological performance of ++Capacity allocating every time, tiny Capacities
-            SetCapacity(header, adjustedCount, typeSize, alignment, trashMode, useMemoryInitPattern, memoryInitPattern, 0);
+            SetCapacity(
+                header,
+                adjustedCount,
+                typeSize,
+                alignment,
+                trashMode,
+                useMemoryInitPattern,
+                memoryInitPattern,
+                0
+            );
         }
 
-        public static void SetCapacity(BufferHeader* header, int count, int typeSize, int alignment, TrashMode trashMode, bool useMemoryInitPattern, byte memoryInitPattern, int internalCapacity)
+        public static void SetCapacity(
+            BufferHeader* header,
+            int count,
+            int typeSize,
+            int alignment,
+            TrashMode trashMode,
+            bool useMemoryInitPattern,
+            byte memoryInitPattern,
+            int internalCapacity
+        )
         {
             var newCapacity = count;
             if (newCapacity == header->Capacity)
@@ -48,7 +79,10 @@ namespace Unity.Entities
             long newSizeInBytes = (long)newCapacity * typeSize;
 
             byte* oldData = GetElementPointer(header);
-            byte* newData = (newCapacity <= internalCapacity) ? (byte*)(header + 1) : (byte*)Memory.Unmanaged.Allocate(newSizeInBytes, alignment, Allocator.Persistent);
+            byte* newData =
+                (newCapacity <= internalCapacity)
+                    ? (byte*)(header + 1)
+                    : (byte*)Memory.Unmanaged.Allocate(newSizeInBytes, alignment, Allocator.Persistent);
 
             if (oldData != newData) // if at least one of them isn't the internal pointer...
             {
@@ -86,9 +120,25 @@ namespace Unity.Entities
             header->Capacity = newCapacity;
         }
 
-        public static void Assign(BufferHeader* header, byte* source, int count, int typeSize, int alignment, bool useMemoryInitPattern, byte memoryInitPattern)
+        public static void Assign(
+            BufferHeader* header,
+            byte* source,
+            int count,
+            int typeSize,
+            int alignment,
+            bool useMemoryInitPattern,
+            byte memoryInitPattern
+        )
         {
-            EnsureCapacity(header, count, typeSize, alignment, TrashMode.TrashOldData, useMemoryInitPattern, memoryInitPattern);
+            EnsureCapacity(
+                header,
+                count,
+                typeSize,
+                alignment,
+                TrashMode.TrashOldData,
+                useMemoryInitPattern,
+                memoryInitPattern
+            );
 
             // Select between internal capacity buffer and heap buffer.
             byte* elementPtr = GetElementPointer(header);
@@ -119,7 +169,11 @@ namespace Unity.Entities
         // So after cloning, just allocate all malloc based buffers and copy the data.
         public static void PatchAfterCloningChunk(Archetype* archetype, byte* chunkBuffer, int entityCount)
         {
-            for (int i = archetype->FirstBufferComponent, archetypeBufferTypesEnd = archetype->BufferComponentsEnd; i < archetypeBufferTypesEnd; ++i)
+            for (
+                int i = archetype->FirstBufferComponent, archetypeBufferTypesEnd = archetype->BufferComponentsEnd;
+                i < archetypeBufferTypesEnd;
+                ++i
+            )
             {
                 var type = archetype->Types[i];
                 ref readonly var ti = ref TypeManager.GetTypeInfo(type.TypeIndex);
@@ -134,7 +188,12 @@ namespace Unity.Entities
                         BufferHeader newHeader = *header;
                         long bytesToAllocate = (long)header->Capacity * ti.ElementSize;
                         long bytesToCopy = (long)header->Length * ti.ElementSize;
-                        newHeader.Pointer = (byte*)Memory.Unmanaged.Allocate(bytesToAllocate, TypeManager.MaximumSupportedAlignment, Allocator.Persistent);
+                        newHeader.Pointer = (byte*)
+                            Memory.Unmanaged.Allocate(
+                                bytesToAllocate,
+                                TypeManager.MaximumSupportedAlignment,
+                                Allocator.Persistent
+                            );
                         UnsafeUtility.MemCpy(newHeader.Pointer, header->Pointer, bytesToCopy);
                         *header = newHeader;
                     }
@@ -142,7 +201,12 @@ namespace Unity.Entities
             }
         }
 
-        public static void MemsetUnusedMemory(BufferHeader* bufferHeader, int internalCapacity, int elementSize, byte value)
+        public static void MemsetUnusedMemory(
+            BufferHeader* bufferHeader,
+            int internalCapacity,
+            int elementSize,
+            byte value
+        )
         {
             // If bufferHeader->Pointer is not null it means with rely on a dedicated buffer instead of the internal one (that follows the header) to store the elements.
             // in this case we also have to fully wipe out the internal buffer which is not in use.
@@ -156,7 +220,11 @@ namespace Unity.Entities
             var elementCountToClean = bufferHeader->Capacity - bufferHeader->Length;
             var firstElementToClean = bufferHeader->Length;
             var buffer = BufferHeader.GetElementPointer(bufferHeader);
-            UnsafeUtility.MemSet(buffer + (firstElementToClean * elementSize), value, elementCountToClean * elementSize);
+            UnsafeUtility.MemSet(
+                buffer + (firstElementToClean * elementSize),
+                value,
+                elementCountToClean * elementSize
+            );
         }
     }
 }

@@ -10,9 +10,7 @@ namespace Unity.PlatformToolkit.Editor
 {
     internal class BuildProfileSettings : ScriptableObject
     {
-        internal const string k_PlatformImplementationKeyProperty = nameof(
-            m_PlatformImplementationKey
-        );
+        internal const string k_PlatformImplementationKeyProperty = nameof(m_PlatformImplementationKey);
 
         [SerializeField]
         private string m_PlatformImplementationKey;
@@ -67,18 +65,13 @@ namespace Unity.PlatformToolkit.Editor
                 return;
 
             var type = AssetDatabase.GetMainAssetTypeAtPath(path);
-            var buildProfile =
-                type == typeof(BuildProfile)
-                    ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path)
-                    : null;
+            var buildProfile = type == typeof(BuildProfile) ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path) : null;
 
             if (buildProfile != null)
                 AssignKeyIfEmpty(buildProfile);
         }
 
-        public static List<IPlatformToolkitSupportDeclaration> GatherValidImplementations(
-            BuildProfile buildProfile
-        )
+        public static List<IPlatformToolkitSupportDeclaration> GatherValidImplementations(BuildProfile buildProfile)
         {
             var choices = new List<IPlatformToolkitSupportDeclaration>();
             var implementations = SupportDeclarationManager.SupportDeclarations;
@@ -130,8 +123,7 @@ namespace Unity.PlatformToolkit.Editor
                     return valid != null && valid.Count > 0;
                 },
                 hasCustomEditor = true,
-                tooltip =
-                    "Provide Platform Toolkit with settings for which implementation to use with this profile.",
+                tooltip = "Provide Platform Toolkit with settings for which implementation to use with this profile.",
             };
 #endif
     }
@@ -152,10 +144,7 @@ namespace Unity.PlatformToolkit.Editor
             {
                 var path = AssetDatabase.GetAssetPath(targetAsset);
                 var type = AssetDatabase.GetMainAssetTypeAtPath(path);
-                buildProfile =
-                    type == typeof(BuildProfile)
-                        ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path)
-                        : null;
+                buildProfile = type == typeof(BuildProfile) ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path) : null;
             }
 
             if (buildProfile == null)
@@ -168,17 +157,11 @@ namespace Unity.PlatformToolkit.Editor
 
     internal static class BuildProfileInspectorGUI
     {
-        public static VisualElement CreateInspectorGUI(
-            BuildProfile profile,
-            SerializedObject serializedObject
-        )
+        public static VisualElement CreateInspectorGUI(BuildProfile profile, SerializedObject serializedObject)
         {
-            BuildProfileSettings targetAsset =
-                serializedObject.targetObject as BuildProfileSettings;
+            BuildProfileSettings targetAsset = serializedObject.targetObject as BuildProfileSettings;
 
-            var keyProperty = serializedObject.FindProperty(
-                BuildProfileSettings.k_PlatformImplementationKeyProperty
-            );
+            var keyProperty = serializedObject.FindProperty(BuildProfileSettings.k_PlatformImplementationKeyProperty);
             Debug.Assert(keyProperty != null);
 
             var choices = BuildProfileSettings.GatherValidImplementations(profile);
@@ -217,12 +200,7 @@ namespace Unity.PlatformToolkit.Editor
             {
                 dropdown.choices.Add(choice);
 
-                if (
-                    choice.Key.Equals(
-                        keyProperty.stringValue,
-                        System.StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                if (choice.Key.Equals(keyProperty.stringValue, System.StringComparison.OrdinalIgnoreCase))
                 {
                     selectedIndex = dropdown.choices.Count - 1;
                 }

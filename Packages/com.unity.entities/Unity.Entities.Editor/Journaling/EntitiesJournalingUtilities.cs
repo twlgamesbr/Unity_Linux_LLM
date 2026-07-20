@@ -12,7 +12,7 @@ namespace Unity.Entities.Editor
         public static void ExportToCSV()
         {
 #if !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             var filePath = EditorUtility.SaveFilePanel("Export to CSV", null, "entities-journaling-export", "csv");
             if (string.IsNullOrEmpty(filePath))
                 return;
@@ -20,7 +20,14 @@ namespace Unity.Entities.Editor
             FileStream fileStream;
             try
             {
-                fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: k_BufferSize, useAsync: true);
+                fileStream = new FileStream(
+                    filePath,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None,
+                    bufferSize: k_BufferSize,
+                    useAsync: true
+                );
             }
             catch (Exception e)
             {
@@ -37,7 +44,11 @@ namespace Unity.Entities.Editor
             {
                 foreach (var row in rows)
                 {
-                    var cancelled = EditorUtility.DisplayCancelableProgressBar("Exporting to CSV", $"Row {FormattingUtility.CountToString(index + 1)} of {FormattingUtility.CountToString(rowCount)} ({FormattingUtility.BytesToString(byteCount)})", (float)index++ / rowCount);
+                    var cancelled = EditorUtility.DisplayCancelableProgressBar(
+                        "Exporting to CSV",
+                        $"Row {FormattingUtility.CountToString(index + 1)} of {FormattingUtility.CountToString(rowCount)} ({FormattingUtility.BytesToString(byteCount)})",
+                        (float)index++ / rowCount
+                    );
                     if (cancelled)
                         break;
 
@@ -53,7 +64,7 @@ namespace Unity.Entities.Editor
                 EditorUtility.ClearProgressBar();
                 fileStream.Dispose();
             }
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #endif
         }
 

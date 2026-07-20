@@ -1,9 +1,9 @@
 using System.IO;
-using UnityEngine;
+using Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -38,7 +38,9 @@ namespace Unity.Web.Stripping.Editor
 
             if (report.summary.platform != BuildTarget.WebGL)
             {
-                Debug.Log("Submodule stripping options set, but the feature is supported only on the Web Platform, skipping processing of the build.");
+                Debug.Log(
+                    "Submodule stripping options set, but the feature is supported only on the Web Platform, skipping processing of the build."
+                );
                 SkipBuild = true;
                 return;
             }
@@ -70,11 +72,13 @@ namespace Unity.Web.Stripping.Editor
             }
 
             if (
-                PlayerSettingsHelper.IsSubmoduleStrippingCompatibilityAvailable &&
-                !PlayerSettingsHelper.EnableSubmoduleStrippingCompatibility
-               )
+                PlayerSettingsHelper.IsSubmoduleStrippingCompatibilityAvailable
+                && !PlayerSettingsHelper.EnableSubmoduleStrippingCompatibility
+            )
             {
-                Debug.LogWarning("Submodule stripping compatibility wasn't enabled in the Player settings. Enabling submodule stripping compatibility.");
+                Debug.LogWarning(
+                    "Submodule stripping compatibility wasn't enabled in the Player settings. Enabling submodule stripping compatibility."
+                );
                 PlayerSettingsHelper.EnableSubmoduleStrippingCompatibility = true;
                 settingsModified = true;
             }
@@ -97,13 +101,19 @@ namespace Unity.Web.Stripping.Editor
 
         public void OnPostprocessBuild(BuildReport report)
         {
-            if (SkipBuild || StrippingProjectSettings.ActiveSettings == null || !StrippingProjectSettings.StripAutomaticallyAfterBuild)
+            if (
+                SkipBuild
+                || StrippingProjectSettings.ActiveSettings == null
+                || !StrippingProjectSettings.StripAutomaticallyAfterBuild
+            )
                 return;
 
             var webBuild = WebBuildReportList.Instance.GetBuild(report.summary.outputPath);
             if (webBuild == null)
             {
-                Debug.LogError($"Did not find WebBuildReport for '{report.summary.outputPath}', cannot strip automatically.");
+                Debug.LogError(
+                    $"Did not find WebBuildReport for '{report.summary.outputPath}', cannot strip automatically."
+                );
                 m_OriginalPlayerSettings.WriteToPlayerSettings();
                 return;
             }

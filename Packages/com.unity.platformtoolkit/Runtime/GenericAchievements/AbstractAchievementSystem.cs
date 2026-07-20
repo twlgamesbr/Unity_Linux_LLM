@@ -15,6 +15,7 @@ namespace Unity.PlatformToolkit
         private const int k_DefaultTimeBetweenUpdatesMilliseconds = 100;
 
         private readonly ILifetimeToken m_ParentLifetimeToken;
+
         // Don't re-initialize a system until all previous initializations have finished
         private readonly SemaphoreSlim m_InitializationSemaphore = new SemaphoreSlim(0, 1);
         private readonly TaskStop m_InactivityStop = new(true);
@@ -39,7 +40,11 @@ namespace Unity.PlatformToolkit
         /// <param name="achievements">List of all achievements.</param>
         /// <param name="timeBetweenUpdatesMilliseconds">Time between achievement update events.</param>
         /// <param name="parentLifetimeToken">A lifetime token which when disposed, disables the achievement system.</param>
-        protected AbstractAchievementSystem(IReadOnlyList<T> achievements, int timeBetweenUpdatesMilliseconds = k_DefaultTimeBetweenUpdatesMilliseconds, ILifetimeToken parentLifetimeToken = null)
+        protected AbstractAchievementSystem(
+            IReadOnlyList<T> achievements,
+            int timeBetweenUpdatesMilliseconds = k_DefaultTimeBetweenUpdatesMilliseconds,
+            ILifetimeToken parentLifetimeToken = null
+        )
         {
             m_AchievementDefinitions = achievements ?? throw new ArgumentNullException(nameof(achievements));
             m_ParentLifetimeToken = parentLifetimeToken;
@@ -159,9 +164,11 @@ namespace Unity.PlatformToolkit
             while (!setProgressCompleted)
             {
                 var currentProgress = achievement.NextProgress;
-                if (newProgress <= achievement.NextProgress ||
-                    Interlocked.CompareExchange(ref achievement.NextProgress, newProgress, currentProgress) ==
-                    currentProgress)
+                if (
+                    newProgress <= achievement.NextProgress
+                    || Interlocked.CompareExchange(ref achievement.NextProgress, newProgress, currentProgress)
+                        == currentProgress
+                )
                 {
                     setProgressCompleted = true;
                 }
@@ -310,21 +317,27 @@ namespace Unity.PlatformToolkit
         protected void LogTypeMismatchPtSingleNativeProgress(T achievement)
         {
 #if DEBUG
-            Debug.LogError($"Achievement {achievement.Id} type mismatch. Achievement is set as non-progressive in Platform Toolkit and progressive natively.");
+            Debug.LogError(
+                $"Achievement {achievement.Id} type mismatch. Achievement is set as non-progressive in Platform Toolkit and progressive natively."
+            );
 #endif
         }
 
         protected void LogTypeMismatchPtProgressNativeSingle(T achievement)
         {
 #if DEBUG
-            Debug.LogError($"Achievement {achievement.Id} type mismatch. Achievement is set as progressive in Platform Toolkit and non-progressive natively.");
+            Debug.LogError(
+                $"Achievement {achievement.Id} type mismatch. Achievement is set as progressive in Platform Toolkit and non-progressive natively."
+            );
 #endif
         }
 
         protected void LogProgressTargetMismatch(T achievement, long nativeTarget)
         {
 #if DEBUG
-            Debug.LogError($"Achievement {achievement.Id} progress target mismatch. Native target: {nativeTarget}, Platform Toolkit target: {achievement.ProgressTarget}. Updating progress will not work as expected.");
+            Debug.LogError(
+                $"Achievement {achievement.Id} progress target mismatch. Native target: {nativeTarget}, Platform Toolkit target: {achievement.ProgressTarget}. Updating progress will not work as expected."
+            );
 #endif
         }
 

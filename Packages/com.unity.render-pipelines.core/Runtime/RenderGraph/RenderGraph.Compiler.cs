@@ -10,12 +10,26 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         internal NativePassCompiler CompileNativeRenderGraph(int graphHash)
         {
-            using (new ProfilingScope(m_RenderGraphContext.cmd, ProfilingSampler.Get(RenderGraphProfileId.CompileRenderGraph)))
+            using (
+                new ProfilingScope(
+                    m_RenderGraphContext.cmd,
+                    ProfilingSampler.Get(RenderGraphProfileId.CompileRenderGraph)
+                )
+            )
             {
                 if (nativeCompiler == null)
                     nativeCompiler = new NativePassCompiler(m_CompilationCache);
 
-                bool compilationIsCached = nativeCompiler.Initialize(m_Resources, m_RenderPasses, m_DebugParameters, name, m_EnableCompilationCaching, graphHash, m_ExecutionCount, m_renderTextureUVOriginStrategy);
+                bool compilationIsCached = nativeCompiler.Initialize(
+                    m_Resources,
+                    m_RenderPasses,
+                    m_DebugParameters,
+                    name,
+                    m_EnableCompilationCaching,
+                    graphHash,
+                    m_ExecutionCount,
+                    m_renderTextureUVOriginStrategy
+                );
                 if (!compilationIsCached)
                     nativeCompiler.Compile(m_Resources);
 
@@ -35,7 +49,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         void ExecuteNativeRenderGraph()
         {
-            using (new ProfilingScope(m_RenderGraphContext.cmd, ProfilingSampler.Get(RenderGraphProfileId.ExecuteRenderGraph)))
+            using (
+                new ProfilingScope(
+                    m_RenderGraphContext.cmd,
+                    ProfilingSampler.Get(RenderGraphProfileId.ExecuteRenderGraph)
+                )
+            )
             {
                 nativeCompiler.ExecuteGraph(m_RenderGraphContext, m_Resources, m_RenderPasses);
             }

@@ -17,12 +17,13 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
                 m_TestModesIncluded |= TestMode.PlayMode;
             if (settings.PlayerIncluded())
                 m_TestModesIncluded |= TestMode.Player;
-
         }
 
         protected override void Action(IPrebuildSetupWithTestData target, TestJobData testJobData)
         {
-            target.Setup(new TestData(m_TestModesIncluded, testJobData.TargetRuntimePlatform, testJobData.filteredTests));
+            target.Setup(
+                new TestData(m_TestModesIncluded, testJobData.TargetRuntimePlatform, testJobData.filteredTests)
+            );
         }
     }
 }

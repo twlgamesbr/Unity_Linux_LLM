@@ -4,7 +4,8 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
 {
     internal class PostbuildCleanupTask : BuildActionTaskBase<IPostBuildCleanup>
     {
-        public PostbuildCleanupTask() : base(new PostbuildCleanupAttributeFinder())
+        public PostbuildCleanupTask()
+            : base(new PostbuildCleanupAttributeFinder())
         {
             RunOnError = ErrorRunMode.RunAlways;
         }

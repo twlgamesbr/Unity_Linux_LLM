@@ -9,7 +9,7 @@ namespace UnityEngine.Rendering
     /// <summary>
     /// This attribute is used to set up a path in the <b>Add Override</b> popup menu in Unity's Volume system.
     /// It allows you to organize and categorize your Volume components into submenus for easier access and management within the editor.
-     /// </summary>
+    /// </summary>
     /// <remarks>Specify the name of the menu entry, and use slashes ("/") to create hierarchical submenus in the popup. This is useful for organizing large or complex sets of Volume components.
     /// To further filter the menu entries based on the active Render Pipeline, you can combine this attribute with the <see cref="SupportedOnRenderPipeline"/> attribute.
     /// This enables conditional display of Volume components depending on the Render Pipeline being used in the project.
@@ -45,7 +45,10 @@ namespace UnityEngine.Rendering
     /// This attribute allows you to add commands to the <b>Add Override</b> popup menu on Volumes,
     /// while also specifying the render pipeline(s) for which the command will be supported.
     /// </summary>
-    [Obsolete(@"VolumeComponentMenuForRenderPipelineAttribute is deprecated. Use VolumeComponentMenu with SupportedOnRenderPipeline instead. #from(2023.1)", true)]
+    [Obsolete(
+        @"VolumeComponentMenuForRenderPipelineAttribute is deprecated. Use VolumeComponentMenu with SupportedOnRenderPipeline instead. #from(2023.1)",
+        true
+    )]
     public class VolumeComponentMenuForRenderPipeline : VolumeComponentMenu
     {
         /// <summary>
@@ -71,25 +74,23 @@ namespace UnityEngine.Rendering
             {
                 if (!typeof(RenderPipeline).IsAssignableFrom(t))
                     throw new Exception(
-                        $"You can only specify types that inherit from {typeof(RenderPipeline)}, please check {t}");
+                        $"You can only specify types that inherit from {typeof(RenderPipeline)}, please check {t}"
+                    );
             }
 
             this.pipelineTypes = pipelineTypes;
         }
     }
 
-
-
     /// <summary>
     /// This attribute prevents the component from being included in the list of available
     /// overrides in the Volume Inspector via the <b>Add Override</b> button.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    [Obsolete("VolumeComponentDeprecated has been deprecated. #from(2023.1) (UnityUpgradable) -> [UnityEngine] UnityEngine.HideInInspector")]
-    public sealed class VolumeComponentDeprecated : Attribute
-    {
-    }
-
+    [Obsolete(
+        "VolumeComponentDeprecated has been deprecated. #from(2023.1) (UnityUpgradable) -> [UnityEngine] UnityEngine.HideInInspector"
+    )]
+    public sealed class VolumeComponentDeprecated : Attribute { }
 
     /// <summary>
     /// The base class for all components that can be part of a <see cref="VolumeProfile"/>.
@@ -143,8 +144,7 @@ namespace UnityEngine.Rendering
 
             /// <summary> Constructor </summary>
             /// <param name="relativeAmount">Relative indent change to use</param>
-            public Indent(int relativeAmount = 1)
-                => this.relativeAmount = relativeAmount;
+            public Indent(int relativeAmount = 1) => this.relativeAmount = relativeAmount;
         }
 
         /// <summary>
@@ -170,7 +170,8 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// A read-only collection of all the <see cref="VolumeParameter"/>s defined in this class.
         /// </summary>
-        public ReadOnlyCollection<VolumeParameter> parameters => m_ParameterReadOnlyCollection ??= new ReadOnlyCollection<VolumeParameter>(parameterList);
+        public ReadOnlyCollection<VolumeParameter> parameters =>
+            m_ParameterReadOnlyCollection ??= new ReadOnlyCollection<VolumeParameter>(parameterList);
 
         /// <summary>
         /// Extracts all the <see cref="VolumeParameter"/>s defined in this class and nested classes.
@@ -178,7 +179,11 @@ namespace UnityEngine.Rendering
         /// <param name="o">The object to find the parameters</param>
         /// <param name="parameters">The list filled with the parameters.</param>
         /// <param name="filter">If you want to filter the parameters</param>
-        internal static void FindParameters(object o, List<VolumeParameter> parameters, Func<FieldInfo, bool> filter = null)
+        internal static void FindParameters(
+            object o,
+            List<VolumeParameter> parameters,
+            Func<FieldInfo, bool> filter = null
+        )
         {
             if (o == null)
                 return;
@@ -225,7 +230,11 @@ namespace UnityEngine.Rendering
                 if (parameter != null)
                     parameter.OnEnable();
                 else
-                    Debug.LogWarning("Volume Component " + GetType().Name + " contains a null parameter; please make sure all parameters are initialized to a default value. Until this is fixed the null parameters will not be considered by the system.");
+                    Debug.LogWarning(
+                        "Volume Component "
+                            + GetType().Name
+                            + " contains a null parameter; please make sure all parameters are initialized to a default value. Until this is fixed the null parameters will not be considered by the system."
+                    );
             }
         }
 
@@ -318,9 +327,10 @@ namespace UnityEngine.Rendering
                 if (VolumeParameter.IsObjectParameter(t))
                 {
                     // This method won't be called a lot but this is sub-optimal, fix me
-                    var innerParams = (ReadOnlyCollection<VolumeParameter>)
-                        t.GetProperty("parameters", BindingFlags.NonPublic | BindingFlags.Instance)
-                            .GetValue(prop, null);
+                    var innerParams =
+                        (ReadOnlyCollection<VolumeParameter>)
+                            t.GetProperty("parameters", BindingFlags.NonPublic | BindingFlags.Instance)
+                                .GetValue(prop, null);
 
                     if (innerParams != null)
                         SetOverridesTo(innerParams, state);

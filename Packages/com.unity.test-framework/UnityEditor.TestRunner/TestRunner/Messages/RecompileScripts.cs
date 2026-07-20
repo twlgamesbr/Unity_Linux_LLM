@@ -26,17 +26,15 @@ namespace UnityEngine.TestTools
         /// }
         /// </code>
         /// </example>
+        public RecompileScripts()
+            : this(true) { }
 
-        public RecompileScripts() : this(true)
-        {
-        }
         /// <summary>
         /// Creates a new instance of the `RecompileScripts` yield instruction.
         /// </summary>
         /// <param name="expectScriptCompilation">This parameter indicates if you expect a script compilation to start (defaults to true). If a script compilation does not start and `expectScriptCompilation` is true, then it throws an exception.</param>
-        public RecompileScripts(bool expectScriptCompilation) : this(expectScriptCompilation, true)
-        {
-        }
+        public RecompileScripts(bool expectScriptCompilation)
+            : this(expectScriptCompilation, true) { }
 
         /// <summary>
         /// Creates a new instance of the `RecompileScripts` yield instruction.
@@ -54,14 +52,17 @@ namespace UnityEngine.TestTools
         /// Returns true if the instruction expects a domain reload to occur.
         /// </summary>
         public bool ExpectDomainReload { get; private set; }
+
         /// <summary>
         /// Returns true if the instruction expects the Unity Editor to be in **Play Mode**.
         /// </summary>
         public bool ExpectedPlaymodeState { get; }
+
         /// <summary>
         /// Indicates whether a script compilation is expected.
         /// </summary>
         public bool ExpectScriptCompilation { get; private set; }
+
         /// <summary>
         /// Indicates whether the expected script compilation is expected to succeed.
         /// </summary>

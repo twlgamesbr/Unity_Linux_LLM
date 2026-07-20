@@ -11,15 +11,22 @@ namespace Unity.Web.Stripping.Editor
             new ISettingsRepository[]
             {
                 new PackageSettingsRepository(PackageConstants.PackageName, "Settings"),
-                new ProjectUserSettings(PackageConstants.PackageName, "Settings")
+                new ProjectUserSettings(PackageConstants.PackageName, "Settings"),
             }
         );
 
-        public static T GetProjectSetting<T>(string key, T fallbackValue) => s_Settings.Get<T, PackageSettingsRepository>(key, fallbackValue);
-        public static void SetProjectSetting<T>(string key, T value) => s_Settings.Set<T, PackageSettingsRepository>(key, value);
-        public static void DeleteProjectSetting<T>(string key) => s_Settings.DeleteKey<T, PackageSettingsRepository>(key);
+        public static T GetProjectSetting<T>(string key, T fallbackValue) =>
+            s_Settings.Get<T, PackageSettingsRepository>(key, fallbackValue);
 
-        public static T GetUserSetting<T>(string key, T fallbackValue) => s_Settings.Get<T, ProjectUserSettings>(key, fallbackValue);
+        public static void SetProjectSetting<T>(string key, T value) =>
+            s_Settings.Set<T, PackageSettingsRepository>(key, value);
+
+        public static void DeleteProjectSetting<T>(string key) =>
+            s_Settings.DeleteKey<T, PackageSettingsRepository>(key);
+
+        public static T GetUserSetting<T>(string key, T fallbackValue) =>
+            s_Settings.Get<T, ProjectUserSettings>(key, fallbackValue);
+
         public static void SetUserSetting<T>(string key, T value) => s_Settings.Set<T, ProjectUserSettings>(key, value);
 
         public static void Save()

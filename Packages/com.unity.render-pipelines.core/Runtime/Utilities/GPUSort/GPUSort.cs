@@ -19,7 +19,7 @@ namespace UnityEngine.Rendering
             LocalBMS,
             LocalDisperse,
             BigFlip,
-            BigDisperse
+            BigDisperse,
         }
 
         private SystemResources resources;
@@ -37,7 +37,7 @@ namespace UnityEngine.Rendering
                 new(resources.computeAsset, "STAGE_BMS"),
                 new(resources.computeAsset, "STAGE_LOCAL_DISPERSE"),
                 new(resources.computeAsset, "STAGE_BIG_FLIP"),
-                new(resources.computeAsset, "STAGE_BIG_DISPERSE")
+                new(resources.computeAsset, "STAGE_BIG_DISPERSE"),
             };
         }
 
@@ -55,11 +55,11 @@ namespace UnityEngine.Rendering
                 // Unfortunately need to configure the keywords like this. Might be worth just having a kernel per stage.
                 foreach (var k in m_Keywords)
                     cmd.SetKeyword(resources.computeAsset, k, false);
-                cmd.SetKeyword(resources.computeAsset, m_Keywords[(int) stage], true);
+                cmd.SetKeyword(resources.computeAsset, m_Keywords[(int)stage], true);
 #endif
 
-                cmd.SetComputeIntParam(resources.computeAsset, "_H", (int) h);
-                cmd.SetComputeIntParam(resources.computeAsset, "_Total", (int) args.count);
+                cmd.SetComputeIntParam(resources.computeAsset, "_H", (int)h);
+                cmd.SetComputeIntParam(resources.computeAsset, "_Total", (int)args.count);
                 cmd.SetComputeBufferParam(resources.computeAsset, 0, "_KeyBuffer", args.resources.sortBufferKeys);
                 cmd.SetComputeBufferParam(resources.computeAsset, 0, "_ValueBuffer", args.resources.sortBufferValues);
                 cmd.DispatchCompute(resources.computeAsset, 0, args.workGroupCount, 1, 1);
@@ -108,7 +108,7 @@ namespace UnityEngine.Rendering
             CopyBuffer(cmd, args.inputKeys, args.resources.sortBufferKeys);
             CopyBuffer(cmd, args.inputValues, args.resources.sortBufferValues);
 
-            args.workGroupCount = Math.Max(1, DivRoundUp((int) n, (int) kWorkGroupSize * 2));
+            args.workGroupCount = Math.Max(1, DivRoundUp((int)n, (int)kWorkGroupSize * 2));
 
             uint h = Math.Min(kWorkGroupSize * 2, args.maxDepth);
 

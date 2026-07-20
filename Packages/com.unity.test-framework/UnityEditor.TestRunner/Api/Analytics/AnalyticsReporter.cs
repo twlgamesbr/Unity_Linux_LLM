@@ -35,7 +35,9 @@ namespace UnityEditor.TestTools.TestRunner.Api.Analytics
         [InitializeOnLoadMethod]
         private static void RegisterCallbacks()
         {
-            ScriptableObject.CreateInstance<TestRunnerApi>().RegisterCallbacks(new AnalyticsTestCallback(ReportRunFinished));
+            ScriptableObject
+                .CreateInstance<TestRunnerApi>()
+                .RegisterCallbacks(new AnalyticsTestCallback(ReportRunFinished));
         }
 
         private static void ReportRunFinished(ITestResultAdaptor testResult)
@@ -58,14 +60,15 @@ namespace UnityEditor.TestTools.TestRunner.Api.Analytics
                 numInconclusiveTests = testResult.InconclusiveCount,
                 numSkippedTests = testResult.SkipCount,
                 testModeFilter = (int)filter.testMode,
-                targetPlatform = executionSettings.targetPlatform != null ? executionSettings.targetPlatform.ToString() : "editor",
+                targetPlatform =
+                    executionSettings.targetPlatform != null ? executionSettings.targetPlatform.ToString() : "editor",
                 runSynchronously = executionSettings.runSynchronously,
                 isCustomRunner = false,
                 isFiltering = executionSettings.filters.Any(f => f.HasAny()),
                 isAutomated = IsCommandLineArgSet("-automated"),
                 isFromCommandLine = IsCommandLineArgSet("-runTests"),
                 totalTestDuration = testResult.Duration,
-                totalRunDuration = (DateTime.Now - Convert.ToDateTime(activeRuns[0].startTime)).TotalSeconds
+                totalRunDuration = (DateTime.Now - Convert.ToDateTime(activeRuns[0].startTime)).TotalSeconds,
             };
 
             EditorAnalytics.SendEventWithLimit(RunFinishedEventName, runFinishedData, 1);

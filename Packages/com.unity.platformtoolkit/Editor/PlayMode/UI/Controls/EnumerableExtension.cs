@@ -12,7 +12,10 @@ namespace Unity.PlatformToolkit.PlayMode
         /// <param name="values">Source values, for which unique strings are generated.</param>
         /// <param name="stringGetter">Function for transforming values to strings.</param>
         /// <returns>A tuple consisting of the original value and its assigned unique string.</returns>
-        public static IEnumerable<(string UniqueString, T Value)> AssignUniqueString<T>(this IEnumerable<T> values, Func<T, string> stringGetter)
+        public static IEnumerable<(string UniqueString, T Value)> AssignUniqueString<T>(
+            this IEnumerable<T> values,
+            Func<T, string> stringGetter
+        )
         {
             var list = new List<(string, T)>();
             var titles = new HashSet<string>();

@@ -1,14 +1,14 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using UnityEngine.Assertions;
-using Unity.Jobs;
-using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
+using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Networking.Transport.Utilities.LowLevel.Unsafe;
+using UnityEngine.Assertions;
 
 namespace Unity.Networking.Transport
 {
@@ -17,16 +17,24 @@ namespace Unity.Networking.Transport
     {
         private NativeList<int> m_Queue;
         private UnsafeAtomicFreeList m_FreeList;
-        [NativeDisableParallelForRestriction] private NativeArray<PacketBuffer> m_Buffers;
-        [NativeDisableUnsafePtrRestriction] private IntPtr m_PayloadsPtr;
-        [NativeDisableUnsafePtrRestriction] private IntPtr m_EndpointsPtr;
+
+        [NativeDisableParallelForRestriction]
+        private NativeArray<PacketBuffer> m_Buffers;
+
+        [NativeDisableUnsafePtrRestriction]
+        private IntPtr m_PayloadsPtr;
+
+        [NativeDisableUnsafePtrRestriction]
+        private IntPtr m_EndpointsPtr;
         private int m_Capacity;
         private int m_MetadataSize;
         private int m_PayloadSize;
         private int m_EndpointSize;
         private int m_DefaultDataOffset;
+
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        [NativeDisableUnsafePtrRestriction] private IntPtr m_BuffersUsage;
+        [NativeDisableUnsafePtrRestriction]
+        private IntPtr m_BuffersUsage;
 #endif
 
         internal int BuffersInUse => m_FreeList.InUse;
@@ -46,17 +54,28 @@ namespace Unity.Networking.Transport
         /// <value>True if created, false otherwise.</value>
         public bool IsCreated => m_Buffers.IsCreated;
 
-        internal ref PacketMetadata GetMetadataRef(int bufferIndex) => ref *(PacketMetadata*)(m_Buffers[bufferIndex].Metadata);
-        internal ref NetworkEndpoint GetEndpointRef(int bufferIndex) => ref *(NetworkEndpoint*)(m_Buffers[bufferIndex].Endpoint);
+        internal ref PacketMetadata GetMetadataRef(int bufferIndex) =>
+            ref *(PacketMetadata*)(m_Buffers[bufferIndex].Metadata);
+
+        internal ref NetworkEndpoint GetEndpointRef(int bufferIndex) =>
+            ref *(NetworkEndpoint*)(m_Buffers[bufferIndex].Endpoint);
 
         internal PacketBuffer GetPacketBuffer(int bufferIndex) => m_Buffers[bufferIndex];
 
-        private static void Initialize(out PacketsQueue packetsQueue, int metadataSize, int payloadSize, int endpointSize, int capacity)
+        private static void Initialize(
+            out PacketsQueue packetsQueue,
+            int metadataSize,
+            int payloadSize,
+            int endpointSize,
+            int capacity
+        )
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (metadataSize != UnsafeUtility.SizeOf<PacketMetadata>())
             {
-                throw new ArgumentException($"Metadata size ({metadataSize}) must be {UnsafeUtility.SizeOf<PacketMetadata>()}");
+                throw new ArgumentException(
+                    $"Metadata size ({metadataSize}) must be {UnsafeUtility.SizeOf<PacketMetadata>()}"
+                );
             }
 #endif
             packetsQueue.m_Capacity = capacity;
@@ -71,7 +90,9 @@ namespace Unity.Networking.Transport
             packetsQueue.m_Queue = new NativeList<int>(capacity, Allocator.Persistent);
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             var buffersUsageSize = (int)math.ceil((float)packetsQueue.m_Capacity / UnsafeUtility.SizeOf<ulong>());
-            packetsQueue.m_BuffersUsage = new IntPtr(UnsafeUtility.Malloc(buffersUsageSize, UnsafeUtility.AlignOf<ulong>(), Allocator.Persistent));
+            packetsQueue.m_BuffersUsage = new IntPtr(
+                UnsafeUtility.Malloc(buffersUsageSize, UnsafeUtility.AlignOf<ulong>(), Allocator.Persistent)
+            );
             UnsafeUtility.MemClear((void*)packetsQueue.m_BuffersUsage, buffersUsageSize);
 #endif
         }
@@ -93,11 +114,7 @@ namespace Unity.Networking.Transport
             // PacketMetadata is prepended to the payload
             var payloadAndMetadataSize = payloadSize + metadataSize;
 
-            Initialize(out this,
-                metadataSize,
-                payloadSize,
-                endpointSize,
-                capacity);
+            Initialize(out this, metadataSize, payloadSize, endpointSize, capacity);
 
             payloadAndMetadataSize = AddPaddingToAlign(payloadAndMetadataSize, JobsUtility.CacheLineSize);
             endpointSize = AddPaddingToAlign(endpointSize, JobsUtility.CacheLineSize);
@@ -107,8 +124,12 @@ namespace Unity.Networking.Transport
             Assert.IsTrue(endpointSize >= m_EndpointSize);
 #endif
 
-            m_PayloadsPtr = new IntPtr(UnsafeUtility.Malloc(capacity * payloadAndMetadataSize, JobsUtility.CacheLineSize, Allocator.Persistent));
-            m_EndpointsPtr = new IntPtr(UnsafeUtility.Malloc(capacity * endpointSize, JobsUtility.CacheLineSize, Allocator.Persistent));
+            m_PayloadsPtr = new IntPtr(
+                UnsafeUtility.Malloc(capacity * payloadAndMetadataSize, JobsUtility.CacheLineSize, Allocator.Persistent)
+            );
+            m_EndpointsPtr = new IntPtr(
+                UnsafeUtility.Malloc(capacity * endpointSize, JobsUtility.CacheLineSize, Allocator.Persistent)
+            );
 
             new FillBufferPointers
             {
@@ -128,13 +149,15 @@ namespace Unity.Networking.Transport
         /// <param name="endpointSize">The size in bytes of a Endpoint buffer</param>
         /// <param name="capacity">The ammount of packets available</param>
         /// <param name="buffers">An array containing the preallocated PacketBuffers to use</param>
-        internal PacketsQueue(int metadataSize, int payloadSize, int endpointSize, int capacity, NativeArray<PacketBuffer> buffers)
+        internal PacketsQueue(
+            int metadataSize,
+            int payloadSize,
+            int endpointSize,
+            int capacity,
+            NativeArray<PacketBuffer> buffers
+        )
         {
-            Initialize(out this,
-                metadataSize,
-                payloadSize,
-                endpointSize,
-                capacity);
+            Initialize(out this, metadataSize, payloadSize, endpointSize, capacity);
 
             buffers.CopyTo(m_Buffers);
         }
@@ -148,8 +171,12 @@ namespace Unity.Networking.Transport
         private struct FillBufferPointers : IJob
         {
             public NativeArray<PacketBuffer> Buffers;
-            [NativeDisableUnsafePtrRestriction] public IntPtr Payloads;
-            [NativeDisableUnsafePtrRestriction] public IntPtr Endpoints;
+
+            [NativeDisableUnsafePtrRestriction]
+            public IntPtr Payloads;
+
+            [NativeDisableUnsafePtrRestriction]
+            public IntPtr Endpoints;
             public int PayloadAndMetadataSize;
             public int EndpointSize;
 
@@ -213,7 +240,12 @@ namespace Unity.Networking.Transport
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 if (bufferIndex < 0)
-                    throw new IndexOutOfRangeException(string.Format("Cannot access the queued packet with index {0} because it has been released", packetIndex));
+                    throw new IndexOutOfRangeException(
+                        string.Format(
+                            "Cannot access the queued packet with index {0} because it has been released",
+                            packetIndex
+                        )
+                    );
 #endif
 
                 return GetPacketProcessor(bufferIndex);
@@ -254,7 +286,9 @@ namespace Unity.Networking.Transport
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (!IsUsed(bufferIndex))
-                throw new InvalidOperationException($"Trying to enqueue a packet ({bufferIndex}) but it has not been acquired");
+                throw new InvalidOperationException(
+                    $"Trying to enqueue a packet ({bufferIndex}) but it has not been acquired"
+                );
 #endif
 
             EnqueueAndGetProcessor(bufferIndex, out packetProcessor);
@@ -287,7 +321,10 @@ namespace Unity.Networking.Transport
 
                 if (EnqueuePacket(out var packetProcessor))
                 {
-                    packet.CopyPayload((byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset, packet.Length);
+                    packet.CopyPayload(
+                        (byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset,
+                        packet.Length
+                    );
                     packetProcessor.SetUnsafeMetadata(packet.Length, packetProcessor.Offset);
                     packetProcessor.ConnectionRef = packet.ConnectionRef;
                     packetProcessor.EndpointRef = packet.EndpointRef;
@@ -375,7 +412,9 @@ namespace Unity.Networking.Transport
         private void CheckIndex(int bufferIndex)
         {
             if (bufferIndex < 0 || bufferIndex >= m_Capacity)
-                throw new IndexOutOfRangeException($"The buffer index {bufferIndex} is out of range [0, {m_Capacity - 1}]");
+                throw new IndexOutOfRangeException(
+                    $"The buffer index {bufferIndex} is out of range [0, {m_Capacity - 1}]"
+                );
         }
 
         private static readonly int k_ULongSizeInBits = UnsafeUtility.SizeOf<ulong>() * 8;
@@ -401,13 +440,17 @@ namespace Unity.Networking.Transport
                 {
                     // This should never happen. If we hit this exception it might indicate
                     // a failure in the UnsafeAtomicFreeList implementation or bad memory
-                    throw new InvalidOperationException($"Trying to acquire buffer with index {bufferIndex} but it was already marked as used");
+                    throw new InvalidOperationException(
+                        $"Trying to acquire buffer with index {bufferIndex} but it was already marked as used"
+                    );
                 }
                 var newUsage = usage | (1UL << bitIndex);
-                if (Interlocked.CompareExchange(ref ((long*)m_BuffersUsage)[intIndex], (long)newUsage, (long)usage) == (long)usage)
+                if (
+                    Interlocked.CompareExchange(ref ((long*)m_BuffersUsage)[intIndex], (long)newUsage, (long)usage)
+                    == (long)usage
+                )
                     break;
-            }
-            while (true);
+            } while (true);
         }
 
         private void MarkAsNotUsed(int bufferIndex)
@@ -419,13 +462,17 @@ namespace Unity.Networking.Transport
                 var usage = ((ulong*)m_BuffersUsage)[intIndex];
                 if ((usage & (1UL << bitIndex)) == 0)
                 {
-                    throw new InvalidOperationException($"Trying to release a buffer with index {bufferIndex} but it was already marked as not used");
+                    throw new InvalidOperationException(
+                        $"Trying to release a buffer with index {bufferIndex} but it was already marked as not used"
+                    );
                 }
                 var newUsage = usage & ~(1UL << bitIndex);
-                if (Interlocked.CompareExchange(ref ((long*)m_BuffersUsage)[intIndex], (long)newUsage, (long)usage) == (long)usage)
+                if (
+                    Interlocked.CompareExchange(ref ((long*)m_BuffersUsage)[intIndex], (long)newUsage, (long)usage)
+                    == (long)usage
+                )
                     break;
-            }
-            while (true);
+            } while (true);
         }
 
 #endif

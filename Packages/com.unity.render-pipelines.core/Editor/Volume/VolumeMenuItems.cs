@@ -13,7 +13,10 @@ namespace UnityEditor.Rendering
             volume.isGlobal = true;
         }
 
-        [MenuItem("GameObject/Volume/Box Volume", priority = CoreUtils.Sections.section1 + CoreUtils.Priorities.gameObjectMenuPriority)]
+        [MenuItem(
+            "GameObject/Volume/Box Volume",
+            priority = CoreUtils.Sections.section1 + CoreUtils.Priorities.gameObjectMenuPriority
+        )]
         static void CreateBoxVolume(MenuCommand menuCommand)
         {
             var go = CoreEditorUtils.CreateGameObject("Box Volume", menuCommand.context);
@@ -24,7 +27,10 @@ namespace UnityEditor.Rendering
             volume.blendDistance = 1f;
         }
 
-        [MenuItem("GameObject/Volume/Sphere Volume", priority = CoreUtils.Sections.section1 + CoreUtils.Priorities.gameObjectMenuPriority + 1)]
+        [MenuItem(
+            "GameObject/Volume/Sphere Volume",
+            priority = CoreUtils.Sections.section1 + CoreUtils.Priorities.gameObjectMenuPriority + 1
+        )]
         static void CreateSphereVolume(MenuCommand menuCommand)
         {
             var go = CoreEditorUtils.CreateGameObject("Sphere Volume", menuCommand.context);
@@ -35,7 +41,10 @@ namespace UnityEditor.Rendering
             volume.blendDistance = 1f;
         }
 
-        [MenuItem("GameObject/Volume/Convex Mesh Volume", priority = CoreUtils.Sections.section1 + CoreUtils.Priorities.gameObjectMenuPriority + 2)]
+        [MenuItem(
+            "GameObject/Volume/Convex Mesh Volume",
+            priority = CoreUtils.Sections.section1 + CoreUtils.Priorities.gameObjectMenuPriority + 2
+        )]
         static void CreateConvexMeshVolume(MenuCommand menuCommand)
         {
             var go = CoreEditorUtils.CreateGameObject("Convex Mesh Volume", menuCommand.context);

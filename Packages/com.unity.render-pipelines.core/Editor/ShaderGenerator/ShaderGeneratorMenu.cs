@@ -5,8 +5,11 @@ namespace UnityEditor.Rendering
 {
     class ShaderGeneratorMenu
     {
-        [MenuItem("Edit/Rendering/Generate Shader Includes", priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.editMenuPriority + 1)]
-        async static Task GenerateShaderIncludes()
+        [MenuItem(
+            "Edit/Rendering/Generate Shader Includes",
+            priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.editMenuPriority + 1
+        )]
+        static async Task GenerateShaderIncludes()
         {
             await CSharpToHLSL.GenerateAll();
             AssetDatabase.Refresh();

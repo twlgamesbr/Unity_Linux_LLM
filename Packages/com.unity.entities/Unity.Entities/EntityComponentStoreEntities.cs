@@ -11,7 +11,8 @@ namespace Unity.Entities
 {
     unsafe partial struct EntityComponentStore
     {
-        internal static readonly SharedStatic<EntityStore> s_entityStore = SharedStatic<EntityStore>.GetOrCreate<EntityStore.BurstStaticIdentifier>();
+        internal static readonly SharedStatic<EntityStore> s_entityStore =
+            SharedStatic<EntityStore>.GetOrCreate<EntityStore.BurstStaticIdentifier>();
 
         internal struct EntityStore : IDisposable
         {
@@ -49,13 +50,15 @@ namespace Unity.Entities
 
                 var block = (DataBlock*)m_DataBlocks[blockIndex];
 
-                if(block == null)
+                if (block == null)
                 {
                     Assert.AreEqual(0, m_EntityCount[blockIndex]);
 
-                    if(m_EntityCount[blockIndex] != 0)
+                    if (m_EntityCount[blockIndex] != 0)
                     {
-                        Debug.Log($"block index {blockIndex} pointer {(ulong)block:X16} count {m_EntityCount[blockIndex]}");
+                        Debug.Log(
+                            $"block index {blockIndex} pointer {(ulong)block:X16} count {m_EntityCount[blockIndex]}"
+                        );
                     }
 
                     return;
@@ -111,8 +114,9 @@ namespace Unity.Entities
                 if (block == null || MissingInBitmask())
                 {
                     throw new ArgumentException(
-                        "All entities passed to EntityManager must exist. One of the entities has already been destroyed or was never created. " +
-                        AppendDestroyedEntityRecordError(entity));
+                        "All entities passed to EntityManager must exist. One of the entities has already been destroyed or was never created. "
+                            + AppendDestroyedEntityRecordError(entity)
+                    );
                 }
             }
 
@@ -198,7 +202,12 @@ namespace Unity.Entities
                 AllocateEntities(entities, entityCount, ChunkIndex.Null, 0);
             }
 
-            internal void AllocateEntities(Entity* entities, int totalCount, ChunkIndex chunkIndex, int firstEntityInChunkIndex)
+            internal void AllocateEntities(
+                Entity* entities,
+                int totalCount,
+                ChunkIndex chunkIndex,
+                int firstEntityInChunkIndex
+            )
             {
                 var entityInChunkIndex = firstEntityInChunkIndex;
 
@@ -261,7 +270,7 @@ namespace Unity.Entities
                                         *entities = new Entity
                                         {
                                             Index = baseEntityIndex + indexInBlock,
-                                            Version = versions[indexInBlock] += 1
+                                            Version = versions[indexInBlock] += 1,
                                         };
 
                                         if (chunkIndex != ChunkIndex.Null)
@@ -298,7 +307,11 @@ namespace Unity.Entities
 
                     Assert.AreEqual(0, remainingCount);
 
-                    var resultCheck = Interlocked.CompareExchange(ref m_EntityCount[i], blockCount + count, k_BlockBusy);
+                    var resultCheck = Interlocked.CompareExchange(
+                        ref m_EntityCount[i],
+                        blockCount + count,
+                        k_BlockBusy
+                    );
 
                     Assert.AreEqual(resultCheck, k_BlockBusy);
 
@@ -320,7 +333,7 @@ namespace Unity.Entities
 
             internal void DeallocateEntities(Entity* entities, int count)
             {
-                for (int i = 0; i < count;)
+                for (int i = 0; i < count; )
                 {
                     int rangeStart = i;
                     int startIndex = entities[i].Index;
@@ -362,7 +375,11 @@ namespace Unity.Entities
                         if (blockCount != k_BlockBusy)
                         {
                             // Set the count to a flag indicating that this block is busy (-1)
-                            var before = Interlocked.CompareExchange(ref m_EntityCount[blockIndex], k_BlockBusy, blockCount);
+                            var before = Interlocked.CompareExchange(
+                                ref m_EntityCount[blockIndex],
+                                k_BlockBusy,
+                                blockCount
+                            );
 
                             if (before == blockCount)
                             {
@@ -399,7 +416,11 @@ namespace Unity.Entities
                     var allocated = block->allocated;
                     var versions = block->versions;
 
-                    for (int j = startIndex, indexInEntitiesArray = rangeStart; j < endIndex; j++, indexInEntitiesArray++)
+                    for (
+                        int j = startIndex, indexInEntitiesArray = rangeStart;
+                        j < endIndex;
+                        j++, indexInEntitiesArray++
+                    )
                     {
                         var indexInBlock = j % k_EntitiesInBlock;
 
@@ -423,7 +444,11 @@ namespace Unity.Entities
                     // Do not deallocate the block even if it's empty. Versions should be preserved.
 
                     {
-                        var resultCheck = Interlocked.CompareExchange(ref m_EntityCount[blockIndex], blockCount, k_BlockBusy);
+                        var resultCheck = Interlocked.CompareExchange(
+                            ref m_EntityCount[blockIndex],
+                            blockCount,
+                            k_BlockBusy
+                        );
                         Assert.AreEqual(resultCheck, k_BlockBusy);
                     }
                 }

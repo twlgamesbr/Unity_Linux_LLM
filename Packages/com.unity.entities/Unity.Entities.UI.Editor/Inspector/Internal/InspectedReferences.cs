@@ -30,8 +30,7 @@ namespace Unity.Entities.UI
         /// </summary>
         /// <param name="value">The object being visited.</param>
         /// <returns><see langword="true"/> if the object has been removed.</returns>
-        internal bool PopReference(object value)
-            => m_References.Remove(value);
+        internal bool PopReference(object value) => m_References.Remove(value);
 
         /// <summary>
         /// Returns the path to the first reference that was visited.

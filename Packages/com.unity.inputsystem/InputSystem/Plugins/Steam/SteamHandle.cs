@@ -39,12 +39,12 @@ namespace UnityEngine.InputSystem.Steam
             return m_Handle.GetHashCode();
         }
 
-        public static bool operator==(SteamHandle<TObject> a, SteamHandle<TObject> b)
+        public static bool operator ==(SteamHandle<TObject> a, SteamHandle<TObject> b)
         {
             return a.m_Handle == b.m_Handle;
         }
 
-        public static bool operator!=(SteamHandle<TObject> a, SteamHandle<TObject> b)
+        public static bool operator !=(SteamHandle<TObject> a, SteamHandle<TObject> b)
         {
             return !(a == b);
         }

@@ -15,17 +15,24 @@ namespace Unity.Entities.Editor
                 return s_MainToolbarElement;
 
             // Get Toolbar static instance
-            var toolbar = Type.GetType("UnityEditor.Toolbar, UnityEditor")?.GetField("get", BindingFlags.Public | BindingFlags.Static)?.GetValue(null);
+            var toolbar = Type.GetType("UnityEditor.Toolbar, UnityEditor")
+                ?.GetField("get", BindingFlags.Public | BindingFlags.Static)
+                ?.GetValue(null);
             if (toolbar == null)
                 return null;
 
             // Get Toolbar.windowBackend
-            var windowBackend = Type.GetType("UnityEditor.GUIView, UnityEditor")?.GetProperty("windowBackend", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(toolbar);
+            var windowBackend = Type.GetType("UnityEditor.GUIView, UnityEditor")
+                ?.GetProperty("windowBackend", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.GetValue(toolbar);
             if (windowBackend == null)
                 return null;
 
             // Get Toolbar.windowBackend.visualTree
-            var visualTree = (VisualElement)Type.GetType("UnityEditor.IWindowBackend, UnityEditor")?.GetProperty("visualTree")?.GetValue(windowBackend);
+            var visualTree = (VisualElement)
+                Type.GetType("UnityEditor.IWindowBackend, UnityEditor")
+                    ?.GetProperty("visualTree")
+                    ?.GetValue(windowBackend);
             if (visualTree == null)
                 return null;
 

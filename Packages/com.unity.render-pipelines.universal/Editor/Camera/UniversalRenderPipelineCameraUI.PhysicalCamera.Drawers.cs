@@ -11,7 +11,9 @@ namespace UnityEditor.Rendering.Universal
             static PhysicalCamera()
             {
                 Drawer = CED.Conditional(
-                    (serialized, owner) => serialized.projectionMatrixMode.intValue == (int)CameraUI.ProjectionMatrixMode.PhysicalPropertiesBased,
+                    (serialized, owner) =>
+                        serialized.projectionMatrixMode.intValue
+                        == (int)CameraUI.ProjectionMatrixMode.PhysicalPropertiesBased,
                     CED.Group(
                         CameraUI.PhysicalCamera.Styles.cameraBody,
                         GroupOption.Indent,
@@ -22,7 +24,7 @@ namespace UnityEditor.Rendering.Universal
                             CameraUI.PhysicalCamera.Drawer_PhysicalCamera_CameraBody_ShutterSpeed,
                             CameraUI.PhysicalCamera.Drawer_PhysicalCamera_CameraBody_GateFit
                         )
-                        ),
+                    ),
                     CED.Group(
                         CameraUI.PhysicalCamera.Styles.lens,
                         GroupOption.Indent,
@@ -33,14 +35,11 @@ namespace UnityEditor.Rendering.Universal
                             CameraUI.PhysicalCamera.Drawer_PhysicalCamera_Lens_Aperture,
                             CameraUI.PhysicalCamera.Drawer_PhysicalCamera_FocusDistance
                         )
-                        ),
+                    ),
                     CED.Group(
                         CameraUI.PhysicalCamera.Styles.apertureShape,
                         GroupOption.Indent,
-                        CED.Group(
-                            GroupOption.Indent,
-                            CameraUI.PhysicalCamera.Drawer_PhysicalCamera_ApertureShape
-                        )
+                        CED.Group(GroupOption.Indent, CameraUI.PhysicalCamera.Drawer_PhysicalCamera_ApertureShape)
                     )
                 );
             }

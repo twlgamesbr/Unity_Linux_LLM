@@ -17,7 +17,7 @@ namespace Unity.Networking.Transport.Utilities
             public T Element;
         }
 
-        private readonly static List<ElementSlot> s_ElementList = new List<ElementSlot>();
+        private static readonly List<ElementSlot> s_ElementList = new List<ElementSlot>();
 
         private static int AllocateElement(ref T element)
         {

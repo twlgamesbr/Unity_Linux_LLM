@@ -53,9 +53,13 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             m_MultiColumnTreeView.columns["TypeColumn"].bindCell = (VisualElement element, int index) =>
                 (element as Label).text = m_MultiColumnTreeView.GetItemDataForIndex<IRowData>(index).TypeName;
             m_MultiColumnTreeView.columns["BytesSentColumn"].bindCell = (VisualElement element, int index) =>
-                (element as Label).text = m_MultiColumnTreeView.GetItemDataForIndex<IRowData>(index).Bytes.Sent.ToString();
+                (element as Label).text = m_MultiColumnTreeView
+                    .GetItemDataForIndex<IRowData>(index)
+                    .Bytes.Sent.ToString();
             m_MultiColumnTreeView.columns["BytesReceivedColumn"].bindCell = (VisualElement element, int index) =>
-                (element as Label).text = m_MultiColumnTreeView.GetItemDataForIndex<IRowData>(index).Bytes.Received.ToString();
+                (element as Label).text = m_MultiColumnTreeView
+                    .GetItemDataForIndex<IRowData>(index)
+                    .Bytes.Received.ToString();
 #if UNITY_2023_2_OR_NEWER
             m_MultiColumnTreeView.sortingMode = ColumnSortingMode.Default;
 #else
@@ -94,7 +98,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         }
 
         /// <summary>
-        /// Rebuild MultiColumnTreeView after sorting changes according to TreeVIew 
+        /// Rebuild MultiColumnTreeView after sorting changes according to TreeVIew
         /// </summary>
         void BuildMultiColumnTreeView()
         {
@@ -105,8 +109,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
             foreach (var item in rootItems)
             {
-                SetExpandedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>) item);
-                SetSelectedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>) item);
+                SetExpandedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>)item);
+                SetSelectedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>)item);
             }
 
             UpdateMultiColumnTreeView(m_InnerTreeView);
@@ -131,8 +135,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
             foreach (var item in rootItems)
             {
-                SetExpandedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>) item);
-                SetSelectedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>) item);
+                SetExpandedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>)item);
+                SetSelectedStateRecursive(m_InnerTreeView, (TreeViewItem<IRowData>)item);
             }
 
             AddTreeView(m_InnerTreeView);
@@ -155,7 +159,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             {
                 foreach (var child in item.children)
                 {
-                    SetExpandedStateRecursive(treeView, (TreeViewItem<IRowData>) child);
+                    SetExpandedStateRecursive(treeView, (TreeViewItem<IRowData>)child);
                 }
             }
         }
@@ -178,7 +182,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             {
                 foreach (var child in item.children)
                 {
-                    SetSelectedStateRecursive(treeView, (TreeViewItem<IRowData>) child);
+                    SetSelectedStateRecursive(treeView, (TreeViewItem<IRowData>)child);
                 }
             }
         }
@@ -193,7 +197,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             var childDataList = new List<TreeViewItemData<IRowData>>();
             foreach (var treeViewItemChild in node.children)
             {
-                var rowDataChild = (TreeViewItem<IRowData>) treeViewItemChild;
+                var rowDataChild = (TreeViewItem<IRowData>)treeViewItemChild;
                 var childData = ConvertToTreeViewItemData(rowDataChild);
 
                 childDataList.Add(childData);
@@ -205,10 +209,13 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
         void UpdateMultiColumnTreeView(TreeView treeView)
         {
             // Update data in TreeView
-            var treeViewItemsList = treeView.rootItems.Select(rootItem => rootItem as TreeViewItem<IRowData>).Select(ConvertToTreeViewItemData).ToList();
+            var treeViewItemsList = treeView
+                .rootItems.Select(rootItem => rootItem as TreeViewItem<IRowData>)
+                .Select(ConvertToTreeViewItemData)
+                .ToList();
             m_MultiColumnTreeView.SetRootItems(treeViewItemsList);
 
-            // Update Expanded-FoldoutState 
+            // Update Expanded-FoldoutState
             m_MultiColumnTreeView.CollapseAll();
             foreach (var expandedItemId in treeView.expandedItemIds)
             {
@@ -244,8 +251,8 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 {
                     flexGrow = 1f,
                     flexShrink = 0f,
-                    flexBasis = 0f
-                }
+                    flexBasis = 0f,
+                },
             };
 
             m_TreeViewContainer.Add(m_MultiColumnTreeView);
@@ -297,27 +304,27 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                 {
                     SortDirection.NameAscending => SortDirection.NameDescending,
                     SortDirection.NameDescending => SortDirection.NameAscending,
-                    _ => SortDirection.NameAscending
+                    _ => SortDirection.NameAscending,
                 },
                 "TypeColumn" => m_SortDirection switch
                 {
                     SortDirection.TypeAscending => SortDirection.TypeDescending,
                     SortDirection.TypeDescending => SortDirection.TypeAscending,
-                    _ => SortDirection.TypeAscending
+                    _ => SortDirection.TypeAscending,
                 },
                 "BytesSentColumn" => m_SortDirection switch
                 {
                     SortDirection.BytesSentAscending => SortDirection.BytesSentDescending,
                     SortDirection.BytesSentDescending => SortDirection.BytesSentAscending,
-                    _ => SortDirection.BytesSentAscending
+                    _ => SortDirection.BytesSentAscending,
                 },
                 "BytesReceivedColumn" => m_SortDirection switch
                 {
                     SortDirection.BytesReceivedAscending => SortDirection.BytesReceivedDescending,
                     SortDirection.BytesReceivedDescending => SortDirection.BytesReceivedAscending,
-                    _ => SortDirection.BytesReceivedAscending
+                    _ => SortDirection.BytesReceivedAscending,
                 },
-                _ => m_SortDirection
+                _ => m_SortDirection,
             };
 
             BuildMultiColumnTreeView();

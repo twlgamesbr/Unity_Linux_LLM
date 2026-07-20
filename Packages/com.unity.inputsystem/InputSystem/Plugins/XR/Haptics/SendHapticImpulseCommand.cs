@@ -43,7 +43,7 @@ namespace UnityEngine.InputSystem.XR.Haptics
                 baseCommand = new InputDeviceCommand(Type, kSize),
                 channel = motorChannel,
                 amplitude = motorAmplitude,
-                duration = motorDuration
+                duration = motorDuration,
             };
         }
     }

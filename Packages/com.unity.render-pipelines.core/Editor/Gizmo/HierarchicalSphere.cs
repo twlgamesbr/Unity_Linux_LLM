@@ -67,9 +67,17 @@ namespace UnityEditor.Rendering
         const float k_HandleSizeCoef = 0.05f;
 
         static Material k_Material_Cache;
-        static Material k_Material => (k_Material_Cache == null || k_Material_Cache.Equals(null) ? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored"))) : k_Material_Cache);
+        static Material k_Material =>
+            (
+                k_Material_Cache == null || k_Material_Cache.Equals(null)
+                    ? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored")))
+                    : k_Material_Cache
+            );
         static Mesh k_MeshSphere_Cache;
-        static Mesh k_MeshSphere => k_MeshSphere_Cache == null || k_MeshSphere_Cache.Equals(null) ? (k_MeshSphere_Cache = Resources.GetBuiltinResource<Mesh>("New-Sphere.fbx")) : k_MeshSphere_Cache;
+        static Mesh k_MeshSphere =>
+            k_MeshSphere_Cache == null || k_MeshSphere_Cache.Equals(null)
+                ? (k_MeshSphere_Cache = Resources.GetBuiltinResource<Mesh>("New-Sphere.fbx"))
+                : k_MeshSphere_Cache;
 
         Material m_Material;
         readonly HierarchicalSphere m_Parent;
@@ -77,9 +85,8 @@ namespace UnityEditor.Rendering
         Color m_WireframeColor;
         Color m_WireframeColorBehind;
 
-        Material material => m_Material == null || m_Material.Equals(null)
-        ? (m_Material = new Material(k_Material))
-        : m_Material;
+        Material material =>
+            m_Material == null || m_Material.Equals(null) ? (m_Material = new Material(k_Material)) : m_Material;
 
         /// <summary>The position of the center of the box in Handle.matrix space.</summary>
         public Vector3 center { get; set; }
@@ -123,12 +130,21 @@ namespace UnityEditor.Rendering
 
             Color wireframeColor = m_HandleColor;
             wireframeColor.a = 0.8f;
-            using (new Handles.DrawingScope(m_WireframeColor, Matrix4x4.TRS((Vector3)Handles.matrix.GetColumn(3) + center, Quaternion.identity, Vector3.one)))
+            using (
+                new Handles.DrawingScope(
+                    m_WireframeColor,
+                    Matrix4x4.TRS((Vector3)Handles.matrix.GetColumn(3) + center, Quaternion.identity, Vector3.one)
+                )
+            )
             {
                 if (filled)
                 {
                     material.SetPass(0);
-                    Matrix4x4 drawMatrix = Matrix4x4.TRS((Vector3)Handles.matrix.GetColumn(3), Quaternion.identity, 2f * radius * Vector3.one);
+                    Matrix4x4 drawMatrix = Matrix4x4.TRS(
+                        (Vector3)Handles.matrix.GetColumn(3),
+                        Quaternion.identity,
+                        2f * radius * Vector3.one
+                    );
                     Graphics.DrawMeshNow(k_MeshSphere, drawMatrix);
                 }
 

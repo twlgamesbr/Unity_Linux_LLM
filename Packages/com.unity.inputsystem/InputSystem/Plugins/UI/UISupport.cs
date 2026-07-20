@@ -11,11 +11,13 @@ static class UISupport
 {
     public static void Initialize()
     {
-        InputSystem.RegisterLayout(@"
+        InputSystem.RegisterLayout(
+            @"
             {
                 ""name"" : ""VirtualMouse"",
                 ""extend"" : ""Mouse""
             }
-        ");
+        "
+        );
     }
 }

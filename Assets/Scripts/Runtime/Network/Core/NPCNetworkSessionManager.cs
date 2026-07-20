@@ -1,22 +1,21 @@
 using System;
 using System.Collections.Generic;
 using EditorAttributes;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+
 namespace NPCSystem.Network.Core
 {
     [DisallowMultipleComponent]
@@ -35,10 +34,9 @@ namespace NPCSystem.Network.Core
         {
             public string PlayerDisplayName = string.Empty;
             public string SelectedNpcSlug = string.Empty;
-            public Dictionary<string, List<DialogueEntry>> HistoryByNpc = new Dictionary<
-                string,
-                List<DialogueEntry>
-            >(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<string, List<DialogueEntry>> HistoryByNpc = new Dictionary<string, List<DialogueEntry>>(
+                StringComparer.OrdinalIgnoreCase
+            );
             public List<string> InventoryItems = new List<string>();
         }
 
@@ -88,9 +86,7 @@ namespace NPCSystem.Network.Core
                 return string.Empty;
             }
 
-            return string.IsNullOrWhiteSpace(session.PlayerDisplayName)
-                ? string.Empty
-                : session.PlayerDisplayName;
+            return string.IsNullOrWhiteSpace(session.PlayerDisplayName) ? string.Empty : session.PlayerDisplayName;
         }
 
         public void SetHistorySnapshot(ulong clientId, string npcSlug, List<DialogueEntry> history)
@@ -119,14 +115,10 @@ namespace NPCSystem.Network.Core
         {
             if (!_sessionsByClientId.TryGetValue(clientId, out NPCClientDialogueSession session))
             {
-                return new Dictionary<string, List<DialogueEntry>>(
-                    StringComparer.OrdinalIgnoreCase
-                );
+                return new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
             }
 
-            var clone = new Dictionary<string, List<DialogueEntry>>(
-                StringComparer.OrdinalIgnoreCase
-            );
+            var clone = new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
             foreach (var pair in session.HistoryByNpc)
             {
                 clone[pair.Key] = CloneEntries(pair.Value);
@@ -135,10 +127,7 @@ namespace NPCSystem.Network.Core
             return clone;
         }
 
-        public void SetAllHistorySnapshots(
-            ulong clientId,
-            Dictionary<string, List<DialogueEntry>> historyByNpc
-        )
+        public void SetAllHistorySnapshots(ulong clientId, Dictionary<string, List<DialogueEntry>> historyByNpc)
         {
             NPCClientDialogueSession session = GetOrCreateSession(clientId);
             session.HistoryByNpc.Clear();
@@ -204,10 +193,7 @@ namespace NPCSystem.Network.Core
                     NPCFlowLogLevel.Info,
                     $"Session manager currently holds {_sessionsByClientId.Count} client session(s).",
                     source: nameof(NPCNetworkSessionManager),
-                    data: new Dictionary<string, object>
-                    {
-                        ["activeSessionCount"] = _sessionsByClientId.Count,
-                    }
+                    data: new Dictionary<string, object> { ["activeSessionCount"] = _sessionsByClientId.Count }
                 );
         }
 
@@ -232,9 +218,7 @@ namespace NPCSystem.Network.Core
 
         static string NormalizeNpcSlug(string npcSlug)
         {
-            return string.IsNullOrWhiteSpace(npcSlug)
-                ? string.Empty
-                : npcSlug.Trim().ToLowerInvariant();
+            return string.IsNullOrWhiteSpace(npcSlug) ? string.Empty : npcSlug.Trim().ToLowerInvariant();
         }
 
         static List<DialogueEntry> CloneEntries(List<DialogueEntry> history)

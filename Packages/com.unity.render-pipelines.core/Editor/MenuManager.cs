@@ -11,9 +11,13 @@ namespace UnityEditor.Rendering
     {
         #region Add Menu Item
         static Action<string, string, bool, int, Action, Func<bool>> s_AddMenuItem = GetAddMenuItemMethod();
+
         static Action<string, string, bool, int, Action, Func<bool>> GetAddMenuItemMethod()
         {
-            MethodInfo addMenuItemMethodInfo = typeof(Menu).GetMethod("AddMenuItem", BindingFlags.Static | BindingFlags.NonPublic);
+            MethodInfo addMenuItemMethodInfo = typeof(Menu).GetMethod(
+                "AddMenuItem",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
             var nameParam = Expression.Parameter(typeof(string), "name");
             var shortcutParam = Expression.Parameter(typeof(string), "shortcut");
             var checkedParam = Expression.Parameter(typeof(bool), "checked");
@@ -21,22 +25,28 @@ namespace UnityEditor.Rendering
             var executeParam = Expression.Parameter(typeof(Action), "execute");
             var validateParam = Expression.Parameter(typeof(Func<bool>), "validate");
 
-            var addMenuItemExpressionCall = Expression.Call(null, addMenuItemMethodInfo,
+            var addMenuItemExpressionCall = Expression.Call(
+                null,
+                addMenuItemMethodInfo,
                 nameParam,
                 shortcutParam,
                 checkedParam,
                 priorityParam,
                 executeParam,
-                validateParam);
+                validateParam
+            );
 
-            return Expression.Lambda<Action<string, string, bool, int, Action, Func<bool>>>(
-                addMenuItemExpressionCall,
-                nameParam,
-                shortcutParam,
-                checkedParam,
-                priorityParam,
-                executeParam,
-                validateParam).Compile();
+            return Expression
+                .Lambda<Action<string, string, bool, int, Action, Func<bool>>>(
+                    addMenuItemExpressionCall,
+                    nameParam,
+                    shortcutParam,
+                    checkedParam,
+                    priorityParam,
+                    executeParam,
+                    validateParam
+                )
+                .Compile();
         }
 
         /// <summary>
@@ -48,7 +58,14 @@ namespace UnityEditor.Rendering
         /// <param name="priority">The priority of the menu item</param>
         /// <param name="execute">The action that will be called once the menu item is pressed</param>
         /// <param name="validate">The action that will be called to know if the menu itme is enabled</param>
-        public static void AddMenuItem(string path, string shortcut, bool @checked, int priority, System.Action execute, System.Func<bool> validate)
+        public static void AddMenuItem(
+            string path,
+            string shortcut,
+            bool @checked,
+            int priority,
+            System.Action execute,
+            System.Func<bool> validate
+        )
         {
             s_AddMenuItem(path, shortcut, @checked, priority, execute, validate);
         }
@@ -57,13 +74,17 @@ namespace UnityEditor.Rendering
 
         #region Remove Menu Item
         static Action<string> s_RemoveMenuItem = GetRemoveMenuItemMethod();
+
         static Action<string> GetRemoveMenuItemMethod()
         {
-            MethodInfo removeMenuItemMethodInfo = typeof(Menu).GetMethod("RemoveMenuItem", BindingFlags.Static | BindingFlags.NonPublic);
+            MethodInfo removeMenuItemMethodInfo = typeof(Menu).GetMethod(
+                "RemoveMenuItem",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
             var nameParam = Expression.Parameter(typeof(string), "name");
-            return Expression.Lambda<Action<string>>(
-                Expression.Call(null, removeMenuItemMethodInfo, nameParam),
-                nameParam).Compile();
+            return Expression
+                .Lambda<Action<string>>(Expression.Call(null, removeMenuItemMethodInfo, nameParam), nameParam)
+                .Compile();
         }
         #endregion
 

@@ -40,14 +40,15 @@ namespace Unity.Numerics.Random
                 return spareGaussian * stdDev + mean;
             }
 
-            float u, v, s;
+            float u,
+                v,
+                s;
             do
             {
                 u = NextUniform(-1, 1);
                 v = NextUniform(-1, 1);
                 s = u * u + v * v;
-            }
-            while (s >= 1 || s == 0);
+            } while (s >= 1 || s == 0);
 
             s = math.sqrt(-2.0f * math.log(s) / s);
             spareGaussian = v * s;

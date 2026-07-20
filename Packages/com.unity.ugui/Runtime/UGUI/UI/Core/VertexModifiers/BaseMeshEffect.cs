@@ -50,7 +50,6 @@ namespace UnityEngine.UI
     /// ]]>
     ///</code>
     ///</example>
-
     [ExecuteAlways]
     public abstract class BaseMeshEffect : UIBehaviour, IMeshModifier
     {
@@ -102,7 +101,6 @@ namespace UnityEngine.UI
             if (graphic != null)
                 graphic.SetVerticesDirty();
         }
-
 #endif
 
         /// <summary>

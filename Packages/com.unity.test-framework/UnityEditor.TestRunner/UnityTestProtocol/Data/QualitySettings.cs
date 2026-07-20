@@ -7,7 +7,13 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
     [Serializable]
     internal class QualitySettings
     {
-        public QualitySettings(int vsync, int antiAliasing, string colorSpace, string anisotropicFiltering, string blendWeights)
+        public QualitySettings(
+            int vsync,
+            int antiAliasing,
+            string colorSpace,
+            string anisotropicFiltering,
+            string blendWeights
+        )
         {
             Vsync = vsync;
             AntiAliasing = antiAliasing;
@@ -16,7 +22,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
             BlendWeights = blendWeights;
         }
 
-        public QualitySettings(){}
+        public QualitySettings() { }
 
         public int Vsync;
         public int AntiAliasing;

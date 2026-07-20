@@ -3,13 +3,19 @@ using Unity.Entities;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_DetailNormalScale"    )]
-    public struct HDRPMaterialPropertyDetailNormalScale : IComponentData { public float  Value; }
+    [MaterialProperty("_DetailNormalScale")]
+    public struct HDRPMaterialPropertyDetailNormalScale : IComponentData
+    {
+        public float Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyDetailNormalScaleAuthoring : UnityEngine.MonoBehaviour
     {
-        [RegisterBinding(typeof(HDRPMaterialPropertyDetailNormalScale), nameof(HDRPMaterialPropertyDetailNormalScale.Value))]
+        [RegisterBinding(
+            typeof(HDRPMaterialPropertyDetailNormalScale),
+            nameof(HDRPMaterialPropertyDetailNormalScale.Value)
+        )]
         public float Value;
 
         class HDRPMaterialPropertyDetailNormalScaleBaker : Baker<HDRPMaterialPropertyDetailNormalScaleAuthoring>

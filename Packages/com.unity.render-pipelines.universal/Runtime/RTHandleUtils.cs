@@ -1,7 +1,7 @@
-using System.Text;
 using System.Collections.Generic;
-using UnityEngine.Rendering.RenderGraphModule;
+using System.Text;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -10,12 +10,15 @@ namespace UnityEngine.Rendering.Universal
     {
         // Dictionary tracks resources by hash and stores resources with same hash in a List (list instead of a stack because we need to be able to remove stale allocations, potentially in the middle of the stack).
         // The list needs to be sorted otherwise you could get inconsistent resource usage from one frame to another.
-        protected Dictionary<int, SortedList<ulong, (RTHandle resource, int frameIndex)>> m_ResourcePool = new Dictionary<int, SortedList<ulong, (RTHandle resource, int frameIndex)>>();
+        protected Dictionary<int, SortedList<ulong, (RTHandle resource, int frameIndex)>> m_ResourcePool =
+            new Dictionary<int, SortedList<ulong, (RTHandle resource, int frameIndex)>>();
         protected List<ulong> m_RemoveList = new List<ulong>(32); // Used to remove stale resources as there is no RemoveAll on SortedLists
 
         protected static int s_CurrentStaleResourceCount = 0;
+
         // Keep stale resources alive for 3 frames
         protected static int s_StaleResourceLifetime = 3;
+
         // Store max 32 rtHandles
         // 1080p * 32bpp * 32 = 265.4mb
         protected static int s_StaleResourceMaxCapacity = 32;
@@ -30,7 +33,8 @@ namespace UnityEngine.Rendering.Universal
         internal int staleResourceCapacity
         {
             get { return s_StaleResourceMaxCapacity; }
-            set {
+            set
+            {
                 if (s_StaleResourceMaxCapacity != value)
                 {
                     s_StaleResourceMaxCapacity = value;
@@ -66,7 +70,11 @@ namespace UnityEngine.Rendering.Universal
         internal bool TryGetResource(in TextureDesc texDesc, out RTHandle resource, bool usepool = true)
         {
             int hashCode = GetHashCodeWithNameHash(texDesc);
-            if (usepool && m_ResourcePool.TryGetValue(hashCode, out SortedList<ulong, (RTHandle resource, int frameIndex)> list) && list.Count > 0)
+            if (
+                usepool
+                && m_ResourcePool.TryGetValue(hashCode, out SortedList<ulong, (RTHandle resource, int frameIndex)> list)
+                && list.Count > 0
+            )
             {
                 resource = list.Values[list.Count - 1].resource;
                 list.RemoveAt(list.Count - 1); // O(1) since it's the last element.
@@ -93,7 +101,7 @@ namespace UnityEngine.Rendering.Universal
             s_CurrentStaleResourceCount = 0;
         }
 
-        static protected bool ShouldReleaseResource(int lastUsedFrameIndex, int currentFrameIndex)
+        protected static bool ShouldReleaseResource(int lastUsedFrameIndex, int currentFrameIndex)
         {
             // We need to have a delay of a few frames before releasing resources for good.
             // Indeed, when having multiple off-screen cameras, they are rendered in a separate SRP render call and thus with a different frame index than main camera
@@ -132,7 +140,11 @@ namespace UnityEngine.Rendering.Universal
         internal void LogDebugInfo()
         {
             var sb = new StringBuilder();
-            sb.AppendFormat("RTHandleResourcePool for frame {0}, Total stale resources {1}", Time.frameCount, s_CurrentStaleResourceCount);
+            sb.AppendFormat(
+                "RTHandleResourcePool for frame {0}, Total stale resources {1}",
+                Time.frameCount,
+                s_CurrentStaleResourceCount
+            );
             sb.AppendLine();
 
             foreach (var kvp in m_ResourcePool)
@@ -143,13 +155,14 @@ namespace UnityEngine.Rendering.Universal
                 for (int i = 0; i < list.Count; ++i)
                 {
                     var value = values[i];
-                    sb.AppendFormat("Resrouce in pool: Name {0} Last active frame index {1} Size {2} x {3} x {4}",
+                    sb.AppendFormat(
+                        "Resrouce in pool: Name {0} Last active frame index {1} Size {2} x {3} x {4}",
                         value.resource.name,
                         value.frameIndex,
                         value.resource.rt.descriptor.width,
                         value.resource.rt.descriptor.height,
                         value.resource.rt.descriptor.volumeDepth
-                        );
+                    );
                     sb.AppendLine();
                 }
             }
@@ -168,11 +181,18 @@ namespace UnityEngine.Rendering.Universal
             return hashCode;
         }
 
-        internal static TextureDesc CreateTextureDesc(RenderTextureDescriptor desc,
-            TextureSizeMode textureSizeMode = TextureSizeMode.Explicit, int anisoLevel = 1, float mipMapBias = 0,
-            FilterMode filterMode = FilterMode.Point, TextureWrapMode wrapMode = TextureWrapMode.Clamp, string name = "")
+        internal static TextureDesc CreateTextureDesc(
+            RenderTextureDescriptor desc,
+            TextureSizeMode textureSizeMode = TextureSizeMode.Explicit,
+            int anisoLevel = 1,
+            float mipMapBias = 0,
+            FilterMode filterMode = FilterMode.Point,
+            TextureWrapMode wrapMode = TextureWrapMode.Clamp,
+            string name = ""
+        )
         {
-            var format = (desc.depthStencilFormat != GraphicsFormat.None) ? desc.depthStencilFormat : desc.graphicsFormat;
+            var format =
+                (desc.depthStencilFormat != GraphicsFormat.None) ? desc.depthStencilFormat : desc.graphicsFormat;
 
             TextureDesc rgDesc = new TextureDesc(desc.width, desc.height);
             rgDesc.sizeMode = textureSizeMode;

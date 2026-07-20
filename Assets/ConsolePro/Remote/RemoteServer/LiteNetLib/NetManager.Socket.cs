@@ -1,11 +1,11 @@
 ﻿#if UNITY_2018_3_OR_NEWER
 #define UNITY_SOCKET_FIX
 #endif
-using System.Runtime.InteropServices;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading;
 using FlyingWormConsole3.LiteNetLib.Utils;
 
@@ -111,10 +111,7 @@ namespace FlyingWormConsole3.LiteNetLib
             {
                 ProcessError(ex);
             }
-            catch (ObjectDisposedException)
-            {
-
-            }
+            catch (ObjectDisposedException) { }
             catch (Exception e)
             {
                 //protects socket receive thread
@@ -193,7 +190,13 @@ namespace FlyingWormConsole3.LiteNetLib
             bool NativeReceiveFrom(IntPtr s, byte[] address)
             {
                 int addrSize = address.Length;
-                packet.Size = NativeSocket.RecvFrom(s, packet.RawData, NetConstants.MaxPacketSize, address, ref addrSize);
+                packet.Size = NativeSocket.RecvFrom(
+                    s,
+                    packet.RawData,
+                    NetConstants.MaxPacketSize,
+                    address,
+                    ref addrSize
+                );
                 if (packet.Size == 0)
                     return true; //socket closed or empty packet
 
@@ -207,13 +210,14 @@ namespace FlyingWormConsole3.LiteNetLib
                 //refresh temp Addr/Port
                 short family = (short)((address[1] << 8) | address[0]);
                 tempEndPoint.Port = (ushort)((address[2] << 8) | address[3]);
-                if ((NativeSocket.UnixMode && family == NativeSocket.AF_INET6) || (!NativeSocket.UnixMode && (AddressFamily)family == AddressFamily.InterNetworkV6))
+                if (
+                    (NativeSocket.UnixMode && family == NativeSocket.AF_INET6)
+                    || (!NativeSocket.UnixMode && (AddressFamily)family == AddressFamily.InterNetworkV6)
+                )
                 {
-                    uint scope = unchecked((uint)(
-                        (address[27] << 24) +
-                        (address[26] << 16) +
-                        (address[25] << 8) +
-                        (address[24])));
+                    uint scope = unchecked(
+                        (uint)((address[27] << 24) + (address[26] << 16) + (address[25] << 8) + (address[24]))
+                    );
 #if NETCOREAPP || NETSTANDARD2_1 || NETSTANDARD2_1_OR_GREATER
                     tempEndPoint.Address = new IPAddress(new ReadOnlySpan<byte>(address, 8, 16), scope);
 #else
@@ -224,10 +228,14 @@ namespace FlyingWormConsole3.LiteNetLib
                 }
                 else //IPv4
                 {
-                    long ipv4Addr = unchecked((uint)((address[4] & 0x000000FF) |
-                                                     (address[5] << 8 & 0x0000FF00) |
-                                                     (address[6] << 16 & 0x00FF0000) |
-                                                     (address[7] << 24)));
+                    long ipv4Addr = unchecked(
+                        (uint)(
+                            (address[4] & 0x000000FF)
+                            | (address[5] << 8 & 0x0000FF00)
+                            | (address[6] << 16 & 0x00FF0000)
+                            | (address[7] << 24)
+                        )
+                    );
                     tempEndPoint.Address = new IPAddress(ipv4Addr);
                 }
 
@@ -252,9 +260,18 @@ namespace FlyingWormConsole3.LiteNetLib
 #if NET8_0_OR_GREATER
             var sockAddr = s.AddressFamily == AddressFamily.InterNetwork ? _sockAddrCacheV4 : _sockAddrCacheV6;
             packet.Size = s.ReceiveFrom(packet, SocketFlags.None, sockAddr);
-            OnMessageReceived(packet, TryGetPeer(sockAddr, out var peer) ? peer : (IPEndPoint)bufferEndPoint.Create(sockAddr));
+            OnMessageReceived(
+                packet,
+                TryGetPeer(sockAddr, out var peer) ? peer : (IPEndPoint)bufferEndPoint.Create(sockAddr)
+            );
 #else
-            packet.Size = s.ReceiveFrom(packet.RawData, 0, NetConstants.MaxPacketSize, SocketFlags.None, ref bufferEndPoint);
+            packet.Size = s.ReceiveFrom(
+                packet.RawData,
+                0,
+                NetConstants.MaxPacketSize,
+                SocketFlags.None,
+                ref bufferEndPoint
+            );
             OnMessageReceived(packet, (IPEndPoint)bufferEndPoint);
 #endif
         }
@@ -379,11 +396,7 @@ namespace FlyingWormConsole3.LiteNetLib
                 ThreadStart ts = ReceiveLogic;
                 if (UseNativeSockets)
                     ts = NativeReceiveLogic;
-                _receiveThread = new Thread(ts)
-                {
-                    Name = $"ReceiveThread({LocalPort})",
-                    IsBackground = true
-                };
+                _receiveThread = new Thread(ts) { Name = $"ReceiveThread({LocalPort})", IsBackground = true };
                 _receiveThread.Start();
                 if (_logicThread == null)
                 {
@@ -455,7 +468,10 @@ namespace FlyingWormConsole3.LiteNetLib
             try
             {
                 socket.Bind(ep);
-                NetDebug.Write(NetLogLevel.Trace, $"[B]Successfully binded to port: {((IPEndPoint)socket.LocalEndPoint).Port}, AF: {socket.AddressFamily}");
+                NetDebug.Write(
+                    NetLogLevel.Trace,
+                    $"[B]Successfully binded to port: {((IPEndPoint)socket.LocalEndPoint).Port}, AF: {socket.AddressFamily}"
+                );
 
                 //join multicast
                 if (ep.AddressFamily == AddressFamily.InterNetworkV6)
@@ -466,7 +482,8 @@ namespace FlyingWormConsole3.LiteNetLib
                         socket.SetSocketOption(
                             SocketOptionLevel.IPv6,
                             SocketOptionName.AddMembership,
-                            new IPv6MulticastOption(MulticastAddressV6));
+                            new IPv6MulticastOption(MulticastAddressV6)
+                        );
 #endif
                     }
                     catch (Exception)
@@ -531,7 +548,12 @@ namespace FlyingWormConsole3.LiteNetLib
                 expandedPacket = PoolGetPacket(length + _extraPacketLayer.ExtraPacketSizeForLayer);
                 Buffer.BlockCopy(message, start, expandedPacket.RawData, 0, length);
                 start = 0;
-                _extraPacketLayer.ProcessOutBoundPacket(ref remoteEndPoint, ref expandedPacket.RawData, ref start, ref length);
+                _extraPacketLayer.ProcessOutBoundPacket(
+                    ref remoteEndPoint,
+                    ref expandedPacket.RawData,
+                    ref start,
+                    ref length
+                );
                 message = expandedPacket.RawData;
             }
 
@@ -551,7 +573,13 @@ namespace FlyingWormConsole3.LiteNetLib
                     unsafe
                     {
                         fixed (byte* dataWithOffset = &message[start])
-                            result = NativeSocket.SendTo(socket.Handle, dataWithOffset, length, peer.NativeAddress, peer.NativeAddress.Length);
+                            result = NativeSocket.SendTo(
+                                socket.Handle,
+                                dataWithOffset,
+                                length,
+                                peer.NativeAddress,
+                                peer.NativeAddress.Length
+                            );
                     }
                     if (result == -1)
                         throw NativeSocket.GetSocketException();
@@ -559,7 +587,11 @@ namespace FlyingWormConsole3.LiteNetLib
                 else
                 {
 #if NET8_0_OR_GREATER
-                    result = socket.SendTo(new ReadOnlySpan<byte>(message, start, length), SocketFlags.None, remoteEndPoint.Serialize());
+                    result = socket.SendTo(
+                        new ReadOnlySpan<byte>(message, start, length),
+                        SocketFlags.None,
+                        remoteEndPoint.Serialize()
+                    );
 #else
                     result = socket.SendTo(message, start, length, SocketFlags.None, remoteEndPoint);
 #endif
@@ -587,14 +619,23 @@ namespace FlyingWormConsole3.LiteNetLib
                                     ? DisconnectReason.HostUnreachable
                                     : DisconnectReason.NetworkUnreachable,
                                 ex.SocketErrorCode,
-                                null);
+                                null
+                            );
                         }
 
-                        CreateEvent(NetEvent.EType.Error, remoteEndPoint: remoteEndPoint, errorCode: ex.SocketErrorCode);
+                        CreateEvent(
+                            NetEvent.EType.Error,
+                            remoteEndPoint: remoteEndPoint,
+                            errorCode: ex.SocketErrorCode
+                        );
                         return -1;
 
                     case SocketError.Shutdown:
-                        CreateEvent(NetEvent.EType.Error, remoteEndPoint: remoteEndPoint, errorCode: ex.SocketErrorCode);
+                        CreateEvent(
+                            NetEvent.EType.Error,
+                            remoteEndPoint: remoteEndPoint,
+                            errorCode: ex.SocketErrorCode
+                        );
                         return -1;
 
                     default:
@@ -650,7 +691,12 @@ namespace FlyingWormConsole3.LiteNetLib
                 var checksumComputeStart = 0;
                 int preCrcLength = length + headerSize;
                 IPEndPoint emptyEp = null;
-                _extraPacketLayer.ProcessOutBoundPacket(ref emptyEp, ref packet.RawData, ref checksumComputeStart, ref preCrcLength);
+                _extraPacketLayer.ProcessOutBoundPacket(
+                    ref emptyEp,
+                    ref packet.RawData,
+                    ref checksumComputeStart,
+                    ref preCrcLength
+                );
             }
             else
             {
@@ -661,21 +707,25 @@ namespace FlyingWormConsole3.LiteNetLib
             bool multicastSuccess = false;
             try
             {
-                broadcastSuccess = _udpSocketv4.SendTo(
-                    packet.RawData,
-                    0,
-                    packet.Size,
-                    SocketFlags.None,
-                    new IPEndPoint(IPAddress.Broadcast, port)) > 0;
-
-                if (_udpSocketv6 != null)
-                {
-                    multicastSuccess = _udpSocketv6.SendTo(
+                broadcastSuccess =
+                    _udpSocketv4.SendTo(
                         packet.RawData,
                         0,
                         packet.Size,
                         SocketFlags.None,
-                        new IPEndPoint(MulticastAddressV6, port)) > 0;
+                        new IPEndPoint(IPAddress.Broadcast, port)
+                    ) > 0;
+
+                if (_udpSocketv6 != null)
+                {
+                    multicastSuccess =
+                        _udpSocketv6.SendTo(
+                            packet.RawData,
+                            0,
+                            packet.Size,
+                            SocketFlags.None,
+                            new IPEndPoint(MulticastAddressV6, port)
+                        ) > 0;
                 }
             }
             catch (SocketException ex)

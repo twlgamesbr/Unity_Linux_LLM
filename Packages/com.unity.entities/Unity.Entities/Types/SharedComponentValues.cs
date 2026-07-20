@@ -8,7 +8,7 @@ namespace Unity.Entities
 
         public static implicit operator SharedComponentValues(int* p)
         {
-            return new SharedComponentValues {firstIndex = p, stride = sizeof(int)};
+            return new SharedComponentValues { firstIndex = p, stride = sizeof(int) };
         }
 
         public bool EqualTo(SharedComponentValues otherValues, int sharedComponentCount)

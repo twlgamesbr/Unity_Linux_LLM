@@ -1,9 +1,9 @@
 using System;
-using Unity.Collections;
-using Unity.Entities.Serialization;
-using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.InteropServices;
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Entities.Serialization;
 using SpinLock = Unity.Entities.LowLevel.SpinLock;
 
 namespace Unity.Entities.Content
@@ -17,22 +17,26 @@ namespace Unity.Entities.Content
         /// The requested runtime id was not found and has not started loading.
         /// </summary>
         None,
+
         /// <summary>
         /// The requested id has enterd the queue to be loaded.
         /// </summary>
         Queued,
+
         /// <summary>
         /// The requested runtime id has started loading, but is still active.
         /// </summary>
         Loading,
+
         /// <summary>
         /// The requested runtime id has completed loading successfully.
         /// </summary>
         Completed,
+
         /// <summary>
         /// There was an error encountered when attempting to load.
         /// </summary>
-        Error
+        Error,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -50,6 +54,7 @@ namespace Unity.Entities.Content
                     ObjectHandle.Free();
             }
         }
+
         SpinLock spinLock;
         UnsafeHashMap<UntypedWeakReferenceId, ObjectCacheEntry> Values;
 
@@ -96,17 +101,21 @@ namespace Unity.Entities.Content
             spinLock.Release();
         }
 
-        unsafe internal void AddEntries(UntypedWeakReferenceId *objectIds, int count)
+        internal unsafe void AddEntries(UntypedWeakReferenceId* objectIds, int count)
         {
             spinLock.Acquire();
             if (Values.Capacity - Values.Count < count)
                 Values.Capacity = Values.Count + count;
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
                 Values.TryAdd(objectIds[i], new ObjectCacheEntry { LoadingStatus = ObjectLoadingStatus.Queued });
             spinLock.Release();
         }
 
-        internal void SetObjectStatus(in UntypedWeakReferenceId objectId, ObjectLoadingStatus status, in GCHandle objHandle)
+        internal void SetObjectStatus(
+            in UntypedWeakReferenceId objectId,
+            ObjectLoadingStatus status,
+            in GCHandle objHandle
+        )
         {
             spinLock.Acquire();
             Values[objectId] = new ObjectCacheEntry { LoadingStatus = status, ObjectHandle = objHandle };
@@ -139,11 +148,10 @@ namespace Unity.Entities.Content
         }
     }
 
-
-
     [BurstCompile]
     [StructLayout(LayoutKind.Sequential)]
-    unsafe struct MultiProducerSingleBulkConsumerQueue<T> : IDisposable where T : unmanaged
+    unsafe struct MultiProducerSingleBulkConsumerQueue<T> : IDisposable
+        where T : unmanaged
     {
         SpinLock spinLock;
         UnsafeRingQueue<T> Values;
@@ -159,13 +167,14 @@ namespace Unity.Entities.Content
             }
         }
         public bool IsCreated => Values.IsCreated;
+
         public MultiProducerSingleBulkConsumerQueue(int initialQueueSize)
         {
             spinLock = new SpinLock();
             Values = new UnsafeRingQueue<T>(initialQueueSize, Allocator.Persistent);
         }
 
-        unsafe public void Produce(T *vals, int count)
+        public unsafe void Produce(T* vals, int count)
         {
             spinLock.Acquire();
             if (Values.Capacity - Values.Length < count)
@@ -180,7 +189,6 @@ namespace Unity.Entities.Content
                 Values.TryEnqueue(vals[i]);
             spinLock.Release();
         }
-
 
         public void Produce(in T val)
         {

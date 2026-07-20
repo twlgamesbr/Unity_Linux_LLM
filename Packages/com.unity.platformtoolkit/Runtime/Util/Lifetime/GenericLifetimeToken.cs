@@ -5,7 +5,7 @@ namespace Unity.PlatformToolkit
     internal enum DisposeReason
     {
         ExplicitDispose,
-        InvalidAccount
+        InvalidAccount,
     }
 
     /// <summary>
@@ -41,14 +41,14 @@ namespace Unity.PlatformToolkit
 
         public void ThrowOnDisposedAccess()
         {
-            if(!m_DisposedFlag.Value)
+            if (!m_DisposedFlag.Value)
                 return;
 
             throw m_Reason switch
             {
                 DisposeReason.ExplicitDispose => new ObjectDisposedException(k_ExplicitDisposeReasonMessage),
                 DisposeReason.InvalidAccount => new InvalidAccountException(k_InvalidAccountExceptionMessage),
-                _ => new ArgumentOutOfRangeException()
+                _ => new ArgumentOutOfRangeException(),
             };
         }
     }

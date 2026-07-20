@@ -6,7 +6,6 @@ namespace UnityEngine.Rendering.LiveGI
 {
     internal class RayTracingRenderPipelineInstance : RenderPipeline
     {
-
         // Use this variable to a reference to the Render Pipeline Asset that was passed to the constructor
         private RayTracingRenderPipelineAsset renderPipelineAsset;
         private PathTracingContext ptContext;
@@ -19,7 +18,10 @@ namespace UnityEngine.Rendering.LiveGI
             var resources = Util.LoadOrCreateRayTracingResources();
             if (resources != null)
             {
-                var activeBackend = ptContext.SelectRayTracingBackend(renderPipelineAsset.settings.raytracingBackend, resources);
+                var activeBackend = ptContext.SelectRayTracingBackend(
+                    renderPipelineAsset.settings.raytracingBackend,
+                    resources
+                );
 
                 // Set the active backend, in case we request an unsuported backend and fallback to another one
                 renderPipelineAsset.settings.raytracingBackend = activeBackend;
@@ -49,7 +51,7 @@ namespace UnityEngine.Rendering.LiveGI
                 if (additionalData == null)
                 {
                     additionalData = camera.gameObject.AddComponent<AdditionalCameraData>();
-                    additionalData.hideFlags = HideFlags.DontSave;   // Don't show this in inspector
+                    additionalData.hideFlags = HideFlags.DontSave; // Don't show this in inspector
                 }
                 additionalData.CreatePersistentResources(camera, renderPipelineAsset.settings.denoising);
 
@@ -57,9 +59,33 @@ namespace UnityEngine.Rendering.LiveGI
 
                 // Render the path tracing into the camera's target texture
                 var scaledSize = additionalData.rayTracingOutput.GetScaledSize();
-                ptContext.Render(cmd, scaledSize, frustum, camera.cameraToWorldMatrix, camera.worldToCameraMatrix, camera.projectionMatrix, additionalData.previousViewProjection, renderPipelineAsset.settings, additionalData.rayTracingOutput, additionalData.normals, additionalData.motionVectors, additionalData.debugOutput, additionalData.frameIndex);
+                ptContext.Render(
+                    cmd,
+                    scaledSize,
+                    frustum,
+                    camera.cameraToWorldMatrix,
+                    camera.worldToCameraMatrix,
+                    camera.projectionMatrix,
+                    additionalData.previousViewProjection,
+                    renderPipelineAsset.settings,
+                    additionalData.rayTracingOutput,
+                    additionalData.normals,
+                    additionalData.motionVectors,
+                    additionalData.debugOutput,
+                    additionalData.frameIndex
+                );
                 var viewProjection = camera.projectionMatrix * camera.worldToCameraMatrix;
-                ptContext.Denoise(cmd,additionalData.denoiser, camera.nearClipPlane, camera.farClipPlane, viewProjection, renderPipelineAsset.settings, additionalData.rayTracingOutput, additionalData.normals, additionalData.motionVectors);
+                ptContext.Denoise(
+                    cmd,
+                    additionalData.denoiser,
+                    camera.nearClipPlane,
+                    camera.farClipPlane,
+                    viewProjection,
+                    renderPipelineAsset.settings,
+                    additionalData.rayTracingOutput,
+                    additionalData.normals,
+                    additionalData.motionVectors
+                );
                 additionalData.UpdateCameraDataPostRender(camera);
 
                 // Blit the path traced frame to the active camera texture
@@ -72,7 +98,6 @@ namespace UnityEngine.Rendering.LiveGI
 
             context.Submit();
         }
-
     }
 }
 

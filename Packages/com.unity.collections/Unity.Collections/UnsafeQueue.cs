@@ -1,14 +1,14 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Burst;
-using Unity.Jobs;
-using Unity.Jobs.LowLevel.Unsafe;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Unity.Burst;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
+using Unity.Jobs.LowLevel.Unsafe;
 using static Unity.Collections.AllocatorManager;
 
 namespace Unity.Collections
@@ -45,8 +45,13 @@ namespace Unity.Collections
             *data = currentWriteBlock;
         }
 
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public static UnsafeQueueBlockHeader* AllocateWriteBlockMT<T>(UnsafeQueueData* data, AllocatorHandle allocator, int threadIndex) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static UnsafeQueueBlockHeader* AllocateWriteBlockMT<T>(
+            UnsafeQueueData* data,
+            AllocatorHandle allocator,
+            int threadIndex
+        )
+            where T : unmanaged
         {
             UnsafeQueueBlockHeader* currentWriteBlock = data->GetCurrentWriteBlockTLS(threadIndex);
 
@@ -62,7 +67,8 @@ namespace Unity.Collections
             currentWriteBlock = (UnsafeQueueBlockHeader*)Memory.Unmanaged.Allocate(m_BlockSize, 16, allocator);
             currentWriteBlock->m_NextBlock = null;
             currentWriteBlock->m_NumItems = 0;
-            UnsafeQueueBlockHeader* prevLast = (UnsafeQueueBlockHeader*)Interlocked.Exchange(ref data->m_LastBlock, (IntPtr)currentWriteBlock);
+            UnsafeQueueBlockHeader* prevLast = (UnsafeQueueBlockHeader*)
+                Interlocked.Exchange(ref data->m_LastBlock, (IntPtr)currentWriteBlock);
 
             if (prevLast == null)
             {
@@ -77,8 +83,9 @@ namespace Unity.Collections
             return currentWriteBlock;
         }
 
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-        public unsafe static void AllocateQueue<T>(AllocatorHandle allocator, out UnsafeQueueData* outBuf) where T : unmanaged
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+        public static unsafe void AllocateQueue<T>(AllocatorHandle allocator, out UnsafeQueueData* outBuf)
+            where T : unmanaged
         {
 #if UNITY_2022_2_14F1_OR_NEWER
             int maxThreadCount = JobsUtility.ThreadIndexCount;
@@ -86,14 +93,17 @@ namespace Unity.Collections
             int maxThreadCount = JobsUtility.MaxJobThreadCount;
 #endif
 
-            var queueDataSize = CollectionHelper.Align(UnsafeUtility.SizeOf<UnsafeQueueData>(), JobsUtility.CacheLineSize);
-
-            var data = (UnsafeQueueData*)Memory.Unmanaged.Allocate(
-                queueDataSize
-                + JobsUtility.CacheLineSize * maxThreadCount
-                , JobsUtility.CacheLineSize
-                , allocator
+            var queueDataSize = CollectionHelper.Align(
+                UnsafeUtility.SizeOf<UnsafeQueueData>(),
+                JobsUtility.CacheLineSize
             );
+
+            var data = (UnsafeQueueData*)
+                Memory.Unmanaged.Allocate(
+                    queueDataSize + JobsUtility.CacheLineSize * maxThreadCount,
+                    JobsUtility.CacheLineSize,
+                    allocator
+                );
 
             data->m_CurrentWriteBlockTLS = ((byte*)data) + queueDataSize;
 
@@ -110,7 +120,7 @@ namespace Unity.Collections
             outBuf = data;
         }
 
-        public unsafe static void DeallocateQueue(UnsafeQueueData* data, AllocatorHandle allocator)
+        public static unsafe void DeallocateQueue(UnsafeQueueData* data, AllocatorHandle allocator)
         {
             UnsafeQueueBlockHeader* firstBlock = (UnsafeQueueBlockHeader*)data->m_FirstBlock;
 
@@ -130,13 +140,13 @@ namespace Unity.Collections
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
     [StructLayout(LayoutKind.Sequential)]
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
-    public unsafe struct UnsafeQueue<T>
-        : INativeDisposable
+    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
+    public unsafe struct UnsafeQueue<T> : INativeDisposable
         where T : unmanaged
     {
         [NativeDisableUnsafePtrRestriction]
         internal UnsafeQueueData* m_Buffer;
+
         [NativeDisableUnsafePtrRestriction]
         internal AllocatorHandle m_AllocatorLabel;
 
@@ -152,7 +162,8 @@ namespace Unity.Collections
 
         internal static UnsafeQueue<T>* Alloc(AllocatorHandle allocator)
         {
-            UnsafeQueue<T>* data = (UnsafeQueue<T>*)Memory.Unmanaged.Allocate(sizeof(UnsafeQueue<T>), UnsafeUtility.AlignOf<UnsafeQueue<T>>(), allocator);
+            UnsafeQueue<T>* data = (UnsafeQueue<T>*)
+                Memory.Unmanaged.Allocate(sizeof(UnsafeQueue<T>), UnsafeUtility.AlignOf<UnsafeQueue<T>>(), allocator);
             return data;
         }
 
@@ -178,9 +189,10 @@ namespace Unity.Collections
                 int count = 0;
                 var currentRead = m_Buffer->m_CurrentRead;
 
-                for (UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock
-                        ; block != null
-                        ; block = block->m_NextBlock
+                for (
+                    UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock;
+                    block != null;
+                    block = block->m_NextBlock
                 )
                 {
                     count += block->m_NumItems;
@@ -208,9 +220,10 @@ namespace Unity.Collections
             {
                 int count = 0;
 
-                for (UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock
-                     ; block != null
-                     ; block = block->m_NextBlock
+                for (
+                    UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock;
+                    block != null;
+                    block = block->m_NextBlock
                 )
                 {
                     count += block->m_NumItems;
@@ -315,7 +328,11 @@ namespace Unity.Collections
         public NativeArray<T> ToArray(AllocatorManager.AllocatorHandle allocator)
         {
             UnsafeQueueBlockHeader* firstBlock = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock;
-            var outputArray = CollectionHelper.CreateNativeArray<T>(Count, allocator, NativeArrayOptions.UninitializedMemory);
+            var outputArray = CollectionHelper.CreateNativeArray<T>(
+                Count,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             UnsafeQueueBlockHeader* currentBlock = firstBlock;
             var arrayPtr = (byte*)outputArray.GetUnsafePtr();
@@ -400,7 +417,10 @@ namespace Unity.Collections
                 return inputDeps;
             }
 
-            var jobHandle = new UnsafeQueueDisposeJob { Data = new UnsafeQueueDispose { m_Buffer = m_Buffer, m_AllocatorLabel = m_AllocatorLabel }  }.Schedule(inputDeps);
+            var jobHandle = new UnsafeQueueDisposeJob
+            {
+                Data = new UnsafeQueueDispose { m_Buffer = m_Buffer, m_AllocatorLabel = m_AllocatorLabel },
+            }.Schedule(inputDeps);
             m_Buffer = null;
 
             return jobHandle;
@@ -439,9 +459,7 @@ namespace Unity.Collections
             {
                 m_Index++;
 
-                for (; m_Block != null
-                     ; m_Block = m_Block->m_NextBlock
-                )
+                for (; m_Block != null; m_Block = m_Block->m_NextBlock)
                 {
                     var numItems = m_Block->m_NumItems;
 
@@ -493,8 +511,7 @@ namespace Unity.Collections
         /// <summary>
         /// A read-only alias for the value of a UnsafeQueue. Does not have its own allocated storage.
         /// </summary>
-        public struct ReadOnly
-            : IEnumerable<T>
+        public struct ReadOnly : IEnumerable<T>
         {
             [NativeDisableUnsafePtrRestriction]
             UnsafeQueueData* m_Buffer;
@@ -511,10 +528,7 @@ namespace Unity.Collections
             public readonly bool IsCreated
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    return m_Buffer != null;
-                }
+                get { return m_Buffer != null; }
             }
 
             /// <summary>
@@ -528,9 +542,10 @@ namespace Unity.Collections
                 int count = 0;
                 var currentRead = m_Buffer->m_CurrentRead;
 
-                for (UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock
-                        ; block != null
-                        ; block = block->m_NextBlock
+                for (
+                    UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock;
+                    block != null;
+                    block = block->m_NextBlock
                 )
                 {
                     count += block->m_NumItems;
@@ -556,9 +571,10 @@ namespace Unity.Collections
                 {
                     int count = 0;
 
-                    for (UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock
-                         ; block != null
-                         ; block = block->m_NextBlock
+                    for (
+                        UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock;
+                        block != null;
+                        block = block->m_NextBlock
                     )
                     {
                         count += block->m_NumItems;
@@ -602,10 +618,11 @@ namespace Unity.Collections
                     {
                         var idx = index;
 
-                        for (UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock;
-                             block != null;
-                             block = block->m_NextBlock
-                            )
+                        for (
+                            UnsafeQueueBlockHeader* block = (UnsafeQueueBlockHeader*)m_Buffer->m_FirstBlock;
+                            block != null;
+                            block = block->m_NextBlock
+                        )
                         {
                             var numItems = block->m_NumItems;
 
@@ -691,7 +708,7 @@ namespace Unity.Collections
         /// <remarks>
         /// Use <see cref="AsParallelWriter"/> to create a parallel writer for a UnsafeQueue.
         /// </remarks>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new [] { typeof(int) })]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
         public unsafe struct ParallelWriter
         {
             [NativeDisableUnsafePtrRestriction]
@@ -708,7 +725,11 @@ namespace Unity.Collections
             /// <param name="value">The value to be enqueued.</param>
             public void Enqueue(T value)
             {
-                UnsafeQueueBlockHeader* writeBlock = UnsafeQueueData.AllocateWriteBlockMT<T>(m_Buffer, m_AllocatorLabel, m_ThreadIndex);
+                UnsafeQueueBlockHeader* writeBlock = UnsafeQueueData.AllocateWriteBlockMT<T>(
+                    m_Buffer,
+                    m_AllocatorLabel,
+                    m_ThreadIndex
+                );
                 UnsafeUtility.WriteArrayElement(writeBlock + 1, writeBlock->m_NumItems, value);
                 ++writeBlock->m_NumItems;
             }
@@ -720,7 +741,11 @@ namespace Unity.Collections
             /// <param name="threadIndexOverride">The thread index which must be set by a field from a job struct with the <see cref="NativeSetThreadIndexAttribute"/> attribute.</param>
             public void Enqueue(T value, int threadIndexOverride)
             {
-                UnsafeQueueBlockHeader* writeBlock = UnsafeQueueData.AllocateWriteBlockMT<T>(m_Buffer, m_AllocatorLabel, threadIndexOverride);
+                UnsafeQueueBlockHeader* writeBlock = UnsafeQueueData.AllocateWriteBlockMT<T>(
+                    m_Buffer,
+                    m_AllocatorLabel,
+                    threadIndexOverride
+                );
                 UnsafeUtility.WriteArrayElement(writeBlock + 1, writeBlock->m_NumItems, value);
                 ++writeBlock->m_NumItems;
             }

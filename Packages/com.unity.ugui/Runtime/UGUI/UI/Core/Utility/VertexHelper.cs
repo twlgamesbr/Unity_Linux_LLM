@@ -57,8 +57,7 @@ namespace UnityEngine.UI
 
         private bool m_ListsInitalized = false;
 
-        public VertexHelper()
-        {}
+        public VertexHelper() { }
 
         public VertexHelper(Mesh m)
         {
@@ -247,7 +246,17 @@ namespace UnityEngine.UI
         /// <param name="normal">Normal of the vert.</param>
         /// <param name="tangent">Tangent of the vert</param>
         /// <param name="prevPosition">Previous position of the vert (in the UV4 slot)</param>
-        public void AddVert(Vector3 position, Color32 color, Vector4 uv0, Vector4 uv1, Vector4 uv2, Vector4 uv3, Vector3 normal, Vector4 tangent, Vector4 prevPosition)
+        public void AddVert(
+            Vector3 position,
+            Color32 color,
+            Vector4 uv0,
+            Vector4 uv1,
+            Vector4 uv2,
+            Vector4 uv3,
+            Vector3 normal,
+            Vector4 tangent,
+            Vector4 prevPosition
+        )
         {
             InitializeListIfRequired();
 
@@ -273,7 +282,16 @@ namespace UnityEngine.UI
         /// <param name="uv3">UV3 of the vert</param>
         /// <param name="normal">Normal of the vert.</param>
         /// <param name="tangent">Tangent of the vert</param>
-        public void AddVert(Vector3 position, Color32 color, Vector4 uv0, Vector4 uv1, Vector4 uv2, Vector4 uv3, Vector3 normal, Vector4 tangent)
+        public void AddVert(
+            Vector3 position,
+            Color32 color,
+            Vector4 uv0,
+            Vector4 uv1,
+            Vector4 uv2,
+            Vector4 uv3,
+            Vector3 normal,
+            Vector4 tangent
+        )
         {
             AddVert(position, color, uv0, uv1, uv2, uv3, normal, tangent, Vector4.zero);
         }
@@ -336,7 +354,14 @@ namespace UnityEngine.UI
             int startIndex = currentVertCount;
 
             for (int i = 0; i < 4; i++)
-                AddVert(verts[i].position, verts[i].color, verts[i].uv0, verts[i].uv1, verts[i].normal, verts[i].tangent);
+                AddVert(
+                    verts[i].position,
+                    verts[i].color,
+                    verts[i].uv0,
+                    verts[i].uv1,
+                    verts[i].normal,
+                    verts[i].tangent
+                );
 
             AddTriangle(startIndex, startIndex + 1, startIndex + 2);
             AddTriangle(startIndex + 2, startIndex + 3, startIndex);
@@ -353,7 +378,18 @@ namespace UnityEngine.UI
 
             if (verts != null)
             {
-                CanvasRenderer.AddUIVertexStream(verts, m_Positions, m_Colors, m_Uv0S, m_Uv1S, m_Uv2S, m_Uv3S, m_Normals, m_Tangents, m_PrevPositions);
+                CanvasRenderer.AddUIVertexStream(
+                    verts,
+                    m_Positions,
+                    m_Colors,
+                    m_Uv0S,
+                    m_Uv1S,
+                    m_Uv2S,
+                    m_Uv3S,
+                    m_Normals,
+                    m_Tangents,
+                    m_PrevPositions
+                );
             }
 
             if (indices != null)
@@ -373,7 +409,19 @@ namespace UnityEngine.UI
 
             InitializeListIfRequired();
 
-            CanvasRenderer.SplitUIVertexStreams(verts, m_Positions, m_Colors, m_Uv0S, m_Uv1S, m_Uv2S, m_Uv3S, m_Normals, m_Tangents, m_PrevPositions, m_Indices);
+            CanvasRenderer.SplitUIVertexStreams(
+                verts,
+                m_Positions,
+                m_Colors,
+                m_Uv0S,
+                m_Uv1S,
+                m_Uv2S,
+                m_Uv3S,
+                m_Normals,
+                m_Tangents,
+                m_PrevPositions,
+                m_Indices
+            );
         }
 
         /// <summary>
@@ -386,7 +434,19 @@ namespace UnityEngine.UI
 
             InitializeListIfRequired();
 
-            CanvasRenderer.CreateUIVertexStream(stream, m_Positions, m_Colors, m_Uv0S, m_Uv1S, m_Uv2S, m_Uv3S, m_Normals, m_Tangents, m_PrevPositions, m_Indices);
+            CanvasRenderer.CreateUIVertexStream(
+                stream,
+                m_Positions,
+                m_Colors,
+                m_Uv0S,
+                m_Uv1S,
+                m_Uv2S,
+                m_Uv3S,
+                m_Normals,
+                m_Tangents,
+                m_PrevPositions,
+                m_Indices
+            );
         }
     }
 }

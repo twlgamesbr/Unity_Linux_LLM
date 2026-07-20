@@ -4,8 +4,12 @@ using System;
 namespace UnityEngine.InputSystem.Editor
 {
 #if UNITY_2023_2_OR_NEWER
-    [UnityEngine.Analytics.AnalyticInfo(eventName: kEventName, maxEventsPerHour: kMaxEventsPerHour,
-        maxNumberOfElements: kMaxNumberOfElements, vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey)]
+    [UnityEngine.Analytics.AnalyticInfo(
+        eventName: kEventName,
+        maxEventsPerHour: kMaxEventsPerHour,
+        maxNumberOfElements: kMaxNumberOfElements,
+        vendorKey: UnityEngine.InputSystem.InputAnalytics.kVendorKey
+    )]
 #endif // UNITY_2023_2_OR_NEWER
     internal class PlayerInputManagerEditorAnalytic : UnityEngine.InputSystem.InputAnalytics.IInputAnalytic
     {
@@ -48,7 +52,7 @@ namespace UnityEngine.InputSystem.Editor
             {
                 JoinPlayersWhenButtonIsPressed = 0, // default
                 JoinPlayersWhenJoinActionIsTriggered = 1,
-                JoinPlayersManually = 2
+                JoinPlayersManually = 2,
             }
 
             public InputEditorAnalytics.PlayerNotificationBehavior behavior;

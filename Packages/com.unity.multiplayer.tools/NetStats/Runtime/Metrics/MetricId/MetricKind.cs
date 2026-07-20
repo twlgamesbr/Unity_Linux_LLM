@@ -11,6 +11,7 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// For a metric that could be decreased, a <see cref="Gauge"/> should be used.
         /// </summary>
         Counter,
+
         /// <summary>
         /// Represent a gauge metric.
         /// A gauge is a metric that represents a single numerical value that can go up or down.

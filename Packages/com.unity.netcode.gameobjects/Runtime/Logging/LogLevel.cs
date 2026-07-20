@@ -23,6 +23,6 @@ namespace Unity.Netcode
         /// <summary>
         /// Nothing logging level, no logging will be done
         /// </summary>
-        Nothing
+        Nothing,
     }
 }

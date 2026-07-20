@@ -12,8 +12,8 @@ namespace UnityEngine.Rendering
 
             // Stride of the indirect arguement buffer in uints, the buffer is split into two sections dispatch options ( a lower or upper arguement set )
             public const int ArgsBufferStride = 16;
-            public const int ArgsBufferUpper  = 0;
-            public const int ArgsBufferLower  = 8;
+            public const int ArgsBufferUpper = 0;
+            public const int ArgsBufferLower = 8;
 
             public static int DivUpGroup(int value)
             {
@@ -81,8 +81,19 @@ namespace UnityEngine.Rendering
             /// <param name="builder">Render Graph Builder</param>
             /// <param name="outputIsTemp">Whether or not to allocate a transient resource.</param>
             /// <returns>The created Render Graph Resources.</returns>
-            [Obsolete("This Create signature is deprecated and will be removed in the future. Please use Create(IBaseRenderGraphBuilder) instead. #from(6000.5)", true)]
-            public static RenderGraphResources Create(int newMaxElementCount, RenderGraph renderGraph, RenderGraphBuilder builder, bool outputIsTemp = false) { return new RenderGraphResources(); }
+            [Obsolete(
+                "This Create signature is deprecated and will be removed in the future. Please use Create(IBaseRenderGraphBuilder) instead. #from(6000.5)",
+                true
+            )]
+            public static RenderGraphResources Create(
+                int newMaxElementCount,
+                RenderGraph renderGraph,
+                RenderGraphBuilder builder,
+                bool outputIsTemp = false
+            )
+            {
+                return new RenderGraphResources();
+            }
 
             /// <summary>
             /// Creates the render graph buffer resources from an input count.
@@ -92,19 +103,32 @@ namespace UnityEngine.Rendering
             /// <param name="builder">Render Graph Builder</param>
             /// <param name="outputIsTemp">Whether or not to allocate a transient resource.</param>
             /// <returns>The created Render Graph Resources.</returns>
-            public static RenderGraphResources Create(int newMaxElementCount, RenderGraph renderGraph, IBaseRenderGraphBuilder builder, bool outputIsTemp = false)
+            public static RenderGraphResources Create(
+                int newMaxElementCount,
+                RenderGraph renderGraph,
+                IBaseRenderGraphBuilder builder,
+                bool outputIsTemp = false
+            )
             {
                 var resources = new RenderGraphResources();
                 resources.Initialize(newMaxElementCount, renderGraph, builder, outputIsTemp);
                 return resources;
             }
 
-            void Initialize(int newMaxElementCount, RenderGraph renderGraph, IBaseRenderGraphBuilder builder, bool outputIsTemp = false)
+            void Initialize(
+                int newMaxElementCount,
+                RenderGraph renderGraph,
+                IBaseRenderGraphBuilder builder,
+                bool outputIsTemp = false
+            )
             {
                 newMaxElementCount = Math.Max(newMaxElementCount, 1);
                 ShaderDefs.CalculateTotalBufferSize(newMaxElementCount, out int totalSize, out int levelCounts);
 
-                var prefixBuffer0Desc = new BufferDesc(totalSize, 4, GraphicsBuffer.Target.Raw) { name = "prefixBuffer0" };
+                var prefixBuffer0Desc = new BufferDesc(totalSize, 4, GraphicsBuffer.Target.Raw)
+                {
+                    name = "prefixBuffer0",
+                };
                 if (outputIsTemp)
                     prefixBuffer0 = builder.CreateTransientBuffer(prefixBuffer0Desc);
                 else
@@ -112,11 +136,33 @@ namespace UnityEngine.Rendering
                     prefixBuffer0 = renderGraph.CreateBuffer(prefixBuffer0Desc);
                     builder.UseBuffer(prefixBuffer0, AccessFlags.Write);
                 }
-                
-                prefixBuffer1 = builder.CreateTransientBuffer(new BufferDesc(newMaxElementCount, 4, GraphicsBuffer.Target.Raw) { name = "prefixBuffer1" });
-                totalLevelCountBuffer = builder.CreateTransientBuffer(new BufferDesc(1, 4, GraphicsBuffer.Target.Raw) { name = "totalLevelCountBuffer" });
-                levelOffsetBuffer = builder.CreateTransientBuffer(new BufferDesc(levelCounts, System.Runtime.InteropServices.Marshal.SizeOf<LevelOffsets>(), GraphicsBuffer.Target.Structured) { name = "levelOffsetBuffer" });
-                indirectDispatchArgsBuffer = builder.CreateTransientBuffer(new BufferDesc(ShaderDefs.ArgsBufferStride * levelCounts, sizeof(uint), GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.IndirectArguments) { name = "indirectDispatchArgsBuffer" });//3 arguments for upp dispatch, 3 arguments for lower dispatch
+
+                prefixBuffer1 = builder.CreateTransientBuffer(
+                    new BufferDesc(newMaxElementCount, 4, GraphicsBuffer.Target.Raw) { name = "prefixBuffer1" }
+                );
+                totalLevelCountBuffer = builder.CreateTransientBuffer(
+                    new BufferDesc(1, 4, GraphicsBuffer.Target.Raw) { name = "totalLevelCountBuffer" }
+                );
+                levelOffsetBuffer = builder.CreateTransientBuffer(
+                    new BufferDesc(
+                        levelCounts,
+                        System.Runtime.InteropServices.Marshal.SizeOf<LevelOffsets>(),
+                        GraphicsBuffer.Target.Structured
+                    )
+                    {
+                        name = "levelOffsetBuffer",
+                    }
+                );
+                indirectDispatchArgsBuffer = builder.CreateTransientBuffer(
+                    new BufferDesc(
+                        ShaderDefs.ArgsBufferStride * levelCounts,
+                        sizeof(uint),
+                        GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.IndirectArguments
+                    )
+                    {
+                        name = "indirectDispatchArgsBuffer",
+                    }
+                ); //3 arguments for upp dispatch, 3 arguments for lower dispatch
                 alignedElementCount = ShaderDefs.AlignUpGroup(newMaxElementCount);
                 maxBufferCount = totalSize;
                 maxLevelCount = levelCounts;
@@ -129,9 +175,9 @@ namespace UnityEngine.Rendering
         public struct SupportResources
         {
             internal bool ownsResources;
-            internal int  alignedElementCount;
-            internal int  maxBufferCount;
-            internal int  maxLevelCount;
+            internal int alignedElementCount;
+            internal int maxBufferCount;
+            internal int maxLevelCount;
 
             internal GraphicsBuffer prefixBuffer0;
             internal GraphicsBuffer prefixBuffer1;
@@ -169,7 +215,9 @@ namespace UnityEngine.Rendering
             internal void Resize(int newMaxElementCount)
             {
                 if (!ownsResources)
-                    throw new Exception("Cannot resize resources unless they are owned. Use GpuPrefixSumSupportResources.Create() for this.");
+                    throw new Exception(
+                        "Cannot resize resources unless they are owned. Use GpuPrefixSumSupportResources.Create() for this."
+                    );
 
                 newMaxElementCount = Math.Max(newMaxElementCount, 1); //at bare minimum support a single group.
                 if (alignedElementCount >= newMaxElementCount)
@@ -179,26 +227,34 @@ namespace UnityEngine.Rendering
                 ShaderDefs.CalculateTotalBufferSize(newMaxElementCount, out int totalSize, out int levelCounts);
 
                 alignedElementCount = ShaderDefs.AlignUpGroup(newMaxElementCount);
-                maxBufferCount      = totalSize;
-                maxLevelCount       = levelCounts;
+                maxBufferCount = totalSize;
+                maxLevelCount = levelCounts;
 
-                prefixBuffer0              = new GraphicsBuffer(GraphicsBuffer.Target.Raw, totalSize, 4);
-                prefixBuffer1              = new GraphicsBuffer(GraphicsBuffer.Target.Raw, newMaxElementCount, 4);
-                totalLevelCountBuffer      = new GraphicsBuffer(GraphicsBuffer.Target.Raw, 1, 4);
-                levelOffsetBuffer          = new GraphicsBuffer(GraphicsBuffer.Target.Structured, levelCounts, System.Runtime.InteropServices.Marshal.SizeOf<LevelOffsets>());
-                indirectDispatchArgsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, ShaderDefs.ArgsBufferStride * levelCounts, sizeof(uint));//3 arguments for upp dispatch, 3 arguments for lower dispatch
+                prefixBuffer0 = new GraphicsBuffer(GraphicsBuffer.Target.Raw, totalSize, 4);
+                prefixBuffer1 = new GraphicsBuffer(GraphicsBuffer.Target.Raw, newMaxElementCount, 4);
+                totalLevelCountBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, 1, 4);
+                levelOffsetBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    levelCounts,
+                    System.Runtime.InteropServices.Marshal.SizeOf<LevelOffsets>()
+                );
+                indirectDispatchArgsBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.IndirectArguments,
+                    ShaderDefs.ArgsBufferStride * levelCounts,
+                    sizeof(uint)
+                ); //3 arguments for upp dispatch, 3 arguments for lower dispatch
             }
 
             void LoadFromShaderGraph(RenderGraphResources shaderGraphResources)
             {
                 alignedElementCount = shaderGraphResources.alignedElementCount;
-                maxBufferCount      = shaderGraphResources.maxBufferCount;
-                maxLevelCount       = shaderGraphResources.maxLevelCount;
+                maxBufferCount = shaderGraphResources.maxBufferCount;
+                maxLevelCount = shaderGraphResources.maxLevelCount;
 
-                prefixBuffer0              = (GraphicsBuffer)shaderGraphResources.prefixBuffer0;
-                prefixBuffer1              = (GraphicsBuffer)shaderGraphResources.prefixBuffer1;
-                totalLevelCountBuffer      = (GraphicsBuffer)shaderGraphResources.totalLevelCountBuffer;
-                levelOffsetBuffer          = (GraphicsBuffer)shaderGraphResources.levelOffsetBuffer;
+                prefixBuffer0 = (GraphicsBuffer)shaderGraphResources.prefixBuffer0;
+                prefixBuffer1 = (GraphicsBuffer)shaderGraphResources.prefixBuffer1;
+                totalLevelCountBuffer = (GraphicsBuffer)shaderGraphResources.totalLevelCountBuffer;
+                levelOffsetBuffer = (GraphicsBuffer)shaderGraphResources.levelOffsetBuffer;
                 indirectDispatchArgsBuffer = (GraphicsBuffer)shaderGraphResources.indirectDispatchArgsBuffer;
             }
 
@@ -235,11 +291,14 @@ namespace UnityEngine.Rendering
         public struct DirectArgs
         {
             /// <summary>An inclusive or exclusive prefix sum.</summary>
-            public bool             exclusive;
+            public bool exclusive;
+
             /// <summary>The size of the input list.</summary>
-            public int              inputCount;
+            public int inputCount;
+
             /// <summary>The input list.</summary>
-            public GraphicsBuffer   input;
+            public GraphicsBuffer input;
+
             /// <summary>Required runtime resources.</summary>
             public SupportResources supportResources;
         }
@@ -250,13 +309,17 @@ namespace UnityEngine.Rendering
         public struct IndirectDirectArgs
         {
             /// <summary>An inclusive or exclusive prefix sum.</summary>
-            public bool             exclusive;
+            public bool exclusive;
+
             /// <summary>Byte offset of the count inside the input count buffer.</summary>
-            public int              inputCountBufferByteOffset;
+            public int inputCountBufferByteOffset;
+
             /// <summary>GPU buffer defining the size of the input list.</summary>
-            public ComputeBuffer    inputCountBuffer;
+            public ComputeBuffer inputCountBuffer;
+
             /// <summary>The input list.</summary>
-            public GraphicsBuffer   input;
+            public GraphicsBuffer input;
+
             /// <summary>Required runtime resources.</summary>
             public SupportResources supportResources;
         }
@@ -284,13 +347,17 @@ namespace UnityEngine.Rendering
                 if (computeAsset == null)
                     return;
 
-                kernelCalculateLevelDispatchArgsFromConst  = computeAsset.FindKernel("MainCalculateLevelDispatchArgsFromConst");
-                kernelCalculateLevelDispatchArgsFromBuffer = computeAsset.FindKernel("MainCalculateLevelDispatchArgsFromBuffer");
-                kernelPrefixSumOnGroup                     = computeAsset.FindKernel("MainPrefixSumOnGroup");
-                kernelPrefixSumOnGroupExclusive            = computeAsset.FindKernel("MainPrefixSumOnGroupExclusive");
-                kernelPrefixSumNextInput                   = computeAsset.FindKernel("MainPrefixSumNextInput");
-                kernelPrefixSumResolveParent               = computeAsset.FindKernel("MainPrefixSumResolveParent");
-                kernelPrefixSumResolveParentExclusive      = computeAsset.FindKernel("MainPrefixSumResolveParentExclusive");
+                kernelCalculateLevelDispatchArgsFromConst = computeAsset.FindKernel(
+                    "MainCalculateLevelDispatchArgsFromConst"
+                );
+                kernelCalculateLevelDispatchArgsFromBuffer = computeAsset.FindKernel(
+                    "MainCalculateLevelDispatchArgsFromBuffer"
+                );
+                kernelPrefixSumOnGroup = computeAsset.FindKernel("MainPrefixSumOnGroup");
+                kernelPrefixSumOnGroupExclusive = computeAsset.FindKernel("MainPrefixSumOnGroupExclusive");
+                kernelPrefixSumNextInput = computeAsset.FindKernel("MainPrefixSumNextInput");
+                kernelPrefixSumResolveParent = computeAsset.FindKernel("MainPrefixSumResolveParent");
+                kernelPrefixSumResolveParentExclusive = computeAsset.FindKernel("MainPrefixSumResolveParentExclusive");
             }
         }
     }

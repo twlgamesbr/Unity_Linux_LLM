@@ -63,8 +63,12 @@ namespace Unity.Entities.CodeGen
             public static readonly AlignAndSize Sentinel = new AlignAndSize(-1);
 
             public static AlignAndSize Pointer(int bits) => (bits == 32 || bits == 0) ? Four : Eight;
-            public static AlignAndSize DynamicArray(int bits) => (bits == 32 || bits == 0) ? new AlignAndSize(4, 12) : new AlignAndSize(8, 16);
-            public static AlignAndSize NativeString(int bits) => (bits == 32 || bits == 0) ? new AlignAndSize(4, 8) : new AlignAndSize(8, 16); // 64-bit has 4 bytes of wasted space to make the alignment work
+
+            public static AlignAndSize DynamicArray(int bits) =>
+                (bits == 32 || bits == 0) ? new AlignAndSize(4, 12) : new AlignAndSize(8, 16);
+
+            public static AlignAndSize NativeString(int bits) =>
+                (bits == 32 || bits == 0) ? new AlignAndSize(4, 8) : new AlignAndSize(8, 16); // 64-bit has 4 bytes of wasted space to make the alignment work
 
             public bool IsSentinel => size == -1;
 
@@ -76,17 +80,20 @@ namespace Unity.Entities.CodeGen
 
         private Dictionary<TypeReference, AlignAndSize>[] ValueTypeAlignment =
         {
-            new Dictionary<TypeReference, AlignAndSize>(new TypeReferenceEqualityComparer()), new Dictionary<TypeReference, AlignAndSize>(new TypeReferenceEqualityComparer())
+            new Dictionary<TypeReference, AlignAndSize>(new TypeReferenceEqualityComparer()),
+            new Dictionary<TypeReference, AlignAndSize>(new TypeReferenceEqualityComparer()),
         };
 
         private Dictionary<FieldReference, AlignAndSize>[] StructFieldAlignment =
         {
-            new Dictionary<FieldReference, AlignAndSize>(new FieldReferenceComparer()), new Dictionary<FieldReference, AlignAndSize>(new FieldReferenceComparer())
+            new Dictionary<FieldReference, AlignAndSize>(new FieldReferenceComparer()),
+            new Dictionary<FieldReference, AlignAndSize>(new FieldReferenceComparer()),
         };
 
         internal Dictionary<TypeReference, bool>[] ValueTypeIsComplex =
         {
-            new Dictionary<TypeReference, bool>(new TypeReferenceEqualityComparer()), new Dictionary<TypeReference, bool>(new TypeReferenceEqualityComparer())
+            new Dictionary<TypeReference, bool>(new TypeReferenceEqualityComparer()),
+            new Dictionary<TypeReference, bool>(new TypeReferenceEqualityComparer()),
         };
 
         public static AlignAndSize AlignAndSizeOfType(MetadataType mtype, int bits)
@@ -107,7 +114,6 @@ namespace Unity.Entities.CodeGen
             throw new ArgumentException($"Metadata type {mtype} is a special type which is not supported");
         }
 
-
         /*
          * Make sure exceptions refer to the top-level component type in error messages
          */
@@ -119,7 +125,9 @@ namespace Unity.Entities.CodeGen
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException($"Caught exception while processing type {typeref.FullName}: {e.Message}");
+                throw new InvalidOperationException(
+                    $"Caught exception while processing type {typeref.FullName}: {e.Message}"
+                );
             }
         }
 
@@ -155,7 +163,9 @@ namespace Unity.Entities.CodeGen
                 // Fixed buffers can only be of primitive types so inspect the fields of the buffer (there should only be one)
                 // and determine the packing requirement for the type
                 if (type.Fields.Count() != 1)
-                    throw new ArgumentException("A FixedBuffer type contains more than one field, this should not happen");
+                    throw new ArgumentException(
+                        "A FixedBuffer type contains more than one field, this should not happen"
+                    );
 
                 var fieldAlignAndSize = AlignAndSizeOfType(type.Fields[0].FieldType.MetadataType, bits);
                 return new AlignAndSize(fieldAlignAndSize.align, type.ClassSize);
@@ -177,7 +187,9 @@ namespace Unity.Entities.CodeGen
 
             if (type.IsArray)
             {
-                throw new ArgumentException($"Can't represent {typeRef}: C# array types cannot be represented directly, use DynamicArray<T>");
+                throw new ArgumentException(
+                    $"Can't represent {typeRef}: C# array types cannot be represented directly, use DynamicArray<T>"
+                );
             }
 
             if (IsDynamicArray(typeRef))
@@ -267,7 +279,6 @@ namespace Unity.Entities.CodeGen
             return (typeRef.FullName == "Unity.Entities.Entity");
         }
 
-
         public static bool IsBlobAssetReferenceType(TypeReference typeRef)
         {
             //XXX THIS IS WRONG USE CECIL AWESOME
@@ -285,10 +296,10 @@ namespace Unity.Entities.CodeGen
             if (!typeRef.IsValueType || typeRef.IsPrimitive)
                 return false;
 
-            return typeRef.Resolve().Interfaces.Any(i => i.InterfaceType.Name == "IComponentData") ||
-                IsSharedComponentType(typeRef) ||
-                IsCleanupComponentData(typeRef) ||
-                IsBufferElementComponentType(typeRef);
+            return typeRef.Resolve().Interfaces.Any(i => i.InterfaceType.Name == "IComponentData")
+                || IsSharedComponentType(typeRef)
+                || IsCleanupComponentData(typeRef)
+                || IsBufferElementComponentType(typeRef);
         }
 
         public static bool IsBufferElementComponentType(TypeReference typeRef)
@@ -365,8 +376,8 @@ namespace Unity.Entities.CodeGen
             return typeRef.Resolve().Interfaces.Any(i => i.InterfaceType.Name == "ICleanupComponentData");
         }
 
-
         Dictionary<TypeReference, bool> m_IsManagedTypeCache = new Dictionary<TypeReference, bool>();
+
         public bool IsManagedType(TypeReference typeRef, int depth)
         {
             if (m_IsManagedTypeCache.TryGetValue(typeRef, out var isManagedType))
@@ -449,7 +460,6 @@ namespace Unity.Entities.CodeGen
             return true;
         }
 
-
         public static TypeDefinition[] GetSystemRunsBefore(TypeDefinition type)
         {
             var deps = new List<TypeDefinition>();
@@ -493,7 +503,6 @@ namespace Unity.Entities.CodeGen
             if (typeRef.IsPointer)
                 return false;
 
-
             if (ValueTypeIsComplex[0].ContainsKey(typeRef))
                 return ValueTypeIsComplex[0][typeRef];
 
@@ -528,8 +537,7 @@ namespace Unity.Entities.CodeGen
             bool isComplex = false;
 
             // have we already preprocessed this?
-            if (ValueTypeAlignment[bits].ContainsKey(valuetype) &&
-                !ValueTypeAlignment[bits][valuetype].IsSentinel)
+            if (ValueTypeAlignment[bits].ContainsKey(valuetype) && !ValueTypeAlignment[bits][valuetype].IsSentinel)
             {
                 return;
             }
@@ -563,13 +571,13 @@ namespace Unity.Entities.CodeGen
                  * We tryadd here because if you have a generic component like UnityObjectRef<Mesh> and another one UnityObjectRef<Material>,
                  * the fields on those two will resolve to the same FieldReference (or at least the Unity.Cecil.Awesome FieldReferenceComparer
                  * can't tell them apart), and it'll yell at you. But it'll always resolve to the same alignandsize, so it's fine. I think.
-		         * Also, we can't literally TryAdd because TryAdd is in netstandard 2.1, and we have to do 2.0 because
-		         * visual studio sucks and can't run anything higher when running tasks in msbuild inside it.
+                 * Also, we can't literally TryAdd because TryAdd is in netstandard 2.1, and we have to do 2.0 because
+                 * visual studio sucks and can't run anything higher when running tasks in msbuild inside it.
                  */
 
-		        var key = typeResolver.Resolve(fs);
-		        if (!StructFieldAlignment[bits].ContainsKey(key))
-		            StructFieldAlignment[bits].Add(key, new AlignAndSize(sz.align, sz.size, size));
+                var key = typeResolver.Resolve(fs);
+                if (!StructFieldAlignment[bits].ContainsKey(key))
+                    StructFieldAlignment[bits].Add(key, new AlignAndSize(sz.align, sz.size, size));
 
                 int offset = fs.Offset;
                 if (offset >= 0)
@@ -595,12 +603,19 @@ namespace Unity.Entities.CodeGen
                 size = typeDef.PackingSize;
 
             ValueTypeAlignment[bits].Remove(valuetype);
-            ValueTypeAlignment[bits].Add(valuetype, new AlignAndSize(highestFieldAlignment, size, 0, instanceFieldCount == 0));
+            ValueTypeAlignment[bits]
+                .Add(valuetype, new AlignAndSize(highestFieldAlignment, size, 0, instanceFieldCount == 0));
             //Console.WriteLine($"ValueType: {valuetype.Name} ({valuetype.GetType()}) - alignment {highestFieldAlignment} sz {size}");
             ValueTypeIsComplex[bits].Add(valuetype, isComplex);
         }
 
-        internal void GetFieldOffsetsOfRecurse(Func<FieldReference, TypeReference, bool> match, int offset, TypeReference type, List<int> list, int bits)
+        internal void GetFieldOffsetsOfRecurse(
+            Func<FieldReference, TypeReference, bool> match,
+            int offset,
+            TypeReference type,
+            List<int> list,
+            int bits
+        )
         {
             int in_type_offset = 0;
             var typeResolver = TypeResolver.For(type);
@@ -612,9 +627,8 @@ namespace Unity.Entities.CodeGen
                 uint alignUp(uint a, uint align) => (a + ((align - a) % align));
                 int valueOr1(int v) => Math.Max(v, 1);
 
-                TypeUtils.AlignAndSize resize(TypeUtils.AlignAndSize s) => new TypeUtils.AlignAndSize(
-                    valueOr1(s.align),
-                    valueOr1(s.size));
+                TypeUtils.AlignAndSize resize(TypeUtils.AlignAndSize s) =>
+                    new TypeUtils.AlignAndSize(valueOr1(s.align), valueOr1(s.size));
 
                 var fieldReference = typeResolver.Resolve(f);
                 var fieldType = typeResolver.Resolve(f.FieldType);
@@ -650,24 +664,29 @@ namespace Unity.Entities.CodeGen
 
             if (typeToLookIn != null)
             {
-
-                GetFieldOffsetsOfRecurse((_, typeRef) =>
-                                {
-                                    //we never look for pointer types
-                                    return (!typeRef.IsPointer) &&
-                                           TypeReferenceEqualityComparer.AreEqual(typeRef.Resolve(), typeToFind);
-                                },
-                                0,
-                                typeToLookIn,
-                                offsets,
-                                archBits);
+                GetFieldOffsetsOfRecurse(
+                    (_, typeRef) =>
+                    {
+                        //we never look for pointer types
+                        return (!typeRef.IsPointer)
+                            && TypeReferenceEqualityComparer.AreEqual(typeRef.Resolve(), typeToFind);
+                    },
+                    0,
+                    typeToLookIn,
+                    offsets,
+                    archBits
+                );
             }
 
             return offsets;
         }
 
         /* match: 1st param is the Field, 2nd param is the FieldType */
-        public List<int> GetFieldOffsetsOf(Func<FieldReference, TypeReference, bool> match, TypeReference typeToLookIn, int archBits)
+        public List<int> GetFieldOffsetsOf(
+            Func<FieldReference, TypeReference, bool> match,
+            TypeReference typeToLookIn,
+            int archBits
+        )
         {
             var offsets = new List<int>();
 
@@ -691,7 +710,12 @@ namespace Unity.Entities.CodeGen
             return fieldName;
         }
 
-        public int GetFieldOffsetByFieldPath(string fieldPath, TypeReference type, int archBits, out TypeReference fieldType)
+        public int GetFieldOffsetByFieldPath(
+            string fieldPath,
+            TypeReference type,
+            int archBits,
+            out TypeReference fieldType
+        )
         {
             fieldType = null;
             var resolvedType = type.Resolve();
@@ -713,9 +737,8 @@ namespace Unity.Entities.CodeGen
                 uint alignUp(uint a, uint align) => (a + ((align - a) % align));
                 int valueOr1(int v) => Math.Max(v, 1);
 
-                AlignAndSize resize(TypeUtils.AlignAndSize s) => new TypeUtils.AlignAndSize(
-                    valueOr1(s.align),
-                    valueOr1(s.size));
+                AlignAndSize resize(TypeUtils.AlignAndSize s) =>
+                    new TypeUtils.AlignAndSize(valueOr1(s.align), valueOr1(s.size));
 
                 var tinfo = resize(AlignAndSizeOfTypeInternal(f.FieldType, archBits, 0));
                 if (f.Offset != -1)
@@ -729,7 +752,9 @@ namespace Unity.Entities.CodeGen
                     if (currentFieldIndex < maxFieldIndex)
                     {
                         if (!(f.FieldType.IsValueType() && !f.FieldType.IsPrimitive))
-                            throw new ArgumentException($"Trying to get the field offset of a primitive type from string '{fieldPath}'. Please confirm your field path string is correct.");
+                            throw new ArgumentException(
+                                $"Trying to get the field offset of a primitive type from string '{fieldPath}'. Please confirm your field path string is correct."
+                            );
 
                         // Swap in the found field types field list and reset our iteration counter
                         resolvedType = f.FieldType.Resolve();
@@ -767,9 +792,8 @@ namespace Unity.Entities.CodeGen
                 uint alignUp(uint a, uint align) => (a + ((align - a) % align));
                 int valueOr1(int v) => Math.Max(v, 1);
 
-                TypeUtils.AlignAndSize resize(TypeUtils.AlignAndSize s) => new TypeUtils.AlignAndSize(
-                    valueOr1(s.align),
-                    valueOr1(s.size));
+                TypeUtils.AlignAndSize resize(TypeUtils.AlignAndSize s) =>
+                    new TypeUtils.AlignAndSize(valueOr1(s.align), valueOr1(s.size));
 
                 var fieldReference = typeResolver.Resolve(f);
                 var fieldType = typeResolver.Resolve(f.FieldType);
@@ -788,6 +812,5 @@ namespace Unity.Entities.CodeGen
 
             return in_type_offset;
         }
-
     }
 }

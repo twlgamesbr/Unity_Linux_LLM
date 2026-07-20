@@ -64,8 +64,10 @@ namespace Unity.Transforms
             children.RemoveAt(childIndex);
             if (children.Length == 0)
             {
-                state.EntityManager.RemoveComponent(parentEntity, ComponentType.FromTypeIndex(
-                    TypeManager.GetTypeIndex<Child>()));
+                state.EntityManager.RemoveComponent(
+                    parentEntity,
+                    ComponentType.FromTypeIndex(TypeManager.GetTypeIndex<Child>())
+                );
             }
         }
 
@@ -74,23 +76,34 @@ namespace Unity.Transforms
         {
             public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter ParentChildrenToAdd;
             public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter ParentChildrenToRemove;
-            public NativeParallelHashSet<Entity>.ParallelWriter ChildParentToRemove;   // Children that have a Parent component, but that parent does not exist (deleted before ParentSystem runs)
+            public NativeParallelHashSet<Entity>.ParallelWriter ChildParentToRemove; // Children that have a Parent component, but that parent does not exist (deleted before ParentSystem runs)
             public NativeParallelHashMap<Entity, int>.ParallelWriter UniqueParents;
             public ComponentTypeHandle<PreviousParent> PreviousParentTypeHandle;
             public EntityStorageInfoLookup EntityStorageInfoLookup;
 
-            [ReadOnly] public BufferLookup<Child> ChildLookup;
+            [ReadOnly]
+            public BufferLookup<Child> ChildLookup;
 
-            [ReadOnly] public ComponentTypeHandle<Parent> ParentTypeHandle;
-            [ReadOnly] public EntityTypeHandle EntityTypeHandle;
+            [ReadOnly]
+            public ComponentTypeHandle<Parent> ParentTypeHandle;
+
+            [ReadOnly]
+            public EntityTypeHandle EntityTypeHandle;
             public uint LastSystemVersion;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
 
-                if (chunk.DidChange(ref ParentTypeHandle, LastSystemVersion) ||
-                    chunk.DidChange(ref PreviousParentTypeHandle, LastSystemVersion))
+                if (
+                    chunk.DidChange(ref ParentTypeHandle, LastSystemVersion)
+                    || chunk.DidChange(ref PreviousParentTypeHandle, LastSystemVersion)
+                )
                 {
                     var chunkPreviousParents = chunk.GetNativeArray(ref PreviousParentTypeHandle);
                     var chunkParents = chunk.GetNativeArray(ref ParentTypeHandle);
@@ -121,10 +134,7 @@ namespace Unity.Transforms
                                 UniqueParents.TryAdd(previousParentEntity, 0);
                             }
 
-                            chunkPreviousParents[j] = new PreviousParent
-                            {
-                                Value = parentEntity
-                            };
+                            chunkPreviousParents[j] = new PreviousParent { Value = parentEntity };
                         }
                     }
                 }
@@ -134,8 +144,11 @@ namespace Unity.Transforms
         [BurstCompile]
         struct FindMissingChild : IJob
         {
-            [ReadOnly] public NativeParallelHashMap<Entity, int> UniqueParents;
-            [ReadOnly] public BufferLookup<Child> ChildLookup;
+            [ReadOnly]
+            public NativeParallelHashMap<Entity, int> UniqueParents;
+
+            [ReadOnly]
+            public BufferLookup<Child> ChildLookup;
             public NativeList<Entity> ParentsMissingChild;
 
             public void Execute()
@@ -155,9 +168,14 @@ namespace Unity.Transforms
         [BurstCompile]
         struct FixupChangedChildren : IJob
         {
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, Entity> ParentChildrenToAdd;
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, Entity> ParentChildrenToRemove;
-            [ReadOnly] public NativeParallelHashMap<Entity, int> UniqueParents;
+            [ReadOnly]
+            public NativeParallelMultiHashMap<Entity, Entity> ParentChildrenToAdd;
+
+            [ReadOnly]
+            public NativeParallelMultiHashMap<Entity, Entity> ParentChildrenToRemove;
+
+            [ReadOnly]
+            public NativeParallelHashMap<Entity, int> UniqueParents;
 
             public BufferLookup<Child> ChildLookup;
 
@@ -187,8 +205,7 @@ namespace Unity.Transforms
                     {
                         var childIndex = FindChildIndex(children, child);
                         children.RemoveAt(childIndex);
-                    }
-                    while (ParentChildrenToRemove.TryGetNextValue(out child, ref it));
+                    } while (ParentChildrenToRemove.TryGetNextValue(out child, ref it));
                 }
             }
 
@@ -199,8 +216,7 @@ namespace Unity.Transforms
                     do
                     {
                         children.Add(new Child() { Value = child });
-                    }
-                    while (ParentChildrenToAdd.TryGetNextValue(out child, ref it));
+                    } while (ParentChildrenToAdd.TryGetNextValue(out child, ref it));
                 }
             }
 
@@ -265,8 +281,10 @@ namespace Unity.Transforms
             if (m_NewParentsQuery.IsEmptyIgnoreFilter)
                 return;
 
-            state.EntityManager.AddComponent(m_NewParentsQuery, ComponentType.FromTypeIndex(
-                TypeManager.GetTypeIndex<PreviousParent>()));
+            state.EntityManager.AddComponent(
+                m_NewParentsQuery,
+                ComponentType.FromTypeIndex(TypeManager.GetTypeIndex<PreviousParent>())
+            );
         }
 
         void UpdateRemoveParents(ref SystemState state)
@@ -275,7 +293,9 @@ namespace Unity.Transforms
                 return;
 
             var childEntities = m_RemovedParentsQuery.ToEntityArray(state.WorldUnmanaged.UpdateAllocator.ToAllocator);
-            var previousParents = m_RemovedParentsQuery.ToComponentDataArray<PreviousParent>(state.WorldUnmanaged.UpdateAllocator.ToAllocator);
+            var previousParents = m_RemovedParentsQuery.ToComponentDataArray<PreviousParent>(
+                state.WorldUnmanaged.UpdateAllocator.ToAllocator
+            );
 
             for (int i = 0; i < childEntities.Length; i++)
             {
@@ -285,8 +305,10 @@ namespace Unity.Transforms
                 RemoveChildFromParent(ref state, childEntity, previousParentEntity);
             }
 
-            state.EntityManager.RemoveComponent(m_RemovedParentsQuery, ComponentType.FromTypeIndex(
-                TypeManager.GetTypeIndex<PreviousParent>()));
+            state.EntityManager.RemoveComponent(
+                m_RemovedParentsQuery,
+                ComponentType.FromTypeIndex(TypeManager.GetTypeIndex<PreviousParent>())
+            );
         }
 
         void UpdateChangeParents(ref SystemState state)
@@ -302,10 +324,22 @@ namespace Unity.Transforms
             // 2. Get (Parent,Child) to add
             // 3. Get unique Parent change list
             // 4. Set PreviousParent to new Parent
-            var parentChildrenToAdd = new NativeParallelMultiHashMap<Entity, Entity>(count, state.WorldUnmanaged.UpdateAllocator.ToAllocator);
-            var parentChildrenToRemove = new NativeParallelMultiHashMap<Entity, Entity>(count, state.WorldUnmanaged.UpdateAllocator.ToAllocator);
-            var childParentToRemove = new NativeParallelHashSet<Entity>(count, state.WorldUnmanaged.UpdateAllocator.ToAllocator);
-            var uniqueParents = new NativeParallelHashMap<Entity, int>(count, state.WorldUnmanaged.UpdateAllocator.ToAllocator);
+            var parentChildrenToAdd = new NativeParallelMultiHashMap<Entity, Entity>(
+                count,
+                state.WorldUnmanaged.UpdateAllocator.ToAllocator
+            );
+            var parentChildrenToRemove = new NativeParallelMultiHashMap<Entity, Entity>(
+                count,
+                state.WorldUnmanaged.UpdateAllocator.ToAllocator
+            );
+            var childParentToRemove = new NativeParallelHashSet<Entity>(
+                count,
+                state.WorldUnmanaged.UpdateAllocator.ToAllocator
+            );
+            var uniqueParents = new NativeParallelHashMap<Entity, int>(
+                count,
+                state.WorldUnmanaged.UpdateAllocator.ToAllocator
+            );
 
             ParentTypeHandleRO.Update(ref state);
             PreviousParentTypeHandleRW.Update(ref state);
@@ -322,9 +356,12 @@ namespace Unity.Transforms
                 EntityStorageInfoLookup = state.GetEntityStorageInfoLookup(),
                 ParentTypeHandle = ParentTypeHandleRO,
                 EntityTypeHandle = EntityTypeHandle,
-                LastSystemVersion = state.LastSystemVersion
+                LastSystemVersion = state.LastSystemVersion,
             };
-            var gatherChangedParentsJobHandle = gatherChangedParentsJob.ScheduleParallel(m_ExistingParentsQuery, state.Dependency);
+            var gatherChangedParentsJobHandle = gatherChangedParentsJob.ScheduleParallel(
+                m_ExistingParentsQuery,
+                state.Dependency
+            );
             gatherChangedParentsJobHandle.Complete();
 
             // Remove Parent components that are not valid
@@ -338,7 +375,7 @@ namespace Unity.Transforms
             {
                 UniqueParents = uniqueParents,
                 ChildLookup = _childLookupRo,
-                ParentsMissingChild = parentsMissingChild
+                ParentsMissingChild = parentsMissingChild,
             };
             var findMissingChildJobHandle = findMissingChildJob.Schedule();
             findMissingChildJobHandle.Complete();
@@ -354,7 +391,7 @@ namespace Unity.Transforms
                 ParentChildrenToAdd = parentChildrenToAdd,
                 ParentChildrenToRemove = parentChildrenToRemove,
                 UniqueParents = uniqueParents,
-                ChildLookup = _childLookupRw
+                ChildLookup = _childLookupRw,
             };
 
             var fixupChangedChildrenJobHandle = fixupChangedChildrenJob.Schedule();
@@ -376,10 +413,15 @@ namespace Unity.Transforms
         [BurstCompile]
         struct GatherChildEntities : IJob
         {
-            [ReadOnly] public NativeArray<Entity> Parents;
+            [ReadOnly]
+            public NativeArray<Entity> Parents;
             public NativeList<Entity> Children;
-            [ReadOnly] public BufferLookup<Child> ChildLookup;
-            [ReadOnly] public ComponentLookup<Parent> ParentFromEntity;
+
+            [ReadOnly]
+            public BufferLookup<Child> ChildLookup;
+
+            [ReadOnly]
+            public ComponentLookup<Parent> ParentFromEntity;
 
             public void Execute()
             {
@@ -390,7 +432,10 @@ namespace Unity.Transforms
                     for (int j = 0; j < childEntitiesSource.Length; j++)
                     {
                         var childEntity = childEntitiesSource[j].Value;
-                        if (ParentFromEntity.TryGetComponent(childEntity, out var parent) && parent.Value == parentEntity)
+                        if (
+                            ParentFromEntity.TryGetComponent(childEntity, out var parent)
+                            && parent.Value == parentEntity
+                        )
                         {
                             Children.Add(childEntitiesSource[j].Value);
                         }
@@ -424,9 +469,12 @@ namespace Unity.Transforms
                 new ComponentTypeSet(
                     ComponentType.FromTypeIndex(TypeManager.GetTypeIndex<Parent>()),
                     ComponentType.FromTypeIndex(TypeManager.GetTypeIndex<PreviousParent>())
-                ));
-            state.EntityManager.RemoveComponent(m_DeletedParentsQuery, ComponentType.FromTypeIndex(
-                TypeManager.GetTypeIndex<Child>()));
+                )
+            );
+            state.EntityManager.RemoveComponent(
+                m_DeletedParentsQuery,
+                ComponentType.FromTypeIndex(TypeManager.GetTypeIndex<Child>())
+            );
         }
 
         /// <inheritdoc cref="ISystem.OnUpdate"/>

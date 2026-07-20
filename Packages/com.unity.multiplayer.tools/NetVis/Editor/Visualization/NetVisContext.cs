@@ -55,10 +55,7 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
         void OnStart()
         {
             DebugUtil.TraceMethodName();
-            m_VisualizationSystem = new VisualizationSystem(
-                ConfigurationWithEvents,
-                NetVisDataStore,
-                RuntimeUpdater);
+            m_VisualizationSystem = new VisualizationSystem(ConfigurationWithEvents, NetVisDataStore, RuntimeUpdater);
         }
 
         void OnDestroyed()

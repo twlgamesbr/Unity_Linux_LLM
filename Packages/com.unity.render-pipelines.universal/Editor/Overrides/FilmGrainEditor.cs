@@ -40,14 +40,18 @@ namespace UnityEditor.Rendering.Universal
                     // builtin resources, thus the check for null
                     if (importer != null)
                     {
-                        bool valid = importer.mipmapEnabled == false
+                        bool valid =
+                            importer.mipmapEnabled == false
                             && importer.alphaSource == TextureImporterAlphaSource.FromGrayScale
                             && importer.filterMode == FilterMode.Point
                             && importer.textureCompression == TextureImporterCompression.Uncompressed
                             && importer.textureType == TextureImporterType.SingleChannel;
 
                         if (!valid)
-                            CoreEditorUtils.DrawFixMeBox("Invalid texture import settings.", () => SetTextureImportSettings(importer));
+                            CoreEditorUtils.DrawFixMeBox(
+                                "Invalid texture import settings.",
+                                () => SetTextureImportSettings(importer)
+                            );
                     }
                 }
             }

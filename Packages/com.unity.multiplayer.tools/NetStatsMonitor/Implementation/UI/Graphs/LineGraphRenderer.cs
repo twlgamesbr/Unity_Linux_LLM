@@ -54,7 +54,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float renderBoundsXMax,
             float renderBoundsYMin,
             float renderBoundsYMax,
-            Vertex[] vertices)
+            Vertex[] vertices
+        )
         {
             // Example Inputs and Outputs 1
             // - Input points: P0, P1, P2, P3
@@ -71,7 +72,6 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             //             \  * P1                                        P2 *  /
             //              *--------------------------------------------------*
             //            V11                                                  V21
-
 
             // Example Inputs and Outputs 2
             // - Input points: P0, P1, P2, P3
@@ -120,16 +120,26 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             var graphPointsPerSample = 1 / graphSamplesPerPoint;
 
             m_BoundsTransformer ??= new GraphBoundsTransformer(
-                renderBoundsXMin, renderBoundsXMax, renderBoundsYMin, renderBoundsYMax,
-                yAxisMin, yAxisMax);
+                renderBoundsXMin,
+                renderBoundsXMax,
+                renderBoundsYMin,
+                renderBoundsYMax,
+                yAxisMin,
+                yAxisMax
+            );
 
             // X and Y axis transforms that must be applied to existing geometry
             // These transforms will be Identity if no transformation of the
             // existing geometry is required  along this axis
             var (xAxisTransform, yAxisTransform) = m_BoundsTransformer.ComputeTransformsForNewBounds(
-                renderBoundsXMin, renderBoundsXMax, renderBoundsYMin, renderBoundsYMax,
-                yAxisMin, yAxisMax,
-                pointsToAdvance);
+                renderBoundsXMin,
+                renderBoundsXMax,
+                renderBoundsYMin,
+                renderBoundsYMax,
+                yAxisMin,
+                yAxisMax,
+                pointsToAdvance
+            );
 
             // TODO: These probably need to be member variables
             var sampleValueMin = 0f;
@@ -145,7 +155,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 stats,
                 dataSampler,
                 graphWidthPoints: graphWidthPoints,
-                pointsToAdvance: pointsToAdvance);
+                pointsToAdvance: pointsToAdvance
+            );
 
             var xScale = (renderBoundsXMax - renderBoundsXMin) / graphWidthPoints;
             var yScale = (renderBoundsYMax - renderBoundsYMin) / yAxisMax;
@@ -153,7 +164,12 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
             var verticesPerStat = GraphBuffers.k_VerticesPerPoint * graphWidthPoints;
 
-            var pointsToCopy = ComputeNumberOfPointsToCopy(xAxisChanged, yAxisChanged, graphWidthPoints, pointsToAdvance);
+            var pointsToCopy = ComputeNumberOfPointsToCopy(
+                xAxisChanged,
+                yAxisChanged,
+                graphWidthPoints,
+                pointsToAdvance
+            );
 
             // This terminology is a bit confusing, but:
             // 1. renderBoundsYMin is the render bound corresponding to the minimum value
@@ -175,7 +191,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     statVerticesBegin: statVerticesBegin,
                     xScale: xScale,
                     pointsToAdvance: pointsToAdvance,
-                    pointsToCopy: pointsToCopy);
+                    pointsToCopy: pointsToCopy
+                );
 
                 ComputeNewGeometry(
                     vertices: vertices,
@@ -191,12 +208,18 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     renderBoundsYMinActual: renderBoundsYMinActual,
                     renderBoundsYMaxActual: renderBoundsYMaxActual,
                     halfLineThickness: halfLineThickness,
-                    pointValues: pointValues);
+                    pointValues: pointValues
+                );
             }
             return new MinAndMax(sampleValueMin, m_MaxPointValue);
         }
 
-        static int ComputeNumberOfPointsToCopy(bool xAxisChanged, bool yAxisChanged, int graphWidthPoints, int pointsToAdvance)
+        static int ComputeNumberOfPointsToCopy(
+            bool xAxisChanged,
+            bool yAxisChanged,
+            int graphWidthPoints,
+            int pointsToAdvance
+        )
         {
             // The last point is a special case, as there is no point after it,
             // so ther vertices cannot be computed to line up with the future next point.
@@ -211,9 +234,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             // a constant thickness, and I haven't thought of a way to do so that's more
             // efficient than just recomputing the geometry for the new scale.
             // So, for the time being, just recompute the geometry when the graph changes size.
-            var pointsToCopy = xAxisChanged || yAxisChanged
-                ? 0
-                : Math.Max(graphWidthPoints - pointsToAdvance - k_OffsetToAvoidCopyingLastPoint, 0);
+            var pointsToCopy =
+                xAxisChanged || yAxisChanged
+                    ? 0
+                    : Math.Max(graphWidthPoints - pointsToAdvance - k_OffsetToAvoidCopyingLastPoint, 0);
             return pointsToCopy;
         }
 
@@ -221,7 +245,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             List<MetricId> stats,
             GraphDataSampler sampler,
             int graphWidthPoints,
-            int pointsToAdvance)
+            int pointsToAdvance
+        )
         {
             // The largest value dropped during this advance
             float maxValueDropped = 0f;
@@ -261,11 +286,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         void ShiftExistingGeometry(
             Vertex[] vertices,
             int statVerticesBegin,
-
             float xScale,
-
             int pointsToAdvance,
-            int pointsToCopy)
+            int pointsToCopy
+        )
         {
             var xOffset = pointsToAdvance * xScale;
 
@@ -303,7 +327,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float renderBoundsYMinActual,
             float renderBoundsYMaxActual,
             float halfLineThickness,
-            RingBuffer<float> pointValues)
+            RingBuffer<float> pointValues
+        )
         {
             // Definitions of names used
             // (some are used only in comments to describe/define other variables)
@@ -341,16 +366,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             // Let b12_delta be the vertical offset between L12 and L12a
             //     - b12_delta = b12a - b12 = b12 - b12b
 
-
             // Precompute information about P1 before the first iteration of the loop
             // ------------------------------------------------------------------------------------
-            var i1 = Math.Max(pointsToCopy, 0);  // Index of the current point
+            var i1 = Math.Max(pointsToCopy, 0); // Index of the current point
             var s1 = Math.Clamp(pointValues[i1], yAxisMin, yAxisMax);
-            var x1 = i1 * xScale;                    // x-value of the current point
+            var x1 = i1 * xScale; // x-value of the current point
             var y1 = s1 * yScale + renderBoundsYMin; // y-value of the current point
-            float a01;                               // Slope of the line between the current and previous point
-            float b01_delta;                         // Vertical offset between L01 and L01a
-            float b01a;                              // Vertical offset of L01a
+            float a01; // Slope of the line between the current and previous point
+            float b01_delta; // Vertical offset between L01 and L01a
+            float b01a; // Vertical offset of L01a
             {
                 // Precompute information about P0 and L01 before the first iteration of the loop
                 // --------------------------------------------------------------------------------
@@ -361,7 +385,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
                 // L01(x) = a01 * x + b01
                 a01 = (y1 - y0) * xScaleInverse; //  slope of L01
-                var b01 = y1 - a01 * x1;         // offset of L01
+                var b01 = y1 - a01 * x1; // offset of L01
 
                 // Vertical offset between L01 and L01a
                 b01_delta = halfLineThickness * MathF.Sqrt(1 + a01 * a01);
@@ -381,7 +405,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 var y2 = s2 * yScale + renderBoundsYMin;
 
                 var a12 = (y2 - y1) * xScaleInverse; //  slope of L12, according to y = a * x + b
-                var b12 = y2 - a12 * x2;             // offset of L12, according to y = a * x + b
+                var b12 = y2 - a12 * x2; // offset of L12, according to y = a * x + b
 
                 // Vertical offset between L01 and L01a
                 var b12_delta = halfLineThickness * MathF.Sqrt(1 + a12 * a12);
@@ -389,9 +413,10 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 var b12a = b12 + b12_delta; // b-value of L12a
 
                 // x-value of the intersection between L01a and L12a
-                var x1a = MathF.Abs(a01 - a12) < 1e-4f
-                    ? (x1 - a12 / b12_delta) // Avoid division by zero if a01 ~= a12
-                    : (b12a - b01a) / (a01 - a12);
+                var x1a =
+                    MathF.Abs(a01 - a12) < 1e-4f
+                        ? (x1 - a12 / b12_delta) // Avoid division by zero if a01 ~= a12
+                        : (b12a - b01a) / (a01 - a12);
 
                 // y-value of the intersection between L01a and L12a
                 var y1a = x1a * a12 + b12a;
@@ -411,7 +436,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     xa: x1a,
                     ya: y1a,
                     xb: x1b,
-                    yb: y1b);
+                    yb: y1b
+                );
 
                 x1 = x2;
                 y1 = y2;
@@ -436,7 +462,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                     xa: x1,
                     ya: y1a,
                     xb: x1,
-                    yb: y1b);
+                    yb: y1b
+                );
             }
         }
 
@@ -449,7 +476,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             float xa,
             float ya,
             float xb,
-            float yb)
+            float yb
+        )
         {
             ya = Math.Clamp(ya, renderBoundsYMinActual, renderBoundsYMaxActual);
             yb = Math.Clamp(yb, renderBoundsYMinActual, renderBoundsYMaxActual);

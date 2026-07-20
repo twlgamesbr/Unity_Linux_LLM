@@ -23,6 +23,7 @@ public struct ParameterTypeInJobEntityExecuteMethod
             : $"Unity.Entities.ComponentType.ReadWrite<{TypeSymbol.ToFullName()}>()";
     }
 }
+
 public partial class JobEntityDescription : ISourceGeneratorDiagnosable
 {
     readonly List<ParameterTypeInJobEntityExecuteMethod> m_ComponentTypesInExecuteMethod;
@@ -44,7 +45,11 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
     static string GetUserExecuteMethodSignature(IMethodSymbol userExecuteMethod) =>
         $"{userExecuteMethod.Name}({userExecuteMethod.Parameters.Select(p => $"{p.Type.Name} {p.Name}").SeparateByComma()})";
 
-    public JobEntityDescription(StructDeclarationSyntax candidate, SemanticModel semanticModel, bool checkUserDefinedQueryForScheduling)
+    public JobEntityDescription(
+        StructDeclarationSyntax candidate,
+        SemanticModel semanticModel,
+        bool checkUserDefinedQueryForScheduling
+    )
     {
         Invalid = false;
         SourceGenDiagnostics = new List<Diagnostic>();
@@ -61,7 +66,12 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
 
         if (userExecuteMethods.Count != 1)
         {
-            JobEntityGeneratorErrors.SGJE0008(this, m_JobEntityTypeSymbol.Locations.First(), FullTypeName, userExecuteMethods);
+            JobEntityGeneratorErrors.SGJE0008(
+                this,
+                m_JobEntityTypeSymbol.Locations.First(),
+                FullTypeName,
+                userExecuteMethods
+            );
             Invalid = true;
             return;
         }
@@ -74,7 +84,12 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
         _userExecuteMethodParams = new JobEntityParam[userExecuteMethod.Parameters.Length];
 
         for (var parameterIndex = 0; parameterIndex < userExecuteMethod.Parameters.Length; parameterIndex++)
-            _userExecuteMethodParams[parameterIndex] = CreateJobEntityParam(userExecuteMethod.Parameters[parameterIndex], checkUserDefinedQueryForScheduling, queryInfo.QueryAllTypes, queryInfo.QueryChangeFilterTypes);
+            _userExecuteMethodParams[parameterIndex] = CreateJobEntityParam(
+                userExecuteMethod.Parameters[parameterIndex],
+                checkUserDefinedQueryForScheduling,
+                queryInfo.QueryAllTypes,
+                queryInfo.QueryChangeFilterTypes
+            );
 
         // Generate Query
         queryInfo.FillFromAttributes(candidate.AttributeLists, semanticModel);
@@ -84,8 +99,12 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
         OutputErrors(userExecuteMethod);
     }
 
-    JobEntityParam CreateJobEntityParam(IParameterSymbol parameterSymbol, bool performSafetyChecks,
-        List<Query> queryAllTypes, ICollection<Query> queryChangeFilterTypes)
+    JobEntityParam CreateJobEntityParam(
+        IParameterSymbol parameterSymbol,
+        bool performSafetyChecks,
+        List<Query> queryAllTypes,
+        ICollection<Query> queryChangeFilterTypes
+    )
     {
         var typeSymbol = parameterSymbol.Type;
 
@@ -137,24 +156,36 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                                     typeArgSymbol.ToFullName(),
                                     Enum.GetName(typeof(Accessibility), typeArgSymbol.DeclaredAccessibility),
                                     m_JobEntityTypeSymbol.ToFullName(),
-                                    Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility));
+                                    Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility)
+                                );
                                 Invalid = true;
                                 return null;
                             }
 
-                            var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(typeArgSymbol, parameterSymbol.IsReadOnly());
-                            var jobEntityParameter = new JobEntityParam_DynamicBuffer(parameterSymbol, typeArgSymbol, typeHandle);
-                            queryAllTypes.Add(new Query
-                            {
-                                IsReadOnly = jobEntityParameter.IsReadOnly,
-                                Type = QueryType.All,
-                                TypeSymbol = jobEntityParameter.TypeSymbol
-                            });
-                            m_ComponentTypesInExecuteMethod.Add(new ParameterTypeInJobEntityExecuteMethod
-                            {
-                                IsReadOnly = jobEntityParameter.IsReadOnly,
-                                TypeSymbol = jobEntityParameter.TypeSymbol,
-                            });
+                            var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(
+                                typeArgSymbol,
+                                parameterSymbol.IsReadOnly()
+                            );
+                            var jobEntityParameter = new JobEntityParam_DynamicBuffer(
+                                parameterSymbol,
+                                typeArgSymbol,
+                                typeHandle
+                            );
+                            queryAllTypes.Add(
+                                new Query
+                                {
+                                    IsReadOnly = jobEntityParameter.IsReadOnly,
+                                    Type = QueryType.All,
+                                    TypeSymbol = jobEntityParameter.TypeSymbol,
+                                }
+                            );
+                            m_ComponentTypesInExecuteMethod.Add(
+                                new ParameterTypeInJobEntityExecuteMethod
+                                {
+                                    IsReadOnly = jobEntityParameter.IsReadOnly,
+                                    TypeSymbol = jobEntityParameter.TypeSymbol,
+                                }
+                            );
                             return jobEntityParameter;
                         }
 
@@ -164,18 +195,21 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                         case "global::Unity.Entities.EnabledRefRW<T>":
                         case "global::Unity.Entities.EnabledRefRO<T>":
                         {
-                            var isReadOnly = fullName is "global::Unity.Entities.RefRO<T>" or "global::Unity.Entities.EnabledRefRO<T>";
+                            var isReadOnly =
+                                fullName
+                                is "global::Unity.Entities.RefRO<T>"
+                                    or "global::Unity.Entities.EnabledRefRO<T>";
                             var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(typeArgSymbol, isReadOnly);
 
-                            var (success, currentJobEntityParameter) =
-                                JobEntityParam.TryParseTypeSymbol(
-                                    typeArgSymbol,
-                                    parameterSymbol,
-                                    isReadOnly,
-                                    performSafetyChecks,
-                                    diagnosable: this,
-                                    typeHandle,
-                                    constructedFrom: fullName);
+                            var (success, currentJobEntityParameter) = JobEntityParam.TryParseTypeSymbol(
+                                typeArgSymbol,
+                                parameterSymbol,
+                                isReadOnly,
+                                performSafetyChecks,
+                                diagnosable: this,
+                                typeHandle,
+                                constructedFrom: fullName
+                            );
 
                             if (success)
                             {
@@ -187,12 +221,15 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                                         typeArgSymbol.ToFullName(),
                                         Enum.GetName(typeof(Accessibility), typeArgSymbol.DeclaredAccessibility),
                                         m_JobEntityTypeSymbol.ToFullName(),
-                                        Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility));
+                                        Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility)
+                                    );
                                     Invalid = true;
                                     return null;
                                 }
 
-                                var index = queryAllTypes.FindIndex(q => SymbolEqualityComparer.Default.Equals(q.TypeSymbol, typeArgSymbol));
+                                var index = queryAllTypes.FindIndex(q =>
+                                    SymbolEqualityComparer.Default.Equals(q.TypeSymbol, typeArgSymbol)
+                                );
 
                                 // If the same type was added previously
                                 if (index != -1)
@@ -201,51 +238,64 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
 
                                     // If the previously added `Query` instance is read-only, but we actually require read-write access,
                                     // e.g. if users use `EnabledRefRO<T>` and `RefRW<T>` in the same `IJobEntity.Execute()` method
-                                    if (sameParameterTypePreviouslyAdded.IsReadOnly && !currentJobEntityParameter.IsReadOnly)
+                                    if (
+                                        sameParameterTypePreviouslyAdded.IsReadOnly
+                                        && !currentJobEntityParameter.IsReadOnly
+                                    )
                                     {
                                         // Delete the previously added `Query` instance, since we will be replacing it with a new `Query`
                                         // instance of the same type with read-write access instead
                                         queryAllTypes.RemoveAtSwapBack(index);
 
-                                        queryAllTypes.Add(new Query
-                                        {
-                                            IsReadOnly = false,
-                                            Type = QueryType.All,
-                                            TypeSymbol = currentJobEntityParameter.TypeSymbol
-                                        });
+                                        queryAllTypes.Add(
+                                            new Query
+                                            {
+                                                IsReadOnly = false,
+                                                Type = QueryType.All,
+                                                TypeSymbol = currentJobEntityParameter.TypeSymbol,
+                                            }
+                                        );
 
                                         m_ComponentTypesInExecuteMethod.RemoveAtSwapBack(index);
 
-                                        m_ComponentTypesInExecuteMethod.Add(new ParameterTypeInJobEntityExecuteMethod
-                                        {
-                                            IsReadOnly = false,
-                                            TypeSymbol = currentJobEntityParameter.TypeSymbol
-                                        });
+                                        m_ComponentTypesInExecuteMethod.Add(
+                                            new ParameterTypeInJobEntityExecuteMethod
+                                            {
+                                                IsReadOnly = false,
+                                                TypeSymbol = currentJobEntityParameter.TypeSymbol,
+                                            }
+                                        );
                                     }
                                 }
                                 // If the same type was not added previously
                                 else
                                 {
-                                    queryAllTypes.Add(new Query
-                                    {
-                                        IsReadOnly = currentJobEntityParameter.IsReadOnly,
-                                        Type = QueryType.All,
-                                        TypeSymbol = currentJobEntityParameter.TypeSymbol
-                                    });
-                                    m_ComponentTypesInExecuteMethod.Add(new ParameterTypeInJobEntityExecuteMethod
-                                    {
-                                        IsReadOnly = currentJobEntityParameter.IsReadOnly,
-                                        TypeSymbol = currentJobEntityParameter.TypeSymbol,
-                                    });
+                                    queryAllTypes.Add(
+                                        new Query
+                                        {
+                                            IsReadOnly = currentJobEntityParameter.IsReadOnly,
+                                            Type = QueryType.All,
+                                            TypeSymbol = currentJobEntityParameter.TypeSymbol,
+                                        }
+                                    );
+                                    m_ComponentTypesInExecuteMethod.Add(
+                                        new ParameterTypeInJobEntityExecuteMethod
+                                        {
+                                            IsReadOnly = currentJobEntityParameter.IsReadOnly,
+                                            TypeSymbol = currentJobEntityParameter.TypeSymbol,
+                                        }
+                                    );
                                 }
                                 if (hasChangeFilter)
                                 {
-                                    queryChangeFilterTypes.Add(new Query
-                                    {
-                                        IsReadOnly = currentJobEntityParameter.IsReadOnly,
-                                        Type = QueryType.ChangeFilter,
-                                        TypeSymbol = currentJobEntityParameter.TypeSymbol
-                                    });
+                                    queryChangeFilterTypes.Add(
+                                        new Query
+                                        {
+                                            IsReadOnly = currentJobEntityParameter.IsReadOnly,
+                                            Type = QueryType.ChangeFilter,
+                                            TypeSymbol = currentJobEntityParameter.TypeSymbol,
+                                        }
+                                    );
                                 }
                                 return currentJobEntityParameter;
                             }
@@ -267,33 +317,43 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                             typeSymbol.ToFullName(),
                             Enum.GetName(typeof(Accessibility), typeSymbol.DeclaredAccessibility),
                             m_JobEntityTypeSymbol.ToFullName(),
-                            Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility));
+                            Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility)
+                        );
                         Invalid = true;
                         return null;
                     }
 
-                    var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(typeSymbol, parameterSymbol.IsReadOnly());
+                    var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(
+                        typeSymbol,
+                        parameterSymbol.IsReadOnly()
+                    );
                     m_RequiresEntityManager |= !typeSymbol.IsUnmanagedType;
                     var jobEntityParameter = new JobEntityParam_SharedComponent(parameterSymbol, typeHandle);
-                    queryAllTypes.Add(new Query
-                    {
-                        IsReadOnly = jobEntityParameter.IsReadOnly,
-                        Type = QueryType.All,
-                        TypeSymbol = jobEntityParameter.TypeSymbol
-                    });
-                    m_ComponentTypesInExecuteMethod.Add(new ParameterTypeInJobEntityExecuteMethod
-                    {
-                        IsReadOnly = jobEntityParameter.IsReadOnly,
-                        TypeSymbol = jobEntityParameter.TypeSymbol,
-                    });
-                    if (hasChangeFilter)
-                    {
-                        queryChangeFilterTypes.Add(new Query
+                    queryAllTypes.Add(
+                        new Query
                         {
                             IsReadOnly = jobEntityParameter.IsReadOnly,
-                            Type = QueryType.ChangeFilter,
-                            TypeSymbol = jobEntityParameter.TypeSymbol
-                        });
+                            Type = QueryType.All,
+                            TypeSymbol = jobEntityParameter.TypeSymbol,
+                        }
+                    );
+                    m_ComponentTypesInExecuteMethod.Add(
+                        new ParameterTypeInJobEntityExecuteMethod
+                        {
+                            IsReadOnly = jobEntityParameter.IsReadOnly,
+                            TypeSymbol = jobEntityParameter.TypeSymbol,
+                        }
+                    );
+                    if (hasChangeFilter)
+                    {
+                        queryChangeFilterTypes.Add(
+                            new Query
+                            {
+                                IsReadOnly = jobEntityParameter.IsReadOnly,
+                                Type = QueryType.ChangeFilter,
+                                TypeSymbol = jobEntityParameter.TypeSymbol,
+                            }
+                        );
                     }
                     return jobEntityParameter;
                 }
@@ -311,14 +371,14 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                     {
                         var isReadOnly = parameterSymbol.IsReadOnly();
                         var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(typeSymbol, isReadOnly);
-                        var (success, jobEntityParameter) =
-                            JobEntityParam.TryParseTypeSymbol(
-                                typeSymbol,
-                                parameterSymbol,
-                                isReadOnly,
-                                performSafetyChecks,
-                                diagnosable: this,
-                                typeHandle);
+                        var (success, jobEntityParameter) = JobEntityParam.TryParseTypeSymbol(
+                            typeSymbol,
+                            parameterSymbol,
+                            isReadOnly,
+                            performSafetyChecks,
+                            diagnosable: this,
+                            typeHandle
+                        );
 
                         if (success)
                         {
@@ -330,29 +390,36 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                                     typeSymbol.ToFullName(),
                                     Enum.GetName(typeof(Accessibility), typeSymbol.DeclaredAccessibility),
                                     m_JobEntityTypeSymbol.ToFullName(),
-                                    Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility));
+                                    Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility)
+                                );
                                 Invalid = true;
                                 return null;
                             }
-                            queryAllTypes.Add(new Query
-                            {
-                                IsReadOnly = jobEntityParameter.IsReadOnly,
-                                Type = QueryType.All,
-                                TypeSymbol = jobEntityParameter.TypeSymbol
-                            });
-                            m_ComponentTypesInExecuteMethod.Add(new ParameterTypeInJobEntityExecuteMethod
-                            {
-                                IsReadOnly = jobEntityParameter.IsReadOnly,
-                                TypeSymbol = jobEntityParameter.TypeSymbol,
-                            });
-                            if (hasChangeFilter)
-                            {
-                                queryChangeFilterTypes.Add(new Query
+                            queryAllTypes.Add(
+                                new Query
                                 {
                                     IsReadOnly = jobEntityParameter.IsReadOnly,
-                                    Type = QueryType.ChangeFilter,
-                                    TypeSymbol = jobEntityParameter.TypeSymbol
-                                });
+                                    Type = QueryType.All,
+                                    TypeSymbol = jobEntityParameter.TypeSymbol,
+                                }
+                            );
+                            m_ComponentTypesInExecuteMethod.Add(
+                                new ParameterTypeInJobEntityExecuteMethod
+                                {
+                                    IsReadOnly = jobEntityParameter.IsReadOnly,
+                                    TypeSymbol = jobEntityParameter.TypeSymbol,
+                                }
+                            );
+                            if (hasChangeFilter)
+                            {
+                                queryChangeFilterTypes.Add(
+                                    new Query
+                                    {
+                                        IsReadOnly = jobEntityParameter.IsReadOnly,
+                                        Type = QueryType.ChangeFilter,
+                                        TypeSymbol = jobEntityParameter.TypeSymbol,
+                                    }
+                                );
                             }
                             return jobEntityParameter;
                         }
@@ -369,16 +436,23 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                         return null;
                     }
 
-                    JobEntityGeneratorErrors.SGJE0010(this, parameterSymbol.Locations.Single(), parameterSymbol.Name, typeSymbol.ToFullName());
+                    JobEntityGeneratorErrors.SGJE0010(
+                        this,
+                        parameterSymbol.Locations.Single(),
+                        parameterSymbol.Name,
+                        typeSymbol.ToFullName()
+                    );
                     Invalid = true;
                     return new JobEntityParamValueTypesPassedWithDefaultArguments(parameterSymbol);
                 }
 
                 // We are a reference type if we get here
-                if (typeSymbol.InheritsFromInterface("Unity.Entities.IComponentData")
+                if (
+                    typeSymbol.InheritsFromInterface("Unity.Entities.IComponentData")
                     || typeSymbol.InheritsFromType("UnityEngine.Component")
                     || typeSymbol.InheritsFromType("UnityEngine.GameObject")
-                    || typeSymbol.InheritsFromType("UnityEngine.ScriptableObject"))
+                    || typeSymbol.InheritsFromType("UnityEngine.ScriptableObject")
+                )
                 {
                     if (parameterSymbol.RefKind == RefKind.Ref || parameterSymbol.RefKind == RefKind.In)
                     {
@@ -395,38 +469,53 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                             typeSymbol.ToFullName(),
                             Enum.GetName(typeof(Accessibility), typeSymbol.DeclaredAccessibility),
                             m_JobEntityTypeSymbol.ToFullName(),
-                            Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility));
+                            Enum.GetName(typeof(Accessibility), m_JobEntityTypeSymbol.DeclaredAccessibility)
+                        );
                         Invalid = true;
                         return null;
                     }
 
-                    var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(typeSymbol, parameterSymbol.IsReadOnly());
+                    var typeHandle = _queriesAndHandles.GetOrCreateTypeHandleField(
+                        typeSymbol,
+                        parameterSymbol.IsReadOnly()
+                    );
                     m_RequiresEntityManager = true;
                     var jobEntityParameter = new JobEntityParam_ManagedComponent(parameterSymbol, typeHandle);
-                    queryAllTypes.Add(new Query
-                    {
-                        IsReadOnly = jobEntityParameter.IsReadOnly,
-                        Type = QueryType.All,
-                        TypeSymbol = jobEntityParameter.TypeSymbol
-                    });
-                    m_ComponentTypesInExecuteMethod.Add(new ParameterTypeInJobEntityExecuteMethod
-                    {
-                        IsReadOnly = jobEntityParameter.IsReadOnly,
-                        TypeSymbol = jobEntityParameter.TypeSymbol,
-                    });
-                    if (hasChangeFilter)
-                    {
-                        queryChangeFilterTypes.Add(new Query
+                    queryAllTypes.Add(
+                        new Query
                         {
                             IsReadOnly = jobEntityParameter.IsReadOnly,
-                            Type = QueryType.ChangeFilter,
-                            TypeSymbol = jobEntityParameter.TypeSymbol
-                        });
+                            Type = QueryType.All,
+                            TypeSymbol = jobEntityParameter.TypeSymbol,
+                        }
+                    );
+                    m_ComponentTypesInExecuteMethod.Add(
+                        new ParameterTypeInJobEntityExecuteMethod
+                        {
+                            IsReadOnly = jobEntityParameter.IsReadOnly,
+                            TypeSymbol = jobEntityParameter.TypeSymbol,
+                        }
+                    );
+                    if (hasChangeFilter)
+                    {
+                        queryChangeFilterTypes.Add(
+                            new Query
+                            {
+                                IsReadOnly = jobEntityParameter.IsReadOnly,
+                                Type = QueryType.ChangeFilter,
+                                TypeSymbol = jobEntityParameter.TypeSymbol,
+                            }
+                        );
                     }
                     return jobEntityParameter;
                 }
 
-                JobEntityGeneratorErrors.SGJE0010(this, parameterSymbol.Locations.Single(), parameterSymbol.Name, typeSymbol.ToFullName());
+                JobEntityGeneratorErrors.SGJE0010(
+                    this,
+                    parameterSymbol.Locations.Single(),
+                    parameterSymbol.Name,
+                    typeSymbol.ToFullName()
+                );
                 Invalid = true;
                 return null;
             }
@@ -460,7 +549,13 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
             };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        ITypeSymbol AddQueryInstance(List<Query> list, TypeOfExpressionSyntax typeOfSyntax, QueryType type, SemanticModel semanticModel, bool removeFromQueryAllIfFound)
+        ITypeSymbol AddQueryInstance(
+            List<Query> list,
+            TypeOfExpressionSyntax typeOfSyntax,
+            QueryType type,
+            SemanticModel semanticModel,
+            bool removeFromQueryAllIfFound
+        )
         {
             var typeSymbol = semanticModel.GetTypeInfo(typeOfSyntax.Type).Type;
             var index = QueryAllTypes.FindIndex(q => SymbolEqualityComparer.Default.Equals(q.TypeSymbol, typeSymbol));
@@ -468,30 +563,40 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
             if (index != -1)
             {
                 var queryAllType = QueryAllTypes[index];
-                list.Add(new Query
-                {
-                    TypeSymbol = typeSymbol,
-                    Type = type,
-                    IsReadOnly = queryAllType.IsReadOnly
-                });
+                list.Add(
+                    new Query
+                    {
+                        TypeSymbol = typeSymbol,
+                        Type = type,
+                        IsReadOnly = queryAllType.IsReadOnly,
+                    }
+                );
 
                 if (removeFromQueryAllIfFound)
                     QueryAllTypes.RemoveAtSwapBack(index);
             }
             else
             {
-                list.Add(new Query
-                {
-                    TypeSymbol = typeSymbol,
-                    Type = type,
-                    IsReadOnly = true,
-                });
+                list.Add(
+                    new Query
+                    {
+                        TypeSymbol = typeSymbol,
+                        Type = type,
+                        IsReadOnly = true,
+                    }
+                );
             }
 
             return typeSymbol;
         }
 
-        void AddQueryInstanceFromAttribute(List<Query> list, AttributeArgumentSyntax argument, QueryType type, SemanticModel semanticModel, bool removeFromQueryAllIfFound)
+        void AddQueryInstanceFromAttribute(
+            List<Query> list,
+            AttributeArgumentSyntax argument,
+            QueryType type,
+            SemanticModel semanticModel,
+            bool removeFromQueryAllIfFound
+        )
         {
             switch (argument.Expression)
             {
@@ -528,40 +633,85 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                 {
                     switch (attribute.Name)
                     {
-                        case SimpleNameSyntax { Identifier.ValueText: "WithDisabled" or "WithDisabledAttribute"}:
+                        case SimpleNameSyntax { Identifier.ValueText: "WithDisabled" or "WithDisabledAttribute" }:
                             if (attribute.ArgumentList != null)
                                 foreach (var argument in attribute.ArgumentList.Arguments)
-                                    AddQueryInstanceFromAttribute(QueryDisabledTypes, argument, QueryType.Disabled, semanticModel, removeFromQueryAllIfFound: true);
+                                    AddQueryInstanceFromAttribute(
+                                        QueryDisabledTypes,
+                                        argument,
+                                        QueryType.Disabled,
+                                        semanticModel,
+                                        removeFromQueryAllIfFound: true
+                                    );
                             break;
                         case SimpleNameSyntax { Identifier.ValueText: "WithPresent" or "WithPresentAttribute" }:
                             if (attribute.ArgumentList != null)
                                 foreach (var argument in attribute.ArgumentList.Arguments)
-                                    AddQueryInstanceFromAttribute(QueryPresentTypes, argument, QueryType.Present, semanticModel, removeFromQueryAllIfFound: true);
+                                    AddQueryInstanceFromAttribute(
+                                        QueryPresentTypes,
+                                        argument,
+                                        QueryType.Present,
+                                        semanticModel,
+                                        removeFromQueryAllIfFound: true
+                                    );
                             break;
                         case SimpleNameSyntax { Identifier.ValueText: "WithAbsent" or "WithAbsentAttribute" }:
                             if (attribute.ArgumentList != null)
                                 foreach (var argument in attribute.ArgumentList.Arguments)
-                                    AddQueryInstanceFromAttribute(QueryAbsentTypes, argument, QueryType.Absent, semanticModel, removeFromQueryAllIfFound: false);
+                                    AddQueryInstanceFromAttribute(
+                                        QueryAbsentTypes,
+                                        argument,
+                                        QueryType.Absent,
+                                        semanticModel,
+                                        removeFromQueryAllIfFound: false
+                                    );
                             break;
-                        case SimpleNameSyntax { Identifier.ValueText: "WithAll" or "WithAllAttribute"}:
+                        case SimpleNameSyntax { Identifier.ValueText: "WithAll" or "WithAllAttribute" }:
                             if (attribute.ArgumentList != null)
                                 foreach (var argument in attribute.ArgumentList.Arguments)
-                                    AddQueryInstanceFromAttribute(QueryAllTypes, argument, QueryType.All, semanticModel, removeFromQueryAllIfFound: false);
+                                    AddQueryInstanceFromAttribute(
+                                        QueryAllTypes,
+                                        argument,
+                                        QueryType.All,
+                                        semanticModel,
+                                        removeFromQueryAllIfFound: false
+                                    );
                             break;
                         case SimpleNameSyntax { Identifier.ValueText: "WithNone" or "WithNoneAttribute" }:
                             if (attribute.ArgumentList != null)
                                 foreach (var argument in attribute.ArgumentList.Arguments)
-                                    AddQueryInstanceFromAttribute(QueryNoneTypes, argument, QueryType.None, semanticModel, removeFromQueryAllIfFound: false);
+                                    AddQueryInstanceFromAttribute(
+                                        QueryNoneTypes,
+                                        argument,
+                                        QueryType.None,
+                                        semanticModel,
+                                        removeFromQueryAllIfFound: false
+                                    );
                             break;
                         case SimpleNameSyntax { Identifier.ValueText: "WithAny" or "WithAnyAttribute" }:
                             if (attribute.ArgumentList != null)
                                 foreach (var argument in attribute.ArgumentList.Arguments)
-                                    AddQueryInstanceFromAttribute(QueryAnyTypes, argument, QueryType.Any, semanticModel, removeFromQueryAllIfFound: false);
+                                    AddQueryInstanceFromAttribute(
+                                        QueryAnyTypes,
+                                        argument,
+                                        QueryType.Any,
+                                        semanticModel,
+                                        removeFromQueryAllIfFound: false
+                                    );
                             break;
-                        case SimpleNameSyntax { Identifier.ValueText: "WithChangeFilter" or "WithChangeFilterAttribute" }:
+                        case SimpleNameSyntax
+                        {
+                            Identifier.ValueText: "WithChangeFilter" or "WithChangeFilterAttribute"
+                        }:
                             if (attribute.ArgumentList != null)
                                 foreach (var argument in attribute.ArgumentList.Arguments)
-                                    AddQueryInstanceFromAttribute(QueryChangeFilterTypes, argument, QueryType.ChangeFilter, semanticModel, removeFromQueryAllIfFound: false);
+                                    AddQueryInstanceFromAttribute(
+                                        QueryChangeFilterTypes,
+                                        argument,
+                                        QueryType.ChangeFilter,
+                                        semanticModel,
+                                        removeFromQueryAllIfFound: false
+                                    );
                             break;
                         case SimpleNameSyntax { Identifier.ValueText: "WithOptions" or "WithOptionsAttribute" }:
                             if (attribute.ArgumentList != null)
@@ -600,7 +750,7 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                     "IgnoreComponentEnabledState" => EntityQueryOptions.IgnoreComponentEnabledState,
                     "IncludeSystems" => EntityQueryOptions.IncludeSystems,
                     "IncludeMetaChunks" => EntityQueryOptions.IncludeMetaChunks,
-                    _ => throw new ArgumentOutOfRangeException()
+                    _ => throw new ArgumentOutOfRangeException(),
                 };
             }
         }
@@ -609,15 +759,19 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
         {
             queriesAndHandles.GetOrCreateQueryField(
                 new SingleArchetypeQueryFieldDescription(
-                    new Archetype(QueryAllTypes,
+                    new Archetype(
+                        QueryAllTypes,
                         QueryAnyTypes,
                         QueryNoneTypes,
                         QueryDisabledTypes,
                         QueryAbsentTypes,
                         QueryPresentTypes,
-                        options: EntityQueryOptions),
-                    changeFilterTypes: QueryChangeFilterTypes),
-                "DefaultQuery");
+                        options: EntityQueryOptions
+                    ),
+                    changeFilterTypes: QueryChangeFilterTypes
+                ),
+                "DefaultQuery"
+            );
         }
     }
 
@@ -631,6 +785,7 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
             _typeSymbol = typeSymbol;
             _refWrapperType = refWrapperType;
         }
+
         public bool Equals(ExecuteMethodParameter x, ExecuteMethodParameter y)
         {
             var identicalTypes = SymbolEqualityComparer.Default.Equals(x._typeSymbol, y._typeSymbol);
@@ -664,9 +819,10 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                     RefWrapperType.RefRW => 1,
                     RefWrapperType.EnabledRefRO => 2,
                     RefWrapperType.EnabledRefRW => 2,
-                    _ => 2
+                    _ => 2,
                 };
-                return ((_typeSymbol != null ? SymbolEqualityComparer.Default.GetHashCode(_typeSymbol) : 0) * 397) ^ refWrapperTypeInt;
+                return ((_typeSymbol != null ? SymbolEqualityComparer.Default.GetHashCode(_typeSymbol) : 0) * 397)
+                    ^ refWrapperTypeInt;
             }
         }
     }
@@ -689,7 +845,7 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
             Invalid = true;
         }
 
-// TODO: This was recently fixed (https://github.com/dotnet/roslyn-analyzers/issues/5804), remove pragmas after we update .net
+        // TODO: This was recently fixed (https://github.com/dotnet/roslyn-analyzers/issues/5804), remove pragmas after we update .net
 #pragma warning disable RS1024
         var executeMethodComponentParameters = new HashSet<ExecuteMethodParameter>();
 #pragma warning restore RS1024
@@ -701,11 +857,18 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
 
             if (param is not IAttributeParameter { IsInt: true })
             {
-                var refWrapperType = param is JobEntityParam_ComponentDataOrBufferElementData data ? data.RefWrapperType : RefWrapperType.NotApplicable;
+                var refWrapperType = param is JobEntityParam_ComponentDataOrBufferElementData data
+                    ? data.RefWrapperType
+                    : RefWrapperType.NotApplicable;
 
                 if (!executeMethodComponentParameters.Add(new ExecuteMethodParameter(param.TypeSymbol, refWrapperType)))
                 {
-                    JobEntityGeneratorErrors.SGJE0017(this, param.ParameterSymbol.Locations.First(), FullTypeName, param.TypeSymbol.ToDisplayString());
+                    JobEntityGeneratorErrors.SGJE0017(
+                        this,
+                        param.ParameterSymbol.Locations.First(),
+                        FullTypeName,
+                        param.TypeSymbol.ToDisplayString()
+                    );
                     Invalid = true;
                 }
             }
@@ -714,7 +877,8 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
             {
                 case IAttributeParameter attributeParameter:
                 {
-                    if (attributeParameter.IsInt) {
+                    if (attributeParameter.IsInt)
+                    {
                         switch (attributeParameter)
                         {
                             case JobEntityParam_ChunkIndexInQuery _ when !foundChunkIndexInQuery:
@@ -728,47 +892,68 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
                                 continue;
                         }
 
-                        JobEntityGeneratorErrors.SGJE0007(this, param.ParameterSymbol.Locations.Single(),
-                            FullTypeName, GetUserExecuteMethodSignature(userExecuteMethod), attributeParameter.AttributeName);
+                        JobEntityGeneratorErrors.SGJE0007(
+                            this,
+                            param.ParameterSymbol.Locations.Single(),
+                            FullTypeName,
+                            GetUserExecuteMethodSignature(userExecuteMethod),
+                            attributeParameter.AttributeName
+                        );
                         Invalid = true;
                         continue;
                     }
 
-                    JobEntityGeneratorErrors.SGJE0006(this, param.ParameterSymbol.Locations.Single(),
-                        FullTypeName, GetUserExecuteMethodSignature(userExecuteMethod), param.ParameterSymbol.Name, attributeParameter.AttributeName);
+                    JobEntityGeneratorErrors.SGJE0006(
+                        this,
+                        param.ParameterSymbol.Locations.Single(),
+                        FullTypeName,
+                        GetUserExecuteMethodSignature(userExecuteMethod),
+                        param.ParameterSymbol.Name,
+                        attributeParameter.AttributeName
+                    );
                     Invalid = true;
                     continue;
                 }
                 case JobEntityParam_SharedComponent sharedComponent:
                     if (sharedComponent.ParameterSymbol.RefKind == RefKind.Ref)
                     {
-                        var text = sharedComponent.ParameterSymbol.DeclaringSyntaxReferences.First().GetSyntax() is ParameterSyntax {Identifier: var i}
+                        var text = sharedComponent.ParameterSymbol.DeclaringSyntaxReferences.First().GetSyntax()
+                            is ParameterSyntax { Identifier: var i }
                             ? i.ValueText
                             : sharedComponent.ParameterSymbol.ToDisplayString();
-                        JobEntityGeneratorErrors.SGJE0013(this, sharedComponent.ParameterSymbol.Locations.Single(), FullTypeName, text);
+                        JobEntityGeneratorErrors.SGJE0013(
+                            this,
+                            sharedComponent.ParameterSymbol.Locations.Single(),
+                            FullTypeName,
+                            text
+                        );
                         Invalid = true;
                     }
                     break;
                 case JobEntityParam_ComponentDataOrBufferElementData componentData:
                 {
                     // E.g. Execute(in RefRW<T1> t1, ref EnabledRefRO<T2> t2)
-                    if (componentData.RefWrapperType != RefWrapperType.None
-                        && componentData.ParameterSymbol.RefKind != RefKind.None)
+                    if (
+                        componentData.RefWrapperType != RefWrapperType.None
+                        && componentData.ParameterSymbol.RefKind != RefKind.None
+                    )
                     {
-                        JobEntityGeneratorErrors.SGJE0018(this,componentData.ParameterSymbol.Locations.Single());
+                        JobEntityGeneratorErrors.SGJE0018(this, componentData.ParameterSymbol.Locations.Single());
                         Invalid = true;
                     }
-
                     // E.g. Execute(ref TagComponent tag)
-                    else if (componentData.RefWrapperType == RefWrapperType.None
-                             && componentData.IsZeroSizedComponent
-                             && componentData.ParameterSymbol.RefKind == RefKind.Ref)
+                    else if (
+                        componentData.RefWrapperType == RefWrapperType.None
+                        && componentData.IsZeroSizedComponent
+                        && componentData.ParameterSymbol.RefKind == RefKind.Ref
+                    )
                     {
                         JobEntityGeneratorErrors.SGJE0016(
                             this,
                             componentData.ParameterSymbol.Locations.Single(),
                             FullTypeName,
-                            componentData.ParameterSymbol.ToDisplayString());
+                            componentData.ParameterSymbol.ToDisplayString()
+                        );
                         Invalid = true;
                     }
                     break;
@@ -780,7 +965,8 @@ public partial class JobEntityDescription : ISourceGeneratorDiagnosable
 
 public class JobEntityParam_SharedComponent : JobEntityParam
 {
-    internal JobEntityParam_SharedComponent(IParameterSymbol parameterSymbol, string typeHandleFieldName) : base(parameterSymbol, typeHandleFieldName)
+    internal JobEntityParam_SharedComponent(IParameterSymbol parameterSymbol, string typeHandleFieldName)
+        : base(parameterSymbol, typeHandleFieldName)
     {
         var typeName = TypeSymbol.Name;
         var variableName = $"{parameterSymbol.Name}Data";
@@ -794,13 +980,16 @@ public class JobEntityParam_SharedComponent : JobEntityParam
 
 public class JobEntityParam_Entity : JobEntityParam
 {
-    internal JobEntityParam_Entity(IParameterSymbol parameterSymbol, string typeHandleFieldName) : base(parameterSymbol, typeHandleFieldName)
+    internal JobEntityParam_Entity(IParameterSymbol parameterSymbol, string typeHandleFieldName)
+        : base(parameterSymbol, typeHandleFieldName)
     {
         const string entityArrayPointer = "entityPointer";
-        VariableDeclarationAtStartOfExecuteMethod = $@"var {entityArrayPointer} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkEntityArrayIntPtr(chunk, __TypeHandle.{TypeHandleFieldName});";
+        VariableDeclarationAtStartOfExecuteMethod =
+            $@"var {entityArrayPointer} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkEntityArrayIntPtr(chunk, __TypeHandle.{TypeHandleFieldName});";
 
         const string argumentInExecuteMethod = "entity";
-        ExecuteMethodArgumentSetup = $"var {argumentInExecuteMethod} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetCopyOfNativeArrayPtrElement<Entity>({entityArrayPointer}, entityIndexInChunk);";
+        ExecuteMethodArgumentSetup =
+            $"var {argumentInExecuteMethod} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetCopyOfNativeArrayPtrElement<Entity>({entityArrayPointer}, entityIndexInChunk);";
 
         ExecuteMethodArgumentValue = argumentInExecuteMethod;
     }
@@ -808,12 +997,18 @@ public class JobEntityParam_Entity : JobEntityParam
 
 public class JobEntityParam_DynamicBuffer : JobEntityParam
 {
-    internal JobEntityParam_DynamicBuffer(IParameterSymbol parameterSymbol, ITypeSymbol typeArgSymbol, string typeHandleFieldName) : base(parameterSymbol, typeHandleFieldName)
+    internal JobEntityParam_DynamicBuffer(
+        IParameterSymbol parameterSymbol,
+        ITypeSymbol typeArgSymbol,
+        string typeHandleFieldName
+    )
+        : base(parameterSymbol, typeHandleFieldName)
     {
         TypeSymbol = typeArgSymbol;
 
         var bufferAccessorVariableName = $"{parameterSymbol.Name}BufferAccessor";
-        VariableDeclarationAtStartOfExecuteMethod = $"var {bufferAccessorVariableName} = chunk.GetBufferAccessor(ref __TypeHandle.{TypeHandleFieldName});";
+        VariableDeclarationAtStartOfExecuteMethod =
+            $"var {bufferAccessorVariableName} = chunk.GetBufferAccessor(ref __TypeHandle.{TypeHandleFieldName});";
 
         var executeArgumentName = $"retrievedByIndexIn{bufferAccessorVariableName}";
         ExecuteMethodArgumentSetup = $"var {executeArgumentName} = {bufferAccessorVariableName}[entityIndexInChunk];";
@@ -822,17 +1017,19 @@ public class JobEntityParam_DynamicBuffer : JobEntityParam
         {
             RefKind.Ref => $"ref {executeArgumentName}",
             RefKind.In => $"in {executeArgumentName}",
-            _ => executeArgumentName
+            _ => executeArgumentName,
         };
     }
 }
 
 public class JobEntityParam_ManagedComponent : JobEntityParam
 {
-    internal JobEntityParam_ManagedComponent(IParameterSymbol parameterSymbol, string typeHandleFieldName) : base(parameterSymbol, typeHandleFieldName)
+    internal JobEntityParam_ManagedComponent(IParameterSymbol parameterSymbol, string typeHandleFieldName)
+        : base(parameterSymbol, typeHandleFieldName)
     {
         var accessorVariableName = $"{parameterSymbol.Name}ManagedComponentAccessor";
-        VariableDeclarationAtStartOfExecuteMethod = $"var {accessorVariableName} = chunk.GetManagedComponentAccessor(ref __TypeHandle.{TypeHandleFieldName}, __EntityManager);";
+        VariableDeclarationAtStartOfExecuteMethod =
+            $"var {accessorVariableName} = chunk.GetManagedComponentAccessor(ref __TypeHandle.{TypeHandleFieldName}, __EntityManager);";
 
         var localName = ExecuteMethodArgumentValue = $"retrievedByIndexIn{accessorVariableName}";
         ExecuteMethodArgumentSetup = $"var {localName} = {accessorVariableName}[entityIndexInChunk];";
@@ -847,7 +1044,9 @@ public class JobEntityParam_ComponentDataOrBufferElementData : JobEntityParam
         bool isReadOnly,
         RefWrapperType refWrapperType,
         bool performSafetyChecks,
-        string typeHandleFieldName) : base(parameterSymbol, typeHandleFieldName)
+        string typeHandleFieldName
+    )
+        : base(parameterSymbol, typeHandleFieldName)
     {
         TypeSymbol = componentTypeSymbol;
         IsReadOnly = isReadOnly;
@@ -874,62 +1073,59 @@ public class JobEntityParam_ComponentDataOrBufferElementData : JobEntityParam
             {
                 case RefWrapperType.None:
                 {
-                    requiredVariableName =
-                        IsZeroSizedComponent
-                            ? string.Empty
-                            : $"{parameterSymbol.Name}ArrayIntPtr";
+                    requiredVariableName = IsZeroSizedComponent ? string.Empty : $"{parameterSymbol.Name}ArrayIntPtr";
                     requiredVariableDeclaration =
-                        IsZeroSizedComponent
-                            ? string.Empty
-                            : IsReadOnly
-                                ? $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayReadOnlyIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});"
-                                : $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});";
+                        IsZeroSizedComponent ? string.Empty
+                        : IsReadOnly
+                            ? $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayReadOnlyIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});"
+                        : $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});";
 
                     value = $"{requiredVariableName}Ref";
-                    setUp =
-                        IsZeroSizedComponent
-                            ? string.Empty
-                            : $"ref var {value} = ref Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetRefToNativeArrayPtrElement<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk);";
+                    setUp = IsZeroSizedComponent
+                        ? string.Empty
+                        : $"ref var {value} = ref Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetRefToNativeArrayPtrElement<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk);";
 
                     value = ParameterSymbol.RefKind switch
                     {
                         RefKind.Ref => IsZeroSizedComponent ? "default" : $"ref {value}",
                         RefKind.In => IsZeroSizedComponent ? "default" : $"in {value}",
-                        _ => IsZeroSizedComponent ? "default" : value
+                        _ => IsZeroSizedComponent ? "default" : value,
                     };
                     return (requiredVariableDeclaration, setUp, value);
                 }
                 case RefWrapperType.RefRW:
                 {
                     requiredVariableName = $"{parameterSymbol.Name}ArrayIntPtr";
-                    requiredVariableDeclaration = $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});";
+                    requiredVariableDeclaration =
+                        $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});";
 
                     value = $"{requiredVariableName}Ref";
-                    setUp =
-                        performSafetyChecks
-                            ? $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRW<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk, ref __TypeHandle.{TypeHandleFieldName});"
-                            : $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRW<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk);";
+                    setUp = performSafetyChecks
+                        ? $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRW<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk, ref __TypeHandle.{TypeHandleFieldName});"
+                        : $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRW<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk);";
                     return (requiredVariableDeclaration, setUp, value);
                 }
                 case RefWrapperType.RefRO:
                 {
                     requiredVariableName = $"{parameterSymbol.Name}ArrayIntPtr";
-                    requiredVariableDeclaration = $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayReadOnlyIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});";
+                    requiredVariableDeclaration =
+                        $"var {requiredVariableName} = Unity.Entities.Internal.InternalCompilerInterface.UnsafeGetChunkNativeArrayReadOnlyIntPtr<{fullyQualifiedTypeName}>(chunk, ref __TypeHandle.{TypeHandleFieldName});";
 
                     value = $"{requiredVariableName}Ref";
-                    setUp =
-                        performSafetyChecks
-                            ? $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRO<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk, ref __TypeHandle.{TypeHandleFieldName});"
-                            : $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRO<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk);";
+                    setUp = performSafetyChecks
+                        ? $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRO<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk, ref __TypeHandle.{TypeHandleFieldName});"
+                        : $"var {value} = Unity.Entities.Internal.InternalCompilerInterface.GetRefRO<{fullyQualifiedTypeName}>({requiredVariableName}, entityIndexInChunk);";
                     return (requiredVariableDeclaration, setUp, value);
                 }
                 case RefWrapperType.EnabledRefRO:
                 case RefWrapperType.EnabledRefRW:
                 {
                     requiredVariableName = $"{parameterSymbol.Name}EnabledMask_{(IsReadOnly ? "RO" : "RW")}";
-                    requiredVariableDeclaration = $"var {requiredVariableName} = chunk.GetEnabledMask(ref __TypeHandle.{TypeHandleFieldName});";
+                    requiredVariableDeclaration =
+                        $"var {requiredVariableName} = chunk.GetEnabledMask(ref __TypeHandle.{TypeHandleFieldName});";
 
-                    value = $"{requiredVariableName}.{(IsReadOnly ? "GetEnabledRefRO" : "GetEnabledRefRW")}<{fullyQualifiedTypeName}>(entityIndexInChunk)";
+                    value =
+                        $"{requiredVariableName}.{(IsReadOnly ? "GetEnabledRefRO" : "GetEnabledRefRW")}<{fullyQualifiedTypeName}>(entityIndexInChunk)";
                     return (requiredVariableDeclaration, SetUp: default, value);
                 }
                 default:
@@ -937,10 +1133,12 @@ public class JobEntityParam_ComponentDataOrBufferElementData : JobEntityParam
             }
         }
     }
+
     public RefWrapperType RefWrapperType { get; }
     public bool IsZeroSizedComponent { get; }
     public bool IsEnableableComponent { get; }
 }
+
 public interface IAttributeParameter
 {
     public bool IsInt { get; }
@@ -949,7 +1147,8 @@ public interface IAttributeParameter
 
 class JobEntityParamValueTypesPassedWithDefaultArguments : JobEntityParam
 {
-    internal JobEntityParamValueTypesPassedWithDefaultArguments(IParameterSymbol parameterSymbol) : base(parameterSymbol, "")
+    internal JobEntityParamValueTypesPassedWithDefaultArguments(IParameterSymbol parameterSymbol)
+        : base(parameterSymbol, "")
     {
         ExecuteMethodArgumentValue = "default";
     }
@@ -960,9 +1159,11 @@ class JobEntityParam_EntityIndexInQuery : JobEntityParam, IAttributeParameter
     public bool IsInt => TypeSymbol.IsInt();
     public string AttributeName => "EntityIndexInQuery";
 
-    internal JobEntityParam_EntityIndexInQuery(IParameterSymbol parameterSymbol) : base(parameterSymbol, string.Empty)
+    internal JobEntityParam_EntityIndexInQuery(IParameterSymbol parameterSymbol)
+        : base(parameterSymbol, string.Empty)
     {
-        ExecuteMethodArgumentSetup = " var entityIndexInQuery = __ChunkBaseEntityIndices[chunkIndexInQuery] + matchingEntityCount;";
+        ExecuteMethodArgumentSetup =
+            " var entityIndexInQuery = __ChunkBaseEntityIndices[chunkIndexInQuery] + matchingEntityCount;";
         ExecuteMethodArgumentValue = "entityIndexInQuery";
     }
 }
@@ -971,7 +1172,9 @@ class JobEntityParam_ChunkIndexInQuery : JobEntityParam, IAttributeParameter
 {
     public bool IsInt => TypeSymbol.IsInt();
     public string AttributeName => "ChunkIndexInQuery";
-    internal JobEntityParam_ChunkIndexInQuery(IParameterSymbol parameterSymbol) : base(parameterSymbol, string.Empty)
+
+    internal JobEntityParam_ChunkIndexInQuery(IParameterSymbol parameterSymbol)
+        : base(parameterSymbol, string.Empty)
     {
         // TODO(DOTS-6130): an extra helper job is needed to provided the chunk index in query when the query has chunk filtering enabled.
         // For now this is an unfiltered chunk index.
@@ -983,7 +1186,9 @@ class JobEntityParam_EntityIndexInChunk : JobEntityParam, IAttributeParameter
 {
     public bool IsInt => TypeSymbol.IsInt();
     public string AttributeName => "EntityIndexInChunk";
-    internal JobEntityParam_EntityIndexInChunk(IParameterSymbol parameterSymbol) : base(parameterSymbol, string.Empty)
+
+    internal JobEntityParam_EntityIndexInChunk(IParameterSymbol parameterSymbol)
+        : base(parameterSymbol, string.Empty)
     {
         ExecuteMethodArgumentValue = "entityIndexInChunk";
     }
@@ -1009,7 +1214,8 @@ public abstract class JobEntityParam
         bool performSafetyChecks,
         ISourceGeneratorDiagnosable diagnosable,
         string typeHandleFieldName,
-        string constructedFrom = null)
+        string constructedFrom = null
+    )
     {
         var refWrapperType = constructedFrom switch
         {
@@ -1017,10 +1223,20 @@ public abstract class JobEntityParam
             "global::Unity.Entities.RefRO<T>" => RefWrapperType.RefRO,
             "global::Unity.Entities.EnabledRefRW<T>" => RefWrapperType.EnabledRefRW,
             "global::Unity.Entities.EnabledRefRO<T>" => RefWrapperType.EnabledRefRO,
-            _ => RefWrapperType.None
+            _ => RefWrapperType.None,
         };
 
-        return (true, new JobEntityParam_ComponentDataOrBufferElementData(parameterSymbol, typeSymbol, isReadOnly, refWrapperType, performSafetyChecks, typeHandleFieldName));
+        return (
+            true,
+            new JobEntityParam_ComponentDataOrBufferElementData(
+                parameterSymbol,
+                typeSymbol,
+                isReadOnly,
+                refWrapperType,
+                performSafetyChecks,
+                typeHandleFieldName
+            )
+        );
     }
 
     internal JobEntityParam(IParameterSymbol parameterSymbol, string typeHandleFieldName)

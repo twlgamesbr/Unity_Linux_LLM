@@ -7,6 +7,6 @@ namespace NPCSystem.Monitoring
         Skipped,
         Fallback,
         Warning,
-        Error
+        Error,
     }
 }

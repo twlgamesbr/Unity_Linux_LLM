@@ -1,13 +1,10 @@
-﻿using UnityEngine;
-using UnityEditor;
-
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
-
-    public static class EditorShaderUtilities 
+    public static class EditorShaderUtilities
     {
-
         /// <summary>
         /// Copy Shader properties from source to destination material.
         /// </summary>
@@ -26,7 +23,7 @@ namespace TMPro.EditorUtilities
                     switch (source.shader.GetPropertyType(i))
                     {
                         case UnityEngine.Rendering.ShaderPropertyType.Color:
-                            destination.SetColor(property_ID, source.GetColor(property_ID));                          
+                            destination.SetColor(property_ID, source.GetColor(property_ID));
                             break;
                         case UnityEngine.Rendering.ShaderPropertyType.Float:
                             destination.SetFloat(property_ID, source.GetFloat(property_ID));
@@ -43,9 +40,6 @@ namespace TMPro.EditorUtilities
                     }
                 }
             }
-
         }
-      
     }
-
 }

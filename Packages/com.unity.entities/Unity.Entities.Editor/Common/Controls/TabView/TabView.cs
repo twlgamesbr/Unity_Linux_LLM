@@ -124,9 +124,14 @@ namespace Unity.Entities.Editor
 
         void AddTab(TabContent content)
         {
-            var tab = new Label(!string.IsNullOrEmpty(content.TabName) ? content.TabName : $"Tab {m_Header.childCount + 1}");
+            var tab = new Label(
+                !string.IsNullOrEmpty(content.TabName) ? content.TabName : $"Tab {m_Header.childCount + 1}"
+            );
             tab.AddToClassList(s_TabClassName);
-            tab.RegisterCallback<PointerDownEvent, TabView>((evt, tabView) => tabView.value = tabView.m_Header.IndexOf((VisualElement)evt.target), this);
+            tab.RegisterCallback<PointerDownEvent, TabView>(
+                (evt, tabView) => tabView.value = tabView.m_Header.IndexOf((VisualElement)evt.target),
+                this
+            );
             content.RegisterValueChangedCallback(evt =>
             {
                 if (evt.target == content)

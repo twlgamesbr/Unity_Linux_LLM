@@ -141,15 +141,17 @@ namespace Unity.Scenes.Editor
                         if (sectionIndex == 0)
                             section0IsLoaded = isLoaded;
 
-                        loadables.Add(new SubSceneInspectorUtility.LoadableScene
-                        {
-                            Scene = section,
-                            Name = name,
-                            SubScene = scene,
-                            SectionIndex = sectionIndex,
-                            IsLoaded = isLoaded,
-                            Section0IsLoaded = section0IsLoaded,
-                        });
+                        loadables.Add(
+                            new SubSceneInspectorUtility.LoadableScene
+                            {
+                                Scene = section,
+                                Name = name,
+                                SubScene = scene,
+                                SectionIndex = sectionIndex,
+                                IsLoaded = isLoaded,
+                                Section0IsLoaded = section0IsLoaded,
+                            }
+                        );
                     }
                 }
 
@@ -185,7 +187,9 @@ namespace Unity.Scenes.Editor
                 var statePtr = world.Unmanaged.ResolveSystemState(sceneSystem);
                 if (statePtr != null)
                 {
-                    var buildConfigGuid = world.EntityManager.GetComponentData<SceneSystemData>(sceneSystem).BuildConfigurationGUID;
+                    var buildConfigGuid = world
+                        .EntityManager.GetComponentData<SceneSystemData>(sceneSystem)
+                        .BuildConfigurationGUID;
                     foreach (var scene in scenes)
                         needRefresh |= SceneWithBuildConfigurationGUIDs.Dirty(scene.SceneGUID, buildConfigGuid);
                 }
@@ -256,7 +260,9 @@ namespace Unity.Scenes.Editor
             var entities = world.EntityManager;
             foreach (SubScene subScene in targets)
             {
-                foreach (var section in GetActiveWorldSections(World.DefaultGameObjectInjectionWorld, subScene.SceneGUID))
+                foreach (
+                    var section in GetActiveWorldSections(World.DefaultGameObjectInjectionWorld, subScene.SceneGUID)
+                )
                 {
                     if (entities.HasComponent<SceneBoundingVolume>(section))
                         bounds.Encapsulate(entities.GetComponentData<SceneBoundingVolume>(section).Value);

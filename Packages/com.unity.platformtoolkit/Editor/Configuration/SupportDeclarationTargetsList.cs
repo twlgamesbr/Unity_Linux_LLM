@@ -8,7 +8,9 @@ namespace Unity.PlatformToolkit.Editor
     {
         public SupportDeclarationTargetsList()
         {
-            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/EditorResources/UI/SupportDeclarationTargetsList.uxml");
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Packages/com.unity.platformtoolkit/EditorResources/UI/SupportDeclarationTargetsList.uxml"
+            );
             uxml.CloneTree(this);
 
 #if UNITY_6000_4_OR_NEWER
@@ -23,7 +25,6 @@ namespace Unity.PlatformToolkit.Editor
 
             foreach (var supportDeclaration in SupportDeclarationManager.SupportDeclarations.OrderBy(p => p.ToString()))
             {
-
                 var spt = new SupportDeclarationTarget(supportDeclaration, targetsManager);
                 var field = new SupportDeclarationTargetField(spt);
                 declarationsList.Add(field);

@@ -58,7 +58,16 @@ namespace UnityEngine.Rendering
             m_CameraNames[GetCameraCount() - 1] = new GUIContent("Original Camera");
             m_CameraIndices[GetCameraCount() - 1] = GetCameraCount() - 1;
 
-            m_DebugEntry = new DebugUI.EnumField { displayName = "Camera Switcher", getter = () => m_CurrentCameraIndex, setter = value => SetCameraIndex(value), enumNames = m_CameraNames, enumValues = m_CameraIndices, getIndex = () => m_DebugEntryEnumIndex, setIndex = value => m_DebugEntryEnumIndex = value };
+            m_DebugEntry = new DebugUI.EnumField
+            {
+                displayName = "Camera Switcher",
+                getter = () => m_CurrentCameraIndex,
+                setter = value => SetCameraIndex(value),
+                enumNames = m_CameraNames,
+                enumValues = m_CameraIndices,
+                getIndex = () => m_DebugEntryEnumIndex,
+                setIndex = value => m_DebugEntryEnumIndex = value,
+            };
             var panel = DebugManager.instance.GetPanel("Camera", true);
             panel.children.Add(m_DebugEntry);
         }
@@ -102,10 +111,16 @@ namespace UnityEngine.Rendering
                 if (m_CurrentCamera != null)
                 {
                     // If we witch back to the original camera, put back the transform in it.
-                    if (m_CurrentCamera == m_OriginalCamera) 
-                        m_OriginalCamera.transform.SetPositionAndRotation(m_OriginalCameraPosition, m_OriginalCameraRotation);
+                    if (m_CurrentCamera == m_OriginalCamera)
+                        m_OriginalCamera.transform.SetPositionAndRotation(
+                            m_OriginalCameraPosition,
+                            m_OriginalCameraRotation
+                        );
 
-                    transform.SetPositionAndRotation(m_CurrentCamera.transform.position, m_CurrentCamera.transform.rotation);
+                    transform.SetPositionAndRotation(
+                        m_CurrentCamera.transform.position,
+                        m_CurrentCamera.transform.rotation
+                    );
                 }
             }
         }

@@ -42,7 +42,11 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         {
             InitializeSetUpAndTearDownCommands();
 
-            if (UnityTestExecutionContext.CurrentContext != null && m_DontRunRestoringResult && EditModeTestCallbacks.RestoringTestContext != null)
+            if (
+                UnityTestExecutionContext.CurrentContext != null
+                && m_DontRunRestoringResult
+                && EditModeTestCallbacks.RestoringTestContext != null
+            )
             {
                 EditModeTestCallbacks.RestoringTestContext();
             }
@@ -68,7 +72,11 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                     //If we do not, the objects could be automatically destroyed when exiting playmode and could result in errors later on
                                     yield return null;
 
-                                    foreach (var child in _unityOneTimeSetupTearDownCommand.ExecuteOneTimeSetUpEnumerable(Context))
+                                    foreach (
+                                        var child in _unityOneTimeSetupTearDownCommand.ExecuteOneTimeSetUpEnumerable(
+                                            Context
+                                        )
+                                    )
                                         yield return child;
 
                                     PerformOneTimeSetUp();
@@ -92,16 +100,27 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                         case TestStatus.Skipped:
                                         case TestStatus.Inconclusive:
                                         case TestStatus.Failed:
-                                            SkipChildren(_suite, Result.ResultState.WithSite(FailureSite.Parent), "OneTimeSetUp: " + Result.Message);
+                                            SkipChildren(
+                                                _suite,
+                                                Result.ResultState.WithSite(FailureSite.Parent),
+                                                "OneTimeSetUp: " + Result.Message
+                                            );
                                             break;
                                     }
                                 }
 
-                                if (Context.ExecutionStatus != TestExecutionStatus.AbortRequested && !m_DontRunRestoringResult)
+                                if (
+                                    Context.ExecutionStatus != TestExecutionStatus.AbortRequested
+                                    && !m_DontRunRestoringResult
+                                )
                                 {
                                     PerformOneTimeTearDown();
 
-                                    foreach (var child in _unityOneTimeSetupTearDownCommand.ExecuteOneTimeTeardownEnumerable(Context))
+                                    foreach (
+                                        var child in _unityOneTimeSetupTearDownCommand.ExecuteOneTimeTeardownEnumerable(
+                                            Context
+                                        )
+                                    )
                                         yield return child;
                                 }
                             }
@@ -138,18 +157,24 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
         private void InitializeSetUpAndTearDownCommands()
         {
-            List<SetUpTearDownItem> setUpTearDownItems = _suite.TypeInfo != null
-                ? CommandBuilder.BuildSetUpTearDownList(_suite.TypeInfo.Type, typeof(OneTimeSetUpAttribute), typeof(OneTimeTearDownAttribute))
-                : new List<SetUpTearDownItem>();
+            List<SetUpTearDownItem> setUpTearDownItems =
+                _suite.TypeInfo != null
+                    ? CommandBuilder.BuildSetUpTearDownList(
+                        _suite.TypeInfo.Type,
+                        typeof(OneTimeSetUpAttribute),
+                        typeof(OneTimeTearDownAttribute)
+                    )
+                    : new List<SetUpTearDownItem>();
 
             var actionItems = new List<TestActionItem>();
             foreach (ITestAction action in Actions)
             {
-                bool applyToSuite = (action.Targets & ActionTargets.Suite) == ActionTargets.Suite
+                bool applyToSuite =
+                    (action.Targets & ActionTargets.Suite) == ActionTargets.Suite
                     || action.Targets == ActionTargets.Default && !(Test is ParameterizedMethodSuite);
 
-                bool applyToTest = (action.Targets & ActionTargets.Test) == ActionTargets.Test
-                    && !(Test is ParameterizedMethodSuite);
+                bool applyToTest =
+                    (action.Targets & ActionTargets.Test) == ActionTargets.Test && !(Test is ParameterizedMethodSuite);
 
                 if (applyToSuite)
                     actionItems.Add(new TestActionItem(action));
@@ -304,7 +329,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
         private static bool ShouldExecuteEvents(Test test)
         {
-            return UnityWorkItemDataHolder.alreadyExecutedTests == null || UnityWorkItemDataHolder.alreadyExecutedTests.All(x => x != test.GetUniqueName());
+            return UnityWorkItemDataHolder.alreadyExecutedTests == null
+                || UnityWorkItemDataHolder.alreadyExecutedTests.All(x => x != test.GetUniqueName());
         }
 
         private void PerformOneTimeTearDown()
@@ -364,7 +390,9 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             {
                 var ctx = child.Context;
                 if (ctx != null)
-                    ctx.ExecutionStatus = force ? TestExecutionStatus.AbortRequested : TestExecutionStatus.StopRequested;
+                    ctx.ExecutionStatus = force
+                        ? TestExecutionStatus.AbortRequested
+                        : TestExecutionStatus.StopRequested;
 
                 if (child.State == WorkItemState.Running)
                     child.Cancel(force);

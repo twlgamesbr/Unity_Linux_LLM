@@ -6,18 +6,18 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
+using Unity.Entities.Graphics;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Profiling;
-using Unity.Entities.Graphics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Rendering;
+using AABB = Unity.Mathematics.AABB;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
-using AABB = Unity.Mathematics.AABB;
 
 namespace Unity.Rendering
 {
@@ -71,7 +71,7 @@ namespace Unity.Rendering
             int cmp_batchID = BatchID.CompareTo(other.BatchID);
 
             int4 lt = math.select(int4.zero, new int4(-1), a < b);
-            int4 gt = math.select(int4.zero, new int4( 1), a > b);
+            int4 gt = math.select(int4.zero, new int4(1), a > b);
             int4 neq = lt | gt;
 
             int* firstNonZero = stackalloc int[4];
@@ -120,7 +120,7 @@ namespace Unity.Rendering
             m_CachedHash = ChunkDrawCommandOutput.FastHash(this);
         }
 
-        public bool HasSortingPosition => (int) (Flags & BatchDrawCommandFlags.HasSortingPosition) != 0;
+        public bool HasSortingPosition => (int)(Flags & BatchDrawCommandFlags.HasSortingPosition) != 0;
 
         public override string ToString()
         {
@@ -143,6 +143,7 @@ namespace Unity.Rendering
         {
             [FieldOffset(0)]
             public AllocatorHelper<RewindableAllocator> Allocator;
+
             [FieldOffset(16)]
             public bool UsedSinceRewind;
 
@@ -158,17 +159,19 @@ namespace Unity.Rendering
         public ThreadLocalAllocator(int expectedUsedCount = -1, int initialSize = kInitialSize)
         {
             // Note, the comparison is <= as on 32-bit builds this size will be smaller, which is fine.
-            Assert.IsTrue(sizeof(AllocatorHelper<RewindableAllocator>) <= 16, $"PaddedAllocator's Allocator size has changed. The type layout needs adjusting.");
-            Assert.IsTrue(sizeof(PaddedAllocator) >= JobsUtility.CacheLineSize,
-                $"Thread local allocators should be on different cache lines. Size: {sizeof(PaddedAllocator)}, Cache Line: {JobsUtility.CacheLineSize}");
+            Assert.IsTrue(
+                sizeof(AllocatorHelper<RewindableAllocator>) <= 16,
+                $"PaddedAllocator's Allocator size has changed. The type layout needs adjusting."
+            );
+            Assert.IsTrue(
+                sizeof(PaddedAllocator) >= JobsUtility.CacheLineSize,
+                $"Thread local allocators should be on different cache lines. Size: {sizeof(PaddedAllocator)}, Cache Line: {JobsUtility.CacheLineSize}"
+            );
 
             if (expectedUsedCount < 0)
                 expectedUsedCount = math.max(0, JobsUtility.JobWorkerCount + 1);
 
-            Allocators = new UnsafeList<PaddedAllocator>(
-                NumThreads,
-                kAllocator,
-                NativeArrayOptions.ClearMemory);
+            Allocators = new UnsafeList<PaddedAllocator>(NumThreads, kAllocator, NativeArrayOptions.ClearMemory);
             Allocators.Resize(NumThreads);
 
             for (int i = 0; i < NumThreads; ++i)
@@ -198,7 +201,6 @@ namespace Unity.Rendering
                 allocator.UsedSinceRewind = false;
             }
             rewindAllocatorsMarker.End();
-
         }
 
         public void Dispose()
@@ -253,10 +255,9 @@ namespace Unity.Rendering
 
         public int NumDrawCommands => HasSortingPosition ? NumDrawCommandsHasPositions : NumDrawCommandsNoPositions;
         public int NumDrawCommandsHasPositions => NumInstances;
+
         // Round up to always have enough commands
-        public int NumDrawCommandsNoPositions =>
-            (MaxInstancesPerCommand - 1 + NumInstances) /
-            MaxInstancesPerCommand;
+        public int NumDrawCommandsNoPositions => (MaxInstancesPerCommand - 1 + NumInstances) / MaxInstancesPerCommand;
     }
 
     internal unsafe struct DrawCommandWorkItem
@@ -296,7 +297,8 @@ namespace Unity.Rendering
     }
 
     [BurstCompile]
-    internal unsafe struct DrawStream<T> where T : unmanaged
+    internal unsafe struct DrawStream<T>
+        where T : unmanaged
     {
         public const int kArraySizeElements = 16;
         public static int ElementsPerHeader => (sizeof(Header) + sizeof(T) - 1) / sizeof(T);
@@ -358,8 +360,10 @@ namespace Unity.Rendering
         {
             // Next array in the chain of arrays
             public Header* Next;
+
             // Number of structs in this array
             public int NumElements;
+
             // Number of instances in this array
             public int NumInstances;
 
@@ -374,15 +378,13 @@ namespace Unity.Rendering
 
         public static Header* AllocateArray(RewindableAllocator* allocator)
         {
-            int alignment = math.max(
-                UnsafeUtility.AlignOf<Header>(),
-                UnsafeUtility.AlignOf<T>());
+            int alignment = math.max(UnsafeUtility.AlignOf<Header>(), UnsafeUtility.AlignOf<T>());
 
             // Make sure we always have space for ElementsPerArray elements,
             // so several streams can be kept in lockstep
             int allocCount = ElementsPerHeader + ElementsPerArray;
 
-            Header* buffer = (Header*) allocator->Allocate(sizeof(T), alignment, allocCount);
+            Header* buffer = (Header*)allocator->Allocate(sizeof(T), alignment, allocCount);
 
             // Zero clear the header area (first struct)
             UnsafeUtility.MemSet(buffer, 0, sizeof(Header));
@@ -423,6 +425,7 @@ namespace Unity.Rendering
         private DrawStream<DrawCommandVisibility> m_Stream;
         private DrawStream<IntPtr> m_ChunkTransformsStream;
         private int m_PrevChunkStartIndex;
+
         [NoAlias]
         private DrawCommandVisibility* m_PrevVisibility;
 
@@ -460,9 +463,13 @@ namespace Unity.Rendering
             m_Stream.AddInstances(1);
         }
 
-        public void EmitDepthSorted(RewindableAllocator* allocator,
-            int qwordIndex, int bitIndex, int chunkStartIndex,
-            float4x4* chunkTransforms)
+        public void EmitDepthSorted(
+            RewindableAllocator* allocator,
+            int qwordIndex,
+            int bitIndex,
+            int chunkStartIndex,
+            float4x4* chunkTransforms
+        )
         {
             DrawCommandVisibility* visibility;
 
@@ -484,7 +491,7 @@ namespace Unity.Rendering
                     m_ChunkTransformsStream.Init(allocator);
 
                 var transforms = m_ChunkTransformsStream.AppendElement(allocator);
-                *transforms = (IntPtr) chunkTransforms;
+                *transforms = (IntPtr)chunkTransforms;
             }
 
             visibility->VisibleInstances[qwordIndex] |= 1ul << bitIndex;
@@ -536,7 +543,13 @@ namespace Unity.Rendering
                 DrawCommands.Dispose();
         }
 
-        public bool Emit(DrawCommandSettings settings, int qwordIndex, int bitIndex, int chunkStartIndex, int threadIndex)
+        public bool Emit(
+            DrawCommandSettings settings,
+            int qwordIndex,
+            int bitIndex,
+            int chunkStartIndex,
+            int threadIndex
+        )
         {
             var allocator = ThreadLocalAllocator.ThreadAllocator(threadIndex);
 
@@ -548,7 +561,6 @@ namespace Unity.Rendering
             }
             else
             {
-
                 streamIndex = DrawCommands.Length;
                 DrawCommands.Add(new DrawCommandStream(allocator));
                 DrawCommandStreamIndices.Add(settings, streamIndex);
@@ -561,9 +573,13 @@ namespace Unity.Rendering
         }
 
         public bool EmitDepthSorted(
-            DrawCommandSettings settings, int qwordIndex, int bitIndex, int chunkStartIndex,
+            DrawCommandSettings settings,
+            int qwordIndex,
+            int bitIndex,
+            int chunkStartIndex,
             float4x4* chunkTransforms,
-            int threadIndex)
+            int threadIndex
+        )
         {
             var allocator = ThreadLocalAllocator.ThreadAllocator(threadIndex);
 
@@ -575,7 +591,6 @@ namespace Unity.Rendering
             }
             else
             {
-
                 streamIndex = DrawCommands.Length;
                 DrawCommands.Add(new DrawCommandStream(allocator));
                 DrawCommandStreamIndices.Add(settings, streamIndex);
@@ -606,7 +621,8 @@ namespace Unity.Rendering
                 WorkItems = new UnsafeList<DrawCommandWorkItem>(
                     kCollectBufferSize,
                     kAllocator,
-                    NativeArrayOptions.UninitializedMemory);
+                    NativeArrayOptions.UninitializedMemory
+                );
 
             if (WorkItems.Length + count > WorkItems.Capacity)
                 Flush(dst);
@@ -690,7 +706,8 @@ namespace Unity.Rendering
                 var uniqueSettings = new NativeArray<DrawCommandSettings>(
                     ThreadLocalArraySize,
                     Allocator.Temp,
-                    NativeArrayOptions.UninitializedMemory);
+                    NativeArrayOptions.UninitializedMemory
+                );
                 int numSettings = 0;
 
                 var keys = drawCommands.DrawCommandStreamIndices.GetEnumerator();
@@ -708,7 +725,8 @@ namespace Unity.Rendering
             private void AddBin(
                 NativeArray<DrawCommandSettings> uniqueSettings,
                 ref int numSettings,
-                DrawCommandSettings settings)
+                DrawCommandSettings settings
+            )
             {
                 if (numSettings >= ThreadLocalArraySize)
                 {
@@ -720,16 +738,12 @@ namespace Unity.Rendering
                 ++numSettings;
             }
 
-            private void Flush(
-                NativeArray<DrawCommandSettings> uniqueSettings,
-                int numSettings)
+            private void Flush(NativeArray<DrawCommandSettings> uniqueSettings, int numSettings)
             {
                 if (numSettings <= 0)
                     return;
 
-                m_BinsParallel.AddRangeNoResize(
-                    uniqueSettings.GetUnsafeReadOnlyPtr(),
-                    numSettings);
+                m_BinsParallel.AddRangeNoResize(uniqueSettings.GetUnsafeReadOnlyPtr(), numSettings);
             }
         }
 
@@ -752,13 +766,12 @@ namespace Unity.Rendering
 
         public JobHandle Dispose(JobHandle dependency)
         {
-            return JobHandle.CombineDependencies(
-                Bins.Dispose(dependency),
-                m_BinSet.Dispose(dependency));
+            return JobHandle.CombineDependencies(Bins.Dispose(dependency), m_BinSet.Dispose(dependency));
         }
     }
 
-    internal unsafe struct IndirectList<T> where T : unmanaged
+    internal unsafe struct IndirectList<T>
+        where T : unmanaged
     {
         [NativeDisableUnsafePtrRestriction]
         public UnsafeList<T>* List;
@@ -769,9 +782,13 @@ namespace Unity.Rendering
         }
 
         public int Length => List->Length;
+
         public void Resize(int length, NativeArrayOptions options) => List->Resize(length, options);
+
         public void SetCapacity(int capacity) => List->SetCapacity(capacity);
+
         public ref T ElementAt(int i) => ref List->ElementAt(i);
+
         public void Add(T value) => List->Add(value);
 
         private static UnsafeList<T>* AllocIndirectList(int capacity, RewindableAllocator* allocator)
@@ -789,9 +806,7 @@ namespace Unity.Rendering
             return default;
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 
     internal static class IndirectListExtensions
@@ -800,7 +815,8 @@ namespace Unity.Rendering
             this T jobData,
             IndirectList<U> list,
             int innerLoopBatchCount = 1,
-            JobHandle dependencies = default)
+            JobHandle dependencies = default
+        )
             where T : struct, IJobParallelForDefer
             where U : unmanaged
         {
@@ -857,13 +873,15 @@ namespace Unity.Rendering
         public ProfilerMarker ProfilerEmit;
 
 #pragma warning disable 649
-        [NativeSetThreadIndex] public int ThreadIndex;
+        [NativeSetThreadIndex]
+        public int ThreadIndex;
 #pragma warning restore 649
 
         public ChunkDrawCommandOutput(
             int initialBinCapacity,
             ThreadLocalAllocator tlAllocator,
-            BatchCullingOutput cullingOutput)
+            BatchCullingOutput cullingOutput
+        )
         {
             BinCapacity = initialBinCapacity;
             CullingOutput = cullingOutput.drawCommands;
@@ -874,24 +892,26 @@ namespace Unity.Rendering
             ThreadLocalDrawCommands = new UnsafeList<ThreadLocalDrawCommands>(
                 NumThreads,
                 generalAllocator->Handle,
-                NativeArrayOptions.ClearMemory);
+                NativeArrayOptions.ClearMemory
+            );
             ThreadLocalDrawCommands.Resize(ThreadLocalDrawCommands.Capacity);
             ThreadLocalCollectBuffers = new UnsafeList<ThreadLocalCollectBuffer>(
                 NumThreads,
                 generalAllocator->Handle,
-                NativeArrayOptions.ClearMemory);
+                NativeArrayOptions.ClearMemory
+            );
             ThreadLocalCollectBuffers.Resize(ThreadLocalCollectBuffers.Capacity);
             BinPresentFilter = new UnsafeList<long>(
                 kBinPresentFilterSize * kNumThreadsBitfieldLength,
                 generalAllocator->Handle,
-                NativeArrayOptions.ClearMemory);
+                NativeArrayOptions.ClearMemory
+            );
             BinPresentFilter.Resize(BinPresentFilter.Capacity);
 
             BinCollector = new DrawBinCollector(ThreadLocalDrawCommands, generalAllocator);
             SortedBins = new IndirectList<int>(0, generalAllocator);
             BinIndices = new IndirectList<DrawCommandBin>(0, generalAllocator);
             WorkItems = new IndirectList<DrawCommandWorkItem>(0, generalAllocator);
-
 
             // Initialized by job system
             ThreadIndex = 0;
@@ -907,24 +927,24 @@ namespace Unity.Rendering
         }
 
         public BatchCullingOutputDrawCommands* CullingOutputDrawCommands =>
-            (BatchCullingOutputDrawCommands*) CullingOutput.GetUnsafePtr();
+            (BatchCullingOutputDrawCommands*)CullingOutput.GetUnsafePtr();
 
-        public static T* Malloc<T>(int count) where T : unmanaged
+        public static T* Malloc<T>(int count)
+            where T : unmanaged
         {
-            return (T*)UnsafeUtility.Malloc(
-                UnsafeUtility.SizeOf<T>() * count,
-                UnsafeUtility.AlignOf<T>(),
-                kAllocator);
+            return (T*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<T>() * count, UnsafeUtility.AlignOf<T>(), kAllocator);
         }
 
         private ThreadLocalDrawCommands* DrawCommands
         {
-            [return: NoAlias] get => ThreadLocalDrawCommands.Ptr + ThreadIndex;
+            [return: NoAlias]
+            get => ThreadLocalDrawCommands.Ptr + ThreadIndex;
         }
 
         public ThreadLocalCollectBuffer* CollectBuffer
         {
-            [return: NoAlias] get => ThreadLocalCollectBuffers.Ptr + ThreadIndex;
+            [return: NoAlias]
+            get => ThreadLocalCollectBuffers.Ptr + ThreadIndex;
         }
 
         public void Emit(DrawCommandSettings settings, int entityQword, int entityBit, int chunkStartIndex)
@@ -942,14 +962,25 @@ namespace Unity.Rendering
         }
 
         public void EmitDepthSorted(
-            DrawCommandSettings settings, int entityQword, int entityBit, int chunkStartIndex,
-            float4x4* chunkTransforms)
+            DrawCommandSettings settings,
+            int entityQword,
+            int entityBit,
+            int chunkStartIndex,
+            float4x4* chunkTransforms
+        )
         {
             // Update the cached hash code here, so all processing after this can just use the cached value
             // without recomputing the hash each time.
             settings.ComputeHashCode();
 
-            bool newBinAdded = DrawCommands->EmitDepthSorted(settings, entityQword, entityBit, chunkStartIndex, chunkTransforms, ThreadIndex);
+            bool newBinAdded = DrawCommands->EmitDepthSorted(
+                settings,
+                entityQword,
+                entityBit,
+                chunkStartIndex,
+                chunkTransforms,
+                ThreadIndex
+            );
             if (newBinAdded)
             {
                 BinCollector.Add(settings);
@@ -960,7 +991,7 @@ namespace Unity.Rendering
         [return: NoAlias]
         public long* BinPresentFilterForSettings(DrawCommandSettings settings)
         {
-            uint hash = (uint) settings.GetHashCode();
+            uint hash = (uint)settings.GetHashCode();
             uint index = hash % (uint)kBinPresentFilterSize;
             return BinPresentFilter.Ptr + index * kNumThreadsBitfieldLength;
         }
@@ -969,16 +1000,14 @@ namespace Unity.Rendering
         {
             long* settingsFilter = BinPresentFilterForSettings(settings);
 
-            uint threadQword = (uint) threadIndex / 64;
-            uint threadBit = (uint) threadIndex % 64;
+            uint threadQword = (uint)threadIndex / 64;
+            uint threadBit = (uint)threadIndex % 64;
 
-            AtomicHelpers.AtomicOr(
-                settingsFilter,
-                (int)threadQword,
-                1L << (int) threadBit);
+            AtomicHelpers.AtomicOr(settingsFilter, (int)threadQword, 1L << (int)threadBit);
         }
 
-        public static int FastHash<T>(T value) where T : struct
+        public static int FastHash<T>(T value)
+            where T : struct
         {
             // TODO: Replace with hardware CRC32?
             return (int)xxHash3.Hash64(UnsafeUtility.AddressOf(ref value), UnsafeUtility.SizeOf<T>()).x;
@@ -996,20 +1025,34 @@ namespace Unity.Rendering
 
             // When those have been released, release the data structures.
             var disposeDone = new JobHandle();
-            disposeDone = JobHandle.CombineDependencies(disposeDone,
-                ThreadLocalDrawCommands.Dispose(releaseChunkDrawCommandsDependency));
-            disposeDone = JobHandle.CombineDependencies(disposeDone,
-                ThreadLocalCollectBuffers.Dispose(releaseChunkDrawCommandsDependency));
-            disposeDone = JobHandle.CombineDependencies(disposeDone,
-                BinPresentFilter.Dispose(releaseChunkDrawCommandsDependency));
-            disposeDone = JobHandle.CombineDependencies(disposeDone,
-                BinCollector.Dispose(releaseChunkDrawCommandsDependency));
-            disposeDone = JobHandle.CombineDependencies(disposeDone,
-                SortedBins.Dispose(releaseChunkDrawCommandsDependency));
-            disposeDone = JobHandle.CombineDependencies(disposeDone,
-                BinIndices.Dispose(releaseChunkDrawCommandsDependency));
-            disposeDone = JobHandle.CombineDependencies(disposeDone,
-                WorkItems.Dispose(releaseChunkDrawCommandsDependency));
+            disposeDone = JobHandle.CombineDependencies(
+                disposeDone,
+                ThreadLocalDrawCommands.Dispose(releaseChunkDrawCommandsDependency)
+            );
+            disposeDone = JobHandle.CombineDependencies(
+                disposeDone,
+                ThreadLocalCollectBuffers.Dispose(releaseChunkDrawCommandsDependency)
+            );
+            disposeDone = JobHandle.CombineDependencies(
+                disposeDone,
+                BinPresentFilter.Dispose(releaseChunkDrawCommandsDependency)
+            );
+            disposeDone = JobHandle.CombineDependencies(
+                disposeDone,
+                BinCollector.Dispose(releaseChunkDrawCommandsDependency)
+            );
+            disposeDone = JobHandle.CombineDependencies(
+                disposeDone,
+                SortedBins.Dispose(releaseChunkDrawCommandsDependency)
+            );
+            disposeDone = JobHandle.CombineDependencies(
+                disposeDone,
+                BinIndices.Dispose(releaseChunkDrawCommandsDependency)
+            );
+            disposeDone = JobHandle.CombineDependencies(
+                disposeDone,
+                WorkItems.Dispose(releaseChunkDrawCommandsDependency)
+            );
 
             return disposeDone;
         }
@@ -1034,20 +1077,47 @@ namespace Unity.Rendering
     [BurstCompile]
     internal unsafe struct EmitDrawCommandsJob : IJobParallelForDefer
     {
-        [ReadOnly] public IndirectList<ChunkVisibilityItem> VisibilityItems;
-        [ReadOnly] public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
-        [ReadOnly] public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfo;
-        [ReadOnly] public ComponentTypeHandle<LocalToWorld> LocalToWorld;
-        [ReadOnly] public ComponentTypeHandle<DepthSorted_Tag> DepthSorted;
-        [ReadOnly] public ComponentTypeHandle<PerVertexMotionVectors_Tag> ProceduralMotion;
-        [ReadOnly] public ComponentTypeHandle<DeformedMeshIndex> DeformedMeshIndex;
-        [ReadOnly] public SharedComponentTypeHandle<RenderMeshArray> RenderMeshArray;
-        [ReadOnly] public SharedComponentTypeHandle<RenderFilterSettings> RenderFilterSettings;
-        [ReadOnly] public SharedComponentTypeHandle<LightMaps> LightMaps;
-        [ReadOnly] public NativeParallelHashMap<int, BatchFilterSettings> FilterSettings;
-        [ReadOnly] public NativeParallelHashMap<int, BRGRenderMeshArray> BRGRenderMeshArrays;
-        [ReadOnly] public ComponentTypeHandle<MeshLodInfoComponent> MeshLodInfoComponent;
-        [ReadOnly] public ComponentTypeHandle<WorldRenderBounds> BoundsComponent;
+        [ReadOnly]
+        public IndirectList<ChunkVisibilityItem> VisibilityItems;
+
+        [ReadOnly]
+        public ComponentTypeHandle<EntitiesGraphicsChunkInfo> EntitiesGraphicsChunkInfo;
+
+        [ReadOnly]
+        public ComponentTypeHandle<MaterialMeshInfo> MaterialMeshInfo;
+
+        [ReadOnly]
+        public ComponentTypeHandle<LocalToWorld> LocalToWorld;
+
+        [ReadOnly]
+        public ComponentTypeHandle<DepthSorted_Tag> DepthSorted;
+
+        [ReadOnly]
+        public ComponentTypeHandle<PerVertexMotionVectors_Tag> ProceduralMotion;
+
+        [ReadOnly]
+        public ComponentTypeHandle<DeformedMeshIndex> DeformedMeshIndex;
+
+        [ReadOnly]
+        public SharedComponentTypeHandle<RenderMeshArray> RenderMeshArray;
+
+        [ReadOnly]
+        public SharedComponentTypeHandle<RenderFilterSettings> RenderFilterSettings;
+
+        [ReadOnly]
+        public SharedComponentTypeHandle<LightMaps> LightMaps;
+
+        [ReadOnly]
+        public NativeParallelHashMap<int, BatchFilterSettings> FilterSettings;
+
+        [ReadOnly]
+        public NativeParallelHashMap<int, BRGRenderMeshArray> BRGRenderMeshArrays;
+
+        [ReadOnly]
+        public ComponentTypeHandle<MeshLodInfoComponent> MeshLodInfoComponent;
+
+        [ReadOnly]
+        public ComponentTypeHandle<WorldRenderBounds> BoundsComponent;
 
         public ChunkDrawCommandOutput DrawCommandOutput;
 
@@ -1060,7 +1130,8 @@ namespace Unity.Rendering
         public ProfilerMarker ProfilerEmitChunk;
 
 #if UNITY_EDITOR
-        [ReadOnly] public SharedComponentTypeHandle<EditorRenderData> EditorDataComponentHandle;
+        [ReadOnly]
+        public SharedComponentTypeHandle<EditorRenderData> EditorDataComponentHandle;
 #endif
 
         public void Execute(int index)
@@ -1184,8 +1255,8 @@ namespace Unity.Rendering
                                 rendererFilterSettings.MeshLodSelectionBias,
                                 MeshLodSelectionContext,
                                 worldBounds[entityIndex].Value,
-                                rendererFilterSettings.ForceMeshLod);
-
+                                rendererFilterSettings.ForceMeshLod
+                            );
                         }
 
                         if (materialMeshInfo.HasMaterialMeshIndexRange)
@@ -1200,7 +1271,9 @@ namespace Unity.Rendering
                                 if (matMeshSubMeshIndex >= brgRenderMeshArray.MaterialMeshSubMeshes.Length)
                                     continue;
 
-                                BatchMaterialMeshSubMesh matMeshSubMesh = brgRenderMeshArray.MaterialMeshSubMeshes[matMeshSubMeshIndex];
+                                BatchMaterialMeshSubMesh matMeshSubMesh = brgRenderMeshArray.MaterialMeshSubMeshes[
+                                    matMeshSubMeshIndex
+                                ];
 
                                 DrawCommandSettings settings = new DrawCommandSettings
                                 {
@@ -1211,7 +1284,7 @@ namespace Unity.Rendering
                                     SplitMask = splitMask,
                                     SubMeshIndex = (ushort)matMeshSubMesh.SubMeshIndex,
                                     Flags = drawCommandFlags,
-                                    MeshLodIndex = lodIndex
+                                    MeshLodIndex = lodIndex,
                                 };
 
                                 EmitDrawCommand(settings, j, bitIndex, chunkStartIndex, localToWorlds);
@@ -1241,7 +1314,7 @@ namespace Unity.Rendering
                                 SplitMask = splitMask,
                                 SubMeshIndex = (ushort)materialMeshInfo.SubMesh,
                                 Flags = drawCommandFlags,
-                                MeshLodIndex = lodIndex
+                                MeshLodIndex = lodIndex,
                             };
 
                             EmitDrawCommand(settings, j, bitIndex, chunkStartIndex, localToWorlds);
@@ -1251,14 +1324,25 @@ namespace Unity.Rendering
             }
         }
 
-        private void EmitDrawCommand(in DrawCommandSettings settings, int entityQword, int entityBit, int chunkStartIndex, NativeArray<LocalToWorld> localToWorlds)
+        private void EmitDrawCommand(
+            in DrawCommandSettings settings,
+            int entityQword,
+            int entityBit,
+            int chunkStartIndex,
+            NativeArray<LocalToWorld> localToWorlds
+        )
         {
             // Depth sorted draws are emitted with access to entity transforms,
             // so they can also be written out for sorting
             if (settings.HasSortingPosition)
             {
-                DrawCommandOutput.EmitDepthSorted(settings, entityQword, entityBit, chunkStartIndex,
-                    (float4x4*)localToWorlds.GetUnsafeReadOnlyPtr());
+                DrawCommandOutput.EmitDepthSorted(
+                    settings,
+                    entityQword,
+                    entityBit,
+                    chunkStartIndex,
+                    (float4x4*)localToWorlds.GetUnsafeReadOnlyPtr()
+                );
             }
             else
             {
@@ -1285,22 +1369,38 @@ namespace Unity.Rendering
 #endif
         }
 
-        private float GetCameraHeightAtDistanceSqr(float3 aabbCenter, float3 cameraPosition,
-            float meshLodSelectionConstant, bool isOrtho)
+        private float GetCameraHeightAtDistanceSqr(
+            float3 aabbCenter,
+            float3 cameraPosition,
+            float meshLodSelectionConstant,
+            bool isOrtho
+        )
         {
-            return isOrtho ? meshLodSelectionConstant :
-                math.lengthsq(aabbCenter - cameraPosition) * meshLodSelectionConstant;
+            return isOrtho
+                ? meshLodSelectionConstant
+                : math.lengthsq(aabbCenter - cameraPosition) * meshLodSelectionConstant;
         }
 
         // Algorithm is detailed and must be kept in sync with CalculateMeshLod (C++)  and ComputeMeshLODLevel in SRP
-        private ushort ComputeMeshLODLevel(ref MeshLodInfoComponent comp, float selectionBias, MeshLodSelectionContext lodSelectionContext, AABB worldAABB, int forceLod)
+        private ushort ComputeMeshLODLevel(
+            ref MeshLodInfoComponent comp,
+            float selectionBias,
+            MeshLodSelectionContext lodSelectionContext,
+            AABB worldAABB,
+            int forceLod
+        )
         {
             if (forceLod >= 0)
-                return (ushort)math.clamp(forceLod, 0, comp.lodCount-1);
+                return (ushort)math.clamp(forceLod, 0, comp.lodCount - 1);
 
             var radiusSqr = math.max(math.lengthsq(worldAABB.Extents), 1e-5f);
             var diameterSqr = radiusSqr * 4;
-            var cameraSqrHeightAtDistance = GetCameraHeightAtDistanceSqr(worldAABB.Center, lodSelectionContext.CameraPosition, lodSelectionContext.SqrMeshLodSelectionConstant, lodSelectionContext.IsOrtho);
+            var cameraSqrHeightAtDistance = GetCameraHeightAtDistanceSqr(
+                worldAABB.Center,
+                lodSelectionContext.CameraPosition,
+                lodSelectionContext.SqrMeshLodSelectionConstant,
+                lodSelectionContext.IsOrtho
+            );
 
             var boundsDesiredPercentage = math.sqrt(cameraSqrHeightAtDistance / diameterSqr);
 
@@ -1310,12 +1410,11 @@ namespace Unity.Rendering
             levelIndexFlt = math.max(levelIndexFlt, 0);
             levelIndexFlt += selectionBias;
 
-            levelIndexFlt = math.clamp(levelIndexFlt,0, comp.lodCount - 1);
+            levelIndexFlt = math.clamp(levelIndexFlt, 0, comp.lodCount - 1);
 
             return (ushort)math.floor(levelIndexFlt);
         }
     }
-
 
     [BurstCompile]
     internal unsafe struct AllocateWorkItemsJob : IJob
@@ -1348,8 +1447,11 @@ namespace Unity.Rendering
 
             public int ValuesPerIndex => (SortedBins.Length + kNumSlices - 1) / kNumSlices;
 
-            [return: NoAlias] public int* ValuesTemp(int i = 0) => SortTemp.List->Ptr + i;
-            [return: NoAlias] public int* ValuesDst(int i = 0) => SortedBins.List->Ptr + i;
+            [return: NoAlias]
+            public int* ValuesTemp(int i = 0) => SortTemp.List->Ptr + i;
+
+            [return: NoAlias]
+            public int* ValuesDst(int i = 0) => SortedBins.List->Ptr + i;
 
             public void GetBeginEnd(int index, out int begin, out int end)
             {
@@ -1475,36 +1577,28 @@ namespace Unity.Rendering
             RewindableAllocator* allocator,
             IndirectList<int> sortedBins,
             IndirectList<DrawCommandSettings> unsortedBins,
-            JobHandle dependency = default)
+            JobHandle dependency = default
+        )
         {
-            var sortArrays = new SortArrays
-            {
-                SortedBins = sortedBins,
-                SortTemp = new IndirectList<int>(0, allocator),
-            };
+            var sortArrays = new SortArrays { SortedBins = sortedBins, SortTemp = new IndirectList<int>(0, allocator) };
 
-            var alloc = new AllocateForSortJob
-            {
-                Arrays = sortArrays,
-                UnsortedBins = unsortedBins,
-            }.Schedule(dependency);
+            var alloc = new AllocateForSortJob { Arrays = sortArrays, UnsortedBins = unsortedBins }.Schedule(
+                dependency
+            );
 
-            var sortSlices = new SortSlicesJob
-            {
-                Arrays = sortArrays,
-                UnsortedBins = unsortedBins,
-            }.Schedule(kNumSlices, 1, alloc);
+            var sortSlices = new SortSlicesJob { Arrays = sortArrays, UnsortedBins = unsortedBins }.Schedule(
+                kNumSlices,
+                1,
+                alloc
+            );
 
-            var mergeSlices = new MergeSlicesJob
-            {
-                Arrays = sortArrays,
-                UnsortedBins = unsortedBins,
-            }.Schedule(sortSlices);
+            var mergeSlices = new MergeSlicesJob { Arrays = sortArrays, UnsortedBins = unsortedBins }.Schedule(
+                sortSlices
+            );
 
             return mergeSlices;
         }
     }
-
 
     [BurstCompile]
     internal unsafe struct CollectWorkItemsJob : IJobParallelForDefer
@@ -1539,7 +1633,7 @@ namespace Unity.Rendering
                 // Load a filter bitfield which has a 1 bit for every thread index that might contain
                 // draws for a given DrawCommandSettings. The filter is exact if there are no hash
                 // collisions, but might contain false positives if hash collisions happened.
-                ulong qword = (ulong) binPresentFilter[qwIndex];
+                ulong qword = (ulong)binPresentFilter[qwIndex];
 
                 while (qword != 0)
                 {
@@ -1561,23 +1655,27 @@ namespace Unity.Rendering
                         if (hasSortingPosition)
                         {
                             var transformStream = threadDraws.DrawCommands[streamIndex].TransformsStream;
-                            collectBuffer->Add(new DrawCommandWorkItem
-                            {
-                                Arrays = stream.Head,
-                                TransformArrays = transformStream.Head,
-                                BinIndex = index,
-                                PrefixSumNumInstances = numInstancesPrefixSum,
-                            });
+                            collectBuffer->Add(
+                                new DrawCommandWorkItem
+                                {
+                                    Arrays = stream.Head,
+                                    TransformArrays = transformStream.Head,
+                                    BinIndex = index,
+                                    PrefixSumNumInstances = numInstancesPrefixSum,
+                                }
+                            );
                         }
                         else
                         {
-                            collectBuffer->Add(new DrawCommandWorkItem
-                            {
-                                Arrays = stream.Head,
-                                TransformArrays = null,
-                                BinIndex = index,
-                                PrefixSumNumInstances = numInstancesPrefixSum,
-                            });
+                            collectBuffer->Add(
+                                new DrawCommandWorkItem
+                                {
+                                    Arrays = stream.Head,
+                                    TransformArrays = null,
+                                    BinIndex = index,
+                                    PrefixSumNumInstances = numInstancesPrefixSum,
+                                }
+                            );
                         }
 
                         numInstancesPrefixSum += stream.TotalInstanceCount;
@@ -1632,9 +1730,7 @@ namespace Unity.Rendering
                 // Keep kNoSortingPosition in the PositionOffset if no sorting
                 // positions, so draw command jobs can reliably check it to
                 // to know whether there are positions without needing access to flags
-                bin.PositionOffset = hasSortingPosition
-                    ? sortingPositionPrefixSum
-                    : DrawCommandBin.kNoSortingPosition;
+                bin.PositionOffset = hasSortingPosition ? sortingPositionPrefixSum : DrawCommandBin.kNoSortingPosition;
 
                 int numInstances = bin.NumInstances;
                 int numPositions = hasSortingPosition ? numInstances : 0;
@@ -1649,9 +1745,8 @@ namespace Unity.Rendering
 
             int numSortingPositionFloats = sortingPositionPrefixSum * 3;
             output->instanceSortingPositionFloatCount = numSortingPositionFloats;
-            output->instanceSortingPositions = (sortingPositionPrefixSum == 0)
-                ? null
-                : ChunkDrawCommandOutput.Malloc<float>(numSortingPositionFloats);
+            output->instanceSortingPositions =
+                (sortingPositionPrefixSum == 0) ? null : ChunkDrawCommandOutput.Malloc<float>(numSortingPositionFloats);
         }
     }
 
@@ -1723,7 +1818,8 @@ namespace Unity.Rendering
                     ExpandArray(
                         visibleInstances,
                         header,
-                        binInstanceOffset + workItemInstanceOffset + headerInstanceOffset);
+                        binInstanceOffset + workItemInstanceOffset + headerInstanceOffset
+                    );
 
                     headerInstanceOffset += header->NumInstances;
                     header = header->Next;
@@ -1744,7 +1840,8 @@ namespace Unity.Rendering
                         header,
                         transformHeader,
                         instanceOffset,
-                        positionOffset);
+                        positionOffset
+                    );
 
                     headerInstanceOffset += header->NumInstances;
                     header = header->Next;
@@ -1756,7 +1853,8 @@ namespace Unity.Rendering
         private int ExpandArray(
             int* visibleInstances,
             DrawStream<DrawCommandVisibility>.Header* header,
-            int instanceOffset)
+            int instanceOffset
+        )
         {
             int numStructs = header->NumElements;
 
@@ -1777,19 +1875,21 @@ namespace Unity.Rendering
             DrawStream<DrawCommandVisibility>.Header* header,
             DrawStream<IntPtr>.Header* transformHeader,
             int instanceOffset,
-            int positionOffset)
+            int positionOffset
+        )
         {
             int numStructs = header->NumElements;
 
             for (int i = 0; i < numStructs; ++i)
             {
                 var visibility = *header->Element(i);
-                var transforms = (float4x4*) (*transformHeader->Element(i));
+                var transforms = (float4x4*)(*transformHeader->Element(i));
                 int numInstances = ExpandVisibilityWithPositions(
                     visibleInstances + instanceOffset,
                     sortingPositions + positionOffset,
                     visibility,
-                    transforms);
+                    transforms
+                );
                 Assert.IsTrue(numInstances > 0);
                 instanceOffset += numInstances;
                 positionOffset += numInstances;
@@ -1797,7 +1897,6 @@ namespace Unity.Rendering
 
             return instanceOffset;
         }
-
 
         private int ExpandVisibility(int* outputInstances, DrawCommandVisibility visibility)
         {
@@ -1826,7 +1925,8 @@ namespace Unity.Rendering
             int* outputInstances,
             float3* outputSortingPosition,
             DrawCommandVisibility visibility,
-            float4x4* transforms)
+            float4x4* transforms
+        )
         {
             int numInstances = 0;
             int startIndex = visibility.ChunkStartIndex;
@@ -1841,10 +1941,7 @@ namespace Unity.Rendering
                     qword ^= mask;
                     int instanceIndex = (i << 6) + bitIndex;
 
-                    var instanceTransform = new LocalToWorld
-                    {
-                        Value = transforms[instanceIndex],
-                    };
+                    var instanceTransform = new LocalToWorld { Value = transforms[instanceIndex] };
 
                     int visibilityIndex = startIndex + instanceIndex;
                     outputInstances[numInstances] = visibilityIndex;
@@ -1884,9 +1981,7 @@ namespace Unity.Rendering
             var bin = DrawCommandOutput.BinIndices.ElementAt(sortedBin);
 
             bool hasSortingPosition = settings.HasSortingPosition;
-            uint maxPerCommand = hasSortingPosition
-                ? 1u
-                : EntitiesGraphicsTuningConstants.kMaxInstancesPerDrawCommand;
+            uint maxPerCommand = hasSortingPosition ? 1u : EntitiesGraphicsTuningConstants.kMaxInstancesPerDrawCommand;
             uint numInstances = (uint)bin.NumInstances;
             int numDrawCommands = bin.NumDrawCommands;
 
@@ -1908,10 +2003,8 @@ namespace Unity.Rendering
                     submeshIndex = (ushort)settings.SubMeshIndex,
                     splitVisibilityMask = settings.SplitMask,
                     flags = settings.Flags,
-                    sortingPosition = hasSortingPosition
-                        ? (int)drawPositionFloatOffset
-                        : 0,
-                    activeMeshLod = settings.MeshLodIndex
+                    sortingPosition = hasSortingPosition ? (int)drawPositionFloatOffset : 0,
+                    activeMeshLod = settings.MeshLodIndex,
                 };
 
                 int drawCommandIndex = bin.DrawCommandOffset + i;
@@ -1946,7 +2039,8 @@ namespace Unity.Rendering
     {
         public ChunkDrawCommandOutput DrawCommandOutput;
 
-        [ReadOnly] public NativeParallelHashMap<int, BatchFilterSettings> FilterSettings;
+        [ReadOnly]
+        public NativeParallelHashMap<int, BatchFilterSettings> FilterSettings;
 
         private const int MaxInstances = EntitiesGraphicsTuningConstants.kMaxInstancesPerDrawRange;
         private const int MaxCommands = EntitiesGraphicsTuningConstants.kMaxDrawCommandsPerDrawRange;
@@ -2003,7 +2097,8 @@ namespace Unity.Rendering
                         drawCommandOffset,
                         instancesInCommand,
                         filterIndex,
-                        hasSortingPosition);
+                        hasSortingPosition
+                    );
 
                     ++drawCommandOffset;
                     numInstances -= instancesInCommand;
@@ -2022,7 +2117,8 @@ namespace Unity.Rendering
             int drawCommandOffset,
             int numInstances,
             int filterIndex,
-            bool hasSortingPosition)
+            bool hasSortingPosition
+        )
         {
             bool isFirst = rangeCount == 0;
 
@@ -2074,7 +2170,6 @@ namespace Unity.Rendering
         }
     }
 
-
     internal unsafe struct DebugValidateSortJob : IJob
     {
         public ChunkDrawCommandOutput DrawCommandOutput;
@@ -2095,8 +2190,14 @@ namespace Unity.Rendering
                 int cmp = settings.CompareTo(settingsNext);
                 int cmpRef = settings.CompareToReference(settingsNext);
 
-                Assert.IsTrue(cmpRef <= 0, $"Draw commands not in order. CompareTo: {cmp}, CompareToReference: {cmpRef}, A: {settings}, B: {settingsNext}");
-                Assert.IsTrue(cmpRef == cmp, $"CompareTo() does not match CompareToReference(). CompareTo: {cmp}, CompareToReference: {cmpRef}, A: {settings}, B: {settingsNext}");
+                Assert.IsTrue(
+                    cmpRef <= 0,
+                    $"Draw commands not in order. CompareTo: {cmp}, CompareToReference: {cmpRef}, A: {settings}, B: {settingsNext}"
+                );
+                Assert.IsTrue(
+                    cmpRef == cmp,
+                    $"CompareTo() does not match CompareToReference(). CompareTo: {cmp}, CompareToReference: {cmpRef}, A: {settings}, B: {settingsNext}"
+                );
             }
         }
     }

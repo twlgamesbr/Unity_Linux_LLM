@@ -22,7 +22,11 @@ namespace Unity.Physics.Authoring
         protected override void OnUpdate()
         {
             var bakingSystem = World.GetExistingSystemManaged<BakingSystem>();
-            BlobComputationContext = new BlobAssetComputationContext<int, Collider>(bakingSystem.BlobAssetStore, 128, Allocator.TempJob);
+            BlobComputationContext = new BlobAssetComputationContext<int, Collider>(
+                bakingSystem.BlobAssetStore,
+                128,
+                Allocator.TempJob
+            );
         }
     }
 }

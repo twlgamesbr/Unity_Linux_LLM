@@ -22,7 +22,11 @@ namespace UnityEngine.Rendering.Universal
             m_JitterMatrix = Matrix4x4.identity;
         }
 
-        internal void SetViewProjectionAndJitterMatrix(Matrix4x4 viewMatrix, Matrix4x4 projectionMatrix, Matrix4x4 jitterMatrix)
+        internal void SetViewProjectionAndJitterMatrix(
+            Matrix4x4 viewMatrix,
+            Matrix4x4 projectionMatrix,
+            Matrix4x4 jitterMatrix
+        )
         {
             m_ViewMatrix = viewMatrix;
             m_ProjectionMatrix = projectionMatrix;
@@ -33,13 +37,15 @@ namespace UnityEngine.Rendering.Universal
         private bool m_CachedRenderIntoTextureXR;
         private bool m_InitBuiltinXRConstants;
 #endif
+
         // Helper function to populate builtin stereo matricies as well as URP stereo matricies
         internal void PushBuiltinShaderConstantsXR(RasterCommandBuffer cmd, bool renderIntoTexture)
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             // Multipass always needs update to prevent wrong view projection matrix set by other passes
-            bool needsUpdate = !m_InitBuiltinXRConstants || m_CachedRenderIntoTextureXR != renderIntoTexture || !xr.singlePassEnabled;
-            if (needsUpdate && xr.enabled )
+            bool needsUpdate =
+                !m_InitBuiltinXRConstants || m_CachedRenderIntoTextureXR != renderIntoTexture || !xr.singlePassEnabled;
+            if (needsUpdate && xr.enabled)
             {
                 var projection0 = GetProjectionMatrix();
                 var view0 = GetViewMatrix();
@@ -158,7 +164,11 @@ namespace UnityEngine.Rendering.Universal
         /// The camera history texture manager. Used to access camera history from a ScriptableRenderPass.
         /// </summary>
         /// <seealso cref="ScriptableRenderPass"/>
-        public UniversalCameraHistory historyManager { get => m_HistoryManager; set => m_HistoryManager = value; }
+        public UniversalCameraHistory historyManager
+        {
+            get => m_HistoryManager;
+            set => m_HistoryManager = value;
+        }
 
         /// <summary>
         /// The camera render type used for camera stacking.
@@ -260,16 +270,19 @@ namespace UnityEngine.Rendering.Universal
 
         internal bool requireSrgbConversion
         {
-            get
-            {
+            get {
 #if ENABLE_VR && ENABLE_XR_MODULE
                 // For some XR platforms we need to encode in SRGB but can't use a _SRGB format texture, only required for 8bit per channel 32 bit formats.
                 if (xr.enabled)
-                    return !xr.renderTargetDesc.sRGB && (xr.renderTargetDesc.graphicsFormat == GraphicsFormat.R8G8B8A8_UNorm || xr.renderTargetDesc.graphicsFormat == GraphicsFormat.B8G8R8A8_UNorm) && (QualitySettings.activeColorSpace == ColorSpace.Linear);
+                    return !xr.renderTargetDesc.sRGB
+                        && (
+                            xr.renderTargetDesc.graphicsFormat == GraphicsFormat.R8G8B8A8_UNorm
+                            || xr.renderTargetDesc.graphicsFormat == GraphicsFormat.B8G8R8A8_UNorm
+                        )
+                        && (QualitySettings.activeColorSpace == ColorSpace.Linear);
 #endif
 
-                return targetTexture == null && Display.main.requiresSrgbBlitToBackbuffer;
-            }
+                return targetTexture == null && Display.main.requiresSrgbBlitToBackbuffer; }
         }
 
         /// <summary>
@@ -287,9 +300,13 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         public bool isPreviewCamera => cameraType == CameraType.Preview;
 
-        internal bool isRenderPassSupportedCamera => (cameraType == CameraType.Game || cameraType == CameraType.Reflection);
+        internal bool isRenderPassSupportedCamera =>
+            (cameraType == CameraType.Game || cameraType == CameraType.Reflection);
 
-        internal bool resolveToScreen => targetTexture == null && resolveFinalTarget && (cameraType == CameraType.Game || camera.cameraType == CameraType.VR);
+        internal bool resolveToScreen =>
+            targetTexture == null
+            && resolveFinalTarget
+            && (cameraType == CameraType.Game || camera.cameraType == CameraType.VR);
 
         /// <summary>
         /// True if the Camera should output to an HDR display.
@@ -331,10 +348,12 @@ namespace UnityEngine.Rendering.Universal
 #endif
                 {
                     HDROutputSettings displaySettings = HDROutputSettings.main;
-                    displayInformation = new HDROutputUtils.HDRDisplayInformation(displaySettings.maxFullFrameToneMapLuminance,
+                    displayInformation = new HDROutputUtils.HDRDisplayInformation(
+                        displaySettings.maxFullFrameToneMapLuminance,
                         displaySettings.maxToneMapLuminance,
                         displaySettings.minToneMapLuminance,
-                        displaySettings.paperWhiteNits);
+                        displaySettings.paperWhiteNits
+                    );
                 }
 
                 return displayInformation;
@@ -400,7 +419,8 @@ namespace UnityEngine.Rendering.Universal
                 return true;
 
             var handleID = new RenderTargetIdentifier(handle.nameID, 0, CubemapFace.Unknown, 0);
-            bool isBackbuffer = handleID == BuiltinRenderTextureType.CameraTarget || handleID == BuiltinRenderTextureType.Depth;
+            bool isBackbuffer =
+                handleID == BuiltinRenderTextureType.CameraTarget || handleID == BuiltinRenderTextureType.Depth;
 #if ENABLE_VR && ENABLE_XR_MODULE
             if (xr.enabled)
                 isBackbuffer |= handleID == new RenderTargetIdentifier(xr.renderTarget, 0, CubemapFace.Unknown, 0);
@@ -446,13 +466,16 @@ namespace UnityEngine.Rendering.Universal
             UniversalAdditionalCameraData additionalCameraData;
             camera.TryGetComponent(out additionalCameraData);
 
-            return IsTemporalAARequested()                                                                                            // Requested
-                   && postProcessEnabled                                                                                              // Postprocessing Enabled
-                   && (taaHistory != null)                                                                                            // Initialized
-                   && (cameraTargetDescriptor.msaaSamples == 1)                                                                       // No MSAA
-                   && !(additionalCameraData?.renderType == CameraRenderType.Overlay || additionalCameraData?.cameraStack.Count > 0)  // No Camera stack
-                   && !camera.allowDynamicResolution                                                                                  // No Dynamic Resolution
-                   && renderer.SupportsMotionVectors();                                                                               // Motion Vectors implemented
+            return IsTemporalAARequested() // Requested
+                && postProcessEnabled // Postprocessing Enabled
+                && (taaHistory != null) // Initialized
+                && (cameraTargetDescriptor.msaaSamples == 1) // No MSAA
+                && !(
+                    additionalCameraData?.renderType == CameraRenderType.Overlay
+                    || additionalCameraData?.cameraStack.Count > 0
+                ) // No Camera stack
+                && !camera.allowDynamicResolution // No Dynamic Resolution
+                && renderer.SupportsMotionVectors(); // Motion Vectors implemented
         }
 
         /// <summary>
@@ -462,13 +485,14 @@ namespace UnityEngine.Rendering.Universal
         /// <returns>True if STP is requested</returns>
         internal bool IsSTPRequested()
         {
-            return (imageScalingMode == ImageScalingMode.Upscaling) &&
+            return (imageScalingMode == ImageScalingMode.Upscaling)
+                &&
 #if ENABLE_UPSCALER_FRAMEWORK
                 (resolvedUpscalerHash == UniversalRenderPipeline.k_UpscalerHash_STP)
 #else
                 (upscalingFilter == ImageUpscalingFilter.STP)
 #endif
-                ;
+            ;
         }
 
         /// <summary>

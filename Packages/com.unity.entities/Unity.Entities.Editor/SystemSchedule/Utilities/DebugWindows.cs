@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor;
 using UnityEngine.LowLevel;
 using UnityEngine.UIElements;
@@ -10,9 +10,13 @@ namespace Unity.Entities.Editor
     class SystemsWindowDebugContentProvider : ContentProvider
     {
         public override string Name => "Systems (Debug)";
+
         public override object GetContent() => new SystemWindowDebugData();
-        protected override ContentStatus GetStatus()
-            => !EditorWindow.HasOpenInstances<SystemScheduleWindow>() ? ContentStatus.ReloadContent : ContentStatus.ContentReady;
+
+        protected override ContentStatus GetStatus() =>
+            !EditorWindow.HasOpenInstances<SystemScheduleWindow>()
+                ? ContentStatus.ReloadContent
+                : ContentStatus.ContentReady;
     }
 
     class SystemWindowDebugData
@@ -20,11 +24,11 @@ namespace Unity.Entities.Editor
         [CreateProperty, UsedImplicitly]
         public int SystemTreeViewItemActiveInstanceCount => SystemTreeViewItemData.Pool.CountActive;
 
-        [CreateProperty, UsedImplicitly] public int SystemTreeViewItemPoolSize => SystemTreeViewItemData.Pool.CountAll;
+        [CreateProperty, UsedImplicitly]
+        public int SystemTreeViewItemPoolSize => SystemTreeViewItemData.Pool.CountAll;
 
         [CreateProperty, UsedImplicitly]
-        public int SystemInformationVisualElementActiveInstanceCount =>
-            SystemInformationVisualElement.Pool.CountActive;
+        public int SystemInformationVisualElementActiveInstanceCount => SystemInformationVisualElement.Pool.CountActive;
 
         [CreateProperty, UsedImplicitly]
         public int SystemInformationVisualElementPoolSize => SystemInformationVisualElement.Pool.CountAll;
@@ -44,22 +48,25 @@ namespace Unity.Entities.Editor
 
                 // Add or remove test system.
                 var buttonAdd = root.Q<Button>("add-system");
-                root.Q<Label>("system-name-label").text =
-                    "Add or Remove 'Systems Window Test System'";
+                root.Q<Label>("system-name-label").text = "Add or Remove 'Systems Window Test System'";
                 var indicationLabel = root.Q<Label>("indication-label");
 
-                buttonAdd.RegisterCallback<MouseUpEvent>((evt) =>
-                {
-                    CreateTestSystem();
-                    indicationLabel.text = "Test system added.";
-                });
+                buttonAdd.RegisterCallback<MouseUpEvent>(
+                    (evt) =>
+                    {
+                        CreateTestSystem();
+                        indicationLabel.text = "Test system added.";
+                    }
+                );
 
                 var buttonRemove = root.Q<Button>("remove-system");
-                buttonRemove.RegisterCallback<MouseUpEvent>((evt) =>
-                {
-                    DestroyTestSystem();
-                    indicationLabel.text = "Test system removed.";
-                });
+                buttonRemove.RegisterCallback<MouseUpEvent>(
+                    (evt) =>
+                    {
+                        DestroyTestSystem();
+                        indicationLabel.text = "Test system removed.";
+                    }
+                );
 
                 // Create or destroy test world.
                 m_SystemScheduleWindow = EditorWindow.GetWindow<SystemScheduleWindow>();
@@ -70,18 +77,22 @@ namespace Unity.Entities.Editor
 
                 m_PreviousPlayerLoop = PlayerLoop.GetCurrentPlayerLoop();
 
-                createWorldButton.RegisterCallback<MouseUpEvent>((evt) =>
-                {
-                    CreateTestWorld();
-                    worldIndicationLabel.text = "Test world created.";
-                });
+                createWorldButton.RegisterCallback<MouseUpEvent>(
+                    (evt) =>
+                    {
+                        CreateTestWorld();
+                        worldIndicationLabel.text = "Test world created.";
+                    }
+                );
 
                 var destroyTestWorld = root.Q<Button>("destroy-test-world");
-                destroyTestWorld.RegisterCallback<MouseUpEvent>((evt) =>
-                {
-                    DestroyTestWorld();
-                    worldIndicationLabel.text = "Test world destroyed.";
-                });
+                destroyTestWorld.RegisterCallback<MouseUpEvent>(
+                    (evt) =>
+                    {
+                        DestroyTestWorld();
+                        worldIndicationLabel.text = "Test world destroyed.";
+                    }
+                );
 
                 return root;
             }
@@ -153,12 +164,8 @@ namespace Unity.Entities.Editor
             new SystemsWindowTestJob().Run();
         }
 
-        protected override void OnCreate()
-        {
-        }
+        protected override void OnCreate() { }
 
-        protected override void OnDestroy()
-        {
-        }
+        protected override void OnDestroy() { }
     }
 }

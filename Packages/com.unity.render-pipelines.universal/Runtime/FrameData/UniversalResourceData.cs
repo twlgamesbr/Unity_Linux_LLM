@@ -95,7 +95,6 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
-
         /// <summary>
         /// The backbuffer color used to render directly to screen. All passes can write to it depending on frame setup.
         /// </summary>
@@ -105,7 +104,6 @@ namespace UnityEngine.Rendering.Universal
             internal set => CheckAndSetTextureHandle(ref _backBufferColor, value);
         }
         private TextureHandle _backBufferColor;
-
 
         /// <summary>
         /// The backbuffer depth used to render directly to screen. All passes can write to it depending on frame setup.

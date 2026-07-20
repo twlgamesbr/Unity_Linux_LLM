@@ -23,6 +23,7 @@ namespace Unity.Netcode
         /// <b>Event Notification:</b> Both server and client are notified a load scene event started
         /// </summary>
         Load,
+
         /// <summary>
         /// Unload a scene<br/>
         /// <b>Invocation:</b> Server Side<br/>
@@ -30,6 +31,7 @@ namespace Unity.Netcode
         /// <b>Event Notification:</b> Both server and client are notified an unload scene event started.
         /// </summary>
         Unload,
+
         /// <summary>
         /// Synchronizes current game session state for newly approved clients<br/>
         /// <b>Invocation:</b> Server Side<br/>
@@ -37,6 +39,7 @@ namespace Unity.Netcode
         /// <b>Event Notification:</b> Server and Client receives a local notification (<em>server receives the ClientId being synchronized</em>).
         /// </summary>
         Synchronize,
+
         /// <summary>
         /// Game session re-synchronization of NetworkObjects that were destroyed during a <see cref="Synchronize"/> event<br/>
         /// <b>Invocation:</b> Server Side<br/>
@@ -44,6 +47,7 @@ namespace Unity.Netcode
         /// <b>Event Notification:</b> Both server and client receive a local notification<br/>
         /// </summary>
         ReSynchronize,
+
         /// <summary>
         /// All clients have finished loading a scene<br/>
         /// <b>Invocation:</b> Server Side<br/>
@@ -52,6 +56,7 @@ namespace Unity.Netcode
         /// as well as the clients that timed out(<em>if any</em>).
         /// </summary>
         LoadEventCompleted,
+
         /// <summary>
         /// All clients have unloaded a scene<br/>
         /// <b>Invocation:</b> Server Side<br/>
@@ -60,6 +65,7 @@ namespace Unity.Netcode
         /// as well as the clients that timed out(<em>if any</em>).
         /// </summary>
         UnloadEventCompleted,
+
         /// <summary>
         /// A client has finished loading a scene<br/>
         /// <b>Invocation:</b> Client Side<br/>
@@ -67,6 +73,7 @@ namespace Unity.Netcode
         /// <b>Event Notification:</b> Both server and client receive a local notification.
         /// </summary>
         LoadComplete,
+
         /// <summary>
         /// A client has finished unloading a scene<br/>
         /// <b>Invocation:</b> Client Side<br/>
@@ -74,6 +81,7 @@ namespace Unity.Netcode
         /// <b>Event Notification:</b> Both server and client receive a local notification.
         /// </summary>
         UnloadComplete,
+
         /// <summary>
         /// A client has finished synchronizing from a <see cref="Synchronize"/> event<br/>
         /// <b>Invocation:</b> Client Side<br/>
@@ -81,11 +89,13 @@ namespace Unity.Netcode
         /// <b>Event Notification:</b> Both server and client receive a local notification.
         /// </summary>
         SynchronizeComplete,
+
         /// <summary>
         /// Synchronizes clients when the active scene has changed
         /// See: <see cref="NetworkObject.ActiveSceneSynchronization"/>
         /// </summary>
         ActiveSceneChanged,
+
         /// <summary>
         /// Synchronizes clients when one or more NetworkObjects are migrated into a new scene
         /// See: <see cref="NetworkObject.SceneMigrationSynchronization"/>
@@ -117,6 +127,7 @@ namespace Unity.Netcode
         /// NetworkVariable information.  If that process changes, then we need to update this
         /// In distributed authority mode this is used to route messages to the appropriate destination client
         internal ulong TargetClientId;
+
         /// Only used with a DAHost
         internal ulong SenderClientId;
 
@@ -153,7 +164,6 @@ namespace Unity.Netcode
         internal Queue<NetworkSceneHandle> SceneHandlesToSynchronize;
 
         internal LoadSceneMode ClientSynchronizationMode;
-
 
         /// <summary>
         /// Server Side:
@@ -196,6 +206,7 @@ namespace Unity.Netcode
         }
 
         internal bool IsStartingSynchronization;
+
         /// <summary>
         /// Client Side:
         /// Determines if all scenes have been processed during the synchronization process
@@ -210,7 +221,9 @@ namespace Unity.Netcode
             else if (ScenesToSynchronize.Count != SceneHandlesToSynchronize.Count)
             {
                 // This should never happen, but in the event it does...
-                throw new Exception($"[{nameof(SceneEventData)}-Internal Mismatch Error] {nameof(ScenesToSynchronize)} count != {nameof(SceneHandlesToSynchronize)} count!");
+                throw new Exception(
+                    $"[{nameof(SceneEventData)}-Internal Mismatch Error] {nameof(ScenesToSynchronize)} count != {nameof(SceneHandlesToSynchronize)} count!"
+                );
             }
             return false;
         }
@@ -319,12 +332,16 @@ namespace Unity.Netcode
         {
             m_NetworkObjectsSync.Clear();
             // If distributed authority mode and sending to the service, then ignore observers
-            var distributedAuthoritySendingToService = m_NetworkManager.DistributedAuthorityMode && TargetClientId == NetworkManager.ServerClientId;
+            var distributedAuthoritySendingToService =
+                m_NetworkManager.DistributedAuthorityMode && TargetClientId == NetworkManager.ServerClientId;
             foreach (var sobj in m_NetworkManager.SpawnManager.SpawnedObjectsList)
             {
                 var spawnedObject = sobj;
                 // Don't synchronize objects that have pending visibility as that will be sent as a CreateObjectMessage towards the end of the current frame
-                if (TargetClientId != NetworkManager.ServerClientId && m_NetworkManager.SpawnManager.IsObjectVisibilityPending(TargetClientId, ref spawnedObject))
+                if (
+                    TargetClientId != NetworkManager.ServerClientId
+                    && m_NetworkManager.SpawnManager.IsObjectVisibilityPending(TargetClientId, ref spawnedObject)
+                )
                 {
                     continue;
                 }
@@ -375,7 +392,11 @@ namespace Unity.Netcode
                 }
                 foreach (var networkObject in FindObjects.FromSceneByType<NetworkObject>(scene, true))
                 {
-                    if (networkObject.InScenePlaced && networkObject.NetworkManagerOwner == m_NetworkManager && !networkObject.IsSpawned)
+                    if (
+                        networkObject.InScenePlaced
+                        && networkObject.NetworkManagerOwner == m_NetworkManager
+                        && !networkObject.IsSpawned
+                    )
                     {
                         m_DespawnedInSceneObjectsSync.Add(networkObject);
                     }
@@ -416,9 +437,9 @@ namespace Unity.Netcode
                 case SceneEventType.UnloadEventCompleted:
                 case SceneEventType.ActiveSceneChanged:
                 case SceneEventType.ObjectSceneChanged:
-                    {
-                        return true;
-                    }
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -527,45 +548,45 @@ namespace Unity.Netcode
             switch (SceneEventType)
             {
                 case SceneEventType.Synchronize:
+                {
+                    writer.WriteValueSafe(ActiveSceneHash);
+
+                    WriteSceneSynchronizationData(writer);
+
+                    if (EnableSerializationLogs)
                     {
-                        writer.WriteValueSafe(ActiveSceneHash);
-
-                        WriteSceneSynchronizationData(writer);
-
-                        if (EnableSerializationLogs)
-                        {
-                            LogArray(writer.ToArray(), 0, writer.Length);
-                        }
-                        break;
+                        LogArray(writer.ToArray(), 0, writer.Length);
                     }
+                    break;
+                }
                 case SceneEventType.Load:
+                {
+                    if (m_NetworkManager.DistributedAuthorityMode && IsForwarding && m_NetworkManager.DAHost)
                     {
-                        if (m_NetworkManager.DistributedAuthorityMode && IsForwarding && m_NetworkManager.DAHost)
-                        {
-                            CopyInternalBuffer(ref writer);
-                        }
-                        else
-                        {
-                            SerializeScenePlacedObjects(writer);
-                        }
-                        break;
+                        CopyInternalBuffer(ref writer);
                     }
+                    else
+                    {
+                        SerializeScenePlacedObjects(writer);
+                    }
+                    break;
+                }
                 case SceneEventType.SynchronizeComplete:
-                    {
-                        WriteClientSynchronizationResults(writer);
-                        break;
-                    }
+                {
+                    WriteClientSynchronizationResults(writer);
+                    break;
+                }
                 case SceneEventType.ReSynchronize:
-                    {
-                        WriteClientReSynchronizationData(writer);
-                        break;
-                    }
+                {
+                    WriteClientReSynchronizationData(writer);
+                    break;
+                }
                 case SceneEventType.LoadEventCompleted:
                 case SceneEventType.UnloadEventCompleted:
-                    {
-                        WriteSceneEventProgressDone(writer);
-                        break;
-                    }
+                {
+                    WriteSceneEventProgressDone(writer);
+                    break;
+                }
             }
         }
 
@@ -614,7 +635,9 @@ namespace Unity.Netcode
             writer.WriteValueSafe(m_NetworkObjectsSync.Count);
             if (EnableSerializationLogs)
             {
-                builder.AppendLine($"[Synchronize Objects][positionStart: {positionStart}][WPos: {writer.Position}][NO-Count: {m_NetworkObjectsSync.Count}] Begin:");
+                builder.AppendLine(
+                    $"[Synchronize Objects][positionStart: {positionStart}][WPos: {writer.Position}][NO-Count: {m_NetworkObjectsSync.Count}] Begin:"
+                );
             }
             var distributedAuthority = m_NetworkManager.DistributedAuthorityMode;
 
@@ -633,7 +656,9 @@ namespace Unity.Netcode
                 {
                     var offStart = noStart - (positionStart + sizeof(int));
                     var offStop = noStop - (positionStart + sizeof(int));
-                    builder.AppendLine($"[Head: {offStart}][Tail: {offStop}][Size: {offStop - offStart}][{networkObject.name}][NID-{networkObject.NetworkObjectId}][Children: {networkObject.ChildNetworkBehaviours.Count}]");
+                    builder.AppendLine(
+                        $"[Head: {offStart}][Tail: {offStop}][Size: {offStop - offStart}][{networkObject.name}][NID-{networkObject.NetworkObjectId}][Children: {networkObject.ChildNetworkBehaviours.Count}]"
+                    );
                     LogArray(writer.ToArray(), noStart, noStop, builder);
                 }
             }
@@ -682,7 +707,8 @@ namespace Unity.Netcode
             writer.WriteValueSafe((ushort)0);
             var distributedAuthority = m_NetworkManager.DistributedAuthorityMode;
             // If distributed authority mode and sending to the service, then ignore observers
-            var distributedAuthoritySendingToService = distributedAuthority && TargetClientId == NetworkManager.ServerClientId;
+            var distributedAuthoritySendingToService =
+                distributedAuthority && TargetClientId == NetworkManager.ServerClientId;
 
             // Clear our objects to sync and build a list of the in-scene placed NetworkObjects instantiated and spawned locally
             m_NetworkObjectsSync.Clear();
@@ -690,7 +716,10 @@ namespace Unity.Netcode
             {
                 foreach (var keyValuePairBySceneHandle in keyValuePairByGlobalObjectIdHash.Value)
                 {
-                    if (keyValuePairBySceneHandle.Value.Observers.Contains(TargetClientId) || distributedAuthoritySendingToService)
+                    if (
+                        keyValuePairBySceneHandle.Value.Observers.Contains(TargetClientId)
+                        || distributedAuthoritySendingToService
+                    )
                     {
                         m_NetworkObjectsSync.Add(keyValuePairBySceneHandle.Value);
                     }
@@ -779,44 +808,48 @@ namespace Unity.Netcode
             switch (SceneEventType)
             {
                 case SceneEventType.Synchronize:
+                {
+                    reader.ReadValueSafe(out ActiveSceneHash);
+                    if (EnableSerializationLogs)
                     {
-                        reader.ReadValueSafe(out ActiveSceneHash);
-                        if (EnableSerializationLogs)
-                        {
-                            LogArray(reader.ToArray(), 0, reader.Length);
-                        }
-                        CopySceneSynchronizationData(reader);
-                        IsStartingSynchronization = true;
-                        break;
+                        LogArray(reader.ToArray(), 0, reader.Length);
                     }
+                    CopySceneSynchronizationData(reader);
+                    IsStartingSynchronization = true;
+                    break;
+                }
                 case SceneEventType.SynchronizeComplete:
-                    {
-                        CheckClientSynchronizationResults(reader);
-                        break;
-                    }
+                {
+                    CheckClientSynchronizationResults(reader);
+                    break;
+                }
                 case SceneEventType.Load:
+                {
+                    unsafe
                     {
-                        unsafe
-                        {
-                            // We store off the trailing in-scene placed serialized NetworkObject data to
-                            // be processed once we are done loading.
-                            m_HasInternalBuffer = true;
-                            // We use Allocator.Persistent since scene loading could take longer than 4 frames
-                            InternalBuffer = new FastBufferReader(reader.GetUnsafePtrAtCurrentPosition(), Allocator.Persistent, reader.Length - reader.Position);
-                        }
-                        break;
+                        // We store off the trailing in-scene placed serialized NetworkObject data to
+                        // be processed once we are done loading.
+                        m_HasInternalBuffer = true;
+                        // We use Allocator.Persistent since scene loading could take longer than 4 frames
+                        InternalBuffer = new FastBufferReader(
+                            reader.GetUnsafePtrAtCurrentPosition(),
+                            Allocator.Persistent,
+                            reader.Length - reader.Position
+                        );
                     }
+                    break;
+                }
                 case SceneEventType.ReSynchronize:
-                    {
-                        ReadClientReSynchronizationData(reader);
-                        break;
-                    }
+                {
+                    ReadClientReSynchronizationData(reader);
+                    break;
+                }
                 case SceneEventType.LoadEventCompleted:
                 case SceneEventType.UnloadEventCompleted:
-                    {
-                        ReadSceneEventProgressDone(reader);
-                        break;
-                    }
+                {
+                    ReadSceneEventProgressDone(reader);
+                    break;
+                }
             }
         }
 
@@ -836,7 +869,6 @@ namespace Unity.Netcode
             ScenesToSynchronize = new Queue<uint>(scenesToSynchronize);
             SceneHandlesToSynchronize = new Queue<NetworkSceneHandle>(sceneHandlesToSynchronize);
 
-
             // is not packed!
             reader.ReadValueSafe(out int sizeToCopy);
             m_InternalBufferSize = sizeToCopy;
@@ -845,12 +877,18 @@ namespace Unity.Netcode
             {
                 if (!reader.TryBeginRead(sizeToCopy))
                 {
-                    throw new OverflowException("Not enough space in the buffer to read recorded synchronization data size.");
+                    throw new OverflowException(
+                        "Not enough space in the buffer to read recorded synchronization data size."
+                    );
                 }
 
                 m_HasInternalBuffer = true;
                 // We use Allocator.Persistent since scene synchronization will most likely take longer than 4 frames
-                InternalBuffer = new FastBufferReader(reader.GetUnsafePtrAtCurrentPosition(), Allocator.Persistent, sizeToCopy);
+                InternalBuffer = new FastBufferReader(
+                    reader.GetUnsafePtrAtCurrentPosition(),
+                    Allocator.Persistent,
+                    sizeToCopy
+                );
                 if (EnableSerializationLogs)
                 {
                     LogArray(InternalBuffer.ToArray());
@@ -935,7 +973,9 @@ namespace Unity.Netcode
                     {
                         if (m_NetworkManager.LogLevel <= LogLevel.Developer)
                         {
-                            NetworkLog.LogWarning($"[ReadClientReSynchronizationData][{networkObject.name}] Despawning and destroying {nameof(NetworkObject)}.");
+                            NetworkLog.LogWarning(
+                                $"[ReadClientReSynchronizationData][{networkObject.name}] Despawning and destroying {nameof(NetworkObject)}."
+                            );
                         }
                         m_NetworkManager.SpawnManager.OnDespawnObject(networkObject, true, true);
                     }
@@ -1026,11 +1066,26 @@ namespace Unity.Netcode
                 {
                     // If we haven't already cached the objects in this scene, build the cache
                     sceneRelativeNetworkObjects = new Dictionary<uint, NetworkObject>();
-                    if (m_NetworkManager.SceneManager.ServerSceneHandleToClientSceneHandle.TryGetValue(networkSceneHandle, out var localSceneHandle))
+                    if (
+                        m_NetworkManager.SceneManager.ServerSceneHandleToClientSceneHandle.TryGetValue(
+                            networkSceneHandle,
+                            out var localSceneHandle
+                        )
+                    )
                     {
-                        if (m_NetworkManager.SceneManager.ScenesLoaded.TryGetValue(localSceneHandle, out var objectRelativeScene))
+                        if (
+                            m_NetworkManager.SceneManager.ScenesLoaded.TryGetValue(
+                                localSceneHandle,
+                                out var objectRelativeScene
+                            )
+                        )
                         {
-                            foreach (var networkObject in FindObjects.FromSceneByType<NetworkObject>(objectRelativeScene, true))
+                            foreach (
+                                var networkObject in FindObjects.FromSceneByType<NetworkObject>(
+                                    objectRelativeScene,
+                                    true
+                                )
+                            )
                             {
                                 if (networkObject.InScenePlaced)
                                 {
@@ -1042,12 +1097,16 @@ namespace Unity.Netcode
                         }
                         else
                         {
-                            UnityEngine.Debug.LogError($"In-Scene NetworkObject GlobalObjectIdHash ({globalObjectIdHash}) cannot find its relative local scene handle {localSceneHandle}!");
+                            UnityEngine.Debug.LogError(
+                                $"In-Scene NetworkObject GlobalObjectIdHash ({globalObjectIdHash}) cannot find its relative local scene handle {localSceneHandle}!"
+                            );
                         }
                     }
                     else
                     {
-                        UnityEngine.Debug.LogError($"In-Scene NetworkObject GlobalObjectIdHash ({globalObjectIdHash}) cannot find its relative NetworkSceneHandle {networkSceneHandle}!");
+                        UnityEngine.Debug.LogError(
+                            $"In-Scene NetworkObject GlobalObjectIdHash ({globalObjectIdHash}) cannot find its relative NetworkSceneHandle {networkSceneHandle}!"
+                        );
                     }
                 }
 
@@ -1062,17 +1121,28 @@ namespace Unity.Netcode
                     despawnedObject.InvokeBehaviourNetworkDespawn();
                     if (!m_NetworkManager.SceneManager.ScenePlacedObjects.ContainsKey(globalObjectIdHash))
                     {
-                        m_NetworkManager.SceneManager.ScenePlacedObjects.Add(globalObjectIdHash, new Dictionary<NetworkSceneHandle, NetworkObject>());
+                        m_NetworkManager.SceneManager.ScenePlacedObjects.Add(
+                            globalObjectIdHash,
+                            new Dictionary<NetworkSceneHandle, NetworkObject>()
+                        );
                     }
 
-                    if (!m_NetworkManager.SceneManager.ScenePlacedObjects[globalObjectIdHash].ContainsKey(despawnedObject.GetSceneOriginHandle()))
+                    if (
+                        !m_NetworkManager
+                            .SceneManager.ScenePlacedObjects[globalObjectIdHash]
+                            .ContainsKey(despawnedObject.GetSceneOriginHandle())
+                    )
                     {
-                        m_NetworkManager.SceneManager.ScenePlacedObjects[globalObjectIdHash].Add(despawnedObject.GetSceneOriginHandle(), despawnedObject);
+                        m_NetworkManager
+                            .SceneManager.ScenePlacedObjects[globalObjectIdHash]
+                            .Add(despawnedObject.GetSceneOriginHandle(), despawnedObject);
                     }
                 }
                 else
                 {
-                    UnityEngine.Debug.LogError($"In-Scene NetworkObject GlobalObjectIdHash ({globalObjectIdHash}) could not be found!");
+                    UnityEngine.Debug.LogError(
+                        $"In-Scene NetworkObject GlobalObjectIdHash ({globalObjectIdHash}) could not be found!"
+                    );
                 }
             }
         }
@@ -1098,7 +1168,9 @@ namespace Unity.Netcode
                 InternalBuffer.ReadValueSafe(out int newObjectsCount);
                 if (EnableSerializationLogs)
                 {
-                    builder.AppendLine($"[Read][Synchronize Objects][WPos: {InternalBuffer.Position}][NO-Count: {newObjectsCount}] Begin:");
+                    builder.AppendLine(
+                        $"[Read][Synchronize Objects][WPos: {InternalBuffer.Position}][NO-Count: {newObjectsCount}] Begin:"
+                    );
                 }
 
                 for (int i = 0; i < newObjectsCount; i++)
@@ -1112,12 +1184,18 @@ namespace Unity.Netcode
                     {
                         m_NetworkManager.SceneManager.SetTheSceneBeingSynchronized(serializedObject.NetworkSceneHandle);
                     }
-                    var spawnedNetworkObject = NetworkObject.Deserialize(serializedObject, InternalBuffer, networkManager);
+                    var spawnedNetworkObject = NetworkObject.Deserialize(
+                        serializedObject,
+                        InternalBuffer,
+                        networkManager
+                    );
 
                     var noStop = InternalBuffer.Position;
                     if (EnableSerializationLogs)
                     {
-                        builder.AppendLine($"[Head: {noStart}][Tail: {noStop}][Size: {noStop - noStart}][{spawnedNetworkObject.name}][NID-{spawnedNetworkObject.NetworkObjectId}][Children: {spawnedNetworkObject.ChildNetworkBehaviours.Count}]");
+                        builder.AppendLine(
+                            $"[Head: {noStart}][Tail: {noStop}][Size: {noStop - noStart}][{spawnedNetworkObject.name}][NID-{spawnedNetworkObject.NetworkObjectId}][Children: {spawnedNetworkObject.ChildNetworkBehaviours.Count}]"
+                        );
                         LogArray(InternalBuffer.ToArray(), noStart, noStop, builder);
                     }
                     // If we failed to deserialize the NetworkObject then don't add null to the list
@@ -1145,7 +1223,6 @@ namespace Unity.Netcode
 
                 // Now deserialize the despawned in-scene placed NetworkObjects list (if any)
                 DeserializeDespawnedInScenePlacedNetworkObjects();
-
             }
             catch (Exception ex)
             {
@@ -1229,7 +1306,9 @@ namespace Unity.Netcode
             {
                 if (!sceneManager.ObjectsMigratedIntoNewScene[sceneHandleObjects.Key].ContainsKey(ownerId))
                 {
-                    throw new Exception($"Trying to send object scene migration for Client-{ownerId} but the client has no entries to send!");
+                    throw new Exception(
+                        $"Trying to send object scene migration for Client-{ownerId} but the client has no entries to send!"
+                    );
                 }
                 // Write the scene handle
                 writer.WriteValueSafe(sceneHandleObjects.Key);
@@ -1281,7 +1360,9 @@ namespace Unity.Netcode
                     reader.ReadValueSafe(out networkObjectId);
                     if (!spawnManager.SpawnedObjects.ContainsKey(networkObjectId))
                     {
-                        NetworkLog.LogError($"[Object Scene Migration] Trying to synchronize NetworkObjectId ({networkObjectId}) but it was not spawned or no longer exists!!");
+                        NetworkLog.LogError(
+                            $"[Object Scene Migration] Trying to synchronize NetworkObjectId ({networkObjectId}) but it was not spawned or no longer exists!!"
+                        );
                         continue;
                     }
                     var networkObject = spawnManager.SpawnedObjects[networkObjectId];
@@ -1290,7 +1371,6 @@ namespace Unity.Netcode
                 }
             }
         }
-
 
         /// <summary>
         /// While a client is synchronizing ObjectSceneChanged messages could be received.
@@ -1310,13 +1390,11 @@ namespace Unity.Netcode
 
             reader.ReadValueSafe(out ownerId);
 
-
             var deferredObjectsMovedEvent = new NetworkSceneManager.DeferredObjectsMovedEvent()
             {
                 OwnerId = ownerId,
                 ObjectsMigratedTable = new Dictionary<NetworkSceneHandle, List<ulong>>(),
             };
-
 
             reader.ReadValueSafe(out numberOfScenes);
             for (int i = 0; i < numberOfScenes; i++)
@@ -1360,7 +1438,9 @@ namespace Unity.Netcode
                     {
                         if (!spawnManager.SpawnedObjects.TryGetValue(objectId, out var networkObject))
                         {
-                            NetworkLog.LogWarning($"[Deferred][Object Scene Migration] Trying to synchronize NetworkObjectId ({objectId}) but it was not spawned or no longer exists!");
+                            NetworkLog.LogWarning(
+                                $"[Deferred][Object Scene Migration] Trying to synchronize NetworkObjectId ({objectId}) but it was not spawned or no longer exists!"
+                            );
                             continue;
                         }
 

@@ -41,7 +41,7 @@ namespace UnityEngine.TestTools
                     currentEnumerator = enumeratorStack.Pop();
                     continue;
                 }
-                
+
                 if (currentEnumerator.Current is IEnumerator nestedEnumerator)
                 {
                     enumeratorStack.Push(currentEnumerator);
@@ -53,19 +53,19 @@ namespace UnityEngine.TestTools
                 }
             }
         }
-        
+
         public static void SetEnumeratorPC(int pc)
         {
             if (currentEnumerator == null)
             {
                 throw new Exception("No enumerator is currently running.");
             }
-            
+
             if (IsRunningNestedEnumerator)
             {
                 throw new Exception("Cannot set the enumerator PC while running nested enumerators.");
             }
-            
+
             ActivePcHelper.SetEnumeratorPC(currentEnumerator, pc);
         }
 
@@ -97,10 +97,7 @@ namespace UnityEngine.TestTools
 
                 return pcHelper;
             }
-            set
-            {
-                pcHelper = value;
-            }
+            set { pcHelper = value; }
         }
     }
 }

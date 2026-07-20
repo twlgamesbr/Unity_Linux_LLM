@@ -13,14 +13,15 @@ namespace Unity.Collections
     /// Extension methods for sorting collections.
     /// </summary>
     [GenerateTestsForBurstCompatibility]
-    public unsafe static class NativeSortExtension
+    public static unsafe class NativeSortExtension
     {
         /// <summary>
         /// A comparer that uses IComparable.CompareTo(). For primitive types, this is an ascending sort.
         /// </summary>
         /// <typeparam name="T">Source type of elements</typeparam>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public struct DefaultComparer<T> : IComparer<T> where T : IComparable<T>
+        public struct DefaultComparer<T> : IComparer<T>
+            where T : IComparable<T>
         {
             /// <summary>
             /// Compares two values.
@@ -42,7 +43,7 @@ namespace Unity.Collections
         /// <param name="length">The number of elements to search. Indexes greater than or equal to `length` won't be searched.</param>
         /// <returns>The zero-based index of the value to find in the sorted array.  If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static int BinarySearch<T>(T* ptr, int length, T value)
+        public static unsafe int BinarySearch<T>(T* ptr, int length, T value)
             where T : unmanaged, IComparable<T>
         {
             return BinarySearch(ptr, length, value, new DefaultComparer<T>());
@@ -60,7 +61,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>The zero-based index of the value to find in the sorted array. If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static int BinarySearch<T, U>(T* ptr, int length, T value, U comp)
+        public static unsafe int BinarySearch<T, U>(T* ptr, int length, T value, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -114,7 +115,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>The zero-based index of the value to find in the sorted array. If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static int BinarySearch<T, U>(this NativeArray<T> container, T value, U comp)
+        public static unsafe int BinarySearch<T, U>(this NativeArray<T> container, T value, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -148,7 +149,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>The zero-based index of the value to find in the sorted array. If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static int BinarySearch<T, U>(this NativeArray<T>.ReadOnly container, T value, U comp)
+        public static unsafe int BinarySearch<T, U>(this NativeArray<T>.ReadOnly container, T value, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -181,7 +182,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>The zero-based index of the value to find in the sorted list. If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static int BinarySearch<T, U>(this NativeList<T> container, T value, U comp)
+        public static unsafe int BinarySearch<T, U>(this NativeList<T> container, T value, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -214,7 +215,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>The zero-based index of the value to find in the sorted list. If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static int BinarySearch<T, U>(this UnsafeList<T> container, T value, U comp)
+        public static unsafe int BinarySearch<T, U>(this UnsafeList<T> container, T value, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -247,7 +248,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>The zero-based index of the value to find in the sorted ReadOnlySpan. If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static int BinarySearch<T, U>(this ReadOnlySpan<T> roSpan, T value, U comp)
+        public static unsafe int BinarySearch<T, U>(this ReadOnlySpan<T> roSpan, T value, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -289,7 +290,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>The zero-based index of the value to find in the sorted slice. If it is not found, a negative number that is the bitwise complement of the index of the next element larger than item or, if there is no larger element, the bitwise complement of the length.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static int BinarySearch<T, U>(this NativeSlice<T> container, T value, U comp)
+        public static unsafe int BinarySearch<T, U>(this NativeSlice<T> container, T value, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -304,7 +305,7 @@ namespace Unity.Collections
         /// <param name="length">The number of elements to sort in the array.
         /// Indexes greater than or equal to `length` won't be included in the sort.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static void Sort<T>(T* ptr, int length)
+        public static unsafe void Sort<T>(T* ptr, int length)
             where T : unmanaged, IComparable<T>
         {
             IntroSort<T, DefaultComparer<T>>(ptr, length, new DefaultComparer<T>());
@@ -320,7 +321,7 @@ namespace Unity.Collections
         /// Indexes greater than or equal to `length` won't be included in the sort.</param>
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static void Sort<T, U>(T* ptr, int length, U comp)
+        public static unsafe void Sort<T, U>(T* ptr, int length, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -337,10 +338,15 @@ namespace Unity.Collections
         /// Indexes greater than or equal to `length` won't be included in the sort.</param>
         /// <returns>A job for sorting the array.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static SortJob<T, DefaultComparer<T>> SortJob<T>(T* ptr, int length)
+        public static unsafe SortJob<T, DefaultComparer<T>> SortJob<T>(T* ptr, int length)
             where T : unmanaged, IComparable<T>
         {
-            return new SortJob<T, DefaultComparer<T>> { Data = ptr, Length = length, Comp = new DefaultComparer<T>() };
+            return new SortJob<T, DefaultComparer<T>>
+            {
+                Data = ptr,
+                Length = length,
+                Comp = new DefaultComparer<T>(),
+            };
         }
 
         /// <summary>
@@ -355,12 +361,17 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>A job for sorting the array.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static SortJob<T, U> SortJob<T, U>(T* ptr, int length, U comp)
+        public static unsafe SortJob<T, U> SortJob<T, U>(T* ptr, int length, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
             CheckComparer(ptr, length, comp);
-            return new SortJob<T, U>() { Data = ptr, Length = length, Comp = comp };
+            return new SortJob<T, U>()
+            {
+                Data = ptr,
+                Length = length,
+                Comp = comp,
+            };
         }
 
         /// <summary>
@@ -369,7 +380,7 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <param name="span">The span to sort.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static void Sort<T>(this Span<T> span)
+        public static unsafe void Sort<T>(this Span<T> span)
             where T : unmanaged, IComparable<T>
         {
             var count = span.Length;
@@ -390,7 +401,7 @@ namespace Unity.Collections
         /// <param name="span">The span to sort.</param>
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static void Sort<T, U>(this Span<T> span, U comp)
+        public static unsafe void Sort<T, U>(this Span<T> span, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -413,7 +424,7 @@ namespace Unity.Collections
         /// <param name="span">The span to sort.</param>
         /// <returns>A job for sorting this array.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static SortJob<T, DefaultComparer<T>> SortJob<T>(this Span<T> span)
+        public static unsafe SortJob<T, DefaultComparer<T>> SortJob<T>(this Span<T> span)
             where T : unmanaged, IComparable<T>
         {
             return SortJob(span, new DefaultComparer<T>());
@@ -429,7 +440,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>A job for sorting the array.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static SortJob<T, U> SortJob<T, U>(this Span<T> span, U comp)
+        public static unsafe SortJob<T, U> SortJob<T, U>(this Span<T> span, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -444,7 +455,7 @@ namespace Unity.Collections
                     {
                         Data = ptr,
                         Length = count,
-                        Comp = comp
+                        Comp = comp,
                     };
                 }
             }
@@ -453,7 +464,7 @@ namespace Unity.Collections
             {
                 Data = null,
                 Length = 0,
-                Comp = comp
+                Comp = comp,
             };
         }
 
@@ -463,7 +474,7 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <param name="container">The array to sort.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static void Sort<T>(this NativeArray<T> container)
+        public static unsafe void Sort<T>(this NativeArray<T> container)
             where T : unmanaged, IComparable<T>
         {
             Sort(container.AsSpan(), new DefaultComparer<T>());
@@ -477,7 +488,7 @@ namespace Unity.Collections
         /// <param name="container">The array to sort.</param>
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static void Sort<T, U>(this NativeArray<T> container, U comp)
+        public static unsafe void Sort<T, U>(this NativeArray<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -492,7 +503,7 @@ namespace Unity.Collections
         /// <param name="container">The array to sort.</param>
         /// <returns>A job for sorting this array.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static SortJob<T, DefaultComparer<T>> SortJob<T>(this NativeArray<T> container)
+        public static unsafe SortJob<T, DefaultComparer<T>> SortJob<T>(this NativeArray<T> container)
             where T : unmanaged, IComparable<T>
         {
             return SortJob(container.AsSpan(), new DefaultComparer<T>());
@@ -508,7 +519,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>A job for sorting the array.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static SortJob<T, U> SortJob<T, U>(this NativeArray<T> container, U comp)
+        public static unsafe SortJob<T, U> SortJob<T, U>(this NativeArray<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -521,7 +532,7 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <param name="container">The list to sort.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static void Sort<T>(this NativeList<T> container)
+        public static unsafe void Sort<T>(this NativeList<T> container)
             where T : unmanaged, IComparable<T>
         {
             Sort(container.AsSpan());
@@ -535,7 +546,7 @@ namespace Unity.Collections
         /// <param name="container">The list to sort.</param>
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static void Sort<T, U>(this NativeList<T> container, U comp)
+        public static unsafe void Sort<T, U>(this NativeList<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -569,7 +580,7 @@ namespace Unity.Collections
         /// <param name="values">Values to use for sorting.</param>
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static void SortIndices<T, U>(this Span<int> indices, ReadOnlySpan<T> values, U comp)
+        public static unsafe void SortIndices<T, U>(this Span<int> indices, ReadOnlySpan<T> values, U comp)
             where T : unmanaged, IComparable<T>
             where U : unmanaged, IComparer<T>
         {
@@ -595,7 +606,7 @@ namespace Unity.Collections
         /// <param name="indices">Indices to sort. Indices must be unique, nonnegative, and strictly less than the length of values.</param>
         /// <param name="values">Values to use for sorting.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static void SortIndices<T>(this Span<int> indices, ReadOnlySpan<T> values)
+        public static unsafe void SortIndices<T>(this Span<int> indices, ReadOnlySpan<T> values)
             where T : unmanaged, IComparable<T>
         {
             indices.SortIndices(values, new DefaultComparer<T>());
@@ -610,7 +621,7 @@ namespace Unity.Collections
         /// <param name="container">The list to sort.</param>
         /// <returns>A job for sorting this list.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static SortJob<T, DefaultComparer<T>> SortJob<T>(this NativeList<T> container)
+        public static unsafe SortJob<T, DefaultComparer<T>> SortJob<T>(this NativeList<T> container)
             where T : unmanaged, IComparable<T>
         {
             return SortJob(container.AsSpan(), new DefaultComparer<T>());
@@ -627,7 +638,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>A job for sorting this list.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static SortJob<T, U> SortJob<T, U>(this NativeList<T> container, U comp)
+        public static unsafe SortJob<T, U> SortJob<T, U>(this NativeList<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -644,7 +655,7 @@ namespace Unity.Collections
         /// <param name="container">The list to sort.</param>
         /// <returns>A job for sorting this list.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static SortJobDefer<T, DefaultComparer<T>> SortJobDefer<T>(this NativeList<T> container)
+        public static unsafe SortJobDefer<T, DefaultComparer<T>> SortJobDefer<T>(this NativeList<T> container)
             where T : unmanaged, IComparable<T>
         {
             return SortJobDefer(container, new DefaultComparer<T>());
@@ -662,7 +673,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>A job for sorting this list.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static SortJobDefer<T, U> SortJobDefer<T, U>(this NativeList<T> container, U comp)
+        public static unsafe SortJobDefer<T, U> SortJobDefer<T, U>(this NativeList<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -675,7 +686,8 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <param name="container">The list to sort.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static void Sort<T>(this UnsafeList<T> container) where T : unmanaged, IComparable<T>
+        public static unsafe void Sort<T>(this UnsafeList<T> container)
+            where T : unmanaged, IComparable<T>
         {
             Sort(container.AsSpan());
         }
@@ -688,7 +700,7 @@ namespace Unity.Collections
         /// <param name="container">The list to sort.</param>
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static void Sort<T, U>(this UnsafeList<T> container, U comp)
+        public static unsafe void Sort<T, U>(this UnsafeList<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -703,7 +715,7 @@ namespace Unity.Collections
         /// <param name="container">The list to sort.</param>
         /// <returns>A job for sorting this list.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static SortJob<T, DefaultComparer<T>> SortJob<T>(this UnsafeList<T> container)
+        public static unsafe SortJob<T, DefaultComparer<T>> SortJob<T>(this UnsafeList<T> container)
             where T : unmanaged, IComparable<T>
         {
             return SortJob(container.AsSpan(), new DefaultComparer<T>());
@@ -719,7 +731,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>A job for sorting this list.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static SortJob<T, U> SortJob<T, U>(this UnsafeList<T> container, U comp)
+        public static unsafe SortJob<T, U> SortJob<T, U>(this UnsafeList<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -732,7 +744,7 @@ namespace Unity.Collections
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <param name="container">The slice to sort.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static void Sort<T>(this NativeSlice<T> container)
+        public static unsafe void Sort<T>(this NativeSlice<T> container)
             where T : unmanaged, IComparable<T>
         {
             container.Sort(new DefaultComparer<T>());
@@ -746,7 +758,7 @@ namespace Unity.Collections
         /// <param name="container">The slice to sort.</param>
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static void Sort<T, U>(this NativeSlice<T> container, U comp)
+        public static unsafe void Sort<T, U>(this NativeSlice<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -766,7 +778,7 @@ namespace Unity.Collections
         /// <param name="container">The slice to sort.</param>
         /// <returns>A job for sorting this slice.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int) })]
-        public unsafe static SortJob<T, DefaultComparer<T>> SortJob<T>(this NativeSlice<T> container)
+        public static unsafe SortJob<T, DefaultComparer<T>> SortJob<T>(this NativeSlice<T> container)
             where T : unmanaged, IComparable<T>
         {
             CheckStrideMatchesSize<T>(container.Stride);
@@ -783,7 +795,7 @@ namespace Unity.Collections
         /// <param name="comp">The comparison function used to determine the relative order of the elements.</param>
         /// <returns>A job for sorting this slice.</returns>
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        public unsafe static SortJob<T, U> SortJob<T, U>(this NativeSlice<T> container, U comp)
+        public static unsafe SortJob<T, U> SortJob<T, U>(this NativeSlice<T> container, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -792,9 +804,8 @@ namespace Unity.Collections
         }
 
         /// -- Internals
-
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        unsafe internal static void IntroSort<T, U>(void* array, int length, U comp)
+        internal static unsafe void IntroSort<T, U>(void* array, int length, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -805,7 +816,7 @@ namespace Unity.Collections
         const int k_IntrosortSizeThreshold = 16;
 
         [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(DefaultComparer<int>) })]
-        unsafe internal static void IntroSort_R<T, U>(void* array, int lo, int hi, int depth, U comp)
+        internal static unsafe void IntroSort_R<T, U>(void* array, int lo, int hi, int depth, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -848,11 +859,12 @@ namespace Unity.Collections
             }
         }
 
-        unsafe static void InsertionSort<T, U>(void* array, int lo, int hi, U comp)
+        static unsafe void InsertionSort<T, U>(void* array, int lo, int hi, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
-            int i, j;
+            int i,
+                j;
             T t;
             for (i = lo; i < hi; i++)
             {
@@ -869,7 +881,7 @@ namespace Unity.Collections
             }
         }
 
-        unsafe static int Partition<T, U>(void* array, int lo, int hi, U comp)
+        static unsafe int Partition<T, U>(void* array, int lo, int hi, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -880,17 +892,14 @@ namespace Unity.Collections
 
             T pivot = UnsafeUtility.ReadArrayElement<T>(array, mid);
             Swap<T>(array, mid, hi - 1);
-            int left = lo, right = hi - 1;
+            int left = lo,
+                right = hi - 1;
 
             while (left < right)
             {
-                while (left < hi && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, ++left)) > 0)
-                {
-                }
+                while (left < hi && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, ++left)) > 0) { }
 
-                while (right > left && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, --right)) < 0)
-                {
-                }
+                while (right > left && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, --right)) < 0) { }
 
                 if (left >= right)
                     break;
@@ -902,7 +911,7 @@ namespace Unity.Collections
             return left;
         }
 
-        unsafe static void HeapSort<T, U>(void* array, int lo, int hi, U comp)
+        static unsafe void HeapSort<T, U>(void* array, int lo, int hi, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -920,7 +929,7 @@ namespace Unity.Collections
             }
         }
 
-        unsafe static void Heapify<T, U>(void* array, int i, int n, int lo, U comp)
+        static unsafe void Heapify<T, U>(void* array, int i, int n, int lo, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -930,7 +939,15 @@ namespace Unity.Collections
             {
                 child = 2 * i;
 
-                if (child < n && (comp.Compare(UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1), UnsafeUtility.ReadArrayElement<T>(array, (lo + child))) < 0))
+                if (
+                    child < n
+                    && (
+                        comp.Compare(
+                            UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1),
+                            UnsafeUtility.ReadArrayElement<T>(array, (lo + child))
+                        ) < 0
+                    )
+                )
                 {
                     child++;
                 }
@@ -940,41 +957,51 @@ namespace Unity.Collections
                     break;
                 }
 
-                UnsafeUtility.WriteArrayElement(array, lo + i - 1, UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1));
+                UnsafeUtility.WriteArrayElement(
+                    array,
+                    lo + i - 1,
+                    UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1)
+                );
                 i = child;
             }
 
             UnsafeUtility.WriteArrayElement(array, lo + i - 1, val);
         }
 
-        unsafe static void Swap<T>(void* array, int lhs, int rhs) where T : unmanaged
+        static unsafe void Swap<T>(void* array, int lhs, int rhs)
+            where T : unmanaged
         {
             T val = UnsafeUtility.ReadArrayElement<T>(array, lhs);
             UnsafeUtility.WriteArrayElement(array, lhs, UnsafeUtility.ReadArrayElement<T>(array, rhs));
             UnsafeUtility.WriteArrayElement(array, rhs, val);
         }
 
-        unsafe static void SwapIfGreaterWithItems<T, U>(void* array, int lhs, int rhs, U comp)
+        static unsafe void SwapIfGreaterWithItems<T, U>(void* array, int lhs, int rhs, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
             if (lhs != rhs)
             {
-                if (comp.Compare(UnsafeUtility.ReadArrayElement<T>(array, lhs), UnsafeUtility.ReadArrayElement<T>(array, rhs)) > 0)
+                if (
+                    comp.Compare(
+                        UnsafeUtility.ReadArrayElement<T>(array, lhs),
+                        UnsafeUtility.ReadArrayElement<T>(array, rhs)
+                    ) > 0
+                )
                 {
                     Swap<T>(array, lhs, rhs);
                 }
             }
         }
 
-        unsafe static void IntroSortStruct<T, U>(void* array, int length, U comp)
+        static unsafe void IntroSortStruct<T, U>(void* array, int length, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
             IntroSortStruct_R<T, U>(array, 0, length - 1, 2 * CollectionHelper.Log2Floor(length), comp);
         }
 
-        unsafe static void IntroSortStruct_R<T, U>(void* array, in int lo, in int _hi, int depth, U comp)
+        static unsafe void IntroSortStruct_R<T, U>(void* array, in int lo, in int _hi, int depth, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -1019,11 +1046,12 @@ namespace Unity.Collections
             }
         }
 
-        unsafe static void InsertionSortStruct<T, U>(void* array, in int lo, in int hi, U comp)
+        static unsafe void InsertionSortStruct<T, U>(void* array, in int lo, in int hi, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
-            int i, j;
+            int i,
+                j;
             T t;
             for (i = lo; i < hi; i++)
             {
@@ -1038,7 +1066,7 @@ namespace Unity.Collections
             }
         }
 
-        unsafe static int PartitionStruct<T, U>(void* array, in int lo, in int hi, U comp)
+        static unsafe int PartitionStruct<T, U>(void* array, in int lo, in int hi, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -1049,17 +1077,14 @@ namespace Unity.Collections
 
             T pivot = UnsafeUtility.ReadArrayElement<T>(array, mid);
             SwapStruct<T>(array, mid, hi - 1);
-            int left = lo, right = hi - 1;
+            int left = lo,
+                right = hi - 1;
 
             while (left < right)
             {
-                while (left < hi && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, ++left)) > 0)
-                {
-                }
+                while (left < hi && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, ++left)) > 0) { }
 
-                while (right > left && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, --right)) < 0)
-                {
-                }
+                while (right > left && comp.Compare(pivot, UnsafeUtility.ReadArrayElement<T>(array, --right)) < 0) { }
 
                 if (left >= right)
                     break;
@@ -1071,7 +1096,7 @@ namespace Unity.Collections
             return left;
         }
 
-        unsafe static void HeapSortStruct<T, U>(void* array, in int lo, in int hi, U comp)
+        static unsafe void HeapSortStruct<T, U>(void* array, in int lo, in int hi, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -1089,7 +1114,7 @@ namespace Unity.Collections
             }
         }
 
-        unsafe static void HeapifyStruct<T, U>(void* array, int i, int n, in int lo, U comp)
+        static unsafe void HeapifyStruct<T, U>(void* array, int i, int n, in int lo, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -1099,7 +1124,15 @@ namespace Unity.Collections
             {
                 child = 2 * i;
 
-                if (child < n && (comp.Compare(UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1), UnsafeUtility.ReadArrayElement<T>(array, (lo + child))) < 0))
+                if (
+                    child < n
+                    && (
+                        comp.Compare(
+                            UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1),
+                            UnsafeUtility.ReadArrayElement<T>(array, (lo + child))
+                        ) < 0
+                    )
+                )
                 {
                     child++;
                 }
@@ -1109,14 +1142,18 @@ namespace Unity.Collections
                     break;
                 }
 
-                UnsafeUtility.WriteArrayElement(array, lo + i - 1, UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1));
+                UnsafeUtility.WriteArrayElement(
+                    array,
+                    lo + i - 1,
+                    UnsafeUtility.ReadArrayElement<T>(array, lo + child - 1)
+                );
                 i = child;
             }
 
             UnsafeUtility.WriteArrayElement(array, lo + i - 1, val);
         }
 
-        unsafe static void SwapStruct<T>(void* array, int lhs, int rhs)
+        static unsafe void SwapStruct<T>(void* array, int lhs, int rhs)
             where T : unmanaged
         {
             T val = UnsafeUtility.ReadArrayElement<T>(array, lhs);
@@ -1124,13 +1161,18 @@ namespace Unity.Collections
             UnsafeUtility.WriteArrayElement(array, rhs, val);
         }
 
-        unsafe static void SwapIfGreaterWithItemsStruct<T, U>(void* array, int lhs, int rhs, U comp)
+        static unsafe void SwapIfGreaterWithItemsStruct<T, U>(void* array, int lhs, int rhs, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
             if (lhs != rhs)
             {
-                if (comp.Compare(UnsafeUtility.ReadArrayElement<T>(array, lhs), UnsafeUtility.ReadArrayElement<T>(array, rhs)) > 0)
+                if (
+                    comp.Compare(
+                        UnsafeUtility.ReadArrayElement<T>(array, lhs),
+                        UnsafeUtility.ReadArrayElement<T>(array, rhs)
+                    ) > 0
+                )
                 {
                     SwapStruct<T>(array, lhs, rhs);
                 }
@@ -1138,7 +1180,8 @@ namespace Unity.Collections
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        static void CheckStrideMatchesSize<T>(int stride) where T : unmanaged
+        static void CheckStrideMatchesSize<T>(int stride)
+            where T : unmanaged
         {
             if (stride != sizeof(T))
             {
@@ -1147,7 +1190,7 @@ namespace Unity.Collections
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        unsafe static void CheckComparer<T, U>(T* array, int length, U comp)
+        static unsafe void CheckComparer<T, U>(T* array, int length, U comp)
             where T : unmanaged
             where U : IComparer<T>
         {
@@ -1157,32 +1200,39 @@ namespace Unity.Collections
 
                 if (0 != comp.Compare(a, a))
                 {
-                    throw new InvalidOperationException("Comparison function is incorrect. Compare(a, a) must return 0/equal.");
+                    throw new InvalidOperationException(
+                        "Comparison function is incorrect. Compare(a, a) must return 0/equal."
+                    );
                 }
 
                 for (int i = 1, len = math.min(length, 8); i < len; ++i)
                 {
                     T b = array[i];
 
-                    if (0 == comp.Compare(a, b) &&
-                        0 == comp.Compare(b, a))
+                    if (0 == comp.Compare(a, b) && 0 == comp.Compare(b, a))
                     {
                         continue;
                     }
 
                     if (0 == comp.Compare(a, b))
                     {
-                        throw new InvalidOperationException("Comparison function is incorrect. Compare(a, b) of two different values should not return 0/equal.");
+                        throw new InvalidOperationException(
+                            "Comparison function is incorrect. Compare(a, b) of two different values should not return 0/equal."
+                        );
                     }
 
                     if (0 == comp.Compare(b, a))
                     {
-                        throw new InvalidOperationException("Comparison function is incorrect. Compare(b, a) of two different values should not return 0/equal.");
+                        throw new InvalidOperationException(
+                            "Comparison function is incorrect. Compare(b, a) of two different values should not return 0/equal."
+                        );
                     }
 
                     if (comp.Compare(a, b) == comp.Compare(b, a))
                     {
-                        throw new InvalidOperationException("Comparison function is incorrect. Compare(a, b) when a and b are different values should not return the same value as Compare(b, a).");
+                        throw new InvalidOperationException(
+                            "Comparison function is incorrect. Compare(a, b) when a and b are different values should not return the same value as Compare(b, a)."
+                        );
                     }
 
                     break;
@@ -1199,7 +1249,9 @@ namespace Unity.Collections
     /// </remarks>
     /// <typeparam name="T">The type of the elements to sort.</typeparam>
     /// <typeparam name="U">The type of the comparer.</typeparam>
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(NativeSortExtension.DefaultComparer<int>) })]
+    [GenerateTestsForBurstCompatibility(
+        GenericTypeArguments = new[] { typeof(int), typeof(NativeSortExtension.DefaultComparer<int>) }
+    )]
     public unsafe struct SortJob<T, U>
         where T : unmanaged
         where U : IComparer<T>
@@ -1277,7 +1329,8 @@ namespace Unity.Collections
                     {
                         var startIndex = i * SegmentWidth;
                         var offset = segmentIndex[i];
-                        var segmentLength = ((Length - startIndex) < SegmentWidth) ? (Length - startIndex) : SegmentWidth;
+                        var segmentLength =
+                            ((Length - startIndex) < SegmentWidth) ? (Length - startIndex) : SegmentWidth;
                         if (offset == segmentLength)
                             continue;
 
@@ -1318,14 +1371,25 @@ namespace Unity.Collections
 #endif
             var workerCount = math.max(1, maxThreadCount);
             var workerSegmentCount = segmentCount / workerCount;
-            var segmentSortJob = new SegmentSort { Data = Data, Comp = Comp, Length = Length, SegmentWidth = 1024 };
+            var segmentSortJob = new SegmentSort
+            {
+                Data = Data,
+                Comp = Comp,
+                Length = Length,
+                SegmentWidth = 1024,
+            };
             var segmentSortJobHandle = segmentSortJob.Schedule(segmentCount, workerSegmentCount, inputDeps);
-            var segmentSortMergeJob = new SegmentSortMerge { Data = Data, Comp = Comp, Length = Length, SegmentWidth = 1024 };
+            var segmentSortMergeJob = new SegmentSortMerge
+            {
+                Data = Data,
+                Comp = Comp,
+                Length = Length,
+                SegmentWidth = 1024,
+            };
             var segmentSortMergeJobHandle = segmentSortMergeJob.Schedule(segmentSortJobHandle);
             return segmentSortMergeJobHandle;
         }
     }
-
 
     /// <summary>
     /// Returned by the `SortJobDefer` methods of <see cref="Unity.Collections.NativeSortExtension"/>. Call `Schedule` to schedule the sorting.
@@ -1335,7 +1399,9 @@ namespace Unity.Collections
     /// </remarks>
     /// <typeparam name="T">The type of the elements to sort.</typeparam>
     /// <typeparam name="U">The type of the comparer.</typeparam>
-    [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(int), typeof(NativeSortExtension.DefaultComparer<int>) })]
+    [GenerateTestsForBurstCompatibility(
+        GenericTypeArguments = new[] { typeof(int), typeof(NativeSortExtension.DefaultComparer<int>) }
+    )]
     public unsafe struct SortJobDefer<T, U>
         where T : unmanaged
         where U : IComparer<T>
@@ -1372,7 +1438,8 @@ namespace Unity.Collections
             public void Execute(int index)
             {
                 var startIndex = index * SegmentWidth;
-                var segmentLength = ((Data->Length - startIndex) < SegmentWidth) ? (Data->Length - startIndex) : SegmentWidth;
+                var segmentLength =
+                    ((Data->Length - startIndex) < SegmentWidth) ? (Data->Length - startIndex) : SegmentWidth;
                 NativeSortExtension.Sort(Data->Ptr + startIndex, segmentLength, Comp);
             }
         }
@@ -1411,7 +1478,8 @@ namespace Unity.Collections
                     {
                         var startIndex = i * SegmentWidth;
                         var offset = segmentIndex[i];
-                        var segmentLength = ((length - startIndex) < SegmentWidth) ? (length - startIndex) : SegmentWidth;
+                        var segmentLength =
+                            ((length - startIndex) < SegmentWidth) ? (length - startIndex) : SegmentWidth;
                         if (offset == segmentLength)
                             continue;
 
@@ -1441,9 +1509,20 @@ namespace Unity.Collections
         /// <returns>The handle of this newly scheduled job.</returns>
         public JobHandle Schedule(JobHandle inputDeps = default)
         {
-            var segmentSortJob = new SegmentSort { DataRO = Data, Data = Data.m_ListData, Comp = Comp, SegmentWidth = 1024 };
+            var segmentSortJob = new SegmentSort
+            {
+                DataRO = Data,
+                Data = Data.m_ListData,
+                Comp = Comp,
+                SegmentWidth = 1024,
+            };
             var segmentSortJobHandle = segmentSortJob.ScheduleByRef(Data, 1024, inputDeps);
-            var segmentSortMergeJob = new SegmentSortMerge { Data = Data, Comp = Comp, SegmentWidth = 1024 };
+            var segmentSortMergeJob = new SegmentSortMerge
+            {
+                Data = Data,
+                Comp = Comp,
+                SegmentWidth = 1024,
+            };
             var segmentSortMergeJobHandle = segmentSortMergeJob.Schedule(segmentSortJobHandle);
 
             return segmentSortMergeJobHandle;

@@ -8,9 +8,7 @@ namespace Unity.Entities.Editor
     {
         public bool ShowAdvancedWorlds;
 
-        public void OnSettingChanged(PropertyPath path)
-        {
-        }
+        public void OnSettingChanged(PropertyPath path) { }
 
         public string[] GetSearchKeywords()
         {

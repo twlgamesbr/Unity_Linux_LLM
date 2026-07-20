@@ -58,7 +58,7 @@ public struct PreprocessorInfo
             IsDotsDebugMode = isDotsDebugMode,
             IsUnityCollectionChecksEnabled = isUnityCollectionChecksEnabled,
             IsForUnityEditor = isForUnityEditor,
-            IsDevelopmentBuildEnabled = isDevelopmentBuildEnabled
+            IsDevelopmentBuildEnabled = isDevelopmentBuildEnabled,
         };
     }
 }

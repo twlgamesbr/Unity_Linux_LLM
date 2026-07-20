@@ -23,12 +23,12 @@ namespace UnityEditor.UI
         {
             base.OnEnable();
 
-            m_HandleRect        = serializedObject.FindProperty("m_HandleRect");
-            m_Direction         = serializedObject.FindProperty("m_Direction");
-            m_Value             = serializedObject.FindProperty("m_Value");
-            m_Size              = serializedObject.FindProperty("m_Size");
-            m_NumberOfSteps     = serializedObject.FindProperty("m_NumberOfSteps");
-            m_OnValueChanged    = serializedObject.FindProperty("m_OnValueChanged");
+            m_HandleRect = serializedObject.FindProperty("m_HandleRect");
+            m_Direction = serializedObject.FindProperty("m_Direction");
+            m_Value = serializedObject.FindProperty("m_Value");
+            m_Size = serializedObject.FindProperty("m_Size");
+            m_NumberOfSteps = serializedObject.FindProperty("m_NumberOfSteps");
+            m_OnValueChanged = serializedObject.FindProperty("m_OnValueChanged");
         }
 
         public override void OnInspectorGUI()
@@ -40,7 +40,13 @@ namespace UnityEditor.UI
 
             // EditorGUILayout.PropertyField(m_HandleRect);
             EditorGUI.BeginChangeCheck();
-            RectTransform newRectTransform = EditorGUILayout.ObjectField("Handle Rect", m_HandleRect.objectReferenceValue, typeof(RectTransform), true) as RectTransform;
+            RectTransform newRectTransform =
+                EditorGUILayout.ObjectField(
+                    "Handle Rect",
+                    m_HandleRect.objectReferenceValue,
+                    typeof(RectTransform),
+                    true
+                ) as RectTransform;
             if (EditorGUI.EndChangeCheck())
             {
                 // Handle Rect will modify its GameObject RectTransform drivenBy, so we need to Record the old and new RectTransform.
@@ -85,13 +91,24 @@ namespace UnityEditor.UI
                     Scrollbar scrollbar = obj as Scrollbar;
                     Scrollbar.Direction dir = scrollbar.direction;
                     if (dir == Scrollbar.Direction.LeftToRight || dir == Scrollbar.Direction.RightToLeft)
-                        warning = (scrollbar.navigation.mode != Navigation.Mode.Automatic && scrollbar.navigation.mode != Navigation.Mode.Horizontal && (scrollbar.FindSelectableOnLeft() != null || scrollbar.FindSelectableOnRight() != null));
+                        warning = (
+                            scrollbar.navigation.mode != Navigation.Mode.Automatic
+                            && scrollbar.navigation.mode != Navigation.Mode.Horizontal
+                            && (scrollbar.FindSelectableOnLeft() != null || scrollbar.FindSelectableOnRight() != null)
+                        );
                     else
-                        warning = (scrollbar.navigation.mode != Navigation.Mode.Automatic && scrollbar.navigation.mode != Navigation.Mode.Vertical && (scrollbar.FindSelectableOnDown() != null || scrollbar.FindSelectableOnUp() != null));
+                        warning = (
+                            scrollbar.navigation.mode != Navigation.Mode.Automatic
+                            && scrollbar.navigation.mode != Navigation.Mode.Vertical
+                            && (scrollbar.FindSelectableOnDown() != null || scrollbar.FindSelectableOnUp() != null)
+                        );
                 }
 
                 if (warning)
-                    EditorGUILayout.HelpBox("The selected scrollbar direction conflicts with navigation. Not all navigation options may work.", MessageType.Warning);
+                    EditorGUILayout.HelpBox(
+                        "The selected scrollbar direction conflicts with navigation. Not all navigation options may work.",
+                        MessageType.Warning
+                    );
 
                 EditorGUILayout.Space();
                 // Draw the event notification options
@@ -99,7 +116,10 @@ namespace UnityEditor.UI
             }
             else
             {
-                EditorGUILayout.HelpBox("Specify a RectTransform for the scrollbar handle. It must have a parent RectTransform that the handle can slide within.", MessageType.Info);
+                EditorGUILayout.HelpBox(
+                    "Specify a RectTransform for the scrollbar handle. It must have a parent RectTransform that the handle can slide within.",
+                    MessageType.Info
+                );
             }
 
             serializedObject.ApplyModifiedProperties();

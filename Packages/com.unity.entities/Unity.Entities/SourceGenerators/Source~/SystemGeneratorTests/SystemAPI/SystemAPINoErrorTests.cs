@@ -1,8 +1,6 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using VerifyCS =
-    Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<
-        Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VerifyCS = Unity.Entities.SourceGenerators.Test.CSharpSourceGeneratorVerifier<Unity.Entities.SourceGen.SystemGenerator.SystemGenerator>;
 
 namespace Unity.Entities.SourceGenerators;
 
@@ -12,7 +10,8 @@ public class SystemAPINoErrorTests
     [TestMethod]
     public async Task TryGetComponent()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -26,12 +25,13 @@ public unsafe partial struct NestedGetSingletonEntity : ISystem
     }
 }";
         await VerifyCS.VerifySourceGeneratorAsync(testSource);
-    }    
-    
+    }
+
     [TestMethod]
     public async Task TryGetComponentManaged()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -48,12 +48,13 @@ public unsafe partial struct NestedGetSingletonEntity : ISystem
 }";
 
         await VerifyCS.VerifySourceGeneratorAsync(testSource);
-    }  
-    
+    }
+
     [TestMethod]
     public async Task TryGetComponentGenericTypeInferred()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -67,12 +68,13 @@ public unsafe partial struct NestedGetSingletonEntity : ISystem
     }
 }";
         await VerifyCS.VerifySourceGeneratorAsync(testSource);
-    }    
-    
+    }
+
     [TestMethod]
     public async Task TryGetComponentManagedGenericTypeInferred()
     {
-        const string testSource = @"
+        const string testSource =
+            @"
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Entities.Tests;
@@ -89,5 +91,5 @@ public unsafe partial struct NestedGetSingletonEntity : ISystem
 }";
 
         await VerifyCS.VerifySourceGeneratorAsync(testSource);
-    }     
+    }
 }

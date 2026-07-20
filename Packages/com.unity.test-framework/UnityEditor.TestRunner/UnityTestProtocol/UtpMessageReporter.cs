@@ -17,7 +17,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
         {
             var testPlanMessage = TestRunnerApiMapper.MapTestToTestPlanMessage(testsToRun);
             Logger.Log(testPlanMessage);
-            
+
             Logger.Log(UtpMessageBuilder.BuildScreenSettings());
             Logger.Log(UtpMessageBuilder.BuildPlayerSettings());
             Logger.Log(UtpMessageBuilder.BuildBuildSettings());

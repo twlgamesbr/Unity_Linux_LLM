@@ -18,14 +18,22 @@ namespace UnityEngine.InputSystem.Utilities
         {
             switch (type)
             {
-                case TypeCode.Byte: return true;
-                case TypeCode.SByte: return true;
-                case TypeCode.Int16: return true;
-                case TypeCode.Int32: return true;
-                case TypeCode.Int64: return true;
-                case TypeCode.UInt16: return true;
-                case TypeCode.UInt32: return true;
-                case TypeCode.UInt64: return true;
+                case TypeCode.Byte:
+                    return true;
+                case TypeCode.SByte:
+                    return true;
+                case TypeCode.Int16:
+                    return true;
+                case TypeCode.Int32:
+                    return true;
+                case TypeCode.Int64:
+                    return true;
+                case TypeCode.UInt16:
+                    return true;
+                case TypeCode.UInt32:
+                    return true;
+                case TypeCode.UInt64:
+                    return true;
             }
             return false;
         }
@@ -96,8 +104,10 @@ namespace UnityEngine.InputSystem.Utilities
                     var haveFoundInterface = false;
                     foreach (var element in interfaces)
                     {
-                        if (element.IsConstructedGenericType &&
-                            element.GetGenericTypeDefinition() == genericTypeDefinition)
+                        if (
+                            element.IsConstructedGenericType
+                            && element.GetGenericTypeDefinition() == genericTypeDefinition
+                        )
                         {
                             type = element;
                             haveFoundInterface = true;
@@ -105,8 +115,11 @@ namespace UnityEngine.InputSystem.Utilities
                         }
 
                         // Recurse into interface in case we're looking for a base interface.
-                        var typeArgument =
-                            GetGenericTypeArgumentFromHierarchy(element, genericTypeDefinition, argumentIndex);
+                        var typeArgument = GetGenericTypeArgumentFromHierarchy(
+                            element,
+                            genericTypeDefinition,
+                            argumentIndex
+                        );
                         if (typeArgument != null)
                             return typeArgument;
                     }

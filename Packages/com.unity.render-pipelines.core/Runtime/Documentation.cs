@@ -1,7 +1,7 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 #if UNITY_EDITOR
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 #endif
@@ -27,9 +27,7 @@ namespace UnityEngine.Rendering
         /// <param name="pageName">The name of the documentation page.</param>
         /// <param name="packageName">The package name, defaulting to "com.unity.render-pipelines.core".</param>
         public CoreRPHelpURLAttribute(string pageName, string packageName = "com.unity.render-pipelines.core")
-            : base(DocumentationInfo.GetPageLink(packageName, pageName, ""))
-        {
-        }
+            : base(DocumentationInfo.GetPageLink(packageName, pageName, "")) { }
 
         /// <summary>
         /// The constructor of the attribute
@@ -37,10 +35,12 @@ namespace UnityEngine.Rendering
         /// <param name="pageName">The name of the documentation page.</param>
         /// <param name="pageHash">The hash specifying a section within the page.</param>
         /// <param name="packageName">The package name, defaulting to "com.unity.render-pipelines.core".</param>
-        public CoreRPHelpURLAttribute(string pageName, string pageHash, string packageName = "com.unity.render-pipelines.core")
-            : base(DocumentationInfo.GetPageLink(packageName, pageName, pageHash))
-        {
-        }
+        public CoreRPHelpURLAttribute(
+            string pageName,
+            string pageHash,
+            string packageName = "com.unity.render-pipelines.core"
+        )
+            : base(DocumentationInfo.GetPageLink(packageName, pageName, pageHash)) { }
     }
 
     /// <summary>
@@ -55,8 +55,9 @@ namespace UnityEngine.Rendering
     public class CurrentPipelineHelpURLAttribute : HelpURLAttribute
     {
         private string pageName { get; }
-        
+
         private string pageHash { get; }
+
         /// <summary>
         /// The constructor of the attribute
         /// </summary>
@@ -80,7 +81,13 @@ namespace UnityEngine.Rendering
                 if (!GraphicsSettings.isScriptableRenderPipelineEnabled)
                     return string.Empty;
 
-                if (DocumentationUtils.TryGetPackageInfoForType(GraphicsSettings.currentRenderPipelineAssetType, out var package, out var version))
+                if (
+                    DocumentationUtils.TryGetPackageInfoForType(
+                        GraphicsSettings.currentRenderPipelineAssetType,
+                        out var package,
+                        out var version
+                    )
+                )
                 {
                     return DocumentationInfo.GetPackageLink(package, version, pageName, pageHash);
                 }
@@ -89,7 +96,7 @@ namespace UnityEngine.Rendering
             }
         }
     }
-    
+
     /// <summary>
     /// Use this attribute to define a documentation URL that is only active when a specific Render Pipeline is in use.
     /// </summary>
@@ -111,9 +118,9 @@ namespace UnityEngine.Rendering
         private string pipelineName { get; }
 
         private string pageName { get; }
-        
+
         private string pageHash { get; }
-        
+
         /// <summary>
         /// Initializes the attribute to link to a specific documentation page for a named Render Pipeline.
         /// </summary>
@@ -148,7 +155,7 @@ namespace UnityEngine.Rendering
                 var pipelineType = GraphicsSettings.currentRenderPipelineAssetType;
                 if (pipelineType.Name != pipelineName)
                     return string.Empty;
-                
+
                 if (DocumentationUtils.TryGetPackageInfoForType(pipelineType, out var package, out var version))
                     return DocumentationInfo.GetPackageLink(package, version, pageName, pageHash);
 #endif
@@ -189,8 +196,9 @@ namespace UnityEngine.Rendering
         /// <param name="packageVersion">The package version.</param>
         /// <param name="pageName">The page name without the extension.</param>
         /// <returns>The full URL of the page.</returns>
-        public static string GetPackageLink(string packageName, string packageVersion, string pageName) => string.Format(url, packageName, packageVersion, pageName, "");
-        
+        public static string GetPackageLink(string packageName, string packageVersion, string pageName) =>
+            string.Format(url, packageName, packageVersion, pageName, "");
+
         /// <summary>
         /// Generates a help URL for the given package, page name and section name.
         /// </summary>
@@ -212,7 +220,8 @@ namespace UnityEngine.Rendering
         /// <param name="packageName">The package name</param>
         /// <param name="pageName">The page name without the extension.</param>
         /// <returns>The full URL of the page.</returns>
-        public static string GetPageLink(string packageName, string pageName) => string.Format(url, packageName, version, pageName, "");
+        public static string GetPageLink(string packageName, string pageName) =>
+            string.Format(url, packageName, version, pageName, "");
 
         /// <summary>
         /// Generates a help url for the given package and page name
@@ -234,14 +243,16 @@ namespace UnityEngine.Rendering
         /// <param name="packageName">The name of the package.</param>
         /// <param name="packageVersion">The version of the package.</param>
         /// <returns>The full URL to the default package documentation page.</returns>
-        public static string GetDefaultPackageLink(string packageName, string packageVersion) => string.Format(packageDocumentationUrl, packageName, packageVersion);
+        public static string GetDefaultPackageLink(string packageName, string packageVersion) =>
+            string.Format(packageDocumentationUrl, packageName, packageVersion);
 
         /// <summary>
         /// Generates a help url to the index page for the provided package name and package version.
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
         /// <returns>The full URL to the default package documentation page.</returns>
-        public static string GetDefaultPackageLink(string packageName) => string.Format(packageDocumentationUrl, packageName, version);
+        public static string GetDefaultPackageLink(string packageName) =>
+            string.Format(packageDocumentationUrl, packageName, version);
     }
 
     /// <summary>
@@ -258,11 +269,11 @@ namespace UnityEngine.Rendering
         public static string GetHelpURL<TEnum>(TEnum mask = default)
             where TEnum : struct, IConvertible
         {
-            var helpURLAttributes = mask
-                .GetType()
-                .GetCustomAttributes(typeof(HelpURLAttribute), false);
+            var helpURLAttributes = mask.GetType().GetCustomAttributes(typeof(HelpURLAttribute), false);
 
-            return helpURLAttributes.Length == 0 ? string.Empty : $"{((HelpURLAttribute)helpURLAttributes[0]).URL}#{mask}";
+            return helpURLAttributes.Length == 0
+                ? string.Empty
+                : $"{((HelpURLAttribute)helpURLAttributes[0]).URL}#{mask}";
         }
 
         /// <summary>
@@ -296,7 +307,11 @@ namespace UnityEngine.Rendering
         /// <param name="packageName">The name of the package containing the given type.</param>
         /// <param name="version">The version number of the package containing the given type. Only Major.Minor will be returned as fix is not used for documentation.</param>
         /// <returns>Returns true if the package information is found; otherwise, false.</returns>
-        public static bool TryGetPackageInfoForType([DisallowNull] Type type, [NotNullWhen(true)] out string packageName, [NotNullWhen(true)] out string version)
+        public static bool TryGetPackageInfoForType(
+            [DisallowNull] Type type,
+            [NotNullWhen(true)] out string packageName,
+            [NotNullWhen(true)] out string version
+        )
         {
             var packageInfo = PackageInfo.FindForAssembly(type.Assembly);
             if (packageInfo == null)

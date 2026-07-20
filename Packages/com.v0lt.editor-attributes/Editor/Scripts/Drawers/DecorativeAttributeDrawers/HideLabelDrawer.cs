@@ -11,13 +11,15 @@ namespace EditorAttributes.Editor
         {
             PropertyField propertyField = CreatePropertyField(property);
 
-            propertyField.RegisterCallbackOnce<GeometryChangedEvent>((callback) =>
-            {
-                var label = propertyField.Q<Label>(className: "unity-label");
+            propertyField.RegisterCallbackOnce<GeometryChangedEvent>(
+                (callback) =>
+                {
+                    var label = propertyField.Q<Label>(className: "unity-label");
 
-                if (label != null)
-                    label.style.display = DisplayStyle.None;
-            });
+                    if (label != null)
+                        label.style.display = DisplayStyle.None;
+                }
+            );
 
             return propertyField;
         }

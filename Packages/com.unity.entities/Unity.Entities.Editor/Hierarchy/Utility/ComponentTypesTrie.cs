@@ -26,8 +26,8 @@ namespace Unity.Entities.Editor
             });
         }
 
-        public static IEnumerable<string> SearchType(string startWith)
-            => !s_IsReady ? Array.Empty<string>() : k_Trie.Search(startWith);
+        public static IEnumerable<string> SearchType(string startWith) =>
+            !s_IsReady ? Array.Empty<string>() : k_Trie.Search(startWith);
     }
 
     static class SharedComponentTypesTrie
@@ -47,7 +47,7 @@ namespace Unity.Entities.Editor
 
             Task.Run(() =>
             {
-                foreach(var propertyDesc in descs)
+                foreach (var propertyDesc in descs)
                 {
                     k_Trie.Index(propertyDesc.propertyReplacement);
                 }
@@ -56,7 +56,7 @@ namespace Unity.Entities.Editor
             });
         }
 
-        public static IEnumerable<string> SearchType(string startWith)
-            => !s_IsReady ? Array.Empty<string>() : k_Trie.Search(startWith);
+        public static IEnumerable<string> SearchType(string startWith) =>
+            !s_IsReady ? Array.Empty<string>() : k_Trie.Search(startWith);
     }
 }

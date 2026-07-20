@@ -12,11 +12,20 @@ namespace UnityEngine.InputSystem
     /// </remarks>
     internal class InputSystemObject : ScriptableObject, ISerializationCallbackReceiver
     {
-        [SerializeField] public InputSystem.State systemState;
-        [SerializeField] public bool newInputBackendsCheckedAsEnabled;
-        [SerializeField] public string settings;
-        [SerializeField] public double exitEditModeTime;
-        [SerializeField] public double enterPlayModeTime;
+        [SerializeField]
+        public InputSystem.State systemState;
+
+        [SerializeField]
+        public bool newInputBackendsCheckedAsEnabled;
+
+        [SerializeField]
+        public string settings;
+
+        [SerializeField]
+        public double exitEditModeTime;
+
+        [SerializeField]
+        public double enterPlayModeTime;
 
         public void OnBeforeSerialize()
         {
@@ -29,9 +38,7 @@ namespace UnityEngine.InputSystem
             systemState.userSettings = InputEditorUserSettings.s_Settings;
         }
 
-        public void OnAfterDeserialize()
-        {
-        }
+        public void OnAfterDeserialize() { }
     }
 }
 #endif // UNITY_EDITOR

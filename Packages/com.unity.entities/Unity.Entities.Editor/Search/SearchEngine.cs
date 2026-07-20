@@ -1,8 +1,8 @@
-using UnityEditor.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Properties;
+using UnityEditor.Search;
 
 namespace Unity.Entities.Editor
 {
@@ -109,10 +109,7 @@ namespace Unity.Entities.Editor
         /// </summary>
         public StringComparison GlobalStringComparison
         {
-            get
-            {
-                return m_GlobalStringComparison;
-            }
+            get { return m_GlobalStringComparison; }
             set
             {
                 m_GlobalStringComparison = value;
@@ -151,10 +148,7 @@ namespace Unity.Entities.Editor
 
         public void AddSearchDataCallback<TData>(Func<TData, IEnumerable<string>> getSearchDataFunc)
         {
-            SearchDataCallbacks.Add(new SearchDataCallback<TData>
-            {
-                GetSearchDataFunc = getSearchDataFunc
-            });
+            SearchDataCallbacks.Add(new SearchDataCallback<TData> { GetSearchDataFunc = getSearchDataFunc });
 
             foreach (var backend in m_SearchBackends.Values.OfType<ISearchBackend<TData>>())
                 backend.AddSearchDataCallback(getSearchDataFunc);
@@ -183,15 +177,21 @@ namespace Unity.Entities.Editor
         /// <param name="options">The set of filter options.</param>
         /// <typeparam name="TData">The data type being searched.</typeparam>
         /// <typeparam name="TFilter">The return type for the filter.</typeparam>
-        public void AddSearchFilterCallback<TData, TFilter>(string token, Func<TData, TFilter> getSearchFilterFunc, SearchFilterOptions options)
+        public void AddSearchFilterCallback<TData, TFilter>(
+            string token,
+            Func<TData, TFilter> getSearchFilterFunc,
+            SearchFilterOptions options
+        )
         {
             SearchFilterTokens.Add(token);
-            SearchFilterCallbacks.Add(new SearchFilterCallback<TData, TFilter>
-            {
-                Token = token,
-                GetSearchFilterFunc = getSearchFilterFunc,
-                Options = options
-            });
+            SearchFilterCallbacks.Add(
+                new SearchFilterCallback<TData, TFilter>
+                {
+                    Token = token,
+                    GetSearchFilterFunc = getSearchFilterFunc,
+                    Options = options,
+                }
+            );
 
             foreach (var backend in m_SearchBackends.Values.OfType<ISearchBackend<TData>>())
                 backend.AddSearchFilterCallback(token, getSearchFilterFunc, options);
@@ -204,13 +204,14 @@ namespace Unity.Entities.Editor
         /// <typeparam name="TFilterConstant">The operator's right hand side type.</typeparam>
         /// <param name="op">The filter operator.</param>
         /// <param name="handler">Callback to handle the operation. Takes a TFilterVariable (value returned by the filter handler, will vary for each element) and a TFilterConstant (right hand side value of the operator, which is constant), and returns a boolean indicating if the filter passes or not.</param>
-        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, bool> handler)
+        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, bool> handler
+        )
         {
-            SearchOperatorHandlers.Add(new SearchOperatorHandler<TFilterVariable, TFilterConstant>
-            {
-                Operator = op,
-                Handler = handler
-            });
+            SearchOperatorHandlers.Add(
+                new SearchOperatorHandler<TFilterVariable, TFilterConstant> { Operator = op, Handler = handler }
+            );
 
             foreach (var backend in m_SearchBackends.Values)
                 backend.AddSearchOperatorHandler(op, handler);
@@ -223,13 +224,18 @@ namespace Unity.Entities.Editor
         /// <typeparam name="TFilterConstant">The operator's right hand side type.</typeparam>
         /// <param name="op">The filter operator.</param>
         /// <param name="handler">Callback to handle the operation. Takes a TFilterVariable (value returned by the filter handler, will vary for each element), a TFilterConstant (right hand side value of the operator, which is constant), a StringComparison option and returns a boolean indicating if the filter passes or not.</param>
-        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler)
+        public void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler
+        )
         {
-            SearchOperatorHandlers.Add(new SearchOperatorHandler<TFilterVariable, TFilterConstant>
-            {
-                Operator = op,
-                HandlerWithStringComparison = handler
-            });
+            SearchOperatorHandlers.Add(
+                new SearchOperatorHandler<TFilterVariable, TFilterConstant>
+                {
+                    Operator = op,
+                    HandlerWithStringComparison = handler,
+                }
+            );
 
             foreach (var backend in m_SearchBackends.Values)
                 backend.AddSearchOperatorHandler(op, handler);
@@ -252,7 +258,9 @@ namespace Unity.Entities.Editor
 
             // NOTE: This method can overwrite the built in backend which was registered but not another custom backend.
             if (m_SearchBackends.TryGetValue(typeof(TData), out var instance) && !(instance is SearchBackend<TData>))
-                throw new InvalidOperationException($"Failed to register ISearchBackend for Type=[{typeof(TData)}]. Type has already been registered.");
+                throw new InvalidOperationException(
+                    $"Failed to register ISearchBackend for Type=[{typeof(TData)}]. Type has already been registered."
+                );
 
             m_SearchBackends[typeof(TData)] = backend;
             backend.GlobalStringComparison = GlobalStringComparison;
@@ -284,10 +292,14 @@ namespace Unity.Entities.Editor
                 throw new ArgumentNullException(nameof(backend));
 
             if (!m_SearchBackends.TryGetValue(typeof(TData), out var instance))
-                throw new InvalidOperationException($"Failed to unregister ISearchBackend for Type=[{typeof(TData)}]. Backend has not been registered.");
+                throw new InvalidOperationException(
+                    $"Failed to unregister ISearchBackend for Type=[{typeof(TData)}]. Backend has not been registered."
+                );
 
             if (instance != backend)
-                throw new InvalidOperationException($"Failed to unregister ISearchBackend for Type=[{typeof(TData)}]. The specified backend does not match the registered instance.");
+                throw new InvalidOperationException(
+                    $"Failed to unregister ISearchBackend for Type=[{typeof(TData)}]. The specified backend does not match the registered instance."
+                );
 
             m_SearchBackends.Remove(typeof(TData));
         }
@@ -315,7 +327,11 @@ namespace Unity.Entities.Editor
 
             // Register any property based filters.
             foreach (var searchFilterProperty in SearchFilterProperties)
-                backend.AddSearchFilterProperty(searchFilterProperty.Token, searchFilterProperty.Path, searchFilterProperty.Options);
+                backend.AddSearchFilterProperty(
+                    searchFilterProperty.Token,
+                    searchFilterProperty.Path,
+                    searchFilterProperty.Options
+                );
 
             // Register any search data callbacks. This is done via interface to invoke using the strongly typed interface.
             foreach (var searchDataCallback in SearchDataCallbacks)
@@ -364,7 +380,10 @@ namespace Unity.Entities.Editor
             {
                 public List<string> SearchData;
 
-                void ICollectionPropertyBagVisitor.Visit<TCollection, TElement>(ICollectionPropertyBag<TCollection, TElement> properties, ref TCollection container)
+                void ICollectionPropertyBagVisitor.Visit<TCollection, TElement>(
+                    ICollectionPropertyBag<TCollection, TElement> properties,
+                    ref TCollection container
+                )
                 {
                     if (null == container)
                         return;
@@ -378,9 +397,16 @@ namespace Unity.Entities.Editor
 
             public readonly List<string> SearchData = new List<string>();
 
-            protected override void VisitPath<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value)
+            protected override void VisitPath<TContainer, TValue>(
+                Property<TContainer, TValue> property,
+                ref TContainer container,
+                ref TValue value
+            )
             {
-                if (PropertyBag.GetPropertyBag<TValue>() is ICollectionPropertyBagAccept<TValue> collectionPropertyBagAccept)
+                if (
+                    PropertyBag.GetPropertyBag<TValue>()
+                    is ICollectionPropertyBagAccept<TValue> collectionPropertyBagAccept
+                )
                 {
                     m_CollectionSearchDataVisitor.SearchData = SearchData;
                     collectionPropertyBagAccept.Accept(m_CollectionSearchDataVisitor, ref value);
@@ -480,9 +506,19 @@ namespace Unity.Entities.Editor
         }
 
         public abstract void AddSearchFilterProperty(string token, PropertyPath path, SearchFilterOptions options);
-        public abstract void AddSearchFilterCallback<TFilter>(string token, Func<TData, TFilter> getFilterDataFunc, SearchFilterOptions options);
-        public abstract void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, bool> handler);
-        public abstract void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(string op, Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler);
+        public abstract void AddSearchFilterCallback<TFilter>(
+            string token,
+            Func<TData, TFilter> getFilterDataFunc,
+            SearchFilterOptions options
+        );
+        public abstract void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, bool> handler
+        );
+        public abstract void AddSearchOperatorHandler<TFilterVariable, TFilterConstant>(
+            string op,
+            Func<TFilterVariable, TFilterConstant, StringComparison, bool> handler
+        );
 
         /// <summary>
         /// Applies the given search text to the specified data set.

@@ -6,12 +6,13 @@ using Unity.Properties;
 
 namespace Unity.Serialization.Binary
 {
-    unsafe class BinaryPropertyWriter : BinaryPropertyVisitor,
-        IPropertyBagVisitor,
-        IListPropertyBagVisitor,
-        ISetPropertyBagVisitor,
-        IDictionaryPropertyBagVisitor,
-        IPropertyVisitor
+    unsafe class BinaryPropertyWriter
+        : BinaryPropertyVisitor,
+            IPropertyBagVisitor,
+            IListPropertyBagVisitor,
+            ISetPropertyBagVisitor,
+            IDictionaryPropertyBagVisitor,
+            IPropertyVisitor
     {
         UnsafeAppendBuffer* m_Stream;
         Type m_SerializedType;
@@ -21,23 +22,18 @@ namespace Unity.Serialization.Binary
 
         internal UnsafeAppendBuffer* Writer => m_Stream;
 
-        public void SetStream(UnsafeAppendBuffer* stream)
-            => m_Stream = stream;
+        public void SetStream(UnsafeAppendBuffer* stream) => m_Stream = stream;
 
-        public void SetSerializedType(Type type)
-            => m_SerializedType = type;
+        public void SetSerializedType(Type type) => m_SerializedType = type;
 
-        public void SetDisableRootAdapters(bool disableRootAdapters)
-            => m_DisableRootAdapters = disableRootAdapters;
+        public void SetDisableRootAdapters(bool disableRootAdapters) => m_DisableRootAdapters = disableRootAdapters;
 
-        public void SetGlobalAdapters(List<IBinaryAdapter> adapters)
-            => m_Adapters.Global = adapters;
+        public void SetGlobalAdapters(List<IBinaryAdapter> adapters) => m_Adapters.Global = adapters;
 
-        public void SetUserDefinedAdapters(List<IBinaryAdapter> adapters)
-            => m_Adapters.UserDefined = adapters;
+        public void SetUserDefinedAdapters(List<IBinaryAdapter> adapters) => m_Adapters.UserDefined = adapters;
 
-        public void SetSerializedReferences(SerializedReferences serializedReferences)
-            => m_SerializedReferences = serializedReferences;
+        public void SetSerializedReferences(SerializedReferences serializedReferences) =>
+            m_SerializedReferences = serializedReferences;
 
         public BinaryPropertyWriter()
         {
@@ -55,7 +51,10 @@ namespace Unity.Serialization.Binary
             }
         }
 
-        void IListPropertyBagVisitor.Visit<TList, TElement>(IListPropertyBag<TList, TElement> properties, ref TList container)
+        void IListPropertyBagVisitor.Visit<TList, TElement>(
+            IListPropertyBag<TList, TElement> properties,
+            ref TList container
+        )
         {
             m_Stream->Add(container.Count);
 
@@ -75,7 +74,10 @@ namespace Unity.Serialization.Binary
             }
         }
 
-        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(IDictionaryPropertyBag<TDictionary, TKey, TValue> properties, ref TDictionary container)
+        void IDictionaryPropertyBagVisitor.Visit<TDictionary, TKey, TValue>(
+            IDictionaryPropertyBag<TDictionary, TKey, TValue> properties,
+            ref TDictionary container
+        )
         {
             m_Stream->Add(container.Count);
 
@@ -100,7 +102,11 @@ namespace Unity.Serialization.Binary
                 WriteValueWithoutAdapters(value, true);
         }
 
-        internal void WriteValueWithAdapters<TValue>(TValue value, BinaryAdapterCollection.Enumerator adapters, bool isRoot)
+        internal void WriteValueWithAdapters<TValue>(
+            TValue value,
+            BinaryAdapterCollection.Enumerator adapters,
+            bool isRoot
+        )
         {
             while (adapters.MoveNext())
             {
@@ -111,7 +117,11 @@ namespace Unity.Serialization.Binary
                         return;
                     case IContravariantBinaryAdapter<TValue> typedContravariant:
                         // NOTE: Boxing
-                        typedContravariant.Serialize((IBinarySerializationContext) new BinarySerializationContext<TValue>(this, adapters, value, isRoot), value);
+                        typedContravariant.Serialize(
+                            (IBinarySerializationContext)
+                                new BinarySerializationContext<TValue>(this, adapters, value, isRoot),
+                            value
+                        );
                         return;
                 }
             }
@@ -182,18 +192,21 @@ namespace Unity.Serialization.Binary
                 {
                     // Special path for polymorphic unity object references.
                     m_Stream->Add(k_TokenUnityEngineObjectReference);
-                    
+
                     var adapters = m_Adapters.GetEnumerator();
 
                     while (adapters.MoveNext())
                     {
                         if (adapters.Current is IContravariantBinaryAdapter<UnityEngine.Object> unityObjectAdaper)
                         {
-                            unityObjectAdaper.Serialize(new BinarySerializationContext<TValue>(this, default, value, isRoot), unityEngineObject);
+                            unityObjectAdaper.Serialize(
+                                new BinarySerializationContext<TValue>(this, default, value, isRoot),
+                                unityEngineObject
+                            );
                             break;
                         }
                     }
-                    
+
                     return;
                 }
 

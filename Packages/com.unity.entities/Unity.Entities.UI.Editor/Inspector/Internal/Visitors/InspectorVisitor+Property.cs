@@ -7,11 +7,11 @@ using UnityEngine;
 namespace Unity.Entities.UI
 {
     partial class InspectorVisitor
-        : IPropertyVisitor
-            , ICollectionPropertyVisitor
-            , IListPropertyVisitor
-            , ISetPropertyVisitor
-            , IDictionaryPropertyVisitor
+        : IPropertyVisitor,
+            ICollectionPropertyVisitor,
+            IListPropertyVisitor,
+            ISetPropertyVisitor,
+            IDictionaryPropertyVisitor
     {
         readonly List<IInspectorVisit> m_AdapterOverrides = new List<IInspectorVisit>();
 
@@ -25,9 +25,7 @@ namespace Unity.Entities.UI
             m_AdapterOverrides.Remove(adapter);
         }
 
-        void IPropertyVisitor.Visit<TContainer, TValue>(
-            Property<TContainer, TValue> property,
-            ref TContainer container)
+        void IPropertyVisitor.Visit<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container)
         {
             if (IsExcluded(property))
                 return;
@@ -37,9 +35,11 @@ namespace Unity.Entities.UI
             Context.IsRootObject = isWrapper;
 
             // Null values
-            if (TypeTraits<TValue>.CanBeNull
+            if (
+                TypeTraits<TValue>.CanBeNull
                 && ShouldBeTreatedAsNull(property, ref container, ref value)
-                && ShouldStayNull(property, ref container, ref value))
+                && ShouldStayNull(property, ref container, ref value)
+            )
             {
                 using (Context.MakePathScope(property))
                 {
@@ -101,8 +101,15 @@ namespace Unity.Entities.UI
                 {
                     if (references.VisitedOnCurrentBranch)
                     {
-                        Context.Parent.Add(new CircularReferenceElement<TValue>(Context.Root, property, value, path,
-                            references.GetReferencePath()));
+                        Context.Parent.Add(
+                            new CircularReferenceElement<TValue>(
+                                Context.Root,
+                                property,
+                                value,
+                                path,
+                                references.GetReferencePath()
+                            )
+                        );
                         return;
                     }
 
@@ -162,7 +169,8 @@ namespace Unity.Entities.UI
         void ICollectionPropertyVisitor.Visit<TContainer, TCollection, TElement>(
             Property<TContainer, TCollection> property,
             ref TContainer container,
-            ref TCollection collection)
+            ref TCollection collection
+        )
         {
             var path = Context.CopyCurrentPath();
             var foldout = GuiFactory.Foldout<TCollection>(property, path, Context);
@@ -173,7 +181,8 @@ namespace Unity.Entities.UI
         void IListPropertyVisitor.Visit<TContainer, TList, TElement>(
             Property<TContainer, TList> property,
             ref TContainer container,
-            ref TList list)
+            ref TList list
+        )
         {
             var path = Context.CopyCurrentPath();
             var foldout = GuiFactory.Foldout<TList, TElement>(property, path, Context);
@@ -184,7 +193,8 @@ namespace Unity.Entities.UI
         void ISetPropertyVisitor.Visit<TContainer, TSet, TValue>(
             Property<TContainer, TSet> property,
             ref TContainer container,
-            ref TSet set)
+            ref TSet set
+        )
         {
             var path = Context.CopyCurrentPath();
             var foldout = GuiFactory.SetFoldout<TSet, TValue>(property, path, Context);
@@ -195,7 +205,9 @@ namespace Unity.Entities.UI
         public void Visit<TContainer, TDictionary, TKey, TValue>(
             Property<TContainer, TDictionary> property,
             ref TContainer container,
-            ref TDictionary dictionary) where TDictionary : IDictionary<TKey, TValue>
+            ref TDictionary dictionary
+        )
+            where TDictionary : IDictionary<TKey, TValue>
         {
             var path = Context.CopyCurrentPath();
             var foldout = GuiFactory.Foldout<TDictionary, TKey, TValue>(property, path, Context);
@@ -203,8 +215,7 @@ namespace Unity.Entities.UI
                 foldout.Reload(property);
         }
 
-        bool IsExcluded<TContainer, TValue>(
-            Property<TContainer, TValue> property)
+        bool IsExcluded<TContainer, TValue>(Property<TContainer, TValue> property)
         {
             var shouldShow = true;
             if (null != Context.Root.m_AttributeFilter && !(property is IPropertyWrapper))
@@ -218,21 +229,26 @@ namespace Unity.Entities.UI
         bool ShouldBeTreatedAsNull<TContainer, TValue>(
             Property<TContainer, TValue> property,
             ref TContainer container,
-            ref TValue value)
+            ref TValue value
+        )
         {
             var isUnityObject = typeof(UnityEngine.Object).IsAssignableFrom(typeof(TValue));
 
-            return (!isUnityObject || property.HasAttribute<InlineUnityObjectAttribute>() )&&
-                   EqualityComparer<TValue>.Default.Equals(value, default);
+            return (!isUnityObject || property.HasAttribute<InlineUnityObjectAttribute>())
+                && EqualityComparer<TValue>.Default.Equals(value, default);
         }
 
         static bool ShouldStayNull<TContainer, TValue>(
             Property<TContainer, TValue> property,
             ref TContainer container,
-            ref TValue value)
+            ref TValue value
+        )
         {
-            if (property.IsReadOnly || !property.HasAttribute<CreateInstanceOnInspectionAttribute>() ||
-                property is ICollectionElementProperty)
+            if (
+                property.IsReadOnly
+                || !property.HasAttribute<CreateInstanceOnInspectionAttribute>()
+                || property is ICollectionElementProperty
+            )
                 return true;
 
             var attribute = property.GetAttribute<CreateInstanceOnInspectionAttribute>();
@@ -250,7 +266,8 @@ namespace Unity.Entities.UI
             else
             {
                 var isAssignable = typeof(TValue).IsAssignableFrom(attribute.Type);
-                var isConstructable = TypeConstructionUtility.GetAllConstructableTypes(typeof(TValue))
+                var isConstructable = TypeConstructionUtility
+                    .GetAllConstructableTypes(typeof(TValue))
                     .Contains(attribute.Type);
                 if (isAssignable && isConstructable)
                 {
@@ -259,19 +276,17 @@ namespace Unity.Entities.UI
                     return false;
                 }
 
-                Debug.LogWarning(isAssignable
-                    ? PropertyChecks.GetNotConstructableWarningMessage(attribute.Type)
-                    : PropertyChecks.GetNotAssignableWarningMessage(attribute.Type, typeof(TValue)));
+                Debug.LogWarning(
+                    isAssignable
+                        ? PropertyChecks.GetNotConstructableWarningMessage(attribute.Type)
+                        : PropertyChecks.GetNotAssignableWarningMessage(attribute.Type, typeof(TValue))
+                );
             }
 
             return true;
         }
 
-        IInspector GetCustomInspector<TValue>(
-            IProperty property,
-            ref TValue value,
-            PropertyPath path,
-            bool root)
+        IInspector GetCustomInspector<TValue>(IProperty property, ref TValue value, PropertyPath path, bool root)
         {
             if (Context.NextInspectorIsIgnored())
             {
@@ -283,13 +298,10 @@ namespace Unity.Entities.UI
                 return InspectorRegistry.GetInspector(Context, property, ref value, path);
             }
             return InspectorRegistry.GetAttributeInspector(Context, property, ref value, path)
-                   ?? InspectorRegistry.GetPropertyInspector(Context, property, ref value, path);
+                ?? InspectorRegistry.GetPropertyInspector(Context, property, ref value, path);
         }
 
-        IInspector GetAttributeDrawer<TValue>(
-            IProperty property,
-            ref TValue value,
-            PropertyPath path)
+        IInspector GetAttributeDrawer<TValue>(IProperty property, ref TValue value, PropertyPath path)
         {
             return Context.NextInspectorIsIgnored()
                 ? null
@@ -317,8 +329,7 @@ namespace Unity.Entities.UI
             return true;
         }
 
-        static bool ShouldShowField<TContainer, TValue>(
-            Property<TContainer, TValue> property)
+        static bool ShouldShowField<TContainer, TValue>(Property<TContainer, TValue> property)
         {
             return !property.HasAttribute<HideInInspector>();
         }

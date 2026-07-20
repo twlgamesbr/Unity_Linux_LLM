@@ -1,7 +1,7 @@
 using System.IO;
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
@@ -12,7 +12,10 @@ namespace EditorAttributes.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             if (!IsSupportedPropertyType(property))
-                return new HelpBox("The FolderPath Attribute can only be attached to a string", HelpBoxMessageType.Error);
+                return new HelpBox(
+                    "The FolderPath Attribute can only be attached to a string",
+                    HelpBoxMessageType.Error
+                );
 
             var folderPathAttribute = attribute as FolderPathAttribute;
 
@@ -52,6 +55,7 @@ namespace EditorAttributes.Editor
             }
         }
 
-        protected override bool IsSupportedPropertyType(SerializedProperty property) => property.propertyType == SerializedPropertyType.String;
+        protected override bool IsSupportedPropertyType(SerializedProperty property) =>
+            property.propertyType == SerializedPropertyType.String;
     }
 }

@@ -13,32 +13,51 @@ namespace Unity.Networking.Transport
     {
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.SendDelegate))]
-        private static int Send(ref NetworkPipelineContext ctx, ref InboundSendBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
+        private static int Send(
+            ref NetworkPipelineContext ctx,
+            ref InboundSendBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        )
         {
             return (int)Error.StatusCode.Success;
         }
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.ReceiveDelegate))]
-        private static void Receive(ref NetworkPipelineContext ctx, ref InboundRecvBuffer inboundBuffer, ref NetworkPipelineStage.Requests requests, int systemHeaderSize)
-        {
-        }
+        private static void Receive(
+            ref NetworkPipelineContext ctx,
+            ref InboundRecvBuffer inboundBuffer,
+            ref NetworkPipelineStage.Requests requests,
+            int systemHeaderSize
+        ) { }
 
         [BurstCompile(DisableDirectCall = true)]
         [MonoPInvokeCallback(typeof(NetworkPipelineStage.InitializeConnectionDelegate))]
-        private static void InitializeConnection(byte* staticInstanceBuffer, int staticInstanceBufferLength,
-            byte* sendProcessBuffer, int sendProcessBufferLength, byte* recvProcessBuffer, int recvProcessBufferLength,
-            byte* sharedProcessBuffer, int sharedProcessBufferLength)
-        {
-        }
+        private static void InitializeConnection(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            byte* sendProcessBuffer,
+            int sendProcessBufferLength,
+            byte* recvProcessBuffer,
+            int recvProcessBufferLength,
+            byte* sharedProcessBuffer,
+            int sharedProcessBufferLength
+        ) { }
 
         /// <inheritdoc/>
-        public NetworkPipelineStage StaticInitialize(byte* staticInstanceBuffer, int staticInstanceBufferLength, NetworkSettings netParams)
+        public NetworkPipelineStage StaticInitialize(
+            byte* staticInstanceBuffer,
+            int staticInstanceBufferLength,
+            NetworkSettings netParams
+        )
         {
             return new NetworkPipelineStage(
                 Receive: new TransportFunctionPointer<NetworkPipelineStage.ReceiveDelegate>(Receive),
                 Send: new TransportFunctionPointer<NetworkPipelineStage.SendDelegate>(Send),
-                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(InitializeConnection),
+                InitializeConnection: new TransportFunctionPointer<NetworkPipelineStage.InitializeConnectionDelegate>(
+                    InitializeConnection
+                ),
                 ReceiveCapacity: 0,
                 SendCapacity: 0,
                 HeaderCapacity: 0,

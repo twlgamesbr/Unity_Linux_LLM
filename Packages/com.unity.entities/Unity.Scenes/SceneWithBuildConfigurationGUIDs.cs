@@ -13,7 +13,7 @@ namespace Unity.Scenes
     {
         public Hash128 SceneGUID;
         public Hash128 BuildConfiguration;
-        public int     _IsBuildingForEditor;
+        public int _IsBuildingForEditor;
 
         public bool IsBuildingForEditor
         {
@@ -61,9 +61,13 @@ namespace Unity.Scenes
                     SceneGUID = sceneGUID,
                     BuildConfiguration = buildConfigurationGUID,
                     IsBuildingForEditor = isBuildingForEditor,
-                    DirtyValue = DateTime.UtcNow.Ticks
+                    DirtyValue = DateTime.UtcNow.Ticks,
                 };
-                WriteEntitySceneWithBuildConfig(guid, sceneWithBuildConfigurationGUIDs, GetSceneWithBuildSettingsPath(guid));
+                WriteEntitySceneWithBuildConfig(
+                    guid,
+                    sceneWithBuildConfigurationGUIDs,
+                    GetSceneWithBuildSettingsPath(guid)
+                );
                 return true;
             }
             else
@@ -80,25 +84,41 @@ namespace Unity.Scenes
             return dirty;
         }
 
-        private static unsafe void WriteEntitySceneWithBuildConfig(Hash128 guid, SceneWithBuildConfigurationGUIDs sceneWithBuildConfigurationGUIDs, string path)
+        private static unsafe void WriteEntitySceneWithBuildConfig(
+            Hash128 guid,
+            SceneWithBuildConfigurationGUIDs sceneWithBuildConfigurationGUIDs,
+            string path
+        )
         {
             var previousPath = AssetDatabaseCompatibility.GuidToPath(guid);
             if (!string.IsNullOrEmpty(previousPath) && previousPath != path)
-                UnityEngine.Debug.LogError($"EntitySceneWithBuildConfig guid is not unique {guid}. ScenePath: '{AssetDatabaseCompatibility.GuidToPath(sceneWithBuildConfigurationGUIDs.SceneGUID)}' Conflicting GUID: '{previousPath}'");
+                UnityEngine.Debug.LogError(
+                    $"EntitySceneWithBuildConfig guid is not unique {guid}. ScenePath: '{AssetDatabaseCompatibility.GuidToPath(sceneWithBuildConfigurationGUIDs.SceneGUID)}' Conflicting GUID: '{previousPath}'"
+                );
 
             Directory.CreateDirectory(k_SceneDependencyCachePath);
             using (var writer = new StreamBinaryWriter(path))
             {
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-                writer.ImHexPattern.WriteTypeWithPosition<SceneWithBuildConfigurationGUIDs>("sceneWithBuildConfigurationGUIDs", writer.Position);
+                writer.ImHexPattern.WriteTypeWithPosition<SceneWithBuildConfigurationGUIDs>(
+                    "sceneWithBuildConfigurationGUIDs",
+                    writer.Position
+                );
 #endif
                 writer.WriteBytes(&sceneWithBuildConfigurationGUIDs, sizeof(SceneWithBuildConfigurationGUIDs));
             }
-            File.WriteAllText(path + ".meta",
-                $"fileFormatVersion: 2\nguid: {guid}\nDefaultImporter:\n  externalObjects: {{}}\n  userData:\n  assetBundleName:\n  assetBundleVariant:\n");
+            File.WriteAllText(
+                path + ".meta",
+                $"fileFormatVersion: 2\nguid: {guid}\nDefaultImporter:\n  externalObjects: {{}}\n  userData:\n  assetBundleName:\n  assetBundleVariant:\n"
+            );
         }
 
-        public static unsafe Hash128 EnsureExistsFor(Hash128 sceneGUID, Hash128 buildConfigurationGUID, bool isBuildingForEditor, out bool mustRequestRefresh)
+        public static unsafe Hash128 EnsureExistsFor(
+            Hash128 sceneGUID,
+            Hash128 buildConfigurationGUID,
+            bool isBuildingForEditor,
+            out bool mustRequestRefresh
+        )
         {
             mustRequestRefresh = false;
             var guid = ComputeBuildConfigurationGUID(sceneGUID, buildConfigurationGUID, isBuildingForEditor);
@@ -109,7 +129,13 @@ namespace Unity.Scenes
             var fileName = GetSceneWithBuildSettingsPath(guid);
             if (!File.Exists(fileName))
             {
-                var sceneWithBuildConfigurationGUIDs = new SceneWithBuildConfigurationGUIDs { SceneGUID = sceneGUID, IsBuildingForEditor = isBuildingForEditor, BuildConfiguration = buildConfigurationGUID, DirtyValue = 0};
+                var sceneWithBuildConfigurationGUIDs = new SceneWithBuildConfigurationGUIDs
+                {
+                    SceneGUID = sceneGUID,
+                    IsBuildingForEditor = isBuildingForEditor,
+                    BuildConfiguration = buildConfigurationGUID,
+                    DirtyValue = 0,
+                };
                 WriteEntitySceneWithBuildConfig(guid, sceneWithBuildConfigurationGUIDs, fileName);
                 mustRequestRefresh = true;
             }
@@ -129,9 +155,18 @@ namespace Unity.Scenes
             return sceneWithBuildConfiguration;
         }
 
-        static Hash128 ComputeBuildConfigurationGUID(in Hash128 sceneGUID, in Hash128 buildConfigurationGUID, bool isBuildingForEditor)
+        static Hash128 ComputeBuildConfigurationGUID(
+            in Hash128 sceneGUID,
+            in Hash128 buildConfigurationGUID,
+            bool isBuildingForEditor
+        )
         {
-            var guids = new SceneWithBuildConfigurationGUIDs { SceneGUID = sceneGUID, BuildConfiguration = buildConfigurationGUID, IsBuildingForEditor = isBuildingForEditor};
+            var guids = new SceneWithBuildConfigurationGUIDs
+            {
+                SceneGUID = sceneGUID,
+                BuildConfiguration = buildConfigurationGUID,
+                IsBuildingForEditor = isBuildingForEditor,
+            };
             var hash = xxHash3.Hash128(guids);
             return new Hash128(hash);
         }

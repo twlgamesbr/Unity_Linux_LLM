@@ -57,7 +57,7 @@ namespace UnityEditor.Lighting
             {
                 var dropdown = new DropdownField
                 {
-                    choices = new System.Collections.Generic.List<string> { "Baking Set", "Single Scene" }
+                    choices = new System.Collections.Generic.List<string> { "Baking Set", "Single Scene" },
                 };
                 return dropdown;
             };
@@ -179,7 +179,7 @@ namespace UnityEditor.Lighting
             {
                 var dropdown = new DropdownField
                 {
-                    choices = new System.Collections.Generic.List<string> { "Global", "Local" }
+                    choices = new System.Collections.Generic.List<string> { "Global", "Local" },
                 };
                 return dropdown;
             };
@@ -390,7 +390,7 @@ namespace UnityEditor.Lighting
         enum AreaLightShape
         {
             Rectangle = LightType.Rectangle,
-            Disc = LightType.Disc
+            Disc = LightType.Disc,
         }
 
         class LightShapeField : EnumField
@@ -410,7 +410,8 @@ namespace UnityEditor.Lighting
                 }
             }
 
-            public LightShapeField() : base(AreaLightShape.Rectangle)
+            public LightShapeField()
+                : base(AreaLightShape.Rectangle)
             {
                 m_Value = LightType.Rectangle;
 

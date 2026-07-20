@@ -5,7 +5,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
     /// </summary>
     internal static class TestScriptAssetMenuItems
     {
-        internal const string addNewFolderWithTestAssemblyDefinitionMenuItem = "Assets/Create/Testing/Tests Assembly Folder";
+        internal const string addNewFolderWithTestAssemblyDefinitionMenuItem =
+            "Assets/Create/Testing/Tests Assembly Folder";
         internal const string addNewTestScriptMenuItem = "Assets/Create/Testing/C# Test Script";
 
         /// <summary>
@@ -24,7 +25,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI.TestAssets
         [MenuItem(addNewFolderWithTestAssemblyDefinitionMenuItem, true, 83)]
         public static bool CanAddNewFolderWithTestAssemblyDefinition()
         {
-            var testAssemblyAlreadyExists = TestScriptAssetsCreator.Instance.ActiveFolderContainsTestAssemblyDefinition();
+            var testAssemblyAlreadyExists =
+                TestScriptAssetsCreator.Instance.ActiveFolderContainsTestAssemblyDefinition();
             return !testAssemblyAlreadyExists;
         }
 

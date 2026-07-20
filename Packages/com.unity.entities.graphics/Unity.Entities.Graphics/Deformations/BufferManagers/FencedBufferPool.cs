@@ -1,7 +1,6 @@
 using System;
 using Unity.Assertions;
 using Unity.Collections;
-
 using GraphicsBuffer = UnityEngine.GraphicsBuffer;
 
 namespace Unity.Rendering
@@ -49,10 +48,7 @@ namespace Unity.Rendering
         {
             Assert.IsFalse(m_CurrentFrameBufferID == -1);
 
-            var frameData = new FrameData
-            {
-                DataBufferID = m_CurrentFrameBufferID,
-            };
+            var frameData = new FrameData { DataBufferID = m_CurrentFrameBufferID };
 
             m_FrameData.Enqueue(frameData);
 
@@ -70,7 +66,12 @@ namespace Unity.Rendering
             m_FrameData.Clear();
 
             m_DataBufferPool?.Dispose();
-            m_DataBufferPool = new BufferPool(size, stride, GraphicsBuffer.Target.Raw, GraphicsBuffer.UsageFlags.LockBufferForWrite);
+            m_DataBufferPool = new BufferPool(
+                size,
+                stride,
+                GraphicsBuffer.Target.Raw,
+                GraphicsBuffer.UsageFlags.LockBufferForWrite
+            );
 
             BufferSize = size;
         }

@@ -17,16 +17,20 @@ namespace UnityEngine.Rendering
         {
             /// <summary>Encapsulate all renderers in the baking set.</summary>
             Global,
+
             /// <summary>Encapsulate all renderers in the scene.</summary>
             Scene,
+
             /// <summary>Encapsulate all renderers in the bounding box.</summary>
-            Local
+            Local,
         }
 
         /// <summary>
         /// If is a global bolume
         /// </summary>
-        [Tooltip("When set to Global this Probe Volume considers all renderers with Contribute Global Illumination enabled. Local only considers renderers in the scene.\nThis list updates every time the Scene is saved or the lighting is baked.")]
+        [Tooltip(
+            "When set to Global this Probe Volume considers all renderers with Contribute Global Illumination enabled. Local only considers renderers in the scene.\nThis list updates every time the Scene is saved or the lighting is baked."
+        )]
         public Mode mode = Mode.Local;
 
         /// <summary>
@@ -69,14 +73,20 @@ namespace UnityEngine.Rendering
         [HideInInspector]
         public bool overridesSubdivLevels = false;
 
-        [SerializeField] internal bool mightNeedRebaking = false;
+        [SerializeField]
+        internal bool mightNeedRebaking = false;
 
-        [SerializeField] internal Matrix4x4 cachedTransform;
-        [SerializeField] internal int cachedHashCode;
+        [SerializeField]
+        internal Matrix4x4 cachedTransform;
+
+        [SerializeField]
+        internal int cachedHashCode;
 
         /// <summary>Whether spaces with no renderers need to be filled with bricks at highest subdivision level.</summary>
         [HideInInspector]
-        [Tooltip("Whether Unity should fill empty space between renderers with bricks at the highest subdivision level.")]
+        [Tooltip(
+            "Whether Unity should fill empty space between renderers with bricks at the highest subdivision level."
+        )]
         public bool fillEmptySpaces = false;
 
 #if UNITY_EDITOR
@@ -145,7 +155,6 @@ namespace UnityEngine.Rendering
         public override int GetHashCode()
         {
             int hash = 17;
-
             unchecked
             {
                 hash = hash * 23 + size.GetHashCode();
@@ -209,19 +218,29 @@ namespace UnityEngine.Rendering
             GeometryUtility.CalculateFrustumPlanes(ctx.ActiveCamera, ctx.FrustumPlanes);
         }
 
-        internal bool ShouldCullCell(in CellCullingContext ctx, Dictionary<string, ProbeVolumeBakingSetWeakReference> sceneToBakingSetMap, ProbeReferenceVolume probeRefVolume, Vector3 cellPosition)
+        internal bool ShouldCullCell(
+            in CellCullingContext ctx,
+            Dictionary<string, ProbeVolumeBakingSetWeakReference> sceneToBakingSetMap,
+            ProbeReferenceVolume probeRefVolume,
+            Vector3 cellPosition
+        )
         {
             var cellSizeInMeters = probeRefVolume.MaxBrickSize();
             var probeOffset = probeRefVolume.ProbeOffset() + ProbeVolumeDebug.currentOffset;
             var debugDisplay = probeRefVolume.probeVolumeDebug;
             if (debugDisplay.realtimeSubdivision)
             {
-                var bakingSet = ProbeVolumeBakingSet.GetBakingSetForScene(sceneToBakingSetMap, gameObject.scene.GetGUID());
+                var bakingSet = ProbeVolumeBakingSet.GetBakingSetForScene(
+                    sceneToBakingSetMap,
+                    gameObject.scene.GetGUID()
+                );
                 if (bakingSet == null)
                     return true;
 
                 // Use the non-backed data to display real-time info
-                cellSizeInMeters = ProbeVolumeBakingSet.GetMinBrickSize(bakingSet.minDistanceBetweenProbes) * ProbeVolumeBakingSet.GetCellSizeInBricks(bakingSet.simplificationLevels);
+                cellSizeInMeters =
+                    ProbeVolumeBakingSet.GetMinBrickSize(bakingSet.minDistanceBetweenProbes)
+                    * ProbeVolumeBakingSet.GetCellSizeInBricks(bakingSet.simplificationLevels);
                 probeOffset = bakingSet.probeOffset + ProbeVolumeDebug.currentOffset;
             }
 
@@ -230,10 +249,13 @@ namespace UnityEngine.Rendering
 
             var cameraTransform = ctx.ActiveCamera.transform;
 
-            Vector3 cellCenterWS = probeOffset + cellPosition * cellSizeInMeters + Vector3.one * (cellSizeInMeters / 2.0f);
+            Vector3 cellCenterWS =
+                probeOffset + cellPosition * cellSizeInMeters + Vector3.one * (cellSizeInMeters / 2.0f);
 
             // Round down to cell size distance
-            float roundedDownDist = Mathf.Floor(Vector3.Distance(cameraTransform.position, cellCenterWS) / cellSizeInMeters) * cellSizeInMeters;
+            float roundedDownDist =
+                Mathf.Floor(Vector3.Distance(cameraTransform.position, cellCenterWS) / cellSizeInMeters)
+                * cellSizeInMeters;
 
             if (roundedDownDist > probeRefVolume.probeVolumeDebug.subdivisionViewCullingDistance)
                 return true;

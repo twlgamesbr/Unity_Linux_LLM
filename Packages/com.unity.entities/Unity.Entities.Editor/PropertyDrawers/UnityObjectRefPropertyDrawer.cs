@@ -1,6 +1,6 @@
-using UnityEditor;
 using System;
 using System.Collections;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
@@ -23,16 +23,18 @@ namespace Unity.Entities.Editor
             {
                 objectType = targetObjectType,
                 allowSceneObjects = false,
-                label = property.name
+                label = property.name,
             };
 
             objectField.SetValueWithoutNotify(currObject);
-            objectField.RegisterCallback((ChangeEvent<UnityEngine.Object> e) =>
-            {
-                instanceIdProperty.entityIdValue = e.newValue.GetEntityId();
-                property.serializedObject.ApplyModifiedProperties();
-            });
-           objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+            objectField.RegisterCallback(
+                (ChangeEvent<UnityEngine.Object> e) =>
+                {
+                    instanceIdProperty.entityIdValue = e.newValue.GetEntityId();
+                    property.serializedObject.ApplyModifiedProperties();
+                }
+            );
+            objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
             container.Add(objectField);
 
             return container;

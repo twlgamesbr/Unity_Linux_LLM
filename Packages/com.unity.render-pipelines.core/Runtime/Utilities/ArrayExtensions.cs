@@ -17,7 +17,8 @@ namespace UnityEngine.Rendering
         /// <typeparam name="T">The type of the array</typeparam>
         /// <param name="array">Target array to resize</param>
         /// <param name="capacity">New size of native array to resize</param>
-        public static void ResizeArray<T>(this ref NativeArray<T> array, int capacity) where T : struct
+        public static void ResizeArray<T>(this ref NativeArray<T> array, int capacity)
+            where T : struct
         {
             var newArray = new NativeArray<T>(capacity, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
             if (array.IsCreated)
@@ -71,7 +72,8 @@ namespace UnityEngine.Rendering
         /// <param name="value">Value to fill</param>
         /// <param name="startIndex">Start index to fill</param>
         /// <param name="length">The number of entries to write, or -1 to fill until the end of the array</param>
-        public static void FillArray<T>(this ref NativeArray<T> array, in T value, int startIndex = 0, int length = -1) where T : unmanaged
+        public static void FillArray<T>(this ref NativeArray<T> array, in T value, int startIndex = 0, int length = -1)
+            where T : unmanaged
         {
             Assert.IsTrue(startIndex >= 0);
 

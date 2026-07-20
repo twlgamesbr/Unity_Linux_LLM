@@ -22,6 +22,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             get => GetOrCreateStateObject().m_SearchBarString;
             set => GetOrCreateStateObject().m_SearchBarString = value;
         }
+
 #if !UNITY_2022_1_OR_NEWER
         public class MostRecentlySelectedItem
         {
@@ -37,24 +38,23 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 
         public static MostRecentlySelectedItem s_mostRecentlySelectedItem;
 #endif
-        
         static int StateObjectHashCode
         {
             get => SessionState.GetInt(nameof(DetailsViewPersistentState), -1);
             set => SessionState.SetInt(nameof(DetailsViewPersistentState), value);
         }
-        
+
         static DetailsViewPersistentState GetOrCreateStateObject()
         {
             if (s_StateObject)
             {
                 return s_StateObject;
             }
-            
-            if(StateObjectHashCode != -1)
+
+            if (StateObjectHashCode != -1)
             {
                 var allStateObjects = Resources.FindObjectsOfTypeAll<DetailsViewPersistentState>();
-                foreach(var stateObject in allStateObjects)
+                foreach (var stateObject in allStateObjects)
                 {
                     if (stateObject.GetHashCode() == StateObjectHashCode)
                     {
@@ -62,7 +62,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
                     }
                 }
             }
-            
+
             if (!s_StateObject)
             {
                 s_StateObject = CreateInstance<DetailsViewPersistentState>();
@@ -73,20 +73,16 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
             return s_StateObject;
         }
 
-        public static bool IsFoldedOut(string locator)
-            => GetOrCreateStateObject().m_FoldoutState.IsFoldedOut(locator);
+        public static bool IsFoldedOut(string locator) => GetOrCreateStateObject().m_FoldoutState.IsFoldedOut(locator);
 
-        public static void SetFoldout(string locator, bool isExpanded)
-            => GetOrCreateStateObject().m_FoldoutState.SetFoldout(locator, isExpanded);
+        public static void SetFoldout(string locator, bool isExpanded) =>
+            GetOrCreateStateObject().m_FoldoutState.SetFoldout(locator, isExpanded);
 
-        public static void SetFoldoutExpandAll()
-            => GetOrCreateStateObject().m_FoldoutState.SetFoldoutExpandAll();
+        public static void SetFoldoutExpandAll() => GetOrCreateStateObject().m_FoldoutState.SetFoldoutExpandAll();
 
-        public static void SetFoldoutContractAll()
-            => GetOrCreateStateObject().m_FoldoutState.SetFoldoutContractAll();
+        public static void SetFoldoutContractAll() => GetOrCreateStateObject().m_FoldoutState.SetFoldoutContractAll();
 
-        public static bool IsSelected(string locator)
-            => GetOrCreateStateObject().m_SelectedState.IsSelected(locator);
+        public static bool IsSelected(string locator) => GetOrCreateStateObject().m_SelectedState.IsSelected(locator);
 
         public static void SetSelected(IReadOnlyList<string> pathList, IReadOnlyList<ulong> idList)
         {
@@ -94,7 +90,10 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor
 #if !UNITY_2022_1_OR_NEWER
             if (pathList.Count > 0)
             {
-                s_mostRecentlySelectedItem = new MostRecentlySelectedItem(pathList[pathList.Count - 1], idList[idList.Count - 1]);
+                s_mostRecentlySelectedItem = new MostRecentlySelectedItem(
+                    pathList[pathList.Count - 1],
+                    idList[idList.Count - 1]
+                );
             }
 #endif
         }

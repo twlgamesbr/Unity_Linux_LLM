@@ -35,9 +35,7 @@ namespace Unity.Rendering
         internal static EntitiesGraphicsDebugSettings DebugSettings => s_EntitiesGraphicsDebugSettings;
 
 #else
-        internal static void EndFrame()
-        {
-        }
+        internal static void EndFrame() { }
 
         internal static EntitiesGraphicsDebugSettings DebugSettings => default;
 #endif

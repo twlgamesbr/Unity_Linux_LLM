@@ -1,7 +1,7 @@
-using Unity.Collections;
 using Unity.Burst;
-using UnityEngine.Assertions;
+using Unity.Collections;
 using Unity.Mathematics;
+using UnityEngine.Assertions;
 
 namespace UnityEngine.Rendering
 {
@@ -9,10 +9,12 @@ namespace UnityEngine.Rendering
     internal static class InstanceCullingBatcherBurst
     {
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static void UpdateMaterialData(in NativeArray<EntityId> materialIDs,
+        public static void UpdateMaterialData(
+            in NativeArray<EntityId> materialIDs,
             in NativeArray<GPUDrivenMaterialData> materialDatas,
             ref NativeParallelHashMap<EntityId, GPUDrivenMaterial> materialMap,
-            ref NativeHashSet<EntityId> changedMaterialIDs)
+            ref NativeHashSet<EntityId> changedMaterialIDs
+        )
         {
             for (int index = 0; index < materialIDs.Length; index++)
             {
@@ -30,12 +32,14 @@ namespace UnityEngine.Rendering
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static void UpdateMeshData(in NativeArray<EntityId> meshIDs,
+        public static void UpdateMeshData(
+            in NativeArray<EntityId> meshIDs,
             in NativeArray<GPUDrivenMeshData> meshDatas,
             in NativeArray<int> subMeshOffsets,
             in NativeArray<GPUDrivenSubMesh> subMeshBuffer,
             ref NativeParallelHashMap<EntityId, MeshInfo> meshMap,
-            ref NativeHashSet<EntityId> changedMeshIDs)
+            ref NativeHashSet<EntityId> changedMeshIDs
+        )
         {
             for (int index = 0; index < meshIDs.Length; index++)
             {
@@ -44,9 +48,15 @@ namespace UnityEngine.Rendering
                 GPUDrivenMeshData newMeshData = meshDatas[index];
                 int subMeshOffset = subMeshOffsets[index];
                 int totalSubMeshCount = newMeshData.subMeshCount * math.max(newMeshData.meshLodCount, 1);
-                NativeArray<GPUDrivenSubMesh> newSubMeshes = subMeshBuffer.GetSubArray(subMeshOffset, totalSubMeshCount);
+                NativeArray<GPUDrivenSubMesh> newSubMeshes = subMeshBuffer.GetSubArray(
+                    subMeshOffset,
+                    totalSubMeshCount
+                );
 
-                if (!meshMap.TryGetValue(meshID, out var meshInfo) || meshInfo.EqualsSourceData(newMeshData, newSubMeshes))
+                if (
+                    !meshMap.TryGetValue(meshID, out var meshInfo)
+                    || meshInfo.EqualsSourceData(newMeshData, newSubMeshes)
+                )
                     continue;
 
                 MeshInfo newMeshInfo = meshInfo;
@@ -62,13 +72,22 @@ namespace UnityEngine.Rendering
             }
         }
 
-        private static ref DrawRange EditDrawRange(in RangeKey key, ref NativeParallelHashMap<RangeKey, int> rangeHash, ref NativeList<DrawRange> drawRanges)
+        private static ref DrawRange EditDrawRange(
+            in RangeKey key,
+            ref NativeParallelHashMap<RangeKey, int> rangeHash,
+            ref NativeList<DrawRange> drawRanges
+        )
         {
             int drawRangeIndex;
 
             if (!rangeHash.TryGetValue(key, out drawRangeIndex))
             {
-                var drawRange = new DrawRange { key = key, drawCount = 0, drawOffset = 0 };
+                var drawRange = new DrawRange
+                {
+                    key = key,
+                    drawCount = 0,
+                    drawOffset = 0,
+                };
                 drawRangeIndex = drawRanges.Length;
                 rangeHash.Add(key, drawRangeIndex);
                 drawRanges.Add(drawRange);
@@ -80,10 +99,12 @@ namespace UnityEngine.Rendering
             return ref data;
         }
 
-        private static ref DrawBatch EditDrawBatch(in DrawKey key,
+        private static ref DrawBatch EditDrawBatch(
+            in DrawKey key,
             in GPUDrivenSubMesh subMesh,
             ref NativeParallelHashMap<DrawKey, int> batchHash,
-            ref NativeList<DrawBatch> drawBatches)
+            ref NativeList<DrawBatch> drawBatches
+        )
         {
             int drawBatchIndex;
 
@@ -111,7 +132,8 @@ namespace UnityEngine.Rendering
             return ref data;
         }
 
-        private static void ProcessRenderer(InstanceHandle instance,
+        private static void ProcessRenderer(
+            InstanceHandle instance,
             ref RenderWorld renderWorld,
             in NativeParallelHashMap<EntityId, MeshInfo> meshMap,
             in NativeParallelHashMap<EntityId, GPUDrivenMaterial> materialMap,
@@ -119,7 +141,8 @@ namespace UnityEngine.Rendering
             ref NativeList<DrawRange> drawRanges,
             ref NativeParallelHashMap<DrawKey, int> batchHash,
             ref NativeList<DrawBatch> drawBatches,
-            ref NativeList<DrawInstance> drawInstances)
+            ref NativeList<DrawInstance> drawInstances
+        )
         {
             Assert.IsTrue(instance.isValid, "Invalid Instance");
             if (!instance.isValid)
@@ -169,7 +192,7 @@ namespace UnityEngine.Rendering
                 shadowCastingMode = rendererSettings.ShadowCastingMode,
                 staticShadowCaster = rendererSettings.StaticShadowCaster,
                 rendererPriority = rendererPriority,
-                supportsIndirect = supportsIndirect
+                supportsIndirect = supportsIndirect,
             };
 
             ref DrawRange drawRange = ref EditDrawRange(rangeKey, ref rangeHash, ref drawRanges);
@@ -220,7 +243,7 @@ namespace UnityEngine.Rendering
                         // uses this index for sorting and for breaking the
                         // batch when lightmaps change across draw calls, and
                         // for binding the correct light map.
-                        lightmapIndex = lightmapIndex
+                        lightmapIndex = lightmapIndex,
                     };
 
                     ref DrawBatch drawBatch = ref EditDrawBatch(drawKey, subMesh, ref batchHash, ref drawBatches);
@@ -230,17 +253,14 @@ namespace UnityEngine.Rendering
 
                     drawBatch.instanceCount += 1;
 
-                    drawInstances.Add(new DrawInstance
-                    {
-                        key = drawKey,
-                        instanceIndex = instance.index
-                    });
+                    drawInstances.Add(new DrawInstance { key = drawKey, instanceIndex = instance.index });
                 }
             }
         }
 
         [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
-        public static void CreateDrawBatches(in NativeArray<InstanceHandle> instances,
+        public static void CreateDrawBatches(
+            in NativeArray<InstanceHandle> instances,
             ref RenderWorld renderWorld,
             in NativeParallelHashMap<EntityId, MeshInfo> meshMap,
             in NativeParallelHashMap<EntityId, GPUDrivenMaterial> materialMap,
@@ -248,10 +268,21 @@ namespace UnityEngine.Rendering
             ref NativeList<DrawRange> drawRanges,
             ref NativeParallelHashMap<DrawKey, int> batchHash,
             ref NativeList<DrawBatch> drawBatches,
-            ref NativeList<DrawInstance> drawInstances)
+            ref NativeList<DrawInstance> drawInstances
+        )
         {
             for (int i = 0; i < instances.Length; i++)
-                ProcessRenderer(instances[i], ref renderWorld, meshMap, materialMap, ref rangeHash, ref drawRanges, ref batchHash, ref drawBatches, ref drawInstances);
+                ProcessRenderer(
+                    instances[i],
+                    ref renderWorld,
+                    meshMap,
+                    materialMap,
+                    ref rangeHash,
+                    ref drawRanges,
+                    ref batchHash,
+                    ref drawBatches,
+                    ref drawInstances
+                );
         }
     }
 }

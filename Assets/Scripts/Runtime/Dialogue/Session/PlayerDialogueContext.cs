@@ -1,22 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
 using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
 using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
 using NPCSystem.Dialogue.Session;
 using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
+using UnityEngine;
+
 namespace NPCSystem.Dialogue.Session
 {
     /// <summary>
@@ -95,7 +94,8 @@ namespace NPCSystem.Dialogue.Session
         public readonly int DialogueCount => _dialogueCount;
         public readonly IReadOnlyList<string> KnownClues => Array.AsReadOnly(_knownClues ?? Array.Empty<string>());
         public readonly IReadOnlyList<string> Inventory => Array.AsReadOnly(_inventory ?? Array.Empty<string>());
-        public readonly IReadOnlyList<string> VisitedLocations => Array.AsReadOnly(_visitedLocations ?? Array.Empty<string>());
+        public readonly IReadOnlyList<string> VisitedLocations =>
+            Array.AsReadOnly(_visitedLocations ?? Array.Empty<string>());
         public readonly bool LoadedFromServer => _loadedFromServer;
 
         public readonly string ExpertiseLabel
@@ -156,52 +156,42 @@ namespace NPCSystem.Dialogue.Session
             {
                 lines.Add(
                     $"Your current relationship with {_playerName}: trust level is '{TrustLabel}' ({_trustScore}/100), "
-                    + $"current mood toward the player is '{_currentMood}', "
-                    + $"and you have had {_dialogueCount} previous exchanges."
+                        + $"current mood toward the player is '{_currentMood}', "
+                        + $"and you have had {_dialogueCount} previous exchanges."
                 );
 
                 if (_trustScore < 40)
                     lines.Add(
-                        "This player has not yet earned your full trust. "
-                        + "Be somewhat guarded in what you reveal."
+                        "This player has not yet earned your full trust. " + "Be somewhat guarded in what you reveal."
                     );
                 else if (_trustScore >= 80)
                     lines.Add(
-                        "You trust this player deeply and are inclined to share "
-                        + "secrets or offer help freely."
+                        "You trust this player deeply and are inclined to share " + "secrets or offer help freely."
                     );
             }
 
             // Investigation state
             if (_knownClues.Length > 0)
             {
-                lines.Add(
-                    $"Clues this player has already discovered: {string.Join("; ", _knownClues)}."
-                );
+                lines.Add($"Clues this player has already discovered: {string.Join("; ", _knownClues)}.");
             }
 
             if (_inventory.Length > 0)
             {
-                lines.Add(
-                    $"Items this player is carrying: {string.Join("; ", _inventory)}."
-                );
+                lines.Add($"Items this player is carrying: {string.Join("; ", _inventory)}.");
             }
 
             if (_visitedLocations.Length > 0)
             {
-                lines.Add(
-                    $"Locations this player has visited: {string.Join("; ", _visitedLocations)}."
-                );
+                lines.Add($"Locations this player has visited: {string.Join("; ", _visitedLocations)}.");
             }
 
             if (_loadedFromServer)
-                lines.Add(
-                    "(Player context loaded from server — facts are persistent across sessions.)"
-                );
+                lines.Add("(Player context loaded from server — facts are persistent across sessions.)");
 
             lines.Add(
                 "Use the above context naturally in conversation. Do not list it explicitly; "
-                + "weave it into your responses as the character would."
+                    + "weave it into your responses as the character would."
             );
 
             return string.Join("\n", lines);
@@ -211,11 +201,7 @@ namespace NPCSystem.Dialogue.Session
 
         public static readonly PlayerDialogueContext Empty = new PlayerDialogueContext(null, null);
 
-        public static PlayerDialogueContext FromLocalState(
-            string playerName,
-            string playerId,
-            string npcSlug
-        )
+        public static PlayerDialogueContext FromLocalState(string playerName, string playerId, string npcSlug)
         {
             return new PlayerDialogueContext(playerName, playerId);
         }

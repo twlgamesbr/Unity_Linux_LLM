@@ -1,15 +1,20 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomEditor(typeof(TextMeshProUGUI), true), CanEditMultipleObjects]
     public class TMP_EditorPanelUI : TMP_BaseEditorPanel
     {
-        static readonly GUIContent k_RaycastTargetLabel = new GUIContent("Raycast Target", "Whether the text blocks raycasts from the Graphic Raycaster.");
-        static readonly GUIContent k_MaskableLabel = new GUIContent("Maskable", "Determines if the text object will be affected by UI Mask.");
+        static readonly GUIContent k_RaycastTargetLabel = new GUIContent(
+            "Raycast Target",
+            "Whether the text blocks raycasts from the Graphic Raycaster."
+        );
+        static readonly GUIContent k_MaskableLabel = new GUIContent(
+            "Maskable",
+            "Determines if the text object will be affected by UI Mask."
+        );
 
         SerializedProperty m_RaycastTargetProp;
         private SerializedProperty m_MaskableProp;
@@ -28,10 +33,13 @@ namespace TMPro.EditorUtilities
             if (GUI.Button(rect, new GUIContent("<b>Extra Settings</b>"), TMP_UIStyleManager.sectionHeader))
                 Foldout.extraSettings = !Foldout.extraSettings;
 
-            GUI.Label(rect, (Foldout.extraSettings ? k_UiStateLabel[0] : k_UiStateLabel[1]), TMP_UIStyleManager.rightLabel);
+            GUI.Label(
+                rect,
+                (Foldout.extraSettings ? k_UiStateLabel[0] : k_UiStateLabel[1]),
+                TMP_UIStyleManager.rightLabel
+            );
             if (Foldout.extraSettings)
             {
-
                 DrawMargins();
 
                 DrawGeometrySorting();
@@ -55,7 +63,6 @@ namespace TMPro.EditorUtilities
                 DrawFontFeatures();
 
                 DrawPadding();
-
             }
         }
 
@@ -109,12 +116,13 @@ namespace TMPro.EditorUtilities
             {
                 for (int i = 0; i < objects.Length; i++)
                 {
-					if (objects[i].GetComponent<TextMeshProUGUI>() == null)
+                    if (objects[i].GetComponent<TextMeshProUGUI>() == null)
                         return true;
                 }
             }
             return false;
         }
+
         protected override void OnUndoRedo()
         {
             int undoEventId = Undo.GetCurrentGroup();

@@ -20,8 +20,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
         public StatHistory(StatHistoryRequirements requirements)
         {
             ContinuousExponentialMovingAverages = requirements
-                .DecayConstants
-                .Select(decayConstant => new ContinuousExponentialMovingAverage(decayConstant))
+                .DecayConstants.Select(decayConstant => new ContinuousExponentialMovingAverage(decayConstant))
                 .ToArray();
             for (var rate = SampleRates.k_First; rate <= SampleRates.k_Last; rate = rate.Next())
             {
@@ -29,8 +28,7 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             }
         }
 
-        static EnumMap<SampleRate, int> GetSampleBufferCapacities(
-            EnumMap<SampleRate, RingBuffer<float>> sampleBuffers)
+        static EnumMap<SampleRate, int> GetSampleBufferCapacities(EnumMap<SampleRate, RingBuffer<float>> sampleBuffers)
         {
             var requirements = new EnumMap<SampleRate, int>();
             for (var rate = SampleRates.k_First; rate <= SampleRates.k_Last; rate = rate.Next())
@@ -45,7 +43,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             // It's possible to infer the requirements from the kind of data we're storing
             return new StatHistoryRequirements(
                 ContinuousExponentialMovingAverages.Select(cema => cema.DecayConstant),
-                GetSampleBufferCapacities(SampleBuffers));
+                GetSampleBufferCapacities(SampleBuffers)
+            );
         }
 
         /// Can be called to update the requirements, while preserving all existing
@@ -62,16 +61,17 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
             var existingAverages = ContinuousExponentialMovingAverages;
             ContinuousExponentialMovingAverages = requirements
-                .DecayConstants
-                .Select(decayConstant =>
+                .DecayConstants.Select(decayConstant =>
                 {
-                    var existingCema = existingAverages
-                        .FirstOrDefault(existingCema => existingCema.DecayConstant == decayConstant);
+                    var existingCema = existingAverages.FirstOrDefault(existingCema =>
+                        existingCema.DecayConstant == decayConstant
+                    );
                     return existingCema != null
                         ? new ContinuousExponentialMovingAverage(
                             decayConstant: decayConstant,
                             value: existingCema.LastValue,
-                            time: existingCema.LastTime)
+                            time: existingCema.LastTime
+                        )
                         : new ContinuousExponentialMovingAverage(decayConstant);
                 })
                 .ToArray();
@@ -86,21 +86,21 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 switch (metric.MetricKind)
                 {
                     case MetricKind.Counter:
+                    {
+                        foreach (var cema in ContinuousExponentialMovingAverages)
                         {
-                            foreach (var cema in ContinuousExponentialMovingAverages)
-                            {
-                                cema.AddSampleForCounter(value, time);
-                            }
-                            break;
+                            cema.AddSampleForCounter(value, time);
                         }
+                        break;
+                    }
                     case MetricKind.Gauge:
+                    {
+                        foreach (var cema in ContinuousExponentialMovingAverages)
                         {
-                            foreach (var cema in ContinuousExponentialMovingAverages)
-                            {
-                                cema.AddSampleForGauge(value, time);
-                            }
-                            break;
+                            cema.AddSampleForGauge(value, time);
                         }
+                        break;
+                    }
                 }
             }
         }

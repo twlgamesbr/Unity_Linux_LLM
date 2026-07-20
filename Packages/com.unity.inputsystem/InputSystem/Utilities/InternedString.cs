@@ -139,8 +139,11 @@ namespace UnityEngine.InputSystem.Utilities
 
         public int CompareTo(InternedString other)
         {
-            return string.Compare(m_StringLowerCase, other.m_StringLowerCase,
-                StringComparison.InvariantCultureIgnoreCase);
+            return string.Compare(
+                m_StringLowerCase,
+                other.m_StringLowerCase,
+                StringComparison.InvariantCultureIgnoreCase
+            );
         }
 
         /// <summary>
@@ -159,46 +162,52 @@ namespace UnityEngine.InputSystem.Utilities
             return m_StringOriginalCase ?? string.Empty;
         }
 
-        public static bool operator==(InternedString a, InternedString b)
+        public static bool operator ==(InternedString a, InternedString b)
         {
             return a.Equals(b);
         }
 
-        public static bool operator!=(InternedString a, InternedString b)
+        public static bool operator !=(InternedString a, InternedString b)
         {
             return !a.Equals(b);
         }
 
-        public static bool operator==(InternedString a, string b)
+        public static bool operator ==(InternedString a, string b)
         {
             return string.Compare(a.m_StringLowerCase, b, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
-        public static bool operator!=(InternedString a, string b)
+        public static bool operator !=(InternedString a, string b)
         {
             return string.Compare(a.m_StringLowerCase, b, StringComparison.InvariantCultureIgnoreCase) != 0;
         }
 
-        public static bool operator==(string a, InternedString b)
+        public static bool operator ==(string a, InternedString b)
         {
             return string.Compare(a, b.m_StringLowerCase, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
-        public static bool operator!=(string a, InternedString b)
+        public static bool operator !=(string a, InternedString b)
         {
             return string.Compare(a, b.m_StringLowerCase, StringComparison.InvariantCultureIgnoreCase) != 0;
         }
 
-        public static bool operator<(InternedString left, InternedString right)
+        public static bool operator <(InternedString left, InternedString right)
         {
-            return string.Compare(left.m_StringLowerCase, right.m_StringLowerCase,
-                StringComparison.InvariantCultureIgnoreCase) < 0;
+            return string.Compare(
+                    left.m_StringLowerCase,
+                    right.m_StringLowerCase,
+                    StringComparison.InvariantCultureIgnoreCase
+                ) < 0;
         }
 
-        public static bool operator>(InternedString left, InternedString right)
+        public static bool operator >(InternedString left, InternedString right)
         {
-            return string.Compare(left.m_StringLowerCase, right.m_StringLowerCase,
-                StringComparison.InvariantCultureIgnoreCase) > 0;
+            return string.Compare(
+                    left.m_StringLowerCase,
+                    right.m_StringLowerCase,
+                    StringComparison.InvariantCultureIgnoreCase
+                ) > 0;
         }
 
         /// <summary>

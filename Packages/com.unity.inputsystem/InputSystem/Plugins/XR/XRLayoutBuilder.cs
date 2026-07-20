@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.InputSystem.Utilities;
 using System.Text;
 using UnityEngine.InputSystem.Layouts;
+using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Utilities;
 using UnityEngine.XR;
 
 namespace UnityEngine.InputSystem.XR
@@ -49,7 +49,13 @@ namespace UnityEngine.InputSystem.XR
             for (var i = 0; i < stringLength; i++)
             {
                 var letter = original[i];
-                if (char.IsUpper(letter) || char.IsLower(letter) || char.IsDigit(letter) || letter == '_' || (allowPaths && (letter == '/')))
+                if (
+                    char.IsUpper(letter)
+                    || char.IsLower(letter)
+                    || char.IsDigit(letter)
+                    || letter == '_'
+                    || (allowPaths && (letter == '/'))
+                )
                 {
                     sanitizedName.Append(letter);
                 }
@@ -57,11 +63,17 @@ namespace UnityEngine.InputSystem.XR
             return sanitizedName.ToString();
         }
 
-        internal static string OnFindLayoutForDevice(ref InputDeviceDescription description, string matchedLayout,
-            InputDeviceExecuteCommandDelegate executeCommandDelegate)
+        internal static string OnFindLayoutForDevice(
+            ref InputDeviceDescription description,
+            string matchedLayout,
+            InputDeviceExecuteCommandDelegate executeCommandDelegate
+        )
         {
             // If the device isn't a XRInput, we're not interested.
-            if (description.interfaceName != XRUtilities.InterfaceCurrent && description.interfaceName != XRUtilities.InterfaceV1)
+            if (
+                description.interfaceName != XRUtilities.InterfaceCurrent
+                && description.interfaceName != XRUtilities.InterfaceV1
+            )
             {
                 return null;
             }
@@ -91,7 +103,8 @@ namespace UnityEngine.InputSystem.XR
 #if UNITY_INPUT_SYSTEM_ENABLE_XR && (ENABLE_VR || UNITY_GAMECORE)
             if (string.IsNullOrEmpty(matchedLayout))
             {
-                const InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Controller;
+                const InputDeviceCharacteristics controllerCharacteristics =
+                    InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Controller;
                 if ((deviceDescriptor.characteristics & InputDeviceCharacteristics.HeadMounted) != 0)
                     matchedLayout = "XRHMD";
                 else if ((deviceDescriptor.characteristics & controllerCharacteristics) == controllerCharacteristics)
@@ -109,7 +122,12 @@ namespace UnityEngine.InputSystem.XR
                     $"{SanitizeString(description.interfaceName)}::{SanitizeString(description.manufacturer)}::{SanitizeString(description.product)}";
             }
 
-            var layout = new XRLayoutBuilder { descriptor = deviceDescriptor, parentLayout = matchedLayout, interfaceName = description.interfaceName };
+            var layout = new XRLayoutBuilder
+            {
+                descriptor = deviceDescriptor,
+                parentLayout = matchedLayout,
+                interfaceName = description.interfaceName,
+            };
             InputSystem.RegisterLayoutBuilder(() => layout.Build(), layoutName, matchedLayout);
 
             return layoutName;
@@ -154,7 +172,7 @@ namespace UnityEngine.InputSystem.XR
             "/position",
             "/rotation",
             "/velocity",
-            "/angularVelocity"
+            "/angularVelocity",
         };
 
         static readonly FeatureType[] poseSubControlTypes =
@@ -164,7 +182,7 @@ namespace UnityEngine.InputSystem.XR
             FeatureType.Axis3D,
             FeatureType.Rotation,
             FeatureType.Axis3D,
-            FeatureType.Axis3D
+            FeatureType.Axis3D,
         };
 
         // A PoseControl consists of 6 subcontrols with specific names and types
@@ -172,8 +190,10 @@ namespace UnityEngine.InputSystem.XR
         {
             for (var i = 0; i < 6; i++)
             {
-                if (!features[startIndex + i].name.EndsWith(poseSubControlNames[i]) ||
-                    features[startIndex + i].featureType != poseSubControlTypes[i])
+                if (
+                    !features[startIndex + i].name.EndsWith(poseSubControlNames[i])
+                    || features[startIndex + i].featureType != poseSubControlTypes[i]
+                )
                     return false;
             }
             return true;
@@ -185,12 +205,10 @@ namespace UnityEngine.InputSystem.XR
             {
                 stateFormat = new FourCC('X', 'R', 'S', '0'),
                 extendsLayout = parentLayout,
-                updateBeforeRender = true
+                updateBeforeRender = true,
             };
 
-            var inheritedLayout = !string.IsNullOrEmpty(parentLayout)
-                ? InputSystem.LoadLayout(parentLayout)
-                : null;
+            var inheritedLayout = !string.IsNullOrEmpty(parentLayout) ? InputSystem.LoadLayout(parentLayout) : null;
 
             var parentControls = new List<string>();
             var currentUsages = new List<string>();
@@ -224,9 +242,7 @@ namespace UnityEngine.InputSystem.XR
                     {
                         if (IsPoseControl(descriptor.inputFeatures, i))
                         {
-                            builder.AddControl(parentControl)
-                                .WithLayout("Pose")
-                                .WithByteOffset(0);
+                            builder.AddControl(parentControl).WithLayout("Pose").WithByteOffset(0);
                             parentControls.Add(parentControl);
                         }
                     }
@@ -246,12 +262,12 @@ namespace UnityEngine.InputSystem.XR
                         currentOffset += (4 - (currentOffset % 4));
                 }
 
-
                 switch (feature.featureType)
                 {
                     case FeatureType.Binary:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Button")
                             .WithByteOffset(currentOffset)
                             .WithFormat(InputStateBlock.FormatBit)
@@ -260,7 +276,8 @@ namespace UnityEngine.InputSystem.XR
                     }
                     case FeatureType.DiscreteStates:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Integer")
                             .WithByteOffset(currentOffset)
                             .WithFormat(InputStateBlock.FormatInt)
@@ -269,7 +286,8 @@ namespace UnityEngine.InputSystem.XR
                     }
                     case FeatureType.Axis1D:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Analog")
                             .WithRange(-1, 1)
                             .WithByteOffset(currentOffset)
@@ -279,23 +297,21 @@ namespace UnityEngine.InputSystem.XR
                     }
                     case FeatureType.Axis2D:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Stick")
                             .WithByteOffset(currentOffset)
                             .WithFormat(InputStateBlock.FormatVector2)
                             .WithUsages(currentUsages);
 
-                        builder.AddControl(featureName + "/x")
-                            .WithLayout("Analog")
-                            .WithRange(-1, 1);
-                        builder.AddControl(featureName + "/y")
-                            .WithLayout("Analog")
-                            .WithRange(-1, 1);
+                        builder.AddControl(featureName + "/x").WithLayout("Analog").WithRange(-1, 1);
+                        builder.AddControl(featureName + "/y").WithLayout("Analog").WithRange(-1, 1);
                         break;
                     }
                     case FeatureType.Axis3D:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Vector3")
                             .WithByteOffset(currentOffset)
                             .WithFormat(InputStateBlock.FormatVector3)
@@ -304,7 +320,8 @@ namespace UnityEngine.InputSystem.XR
                     }
                     case FeatureType.Rotation:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Quaternion")
                             .WithByteOffset(currentOffset)
                             .WithFormat(InputStateBlock.FormatQuaternion)
@@ -317,7 +334,8 @@ namespace UnityEngine.InputSystem.XR
                     }
                     case FeatureType.Bone:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Bone")
                             .WithByteOffset(currentOffset)
                             .WithUsages(currentUsages);
@@ -325,7 +343,8 @@ namespace UnityEngine.InputSystem.XR
                     }
                     case FeatureType.Eyes:
                     {
-                        builder.AddControl(featureName)
+                        builder
+                            .AddControl(featureName)
                             .WithLayout("Eyes")
                             .WithByteOffset(currentOffset)
                             .WithUsages(currentUsages);

@@ -15,14 +15,17 @@ namespace Unity.Rendering
         private const int kCacheLinePadding = kCacheLineNumFloats - kAABBNumFloats;
 
         public MinMaxAABB AABB;
+
         // Pad the size of this struct to a single cache line, to ensure that thread local updates
         // don't cause false sharing
         public fixed float CacheLinePadding[kCacheLinePadding];
 
         public static void AssertCacheLineSize()
         {
-            Assert.IsTrue(UnsafeUtility.SizeOf<ThreadLocalAABB>() == JobsUtility.CacheLineSize,
-                "ThreadLocalAABB should have a size equal to the CPU cache line size");
+            Assert.IsTrue(
+                UnsafeUtility.SizeOf<ThreadLocalAABB>() == JobsUtility.CacheLineSize,
+                "ThreadLocalAABB should have a size equal to the CPU cache line size"
+            );
         }
     }
 
@@ -33,9 +36,8 @@ namespace Unity.Rendering
 
         public void Execute(int index)
         {
-            var threadLocalAABB = ((ThreadLocalAABB*) ThreadLocalAABBs.GetUnsafePtr()) + index;
+            var threadLocalAABB = ((ThreadLocalAABB*)ThreadLocalAABBs.GetUnsafePtr()) + index;
             threadLocalAABB->AABB = MinMaxAABB.Empty;
         }
     }
-
 }

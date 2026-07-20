@@ -12,11 +12,12 @@ namespace Unity.Serialization.Json
     unsafe struct UnsafeSerializedObjectReader : IDisposable
     {
         delegate void GetNextBlockDelegate(IntPtr self);
-        
-        static readonly SharedStatic<IntPtr> s_GetNextBlockTrampoline = SharedStatic<IntPtr>.GetOrCreate<GetNextBlockDelegate>();
-        
+
+        static readonly SharedStatic<IntPtr> s_GetNextBlockTrampoline =
+            SharedStatic<IntPtr>.GetOrCreate<GetNextBlockDelegate>();
+
         static object s_GetNextBlockDelegateReference;
-        
+
         internal static void CreateBurstDelegates()
         {
             if (s_GetNextBlockDelegateReference == null)
@@ -26,7 +27,7 @@ namespace Unity.Serialization.Json
                 s_GetNextBlockTrampoline.Data = Marshal.GetFunctionPointerForDelegate(trampoline);
             }
         }
-        
+
         readonly bool m_LeaveOutputOpen;
 
         JsonTokenStream m_JsonTokenStream;
@@ -37,7 +38,7 @@ namespace Unity.Serialization.Json
         PackedBinaryWriter m_PackedBinaryWriter;
 
         GCHandle m_StreamBlockReader;
-        
+
         UnsafeBuffer<char> m_InitialBlock;
         UnsafeBuffer<char> m_CurrentBlock;
 
@@ -55,8 +56,11 @@ namespace Unity.Serialization.Json
             get => m_RequiresExplicitExceptionHandling;
             set => m_RequiresExplicitExceptionHandling = value;
         }
-        
-        static PackedBinaryStream OpenBinaryStreamWithConfiguration(SerializedObjectReaderConfiguration configuration, Allocator label)
+
+        static PackedBinaryStream OpenBinaryStreamWithConfiguration(
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label
+        )
         {
             if (configuration.TokenBufferSize < 16)
                 throw new ArgumentException("TokenBufferSize < 16");
@@ -67,28 +71,47 @@ namespace Unity.Serialization.Json
             return new PackedBinaryStream(configuration.TokenBufferSize, configuration.OutputBufferSize, label);
         }
 
-        public UnsafeSerializedObjectReader(Stream input, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveInputOpen = true)
-            : this(input, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label, leaveInputOpen, false)
-        {
+        public UnsafeSerializedObjectReader(
+            Stream input,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveInputOpen = true
+        )
+            : this(
+                input,
+                OpenBinaryStreamWithConfiguration(configuration, label),
+                configuration,
+                label,
+                leaveInputOpen,
+                false
+            ) { }
 
-        }
-        
-        public UnsafeSerializedObjectReader(Stream input, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveInputOpen = true)
-            : this(input, output, configuration, label, leaveInputOpen, true)
-        {
+        public UnsafeSerializedObjectReader(
+            Stream input,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveInputOpen = true
+        )
+            : this(input, output, configuration, label, leaveInputOpen, true) { }
 
-        }
-
-        internal UnsafeSerializedObjectReader(Stream input, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveInputOpen = true, bool leaveOutputOpen = true)
+        internal UnsafeSerializedObjectReader(
+            Stream input,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveInputOpen = true,
+            bool leaveOutputOpen = true
+        )
         {
             if (configuration.BlockBufferSize < 16)
                 throw new ArgumentException("BlockBufferSize < 16");
 
             if (configuration.TokenBufferSize < 16)
                 throw new ArgumentException("TokenBufferSize < 16");
-            
+
             m_LeaveOutputOpen = leaveOutputOpen;
-            
+
             m_JsonTokenStream = new JsonTokenStream(configuration.TokenBufferSize, label);
             m_JsonTokenizer = new JsonTokenizer(label);
             m_JsonValidator = default;
@@ -100,20 +123,20 @@ namespace Unity.Serialization.Json
                     m_JsonValidator = new JsonValidator(configuration.ValidationType, label);
                     break;
             }
-            
+
             m_NodeParser = new NodeParser(m_JsonTokenStream, configuration.NodeBufferSize, label);
             m_PackedBinaryStream = output;
             m_PackedBinaryWriter = new PackedBinaryWriter(m_JsonTokenStream, m_PackedBinaryStream, label)
             {
-                StripStringEscapeCharacters = configuration.StripStringEscapeCharacters
+                StripStringEscapeCharacters = configuration.StripStringEscapeCharacters,
             };
 
-            var reader = configuration.UseReadAsync 
-                ? (IUnsafeStreamBlockReader) new AsyncBlockReader(input, configuration.BlockBufferSize, leaveInputOpen) 
-                : (IUnsafeStreamBlockReader) new SyncBlockReader(input, configuration.BlockBufferSize, leaveInputOpen);
-            
+            var reader = configuration.UseReadAsync
+                ? (IUnsafeStreamBlockReader)new AsyncBlockReader(input, configuration.BlockBufferSize, leaveInputOpen)
+                : (IUnsafeStreamBlockReader)new SyncBlockReader(input, configuration.BlockBufferSize, leaveInputOpen);
+
             m_StreamBlockReader = GCHandle.Alloc(reader);
-            
+
             m_InitialBlock = default;
             m_CurrentBlock = default;
             m_CurrentBlockIsFinal = false;
@@ -121,27 +144,41 @@ namespace Unity.Serialization.Json
             m_ValidationResult = default;
             m_RequiresExplicitExceptionHandling = false;
         }
-        
-        public UnsafeSerializedObjectReader(char* buffer, int length, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
-            : this(buffer, length, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label)
-        {
-        }
-        
-        public UnsafeSerializedObjectReader(char* buffer, int length, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
-            : this(buffer, length, output, configuration, label, true)
-        {
-        }
-        
-        internal UnsafeSerializedObjectReader(char* buffer, int length, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveOutputOpen = true)
+
+        public UnsafeSerializedObjectReader(
+            char* buffer,
+            int length,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel
+        )
+            : this(buffer, length, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label) { }
+
+        public UnsafeSerializedObjectReader(
+            char* buffer,
+            int length,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel
+        )
+            : this(buffer, length, output, configuration, label, true) { }
+
+        internal UnsafeSerializedObjectReader(
+            char* buffer,
+            int length,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveOutputOpen = true
+        )
         {
             if (configuration.BlockBufferSize < 16)
                 throw new ArgumentException("BlockBufferSize < 16");
 
             if (configuration.TokenBufferSize < 16)
                 throw new ArgumentException("TokenBufferSize < 16");
-            
+
             m_LeaveOutputOpen = leaveOutputOpen;
-            
+
             m_JsonTokenStream = new JsonTokenStream(configuration.TokenBufferSize, label);
             m_JsonTokenizer = new JsonTokenizer(label);
             m_JsonValidator = default;
@@ -153,16 +190,16 @@ namespace Unity.Serialization.Json
                     m_JsonValidator = new JsonValidator(configuration.ValidationType, label);
                     break;
             }
-            
+
             m_NodeParser = new NodeParser(m_JsonTokenStream, configuration.NodeBufferSize, label);
             m_PackedBinaryStream = output;
             m_PackedBinaryWriter = new PackedBinaryWriter(m_JsonTokenStream, m_PackedBinaryStream, label)
             {
-                StripStringEscapeCharacters = configuration.StripStringEscapeCharacters
+                StripStringEscapeCharacters = configuration.StripStringEscapeCharacters,
             };
 
             m_StreamBlockReader = default;
-            
+
             m_InitialBlock = new UnsafeBuffer<char>(buffer, length);
             m_CurrentBlock = default;
             m_CurrentBlockIsFinal = false;
@@ -177,10 +214,10 @@ namespace Unity.Serialization.Json
             m_JsonTokenizer.Dispose();
             m_JsonValidator.Dispose();
             m_NodeParser.Dispose();
-            
+
             if (!m_LeaveOutputOpen)
                 m_PackedBinaryStream.Dispose();
-            
+
             m_PackedBinaryWriter.Dispose();
 
             DisposeManagedResources();
@@ -205,15 +242,15 @@ namespace Unity.Serialization.Json
             m_PackedBinaryStream.Clear();
             m_PackedBinaryWriter.Seek(0, -1);
         }
-        
+
         public void SetSource(char* ptr, int length)
         {
             Reset();
-            
+
             m_InitialBlock = new UnsafeBuffer<char>(ptr, length);
             m_CurrentBlock = default;
         }
-        
+
         /// <summary>
         /// Discards completed data from the buffers.
         /// </summary>
@@ -221,7 +258,7 @@ namespace Unity.Serialization.Json
         {
             m_PackedBinaryStream.DiscardCompleted();
         }
-        
+
         /// <summary>
         /// Advances the reader to the given node type, ignoring depth/scope.
         /// </summary>
@@ -244,7 +281,7 @@ namespace Unity.Serialization.Json
             view = ReadInternal(node, NodeParser.IgnoreParent);
             return m_NodeParser.NodeType;
         }
-        
+
         /// <summary>
         /// Reads the next node in the stream.
         /// </summary>
@@ -254,7 +291,7 @@ namespace Unity.Serialization.Json
         {
             return Read(out _);
         }
-        
+
         /// <summary>
         /// Reads the next node in the stream, respecting depth/scope.
         /// </summary>
@@ -265,7 +302,7 @@ namespace Unity.Serialization.Json
             ReadInternal(node, m_NodeParser.TokenParentIndex);
             return m_NodeParser.NodeType;
         }
-        
+
         /// <summary>
         /// Reads the next node in the stream, respecting depth/scope.
         /// </summary>
@@ -277,7 +314,7 @@ namespace Unity.Serialization.Json
             view = ReadInternal(node, m_NodeParser.TokenParentIndex);
             return m_NodeParser.NodeType;
         }
-        
+
         /// <summary>
         /// Reads the next node as a <see cref="SerializedObjectView"/>
         /// </summary>
@@ -288,12 +325,14 @@ namespace Unity.Serialization.Json
             FillBuffers();
 
             if (!CheckNextTokenType(TokenType.Object))
-                throw new InvalidOperationException($"Invalid token read Expected=[{TokenType.Object}] but Received=[{GetNextTokenType()}]");
-            
+                throw new InvalidOperationException(
+                    $"Invalid token read Expected=[{TokenType.Object}] but Received=[{GetNextTokenType()}]"
+                );
+
             Read(out var view);
             return view.AsObjectView();
         }
-        
+
         public SerializedMemberView ReadMember()
         {
             FillBuffers();
@@ -301,12 +340,14 @@ namespace Unity.Serialization.Json
             var nextTokenType = GetNextTokenType();
             if (nextTokenType != TokenType.String && nextTokenType != TokenType.Primitive)
             {
-                throw new InvalidOperationException($"Invalid token read Expected=[{TokenType.String}|{TokenType.Primitive}] but Received=[{GetNextTokenType()}]");
+                throw new InvalidOperationException(
+                    $"Invalid token read Expected=[{TokenType.String}|{TokenType.Primitive}] but Received=[{GetNextTokenType()}]"
+                );
             }
             Read(out var view);
             return view.AsMemberView();
         }
-        
+
         /// <summary>
         /// Reads the next node as a member, respecting depth/scope and adds it to the given <see cref="SerializedMemberViewCollection"/>.
         /// </summary>
@@ -315,7 +356,7 @@ namespace Unity.Serialization.Json
         {
             collection.Add(ReadMember());
         }
-        
+
         /// <summary>
         /// Reads the next node as an array element.
         /// </summary>
@@ -337,7 +378,7 @@ namespace Unity.Serialization.Json
             view = default;
             return false;
         }
-        
+
         /// <summary>
         /// Reads the next <see cref="count"/> elements of an array and writes views to the given buffer.
         /// </summary>
@@ -355,7 +396,7 @@ namespace Unity.Serialization.Json
 
         SerializedValueView ReadInternal(NodeType type, int parent)
         {
-            for (;;)
+            for (; ; )
             {
                 // Parse and tokenize the input stream.
                 if (FillBuffers())
@@ -369,14 +410,19 @@ namespace Unity.Serialization.Json
                 var writerStart = m_PackedBinaryStream.TokenNextIndex - 1;
 
                 m_NodeParser.Step(type, parent);
-                
-                m_PackedBinaryWriter.Write(m_CurrentBlock, m_NodeParser.TokenNextIndex - m_PackedBinaryWriter.TokenNextIndex);
+
+                m_PackedBinaryWriter.Write(
+                    m_CurrentBlock,
+                    m_NodeParser.TokenNextIndex - m_PackedBinaryWriter.TokenNextIndex
+                );
 
                 if (m_NodeParser.NodeType == NodeType.None && !IsEmpty(m_CurrentBlock))
                     continue;
 
                 var node = m_NodeParser.Node;
-                return node == -1 ? default : m_PackedBinaryStream.GetView(GetViewIndex(node, parserStart, writerStart));
+                return node == -1
+                    ? default
+                    : m_PackedBinaryStream.GetView(GetViewIndex(node, parserStart, writerStart));
             }
         }
 
@@ -384,7 +430,7 @@ namespace Unity.Serialization.Json
         {
             var index = 0;
 
-            for (;;)
+            for (; ; )
             {
                 // Parse and tokenize the input stream.
                 if (FillBuffers())
@@ -399,10 +445,15 @@ namespace Unity.Serialization.Json
 
                 var batchCount = m_NodeParser.StepBatch(count - index, type, parent);
 
-                m_PackedBinaryWriter.Write(m_CurrentBlock, m_NodeParser.TokenNextIndex - m_PackedBinaryWriter.TokenNextIndex);
+                m_PackedBinaryWriter.Write(
+                    m_CurrentBlock,
+                    m_NodeParser.TokenNextIndex - m_PackedBinaryWriter.TokenNextIndex
+                );
 
                 for (var i = 0; i < batchCount; i++)
-                    views[index + i] = m_PackedBinaryStream.GetView(GetViewIndex(m_NodeParser.Nodes[i], parserStart, writerStart));
+                    views[index + i] = m_PackedBinaryStream.GetView(
+                        GetViewIndex(m_NodeParser.Nodes[i], parserStart, writerStart)
+                    );
 
                 index += batchCount;
 
@@ -417,16 +468,19 @@ namespace Unity.Serialization.Json
         {
             return buffer.Buffer == null || buffer.Length == 0;
         }
-        
+
         bool FillBuffers()
         {
-            if (m_NodeParser.TokenNextIndex < m_JsonTokenStream.TokenNextIndex || m_NodeParser.NodeType != NodeType.None)
+            if (
+                m_NodeParser.TokenNextIndex < m_JsonTokenStream.TokenNextIndex
+                || m_NodeParser.NodeType != NodeType.None
+            )
                 return false;
 
             if (m_StreamBlockReader.IsAllocated)
             {
                 var executedByMono = false;
-                
+
                 TryGetNextBlock(ref executedByMono);
 
                 if (!executedByMono)
@@ -442,23 +496,26 @@ namespace Unity.Serialization.Json
                 m_InitialBlock = default;
                 m_CurrentBlockIsFinal = true;
             }
-                
+
             if (IsEmpty(m_CurrentBlock))
             {
                 m_CurrentBlock = default;
-                
+
                 // We need to perform off one final write call to trigger validation.
                 m_JsonTokenizer.Write(m_JsonTokenStream, m_CurrentBlock, 0, 0, true);
                 Validate();
                 return false;
             }
-            
+
             m_JsonTokenStream.DiscardCompleted();
             m_NodeParser.Seek(m_JsonTokenStream.TokenNextIndex, m_JsonTokenStream.TokenParentIndex);
-            m_PackedBinaryWriter.Seek(m_JsonTokenStream.TokenNextIndex, m_PackedBinaryWriter.TokenParentIndex != -1
-                ? m_JsonTokenStream.Discard[m_PackedBinaryWriter.TokenParentIndex]
-                : -1);
-            
+            m_PackedBinaryWriter.Seek(
+                m_JsonTokenStream.TokenNextIndex,
+                m_PackedBinaryWriter.TokenParentIndex != -1
+                    ? m_JsonTokenStream.Discard[m_PackedBinaryWriter.TokenParentIndex]
+                    : -1
+            );
+
             m_JsonTokenizer.Write(m_JsonTokenStream, m_CurrentBlock, 0, m_CurrentBlock.Length, m_CurrentBlockIsFinal);
             Validate();
             return true;
@@ -474,14 +531,14 @@ namespace Unity.Serialization.Json
             m_CurrentBlock = block.Block;
             m_CurrentBlockIsFinal = block.IsFinal;
         }
-        
+
         [BurstDiscard]
         [MonoPInvokeCallback(typeof(GetNextBlockDelegate))]
         static void GetNextBlockDelegateInMono(IntPtr target)
         {
             try
             {
-                var self = (UnsafeSerializedObjectReader*) target.ToPointer();
+                var self = (UnsafeSerializedObjectReader*)target.ToPointer();
                 var reader = self->m_StreamBlockReader.Target as IUnsafeStreamBlockReader;
                 var block = reader.GetNextBlock();
 
@@ -493,7 +550,7 @@ namespace Unity.Serialization.Json
                 Debug.LogException(ex);
             }
         }
-        
+
         void Validate()
         {
             if (!m_JsonValidator.IsCreated)
@@ -502,11 +559,11 @@ namespace Unity.Serialization.Json
                 if (m_JsonTokenizer.ResultCode == JsonTokenizer.ResultInvalidInput)
                 {
                     m_IsInvalid = true;
-                    
+
                     if (!m_RequiresExplicitExceptionHandling)
                         CheckAndThrowInvalidJsonException();
                 }
-                
+
                 return;
             }
 
@@ -520,14 +577,17 @@ namespace Unity.Serialization.Json
                     // The last received token was an end of stream token but we are still waiting on more characters.
                     // We can safely ignore this error for now.
                 }
-                else if (m_JsonTokenStream.TokenNextIndex == 1 && m_JsonTokenStream.Tokens[0].Type == TokenType.Primitive)
+                else if (
+                    m_JsonTokenStream.TokenNextIndex == 1
+                    && m_JsonTokenStream.Tokens[0].Type == TokenType.Primitive
+                )
                 {
                     // This is a single primitive value. We can deserialize safely and accept this as valid.
                 }
                 else
                 {
                     m_IsInvalid = true;
-                    
+
                     if (!m_RequiresExplicitExceptionHandling)
                         CheckAndThrowInvalidJsonException();
                 }
@@ -544,14 +604,16 @@ namespace Unity.Serialization.Json
                     throw new InvalidJsonException(m_ValidationResult)
                     {
                         Line = m_ValidationResult.LineCount,
-                        Character = m_ValidationResult.CharCount
+                        Character = m_ValidationResult.CharCount,
                     };
                 }
 
-                throw new InvalidJsonException($"Input json was structurally invalid. Try with {nameof(JsonValidationType)}=[Standard or Simple]")
+                throw new InvalidJsonException(
+                    $"Input json was structurally invalid. Try with {nameof(JsonValidationType)}=[Standard or Simple]"
+                )
                 {
                     Line = -1,
-                    Character = -1
+                    Character = -1,
                 };
             }
         }
@@ -581,32 +643,39 @@ namespace Unity.Serialization.Json
             {
                 if (inputTokenStart == -1)
                     throw new IndexOutOfRangeException();
-                
+
                 inputTokenStart = m_JsonTokenStream.Tokens[inputTokenStart].Parent;
                 binaryIndex = binaryTokens[binaryIndex].Parent;
             }
 
             return binaryIndex;
         }
-        
+
         TokenType GetNextTokenType()
         {
-            return m_NodeParser.TokenNextIndex >= m_JsonTokenStream.TokenNextIndex ? TokenType.Undefined : m_JsonTokenStream.Tokens[m_NodeParser.TokenNextIndex].Type;
+            return m_NodeParser.TokenNextIndex >= m_JsonTokenStream.TokenNextIndex
+                ? TokenType.Undefined
+                : m_JsonTokenStream.Tokens[m_NodeParser.TokenNextIndex].Type;
         }
-        
+
         bool CheckNextTokenType(TokenType type)
         {
-            return m_NodeParser.TokenNextIndex < m_JsonTokenStream.TokenNextIndex && m_JsonTokenStream.Tokens[m_NodeParser.TokenNextIndex].Type == type;
+            return m_NodeParser.TokenNextIndex < m_JsonTokenStream.TokenNextIndex
+                && m_JsonTokenStream.Tokens[m_NodeParser.TokenNextIndex].Type == type;
         }
-        
+
         bool CheckArrayElement()
         {
             if (m_NodeParser.Node == -1)
                 return false;
 
-            return CheckNextTokenParent(m_NodeParser.NodeType == NodeType.BeginArray ? m_NodeParser.Node : m_JsonTokenStream.Tokens[m_NodeParser.Node].Parent);
+            return CheckNextTokenParent(
+                m_NodeParser.NodeType == NodeType.BeginArray
+                    ? m_NodeParser.Node
+                    : m_JsonTokenStream.Tokens[m_NodeParser.Node].Parent
+            );
         }
-        
+
         bool CheckNextTokenParent(int parent)
         {
             if (m_NodeParser.TokenNextIndex >= m_JsonTokenStream.TokenNextIndex)

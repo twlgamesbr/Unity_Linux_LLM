@@ -53,8 +53,11 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
         internal static bool IsFramebufferFetchEmulationMSAASupportedOnCurrentPlatform()
         {
             // TODO: Temporarily disable this utility pending a more efficient solution for supporting or disabling framebuffer fetch emulation on PS4/PS5.
-            return (SystemInfo.graphicsDeviceType != GraphicsDeviceType.PlayStation4
-                 && SystemInfo.graphicsDeviceType != GraphicsDeviceType.PlayStation5 && SystemInfo.graphicsDeviceType != GraphicsDeviceType.PlayStation5NGGC);
+            return (
+                SystemInfo.graphicsDeviceType != GraphicsDeviceType.PlayStation4
+                && SystemInfo.graphicsDeviceType != GraphicsDeviceType.PlayStation5
+                && SystemInfo.graphicsDeviceType != GraphicsDeviceType.PlayStation5NGGC
+            );
         }
 
         /// <summary>
@@ -97,14 +100,16 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             if (sourceInfo.msaaSamples != destinationInfo.msaaSamples)
                 return false;
 
-            if (sourceInfo.width != destinationInfo.width ||
-                sourceInfo.height != destinationInfo.height)
+            if (sourceInfo.width != destinationInfo.width || sourceInfo.height != destinationInfo.height)
                 return false;
 
             if (sourceInfo.volumeDepth != destinationInfo.volumeDepth)
                 return false;
 
-            if (GraphicsFormatUtility.IsDepthFormat(sourceInfo.format) || GraphicsFormatUtility.IsDepthFormat(destinationInfo.format))
+            if (
+                GraphicsFormatUtility.IsDepthFormat(sourceInfo.format)
+                || GraphicsFormatUtility.IsDepthFormat(destinationInfo.format)
+            )
                 return false;
 
             // Note: Needs shader model ps_4.1 to support SV_SampleIndex which means the copy pass isn't supported for MSAA on some platforms.
@@ -134,7 +139,7 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
         /// function please use the AddBlitPass function. To verify whether the copy pass is supported for the intended operation, use the CanAddCopyPass function.
         ///
         /// When XR is active, array textures containing both eyes will be automatically copied.
-        /// 
+        ///
         /// </summary>
         /// <param name="graph">The RenderGraph adding this pass to.</param>
         /// <param name="source">The texture the data is copied from.</param>
@@ -151,8 +156,10 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             string passName = "Copy Pass Utility",
             bool returnBuilder = false
 #if !CORE_PACKAGE_DOCTOOLS
-            , [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0)
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
 #endif
         {
             var sourceInfo = graph.GetRenderTargetInfo(source);
@@ -161,15 +168,19 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             if (sourceInfo.msaaSamples != destinationInfo.msaaSamples)
                 throw new ArgumentException("MSAA samples from source and destination texture doesn't match.");
 
-            if (sourceInfo.width != destinationInfo.width ||
-                sourceInfo.height != destinationInfo.height)
+            if (sourceInfo.width != destinationInfo.width || sourceInfo.height != destinationInfo.height)
                 throw new ArgumentException("Dimensions for source and destination texture doesn't match.");
 
             if (sourceInfo.volumeDepth != destinationInfo.volumeDepth)
                 throw new ArgumentException("Slice count for source and destination texture doesn't match.");
 
-            if (GraphicsFormatUtility.IsDepthFormat(sourceInfo.format) || GraphicsFormatUtility.IsDepthFormat(destinationInfo.format))
-                throw new ArgumentException("Depth format for source or destination texture is not supported. Use AddBlitPass instead.");
+            if (
+                GraphicsFormatUtility.IsDepthFormat(sourceInfo.format)
+                || GraphicsFormatUtility.IsDepthFormat(destinationInfo.format)
+            )
+                throw new ArgumentException(
+                    "Depth format for source or destination texture is not supported. Use AddBlitPass instead."
+                );
 
             var isMSAA = (int)sourceInfo.msaaSamples > 1;
 
@@ -179,7 +190,9 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             //       https://docs.unity3d.com/2017.4/Documentation/Manual/SL-ShaderCompileTargets.html
             //       https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-get-sample-position
             if (isMSAA && !CanAddCopyPassMSAA(sourceInfo.bindMS))
-                throw new ArgumentException("Target does not support MSAA for AddCopyPass. Please use the blit alternative or use non MSAA textures.");
+                throw new ArgumentException(
+                    "Target does not support MSAA for AddCopyPass. Please use the blit alternative or use non MSAA textures."
+                );
 
             var builder = graph.AddRasterRenderPass<CopyPassData>(passName, out var passData, file, line);
 
@@ -193,10 +206,12 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
 
                 builder.SetInputAttachment(source, 0);
                 builder.SetRenderAttachment(destination, 0, AccessFlags.Write);
-                builder.SetRenderFunc(static (CopyPassData data, RasterGraphContext context) => CopyRenderFunc(data, context));
+                builder.SetRenderFunc(
+                    static (CopyPassData data, RasterGraphContext context) => CopyRenderFunc(data, context)
+                );
 
                 if (passData.force2DForXR)
-                    builder.AllowGlobalStateModification(true);// So we can set the keywords
+                    builder.AllowGlobalStateModification(true); // So we can set the keywords
             }
             catch
             {
@@ -246,8 +261,10 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             int destinationMip = 0,
             string passName = "Copy Pass Utility"
 #if !CORE_PACKAGE_DOCTOOLS
-            , [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0)
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
 #endif
         {
             AddCopyPass(graph, source, destination, passName, false, file, line);
@@ -267,15 +284,23 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
         /// <param name="destinationSlice"></param>
         /// <param name="numSlices"></param>
         /// <param name="numMips"></param>
-        internal static bool IsTextureXR(ref RenderTargetInfo destDesc, int sourceSlice, int destinationSlice, int numSlices, int numMips)
+        internal static bool IsTextureXR(
+            ref RenderTargetInfo destDesc,
+            int sourceSlice,
+            int destinationSlice,
+            int numSlices,
+            int numMips
+        )
         {
-            if (TextureXR.useTexArray &&
-                  destDesc.volumeDepth > 1 &&
-                  destDesc.volumeDepth == TextureXR.slices &&
-                  sourceSlice == 0 &&
-                  destinationSlice == 0 &&
-                  numSlices == TextureXR.slices &&
-                  numMips == 1)
+            if (
+                TextureXR.useTexArray
+                && destDesc.volumeDepth > 1
+                && destDesc.volumeDepth == TextureXR.slices
+                && sourceSlice == 0
+                && destinationSlice == 0
+                && numSlices == TextureXR.slices
+                && numMips == 1
+            )
             {
                 return true;
             }
@@ -291,10 +316,11 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// Clamp to the nearest pixel when selecting which pixel to blit from.
             /// </summary>
             ClampNearest,
+
             /// <summary>
             /// Use bileanear filtering when selecting which pixels to blit from.
             /// </summary>
-            ClampBilinear
+            ClampBilinear,
         }
 
         class BlitPassData
@@ -346,7 +372,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
         /// <param name="file">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of IBaseRenderGraphBuilder used to setup the new Render Pass, returned only if <paramref name="returnBuilder"/> is set to <c>true</c>or <c>null</c> if <paramref name="returnBuilder"/> is <c>false</c>.</returns>
-        public static IBaseRenderGraphBuilder AddBlitPass(this RenderGraph graph,
+        public static IBaseRenderGraphBuilder AddBlitPass(
+            this RenderGraph graph,
             TextureHandle source,
             TextureHandle destination,
             Vector2 scale,
@@ -361,8 +388,10 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             string passName = "Blit Pass Utility",
             bool returnBuilder = false
 #if !CORE_PACKAGE_DOCTOOLS
-                , [CallerFilePath] string file = "",
-                [CallerLineNumber] int line = 0)
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
 #endif
         {
             if (!source.IsValid())
@@ -380,34 +409,53 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             int sourceMaxWidth = math.max(math.max(sourceDesc.width, sourceDesc.height), sourceDesc.slices);
             int sourceTotalMipChainLevels = (int)math.log2(sourceMaxWidth) + 1;
 
-            int destinationMaxWidth = math.max(math.max(destinationDesc.width, destinationDesc.height), destinationDesc.volumeDepth);
+            int destinationMaxWidth = math.max(
+                math.max(destinationDesc.width, destinationDesc.height),
+                destinationDesc.volumeDepth
+            );
             int destinationTotalMipChainLevels = (int)math.log2(destinationMaxWidth) + 1;
 
             if (numSlices == -1)
                 numSlices = sourceDesc.slices - sourceSlice;
-            if (numSlices > sourceDesc.slices - sourceSlice
-                || numSlices > destinationDesc.volumeDepth - destinationSlice)
+            if (
+                numSlices > sourceDesc.slices - sourceSlice
+                || numSlices > destinationDesc.volumeDepth - destinationSlice
+            )
             {
-                throw new ArgumentException($"BlitPass: {passName} attempts to blit too many slices. The pass will be skipped.");
+                throw new ArgumentException(
+                    $"BlitPass: {passName} attempts to blit too many slices. The pass will be skipped."
+                );
             }
             if (numMips == -1)
                 numMips = sourceTotalMipChainLevels - sourceMip;
-            if (numMips > sourceTotalMipChainLevels - sourceMip
-                || numMips > destinationTotalMipChainLevels - destinationMip)
+            if (
+                numMips > sourceTotalMipChainLevels - sourceMip
+                || numMips > destinationTotalMipChainLevels - destinationMip
+            )
             {
-                throw new ArgumentException($"BlitPass: {passName} attempts to blit too many mips. The pass will be skipped.");
+                throw new ArgumentException(
+                    $"BlitPass: {passName} attempts to blit too many mips. The pass will be skipped."
+                );
             }
 
             bool sourceIsDepth = GraphicsFormatUtility.IsDepthFormat(sourceDesc.format);
             bool destinationIsDepth = GraphicsFormatUtility.IsDepthFormat(destinationDesc.format);
             if (!sourceIsDepth && destinationIsDepth)
-                throw new ArgumentException($"BlitPass: {passName} attempts to blit from a color texture to a depth texture. This is not allowed.");
+                throw new ArgumentException(
+                    $"BlitPass: {passName} attempts to blit from a color texture to a depth texture. This is not allowed."
+                );
 
             if (sourceIsDepth && !sourceDesc.bindTextureMS && sourceDesc.msaaSamples != MSAASamples.None)
-                throw new ArgumentException($"BlitPass: {passName} source depth render texture is MSAA but doesn't have the bindTextureMS flag set to true, this is not supported. This is not allowed.");
+                throw new ArgumentException(
+                    $"BlitPass: {passName} source depth render texture is MSAA but doesn't have the bindTextureMS flag set to true, this is not supported. This is not allowed."
+                );
 
-            var canUseCopyPass = CanAddCopyPass(graph, source, destination)
-                                 && scale == Vector2.one && offset == Vector2.zero && numSlices == 1 && numMips == 1;
+            var canUseCopyPass =
+                CanAddCopyPass(graph, source, destination)
+                && scale == Vector2.one
+                && offset == Vector2.zero
+                && numSlices == 1
+                && numMips == 1;
 
             if (canUseCopyPass && !destinationIsDepth)
             {
@@ -432,7 +480,9 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                 passData.isDepth = destinationIsDepth;
                 builder.UseTexture(source, AccessFlags.Read);
                 builder.UseTexture(destination, AccessFlags.Write);
-                builder.SetRenderFunc(static (BlitPassData data, UnsafeGraphContext context) => BlitRenderFunc(data, context));
+                builder.SetRenderFunc(
+                    static (BlitPassData data, UnsafeGraphContext context) => BlitRenderFunc(data, context)
+                );
             }
             catch
             {
@@ -448,6 +498,7 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
         }
 
         static Vector4 s_BlitScaleBias = new Vector4();
+
         static void BlitRenderFunc(BlitPassData data, UnsafeGraphContext context)
         {
             s_BlitScaleBias.x = data.scale.x;
@@ -467,7 +518,13 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                 // This is the magic that makes XR work for blit. We set the rendertargets passing -1 for the slices. This means it will bind all (both eyes) slices.
                 // The engine will then also automatically duplicate our draws and the vertex and pixel shader (through macros) will ensure those draws end up in the right eye.
                 context.cmd.SetRenderTarget(data.destination, 0, CubemapFace.Unknown, -1);
-                Blitter.BlitTexture(unsafeCmd, data.source, s_BlitScaleBias, data.sourceMip, data.filterMode == BlitFilterMode.ClampBilinear);
+                Blitter.BlitTexture(
+                    unsafeCmd,
+                    data.source,
+                    s_BlitScaleBias,
+                    data.sourceMip,
+                    data.filterMode == BlitFilterMode.ClampBilinear
+                );
             }
             else
             {
@@ -475,8 +532,20 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                 {
                     for (int currMip = 0; currMip < data.numMips; currMip++)
                     {
-                        context.cmd.SetRenderTarget(data.destination, data.destinationMip + currMip, CubemapFace.Unknown, data.destinationSlice + currSlice);
-                        Blitter.BlitTexture(unsafeCmd, data.source, s_BlitScaleBias, data.sourceMip + currMip, data.sourceSlice + currSlice, data.filterMode == BlitFilterMode.ClampBilinear);
+                        context.cmd.SetRenderTarget(
+                            data.destination,
+                            data.destinationMip + currMip,
+                            CubemapFace.Unknown,
+                            data.destinationSlice + currSlice
+                        );
+                        Blitter.BlitTexture(
+                            unsafeCmd,
+                            data.source,
+                            s_BlitScaleBias,
+                            data.sourceMip + currMip,
+                            data.sourceSlice + currSlice,
+                            data.filterMode == BlitFilterMode.ClampBilinear
+                        );
                     }
                 }
             }
@@ -492,11 +561,13 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// This geometry allows you to use a simples vertex shader but has more rendering overhead on the CPU as a mesh and vertex buffers need to be bound to the pipeline.
             /// </summary>
             Mesh,
+
             /// <summary>
             /// A single triangle will be scheduled. The vertex shader will need to generate  correct vertex data in the vertex shader for the tree vertices to cover the full screen.
             /// To get the vertices in the vertex shader include "com.unity.render-pipelines.core\ShaderLibrary\Common.hlsl" and call the GetFullScreenTriangleTexCoord/GetFullScreenTriangleVertexPosition
             /// </summary>
             ProceduralTriangle,
+
             /// <summary>
             /// A four vertices forming two triangles will be scheduled. The vertex shader will need to generate correct vertex data in the vertex shader for the four vertices to cover the full screen.
             /// While more intuitive this may be slower as the quad occupancy will be lower alongside the diagonal line where the two triangles meet.
@@ -531,7 +602,12 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// <param name="destination">The texture the data is copied to.</param>
             /// <param name="material">Material used for blitting.</param>
             /// <param name="shaderPass">The shader pass index to use for the material.</param>
-            public BlitMaterialParameters(TextureHandle source, TextureHandle destination, Material material, int shaderPass)
+            public BlitMaterialParameters(
+                TextureHandle source,
+                TextureHandle destination,
+                Material material,
+                int shaderPass
+            )
                 : this(source, destination, Vector2.one, Vector2.zero, material, shaderPass) { }
 
             /// <summary>
@@ -543,7 +619,14 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// <param name="offset">Offset also known as bias for sampling the input texture</param>
             /// <param name="material">Material used for blitting.</param>
             /// <param name="shaderPass">The shader pass index to use for the material.</param>
-            public BlitMaterialParameters(TextureHandle source, TextureHandle destination, Vector2 scale, Vector2 offset, Material material, int shaderPass)
+            public BlitMaterialParameters(
+                TextureHandle source,
+                TextureHandle destination,
+                Vector2 scale,
+                Vector2 offset,
+                Material material,
+                int shaderPass
+            )
             {
                 this.source = source;
                 this.destination = destination;
@@ -592,7 +675,11 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// The scalar property to set with the source mip index. If -1 the default "_BlitMipLevel" property will be used. Note: Use Shader.PropertyToID to convert a string property name to an ID.
             /// If more than one mip is rendered using the blit function (numMips>1) several full screen quads will be rendered for each slice with different sourceMipPropertyID values set.
             /// </param>
-            public BlitMaterialParameters(TextureHandle source, TextureHandle destination, Material material, int shaderPass,
+            public BlitMaterialParameters(
+                TextureHandle source,
+                TextureHandle destination,
+                Material material,
+                int shaderPass,
                 MaterialPropertyBlock mpb,
                 int destinationSlice,
                 int destinationMip,
@@ -603,14 +690,27 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                 FullScreenGeometryType geometry = FullScreenGeometryType.Mesh,
                 int sourceTexturePropertyID = -1,
                 int sourceSlicePropertyID = -1,
-                int sourceMipPropertyID = -1)
-                : this(source, destination, Vector2.one, Vector2.zero, material, shaderPass,
-                      mpb,
-                      destinationSlice, destinationMip,
-                      numSlices, numMips,
-                      sourceSlice, sourceMip,
-                      geometry,
-                      sourceTexturePropertyID, sourceSlicePropertyID, sourceMipPropertyID) { }
+                int sourceMipPropertyID = -1
+            )
+                : this(
+                    source,
+                    destination,
+                    Vector2.one,
+                    Vector2.zero,
+                    material,
+                    shaderPass,
+                    mpb,
+                    destinationSlice,
+                    destinationMip,
+                    numSlices,
+                    numMips,
+                    sourceSlice,
+                    sourceMip,
+                    geometry,
+                    sourceTexturePropertyID,
+                    sourceSlicePropertyID,
+                    sourceMipPropertyID
+                ) { }
 
             /// <summary>
             /// Constructor to set the source and destination mip and slices as well as material property and IDs to interact with it.
@@ -644,7 +744,13 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// <param name="scaleBiasPropertyID">
             /// The scalar property to set with the scale and bias known as offset. If -1 the default "_BlitScaleBias" property will be used. Note: Use Shader.PropertyToID to convert a string property name to an ID.
             /// </param>
-            public BlitMaterialParameters(TextureHandle source, TextureHandle destination, Vector2 scale, Vector2 offset, Material material, int shaderPass,
+            public BlitMaterialParameters(
+                TextureHandle source,
+                TextureHandle destination,
+                Vector2 scale,
+                Vector2 offset,
+                Material material,
+                int shaderPass,
                 MaterialPropertyBlock mpb,
                 int destinationSlice,
                 int destinationMip,
@@ -656,7 +762,9 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                 int sourceTexturePropertyID = -1,
                 int sourceSlicePropertyID = -1,
                 int sourceMipPropertyID = -1,
-                int scaleBiasPropertyID = -1) : this(source, destination, scale, offset, material, shaderPass)
+                int scaleBiasPropertyID = -1
+            )
+                : this(source, destination, scale, offset, material, shaderPass)
             {
                 this.propertyBlock = mpb;
                 this.sourceSlice = sourceSlice;
@@ -697,17 +805,30 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// The scalar property to set with the source mip index. If -1 the default "_BlitMipLevel" property will be used. Note: Use Shader.PropertyToID to convert a string property name to an ID.
             /// If more than one mip is rendered using the blit function (numMips>1) several full screen quads will be rendered for each slice with different sourceMipPropertyID values set.
             /// </param>
-            public BlitMaterialParameters(TextureHandle source, TextureHandle destination, Material material, int shaderPass,
+            public BlitMaterialParameters(
+                TextureHandle source,
+                TextureHandle destination,
+                Material material,
+                int shaderPass,
                 MaterialPropertyBlock mpb,
                 FullScreenGeometryType geometry = FullScreenGeometryType.Mesh,
                 int sourceTexturePropertyID = -1,
                 int sourceSlicePropertyID = -1,
-                int sourceMipPropertyID = -1)
-                : this(source, destination,
-                      Vector2.one, Vector2.zero,
-                      material, shaderPass,
-                      mpb, geometry,
-                      sourceTexturePropertyID, sourceSlicePropertyID, sourceMipPropertyID) { }
+                int sourceMipPropertyID = -1
+            )
+                : this(
+                    source,
+                    destination,
+                    Vector2.one,
+                    Vector2.zero,
+                    material,
+                    shaderPass,
+                    mpb,
+                    geometry,
+                    sourceTexturePropertyID,
+                    sourceSlicePropertyID,
+                    sourceMipPropertyID
+                ) { }
 
             /// <summary>
             /// Constructor to set textures, material, shader pass and material property block.
@@ -735,13 +856,21 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             /// <param name="scaleBiasPropertyID">
             /// The scalar property to set with the scale and bias known as offset. If -1 the default "_BlitScaleBias" property will be used. Note: Use Shader.PropertyToID to convert a string property name to an ID.
             /// </param>
-            public BlitMaterialParameters(TextureHandle source, TextureHandle destination, Vector2 scale, Vector2 offset, Material material, int shaderPass,
+            public BlitMaterialParameters(
+                TextureHandle source,
+                TextureHandle destination,
+                Vector2 scale,
+                Vector2 offset,
+                Material material,
+                int shaderPass,
                 MaterialPropertyBlock mpb,
                 FullScreenGeometryType geometry = FullScreenGeometryType.Mesh,
                 int sourceTexturePropertyID = -1,
                 int sourceSlicePropertyID = -1,
                 int sourceMipPropertyID = -1,
-                int scaleBiasPropertyID = -1) : this(source, destination, scale, offset, material, shaderPass)
+                int scaleBiasPropertyID = -1
+            )
+                : this(source, destination, scale, offset, material, shaderPass)
             {
                 this.propertyBlock = mpb;
                 if (sourceTexturePropertyID != -1)
@@ -911,18 +1040,21 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
         /// </summary>
         /// <param name="graph">The RenderGraph adding this pass to.</param>
         /// <param name="blitParameters">Parameters used for rendering.</param>
-		/// <param name="passName">A name to use for debugging and error logging. This name will be shown in the rendergraph debugger. </param>
+        /// <param name="passName">A name to use for debugging and error logging. This name will be shown in the rendergraph debugger. </param>
         /// <param name="returnBuilder">A boolean indicating whether to return the builder instance for the blit pass.</param>
         /// <param name="file">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <param name="line">File line of the source file this function is called from. Used for debugging. This parameter is automatically generated by the compiler. Users do not need to pass it.</param>
         /// <returns>A new instance of IBaseRenderGraphBuilder used to setup the new Render Pass, returned only if <paramref name="returnBuilder"/> is set to <c>true</c>or <c>null</c> if <paramref name="returnBuilder"/> is <c>false</c>.</returns>
-        public static IBaseRenderGraphBuilder AddBlitPass(this RenderGraph graph,
+        public static IBaseRenderGraphBuilder AddBlitPass(
+            this RenderGraph graph,
             BlitMaterialParameters blitParameters,
             string passName = "Blit Pass Utility w. Material",
             bool returnBuilder = false
 #if !CORE_PACKAGE_DOCTOOLS
-                , [CallerFilePath] string file = "",
-                [CallerLineNumber] int line = 0)
+            ,
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0
+        )
 #endif
         {
             if (!blitParameters.destination.IsValid())
@@ -933,7 +1065,10 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             var destinationDesc = graph.GetRenderTargetInfo(blitParameters.destination);
 
             // Fill in unspecified parameters automatically based on the texture descriptor
-            int destinationMaxWidth = math.max(math.max(destinationDesc.width, destinationDesc.height), destinationDesc.volumeDepth);
+            int destinationMaxWidth = math.max(
+                math.max(destinationDesc.width, destinationDesc.height),
+                destinationDesc.volumeDepth
+            );
             int destinationTotalMipChainLevels = (int)math.log2(destinationMaxWidth) + 1;
             if (blitParameters.numSlices == -1)
             {
@@ -952,26 +1087,40 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                 int sourceMaxWidth = math.max(math.max(sourceDesc.width, sourceDesc.height), sourceDesc.slices);
                 int sourceTotalMipChainLevels = (int)math.log2(sourceMaxWidth) + 1;
 
-                if (blitParameters.sourceSlice != -1 && blitParameters.numSlices > sourceDesc.slices - blitParameters.sourceSlice)
+                if (
+                    blitParameters.sourceSlice != -1
+                    && blitParameters.numSlices > sourceDesc.slices - blitParameters.sourceSlice
+                )
                 {
-                    throw new ArgumentException($"BlitPass: {passName} attempts to blit too many slices. There are not enough slices in the source array. The pass will be skipped.");
+                    throw new ArgumentException(
+                        $"BlitPass: {passName} attempts to blit too many slices. There are not enough slices in the source array. The pass will be skipped."
+                    );
                 }
 
-                if (blitParameters.sourceMip != -1 && blitParameters.numMips > sourceTotalMipChainLevels - blitParameters.sourceMip)
+                if (
+                    blitParameters.sourceMip != -1
+                    && blitParameters.numMips > sourceTotalMipChainLevels - blitParameters.sourceMip
+                )
                 {
-                    throw new ArgumentException($"BlitPass: {passName} attempts to blit too many mips. There are not enough mips in the source texture. The pass will be skipped.");
+                    throw new ArgumentException(
+                        $"BlitPass: {passName} attempts to blit too many mips. There are not enough mips in the source texture. The pass will be skipped."
+                    );
                 }
             }
 
             // Validate against destination
             if (blitParameters.numSlices > destinationDesc.volumeDepth - blitParameters.destinationSlice)
             {
-                throw new ArgumentException($"BlitPass: {passName} attempts to blit too many slices. There are not enough slices in the destination array. The pass will be skipped.");
+                throw new ArgumentException(
+                    $"BlitPass: {passName} attempts to blit too many slices. There are not enough slices in the destination array. The pass will be skipped."
+                );
             }
 
             if (blitParameters.numMips > destinationTotalMipChainLevels - blitParameters.destinationMip)
             {
-                throw new ArgumentException($"BlitPass: {passName} attempts to blit too many mips. There are not enough mips in the destination texture. The pass will be skipped.");
+                throw new ArgumentException(
+                    $"BlitPass: {passName} attempts to blit too many mips. There are not enough mips in the destination texture. The pass will be skipped."
+                );
             }
 
             if (blitParameters.material == null)
@@ -1001,13 +1150,22 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                 passData.sourceMipPropertyID = blitParameters.sourceMipPropertyID;
                 passData.scaleBiasPropertyID = blitParameters.scaleBiasPropertyID;
 
-                passData.isXR = IsTextureXR(ref destinationDesc, (passData.sourceSlice == -1) ? 0 : passData.sourceSlice, passData.destinationSlice, passData.numSlices, passData.numMips);
+                passData.isXR = IsTextureXR(
+                    ref destinationDesc,
+                    (passData.sourceSlice == -1) ? 0 : passData.sourceSlice,
+                    passData.destinationSlice,
+                    passData.numSlices,
+                    passData.numMips
+                );
                 if (blitParameters.source.IsValid())
                 {
                     builder.UseTexture(blitParameters.source);
                 }
                 builder.UseTexture(blitParameters.destination, AccessFlags.Write);
-                builder.SetRenderFunc(static (BlitMaterialPassData data, UnsafeGraphContext context) => BlitMaterialRenderFunc(data, context));
+                builder.SetRenderFunc(
+                    static (BlitMaterialPassData data, UnsafeGraphContext context) =>
+                        BlitMaterialRenderFunc(data, context)
+                );
             }
             catch
             {
@@ -1076,7 +1234,12 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
                         if (data.sourceMip != -1)
                             data.propertyBlock.SetInt(data.sourceMipPropertyID, data.sourceMip + currMip);
 
-                        context.cmd.SetRenderTarget(data.destination, data.destinationMip + currMip, CubemapFace.Unknown, data.destinationSlice + currSlice);
+                        context.cmd.SetRenderTarget(
+                            data.destination,
+                            data.destinationMip + currMip,
+                            CubemapFace.Unknown,
+                            data.destinationSlice + currSlice
+                        );
                         switch (data.geometry)
                         {
                             case FullScreenGeometryType.Mesh:

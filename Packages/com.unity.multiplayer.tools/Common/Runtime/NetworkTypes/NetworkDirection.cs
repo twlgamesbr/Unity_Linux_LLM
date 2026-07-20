@@ -30,7 +30,7 @@ namespace Unity.Multiplayer.Tools.Common
                 NetworkDirection.Received => "Received",
                 NetworkDirection.Sent => "Sent",
                 NetworkDirection.SentAndReceived => "Sent And Received",
-                _ => throw new ArgumentOutOfRangeException($"Unknow {nameof(NetworkDirection)} {direction}")
+                _ => throw new ArgumentOutOfRangeException($"Unknow {nameof(NetworkDirection)} {direction}"),
             };
         }
     }

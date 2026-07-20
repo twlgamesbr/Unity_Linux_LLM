@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace UnityEditor.TestTools.TestRunner.GUI.Controls
 {
-    internal class MultiValueContentProvider<T> : ISelectionDropDownContentProvider where T : IEquatable<T>
+    internal class MultiValueContentProvider<T> : ISelectionDropDownContentProvider
+        where T : IEquatable<T>
     {
         private T[] m_Values;
         private bool[] m_Selected;
@@ -37,6 +38,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI.Controls
         {
             get { return new int[0]; }
         }
+
         public string GetName(int index)
         {
             if (!ValidateIndexBounds(index))

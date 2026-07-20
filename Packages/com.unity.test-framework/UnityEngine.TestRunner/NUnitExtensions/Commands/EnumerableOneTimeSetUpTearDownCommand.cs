@@ -13,15 +13,15 @@ namespace UnityEngine.TestTools
 {
     internal class EnumerableOneTimeSetUpTearDownCommand : BeforeAfterTestCommandBase<MethodInfo>
     {
-        private static readonly Dictionary<Type, List<MethodInfo>> m_BeforeActionsCache = new Dictionary<Type, List<MethodInfo>>();
-        private static readonly Dictionary<Type, List<MethodInfo>> m_AfterActionsCache = new Dictionary<Type, List<MethodInfo>>();
+        private static readonly Dictionary<Type, List<MethodInfo>> m_BeforeActionsCache =
+            new Dictionary<Type, List<MethodInfo>>();
+        private static readonly Dictionary<Type, List<MethodInfo>> m_AfterActionsCache =
+            new Dictionary<Type, List<MethodInfo>>();
 
         public class DoNothing : TestCommand
         {
             public DoNothing(Test test)
-                : base(test)
-            {
-            }
+                : base(test) { }
 
             public override TestResult Execute(ITestExecutionContext context)
             {
@@ -44,8 +44,20 @@ namespace UnityEngine.TestTools
             {
                 if (Test.TypeInfo != null && Test.TypeInfo.Type != null)
                 {
-                    BeforeActions = GetActions(m_BeforeActionsCache, Test.TypeInfo.Type, typeof(UnityOneTimeSetUpAttribute), new[] { typeof(IEnumerator) });
-                    AfterActions = GetActions(m_AfterActionsCache, Test.TypeInfo.Type, typeof(UnityOneTimeTearDownAttribute), new[] { typeof(IEnumerator) }).Reverse().ToArray();
+                    BeforeActions = GetActions(
+                        m_BeforeActionsCache,
+                        Test.TypeInfo.Type,
+                        typeof(UnityOneTimeSetUpAttribute),
+                        new[] { typeof(IEnumerator) }
+                    );
+                    AfterActions = GetActions(
+                            m_AfterActionsCache,
+                            Test.TypeInfo.Type,
+                            typeof(UnityOneTimeTearDownAttribute),
+                            new[] { typeof(IEnumerator) }
+                        )
+                        .Reverse()
+                        .ToArray();
                 }
             }
         }
@@ -65,6 +77,7 @@ namespace UnityEngine.TestTools
                 return base.MoveBeforeEnumerator(enumerator, test);
             }
         }
+
         private void SetTestObject(UnityTestExecutionContext context)
         {
             if (!_typeInfo.IsStaticClass)
@@ -98,7 +111,9 @@ namespace UnityEngine.TestTools
 
         public IEnumerable ExecuteOneTimeSetUpEnumerable(ITestExecutionContext context)
         {
-            foreach (var child in ExecuteEnumerable(context, ExecutionFlags.SkipAfterActions | ExecutionFlags.SkipStateReset))
+            foreach (
+                var child in ExecuteEnumerable(context, ExecutionFlags.SkipAfterActions | ExecutionFlags.SkipStateReset)
+            )
                 yield return child;
         }
 

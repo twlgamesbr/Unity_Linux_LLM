@@ -1,7 +1,7 @@
 ﻿using System;
-using UnityEngine;
 using Unity.Multiplayer.Tools.Adapters;
 using Unity.Multiplayer.Tools.Common.Visualization;
+using UnityEngine;
 
 namespace Unity.Multiplayer.Tools.NetVis.Configuration
 {

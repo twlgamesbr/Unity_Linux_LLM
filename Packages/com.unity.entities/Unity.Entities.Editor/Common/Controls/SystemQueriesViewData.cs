@@ -11,8 +11,12 @@ namespace Unity.Entities.Editor
         bool m_IsDuplicatedTypeName;
         string m_CachedDisplayName;
 
-        public SystemQueriesViewData(SystemProxy systemProxy, SystemKind kind, [NotNull] QueryViewData[] queries,
-            bool isDuplicatedTypeName = false)
+        public SystemQueriesViewData(
+            SystemProxy systemProxy,
+            SystemKind kind,
+            [NotNull] QueryViewData[] queries,
+            bool isDuplicatedTypeName = false
+        )
         {
             SystemProxy = systemProxy;
             Kind = kind;
@@ -21,9 +25,10 @@ namespace Unity.Entities.Editor
             m_CachedDisplayName = null;
         }
 
-        public string SystemName => m_CachedDisplayName ??= m_IsDuplicatedTypeName
-            ? $"{SystemProxy.NicifiedDisplayName} ({SystemProxy.Namespace})"
-            : SystemProxy.NicifiedDisplayName;
+        public string SystemName =>
+            m_CachedDisplayName ??= m_IsDuplicatedTypeName
+                ? $"{SystemProxy.NicifiedDisplayName} ({SystemProxy.Namespace})"
+                : SystemProxy.NicifiedDisplayName;
 
         public bool MarkAsDuplicatedTypeName()
         {
@@ -40,9 +45,15 @@ namespace Unity.Entities.Editor
             Regular = 0,
             Unmanaged = 1,
             CommandBufferBegin = 2,
-            CommandBufferEnd = 3
+            CommandBufferEnd = 3,
         }
 
-        public bool Equals(SystemQueriesViewData other) => Kind == other.Kind && string.Equals(SystemProxy.TypeFullName, other.SystemProxy.TypeFullName, StringComparison.InvariantCultureIgnoreCase);
+        public bool Equals(SystemQueriesViewData other) =>
+            Kind == other.Kind
+            && string.Equals(
+                SystemProxy.TypeFullName,
+                other.SystemProxy.TypeFullName,
+                StringComparison.InvariantCultureIgnoreCase
+            );
     }
 }

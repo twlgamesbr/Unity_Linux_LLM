@@ -61,7 +61,7 @@ namespace UnityEditor
             /// <summary>
             /// Use this for transparent surfaces.
             /// </summary>
-            Transparent
+            Transparent,
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace UnityEditor
             /// <summary>
             /// Use this for alpha blend mode.
             /// </summary>
-            Alpha,   // Old school alpha-blending mode, fresnel does not affect amount of transparency
+            Alpha, // Old school alpha-blending mode, fresnel does not affect amount of transparency
 
             /// <summary>
             /// Use this for premultiply blend mode.
@@ -87,7 +87,7 @@ namespace UnityEditor
             /// <summary>
             /// Use this for multiply blend mode.
             /// </summary>
-            Multiply
+            Multiply,
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace UnityEditor
             /// <summary>
             /// Use this to render both faces.
             /// </summary>
-            Both = 0
+            Both = 0,
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace UnityEditor
             /// <summary>
             /// Use this for explicitly selecting a render queue.
             /// </summary>
-            UserOverride = 1
+            UserOverride = 1,
         }
 
         /// <summary>
@@ -166,7 +166,9 @@ namespace UnityEditor
             /// <summary>
             /// The names for options available in the ZWriteControl enum.
             /// </summary>
-            public static readonly string[] zwriteNames = Enum.GetNames(typeof(UnityEditor.Rendering.Universal.ShaderGraph.ZWriteControl));
+            public static readonly string[] zwriteNames = Enum.GetNames(
+                typeof(UnityEditor.Rendering.Universal.ShaderGraph.ZWriteControl)
+            );
 
             /// <summary>
             /// The names for options available in the QueueControl enum.
@@ -177,139 +179,189 @@ namespace UnityEditor
             /// The values for options available in the ZTestMode enum.
             /// </summary>
             // Skipping the first entry for ztest (ZTestMode.Disabled is not a valid value)
-            public static readonly int[] ztestValues = ((int[])Enum.GetValues(typeof(UnityEditor.Rendering.Universal.ShaderGraph.ZTestMode))).Skip(1).ToArray();
+            public static readonly int[] ztestValues = (
+                (int[])Enum.GetValues(typeof(UnityEditor.Rendering.Universal.ShaderGraph.ZTestMode))
+            )
+                .Skip(1)
+                .ToArray();
 
             /// <summary>
             /// The names for options available in the ZTestMode enum.
             /// </summary>
             // Skipping the first entry for ztest (ZTestMode.Disabled is not a valid value)
-            public static readonly string[] ztestNames = Enum.GetNames(typeof(UnityEditor.Rendering.Universal.ShaderGraph.ZTestMode)).Skip(1).ToArray();
+            public static readonly string[] ztestNames = Enum.GetNames(
+                    typeof(UnityEditor.Rendering.Universal.ShaderGraph.ZTestMode)
+                )
+                .Skip(1)
+                .ToArray();
 
             // Categories
             /// <summary>
             /// The text and tooltip for the surface options GUI.
             /// </summary>
-            public static readonly GUIContent SurfaceOptions =
-                EditorGUIUtility.TrTextContent("Surface Options", "Controls how URP Renders the material on screen.");
+            public static readonly GUIContent SurfaceOptions = EditorGUIUtility.TrTextContent(
+                "Surface Options",
+                "Controls how URP Renders the material on screen."
+            );
 
             /// <summary>
             /// The text and tooltip for the surface inputs GUI.
             /// </summary>
-            public static readonly GUIContent SurfaceInputs = EditorGUIUtility.TrTextContent("Surface Inputs",
-                "These settings describe the look and feel of the surface itself.");
+            public static readonly GUIContent SurfaceInputs = EditorGUIUtility.TrTextContent(
+                "Surface Inputs",
+                "These settings describe the look and feel of the surface itself."
+            );
 
             /// <summary>
             /// The text and tooltip for the advanced options GUI.
             /// </summary>
-            public static readonly GUIContent AdvancedLabel = EditorGUIUtility.TrTextContent("Advanced Options",
-                "These settings affect behind-the-scenes rendering and underlying calculations.");
+            public static readonly GUIContent AdvancedLabel = EditorGUIUtility.TrTextContent(
+                "Advanced Options",
+                "These settings affect behind-the-scenes rendering and underlying calculations."
+            );
 
             /// <summary>
             /// The text and tooltip for the Surface Type GUI.
             /// </summary>
-            public static readonly GUIContent surfaceType = EditorGUIUtility.TrTextContent("Surface Type",
-                "Select a surface type for your texture. Choose between Opaque or Transparent.");
+            public static readonly GUIContent surfaceType = EditorGUIUtility.TrTextContent(
+                "Surface Type",
+                "Select a surface type for your texture. Choose between Opaque or Transparent."
+            );
 
             /// <summary>
             /// The text and tooltip for the blending mode GUI.
             /// </summary>
-            public static readonly GUIContent blendingMode = EditorGUIUtility.TrTextContent("Blending Mode",
-                "Controls how the color of the Transparent surface blends with the Material color in the background.");
+            public static readonly GUIContent blendingMode = EditorGUIUtility.TrTextContent(
+                "Blending Mode",
+                "Controls how the color of the Transparent surface blends with the Material color in the background."
+            );
 
             /// <summary>
             /// The text and tooltip for the preserve specular lighting GUI.
             /// </summary>
-            public static readonly GUIContent preserveSpecularText = EditorGUIUtility.TrTextContent("Preserve Specular Lighting",
-                "Preserves specular lighting intensity and size by not applying transparent alpha to the specular light contribution.");
+            public static readonly GUIContent preserveSpecularText = EditorGUIUtility.TrTextContent(
+                "Preserve Specular Lighting",
+                "Preserves specular lighting intensity and size by not applying transparent alpha to the specular light contribution."
+            );
 
             /// <summary>
             /// The text and tooltip for the render face GUI.
             /// </summary>
-            public static readonly GUIContent cullingText = EditorGUIUtility.TrTextContent("Render Face",
-                "Specifies which faces to cull from your geometry. Front culls front faces. Back culls back faces. Both means that both sides are rendered.");
+            public static readonly GUIContent cullingText = EditorGUIUtility.TrTextContent(
+                "Render Face",
+                "Specifies which faces to cull from your geometry. Front culls front faces. Back culls back faces. Both means that both sides are rendered."
+            );
 
             /// <summary>
             /// The text and tooltip for the depth write GUI.
             /// </summary>
-            public static readonly GUIContent zwriteText = EditorGUIUtility.TrTextContent("Depth Write",
-                "Controls whether the shader writes depth.  Auto will write only when the shader is opaque.");
+            public static readonly GUIContent zwriteText = EditorGUIUtility.TrTextContent(
+                "Depth Write",
+                "Controls whether the shader writes depth.  Auto will write only when the shader is opaque."
+            );
 
             /// <summary>
             /// The text and tooltip for the depth test GUI.
             /// </summary>
-            public static readonly GUIContent ztestText = EditorGUIUtility.TrTextContent("Depth Test",
-                "Specifies the depth test mode.  The default is LEqual.");
+            public static readonly GUIContent ztestText = EditorGUIUtility.TrTextContent(
+                "Depth Test",
+                "Specifies the depth test mode.  The default is LEqual."
+            );
 
             /// <summary>
             /// The text and tooltip for the alpha clipping GUI.
             /// </summary>
-            public static readonly GUIContent alphaClipText = EditorGUIUtility.TrTextContent("Alpha Clipping",
-                "Makes your Material act like a Cutout shader. Use this to create a transparent effect with hard edges between opaque and transparent areas. Avoid using when Alpha is constant for the entire material as enabling in this case could introduce visual artifacts and will add an unnecessary performance cost when used with MSAA (due to AlphaToMask).");
+            public static readonly GUIContent alphaClipText = EditorGUIUtility.TrTextContent(
+                "Alpha Clipping",
+                "Makes your Material act like a Cutout shader. Use this to create a transparent effect with hard edges between opaque and transparent areas. Avoid using when Alpha is constant for the entire material as enabling in this case could introduce visual artifacts and will add an unnecessary performance cost when used with MSAA (due to AlphaToMask)."
+            );
 
             /// <summary>
             /// The text and tooltip for the alpha clipping threshold GUI.
             /// </summary>
-            public static readonly GUIContent alphaClipThresholdText = EditorGUIUtility.TrTextContent("Threshold",
-                "Sets where the Alpha Clipping starts. The higher the value is, the brighter the  effect is when clipping starts.");
+            public static readonly GUIContent alphaClipThresholdText = EditorGUIUtility.TrTextContent(
+                "Threshold",
+                "Sets where the Alpha Clipping starts. The higher the value is, the brighter the  effect is when clipping starts."
+            );
 
             /// <summary>
             /// The text and tooltip for the cast shadows GUI.
             /// </summary>
-            public static readonly GUIContent castShadowText = EditorGUIUtility.TrTextContent("Cast Shadows",
-                "When enabled, this GameObject will cast shadows onto any geometry that can receive them.");
+            public static readonly GUIContent castShadowText = EditorGUIUtility.TrTextContent(
+                "Cast Shadows",
+                "When enabled, this GameObject will cast shadows onto any geometry that can receive them."
+            );
 
             /// <summary>
             /// The text and tooltip for the receive shadows GUI.
             /// </summary>
-            public static readonly GUIContent receiveShadowText = EditorGUIUtility.TrTextContent("Receive Shadows",
-                "When enabled, other GameObjects can cast shadows onto this GameObject.");
+            public static readonly GUIContent receiveShadowText = EditorGUIUtility.TrTextContent(
+                "Receive Shadows",
+                "When enabled, other GameObjects can cast shadows onto this GameObject."
+            );
 
             /// <summary>
             /// The text and tooltip for the base map GUI.
             /// </summary>
-            public static readonly GUIContent baseMap = EditorGUIUtility.TrTextContent("Base Map",
-                "Specifies the base Material and/or Color of the surface. If you’ve selected Transparent or Alpha Clipping under Surface Options, your Material uses the Texture’s alpha channel or color.");
+            public static readonly GUIContent baseMap = EditorGUIUtility.TrTextContent(
+                "Base Map",
+                "Specifies the base Material and/or Color of the surface. If you’ve selected Transparent or Alpha Clipping under Surface Options, your Material uses the Texture’s alpha channel or color."
+            );
 
             /// <summary>
             /// The text and tooltip for the emission map GUI.
             /// </summary>
-            public static readonly GUIContent emissionMap = EditorGUIUtility.TrTextContent("Emission Map",
-                "Determines the color and intensity of light that the surface of the material emits.");
+            public static readonly GUIContent emissionMap = EditorGUIUtility.TrTextContent(
+                "Emission Map",
+                "Determines the color and intensity of light that the surface of the material emits."
+            );
 
             /// <summary>
             /// The text and tooltip for the normal map GUI.
             /// </summary>
-            public static readonly GUIContent normalMapText =
-                EditorGUIUtility.TrTextContent("Normal Map", "Designates a Normal Map to create the illusion of bumps and dents on this Material's surface.");
+            public static readonly GUIContent normalMapText = EditorGUIUtility.TrTextContent(
+                "Normal Map",
+                "Designates a Normal Map to create the illusion of bumps and dents on this Material's surface."
+            );
 
             /// <summary>
             /// The text and tooltip for the bump scale not supported GUI.
             /// </summary>
-            public static readonly GUIContent bumpScaleNotSupported =
-                EditorGUIUtility.TrTextContent("Bump scale is not supported on mobile platforms");
+            public static readonly GUIContent bumpScaleNotSupported = EditorGUIUtility.TrTextContent(
+                "Bump scale is not supported on mobile platforms"
+            );
 
             /// <summary>
             /// The text and tooltip for the normals fix now GUI.
             /// </summary>
-            public static readonly GUIContent fixNormalNow = EditorGUIUtility.TrTextContent("Fix now",
-                "Converts the assigned texture to be a normal map format.");
+            public static readonly GUIContent fixNormalNow = EditorGUIUtility.TrTextContent(
+                "Fix now",
+                "Converts the assigned texture to be a normal map format."
+            );
 
             /// <summary>
             /// The text and tooltip for the sorting priority GUI.
             /// </summary>
-            public static readonly GUIContent queueSlider = EditorGUIUtility.TrTextContent("Sorting Priority",
-                "Determines the chronological rendering order for a Material. Materials with lower value are rendered first.");
+            public static readonly GUIContent queueSlider = EditorGUIUtility.TrTextContent(
+                "Sorting Priority",
+                "Determines the chronological rendering order for a Material. Materials with lower value are rendered first."
+            );
 
             /// <summary>
             /// The text and tooltip for the queue control GUI.
             /// </summary>
-            public static readonly GUIContent queueControl = EditorGUIUtility.TrTextContent("Queue Control",
-                "Controls whether render queue is automatically set based on material surface type, or explicitly set by the user.");
+            public static readonly GUIContent queueControl = EditorGUIUtility.TrTextContent(
+                "Queue Control",
+                "Controls whether render queue is automatically set based on material surface type, or explicitly set by the user."
+            );
 
             /// <summary>
             /// The text and tooltip for the help reference GUI.
             /// </summary>
-            public static readonly GUIContent documentationIcon = EditorGUIUtility.TrIconContent("_Help", $"Open Reference for URP Shaders.");
+            public static readonly GUIContent documentationIcon = EditorGUIUtility.TrIconContent(
+                "_Help",
+                $"Open Reference for URP Shaders."
+            );
         }
 
         #endregion
@@ -419,7 +471,9 @@ namespace UnityEditor
         public bool m_FirstTimeApply = true;
 
         // By default, everything is expanded, except advanced
-        readonly MaterialHeaderScopeList m_MaterialScopeList = new MaterialHeaderScopeList(uint.MaxValue & ~(uint)Expandable.Advanced);
+        readonly MaterialHeaderScopeList m_MaterialScopeList = new MaterialHeaderScopeList(
+            uint.MaxValue & ~(uint)Expandable.Advanced
+        );
 
         #endregion
 
@@ -453,7 +507,7 @@ namespace UnityEditor
 
             surfaceTypeProp = FindProperty(Property.SurfaceType, properties, false);
             blendModeProp = FindProperty(Property.BlendMode, properties, false);
-            preserveSpecProp = FindProperty(Property.BlendModePreserveSpecular, properties, false);  // Separate blend for diffuse and specular.
+            preserveSpecProp = FindProperty(Property.BlendModePreserveSpecular, properties, false); // Separate blend for diffuse and specular.
             cullingProp = FindProperty(Property.CullMode, properties, false);
             zwriteProp = FindProperty(Property.ZWriteControl, properties, false);
             ztestProp = FindProperty(Property.ZTest, properties, false);
@@ -486,7 +540,7 @@ namespace UnityEditor
             materialEditor = materialEditorIn;
             Material material = materialEditor.target as Material;
 
-            FindProperties(properties);   // MaterialProperties can be animated so we do not cache them but fetch them every event to ensure animated values are updated correctly
+            FindProperties(properties); // MaterialProperties can be animated so we do not cache them but fetch them every event to ensure animated values are updated correctly
 
             // Make sure that needed setup (ie keywords/renderqueue) are set up if we're switching some existing
             // material to a universal shader.
@@ -515,16 +569,28 @@ namespace UnityEditor
 
             // Generate the foldouts
             if (filter.HasFlag(Expandable.SurfaceOptions))
-                m_MaterialScopeList.RegisterHeaderScope(Styles.SurfaceOptions, (uint)Expandable.SurfaceOptions, DrawSurfaceOptions);
+                m_MaterialScopeList.RegisterHeaderScope(
+                    Styles.SurfaceOptions,
+                    (uint)Expandable.SurfaceOptions,
+                    DrawSurfaceOptions
+                );
 
             if (filter.HasFlag(Expandable.SurfaceInputs))
-                m_MaterialScopeList.RegisterHeaderScope(Styles.SurfaceInputs, (uint)Expandable.SurfaceInputs, DrawSurfaceInputs);
+                m_MaterialScopeList.RegisterHeaderScope(
+                    Styles.SurfaceInputs,
+                    (uint)Expandable.SurfaceInputs,
+                    DrawSurfaceInputs
+                );
 
             if (filter.HasFlag(Expandable.Details))
                 FillAdditionalFoldouts(m_MaterialScopeList);
 
             if (filter.HasFlag(Expandable.Advanced))
-                m_MaterialScopeList.RegisterHeaderScope(Styles.AdvancedLabel, (uint)Expandable.Advanced, DrawAdvancedOptions);
+                m_MaterialScopeList.RegisterHeaderScope(
+                    Styles.AdvancedLabel,
+                    (uint)Expandable.Advanced,
+                    DrawAdvancedOptions
+                );
         }
 
         /// <summary>
@@ -550,7 +616,12 @@ namespace UnityEditor
             ShaderGraphPropertyDrawers.DrawShaderGraphGUI(materialEditor, properties);
         }
 
-        internal static void DrawFloatToggleProperty(GUIContent styles, MaterialProperty prop, int indentLevel = 0, bool isDisabled = false)
+        internal static void DrawFloatToggleProperty(
+            GUIContent styles,
+            MaterialProperty prop,
+            int indentLevel = 0,
+            bool isDisabled = false
+        )
         {
             if (prop == null)
                 return;
@@ -590,7 +661,12 @@ namespace UnityEditor
             DoPopup(Styles.zwriteText, zwriteProp, Styles.zwriteNames);
 
             if (ztestProp != null)
-                materialEditor.IntPopupShaderProperty(ztestProp, Styles.ztestText.text, Styles.ztestNames, Styles.ztestValues);
+                materialEditor.IntPopupShaderProperty(
+                    ztestProp,
+                    Styles.ztestText.text,
+                    Styles.ztestNames,
+                    Styles.ztestValues
+                );
 
             DrawFloatToggleProperty(Styles.alphaClipText, alphaClipProp);
 
@@ -632,19 +708,29 @@ namespace UnityEditor
         protected void DrawQueueOffsetField()
         {
             if (queueOffsetProp != null)
-                materialEditor.IntSliderShaderProperty(queueOffsetProp, -queueOffsetRange, queueOffsetRange, Styles.queueSlider);
+                materialEditor.IntSliderShaderProperty(
+                    queueOffsetProp,
+                    -queueOffsetRange,
+                    queueOffsetRange,
+                    Styles.queueSlider
+                );
         }
 
         private void DrawMotionVectorOptions(Material material)
         {
-            if(material.HasProperty(Property.AddPrecomputedVelocity))
+            if (material.HasProperty(Property.AddPrecomputedVelocity))
                 DrawFloatToggleProperty(EditorUtils.Styles.alembicMotionVectors, addPrecomputedVelocityProp);
         }
 
         private void DrawXRMotionVectorsPassOption(Material material)
         {
             if (material.HasProperty(Property.XrMotionVectorsPass))
-                DrawFloatToggleProperty(EditorUtils.Styles.xrMotionVectorsPass, xrMotionVectorsPassProp, 0, !IsSpacewarpSupported());
+                DrawFloatToggleProperty(
+                    EditorUtils.Styles.xrMotionVectorsPass,
+                    xrMotionVectorsPassProp,
+                    0,
+                    !IsSpacewarpSupported()
+                );
         }
 
         /// <summary>
@@ -672,7 +758,12 @@ namespace UnityEditor
 
             using (new EditorGUI.IndentLevelScope(2))
             {
-                materialEditor.TexturePropertyWithHDRColor(Styles.emissionMap, emissionMapProp, emissionColorProp, false);
+                materialEditor.TexturePropertyWithHDRColor(
+                    Styles.emissionMap,
+                    emissionMapProp,
+                    emissionColorProp,
+                    false
+                );
             }
         }
 
@@ -720,15 +811,25 @@ namespace UnityEditor
         /// <param name="materialEditor">The material editor to use.</param>
         /// <param name="bumpMap">The normal map property.</param>
         /// <param name="bumpMapScale">The normal map scale property.</param>
-        public static void DrawNormalArea(MaterialEditor materialEditor, MaterialProperty bumpMap, MaterialProperty bumpMapScale = null)
+        public static void DrawNormalArea(
+            MaterialEditor materialEditor,
+            MaterialProperty bumpMap,
+            MaterialProperty bumpMapScale = null
+        )
         {
             if (bumpMapScale != null)
             {
-                materialEditor.TexturePropertySingleLine(Styles.normalMapText, bumpMap,
-                    bumpMap.textureValue != null ? bumpMapScale : null);
-                if (bumpMapScale.floatValue != 1 &&
-                    UnityEditorInternal.InternalEditorUtility.IsMobilePlatform(
-                        EditorUserBuildSettings.activeBuildTarget))
+                materialEditor.TexturePropertySingleLine(
+                    Styles.normalMapText,
+                    bumpMap,
+                    bumpMap.textureValue != null ? bumpMapScale : null
+                );
+                if (
+                    bumpMapScale.floatValue != 1
+                    && UnityEditorInternal.InternalEditorUtility.IsMobilePlatform(
+                        EditorUserBuildSettings.activeBuildTarget
+                    )
+                )
                     if (materialEditor.HelpBoxWithButton(Styles.bumpScaleNotSupported, Styles.fixNormalNow))
                         bumpMapScale.floatValue = 1;
             }
@@ -803,7 +904,11 @@ namespace UnityEditor
 
             // Receive Shadows
             if (material.HasProperty(Property.ReceiveShadows))
-                CoreUtils.SetKeyword(material, ShaderKeywordStrings._RECEIVE_SHADOWS_OFF, material.GetFloat(Property.ReceiveShadows) == 0.0f);
+                CoreUtils.SetKeyword(
+                    material,
+                    ShaderKeywordStrings._RECEIVE_SHADOWS_OFF,
+                    material.GetFloat(Property.ReceiveShadows) == 0.0f
+                );
         }
 
         internal static void UpdateMotionVectorKeywordsAndPass(Material material)
@@ -815,11 +920,15 @@ namespace UnityEditor
             bool motionVectorPassEnabled = true;
             if (HasMotionVectorLightModeTag(shaderId))
             {
-                if(material.HasProperty(Property.AddPrecomputedVelocity))
+                if (material.HasProperty(Property.AddPrecomputedVelocity))
                 {
                     // The URP text shaders are the only ones that have this property
                     motionVectorPassEnabled = material.GetFloat(Property.AddPrecomputedVelocity) != 0.0f;
-                    CoreUtils.SetKeyword(material, ShaderKeywordStrings._ADD_PRECOMPUTED_VELOCITY, motionVectorPassEnabled);
+                    CoreUtils.SetKeyword(
+                        material,
+                        ShaderKeywordStrings._ADD_PRECOMPUTED_VELOCITY,
+                        motionVectorPassEnabled
+                    );
                 }
                 else if (material.GetTag("AlwaysRenderMotionVectors", false, "false") != "true")
                 {
@@ -834,7 +943,10 @@ namespace UnityEditor
             // Check if the material is a SpeedTree material and whether it has wind turned on or off.
             // We want to disable the custom motion vector pass for SpeedTrees which won't have any
             // vertex animation due to no wind.
-            if(shaderId == ShaderID.SpeedTree8 && SpeedTree8MaterialUpgrader.DoesMaterialHaveSpeedTreeWindKeyword(material))
+            if (
+                shaderId == ShaderID.SpeedTree8
+                && SpeedTree8MaterialUpgrader.DoesMaterialHaveSpeedTreeWindKeyword(material)
+            )
             {
                 motionVectorPassEnabled = SpeedTree8MaterialUpgrader.IsWindEnabled(material);
             }
@@ -921,7 +1033,11 @@ namespace UnityEditor
         /// <param name="material">The material to use.</param>
         /// <param name="shadingModelFunc">Function to set shading models.</param>
         /// <param name="shaderFunc">Function to set some extra shader parameters.</param>
-        public static void SetMaterialKeywords(Material material, Action<Material> shadingModelFunc = null, Action<Material> shaderFunc = null)
+        public static void SetMaterialKeywords(
+            Material material,
+            Action<Material> shadingModelFunc = null,
+            Action<Material> shaderFunc = null
+        )
         {
             UpdateMaterialSurfaceOptions(material, automaticRenderQueue: true);
 
@@ -943,7 +1059,8 @@ namespace UnityEditor
             if (material.HasProperty(Property.EmissionColor))
                 MaterialEditor.FixupEmissiveFlag(material);
 
-            bool shouldEmissionBeEnabled = (material.globalIlluminationFlags & MaterialGlobalIlluminationFlags.AnyEmissive) != 0;
+            bool shouldEmissionBeEnabled =
+                (material.globalIlluminationFlags & MaterialGlobalIlluminationFlags.AnyEmissive) != 0;
 
             // Not sure what this is used for, I don't see this property declared by any Unity shader in our repo...
             // I'm guessing it is some kind of legacy material upgrade support thing?  Or maybe just dead code now...
@@ -966,7 +1083,11 @@ namespace UnityEditor
             shaderFunc?.Invoke(material);
         }
 
-        internal static void SetMaterialSrcDstBlendProperties(Material material, UnityEngine.Rendering.BlendMode srcBlend, UnityEngine.Rendering.BlendMode dstBlend)
+        internal static void SetMaterialSrcDstBlendProperties(
+            Material material,
+            UnityEngine.Rendering.BlendMode srcBlend,
+            UnityEngine.Rendering.BlendMode dstBlend
+        )
         {
             if (material.HasProperty(Property.SrcBlend))
                 material.SetFloat(Property.SrcBlend, (float)srcBlend);
@@ -981,7 +1102,13 @@ namespace UnityEditor
                 material.SetFloat(Property.DstBlendAlpha, (float)dstBlend);
         }
 
-        internal static void SetMaterialSrcDstBlendProperties(Material material, UnityEngine.Rendering.BlendMode srcBlendRGB, UnityEngine.Rendering.BlendMode dstBlendRGB, UnityEngine.Rendering.BlendMode srcBlendAlpha, UnityEngine.Rendering.BlendMode dstBlendAlpha)
+        internal static void SetMaterialSrcDstBlendProperties(
+            Material material,
+            UnityEngine.Rendering.BlendMode srcBlendRGB,
+            UnityEngine.Rendering.BlendMode dstBlendRGB,
+            UnityEngine.Rendering.BlendMode srcBlendAlpha,
+            UnityEngine.Rendering.BlendMode dstBlendAlpha
+        )
         {
             if (material.HasProperty(Property.SrcBlend))
                 material.SetFloat(Property.SrcBlend, (float)srcBlendRGB);
@@ -1014,12 +1141,16 @@ namespace UnityEditor
 
             // default is to use the shader render queue
             int renderQueue = material.shader.renderQueue;
-            material.SetOverrideTag("RenderType", "");      // clear override tag
+            material.SetOverrideTag("RenderType", ""); // clear override tag
             if (material.HasProperty(Property.SurfaceType))
             {
                 SurfaceType surfaceType = (SurfaceType)material.GetFloat(Property.SurfaceType);
                 bool zwrite = false;
-                CoreUtils.SetKeyword(material, ShaderKeywordStrings._SURFACE_TYPE_TRANSPARENT, surfaceType == SurfaceType.Transparent);
+                CoreUtils.SetKeyword(
+                    material,
+                    ShaderKeywordStrings._SURFACE_TYPE_TRANSPARENT,
+                    surfaceType == SurfaceType.Transparent
+                );
                 bool alphaToMask = false;
                 if (surfaceType == SurfaceType.Opaque)
                 {
@@ -1035,7 +1166,11 @@ namespace UnityEditor
                         material.SetOverrideTag("RenderType", "Opaque");
                     }
 
-                    SetMaterialSrcDstBlendProperties(material, UnityEngine.Rendering.BlendMode.One, UnityEngine.Rendering.BlendMode.Zero);
+                    SetMaterialSrcDstBlendProperties(
+                        material,
+                        UnityEngine.Rendering.BlendMode.One,
+                        UnityEngine.Rendering.BlendMode.Zero
+                    );
                     zwrite = true;
                     material.DisableKeyword(ShaderKeywordStrings._ALPHAPREMULTIPLY_ON);
                     material.DisableKeyword(ShaderKeywordStrings._ALPHAMODULATE_ON);
@@ -1095,9 +1230,13 @@ namespace UnityEditor
                     // Lift alpha multiply from ROP to shader by setting pre-multiplied _SrcBlend mode.
                     // The intent is to do different blending for diffuse and specular in shader.
                     // ref: http://advances.realtimerendering.com/other/2016/naughty_dog/NaughtyDog_TechArt_Final.pdf
-                    bool preserveSpecular = (material.HasProperty(Property.BlendModePreserveSpecular) &&
-                                             material.GetFloat(Property.BlendModePreserveSpecular) > 0) &&
-                                            blendMode != BlendMode.Multiply && blendMode != BlendMode.Premultiply;
+                    bool preserveSpecular =
+                        (
+                            material.HasProperty(Property.BlendModePreserveSpecular)
+                            && material.GetFloat(Property.BlendModePreserveSpecular) > 0
+                        )
+                        && blendMode != BlendMode.Multiply
+                        && blendMode != BlendMode.Premultiply;
                     if (preserveSpecular)
                     {
                         srcBlendRGB = UnityEngine.Rendering.BlendMode.One;
@@ -1108,11 +1247,20 @@ namespace UnityEditor
                     if (offScreenAccumulateAlpha)
                         srcBlendA = UnityEngine.Rendering.BlendMode.Zero;
 
-                    SetMaterialSrcDstBlendProperties(material, srcBlendRGB, dstBlendRGB, // RGB
-                        srcBlendA, dstBlendA); // Alpha
+                    SetMaterialSrcDstBlendProperties(
+                        material,
+                        srcBlendRGB,
+                        dstBlendRGB, // RGB
+                        srcBlendA,
+                        dstBlendA
+                    ); // Alpha
 
                     CoreUtils.SetKeyword(material, ShaderKeywordStrings._ALPHAPREMULTIPLY_ON, preserveSpecular);
-                    CoreUtils.SetKeyword(material, ShaderKeywordStrings._ALPHAMODULATE_ON, blendMode == BlendMode.Multiply);
+                    CoreUtils.SetKeyword(
+                        material,
+                        ShaderKeywordStrings._ALPHAMODULATE_ON,
+                        blendMode == BlendMode.Multiply
+                    );
 
                     // General Transparent Material Settings
                     material.SetOverrideTag("RenderType", "Transparent");
@@ -1128,7 +1276,8 @@ namespace UnityEditor
                 // check for override enum
                 if (material.HasProperty(Property.ZWriteControl))
                 {
-                    var zwriteControl = (UnityEditor.Rendering.Universal.ShaderGraph.ZWriteControl)material.GetFloat(Property.ZWriteControl);
+                    var zwriteControl = (UnityEditor.Rendering.Universal.ShaderGraph.ZWriteControl)
+                        material.GetFloat(Property.ZWriteControl);
                     if (zwriteControl == UnityEditor.Rendering.Universal.ShaderGraph.ZWriteControl.ForceEnabled)
                         zwrite = true;
                     else if (zwriteControl == UnityEditor.Rendering.Universal.ShaderGraph.ZWriteControl.ForceDisabled)
@@ -1198,8 +1347,15 @@ namespace UnityEditor
         /// <param name="prop2Label">The label for the second float.</param>
         /// <param name="materialEditor">The material editor to use.</param>
         /// <param name="labelWidth">The width of the labels.</param>
-        public static void TwoFloatSingleLine(GUIContent title, MaterialProperty prop1, GUIContent prop1Label,
-            MaterialProperty prop2, GUIContent prop2Label, MaterialEditor materialEditor, float labelWidth = 30f)
+        public static void TwoFloatSingleLine(
+            GUIContent title,
+            MaterialProperty prop1,
+            GUIContent prop1Label,
+            MaterialProperty prop2,
+            GUIContent prop2Label,
+            MaterialEditor materialEditor,
+            float labelWidth = 30f
+        )
         {
             const int kInterFieldPadding = 2;
 
@@ -1214,16 +1370,24 @@ namespace UnityEditor
             EditorGUI.indentLevel = 0;
             EditorGUIUtility.labelWidth = labelWidth;
 
-            Rect propRect1 = new Rect(rect.x + preLabelWidth, rect.y,
-                (rect.width - preLabelWidth) * 0.5f - 1, EditorGUIUtility.singleLineHeight);
+            Rect propRect1 = new Rect(
+                rect.x + preLabelWidth,
+                rect.y,
+                (rect.width - preLabelWidth) * 0.5f - 1,
+                EditorGUIUtility.singleLineHeight
+            );
             EditorGUI.BeginChangeCheck();
             EditorGUI.showMixedValue = prop1.hasMixedValue;
             var prop1val = EditorGUI.FloatField(propRect1, prop1Label, prop1.floatValue);
             if (EditorGUI.EndChangeCheck())
                 prop1.floatValue = prop1val;
 
-            Rect propRect2 = new Rect(propRect1.x + propRect1.width + kInterFieldPadding, rect.y,
-                propRect1.width, EditorGUIUtility.singleLineHeight);
+            Rect propRect2 = new Rect(
+                propRect1.x + propRect1.width + kInterFieldPadding,
+                rect.y,
+                propRect1.width,
+                EditorGUIUtility.singleLineHeight
+            );
             EditorGUI.BeginChangeCheck();
             EditorGUI.showMixedValue = prop2.hasMixedValue;
             var prop2val = EditorGUI.FloatField(propRect2, prop2Label, prop2.floatValue);
@@ -1260,7 +1424,13 @@ namespace UnityEditor
         /// <param name="colorProp">The color property.</param>
         /// <param name="hdr">Marks whether this is a HDR texture or not.</param>
         /// <returns></returns>
-        public static Rect TextureColorProps(MaterialEditor materialEditor, GUIContent label, MaterialProperty textureProp, MaterialProperty colorProp, bool hdr = false)
+        public static Rect TextureColorProps(
+            MaterialEditor materialEditor,
+            GUIContent label,
+            MaterialProperty textureProp,
+            MaterialProperty colorProp,
+            bool hdr = false
+        )
         {
             MaterialEditor.BeginProperty(textureProp);
             if (colorProp != null)
@@ -1277,10 +1447,13 @@ namespace UnityEditor
                 EditorGUI.showMixedValue = colorProp.hasMixedValue;
                 int indentLevel = EditorGUI.indentLevel;
                 EditorGUI.indentLevel = 0;
-                Rect rectAfterLabel = new Rect(rect.x + EditorGUIUtility.labelWidth, rect.y,
-                    EditorGUIUtility.fieldWidth, EditorGUIUtility.singleLineHeight);
-                var col = EditorGUI.ColorField(rectAfterLabel, GUIContent.none, colorProp.colorValue, true,
-                    false, hdr);
+                Rect rectAfterLabel = new Rect(
+                    rect.x + EditorGUIUtility.labelWidth,
+                    rect.y,
+                    EditorGUIUtility.fieldWidth,
+                    EditorGUIUtility.singleLineHeight
+                );
+                var col = EditorGUI.ColorField(rectAfterLabel, GUIContent.none, colorProp.colorValue, true, false, hdr);
                 EditorGUI.indentLevel = indentLevel;
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -1304,7 +1477,7 @@ namespace UnityEditor
         /// <param name="propertyName">The property to find.</param>
         /// <param name="properties">Array of properties to search in.</param>
         /// <returns>A MaterialProperty instance for the property.</returns>
-        public new static MaterialProperty FindProperty(string propertyName, MaterialProperty[] properties)
+        public static new MaterialProperty FindProperty(string propertyName, MaterialProperty[] properties)
         {
             return FindProperty(propertyName, properties, true);
         }
@@ -1318,7 +1491,11 @@ namespace UnityEditor
         /// <param name="propertyIsMandatory">Should throw exception if property is not found</param>
         /// <returns>A MaterialProperty instance for the property.</returns>
         /// <exception cref="ArgumentException"></exception>
-        public new static MaterialProperty FindProperty(string propertyName, MaterialProperty[] properties, bool propertyIsMandatory)
+        public static new MaterialProperty FindProperty(
+            string propertyName,
+            MaterialProperty[] properties,
+            bool propertyIsMandatory
+        )
         {
             for (int index = 0; index < properties.Length; ++index)
             {
@@ -1326,7 +1503,12 @@ namespace UnityEditor
                     return properties[index];
             }
             if (propertyIsMandatory)
-                throw new ArgumentException("Could not find MaterialProperty: '" + propertyName + "', Num properties: " + (object)properties.Length);
+                throw new ArgumentException(
+                    "Could not find MaterialProperty: '"
+                        + propertyName
+                        + "', Num properties: "
+                        + (object)properties.Length
+                );
             return null;
         }
 

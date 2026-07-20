@@ -49,8 +49,7 @@ namespace Unity.Web.Stripping.Editor
         }
         static bool s_StripAutomaticallyAfterBuild = false;
 
-        internal const string k_DefaultSettingsPath =
-            "Assets/DefaultSubmoduleStrippingSettings.asset";
+        internal const string k_DefaultSettingsPath = "Assets/DefaultSubmoduleStrippingSettings.asset";
 
         // allow changing the path for testing purposes
         internal static string DefaultSettingsPath { get; set; } = k_DefaultSettingsPath;
@@ -74,17 +73,13 @@ namespace Unity.Web.Stripping.Editor
             return AssetDatabase
                 .FindAssets($"t:{nameof(SubmoduleStrippingSettings)}")
                 .Select(path =>
-                    AssetDatabase.LoadAssetAtPath<SubmoduleStrippingSettings>(
-                        AssetDatabase.GUIDToAssetPath(path)
-                    )
+                    AssetDatabase.LoadAssetAtPath<SubmoduleStrippingSettings>(AssetDatabase.GUIDToAssetPath(path))
                 )
                 .ToArray();
         }
 
         const string k_SetAsActiveMenuItem =
-            "Assets/"
-            + SubmoduleStrippingSettings.RootMenuName
-            + "/Set as Active Submodule Stripping Settings";
+            "Assets/" + SubmoduleStrippingSettings.RootMenuName + "/Set as Active Submodule Stripping Settings";
 
         [MenuItem(k_SetAsActiveMenuItem, true)]
         internal static bool SetSelectedSettingsAsActiveSettings_Validate() =>
@@ -100,11 +95,7 @@ namespace Unity.Web.Stripping.Editor
             }
         }
 
-        [MenuItem(
-            "Assets/"
-                + SubmoduleStrippingSettings.RootMenuName
-                + "/Reveal Active Submodule Stripping Settings"
-        )]
+        [MenuItem("Assets/" + SubmoduleStrippingSettings.RootMenuName + "/Reveal Active Submodule Stripping Settings")]
         internal static void ShowActiveSettings()
         {
             if (ActiveSettings != null)
@@ -140,14 +131,8 @@ namespace Unity.Web.Stripping.Editor
 
         static void SaveSettings()
         {
-            PackageSettings.SetProjectSetting(
-                k_AssetPathKey,
-                AssetDatabase.GetAssetPath(ActiveSettings)
-            );
-            PackageSettings.SetProjectSetting(
-                k_StripAutomaticallyAfterBuildKey,
-                StripAutomaticallyAfterBuild
-            );
+            PackageSettings.SetProjectSetting(k_AssetPathKey, AssetDatabase.GetAssetPath(ActiveSettings));
+            PackageSettings.SetProjectSetting(k_StripAutomaticallyAfterBuildKey, StripAutomaticallyAfterBuild);
             PackageSettings.Save();
         }
 

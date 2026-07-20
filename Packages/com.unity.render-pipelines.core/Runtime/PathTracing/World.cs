@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using System.Runtime.InteropServices;
+using Unity.Mathematics;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.UnifiedRayTracing;
 
@@ -9,10 +9,8 @@ namespace UnityEngine.PathTracing.Core
 {
     using InstanceHandle = Handle<World.InstanceKey>;
     using InstanceHandleSet = HandleSet<World.InstanceKey>;
-
     using LightHandle = Handle<World.LightDescriptor>;
     using LightHandleSet = HandleSet<World.LightDescriptor>;
-
     using MaterialHandle = Handle<MaterialPool.MaterialDescriptor>;
     using MaterialHandleSet = HandleSet<MaterialPool.MaterialDescriptor>;
 
@@ -20,14 +18,16 @@ namespace UnityEngine.PathTracing.Core
     {
         All = 0,
         OnlyStatic = 1,
-        AllInCameraRaysThenOnlyStatic = 2
+        AllInCameraRaysThenOnlyStatic = 2,
     }
+
     internal enum LightPickingMethod
     {
         Uniform = 0,
         Regir,
-        LightGrid
+        LightGrid,
     }
+
     internal enum InstanceFlags
     {
         DIRECT_RAY_VIS_MASK = 1,
@@ -36,7 +36,7 @@ namespace UnityEngine.PathTracing.Core
         CURRENT_LOD_FOR_LIGHTMAP_INSTANCE = 8,
         LOD_ZERO_FOR_LIGHTMAP_INSTANCE = 16,
         CURRENT_LOD_FOR_LIGHTMAP_INSTANCE_SHADOW = 32,
-        LOD_ZERO_FOR_LIGHTMAP_INSTANCE_SHADOW = 64
+        LOD_ZERO_FOR_LIGHTMAP_INSTANCE_SHADOW = 64,
     }
 
     internal class World : IDisposable
@@ -96,16 +96,23 @@ namespace UnityEngine.PathTracing.Core
 
             public override readonly int GetHashCode()
             {
-                return HashCode.Combine(position, type, intensity, castShadows, forward, contributesToDirectLighting, range)
-                       ^ HashCode.Combine(attenuation, up, width, right, height, layerMask, indirectScale, falloffIndex);
+                return HashCode.Combine(
+                        position,
+                        type,
+                        intensity,
+                        castShadows,
+                        forward,
+                        contributesToDirectLighting,
+                        range
+                    ) ^ HashCode.Combine(attenuation, up, width, right, height, layerMask, indirectScale, falloffIndex);
             }
         }
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct ThinReservoir
         {
-            public int      LightIndex;
-            public float    Weight;
+            public int LightIndex;
+            public float Weight;
         }
 
         private readonly InstanceHandleSet _instanceHandleSet = new();
@@ -205,8 +212,13 @@ namespace UnityEngine.PathTracing.Core
             private static void BuildLightFalloffLUTs(LightState lightState)
             {
                 // Build the LUT data
-                lightState.LightFalloff = LightFalloffLUT.BuildLightFalloffLUTs(lightState.LightFalloffDescs.ToArray(), LightFalloffLUTLength);
-                Debug.Assert(lightState.LightFalloff.Length == LightFalloffLUTLength * lightState.LightFalloffDescs.Count);
+                lightState.LightFalloff = LightFalloffLUT.BuildLightFalloffLUTs(
+                    lightState.LightFalloffDescs.ToArray(),
+                    LightFalloffLUTLength
+                );
+                Debug.Assert(
+                    lightState.LightFalloff.Length == LightFalloffLUTLength * lightState.LightFalloffDescs.Count
+                );
 
                 // Store the range of each LUT
                 lightState.LightFalloffLUTRanges = new float[lightState.LightFalloffDescs.Count];
@@ -227,15 +239,27 @@ namespace UnityEngine.PathTracing.Core
                 if (lightState.LightListBuffer == null || lightState.LightListBuffer.count < lightState.LightList.Count)
                 {
                     lightState.LightListBuffer?.Release();
-                    lightState.LightListBuffer = new ComputeBuffer(math.max(64, lightState.LightList.Count), Marshal.SizeOf<PTLight>());
+                    lightState.LightListBuffer = new ComputeBuffer(
+                        math.max(64, lightState.LightList.Count),
+                        Marshal.SizeOf<PTLight>()
+                    );
                 }
 
                 if (lightState.LightList.Count > 0)
                 {
-                    cmdBuf.SetBufferData(lightState.LightListBuffer, lightState.LightList, 0, 0, lightState.LightList.Count);
+                    cmdBuf.SetBufferData(
+                        lightState.LightListBuffer,
+                        lightState.LightList,
+                        0,
+                        0,
+                        lightState.LightList.Count
+                    );
                 }
 
-                if (lightState.LightFalloffBuffer == null || lightState.LightFalloffBuffer.count < lightState.LightFalloff.Length)
+                if (
+                    lightState.LightFalloffBuffer == null
+                    || lightState.LightFalloffBuffer.count < lightState.LightFalloff.Length
+                )
                 {
                     lightState.LightFalloffBuffer?.Release();
                     int count = math.max(1, lightState.LightFalloff.Length);
@@ -245,10 +269,19 @@ namespace UnityEngine.PathTracing.Core
 
                 if (lightState.LightFalloff.Length > 0)
                 {
-                    cmdBuf.SetBufferData(lightState.LightFalloffBuffer, lightState.LightFalloff, 0, 0, lightState.LightFalloff.Length);
+                    cmdBuf.SetBufferData(
+                        lightState.LightFalloffBuffer,
+                        lightState.LightFalloff,
+                        0,
+                        0,
+                        lightState.LightFalloff.Length
+                    );
                 }
 
-                if (lightState.LightFalloffLUTRangeBuffer == null || lightState.LightFalloffLUTRangeBuffer.count < lightState.LightFalloffLUTRanges.Length)
+                if (
+                    lightState.LightFalloffLUTRangeBuffer == null
+                    || lightState.LightFalloffLUTRangeBuffer.count < lightState.LightFalloffLUTRanges.Length
+                )
                 {
                     lightState.LightFalloffLUTRangeBuffer?.Release();
                     int count = math.max(1, lightState.LightFalloffLUTRanges.Length);
@@ -258,10 +291,17 @@ namespace UnityEngine.PathTracing.Core
 
                 if (lightState.LightFalloffLUTRanges.Length > 0)
                 {
-                    cmdBuf.SetBufferData(lightState.LightFalloffLUTRangeBuffer, lightState.LightFalloffLUTRanges, 0, 0, lightState.LightFalloffLUTRanges.Length);
+                    cmdBuf.SetBufferData(
+                        lightState.LightFalloffLUTRangeBuffer,
+                        lightState.LightFalloffLUTRanges,
+                        0,
+                        0,
+                        lightState.LightFalloffLUTRanges.Length
+                    );
                 }
             }
         }
+
         private LightState _lightState;
 
         public LightPickingMethod lightPickingMethod
@@ -282,9 +322,12 @@ namespace UnityEngine.PathTracing.Core
             {
                 switch (_lightState.lightPickingMethod)
                 {
-                    case LightPickingMethod.LightGrid: return _conservativeLightGrid.MaxLightsInAnyCell;
-                    case LightPickingMethod.Regir: return _reservoirGrid.MaxLightsInAnyCell;
-                    default: return LightCount;
+                    case LightPickingMethod.LightGrid:
+                        return _conservativeLightGrid.MaxLightsInAnyCell;
+                    case LightPickingMethod.Regir:
+                        return _reservoirGrid.MaxLightsInAnyCell;
+                    default:
+                        return LightCount;
                 }
             }
         }
@@ -327,13 +370,24 @@ namespace UnityEngine.PathTracing.Core
 
         public void Init(RayTracingContext ctx, WorldResourceSet worldResources)
         {
-            _materialPool = new MaterialPool(worldResources.SetAlphaChannelShader, worldResources.BlitCubemap, worldResources.BlitGrayScaleCookie);
+            _materialPool = new MaterialPool(
+                worldResources.SetAlphaChannelShader,
+                worldResources.BlitCubemap,
+                worldResources.BlitGrayScaleCookie
+            );
 
             var options = new AccelerationStructureOptions()
             {
                 buildFlags = BuildFlags.None, // TODO: Consider whether to use BuildFlags.MinimizeMemory once https://jira.unity3d.com/browse/UUM-54575 is fixed.
             };
-            _rayTracingAccelerationStructure = new AccelStructAdapter(ctx.CreateAccelerationStructure(options), new GeometryPool(GeometryPoolDesc.NewDefault(), ctx.Resources.geometryPoolKernels, ctx.Resources.copyBuffer));
+            _rayTracingAccelerationStructure = new AccelStructAdapter(
+                ctx.CreateAccelerationStructure(options),
+                new GeometryPool(
+                    GeometryPoolDesc.NewDefault(),
+                    ctx.Resources.geometryPoolKernels,
+                    ctx.Resources.copyBuffer
+                )
+            );
 
             _lightState = new LightState();
 
@@ -484,7 +538,10 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-        public MaterialHandle AddMaterial(in MaterialPool.MaterialDescriptor material, UVChannel albedoAndEmissionUVChannel)
+        public MaterialHandle AddMaterial(
+            in MaterialPool.MaterialDescriptor material,
+            UVChannel albedoAndEmissionUVChannel
+        )
         {
             MaterialHandle handle = _materialHandleSet.Add();
             try
@@ -498,7 +555,11 @@ namespace UnityEngine.PathTracing.Core
             return handle;
         }
 
-        public void UpdateMaterial(MaterialHandle materialHandle, in MaterialPool.MaterialDescriptor material, UVChannel albedoAndEmissionUVChannel)
+        public void UpdateMaterial(
+            MaterialHandle materialHandle,
+            in MaterialPool.MaterialDescriptor material,
+            UVChannel albedoAndEmissionUVChannel
+        )
         {
             try
             {
@@ -535,7 +596,8 @@ namespace UnityEngine.PathTracing.Core
             Bounds bounds,
             bool isStatic,
             RenderedGameObjectsFilter filter,
-            bool enableEmissiveSampling)
+            bool enableEmissiveSampling
+        )
         {
             Debug.Assert(mesh.subMeshCount == materials.Length);
             Debug.Assert(mesh.subMeshCount == masks.Length);
@@ -553,9 +615,31 @@ namespace UnityEngine.PathTracing.Core
             }
 
             InstanceHandle instance = _instanceHandleSet.Add();
-            _rayTracingAccelerationStructure.AddInstance(instance.Value, mesh, localToWorldMatrix, masks, materialIndices, isOpaque, renderingLayerMask);
+            _rayTracingAccelerationStructure.AddInstance(
+                instance.Value,
+                mesh,
+                localToWorldMatrix,
+                masks,
+                materialIndices,
+                isOpaque,
+                renderingLayerMask
+            );
 
-            if (enableEmissiveSampling && !ProcessEmissiveMeshes(instance, mesh, bounds, materials, isStatic, _rayTracingAccelerationStructure, _materialPool, filter, _lightState.MeshLights, _subMeshIndices))
+            if (
+                enableEmissiveSampling
+                && !ProcessEmissiveMeshes(
+                    instance,
+                    mesh,
+                    bounds,
+                    materials,
+                    isStatic,
+                    _rayTracingAccelerationStructure,
+                    _materialPool,
+                    filter,
+                    _lightState.MeshLights,
+                    _subMeshIndices
+                )
+            )
                 LogError($"Failed to process emissive triangles in mesh {mesh.name}.");
 
             return instance;
@@ -570,6 +654,7 @@ namespace UnityEngine.PathTracing.Core
         {
             _rayTracingAccelerationStructure.UpdateInstanceMask(instance.Value, perSubMeshMask);
         }
+
         public void UpdateInstanceMask(InstanceHandle instance, uint mask)
         {
             _rayTracingAccelerationStructure.UpdateInstanceMask(instance.Value, mask);
@@ -592,16 +677,35 @@ namespace UnityEngine.PathTracing.Core
             Bounds bounds,
             Span<MaterialHandle> materials,
             bool isStatic,
-            RenderedGameObjectsFilter filter)
+            RenderedGameObjectsFilter filter
+        )
         {
-            if (!ProcessEmissiveMeshes(instance, mesh, bounds, materials, isStatic, _rayTracingAccelerationStructure, _materialPool, filter, _lightState.MeshLights, _subMeshIndices))
+            if (
+                !ProcessEmissiveMeshes(
+                    instance,
+                    mesh,
+                    bounds,
+                    materials,
+                    isStatic,
+                    _rayTracingAccelerationStructure,
+                    _materialPool,
+                    filter,
+                    _lightState.MeshLights,
+                    _subMeshIndices
+                )
+            )
             {
                 LogError($"failed to process emissive triangles in mesh with handle {instance}");
             }
         }
 
         // InstanceMask bit encoding format:
-        internal static uint GetInstanceMask(ShadowCastingMode shadowMode, bool isStatic, RenderedGameObjectsFilter filter, bool hasLightmaps = true)
+        internal static uint GetInstanceMask(
+            ShadowCastingMode shadowMode,
+            bool isStatic,
+            RenderedGameObjectsFilter filter,
+            bool hasLightmaps = true
+        )
         {
             uint instanceMask = 0u;
 
@@ -665,7 +769,8 @@ namespace UnityEngine.PathTracing.Core
             MaterialPool sceneMaterials,
             RenderedGameObjectsFilter filter,
             Dictionary<int, PTLight> meshLights,
-            Dictionary<InstanceHandle, List<int>> subMeshIndexMap)
+            Dictionary<InstanceHandle, List<int>> subMeshIndexMap
+        )
         {
             if (filter != RenderedGameObjectsFilter.All && !isStatic)
                 return true;
@@ -679,9 +784,10 @@ namespace UnityEngine.PathTracing.Core
             }
 
             // Approximate area of the emissive mesh using the bounding box
-            float boundingBoxArea = 2 * (bounds.size.x * bounds.size.y) +
-                 2 * (bounds.size.y * bounds.size.z) +
-                 2 * (bounds.size.x * bounds.size.z);
+            float boundingBoxArea =
+                2 * (bounds.size.x * bounds.size.y)
+                + 2 * (bounds.size.y * bounds.size.z)
+                + 2 * (bounds.size.x * bounds.size.z);
 
             // List to keep track of the emissive subMeshes
             List<int> subMeshIndices = new List<int>(subMeshCount);
@@ -736,10 +842,12 @@ namespace UnityEngine.PathTracing.Core
             return true;
         }
 
-        public LightHandle[] AddLights(Span<LightDescriptor> lights,
+        public LightHandle[] AddLights(
+            Span<LightDescriptor> lights,
             bool respectLightLayers,
             bool autoEstimateLUTRange,
-            MixedLightingMode mixedLightingMode)
+            MixedLightingMode mixedLightingMode
+        )
         {
             // Generate handles
             LightHandle[] handles = new LightHandle[lights.Length];
@@ -755,7 +863,12 @@ namespace UnityEngine.PathTracing.Core
             return handles;
         }
 
-        private static float EstimateLUTRange(float range, float luminance, Experimental.GlobalIllumination.FalloffType falloffType, float threshold = 0.01f)
+        private static float EstimateLUTRange(
+            float range,
+            float luminance,
+            Experimental.GlobalIllumination.FalloffType falloffType,
+            float threshold = 0.01f
+        )
         {
             Debug.Assert(threshold > 0.0f);
             Debug.Assert(range > 0.0f);
@@ -766,12 +879,14 @@ namespace UnityEngine.PathTracing.Core
             {
                 case Experimental.GlobalIllumination.FalloffType.InverseSquaredNoRangeAttenuation:
                 case Experimental.GlobalIllumination.FalloffType.InverseSquared:
-                    {
-                        // compute the range at which the attenuated luminance is below the threshold
-                        float estimatedRange = math.max(1.0f, math.ceil(math.sqrt(luminance / threshold)));
-                        Debug.Assert(luminance * LightFalloffLUT.InverseSquaredFalloff(estimatedRange * estimatedRange) <= threshold);
-                        return math.min(estimatedRange, range);
-                    }
+                {
+                    // compute the range at which the attenuated luminance is below the threshold
+                    float estimatedRange = math.max(1.0f, math.ceil(math.sqrt(luminance / threshold)));
+                    Debug.Assert(
+                        luminance * LightFalloffLUT.InverseSquaredFalloff(estimatedRange * estimatedRange) <= threshold
+                    );
+                    return math.min(estimatedRange, range);
+                }
                 case Experimental.GlobalIllumination.FalloffType.Linear:
                 case Experimental.GlobalIllumination.FalloffType.Legacy:
                     return range;
@@ -780,10 +895,13 @@ namespace UnityEngine.PathTracing.Core
             return range;
         }
 
-        public void UpdateLights(LightHandle[] lightHandles, Span<LightDescriptor> lightDescriptors,
+        public void UpdateLights(
+            LightHandle[] lightHandles,
+            Span<LightDescriptor> lightDescriptors,
             bool respectLightLayers,
             bool autoEstimateLUTRange,
-            MixedLightingMode mixedLightingMode)
+            MixedLightingMode mixedLightingMode
+        )
         {
             Debug.Assert(lightHandles.Length == lightDescriptors.Length);
 
@@ -850,13 +968,25 @@ namespace UnityEngine.PathTracing.Core
                     {
                         // Guesstimate a good LUT range, such that the LUT covers the falloff up to a distance where it is nearly 0.
                         // The range can be any number and we don't want to stretch the LUT to some arbitrary range (most of which is practically 0).
-                        estimatedLUTRange = EstimateLUTRange(light.Range, Luminance(new Color(light.LinearLightColor.x, light.LinearLightColor.y, light.LinearLightColor.z, 1.0f)), light.FalloffType, 0.01f);
+                        estimatedLUTRange = EstimateLUTRange(
+                            light.Range,
+                            Luminance(
+                                new Color(
+                                    light.LinearLightColor.x,
+                                    light.LinearLightColor.y,
+                                    light.LinearLightColor.z,
+                                    1.0f
+                                )
+                            ),
+                            light.FalloffType,
+                            0.01f
+                        );
                     }
 
                     LightFalloffDesc falloffDesc = new LightFalloffDesc
                     {
                         LUTRange = estimatedLUTRange,
-                        FalloffType = light.FalloffType
+                        FalloffType = light.FalloffType,
                     };
                     var falloffHash = falloffDesc.GetHashCode();
                     if (!falloffHashToFalloffIndex.TryGetValue(falloffHash, out newLight.falloffIndex))
@@ -894,7 +1024,11 @@ namespace UnityEngine.PathTracing.Core
                     var spotAngle = light.SpotAngle;
 
                     var cosSpotOuterHalfAngle = Mathf.Clamp(Mathf.Cos(spotAngle * 0.5f * Mathf.Deg2Rad), 0.0f, 1.0f);
-                    var cosSpotInnerHalfAngle = Mathf.Clamp(Mathf.Cos(0.5f * light.InnerSpotAngle * Mathf.Deg2Rad), 0.0f, 1.0f); // inner cone
+                    var cosSpotInnerHalfAngle = Mathf.Clamp(
+                        Mathf.Cos(0.5f * light.InnerSpotAngle * Mathf.Deg2Rad),
+                        0.0f,
+                        1.0f
+                    ); // inner cone
 
                     var val = Mathf.Max(0.0001f, (cosSpotInnerHalfAngle - cosSpotOuterHalfAngle));
                     newLight.attenuation.z = 1.0f / val;
@@ -922,7 +1056,14 @@ namespace UnityEngine.PathTracing.Core
             }
         }
 
-        public void Build(Bounds sceneBounds, CommandBuffer cmdBuf, ref GraphicsBuffer scratchBuffer, Rendering.Sampling.SamplingResources samplingResources, bool emissiveSampling, int envCubemapResolution)
+        public void Build(
+            Bounds sceneBounds,
+            CommandBuffer cmdBuf,
+            ref GraphicsBuffer scratchBuffer,
+            Rendering.Sampling.SamplingResources samplingResources,
+            bool emissiveSampling,
+            int envCubemapResolution
+        )
         {
             Debug.Assert(_rayTracingAccelerationStructure != null);
             _lightState.Build(sceneBounds, cmdBuf, emissiveSampling && _cubemapRender.GetMaterial() != null);

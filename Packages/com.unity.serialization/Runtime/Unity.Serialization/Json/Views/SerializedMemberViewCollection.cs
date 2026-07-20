@@ -26,7 +26,7 @@ namespace Unity.Serialization.Json
                 m_Collection = collection;
                 m_Index = -1;
             }
-            
+
             /// <summary>
             /// Advances the enumerator to the next element of the <see cref="SerializedMemberViewCollection"/>.
             /// </summary>
@@ -44,7 +44,6 @@ namespace Unity.Serialization.Json
             {
                 m_Index = -1;
             }
-
 
             /// <summary>
             /// The element in the <see cref="SerializedMemberViewCollection"/> at the current position of the enumerator.
@@ -67,10 +66,7 @@ namespace Unity.Serialization.Json
             /// <summary>
             /// Releases all resources used by the <see cref="SerializedMemberViewCollection.Enumerator" />.
             /// </summary>
-            public void Dispose()
-            {
-
-            }
+            public void Dispose() { }
         }
 
         readonly NativeList<SerializedMemberView> m_Members;
@@ -90,21 +86,21 @@ namespace Unity.Serialization.Json
         /// <param name="name">The key of the value to get.</param>
         /// <exception cref="KeyNotFoundException">The key does not exist in the collection.</exception>
         public SerializedValueView this[string name] => GetValue(name);
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
         /// <param name="name">The key of the value to get.</param>
         /// <exception cref="KeyNotFoundException">The key does not exist in the collection.</exception>
         public SerializedValueView this[FixedString32Bytes name] => GetValue(name);
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
         /// <param name="name">The key of the value to get.</param>
         /// <exception cref="KeyNotFoundException">The key does not exist in the collection.</exception>
         public SerializedValueView this[FixedString64Bytes name] => GetValue(name);
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
@@ -121,7 +117,7 @@ namespace Unity.Serialization.Json
         {
             if (!TryGetValue(name, out var value))
                 throw new KeyNotFoundException(name);
-                
+
             return value;
         }
 
@@ -147,21 +143,22 @@ namespace Unity.Serialization.Json
             value = default;
             return false;
         }
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
         /// <param name="name">The key of the value to get.</param>
         /// <typeparam name="T">The fixed string type.</typeparam>
         /// <returns>Returns the value associated with the specified key.</returns>
-        public SerializedValueView GetValue<T>(T name) where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public SerializedValueView GetValue<T>(T name)
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             if (!TryGetValue(name, out var value))
                 throw new KeyNotFoundException($"The Key=[\"{name}\"] could not be found in the SerializedObjectView.");
-            
+
             return value;
         }
-        
+
         /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
@@ -169,7 +166,8 @@ namespace Unity.Serialization.Json
         /// <param name="value">When this method returns, contains the value associated with the specified key, if the key is found; otherwise, the default value.</param>
         /// <typeparam name="T">The fixed string type.</typeparam>
         /// <returns>true if the <see cref="SerializedObjectView"/> contains an element with the specified key; otherwise, false.</returns>
-        public bool TryGetValue<T>(T name, out SerializedValueView value) where T : unmanaged, INativeList<byte>, IUTF8Bytes
+        public bool TryGetValue<T>(T name, out SerializedValueView value)
+            where T : unmanaged, INativeList<byte>, IUTF8Bytes
         {
             foreach (var m in this)
             {
@@ -194,7 +192,7 @@ namespace Unity.Serialization.Json
         {
             m_Members.Add(view);
         }
-        
+
         /// <summary>
         /// Returns an enumerator that iterates through the <see cref="SerializedMemberViewCollection"/>.
         /// </summary>

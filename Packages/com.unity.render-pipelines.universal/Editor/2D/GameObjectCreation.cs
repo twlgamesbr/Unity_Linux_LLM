@@ -3,14 +3,16 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-
 namespace UnityEditor.Rendering.Universal
 {
     static class GameObjectCreation
     {
         const int k_PixelPerfectCameraGameObjectMenuPriority = 5;
 
-        [MenuItem("GameObject/2D Object/Pixel Perfect Camera (URP)", priority = k_PixelPerfectCameraGameObjectMenuPriority)]
+        [MenuItem(
+            "GameObject/2D Object/Pixel Perfect Camera (URP)",
+            priority = k_PixelPerfectCameraGameObjectMenuPriority
+        )]
         static void GameObjectCreatePixelPerfectCamera(MenuCommand menuCommand)
         {
             var go = CreateGameObject("Pixel Perfect Camera", menuCommand, new[] { typeof(PixelPerfectCamera) });
@@ -18,7 +20,7 @@ namespace UnityEditor.Rendering.Universal
             go.GetComponent<Camera>().orthographic = true;
         }
 
-        static public GameObject CreateGameObject(string name, MenuCommand menuCommand, params Type[] components)
+        public static GameObject CreateGameObject(string name, MenuCommand menuCommand, params Type[] components)
         {
             var parent = menuCommand.context as GameObject;
             var newGO = ObjectFactory.CreateGameObject(name, components);

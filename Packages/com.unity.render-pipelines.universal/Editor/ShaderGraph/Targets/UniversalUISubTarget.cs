@@ -1,20 +1,23 @@
-using UnityEditor.ShaderGraph;
 using System;
 using System.Collections.Generic;
 using UnityEditor.Rendering.UITK.ShaderGraph;
+using UnityEditor.ShaderGraph;
 
 namespace UnityEditor.Rendering.Universal.ShaderGraph
 {
-    class UniversalUISubTarget: UISubTarget<UniversalTarget>
+    class UniversalUISubTarget : UISubTarget<UniversalTarget>
     {
-        static readonly UnityEngine.GUID kSourceCodeGuid = new UnityEngine.GUID("b1197b10aa62577498d67cffe1d3bd43");  // UniversalUISubTarget.cs
+        static readonly UnityEngine.GUID kSourceCodeGuid = new UnityEngine.GUID("b1197b10aa62577498d67cffe1d3bd43"); // UniversalUISubTarget.cs
 
-        static readonly string kUITKPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/UITKPass.hlsl";
+        static readonly string kUITKPass =
+            "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/UITKPass.hlsl";
+
         public override void Setup(ref TargetSetupContext context)
         {
             base.Setup(ref context);
             context.AddAssetDependency(kSourceCodeGuid, AssetCollection.Flags.SourceDependency);
         }
+
         public override bool IsActive() => true;
 
         // We don't need the save context / update materials for now
@@ -22,17 +25,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
 
         protected override string pipelineTag => UniversalTarget.kPipelineTag;
 
-        protected override IncludeCollection pregraphIncludes => new IncludeCollection
-        {
-            { CoreIncludes.CorePregraph },
-            { kInstancing, IncludeLocation.Pregraph },
-            { CoreIncludes.ShaderGraphPregraph },
-            { kUIShim, IncludeLocation.Pregraph }
-        };
-        protected override IncludeCollection postgraphIncludes => new IncludeCollection
-        {
-            {kUITKPass, IncludeLocation.Postgraph},
-        };
+        protected override IncludeCollection pregraphIncludes =>
+            new IncludeCollection
+            {
+                { CoreIncludes.CorePregraph },
+                { kInstancing, IncludeLocation.Pregraph },
+                { CoreIncludes.ShaderGraphPregraph },
+                { kUIShim, IncludeLocation.Pregraph },
+            };
+        protected override IncludeCollection postgraphIncludes =>
+            new IncludeCollection { { kUITKPass, IncludeLocation.Postgraph } };
 
         public UniversalUISubTarget()
         {
@@ -63,7 +65,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     context.AddField(Fields.BlendAlpha);
                     break;
             }
-
         }
 
         public override PassDescriptor GenerateUIPassDescriptor(bool isSRP)
@@ -78,7 +79,9 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             switch (target.alphaMode)
             {
                 case AlphaMode.Alpha:
-                    result.Add(RenderState.Blend(Blend.SrcAlpha, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha));
+                    result.Add(
+                        RenderState.Blend(Blend.SrcAlpha, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha)
+                    );
                     break;
                 case AlphaMode.Premultiply:
                     result.Add(RenderState.Blend(Blend.One, Blend.OneMinusSrcAlpha, Blend.One, Blend.OneMinusSrcAlpha));
@@ -96,18 +99,29 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             return passDescriptor;
         }
 
-        public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
+        public override void GetPropertiesGUI(
+            ref TargetPropertyGUIContext context,
+            Action onChange,
+            Action<String> registerUndo
+        )
         {
-            context.AddHelpBox(MessageType.Info, "This shader is intended for use with Unity's UI Toolkit. It has special requirements.\n\nStart with the UI > Render Type Branch node and connect its outputs to the Fragment node.");
-            context.AddProperty("Blending Mode", new UnityEngine.UIElements.EnumField(AlphaMode.Alpha) { value = target.alphaMode }, (evt) =>
-            {
-                if (Equals(target.alphaMode, evt.newValue))
-                    return;
+            context.AddHelpBox(
+                MessageType.Info,
+                "This shader is intended for use with Unity's UI Toolkit. It has special requirements.\n\nStart with the UI > Render Type Branch node and connect its outputs to the Fragment node."
+            );
+            context.AddProperty(
+                "Blending Mode",
+                new UnityEngine.UIElements.EnumField(AlphaMode.Alpha) { value = target.alphaMode },
+                (evt) =>
+                {
+                    if (Equals(target.alphaMode, evt.newValue))
+                        return;
 
-                registerUndo("Change Blend");
-                target.alphaMode = (AlphaMode)evt.newValue;
-                onChange();
-            });
+                    registerUndo("Change Blend");
+                    target.alphaMode = (AlphaMode)evt.newValue;
+                    onChange();
+                }
+            );
         }
     }
 }

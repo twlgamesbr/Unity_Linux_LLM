@@ -1,4 +1,3 @@
-
 namespace Unity.Netcode
 {
     // Todo: Would be lovely to get this one nicely formatted with all the data it sends in the struct
@@ -8,7 +7,6 @@ namespace Unity.Netcode
         public int Version => 0;
 
         public SceneEventData EventData;
-
 
         private FastBufferReader m_ReceivedData;
 

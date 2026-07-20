@@ -14,6 +14,5 @@ namespace Unity.PlatformToolkit.Editor
 
         /// <summary>Achievements defined in the Achievements Editor window.</summary>
         IReadOnlyList<IAchievement> Achievements { get; }
-
     }
 }

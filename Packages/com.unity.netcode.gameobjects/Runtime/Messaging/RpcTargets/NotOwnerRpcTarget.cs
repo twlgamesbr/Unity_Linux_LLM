@@ -16,7 +16,12 @@ namespace Unity.Netcode
             m_GroupSendTarget = null;
         }
 
-        internal override void Send(NetworkBehaviour behaviour, ref RpcMessage message, NetworkDelivery delivery, RpcParams rpcParams)
+        internal override void Send(
+            NetworkBehaviour behaviour,
+            ref RpcMessage message,
+            NetworkDelivery delivery,
+            RpcParams rpcParams
+        )
         {
             // Not owner is the same as not authority in distributed authority mode
             if (m_NetworkManager.DistributedAuthorityMode)
@@ -88,7 +93,8 @@ namespace Unity.Netcode
             }
         }
 
-        internal NotOwnerRpcTarget(NetworkManager manager) : base(manager)
+        internal NotOwnerRpcTarget(NetworkManager manager)
+            : base(manager)
         {
             m_ServerRpcTarget = new ServerRpcTarget(manager);
             m_LocalSendRpcTarget = new LocalSendRpcTarget(manager);

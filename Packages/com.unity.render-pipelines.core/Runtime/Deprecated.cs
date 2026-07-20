@@ -10,7 +10,6 @@ namespace UnityEngine.Rendering
     /// Exposes settings for shader variants
     /// </summary>
     [Obsolete("Use GraphicsSettings.GetRenderPipelineSettings<ShaderStrippingSetting>(). #from(2023.3)")]
-
     public interface IShaderVariantSettings
     {
         /// <summary>
@@ -26,22 +25,29 @@ namespace UnityEngine.Rendering
         /// <summary>
         /// Controls whether debug display shaders for Rendering Debugger are available in Player builds.
         /// </summary>
-        bool stripDebugVariants { get => false; set { } }
+        bool stripDebugVariants
+        {
+            get => false;
+            set { }
+        }
     }
 
     public abstract partial class VolumeDebugSettings<T>
     {
         static List<Type> s_ComponentTypes;
+
         /// <summary>List of Volume component types.</summary>
-        [Obsolete("Please use volumeComponentsPathAndType instead, and get the second element of the tuple #from(2022.2)")]
+        [Obsolete(
+            "Please use volumeComponentsPathAndType instead, and get the second element of the tuple #from(2022.2)"
+        )]
         public static List<Type> componentTypes
         {
             get
             {
                 if (s_ComponentTypes == null)
                 {
-                    s_ComponentTypes = VolumeManager.instance.baseComponentTypeArray
-                        .Where(t => !t.IsDefined(typeof(HideInInspector), false))
+                    s_ComponentTypes = VolumeManager
+                        .instance.baseComponentTypeArray.Where(t => !t.IsDefined(typeof(HideInInspector), false))
                         .Where(t => !t.IsDefined(typeof(ObsoleteAttribute), false))
                         .OrderBy(t => ComponentDisplayName(t))
                         .ToList();
@@ -56,10 +62,16 @@ namespace UnityEngine.Rendering
         [Obsolete("Please use componentPathAndType instead, and get the first element of the tuple #from(2022.2)")]
         public static string ComponentDisplayName(Type component)
         {
-            if (component.GetCustomAttribute(typeof(VolumeComponentMenuForRenderPipeline), false) is VolumeComponentMenuForRenderPipeline volumeComponentMenuForRenderPipeline)
+            if (
+                component.GetCustomAttribute(typeof(VolumeComponentMenuForRenderPipeline), false)
+                is VolumeComponentMenuForRenderPipeline volumeComponentMenuForRenderPipeline
+            )
                 return volumeComponentMenuForRenderPipeline.menu;
 
-            if (component.GetCustomAttribute(typeof(VolumeComponentMenu), false) is VolumeComponentMenuForRenderPipeline volumeComponentMenu)
+            if (
+                component.GetCustomAttribute(typeof(VolumeComponentMenu), false)
+                is VolumeComponentMenuForRenderPipeline volumeComponentMenu
+            )
                 return volumeComponentMenu.menu;
 
             return component.Name;
@@ -118,9 +130,7 @@ namespace UnityEngine.Rendering
     /// A marker to adjust probes in an area of the scene.
     /// </summary>
     [Obsolete("ProbeTouchupVolume has been deprecated. #from(2023.2) (UnityUpgradable) -> ProbeAdjustmentVolume")]
-    public class ProbeTouchupVolume : ProbeAdjustmentVolume
-    {
-    }
+    public class ProbeTouchupVolume : ProbeAdjustmentVolume { }
 
     public sealed partial class VolumeManager
     {
@@ -137,8 +147,10 @@ namespace UnityEngine.Rendering
         {
             if (volume.gameObject.layer != layer)
             {
-                Debug.LogWarning($"Trying to register Volume {volume.name} on layer index {layer}, when the GameObject {volume.gameObject.name} is on layer index {volume.gameObject.layer}." +
-                                 $"{Environment.NewLine}The Volume Manager will respect the GameObject's layer.");
+                Debug.LogWarning(
+                    $"Trying to register Volume {volume.name} on layer index {layer}, when the GameObject {volume.gameObject.name} is on layer index {volume.gameObject.layer}."
+                        + $"{Environment.NewLine}The Volume Manager will respect the GameObject's layer."
+                );
             }
 
             Register(volume);
@@ -157,21 +169,24 @@ namespace UnityEngine.Rendering
         {
             if (volume.gameObject.layer != layer)
             {
-                Debug.LogWarning($"Trying to unregister Volume {volume.name} on layer index {layer}, when the GameObject {volume.gameObject.name} is on layer index {volume.gameObject.layer}." +
-                                 $"{Environment.NewLine}The Volume Manager will respect the GameObject's layer.");
+                Debug.LogWarning(
+                    $"Trying to unregister Volume {volume.name} on layer index {layer}, when the GameObject {volume.gameObject.name} is on layer index {volume.gameObject.layer}."
+                        + $"{Environment.NewLine}The Volume Manager will respect the GameObject's layer."
+                );
             }
 
             Unregister(volume);
         }
     }
 
-
     public partial class DebugUI
     {
         /// <summary>
         /// Maskfield enumeration field.
         /// </summary>
-        [Obsolete("Mask field is not longer supported. Please use a BitField or implement your own Widget. #from(6000.2)")]
+        [Obsolete(
+            "Mask field is not longer supported. Please use a BitField or implement your own Widget. #from(6000.2)"
+        )]
         public class MaskField : EnumField<uint>
         {
             /// <summary>

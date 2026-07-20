@@ -54,8 +54,11 @@ namespace Unity.Rendering
         [BurstCompile]
         partial struct CopyBlendShapeWeightsToGPUJob : IJobEntity
         {
-            [NativeDisableContainerSafetyRestriction] public NativeArray<float> BlendShapeWeightsBuffer;
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, int> DeformedEntityToComputeIndex;
+            [NativeDisableContainerSafetyRestriction]
+            public NativeArray<float> BlendShapeWeightsBuffer;
+
+            [ReadOnly]
+            public NativeParallelMultiHashMap<Entity, int> DeformedEntityToComputeIndex;
 
             private void Execute(in DynamicBuffer<BlendShapeWeight> weights, in Entity entity)
             {
@@ -79,7 +82,7 @@ namespace Unity.Rendering
                 }
             }
         }
-        
+
         protected override void OnUpdate()
         {
             if (m_PushMeshDataSystem.BlendShapeWeightCount == 0)
@@ -87,18 +90,23 @@ namespace Unity.Rendering
 
             k_Marker.Begin();
 
-            var deformedEntityToComputeIndex = new NativeParallelMultiHashMap<Entity, int>(m_BlendShapedEntityQuery.CalculateEntityCount(), Allocator.TempJob);
+            var deformedEntityToComputeIndex = new NativeParallelMultiHashMap<Entity, int>(
+                m_BlendShapedEntityQuery.CalculateEntityCount(),
+                Allocator.TempJob
+            );
             var deformedEntityToComputeIndexParallel = deformedEntityToComputeIndex.AsParallelWriter();
             Dependency = new ConstructHashMapJob
             {
-                DeformedEntityToComputeIndexParallel = deformedEntityToComputeIndexParallel
+                DeformedEntityToComputeIndexParallel = deformedEntityToComputeIndexParallel,
             }.ScheduleParallel(Dependency);
 
-            var blendShapeWeightsBuffer = m_PushMeshDataSystem.BlendShapeBufferManager.LockBlendWeightBufferForWrite(m_PushMeshDataSystem.BlendShapeWeightCount);
+            var blendShapeWeightsBuffer = m_PushMeshDataSystem.BlendShapeBufferManager.LockBlendWeightBufferForWrite(
+                m_PushMeshDataSystem.BlendShapeWeightCount
+            );
             Dependency = new CopyBlendShapeWeightsToGPUJob
             {
                 BlendShapeWeightsBuffer = blendShapeWeightsBuffer,
-                DeformedEntityToComputeIndex = deformedEntityToComputeIndex
+                DeformedEntityToComputeIndex = deformedEntityToComputeIndex,
             }.ScheduleParallel(Dependency);
 
             Dependency = deformedEntityToComputeIndex.Dispose(Dependency);

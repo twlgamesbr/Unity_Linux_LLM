@@ -18,17 +18,20 @@ namespace UnityEngine.InputSystem.Editor
         {
             m_ParentFoldout = foldout;
 
-            CreateSelector(state => state.selectedBindingIndex,
+            CreateSelector(
+                state => state.selectedBindingIndex,
                 s => new ViewStateCollection<InputControlScheme>(Selectors.GetControlSchemes(s)),
-                (_, controlSchemes, s) => new ViewState
-                {
-                    controlSchemes = controlSchemes,
-                    currentControlScheme = s.selectedControlScheme,
-                    selectedBinding = Selectors.GetSelectedBinding(s),
-                    selectedBindingIndex = s.selectedBindingIndex,
-                    selectedBindingPath = Selectors.GetSelectedBindingPath(s),
-                    selectedInputAction = Selectors.GetSelectedAction(s)
-                });
+                (_, controlSchemes, s) =>
+                    new ViewState
+                    {
+                        controlSchemes = controlSchemes,
+                        currentControlScheme = s.selectedControlScheme,
+                        selectedBinding = Selectors.GetSelectedBinding(s),
+                        selectedBindingIndex = s.selectedBindingIndex,
+                        selectedBindingPath = Selectors.GetSelectedBindingPath(s),
+                        selectedInputAction = Selectors.GetSelectedAction(s),
+                    }
+            );
         }
 
         public override void RedrawUI(ViewState viewState)
@@ -47,19 +50,31 @@ namespace UnityEngine.InputSystem.Editor
             if (binding.Value.isComposite)
             {
                 m_ParentFoldout.text = "Composite";
-                m_CompositeBindingPropertiesView = CreateChildView(new CompositeBindingPropertiesView(rootElement, stateContainer));
+                m_CompositeBindingPropertiesView = CreateChildView(
+                    new CompositeBindingPropertiesView(rootElement, stateContainer)
+                );
             }
             else if (binding.Value.isPartOfComposite)
             {
-                m_CompositePartBindingPropertiesView = CreateChildView(new CompositePartBindingPropertiesView(rootElement, stateContainer));
+                m_CompositePartBindingPropertiesView = CreateChildView(
+                    new CompositePartBindingPropertiesView(rootElement, stateContainer)
+                );
                 DrawMatchingControlPaths(viewState);
                 DrawControlSchemeToggles(viewState, binding.Value);
             }
             else
             {
-                var controlPathEditor = new InputControlPathEditor(viewState.selectedBindingPath, new InputControlPickerState(),
-                    () => { Dispatch(Commands.ApplyModifiedProperties()); });
-                controlPathEditor.SetControlPathsToMatch(viewState.currentControlScheme.deviceRequirements.Select(x => x.controlPath));
+                var controlPathEditor = new InputControlPathEditor(
+                    viewState.selectedBindingPath,
+                    new InputControlPickerState(),
+                    () =>
+                    {
+                        Dispatch(Commands.ApplyModifiedProperties());
+                    }
+                );
+                controlPathEditor.SetControlPathsToMatch(
+                    viewState.currentControlScheme.deviceRequirements.Select(x => x.controlPath)
+                );
 
                 var inputAction = viewState.selectedInputAction;
                 controlPathEditor.SetExpectedControlLayout(inputAction?.expectedControlType ?? "");
@@ -73,25 +88,26 @@ namespace UnityEngine.InputSystem.Editor
         }
 
         static bool s_showMatchingLayouts = false;
+
         internal void DrawMatchingControlPaths(ViewState viewState)
         {
             bool controlPathUsagePresent = false;
             bool showPaths = s_showMatchingLayouts;
-            List<MatchingControlPath> matchingControlPaths = MatchingControlPath.CollectMatchingControlPaths(viewState.selectedBindingPath.stringValue, showPaths, ref controlPathUsagePresent);
+            List<MatchingControlPath> matchingControlPaths = MatchingControlPath.CollectMatchingControlPaths(
+                viewState.selectedBindingPath.stringValue,
+                showPaths,
+                ref controlPathUsagePresent
+            );
 
             var parentElement = rootElement;
             if (matchingControlPaths == null || matchingControlPaths.Count != 0)
             {
-                var controllingElement = new Foldout()
-                {
-                    text = $"Show Derived Bindings",
-                    value = showPaths
-                };
+                var controllingElement = new Foldout() { text = $"Show Derived Bindings", value = showPaths };
                 rootElement.Add(controllingElement);
 
                 controllingElement.RegisterValueChangedCallback(changeEvent =>
                 {
-                    if (changeEvent.target == controllingElement)   // only react to foldout and not tree elements
+                    if (changeEvent.target == controllingElement) // only react to foldout and not tree elements
                         s_showMatchingLayouts = changeEvent.newValue;
                 });
 
@@ -100,8 +116,9 @@ namespace UnityEngine.InputSystem.Editor
 
             if (matchingControlPaths == null)
             {
-                var messageString = controlPathUsagePresent ? "No registered controls match this current binding. Some controls are only registered at runtime." :
-                    "No other registered controls match this current binding. Some controls are only registered at runtime.";
+                var messageString = controlPathUsagePresent
+                    ? "No registered controls match this current binding. Some controls are only registered at runtime."
+                    : "No other registered controls match this current binding. Some controls are only registered at runtime.";
 
                 var helpBox = new HelpBox(messageString, HelpBoxMessageType.Warning);
                 helpBox.AddToClassList("matching-controls");
@@ -109,7 +126,8 @@ namespace UnityEngine.InputSystem.Editor
             }
             else if (matchingControlPaths.Count > 0)
             {
-                List<TreeViewItemData<MatchingControlPath>> treeViewMatchingControlPaths = MatchingControlPath.BuildMatchingControlPathsTreeData(matchingControlPaths);
+                List<TreeViewItemData<MatchingControlPath>> treeViewMatchingControlPaths =
+                    MatchingControlPath.BuildMatchingControlPathsTreeData(matchingControlPaths);
 
                 var treeView = new TreeView();
                 parentElement.Add(treeView);
@@ -149,10 +167,7 @@ namespace UnityEngine.InputSystem.Editor
             if (!viewState.controlSchemes.Any())
                 return;
 
-            var useInControlSchemeLabel = new Label("Use in control scheme")
-            {
-                name = "control-scheme-usage-title"
-            };
+            var useInControlSchemeLabel = new Label("Use in control scheme") { name = "control-scheme-usage-title" };
 
             rootElement.Add(useInControlSchemeLabel);
 
@@ -160,12 +175,17 @@ namespace UnityEngine.InputSystem.Editor
             {
                 var checkbox = new Toggle(controlScheme.name)
                 {
-                    value = binding.controlSchemes.Any(scheme => controlScheme.name == scheme)
+                    value = binding.controlSchemes.Any(scheme => controlScheme.name == scheme),
                 };
                 rootElement.Add(checkbox);
                 checkbox.RegisterValueChangedCallback(changeEvent =>
                 {
-                    Dispatch(ControlSchemeCommands.ChangeSelectedBindingsControlSchemes(controlScheme.name, changeEvent.newValue));
+                    Dispatch(
+                        ControlSchemeCommands.ChangeSelectedBindingsControlSchemes(
+                            controlScheme.name,
+                            changeEvent.newValue
+                        )
+                    );
                 });
             }
         }

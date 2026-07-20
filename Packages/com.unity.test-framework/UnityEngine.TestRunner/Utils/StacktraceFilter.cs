@@ -10,13 +10,13 @@ namespace UnityEngine.TestTools.Utils
             @"UnityEngine.DebugLogHandler:Internal_Log",
             @"UnityEngine.DebugLogHandler:Log",
             @"UnityEngine.Logger:Log",
-            @"UnityEngine.Debug"
+            @"UnityEngine.Debug",
         };
 
         private static readonly string[] s_LastMessages =
         {
             @"System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)",
-            @"UnityEditor.TestTools.TestRunner.EditModeRunner:InvokeDelegator"
+            @"UnityEditor.TestTools.TestRunner.EditModeRunner:InvokeDelegator",
         };
 
         public static string Filter(string inputStackTrace)

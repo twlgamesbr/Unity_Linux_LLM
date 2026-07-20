@@ -15,7 +15,12 @@ namespace Unity.Entities.Editor
         Label m_MoreLabel;
         List<string> m_SearchTerms;
 
-        public SystemQueriesListView(List<SystemQueriesViewData> systems, List<string> searchTerms, string moreLabel, string moreLabelWithFilter)
+        public SystemQueriesListView(
+            List<SystemQueriesViewData> systems,
+            List<string> searchTerms,
+            string moreLabel,
+            string moreLabelWithFilter
+        )
         {
             m_SearchTerms = searchTerms;
             m_MoreLabelText = moreLabel;
@@ -27,7 +32,7 @@ namespace Unity.Entities.Editor
             m_SystemElements = new FoldoutWithoutActionButton
             {
                 HeaderName = { text = k_SectionHeader },
-                MatchingCount = { text = systems.Count.ToString() }
+                MatchingCount = { text = systems.Count.ToString() },
             };
 
             content.Insert(0, m_SystemElements);
@@ -39,7 +44,8 @@ namespace Unity.Entities.Editor
             Update(systems);
         }
 
-        public void OnSearchTermsChanged() => m_MoreLabel.text = m_SearchTerms.Count > 0 ? m_MoreLabelWithFilterText : m_MoreLabelText;
+        public void OnSearchTermsChanged() =>
+            m_MoreLabel.text = m_SearchTerms.Count > 0 ? m_MoreLabelWithFilterText : m_MoreLabelText;
 
         bool Filter(SystemQueriesViewData system)
         {
@@ -65,7 +71,11 @@ namespace Unity.Entities.Editor
             var systemIndex = 0;
             var visibleItemCount = 0;
             var atLeastOneMoreSystemNotShown = false;
-            while (uiIndex < ui.Count && systemIndex < systems.Count && visibleItemCount < Constants.Inspector.MaxVisibleSystemCount)
+            while (
+                uiIndex < ui.Count
+                && systemIndex < systems.Count
+                && visibleItemCount < Constants.Inspector.MaxVisibleSystemCount
+            )
             {
                 if (!Filter(systems[systemIndex]))
                 {

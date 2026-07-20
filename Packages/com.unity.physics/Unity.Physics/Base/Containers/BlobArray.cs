@@ -9,12 +9,13 @@ namespace Unity.Physics
     public struct BlobArray
     {
         internal int Offset;
-        internal int Length;    // number of T, not number of bytes
+        internal int Length; // number of T, not number of bytes
 
         /// <summary>   Generic accessor. </summary>
         ///
         /// <typeparam name="T">    Generic type parameter. </typeparam>
-        public unsafe struct Accessor<T> where T : struct
+        public unsafe struct Accessor<T>
+            where T : struct
         {
             private readonly int* m_OffsetPtr;
 
@@ -28,7 +29,7 @@ namespace Unity.Physics
             /// <param name="blobArray">    [in,out] Array of blobs. </param>
             public Accessor(ref BlobArray blobArray)
             {
-                fixed(BlobArray* ptr = &blobArray)
+                fixed (BlobArray* ptr = &blobArray)
                 {
                     m_OffsetPtr = &ptr->Offset;
                     Length = ptr->Length;
@@ -53,7 +54,6 @@ namespace Unity.Physics
             ///
             /// <returns>   The enumerator. </returns>
             public Enumerator GetEnumerator() => new Enumerator(m_OffsetPtr, Length);
-
 
             /// <summary>   An enumerator. </summary>
             public struct Enumerator

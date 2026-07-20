@@ -1,24 +1,23 @@
 using System;
 using System.Threading.Tasks;
 using EditorAttributes;
+using NPCSystem.Auth;
+using NPCSystem.Character.NPC;
+using NPCSystem.Character.Player;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.Persistence;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Initialization;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Monitoring;
+using NPCSystem.Network.Core;
 using Supabase;
 using Supabase.Gotrue;
 using UnityEngine;
 
-
-using NPCSystem.Monitoring;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Network.Core;
-using NPCSystem.Character.Player;
-using NPCSystem.Auth;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Initialization;
-using NPCSystem.Character.NPC;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Persistence;
 namespace NPCSystem.Auth
 {
     // ── Auth response DTOs ────────────────────────────────
@@ -55,13 +54,7 @@ namespace NPCSystem.Auth
     public class PlayerAuthService : MonoBehaviour
     {
         [Title("Player Auth Service \u2014 Supabase Gotrue (SDK)")]
-        [FoldoutGroup(
-            "Supabase Auth",
-            true,
-            nameof(supabaseUrl),
-            nameof(supabaseAnonKey),
-            nameof(restApiUrl)
-        )]
+        [FoldoutGroup("Supabase Auth", true, nameof(supabaseUrl), nameof(supabaseAnonKey), nameof(restApiUrl))]
         [HelpBox(
             "supabaseUrl points to Gotrue. restApiUrl points to PostgREST. For development defaults: Gotrue on :8091, PostgREST on :8092.",
             MessageMode.Log
@@ -97,13 +90,7 @@ namespace NPCSystem.Auth
         [SerializeField, HideProperty]
         bool restoreStoredSessionOnWebGLStart;
 
-        [FoldoutGroup(
-            "Debug",
-            true,
-            nameof(lastAuthStatus),
-            nameof(lastAuthRoute),
-            nameof(lastAuthDurationMs)
-        )]
+        [FoldoutGroup("Debug", true, nameof(lastAuthStatus), nameof(lastAuthRoute), nameof(lastAuthDurationMs))]
         [SerializeField]
         EditorAttributes.Void debugGroup;
 
@@ -135,9 +122,7 @@ namespace NPCSystem.Auth
 
         [ShowInInspector]
         string AuthSessionPreview =>
-            CurrentSession == null
-                ? "<none>"
-                : $"{CurrentSession.username} ({CurrentSession.playerId})";
+            CurrentSession == null ? "<none>" : $"{CurrentSession.username} ({CurrentSession.playerId})";
 
         [ShowInInspector]
         string BackendHealthPreview =>
@@ -160,12 +145,8 @@ namespace NPCSystem.Auth
                 .FindOrCreate()
                 ?.Log(
                     NPCFlowStage.ConfigurationValidation,
-                    validUrl && validKey && validTimeout
-                        ? NPCFlowStatus.Success
-                        : NPCFlowStatus.Warning,
-                    validUrl && validKey && validTimeout
-                        ? NPCFlowLogLevel.Info
-                        : NPCFlowLogLevel.Warning,
+                    validUrl && validKey && validTimeout ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
+                    validUrl && validKey && validTimeout ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
                     lastAuthStatus,
                     source: nameof(PlayerAuthService),
                     data: new System.Collections.Generic.Dictionary<string, object>
@@ -190,8 +171,10 @@ namespace NPCSystem.Auth
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             SupabaseAuthClient.ResolveWebGLUrls(
-                supabaseUrl, restApiUrl,
-                out string resolvedSupabase, out string resolvedRest
+                supabaseUrl,
+                restApiUrl,
+                out string resolvedSupabase,
+                out string resolvedRest
             );
             supabaseUrl = resolvedSupabase;
             restApiUrl = resolvedRest;
@@ -215,10 +198,12 @@ namespace NPCSystem.Auth
 
             if (CurrentSession != null && UnitySessionStore.IsExpired(CurrentSession.expiresAtUtc))
             {
-                PlayerAuthSessionResponse refreshed =
-                    await SupabaseAuthClient.RefreshSessionWebGLAsync(
-                        supabaseUrl, supabaseAnonKey, CurrentSession, requestTimeoutSeconds
-                    );
+                PlayerAuthSessionResponse refreshed = await SupabaseAuthClient.RefreshSessionWebGLAsync(
+                    supabaseUrl,
+                    supabaseAnonKey,
+                    CurrentSession,
+                    requestTimeoutSeconds
+                );
                 if (refreshed != null)
                 {
                     UnitySessionStore.Save(refreshed);
@@ -256,17 +241,15 @@ namespace NPCSystem.Auth
                     RestUrlFormat = restApiUrl,
                 };
 
-                _supabaseClient = new Supabase.Client(
-                    supabaseUrl.TrimEnd('/'),
-                    supabaseAnonKey,
-                    options
-                );
+                _supabaseClient = new Supabase.Client(supabaseUrl.TrimEnd('/'), supabaseAnonKey, options);
 
-                _supabaseClient.Auth.AddDebugListener((msg, ex) =>
-                {
-                    if (ex != null)
-                        Debug.Log($"[Supabase Auth] {msg}: {ex.Message}");
-                });
+                _supabaseClient.Auth.AddDebugListener(
+                    (msg, ex) =>
+                    {
+                        if (ex != null)
+                            Debug.Log($"[Supabase Auth] {msg}: {ex.Message}");
+                    }
+                );
 
                 _supabaseClient.Auth.AddStateChangedListener(
                     (Supabase.Gotrue.Interfaces.IGotrueClient<User, Session> sender, Constants.AuthState state) =>
@@ -285,11 +268,8 @@ namespace NPCSystem.Auth
 
                 if (_supabaseClient.Auth.CurrentSession != null)
                 {
-                    CurrentSession = UnitySessionStore.ToAuthSession(
-                        _supabaseClient.Auth.CurrentSession
-                    );
-                    lastAuthStatus =
-                        $"SDK initialized. Session active for {CurrentSession.username}.";
+                    CurrentSession = UnitySessionStore.ToAuthSession(_supabaseClient.Auth.CurrentSession);
+                    lastAuthStatus = $"SDK initialized. Session active for {CurrentSession.username}.";
                 }
                 else
                 {
@@ -313,10 +293,7 @@ namespace NPCSystem.Auth
                 if (restored == null)
                     scope.Warning("Stored auth session could not be restored.");
                 else
-                    scope.Success(
-                        $"Stored auth session restored for {restored.username}.",
-                        BuildSessionData(restored)
-                    );
+                    scope.Success($"Stored auth session restored for {restored.username}.", BuildSessionData(restored));
 
                 return restored;
             }
@@ -329,14 +306,15 @@ namespace NPCSystem.Auth
 #endif
         }
 
-        public async Task<PlayerAuthRegisterResponse> RegisterAsync(
-            string username,
-            string password
-        )
+        public async Task<PlayerAuthRegisterResponse> RegisterAsync(string username, string password)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             var registerResult = await SupabaseAuthClient.RegisterWebGLAsync(
-                supabaseUrl, supabaseAnonKey, username, password, requestTimeoutSeconds
+                supabaseUrl,
+                supabaseAnonKey,
+                username,
+                password,
+                requestTimeoutSeconds
             );
 
             string sessionToken = registerResult.sessionToken ?? string.Empty;
@@ -354,11 +332,7 @@ namespace NPCSystem.Auth
 #else
             string email = EmailFromUsername(username?.Trim() ?? string.Empty);
 
-            Session session = await _supabaseClient.Auth.SignUp(
-                email,
-                password ?? string.Empty,
-                null
-            );
+            Session session = await _supabaseClient.Auth.SignUp(email, password ?? string.Empty, null);
 
             if (session?.User == null || string.IsNullOrWhiteSpace(session.User.Id))
                 throw new InvalidOperationException("Supabase signup returned no user.");
@@ -384,10 +358,10 @@ namespace NPCSystem.Auth
 
             try
             {
-                await _supabaseClient.Rpc("create_or_update_player_profile", new
-                {
-                    p_display_name = displayName?.Trim() ?? string.Empty,
-                });
+                await _supabaseClient.Rpc(
+                    "create_or_update_player_profile",
+                    new { p_display_name = displayName?.Trim() ?? string.Empty }
+                );
 
                 NPCFlowLogger
                     .FindOrCreate()
@@ -413,15 +387,16 @@ namespace NPCSystem.Auth
             }
         }
 
-        public async Task<PlayerAuthSessionResponse> LoginAsync(
-            string username,
-            string password,
-            bool rememberMe
-        )
+        public async Task<PlayerAuthSessionResponse> LoginAsync(string username, string password, bool rememberMe)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             var session = await SupabaseAuthClient.LoginWebGLAsync(
-                supabaseUrl, supabaseAnonKey, username, password, rememberMe, requestTimeoutSeconds
+                supabaseUrl,
+                supabaseAnonKey,
+                username,
+                password,
+                rememberMe,
+                requestTimeoutSeconds
             );
 
             CurrentSession = session;
@@ -431,12 +406,15 @@ namespace NPCSystem.Auth
                 UnitySessionStore.Clear();
 
             await SupabaseAuthClient.CreatePlayerProfileWebGLAsync(
-                supabaseUrl, restApiUrl, supabaseAnonKey,
-                username?.Trim(), session.sessionToken, requestTimeoutSeconds
+                supabaseUrl,
+                restApiUrl,
+                supabaseAnonKey,
+                username?.Trim(),
+                session.sessionToken,
+                requestTimeoutSeconds
             );
 
-            lastAuthStatus =
-                $"Login successful for '{username?.Trim()}'. Session expires at {session.expiresAtUtc}.";
+            lastAuthStatus = $"Login successful for '{username?.Trim()}'. Session expires at {session.expiresAtUtc}.";
             return session;
 #else
             string email = EmailFromUsername(username?.Trim() ?? string.Empty);
@@ -472,7 +450,10 @@ namespace NPCSystem.Auth
             if (UnitySessionStore.IsExpired(CurrentSession.expiresAtUtc))
             {
                 var refreshed = await SupabaseAuthClient.RefreshSessionWebGLAsync(
-                    supabaseUrl, supabaseAnonKey, CurrentSession, requestTimeoutSeconds
+                    supabaseUrl,
+                    supabaseAnonKey,
+                    CurrentSession,
+                    requestTimeoutSeconds
                 );
                 if (refreshed == null)
                 {
@@ -505,9 +486,7 @@ namespace NPCSystem.Auth
                     return null;
                 }
 
-                CurrentSession = UnitySessionStore.ToAuthSession(
-                    _supabaseClient.Auth.CurrentSession
-                );
+                CurrentSession = UnitySessionStore.ToAuthSession(_supabaseClient.Auth.CurrentSession);
 
                 await TryCreatePlayerProfileAsync(CurrentSession.username);
                 AuthNetworkBridge.ActivePlayerName = CurrentSession.username;
@@ -526,7 +505,10 @@ namespace NPCSystem.Auth
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             await SupabaseAuthClient.LogoutWebGLAsync(
-                supabaseUrl, supabaseAnonKey, CurrentSession, requestTimeoutSeconds
+                supabaseUrl,
+                supabaseAnonKey,
+                CurrentSession,
+                requestTimeoutSeconds
             );
             ClearLocalSession();
 #else
@@ -560,9 +542,7 @@ namespace NPCSystem.Auth
         {
             if (_supabaseClient?.Auth?.CurrentSession != null)
             {
-                CurrentSession = UnitySessionStore.ToAuthSession(
-                    _supabaseClient.Auth.CurrentSession
-                );
+                CurrentSession = UnitySessionStore.ToAuthSession(_supabaseClient.Auth.CurrentSession);
                 lastAuthStatus = $"Auth state changed: {state} for {CurrentSession.username}";
             }
             else
@@ -581,9 +561,7 @@ namespace NPCSystem.Auth
         async Task TryConnectRealtimeAsync()
         {
             if (_realtimeService == null)
-                _realtimeService = FindAnyObjectByType<SupabaseRealtimeService>(
-                    FindObjectsInactive.Include
-                );
+                _realtimeService = FindAnyObjectByType<SupabaseRealtimeService>(FindObjectsInactive.Include);
 
             if (_realtimeService != null)
                 await _realtimeService.ConnectAsync();
@@ -592,9 +570,7 @@ namespace NPCSystem.Auth
         void DisconnectRealtime()
         {
             if (_realtimeService == null)
-                _realtimeService = FindAnyObjectByType<SupabaseRealtimeService>(
-                    FindObjectsInactive.Include
-                );
+                _realtimeService = FindAnyObjectByType<SupabaseRealtimeService>(FindObjectsInactive.Include);
 
             if (_realtimeService != null)
                 _realtimeService.Disconnect();
@@ -624,18 +600,14 @@ namespace NPCSystem.Auth
             return platform != RuntimePlatform.WebGLPlayer || restoreOnWebGLStart;
         }
 
-        static System.Collections.Generic.Dictionary<string, object> BuildSessionData(
-            PlayerAuthSessionResponse session
-        )
+        static System.Collections.Generic.Dictionary<string, object> BuildSessionData(PlayerAuthSessionResponse session)
         {
             return new System.Collections.Generic.Dictionary<string, object>
             {
                 ["playerId"] = session?.playerId ?? string.Empty,
                 ["username"] = session?.username ?? string.Empty,
                 ["expiresAtUtc"] = session?.expiresAtUtc ?? string.Empty,
-                ["hasRefreshToken"] = !string.IsNullOrWhiteSpace(session?.refreshToken)
-                    ? "yes"
-                    : "no",
+                ["hasRefreshToken"] = !string.IsNullOrWhiteSpace(session?.refreshToken) ? "yes" : "no",
             };
         }
     }

@@ -40,7 +40,6 @@ namespace Unity.Web.Stripping.Editor
             var lines = File.ReadLines(path);
             var symbolFile = new SymbolFile();
 
-
             foreach (var line in lines)
             {
                 var index = line.IndexOf(':');
@@ -77,11 +76,7 @@ namespace Unity.Web.Stripping.Editor
         private static string UnescapeFunctionName(string functionName)
         {
             return Regex.Unescape(
-                Regex.Replace(
-                    functionName,
-                    EscapedUTF8CharacterPattern,
-                    EscapedUTF8CharacterReplacement
-                )
+                Regex.Replace(functionName, EscapedUTF8CharacterPattern, EscapedUTF8CharacterReplacement)
             );
         }
     }

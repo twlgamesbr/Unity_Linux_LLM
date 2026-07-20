@@ -6,23 +6,26 @@ namespace Unity.Numerics.Linear
 {
     internal enum Side
     {
-        Left, Right
+        Left,
+        Right,
     }
 
     internal enum Op
     {
-        None, Transpose
+        None,
+        Transpose,
     }
 
     internal enum TriangularType
     {
-        Upper, Lower
+        Upper,
+        Lower,
     }
 
     internal enum DiagonalType
     {
         Explicit,
-        Unit
+        Unit,
     }
 
     [BurstCompile]

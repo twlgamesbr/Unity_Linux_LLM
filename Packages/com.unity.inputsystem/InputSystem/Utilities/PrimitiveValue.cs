@@ -18,19 +18,44 @@ namespace UnityEngine.InputSystem.Utilities
     [StructLayout(LayoutKind.Explicit)]
     public struct PrimitiveValue : IEquatable<PrimitiveValue>, IConvertible
     {
-        [FieldOffset(0)] private TypeCode m_Type;
-        [FieldOffset(4)] private bool m_BoolValue;
-        [FieldOffset(4)] private char m_CharValue;
-        [FieldOffset(4)] private byte m_ByteValue;
-        [FieldOffset(4)] private sbyte m_SByteValue;
-        [FieldOffset(4)] private short m_ShortValue;
-        [FieldOffset(4)] private ushort m_UShortValue;
-        [FieldOffset(4)] private int m_IntValue;
-        [FieldOffset(4)] private uint m_UIntValue;
-        [FieldOffset(4)] private long m_LongValue;
-        [FieldOffset(4)] private ulong m_ULongValue;
-        [FieldOffset(4)] private float m_FloatValue;
-        [FieldOffset(4)] private double m_DoubleValue;
+        [FieldOffset(0)]
+        private TypeCode m_Type;
+
+        [FieldOffset(4)]
+        private bool m_BoolValue;
+
+        [FieldOffset(4)]
+        private char m_CharValue;
+
+        [FieldOffset(4)]
+        private byte m_ByteValue;
+
+        [FieldOffset(4)]
+        private sbyte m_SByteValue;
+
+        [FieldOffset(4)]
+        private short m_ShortValue;
+
+        [FieldOffset(4)]
+        private ushort m_UShortValue;
+
+        [FieldOffset(4)]
+        private int m_IntValue;
+
+        [FieldOffset(4)]
+        private uint m_UIntValue;
+
+        [FieldOffset(4)]
+        private long m_LongValue;
+
+        [FieldOffset(4)]
+        private ulong m_ULongValue;
+
+        [FieldOffset(4)]
+        private float m_FloatValue;
+
+        [FieldOffset(4)]
+        private double m_DoubleValue;
 
         internal unsafe byte* valuePtr => (byte*)UnsafeUtility.AddressOf(ref this) + 4;
 
@@ -211,19 +236,32 @@ namespace UnityEngine.InputSystem.Utilities
         {
             switch (type)
             {
-                case TypeCode.Boolean: return ToBoolean();
-                case TypeCode.Char: return ToChar();
-                case TypeCode.Byte: return ToByte();
-                case TypeCode.SByte: return ToSByte();
-                case TypeCode.Int16: return ToInt16();
-                case TypeCode.Int32: return ToInt32();
-                case TypeCode.Int64: return ToInt64();
-                case TypeCode.UInt16: return ToInt16();
-                case TypeCode.UInt32: return ToInt32();
-                case TypeCode.UInt64: return ToUInt64();
-                case TypeCode.Single: return ToSingle();
-                case TypeCode.Double: return ToDouble();
-                case TypeCode.Empty: return new PrimitiveValue();
+                case TypeCode.Boolean:
+                    return ToBoolean();
+                case TypeCode.Char:
+                    return ToChar();
+                case TypeCode.Byte:
+                    return ToByte();
+                case TypeCode.SByte:
+                    return ToSByte();
+                case TypeCode.Int16:
+                    return ToInt16();
+                case TypeCode.Int32:
+                    return ToInt32();
+                case TypeCode.Int64:
+                    return ToInt64();
+                case TypeCode.UInt16:
+                    return ToInt16();
+                case TypeCode.UInt32:
+                    return ToInt32();
+                case TypeCode.UInt64:
+                    return ToUInt64();
+                case TypeCode.Single:
+                    return ToSingle();
+                case TypeCode.Double:
+                    return ToDouble();
+                case TypeCode.Empty:
+                    return new PrimitiveValue();
             }
 
             throw new ArgumentException($"Don't know how to convert PrimitiveValue to '{type}'", nameof(type));
@@ -267,9 +305,20 @@ namespace UnityEngine.InputSystem.Utilities
                 return false;
             if (obj is PrimitiveValue value)
                 return Equals(value);
-            if (obj is bool || obj is char || obj is byte || obj is sbyte || obj is short
-                || obj is ushort || obj is int || obj is uint || obj is long || obj is ulong
-                || obj is float || obj is double)
+            if (
+                obj is bool
+                || obj is char
+                || obj is byte
+                || obj is sbyte
+                || obj is short
+                || obj is ushort
+                || obj is int
+                || obj is uint
+                || obj is long
+                || obj is ulong
+                || obj is float
+                || obj is double
+            )
                 return Equals(FromObject(obj));
             return false;
         }
@@ -281,7 +330,7 @@ namespace UnityEngine.InputSystem.Utilities
         /// <param name="right">Second value.</param>
         /// <returns>True if the two values are equal.</returns>
         /// <seealso cref="Equals(PrimitiveValue)"/>
-        public static bool operator==(PrimitiveValue left, PrimitiveValue right)
+        public static bool operator ==(PrimitiveValue left, PrimitiveValue right)
         {
             return left.Equals(right);
         }
@@ -293,7 +342,7 @@ namespace UnityEngine.InputSystem.Utilities
         /// <param name="right">Second value.</param>
         /// <returns>True if the two values are not equal.</returns>
         /// <seealso cref="Equals(PrimitiveValue)"/>
-        public static bool operator!=(PrimitiveValue left, PrimitiveValue right)
+        public static bool operator !=(PrimitiveValue left, PrimitiveValue right)
         {
             return !left.Equals(right);
         }
@@ -306,7 +355,7 @@ namespace UnityEngine.InputSystem.Utilities
         {
             unchecked
             {
-                fixed(double* valuePtr = &m_DoubleValue)
+                fixed (double* valuePtr = &m_DoubleValue)
                 {
                     var hashCode = m_Type.GetHashCode();
                     hashCode = (hashCode * 397) ^ valuePtr->GetHashCode();
@@ -381,8 +430,12 @@ namespace UnityEngine.InputSystem.Utilities
                 return new PrimitiveValue(false);
 
             // Double.
-            if (value.Contains('.') || value.Contains("e") || value.Contains("E") ||
-                value.Contains("infinity", StringComparison.InvariantCultureIgnoreCase))
+            if (
+                value.Contains('.')
+                || value.Contains("e")
+                || value.Contains("E")
+                || value.Contains("infinity", StringComparison.InvariantCultureIgnoreCase)
+            )
             {
                 if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var doubleResult))
                     return new PrimitiveValue(doubleResult);
@@ -726,19 +779,32 @@ namespace UnityEngine.InputSystem.Utilities
         {
             switch (m_Type)
             {
-                case TypeCode.Boolean: return m_BoolValue;
-                case TypeCode.Char: return m_CharValue;
-                case TypeCode.Byte: return m_ByteValue;
-                case TypeCode.SByte: return m_SByteValue;
-                case TypeCode.Int16: return m_ShortValue;
-                case TypeCode.UInt16: return m_UShortValue;
-                case TypeCode.Int32: return m_IntValue;
-                case TypeCode.UInt32: return m_UIntValue;
-                case TypeCode.Int64: return m_LongValue;
-                case TypeCode.UInt64: return m_ULongValue;
-                case TypeCode.Single: return m_FloatValue;
-                case TypeCode.Double: return m_DoubleValue;
-                default: return null;
+                case TypeCode.Boolean:
+                    return m_BoolValue;
+                case TypeCode.Char:
+                    return m_CharValue;
+                case TypeCode.Byte:
+                    return m_ByteValue;
+                case TypeCode.SByte:
+                    return m_SByteValue;
+                case TypeCode.Int16:
+                    return m_ShortValue;
+                case TypeCode.UInt16:
+                    return m_UShortValue;
+                case TypeCode.Int32:
+                    return m_IntValue;
+                case TypeCode.UInt32:
+                    return m_UIntValue;
+                case TypeCode.Int64:
+                    return m_LongValue;
+                case TypeCode.UInt64:
+                    return m_ULongValue;
+                case TypeCode.Single:
+                    return m_FloatValue;
+                case TypeCode.Double:
+                    return m_DoubleValue;
+                default:
+                    return null;
             }
         }
 
@@ -763,22 +829,36 @@ namespace UnityEngine.InputSystem.Utilities
             var typeCode = Type.GetTypeCode(type);
             switch (typeCode)
             {
-                case TypeCode.Boolean: return new PrimitiveValue(Convert.ToBoolean(value));
-                case TypeCode.Char: return new PrimitiveValue(Convert.ToChar(value));
-                case TypeCode.Byte: return new PrimitiveValue(Convert.ToByte(value));
-                case TypeCode.SByte: return new PrimitiveValue(Convert.ToSByte(value));
-                case TypeCode.Int16: return new PrimitiveValue(Convert.ToInt16(value));
-                case TypeCode.Int32: return new PrimitiveValue(Convert.ToInt32(value));
-                case TypeCode.Int64: return new PrimitiveValue(Convert.ToInt64(value));
-                case TypeCode.UInt16: return new PrimitiveValue(Convert.ToUInt16(value));
-                case TypeCode.UInt32: return new PrimitiveValue(Convert.ToUInt32(value));
-                case TypeCode.UInt64: return new PrimitiveValue(Convert.ToUInt64(value));
-                case TypeCode.Single: return new PrimitiveValue(Convert.ToSingle(value));
-                case TypeCode.Double: return new PrimitiveValue(Convert.ToDouble(value));
+                case TypeCode.Boolean:
+                    return new PrimitiveValue(Convert.ToBoolean(value));
+                case TypeCode.Char:
+                    return new PrimitiveValue(Convert.ToChar(value));
+                case TypeCode.Byte:
+                    return new PrimitiveValue(Convert.ToByte(value));
+                case TypeCode.SByte:
+                    return new PrimitiveValue(Convert.ToSByte(value));
+                case TypeCode.Int16:
+                    return new PrimitiveValue(Convert.ToInt16(value));
+                case TypeCode.Int32:
+                    return new PrimitiveValue(Convert.ToInt32(value));
+                case TypeCode.Int64:
+                    return new PrimitiveValue(Convert.ToInt64(value));
+                case TypeCode.UInt16:
+                    return new PrimitiveValue(Convert.ToUInt16(value));
+                case TypeCode.UInt32:
+                    return new PrimitiveValue(Convert.ToUInt32(value));
+                case TypeCode.UInt64:
+                    return new PrimitiveValue(Convert.ToUInt64(value));
+                case TypeCode.Single:
+                    return new PrimitiveValue(Convert.ToSingle(value));
+                case TypeCode.Double:
+                    return new PrimitiveValue(Convert.ToDouble(value));
             }
 
             throw new ArgumentException(
-                $"Cannot convert value '{value}' of type '{typeof(TValue).Name}' to PrimitiveValue", nameof(value));
+                $"Cannot convert value '{value}' of type '{typeof(TValue).Name}' to PrimitiveValue",
+                nameof(value)
+            );
         }
 
         /// <summary>
@@ -830,14 +910,22 @@ namespace UnityEngine.InputSystem.Utilities
                 var underlyingTypeCode = Type.GetTypeCode(underlyingType);
                 switch (underlyingTypeCode)
                 {
-                    case TypeCode.Byte: return new PrimitiveValue((byte)value);
-                    case TypeCode.SByte: return new PrimitiveValue((sbyte)value);
-                    case TypeCode.Int16: return new PrimitiveValue((short)value);
-                    case TypeCode.Int32: return new PrimitiveValue((int)value);
-                    case TypeCode.Int64: return new PrimitiveValue((long)value);
-                    case TypeCode.UInt16: return new PrimitiveValue((ushort)value);
-                    case TypeCode.UInt32: return new PrimitiveValue((uint)value);
-                    case TypeCode.UInt64: return new PrimitiveValue((ulong)value);
+                    case TypeCode.Byte:
+                        return new PrimitiveValue((byte)value);
+                    case TypeCode.SByte:
+                        return new PrimitiveValue((sbyte)value);
+                    case TypeCode.Int16:
+                        return new PrimitiveValue((short)value);
+                    case TypeCode.Int32:
+                        return new PrimitiveValue((int)value);
+                    case TypeCode.Int64:
+                        return new PrimitiveValue((long)value);
+                    case TypeCode.UInt16:
+                        return new PrimitiveValue((ushort)value);
+                    case TypeCode.UInt32:
+                        return new PrimitiveValue((uint)value);
+                    case TypeCode.UInt64:
+                        return new PrimitiveValue((ulong)value);
                 }
             }
 

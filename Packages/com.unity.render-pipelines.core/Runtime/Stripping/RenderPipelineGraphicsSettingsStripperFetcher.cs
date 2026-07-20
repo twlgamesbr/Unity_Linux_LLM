@@ -36,16 +36,26 @@ namespace UnityEngine.Rendering
 
             private static IEnumerable<(Type, Type)> GetStrippersFromAssemblies()
             {
-                foreach (var stripperType in TypeCache.GetTypesDerivedFrom(typeof(IRenderPipelineGraphicsSettingsStripper<>)))
+                foreach (
+                    var stripperType in TypeCache.GetTypesDerivedFrom(typeof(IRenderPipelineGraphicsSettingsStripper<>))
+                )
                 {
                     if (stripperType.IsAbstract)
                         continue;
 
                     // The ctor is private?
-                    if (stripperType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes,
-                            null) == null)
+                    if (
+                        stripperType.GetConstructor(
+                            BindingFlags.Public | BindingFlags.Instance,
+                            null,
+                            Type.EmptyTypes,
+                            null
+                        ) == null
+                    )
                     {
-                        Debug.LogWarning($"{stripperType} has no public constructor, it will not be used to strip {nameof(IRenderPipelineGraphicsSettings)}.");
+                        Debug.LogWarning(
+                            $"{stripperType} has no public constructor, it will not be used to strip {nameof(IRenderPipelineGraphicsSettings)}."
+                        );
                         continue;
                     }
 

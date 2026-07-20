@@ -1,15 +1,15 @@
 //#define ENABLE_CONTENT_DIAGNOSTICS
 using System;
-using UnityEngine;
-using Unity.Loading;
-using Unity.Collections;
-using Unity.IO.Archive;
-using Unity.Entities.Serialization;
-using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.InteropServices;
-using UnityEngine.SceneManagement;
-using Unity.Content;
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Content;
+using Unity.Entities.Serialization;
+using Unity.IO.Archive;
+using Unity.Loading;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 #if ENABLE_PROFILER
 #endif
 
@@ -34,26 +34,31 @@ namespace Unity.Entities.Content
         /// </summary>
         [ExcludeFromBurstCompatTesting("References managed objects")]
         public static string RelativeCatalogPath => $"{k_ContentArchiveDirectory}/{k_ContentCatalogFilename}";
+
         /// <summary>
         /// Functor that transforms a file id into the internal mounted path.
         /// </summary>
         /// <param name="fileId">The file id.</param>
         /// <returns>The internal mount path for the file. This is implemented as $"ns:/{k_NameSpaceString}/{ArchivePrefix}/{fileId}"</returns>
         [ExcludeFromBurstCompatTesting("References managed objects")]
-        public static string DefaultContentFileNameFunc(string fileId) => $"ns:/{k_NameSpaceString}/{ArchivePrefix}/{fileId}";
+        public static string DefaultContentFileNameFunc(string fileId) =>
+            $"ns:/{k_NameSpaceString}/{ArchivePrefix}/{fileId}";
+
         /// <summary>
         /// Functor that transforms an archive id into a relative path.  This path should be relative to the streaming assets path.
         /// </summary>
         /// <param name="archiveId">The archive id.</param>
         /// <returns>The relative path of the archive file.</returns>
         [ExcludeFromBurstCompatTesting("References managed objects")]
-        public static string DefaultArchivePathFunc(string archiveId) => $"{k_ContentArchiveDirectory}/{archiveId}{k_ContentArchiveExtension}";
+        public static string DefaultArchivePathFunc(string archiveId) =>
+            $"{k_ContentArchiveDirectory}/{archiveId}{k_ContentArchiveExtension}";
 
         struct ActiveArchive
         {
             public ContentArchiveId ArchiveId;
             public int ReferenceCount;
             public ArchiveHandle Archive;
+
             public override int GetHashCode() => ArchiveId.GetHashCode();
         }
 
@@ -63,6 +68,7 @@ namespace Unity.Entities.Content
             public int ReferenceCount;
             public ContentArchiveId ArchiveId;
             public ContentFile File;
+
             public override int GetHashCode() => ContentFileId.GetHashCode();
         }
 
@@ -72,6 +78,7 @@ namespace Unity.Entities.Content
             public int ReferenceCount;
             public ContentFileId ContentFileId;
             public long LocalIdentifierInFile;
+
             public override int GetHashCode() => ObjectReferenceId.GetHashCode();
         }
 
@@ -100,17 +107,37 @@ namespace Unity.Entities.Content
         public static Action<string> LogFunc;
 #endif
 
-
         //shared static data between C# & HPC#
-        static readonly SharedStatic<ObjectValueCache> SharedStaticObjectValueCache = SharedStatic<ObjectValueCache>.GetOrCreate<ObjectValueCacheType>();
+        static readonly SharedStatic<ObjectValueCache> SharedStaticObjectValueCache =
+            SharedStatic<ObjectValueCache>.GetOrCreate<ObjectValueCacheType>();
+
         struct ObjectValueCacheType { }
-        static readonly SharedStatic<MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>> SharedStaticObjectLoadQueue = SharedStatic<MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>>.GetOrCreate<LoadQueueType>();
+
+        static readonly SharedStatic<
+            MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>
+        > SharedStaticObjectLoadQueue = SharedStatic<
+            MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>
+        >.GetOrCreate<LoadQueueType>();
+
         struct LoadQueueType { }
-        static readonly SharedStatic<MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>> SharedStaticObjectReleaseQueue = SharedStatic<MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>>.GetOrCreate<ReleaseQueueType>();
+
+        static readonly SharedStatic<
+            MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>
+        > SharedStaticObjectReleaseQueue = SharedStatic<
+            MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>
+        >.GetOrCreate<ReleaseQueueType>();
+
         struct ReleaseQueueType { }
-        static readonly SharedStatic<UnsafeList<UntypedWeakReferenceId>> SharedStaticLoadingObjects = SharedStatic<UnsafeList<UntypedWeakReferenceId>>.GetOrCreate<LoadingObjectsType>();
+
+        static readonly SharedStatic<UnsafeList<UntypedWeakReferenceId>> SharedStaticLoadingObjects = SharedStatic<
+            UnsafeList<UntypedWeakReferenceId>
+        >.GetOrCreate<LoadingObjectsType>();
+
         struct LoadingObjectsType { }
-        static readonly SharedStatic<UnsafeList<DeferredSceneDependencyUnload>> SharedStaticDeferredSceneUnloads = SharedStatic<UnsafeList<DeferredSceneDependencyUnload>>.GetOrCreate<DeferredSceneUnloadsType>();
+
+        static readonly SharedStatic<UnsafeList<DeferredSceneDependencyUnload>> SharedStaticDeferredSceneUnloads =
+            SharedStatic<UnsafeList<DeferredSceneDependencyUnload>>.GetOrCreate<DeferredSceneUnloadsType>();
+
         struct DeferredSceneUnloadsType { }
 
         static RuntimeContentCatalog Catalog;
@@ -129,7 +156,7 @@ namespace Unity.Entities.Content
         /// Initialize the internal data structures for handling content archives.
         /// </summary>
         [ExcludeFromBurstCompatTesting("References managed objects")]
-        public unsafe static void Initialize()
+        public static unsafe void Initialize()
         {
 #if ENABLE_PROFILER
             RuntimeContentManagerProfiler.Initialize();
@@ -158,9 +185,14 @@ namespace Unity.Entities.Content
 
             SharedStaticObjectValueCache.Data = new ObjectValueCache(2048);
             SharedStaticObjectLoadQueue.Data = new MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>(2048);
-            SharedStaticObjectReleaseQueue.Data = new MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>(2048);
+            SharedStaticObjectReleaseQueue.Data = new MultiProducerSingleBulkConsumerQueue<UntypedWeakReferenceId>(
+                2048
+            );
             SharedStaticLoadingObjects.Data = new UnsafeList<UntypedWeakReferenceId>(2048, Allocator.Persistent);
-            SharedStaticDeferredSceneUnloads.Data = new UnsafeList<DeferredSceneDependencyUnload>(1024, Allocator.Persistent);
+            SharedStaticDeferredSceneUnloads.Data = new UnsafeList<DeferredSceneDependencyUnload>(
+                1024,
+                Allocator.Persistent
+            );
 
             if (s_LoadObjectDelegateGCPrevention == null)
             {
@@ -213,9 +245,15 @@ namespace Unity.Entities.Content
 #pragma warning disable UAC0006
             AppDomain.CurrentDomain.DomainUnload += OnShutdown;
 #pragma warning restore UAC0006
-            UnityEditor.EditorApplication.quitting += () => { Cleanup(out _); };
+            UnityEditor.EditorApplication.quitting += () =>
+            {
+                Cleanup(out _);
+            };
 #else
-            DefaultWorldInitialization.DefaultWorldDestroyed += () => { RuntimeContentManager.Cleanup(out _); };
+            DefaultWorldInitialization.DefaultWorldDestroyed += () =>
+            {
+                RuntimeContentManager.Cleanup(out _);
+            };
 #endif
         }
 
@@ -227,12 +265,24 @@ namespace Unity.Entities.Content
                 if (!Catalog.TryGetSceneLocation(sceneInstance.SceneId, out var fileId, out var sceneName))
                     throw new Exception($"Invalid scene location: {sceneInstance.SceneId}");
 
-                if (!Catalog.TryGetFileLocation(fileId, out string filePath, out var deps, out var archiveId, out var depIndex))
-                    throw new Exception($"Invalid file location: {fileId} for scene {sceneInstance.SceneId} with name '{sceneName}'.");
+                if (
+                    !Catalog.TryGetFileLocation(
+                        fileId,
+                        out string filePath,
+                        out var deps,
+                        out var archiveId,
+                        out var depIndex
+                    )
+                )
+                    throw new Exception(
+                        $"Invalid file location: {fileId} for scene {sceneInstance.SceneId} with name '{sceneName}'."
+                    );
 
                 ReleaseArchive(archiveId);
                 //dependencies of scenes must be deferred a frame to avoid releasing too early.
-                SharedStaticDeferredSceneUnloads.Data.Add(new DeferredSceneDependencyUnload { DependencyIndex = depIndex, FileIds = deps });
+                SharedStaticDeferredSceneUnloads.Data.Add(
+                    new DeferredSceneDependencyUnload { DependencyIndex = depIndex, FileIds = deps }
+                );
             }
         }
 
@@ -247,7 +297,7 @@ namespace Unity.Entities.Content
         /// <param name="unreleasedObjectCount">The number of unreleased objects found during cleanup.</param>
         /// <returns>True if no unreleased objects were found, false otherwise.</returns>
         [ExcludeFromBurstCompatTesting("References managed objects")]
-        public unsafe static bool Cleanup(out int unreleasedObjectCount)
+        public static unsafe bool Cleanup(out int unreleasedObjectCount)
         {
             unreleasedObjectCount = 0;
             if (!ActiveObjects.IsCreated)
@@ -322,7 +372,9 @@ namespace Unity.Entities.Content
                         if (ds.Files.IsCreated)
                         {
 #if ENABLE_CONTENT_DIAGNOSTICS
-                            LogFunc?.Invoke($"Cleanup: ActiveDependencySets[{i}] contains {ds.Files.Length} items, ref count {ds.ReferenceCount}");
+                            LogFunc?.Invoke(
+                                $"Cleanup: ActiveDependencySets[{i}] contains {ds.Files.Length} items, ref count {ds.ReferenceCount}"
+                            );
 #endif
                             ds.Files.Dispose();
                         }
@@ -353,7 +405,9 @@ namespace Unity.Entities.Content
                 {
 #if ENABLE_CONTENT_DIAGNOSTICS
                     if (SharedStaticObjectValueCache.Data.Count() > 0)
-                        LogFunc?.Invoke($"Cleanup: ObjectValueCache contains {SharedStaticObjectValueCache.Data.Count()} items.");
+                        LogFunc?.Invoke(
+                            $"Cleanup: ObjectValueCache contains {SharedStaticObjectValueCache.Data.Count()} items."
+                        );
 #endif
                     SharedStaticObjectValueCache.Data.Dispose();
                 }
@@ -410,7 +464,11 @@ namespace Unity.Entities.Content
         /// <param name="archivePathFunc">Functor to transform content archive ids to full local paths.</param>
         /// <returns>True if the data was loaded successfully.</returns>
         [ExcludeFromBurstCompatTesting("References managed objects")]
-        public static bool LoadLocalCatalogData(string catalogPath, Func<string, string> fileNameFunc, Func<string, string> archivePathFunc)
+        public static bool LoadLocalCatalogData(
+            string catalogPath,
+            Func<string, string> fileNameFunc,
+            Func<string, string> archivePathFunc
+        )
         {
 #if ENABLE_CONTENT_DIAGNOSTICS
             LogFunc?.Invoke($"LoadLocalCatalogData({catalogPath})");
@@ -423,7 +481,11 @@ namespace Unity.Entities.Content
                 return false;
             }
             if (!ActiveDependencySets.IsCreated)
-                ActiveDependencySets = new UnsafeList<ActiveDependencySet>(Catalog.FileDependencySetCount, Allocator.Persistent, NativeArrayOptions.ClearMemory);
+                ActiveDependencySets = new UnsafeList<ActiveDependencySet>(
+                    Catalog.FileDependencySetCount,
+                    Allocator.Persistent,
+                    NativeArrayOptions.ClearMemory
+                );
             ActiveDependencySets.Resize(Catalog.FileDependencySetCount, NativeArrayOptions.ClearMemory);
 
 #if ENABLE_CONTENT_DIAGNOSTICS
@@ -439,7 +501,8 @@ namespace Unity.Entities.Content
         /// <param name="alloc">Allocator to use for created NativeArray.</param>
         /// <returns>The set of object ids.  The caller is responsible for disposing the returned array.</returns>
         [ExcludeFromBurstCompatTesting("Cannot return structs")]
-        public static NativeArray<UntypedWeakReferenceId> GetObjectIds(AllocatorManager.AllocatorHandle alloc) => Catalog.GetObjectIds(alloc);
+        public static NativeArray<UntypedWeakReferenceId> GetObjectIds(AllocatorManager.AllocatorHandle alloc) =>
+            Catalog.GetObjectIds(alloc);
 
         /// <summary>
         /// Get the entire list of object ids.
@@ -447,7 +510,8 @@ namespace Unity.Entities.Content
         /// <param name="alloc">Allocator to use for created NativeArray.</param>
         /// <returns>The set of object ids.  The caller is responsible for disposing the returned array.</returns>
         [ExcludeFromBurstCompatTesting("Cannot return structs")]
-        public static NativeArray<UntypedWeakReferenceId> GetSceneIds(AllocatorManager.AllocatorHandle alloc) => Catalog.GetSceneIds(alloc);
+        public static NativeArray<UntypedWeakReferenceId> GetSceneIds(AllocatorManager.AllocatorHandle alloc) =>
+            Catalog.GetSceneIds(alloc);
 
         /// <summary>
         /// Thread safe method to initiate an object load. The load will start during the main thread update.
@@ -455,7 +519,7 @@ namespace Unity.Entities.Content
         /// <param name="objectId">The object id to load.</param>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public unsafe static void LoadObjectAsync(in UntypedWeakReferenceId objectId)
+        public static unsafe void LoadObjectAsync(in UntypedWeakReferenceId objectId)
         {
             SharedStaticObjectLoadQueue.Data.Produce(objectId);
             SharedStaticObjectValueCache.Data.AddEntry(objectId);
@@ -463,17 +527,21 @@ namespace Unity.Entities.Content
 #if UNITY_EDITOR
         //These methods are only used in play mode in the editor from AsyncLoadSceneOperation.  This ensures that new copies of the objects are loaded for each sub scene.
         static long instanceLoadCounter = 0;
+
         public struct InstanceHandle : IEquatable<InstanceHandle>
         {
             public UntypedWeakReferenceId ObjectId;
             public long InstanceId;
             public bool IsValid => ObjectId.IsValid && InstanceId > 0;
-            public bool Equals(InstanceHandle other) => InstanceId.Equals(other.InstanceId) && ObjectId.Equals(other.ObjectId);
+
+            public bool Equals(InstanceHandle other) =>
+                InstanceId.Equals(other.InstanceId) && ObjectId.Equals(other.ObjectId);
+
             public override int GetHashCode() => (int)(InstanceId * 31 + ObjectId.GetHashCode());
         }
 
         [ExcludeFromBurstCompatTesting("LoadInstanceAsync is editor only and not called from bursted code.")]
-        internal unsafe static InstanceHandle LoadInstanceAsync(in UntypedWeakReferenceId objectId)
+        internal static unsafe InstanceHandle LoadInstanceAsync(in UntypedWeakReferenceId objectId)
         {
             //incremented first to ensure that 0 is not used for a valid handle
             var handle = new InstanceHandle { ObjectId = objectId, InstanceId = instanceLoadCounter + 1 };
@@ -483,6 +551,7 @@ namespace Unity.Entities.Content
                 instanceLoadCounter++;
             return handle;
         }
+
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
         internal static bool WaitForInstanceCompletion(in InstanceHandle handle, int timeoutMs = 0)
         {
@@ -490,17 +559,20 @@ namespace Unity.Entities.Content
         }
 
         [ExcludeFromBurstCompatTesting("ReleaseInstancesAsync is editor only and not called from bursted code.")]
-        internal unsafe static void ReleaseInstancesAsync(in InstanceHandle handle)
+        internal static unsafe void ReleaseInstancesAsync(in InstanceHandle handle)
         {
             OverrideLoader.ReleaseInstance(handle);
         }
+
         [ExcludeFromBurstCompatTesting("GetInstanceLoadingStatus is editor only and not called from bursted code.")]
-        internal unsafe static ObjectLoadingStatus GetInstanceLoadingStatus(in InstanceHandle handle)
+        internal static unsafe ObjectLoadingStatus GetInstanceLoadingStatus(in InstanceHandle handle)
         {
             return OverrideLoader.GetInstanceLoadStatus(handle);
         }
+
         [ExcludeFromBurstCompatTesting("GetInstanceValue is editor only and not called from bursted code.")]
-        internal static TObject GetInstanceValue<TObject>(in InstanceHandle handle) where TObject : UnityEngine.Object
+        internal static TObject GetInstanceValue<TObject>(in InstanceHandle handle)
+            where TObject : UnityEngine.Object
         {
             return OverrideLoader.GetInstance(handle) as TObject;
         }
@@ -512,17 +584,19 @@ namespace Unity.Entities.Content
         /// <param name="objectId">The object id to release.</param>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public unsafe static void ReleaseObjectAsync(in UntypedWeakReferenceId objectId)
+        public static unsafe void ReleaseObjectAsync(in UntypedWeakReferenceId objectId)
         {
             SharedStaticObjectReleaseQueue.Data.Produce(objectId);
         }
 
-        unsafe private delegate void DeferredSceneUnloadManagedDelegate(ref DeferredSceneDependencyUnload id);
-        private static readonly SharedStatic<IntPtr> s_ManagedDeferredSceneUnloadTrampoline = SharedStatic<IntPtr>.GetOrCreate<DeferredSceneUnloadManagedDelegate>();
+        private unsafe delegate void DeferredSceneUnloadManagedDelegate(ref DeferredSceneDependencyUnload id);
+        private static readonly SharedStatic<IntPtr> s_ManagedDeferredSceneUnloadTrampoline =
+            SharedStatic<IntPtr>.GetOrCreate<DeferredSceneUnloadManagedDelegate>();
         private static object s_DeferredSceneUnloadDelegateGCPrevention;
+
         [ExcludeFromBurstCompatTesting("DeferredSceneUnload is not burstable")]
         [MonoPInvokeCallback(typeof(DeferredSceneUnloadManagedDelegate))]
-        private unsafe static void DeferredSceneUnloadImpl(ref DeferredSceneDependencyUnload id)
+        private static unsafe void DeferredSceneUnloadImpl(ref DeferredSceneDependencyUnload id)
         {
             try
             {
@@ -534,12 +608,14 @@ namespace Unity.Entities.Content
             }
         }
 
-        unsafe private delegate void LoadObjectManagedDelegate(UntypedWeakReferenceId* ids, int count);
-        private static readonly SharedStatic<IntPtr> s_ManagedLoadObjectTrampoline = SharedStatic<IntPtr>.GetOrCreate<LoadObjectManagedDelegate>();
+        private unsafe delegate void LoadObjectManagedDelegate(UntypedWeakReferenceId* ids, int count);
+        private static readonly SharedStatic<IntPtr> s_ManagedLoadObjectTrampoline =
+            SharedStatic<IntPtr>.GetOrCreate<LoadObjectManagedDelegate>();
         private static object s_LoadObjectDelegateGCPrevention;
+
         [ExcludeFromBurstCompatTesting("LoadObjectImpl is not burstable")]
         [MonoPInvokeCallback(typeof(LoadObjectManagedDelegate))]
-        private unsafe static void LoadObjectsImpl(UntypedWeakReferenceId* pObjectIds, int count)
+        private static unsafe void LoadObjectsImpl(UntypedWeakReferenceId* pObjectIds, int count)
         {
             try
             {
@@ -559,12 +635,14 @@ namespace Unity.Entities.Content
             }
         }
 
-        unsafe private delegate void ReleaseObjectManagedDelegate(UntypedWeakReferenceId* ids, int count);
-        private static readonly SharedStatic<IntPtr> s_ManagedReleaseObjectTrampoline = SharedStatic<IntPtr>.GetOrCreate<ReleaseObjectManagedDelegate>();
+        private unsafe delegate void ReleaseObjectManagedDelegate(UntypedWeakReferenceId* ids, int count);
+        private static readonly SharedStatic<IntPtr> s_ManagedReleaseObjectTrampoline =
+            SharedStatic<IntPtr>.GetOrCreate<ReleaseObjectManagedDelegate>();
         private static object s_ReleaseObjectDelegateGCPrevention;
+
         [ExcludeFromBurstCompatTesting("ReleaseObjectImpl is not burstable")]
         [MonoPInvokeCallback(typeof(ReleaseObjectManagedDelegate))]
-        private unsafe static void ReleaseObjectsImpl(UntypedWeakReferenceId* pObjectIds, int count)
+        private static unsafe void ReleaseObjectsImpl(UntypedWeakReferenceId* pObjectIds, int count)
         {
             try
             {
@@ -577,23 +655,29 @@ namespace Unity.Entities.Content
             }
         }
 
-        unsafe private delegate void ProcessObjectManagedDelegate();
-        private static readonly SharedStatic<IntPtr> s_ManagedProcessObjectTrampoline = SharedStatic<IntPtr>.GetOrCreate<ProcessObjectManagedDelegate>();
+        private unsafe delegate void ProcessObjectManagedDelegate();
+        private static readonly SharedStatic<IntPtr> s_ManagedProcessObjectTrampoline =
+            SharedStatic<IntPtr>.GetOrCreate<ProcessObjectManagedDelegate>();
         private static object s_ProcessObjectDelegateGCPrevention;
+
         [ExcludeFromBurstCompatTesting("ComputeObjectLoadingStatus is not burstable")]
         [MonoPInvokeCallback(typeof(ProcessObjectManagedDelegate))]
-        private unsafe static void UpdateLoadingObjectStatus()
+        private static unsafe void UpdateLoadingObjectStatus()
         {
             try
             {
-                for (int i = 0; i < SharedStaticLoadingObjects.Data.Length;)
+                for (int i = 0; i < SharedStaticLoadingObjects.Data.Length; )
                 {
                     var id = SharedStaticLoadingObjects.Data[i];
                     var s = ComputeObjectLoadingStatus(id);
                     if (s >= ObjectLoadingStatus.Completed)
                     {
                         var gcHandle = GetObjectHandleImpl(id);
-                        SharedStaticObjectValueCache.Data.SetObjectStatus(id, gcHandle.IsAllocated ? ObjectLoadingStatus.Completed : ObjectLoadingStatus.Error, gcHandle);
+                        SharedStaticObjectValueCache.Data.SetObjectStatus(
+                            id,
+                            gcHandle.IsAllocated ? ObjectLoadingStatus.Completed : ObjectLoadingStatus.Error,
+                            gcHandle
+                        );
                         SharedStaticLoadingObjects.Data.RemoveAtSwapBack(i);
                     }
                     else
@@ -626,12 +710,14 @@ namespace Unity.Entities.Content
             }
         }
 
-        unsafe private delegate void SendProfilerFrameDataManagedDelegate();
-        private static readonly SharedStatic<IntPtr> s_SendProfilerFrameDataManagedTrampoline = SharedStatic<IntPtr>.GetOrCreate<SendProfilerFrameDataManagedDelegate>();
+        private unsafe delegate void SendProfilerFrameDataManagedDelegate();
+        private static readonly SharedStatic<IntPtr> s_SendProfilerFrameDataManagedTrampoline =
+            SharedStatic<IntPtr>.GetOrCreate<SendProfilerFrameDataManagedDelegate>();
         private static object s_SendProfilerFrameDataManagedDelegateGCPrevention;
+
         [ExcludeFromBurstCompatTesting("SendProfilerFrameData is not burstable")]
         [MonoPInvokeCallback(typeof(SendProfilerFrameDataManagedDelegate))]
-        private unsafe static void SendProfilerFrameData()
+        private static unsafe void SendProfilerFrameData()
         {
             try
             {
@@ -641,9 +727,20 @@ namespace Unity.Entities.Content
                     PrepareArray(ref profilerFrameArchiveData, ActiveArchives.Count);
                     int index = 0;
                     foreach (var o in ActiveArchives)
-                        profilerFrameArchiveData[index++] = new RuntimeContentManagerProfilerFrameData {
-                            id = new UntypedWeakReferenceId { GlobalId = new RuntimeGlobalObjectId { AssetGUID = o.Key.Value } }, refCount = o.Value.ReferenceCount, parent = default };
-                    UnityEngine.Profiling.Profiler.EmitFrameMetaData(RuntimeContentManagerProfiler.Guid, 0, profilerFrameArchiveData);
+                        profilerFrameArchiveData[index++] = new RuntimeContentManagerProfilerFrameData
+                        {
+                            id = new UntypedWeakReferenceId
+                            {
+                                GlobalId = new RuntimeGlobalObjectId { AssetGUID = o.Key.Value },
+                            },
+                            refCount = o.Value.ReferenceCount,
+                            parent = default,
+                        };
+                    UnityEngine.Profiling.Profiler.EmitFrameMetaData(
+                        RuntimeContentManagerProfiler.Guid,
+                        0,
+                        profilerFrameArchiveData
+                    );
                 }
 
                 {
@@ -652,11 +749,18 @@ namespace Unity.Entities.Content
                     foreach (var o in ActiveFiles)
                         profilerFrameFileData[index++] = new RuntimeContentManagerProfilerFrameData
                         {
-                            id = new UntypedWeakReferenceId { GlobalId = new RuntimeGlobalObjectId { AssetGUID = o.Key.Value } },
+                            id = new UntypedWeakReferenceId
+                            {
+                                GlobalId = new RuntimeGlobalObjectId { AssetGUID = o.Key.Value },
+                            },
                             refCount = o.Value.ReferenceCount,
-                            parent = o.Value.ArchiveId.Value.GetHashCode()
-                        };// new UntypedWeakReferenceId { GlobalId = new RuntimeGlobalObjectId { AssetGUID = o.Value.ArchiveId.Value } } };
-                    UnityEngine.Profiling.Profiler.EmitFrameMetaData(RuntimeContentManagerProfiler.Guid, 1, profilerFrameFileData);
+                            parent = o.Value.ArchiveId.Value.GetHashCode(),
+                        }; // new UntypedWeakReferenceId { GlobalId = new RuntimeGlobalObjectId { AssetGUID = o.Value.ArchiveId.Value } } };
+                    UnityEngine.Profiling.Profiler.EmitFrameMetaData(
+                        RuntimeContentManagerProfiler.Guid,
+                        1,
+                        profilerFrameFileData
+                    );
                 }
 
                 {
@@ -667,9 +771,13 @@ namespace Unity.Entities.Content
                         {
                             id = o.Key,
                             refCount = o.Value.ReferenceCount,
-                            parent = o.Value.ContentFileId.Value.GetHashCode()
+                            parent = o.Value.ContentFileId.Value.GetHashCode(),
                         }; //new UntypedWeakReferenceId { GlobalId = new RuntimeGlobalObjectId { AssetGUID = o.Value.ContentFileId.Value } } };
-                    UnityEngine.Profiling.Profiler.EmitFrameMetaData(RuntimeContentManagerProfiler.Guid, 2, profilerFrameObjectData);
+                    UnityEngine.Profiling.Profiler.EmitFrameMetaData(
+                        RuntimeContentManagerProfiler.Guid,
+                        2,
+                        profilerFrameObjectData
+                    );
                 }
             }
             catch (Exception e)
@@ -678,12 +786,13 @@ namespace Unity.Entities.Content
             }
         }
 #endif
+
         /// <summary>
         /// Process queued load and release requests.
         /// </summary>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public unsafe static void ProcessQueuedCommands()
+        public static unsafe void ProcessQueuedCommands()
         {
 #if ENABLE_PROFILER
             RuntimeContentManagerProfiler.EnterProcessCommands();
@@ -691,25 +800,33 @@ namespace Unity.Entities.Content
 
             if (SharedStaticObjectLoadQueue.Data.ConsumeAll(out var objectLoads, Allocator.Temp))
             {
-                new FunctionPointer<LoadObjectManagedDelegate>(s_ManagedLoadObjectTrampoline.Data).Invoke((UntypedWeakReferenceId *)objectLoads.GetUnsafePtr<UntypedWeakReferenceId>(), objectLoads.Length);
+                new FunctionPointer<LoadObjectManagedDelegate>(s_ManagedLoadObjectTrampoline.Data).Invoke(
+                    (UntypedWeakReferenceId*)objectLoads.GetUnsafePtr<UntypedWeakReferenceId>(),
+                    objectLoads.Length
+                );
                 objectLoads.Dispose();
             }
 
             if (SharedStaticObjectReleaseQueue.Data.ConsumeAll(out var objectReleases, Allocator.Temp))
             {
-                new FunctionPointer<ReleaseObjectManagedDelegate>(s_ManagedReleaseObjectTrampoline.Data).Invoke((UntypedWeakReferenceId*)objectReleases.GetUnsafePtr<UntypedWeakReferenceId>(), objectReleases.Length);
+                new FunctionPointer<ReleaseObjectManagedDelegate>(s_ManagedReleaseObjectTrampoline.Data).Invoke(
+                    (UntypedWeakReferenceId*)objectReleases.GetUnsafePtr<UntypedWeakReferenceId>(),
+                    objectReleases.Length
+                );
                 objectReleases.Dispose();
             }
 
-            if(!SharedStaticLoadingObjects.Data.IsEmpty)
+            if (!SharedStaticLoadingObjects.Data.IsEmpty)
                 new FunctionPointer<ProcessObjectManagedDelegate>(s_ManagedProcessObjectTrampoline.Data).Invoke();
 
             if (!SharedStaticDeferredSceneUnloads.Data.IsEmpty)
             {
-                for(int i = 0; i < SharedStaticDeferredSceneUnloads.Data.Length; i++)
+                for (int i = 0; i < SharedStaticDeferredSceneUnloads.Data.Length; i++)
                 {
                     var deferredUnload = SharedStaticDeferredSceneUnloads.Data[i];
-                    new FunctionPointer<DeferredSceneUnloadManagedDelegate>(s_ManagedDeferredSceneUnloadTrampoline.Data).Invoke(ref deferredUnload);
+                    new FunctionPointer<DeferredSceneUnloadManagedDelegate>(
+                        s_ManagedDeferredSceneUnloadTrampoline.Data
+                    ).Invoke(ref deferredUnload);
                 }
                 SharedStaticDeferredSceneUnloads.Data.Clear();
             }
@@ -717,10 +834,11 @@ namespace Unity.Entities.Content
 #if ENABLE_PROFILER
             RuntimeContentManagerProfiler.ExitProcessCommands();
             if (UnityEngine.Profiling.Profiler.enabled)
-                new FunctionPointer<SendProfilerFrameDataManagedDelegate>(s_SendProfilerFrameDataManagedTrampoline.Data).Invoke();
+                new FunctionPointer<SendProfilerFrameDataManagedDelegate>(
+                    s_SendProfilerFrameDataManagedTrampoline.Data
+                ).Invoke();
 #endif
         }
-
 
         //used by tests
         [ExcludeFromBurstCompatTesting("ActiveObjects is static and not shared")]
@@ -735,7 +853,7 @@ namespace Unity.Entities.Content
 
         //used by tests
         [ExcludeFromBurstCompatTesting("ActiveObjects is static and not shared")]
-        internal unsafe static int UnfinishedObjectLoads()
+        internal static unsafe int UnfinishedObjectLoads()
         {
             int count = SharedStaticObjectLoadQueue.Data.Length;
             foreach (var a in ActiveObjects)
@@ -746,7 +864,7 @@ namespace Unity.Entities.Content
 
         //used by tests
         [ExcludeFromBurstCompatTesting("SharedStaticLoadingObjects is static and not shared")]
-        internal unsafe static int LoadingObjectsCount()
+        internal static unsafe int LoadingObjectsCount()
         {
             return SharedStaticLoadingObjects.Data.Length;
         }
@@ -769,7 +887,11 @@ namespace Unity.Entities.Content
         }
 
         [ExcludeFromBurstCompatTesting("References static data")]
-        static void LoadActiveDependencySet(int depIndex, in UnsafeList<ContentFileId> deps, out ActiveDependencySet activeDepSet)
+        static void LoadActiveDependencySet(
+            int depIndex,
+            in UnsafeList<ContentFileId> deps,
+            out ActiveDependencySet activeDepSet
+        )
         {
             activeDepSet = ActiveDependencySets[depIndex];
             if (activeDepSet.ReferenceCount == 0)
@@ -792,17 +914,30 @@ namespace Unity.Entities.Content
         }
 
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
-        unsafe static ActiveFile LoadFile(ContentFileId fileId)
+        static unsafe ActiveFile LoadFile(ContentFileId fileId)
         {
 #if ENABLE_CONTENT_DIAGNOSTICS
             LogFunc?.Invoke($"Loading file {fileId}");
 #endif
             if (!ActiveFiles.TryGetValue(fileId, out var activeFile))
             {
-                if (!Catalog.TryGetFileLocation(fileId, out string filePath, out var deps, out var archiveId, out var depIndex))
+                if (
+                    !Catalog.TryGetFileLocation(
+                        fileId,
+                        out string filePath,
+                        out var deps,
+                        out var archiveId,
+                        out var depIndex
+                    )
+                )
                     throw new Exception($"Invalid file location: {fileId}");
 
-                activeFile = new ActiveFile() { ContentFileId = fileId, ArchiveId = archiveId, ReferenceCount = 1 };
+                activeFile = new ActiveFile()
+                {
+                    ContentFileId = fileId,
+                    ArchiveId = archiveId,
+                    ReferenceCount = 1,
+                };
                 LoadActiveDependencySet(depIndex, in deps, out var activeDepSet);
 
                 var activeArchive = archiveId.IsValid ? LoadArchive(archiveId) : default;
@@ -810,7 +945,13 @@ namespace Unity.Entities.Content
                 LogFunc?.Invoke($"Starting file load for {fileId}");
 #endif
                 if (fileId.IsValid && !string.IsNullOrEmpty(filePath) && archiveId.IsValid)
-                    activeFile.File = ContentLoadInterface.LoadContentFileAsync(Namespace, filePath, activeDepSet.Files.Ptr, activeDepSet.Files.Length, activeArchive.Archive.JobHandle);
+                    activeFile.File = ContentLoadInterface.LoadContentFileAsync(
+                        Namespace,
+                        filePath,
+                        activeDepSet.Files.Ptr,
+                        activeDepSet.Files.Length,
+                        activeArchive.Archive.JobHandle
+                    );
                 ActiveFiles.TryAdd(fileId, activeFile);
 #if ENABLE_PROFILER
                 RuntimeContentManagerProfiler.RecordLoadFile();
@@ -891,7 +1032,7 @@ namespace Unity.Entities.Content
         /// <param name="count">The number of objects in the array.</param>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public unsafe static void ReleaseObjects(UntypedWeakReferenceId* pObjectIds, int count)
+        public static unsafe void ReleaseObjects(UntypedWeakReferenceId* pObjectIds, int count)
         {
             SharedStaticObjectReleaseQueue.Data.Produce(pObjectIds, count);
         }
@@ -903,7 +1044,7 @@ namespace Unity.Entities.Content
         /// <param name="count">The number of objects in the array.</param>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public unsafe static void LoadObjectsAsync(UntypedWeakReferenceId *pObjectIds, int count)
+        public static unsafe void LoadObjectsAsync(UntypedWeakReferenceId* pObjectIds, int count)
         {
             SharedStaticObjectLoadQueue.Data.Produce(pObjectIds, count);
             SharedStaticObjectValueCache.Data.AddEntries(pObjectIds, count);
@@ -915,7 +1056,7 @@ namespace Unity.Entities.Content
         /// <param name="objectId">The id of the object.</param>
         /// <returns>True if the process started, false if any errors are encountered.</returns>
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
-        private unsafe static bool LoadObjectImpl(in UntypedWeakReferenceId objectId)
+        private static unsafe bool LoadObjectImpl(in UntypedWeakReferenceId objectId)
         {
 #if ENABLE_PROFILER
             RuntimeContentManagerProfiler.RecordLoadObjectRequest();
@@ -954,7 +1095,13 @@ namespace Unity.Entities.Content
                 if (fileId.IsValid)
                     LoadFile(fileId);
 
-                activeObject = new ActiveObject() { ObjectReferenceId = objectId, LocalIdentifierInFile = localFileId, ContentFileId = fileId, ReferenceCount = 1 };
+                activeObject = new ActiveObject()
+                {
+                    ObjectReferenceId = objectId,
+                    LocalIdentifierInFile = localFileId,
+                    ContentFileId = fileId,
+                    ReferenceCount = 1,
+                };
                 ActiveObjects.TryAdd(objectId, activeObject);
 #if ENABLE_PROFILER
                 RuntimeContentManagerProfiler.RecordLoadObject();
@@ -975,7 +1122,7 @@ namespace Unity.Entities.Content
         /// </summary>
         /// <param name="objectId">The object id to release.</param>
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
-        private unsafe static bool ReleaseObjectImpl(UntypedWeakReferenceId objectId)
+        private static unsafe bool ReleaseObjectImpl(UntypedWeakReferenceId objectId)
         {
 #if ENABLE_PROFILER
             RuntimeContentManagerProfiler.RecordReleaseObjectRequest();
@@ -998,10 +1145,13 @@ namespace Unity.Entities.Content
                 LogFunc?.Invoke($"Removing object {activeObject.ObjectReferenceId}");
 #endif
                 ActiveObjects.Remove(objectId);
-                if (SharedStaticObjectValueCache.Data.RemoveEntry(objectId, out var status) && status < ObjectLoadingStatus.Completed)
+                if (
+                    SharedStaticObjectValueCache.Data.RemoveEntry(objectId, out var status)
+                    && status < ObjectLoadingStatus.Completed
+                )
                 {
                     //the object has not completed loading so we need to remove it from the loading objects list
-                    for (int i = 0; i < SharedStaticLoadingObjects.Data.Length;i++)
+                    for (int i = 0; i < SharedStaticLoadingObjects.Data.Length; i++)
                     {
                         if (SharedStaticLoadingObjects.Data[i] == objectId)
                         {
@@ -1032,7 +1182,6 @@ namespace Unity.Entities.Content
             return true;
         }
 
-
         /// <summary>
         /// Loads a GameObject based scene.
         /// </summary>
@@ -1040,13 +1189,13 @@ namespace Unity.Entities.Content
         /// <param name="loadParams">Parameters to control how the scene is loaded.</param>
         /// <returns>The scene that was requested to load.  This scene may not be loaded at this point.</returns>
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
-        unsafe public static Scene LoadSceneAsync(UntypedWeakReferenceId sceneId, ContentSceneParameters loadParams)
+        public static unsafe Scene LoadSceneAsync(UntypedWeakReferenceId sceneId, ContentSceneParameters loadParams)
         {
 #if ENABLE_CONTENT_DIAGNOSTICS
             LogFunc?.Invoke($"Loading scene {sceneId}");
 #endif
 #if ENABLE_PROFILER
-                RuntimeContentManagerProfiler.RecordLoadSceneRequest();
+            RuntimeContentManagerProfiler.RecordLoadSceneRequest();
 #endif
             if (!Catalog.TryGetSceneLocation(sceneId, out var fileId, out var sceneName))
             {
@@ -1057,21 +1206,34 @@ namespace Unity.Entities.Content
 #endif
             }
 
-            if (!Catalog.TryGetFileLocation(fileId, out string filePath, out var deps, out var archiveId, out var depIndex))
+            if (
+                !Catalog.TryGetFileLocation(
+                    fileId,
+                    out string filePath,
+                    out var deps,
+                    out var archiveId,
+                    out var depIndex
+                )
+            )
                 throw new Exception($"Invalid file location: {fileId} for scene {sceneId} with name '{sceneName}'.");
 
             LoadActiveDependencySet(depIndex, in deps, out var depSet);
             var archive = LoadArchive(archiveId);
 
-            var sceneFile = ContentLoadInterface.LoadSceneAsync(Namespace,
+            var sceneFile = ContentLoadInterface.LoadSceneAsync(
+                Namespace,
                 filePath,
                 sceneName,
                 loadParams,
                 depSet.Files.Ptr,
                 depSet.Files.Length,
-                archive.Archive.JobHandle);
+                archive.Archive.JobHandle
+            );
 
-            ActiveScenes.Add(sceneFile.Scene.handle.GetRawData(), new ActiveScene { SceneFile = sceneFile, SceneId = sceneId });
+            ActiveScenes.Add(
+                sceneFile.Scene.handle.GetRawData(),
+                new ActiveScene { SceneFile = sceneFile, SceneId = sceneId }
+            );
             return sceneFile.Scene;
         }
 
@@ -1088,14 +1250,20 @@ namespace Unity.Entities.Content
 #if UNITY_EDITOR
                 return OverrideLoader.IntegrateSceneAtEndOfFrame(ref scene);
 #endif
-                throw new Exception($"Unable to find scene {scene} to integrate - make sure that it has been loaded with LoadSceneAync first.");
+                throw new Exception(
+                    $"Unable to find scene {scene} to integrate - make sure that it has been loaded with LoadSceneAync first."
+                );
             }
             if (!sceneInstance.SceneFile.IsValid)
-                throw new Exception($"Invalid file for scene {scene}.  This may indicate that the build data is incorrect.");
+                throw new Exception(
+                    $"Invalid file for scene {scene}.  This may indicate that the build data is incorrect."
+                );
 
             if (sceneInstance.SceneFile.Status != SceneLoadingStatus.WaitingForIntegrate)
             {
-                Debug.LogError($"Attempting to integrate a scene that is not ready - current state is {sceneInstance.SceneFile.Status}, but needs to be {SceneLoadingStatus.WaitingForIntegrate}.");
+                Debug.LogError(
+                    $"Attempting to integrate a scene that is not ready - current state is {sceneInstance.SceneFile.Status}, but needs to be {SceneLoadingStatus.WaitingForIntegrate}."
+                );
                 return false;
             }
 
@@ -1116,14 +1284,17 @@ namespace Unity.Entities.Content
 #if UNITY_EDITOR
                 return OverrideLoader.GetSceneLoadingStatus(ref scene);
 #endif
-                throw new Exception($"Unable to find scene {scene} to check status - make sure that it has been loaded with LoadSceneAync first.");
+                throw new Exception(
+                    $"Unable to find scene {scene} to check status - make sure that it has been loaded with LoadSceneAync first."
+                );
             }
             if (!sceneInstance.SceneFile.IsValid)
-                throw new Exception($"Invalid file for scene {scene}.  This may indicate that the build data is incorrect.");
+                throw new Exception(
+                    $"Invalid file for scene {scene}.  This may indicate that the build data is incorrect."
+                );
 
             return sceneInstance.SceneFile.Status;
         }
-
 
         /// <summary>
         /// Release a scene.  If the reference count goes to zero, the scene will be unloaded.
@@ -1144,7 +1315,9 @@ namespace Unity.Entities.Content
                 OverrideLoader.UnloadScene(ref scene);
                 return;
 #endif
-                throw new Exception($"Unable to find scene {scene} to unload - make sure that it has been loaded with LoadSceneAync first.");
+                throw new Exception(
+                    $"Unable to find scene {scene} to unload - make sure that it has been loaded with LoadSceneAync first."
+                );
             }
             sceneInstance.SceneFile.UnloadAtEndOfFrame();
             scene = default;
@@ -1260,7 +1433,7 @@ namespace Unity.Entities.Content
         /// <returns>The loading status of the object.</returns>
         [BurstCompile]
         [GenerateTestsForBurstCompatibility]
-        public unsafe static ObjectLoadingStatus GetObjectLoadingStatus(in UntypedWeakReferenceId objectId)
+        public static unsafe ObjectLoadingStatus GetObjectLoadingStatus(in UntypedWeakReferenceId objectId)
         {
             return SharedStaticObjectValueCache.Data.GetLoadingStatus(objectId);
         }
@@ -1272,7 +1445,8 @@ namespace Unity.Entities.Content
         /// <param name="objectId">The object id.</param>
         /// <returns>The reference to the object.</returns>
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
-        public static TObject GetObjectValue<TObject>(UntypedWeakReferenceId objectId) where TObject : UnityEngine.Object
+        public static TObject GetObjectValue<TObject>(UntypedWeakReferenceId objectId)
+            where TObject : UnityEngine.Object
         {
             GCHandle handle = default;
             if (!GetObjectHandle(objectId, ref handle))
@@ -1287,7 +1461,7 @@ namespace Unity.Entities.Content
         /// <param name="objectId">The object id.</param>
         /// <returns>The reference to the object.</returns>
         [BurstCompile]
-        unsafe static bool GetObjectHandle(in UntypedWeakReferenceId objectId, ref GCHandle objectHandle)
+        static unsafe bool GetObjectHandle(in UntypedWeakReferenceId objectId, ref GCHandle objectHandle)
         {
             return SharedStaticObjectValueCache.Data.GetObjectHandle(objectId, ref objectHandle);
         }
@@ -1319,7 +1493,6 @@ namespace Unity.Entities.Content
             return result2 == null ? default : GCHandle.Alloc(result2);
         }
 
-
 #if UNITY_EDITOR
         internal interface IAlternativeLoader : IDisposable
         {
@@ -1350,7 +1523,9 @@ namespace Unity.Entities.Content
         /// <param name="sceneId">The id of the scene.</param>
         /// <returns>The status of the scene loading process.</returns>
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
-        [Obsolete("This property is no longer valid.  Check the loading status of the scene returned from LoadSceneAsync.")]
+        [Obsolete(
+            "This property is no longer valid.  Check the loading status of the scene returned from LoadSceneAsync."
+        )]
         public static SceneLoadingStatus GetSceneLoadingStatus(UntypedWeakReferenceId sceneId) => default;
 
         /// <summary>
@@ -1370,6 +1545,5 @@ namespace Unity.Entities.Content
         [ExcludeFromBurstCompatTesting("References managed engine API and static data")]
         [Obsolete("This property is no longer valid.  Use the scene returned from LoadAsync.")]
         public static Scene GetSceneValue(UntypedWeakReferenceId sceneId) => default;
-
     }
 }

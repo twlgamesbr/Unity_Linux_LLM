@@ -23,9 +23,12 @@ namespace Unity.Entities
             TypeManager.Initialize();
             ManagedComponentStore.CompanionReferenceTypeIndex = TypeManager.GetTypeIndex(typeof(CompanionReference));
             ManagedComponentStore.CompanionLinkTypeIndex = TypeManager.GetTypeIndex(typeof(CompanionLink));
-            ManagedComponentStore.CompanionLinkTransformTypeIndex = TypeManager.GetTypeIndex(typeof(CompanionLinkTransform));
+            ManagedComponentStore.CompanionLinkTransformTypeIndex = TypeManager.GetTypeIndex(
+                typeof(CompanionLinkTransform)
+            );
             ManagedComponentStore.InstantiateCompanionComponent = InstantiateCompanionComponentDelegate;
-            ManagedComponentStore.AssignCompanionComponentsToCompanionGameObjects = AssignCompanionComponentsToCompanionGameObjectsDelegate;
+            ManagedComponentStore.AssignCompanionComponentsToCompanionGameObjects =
+                AssignCompanionComponentsToCompanionGameObjectsDelegate;
         }
 
         /// <summary>
@@ -38,20 +41,30 @@ namespace Unity.Entities
         /// <param name="dstArray">Array of destination managed component indices. One per <paramref name="componentCount"/>*<paramref name="instanceCount"/>. All indices for the first component stored first etc.</param>
         /// <param name="instanceCount">Number of instances being created</param>
         /// <param name="managedComponentStore">Managed Store that owns the instances we create</param>
-        static void InstantiateCompanionComponentDelegate(int* srcArray, int componentCount, Entity* dstEntities, int* dstCompanionLinkIndices, EntityId* dstComponentLinkIds, int* dstArray, int instanceCount, ManagedComponentStore managedComponentStore)
+        static void InstantiateCompanionComponentDelegate(
+            int* srcArray,
+            int componentCount,
+            Entity* dstEntities,
+            int* dstCompanionLinkIndices,
+            EntityId* dstComponentLinkIds,
+            int* dstArray,
+            int instanceCount,
+            ManagedComponentStore managedComponentStore
+        )
         {
             if (dstCompanionLinkIndices != null)
             {
                 var dstCompanionGameObjects = new GameObject[instanceCount];
                 for (int i = 0; i < instanceCount; ++i)
                 {
-                    var companionLink = (CompanionReference)managedComponentStore.GetManagedComponent(dstCompanionLinkIndices[i]);
+                    var companionLink = (CompanionReference)
+                        managedComponentStore.GetManagedComponent(dstCompanionLinkIndices[i]);
                     // Update referenced EntityId ID
                     companionLink.Companion.Id.entityId = dstComponentLinkIds[i];
                     dstCompanionGameObjects[i] = companionLink.Companion;
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     CompanionGameObjectUtility.SetCompanionName(dstEntities[i], dstCompanionGameObjects[i]);
-                    #endif
+#endif
                 }
 
                 for (int src = 0; src < componentCount; ++src)
@@ -81,7 +94,10 @@ namespace Unity.Entities
             }
         }
 
-        static void AssignCompanionComponentsToCompanionGameObjectsDelegate(EntityManager entityManager, NativeArray<Entity> entities)
+        static void AssignCompanionComponentsToCompanionGameObjectsDelegate(
+            EntityManager entityManager,
+            NativeArray<Entity> entities
+        )
         {
             for (int i = 0; i < entities.Length; ++i)
             {
@@ -106,7 +122,11 @@ namespace Unity.Entities
                         continue;
 
                     var companionComponent = companionGameObject.GetComponent(type.Type);
-                    entityManager.SetComponentObject(entity, ComponentType.FromTypeIndex(type.TypeIndex), companionComponent);
+                    entityManager.SetComponentObject(
+                        entity,
+                        ComponentType.FromTypeIndex(type.TypeIndex),
+                        companionComponent
+                    );
                 }
             }
 

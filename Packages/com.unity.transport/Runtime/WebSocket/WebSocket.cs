@@ -13,7 +13,11 @@ namespace Unity.Networking.Transport
         static void Warn(string msg) => UnityEngine.Debug.LogWarning(msg);
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
-        static void WarnIf(bool condition, string msg) { if (condition) UnityEngine.Debug.LogWarning(msg); }
+        static void WarnIf(bool condition, string msg)
+        {
+            if (condition)
+                UnityEngine.Debug.LogWarning(msg);
+        }
 
         public enum Opcode
         {
@@ -22,7 +26,7 @@ namespace Unity.Networking.Transport
             BinaryData = 2,
             Close = 8,
             Ping = 9,
-            Pong = 10
+            Pong = 10,
         }
 
         public enum StatusCode
@@ -50,12 +54,18 @@ namespace Unity.Networking.Transport
             Client = 1, // outgoing (active) connection
         }
 
-        public static unsafe void Connect(ref Buffer buffer, ref NetworkEndpoint remoteEndpoint, ref Keys keys, ref FixedString128Bytes path)
+        public static unsafe void Connect(
+            ref Buffer buffer,
+            ref NetworkEndpoint remoteEndpoint,
+            ref Keys keys,
+            ref FixedString128Bytes path
+        )
         {
             FixedString32Bytes end = "\r\n";
             FixedString512Bytes handshake = "GET ";
             handshake.Append(path);
-            FixedString128Bytes headers = " HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\n";
+            FixedString128Bytes headers =
+                " HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\n";
             handshake.Append(headers);
             FixedString32Bytes key = "Sec-WebSocket-Key: ";
             handshake.Append(key);
@@ -69,13 +79,19 @@ namespace Unity.Networking.Transport
             handshake.Append(end);
 
             fixed (byte* data = buffer.Data)
-            { 
+            {
                 UnsafeUtility.MemCpy(data, handshake.GetUnsafePtr(), (uint)handshake.Length);
             }
             buffer.Length = handshake.Length;
         }
 
-        public static unsafe State Handshake(ref Buffer recvbuffer, ref Buffer sendbuffer, bool isClient, ref Keys keys, ref FixedString128Bytes path)
+        public static unsafe State Handshake(
+            ref Buffer recvbuffer,
+            ref Buffer sendbuffer,
+            bool isClient,
+            ref Keys keys,
+            ref FixedString128Bytes path
+        )
         {
             if (recvbuffer.Length == 0)
                 return State.Opening;
@@ -84,10 +100,11 @@ namespace Unity.Networking.Transport
             var complete = false;
             int length;
             for (length = 0; length < recvbuffer.Length - 3 && !complete; ++length)
-                complete = recvbuffer.Data[length] == '\r'
-                        && recvbuffer.Data[length + 1] == '\n'
-                        && recvbuffer.Data[length + 2] == '\r'
-                        && recvbuffer.Data[length + 3] == '\n';
+                complete =
+                    recvbuffer.Data[length] == '\r'
+                    && recvbuffer.Data[length + 1] == '\n'
+                    && recvbuffer.Data[length + 2] == '\r'
+                    && recvbuffer.Data[length + 3] == '\n';
 
             if (!complete)
                 return State.Opening;
@@ -106,7 +123,10 @@ namespace Unity.Networking.Transport
                     ++lineEnd;
 
                 int firstLineEnd = lineEnd;
-                var headerLookup = new NativeParallelHashMap<FixedString128Bytes, FixedString512Bytes>(8, Allocator.Temp);
+                var headerLookup = new NativeParallelHashMap<FixedString128Bytes, FixedString512Bytes>(
+                    8,
+                    Allocator.Temp
+                );
 
                 // Headers we care about.
                 FixedString128Bytes connectionHeader = "connection";
@@ -135,11 +155,15 @@ namespace Unity.Networking.Transport
 
                     int keyEnd = keyStart;
                     FixedString128Bytes key = default;
-                    
+
                     // Not allowing whitespace in keys
-                    while (recvHandshake[keyEnd] != ':' && recvHandshake[keyEnd] != ' ' 
-                        && recvHandshake[keyEnd] != '\t' && recvHandshake[keyEnd] != '\r' 
-                        && recvHandshake[keyEnd] != '\n')
+                    while (
+                        recvHandshake[keyEnd] != ':'
+                        && recvHandshake[keyEnd] != ' '
+                        && recvHandshake[keyEnd] != '\t'
+                        && recvHandshake[keyEnd] != '\r'
+                        && recvHandshake[keyEnd] != '\n'
+                    )
                     {
                         byte ch = recvHandshake[keyEnd];
                         if (ch >= (byte)'A' && ch <= (byte)'Z')
@@ -148,21 +172,25 @@ namespace Unity.Networking.Transport
                         ++keyEnd;
                     }
 
-                    var isHeaderWeCareAbout = 
-                        key == connectionHeader ||
-                        key == upgradeHeader ||
-                        key == protocolHeader ||
-                        key == extensionHeader ||
-                        key == acceptHeader ||
-                        key == hostHeader ||
-                        key == keyHeader ||
-                        key == versionHeader;
+                    var isHeaderWeCareAbout =
+                        key == connectionHeader
+                        || key == upgradeHeader
+                        || key == protocolHeader
+                        || key == extensionHeader
+                        || key == acceptHeader
+                        || key == hostHeader
+                        || key == keyHeader
+                        || key == versionHeader;
 
                     int valueStart = keyEnd;
                     while (recvHandshake[valueStart] != ':')
                     {
-                        if (recvHandshake[valueStart] != ' ' && recvHandshake[valueStart] != '\t' 
-                            && recvHandshake[valueStart] != '\r' && recvHandshake[valueStart] != '\n')
+                        if (
+                            recvHandshake[valueStart] != ' '
+                            && recvHandshake[valueStart] != '\t'
+                            && recvHandshake[valueStart] != '\r'
+                            && recvHandshake[valueStart] != '\n'
+                        )
                             break;
 
                         ++valueStart;
@@ -207,7 +235,8 @@ namespace Unity.Networking.Transport
 
                 FixedString128Bytes keyMagic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
                 FixedString512Bytes headerValue;
-                var invalidConnection = !headerLookup.TryGetValue(connectionHeader, out headerValue) || headerValue.Length < 7;
+                var invalidConnection =
+                    !headerLookup.TryGetValue(connectionHeader, out headerValue) || headerValue.Length < 7;
                 // Scan for "upgrade" in a coma separated list
                 if (!invalidConnection)
                 {
@@ -216,11 +245,23 @@ namespace Unity.Networking.Transport
                     int len = 0;
                     while ((len = headerValue.Length - upPos) >= 7)
                     {
-                        invalidConnection = ((headerValue[upPos + 0] | 32) != 'u' || (headerValue[upPos + 1] | 32) != 'p' || (headerValue[upPos + 2] | 32) != 'g' ||
-                            (headerValue[upPos + 3] | 32) != 'r' || (headerValue[upPos + 4] | 32) != 'a' || (headerValue[upPos + 5] | 32) != 'd' || (headerValue[upPos + 6] | 32) != 'e');
+                        invalidConnection = (
+                            (headerValue[upPos + 0] | 32) != 'u'
+                            || (headerValue[upPos + 1] | 32) != 'p'
+                            || (headerValue[upPos + 2] | 32) != 'g'
+                            || (headerValue[upPos + 3] | 32) != 'r'
+                            || (headerValue[upPos + 4] | 32) != 'a'
+                            || (headerValue[upPos + 5] | 32) != 'd'
+                            || (headerValue[upPos + 6] | 32) != 'e'
+                        );
                         if (!invalidConnection)
                         {
-                            if (len == 7 || headerValue[upPos + 7] == ',' || headerValue[upPos + 7] == ' ' || headerValue[upPos + 7] == '\t')
+                            if (
+                                len == 7
+                                || headerValue[upPos + 7] == ','
+                                || headerValue[upPos + 7] == ' '
+                                || headerValue[upPos + 7] == '\t'
+                            )
                                 break;
                             invalidConnection = true;
                         }
@@ -233,18 +274,40 @@ namespace Unity.Networking.Transport
                             ++upPos;
                     }
                 }
-                var invalidUpgrade = (!headerLookup.TryGetValue(upgradeHeader, out headerValue) || headerValue.Length != 9 ||
-                    (headerValue[0] | 32) != 'w' || (headerValue[1] | 32) != 'e' || (headerValue[2] | 32) != 'b' || (headerValue[3] | 32) != 's' || (headerValue[4] | 32) != 'o' || (headerValue[5] | 32) != 'c' || (headerValue[6] | 32) != 'k' || (headerValue[7] | 32) != 'e' || (headerValue[8] | 32) != 't');
-                
+                var invalidUpgrade = (
+                    !headerLookup.TryGetValue(upgradeHeader, out headerValue)
+                    || headerValue.Length != 9
+                    || (headerValue[0] | 32) != 'w'
+                    || (headerValue[1] | 32) != 'e'
+                    || (headerValue[2] | 32) != 'b'
+                    || (headerValue[3] | 32) != 's'
+                    || (headerValue[4] | 32) != 'o'
+                    || (headerValue[5] | 32) != 'c'
+                    || (headerValue[6] | 32) != 'k'
+                    || (headerValue[7] | 32) != 'e'
+                    || (headerValue[8] | 32) != 't'
+                );
+
                 // Try to parse the xpecetd handshake message: server expects HTTP UPGRADE; client expects
                 // HTTP SWITCHING PROTOCOL.
                 if (isClient)
                 {
-                    var invalidStatusLine = (firstLineEnd < 14 ||
-                        recvHandshake[0]  != 'H' || recvHandshake[1] != 'T' || recvHandshake[2]  != 'T' || recvHandshake[3]  != 'P' ||
-                        recvHandshake[4]  != '/' || recvHandshake[5] != '1' || recvHandshake[6]  != '.' || recvHandshake[7]  != '1' ||
-                        recvHandshake[8]  != ' ' || recvHandshake[9] != '1' || recvHandshake[10] != '0' || recvHandshake[11] != '1' ||
-                        recvHandshake[12] != ' ');
+                    var invalidStatusLine = (
+                        firstLineEnd < 14
+                        || recvHandshake[0] != 'H'
+                        || recvHandshake[1] != 'T'
+                        || recvHandshake[2] != 'T'
+                        || recvHandshake[3] != 'P'
+                        || recvHandshake[4] != '/'
+                        || recvHandshake[5] != '1'
+                        || recvHandshake[6] != '.'
+                        || recvHandshake[7] != '1'
+                        || recvHandshake[8] != ' '
+                        || recvHandshake[9] != '1'
+                        || recvHandshake[10] != '0'
+                        || recvHandshake[11] != '1'
+                        || recvHandshake[12] != ' '
+                    );
 
                     if (invalidStatusLine)
                     {
@@ -254,14 +317,25 @@ namespace Unity.Networking.Transport
 
                     FixedString512Bytes wsKey;
 
-                    if (invalidConnection || invalidUpgrade || headerLookup.ContainsKey(protocolHeader) ||
-                        headerLookup.ContainsKey(extensionHeader) || !headerLookup.TryGetValue(acceptHeader, out wsKey))
+                    if (
+                        invalidConnection
+                        || invalidUpgrade
+                        || headerLookup.ContainsKey(protocolHeader)
+                        || headerLookup.ContainsKey(extensionHeader)
+                        || !headerLookup.TryGetValue(acceptHeader, out wsKey)
+                    )
                     {
                         WarnIf(invalidConnection, "Received handshake with invalid or missing Connection key.");
                         WarnIf(invalidUpgrade, "Received handshake with invalid or missing Upgrade key.");
-                        WarnIf(headerLookup.ContainsKey(protocolHeader), "Received handshake with a subprotocol != null.");
+                        WarnIf(
+                            headerLookup.ContainsKey(protocolHeader),
+                            "Received handshake with a subprotocol != null."
+                        );
                         WarnIf(headerLookup.ContainsKey(extensionHeader), "Received handshake with an extension.");
-                        WarnIf (!headerLookup.ContainsKey(acceptHeader), "Received handshake with a missing sec-websocket-accept key.");
+                        WarnIf(
+                            !headerLookup.ContainsKey(acceptHeader),
+                            "Received handshake with a missing sec-websocket-accept key."
+                        );
 
                         return State.Closed;
                     }
@@ -277,21 +351,43 @@ namespace Unity.Networking.Transport
                     {
                         Warn("Received handshake with incorrect sec-websocket-accept.");
                         return State.Closed;
-                    }                 
+                    }
                 }
                 else
                 {
                     FixedString512Bytes handshake;
-                    var invalidRequestLine = (firstLineEnd < 14 || recvHandshake[0] != 'G' || recvHandshake[1] != 'E' || recvHandshake[2] != 'T' || recvHandshake[3] != ' ' ||
-                        recvHandshake[firstLineEnd - 9] != ' ' ||
-                        recvHandshake[firstLineEnd - 8] != 'H' || recvHandshake[firstLineEnd - 7] != 'T' || recvHandshake[firstLineEnd - 6] != 'T' || recvHandshake[firstLineEnd - 5] != 'P' ||
-                        recvHandshake[firstLineEnd - 4] != '/' || recvHandshake[firstLineEnd - 3] != '1' || recvHandshake[firstLineEnd - 2] != '.' || recvHandshake[firstLineEnd - 1] != '1');
+                    var invalidRequestLine = (
+                        firstLineEnd < 14
+                        || recvHandshake[0] != 'G'
+                        || recvHandshake[1] != 'E'
+                        || recvHandshake[2] != 'T'
+                        || recvHandshake[3] != ' '
+                        || recvHandshake[firstLineEnd - 9] != ' '
+                        || recvHandshake[firstLineEnd - 8] != 'H'
+                        || recvHandshake[firstLineEnd - 7] != 'T'
+                        || recvHandshake[firstLineEnd - 6] != 'T'
+                        || recvHandshake[firstLineEnd - 5] != 'P'
+                        || recvHandshake[firstLineEnd - 4] != '/'
+                        || recvHandshake[firstLineEnd - 3] != '1'
+                        || recvHandshake[firstLineEnd - 2] != '.'
+                        || recvHandshake[firstLineEnd - 1] != '1'
+                    );
                     FixedString512Bytes wsKey;
-                    var invalidVersion = (!headerLookup.TryGetValue(versionHeader, out headerValue) || headerValue.Length != 2 ||
-                        headerValue[0] != '1' || headerValue[1] != '3');
+                    var invalidVersion = (
+                        !headerLookup.TryGetValue(versionHeader, out headerValue)
+                        || headerValue.Length != 2
+                        || headerValue[0] != '1'
+                        || headerValue[1] != '3'
+                    );
                     var invalidKey = (!headerLookup.TryGetValue(keyHeader, out wsKey) || wsKey.Length != 24);
-                    if (invalidRequestLine || !headerLookup.ContainsKey(hostHeader) || invalidKey ||
-                        invalidVersion || invalidConnection || invalidUpgrade)
+                    if (
+                        invalidRequestLine
+                        || !headerLookup.ContainsKey(hostHeader)
+                        || invalidKey
+                        || invalidVersion
+                        || invalidConnection
+                        || invalidUpgrade
+                    )
                     {
                         WarnIf(invalidRequestLine, "Received handshake with invalid http request line.");
                         WarnIf(invalidVersion, "Received handshake with invalid or missing sec-websocket-version key.");
@@ -304,21 +400,26 @@ namespace Unity.Networking.Transport
                         handshake = "HTTP/1.1 400 Bad Request\r\nSec-WebSocket-Version: 13\r\n\r\n";
                         if (sendbuffer.Available >= handshake.Length)
                         {
-                            fixed(byte* destination = sendbuffer.Data)
-                                UnsafeUtility.MemCpy(destination + sendbuffer.Length, handshake.GetUnsafePtr(), handshake.Length);
+                            fixed (byte* destination = sendbuffer.Data)
+                                UnsafeUtility.MemCpy(
+                                    destination + sendbuffer.Length,
+                                    handshake.GetUnsafePtr(),
+                                    handshake.Length
+                                );
                             sendbuffer.Length += handshake.Length;
                         }
                         else
                         {
                             Warn("Insufficient send buffer.");
                         }
-                           
+
                         return State.Closed;
                     }
 
                     // Check that path is the one expected.
-                    var pathValid = firstLineEnd == 13 + path.Length &&
-                        UnsafeUtility.MemCmp(recvHandshake + 4, path.GetUnsafePtr(), path.Length) == 0;
+                    var pathValid =
+                        firstLineEnd == 13 + path.Length
+                        && UnsafeUtility.MemCmp(recvHandshake + 4, path.GetUnsafePtr(), path.Length) == 0;
                     if (!pathValid)
                     {
                         Warn("Received handshake with an incorrect resource name.");
@@ -326,8 +427,12 @@ namespace Unity.Networking.Transport
                         handshake = "HTTP/1.1 404 Not Found\r\n\r\n";
                         if (sendbuffer.Available >= handshake.Length)
                         {
-                            fixed(byte* destination = sendbuffer.Data)
-                                UnsafeUtility.MemCpy(destination + sendbuffer.Length, handshake.GetUnsafePtr(), handshake.Length);
+                            fixed (byte* destination = sendbuffer.Data)
+                                UnsafeUtility.MemCpy(
+                                    destination + sendbuffer.Length,
+                                    handshake.GetUnsafePtr(),
+                                    handshake.Length
+                                );
                             sendbuffer.Length += handshake.Length;
                         }
                         else
@@ -349,8 +454,12 @@ namespace Unity.Networking.Transport
                     handshake.Append(end);
                     if (sendbuffer.Available >= handshake.Length)
                     {
-                        fixed(byte* destination = sendbuffer.Data)
-                            UnsafeUtility.MemCpy(destination + sendbuffer.Length, handshake.GetUnsafePtr(), handshake.Length);
+                        fixed (byte* destination = sendbuffer.Data)
+                            UnsafeUtility.MemCpy(
+                                destination + sendbuffer.Length,
+                                handshake.GetUnsafePtr(),
+                                handshake.Length
+                            );
                         sendbuffer.Length += handshake.Length;
                     }
                     else
@@ -370,14 +479,18 @@ namespace Unity.Networking.Transport
                     UnsafeUtility.MemMove(data, data + length, pending);
                 recvbuffer.Length = pending;
             }
-                               
+
             return State.Open;
         }
 
         public static unsafe bool Close(ref Buffer buffer, StatusCode status, bool useMask, uint mask)
         {
             var start = buffer.Length;
-            var code = (ushort)(BitConverter.IsLittleEndian ? (((ushort)status & 0xFF) << 8) | (((ushort)status >> 8) & 0xFF) : (ushort)status);
+            var code = (ushort)(
+                BitConverter.IsLittleEndian
+                    ? (((ushort)status & 0xFF) << 8) | (((ushort)status >> 8) & 0xFF)
+                    : (ushort)status
+            );
             if (Binary(ref buffer, &code, sizeof(ushort), useMask, mask))
             {
                 buffer.Data[start] = 0x88;
@@ -421,7 +534,7 @@ namespace Unity.Networking.Transport
                 offset -= headerLen;
                 length += headerLen;
                 if (useMask)
-                {                           
+                {
                     var maskBytes = destination - 4;
                     for (int i = 0; i < length; i++)
                         destination[i] ^= maskBytes[i & 3];
@@ -431,12 +544,12 @@ namespace Unity.Networking.Transport
             }
 
             return false;
-        }          
+        }
 
         private static unsafe bool Binary(ref Buffer buffer, void* payload, int payloadLen, bool useMask, uint mask)
         {
             var padding = HeaderLen(payloadLen, useMask);
-            fixed(byte* ptr = buffer.Data)
+            fixed (byte* ptr = buffer.Data)
             {
                 var destination = ptr + buffer.Length;
                 var capacity = buffer.Available;
@@ -478,9 +591,16 @@ namespace Unity.Networking.Transport
             return totalHeaderLen;
         }
 
-        private static unsafe int Header(byte* destination, int padding, int capacity, int payloadLen, bool useMask, uint mask)
+        private static unsafe int Header(
+            byte* destination,
+            int padding,
+            int capacity,
+            int payloadLen,
+            bool useMask,
+            uint mask
+        )
         {
-            int totalHeaderLen = HeaderLen(payloadLen, useMask);                
+            int totalHeaderLen = HeaderLen(payloadLen, useMask);
             if (capacity < padding || capacity < totalHeaderLen + payloadLen || totalHeaderLen > padding)
                 return 0;
 
@@ -488,7 +608,7 @@ namespace Unity.Networking.Transport
 
             // fin + binary
             *destination++ = 0x82;
-            (int maskLen, byte maskFlag)  = useMask ? (4, (byte)0x80) : (0, (byte)0);
+            (int maskLen, byte maskFlag) = useMask ? (4, (byte)0x80) : (0, (byte)0);
             if (payloadLen < 126)
             {
                 *destination++ = (byte)(maskFlag | payloadLen);
@@ -551,7 +671,7 @@ namespace Unity.Networking.Transport
             public int Length;
             public int Available => Capacity - Length;
         }
-                    
+
         public struct Settings
         {
             public FixedString128Bytes Path;
@@ -703,15 +823,15 @@ namespace Unity.Networking.Transport
             private uint h2;
             private uint h3;
             private uint h4;
-        }           
+        }
 
         static unsafe void GenerateBase64Key(out FixedString32Bytes key, ref Keys keys)
         {
             key = default;
             AppendBase64(ref key, (byte)(keys.Key[0] >> 24), (byte)(keys.Key[0] >> 16), (byte)(keys.Key[0] >> 8));
-            AppendBase64(ref key, (byte)(keys.Key[0]),       (byte)(keys.Key[1] >> 24), (byte)(keys.Key[1] >> 16));
-            AppendBase64(ref key, (byte)(keys.Key[1] >> 8),  (byte)(keys.Key[1]),       (byte)(keys.Key[2] >> 24));
-            AppendBase64(ref key, (byte)(keys.Key[2] >> 16), (byte)(keys.Key[2] >> 8),  (byte)(keys.Key[2]));
+            AppendBase64(ref key, (byte)(keys.Key[0]), (byte)(keys.Key[1] >> 24), (byte)(keys.Key[1] >> 16));
+            AppendBase64(ref key, (byte)(keys.Key[1] >> 8), (byte)(keys.Key[1]), (byte)(keys.Key[2] >> 24));
+            AppendBase64(ref key, (byte)(keys.Key[2] >> 16), (byte)(keys.Key[2] >> 8), (byte)(keys.Key[2]));
             AppendBase64(ref key, (byte)(keys.Key[3] >> 24), (byte)(keys.Key[3] >> 16), (byte)(keys.Key[3] >> 8));
             AppendBase64(ref key, (byte)(keys.Key[3]));
         }
@@ -762,7 +882,7 @@ namespace Unity.Networking.Transport
             else if (val == 62)
                 return (byte)'+';
             return (byte)'/';
-        }            
+        }
     }
 }
 #endif

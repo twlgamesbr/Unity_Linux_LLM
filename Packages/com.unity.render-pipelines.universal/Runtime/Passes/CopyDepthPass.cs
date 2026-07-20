@@ -38,9 +38,19 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <param name="copyResolvedDepth">Deprecated, the parameter is ignored. This is now automatically derived from the source and destination TextureHandle.</param>
         /// <param name="customPassName">An optional custom profiling name to disambiguate multiple copy passes.</param>
         /// <seealso cref="RenderPassEvent"/>
-        public CopyDepthPass(RenderPassEvent evt, Shader copyDepthShader, bool shouldClear = false, bool copyToDepth = false, bool copyResolvedDepth = false, string customPassName = null)
+        public CopyDepthPass(
+            RenderPassEvent evt,
+            Shader copyDepthShader,
+            bool shouldClear = false,
+            bool copyToDepth = false,
+            bool copyResolvedDepth = false,
+            string customPassName = null
+        )
         {
-            profilingSampler = customPassName != null ? new ProfilingSampler(customPassName) : ProfilingSampler.Get(URPProfileId.CopyDepth);
+            profilingSampler =
+                customPassName != null
+                    ? new ProfilingSampler(customPassName)
+                    : ProfilingSampler.Get(URPProfileId.CopyDepth);
             m_CopyDepthMaterial = copyDepthShader != null ? CoreUtils.CreateEngineMaterial(copyDepthShader) : null;
             renderPassEvent = evt;
             CopyToDepthXR = false;
@@ -51,10 +61,7 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// </summary>
         /// <param name="source">Source Render Target</param>
         /// <param name="destination">Destination Render Target</param>
-        public void Setup(RTHandle source, RTHandle destination)
-        {
-
-        }
+        public void Setup(RTHandle source, RTHandle destination) { }
 
         /// <summary>
         /// Cleans up resources used by the pass.
@@ -81,7 +88,10 @@ namespace UnityEngine.Rendering.Universal.Internal
 
             if (copyDepthMaterial == null)
             {
-                Debug.LogErrorFormat("Missing {0}. Copy Depth render pass will not execute. Check for missing reference in the renderer resources.", copyDepthMaterial);
+                Debug.LogErrorFormat(
+                    "Missing {0}. Copy Depth render pass will not execute. Check for missing reference in the renderer resources.",
+                    copyDepthMaterial
+                );
                 return;
             }
 
@@ -144,7 +154,14 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <param name="source"><c>TextureHandle</c> of the source it will copy from.</param>
         /// <param name="bindAsCameraDepth">If this is true, the destination texture is bound as _CameraDepthTexture after the copy pass</param>
         /// <param name="passName">The pass name used for debug and identifying the pass.</param>
-        public void Render(RenderGraph renderGraph, ContextContainer frameData, TextureHandle destination, TextureHandle source, bool bindAsCameraDepth = false, string passName = "Copy Depth")
+        public void Render(
+            RenderGraph renderGraph,
+            ContextContainer frameData,
+            TextureHandle destination,
+            TextureHandle source,
+            bool bindAsCameraDepth = false,
+            string passName = "Copy Depth"
+        )
         {
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
@@ -161,7 +178,15 @@ namespace UnityEngine.Rendering.Universal.Internal
         /// <param name="cameraData">Camera settings for the current frame.</param>
         /// <param name="bindAsCameraDepth">If this is true, the destination texture is bound as _CameraDepthTexture after the copy pass</param>
         /// <param name="passName">The pass name used for debug and identifying the pass.</param>
-        public void Render(RenderGraph renderGraph, TextureHandle destination, TextureHandle source, UniversalResourceData resourceData, UniversalCameraData cameraData, bool bindAsCameraDepth = false, string passName = "Copy Depth")
+        public void Render(
+            RenderGraph renderGraph,
+            TextureHandle destination,
+            TextureHandle source,
+            UniversalResourceData resourceData,
+            UniversalCameraData cameraData,
+            bool bindAsCameraDepth = false,
+            string passName = "Copy Depth"
+        )
         {
             Debug.Assert(source.IsValid(), "CopyDepthPass source is not a valid texture.");
             Debug.Assert(destination.IsValid(), "CopyDepthPass destination is not a valid texture.");
@@ -175,11 +200,15 @@ namespace UnityEngine.Rendering.Universal.Internal
             var canUseResolvedDepth = !sourceDesc.bindTextureMS && RenderingUtils.MultisampleDepthResolveSupported();
             var canSampleMSAADepth = sourceDesc.bindTextureMS && SystemInfo.supportsMultisampledTextures != 0;
 
-            Debug.Assert(!hasMSAA || canUseResolvedDepth || canSampleMSAADepth || !dstHasDepthFormat
-                , "Can't copy depth to destination with depth format due to MSAA and platform/API limitations: no resolved depth resource (bindMS), depth resolve unsupported, and MSAA depth sampling unsupported.");
+            Debug.Assert(
+                !hasMSAA || canUseResolvedDepth || canSampleMSAADepth || !dstHasDepthFormat,
+                "Can't copy depth to destination with depth format due to MSAA and platform/API limitations: no resolved depth resource (bindMS), depth resolve unsupported, and MSAA depth sampling unsupported."
+            );
 
             // Having a different pass name than profilingSampler.name is bad practice but this method was public before we cleaned up this naming
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData, profilingSampler)
+            )
             {
                 passData.copyDepthMaterial = m_CopyDepthMaterial;
                 passData.cameraData = cameraData;
@@ -214,15 +243,17 @@ namespace UnityEngine.Rendering.Universal.Internal
                         // This also makes this pass unmergeable in this case, potentially impacting performance
                         if (backBufferDesc.msaaSamples > 1)
                         {
-                            TextureHandle dummyXRRenderTarget = renderGraph.CreateTexture(new TextureDesc(backBufferDesc.width, backBufferDesc.height, false, true)
-                            {
-                                name = "XR Copy Depth Dummy Render Target",
-                                slices = backBufferDesc.volumeDepth,
-                                format = backBufferDesc.format,
-                                msaaSamples = (MSAASamples)backBufferDesc.msaaSamples,
-                                clearBuffer = false,
-                                bindTextureMS = backBufferDesc.bindMS
-                            });
+                            TextureHandle dummyXRRenderTarget = renderGraph.CreateTexture(
+                                new TextureDesc(backBufferDesc.width, backBufferDesc.height, false, true)
+                                {
+                                    name = "XR Copy Depth Dummy Render Target",
+                                    slices = backBufferDesc.volumeDepth,
+                                    format = backBufferDesc.format,
+                                    msaaSamples = (MSAASamples)backBufferDesc.msaaSamples,
+                                    clearBuffer = false,
+                                    bindTextureMS = backBufferDesc.bindMS,
+                                }
+                            );
                             builder.SetRenderAttachment(dummyXRRenderTarget, 0);
                         }
                         else
@@ -239,7 +270,11 @@ namespace UnityEngine.Rendering.Universal.Internal
                     // Also required for preview camera rendering for grid drawn with builtin RP (UUM-55171).
                     // Also required for render gizmos (UUM-91335).
                     // When MSAA is enabled with Dbuffer can cause sample count mismatches between active color and depth target; create a dummy color target to resolve. (UUM-131330)
-                    if (cameraData.isSceneViewCamera || cameraData.isPreviewCamera || UnityEditor.Handles.ShouldRenderGizmos())
+                    if (
+                        cameraData.isSceneViewCamera
+                        || cameraData.isPreviewCamera
+                        || UnityEditor.Handles.ShouldRenderGizmos()
+                    )
                     {
                         // get info for the active color
                         var activeColorInfo = renderGraph.GetRenderTargetInfo(resourceData.activeColorTexture);
@@ -250,15 +285,17 @@ namespace UnityEngine.Rendering.Universal.Internal
                         // if samples mismatch, create a dummy color RT with dest's samples
                         if (activeColorInfo.msaaSamples != destInfo.msaaSamples)
                         {
-                            TextureHandle dummyColor = renderGraph.CreateTexture(new TextureDesc(activeColorInfo.width, activeColorInfo.height, false, true)
-                            {
-                                name = "Copy Depth Editor Dummy Color",
-                                slices = activeColorInfo.volumeDepth,
-                                format = activeColorInfo.format,
-                                msaaSamples = (MSAASamples)destInfo.msaaSamples, // match the depth target
-                                clearBuffer = false,
-                                bindTextureMS = activeColorInfo.bindMS
-                            });
+                            TextureHandle dummyColor = renderGraph.CreateTexture(
+                                new TextureDesc(activeColorInfo.width, activeColorInfo.height, false, true)
+                                {
+                                    name = "Copy Depth Editor Dummy Color",
+                                    slices = activeColorInfo.volumeDepth,
+                                    format = activeColorInfo.format,
+                                    msaaSamples = (MSAASamples)destInfo.msaaSamples, // match the depth target
+                                    clearBuffer = false,
+                                    bindTextureMS = activeColorInfo.bindMS,
+                                }
+                            );
                             builder.SetRenderAttachment(dummyColor, 0);
                         }
                         else
@@ -283,11 +320,17 @@ namespace UnityEngine.Rendering.Universal.Internal
 
                 builder.AllowGlobalStateModification(true);
 
-                builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
-                {
-                    Vector4 scaleBias = RenderingUtils.GetFinalBlitScaleBias(context, data.source, data.destination);
-                    ExecutePass(context.cmd, data, data.source, scaleBias);
-                });
+                builder.SetRenderFunc(
+                    static (PassData data, RasterGraphContext context) =>
+                    {
+                        Vector4 scaleBias = RenderingUtils.GetFinalBlitScaleBias(
+                            context,
+                            data.source,
+                            data.destination
+                        );
+                        ExecutePass(context.cmd, data, data.source, scaleBias);
+                    }
+                );
             }
         }
     }

@@ -23,12 +23,20 @@ namespace Unity.Entities.Editor
             m_ComponentIcon = this.Q(className: UssClasses.ComponentView.Icon);
             m_ComponentName = this.Q<Label>(className: UssClasses.ComponentView.Name);
             m_AccessMode = this.Q<Label>(className: UssClasses.ComponentView.AccessMode);
-            this.Q(className: UssClasses.ComponentView.GoTo).RegisterCallback<MouseDownEvent, ComponentView>((evt, @this) =>
-            {
-                evt.StopPropagation();
-                Analytics.SendEditorEvent(Analytics.Window.Inspector, Analytics.EventType.RelationshipGoTo, Analytics.GoToComponentDestination);
-                ContentUtilities.ShowComponentInspectorContent(@this.m_Data.InComponentType);
-            }, this);
+            this.Q(className: UssClasses.ComponentView.GoTo)
+                .RegisterCallback<MouseDownEvent, ComponentView>(
+                    (evt, @this) =>
+                    {
+                        evt.StopPropagation();
+                        Analytics.SendEditorEvent(
+                            Analytics.Window.Inspector,
+                            Analytics.EventType.RelationshipGoTo,
+                            Analytics.GoToComponentDestination
+                        );
+                        ContentUtilities.ShowComponentInspectorContent(@this.m_Data.InComponentType);
+                    },
+                    this
+                );
 
             Update(data);
         }
@@ -49,7 +57,7 @@ namespace Unity.Entities.Editor
                     ComponentViewData.QueryOptions.Disabled => k_Disabled,
                     ComponentViewData.QueryOptions.Present => k_Present,
                     ComponentViewData.QueryOptions.Absent => k_Absent,
-                    _ => string.Empty
+                    _ => string.Empty,
                 };
             }
             else
@@ -59,20 +67,21 @@ namespace Unity.Entities.Editor
                     ComponentType.AccessMode.ReadOnly => k_ReadOnly,
                     ComponentType.AccessMode.ReadWrite => k_ReadWrite,
                     ComponentType.AccessMode.Exclude => k_Exclude,
-                    _ => string.Empty
+                    _ => string.Empty,
                 };
             }
         }
 
-        static string GetClassForKind(ComponentViewData.ComponentKind kind) => kind switch
-        {
-            ComponentViewData.ComponentKind.Tag => "tag",
-            ComponentViewData.ComponentKind.Buffer => "buffer",
-            ComponentViewData.ComponentKind.Shared => "shared",
-            ComponentViewData.ComponentKind.Chunk => "chunk",
-            ComponentViewData.ComponentKind.Managed => "managed",
-            _ => string.Empty
-        };
+        static string GetClassForKind(ComponentViewData.ComponentKind kind) =>
+            kind switch
+            {
+                ComponentViewData.ComponentKind.Tag => "tag",
+                ComponentViewData.ComponentKind.Buffer => "buffer",
+                ComponentViewData.ComponentKind.Shared => "shared",
+                ComponentViewData.ComponentKind.Chunk => "chunk",
+                ComponentViewData.ComponentKind.Managed => "managed",
+                _ => string.Empty,
+            };
 
         void UpdateIcon(ComponentViewData.ComponentKind previousKind, ComponentViewData.ComponentKind newKind)
         {

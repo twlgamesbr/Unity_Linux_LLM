@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityEngine;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using System.Text.RegularExpressions;
 #endif
-using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace Unity.Netcode.Components
@@ -31,7 +31,6 @@ namespace Unity.Netcode.Components
         [Serializable]
         internal class ComponentEntry
         {
-
             // Ignoring the naming convention in order to auto-assign element names
 #pragma warning disable IDE1006
             /// <summary>
@@ -44,7 +43,9 @@ namespace Unity.Netcode.Components
             /// <summary>
             /// When true, this component's enabled state will be the inverse of the value passed into <see cref="SetEnabled(bool)"/>.
             /// </summary>
-            [Tooltip("When enabled, this component will inversely mirror the currently applied ComponentController's enabled state.")]
+            [Tooltip(
+                "When enabled, this component will inversely mirror the currently applied ComponentController's enabled state."
+            )]
             public bool InvertEnabled;
 
             /// <summary>
@@ -56,7 +57,9 @@ namespace Unity.Netcode.Components
             /// rendering anomalies until the <see cref="Rigidbody"/> has updated the <see cref="Transform"/>.
             /// </remarks>
             [Range(0.0f, 2.0f)]
-            [Tooltip("The amount of time to delay when transitioning this component from disabled to enabled. When 0, the change is immediate.")]
+            [Tooltip(
+                "The amount of time to delay when transitioning this component from disabled to enabled. When 0, the change is immediate."
+            )]
             public float EnableDelay;
 
             /// <summary>
@@ -65,7 +68,9 @@ namespace Unity.Netcode.Components
             /// <remarks>
             /// This can be useful under scenarios where you might want to prevent a component from being disabled too early prior to making any adjustments.<br />
             /// </remarks>
-            [Tooltip("The amount of time to delay when transitioning this component from enabled to disabled. When 0, the change is immediate.")]
+            [Tooltip(
+                "The amount of time to delay when transitioning this component from enabled to disabled. When 0, the change is immediate."
+            )]
             [Range(0f, 2.0f)]
             public float DisableDelay;
 
@@ -75,7 +80,9 @@ namespace Unity.Netcode.Components
             /// <remarks>
             /// You can assign an entire <see cref="GameObject"/> to this property which will add all components attached to the <see cref="GameObject"/> and its children.
             /// </remarks>
-            [Tooltip("The component that will have its enabled status synchonized. You can drop a GameObject onto this field and all valid components will be added to the list.")]
+            [Tooltip(
+                "The component that will have its enabled status synchonized. You can drop a GameObject onto this field and all valid components will be added to the list."
+            )]
             public Object Component;
             internal PropertyInfo PropertyInfo;
 
@@ -156,7 +163,11 @@ namespace Unity.Netcode.Components
                     return TimeDeltaDelayInProgress;
                 }
 
-                internal PendingStateUpdate(ComponentEntry componentControllerEntry, bool isEnabled, float relativeTimeOffset)
+                internal PendingStateUpdate(
+                    ComponentEntry componentControllerEntry,
+                    bool isEnabled,
+                    float relativeTimeOffset
+                )
                 {
                     ComponentEntry = componentControllerEntry;
                     // If there is a pending state, then add the delay to the end of the last pending state's.
@@ -175,6 +186,7 @@ namespace Unity.Netcode.Components
                 }
             }
         }
+
         /// <summary>
         /// Determines whether the selected <see cref="Components"/>s will start enabled or disabled when spawned.
         /// </summary>
@@ -184,7 +196,9 @@ namespace Unity.Netcode.Components
         /// <summary>
         /// The list of <see cref="Components"/>s to be enabled and disabled.
         /// </summary>
-        [Tooltip("The list of components to control. You can drag and drop an entire GameObject on this to include all components.")]
+        [Tooltip(
+            "The list of components to control. You can drag and drop an entire GameObject on this to include all components."
+        )]
         [SerializeField]
         internal List<ComponentEntry> Components;
 
@@ -201,14 +215,20 @@ namespace Unity.Netcode.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsValidComponentType(Object component)
         {
-            return !(component.GetType().IsSubclassOf(typeof(NetworkBehaviour)) || component.GetType() == typeof(NetworkObject) || component.GetType() == typeof(NetworkManager));
+            return !(
+                component.GetType().IsSubclassOf(typeof(NetworkBehaviour))
+                || component.GetType() == typeof(NetworkObject)
+                || component.GetType() == typeof(NetworkManager)
+            );
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static string GetComponentNameFormatted(Object component)
         {
             // Split the class name up based on capitalization
-            var classNameDisplay = Regex.Replace(component.GetType().Name, "([A-Z])", " $1", RegexOptions.Compiled).Trim();
+            var classNameDisplay = Regex
+                .Replace(component.GetType().Name, "([A-Z])", " $1", RegexOptions.Compiled)
+                .Trim();
             return $"{component.name} ({classNameDisplay})";
         }
 
@@ -249,15 +269,21 @@ namespace Unity.Netcode.Components
 
                 if (!IsValidComponentType(Components[i].Component))
                 {
-                    Debug.LogWarning($"Removing {GetComponentNameFormatted(Components[i].Component)} since {Components[i].Component.GetType().Name} is not an allowed component type.");
+                    Debug.LogWarning(
+                        $"Removing {GetComponentNameFormatted(Components[i].Component)} since {Components[i].Component.GetType().Name} is not an allowed component type."
+                    );
                     Components.RemoveAt(i);
                     continue;
                 }
 
-                var propertyInfo = Components[i].Component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+                var propertyInfo = Components[i]
+                    .Component.GetType()
+                    .GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
                 if (propertyInfo == null || propertyInfo.PropertyType != typeof(bool))
                 {
-                    Debug.LogWarning($"{Components[i].Component.name} does not contain a public enabled property! (Removing)");
+                    Debug.LogWarning(
+                        $"{Components[i].Component.name} does not contain a public enabled property! (Removing)"
+                    );
                     Components.RemoveAt(i);
                 }
             }
@@ -276,7 +302,9 @@ namespace Unity.Netcode.Components
                         continue;
                     }
 
-                    var propertyInfo = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+                    var propertyInfo = component
+                        .GetType()
+                        .GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
                     if (propertyInfo != null && propertyInfo.PropertyType == typeof(bool))
                     {
                         var componentEntry = new ComponentEntry()
@@ -317,9 +345,7 @@ namespace Unity.Netcode.Components
         /// <remarks>
         /// The <see cref="ComponentController"/>'s Awake method is protected to assure it is invoked in the correct order.
         /// </remarks>
-        protected virtual void OnAwake()
-        {
-        }
+        protected virtual void OnAwake() { }
 
         private void Awake()
         {
@@ -340,7 +366,9 @@ namespace Unity.Netcode.Components
                     emptyEntries++;
                     continue;
                 }
-                var propertyInfo = entry.Component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+                var propertyInfo = entry
+                    .Component.GetType()
+                    .GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
                 if (propertyInfo != null && propertyInfo.PropertyType == typeof(bool))
                 {
                     entry.PropertyInfo = propertyInfo;
@@ -353,7 +381,9 @@ namespace Unity.Netcode.Components
             }
             if (emptyEntries > 0)
             {
-                NetworkLog.LogWarning($"{name} has {emptyEntries} emtpy(null) entries in the {nameof(Components)} list!");
+                NetworkLog.LogWarning(
+                    $"{name} has {emptyEntries} emtpy(null) entries in the {nameof(Components)} list!"
+                );
             }
 
             // Apply the initial state of all components this instance is controlling.
@@ -454,7 +484,6 @@ namespace Unity.Netcode.Components
 
         private CoroutineObject m_CoroutineObject = new CoroutineObject();
 
-
         private IEnumerator PendingAppliedState()
         {
             var continueProcessing = true;
@@ -497,7 +526,9 @@ namespace Unity.Netcode.Components
 
             if (!OnHasAuthority())
             {
-                Debug.Log($"[Client-{NetworkManager.LocalClientId}] Attempting to invoke {nameof(SetEnabled)} without authority!");
+                Debug.Log(
+                    $"[Client-{NetworkManager.LocalClientId}] Attempting to invoke {nameof(SetEnabled)} without authority!"
+                );
                 return;
             }
             ChangeEnabled(isEnabled);

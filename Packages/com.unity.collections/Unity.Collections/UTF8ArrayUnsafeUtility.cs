@@ -8,7 +8,6 @@ namespace Unity.Collections
     [GenerateTestsForBurstCompatibility]
     public static unsafe class UTF8ArrayUnsafeUtility
     {
-
         /// <summary>
         /// Copies a buffer of UCS-2 text. The copy is encoded as UTF-8.
         /// </summary>
@@ -19,7 +18,13 @@ namespace Unity.Collections
         /// <param name="destLength">Outputs the number of bytes written to the destination.</param>
         /// <param name="destUTF8MaxLengthInBytes">The max number of bytes that will be written to the destination buffer.</param>
         /// <returns><see cref="CopyError.None"/> if the copy fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Copy(byte *dest, out int destLength, int destUTF8MaxLengthInBytes, char *src, int srcLength)
+        public static CopyError Copy(
+            byte* dest,
+            out int destLength,
+            int destUTF8MaxLengthInBytes,
+            char* src,
+            int srcLength
+        )
         {
             var error = Unicode.Utf16ToUtf8(src, srcLength, dest, out destLength, destUTF8MaxLengthInBytes);
             if (error == ConversionError.None)
@@ -37,7 +42,13 @@ namespace Unity.Collections
         /// <param name="destLength">Outputs the number of bytes written to the destination.</param>
         /// <param name="destUTF8MaxLengthInBytes">The max number of bytes that will be written to the destination buffer.</param>
         /// <returns><see cref="CopyError.None"/> if the copy fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Copy(byte *dest, out ushort destLength, ushort destUTF8MaxLengthInBytes, char *src, int srcLength)
+        public static CopyError Copy(
+            byte* dest,
+            out ushort destLength,
+            ushort destUTF8MaxLengthInBytes,
+            char* src,
+            int srcLength
+        )
         {
             var error = Unicode.Utf16ToUtf8(src, srcLength, dest, out var temp, destUTF8MaxLengthInBytes);
             destLength = (ushort)temp;
@@ -56,7 +67,13 @@ namespace Unity.Collections
         /// <param name="destLength">Outputs the number of bytes written to the destination.</param>
         /// <param name="destUTF8MaxLengthInBytes">The max number of bytes that will be written to the destination buffer.</param>
         /// <returns><see cref="CopyError.None"/> if the copy fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Copy(byte *dest, out int destLength, int destUTF8MaxLengthInBytes, byte *src, int srcLength)
+        public static CopyError Copy(
+            byte* dest,
+            out int destLength,
+            int destUTF8MaxLengthInBytes,
+            byte* src,
+            int srcLength
+        )
         {
             var error = Unicode.Utf8ToUtf8(src, srcLength, dest, out var temp, destUTF8MaxLengthInBytes);
             destLength = temp;
@@ -75,7 +92,13 @@ namespace Unity.Collections
         /// <param name="destLength">Outputs the number of bytes written to the destination.</param>
         /// <param name="destUTF8MaxLengthInBytes">The max number of bytes that will be written to the destination buffer.</param>
         /// <returns><see cref="CopyError.None"/> if the copy fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Copy(byte *dest, out ushort destLength, ushort destUTF8MaxLengthInBytes, byte *src, ushort srcLength)
+        public static CopyError Copy(
+            byte* dest,
+            out ushort destLength,
+            ushort destUTF8MaxLengthInBytes,
+            byte* src,
+            ushort srcLength
+        )
         {
             var error = Unicode.Utf8ToUtf8(src, srcLength, dest, out var temp, destUTF8MaxLengthInBytes);
             destLength = (ushort)temp;
@@ -94,9 +117,18 @@ namespace Unity.Collections
         /// <param name="destLength">Outputs the number of chars written to the destination.</param>
         /// <param name="destUCS2MaxLengthInChars">The max number of chars that will be written to the destination buffer.</param>
         /// <returns><see cref="CopyError.None"/> if the copy fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Copy(char *dest, out int destLength, int destUCS2MaxLengthInChars, byte *src, int srcLength)
+        public static CopyError Copy(
+            char* dest,
+            out int destLength,
+            int destUCS2MaxLengthInChars,
+            byte* src,
+            int srcLength
+        )
         {
-            if (ConversionError.None == Unicode.Utf8ToUtf16(src, srcLength, dest, out destLength, destUCS2MaxLengthInChars))
+            if (
+                ConversionError.None
+                == Unicode.Utf8ToUtf16(src, srcLength, dest, out destLength, destUCS2MaxLengthInChars)
+            )
                 return CopyError.None;
             return CopyError.Truncation;
         }
@@ -111,7 +143,13 @@ namespace Unity.Collections
         /// <param name="destLength">Outputs the number of chars written to the destination.</param>
         /// <param name="destUCS2MaxLengthInChars">The max number of chars that will be written to the destination buffer.</param>
         /// <returns><see cref="CopyError.None"/> if the copy fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Copy(char *dest, out ushort destLength, ushort destUCS2MaxLengthInChars, byte *src, ushort srcLength)
+        public static CopyError Copy(
+            char* dest,
+            out ushort destLength,
+            ushort destUCS2MaxLengthInChars,
+            byte* src,
+            ushort srcLength
+        )
         {
             var error = Unicode.Utf8ToUtf16(src, srcLength, dest, out var temp, destUCS2MaxLengthInChars);
             destLength = (ushort)temp;
@@ -133,7 +171,13 @@ namespace Unity.Collections
         /// <param name="destLength">Reference to the destination buffer's length in bytes *before* the append. Will be assigned the new length *after* the append.</param>
         /// <param name="destCapacity">The destination buffer capacity in bytes.</param>
         /// <returns><see cref="FormatError.None"/> if the append fully completes. Otherwise, returns <see cref="FormatError.Overflow"/>.</returns>
-        public static FormatError AppendUTF8Bytes(byte* dest, ref int destLength, int destCapacity, byte* src, int srcLength)
+        public static FormatError AppendUTF8Bytes(
+            byte* dest,
+            ref int destLength,
+            int destCapacity,
+            byte* src,
+            int srcLength
+        )
         {
             if (destLength + srcLength > destCapacity)
                 return FormatError.Overflow;
@@ -152,9 +196,21 @@ namespace Unity.Collections
         /// <param name="destLength">Reference to the destination buffer's length in bytes *before* the append. Will be assigned the number of bytes appended.</param>
         /// <param name="destUTF8MaxLengthInBytes">The destination buffer's length in bytes. Data will not be appended past this length.</param>
         /// <returns><see cref="CopyError.None"/> if the append fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Append(byte *dest, ref ushort destLength, ushort destUTF8MaxLengthInBytes, byte *src, ushort srcLength)
+        public static CopyError Append(
+            byte* dest,
+            ref ushort destLength,
+            ushort destUTF8MaxLengthInBytes,
+            byte* src,
+            ushort srcLength
+        )
         {
-            var error = Unicode.Utf8ToUtf8(src, srcLength, dest + destLength, out var temp, destUTF8MaxLengthInBytes - destLength);
+            var error = Unicode.Utf8ToUtf8(
+                src,
+                srcLength,
+                dest + destLength,
+                out var temp,
+                destUTF8MaxLengthInBytes - destLength
+            );
             destLength += (ushort)temp;
             if (error == ConversionError.None)
                 return CopyError.None;
@@ -171,9 +227,21 @@ namespace Unity.Collections
         /// <param name="destLength">Reference to the destination buffer's length in bytes *before* the append. Will be assigned the number of bytes appended.</param>
         /// <param name="destUTF8MaxLengthInBytes">The destination buffer's length in bytes. Data will not be appended past this length.</param>
         /// <returns><see cref="CopyError.None"/> if the append fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Append(byte *dest, ref ushort destLength, ushort destUTF8MaxLengthInBytes, char *src, int srcLength)
+        public static CopyError Append(
+            byte* dest,
+            ref ushort destLength,
+            ushort destUTF8MaxLengthInBytes,
+            char* src,
+            int srcLength
+        )
         {
-            var error = Unicode.Utf16ToUtf8(src, srcLength, dest + destLength, out var temp, destUTF8MaxLengthInBytes - destLength);
+            var error = Unicode.Utf16ToUtf8(
+                src,
+                srcLength,
+                dest + destLength,
+                out var temp,
+                destUTF8MaxLengthInBytes - destLength
+            );
             destLength += (ushort)temp;
             if (error == ConversionError.None)
                 return CopyError.None;
@@ -190,9 +258,21 @@ namespace Unity.Collections
         /// <param name="destLength">Reference to the destination buffer's length in chars *before* the append. Will be assigned the number of chars appended.</param>
         /// <param name="destUCS2MaxLengthInChars">The destination buffer's length in chars. Data will not be appended past this length.</param>
         /// <returns><see cref="CopyError.None"/> if the append fully completes. Otherwise, returns <see cref="CopyError.Truncation"/>.</returns>
-        public static CopyError Append(char *dest, ref ushort destLength, ushort destUCS2MaxLengthInChars, byte *src, ushort srcLength)
+        public static CopyError Append(
+            char* dest,
+            ref ushort destLength,
+            ushort destUCS2MaxLengthInChars,
+            byte* src,
+            ushort srcLength
+        )
         {
-            var error = Unicode.Utf8ToUtf16(src, srcLength, dest + destLength, out var temp, destUCS2MaxLengthInChars - destLength);
+            var error = Unicode.Utf8ToUtf16(
+                src,
+                srcLength,
+                dest + destLength,
+                out var temp,
+                destUCS2MaxLengthInChars - destLength
+            );
             destLength += (ushort)temp;
             if (error == ConversionError.None)
                 return CopyError.None;
@@ -203,13 +283,14 @@ namespace Unity.Collections
         {
             public bool terminates;
             public int result;
+
             public Comparison(Unicode.Rune runeA, ConversionError errorA, Unicode.Rune runeB, ConversionError errorB)
             {
-                if(errorA != ConversionError.None)
+                if (errorA != ConversionError.None)
                     runeA.value = 0;
-                if(errorB != ConversionError.None)
+                if (errorB != ConversionError.None)
                     runeB.value = 0;
-                if(runeA.value != runeB.value)
+                if (runeA.value != runeB.value)
                 {
                     result = runeA.value - runeB.value;
                     terminates = true;
@@ -236,23 +317,33 @@ namespace Unity.Collections
         {
             int byteIndexA = 0;
             int byteIndexB = 0;
-            while(true)
+            while (true)
             {
-                var utf8ErrorA = Unicode.Utf8ToUcs(out var utf8RuneA, utf8BufferA,ref byteIndexA, utf8LengthInBytesA);
+                var utf8ErrorA = Unicode.Utf8ToUcs(out var utf8RuneA, utf8BufferA, ref byteIndexA, utf8LengthInBytesA);
                 var utf8ErrorB = Unicode.Utf8ToUcs(out var utf8RuneB, utf8BufferB, ref byteIndexB, utf8LengthInBytesB);
                 var comparison = new Comparison(utf8RuneA, utf8ErrorA, utf8RuneB, utf8ErrorB);
-                if(comparison.terminates)
+                if (comparison.terminates)
                     return comparison.result;
             }
         }
 
-        internal static int StrCmp(byte* utf8BufferA, int utf8LengthInBytesA, Unicode.Rune* runeBufferB, int lengthInRunesB)
+        internal static int StrCmp(
+            byte* utf8BufferA,
+            int utf8LengthInBytesA,
+            Unicode.Rune* runeBufferB,
+            int lengthInRunesB
+        )
         {
             int charIndexA = 0;
             int charIndexB = 0;
             while (true)
             {
-                var utf16ErrorA = Unicode.Utf8ToUcs(out var utf16RuneA, utf8BufferA, ref charIndexA, utf8LengthInBytesA);
+                var utf16ErrorA = Unicode.Utf8ToUcs(
+                    out var utf16RuneA,
+                    utf8BufferA,
+                    ref charIndexA,
+                    utf8LengthInBytesA
+                );
                 var errorB = Unicode.UcsToUcs(out var runeB, runeBufferB, ref charIndexB, lengthInRunesB);
                 var comparison = new Comparison(utf16RuneA, utf16ErrorA, runeB, errorB);
                 if (comparison.terminates)
@@ -270,16 +361,31 @@ namespace Unity.Collections
         /// Zero if the strings are identical.
         /// More than zero if first different code point is less in the second UTF-16 buffer.
         /// </returns>
-        public static int StrCmp(char* utf16BufferA, int utf16LengthInCharsA, char* utf16BufferB, int utf16LengthInCharsB)
+        public static int StrCmp(
+            char* utf16BufferA,
+            int utf16LengthInCharsA,
+            char* utf16BufferB,
+            int utf16LengthInCharsB
+        )
         {
             int charIndexA = 0;
             int charIndexB = 0;
-            while(true)
+            while (true)
             {
-                var utf16ErrorA = Unicode.Utf16ToUcs(out var utf16RuneA, utf16BufferA,ref charIndexA, utf16LengthInCharsA);
-                var utf16ErrorB = Unicode.Utf16ToUcs(out var utf16RuneB, utf16BufferB, ref charIndexB, utf16LengthInCharsB);
+                var utf16ErrorA = Unicode.Utf16ToUcs(
+                    out var utf16RuneA,
+                    utf16BufferA,
+                    ref charIndexA,
+                    utf16LengthInCharsA
+                );
+                var utf16ErrorB = Unicode.Utf16ToUcs(
+                    out var utf16RuneB,
+                    utf16BufferB,
+                    ref charIndexB,
+                    utf16LengthInCharsB
+                );
                 var comparison = new Comparison(utf16RuneA, utf16ErrorA, utf16RuneB, utf16ErrorB);
-                if(comparison.terminates)
+                if (comparison.terminates)
                     return comparison.result;
             }
         }
@@ -309,12 +415,12 @@ namespace Unity.Collections
         {
             int byteIndex = 0;
             int charIndex = 0;
-            while(true)
+            while (true)
             {
-                var utf8Error = Unicode.Utf8ToUcs(out var utf8Rune, utf8Buffer,ref byteIndex, utf8LengthInBytes);
+                var utf8Error = Unicode.Utf8ToUcs(out var utf8Rune, utf8Buffer, ref byteIndex, utf8LengthInBytes);
                 var utf16Error = Unicode.Utf16ToUcs(out var utf16Rune, utf16Buffer, ref charIndex, utf16LengthInChars);
                 var comparison = new Comparison(utf8Rune, utf8Error, utf16Rune, utf16Error);
-                if(comparison.terminates)
+                if (comparison.terminates)
                     return comparison.result;
             }
         }
@@ -333,6 +439,5 @@ namespace Unity.Collections
         {
             return -StrCmp(utf8Buffer, utf8LengthInBytes, utf16Buffer, utf16LengthInChars);
         }
-
     }
 }

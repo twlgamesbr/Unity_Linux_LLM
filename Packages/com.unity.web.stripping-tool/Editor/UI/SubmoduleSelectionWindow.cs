@@ -53,7 +53,6 @@ namespace Unity.Web.Stripping.Editor
 
                 return m_SelectedSubmodules;
             }
-
             set
             {
                 m_SelectedSubmodules = value;
@@ -67,6 +66,7 @@ namespace Unity.Web.Stripping.Editor
         }
 
         public delegate void SubmodulesChangedCallback(HashSet<string> selectedSubmodules);
+
         /// <summary>
         /// Raised when the selection of submodules changes.
         /// </summary>
@@ -116,7 +116,8 @@ namespace Unity.Web.Stripping.Editor
             // Hook up buttons
             root.Q<Button>("SelectAllButton").clicked += () => OnBatchSelection(true);
             root.Q<Button>("SelectNoneButton").clicked += () => OnBatchSelection(false);
-            root.Q<Button>("SetFromProfilingDataButton").clicked += () => SetSubmodulesFromProfilingDataUsingFileDialog();
+            root.Q<Button>("SetFromProfilingDataButton").clicked += () =>
+                SetSubmodulesFromProfilingDataUsingFileDialog();
             UIUtils.AddHelpButton(root.Q<Toolbar>(), k_DocumentationPage);
 
             // Load submodule definition and create hierarchy
@@ -130,20 +131,21 @@ namespace Unity.Web.Stripping.Editor
             {
                 var toggle = new Toggle();
                 toggle.name = "unity-select-submodule-toggle";
-                toggle.RegisterCallback<ChangeEvent<bool>>((evt) =>
-                {
-                    if (toggle.userData is ToggleUserData userData)
+                toggle.RegisterCallback<ChangeEvent<bool>>(
+                    (evt) =>
                     {
-                        OnSubmoduleToggleChange(userData, evt);
+                        if (toggle.userData is ToggleUserData userData)
+                        {
+                            OnSubmoduleToggleChange(userData, evt);
+                        }
                     }
-                });
+                );
 
                 return toggle;
             };
 
             // For each column, set Column.bindCell to bind an initialized node to a data item.
-            m_TreeView.columns["index"].bindCell = (VisualElement element, int index) =>
-                BindTextCell(element, index);
+            m_TreeView.columns["index"].bindCell = (VisualElement element, int index) => BindTextCell(element, index);
             m_TreeView.columns["active"].bindCell = (VisualElement element, int index) =>
                 BindSelectionCell(element, index);
 
@@ -164,11 +166,7 @@ namespace Unity.Web.Stripping.Editor
         {
             var submodule = m_TreeView.GetItemDataForIndex<SubmoduleHierarchyNode>(index);
             var toggle = element as Toggle;
-            toggle.userData = new ToggleUserData()
-            {
-                Submodule = submodule,
-                Index = index
-            };
+            toggle.userData = new ToggleUserData() { Submodule = submodule, Index = index };
             switch (submodule.State)
             {
                 case SubmoduleSelectionState.NotSelected:
@@ -209,7 +207,10 @@ namespace Unity.Web.Stripping.Editor
             m_TreeView.SetRootItems(m_TreeViewData);
         }
 
-        private void AddTreeViewItems(SubmoduleHierarchyNode parent, List<TreeViewItemData<SubmoduleHierarchyNode>> treeViewItems)
+        private void AddTreeViewItems(
+            SubmoduleHierarchyNode parent,
+            List<TreeViewItemData<SubmoduleHierarchyNode>> treeViewItems
+        )
         {
             foreach (var submodule in parent.Children)
             {
@@ -271,7 +272,12 @@ namespace Unity.Web.Stripping.Editor
             }
         }
 
-        internal enum MergeBehavior { Overwrite, Cancel, Combine }
+        internal enum MergeBehavior
+        {
+            Overwrite,
+            Cancel,
+            Combine,
+        }
 
         [ExcludeFromCodeCoverage] // File dialogs, impossible / very tricky to drive via CI
         void SetSubmodulesFromProfilingDataUsingFileDialog()
@@ -288,13 +294,14 @@ namespace Unity.Web.Stripping.Editor
                 if (!SelectedSubmodules.Any())
                     return MergeBehavior.Overwrite;
 
-                return (MergeBehavior)EditorUtility.DisplayDialogComplex(
-                    "Import Profiling Data",
-                    "Do you wish to overwrite the existing submodule selection?",
-                    "Overwrite", // 0
-                    "Cancel", // 1
-                    "Combine" // 2
-                );
+                return (MergeBehavior)
+                    EditorUtility.DisplayDialogComplex(
+                        "Import Profiling Data",
+                        "Do you wish to overwrite the existing submodule selection?",
+                        "Overwrite", // 0
+                        "Cancel", // 1
+                        "Combine" // 2
+                    );
             }
 
             SetSubmodulesFromProfilingData(path, OverwriteSelection);

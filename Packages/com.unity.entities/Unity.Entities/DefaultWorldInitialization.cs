@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Unity.Assertions;
-using UnityEngine;
 using Unity.Collections;
 using Unity.Profiling;
+using UnityEngine;
 using UnityEngine.LowLevel;
 
 namespace Unity.Entities
@@ -43,6 +43,7 @@ namespace Unity.Entities
         }
 
         internal static void CleanupEntityComponentStore(object _, EventArgs __) => CleanupEntityComponentStore();
+
         internal static void CleanupEntityComponentStore()
         {
 #if!ENTITY_STORE_V1
@@ -100,9 +101,9 @@ namespace Unity.Entities
             CleanupEntityComponentStore();
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             EntitiesJournaling.Shutdown();
-#pragma warning restore 0618            
+#pragma warning restore 0618
 #endif
 
 #if ENABLE_PROFILER
@@ -131,7 +132,7 @@ namespace Unity.Entities
 #endif
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING
-#pragma warning disable 0618            
+#pragma warning disable 0618
             EntitiesJournaling.Initialize();
 #pragma warning restore 0618
 #endif
@@ -141,10 +142,12 @@ namespace Unity.Entities
                 var bootStrap = CreateBootStrap();
                 if (bootStrap != null && bootStrap.Initialize(defaultWorldName))
                 {
-                    Assert.IsTrue(World.DefaultGameObjectInjectionWorld != null,
-                        $"ICustomBootstrap.Initialize() implementation failed to set " +
-                        $"World.DefaultGameObjectInjectionWorld, despite returning true " +
-                        $"(indicating the World has been properly initialized)");
+                    Assert.IsTrue(
+                        World.DefaultGameObjectInjectionWorld != null,
+                        $"ICustomBootstrap.Initialize() implementation failed to set "
+                            + $"World.DefaultGameObjectInjectionWorld, despite returning true "
+                            + $"(indicating the World has been properly initialized)"
+                    );
                     return World.DefaultGameObjectInjectionWorld;
                 }
             }
@@ -152,7 +155,10 @@ namespace Unity.Entities
 
             World.DefaultGameObjectInjectionWorld = world;
 
-            AddSystemToRootLevelSystemGroupsInternal(world, GetAllSystemTypeIndices(WorldSystemFilterFlags.Default, editorWorld));
+            AddSystemToRootLevelSystemGroupsInternal(
+                world,
+                GetAllSystemTypeIndices(WorldSystemFilterFlags.Default, editorWorld)
+            );
 
             ScriptBehaviourUpdateOrder.AppendWorldToCurrentPlayerLoop(world);
 
@@ -236,12 +242,17 @@ namespace Unity.Entities
         struct DefaultRootGroups : IIdentifyRootGroups
         {
             public bool IsRootGroup(SystemTypeIndex type) =>
-                type == TypeManager.GetSystemTypeIndex<InitializationSystemGroup>() ||
-                type == TypeManager.GetSystemTypeIndex<SimulationSystemGroup>() ||
-                type == TypeManager.GetSystemTypeIndex<PresentationSystemGroup>();
+                type == TypeManager.GetSystemTypeIndex<InitializationSystemGroup>()
+                || type == TypeManager.GetSystemTypeIndex<SimulationSystemGroup>()
+                || type == TypeManager.GetSystemTypeIndex<PresentationSystemGroup>();
         }
 
-        internal static unsafe void AddSystemToRootLevelSystemGroupsInternal<T>(World world, NativeList<SystemTypeIndex> systemTypesOrig, ComponentSystemGroup defaultGroup, T rootGroups)
+        internal static unsafe void AddSystemToRootLevelSystemGroupsInternal<T>(
+            World world,
+            NativeList<SystemTypeIndex> systemTypesOrig,
+            ComponentSystemGroup defaultGroup,
+            T rootGroups
+        )
             where T : struct, IIdentifyRootGroups
         {
             var managedTypes = new List<SystemTypeIndex>();
@@ -260,7 +271,7 @@ namespace Unity.Entities
             var allSystemHandlesToAdd = world.GetOrCreateSystemsAndLogException(systemTypesOrig, Allocator.Temp);
 
             // Add systems to their groups, based on the [UpdateInGroup] attribute.
-            for (int i=0; i<systemTypesOrig.Length; i++)
+            for (int i = 0; i < systemTypesOrig.Length; i++)
             {
                 SystemHandle system = allSystemHandlesToAdd[i];
 
@@ -270,8 +281,10 @@ namespace Unity.Entities
                     continue;
                 }
 
-                var updateInGroupAttributes = TypeManager.GetSystemAttributes(systemTypesOrig[i],
-                    TypeManager.SystemAttributeKind.UpdateInGroup);
+                var updateInGroupAttributes = TypeManager.GetSystemAttributes(
+                    systemTypesOrig[i],
+                    TypeManager.SystemAttributeKind.UpdateInGroup
+                );
                 if (updateInGroupAttributes.Length == 0)
                 {
                     defaultGroup.AddSystemToUpdateList(system);
@@ -288,7 +301,10 @@ namespace Unity.Entities
             }
         }
 
-        internal static void AddSystemToRootLevelSystemGroupsInternal(World world, NativeList<SystemTypeIndex> systemTypesOrig)
+        internal static void AddSystemToRootLevelSystemGroupsInternal(
+            World world,
+            NativeList<SystemTypeIndex> systemTypesOrig
+        )
         {
             using var marker = new ProfilerMarker("AddSystems").Auto();
 
@@ -296,7 +312,12 @@ namespace Unity.Entities
             var simulationSystemGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
             var presentationSystemGroup = world.GetOrCreateSystemManaged<PresentationSystemGroup>();
 
-            AddSystemToRootLevelSystemGroupsInternal(world, systemTypesOrig, simulationSystemGroup, new DefaultRootGroups());
+            AddSystemToRootLevelSystemGroupsInternal(
+                world,
+                systemTypesOrig,
+                simulationSystemGroup,
+                new DefaultRootGroups()
+            );
 
             // Update player loop
             initializationSystemGroup.SortSystems();
@@ -304,33 +325,50 @@ namespace Unity.Entities
             presentationSystemGroup.SortSystems();
         }
 
-        private static ComponentSystemGroup FindGroup(World world, SystemTypeIndex systemType, TypeManager.SystemAttribute attr)
+        private static ComponentSystemGroup FindGroup(
+            World world,
+            SystemTypeIndex systemType,
+            TypeManager.SystemAttribute attr
+        )
         {
             var groupTypeIndex = attr.TargetSystemTypeIndex;
 
             if (!TypeManager.IsSystemTypeIndex(groupTypeIndex) || !groupTypeIndex.IsGroup)
             {
-                throw new InvalidOperationException($"Invalid [{nameof(UpdateInGroupAttribute)}] attribute for {systemType}: target group must be derived from {nameof(ComponentSystemGroup)}.");
+                throw new InvalidOperationException(
+                    $"Invalid [{nameof(UpdateInGroupAttribute)}] attribute for {systemType}: target group must be derived from {nameof(ComponentSystemGroup)}."
+                );
             }
-            if ((attr.Flags & TypeManager.SystemAttribute.kOrderFirstFlag) != 0 && (attr.Flags & TypeManager.SystemAttribute.kOrderLastFlag) != 0)
+            if (
+                (attr.Flags & TypeManager.SystemAttribute.kOrderFirstFlag) != 0
+                && (attr.Flags & TypeManager.SystemAttribute.kOrderLastFlag) != 0
+            )
             {
-                throw new InvalidOperationException($"The system {systemType} can not specify both OrderFirst=true and OrderLast=true in its [{nameof(UpdateInGroupAttribute)}] attribute.");
+                throw new InvalidOperationException(
+                    $"The system {systemType} can not specify both OrderFirst=true and OrderLast=true in its [{nameof(UpdateInGroupAttribute)}] attribute."
+                );
             }
 
             var groupSys = world.GetExistingSystemManaged(groupTypeIndex);
             if (groupSys == null)
             {
                 // Warn against unexpected behaviour combining DisableAutoCreation and UpdateInGroup
-                var parentDisableAutoCreation = TypeManager.GetSystemAttributes(groupTypeIndex, TypeManager.SystemAttributeKind.DisableAutoCreation).Length > 0;
+                var parentDisableAutoCreation =
+                    TypeManager
+                        .GetSystemAttributes(groupTypeIndex, TypeManager.SystemAttributeKind.DisableAutoCreation)
+                        .Length > 0;
                 var name = TypeManager.GetSystemName(groupTypeIndex);
                 if (parentDisableAutoCreation)
                 {
-                    Debug.LogWarning($"A system {systemType} wants to execute in {name} but this group has [{nameof(DisableAutoCreationAttribute)}] and {systemType} does not. The system will not be added to any group and thus not update.");
+                    Debug.LogWarning(
+                        $"A system {systemType} wants to execute in {name} but this group has [{nameof(DisableAutoCreationAttribute)}] and {systemType} does not. The system will not be added to any group and thus not update."
+                    );
                 }
                 else
                 {
                     Debug.LogWarning(
-                        $"A system {systemType} could not be added to group {name}, because the group was not created in the world {world.Name}. Fix these errors before continuing. The system will not be added to any group and thus not update.");
+                        $"A system {systemType} could not be added to group {name}, because the group was not created in the world {world.Name}. Fix these errors before continuing. The system will not be added to any group and thus not update."
+                    );
                 }
             }
 
@@ -375,7 +413,10 @@ namespace Unity.Entities
         /// <param name="filterFlags">The filter flags to search for.</param>
         /// <param name="requireExecuteInEditor">Optionally require that [WorldSystemFilter(WorldSystemFilterFlags.Editor)] is present on the system. This is used when creating edit mode worlds.</param>
         /// <returns>The list of filtered systems</returns>
-        public static IReadOnlyList<Type> GetAllSystems(WorldSystemFilterFlags filterFlags, bool requireExecuteInEditor = false)
+        public static IReadOnlyList<Type> GetAllSystems(
+            WorldSystemFilterFlags filterFlags,
+            bool requireExecuteInEditor = false
+        )
         {
             using var marker = new ProfilerMarker("GetAllSystems").Auto();
             var indices = GetAllSystemTypeIndices(filterFlags, requireExecuteInEditor);
@@ -395,9 +436,15 @@ namespace Unity.Entities
         /// <param name="filterFlags">The filter flags to search for.</param>
         /// <param name="requireExecuteInEditor">Optionally require that [WorldSystemFilter(WorldSystemFilterFlags.Editor)] is present on the system. This is used when creating edit mode worlds.</param>
         /// <returns>The list of filtered systems</returns>
-        public static NativeList<SystemTypeIndex> GetAllSystemTypeIndices(WorldSystemFilterFlags filterFlags, bool requireExecuteInEditor = false)
+        public static NativeList<SystemTypeIndex> GetAllSystemTypeIndices(
+            WorldSystemFilterFlags filterFlags,
+            bool requireExecuteInEditor = false
+        )
         {
-            return TypeManager.GetSystemTypeIndices(filterFlags, requireExecuteInEditor ? WorldSystemFilterFlags.Editor : 0);
+            return TypeManager.GetSystemTypeIndices(
+                filterFlags,
+                requireExecuteInEditor ? WorldSystemFilterFlags.Editor : 0
+            );
         }
 
         static ICustomBootstrap CreateBootStrap()
@@ -408,7 +455,10 @@ namespace Unity.Entities
             var filteredBootstrapTypes = new List<Type>();
             foreach (var type in bootstrapTypes)
             {
-                if (type.GetCustomAttribute<DisableBootstrapOverridesAttribute>() == null && type.Assembly.GetCustomAttribute<DisableBootstrapOverridesAttribute>() == null)
+                if (
+                    type.GetCustomAttribute<DisableBootstrapOverridesAttribute>() == null
+                    && type.Assembly.GetCustomAttribute<DisableBootstrapOverridesAttribute>() == null
+                )
                     filteredBootstrapTypes.Add(type);
             }
             bootstrapTypes = filteredBootstrapTypes;
@@ -466,8 +516,6 @@ namespace Unity.Entities
     /// namespace Tests{}
     /// </code>
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class | AttributeTargets.Assembly, Inherited=false)]
-    public class DisableBootstrapOverridesAttribute : Attribute
-    {
-    }
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class | AttributeTargets.Assembly, Inherited = false)]
+    public class DisableBootstrapOverridesAttribute : Attribute { }
 }

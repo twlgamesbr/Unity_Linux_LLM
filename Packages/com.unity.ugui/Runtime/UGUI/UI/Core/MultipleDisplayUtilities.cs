@@ -12,9 +12,9 @@ namespace UnityEngine.UI
         /// <returns>Returns true except when the drag operation is not on the same display as it originated</returns>
         public static bool GetRelativeMousePositionForDrag(PointerEventData eventData, ref Vector2 position)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             position = eventData.position;
-            #else
+#else
             int pressDisplayIndex = eventData.pointerPressRaycast.displayIndex;
             var relativePosition = RelativeMouseAtScaled(eventData.position, eventData.displayIndex);
             int currentDisplayIndex = (int)relativePosition.z;
@@ -25,7 +25,7 @@ namespace UnityEngine.UI
 
             // If we are not on the main display then we must use the relative position.
             position = pressDisplayIndex != 0 ? (Vector2)relativePosition : eventData.position;
-            #endif
+#endif
             return true;
         }
 
@@ -65,7 +65,7 @@ namespace UnityEngine.UI
         /// <returns></returns>
         public static Vector3 RelativeMouseAtScaled(Vector2 position, int displayIndex)
         {
-            #if !UNITY_EDITOR && !UNITY_WSA
+#if !UNITY_EDITOR && !UNITY_WSA
             // For most platforms, if the main display is not the same resolution as the system then we will have to scale the mouse position. (case 1141732)
             var display = Display.main;
 #if ENABLE_INPUT_SYSTEM && PACKAGE_INPUTSYSTEM
@@ -112,8 +112,12 @@ namespace UnityEngine.UI
 
                 // If we are not inside of the main display then we must adjust the mouse position so it is scaled by
                 // the main display and adjusted for any padding that may have been added due to different aspect ratios.
-                if (position.y < -padding.y || position.y > sizePlusPositivePadding.y ||
-                     position.x < -padding.x || position.x > sizePlusPositivePadding.x)
+                if (
+                    position.y < -padding.y
+                    || position.y > sizePlusPositivePadding.y
+                    || position.x < -padding.x
+                    || position.x > sizePlusPositivePadding.x
+                )
                 {
                     var adjustedPosition = position;
 

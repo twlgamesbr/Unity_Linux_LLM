@@ -6,51 +6,54 @@ using UnityEngine;
 namespace Unity.Multiplayer.Tools.Adapters.MockNgo
 {
     class MockNgoAdapter
-
-        : INetworkAdapter
-
-        , IDisposable
-
-        // Events
-        // --------------------------------------------------------------------
-        , IGetConnectedClients
-
-        // Queries
-        // ----------------------------------------------------------------------------------------
-        , IGetBandwidth
-        , IGetClientId
-        , IGetGameObject
-        , IGetObjectIds
-        , IGetOwnership
-        , IGetRpcCount
+        : INetworkAdapter,
+            IDisposable
+            // Events
+            // --------------------------------------------------------------------
+            ,
+            IGetConnectedClients
+            // Queries
+            // ----------------------------------------------------------------------------------------
+            ,
+            IGetBandwidth,
+            IGetClientId,
+            IGetGameObject,
+            IGetObjectIds,
+            IGetOwnership,
+            IGetRpcCount
     {
         public delegate ClientId ClientIdProvider();
         readonly ClientIdProvider m_ClientIdProvider;
+
         public MockNgoAdapter(ClientIdProvider clientIdProvider)
         {
             m_ClientIdProvider = clientIdProvider;
             NetworkAdapters.AddAdapter(this);
         }
+
         public void Dispose()
         {
             NetworkAdapters.RemoveAdapter(this);
         }
 
-        public AdapterMetadata Metadata { get; } = new AdapterMetadata
-        {
-            PackageInfo = new PackageInfo
+        public AdapterMetadata Metadata { get; } =
+            new AdapterMetadata
             {
-                PackageName = "com.unity.multiplayer.tools.mock",
-                Version = new PackageVersion
+                PackageInfo = new PackageInfo
                 {
-                    Major = 0,
-                    Minor = 0,
-                    Patch = 0,
-                    PreRelease = ""
-                }
-            }
-        };
-        public T GetComponent<T>() where T : class, IAdapterComponent
+                    PackageName = "com.unity.multiplayer.tools.mock",
+                    Version = new PackageVersion
+                    {
+                        Major = 0,
+                        Minor = 0,
+                        Patch = 0,
+                        PreRelease = "",
+                    },
+                },
+            };
+
+        public T GetComponent<T>()
+            where T : class, IAdapterComponent
         {
             return this as T;
         }
@@ -77,6 +80,7 @@ namespace Unity.Multiplayer.Tools.Adapters.MockNgo
         Dictionary<ObjectId, BytesSentAndReceived> AdditionalBandwidth { get; } = new();
 
         int m_LastFrameCount = 0;
+
         void ClearOldData()
         {
             var frameCount = Time.frameCount;
@@ -96,7 +100,8 @@ namespace Unity.Multiplayer.Tools.Adapters.MockNgo
         void RecordNetworkTraffic(
             Dictionary<ObjectId, BytesSentAndReceived> networkTrafficCache,
             ObjectId objectId,
-            int byteCount)
+            int byteCount
+        )
         {
             ClearOldData();
             var owner = ObjectOwners[objectId];
@@ -219,7 +224,8 @@ namespace Unity.Multiplayer.Tools.Adapters.MockNgo
         public float GetBandwidthBytes(
             ObjectId objectId,
             BandwidthTypes bandwidthTypes = BandwidthTypes.All,
-            NetworkDirection networkDirection = NetworkDirection.SentAndReceived)
+            NetworkDirection networkDirection = NetworkDirection.SentAndReceived
+        )
         {
             if (OnBandwidthUpdated == null)
             {
@@ -232,23 +238,30 @@ namespace Unity.Multiplayer.Tools.Adapters.MockNgo
                 throw new NoSubscribersException(nameof(IGetBandwidth), nameof(OnBandwidthUpdated));
             }
             var total = new BytesSentAndReceived();
-            if (bandwidthTypes.ContainsAny(BandwidthTypes.Other) &&
-                AdditionalBandwidth.TryGetValue(objectId, out var additionalBandwidth))
+            if (
+                bandwidthTypes.ContainsAny(BandwidthTypes.Other)
+                && AdditionalBandwidth.TryGetValue(objectId, out var additionalBandwidth)
+            )
             {
                 total += additionalBandwidth;
             }
-            if (bandwidthTypes.ContainsAny(BandwidthTypes.NetVar) &&
-                NetVarBandwidth.TryGetValue(objectId, out var netVarBandwidth))
+            if (
+                bandwidthTypes.ContainsAny(BandwidthTypes.NetVar)
+                && NetVarBandwidth.TryGetValue(objectId, out var netVarBandwidth)
+            )
             {
                 total += netVarBandwidth;
             }
-            if (bandwidthTypes.ContainsAny(BandwidthTypes.Rpc) &&
-                RpcCallBandwidth.TryGetValue(objectId, out var rpcCallBandwidth))
+            if (
+                bandwidthTypes.ContainsAny(BandwidthTypes.Rpc)
+                && RpcCallBandwidth.TryGetValue(objectId, out var rpcCallBandwidth)
+            )
             {
                 total += rpcCallBandwidth;
             }
             return total[networkDirection];
         }
+
         public event Action OnBandwidthUpdated;
 
         // IGetClientId
@@ -271,6 +284,7 @@ namespace Unity.Multiplayer.Tools.Adapters.MockNgo
         // IGetRpcCount
         // ----------------------------------------------------------------------------------------
         public int GetRpcCount(ObjectId objectId) => RpcCallCounts.GetValueOrDefault(objectId);
+
         public event Action OnRpcCountUpdated;
 
         // IClientConnectionEvents

@@ -1,6 +1,6 @@
 using System;
-using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.InteropServices;
+using Unity.Collections.LowLevel.Unsafe;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -16,30 +16,36 @@ namespace Unity.Entities.Serialization
         /// Unknown generation type, this usually indicates that the <seealso cref="UntypedWeakReferenceId"/> has not been initialized.
         /// </summary>
         Unknown,
+
         /// <summary>
         /// Reference to an object derived from <seealso cref="UnityEngine.Object"/>.
         /// </summary>
         UnityObject,
+
         /// <summary>
         /// Texture asset for DOTS Runtime.
         /// </summary>
         Texture,
+
         /// <summary>
         /// Reference to a GameObject based scene.
         /// </summary>
         GameObjectScene,
+
         /// <summary>
         /// Reference to an Entity based scene.
         /// </summary>
         EntityScene,
+
         /// <summary>
         /// Reference to a converted prefab.
         /// </summary>
         EntityPrefab,
+
         /// <summary>
         /// Reference to a collection of referenced <seealso cref="UnityEngine.Object"/>s from a sub scene.
         /// </summary>
-        SubSceneObjectReferences
+        SubSceneObjectReferences,
     };
 
     // Workaround to be able to store UntypedWeakReferenceId in a blob.
@@ -52,6 +58,7 @@ namespace Unity.Entities.Serialization
             GlobalId = weakAssetRef.GlobalId;
             GenerationType = weakAssetRef.GenerationType;
         }
+
         public RuntimeGlobalObjectId GlobalId;
         public WeakReferenceGenerationType GenerationType;
     }
@@ -92,9 +99,19 @@ namespace Unity.Entities.Serialization
         /// <param name="localFileIdentifier">The object local identifier.</param>
         /// <param name="idType">The object type.</param>
         /// <param name="genType">The id generation type.</param>
-        public UntypedWeakReferenceId(Hash128 guid, long localFileIdentifier, int idType, WeakReferenceGenerationType genType)
+        public UntypedWeakReferenceId(
+            Hash128 guid,
+            long localFileIdentifier,
+            int idType,
+            WeakReferenceGenerationType genType
+        )
         {
-            GlobalId = new RuntimeGlobalObjectId { AssetGUID = guid, SceneObjectIdentifier0 = localFileIdentifier, IdentifierType = idType };
+            GlobalId = new RuntimeGlobalObjectId
+            {
+                AssetGUID = guid,
+                SceneObjectIdentifier0 = localFileIdentifier,
+                IdentifierType = idType,
+            };
             GenerationType = genType;
         }
 
@@ -103,7 +120,8 @@ namespace Unity.Entities.Serialization
         /// </summary>
         /// <param name="other">The id to compare to.</param>
         /// <returns>True if the GenerationType and GlobalId are equal.</returns>
-        public bool Equals(UntypedWeakReferenceId other) => GenerationType == other.GenerationType && GlobalId.Equals(other.GlobalId);
+        public bool Equals(UntypedWeakReferenceId other) =>
+            GenerationType == other.GenerationType && GlobalId.Equals(other.GlobalId);
 
         /// <summary>
         /// Converts the id to a string.
@@ -155,7 +173,12 @@ namespace Unity.Entities.Serialization
 
             var goid = UnityEditor.GlobalObjectId.GetGlobalObjectIdSlow(obj.GetEntityId());
             var rtgoid = UnsafeUtility.As<GlobalObjectId, RuntimeGlobalObjectId>(ref goid);
-            return new UntypedWeakReferenceId(rtgoid, typeof(SceneAsset) == obj.GetType() ? WeakReferenceGenerationType.GameObjectScene : WeakReferenceGenerationType.UnityObject);
+            return new UntypedWeakReferenceId(
+                rtgoid,
+                typeof(SceneAsset) == obj.GetType()
+                    ? WeakReferenceGenerationType.GameObjectScene
+                    : WeakReferenceGenerationType.UnityObject
+            );
         }
 
         /// <summary>
@@ -165,7 +188,9 @@ namespace Unity.Entities.Serialization
         /// <returns>The object referenced by the id or null if the id is invalid.</returns>
         public static UnityEngine.Object GetEditorObject(UntypedWeakReferenceId id)
         {
-            return GlobalObjectId.GlobalObjectIdentifierToObjectSlow(UnsafeUtility.As<RuntimeGlobalObjectId, GlobalObjectId>(ref id.GlobalId));
+            return GlobalObjectId.GlobalObjectIdentifierToObjectSlow(
+                UnsafeUtility.As<RuntimeGlobalObjectId, GlobalObjectId>(ref id.GlobalId)
+            );
         }
 #endif
     }

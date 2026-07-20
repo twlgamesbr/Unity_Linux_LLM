@@ -1,4 +1,3 @@
-
 namespace System.Runtime.CompilerServices
 {
     /// <summary>
@@ -9,8 +8,5 @@ namespace System.Runtime.CompilerServices
     /// This will not affect user code, which does not have access to this assembly
     /// via ExposeInternalsTo
     /// </remarks>
-    internal static class IsExternalInit
-    {
-
-    }
+    internal static class IsExternalInit { }
 }

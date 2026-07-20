@@ -3,6 +3,6 @@
     enum Lifetime
     {
         Singleton,
-        Transient
+        Transient,
     }
 }

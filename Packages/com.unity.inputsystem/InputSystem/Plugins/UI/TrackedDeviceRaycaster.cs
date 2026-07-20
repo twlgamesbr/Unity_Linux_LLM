@@ -93,12 +93,16 @@ namespace UnityEngine.InputSystem.UI
 
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
-            if (eventData is ExtendedPointerEventData trackedEventData && trackedEventData.pointerType == UIPointerType.Tracked)
+            if (
+                eventData is ExtendedPointerEventData trackedEventData
+                && trackedEventData.pointerType == UIPointerType.Tracked
+            )
                 PerformRaycast(trackedEventData, resultAppendList);
         }
 
         // Cached instances for raycasts hits to minimize GC.
-        [NonSerialized] private List<RaycastHitData> m_RaycastResultsCache = new List<RaycastHitData>();
+        [NonSerialized]
+        private List<RaycastHitData> m_RaycastResultsCache = new List<RaycastHitData>();
 
         internal void PerformRaycast(ExtendedPointerEventData eventData, List<RaycastResult> resultAppendList)
         {
@@ -111,15 +115,15 @@ namespace UnityEngine.InputSystem.UI
             var ray = new Ray(eventData.trackedDevicePosition, eventData.trackedDeviceOrientation * Vector3.forward);
             var hitDistance = m_MaxDistance;
 
-            #if UNITY_INPUT_SYSTEM_ENABLE_PHYSICS
+#if UNITY_INPUT_SYSTEM_ENABLE_PHYSICS
             if (m_CheckFor3DOcclusion)
             {
                 if (Physics.Raycast(ray, out var hit, maxDistance: hitDistance, layerMask: m_BlockingMask))
                     hitDistance = hit.distance;
             }
-            #endif
+#endif
 
-            #if UNITY_INPUT_SYSTEM_ENABLE_PHYSICS2D
+#if UNITY_INPUT_SYSTEM_ENABLE_PHYSICS2D
             if (m_CheckFor2DOcclusion)
             {
                 var raycastDistance = hitDistance;
@@ -127,7 +131,7 @@ namespace UnityEngine.InputSystem.UI
                 if (hits.collider != null)
                     hitDistance = hits.distance;
             }
-            #endif
+#endif
 
             m_RaycastResultsCache.Clear();
             SortedRaycastGraphics(canvas, ray, m_RaycastResultsCache);
@@ -170,6 +174,7 @@ namespace UnityEngine.InputSystem.UI
         internal static InlinedArray<TrackedDeviceRaycaster> s_Instances;
 
         private static readonly List<RaycastHitData> s_SortedGraphics = new List<RaycastHitData>();
+
         private void SortedRaycastGraphics(Canvas canvas, Ray ray, List<RaycastHitData> results)
         {
             var graphics = GraphicRegistry.GetGraphicsForCanvas(canvas);
@@ -200,7 +205,12 @@ namespace UnityEngine.InputSystem.UI
             results.AddRange(s_SortedGraphics);
         }
 
-        private static bool RayIntersectsRectTransform(RectTransform transform, Ray ray, out Vector3 worldPosition, out float distance)
+        private static bool RayIntersectsRectTransform(
+            RectTransform transform,
+            Ray ray,
+            out Vector3 worldPosition,
+            out float distance
+        )
         {
             var corners = new Vector3[4];
             transform.GetWorldCorners(corners);
@@ -251,7 +261,8 @@ namespace UnityEngine.InputSystem.UI
         private bool m_CheckFor3DOcclusion;
 
         [Tooltip("Maximum distance (in 3D world space) that rays are traced to find a hit.")]
-        [SerializeField] private float m_MaxDistance = 1000;
+        [SerializeField]
+        private float m_MaxDistance = 1000;
 
         [SerializeField]
         private LayerMask m_BlockingMask;

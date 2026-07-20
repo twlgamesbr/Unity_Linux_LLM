@@ -10,16 +10,15 @@ namespace UnityEngine.Rendering
 {
     using InstanceHandle = Handle<SurfaceCacheWorld.Instance>;
     using InstanceHandleSet = HandleSet<SurfaceCacheWorld.Instance>;
-
     using LightHandle = Handle<SurfaceCacheWorld.Light>;
     using LightHandleSet = HandleSet<SurfaceCacheWorld.Light>;
-
     using MaterialHandle = Handle<MaterialPool.MaterialDescriptor>;
     using MaterialHandleSet = HandleSet<MaterialPool.MaterialDescriptor>;
 
     internal class SurfaceCacheWorld : IDisposable
     {
         internal readonly struct Light { }
+
         internal readonly struct Instance { }
 
         internal struct LightDescriptor
@@ -51,7 +50,8 @@ namespace UnityEngine.Rendering
         {
             struct Light { }
 
-            class LightList<T> : IDisposable where T : struct
+            class LightList<T> : IDisposable
+                where T : struct
             {
                 private HandleSet<Light> _handles = new();
                 private List<T> _list = new();
@@ -106,7 +106,11 @@ namespace UnityEngine.Rendering
                         if (_buffer == null || _buffer.count < _list.Count)
                         {
                             _buffer?.Dispose();
-                            _buffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _list.Count, UnsafeUtility.SizeOf<T>());
+                            _buffer = new GraphicsBuffer(
+                                GraphicsBuffer.Target.Structured,
+                                _list.Count,
+                                UnsafeUtility.SizeOf<T>()
+                            );
                         }
                         cmd.SetBufferData(_buffer, _list);
                     }
@@ -123,7 +127,8 @@ namespace UnityEngine.Rendering
             LightList<PunctualLight> _punctualLights = new();
             LightList<DirectionalLight> _directionalLights = new();
 
-            public DirectionalLight? DirectionalLight => 0 < _directionalLights.Count ? _directionalLights.Values[0] : null;
+            public DirectionalLight? DirectionalLight =>
+                0 < _directionalLights.Count ? _directionalLights.Values[0] : null;
             public GraphicsBuffer PunctualLightBuffer => _punctualLights.Buffer;
             public uint PunctualLightCount => _punctualLights.Count;
 
@@ -167,7 +172,7 @@ namespace UnityEngine.Rendering
                 return new DirectionalLight()
                 {
                     Direction = GetLightDirection(desc),
-                    Intensity = desc.LinearLightColor
+                    Intensity = desc.LinearLightColor,
                 };
             }
 
@@ -178,7 +183,7 @@ namespace UnityEngine.Rendering
                     Position = desc.Transform.GetPosition(),
                     Direction = GetLightDirection(desc),
                     Intensity = desc.LinearLightColor,
-                    CosAngle = Mathf.Cos(desc.SpotAngle / 360.0f * 2.0f * Mathf.PI * 0.5f)
+                    CosAngle = Mathf.Cos(desc.SpotAngle / 360.0f * 2.0f * Mathf.PI * 0.5f),
                 };
             }
 
@@ -189,7 +194,7 @@ namespace UnityEngine.Rendering
                     Position = desc.Transform.GetPosition(),
                     Direction = Vector3.up, // doesn't matter
                     Intensity = desc.LinearLightColor,
-                    CosAngle = -1.0f // cos(pi) = -1
+                    CosAngle = -1.0f, // cos(pi) = -1
                 };
             }
 
@@ -284,13 +289,24 @@ namespace UnityEngine.Rendering
 
         public void Init(RayTracingContext ctx, WorldResourceSet worldResources)
         {
-            _materialPool = new MaterialPool(worldResources.SetAlphaChannelShader, worldResources.BlitCubemap, worldResources.BlitGrayScaleCookie);
+            _materialPool = new MaterialPool(
+                worldResources.SetAlphaChannelShader,
+                worldResources.BlitCubemap,
+                worldResources.BlitGrayScaleCookie
+            );
 
             var options = new AccelerationStructureOptions()
             {
                 buildFlags = BuildFlags.None, // TODO: Consider whether to use BuildFlags.MinimizeMemory once https://jira.unity3d.com/browse/UUM-54575 is fixed.
             };
-            _rayTracingAccelerationStructure = new AccelStructAdapter(ctx.CreateAccelerationStructure(options), new GeometryPool(GeometryPoolDesc.NewDefault(), ctx.Resources.geometryPoolKernels, ctx.Resources.copyBuffer));
+            _rayTracingAccelerationStructure = new AccelStructAdapter(
+                ctx.CreateAccelerationStructure(options),
+                new GeometryPool(
+                    GeometryPoolDesc.NewDefault(),
+                    ctx.Resources.geometryPoolKernels,
+                    ctx.Resources.copyBuffer
+                )
+            );
 
             _cubemapRender = new CubemapRender(worldResources.SkyBoxMesh, worldResources.SixFaceSkyBoxMesh);
         }
@@ -375,14 +391,21 @@ namespace UnityEngine.Rendering
             _materialPool.RemoveMaterial(materialHandle.Value);
         }
 
-        public MaterialHandle AddMaterial(in MaterialPool.MaterialDescriptor material, UVChannel albedoAndEmissionUVChannel)
+        public MaterialHandle AddMaterial(
+            in MaterialPool.MaterialDescriptor material,
+            UVChannel albedoAndEmissionUVChannel
+        )
         {
             MaterialHandle handle = _materialHandleSet.Add();
             _materialPool.AddMaterial(handle.Value, in material, albedoAndEmissionUVChannel);
             return handle;
         }
 
-        public void UpdateMaterial(MaterialHandle materialHandle, in MaterialPool.MaterialDescriptor material, UVChannel albedoAndEmissionUVChannel)
+        public void UpdateMaterial(
+            MaterialHandle materialHandle,
+            in MaterialPool.MaterialDescriptor material,
+            UVChannel albedoAndEmissionUVChannel
+        )
         {
             _materialPool.UpdateMaterial(materialHandle.Value, in material, albedoAndEmissionUVChannel);
         }
@@ -391,7 +414,8 @@ namespace UnityEngine.Rendering
             Mesh mesh,
             Span<MaterialHandle> materials,
             Span<uint> masks,
-            in Matrix4x4 localToWorldMatrix)
+            in Matrix4x4 localToWorldMatrix
+        )
         {
             Debug.Assert(mesh.vertexCount > 0);
             Debug.Assert(mesh.subMeshCount == materials.Length);
@@ -410,7 +434,15 @@ namespace UnityEngine.Rendering
             }
 
             InstanceHandle instance = _instanceHandleSet.Add();
-            _rayTracingAccelerationStructure.AddInstance(instance.Value, mesh, localToWorldMatrix, masks, materialIndices, isOpaque, 0);
+            _rayTracingAccelerationStructure.AddInstance(
+                instance.Value,
+                mesh,
+                localToWorldMatrix,
+                masks,
+                materialIndices,
+                isOpaque,
+                0
+            );
             return instance;
         }
 
@@ -418,7 +450,8 @@ namespace UnityEngine.Rendering
             Terrain terrain,
             MaterialHandle material,
             uint mask,
-            in Matrix4x4 localToWorldMatrix)
+            in Matrix4x4 localToWorldMatrix
+        )
         {
             Debug.Assert(terrain.terrainData != null);
             Debug.Assert(material != MaterialHandle.Invalid);
@@ -434,7 +467,14 @@ namespace UnityEngine.Rendering
             Component comp = terrain;
             InstanceHandle instance = _instanceHandleSet.Add();
 
-            _rayTracingAccelerationStructure.AddInstance(instance.Value, comp, masks, materialIndices, isOpaque, terrain.renderingLayerMask);
+            _rayTracingAccelerationStructure.AddInstance(
+                instance.Value,
+                comp,
+                masks,
+                materialIndices,
+                isOpaque,
+                terrain.renderingLayerMask
+            );
             return instance;
         }
 
@@ -489,7 +529,12 @@ namespace UnityEngine.Rendering
             }
         }
 
-        public void Commit(CommandBuffer cmdBuf, ref GraphicsBuffer scratchBuffer, uint envCubemapResolution, UnityEngine.Light sun)
+        public void Commit(
+            CommandBuffer cmdBuf,
+            ref GraphicsBuffer scratchBuffer,
+            uint envCubemapResolution,
+            UnityEngine.Light sun
+        )
         {
             Debug.Assert(_rayTracingAccelerationStructure != null);
             _materialPool.Build(cmdBuf);

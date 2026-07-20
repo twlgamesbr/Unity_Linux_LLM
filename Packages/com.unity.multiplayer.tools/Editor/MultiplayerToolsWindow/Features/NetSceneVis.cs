@@ -1,8 +1,8 @@
 using Unity.Multiplayer.Tools.Common.Helpers;
 using Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow.Analytics;
 using UnityEditor;
-using UnityEngine;
 using UnityEditor.Overlays;
+using UnityEngine;
 
 namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 {
@@ -30,11 +30,13 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
             else
             {
                 Debug.LogWarning("Network Scene Visualization overlay not found");
-            }       
+            }
         }
 #else
         public bool IsAvailable => false;
-        public string AvailabilityMessage => "Network Scene Visualization is only available from version 2023.1.14f1, with Netcode for GameObjects 1.1+";
+        public string AvailabilityMessage =>
+            "Network Scene Visualization is only available from version 2023.1.14f1, with Netcode for GameObjects 1.1+";
+
         public void Open() => throw new NotImplementedException();
 #endif
     }

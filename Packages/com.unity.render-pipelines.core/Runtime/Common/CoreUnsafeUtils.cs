@@ -120,14 +120,29 @@ namespace UnityEngine.Rendering
         }
 
         internal struct DefaultKeyGetter<T> : IKeyGetter<T, T>
-        { public T Get(ref T v) { return v; } }
+        {
+            public T Get(ref T v)
+            {
+                return v;
+            }
+        }
 
         // Note: this is a workaround needed to circumvent some AOT issues when building for xbox
         internal struct UintKeyGetter : IKeyGetter<uint, uint>
-        { public uint Get(ref uint v) { return v; } }
-        internal struct UlongKeyGetter : IKeyGetter<ulong, ulong>
-        { public ulong Get(ref ulong v) { return v; } }
+        {
+            public uint Get(ref uint v)
+            {
+                return v;
+            }
+        }
 
+        internal struct UlongKeyGetter : IKeyGetter<ulong, ulong>
+        {
+            public ulong Get(ref ulong v)
+            {
+                return v;
+            }
+        }
 
         /// <summary>
         /// Extension method to copy elements of a list into a buffer.
@@ -174,8 +189,14 @@ namespace UnityEngine.Rendering
         }
 
         private static unsafe void CalculateRadixSortSupportArrays(
-            int bitStates, int arrayLength, uint* supportArray,
-            out uint* bucketIndices, out uint* bucketSizes, out uint* bucketPrefix, out uint* arrayOutput)
+            int bitStates,
+            int arrayLength,
+            uint* supportArray,
+            out uint* bucketIndices,
+            out uint* bucketSizes,
+            out uint* bucketPrefix,
+            out uint* arrayOutput
+        )
         {
             bucketIndices = supportArray;
             bucketSizes = bucketIndices + bitStates;
@@ -312,7 +333,15 @@ namespace UnityEngine.Rendering
         private static unsafe void RadixSort(uint* array, uint* support, int radixBits, int bitStates, int length)
         {
             uint mask = (uint)(bitStates - 1);
-            CalculateRadixSortSupportArrays(bitStates, length, support, out uint* bucketIndices, out uint* bucketSizes, out uint* bucketPrefix, out uint* arrayOutput);
+            CalculateRadixSortSupportArrays(
+                bitStates,
+                length,
+                support,
+                out uint* bucketIndices,
+                out uint* bucketSizes,
+                out uint* bucketPrefix,
+                out uint* arrayOutput
+            );
 
             int buckets = (sizeof(uint) * 8) / radixBits;
             uint* targetBuffer = arrayOutput;
@@ -321,7 +350,7 @@ namespace UnityEngine.Rendering
             {
                 int shift = b * radixBits;
                 for (int s = 0; s < 3 * bitStates; ++s)
-                    bucketIndices[s] = 0;//bucketSizes and bucketPrefix get zeroed, since we walk 3x the bit states
+                    bucketIndices[s] = 0; //bucketSizes and bucketPrefix get zeroed, since we walk 3x the bit states
 
                 for (int i = 0; i < length; ++i)
                     bucketSizes[((inputBuffer[i] >> shift) & mask)]++;
@@ -372,7 +401,12 @@ namespace UnityEngine.Rendering
         /// <param name="sortSize">Size of the array to sort. If greater than array capacity, it will get clamped.</param>
         /// <param name="supportArray">Array of uints that is used for support data. The algorithm will automatically allocate it if necessary.</param>
         /// <param name="radixBits">Number of bits to use for each bucket. Can only be 8, 4 or 2.</param>
-        public static unsafe void RadixSort(NativeArray<uint> array, int sortSize, ref NativeArray<uint> supportArray, int radixBits = 8)
+        public static unsafe void RadixSort(
+            NativeArray<uint> array,
+            int sortSize,
+            ref NativeArray<uint> supportArray,
+            int radixBits = 8
+        )
         {
             sortSize = Math.Min(sortSize, array.Length);
             CalculateRadixParams(radixBits, out int bitStates);
@@ -383,7 +417,13 @@ namespace UnityEngine.Rendering
             if (!supportArray.IsCreated || supportArray.Length < supportSize)
                 supportArray.ResizeArray((int)supportSize);
 
-            CoreUnsafeUtils.RadixSort((uint*)array.GetUnsafePtr(), (uint*)supportArray.GetUnsafePtr(), radixBits, bitStates, sortSize);
+            CoreUnsafeUtils.RadixSort(
+                (uint*)array.GetUnsafePtr(),
+                (uint*)supportArray.GetUnsafePtr(),
+                radixBits,
+                bitStates,
+                sortSize
+            );
         }
 
         /// <summary>
@@ -504,13 +544,16 @@ namespace UnityEngine.Rendering
         /// <param name="addCount">Number of elements to add will be written here.</param>
         /// <param name="remCount">Number of elements to remove will be written here.</param>
         /// <returns>The number of operations to perform (<paramref name="addCount"/><c> + </c><paramref name="remCount"/>)</returns>
-
         public static int CompareHashes<TOldValue, TOldGetter, TNewValue, TNewGetter>(
-            int oldHashCount, void* oldHashes,
-            int newHashCount, void* newHashes,
+            int oldHashCount,
+            void* oldHashes,
+            int newHashCount,
+            void* newHashes,
             // assume that the capacity of indices is >= max(oldHashCount, newHashCount)
-            int* addIndices, int* removeIndices,
-            out int addCount, out int remCount
+            int* addIndices,
+            int* removeIndices,
+            out int addCount,
+            out int remCount
         )
             where TOldValue : struct
             where TNewValue : struct
@@ -618,18 +661,26 @@ namespace UnityEngine.Rendering
         /// <param name="remCount">Number of elements to remove will be written here.</param>
         /// <returns>The number of operations to perform (<paramref name="addCount"/><c> + </c><paramref name="remCount"/>)</returns>
         public static int CompareHashes(
-            int oldHashCount, Hash128* oldHashes,
-            int newHashCount, Hash128* newHashes,
+            int oldHashCount,
+            Hash128* oldHashes,
+            int newHashCount,
+            Hash128* newHashes,
             // assume that the capacity of indices is >= max(oldHashCount, newHashCount)
-            int* addIndices, int* removeIndices,
-            out int addCount, out int remCount
+            int* addIndices,
+            int* removeIndices,
+            out int addCount,
+            out int remCount
         )
         {
             return CompareHashes<Hash128, DefaultKeyGetter<Hash128>, Hash128, DefaultKeyGetter<Hash128>>(
-                oldHashCount, oldHashes,
-                newHashCount, newHashes,
-                addIndices, removeIndices,
-                out addCount, out remCount
+                oldHashCount,
+                oldHashes,
+                newHashCount,
+                newHashes,
+                addIndices,
+                removeIndices,
+                out addCount,
+                out remCount
             );
         }
 
@@ -687,8 +738,7 @@ namespace UnityEngine.Rendering
                     lvalue = UnsafeUtility.ReadArrayElement<TValue>(data, left);
                     lkey = getter.Get(ref lvalue);
                     c = lkey.CompareTo(pivot);
-                }
-                while (c < 0);
+                } while (c < 0);
 
                 var rvalue = default(TValue);
                 var rkey = default(TKey);
@@ -698,8 +748,7 @@ namespace UnityEngine.Rendering
                     rvalue = UnsafeUtility.ReadArrayElement<TValue>(data, right);
                     rkey = getter.Get(ref rvalue);
                     c = rkey.CompareTo(pivot);
-                }
-                while (c > 0);
+                } while (c > 0);
 
                 if (left < right)
                 {
@@ -725,7 +774,11 @@ namespace UnityEngine.Rendering
             QuickSort<int>(arr.Length, copy);
             for (int i = arr.Length - 1; i > 0; --i)
             {
-                if (UnsafeUtility.ReadArrayElement<int>(copy, i).CompareTo(UnsafeUtility.ReadArrayElement<int>(copy, i - 1)) == 0)
+                if (
+                    UnsafeUtility
+                        .ReadArrayElement<int>(copy, i)
+                        .CompareTo(UnsafeUtility.ReadArrayElement<int>(copy, i - 1)) == 0
+                )
                 {
                     return true;
                 }

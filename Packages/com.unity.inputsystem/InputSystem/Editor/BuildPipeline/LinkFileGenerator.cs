@@ -52,8 +52,10 @@ namespace UnityEngine.InputSystem.Editor
                 try
                 {
                     // Skip any assembly that doesn't reference the input system assembly.
-                    if (assembly.GetName().Name != currentAssemblyName && !assembly
-                        .GetReferencedAssemblies().Any(x => x.Name == currentAssemblyName))
+                    if (
+                        assembly.GetName().Name != currentAssemblyName
+                        && !assembly.GetReferencedAssemblies().Any(x => x.Name == currentAssemblyName)
+                    )
                         continue;
 
                     var types = assembly.GetTypes().Where(ShouldPreserveType).ToArray();
@@ -76,7 +78,8 @@ namespace UnityEngine.InputSystem.Editor
                 var types = typesByAssemblies[assembly];
                 foreach (var type in types.OrderBy(t => t.FullName))
                     sb.AppendLine(
-                        $"    <type fullname=\"{FormatForXml(ToCecilName(type.FullName))}\" preserve=\"all\"/>");
+                        $"    <type fullname=\"{FormatForXml(ToCecilName(type.FullName))}\" preserve=\"all\"/>"
+                    );
 
                 sb.AppendLine("  </assembly>");
             }
@@ -93,24 +96,24 @@ namespace UnityEngine.InputSystem.Editor
 
         static bool IsTypeUsedViaReflectionByInputSystem(Type type)
         {
-            return type.IsSubclassOf(typeof(InputControl)) ||
-                typeof(IInputStateTypeInfo).IsAssignableFrom(type) ||
-                typeof(IInputInteraction).IsAssignableFrom(type) ||
-                typeof(InputProcessor).IsAssignableFrom(type) ||
-                typeof(InputBindingComposite).IsAssignableFrom(type) ||
-                type.GetCustomAttributes<InputControlAttribute>().Any();
+            return type.IsSubclassOf(typeof(InputControl))
+                || typeof(IInputStateTypeInfo).IsAssignableFrom(type)
+                || typeof(IInputInteraction).IsAssignableFrom(type)
+                || typeof(InputProcessor).IsAssignableFrom(type)
+                || typeof(InputBindingComposite).IsAssignableFrom(type)
+                || type.GetCustomAttributes<InputControlAttribute>().Any();
         }
 
         static bool IsFieldRelatedToControlLayouts(FieldInfo field)
         {
-            return IsTypeUsedViaReflectionByInputSystem(field.GetType()) ||
-                field.GetCustomAttributes<InputControlAttribute>().Any();
+            return IsTypeUsedViaReflectionByInputSystem(field.GetType())
+                || field.GetCustomAttributes<InputControlAttribute>().Any();
         }
 
         static bool IsPropertyRelatedToControlLayouts(PropertyInfo property)
         {
-            return IsTypeUsedViaReflectionByInputSystem(property.GetType()) ||
-                property.GetCustomAttributes<InputControlAttribute>().Any();
+            return IsTypeUsedViaReflectionByInputSystem(property.GetType())
+                || property.GetCustomAttributes<InputControlAttribute>().Any();
         }
 
         static bool ShouldPreserveType(Type type)
@@ -139,13 +142,9 @@ namespace UnityEngine.InputSystem.Editor
             return value.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
         }
 
-        public void OnBeforeRun(BuildReport report, UnityLinkerBuildPipelineData data)
-        {
-        }
+        public void OnBeforeRun(BuildReport report, UnityLinkerBuildPipelineData data) { }
 
-        public void OnAfterRun(BuildReport report, UnityLinkerBuildPipelineData data)
-        {
-        }
+        public void OnAfterRun(BuildReport report, UnityLinkerBuildPipelineData data) { }
     }
 }
 #endif

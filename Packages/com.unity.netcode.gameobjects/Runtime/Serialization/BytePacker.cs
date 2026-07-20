@@ -13,7 +13,8 @@ namespace Unity.Netcode
 #if UNITY_NETCODE_DEBUG_NO_PACKING
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteValuePacked<T>(FastBufferWriter writer, T value) where T: unmanaged => writer.WriteValueSafe(value);
+        public void WriteValuePacked<T>(FastBufferWriter writer, T value)
+            where T : unmanaged => writer.WriteValueSafe(value);
 #else
         /// <summary>
         /// Write a packed enum value.
@@ -22,7 +23,8 @@ namespace Unity.Netcode
         /// <param name="value">The value to write</param>
         /// <typeparam name="TEnum">An enum type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteValuePacked<TEnum>(FastBufferWriter writer, TEnum value) where TEnum : unmanaged, Enum
+        public static unsafe void WriteValuePacked<TEnum>(FastBufferWriter writer, TEnum value)
+            where TEnum : unmanaged, Enum
         {
             TEnum enumValue = value;
             switch (sizeof(TEnum))
@@ -88,7 +90,6 @@ namespace Unity.Netcode
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteValuePacked(FastBufferWriter writer, bool value) => writer.WriteValueSafe(value);
 
-
         /// <summary>
         /// Write a signed short (Int16) as a ZigZag encoded varint to the buffer.
         /// WARNING: If the value you're writing is > 2287, this will use MORE space
@@ -109,7 +110,8 @@ namespace Unity.Netcode
         /// <param name="writer">The writer to write to</param>
         /// <param name="value">Value to write</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteValuePacked(FastBufferWriter writer, ushort value) => WriteValueBitPacked(writer, value);
+        public static void WriteValuePacked(FastBufferWriter writer, ushort value) =>
+            WriteValueBitPacked(writer, value);
 
         /// <summary>
         /// Write a two-byte character as a varint to the buffer.
@@ -288,11 +290,11 @@ namespace Unity.Netcode
         }
 #endif
 
-
 #if UNITY_NETCODE_DEBUG_NO_PACKING
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteValueBitPacked<T>(FastBufferWriter writer, T value) where T: unmanaged => writer.WriteValueSafe(value);
+        public void WriteValueBitPacked<T>(FastBufferWriter writer, T value)
+            where T : unmanaged => writer.WriteValueSafe(value);
 #else
         /// <summary>
         /// Obsolete value that no longer carries meaning. Do not use.
@@ -350,7 +352,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="writer">The writer to write to</param>
         /// <param name="value">The value to pack</param>
-        public static void WriteValueBitPacked(FastBufferWriter writer, short value) => WriteValueBitPacked(writer, (ushort)Arithmetic.ZigZagEncode(value));
+        public static void WriteValueBitPacked(FastBufferWriter writer, short value) =>
+            WriteValueBitPacked(writer, (ushort)Arithmetic.ZigZagEncode(value));
 
         /// <summary>
         /// Writes a 16-bit unsigned short to the buffer in a bit-encoded packed format.
@@ -394,7 +397,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="writer">The writer to write to</param>
         /// <param name="value">The value to pack</param>
-        public static void WriteValueBitPacked(FastBufferWriter writer, int value) => WriteValueBitPacked(writer, (uint)Arithmetic.ZigZagEncode(value));
+        public static void WriteValueBitPacked(FastBufferWriter writer, int value) =>
+            WriteValueBitPacked(writer, (uint)Arithmetic.ZigZagEncode(value));
 
         /// <summary>
         /// Writes a 32-bit unsigned int to the buffer in a bit-encoded packed format.
@@ -438,7 +442,8 @@ namespace Unity.Netcode
         /// </summary>
         /// <param name="writer">The writer to write to</param>
         /// <param name="value">The value to pack</param>
-        public static void WriteValueBitPacked(FastBufferWriter writer, long value) => WriteValueBitPacked(writer, Arithmetic.ZigZagEncode(value));
+        public static void WriteValueBitPacked(FastBufferWriter writer, long value) =>
+            WriteValueBitPacked(writer, Arithmetic.ZigZagEncode(value));
 
         /// <summary>
         /// Writes a 64-bit unsigned long to the buffer in a bit-encoded packed format.
@@ -471,15 +476,18 @@ namespace Unity.Netcode
             writer.WritePartialValue(value | (uint)(numBytes), numBytes);
         }
 #endif
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe uint ToUint<T>(T value) where T : unmanaged
+        private static unsafe uint ToUint<T>(T value)
+            where T : unmanaged
         {
             uint* asUint = (uint*)&value;
             return *asUint;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe ulong ToUlong<T>(T value) where T : unmanaged
+        private static unsafe ulong ToUlong<T>(T value)
+            where T : unmanaged
         {
             ulong* asUlong = (ulong*)&value;
             return *asUlong;

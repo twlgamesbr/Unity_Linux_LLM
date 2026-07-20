@@ -13,6 +13,7 @@ namespace UnityEngine.TestTools.NUnitExtensions
     internal class ActionDelegator : BaseDelegator
     {
         private Func<object> m_Action;
+
         public object Delegate(Action action)
         {
             return Delegate(() =>

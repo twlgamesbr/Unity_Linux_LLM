@@ -11,7 +11,8 @@ namespace UnityEngine.Rendering
     /// </summary>
     public class UpscalerOptionsEditorCache
     {
-        private readonly Dictionary<ScriptableObject, Editor> m_EditorCache = new Dictionary<ScriptableObject, Editor>();
+        private readonly Dictionary<ScriptableObject, Editor> m_EditorCache =
+            new Dictionary<ScriptableObject, Editor>();
 
         /// <summary>
         /// Gets a cached editor for the given @options. If the editor is not

@@ -15,14 +15,17 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// Represent bytes.
         /// </summary>
         Bytes,
+
         /// <summary>
         /// Represent bytes per second.
         /// </summary>
         BytesPerSecond,
+
         /// <summary>
         /// Represent a second.
         /// </summary>
         Seconds,
+
         /// <summary>
         /// Represent a hertz (1/second).
         /// </summary>

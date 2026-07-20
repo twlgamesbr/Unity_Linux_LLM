@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.PlatformToolkit.Editor;
 using Unity.Properties;
 using UnityEditor;
@@ -40,7 +40,6 @@ namespace Unity.PlatformToolkit.PlayMode
         private readonly Dictionary<string, IPlayModeCapability> m_PlayModeCapabilityOptions = new();
         private readonly List<string> m_PlayModeCapabilityOptionNames = new();
 
-
         public bool IsValid => (m_Settings != null) && (m_Runtime != null) && m_Settings.HasBeenEnabled;
         public bool AreSettingsValid => (m_Settings != null) && m_Settings.HasBeenEnabled;
         public bool IsPlaying => m_Settings.PlayModeAccessor.IsPlaying;
@@ -48,16 +47,19 @@ namespace Unity.PlatformToolkit.PlayMode
         internal PlayModeControlsSettings BoundSettings => m_Settings;
         internal PlayModeControlsRuntime BoundRuntime => m_Runtime;
 
-        [CreateProperty] public bool ShowInputDeviceMappingHelpBox => !Capability.SupportsAccountInputOwnership;
+        [CreateProperty]
+        public bool ShowInputDeviceMappingHelpBox => !Capability.SupportsAccountInputOwnership;
 
-        [CreateProperty] public bool ShowInputDeviceMappingLabel
+        [CreateProperty]
+        public bool ShowInputDeviceMappingLabel
         {
             get
             {
 #if INPUT_SYSTEM_AVAILABLE
-            return m_Runtime.PlayModeInputSystem.GetAccountDevicePairs().Count == 0 && Capability.SupportsAccountInputOwnership;
+                return m_Runtime.PlayModeInputSystem.GetAccountDevicePairs().Count == 0
+                    && Capability.SupportsAccountInputOwnership;
 #else
-            return false;
+                return false;
 #endif
             }
         }
@@ -73,7 +75,6 @@ namespace Unity.PlatformToolkit.PlayMode
         {
             Assert.IsTrue(AreSettingsValid, "AreSettingsValid should be used to check if it's valid to call this.");
         }
-
 
         /// <summary>
         /// Events for property changes, to notify the UI and listeners of modified data.
@@ -231,7 +232,6 @@ namespace Unity.PlatformToolkit.PlayMode
         /// <summary>
         /// Attributes management methods and bindable properties.
         /// </summary>
-
         #region Attributes
 
         [CreateProperty]
@@ -275,7 +275,13 @@ namespace Unity.PlatformToolkit.PlayMode
 
                     for (int j = i + 1; j < attributeDefinitions.Count; j++)
                     {
-                        if (string.Equals(attributeDefinitions[i].Name, attributeDefinitions[j].Name, StringComparison.CurrentCultureIgnoreCase))
+                        if (
+                            string.Equals(
+                                attributeDefinitions[i].Name,
+                                attributeDefinitions[j].Name,
+                                StringComparison.CurrentCultureIgnoreCase
+                            )
+                        )
                             return true;
                     }
                 }
@@ -317,7 +323,6 @@ namespace Unity.PlatformToolkit.PlayMode
         internal Dictionary<string, IPlayModeCapability> CapabilityOptions => m_PlayModeCapabilityOptions;
         internal List<string> CapabilityOptionNames => m_PlayModeCapabilityOptionNames;
 
-
         [CreateProperty]
         internal IPlayModeCapability Capability
         {
@@ -341,7 +346,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.OfflineNetwork;
             }
-
             set
             {
                 CheckIsValid();
@@ -357,7 +361,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.FullStorage;
             }
-
             set
             {
                 CheckIsValid();
@@ -373,14 +376,12 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.CallsPausingTime;
             }
-
             set
             {
                 CheckIsValid();
                 m_Runtime.Environment.CallsPausingTime = value;
             }
         }
-
 
         [CreateProperty]
         internal bool StorageWarningsEnabled
@@ -390,14 +391,12 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.StorageWarningsEnabled;
             }
-
             set
             {
                 CheckIsValid();
                 m_Runtime.Environment.WarningSettings.StorageWarningsEnabled = value;
             }
         }
-
 
         [CreateProperty]
         internal TimeSpan WarningOpenFrequencyInterval
@@ -407,7 +406,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.OpenFrequency;
             }
-
             set
             {
                 CheckIsValid();
@@ -423,7 +421,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.ReadFrequency;
             }
-
             set
             {
                 CheckIsValid();
@@ -439,7 +436,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.WriteFrequency;
             }
-
             set
             {
                 CheckIsValid();
@@ -455,7 +451,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.EnumFrequency;
             }
-
             set
             {
                 CheckIsValid();
@@ -471,7 +466,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.CommitFrequency;
             }
-
             set
             {
                 CheckIsValid();
@@ -487,7 +481,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.DeleteFrequency;
             }
-
             set
             {
                 CheckIsValid();
@@ -503,7 +496,6 @@ namespace Unity.PlatformToolkit.PlayMode
                 CheckIsValid();
                 return m_Runtime.Environment.WarningSettings.UndisposedSavesThreshold;
             }
-
             set
             {
                 CheckIsValid();
@@ -515,7 +507,8 @@ namespace Unity.PlatformToolkit.PlayMode
         internal TimeOptionConfiguration WarningFrequencyTimeOptions => PlayModeWarningTimeOptions.Frequency;
 
         [CreateProperty]
-        internal TimeOptionConfiguration WarningUndisposedSavesTimeOptions => PlayModeWarningTimeOptions.UndisposedSaves;
+        internal TimeOptionConfiguration WarningUndisposedSavesTimeOptions =>
+            PlayModeWarningTimeOptions.UndisposedSaves;
 
         #endregion
 
@@ -538,8 +531,10 @@ namespace Unity.PlatformToolkit.PlayMode
             get
             {
                 CheckIsValid();
-                return !(m_Runtime.Capability.PrimaryAccountBehaviour == PrimaryAccountBehaviour.NotSupported &&
-                    m_Runtime.Capability.AdditionalAccountBehaviour == AdditionalAccountBehaviour.NotSupported);
+                return !(
+                    m_Runtime.Capability.PrimaryAccountBehaviour == PrimaryAccountBehaviour.NotSupported
+                    && m_Runtime.Capability.AdditionalAccountBehaviour == AdditionalAccountBehaviour.NotSupported
+                );
             }
         }
 
@@ -563,16 +558,19 @@ namespace Unity.PlatformToolkit.PlayMode
         public static void RegisterConverters()
         {
             var group = new ConverterGroup("TimeOptionToTimeSpan");
-            group.AddConverter<TimeOption, TimeSpan>((ref TimeOption s) =>
-            {
-                return TimeOption.ConvertValueToTimeSpan(s);
-            });
+            group.AddConverter<TimeOption, TimeSpan>(
+                (ref TimeOption s) =>
+                {
+                    return TimeOption.ConvertValueToTimeSpan(s);
+                }
+            );
 
-            group.AddConverter<TimeSpan, TimeOption>((ref TimeSpan value) =>
-            {
-                return TimeOption.ConvertTimeSpanToValue(value);
-            });
-
+            group.AddConverter<TimeSpan, TimeOption>(
+                (ref TimeSpan value) =>
+                {
+                    return TimeOption.ConvertTimeSpanToValue(value);
+                }
+            );
 
             ConverterGroups.RegisterConverterGroup(group);
         }
@@ -580,10 +578,14 @@ namespace Unity.PlatformToolkit.PlayMode
         internal PlayModeControlsViewModel(PlayModeControlsSettings settings)
         {
             if (settings == null)
-                throw new ArgumentNullException("PlayModeControlsViewModel cannot be constructed with a null settings asset.");
+                throw new ArgumentNullException(
+                    "PlayModeControlsViewModel cannot be constructed with a null settings asset."
+                );
 
             if (!settings.HasBeenEnabled)
-                throw new ArgumentException("Settings should only be bound for enabled PlayModeControlsSettings assets.");
+                throw new ArgumentException(
+                    "Settings should only be bound for enabled PlayModeControlsSettings assets."
+                );
 
             m_Settings = settings;
             if (m_Settings.Runtime != null)
@@ -615,16 +617,26 @@ namespace Unity.PlatformToolkit.PlayMode
                 OnDisposed?.Invoke();
         }
 
-        internal void BindRuntime(PlayModeControlsRuntime runtime, PlayModeControlsSettings expectedSettings, bool shouldNotify = true)
+        internal void BindRuntime(
+            PlayModeControlsRuntime runtime,
+            PlayModeControlsSettings expectedSettings,
+            bool shouldNotify = true
+        )
         {
             if (runtime == null)
-                throw new ArgumentNullException("A null runtime shouldn't be bound explicitly as one should always exist with valid settings. Call BindSettings with null instead to remove bindings.");
+                throw new ArgumentNullException(
+                    "A null runtime shouldn't be bound explicitly as one should always exist with valid settings. Call BindSettings with null instead to remove bindings."
+                );
 
             if (m_Settings == null)
-                throw new ArgumentException("No settings are bound for this view. A runtime cannot be bound without bound settings.");
+                throw new ArgumentException(
+                    "No settings are bound for this view. A runtime cannot be bound without bound settings."
+                );
 
             if (expectedSettings != m_Settings)
-                throw new ArgumentException("The bound settings do not match the ones passed as an argument. This is likely a runtime for a different asset.");
+                throw new ArgumentException(
+                    "The bound settings do not match the ones passed as an argument. This is likely a runtime for a different asset."
+                );
 
             UnbindRuntime();
 
@@ -671,7 +683,6 @@ namespace Unity.PlatformToolkit.PlayMode
             OnEnvironmentControlsInvalidated?.Invoke();
         }
 
-
         private void UnbindRuntime()
         {
             if (m_Runtime != null)
@@ -705,5 +716,4 @@ namespace Unity.PlatformToolkit.PlayMode
             }
         }
     }
-
 }

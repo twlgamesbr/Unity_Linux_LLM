@@ -6,7 +6,8 @@ namespace UnityEditor.Rendering
     {
         public bool active => true;
 
-        public bool CanRemoveSettings(ProbeVolumeRuntimeResources settings) => !ProbeVolumeGlobalSettingsStripper.ProbeVolumeSupportedForBuild();
+        public bool CanRemoveSettings(ProbeVolumeRuntimeResources settings) =>
+            !ProbeVolumeGlobalSettingsStripper.ProbeVolumeSupportedForBuild();
     }
 
     class ProbeVolumeDebugResourceStripper : IRenderPipelineGraphicsSettingsStripper<ProbeVolumeDebugResources>

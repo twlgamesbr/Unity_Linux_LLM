@@ -1,29 +1,29 @@
 using System;
+using System.IO;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using System.IO;
 
 namespace Unity.Serialization.Json
-{    
+{
     struct BlockInfo
     {
         public UnsafeBuffer<char> Block;
         public bool IsFinal;
     }
-    
+
     interface IUnsafeStreamBlockReader : IDisposable
     {
         /// <summary>
         /// Resets the reader for re-use.
         /// </summary>
         void Reset();
-        
+
         /// <summary>
         /// Returns the next block in the stream.
         /// </summary>
         BlockInfo GetNextBlock();
     }
-    
+
     /// <summary>
     /// Parameters used to configure the <see cref="SerializedObjectReader"/>.
     /// </summary>
@@ -75,18 +75,20 @@ namespace Unity.Serialization.Json
             OutputBufferSize = 4096,
             NodeBufferSize = 128,
             ValidationType = JsonValidationType.Standard,
-            StripStringEscapeCharacters = true
+            StripStringEscapeCharacters = true,
         };
     }
-    
+
     /// <summary>
     /// The <see cref="SerializedObjectReader"/> is the high level API used to deserialize a stream of data.
     /// </summary>
     public unsafe struct SerializedObjectReader : IDisposable
     {
         readonly Allocator m_Label;
-        [NativeDisableUnsafePtrRestriction] UnsafeSerializedObjectReader* m_Data;
-        
+
+        [NativeDisableUnsafePtrRestriction]
+        UnsafeSerializedObjectReader* m_Data;
+
         /// <summary>
         /// If this flag is true. No exceptions are thrown unless <see cref="CheckAndThrowInvalidJsonException"/> is called.
         /// </summary>
@@ -95,8 +97,11 @@ namespace Unity.Serialization.Json
             get => m_Data->RequiresExplicitExceptionHandling;
             set => m_Data->RequiresExplicitExceptionHandling = value;
         }
-        
-        static PackedBinaryStream OpenBinaryStreamWithConfiguration(SerializedObjectReaderConfiguration configuration, Allocator label)
+
+        static PackedBinaryStream OpenBinaryStreamWithConfiguration(
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label
+        )
         {
             if (configuration.TokenBufferSize < 16)
                 throw new ArgumentException("TokenBufferSize < 16");
@@ -112,18 +117,26 @@ namespace Unity.Serialization.Json
             if (configuration.BlockBufferSize < 16)
                 throw new ArgumentException("SerializedObjectReaderConfiguration.BlockBufferSize < 16");
 
-            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, configuration.BlockBufferSize, configuration.UseReadAsync ? FileOptions.Asynchronous : FileOptions.None);
+            return new FileStream(
+                path,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                configuration.BlockBufferSize,
+                configuration.UseReadAsync ? FileOptions.Asynchronous : FileOptions.None
+            );
         }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class based on the specified configuration.
         /// </summary>
         /// <param name="configuration">The configuration parameters to use for the reader.</param>
         /// <param name="label">The memory allocator label to use.</param>
-        public SerializedObjectReader(SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
-            : this(null, 0, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label, false)
-        {
-        }
+        public SerializedObjectReader(
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel
+        )
+            : this(null, 0, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label, false) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class based on the specified configuration.
@@ -131,10 +144,12 @@ namespace Unity.Serialization.Json
         /// <param name="output">The output stream.</param>
         /// <param name="configuration">The configuration parameters to use for the reader.</param>
         /// <param name="label">The memory allocator label to use.</param>
-        public SerializedObjectReader(PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
-            : this(null, 0, output, configuration, label, false)
-        {
-        }
+        public SerializedObjectReader(
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel
+        )
+            : this(null, 0, output, configuration, label, false) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class with the specified path.
@@ -142,9 +157,7 @@ namespace Unity.Serialization.Json
         /// <param name="path">A relative or absolute file path.</param>
         /// <param name="label">The memory allocator label to use.</param>
         public SerializedObjectReader(string path, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
-            : this(path, SerializedObjectReaderConfiguration.Default, label)
-        {
-        }
+            : this(path, SerializedObjectReaderConfiguration.Default, label) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class with the specified path and configuration.
@@ -152,10 +165,12 @@ namespace Unity.Serialization.Json
         /// <param name="path">A relative or absolute file path.</param>
         /// <param name="configuration">The configuration parameters to use for the reader.</param>
         /// <param name="label">The memory allocator label to use.</param>
-        public SerializedObjectReader(string path, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
-            : this(path, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label, false)
-        {
-        }
+        public SerializedObjectReader(
+            string path,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel
+        )
+            : this(path, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label, false) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class with the specified path and output stream.
@@ -164,10 +179,13 @@ namespace Unity.Serialization.Json
         /// <param name="output">The output stream.</param>
         /// <param name="label">The memory allocator label to use.</param>
         /// <param name="leaveOutputOpen">True to leave the stream open after the reader object is disposed; otherwise, false.</param>
-        public SerializedObjectReader(string path, PackedBinaryStream output, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveOutputOpen = true)
-            : this(path, output, SerializedObjectReaderConfiguration.Default, label, leaveOutputOpen)
-        {
-        }
+        public SerializedObjectReader(
+            string path,
+            PackedBinaryStream output,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveOutputOpen = true
+        )
+            : this(path, output, SerializedObjectReaderConfiguration.Default, label, leaveOutputOpen) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class with the specified path, output stream and configuration.
@@ -177,10 +195,21 @@ namespace Unity.Serialization.Json
         /// <param name="configuration">The configuration parameters to use for the reader.</param>
         /// <param name="label">The memory allocator label to use.</param>
         /// <param name="leaveOutputOpen">True to leave the output stream open after the reader object is disposed; otherwise, false.</param>
-        public SerializedObjectReader(string path, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveOutputOpen = true)
-            : this(OpenFileStreamWithConfiguration(path, configuration), output, configuration, label, false, leaveOutputOpen)
-        {
-        }
+        public SerializedObjectReader(
+            string path,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveOutputOpen = true
+        )
+            : this(
+                OpenFileStreamWithConfiguration(path, configuration),
+                output,
+                configuration,
+                label,
+                false,
+                leaveOutputOpen
+            ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class based on the specified input stream.
@@ -188,10 +217,12 @@ namespace Unity.Serialization.Json
         /// <param name="input">The input stream.</param>
         /// <param name="label">The memory allocator label to use.</param>
         /// <param name="leaveInputOpen">True to leave the input stream open after the reader object is disposed; otherwise, false.</param>
-        public SerializedObjectReader(Stream input, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveInputOpen = true)
-            : this(input, SerializedObjectReaderConfiguration.Default, label, leaveInputOpen)
-        {
-        }
+        public SerializedObjectReader(
+            Stream input,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveInputOpen = true
+        )
+            : this(input, SerializedObjectReaderConfiguration.Default, label, leaveInputOpen) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class based on the specified input stream and output stream.
@@ -201,10 +232,15 @@ namespace Unity.Serialization.Json
         /// <param name="label">The memory allocator label to use.</param>
         /// <param name="leaveInputOpen">True to leave the input stream open after the reader object is disposed; otherwise, false.</param>
         /// <param name="leaveOutputOpen">True to leave the output stream open after the reader object is disposed; otherwise, false.</param>
-        public SerializedObjectReader(Stream input, PackedBinaryStream output, Allocator label =  SerializationConfiguration.DefaultAllocatorLabel, bool leaveInputOpen = true, bool leaveOutputOpen = true)
+        public SerializedObjectReader(
+            Stream input,
+            PackedBinaryStream output,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveInputOpen = true,
+            bool leaveOutputOpen = true
+        )
             : this(input, output, SerializedObjectReaderConfiguration.Default, label, leaveInputOpen, leaveOutputOpen)
-        {
-        }
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class based on the specified input stream and configuration.
@@ -213,10 +249,20 @@ namespace Unity.Serialization.Json
         /// <param name="configuration">The configuration parameters to use for the reader.</param>
         /// <param name="label">The memory allocator label to use.</param>
         /// <param name="leaveInputOpen">True to leave the input stream open after the reader object is disposed; otherwise, false.</param>
-        public SerializedObjectReader(Stream input, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveInputOpen = true)
-            : this(input, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label, leaveInputOpen, false)
-        {
-        }
+        public SerializedObjectReader(
+            Stream input,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveInputOpen = true
+        )
+            : this(
+                input,
+                OpenBinaryStreamWithConfiguration(configuration, label),
+                configuration,
+                label,
+                leaveInputOpen,
+                false
+            ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class based on the specified input stream, output stream and configuration.
@@ -228,11 +274,30 @@ namespace Unity.Serialization.Json
         /// <param name="leaveInputOpen">True to leave the input stream open after the reader object is disposed; otherwise, false.</param>
         /// <param name="leaveOutputOpen">True to leave the output stream open after the reader object is disposed; otherwise, false.</param>
         /// <exception cref="ArgumentException">The configuration is invalid.</exception>
-        public SerializedObjectReader(Stream input, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveInputOpen = true, bool leaveOutputOpen = true)
+        public SerializedObjectReader(
+            Stream input,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveInputOpen = true,
+            bool leaveOutputOpen = true
+        )
         {
             m_Label = label;
-            m_Data = (UnsafeSerializedObjectReader*) UnsafeUtility.Malloc(sizeof(UnsafeSerializedObjectReader), UnsafeUtility.AlignOf<UnsafeSerializedObjectReader>(), m_Label);
-            *m_Data = new UnsafeSerializedObjectReader(input, output, configuration, label, leaveInputOpen, leaveOutputOpen);
+            m_Data = (UnsafeSerializedObjectReader*)
+                UnsafeUtility.Malloc(
+                    sizeof(UnsafeSerializedObjectReader),
+                    UnsafeUtility.AlignOf<UnsafeSerializedObjectReader>(),
+                    m_Label
+                );
+            *m_Data = new UnsafeSerializedObjectReader(
+                input,
+                output,
+                configuration,
+                label,
+                leaveInputOpen,
+                leaveOutputOpen
+            );
         }
 
         /// <summary>
@@ -242,11 +307,15 @@ namespace Unity.Serialization.Json
         /// <param name="length">The input buffer length.</param>
         /// <param name="configuration">The configuration parameters to use for the reader.</param>
         /// <param name="label">The memory allocator label to use.</param>
-        public SerializedObjectReader(char* buffer, int length, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
+        public SerializedObjectReader(
+            char* buffer,
+            int length,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel
+        )
             : this(buffer, length, OpenBinaryStreamWithConfiguration(configuration, label), configuration, label, false)
-        {
-        }
-        
+        { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializedObjectReader"/> class based on the specified input buffer, output stream and configuration.
         /// </summary>
@@ -255,15 +324,31 @@ namespace Unity.Serialization.Json
         /// <param name="output">The output stream.</param>
         /// <param name="configuration">The configuration parameters to use for the reader.</param>
         /// <param name="label">The memory allocator label to use.</param>
-        public SerializedObjectReader(char* buffer, int length, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel)
-            : this(buffer, length, output, configuration, label, true)
-        {
-        }
+        public SerializedObjectReader(
+            char* buffer,
+            int length,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel
+        )
+            : this(buffer, length, output, configuration, label, true) { }
 
-        internal SerializedObjectReader(char* buffer, int length, PackedBinaryStream output, SerializedObjectReaderConfiguration configuration, Allocator label = SerializationConfiguration.DefaultAllocatorLabel, bool leaveOutputOpen = true)
+        internal SerializedObjectReader(
+            char* buffer,
+            int length,
+            PackedBinaryStream output,
+            SerializedObjectReaderConfiguration configuration,
+            Allocator label = SerializationConfiguration.DefaultAllocatorLabel,
+            bool leaveOutputOpen = true
+        )
         {
             m_Label = label;
-            m_Data = (UnsafeSerializedObjectReader*) UnsafeUtility.Malloc(sizeof(UnsafeSerializedObjectReader), UnsafeUtility.AlignOf<UnsafeSerializedObjectReader>(), m_Label);
+            m_Data = (UnsafeSerializedObjectReader*)
+                UnsafeUtility.Malloc(
+                    sizeof(UnsafeSerializedObjectReader),
+                    UnsafeUtility.AlignOf<UnsafeSerializedObjectReader>(),
+                    m_Label
+                );
             *m_Data = new UnsafeSerializedObjectReader(buffer, length, output, configuration, label, leaveOutputOpen);
         }
 
@@ -318,7 +403,7 @@ namespace Unity.Serialization.Json
         {
             return m_Data->Step(out view, node);
         }
-        
+
         /// <summary>
         /// Reads the specified data and returns a new <see cref="SerializedValueView"/>.
         /// </summary>
@@ -406,8 +491,8 @@ namespace Unity.Serialization.Json
         {
             if (count > views.Length)
                 throw new IndexOutOfRangeException();
-            
-            return m_Data->ReadArrayElementBatch((SerializedValueView*) views.GetUnsafePtr(), count);
+
+            return m_Data->ReadArrayElementBatch((SerializedValueView*)views.GetUnsafePtr(), count);
         }
 
         /// <summary>
@@ -420,7 +505,7 @@ namespace Unity.Serialization.Json
         {
             return m_Data->ReadArrayElementBatch(views, count);
         }
-        
+
         /// <summary>
         /// Discards completed data from the buffers.
         /// </summary>

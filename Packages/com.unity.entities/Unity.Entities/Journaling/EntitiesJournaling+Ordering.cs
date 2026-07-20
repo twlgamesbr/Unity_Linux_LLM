@@ -6,7 +6,7 @@ namespace Unity.Entities
         public enum Ordering
         {
             Ascending,
-            Descending
+            Descending,
         }
     }
 }

@@ -6,9 +6,7 @@ namespace Unity.Multiplayer.Tools.Common
     /// Defines a Tool-specific context, to serve as entry point for dependency wiring.
     /// Base interface definition for <see cref="IEditorSetupHandler"/> and <see cref="IRuntimeSetupHandler"/>.
     /// </summary>
-    interface IContext
-    {
-    }
+    interface IContext { }
 
     /// <summary>
     /// Defines a Context to receive enable callback at edit time.
@@ -38,7 +36,7 @@ namespace Unity.Multiplayer.Tools.Common
         {
             Disabled,
             EnabledInEditor,
-            EnabledInRuntime
+            EnabledInRuntime,
         }
 
         protected ContextStatus Status { get; private set; }

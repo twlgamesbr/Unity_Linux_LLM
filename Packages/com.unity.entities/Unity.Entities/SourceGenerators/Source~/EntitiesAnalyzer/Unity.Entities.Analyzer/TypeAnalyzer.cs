@@ -1,9 +1,9 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Unity.Entities.SourceGen.Common;
 using Unity.Entities.SourceGen.SystemGenerator.Common;
 
@@ -35,7 +35,11 @@ namespace Unity.Entities.Analyzer
                     if (fullName is not ("global::Unity.Entities.IJobEntity"))
                         continue;
 
-                    for (var parent = typeDeclaration.Parent; parent is TypeDeclarationSyntax parentType; parent = parent.Parent)
+                    for (
+                        var parent = typeDeclaration.Parent;
+                        parent is TypeDeclarationSyntax parentType;
+                        parent = parent.Parent
+                    )
                     {
                         // If we have partial continue to next parent
                         foreach (var modifier in parentType.Modifiers)
@@ -44,8 +48,17 @@ namespace Unity.Entities.Analyzer
 
                         var declaredInnerSymbol = context.SemanticModel.GetDeclaredSymbol(typeDeclaration);
                         var declaredParentSymbol = context.SemanticModel.GetDeclaredSymbol(parentType);
-                        context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0008Descriptor, parentType.Identifier.GetLocation(), type.Type, declaredInnerSymbol.ToFullName(), declaredParentSymbol.ToFullName()));
-                        NextParent:;
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                EntitiesDiagnostics.k_Ea0008Descriptor,
+                                parentType.Identifier.GetLocation(),
+                                type.Type,
+                                declaredInnerSymbol.ToFullName(),
+                                declaredParentSymbol.ToFullName()
+                            )
+                        );
+                        NextParent:
+                        ;
                     }
 
                     foreach (var modifier in typeDeclaration.Modifiers)
@@ -53,7 +66,14 @@ namespace Unity.Entities.Analyzer
                             return;
 
                     var declaredSymbol = context.SemanticModel.GetDeclaredSymbol(typeDeclaration);
-                    context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0007Descriptor, typeDeclaration.Identifier.GetLocation(), type.Type, declaredSymbol.ToFullName()));
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            EntitiesDiagnostics.k_Ea0007Descriptor,
+                            typeDeclaration.Identifier.GetLocation(),
+                            type.Type,
+                            declaredSymbol.ToFullName()
+                        )
+                    );
                     return;
                 }
 
@@ -65,10 +85,17 @@ namespace Unity.Entities.Analyzer
             var typeSymbol = context.SemanticModel.GetDeclaredSymbol(typeDeclaration); // Because of SystemBase supporting inheritance
             var (isSystem, systemType) = typeSymbol.TryGetSystemType();
             if (isSystem)
-                context.ReportDiagnostic(Diagnostic.Create(EntitiesDiagnostics.k_Ea0007Descriptor, typeDeclaration.Identifier.GetLocation(), systemType.ToString(), typeSymbol.ToFullName()));
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        EntitiesDiagnostics.k_Ea0007Descriptor,
+                        typeDeclaration.Identifier.GetLocation(),
+                        systemType.ToString(),
+                        typeSymbol.ToFullName()
+                    )
+                );
         }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-            EntitiesDiagnostics.k_Ea0007Descriptor, EntitiesDiagnostics.k_Ea0008Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+            ImmutableArray.Create(EntitiesDiagnostics.k_Ea0007Descriptor, EntitiesDiagnostics.k_Ea0008Descriptor);
     }
 }

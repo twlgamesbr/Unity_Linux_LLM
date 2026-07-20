@@ -157,7 +157,9 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 if (index < 0 || index >= m_RecordCount)
                     throw new ArgumentOutOfRangeException(
-                        $"Index {index} is out of range for history with {m_RecordCount} entries", nameof(index));
+                        $"Index {index} is out of range for history with {m_RecordCount} entries",
+                        nameof(index)
+                    );
 
                 var recordIndex = UserIndexToRecordIndex(index);
                 return new Record(this, recordIndex, GetRecord(recordIndex));
@@ -166,7 +168,9 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 if (index < 0 || index >= m_RecordCount)
                     throw new ArgumentOutOfRangeException(
-                        $"Index {index} is out of range for history with {m_RecordCount} entries", nameof(index));
+                        $"Index {index} is out of range for history with {m_RecordCount} entries",
+                        nameof(index)
+                    );
 
                 var recordIndex = UserIndexToRecordIndex(index);
                 new Record(this, recordIndex, GetRecord(recordIndex)).CopyFrom(value);
@@ -244,7 +248,7 @@ namespace UnityEngine.InputSystem.LowLevel
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
 
-            m_Controls = new[] {control};
+            m_Controls = new[] { control };
             m_ControlCount = 1;
         }
 
@@ -367,8 +371,10 @@ namespace UnityEngine.InputSystem.LowLevel
                 throw new NotImplementedException();
 
             if (!eventPtr.IsA<StateEvent>())
-                throw new ArgumentException($"Event must be a state event but is '{eventPtr}' instead",
-                    nameof(eventPtr));
+                throw new ArgumentException(
+                    $"Event must be a state event but is '{eventPtr}' instead",
+                    nameof(eventPtr)
+                );
 
             var statePtr = (byte*)StateEvent.From(eventPtr)->state - control.device.stateBlock.byteOffset;
             return RecordStateChange(control, statePtr, eventPtr.time);
@@ -395,12 +401,15 @@ namespace UnityEngine.InputSystem.LowLevel
                 {
                     if (control.stateBlock.alignedSizeInBytes > m_StateSizeInBytes)
                         throw new InvalidOperationException(
-                            $"Cannot add control '{control}' with state larger than {m_StateSizeInBytes} bytes");
+                            $"Cannot add control '{control}' with state larger than {m_StateSizeInBytes} bytes"
+                        );
                     controlIndex = ArrayHelpers.AppendWithCapacity(ref m_Controls, ref m_ControlCount, control);
                 }
                 else
-                    throw new ArgumentException($"Control '{control}' is not part of InputStateHistory",
-                        nameof(control));
+                    throw new ArgumentException(
+                        $"Control '{control}' is not part of InputStateHistory",
+                        nameof(control)
+                    );
             }
 
             var recordPtr = AllocateRecord(out var index);
@@ -498,8 +507,11 @@ namespace UnityEngine.InputSystem.LowLevel
             // add space for the RecordHeader header.
             // NOTE: If we only have a single control, we omit storing the integer control index.
             var totalSizeOfBuffer = bytesPerRecord * m_HistoryDepth;
-            m_RecordBuffer = new NativeArray<byte>(totalSizeOfBuffer, Allocator.Persistent,
-                NativeArrayOptions.UninitializedMemory);
+            m_RecordBuffer = new NativeArray<byte>(
+                totalSizeOfBuffer,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory
+            );
         }
 
         /// <summary>
@@ -607,7 +619,8 @@ namespace UnityEngine.InputSystem.LowLevel
             var control = haveSingleControl ? controls[0] : controls[data->controlIndex];
             if (!(control is InputControl<TValue> controlOfType))
                 throw new InvalidOperationException(
-                    $"Cannot read value of type '{TypeHelpers.GetNiceTypeName(typeof(TValue))}' from control '{control}' with value type '{TypeHelpers.GetNiceTypeName(control.valueType)}'");
+                    $"Cannot read value of type '{TypeHelpers.GetNiceTypeName(typeof(TValue))}' from control '{control}' with value type '{TypeHelpers.GetNiceTypeName(control.valueType)}'"
+                );
 
             // Grab state memory.
             var statePtr = haveSingleControl ? data->statePtrWithoutControlIndex : data->statePtrWithControlIndex;
@@ -648,8 +661,12 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <remarks>
         /// Records a state change after checking the <see cref="updateMask"/> and the <see cref="onShouldRecordStateChange"/> callback.
         /// </remarks>
-        unsafe void IInputStateChangeMonitor.NotifyControlStateChanged(InputControl control, double time,
-            InputEventPtr eventPtr, long monitorIndex)
+        unsafe void IInputStateChangeMonitor.NotifyControlStateChanged(
+            InputControl control,
+            double time,
+            InputEventPtr eventPtr,
+            long monitorIndex
+        )
         {
             // Ignore state change if it's in an input update we're not interested in.
             var currentUpdateType = InputState.currentUpdateType;
@@ -674,10 +691,12 @@ namespace UnityEngine.InputSystem.LowLevel
         /// <param name="monitorIndex">Index of the monitor as given to <see cref="InputState.AddChangeMonitor(InputControl,IInputStateChangeMonitor,long,uint)"/>.</param>
         /// <param name="timerIndex">Index of the timer as given to <see cref="InputState.AddChangeMonitorTimeout"/>.</param>
         /// <seealso cref="InputState.AddChangeMonitorTimeout"/>
-        void IInputStateChangeMonitor.NotifyTimerExpired(InputControl control, double time, long monitorIndex,
-            int timerIndex)
-        {
-        }
+        void IInputStateChangeMonitor.NotifyTimerExpired(
+            InputControl control,
+            double time,
+            long monitorIndex,
+            int timerIndex
+        ) { }
 
         internal InputControl[] m_Controls;
         internal int m_ControlCount;
@@ -692,11 +711,15 @@ namespace UnityEngine.InputSystem.LowLevel
         internal readonly bool m_AddNewControls;
 
         internal int bytesPerRecord =>
-            (m_StateSizeInBytes +
-                m_ExtraMemoryPerRecord +
-                (m_ControlCount == 1 && !m_AddNewControls
-                    ? RecordHeader.kSizeWithoutControlIndex
-                    : RecordHeader.kSizeWithControlIndex)).AlignToMultipleOf(4);
+            (
+                m_StateSizeInBytes
+                + m_ExtraMemoryPerRecord
+                + (
+                    m_ControlCount == 1 && !m_AddNewControls
+                        ? RecordHeader.kSizeWithoutControlIndex
+                        : RecordHeader.kSizeWithControlIndex
+                )
+            ).AlignToMultipleOf(4);
 
         private struct Enumerator : IEnumerator<Record>
         {
@@ -726,9 +749,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
             object IEnumerator.Current => Current;
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
 
         /// <summary>State change record header</summary>
@@ -747,7 +768,8 @@ namespace UnityEngine.InputSystem.LowLevel
             /// The time stamp of the input state record in the owning container.
             /// <see cref="IInputRuntime.currentTime"/>
             /// </remarks>
-            [FieldOffset(0)] public double time;
+            [FieldOffset(0)]
+            public double time;
 
             /// <summary>
             /// The version of the input state record.
@@ -755,7 +777,8 @@ namespace UnityEngine.InputSystem.LowLevel
             /// <remarks>
             /// Current version stamp. See <see cref="InputStateHistory.version"/>.
             /// </remarks>
-            [FieldOffset(8)] public uint version;
+            [FieldOffset(8)]
+            public uint version;
 
             /// <summary>
             /// The index of the record.
@@ -764,10 +787,14 @@ namespace UnityEngine.InputSystem.LowLevel
             /// The index of the record relative to the start of the buffer.
             /// See <see cref="InputStateHistory.RecordIndexToUserIndex"/> to remap this record index to a user index.
             /// </remarks>
-            [FieldOffset(12)] public int controlIndex;
+            [FieldOffset(12)]
+            public int controlIndex;
 
-            [FieldOffset(12)] private fixed byte m_StateWithoutControlIndex[1];
-            [FieldOffset(16)] private fixed byte m_StateWithControlIndex[1];
+            [FieldOffset(12)]
+            private fixed byte m_StateWithoutControlIndex[1];
+
+            [FieldOffset(16)]
+            private fixed byte m_StateWithControlIndex[1];
 
             /// <summary>
             /// The state data including the control index.
@@ -779,8 +806,8 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 get
                 {
-                    fixed(byte* ptr = m_StateWithControlIndex)
-                    return ptr;
+                    fixed (byte* ptr = m_StateWithControlIndex)
+                        return ptr;
                 }
             }
 
@@ -794,8 +821,8 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 get
                 {
-                    fixed(byte* ptr = m_StateWithoutControlIndex)
-                    return ptr;
+                    fixed (byte* ptr = m_StateWithoutControlIndex)
+                        return ptr;
                 }
             }
 
@@ -1011,7 +1038,9 @@ namespace UnityEngine.InputSystem.LowLevel
             internal void* GetUnsafeExtraMemoryPtrUnchecked()
             {
                 if (m_Owner.extraMemoryPerRecord == 0)
-                    throw new InvalidOperationException("No extra memory has been set up for history records; set extraMemoryPerRecord");
+                    throw new InvalidOperationException(
+                        "No extra memory has been set up for history records; set extraMemoryPerRecord"
+                    );
                 return (byte*)header + m_Owner.bytesPerRecord - m_Owner.extraMemoryPerRecord;
             }
 
@@ -1035,17 +1064,23 @@ namespace UnityEngine.InputSystem.LowLevel
                 {
                     // We haven't found it. Throw if we can't add it.
                     if (!m_Owner.m_AddNewControls)
-                        throw new InvalidOperationException($"Control '{record.control}' is not tracked by target history");
+                        throw new InvalidOperationException(
+                            $"Control '{record.control}' is not tracked by target history"
+                        );
 
-                    controlIndex =
-                        ArrayHelpers.AppendWithCapacity(ref m_Owner.m_Controls, ref m_Owner.m_ControlCount, control);
+                    controlIndex = ArrayHelpers.AppendWithCapacity(
+                        ref m_Owner.m_Controls,
+                        ref m_Owner.m_ControlCount,
+                        control
+                    );
                 }
 
                 // Make sure memory sizes match.
                 var numBytesForState = m_Owner.m_StateSizeInBytes;
                 if (numBytesForState != record.m_Owner.m_StateSizeInBytes)
                     throw new InvalidOperationException(
-                        $"Cannot copy record from owner with state size '{record.m_Owner.m_StateSizeInBytes}' to owner with state size '{numBytesForState}'");
+                        $"Cannot copy record from owner with state size '{record.m_Owner.m_StateSizeInBytes}' to owner with state size '{numBytesForState}'"
+                    );
 
                 // Copy and update header.
                 var thisRecordPtr = header;
@@ -1061,17 +1096,21 @@ namespace UnityEngine.InputSystem.LowLevel
                     thisRecordPtr->controlIndex = controlIndex;
                     dstPtr = thisRecordPtr->statePtrWithControlIndex;
                 }
-                var srcPtr = record.m_Owner.m_ControlCount > 1 || record.m_Owner.m_AddNewControls
-                    ? otherRecordPtr->statePtrWithControlIndex
-                    : otherRecordPtr->statePtrWithoutControlIndex;
+                var srcPtr =
+                    record.m_Owner.m_ControlCount > 1 || record.m_Owner.m_AddNewControls
+                        ? otherRecordPtr->statePtrWithControlIndex
+                        : otherRecordPtr->statePtrWithoutControlIndex;
                 UnsafeUtility.MemCpy(dstPtr, srcPtr, numBytesForState);
 
                 // Copy extra memory, but only if the size in the source and target
                 // history are identical.
                 var numBytesExtraMemory = m_Owner.m_ExtraMemoryPerRecord;
                 if (numBytesExtraMemory > 0 && numBytesExtraMemory == record.m_Owner.m_ExtraMemoryPerRecord)
-                    UnsafeUtility.MemCpy(GetUnsafeExtraMemoryPtr(), record.GetUnsafeExtraMemoryPtr(),
-                        numBytesExtraMemory);
+                    UnsafeUtility.MemCpy(
+                        GetUnsafeExtraMemoryPtr(),
+                        record.GetUnsafeExtraMemoryPtr(),
+                        numBytesExtraMemory
+                    );
 
                 // Notify.
                 m_Owner.onRecordAdded?.Invoke(this);
@@ -1092,7 +1131,9 @@ namespace UnityEngine.InputSystem.LowLevel
             /// <returns>True if the records are the same, False if they differ.</returns>
             public bool Equals(Record other)
             {
-                return ReferenceEquals(m_Owner, other.m_Owner) && m_IndexPlusOne == other.m_IndexPlusOne && m_Version == other.m_Version;
+                return ReferenceEquals(m_Owner, other.m_Owner)
+                    && m_IndexPlusOne == other.m_IndexPlusOne
+                    && m_Version == other.m_Version;
             }
 
             /// <summary>Compare two records.</summary>
@@ -1156,12 +1197,15 @@ namespace UnityEngine.InputSystem.LowLevel
         /// New controls are automatically added into the state history if there state is smaller than the threshold.
         /// </remarks>
         public InputStateHistory(int? maxStateSizeInBytes = null)
-        // Using the size of the value here isn't quite correct but the value is used as an upper
-        // bound on stored state size for which the size of the value should be a reasonable guess.
+            // Using the size of the value here isn't quite correct but the value is used as an upper
+            // bound on stored state size for which the size of the value should be a reasonable guess.
             : base(maxStateSizeInBytes ?? UnsafeUtility.SizeOf<TValue>())
         {
             if (maxStateSizeInBytes < UnsafeUtility.SizeOf<TValue>())
-                throw new ArgumentException("Max state size cannot be smaller than sizeof(TValue)", nameof(maxStateSizeInBytes));
+                throw new ArgumentException(
+                    "Max state size cannot be smaller than sizeof(TValue)",
+                    nameof(maxStateSizeInBytes)
+                );
         }
 
         /// <summary>
@@ -1172,9 +1216,7 @@ namespace UnityEngine.InputSystem.LowLevel
         /// Creates a new InputStateHistory to record a history of state changes for the specified control.
         /// </remarks>
         public InputStateHistory(InputControl<TValue> control)
-            : base(control)
-        {
-        }
+            : base(control) { }
 
         /// <summary>
         /// Creates a new InputStateHistory class to record state changes for a specified control.
@@ -1196,7 +1238,8 @@ namespace UnityEngine.InputSystem.LowLevel
             foreach (var control in controls)
                 if (!typeof(TValue).IsAssignableFrom(control.valueType))
                     throw new ArgumentException(
-                        $"Control '{control}' matched by '{path}' has value type '{TypeHelpers.GetNiceTypeName(control.valueType)}' which is incompatible with '{TypeHelpers.GetNiceTypeName(typeof(TValue))}'");
+                        $"Control '{control}' matched by '{path}' has value type '{TypeHelpers.GetNiceTypeName(control.valueType)}' which is incompatible with '{TypeHelpers.GetNiceTypeName(typeof(TValue))}'"
+                    );
         }
 
         /// <summary>
@@ -1296,7 +1339,9 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 if (index < 0 || index >= Count)
                     throw new ArgumentOutOfRangeException(
-                        $"Index {index} is out of range for history with {Count} entries", nameof(index));
+                        $"Index {index} is out of range for history with {Count} entries",
+                        nameof(index)
+                    );
 
                 var recordIndex = UserIndexToRecordIndex(index);
                 return new Record(this, recordIndex, GetRecord(recordIndex));
@@ -1305,7 +1350,9 @@ namespace UnityEngine.InputSystem.LowLevel
             {
                 if (index < 0 || index >= Count)
                     throw new ArgumentOutOfRangeException(
-                        $"Index {index} is out of range for history with {Count} entries", nameof(index));
+                        $"Index {index} is out of range for history with {Count} entries",
+                        nameof(index)
+                    );
                 var recordIndex = UserIndexToRecordIndex(index);
                 new Record(this, recordIndex, GetRecord(recordIndex)).CopyFrom(value);
             }
@@ -1339,9 +1386,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
             object IEnumerator.Current => Current;
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
 
         /// <summary>State change record</summary>
@@ -1528,7 +1573,9 @@ namespace UnityEngine.InputSystem.LowLevel
             internal void* GetUnsafeExtraMemoryPtrUnchecked()
             {
                 if (m_Owner.extraMemoryPerRecord == 0)
-                    throw new InvalidOperationException("No extra memory has been set up for history records; set extraMemoryPerRecord");
+                    throw new InvalidOperationException(
+                        "No extra memory has been set up for history records; set extraMemoryPerRecord"
+                    );
                 return (byte*)header + m_Owner.bytesPerRecord - m_Owner.extraMemoryPerRecord;
             }
 
@@ -1563,7 +1610,9 @@ namespace UnityEngine.InputSystem.LowLevel
             /// <returns>True if the records are the same, False if they differ.</returns>
             public bool Equals(Record other)
             {
-                return ReferenceEquals(m_Owner, other.m_Owner) && m_IndexPlusOne == other.m_IndexPlusOne && m_Version == other.m_Version;
+                return ReferenceEquals(m_Owner, other.m_Owner)
+                    && m_IndexPlusOne == other.m_IndexPlusOne
+                    && m_Version == other.m_Version;
             }
 
             /// <summary>Compare two records.</summary>

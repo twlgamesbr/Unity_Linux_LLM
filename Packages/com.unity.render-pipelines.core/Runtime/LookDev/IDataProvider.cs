@@ -62,8 +62,10 @@ namespace UnityEngine.Rendering.LookDev
     {
         /// <summary>The cubemap representing this sky</summary>
         public Cubemap cubemap;
+
         /// <summary>The longitude offset to rotate this cubemap</summary>
         public float longitudeOffset;
+
         /// <summary>The sky exposure</summary>
         public float exposure;
     }
@@ -82,7 +84,8 @@ namespace UnityEngine.Rendering.LookDev
         public StageRuntimeInterface(
             System.Func<bool, GameObject> AddGameObject,
             System.Func<Camera> GetCamera,
-            System.Func<Light> GetSunLight)
+            System.Func<Light> GetSunLight
+        )
         {
             m_AddGameObject = AddGameObject;
             m_GetCamera = GetCamera;
@@ -95,8 +98,7 @@ namespace UnityEngine.Rendering.LookDev
         /// Default value: false.
         /// </param>
         /// <returns>The newly created GameObject, or null if the creation process failed.</returns>
-        public GameObject AddGameObject(bool persistent = false)
-            => m_AddGameObject?.Invoke(persistent);
+        public GameObject AddGameObject(bool persistent = false) => m_AddGameObject?.Invoke(persistent);
 
         /// <summary>Get the camera used in the stage</summary>
         public Camera camera => m_GetCamera?.Invoke();

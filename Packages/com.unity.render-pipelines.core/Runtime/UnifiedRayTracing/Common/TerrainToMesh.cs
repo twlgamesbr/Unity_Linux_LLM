@@ -8,7 +8,13 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 {
     internal static class TerrainToMesh
     {
-        static private AsyncTerrainToMeshRequest MakeAsyncTerrainToMeshRequest(int width, int height, Vector3 heightmapScale, float[,] heightmap, bool[,] holes)
+        private static AsyncTerrainToMeshRequest MakeAsyncTerrainToMeshRequest(
+            int width,
+            int height,
+            Vector3 heightmapScale,
+            float[,] heightmap,
+            bool[,] holes
+        )
         {
             int vertexCount = width * height;
             var job = new ComputeTerrainMeshJob();
@@ -34,7 +40,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return new AsyncTerrainToMeshRequest(job, jobHandle);
         }
 
-        static public AsyncTerrainToMeshRequest ConvertAsync(Terrain terrain)
+        public static AsyncTerrainToMeshRequest ConvertAsync(Terrain terrain)
         {
             TerrainData terrainData = terrain.terrainData;
             int width = terrainData.heightmapTexture.width;
@@ -44,38 +50,63 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             return MakeAsyncTerrainToMeshRequest(width, height, terrainData.heightmapScale, heightmap, holes);
         }
 
-        static public AsyncTerrainToMeshRequest ConvertAsync(int heightmapWidth, int heightmapHeight, short[] heightmapData, Vector3 heightmapScale, int holeWidth, int holeHeight, byte[] holedata)
+        public static AsyncTerrainToMeshRequest ConvertAsync(
+            int heightmapWidth,
+            int heightmapHeight,
+            short[] heightmapData,
+            Vector3 heightmapScale,
+            int holeWidth,
+            int holeHeight,
+            byte[] holedata
+        )
         {
-            float[,] heightmap = new float[heightmapWidth,heightmapHeight];
+            float[,] heightmap = new float[heightmapWidth, heightmapHeight];
             for (int y = 0; y < heightmapHeight; ++y)
-                for (int x = 0; x < heightmapWidth; ++x)
-                    heightmap[y, x] = (float)heightmapData[y * heightmapWidth + x] / (float)32766;
+            for (int x = 0; x < heightmapWidth; ++x)
+                heightmap[y, x] = (float)heightmapData[y * heightmapWidth + x] / (float)32766;
 
             bool[,] holes = new bool[heightmapWidth - 1, heightmapHeight - 1];
             if (holedata != null)
             {
                 for (int y = 0; y < heightmapHeight - 1; ++y)
-                    for (int x = 0; x < heightmapWidth - 1; ++x)
-                        holes[y, x] = holedata[y * holeWidth + x] != 0;
+                for (int x = 0; x < heightmapWidth - 1; ++x)
+                    holes[y, x] = holedata[y * holeWidth + x] != 0;
             }
             else
             {
                 for (int y = 0; y < heightmapHeight - 1; ++y)
-                    for (int x = 0; x < heightmapWidth - 1; ++x)
-                        holes[x, y] = true;
+                for (int x = 0; x < heightmapWidth - 1; ++x)
+                    holes[x, y] = true;
             }
             return MakeAsyncTerrainToMeshRequest(heightmapWidth, heightmapHeight, heightmapScale, heightmap, holes);
         }
-        static public Mesh Convert(Terrain terrain)
+
+        public static Mesh Convert(Terrain terrain)
         {
             var request = ConvertAsync(terrain);
             request.WaitForCompletion();
             return request.GetMesh();
         }
 
-        static public Mesh Convert(int heightmapWidth, int heightmapHeight, short[] heightmapData, Vector3 heightmapScale, int holeWidth, int holeHeight, byte[] holedata)
+        public static Mesh Convert(
+            int heightmapWidth,
+            int heightmapHeight,
+            short[] heightmapData,
+            Vector3 heightmapScale,
+            int holeWidth,
+            int holeHeight,
+            byte[] holedata
+        )
         {
-            var request = ConvertAsync(heightmapWidth, heightmapHeight, heightmapData, heightmapScale, holeWidth, holeHeight, holedata);
+            var request = ConvertAsync(
+                heightmapWidth,
+                heightmapHeight,
+                heightmapData,
+                heightmapScale,
+                holeWidth,
+                holeHeight,
+                holedata
+            );
             request.WaitForCompletion();
             return request.GetMesh();
         }
@@ -89,7 +120,11 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             m_JobHandle = jobHandle;
         }
 
-        public bool done { get { return m_JobHandle.IsCompleted; } }
+        public bool done
+        {
+            get { return m_JobHandle.IsCompleted; }
+        }
+
         public Mesh GetMesh()
         {
             if (!done)
@@ -180,7 +215,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             int x = vertexIndex % width;
             int y = vertexIndex / height;
 
-            float3 v = new float3(x, heightmap[y*width +x], y);
+            float3 v = new float3(x, heightmap[y * width + x], y);
 
             positions[vertexIndex] = v * heightmapScale;
             uvs[vertexIndex] = v.xz / new float2(width, height);
@@ -200,19 +235,27 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                     i1 = i2 = i3 = i4 = 0;
                 }
 
-                indices[6* faceIndex + 0] = i1;
-                indices[6* faceIndex + 1] = i4;
-                indices[6* faceIndex + 2] = i2;
+                indices[6 * faceIndex + 0] = i1;
+                indices[6 * faceIndex + 1] = i4;
+                indices[6 * faceIndex + 2] = i2;
 
-                indices[6* faceIndex + 3] = i1;
-                indices[6* faceIndex + 4] = i3;
-                indices[6* faceIndex + 5] = i4;
+                indices[6 * faceIndex + 3] = i1;
+                indices[6 * faceIndex + 4] = i3;
+                indices[6 * faceIndex + 5] = i4;
             }
         }
 
-        static float3 CalculateTerrainNormal(NativeArray<float> heightmap, int x, int y, int width, int height, float3 scale)
+        static float3 CalculateTerrainNormal(
+            NativeArray<float> heightmap,
+            int x,
+            int y,
+            int width,
+            int height,
+            float3 scale
+        )
         {
-            float dY, dX;
+            float dY,
+                dX;
 
             dX = SampleHeight(x - 1, y - 1, width, height, heightmap, scale.y) * -1.0F;
             dX += SampleHeight(x - 1, y, width, height, heightmap, scale.y) * -2.0F;
@@ -234,13 +277,12 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             // Cross Product of components of gradient reduces to
             return math.normalize(new float3(-dX, 8, -dY));
         }
+
         static float SampleHeight(int x, int y, int width, int height, NativeArray<float> heightmap, float scale)
         {
             x = math.clamp(x, 0, width - 1);
             y = math.clamp(y, 0, height - 1);
-            return heightmap[x + y* width] * scale;
+            return heightmap[x + y * width] * scale;
         }
-
     }
-
 }

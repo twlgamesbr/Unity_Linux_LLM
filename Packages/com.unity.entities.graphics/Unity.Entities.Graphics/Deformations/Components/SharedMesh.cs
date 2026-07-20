@@ -25,13 +25,7 @@ namespace Unity.Rendering
             int hash = 0;
             unsafe
             {
-                var buffer = stackalloc int[]
-                {
-                    (int)MeshID.value,
-                    VertexCount,
-                    BlendShapeCount,
-                    BoneCount,
-                };
+                var buffer = stackalloc int[] { (int)MeshID.value, VertexCount, BlendShapeCount, BoneCount };
 
                 hash = (int)XXHash.Hash32((byte*)buffer, 4 * 4);
             }

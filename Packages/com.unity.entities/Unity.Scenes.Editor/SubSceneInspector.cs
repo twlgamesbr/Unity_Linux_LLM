@@ -63,12 +63,12 @@ namespace Unity.Scenes.Editor
                 var prevSceneAsset = m_PreviousSceneAssets[i];
                 if (prevSceneAsset != subScene.SceneAsset)
                 {
-
                     if (subScene.gameObject.scene.path == subScene.EditingScene.path)
                     {
                         UnityEngine.Debug.LogError(
                             $"Circular reference detected: Attempted to convert Scene '{subScene.EditingScene.path}' into a Sub Scene. A scene cannot reference itself as a SubScene.",
-                            this );
+                            this
+                        );
                         Undo.PerformUndo();
                         break;
                     }
@@ -80,7 +80,14 @@ namespace Unity.Scenes.Editor
                         var scene = subScene.EditingScene;
                         if (scene.IsValid() && !scene.isSubScene)
                         {
-                            if (EditorUtility.DisplayDialog("Convert to Sub Scene?", "The Scene is already loaded as a root Scene. Do you want to convert it to a Sub Scene?", "Convert", "Cancel"))
+                            if (
+                                EditorUtility.DisplayDialog(
+                                    "Convert to Sub Scene?",
+                                    "The Scene is already loaded as a root Scene. Do you want to convert it to a Sub Scene?",
+                                    "Convert",
+                                    "Cancel"
+                                )
+                            )
                             {
                                 // Make loaded scene a Sub Scene. Only needs to be done once,
                                 // since even with multi-editing, user can only have assigned one Scene.
@@ -190,12 +197,16 @@ namespace Unity.Scenes.Editor
                     GUILayout.Space(EditorGUIUtility.singleLineHeight);
                     EditorGUILayout.HelpBox(
                         "Opened subscenes are just for live editing in the editor. Opened subscenes don't stream in and their entities are immediately available when entering playmode in the editor.\n\nClosed subscenes are streamed in and their entities will take a few frames to be available when entering playmode. \n\nIn builds, subscenes will behave as closed subscenes in the editor, therefore their entities will not be available immediately.",
-                        MessageType.Warning);
+                        MessageType.Warning
+                    );
                 }
             }
         }
 
-        private static bool DrawClosedSubScenes(SubSceneInspectorUtility.LoadableScene[] loadableScenes, SubScene[] closedSubScenes)
+        private static bool DrawClosedSubScenes(
+            SubSceneInspectorUtility.LoadableScene[] loadableScenes,
+            SubScene[] closedSubScenes
+        )
         {
             if (World.DefaultGameObjectInjectionWorld != null && closedSubScenes.Length != 0)
             {
@@ -217,7 +228,14 @@ namespace Unity.Scenes.Editor
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(Content.ClosedSubScenesLabel, EditorStyles.boldLabel);
                     GUILayout.FlexibleSpace();
-                    GUILayout.Label(string.Format(Content.ClosedStatusString, numScenesLoaded, loadableScenes.Length, numScenesImported));
+                    GUILayout.Label(
+                        string.Format(
+                            Content.ClosedStatusString,
+                            numScenesLoaded,
+                            loadableScenes.Length,
+                            numScenesImported
+                        )
+                    );
                     GUILayout.EndHorizontal();
                 }
                 else
@@ -225,7 +243,14 @@ namespace Unity.Scenes.Editor
                     GUILayout.Label(Content.ClosedSubScenesLabel, EditorStyles.boldLabel);
                     GUILayout.BeginHorizontal();
                     GUILayout.FlexibleSpace();
-                    GUILayout.Label(string.Format(Content.ClosedStatusString, numScenesLoaded, loadableScenes.Length, numScenesImported));
+                    GUILayout.Label(
+                        string.Format(
+                            Content.ClosedStatusString,
+                            numScenesLoaded,
+                            loadableScenes.Length,
+                            numScenesImported
+                        )
+                    );
                     GUILayout.EndHorizontal();
                 }
 
@@ -258,7 +283,15 @@ namespace Unity.Scenes.Editor
 
                     GUILayout.EndHorizontal();
 
-                    if (reimportRequested && EditorUtility.DisplayDialog(Content.ReimportAllSubScenes, Content.ReimportAllSubScenesDetails, Content.Yes, Content.No))
+                    if (
+                        reimportRequested
+                        && EditorUtility.DisplayDialog(
+                            Content.ReimportAllSubScenes,
+                            Content.ReimportAllSubScenesDetails,
+                            Content.Yes,
+                            Content.No
+                        )
+                    )
                         SubSceneInspectorUtility.ForceReimport(closedSubScenes);
 
                     GUILayout.Space(EditorGUIUtility.standardVerticalSpacing);
@@ -291,8 +324,12 @@ namespace Unity.Scenes.Editor
             return false;
         }
 
-
-        static void DrawSection(EntityManager entityManager, SubScene subscene, bool hasLoadableSections, SubSceneInspectorUtility.LoadableScene loadableScene)
+        static void DrawSection(
+            EntityManager entityManager,
+            SubScene subscene,
+            bool hasLoadableSections,
+            SubSceneInspectorUtility.LoadableScene loadableScene
+        )
         {
             if (hasLoadableSections)
             {
@@ -323,7 +360,9 @@ namespace Unity.Scenes.Editor
                 buttonRect.x += buttonRect.width + spacing;
                 if (!loadableScene.IsLoaded)
                 {
-                    using (new EditorGUI.DisabledScope(!loadableScene.Section0IsLoaded && loadableScene.SectionIndex != 0))
+                    using (
+                        new EditorGUI.DisabledScope(!loadableScene.Section0IsLoaded && loadableScene.SectionIndex != 0)
+                    )
                     {
                         if (GUI.Button(buttonRect, Content.LoadLabel))
                         {
@@ -335,7 +374,11 @@ namespace Unity.Scenes.Editor
                 }
                 else
                 {
-                    using (new EditorGUI.DisabledScope(loadableScene.NumSubSceneSectionsLoaded > 1 && loadableScene.SectionIndex == 0))
+                    using (
+                        new EditorGUI.DisabledScope(
+                            loadableScene.NumSubSceneSectionsLoaded > 1 && loadableScene.SectionIndex == 0
+                        )
+                    )
                     {
                         if (GUI.Button(buttonRect, Content.UnloadLabel))
                         {
@@ -367,7 +410,11 @@ namespace Unity.Scenes.Editor
                 // SubScene, and not the load/unload/edit/close buttons.
                 base.OnInspectorGUI();
 
-                EditorGUILayout.HelpBox($"Only Sub Scenes in the Main Stage can be loaded and unloaded.", MessageType.Info, true);
+                EditorGUILayout.HelpBox(
+                    $"Only Sub Scenes in the Main Stage can be loaded and unloaded.",
+                    MessageType.Info,
+                    true
+                );
                 EditorGUILayout.Space();
                 return;
             }
@@ -418,12 +465,18 @@ namespace Unity.Scenes.Editor
 
                 EditorUpdateUtility.EditModeQueuePlayerLoopUpdate();
             }
-    #endif
+#endif
 
-            bool hasDuplicates = subScene.SceneAsset != null && (SubScene.AllSubScenes.Count(s => (s.SceneAsset == subScene.SceneAsset)) > 1);
+            bool hasDuplicates =
+                subScene.SceneAsset != null
+                && (SubScene.AllSubScenes.Count(s => (s.SceneAsset == subScene.SceneAsset)) > 1);
             if (hasDuplicates)
             {
-                EditorGUILayout.HelpBox($"The Scene Asset '{subScene.EditableScenePath}' is used mutiple times and this is not supported. Clear the reference.", MessageType.Warning, true);
+                EditorGUILayout.HelpBox(
+                    $"The Scene Asset '{subScene.EditableScenePath}' is used mutiple times and this is not supported. Clear the reference.",
+                    MessageType.Warning,
+                    true
+                );
                 if (GUILayout.Button("Clear"))
                 {
                     subScene.SceneAsset = null;
@@ -435,7 +488,11 @@ namespace Unity.Scenes.Editor
             var uncleanHierarchyObject = SubSceneInspectorUtility.GetUncleanHierarchyObject(_selectedSubscenes);
             if (uncleanHierarchyObject != null)
             {
-                EditorGUILayout.HelpBox($"Scene transform values are not applied to scenes child transforms. But {uncleanHierarchyObject.name} has an offset Transform.", MessageType.Warning, true);
+                EditorGUILayout.HelpBox(
+                    $"Scene transform values are not applied to scenes child transforms. But {uncleanHierarchyObject.name} has an offset Transform.",
+                    MessageType.Warning,
+                    true
+                );
                 if (GUILayout.Button("Clear"))
                 {
                     foreach (var scene in _selectedSubscenes)
@@ -449,7 +506,11 @@ namespace Unity.Scenes.Editor
             }
             if (SubSceneInspectorUtility.HasChildren(_selectedSubscenes))
             {
-                EditorGUILayout.HelpBox($"SubScenes can not have child game objects. Close the scene and delete the child game objects.", MessageType.Warning, true);
+                EditorGUILayout.HelpBox(
+                    $"SubScenes can not have child game objects. Close the scene and delete the child game objects.",
+                    MessageType.Warning,
+                    true
+                );
             }
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
@@ -465,7 +526,9 @@ namespace Unity.Scenes.Editor
         // Frames the whole sub scene in scene view
         bool HasFrameBounds()
         {
-            return !SubSceneInspectorUtility.GetActiveWorldMinMax(World.DefaultGameObjectInjectionWorld, targets).Equals(MinMaxAABB.Empty);
+            return !SubSceneInspectorUtility
+                .GetActiveWorldMinMax(World.DefaultGameObjectInjectionWorld, targets)
+                .Equals(MinMaxAABB.Empty);
         }
 
         Bounds OnGetFrameBounds()
@@ -489,7 +552,12 @@ namespace Unity.Scenes.Editor
 
                 if (sceneSystem != SystemHandle.Null)
                 {
-                    var hash = EntityScenesPaths.GetSubSceneArtifactHash(subScene.SceneGUID, world.EntityManager.GetComponentData<SceneSystemData>(sceneSystem).BuildConfigurationGUID, true, mode);
+                    var hash = EntityScenesPaths.GetSubSceneArtifactHash(
+                        subScene.SceneGUID,
+                        world.EntityManager.GetComponentData<SceneSystemData>(sceneSystem).BuildConfigurationGUID,
+                        true,
+                        mode
+                    );
                     if (!hash.IsValid)
                         return false;
                 }
@@ -507,16 +575,22 @@ namespace Unity.Scenes.Editor
             public static readonly GUIContent LoadAllLabel = EditorGUIUtility.TrTextContent("Load All");
             public static readonly GUIContent UnloadAllLabel = EditorGUIUtility.TrTextContent("Unload All");
             public static readonly GUIContent ReimportAllLabel = EditorGUIUtility.TrTextContent("Reimport All");
-            public static readonly GUIContent LoadLabel = EditorGUIUtility.TrTextContent("Load", "You can only load a section if section 0 of that scene is also loaded.");
-            public static readonly GUIContent UnloadLabel = EditorGUIUtility.TrTextContent("Unload", "You can only unload section 0 if no other sections of that scene are loaded.");
+            public static readonly GUIContent LoadLabel = EditorGUIUtility.TrTextContent(
+                "Load",
+                "You can only load a section if section 0 of that scene is also loaded."
+            );
+            public static readonly GUIContent UnloadLabel = EditorGUIUtility.TrTextContent(
+                "Unload",
+                "You can only unload section 0 if no other sections of that scene are loaded."
+            );
             public static readonly GUIContent ReimportLabel = EditorGUIUtility.TrTextContent("Reimport");
             public static readonly GUIContent ImportingLabel = EditorGUIUtility.TrTextContent("Importing...");
             public static readonly GUIContent OpenLabel = EditorGUIUtility.TrTextContent("Open");
             public static readonly string ClosedStatusString = L10n.Tr("{0} / {1} loaded, {2} / {1} imported");
             public static readonly string ReimportAllSubScenes = L10n.Tr("Reimport All Selected SubScenes?");
-            public static readonly string ReimportAllSubScenesDetails =
-                L10n.Tr(
-                    "Reimporting all SubScenes could take a considerable amount of time. Do you really want to trigger a reimport?");
+            public static readonly string ReimportAllSubScenesDetails = L10n.Tr(
+                "Reimporting all SubScenes could take a considerable amount of time. Do you really want to trigger a reimport?"
+            );
             public static readonly string Yes = L10n.Tr("Yes");
             public static readonly string No = L10n.Tr("No");
         }

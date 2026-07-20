@@ -1,7 +1,6 @@
 #if HAS_VFX_GRAPH
 using System.Linq;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 namespace UnityEditor.VFX.URP
@@ -30,26 +29,55 @@ namespace UnityEditor.VFX.URP
             MetallicMapBlue,
         }
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), Header("Opacity Channels"), SerializeField,
-         Tooltip("Specifies the source this Material uses as opacity for its Normal Map.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            Header("Opacity Channels"),
+            SerializeField,
+            Tooltip("Specifies the source this Material uses as opacity for its Normal Map.")
+        ]
         BlendSource normalOpacityChannel = BlendSource.BaseColorMapAlpha;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, InspectorName("MAOS Opacity Channel"),
-         Tooltip("Specifies the source this Material uses as opacity for its Mask Map.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            InspectorName("MAOS Opacity Channel"),
+            Tooltip("Specifies the source this Material uses as opacity for its Mask Map.")
+        ]
         BlendSource MAOSOpacityChannel = BlendSource.BaseColorMapAlpha;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("Enables fading the decal based on the angle between the decal backward direction and the receiving surface normal.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "Enables fading the decal based on the angle between the decal backward direction and the receiving surface normal."
+            )
+        ]
         internal bool angleFade = true;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), Header("Surface options"), SerializeField,
-         Tooltip("When enabled, modifies the base color of the surface it projects onto.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            Header("Surface options"),
+            SerializeField,
+            Tooltip("When enabled, modifies the base color of the surface it projects onto.")
+        ]
         private bool affectBaseColor = true;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField,
-         Tooltip("When enabled, modifies the metallic, ambient occlusion and smoothness of the surface it projects onto. The ambient occlusion slider is available when using an Occlusion Map.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "When enabled, modifies the metallic, ambient occlusion and smoothness of the surface it projects onto. The ambient occlusion slider is available when using an Occlusion Map."
+            )
+        ]
         private bool affectMAOS = true;
 
-        [VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector), SerializeField, Tooltip("Specify the layer mask for the decals. Unity renders decals on all meshes where at least one Rendering Layer value matches.")]
+        [
+            VFXSetting(VFXSettingAttribute.VisibleFlags.InInspector),
+            SerializeField,
+            Tooltip(
+                "Specify the layer mask for the decals. Unity renders decals on all meshes where at least one Rendering Layer value matches."
+            )
+        ]
         private uint decalLayer = ~0u;
 
         protected override bool useSmoothness => affectMAOS;
@@ -57,6 +85,7 @@ namespace UnityEditor.VFX.URP
         protected override bool useNormalScale => false;
 
         public override bool HasSorting() => (sort == SortActivationMode.On) || (sort == SortActivationMode.Auto);
+
         public class FadeFactorProperty
         {
             [Range(0, 1), Tooltip("Controls the transparency of the decal.")]
@@ -65,7 +94,12 @@ namespace UnityEditor.VFX.URP
 
         public class AngleFadeProperty
         {
-            [Tooltip("Use the min-max slider to control the fade out range of the decal based on the angle between the Decal backward direction and the vertex normal of the receiving surface."), MinMax(0.0f, 180.0f)]
+            [
+                Tooltip(
+                    "Use the min-max slider to control the fade out range of the decal based on the angle between the Decal backward direction and the vertex normal of the receiving surface."
+                ),
+                MinMax(0.0f, 180.0f)
+            ]
             public Vector2 angleFade = new Vector2(0.0f, 180.0f);
         }
 
@@ -80,6 +114,7 @@ namespace UnityEditor.VFX.URP
             [Tooltip("Controls the scale factor for the particle’s ambient occlusion."), Range(0, 1)]
             public float ambientOcclusion = 1.0f;
         }
+
         protected override IEnumerable<VFXPropertyWithValue> inputProperties
         {
             get
@@ -87,19 +122,18 @@ namespace UnityEditor.VFX.URP
                 var properties = Enumerable.Empty<VFXPropertyWithValue>();
 
                 properties = properties.Concat(PropertiesFromType(nameof(FadeFactorProperty)));
-                if(angleFade)
+                if (angleFade)
                     properties = properties.Concat(PropertiesFromType(nameof(AngleFadeProperty)));
 
                 foreach (var prop in base.inputProperties)
                 {
                     //Inserts slots in the correct order
                     properties = properties.Append(prop);
-                    if(prop.property.name ==  "normalMap")
+                    if (prop.property.name == "normalMap")
                         properties = properties.Concat(PropertiesFromType(nameof(NormalAlphaProperty)));
 
-                    if(affectMAOS && useOcclusionMap && prop.property.name == "occlusionMap")
+                    if (affectMAOS && useOcclusionMap && prop.property.name == "occlusionMap")
                         properties = properties.Concat(PropertiesFromType(nameof(AmbientOcclusionProperty)));
-
                 }
 
                 return properties;
@@ -107,7 +141,8 @@ namespace UnityEditor.VFX.URP
         }
 
         protected override IEnumerable<VFXNamedExpression> CollectGPUExpressions(
-            IEnumerable<VFXNamedExpression> slotExpressions)
+            IEnumerable<VFXNamedExpression> slotExpressions
+        )
         {
             foreach (var exp in base.CollectGPUExpressions(slotExpressions))
             {
@@ -121,12 +156,16 @@ namespace UnityEditor.VFX.URP
                 if (angleFade)
                 {
                     var angleFadeExp = slotExpressions.First(o => o.name == nameof(AngleFadeProperty.angleFade));
-                    yield return new VFXNamedExpression(AngleFadeSimplification(angleFadeExp.exp),
-                        nameof(AngleFadeProperty.angleFade));
+                    yield return new VFXNamedExpression(
+                        AngleFadeSimplification(angleFadeExp.exp),
+                        nameof(AngleFadeProperty.angleFade)
+                    );
                 }
 
                 if (affectMAOS && useOcclusionMap)
-                    yield return slotExpressions.First(o => o.name == nameof(AmbientOcclusionProperty.ambientOcclusion));
+                    yield return slotExpressions.First(o =>
+                        o.name == nameof(AmbientOcclusionProperty.ambientOcclusion)
+                    );
 
                 if (useNormalMap)
                     yield return slotExpressions.First(o => o.name == nameof(NormalAlphaProperty.normalAlpha));
@@ -143,10 +182,10 @@ namespace UnityEditor.VFX.URP
             var range = new VFXExpressionMax(VFXValue.Constant(0.0001f), angleEnd - angleStart);
             var simplifiedAngleFade = new VFXExpressionCombine(
                 VFXValue.Constant(1.0f) - (VFXValue.Constant(0.25f) - angleStart) / range,
-                VFXValue.Constant(-0.25f) / range);
+                VFXValue.Constant(-0.25f) / range
+            );
             return simplifiedAngleFade;
         }
-
 
         public override IEnumerable<string> additionalDefines
         {
@@ -213,7 +252,6 @@ namespace UnityEditor.VFX.URP
                     yield return nameof(useOcclusionMap);
                     yield return nameof(MAOSOpacityChannel);
                 }
-
             }
         }
 
@@ -228,7 +266,6 @@ namespace UnityEditor.VFX.URP
                 yield return nameof(blendMode);
             }
         }
-
 
         protected VFXShaderWriter GetDBufferMaskColor(int maskIndex)
         {
@@ -272,6 +309,7 @@ namespace UnityEditor.VFX.URP
 
             return rs;
         }
+
         public override IEnumerable<KeyValuePair<string, VFXShaderWriter>> additionalReplacements
         {
             get
@@ -281,13 +319,17 @@ namespace UnityEditor.VFX.URP
 
                 for (int i = 0; i < 3; i++)
                 {
-                    yield return new KeyValuePair<string, VFXShaderWriter>("${VFXDBufferColorMask" + i + "}",
-                        GetDBufferMaskColor(i));
+                    yield return new KeyValuePair<string, VFXShaderWriter>(
+                        "${VFXDBufferColorMask" + i + "}",
+                        GetDBufferMaskColor(i)
+                    );
                 }
                 for (int i = 0; i < 4; i++)
                 {
-                    yield return new KeyValuePair<string, VFXShaderWriter>("${VFXGBufferDecalColorMask" + i + "}",
-                        GetGBufferDecalMaskColor(i));
+                    yield return new KeyValuePair<string, VFXShaderWriter>(
+                        "${VFXGBufferDecalColorMask" + i + "}",
+                        GetGBufferDecalMaskColor(i)
+                    );
                 }
             }
         }
@@ -317,8 +359,6 @@ namespace UnityEditor.VFX.URP
         }
     }
 }
-
-
 
 
 #endif

@@ -11,7 +11,11 @@ namespace Unity.Entities.UI
     struct ScopedVisitor<T> : IDisposable
         where T : class, IResetableVisitor, new()
     {
-        public static readonly UnityEngine.Pool.ObjectPool<T> Pool = new UnityEngine.Pool.ObjectPool<T>(() => new T(), null, v => v.Reset());
+        public static readonly UnityEngine.Pool.ObjectPool<T> Pool = new UnityEngine.Pool.ObjectPool<T>(
+            () => new T(),
+            null,
+            v => v.Reset()
+        );
 
         readonly T Value;
 
@@ -42,7 +46,7 @@ namespace Unity.Entities.UI
             None,
             Inspector,
             PropertyInspector,
-            AttributeInspector
+            AttributeInspector,
         }
 
         class CustomInspectorVisitor<TDeclaredValueType> : ConcreteTypeVisitor, IResetableVisitor
@@ -88,12 +92,7 @@ namespace Unity.Entities.UI
 
                 if (null != inspector)
                 {
-                    inspector.Context = new InspectorContext<T>(
-                        Root,
-                        PropertyPath,
-                        Property,
-                        Property.GetAttributes()
-                    );
+                    inspector.Context = new InspectorContext<T>(Root, PropertyPath, Property, Property.GetAttributes());
                 }
 
                 return inspector;

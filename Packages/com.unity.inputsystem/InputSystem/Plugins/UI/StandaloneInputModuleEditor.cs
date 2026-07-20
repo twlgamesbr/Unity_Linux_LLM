@@ -21,7 +21,9 @@ namespace UnityEngine.InputSystem.UI.Editor
             {
                 var playerSettings = Resources.FindObjectsOfTypeAll<PlayerSettings>()[0];
                 var so = new SerializedObject(playerSettings);
-                enableNativePlatformBackendsForNewInputSystem = so.FindProperty("enableNativePlatformBackendsForNewInputSystem");
+                enableNativePlatformBackendsForNewInputSystem = so.FindProperty(
+                    "enableNativePlatformBackendsForNewInputSystem"
+                );
                 disableOldInputManagerSupport = so.FindProperty("disableOldInputManagerSupport");
             }
         }
@@ -29,12 +31,21 @@ namespace UnityEngine.InputSystem.UI.Editor
         public override void OnInspectorGUI()
         {
             // We assume that if these properties don't exist (ie are null), then that's because the new Input System has become the default.
-            if (enableNativePlatformBackendsForNewInputSystem == null || enableNativePlatformBackendsForNewInputSystem.boolValue)
+            if (
+                enableNativePlatformBackendsForNewInputSystem == null
+                || enableNativePlatformBackendsForNewInputSystem.boolValue
+            )
             {
                 if (disableOldInputManagerSupport == null || disableOldInputManagerSupport.boolValue)
-                    EditorGUILayout.HelpBox("You are using StandaloneInputModule, which uses the old InputManager. You are using the new InputSystem, and have the old InputManager disabled. StandaloneInputModule will not work. Click the button below to replace this component with a InputSystemUIInputModule, which uses the new InputSystem.", MessageType.Error);
+                    EditorGUILayout.HelpBox(
+                        "You are using StandaloneInputModule, which uses the old InputManager. You are using the new InputSystem, and have the old InputManager disabled. StandaloneInputModule will not work. Click the button below to replace this component with a InputSystemUIInputModule, which uses the new InputSystem.",
+                        MessageType.Error
+                    );
                 else
-                    EditorGUILayout.HelpBox("You are using StandaloneInputModule, which uses the old InputManager. You also have the new InputSystem enabled in your project. Click the button below to replace this component with a InputSystemUIInputModule, which uses the new InputSystem (recommended).", MessageType.Info);
+                    EditorGUILayout.HelpBox(
+                        "You are using StandaloneInputModule, which uses the old InputManager. You also have the new InputSystem enabled in your project. Click the button below to replace this component with a InputSystemUIInputModule, which uses the new InputSystem (recommended).",
+                        MessageType.Info
+                    );
                 if (GUILayout.Button("Replace with InputSystemUIInputModule"))
                 {
                     var go = ((StandaloneInputModule)target).gameObject;

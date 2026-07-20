@@ -33,6 +33,7 @@ namespace UnityEngine.TestTools
         /// Returns true if the instruction expects a domain reload to occur.
         /// </summary>
         public bool ExpectDomainReload { get; }
+
         /// <summary>
         /// Returns true if the instruction expects the Unity Editor to be in **Play Mode**.
         /// </summary>
@@ -57,7 +58,8 @@ namespace UnityEngine.TestTools
             throw new Exception(
                 EditorUtility.scriptCompilationFailed
                     ? "Script compilation failed"
-                    : "Expected domain reload, but it did not occur");
+                    : "Expected domain reload, but it did not occur"
+            );
         }
     }
 }

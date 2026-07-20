@@ -16,11 +16,18 @@ namespace UnityEngine.InputSystem.Editor
         }
 
         static readonly Vector2 k_MinWindowSize = new Vector2(740, 450);
+
         // For UI testing purpose
         internal InputActionAsset currentAssetInEditor => m_AssetObjectForEditing;
-        [SerializeField] private InputActionAsset m_AssetObjectForEditing;
-        [SerializeField] private InputActionsEditorState m_State;
-        [SerializeField] private string m_AssetGUID;
+
+        [SerializeField]
+        private InputActionAsset m_AssetObjectForEditing;
+
+        [SerializeField]
+        private InputActionsEditorState m_State;
+
+        [SerializeField]
+        private string m_AssetGUID;
 
         private string m_AssetJson;
         private bool m_IsDirty;
@@ -32,7 +39,8 @@ namespace UnityEngine.InputSystem.Editor
 
         private InputActionsEditorSessionAnalytic analytics =>
             m_Analytics ??= new InputActionsEditorSessionAnalytic(
-                InputActionsEditorSessionAnalytic.Data.Kind.EditorWindow);
+                InputActionsEditorSessionAnalytic.Data.Kind.EditorWindow
+            );
 
         // Unity 6.3 changed signature of OpenAsset, and now it accepts entity id instead of instance id.
         [OnOpenAsset]
@@ -44,7 +52,6 @@ namespace UnityEngine.InputSystem.Editor
 
             return OpenAsset(EditorUtility.EntityIdToObject(entityId));
         }
-
 #else
         public static bool OpenAsset(int instanceId, int line)
         {
@@ -53,7 +60,6 @@ namespace UnityEngine.InputSystem.Editor
 
             return OpenAsset(EditorUtility.InstanceIDToObject(instanceId));
         }
-
 #endif
 
         private static bool OpenAsset(Object obj)
@@ -90,13 +96,19 @@ namespace UnityEngine.InputSystem.Editor
             return true;
         }
 
-        private static InputActionsEditorWindow OpenWindow(InputActionAsset asset, string actionMapToSelect = null, string actionToSelect = null)
+        private static InputActionsEditorWindow OpenWindow(
+            InputActionAsset asset,
+            string actionMapToSelect = null,
+            string actionToSelect = null
+        )
         {
             ////REVIEW: It'd be great if the window got docked by default but the public EditorWindow API doesn't allow that
             ////        to be done for windows that aren't singletons (GetWindow<T>() will only create one window and it's the
             ////        only way to get programmatic docking with the current API).
             // See if we have an existing editor window that has the asset open.
-            var existingWindow = InputActionAssetEditor.FindOpenEditor<InputActionsEditorWindow>(AssetDatabase.GetAssetPath(asset));
+            var existingWindow = InputActionAssetEditor.FindOpenEditor<InputActionsEditorWindow>(
+                AssetDatabase.GetAssetPath(asset)
+            );
             if (existingWindow != null)
             {
                 existingWindow.Focus();
@@ -160,8 +172,10 @@ namespace UnityEngine.InputSystem.Editor
             try
             {
                 // Obtain and persist GUID for the associated asset
-                Debug.Assert(AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out m_AssetGUID, out long _),
-                    $"Failed to get asset {asset.name} GUID");
+                Debug.Assert(
+                    AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out m_AssetGUID, out long _),
+                    $"Failed to get asset {asset.name} GUID"
+                );
 
                 // Attempt to update editor and internals based on associated asset
                 if (!TryUpdateFromAsset())
@@ -207,7 +221,9 @@ namespace UnityEngine.InputSystem.Editor
                     var asset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(assetPath);
 
                     if (asset == null)
-                        throw new Exception($"Failed to load asset \"{assetPath}\". The file may have been deleted or moved.");
+                        throw new Exception(
+                            $"Failed to load asset \"{assetPath}\". The file may have been deleted or moved."
+                        );
 
                     m_AssetJson = InputActionsEditorWindowUtils.ToJsonWithoutName(asset);
 
@@ -258,7 +274,12 @@ namespace UnityEngine.InputSystem.Editor
             rootVisualElement.Clear();
             if (!rootVisualElement.styleSheets.Contains(InputActionsEditorWindowUtils.theme))
                 rootVisualElement.styleSheets.Add(InputActionsEditorWindowUtils.theme);
-            m_View = new InputActionsEditorView(rootVisualElement, m_StateContainer, false, () => Save(isAutoSave: false));
+            m_View = new InputActionsEditorView(
+                rootVisualElement,
+                m_StateContainer,
+                false,
+                () => Save(isAutoSave: false)
+            );
             m_StateContainer.Initialize(rootVisualElement.Q("action-editor"));
         }
 
@@ -419,7 +440,9 @@ namespace UnityEngine.InputSystem.Editor
             var assetPath = AssetDatabase.GUIDToAssetPath(m_AssetGUID);
             if (assetPath == null)
             {
-                Debug.LogWarning($"Failed to open InputActionAsset with GUID {m_AssetGUID}. The asset might have been deleted.");
+                Debug.LogWarning(
+                    $"Failed to open InputActionAsset with GUID {m_AssetGUID}. The asset might have been deleted."
+                );
                 return false;
             }
 
@@ -496,7 +519,12 @@ namespace UnityEngine.InputSystem.Editor
             window.Save(isAutoSave: false);
         }
 
-        [Shortcut("Input Action Editor/Add Action Map", typeof(InputActionsEditorWindow), KeyCode.M, ShortcutModifiers.Alt)]
+        [Shortcut(
+            "Input Action Editor/Add Action Map",
+            typeof(InputActionsEditorWindow),
+            KeyCode.M,
+            ShortcutModifiers.Alt
+        )]
         private static void AddActionMapShortcut(ShortcutArguments arguments)
         {
             var window = (InputActionsEditorWindow)arguments.context;
@@ -510,7 +538,12 @@ namespace UnityEngine.InputSystem.Editor
             window.m_StateContainer.Dispatch(Commands.AddAction());
         }
 
-        [Shortcut("Input Action Editor/Add Binding", typeof(InputActionsEditorWindow), KeyCode.B, ShortcutModifiers.Alt)]
+        [Shortcut(
+            "Input Action Editor/Add Binding",
+            typeof(InputActionsEditorWindow),
+            KeyCode.B,
+            ShortcutModifiers.Alt
+        )]
         private static void AddBindingShortcut(ShortcutArguments arguments)
         {
             var window = (InputActionsEditorWindow)arguments.context;

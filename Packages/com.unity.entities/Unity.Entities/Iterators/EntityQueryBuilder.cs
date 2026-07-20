@@ -49,6 +49,7 @@ namespace Unity.Entities
             public ushort Index;
             public ushort Count;
         }
+
         internal struct QueryTypes
         {
             public ComponentIndexArray All;
@@ -67,6 +68,7 @@ namespace Unity.Entities
 
             // A homogenous list of ComponentTypes use for query specification.
             internal UnsafeList<ComponentType> _typeData;
+
             // List of structs that provide indices and ranges into the _typeData list for each of the component lists.
             // There will be one element in this list for each ArchetypeQuery created
             // in the EntityQuery (see AddAdditionalQuery).
@@ -123,7 +125,11 @@ namespace Unity.Entities
         ///
         /// If a component's access mode is "Exclude", it will instead be added to the None list as a read-only type.
         /// </remarks>
-        internal EntityQueryBuilder(AllocatorManager.AllocatorHandle allocator, ComponentType* componentTypes, int count)
+        internal EntityQueryBuilder(
+            AllocatorManager.AllocatorHandle allocator,
+            ComponentType* componentTypes,
+            int count
+        )
         {
             _allocator = allocator;
             _builderDataPtr = _allocator.Allocate(default(BuilderData), 1);
@@ -160,7 +166,9 @@ namespace Unity.Entities
         private void CheckBuilderPtr()
         {
             if (_builderDataPtr == null)
-                throw new NullReferenceException("The EntityQueryBuilder has not been initialized! The EntityQueryBuilder needs to be passed an Allocator when created!");
+                throw new NullReferenceException(
+                    "The EntityQueryBuilder has not been initialized! The EntityQueryBuilder needs to be passed an Allocator when created!"
+                );
         }
 
         /// <summary>
@@ -180,12 +188,14 @@ namespace Unity.Entities
             CheckBuilderPtr();
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            if(_builderDataPtr->_pendingOptions != default(EntityQueryOptions))
+            if (_builderDataPtr->_pendingOptions != default(EntityQueryOptions))
             {
-                throw new InvalidOperationException("EntityQueryBuilder.WithOptions should only be called once " +
-                                                    "for each query description. Subsequent calls will override previous " +
-                                                    "options, rather than adding to them. Use the bitwise OR operator '|'" +
-                                                    "to combine multiple options.");
+                throw new InvalidOperationException(
+                    "EntityQueryBuilder.WithOptions should only be called once "
+                        + "for each query description. Subsequent calls will override previous "
+                        + "options, rather than adding to them. Use the bitwise OR operator '|'"
+                        + "to combine multiple options."
+                );
             }
 #endif
             _builderDataPtr->_pendingOptions = options;
@@ -201,7 +211,10 @@ namespace Unity.Entities
         /// Add an "all" matching type to the current query.</remarks>
         /// <param name="t">The component type</param>
         /// <returns>The builder object that invoked this method.</returns>
-        [Obsolete("Use WithAll<T,...> instead, or WithAll(INativeList) if component types are not known at compile time. (RemovedAfter Entities 1.0)", false)]
+        [Obsolete(
+            "Use WithAll<T,...> instead, or WithAll(INativeList) if component types are not known at compile time. (RemovedAfter Entities 1.0)",
+            false
+        )]
         public EntityQueryBuilder AddAll(ComponentType t)
         {
             CheckBuilderPtr();
@@ -236,108 +249,315 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
 
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAll``1"/>
         /// <typeparam name="T2">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithAll<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithAll<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAll``2"/>
         /// <typeparam name="T3">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAll<T1,T2,T3>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAll<T1, T2, T3>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAll``3"/>
         /// <typeparam name="T4">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAll<T1,T2,T3,T4>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAll<T1, T2, T3, T4>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAll``4"/>
         /// <typeparam name="T5">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAll<T1,T2,T3,T4,T5>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAll<T1, T2, T3, T4, T5>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAll``5"/>
         /// <typeparam name="T6">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAll<T1,T2,T3,T4,T5,T6>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAll<T1, T2, T3, T4, T5, T6>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAll``6"/>
         /// <typeparam name="T7">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAll<T1,T2,T3,T4,T5,T6,T7>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAll<T1, T2, T3, T4, T5, T6, T7>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T7>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T7>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -367,19 +587,40 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAllRW``1"/>
         /// <typeparam name="T2">A required ReadWrite component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithAllRW<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithAllRW<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
-            _builderDataPtr->_all.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
+            _builderDataPtr->_all.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -455,7 +696,7 @@ namespace Unity.Entities
         /// </param>
         /// <typeparam name="T">A container of component types</typeparam>
         /// <returns>The builder object that invoked this method.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>)})]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>) })]
         public EntityQueryBuilder WithAll<T>(ref T componentTypes)
             where T : INativeList<ComponentType>
         {
@@ -491,7 +732,10 @@ namespace Unity.Entities
         /// Add an "any" matching type to the current query.</remarks>
         /// <param name="t">The component type</param>
         /// <returns>The builder object that invoked this method.</returns>
-        [Obsolete("Use WithAny<T,...> instead, or WithAny(INativeList) if component types are not known at compile time. (RemovedAfter Entities 1.0)", false)]
+        [Obsolete(
+            "Use WithAny<T,...> instead, or WithAny(INativeList) if component types are not known at compile time. (RemovedAfter Entities 1.0)",
+            false
+        )]
         public EntityQueryBuilder AddAny(ComponentType t)
         {
             CheckBuilderPtr();
@@ -499,7 +743,6 @@ namespace Unity.Entities
             _builderDataPtr->_isFinalized = 0;
             return WithAny(&t, 1);
         }
-
 
         /// <summary>
         /// Add optional component types to the query.
@@ -527,107 +770,315 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAny``1"/>
         /// <typeparam name="T2">An optional component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithAny<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithAny<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAny``2"/>
         /// <typeparam name="T3">An optional component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAny<T1,T2,T3>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAny<T1, T2, T3>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAny``3"/>
         /// <typeparam name="T4">An optional component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAny<T1,T2,T3,T4>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAny<T1, T2, T3, T4>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAny``4"/>
         /// <typeparam name="T5">An optional component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAny<T1,T2,T3,T4,T5>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAny<T1, T2, T3, T4, T5>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAny``5"/>
         /// <typeparam name="T6">An optional component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAny<T1,T2,T3,T4,T5,T6>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAny<T1, T2, T3, T4, T5, T6>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAny``6"/>
         /// <typeparam name="T7">An optional component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAny<T1,T2,T3,T4,T5,T6,T7>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAny<T1, T2, T3, T4, T5, T6, T7>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T7>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T7>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -663,19 +1114,40 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAnyRW``1"/>
         /// <typeparam name="T2">An optional ReadWrite component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithAnyRW<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithAnyRW<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
-            _builderDataPtr->_any.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
+            _builderDataPtr->_any.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -758,7 +1230,7 @@ namespace Unity.Entities
         /// </param>
         /// <typeparam name="T">A container of component types</typeparam>
         /// <returns>The builder object that invoked this method.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>)})]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>) })]
         public EntityQueryBuilder WithAny<T>(ref T componentTypes)
             where T : INativeList<ComponentType>
         {
@@ -796,7 +1268,10 @@ namespace Unity.Entities
         /// provided component type is <see cref="ComponentType.AccessMode.ReadWrite"/>, will be forced to
         /// <see cref="NativeArray{T}.ReadOnly"/> in the query.</remarks>
         /// <returns>The builder object that invoked this method.</returns>
-        [Obsolete("Use WithNone<T,...> instead, or WithNone(INativeList) if component types are not known at compile time. (RemovedAfter Entities 1.0)", false)]
+        [Obsolete(
+            "Use WithNone<T,...> instead, or WithNone(INativeList) if component types are not known at compile time. (RemovedAfter Entities 1.0)",
+            false
+        )]
         public EntityQueryBuilder AddNone(ComponentType t)
         {
             CheckBuilderPtr();
@@ -834,107 +1309,315 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithNone``1"/>
         /// <typeparam name="T2">An excluded component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)})]
-        public EntityQueryBuilder WithNone<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithNone<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithNone``2"/>
         /// <typeparam name="T3">An excluded component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithNone<T1,T2,T3>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithNone<T1, T2, T3>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithNone``3"/>
         /// <typeparam name="T4">An excluded component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithNone<T1,T2,T3,T4>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithNone<T1, T2, T3, T4>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithNone``4"/>
         /// <typeparam name="T5">An excluded component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithNone<T1,T2,T3,T4,T5>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithNone<T1, T2, T3, T4, T5>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithNone``5"/>
         /// <typeparam name="T6">An excluded component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithNone<T1,T2,T3,T4,T5,T6>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithNone<T1, T2, T3, T4, T5, T6>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithNone``6"/>
         /// <typeparam name="T7">An excluded component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithNone<T1,T2,T3,T4,T5,T6,T7>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithNone<T1, T2, T3, T4, T5, T6, T7>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_none.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T7>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_none.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T7>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -993,7 +1676,7 @@ namespace Unity.Entities
         /// </param>
         /// <typeparam name="T">A container of component types</typeparam>
         /// <returns>The builder object that invoked this method.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>)})]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>) })]
         public EntityQueryBuilder WithNone<T>(ref T componentTypes)
             where T : INativeList<ComponentType>
         {
@@ -1007,6 +1690,7 @@ namespace Unity.Entities
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         internal EntityQueryBuilder WithNone(ComponentType* componentTypes, int count)
         {
             CheckBuilderPtr();
@@ -1019,7 +1703,6 @@ namespace Unity.Entities
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
-
 
         /// <summary>
         /// Add required disabled component types to the query.
@@ -1053,108 +1736,315 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
 
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithDisabled``1"/>
         /// <typeparam name="T2">A required disabled component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithDisabled<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithDisabled<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithDisabled``2"/>
         /// <typeparam name="T3">A required disabled component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithDisabled<T1,T2,T3>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithDisabled<T1, T2, T3>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithDisabled``3"/>
         /// <typeparam name="T4">A required disabled component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithDisabled<T1,T2,T3,T4>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithDisabled<T1, T2, T3, T4>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithDisabled``4"/>
         /// <typeparam name="T5">A required disabled component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithDisabled<T1,T2,T3,T4,T5>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithDisabled<T1, T2, T3, T4, T5>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAll``5"/>
         /// <typeparam name="T6">A required disabled component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithDisabled<T1,T2,T3,T4,T5,T6>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithDisabled<T1, T2, T3, T4, T5, T6>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithDisabled``6"/>
         /// <typeparam name="T7">A required disabled component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithDisabled<T1,T2,T3,T4,T5,T6,T7>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithDisabled<T1, T2, T3, T4, T5, T6, T7>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T7>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T7>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -1191,19 +2081,40 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithDisabledRW``1"/>
         /// <typeparam name="T2">A required disabled ReadWrite component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithDisabledRW<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithDisabledRW<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
-            _builderDataPtr->_disabled.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
+            _builderDataPtr->_disabled.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -1227,7 +2138,7 @@ namespace Unity.Entities
         /// </param>
         /// <typeparam name="T">A container of component types</typeparam>
         /// <returns>The builder object that invoked this method.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>)})]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>) })]
         public EntityQueryBuilder WithDisabled<T>(ref T componentTypes)
             where T : INativeList<ComponentType>
         {
@@ -1255,7 +2166,6 @@ namespace Unity.Entities
             return this;
         }
 
-
         /// <summary>
         /// Add absent component types to the query.
         /// </summary>
@@ -1282,107 +2192,315 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAbsent``1"/>
         /// <typeparam name="T2">An absent component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)})]
-        public EntityQueryBuilder WithAbsent<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithAbsent<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAbsent``2"/>
         /// <typeparam name="T3">An absent component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAbsent<T1,T2,T3>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAbsent<T1, T2, T3>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAbsent``3"/>
         /// <typeparam name="T4">An absent component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAbsent<T1,T2,T3,T4>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAbsent<T1, T2, T3, T4>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAbsent``4"/>
         /// <typeparam name="T5">An absent component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAbsent<T1,T2,T3,T4,T5>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAbsent<T1, T2, T3, T4, T5>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAbsent``5"/>
         /// <typeparam name="T6">An absent component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAbsent<T1,T2,T3,T4,T5,T6>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAbsent<T1, T2, T3, T4, T5, T6>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithAbsent``6"/>
         /// <typeparam name="T7">An absent component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithAbsent<T1,T2,T3,T4,T5,T6,T7>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithAbsent<T1, T2, T3, T4, T5, T6, T7>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_absent.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T7>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_absent.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T7>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -1441,7 +2559,7 @@ namespace Unity.Entities
         /// </param>
         /// <typeparam name="T">A container of component types</typeparam>
         /// <returns>The builder object that invoked this method.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>)})]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>) })]
         public EntityQueryBuilder WithAbsent<T>(ref T componentTypes)
             where T : INativeList<ComponentType>
         {
@@ -1455,6 +2573,7 @@ namespace Unity.Entities
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         internal EntityQueryBuilder WithAbsent(ComponentType* componentTypes, int count)
         {
             CheckBuilderPtr();
@@ -1467,7 +2586,6 @@ namespace Unity.Entities
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
-
 
         /// <summary>
         /// Add required component types to the query, whether the type is enabled or not.
@@ -1495,108 +2613,315 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
 
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithPresent``1"/>
         /// <typeparam name="T2">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithPresent<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithPresent<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithPresent``2"/>
         /// <typeparam name="T3">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithPresent<T1,T2,T3>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithPresent<T1, T2, T3>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithPresent``3"/>
         /// <typeparam name="T4">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithPresent<T1,T2,T3,T4>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithPresent<T1, T2, T3, T4>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithPresent``4"/>
         /// <typeparam name="T5">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithPresent<T1,T2,T3,T4,T5>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithPresent<T1, T2, T3, T4, T5>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithPresent``5"/>
         /// <typeparam name="T6">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithPresent<T1,T2,T3,T4,T5,T6>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithPresent<T1, T2, T3, T4, T5, T6>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithPresent``6"/>
         /// <typeparam name="T7">A required component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData),
-            typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData)
-        })]
-        public EntityQueryBuilder WithPresent<T1,T2,T3,T4,T5,T6,T7>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[]
+            {
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+                typeof(BurstCompatibleComponentData),
+            }
+        )]
+        public EntityQueryBuilder WithPresent<T1, T2, T3, T4, T5, T6, T7>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T3>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T4>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T5>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T6>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T7>(), AccessModeType = ComponentType.AccessMode.ReadOnly });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T3>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T4>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T5>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T6>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T7>(),
+                    AccessModeType = ComponentType.AccessMode.ReadOnly,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -1629,19 +2954,40 @@ namespace Unity.Entities
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
+
         /// <inheritdoc cref="M:Unity.Entities.EntityQueryBuilder.WithPresentRW``1"/>
         /// <typeparam name="T2">A required ReadWrite component type</typeparam>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) })]
-        public EntityQueryBuilder WithPresentRW<T1,T2>()
+        [GenerateTestsForBurstCompatibility(
+            GenericTypeArguments = new[] { typeof(BurstCompatibleComponentData), typeof(BurstCompatibleComponentData) }
+        )]
+        public EntityQueryBuilder WithPresentRW<T1, T2>()
         {
             CheckBuilderPtr();
 
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T1>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
-            _builderDataPtr->_present.Add(new ComponentType{ TypeIndex = TypeManager.GetTypeIndex<T2>(), AccessModeType = ComponentType.AccessMode.ReadWrite });
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T1>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
+            _builderDataPtr->_present.Add(
+                new ComponentType
+                {
+                    TypeIndex = TypeManager.GetTypeIndex<T2>(),
+                    AccessModeType = ComponentType.AccessMode.ReadWrite,
+                }
+            );
             _builderDataPtr->_isFinalized = 0;
             return this;
         }
@@ -1713,7 +3059,7 @@ namespace Unity.Entities
         /// </param>
         /// <typeparam name="T">A container of component types</typeparam>
         /// <returns>The builder object that invoked this method.</returns>
-        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>)})]
+        [GenerateTestsForBurstCompatibility(GenericTypeArguments = new[] { typeof(FixedList32Bytes<ComponentType>) })]
         public EntityQueryBuilder WithPresent<T>(ref T componentTypes)
             where T : INativeList<ComponentType>
         {
@@ -1769,9 +3115,12 @@ namespace Unity.Entities
         /// <remarks>**Obsolete.** You don't need to call this on EntityQueryBuilder.
         /// If you want to build an EntityQuery with multiple query descriptions, call <see cref="AddAdditionalQuery"/>.</remarks>
         /// <returns></returns>
-        [Obsolete("It is no longer necessary to call FinalizeQuery on every EntityQueryBuilder. " +
-                  "If you want to build an EntityQuery with multiple query descriptions, call AddAdditionalQuery " +
-                  "before each subsequent query description. (RemovedAfter Entities 1.0)", true)]
+        [Obsolete(
+            "It is no longer necessary to call FinalizeQuery on every EntityQueryBuilder. "
+                + "If you want to build an EntityQuery with multiple query descriptions, call AddAdditionalQuery "
+                + "before each subsequent query description. (RemovedAfter Entities 1.0)",
+            true
+        )]
         public EntityQueryBuilder FinalizeQuery()
         {
             return this;
@@ -1916,7 +3265,10 @@ namespace Unity.Entities
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        internal static void ValidateComponentTypes(in UnsafeList<ComponentType> componentTypes, ref UnsafeList<TypeIndex> allTypeIds)
+        internal static void ValidateComponentTypes(
+            in UnsafeList<ComponentType> componentTypes,
+            ref UnsafeList<TypeIndex> allTypeIds
+        )
         {
             // Needs to make sure that AccessModeType is not Exclude
             var entityTypeIndex = TypeManager.GetTypeIndex<Entity>();
@@ -1940,15 +3292,28 @@ namespace Unity.Entities
         {
             var typeName = TypeManager.GetType(curId).Name;
             throw new EntityQueryDescValidationException(
-                $"EntityQuery contains a filter with duplicate component type name {typeName}.  Queries can only contain a single component of a given type in a filter.");
+                $"EntityQuery contains a filter with duplicate component type name {typeName}.  Queries can only contain a single component of a given type in a filter."
+            );
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS"), Conditional("UNITY_DOTS_DEBUG")]
-        internal static void Validate(in UnsafeList<ComponentType> allTypes, in UnsafeList<ComponentType> anyTypes, in UnsafeList<ComponentType> noneTypes,
-            in UnsafeList<ComponentType> disabledTypes, in UnsafeList<ComponentType> absentTypes, in UnsafeList<ComponentType> presentTypes)
+        internal static void Validate(
+            in UnsafeList<ComponentType> allTypes,
+            in UnsafeList<ComponentType> anyTypes,
+            in UnsafeList<ComponentType> noneTypes,
+            in UnsafeList<ComponentType> disabledTypes,
+            in UnsafeList<ComponentType> absentTypes,
+            in UnsafeList<ComponentType> presentTypes
+        )
         {
             // Determine the number of ComponentTypes contained in the filters
-            var itemCount = allTypes.Length + anyTypes.Length + noneTypes.Length + disabledTypes.Length + absentTypes.Length + presentTypes.Length;
+            var itemCount =
+                allTypes.Length
+                + anyTypes.Length
+                + noneTypes.Length
+                + disabledTypes.Length
+                + absentTypes.Length
+                + presentTypes.Length;
 
             // Project all the ComponentType Ids of None, All, Any queryDesc filters into the same array to identify duplicated later on
 
@@ -1975,7 +3340,8 @@ namespace Unity.Entities
                     {
                         ThrowDuplicateComponentTypeError(curId);
                         throw new EntityQueryDescValidationException(
-                            $"EntityQuery contains an EntityQueryDesc with duplicate component type index {curId}.  Queries can only contain a single component of a given type in a EntityQueryDesc.");
+                            $"EntityQuery contains an EntityQueryDesc with duplicate component type index {curId}.  Queries can only contain a single component of a given type in a EntityQueryDesc."
+                        );
                     }
 
                     refId = curId;

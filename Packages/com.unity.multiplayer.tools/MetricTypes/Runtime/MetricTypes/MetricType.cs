@@ -23,7 +23,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         RttToServer,
         NetworkObjects,
         Connections,
-        PacketLoss
+        PacketLoss,
     }
 
     // NOTE: Public because it needs to be exposed for RNSM configuration
@@ -41,6 +41,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(Units = Units.Bytes)]
         TotalBytesSent = (MT.TotalBytes << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of total bytes received.
         /// </summary>
@@ -52,6 +53,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "RPCs Sent")]
         RpcSent = (MT.Rpc << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of RPC received.
         /// </summary>
@@ -87,6 +89,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "Network Variable Deltas Sent")]
         NetworkVariableDeltaSent = (MT.NetworkVariableDelta << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of network variable delta message received.
         /// </summary>
@@ -98,6 +101,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "Objects Spawned Sent")]
         ObjectSpawnedSent = (MT.ObjectSpawned << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of network object spawned message received.
         /// </summary>
@@ -109,6 +113,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "Objects Destroyed Sent")]
         ObjectDestroyedSent = (MT.ObjectDestroyed << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of network object destroyed message received.
         /// </summary>
@@ -120,6 +125,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "Ownership Changes Sent")]
         OwnershipChangeSent = (MT.OwnershipChange << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of ownership change message received.
         /// </summary>
@@ -131,6 +137,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "Server Logs Sent")]
         ServerLogSent = (MT.ServerLog << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of server log message received.
         /// </summary>
@@ -142,6 +149,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "Scene Events Sent")]
         SceneEventSent = (MT.SceneEvent << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of scene event message received.
         /// </summary>
@@ -153,6 +161,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// </summary>
         [MetricMetadata(DisplayName = "Network Messages Sent")]
         NetworkMessageSent = (MT.NetworkMessage << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of network message received.
         /// </summary>
@@ -163,6 +172,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// Number of packets sent.
         /// </summary>
         PacketsSent = (MT.Packets << NDC.k_BitWidth) | ND.Sent,
+
         /// <summary>
         /// Number of packets received.
         /// </summary>
@@ -173,10 +183,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// This include the processing time at the transport level
         /// but does not contain the processing time spent inside the Netcode for GameObjects.
         /// </summary>
-        [MetricMetadata(
-            DisplayName = "RTT To Server",
-            MetricKind = MetricKind.Gauge,
-            Units = Units.Seconds)]
+        [MetricMetadata(DisplayName = "RTT To Server", MetricKind = MetricKind.Gauge, Units = Units.Seconds)]
         RttToServer = (MT.RttToServer << NDC.k_BitWidth) | ND.SentAndReceived,
 
         /// <summary>
@@ -197,9 +204,7 @@ namespace Unity.Multiplayer.Tools.MetricTypes
         /// This is only valid for clients.
         /// This value will always be zero on a server.
         /// </summary>
-        [MetricMetadata(
-            MetricKind = MetricKind.Gauge,
-            DisplayAsPercentage = true)]
+        [MetricMetadata(MetricKind = MetricKind.Gauge, DisplayAsPercentage = true)]
         PacketLoss = (MT.PacketLoss << NDC.k_BitWidth) | ND.Received,
     }
 }

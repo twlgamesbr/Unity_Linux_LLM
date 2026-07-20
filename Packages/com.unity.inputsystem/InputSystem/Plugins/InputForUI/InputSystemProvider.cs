@@ -149,19 +149,12 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             {
                 // We need to ignore some pointer events based on priority (Touch->Pen->Mouse)
                 // This is mostly used to filter out simulated input, e.g. when pen is active it also generates mouse input
-                if (
-                    m_SeenTouchEvents
-                    && ev.type == Event.Type.PointerEvent
-                    && ev.eventSource == EventSource.Pen
-                )
+                if (m_SeenTouchEvents && ev.type == Event.Type.PointerEvent && ev.eventSource == EventSource.Pen)
                     m_PenState.Reset();
                 else if (
                     (m_SeenTouchEvents || m_SeenPenEvents)
                     && ev.type == Event.Type.PointerEvent
-                    && (
-                        ev.eventSource == EventSource.Mouse
-                        || ev.eventSource == EventSource.Unspecified
-                    )
+                    && (ev.eventSource == EventSource.Mouse || ev.eventSource == EventSource.Unspecified)
                 )
                     m_MouseState.Reset();
                 else
@@ -211,13 +204,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             }
             else
             {
-                if (
-                    m_RepeatHelper.ShouldSendMoveEvent(
-                        currentTime,
-                        direction,
-                        axesButtonWerePressed
-                    )
-                )
+                if (m_RepeatHelper.ShouldSendMoveEvent(currentTime, direction, axesButtonWerePressed))
                 {
                     EventProvider.Dispatch(
                         Event.From(
@@ -226,9 +213,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
                                 type = NavigationEvent.Type.Move,
                                 direction = direction,
                                 timestamp = currentTime,
-                                eventSource = GetEventSource(
-                                    GetActiveDeviceFromDirection(direction)
-                                ),
+                                eventSource = GetEventSource(GetActiveDeviceFromDirection(direction)),
                                 playerId = k_DefaultPlayerId,
                                 eventModifiers = m_EventModifiers,
                             }
@@ -316,21 +301,15 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
                 {
                     if (m_TouchState.LastPositionValid)
                         EventProvider.Dispatch(
-                            Event.From(
-                                ToPointerStateEvent(m_CurrentTime, m_TouchState, EventSource.Touch)
-                            )
+                            Event.From(ToPointerStateEvent(m_CurrentTime, m_TouchState, EventSource.Touch))
                         );
                     if (m_PenState.LastPositionValid)
                         EventProvider.Dispatch(
-                            Event.From(
-                                ToPointerStateEvent(m_CurrentTime, m_PenState, EventSource.Pen)
-                            )
+                            Event.From(ToPointerStateEvent(m_CurrentTime, m_PenState, EventSource.Pen))
                         );
                     if (m_MouseState.LastPositionValid)
                         EventProvider.Dispatch(
-                            Event.From(
-                                ToPointerStateEvent(m_CurrentTime, m_MouseState, EventSource.Mouse)
-                            )
+                            Event.From(ToPointerStateEvent(m_CurrentTime, m_MouseState, EventSource.Mouse))
                         );
                     else
                     {
@@ -361,11 +340,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             return position;
         }
 
-        PointerEvent ToPointerStateEvent(
-            DiscreteTime currentTime,
-            in PointerState state,
-            EventSource eventSource
-        )
+        PointerEvent ToPointerStateEvent(DiscreteTime currentTime, in PointerState state, EventSource eventSource)
         {
             return new PointerEvent
             {
@@ -435,10 +410,8 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             if (touchscreen == null)
                 return 0;
 
-            var asVector2Control =
-                ctx.control is Vector2Control ? (Vector2Control)ctx.control : null;
-            var asTouchPressControl =
-                ctx.control is TouchPressControl ? (TouchPressControl)ctx.control : null;
+            var asVector2Control = ctx.control is Vector2Control ? (Vector2Control)ctx.control : null;
+            var asTouchPressControl = ctx.control is TouchPressControl ? (TouchPressControl)ctx.control : null;
             var asTouchControl = ctx.control is TouchControl ? (TouchControl)ctx.control : null;
 
             // Finds the index of the matching control type in the Touchscreen device lost of touch controls (touches)
@@ -446,10 +419,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             {
                 if (asVector2Control != null && asVector2Control == touchscreen.touches[i].position)
                     return i;
-                if (
-                    asTouchPressControl != null
-                    && asTouchPressControl == touchscreen.touches[i].press
-                )
+                if (asTouchPressControl != null && asTouchPressControl == touchscreen.touches[i].press)
                     return i;
                 if (asTouchControl != null && asTouchControl == touchscreen.touches[i])
                     return i;
@@ -464,11 +434,9 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
 
             // Overall I'm not happy how leaky this is, we're using input actions to have flexibility to bind to different controls,
             // but instead we just kinda abuse it to bind to different devices ...
-            var asPointerDevice =
-                ctx.control.device is Pointer ? (Pointer)ctx.control.device : null;
+            var asPointerDevice = ctx.control.device is Pointer ? (Pointer)ctx.control.device : null;
             var asPenDevice = ctx.control.device is Pen ? (Pen)ctx.control.device : null;
-            var asTouchscreenDevice =
-                ctx.control.device is Touchscreen ? (Touchscreen)ctx.control.device : null;
+            var asTouchscreenDevice = ctx.control.device is Touchscreen ? (Touchscreen)ctx.control.device : null;
             var asTouchControl = ctx.control is TouchControl ? (TouchControl)ctx.control : null;
             var pointerIndex = FindTouchFingerIndex(asTouchscreenDevice, ctx);
 
@@ -488,9 +456,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
                             : (asPenDevice != null ? asPenDevice.displayIndex.ReadValue() : 0)
                     );
             var position = ScreenBottomLeftToPanelPosition(positionISX, targetDisplay);
-            var delta = pointerState.LastPositionValid
-                ? position - pointerState.LastPosition
-                : Vector2.zero;
+            var delta = pointerState.LastPositionValid ? position - pointerState.LastPosition : Vector2.zero;
 
             var tilt = asPenDevice != null ? asPenDevice.tilt.ReadValue() : Vector2.zero;
             var twist = asPenDevice != null ? asPenDevice.twist.ReadValue() : 0.0f;
@@ -568,16 +534,11 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             );
         }
 
-        void OnClickPerformed(
-            InputAction.CallbackContext ctx,
-            EventSource eventSource,
-            PointerEvent.Button button
-        )
+        void OnClickPerformed(InputAction.CallbackContext ctx, EventSource eventSource, PointerEvent.Button button)
         {
             ref var state = ref GetPointerStateForSource(eventSource);
 
-            var asTouchscreenDevice =
-                ctx.control.device is Touchscreen ? (Touchscreen)ctx.control.device : null;
+            var asTouchscreenDevice = ctx.control.device is Touchscreen ? (Touchscreen)ctx.control.device : null;
             var asTouchControl = ctx.control is TouchControl ? (TouchControl)ctx.control : null;
             var pointerIndex = FindTouchFingerIndex(asTouchscreenDevice, ctx);
 
@@ -593,9 +554,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
                 Event.From(
                     new PointerEvent
                     {
-                        type = isPressed
-                            ? PointerEvent.Type.ButtonPressed
-                            : PointerEvent.Type.ButtonReleased,
+                        type = isPressed ? PointerEvent.Type.ButtonPressed : PointerEvent.Type.ButtonReleased,
                         pointerIndex = pointerIndex,
                         position = state.LastPosition,
                         deltaPosition = Vector2.zero,
@@ -685,10 +644,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
 
         void RegisterFixedActions()
         {
-            m_NextPreviousAction = new InputAction(
-                name: "nextPreviousAction",
-                type: InputActionType.Button
-            );
+            m_NextPreviousAction = new InputAction(name: "nextPreviousAction", type: InputActionType.Button);
             // TODO add more default bindings, or make them configurable
             m_NextPreviousAction.AddBinding("<Keyboard>/tab");
             m_NextPreviousAction.Enable();
@@ -724,22 +680,10 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             m_MoveAction = FindActionAndRegisterCallback(Actions.MoveAction); // No callback for this action
             m_SubmitAction = FindActionAndRegisterCallback(Actions.SubmitAction, OnSubmitPerformed);
             m_CancelAction = FindActionAndRegisterCallback(Actions.CancelAction, OnCancelPerformed);
-            m_LeftClickAction = FindActionAndRegisterCallback(
-                Actions.LeftClickAction,
-                OnLeftClickPerformed
-            );
-            m_MiddleClickAction = FindActionAndRegisterCallback(
-                Actions.MiddleClickAction,
-                OnMiddleClickPerformed
-            );
-            m_RightClickAction = FindActionAndRegisterCallback(
-                Actions.RightClickAction,
-                OnRightClickPerformed
-            );
-            m_ScrollWheelAction = FindActionAndRegisterCallback(
-                Actions.ScrollWheelAction,
-                OnScrollWheelPerformed
-            );
+            m_LeftClickAction = FindActionAndRegisterCallback(Actions.LeftClickAction, OnLeftClickPerformed);
+            m_MiddleClickAction = FindActionAndRegisterCallback(Actions.MiddleClickAction, OnMiddleClickPerformed);
+            m_RightClickAction = FindActionAndRegisterCallback(Actions.RightClickAction, OnRightClickPerformed);
+            m_ScrollWheelAction = FindActionAndRegisterCallback(Actions.ScrollWheelAction, OnScrollWheelPerformed);
 
             // When adding new actions, don't forget to add them to UnregisterActions
             if (InputSystem.actions == null)
@@ -751,10 +695,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
                 m_InputActionAsset.Enable();
         }
 
-        void UnregisterAction(
-            ref InputAction action,
-            Action<InputAction.CallbackContext> callback = null
-        )
+        void UnregisterAction(ref InputAction action, Action<InputAction.CallbackContext> callback = null)
         {
             if (action != null && callback != null)
                 action.performed -= callback;
@@ -783,8 +724,7 @@ namespace UnityEngine.InputSystem.Plugins.InputForUI
             // - Project-wide Input Actions have been configured but contains no UI action map.
             var projectWideInputActions = InputSystem.actions;
             var useProjectWideInputActions =
-                projectWideInputActions != null
-                && projectWideInputActions.FindActionMap("UI") != null;
+                projectWideInputActions != null && projectWideInputActions.FindActionMap("UI") != null;
 
             // Use InputSystem.actions (Project-wide Actions) if available, else use default asset if
             // user didn't specifically set one, so that UI functions still work (ISXB-811).

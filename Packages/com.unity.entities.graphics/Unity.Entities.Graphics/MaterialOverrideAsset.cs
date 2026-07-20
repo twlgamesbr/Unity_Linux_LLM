@@ -97,7 +97,10 @@ public class MaterialOverrideAsset : ScriptableObject
                     {
                         // propFormat = MaterialPropertyFormat.Float4;
                     }
-                    else if (overrideData.type == ShaderPropertyType.Float || overrideData.type == ShaderPropertyType.Range)
+                    else if (
+                        overrideData.type == ShaderPropertyType.Float
+                        || overrideData.type == ShaderPropertyType.Range
+                    )
                     {
                         // propFormat = MaterialPropertyFormat.Float;
                     }

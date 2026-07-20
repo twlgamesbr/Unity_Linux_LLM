@@ -13,7 +13,7 @@ namespace UnityEngine.Rendering.Universal
         [SerializeField]
         [ResourcePath("Editor/Volume/DefaultVolumeProfile.asset")]
         private VolumeProfile m_DefaultSettingsVolumeProfile;
-        
+
         public VolumeProfile defaultVolumeProfile
         {
             get => m_DefaultSettingsVolumeProfile;

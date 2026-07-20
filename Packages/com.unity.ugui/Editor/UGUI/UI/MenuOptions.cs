@@ -1,6 +1,6 @@
 using System;
-using UnityEditor.SceneManagement;
 using UnityEditor.EventSystems;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,16 +10,18 @@ namespace UnityEditor.UI
     /// <summary>
     /// This script adds the UI menu options to the Unity Editor.
     /// </summary>
-
-    static internal class MenuOptions
+    internal static class MenuOptions
     {
-        enum MenuOptionsPriorityOrder {
+        enum MenuOptionsPriorityOrder
+        {
             // 2000 - Text (TMP)
             Image = 2001,
             RawImage = 2002,
             Panel = 2003,
+
             // 2020 - Button (TMP)
             Toggle = 2101,
+
             // 2022 - Dropdown (TMP)
             // 2023 - Input Field (TMP)
             Slider = 2104,
@@ -36,23 +38,25 @@ namespace UnityEditor.UI
 
         private const string kUILayerName = "UI";
 
-        private const string kStandardSpritePath       = "UI/Skin/UISprite.psd";
-        private const string kBackgroundSpritePath     = "UI/Skin/Background.psd";
+        private const string kStandardSpritePath = "UI/Skin/UISprite.psd";
+        private const string kBackgroundSpritePath = "UI/Skin/Background.psd";
         private const string kInputFieldBackgroundPath = "UI/Skin/InputFieldBackground.psd";
-        private const string kKnobPath                 = "UI/Skin/Knob.psd";
-        private const string kCheckmarkPath            = "UI/Skin/Checkmark.psd";
-        private const string kDropdownArrowPath        = "UI/Skin/DropdownArrow.psd";
-        private const string kMaskPath                 = "UI/Skin/UIMask.psd";
+        private const string kKnobPath = "UI/Skin/Knob.psd";
+        private const string kCheckmarkPath = "UI/Skin/Checkmark.psd";
+        private const string kDropdownArrowPath = "UI/Skin/DropdownArrow.psd";
+        private const string kMaskPath = "UI/Skin/UIMask.psd";
 
-        static private DefaultControls.Resources s_StandardResources;
+        private static DefaultControls.Resources s_StandardResources;
 
-        static private DefaultControls.Resources GetStandardResources()
+        private static DefaultControls.Resources GetStandardResources()
         {
             if (s_StandardResources.standard == null)
             {
                 s_StandardResources.standard = AssetDatabase.GetBuiltinExtraResource<Sprite>(kStandardSpritePath);
                 s_StandardResources.background = AssetDatabase.GetBuiltinExtraResource<Sprite>(kBackgroundSpritePath);
-                s_StandardResources.inputField = AssetDatabase.GetBuiltinExtraResource<Sprite>(kInputFieldBackgroundPath);
+                s_StandardResources.inputField = AssetDatabase.GetBuiltinExtraResource<Sprite>(
+                    kInputFieldBackgroundPath
+                );
                 s_StandardResources.knob = AssetDatabase.GetBuiltinExtraResource<Sprite>(kKnobPath);
                 s_StandardResources.checkmark = AssetDatabase.GetBuiltinExtraResource<Sprite>(kCheckmarkPath);
                 s_StandardResources.dropdown = AssetDatabase.GetBuiltinExtraResource<Sprite>(kDropdownArrowPath);
@@ -158,7 +162,7 @@ namespace UnityEditor.UI
         // Graphic elements
 
         [MenuItem("GameObject/UI (Canvas)/Image", false, (int)MenuOptionsPriorityOrder.Image)]
-        static public void AddImage(MenuCommand menuCommand)
+        public static void AddImage(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -167,7 +171,7 @@ namespace UnityEditor.UI
         }
 
         [MenuItem("GameObject/UI (Canvas)/Raw Image", false, (int)MenuOptionsPriorityOrder.RawImage)]
-        static public void AddRawImage(MenuCommand menuCommand)
+        public static void AddRawImage(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -176,7 +180,7 @@ namespace UnityEditor.UI
         }
 
         [MenuItem("GameObject/UI (Canvas)/Panel", false, (int)MenuOptionsPriorityOrder.Panel)]
-        static public void AddPanel(MenuCommand menuCommand)
+        public static void AddPanel(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -194,7 +198,7 @@ namespace UnityEditor.UI
         // Toggle is a control you just click on.
 
         [MenuItem("GameObject/UI (Canvas)/Toggle", false, (int)MenuOptionsPriorityOrder.Toggle)]
-        static public void AddToggle(MenuCommand menuCommand)
+        public static void AddToggle(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -205,7 +209,7 @@ namespace UnityEditor.UI
         // Slider and Scrollbar modify a number
 
         [MenuItem("GameObject/UI (Canvas)/Slider", false, (int)MenuOptionsPriorityOrder.Slider)]
-        static public void AddSlider(MenuCommand menuCommand)
+        public static void AddSlider(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -214,7 +218,7 @@ namespace UnityEditor.UI
         }
 
         [MenuItem("GameObject/UI (Canvas)/Scrollbar", false, (int)MenuOptionsPriorityOrder.Scrollbar)]
-        static public void AddScrollbar(MenuCommand menuCommand)
+        public static void AddScrollbar(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -223,7 +227,7 @@ namespace UnityEditor.UI
         }
 
         [MenuItem("GameObject/UI (Canvas)/Scroll View", false, (int)MenuOptionsPriorityOrder.ScrollView)]
-        static public void AddScrollView(MenuCommand menuCommand)
+        public static void AddScrollView(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -234,7 +238,7 @@ namespace UnityEditor.UI
         // Containers
 
         [MenuItem("GameObject/UI (Canvas)/Canvas", false, (int)MenuOptionsPriorityOrder.Canvas)]
-        static public void AddCanvas(MenuCommand menuCommand)
+        public static void AddCanvas(MenuCommand menuCommand)
         {
             var go = CreateNewUI();
             SetParentAndAlign(go, menuCommand.context as GameObject);
@@ -252,7 +256,7 @@ namespace UnityEditor.UI
         // Legacy Elements
 
         [MenuItem("GameObject/UI (Canvas)/Legacy/Text", false, (int)MenuOptionsPriorityOrder.Text)]
-        static public void AddText(MenuCommand menuCommand)
+        public static void AddText(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -261,7 +265,7 @@ namespace UnityEditor.UI
         }
 
         [MenuItem("GameObject/UI (Canvas)/Legacy/Button", false, (int)MenuOptionsPriorityOrder.Button)]
-        static public void AddButton(MenuCommand menuCommand)
+        public static void AddButton(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -270,7 +274,7 @@ namespace UnityEditor.UI
         }
 
         [MenuItem("GameObject/UI (Canvas)/Legacy/Dropdown", false, (int)MenuOptionsPriorityOrder.Dropdown)]
-        static public void AddDropdown(MenuCommand menuCommand)
+        public static void AddDropdown(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
@@ -298,10 +302,15 @@ namespace UnityEditor.UI
 
         // Helper methods
 
-        static public GameObject CreateNewUI()
+        public static GameObject CreateNewUI()
         {
             // Root for the UI
-            var root = ObjectFactory.CreateGameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            var root = ObjectFactory.CreateGameObject(
+                "Canvas",
+                typeof(Canvas),
+                typeof(CanvasScaler),
+                typeof(GraphicRaycaster)
+            );
             root.layer = LayerMask.NameToLayer(kUILayerName);
             Canvas canvas = root.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -341,7 +350,8 @@ namespace UnityEditor.UI
 
         private static void CreateEventSystem(bool select, GameObject parent)
         {
-            StageHandle stage = parent == null ? StageUtility.GetCurrentStageHandle() : StageUtility.GetStageHandle(parent);
+            StageHandle stage =
+                parent == null ? StageUtility.GetCurrentStageHandle() : StageUtility.GetStageHandle(parent);
             var esys = stage.FindComponentOfType<EventSystem>();
             if (esys == null)
             {
@@ -363,7 +373,7 @@ namespace UnityEditor.UI
         }
 
         // Helper function that returns a Canvas GameObject; preferably a parent of the selection, or other existing Canvas.
-        static public GameObject GetOrCreateCanvasGameObject()
+        public static GameObject GetOrCreateCanvasGameObject()
         {
             GameObject selectedGo = Selection.activeGameObject;
 

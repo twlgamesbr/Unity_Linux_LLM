@@ -7,8 +7,11 @@ namespace Unity.Entities
         [StructLayout(LayoutKind.Explicit, Size = 16)]
         public readonly struct ComponentTypeData
         {
-            [FieldOffset(0)] public readonly ulong StableTypeHash;
-            [FieldOffset(8)] public readonly ComponentTypeFlags Flags;
+            [FieldOffset(0)]
+            public readonly ulong StableTypeHash;
+
+            [FieldOffset(8)]
+            public readonly ComponentTypeFlags Flags;
 
             public ComponentTypeData(ulong stableTypeHash, ComponentTypeFlags flags)
             {

@@ -32,13 +32,15 @@ namespace UnityEditor.Rendering
         public void RegisterHeaderScope<TEnum>(GUIContent title, TEnum expandable, Action<Material> action)
             where TEnum : struct, IConvertible
         {
-            m_Items.Add(new MaterialHeaderScopeItem()
-            {
-                headerTitle = title,
-                expandable = Convert.ToUInt32(expandable),
-                drawMaterialScope = action,
-                url = DocumentationUtils.GetHelpURL<TEnum>(expandable)
-            });
+            m_Items.Add(
+                new MaterialHeaderScopeItem()
+                {
+                    headerTitle = title,
+                    expandable = Convert.ToUInt32(expandable),
+                    drawMaterialScope = action,
+                    url = DocumentationUtils.GetHelpURL<TEnum>(expandable),
+                }
+            );
         }
 
         /// <summary>
@@ -61,7 +63,8 @@ namespace UnityEditor.Rendering
                     item.expandable,
                     materialEditor,
                     defaultExpandedState: m_DefaultExpandedState,
-                    documentationURL: item.url);
+                    documentationURL: item.url
+                );
                 if (!header.expanded)
                     continue;
 

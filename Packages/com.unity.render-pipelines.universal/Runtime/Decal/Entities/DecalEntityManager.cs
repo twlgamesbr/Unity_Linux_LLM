@@ -42,11 +42,7 @@ namespace UnityEngine.Rendering.Universal
                     version = newVersion,
                 };
 
-                return new DecalEntity()
-                {
-                    index = entityIndex,
-                    version = newVersion,
-                };
+                return new DecalEntity() { index = entityIndex, version = newVersion };
             }
 
             // Create new one
@@ -54,19 +50,16 @@ namespace UnityEngine.Rendering.Universal
                 int entityIndex = m_Entities.Count;
                 int version = 1;
 
-                m_Entities.Add(new DecalEntityItem()
-                {
-                    arrayIndex = arrayIndex,
-                    chunkIndex = chunkIndex,
-                    version = version,
-                });
+                m_Entities.Add(
+                    new DecalEntityItem()
+                    {
+                        arrayIndex = arrayIndex,
+                        chunkIndex = chunkIndex,
+                        version = version,
+                    }
+                );
 
-
-                return new DecalEntity()
-                {
-                    index = entityIndex,
-                    version = version,
-                };
+                return new DecalEntity() { index = entityIndex, version = version };
             }
         }
 
@@ -192,6 +185,7 @@ namespace UnityEngine.Rendering.Universal
             public int previousChunkIndex;
             public bool valid;
         }
+
         private List<CombinedChunks> m_CombinedChunks = new List<CombinedChunks>();
         private List<int> m_CombinedChunkRemmap = new List<int>();
 
@@ -212,7 +206,10 @@ namespace UnityEngine.Rendering.Universal
             get
             {
                 if (m_DecalProjectorMesh == null)
-                    m_DecalProjectorMesh = CoreUtils.CreateCubeMesh(new Vector4(-0.5f, -0.5f, -0.5f, 1.0f), new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
+                    m_DecalProjectorMesh = CoreUtils.CreateCubeMesh(
+                        new Vector4(-0.5f, -0.5f, -0.5f, 1.0f),
+                        new Vector4(0.5f, 0.5f, 0.5f, 1.0f)
+                    );
                 return m_DecalProjectorMesh;
             }
         }
@@ -289,13 +286,12 @@ namespace UnityEngine.Rendering.Universal
                 propertyBlock.SetFloatArray("_DecalLayerMaskFromDecal", new float[DecalDrawSystem.MaxBatchSize]);
 
                 entityChunks.Add(new DecalEntityChunk() { material = material });
-                cachedChunks.Add(new DecalCachedChunk()
-                {
-                    propertyBlock = propertyBlock,
-                });
+                cachedChunks.Add(new DecalCachedChunk() { propertyBlock = propertyBlock });
 
                 culledChunks.Add(new DecalCulledChunk());
-                drawCallChunks.Add(new DecalDrawCallChunk() { subCallCounts = new NativeArray<int>(1, Allocator.Persistent) });
+                drawCallChunks.Add(
+                    new DecalDrawCallChunk() { subCallCounts = new NativeArray<int>(1, Allocator.Persistent) }
+                );
 
                 m_CombinedChunks.Add(new CombinedChunks());
                 m_CombinedChunkRemmap.Add(0);
@@ -335,7 +331,8 @@ namespace UnityEngine.Rendering.Universal
 
             DecalCachedChunk cachedChunk = cachedChunks[chunkIndex];
 
-            cachedChunk.sizeOffsets[arrayIndex] = Matrix4x4.Translate(decalProjector.decalOffset) * Matrix4x4.Scale(decalProjector.decalSize);
+            cachedChunk.sizeOffsets[arrayIndex] =
+                Matrix4x4.Translate(decalProjector.decalOffset) * Matrix4x4.Scale(decalProjector.decalSize);
 
             float drawDistance = decalProjector.drawDistance;
             float fadeScale = decalProjector.fadeScale;
@@ -345,8 +342,9 @@ namespace UnityEngine.Rendering.Universal
             int layerMask = decalProjector.gameObject.layer;
 #if UNITY_EDITOR
             // instead of removing decal altogether, set scene culling mask to game view only if !visibleInScene
-            ulong sceneLayerMask = decalProjector.visibleInScene ? decalProjector.gameObject.sceneCullingMask : 
-                                                                UnityEditor.SceneManagement.SceneCullingMasks.GameViewObjects;
+            ulong sceneLayerMask = decalProjector.visibleInScene
+                ? decalProjector.gameObject.sceneCullingMask
+                : UnityEditor.SceneManagement.SceneCullingMasks.GameViewObjects;
 #else
             ulong sceneLayerMask = decalProjector.gameObject.sceneCullingMask;
 #endif
@@ -375,7 +373,9 @@ namespace UnityEngine.Rendering.Universal
             cachedChunk.sceneLayerMasks[arrayIndex] = sceneLayerMask;
             cachedChunk.fadeFactors[arrayIndex] = fadeFactor;
             cachedChunk.scaleModes[arrayIndex] = decalProjector.scaleMode;
-            cachedChunk.renderingLayerMasks[arrayIndex] = RenderingLayerUtils.ToValidRenderingLayers(decalProjector.renderingLayerMask);
+            cachedChunk.renderingLayerMasks[arrayIndex] = RenderingLayerUtils.ToValidRenderingLayers(
+                decalProjector.renderingLayerMask
+            );
 
             cachedChunk.positions[arrayIndex] = decalProjector.transform.position;
             cachedChunk.rotation[arrayIndex] = decalProjector.transform.rotation;
@@ -433,21 +433,22 @@ namespace UnityEngine.Rendering.Universal
                     };
                 }
 
-
                 // Sort
-                m_CombinedChunks.Sort((a, b) =>
-                {
-                    if (a.valid && !b.valid)
-                        return -1;
-                    if (!a.valid && b.valid)
-                        return 1;
+                m_CombinedChunks.Sort(
+                    (a, b) =>
+                    {
+                        if (a.valid && !b.valid)
+                            return -1;
+                        if (!a.valid && b.valid)
+                            return 1;
 
-                    if (a.cachedChunk.drawOrder < b.cachedChunk.drawOrder)
-                        return -1;
-                    if (a.cachedChunk.drawOrder > b.cachedChunk.drawOrder)
-                        return 1;
-                    return a.entityChunk.material.GetHashCode().CompareTo(b.entityChunk.material.GetHashCode());
-                });
+                        if (a.cachedChunk.drawOrder < b.cachedChunk.drawOrder)
+                            return -1;
+                        if (a.cachedChunk.drawOrder > b.cachedChunk.drawOrder)
+                            return 1;
+                        return a.entityChunk.material.GetHashCode().CompareTo(b.entityChunk.material.GetHashCode());
+                    }
+                );
 
                 // Early out if nothing changed
                 bool dirty = false;

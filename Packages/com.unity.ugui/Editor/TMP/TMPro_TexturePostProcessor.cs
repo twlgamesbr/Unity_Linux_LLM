@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using UnityEditor;
-
+using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
@@ -11,7 +10,12 @@ namespace TMPro.EditorUtilities
     /// </summary>
     internal class TMPro_TexturePostProcessor : AssetPostprocessor
     {
-        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        private static void OnPostprocessAllAssets(
+            string[] importedAssets,
+            string[] deletedAssets,
+            string[] movedAssets,
+            string[] movedFromAssetPaths
+        )
         {
             // Only run post processor after the Editor has been fully loaded.
             if (Time.frameCount == 0)
@@ -29,7 +33,8 @@ namespace TMPro.EditorUtilities
 
                 if (assetType == typeof(TMP_FontAsset))
                 {
-                    TMP_FontAsset fontAsset = AssetDatabase.LoadAssetAtPath(asset, typeof(TMP_FontAsset)) as TMP_FontAsset;
+                    TMP_FontAsset fontAsset =
+                        AssetDatabase.LoadAssetAtPath(asset, typeof(TMP_FontAsset)) as TMP_FontAsset;
 
                     // Only refresh font asset definition if font asset was previously initialized.
                     if (fontAsset != null && fontAsset.m_CharacterLookupDictionary != null)

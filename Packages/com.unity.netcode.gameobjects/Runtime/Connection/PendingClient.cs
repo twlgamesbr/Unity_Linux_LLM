@@ -29,10 +29,11 @@ namespace Unity.Netcode
             /// Waiting for client to send it's initial connection request
             /// </summary>
             PendingConnection,
+
             /// <summary>
             /// Waiting for client connection request to be approved
             /// </summary>
-            PendingApproval
+            PendingApproval,
         }
     }
 }

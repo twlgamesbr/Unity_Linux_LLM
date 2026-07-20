@@ -15,7 +15,8 @@ namespace UnityEngine.Rendering
         ///       E.g. The first frame doesn't have any history data available at all.
         /// </summary>
         /// <typeparam name="Type">Type of the history instance.</typeparam>
-        public void RequestAccess<Type>() where Type : ContextItem;
+        public void RequestAccess<Type>()
+            where Type : ContextItem;
     }
 
     /// <summary>
@@ -31,7 +32,8 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <typeparam name="Type">Type of the history instance.</typeparam>
         /// <returns>True if a type has been requested earlier. False otherwise.</returns>
-        public bool IsAccessRequested<Type>() where Type : ContextItem;
+        public bool IsAccessRequested<Type>()
+            where Type : ContextItem;
 
         /// <summary>
         /// Get write access to an instance of certain history type.
@@ -41,14 +43,16 @@ namespace UnityEngine.Rendering
         /// </summary>
         /// <typeparam name="Type">Type of the history instance.</typeparam>
         /// <returns>True if a type has been requested earlier. False otherwise.</returns>
-        public Type GetHistoryForWrite<Type>() where Type : ContextItem, new();
+        public Type GetHistoryForWrite<Type>()
+            where Type : ContextItem, new();
 
         /// <summary>
         /// Check if a type was already written this frame by some render pass.
         /// </summary>
         /// <typeparam name="Type">Type of the history instance.</typeparam>
         /// <returns>True if a type has been written earlier. False otherwise.</returns>
-        public bool IsWritten<Type>()  where Type : ContextItem;
+        public bool IsWritten<Type>()
+            where Type : ContextItem;
     }
 
     /// <summary>
@@ -68,7 +72,8 @@ namespace UnityEngine.Rendering
         /// <typeparam name="Type">Type of the history instance.</typeparam>
         /// <returns>A class instance of Type. Null if not available on this frame.</returns>
         // Get a certain history item from the camera or null if not available this frame.
-        public Type GetHistoryForRead<Type>() where Type : ContextItem;
+        public Type GetHistoryForRead<Type>()
+            where Type : ContextItem;
 
         /// <summary>
         /// Callback type for requesting various history type instances for read.
@@ -104,6 +109,7 @@ namespace UnityEngine.Rendering
     {
         // BufferedRTHandleSystem of the owning camera.
         private BufferedRTHandleSystem m_owner = null;
+
         // Unique id for this type (derived) given by the owning camera.
         private uint m_TypeId = uint.MaxValue;
 
@@ -148,8 +154,7 @@ namespace UnityEngine.Rendering
         /// <param name="desc">Texture descriptor used for each RTHandle in the allocation.</param>
         /// <param name="name">User visible debug name of the texture.</param>
         /// <returns>Current frame RTHandle in the allocation.</returns>
-        protected RTHandle AllocHistoryFrameRT(int id, int count,
-            ref RenderTextureDescriptor desc, string name = "")
+        protected RTHandle AllocHistoryFrameRT(int id, int count, ref RenderTextureDescriptor desc, string name = "")
         {
             // Simplified for typical history textures:
             // Sampling is usually bilinear & clamp. Point sample can be a texture.Load() or done with inline samplers.
@@ -165,10 +170,13 @@ namespace UnityEngine.Rendering
         /// <param name="filterMode">Filtering mode of the texture.</param>
         /// <param name="name">User visible debug name of the texture.</param>
         /// <returns>Current frame RTHandle in the allocation.</returns>
-        protected RTHandle AllocHistoryFrameRT(int id, int count,
+        protected RTHandle AllocHistoryFrameRT(
+            int id,
+            int count,
             ref RenderTextureDescriptor desc,
             FilterMode filterMode,
-            string name = "")
+            string name = ""
+        )
         {
             RenderTextureDescriptor d = desc;
             // Simplified for typical history textures:

@@ -31,7 +31,7 @@ namespace Unity.Entities.Editor
             icon.AddToClassList(Target.IconClass);
             root.Add(icon);
 
-            var name = new Label {text = Target.Name};
+            var name = new Label { text = Target.Name };
             name.AddToClassList("header__name");
             root.Add(name);
 

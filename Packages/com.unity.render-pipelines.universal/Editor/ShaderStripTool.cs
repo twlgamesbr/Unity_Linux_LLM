@@ -1,6 +1,6 @@
 using System;
-using UnityEngine.Rendering;
 using System.Runtime.CompilerServices;
+using UnityEngine.Rendering;
 using IShaderScriptableStrippingData = UnityEditor.Rendering.Universal.ShaderScriptableStripper.IShaderScriptableStrippingData;
 
 namespace UnityEditor.Rendering.Universal
@@ -9,7 +9,8 @@ namespace UnityEditor.Rendering.Universal
     /// Struct used to determine whether keyword variants can be stripped from builds
     /// </summary>
     /// <typeparam name="T">The Shader Features used for verifying against the keywords</typeparam>
-    internal struct ShaderStripTool<T> where T : Enum
+    internal struct ShaderStripTool<T>
+        where T : Enum
     {
         T m_Features;
         private IShaderScriptableStrippingData m_StrippingData;
@@ -20,7 +21,14 @@ namespace UnityEditor.Rendering.Universal
             m_StrippingData = strippingData;
         }
 
-        public bool StripMultiCompileKeepOffVariant(in LocalKeyword kw, T feature, in LocalKeyword kw2, T feature2, in LocalKeyword kw3, T feature3)
+        public bool StripMultiCompileKeepOffVariant(
+            in LocalKeyword kw,
+            T feature,
+            in LocalKeyword kw2,
+            T feature2,
+            in LocalKeyword kw3,
+            T feature3
+        )
         {
             if (StripMultiCompileKeepOffVariant(kw, feature))
                 return true;
@@ -31,7 +39,14 @@ namespace UnityEditor.Rendering.Universal
             return false;
         }
 
-        public bool StripMultiCompile(in LocalKeyword kw, T feature, in LocalKeyword kw2, T feature2, in LocalKeyword kw3, T feature3)
+        public bool StripMultiCompile(
+            in LocalKeyword kw,
+            T feature,
+            in LocalKeyword kw2,
+            T feature2,
+            in LocalKeyword kw3,
+            T feature3
+        )
         {
             if (StripMultiCompileKeepOffVariant(kw, feature, kw2, feature2, kw3, feature3))
                 return true;
@@ -44,8 +59,12 @@ namespace UnityEditor.Rendering.Universal
             if (m_StrippingData.stripUnusedVariants)
             {
                 bool containsKeywords = ContainsKeyword(kw) && ContainsKeyword(kw2) && ContainsKeyword(kw3);
-                bool keywordsDisabled = !m_StrippingData.IsKeywordEnabled(kw) && !m_StrippingData.IsKeywordEnabled(kw2) && !m_StrippingData.IsKeywordEnabled(kw3);
-                bool hasAnyFeatureEnabled = m_Features.HasFlag(feature) || m_Features.HasFlag(feature2) || m_Features.HasFlag(feature3);
+                bool keywordsDisabled =
+                    !m_StrippingData.IsKeywordEnabled(kw)
+                    && !m_StrippingData.IsKeywordEnabled(kw2)
+                    && !m_StrippingData.IsKeywordEnabled(kw3);
+                bool hasAnyFeatureEnabled =
+                    m_Features.HasFlag(feature) || m_Features.HasFlag(feature2) || m_Features.HasFlag(feature3);
                 if (containsKeywords && keywordsDisabled && hasAnyFeatureEnabled)
                     return true;
             }
@@ -98,7 +117,6 @@ namespace UnityEditor.Rendering.Universal
                 if (m_StrippingData.IsKeywordEnabled(kw))
                     return true;
             }
-
             // To strip out the OFF variant, it needs to check if
             // * Strip unused variants has been enabled
             // * The keyword is present in that pass

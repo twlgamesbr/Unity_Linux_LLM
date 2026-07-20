@@ -1,16 +1,17 @@
 using System;
 using Unity.Baselib.LowLevel;
-using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using ErrorState = Unity.Baselib.LowLevel.Binding.Baselib_ErrorState;
+using Unity.Mathematics;
 using ErrorCode = Unity.Baselib.LowLevel.Binding.Baselib_ErrorCode;
+using ErrorState = Unity.Baselib.LowLevel.Binding.Baselib_ErrorState;
 
 namespace Unity.Networking.Transport
 {
     internal unsafe struct UnsafeBaselibNetworkArray : IDisposable
     {
-        [NativeDisableUnsafePtrRestriction] UnsafePtrList<Binding.Baselib_RegisteredNetwork_Buffer> m_BufferPool;
+        [NativeDisableUnsafePtrRestriction]
+        UnsafePtrList<Binding.Baselib_RegisteredNetwork_Buffer> m_BufferPool;
         private uint m_ElementSize;
 
         public uint ElementSize => m_ElementSize;
@@ -34,7 +35,10 @@ namespace Unity.Networking.Transport
                 throw new ArgumentOutOfRangeException(nameof(typeSize), "Capacity must be >= 0");
 
             if (totalSize > int.MaxValue)
-                throw new ArgumentOutOfRangeException(nameof(typeSize), $"Capacity * sizeof(T) cannot exceed {int.MaxValue} bytes");
+                throw new ArgumentOutOfRangeException(
+                    nameof(typeSize),
+                    $"Capacity * sizeof(T) cannot exceed {int.MaxValue} bytes"
+                );
 #endif
 
             var poolSize = capacity;
@@ -53,7 +57,12 @@ namespace Unity.Networking.Transport
                     pageCount = (ulong)math.ceil(totalSize / (double)defaultPageSize);
                 }
 
-                var buffer = (Binding.Baselib_RegisteredNetwork_Buffer*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<Binding.Baselib_RegisteredNetwork_Buffer>(), UnsafeUtility.AlignOf<Binding.Baselib_RegisteredNetwork_Buffer>(), Allocator.Persistent);
+                var buffer = (Binding.Baselib_RegisteredNetwork_Buffer*)
+                    UnsafeUtility.Malloc(
+                        UnsafeUtility.SizeOf<Binding.Baselib_RegisteredNetwork_Buffer>(),
+                        UnsafeUtility.AlignOf<Binding.Baselib_RegisteredNetwork_Buffer>(),
+                        Allocator.Persistent
+                    );
 
                 var error = default(ErrorState);
 
@@ -62,7 +71,8 @@ namespace Unity.Networking.Transport
                     pageCount,
                     1,
                     Binding.Baselib_Memory_PageState.ReadWrite,
-                    &error);
+                    &error
+                );
 
                 if (error.code != ErrorCode.Success)
                 {
@@ -73,7 +83,11 @@ namespace Unity.Networking.Transport
 #endif
                 }
 
-                UnsafeUtility.MemSet((void*)pageAllocation.ptr, 0, (long)(pageAllocation.pageCount * pageAllocation.pageSize));
+                UnsafeUtility.MemSet(
+                    (void*)pageAllocation.ptr,
+                    0,
+                    (long)(pageAllocation.pageCount * pageAllocation.pageSize)
+                );
                 *buffer = Binding.Baselib_RegisteredNetwork_Buffer_Register(pageAllocation, &error);
 
                 if (error.code != (int)ErrorCode.Success)
@@ -112,12 +126,12 @@ namespace Unity.Networking.Transport
         {
             IntPtr data;
             Binding.Baselib_RegisteredNetwork_Buffer* buffer = null;
-    #if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             if (index >= m_BufferPool.Length)
             {
                 throw new Exception($"Index out of range when trying to get slice {index}");
             }
-    #endif
+#endif
             buffer = m_BufferPool[index];
             data = (IntPtr)((byte*)buffer->allocation.ptr);
 

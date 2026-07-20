@@ -3,10 +3,7 @@ namespace Unity.Serialization.Json
     /// <summary>
     /// Base interface used to hold a reference to a typed <see cref="IJsonMigration{TValue}"/>.
     /// </summary>
-    public interface IJsonMigration
-    {
-
-    }
+    public interface IJsonMigration { }
 
     /// <summary>
     /// Interface used to describe how a specified type should be migrated from one version to another.

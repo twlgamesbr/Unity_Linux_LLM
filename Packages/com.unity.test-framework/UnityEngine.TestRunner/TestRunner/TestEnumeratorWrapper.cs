@@ -21,8 +21,12 @@ namespace UnityEngine.TestTools.TestRunner
             {
                 return HandleEnumerableTest(context);
             }
-            var message = string.Format("Return type {0} of {1} in {2} is not supported.",
-                m_TestMethod.Method.ReturnType, m_TestMethod.Method.Name, m_TestMethod.Method.TypeInfo.FullName);
+            var message = string.Format(
+                "Return type {0} of {1} in {2} is not supported.",
+                m_TestMethod.Method.ReturnType,
+                m_TestMethod.Method.Name,
+                m_TestMethod.Method.TypeInfo.FullName
+            );
             if (m_TestMethod.Method.ReturnType.Type == typeof(IEnumerable))
             {
                 message += "\nDid you mean IEnumerator?";
@@ -34,7 +38,10 @@ namespace UnityEngine.TestTools.TestRunner
         {
             try
             {
-                return m_TestMethod.Method.MethodInfo.Invoke(context.TestObject, m_TestMethod.parms != null ? m_TestMethod.parms.OriginalArguments : null) as IEnumerator;
+                return m_TestMethod.Method.MethodInfo.Invoke(
+                        context.TestObject,
+                        m_TestMethod.parms != null ? m_TestMethod.parms.OriginalArguments : null
+                    ) as IEnumerator;
             }
             catch (TargetInvocationException e)
             {

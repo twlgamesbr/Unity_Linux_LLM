@@ -18,7 +18,8 @@ namespace Unity.Physics
         // Solver stabilization data (it's completely ok to be unallocated)
         [NativeDisableContainerSafetyRestriction]
         private NativeArray<Solver.StabilizationMotionData> m_SolverStabilizationMotionData;
-        internal NativeArray<Solver.StabilizationMotionData> SolverStabilizationMotionData => m_SolverStabilizationMotionData.GetSubArray(0, m_NumDynamicBodies);
+        internal NativeArray<Solver.StabilizationMotionData> SolverStabilizationMotionData =>
+            m_SolverStabilizationMotionData.GetSubArray(0, m_NumDynamicBodies);
 
         internal float TimeStep;
 
@@ -31,7 +32,8 @@ namespace Unity.Physics
         /// <summary>   Gets the collision events. </summary>
         ///
         /// <value> The collision events. </value>
-        public CollisionEvents CollisionEvents => new CollisionEvents(CollisionEventDataStream, InputVelocities, TimeStep);
+        public CollisionEvents CollisionEvents =>
+            new CollisionEvents(CollisionEventDataStream, InputVelocities, TimeStep);
 
         /// <summary>   Gets the trigger events. </summary>
         ///
@@ -43,7 +45,11 @@ namespace Unity.Physics
         /// <value> The impulse events. </value>
         public ImpulseEvents ImpulseEvents => new ImpulseEvents(ImpulseEventDataStream);
 
-        internal bool ReadyForEventScheduling => m_InputVelocities.IsCreated && CollisionEventDataStream.IsCreated && TriggerEventDataStream.IsCreated && ImpulseEventDataStream.IsCreated;
+        internal bool ReadyForEventScheduling =>
+            m_InputVelocities.IsCreated
+            && CollisionEventDataStream.IsCreated
+            && TriggerEventDataStream.IsCreated
+            && ImpulseEventDataStream.IsCreated;
 
         /// <summary>
         /// Resets the simulation storage
@@ -63,25 +69,39 @@ namespace Unity.Physics
                 {
                     m_InputVelocities.Dispose();
                 }
-                m_InputVelocities = new NativeArray<Velocity>(m_NumDynamicBodies, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                m_InputVelocities = new NativeArray<Velocity>(
+                    m_NumDynamicBodies,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             // Solver stabilization data
             if (stepInput.SolverStabilizationHeuristicSettings.EnableSolverStabilization)
             {
-                if (!m_SolverStabilizationMotionData.IsCreated || m_SolverStabilizationMotionData.Length < m_NumDynamicBodies)
+                if (
+                    !m_SolverStabilizationMotionData.IsCreated
+                    || m_SolverStabilizationMotionData.Length < m_NumDynamicBodies
+                )
                 {
                     if (m_SolverStabilizationMotionData.IsCreated)
                     {
                         m_SolverStabilizationMotionData.Dispose();
                     }
-                    m_SolverStabilizationMotionData = new NativeArray<Solver.StabilizationMotionData>(m_NumDynamicBodies, Allocator.Persistent, NativeArrayOptions.ClearMemory);
+                    m_SolverStabilizationMotionData = new NativeArray<Solver.StabilizationMotionData>(
+                        m_NumDynamicBodies,
+                        Allocator.Persistent,
+                        NativeArrayOptions.ClearMemory
+                    );
                 }
                 else if (m_NumDynamicBodies > 0)
                 {
                     unsafe
                     {
-                        UnsafeUtility.MemClear(m_SolverStabilizationMotionData.GetUnsafePtr(), m_NumDynamicBodies * UnsafeUtility.SizeOf<Solver.StabilizationMotionData>());
+                        UnsafeUtility.MemClear(
+                            m_SolverStabilizationMotionData.GetUnsafePtr(),
+                            m_NumDynamicBodies * UnsafeUtility.SizeOf<Solver.StabilizationMotionData>()
+                        );
                     }
                 }
             }
@@ -115,25 +135,39 @@ namespace Unity.Physics
                 {
                     m_InputVelocities.Dispose();
                 }
-                m_InputVelocities = new NativeArray<Velocity>(m_NumDynamicBodies, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                m_InputVelocities = new NativeArray<Velocity>(
+                    m_NumDynamicBodies,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
             }
 
             // Solver stabilization data
             if (stepInput.SolverStabilizationHeuristicSettings.EnableSolverStabilization)
             {
-                if (!m_SolverStabilizationMotionData.IsCreated || m_SolverStabilizationMotionData.Length < m_NumDynamicBodies)
+                if (
+                    !m_SolverStabilizationMotionData.IsCreated
+                    || m_SolverStabilizationMotionData.Length < m_NumDynamicBodies
+                )
                 {
                     if (m_SolverStabilizationMotionData.IsCreated)
                     {
                         m_SolverStabilizationMotionData.Dispose();
                     }
-                    m_SolverStabilizationMotionData = new NativeArray<Solver.StabilizationMotionData>(m_NumDynamicBodies, Allocator.Persistent, NativeArrayOptions.ClearMemory);
+                    m_SolverStabilizationMotionData = new NativeArray<Solver.StabilizationMotionData>(
+                        m_NumDynamicBodies,
+                        Allocator.Persistent,
+                        NativeArrayOptions.ClearMemory
+                    );
                 }
                 else if (m_NumDynamicBodies > 0)
                 {
                     unsafe
                     {
-                        UnsafeUtility.MemClear(m_SolverStabilizationMotionData.GetUnsafePtr(), m_NumDynamicBodies * UnsafeUtility.SizeOf<Solver.StabilizationMotionData>());
+                        UnsafeUtility.MemClear(
+                            m_SolverStabilizationMotionData.GetUnsafePtr(),
+                            m_NumDynamicBodies * UnsafeUtility.SizeOf<Solver.StabilizationMotionData>()
+                        );
                     }
                 }
             }
@@ -225,7 +259,8 @@ namespace Unity.Physics
         /// <summary>   Gets the handle of the final job. </summary>
         ///
         /// <value> The final job handle. </value>
-        public JobHandle FinalJobHandle => JobHandle.CombineDependencies(FinalSimulationJobHandle, m_StepHandles.FinalDisposeHandle);
+        public JobHandle FinalJobHandle =>
+            JobHandle.CombineDependencies(FinalSimulationJobHandle, m_StepHandles.FinalDisposeHandle);
 
         internal SimulationScheduleStage m_SimulationScheduleStage;
 
@@ -296,7 +331,11 @@ namespace Unity.Physics
         public static void StepImmediate(SimulationStepInput input, ref SimulationContext simulationContext)
         {
             SafetyChecks.CheckFiniteAndPositiveAndThrow(input.TimeStep, nameof(input.TimeStep));
-            SafetyChecks.CheckInRangeAndThrow(input.NumSolverIterations, new int2(1, int.MaxValue), nameof(input.NumSolverIterations));
+            SafetyChecks.CheckInRangeAndThrow(
+                input.NumSolverIterations,
+                new int2(1, int.MaxValue),
+                nameof(input.NumSolverIterations)
+            );
 
             if (input.World.NumDynamicBodies == 0)
             {
@@ -316,42 +355,79 @@ namespace Unity.Physics
             {
                 var dynamicVsDynamicBodyPairsWriter = dynamicVsDynamicBodyPairs.AsWriter();
                 var dynamicVsStaticBodyPairsWriter = dynamicVsStaticBodyPairs.AsWriter();
-                input.World.CollisionWorld.FindOverlaps(ref dynamicVsDynamicBodyPairsWriter, ref dynamicVsStaticBodyPairsWriter);
+                input.World.CollisionWorld.FindOverlaps(
+                    ref dynamicVsDynamicBodyPairsWriter,
+                    ref dynamicVsStaticBodyPairsWriter
+                );
             }
 
             // Create dispatch pairs
             var dispatchPairs = new NativeList<DispatchPairSequencer.DispatchPair>(Allocator.Temp);
             var solverSchedulerInfo = new DispatchPairSequencer.SolverSchedulerInfo(1, Allocator.Temp);
-            DispatchPairSequencer.CreateDispatchPairs(input, ref dynamicVsDynamicBodyPairs, ref dynamicVsStaticBodyPairs,
-                ref solverSchedulerInfo, ref dispatchPairs);
+            DispatchPairSequencer.CreateDispatchPairs(
+                input,
+                ref dynamicVsDynamicBodyPairs,
+                ref dynamicVsStaticBodyPairs,
+                ref solverSchedulerInfo,
+                ref dispatchPairs
+            );
 
             var contacts = new NativeStream(solverSchedulerInfo.NumIterativeWorkItems.Value, Allocator.Temp);
             {
                 if (input.NumSubsteps <= 1)
                 {
                     // Integrate gravity using frame timestep
-                    Solver.ApplyGravityAndUpdateInputVelocities(input.World.DynamicsWorld.MotionVelocities,
-                        simulationContext.InputVelocities, input.Gravity, input.TimeStep, input.EnableGyroscopicTorque);
+                    Solver.ApplyGravityAndUpdateInputVelocities(
+                        input.World.DynamicsWorld.MotionVelocities,
+                        simulationContext.InputVelocities,
+                        input.Gravity,
+                        input.TimeStep,
+                        input.EnableGyroscopicTorque
+                    );
 
                     var contactsWriter = contacts.AsWriter();
-                    NarrowPhase.CreateContacts(ref input.World, simulationContext.InputVelocities,
-                        dispatchPairs.AsArray(), ref solverSchedulerInfo, input.TimeStep, ref contactsWriter); //Frame timestep
+                    NarrowPhase.CreateContacts(
+                        ref input.World,
+                        simulationContext.InputVelocities,
+                        dispatchPairs.AsArray(),
+                        ref solverSchedulerInfo,
+                        input.TimeStep,
+                        ref contactsWriter
+                    ); //Frame timestep
                 }
                 else // Using substeps
                 {
                     // Predict linear velocity at the end of a frame under the influence of gravity
-                    var copyInputVelocities = new NativeArray<Velocity>(input.World.DynamicsWorld.MotionVelocities.Length, Allocator.Temp);
+                    var copyInputVelocities = new NativeArray<Velocity>(
+                        input.World.DynamicsWorld.MotionVelocities.Length,
+                        Allocator.Temp
+                    );
                     var velocityFromGravity = input.TimeStep * input.Gravity;
-                    Solver.UpdateInputVelocities(input.World.DynamicsWorld.MotionVelocities, copyInputVelocities, velocityFromGravity);
+                    Solver.UpdateInputVelocities(
+                        input.World.DynamicsWorld.MotionVelocities,
+                        copyInputVelocities,
+                        velocityFromGravity
+                    );
 
                     var contactsWriter = contacts.AsWriter();
-                    NarrowPhase.CreateContacts(ref input.World, copyInputVelocities,
-                        dispatchPairs.AsArray(), ref solverSchedulerInfo, input.TimeStep, ref contactsWriter); //Frame timestep
+                    NarrowPhase.CreateContacts(
+                        ref input.World,
+                        copyInputVelocities,
+                        dispatchPairs.AsArray(),
+                        ref solverSchedulerInfo,
+                        input.TimeStep,
+                        ref contactsWriter
+                    ); //Frame timestep
                     copyInputVelocities.Dispose();
 
                     // Integrate gravity using substep timestep
-                    Solver.ApplyGravityAndUpdateInputVelocities(input.World.DynamicsWorld.MotionVelocities,
-                        simulationContext.InputVelocities, input.Gravity, input.SubstepTimeStep, input.EnableGyroscopicTorque);
+                    Solver.ApplyGravityAndUpdateInputVelocities(
+                        input.World.DynamicsWorld.MotionVelocities,
+                        simulationContext.InputVelocities,
+                        input.Gravity,
+                        input.SubstepTimeStep,
+                        input.EnableGyroscopicTorque
+                    );
                 }
             }
 
@@ -361,7 +437,13 @@ namespace Unity.Physics
                 var contactsReader = contacts.AsReader();
                 var jacobiansWriter = jacobians.AsWriter();
                 var dispatchPairsArray = dispatchPairs.AsArray();
-                Solver.BuildJacobians(input, dispatchPairsArray, ref solverSchedulerInfo, ref contactsReader, ref jacobiansWriter);
+                Solver.BuildJacobians(
+                    input,
+                    dispatchPairsArray,
+                    ref solverSchedulerInfo,
+                    ref contactsReader,
+                    ref jacobiansWriter
+                );
                 Solver.BuildDirectSolverJacobiansMap(ref solverSchedulerInfo, jacobians.AsReader(), dispatchPairsArray);
             }
 
@@ -374,24 +456,33 @@ namespace Unity.Physics
                 NumSolverIterations = input.NumSolverIterations,
                 DirectSolverSettings = input.DirectSolverSettings,
                 CurrentSubstep = -1,
-                CurrentSolverIteration = -1
+                CurrentSolverIteration = -1,
             };
 
             // Make sure we have sufficient event buffers
             var workItemCount = solverSchedulerInfo.NumIterativeWorkItems.Value;
-            if (simulationContext.CollisionEventDataStream.IsCreated && simulationContext.CollisionEventDataStream.ForEachCount < workItemCount)
+            if (
+                simulationContext.CollisionEventDataStream.IsCreated
+                && simulationContext.CollisionEventDataStream.ForEachCount < workItemCount
+            )
             {
                 simulationContext.CollisionEventDataStream.Dispose();
                 simulationContext.CollisionEventDataStream = new NativeStream(workItemCount, Allocator.Persistent);
             }
 
-            if (simulationContext.TriggerEventDataStream.IsCreated && simulationContext.TriggerEventDataStream.ForEachCount < workItemCount)
+            if (
+                simulationContext.TriggerEventDataStream.IsCreated
+                && simulationContext.TriggerEventDataStream.ForEachCount < workItemCount
+            )
             {
                 simulationContext.TriggerEventDataStream.Dispose();
                 simulationContext.TriggerEventDataStream = new NativeStream(workItemCount, Allocator.Persistent);
             }
 
-            if (simulationContext.ImpulseEventDataStream.IsCreated && simulationContext.ImpulseEventDataStream.ForEachCount < workItemCount)
+            if (
+                simulationContext.ImpulseEventDataStream.IsCreated
+                && simulationContext.ImpulseEventDataStream.ForEachCount < workItemCount
+            )
             {
                 simulationContext.ImpulseEventDataStream.Dispose();
                 simulationContext.ImpulseEventDataStream = new NativeStream(workItemCount, Allocator.Persistent);
@@ -406,23 +497,49 @@ namespace Unity.Physics
                 var jacobiansReader = jacobians.AsReader();
                 if (i > 0) // First substep will be covered by the Jacobians.Build stage
                 {
-                    Solver.ApplyGravityAndUpdateInputVelocities(input.World.DynamicsWorld.MotionVelocities, simulationContext.InputVelocities,
-                        input.Gravity, input.SubstepTimeStep, input.EnableGyroscopicTorque);
-                    Solver.UpdateJacobians(workItemIndex: 0, input.World.DynamicsWorld.MotionDatas, input.World.DynamicsWorld.MotionVelocities,
-                        input.World.CollisionWorld.Bodies, ref jacobiansReader, stepInput);
+                    Solver.ApplyGravityAndUpdateInputVelocities(
+                        input.World.DynamicsWorld.MotionVelocities,
+                        simulationContext.InputVelocities,
+                        input.Gravity,
+                        input.SubstepTimeStep,
+                        input.EnableGyroscopicTorque
+                    );
+                    Solver.UpdateJacobians(
+                        workItemIndex: 0,
+                        input.World.DynamicsWorld.MotionDatas,
+                        input.World.DynamicsWorld.MotionVelocities,
+                        input.World.CollisionWorld.Bodies,
+                        ref jacobiansReader,
+                        stepInput
+                    );
                 }
 
                 var collisionEventsWriter = simulationContext.CollisionEventDataStream.AsWriter();
                 var triggerEventsWriter = simulationContext.TriggerEventDataStream.AsWriter();
                 var impulseEventsWriter = simulationContext.ImpulseEventDataStream.AsWriter();
-                Solver.StabilizationData solverStabilizationData = new Solver.StabilizationData(input, simulationContext);
+                Solver.StabilizationData solverStabilizationData = new Solver.StabilizationData(
+                    input,
+                    simulationContext
+                );
 
-                Solver.SolveJacobians(solverSchedulerInfo, jacobiansReader, ref motionVelocities, input.World.DynamicsWorld.MotionDatas, stepInput,
-                    ref collisionEventsWriter, ref triggerEventsWriter, ref impulseEventsWriter, solverStabilizationData);
+                Solver.SolveJacobians(
+                    solverSchedulerInfo,
+                    jacobiansReader,
+                    ref motionVelocities,
+                    input.World.DynamicsWorld.MotionDatas,
+                    stepInput,
+                    ref collisionEventsWriter,
+                    ref triggerEventsWriter,
+                    ref impulseEventsWriter,
+                    solverStabilizationData
+                );
 
                 // Integrate motions
-                Integrator.Integrate(input.World.DynamicsWorld.MotionDatas, input.World.DynamicsWorld.MotionVelocities,
-                    input.SubstepTimeStep);
+                Integrator.Integrate(
+                    input.World.DynamicsWorld.MotionDatas,
+                    input.World.DynamicsWorld.MotionVelocities,
+                    input.SubstepTimeStep
+                );
             }
 
             // Synchronize the collision world if asked for
@@ -439,15 +556,35 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   The SimulationJobHandles. </returns>
-        public SimulationJobHandles ScheduleBroadphaseJobs(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded = true)
+        public SimulationJobHandles ScheduleBroadphaseJobs(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
-            return ScheduleBroadphaseJobsInternal(input, inputDeps, multiThreaded, incrementalDynamicBroadphase: false, incrementalStaticBroadphase: false);
+            return ScheduleBroadphaseJobsInternal(
+                input,
+                inputDeps,
+                multiThreaded,
+                incrementalDynamicBroadphase: false,
+                incrementalStaticBroadphase: false
+            );
         }
 
-        internal SimulationJobHandles ScheduleBroadphaseJobsInternal(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded, bool incrementalDynamicBroadphase, bool incrementalStaticBroadphase)
+        internal SimulationJobHandles ScheduleBroadphaseJobsInternal(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded,
+            bool incrementalDynamicBroadphase,
+            bool incrementalStaticBroadphase
+        )
         {
             SafetyChecks.CheckFiniteAndPositiveAndThrow(input.TimeStep, nameof(input.TimeStep));
-            SafetyChecks.CheckInRangeAndThrow(input.NumSolverIterations, new int2(1, int.MaxValue), nameof(input.NumSolverIterations));
+            SafetyChecks.CheckInRangeAndThrow(
+                input.NumSolverIterations,
+                new int2(1, int.MaxValue),
+                nameof(input.NumSolverIterations)
+            );
             SafetyChecks.CheckSimulationStageAndThrow(m_SimulationScheduleStage, SimulationScheduleStage.Idle);
             m_SimulationScheduleStage = SimulationScheduleStage.PostCreateBodyPairs;
 
@@ -468,22 +605,34 @@ namespace Unity.Physics
 
             // Find all body pairs that overlap in the broadphase
             var handles = input.World.CollisionWorld.ScheduleFindOverlapsJobsInternal(
-                out NativeStream dynamicVsDynamicBodyPairs, out NativeStream dynamicVsStaticBodyPairs,
-                handle, multiThreaded, incrementalDynamicBroadphase, incrementalStaticBroadphase);
+                out NativeStream dynamicVsDynamicBodyPairs,
+                out NativeStream dynamicVsStaticBodyPairs,
+                handle,
+                multiThreaded,
+                incrementalDynamicBroadphase,
+                incrementalStaticBroadphase
+            );
             handle = handles.FinalExecutionHandle;
             var disposeHandle = handles.FinalDisposeHandle;
             var postOverlapsHandle = handle;
 
             // Sort all overlapping and jointed body pairs into phases
-            handles = DispatchPairSequencer.ScheduleCreatePhasedDispatchPairsJob(input,
-                ref dynamicVsDynamicBodyPairs, ref dynamicVsStaticBodyPairs, handle,
-                ref StepContext.PhasedDispatchPairs, out StepContext.SolverSchedulerInfo, multiThreaded);
+            handles = DispatchPairSequencer.ScheduleCreatePhasedDispatchPairsJob(
+                input,
+                ref dynamicVsDynamicBodyPairs,
+                ref dynamicVsStaticBodyPairs,
+                handle,
+                ref StepContext.PhasedDispatchPairs,
+                out StepContext.SolverSchedulerInfo,
+                multiThreaded
+            );
 
             StepContext.CreateDispatchPairsJobHandle = handles.FinalExecutionHandle;
 
             m_StepHandles.FinalDisposeHandle = JobHandle.CombineDependencies(handles.FinalDisposeHandle, disposeHandle);
-            m_StepHandles.FinalExecutionHandle = multiThreaded ?
-                JobHandle.CombineDependencies(handles.FinalExecutionHandle, postOverlapsHandle) : handles.FinalExecutionHandle;
+            m_StepHandles.FinalExecutionHandle = multiThreaded
+                ? JobHandle.CombineDependencies(handles.FinalExecutionHandle, postOverlapsHandle)
+                : handles.FinalExecutionHandle;
 
             return m_StepHandles;
         }
@@ -495,9 +644,16 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   The SimulationJobHandles. </returns>
-        public SimulationJobHandles ScheduleNarrowphaseJobs(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded = true)
+        public SimulationJobHandles ScheduleNarrowphaseJobs(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
-            SafetyChecks.CheckSimulationStageAndThrow(m_SimulationScheduleStage, SimulationScheduleStage.PostCreateBodyPairs);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateBodyPairs
+            );
             m_SimulationScheduleStage = SimulationScheduleStage.PostCreateContacts;
 
             if (input.World.NumDynamicBodies == 0)
@@ -511,31 +667,68 @@ namespace Unity.Physics
             if (input.NumSubsteps <= 1)
             {
                 // Integrate gravity so Jacobian Build is using same source data as Jacobian Solve
-                var handle = Solver.ScheduleApplyGravityAndUpdateInputVelocitiesJob(ref input.World.DynamicsWorld,
-                    SimulationContext.InputVelocities, input.Gravity, input.TimeStep, input.EnableGyroscopicTorque, inputDeps, multiThreaded);
+                var handle = Solver.ScheduleApplyGravityAndUpdateInputVelocitiesJob(
+                    ref input.World.DynamicsWorld,
+                    SimulationContext.InputVelocities,
+                    input.Gravity,
+                    input.TimeStep,
+                    input.EnableGyroscopicTorque,
+                    inputDeps,
+                    multiThreaded
+                );
 
-                m_StepHandles = NarrowPhase.ScheduleCreateContactsJobs(ref input.World, input.TimeStep,
-                    SimulationContext.InputVelocities, ref StepContext.Contacts, ref StepContext.Jacobians,
-                    ref StepContext.PhasedDispatchPairs, handle, ref StepContext.SolverSchedulerInfo, multiThreaded);
+                m_StepHandles = NarrowPhase.ScheduleCreateContactsJobs(
+                    ref input.World,
+                    input.TimeStep,
+                    SimulationContext.InputVelocities,
+                    ref StepContext.Contacts,
+                    ref StepContext.Jacobians,
+                    ref StepContext.PhasedDispatchPairs,
+                    handle,
+                    ref StepContext.SolverSchedulerInfo,
+                    multiThreaded
+                );
             }
             else // Using substeps
             {
                 // Predict Linear Velocity at the end of a frame under the influence of gravity
-                var copyInputVelocities = new NativeArray<Velocity>(input.World.DynamicsWorld.MotionVelocities.Length, Allocator.TempJob);
+                var copyInputVelocities = new NativeArray<Velocity>(
+                    input.World.DynamicsWorld.MotionVelocities.Length,
+                    Allocator.TempJob
+                );
                 var velocityFromGravity = input.TimeStep * input.Gravity;
-                var handle = Solver.ScheduleUpdateInputVelocitiesJob(input.World.DynamicsWorld.MotionVelocities,
-                    copyInputVelocities, velocityFromGravity, inputDeps, multiThreaded);
+                var handle = Solver.ScheduleUpdateInputVelocitiesJob(
+                    input.World.DynamicsWorld.MotionVelocities,
+                    copyInputVelocities,
+                    velocityFromGravity,
+                    inputDeps,
+                    multiThreaded
+                );
 
                 // Create contacts using the velocity prediction data for the full frame timestep
-                m_StepHandles = NarrowPhase.ScheduleCreateContactsJobs(ref input.World, input.TimeStep, copyInputVelocities,
-                    ref StepContext.Contacts, ref StepContext.Jacobians, ref StepContext.PhasedDispatchPairs, handle,
-                    ref StepContext.SolverSchedulerInfo, multiThreaded);
+                m_StepHandles = NarrowPhase.ScheduleCreateContactsJobs(
+                    ref input.World,
+                    input.TimeStep,
+                    copyInputVelocities,
+                    ref StepContext.Contacts,
+                    ref StepContext.Jacobians,
+                    ref StepContext.PhasedDispatchPairs,
+                    handle,
+                    ref StepContext.SolverSchedulerInfo,
+                    multiThreaded
+                );
 
                 var copyHandle = copyInputVelocities.Dispose(m_StepHandles.FinalExecutionHandle);
-                m_StepHandles.FinalExecutionHandle = JobHandle.CombineDependencies(copyHandle, m_StepHandles.FinalExecutionHandle);
+                m_StepHandles.FinalExecutionHandle = JobHandle.CombineDependencies(
+                    copyHandle,
+                    m_StepHandles.FinalExecutionHandle
+                );
             }
 
-            m_StepHandles.FinalDisposeHandle = JobHandle.CombineDependencies(disposeHandle, m_StepHandles.FinalDisposeHandle);
+            m_StepHandles.FinalDisposeHandle = JobHandle.CombineDependencies(
+                disposeHandle,
+                m_StepHandles.FinalDisposeHandle
+            );
 
             return m_StepHandles;
         }
@@ -547,9 +740,16 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   The SimulationJobHandles. </returns>
-        public SimulationJobHandles ScheduleCreateJacobiansJobs(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded = true)
+        public SimulationJobHandles ScheduleCreateJacobiansJobs(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
-            SafetyChecks.CheckSimulationStageAndThrow(m_SimulationScheduleStage, SimulationScheduleStage.PostCreateContacts);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateContacts
+            );
             m_SimulationScheduleStage = SimulationScheduleStage.PostCreateJacobians;
 
             if (input.World.NumDynamicBodies == 0)
@@ -562,16 +762,32 @@ namespace Unity.Physics
             if (input.NumSubsteps > 1)
             {
                 // Integrate gravity so Jacobian Build is using same source data as Jacobian Solve
-                inputDeps = Solver.ScheduleApplyGravityAndUpdateInputVelocitiesJob(ref input.World.DynamicsWorld,
-                    SimulationContext.InputVelocities, input.Gravity, input.SubstepTimeStep, input.EnableGyroscopicTorque, inputDeps, multiThreaded);
+                inputDeps = Solver.ScheduleApplyGravityAndUpdateInputVelocitiesJob(
+                    ref input.World.DynamicsWorld,
+                    SimulationContext.InputVelocities,
+                    input.Gravity,
+                    input.SubstepTimeStep,
+                    input.EnableGyroscopicTorque,
+                    inputDeps,
+                    multiThreaded
+                );
             }
 
             // Create/Initialize Jacobians for first substep
             var disposeHandle = m_StepHandles.FinalDisposeHandle;
-            m_StepHandles = Solver.ScheduleBuildJacobiansJobs(input,
-                inputDeps, ref StepContext.PhasedDispatchPairs,
-                ref StepContext.SolverSchedulerInfo, ref StepContext.Contacts, ref StepContext.Jacobians, multiThreaded);
-            m_StepHandles.FinalDisposeHandle = JobHandle.CombineDependencies(disposeHandle, m_StepHandles.FinalDisposeHandle);
+            m_StepHandles = Solver.ScheduleBuildJacobiansJobs(
+                input,
+                inputDeps,
+                ref StepContext.PhasedDispatchPairs,
+                ref StepContext.SolverSchedulerInfo,
+                ref StepContext.Contacts,
+                ref StepContext.Jacobians,
+                multiThreaded
+            );
+            m_StepHandles.FinalDisposeHandle = JobHandle.CombineDependencies(
+                disposeHandle,
+                m_StepHandles.FinalDisposeHandle
+            );
 
             return m_StepHandles;
         }
@@ -583,9 +799,16 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   The SimulationJobHandles. </returns>
-        public SimulationJobHandles ScheduleSolveAndIntegrateJobs(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded = true)
+        public SimulationJobHandles ScheduleSolveAndIntegrateJobs(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
-            SafetyChecks.CheckSimulationStageAndThrow(m_SimulationScheduleStage, SimulationScheduleStage.PostCreateJacobians);
+            SafetyChecks.CheckSimulationStageAndThrow(
+                m_SimulationScheduleStage,
+                SimulationScheduleStage.PostCreateJacobians
+            );
             m_SimulationScheduleStage = SimulationScheduleStage.Idle;
 
             if (input.World.NumDynamicBodies == 0)
@@ -613,14 +836,29 @@ namespace Unity.Physics
             // solver iteration of the last substep
 
             JobHandle collisionEventStreamHandle = NativeStream.ScheduleConstruct(
-            out SimulationContext.CollisionEventDataStream, numWorkItems, inputDeps, Allocator.Persistent);
+                out SimulationContext.CollisionEventDataStream,
+                numWorkItems,
+                inputDeps,
+                Allocator.Persistent
+            );
             JobHandle triggerEventStreamHandle = NativeStream.ScheduleConstruct(
-            out SimulationContext.TriggerEventDataStream, numWorkItems, inputDeps, Allocator.Persistent);
+                out SimulationContext.TriggerEventDataStream,
+                numWorkItems,
+                inputDeps,
+                Allocator.Persistent
+            );
             JobHandle impulseEventStreamHandle = NativeStream.ScheduleConstruct(
-            out SimulationContext.ImpulseEventDataStream, numWorkItems, inputDeps, Allocator.Persistent);
+                out SimulationContext.ImpulseEventDataStream,
+                numWorkItems,
+                inputDeps,
+                Allocator.Persistent
+            );
 
             var streamJobHandle = JobHandle.CombineDependencies(
-                collisionEventStreamHandle, triggerEventStreamHandle, impulseEventStreamHandle);
+                collisionEventStreamHandle,
+                triggerEventStreamHandle,
+                impulseEventStreamHandle
+            );
             jobHandle = JobHandle.CombineDependencies(jobHandle, streamJobHandle);
 
             var stepInput = new Solver.StepInput()
@@ -632,7 +870,7 @@ namespace Unity.Physics
                 NumSolverIterations = input.NumSolverIterations,
                 DirectSolverSettings = input.DirectSolverSettings,
                 CurrentSubstep = -1,
-                CurrentSolverIteration = -1
+                CurrentSolverIteration = -1,
             };
 
             for (var i = 0; i < input.NumSubsteps; i++)
@@ -641,27 +879,58 @@ namespace Unity.Physics
 
                 if (i > 0) // Gravity integration for first substep is covered in the Jacobians.Build stage
                 {
-                    jobHandle = Solver.ScheduleApplyGravityAndUpdateInputVelocitiesJob(ref input.World.DynamicsWorld, SimulationContext.InputVelocities,
-                        input.Gravity, input.SubstepTimeStep,  input.EnableGyroscopicTorque, jobHandle, multiThreaded);
+                    jobHandle = Solver.ScheduleApplyGravityAndUpdateInputVelocitiesJob(
+                        ref input.World.DynamicsWorld,
+                        SimulationContext.InputVelocities,
+                        input.Gravity,
+                        input.SubstepTimeStep,
+                        input.EnableGyroscopicTorque,
+                        jobHandle,
+                        multiThreaded
+                    );
 
-                    jobHandle = Solver.ScheduleUpdateJacobiansJobs(ref input.World, ref StepContext.Jacobians,
-                        ref StepContext.SolverSchedulerInfo, stepInput, jobHandle, multiThreaded);
+                    jobHandle = Solver.ScheduleUpdateJacobiansJobs(
+                        ref input.World,
+                        ref StepContext.Jacobians,
+                        ref StepContext.SolverSchedulerInfo,
+                        stepInput,
+                        jobHandle,
+                        multiThreaded
+                    );
                 }
 
                 // Solve Jacobians
-                m_StepHandles = Solver.ScheduleSolveJacobiansJobs(input.World.DynamicsWorld, stepInput,
-                    StepContext.Jacobians, SimulationContext.CollisionEventDataStream,
-                    SimulationContext.TriggerEventDataStream, SimulationContext.ImpulseEventDataStream,
-                    StepContext.SolverSchedulerInfo, solverStabilizationData, jobHandle, multiThreaded);
+                m_StepHandles = Solver.ScheduleSolveJacobiansJobs(
+                    input.World.DynamicsWorld,
+                    stepInput,
+                    StepContext.Jacobians,
+                    SimulationContext.CollisionEventDataStream,
+                    SimulationContext.TriggerEventDataStream,
+                    SimulationContext.ImpulseEventDataStream,
+                    StepContext.SolverSchedulerInfo,
+                    solverStabilizationData,
+                    jobHandle,
+                    multiThreaded
+                );
 
                 // Integrate motions (updates MotionDatas, MotionVelocities)
-                jobHandle = Integrator.ScheduleIntegrateJobs(ref input.World.DynamicsWorld,
-                    input.SubstepTimeStep, m_StepHandles.FinalExecutionHandle, multiThreaded);
+                jobHandle = Integrator.ScheduleIntegrateJobs(
+                    ref input.World.DynamicsWorld,
+                    input.SubstepTimeStep,
+                    m_StepHandles.FinalExecutionHandle,
+                    multiThreaded
+                );
 
-                m_StepHandles.FinalDisposeHandle =
-                    JobHandle.CombineDependencies(disposeHandle, m_StepHandles.FinalDisposeHandle);
+                m_StepHandles.FinalDisposeHandle = JobHandle.CombineDependencies(
+                    disposeHandle,
+                    m_StepHandles.FinalDisposeHandle
+                );
 
-                jobHandle = JobHandle.CombineDependencies(jobHandle, executionHandle, m_StepHandles.FinalExecutionHandle);
+                jobHandle = JobHandle.CombineDependencies(
+                    jobHandle,
+                    executionHandle,
+                    m_StepHandles.FinalExecutionHandle
+                );
 
                 if (stepInput.IsLastSubstep)
                 {
@@ -669,13 +938,21 @@ namespace Unity.Physics
                 }
             }
 
-            m_StepHandles.FinalExecutionHandle = JobHandle.CombineDependencies(m_StepHandles.FinalExecutionHandle, jobHandle);
+            m_StepHandles.FinalExecutionHandle = JobHandle.CombineDependencies(
+                m_StepHandles.FinalExecutionHandle,
+                jobHandle
+            );
 
             // Synchronize the collision world
             if (input.SynchronizeCollisionWorld)
             {
                 m_StepHandles.FinalExecutionHandle = input.World.CollisionWorld.ScheduleUpdateDynamicTree(
-                    ref input.World, input.TimeStep, input.Gravity, m_StepHandles.FinalExecutionHandle, multiThreaded);
+                    ref input.World,
+                    input.TimeStep,
+                    input.Gravity,
+                    m_StepHandles.FinalExecutionHandle,
+                    multiThreaded
+                );
             }
 
             return m_StepHandles;
@@ -715,7 +992,11 @@ namespace Unity.Physics
         /// <param name="multiThreaded">    (Optional) True if multi threaded. </param>
         ///
         /// <returns>   The SimulationJobHandles. </returns>
-        public unsafe SimulationJobHandles ScheduleStepJobs(SimulationStepInput input, JobHandle inputDeps, bool multiThreaded = true)
+        public unsafe SimulationJobHandles ScheduleStepJobs(
+            SimulationStepInput input,
+            JobHandle inputDeps,
+            bool multiThreaded = true
+        )
         {
             ScheduleBroadphaseJobs(input, inputDeps, multiThreaded);
             ScheduleNarrowphaseJobs(input, m_StepHandles.FinalExecutionHandle, multiThreaded);

@@ -24,7 +24,9 @@ namespace Unity.Networking.Transport.Relay
             if (length != k_Length)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                throw new ArgumentException($"Provided byte array length is invalid, must be {k_Length} but got {length}.");
+                throw new ArgumentException(
+                    $"Provided byte array length is invalid, must be {k_Length} but got {length}."
+                );
 #else
                 Debug.LogError($"Provided byte array length is invalid, must be {k_Length} but got {length}.");
                 return default;
@@ -41,7 +43,7 @@ namespace Unity.Networking.Transport.Relay
         /// <returns>New HMAC key.</returns>
         public static RelayHMACKey FromByteArray(byte[] data)
         {
-            fixed(byte* ptr = data)
+            fixed (byte* ptr = data)
             {
                 return RelayHMACKey.FromBytePointer(ptr, data.Length);
             }

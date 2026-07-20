@@ -28,7 +28,7 @@ namespace UnityEngine.Rendering.Universal
         }
 
         // This range check uses SortingLayer.value.
-       internal bool IsValueWithinLayerRange(int value)
+        internal bool IsValueWithinLayerRange(int value)
         {
             return value >= layerRange.lowerBound && value <= layerRange.upperBound;
         }
@@ -38,7 +38,12 @@ namespace UnityEngine.Rendering.Universal
     {
         private static LayerBatch[] s_LayerBatches;
 
-        private static bool CanBatchLightsInLayer(int layerIndex1, int layerIndex2, SortingLayer[] sortingLayers, ILight2DCullResult lightCullResult)
+        private static bool CanBatchLightsInLayer(
+            int layerIndex1,
+            int layerIndex2,
+            SortingLayer[] sortingLayers,
+            ILight2DCullResult lightCullResult
+        )
         {
             var layerId1 = sortingLayers[layerIndex1].id;
             var layerId2 = sortingLayers[layerIndex2].id;
@@ -63,7 +68,11 @@ namespace UnityEngine.Rendering.Universal
             return true;
         }
 
-        private static bool CanBatchCameraSortingLayer(int startLayerIndex, SortingLayer[] sortingLayers, Renderer2DData rendererData)
+        private static bool CanBatchCameraSortingLayer(
+            int startLayerIndex,
+            SortingLayer[] sortingLayers,
+            Renderer2DData rendererData
+        )
         {
             if (rendererData.useCameraSortingLayerTexture)
             {
@@ -74,7 +83,11 @@ namespace UnityEngine.Rendering.Universal
             return false;
         }
 
-        private static int FindUpperBoundInBatch(int startLayerIndex, SortingLayer[] sortingLayers, Renderer2DData rendererData)
+        private static int FindUpperBoundInBatch(
+            int startLayerIndex,
+            SortingLayer[] sortingLayers,
+            Renderer2DData rendererData
+        )
         {
             // break layer if camera sorting layer is active
             if (CanBatchCameraSortingLayer(startLayerIndex, sortingLayers, rendererData))
@@ -127,7 +140,7 @@ namespace UnityEngine.Rendering.Universal
 
             bool anyNormals = false;
             batchCount = 0;
-            for (var i = 0; i < cachedSortingLayers.Length;)
+            for (var i = 0; i < cachedSortingLayers.Length; )
             {
                 var layerToRender = cachedSortingLayers[i].id;
                 var layerBatch = s_LayerBatches[batchCount++];
@@ -174,7 +187,11 @@ namespace UnityEngine.Rendering.Universal
             return s_LayerBatches;
         }
 
-        public static void GetFilterSettings(Renderer2DData rendererData, LayerBatch layerBatch, out FilteringSettings filterSettings)
+        public static void GetFilterSettings(
+            Renderer2DData rendererData,
+            LayerBatch layerBatch,
+            out FilteringSettings filterSettings
+        )
         {
             filterSettings = FilteringSettings.defaultValue;
             filterSettings.renderQueueRange = RenderQueueRange.all;
@@ -192,7 +209,11 @@ namespace UnityEngine.Rendering.Universal
 
                 // Determine number of blend styles used
                 int size = 0;
-                for (var blendStyleIndex = 0; blendStyleIndex < RendererLighting.k_ShapeLightTextureIDs.Length; blendStyleIndex++)
+                for (
+                    var blendStyleIndex = 0;
+                    blendStyleIndex < RendererLighting.k_ShapeLightTextureIDs.Length;
+                    blendStyleIndex++
+                )
                 {
                     var blendStyleMask = (uint)(1 << blendStyleIndex);
                     var blendStyleUsed = (layer.lightStats.blendStylesUsed & blendStyleMask) > 0;
@@ -206,7 +227,11 @@ namespace UnityEngine.Rendering.Universal
 
                 // Save indices so we don't have to copy the whole Light2DBlendStyle struct
                 var index = 0;
-                for (var blendStyleIndex = 0; blendStyleIndex < RendererLighting.k_ShapeLightTextureIDs.Length; blendStyleIndex++)
+                for (
+                    var blendStyleIndex = 0;
+                    blendStyleIndex < RendererLighting.k_ShapeLightTextureIDs.Length;
+                    blendStyleIndex++
+                )
                 {
                     var blendStyleMask = (uint)(1 << blendStyleIndex);
                     var blendStyleUsed = (layer.lightStats.blendStylesUsed & blendStyleMask) > 0;

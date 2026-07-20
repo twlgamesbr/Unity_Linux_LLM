@@ -11,11 +11,11 @@ namespace Unity.Entities.UI
     {
         public override VisualElement Build()
         {
-            var root = new Foldout {text = DisplayName};
+            var root = new Foldout { text = DisplayName };
             var majorField = new IntegerField
             {
                 bindingPath = nameof(Version.Major),
-                label = ObjectNames.NicifyVariableName(nameof(Version.Major))
+                label = ObjectNames.NicifyVariableName(nameof(Version.Major)),
             };
             majorField.RegisterCallback<ChangeEvent<int>, IntegerField>(ClampEditingValue, majorField);
             majorField.RegisterValueChangedCallback(OnMajorChanged);
@@ -24,7 +24,7 @@ namespace Unity.Entities.UI
             var minorField = new IntegerField
             {
                 bindingPath = nameof(Version.Minor),
-                label = ObjectNames.NicifyVariableName(nameof(Version.Minor))
+                label = ObjectNames.NicifyVariableName(nameof(Version.Minor)),
             };
             minorField.RegisterCallback<ChangeEvent<int>, IntegerField>(ClampEditingValue, minorField);
             minorField.RegisterValueChangedCallback(OnMinorChanged);
@@ -36,7 +36,7 @@ namespace Unity.Entities.UI
                 var buildField = new IntegerField
                 {
                     bindingPath = nameof(Version.Build),
-                    label = ObjectNames.NicifyVariableName(nameof(Version.Build))
+                    label = ObjectNames.NicifyVariableName(nameof(Version.Build)),
                 };
                 buildField.RegisterCallback<ChangeEvent<int>, IntegerField>(ClampEditingValue, buildField);
                 buildField.RegisterValueChangedCallback(OnBuildChanged);
@@ -48,7 +48,7 @@ namespace Unity.Entities.UI
                 var revisionField = new IntegerField
                 {
                     bindingPath = nameof(Version.Revision),
-                    label = ObjectNames.NicifyVariableName(nameof(Version.Revision))
+                    label = ObjectNames.NicifyVariableName(nameof(Version.Revision)),
                 };
                 revisionField.RegisterCallback<ChangeEvent<int>, IntegerField>(ClampEditingValue, revisionField);
                 revisionField.RegisterValueChangedCallback(OnRevisionChanged);

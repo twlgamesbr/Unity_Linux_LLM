@@ -1,4 +1,3 @@
-
 using System;
 using System.Diagnostics;
 
@@ -36,7 +35,8 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
 
         [Conditional("UNITY_ASSERTIONS")]
-        public static void CheckArgRange<T>(T value, T minIncluded, T maxExcluded, string argName) where T: IComparable
+        public static void CheckArgRange<T>(T value, T minIncluded, T maxExcluded, string argName)
+            where T : IComparable
         {
             if (value.CompareTo(minIncluded) < 0 || value.CompareTo(maxExcluded) >= 0)
             {
@@ -46,4 +46,3 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
     }
 }
-

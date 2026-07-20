@@ -25,7 +25,12 @@ public partial class JobEntityDescription
         while (parameterSymbolContainingType != null)
         {
             // E.g. if an `IComponentData` type is declared `public` but nested within a non-public type, then its accessibility is in fact less accessible than `public`
-            if (IsLessAccessibleThan(parameterSymbolContainingType.DeclaredAccessibility, executeParameterSymbolAccessibility))
+            if (
+                IsLessAccessibleThan(
+                    parameterSymbolContainingType.DeclaredAccessibility,
+                    executeParameterSymbolAccessibility
+                )
+            )
                 executeParameterSymbolAccessibility = parameterSymbolContainingType.DeclaredAccessibility;
 
             parameterSymbolContainingType = parameterSymbolContainingType.ContainingType;
@@ -39,11 +44,17 @@ public partial class JobEntityDescription
         return accessibility1 switch
         {
             Accessibility.Private => accessibility2 != Accessibility.Private,
-            Accessibility.Internal => accessibility2 is Accessibility.ProtectedOrInternal or Accessibility.Protected or Accessibility.Public,
-            Accessibility.Protected => accessibility2 is Accessibility.ProtectedOrInternal or Accessibility.Internal or Accessibility.Public,
+            Accessibility.Internal => accessibility2
+                is Accessibility.ProtectedOrInternal
+                    or Accessibility.Protected
+                    or Accessibility.Public,
+            Accessibility.Protected => accessibility2
+                is Accessibility.ProtectedOrInternal
+                    or Accessibility.Internal
+                    or Accessibility.Public,
             Accessibility.ProtectedOrInternal => accessibility2 == Accessibility.Public,
             Accessibility.Public => false,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
 }

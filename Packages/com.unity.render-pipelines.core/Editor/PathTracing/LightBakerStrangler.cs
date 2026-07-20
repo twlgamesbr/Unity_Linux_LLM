@@ -1,18 +1,18 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System;
 using Unity.Collections;
-using Unity.Mathematics;
-using UnityEngine;
-using UnityEngine.LightTransport;
-using UnityEngine.PathTracing.Integration;
-using UnityEngine.Rendering;
-using UnityEngine.Assertions;
-using UnityEngine.PathTracing.Core;
-using UnityEngine.PathTracing.Lightmapping;
-using UnityEngine.Rendering.UnifiedRayTracing;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
 using UnityEditor.PathTracing.Debugging;
+using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.LightTransport;
+using UnityEngine.PathTracing.Core;
+using UnityEngine.PathTracing.Integration;
+using UnityEngine.PathTracing.Lightmapping;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.UnifiedRayTracing;
 
 namespace UnityEditor.PathTracing.LightBakerBridge
 {
@@ -35,7 +35,12 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
         }
 
-        internal static void AddContributingInstancesToWorld(World world, in FatInstance[] fatInstances, out Dictionary<int, List<LodInstanceBuildData>> lodInstances, out Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances)
+        internal static void AddContributingInstancesToWorld(
+            World world,
+            in FatInstance[] fatInstances,
+            out Dictionary<int, List<LodInstanceBuildData>> lodInstances,
+            out Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances
+        )
         {
             lodInstances = new();
             lodgroupToContributorInstances = new();
@@ -44,17 +49,21 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             {
                 if (fatInstance.LodIdentifier.IsValid() && !fatInstance.LodIdentifier.IsContributor())
                 {
-                    WorldHelpers.MultiValueDictAdd(lodInstances, fatInstance.LodIdentifier.LodGroup, new LodInstanceBuildData
-                    {
-                        LodMask = fatInstance.LodIdentifier.LodMask,
-                        Mesh = fatInstance.Mesh,
-                        Materials = fatInstance.Materials,
-                        Masks = fatInstance.SubMeshMasks,
-                        LocalToWorldMatrix = fatInstance.LocalToWorldMatrix,
-                        Bounds = fatInstance.Bounds,
-                        IsStatic = fatInstance.IsStatic,
-                        Filter = fatInstance.Filter
-                    });
+                    WorldHelpers.MultiValueDictAdd(
+                        lodInstances,
+                        fatInstance.LodIdentifier.LodGroup,
+                        new LodInstanceBuildData
+                        {
+                            LodMask = fatInstance.LodIdentifier.LodMask,
+                            Mesh = fatInstance.Mesh,
+                            Materials = fatInstance.Materials,
+                            Masks = fatInstance.SubMeshMasks,
+                            LocalToWorldMatrix = fatInstance.LocalToWorldMatrix,
+                            Bounds = fatInstance.Bounds,
+                            IsStatic = fatInstance.IsStatic,
+                            Filter = fatInstance.Filter,
+                        }
+                    );
                     continue;
                 }
 
@@ -67,15 +76,20 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     fatInstance.Bounds,
                     fatInstance.IsStatic,
                     fatInstance.Filter,
-                    fatInstance.EnableEmissiveSampling);
+                    fatInstance.EnableEmissiveSampling
+                );
 
                 if (fatInstance.LodIdentifier.IsValid() && fatInstance.LodIdentifier.IsContributor())
-                    WorldHelpers.MultiValueDictAdd(lodgroupToContributorInstances, fatInstance.LodIdentifier.LodGroup, new ContributorLodInfo
-                    {
-                        LodMask = fatInstance.LodIdentifier.LodMask,
-                        InstanceHandle = instanceHandle,
-                        Masks = fatInstance.SubMeshMasks
-                    });
+                    WorldHelpers.MultiValueDictAdd(
+                        lodgroupToContributorInstances,
+                        fatInstance.LodIdentifier.LodGroup,
+                        new ContributorLodInfo
+                        {
+                            LodMask = fatInstance.LodIdentifier.LodMask,
+                            InstanceHandle = instanceHandle,
+                            Masks = fatInstance.SubMeshMasks,
+                        }
+                    );
             }
         }
     }
@@ -91,7 +105,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             AddResourcesToCacheFailure,
             InitializeExpandedBufferFailure,
             WriteToDiskFailure,
-            Cancelled
+            Cancelled,
         };
 
         // File layout matches WriteInterleavedSHArrayToFile.
@@ -173,7 +187,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             foreach (LightmapRequestOutputType channel in Enum.GetValues(typeof(LightmapRequestOutputType)))
             {
                 // Check if the bitfield has the current value set
-                if ((bitfield & (int) channel) == 0)
+                if ((bitfield & (int)channel) == 0)
                     continue;
                 // Add the value to the list
                 if (channel != LightmapRequestOutputType.All)
@@ -182,7 +196,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return outputTypes;
         }
 
-        private static bool LightmapRequestOutputTypeToIntegratedOutputType(LightmapRequestOutputType type, out IntegratedOutputType integratedOutputType)
+        private static bool LightmapRequestOutputTypeToIntegratedOutputType(
+            LightmapRequestOutputType type,
+            out IntegratedOutputType integratedOutputType
+        )
         {
             integratedOutputType = IntegratedOutputType.AO;
             switch (type)
@@ -222,7 +239,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         }
 
         // We can ignore the G-Buffer data part of atlassing, we are using stochastic sampling instead.
-        internal static LightmapDesc[] PopulateLightmapDescsFromAtlassing(in PVRAtlassingData atlassing, in FatInstance[] fatInstances)
+        internal static LightmapDesc[] PopulateLightmapDescsFromAtlassing(
+            in PVRAtlassingData atlassing,
+            in FatInstance[] fatInstances
+        )
         {
             int atlasCount = atlassing.m_AtlasHashToGBufferHash.Count;
             var lightmapDescs = new LightmapDesc[atlasCount];
@@ -232,23 +252,29 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                 // Get the array of object ID hashes for the given atlas.
                 bool found = atlassing.m_AtlasHashToObjectIDHashes.TryGetValue(
-                        atlasIdToAtlasHash.m_AtlasHash, out IndexHash128[] objectIDHashes);
+                    atlasIdToAtlasHash.m_AtlasHash,
+                    out IndexHash128[] objectIDHashes
+                );
                 Debug.Assert(found, $"Couldn't find object ID hashes for atlas {atlasIdToAtlasHash.m_AtlasHash}.");
 
                 // Get the GBuffer data for the given atlas, so we can use it to find instance data like IDs and transforms.
-                found = atlassing.m_AtlasHashToGBufferHash.TryGetValue(
-                    atlasIdToAtlasHash.m_AtlasHash, out _);
+                found = atlassing.m_AtlasHashToGBufferHash.TryGetValue(atlasIdToAtlasHash.m_AtlasHash, out _);
                 if (found == false)
                     continue; // Skip atlasses without GBuffers, they are used for SSD objects.
 
                 uint lightmapResolution = (uint)atlassing.m_AtlasSizes[atlasId].width;
-                Debug.Assert(lightmapResolution == atlassing.m_AtlasSizes[atlasId].height,
-                    "The following code assumes that we always have square lightmaps.");
-                uint antiAliasingSampleCount = (uint)((int)atlasIdToAtlasHash.m_BakeParameters.supersamplingMultiplier * (int)atlasIdToAtlasHash.m_BakeParameters.supersamplingMultiplier);
+                Debug.Assert(
+                    lightmapResolution == atlassing.m_AtlasSizes[atlasId].height,
+                    "The following code assumes that we always have square lightmaps."
+                );
+                uint antiAliasingSampleCount = (uint)(
+                    (int)atlasIdToAtlasHash.m_BakeParameters.supersamplingMultiplier
+                    * (int)atlasIdToAtlasHash.m_BakeParameters.supersamplingMultiplier
+                );
                 var lightmapDesc = new LightmapDesc
                 {
                     Resolution = lightmapResolution,
-                    PushOff = atlasIdToAtlasHash.m_BakeParameters.pushOff
+                    PushOff = atlasIdToAtlasHash.m_BakeParameters.pushOff,
                 };
                 int instanceCount = objectIDHashes.Length;
                 var bakeInstances = new BakeInstance[instanceCount];
@@ -256,8 +282,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 foreach (var instanceHash in objectIDHashes)
                 {
                     // Get the AtlassedInstanceData for the instance.
-                    found = atlassing.m_InstanceAtlassingData.TryGetValue(instanceHash,
-                        out AtlassedInstanceData atlassedInstanceData);
+                    found = atlassing.m_InstanceAtlassingData.TryGetValue(
+                        instanceHash,
+                        out AtlassedInstanceData atlassedInstanceData
+                    );
                     Debug.Assert(found, $"Didn't find AtlassedInstanceData for instance {instanceHash}.");
                     Debug.Assert(atlassedInstanceData.m_AtlasId == atlasId, "Atlas ID mismatch.");
 
@@ -265,18 +293,27 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     uint bakeInputInstanceIndex = (uint)instanceHash.Index;
                     ref readonly FatInstance fatInstance = ref fatInstances[bakeInputInstanceIndex];
                     LightmapIntegrationHelpers.ComputeOccupiedTexelRegionForInstance(
-                        lightmapResolution, lightmapResolution, atlassedInstanceData.m_LightmapST, fatInstance.UVBoundsSize, fatInstance.UVBoundsOffset,
-                        out Vector4 normalizedOccupiedST, out Vector2Int occupiedTexelSize, out Vector2Int occupiedTexelOffset);
-                    bakeInstances[instanceCounter].Build(
-                        fatInstance.Mesh,
-                        normalizedOccupiedST,
+                        lightmapResolution,
+                        lightmapResolution,
                         atlassedInstanceData.m_LightmapST,
-                        occupiedTexelSize,
-                        occupiedTexelOffset,
-                        fatInstance.LocalToWorldMatrix,
-                        fatInstance.ReceiveShadows,
-                        fatInstance.LodIdentifier,
-                        bakeInputInstanceIndex);
+                        fatInstance.UVBoundsSize,
+                        fatInstance.UVBoundsOffset,
+                        out Vector4 normalizedOccupiedST,
+                        out Vector2Int occupiedTexelSize,
+                        out Vector2Int occupiedTexelOffset
+                    );
+                    bakeInstances[instanceCounter]
+                        .Build(
+                            fatInstance.Mesh,
+                            normalizedOccupiedST,
+                            atlassedInstanceData.m_LightmapST,
+                            occupiedTexelSize,
+                            occupiedTexelOffset,
+                            fatInstance.LocalToWorldMatrix,
+                            fatInstance.ReceiveShadows,
+                            fatInstance.LodIdentifier,
+                            bakeInputInstanceIndex
+                        );
                     ++instanceCounter;
                 }
 
@@ -287,7 +324,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return lightmapDescs;
         }
 
-        private static void MakeOutputFolderPathsFullyQualified(ProbeRequest[] probeRequestsToFixUp, string bakeOutputFolderPath)
+        private static void MakeOutputFolderPathsFullyQualified(
+            ProbeRequest[] probeRequestsToFixUp,
+            string bakeOutputFolderPath
+        )
         {
             for (int i = 0; i < probeRequestsToFixUp.Length; i++)
             {
@@ -296,7 +336,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
         }
 
-        private static void MakeOutputFolderPathsFullyQualified(LightmapRequest[] requestsToFixUp, string bakeOutputFolderPath)
+        private static void MakeOutputFolderPathsFullyQualified(
+            LightmapRequest[] requestsToFixUp,
+            string bakeOutputFolderPath
+        )
         {
             for (int i = 0; i < requestsToFixUp.Length; i++)
             {
@@ -305,14 +348,25 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
         }
 
-        internal static bool Bake(string bakeInputPath, string lightmapRequestsPath, string lightProbeRequestsPath, string bakeOutputFolderPath, BakeProgressState progressState)
+        internal static bool Bake(
+            string bakeInputPath,
+            string lightmapRequestsPath,
+            string lightProbeRequestsPath,
+            string bakeOutputFolderPath,
+            BakeProgressState progressState
+        )
         {
             using (new BakeProfilingScope())
             {
                 // Read BakeInput and requests from LightBaker
                 if (!BakeInputSerialization.Deserialize(bakeInputPath, out BakeInput bakeInput))
                     return false;
-                if (!BakeInputSerialization.Deserialize(lightmapRequestsPath, out LightmapRequestData lightmapRequestData))
+                if (
+                    !BakeInputSerialization.Deserialize(
+                        lightmapRequestsPath,
+                        out LightmapRequestData lightmapRequestData
+                    )
+                )
                     return false;
                 if (!BakeInputSerialization.Deserialize(lightProbeRequestsPath, out ProbeRequestData probeRequestData))
                     return false;
@@ -346,27 +400,64 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 // Deserialize BakeInput, inject data into world
                 const bool useLegacyBakingBehavior = true;
                 const bool autoEstimateLUTRange = true;
-                BakeInputToWorldConversion.InjectBakeInputData(world.PathTracingWorld, autoEstimateLUTRange, in bakeInput,
-                    out Bounds sceneBounds, out world.Meshes, out FatInstance[] fatInstances, out world.LightHandles,
-                    world.TemporaryObjects, UnityComputeWorld.RenderingObjectLayer);
+                BakeInputToWorldConversion.InjectBakeInputData(
+                    world.PathTracingWorld,
+                    autoEstimateLUTRange,
+                    in bakeInput,
+                    out Bounds sceneBounds,
+                    out world.Meshes,
+                    out FatInstance[] fatInstances,
+                    out world.LightHandles,
+                    world.TemporaryObjects,
+                    UnityComputeWorld.RenderingObjectLayer
+                );
 
                 // Add instances to world
-                WorldHelpers.AddContributingInstancesToWorld(world.PathTracingWorld, in fatInstances, out var lodInstances, out var lodgroupToContributorInstances);
+                WorldHelpers.AddContributingInstancesToWorld(
+                    world.PathTracingWorld,
+                    in fatInstances,
+                    out var lodInstances,
+                    out var lodgroupToContributorInstances
+                );
 
                 // Build world with extracted data
                 const bool emissiveSampling = true;
-                world.PathTracingWorld.Build(sceneBounds, deviceContext.GetCommandBuffer(), ref world.ScratchBuffer, samplingResources, emissiveSampling, 1024);
+                world.PathTracingWorld.Build(
+                    sceneBounds,
+                    deviceContext.GetCommandBuffer(),
+                    ref world.ScratchBuffer,
+                    samplingResources,
+                    emissiveSampling,
+                    1024
+                );
 
                 LightmapBakeSettings lightmapBakeSettings = GetLightmapBakeSettings(bakeInput);
                 // Build array of lightmap descriptors based on the atlassing data and instances.
-                LightmapDesc[] lightmapDescriptors = PopulateLightmapDescsFromAtlassing(in lightmapRequestData.atlassing, in fatInstances);
+                LightmapDesc[] lightmapDescriptors = PopulateLightmapDescsFromAtlassing(
+                    in lightmapRequestData.atlassing,
+                    in fatInstances
+                );
                 SortInstancesByMeshAndResolution(lightmapDescriptors);
 
                 ulong probeWorkSteps = CalculateWorkStepsForProbeRequests(in bakeInput, in probeRequestData);
-                ulong lightmapWorkSteps = CalculateWorkStepsForLightmapRequests(in lightmapRequestData, lightmapDescriptors, lightmapBakeSettings);
+                ulong lightmapWorkSteps = CalculateWorkStepsForLightmapRequests(
+                    in lightmapRequestData,
+                    lightmapDescriptors,
+                    lightmapBakeSettings
+                );
                 progressState.SetTotalWorkSteps(probeWorkSteps + lightmapWorkSteps);
 
-                if (!ExecuteProbeRequests(in bakeInput, in probeRequestData, deviceContext, useLegacyBakingBehavior, world, progressState, samplingResources))
+                if (
+                    !ExecuteProbeRequests(
+                        in bakeInput,
+                        in probeRequestData,
+                        deviceContext,
+                        useLegacyBakingBehavior,
+                        world,
+                        progressState,
+                        samplingResources
+                    )
+                )
                     return false;
 
                 if (lightmapRequestData.requests.Length <= 0)
@@ -376,7 +467,23 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 LightmapResourceLibrary resources = new();
                 resources.Load(world.RayTracingContext);
 
-                if (ExecuteLightmapRequests(in lightmapRequestData, deviceContext, world, in fatInstances, in lodInstances, in lodgroupToContributorInstances, integrationSettings, useLegacyBakingBehavior, resources, progressState, lightmapDescriptors, lightmapBakeSettings, samplingResources) != Result.Success)
+                if (
+                    ExecuteLightmapRequests(
+                        in lightmapRequestData,
+                        deviceContext,
+                        world,
+                        in fatInstances,
+                        in lodInstances,
+                        in lodgroupToContributorInstances,
+                        integrationSettings,
+                        useLegacyBakingBehavior,
+                        resources,
+                        progressState,
+                        lightmapDescriptors,
+                        lightmapBakeSettings,
+                        samplingResources
+                    ) != Result.Success
+                )
                     return false;
 
                 CoreUtils.Destroy(resources.UVFallbackBufferGenerationMaterial);
@@ -385,23 +492,39 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
         }
 
-        internal static ulong CalculateWorkStepsForProbeRequests(in BakeInput bakeInput, in ProbeRequestData probeRequestData)
+        internal static ulong CalculateWorkStepsForProbeRequests(
+            in BakeInput bakeInput,
+            in ProbeRequestData probeRequestData
+        )
         {
             ulong calculatedWorkSteps = 0;
             foreach (ProbeRequest probeRequest in probeRequestData.requests)
             {
-                (uint directSampleCount, uint effectiveIndirectSampleCount) = GetProbeSampleCounts(probeRequest.sampleCount);
+                (uint directSampleCount, uint effectiveIndirectSampleCount) = GetProbeSampleCounts(
+                    probeRequest.sampleCount
+                );
 
-                calculatedWorkSteps += CalculateProbeWorkSteps(probeRequest.count, probeRequest.outputTypeMask,
-                    directSampleCount, effectiveIndirectSampleCount,
+                calculatedWorkSteps += CalculateProbeWorkSteps(
+                    probeRequest.count,
+                    probeRequest.outputTypeMask,
+                    directSampleCount,
+                    effectiveIndirectSampleCount,
                     bakeInput.lightingSettings.mixedLightingMode != MixedLightingMode.IndirectOnly,
-                    probeRequest.maxBounces);
+                    probeRequest.maxBounces
+                );
             }
 
             return calculatedWorkSteps;
         }
 
-        private static ulong CalculateProbeWorkSteps(ulong count, ProbeRequestOutputType outputTypeMask, uint directSampleCount, uint effectiveIndirectSampleCount, bool usesProbeOcclusion, uint bounceCount)
+        private static ulong CalculateProbeWorkSteps(
+            ulong count,
+            ProbeRequestOutputType outputTypeMask,
+            uint directSampleCount,
+            uint effectiveIndirectSampleCount,
+            bool usesProbeOcclusion,
+            uint bounceCount
+        )
         {
             ulong workSteps = 0;
             if (outputTypeMask.HasFlag(ProbeRequestOutputType.RadianceIndirect))
@@ -416,7 +539,11 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return workSteps;
         }
 
-        internal static ulong CalculateWorkStepsForLightmapRequests(in LightmapRequestData lightmapRequestData, LightmapDesc[] lightmapDescriptors, LightmapBakeSettings lightmapBakeSettings)
+        internal static ulong CalculateWorkStepsForLightmapRequests(
+            in LightmapRequestData lightmapRequestData,
+            LightmapDesc[] lightmapDescriptors,
+            LightmapBakeSettings lightmapBakeSettings
+        )
         {
             ulong calculatedWorkSteps = 0;
             foreach (LightmapRequest r in lightmapRequestData.requests)
@@ -427,7 +554,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 for (int lightmapIndex = 0; lightmapIndex < request.lightmapCount; lightmapIndex++)
                 {
                     LightmapDesc currentLightmapDesc = lightmapDescriptors[lightmapIndex];
-                    Dictionary<IntegratedOutputType, RequestedSubOutput> requestedLightmapTypes = GetRequestedIntegratedOutputTypes(request);
+                    Dictionary<IntegratedOutputType, RequestedSubOutput> requestedLightmapTypes =
+                        GetRequestedIntegratedOutputTypes(request);
                     foreach (IntegratedOutputType lightmapType in requestedLightmapTypes.Keys)
                     {
                         uint sampleCount = lightmapBakeSettings.GetSampleCount(lightmapType);
@@ -436,25 +564,43 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                             uint instanceWidth = (uint)bakeInstance.TexelSize.x;
                             uint instanceHeight = (uint)bakeInstance.TexelSize.y;
 
-                            calculatedWorkSteps += CalculateIntegratedLightmapWorkSteps(sampleCount, instanceWidth * instanceHeight, lightmapType, lightmapBakeSettings.BounceCount, 1);
+                            calculatedWorkSteps += CalculateIntegratedLightmapWorkSteps(
+                                sampleCount,
+                                instanceWidth * instanceHeight,
+                                lightmapType,
+                                lightmapBakeSettings.BounceCount,
+                                1
+                            );
                         }
                     }
-                    HashSet<LightmapRequestOutputType> requestedNonIntegratedLightmapTypes = GetRequestedNonIntegratedOutputTypes(request);
+                    HashSet<LightmapRequestOutputType> requestedNonIntegratedLightmapTypes =
+                        GetRequestedNonIntegratedOutputTypes(request);
                     foreach (LightmapRequestOutputType _ in requestedNonIntegratedLightmapTypes)
-                        calculatedWorkSteps += CalculateNonIntegratedLightmapWorkSteps(currentLightmapDesc.Resolution * currentLightmapDesc.Resolution);
+                        calculatedWorkSteps += CalculateNonIntegratedLightmapWorkSteps(
+                            currentLightmapDesc.Resolution * currentLightmapDesc.Resolution
+                        );
                 }
             }
 
             return calculatedWorkSteps;
         }
 
-        private static ulong CalculateIntegratedLightmapWorkSteps(uint samplesPerTexel, uint chunkSize, IntegratedOutputType outputType, uint bounces, uint multiplier)
+        private static ulong CalculateIntegratedLightmapWorkSteps(
+            uint samplesPerTexel,
+            uint chunkSize,
+            IntegratedOutputType outputType,
+            uint bounces,
+            uint multiplier
+        )
         {
-            uint bouncesMultiplier = outputType == IntegratedOutputType.Indirect
-                ? 0 == bounces ? 1 : bounces
-                : 1;
+            uint bouncesMultiplier =
+                outputType == IntegratedOutputType.Indirect
+                    ? 0 == bounces
+                        ? 1
+                        : bounces
+                    : 1;
 
-            return samplesPerTexel*chunkSize*bouncesMultiplier*multiplier;
+            return samplesPerTexel * chunkSize * bouncesMultiplier * multiplier;
         }
 
         private static ulong CalculateNonIntegratedLightmapWorkSteps(uint lightmapResolution) => lightmapResolution;
@@ -463,8 +609,10 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         {
             var retVal = IntegrationSettings.Default;
             retVal.Backend =
-                bakeInput.lightingSettings.useHardwareRayTracing && RayTracingContext.IsBackendSupported(RayTracingBackend.Hardware) ?
-                    RayTracingBackend.Hardware : RayTracingBackend.Compute;
+                bakeInput.lightingSettings.useHardwareRayTracing
+                && RayTracingContext.IsBackendSupported(RayTracingBackend.Hardware)
+                    ? RayTracingBackend.Hardware
+                    : RayTracingBackend.Compute;
 
             return retVal;
         }
@@ -478,7 +626,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 DirectSampleCount = math.max(0, bakeInput.lightingSettings.lightmapSampleCounts.directSampleCount),
                 IndirectSampleCount = math.max(0, bakeInput.lightingSettings.lightmapSampleCounts.indirectSampleCount),
                 BounceCount = math.max(0, bakeInput.lightingSettings.maxBounces),
-                AOMaxDistance = math.max(0.0f, bakeInput.lightingSettings.aoDistance)
+                AOMaxDistance = math.max(0.0f, bakeInput.lightingSettings.aoDistance),
             };
             lightmapBakeSettings.ValiditySampleCount = lightmapBakeSettings.IndirectSampleCount;
             return lightmapBakeSettings;
@@ -488,7 +636,7 @@ namespace UnityEditor.PathTracing.LightBakerBridge
         private enum RequestedSubOutput
         {
             PrimaryTexture = 1 << 0,
-            DirectionalityTexture = 1 << 1
+            DirectionalityTexture = 1 << 1,
         }
 
         private struct HashedInstanceIndex : IComparable<HashedInstanceIndex>
@@ -501,16 +649,16 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
             public int CompareTo(HashedInstanceIndex other)
             {
-                    int size = other.texelCount - texelCount;
-                    if (size != 0)
-                        return size;
-                    int xOffset = other.offsetX - offsetX;
-                    if (xOffset != 0)
-                        return xOffset;
-                    int yOffset = offsetY - other.offsetY;
-                    if (yOffset != 0)
-                        return yOffset;
-                    return hashCode - other.hashCode;
+                int size = other.texelCount - texelCount;
+                if (size != 0)
+                    return size;
+                int xOffset = other.offsetX - offsetX;
+                if (xOffset != 0)
+                    return xOffset;
+                int yOffset = offsetY - other.offsetY;
+                if (yOffset != 0)
+                    return yOffset;
+                return hashCode - other.hashCode;
             }
         };
 
@@ -573,9 +721,11 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return false;
         }
 
-        private static bool EnsureInstanceInCacheAndClearExistingEntries(CommandBuffer cmd,
+        private static bool EnsureInstanceInCacheAndClearExistingEntries(
+            CommandBuffer cmd,
             LightmappingContext lightmappingContext,
-            BakeInstance bakeInstance)
+            BakeInstance bakeInstance
+        )
         {
             var bakeInstances = new[] { bakeInstance };
             if (!lightmappingContext.ResourceCache.CacheIsHot(bakeInstances))
@@ -584,9 +734,14 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 GraphicsHelpers.Flush(cmd); // need to flush as we are removing resources from the cache which might be in use
                 lightmappingContext.ResourceCache.FreeResources(bakeInstances);
 
-                if (!lightmappingContext.ResourceCache.AddResources(
-                    bakeInstances, lightmappingContext.World.RayTracingContext, cmd,
-                    lightmappingContext.IntegratorContext.UVFallbackBufferBuilder))
+                if (
+                    !lightmappingContext.ResourceCache.AddResources(
+                        bakeInstances,
+                        lightmappingContext.World.RayTracingContext,
+                        cmd,
+                        lightmappingContext.IntegratorContext.UVFallbackBufferBuilder
+                    )
+                )
                 {
                     return false;
                 }
@@ -603,7 +758,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             BakeInstance bakeInstance,
             out UVMesh uvMesh,
             out UVAccelerationStructure uvAS,
-            out UVFallbackBuffer uvFallbackBuffer)
+            out UVFallbackBuffer uvFallbackBuffer
+        )
         {
             uvMesh = default;
             uvAS = default;
@@ -612,8 +768,12 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             if (!EnsureInstanceInCacheAndClearExistingEntries(cmd, lightmappingContext, bakeInstance))
                 return false;
 
-            bool gotResources = lightmappingContext.ResourceCache.GetResources(new[] { bakeInstance },
-                out UVMesh[] uvMeshes, out UVAccelerationStructure[] uvAccelerationStructures, out UVFallbackBuffer[] uvFallbackBuffers);
+            bool gotResources = lightmappingContext.ResourceCache.GetResources(
+                new[] { bakeInstance },
+                out UVMesh[] uvMeshes,
+                out UVAccelerationStructure[] uvAccelerationStructures,
+                out UVFallbackBuffer[] uvFallbackBuffers
+            );
             if (!gotResources)
                 return false;
 
@@ -660,7 +820,14 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             }
         }
 
-        internal static InstanceHandle[] AddLODInstances(World world, CommandBuffer cmd, LodIdentifier lodIdentifier, in List<LodInstanceBuildData> lodInstancesBuildData, bool pathtracingShader, Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances)
+        internal static InstanceHandle[] AddLODInstances(
+            World world,
+            CommandBuffer cmd,
+            LodIdentifier lodIdentifier,
+            in List<LodInstanceBuildData> lodInstancesBuildData,
+            bool pathtracingShader,
+            Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances
+        )
         {
             Debug.Assert(lodIdentifier.IsValid() && !lodIdentifier.IsContributor());
 
@@ -676,7 +843,17 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 Span<uint> currentLodMasks = stackalloc uint[lodBuildData.Masks.Length];
                 GetCurrentLodInstanceMasks(pathtracingShader, lodBuildData.Masks, currentLodMasks);
 
-                instanceHandles[i++] = world.AddInstance(lodBuildData.Mesh, lodBuildData.Materials, currentLodMasks, UnityComputeWorld.RenderingObjectLayer, lodBuildData.LocalToWorldMatrix, lodBuildData.Bounds, lodBuildData.IsStatic, lodBuildData.Filter, true);
+                instanceHandles[i++] = world.AddInstance(
+                    lodBuildData.Mesh,
+                    lodBuildData.Materials,
+                    currentLodMasks,
+                    UnityComputeWorld.RenderingObjectLayer,
+                    lodBuildData.LocalToWorldMatrix,
+                    lodBuildData.Bounds,
+                    lodBuildData.IsStatic,
+                    lodBuildData.Filter,
+                    true
+                );
             }
             Array.Resize(ref instanceHandles, i);
 
@@ -699,7 +876,13 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return instanceHandles;
         }
 
-        internal static void RemoveLODInstances(World world, CommandBuffer cmd, LodIdentifier lodIdentifier, Span<InstanceHandle> currentLodInstanceHandles, Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances)
+        internal static void RemoveLODInstances(
+            World world,
+            CommandBuffer cmd,
+            LodIdentifier lodIdentifier,
+            Span<InstanceHandle> currentLodInstanceHandles,
+            Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances
+        )
         {
             if (!lodIdentifier.IsValid() || lodIdentifier.IsContributor())
                 return;
@@ -723,7 +906,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             BakeInstance bakeInstance,
             Dictionary<int, List<LodInstanceBuildData>> lodInstances,
             Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances,
-            bool isPathTracingPass)
+            bool isPathTracingPass
+        )
         {
             if (bakeInstance.LodIdentifier.IsValid() && !bakeInstance.LodIdentifier.IsContributor())
             {
@@ -731,7 +915,14 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 GraphicsHelpers.Flush(cmd);
 
                 var currentLodInstancesBuildData = lodInstances[bakeInstance.LodIdentifier.LodGroup];
-                InstanceHandle[] handles = AddLODInstances(world.PathTracingWorld, cmd, bakeInstance.LodIdentifier, currentLodInstancesBuildData, isPathTracingPass, lodgroupToContributorInstances);
+                InstanceHandle[] handles = AddLODInstances(
+                    world.PathTracingWorld,
+                    cmd,
+                    bakeInstance.LodIdentifier,
+                    currentLodInstancesBuildData,
+                    isPathTracingPass,
+                    lodgroupToContributorInstances
+                );
                 world.BuildAccelerationStructure(cmd);
                 return handles;
             }
@@ -743,19 +934,27 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             UnityComputeWorld world,
             BakeInstance bakeInstance,
             InstanceHandle[] currentLodInstances,
-            Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances)
+            Dictionary<Int32, List<ContributorLodInfo>> lodgroupToContributorInstances
+        )
         {
             if (bakeInstance.LodIdentifier.IsValid() && !bakeInstance.LodIdentifier.IsContributor())
             {
                 // RemoveLODInstances calls _pathTracingWorld.Add/RemoveInstance(...) that doesn't take a cmd buffer arg. Need to flush as cmdbuffer and immediate calls cannot be mixed.
                 GraphicsHelpers.Flush(cmd);
 
-                RemoveLODInstances(world.PathTracingWorld, cmd, bakeInstance.LodIdentifier, currentLodInstances, lodgroupToContributorInstances);
+                RemoveLODInstances(
+                    world.PathTracingWorld,
+                    cmd,
+                    bakeInstance.LodIdentifier,
+                    currentLodInstances,
+                    lodgroupToContributorInstances
+                );
                 world.BuildAccelerationStructure(cmd);
             }
         }
 
-         private static Result IntegrateLightmapInstance(CommandBuffer cmd,
+        private static Result IntegrateLightmapInstance(
+            CommandBuffer cmd,
             int lightmapIndex,
             IntegratedOutputType integratedOutputType,
             BakeInstance bakeInstance,
@@ -769,9 +968,13 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             bool doDirectionality,
             BakeProgressState progressState,
             LightmapIntegrationHelpers.GPUSync gpuSync,
-            bool debugDispatches)
+            bool debugDispatches
+        )
         {
-            Debug.Assert(!lightmappingContext.ExpandedBufferNeedsUpdating(lightmapBakeSettings.ExpandedBufferSize), "The integration data must be allocated at this point.");
+            Debug.Assert(
+                !lightmappingContext.ExpandedBufferNeedsUpdating(lightmapBakeSettings.ExpandedBufferSize),
+                "The integration data must be allocated at this point."
+            );
 
             // Bake the lightmap instances
             int bakeDispatches = 0;
@@ -793,14 +996,25 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 {
                     gpuSync.Sync(cmd);
                     dispatchStopwatch.Restart();
-                    Console.WriteLine($"Begin pass {bakeDispatches} for lm: {lightmapIndex}, type: {integratedOutputType}, sample count: {bakeState.SampleIndex}, res: [{bakeInstance.TexelSize.x} x {bakeInstance.TexelSize.y}], offset: [{bakeInstance.TexelOffset.x} x {bakeInstance.TexelOffset.y}].");
+                    Console.WriteLine(
+                        $"Begin pass {bakeDispatches} for lm: {lightmapIndex}, type: {integratedOutputType}, sample count: {bakeState.SampleIndex}, res: [{bakeInstance.TexelSize.x} x {bakeInstance.TexelSize.y}], offset: [{bakeInstance.TexelOffset.x} x {bakeInstance.TexelOffset.y}]."
+                    );
                 }
 
                 bool isInstanceStart = (bakeState.SampleIndex == 0);
                 if (isInstanceStart)
                 {
-                    bool isPathTracingPass = integratedOutputType == IntegratedOutputType.Indirect || integratedOutputType == IntegratedOutputType.DirectionalityIndirect;
-                    currentLodInstances = PrepareLodInstances(cmd, lightmappingContext.World, bakeInstance, lodInstances, lodgroupToContributorInstances, isPathTracingPass);
+                    bool isPathTracingPass =
+                        integratedOutputType == IntegratedOutputType.Indirect
+                        || integratedOutputType == IntegratedOutputType.DirectionalityIndirect;
+                    currentLodInstances = PrepareLodInstances(
+                        cmd,
+                        lightmappingContext.World,
+                        bakeInstance,
+                        lodInstances,
+                        lodgroupToContributorInstances,
+                        isPathTracingPass
+                    );
                 }
 
                 // Enqueue some baking work in the command buffer.
@@ -817,21 +1031,30 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     uvFallbackBuffer,
                     doDirectionality,
                     out uint chunkSize,
-                    out isInstanceDone);
+                    out isInstanceDone
+                );
 
                 samples += instanceWidth * instanceHeight * passSamplesPerTexel;
                 cmd.EndSample($"Bake {integratedOutputType}");
 
                 if (isInstanceDone)
                 {
-                    ClearLodInstances(cmd, lightmappingContext.World, bakeInstance, currentLodInstances, lodgroupToContributorInstances);
+                    ClearLodInstances(
+                        cmd,
+                        lightmappingContext.World,
+                        bakeInstance,
+                        currentLodInstances,
+                        lodgroupToContributorInstances
+                    );
                 }
 
                 if (debugDispatches)
                 {
                     gpuSync.Sync(cmd);
                     dispatchStopwatch.Stop();
-                    Console.WriteLine($"Finished pass {bakeDispatches}. Elapsed ms: {dispatchStopwatch.ElapsedMilliseconds}");
+                    Console.WriteLine(
+                        $"Finished pass {bakeDispatches}. Elapsed ms: {dispatchStopwatch.ElapsedMilliseconds}"
+                    );
                 }
 
                 bakeDispatches++;
@@ -841,8 +1064,13 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     continue;
 
                 // Chip-off work steps based on the chunk done so far
-                ulong completedWorkSteps =
-                    CalculateIntegratedLightmapWorkSteps(passSamplesPerTexel, chunkSize, integratedOutputType, lightmapBakeSettings.BounceCount, integrationSettings.MaxDispatchesPerFlush);
+                ulong completedWorkSteps = CalculateIntegratedLightmapWorkSteps(
+                    passSamplesPerTexel,
+                    chunkSize,
+                    integratedOutputType,
+                    lightmapBakeSettings.BounceCount,
+                    integrationSettings.MaxDispatchesPerFlush
+                );
                 gpuSync.RequestAsyncReadback(cmd, _ => progressState.IncrementCompletedWorkSteps(completedWorkSteps));
                 GraphicsHelpers.Flush(cmd);
 
@@ -851,14 +1079,15 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                 gpuSync.Sync(cmd);
                 instanceFlushStopwatch.Stop();
-                Console.WriteLine($"Bake dispatch flush -> Instance: {bakeInstance.Mesh.GetEntityId()}, dispatches {dispatchCount}, Samples: \t{samples}\t. Elapsed ms:\t{instanceFlushStopwatch.ElapsedMilliseconds}");
+                Console.WriteLine(
+                    $"Bake dispatch flush -> Instance: {bakeInstance.Mesh.GetEntityId()}, dispatches {dispatchCount}, Samples: \t{samples}\t. Elapsed ms:\t{instanceFlushStopwatch.ElapsedMilliseconds}"
+                );
                 samples = 0;
                 dispatchCount = 0;
                 instanceFlushStopwatch.Restart();
 
                 //LightmapIntegrationHelpers.WriteRenderTexture(cmd, $"Temp/lm{lightmapIndex}_type{lightmapType}_pass{bakeDispatches}.r2d", lightmappingContext.AccumulatedOutput, lightmappingContext.AccumulatedOutput.width, lightmappingContext.AccumulatedOutput.height);
-            }
-            while (isInstanceDone == false);
+            } while (isInstanceDone == false);
 
             return Result.Success;
         }
@@ -876,12 +1105,21 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             BakeProgressState progressState,
             LightmapDesc[] lightmapDescriptors,
             LightmapBakeSettings lightmapBakeSettings,
-            UnityEngine.Rendering.Sampling.SamplingResources samplingResources)
+            UnityEngine.Rendering.Sampling.SamplingResources samplingResources
+        )
         {
             using var lightmappingContext = new LightmappingContext();
 
             bool debugDispatches = integrationSettings.DebugDispatches;
-            bool doDirectionality = AnyLightmapRequestHasOutput(lightmapRequestData.requests, LightmapRequestOutputType.DirectionalityDirect) || AnyLightmapRequestHasOutput(lightmapRequestData.requests, LightmapRequestOutputType.DirectionalityIndirect);
+            bool doDirectionality =
+                AnyLightmapRequestHasOutput(
+                    lightmapRequestData.requests,
+                    LightmapRequestOutputType.DirectionalityDirect
+                )
+                || AnyLightmapRequestHasOutput(
+                    lightmapRequestData.requests,
+                    LightmapRequestOutputType.DirectionalityIndirect
+                );
 
             // Find the max index and vertex count in any mesh, so we can pre-allocate various buffers based on it.
             uint maxIndexCount = 1;
@@ -894,15 +1132,35 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
             (int width, int height)[] atlasSizes = lightmapRequestData.atlassing.m_AtlasSizes;
             int initialLightmapResolution = atlasSizes.Length > 0 ? atlasSizes[0].width : 1024;
-            if (!lightmappingContext.Initialize(deviceContext, initialLightmapResolution, initialLightmapResolution, world, maxIndexCount, maxVertexCount, lightmapResourceLib))
+            if (
+                !lightmappingContext.Initialize(
+                    deviceContext,
+                    initialLightmapResolution,
+                    initialLightmapResolution,
+                    world,
+                    maxIndexCount,
+                    maxVertexCount,
+                    lightmapResourceLib
+                )
+            )
                 return Result.InitializeFailure;
 
-            lightmappingContext.IntegratorContext.Initialize(samplingResources, lightmapResourceLib, !useLegacyBakingBehavior);
+            lightmappingContext.IntegratorContext.Initialize(
+                samplingResources,
+                lightmapResourceLib,
+                !useLegacyBakingBehavior
+            );
 
             // Chart identification happens in multithreaded fashion on the CPU. We start it immediately so it can run in tandem with other work.
-            bool usesChartIdentification = AnyLightmapRequestHasOutput(lightmapRequestData.requests, LightmapRequestOutputType.ChartIndex) ||
-                                           AnyLightmapRequestHasOutput(lightmapRequestData.requests, LightmapRequestOutputType.OverlapPixelIndex);
-            using ParallelChartIdentification chartIdentification = usesChartIdentification ? new ParallelChartIdentification(GetMeshesInInstanceOrder(lightmapDescriptors)) : null;
+            bool usesChartIdentification =
+                AnyLightmapRequestHasOutput(lightmapRequestData.requests, LightmapRequestOutputType.ChartIndex)
+                || AnyLightmapRequestHasOutput(
+                    lightmapRequestData.requests,
+                    LightmapRequestOutputType.OverlapPixelIndex
+                );
+            using ParallelChartIdentification chartIdentification = usesChartIdentification
+                ? new ParallelChartIdentification(GetMeshesInInstanceOrder(lightmapDescriptors))
+                : null;
             if (usesChartIdentification)
                 chartIdentification.Start();
 
@@ -913,7 +1171,9 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     Console.WriteLine($"Desc:");
                     int instanceIndex = 0;
                     foreach (var bakeInstance in lightmapDescriptors[i].BakeInstances)
-                        Console.WriteLine($"  Instance[{instanceIndex++}]: {bakeInstance.Mesh.GetEntityId()}, res: [{bakeInstance.TexelSize.x} x {bakeInstance.TexelSize.y}], offset: [{bakeInstance.TexelOffset.x} x {bakeInstance.TexelOffset.y}].");
+                        Console.WriteLine(
+                            $"  Instance[{instanceIndex++}]: {bakeInstance.Mesh.GetEntityId()}, res: [{bakeInstance.TexelSize.x} x {bakeInstance.TexelSize.y}], offset: [{bakeInstance.TexelOffset.x} x {bakeInstance.TexelOffset.y}]."
+                        );
                 }
             }
 
@@ -935,8 +1195,11 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 if (createDirResult.Exists == false)
                     return Result.CreateDirectoryFailure;
 
-                Dictionary<IntegratedOutputType, RequestedSubOutput> integratedRequestOutputs = GetRequestedIntegratedOutputTypes(request);
-                bool needsNormalsForDirectionality = request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityIndirect) || request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityDirect);
+                Dictionary<IntegratedOutputType, RequestedSubOutput> integratedRequestOutputs =
+                    GetRequestedIntegratedOutputTypes(request);
+                bool needsNormalsForDirectionality =
+                    request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityIndirect)
+                    || request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityDirect);
                 bool writeNormals = request.outputTypeMask.HasFlag(LightmapRequestOutputType.Normal);
 
                 // Request related bake settings
@@ -949,7 +1212,9 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     lightmapBakeSettings.PushOff = currentLightmapDesc.PushOff;
                     int resolution = (int)currentLightmapDesc.Resolution;
                     UInt64 lightmapSize = (UInt64)resolution * (UInt64)resolution;
-                    lightmapBakeSettings.ExpandedBufferSize = LightmapRequest.TilingModeToLightmapExpandedBufferSize(request.tilingMode);
+                    lightmapBakeSettings.ExpandedBufferSize = LightmapRequest.TilingModeToLightmapExpandedBufferSize(
+                        request.tilingMode
+                    );
 
                     // allocate expanded buffer
                     if (lightmappingContext.ExpandedBufferNeedsUpdating(lightmapBakeSettings.ExpandedBufferSize))
@@ -961,7 +1226,9 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         uint scratchBufferSize = (uint)lightmapBakeSettings.ExpandedBufferSize;
                         lightmappingContext.InitializeTraceScratchBuffer(scratchBufferSize, 1, 1);
                         if (debugDispatches)
-                            Console.WriteLine($"Built expanded buffer for {lightmapBakeSettings.ExpandedBufferSize} samples, lm w: {lightmappingContext.AccumulatedOutput.width}, lm h: {lightmappingContext.AccumulatedOutput.height}].");
+                            Console.WriteLine(
+                                $"Built expanded buffer for {lightmapBakeSettings.ExpandedBufferSize} samples, lm w: {lightmappingContext.AccumulatedOutput.width}, lm h: {lightmappingContext.AccumulatedOutput.height}]."
+                            );
                     }
 
                     ref RenderTexture accumulatedOutput = ref lightmappingContext.AccumulatedOutput;
@@ -978,16 +1245,24 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         IRayTracingShader normalShader = lightmapResourceLib.NormalAccumulationShader;
                         GraphicsBuffer compactedGBufferLength = lightmappingContext.CompactedGBufferLength;
                         GraphicsBuffer indirectDispatchBuffer = lightmappingContext.IndirectDispatchBuffer;
-                        GraphicsBuffer indirectRayTracingDispatchBuffer = lightmappingContext.IndirectDispatchRayTracingBuffer;
+                        GraphicsBuffer indirectRayTracingDispatchBuffer =
+                            lightmappingContext.IndirectDispatchRayTracingBuffer;
 
                         uint maxChunkSize = (uint)lightmappingContext.ExpandedOutput.count;
                         var expansionShaders = lightmapResourceLib.ExpansionHelpers;
                         var compactionKernel = expansionShaders.FindKernel("CompactGBuffer");
                         var populateCopyDispatchKernel = expansionShaders.FindKernel("PopulateCopyDispatch");
                         var copyToLightmapKernel = expansionShaders.FindKernel("AdditivelyCopyCompactedTo2D");
-                        var populateNormalShaderDispatchKernel = expansionShaders.FindKernel("PopulateAccumulationDispatch");
+                        var populateNormalShaderDispatchKernel = expansionShaders.FindKernel(
+                            "PopulateAccumulationDispatch"
+                        );
 
-                        expansionShaders.GetKernelThreadGroupSizes(copyToLightmapKernel, out uint copyThreadGroupSizeX, out uint copyThreadGroupSizeY, out uint copyThreadGroupSizeZ);
+                        expansionShaders.GetKernelThreadGroupSizes(
+                            copyToLightmapKernel,
+                            out uint copyThreadGroupSizeX,
+                            out uint copyThreadGroupSizeY,
+                            out uint copyThreadGroupSizeZ
+                        );
                         Debug.Assert(copyThreadGroupSizeY == 1 && copyThreadGroupSizeZ == 1);
 
                         foreach (var bakeInstance in currentLightmapDesc.BakeInstances)
@@ -995,11 +1270,29 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                             if (progressState.WasCancelled())
                                 return Result.Cancelled;
 
-                            if (!GetInstanceUVResources(cmd, lightmappingContext, bakeInstance, out _, out var uvAS, out var uvFallbackBuffer))
+                            if (
+                                !GetInstanceUVResources(
+                                    cmd,
+                                    lightmappingContext,
+                                    bakeInstance,
+                                    out _,
+                                    out var uvAS,
+                                    out var uvFallbackBuffer
+                                )
+                            )
                                 return Result.AddResourcesToCacheFailure;
 
-                            InstanceHandle[] currentLodInstances = PrepareLodInstances(cmd, lightmappingContext.World, bakeInstance, lodInstances, lodgroupToContributorInstances, false);
-                            var instanceGeometryIndex = lightmappingContext.World.PathTracingWorld.GetAccelerationStructure().GeometryPool.GetInstanceGeometryIndex(bakeInstance.Mesh);
+                            InstanceHandle[] currentLodInstances = PrepareLodInstances(
+                                cmd,
+                                lightmappingContext.World,
+                                bakeInstance,
+                                lodInstances,
+                                lodgroupToContributorInstances,
+                                false
+                            );
+                            var instanceGeometryIndex = lightmappingContext
+                                .World.PathTracingWorld.GetAccelerationStructure()
+                                .GeometryPool.GetInstanceGeometryIndex(bakeInstance.Mesh);
 
                             uint instanceWidth = (uint)bakeInstance.TexelSize.x;
                             uint instanceHeight = (uint)bakeInstance.TexelSize.y;
@@ -1007,8 +1300,14 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                             UInt64 chunkTexelOffset = 0;
                             do
                             {
-                                uint2 chunkOffset = new uint2((uint)(chunkTexelOffset % (UInt64)instanceWidth), (uint)(chunkTexelOffset / (UInt64)instanceWidth));
-                                uint remainingTexels = instanceWidth - chunkOffset.x + ((instanceHeight - 1) - chunkOffset.y) * instanceWidth;
+                                uint2 chunkOffset = new uint2(
+                                    (uint)(chunkTexelOffset % (UInt64)instanceWidth),
+                                    (uint)(chunkTexelOffset / (UInt64)instanceWidth)
+                                );
+                                uint remainingTexels =
+                                    instanceWidth
+                                    - chunkOffset.x
+                                    + ((instanceHeight - 1) - chunkOffset.y) * instanceWidth;
                                 uint chunkSize = math.min(maxChunkSize, remainingTexels);
                                 Debug.Assert(remainingTexels > 0);
 
@@ -1022,7 +1321,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                                     chunkOffset,
                                     uvFallbackBuffer,
                                     compactedGBufferLength,
-                                    lightmappingContext.CompactedTexelIndices);
+                                    lightmappingContext.CompactedTexelIndices
+                                );
 
                                 // build a gBuffer for the chunk
                                 ExpansionHelpers.GenerateGBuffer(
@@ -1042,64 +1342,161 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                                     passSampleCount: 1,
                                     sampleOffset: 0,
                                     AntiAliasingType.SuperSampling,
-                                    superSampleWidth: 1);
+                                    superSampleWidth: 1
+                                );
                                 chunkTexelOffset += chunkSize;
 
                                 // now perform the normal generation for the chunk
                                 // geometry pool bindings
-                                Util.BindAccelerationStructure(cmd, normalShader, world.PathTracingWorld.GetAccelerationStructure());
+                                Util.BindAccelerationStructure(
+                                    cmd,
+                                    normalShader,
+                                    world.PathTracingWorld.GetAccelerationStructure()
+                                );
 
-                                var requiredSizeInBytes = normalShader.GetTraceScratchBufferRequiredSizeInBytes((uint)chunkSize, 1, 1);
+                                var requiredSizeInBytes = normalShader.GetTraceScratchBufferRequiredSizeInBytes(
+                                    (uint)chunkSize,
+                                    1,
+                                    1
+                                );
                                 if (requiredSizeInBytes > 0)
                                 {
-                                    var actualScratchBufferSize = (ulong)(lightmappingContext.TraceScratchBuffer.count * lightmappingContext.TraceScratchBuffer.stride);
+                                    var actualScratchBufferSize = (ulong)(
+                                        lightmappingContext.TraceScratchBuffer.count
+                                        * lightmappingContext.TraceScratchBuffer.stride
+                                    );
                                     Debug.Assert(lightmappingContext.TraceScratchBuffer.stride == sizeof(uint));
                                     Debug.Assert(requiredSizeInBytes <= actualScratchBufferSize);
                                 }
 
-                                normalShader.SetMatrixParam(cmd, LightmapIntegratorShaderIDs.ShaderLocalToWorld, bakeInstance.LocalToWorldMatrix);
-                                normalShader.SetMatrixParam(cmd, LightmapIntegratorShaderIDs.ShaderLocalToWorldNormals, bakeInstance.LocalToWorldMatrixNormals);
-                                normalShader.SetIntParam(cmd, LightmapIntegratorShaderIDs.InstanceGeometryIndex, instanceGeometryIndex);
-                                normalShader.SetIntParam(cmd, LightmapIntegratorShaderIDs.InstanceWidth, (int)instanceWidth);
+                                normalShader.SetMatrixParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.ShaderLocalToWorld,
+                                    bakeInstance.LocalToWorldMatrix
+                                );
+                                normalShader.SetMatrixParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.ShaderLocalToWorldNormals,
+                                    bakeInstance.LocalToWorldMatrixNormals
+                                );
+                                normalShader.SetIntParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.InstanceGeometryIndex,
+                                    instanceGeometryIndex
+                                );
+                                normalShader.SetIntParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.InstanceWidth,
+                                    (int)instanceWidth
+                                );
 
-                                normalShader.SetBufferParam(cmd, LightmapIntegratorShaderIDs.GBuffer, lightmappingContext.GBuffer);
-                                normalShader.SetBufferParam(cmd, LightmapIntegratorShaderIDs.CompactedGBuffer, lightmappingContext.CompactedTexelIndices);
-                                normalShader.SetBufferParam(cmd, LightmapIntegratorShaderIDs.ExpandedOutput, lightmappingContext.ExpandedOutput);
+                                normalShader.SetBufferParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.GBuffer,
+                                    lightmappingContext.GBuffer
+                                );
+                                normalShader.SetBufferParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.CompactedGBuffer,
+                                    lightmappingContext.CompactedTexelIndices
+                                );
+                                normalShader.SetBufferParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.ExpandedOutput,
+                                    lightmappingContext.ExpandedOutput
+                                );
                                 normalShader.SetIntParam(cmd, LightmapIntegratorShaderIDs.ExpandedTexelSampleWidth, 1);
-                                normalShader.SetIntParam(cmd, LightmapIntegratorShaderIDs.ChunkOffsetX, (int)chunkOffset.x);
-                                normalShader.SetIntParam(cmd, LightmapIntegratorShaderIDs.ChunkOffsetY, (int)chunkOffset.y);
+                                normalShader.SetIntParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.ChunkOffsetX,
+                                    (int)chunkOffset.x
+                                );
+                                normalShader.SetIntParam(
+                                    cmd,
+                                    LightmapIntegratorShaderIDs.ChunkOffsetY,
+                                    (int)chunkOffset.y
+                                );
 
-                                ExpansionHelpers.PopulateAccumulationIndirectDispatch(cmd, normalShader, expansionShaders, populateNormalShaderDispatchKernel, 1, compactedGBufferLength, indirectRayTracingDispatchBuffer);
+                                ExpansionHelpers.PopulateAccumulationIndirectDispatch(
+                                    cmd,
+                                    normalShader,
+                                    expansionShaders,
+                                    populateNormalShaderDispatchKernel,
+                                    1,
+                                    compactedGBufferLength,
+                                    indirectRayTracingDispatchBuffer
+                                );
                                 normalShader.SetIntParam(cmd, LightmapIntegratorShaderIDs.SampleOffset, 0);
                                 normalShader.SetIntParam(cmd, LightmapIntegratorShaderIDs.MaxLocalSampleCount, 1);
                                 cmd.BeginSample("Normal Generation");
-                                normalShader.Dispatch(cmd, lightmappingContext.TraceScratchBuffer, indirectRayTracingDispatchBuffer);
+                                normalShader.Dispatch(
+                                    cmd,
+                                    lightmappingContext.TraceScratchBuffer,
+                                    indirectRayTracingDispatchBuffer
+                                );
                                 cmd.EndSample("Normal Generation");
 
                                 // copy back to the output
-                                ExpansionHelpers.PopulateCopyToLightmapIndirectDispatch(cmd, expansionShaders, populateCopyDispatchKernel, copyThreadGroupSizeX, compactedGBufferLength, indirectDispatchBuffer);
-                                ExpansionHelpers.CopyToLightmap(cmd, expansionShaders, copyToLightmapKernel, 1, (int)instanceWidth, bakeInstance.TexelOffset, chunkOffset, compactedGBufferLength, lightmappingContext.CompactedTexelIndices, lightmappingContext.ExpandedOutput, indirectDispatchBuffer, lightmappingContext.AccumulatedOutput);
+                                ExpansionHelpers.PopulateCopyToLightmapIndirectDispatch(
+                                    cmd,
+                                    expansionShaders,
+                                    populateCopyDispatchKernel,
+                                    copyThreadGroupSizeX,
+                                    compactedGBufferLength,
+                                    indirectDispatchBuffer
+                                );
+                                ExpansionHelpers.CopyToLightmap(
+                                    cmd,
+                                    expansionShaders,
+                                    copyToLightmapKernel,
+                                    1,
+                                    (int)instanceWidth,
+                                    bakeInstance.TexelOffset,
+                                    chunkOffset,
+                                    compactedGBufferLength,
+                                    lightmappingContext.CompactedTexelIndices,
+                                    lightmappingContext.ExpandedOutput,
+                                    indirectDispatchBuffer,
+                                    lightmappingContext.AccumulatedOutput
+                                );
                                 cmd.EndSample("Bake Normals");
-                            }
-                            while (chunkTexelOffset < instanceSize);
+                            } while (chunkTexelOffset < instanceSize);
 
-                            ClearLodInstances(cmd, lightmappingContext.World, bakeInstance, currentLodInstances, lodgroupToContributorInstances);
+                            ClearLodInstances(
+                                cmd,
+                                lightmappingContext.World,
+                                bakeInstance,
+                                currentLodInstances,
+                                lodgroupToContributorInstances
+                            );
                         }
 
                         if (writeNormals)
                         {
-                            if (LightmapIntegrationHelpers.WriteLightmap(cmd, accumulatedOutput, "normal", lightmapIndex, request.outputFolderPath) == false)
+                            if (
+                                LightmapIntegrationHelpers.WriteLightmap(
+                                    cmd,
+                                    accumulatedOutput,
+                                    "normal",
+                                    lightmapIndex,
+                                    request.outputFolderPath
+                                ) == false
+                            )
                                 return Result.WriteToDiskFailure;
                         }
 
                         if (needsNormalsForDirectionality)
                         {
                             // Hang on to normal buffer for normalization of directionality
-                            normalBuffer = LightmappingContext.MakeRenderTexture(accumulatedOutput.width, accumulatedOutput.height, "TempNormalBuffer");
+                            normalBuffer = LightmappingContext.MakeRenderTexture(
+                                accumulatedOutput.width,
+                                accumulatedOutput.height,
+                                "TempNormalBuffer"
+                            );
                             cmd.CopyTexture(accumulatedOutput, normalBuffer);
                         }
 
-                        ulong workSteps = CalculateNonIntegratedLightmapWorkSteps((uint) lightmapSize);
+                        ulong workSteps = CalculateNonIntegratedLightmapWorkSteps((uint)lightmapSize);
                         progressState.IncrementCompletedWorkSteps(workSteps);
                     }
 
@@ -1110,7 +1507,16 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                         foreach (var bakeInstance in currentLightmapDesc.BakeInstances)
                         {
-                            if (!GetInstanceUVResources(cmd, lightmappingContext, bakeInstance, out _, out _, out var uvFallbackBuffer))
+                            if (
+                                !GetInstanceUVResources(
+                                    cmd,
+                                    lightmappingContext,
+                                    bakeInstance,
+                                    out _,
+                                    out _,
+                                    out var uvFallbackBuffer
+                                )
+                            )
                                 return Result.AddResourcesToCacheFailure;
 
                             lightmappingContext.IntegratorContext.LightmapOccupancyIntegrator.Accumulate(
@@ -1118,13 +1524,22 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                                 bakeInstance.TexelSize,
                                 bakeInstance.TexelOffset,
                                 uvFallbackBuffer,
-                                accumulatedOutput);
+                                accumulatedOutput
+                            );
                         }
 
-                        if (LightmapIntegrationHelpers.WriteLightmap(cmd, accumulatedOutput, "occupancy", lightmapIndex, request.outputFolderPath) == false)
+                        if (
+                            LightmapIntegrationHelpers.WriteLightmap(
+                                cmd,
+                                accumulatedOutput,
+                                "occupancy",
+                                lightmapIndex,
+                                request.outputFolderPath
+                            ) == false
+                        )
                             return Result.WriteToDiskFailure;
 
-                        ulong workSteps = CalculateNonIntegratedLightmapWorkSteps((uint) lightmapSize);
+                        ulong workSteps = CalculateNonIntegratedLightmapWorkSteps((uint)lightmapSize);
                         progressState.IncrementCompletedWorkSteps(workSteps);
                     }
 
@@ -1141,24 +1556,51 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                         foreach (var bakeInstance in currentLightmapDesc.BakeInstances)
                         {
-                            if (!GetInstanceUVResources(cmd, lightmappingContext, bakeInstance, out var uvMesh, out _, out _))
+                            if (
+                                !GetInstanceUVResources(
+                                    cmd,
+                                    lightmappingContext,
+                                    bakeInstance,
+                                    out var uvMesh,
+                                    out _,
+                                    out _
+                                )
+                            )
                                 return Result.AddResourcesToCacheFailure;
 
                             var vertexToChartId = chartIdentification.CompleteAndGetResult(bakeInstance.Mesh);
-                            cmd.SetBufferData(lightmappingContext.ChartRasterizerBuffers.vertexToChartID, vertexToChartId.VertexChartIndices);
+                            cmd.SetBufferData(
+                                lightmappingContext.ChartRasterizerBuffers.vertexToChartID,
+                                vertexToChartId.VertexChartIndices
+                            );
 
-                            ChartRasterizer.PrepareRasterizeSoftware(cmd, uvMesh.Mesh,
-                                lightmappingContext.ChartRasterizerBuffers.vertex, lightmappingContext.ChartRasterizerBuffers.vertexToOriginalVertex);
-                            rasterizer.RasterizeSoftware(cmd, lightmappingContext.ChartRasterizerBuffers.vertex,
-                                lightmappingContext.ChartRasterizerBuffers.vertexToOriginalVertex, lightmappingContext.ChartRasterizerBuffers.vertexToChartID,
-                                uvMesh.Mesh.GetTotalIndexCount(), bakeInstance.NormalizedOccupiedST, chartIndexOffset, lightmappingContext.AccumulatedOutput);
+                            ChartRasterizer.PrepareRasterizeSoftware(
+                                cmd,
+                                uvMesh.Mesh,
+                                lightmappingContext.ChartRasterizerBuffers.vertex,
+                                lightmappingContext.ChartRasterizerBuffers.vertexToOriginalVertex
+                            );
+                            rasterizer.RasterizeSoftware(
+                                cmd,
+                                lightmappingContext.ChartRasterizerBuffers.vertex,
+                                lightmappingContext.ChartRasterizerBuffers.vertexToOriginalVertex,
+                                lightmappingContext.ChartRasterizerBuffers.vertexToChartID,
+                                uvMesh.Mesh.GetTotalIndexCount(),
+                                bakeInstance.NormalizedOccupiedST,
+                                chartIndexOffset,
+                                lightmappingContext.AccumulatedOutput
+                            );
 
                             chartIndexOffset += vertexToChartId.ChartCount;
                         }
 
                         // Readback texture
                         Vector4[] pixels = null;
-                        cmd.RequestAsyncReadback(lightmappingContext.AccumulatedOutput, 0, request => pixels = request.GetData<Vector4>().ToArray());
+                        cmd.RequestAsyncReadback(
+                            lightmappingContext.AccumulatedOutput,
+                            0,
+                            request => pixels = request.GetData<Vector4>().ToArray()
+                        );
                         cmd.WaitAllAsyncReadbackRequests();
 
                         GraphicsHelpers.Flush(cmd);
@@ -1167,7 +1609,13 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         int[] chartIndices = new int[pixels.Length];
                         for (int i = 0; i < pixels.Length; i++)
                             chartIndices[i] = (int)pixels[i].x;
-                        if (!SaveArrayToFile(request.outputFolderPath + $"/chartIndex{lightmapIndex}.int", chartIndices.Length, chartIndices))
+                        if (
+                            !SaveArrayToFile(
+                                request.outputFolderPath + $"/chartIndex{lightmapIndex}.int",
+                                chartIndices.Length,
+                                chartIndices
+                            )
+                        )
                             return Result.WriteToDiskFailure;
 
                         ulong workSteps = CalculateNonIntegratedLightmapWorkSteps((uint)lightmapSize);
@@ -1178,14 +1626,28 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     if (request.outputTypeMask.HasFlag(LightmapRequestOutputType.OverlapPixelIndex))
                     {
                         using var overlapDetection = new UVOverlapDetection();
-                        overlapDetection.Initialize(UVOverlapDetection.LoadShader(), (uint)resolution, maxIndexCount, (uint)fatInstances.Length);
+                        overlapDetection.Initialize(
+                            UVOverlapDetection.LoadShader(),
+                            (uint)resolution,
+                            maxIndexCount,
+                            (uint)fatInstances.Length
+                        );
 
                         // Mark overlaps in every instance. Keep track of how many charts we have processed,
                         // so we can ensure uniqueness across the entire lightmap.
                         uint chartIndexOffset = 0;
                         foreach (var bakeInstance in currentLightmapDesc.BakeInstances)
                         {
-                            if (!GetInstanceUVResources(cmd, lightmappingContext, bakeInstance, out var uvMesh, out _, out _))
+                            if (
+                                !GetInstanceUVResources(
+                                    cmd,
+                                    lightmappingContext,
+                                    bakeInstance,
+                                    out var uvMesh,
+                                    out _,
+                                    out _
+                                )
+                            )
                                 return Result.AddResourcesToCacheFailure;
 
                             var vertexToChartId = chartIdentification.CompleteAndGetResult(bakeInstance.Mesh);
@@ -1197,7 +1659,8 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                                 vertexToChartId.VertexChartIndicesIgnoringNormals,
                                 bakeInstance.NormalizedOccupiedST,
                                 bakeInstance.InstanceIndex,
-                                chartIndexOffset);
+                                chartIndexOffset
+                            );
                             cmd.EndSample("UV Overlap Detection");
 
                             chartIndexOffset += vertexToChartId.ChartCount;
@@ -1207,10 +1670,19 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         overlapDetection.CompactAndReadbackOverlaps(
                             cmd,
                             out var uniqueOverlapPixelIndices,
-                            out var uniqueOverlapInstanceIndices);
+                            out var uniqueOverlapInstanceIndices
+                        );
 
-                        SaveArrayToFile(request.outputFolderPath + $"/overlapPixelIndex{lightmapIndex}.uint", uniqueOverlapPixelIndices.Length, uniqueOverlapPixelIndices);
-                        SaveArrayToFile(request.outputFolderPath + $"/uvOverlapInstanceIds{lightmapIndex}.size_t", uniqueOverlapInstanceIndices.Length, uniqueOverlapInstanceIndices);
+                        SaveArrayToFile(
+                            request.outputFolderPath + $"/overlapPixelIndex{lightmapIndex}.uint",
+                            uniqueOverlapPixelIndices.Length,
+                            uniqueOverlapPixelIndices
+                        );
+                        SaveArrayToFile(
+                            request.outputFolderPath + $"/uvOverlapInstanceIds{lightmapIndex}.size_t",
+                            uniqueOverlapInstanceIndices.Length,
+                            uniqueOverlapInstanceIndices
+                        );
 
                         ulong workSteps = CalculateNonIntegratedLightmapWorkSteps((uint)lightmapSize);
                         progressState.IncrementCompletedWorkSteps(workSteps);
@@ -1227,7 +1699,16 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         IntegratedOutputType integratedOutputType = integratedRequestOutputType.Key;
                         foreach (var bakeInstance in currentLightmapDesc.BakeInstances)
                         {
-                            if (!GetInstanceUVResources(cmd, lightmappingContext, bakeInstance, out _, out var uvAS, out var uvFallbackBuffer))
+                            if (
+                                !GetInstanceUVResources(
+                                    cmd,
+                                    lightmappingContext,
+                                    bakeInstance,
+                                    out _,
+                                    out var uvAS,
+                                    out var uvFallbackBuffer
+                                )
+                            )
                                 return Result.AddResourcesToCacheFailure;
 
                             var result = IntegrateLightmapInstance(
@@ -1253,10 +1734,15 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         }
 
                         // Copy out the results
-                        bool hasDirectionality = integratedRequestOutputType.Value.HasFlag(RequestedSubOutput.DirectionalityTexture);
+                        bool hasDirectionality = integratedRequestOutputType.Value.HasFlag(
+                            RequestedSubOutput.DirectionalityTexture
+                        );
                         if (hasDirectionality)
                         {
-                            Debug.Assert(normalBuffer != null, "Normal buffer must be set when directionality is requested.");
+                            Debug.Assert(
+                                normalBuffer != null,
+                                "Normal buffer must be set when directionality is requested."
+                            );
                             Debug.Assert(needsNormalsForDirectionality);
 
                             // This uses the accumulatedOutput to get the sample count, so directionality must be normalized first since the sample count will be normalized when the lightmap is normalized
@@ -1264,10 +1750,20 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                             switch (integratedOutputType)
                             {
                                 case IntegratedOutputType.Direct:
-                                    lightmappingContext.IntegratorContext.LightmapDirectIntegrator.NormalizeDirectional(cmd, lightmappingContext.AccumulatedDirectionalOutput, accumulatedOutput, normalBuffer);
+                                    lightmappingContext.IntegratorContext.LightmapDirectIntegrator.NormalizeDirectional(
+                                        cmd,
+                                        lightmappingContext.AccumulatedDirectionalOutput,
+                                        accumulatedOutput,
+                                        normalBuffer
+                                    );
                                     break;
                                 case IntegratedOutputType.Indirect:
-                                    lightmappingContext.IntegratorContext.LightmapIndirectIntegrator.NormalizeDirectional(cmd, lightmappingContext.AccumulatedDirectionalOutput, accumulatedOutput, normalBuffer);
+                                    lightmappingContext.IntegratorContext.LightmapIndirectIntegrator.NormalizeDirectional(
+                                        cmd,
+                                        lightmappingContext.AccumulatedDirectionalOutput,
+                                        accumulatedOutput,
+                                        normalBuffer
+                                    );
                                     break;
                             }
                         }
@@ -1275,19 +1771,35 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         switch (integratedOutputType)
                         {
                             case IntegratedOutputType.AO:
-                                lightmappingContext.IntegratorContext.LightmapAOIntegrator.Normalize(cmd, accumulatedOutput);
+                                lightmappingContext.IntegratorContext.LightmapAOIntegrator.Normalize(
+                                    cmd,
+                                    accumulatedOutput
+                                );
                                 break;
                             case IntegratedOutputType.Direct:
-                                lightmappingContext.IntegratorContext.LightmapDirectIntegrator.Normalize(cmd, accumulatedOutput);
+                                lightmappingContext.IntegratorContext.LightmapDirectIntegrator.Normalize(
+                                    cmd,
+                                    accumulatedOutput
+                                );
                                 break;
                             case IntegratedOutputType.Indirect:
-                                lightmappingContext.IntegratorContext.LightmapIndirectIntegrator.Normalize(cmd, accumulatedOutput);
+                                lightmappingContext.IntegratorContext.LightmapIndirectIntegrator.Normalize(
+                                    cmd,
+                                    accumulatedOutput
+                                );
                                 break;
                             case IntegratedOutputType.Validity:
-                                lightmappingContext.IntegratorContext.LightmapValidityIntegrator.Normalize(cmd, accumulatedOutput);
+                                lightmappingContext.IntegratorContext.LightmapValidityIntegrator.Normalize(
+                                    cmd,
+                                    accumulatedOutput
+                                );
                                 break;
                             case IntegratedOutputType.ShadowMask:
-                                lightmappingContext.IntegratorContext.LightmapShadowMaskIntegrator.Normalize(cmd, accumulatedOutput, lightmappingContext.AccumulatedDirectionalOutput);
+                                lightmappingContext.IntegratorContext.LightmapShadowMaskIntegrator.Normalize(
+                                    cmd,
+                                    accumulatedOutput,
+                                    lightmappingContext.AccumulatedDirectionalOutput
+                                );
                                 break;
                         }
 
@@ -1302,10 +1814,20 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         }
 
                         // Write lightmap to disk. TODO: kick off a C# job so the compression and file IO happens in a different thread LIGHT-1772
-                        bool outputPrimaryTexture = integratedRequestOutputType.Value.HasFlag(RequestedSubOutput.PrimaryTexture);
+                        bool outputPrimaryTexture = integratedRequestOutputType.Value.HasFlag(
+                            RequestedSubOutput.PrimaryTexture
+                        );
                         // We explicitly take into account whether to write for directionality, no directionality or for both.
                         if (outputPrimaryTexture)
-                            if (LightmapIntegrationHelpers.WriteLightmap(cmd, accumulatedOutput, integratedOutputType, lightmapIndex, request.outputFolderPath) == false)
+                            if (
+                                LightmapIntegrationHelpers.WriteLightmap(
+                                    cmd,
+                                    accumulatedOutput,
+                                    integratedOutputType,
+                                    lightmapIndex,
+                                    request.outputFolderPath
+                                ) == false
+                            )
                                 return Result.WriteToDiskFailure;
 
                         if (!integratedRequestOutputType.Value.HasFlag(RequestedSubOutput.DirectionalityTexture))
@@ -1313,8 +1835,18 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                         // Write 'direct/indirect directionality' if requested - it is baked in the same pass as 'direct/indirect'.
                         IntegratedOutputType directionalityLightmapType =
-                            integratedOutputType == IntegratedOutputType.Direct ? IntegratedOutputType.DirectionalityDirect : IntegratedOutputType.DirectionalityIndirect;
-                        if (LightmapIntegrationHelpers.WriteLightmap(cmd, lightmappingContext.AccumulatedDirectionalOutput, directionalityLightmapType, lightmapIndex, request.outputFolderPath) == false)
+                            integratedOutputType == IntegratedOutputType.Direct
+                                ? IntegratedOutputType.DirectionalityDirect
+                                : IntegratedOutputType.DirectionalityIndirect;
+                        if (
+                            LightmapIntegrationHelpers.WriteLightmap(
+                                cmd,
+                                lightmappingContext.AccumulatedDirectionalOutput,
+                                directionalityLightmapType,
+                                lightmapIndex,
+                                request.outputFolderPath
+                            ) == false
+                        )
                             return Result.WriteToDiskFailure;
                     }
 
@@ -1334,12 +1866,18 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     {
                         // Environment is part of indirect irradiance.
                         if (request.outputTypeMask.HasFlag(LightmapRequestOutputType.IrradianceEnvironment))
-                            File.WriteAllBytes(request.outputFolderPath + $"/irradianceEnvironment{lightmapIndex}.r2d", compressedBlack);
+                            File.WriteAllBytes(
+                                request.outputFolderPath + $"/irradianceEnvironment{lightmapIndex}.r2d",
+                                compressedBlack
+                            );
 
                         // occupiedTexels is needed for analytics, don't fail the bake if we cannot write it.
                         UInt64 occupiedTexels = (UInt64)lightmapRequestData.atlassing.m_EstimatedTexelCount;
                         if (request.outputTypeMask.HasFlag(LightmapRequestOutputType.Occupancy))
-                            File.WriteAllBytes(request.outputFolderPath + $"/occupiedTexels{lightmapIndex}.UInt64", BitConverter.GetBytes(occupiedTexels));
+                            File.WriteAllBytes(
+                                request.outputFolderPath + $"/occupiedTexels{lightmapIndex}.UInt64",
+                                BitConverter.GetBytes(occupiedTexels)
+                            );
                     }
                     catch (Exception e)
                     {
@@ -1353,7 +1891,9 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return Result.Success;
         }
 
-        private static Dictionary<IntegratedOutputType, RequestedSubOutput> GetRequestedIntegratedOutputTypes(in LightmapRequest request)
+        private static Dictionary<IntegratedOutputType, RequestedSubOutput> GetRequestedIntegratedOutputTypes(
+            in LightmapRequest request
+        )
         {
             // TODO handle lightmapOffset and lightmapCount from the request.
             // Turn the bits set in the request bitmask into an array of LightmapRequestOutputType.
@@ -1371,7 +1911,12 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
             foreach (var lightmapRequestOutputType in lightmapRequestOutputTypes)
             {
-                if (!LightmapRequestOutputTypeToIntegratedOutputType(lightmapRequestOutputType, out IntegratedOutputType lightmapType))
+                if (
+                    !LightmapRequestOutputTypeToIntegratedOutputType(
+                        lightmapRequestOutputType,
+                        out IntegratedOutputType lightmapType
+                    )
+                )
                     continue;
 
                 switch (lightmapType)
@@ -1380,13 +1925,19 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                         AddToRequestedLightmapTypes(IntegratedOutputType.Indirect, RequestedSubOutput.PrimaryTexture);
                         break;
                     case IntegratedOutputType.DirectionalityIndirect:
-                        AddToRequestedLightmapTypes(IntegratedOutputType.Indirect, RequestedSubOutput.DirectionalityTexture);
+                        AddToRequestedLightmapTypes(
+                            IntegratedOutputType.Indirect,
+                            RequestedSubOutput.DirectionalityTexture
+                        );
                         break;
                     case IntegratedOutputType.Direct:
                         AddToRequestedLightmapTypes(IntegratedOutputType.Direct, RequestedSubOutput.PrimaryTexture);
                         break;
                     case IntegratedOutputType.DirectionalityDirect:
-                        AddToRequestedLightmapTypes(IntegratedOutputType.Direct, RequestedSubOutput.DirectionalityTexture);
+                        AddToRequestedLightmapTypes(
+                            IntegratedOutputType.Direct,
+                            RequestedSubOutput.DirectionalityTexture
+                        );
                         break;
                     default:
                         AddToRequestedLightmapTypes(lightmapType, RequestedSubOutput.PrimaryTexture);
@@ -1397,27 +1948,48 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             return requestedLightmapTypes;
         }
 
-        private static HashSet<LightmapRequestOutputType> GetRequestedNonIntegratedOutputTypes(in LightmapRequest request)
+        private static HashSet<LightmapRequestOutputType> GetRequestedNonIntegratedOutputTypes(
+            in LightmapRequest request
+        )
         {
-            HashSet<LightmapRequestOutputType> outputTypes =
-                BitfieldToList((int) (request.outputTypeMask & (LightmapRequestOutputType.Normal | LightmapRequestOutputType.Occupancy | LightmapRequestOutputType.ChartIndex | LightmapRequestOutputType.OverlapPixelIndex)));
-            bool needsNormalsForDirectionality = request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityIndirect) || request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityDirect);
+            HashSet<LightmapRequestOutputType> outputTypes = BitfieldToList(
+                (int)(
+                    request.outputTypeMask
+                    & (
+                        LightmapRequestOutputType.Normal
+                        | LightmapRequestOutputType.Occupancy
+                        | LightmapRequestOutputType.ChartIndex
+                        | LightmapRequestOutputType.OverlapPixelIndex
+                    )
+                )
+            );
+            bool needsNormalsForDirectionality =
+                request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityIndirect)
+                || request.outputTypeMask.HasFlag(LightmapRequestOutputType.DirectionalityDirect);
             if (needsNormalsForDirectionality)
                 outputTypes.Add(LightmapRequestOutputType.Normal);
 
             return outputTypes;
         }
 
-        private static (uint directSampleCount, uint effectiveIndirectSampleCount) GetProbeSampleCounts(in SampleCount probeSampleCounts)
+        private static (uint directSampleCount, uint effectiveIndirectSampleCount) GetProbeSampleCounts(
+            in SampleCount probeSampleCounts
+        )
         {
             uint indirectSampleCount = probeSampleCounts.indirectSampleCount;
 
             return (probeSampleCounts.directSampleCount, indirectSampleCount);
         }
 
-        internal static bool ExecuteProbeRequests(in BakeInput bakeInput, in ProbeRequestData probeRequestData, UnityComputeDeviceContext deviceContext,
-            bool useLegacyBakingBehavior, UnityComputeWorld world, BakeProgressState progressState,
-            UnityEngine.Rendering.Sampling.SamplingResources samplingResources)
+        internal static bool ExecuteProbeRequests(
+            in BakeInput bakeInput,
+            in ProbeRequestData probeRequestData,
+            UnityComputeDeviceContext deviceContext,
+            bool useLegacyBakingBehavior,
+            UnityComputeWorld world,
+            BakeProgressState progressState,
+            UnityEngine.Rendering.Sampling.SamplingResources samplingResources
+        )
         {
             if (probeRequestData.requests.Length == 0)
                 return true;
@@ -1425,21 +1997,37 @@ namespace UnityEditor.PathTracing.LightBakerBridge
             ProbeIntegratorResources integrationResources = new();
             integrationResources.Load(world.RayTracingContext);
 
-            var probeOcclusionLightIndexMappingShader = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>("Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/ProbeOcclusionLightIndexMapping.compute");
-            using UnityComputeProbeIntegrator probeIntegrator = new(!useLegacyBakingBehavior, samplingResources, integrationResources, probeOcclusionLightIndexMappingShader);
+            var probeOcclusionLightIndexMappingShader = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>(
+                "Packages/com.unity.render-pipelines.core/Runtime/PathTracing/Shaders/ProbeOcclusionLightIndexMapping.compute"
+            );
+            using UnityComputeProbeIntegrator probeIntegrator = new(
+                !useLegacyBakingBehavior,
+                samplingResources,
+                integrationResources,
+                probeOcclusionLightIndexMappingShader
+            );
             probeIntegrator.SetProgressReporter(progressState);
 
             // Create input position buffer
             using NativeArray<float3> inputPositions = new(probeRequestData.positions, Allocator.Temp);
-            var positionsBuffer = deviceContext.CreateBuffer((ulong)probeRequestData.positions.Length, sizeof(float) * 3);
+            var positionsBuffer = deviceContext.CreateBuffer(
+                (ulong)probeRequestData.positions.Length,
+                sizeof(float) * 3
+            );
             BufferSlice<float3> positionsBufferSlice = positionsBuffer.Slice<float3>();
             var positionsWriteEvent = deviceContext.CreateEvent();
             deviceContext.WriteBuffer(positionsBufferSlice, inputPositions, positionsWriteEvent);
             deviceContext.DestroyEvent(positionsWriteEvent);
 
             // Create input probe occlusion light indices buffer (shared for all requests)
-            using NativeArray<int> inputPerProbeLightIndices = new(probeRequestData.occlusionLightIndices, Allocator.Temp);
-            var perProbeLightIndicesBuffer = deviceContext.CreateBuffer((ulong)probeRequestData.occlusionLightIndices.Length, sizeof(int));
+            using NativeArray<int> inputPerProbeLightIndices = new(
+                probeRequestData.occlusionLightIndices,
+                Allocator.Temp
+            );
+            var perProbeLightIndicesBuffer = deviceContext.CreateBuffer(
+                (ulong)probeRequestData.occlusionLightIndices.Length,
+                sizeof(int)
+            );
             BufferSlice<int> perProbeLightIndicesBufferSlice = perProbeLightIndicesBuffer.Slice<int>();
             deviceContext.WriteBuffer(perProbeLightIndicesBufferSlice, inputPerProbeLightIndices);
 
@@ -1455,21 +2043,43 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                 int bounceCount = (int)request.maxBounces;
                 (uint directSampleCount, uint effectiveIndirectSampleCount) = GetProbeSampleCounts(request.sampleCount);
 
-                probeIntegrator.Prepare(deviceContext, world, positionsBuffer.Slice<Vector3>(), pushoff, (int)bounceCount);
+                probeIntegrator.Prepare(
+                    deviceContext,
+                    world,
+                    positionsBuffer.Slice<Vector3>(),
+                    pushoff,
+                    (int)bounceCount
+                );
 
                 List<EventID> eventsToWaitFor = new();
                 List<BufferID> buffersToDestroy = new();
 
                 // Integrate indirect radiance
-                using NativeArray<SphericalHarmonicsL2> outputIndirectRadiance = new(requestLength, Allocator.Persistent);
-                if (request.outputTypeMask.HasFlag(ProbeRequestOutputType.RadianceIndirect) && effectiveIndirectSampleCount > 0)
+                using NativeArray<SphericalHarmonicsL2> outputIndirectRadiance = new(
+                    requestLength,
+                    Allocator.Persistent
+                );
+                if (
+                    request.outputTypeMask.HasFlag(ProbeRequestOutputType.RadianceIndirect)
+                    && effectiveIndirectSampleCount > 0
+                )
                 {
                     var shIndirectBuffer = deviceContext.CreateBuffer(request.count * 27, sizeof(float));
                     buffersToDestroy.Add(shIndirectBuffer);
                     var shIndirectBufferSlice = shIndirectBuffer.Slice<SphericalHarmonicsL2>();
-                    var integrationResult = probeIntegrator.IntegrateIndirectRadiance(deviceContext, requestOffset, requestLength,
-                        (int)effectiveIndirectSampleCount, request.ignoreIndirectEnvironment, shIndirectBufferSlice);
-                    Assert.AreEqual(IProbeIntegrator.ResultType.Success, integrationResult.type, "IntegrateIndirectRadiance failed.");
+                    var integrationResult = probeIntegrator.IntegrateIndirectRadiance(
+                        deviceContext,
+                        requestOffset,
+                        requestLength,
+                        (int)effectiveIndirectSampleCount,
+                        request.ignoreIndirectEnvironment,
+                        shIndirectBufferSlice
+                    );
+                    Assert.AreEqual(
+                        IProbeIntegrator.ResultType.Success,
+                        integrationResult.type,
+                        "IntegrateIndirectRadiance failed."
+                    );
                     var readEvent = deviceContext.CreateEvent();
                     deviceContext.ReadBuffer(shIndirectBufferSlice, outputIndirectRadiance, readEvent);
                     eventsToWaitFor.Add(readEvent);
@@ -1482,9 +2092,19 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     var shDirectBuffer = deviceContext.CreateBuffer(request.count * 27, sizeof(float));
                     buffersToDestroy.Add(shDirectBuffer);
                     var shDirectBufferSlice = shDirectBuffer.Slice<SphericalHarmonicsL2>();
-                    var integrationResult = probeIntegrator.IntegrateDirectRadiance(deviceContext, requestOffset, requestLength,
-                        (int)directSampleCount, request.ignoreDirectEnvironment, shDirectBufferSlice);
-                    Assert.AreEqual(IProbeIntegrator.ResultType.Success, integrationResult.type, "IntegrateDirectRadiance failed.");
+                    var integrationResult = probeIntegrator.IntegrateDirectRadiance(
+                        deviceContext,
+                        requestOffset,
+                        requestLength,
+                        (int)directSampleCount,
+                        request.ignoreDirectEnvironment,
+                        shDirectBufferSlice
+                    );
+                    Assert.AreEqual(
+                        IProbeIntegrator.ResultType.Success,
+                        integrationResult.type,
+                        "IntegrateDirectRadiance failed."
+                    );
                     var readEvent = deviceContext.CreateEvent();
                     deviceContext.ReadBuffer(shDirectBufferSlice, outputDirectRadiance, readEvent);
                     eventsToWaitFor.Add(readEvent);
@@ -1497,9 +2117,18 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     var validityBuffer = deviceContext.CreateBuffer(request.count, sizeof(float));
                     buffersToDestroy.Add(validityBuffer);
                     var validityBufferSlice = validityBuffer.Slice<float>();
-                    var integrationResult = probeIntegrator.IntegrateValidity(deviceContext, requestOffset, requestLength,
-                        (int)effectiveIndirectSampleCount, validityBufferSlice);
-                    Assert.AreEqual(IProbeIntegrator.ResultType.Success, integrationResult.type, "IntegrateValidity failed.");
+                    var integrationResult = probeIntegrator.IntegrateValidity(
+                        deviceContext,
+                        requestOffset,
+                        requestLength,
+                        (int)effectiveIndirectSampleCount,
+                        validityBufferSlice
+                    );
+                    Assert.AreEqual(
+                        IProbeIntegrator.ResultType.Success,
+                        integrationResult.type,
+                        "IntegrateValidity failed."
+                    );
                     var readEvent = deviceContext.CreateEvent();
                     deviceContext.ReadBuffer(validityBufferSlice, outputValidity, readEvent);
                     eventsToWaitFor.Add(readEvent);
@@ -1507,17 +2136,39 @@ namespace UnityEditor.PathTracing.LightBakerBridge
 
                 // Integrate occlusion values
                 const int maxOcclusionLightsPerProbe = 4;
-                bool usesProbeOcclusion = bakeInput.lightingSettings.mixedLightingMode != MixedLightingMode.IndirectOnly;
-                using NativeArray<float> outputOcclusion = new(requestLength * maxOcclusionLightsPerProbe, Allocator.Persistent);
-                if (request.outputTypeMask.HasFlag(ProbeRequestOutputType.LightProbeOcclusion) && usesProbeOcclusion && effectiveIndirectSampleCount > 0)
+                bool usesProbeOcclusion =
+                    bakeInput.lightingSettings.mixedLightingMode != MixedLightingMode.IndirectOnly;
+                using NativeArray<float> outputOcclusion = new(
+                    requestLength * maxOcclusionLightsPerProbe,
+                    Allocator.Persistent
+                );
+                if (
+                    request.outputTypeMask.HasFlag(ProbeRequestOutputType.LightProbeOcclusion)
+                    && usesProbeOcclusion
+                    && effectiveIndirectSampleCount > 0
+                )
                 {
-                    var occlusionBuffer = deviceContext.CreateBuffer(maxOcclusionLightsPerProbe * request.count, sizeof(float));
+                    var occlusionBuffer = deviceContext.CreateBuffer(
+                        maxOcclusionLightsPerProbe * request.count,
+                        sizeof(float)
+                    );
                     buffersToDestroy.Add(occlusionBuffer);
                     var occlusionBufferSlice = occlusionBuffer.Slice<float>();
 
-                    var integrationResult = probeIntegrator.IntegrateOcclusion(deviceContext, requestOffset, requestLength,
-                        (int)effectiveIndirectSampleCount, maxOcclusionLightsPerProbe, perProbeLightIndicesBufferSlice, occlusionBufferSlice);
-                    Assert.AreEqual(IProbeIntegrator.ResultType.Success, integrationResult.type, "IntegrateOcclusion failed.");
+                    var integrationResult = probeIntegrator.IntegrateOcclusion(
+                        deviceContext,
+                        requestOffset,
+                        requestLength,
+                        (int)effectiveIndirectSampleCount,
+                        maxOcclusionLightsPerProbe,
+                        perProbeLightIndicesBufferSlice,
+                        occlusionBufferSlice
+                    );
+                    Assert.AreEqual(
+                        IProbeIntegrator.ResultType.Success,
+                        integrationResult.type,
+                        "IntegrateOcclusion failed."
+                    );
 
                     EventID readEvent = deviceContext.CreateEvent();
                     deviceContext.ReadBuffer(occlusionBufferSlice, outputOcclusion, readEvent);
@@ -1538,12 +2189,19 @@ namespace UnityEditor.PathTracing.LightBakerBridge
                     {
                         LightProbeOcclusion occlusion = new();
                         occlusion.SetDefaultValues();
-                        for (int indirectLightIdx = 0; indirectLightIdx < maxOcclusionLightsPerProbe; indirectLightIdx++)
+                        for (
+                            int indirectLightIdx = 0;
+                            indirectLightIdx < maxOcclusionLightsPerProbe;
+                            indirectLightIdx++
+                        )
                         {
-                            int bakeInputLightIdx = inputPerProbeLightIndices[probeIdx * maxOcclusionLightsPerProbe + indirectLightIdx];
+                            int bakeInputLightIdx = inputPerProbeLightIndices[
+                                probeIdx * maxOcclusionLightsPerProbe + indirectLightIdx
+                            ];
                             if (bakeInputLightIdx >= 0)
                             {
-                                sbyte occlusionMaskChannel = (sbyte)bakeInput.lightData[bakeInputLightIdx].shadowMaskChannel;
+                                sbyte occlusionMaskChannel = (sbyte)
+                                    bakeInput.lightData[bakeInputLightIdx].shadowMaskChannel;
 
                                 occlusion.SetProbeOcclusionLightIndex(indirectLightIdx, bakeInputLightIdx);
                                 occlusion.SetOcclusion(indirectLightIdx, 0.0f);

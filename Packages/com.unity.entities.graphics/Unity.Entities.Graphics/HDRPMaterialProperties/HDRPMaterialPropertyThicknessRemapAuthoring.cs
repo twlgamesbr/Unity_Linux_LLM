@@ -4,8 +4,11 @@ using Unity.Mathematics;
 
 namespace Unity.Rendering
 {
-    [MaterialProperty("_ThicknessRemap"       )]
-    public struct HDRPMaterialPropertyThicknessRemap : IComponentData { public float4 Value; }
+    [MaterialProperty("_ThicknessRemap")]
+    public struct HDRPMaterialPropertyThicknessRemap : IComponentData
+    {
+        public float4 Value;
+    }
 
     [UnityEngine.DisallowMultipleComponent]
     public class HDRPMaterialPropertyThicknessRemapAuthoring : UnityEngine.MonoBehaviour

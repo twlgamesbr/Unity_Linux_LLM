@@ -49,9 +49,14 @@ namespace UnityEngine.Rendering.RenderGraphModule
             [Serializable]
             public class ResourceLists<T>
             {
-                [SerializeField] private List<T> m_Textures = new();
-                [SerializeField] private List<T> m_Buffers = new();
-                [SerializeField] private List<T> m_AccelerationStructures = new();
+                [SerializeField]
+                private List<T> m_Textures = new();
+
+                [SerializeField]
+                private List<T> m_Buffers = new();
+
+                [SerializeField]
+                private List<T> m_AccelerationStructures = new();
 
                 // Indexer to access the lists by index
                 public List<T> this[int index]
@@ -63,7 +68,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
                             (int)RenderGraphResourceType.Texture => m_Textures,
                             (int)RenderGraphResourceType.Buffer => m_Buffers,
                             (int)RenderGraphResourceType.AccelerationStructure => m_AccelerationStructures,
-                            _ => throw new ArgumentOutOfRangeException(nameof(index))
+                            _ => throw new ArgumentOutOfRangeException(nameof(index)),
                         };
                     }
                     set
@@ -102,8 +107,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
             // Debug data for resources.
             [Serializable]
-            public class ResourceDataLists : ResourceLists<ResourceData>
-            { }
+            public class ResourceDataLists : ResourceLists<ResourceData> { }
 
             public ResourceDataLists resourceLists = new();
 
@@ -139,8 +143,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 public RenderGraphPassType type;
 
                 [Serializable]
-                public class ResourceIdLists : ResourceLists<int>
-                {}
+                public class ResourceIdLists : ResourceLists<int> { }
 
                 // List of ResourceHandle.index's for each resource type read by this pass.
                 public ResourceIdLists resourceReadLists;

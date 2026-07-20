@@ -6,7 +6,10 @@ namespace Unity.Serialization
     /// <summary>
     /// Use this attribute to rename a struct, class, field or property without losing its serialized value.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(
+        AttributeTargets.Struct | AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property,
+        AllowMultiple = true
+    )]
     public class FormerNameAttribute : Attribute
     {
         /// <summary>
@@ -22,8 +25,9 @@ namespace Unity.Serialization
         {
             OldName = oldName;
         }
-        
-        static readonly Dictionary<string, string> s_FormerlySerializedAsToCurrentName = new Dictionary<string, string>();
+
+        static readonly Dictionary<string, string> s_FormerlySerializedAsToCurrentName =
+            new Dictionary<string, string>();
         static bool m_Registered;
 
         static void RegisterFormerlySerializedAsTypes()
@@ -32,7 +36,7 @@ namespace Unity.Serialization
                 return;
 
             m_Registered = true;
-            
+
 #if UNITY_EDITOR
             foreach (var type in UnityEditor.TypeCache.GetTypesWithAttribute<FormerNameAttribute>())
             {
@@ -44,13 +48,17 @@ namespace Unity.Serialization
                 var attributes = (FormerNameAttribute[])type.GetCustomAttributes(typeof(FormerNameAttribute), false);
                 foreach (var attribute in attributes)
                 {
-                    s_FormerlySerializedAsToCurrentName.Add(attribute.OldName, $"{type}, {type.Assembly.GetName().Name}");
+                    s_FormerlySerializedAsToCurrentName.Add(
+                        attribute.OldName,
+                        $"{type}, {type.Assembly.GetName().Name}"
+                    );
                 }
             }
 #else
-            var types = CurrentAssemblies.GetLoadedAssemblies()
-                                      .SelectMany(a => a.GetTypes())
-                                      .Where(t => !(t.IsAbstract || t.IsGenericType));
+            var types = CurrentAssemblies
+                .GetLoadedAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => !(t.IsAbstract || t.IsGenericType));
 
             foreach (var type in types)
             {
@@ -58,7 +66,10 @@ namespace Unity.Serialization
 
                 foreach (var attribute in attributes)
                 {
-                    s_FormerlySerializedAsToCurrentName.Add(attribute.OldName, $"{type}, {type.Assembly.GetName().Name}");
+                    s_FormerlySerializedAsToCurrentName.Add(
+                        attribute.OldName,
+                        $"{type}, {type.Assembly.GetName().Name}"
+                    );
                 }
             }
 #endif
@@ -81,8 +92,5 @@ namespace Unity.Serialization
     /// Use this attribute to flag a field or property to be ignored during serialization. This class cannot be inherited.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class DontSerializeAttribute : Attribute
-    {
-        
-    }
+    public sealed class DontSerializeAttribute : Attribute { }
 }

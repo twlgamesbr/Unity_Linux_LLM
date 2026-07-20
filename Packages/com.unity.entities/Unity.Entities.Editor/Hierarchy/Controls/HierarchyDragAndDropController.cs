@@ -47,29 +47,54 @@ namespace Unity.Entities.Editor
             }
         }
 
-        public DragVisualMode HandleDragAndDrop(object target, int insertAtIndex, DragAndDropPosition position, DragAndDropData data)
-            => Handle(target, insertAtIndex, position, data, false);
+        public DragVisualMode HandleDragAndDrop(
+            object target,
+            int insertAtIndex,
+            DragAndDropPosition position,
+            DragAndDropData data
+        ) => Handle(target, insertAtIndex, position, data, false);
 
-        public void OnDrop(object target, int insertAtIndex, DragAndDropPosition position, DragAndDropData data)
-            => Handle(target, insertAtIndex, position, data, true);
+        public void OnDrop(object target, int insertAtIndex, DragAndDropPosition position, DragAndDropData data) =>
+            Handle(target, insertAtIndex, position, data, true);
 
-        DragVisualMode Handle(object target, int insertAtIndex, DragAndDropPosition position, DragAndDropData data, bool perform)
+        DragVisualMode Handle(
+            object target,
+            int insertAtIndex,
+            DragAndDropPosition position,
+            DragAndDropData data,
+            bool perform
+        )
         {
             if (data.userData is HierarchyNodeHandle { Kind: NodeKind.Entity })
                 return DragVisualMode.Rejected;
             if (data.userData is HierarchyNodeHandle { Kind: NodeKind.Scene } sceneHandle)
-                return HandleSceneReorder(EditorSceneManagerBridge.GetSceneByEntityId(sceneHandle.ToEntityId()), insertAtIndex, position, data, perform);
+                return HandleSceneReorder(
+                    EditorSceneManagerBridge.GetSceneByEntityId(sceneHandle.ToEntityId()),
+                    insertAtIndex,
+                    position,
+                    data,
+                    perform
+                );
             if (data.unityObjectReferences.Any(o => o is SceneAsset))
-                return HandleLoadScene(data.unityObjectReferences.Where(o => o is SceneAsset).Cast<SceneAsset>(), insertAtIndex, position, data, perform);
+                return HandleLoadScene(
+                    data.unityObjectReferences.Where(o => o is SceneAsset).Cast<SceneAsset>(),
+                    insertAtIndex,
+                    position,
+                    data,
+                    perform
+                );
 
             var destination = GetDestinationNode(insertAtIndex, position, out var dropFlags);
             var destinationHandle = destination.GetHandle();
             if (destinationHandle.Kind is NodeKind.Entity)
                 return DragVisualMode.Rejected;
 
-            if (dropFlags is HierarchyDropFlags.DropUpon or HierarchyDropFlags.DropBetween
+            if (
+                dropFlags is HierarchyDropFlags.DropUpon or HierarchyDropFlags.DropBetween
                 && destinationHandle.Kind is NodeKind.SubScene
-                && m_Hierarchy.SubSceneMap.GetSubSceneStateImmediate(destinationHandle, m_Hierarchy.World) is not (SubSceneLoadedState.Opened or SubSceneLoadedState.LiveConverted))
+                && m_Hierarchy.SubSceneMap.GetSubSceneStateImmediate(destinationHandle, m_Hierarchy.World)
+                    is not (SubSceneLoadedState.Opened or SubSceneLoadedState.LiveConverted)
+            )
                 return DragVisualMode.Rejected;
 
             var targetDropId = GetDestinationInstanceId(destination);
@@ -77,13 +102,17 @@ namespace Unity.Entities.Editor
                 return DragVisualMode.Rejected;
 
             // In playmode reject dragging a node from scene to a subscene, or from a subscene to a scene
-            if (EditorApplication.isPlaying && data.userData is HierarchyNodeHandle { Kind: NodeKind.GameObject  } handle)
+            if (
+                EditorApplication.isPlaying && data.userData is HierarchyNodeHandle { Kind: NodeKind.GameObject } handle
+            )
             {
                 var nodeSceneContainerKind = GetNodeContainerKind(handle);
                 var destinationSceneContainerKind = GetNodeContainerKind(destinationHandle);
 
-                if ((nodeSceneContainerKind == NodeKind.Scene && destinationSceneContainerKind is NodeKind.SubScene)
-                    || (nodeSceneContainerKind == NodeKind.SubScene && destinationSceneContainerKind is NodeKind.Scene))
+                if (
+                    (nodeSceneContainerKind == NodeKind.Scene && destinationSceneContainerKind is NodeKind.SubScene)
+                    || (nodeSceneContainerKind == NodeKind.SubScene && destinationSceneContainerKind is NodeKind.Scene)
+                )
                     return DragVisualMode.Rejected;
             }
 
@@ -91,7 +120,13 @@ namespace Unity.Entities.Editor
             return Convert(visualMode);
         }
 
-        DragVisualMode HandleSceneReorder(Scene scene, int insertAtIndex, DragAndDropPosition position, DragAndDropData data, bool perform)
+        DragVisualMode HandleSceneReorder(
+            Scene scene,
+            int insertAtIndex,
+            DragAndDropPosition position,
+            DragAndDropData data,
+            bool perform
+        )
         {
             if (!perform)
                 return DragVisualMode.Move;
@@ -114,7 +149,9 @@ namespace Unity.Entities.Editor
             var destination = GetDestinationNode(insertAtIndex, position, out _);
             if (destination.GetHandle().Kind is NodeKind.Scene)
             {
-                var destinationScene = EditorSceneManagerBridge.GetSceneByEntityId(destination.GetHandle().ToEntityId());
+                var destinationScene = EditorSceneManagerBridge.GetSceneByEntityId(
+                    destination.GetHandle().ToEntityId()
+                );
                 EditorSceneManager.MoveSceneAfter(scene, destinationScene);
                 return DragVisualMode.Move;
             }
@@ -131,21 +168,31 @@ namespace Unity.Entities.Editor
             }
             else
             {
-
-                var destinationScene = EditorSceneManagerBridge.GetSceneByEntityId(destination.GetHandle().ToEntityId());
+                var destinationScene = EditorSceneManagerBridge.GetSceneByEntityId(
+                    destination.GetHandle().ToEntityId()
+                );
                 EditorSceneManager.MoveSceneAfter(scene, destinationScene);
             }
 
             return DragVisualMode.Move;
         }
 
-        DragVisualMode HandleLoadScene(IEnumerable<SceneAsset> scenes, int insertAtIndex, DragAndDropPosition position, DragAndDropData data, bool perform)
+        DragVisualMode HandleLoadScene(
+            IEnumerable<SceneAsset> scenes,
+            int insertAtIndex,
+            DragAndDropPosition position,
+            DragAndDropData data,
+            bool perform
+        )
         {
             if (perform)
             {
                 foreach (var sceneAsset in scenes)
                 {
-                    var scene = EditorSceneManager.OpenScene(AssetDatabase.GetAssetPath(sceneAsset), OpenSceneMode.Additive);
+                    var scene = EditorSceneManager.OpenScene(
+                        AssetDatabase.GetAssetPath(sceneAsset),
+                        OpenSceneMode.Additive
+                    );
                     HandleSceneReorder(scene, insertAtIndex, position, data, true);
                 }
             }
@@ -153,7 +200,11 @@ namespace Unity.Entities.Editor
             return DragVisualMode.Copy;
         }
 
-        HierarchyNode.Immutable GetDestinationNode(int insertAtIndex, DragAndDropPosition position, out HierarchyDropFlags dropFlags)
+        HierarchyNode.Immutable GetDestinationNode(
+            int insertAtIndex,
+            DragAndDropPosition position,
+            out HierarchyDropFlags dropFlags
+        )
         {
             var hierarchyNodes = m_Hierarchy.GetNodes();
             if (insertAtIndex > hierarchyNodes.Count - 1)
@@ -197,7 +248,10 @@ namespace Unity.Entities.Editor
 
                     if (nodeBefore.GetDepth() < nodeAfter.GetDepth())
                     {
-                        dropFlags = HierarchyDropFlags.DropBetween | HierarchyDropFlags.DropAbove | HierarchyDropFlags.DropAfterParent;
+                        dropFlags =
+                            HierarchyDropFlags.DropBetween
+                            | HierarchyDropFlags.DropAbove
+                            | HierarchyDropFlags.DropAfterParent;
                         return nodeAfter;
                     }
 
@@ -213,16 +267,18 @@ namespace Unity.Entities.Editor
                 default:
                     throw new NotSupportedException($"{nameof(position)} value: {position} is not supported");
             }
-
         }
 
-        EntityId GetDestinationInstanceId(HierarchyNode.Immutable destination) => destination.GetHandle().Kind switch
-        {
-            NodeKind.GameObject => destination.GetHandle().ToEntityId(),
-            NodeKind.Scene => destination.GetHandle().ToEntityId(),
-            NodeKind.SubScene => m_Hierarchy.SubSceneMap.GetSubSceneMonobehaviourFromHandle(destination.GetHandle()).gameObject.GetEntityId(),
-            _ => EntityId.None
-        };
+        EntityId GetDestinationInstanceId(HierarchyNode.Immutable destination) =>
+            destination.GetHandle().Kind switch
+            {
+                NodeKind.GameObject => destination.GetHandle().ToEntityId(),
+                NodeKind.Scene => destination.GetHandle().ToEntityId(),
+                NodeKind.SubScene => m_Hierarchy
+                    .SubSceneMap.GetSubSceneMonobehaviourFromHandle(destination.GetHandle())
+                    .gameObject.GetEntityId(),
+                _ => EntityId.None,
+            };
 
         static DragVisualMode Convert(DragAndDropVisualMode visualMode)
         {
@@ -250,7 +306,7 @@ namespace Unity.Entities.Editor
             if (node.GetDepth() > 0)
             {
                 var parent = node.GetParent();
-                for (;;)
+                for (; ; )
                 {
                     var parentKind = parent.GetHandle().Kind;
                     if (parentKind is NodeKind.Root)
@@ -280,7 +336,7 @@ namespace Unity.Entities.Editor
             var nodes = m_Hierarchy.GetNodes();
             var node = nodes[handle];
             var parent = node.GetParent();
-            for (;;)
+            for (; ; )
             {
                 var parentKind = parent.GetHandle().Kind;
                 if (parentKind is NodeKind.Root or NodeKind.Scene or NodeKind.SubScene)
@@ -289,6 +345,5 @@ namespace Unity.Entities.Editor
                 parent = parent.GetParent();
             }
         }
-
     }
 }

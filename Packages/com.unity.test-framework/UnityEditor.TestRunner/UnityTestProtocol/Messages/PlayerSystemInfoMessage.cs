@@ -6,6 +6,7 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
     internal class PlayerSystemInfoMessage : Message
     {
         public PlayerSystemInfo PlayerSystemInfo;
+
         public PlayerSystemInfoMessage()
         {
             type = "PlayerSystemInfo";

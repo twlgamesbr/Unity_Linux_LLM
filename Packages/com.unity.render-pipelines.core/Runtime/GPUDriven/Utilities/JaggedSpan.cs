@@ -7,7 +7,8 @@ using Unity.Jobs;
 namespace UnityEngine.Rendering
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct JaggedSpan<T> : IDisposable where T : unmanaged
+    internal struct JaggedSpan<T> : IDisposable
+        where T : unmanaged
     {
         UnsafeList<UnsafeList<T>> m_Sections;
         int m_TotalLength;
@@ -17,7 +18,8 @@ namespace UnityEngine.Rendering
         public int totalLength => m_TotalLength;
         public bool isEmpty => totalLength == 0;
         public NativeArray<UnsafeList<T>> sections => m_Sections.IsCreated ? m_Sections.AsNativeArray() : default;
-        public NativeArray<UntypedUnsafeList> untypedSections => m_Sections.IsCreated ? m_Sections.AsUntypedUnsafeList().AsNativeArray() : default;
+        public NativeArray<UntypedUnsafeList> untypedSections =>
+            m_Sections.IsCreated ? m_Sections.AsUntypedUnsafeList().AsNativeArray() : default;
 
         public JaggedSpan(int initialCapacity, Allocator allocator)
         {
@@ -71,6 +73,7 @@ namespace UnityEngine.Rendering
         }
 
         private static NativeArray<T> SectionAsArray(in UnsafeList<T> section) => section.AsNativeArray();
+
         private static UnsafeList<T> SectionAsUnsafeList(in NativeArray<T> section) => section.AsUnsafeList();
     }
 
@@ -138,7 +141,8 @@ namespace UnityEngine.Rendering
 
     internal static class JaggedSpanExtensions
     {
-        public static JaggedSpan<T> ToJaggedSpan<T>(this NativeArray<T> array, Allocator allocator) where T : unmanaged
+        public static JaggedSpan<T> ToJaggedSpan<T>(this NativeArray<T> array, Allocator allocator)
+            where T : unmanaged
         {
             var jaggedSpan = new JaggedSpan<T>(1, allocator);
             jaggedSpan.Add(array);

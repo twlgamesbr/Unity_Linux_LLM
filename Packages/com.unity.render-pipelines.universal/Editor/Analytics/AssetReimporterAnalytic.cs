@@ -8,8 +8,12 @@ namespace UnityEditor.Rendering.Universal.Analytics
     // taxonomy = editor.analytics.uAssetReimporterAnalytic.v2
     internal class AssetReimporterAnalytic
     {
-
-        [AnalyticInfo(eventName: "uAssetReimporterAnalytic", vendorKey: "unity.srp", maxEventsPerHour:100, maxNumberOfElements:1000)]
+        [AnalyticInfo(
+            eventName: "uAssetReimporterAnalytic",
+            vendorKey: "unity.srp",
+            maxEventsPerHour: 100,
+            maxNumberOfElements: 1000
+        )]
         class Analytic : IAnalytic
         {
             public Analytic(double duration, uint numberOfAssets, string assetType)
@@ -41,8 +45,8 @@ namespace UnityEditor.Rendering.Universal.Analytics
                 error = null;
                 return true;
             }
-            Data m_Data;
 
+            Data m_Data;
         }
 
         public static void Send<T>(double duration, uint numberOfAssets)

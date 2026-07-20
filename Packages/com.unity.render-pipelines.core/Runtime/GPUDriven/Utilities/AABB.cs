@@ -9,8 +9,14 @@ namespace UnityEngine.Rendering
         public float3 center;
         public float3 extents; // half the size, must be 0 or greater
 
-        public float3 min { get { return center - extents; } }
-        public float3 max { get { return center + extents; } }
+        public float3 min
+        {
+            get { return center - extents; }
+        }
+        public float3 max
+        {
+            get { return center + extents; }
+        }
 
         /// <summary>Returns a string representation of the AABB.</summary>
         public override string ToString()

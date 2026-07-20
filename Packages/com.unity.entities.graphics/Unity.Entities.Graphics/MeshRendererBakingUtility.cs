@@ -14,7 +14,7 @@ namespace Unity.Rendering
             Null,
             AttachToPrimaryEntity,
             AttachToPrimaryEntityForSingleMaterial,
-            AttachToMultipleEntities
+            AttachToMultipleEntities,
         }
 
         [TemporaryBakingType]
@@ -24,17 +24,19 @@ namespace Unity.Rendering
             public UnityObjectRef<Material> Material;
         }
 
-        struct LODStateBakeData<T> where T : Component
+        struct LODStateBakeData<T>
+            where T : Component
         {
             MeshLODComponent m_LODComponent;
             bool m_DoLOD;
+
             public LODStateBakeData(Baker<T> baker, Renderer authoringSource)
             {
                 var lodGroup = baker.GetComponentInParent<LODGroup>();
                 m_LODComponent = new MeshLODComponent
                 {
                     Group = baker.GetEntity(lodGroup, TransformUsageFlags.Renderable),
-                    LODMask = FindInLODs(lodGroup, authoringSource)
+                    LODMask = FindInLODs(lodGroup, authoringSource),
                 };
                 m_DoLOD = m_LODComponent.Group != Entity.Null && m_LODComponent.LODMask != -1;
             }
@@ -76,39 +78,53 @@ namespace Unity.Rendering
             }
         }
 
-
 #pragma warning disable CS0162
 
-        internal static void ConvertToMultipleEntities<T>(Baker<T> baker,
+        internal static void ConvertToMultipleEntities<T>(
+            Baker<T> baker,
             Renderer authoring,
             Mesh mesh,
             Transform root,
-            out NativeArray<Entity> additionalEntities) where T : Component
+            out NativeArray<Entity> additionalEntities
+        )
+            where T : Component
         {
             Convert(baker, authoring, mesh, ConversionMode.AttachToMultipleEntities, root, out additionalEntities);
         }
 
-        internal static void ConvertOnPrimaryEntityForSingleMaterial<T>(Baker<T> baker,
+        internal static void ConvertOnPrimaryEntityForSingleMaterial<T>(
+            Baker<T> baker,
             Renderer authoring,
             Mesh mesh,
-            out NativeArray<Entity> additionalEntities) where T : Component
+            out NativeArray<Entity> additionalEntities
+        )
+            where T : Component
         {
-            Convert(baker, authoring, mesh, ConversionMode.AttachToPrimaryEntityForSingleMaterial, null, out additionalEntities);
+            Convert(
+                baker,
+                authoring,
+                mesh,
+                ConversionMode.AttachToPrimaryEntityForSingleMaterial,
+                null,
+                out additionalEntities
+            );
         }
 
-        internal static void ConvertOnPrimaryEntity<T>(Baker<T> baker,
-            Renderer authoring,
-            Mesh mesh) where T : Component
+        internal static void ConvertOnPrimaryEntity<T>(Baker<T> baker, Renderer authoring, Mesh mesh)
+            where T : Component
         {
             Convert(baker, authoring, mesh, ConversionMode.AttachToPrimaryEntity, null, out _);
         }
 
-        private static void Convert<T>(Baker<T> baker,
+        private static void Convert<T>(
+            Baker<T> baker,
             Renderer authoring,
             Mesh mesh,
             ConversionMode conversionMode,
             Transform root,
-            out NativeArray<Entity> additionalEntities) where T : Component
+            out NativeArray<Entity> additionalEntities
+        )
+            where T : Component
         {
             Assert.IsTrue(conversionMode != ConversionMode.Null);
             additionalEntities = default;
@@ -129,7 +145,9 @@ namespace Unity.Rendering
             // Add material references if there are more than one material on a single entity
             if (conversionMode == ConversionMode.AttachToPrimaryEntity && authoring.sharedMaterials.Length > 1)
             {
-                var extraMaterials = baker.AddBuffer<MaterialReferenceElement>(baker.GetEntity(TransformUsageFlags.None));
+                var extraMaterials = baker.AddBuffer<MaterialReferenceElement>(
+                    baker.GetEntity(TransformUsageFlags.None)
+                );
                 var sharedMaterials = authoring.sharedMaterials;
                 for (var index = 1; index < sharedMaterials.Length; index++)
                     extraMaterials.Add(new MaterialReferenceElement { Material = sharedMaterials[index] });
@@ -137,27 +155,17 @@ namespace Unity.Rendering
 
             var attachToPrimaryEntity = false;
             attachToPrimaryEntity |= conversionMode == ConversionMode.AttachToPrimaryEntity;
-            attachToPrimaryEntity |= conversionMode == ConversionMode.AttachToPrimaryEntityForSingleMaterial && authoring.sharedMaterials.Length == 1;
+            attachToPrimaryEntity |=
+                conversionMode == ConversionMode.AttachToPrimaryEntityForSingleMaterial
+                && authoring.sharedMaterials.Length == 1;
 
             if (attachToPrimaryEntity)
             {
-                ConvertToSingleEntity(
-                    baker,
-                    desc,
-                    authoring,
-                    mesh,
-                    materials);
+                ConvertToSingleEntity(baker, desc, authoring, mesh, materials);
             }
             else
             {
-                ConvertToMultipleEntities(
-                    baker,
-                    desc,
-                    authoring,
-                    mesh,
-                    materials,
-                    root,
-                    out additionalEntities);
+                ConvertToMultipleEntities(baker, desc, authoring, mesh, materials, root, out additionalEntities);
             }
         }
 
@@ -166,7 +174,11 @@ namespace Unity.Rendering
         static void ConvertToSingleEntity<T>(
             Baker<T> baker,
             RenderMeshDescription renderMeshDescription,
-            Renderer renderer, Mesh mesh, Material[] materials) where T : Component
+            Renderer renderer,
+            Mesh mesh,
+            Material[] materials
+        )
+            where T : Component
         {
             var entity = baker.GetEntity(renderer, TransformUsageFlags.Renderable);
             var lodComponent = new LODStateBakeData<T>(baker, renderer);
@@ -189,19 +201,23 @@ namespace Unity.Rendering
             if (RenderMeshUtility.IsLightMapped(renderer.lightmapIndex))
                 baker.AddComponent(entity, RenderMeshUtility.LightmapComponents);
 
-            var subMeshIndexInfo = materials.Length == 1 ? new SubMeshIndexInfo32(0) : new SubMeshIndexInfo32(0, (byte)materials.Length);
+            var subMeshIndexInfo =
+                materials.Length == 1 ? new SubMeshIndexInfo32(0) : new SubMeshIndexInfo32(0, (byte)materials.Length);
             baker.SetSharedComponent(entity, renderMeshDescription.FilterSettings);
             baker.SetComponent(entity, new RenderMeshUnmanaged(mesh, renderer.sharedMaterial, subMeshIndexInfo));
             baker.SetComponent(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
 
             if (mesh.lodCount > 1)
             {
-                baker.SetComponent(entity, new MeshLodInfoComponent()
-                {
-                    lodCount = mesh.lodCount,
-                    lodSlope = mesh.lodSelectionCurve.lodSlope,
-                    lodBias = mesh.lodSelectionCurve.lodBias
-                });
+                baker.SetComponent(
+                    entity,
+                    new MeshLodInfoComponent()
+                    {
+                        lodCount = mesh.lodCount,
+                        lodSlope = mesh.lodSelectionCurve.lodSlope,
+                        lodBias = mesh.lodSelectionCurve.lodBias,
+                    }
+                );
             }
 
             lodComponent.SetLODComponent(baker, entity);
@@ -210,14 +226,17 @@ namespace Unity.Rendering
         internal static void ConvertToMultipleEntities<T>(
             Baker<T> baker,
             RenderMeshDescription renderMeshDescription,
-            Renderer renderer, Mesh mesh, Material[] materials,
+            Renderer renderer,
+            Mesh mesh,
+            Material[] materials,
             UnityEngine.Transform root,
-            out NativeArray<Entity> additionalEntities) where T : Component
+            out NativeArray<Entity> additionalEntities
+        )
+            where T : Component
         {
             var lodState = new LODStateBakeData<T>(baker, renderer);
             var renderBounds = new RenderBounds { Value = mesh.bounds.ToAABB() };
             additionalEntities = new NativeArray<Entity>(materials.Length, Allocator.Temp);
-
 
             if (root == null)
             {
@@ -227,15 +246,12 @@ namespace Unity.Rendering
             else
             {
                 baker.CreateAdditionalEntities(additionalEntities, TransformUsageFlags.ManualOverride); // $"{baker.GetName()}-MeshRendererEntity");
-                baker.AddComponent(additionalEntities, new LocalToWorld {Value = root.localToWorldMatrix});
+                baker.AddComponent(additionalEntities, new LocalToWorld { Value = root.localToWorldMatrix });
                 baker.AddComponent(additionalEntities, LocalTransform.Identity);
 
                 if (!baker.IsStatic())
                 {
-                    var parent = new Parent
-                    {
-                        Value = baker.GetEntity(root, TransformUsageFlags.Renderable)
-                    };
+                    var parent = new Parent { Value = baker.GetEntity(root, TransformUsageFlags.Renderable) };
                     baker.AddComponent<Parent>(additionalEntities);
                     foreach (var entity in additionalEntities)
                         baker.SetComponent(entity, parent);
@@ -257,17 +273,27 @@ namespace Unity.Rendering
             for (ushort subMeshMaterialIndex = 0; subMeshMaterialIndex < materials.Length; subMeshMaterialIndex++)
             {
                 var meshEntity = additionalEntities[subMeshMaterialIndex];
-                baker.SetComponent(meshEntity, new RenderMeshUnmanaged(mesh, materials[subMeshMaterialIndex], new SubMeshIndexInfo32(subMeshMaterialIndex)));
+                baker.SetComponent(
+                    meshEntity,
+                    new RenderMeshUnmanaged(
+                        mesh,
+                        materials[subMeshMaterialIndex],
+                        new SubMeshIndexInfo32(subMeshMaterialIndex)
+                    )
+                );
                 baker.SetComponent(meshEntity, renderBounds);
 
                 if (mesh.lodCount > 1)
                 {
-                    baker.AddComponent(meshEntity, new MeshLodInfoComponent()
-                    {
-                        lodCount = mesh.lodCount,
-                        lodSlope = mesh.lodSelectionCurve.lodSlope,
-                        lodBias = mesh.lodSelectionCurve.lodBias,
-                    });
+                    baker.AddComponent(
+                        meshEntity,
+                        new MeshLodInfoComponent()
+                        {
+                            lodCount = mesh.lodCount,
+                            lodSlope = mesh.lodSelectionCurve.lodSlope,
+                            lodBias = mesh.lodSelectionCurve.lodBias,
+                        }
+                    );
                 }
 
                 lodState.SetLODComponent(baker, meshEntity);
@@ -280,7 +306,8 @@ namespace Unity.Rendering
             {
                 Debug.LogWarning(
                     $"Renderer on GameObject \"{authoring.name}\" was not converted. The assigned mesh is null or no materials are assigned.",
-                    authoring);
+                    authoring
+                );
 
                 return false;
             }
@@ -299,7 +326,8 @@ namespace Unity.Rendering
             {
                 Debug.LogWarning(
                     $"Renderer on GameObject \"{authoring.name}\" has invalid Materials and will not render correctly at runtime. {errorMessage}",
-                    authoring);
+                    authoring
+                );
             }
 
             return true;

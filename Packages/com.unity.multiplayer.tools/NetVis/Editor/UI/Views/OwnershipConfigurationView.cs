@@ -11,11 +11,17 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
     [LoadUxmlView(NetVisEditorPaths.k_UxmlRoot)]
     partial class OwnershipConfigurationView : InjectedVisualElement<OwnershipConfigurationView>
     {
-        [UxmlQuery] OwnershipServerClientConfigurationView OwnershipServerClientConfigurationView;
-        [UxmlQuery] Toggle MeshShadingEnabled;
-        [UxmlQuery] Toggle TextOverlayEnabled;
+        [UxmlQuery]
+        OwnershipServerClientConfigurationView OwnershipServerClientConfigurationView;
 
-        [Inject] NetVisConfigurationWithEvents Configuration;
+        [UxmlQuery]
+        Toggle MeshShadingEnabled;
+
+        [UxmlQuery]
+        Toggle TextOverlayEnabled;
+
+        [Inject]
+        NetVisConfigurationWithEvents Configuration;
         OwnershipSettings OwnershipSettings => Configuration.Configuration.Settings.Ownership;
 
         public OwnershipConfigurationView()
@@ -26,7 +32,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
                 {
                     OwnershipSettings.MeshShadingEnabled = value;
                     Configuration.NotifySettingsChanged();
-                });
+                }
+            );
 
             TextOverlayEnabled.Bind(
                 OwnershipSettings.TextOverlayEnabled,
@@ -34,8 +41,10 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
                 {
                     OwnershipSettings.TextOverlayEnabled = value;
                     Configuration.NotifySettingsChanged();
-                });
+                }
+            );
         }
+
 #if !UNITY_2023_3_OR_NEWER
         public new class UxmlFactory : UxmlFactory<OwnershipConfigurationView, UxmlTraits> { }
 #endif

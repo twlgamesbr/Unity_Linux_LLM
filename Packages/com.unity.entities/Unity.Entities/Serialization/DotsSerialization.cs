@@ -50,7 +50,11 @@ namespace Unity.Entities.Serialization
         /// <param name="fileId">A unique ID identifying the file, used for identification purpose and possibly future cross file references</param>
         /// <param name="fileType">Type of the file, should be user level.</param>
         /// <returns></returns>
-        public static DotsSerializationWriter CreateWriter(BinaryWriter writer, Hash128 fileId, FixedString64Bytes fileType)
+        public static DotsSerializationWriter CreateWriter(
+            BinaryWriter writer,
+            Hash128 fileId,
+            FixedString64Bytes fileType
+        )
         {
             return new DotsSerializationWriter(writer, fileId, fileType);
         }
@@ -73,24 +77,34 @@ namespace Unity.Entities.Serialization
             return new DotsSerializationReader(ref header);
         }
 
-        internal static readonly byte[] HeaderMagic = {(byte)'D', (byte)'O', (byte)'T', (byte)'S', (byte)'B', (byte)'I', (byte)'N', (byte)'!'};
+        internal static readonly byte[] HeaderMagic =
+        {
+            (byte)'D',
+            (byte)'O',
+            (byte)'T',
+            (byte)'S',
+            (byte)'B',
+            (byte)'I',
+            (byte)'N',
+            (byte)'!',
+        };
         internal const ulong RootNodeHash = 0;
 
         [StructLayout(LayoutKind.Sequential)]
         public struct FileHeader
         {
-            public long MagicValue;            // 8-bytes containing the ASCII value of 'DOTSBIN!'
-            public int FileVersion;            // The version of the file format that was used to write this file
-            public int HeaderSize;             // Size of this header, can ensure us a backward/forward compatibility through format changes
-            public Hash128 FileId;             // A hash value that uniquely identifies this file
-            public FixedString64Bytes FileType;     // 62-bytes of an UTF8 string that defines the purpose of the file
-            public int FirstLevelNodesCount;   // The number of nodes on the first level of the node hierarchy.
-            public long NodesSectionOffset;    // The offset of the node section from the start of the file.
-            public int NodesSectionSize;       // The size of the node section in bytes.
+            public long MagicValue; // 8-bytes containing the ASCII value of 'DOTSBIN!'
+            public int FileVersion; // The version of the file format that was used to write this file
+            public int HeaderSize; // Size of this header, can ensure us a backward/forward compatibility through format changes
+            public Hash128 FileId; // A hash value that uniquely identifies this file
+            public FixedString64Bytes FileType; // 62-bytes of an UTF8 string that defines the purpose of the file
+            public int FirstLevelNodesCount; // The number of nodes on the first level of the node hierarchy.
+            public long NodesSectionOffset; // The offset of the node section from the start of the file.
+            public int NodesSectionSize; // The size of the node section in bytes.
             public long MetadataSectionOffset; // The offset of the metadata section from the start of the file.
-            public int MetadataSectionSize;    // The size of the metadata section in bytes.
-            public long DataSectionOffset;     // The offset of the data section from the start of the file.
-            public long DataSectionSize;       // The size of the data section in bytes.
+            public int MetadataSectionSize; // The size of the metadata section in bytes.
+            public long DataSectionOffset; // The offset of the data section from the start of the file.
+            public long DataSectionSize; // The size of the data section in bytes.
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -108,15 +122,15 @@ namespace Unity.Entities.Serialization
         [StructLayout(LayoutKind.Sequential)]
         public struct NodeHeader : IComponentData
         {
-            public ulong NodeTypeHash;          // Type of the Node, a fixed ID.
-            public Hash128 Id;                  // Should be a unique identifier
-            public int Size;                    // Size of the Node Header data, used to navigate to the next Node Header (the first child, if any, of the next sibling, if any)
-            public int NextSiblingOffset;       // Offset from the start of the Node section, of the next sibling, -1 if none
-            public int ChildrenCount;           // Number of children inside this node
+            public ulong NodeTypeHash; // Type of the Node, a fixed ID.
+            public Hash128 Id; // Should be a unique identifier
+            public int Size; // Size of the Node Header data, used to navigate to the next Node Header (the first child, if any, of the next sibling, if any)
+            public int NextSiblingOffset; // Offset from the start of the Node section, of the next sibling, -1 if none
+            public int ChildrenCount; // Number of children inside this node
             public long MetadataStartingOffset; // The offset of the metadata for this node from the start of the file.
-            public int MetadataSize;            // The size of the metadata for this node in bytes.
-            public long DataStartingOffset;     // The offset of the data for this node from the start of the file.
-            public long DataSize;               // The size of the data for this node in bytes.
+            public int MetadataSize; // The size of the metadata for this node in bytes.
+            public long DataStartingOffset; // The offset of the data for this node from the start of the file.
+            public long DataSize; // The size of the data for this node in bytes.
 
             public bool HasMetadata => MetadataStartingOffset != -1;
         }
@@ -193,7 +207,11 @@ namespace Unity.Entities.Serialization
 
             // Write the metadata
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-            _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>("MetadataSection", _writer.Position, _metadataSection.Length);
+            _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>(
+                "MetadataSection",
+                _writer.Position,
+                _metadataSection.Length
+            );
 #endif
             _writer.WriteBytes(_metadataSection.Ptr, _metadataSection.Length);
 
@@ -202,7 +220,11 @@ namespace Unity.Entities.Serialization
             for (int i = 0; i < pages.Length; i++)
             {
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-                _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>("NodePage", _writer.Position, pages[i].FreeOffset);
+                _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>(
+                    "NodePage",
+                    _writer.Position,
+                    pages[i].FreeOffset
+                );
 #endif
                 _writer.WriteBytes(pages[i].Buffer, pages[i].FreeOffset);
             }
@@ -228,7 +250,11 @@ namespace Unity.Entities.Serialization
 
             // Write the metadata
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-            _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>("MetaDataSection", _writer.Position, _metadataSection.Length);
+            _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>(
+                "MetaDataSection",
+                _writer.Position,
+                _metadataSection.Length
+            );
 #endif
             _writer.WriteBytes(_metadataSection.Ptr, _metadataSection.Length);
             var metaSectionArray = blobBuilder.Allocate(ref root.MetadataSection, _metadataSection.Length);
@@ -257,7 +283,11 @@ namespace Unity.Entities.Serialization
             for (int i = 0; i < pages.Length; i++)
             {
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-                _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>("NodePage", _writer.Position, pages[i].FreeOffset);
+                _writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>(
+                    "NodePage",
+                    _writer.Position,
+                    pages[i].FreeOffset
+                );
 #endif
                 _writer.WriteBytes(pages[i].Buffer, pages[i].FreeOffset);
                 UnsafeUtility.MemCpy(nodes, pages[i].Buffer, pages[i].FreeOffset);
@@ -269,7 +299,6 @@ namespace Unity.Entities.Serialization
             return blobAssetRef;
         }
 
-
         /// <summary>
         /// Create a Node of the given type, with an optional unique id
         /// </summary>
@@ -279,9 +308,10 @@ namespace Unity.Entities.Serialization
         /// <remarks>This node will be created as a child of the current parent node but will immediately become the current parent until <see cref="Dispose"/> is called.
         /// It is recommended to use the <code>using (var myNode = CreateNode()){ // Child node create here } pattern</code>
         /// </remarks>
-        public unsafe NodeHandle<T> CreateNode<T>(Hash128 id = default) where T : unmanaged, IComponentData
+        public unsafe NodeHandle<T> CreateNode<T>(Hash128 id = default)
+            where T : unmanaged, IComponentData
         {
-           var curNodeHeader = (byte*)_nodesStack[_nodesStack.Length - 1];
+            var curNodeHeader = (byte*)_nodesStack[_nodesStack.Length - 1];
 
             var nodeData = AllocateNodeData<T>(out var nodeOffset);
             var handle = new NodeHandle<T>(this, nodeData);
@@ -317,7 +347,8 @@ namespace Unity.Entities.Serialization
         /// While you can use the <see cref="NodeHandle{T}"/> APIs to write directly to the raw data segment, this type allow you to access a Stream object to perform stream based writes.
         /// Call <see cref="Dispose()"/> on the instance to go one level up in the hierarchy of nodes
         /// </remarks>
-        public struct WriterHandle<T> : IDisposable where T : unmanaged, IComponentData
+        public struct WriterHandle<T> : IDisposable
+            where T : unmanaged, IComponentData
         {
             private DotsSerializationWriter _owner;
             private readonly NodeHandle<T> _node;
@@ -350,7 +381,8 @@ namespace Unity.Entities.Serialization
         /// <remarks>
         /// This writer will expose a <see cref="MemoryBinaryWriter"/> stream to capture data im memory and will serialize its content upon <see cref="Dispose()"/>
         /// </remarks>
-        public struct DeferredWriterHandle<T> : IDisposable where T : unmanaged, IComponentData
+        public struct DeferredWriterHandle<T> : IDisposable
+            where T : unmanaged, IComponentData
         {
             private DotsSerializationWriter _owner;
             private readonly NodeHandle<T> _node;
@@ -388,7 +420,8 @@ namespace Unity.Entities.Serialization
         /// Type handling a given Node being serialized
         /// </summary>
         /// <typeparam name="T">Type of the node being serialized</typeparam>
-        public struct NodeHandle<T> : IDisposable where T : unmanaged, IComponentData
+        public struct NodeHandle<T> : IDisposable
+            where T : unmanaged, IComponentData
         {
             private readonly DotsSerializationWriter _owner;
             internal readonly unsafe byte* NodeHeaderAddress;
@@ -399,7 +432,8 @@ namespace Unity.Entities.Serialization
             }
 
             public unsafe ref T NodeHeader => ref UnsafeUtility.AsRef<T>(NodeHeaderAddress);
-            internal unsafe ref DotsSerialization.NodeHeader AsNodeHeader => ref UnsafeUtility.AsRef<DotsSerialization.NodeHeader>(NodeHeaderAddress);
+            internal unsafe ref DotsSerialization.NodeHeader AsNodeHeader =>
+                ref UnsafeUtility.AsRef<DotsSerialization.NodeHeader>(NodeHeaderAddress);
 
             internal unsafe NodeHandle(DotsSerializationWriter owner, byte* nodeHeaderAddress)
             {
@@ -422,7 +456,8 @@ namespace Unity.Entities.Serialization
             /// <param name="blobAssetReference">BlobAsset storing the metadata to set</param>
             /// <typeparam name="TB">BlobAsset type</typeparam>
             /// <returns>true if the call succeeded, false if the metadata was already set for this node.</returns>
-            public bool SetMetadata<TB>(BlobAssetReference<TB> blobAssetReference) where TB : unmanaged
+            public bool SetMetadata<TB>(BlobAssetReference<TB> blobAssetReference)
+                where TB : unmanaged
             {
                 return _owner.SetNodeMetadata(this, blobAssetReference);
             }
@@ -477,7 +512,7 @@ namespace Unity.Entities.Serialization
 
         private unsafe void SetNodeTrackedSegmentDataWrite(byte* nodeHeaderAddress, int value)
         {
-            var headerAddress = (IntPtr) nodeHeaderAddress;
+            var headerAddress = (IntPtr)nodeHeaderAddress;
             if (!_trackedSegmentDataWriteByNode.ContainsKey(headerAddress))
             {
                 _trackedSegmentDataWriteByNode.Add(headerAddress, value);
@@ -488,7 +523,9 @@ namespace Unity.Entities.Serialization
             }
         }
 
-        private unsafe bool SetNodeMetadata<T, TB>(NodeHandle<T> nodeHandle, BlobAssetReference<TB> blobAssetReference) where T : unmanaged, IComponentData where TB : unmanaged
+        private unsafe bool SetNodeMetadata<T, TB>(NodeHandle<T> nodeHandle, BlobAssetReference<TB> blobAssetReference)
+            where T : unmanaged, IComponentData
+            where TB : unmanaged
         {
             ref var header = ref nodeHandle.AsNodeHeader;
             if (header.MetadataStartingOffset != -1)
@@ -497,7 +534,10 @@ namespace Unity.Entities.Serialization
             }
 
             var blobAssetLength = blobAssetReference.m_data.Header->Length;
-            var serializeReadyHeader = BlobAssetHeader.CreateForSerialize(blobAssetLength, blobAssetReference.m_data.Header->Hash);
+            var serializeReadyHeader = BlobAssetHeader.CreateForSerialize(
+                blobAssetLength,
+                blobAssetReference.m_data.Header->Hash
+            );
 
             header.MetadataStartingOffset = _metadataSection.Length;
             _metadataSection.AddRange(&serializeReadyHeader, sizeof(BlobAssetHeader));
@@ -505,7 +545,8 @@ namespace Unity.Entities.Serialization
             return true;
         }
 
-        private long InitWriteData<T>(NodeHandle<T> nodeHandle) where T : unmanaged, IComponentData
+        private long InitWriteData<T>(NodeHandle<T> nodeHandle)
+            where T : unmanaged, IComponentData
         {
             ref var nodeHeader = ref nodeHandle.AsNodeHeader;
             nodeHandle.TrackedSegmentDataWrite = _trackedNodeCounter;
@@ -515,7 +556,8 @@ namespace Unity.Entities.Serialization
             return _writer.Position;
         }
 
-        private void EndWriteData<T>(NodeHandle<T> nodeHandle, long startPosition) where T : unmanaged, IComponentData
+        private void EndWriteData<T>(NodeHandle<T> nodeHandle, long startPosition)
+            where T : unmanaged, IComponentData
         {
             ref var nodeHeader = ref nodeHandle.AsNodeHeader;
 
@@ -523,14 +565,17 @@ namespace Unity.Entities.Serialization
             //  A would end up with a non consecutive data segment and we can't allow that.
             if (nodeHandle.TrackedSegmentDataWrite != _trackedNodeCounter)
             {
-                throw new InvalidOperationException($"Can't write data for the node {nodeHeader.Id} before and after processing its children. You must pack your write before or after processing the children ");
+                throw new InvalidOperationException(
+                    $"Can't write data for the node {nodeHeader.Id} before and after processing its children. You must pack your write before or after processing the children "
+                );
             }
 
             // Write the data size
             nodeHeader.DataSize = _writer.Position - startPosition;
         }
 
-        private unsafe void WriteData<T>(NodeHandle<T> nodeHandle, void* data, int dataLength) where T : unmanaged, IComponentData
+        private unsafe void WriteData<T>(NodeHandle<T> nodeHandle, void* data, int dataLength)
+            where T : unmanaged, IComponentData
         {
             ref var nodeHeader = ref nodeHandle.AsNodeHeader;
 
@@ -546,7 +591,9 @@ namespace Unity.Entities.Serialization
             //  A would end up with a non consecutive data segment and we can't allow that.
             if (nodeHandle.TrackedSegmentDataWrite != _trackedNodeCounter)
             {
-                throw new InvalidOperationException($"Can't write data for the node {nodeHeader.Id} before and after processing its children. You must pack your write before or after processing the children ");
+                throw new InvalidOperationException(
+                    $"Can't write data for the node {nodeHeader.Id} before and after processing its children. You must pack your write before or after processing the children "
+                );
             }
 
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
@@ -558,7 +605,7 @@ namespace Unity.Entities.Serialization
 
         private unsafe void SetNextSiblingOffset(byte* parentNode, byte* newChildNode, int newChildOffset)
         {
-            bool isValid = _currentLastChildOffset.TryGetValue((IntPtr) parentNode, out var currentLastChild);
+            bool isValid = _currentLastChildOffset.TryGetValue((IntPtr)parentNode, out var currentLastChild);
             Assert.IsTrue(isValid);
 
             // Add an entry for the new child node, which may have children to fix later on...
@@ -567,25 +614,27 @@ namespace Unity.Entities.Serialization
             // Will be zero if there is no child, so nothing to set
             if (currentLastChild != IntPtr.Zero)
             {
-                ((DotsSerialization.NodeHeader*) currentLastChild)->NextSiblingOffset = newChildOffset;
+                ((DotsSerialization.NodeHeader*)currentLastChild)->NextSiblingOffset = newChildOffset;
             }
             _currentLastChildOffset[(IntPtr)parentNode] = (IntPtr)newChildNode;
         }
 
-        private unsafe byte* AllocateNodeData<T>(out int nodeOffset) where T : unmanaged, IComponentData
+        private unsafe byte* AllocateNodeData<T>(out int nodeOffset)
+            where T : unmanaged, IComponentData
         {
             var nodeSize = UnsafeUtility.SizeOf<T>();
             nodeOffset = _nodesAllocation.CurrentGlobalOffset;
             return _nodesAllocation.Reserve(nodeSize);
         }
 
-        private unsafe void PopNode<T>(ref NodeHandle<T> nodeHandle) where T : unmanaged, IComponentData
+        private unsafe void PopNode<T>(ref NodeHandle<T> nodeHandle)
+            where T : unmanaged, IComponentData
         {
-            _currentLastChildOffset.Remove((IntPtr) nodeHandle.NodeHeaderAddress);
+            _currentLastChildOffset.Remove((IntPtr)nodeHandle.NodeHeaderAddress);
 
             Assert.IsTrue(_nodesStack.Length > 1);
-            Assert.AreEqual((IntPtr)nodeHandle.NodeHeaderAddress, _nodesStack[_nodesStack.Length-1]);
-            _nodesStack.RemoveAt(_nodesStack.Length-1);
+            Assert.AreEqual((IntPtr)nodeHandle.NodeHeaderAddress, _nodesStack[_nodesStack.Length - 1]);
+            _nodesStack.RemoveAt(_nodesStack.Length - 1);
         }
 
         private readonly BinaryWriter _writer;
@@ -606,12 +655,13 @@ namespace Unity.Entities.Serialization
             _writer = writer;
 
             _currentLastChildOffset = new Dictionary<IntPtr, IntPtr>();
-            _metadataSection = new UnsafeList<byte>(64*1024*1024, Allocator.Persistent);
+            _metadataSection = new UnsafeList<byte>(64 * 1024 * 1024, Allocator.Persistent);
             _nodesAllocation = new PagedAllocation(Allocator.Persistent);
             _trackedNodeCounter = 0;
             _trackedSegmentDataWriteByNode = new Dictionary<IntPtr, int>();
 
-            _rootNodeHeader = (DotsSerialization.NodeHeader*) Memory.Unmanaged.Allocate(sizeof(DotsSerialization.NodeHeader), 16, Allocator.Persistent);
+            _rootNodeHeader = (DotsSerialization.NodeHeader*)
+                Memory.Unmanaged.Allocate(sizeof(DotsSerialization.NodeHeader), 16, Allocator.Persistent);
             UnsafeUtility.MemClear(_rootNodeHeader, sizeof(DotsSerialization.NodeHeader));
             _rootNodeHeader->NodeTypeHash = DotsSerialization.RootNodeHash;
 
@@ -624,7 +674,11 @@ namespace Unity.Entities.Serialization
             // Initialize the header with the info we already have
             fixed (byte* addr = DotsSerialization.HeaderMagic)
             {
-                UnsafeUtility.MemCpy(UnsafeUtility.AddressOf(ref _header.MagicValue), addr, DotsSerialization.HeaderMagic.Length);
+                UnsafeUtility.MemCpy(
+                    UnsafeUtility.AddressOf(ref _header.MagicValue),
+                    addr,
+                    DotsSerialization.HeaderMagic.Length
+                );
             }
 
             _header.FileVersion = SerializeUtility.CurrentFileFormatVersion;
@@ -647,7 +701,10 @@ namespace Unity.Entities.Serialization
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
             _writer.ImHexPattern.WriteTypeWithPosition<DotsSerialization.FileHeader>("header", _writer.Position);
 #endif
-            _writer.WriteBytes(UnsafeUtility.AddressOf(ref _header), UnsafeUtility.SizeOf<DotsSerialization.FileHeader>());
+            _writer.WriteBytes(
+                UnsafeUtility.AddressOf(ref _header),
+                UnsafeUtility.SizeOf<DotsSerialization.FileHeader>()
+            );
             _writer.Position = pos;
         }
     }
@@ -682,11 +739,18 @@ namespace Unity.Entities.Serialization
             {
                 var pos = (int)_writerHandle.Writer.Position;
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-                _writerHandle.Writer.ImHexPattern.WriteTypeWithPosition<int>("stringLength", _writerHandle.Writer.Position);
+                _writerHandle.Writer.ImHexPattern.WriteTypeWithPosition<int>(
+                    "stringLength",
+                    _writerHandle.Writer.Position
+                );
 #endif
                 _writerHandle.Writer.Write(bytes.Length);
 #if UNITY_EDITOR && UNITY_DOTS_IMHEX
-                _writerHandle.Writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>("stringData", _writerHandle.Writer.Position, bytes.Length);
+                _writerHandle.Writer.ImHexPattern.WriteArrayOfTypeWithPosition<byte>(
+                    "stringData",
+                    _writerHandle.Writer.Position,
+                    bytes.Length
+                );
 #endif
                 _writerHandle.Writer.WriteBytes(b, bytes.Length);
                 return pos;
@@ -695,12 +759,12 @@ namespace Unity.Entities.Serialization
 
         private DotsSerializationWriter.NodeHandle<DotsSerialization.StringTableNode> _nodeHandle;
         private DotsSerializationWriter.DeferredWriterHandle<DotsSerialization.StringTableNode> _writerHandle;
+
         public void Dispose()
         {
             _writerHandle.Dispose();
         }
     }
-
 
     internal struct StringTableReaderHandle : IDisposable
     {
@@ -836,7 +900,7 @@ namespace Unity.Entities.Serialization
             {
                 return -1;
             }
-            return *(int*) (_stringTableData + offset);
+            return *(int*)(_stringTableData + offset);
         }
 
         private readonly unsafe byte* _stringTableData;
@@ -865,7 +929,10 @@ namespace Unity.Entities.Serialization
         /// <param name="reader">The reader the node is stored into</param>
         /// <param name="stringTableNode">Handle of the String Table node</param>
         /// <returns>String Table handle</returns>
-        public static StringTableReaderHandle OpenStringTableNode(this DotsSerializationReader reader, DotsSerializationReader.NodeHandle stringTableNode)
+        public static StringTableReaderHandle OpenStringTableNode(
+            this DotsSerializationReader reader,
+            DotsSerializationReader.NodeHandle stringTableNode
+        )
         {
             return new StringTableReaderHandle(stringTableNode);
         }
@@ -897,11 +964,14 @@ namespace Unity.Entities.Serialization
             }
 
             if (fileHeader.FileVersion != SerializeUtility.CurrentFileFormatVersion)
-                throw new Exception($"Version mismatch! The file was written with version {fileHeader.FileVersion} but the latest version is {SerializeUtility.CurrentFileFormatVersion}.");
+                throw new Exception(
+                    $"Version mismatch! The file was written with version {fileHeader.FileVersion} but the latest version is {SerializeUtility.CurrentFileFormatVersion}."
+                );
 
             // Read Node and metadata sections
             var nodeHeaderSize = UnsafeUtility.SizeOf<DotsSerialization.NodeHeader>();
-            _rootNodeHeader = (DotsSerialization.NodeHeader*)Memory.Unmanaged.Allocate(fileHeader.NodesSectionSize + nodeHeaderSize, 16, Allocator.Persistent);
+            _rootNodeHeader = (DotsSerialization.NodeHeader*)
+                Memory.Unmanaged.Allocate(fileHeader.NodesSectionSize + nodeHeaderSize, 16, Allocator.Persistent);
             _nodesSection = (byte*)(_rootNodeHeader + 1);
             _reader.Position = fileHeader.NodesSectionOffset;
             _reader.ReadBytes(_nodesSection, fileHeader.NodesSectionSize);
@@ -916,7 +986,8 @@ namespace Unity.Entities.Serialization
             _rootNodeHeader->DataStartingOffset = -1;
             _rootNodeHeader->MetadataStartingOffset = -1;
 
-            _metadataSection = (byte*)Memory.Unmanaged.Allocate(fileHeader.MetadataSectionSize, 16, Allocator.Persistent);
+            _metadataSection = (byte*)
+                Memory.Unmanaged.Allocate(fileHeader.MetadataSectionSize, 16, Allocator.Persistent);
             _reader.Position = fileHeader.MetadataSectionOffset;
             _reader.ReadBytes(_metadataSection, fileHeader.MetadataSectionSize);
         }
@@ -926,7 +997,7 @@ namespace Unity.Entities.Serialization
             _rootNodeHeader = (DotsSerialization.NodeHeader*)blobHeader.NodeSection.GetUnsafePtr();
             Assertions.Assert.AreEqual(DotsSerialization.RootNodeHash, _rootNodeHeader->NodeTypeHash);
             _nodesSection = (byte*)(_rootNodeHeader + 1);
-            _metadataSection = (byte*) blobHeader.MetadataSection.GetUnsafePtr();
+            _metadataSection = (byte*)blobHeader.MetadataSection.GetUnsafePtr();
         }
 
         /// <summary>
@@ -987,21 +1058,26 @@ namespace Unity.Entities.Serialization
 
             private unsafe byte* SectionBaseAddress => _owner._nodesSection;
 
-            private unsafe ref DotsSerialization.NodeHeader GetHeader(int offset) => ref UnsafeUtility.AsRef<DotsSerialization.NodeHeader>(SectionBaseAddress+offset);
+            private unsafe ref DotsSerialization.NodeHeader GetHeader(int offset) =>
+                ref UnsafeUtility.AsRef<DotsSerialization.NodeHeader>(SectionBaseAddress + offset);
+
             public ref DotsSerialization.NodeHeader AsNodeHeader => ref GetHeader(_nodeHeaderOffset);
 
             /// <summary>
             ///  Determine if the handle is valid or not
             /// </summary>
             public bool IsValid => _owner != null;
+
             /// <summary>
             /// Count of direct children
             /// </summary>
             public int ChildrenCount => AsNodeHeader.ChildrenCount;
+
             /// <summary>
             /// Node type
             /// </summary>
             public ulong NodeTypeHash => AsNodeHeader.NodeTypeHash;
+
             /// <summary>
             /// .net type of the node
             /// </summary>
@@ -1020,10 +1096,11 @@ namespace Unity.Entities.Serialization
             /// <typeparam name="T"></typeparam>
             /// <returns></returns>
             /// <exception cref="Exception"></exception>
-            public unsafe ref T As<T>() where T : unmanaged
+            public unsafe ref T As<T>()
+                where T : unmanaged
             {
                 Assert.AreEqual(NodeDotNetType, typeof(T));
-                return ref UnsafeUtility.AsRef<T>(SectionBaseAddress+_nodeHeaderOffset);
+                return ref UnsafeUtility.AsRef<T>(SectionBaseAddress + _nodeHeaderOffset);
             }
 
             /// <summary>
@@ -1040,7 +1117,7 @@ namespace Unity.Entities.Serialization
                     {
                         return false;
                     }
-                    node = new NodeHandle(_owner, _nodeHeaderOffset+AsNodeHeader.Size);
+                    node = new NodeHandle(_owner, _nodeHeaderOffset + AsNodeHeader.Size);
                     return true;
                 }
 
@@ -1060,7 +1137,8 @@ namespace Unity.Entities.Serialization
             /// <param name="nestedLevel">The number of nested levels the search has to be performed, 1 for direct children, 2 for direct children and their direct children, etc</param>
             /// <typeparam name="T">Type of the node to find</typeparam>
             /// <returns>Return a valid Node Handle if found, an invalid one otherwise</returns>
-            public NodeHandle FindNode<T>(int nestedLevel = Int32.MaxValue) where T : unmanaged
+            public NodeHandle FindNode<T>(int nestedLevel = Int32.MaxValue)
+                where T : unmanaged
             {
                 return FindByType(TypeManager.GetTypeInfo<T>().StableTypeHash, nestedLevel);
             }
@@ -1203,7 +1281,8 @@ namespace Unity.Entities.Serialization
             /// </summary>
             /// <typeparam name="T">Type of BlobAsset the metadata is stored with</typeparam>
             /// <returns>BlobAsset reference of the metadata</returns>
-            public BlobAssetReference<T> GetMetadata<T>() where T : unmanaged
+            public BlobAssetReference<T> GetMetadata<T>()
+                where T : unmanaged
             {
                 return _owner.GetMetadata<T>(this);
             }
@@ -1248,7 +1327,8 @@ namespace Unity.Entities.Serialization
             return true;
         }
 
-        private unsafe BlobAssetReference<T> GetMetadata<T>(NodeHandle nodeHandle) where T : unmanaged
+        private unsafe BlobAssetReference<T> GetMetadata<T>(NodeHandle nodeHandle)
+            where T : unmanaged
         {
             ref var header = ref nodeHandle.AsNodeHeader;
             if (!header.HasMetadata)
@@ -1257,7 +1337,7 @@ namespace Unity.Entities.Serialization
             }
 
             byte* data = _metadataSection + header.MetadataStartingOffset;
-            var bufferHeader = (BlobAssetHeader*) data;
+            var bufferHeader = (BlobAssetHeader*)data;
             bufferHeader->Allocator = Allocator.None;
             bufferHeader->ValidationPtr = data + sizeof(BlobAssetHeader);
 
@@ -1284,10 +1364,10 @@ namespace Unity.Entities.Serialization
             PageSize = pageSize;
             Allocator = allocator;
             CurrentGlobalOffset = 0;
-            Pages.Add(new PageInfo((byte*)Memory.Unmanaged.Allocate(PageSize,16, Allocator), 0));
+            Pages.Add(new PageInfo((byte*)Memory.Unmanaged.Allocate(PageSize, 16, Allocator), 0));
         }
 
-        public byte* Reserve(int size, bool clearMemory=true)
+        public byte* Reserve(int size, bool clearMemory = true)
         {
             CurrentGlobalOffset += size;
 
@@ -1299,7 +1379,8 @@ namespace Unity.Entities.Serialization
 
                 // The previous page might be as filled as...empty, but so be it, this code path is not supposed to happen must and we absolutely need to maintain a Global Offset
                 Pages.Add(new PageInfo(buffer, size));
-            } else
+            }
+            else
             {
                 // Reserve to current page, if possible
                 var page = &Pages.Ptr[Pages.Length - 1];
@@ -1314,7 +1395,7 @@ namespace Unity.Entities.Serialization
                 else
                 {
                     // Allocate a new page that will contains the block to reserve because it couldn't fit in the previous page
-                    buffer = (byte*) Memory.Unmanaged.Allocate(PageSize, 16, Allocator);
+                    buffer = (byte*)Memory.Unmanaged.Allocate(PageSize, 16, Allocator);
                     var pi = new PageInfo(buffer, size);
                     Pages.Add(pi);
                 }

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Unity.Assertions;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Assertions;
 
 namespace Unity.Entities
 {
@@ -18,7 +18,7 @@ namespace Unity.Entities
         OnStopRunning,
         OnCreateForCompiler,
 
-        Count
+        Count,
     }
 
     unsafe struct UnmanagedComponentSystemDelegates
@@ -122,11 +122,10 @@ namespace Unity.Entities
             public static bool s_DisposeRegistered = false;
         }
 
-        struct Dummy
-        {
-        }
+        struct Dummy { }
 
-        internal readonly static SharedStatic<UnmanagedSystemTypeRegistryData> s_Data = SharedStatic<UnmanagedSystemTypeRegistryData>.GetOrCreate<Dummy>();
+        internal static readonly SharedStatic<UnmanagedSystemTypeRegistryData> s_Data =
+            SharedStatic<UnmanagedSystemTypeRegistryData>.GetOrCreate<Dummy>();
 
         // TODO: Need to dispose this thing when domain reload happens.
         public delegate void ForwardingFunc(IntPtr systemPtr, IntPtr state);
@@ -159,9 +158,18 @@ namespace Unity.Entities
         }
 
         [ExcludeFromBurstCompatTesting("Takes managed Type")]
-        public static unsafe void AddUnmanagedSystemType(Type type, long typeHash, ForwardingFunc onCreate, ForwardingFunc onUpdate,
-            ForwardingFunc onDestroy, ForwardingFunc onStartRunning, ForwardingFunc onStopRunning, ForwardingFunc onCreateForCompiler,
-            string debugName, int burstCompileBits)
+        public static unsafe void AddUnmanagedSystemType(
+            Type type,
+            long typeHash,
+            ForwardingFunc onCreate,
+            ForwardingFunc onUpdate,
+            ForwardingFunc onDestroy,
+            ForwardingFunc onStartRunning,
+            ForwardingFunc onStopRunning,
+            ForwardingFunc onCreateForCompiler,
+            string debugName,
+            int burstCompileBits
+        )
         {
             //Debug.Log($"Adding unmanaged system type {debugName}, bcb={burstCompileBits}");
 
@@ -197,14 +205,16 @@ namespace Unity.Entities
             Assert.AreEqual(functions.Length, (int)UnmanagedSystemFunctionType.Count);
 
             // Buffer the data
-            Managed.s_PendingRegistrations.Add(new RegistrationEntry
-            {
-                m_Type = type,
-                m_TypeHash = typeHash,
-                m_Functions = functions,
-                m_DebugName = debugName,
-                m_BurstCompileBits = burstCompileBits
-            });
+            Managed.s_PendingRegistrations.Add(
+                new RegistrationEntry
+                {
+                    m_Type = type,
+                    m_TypeHash = typeHash,
+                    m_Functions = functions,
+                    m_DebugName = debugName,
+                    m_BurstCompileBits = burstCompileBits,
+                }
+            );
         }
 
         [ExcludeFromBurstCompatTesting("Uses managed delegate")]
@@ -218,11 +228,13 @@ namespace Unity.Entities
                     result = (ulong)GCHandle.ToIntPtr(GCHandle.Alloc(fp.Invoke));
                     return;
                 }
-                catch(InvalidCastException)
+                catch (InvalidCastException)
                 {
                     // Asset ImportWorkers are occasionally throwing InvalidCastExceptions. Provide some debug information when this happens
                     // then fall through to use the managed delegate directly rather than the delegate returned from Burst. DOTS-8094
-                    Debug.LogWarning($"SelectManagedFn failed to cast {fp.GetType()}. BurstFn: {burstFn}.Forwarding Func: {managedFn.GetType()}. Falling back to managed delegate. Please report this as a bug using Help > Report a Bug...");
+                    Debug.LogWarning(
+                        $"SelectManagedFn failed to cast {fp.GetType()}. BurstFn: {burstFn}.Forwarding Func: {managedFn.GetType()}. Falling back to managed delegate. Please report this as a bug using Help > Report a Bug..."
+                    );
                     burstFn = 0;
                 }
             }
@@ -263,7 +275,7 @@ namespace Unity.Entities
         }
 
         [ExcludeFromBurstCompatTesting("Uses managed delegates")]
-        public unsafe static void InitializePendingTypes()
+        public static unsafe void InitializePendingTypes()
         {
             if (Managed.s_PendingRegistrations == null)
                 return;
@@ -325,7 +337,10 @@ namespace Unity.Entities
                 {
                     // Burst: we're calling either directly into Burst code, or we are calling into a managed wrapper.
                     // In any case, creating the function pointer from the IntPtr is free.
-                    new FunctionPointer<ForwardingFunc>((IntPtr)delegates.BurstFunctions[functionIndex]).Invoke((IntPtr)systemPointer, (IntPtr)systemState);
+                    new FunctionPointer<ForwardingFunc>((IntPtr)delegates.BurstFunctions[functionIndex]).Invoke(
+                        (IntPtr)systemPointer,
+                        (IntPtr)systemState
+                    );
                 }
                 else
                 {
@@ -350,7 +365,7 @@ namespace Unity.Entities
         // * Burst has completed compilation of the method yet
         // Unfortunately there is no way to get this data from burst yet.
         // BUR-1651
-        internal unsafe static bool IsOnUpdateUsingBurst(in SystemState* state)
+        internal static unsafe bool IsOnUpdateUsingBurst(in SystemState* state)
         {
             bool isBurst = true;
             CheckBurst(ref isBurst);
@@ -360,7 +375,11 @@ namespace Unity.Entities
         }
 
         [BurstDiscard]
-        private static unsafe void ForwardToManaged(IntPtr delegateIntPtr, SystemState* systemState, void* systemPointer)
+        private static unsafe void ForwardToManaged(
+            IntPtr delegateIntPtr,
+            SystemState* systemState,
+            void* systemPointer
+        )
         {
             GCHandle h = GCHandle.FromIntPtr(delegateIntPtr);
             ((ForwardingFunc)h.Target)((IntPtr)systemPointer, (IntPtr)systemState);

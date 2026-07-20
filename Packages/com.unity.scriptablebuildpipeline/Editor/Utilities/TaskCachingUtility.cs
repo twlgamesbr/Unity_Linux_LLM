@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Build.Pipeline.Interfaces;
 
-
 namespace UnityEditor.Build.Pipeline.Utilities
 {
     internal static class TaskCachingUtility
@@ -13,6 +12,7 @@ namespace UnityEditor.Build.Pipeline.Utilities
             public int Index;
             public CacheEntry entry;
             public string StatusText;
+
             public WorkItem(T context, string statusText = "")
             {
                 this.Context = context;
@@ -56,7 +56,11 @@ namespace UnityEditor.Build.Pipeline.Utilities
             CachedInfo CreateCachedInfo(WorkItem<T> item);
         }
 
-        public static ReturnCode RunCachedOperation<T>(IBuildCache cache, IBuildLogger log, IProgressTracker tracker, List<WorkItem<T>> workItems,
+        public static ReturnCode RunCachedOperation<T>(
+            IBuildCache cache,
+            IBuildLogger log,
+            IProgressTracker tracker,
+            List<WorkItem<T>> workItems,
             IRunCachedCallbacks<T> cbs
         )
         {
@@ -116,7 +120,10 @@ namespace UnityEditor.Build.Pipeline.Utilities
                     }
                 }
 
-                log.AddEntrySafe(LogLevel.Info, $"Total Entries: {workItems.Count}, Processed: {nonCachedItems.Count}, Cached: {cachedItems.Count}");
+                log.AddEntrySafe(
+                    LogLevel.Info,
+                    $"Total Entries: {workItems.Count}, Processed: {nonCachedItems.Count}, Cached: {cachedItems.Count}"
+                );
                 return ReturnCode.Success;
             }
         }

@@ -1,14 +1,14 @@
 using System;
 using System.Diagnostics;
-using UnityEngine.Assertions;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.Assertions;
 
 namespace Unity.Collections
 {
     /// <summary>
     /// A double rewindable allocators <see cref="RewindableAllocator"/>.
     /// </summary>
-    unsafe public struct DoubleRewindableAllocators : IDisposable
+    public unsafe struct DoubleRewindableAllocators : IDisposable
     {
         RewindableAllocator* Pointer;
         AllocatorHelper<RewindableAllocator> UpdateAllocatorHelper0;
@@ -101,7 +101,9 @@ namespace Unity.Collections
         {
             get
             {
-                Assert.IsTrue(UpdateAllocatorHelper0.Allocator.EnableBlockFree == UpdateAllocatorHelper1.Allocator.EnableBlockFree);
+                Assert.IsTrue(
+                    UpdateAllocatorHelper0.Allocator.EnableBlockFree == UpdateAllocatorHelper1.Allocator.EnableBlockFree
+                );
                 return UpdateAllocatorHelper0.Allocator.EnableBlockFree;
             }
             set

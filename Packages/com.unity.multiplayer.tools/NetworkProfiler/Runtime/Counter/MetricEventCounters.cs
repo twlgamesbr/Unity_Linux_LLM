@@ -19,9 +19,7 @@ namespace Unity.Multiplayer.Tools.NetworkProfiler.Runtime
             m_ReceivedCounter = counterFactory.Construct(Received);
         }
 
-        public void Sample<TEventData>(
-            IReadOnlyCollection<TEventData> sent,
-            IReadOnlyCollection<TEventData> received)
+        public void Sample<TEventData>(IReadOnlyCollection<TEventData> sent, IReadOnlyCollection<TEventData> received)
         {
             m_SentCounter.Sample(sent.Count);
             m_ReceivedCounter.Sample(received.Count);

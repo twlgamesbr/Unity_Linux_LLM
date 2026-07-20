@@ -12,12 +12,15 @@ namespace Unity.Entities
         /// <summary>
         /// System view into journal buffer.
         /// </summary>
-        [GenerateTestsForBurstCompatibility(RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING")]
+        [GenerateTestsForBurstCompatibility(
+            RequiredUnityDefine = "(UNITY_EDITOR || DEVELOPMENT_BUILD) && !DISABLE_ENTITIES_JOURNALING"
+        )]
         [DebuggerDisplay("{Name}")]
         [StructLayout(LayoutKind.Sequential)]
-        public unsafe readonly struct SystemView : IEquatable<SystemView>
+        public readonly unsafe struct SystemView : IEquatable<SystemView>
         {
-            [NativeDisableUnsafePtrRestriction] readonly SystemHandle* m_HandlePtr;
+            [NativeDisableUnsafePtrRestriction]
+            readonly SystemHandle* m_HandlePtr;
 
             /// <summary>
             /// The system untyped handle.
@@ -42,11 +45,18 @@ namespace Unity.Entities
             }
 
             public bool Equals(SystemView other) => Handle == other.Handle;
-            [ExcludeFromBurstCompatTesting("Takes managed object")] public override bool Equals(object obj) => obj is SystemView type ? Equals(type) : false;
+
+            [ExcludeFromBurstCompatTesting("Takes managed object")]
+            public override bool Equals(object obj) => obj is SystemView type ? Equals(type) : false;
+
             public override int GetHashCode() => Handle.GetHashCode();
+
             public static bool operator ==(SystemView lhs, SystemView rhs) => lhs.Handle == rhs.Handle;
+
             public static bool operator !=(SystemView lhs, SystemView rhs) => !(lhs == rhs);
-            [ExcludeFromBurstCompatTesting("Returns managed object")] public override string ToString() => $"{Name}:{Handle.GetHashCode()}";
+
+            [ExcludeFromBurstCompatTesting("Returns managed object")]
+            public override string ToString() => $"{Name}:{Handle.GetHashCode()}";
         }
     }
 }

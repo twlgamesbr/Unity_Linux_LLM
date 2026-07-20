@@ -68,7 +68,10 @@ namespace Unity.PlatformToolkit
         /// </remarks>
         /// <param name="writtenFiles">Collection of written files: file names and written data.</param>
         /// <param name="deletedFiles">Collection of deleted file names.</param>
-        public void GetModifiedFiles(out IReadOnlyCollection<(string name, byte[] data)> writtenFiles, out IReadOnlyCollection<string> deletedFiles)
+        public void GetModifiedFiles(
+            out IReadOnlyCollection<(string name, byte[] data)> writtenFiles,
+            out IReadOnlyCollection<string> deletedFiles
+        )
         {
             lock (m_Lock)
             {

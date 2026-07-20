@@ -20,8 +20,10 @@ namespace UnityEngine.Rendering
     {
         /// <summary>No occlusion test, all instances are visible.</summary>
         None,
+
         /// <summary>Test all instances against the latest occluders.</summary>
         TestAll,
+
         /// <summary>Only test the culled objects from the previous pass.</summary>
         TestCulled,
     }
@@ -49,6 +51,7 @@ namespace UnityEngine.Rendering
     {
         /// <summary>The split index to read from the CPU culling output.</summary>
         public int cullingSplitIndex;
+
         /// <summary>The occluder subview to occlusion test against.</summary>
         public int occluderSubviewIndex;
     }
@@ -58,8 +61,10 @@ namespace UnityEngine.Rendering
     {
         /// <summary>The instance ID of the camera, to identify the culling output and occluders to use.</summary>
         public EntityId viewInstanceID;
+
         /// <summary>The occlusion test to use.</summary>
         public OcclusionTest occlusionTest;
+
         /// <summary>An instance multiplier to use for the generated indirect draw calls.</summary>
         public int instanceMultiplier;
 
@@ -84,15 +89,19 @@ namespace UnityEngine.Rendering
 
         /// <summary>The slice index of the depth data to read.</summary>
         public int depthSliceIndex;
+
         /// <summary>The offset in pixels to the start of the depth data to read.</summary>
         public Vector2Int depthOffset;
 
         /// <summary>The transform from world space to view space when rendering the depth buffer.</summary>
         public Matrix4x4 viewMatrix;
+
         /// <summary>The transform from view space to world space when rendering the depth buffer.</summary>
         public Matrix4x4 invViewMatrix;
+
         /// <summary>The GPU projection matrix when rendering the depth buffer.</summary>
         public Matrix4x4 gpuProjMatrix;
+
         /// <summary>An additional world space offset to apply when moving between world space and view space.</summary>
         public Vector3 viewOffsetWorldSpace;
 
@@ -117,13 +126,16 @@ namespace UnityEngine.Rendering
     {
         /// <summary>The instance ID of the camera, used to identify these occluders for the occlusion test.</summary>
         public EntityId viewInstanceID;
+
         /// <summary>The total number of subviews for this occluder.</summary>
         public int subviewCount;
 
         /// <summary>The depth texture to read.</summary>
         public TextureHandle depthTexture;
+
         /// <summary>The size in pixels of the area of the depth data to read.</summary>
         public Vector2Int depthSize;
+
         /// <summary>True if the depth texture is a texture array, false otherwise.</summary>
         public bool depthIsArray;
 

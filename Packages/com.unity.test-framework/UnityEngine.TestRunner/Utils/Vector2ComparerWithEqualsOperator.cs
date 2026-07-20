@@ -8,12 +8,17 @@ namespace UnityEngine.TestTools.Utils
     public class Vector2ComparerWithEqualsOperator : IEqualityComparer<Vector2>
     {
         private static readonly Vector2ComparerWithEqualsOperator m_Instance = new Vector2ComparerWithEqualsOperator();
+
         /// <summary>
         /// A singleton instance of the comparer with a predefined default error value.
         /// </summary>
-        public static Vector2ComparerWithEqualsOperator Instance { get { return m_Instance; } }
+        public static Vector2ComparerWithEqualsOperator Instance
+        {
+            get { return m_Instance; }
+        }
 
-        private Vector2ComparerWithEqualsOperator() {}
+        private Vector2ComparerWithEqualsOperator() { }
+
         /// <summary>
         /// Compares the actual and expected objects for equality using a custom comparison mechanism.
         /// </summary>

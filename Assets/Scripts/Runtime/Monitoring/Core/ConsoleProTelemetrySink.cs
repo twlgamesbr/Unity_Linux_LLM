@@ -28,9 +28,7 @@ namespace NPCSystem.Monitoring
 
         public void Emit(in TelemetryEvent evt)
         {
-            string category = string.IsNullOrWhiteSpace(evt.Category)
-                ? "system"
-                : evt.Category.ToLowerInvariant();
+            string category = string.IsNullOrWhiteSpace(evt.Category) ? "system" : evt.Category.ToLowerInvariant();
 
             string filterName = $"{_filterPrefix.ToLowerInvariant()}/{category}";
             string logMessage = BuildLogMessage(evt, category);

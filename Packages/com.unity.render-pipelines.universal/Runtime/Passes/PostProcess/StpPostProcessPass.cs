@@ -1,5 +1,5 @@
-using UnityEngine.Rendering.RenderGraphModule;
 using System.Runtime.CompilerServices; // AggressiveInlining
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace UnityEngine.Rendering.Universal
 {
@@ -15,7 +15,7 @@ namespace UnityEngine.Rendering.Universal
         public StpPostProcessPass(Texture2D[] blueNoise16LTex)
         {
             this.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing - 1;
-            this.profilingSampler = null;   // Use default name
+            this.profilingSampler = null; // Use default name
             m_BlueNoise16LTex = blueNoise16LTex;
 
             m_IsValid = m_BlueNoise16LTex != null && m_BlueNoise16LTex.Length > 0;
@@ -61,7 +61,13 @@ namespace UnityEngine.Rendering.Universal
 
             var srcDesc = renderGraph.GetTextureDesc(sourceTexture);
             var dstDesc = StpPostProcessPass.GetStpTargetDesc(srcDesc, cameraData);
-            var destinationTexture =  PostProcessUtils.CreateCompatibleTexture(renderGraph, dstDesc, k_UpscaledColorTargetName, false, FilterMode.Bilinear);
+            var destinationTexture = PostProcessUtils.CreateCompatibleTexture(
+                renderGraph,
+                dstDesc,
+                k_UpscaledColorTargetName,
+                false,
+                FilterMode.Bilinear
+            );
 
             TextureHandle cameraDepth = resourceData.cameraDepthTexture;
             TextureHandle motionVectors = resourceData.motionVectorColor;
@@ -71,11 +77,24 @@ namespace UnityEngine.Rendering.Universal
             int frameIndex = Time.frameCount;
             var noiseTexture = m_BlueNoise16LTex[frameIndex & (m_BlueNoise16LTex.Length - 1)];
 
-            StpUtils.Execute(renderGraph, resourceData, cameraData, sourceTexture, cameraDepth, motionVectors, destinationTexture, noiseTexture);
+            StpUtils.Execute(
+                renderGraph,
+                resourceData,
+                cameraData,
+                sourceTexture,
+                cameraDepth,
+                motionVectors,
+                destinationTexture,
+                noiseTexture
+            );
 
             // Update the camera resolution to reflect the upscaled size
             var destDesc = destinationTexture.GetDescriptor(renderGraph);
-            UpscalerPostProcessPass.UpdateCameraResolution(renderGraph, cameraData, new Vector2Int(destDesc.width, destDesc.height));
+            UpscalerPostProcessPass.UpdateCameraResolution(
+                renderGraph,
+                cameraData,
+                new Vector2Int(destDesc.width, destDesc.height)
+            );
 
             resourceData.cameraColor = destinationTexture;
         }
@@ -83,11 +102,13 @@ namespace UnityEngine.Rendering.Universal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TextureDesc GetStpTargetDesc(in TextureDesc sourceDesc, UniversalCameraData cameraData)
         {
-            var targetDesc = PostProcessUtils.GetCompatibleDescriptor(sourceDesc,
+            var targetDesc = PostProcessUtils.GetCompatibleDescriptor(
+                sourceDesc,
                 cameraData.pixelWidth,
                 cameraData.pixelHeight,
                 // Avoid enabling sRGB because STP works with compute shaders which can't output sRGB automatically.
-                Experimental.Rendering.GraphicsFormatUtility.GetLinearFormat(sourceDesc.format));
+                Experimental.Rendering.GraphicsFormatUtility.GetLinearFormat(sourceDesc.format)
+            );
 
             // STP uses compute shaders so all render textures must enable random writes
             targetDesc.enableRandomWrite = true;
@@ -96,8 +117,6 @@ namespace UnityEngine.Rendering.Universal
         }
 
         // Precomputed shader ids to same some CPU cycles (mostly affects mobile)
-        public static class ShaderConstants
-        {
-        }
+        public static class ShaderConstants { }
     }
 }

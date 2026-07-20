@@ -36,7 +36,7 @@ namespace UnityEngine.InputSystem.LowLevel
         {
             get
             {
-                fixed(byte* data = stateData)
+                fixed (byte* data = stateData)
                 {
                     return data;
                 }
@@ -47,7 +47,7 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public InputEventPtr ToEventPtr()
         {
-            fixed(DeltaStateEvent * ptr = &this)
+            fixed (DeltaStateEvent* ptr = &this)
             {
                 return new InputEventPtr((InputEvent*)ptr);
             }
@@ -68,14 +68,20 @@ namespace UnityEngine.InputSystem.LowLevel
             return (DeltaStateEvent*)ptr.data;
         }
 
-        public static NativeArray<byte> From(InputControl control, out InputEventPtr eventPtr,  Allocator allocator = Allocator.Temp)
+        public static NativeArray<byte> From(
+            InputControl control,
+            out InputEventPtr eventPtr,
+            Allocator allocator = Allocator.Temp
+        )
         {
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
             var device = control.device;
             if (!device.added)
-                throw new ArgumentException($"Device for control '{control}' has not been added to system",
-                    nameof(control));
+                throw new ArgumentException(
+                    $"Device for control '{control}' has not been added to system",
+                    nameof(control)
+                );
             if (control.currentStatePtr == null) // Protects statePtr assignment below
                 throw new ArgumentNullException($"Control '{control}' does not have an associated state");
 
@@ -95,7 +101,12 @@ namespace UnityEngine.InputSystem.LowLevel
             var buffer = new NativeArray<byte>((int)eventSize.AlignToMultipleOf(4), allocator);
             var stateEventPtr = (DeltaStateEvent*)buffer.GetUnsafePtr();
 
-            stateEventPtr->baseEvent = new InputEvent(Type, (int)eventSize, device.deviceId, InputRuntime.s_Instance.currentTime);
+            stateEventPtr->baseEvent = new InputEvent(
+                Type,
+                (int)eventSize,
+                device.deviceId,
+                InputRuntime.s_Instance.currentTime
+            );
             stateEventPtr->stateFormat = stateFormat;
             stateEventPtr->stateOffset = controlStateBlock.byteOffset - deviceStateBlock.byteOffset; // Make offset relative to device.
             UnsafeUtility.MemCpy(stateEventPtr->deltaState, statePtr, stateSize);

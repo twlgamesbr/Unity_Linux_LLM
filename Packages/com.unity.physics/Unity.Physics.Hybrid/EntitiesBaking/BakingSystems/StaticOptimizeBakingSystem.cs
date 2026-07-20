@@ -10,7 +10,7 @@ namespace Unity.Physics.Authoring
     /// Marks a primary entity as a static root when building the compound colliders.
     /// </summary>
     [TemporaryBakingType]
-    struct StaticOptimizePhysicsBaking : IComponentData {}
+    struct StaticOptimizePhysicsBaking : IComponentData { }
 
     /// <summary>
     /// Component added on additional entities in bakers to mark the static root found during the baking of a collider.
@@ -54,7 +54,8 @@ namespace Unity.Physics.Authoring
                 ComponentType.ReadWrite<StaticOptimizePhysicsBaking>(),
                 ComponentType.ReadWrite<PhysicsWorldIndex>(),
                 ComponentType.ReadWrite<PhysicsCompoundData>(),
-                ComponentType.ReadWrite<PhysicsCollider>());
+                ComponentType.ReadWrite<PhysicsCollider>()
+            );
         }
 
         [BurstCompile]
@@ -96,17 +97,23 @@ namespace Unity.Physics.Authoring
 
                 systemState.EntityManager.SetSharedComponent(rootEntity, new PhysicsWorldIndex());
 
-                systemState.EntityManager.SetComponentData(rootEntity, new PhysicsCompoundData()
-                {
-                    AssociateBlobToBody = false,
-                    ConvertedBodyEntityId = kv.Value.ConvertedBodyEntityId,
-                    Hash = default,
-                });
+                systemState.EntityManager.SetComponentData(
+                    rootEntity,
+                    new PhysicsCompoundData()
+                    {
+                        AssociateBlobToBody = false,
+                        ConvertedBodyEntityId = kv.Value.ConvertedBodyEntityId,
+                        Hash = default,
+                    }
+                );
             }
         }
 
         [BurstCompile]
-        static void GetUniqueRoots(in NativeArray<BakeStaticRoot> rootMarkers, ref NativeHashMap<Entity, BakeStaticRoot> bodyRoots)
+        static void GetUniqueRoots(
+            in NativeArray<BakeStaticRoot> rootMarkers,
+            ref NativeHashMap<Entity, BakeStaticRoot> bodyRoots
+        )
         {
             for (int i = 0, count = rootMarkers.Length; i < count; ++i)
             {

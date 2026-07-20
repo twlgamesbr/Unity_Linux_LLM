@@ -12,7 +12,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         private IRayTracingAccelStruct _accelStruct;
         AccelStructInstances _instances;
 
-        internal AccelStructInstances Instances { get => _instances; }
+        internal AccelStructInstances Instances
+        {
+            get => _instances;
+        }
 
         struct IdsOfInstances
         {
@@ -29,8 +32,10 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         }
 
         public AccelStructAdapter(IRayTracingAccelStruct accelStruct, RayTracingResources resources)
-            : this(accelStruct, new GeometryPool(GeometryPoolDesc.NewDefault(), resources.geometryPoolKernels, resources.copyBuffer))
-        { }
+            : this(
+                accelStruct,
+                new GeometryPool(GeometryPoolDesc.NewDefault(), resources.geometryPoolKernels, resources.copyBuffer)
+            ) { }
 
         public IRayTracingAccelStruct GetAccelerationStructure()
         {
@@ -54,7 +59,14 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             _objectHandleToInstances.Clear();
         }
 
-        public void AddInstance(UInt64 objectHandle, Component meshRendererOrTerrain, Span<uint> perSubMeshMask, Span<uint> perSubMeshMaterialIDs, Span<bool> perSubMeshIsOpaque, uint renderingLayerMask)
+        public void AddInstance(
+            UInt64 objectHandle,
+            Component meshRendererOrTerrain,
+            Span<uint> perSubMeshMask,
+            Span<uint> perSubMeshMaterialIDs,
+            Span<bool> perSubMeshIsOpaque,
+            uint renderingLayerMask
+        )
         {
             if (meshRendererOrTerrain is Terrain terrain)
             {
@@ -73,13 +85,32 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             {
                 var meshRenderer = (MeshRenderer)meshRendererOrTerrain;
                 Debug.Assert(meshRenderer.enabled, "Mesh renderers are expected to be enabled.");
-                Debug.Assert(!meshRenderer.isPartOfStaticBatch, "Mesh renderers are expected to not be part of static batch.");
+                Debug.Assert(
+                    !meshRenderer.isPartOfStaticBatch,
+                    "Mesh renderers are expected to not be part of static batch."
+                );
                 var mesh = meshRenderer.GetComponent<MeshFilter>().sharedMesh;
-				AddInstance(objectHandle, mesh, meshRenderer.transform.localToWorldMatrix, perSubMeshMask, perSubMeshMaterialIDs, perSubMeshIsOpaque, renderingLayerMask);
+                AddInstance(
+                    objectHandle,
+                    mesh,
+                    meshRenderer.transform.localToWorldMatrix,
+                    perSubMeshMask,
+                    perSubMeshMaterialIDs,
+                    perSubMeshIsOpaque,
+                    renderingLayerMask
+                );
             }
         }
 
-        public void AddInstance(UInt64 objectHandle, Mesh mesh, Matrix4x4 localToWorldMatrix, Span<uint> perSubMeshMask, Span<uint> perSubMeshMaterialIDs, Span<bool> perSubMeshIsOpaque, uint renderingLayerMask)
+        public void AddInstance(
+            UInt64 objectHandle,
+            Mesh mesh,
+            Matrix4x4 localToWorldMatrix,
+            Span<uint> perSubMeshMask,
+            Span<uint> perSubMeshMaterialIDs,
+            Span<bool> perSubMeshIsOpaque,
+            uint renderingLayerMask
+        )
         {
             int subMeshCount = mesh.subMeshCount;
 
@@ -90,10 +121,14 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 {
                     localToWorldMatrix = localToWorldMatrix,
                     mask = perSubMeshMask[i],
-                    opaqueGeometry = perSubMeshIsOpaque[i]
+                    opaqueGeometry = perSubMeshIsOpaque[i],
                 };
 
-                instances[i].IdOfInstance = _instances.AddInstance(instanceDesc, perSubMeshMaterialIDs[i], renderingLayerMask);
+                instances[i].IdOfInstance = _instances.AddInstance(
+                    instanceDesc,
+                    perSubMeshMaterialIDs[i],
+                    renderingLayerMask
+                );
                 instanceDesc.instanceID = (uint)instances[i].IdOfInstance;
                 instances[i].AccelStructID = _accelStruct.AddInstance(instanceDesc);
             }
@@ -109,7 +144,6 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             AddTrees(terrainDesc, ref instanceHandles);
 
             _objectHandleToInstances.Add(objectHandle, instanceHandles.ToArray());
-
         }
 
         void AddHeightmap(TerrainDesc terrainDesc, ref List<IdsOfInstances> instanceHandles)
@@ -122,14 +156,16 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             instanceDesc.frontTriangleCounterClockwise = terrainDesc.frontTriangleCounterClockwise;
 
             instanceHandles.Add(AddInstance(instanceDesc, terrainDesc.materialID, terrainDesc.renderingLayerMask));
-
         }
 
         void AddTrees(TerrainDesc terrainDesc, ref List<IdsOfInstances> instanceHandles)
         {
             TerrainData terrainData = terrainDesc.terrain.terrainData;
             Matrix4x4 terrainLocalToWorld = terrainDesc.localToWorldMatrix;
-            Vector3 positionScale = Vector3.Scale(new Vector3(terrainData.heightmapResolution, 1.0f, terrainData.heightmapResolution), terrainData.heightmapScale);
+            Vector3 positionScale = Vector3.Scale(
+                new Vector3(terrainData.heightmapResolution, 1.0f, terrainData.heightmapResolution),
+                terrainData.heightmapScale
+            );
             Vector3 positionOffset = terrainLocalToWorld.GetPosition();
 
             foreach (var treeInstance in terrainData.treeInstances)
@@ -137,7 +173,8 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                 var localToWorld = Matrix4x4.TRS(
                     positionOffset + Vector3.Scale(treeInstance.position, positionScale),
                     Quaternion.AngleAxis(treeInstance.rotation, Vector3.up),
-                    new Vector3(treeInstance.widthScale, treeInstance.heightScale, treeInstance.widthScale));
+                    new Vector3(treeInstance.widthScale, treeInstance.heightScale, treeInstance.widthScale)
+                );
 
                 var prefab = terrainData.treePrototypes[treeInstance.prototypeIndex].prefab;
 
@@ -159,7 +196,9 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
                     instanceDesc.mask = terrainDesc.mask;
                     instanceDesc.enableTriangleCulling = terrainDesc.enableTriangleCulling;
                     instanceDesc.frontTriangleCounterClockwise = terrainDesc.frontTriangleCounterClockwise;
-                    instanceHandles.Add(AddInstance(instanceDesc, terrainDesc.materialID, 1u << prefab.gameObject.layer));
+                    instanceHandles.Add(
+                        AddInstance(instanceDesc, terrainDesc.materialID, 1u << prefab.gameObject.layer)
+                    );
                 }
             }
         }
@@ -173,7 +212,6 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
 
             return res;
         }
-
 
         public void RemoveInstance(UInt64 objectHandle)
         {
@@ -194,7 +232,7 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             bool success = _objectHandleToInstances.TryGetValue(objectHandle, out var instances);
             Assert.IsTrue(success);
 
-            foreach(var instance in instances)
+            foreach (var instance in instances)
             {
                 _instances.UpdateInstanceTransform(instance.IdOfInstance, localToWorldMatrix);
                 _accelStruct.UpdateInstanceTransform(instance.AccelStructID, localToWorldMatrix);
@@ -266,7 +304,6 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
             instanceIDs = Array.ConvertAll(instIDs, item => item.IdOfInstance);
             return true;
         }
-
     }
 
     internal struct TerrainDesc

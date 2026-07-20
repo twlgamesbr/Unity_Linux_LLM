@@ -39,6 +39,7 @@ namespace UnityEngine.Rendering.Universal
         }
 
         private const int k_XRViewCountPerPass = 2;
+
         private class PassData
         {
             internal RendererListHandle objMotionRendererList;
@@ -61,7 +62,10 @@ namespace UnityEngine.Rendering.Universal
 
         private static DrawingSettings GetObjectMotionDrawingSettings(Camera camera, bool isTransparent = false)
         {
-            var sortingSettings = new SortingSettings(camera) { criteria = isTransparent ? SortingCriteria.CommonTransparent : SortingCriteria.CommonOpaque };
+            var sortingSettings = new SortingSettings(camera)
+            {
+                criteria = isTransparent ? SortingCriteria.CommonTransparent : SortingCriteria.CommonOpaque,
+            };
             // Notes: Usually, PerObjectData.MotionVectors will filter the renderer nodes to only draw moving objects.
             // In our case, we use forceAllMotionVectorObjects in the filteringSettings to draw idle objects as well to populate depth.
             var drawingSettings = new DrawingSettings(k_MotionOnlyShaderTagId, sortingSettings)
@@ -77,7 +81,12 @@ namespace UnityEngine.Rendering.Universal
             return drawingSettings;
         }
 
-        private void InitObjectMotionRendererLists(ref PassData passData, ref CullingResults cullResults, RenderGraph renderGraph, Camera camera)
+        private void InitObjectMotionRendererLists(
+            ref PassData passData,
+            ref CullingResults cullResults,
+            RenderGraph renderGraph,
+            Camera camera
+        )
         {
             var objectMotionDrawingSettings = GetObjectMotionDrawingSettings(camera);
 
@@ -86,9 +95,22 @@ namespace UnityEngine.Rendering.Universal
             filteringSettings.forceAllMotionVectorObjects = true;
             var renderStateBlock = new RenderStateBlock(RenderStateMask.Nothing);
 
-            RenderingUtils.CreateRendererListWithRenderStateBlock(renderGraph, ref cullResults, objectMotionDrawingSettings, filteringSettings, renderStateBlock, ref passData.objMotionRendererList);
+            RenderingUtils.CreateRendererListWithRenderStateBlock(
+                renderGraph,
+                ref cullResults,
+                objectMotionDrawingSettings,
+                filteringSettings,
+                renderStateBlock,
+                ref passData.objMotionRendererList
+            );
         }
-        private void InitTransparentObjectMotionRendererLists(ref PassData passData, ref CullingResults cullResults, RenderGraph renderGraph, Camera camera)
+
+        private void InitTransparentObjectMotionRendererLists(
+            ref PassData passData,
+            ref CullingResults cullResults,
+            RenderGraph renderGraph,
+            Camera camera
+        )
         {
             var objectMotionDrawingSettings = GetObjectMotionDrawingSettings(camera, true);
 
@@ -97,7 +119,14 @@ namespace UnityEngine.Rendering.Universal
             filteringSettings.forceAllMotionVectorObjects = true;
             var renderStateBlock = new RenderStateBlock(RenderStateMask.Nothing);
 
-            RenderingUtils.CreateRendererListWithRenderStateBlock(renderGraph, ref cullResults, objectMotionDrawingSettings, filteringSettings, renderStateBlock, ref passData.objTransparentMotionRendererList);
+            RenderingUtils.CreateRendererListWithRenderStateBlock(
+                renderGraph,
+                ref cullResults,
+                objectMotionDrawingSettings,
+                filteringSettings,
+                renderStateBlock,
+                ref passData.objTransparentMotionRendererList
+            );
         }
 
         /// <summary>
@@ -178,12 +207,16 @@ namespace UnityEngine.Rendering.Universal
             importMotionDepthParams.discardOnLastUse = false;
 
             xrMotionVectorColor = renderGraph.ImportTexture(m_XRMotionVectorColor, importInfo, importMotionColorParams);
-            xrMotionVectorDepth = renderGraph.ImportTexture(m_XRMotionVectorDepth, importInfoDepth, importMotionDepthParams);
+            xrMotionVectorDepth = renderGraph.ImportTexture(
+                m_XRMotionVectorDepth,
+                importInfoDepth,
+                importMotionDepthParams
+            );
 
             m_XRSpaceWarpRightHandedNDC = cameraData.xr.spaceWarpRightHandedNDC;
         }
 
-#region Recording
+        #region Recording
         internal void Render(RenderGraph renderGraph, ContextContainer frameData)
         {
             UniversalRenderingData renderingData = frameData.Get<UniversalRenderingData>();
@@ -192,14 +225,18 @@ namespace UnityEngine.Rendering.Universal
             // XR should be enabled and single pass should be enabled.
             if (!cameraData.xr.enabled || !cameraData.xr.singlePassEnabled)
             {
-                Debug.LogWarning("XRDepthMotionPass::Render is skipped because either XR is not enabled or singlepass rendering is not enabled.");
+                Debug.LogWarning(
+                    "XRDepthMotionPass::Render is skipped because either XR is not enabled or singlepass rendering is not enabled."
+                );
                 return;
             }
 
             // XR motion vector pass should be enabled.
             if (!cameraData.xr.hasMotionVectorPass)
             {
-                Debug.LogWarning("XRDepthMotionPass::Render is skipped because XR motion vector is not enabled for the current XRPass.");
+                Debug.LogWarning(
+                    "XRDepthMotionPass::Render is skipped because XR motion vector is not enabled for the current XRPass."
+                );
                 return;
             }
 
@@ -211,7 +248,13 @@ namespace UnityEngine.Rendering.Universal
             cameraData.camera.depthTextureMode |= DepthTextureMode.MotionVectors | DepthTextureMode.Depth;
 
             // Start recording the pass
-            using (var builder = renderGraph.AddRasterRenderPass<PassData>("XR Motion Pass", out var passData, base.profilingSampler))
+            using (
+                var builder = renderGraph.AddRasterRenderPass<PassData>(
+                    "XR Motion Pass",
+                    out var passData,
+                    base.profilingSampler
+                )
+            )
             {
                 builder.EnableFoveatedRasterization(cameraData.xr.supportsFoveatedRendering);
 
@@ -225,9 +268,19 @@ namespace UnityEngine.Rendering.Universal
                 builder.SetRenderAttachmentDepth(xrMotionVectorDepth, AccessFlags.ReadWrite);
 
                 // Setup RendererList
-                InitObjectMotionRendererLists(ref passData, ref renderingData.cullResults, renderGraph, cameraData.camera);
+                InitObjectMotionRendererLists(
+                    ref passData,
+                    ref renderingData.cullResults,
+                    renderGraph,
+                    cameraData.camera
+                );
                 builder.UseRendererList(passData.objMotionRendererList);
-                InitTransparentObjectMotionRendererLists(ref passData, ref renderingData.cullResults, renderGraph, cameraData.camera);
+                InitTransparentObjectMotionRendererLists(
+                    ref passData,
+                    ref renderingData.cullResults,
+                    renderGraph,
+                    cameraData.camera
+                );
                 builder.UseRendererList(passData.objTransparentMotionRendererList);
 
                 // Allow setting up global matrix array
@@ -235,30 +288,45 @@ namespace UnityEngine.Rendering.Universal
                 // Setup rest of the passData
                 InitPassData(ref passData, cameraData);
 
-                builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
-                {
-                    // Setup camera stereo buffer
-                    context.cmd.SetGlobalMatrixArray(ShaderPropertyId.previousViewProjectionNoJitterStereo, data.previousViewProjectionStereo);
-                    context.cmd.SetGlobalMatrixArray(ShaderPropertyId.viewProjectionNoJitterStereo, data.viewProjectionStereo);
+                builder.SetRenderFunc(
+                    (PassData data, RasterGraphContext context) =>
+                    {
+                        // Setup camera stereo buffer
+                        context.cmd.SetGlobalMatrixArray(
+                            ShaderPropertyId.previousViewProjectionNoJitterStereo,
+                            data.previousViewProjectionStereo
+                        );
+                        context.cmd.SetGlobalMatrixArray(
+                            ShaderPropertyId.viewProjectionNoJitterStereo,
+                            data.viewProjectionStereo
+                        );
 
-                    // SpaceWarp is only available on Vulkan, so these values are always true. This is to support 2 versions of spacewarp
-                    // One expects OpenGL NDC space motion vectors, the other expects Vulkan NDC space
-                    context.cmd.SetGlobalFloat(k_SpaceWarpNDCModifier, m_XRSpaceWarpRightHandedNDC ? -1.0f : 1.0f);
+                        // SpaceWarp is only available on Vulkan, so these values are always true. This is to support 2 versions of spacewarp
+                        // One expects OpenGL NDC space motion vectors, the other expects Vulkan NDC space
+                        context.cmd.SetGlobalFloat(k_SpaceWarpNDCModifier, m_XRSpaceWarpRightHandedNDC ? -1.0f : 1.0f);
 
-                    // Object Motion for both static and dynamic objects, fill stencil for mv filled pixels.
-                    context.cmd.DrawRendererList(passData.objMotionRendererList);
+                        // Object Motion for both static and dynamic objects, fill stencil for mv filled pixels.
+                        context.cmd.DrawRendererList(passData.objMotionRendererList);
 
-                    // Fill mv texturew with camera motion for pixels that don't have mv stencil bit.
-                    context.cmd.DrawProcedural(Matrix4x4.identity, data.xrMotionVector, 0, MeshTopology.Triangles, 3, 1);
+                        // Fill mv texturew with camera motion for pixels that don't have mv stencil bit.
+                        context.cmd.DrawProcedural(
+                            Matrix4x4.identity,
+                            data.xrMotionVector,
+                            0,
+                            MeshTopology.Triangles,
+                            3,
+                            1
+                        );
 
-                    // Transparent Object Motion for both static and dynamic objects, fill stencil for mv filled pixels.
-                    context.cmd.SetKeyword(ShaderGlobalKeywords.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT, true);
-                    context.cmd.DrawRendererList(passData.objTransparentMotionRendererList);
-                    context.cmd.SetKeyword(ShaderGlobalKeywords.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT, false);
-                });
+                        // Transparent Object Motion for both static and dynamic objects, fill stencil for mv filled pixels.
+                        context.cmd.SetKeyword(ShaderGlobalKeywords.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT, true);
+                        context.cmd.DrawRendererList(passData.objTransparentMotionRendererList);
+                        context.cmd.SetKeyword(ShaderGlobalKeywords.APPLICATION_SPACE_WARP_MOTION_TRANSPARENT, false);
+                    }
+                );
             }
         }
-#endregion
+        #endregion
 
         private void ResetMotionData()
         {
@@ -278,15 +346,21 @@ namespace UnityEngine.Rendering.Universal
         {
             if (!cameraData.xr.enabled || !cameraData.xr.singlePassEnabled)
             {
-                Debug.LogWarning("XRDepthMotionPass::Update is skipped because either XR is not enabled or singlepass rendering is not enabled.");
+                Debug.LogWarning(
+                    "XRDepthMotionPass::Update is skipped because either XR is not enabled or singlepass rendering is not enabled."
+                );
                 return;
             }
 
             if (m_LastFrameIndex != Time.frameCount)
             {
                 {
-                    var gpuVP0 = GL.GetGPUProjectionMatrix(cameraData.GetProjectionMatrixNoJitter(0), renderIntoTexture: false) * cameraData.GetViewMatrix(0);
-                    var gpuVP1 = GL.GetGPUProjectionMatrix(cameraData.GetProjectionMatrixNoJitter(1), renderIntoTexture: false) * cameraData.GetViewMatrix(1);
+                    var gpuVP0 =
+                        GL.GetGPUProjectionMatrix(cameraData.GetProjectionMatrixNoJitter(0), renderIntoTexture: false)
+                        * cameraData.GetViewMatrix(0);
+                    var gpuVP1 =
+                        GL.GetGPUProjectionMatrix(cameraData.GetProjectionMatrixNoJitter(1), renderIntoTexture: false)
+                        * cameraData.GetViewMatrix(1);
                     var xr = cameraData.xr;
                     var viewStartIndex = xr.viewCount * xr.multipassId;
                     m_PreviousViewProjection[viewStartIndex] = m_ViewProjection[viewStartIndex];

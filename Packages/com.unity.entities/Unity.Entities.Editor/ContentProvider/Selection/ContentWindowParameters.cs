@@ -18,7 +18,7 @@ namespace Unity.Entities.UI
         {
             ApplyInspectorStyling = false,
             AddScrollView = true,
-            MinSize = k_MinSize
+            MinSize = k_MinSize,
         };
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Unity.Entities.UI
         {
             ApplyInspectorStyling = true,
             AddScrollView = true,
-            MinSize = k_MinSize
+            MinSize = k_MinSize,
         };
 
         /// <summary>

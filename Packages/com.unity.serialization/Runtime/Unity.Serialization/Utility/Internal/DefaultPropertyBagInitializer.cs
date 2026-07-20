@@ -12,7 +12,7 @@ namespace Unity.Serialization
         {
             PropertyBag.Register(new Json.SerializedObjectViewPropertyBag());
             PropertyBag.Register(new Json.SerializedArrayViewPropertyBag());
-            
+
             UnsafeSerializedObjectReader.CreateBurstDelegates();
         }
     }

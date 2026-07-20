@@ -27,7 +27,7 @@ namespace UnityEngine.InputSystem.LowLevel
             return new QueryEditorWindowCoordinatesCommand
             {
                 baseCommand = new InputDeviceCommand(Type, kSize),
-                inOutCoordinates = playerWindowCoordinates
+                inOutCoordinates = playerWindowCoordinates,
             };
         }
     }

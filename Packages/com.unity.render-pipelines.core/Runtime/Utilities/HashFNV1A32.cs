@@ -126,7 +126,8 @@ namespace UnityEngine.Rendering
         /// <typeparam name="T">Any value type.</typeparam>
         /// <param name="input">Value to fold in.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Append<T>(T input) where T : struct
+        public void Append<T>(T input)
+            where T : struct
         {
             unchecked
             {
@@ -147,7 +148,9 @@ namespace UnityEngine.Rendering
     static class DelegateHashCodeUtils
     {
         //Cache to prevent CompilerGeneratedAttribute extraction for known delegate
-        static readonly Lazy<Dictionary<int, bool>> s_MethodHashCodeToSkipTargetHashMap = new(() => new Dictionary<int, bool>(64));
+        static readonly Lazy<Dictionary<int, bool>> s_MethodHashCodeToSkipTargetHashMap = new(() =>
+            new Dictionary<int, bool>(64)
+        );
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetFuncHashCode(Delegate del)
@@ -161,10 +164,12 @@ namespace UnityEngine.Rendering
             //If Lambda have any captured variable Target hashcode will be different each time we re-create lambda.
             if (!s_MethodHashCodeToSkipTargetHashMap.Value.TryGetValue(methodHashCode, out var skipTarget))
             {
-                skipTarget = del.Target == null || (
-                    del.Method.DeclaringType?.IsNestedPrivate == true &&
-                    Attribute.IsDefined(del.Method.DeclaringType, typeof(CompilerGeneratedAttribute), false)
-                );
+                skipTarget =
+                    del.Target == null
+                    || (
+                        del.Method.DeclaringType?.IsNestedPrivate == true
+                        && Attribute.IsDefined(del.Method.DeclaringType, typeof(CompilerGeneratedAttribute), false)
+                    );
 
                 s_MethodHashCodeToSkipTargetHashMap.Value[methodHashCode] = skipTarget;
             }

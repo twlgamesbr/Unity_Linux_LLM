@@ -24,7 +24,9 @@ namespace Unity.Entities
     /// If a BlobAsset is no longer used by any UnityObject, it will be disposed.
     /// Thread-safety: main thread only.
     /// </remarks>
-    struct BlobAssetComputationContext<TS, TB> : IDisposable where TS : unmanaged where TB : unmanaged
+    struct BlobAssetComputationContext<TS, TB> : IDisposable
+        where TS : unmanaged
+        where TB : unmanaged
     {
         /// <summary>
         /// Initializes and returns an instance of BlobAssetComputationContext.
@@ -36,7 +38,10 @@ namespace Unity.Entities
         public BlobAssetComputationContext(BlobAssetStore blobAssetStore, int initialCapacity, Allocator allocator)
         {
             if (!blobAssetStore.IsCreated)
-                throw new ArgumentNullException(nameof(blobAssetStore), "A valid BlobAssetStore must be passed to construct a BlobAssetComputationContext");
+                throw new ArgumentNullException(
+                    nameof(blobAssetStore),
+                    "A valid BlobAssetStore must be passed to construct a BlobAssetComputationContext"
+                );
             m_BlobAssetStore = blobAssetStore;
             m_ToCompute = new NativeParallelHashMap<Hash128, TS>(initialCapacity, allocator);
             m_Computed = new NativeParallelHashMap<Hash128, BlobAssetReference<TB>>(initialCapacity, allocator);
@@ -97,7 +102,9 @@ namespace Unity.Entities
         {
             if (!m_ToCompute.TryAdd(hash, settings))
             {
-                throw new ArgumentException($"The hash: {hash} already as a setting object. You shouldn't add a setting object more than once.");
+                throw new ArgumentException(
+                    $"The hash: {hash} already as a setting object. You shouldn't add a setting object more than once."
+                );
             }
         }
 
@@ -110,7 +117,9 @@ namespace Unity.Entities
         {
             if (!m_Computed.TryAdd(hash, blob) || !m_BlobAssetStore.TryAdd(hash, m_BlobAssetStoreTypeHash, ref blob))
             {
-                throw new ArgumentException($"There is already a BlobAsset with the hash: {hash} in the Store or the Computed list. You should add a newly computed BlobAsset only once.");
+                throw new ArgumentException(
+                    $"There is already a BlobAsset with the hash: {hash} in the Store or the Computed list. You should add a newly computed BlobAsset only once."
+                );
             }
         }
 
@@ -122,7 +131,8 @@ namespace Unity.Entities
         /// <returns>true if the blob asset was found, false otherwise</returns>
         public bool GetBlobAsset(Hash128 hash, out BlobAssetReference<TB> blob)
         {
-            return m_Computed.TryGetValue(hash, out blob) || m_BlobAssetStore.TryGet(hash, m_BlobAssetStoreTypeHash, out blob);
+            return m_Computed.TryGetValue(hash, out blob)
+                || m_BlobAssetStore.TryGet(hash, m_BlobAssetStoreTypeHash, out blob);
         }
     }
 }

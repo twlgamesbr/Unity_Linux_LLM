@@ -9,6 +9,7 @@ namespace Unity.Netcode.Logging
         private NetworkManager m_NetworkManager;
         private const string k_ServerString = "[Server]";
         private const string k_SessionOwnerString = "[Session Owner]";
+
         // This will get appended with the current clientID, doesn't need brackets
         private const string k_ClientString = "Client";
 
@@ -32,10 +33,13 @@ namespace Unity.Netcode.Logging
 
         public readonly void TrySendMessage(LogType logType, string message)
         {
-            if (m_NetworkManager != null
+            if (
+                m_NetworkManager != null
                 && m_NetworkManager.IsListening
                 && (m_NetworkManager?.NetworkConfig.EnableNetworkLogs ?? false)
-                && !m_NetworkManager.IsServer && !m_NetworkManager.LocalClient.IsSessionOwner)
+                && !m_NetworkManager.IsServer
+                && !m_NetworkManager.LocalClient.IsSessionOwner
+            )
             {
                 var messageType = NetworkLog.GetMessageLogType(logType);
 
@@ -43,9 +47,13 @@ namespace Unity.Netcode.Logging
                 {
                     LogType = messageType,
                     Message = message,
-                    SenderId = m_NetworkManager.LocalClientId
+                    SenderId = m_NetworkManager.LocalClientId,
                 };
-                var size = m_NetworkManager.ConnectionManager.SendMessage(ref networkMessage, MessageDeliveryType<ServerLogMessage>.DefaultDelivery, NetworkManager.ServerClientId);
+                var size = m_NetworkManager.ConnectionManager.SendMessage(
+                    ref networkMessage,
+                    MessageDeliveryType<ServerLogMessage>.DefaultDelivery,
+                    NetworkManager.ServerClientId
+                );
                 m_NetworkManager.NetworkMetrics.TrackServerLogSent(NetworkManager.ServerClientId, (uint)logType, size);
             }
         }
@@ -115,5 +123,4 @@ namespace Unity.Netcode.Logging
             m_NetworkManager = null;
         }
     }
-
 }

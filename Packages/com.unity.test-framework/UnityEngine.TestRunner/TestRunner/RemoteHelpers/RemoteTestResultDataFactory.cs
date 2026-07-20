@@ -11,11 +11,7 @@ namespace UnityEngine.TestRunner.TestLaunchers
         {
             var tests = CreateTestDataList(result.Test);
             tests.First().testCaseTimeout = UnityTestExecutionContext.CurrentContext.TestCaseTimeout;
-            return new RemoteTestResultDataWithTestData
-            {
-                results = CreateTestResultDataList(result),
-                tests = tests
-            };
+            return new RemoteTestResultDataWithTestData { results = CreateTestResultDataList(result), tests = tests };
         }
 
         public RemoteTestResultDataWithTestData CreateFromTest(ITest test)
@@ -26,10 +22,7 @@ namespace UnityEngine.TestRunner.TestLaunchers
                 tests.First().testCaseTimeout = UnityTestExecutionContext.CurrentContext.TestCaseTimeout;
             }
 
-            return new RemoteTestResultDataWithTestData
-            {
-                tests = tests
-            };
+            return new RemoteTestResultDataWithTestData { tests = tests };
         }
 
         private RemoteTestData[] CreateTestDataList(ITest test)

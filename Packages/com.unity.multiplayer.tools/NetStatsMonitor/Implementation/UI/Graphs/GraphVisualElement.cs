@@ -61,13 +61,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             Add(m_Legend);
 
             m_XAxisLabels.MaxLabelMarginRight = m_YAxisLabels.contentRect.width;
-            m_YAxisLabels.RegisterCallback((GeometryChangedEvent geometryChangeEvent) =>
-            {
-                // Although typically we don't use inline styling, and although it may be possible
-                // to do this with USS, this is much more straightforward
-                var newWidth = geometryChangeEvent.newRect.width;
-                m_XAxisLabels.MaxLabelMarginRight = newWidth;
-            });
+            m_YAxisLabels.RegisterCallback(
+                (GeometryChangedEvent geometryChangeEvent) =>
+                {
+                    // Although typically we don't use inline styling, and although it may be possible
+                    // to do this with USS, this is much more straightforward
+                    var newWidth = geometryChangeEvent.newRect.width;
+                    m_XAxisLabels.MaxLabelMarginRight = newWidth;
+                }
+            );
         }
 
         internal void UpdateConfiguration(DisplayElementConfiguration config)
@@ -84,13 +86,15 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
 
             // Although in CSS it's possible, in USS it's not possible to have a selector based on an attribute value,
             // such as an empty label, so we need to add a class instead
-            m_Label.EnableInClassList(UssClassNames.k_DisplayElementLabelEmpty, String.IsNullOrWhiteSpace(config.Label));
+            m_Label.EnableInClassList(
+                UssClassNames.k_DisplayElementLabelEmpty,
+                String.IsNullOrWhiteSpace(config.Label)
+            );
 
             m_Content.UpdateConfiguration(config);
 
             m_YAxisUnits = MetricsUtils.GetUnits(m_Stats, m_Label.text);
-            m_YAxisDisplayAsPercentage =
-                MetricsUtils.ShouldDisplayAsPercentage(m_Stats, m_Label.text);
+            m_YAxisDisplayAsPercentage = MetricsUtils.ShouldDisplayAsPercentage(m_Stats, m_Label.text);
 
             m_YAxisLabels.MinLabel = $"0 {m_YAxisUnits}";
 
@@ -125,7 +129,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
                 mantissaAndExponent,
                 significantDigits: mantissa == MathF.Floor(mantissa) ? 1 : 2,
                 m_YAxisUnits,
-                m_YAxisDisplayAsPercentage);
+                m_YAxisDisplayAsPercentage
+            );
             return (displayString, value);
         }
 
@@ -134,8 +139,16 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Implementation
             // The minimum and maximum axis bounds can be computed using the same method without
             // special case handling because m_PlotRange.Min <= 0 and m_PlotRange.Max >= 0,
             // and so the next round number of greater magnitude works as an axis bound in both cases
-            var (yAxisMinLabel, minPlotValue) = ComputeYAxisBound(m_PlotRange.Min, m_LastYValues.Min, m_YAxisLabels.MinLabel);
-            var (yAxisMaxLabel, maxPlotValue) = ComputeYAxisBound(m_PlotRange.Max, m_LastYValues.Max, m_YAxisLabels.MaxLabel);
+            var (yAxisMinLabel, minPlotValue) = ComputeYAxisBound(
+                m_PlotRange.Min,
+                m_LastYValues.Min,
+                m_YAxisLabels.MinLabel
+            );
+            var (yAxisMaxLabel, maxPlotValue) = ComputeYAxisBound(
+                m_PlotRange.Max,
+                m_LastYValues.Max,
+                m_YAxisLabels.MaxLabel
+            );
 
             m_LastYValues.Min = minPlotValue;
             m_LastYValues.Max = maxPlotValue;

@@ -1,7 +1,6 @@
 namespace UnityEditor.TestTools.TestRunner
 {
-
-    #if !UNITY_2021_1_OR_NEWER
+#if !UNITY_2021_1_OR_NEWER
 
     internal class XboxOnePlatformSetup : IPlatformSetup
     {
@@ -24,17 +23,11 @@ namespace UnityEditor.TestTools.TestRunner
             EditorUserBuildSettings.xboxOneAdditionalDebugPorts = "34999";
         }
 
-        public void PostBuildAction()
-        {
-        }
+        public void PostBuildAction() { }
 
-        public void PostSuccessfulBuildAction()
-        {
-        }
+        public void PostSuccessfulBuildAction() { }
 
-        public void PostSuccessfulLaunchAction()
-        {
-        }
+        public void PostSuccessfulLaunchAction() { }
 
         public void CleanUp()
         {
@@ -47,5 +40,5 @@ namespace UnityEditor.TestTools.TestRunner
             EditorUserBuildSettings.xboxOneAdditionalDebugPorts = oldXboxOneAdditionalDebugPorts;
         }
     }
-    #endif
+#endif
 }

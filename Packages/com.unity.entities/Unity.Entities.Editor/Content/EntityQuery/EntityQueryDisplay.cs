@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Unity.Collections;
-using Unity.Properties;
 using Unity.Entities.UI;
+using Unity.Properties;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -50,10 +50,24 @@ namespace Unity.Entities.Editor
         TabContent m_EntitiesTab;
         TabContent m_ComponentTab;
 
-        readonly CenteredMessageElement m_EmptyEntitiesMessage = new CenteredMessageElement { Message = L10n.Tr("No Entities") };
-        readonly CenteredMessageElement m_UniversalQueryMessage = new CenteredMessageElement { Message = L10n.Tr("This is a Universal Query. Universal Queries don’t have components. It will match all Entities.") };
-        readonly CenteredMessageElement m_NoEntitiesResultMessage = new CenteredMessageElement { Message = L10n.Tr("No matches") };
-        readonly CenteredMessageElement m_NoComponentResultMessage = new CenteredMessageElement { Message = L10n.Tr("No matches") };
+        readonly CenteredMessageElement m_EmptyEntitiesMessage = new CenteredMessageElement
+        {
+            Message = L10n.Tr("No Entities"),
+        };
+        readonly CenteredMessageElement m_UniversalQueryMessage = new CenteredMessageElement
+        {
+            Message = L10n.Tr(
+                "This is a Universal Query. Universal Queries don’t have components. It will match all Entities."
+            ),
+        };
+        readonly CenteredMessageElement m_NoEntitiesResultMessage = new CenteredMessageElement
+        {
+            Message = L10n.Tr("No matches"),
+        };
+        readonly CenteredMessageElement m_NoComponentResultMessage = new CenteredMessageElement
+        {
+            Message = L10n.Tr("No matches"),
+        };
 
         int GetQueryComponentCount()
         {
@@ -61,11 +75,12 @@ namespace Unity.Entities.Editor
             int totalCount = 0;
             for (int i = 0; i < queryDescs.Length; ++i)
             {
-                totalCount += queryDescs[i].All.Length +
-                              queryDescs[i].Any.Length +
-                              queryDescs[i].None.Length +
-                              queryDescs[i].Disabled.Length +
-                              queryDescs[i].Absent.Length;
+                totalCount +=
+                    queryDescs[i].All.Length
+                    + queryDescs[i].Any.Length
+                    + queryDescs[i].None.Length
+                    + queryDescs[i].Disabled.Length
+                    + queryDescs[i].Absent.Length;
             }
             return totalCount;
         }
@@ -73,7 +88,10 @@ namespace Unity.Entities.Editor
         public override VisualElement Build()
         {
             var root = new VisualElement();
-            root.RegisterCallback<DetachFromPanelEvent, EntityQueryDisplayInspector>((ev, @this) => Selection.selectionChanged -= @this.HandleGlobalSelectionChanged, this);
+            root.RegisterCallback<DetachFromPanelEvent, EntityQueryDisplayInspector>(
+                (ev, @this) => Selection.selectionChanged -= @this.HandleGlobalSelectionChanged,
+                this
+            );
 
             Resources.AddCommonVariables(root);
             root.AddToClassList(UssClasses.Content.Query.EntityQuery.Container);
@@ -83,33 +101,52 @@ namespace Unity.Entities.Editor
             if (fromSystem)
             {
                 header.AddToClassList(UssClasses.Content.Query.EntityQuery.SystemQuery);
-                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderMainTitle).text = $"Query #{Target.Content.QueryOrder}";
-                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderSubTitle).text = Target.Content.SystemProxy.NicifiedDisplayName;
-                header.Query(className: UssClasses.Content.Query.EntityQuery.HeaderGoTo).ForEach(v => v.RegisterCallback<MouseDownEvent>((evt) =>
-                {
-                    evt.StopPropagation();
+                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderMainTitle).text =
+                    $"Query #{Target.Content.QueryOrder}";
+                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderSubTitle).text = Target
+                    .Content
+                    .SystemProxy
+                    .NicifiedDisplayName;
+                header
+                    .Query(className: UssClasses.Content.Query.EntityQuery.HeaderGoTo)
+                    .ForEach(v =>
+                        v.RegisterCallback<MouseDownEvent>(
+                            (evt) =>
+                            {
+                                evt.StopPropagation();
 #if !UNITY_2023_2_OR_NEWER
-                    evt.PreventDefault();
+                                evt.PreventDefault();
 #endif
-                    SystemScheduleWindow.HighlightSystem(Target.Content.SystemProxy);
-                    ContentUtilities.ShowSystemInspectorContent(Target.Content.SystemProxy);
-                }));
+                                SystemScheduleWindow.HighlightSystem(Target.Content.SystemProxy);
+                                ContentUtilities.ShowSystemInspectorContent(Target.Content.SystemProxy);
+                            }
+                        )
+                    );
             }
             else
             {
                 header.AddToClassList(UssClasses.Content.Query.EntityQuery.ComponentQuery);
                 var types = Target.Content.Query.GetQueryTypes();
                 var componentType = types.Length > 0 ? types[0].GetManagedType() : typeof(Entity);
-                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderMainTitle).text = componentType.Name;
-                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderSubTitle).text = L10n.Tr("Component Query");
-                header.Query(className: UssClasses.Content.Query.EntityQuery.HeaderGoTo).ForEach(v => v.RegisterCallback<MouseDownEvent>((evt) =>
-                {
-                    evt.StopPropagation();
+                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderMainTitle).text =
+                    componentType.Name;
+                header.Q<Label>(className: UssClasses.Content.Query.EntityQuery.HeaderSubTitle).text = L10n.Tr(
+                    "Component Query"
+                );
+                header
+                    .Query(className: UssClasses.Content.Query.EntityQuery.HeaderGoTo)
+                    .ForEach(v =>
+                        v.RegisterCallback<MouseDownEvent>(
+                            (evt) =>
+                            {
+                                evt.StopPropagation();
 #if !UNITY_2023_2_OR_NEWER
-                    evt.PreventDefault();
+                                evt.PreventDefault();
 #endif
-                    ContentUtilities.ShowComponentInspectorContent(@componentType);
-                }));
+                                ContentUtilities.ShowComponentInspectorContent(@componentType);
+                            }
+                        )
+                    );
             }
 
             var tabView = new TabView();
@@ -143,7 +180,12 @@ namespace Unity.Entities.Editor
             m_EntitiesSearchElement.AddSearchFilterProperty("id", new PropertyPath("EntityId"));
             m_EntitiesSearchElement.AddSearchFilterPopupItem("id", "Instance Id");
             entitiesSearchContainer.Add(m_EntitiesSearchElement);
-            m_EntitiesListView = new ListView { fixedItemHeight = 18, showAlternatingRowBackgrounds = AlternatingRowBackground.None, selectionType = SelectionType.Single };
+            m_EntitiesListView = new ListView
+            {
+                fixedItemHeight = 18,
+                showAlternatingRowBackgrounds = AlternatingRowBackground.None,
+                selectionType = SelectionType.Single,
+            };
             m_EntitiesListView.AddToClassList(UssClasses.Content.Query.EntityQuery.ListView);
 
             m_EntitiesSearchElement.RegisterSearchQueryHandler<EntityViewData>(search =>
@@ -163,7 +205,7 @@ namespace Unity.Entities.Editor
             m_EntitiesListView.itemsSource = Target.FilteredEntities;
             m_EntitiesListView.selectionChanged += objects =>
             {
-                if(!objects.Any())
+                if (!objects.Any())
                     return;
                 var evd = objects.Cast<EntityViewData>().Single();
                 EntitySelectionProxy.SelectEntity(evd.World, evd.Entity);
@@ -192,7 +234,12 @@ namespace Unity.Entities.Editor
             m_ComponentTab.Add(m_NoComponentResultMessage);
             m_ComponentTab.Add(m_UniversalQueryMessage);
 
-            m_ComponentsListView = new ListView { fixedItemHeight = 18, showAlternatingRowBackgrounds = AlternatingRowBackground.None, selectionType = SelectionType.Single };
+            m_ComponentsListView = new ListView
+            {
+                fixedItemHeight = 18,
+                showAlternatingRowBackgrounds = AlternatingRowBackground.None,
+                selectionType = SelectionType.Single,
+            };
             m_ComponentsListView.AddToClassList(UssClasses.Content.Query.EntityQuery.ListView);
             m_ComponentsListView.makeItem += () =>
             {
@@ -209,7 +256,7 @@ namespace Unity.Entities.Editor
             m_ComponentsListView.itemsSource = Target.FilteredComponents;
             m_ComponentsListView.selectionChanged += objects =>
             {
-                if(!objects.Any())
+                if (!objects.Any())
                     return;
                 var cvd = objects.Cast<ComponentViewData>().Single();
 
@@ -231,9 +278,14 @@ namespace Unity.Entities.Editor
                 var idx = Target.FilteredEntities.FindIndex(e => e.Entity == selectedProxy.Entity);
                 HandleSelection(idx, m_EntitiesListView, m_EntitiesListView, m_ComponentsListView);
             }
-            else if (Selection.activeObject is InspectorContent inspectorContent && inspectorContent.Content.Provider is ComponentContentProvider componentContentProvider)
+            else if (
+                Selection.activeObject is InspectorContent inspectorContent
+                && inspectorContent.Content.Provider is ComponentContentProvider componentContentProvider
+            )
             {
-                var idx = Target.FilteredComponents.FindIndex(c => c.InComponentType == componentContentProvider.ComponentType);
+                var idx = Target.FilteredComponents.FindIndex(c =>
+                    c.InComponentType == componentContentProvider.ComponentType
+                );
                 HandleSelection(idx, m_ComponentsListView, m_EntitiesListView, m_ComponentsListView);
             }
             else
@@ -261,7 +313,11 @@ namespace Unity.Entities.Editor
 
         public override void Update()
         {
-            if (Target.World == null || !Target.World.IsCreated || !Target.World.EntityManager.IsQueryValid(Target.Query))
+            if (
+                Target.World == null
+                || !Target.World.IsCreated
+                || !Target.World.EntityManager.IsQueryValid(Target.Query)
+            )
                 return;
 
             // TODO(DOTS-10317): Replace this with a proper EntityQuery results hash if & when we have one
@@ -291,15 +347,23 @@ namespace Unity.Entities.Editor
         void UpdateComponentsEmptyMessagesVisibility()
         {
             m_ComponentsListView.SetVisibility(Target.FilteredComponents.Count > 0);
-            m_UniversalQueryMessage.SetVisibility(Target.SourceComponents.Count == 0 && string.IsNullOrWhiteSpace(m_ComponentsSearchElement.value));
-            m_NoComponentResultMessage.SetVisibility(Target.FilteredComponents.Count == 0 && !string.IsNullOrWhiteSpace(m_ComponentsSearchElement.value));
+            m_UniversalQueryMessage.SetVisibility(
+                Target.SourceComponents.Count == 0 && string.IsNullOrWhiteSpace(m_ComponentsSearchElement.value)
+            );
+            m_NoComponentResultMessage.SetVisibility(
+                Target.FilteredComponents.Count == 0 && !string.IsNullOrWhiteSpace(m_ComponentsSearchElement.value)
+            );
         }
 
         void UpdateEntitiesEmptyMessagesVisibility()
         {
             m_EntitiesListView.SetVisibility(Target.FilteredEntities.Count > 0);
-            m_EmptyEntitiesMessage.SetVisibility(Target.SourceEntities.Count == 0 && string.IsNullOrWhiteSpace(m_EntitiesSearchElement.value));
-            m_NoEntitiesResultMessage.SetVisibility(Target.FilteredEntities.Count == 0 && !string.IsNullOrWhiteSpace(m_EntitiesSearchElement.value));
+            m_EmptyEntitiesMessage.SetVisibility(
+                Target.SourceEntities.Count == 0 && string.IsNullOrWhiteSpace(m_EntitiesSearchElement.value)
+            );
+            m_NoEntitiesResultMessage.SetVisibility(
+                Target.FilteredEntities.Count == 0 && !string.IsNullOrWhiteSpace(m_EntitiesSearchElement.value)
+            );
         }
     }
 }

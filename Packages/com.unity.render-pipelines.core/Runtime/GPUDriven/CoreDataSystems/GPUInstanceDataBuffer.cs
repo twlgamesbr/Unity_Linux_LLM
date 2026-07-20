@@ -52,28 +52,41 @@ namespace UnityEngine.Rendering
         public NativeArray<int>.ReadOnly componentPerInstance => m_InternalBuffer.componentPerInstance.AsReadOnly();
         public NativeArray<int>.ReadOnly componentsGPUAddress => m_InternalBuffer.componentsGPUAddress.AsReadOnly();
         public NativeArray<int>.ReadOnly componentByteSizes => m_InternalBuffer.componentByteSizes.AsReadOnly();
-        public NativeArray<int2>.ReadOnly componentInstanceIndexRanges => m_InternalBuffer.componentInstanceIndexRanges.AsReadOnly();
-        public NativeArray<MetadataValue>.ReadOnly componentsMetadata => m_InternalBuffer.componentsMetadata.AsReadOnly();
+        public NativeArray<int2>.ReadOnly componentInstanceIndexRanges =>
+            m_InternalBuffer.componentInstanceIndexRanges.AsReadOnly();
+        public NativeArray<MetadataValue>.ReadOnly componentsMetadata =>
+            m_InternalBuffer.componentsMetadata.AsReadOnly();
         public NativeArray<GPUComponentHandle>.ReadOnly components => m_InternalBuffer.components.AsReadOnly();
         public int gpuBufferByteSize => m_InternalBuffer.gpuBufferByteSize;
         public GraphicsBuffer nativeBuffer => m_InternalBuffer.gpuBuffer;
         public int layoutVersion => m_LayoutVersion;
 
-        public GPUInstanceDataBuffer(ref GPUArchetypeManager archetypeManager, in GPUInstanceDataBufferLayout layout, GPUResidentDrawerResources resources)
+        public GPUInstanceDataBuffer(
+            ref GPUArchetypeManager archetypeManager,
+            in GPUInstanceDataBufferLayout layout,
+            GPUResidentDrawerResources resources
+        )
         {
             m_InstanceDataBufferUploadKernels = resources.instanceDataBufferUploadKernels;
             m_InstanceDataBufferCopyKernels = resources.instanceDataBufferCopyKernels;
             m_InternalBuffer = new InternalGPUInstanceDataBuffer(ref archetypeManager, layout);
 
-            m_MainUploadScatterInstancesKernelID = m_InstanceDataBufferUploadKernels.FindKernel("MainUploadScatterInstances");
+            m_MainUploadScatterInstancesKernelID = m_InstanceDataBufferUploadKernels.FindKernel(
+                "MainUploadScatterInstances"
+            );
             m_MainCopyInstancesKernelID = m_InstanceDataBufferCopyKernels.FindKernel("MainCopyInstances");
-            Assert.IsTrue(m_MainUploadScatterInstancesKernelID != -1, "Unable to load MainUploadScatterInstances compute shader kernel.");
+            Assert.IsTrue(
+                m_MainUploadScatterInstancesKernelID != -1,
+                "Unable to load MainUploadScatterInstances compute shader kernel."
+            );
             Assert.IsTrue(m_MainCopyInstancesKernelID != -1, "Unable to load MainCopyInstances compute shader kernel.");
 
-            m_InstanceDataBufferUploadKernels.GetKernelThreadGroupSizes(m_MainUploadScatterInstancesKernelID,
+            m_InstanceDataBufferUploadKernels.GetKernelThreadGroupSizes(
+                m_MainUploadScatterInstancesKernelID,
                 out m_UploaKernelThreadGroupSize.x,
                 out m_UploaKernelThreadGroupSize.y,
-                out m_UploaKernelThreadGroupSize.z);
+                out m_UploaKernelThreadGroupSize.z
+            );
         }
 
         public void Dispose()
@@ -89,7 +102,11 @@ namespace UnityEngine.Rendering
         {
             // See UnityDOTSInstancing.hlsl
             const uint kPerInstanceDataBit = 0x80000000;
-            return new MetadataValue { NameID = nameID, Value = (uint)gpuAddress | (isPerInstance ? kPerInstanceDataBit : 0) };
+            return new MetadataValue
+            {
+                NameID = nameID,
+                Value = (uint)gpuAddress | (isPerInstance ? kPerInstanceDataBit : 0),
+            };
         }
 
         public ComponentIndex GetComponentIndex(GPUComponentHandle component)
@@ -101,7 +118,10 @@ namespace UnityEngine.Rendering
 
         public int GetComponentGPUAddress(ComponentIndex compIndex)
         {
-            Assert.IsTrue(compIndex.layoutVersion == m_LayoutVersion, "Component index was acquired from previous layout. Update component index.");
+            Assert.IsTrue(
+                compIndex.layoutVersion == m_LayoutVersion,
+                "Component index was acquired from previous layout. Update component index."
+            );
             return m_InternalBuffer.componentsGPUAddress[compIndex.index];
         }
 
@@ -130,20 +150,30 @@ namespace UnityEngine.Rendering
 
         public int GetInstancesCount(in ArchetypeIndex archIndex)
         {
-            Assert.IsTrue(archIndex.layoutVersion == m_LayoutVersion, "Archetype index was acquired from previous layout. Update archetype index.");
+            Assert.IsTrue(
+                archIndex.layoutVersion == m_LayoutVersion,
+                "Archetype index was acquired from previous layout. Update archetype index."
+            );
             return m_InternalBuffer.layout.instancesCount[archIndex.index];
         }
 
         public GPUInstanceIndex InstanceToGPUIndex(in ArchetypeIndex archIndex, int instanceIndex)
         {
-            Assert.IsTrue(archIndex.layoutVersion == m_LayoutVersion, "Archetype index was acquired from previous layout. Update archetype index.");
+            Assert.IsTrue(
+                archIndex.layoutVersion == m_LayoutVersion,
+                "Archetype index was acquired from previous layout. Update archetype index."
+            );
             int instancesBegin = m_InternalBuffer.instancesCountPrefixSum[archIndex.index];
             int instancesCount = m_InternalBuffer.layout.instancesCount[archIndex.index];
             Assert.IsTrue(instanceIndex >= 0 && instanceIndex < instancesCount);
             return GPUInstanceIndex.Create(instancesBegin + instanceIndex);
         }
 
-        public void QueryInstanceGPUIndices(in RenderWorld renderWorld, NativeArray<InstanceHandle> instances, NativeArray<GPUInstanceIndex> gpuIndices)
+        public void QueryInstanceGPUIndices(
+            in RenderWorld renderWorld,
+            NativeArray<InstanceHandle> instances,
+            NativeArray<GPUInstanceIndex> gpuIndices
+        )
         {
             Assert.AreEqual(instances.Length, gpuIndices.Length);
 
@@ -155,14 +185,18 @@ namespace UnityEngine.Rendering
                 instancesCountPrefixSum = m_InternalBuffer.instancesCountPrefixSum,
                 layout = m_InternalBuffer.layout,
                 instances = instances,
-                gpuIndices = gpuIndices
-            }
-            .RunParallel(instances.Length, 512);
+                gpuIndices = gpuIndices,
+            }.RunParallel(instances.Length, 512);
 
             Profiler.EndSample();
         }
 
-        public void UploadDataToGPU(CommandBuffer cmd, GraphicsBuffer uploadBuffer, in GPUInstanceUploadData uploadData, NativeArray<GPUInstanceIndex> scatterGPUIndices)
+        public void UploadDataToGPU(
+            CommandBuffer cmd,
+            GraphicsBuffer uploadBuffer,
+            in GPUInstanceUploadData uploadData,
+            NativeArray<GPUInstanceIndex> scatterGPUIndices
+        )
         {
             Assert.IsNotNull(cmd);
 
@@ -173,8 +207,16 @@ namespace UnityEngine.Rendering
 
             Assert.IsTrue(scatterGPUIndices.Length <= uploadData.length);
 
-            var outputComponentIndices = new NativeArray<int>(uploadData.writtenComponents.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            var inputComponentAddresses = new NativeArray<int>(uploadData.writtenComponents.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var outputComponentIndices = new NativeArray<int>(
+                uploadData.writtenComponents.Length,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
+            var inputComponentAddresses = new NativeArray<int>(
+                uploadData.writtenComponents.Length,
+                Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory
+            );
 
             for (int i = 0; i < uploadData.writtenComponents.Length; ++i)
             {
@@ -184,9 +226,21 @@ namespace UnityEngine.Rendering
                 inputComponentAddresses[i] = uploadData.componentGPUAddress[inputComponentIndex];
             }
 
-            m_InputInstanceIndicesBuffer = EnsureBufferCountOrResize(m_InputInstanceIndicesBuffer, scatterGPUIndices.Length, UnsafeUtility.SizeOf<GPUInstanceIndex>());
-            m_InputComponentAddressesBuffer = EnsureBufferCountOrResize(m_InputComponentAddressesBuffer, inputComponentAddresses.Length, sizeof(int));
-            m_OutputComponentIndicesBuffer = EnsureBufferCountOrResize(m_OutputComponentIndicesBuffer, outputComponentIndices.Length, sizeof(int));
+            m_InputInstanceIndicesBuffer = EnsureBufferCountOrResize(
+                m_InputInstanceIndicesBuffer,
+                scatterGPUIndices.Length,
+                UnsafeUtility.SizeOf<GPUInstanceIndex>()
+            );
+            m_InputComponentAddressesBuffer = EnsureBufferCountOrResize(
+                m_InputComponentAddressesBuffer,
+                inputComponentAddresses.Length,
+                sizeof(int)
+            );
+            m_OutputComponentIndicesBuffer = EnsureBufferCountOrResize(
+                m_OutputComponentIndicesBuffer,
+                outputComponentIndices.Length,
+                sizeof(int)
+            );
 
             m_InputInstanceIndicesBuffer.SetData(scatterGPUIndices);
             m_InputComponentAddressesBuffer.SetData(inputComponentAddresses);
@@ -195,15 +249,60 @@ namespace UnityEngine.Rendering
             ComputeShader shader = m_InstanceDataBufferUploadKernels;
             cmd.SetComputeIntParam(shader, UploadKernelID.kInputComponentsCount, uploadData.writtenComponents.Length);
             cmd.SetComputeIntParam(shader, UploadKernelID.kInputInstancesCount, scatterGPUIndices.Length);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kInputInstanceData, uploadBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kInputInstanceIndices, m_InputInstanceIndicesBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kInputComponentAddresses, m_InputComponentAddressesBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kOutputComponentByteCounts, m_InternalBuffer.componentByteCountsGPUBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kOutputComponentIndices, m_OutputComponentIndicesBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kOutputComponentInstanceIndexRanges, m_InternalBuffer.componentGPUInstanceIndexRangesGPUBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kOutputComponentIsPerInstance, m_InternalBuffer.componentsPerInstanceGPUBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kOutputComponentAddresses, m_InternalBuffer.componentsGPUAddressGPUBuffer);
-            cmd.SetComputeBufferParam(shader, m_MainUploadScatterInstancesKernelID, UploadKernelID.kOutputBuffer, m_InternalBuffer.gpuBuffer);
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kInputInstanceData,
+                uploadBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kInputInstanceIndices,
+                m_InputInstanceIndicesBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kInputComponentAddresses,
+                m_InputComponentAddressesBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kOutputComponentByteCounts,
+                m_InternalBuffer.componentByteCountsGPUBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kOutputComponentIndices,
+                m_OutputComponentIndicesBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kOutputComponentInstanceIndexRanges,
+                m_InternalBuffer.componentGPUInstanceIndexRangesGPUBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kOutputComponentIsPerInstance,
+                m_InternalBuffer.componentsPerInstanceGPUBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kOutputComponentAddresses,
+                m_InternalBuffer.componentsGPUAddressGPUBuffer
+            );
+            cmd.SetComputeBufferParam(
+                shader,
+                m_MainUploadScatterInstancesKernelID,
+                UploadKernelID.kOutputBuffer,
+                m_InternalBuffer.gpuBuffer
+            );
 
             int threadGroupCountX = CoreUtils.DivRoundUp(scatterGPUIndices.Length, (int)m_UploaKernelThreadGroupSize.x);
             Assert.IsTrue(m_UploaKernelThreadGroupSize.y == 1);
@@ -217,7 +316,12 @@ namespace UnityEngine.Rendering
             Profiler.EndSample();
         }
 
-        public void SetGPULayout(CommandBuffer cmd, ref GPUArchetypeManager archetypeManager, in GPUInstanceDataBufferLayout newLayout, bool submitCmdBuffer)
+        public void SetGPULayout(
+            CommandBuffer cmd,
+            ref GPUArchetypeManager archetypeManager,
+            in GPUInstanceDataBufferLayout newLayout,
+            bool submitCmdBuffer
+        )
         {
             if (submitCmdBuffer)
                 Assert.IsNotNull(cmd);
@@ -234,7 +338,11 @@ namespace UnityEngine.Rendering
             var inputThreadGroupBeginIndices = new NativeList<int>(Allocator.Temp);
             var threadGroupsCount = 0;
 
-            for (int newArchetypeIndex = 0; newArchetypeIndex < newInternalBuffer.layout.archetypes.Length; ++newArchetypeIndex)
+            for (
+                int newArchetypeIndex = 0;
+                newArchetypeIndex < newInternalBuffer.layout.archetypes.Length;
+                ++newArchetypeIndex
+            )
             {
                 var archetype = newInternalBuffer.layout.archetypes[newArchetypeIndex];
                 int archetypeIndex = m_InternalBuffer.FindArchetypeIndex(archetype);
@@ -259,18 +367,35 @@ namespace UnityEngine.Rendering
                     Assert.AreNotEqual(componentIndex, InvalidIndex);
                     Assert.AreNotEqual(newComponentIndex, InvalidIndex);
 
-                    var newComponentArchetypeIndexSpan = newInternalBuffer.componentsArchetypeIndexSpan[newComponentIndex];
-                    var newComponentInstanceIndexRange = newInternalBuffer.componentInstanceIndexRanges[newComponentIndex];
-                    Assert.IsTrue(newArchetypeIndex >= newComponentArchetypeIndexSpan.x && newArchetypeIndex < newComponentArchetypeIndexSpan.y);
-                    Assert.IsTrue(newInstancesBegin >= newComponentInstanceIndexRange.x && newInstancesBegin + newInstancesCount <= newComponentInstanceIndexRange.y);
-                    Assert.AreEqual(newInternalBuffer.componentByteSizes[newComponentIndex], m_InternalBuffer.componentByteSizes[componentIndex]);
+                    var newComponentArchetypeIndexSpan = newInternalBuffer.componentsArchetypeIndexSpan[
+                        newComponentIndex
+                    ];
+                    var newComponentInstanceIndexRange = newInternalBuffer.componentInstanceIndexRanges[
+                        newComponentIndex
+                    ];
+                    Assert.IsTrue(
+                        newArchetypeIndex >= newComponentArchetypeIndexSpan.x
+                            && newArchetypeIndex < newComponentArchetypeIndexSpan.y
+                    );
+                    Assert.IsTrue(
+                        newInstancesBegin >= newComponentInstanceIndexRange.x
+                            && newInstancesBegin + newInstancesCount <= newComponentInstanceIndexRange.y
+                    );
+                    Assert.AreEqual(
+                        newInternalBuffer.componentByteSizes[newComponentIndex],
+                        m_InternalBuffer.componentByteSizes[componentIndex]
+                    );
 
                     ref readonly GPUComponentDesc componentDesc = ref archetypeManager.GetComponentDesc(component);
                     int isPerInstance = componentDesc.isPerInstance ? 1 : 0;
                     int instancesToCopy = componentDesc.isPerInstance ? math.min(instancesCount, newInstancesCount) : 1;
                     int componentByteSize = newInternalBuffer.componentByteSizes[newComponentIndex];
-                    int componentDataAddress = m_InternalBuffer.componentsGPUAddress[componentIndex] + instancesBegin * componentByteSize * isPerInstance;
-                    int newCopmonentDataAddress = newInternalBuffer.componentsGPUAddress[newComponentIndex] + newInstancesBegin * componentByteSize * isPerInstance;
+                    int componentDataAddress =
+                        m_InternalBuffer.componentsGPUAddress[componentIndex]
+                        + instancesBegin * componentByteSize * isPerInstance;
+                    int newCopmonentDataAddress =
+                        newInternalBuffer.componentsGPUAddress[newComponentIndex]
+                        + newInstancesBegin * componentByteSize * isPerInstance;
                     int componentDataUIntSize = (componentByteSize * instancesToCopy) / sizeof(uint);
 
                     int threadGroupBeginIndex = threadGroupsCount;
@@ -288,15 +413,39 @@ namespace UnityEngine.Rendering
 
             if (threadGroupsCount > 0)
             {
-                inputThreadGroupBeginIndices.ResizeUninitialized(CollectionHelper.Align(inputThreadGroupBeginIndices.Length, sizeof(uint)));
-                inputComponentDataAddresses.ResizeUninitialized(CollectionHelper.Align(inputComponentDataAddresses.Length, sizeof(uint)));
-                outputComponentDataAddresses.ResizeUninitialized(CollectionHelper.Align(outputComponentDataAddresses.Length, sizeof(uint)));
-                outputComponentDataUIntSizes.ResizeUninitialized(CollectionHelper.Align(outputComponentDataUIntSizes.Length, sizeof(uint)));
+                inputThreadGroupBeginIndices.ResizeUninitialized(
+                    CollectionHelper.Align(inputThreadGroupBeginIndices.Length, sizeof(uint))
+                );
+                inputComponentDataAddresses.ResizeUninitialized(
+                    CollectionHelper.Align(inputComponentDataAddresses.Length, sizeof(uint))
+                );
+                outputComponentDataAddresses.ResizeUninitialized(
+                    CollectionHelper.Align(outputComponentDataAddresses.Length, sizeof(uint))
+                );
+                outputComponentDataUIntSizes.ResizeUninitialized(
+                    CollectionHelper.Align(outputComponentDataUIntSizes.Length, sizeof(uint))
+                );
 
-                var inputThreadGroupBeginIndicesGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, inputThreadGroupBeginIndices.Length, sizeof(uint));
-                var inputComponentDataAddressesGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, inputComponentDataAddresses.Length, sizeof(uint));
-                var outputComponentDataAddressesGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, outputComponentDataAddresses.Length, sizeof(uint));
-                var outputComponentDataUIntSizesGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, outputComponentDataUIntSizes.Length, sizeof(uint));
+                var inputThreadGroupBeginIndicesGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    inputThreadGroupBeginIndices.Length,
+                    sizeof(uint)
+                );
+                var inputComponentDataAddressesGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    inputComponentDataAddresses.Length,
+                    sizeof(uint)
+                );
+                var outputComponentDataAddressesGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    outputComponentDataAddresses.Length,
+                    sizeof(uint)
+                );
+                var outputComponentDataUIntSizesGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Structured,
+                    outputComponentDataUIntSizes.Length,
+                    sizeof(uint)
+                );
 
                 inputThreadGroupBeginIndicesGPUBuffer.SetData(inputThreadGroupBeginIndices.AsArray());
                 inputComponentDataAddressesGPUBuffer.SetData(inputComponentDataAddresses.AsArray());
@@ -305,17 +454,50 @@ namespace UnityEngine.Rendering
 
                 var shader = m_InstanceDataBufferCopyKernels;
                 cmd.SetComputeIntParam(shader, CopyKernelID.kInputComponentsCount, inputComponentDataAddresses.Length);
-                cmd.SetComputeBufferParam(shader, m_MainCopyInstancesKernelID, CopyKernelID.kInputThreadGroupBeginIndices, inputThreadGroupBeginIndicesGPUBuffer);
-                cmd.SetComputeBufferParam(shader, m_MainCopyInstancesKernelID, CopyKernelID.kInputComponentDataAddresses, inputComponentDataAddressesGPUBuffer);
-                cmd.SetComputeBufferParam(shader, m_MainCopyInstancesKernelID, CopyKernelID.kOutputComponentDataAddresses, outputComponentDataAddressesGPUBuffer);
-                cmd.SetComputeBufferParam(shader, m_MainCopyInstancesKernelID, CopyKernelID.kOutputComponentDataUIntSizes, outputComponentDataUIntSizesGPUBuffer);
-                cmd.SetComputeBufferParam(shader, m_MainCopyInstancesKernelID, CopyKernelID.kInputBuffer, m_InternalBuffer.gpuBuffer);
-                cmd.SetComputeBufferParam(shader, m_MainCopyInstancesKernelID, CopyKernelID.kOutputBuffer, newInternalBuffer.gpuBuffer);
+                cmd.SetComputeBufferParam(
+                    shader,
+                    m_MainCopyInstancesKernelID,
+                    CopyKernelID.kInputThreadGroupBeginIndices,
+                    inputThreadGroupBeginIndicesGPUBuffer
+                );
+                cmd.SetComputeBufferParam(
+                    shader,
+                    m_MainCopyInstancesKernelID,
+                    CopyKernelID.kInputComponentDataAddresses,
+                    inputComponentDataAddressesGPUBuffer
+                );
+                cmd.SetComputeBufferParam(
+                    shader,
+                    m_MainCopyInstancesKernelID,
+                    CopyKernelID.kOutputComponentDataAddresses,
+                    outputComponentDataAddressesGPUBuffer
+                );
+                cmd.SetComputeBufferParam(
+                    shader,
+                    m_MainCopyInstancesKernelID,
+                    CopyKernelID.kOutputComponentDataUIntSizes,
+                    outputComponentDataUIntSizesGPUBuffer
+                );
+                cmd.SetComputeBufferParam(
+                    shader,
+                    m_MainCopyInstancesKernelID,
+                    CopyKernelID.kInputBuffer,
+                    m_InternalBuffer.gpuBuffer
+                );
+                cmd.SetComputeBufferParam(
+                    shader,
+                    m_MainCopyInstancesKernelID,
+                    CopyKernelID.kOutputBuffer,
+                    newInternalBuffer.gpuBuffer
+                );
                 int dispatchesCount = CoreUtils.DivRoundUp(threadGroupsCount, MaxThreadGroupsPerDispatch);
                 int dispatchedThreadGroups = 0;
                 for (int i = 0; i < dispatchesCount; ++i)
                 {
-                    int dispatchThreadGroupCount = math.min(threadGroupsCount - dispatchedThreadGroups, MaxThreadGroupsPerDispatch);
+                    int dispatchThreadGroupCount = math.min(
+                        threadGroupsCount - dispatchedThreadGroups,
+                        MaxThreadGroupsPerDispatch
+                    );
                     cmd.SetComputeIntParam(shader, CopyKernelID.kDispatchThreadGroupBase, dispatchedThreadGroups);
                     cmd.DispatchCompute(shader, m_MainCopyInstancesKernelID, dispatchThreadGroupCount, 1, 1);
                     dispatchedThreadGroups += dispatchThreadGroupCount;
@@ -403,7 +585,9 @@ namespace UnityEngine.Rendering
                 int archetypeIndex = layout.FindArchetypeIndex(gpuHandle.archetype);
                 int instancesBegin = instancesCountPrefixSum[archetypeIndex];
                 int instancesCount = layout.instancesCount[archetypeIndex];
-                Assert.IsTrue(gpuHandle.archetypeInstanceIndex >= 0 && gpuHandle.archetypeInstanceIndex < instancesCount);
+                Assert.IsTrue(
+                    gpuHandle.archetypeInstanceIndex >= 0 && gpuHandle.archetypeInstanceIndex < instancesCount
+                );
                 return GPUInstanceIndex.Create(instancesBegin + gpuHandle.archetypeInstanceIndex);
             }
         }
@@ -432,16 +616,27 @@ namespace UnityEngine.Rendering
             internal readonly GraphicsBuffer componentGPUInstanceIndexRangesGPUBuffer;
             internal readonly GraphicsBuffer componentByteCountsGPUBuffer;
 
-            public InternalGPUInstanceDataBuffer(ref GPUArchetypeManager archetypeManager, in GPUInstanceDataBufferLayout layout)
+            public InternalGPUInstanceDataBuffer(
+                ref GPUArchetypeManager archetypeManager,
+                in GPUInstanceDataBufferLayout layout
+            )
             {
                 this.layout = new GPUInstanceDataBufferLayout(layout, Allocator.Persistent);
 
                 components = new NativeList<GPUComponentHandle>(Allocator.Persistent);
                 componentsArchetypeIndexSpan = new NativeList<int2>(Allocator.Persistent);
-                componentIndices = new NativeArray<int>(archetypeManager.GetComponentsCount(), Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                componentIndices = new NativeArray<int>(
+                    archetypeManager.GetComponentsCount(),
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
                 componentIndices.FillArray(InvalidIndex);
 
-                instancesCountPrefixSum = new NativeArray<int>(layout.archetypes.Length, Allocator.Persistent, NativeArrayOptions.ClearMemory);
+                instancesCountPrefixSum = new NativeArray<int>(
+                    layout.archetypes.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.ClearMemory
+                );
 
                 int instancesCountSum = 0;
 
@@ -450,7 +645,9 @@ namespace UnityEngine.Rendering
                     instancesCountPrefixSum[i] = instancesCountSum;
                     instancesCountSum += layout.instancesCount[i];
 
-                    ref readonly GPUArchetypeDesc archetypeDesc = ref archetypeManager.GetArchetypeDesc(layout.archetypes[i]);
+                    ref readonly GPUArchetypeDesc archetypeDesc = ref archetypeManager.GetArchetypeDesc(
+                        layout.archetypes[i]
+                    );
 
                     for (int j = 0; j < archetypeDesc.components.Length; ++j)
                     {
@@ -478,18 +675,40 @@ namespace UnityEngine.Rendering
 
                 Assert.AreEqual(components.Length, componentsArchetypeIndexSpan.Length);
 
-                componentsMetadata = new NativeArray<MetadataValue>(components.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                componentsGPUAddress = new NativeArray<int>(components.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                componentPerInstance = new NativeArray<int>(components.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                componentByteSizes = new NativeArray<int>(components.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                componentInstanceIndexRanges = new NativeArray<int2>(components.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                componentsMetadata = new NativeArray<MetadataValue>(
+                    components.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
+                componentsGPUAddress = new NativeArray<int>(
+                    components.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
+                componentPerInstance = new NativeArray<int>(
+                    components.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
+                componentByteSizes = new NativeArray<int>(
+                    components.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
+                componentInstanceIndexRanges = new NativeArray<int2>(
+                    components.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory
+                );
 
                 // Initial offset, must be {0, 0, 0, 0} for BatchRendererGroup header.
                 int byteOffset = 4 * UnsafeUtility.SizeOf<Vector4>();
 
                 for (int compIndex = 0; compIndex < components.Length; ++compIndex)
                 {
-                    ref readonly GPUComponentDesc componentDesc = ref archetypeManager.GetComponentDesc(components[compIndex]);
+                    ref readonly GPUComponentDesc componentDesc = ref archetypeManager.GetComponentDesc(
+                        components[compIndex]
+                    );
                     int2 archetypeSpan = componentsArchetypeIndexSpan[compIndex];
                     Assert.IsTrue(archetypeSpan.y > archetypeSpan.x);
 
@@ -497,7 +716,8 @@ namespace UnityEngine.Rendering
                     int lastArchetypeIndex = archetypeSpan.y - 1;
 
                     int instancesBegin = instancesCountPrefixSum[firstArchetypeIndex];
-                    int instancesEnd = instancesCountPrefixSum[lastArchetypeIndex] + layout.instancesCount[lastArchetypeIndex];
+                    int instancesEnd =
+                        instancesCountPrefixSum[lastArchetypeIndex] + layout.instancesCount[lastArchetypeIndex];
                     int instancesNum = componentDesc.isPerInstance ? instancesEnd - instancesBegin : 1;
                     Assert.IsTrue(instancesNum >= 0);
 
@@ -514,12 +734,19 @@ namespace UnityEngine.Rendering
                     // GPU component address should not become negative. This generally should not happen often. See 'kIsOverriddenBit'.
                     if (componentGPUAddress < 0)
                     {
-                        byteOffset = CollectionHelper.Align(byteOffset + Math.Abs(componentGPUAddress), kComponentAddressAlignment);
+                        byteOffset = CollectionHelper.Align(
+                            byteOffset + Math.Abs(componentGPUAddress),
+                            kComponentAddressAlignment
+                        );
                         componentGPUAddress = byteOffset - componentInstanceOffset;
                     }
 
                     componentsGPUAddress[compIndex] = componentGPUAddress;
-                    componentsMetadata[compIndex] = CreateMetadataValue(componentDesc.propertyID, componentGPUAddress, componentDesc.isPerInstance);
+                    componentsMetadata[compIndex] = CreateMetadataValue(
+                        componentDesc.propertyID,
+                        componentGPUAddress,
+                        componentDesc.isPerInstance
+                    );
 
                     componentPerInstance[compIndex] = componentDesc.isPerInstance ? 1 : 0;
                     componentInstanceIndexRanges[compIndex] = new int2(instancesBegin, instancesEnd);
@@ -531,17 +758,39 @@ namespace UnityEngine.Rendering
 
                 gpuBufferByteSize = byteOffset;
 
-                Assert.IsTrue((gpuBufferByteSize % sizeof(uint)) == 0 && gpuBufferByteSize <= MaxGPUInstancDataBufferSize);
+                Assert.IsTrue(
+                    (gpuBufferByteSize % sizeof(uint)) == 0 && gpuBufferByteSize <= MaxGPUInstancDataBufferSize
+                );
 
-                gpuBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, gpuBufferByteSize / sizeof(uint), sizeof(uint));
+                gpuBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Raw,
+                    gpuBufferByteSize / sizeof(uint),
+                    sizeof(uint)
+                );
                 gpuBuffer.SetData(new NativeArray<Vector4>(4, Allocator.Temp), 0, 0, 4);
-                componentsPerInstanceGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, components.Length, sizeof(int));
+                componentsPerInstanceGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Raw,
+                    components.Length,
+                    sizeof(int)
+                );
                 componentsPerInstanceGPUBuffer.SetData(componentPerInstance, 0, 0, components.Length);
-                componentsGPUAddressGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, components.Length, sizeof(int));
+                componentsGPUAddressGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Raw,
+                    components.Length,
+                    sizeof(int)
+                );
                 componentsGPUAddressGPUBuffer.SetData(componentsGPUAddress, 0, 0, components.Length);
-                componentGPUInstanceIndexRangesGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, components.Length, UnsafeUtility.SizeOf<int2>());
+                componentGPUInstanceIndexRangesGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Raw,
+                    components.Length,
+                    UnsafeUtility.SizeOf<int2>()
+                );
                 componentGPUInstanceIndexRangesGPUBuffer.SetData(componentInstanceIndexRanges, 0, 0, components.Length);
-                componentByteCountsGPUBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, components.Length, sizeof(int));
+                componentByteCountsGPUBuffer = new GraphicsBuffer(
+                    GraphicsBuffer.Target.Raw,
+                    components.Length,
+                    sizeof(int)
+                );
                 componentByteCountsGPUBuffer.SetData(componentByteSizes, 0, 0, components.Length);
             }
 
@@ -611,8 +860,12 @@ namespace UnityEngine.Rendering
             public static readonly int kInputComponentAddresses = Shader.PropertyToID("_InputComponentAddresses");
             public static readonly int kOutputComponentByteCounts = Shader.PropertyToID("_OutputComponentByteCounts");
             public static readonly int kOutputComponentIndices = Shader.PropertyToID("_OutputComponentIndices");
-            public static readonly int kOutputComponentInstanceIndexRanges = Shader.PropertyToID("_OutputComponentInstanceIndexRanges");
-            public static readonly int kOutputComponentIsPerInstance = Shader.PropertyToID("_OutputComponentIsPerInstance");
+            public static readonly int kOutputComponentInstanceIndexRanges = Shader.PropertyToID(
+                "_OutputComponentInstanceIndexRanges"
+            );
+            public static readonly int kOutputComponentIsPerInstance = Shader.PropertyToID(
+                "_OutputComponentIsPerInstance"
+            );
             public static readonly int kOutputComponentAddresses = Shader.PropertyToID("_OutputComponentAddresses");
             public static readonly int kOutputBuffer = Shader.PropertyToID("_OutputBuffer");
         }
@@ -621,10 +874,18 @@ namespace UnityEngine.Rendering
         {
             public static readonly int kDispatchThreadGroupBase = Shader.PropertyToID("_DispatchThreadGroupBase");
             public static readonly int kInputComponentsCount = Shader.PropertyToID("_InputComponentsCount");
-            public static readonly int kInputThreadGroupBeginIndices = Shader.PropertyToID("_InputThreadGroupBeginIndices");
-            public static readonly int kInputComponentDataAddresses = Shader.PropertyToID("_InputComponentDataAddresses");
-            public static readonly int kOutputComponentDataAddresses = Shader.PropertyToID("_OutputComponentDataAddresses");
-            public static readonly int kOutputComponentDataUIntSizes = Shader.PropertyToID("_OutputComponentDataUIntSizes");
+            public static readonly int kInputThreadGroupBeginIndices = Shader.PropertyToID(
+                "_InputThreadGroupBeginIndices"
+            );
+            public static readonly int kInputComponentDataAddresses = Shader.PropertyToID(
+                "_InputComponentDataAddresses"
+            );
+            public static readonly int kOutputComponentDataAddresses = Shader.PropertyToID(
+                "_OutputComponentDataAddresses"
+            );
+            public static readonly int kOutputComponentDataUIntSizes = Shader.PropertyToID(
+                "_OutputComponentDataUIntSizes"
+            );
             public static readonly int kInputBuffer = Shader.PropertyToID("_InputBuffer");
             public static readonly int kOutputBuffer = Shader.PropertyToID("_OutputBuffer");
         }
@@ -646,7 +907,12 @@ namespace UnityEngine.Rendering
         public NativeArray<int>.ReadOnly componentGPUAddress => m_ComponentGPUAddress.AsReadOnly();
         public NativeArray<GPUComponentHandle>.ReadOnly writtenComponents => m_WrittenComponents.AsReadOnly();
 
-        public GPUInstanceUploadData(ref GPUArchetypeManager archetypeManager, NativeArray<GPUComponentHandle> components, int length, Allocator allocator)
+        public GPUInstanceUploadData(
+            ref GPUArchetypeManager archetypeManager,
+            NativeArray<GPUComponentHandle> components,
+            int length,
+            Allocator allocator
+        )
         {
             Assert.IsTrue(length > 0);
             Assert.IsTrue(components.Length != 0);
@@ -654,9 +920,21 @@ namespace UnityEngine.Rendering
             m_Length = length;
             m_Components = new NativeArray<GPUComponentHandle>(components.Length, allocator);
             m_Components.CopyFrom(components);
-            m_ComponentGPUAddress = new NativeArray<int>(components.Length, allocator, NativeArrayOptions.UninitializedMemory);
-            m_ComponentSize = new NativeArray<int>(components.Length, allocator, NativeArrayOptions.UninitializedMemory);
-            m_ComponentPerInstance = new NativeArray<bool>(components.Length, allocator, NativeArrayOptions.UninitializedMemory);
+            m_ComponentGPUAddress = new NativeArray<int>(
+                components.Length,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
+            m_ComponentSize = new NativeArray<int>(
+                components.Length,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
+            m_ComponentPerInstance = new NativeArray<bool>(
+                components.Length,
+                allocator,
+                NativeArrayOptions.UninitializedMemory
+            );
             m_ComponentIndices = new NativeArray<int>(archetypeManager.GetComponentsCount(), allocator);
             m_ComponentIndices.FillArray(GPUInstanceDataBuffer.InvalidIndex);
             m_WrittenComponents = new NativeList<GPUComponentHandle>(components.Length, allocator);
@@ -705,11 +983,14 @@ namespace UnityEngine.Rendering
             return componentIndex;
         }
 
-        public int PrepareComponentWrite<T>(GPUComponentHandle component) where T : unmanaged
+        public int PrepareComponentWrite<T>(GPUComponentHandle component)
+            where T : unmanaged
         {
             int componentIndex = FindComponentIndex(component);
-            Assert.IsTrue(UnsafeUtility.SizeOf<T>() == m_ComponentSize[componentIndex],
-                "Component to write is incompatible, must be same stride as destination.");
+            Assert.IsTrue(
+                UnsafeUtility.SizeOf<T>() == m_ComponentSize[componentIndex],
+                "Component to write is incompatible, must be same stride as destination."
+            );
 
             if (!m_WrittenComponents.Contains(component))
                 m_WrittenComponents.Add(component);
@@ -717,15 +998,32 @@ namespace UnityEngine.Rendering
             return m_ComponentGPUAddress[componentIndex] / UnsafeUtility.SizeOf<uint>();
         }
 
-        public JobHandle ScheduleWriteComponentsJob<T>(NativeArray<T> instanceData, GPUComponentHandle component, NativeArray<uint> uploadBuffer) where T : unmanaged
+        public JobHandle ScheduleWriteComponentsJob<T>(
+            NativeArray<T> instanceData,
+            GPUComponentHandle component,
+            NativeArray<uint> uploadBuffer
+        )
+            where T : unmanaged
         {
-            var jaggedInstanceData = instanceData.Reinterpret<byte>(UnsafeUtility.SizeOf<T>()).ToJaggedSpan(Allocator.TempJob);
-            JobHandle jobHandle = ScheduleWriteComponentsJob(jaggedInstanceData, component, UnsafeUtility.SizeOf<T>(), uploadBuffer);
+            var jaggedInstanceData = instanceData
+                .Reinterpret<byte>(UnsafeUtility.SizeOf<T>())
+                .ToJaggedSpan(Allocator.TempJob);
+            JobHandle jobHandle = ScheduleWriteComponentsJob(
+                jaggedInstanceData,
+                component,
+                UnsafeUtility.SizeOf<T>(),
+                uploadBuffer
+            );
             jaggedInstanceData.Dispose(jobHandle);
             return jobHandle;
         }
 
-        public unsafe JobHandle ScheduleWriteComponentsJob(JaggedSpan<byte> instanceData, GPUComponentHandle component, int componentSize, NativeArray<uint> uploadBuffer)
+        public unsafe JobHandle ScheduleWriteComponentsJob(
+            JaggedSpan<byte> instanceData,
+            GPUComponentHandle component,
+            int componentSize,
+            NativeArray<uint> uploadBuffer
+        )
         {
             if (instanceData.sectionCount == 0)
                 return default;
@@ -747,8 +1045,10 @@ namespace UnityEngine.Rendering
                 Assert.IsTrue(m_Length >= 1 && componentCount == 1);
             }
 
-            Assert.IsTrue(componentSize == m_ComponentSize[componentIndex],
-                "Component to write is incompatible, must be same stride as destination.");
+            Assert.IsTrue(
+                componentSize == m_ComponentSize[componentIndex],
+                "Component to write is incompatible, must be same stride as destination."
+            );
 
             if (!m_WrittenComponents.Contains(component))
                 m_WrittenComponents.Add(component);
@@ -758,16 +1058,19 @@ namespace UnityEngine.Rendering
             if (isPerInstance)
             {
                 // Each job writes 16 cache lines (1KiB)
-                NativeList<JaggedJobRange> jobRanges = JaggedJobRange.FromSpanWithRelaxedBatchSize(instanceData, 16 * 64, Allocator.TempJob);
+                NativeList<JaggedJobRange> jobRanges = JaggedJobRange.FromSpanWithRelaxedBatchSize(
+                    instanceData,
+                    16 * 64,
+                    Allocator.TempJob
+                );
 
                 var jobHandle = new WriteGPUComponentDataJob
                 {
                     JobRanges = jobRanges.AsArray(),
                     ComponentOffsetInBytes = m_ComponentGPUAddress[componentIndex],
                     JaggedInstanceData = instanceData,
-                    UploadBuffer = uploadBuffer.Reinterpret<byte>(sizeof(uint))
-                }
-                .Schedule(jobRanges);
+                    UploadBuffer = uploadBuffer.Reinterpret<byte>(sizeof(uint)),
+                }.Schedule(jobRanges);
                 jobRanges.Dispose(jobHandle);
 
                 return jobHandle;
@@ -824,9 +1127,15 @@ namespace UnityEngine.Rendering
                 m_ArchetypeIndex = new NativeList<int>(1, Allocator.Temp);
 
             if (archetype.index >= m_ArchetypeIndex.Length)
-                m_ArchetypeIndex.AddReplicate(GPUArchetypeHandle.Invalid.index, archetype.index - m_Archetypes.Length + 1);
+                m_ArchetypeIndex.AddReplicate(
+                    GPUArchetypeHandle.Invalid.index,
+                    archetype.index - m_Archetypes.Length + 1
+                );
 
-            Assert.IsTrue(m_ArchetypeIndex[archetype.index] == GPUArchetypeHandle.Invalid.index, "The layout already contains the archetype.");
+            Assert.IsTrue(
+                m_ArchetypeIndex[archetype.index] == GPUArchetypeHandle.Invalid.index,
+                "The layout already contains the archetype."
+            );
 
             m_ArchetypeIndex[archetype.index] = m_Archetypes.Length;
             m_Archetypes.Add(archetype);
@@ -854,7 +1163,7 @@ namespace UnityEngine.Rendering
         public int FindArchetypeIndex(GPUArchetypeHandle archetype)
         {
             Assert.IsTrue(archetype.valid, "The archetype is invalid.");
-            if(archetype.index < m_ArchetypeIndex.Length)
+            if (archetype.index < m_ArchetypeIndex.Length)
                 return m_ArchetypeIndex[archetype.index];
             else
                 return GPUInstanceDataBuffer.InvalidIndex;
@@ -889,7 +1198,8 @@ namespace UnityEngine.Rendering
         }
     }
 
-    internal struct GPUInstanceDataBufferReadback<TData> : IDisposable where TData : unmanaged
+    internal struct GPUInstanceDataBufferReadback<TData> : IDisposable
+        where TData : unmanaged
     {
         private GPUInstanceDataBuffer m_InstanceDataBuffer;
 
@@ -902,16 +1212,22 @@ namespace UnityEngine.Rendering
             m_InstanceDataBuffer = instanceDataBuffer;
 
             var dataSize = UnsafeUtility.SizeOf<TData>();
-            var localData = new NativeArray<TData>((instanceDataBuffer.gpuBufferByteSize + (dataSize - 1)) / dataSize, Allocator.Persistent);
+            var localData = new NativeArray<TData>(
+                (instanceDataBuffer.gpuBufferByteSize + (dataSize - 1)) / dataSize,
+                Allocator.Persistent
+            );
             var errorCount = 0;
 
-            cmd.RequestAsyncReadback(instanceDataBuffer.nativeBuffer, (AsyncGPUReadbackRequest req) =>
-            {
-                if (req.done)
-                    localData.CopyFrom(req.GetData<TData>());
-                else
-                    ++errorCount;
-            });
+            cmd.RequestAsyncReadback(
+                instanceDataBuffer.nativeBuffer,
+                (AsyncGPUReadbackRequest req) =>
+                {
+                    if (req.done)
+                        localData.CopyFrom(req.GetData<TData>());
+                    else
+                        ++errorCount;
+                }
+            );
 
             cmd.WaitAllAsyncReadbackRequests();
             Graphics.ExecuteCommandBuffer(cmd);
@@ -924,16 +1240,22 @@ namespace UnityEngine.Rendering
             return errorCount == 0;
         }
 
-        public unsafe T LoadData<T>(GPUComponentHandle component, GPUInstanceIndex gpuInstanceIndex) where T : unmanaged
+        public unsafe T LoadData<T>(GPUComponentHandle component, GPUInstanceIndex gpuInstanceIndex)
+            where T : unmanaged
         {
             var compIndex = m_InstanceDataBuffer.GetComponentIndex(component);
             var componentIndexRange = m_InstanceDataBuffer.componentInstanceIndexRanges[compIndex.index];
-            Assert.IsTrue(gpuInstanceIndex.index >= componentIndexRange.x && gpuInstanceIndex.index < componentIndexRange.y, "GPUInstanceIndex is out of component range.");
+            Assert.IsTrue(
+                gpuInstanceIndex.index >= componentIndexRange.x && gpuInstanceIndex.index < componentIndexRange.y,
+                "GPUInstanceIndex is out of component range."
+            );
             var componentByteSize = m_InstanceDataBuffer.componentByteSizes[compIndex.index];
             Assert.IsTrue(componentByteSize == UnsafeUtility.SizeOf<T>(), "Component byte size doesn't match.");
             int isPerInstance = m_InstanceDataBuffer.componentPerInstance[compIndex.index];
             int gpuBaseAddress = m_InstanceDataBuffer.componentsGPUAddress[compIndex.index];
-            int index = (gpuBaseAddress + componentByteSize * gpuInstanceIndex.index * isPerInstance) / UnsafeUtility.SizeOf<uint>();
+            int index =
+                (gpuBaseAddress + componentByteSize * gpuInstanceIndex.index * isPerInstance)
+                / UnsafeUtility.SizeOf<uint>();
             uint* dataPtr = (uint*)data.GetUnsafePtr() + index;
             T result = *(T*)(dataPtr);
             return result;
@@ -948,11 +1270,19 @@ namespace UnityEngine.Rendering
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
     internal struct WriteGPUComponentDataJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<JaggedJobRange> JobRanges;
-        [ReadOnly] public int ComponentOffsetInBytes;
-        [NativeDisableContainerSafetyRestriction, NoAlias][ReadOnly] public JaggedSpan<byte> JaggedInstanceData;
+        [ReadOnly]
+        public NativeArray<JaggedJobRange> JobRanges;
 
-        [NativeDisableContainerSafetyRestriction, NoAlias][WriteOnly] public NativeArray<byte> UploadBuffer;
+        [ReadOnly]
+        public int ComponentOffsetInBytes;
+
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [ReadOnly]
+        public JaggedSpan<byte> JaggedInstanceData;
+
+        [NativeDisableContainerSafetyRestriction, NoAlias]
+        [WriteOnly]
+        public NativeArray<byte> UploadBuffer;
 
         public unsafe void Execute(int jobIndex)
         {
@@ -976,12 +1306,20 @@ namespace UnityEngine.Rendering
     [BurstCompile(DisableSafetyChecks = true, OptimizeFor = OptimizeFor.Performance)]
     internal struct InstancesToGPUIndicesJob : IJobParallelFor
     {
-        [ReadOnly] public RenderWorld renderWorld;
-        [ReadOnly] public NativeArray<int> instancesCountPrefixSum;
-        [ReadOnly] public GPUInstanceDataBufferLayout layout;
-        [ReadOnly] public NativeArray<InstanceHandle> instances;
+        [ReadOnly]
+        public RenderWorld renderWorld;
 
-        [WriteOnly] public NativeArray<GPUInstanceIndex> gpuIndices;
+        [ReadOnly]
+        public NativeArray<int> instancesCountPrefixSum;
+
+        [ReadOnly]
+        public GPUInstanceDataBufferLayout layout;
+
+        [ReadOnly]
+        public NativeArray<InstanceHandle> instances;
+
+        [WriteOnly]
+        public NativeArray<GPUInstanceIndex> gpuIndices;
 
         public void Execute(int index)
         {
@@ -1012,10 +1350,24 @@ namespace UnityEngine.Rendering
     {
         public int index { get; private set; }
         public bool valid => index >= 0;
-        public static GPUInstanceIndex Create(int index) { return new GPUInstanceIndex { index = index }; }
+
+        public static GPUInstanceIndex Create(int index)
+        {
+            return new GPUInstanceIndex { index = index };
+        }
+
         public static readonly GPUInstanceIndex Invalid = new GPUInstanceIndex { index = -1 };
+
         public bool Equals(GPUInstanceIndex other) => index == other.index;
-        public int CompareTo(GPUInstanceIndex other) { return index.CompareTo(other.index); }
-        public override int GetHashCode() { return index; }
+
+        public int CompareTo(GPUInstanceIndex other)
+        {
+            return index.CompareTo(other.index);
+        }
+
+        public override int GetHashCode()
+        {
+            return index;
+        }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using System.Linq;
+using Unity.Collections;
 using UnityEngine;
 using Hash128 = Unity.Entities.Hash128;
 
@@ -17,7 +17,7 @@ namespace Unity.Scenes
             EntitiesHeader,
             EntitiesWeakAssetRefs,
             EntitiesGlobalUsage,
-            EntitiesExportedTypes
+            EntitiesExportedTypes,
         }
 
         internal static string GetExtension(PathType pathType)
@@ -25,13 +25,20 @@ namespace Unity.Scenes
             switch (pathType)
             {
                 // these must all be lowercase
-                case PathType.EntitiesUnityObjectReferences: return "asset";
-                case PathType.EntitiesBinary: return "entities";
-                case PathType.EntitiesHeader: return "entityheader";
-                case PathType.EntitiesAssetDependencyGUIDs: return "dependencies";
-                case PathType.EntitiesWeakAssetRefs: return "weakassetrefs";
-                case PathType.EntitiesGlobalUsage: return "globalusage";
-                case PathType.EntitiesExportedTypes: return "exportedtypes";
+                case PathType.EntitiesUnityObjectReferences:
+                    return "asset";
+                case PathType.EntitiesBinary:
+                    return "entities";
+                case PathType.EntitiesHeader:
+                    return "entityheader";
+                case PathType.EntitiesAssetDependencyGUIDs:
+                    return "dependencies";
+                case PathType.EntitiesWeakAssetRefs:
+                    return "weakassetrefs";
+                case PathType.EntitiesGlobalUsage:
+                    return "globalusage";
+                case PathType.EntitiesExportedTypes:
+                    return "exportedtypes";
             }
 
             throw new ArgumentException($"Unknown PathType {pathType}");
@@ -44,7 +51,7 @@ namespace Unity.Scenes
         internal static string FullPathForFile(string rootPath, string relPath)
         {
 #if ENABLE_CONTENT_DELIVERY
-            if(Entities.Content.ContentDeliveryGlobalState.PathRemapFuncWithFileCheck == null)
+            if (Entities.Content.ContentDeliveryGlobalState.PathRemapFuncWithFileCheck == null)
                 return $"{rootPath}/{relPath}";
             return Entities.Content.ContentDeliveryGlobalState.PathRemapFuncWithFileCheck(relPath, true);
 #else
@@ -63,10 +70,19 @@ namespace Unity.Scenes
 
         static Dictionary<Hash128, string> s_HashToString = new Dictionary<Hash128, string>();
 
-
-        internal static Hash128 GetSubSceneArtifactHash(Hash128 sceneGUID, Hash128 buildConfigurationGUID, bool isBuildingForEditor, ImportMode importMode)
+        internal static Hash128 GetSubSceneArtifactHash(
+            Hash128 sceneGUID,
+            Hash128 buildConfigurationGUID,
+            bool isBuildingForEditor,
+            ImportMode importMode
+        )
         {
-            var guid = SceneWithBuildConfigurationGUIDs.EnsureExistsFor(sceneGUID, buildConfigurationGUID, isBuildingForEditor, out var mustRequestRefresh);
+            var guid = SceneWithBuildConfigurationGUIDs.EnsureExistsFor(
+                sceneGUID,
+                buildConfigurationGUID,
+                isBuildingForEditor,
+                out var mustRequestRefresh
+            );
             if (mustRequestRefresh)
                 UnityEditor.AssetDatabase.Refresh();
 
@@ -102,8 +118,6 @@ namespace Unity.Scenes
             var extension = $"{sectionIndex}.{GetExtension(type)}";
             return paths.FirstOrDefault(p => p.EndsWith(extension, StringComparison.Ordinal));
         }
-
-
 #endif // UNITY_EDITOR
         internal static string GetFileName(Hash128 sceneGUID, PathType type, int sectionIndex)
         {
@@ -126,10 +140,10 @@ namespace Unity.Scenes
         {
             const int kFilenameLen = 16;
             var filenameBuffer = stackalloc char[kFilenameLen];
-            var rng = new Mathematics.Random(((uint) Time.realtimeSinceStartup) + 1);
+            var rng = new Mathematics.Random(((uint)Time.realtimeSinceStartup) + 1);
 
-            for(int i = 0; i < kFilenameLen; ++i)
-                filenameBuffer[i] = rng.NextBool() ? (char) rng.NextInt('a', 'z') : (char) rng.NextInt('0', '9');
+            for (int i = 0; i < kFilenameLen; ++i)
+                filenameBuffer[i] = rng.NextBool() ? (char)rng.NextInt('a', 'z') : (char)rng.NextInt('0', '9');
 
             return new string(filenameBuffer, 0, kFilenameLen);
         }
@@ -147,7 +161,7 @@ namespace Unity.Scenes
             // Found the extension dot, so null it and search for a section number '.' delimiter
             localStr[index] = 0;
             index = localStr.LastIndexOf(dot, index);
-            if(index < 0)
+            if (index < 0)
                 return 0;
 
             index++;

@@ -1,7 +1,7 @@
+using EditorAttributes.Editor.Utility;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
@@ -35,11 +35,14 @@ namespace EditorAttributes.Editor
             root.Add(title);
             root.Add(CreatePropertyField(property));
 
-            UpdateVisualElement(title, () =>
-            {
-                title.text = GetDynamicString(titleAttribute.Title, property, titleAttribute, errorBox);
-                DisplayErrorBox(root, errorBox);
-            });
+            UpdateVisualElement(
+                title,
+                () =>
+                {
+                    title.text = GetDynamicString(titleAttribute.Title, property, titleAttribute, errorBox);
+                    DisplayErrorBox(root, errorBox);
+                }
+            );
 
             return root;
         }

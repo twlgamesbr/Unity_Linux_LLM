@@ -23,20 +23,29 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
 
         [UxmlQuery]
         Label ServerHost;
+
         [UxmlQuery]
         ColorField ServerHostColor;
+
         [UxmlQuery]
         Label NoClientsConnectedText;
+
         [UxmlQuery]
         VisualElement ClientsContainer;
 
         [Inject]
         NetVisConfigurationWithEvents Configuration;
+
         [Inject]
         IGetConnectedClients ConnectedClientsRepository;
         OwnershipSettings OwnershipSettings => Configuration.Configuration.Settings.Ownership;
 
-        readonly List<(ClientId ClientId, ColorField Color, Action<NetVisSettings> SettingsChangedCallback, Action ColorsChangedCallback)> m_ConnectedClients = new();
+        readonly List<(
+            ClientId ClientId,
+            ColorField Color,
+            Action<NetVisSettings> SettingsChangedCallback,
+            Action ColorsChangedCallback
+        )> m_ConnectedClients = new();
 
         public OwnershipServerClientConfigurationView()
         {
@@ -45,17 +54,26 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             ServerHostColor.showAlpha = k_ClientColorShowAlpha;
             ServerHostColor.showEyeDropper = k_ClientColorShowEyeDropper;
 
-            ServerHostColor.Bind(OwnershipSettings.ServerHostColor,
-                newColor => OwnershipSettings.SetCustomColor(0, newColor));
+            ServerHostColor.Bind(
+                OwnershipSettings.ServerHostColor,
+                newColor => OwnershipSettings.SetCustomColor(0, newColor)
+            );
 
-            this.AddManipulator(new ContextualMenuManipulator(evt =>
-                evt.menu.AppendAction("Reset Colors", _ =>
-                {
-                    OwnershipSettings.ResetCustomColors();
-                })));
+            this.AddManipulator(
+                new ContextualMenuManipulator(evt =>
+                    evt.menu.AppendAction(
+                        "Reset Colors",
+                        _ =>
+                        {
+                            OwnershipSettings.ResetCustomColors();
+                        }
+                    )
+                )
+            );
 
             Configuration.SettingsChanged += _ => RefreshColorField(ServerHostColor, OwnershipSettings.ServerHostColor);
-            OwnershipSettings.ColorsChanged += () => RefreshColorField(ServerHostColor, OwnershipSettings.ServerHostColor);
+            OwnershipSettings.ColorsChanged += () =>
+                RefreshColorField(ServerHostColor, OwnershipSettings.ServerHostColor);
 
             RefreshClientList();
         }
@@ -106,13 +124,14 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
             {
                 label = clientId.ToString(),
                 showAlpha = k_ClientColorShowAlpha,
-                showEyeDropper = k_ClientColorShowEyeDropper
+                showEyeDropper = k_ClientColorShowEyeDropper,
             };
 
             var clientColor = OwnershipSettings.GetClientColor(clientId);
             colorField.Bind(clientColor, newColor => OwnershipSettings.SetCustomColor(clientId, newColor));
 
-            Action<NetVisSettings> settingsChanged = _ => RefreshColorField(colorField, OwnershipSettings.GetClientColor(clientId));
+            Action<NetVisSettings> settingsChanged = _ =>
+                RefreshColorField(colorField, OwnershipSettings.GetClientColor(clientId));
             Configuration.SettingsChanged += settingsChanged;
 
             Action colorsChanged = () => RefreshColorField(colorField, OwnershipSettings.GetClientColor(clientId));

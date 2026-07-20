@@ -9,23 +9,46 @@ namespace UnityEditor.Rendering
 {
     internal static class TextureParameterHelper
     {
-        static readonly Type k_ObjectFieldValidator = Type.GetType("UnityEditor.EditorGUI+ObjectFieldValidator,UnityEditor");
+        static readonly Type k_ObjectFieldValidator = Type.GetType(
+            "UnityEditor.EditorGUI+ObjectFieldValidator,UnityEditor"
+        );
 
         internal static Func<Object[], Type, SerializedProperty, int, Object> ValidateObjectFieldAssignment;
-        static Func<Rect, Rect, int, Object, Object, Type, Type, SerializedProperty, Delegate, bool, GUIStyle, Object> k_DoObjectField;
+        static Func<
+            Rect,
+            Rect,
+            int,
+            Object,
+            Object,
+            Type,
+            Type,
+            SerializedProperty,
+            Delegate,
+            bool,
+            GUIStyle,
+            Object
+        > k_DoObjectField;
 
-        internal delegate Object ObjectFieldValidator(Object[] references, Type objType, SerializedProperty property, int options);
+        internal delegate Object ObjectFieldValidator(
+            Object[] references,
+            Type objType,
+            SerializedProperty property,
+            int options
+        );
 
         static TextureParameterHelper()
         {
-            Type ObjectFieldValidatorOptions_Type = Type.GetType("UnityEditor.EditorGUI+ObjectFieldValidatorOptions,UnityEditor");
+            Type ObjectFieldValidatorOptions_Type = Type.GetType(
+                "UnityEditor.EditorGUI+ObjectFieldValidatorOptions,UnityEditor"
+            );
 
             var typeParameter = Expression.Parameter(typeof(Type), "type");
             var propertyParameter = Expression.Parameter(typeof(SerializedProperty), "property");
             var intParameter = Expression.Parameter(typeof(int), "int");
 
             // ValidateObjectFieldAssignment
-            MethodInfo validateObjectFieldAssignment_Info = Type.GetType("UnityEditor.EditorGUI,UnityEditor").GetMethod("ValidateObjectFieldAssignment", BindingFlags.Static | BindingFlags.NonPublic);
+            MethodInfo validateObjectFieldAssignment_Info = Type.GetType("UnityEditor.EditorGUI,UnityEditor")
+                .GetMethod("ValidateObjectFieldAssignment", BindingFlags.Static | BindingFlags.NonPublic);
 
             var referencesParameter = Expression.Parameter(typeof(Object[]), "references");
             var optionsVariable = Expression.Parameter(ObjectFieldValidatorOptions_Type, "options");
@@ -33,16 +56,42 @@ namespace UnityEditor.Rendering
             var validateObjectFieldAssignment_Block = Expression.Block(
                 new[] { optionsVariable },
                 Expression.Assign(optionsVariable, Expression.Convert(intParameter, ObjectFieldValidatorOptions_Type)),
-                Expression.Call(validateObjectFieldAssignment_Info, referencesParameter, typeParameter, propertyParameter, optionsVariable)
+                Expression.Call(
+                    validateObjectFieldAssignment_Info,
+                    referencesParameter,
+                    typeParameter,
+                    propertyParameter,
+                    optionsVariable
+                )
             );
 
-            var validateObjectFieldAssignment_Lambda = Expression.Lambda<Func<Object[], Type, SerializedProperty, int, Object>>(
-                validateObjectFieldAssignment_Block, referencesParameter, typeParameter, propertyParameter, intParameter);
+            var validateObjectFieldAssignment_Lambda = Expression.Lambda<
+                Func<Object[], Type, SerializedProperty, int, Object>
+            >(validateObjectFieldAssignment_Block, referencesParameter, typeParameter, propertyParameter, intParameter);
             ValidateObjectFieldAssignment = validateObjectFieldAssignment_Lambda.Compile();
 
             // ObjectField
-            MethodInfo doObjectField_Info = Type.GetType("UnityEditor.EditorGUI,UnityEditor").GetMethod("DoObjectField", BindingFlags.Static | BindingFlags.NonPublic, null,
-                new Type[] { typeof(Rect), typeof(Rect), typeof(int), typeof(Object), typeof(Object), typeof(Type), typeof(Type), typeof(SerializedProperty), k_ObjectFieldValidator, typeof(bool), typeof(GUIStyle) }, null);
+            MethodInfo doObjectField_Info = Type.GetType("UnityEditor.EditorGUI,UnityEditor")
+                .GetMethod(
+                    "DoObjectField",
+                    BindingFlags.Static | BindingFlags.NonPublic,
+                    null,
+                    new Type[]
+                    {
+                        typeof(Rect),
+                        typeof(Rect),
+                        typeof(int),
+                        typeof(Object),
+                        typeof(Object),
+                        typeof(Type),
+                        typeof(Type),
+                        typeof(SerializedProperty),
+                        k_ObjectFieldValidator,
+                        typeof(bool),
+                        typeof(GUIStyle),
+                    },
+                    null
+                );
 
             var positionParameter = Expression.Parameter(typeof(Rect), "position");
             var rectParameter = Expression.Parameter(typeof(Rect), "rect");
@@ -57,11 +106,38 @@ namespace UnityEditor.Rendering
             var doObjectField_Block = Expression.Block(
                 new[] { validatorVariable },
                 Expression.Assign(validatorVariable, Expression.Convert(validatorParameter, k_ObjectFieldValidator)),
-                Expression.Call(doObjectField_Info, positionParameter, rectParameter, intParameter, objectParameter, unusedParameter, typeParameter, type2Parameter, propertyParameter, validatorVariable, boolParameter, styleParameter)
+                Expression.Call(
+                    doObjectField_Info,
+                    positionParameter,
+                    rectParameter,
+                    intParameter,
+                    objectParameter,
+                    unusedParameter,
+                    typeParameter,
+                    type2Parameter,
+                    propertyParameter,
+                    validatorVariable,
+                    boolParameter,
+                    styleParameter
+                )
             );
 
-            var doObjectField_Lambda = Expression.Lambda<Func<Rect, Rect, int, Object, Object, Type, Type, SerializedProperty, Delegate, bool, GUIStyle, Object>>(
-                doObjectField_Block, positionParameter, rectParameter, intParameter, objectParameter, unusedParameter, typeParameter, type2Parameter, propertyParameter, validatorParameter, boolParameter, styleParameter);
+            var doObjectField_Lambda = Expression.Lambda<
+                Func<Rect, Rect, int, Object, Object, Type, Type, SerializedProperty, Delegate, bool, GUIStyle, Object>
+            >(
+                doObjectField_Block,
+                positionParameter,
+                rectParameter,
+                intParameter,
+                objectParameter,
+                unusedParameter,
+                typeParameter,
+                type2Parameter,
+                propertyParameter,
+                validatorParameter,
+                boolParameter,
+                styleParameter
+            );
             k_DoObjectField = doObjectField_Lambda.Compile();
         }
 
@@ -70,13 +146,26 @@ namespace UnityEditor.Rendering
             return DelegateUtility.Cast(validator, k_ObjectFieldValidator);
         }
 
-        internal static void DoObjectField(SerializedProperty property, GUIContent label, Type type1, Type type2, Delegate validator)
+        internal static void DoObjectField(
+            SerializedProperty property,
+            GUIContent label,
+            Type type1,
+            Type type2,
+            Delegate validator
+        )
         {
             Rect r = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
             DoObjectField(r, property, label, type1, type2, validator);
         }
 
-        internal static void DoObjectField(Rect r, SerializedProperty property, GUIContent label, Type type1, Type type2, Delegate validator)
+        internal static void DoObjectField(
+            Rect r,
+            SerializedProperty property,
+            GUIContent label,
+            Type type1,
+            Type type2,
+            Delegate validator
+        )
         {
             int id = GUIUtility.GetControlID(FocusType.Keyboard, r);
             r = EditorGUI.PrefixLabel(r, id, label);
@@ -84,15 +173,20 @@ namespace UnityEditor.Rendering
             k_DoObjectField(r, r, id, null, null, type1, type2, property, validator, false, EditorStyles.objectField);
         }
 
-
         internal const float kIndentPerLevel = 15;
+
         internal static void GetRectsForMiniThumbnailField(Rect position, out Rect thumbRect, out Rect labelRect)
         {
             float x = EditorGUI.indentLevel * kIndentPerLevel;
             thumbRect = new Rect(position.x + x, position.y, 32f, 18f);
 
             float labelStartX = thumbRect.x + 2 * kIndentPerLevel; // label aligns with indent levels for being able to have the following labels align with this label
-            labelRect = new Rect(labelStartX, position.y, thumbRect.x + EditorGUIUtility.labelWidth - labelStartX, position.height);
+            labelRect = new Rect(
+                labelStartX,
+                position.y,
+                thumbRect.x + EditorGUIUtility.labelWidth - labelStartX,
+                position.height
+            );
         }
 
         internal static void MiniThumbnail(Rect r, SerializedProperty property, GUIContent label, Type type)
@@ -104,7 +198,19 @@ namespace UnityEditor.Rendering
 
             EditorGUI.BeginChangeCheck();
             int controlID = GUIUtility.GetControlID(12354, FocusType.Keyboard, r);
-            var value = k_DoObjectField(thumbRect, thumbRect, controlID, property.objectReferenceValue, null, type, typeof(RenderTexture), null, null, false, EditorStyles.objectField);
+            var value = k_DoObjectField(
+                thumbRect,
+                thumbRect,
+                controlID,
+                property.objectReferenceValue,
+                null,
+                type,
+                typeof(RenderTexture),
+                null,
+                null,
+                false,
+                EditorStyles.objectField
+            );
             if (EditorGUI.EndChangeCheck())
                 property.objectReferenceValue = value;
 
@@ -125,27 +231,36 @@ namespace UnityEditor.Rendering
             return genuineNullSelection;
         }
 
-        static Delegate validator = TextureParameterHelper.CastValidator((Object[] references, Type objType, SerializedProperty property, int options) =>
-        {
-            if (HasGenuineNullSelection(references))
-                return null;
-
-            // Accept RenderTextures of correct dimensions
-            Texture validated = (RenderTexture)TextureParameterHelper.ValidateObjectFieldAssignment(references, typeof(RenderTexture), property, options);
-            if (validated != null)
+        static Delegate validator = TextureParameterHelper.CastValidator(
+            (Object[] references, Type objType, SerializedProperty property, int options) =>
             {
-                if (objType == typeof(Texture2D) && validated.dimension != TextureDimension.Tex2D)
-                    validated = null;
-                if (objType == typeof(Texture3D) && validated.dimension != TextureDimension.Tex3D)
-                    validated = null;
-                if (objType == typeof(Cubemap)   && validated.dimension != TextureDimension.Cube)
-                    validated = null;
+                if (HasGenuineNullSelection(references))
+                    return null;
+
+                // Accept RenderTextures of correct dimensions
+                Texture validated = (RenderTexture)
+                    TextureParameterHelper.ValidateObjectFieldAssignment(
+                        references,
+                        typeof(RenderTexture),
+                        property,
+                        options
+                    );
+                if (validated != null)
+                {
+                    if (objType == typeof(Texture2D) && validated.dimension != TextureDimension.Tex2D)
+                        validated = null;
+                    if (objType == typeof(Texture3D) && validated.dimension != TextureDimension.Tex3D)
+                        validated = null;
+                    if (objType == typeof(Cubemap) && validated.dimension != TextureDimension.Cube)
+                        validated = null;
+                }
+                // Accept textures of correct type
+                if (validated == null)
+                    validated = (Texture)
+                        TextureParameterHelper.ValidateObjectFieldAssignment(references, objType, property, options);
+                return validated ? validated : property.objectReferenceValue;
             }
-            // Accept textures of correct type
-            if (validated == null)
-                validated = (Texture)TextureParameterHelper.ValidateObjectFieldAssignment(references, objType, property, options);
-            return validated ? validated : property.objectReferenceValue;
-        });
+        );
 
         internal static bool TextureField(SerializedProperty property, GUIContent title, TextureDimension dimension)
         {
@@ -157,13 +272,34 @@ namespace UnityEditor.Rendering
             switch (dimension)
             {
                 case TextureDimension.Tex2D:
-                    TextureParameterHelper.DoObjectField(rect, property, title, typeof(Texture2D), typeof(RenderTexture), validator);
+                    TextureParameterHelper.DoObjectField(
+                        rect,
+                        property,
+                        title,
+                        typeof(Texture2D),
+                        typeof(RenderTexture),
+                        validator
+                    );
                     break;
                 case TextureDimension.Tex3D:
-                    TextureParameterHelper.DoObjectField(rect, property, title, typeof(Texture3D), typeof(RenderTexture), validator);
+                    TextureParameterHelper.DoObjectField(
+                        rect,
+                        property,
+                        title,
+                        typeof(Texture3D),
+                        typeof(RenderTexture),
+                        validator
+                    );
                     break;
                 case TextureDimension.Cube:
-                    TextureParameterHelper.DoObjectField(rect, property, title, typeof(Cubemap), typeof(RenderTexture), validator);
+                    TextureParameterHelper.DoObjectField(
+                        rect,
+                        property,
+                        title,
+                        typeof(Cubemap),
+                        typeof(RenderTexture),
+                        validator
+                    );
                     break;
                 default:
                     EditorGUI.PropertyField(rect, property, title);

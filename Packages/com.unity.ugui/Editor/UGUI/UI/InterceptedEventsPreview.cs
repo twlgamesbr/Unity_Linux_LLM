@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.EventSystems;
+using UnityEngine.Profiling;
 
 namespace UnityEditor.Events
 {
@@ -73,7 +73,6 @@ namespace UnityEditor.Events
             if (Event.current.type != EventType.Repaint)
                 return;
             Profiler.BeginSample("InterceptedEventsPreview.OnPreviewGUI");
-
 
             if (m_Styles == null)
                 m_Styles = new Styles();
@@ -150,13 +149,16 @@ namespace UnityEditor.Events
         //Lookup cache to avoid recalculating which types uses which events:
         //Caches all interfaces that inherit from IEventSystemHandler
         static List<Type> s_EventSystemInterfaces = null;
+
         //Caches all GUIContents in a single list to avoid creating too much GUIContent and strings.
         private static List<GUIContent> s_PossibleEvents = null;
+
         //Caches all events used by each interface
         static Dictionary<Type, List<int>> s_InterfaceEventSystemEvents = null;
-        //Caches each concrete type and it's events
-        static readonly Dictionary<Type, ComponentInterceptedEvents> s_ComponentEvents2 = new Dictionary<Type, ComponentInterceptedEvents>();
 
+        //Caches each concrete type and it's events
+        static readonly Dictionary<Type, ComponentInterceptedEvents> s_ComponentEvents2 =
+            new Dictionary<Type, ComponentInterceptedEvents>();
 
         protected static List<ComponentInterceptedEvents> GetEventsInfo(GameObject gameObject)
         {
@@ -199,7 +201,9 @@ namespace UnityEditor.Events
                     {
                         componentEvent = new ComponentInterceptedEvents();
                         componentEvent.componentName = new GUIContent(type.Name);
-                        componentEvent.interceptedEvents = events.OrderBy(index => s_PossibleEvents[index].text).ToArray();
+                        componentEvent.interceptedEvents = events
+                            .OrderBy(index => s_PossibleEvents[index].text)
+                            .ToArray();
                     }
                     s_ComponentEvents2.Add(type, componentEvent);
 
@@ -209,7 +213,6 @@ namespace UnityEditor.Events
                 {
                     componentEvent = s_ComponentEvents2[type];
                 }
-
 
                 if (componentEvent != null)
                 {
@@ -238,7 +241,9 @@ namespace UnityEditor.Events
                 s_EventSystemInterfaces.Add(type);
                 List<int> eventIndexList = new List<int>();
 
-                MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo[] methodInfos = type.GetMethods(
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                );
                 for (int mi = 0; mi < methodInfos.Length; mi++)
                 {
                     MethodInfo methodInfo = methodInfos[mi];

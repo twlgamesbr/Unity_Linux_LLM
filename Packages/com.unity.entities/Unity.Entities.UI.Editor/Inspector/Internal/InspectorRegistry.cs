@@ -18,7 +18,9 @@ namespace Unity.Entities.UI
         /// <returns>The inspector instance or null</returns>
         static IInspector<TValue> GetInspector<TValue>(params IInspectorConstraint[] constraints)
         {
-            return GetInspectorWithConstraints<TValue>(InspectorConstraint.Combine(InspectorConstraint.AssignableTo<IRootInspector>(), constraints));
+            return GetInspectorWithConstraints<TValue>(
+                InspectorConstraint.Combine(InspectorConstraint.AssignableTo<IRootInspector>(), constraints)
+            );
         }
 
         /// <summary>
@@ -29,20 +31,29 @@ namespace Unity.Entities.UI
         /// <param name="constraints">Constraints that filter the candidate property drawer types.</param>
         /// <typeparam name="TValue">The type of the value</typeparam>
         /// <returns>The property drawer instance or null</returns>
-        static IInspector<TValue> GetPropertyInspector<TValue>(IProperty property, params IInspectorConstraint[] constraints)
+        static IInspector<TValue> GetPropertyInspector<TValue>(
+            IProperty property,
+            params IInspectorConstraint[] constraints
+        )
         {
-            foreach (var attribute in property.GetAttributes<UnityEngine.PropertyAttribute>() ??
-                                            Array.Empty<UnityEngine.PropertyAttribute>())
+            foreach (
+                var attribute in property.GetAttributes<UnityEngine.PropertyAttribute>()
+                    ?? Array.Empty<UnityEngine.PropertyAttribute>()
+            )
             {
                 var drawer = typeof(IPropertyDrawer<>).MakeGenericType(attribute.GetType());
-                var inspector = GetPropertyInspector<TValue>(InspectorConstraint.Combine(InspectorConstraint.AssignableTo(drawer), constraints));
+                var inspector = GetPropertyInspector<TValue>(
+                    InspectorConstraint.Combine(InspectorConstraint.AssignableTo(drawer), constraints)
+                );
                 if (null != inspector)
                 {
                     return inspector;
                 }
             }
 
-            return GetInspectorWithConstraints<TValue>(InspectorConstraint.Combine(InspectorConstraint.AssignableTo<IPropertyDrawer>(), constraints));
+            return GetInspectorWithConstraints<TValue>(
+                InspectorConstraint.Combine(InspectorConstraint.AssignableTo<IPropertyDrawer>(), constraints)
+            );
         }
 
         /// <summary>
@@ -53,13 +64,20 @@ namespace Unity.Entities.UI
         /// <param name="constraints">Constraints that filter the candidate property drawer types.</param>
         /// <typeparam name="TValue">The type of the value</typeparam>
         /// <returns>The property drawer instance or null</returns>
-        static IInspector<TValue> GetAttributeInspector<TValue>(IProperty property, params IInspectorConstraint[] constraints)
+        static IInspector<TValue> GetAttributeInspector<TValue>(
+            IProperty property,
+            params IInspectorConstraint[] constraints
+        )
         {
-            foreach (var attribute in property.GetAttributes<UnityEngine.PropertyAttribute>() ??
-                                      Array.Empty<UnityEngine.PropertyAttribute>())
+            foreach (
+                var attribute in property.GetAttributes<UnityEngine.PropertyAttribute>()
+                    ?? Array.Empty<UnityEngine.PropertyAttribute>()
+            )
             {
                 var drawer = typeof(IPropertyDrawer<>).MakeGenericType(attribute.GetType());
-                var inspector = GetInspectorWithConstraints<TValue>(InspectorConstraint.Combine(InspectorConstraint.AssignableTo(drawer), constraints));
+                var inspector = GetInspectorWithConstraints<TValue>(
+                    InspectorConstraint.Combine(InspectorConstraint.AssignableTo(drawer), constraints)
+                );
                 if (null != inspector)
                 {
                     return inspector;
@@ -79,7 +97,10 @@ namespace Unity.Entities.UI
         /// <returns>The property drawer instance or null</returns>
         static PropertyInspector<TValue> GetPropertyInspector<TValue>(params IInspectorConstraint[] constraints)
         {
-            return (PropertyInspector<TValue>) GetInspectorWithConstraints<TValue>(InspectorConstraint.Combine(InspectorConstraint.AssignableTo<IPropertyDrawer>(), constraints));
+            return (PropertyInspector<TValue>)
+                GetInspectorWithConstraints<TValue>(
+                    InspectorConstraint.Combine(InspectorConstraint.AssignableTo<IPropertyDrawer>(), constraints)
+                );
         }
 
         /// <summary>
@@ -154,9 +175,7 @@ namespace Unity.Entities.UI
                     bestType = type;
                 }
 
-                return null != bestType
-                    ? (InspectorBase<TValue>) Activator.CreateInstance(bestType)
-                    : null;
+                return null != bestType ? (InspectorBase<TValue>)Activator.CreateInstance(bestType) : null;
             }
             finally
             {
@@ -182,14 +201,22 @@ namespace Unity.Entities.UI
             if (!valueType.IsGenericType)
                 yield break;
 
-            enumerator = GetInspectorTypes(Cache.s_InspectorsPerType, valueType.GetGenericTypeDefinition(), constraints);
+            enumerator = GetInspectorTypes(
+                Cache.s_InspectorsPerType,
+                valueType.GetGenericTypeDefinition(),
+                constraints
+            );
             while (enumerator.MoveNext())
             {
                 yield return enumerator.Current;
             }
         }
 
-        static SatisfiesConstraintsEnumerator GetInspectorTypes(Dictionary<Type, List<Type>> lookup, Type type, params IInspectorConstraint[] constraints)
+        static SatisfiesConstraintsEnumerator GetInspectorTypes(
+            Dictionary<Type, List<Type>> lookup,
+            Type type,
+            params IInspectorConstraint[] constraints
+        )
         {
             lookup.TryGetValue(type, out var inspectors);
             return new SatisfiesConstraintsEnumerator(inspectors, constraints);
@@ -201,8 +228,9 @@ namespace Unity.Entities.UI
                 return Array.Empty<Type>();
 
             if (!Cache.s_RootGenericArgumentsPerType.TryGetValue(type, out var array))
-                Cache.s_RootGenericArgumentsPerType[type] =
-                    array = type.GetGenericTypeDefinition().GetRootType().GetGenericArguments();
+                Cache.s_RootGenericArgumentsPerType[type] = array = type.GetGenericTypeDefinition()
+                    .GetRootType()
+                    .GetGenericArguments();
             return array;
         }
 

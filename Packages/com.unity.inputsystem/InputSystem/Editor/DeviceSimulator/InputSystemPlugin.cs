@@ -47,13 +47,15 @@ namespace UnityEngine.InputSystem.Editor
             // Input System does not accept 0 as id
             var id = touchEvent.touchId + 1;
 
-            InputSystem.QueueStateEvent(SimulatorTouchscreen,
+            InputSystem.QueueStateEvent(
+                SimulatorTouchscreen,
                 new TouchState
                 {
                     touchId = id,
                     phase = ToInputSystem(touchEvent.phase),
-                    position = touchEvent.position
-                });
+                    position = touchEvent.position,
+                }
+            );
         }
 
         private void DisableConflictingDevice(InputDevice device)
@@ -71,7 +73,9 @@ namespace UnityEngine.InputSystem.Editor
                 DisableConflictingDevice(device);
         }
 
-        private static UnityEngine.InputSystem.TouchPhase ToInputSystem(UnityEditor.DeviceSimulation.TouchPhase original)
+        private static UnityEngine.InputSystem.TouchPhase ToInputSystem(
+            UnityEditor.DeviceSimulation.TouchPhase original
+        )
         {
             switch (original)
             {

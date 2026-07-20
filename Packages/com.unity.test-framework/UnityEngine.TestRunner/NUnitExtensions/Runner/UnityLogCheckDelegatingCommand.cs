@@ -15,7 +15,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         private static Dictionary<object, bool?> s_AttributeCache = new Dictionary<object, bool?>();
 
         public UnityLogCheckDelegatingCommand(TestCommand innerCommand)
-            : base(innerCommand) {}
+            : base(innerCommand) { }
 
         public override TestResult Execute(ITestExecutionContext context)
         {
@@ -40,8 +40,13 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             {
                 IEnumerable executeEnumerable = null;
 
-                if (!ExecuteAndCheckLog(logScope, context.CurrentResult,
-                    () => executeEnumerable = enumerableTestMethodCommand.ExecuteEnumerable(context)))
+                if (
+                    !ExecuteAndCheckLog(
+                        logScope,
+                        context.CurrentResult,
+                        () => executeEnumerable = enumerableTestMethodCommand.ExecuteEnumerable(context)
+                    )
+                )
                     yield break;
 
                 var innerCommandIsTask = enumerableTestMethodCommand is TaskTestMethodCommand;
@@ -49,7 +54,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                 {
                     // do not check expected logs here - we want to permit expecting and receiving messages to run
                     // across frames. This means that we break on failing logs and fail on next frame.
-                    // An exception is async (Task), in which case we first fail after the task has run, as we cannot cancel the task. 
+                    // An exception is async (Task), in which case we first fail after the task has run, as we cannot cancel the task.
                     if (!innerCommandIsTask && !CheckFailingLogs(logScope, context.CurrentResult))
                     {
                         yield break;
@@ -79,8 +84,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             }
         }
 
-        private static bool ExecuteAndCheckLog(LogScope logScope, TestResult result, Action action)
-            => CaptureException(result, action) && CheckLogs(result, logScope);
+        private static bool ExecuteAndCheckLog(LogScope logScope, TestResult result, Action action) =>
+            CaptureException(result, action) && CheckLogs(result, logScope);
 
         private static void PostTestValidation(LogScope logScope, TestCommand command, TestResult result)
         {

@@ -11,30 +11,19 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
     {
         const string k_IconPath =
             // This is the same logic as NetVisIcon.GetPath, however for use in an attribute it must be a compile-time constant
-            NetVisEditorPaths.k_IconsRoot + nameof(NetVisIcon.NetSceneVis) + ".png";
+            NetVisEditorPaths.k_IconsRoot
+            + nameof(NetVisIcon.NetSceneVis)
+            + ".png";
 
         public NetVisToolbarOverlay()
-            : base(
-                BandwidthToolbarDropdownToggle.k_Id,
-                OwnershipToolbarDropdownToggle.k_Id,
-                SettingsToolbarButton.k_Id)
-        {
-        }
+            : base(BandwidthToolbarDropdownToggle.k_Id, OwnershipToolbarDropdownToggle.k_Id, SettingsToolbarButton.k_Id)
+        { }
 
         public override VisualElement CreatePanelContent()
         {
-            var root = new VisualElement
-            {
-                name = nameof(NetVisToolbarOverlay),
-                style =
-                {
-                    width = 300,
-                },
-            };
+            var root = new VisualElement { name = nameof(NetVisToolbarOverlay), style = { width = 300 } };
 
-            root.Add(layout == Layout.Panel
-                ? new PanelOverlayView()
-                : new ToolbarOverlayView());
+            root.Add(layout == Layout.Panel ? new PanelOverlayView() : new ToolbarOverlayView());
 
             return root;
         }

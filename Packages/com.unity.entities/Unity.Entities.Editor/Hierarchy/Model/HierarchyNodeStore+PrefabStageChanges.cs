@@ -32,7 +32,9 @@ namespace Unity.Entities.Editor
                 if (!gameObject)
                     continue;
 
-                HierarchyNodeHandle parent = gameObject.transform.parent ? GetNodeHandle(gameObject.transform.parent.gameObject, subSceneMap) : HierarchyNodeHandle.Root;
+                HierarchyNodeHandle parent = gameObject.transform.parent
+                    ? GetNodeHandle(gameObject.transform.parent.gameObject, subSceneMap)
+                    : HierarchyNodeHandle.Root;
 
                 if (null != gameObject.transform.parent)
                 {
@@ -42,7 +44,10 @@ namespace Unity.Entities.Editor
                         for (var j = i; j < events.Length; j++)
                         {
                             var evt = events[j];
-                            if (evt.EntityId == parent && (evt.EventType & GameObjectChangeTrackerEventType.Destroyed) == 0)
+                            if (
+                                evt.EntityId == parent
+                                && (evt.EventType & GameObjectChangeTrackerEventType.Destroyed) == 0
+                            )
                             {
                                 // replace the current event with the one found
                                 events[i] = evt;
@@ -98,11 +103,18 @@ namespace Unity.Entities.Editor
                     }
                 }
 
-                if (((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedScene) != 0 || ((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedParent) != 0)))
+                if (
+                    (
+                        (changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedScene) != 0
+                        || ((changeTrackerEvent.EventType & GameObjectChangeTrackerEventType.ChangedParent) != 0)
+                    )
+                )
                 {
                     if (!Exists(parent))
                     {
-                        Debug.Log($"[{changeTrackerEvent.EventType}]: Ignoring GameObject {gameObject.name} ({gameObject.GetEntityId()}), expected parent {parent} does not exist in the hierarchy");
+                        Debug.Log(
+                            $"[{changeTrackerEvent.EventType}]: Ignoring GameObject {gameObject.name} ({gameObject.GetEntityId()}), expected parent {parent} does not exist in the hierarchy"
+                        );
                     }
                     else
                     {

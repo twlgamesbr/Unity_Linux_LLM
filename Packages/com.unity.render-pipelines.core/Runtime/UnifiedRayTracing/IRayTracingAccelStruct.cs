@@ -147,4 +147,3 @@ namespace UnityEngine.Rendering.UnifiedRayTracing
         ulong GetBuildScratchBufferRequiredSizeInBytes();
     }
 }
-

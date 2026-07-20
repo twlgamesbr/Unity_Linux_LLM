@@ -13,8 +13,10 @@ namespace Unity.Entities.SourceGen.SystemGenerator.EntityQueryBulkOperations
         private readonly IDictionary<InvocationExpressionSyntax, SyntaxNode> _originalToReplacementNodes;
         private bool _hasWrittenSyntax;
 
-        public EntityQueryBulkOperationSyntaxWalker(IDictionary<InvocationExpressionSyntax, SyntaxNode> originalToReplacementNodes) : base(SyntaxWalkerDepth.Trivia) =>
-            _originalToReplacementNodes = originalToReplacementNodes;
+        public EntityQueryBulkOperationSyntaxWalker(
+            IDictionary<InvocationExpressionSyntax, SyntaxNode> originalToReplacementNodes
+        )
+            : base(SyntaxWalkerDepth.Trivia) => _originalToReplacementNodes = originalToReplacementNodes;
 
         public bool TryWriteSyntax(IndentedTextWriter writer, CandidateSyntax candidateSyntax)
         {

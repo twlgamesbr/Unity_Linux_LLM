@@ -61,7 +61,8 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             parentUniqueId = test.ParentUniqueName;
         }
 
-        internal TestRunnerResult(ITestResultAdaptor testResult) : this(testResult.Test)
+        internal TestRunnerResult(ITestResultAdaptor testResult)
+            : this(testResult.Test)
         {
             notOutdated = true;
 
@@ -83,7 +84,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         {
             if (results == null)
                 return;
-            results.TryGetValue(parentId , out var childrenResult);
+            results.TryGetValue(parentId, out var childrenResult);
             if (childrenResult == null)
                 return;
             if (childrenResult.TrueForAll(x => x.resultStatus == ResultStatus.Passed))
@@ -107,7 +108,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         {
             if (results == null)
                 return;
-            results.TryGetValue(parentId , out var childrenResult);
+            results.TryGetValue(parentId, out var childrenResult);
             if (childrenResult == null)
                 return;
             var totalDuration = childrenResult.Sum(x => x.duration);
@@ -125,7 +126,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
             else
             {
-                results.Add(parentUniqueId, new List<TestRunnerResult> {this});
+                results.Add(parentUniqueId, new List<TestRunnerResult> { this });
             }
         }
 
@@ -160,7 +161,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             Passed,
             Failed,
             Inconclusive,
-            Skipped
+            Skipped,
         }
 
         private static ResultStatus ParseNUnitResultStatus(TestStatus status)
@@ -185,11 +186,26 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             return string.Format("{0} ({1})", name, fullName);
         }
 
-        public string Id { get { return uniqueId; } }
-        public string FullName { get { return fullName; } }
-        public string ParentId { get { return parentUniqueId; } }
-        public bool IsSuite { get { return isSuite; } }
-        public List<string> Categories { get { return categories; } }
+        public string Id
+        {
+            get { return uniqueId; }
+        }
+        public string FullName
+        {
+            get { return fullName; }
+        }
+        public string ParentId
+        {
+            get { return parentUniqueId; }
+        }
+        public bool IsSuite
+        {
+            get { return isSuite; }
+        }
+        public List<string> Categories
+        {
+            get { return categories; }
+        }
 
         public void Clear()
         {

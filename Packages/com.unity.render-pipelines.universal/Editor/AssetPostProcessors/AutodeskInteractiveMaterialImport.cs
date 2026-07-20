@@ -1,5 +1,5 @@
-using UnityEngine;
 using UnityEditor.AssetImporters;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -9,6 +9,7 @@ namespace UnityEditor.Rendering.Universal
     {
         static readonly uint k_Version = 2;
         static readonly int k_Order = -970;
+
         public override uint GetVersion()
         {
             return k_Version;
@@ -19,7 +20,11 @@ namespace UnityEditor.Rendering.Universal
             return k_Order;
         }
 
-        public void OnPreprocessMaterialDescription(MaterialDescription description, Material material, AnimationClip[] clips)
+        public void OnPreprocessMaterialDescription(
+            MaterialDescription description,
+            Material material,
+            AnimationClip[] clips
+        )
         {
             var pipelineAsset = GraphicsSettings.currentRenderPipeline;
             if (!pipelineAsset || pipelineAsset.GetType() != typeof(UniversalRenderPipelineAsset))
@@ -142,27 +147,51 @@ namespace UnityEditor.Rendering.Universal
 
                 for (int i = 0; i < clips.Length; i++)
                 {
-                    if (description.HasAnimationCurveInClip(clips[i].name, "uv_scale.x") || description.HasAnimationCurveInClip(clips[i].name, "uv_scale.y"))
+                    if (
+                        description.HasAnimationCurveInClip(clips[i].name, "uv_scale.x")
+                        || description.HasAnimationCurveInClip(clips[i].name, "uv_scale.y")
+                    )
                     {
                         AnimationCurve curve;
                         if (description.TryGetAnimationCurve(clips[i].name, "uv_scale.x", out curve))
                             clips[i].SetCurve("", typeof(Material), "_UvTiling.x", curve);
                         else
-                            clips[i].SetCurve("", typeof(Material), "_UvTiling.x", AnimationCurve.Constant(0.0f, 1.0f, 1.0f));
+                            clips[i]
+                                .SetCurve(
+                                    "",
+                                    typeof(Material),
+                                    "_UvTiling.x",
+                                    AnimationCurve.Constant(0.0f, 1.0f, 1.0f)
+                                );
 
                         if (description.TryGetAnimationCurve(clips[i].name, "uv_scale.y", out curve))
                             clips[i].SetCurve("", typeof(Material), "_UvTiling.y", curve);
                         else
-                            clips[i].SetCurve("", typeof(Material), "_UvTiling.y", AnimationCurve.Constant(0.0f, 1.0f, 1.0f));
+                            clips[i]
+                                .SetCurve(
+                                    "",
+                                    typeof(Material),
+                                    "_UvTiling.y",
+                                    AnimationCurve.Constant(0.0f, 1.0f, 1.0f)
+                                );
                     }
 
-                    if (description.HasAnimationCurveInClip(clips[i].name, "uv_offset.x") || description.HasAnimationCurveInClip(clips[i].name, "uv_offset.y"))
+                    if (
+                        description.HasAnimationCurveInClip(clips[i].name, "uv_offset.x")
+                        || description.HasAnimationCurveInClip(clips[i].name, "uv_offset.y")
+                    )
                     {
                         AnimationCurve curve;
                         if (description.TryGetAnimationCurve(clips[i].name, "uv_offset.x", out curve))
                             clips[i].SetCurve("", typeof(Material), "_UvOffset.x", curve);
                         else
-                            clips[i].SetCurve("", typeof(Material), "_UvOffset.x", AnimationCurve.Constant(0.0f, 1.0f, 0.0f));
+                            clips[i]
+                                .SetCurve(
+                                    "",
+                                    typeof(Material),
+                                    "_UvOffset.x",
+                                    AnimationCurve.Constant(0.0f, 1.0f, 0.0f)
+                                );
 
                         if (description.TryGetAnimationCurve(clips[i].name, "uv_offset.y", out curve))
                         {
@@ -170,7 +199,13 @@ namespace UnityEditor.Rendering.Universal
                             clips[i].SetCurve("", typeof(Material), "_UvOffset.y", curve);
                         }
                         else
-                            clips[i].SetCurve("", typeof(Material), "_UvOffset.y", AnimationCurve.Constant(0.0f, 1.0f, 0.0f));
+                            clips[i]
+                                .SetCurve(
+                                    "",
+                                    typeof(Material),
+                                    "_UvOffset.y",
+                                    AnimationCurve.Constant(0.0f, 1.0f, 0.0f)
+                                );
                     }
                 }
 
@@ -204,7 +239,6 @@ namespace UnityEditor.Rendering.Universal
 
                     material.SetColor("_EmissionColor", vectorProperty);
 
-
                     if (description.HasAnimationCurve("emissive.x"))
                     {
                         if (description.HasAnimationCurve("emissive_intensity"))
@@ -214,7 +248,11 @@ namespace UnityEditor.Rendering.Universal
                             {
                                 AnimationCurve curve;
                                 AnimationCurve intensityCurve;
-                                description.TryGetAnimationCurve(clips[i].name, "emissive_intensity", out intensityCurve);
+                                description.TryGetAnimationCurve(
+                                    clips[i].name,
+                                    "emissive_intensity",
+                                    out intensityCurve
+                                );
 
                                 description.TryGetAnimationCurve(clips[i].name, "emissive.x", out curve);
                                 MultiplyCurves(curve, intensityCurve);
@@ -276,12 +314,25 @@ namespace UnityEditor.Rendering.Universal
             curve.keys = keyframes;
         }
 
-        static void ConvertAndCopyKeys(AnimationCurve curveDest, AnimationCurve curveSource, System.Func<float, float> convertionDelegate)
+        static void ConvertAndCopyKeys(
+            AnimationCurve curveDest,
+            AnimationCurve curveSource,
+            System.Func<float, float> convertionDelegate
+        )
         {
             for (int i = 0; i < curveSource.keys.Length; i++)
             {
                 var sourceKey = curveSource.keys[i];
-                curveDest.AddKey(new Keyframe(sourceKey.time, convertionDelegate(sourceKey.value), sourceKey.inTangent, sourceKey.outTangent, sourceKey.inWeight, sourceKey.outWeight));
+                curveDest.AddKey(
+                    new Keyframe(
+                        sourceKey.time,
+                        convertionDelegate(sourceKey.value),
+                        sourceKey.inTangent,
+                        sourceKey.outTangent,
+                        sourceKey.inWeight,
+                        sourceKey.outWeight
+                    )
+                );
             }
         }
 
@@ -305,7 +356,12 @@ namespace UnityEditor.Rendering.Universal
             curve.keys = keyframes;
         }
 
-        static void RemapCurve(MaterialDescription description, AnimationClip[] clips, string originalPropertyName, string newPropertyName)
+        static void RemapCurve(
+            MaterialDescription description,
+            AnimationClip[] clips,
+            string originalPropertyName,
+            string newPropertyName
+        )
         {
             AnimationCurve curve;
             for (int i = 0; i < clips.Length; i++)
@@ -317,7 +373,12 @@ namespace UnityEditor.Rendering.Universal
             }
         }
 
-        static void RemapColorCurves(MaterialDescription description, AnimationClip[] clips, string originalPropertyName, string newPropertyName)
+        static void RemapColorCurves(
+            MaterialDescription description,
+            AnimationClip[] clips,
+            string originalPropertyName,
+            string newPropertyName
+        )
         {
             AnimationCurve curve;
             for (int i = 0; i < clips.Length; i++)

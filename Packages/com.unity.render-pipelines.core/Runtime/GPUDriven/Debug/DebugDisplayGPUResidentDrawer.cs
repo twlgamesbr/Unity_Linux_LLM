@@ -1,10 +1,11 @@
 using System;
+using static UnityEngine.Rendering.DebugUI;
+using static UnityEngine.Rendering.DebugUI.Widget;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-using static UnityEngine.Rendering.DebugUI;
-using static UnityEngine.Rendering.DebugUI.Widget;
+
 
 namespace UnityEngine.Rendering
 {
@@ -75,16 +76,53 @@ namespace UnityEngine.Rendering
         static class Strings
         {
             public const string drawerSettingsContainerName = "GPU Resident Drawer Settings";
-            public static readonly NameAndTooltip displayBatcherStats = new() { name = "Display Culling Stats", tooltip = "Enable the checkbox to display stats for instance culling." };
+            public static readonly NameAndTooltip displayBatcherStats = new()
+            {
+                name = "Display Culling Stats",
+                tooltip = "Enable the checkbox to display stats for instance culling.",
+            };
             public const string occlusionCullingTitle = "Occlusion Culling";
-            public static readonly NameAndTooltip occlusionTestOverlayEnable = new() { name = "Occlusion Test Overlay", tooltip = "Occlusion test visualisation." };
-            public static readonly NameAndTooltip occlusionTestOverlayCountVisible = new() { name = "Occlusion Test Overlay Count Visible", tooltip = "Occlusion test visualisation should count visible instances instead of occluded instances." };
-            public static readonly NameAndTooltip overrideOcclusionTestToAlwaysPass = new() { name = "Override Occlusion Test To Always Pass", tooltip = "Occlusion test always passes." };
-            public static readonly NameAndTooltip occluderContextStats = new() { name = "Occluder Context Stats", tooltip = "Show all the active occluder context textures." };
-            public static readonly NameAndTooltip occluderDebugViewEnable = new() { name = "Occluder Debug View", tooltip = "Debug view of occluder texture." };
-            public static readonly NameAndTooltip occluderDebugViewIndex = new() { name = "Occluder Debug View Index", tooltip = "Index of the view for which the occluder texture is displayed. Use the Occlusion Test Context Stats for a list of the views." };
-            public static readonly NameAndTooltip occluderDebugViewRangeMin = new() { name = "Occluder Debug View Range Min", tooltip = "Range in which the occluder debug texture are displayed." };
-            public static readonly NameAndTooltip occluderDebugViewRangeMax = new() { name = "Occluder Debug View Range Max", tooltip = "Range in which the occluder debug texture are displayed." };
+            public static readonly NameAndTooltip occlusionTestOverlayEnable = new()
+            {
+                name = "Occlusion Test Overlay",
+                tooltip = "Occlusion test visualisation.",
+            };
+            public static readonly NameAndTooltip occlusionTestOverlayCountVisible = new()
+            {
+                name = "Occlusion Test Overlay Count Visible",
+                tooltip = "Occlusion test visualisation should count visible instances instead of occluded instances.",
+            };
+            public static readonly NameAndTooltip overrideOcclusionTestToAlwaysPass = new()
+            {
+                name = "Override Occlusion Test To Always Pass",
+                tooltip = "Occlusion test always passes.",
+            };
+            public static readonly NameAndTooltip occluderContextStats = new()
+            {
+                name = "Occluder Context Stats",
+                tooltip = "Show all the active occluder context textures.",
+            };
+            public static readonly NameAndTooltip occluderDebugViewEnable = new()
+            {
+                name = "Occluder Debug View",
+                tooltip = "Debug view of occluder texture.",
+            };
+            public static readonly NameAndTooltip occluderDebugViewIndex = new()
+            {
+                name = "Occluder Debug View Index",
+                tooltip =
+                    "Index of the view for which the occluder texture is displayed. Use the Occlusion Test Context Stats for a list of the views.",
+            };
+            public static readonly NameAndTooltip occluderDebugViewRangeMin = new()
+            {
+                name = "Occluder Debug View Range Min",
+                tooltip = "Range in which the occluder debug texture are displayed.",
+            };
+            public static readonly NameAndTooltip occluderDebugViewRangeMax = new()
+            {
+                name = "Occluder Debug View Range Max",
+                tooltip = "Range in which the occluder debug texture are displayed.",
+            };
         }
 
         private static DebugOccluderStats GetOccluderStats(int occluderIndex)
@@ -116,11 +154,25 @@ namespace UnityEngine.Rendering
             return new DebugUI.Table.Row
             {
                 displayName = "",
-                isHiddenCallback = () => { return viewIndex >= GetInstanceCullerViewCount(); },
+                isHiddenCallback = () =>
+                {
+                    return viewIndex >= GetInstanceCullerViewCount();
+                },
                 children =
                 {
-                    new DebugUI.Value { displayName = "View Type",          refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => GetInstanceCullerViewStats(viewIndex).viewType },
-                    new DebugUI.Value { displayName = "View Instance ID",   refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                    new DebugUI.Value
+                    {
+                        displayName = "View Type",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => GetInstanceCullerViewStats(viewIndex).viewType,
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "View Instance ID",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () =>
                         {
                             var viewStats = GetInstanceCullerViewStats(viewIndex);
 #if UNITY_EDITOR
@@ -131,29 +183,58 @@ namespace UnityEngine.Rendering
                             }
 #endif
                             return viewStats.viewID;
-                        }
+                        },
                     },
-                    new DebugUI.Value { displayName = "Split Index",        refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => GetInstanceCullerViewStats(viewIndex).splitIndex },
-                    new DebugUI.Value { displayName = "Visible Instances CPU | GPU", tooltip = "Visible instances after CPU culling and after GPU culling.", refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                    new DebugUI.Value
+                    {
+                        displayName = "Split Index",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => GetInstanceCullerViewStats(viewIndex).splitIndex,
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Visible Instances CPU | GPU",
+                        tooltip = "Visible instances after CPU culling and after GPU culling.",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () =>
                         {
                             var viewStats = GetInstanceCullerViewStats(viewIndex);
                             return $"{viewStats.visibleInstancesOnCPU} | {viewStats.visibleInstancesOnGPU}";
-                        }
+                        },
                     },
-                    new DebugUI.Value { displayName = "Visible Primitives CPU | GPU", tooltip = "Visible primitives after CPU culling and after GPU culling.", refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                    new DebugUI.Value
+                    {
+                        displayName = "Visible Primitives CPU | GPU",
+                        tooltip = "Visible primitives after CPU culling and after GPU culling.",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () =>
                         {
                             var viewStats = GetInstanceCullerViewStats(viewIndex);
                             return $"{viewStats.visiblePrimitivesOnCPU} | {viewStats.visiblePrimitivesOnGPU}";
-                        }
+                        },
                     },
-                    new DebugUI.Value { displayName = "Draw Commands",      refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => GetInstanceCullerViewStats(viewIndex).drawCommands },
-                }
+                    new DebugUI.Value
+                    {
+                        displayName = "Draw Commands",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => GetInstanceCullerViewStats(viewIndex).drawCommands,
+                    },
+                },
             };
         }
 
         private static object OccluderVersionString(in InstanceOcclusionEventStats stats)
         {
-            return (stats.eventType == InstanceOcclusionEventType.OccluderUpdate || stats.occlusionTest != OcclusionTest.None) ? stats.occluderVersion : "-";
+            return (
+                stats.eventType == InstanceOcclusionEventType.OccluderUpdate
+                || stats.occlusionTest != OcclusionTest.None
+            )
+                ? stats.occluderVersion
+                : "-";
         }
 
         private static object OcclusionTestString(in InstanceOcclusionEventStats stats)
@@ -186,10 +267,18 @@ namespace UnityEngine.Rendering
             return new DebugUI.Table.Row
             {
                 displayName = "",
-                isHiddenCallback = () => { return eventIndex >= GetInstanceOcclusionEventCount(); },
+                isHiddenCallback = () =>
+                {
+                    return eventIndex >= GetInstanceOcclusionEventCount();
+                },
                 children =
                 {
-                    new DebugUI.Value { displayName = "View Instance ID",   refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                    new DebugUI.Value
+                    {
+                        displayName = "View Instance ID",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () =>
                         {
                             var eventStats = GetInstanceOcclusionEventStats(eventIndex);
 #if UNITY_EDITOR
@@ -200,17 +289,65 @@ namespace UnityEngine.Rendering
                             }
 #endif
                             return eventStats.viewID;
-                        }
+                        },
                     },
-                    new DebugUI.Value { displayName = "Event Type",         refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => $"{GetInstanceOcclusionEventStats(eventIndex).eventType}" },
-                    new DebugUI.Value { displayName = "Occluder Version",   refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => OccluderVersionString(GetInstanceOcclusionEventStats(eventIndex)) },
-                    new DebugUI.Value { displayName = "Subview Mask",       refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => $"0x{GetInstanceOcclusionEventStats(eventIndex).subviewMask:X}" },
-                    new DebugUI.Value { displayName = "Occlusion Test",     refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => $"{OcclusionTestString(GetInstanceOcclusionEventStats(eventIndex))}" },
-                    new DebugUI.Value { displayName = "Visible Instances",  refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => VisibleInstancesString(GetInstanceOcclusionEventStats(eventIndex)) },
-                    new DebugUI.Value { displayName = "Culled Instances",   refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => CulledInstancesString(GetInstanceOcclusionEventStats(eventIndex)) },
-                    new DebugUI.Value { displayName = "Visible Primitives",  refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => VisiblePrimitivesString(GetInstanceOcclusionEventStats(eventIndex)) },
-                    new DebugUI.Value { displayName = "Culled Primitives",   refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => CulledPrimitivesString(GetInstanceOcclusionEventStats(eventIndex)) },
-                }
+                    new DebugUI.Value
+                    {
+                        displayName = "Event Type",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => $"{GetInstanceOcclusionEventStats(eventIndex).eventType}",
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Occluder Version",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => OccluderVersionString(GetInstanceOcclusionEventStats(eventIndex)),
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Subview Mask",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => $"0x{GetInstanceOcclusionEventStats(eventIndex).subviewMask:X}",
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Occlusion Test",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => $"{OcclusionTestString(GetInstanceOcclusionEventStats(eventIndex))}",
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Visible Instances",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => VisibleInstancesString(GetInstanceOcclusionEventStats(eventIndex)),
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Culled Instances",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => CulledInstancesString(GetInstanceOcclusionEventStats(eventIndex)),
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Visible Primitives",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => VisiblePrimitivesString(GetInstanceOcclusionEventStats(eventIndex)),
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Culled Primitives",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => CulledPrimitivesString(GetInstanceOcclusionEventStats(eventIndex)),
+                    },
+                },
             };
         }
 
@@ -222,15 +359,32 @@ namespace UnityEngine.Rendering
                 isHiddenCallback = () => index >= GetOcclusionContextsCounts(),
                 children =
                 {
-                    new DebugUI.Value { displayName = "View Instance ID",   refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => GetOccluderStats(index).viewID },
-                    new DebugUI.Value { displayName = "Subview Count",      refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => GetOccluderStats(index).subviewCount },
-                    new DebugUI.Value { displayName = "Size Per Subview",       refreshRate = k_RefreshRate, formatString = k_FormatString, getter =
-                    () =>
+                    new DebugUI.Value
                     {
-                        Vector2Int size = GetOccluderStats(index).occluderMipLayoutSize;
-                        return $"{size.x}x{size.y}";
-                    }},
-                }
+                        displayName = "View Instance ID",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => GetOccluderStats(index).viewID,
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Subview Count",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () => GetOccluderStats(index).subviewCount,
+                    },
+                    new DebugUI.Value
+                    {
+                        displayName = "Size Per Subview",
+                        refreshRate = k_RefreshRate,
+                        formatString = k_FormatString,
+                        getter = () =>
+                        {
+                            Vector2Int size = GetOccluderStats(index).occluderMipLayoutSize;
+                            return $"{size.x}x{size.y}";
+                        },
+                    },
+                },
             };
         }
 
@@ -243,7 +397,7 @@ namespace UnityEngine.Rendering
                 var foldout = new DebugUI.Foldout()
                 {
                     displayName = Strings.drawerSettingsContainerName,
-                    documentationUrl = documentationUrl
+                    documentationUrl = documentationUrl,
                 };
                 AddWidget(foldout);
 
@@ -254,9 +408,11 @@ namespace UnityEngine.Rendering
                     messageCallback = () =>
                     {
                         var settings = GPUResidentDrawer.GetGlobalSettingsFromRPAsset();
-                        return GPUResidentDrawer.IsGPUResidentDrawerSupportedBySRP(settings, out var msg, out var _) ? string.Empty : msg;
+                        return GPUResidentDrawer.IsGPUResidentDrawerSupportedBySRP(settings, out var msg, out var _)
+                            ? string.Empty
+                            : msg;
                     },
-                    isHiddenCallback = () => GPUResidentDrawer.IsInitialized()
+                    isHiddenCallback = () => GPUResidentDrawer.IsInitialized(),
                 };
                 foldout.children.Add(helpBox);
 
@@ -269,31 +425,80 @@ namespace UnityEngine.Rendering
                 if (!GPUResidentDrawer.IsInitialized())
                     return;
 
-                foldout.children.Add(new Container()
-                {
-                    displayName = Strings.occlusionCullingTitle,
-                    isHiddenCallback = () => !GPUResidentDrawer.IsInitialized(),
-                    children =
+                foldout.children.Add(
+                    new Container()
                     {
-                        new DebugUI.BoolField { nameAndTooltip = Strings.occlusionTestOverlayEnable, getter = () => data.occlusionTestOverlayEnabled, setter = value => data.occlusionTestOverlayEnabled = value},
-                        new DebugUI.BoolField { nameAndTooltip = Strings.occlusionTestOverlayCountVisible, getter = () => data.occlusionTestOverlayCountVisible, setter = value => data.occlusionTestOverlayCountVisible = value},
-                        new DebugUI.BoolField { nameAndTooltip = Strings.overrideOcclusionTestToAlwaysPass, getter = () => data.overrideOcclusionTestToAlwaysPass, setter = value => data.overrideOcclusionTestToAlwaysPass = value},
-                        new DebugUI.BoolField { nameAndTooltip = Strings.occluderContextStats, getter = () => data.occluderContextStats, setter = value => data.occluderContextStats = value},
-                        new DebugUI.BoolField { nameAndTooltip = Strings.occluderDebugViewEnable, getter = () => data.occluderDebugViewEnable, setter = value => data.occluderDebugViewEnable = value},
-                        new DebugUI.IntField { nameAndTooltip = Strings.occluderDebugViewIndex, getter = () => data.occluderDebugViewIndex, setter = value => data.occluderDebugViewIndex = value, isHiddenCallback = () => !data.occluderDebugViewEnable, min = () => 0, max = () => Math.Max(GetOcclusionContextsCounts() - 1, 0) },
-                        new DebugUI.FloatField {nameAndTooltip = Strings.occluderDebugViewRangeMin, getter = () => data.occluderDebugViewRange.x, setter = value => data.occluderDebugViewRange.x = value, isHiddenCallback = () => !data.occluderDebugViewEnable},
-                        new DebugUI.FloatField {nameAndTooltip = Strings.occluderDebugViewRangeMax, getter = () => data.occluderDebugViewRange.y, setter = value => data.occluderDebugViewRange.y = value, isHiddenCallback = () => !data.occluderDebugViewEnable}
+                        displayName = Strings.occlusionCullingTitle,
+                        isHiddenCallback = () => !GPUResidentDrawer.IsInitialized(),
+                        children =
+                        {
+                            new DebugUI.BoolField
+                            {
+                                nameAndTooltip = Strings.occlusionTestOverlayEnable,
+                                getter = () => data.occlusionTestOverlayEnabled,
+                                setter = value => data.occlusionTestOverlayEnabled = value,
+                            },
+                            new DebugUI.BoolField
+                            {
+                                nameAndTooltip = Strings.occlusionTestOverlayCountVisible,
+                                getter = () => data.occlusionTestOverlayCountVisible,
+                                setter = value => data.occlusionTestOverlayCountVisible = value,
+                            },
+                            new DebugUI.BoolField
+                            {
+                                nameAndTooltip = Strings.overrideOcclusionTestToAlwaysPass,
+                                getter = () => data.overrideOcclusionTestToAlwaysPass,
+                                setter = value => data.overrideOcclusionTestToAlwaysPass = value,
+                            },
+                            new DebugUI.BoolField
+                            {
+                                nameAndTooltip = Strings.occluderContextStats,
+                                getter = () => data.occluderContextStats,
+                                setter = value => data.occluderContextStats = value,
+                            },
+                            new DebugUI.BoolField
+                            {
+                                nameAndTooltip = Strings.occluderDebugViewEnable,
+                                getter = () => data.occluderDebugViewEnable,
+                                setter = value => data.occluderDebugViewEnable = value,
+                            },
+                            new DebugUI.IntField
+                            {
+                                nameAndTooltip = Strings.occluderDebugViewIndex,
+                                getter = () => data.occluderDebugViewIndex,
+                                setter = value => data.occluderDebugViewIndex = value,
+                                isHiddenCallback = () => !data.occluderDebugViewEnable,
+                                min = () => 0,
+                                max = () => Math.Max(GetOcclusionContextsCounts() - 1, 0),
+                            },
+                            new DebugUI.FloatField
+                            {
+                                nameAndTooltip = Strings.occluderDebugViewRangeMin,
+                                getter = () => data.occluderDebugViewRange.x,
+                                setter = value => data.occluderDebugViewRange.x = value,
+                                isHiddenCallback = () => !data.occluderDebugViewEnable,
+                            },
+                            new DebugUI.FloatField
+                            {
+                                nameAndTooltip = Strings.occluderDebugViewRangeMax,
+                                getter = () => data.occluderDebugViewRange.y,
+                                setter = value => data.occluderDebugViewRange.y = value,
+                                isHiddenCallback = () => !data.occluderDebugViewEnable,
+                            },
+                        },
                     }
-                });
+                );
                 AddOcclusionContextStatsWidget(data);
 
-                foldout.children.Add(new DebugUI.BoolField
-                {
-                    nameAndTooltip = Strings.displayBatcherStats,
-                    getter = () => data.displayBatcherStats,
-                    setter = value => data.displayBatcherStats = value,
-                    isHiddenCallback = () => !GPUResidentDrawer.IsInitialized()
-                });
+                foldout.children.Add(
+                    new DebugUI.BoolField
+                    {
+                        nameAndTooltip = Strings.displayBatcherStats,
+                        getter = () => data.displayBatcherStats,
+                        setter = value => data.displayBatcherStats = value,
+                        isHiddenCallback = () => !GPUResidentDrawer.IsInitialized(),
+                    }
+                );
 
                 AddInstanceCullingStatsWidget(data);
             }
@@ -303,7 +508,7 @@ namespace UnityEngine.Rendering
                 // Reload the UI if GRD enabled state changes, from disabled to enabled only, as the UI did not have all the widgets and we need to add them
                 // in assembly reloads, or entering playmode we do not have this code path and the SettingsPanel will be recreated itself by the Rendering Debugger
                 // reconstruction.
-                if ( previousValue == false && currentValue == true )
+                if (previousValue == false && currentValue == true)
                     DebugManager.instance.Reset();
             }
 
@@ -320,121 +525,160 @@ namespace UnityEngine.Rendering
                     displayName = "Instance Culler Stats",
                     isHeader = true,
                     opened = true,
-                    isHiddenCallback = () => !data.displayBatcherStats
+                    isHiddenCallback = () => !data.displayBatcherStats,
                 };
 
-                instanceCullerStats.children.Add(new DebugUI.ValueTuple()
-                {
-                    displayName = "View Count",
-                    values = new[]
+                instanceCullerStats.children.Add(
+                    new DebugUI.ValueTuple()
                     {
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => GetInstanceCullerViewCount() }
-                    }
-                });
-
-                instanceCullerStats.children.Add(new DebugUI.ValueTuple()
-                {
-                    displayName = "Total Visible Instances (Cameras | Lights | Both)",
-                    values = new[]
-                    {
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
-                            {
-                                int totalGRDInstances = 0;
-
-                                for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
-                                {
-                                    var viewStats = GetInstanceCullerViewStats(viewIndex);
-                                    if (viewStats.viewType == BatchCullingViewType.Camera)
-                                        totalGRDInstances += viewStats.visibleInstancesOnGPU;
-                                }
-                                return totalGRDInstances;
-                            }
-                        },
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
-                            {
-                                int totalGRDInstances = 0;
-
-                                for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
-                                {
-                                    var viewStats = GetInstanceCullerViewStats(viewIndex);
-                                    if (viewStats.viewType == BatchCullingViewType.Light)
-                                        totalGRDInstances += viewStats.visibleInstancesOnGPU;
-                                }
-                                return totalGRDInstances;
-                            }
-                        },
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                        displayName = "View Count",
+                        values = new[]
                         {
-                            int totalGRDInstances = 0;
-
-                            for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                            new DebugUI.Value
                             {
-                                var viewStats = GetInstanceCullerViewStats(viewIndex);
-                                if (viewStats.viewType != BatchCullingViewType.Filtering
-                                    && viewStats.viewType != BatchCullingViewType.Picking
-                                    && viewStats.viewType != BatchCullingViewType.SelectionOutline)
-                                    totalGRDInstances += viewStats.visibleInstancesOnGPU;
-                            }
-                            return totalGRDInstances;
-                        }
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () => GetInstanceCullerViewCount(),
+                            },
                         },
                     }
-                });
+                );
 
-                instanceCullerStats.children.Add(new DebugUI.ValueTuple()
-                {
-                    displayName = "Total Visible Primitives (Cameras | Lights | Both)",
-                    values = new[]
+                instanceCullerStats.children.Add(
+                    new DebugUI.ValueTuple()
                     {
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                        displayName = "Total Visible Instances (Cameras | Lights | Both)",
+                        values = new[]
+                        {
+                            new DebugUI.Value
                             {
-                                int totalGRDPrimitives = 0;
-
-                                for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () =>
                                 {
-                                    var viewStats = GetInstanceCullerViewStats(viewIndex);
-                                    if (viewStats.viewType == BatchCullingViewType.Camera)
-                                        totalGRDPrimitives += viewStats.visiblePrimitivesOnGPU;
-                                }
-                                return totalGRDPrimitives;
-                            }
-                        },
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                                    int totalGRDInstances = 0;
+
+                                    for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                    {
+                                        var viewStats = GetInstanceCullerViewStats(viewIndex);
+                                        if (viewStats.viewType == BatchCullingViewType.Camera)
+                                            totalGRDInstances += viewStats.visibleInstancesOnGPU;
+                                    }
+                                    return totalGRDInstances;
+                                },
+                            },
+                            new DebugUI.Value
                             {
-                                int totalGRDPrimitives = 0;
-
-                                for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () =>
                                 {
-                                    var viewStats = GetInstanceCullerViewStats(viewIndex);
-                                    if (viewStats.viewType == BatchCullingViewType.Light)
-                                        totalGRDPrimitives += viewStats.visiblePrimitivesOnGPU;
-                                }
-                                return totalGRDPrimitives;
-                            }
-                        },
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () =>
+                                    int totalGRDInstances = 0;
+
+                                    for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                    {
+                                        var viewStats = GetInstanceCullerViewStats(viewIndex);
+                                        if (viewStats.viewType == BatchCullingViewType.Light)
+                                            totalGRDInstances += viewStats.visibleInstancesOnGPU;
+                                    }
+                                    return totalGRDInstances;
+                                },
+                            },
+                            new DebugUI.Value
                             {
-                                int totalGRDPrimitives = 0;
-
-                                for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () =>
                                 {
-                                    var viewStats = GetInstanceCullerViewStats(viewIndex);
-                                    if (viewStats.viewType != BatchCullingViewType.Filtering
-                                        && viewStats.viewType != BatchCullingViewType.Picking
-                                        && viewStats.viewType != BatchCullingViewType.SelectionOutline)
-                                        totalGRDPrimitives += viewStats.visiblePrimitivesOnGPU;
-                                }
-                                return totalGRDPrimitives;
-                            }
+                                    int totalGRDInstances = 0;
+
+                                    for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                    {
+                                        var viewStats = GetInstanceCullerViewStats(viewIndex);
+                                        if (
+                                            viewStats.viewType != BatchCullingViewType.Filtering
+                                            && viewStats.viewType != BatchCullingViewType.Picking
+                                            && viewStats.viewType != BatchCullingViewType.SelectionOutline
+                                        )
+                                            totalGRDInstances += viewStats.visibleInstancesOnGPU;
+                                    }
+                                    return totalGRDInstances;
+                                },
+                            },
                         },
                     }
-                });
+                );
+
+                instanceCullerStats.children.Add(
+                    new DebugUI.ValueTuple()
+                    {
+                        displayName = "Total Visible Primitives (Cameras | Lights | Both)",
+                        values = new[]
+                        {
+                            new DebugUI.Value
+                            {
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () =>
+                                {
+                                    int totalGRDPrimitives = 0;
+
+                                    for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                    {
+                                        var viewStats = GetInstanceCullerViewStats(viewIndex);
+                                        if (viewStats.viewType == BatchCullingViewType.Camera)
+                                            totalGRDPrimitives += viewStats.visiblePrimitivesOnGPU;
+                                    }
+                                    return totalGRDPrimitives;
+                                },
+                            },
+                            new DebugUI.Value
+                            {
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () =>
+                                {
+                                    int totalGRDPrimitives = 0;
+
+                                    for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                    {
+                                        var viewStats = GetInstanceCullerViewStats(viewIndex);
+                                        if (viewStats.viewType == BatchCullingViewType.Light)
+                                            totalGRDPrimitives += viewStats.visiblePrimitivesOnGPU;
+                                    }
+                                    return totalGRDPrimitives;
+                                },
+                            },
+                            new DebugUI.Value
+                            {
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () =>
+                                {
+                                    int totalGRDPrimitives = 0;
+
+                                    for (int viewIndex = 0; viewIndex < GetInstanceCullerViewCount(); viewIndex++)
+                                    {
+                                        var viewStats = GetInstanceCullerViewStats(viewIndex);
+                                        if (
+                                            viewStats.viewType != BatchCullingViewType.Filtering
+                                            && viewStats.viewType != BatchCullingViewType.Picking
+                                            && viewStats.viewType != BatchCullingViewType.SelectionOutline
+                                        )
+                                            totalGRDPrimitives += viewStats.visiblePrimitivesOnGPU;
+                                    }
+                                    return totalGRDPrimitives;
+                                },
+                            },
+                        },
+                    }
+                );
 
                 DebugUI.Table viewTable = new DebugUI.Table
                 {
                     displayName = "",
                     displayRowNames = false,
-                    isReadOnly = true
+                    isReadOnly = true,
                 };
 
                 // Always add all possible rows, they are dynamically hidden based on actual data
@@ -446,18 +690,17 @@ namespace UnityEngine.Rendering
                     displayName = "Per View Stats",
                     isHeader = true,
                     opened = false,
-                    isHiddenCallback = () => !data.displayBatcherStats
+                    isHiddenCallback = () => !data.displayBatcherStats,
                 };
                 perViewStats.children.Add(viewTable);
 
                 instanceCullerStats.children.Add(perViewStats);
 
-
                 DebugUI.Table eventTable = new DebugUI.Table
                 {
-                    displayName = "",   // First column is empty because its content needs to change dynamically
+                    displayName = "", // First column is empty because its content needs to change dynamically
                     displayRowNames = false,
-                    isReadOnly = true
+                    isReadOnly = true,
                 };
 
                 // Always add all possible rows, they are dynamically hidden based on actual data
@@ -469,15 +712,15 @@ namespace UnityEngine.Rendering
                     displayName = "Occlusion Culling Events",
                     isHeader = true,
                     opened = false,
-                    isHiddenCallback = () => !data.displayBatcherStats
+                    isHiddenCallback = () => !data.displayBatcherStats,
                 };
                 perEventStats.children.Add(eventTable);
 
                 instanceCullerStats.children.Add(perEventStats);
 
-
                 AddWidget(instanceCullerStats);
             }
+
             private void AddOcclusionContextStatsWidget(DebugDisplayGPUResidentDrawer data)
             {
                 var visibilityStats = new DebugUI.Foldout
@@ -485,22 +728,29 @@ namespace UnityEngine.Rendering
                     displayName = "Occlusion Context Stats",
                     isHeader = true,
                     opened = true,
-                    isHiddenCallback = () => !data.occluderContextStats
+                    isHiddenCallback = () => !data.occluderContextStats,
                 };
 
-                visibilityStats.children.Add(new DebugUI.ValueTuple()
-                {
-                    displayName = "Active Occlusion Contexts",
-                    values = new[]
+                visibilityStats.children.Add(
+                    new DebugUI.ValueTuple()
                     {
-                        new DebugUI.Value { refreshRate = k_RefreshRate, formatString = k_FormatString, getter = () => GetOcclusionContextsCounts() }
+                        displayName = "Active Occlusion Contexts",
+                        values = new[]
+                        {
+                            new DebugUI.Value
+                            {
+                                refreshRate = k_RefreshRate,
+                                formatString = k_FormatString,
+                                getter = () => GetOcclusionContextsCounts(),
+                            },
+                        },
                     }
-                });
+                );
 
                 DebugUI.Table viewTable = new DebugUI.Table
                 {
-                    displayName = "",   // First column is empty because its content needs to change dynamically
-                    isReadOnly = true
+                    displayName = "", // First column is empty because its content needs to change dynamically
+                    isReadOnly = true,
                 };
 
                 // Always add all possible rows, they are dynamically hidden based on actual data
@@ -511,7 +761,6 @@ namespace UnityEngine.Rendering
 
                 AddWidget(visibilityStats);
             }
-
         }
 
         #region IDebugDisplaySettingsQuery

@@ -1,4 +1,3 @@
-
 namespace UnityEngine.PathTracing.Core
 {
     internal static class ShaderProperties

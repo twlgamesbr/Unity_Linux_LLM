@@ -12,11 +12,13 @@ namespace Unity.Entities.Editor
 
         // internal for test.
         internal MultiColumnTreeView MultiColumnTreeViewElement { get; }
-        internal IList<TreeViewItemData<SystemTreeViewItemData>> TreeViewRootItems { get; } = new List<TreeViewItemData<SystemTreeViewItemData>>();
-        // Column Labels
-        static readonly ObjectPool<VisualElement> k_CellLabelPool = new (() => new VisualElement());
+        internal IList<TreeViewItemData<SystemTreeViewItemData>> TreeViewRootItems { get; } =
+            new List<TreeViewItemData<SystemTreeViewItemData>>();
 
-        internal readonly List<TreeViewItemData<SystemTreeViewItemData>> m_ListViewFilteredItems = new ();
+        // Column Labels
+        static readonly ObjectPool<VisualElement> k_CellLabelPool = new(() => new VisualElement());
+
+        internal readonly List<TreeViewItemData<SystemTreeViewItemData>> m_ListViewFilteredItems = new();
 
         internal System.Action<SystemProxy> systemSelectionChanged;
 
@@ -60,10 +62,7 @@ namespace Unity.Entities.Editor
                 autoExpand = true,
                 viewDataKey = "full-view",
                 selectionType = SelectionType.Single,
-                style =
-                {
-                    flexGrow = 1
-                }
+                style = { flexGrow = 1 },
             };
 
             CreateColumns();
@@ -90,7 +89,10 @@ namespace Unity.Entities.Editor
 
             MultiColumnTreeViewElement.RegisterCallback<PointerDownEvent>(evt =>
             {
-                if (evt.target == MultiColumnTreeViewElement.Q(className: ScrollView.contentAndVerticalScrollUssClassName))
+                if (
+                    evt.target
+                    == MultiColumnTreeViewElement.Q(className: ScrollView.contentAndVerticalScrollUssClassName)
+                )
                     Selection.activeObject = null;
             });
         }
@@ -102,11 +104,11 @@ namespace Unity.Entities.Editor
             if (ShowWorldColumn)
                 MultiColumnTreeViewElement.columns.Add(m_WorldColumn);
             if (ShowNamespaceColumn)
-                    MultiColumnTreeViewElement.columns.Add(m_NamespaceColumn);
+                MultiColumnTreeViewElement.columns.Add(m_NamespaceColumn);
             if (ShowEntityCountColumn)
-                    MultiColumnTreeViewElement.columns.Add(m_EntityCountColumn);
+                MultiColumnTreeViewElement.columns.Add(m_EntityCountColumn);
             if (ShowTimeColumn)
-                    MultiColumnTreeViewElement.columns.Add(m_RunningTimeColumn);
+                MultiColumnTreeViewElement.columns.Add(m_RunningTimeColumn);
             Resources.Templates.SystemScheduleItem.AddStyles(MultiColumnTreeViewElement);
         }
 
@@ -131,7 +133,7 @@ namespace Unity.Entities.Editor
                 optional = false,
                 destroyCell = ReleaseTreeViewItem,
                 minWidth = 100,
-                width = 300
+                width = 300,
             };
 
             m_WorldColumn = new Column()
@@ -148,7 +150,7 @@ namespace Unity.Entities.Editor
                 makeCell = MakeCellLabel,
                 bindCell = BindWorldCell,
                 resizable = true,
-                width = 100
+                width = 100,
             };
 
             m_NamespaceColumn = new Column()
@@ -165,7 +167,7 @@ namespace Unity.Entities.Editor
                 makeCell = MakeCellLabel,
                 bindCell = BindNamespaceCell,
                 resizable = true,
-                width = 100
+                width = 100,
             };
 
             m_EntityCountColumn = new Column()
@@ -182,10 +184,10 @@ namespace Unity.Entities.Editor
                 makeCell = MakeCellLabel,
                 bindCell = BindEntityCountCell,
                 resizable = true,
-                width = 100
+                width = 100,
             };
 
-           m_RunningTimeColumn = new Column()
+            m_RunningTimeColumn = new Column()
             {
                 name = SystemScheduleWindow.Contents.Time,
                 makeHeader = MakeHeaderLabel,
@@ -199,9 +201,10 @@ namespace Unity.Entities.Editor
                 makeCell = MakeCellLabel,
                 bindCell = BindRunningTimeCell,
                 resizable = true,
-                width = 100
+                width = 100,
             };
         }
+
         void OnSelectionChanged(IEnumerable<object> selection)
         {
             SystemTreeViewItemData selectedItem = null;
@@ -233,10 +236,7 @@ namespace Unity.Entities.Editor
         {
             var element = new VisualElement();
             Resources.Templates.SystemScheduleTreeViewHeader.AddStyles(element);
-            var label = new Label
-            {
-                name = "Header",
-            };
+            var label = new Label { name = "Header" };
             element.Add(label);
             return element;
         }
@@ -245,10 +245,7 @@ namespace Unity.Entities.Editor
         {
             var element = k_CellLabelPool.Get();
             Resources.Templates.SystemScheduleItem.AddStyles(element);
-            var label = new Label
-            {
-                name = "Cell"
-            };
+            var label = new Label { name = "Cell" };
             element.Add(label);
             return element;
         }
@@ -257,7 +254,7 @@ namespace Unity.Entities.Editor
 
         static void ReleaseTreeViewItem(VisualElement ve)
         {
-            if(ve  != null)
+            if (ve != null)
                 ((SystemInformationVisualElement)ve).Release();
         }
 
@@ -315,10 +312,7 @@ namespace Unity.Entities.Editor
         {
             if (item.SystemProxy.Valid)
             {
-                var systemForSearch = new SystemDescriptor(item.SystemProxy)
-                {
-                    Node = item.Node,
-                };
+                var systemForSearch = new SystemDescriptor(item.SystemProxy) { Node = item.Node };
                 m_AllSystemsForSearch.Add(systemForSearch);
                 SystemProxy.BuildSystemDependencyMap(item.SystemProxy, m_SystemDependencyMap);
             }
@@ -343,7 +337,10 @@ namespace Unity.Entities.Editor
             return result;
         }
 
-        static void FillSystemDependencyCache(List<SystemDescriptor> descriptors, Dictionary<string, string[]> dependencyMap)
+        static void FillSystemDependencyCache(
+            List<SystemDescriptor> descriptors,
+            Dictionary<string, string[]> dependencyMap
+        )
         {
             foreach (var desc in descriptors)
             {
@@ -389,7 +386,9 @@ namespace Unity.Entities.Editor
             foreach (var system in m_SearchResultsFlatSystemList)
             {
                 var listViewItems = SystemTreeViewItemData.Acquire(LocalSystemGraph, system.Node, m_WorldProxy);
-                m_ListViewFilteredItems.Add(new TreeViewItemData<SystemTreeViewItemData>(listViewItems.id, listViewItems));
+                m_ListViewFilteredItems.Add(
+                    new TreeViewItemData<SystemTreeViewItemData>(listViewItems.id, listViewItems)
+                );
             }
         }
 
@@ -420,7 +419,11 @@ namespace Unity.Entities.Editor
         public void SetSelection()
         {
             // Update last selected item ID if we have a valid selected system
-            if (SelectedSystem.Valid && (m_WorldProxy == null || SelectedSystem.WorldProxy.Equals(m_WorldProxy)) && m_AllSystemsForSearch.Count > 0)
+            if (
+                SelectedSystem.Valid
+                && (m_WorldProxy == null || SelectedSystem.WorldProxy.Equals(m_WorldProxy))
+                && m_AllSystemsForSearch.Count > 0
+            )
             {
                 SystemDescriptor selectedSystem = null;
                 foreach (var s in m_AllSystemsForSearch)
@@ -444,7 +447,7 @@ namespace Unity.Entities.Editor
             if (MultiColumnTreeViewElement.GetItemDataForId<SystemTreeViewItemData>(m_LastSelectedItemId) == null)
                 return;
 
-            MultiColumnTreeViewElement.SetSelectionByIdWithoutNotify(new []{ m_LastSelectedItemId });
+            MultiColumnTreeViewElement.SetSelectionByIdWithoutNotify(new[] { m_LastSelectedItemId });
             MultiColumnTreeViewElement.RefreshItems();
             MultiColumnTreeViewElement.ScrollToItemById(m_LastSelectedItemId);
         }
@@ -535,8 +538,7 @@ namespace Unity.Entities.Editor
                     var groupState = progressItem.SystemProxy.Enabled && progressItem.GetParentState();
                     label.SetEnabled(groupState);
                 }
-                if (!Show0sInEntityCountAndTimeColumn &&
-                    (runningTime.Equals("0.00") || runningTime.Equals("0.0000")))
+                if (!Show0sInEntityCountAndTimeColumn && (runningTime.Equals("0.00") || runningTime.Equals("0.0000")))
                 {
                     label.Hide();
                 }

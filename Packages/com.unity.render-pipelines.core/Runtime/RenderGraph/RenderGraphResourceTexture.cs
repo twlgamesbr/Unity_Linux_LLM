@@ -42,11 +42,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// To ensure this behavior, Unity will store the content for texture upside down (flipped) on modern graphics APIs.
         /// </summary>
         BottomLeft,
+
         /// <summary>
         /// The UV coordinate (0,0) in a shader will sample the TOP left texel of the texture. This matches the standard of modern graphics APIs (Vulkan, DX, Metal,...).
         /// The actual backbuffer will have a TopLeft orientation when a modern graphics API is active.
         /// </summary>
-        TopLeft
+        TopLeft,
     }
 
     /// <summary>
@@ -61,17 +62,18 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// To ensure this behavior, Unity will store the content for texture upside down (flipped) on modern graphics APIs.
         /// </summary>
         BottomLeft,
+
         /// <summary>
         /// The UV coordinate (0,0) in a shader will sample the TOP left texel of the texture. This matches the standard of modern graphics APIs (Vulkan, DX, Metal,...).
         /// The actual backbuffer will have a TopLeft orientation when a modern graphics API is active.
         /// </summary>
         TopLeft,
+
         /// <summary>
         /// The orientation has not been assigned yet.
         /// </summary>
-        Unknown
+        Unknown,
     }
-
 
     /// <summary>
     /// An abstract handle representing a texture resource as known by one particular record + execute of the render graph.
@@ -104,7 +106,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// Returns a null texture handle
         /// </summary>
         /// <value>A null texture handle.</value>
-        public static TextureHandle nullHandle { get { return s_NullHandle; } }
+        public static TextureHandle nullHandle
+        {
+            get { return s_NullHandle; }
+        }
 
         internal readonly ResourceHandle handle;
 
@@ -127,28 +132,34 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </summary>
         /// <param name="texture">Input TextureHandle.</param>
         /// <returns>Resource as a RenderTargetIdentifier.</returns>
-        public static implicit operator RenderTargetIdentifier(TextureHandle texture) => texture.IsValid() ? RenderGraphResourceRegistry.current.GetTexture(texture) : default(RenderTargetIdentifier);
+        public static implicit operator RenderTargetIdentifier(TextureHandle texture) =>
+            texture.IsValid()
+                ? RenderGraphResourceRegistry.current.GetTexture(texture)
+                : default(RenderTargetIdentifier);
 
         /// <summary>
         /// Cast to Texture
         /// </summary>
         /// <param name="texture">Input TextureHandle.</param>
         /// <returns>Resource as a Texture.</returns>
-        public static implicit operator Texture(TextureHandle texture) => texture.IsValid() ? RenderGraphResourceRegistry.current.GetTexture(texture) : null;
+        public static implicit operator Texture(TextureHandle texture) =>
+            texture.IsValid() ? RenderGraphResourceRegistry.current.GetTexture(texture) : null;
 
         /// <summary>
         /// Cast to RenderTexture
         /// </summary>
         /// <param name="texture">Input TextureHandle.</param>
         /// <returns>Resource as a RenderTexture.</returns>
-        public static implicit operator RenderTexture(TextureHandle texture) => texture.IsValid() ? RenderGraphResourceRegistry.current.GetTexture(texture) : null;
+        public static implicit operator RenderTexture(TextureHandle texture) =>
+            texture.IsValid() ? RenderGraphResourceRegistry.current.GetTexture(texture) : null;
 
         /// <summary>
         /// Cast to RTHandle
         /// </summary>
         /// <param name="texture">Input TextureHandle.</param>
         /// <returns>Resource as a RTHandle.</returns>
-        public static implicit operator RTHandle(TextureHandle texture) => texture.IsValid() ? RenderGraphResourceRegistry.current.GetTexture(texture) : null;
+        public static implicit operator RTHandle(TextureHandle texture) =>
+            texture.IsValid() ? RenderGraphResourceRegistry.current.GetTexture(texture) : null;
 
         /// <summary>
         /// Determines whether this instance and another specified <see cref="TextureHandle"/> object have the same underlying resource handle.
@@ -215,7 +226,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// </summary>
         /// <param name="renderGraph">The rendergraph instance that was used to create the texture on. Texture handles are a lightweight object, all information is stored on the RenderGraph itself.</param>
         /// <returns>The texture descriptor for the given texture handle.</returns>
-        public TextureDesc GetDescriptor(RenderGraph renderGraph) { return renderGraph.GetTextureDesc(this); }
+        public TextureDesc GetDescriptor(RenderGraph renderGraph)
+        {
+            return renderGraph.GetTextureDesc(this);
+        }
     }
 
     /// <summary>
@@ -225,10 +239,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         ///<summary>Explicit size.</summary>
         Explicit,
+
         ///<summary>Size automatically scaled by a Vector.</summary>
         Scale,
+
         ///<summary>Size automatically scaled by a Functor.</summary>
-        Functor
+        Functor,
     }
 
     /// <summary>
@@ -238,8 +254,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         ///<summary>Whether the texture will be in fast memory.</summary>
         public bool inFastMemory;
+
         ///<summary>Flag to determine what parts of the render target is spilled if not fully resident in fast memory.</summary>
         public FastMemoryFlags flags;
+
         ///<summary>How much of the render target is to be switched into fast memory (between 0 and 1).</summary>
         public float residencyFraction;
     }
@@ -251,44 +269,64 @@ namespace UnityEngine.Rendering.RenderGraphModule
     {
         ///<summary>Texture sizing mode.</summary>
         public TextureSizeMode sizeMode;
+
         ///<summary>Texture width.</summary>
         public int width;
+
         ///<summary>Texture height.</summary>
         public int height;
+
         ///<summary>Number of texture slices.</summary>
         public int slices;
+
         ///<summary>Texture scale.</summary>
         public Vector2 scale;
+
         ///<summary>Texture scale function.</summary>
         public ScaleFunc func;
+
         ///<summary>Color or depth stencil format.</summary>
         public GraphicsFormat format;
+
         ///<summary>Filtering mode.</summary>
         public FilterMode filterMode;
+
         ///<summary>Addressing mode.</summary>
         public TextureWrapMode wrapMode;
+
         ///<summary>Texture dimension.</summary>
         public TextureDimension dimension;
+
         ///<summary>Enable random UAV read/write on the texture.</summary>
         public bool enableRandomWrite;
+
         ///<summary>Texture needs mip maps.</summary>
         public bool useMipMap;
+
         ///<summary>Automatically generate mip maps.</summary>
         public bool autoGenerateMips;
+
         ///<summary>Texture is a shadow map.</summary>
         public bool isShadowMap;
+
         ///<summary>Anisotropic filtering level.</summary>
         public int anisoLevel;
+
         ///<summary>Mip map bias.</summary>
         public float mipMapBias;
+
         ///<summary>Number of MSAA samples.</summary>
         public MSAASamples msaaSamples;
+
         ///<summary>Bind texture multi sampled.</summary>
         public bool bindTextureMS;
+
         ///<summary>[See Dynamic Resolution documentation](https://docs.unity3d.com/Manual/DynamicResolution.html)</summary>
         public bool useDynamicScale;
+
         ///<summary>[See Dynamic Resolution documentation](https://docs.unity3d.com/Manual/DynamicResolution.html)</summary>
         public bool useDynamicScaleExplicit;
+
         ///<summary>
         ///[See Memoryless documentation](https://docs.unity3d.com/ScriptReference/RenderTextureMemoryless.html)
         ///</summary>
@@ -296,6 +334,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
         ///If this is a Render Graph created resource only used in a single raster render pass, and not sampled (no UseTexture() usage), Render Graph will automatically set this resource as memoryless.
         ///</remarks>
         public RenderTextureMemoryless memoryless;
+
         ///<summary>Special treatment of the VR eye texture used in stereoscopic rendering.</summary>
         public VRTextureUsage vrUsage;
 
@@ -310,10 +349,13 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         ///<summary>Texture name.</summary>
         public string name;
+
         ///<summary>Descriptor to determine how the texture will be in fast memory on platform that supports it.</summary>
         public FastMemoryDesc fastMemoryDesc;
+
         ///<summary>Determines whether the texture will fallback to a black texture if it is read without ever writing to it.</summary>
         public bool fallBackToBlackTexture;
+
         ///<summary>
         ///If all passes writing to a texture are culled by Dynamic Render Pass Culling, it will automatically fallback to a similar preallocated texture.
         ///Set this to true to force the allocation.
@@ -323,12 +365,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
         // Initial state. Those should not be used in the hash
         ///<summary>Texture needs to be cleared on first use.</summary>
         public bool clearBuffer;
+
         ///<summary>Clear color.</summary>
         public Color clearColor;
 
         ///<summary>Texture needs to be discarded on last use.</summary>
         public bool discardBuffer;
-
 
         ///<summary>Depth buffer bit depth of the format. The setter convert the bits to valid depth stencil format and sets the format. The getter gets the depth bits of the format.</summary>
         public DepthBits depthBufferBits
@@ -338,7 +380,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
             {
                 if (value == DepthBits.None)
                 {
-                    if( !GraphicsFormatUtility.IsDepthStencilFormat(format) )
+                    if (!GraphicsFormatUtility.IsDepthStencilFormat(format))
                         return;
                     else
                         format = GraphicsFormat.None;
@@ -454,7 +496,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
             slices = input.volumeDepth;
             scale = Vector2.one;
             func = null;
-            format = (input.depthStencilFormat != GraphicsFormat.None) ? input.depthStencilFormat : input.graphicsFormat;
+            format =
+                (input.depthStencilFormat != GraphicsFormat.None) ? input.depthStencilFormat : input.graphicsFormat;
             filterMode = FilterMode.Bilinear;
             wrapMode = TextureWrapMode.Clamp;
             dimension = input.dimension;
@@ -486,7 +529,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
         /// render graph textures using this TextureDesc due to the underlying RTHandle system.
         /// </summary>
         /// <param name="input">The texture to create a TextureDesc from</param>
-        public TextureDesc(RenderTexture input) : this(input.descriptor)
+        public TextureDesc(RenderTexture input)
+            : this(input.descriptor)
         {
             filterMode = input.filterMode;
             wrapMode = input.wrapMode;
@@ -519,12 +563,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
             hashCode.Append(mipMapBias);
             hashCode.Append(slices);
-            hashCode.Append((int) format);
-            hashCode.Append((int) filterMode);
-            hashCode.Append((int) wrapMode);
-            hashCode.Append((int) dimension);
-            hashCode.Append((int) memoryless);
-            hashCode.Append((int) vrUsage);
+            hashCode.Append((int)format);
+            hashCode.Append((int)filterMode);
+            hashCode.Append((int)wrapMode);
+            hashCode.Append((int)dimension);
+            hashCode.Append((int)memoryless);
+            hashCode.Append((int)vrUsage);
             hashCode.Append(anisoLevel);
             hashCode.Append(enableRandomWrite);
             hashCode.Append(useMipMap);
@@ -532,7 +576,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
             hashCode.Append(isShadowMap);
             hashCode.Append(bindTextureMS);
             hashCode.Append(useDynamicScale);
-            hashCode.Append((int) msaaSamples);
+            hashCode.Append((int)msaaSamples);
             hashCode.Append(fastMemoryDesc.inFastMemory);
             hashCode.Append(enableShadingRate);
             return hashCode.value;
@@ -551,7 +595,7 @@ namespace UnityEngine.Rendering.RenderGraphModule
                 TextureSizeMode.Explicit => new Vector2Int(width, height),
                 TextureSizeMode.Scale => RTHandles.CalculateDimensions(scale),
                 TextureSizeMode.Functor => RTHandles.CalculateDimensions(func),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
         }
     }
@@ -572,7 +616,10 @@ namespace UnityEngine.Rendering.RenderGraphModule
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetDescHashCode() { return desc.GetHashCode(); }
+        public override int GetDescHashCode()
+        {
+            return desc.GetHashCode();
+        }
 
         public override void CreateGraphicsResource()
         {
@@ -653,12 +700,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
             return Profiling.Profiler.GetRuntimeMemorySizeLong(res.rt);
         }
 
-        override protected string GetResourceTypeName()
+        protected override string GetResourceTypeName()
         {
             return "Texture";
         }
 
-        override protected ulong GetSortIndex(RTHandle res)
+        protected override ulong GetSortIndex(RTHandle res)
         {
             return res.GetUniqueID();
         }
